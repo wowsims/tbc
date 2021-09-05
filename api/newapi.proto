@@ -1,0 +1,274 @@
+syntax = "proto3";
+package newapi;
+
+option go_package = "tbc/newapi";
+
+enum RaceBonusType {
+    NONE = 0;
+    TROLL10 = 1;
+    TROLL30 = 2;
+    ORC = 3;
+    TAUREN = 4;
+    UNDEAD = 5;
+    BLOODELF = 6;
+    HUMAN = 7;
+    DWARF = 8;
+    GNOME = 9;
+    NIGHTELF = 10;
+    DRAENEI = 11;
+}
+
+enum Stat {
+	Intellect = 0;
+	Stamina = 1;
+	Strength = 2;
+	Agility = 3;
+	Spirit = 4;
+	SpellCrit = 5;
+	SpellHit = 6;
+	Healing = 7;
+	SpellDmg = 8;
+	SpellHaste = 9;
+	MP5 = 10;
+	SpellPen = 11;
+	FireSpellPower = 12;
+	NatureSpellPower = 13;
+	FrostSpellPower = 14;
+	ShadowSpellPower = 15;
+	HolySpellPower = 16;
+	ArcaneSpellPower = 17;
+	AttackPower = 18;
+	MeleeHit = 19;
+	MeleeHaste = 20;
+	MeleeCrit = 21;
+	Expertise = 22;
+	ArmorPenetration = 23;
+	Mana = 24;
+	Energy = 25;
+	Rage = 26;
+	Armor = 27;
+}
+
+message Buffs {
+	// Raid buffs
+	bool ArcaneInt                = 1;
+	bool GiftOftheWild            = 2;
+	bool BlessingOfKings          = 3;
+	bool ImprovedBlessingOfWisdom = 4;
+	bool ImprovedDivineSpirit     = 5;
+
+	// Party Buffs
+	bool moonkin = 6;
+	bool moonkinRavenGoddess = 7;
+	int32 spriestDPS = 8;
+
+	// Target Debuff
+	bool JudgementOfWisdom = 9;
+	bool ImpSealofCrusader = 10;
+	bool Misery            = 11;
+}
+
+message PlayerOptions {
+    RaceBonusType race = 1;
+    oneof class {
+        Druid druid = 2;
+        Hunter hunter = 3;
+        Mage mage = 4;
+        Paladin paladin = 5;
+        Priest priest = 6;
+        Rogue rogue = 7;
+        Shaman shaman = 8;
+        Warlock warlock = 9;
+        Warrior warrior = 10;
+    }
+    bool drummer = 11; // Has leatherworking
+}
+
+
+message Druid {
+}
+message Hunter {
+}
+message Mage {
+}
+message Paladin {
+}
+message Priest {
+}
+message Rogue {
+}
+message Shaman {
+    enum AgentType {
+        UNKNOWN = 0;
+        FIXED_3LB_1CL = 1;
+        FIXED_4LB_1CL = 2;
+        FIXED_5LB_1CL = 3;
+        FIXED_6LB_1CL = 4;
+        FIXED_7LB_1CL = 5;
+        FIXED_8LB_1CL = 6;
+        FIXED_9LB_1CL = 7;
+        FIXED_10LB_1CL = 8;
+        FIXED_LB_ONLY = 9;
+        FIXED_CL_ON_CD = 10;
+        ADAPTIVE = 11;
+        CL_ON_CLEARCAST = 12;
+    }
+    AgentType agentType = 1;
+
+    message ShamanSpec {
+        int32 lightningOverload = 1;
+        int32 elementalPrecision = 2;
+        int32 naturesGuidance = 3;
+        int32 tidalMastery = 4;
+        bool elementalMastery = 5;
+        int32 unrelentingStorm = 6;
+        int32 callOfThunder = 7;
+        int32 convection = 8;
+    }
+    ShamanSpec spec = 2;
+    
+    bool waterShield = 3;
+	// int32 WaterShieldPPM
+}
+message Warlock {
+}
+message Warrior {
+}
+
+
+message GemSpec {
+	string Name = 1;
+	int32 ID = 2;
+} 
+
+message EnchantSpec {
+	string Name = 1;
+	int32 ID = 2;
+}
+
+message ItemSpec {
+    string name = 1;
+	int32 ID = 2;
+	EnchantSpec enchant = 3;
+	repeated GemSpec gems = 4;
+}
+
+message EquipmentSpec {
+    repeated ItemSpec Items = 1;
+}
+
+message Player {
+    PlayerOptions options = 1;
+    EquipmentSpec equipment = 2;
+    repeated double customStats = 3;
+}
+
+message Party {
+    repeated Player players = 1;
+}
+
+message Raid {
+    repeated Party parties = 1; 
+}
+
+message Encounter {
+    int32 targetArmor = 1;
+    double duration = 2;
+    int32 numTargets = 3;
+}
+
+// RPC IndividualSim
+message IndividualSimRequest {
+    Player player = 1;
+    Buffs buffs = 2;
+    Encounter encounter = 3;
+    int64 rSeed = 4;
+    double gcdMin = 5; // sets the minimum GCD
+    bool debug = 6; // enables debug printing.
+}
+// message IndividualSimRequest {
+// 	ExecutionDurationMs int64
+// 	Logs                string
+
+// 	DpsAvg   double
+// 	DpsStDev double
+// 	DpsMax   double
+// 	DpsHist  map[int]int
+
+// 	NumOom      int
+// 	OomAtAvg    double
+// 	DpsAtOomAvg double
+
+// 	Casts map[int32]CastMetric
+// }
+// message CastMetric {
+// 	Count int
+// 	Dmg   double
+// 	Crits int
+// }
+
+// RPC RaidSim
+message RaidSimRequest {
+    Raid raid = 1;
+    Encounter encounter = 2;
+    int64 rSeed = 3;
+    double gcdMin = 4; // sets the minimum GCD
+    bool debug = 5; // enables debug printing.
+}
+
+message Item {
+	// ID         int32
+	// Slot       byte
+	// SubSlot    byte `json:"subSlot,omitempty"`
+	// Name       string
+	// SourceZone string
+	// SourceDrop string
+	// Stats      Stats // Stats applied to wearer
+	// Phase      byte
+	// Quality    ItemQuality
+	// GemSlots    []GemColor
+	// SocketBonus Stats
+}
+message Enchant {
+
+}
+message Gem {
+	// ID       int32
+	// Name     string
+	// Stats    Stats
+	// Color    GemColor
+	// Phase    byte
+	// Quality  ItemQuality
+}
+
+// RPC GearList
+message GearListRequest {
+}
+message GearListResult {
+	repeated Item items = 1;
+	repeated Enchant enchants = 2;
+	repeated Gem gems = 3;
+}
+
+// RPC ComputeStats
+message ComputeStatsRequest {
+	Player player = 1;
+    Buffs buffs = 2;
+	EquipmentSpec gear = 3;
+}
+message ComputeStatsResult {
+	repeated double gearOnly = 1;
+	repeated double finalStats = 2;
+	repeated string sets = 3;
+}
+
+// RPC StatWeights
+message StatWeightsRequest {
+    IndividualSimRequest options = 1;
+}
+message StatWeightsResult {
+	repeated double weights = 1;
+	repeated double WeightsStDev = 2;
+	repeated double EpValues = 3;
+	repeated double EpValuesStDev = 4;
+}
