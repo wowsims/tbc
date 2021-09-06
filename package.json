@@ -1,0 +1,20 @@
+{
+    "name": "tbc",
+    "version": "0.1.0",
+    "private": true,
+    "devDependencies": {
+        "@bazel/bazelisk": "1.10.1",
+        "@bazel/buildifier": "4.0.1",
+        "@bazel/ibazel": "0.15.10"
+    },
+    "scripts": {
+        "build": "bazel build //...",
+        "test": "bazel test //...",
+        "elemental_shaman_host": "bazel run //ui/elemental_shaman:server"
+    },
+    "dependencies": {
+        "@bazel/typescript": "4.0.0",
+        "http-server": "13.0.1",
+        "typescript": "4.3.5"
+    }
+}
