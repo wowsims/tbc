@@ -1,1 +1,21 @@
-
+{
+  "compilerOptions": {
+    "target": "ES2018",
+    "module": "ES6",
+    "strict": true,
+    "lib": [
+      "DOM",
+      "ES2018",
+    ],
+    "esModuleInterop": true,
+    "rootDirs": [
+      ".",
+      "../bazel-out/darwin-fastbuild/bin/ui",
+      "../bazel-out/darwin-dbg/bin/ui",
+      "../bazel-out/k8-fastbuild/bin/ui",
+      "../bazel-out/k8-dbg/bin/ui",
+      "../bazel-out/x64_wndows-fastbuild/bin/ui",
+      "../bazel-out/x64_windows-dbg/bin/ui",
+    ],
+  },
+}
