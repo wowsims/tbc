@@ -4,68 +4,100 @@ package newapi;
 option go_package = "tbc/newapi";
 
 enum RaceBonusType {
-    NONE = 0;
-    TROLL10 = 1;
-    TROLL30 = 2;
-    ORC = 3;
-    TAUREN = 4;
-    UNDEAD = 5;
-    BLOODELF = 6;
-    HUMAN = 7;
-    DWARF = 8;
-    GNOME = 9;
-    NIGHTELF = 10;
-    DRAENEI = 11;
+    none = 0;
+    bloodelf = 1;
+    draenei = 2;
+    dwarf = 3;
+    gnome = 4;
+    human = 5;
+    nightelf = 6;
+    orc = 7;
+    tauren = 8;
+    troll10 = 9;
+    troll30 = 10;
+    undead = 11;
 }
 
 enum Stat {
-	Intellect = 0;
-	Stamina = 1;
-	Strength = 2;
-	Agility = 3;
-	Spirit = 4;
-	SpellCrit = 5;
-	SpellHit = 6;
-	Healing = 7;
-	SpellDmg = 8;
-	SpellHaste = 9;
-	MP5 = 10;
-	SpellPen = 11;
-	FireSpellPower = 12;
-	NatureSpellPower = 13;
-	FrostSpellPower = 14;
-	ShadowSpellPower = 15;
-	HolySpellPower = 16;
-	ArcaneSpellPower = 17;
-	AttackPower = 18;
-	MeleeHit = 19;
-	MeleeHaste = 20;
-	MeleeCrit = 21;
-	Expertise = 22;
-	ArmorPenetration = 23;
-	Mana = 24;
-	Energy = 25;
-	Rage = 26;
-	Armor = 27;
+	strength = 0;
+	agility = 1;
+	stamina = 2;
+    intellect = 3;
+	spirit = 4;
+	spell_crit = 5;
+	spell_hit = 6;
+	healing = 7;
+	spell_power = 8;
+	spell_haste = 9;
+	mp5 = 10;
+	spellpen = 11;
+	fire_spell_power = 12;
+	nature_spell_power = 13;
+	frost_spell_power = 14;
+	shadow_spell_power = 15;
+	holy_spell_power = 16;
+	arcane_spell_power = 17;
+	attack_power = 18;
+	melee_hit = 19;
+	melee_haste = 20;
+	melee_crit = 21;
+	expertise = 22;
+	armor_penetration = 23;
+	mana = 24;
+	energy = 25;
+	rage = 26;
+	armor = 27;
+}
+
+enum ItemQuality {
+	Junk = 0;
+	Uncommon = 1;
+	Rare = 2;
+	Epic = 3;
+	Legendary = 4;
+}
+
+enum GemColor {
+    UnknownColor = 0;
+	Meta = 1;
+	Red = 2;
+	Blue = 3;
+	Yellow = 4;
+	Green = 5;
+	Orange = 6;
+	Purple = 7;
+	Prismatic = 8;
 }
 
 message Buffs {
 	// Raid buffs
-	bool ArcaneInt                = 1;
-	bool GiftOftheWild            = 2;
-	bool BlessingOfKings          = 3;
-	bool ImprovedBlessingOfWisdom = 4;
-	bool ImprovedDivineSpirit     = 5;
+	bool arcane_int = 1;
+	bool gift_of_the_wild = 2;
+	bool blessing_of_kings = 3;
+	bool improved_blessing_of_wisdom = 4;
+	bool improved_divine_spirit = 5;
 
 	// Party Buffs
 	bool moonkin = 6;
-	bool moonkinRavenGoddess = 7;
-	int32 spriestDPS = 8;
+	bool moonkin_raven_goddess = 7;
+	int32 spriest_dps = 8;
 
 	// Target Debuff
-	bool JudgementOfWisdom = 9;
-	bool ImpSealofCrusader = 10;
-	bool Misery            = 11;
+	bool judgement_of_wisdom = 9;
+	bool improved_seal_of_the_crusader = 10;
+	bool misery = 11;
+}
+
+message Consumes {
+	bool brilliant_wizard_oil = 1; 
+	bool major_mageblood = 2;
+	bool flask_of_blinding_light = 3;
+	bool flask_of_mighty_restoration = 4;
+	bool blackend_basilisk = 5;
+	bool destruction_potion = 6;
+	bool super_mana_potion = 7;
+	bool dark_rune = 8;
+    bool drums_of_battle = 9;
 }
 
 message PlayerOptions {
@@ -81,9 +113,8 @@ message PlayerOptions {
         Warlock warlock = 9;
         Warrior warrior = 10;
     }
-    bool drummer = 11; // Has leatherworking
+    Consumes consumes = 11; // What consumes this player is going to be using.
 }
-
 
 message Druid {
 }
@@ -99,19 +130,19 @@ message Rogue {
 }
 message Shaman {
     enum AgentType {
-        UNKNOWN = 0;
-        FIXED_3LB_1CL = 1;
-        FIXED_4LB_1CL = 2;
-        FIXED_5LB_1CL = 3;
-        FIXED_6LB_1CL = 4;
-        FIXED_7LB_1CL = 5;
-        FIXED_8LB_1CL = 6;
-        FIXED_9LB_1CL = 7;
-        FIXED_10LB_1CL = 8;
-        FIXED_LB_ONLY = 9;
-        FIXED_CL_ON_CD = 10;
-        ADAPTIVE = 11;
-        CL_ON_CLEARCAST = 12;
+        unknown_agent = 0;
+        fixed_3lb_1cl = 1;
+        fixed_4lb_1cl = 2;
+        fixed_5lb_1cl = 3;
+        fixed_6lb_1cl = 4;
+        fixed_7lb_1cl = 5;
+        fixed_8lb_1cl = 6;
+        fixed_9lb_1cl = 7;
+        fixed_10lb_1cl = 8;
+        fixed_lb_only = 9;
+        fixed_cl_on_cd = 10;
+        adaptive = 11;
+        cl_on_clearcast = 12;
     }
     AgentType agentType = 1;
 
@@ -129,38 +160,30 @@ message Shaman {
     
     bool waterShield = 3;
 	// int32 WaterShieldPPM
+
+    // Are there "agent" and "spec" options specific to the specs we would need 
+    // some kind of options map here? Or would just the 'AgentType' alone encapsulate
+    // everything needed?
 }
 message Warlock {
 }
 message Warrior {
 }
 
-
-message GemSpec {
-	string Name = 1;
-	int32 ID = 2;
-} 
-
-message EnchantSpec {
-	string Name = 1;
-	int32 ID = 2;
-}
-
 message ItemSpec {
-    string name = 1;
-	int32 ID = 2;
-	EnchantSpec enchant = 3;
-	repeated GemSpec gems = 4;
+	int32 id = 2;
+	int32 enchant = 3;
+	repeated int32 gems = 4;
 }
 
 message EquipmentSpec {
-    repeated ItemSpec Items = 1;
+    repeated ItemSpec items = 1;
 }
 
 message Player {
     PlayerOptions options = 1;
     EquipmentSpec equipment = 2;
-    repeated double customStats = 3;
+    repeated double custom_stats = 3;
 }
 
 message Party {
@@ -172,9 +195,9 @@ message Raid {
 }
 
 message Encounter {
-    int32 targetArmor = 1;
+    int32 target_armor = 1;
     double duration = 2;
-    int32 numTargets = 3;
+    int32 num_targets = 3;
 }
 
 // RPC IndividualSim
@@ -182,30 +205,38 @@ message IndividualSimRequest {
     Player player = 1;
     Buffs buffs = 2;
     Encounter encounter = 3;
-    int64 rSeed = 4;
-    double gcdMin = 5; // sets the minimum GCD
+    int64 random_seed = 4;
+    double gcd_min = 5; // sets the minimum GCD
     bool debug = 6; // enables debug printing.
 }
-// message IndividualSimRequest {
-// 	ExecutionDurationMs int64
-// 	Logs                string
 
-// 	DpsAvg   double
-// 	DpsStDev double
-// 	DpsMax   double
-// 	DpsHist  map[int]int
+message IndividualSimResult {
+	int64 execution_duration_ms = 1;
+ 	string logs = 2;
 
-// 	NumOom      int
-// 	OomAtAvg    double
-// 	DpsAtOomAvg double
+	double dps_avg   = 3;
+	double dps_stdev = 4;
+	double dps_max   = 5;
+ 	map<int32, int32> dps_hist = 6;
 
-// 	Casts map[int32]CastMetric
-// }
-// message CastMetric {
-// 	Count int
-// 	Dmg   double
-// 	Crits int
-// }
+ 	int32 num_oom = 7;
+	double oom_at_avg = 8;
+	double dps_at_oom_avg = 9;
+
+ 	map<int32, CastMetric> casts = 10;
+}
+
+message CastMetric {
+ 	int32 count = 1; // count of non-LO, non-crit casts
+    int32 lo = 2; // count of non-crit LO procs
+    int32 count_crit = 3; // count non-LO crits
+    int32 count_lo_crit = 4; // count of lo crits
+
+    double dmg = 5;
+    double crit_dmg = 6;
+    double lo_dmg = 7;
+    double lo_crit_dmg = 8;
+}
 
 // RPC RaidSim
 message RaidSimRequest {
@@ -217,32 +248,50 @@ message RaidSimRequest {
 }
 
 message Item {
-	// ID         int32
-	// Slot       byte
-	// SubSlot    byte `json:"subSlot,omitempty"`
-	// Name       string
-	// SourceZone string
-	// SourceDrop string
-	// Stats      Stats // Stats applied to wearer
-	// Phase      byte
-	// Quality    ItemQuality
-	// GemSlots    []GemColor
-	// SocketBonus Stats
+	int32 id = 1;
+	int32 slot = 2;
+	int32 sub_slot = 3;
+	string name = 4;
+	repeated double stats = 5;
+	int32 phase = 6;
+	ItemQuality quality = 7;
+	repeated GemColor gem_slots = 8;
+	repeated double socket_bonus = 9; // does the client need this any more?
+    // Do we need to include 'armor type' in this or is it enough that we already filtered type in the request?
 }
 message Enchant {
-
+    int32 id = 1;        // ID of the enchant "item".
+	int32 effect_id = 2;  // ID of the effect (for the item tooltip UI)
+	string name = 3;     
+	int32 slot = 5;      // which slot does the enchant go on.
 }
 message Gem {
-	// ID       int32
-	// Name     string
-	// Stats    Stats
-	// Color    GemColor
-	// Phase    byte
-	// Quality  ItemQuality
+	int32 id = 1;
+	string name = 2;
+	repeated double stats = 3;
+	GemColor color = 4;
+	int32 phase = 5;
+	ItemQuality quality = 6;
 }
 
 // RPC GearList
+enum Role {
+    norole = 0;
+    caster = 1;
+    healer = 2;
+    tank = 3;
+    melee = 4;
+}
+enum Armor {
+    noarmor = 0;
+    cloth = 1;
+    leather = 2;
+    mail = 3;
+    plate = 4;
+}
 message GearListRequest {
+    Role role = 1;
+    Armor armor = 2;
 }
 message GearListResult {
 	repeated Item items = 1;
