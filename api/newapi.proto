@@ -19,84 +19,84 @@ enum RaceBonusType {
 }
 
 enum Stat {
-	strength = 0;
-	agility = 1;
-	stamina = 2;
+    strength = 0;
+    agility = 1;
+    stamina = 2;
     intellect = 3;
-	spirit = 4;
-	spell_crit = 5;
-	spell_hit = 6;
-	healing = 7;
-	spell_power = 8;
-	spell_haste = 9;
-	mp5 = 10;
-	spellpen = 11;
-	fire_spell_power = 12;
-	nature_spell_power = 13;
-	frost_spell_power = 14;
-	shadow_spell_power = 15;
-	holy_spell_power = 16;
-	arcane_spell_power = 17;
-	attack_power = 18;
-	melee_hit = 19;
-	melee_haste = 20;
-	melee_crit = 21;
-	expertise = 22;
-	armor_penetration = 23;
-	mana = 24;
-	energy = 25;
-	rage = 26;
-	armor = 27;
+    spirit = 4;
+    spell_crit = 5;
+    spell_hit = 6;
+    healing = 7;
+    spell_power = 8;
+    spell_haste = 9;
+    mp5 = 10;
+    spellpen = 11;
+    fire_spell_power = 12;
+    nature_spell_power = 13;
+    frost_spell_power = 14;
+    shadow_spell_power = 15;
+    holy_spell_power = 16;
+    arcane_spell_power = 17;
+    attack_power = 18;
+    melee_hit = 19;
+    melee_haste = 20;
+    melee_crit = 21;
+    expertise = 22;
+    armor_penetration = 23;
+    mana = 24;
+    energy = 25;
+    rage = 26;
+    armor = 27;
 }
 
 enum ItemQuality {
-	Junk = 0;
-	Uncommon = 1;
-	Rare = 2;
-	Epic = 3;
-	Legendary = 4;
+    Junk = 0;
+    Uncommon = 1;
+    Rare = 2;
+    Epic = 3;
+    Legendary = 4;
 }
 
 enum GemColor {
     UnknownColor = 0;
-	Meta = 1;
-	Red = 2;
-	Blue = 3;
-	Yellow = 4;
-	Green = 5;
-	Orange = 6;
-	Purple = 7;
-	Prismatic = 8;
+    Meta = 1;
+    Red = 2;
+    Blue = 3;
+    Yellow = 4;
+    Green = 5;
+    Orange = 6;
+    Purple = 7;
+    Prismatic = 8;
 }
 
 message Buffs {
-	// Raid buffs
-	bool arcane_int = 1;
-	bool gift_of_the_wild = 2;
-	bool blessing_of_kings = 3;
-	bool improved_blessing_of_wisdom = 4;
-	bool improved_divine_spirit = 5;
+    // Raid buffs
+    bool arcane_int = 1;
+    bool gift_of_the_wild = 2;
+    bool blessing_of_kings = 3;
+    bool improved_blessing_of_wisdom = 4;
+    bool improved_divine_spirit = 5;
 
-	// Party Buffs
-	bool moonkin = 6;
-	bool moonkin_raven_goddess = 7;
-	int32 spriest_dps = 8;
+    // Party Buffs
+    bool moonkin = 6;
+    bool moonkin_raven_goddess = 7;
+    int32 spriest_dps = 8;
 
-	// Target Debuff
-	bool judgement_of_wisdom = 9;
-	bool improved_seal_of_the_crusader = 10;
-	bool misery = 11;
+    // Target Debuff
+    bool judgement_of_wisdom = 9;
+    bool improved_seal_of_the_crusader = 10;
+    bool misery = 11;
 }
 
 message Consumes {
-	bool brilliant_wizard_oil = 1; 
-	bool major_mageblood = 2;
-	bool flask_of_blinding_light = 3;
-	bool flask_of_mighty_restoration = 4;
-	bool blackend_basilisk = 5;
-	bool destruction_potion = 6;
-	bool super_mana_potion = 7;
-	bool dark_rune = 8;
+    bool brilliant_wizard_oil = 1; 
+    bool major_mageblood = 2;
+    bool flask_of_blinding_light = 3;
+    bool flask_of_mighty_restoration = 4;
+    bool blackend_basilisk = 5;
+    bool destruction_potion = 6;
+    bool super_mana_potion = 7;
+    bool dark_rune = 8;
     bool drums_of_battle = 9;
 }
 
@@ -159,7 +159,7 @@ message Shaman {
     ShamanSpec spec = 2;
     
     bool waterShield = 3;
-	// int32 WaterShieldPPM
+    // int32 WaterShieldPPM
 
     // Are there "agent" and "spec" options specific to the specs we would need 
     // some kind of options map here? Or would just the 'AgentType' alone encapsulate
@@ -171,9 +171,9 @@ message Warrior {
 }
 
 message ItemSpec {
-	int32 id = 2;
-	int32 enchant = 3;
-	repeated int32 gems = 4;
+    int32 id = 2;
+    int32 enchant = 3;
+    repeated int32 gems = 4;
 }
 
 message EquipmentSpec {
@@ -211,27 +211,26 @@ message IndividualSimRequest {
 }
 
 message IndividualSimResult {
-	int64 execution_duration_ms = 1;
- 	string logs = 2;
+    int64 execution_duration_ms = 1;
+    string logs = 2;
 
-	double dps_avg   = 3;
-	double dps_stdev = 4;
-	double dps_max   = 5;
- 	map<int32, int32> dps_hist = 6;
+    double dps_avg   = 3;
+    double dps_stdev = 4;
+    double dps_max   = 5;
+    map<int32, int32> dps_hist = 6;
 
- 	int32 num_oom = 7;
-	double oom_at_avg = 8;
-	double dps_at_oom_avg = 9;
+    int32 num_oom = 7;
+    double oom_at_avg = 8;
+    double dps_at_oom_avg = 9;
 
- 	map<int32, CastMetric> casts = 10;
+    map<int32, CastMetric> casts = 10;
 }
 
 message CastMetric {
- 	int32 count = 1; // count of non-LO, non-crit casts
+    int32 count = 1; // count of non-LO, non-crit casts
     int32 lo = 2; // count of non-crit LO procs
     int32 count_crit = 3; // count non-LO crits
     int32 count_lo_crit = 4; // count of lo crits
-
     double dmg = 5;
     double crit_dmg = 6;
     double lo_dmg = 7;
@@ -248,30 +247,30 @@ message RaidSimRequest {
 }
 
 message Item {
-	int32 id = 1;
-	int32 slot = 2;
-	int32 sub_slot = 3;
-	string name = 4;
-	repeated double stats = 5;
-	int32 phase = 6;
-	ItemQuality quality = 7;
-	repeated GemColor gem_slots = 8;
-	repeated double socket_bonus = 9; // does the client need this any more?
+    int32 id = 1;
+    int32 slot = 2;
+    int32 sub_slot = 3;
+    string name = 4;
+    repeated double stats = 5;
+    int32 phase = 6;
+    ItemQuality quality = 7;
+    repeated GemColor gem_slots = 8;
+    repeated double socket_bonus = 9; // does the client need this any more?
     // Do we need to include 'armor type' in this or is it enough that we already filtered type in the request?
 }
 message Enchant {
     int32 id = 1;        // ID of the enchant "item".
-	int32 effect_id = 2;  // ID of the effect (for the item tooltip UI)
-	string name = 3;     
-	int32 slot = 5;      // which slot does the enchant go on.
+    int32 effect_id = 2;  // ID of the effect (for the item tooltip UI)
+    string name = 3;     
+    int32 slot = 5;      // which slot does the enchant go on.
 }
 message Gem {
-	int32 id = 1;
-	string name = 2;
-	repeated double stats = 3;
-	GemColor color = 4;
-	int32 phase = 5;
-	ItemQuality quality = 6;
+    int32 id = 1;
+    string name = 2;
+    repeated double stats = 3;
+    GemColor color = 4;
+    int32 phase = 5;
+    ItemQuality quality = 6;
 }
 
 // RPC GearList
@@ -294,21 +293,21 @@ message GearListRequest {
     Armor armor = 2;
 }
 message GearListResult {
-	repeated Item items = 1;
-	repeated Enchant enchants = 2;
-	repeated Gem gems = 3;
+    repeated Item items = 1;
+    repeated Enchant enchants = 2;
+    repeated Gem gems = 3;
 }
 
 // RPC ComputeStats
 message ComputeStatsRequest {
-	Player player = 1;
+    Player player = 1;
     Buffs buffs = 2;
-	EquipmentSpec gear = 3;
+    EquipmentSpec gear = 3;
 }
 message ComputeStatsResult {
-	repeated double gearOnly = 1;
-	repeated double finalStats = 2;
-	repeated string sets = 3;
+    repeated double gearOnly = 1;
+    repeated double finalStats = 2;
+    repeated string sets = 3;
 }
 
 // RPC StatWeights
@@ -316,8 +315,8 @@ message StatWeightsRequest {
     IndividualSimRequest options = 1;
 }
 message StatWeightsResult {
-	repeated double weights = 1;
-	repeated double WeightsStDev = 2;
-	repeated double EpValues = 3;
-	repeated double EpValuesStDev = 4;
+    repeated double weights = 1;
+    repeated double WeightsStDev = 2;
+    repeated double EpValues = 3;
+    repeated double EpValuesStDev = 4;
 }
