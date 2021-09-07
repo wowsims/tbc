@@ -9,18 +9,3 @@ ts_config(
     "//ui:tsconfig",
   ],
 )
-
-ts_project(
-	name = "core_ts",
-	srcs = glob(["**/*.ts"]),
-	deps = [],
-	tsconfig = ":tsconfig",
-  composite = True,
-)
-
-filegroup(
-  name = "core_js",
-  srcs = [
-    "gear_picker.js",
-  ],
-)

@@ -1,2 +1,3 @@
-import {a} from '../core/gear_picker.js';
-console.log('hello' + a);
+import { DefaultTheme } from '../core/themes/default.js';
+
+const theme = new DefaultTheme(document.body);
