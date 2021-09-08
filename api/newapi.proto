@@ -1,7 +1,7 @@
 syntax = "proto3";
 package newapi;
 
-option go_package = "tbc/newapi";
+option go_package = "api/";
 
 enum RaceBonusType {
     none = 0;
@@ -131,18 +131,10 @@ message Rogue {
 message Shaman {
     enum AgentType {
         unknown_agent = 0;
-        fixed_3lb_1cl = 1;
-        fixed_4lb_1cl = 2;
-        fixed_5lb_1cl = 3;
-        fixed_6lb_1cl = 4;
-        fixed_7lb_1cl = 5;
-        fixed_8lb_1cl = 6;
-        fixed_9lb_1cl = 7;
-        fixed_10lb_1cl = 8;
-        fixed_lb_only = 9;
-        fixed_cl_on_cd = 10;
-        adaptive = 11;
-        cl_on_clearcast = 12;
+        fixed_lb_cl = 1;
+        cl_on_clearcast = 2;
+        adaptive = 3;
+        enhancer = 4;
     }
     AgentType agentType = 1;
 
@@ -160,7 +152,8 @@ message Shaman {
     
     bool water_shield = 3;
     // int32 WaterShieldPPM
-
+    
+    map<string, string> AgentOptions = 4;
     // Are there "agent" and "spec" options specific to the specs we would need 
     // some kind of options map here? Or would just the 'AgentType' alone encapsulate
     // everything needed?
@@ -224,17 +217,16 @@ message IndividualSimResult {
     double dps_at_oom_avg = 9;
 
     map<int32, CastMetric> casts = 10;
+    // TODO: melee
+    // map<int32, AttackMetric> attacks = 11; 
 }
 
+// CastMetric holds a collection of counts of casts and 
+// 
 message CastMetric {
-    int32 count = 1; // count of non-LO, non-crit casts
-    int32 lo = 2; // count of non-crit LO procs
-    int32 count_crit = 3; // count non-LO crits
-    int32 count_lo_crit = 4; // count of lo crits
-    double dmg = 5;
-    double crit_dmg = 6;
-    double lo_dmg = 7;
-    double lo_crit_dmg = 8;
+    repeated int32 counts = 1;
+    repeated double dmgs = 2;
+    repeated int32 tags = 3;
 }
 
 // RPC RaidSim
