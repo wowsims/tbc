@@ -274,23 +274,11 @@ message Gem {
 }
 
 // RPC GearList
-enum Role {
-    norole = 0;
-    caster = 1;
-    healer = 2;
-    tank = 3;
-    melee = 4;
-}
-enum Armor {
-    noarmor = 0;
-    cloth = 1;
-    leather = 2;
-    mail = 3;
-    plate = 4;
+enum Spec {
+    elemental_shaman = 0;
 }
 message GearListRequest {
-    Role role = 1;
-    Armor armor = 2;
+    Spec spec = 1; // Each spec has a custom gear list in the simulator.
 }
 message GearListResult {
     repeated Item items = 1;
