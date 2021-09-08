@@ -1,0 +1,4 @@
+{
+  "extends": "../tsconfig",
+  // Override tsconfig params here
+}
