@@ -50,23 +50,23 @@ enum Stat {
 }
 
 enum ItemQuality {
-    Junk = 0;
-    Uncommon = 1;
-    Rare = 2;
-    Epic = 3;
-    Legendary = 4;
+    junk = 0;
+    uncommon = 1;
+    rare = 2;
+    epic = 3;
+    legendary = 4;
 }
 
 enum GemColor {
-    UnknownColor = 0;
-    Meta = 1;
-    Red = 2;
-    Blue = 3;
-    Yellow = 4;
-    Green = 5;
-    Orange = 6;
-    Purple = 7;
-    Prismatic = 8;
+    unknown_color = 0;
+    meta = 1;
+    red = 2;
+    blue = 3;
+    yellow = 4;
+    green = 5;
+    orange = 6;
+    purple = 7;
+    prismatic = 8;
 }
 
 message Buffs {
@@ -147,18 +147,18 @@ message Shaman {
     AgentType agentType = 1;
 
     message ShamanSpec {
-        int32 lightningOverload = 1;
-        int32 elementalPrecision = 2;
-        int32 naturesGuidance = 3;
-        int32 tidalMastery = 4;
-        bool elementalMastery = 5;
-        int32 unrelentingStorm = 6;
-        int32 callOfThunder = 7;
+        int32 lightning_overload = 1;
+        int32 elemental_precision = 2;
+        int32 natures_guidance = 3;
+        int32 tidal_mastery = 4;
+        bool elemental_mastery = 5;
+        int32 unrelenting_storm = 6;
+        int32 call_of_thunder = 7;
         int32 convection = 8;
     }
     ShamanSpec spec = 2;
     
-    bool waterShield = 3;
+    bool water_shield = 3;
     // int32 WaterShieldPPM
 
     // Are there "agent" and "spec" options specific to the specs we would need 
@@ -241,8 +241,8 @@ message CastMetric {
 message RaidSimRequest {
     Raid raid = 1;
     Encounter encounter = 2;
-    int64 rSeed = 3;
-    double gcdMin = 4; // sets the minimum GCD
+    int64 random_seed = 3;
+    double gcd_min = 4; // sets the minimum GCD
     bool debug = 5; // enables debug printing.
 }
 
@@ -305,7 +305,7 @@ message ComputeStatsRequest {
     EquipmentSpec gear = 3;
 }
 message ComputeStatsResult {
-    repeated double gearOnly = 1;
+    repeated double gear_only = 1;
     repeated double finalStats = 2;
     repeated string sets = 3;
 }
@@ -316,7 +316,7 @@ message StatWeightsRequest {
 }
 message StatWeightsResult {
     repeated double weights = 1;
-    repeated double WeightsStDev = 2;
-    repeated double EpValues = 3;
-    repeated double EpValuesStDev = 4;
+    repeated double Weights_stdev = 2;
+    repeated double ep_values = 3;
+    repeated double ep_values_stdev = 4;
 }
