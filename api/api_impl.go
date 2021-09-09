@@ -10,7 +10,7 @@ import (
 	"github.com/wowsims/tbc/sim/shaman"
 )
 
-func getGearListImpl(request GearListRequest) GearListResult {
+func getGearListImpl(request *GearListRequest) *GearListResult {
 	result := GearListResult{}
 
 	// Items:    items,
@@ -20,25 +20,24 @@ func getGearListImpl(request GearListRequest) GearListResult {
 	return result
 }
 
-func computeStatsImpl(request ComputeStatsRequest) ComputeStatsResult {
+func computeStatsImpl(request *ComputeStatsRequest) *ComputeStatsResult {
 	panic("not implemented")
-	// request.Options.AgentType = AGENT_TYPE_ADAPTIVE
-	// fakeSim := NewSim(request.Gear, request.Options)
+	fakeSim := core.NewSim(request.Gear, request.Options)
 
-	// sets := fakeSim.ActivateSets()
-	// fakeSim.reset() // this will activate any perm-effect items as well
+	sets := fakeSim.ActivateSets()
+	fakeSim.reset() // this will activate any perm-effect items as well
 
-	// gearOnlyStats := fakeSim.Equip.Stats().CalculatedTotal()
-	// finalStats := fakeSim.Stats
+	gearOnlyStats := fakeSim.Equip.Stats().CalculatedTotal()
+	finalStats := fakeSim.Stats
 
-	// return ComputeStatsResult{
-	// 	GearOnly:   gearOnlyStats,
-	// 	FinalStats: finalStats,
-	// 	Sets:       sets,
-	// }
+	return &ComputeStatsResult{
+		GearOnly:   gearOnlyStats,
+		FinalStats: finalStats,
+		Sets:       sets,
+	}
 }
 
-func statWeightsImpl(request StatWeightsRequest) StatWeightsResult {
+func statWeightsImpl(request *StatWeightsRequest) *StatWeightsResult {
 	panic("not implemented")
 
 	// request.Options.AgentType = AGENT_TYPE_ADAPTIVE
@@ -141,7 +140,7 @@ func sampleFromDpsHist(hist map[int]int, histNumSamples int) int {
 	panic("Invalid dps histogram")
 }
 
-func runSimulationImpl(request IndividualSimRequest) IndividualSimResult {
+func runSimulationImpl(request *IndividualSimRequest) *IndividualSimResult {
 	panic("not implemented")
 
 	var agent core.PlayerAgent

@@ -92,29 +92,11 @@ type Cast struct {
 
 // NewCast constructs a Cast from the current simulation and selected spell.
 //  OnCast mechanics are applied at this time (anything that modifies the cast before its cast, usually just mana cost stuff)
-func NewCast(sim *Simulation, player Player, sp *Spell) *Cast {
+func NewCast(sim *Simulation, sp *Spell) *Cast {
 	cast := sim.cache.NewCast()
 	cast.Spell = sp
 	cast.ManaCost = float64(sp.Mana)
 	cast.CritBonus = 1.5
-
-	castTime := sp.CastTime
-
-	if sp.ID == MagicIDLB12 || sp.ID == MagicIDCL6 {
-		cast.ManaCost *= 1 - (0.02 * float64(sim.Options.Talents.Convection))
-		// TODO: Add LightningMaster to talent list (this will never not be selected for an elemental shaman)
-		castTime -= time.Millisecond * 500 // Talent Lightning Mastery
-	}
-	hasteBonus := 1 + (player.Stats[StatSpellHaste] / 1576)
-	castTime = time.Duration(float64(castTime) / hasteBonus)
-	cast.CastTime = castTime
-
-	// Apply any on cast effects.
-	for _, id := range player.activeAuraIDs {
-		if player.auras[id].OnCast != nil {
-			player.auras[id].OnCast(sim, cast)
-		}
-	}
-
+	cast.CastTime = sp.CastTime
 	return cast
 }

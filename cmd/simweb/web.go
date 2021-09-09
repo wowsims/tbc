@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"flag"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -14,8 +15,8 @@ import (
 	"time"
 
 	"github.com/wowsims/tbc/api"
-	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/ui"
+	"google.golang.org/protobuf/proto"
 )
 
 func main() {
@@ -109,11 +110,25 @@ func main() {
 // } else if request.Sim != nil {
 
 func handleIndividualSim(w http.ResponseWriter, r *http.Request) {
-	isr := api.IndividualSimRequest{}
 
-	req := core.SimRequest{}
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
 
-	result := core.RunSimulation(req)
+		return
+	}
+	isr := &api.IndividualSimRequest{}
+	if err := proto.Unmarshal(body, isr); err != nil {
+		log.Fatalln("Failed to parse address book:", err)
+	}
+	result := api.RunSimulation(isr)
+
+	outbytes, err := proto.Marshal(result)
+	if err != nil {
+		log.Printf("[ERROR] Failed to marshal result: %s", err.Error())
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	w.Write(outbytes)
 }
 func handleRaidSim(w http.ResponseWriter, r *http.Request) {
 

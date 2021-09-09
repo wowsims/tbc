@@ -200,7 +200,7 @@ message IndividualSimRequest {
     Encounter encounter = 3;
     int64 random_seed = 4;
     double gcd_min = 5; // sets the minimum GCD
-    bool debug = 6; // enables debug printing.
+    bool debug = 6; // enables debug logging.
 }
 
 message IndividualSimResult {
@@ -248,7 +248,6 @@ message Item {
     ItemQuality quality = 7;
     repeated GemColor gem_slots = 8;
     repeated double socket_bonus = 9; // does the client need this any more?
-    // Do we need to include 'armor type' in this or is it enough that we already filtered type in the request?
 }
 message Enchant {
     int32 id = 1;        // ID of the enchant "item".
@@ -270,7 +269,7 @@ enum Spec {
     elemental_shaman = 0;
 }
 message GearListRequest {
-    Spec spec = 1; // Each spec has a custom gear list in the simulator.
+    Spec spec = 1; // Each spec has a custom gear list
 }
 message GearListResult {
     repeated Item items = 1;
@@ -293,6 +292,8 @@ message ComputeStatsResult {
 // RPC StatWeights
 message StatWeightsRequest {
     IndividualSimRequest options = 1;
+    repeated int32 stats_to_weigh = 2;
+    int32 base_stat = 3;
 }
 message StatWeightsResult {
     repeated double weights = 1;

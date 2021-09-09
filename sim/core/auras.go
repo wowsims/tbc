@@ -309,7 +309,7 @@ func ActivateChainLightningBounce(sim *Simulation) Aura {
 			if c.IsLO {
 				dmgCoeff = 0.5
 			}
-			for i := 1; i < sim.Options.Encounter.NumClTargets; i++ {
+			for i := 1; i < sim.Options.Encounter.NumTargets; i++ {
 				if sim.hasAura(MagicIDTidefury) {
 					dmgCoeff *= 0.83
 				} else {
@@ -345,7 +345,7 @@ func AuraLightningOverload(lvl int) Aura {
 			if c.Spell.ID == MagicIDCL6 {
 				actualChance /= 3 // 33% chance of regular for CL LO
 			}
-			if sim.rando.Float64() < actualChance {
+			if sim.Rando.Float64() < actualChance {
 				if sim.Debug != nil {
 					sim.Debug(" +Lightning Overload\n")
 				}
@@ -463,7 +463,7 @@ func ActivateQuagsEye(sim *Simulation) Aura {
 		ID:      MagicIDQuagsEye,
 		Expires: neverExpires,
 		OnCastComplete: func(sim *Simulation, c *Cast) {
-			if !icd.isOnCD(sim) && sim.rando.Float64() < 0.1 {
+			if !icd.isOnCD(sim) && sim.Rando.Float64() < 0.1 {
 				icd = InternalCD(sim.CurrentTime + dur)
 				sim.Stats[StatHaste] += hasteBonus
 				sim.addAura(AuraStatRemoval(sim.CurrentTime, time.Second*6, hasteBonus, StatHaste, MagicIDFungalFrenzy))
@@ -480,7 +480,7 @@ func ActivateNexusHorn(sim *Simulation) Aura {
 		ID:      MagicIDNexusHorn,
 		Expires: neverExpires,
 		OnSpellHit: func(sim *Simulation, c *Cast) {
-			if !icd.isOnCD(sim) && c.DidCrit && sim.rando.Float64() < 0.2 {
+			if !icd.isOnCD(sim) && c.DidCrit && sim.Rando.Float64() < 0.2 {
 				icd = InternalCD(sim.CurrentTime + dur)
 				sim.Stats[StatSpellDmg] += spellBonus
 				sim.addAura(AuraStatRemoval(sim.CurrentTime, time.Second*10, spellBonus, StatSpellDmg, MagicIDCallOfTheNexus))
@@ -601,7 +601,7 @@ func ActivateSkycall(sim *Simulation) Aura {
 		ID:      MagicIDSkycall,
 		Expires: neverExpires,
 		OnCastComplete: func(sim *Simulation, c *Cast) {
-			if c.Spell.ID == MagicIDLB12 && sim.rando.Float64() < 0.15 {
+			if c.Spell.ID == MagicIDLB12 && sim.Rando.Float64() < 0.15 {
 				sim.Stats[StatHaste] += hasteBonus
 				sim.addAura(Aura{
 					ID:      MagicIDEnergized,
@@ -647,7 +647,7 @@ func ActivateIED(sim *Simulation) Aura {
 		ID:      MagicIDInsightfulEarthstorm,
 		Expires: neverExpires,
 		OnCastComplete: func(sim *Simulation, c *Cast) {
-			if !icd.isOnCD(sim) && sim.rando.Float64() < 0.04 {
+			if !icd.isOnCD(sim) && sim.Rando.Float64() < 0.04 {
 				icd = InternalCD(sim.CurrentTime + dur)
 				if sim.Debug != nil {
 					sim.Debug(" *Insightful Earthstorm Mana Restore - 300\n")
@@ -667,7 +667,7 @@ func ActivateMSD(sim *Simulation) Aura {
 		ID:      MagicIDMysticSkyfire,
 		Expires: neverExpires,
 		OnCastComplete: func(sim *Simulation, c *Cast) {
-			if !icd.isOnCD(sim) && sim.rando.Float64() < 0.15 {
+			if !icd.isOnCD(sim) && sim.Rando.Float64() < 0.15 {
 				icd = InternalCD(sim.CurrentTime + icdDur)
 				sim.Stats[StatHaste] += hasteBonus
 				sim.addAura(AuraStatRemoval(sim.CurrentTime, dur, hasteBonus, StatHaste, MagicIDMysticFocus))
@@ -691,7 +691,7 @@ func ActivateSpellstrike(sim *Simulation) Aura {
 		ID:      MagicIDSpellstrike,
 		Expires: neverExpires,
 		OnCastComplete: func(sim *Simulation, c *Cast) {
-			if sim.rando.Float64() < 0.05 {
+			if sim.Rando.Float64() < 0.05 {
 				sim.Stats[StatSpellDmg] += spellBonus
 				sim.addAura(Aura{
 					ID:      MagicIDSpellstrikeInfusion,
@@ -712,7 +712,7 @@ func ActivateManaEtched(sim *Simulation) Aura {
 		ID:      MagicIDManaEtched,
 		Expires: neverExpires,
 		OnCastComplete: func(sim *Simulation, c *Cast) {
-			if sim.rando.Float64() < 0.02 {
+			if sim.Rando.Float64() < 0.02 {
 				sim.Stats[StatSpellDmg] += spellBonus
 				sim.addAura(Aura{
 					ID:      MagicIDManaEtchedInsight,
@@ -793,7 +793,7 @@ func ActivateCycloneManaReduce(sim *Simulation) Aura {
 		ID:      MagicIDCyclone4pc,
 		Expires: neverExpires,
 		OnSpellHit: func(sim *Simulation, c *Cast) {
-			if c.DidCrit && sim.rando.Float64() < 0.11 {
+			if c.DidCrit && sim.Rando.Float64() < 0.11 {
 				sim.addAura(Aura{
 					ID: MagicIDCycloneMana,
 					OnCast: func(sim *Simulation, c *Cast) {
@@ -814,7 +814,7 @@ func ActivateCataclysmLBDiscount(sim *Simulation) Aura {
 		ID:      MagicIDCataclysm4pc,
 		Expires: neverExpires,
 		OnSpellHit: func(sim *Simulation, c *Cast) {
-			if c.DidCrit && sim.rando.Float64() < 0.25 {
+			if c.DidCrit && sim.Rando.Float64() < 0.25 {
 				sim.CurrentMana += 120
 			}
 		},
@@ -876,7 +876,7 @@ func TryActivateDarkRune(sim *Simulation) {
 	}
 
 	// Restores 900 to 1500 mana. (2 Min Cooldown)
-	sim.CurrentMana += 900 + (sim.rando.Float64() * 600)
+	sim.CurrentMana += 900 + (sim.Rando.Float64() * 600)
 	sim.setCD(MagicIDRune, time.Second*120)
 	if sim.Debug != nil {
 		sim.Debug("Used Dark Rune\n")
@@ -897,7 +897,7 @@ func TryActivateSuperManaPotion(sim *Simulation) {
 	}
 
 	// Restores 1800 to 3000 mana. (2 Min Cooldown)
-	manaGain := 1800 + (sim.rando.Float64() * 1200)
+	manaGain := 1800 + (sim.Rando.Float64() * 1200)
 
 	if sim.hasAura(MagicIDAlchStone) {
 		manaGain *= 1.4
@@ -920,7 +920,7 @@ func ActivateSextant(sim *Simulation) Aura {
 		ID:      MagicIDSextant,
 		Expires: neverExpires,
 		OnSpellHit: func(sim *Simulation, c *Cast) {
-			if c.DidCrit && !icd.isOnCD(sim) && sim.rando.Float64() < 0.2 {
+			if c.DidCrit && !icd.isOnCD(sim) && sim.Rando.Float64() < 0.2 {
 				icd = InternalCD(sim.CurrentTime + icdDur)
 				sim.Stats[StatSpellDmg] += spellBonus
 				sim.addAura(AuraStatRemoval(sim.CurrentTime, dur, spellBonus, StatSpellDmg, MagicIDUnstableCurrents))
@@ -960,7 +960,7 @@ func ActivateElderScribes(sim *Simulation) Aura {
 		Expires: neverExpires,
 		OnSpellHit: func(sim *Simulation, c *Cast) {
 			// This code is starting to look a lot like other ICD buff items. Perhaps we could DRY this out.
-			if !icd.isOnCD(sim) && sim.rando.Float64() < proc {
+			if !icd.isOnCD(sim) && sim.Rando.Float64() < proc {
 				icd = InternalCD(sim.CurrentTime + icdDur)
 				sim.Stats[StatSpellDmg] += spellBonus
 				sim.addAura(AuraStatRemoval(sim.CurrentTime, dur, spellBonus, StatSpellDmg, MagicIDElderScribeProc))
@@ -997,7 +997,7 @@ func ActivateFathomBrooch(sim *Simulation) Aura {
 			if c.Spell.DamageType != DamageTypeNature {
 				return
 			}
-			if sim.rando.Float64() < 0.15 {
+			if sim.Rando.Float64() < 0.15 {
 				icd = InternalCD(sim.CurrentTime + icdDur)
 				sim.CurrentMana += 335
 			}
