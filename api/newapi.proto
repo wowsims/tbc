@@ -1,0 +1,303 @@
+syntax = "proto3";
+package newapi;
+
+option go_package = "api/";
+
+enum RaceBonusType {
+    none = 0;
+    bloodelf = 1;
+    draenei = 2;
+    dwarf = 3;
+    gnome = 4;
+    human = 5;
+    nightelf = 6;
+    orc = 7;
+    tauren = 8;
+    troll10 = 9;
+    troll30 = 10;
+    undead = 11;
+}
+
+enum Stat {
+    strength = 0;
+    agility = 1;
+    stamina = 2;
+    intellect = 3;
+    spirit = 4;
+    spell_crit = 5;
+    spell_hit = 6;
+    healing = 7;
+    spell_power = 8;
+    spell_haste = 9;
+    mp5 = 10;
+    spellpen = 11;
+    fire_spell_power = 12;
+    nature_spell_power = 13;
+    frost_spell_power = 14;
+    shadow_spell_power = 15;
+    holy_spell_power = 16;
+    arcane_spell_power = 17;
+    attack_power = 18;
+    melee_hit = 19;
+    melee_haste = 20;
+    melee_crit = 21;
+    expertise = 22;
+    armor_penetration = 23;
+    mana = 24;
+    energy = 25;
+    rage = 26;
+    armor = 27;
+}
+
+enum ItemQuality {
+    junk = 0;
+    uncommon = 1;
+    rare = 2;
+    epic = 3;
+    legendary = 4;
+}
+
+enum GemColor {
+    unknown_color = 0;
+    meta = 1;
+    red = 2;
+    blue = 3;
+    yellow = 4;
+    green = 5;
+    orange = 6;
+    purple = 7;
+    prismatic = 8;
+}
+
+message Buffs {
+    // Raid buffs
+    bool arcane_int = 1;
+    bool gift_of_the_wild = 2;
+    bool blessing_of_kings = 3;
+    bool improved_blessing_of_wisdom = 4;
+    bool improved_divine_spirit = 5;
+
+    // Party Buffs
+    bool moonkin = 6;
+    bool moonkin_raven_goddess = 7;
+    int32 spriest_dps = 8;
+
+    // Target Debuff
+    bool judgement_of_wisdom = 9;
+    bool improved_seal_of_the_crusader = 10;
+    bool misery = 11;
+}
+
+message Consumes {
+    bool brilliant_wizard_oil = 1; 
+    bool major_mageblood = 2;
+    bool flask_of_blinding_light = 3;
+    bool flask_of_mighty_restoration = 4;
+    bool blackend_basilisk = 5;
+    bool destruction_potion = 6;
+    bool super_mana_potion = 7;
+    bool dark_rune = 8;
+    bool drums_of_battle = 9;
+}
+
+message PlayerOptions {
+    RaceBonusType race = 1;
+    oneof class {
+        Druid druid = 2;
+        Hunter hunter = 3;
+        Mage mage = 4;
+        Paladin paladin = 5;
+        Priest priest = 6;
+        Rogue rogue = 7;
+        Shaman shaman = 8;
+        Warlock warlock = 9;
+        Warrior warrior = 10;
+    }
+    Consumes consumes = 11; // What consumes this player is going to be using.
+}
+
+message Druid {
+}
+message Hunter {
+}
+message Mage {
+}
+message Paladin {
+}
+message Priest {
+}
+message Rogue {
+}
+message Shaman {
+    enum AgentType {
+        unknown_agent = 0;
+        fixed_lb_cl = 1;
+        cl_on_clearcast = 2;
+        adaptive = 3;
+        enhancer = 4;
+    }
+    AgentType agentType = 1;
+
+    message ShamanSpec {
+        int32 lightning_overload = 1;
+        int32 elemental_precision = 2;
+        int32 natures_guidance = 3;
+        int32 tidal_mastery = 4;
+        bool elemental_mastery = 5;
+        int32 unrelenting_storm = 6;
+        int32 call_of_thunder = 7;
+        int32 convection = 8;
+    }
+    ShamanSpec spec = 2;
+    
+    bool water_shield = 3;
+    // int32 WaterShieldPPM
+    
+    map<string, string> AgentOptions = 4;
+    // Are there "agent" and "spec" options specific to the specs we would need 
+    // some kind of options map here? Or would just the 'AgentType' alone encapsulate
+    // everything needed?
+}
+message Warlock {
+}
+message Warrior {
+}
+
+message ItemSpec {
+    int32 id = 2;
+    int32 enchant = 3;
+    repeated int32 gems = 4;
+}
+
+message EquipmentSpec {
+    repeated ItemSpec items = 1;
+}
+
+message Player {
+    PlayerOptions options = 1;
+    EquipmentSpec equipment = 2;
+    repeated double custom_stats = 3;
+}
+
+message Party {
+    repeated Player players = 1;
+}
+
+message Raid {
+    repeated Party parties = 1; 
+}
+
+message Encounter {
+    int32 target_armor = 1;
+    double duration = 2;
+    int32 num_targets = 3;
+}
+
+// RPC IndividualSim
+message IndividualSimRequest {
+    Player player = 1;
+    Buffs buffs = 2;
+    Encounter encounter = 3;
+    int64 random_seed = 4;
+    double gcd_min = 5; // sets the minimum GCD
+    bool debug = 6; // enables debug logging.
+}
+
+message IndividualSimResult {
+    int64 execution_duration_ms = 1;
+    string logs = 2;
+
+    double dps_avg   = 3;
+    double dps_stdev = 4;
+    double dps_max   = 5;
+    map<int32, int32> dps_hist = 6;
+
+    int32 num_oom = 7;
+    double oom_at_avg = 8;
+    double dps_at_oom_avg = 9;
+
+    map<int32, CastMetric> casts = 10;
+    // TODO: melee
+    // map<int32, AttackMetric> attacks = 11; 
+}
+
+// CastMetric holds a collection of counts of casts and 
+// 
+message CastMetric {
+    repeated int32 counts = 1;
+    repeated double dmgs = 2;
+    repeated int32 tags = 3;
+}
+
+// RPC RaidSim
+message RaidSimRequest {
+    Raid raid = 1;
+    Encounter encounter = 2;
+    int64 random_seed = 3;
+    double gcd_min = 4; // sets the minimum GCD
+    bool debug = 5; // enables debug printing.
+}
+
+message Item {
+    int32 id = 1;
+    int32 slot = 2;
+    int32 sub_slot = 3;
+    string name = 4;
+    repeated double stats = 5;
+    int32 phase = 6;
+    ItemQuality quality = 7;
+    repeated GemColor gem_slots = 8;
+    repeated double socket_bonus = 9; // does the client need this any more?
+}
+message Enchant {
+    int32 id = 1;        // ID of the enchant "item".
+    int32 effect_id = 2;  // ID of the effect (for the item tooltip UI)
+    string name = 3;     
+    int32 slot = 5;      // which slot does the enchant go on.
+}
+message Gem {
+    int32 id = 1;
+    string name = 2;
+    repeated double stats = 3;
+    GemColor color = 4;
+    int32 phase = 5;
+    ItemQuality quality = 6;
+}
+
+// RPC GearList
+enum Spec {
+    elemental_shaman = 0;
+}
+message GearListRequest {
+    Spec spec = 1; // Each spec has a custom gear list
+}
+message GearListResult {
+    repeated Item items = 1;
+    repeated Enchant enchants = 2;
+    repeated Gem gems = 3;
+}
+
+// RPC ComputeStats
+message ComputeStatsRequest {
+    Player player = 1;
+    Buffs buffs = 2;
+    EquipmentSpec gear = 3;
+}
+message ComputeStatsResult {
+    repeated double gear_only = 1;
+    repeated double finalStats = 2;
+    repeated string sets = 3;
+}
+
+// RPC StatWeights
+message StatWeightsRequest {
+    IndividualSimRequest options = 1;
+    repeated int32 stats_to_weigh = 2;
+    int32 base_stat = 3;
+}
+message StatWeightsResult {
+    repeated double weights = 1;
+    repeated double Weights_stdev = 2;
+    repeated double ep_values = 3;
+    repeated double ep_values_stdev = 4;
+}
