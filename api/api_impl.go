@@ -13,6 +13,9 @@ import (
 func getGearListImpl(request *GearListRequest) *GearListResult {
 	result := GearListResult{}
 
+	for k, v := range request.Spec {
+
+	}
 	// Items:    items,
 	// Enchants: Enchants,
 	// Gems:     Gems,
@@ -22,19 +25,19 @@ func getGearListImpl(request *GearListRequest) *GearListResult {
 
 func computeStatsImpl(request *ComputeStatsRequest) *ComputeStatsResult {
 	panic("not implemented")
-	fakeSim := core.NewSim(request.Gear, request.Options)
+	// fakeSim := core.NewSim(request.Gear, request.Options)
 
-	sets := fakeSim.ActivateSets()
-	fakeSim.reset() // this will activate any perm-effect items as well
+	// sets := fakeSim.ActivateSets()
+	// fakeSim.reset() // this will activate any perm-effect items as well
 
-	gearOnlyStats := fakeSim.Equip.Stats().CalculatedTotal()
-	finalStats := fakeSim.Stats
+	// gearOnlyStats := fakeSim.Equip.Stats().CalculatedTotal()
+	// finalStats := fakeSim.Stats
 
-	return &ComputeStatsResult{
-		GearOnly:   gearOnlyStats,
-		FinalStats: finalStats,
-		Sets:       sets,
-	}
+	// return &ComputeStatsResult{
+	// 	GearOnly:   gearOnlyStats,
+	// 	FinalStats: finalStats,
+	// 	Sets:       sets,
+	// }
 }
 
 func statWeightsImpl(request *StatWeightsRequest) *StatWeightsResult {

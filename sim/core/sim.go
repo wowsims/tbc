@@ -14,19 +14,6 @@ func debugFunc(sim *Simulation) func(string, ...interface{}) {
 	}
 }
 
-type PlayerAgent interface {
-	BuffUp(*Simulation) // Any pre-start buffs to apply to the raid.
-
-	// Returns the action this Agent would like to take next.
-	ChooseAction(*Simulation) AgentAction
-
-	// This will be invoked if the chosen action is actually executed, so the Agent can update its state.
-	OnActionAccepted(*Simulation, AgentAction)
-
-	// Returns this Agent to its initial state.
-	Reset(*Simulation)
-}
-
 type Options struct {
 	Encounter Encounter
 	RSeed     int64

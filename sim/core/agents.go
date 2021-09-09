@@ -14,7 +14,7 @@ type PlayerAgent interface {
 	OnActionAccepted(*Simulation, AgentAction)
 
 	// Returns this Agent to its initial state.
-	Reset(*Simulation)
+	Reset(newsim *Simulation)
 }
 
 // A single action that an Agent can take.

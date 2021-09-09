@@ -168,35 +168,6 @@ type Consumes struct {
 	DarkRune          bool
 }
 
-func (c Consumes) Pack() []byte {
-	var opt1 byte
-	if c.BrilliantWizardOil {
-		opt1 = opt1 | 1
-	}
-	if c.MajorMageblood {
-		opt1 = opt1 | 1<<1
-	}
-	if c.FlaskOfBlindingLight {
-		opt1 = opt1 | 1<<2
-	}
-	if c.FlaskOfMightyRestoration {
-		opt1 = opt1 | 1<<3
-	}
-	if c.BlackendBasilisk {
-		opt1 = opt1 | 1<<4
-	}
-	if c.DestructionPotion {
-		opt1 = opt1 | 1<<5
-	}
-	if c.SuperManaPotion {
-		opt1 = opt1 | 1<<6
-	}
-	if c.DarkRune {
-		opt1 = opt1 | 1<<7
-	}
-	return []byte{opt1}
-}
-
 func (c Consumes) AddStats(s Stats) Stats {
 	if c.BrilliantWizardOil {
 		s[StatSpellCrit] += 14
