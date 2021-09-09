@@ -198,9 +198,10 @@ message IndividualSimRequest {
     Player player = 1;
     Buffs buffs = 2;
     Encounter encounter = 3;
-    int64 random_seed = 4;
-    double gcd_min = 5; // sets the minimum GCD
-    bool debug = 6; // enables debug logging.
+    int32 iterations = 4;
+    int64 random_seed = 5;
+    double gcd_min = 6; // sets the minimum GCD
+    bool debug = 7; // enables debug logging.
 }
 
 message IndividualSimResult {

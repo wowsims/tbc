@@ -85,7 +85,6 @@ type Cast struct {
 	DidHit  bool
 	DidCrit bool
 	DidDmg  float64
-	CastAt  time.Duration // simulation time the spell cast
 
 	Effect AuraEffect // effects applied ONLY to this cast.
 }

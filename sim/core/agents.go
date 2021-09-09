@@ -4,8 +4,14 @@ import (
 	"time"
 )
 
-type PlayerAgent interface {
-	BuffUp(*Simulation) // Any pre-start buffs to apply to the raid.
+type PlayerAgent struct {
+	Agent
+	*Player
+}
+
+type Agent interface {
+	// Any pre-start buffs to apply to the raid/party/self
+	BuffUp(*Simulation, *Party)
 
 	// Returns the action this Agent would like to take next.
 	ChooseAction(*Simulation) AgentAction

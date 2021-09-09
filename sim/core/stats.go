@@ -160,7 +160,7 @@ func CalculateTotalStats(o Options, e Equipment) Stats {
 	stats = stats.CalculatedTotal()
 
 	// Add stat increases from talents
-	stats[StatMP5] += stats[StatInt] * (0.02 * float64(o.Talents.UnrelentingStormP)
+	// stats[StatMP5] += stats[StatInt] * (0.02 * float64(o.Talents.UnrelentingStorm)
 
 	return stats
 }

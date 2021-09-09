@@ -4,17 +4,32 @@ package api
 import (
 	"math"
 	"math/rand"
-	"time"
 
 	"github.com/wowsims/tbc/sim/core"
+	"github.com/wowsims/tbc/sim/runner"
 	"github.com/wowsims/tbc/sim/shaman"
 )
 
 func getGearListImpl(request *GearListRequest) *GearListResult {
-	result := GearListResult{}
+	result := &GearListResult{}
 
-	for k, v := range request.Spec {
-
+	if request.Spec == Spec_elemental_shaman {
+		for _, v := range shaman.ElementalItems {
+			item := core.ItemsByID[v]
+			result.Items = append(result.Items,
+				&Item{
+					Id:      item.ID,
+					Slot:    int32(item.Slot),
+					SubSlot: int32(item.SubSlot),
+					Name:    item.Name,
+					// Stats:       item.Stats,
+					Phase:   int32(item.Phase),
+					Quality: ItemQuality(item.Quality),
+					// GemSlots:    item.GemSlots,
+					// SocketBonus: item.SocketBonus,
+				},
+			)
+		}
 	}
 	// Items:    items,
 	// Enchants: Enchants,
@@ -144,128 +159,43 @@ func sampleFromDpsHist(hist map[int]int, histNumSamples int) int {
 }
 
 func runSimulationImpl(request *IndividualSimRequest) *IndividualSimResult {
-	panic("not implemented")
+	// panic("not implemented")
 
-	var agent core.PlayerAgent
+	player := core.NewPlayer(core.EquipmentSpec{}, core.Consumes{})
+
+	var agent core.Agent
 	switch v := request.Player.Options.Class.(type) {
 	case *PlayerOptions_Shaman:
-		switch v.Shaman.AgentType {
-		case Shaman_cl_on_clearcast, Shaman_fixed_lb_cl, Shaman_adaptive:
-			agent = shaman.NewElemental(int(v.Shaman.AgentType), v.Shaman.AgentOptions)
-		case Shaman_enhancer:
-			agent = shaman.NewEnhancement(int(v.Shaman.AgentType), v.Shaman.AgentOptions)
-		}
+		agent = shaman.NewShaman(player, int(v.Shaman.AgentType), v.Shaman.AgentOptions)
 	default:
 		panic("class not supported")
 	}
-	player := core.NewPlayer(EquipmentSpec{}, Consumes{}, agent)
 
-	// if sim.Options.Buffs.Misery {
-	// 	sim.cache.elcDmgBonus += 0.05
-	// 	sim.cache.dmgBonus += 0.05
-	// }
-
-	// Buffs    Buffs
-	// sim := NewSim(request.Gear, request.Options)
-
-	// logsBuffer := &strings.Builder{}
-	// aggregator := NewMetricsAggregator()
-
-	// if request.IncludeLogs {
-	// 	sim.Debug = func(s string, vals ...interface{}) {
-	// 		logsBuffer.WriteString(fmt.Sprintf("[%0.1f] "+s, append([]interface{}{sim.CurrentTime.Seconds()}, vals...)...))
-	// 	}
-	// }
-
-	// for i := 0; i < request.Iterations; i++ {
-	// 	metrics := sim.Run()
-	// 	aggregator.addMetrics(request.Options, metrics)
-	// 	sim.cache.ReturnCasts(metrics.Casts)
-	// }
-
-	// result := aggregator.getResult()
-	// result.Logs = logsBuffer.String()
-	// return result
-}
-
-type MetricsAggregator struct {
-	startTime time.Time
-	numSims   int
-
-	dpsSum        float64
-	dpsSumSquared float64
-	dpsMax        float64
-	dpsHist       map[int]int // rounded DPS to count
-
-	numOom      int
-	oomAtSum    float64
-	dpsAtOomSum float64
-
-	casts map[int32]CastMetric
-}
-
-func NewMetricsAggregator() *MetricsAggregator {
-	return &MetricsAggregator{
-		startTime: time.Now(),
-		dpsHist:   make(map[int]int),
-		casts:     make(map[int32]CastMetric),
-	}
-}
-
-func (aggregator *MetricsAggregator) addMetrics(options Options, metrics SimMetrics) {
-	aggregator.numSims++
-
-	dps := metrics.TotalDamage / options.Encounter.Duration
-	if options.DPSReportTime > 0 {
-		dps = metrics.ReportedDamage / float64(options.DPSReportTime)
+	raid := &core.Raid{
+		Parties: []*core.Party{
+			{
+				Players: []core.PlayerAgent{
+					{Player: player, Agent: agent},
+				},
+			},
+		},
 	}
 
-	aggregator.dpsSum += dps
-	aggregator.dpsSumSquared += dps * dps
-	aggregator.dpsMax = math.Max(aggregator.dpsMax, dps)
+	options := core.Options{}
 
-	dpsRounded := int(math.Round(dps/10) * 10)
-	aggregator.dpsHist[dpsRounded]++
-
-	if metrics.OOMAt > 0 {
-		aggregator.numOom++
-		aggregator.oomAtSum += float64(metrics.OOMAt)
-		aggregator.dpsAtOomSum += float64(metrics.DamageAtOOM) / float64(metrics.OOMAt)
+	isr := &IndividualSimResult{
+		// ExecutionDurationMs int64                 `protobuf:"varint,1,opt,name=execution_duration_ms,json=executionDurationMs,proto3" json:"execution_duration_ms,omitempty"`
+		// Logs                string                `protobuf:"bytes,2,opt,name=logs,proto3" json:"logs,omitempty"`
+		// DpsAvg              float64               `protobuf:"fixed64,3,opt,name=dps_avg,json=dpsAvg,proto3" json:"dps_avg,omitempty"`
+		// DpsStdev            float64               `protobuf:"fixed64,4,opt,name=dps_stdev,json=dpsStdev,proto3" json:"dps_stdev,omitempty"`
+		// DpsMax              float64               `protobuf:"fixed64,5,opt,name=dps_max,json=dpsMax,proto3" json:"dps_max,omitempty"`
+		// DpsHist             map[int32]int32       `protobuf:"bytes,6,rep,name=dps_hist,json=dpsHist,proto3" json:"dps_hist,omitempty" protobuf_key:"varint,1,opt,name=key,proto3" protobuf_val:"varint,2,opt,name=value,proto3"`
+		// NumOom              int32                 `protobuf:"varint,7,opt,name=num_oom,json=numOom,proto3" json:"num_oom,omitempty"`
+		// OomAtAvg            float64               `protobuf:"fixed64,8,opt,name=oom_at_avg,json=oomAtAvg,proto3" json:"oom_at_avg,omitempty"`
+		// DpsAtOomAvg         float64               `protobuf:"fixed64,9,opt,name=dps_at_oom_avg,json=dpsAtOomAvg,proto3" json:"dps_at_oom_avg,omitempty"`
+		// Casts               map[int32]*CastMetric `protobuf:"bytes,10,rep,name=casts,proto3" json:"casts,omitempty" protobuf_key:"varint,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 	}
+	runner.RunSim(raid, options)
 
-	for _, cast := range metrics.Casts {
-		var id = cast.Spell.ID
-		cm := aggregator.casts[id]
-		idx := 0
-		if cast.IsLO {
-			idx = 2
-		} else if cast.DidCrit {
-			idx = 1
-		}
-		cm.Counts[idx]++
-		cm.Dmgs[idx] += cast.DidDmg
-
-		aggregator.casts[id] = cm
-	}
+	return isr
 }
-
-// func (aggregator *MetricsAggregator) getResult() SimResult {
-// 	result := SimResult{}
-// 	result.ExecutionDurationMs = time.Since(aggregator.startTime).Milliseconds()
-
-// 	numSims := float64(aggregator.numSims)
-// 	result.DpsAvg = aggregator.dpsSum / numSims
-// 	result.DpsStDev = math.Sqrt((aggregator.dpsSumSquared / numSims) - (result.DpsAvg * result.DpsAvg))
-// 	result.DpsMax = aggregator.dpsMax
-// 	result.DpsHist = aggregator.dpsHist
-
-// 	result.NumOom = aggregator.numOom
-// 	if result.NumOom > 0 {
-// 		result.OomAtAvg = aggregator.oomAtSum / float64(aggregator.numOom)
-// 		result.DpsAtOomAvg = aggregator.dpsAtOomSum / float64(aggregator.numOom)
-// 	}
-
-// 	result.Casts = aggregator.casts
-
-// 	return result
-// }

@@ -42,7 +42,6 @@ func (p *cache) ReturnCasts(casts []*Cast) {
 		v.DidHit = false
 		v.DidCrit = false
 		v.DidDmg = 0
-		v.CastAt = 0
 		v.Effect = nil
 	}
 

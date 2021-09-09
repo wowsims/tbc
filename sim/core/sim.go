@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"math"
 	"math/rand"
-	"strconv"
+	"sort"
 	"time"
 )
 
@@ -15,13 +15,12 @@ func debugFunc(sim *Simulation) func(string, ...interface{}) {
 }
 
 type Options struct {
-	Encounter Encounter
-	RSeed     int64
-	ExitOnOOM bool
-	GCDMin    time.Duration // sets the minimum GCD
-
-	DPSReportTime time.Duration // how many seconds to calculate DPS for.
-	Debug         bool          // enables debug printing.
+	Encounter  Encounter
+	Iterations int32
+	RSeed      int64
+	ExitOnOOM  bool
+	GCDMin     time.Duration // sets the minimum GCD
+	Debug      bool          // enables debug printing.
 }
 
 type Encounter struct {
@@ -31,9 +30,10 @@ type Encounter struct {
 }
 
 type Simulation struct {
-	Raid     Raid
-	Options  Options
-	Duration time.Duration
+	Raid         Raid
+	Options      Options
+	Duration     time.Duration
+	*AuraTracker // Global Debuffs mostly.. put on the boss/target
 
 	// Clears and regenerates on each Run call.
 	Metrics SimMetrics
@@ -49,56 +49,49 @@ type Simulation struct {
 }
 
 type SimMetrics struct {
-	TotalDamage    float64
-	ReportedDamage float64 // used when DPSReportTime is set
-	DamageAtOOM    float64
-	OOMAt          float64
-	Casts          []*Cast
-	ManaSpent      float64
-	ManaAtEnd      int
+	TotalDamage       float64
+	Casts             []*Cast
+	IndividualMetrics []IndividualMetric
+}
+
+type IndividualMetric struct {
+	// TODO: ID the player somehow?
+	TotalDamage float64
+	DamageAtOOM float64
+	OOMAt       float64
+	ManaSpent   float64
 }
 
 // New sim contructs a simulator with the given equipment / options.
-func NewSim(raid Raid, options Options) *Simulation {
+func NewSim(raid *Raid, options Options) *Simulation {
 	if options.GCDMin == 0 {
 		options.GCDMin = durationFromSeconds(0.75) // default to 0.75s GCD
 	}
 	if options.RSeed == 0 {
 		options.RSeed = time.Now().Unix()
 	}
-	// equip := NewEquipmentSet(equipSpec)
-	// initialStats := CalculateTotalStats(options, equip)
 
 	sim := &Simulation{
 		Options:  options,
 		Duration: durationFromSeconds(options.Encounter.Duration),
-		rando:    rand.New(rand.NewSource(options.RSeed)),
+		Rando:    rand.New(rand.NewSource(options.RSeed)),
 		Debug:    nil,
 		cache: &cache{
 			castPool: make([]*Cast, 0, 1000),
 		},
+		AuraTracker: &AuraTracker{},
 	}
 
 	sim.cache.fillCasts()
 
-	for i, eq := range equip {
-		if eq.Activate != nil {
-			sim.activeEquip = append(sim.activeEquip, &equip[i])
-		}
-		for _, g := range eq.Gems {
-			if g.Activate != nil {
-				sim.activeEquip = append(sim.activeEquip, &equip[i])
-			}
-		}
-	}
-
-	sim.Agent = NewAgent(sim, options.AgentType)
-	if sim.Agent == nil {
-		fmt.Printf("[ERROR] No rotation given to sim.\n")
-		return nil
-	}
-
 	return sim
+}
+
+func (sim *Simulation) NewCast() *Cast {
+	return sim.cache.NewCast()
+}
+func (sim *Simulation) ReturnCasts(casts []*Cast) {
+	sim.cache.ReturnCasts(casts)
 }
 
 // reset will set sim back and erase all current state.
@@ -106,78 +99,40 @@ func NewSim(raid Raid, options Options) *Simulation {
 //  This includes resetting and reactivating always on trinkets, auras, set bonuses, etc
 func (sim *Simulation) reset() {
 	// sim.rseed++
-	// sim.rando.Seed(sim.rseed)
+	// sim.Rando.Seed(sim.rseed)
 
-	sim.Stats = sim.InitialStats
-	sim.cache.destructionPotion = false
-	sim.cache.bloodlustCasts = 0
 	sim.CurrentTime = 0.0
-	sim.CurrentMana = sim.Stats[StatMana]
-	sim.CDs = [MagicIDLen]time.Duration{}
-	sim.auras = [MagicIDLen]Aura{}
-	if len(sim.activeAuraIDs) > 0 {
-		sim.activeAuraIDs = sim.activeAuraIDs[len(sim.activeAuraIDs)-1:] // chop off end of activeids slice, faster than making a new one
-	}
-	sim.metrics = SimMetrics{
+	sim.ResetAuras()
+	sim.Metrics = SimMetrics{
 		Casts: make([]*Cast, 0, 1000),
 	}
-
 	if sim.Debug != nil {
 		sim.Debug("SIM RESET\n")
 		sim.Debug("----------------------\n")
 	}
 
-	// Activate all talents
-	if sim.Options.Talents.LightningOverload > 0 {
-		sim.addAura(AuraLightningOverload(sim.Options.Talents.LightningOverload))
-	}
-
-	// Chain lightning bounces
-	if sim.Options.Encounter.NumClTargets > 1 {
-		sim.addAura(ActivateChainLightningBounce(sim))
-	}
-
-	// Judgement of Wisdom
-	if sim.Options.Buffs.JudgementOfWisdom {
-		sim.addAura(AuraJudgementOfWisdom())
-	}
-
-	// Activate all permanent item effects.
-	for _, item := range sim.activeEquip {
-		if item.Activate != nil && item.ActivateCD == neverExpires {
-			sim.addAura(item.Activate(sim))
-		}
-		for _, g := range item.Gems {
-			if g.Activate != nil {
-				sim.addAura(g.Activate(sim))
-			}
+	// Reset all players
+	for _, party := range sim.Raid.Parties {
+		for _, pl := range party.Players {
+			pl.Player.Reset()
+			pl.Agent.Reset(sim)
 		}
 	}
 
-	sim.ActivateSets()
-	sim.Agent.Reset(sim)
-
-	// Currently no temp hit increase effects in the sim... so lets cache this!
-	sim.cache.spellHit = 0.83 + sim.Stats[StatSpellHit]/1260.0 // 12.6 hit == 1% hit
+	// Now buff everyone back up!
+	for _, party := range sim.Raid.Parties {
+		for _, pl := range party.Players {
+			pl.ActivateSets(sim)
+			pl.TryActivateEquipment()
+			pl.BuffUp(sim, party)
+		}
+	}
 }
 
-// Activates set bonuses, returning the list of active bonuses.
-func (sim *Simulation) ActivateSets() []string {
-	active := []string{}
-	// Activate Set Bonuses
-	setItemCount := map[string]int{}
-	for _, i := range sim.Equip {
-		set := itemSetLookup[i.ID]
-		if set != nil {
-			setItemCount[set.Name]++
-			if bonus, ok := set.Bonuses[setItemCount[set.Name]]; ok {
-				active = append(active, set.Name+" ("+strconv.Itoa(setItemCount[set.Name])+"pc)")
-				sim.addAura(bonus(sim))
-			}
-		}
-	}
-
-	return active
+type pendingAction struct {
+	Agent PlayerAgent
+	AgentAction
+	ExecuteAt time.Duration
 }
 
 // Run will run the simulation for number of seconds.
@@ -185,125 +140,110 @@ func (sim *Simulation) ActivateSets() []string {
 func (sim *Simulation) Run() SimMetrics {
 	sim.reset()
 
-	for sim.CurrentTime < sim.Duration {
-		TryActivateDrums(sim)
-		TryActivateBloodlust(sim)
-		TryActivateEleMastery(sim)
-		TryActivateRacial(sim)
-		TryActivateDestructionPotion(sim)
-		sim.TryActivateEquipment()
-
-		TryActivateDarkRune(sim)
-		TryActivateSuperManaPotion(sim)
-
-		// Choose next action
-		action := sim.Agent.ChooseAction(sim)
-		if action.Wait != 0 {
-			sim.Agent.OnActionAccepted(sim, action)
-			sim.Advance(action.Wait)
-			continue
+	pendingActions := make([]pendingAction, 0, 25)
+	for _, party := range sim.Raid.Parties {
+		for _, pl := range party.Players {
+			action := pl.ChooseAction(sim)
+			pendingActions = append(pendingActions, pendingAction{
+				ExecuteAt:   action.Wait,
+				Agent:       pl,
+				AgentAction: action,
+			})
 		}
+	}
+	// order pending by execution time.
+	sort.Slice(pendingActions, func(i, j int) bool {
+		return pendingActions[i].ExecuteAt < pendingActions[j].ExecuteAt
+	})
 
-		castingSpell := action.Cast
-		if castingSpell == nil {
+	for sim.CurrentTime < sim.Duration {
+		action := pendingActions[0]
+		agent := action.Agent
+		agent.OnActionAccepted(sim, action.AgentAction)
+		if action.ExecuteAt > sim.CurrentTime {
+			sim.Advance(action.ExecuteAt - sim.CurrentTime)
+		}
+		if action.Cast != nil {
+			sim.Cast(action.Agent, action.Cast)
+		} else {
+			// FUTURE: Swing timers could be handled in this if block.
 			panic("Agent returned nil action")
 		}
-		if castingSpell.CastTime < sim.GCDMin {
-			castingSpell.CastTime = sim.GCDMin
-		}
 
-		if sim.CurrentMana >= castingSpell.ManaCost {
-			if sim.Debug != nil {
-				sim.Debug("Start Casting %s Cast Time: %0.1fs\n", castingSpell.Spell.Name, castingSpell.CastTime.Seconds())
-			}
-
-			sim.Agent.OnActionAccepted(sim, action)
-			sim.Advance(castingSpell.CastTime)
-			sim.Cast(castingSpell)
-		} else {
-			// Not enough mana, wait until there is enough mana to cast the desired spell
-			if sim.metrics.OOMAt == 0 {
-				sim.metrics.OOMAt = sim.CurrentTime.Seconds()
-				sim.metrics.DamageAtOOM = sim.metrics.TotalDamage
-				if sim.Options.ExitOnOOM {
-					return sim.metrics
+		newAction := agent.ChooseAction(sim)
+		wait := newAction.Wait
+		if newAction.Cast != nil {
+			wait = newAction.Cast.CastTime
+			if agent.Stats[StatMana] < newAction.Cast.ManaCost {
+				// Not enough mana, wait until there is enough mana to cast the desired spell
+				regenTime := durationFromSeconds((newAction.Cast.ManaCost-agent.Stats[StatMana])/agent.manaRegenPerSecond()) + 1
+				if regenTime > wait {
+					wait = regenTime
 				}
 			}
-			timeUntilRegen := durationFromSeconds((castingSpell.ManaCost-sim.CurrentMana)/sim.manaRegenPerSecond()) + 1
-			sim.Advance(timeUntilRegen)
-			// Don't actually cast; let the next iteration do the cast, so we recheck for pots/CDs/etc
+			if newAction.Cast.CastTime < sim.Options.GCDMin {
+				newAction.Cast.CastTime = sim.Options.GCDMin
+			}
+			if sim.Debug != nil {
+				sim.Debug("Start Casting %s Cast Time: %0.1fs\n", newAction.Cast.Spell.Name, newAction.Cast.CastTime.Seconds())
+			}
+		}
+		pa := pendingAction{
+			ExecuteAt:   sim.CurrentTime + wait,
+			Agent:       agent,
+			AgentAction: newAction,
+		}
+		if len(pendingActions) == 1 {
+			// We know in a single user sim, just always make the next pending action ours.
+			pendingActions[0] = pa
+		} else {
+			// Insert into the list the correct execution time.
+			for i, v := range pendingActions {
+				if v.ExecuteAt >= pa.ExecuteAt {
+					copy(pendingActions, pendingActions[:i])
+					pendingActions[i] = pa
+				}
+			}
 		}
 	}
-	sim.metrics.ManaAtEnd = int(sim.CurrentMana)
 
-	return sim.metrics
-}
-
-// Advance moves time forward counting down auras, CDs, mana regen, etc
-func (sim *Simulation) Advance(elapsedTime time.Duration) {
-	newTime := sim.CurrentTime + elapsedTime
-
-	// MP5 regen
-	sim.CurrentMana = math.Min(
-		sim.Stats[StatMana],
-		sim.CurrentMana+sim.manaRegenPerSecond()*elapsedTime.Seconds())
-
-	// Go in reverse order so we can safely delete while looping
-	for i := len(sim.activeAuraIDs) - 1; i >= 0; i-- {
-		id := sim.activeAuraIDs[i]
-		if sim.auras[id].Expires != 0 && sim.auras[id].Expires <= newTime {
-			sim.removeAura(id)
-		}
-	}
-	sim.CurrentTime = newTime
+	return sim.Metrics
 }
 
 // Cast will actually cast and treat all casts as having no 'flight time'.
 // This will activate any auras around casting, calculate hit/crit and add to sim metrics.
-func (sim *Simulation) Cast(cast *Cast) {
+func (sim *Simulation) Cast(p *Player, cast *Cast) {
 	if sim.Debug != nil {
-		sim.Debug("Current Mana %0.0f, Cast Cost: %0.0f\n", sim.CurrentMana, cast.ManaCost)
+		sim.Debug("Current Mana %0.0f, Cast Cost: %0.0f\n", p.Stats[StatMana], cast.ManaCost)
 	}
-	sim.CurrentMana -= cast.ManaCost
-	sim.metrics.ManaSpent += cast.ManaCost
+	p.Stats[StatMana] -= cast.ManaCost
+	// sim.Metrics.ManaSpent += cast.ManaCost
 
-	for _, id := range sim.activeAuraIDs {
-		if sim.auras[id].OnCastComplete != nil {
-			sim.auras[id].OnCastComplete(sim, cast)
+	for _, id := range p.ActiveAuraIDs {
+		if p.Auras[id].OnCastComplete != nil {
+			p.Auras[id].OnCastComplete(sim, p, cast)
 		}
 	}
-	hit := sim.cache.spellHit + cast.Hit // 12.6 hit == 1% hit
-	hit = math.Min(hit, 0.99)            // can't get away from the 1% miss
+	hit := 0.83 + p.Stats[StatSpellHit]/1260.0 + cast.Hit // 12.6 hit == 1% hit
+	hit = math.Min(hit, 0.99)                             // can't get away from the 1% miss
 
 	dbgCast := cast.Spell.Name
 	if sim.Debug != nil {
 		sim.Debug("Completed Cast (%s)\n", dbgCast)
 	}
-	if sim.rando.Float64() < hit {
-		dmg := (sim.rando.Float64() * cast.Spell.DmgDiff) + cast.Spell.MinDmg + (sim.Stats[StatSpellDmg] * cast.Spell.Coeff)
+	if sim.Rando.Float64() < hit {
+		dmg := (sim.Rando.Float64() * cast.Spell.DmgDiff) + cast.Spell.MinDmg + (p.Stats[StatSpellPower] * cast.Spell.Coeff)
 		if cast.DidDmg != 0 { // use the pre-set dmg
 			dmg = cast.DidDmg
 		}
 		cast.DidHit = true
 
-		itsElectric := cast.Spell.ID == MagicIDCL6 || cast.Spell.ID == MagicIDLB12
+		// itsElectric := cast.Spell.ID == MagicIDCL6 || cast.Spell.ID == MagicIDLB12
 
-		crit := (sim.Stats[StatSpellCrit] / 2208.0) + cast.Crit // 22.08 crit == 1% crit
-		if sim.rando.Float64() < crit {
+		crit := (p.Stats[StatSpellCrit] / 2208.0) + cast.Crit // 22.08 crit == 1% crit
+		if sim.Rando.Float64() < crit {
 			cast.DidCrit = true
-			critBonus := 1.5 // fall back crit damage
-			if cast.CritBonus != 0 {
-				critBonus = cast.CritBonus // This means we had pre-set the crit bonus when the spell was created. CSD will modify this.
-			}
-			if itsElectric {
-				critBonus *= 2 // This handles the 'Elemental Fury' talent which increases the crit bonus.
-				critBonus -= 1 // reduce to multiplier instead of percent.
-			}
-			dmg *= critBonus
-			if cast.Spell.ID != MagicIDTLCLB {
-				// TLC does not proc focus.
-				sim.addAura(AuraElementalFocus(sim))
-			}
+			dmg *= cast.CritBonus
 			if sim.Debug != nil {
 				dbgCast += " crit"
 			}
@@ -311,17 +251,18 @@ func (sim *Simulation) Cast(cast *Cast) {
 			dbgCast += " hit"
 		}
 
-		if itsElectric {
-			dmg *= sim.cache.elcDmgBonus
-		} else {
-			dmg *= sim.cache.dmgBonus
-		}
+		// TODO: move dmg bonuses where they belong.
+		// if itsElectric {
+		// 	dmg *= sim.cache.elcDmgBonus
+		// } else {
+		// 	dmg *= sim.cache.dmgBonus
+		// }
 
 		// Average Resistance (AR) = (Target's Resistance / (Caster's Level * 5)) * 0.75
 		// P(x) = 50% - 250%*|x - AR| <- where X is %resisted
 		// Using these stats:
 		//    13.6% chance of
-		resVal := sim.rando.Float64()
+		resVal := sim.Rando.Float64()
 		if resVal < 0.18 { // 13% chance for 25% resist, 4% for 50%, 1% for 75%
 			if sim.Debug != nil {
 				dbgCast += " (partial resist: "
@@ -346,12 +287,12 @@ func (sim *Simulation) Cast(cast *Cast) {
 		cast.DidDmg = dmg
 		// Apply any effects specific to this cast.
 		if cast.Effect != nil {
-			cast.Effect(sim, cast)
+			cast.Effect(sim, p, cast)
 		}
 		// Apply any on spell hit effects.
-		for _, id := range sim.activeAuraIDs {
-			if sim.auras[id].OnSpellHit != nil {
-				sim.auras[id].OnSpellHit(sim, cast)
+		for _, id := range p.ActiveAuraIDs {
+			if p.Auras[id].OnSpellHit != nil {
+				p.Auras[id].OnSpellHit(sim, p, cast)
 			}
 		}
 	} else {
@@ -361,117 +302,43 @@ func (sim *Simulation) Cast(cast *Cast) {
 		cast.DidDmg = 0
 		cast.DidCrit = false
 		cast.DidHit = false
-		for _, id := range sim.activeAuraIDs {
-			if sim.auras[id].OnSpellMiss != nil {
-				sim.auras[id].OnSpellMiss(sim, cast)
+		for _, id := range p.ActiveAuraIDs {
+			if p.Auras[id].OnSpellMiss != nil {
+				p.Auras[id].OnSpellMiss(sim, p, cast)
 			}
 		}
 	}
 
 	if cast.Spell.Cooldown > 0 {
-		sim.setCD(cast.Spell.ID, cast.Spell.Cooldown)
+		p.SetCD(cast.Spell.ID, cast.Spell.Cooldown)
 	}
 
 	if sim.Debug != nil {
 		sim.Debug("%s: %0.0f\n", dbgCast, cast.DidDmg)
 	}
 
-	sim.metrics.Casts = append(sim.metrics.Casts, cast)
-
-	sim.metrics.TotalDamage += cast.DidDmg
-	if sim.Options.DPSReportTime > 0 && sim.CurrentTime <= sim.cache.dpsReportTime {
-		sim.metrics.ReportedDamage += cast.DidDmg
-	}
+	sim.Metrics.Casts = append(sim.Metrics.Casts, cast)
+	sim.Metrics.TotalDamage += cast.DidDmg
 }
 
-// addAura will add a new aura to the simulation. If there is a matching aura ID
-// it will be replaced with the newer aura.
-// Auras with duration of 0 will be logged as activating but never added to simulation auras.
-func (sim *Simulation) addAura(newAura Aura) {
-	if sim.Debug != nil {
-		sim.Debug(" +%s\n", AuraName(newAura.ID))
-	}
-	if newAura.Expires < sim.CurrentTime {
-		return // no need to waste time adding aura that doesn't last.
-	}
+// Advance moves time forward counting down auras, CDs, mana regen, etc
+func (sim *Simulation) Advance(elapsedTime time.Duration) {
+	newTime := sim.CurrentTime + elapsedTime
 
-	if sim.hasAura(newAura.ID) {
-		sim.removeAura(newAura.ID)
-	}
-
-	sim.auras[newAura.ID] = newAura
-	sim.auras[newAura.ID].activeIndex = int32(len(sim.activeAuraIDs))
-	sim.activeAuraIDs = append(sim.activeAuraIDs, newAura.ID)
-}
-
-// Remove an aura by its ID
-func (sim *Simulation) removeAura(id int32) {
-	if sim.auras[id].OnExpire != nil {
-		sim.auras[id].OnExpire(sim, nil)
-	}
-	removeActiveIndex := sim.auras[id].activeIndex
-	sim.auras[id] = Aura{}
-
-	// Overwrite the element being removed with the last element
-	otherAuraID := sim.activeAuraIDs[len(sim.activeAuraIDs)-1]
-	if id != otherAuraID {
-		sim.activeAuraIDs[removeActiveIndex] = otherAuraID
-		sim.auras[otherAuraID].activeIndex = removeActiveIndex
-	}
-
-	// Now we can remove the last element, in constant time
-	sim.activeAuraIDs = sim.activeAuraIDs[:len(sim.activeAuraIDs)-1]
-
-	if sim.Debug != nil {
-		sim.Debug(" -%s\n", AuraName(id))
-	}
-}
-
-// Returns whether an aura with the given ID is currently active.
-func (sim *Simulation) hasAura(id int32) bool {
-	return sim.auras[id].ID != 0
-}
-
-// Returns rate of mana regen, as mana / second
-func (sim *Simulation) manaRegenPerSecond() float64 {
-	return sim.Stats[StatMP5] / 5.0
-}
-
-func (sim *Simulation) isOnCD(magicID int32) bool {
-	return sim.CDs[magicID] > sim.CurrentTime
-}
-
-func (sim *Simulation) getRemainingCD(magicID int32) time.Duration {
-	remainingCD := sim.CDs[magicID] - sim.CurrentTime
-	if remainingCD > 0 {
-		return remainingCD
-	} else {
-		return 0
-	}
-}
-
-func (sim *Simulation) setCD(magicID int32, newCD time.Duration) {
-	sim.CDs[magicID] = sim.CurrentTime + newCD
-}
-
-// Pops any on-use trinkets / gear
-func (sim *Simulation) TryActivateEquipment() {
-	for _, item := range sim.activeEquip {
-		if item.Activate == nil || item.ActivateCD == neverExpires { // ignore non-activatable, and always active items.
-			continue
-		}
-		if sim.isOnCD(item.CoolID) {
-			continue
-		}
-		if item.Slot == EquipTrinket && sim.isOnCD(MagicIDAllTrinket) {
-			continue
-		}
-		sim.addAura(item.Activate(sim))
-		sim.setCD(item.CoolID, item.ActivateCD)
-		if item.Slot == EquipTrinket {
-			sim.setCD(MagicIDAllTrinket, time.Second*30)
+	for _, party := range sim.Raid.Parties {
+		for _, pl := range party.Players {
+			// FUTURE: Do agents need to be notified or just advance the player state?
+			pl.Advance(sim, elapsedTime, newTime)
 		}
 	}
+	// Go in reverse order so we can safely delete while looping
+	for i := len(sim.ActiveAuraIDs) - 1; i >= 0; i-- {
+		id := sim.ActiveAuraIDs[i]
+		if sim.Auras[id].Expires != 0 && sim.Auras[id].Expires <= newTime {
+			sim.RemoveAura(sim, nil, id) // auras on the sim have no player attached.
+		}
+	}
+	sim.CurrentTime = newTime
 }
 
 func durationFromSeconds(numSeconds float64) time.Duration {

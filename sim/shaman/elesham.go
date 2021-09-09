@@ -18,102 +18,121 @@ var ElementalEnchants = []int32{
 	29191, 28909, 28886, 24421, 20076, 23545, 27960, 27917, 22534, 33997, 28272, 24274, 24273, 27975, 22555, 35445, 27945,
 }
 
-func NewElemental(agentID int, options map[string]string) *Elemental {
-	agent := NewAdaptiveAgent()
-	return &Elemental{
-		Agent: agent,
+func loDmgMod(sim *core.Simulation, p *core.Player, c *core.Cast) {
+	c.DidDmg /= 2
+}
+
+func AuraLightningOverload(lvl int) core.Aura {
+	chance := 0.04 * float64(lvl)
+	return core.Aura{
+		ID:      core.MagicIDLOTalent,
+		Expires: core.NeverExpires,
+		OnSpellHit: func(sim *core.Simulation, p *core.Player, c *core.Cast) {
+			if c.Spell.ID != core.MagicIDLB12 && c.Spell.ID != core.MagicIDCL6 {
+				return
+			}
+			if c.IsLO {
+				return // can't proc LO on LO
+			}
+			actualChance := chance
+			if c.Spell.ID == core.MagicIDCL6 {
+				actualChance /= 3 // 33% chance of regular for CL LO
+			}
+			if sim.Rando.Float64() < actualChance {
+				if sim.Debug != nil {
+					sim.Debug(" +Lightning Overload\n")
+				}
+				clone := sim.NewCast()
+				// Don't set IsClBounce even if this is a bounce, so that the clone does a normal CL and bounces
+				clone.IsLO = true
+				clone.Spell = c.Spell
+				clone.CritBonus = c.CritBonus
+				clone.Effect = loDmgMod
+				sim.Cast(p, clone)
+			}
+		},
 	}
 }
 
-type Elemental struct {
-	CurrentMana float64
-	Talents     Talents
-
-	Agent
+func elementalFocusOnCast(sim *core.Simulation, player *core.Player, c *core.Cast) {
+	c.ManaCost *= .6 // reduced by 40%
 }
 
-// BuffUp lets you buff up all players in sim.
-func (e *Elemental) BuffUp(sim *core.Simulation) {
-	// if sim.Options.Talents.Concussion > 0 {
-	// 	bonusdmg := (0.01 * sim.Options.Talents.Concussion)
+func elementalFocusOnCastComplete(sim *core.Simulation, player *core.Player, c *core.Cast) {
+	if c.ManaCost <= 0 {
+		return // Don't consume charges from free spells.
+	}
+
+	player.Auras[core.MagicIDEleFocus].Stacks--
+	if player.Auras[core.MagicIDEleFocus].Stacks == 0 {
+		player.RemoveAura(sim, player, core.MagicIDEleFocus)
+	}
+}
+
+func AuraElementalFocus(sim *core.Simulation) core.Aura {
+	return core.Aura{
+		ID:             core.MagicIDEleFocus,
+		Expires:        sim.CurrentTime + time.Second*15,
+		Stacks:         2,
+		OnCast:         elementalFocusOnCast,
+		OnCastComplete: elementalFocusOnCastComplete,
+	}
+}
+
+func TryActivateEleMastery(sim *core.Simulation, player *core.Player) {
+	if player.IsOnCD(core.MagicIDEleMastery, sim.CurrentTime) {
+		return
+	}
+
+	player.AddAura(sim, core.Aura{
+		ID:      core.MagicIDEleMastery,
+		Expires: core.NeverExpires,
+		OnCast: func(sim *core.Simulation, p *core.Player, c *core.Cast) {
+			if c.Spell.ID != core.MagicIDTLCLB {
+				c.ManaCost = 0
+			}
+		},
+		OnCastComplete: func(sim *core.Simulation, p *core.Player, c *core.Cast) {
+			c.Crit += 1.01 // 101% chance of crit
+			// Remove the buff and put skill on CD
+			p.SetCD(core.MagicIDEleMastery, time.Second*180)
+			p.RemoveAura(sim, p, core.MagicIDEleMastery)
+		},
+	})
+}
+
+// TODO: Need to make this always active... (need a new magic ID)
+//  can we have a 'pre-cast' function on agent?
+func AuraElementalFocus2(sim *core.Simulation) core.Aura {
+	// if cast.Spell.ID != core.MagicIDTLCLB {
+	// 	// TLC does not proc focus.
+	// 	player.addAura(AuraElementalFocus(sim))
 	// }
+	return core.Aura{
+		ID:      core.MagicIDEleFocus,
+		Expires: core.NeverExpires,
+	}
 }
-
-// Agent is shaman specific agent for behavior.
-type Agent interface {
-	// Returns the action this Agent would like to take next.
-	ChooseAction(*core.Simulation) core.AgentAction
-
-	// This will be invoked if the chosen action is actually executed, so the Agent can update its state.
-	OnActionAccepted(*core.Simulation, core.AgentAction)
-
-	// Returns this Agent to its initial state.
-	Reset(*core.Simulation)
-}
-
-type Totems struct {
-	TotemOfWrath int
-	WrathOfAir   bool
-	ManaStream   bool
-	Cyclone2PC   bool // Cyclone set 2pc bonus
-}
-
-// func (tt Totems) AddStats(s Stats) Stats {
-// 	s[StatSpellCrit] += 66.24 * float64(tt.TotemOfWrath)
-// 	s[StatSpellHit] += 37.8 * float64(tt.TotemOfWrath)
-// 	if tt.WrathOfAir {
-// 		s[StatSpellDmg] += 101
-// 		if tt.Cyclone2PC {
-// 			s[StatSpellDmg] += 20
-// 		}
-// 	}
-// 	if tt.ManaStream {
-// 		s[StatMP5] += 50
-// 	}
-// 	return s
-// }
-
-type Talents struct {
-	LightningOverload  int
-	ElementalPrecision int
-	NaturesGuidance    int
-	TidalMastery       int
-	ElementalMastery   bool
-	UnrelentingStorm   int
-	CallOfThunder      int
-	Convection         int
-
-	Concussion float64 // temp hack to speed up not converting this to a int on every spell cast
-}
-
-// func (t Talents) AddStats(s Stats) Stats {
-// 	s[StatSpellHit] += 25.2 * float64(t.ElementalPrecision)
-// 	s[StatSpellHit] += 12.6 * float64(t.NaturesGuidance)
-// 	s[StatSpellCrit] += 22.08 * float64(t.TidalMastery)
-// 	s[StatSpellCrit] += 22.08 * float64(t.CallOfThunder)
-
-// 	return s
-// }
 
 // ################################################################
 //                              LB ONLY
 // ################################################################
-// type LBOnlyAgent struct {
-// 	lb *core.Spell
-// }
+type LBOnlyAgent struct {
+	lb *core.Spell
+}
 
-// func (agent *LBOnlyAgent) ChooseAction(sim *core.Simulation) AgentAction {
-// 	return core.NewCastAction(sim, agent.lb)
-// }
+func (agent *LBOnlyAgent) ChooseAction(sim *core.Simulation) AgentAction {
+	return NewCastAction(sim, agent.lb)
+}
 
-// func (agent *LBOnlyAgent) OnActionAccepted(sim *core.Simulation, action AgentAction) {}
-// func (agent *LBOnlyAgent) Reset(sim *core.Simulation)                                {}
+func (agent *LBOnlyAgent) OnActionAccepted(sim *core.Simulation, action AgentAction) {}
+func (agent *LBOnlyAgent) Reset(sim *core.Simulation)                                {}
 
-// func NewLBOnlyAgent(sim *core.Simulation) *LBOnlyAgent {
-// 	return &LBOnlyAgent{
-// 		lb: core.Spells[MagicIDLB12],
-// 	}
-// }
+func NewLBOnlyAgent(sim *core.Simulation) *LBOnlyAgent {
+	return &LBOnlyAgent{
+		lb: core.Spells[MagicIDLB12],
+	}
+}
 
 // ################################################################
 //                             CL ON CD
@@ -215,16 +234,16 @@ type CLOnClearcastAgent struct {
 	cl *core.Spell
 }
 
-func (agent *CLOnClearcastAgent) ChooseAction(sim *core.Simulation) AgentAction {
-	if sim.isOnCD(MagicIDCL6) || !agent.prevPrevCastProccedCC {
-		return NewCastAction(sim, agent.lb)
+func (agent *CLOnClearcastAgent) ChooseAction(p *Shaman, sim *core.Simulation) core.AgentAction {
+	if p.Auras.IsOnCD(core.MagicIDCL6, sim.CurrentTime) || !agent.prevPrevCastProccedCC {
+		return core.AgentAction{}
 	}
 
 	return NewCastAction(sim, agent.cl)
 }
 
-func (agent *CLOnClearcastAgent) OnActionAccepted(sim *core.Simulation, action AgentAction) {
-	agent.prevPrevCastProccedCC = sim.auras[MagicIDEleFocus].stacks == 2
+func (agent *CLOnClearcastAgent) OnActionAccepted(p *Shaman, sim *core.Simulation, action core.AgentAction) {
+	agent.prevPrevCastProccedCC = p.Auras.Auras[core.MagicIDEleFocus].Stacks == 2
 }
 
 func (agent *CLOnClearcastAgent) Reset(sim *core.Simulation) {
@@ -233,8 +252,8 @@ func (agent *CLOnClearcastAgent) Reset(sim *core.Simulation) {
 
 func NewCLOnClearcastAgent(sim *core.Simulation) *CLOnClearcastAgent {
 	return &CLOnClearcastAgent{
-		lb: spellmap[MagicIDLB12],
-		cl: spellmap[MagicIDCL6],
+		lb: core.Spells[core.MagicIDLB12],
+		cl: core.Spells[core.MagicIDCL6],
 	}
 }
 
@@ -247,10 +266,8 @@ type AdaptiveAgent struct {
 	numSnapshots       int32
 	firstSnapshotIndex int32
 
-	p *core.Player // two way connection seems bad.
-
-	baseAgent    Agent // The agent used most of the time
-	surplusAgent Agent // The agent used when we have extra mana
+	baseAgent    shamanAgent // The agent used most of the time
+	surplusAgent shamanAgent // The agent used when we have extra mana
 }
 
 const manaSpendingWindowNumSeconds = 60
@@ -294,7 +311,7 @@ func (agent *AdaptiveAgent) takeSnapshot(sim *core.Simulation) {
 	agent.numSnapshots++
 }
 
-func (agent *AdaptiveAgent) ChooseAction(sim *core.Simulation) core.AgentAction {
+func (agent *AdaptiveAgent) ChooseAction(s *Shaman, sim *core.Simulation) core.AgentAction {
 	agent.purgeExpiredSnapshots(sim)
 	oldestSnapshot := agent.getOldestSnapshot()
 
@@ -313,10 +330,10 @@ func (agent *AdaptiveAgent) ChooseAction(sim *core.Simulation) core.AgentAction 
 	}
 
 	// If we have enough mana to burn, use the surplus agent.
-	if projectedManaCost < agent.p.CurrentMana {
-		return agent.surplusAgent.ChooseAction(sim)
+	if projectedManaCost < s.Stats[core.StatMana] {
+		return agent.surplusAgent.ChooseAction(s, sim)
 	} else {
-		return agent.baseAgent.ChooseAction(sim)
+		return agent.baseAgent.ChooseAction(s, sim)
 	}
 }
 func (agent *AdaptiveAgent) OnActionAccepted(sim *core.Simulation, action core.AgentAction) {
@@ -355,22 +372,28 @@ func NewAdaptiveAgent(sim *core.Simulation) *AdaptiveAgent {
 	return agent
 }
 
-func NewCastAction(sim *core.Simulation, player *, sp *core.Spell) core.AgentAction {
-	cast := core.NewCast(sim, spell)
-	
+// NewCastAction is how a shaman creates a new spell
+//  TODO: Decide if we need separate functions for elemental and enhancement?
+func NewCastAction(sim *core.Simulation, player *Shaman, sp *core.Spell) core.AgentAction {
+	cast := core.NewCast(sim, sp)
+
+	if sp.ID == core.MagicIDCL6 || sp.ID == core.MagicIDLB12 {
+		cast.CritBonus *= 2 // This handles the 'Elemental Fury' talent which increases the crit bonus.
+		cast.CritBonus -= 1 // reduce to multiplier instead of percent.
+	}
 	castTime := cast.CastTime
 	if sp.ID == core.MagicIDLB12 || sp.ID == core.MagicIDCL6 {
 		cast.ManaCost *= 1 - (0.02 * float64(player.Talents.Convection))
 		// TODO: Add LightningMaster to talent list (this will never not be selected for an elemental shaman)
 		castTime -= time.Millisecond * 500 // Talent Lightning Mastery
 	}
-	castTime = time.Duration(float64(castTime) / hasteBonus)
+	castTime = time.Duration(float64(castTime) / player.HasteBonus())
 	cast.CastTime = castTime
 
 	// Apply any on cast effects.
-	for _, id := range player.activeAuraIDs {
-		if player.auras[id].OnCast != nil {
-			player.auras[id].OnCast(sim, cast)
+	for _, id := range player.ActiveAuraIDs {
+		if player.Auras[id].OnCast != nil {
+			player.Auras[id].OnCast(sim, player.Player, cast)
 		}
 	}
 
