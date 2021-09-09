@@ -1,1 +1,33 @@
 @import "../components/character_stats";
+
+.character-stats-root {
+  //background-color: SlateGrey
+}
+
+.character-stats-header {
+  padding: 5px;
+  font-size: 14px;
+}
+
+.character-stats-table {
+  padding: 10px;
+}
+
+.character-stats-table-row {
+  border-bottom: 1px solid black;
+  padding: 7px 10px;
+  font-size: 12px;
+}
+
+.default-root {
+  height: 100%;
+}
+
+.default-sidebar {
+  height: 100%;
+  width: 20%;
+  min-width: 200px;
+  display: flex;
+  flex-direction: column;
+  background: SteelBlue;
+}

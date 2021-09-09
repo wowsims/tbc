@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "target": "ES2018",
+    "module": "amd",
+    "moduleResolution": "node",
+    "strict": true,
+    "lib": [
+      "DOM",
+      "ES2018",
+    ],
+    "esModuleInterop": true,
+  },
+  "include": [
+    "core/**/*.ts",
+    "elemental_shaman/**/*.ts",
+  ],
+}
