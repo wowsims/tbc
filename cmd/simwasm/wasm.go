@@ -18,7 +18,7 @@ func main() {
 }
 
 func individualSim(this js.Value, args []js.Value) interface{} {
-	data := make([]byte, args[0].Call(""))
+	data := make([]byte, args[0].Call("length").Int())
 	// Assumes input is a JSON object as a string
 	js.CopyBytesToGo(data, args[0])
 
