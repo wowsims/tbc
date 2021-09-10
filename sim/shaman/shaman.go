@@ -16,6 +16,8 @@ func NewShaman(player *core.Player, agentID int, options map[string]string) *Sha
 	// TODO: could we include Party as a constructor argument to add spec specific
 	// buffs during construction instead of on every reset.
 
+	// TODO: totem buffs
+
 	return &Shaman{
 		agent:  agent,
 		Player: player,
@@ -31,6 +33,9 @@ type Shaman struct {
 
 // BuffUp lets you buff up all players in sim (and yourself)
 func (s *Shaman) BuffUp(sim *core.Simulation, party *core.Party) {
+
+	// TODO: Should this be a special aura just for shaman? or should we add all the general aura
+	//   OnXXX functions to agents (to allow them to apply non-aura effects for the class)
 	// if sim.Options.Talents.Concussion > 0 {
 	// 	bonusdmg := (0.01 * sim.Options.Talents.Concussion)
 	// }
@@ -43,7 +48,7 @@ func (s *Shaman) ChooseAction(sim *core.Simulation) core.AgentAction {
 	return s.agent.ChooseAction(s, sim)
 }
 func (s *Shaman) OnActionAccepted(sim *core.Simulation, action core.AgentAction) {
-	s.agent.OnActionAccepted(sim, action)
+	s.agent.OnActionAccepted(s, sim, action)
 }
 func (s *Shaman) Reset(newsim *core.Simulation) {
 	// Do we need to reset anything special?
@@ -55,7 +60,7 @@ type shamanAgent interface {
 	ChooseAction(*Shaman, *core.Simulation) core.AgentAction
 
 	// This will be invoked if the chosen action is actually executed, so the Agent can update its state.
-	OnActionAccepted(*core.Simulation, core.AgentAction)
+	OnActionAccepted(*Shaman, *core.Simulation, core.AgentAction)
 
 	// Returns this Agent to its initial state.
 	Reset(*core.Simulation)

@@ -121,16 +121,17 @@ type LBOnlyAgent struct {
 	lb *core.Spell
 }
 
-func (agent *LBOnlyAgent) ChooseAction(sim *core.Simulation) AgentAction {
-	return NewCastAction(sim, agent.lb)
+func (agent *LBOnlyAgent) ChooseAction(p *Shaman, sim *core.Simulation) core.AgentAction {
+	return NewCastAction(sim, p, agent.lb)
 }
 
-func (agent *LBOnlyAgent) OnActionAccepted(sim *core.Simulation, action AgentAction) {}
-func (agent *LBOnlyAgent) Reset(sim *core.Simulation)                                {}
+func (agent *LBOnlyAgent) OnActionAccepted(p *Shaman, sim *core.Simulation, action core.AgentAction) {
+}
+func (agent *LBOnlyAgent) Reset(sim *core.Simulation) {}
 
 func NewLBOnlyAgent(sim *core.Simulation) *LBOnlyAgent {
 	return &LBOnlyAgent{
-		lb: core.Spells[MagicIDLB12],
+		lb: core.Spells[core.MagicIDLB12],
 	}
 }
 
@@ -235,15 +236,15 @@ type CLOnClearcastAgent struct {
 }
 
 func (agent *CLOnClearcastAgent) ChooseAction(p *Shaman, sim *core.Simulation) core.AgentAction {
-	if p.Auras.IsOnCD(core.MagicIDCL6, sim.CurrentTime) || !agent.prevPrevCastProccedCC {
+	if p.IsOnCD(core.MagicIDCL6, sim.CurrentTime) || !agent.prevPrevCastProccedCC {
 		return core.AgentAction{}
 	}
 
-	return NewCastAction(sim, agent.cl)
+	return NewCastAction(sim, p, agent.cl)
 }
 
 func (agent *CLOnClearcastAgent) OnActionAccepted(p *Shaman, sim *core.Simulation, action core.AgentAction) {
-	agent.prevPrevCastProccedCC = p.Auras.Auras[core.MagicIDEleFocus].Stacks == 2
+	agent.prevPrevCastProccedCC = p.Auras[core.MagicIDEleFocus].Stacks == 2
 }
 
 func (agent *CLOnClearcastAgent) Reset(sim *core.Simulation) {
@@ -302,8 +303,9 @@ func (agent *AdaptiveAgent) takeSnapshot(sim *core.Simulation) {
 	}
 
 	snapshot := ManaSnapshot{
-		time:      sim.CurrentTime,
-		manaSpent: sim.Metrics.ManaSpent,
+		time: sim.CurrentTime,
+		// manaSpent: sim.Metrics.ManaSpent,
+		// TODO: Get individual metrics up and working. Probably just need to give every player an 'ID' (order of appearance)
 	}
 
 	nextIndex := (agent.firstSnapshotIndex + agent.numSnapshots) % manaSnapshotsBufferSize
@@ -315,7 +317,7 @@ func (agent *AdaptiveAgent) ChooseAction(s *Shaman, sim *core.Simulation) core.A
 	agent.purgeExpiredSnapshots(sim)
 	oldestSnapshot := agent.getOldestSnapshot()
 
-	manaSpent := sim.Metrics.ManaSpent - oldestSnapshot.manaSpent
+	manaSpent := float64(0) //sim.Metrics.ManaSpent - oldestSnapshot.manaSpent
 	timeDelta := sim.CurrentTime - oldestSnapshot.time
 	if timeDelta == 0 {
 		timeDelta = 1
@@ -326,7 +328,7 @@ func (agent *AdaptiveAgent) ChooseAction(s *Shaman, sim *core.Simulation) core.A
 
 	if sim.Debug != nil {
 		manaSpendingRate := manaSpent / timeDelta.Seconds()
-		sim.Debug("[AI] CL Ready: Mana/s: %0.1f, Est Mana Cost: %0.1f, CurrentMana: %0.1f\n", manaSpendingRate, projectedManaCost, sim.CurrentMana)
+		sim.Debug("[AI] CL Ready: Mana/s: %0.1f, Est Mana Cost: %0.1f, CurrentMana: %0.1f\n", manaSpendingRate, projectedManaCost, s.Stats[core.StatMana])
 	}
 
 	// If we have enough mana to burn, use the surplus agent.
@@ -336,10 +338,10 @@ func (agent *AdaptiveAgent) ChooseAction(s *Shaman, sim *core.Simulation) core.A
 		return agent.baseAgent.ChooseAction(s, sim)
 	}
 }
-func (agent *AdaptiveAgent) OnActionAccepted(sim *core.Simulation, action core.AgentAction) {
+func (agent *AdaptiveAgent) OnActionAccepted(p *Shaman, sim *core.Simulation, action core.AgentAction) {
 	agent.takeSnapshot(sim)
-	agent.baseAgent.OnActionAccepted(sim, action)
-	agent.surplusAgent.OnActionAccepted(sim, action)
+	agent.baseAgent.OnActionAccepted(p, sim, action)
+	agent.surplusAgent.OnActionAccepted(p, sim, action)
 }
 
 func (agent *AdaptiveAgent) Reset(sim *core.Simulation) {
@@ -353,21 +355,25 @@ func (agent *AdaptiveAgent) Reset(sim *core.Simulation) {
 func NewAdaptiveAgent(sim *core.Simulation) *AdaptiveAgent {
 	agent := &AdaptiveAgent{}
 
-	clearcastSimRequest := core.SimRequest{
-		Options:    sim.Options,
-		Gear:       sim.EquipSpec,
-		Iterations: 100,
-	}
-	clearcastSimRequest.Options.AgentType = AGENT_TYPE_CL_ON_CLEARCAST
-	clearcastResult := core.RunSimulation(clearcastSimRequest)
+	// TODO: Can we just start with more aggressive agent and drop to less aggressive if we go OOM 5 times?
+	//   not as deterministic... but probably averages out the same?
+	// Otherwise we need to figure out how to do this after all other agents are setup (in the eventual 'raid' sim setup)
 
-	if clearcastResult.NumOom >= 5 {
-		agent.baseAgent = NewAgent(sim, AGENT_TYPE_FIXED_LB_ONLY)
-		agent.surplusAgent = NewAgent(sim, AGENT_TYPE_CL_ON_CLEARCAST)
-	} else {
-		agent.baseAgent = NewAgent(sim, AGENT_TYPE_CL_ON_CLEARCAST)
-		agent.surplusAgent = NewAgent(sim, AGENT_TYPE_FIXED_CL_ON_CD)
-	}
+	// clearcastSimRequest := core.SimRequest{
+	// 	Options:    sim.Options,
+	// 	Gear:       sim.EquipSpec,
+	// 	Iterations: 100,
+	// }
+	// clearcastSimRequest.Options.AgentType = AGENT_TYPE_CL_ON_CLEARCAST
+	// clearcastResult := core.RunSimulation(clearcastSimRequest)
+
+	// if clearcastResult.NumOom >= 5 {
+	agent.baseAgent = NewLBOnlyAgent(sim)           //NewAgent(sim, AGENT_TYPE_FIXED_LB_ONLY)
+	agent.surplusAgent = NewCLOnClearcastAgent(sim) //NewAgent(sim, AGENT_TYPE_CL_ON_CLEARCAST)
+	// } else {
+	// 	agent.baseAgent = NewAgent(sim, AGENT_TYPE_CL_ON_CLEARCAST)
+	// 	agent.surplusAgent = NewAgent(sim, AGENT_TYPE_FIXED_CL_ON_CD)
+	// }
 
 	return agent
 }
@@ -380,19 +386,22 @@ func NewCastAction(sim *core.Simulation, player *Shaman, sp *core.Spell) core.Ag
 	itsElectric := sp.ID == core.MagicIDCL6 || sp.ID == core.MagicIDLB12
 	castTime := cast.CastTime
 
+	if itsElectric {
+		cast.ManaCost *= 1 - (0.02 * float64(player.Talents.Convection))
+
+		// TODO: Add LightningMastery to talent list
+		castTime -= time.Millisecond * 500 // Talent Lightning Mastery
+	}
 	// Apply any on cast effects.
 	for _, id := range player.ActiveAuraIDs {
 		if player.Auras[id].OnCast != nil {
 			player.Auras[id].OnCast(sim, player.Player, cast)
 		}
 	}
-
 	if itsElectric {
+		// This is written this way to deal with making CSD dmg increase correct.
 		cast.CritBonus *= 2 // This handles the 'Elemental Fury' talent which increases the crit bonus.
 		cast.CritBonus -= 1 // reduce to multiplier instead of percent.
-		cast.ManaCost *= 1 - (0.02 * float64(player.Talents.Convection))
-		// TODO: Add LightningMaster to talent list (this will never not be selected for an elemental shaman)
-		castTime -= time.Millisecond * 500 // Talent Lightning Mastery
 	}
 	cast.CastTime = time.Duration(float64(castTime) / player.HasteBonus())
 
@@ -401,35 +410,3 @@ func NewCastAction(sim *core.Simulation, player *Shaman, sp *core.Spell) core.Ag
 		Cast: cast,
 	}
 }
-
-// func NewAgent(sim *core.Simulation, agentType AgentType) Agent {
-// 	switch agentType {
-// 	case AGENT_TYPE_FIXED_3LB_1CL:
-// 		return NewFixedRotationAgent(sim, 3)
-// 	case AGENT_TYPE_FIXED_4LB_1CL:
-// 		return NewFixedRotationAgent(sim, 4)
-// 	case AGENT_TYPE_FIXED_5LB_1CL:
-// 		return NewFixedRotationAgent(sim, 5)
-// 	case AGENT_TYPE_FIXED_6LB_1CL:
-// 		return NewFixedRotationAgent(sim, 6)
-// 	case AGENT_TYPE_FIXED_7LB_1CL:
-// 		return NewFixedRotationAgent(sim, 7)
-// 	case AGENT_TYPE_FIXED_8LB_1CL:
-// 		return NewFixedRotationAgent(sim, 8)
-// 	case AGENT_TYPE_FIXED_9LB_1CL:
-// 		return NewFixedRotationAgent(sim, 9)
-// 	case AGENT_TYPE_FIXED_10LB_1CL:
-// 		return NewFixedRotationAgent(sim, 10)
-// 	case AGENT_TYPE_FIXED_LB_ONLY:
-// 		return NewLBOnlyAgent(sim)
-// 	case AGENT_TYPE_FIXED_CL_ON_CD:
-// 		return NewCLOnCDAgent(sim)
-// 	case AGENT_TYPE_ADAPTIVE:
-// 		return NewAdaptiveAgent(sim)
-// 	case AGENT_TYPE_CL_ON_CLEARCAST:
-// 		return NewCLOnClearcastAgent(sim)
-// 	default:
-// 		fmt.Printf("[ERROR] No rotation given to sim.\n")
-// 		return nil
-// 	}
-// }

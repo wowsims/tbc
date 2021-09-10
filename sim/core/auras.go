@@ -725,7 +725,7 @@ func ActivateTLC(sim *Simulation, party *Party, player *Player) Aura {
 				// TLC does not get hit talents bonus, subtract them here. (since we dont conditionally apply them)
 				clone.Spell = tlcspell
 				clone.CritBonus = 1.5
-
+				// FUTURE: does CSD apply to TLC? if so, we should probably apply it.
 				sim.Cast(player, clone)
 				charges = 0
 			}
