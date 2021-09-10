@@ -9,7 +9,9 @@
     },
     "dependencies": {
         "@protobuf-ts/plugin": "^2.0.4",
+        "@protobuf-ts/runtime": "^2.0.4",
         "http-server": "13.0.1",
+        "requirejs": "^2.3.6",
         "sass": "^1.39.0",
         "typescript": "4.3.5"
     }

@@ -1,3 +1,4 @@
+import { Spec } from '../api/newapi';
 import { Stat } from '../api/newapi';
 import { Actions } from '../components/actions.js';
 import { CharacterStats } from '../components/character_stats.js';
@@ -22,8 +23,8 @@ const layoutHTML = `
 `;
 
 export class DefaultTheme extends Theme {
-  constructor(parentElem: HTMLElement) {
-    super(parentElem)
+  constructor(parentElem: HTMLElement, spec: Spec) {
+    super(parentElem, spec)
 
     this.parentElem.innerHTML = layoutHTML;
 
@@ -37,7 +38,7 @@ export class DefaultTheme extends Theme {
       Stat.mp5,
     ];
 
-    const actions = new Actions();
+    const actions = new Actions(this.sim);
     actions.appendTo(this.parentElem.getElementsByClassName('default-actions')[0]);
 
     const characterStats = new CharacterStats(stats);

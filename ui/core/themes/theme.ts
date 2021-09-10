@@ -1,11 +1,12 @@
-import { Sim } from '../internal/sim.js';
+import { Sim } from '../sim.js';
+import { Spec } from '../api/newapi';
 
 export abstract class Theme {
   readonly parentElem: HTMLElement;
   readonly sim: Sim;
 
-  constructor(parentElem: HTMLElement) {
+  constructor(parentElem: HTMLElement, spec: Spec) {
     this.parentElem = parentElem;
-    this.sim = new Sim(3);
+    this.sim = new Sim(spec);
   }
 }

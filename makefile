@@ -15,14 +15,15 @@ host: dist
 	npx http-server dist
 
 ui/core/api/newapi.ts: api/newapi.proto
+	npx r.js -convert node_modules/@protobuf-ts/runtime/build/commonjs/ dist/@protobuf-ts
 	mkdir -p ui/core/api
-	npx protoc --ts_out ui/core/api --proto_path api api/newapi.proto
+	npx protoc --ts_opt generate_dependencies --ts_out ui/core/api --proto_path api api/newapi.proto
 
-dist/core/core.js: $(call rwildcard,ui/core,*.ts) ui/core/api/newapi.ts
+dist/core/tsconfig.tsbuildinfo: $(call rwildcard,ui/core,*.ts) ui/core/api/newapi.ts
 	npx tsc -p ui/core
 
 # Generic rule for building index.js for any class directory
-dist/%/index.js: ui/%/index.ts dist/core/core.js
+dist/%/index.js: ui/%/index.ts dist/core/tsconfig.tsbuildinfo
 	npx tsc -p $(<D) 
 
 # Generic rule for building index.css for any class directory

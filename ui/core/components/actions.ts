@@ -1,25 +1,33 @@
 import { Component } from './component.js';
+import { Sim } from '../sim.js';
 
 export class Actions extends Component {
   readonly rootElem: HTMLDivElement;
-  readonly simButton: HTMLElement;
-  readonly statWeightsButton: HTMLElement;
 
-  constructor() {
+  constructor(sim: Sim) {
     super();
 
     this.rootElem = document.createElement('div');
     this.rootElem.classList.add('actions-root');
 
-    this.simButton = document.createElement('button');
-    this.simButton.classList.add('actions-button');
-    this.simButton.textContent = 'DPS';
-    this.rootElem.appendChild(this.simButton);
+    const simButton = document.createElement('button');
+    simButton.classList.add('actions-button');
+    simButton.textContent = 'DPS';
+    this.rootElem.appendChild(simButton);
 
-    this.statWeightsButton = document.createElement('button');
-    this.statWeightsButton.classList.add('actions-button');
-    this.statWeightsButton.textContent = 'Calculate EP';
-    this.rootElem.appendChild(this.statWeightsButton);
+    const statWeightsButton = document.createElement('button');
+    statWeightsButton.classList.add('actions-button');
+    statWeightsButton.textContent = 'Calculate EP';
+    this.rootElem.appendChild(statWeightsButton);
+
+    const iterationsDiv = document.createElement('div');
+    iterationsDiv.classList.add('iterations-div');
+    iterationsDiv.innerHTML = `
+      <span class="iterations-label">Iterations</span>
+      <input class="iterations-input" type="number" min="1" value="1000" step="1000">
+    `;
+    this.rootElem.appendChild(iterationsDiv);
+    const iterationsInput = document.createElement('input');
   }
 
   getRootElement() {
