@@ -79,7 +79,7 @@ func NewSim(raid *Raid, options Options) *Simulation {
 		cache: &cache{
 			castPool: make([]*Cast, 0, 1000),
 		},
-		AuraTracker: &AuraTracker{},
+		AuraTracker: NewAuraTracker(),
 	}
 
 	sim.cache.fillCasts()
@@ -122,11 +122,13 @@ func (sim *Simulation) reset() {
 	// Now buff everyone back up!
 	for _, party := range sim.Raid.Parties {
 		for _, pl := range party.Players {
-			pl.ActivateSets(sim)
-			pl.TryActivateEquipment()
+			pl.ActivateSets(sim, party)
+			pl.TryActivateEquipment(sim, party)
 			pl.BuffUp(sim, party)
 		}
 	}
+
+	// TODO: probably need to special case the kings buff here.
 }
 
 type pendingAction struct {
@@ -164,7 +166,7 @@ func (sim *Simulation) Run() SimMetrics {
 			sim.Advance(action.ExecuteAt - sim.CurrentTime)
 		}
 		if action.Cast != nil {
-			sim.Cast(action.Agent, action.Cast)
+			sim.Cast(action.Agent.Player, action.Cast)
 		} else {
 			// FUTURE: Swing timers could be handled in this if block.
 			panic("Agent returned nil action")
@@ -179,6 +181,10 @@ func (sim *Simulation) Run() SimMetrics {
 				regenTime := durationFromSeconds((newAction.Cast.ManaCost-agent.Stats[StatMana])/agent.manaRegenPerSecond()) + 1
 				if regenTime > wait {
 					wait = regenTime
+				}
+
+				if sim.Options.ExitOnOOM {
+					// TODO: implement this... first player to OOM ends sim (probably only makes sense in an individual sim)
 				}
 			}
 			if newAction.Cast.CastTime < sim.Options.GCDMin {
@@ -238,8 +244,6 @@ func (sim *Simulation) Cast(p *Player, cast *Cast) {
 		}
 		cast.DidHit = true
 
-		// itsElectric := cast.Spell.ID == MagicIDCL6 || cast.Spell.ID == MagicIDLB12
-
 		crit := (p.Stats[StatSpellCrit] / 2208.0) + cast.Crit // 22.08 crit == 1% crit
 		if sim.Rando.Float64() < crit {
 			cast.DidCrit = true
@@ -251,17 +255,11 @@ func (sim *Simulation) Cast(p *Player, cast *Cast) {
 			dbgCast += " hit"
 		}
 
-		// TODO: move dmg bonuses where they belong.
-		// if itsElectric {
-		// 	dmg *= sim.cache.elcDmgBonus
-		// } else {
-		// 	dmg *= sim.cache.dmgBonus
-		// }
-
 		// Average Resistance (AR) = (Target's Resistance / (Caster's Level * 5)) * 0.75
 		// P(x) = 50% - 250%*|x - AR| <- where X is %resisted
 		// Using these stats:
 		//    13.6% chance of
+		//  FUTURE: handle boss resists for fights/classes that are actually impacted by that.
 		resVal := sim.Rando.Float64()
 		if resVal < 0.18 { // 13% chance for 25% resist, 4% for 50%, 1% for 75%
 			if sim.Debug != nil {

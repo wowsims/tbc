@@ -18,6 +18,7 @@ type Raid struct {
 //  All players have stats, equipment, auras, etc
 type Player struct {
 	Consumes Consumes // pretty sure most classes have consumes to care about.
+	Race     RaceBonusType
 
 	InitialStats Stats
 	Stats        Stats
@@ -37,26 +38,39 @@ func (p *Player) GetPlayer() *Player {
 	return p
 }
 
-func NewPlayer(equip EquipmentSpec, consumes Consumes) *Player {
+func NewPlayer(equipSpec EquipmentSpec, race RaceBonusType, consumes Consumes) *Player {
 	// TODO: configure player here.
 
-	// equip := NewEquipmentSet(equipSpec)
-	// initialStats := CalculateTotalStats(options, equip)
+	equip := NewEquipmentSet(equipSpec)
+	initialStats := CalculateTotalStats(race, equip, consumes)
 
-	// for i, eq := range equip {
-	// 	if eq.Activate != nil {
-	// 		player.activeEquip = append(player.activeEquip, &equip[i])
-	// 	}
-	// 	for _, g := range eq.Gems {
-	// 		if g.Activate != nil {
-	// 			player.activeEquip = append(player.activeEquip, &equip[i])
-	// 		}
-	// 	}
-	// }
-
-	return &Player{
-		AuraTracker: &AuraTracker{},
+	if race == RaceBonusTypeDraenei {
+		initialStats[StatSpellHit] += 12.60 // 1% hit
 	}
+
+	player := &Player{
+		Race:         race,
+		Consumes:     consumes,
+		InitialStats: initialStats,
+		Stats:        initialStats,
+		Equip:        equip,
+		EquipSpec:    equipSpec,
+		ActiveEquip:  []*Item{},
+		AuraTracker:  NewAuraTracker(),
+	}
+
+	for i, eq := range equip {
+		if eq.Activate != nil {
+			player.ActiveEquip = append(player.ActiveEquip, &equip[i])
+		}
+		for _, g := range eq.Gems {
+			if g.Activate != nil {
+				player.ActiveEquip = append(player.ActiveEquip, &equip[i])
+			}
+		}
+	}
+
+	return player
 }
 
 // Advance moves time forward counting down auras, CDs, mana regen, etc
@@ -133,7 +147,7 @@ func (p *Player) manaRegenPerSecond() float64 {
 }
 
 // Pops any on-use trinkets / gear
-func (p *Player) TryActivateEquipment() {
+func (p *Player) TryActivateEquipment(sim *Simulation, party *Party) {
 	// TODO: Fix this.
 
 	// 	for _, item := range sim.activeEquip {
@@ -155,7 +169,7 @@ func (p *Player) TryActivateEquipment() {
 }
 
 // Activates set bonuses, returning the list of active bonuses.
-func (p *Player) ActivateSets(sim *Simulation) []string {
+func (p *Player) ActivateSets(sim *Simulation, party *Party) []string {
 	active := []string{}
 	// Activate Set Bonuses
 	setItemCount := map[string]int{}
@@ -165,7 +179,7 @@ func (p *Player) ActivateSets(sim *Simulation) []string {
 			setItemCount[set.Name]++
 			if bonus, ok := set.Bonuses[setItemCount[set.Name]]; ok {
 				active = append(active, set.Name+" ("+strconv.Itoa(setItemCount[set.Name])+"pc)")
-				p.AddAura(sim, bonus(sim, p))
+				p.AddAura(sim, bonus(sim, party, p))
 			}
 		}
 	}

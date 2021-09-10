@@ -9,7 +9,20 @@ import (
 	"github.com/wowsims/tbc/sim/core"
 )
 
-func RunSim(raid *core.Raid, options core.Options) {
+func RunSim(raid *core.Raid, buffs core.Buffs, options core.Options) {
+	// TODO: Create buff bot players here
+	// TODO: Since buff bots will just be implemented separate from the real
+	//   agent for the class... maybe just add a public "ApplyXX" function for teh buffs
+
+	// TODO: Move these to an "item buff bot"?
+	// Or just the first party member other than you? (create item buff bot if not i guess)
+	// if b.TwilightOwl {
+	// 	s[StatSpellCrit] += 44.16
+	// }
+	// if b.EyeOfNight {
+	// 	s[StatSpellPower] += 34
+	// }
+
 	sim := core.NewSim(raid, options)
 
 	// if sim.Options.Buffs.Misery {

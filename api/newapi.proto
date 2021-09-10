@@ -81,11 +81,16 @@ message Buffs {
     bool moonkin = 6;
     bool moonkin_raven_goddess = 7;
     int32 spriest_dps = 8;
+    bool bloodlust = 9;
 
     // Target Debuff
-    bool judgement_of_wisdom = 9;
-    bool improved_seal_of_the_crusader = 10;
-    bool misery = 11;
+    bool judgement_of_wisdom = 10;
+    bool improved_seal_of_the_crusader = 11;
+    bool misery = 12;
+
+    // Item Buffs
+    bool eye_of_the_night = 13;
+    bool chain_of_the_twilight_owl = 14;
 }
 
 message Consumes {
@@ -202,6 +207,7 @@ message IndividualSimRequest {
     int64 random_seed = 5;
     double gcd_min = 6; // sets the minimum GCD
     bool debug = 7; // enables debug logging.
+    bool exit_on_oom = 8;
 }
 
 message IndividualSimResult {
@@ -218,8 +224,10 @@ message IndividualSimResult {
     double dps_at_oom_avg = 9;
 
     map<int32, CastMetric> casts = 10;
-    // TODO: melee
+    // FUTURE: melee
     // map<int32, AttackMetric> attacks = 11; 
+
+    string error = 11; 
 }
 
 // CastMetric holds a collection of counts of casts and 

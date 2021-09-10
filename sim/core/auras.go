@@ -26,6 +26,12 @@ type Aura struct {
 	OnExpire       AuraEffect
 }
 
+func NewAuraTracker() *AuraTracker {
+	return &AuraTracker{
+		ActiveAuraIDs: make([]int32, 0, 5),
+	}
+}
+
 type AuraTracker struct {
 	CDs           [MagicIDLen]time.Duration // Map of MagicID to sim duration at which CD is done.
 	Auras         [MagicIDLen]Aura          // this is array instead of map to speed up browser perf.
@@ -110,7 +116,7 @@ func (at *AuraTracker) GetRemainingCD(magicID int32, currentTime time.Duration) 
 }
 
 func (at *AuraTracker) SetCD(magicID int32, newCD time.Duration) {
-	at.CDs[magicID] = at.CurrentTime + newCD
+	at.CDs[magicID] = newCD
 }
 
 func AuraName(a int32) string {
@@ -388,24 +394,27 @@ func AuraJudgementOfWisdom() Aura {
 	return Aura{
 		ID:      MagicIDJoW,
 		Expires: NeverExpires,
-		OnSpellHit: func(sim *Simulation, c *Cast) {
+		OnSpellHit: func(sim *Simulation, player *Player, c *Cast) {
 			if sim.Debug != nil {
 				sim.Debug(" +Judgement Of Wisdom: 37 mana (74 @ 50%% proc)\n")
 			}
-			sim.CurrentMana += mana
+			// Only apply to players that have mana.
+			if player.InitialStats[StatMana] > 0 {
+				player.Stats[StatMana] += mana
+			}
 		},
 	}
 }
 
 func createHasteActivate(id int32, haste float64, duration time.Duration) ItemActivation {
 	// Implemented haste activate as a buff so that the creation of a new cast gets the correct cast time
-	return func(sim *Simulation) Aura {
-		sim.Stats[StatHaste] += haste
+	return func(sim *Simulation, party *Party, player *Player) Aura {
+		player.Stats[StatSpellHaste] += haste
 		return Aura{
 			ID:      id,
 			Expires: sim.CurrentTime + duration,
-			OnExpire: func(sim *Simulation, c *Cast) {
-				sim.Stats[StatHaste] -= haste
+			OnExpire: func(sim *Simulation, player *Player, c *Cast) {
+				player.Stats[StatSpellHaste] -= haste
 			},
 		}
 	}
@@ -414,70 +423,70 @@ func createHasteActivate(id int32, haste float64, duration time.Duration) ItemAc
 // createSpellDmgActivate creates a function for trinket activation that uses +spellpower
 //  This is so we don't need a separate function for every spell power trinket.
 func createSpellDmgActivate(id int32, sp float64, duration time.Duration) ItemActivation {
-	return func(sim *Simulation) Aura {
-		sim.Stats[StatSpellDmg] += sp
+	return func(sim *Simulation, party *Party, player *Player) Aura {
+		player.Stats[StatSpellPower] += sp
 		return Aura{
 			ID:      id,
 			Expires: sim.CurrentTime + duration,
-			OnExpire: func(sim *Simulation, c *Cast) {
-				sim.Stats[StatSpellDmg] -= sp
+			OnExpire: func(sim *Simulation, player *Player, c *Cast) {
+				player.Stats[StatSpellPower] -= sp
 			},
 		}
 	}
 }
 
-func ActivateQuagsEye(sim *Simulation) Aura {
+func ActivateQuagsEye(sim *Simulation, party *Party, player *Player) Aura {
 	const hasteBonus = 320.0
 	const dur = time.Second * 45
 	icd := NewICD()
 	return Aura{
 		ID:      MagicIDQuagsEye,
 		Expires: NeverExpires,
-		OnCastComplete: func(sim *Simulation, c *Cast) {
+		OnCastComplete: func(sim *Simulation, player *Player, c *Cast) {
 			if !icd.isOnCD(sim) && sim.Rando.Float64() < 0.1 {
 				icd = InternalCD(sim.CurrentTime + dur)
-				sim.Stats[StatHaste] += hasteBonus
-				sim.addAura(AuraStatRemoval(sim.CurrentTime, time.Second*6, hasteBonus, StatHaste, MagicIDFungalFrenzy))
+				player.Stats[StatSpellHaste] += hasteBonus
+				player.AddAura(sim, AuraStatRemoval(sim.CurrentTime, time.Second*6, hasteBonus, StatSpellHaste, MagicIDFungalFrenzy))
 			}
 		},
 	}
 }
 
-func ActivateNexusHorn(sim *Simulation) Aura {
+func ActivateNexusHorn(sim *Simulation, party *Party, player *Player) Aura {
 	icd := NewICD()
 	const spellBonus = 225.0
 	const dur = time.Second * 45
 	return Aura{
 		ID:      MagicIDNexusHorn,
 		Expires: NeverExpires,
-		OnSpellHit: func(sim *Simulation, c *Cast) {
+		OnSpellHit: func(sim *Simulation, player *Player, c *Cast) {
 			if !icd.isOnCD(sim) && c.DidCrit && sim.Rando.Float64() < 0.2 {
 				icd = InternalCD(sim.CurrentTime + dur)
-				sim.Stats[StatSpellDmg] += spellBonus
-				sim.addAura(AuraStatRemoval(sim.CurrentTime, time.Second*10, spellBonus, StatSpellDmg, MagicIDCallOfTheNexus))
+				player.Stats[StatSpellPower] += spellBonus
+				player.AddAura(sim, AuraStatRemoval(sim.CurrentTime, time.Second*10, spellBonus, StatSpellPower, MagicIDCallOfTheNexus))
 			}
 		},
 	}
 }
 
-func ActivateDCC(sim *Simulation) Aura {
+func ActivateDCC(sim *Simulation, party *Party, player *Player) Aura {
 	const spellBonus = 8.0
 	stacks := 0
 	return Aura{
 		ID:      MagicIDDCC,
 		Expires: NeverExpires,
-		OnCastComplete: func(sim *Simulation, c *Cast) {
+		OnCastComplete: func(sim *Simulation, player *Player, c *Cast) {
 			if stacks < 10 {
 				stacks++
-				sim.Stats[StatSpellDmg] += spellBonus
+				player.Stats[StatSpellPower] += spellBonus
 			}
 			// Removal aura will refresh with new total spellpower based on stacks.
 			//  This will remove the old stack removal buff.
-			sim.addAura(Aura{
+			player.AddAura(sim, Aura{
 				ID:      MagicIDDCCBonus,
 				Expires: sim.CurrentTime + time.Second*10,
-				OnExpire: func(sim *Simulation, c *Cast) {
-					sim.Stats[StatSpellDmg] -= spellBonus * float64(stacks)
+				OnExpire: func(sim *Simulation, player *Player, c *Cast) {
+					player.Stats[StatSpellPower] -= spellBonus * float64(stacks)
 					stacks = 0
 				},
 			})
@@ -491,46 +500,31 @@ func AuraStatRemoval(currentTime time.Duration, duration time.Duration, amount f
 	return Aura{
 		ID:      id,
 		Expires: currentTime + duration,
-		OnExpire: func(sim *Simulation, c *Cast) {
+		OnExpire: func(sim *Simulation, player *Player, c *Cast) {
 			if sim.Debug != nil {
 				sim.Debug(" -%0.0f %s from %s\n", amount, stat.StatName(), AuraName(id))
 			}
-			sim.Stats[stat] -= amount
+			player.Stats[stat] -= amount
 		},
 	}
 }
 
-func TryActivateDrums(sim *Simulation) {
-	if sim.Options.NumDrums == 0 || sim.isOnCD(MagicIDDrums) {
+func TryActivateDrums(sim *Simulation, party *Party, player *Player) {
+	if player.Consumes.DrumsOfBattle || player.IsOnCD(MagicIDDrums, sim.CurrentTime) {
 		return
 	}
 
-	sim.Stats[StatHaste] += 80
-	sim.setCD(MagicIDDrums, time.Minute*2)
-	sim.addAura(AuraStatRemoval(sim.CurrentTime, time.Second*30, 80, StatHaste, MagicIDDrums))
-}
-
-func TryActivateBloodlust(sim *Simulation) {
-	if sim.Options.NumBloodlust <= sim.cache.bloodlustCasts || sim.isOnCD(MagicIDBloodlust) {
-		return
+	player.Stats[StatSpellHaste] += 80
+	for _, p := range party.Players {
+		p.SetCD(MagicIDDrums, time.Minute*2+sim.CurrentTime)
+		p.AddAura(sim, AuraStatRemoval(sim.CurrentTime, time.Second*30, 80, StatSpellHaste, MagicIDDrums))
 	}
-
-	dur := time.Second * 40 // assumes that multiple BLs are different shaman.
-	sim.setCD(MagicIDBloodlust, dur)
-	sim.cache.bloodlustCasts++ // TODO: will this break anything?
-	sim.addAura(Aura{
-		ID:      MagicIDBloodlust,
-		Expires: sim.CurrentTime + dur,
-		OnCast: func(sim *Simulation, c *Cast) {
-			c.CastTime = (c.CastTime * 10) / 13 // 30% faster
-		},
-	})
 }
 
-func TryActivateRacial(sim *Simulation) {
-	switch v := sim.Options.Buffs.Race; v {
-	case RaceBonusOrc:
-		if sim.isOnCD(MagicIDOrcBloodFury) {
+func TryActivateRacial(sim *Simulation, party *Party, player *Player) {
+	switch player.Race {
+	case RaceBonusTypeOrc:
+		if player.IsOnCD(MagicIDOrcBloodFury, sim.CurrentTime) {
 			return
 		}
 
@@ -538,47 +532,46 @@ func TryActivateRacial(sim *Simulation) {
 		const dur = time.Second * 15
 		const cd = time.Minute * 2
 
-		sim.Stats[StatSpellDmg] += spBonus
-		sim.setCD(MagicIDOrcBloodFury, cd)
-		sim.addAura(AuraStatRemoval(sim.CurrentTime, dur, spBonus, StatSpellDmg, MagicIDOrcBloodFury))
+		player.Stats[StatSpellPower] += spBonus
+		player.SetCD(MagicIDOrcBloodFury, cd+sim.CurrentTime)
+		player.AddAura(sim, AuraStatRemoval(sim.CurrentTime, dur, spBonus, StatSpellPower, MagicIDOrcBloodFury))
 
-	case RaceBonusTroll10, RaceBonusTroll30:
-		if sim.isOnCD(MagicIDTrollBerserking) {
+	case RaceBonusTypeTroll10, RaceBonusTypeTroll30:
+		if player.IsOnCD(MagicIDTrollBerserking, sim.CurrentTime) {
 			return
 		}
-
 		hasteBonus := time.Duration(11) // 10% haste
-		if v == RaceBonusTroll30 {
+		if player.Race == RaceBonusTypeTroll30 {
 			hasteBonus = time.Duration(13) // 30% haste
 		}
 		const dur = time.Second * 10
 		const cd = time.Minute * 3
 
-		sim.setCD(MagicIDTrollBerserking, cd)
-		sim.addAura(Aura{
+		player.SetCD(MagicIDTrollBerserking, cd+sim.CurrentTime)
+		player.AddAura(sim, Aura{
 			ID:      MagicIDTrollBerserking,
 			Expires: sim.CurrentTime + dur,
-			OnCast: func(sim *Simulation, c *Cast) {
+			OnCast: func(sim *Simulation, p *Player, c *Cast) {
 				c.CastTime = (c.CastTime * 10) / hasteBonus
 			},
 		})
 	}
 }
 
-func ActivateSkycall(sim *Simulation) Aura {
+func ActivateSkycall(sim *Simulation, party *Party, player *Player) Aura {
 	const hasteBonus = 101
 	const dur = time.Second * 10
 	return Aura{
 		ID:      MagicIDSkycall,
 		Expires: NeverExpires,
-		OnCastComplete: func(sim *Simulation, c *Cast) {
+		OnCastComplete: func(sim *Simulation, player *Player, c *Cast) {
 			if c.Spell.ID == MagicIDLB12 && sim.Rando.Float64() < 0.15 {
-				sim.Stats[StatHaste] += hasteBonus
-				sim.addAura(Aura{
+				player.Stats[StatSpellHaste] += hasteBonus
+				player.AddAura(sim, Aura{
 					ID:      MagicIDEnergized,
 					Expires: sim.CurrentTime + dur,
-					OnExpire: func(sim *Simulation, c *Cast) {
-						sim.Stats[StatHaste] -= hasteBonus
+					OnExpire: func(sim *Simulation, player *Player, c *Cast) {
+						player.Stats[StatSpellHaste] -= hasteBonus
 					},
 				})
 			}
@@ -586,50 +579,52 @@ func ActivateSkycall(sim *Simulation) Aura {
 	}
 }
 
-func ActivateNAC(sim *Simulation) Aura {
+func ActivateNAC(sim *Simulation, party *Party, player *Player) Aura {
 	const sp = 250
-	sim.Stats[StatSpellDmg] += sp
+	player.Stats[StatSpellPower] += sp
 	return Aura{
 		ID:      MagicIDNAC,
 		Expires: sim.CurrentTime + time.Second*20,
-		OnCast: func(sim *Simulation, c *Cast) {
+		OnCast: func(sim *Simulation, p *Player, c *Cast) {
 			c.ManaCost *= 1.2
 		},
-		OnExpire: func(sim *Simulation, c *Cast) {
-			sim.Stats[StatSpellDmg] -= sp
+		OnExpire: func(sim *Simulation, player *Player, c *Cast) {
+			player.Stats[StatSpellPower] -= sp
 		},
 	}
 }
 
-func ActivateCSD(sim *Simulation) Aura {
+func ActivateCSD(sim *Simulation, party *Party, player *Player) Aura {
 	return Aura{
 		ID:      MagicIDChaoticSkyfire,
 		Expires: NeverExpires,
-		OnCast: func(sim *Simulation, c *Cast) {
+		OnCast: func(sim *Simulation, p *Player, c *Cast) {
+			// TODO: Figure out how to make this work properly/easily with crit bonus
+			//  and classes with crit bonus modifiers
 			c.CritBonus *= 1.03
 		},
 	}
 }
 
-func ActivateIED(sim *Simulation) Aura {
+func ActivateIED(sim *Simulation, party *Party, player *Player) Aura {
 	icd := NewICD()
 	const dur = time.Second * 15
 	return Aura{
 		ID:      MagicIDInsightfulEarthstorm,
 		Expires: NeverExpires,
-		OnCastComplete: func(sim *Simulation, c *Cast) {
+		OnCastComplete: func(sim *Simulation, player *Player, c *Cast) {
 			if !icd.isOnCD(sim) && sim.Rando.Float64() < 0.04 {
 				icd = InternalCD(sim.CurrentTime + dur)
 				if sim.Debug != nil {
 					sim.Debug(" *Insightful Earthstorm Mana Restore - 300\n")
 				}
-				sim.CurrentMana += 300
+				player.Stats[StatMana] += 300
 			}
 		},
 	}
 }
 
-func ActivateMSD(sim *Simulation) Aura {
+func ActivateMSD(sim *Simulation, party *Party, player *Player) Aura {
 	const hasteBonus = 320.0
 	const dur = time.Second * 4
 	const icdDur = time.Second * 35
@@ -637,38 +632,39 @@ func ActivateMSD(sim *Simulation) Aura {
 	return Aura{
 		ID:      MagicIDMysticSkyfire,
 		Expires: NeverExpires,
-		OnCastComplete: func(sim *Simulation, c *Cast) {
+		OnCastComplete: func(sim *Simulation, player *Player, c *Cast) {
 			if !icd.isOnCD(sim) && sim.Rando.Float64() < 0.15 {
 				icd = InternalCD(sim.CurrentTime + icdDur)
-				sim.Stats[StatHaste] += hasteBonus
-				sim.addAura(AuraStatRemoval(sim.CurrentTime, dur, hasteBonus, StatHaste, MagicIDMysticFocus))
+				player.Stats[StatSpellHaste] += hasteBonus
+				player.AddAura(sim, AuraStatRemoval(sim.CurrentTime, dur, hasteBonus, StatSpellHaste, MagicIDMysticFocus))
 			}
 		},
 	}
 }
 
-func ActivateESD(sim *Simulation) Aura {
-	sim.Stats[StatInt] += sim.Stats[StatInt] * 0.02
+func ActivateESD(sim *Simulation, party *Party, player *Player) Aura {
+	// FUTURE: this technically should be modified by blessing of kings?
+	player.Stats[StatIntellect] += player.Stats[StatIntellect] * 0.02
 	return Aura{
 		ID:      MagicIDEmberSkyfire,
 		Expires: NeverExpires,
 	}
 }
 
-func ActivateSpellstrike(sim *Simulation) Aura {
+func ActivateSpellstrike(sim *Simulation, party *Party, player *Player) Aura {
 	const spellBonus = 92.0
 	const duration = time.Second * 10
 	return Aura{
 		ID:      MagicIDSpellstrike,
 		Expires: NeverExpires,
-		OnCastComplete: func(sim *Simulation, c *Cast) {
+		OnCastComplete: func(sim *Simulation, player *Player, c *Cast) {
 			if sim.Rando.Float64() < 0.05 {
-				sim.Stats[StatSpellDmg] += spellBonus
-				sim.addAura(Aura{
+				player.Stats[StatSpellPower] += spellBonus
+				player.AddAura(sim, Aura{
 					ID:      MagicIDSpellstrikeInfusion,
 					Expires: sim.CurrentTime + duration,
-					OnExpire: func(sim *Simulation, c *Cast) {
-						sim.Stats[StatSpellDmg] -= spellBonus
+					OnExpire: func(sim *Simulation, player *Player, c *Cast) {
+						player.Stats[StatSpellPower] -= spellBonus
 					},
 				})
 			}
@@ -676,20 +672,20 @@ func ActivateSpellstrike(sim *Simulation) Aura {
 	}
 }
 
-func ActivateManaEtched(sim *Simulation) Aura {
+func ActivateManaEtched(sim *Simulation, party *Party, player *Player) Aura {
 	const spellBonus = 110.0
 	const duration = time.Second * 15
 	return Aura{
 		ID:      MagicIDManaEtched,
 		Expires: NeverExpires,
-		OnCastComplete: func(sim *Simulation, c *Cast) {
+		OnCastComplete: func(sim *Simulation, player *Player, c *Cast) {
 			if sim.Rando.Float64() < 0.02 {
-				sim.Stats[StatSpellDmg] += spellBonus
-				sim.addAura(Aura{
+				player.Stats[StatSpellPower] += spellBonus
+				player.AddAura(sim, Aura{
 					ID:      MagicIDManaEtchedInsight,
 					Expires: sim.CurrentTime + duration,
-					OnExpire: func(sim *Simulation, c *Cast) {
-						sim.Stats[StatSpellDmg] -= spellBonus
+					OnExpire: func(sim *Simulation, player *Player, c *Cast) {
+						player.Stats[StatSpellPower] -= spellBonus
 					},
 				})
 			}
@@ -697,23 +693,19 @@ func ActivateManaEtched(sim *Simulation) Aura {
 	}
 }
 
-func ActivateTLC(sim *Simulation, player *Player) Aura {
+func ActivateTLC(sim *Simulation, party *Party, player *Player) Aura {
 	const spellBonus = 110.0
 	const duration = time.Second * 15
 	const icdDur = time.Millisecond * 2500
-	tlcspell := spellmap[MagicIDTLCLB]
+	tlcspell := Spells[MagicIDTLCLB]
 
 	charges := 0
 	icd := NewICD()
 
-	// Mods for TLC spells that don't change within the sim.
-	var hitMod = (-0.02 * float64(sim.Options.Talents.ElementalPrecision)) + (-0.01 * float64(sim.Options.Talents.NaturesGuidance))
-	var critMod = (-0.01 * float64(sim.Options.Talents.TidalMastery)) + (-0.01 * float64(sim.Options.Talents.CallOfThunder))
-
 	return Aura{
 		ID:      MagicIDTLC,
 		Expires: NeverExpires,
-		OnSpellHit: func(sim *Simulation, c *Cast) {
+		OnSpellHit: func(sim *Simulation, player *Player, c *Cast) {
 			if icd.isOnCD(sim) {
 				return
 			}
@@ -729,50 +721,49 @@ func ActivateTLC(sim *Simulation, player *Player) Aura {
 					sim.Debug(" Lightning Capacitor Triggered!\n")
 				}
 				icd = InternalCD(sim.CurrentTime + icdDur)
-
 				clone := sim.cache.NewCast()
 				// TLC does not get hit talents bonus, subtract them here. (since we dont conditionally apply them)
 				clone.Spell = tlcspell
 				clone.CritBonus = 1.5
-				clone.Hit = hitMod
-				clone.Crit = critMod
-				sim.Cast(clone)
+
+				sim.Cast(player, clone)
 				charges = 0
 			}
 		},
 	}
 }
 
-func ActivateChainTO(sim *Simulation) Aura {
-	if sim.Options.Buffs.TwilightOwl {
-		return Aura{ID: MagicIDChainTO}
-	}
+func ActivateChainTO(sim *Simulation, party *Party, player *Player) Aura {
 	const bonus = 2 * 22.08 // 2% crit
-	sim.Stats[StatSpellCrit] += bonus
+	for _, p := range party.Players {
+		p.Stats[StatSpellCrit] += bonus
+	}
 	return Aura{
 		ID:      MagicIDChainTO,
 		Expires: sim.CurrentTime + time.Minute*30,
 		// Technically this would never expire in any real sim... should I just make it NeverExpires?
-		OnExpire: func(sim *Simulation, c *Cast) {
-			sim.Stats[StatSpellCrit] -= bonus
+		OnExpire: func(sim *Simulation, player *Player, c *Cast) {
+			for _, p := range party.Players {
+				p.Stats[StatSpellCrit] -= bonus
+			}
 		},
 	}
 }
 
-func ActivateCycloneManaReduce(sim *Simulation) Aura {
+func ActivateCycloneManaReduce(sim *Simulation, party *Party, player *Player) Aura {
 	return Aura{
 		ID:      MagicIDCyclone4pc,
 		Expires: NeverExpires,
-		OnSpellHit: func(sim *Simulation, c *Cast) {
+		OnSpellHit: func(sim *Simulation, player *Player, c *Cast) {
 			if c.DidCrit && sim.Rando.Float64() < 0.11 {
-				sim.addAura(Aura{
+				player.AddAura(sim, Aura{
 					ID: MagicIDCycloneMana,
-					OnCast: func(sim *Simulation, c *Cast) {
+					OnCast: func(sim *Simulation, p *Player, c *Cast) {
 						// TODO: how to make sure this goes in before clearcasting?
 						c.ManaCost -= 270
 					},
-					OnCastComplete: func(sim *Simulation, c *Cast) {
-						sim.removeAura(MagicIDCycloneMana)
+					OnCastComplete: func(sim *Simulation, player *Player, c *Cast) {
+						player.RemoveAura(sim, player, MagicIDCycloneMana)
 					},
 				})
 			}
@@ -780,23 +771,23 @@ func ActivateCycloneManaReduce(sim *Simulation) Aura {
 	}
 }
 
-func ActivateCataclysmLBDiscount(sim *Simulation) Aura {
+func ActivateCataclysmLBDiscount(sim *Simulation, party *Party, player *Player) Aura {
 	return Aura{
 		ID:      MagicIDCataclysm4pc,
 		Expires: NeverExpires,
-		OnSpellHit: func(sim *Simulation, c *Cast) {
+		OnSpellHit: func(sim *Simulation, player *Player, c *Cast) {
 			if c.DidCrit && sim.Rando.Float64() < 0.25 {
-				sim.CurrentMana += 120
+				player.Stats[StatMana] += 120
 			}
 		},
 	}
 }
 
-func ActivateSkyshatterImpLB(sim *Simulation) Aura {
+func ActivateSkyshatterImpLB(sim *Simulation, party *Party, player *Player) Aura {
 	return Aura{
 		ID:      MagicIDSkyshatter4pc,
 		Expires: NeverExpires,
-		OnSpellHit: func(sim *Simulation, c *Cast) {
+		OnSpellHit: func(sim *Simulation, player *Player, c *Cast) {
 			if c.Spell.ID == MagicIDLB12 {
 				c.DidDmg *= 1.05
 			}
@@ -804,51 +795,54 @@ func ActivateSkyshatterImpLB(sim *Simulation) Aura {
 	}
 }
 
-func TryActivateDestructionPotion(sim *Simulation) {
-	if !sim.Options.Consumes.DestructionPotion || sim.isOnCD(MagicIDPotion) {
-		return
-	}
+func TryActivateDestructionPotion(sim *Simulation, party *Party, player *Player) {
 
-	// Only use dest potion if not using mana or if we haven't used it once.
-	// If we are using mana, only use destruction potion on the pull.
-	if sim.cache.destructionPotion && sim.Options.Consumes.SuperManaPotion {
-		return
-	}
+	// TODO: add destruction potions
 
-	const spBonus = 120
-	const critBonus = 44.16
-	const dur = time.Second * 15
+	// if !sim.Options.Consumes.DestructionPotion || player.IsOnCD(MagicIDPotion, sim.CurrentTime) {
+	// 	return
+	// }
 
-	sim.cache.destructionPotion = true
-	sim.setCD(MagicIDPotion, time.Second*120)
-	sim.Stats[StatSpellDmg] += spBonus
-	sim.Stats[StatSpellCrit] += critBonus
+	// // Only use dest potion if not using mana or if we haven't used it once.
+	// // If we are using mana, only use destruction potion on the pull.
+	// if sim.cache.destructionPotion && sim.Options.Consumes.SuperManaPotion {
+	// 	return
+	// }
 
-	sim.addAura(Aura{
-		ID:      MagicIDDestructionPotion,
-		Expires: sim.CurrentTime + dur,
-		OnExpire: func(sim *Simulation, c *Cast) {
-			sim.Stats[StatSpellDmg] -= spBonus
-			sim.Stats[StatSpellCrit] -= critBonus
-		},
-	})
+	// const spBonus = 120
+	// const critBonus = 44.16
+	// const dur = time.Second * 15
+
+	// sim.cache.destructionPotion = true
+	// sim.setCD(MagicIDPotion, time.Second*120)
+	// player.Stats[StatSpellPower] += spBonus
+	// player.Stats[StatSpellCrit] += critBonus
+
+	// player.AddAura(sim, Aura{
+	// 	ID:      MagicIDDestructionPotion,
+	// 	Expires: sim.CurrentTime + dur,
+	// 	OnExpire: func(sim *Simulation, player *Player, c *Cast) {
+	// 		player.Stats[StatSpellPower] -= spBonus
+	// 		player.Stats[StatSpellCrit] -= critBonus
+	// 	},
+	// })
 }
 
 // TODO: This function doesn't really belong in auras.go, find a better home for it.
-func TryActivateDarkRune(sim *Simulation) {
-	if !sim.Options.Consumes.DarkRune || sim.isOnCD(MagicIDRune) {
+func TryActivateDarkRune(sim *Simulation, party *Party, player *Player) {
+	if !player.Consumes.DarkRune || player.IsOnCD(MagicIDRune, sim.CurrentTime) {
 		return
 	}
 
 	// Only pop if we have less than the max mana provided by the potion minus 1mp5 tick.
-	totalRegen := sim.manaRegenPerSecond() * 5
-	if sim.Stats[StatMana]-(sim.CurrentMana+totalRegen) < 1500 {
+	totalRegen := player.manaRegenPerSecond() * 5
+	if player.Stats[StatMana]-(player.Stats[StatMana]+totalRegen) < 1500 {
 		return
 	}
 
 	// Restores 900 to 1500 mana. (2 Min Cooldown)
-	sim.CurrentMana += 900 + (sim.Rando.Float64() * 600)
-	sim.setCD(MagicIDRune, time.Second*120)
+	player.Stats[StatMana] += 900 + (sim.Rando.Float64() * 600)
+	player.SetCD(MagicIDRune, time.Second*120+sim.CurrentTime)
 	if sim.Debug != nil {
 		sim.Debug("Used Dark Rune\n")
 	}
@@ -856,33 +850,33 @@ func TryActivateDarkRune(sim *Simulation) {
 }
 
 // TODO: This function doesn't really belong in auras.go, find a better home for it.
-func TryActivateSuperManaPotion(sim *Simulation) {
-	if !sim.Options.Consumes.SuperManaPotion || sim.isOnCD(MagicIDPotion) {
+func TryActivateSuperManaPotion(sim *Simulation, party *Party, player *Player) {
+	if !player.Consumes.SuperManaPotion || player.IsOnCD(MagicIDPotion, sim.CurrentTime) {
 		return
 	}
 
 	// Only pop if we have less than the max mana provided by the potion minus 1mp5 tick.
-	totalRegen := sim.manaRegenPerSecond() * 5
-	if sim.Stats[StatMana]-(sim.CurrentMana+totalRegen) < 3000 {
+	totalRegen := player.manaRegenPerSecond() * 5
+	if player.Stats[StatMana]-(player.Stats[StatMana]+totalRegen) < 3000 {
 		return
 	}
 
 	// Restores 1800 to 3000 mana. (2 Min Cooldown)
 	manaGain := 1800 + (sim.Rando.Float64() * 1200)
 
-	if sim.hasAura(MagicIDAlchStone) {
+	if player.HasAura(MagicIDAlchStone) {
 		manaGain *= 1.4
 	}
 
-	sim.CurrentMana += manaGain
-	sim.setCD(MagicIDPotion, time.Second*120)
+	player.Stats[StatMana] += manaGain
+	player.SetCD(MagicIDPotion, time.Second*120+sim.CurrentTime)
 	if sim.Debug != nil {
 		sim.Debug("Used Mana Potion\n")
 	}
 	return
 }
 
-func ActivateSextant(sim *Simulation) Aura {
+func ActivateSextant(sim *Simulation, party *Party, player *Player) Aura {
 	icd := NewICD()
 	const spellBonus = 190.0
 	const dur = time.Second * 15
@@ -890,36 +884,36 @@ func ActivateSextant(sim *Simulation) Aura {
 	return Aura{
 		ID:      MagicIDSextant,
 		Expires: NeverExpires,
-		OnSpellHit: func(sim *Simulation, c *Cast) {
+		OnSpellHit: func(sim *Simulation, player *Player, c *Cast) {
 			if c.DidCrit && !icd.isOnCD(sim) && sim.Rando.Float64() < 0.2 {
 				icd = InternalCD(sim.CurrentTime + icdDur)
-				sim.Stats[StatSpellDmg] += spellBonus
-				sim.addAura(AuraStatRemoval(sim.CurrentTime, dur, spellBonus, StatSpellDmg, MagicIDUnstableCurrents))
+				player.Stats[StatSpellPower] += spellBonus
+				player.AddAura(sim, AuraStatRemoval(sim.CurrentTime, dur, spellBonus, StatSpellPower, MagicIDUnstableCurrents))
 			}
 		},
 	}
 }
 
-func ActivateEyeOfMag(sim *Simulation) Aura {
+func ActivateEyeOfMag(sim *Simulation, party *Party, player *Player) Aura {
 	const spellBonus = 170.0
 	const dur = time.Second * 10
 	return Aura{
 		ID:      MagicIDEyeOfMag,
 		Expires: NeverExpires,
-		OnSpellMiss: func(sim *Simulation, c *Cast) {
-			sim.Stats[StatSpellDmg] += spellBonus
-			sim.addAura(Aura{
+		OnSpellMiss: func(sim *Simulation, p *Player, c *Cast) {
+			player.Stats[StatSpellPower] += spellBonus
+			player.AddAura(sim, Aura{
 				ID:      MagicIDRecurringPower,
 				Expires: sim.CurrentTime + dur,
-				OnExpire: func(sim *Simulation, c *Cast) {
-					sim.Stats[StatSpellDmg] -= spellBonus
+				OnExpire: func(sim *Simulation, player *Player, c *Cast) {
+					player.Stats[StatSpellPower] -= spellBonus
 				},
 			})
 		},
 	}
 }
 
-func ActivateElderScribes(sim *Simulation) Aura {
+func ActivateElderScribes(sim *Simulation, party *Party, player *Player) Aura {
 	// Gives a chance when your harmful spells land to increase the damage of your spells and effects by up to 130 for 10 sec. (Proc chance: 20%, 50s cooldown)
 	icd := NewICD()
 	const spellBonus = 130.0
@@ -929,22 +923,22 @@ func ActivateElderScribes(sim *Simulation) Aura {
 	return Aura{
 		ID:      MagicIDElderScribe,
 		Expires: NeverExpires,
-		OnSpellHit: func(sim *Simulation, c *Cast) {
+		OnSpellHit: func(sim *Simulation, player *Player, c *Cast) {
 			// This code is starting to look a lot like other ICD buff items. Perhaps we could DRY this out.
 			if !icd.isOnCD(sim) && sim.Rando.Float64() < proc {
 				icd = InternalCD(sim.CurrentTime + icdDur)
-				sim.Stats[StatSpellDmg] += spellBonus
-				sim.addAura(AuraStatRemoval(sim.CurrentTime, dur, spellBonus, StatSpellDmg, MagicIDElderScribeProc))
+				player.Stats[StatSpellPower] += spellBonus
+				player.AddAura(sim, AuraStatRemoval(sim.CurrentTime, dur, spellBonus, StatSpellPower, MagicIDElderScribeProc))
 			}
 		},
 	}
 }
 
-func ActivateTotemOfPulsingEarth(sim *Simulation) Aura {
+func ActivateTotemOfPulsingEarth(sim *Simulation, party *Party, player *Player) Aura {
 	return Aura{
 		ID:      MagicIDTotemOfPulsingEarth,
 		Expires: NeverExpires,
-		OnCast: func(sim *Simulation, c *Cast) {
+		OnCast: func(sim *Simulation, p *Player, c *Cast) {
 			if c.Spell.ID == MagicIDLB12 {
 				// TODO: how to make sure this goes in before clearcasting?
 				c.ManaCost = math.Max(c.ManaCost-27, 0)
@@ -955,13 +949,13 @@ func ActivateTotemOfPulsingEarth(sim *Simulation) Aura {
 
 // ActivateFathomBrooch adds an aura that has a chance on cast of nature spell
 //  to restore 335 mana. 40s ICD
-func ActivateFathomBrooch(sim *Simulation) Aura {
+func ActivateFathomBrooch(sim *Simulation, party *Party, player *Player) Aura {
 	icd := NewICD()
 	const icdDur = time.Second * 40
 	return Aura{
 		ID:      MagicIDRegainMana,
 		Expires: NeverExpires,
-		OnCastComplete: func(sim *Simulation, c *Cast) {
+		OnCastComplete: func(sim *Simulation, player *Player, c *Cast) {
 			if icd.isOnCD(sim) {
 				return
 			}
@@ -970,7 +964,7 @@ func ActivateFathomBrooch(sim *Simulation) Aura {
 			}
 			if sim.Rando.Float64() < 0.15 {
 				icd = InternalCD(sim.CurrentTime + icdDur)
-				sim.CurrentMana += 335
+				player.Stats[StatMana] += 335
 			}
 		},
 	}
@@ -978,7 +972,7 @@ func ActivateFathomBrooch(sim *Simulation) Aura {
 
 // ActivateAlchStone adds the alch stone aura that has no effect on casts.
 //  The usage for this aura is in the potion usage function.
-func ActivateAlchStone(sim *Simulation) Aura {
+func ActivateAlchStone(sim *Simulation, party *Party, player *Player) Aura {
 	return Aura{
 		ID:      MagicIDAlchStone,
 		Expires: math.MaxInt32,

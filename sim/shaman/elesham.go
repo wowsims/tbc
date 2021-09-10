@@ -377,18 +377,8 @@ func NewAdaptiveAgent(sim *core.Simulation) *AdaptiveAgent {
 func NewCastAction(sim *core.Simulation, player *Shaman, sp *core.Spell) core.AgentAction {
 	cast := core.NewCast(sim, sp)
 
-	if sp.ID == core.MagicIDCL6 || sp.ID == core.MagicIDLB12 {
-		cast.CritBonus *= 2 // This handles the 'Elemental Fury' talent which increases the crit bonus.
-		cast.CritBonus -= 1 // reduce to multiplier instead of percent.
-	}
+	itsElectric := sp.ID == core.MagicIDCL6 || sp.ID == core.MagicIDLB12
 	castTime := cast.CastTime
-	if sp.ID == core.MagicIDLB12 || sp.ID == core.MagicIDCL6 {
-		cast.ManaCost *= 1 - (0.02 * float64(player.Talents.Convection))
-		// TODO: Add LightningMaster to talent list (this will never not be selected for an elemental shaman)
-		castTime -= time.Millisecond * 500 // Talent Lightning Mastery
-	}
-	castTime = time.Duration(float64(castTime) / player.HasteBonus())
-	cast.CastTime = castTime
 
 	// Apply any on cast effects.
 	for _, id := range player.ActiveAuraIDs {
@@ -396,6 +386,15 @@ func NewCastAction(sim *core.Simulation, player *Shaman, sp *core.Spell) core.Ag
 			player.Auras[id].OnCast(sim, player.Player, cast)
 		}
 	}
+
+	if itsElectric {
+		cast.CritBonus *= 2 // This handles the 'Elemental Fury' talent which increases the crit bonus.
+		cast.CritBonus -= 1 // reduce to multiplier instead of percent.
+		cast.ManaCost *= 1 - (0.02 * float64(player.Talents.Convection))
+		// TODO: Add LightningMaster to talent list (this will never not be selected for an elemental shaman)
+		castTime -= time.Millisecond * 500 // Talent Lightning Mastery
+	}
+	cast.CastTime = time.Duration(float64(castTime) / player.HasteBonus())
 
 	return core.AgentAction{
 		Wait: 0,

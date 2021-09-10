@@ -1,11 +1,20 @@
 package shaman
 
 import (
+	"time"
+
 	"github.com/wowsims/tbc/sim/core"
 )
 
 func NewShaman(player *core.Player, agentID int, options map[string]string) *Shaman {
 	agent := NewAdaptiveAgent(nil)
+
+	// if WaterShield {
+	// 	s[StatMP5] += 50
+	// }
+
+	// TODO: could we include Party as a constructor argument to add spec specific
+	// buffs during construction instead of on every reset.
 
 	return &Shaman{
 		agent:  agent,
@@ -25,6 +34,7 @@ func (s *Shaman) BuffUp(sim *core.Simulation, party *core.Party) {
 	// if sim.Options.Talents.Concussion > 0 {
 	// 	bonusdmg := (0.01 * sim.Options.Talents.Concussion)
 	// }
+
 	if s.Talents.LightningOverload > 0 {
 		s.AddAura(sim, AuraLightningOverload(s.Talents.LightningOverload))
 	}
@@ -33,13 +43,10 @@ func (s *Shaman) ChooseAction(sim *core.Simulation) core.AgentAction {
 	return s.agent.ChooseAction(s, sim)
 }
 func (s *Shaman) OnActionAccepted(sim *core.Simulation, action core.AgentAction) {
-
+	s.agent.OnActionAccepted(sim, action)
 }
 func (s *Shaman) Reset(newsim *core.Simulation) {
-
-}
-func (s *Shaman) Cast() {
-
+	// Do we need to reset anything special?
 }
 
 // Agent is shaman specific agent for behavior.
@@ -61,20 +68,20 @@ type Totems struct {
 	Cyclone2PC   bool // Cyclone set 2pc bonus
 }
 
-// func (tt Totems) AddStats(s Stats) Stats {
-// 	s[StatSpellCrit] += 66.24 * float64(tt.TotemOfWrath)
-// 	s[StatSpellHit] += 37.8 * float64(tt.TotemOfWrath)
-// 	if tt.WrathOfAir {
-// 		s[StatSpellDmg] += 101
-// 		if tt.Cyclone2PC {
-// 			s[StatSpellDmg] += 20
-// 		}
-// 	}
-// 	if tt.ManaStream {
-// 		s[StatMP5] += 50
-// 	}
-// 	return s
-// }
+func (tt Totems) AddStats(s core.Stats) core.Stats {
+	s[core.StatSpellCrit] += 66.24 * float64(tt.TotemOfWrath)
+	s[core.StatSpellHit] += 37.8 * float64(tt.TotemOfWrath)
+	if tt.WrathOfAir {
+		s[core.StatSpellPower] += 101
+		if tt.Cyclone2PC {
+			s[core.StatSpellPower] += 20
+		}
+	}
+	if tt.ManaStream {
+		s[core.StatMP5] += 50
+	}
+	return s
+}
 
 type Talents struct {
 	LightningOverload  int
@@ -89,7 +96,12 @@ type Talents struct {
 	Concussion float64 // temp hack to speed up not converting this to a int on every spell cast
 }
 
+// Mods for TLC spells that don't change within the sim.
+// var hitMod = (-0.02 * float64(sim.Options.Talents.ElementalPrecision)) + (-0.01 * float64(sim.Options.Talents.NaturesGuidance))
+// var critMod = (-0.01 * float64(sim.Options.Talents.TidalMastery)) + (-0.01 * float64(sim.Options.Talents.CallOfThunder))
+
 // func (t Talents) AddStats(s Stats) Stats {
+// TODO: make these an 'oncast' effect that specificaly checks the cast type.
 // 	s[StatSpellHit] += 25.2 * float64(t.ElementalPrecision)
 // 	s[StatSpellHit] += 12.6 * float64(t.NaturesGuidance)
 // 	s[StatSpellCrit] += 22.08 * float64(t.TidalMastery)
@@ -128,5 +140,24 @@ func ActivateChainLightningBounce() core.Aura {
 				sim.Cast(p, clone)
 			}
 		},
+	}
+}
+
+func TryActivateBloodlust(sim *core.Simulation, party *core.Party, player *core.Player) {
+	if player.IsOnCD(core.MagicIDBloodlust, sim.CurrentTime) {
+		return
+	}
+
+	dur := time.Second * 40 // assumes that multiple BLs are different shaman.
+	player.SetCD(core.MagicIDBloodlust, time.Minute*10)
+
+	for _, p := range party.Players {
+		p.AddAura(sim, core.Aura{
+			ID:      core.MagicIDBloodlust,
+			Expires: sim.CurrentTime + dur,
+			OnCast: func(sim *core.Simulation, p *core.Player, c *core.Cast) {
+				c.CastTime = (c.CastTime * 10) / 13 // 30% faster
+			},
+		})
 	}
 }

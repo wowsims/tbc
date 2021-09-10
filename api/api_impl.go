@@ -4,6 +4,7 @@ package api
 import (
 	"math"
 	"math/rand"
+	"time"
 
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/runner"
@@ -158,10 +159,30 @@ func sampleFromDpsHist(hist map[int]int, histNumSamples int) int {
 	panic("Invalid dps histogram")
 }
 
-func runSimulationImpl(request *IndividualSimRequest) *IndividualSimResult {
-	// panic("not implemented")
+func createConsumes(c *Consumes) core.Consumes {
+	cconsume := core.Consumes{
+		BrilliantWizardOil:       c.BrilliantWizardOil,
+		MajorMageblood:           c.MajorMageblood,
+		FlaskOfBlindingLight:     c.FlaskOfBlindingLight,
+		FlaskOfMightyRestoration: c.FlaskOfMightyRestoration,
+		BlackendBasilisk:         c.BlackendBasilisk,
+		DestructionPotion:        c.DestructionPotion,
+		SuperManaPotion:          c.SuperManaPotion,
+		DarkRune:                 c.DarkRune,
+		DrumsOfBattle:            c.DrumsOfBattle,
+	}
 
-	player := core.NewPlayer(core.EquipmentSpec{}, core.Consumes{})
+	return cconsume
+}
+
+func runSimulationImpl(request *IndividualSimRequest) *IndividualSimResult {
+
+	player := core.NewPlayer(core.EquipmentSpec{}, core.RaceBonusType(request.Player.Options.Race), createConsumes(request.Player.Options.Consumes))
+
+	// TODO: should this be moved into the player constructor?
+	for k, v := range request.Player.CustomStats {
+		player.Stats[k] += v
+	}
 
 	var agent core.Agent
 	switch v := request.Player.Options.Class.(type) {
@@ -181,7 +202,18 @@ func runSimulationImpl(request *IndividualSimRequest) *IndividualSimResult {
 		},
 	}
 
-	options := core.Options{}
+	options := core.Options{
+		Encounter: core.Encounter{
+			Duration:   request.Encounter.Duration,
+			NumTargets: int(request.Encounter.NumTargets),
+			Armor:      request.Encounter.TargetArmor,
+		},
+		Iterations: request.Iterations,
+		RSeed:      request.RandomSeed,
+		ExitOnOOM:  request.ExitOnOom,
+		GCDMin:     time.Duration(request.GcdMin),
+		Debug:      request.Debug,
+	}
 
 	isr := &IndividualSimResult{
 		// ExecutionDurationMs int64                 `protobuf:"varint,1,opt,name=execution_duration_ms,json=executionDurationMs,proto3" json:"execution_duration_ms,omitempty"`
@@ -195,7 +227,27 @@ func runSimulationImpl(request *IndividualSimRequest) *IndividualSimResult {
 		// DpsAtOomAvg         float64               `protobuf:"fixed64,9,opt,name=dps_at_oom_avg,json=dpsAtOomAvg,proto3" json:"dps_at_oom_avg,omitempty"`
 		// Casts               map[int32]*CastMetric `protobuf:"bytes,10,rep,name=casts,proto3" json:"casts,omitempty" protobuf_key:"varint,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 	}
-	runner.RunSim(raid, options)
+
+	buffs := convertBuffs(request.Buffs)
+	runner.RunSim(raid, buffs, options)
 
 	return isr
+}
+
+func convertBuffs(inBuff *Buffs) core.Buffs {
+	return core.Buffs{
+		ArcaneInt:                 inBuff.ArcaneInt,
+		GiftOfTheWild:             inBuff.GiftOfTheWild,
+		BlessingOfKings:           inBuff.BlessingOfKings,
+		ImprovedBlessingOfWisdom:  inBuff.ImprovedBlessingOfWisdom,
+		ImprovedDivineSpirit:      inBuff.ImprovedDivineSpirit,
+		Moonkin:                   inBuff.Moonkin,
+		MoonkinRavenGoddess:       inBuff.MoonkinRavenGoddess,
+		SpriestDPS:                uint16(inBuff.SpriestDps),
+		EyeOfNight:                inBuff.EyeOfTheNight,
+		TwilightOwl:               inBuff.ChainOfTheTwilightOwl,
+		JudgementOfWisdom:         inBuff.JudgementOfWisdom,
+		ImprovedSealOfTheCrusader: inBuff.ImprovedSealOfTheCrusader,
+		Misery:                    inBuff.Misery,
+	}
 }

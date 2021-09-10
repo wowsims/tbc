@@ -224,7 +224,9 @@ func (gm GemColor) Intersects(o GemColor) bool {
 	return false // dunno wtf this is.
 }
 
-type ItemActivation func(*Simulation, *Player) Aura
+// ItemActivation needs the state from simulator, party, and player
+//  because items can impact all 3. (potions, drums, JC necks, etc)
+type ItemActivation func(*Simulation, *Party, *Player) Aura
 
 type Equipment [EquipRanged + 1]Item
 
@@ -691,12 +693,9 @@ var items = []Item{
 	{ID: 30663, Slot: EquipTrinket, Name: "Fathom-Brooch of the Tidewalker", Phase: 2, Quality: ItemQualityEpic, SourceZone: "SSC", SourceDrop: "Fathom-Lord Karathress", Stats: Stats{}, Activate: ActivateFathomBrooch, ActivateCD: NeverExpires},
 	{ID: 35749, Slot: EquipTrinket, Name: "Sorcerer's Alchemist Stone", Phase: 5, Quality: ItemQualityEpic, SourceZone: "Shattered Sun Offensive", SourceDrop: "Exalted", Stats: Stats{StatSpellPower: 63}, Activate: ActivateAlchStone, ActivateCD: NeverExpires},
 
-	{ID: 24116, Slot: EquipNeck, Name: "Eye of the Night", Phase: 1, Quality: ItemQualityRare, SourceZone: "Jewelcrafting", SourceDrop: "", Stats: Stats{StatSpellCrit: 26, StatSpellHit: 16, StatSpellPen: 15}, Activate: func(sim *Simulation) Aura {
-		if sim.Options.Buffs.EyeOfNight {
-			return Aura{} // if we already have buff from party member, no need to activate this
-		}
+	{ID: 24116, Slot: EquipNeck, Name: "Eye of the Night", Phase: 1, Quality: ItemQualityRare, SourceZone: "Jewelcrafting", SourceDrop: "", Stats: Stats{StatSpellCrit: 26, StatSpellHit: 16}, Activate: func(sim *Simulation, party *Party, player *Player) Aura {
 		activate := createSpellDmgActivate(MagicIDEyeOfTheNight, 34, time.Minute*30)
-		return activate(sim)
+		return activate(sim, party, player)
 	}, ActivateCD: NeverExpires, CoolID: MagicIDEyeOfTheNightTrink},
 	{ID: 24121, Slot: EquipNeck, Name: "Chain of the Twilight Owl", Phase: 1, Quality: ItemQualityRare, SourceZone: "Jewelcrafting", SourceDrop: "", Stats: Stats{StatStamina: 0, StatIntellect: 19, StatSpellPower: 21}, Activate: ActivateChainTO, ActivateCD: NeverExpires, CoolID: MagicIDChainTOTrink},
 	{ID: 31075, Slot: EquipFinger, Name: "Evoker's Mark of the Redemption", Phase: 1, Quality: ItemQualityRare, SourceZone: "Quest SMV", SourceDrop: "Dissension Amongst the Ranks...", Stats: Stats{StatIntellect: 15, StatSpellPower: 29, StatSpellCrit: 10}},
@@ -869,16 +868,16 @@ var sets = []ItemSet{
 	{
 		Name:  "Netherstrike",
 		Items: map[string]bool{"Netherstrike Breastplate": true, "Netherstrike Bracers": true, "Netherstrike Belt": true},
-		Bonuses: map[int]ItemActivation{3: func(sim *Simulation) Aura {
-			sim.Stats[StatSpellPower] += 23
+		Bonuses: map[int]ItemActivation{3: func(sim *Simulation, party *Party, player *Player) Aura {
+			player.Stats[StatSpellPower] += 23
 			return Aura{ID: MagicIDNetherstrike}
 		}},
 	},
 	{
 		Name:  "The Twin Stars",
 		Items: map[string]bool{"Charlotte's Ivy": true, "Lola's Eve": true},
-		Bonuses: map[int]ItemActivation{2: func(sim *Simulation) Aura {
-			sim.Stats[StatSpellPower] += 15
+		Bonuses: map[int]ItemActivation{2: func(sim *Simulation, party *Party, player *Player) Aura {
+			player.Stats[StatSpellPower] += 15
 			return Aura{ID: MagicIDNetherstrike}
 		}},
 	},
@@ -886,13 +885,13 @@ var sets = []ItemSet{
 		Name:  "Tidefury",
 		Items: map[string]bool{"Tidefury Helm": true, "Tidefury Shoulderguards": true, "Tidefury Chestpiece": true, "Tidefury Kilt": true, "Tidefury Gauntlets": true},
 		Bonuses: map[int]ItemActivation{
-			2: func(sim *Simulation) Aura {
+			2: func(sim *Simulation, party *Party, player *Player) Aura {
 				return Aura{ID: MagicIDTidefury}
 			},
-			4: func(sim *Simulation) Aura {
-				if sim.Options.Buffs.WaterShield {
-					sim.Stats[StatMP5] += 3
-				}
+			4: func(sim *Simulation, party *Party, player *Player) Aura {
+				// if sim.Options.Buffs.WaterShield {
+				player.Stats[StatMP5] += 3
+				// }
 				return Aura{ID: MagicIDTidefury}
 			},
 		},
@@ -905,28 +904,33 @@ var sets = []ItemSet{
 	{
 		Name:  "Mana Etched",
 		Items: map[string]bool{"Mana-Etched Crown": true, "Mana-Etched Spaulders": true, "Mana-Etched Vestments": true, "Mana-Etched Gloves": true, "Mana-Etched Pantaloons": true},
-		Bonuses: map[int]ItemActivation{4: ActivateManaEtched, 2: func(sim *Simulation) Aura {
-			sim.Stats[StatSpellHit] += 35
+		Bonuses: map[int]ItemActivation{4: ActivateManaEtched, 2: func(sim *Simulation, party *Party, player *Player) Aura {
+			player.Stats[StatSpellHit] += 35
 			return Aura{ID: MagicIDManaEtchedHit}
 		}},
 	},
 	{
 		Name:  "Cyclone Regalia",
 		Items: map[string]bool{"Cyclone Faceguard (Tier 4)": true, "Cyclone Shoulderguards (Tier 4)": true, "Cyclone Chestguard (Tier 4)": true, "Cyclone Handguards (Tier 4)": true, "Cyclone Legguards (Tier 4)": true},
-		Bonuses: map[int]ItemActivation{4: ActivateCycloneManaReduce, 2: func(sim *Simulation) Aura {
-			if !sim.Options.Totems.Cyclone2PC && sim.Options.Totems.WrathOfAir {
-				sim.Stats[StatSpellPower] += 20 // only activate if we don't already have it from party/
+		Bonuses: map[int]ItemActivation{4: ActivateCycloneManaReduce, 2: func(sim *Simulation, party *Party, player *Player) Aura {
+			// if sim.Options.Totems.WrathOfAir {
+
+			// TODO: Only one ele shaman in the party can use this at a time.
+			//   not a big deal now but will need to be fixed to support full raid sim.
+			for _, p := range party.Players {
+				p.Stats[StatSpellPower] += 20
 			}
+
+			// }
 			return Aura{ID: MagicIDCyclone2pc}
 		}},
 	},
 	{
 		Name:  "Windhawk",
 		Items: map[string]bool{"Windhawk Hauberk": true, "Windhawk Belt": true, "Windhawk Bracers": true},
-		Bonuses: map[int]ItemActivation{3: func(sim *Simulation) Aura {
-			if sim.Options.Buffs.WaterShield {
-				sim.Stats[StatMP5] += 8
-			}
+		Bonuses: map[int]ItemActivation{3: func(sim *Simulation, party *Party, player *Player) Aura {
+			// TODO: check if player has water shield on?
+			player.Stats[StatMP5] += 8
 			return Aura{ID: MagicIDWindhawk}
 		}},
 	},
@@ -947,10 +951,10 @@ var sets = []ItemSet{
 			"Skyshatter Treads":               true,
 			"Skyshatter Bands":                true,
 		},
-		Bonuses: map[int]ItemActivation{2: func(sim *Simulation) Aura {
-			sim.Stats[StatMP5] += 15
-			sim.Stats[StatSpellCrit] += 35
-			sim.Stats[StatSpellPower] += 45
+		Bonuses: map[int]ItemActivation{2: func(sim *Simulation, party *Party, player *Player) Aura {
+			player.Stats[StatMP5] += 15
+			player.Stats[StatSpellCrit] += 35
+			player.Stats[StatSpellPower] += 45
 			return Aura{ID: MagicIDSkyshatter2pc}
 		}, 4: ActivateSkyshatterImpLB},
 	},

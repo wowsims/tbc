@@ -3,6 +3,11 @@ package mage
 import "github.com/wowsims/tbc/sim/core"
 
 func NewBuffBot() *Mage {
+	// TODO: apply to raid
+	// if b.ArcaneInt {
+	// 	s[StatIntellect] += 40
+	// }
+
 	return &Mage{}
 }
 
