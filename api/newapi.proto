@@ -81,7 +81,7 @@ message Buffs {
     bool moonkin = 6;
     bool moonkin_raven_goddess = 7;
     int32 spriest_dps = 8;
-    bool bloodlust = 9;
+    int32 bloodlust = 9;
 
     // Target Debuff
     bool judgement_of_wisdom = 10;

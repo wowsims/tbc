@@ -1,5 +1,20 @@
 .character-stats-root {
   width: 100%;
   height: 100%;
-  background-color: red;
+}
+
+.character-stats-table {
+  width: 100%;
+}
+
+.character-stats-row {
+  width: 100%;
+}
+
+.character-stats-label {
+  text-align: left;
+}
+
+.character-stats-value {
+  text-align: right;
 }

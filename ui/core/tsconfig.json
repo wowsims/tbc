@@ -1,6 +1,12 @@
 {
-  "extends": "../tsconfig",
+  "extends": "../../tsconfig-base",
   "compilerOptions": {
     "composite": true,
+    "rootDir": "..",
+    "outFile": "../../dist/core/core.js",
   },
+  "include": [
+    "**/*.js",
+    "**/*.ts",
+  ],
 }
