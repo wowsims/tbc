@@ -1,30 +1,36 @@
-# Make everything
+# Recursive wildcard function
+rwildcard=$(foreach d,$(wildcard $(1:=/*)),$(call rwildcard,$d,$2) $(filter $(subst *,%,$2),$d))
+
+# Make everything. Keep this first so it's the default rule.
 dist: elemental_shaman
 
-clean_dist:
-	rm -r dist
+clean:
+	rm -f ui/core/api/newapi.ts
+	rm -rf dist
 
 # Host a local server, for dev testing
-host:
+host: dist
 	npx http-server dist
 
-proto_ts: api/newapi.proto
-	rm -f ui/core/api/newapi.ts
+ui/core/api/newapi.ts: api/newapi.proto
 	mkdir -p ui/core/api
 	npx protoc --ts_out ui/core/api --proto_path api api/newapi.proto
 
-# tsc -b already knows how to build dependencies, so this rule is only for
-# building ui/core in isolation for development
-core_js: proto_ts
+dist/core/core.js: $(call rwildcard,ui/core,*.ts) ui/core/api/newapi.ts
 	npx tsc -p ui/core
 
-elemental_shaman_js:
-	npx tsc -b ui/elemental_shaman
+# Generic rule for building index.js for any class directory
+dist/%/index.js: ui/%/index.ts dist/core/core.js
+	npx tsc -p $(<D) 
 
-elemental_shaman_css:
-	npx sass ui/elemental_shaman/index.scss dist/elemental_shaman/index.css
+# Generic rule for building index.css for any class directory
+dist/%/index.css: ui/%/index.scss
+	mkdir -p $(@D)
+	npx sass $< $@
 
-elemental_shaman_html:
-	cp ui/elemental_shaman/index.html dist/elemental_shaman
+# Generic rule for building index.html for any class directory
+dist/%/index.html: ui/%/index.html
+	mkdir -p $(@D)
+	cp $< $@
 
-elemental_shaman: elemental_shaman_js elemental_shaman_css elemental_shaman_html
+elemental_shaman: dist/elemental_shaman/index.js dist/elemental_shaman/index.css dist/elemental_shaman/index.html
