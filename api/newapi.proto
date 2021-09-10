@@ -49,6 +49,25 @@ enum Stat {
     armor = 27;
 }
 
+enum ItemSlot {
+    unknown = 0;
+    head = 1;
+    neck = 2;
+    shoulder = 3;
+    back = 4;
+    chest = 5;
+    wrist = 6;
+    hands = 7;
+    waist = 8;
+    legs = 9;
+    feet = 10;
+    finger = 11;
+    trinket = 12;
+    weapon = 13; // can be 1h or 2h
+    offhand = 14;
+    ranged = 15;
+}
+
 enum ItemQuality {
     junk = 0;
     uncommon = 1;

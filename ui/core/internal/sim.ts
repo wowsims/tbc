@@ -1,7 +1,7 @@
-import { ComputeStatsRequest, ComputeStatsResult } from './api/newapi';
-import { GearListRequest, GearListResult } from './api/newapi';
-import { IndividualSimRequest, IndividualSimResult } from './api/newapi';
-import { StatWeightsRequest, StatWeightsResult } from './api/newapi';
+import { ComputeStatsRequest, ComputeStatsResult } from '../api/newapi';
+import { GearListRequest, GearListResult } from '../api/newapi';
+import { IndividualSimRequest, IndividualSimResult } from '../api/newapi';
+import { StatWeightsRequest, StatWeightsResult } from '../api/newapi';
 
 export class Sim {
   constructor(numWorkers: number) {

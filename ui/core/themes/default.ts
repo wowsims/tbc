@@ -27,13 +27,20 @@ export class DefaultTheme extends Theme {
 
     this.parentElem.innerHTML = layoutHTML;
 
+    const stats = [
+      Stat.stamina,
+      Stat.intellect,
+      Stat.spell_power,
+      Stat.spell_hit,
+      Stat.spell_crit,
+      Stat.spell_haste,
+      Stat.mp5,
+    ];
+
     const actions = new Actions();
     actions.appendTo(this.parentElem.getElementsByClassName('default-actions')[0]);
 
-    const characterStats = new CharacterStats([
-      Stat.stamina,
-      Stat.intellect,
-    ]);
+    const characterStats = new CharacterStats(stats);
     characterStats.appendTo(this.parentElem.getElementsByClassName('default-stats')[0]);
   }
 }

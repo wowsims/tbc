@@ -1,4 +1,18 @@
+import { RaceBonusType } from './newapi';
+import { Spec } from './newapi';
 import { Stat } from './newapi';
+
+const shamanRaces = [
+    RaceBonusType.draenei,
+    RaceBonusType.orc,
+    RaceBonusType.tauren,
+    RaceBonusType.troll10,
+    RaceBonusType.troll30,
+];
+
+export const SpecToEligibleRaces: Record<Spec, Array<RaceBonusType>> = {
+  [Spec.elemental_shaman]: shamanRaces,
+};
 
 export const StatNames: Record<Stat, string> = {
   [Stat.strength]: 'Strength',

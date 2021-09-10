@@ -1,4 +1,4 @@
-import { Sim } from '../sim.js';
+import { Sim } from '../internal/sim.js';
 
 export abstract class Theme {
   readonly parentElem: HTMLElement;
