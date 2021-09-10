@@ -28,3 +28,12 @@ elemental_shaman_html:
 	cp ui/elemental_shaman/index.html dist/elemental_shaman
 
 elemental_shaman: elemental_shaman_js elemental_shaman_css elemental_shaman_html
+
+wasm:
+	GOOS=js GOARCH=wasm go build -o ./dist/lib.wasm ./cmd/simwasm/
+
+web:
+	go build -o simweb ./cmd/simweb/web.go
+
+proto_go:
+	protoc -I=./api/ --go_out=. ./api/newapi.proto
