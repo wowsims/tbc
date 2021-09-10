@@ -8,9 +8,14 @@ clean_dist:
 host:
 	npx http-server dist
 
+proto_ts: api/newapi.proto
+	rm -r ui/core/api
+	mkdir -p ui/core/api
+	npx protoc --ts_out ui/core/api --proto_path api api/newapi.proto
+
 # tsc -b already knows how to build dependencies, so this rule is only for
 # building ui/core in isolation for development
-core_js:
+core_js: proto_ts
 	npx tsc -p ui/core
 
 elemental_shaman_js:

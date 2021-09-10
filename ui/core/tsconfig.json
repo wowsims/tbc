@@ -6,6 +6,7 @@
     "outFile": "../../dist/core/core.js",
   },
   "include": [
+    "**/*.js",
     "**/*.ts",
   ],
 }

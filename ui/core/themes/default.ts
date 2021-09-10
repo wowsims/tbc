@@ -1,14 +1,18 @@
+import { Actions } from '../components/actions.js';
 import { CharacterStats } from '../components/character_stats.js';
 import { Theme } from './theme.js';
 
 const layoutHTML = `
 <div class="default-root">
   <section class="default-sidebar">
-    <div class="default-stats">
+    <div class="default-title">
+      TBC Elemental Shaman Sim
+    </div>
+    <div class="default-actions">
     </div>
     <div class="default-results">
     </div>
-    <div class="default-actions">
+    <div class="default-stats">
     </div>
   </div>
   <div class="default-main">
@@ -21,6 +25,9 @@ export class DefaultTheme extends Theme {
     super(parentElem)
 
     this.parentElem.innerHTML = layoutHTML;
+
+    const actions = new Actions();
+    actions.appendTo(this.parentElem.getElementsByClassName('default-actions')[0]);
 
     const characterStats = new CharacterStats();
     characterStats.appendTo(this.parentElem.getElementsByClassName('default-stats')[0]);
