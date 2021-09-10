@@ -1,4 +1,7 @@
+import { ComputeStatsRequest, ComputeStatsResult } from './api/newapi';
 import { GearListRequest, GearListResult } from './api/newapi';
+import { IndividualSimRequest, IndividualSimResult } from './api/newapi';
+import { StatWeightsRequest, StatWeightsResult } from './api/newapi';
 
 export class Sim {
   constructor(numWorkers: number) {
@@ -6,18 +9,21 @@ export class Sim {
 
   async getGearList(request: GearListRequest): Promise<GearListResult> {
     return Promise.resolve({
-      'items': [],
-      'enchants': [],
-      'gems': [],
+      items: [],
+      enchants: [],
+      gems: [],
     });
   }
 
-  async computeStats() {
+  async computeStats(request: ComputeStatsRequest): Promise<ComputeStatsResult> {
+    return Promise.resolve(ComputeStatsResult.create());
   }
 
-  async statWeights() {
+  async statWeights(request: StatWeightsRequest): Promise<StatWeightsResult> {
+    return Promise.resolve(StatWeightsResult.create());
   }
 
-  async runSimulation() {
+  async individualSim(request: IndividualSimRequest): Promise<IndividualSimResult> {
+    return Promise.resolve(IndividualSimResult.create());
   }
 }

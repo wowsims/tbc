@@ -1,3 +1,3 @@
 node_modules
 bazel-*
-ui/core/api
+ui/core/api/newapi.ts

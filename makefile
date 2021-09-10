@@ -9,7 +9,7 @@ host:
 	npx http-server dist
 
 proto_ts: api/newapi.proto
-	rm -r ui/core/api
+	rm -f ui/core/api/newapi.ts
 	mkdir -p ui/core/api
 	npx protoc --ts_out ui/core/api --proto_path api api/newapi.proto
 

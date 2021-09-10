@@ -1,23 +1,15 @@
+import { Stat } from '../api/newapi';
+import { StatNames } from '../api/names';
 import { Component } from './component.js';
 
 export class CharacterStats extends Component {
   readonly rootElem: HTMLDivElement;
-  readonly stats: Array<string>;
+  readonly stats: Array<Stat>;
   readonly valueElems: Array<HTMLTableCellElement>;
 
-  constructor() {
+  constructor(stats: Array<Stat>) {
     super();
-
-    this.stats = [
-      'Stamina',
-      'Intellect',
-      'Spirit',
-      'Spell Power',
-      'Nature Power',
-      'Hit',
-      'Crit',
-      'Haste',
-    ];
+    this.stats = stats;
 
     this.rootElem = document.createElement('div');
     this.rootElem.classList.add('character-stats-root');
@@ -34,7 +26,7 @@ export class CharacterStats extends Component {
 
       const label = document.createElement('td');
       label.classList.add('character-stats-table-label');
-      label.textContent = stat;
+      label.textContent = StatNames[stat];
       row.appendChild(label);
 
       const value = document.createElement('td');

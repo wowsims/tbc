@@ -1,3 +1,4 @@
+import { Stat } from '../api/newapi';
 import { Actions } from '../components/actions.js';
 import { CharacterStats } from '../components/character_stats.js';
 import { Theme } from './theme.js';
@@ -29,7 +30,10 @@ export class DefaultTheme extends Theme {
     const actions = new Actions();
     actions.appendTo(this.parentElem.getElementsByClassName('default-actions')[0]);
 
-    const characterStats = new CharacterStats();
+    const characterStats = new CharacterStats([
+      Stat.stamina,
+      Stat.intellect,
+    ]);
     characterStats.appendTo(this.parentElem.getElementsByClassName('default-stats')[0]);
   }
 }
