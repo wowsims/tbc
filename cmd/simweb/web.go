@@ -118,7 +118,9 @@ func handleIndividualSim(w http.ResponseWriter, r *http.Request) {
 	}
 	isr := &api.IndividualSimRequest{}
 	if err := proto.Unmarshal(body, isr); err != nil {
-		log.Fatalln("Failed to parse address book:", err)
+		log.Printf("Failed to parse request: %s", err.Error())
+		w.WriteHeader(http.StatusInternalServerError)
+		return
 	}
 	result := api.RunSimulation(isr)
 
