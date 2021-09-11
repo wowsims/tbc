@@ -2,8 +2,8 @@ import { Buffs } from './api/newapi';
 import { Encounter } from './api/newapi';
 import { ItemSlot } from './api/newapi';
 import { Item } from './api/newapi';
-import { RaceBonusType } from './api/newapi';
 import { Player } from './api/newapi';
+import { Race } from './api/newapi';
 import { Spec } from './api/newapi';
 import { SpecToEligibleRaces } from './api/utils';
 import { Stat } from './api/newapi';
@@ -19,9 +19,9 @@ import { TypedEvent } from './typed_event';
 
 export class Sim {
   readonly spec: Spec;
-  readonly raceChangeEmitter = new TypedEvent<RaceBonusType>();
+  readonly raceChangeEmitter = new TypedEvent<Race>();
 
-  private _race: RaceBonusType;
+  private _race: Race;
   private _gear: Partial<Record<ItemSlot, Item>>;
 
   constructor(spec: Spec) {
@@ -33,7 +33,7 @@ export class Sim {
   get race() {
     return this._race;
   }
-  set race(newRace: RaceBonusType) {
+  set race(newRace: Race) {
     if (newRace != this._race) {
       this._race = newRace;
       this.raceChangeEmitter.emit(newRace);
@@ -74,22 +74,22 @@ export class Sim {
 
   async statWeights(request: StatWeightsRequest): Promise<StatWeightsResult> {
     const epValues = [];
-    epValues[Stat.spell_power] = Math.random() * 2;
-    epValues[Stat.intellect] = Math.random() * 2;
-    epValues[Stat.mp5] = Math.random() * 2;
-    epValues[Stat.nature_spell_power] = Math.random() * 2;
-    epValues[Stat.spell_hit] = Math.random() * 2;
-    epValues[Stat.spell_crit] = Math.random() * 2;
-    epValues[Stat.spell_haste] = Math.random() * 2;
+    epValues[Stat.StatSpellPower] = Math.random() * 2;
+    epValues[Stat.StatIntellect] = Math.random() * 2;
+    epValues[Stat.StatMP5] = Math.random() * 2;
+    epValues[Stat.StatNatureSpellPower] = Math.random() * 2;
+    epValues[Stat.StatSpellHit] = Math.random() * 2;
+    epValues[Stat.StatSpellCrit] = Math.random() * 2;
+    epValues[Stat.StatSpellHaste] = Math.random() * 2;
 
     const epStDevs = [];
-    epStDevs[Stat.spell_power] = Math.random() * 0.5;
-    epStDevs[Stat.intellect] = Math.random() * 0.5;
-    epStDevs[Stat.mp5] = Math.random() * 0.5;
-    epStDevs[Stat.nature_spell_power] = Math.random() * 0.5;
-    epStDevs[Stat.spell_hit] = Math.random() * 0.5;
-    epStDevs[Stat.spell_crit] = Math.random() * 0.5;
-    epStDevs[Stat.spell_haste] = Math.random() * 0.5;
+    epStDevs[Stat.StatSpellPower] = Math.random() * 0.5;
+    epStDevs[Stat.StatIntellect] = Math.random() * 0.5;
+    epStDevs[Stat.StatMP5] = Math.random() * 0.5;
+    epStDevs[Stat.StatNatureSpellPower] = Math.random() * 0.5;
+    epStDevs[Stat.StatSpellHit] = Math.random() * 0.5;
+    epStDevs[Stat.StatSpellCrit] = Math.random() * 0.5;
+    epStDevs[Stat.StatSpellHaste] = Math.random() * 0.5;
 
     return Promise.resolve(StatWeightsResult.create({
       weights: epValues,

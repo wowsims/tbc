@@ -1,4 +1,4 @@
-import { RaceBonusType } from '../api/newapi';
+import { Race } from '../api/newapi';
 import { SpecToEligibleRaces } from '../api/utils';
 import { RaceNames } from '../api/utils';
 import { Sim } from '../sim.js';
@@ -32,7 +32,7 @@ export class RacePicker extends Component {
     });
 
     raceSelector.addEventListener('change', event => {
-      sim.race = parseInt(raceSelector.value) as RaceBonusType;
+      sim.race = parseInt(raceSelector.value) as Race;
     });
   }
 }

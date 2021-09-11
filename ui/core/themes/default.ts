@@ -47,24 +47,24 @@ export class DefaultTheme extends Theme {
     this.parentElem.innerHTML = layoutHTML;
 
     const epStats = [
-      Stat.intellect,
-      Stat.spell_power,
-      Stat.nature_spell_power,
-      Stat.spell_hit,
-      Stat.spell_crit,
-      Stat.spell_haste,
-      Stat.mp5,
+      Stat.StatIntellect,
+      Stat.StatSpellPower,
+      Stat.StatNatureSpellPower,
+      Stat.StatSpellHit,
+      Stat.StatSpellCrit,
+      Stat.StatSpellHaste,
+      Stat.StatMP5,
     ];
-    const epReferenceStat = Stat.spell_power;
+    const epReferenceStat = Stat.StatSpellPower;
 
     const displayStats = [
-      Stat.stamina,
-      Stat.intellect,
-      Stat.spell_power,
-      Stat.spell_hit,
-      Stat.spell_crit,
-      Stat.spell_haste,
-      Stat.mp5,
+      Stat.StatStamina,
+      Stat.StatIntellect,
+      Stat.StatSpellPower,
+      Stat.StatSpellHit,
+      Stat.StatSpellCrit,
+      Stat.StatSpellHaste,
+      Stat.StatMP5,
     ];
 
     const results = new Results(this.parentElem.getElementsByClassName('default-results')[0] as HTMLElement);

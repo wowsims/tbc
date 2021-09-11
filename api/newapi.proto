@@ -3,142 +3,150 @@ package newapi;
 
 option go_package = "api/";
 
-enum RaceBonusType {
-    none = 0;
-    bloodelf = 1;
-    draenei = 2;
-    dwarf = 3;
-    gnome = 4;
-    human = 5;
-    nightelf = 6;
-    orc = 7;
-    tauren = 8;
-    troll10 = 9;
-    troll30 = 10;
-    undead = 11;
+enum Race {
+    RaceUnknown = 0;
+    RaceBloodElf = 1;
+    RaceDraenei = 2;
+    RaceDwarf = 3;
+    RaceGnome = 4;
+    RaceHuman = 5;
+    RaceNightElf = 6;
+    RaceOrc = 7;
+    RaceTauren = 8;
+    RaceTroll10 = 9;
+    RaceTroll30 = 10;
+    RaceUndead = 11;
 }
 
 enum Stat {
-    strength = 0;
-    agility = 1;
-    stamina = 2;
-    intellect = 3;
-    spirit = 4;
-    spell_power = 5;
-    healing_power = 6;
-    arcane_spell_power = 7;
-    fire_spell_power = 8;
-    frost_spell_power = 9;
-    holy_spell_power = 10;
-    nature_spell_power = 11;
-    shadow_spell_power = 12;
-    mp5 = 13;
-    spell_hit = 14;
-    spell_crit = 15;
-    spell_haste = 16;
-    spell_penetration = 17;
-    attack_power = 18;
-    melee_hit = 19;
-    melee_crit = 20;
-    melee_haste = 21;
-    armor_penetration = 22;
-    expertise = 23;
-    mana = 24;
-    energy = 25;
-    rage = 26;
-    armor = 27;
+    StatStrength = 0;
+    StatAgility = 1;
+    StatStamina = 2;
+    StatIntellect = 3;
+    StatSpirit = 4;
+    StatSpellPower = 5;
+    StatHealingPower = 6;
+    StatArcaneSpellPower = 7;
+    StatFireSpellPower = 8;
+    StatFrostSpellPower = 9;
+    StatHolySpellPower = 10;
+    StatNatureSpellPower = 11;
+    StatShadowSpellPower = 12;
+    StatMP5 = 13;
+    StatSpellHit = 14;
+    StatSpellCrit = 15;
+    StatSpellHaste = 16;
+    StatSpellPenetration = 17;
+    StatAttackPower = 18;
+    StatMeleeHit = 19;
+    StatMeleeCrit = 20;
+    StatMeleeHaste = 21;
+    StatArmorPenetration = 22;
+    StatExpertise = 23;
+    StatMana = 24;
+    StatEnergy = 25;
+    StatRage = 26;
+    StatArmor = 27;
 }
 
 enum ItemType {
-    unknown = 0;
-    head = 1;
-    neck = 2;
-    shoulder = 3;
-    back = 4;
-    chest = 5;
-    wrist = 6;
-    hands = 7;
-    waist = 8;
-    legs = 9;
-    feet = 10;
-    finger = 11;
-    trinket = 12;
-    weapon = 13;
-    ranged = 14;
+    ItemTypeUnknown = 0;
+    ItemTypeHead = 1;
+    ItemTypeNeck = 2;
+    ItemTypeShoulder = 3;
+    ItemTypeBack = 4;
+    ItemTypeChest = 5;
+    ItemTypeWrist = 6;
+    ItemTypeHands = 7;
+    ItemTypeWaist = 8;
+    ItemTypeLegs = 9;
+    ItemTypeFeet = 10;
+    ItemTypeFinger = 11;
+    ItemTypeTrinket = 12;
+    ItemTypeWeapon = 13;
+    ItemTypeRanged = 14;
+}
+
+enum ArmorType {
+    ArmorTypeUnknown = 0;
+    ArmorTypeCloth = 1;
+    ArmorTypeLeather = 2;
+    ArmorTypeMail = 3;
+    ArmorTypePlate = 4;
 }
 
 enum WeaponType {
-    unknown = 0;
-    axe = 1;
-    dagger = 2;
-    fist = 3;
-    mace = 4;
-    polearm = 5;
-    off_hand = 6;
-    staff = 7;
-    sword = 8;
-    shield = 9;
+    WeaponTypeUnknown = 0;
+    WeaponTypeAxe = 1;
+    WeaponTypeDagger = 2;
+    WeaponTypeFist = 3;
+    WeaponTypeMace = 4;
+    WeaponTypePolearm = 5;
+    WeaponTypeOffHand = 6;
+    WeaponTypeStaff = 7;
+    WeaponTypeSword = 8;
+    WeaponTypeShield = 9;
 }
 
-enum WeaponHandType {
-    unknown = 0;
-    main_hand = 1;
-    one_hand = 2;
-    off_hand = 3;
-    two_hand = 4;
+enum HandType {
+    HandTypeUnknown = 0;
+    HandTypeMainHand = 1;
+    HandTypeOneHand = 2;
+    HandTypeOffHand = 3;
+    HandTypeTwoHand = 4;
 }
 
 enum RangedWeaponType {
-    unknown = 0;
-    bow = 1;
-    crossbow = 2;
-    gun = 3;
-    libram = 5;
-    relic = 6;
-    thrown = 7;
-    totem = 8;
-    wand = 9;
+    RangedWeaponTypeUnknown = 0;
+    RangedWeaponTypeBow = 1;
+    RangedWeaponTypeCrossbow = 2;
+    RangedWeaponTypeGun = 3;
+    RangedWeaponTypeLibram = 5;
+    RangedWeaponTypeRelic = 6;
+    RangedWeaponTypeThrown = 7;
+    RangedWeaponTypeTotem = 8;
+    RangedWeaponTypeWand = 9;
 }
 
 // All slots on the gear menu where a single item can be worn.
 enum ItemSlot {
-    head = 0;
-    neck = 1;
-    shoulder = 2;
-    back = 3;
-    chest = 4;
-    wrist = 5;
-    hands = 6;
-    waist = 7;
-    legs = 8;
-    feet = 9;
-    finger1 = 10;
-    finger2 = 11;
-    trinket1 = 12;
-    trinket2 = 13;
-    main_hand = 14; // can be 1h or 2h
-    off_hand = 15;
-    ranged = 16;
+    ItemSlotHead = 0;
+    ItemSlotNeck = 1;
+    ItemSlotShoulder = 2;
+    ItemSlotBack = 3;
+    ItemSlotChest = 4;
+    ItemSlotWrist = 5;
+    ItemSlotHands = 6;
+    ItemSlotWaist = 7;
+    ItemSlotLegs = 8;
+    ItemSlotFeet = 9;
+    ItemSlotFinger1 = 10;
+    ItemSlotFinger2 = 11;
+    ItemSlotTrinket1 = 12;
+    ItemSlotTrinket2 = 13;
+    ItemSlotMainHand = 14; // can be 1h or 2h
+    ItemSlotOffHand = 15;
+    ItemSlotRanged = 16;
 }
 
 enum ItemQuality {
-    junk = 0;
-    uncommon = 1;
-    rare = 2;
-    epic = 3;
-    legendary = 4;
+    ItemQualityJunk = 0;
+    ItemQualityUncommon = 1;
+    ItemQualityRare = 2;
+    ItemQualityEpic = 3;
+    ItemQualityLegendary = 4;
 }
 
 enum GemColor {
-    unknown_color = 0;
-    meta = 1;
-    red = 2;
-    blue = 3;
-    yellow = 4;
-    green = 5;
-    orange = 6;
-    purple = 7;
-    prismatic = 8;
+    GemColorUnknown = 0;
+    GemColorMeta = 1;
+    GemColorRed = 2;
+    GemColorBlue = 3;
+    GemColorYellow = 4;
+    GemColorGreen = 5;
+    GemColorOrange = 6;
+    GemColorPurple = 7;
+    GemColorPrismatic = 8;
 }
 
 message Buffs {
@@ -178,7 +186,7 @@ message Consumes {
 }
 
 message PlayerOptions {
-    RaceBonusType race = 1;
+    Race race = 1;
     oneof class {
         Druid druid = 2;
         Hunter hunter = 3;
@@ -207,11 +215,11 @@ message Rogue {
 }
 message Shaman {
     enum AgentType {
-        unknown_agent = 0;
-        fixed_lb_cl = 1;
-        cl_on_clearcast = 2;
-        adaptive = 3;
-        enhancer = 4;
+        Unknown = 0;
+        FixedLBCL = 1;
+        CLOnClearcast = 2;
+        Adaptive = 3;
+        Enhancer = 4;
     }
     AgentType agentType = 1;
 
@@ -323,15 +331,16 @@ message Item {
     int32 id = 1;
 
     ItemType type = 2;
-    WeaponType weapon_type = 3;
-    WeaponHandType weapon_hand_type = 4;
-    RangedWeaponType ranged_weapon_type = 5;
+    ArmorType armor_type = 3;
+    WeaponType weapon_type = 4;
+    HandType weapon_hand_type = 5;
+    RangedWeaponType ranged_weapon_type = 6;
 
-    string name = 6;
-    repeated double stats = 7;
-    int32 phase = 8;
-    ItemQuality quality = 9;
-    repeated GemColor gem_slots = 10;
+    string name = 7;
+    repeated double stats = 8;
+    int32 phase = 9;
+    ItemQuality quality = 10;
+    repeated GemColor gem_slots = 11;
 }
 message Enchant {
     int32 id = 1;        // ID of the enchant "item".
@@ -351,7 +360,7 @@ message Gem {
 
 // RPC GearList
 enum Spec {
-    elemental_shaman = 0;
+    ElementalShaman = 0;
 }
 message GearListRequest {
     Spec spec = 1; // Each spec has a custom gear list
