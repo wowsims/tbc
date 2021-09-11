@@ -74,9 +74,10 @@ enum WeaponType {
     fist = 3;
     mace = 4;
     polearm = 5;
-    staff = 6;
-    sword = 7;
-    shield = 8;
+    off_hand = 6;
+    staff = 7;
+    sword = 8;
+    shield = 9;
 }
 
 enum WeaponHandType {
