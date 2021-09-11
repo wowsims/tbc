@@ -14,6 +14,21 @@ export const SpecToEligibleRaces: Record<Spec, Array<RaceBonusType>> = {
   [Spec.elemental_shaman]: shamanRaces,
 };
 
+export const RaceNames: Record<RaceBonusType, string> = {
+  [RaceBonusType.none]: 'None',
+  [RaceBonusType.bloodelf]: 'Blood Elf',
+  [RaceBonusType.draenei]: 'Draenei',
+  [RaceBonusType.dwarf]: 'Dwarf',
+  [RaceBonusType.gnome]: 'Gnome',
+  [RaceBonusType.human]: 'Human',
+  [RaceBonusType.nightelf]: 'Night Elf',
+  [RaceBonusType.orc]: 'Orc',
+  [RaceBonusType.tauren]: 'Tauren',
+  [RaceBonusType.troll10]: 'Troll (+10% Haste)',
+  [RaceBonusType.troll30]: 'Troll (+30% Haste)',
+  [RaceBonusType.undead]: 'Undead',
+};
+
 export const StatNames: Record<Stat, string> = {
   [Stat.strength]: 'Strength',
   [Stat.agility]: 'Agility',

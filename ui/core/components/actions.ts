@@ -1,9 +1,10 @@
 import { IndividualSimRequest } from '../api/newapi';
 import { Stat } from '../api/newapi';
 import { StatWeightsRequest } from '../api/newapi';
+import { Sim } from '../sim.js';
+
 import { Component } from './component.js';
 import { Results } from './results.js';
-import { Sim } from '../sim.js';
 
 export class Actions extends Component {
   readonly rootElem: HTMLDivElement;

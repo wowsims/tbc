@@ -14,16 +14,30 @@ import { IndividualSimRequest, IndividualSimResult } from './api/newapi';
 import { StatWeightsRequest, StatWeightsResult } from './api/newapi';
 
 import { wait } from './utils';
+import { Listener } from './typed_event';
+import { TypedEvent } from './typed_event';
 
 export class Sim {
   readonly spec: Spec;
-  race: RaceBonusType;
-  gear: Partial<Record<ItemSlot, Item>>;
+  readonly raceChangeEmitter: TypedEvent<RaceBonusType> = new TypedEvent<RaceBonusType>();
+
+  private _race: RaceBonusType;
+  private _gear: Partial<Record<ItemSlot, Item>>;
 
   constructor(spec: Spec) {
     this.spec = spec;
-    this.race = SpecToEligibleRaces[this.spec][0];
-    this.gear = {};
+    this._race = SpecToEligibleRaces[this.spec][0];
+    this._gear = {};
+  }
+  
+  get race() {
+    return this._race;
+  }
+  set race(newRace: RaceBonusType) {
+    if (newRace != this._race) {
+      this._race = newRace;
+      this.raceChangeEmitter.emit(newRace);
+    }
   }
 
   currentPlayer(): Player {

@@ -2,7 +2,9 @@ import { Spec } from '../api/newapi';
 import { Stat } from '../api/newapi';
 import { Actions } from '../components/actions.js';
 import { CharacterStats } from '../components/character_stats.js';
+import { RacePicker } from '../components/race_picker.js';
 import { Results } from '../components/results.js';
+
 import { Theme } from './theme.js';
 
 const layoutHTML = `
@@ -17,9 +19,23 @@ const layoutHTML = `
     </div>
     <div class="default-stats">
     </div>
-  </div>
-  <div class="default-main">
-  </div>
+  </section>
+  <section class="default-main">
+    <ul class="nav nav-tabs">
+      <li class="active"><a data-toggle="tab" href="#gear-tab">Gear</a></li>
+      <li><a data-toggle="tab" href="#settings-tab">Settings</a></li>
+    </ul>
+    <div class="tab-content">
+      <div id="gear-tab" class="tab-pane fade in active">
+        <div class="race-picker">
+        </div>
+        <div class="gear-picker">
+        </div>
+      </div>
+      <div id="settings-tab" class="tab-pane fade">
+      </div>
+    </div>
+  </section>
 </div>
 `;
 
@@ -58,5 +74,8 @@ export class DefaultTheme extends Theme {
 
     const characterStats = new CharacterStats(displayStats);
     characterStats.appendTo(this.parentElem.getElementsByClassName('default-stats')[0]);
+
+    const racePicker = new RacePicker(this.sim);
+    racePicker.appendTo(this.parentElem.getElementsByClassName('race-picker')[0]);
   }
 }
