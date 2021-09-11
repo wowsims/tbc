@@ -27,7 +27,7 @@ dist/%/index.js: ui/%/index.ts dist/core/tsconfig.tsbuildinfo
 	npx tsc -p $(<D) 
 
 # Generic rule for building index.css for any class directory
-dist/%/index.css: ui/%/index.scss
+dist/%/index.css: ui/%/index.scss $(call rwildcard,ui/core,*.scss)
 	mkdir -p $(@D)
 	npx sass $< $@
 

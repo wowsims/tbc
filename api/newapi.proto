@@ -320,12 +320,12 @@ message ComputeStatsResult {
 // RPC StatWeights
 message StatWeightsRequest {
     IndividualSimRequest options = 1;
-    repeated int32 stats_to_weigh = 2;
-    int32 base_stat = 3;
+    repeated Stat stats_to_weigh = 2;
+    Stat ep_reference_stat = 3;
 }
 message StatWeightsResult {
     repeated double weights = 1;
-    repeated double Weights_stdev = 2;
+    repeated double weights_stdev = 2;
     repeated double ep_values = 3;
     repeated double ep_values_stdev = 4;
 }

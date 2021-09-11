@@ -1,3 +1,5 @@
+@import "../shared";
+
 .actions-root {
   display: flex;
   flex-direction: column;
@@ -9,4 +11,15 @@
   height: 40px;
   cursor: pointer;
   margin: 5px;
+}
+
+.iterations-div {
+  text-align: center;
+}
+
+.iterations-label {
+}
+
+.iterations-input {
+  width: 30%;
 }

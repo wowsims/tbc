@@ -2,6 +2,7 @@ import { Spec } from '../api/newapi';
 import { Stat } from '../api/newapi';
 import { Actions } from '../components/actions.js';
 import { CharacterStats } from '../components/character_stats.js';
+import { Results } from '../components/results.js';
 import { Theme } from './theme.js';
 
 const layoutHTML = `
@@ -28,7 +29,18 @@ export class DefaultTheme extends Theme {
 
     this.parentElem.innerHTML = layoutHTML;
 
-    const stats = [
+    const epStats = [
+      Stat.intellect,
+      Stat.spell_power,
+      Stat.nature_spell_power,
+      Stat.spell_hit,
+      Stat.spell_crit,
+      Stat.spell_haste,
+      Stat.mp5,
+    ];
+    const epReferenceStat = Stat.spell_power;
+
+    const displayStats = [
       Stat.stamina,
       Stat.intellect,
       Stat.spell_power,
@@ -38,10 +50,13 @@ export class DefaultTheme extends Theme {
       Stat.mp5,
     ];
 
-    const actions = new Actions(this.sim);
+    const results = new Results();
+    results.appendTo(this.parentElem.getElementsByClassName('default-results')[0]);
+
+    const actions = new Actions(this.sim, results, epStats, epReferenceStat);
     actions.appendTo(this.parentElem.getElementsByClassName('default-actions')[0]);
 
-    const characterStats = new CharacterStats(stats);
+    const characterStats = new CharacterStats(displayStats);
     characterStats.appendTo(this.parentElem.getElementsByClassName('default-stats')[0]);
   }
 }

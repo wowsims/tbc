@@ -1,0 +1,82 @@
+@import "../shared";
+
+.results-root {
+  height: 100%;
+  position: relative;
+}
+
+.results-root > div {
+  @include vertical-horizontal-center;
+  width: 100%;
+}
+
+.results-pending {
+}
+.results-pending .loader {
+  margin: auto;
+}
+
+.results-sim {
+  text-align: center;
+}
+
+.results-sim-dps-avg {
+  font-size: 30px;
+  font-weight: 700;
+}
+.results-sim-dps-avg:after {
+  content: " DPS";
+  font-size: 18px;
+}
+
+.results-sim-dps-stdev {
+  font-size: 18px;
+  font-weight: 700;
+}
+.results-sim-dps-stdev:before {
+  content: " \00b1";
+}
+
+.results-ep {
+}
+
+.results-ep-table {
+  margin: auto;
+}
+
+.results-ep-table tr td:nth-child(1) {
+  text-align: right;
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.results-ep-table tr td:nth-child(2), .results-ep-table tr td:nth-child(4) {
+  text-align: left;
+  font-size: 20px;
+  font-weight: 500;
+}
+.results-ep-table tr td:nth-child(2):after {
+  content: " DPS";
+  font-size: 18px;
+}
+.results-ep-table tr td:nth-child(4):after {
+  content: " EP";
+  font-size: 18px;
+}
+
+.results-ep-table tr td:nth-child(3), .results-ep-table tr td:nth-child(3) {
+  text-align: left;
+  font-size: 15px;
+  font-weight: 500;
+}
+.results-ep-table tr td:nth-child(5):before, .results-ep-table tr td:nth-child(5):before {
+  content: " \00b1";
+}
+
+// Uncomment one of these, to control whether DPS or EP values are displayed
+.results-ep-table tr td:nth-child(2), .results-ep-table tr td:nth-child(3) {
+  display: none;
+}
+//.results-ep-table tr td:nth-child(4), .results-ep-table tr td:nth-child(5) {
+//  display: none;
+//}
