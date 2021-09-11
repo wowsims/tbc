@@ -19,7 +19,7 @@ import { TypedEvent } from './typed_event';
 
 export class Sim {
   readonly spec: Spec;
-  readonly raceChangeEmitter: TypedEvent<RaceBonusType> = new TypedEvent<RaceBonusType>();
+  readonly raceChangeEmitter = new TypedEvent<RaceBonusType>();
 
   private _race: RaceBonusType;
   private _gear: Partial<Record<ItemSlot, Item>>;

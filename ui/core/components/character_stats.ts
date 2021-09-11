@@ -3,16 +3,12 @@ import { StatNames } from '../api/utils';
 import { Component } from './component.js';
 
 export class CharacterStats extends Component {
-  readonly rootElem: HTMLDivElement;
   readonly stats: Array<Stat>;
   readonly valueElems: Array<HTMLTableCellElement>;
 
-  constructor(stats: Array<Stat>) {
-    super();
+  constructor(parent: HTMLElement, stats: Array<Stat>) {
+    super(parent, 'character-stats-root');
     this.stats = stats;
-
-    this.rootElem = document.createElement('div');
-    this.rootElem.classList.add('character-stats-root');
 
     const table = document.createElement('table');
     table.classList.add('character-stats-table');
@@ -35,9 +31,5 @@ export class CharacterStats extends Component {
       value.textContent = String(Math.floor(Math.random() * 100));
       this.valueElems.push(value);
     });
-  }
-
-  getRootElement() {
-    return this.rootElem;
   }
 }

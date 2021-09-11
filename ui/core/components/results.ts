@@ -5,16 +5,13 @@ import { StatNames } from '../api/utils';
 import { Component } from './component.js';
 
 export class Results extends Component {
-  readonly rootElem: HTMLDivElement;
   readonly pendingElem: HTMLDivElement;
   readonly simElem: HTMLDivElement;
   readonly epElem: HTMLDivElement;
 
-  constructor() {
-    super();
+  constructor(parent: HTMLElement) {
+    super(parent, 'results-root');
 
-    this.rootElem = document.createElement('div');
-    this.rootElem.classList.add('results-root');
     this.rootElem.innerHTML = `
       <div class="results-pending">
         <div class="loader"></div>
@@ -29,10 +26,6 @@ export class Results extends Component {
     this.simElem = this.rootElem.getElementsByClassName('results-sim')[0] as HTMLDivElement;
     this.epElem = this.rootElem.getElementsByClassName('results-ep')[0] as HTMLDivElement;
     this.hideAll();
-  }
-
-  getRootElement() {
-    return this.rootElem;
   }
 
   hideAll() {

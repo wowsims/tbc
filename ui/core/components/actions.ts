@@ -7,13 +7,8 @@ import { Component } from './component.js';
 import { Results } from './results.js';
 
 export class Actions extends Component {
-  readonly rootElem: HTMLDivElement;
-
-  constructor(sim: Sim, results: Results, epStats: Array<Stat>, epReferenceStat: Stat) {
-    super();
-
-    this.rootElem = document.createElement('div');
-    this.rootElem.classList.add('actions-root');
+  constructor(parent: HTMLElement, sim: Sim, results: Results, epStats: Array<Stat>, epReferenceStat: Stat) {
+    super(parent, 'actions-root');
 
     const simButton = document.createElement('button');
     simButton.classList.add('actions-button');
@@ -57,9 +52,5 @@ export class Actions extends Component {
       const result = await sim.statWeights(statWeightsRequest);
       results.setStatWeights(result, epStats);
     });
-  }
-
-  getRootElement() {
-    return this.rootElem;
   }
 }

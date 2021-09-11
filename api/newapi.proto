@@ -49,7 +49,7 @@ enum Stat {
     armor = 27;
 }
 
-enum ItemSlot {
+enum ItemType {
     unknown = 0;
     head = 1;
     neck = 2;
@@ -63,9 +63,61 @@ enum ItemSlot {
     feet = 10;
     finger = 11;
     trinket = 12;
-    weapon = 13; // can be 1h or 2h
-    offhand = 14;
-    ranged = 15;
+    weapon = 13;
+    ranged = 14;
+}
+
+enum WeaponType {
+    unknown = 0;
+    axe = 1;
+    dagger = 2;
+    fist = 3;
+    mace = 4;
+    polearm = 5;
+    staff = 6;
+    sword = 7;
+    shield = 8;
+}
+
+enum WeaponHandType {
+    unknown = 0;
+    main_hand = 1;
+    one_hand = 2;
+    off_hand = 3;
+    two_hand = 4;
+}
+
+enum RangedWeaponType {
+    unknown = 0;
+    bow = 1;
+    crossbow = 2;
+    gun = 3;
+    libram = 5;
+    relic = 6;
+    thrown = 7;
+    totem = 8;
+    wand = 9;
+}
+
+// All slots on the gear menu where a single item can be worn.
+enum ItemSlot {
+    head = 0;
+    neck = 1;
+    shoulder = 2;
+    back = 3;
+    chest = 4;
+    wrist = 5;
+    hands = 6;
+    waist = 7;
+    legs = 8;
+    feet = 9;
+    finger1 = 10;
+    finger2 = 11;
+    trinket1 = 12;
+    trinket2 = 13;
+    main_hand = 14; // can be 1h or 2h
+    off_hand = 15;
+    ranged = 16;
 }
 
 enum ItemQuality {
@@ -268,20 +320,24 @@ message RaidSimRequest {
 
 message Item {
     int32 id = 1;
-    int32 slot = 2;
-    int32 sub_slot = 3;
-    string name = 4;
-    repeated double stats = 5;
-    int32 phase = 6;
-    ItemQuality quality = 7;
-    repeated GemColor gem_slots = 8;
-    repeated double socket_bonus = 9; // does the client need this any more?
+
+    ItemType type = 2;
+    WeaponType weapon_type = 3;
+    WeaponHandType weapon_hand_type = 4;
+    RangedWeaponType ranged_weapon_type = 5;
+
+    string name = 6;
+    repeated double stats = 7;
+    int32 phase = 8;
+    ItemQuality quality = 9;
+    repeated GemColor gem_slots = 10;
 }
 message Enchant {
     int32 id = 1;        // ID of the enchant "item".
-    int32 effect_id = 2;  // ID of the effect (for the item tooltip UI)
+    int32 effect_id = 2; // ID of the effect (for the item tooltip UI)
     string name = 3;     
-    int32 slot = 5;      // which slot does the enchant go on.
+    ItemType slot = 5;   // Which type of item this enchant can be applied to.
+    bool two_handed_only = 6;
 }
 message Gem {
     int32 id = 1;

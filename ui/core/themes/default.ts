@@ -2,6 +2,7 @@ import { Spec } from '../api/newapi';
 import { Stat } from '../api/newapi';
 import { Actions } from '../components/actions.js';
 import { CharacterStats } from '../components/character_stats.js';
+import { GearPicker } from '../components/gear_picker.js';
 import { RacePicker } from '../components/race_picker.js';
 import { Results } from '../components/results.js';
 
@@ -66,16 +67,13 @@ export class DefaultTheme extends Theme {
       Stat.mp5,
     ];
 
-    const results = new Results();
-    results.appendTo(this.parentElem.getElementsByClassName('default-results')[0]);
+    const results = new Results(this.parentElem.getElementsByClassName('default-results')[0] as HTMLElement);
 
-    const actions = new Actions(this.sim, results, epStats, epReferenceStat);
-    actions.appendTo(this.parentElem.getElementsByClassName('default-actions')[0]);
+    const actions = new Actions(this.parentElem.getElementsByClassName('default-actions')[0] as HTMLElement, this.sim, results, epStats, epReferenceStat);
 
-    const characterStats = new CharacterStats(displayStats);
-    characterStats.appendTo(this.parentElem.getElementsByClassName('default-stats')[0]);
+    const characterStats = new CharacterStats(this.parentElem.getElementsByClassName('default-stats')[0] as HTMLElement, displayStats);
 
-    const racePicker = new RacePicker(this.sim);
-    racePicker.appendTo(this.parentElem.getElementsByClassName('race-picker')[0]);
+    const racePicker = new RacePicker(this.parentElem.getElementsByClassName('race-picker')[0] as HTMLElement, this.sim);
+    const gearPicker = new GearPicker(this.parentElem.getElementsByClassName('gear-picker')[0] as HTMLElement, this.sim);
   }
 }
