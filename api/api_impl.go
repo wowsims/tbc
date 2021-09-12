@@ -41,10 +41,19 @@ func getGearListImpl(request *GearListRequest) *GearListResult {
 				},
 			)
 		}
+		for _, v := range shaman.ElementalGems {
+			gem := core.GemsByID[v]
+			result.Gems = append(result.Gems, &Gem{
+				Id:      gem.ID,
+				Name:    gem.Name,
+				Stats:   gem.Stats[:],
+				Color:   GemColor(gem.Color),
+				Phase:   int32(gem.Phase),
+				Quality: ItemQuality(gem.Quality),
+			})
+		}
 	}
-	// Items:    items,
 	// Enchants: Enchants,
-	// Gems:     Gems,
 
 	return result
 }

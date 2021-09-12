@@ -17,6 +17,7 @@ func SetupSim(raid *core.Raid, buffs core.Buffs, options core.Options) *core.Sim
 	sim := core.NewSim(raid, options)
 
 	// These buffs are a one-time apply... no need to add the bots to the raid group.
+	//  the constructors apply their buffs to the party.
 	druid.NewBuffBot(sim, raid.Parties[0], buffs.GiftOfTheWild, buffs.Moonkin, buffs.MoonkinRavenGoddess)
 	mage.NewBuffBot(sim, raid.Parties[0], buffs.ArcaneInt)
 
@@ -88,6 +89,7 @@ func SetupSim(raid *core.Raid, buffs core.Buffs, options core.Options) *core.Sim
 
 	for _, raidParty := range sim.Raid.Parties {
 		for _, pl := range raidParty.Players {
+			// Add SpellCrit from Int and Mana from Int
 			pl.Player.InitialStats = pl.Player.InitialStats.CalculatedTotal()
 
 			// TODO: Figure out how to handle buffs that buff based on other buffs...
