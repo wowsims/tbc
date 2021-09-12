@@ -1,26 +1,14 @@
+import { Stat } from '../api/newapi';
+import { StatNames } from '../api/names';
 import { Component } from './component.js';
 
 export class CharacterStats extends Component {
-  readonly rootElem: HTMLDivElement;
-  readonly stats: Array<string>;
+  readonly stats: Array<Stat>;
   readonly valueElems: Array<HTMLTableCellElement>;
 
-  constructor() {
-    super();
-
-    this.stats = [
-      'Stamina',
-      'Intellect',
-      'Spirit',
-      'Spell Power',
-      'Nature Power',
-      'Hit',
-      'Crit',
-      'Haste',
-    ];
-
-    this.rootElem = document.createElement('div');
-    this.rootElem.classList.add('character-stats-root');
+  constructor(parent: HTMLElement, stats: Array<Stat>) {
+    super(parent, 'character-stats-root');
+    this.stats = stats;
 
     const table = document.createElement('table');
     table.classList.add('character-stats-table');
@@ -34,7 +22,7 @@ export class CharacterStats extends Component {
 
       const label = document.createElement('td');
       label.classList.add('character-stats-table-label');
-      label.textContent = stat;
+      label.textContent = StatNames[stat];
       row.appendChild(label);
 
       const value = document.createElement('td');
@@ -43,9 +31,5 @@ export class CharacterStats extends Component {
       value.textContent = String(Math.floor(Math.random() * 100));
       this.valueElems.push(value);
     });
-  }
-
-  getRootElement() {
-    return this.rootElem;
   }
 }

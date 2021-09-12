@@ -1,0 +1,27 @@
+<html>
+  <head>
+    <title>TBC @@TITLE@@ Simulator</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="index.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <script data-main="index.js" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script>
+      require.config({
+        paths: {
+          "core": "/core",
+          "@protobuf-ts": "/@protobuf-ts",
+          "@protobuf-ts/runtime": "/@protobuf-ts/index",
+        },
+      });
+      require(["index"], function(){});
+    </script>
+  </head>
+  <body>
+  </body>
+  <!-- Load wowhead scripts after done loading everything else -->
+  <script>const whTooltips = {colorLinks: true};</script>
+  <script src="https://wow.zamimg.com/widgets/power.js"></script>
+</html>

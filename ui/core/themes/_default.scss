@@ -1,5 +1,8 @@
 @import "../components/actions";
 @import "../components/character_stats";
+@import "../components/gear_picker";
+@import "../components/race_picker";
+@import "../components/results";
 
 .actions-button {
   background: transparent;
@@ -37,6 +40,7 @@
 
 .default-root {
   height: 100%;
+  display: flex;
 }
 
 .default-sidebar {
@@ -62,4 +66,18 @@
 
 .default-results {
   flex-grow: 1;
+}
+
+.default-main {
+  height: 100%;
+  width: 80%;
+}
+
+.default-main > .nav-tabs {
+  padding-left: 40px;
+  padding-top: 15px;
+}
+
+.default-main > .tab-content > .tab-pane {
+  padding: 20px;
 }

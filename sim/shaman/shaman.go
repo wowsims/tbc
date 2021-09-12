@@ -181,11 +181,11 @@ func NewCastAction(sim *core.Simulation, player *Shaman, sp *core.Spell) core.Ag
 	if itsElectric {
 		// TODO: Should we change these to be full auras?
 		//   Doesnt seem needed since they can only be used by shaman right here.
-		if player.Equip[core.EquipRanged].ID == 28248 {
+		if player.Equip[core.ItemSlotRanged].ID == 28248 {
 			cast.Dmg += 55
-		} else if player.Equip[core.EquipRanged].ID == 23199 {
+		} else if player.Equip[core.ItemSlotRanged].ID == 23199 {
 			cast.Dmg += 33
-		} else if player.Equip[core.EquipRanged].ID == 32330 {
+		} else if player.Equip[core.ItemSlotRanged].ID == 32330 {
 			cast.Dmg += 85
 		}
 		if player.Talents.CallOfThunder > 0 { // only applies to CL and LB

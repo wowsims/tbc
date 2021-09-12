@@ -1,38 +1,47 @@
-# Make everything
+# Recursive wildcard function
+rwildcard=$(foreach d,$(wildcard $(1:=/*)),$(call rwildcard,$d,$2) $(filter $(subst *,%,$2),$d))
+
+# Make everything. Keep this first so it's the default rule.
 dist: elemental_shaman
 
-clean_dist:
-	rm -r dist
+elemental_shaman: dist/elemental_shaman/index.js dist/elemental_shaman/index.css dist/elemental_shaman/index.html
+
+clean:
+	rm -f ui/core/api/newapi.ts
+	rm -rf dist
 
 # Host a local server, for dev testing
-host:
+host: dist
 	npx http-server dist
 
-proto_ts: api/newapi.proto
-	rm -r ui/core/api
+ui/core/api/newapi.ts: api/newapi.proto
+	npx r.js -convert node_modules/@protobuf-ts/runtime/build/commonjs/ dist/@protobuf-ts
 	mkdir -p ui/core/api
-	npx protoc --ts_out ui/core/api --proto_path api api/newapi.proto
+	npx protoc --ts_opt generate_dependencies --ts_out ui/core/api --proto_path api api/newapi.proto
 
-# tsc -b already knows how to build dependencies, so this rule is only for
-# building ui/core in isolation for development
-core_js: proto_ts
+dist/core/tsconfig.tsbuildinfo: $(call rwildcard,ui/core,*.ts) ui/core/api/newapi.ts
 	npx tsc -p ui/core
 
-elemental_shaman_js:
-	npx tsc -b ui/elemental_shaman
+# Generic rule for building index.js for any class directory
+dist/%/index.js: ui/%/index.ts dist/core/tsconfig.tsbuildinfo
+	npx tsc -p $(<D) 
 
-elemental_shaman_css:
-	npx sass ui/elemental_shaman/index.scss dist/elemental_shaman/index.css
+# Generic rule for building index.css for any class directory
+dist/%/index.css: ui/%/index.scss $(call rwildcard,ui/core,*.scss)
+	mkdir -p $(@D)
+	npx sass $< $@
 
-elemental_shaman_html:
-	cp ui/elemental_shaman/index.html dist/elemental_shaman
-
-elemental_shaman: elemental_shaman_js elemental_shaman_css elemental_shaman_html
+# Generic rule for building index.html for any class directory
+dist/%/index.html: index_template.html
+	$(eval title := $(shell echo $(shell basename $(@D)) | sed -r 's/(^|_)([a-z])/\U \2/g' | cut -c 2-))
+	echo $(title)
+	mkdir -p $(@D)
+	cat index_template.html | sed 's/@@TITLE@@/$(title)/g' > $@
 
 wasm:
 	GOOS=js GOARCH=wasm go build -o ./dist/lib.wasm ./cmd/simwasm/
 
-web:
+web: proto_go
 	go build -o simweb ./cmd/simweb/web.go
 
 proto_go:

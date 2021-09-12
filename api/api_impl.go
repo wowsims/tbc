@@ -11,23 +11,33 @@ import (
 	"github.com/wowsims/tbc/sim/shaman"
 )
 
+func coreGemColorToColor(s []core.GemColor) []GemColor {
+	newColors := make([]GemColor, len(s))
+	for k, v := range s {
+		newColors[k] = GemColor(v)
+	}
+	return newColors
+}
+
 func getGearListImpl(request *GearListRequest) *GearListResult {
 	result := &GearListResult{}
 
-	if request.Spec == Spec_elemental_shaman {
+	if request.Spec == Spec_ElementalShaman {
 		for _, v := range shaman.ElementalItems {
 			item := core.ItemsByID[v]
 			result.Items = append(result.Items,
 				&Item{
-					Id:      item.ID,
-					Slot:    int32(item.Slot),
-					SubSlot: int32(item.SubSlot),
-					Name:    item.Name,
-					// Stats:       item.Stats,
-					Phase:   int32(item.Phase),
-					Quality: ItemQuality(item.Quality),
-					// GemSlots:    item.GemSlots,
-					// SocketBonus: item.SocketBonus,
+					Id:         item.ID,
+					Type:       ItemType(item.ItemType),
+					ArmorType:  ArmorType(item.ArmorType),
+					WeaponType: WeaponType(item.WeaponType),
+					HandType:   HandType(item.HandType),
+					// RangedWeaponType:
+					Name:       item.Name,
+					Stats:      item.Stats[:],
+					Phase:      int32(item.Phase),
+					Quality:    ItemQuality(item.Quality),
+					GemSockets: coreGemColorToColor(item.GemSockets),
 				},
 			)
 		}

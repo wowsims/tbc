@@ -1,7 +1,9 @@
 export abstract class Component {
-  abstract getRootElement(): HTMLElement;
+  readonly rootElem: HTMLDivElement;
 
-  appendTo(newParent: Element) {
-    newParent.appendChild(this.getRootElement());
+  constructor(parentElem: HTMLElement, rootCssClass: string) {
+    this.rootElem = document.createElement('div');
+    this.rootElem.classList.add(rootCssClass);
+    parentElem.appendChild(this.rootElem);
   }
 }

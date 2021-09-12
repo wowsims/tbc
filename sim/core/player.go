@@ -133,12 +133,12 @@ func (p *Player) TryActivateEquipment(sim *Simulation, party *Party) {
 		if p.IsOnCD(item.CoolID, sim.CurrentTime) {
 			continue
 		}
-		if item.Slot == EquipTrinket && p.IsOnCD(MagicIDAllTrinket, sim.CurrentTime) {
+		if item.ItemType == ItemTypeTrinket && p.IsOnCD(MagicIDAllTrinket, sim.CurrentTime) {
 			continue
 		}
 		p.AddAura(sim, item.Activate(sim, party, p))
 		p.SetCD(item.CoolID, item.ActivateCD+sim.CurrentTime)
-		if item.Slot == EquipTrinket {
+		if item.ItemType == ItemTypeTrinket {
 			p.SetCD(MagicIDAllTrinket, time.Second*30+sim.CurrentTime)
 		}
 	}
