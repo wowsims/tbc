@@ -348,6 +348,7 @@ message Enchant {
     string name = 3;     
     ItemType type = 4;   // Which type of item this enchant can be applied to.
     bool two_handed_only = 5;
+    ItemQuality quality = 6;
 }
 message Gem {
     int32 id = 1;

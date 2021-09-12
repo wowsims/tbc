@@ -29,6 +29,7 @@
   height: 70px;
   border: 2px solid dimgray;
   position: relative;
+  cursor: pointer;
 }
 
 .item-picker-sockets-container {
@@ -56,4 +57,47 @@
 
 .item-picker-enchant {
   display: block;
+}
+
+.selector-modal {
+  display: flex !important;
+  align-items: center;
+  pointer-events: none;
+}
+
+.selector-modal .modal-dialog {
+  pointer-events: all;
+}
+
+.selector-modal-tab-content-header {
+  margin: 5px;
+}
+
+.selector-modal-list {
+  padding: 0;
+}
+
+.selector-modal-list-item {
+  display: flex;
+  align-items: center;
+}
+
+.selector-modal-list-item.active .selector-modal-list-item-icon {
+  border: 3px solid lawngreen;
+}
+
+.selector-modal-list-item-icon {
+  background-repeat: no-repeat;
+  background-size: contain;
+  width: 50px;
+  height: 50px;
+  border: 2px solid dimgray;
+  cursor: pointer;
+}
+
+.selector-modal-list-item-name {
+  font-size: 18px;
+  text-decoration: none !important;
+  cursor: pointer;
+  margin-left: 10px;
 }

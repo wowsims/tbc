@@ -1,6 +1,7 @@
 import { Enchant } from './api/newapi';
 import { Gem } from './api/newapi';
 import { Item } from './api/newapi';
+import { ItemSlot } from './api/newapi';
 
 /**
  * Represents an equipped item along with enchants/gems attached to it.

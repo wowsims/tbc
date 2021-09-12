@@ -1,5 +1,6 @@
 import { Enchant } from '../api/newapi';
 import { Item } from '../api/newapi';
+import { ItemQuality } from '../api/newapi';
 import { ItemSlot } from '../api/newapi';
 import { SlotNames } from '../api/names';
 import { GetEligibleEnchantSlots } from '../api/utils';
@@ -30,6 +31,8 @@ export class GearPicker extends Component {
     rightSide.classList.add('gear-picker-right');
     this.rootElem.appendChild(rightSide);
 
+    const selectorModal = new SelectorModal(document.body, sim);
+
     const leftItemPickers = [
       ItemSlot.ItemSlotHead,
       ItemSlot.ItemSlotNeck,
@@ -39,7 +42,7 @@ export class GearPicker extends Component {
       ItemSlot.ItemSlotWrist,
       ItemSlot.ItemSlotMainHand,
       ItemSlot.ItemSlotOffHand,
-    ].map(slot => new ItemPicker(leftSide, sim, slot));
+    ].map(slot => new ItemPicker(leftSide, sim, slot, selectorModal));
 
     const rightItemPickers = [
       ItemSlot.ItemSlotHands,
@@ -51,7 +54,7 @@ export class GearPicker extends Component {
       ItemSlot.ItemSlotTrinket1,
       ItemSlot.ItemSlotTrinket2,
       ItemSlot.ItemSlotRanged,
-    ].map(slot => new ItemPicker(rightSide, sim, slot));
+    ].map(slot => new ItemPicker(rightSide, sim, slot, selectorModal));
 
     this.itemPickers = leftItemPickers.concat(rightItemPickers).sort((a, b) => a.slot - b.slot);
   }
@@ -72,12 +75,12 @@ class ItemPicker extends Component {
   private _equippedItem: EquippedItem | null = null;
   
 
-  constructor(parent: HTMLElement, sim: Sim, slot: ItemSlot) {
+  constructor(parent: HTMLElement, sim: Sim, slot: ItemSlot, selectorModal: SelectorModal) {
     super(parent, 'item-picker-root');
     this.slot = slot;
 
     this.rootElem.innerHTML = `
-      <a class="item-picker-icon" target="_blank">
+      <a class="item-picker-icon" target="_blank" data-toggle="modal" data-target="#selectorModal">
         <div class="item-picker-sockets-container">
         </div>
       </a>
@@ -96,6 +99,10 @@ class ItemPicker extends Component {
     sim.gearListEmitter.on(gearListResult => {
       this._items = gearListResult.items.filter(item => GetEligibleItemSlots(item).includes(this.slot));
       this._enchants = gearListResult.enchants.filter(enchant => GetEligibleEnchantSlots(enchant).includes(this.slot));
+
+      this.iconElem.addEventListener('click', event => {
+        selectorModal.setData(this.slot, this._equippedItem, this._items, this._enchants);
+      });
     });
     sim.gearChangeEmitter.on(newGear => {
       if (newGear[this.slot]?.item.id != this._equippedItem?.item.id) {
@@ -141,5 +148,159 @@ class ItemPicker extends Component {
       });
     }
     this._equippedItem = newItem;
+  }
+}
+
+class SelectorModal extends Component {
+  private readonly sim: Sim;
+  private readonly tabsElem: HTMLElement;
+  private readonly contentElem: HTMLElement;
+  private readonly closeButton: HTMLButtonElement;
+
+  constructor(parent: HTMLElement, sim: Sim) {
+    super(parent, 'selector-model-root');
+    this.sim = sim;
+
+    this.rootElem.innerHTML = `
+    <div class="modal fade selector-modal" id="selectorModal" tabindex="-1" role="dialog" aria-labelledby="selectorModalTitle" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-body">
+            <ul class="nav nav-tabs selector-modal-tabs">
+            </ul>
+            <div class="tab-content selector-modal-tab-content">
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary selector-modal-close-button" data-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    `;
+
+    this.tabsElem = this.rootElem.getElementsByClassName('selector-modal-tabs')[0] as HTMLElement;
+    this.contentElem = this.rootElem.getElementsByClassName('selector-modal-tab-content')[0] as HTMLElement;
+    this.closeButton = this.rootElem.getElementsByClassName('selector-modal-close-button')[0] as HTMLButtonElement;
+  }
+
+  setData(slot: ItemSlot, equippedItem: EquippedItem | null, eligibleItems: Array<Item>, eligibleEnchants: Array<Enchant>) {
+    this.tabsElem.innerHTML = '';
+    this.contentElem.innerHTML = '';
+    this.tabsElem.innerHTML = `
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+    `;
+
+    this.addTab(
+        'Items',
+        slot,
+        equippedItem,
+        eligibleItems,
+        equippedItem => equippedItem?.item.id || 0,
+        item => {
+          return {
+            id: item.id,
+            name: item.name,
+            quality: item.quality,
+            onclick: item => {
+              this.sim.equipItem(slot, new EquippedItem(item));
+            },
+          };
+        });
+  }
+
+  /**
+   * Adds one of the tabs for the item selector menu.
+   *
+   * T is expected to be Item, Enchant, or Gem. Tab menus for all 3 looks extremely
+   * similar so this function uses extra functions to do it generically.
+   */
+  private addTab<T>(
+        label: string,
+        slot: ItemSlot,
+        equippedItem: EquippedItem | null,
+        items: Array<T>,
+        equippedToIdFn: (equippedItem: EquippedItem | null) => number,
+        getItemData: (item: T) => {
+          id: number,
+          name: string,
+          quality: ItemQuality,
+          onclick: (item: T) => void,
+        }) {
+    const tabElem = document.createElement('li');
+    this.tabsElem.insertBefore(tabElem, this.tabsElem.lastChild);
+    const tabContentId = label + '-tab';
+    tabElem.innerHTML = `<a class="selector-modal-item-tab" data-toggle="tab" href="#${tabContentId}">${label}</a>`;
+
+    const tabContent = document.createElement('div');
+    tabContent.id = tabContentId;
+    tabContent.classList.add('tab-pane', 'fade', 'selector-modal-tab-content');
+    this.contentElem.appendChild(tabContent);
+    tabContent.innerHTML = `
+    <div class="selector-modal-tab-content-header">
+      <button class="selector-modal-remove-button">Remove</button>
+      <input class="selector-modal-search" type="text" placeholder="Search...">
+    </div>
+    <ul class="selector-modal-list"></ul>
+    `;
+
+    if (label == 'Items') {
+      tabElem.classList.add('active', 'in');
+      tabContent.classList.add('active', 'in');
+    }
+
+    const searchInput = tabContent.getElementsByClassName('selector-modal-search')[0] as HTMLInputElement;
+    const listElem = tabContent.getElementsByClassName('selector-modal-list')[0] as HTMLElement;
+
+    const listItemElems = items.map(item => {
+      const itemData = getItemData(item);
+
+      const listItemElem = document.createElement('li');
+      listItemElem.classList.add('selector-modal-list-item');
+      if (itemData.id == equippedToIdFn(equippedItem)) {
+        listItemElem.classList.add('active');
+      }
+      listElem.appendChild(listItemElem);
+
+      listItemElem.dataset.id = String(itemData.id);
+      listItemElem.innerHTML = `
+        <a class="selector-modal-list-item-icon" href="https://tbc.wowhead.com/item=${itemData.id}"></a>
+        <a class="selector-modal-list-item-name" href="https://tbc.wowhead.com/item=${itemData.id}">${itemData.name}</a>
+      `;
+
+      const iconElem = tabContent.getElementsByClassName('selector-modal-list-item-icon')[0] as HTMLImageElement;
+      GetItemIconUrl(itemData.id).then(url => {
+        iconElem.style.backgroundImage = `url('${url}')`;
+      });
+
+      const nameElem = tabContent.getElementsByClassName('selector-modal-list-item-name')[0] as HTMLImageElement;
+      SetItemQualityCssClass(nameElem, itemData.quality);
+
+      const onclick = (event: Event) => {
+        event.preventDefault();
+        itemData.onclick(item);
+      };
+      nameElem.addEventListener('click', onclick);
+      iconElem.addEventListener('click', onclick);
+
+      return listItemElem;
+    });
+
+    const removeButton = tabContent.getElementsByClassName('selector-modal-remove-button')[0] as HTMLButtonElement;
+    removeButton.addEventListener('click', event => {
+      listItemElems.forEach(elem => elem.classList.remove('active'));
+      this.sim.unequipItem(slot);
+    });
+
+    this.sim.gearChangeEmitter.on(newGear => {
+      const newEquippedItem = newGear[slot];
+      listItemElems.forEach(elem => {
+        elem.classList.remove('active');
+        if (parseInt(elem.dataset.id!) == equippedToIdFn(newEquippedItem)) {
+          elem.classList.add('active');
+        }
+      });
+    });
   }
 }
