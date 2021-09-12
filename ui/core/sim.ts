@@ -60,6 +60,10 @@ export class Sim {
 
     this.gearListEmitter.emit(result);
   }
+
+  get gems(): Array<Gem> {
+    return Object.values(this._gems);
+  }
   
   get race() {
     return this._race;
@@ -71,14 +75,13 @@ export class Sim {
     }
   }
 
-  equipItem(slot: ItemSlot, item: EquippedItem) {
+  equipItem(slot: ItemSlot, item: EquippedItem | null) {
     this._gear[slot] = item;
     this.gearChangeEmitter.emit(this._gear);
   }
 
-  unequipItem(slot: ItemSlot) {
-    this._gear[slot] = null;
-    this.gearChangeEmitter.emit(this._gear);
+  getEquippedItem(slot: ItemSlot): EquippedItem | null {
+    return this._gear[slot];
   }
 
   currentPlayer(): Player {
@@ -105,6 +108,27 @@ export class Sim {
     return Promise.resolve({
       items: [
         Item.create({
+          id: 29035,
+          type: ItemType.ItemTypeHead,
+          name: 'Cyclone Facegaurd',
+          quality: ItemQuality.ItemQualityEpic,
+          gemSockets: [GemColor.GemColorMeta, GemColor.GemColorYellow],
+        }),
+        Item.create({
+          id: 30171,
+          type: ItemType.ItemTypeHead,
+          name: 'Cataclysm Headpiece',
+          quality: ItemQuality.ItemQualityEpic,
+          gemSockets: [GemColor.GemColorMeta, GemColor.GemColorYellow],
+        }),
+        Item.create({
+          id: 30169,
+          type: ItemType.ItemTypeChest,
+          name: 'Cataclysm Chestpiece',
+          quality: ItemQuality.ItemQualityEpic,
+          gemSockets: [GemColor.GemColorBlue, GemColor.GemColorYellow, GemColor.GemColorYellow],
+        }),
+        Item.create({
           id: 32235,
           type: ItemType.ItemTypeHead,
           name: 'Cursed Vision of Sargeras',
@@ -112,8 +136,41 @@ export class Sim {
           gemSockets: [GemColor.GemColorMeta, GemColor.GemColorYellow],
         }),
       ],
-      enchants: [],
-      gems: [],
+      enchants: [
+        Enchant.create({
+          id: 29191,
+          effectId: 3002,
+          name: 'Glyph of Power',
+          type: ItemType.ItemTypeHead,
+          quality: ItemQuality.ItemQualityUncommon,
+        }),
+      ],
+      gems: [
+        Gem.create({
+          id: 34220,
+          name: 'Chaotic Skyfire Diamond',
+          quality: ItemQuality.ItemQualityRare,
+          color: GemColor.GemColorMeta,
+        }),
+        Gem.create({
+          id: 23096,
+          name: 'Runed Blood Garnet',
+          quality: ItemQuality.ItemQualityUncommon,
+          color: GemColor.GemColorRed,
+        }),
+        Gem.create({
+          id: 24030,
+          name: 'Runed Living Ruby',
+          quality: ItemQuality.ItemQualityRare,
+          color: GemColor.GemColorRed,
+        }),
+        Gem.create({
+          id: 24059,
+          name: 'Potent Noble Topaz',
+          quality: ItemQuality.ItemQualityRare,
+          color: GemColor.GemColorOrange
+        }),
+      ],
     });
   }
 
@@ -156,5 +213,18 @@ export class Sim {
     result.dpsStdev = Math.random() * 200;
     console.log('Individual sim result: ' + IndividualSimResult.toJsonString(result));
     return result;
+  }
+
+  setWowheadData(equippedItem: EquippedItem, elem: HTMLElement) {
+    let parts = [];
+    if (equippedItem.gems.length > 0) {
+      parts.push('gems=' + equippedItem.gems.map(gem => gem ? gem.id : 0).join(':'));
+    }
+    if (equippedItem.enchant != null) {
+      parts.push('ench=' + equippedItem.enchant.effectId);
+    }
+    parts.push('pcs=' + this._gear.filter(ei => ei != null).map(ei => ei!.item.id).join(':'));
+
+    elem.setAttribute('data-wowhead', parts.join('&'));
   }
 }

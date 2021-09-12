@@ -346,9 +346,11 @@ message Enchant {
     int32 id = 1;        // ID of the enchant "item".
     int32 effect_id = 2; // ID of the effect (for the item tooltip UI)
     string name = 3;     
-    ItemType type = 4;   // Which type of item this enchant can be applied to.
-    bool two_handed_only = 5;
-    ItemQuality quality = 6;
+    ItemQuality quality = 4;
+
+    ItemType type = 5;   // Which type of item this enchant can be applied to.
+    bool two_handed_only = 6;
+    bool shield_only = 7;
 }
 message Gem {
     int32 id = 1;

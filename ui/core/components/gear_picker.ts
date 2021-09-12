@@ -2,7 +2,9 @@ import { Enchant } from '../api/newapi';
 import { Item } from '../api/newapi';
 import { ItemQuality } from '../api/newapi';
 import { ItemSlot } from '../api/newapi';
+import { EnchantDescriptions } from '../api/names';
 import { SlotNames } from '../api/names';
+import { GemEligibleForSocket } from '../api/utils';
 import { GetEligibleEnchantSlots } from '../api/utils';
 import { GetEligibleItemSlots } from '../api/utils';
 import { EquippedItem } from '../equipped_item';
@@ -63,6 +65,7 @@ export class GearPicker extends Component {
 class ItemPicker extends Component {
   readonly slot: ItemSlot;
 
+  private readonly sim: Sim;
   private readonly iconElem: HTMLElement;
   private readonly nameElem: HTMLElement;
   private readonly enchantElem: HTMLElement;
@@ -78,6 +81,7 @@ class ItemPicker extends Component {
   constructor(parent: HTMLElement, sim: Sim, slot: ItemSlot, selectorModal: SelectorModal) {
     super(parent, 'item-picker-root');
     this.slot = slot;
+    this.sim = sim;
 
     this.rootElem.innerHTML = `
       <a class="item-picker-icon" target="_blank" data-toggle="modal" data-target="#selectorModal">
@@ -86,7 +90,7 @@ class ItemPicker extends Component {
       </a>
       <div class="item-picker-labels-container">
         <span class="item-picker-name"></span>
-        <a class="item-picker-enchant" target="_blank"></a>
+        <span class="item-picker-enchant"></span>
       </div>
     `;
 
@@ -105,34 +109,39 @@ class ItemPicker extends Component {
       });
     });
     sim.gearChangeEmitter.on(newGear => {
-      if (newGear[this.slot]?.item.id != this._equippedItem?.item.id) {
-        this.item = newGear[this.slot];
-      }
+      this.item = newGear[this.slot];
     });
   }
 
   set item(newItem: EquippedItem | null) {
-    if (newItem == null) {
-      this.iconElem.style.backgroundImage = `url('${GetEmptySlotIconUrl(this.slot)}')`;
-      this.iconElem.removeAttribute('data-wowhead');
-      this.iconElem.removeAttribute('href');
+    // Clear everything first
+    this.iconElem.style.backgroundImage = `url('${GetEmptySlotIconUrl(this.slot)}')`;
+    this.iconElem.removeAttribute('data-wowhead');
+    this.iconElem.removeAttribute('href');
 
-      this.nameElem.textContent = SlotNames[this.slot];
-      SetItemQualityCssClass(this.nameElem, null);
+    this.nameElem.textContent = SlotNames[this.slot];
+    SetItemQualityCssClass(this.nameElem, null);
 
-      this.enchantElem.textContent = '';
-      this.socketsContainerElem.innerHTML = '';
-    } else {
+    this.enchantElem.textContent = '';
+    //this.enchantElem.removeAttribute('data-wowhead');
+    //this.enchantElem.removeAttribute('href');
+    this.socketsContainerElem.innerHTML = '';
+
+    if (newItem != null) {
       this.nameElem.textContent = newItem.item.name;
       SetItemQualityCssClass(this.nameElem, newItem.item.quality);
 
-      newItem.setWowheadData(this.iconElem);
+      this.sim.setWowheadData(newItem, this.iconElem);
       this.iconElem.setAttribute('href', 'https://tbc.wowhead.com/item=' + newItem.item.id);
       GetItemIconUrl(newItem.item.id).then(url => {
         this.iconElem.style.backgroundImage = `url('${url}')`;
       });
 
-      this.socketsContainerElem.innerHTML = '';
+      if (newItem.enchant) {
+        this.enchantElem.textContent = EnchantDescriptions.get(newItem.enchant.id) || newItem.enchant.name;
+        //this.enchantElem.setAttribute('href', 'https://tbc.wowhead.com/item=' + newItem.enchant.id);
+      }
+
       newItem.item.gemSockets.forEach((socketColor, gemIdx) => {
         const gemIconElem = document.createElement('div');
         gemIconElem.classList.add('item-picker-gem-icon');
@@ -203,11 +212,73 @@ class SelectorModal extends Component {
             id: item.id,
             name: item.name,
             quality: item.quality,
-            onclick: item => {
-              this.sim.equipItem(slot, new EquippedItem(item));
+            onEquip: item => {
+              const equippedItem = this.sim.getEquippedItem(slot);
+              if (equippedItem) {
+                this.sim.equipItem(slot, equippedItem.withItem(item));
+              } else {
+                this.sim.equipItem(slot, new EquippedItem(item));
+              }
             },
           };
+        },
+        () => {
+          this.sim.equipItem(slot, null);
         });
+
+    this.addTab(
+        'Enchants',
+        slot,
+        equippedItem,
+        eligibleEnchants,
+        equippedItem => equippedItem?.enchant?.id || 0,
+        enchant => {
+          return {
+            id: enchant.id,
+            name: enchant.name,
+            quality: enchant.quality,
+            onEquip: enchant => {
+              const equippedItem = this.sim.getEquippedItem(slot);
+              if (equippedItem)
+                this.sim.equipItem(slot, equippedItem.withEnchant(enchant));
+            },
+          };
+        },
+        () => {
+          const equippedItem = this.sim.getEquippedItem(slot);
+          if (equippedItem)
+            this.sim.equipItem(slot, equippedItem.withEnchant(null));
+        });
+
+    this.addGemTabs(slot, equippedItem);
+  }
+
+  private addGemTabs(slot: ItemSlot, equippedItem: EquippedItem | null) {
+    equippedItem?.item.gemSockets.forEach((socketColor, socketIdx) => {
+      this.addTab(
+          'Gem ' + (socketIdx + 1),
+          slot,
+          equippedItem,
+          this.sim.gems.filter(gem => GemEligibleForSocket(gem, socketColor)),
+          equippedItem => equippedItem?.gems[socketIdx]?.id || 0,
+          gem => {
+            return {
+              id: gem.id,
+              name: gem.name,
+              quality: gem.quality,
+              onEquip: gem => {
+                const equippedItem = this.sim.getEquippedItem(slot);
+                if (equippedItem)
+                  this.sim.equipItem(slot, equippedItem.withGem(gem, socketIdx));
+              },
+            };
+          },
+          () => {
+            const equippedItem = this.sim.getEquippedItem(slot);
+            if (equippedItem)
+              this.sim.equipItem(slot, equippedItem.withGem(null, socketIdx));
+          });
+    });
   }
 
   /**
@@ -226,11 +297,16 @@ class SelectorModal extends Component {
           id: number,
           name: string,
           quality: ItemQuality,
-          onclick: (item: T) => void,
-        }) {
+          onEquip: (item: T) => void,
+        },
+        onRemove: () => void) {
+    if (items.length == 0) {
+      return;
+    }
+
     const tabElem = document.createElement('li');
     this.tabsElem.insertBefore(tabElem, this.tabsElem.lastChild);
-    const tabContentId = label + '-tab';
+    const tabContentId = (label + '-tab').split(' ').join('');
     tabElem.innerHTML = `<a class="selector-modal-item-tab" data-toggle="tab" href="#${tabContentId}">${label}</a>`;
 
     const tabContent = document.createElement('div');
@@ -250,7 +326,6 @@ class SelectorModal extends Component {
       tabContent.classList.add('active', 'in');
     }
 
-    const searchInput = tabContent.getElementsByClassName('selector-modal-search')[0] as HTMLInputElement;
     const listElem = tabContent.getElementsByClassName('selector-modal-list')[0] as HTMLElement;
 
     const listItemElems = items.map(item => {
@@ -264,22 +339,30 @@ class SelectorModal extends Component {
       listElem.appendChild(listItemElem);
 
       listItemElem.dataset.id = String(itemData.id);
+      listItemElem.dataset.name = itemData.name;
+
       listItemElem.innerHTML = `
         <a class="selector-modal-list-item-icon" href="https://tbc.wowhead.com/item=${itemData.id}"></a>
         <a class="selector-modal-list-item-name" href="https://tbc.wowhead.com/item=${itemData.id}">${itemData.name}</a>
       `;
 
-      const iconElem = tabContent.getElementsByClassName('selector-modal-list-item-icon')[0] as HTMLImageElement;
+      const iconElem = listItemElem.getElementsByClassName('selector-modal-list-item-icon')[0] as HTMLImageElement;
       GetItemIconUrl(itemData.id).then(url => {
         iconElem.style.backgroundImage = `url('${url}')`;
       });
 
-      const nameElem = tabContent.getElementsByClassName('selector-modal-list-item-name')[0] as HTMLImageElement;
+      const nameElem = listItemElem.getElementsByClassName('selector-modal-list-item-name')[0] as HTMLImageElement;
       SetItemQualityCssClass(nameElem, itemData.quality);
 
       const onclick = (event: Event) => {
         event.preventDefault();
-        itemData.onclick(item);
+        itemData.onEquip(item);
+
+        // If the item changes, the gem slots might change, so remove and recreate the gem tabs
+        if (Item.is(item)) {
+          this.removeTabs('Gem');
+          this.addGemTabs(slot, this.sim.getEquippedItem(slot));
+        }
       };
       nameElem.addEventListener('click', onclick);
       iconElem.addEventListener('click', onclick);
@@ -290,7 +373,7 @@ class SelectorModal extends Component {
     const removeButton = tabContent.getElementsByClassName('selector-modal-remove-button')[0] as HTMLButtonElement;
     removeButton.addEventListener('click', event => {
       listItemElems.forEach(elem => elem.classList.remove('active'));
-      this.sim.unequipItem(slot);
+      onRemove();
     });
 
     this.sim.gearChangeEmitter.on(newGear => {
@@ -302,5 +385,26 @@ class SelectorModal extends Component {
         }
       });
     });
+
+    const searchInput = tabContent.getElementsByClassName('selector-modal-search')[0] as HTMLInputElement;
+    searchInput.addEventListener('input', event => {
+      listItemElems.forEach(elem => {
+        if (elem.dataset.name!.toLowerCase().includes(searchInput.value.toLowerCase())) {
+          elem.style.display = 'flex';
+        } else {
+          elem.style.display = 'none';
+        }
+      });
+    });
+  }
+
+  private removeTabs(labelSubstring: string) {
+    const tabElems = Array.prototype.slice.call(this.tabsElem.getElementsByClassName('selector-modal-item-tab')).filter(tab => tab.textContent.includes(labelSubstring));
+    const contentElems = tabElems
+        .map(tabElem => document.getElementById(tabElem.href.substring(1)))
+        .filter(tabElem => Boolean(tabElem));
+
+    tabElems.forEach(elem => elem.remove());
+    contentElems.forEach(elem => elem!.remove());
   }
 }

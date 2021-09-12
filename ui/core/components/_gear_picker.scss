@@ -49,24 +49,31 @@
 }
 
 .item-picker-labels-container {
+  padding: 3px;
 }
 
 .item-picker-name {
   display: block;
+  font-size: 18px;
 }
 
 .item-picker-enchant {
   display: block;
+  font-size: 14px;
+  color: lawngreen;
 }
 
 .selector-modal {
-  display: flex !important;
-  align-items: center;
-  pointer-events: none;
+  display: block;
 }
 
 .selector-modal .modal-dialog {
-  pointer-events: all;
+  @include screen-vertical-horizontal-center;
+}
+
+.selector-modal-search {
+  border: 1px inset black;
+  border-radius: 4px;
 }
 
 .selector-modal-tab-content-header {
@@ -77,9 +84,20 @@
   padding: 0;
 }
 
+.selector-modal-list li {
+  background: LightGrey;
+}
+.selector-modal-list li:nth-child(odd) {
+  background: DarkGrey;
+}
+.selector-modal-list li:hover {
+  background: Grey;
+}
+
 .selector-modal-list-item {
   display: flex;
   align-items: center;
+  padding: 2px;
 }
 
 .selector-modal-list-item.active .selector-modal-list-item-icon {
