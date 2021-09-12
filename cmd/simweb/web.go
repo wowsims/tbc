@@ -15,7 +15,7 @@ import (
 	"time"
 
 	"github.com/wowsims/tbc/api"
-	"github.com/wowsims/tbc/ui"
+	// "github.com/wowsims/tbc/dist"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -28,11 +28,14 @@ func main() {
 	var fs http.Handler
 	if *useFS {
 		log.Printf("Using local file system for development.")
-		fs = http.FileServer(http.Dir("."))
+		fs = http.FileServer(http.Dir("./dist"))
 	} else {
 		log.Printf("Embedded file server running.")
-		fs = http.FileServer(http.FS(ui.FS))
+		// fs = http.FileServer(http.FS(dist.FS))
 	}
+
+	http.HandleFunc("/individualSim", handleIndividualSim)
+	http.HandleFunc("/gearList", handleGearList)
 
 	http.HandleFunc("/", func(resp http.ResponseWriter, req *http.Request) {
 		resp.Header().Add("Cache-Control", "no-cache")
@@ -42,7 +45,7 @@ func main() {
 		fs.ServeHTTP(resp, req)
 	})
 
-	url := fmt.Sprintf("http://localhost%s/ui", *host)
+	url := fmt.Sprintf("http://localhost%s/elemental_shaman/", *host)
 	log.Printf("Launching interface on %s", url)
 
 	go func() {
@@ -110,7 +113,6 @@ func main() {
 // } else if request.Sim != nil {
 
 func handleIndividualSim(w http.ResponseWriter, r *http.Request) {
-
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 
@@ -130,13 +132,34 @@ func handleIndividualSim(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
+	w.Header().Add("Content-Type", "application/x-protobuf")
 	w.Write(outbytes)
 }
 func handleRaidSim(w http.ResponseWriter, r *http.Request) {
 
 }
 func handleGearList(w http.ResponseWriter, r *http.Request) {
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
 
+		return
+	}
+	glr := &api.GearListRequest{}
+	if err := proto.Unmarshal(body, glr); err != nil {
+		log.Printf("Failed to parse request: %s", err.Error())
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	result := api.GetGearList(glr)
+
+	outbytes, err := proto.Marshal(result)
+	if err != nil {
+		log.Printf("[ERROR] Failed to marshal result: %s", err.Error())
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	w.Header().Add("Content-Type", "application/x-protobuf")
+	w.Write(outbytes)
 }
 func handleComputeStats(w http.ResponseWriter, r *http.Request) {
 

@@ -38,7 +38,7 @@ dist/%/index.html: index_template.html
 	mkdir -p $(@D)
 	cat index_template.html | sed 's/@@TITLE@@/$(title)/g' > $@
 
-wasm:
+wasm: proto_go
 	GOOS=js GOARCH=wasm go build -o ./dist/lib.wasm ./cmd/simwasm/
 
 web: proto_go
