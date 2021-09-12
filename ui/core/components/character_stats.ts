@@ -1,5 +1,5 @@
 import { Stat } from '../api/newapi';
-import { StatNames } from '../api/utils';
+import { StatNames } from '../api/names';
 import { Component } from './component.js';
 
 export class CharacterStats extends Component {

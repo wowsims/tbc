@@ -1,6 +1,12 @@
+import { intersection } from '../utils';
+
+import { Enchant } from './newapi';
+import { HandType } from './newapi';
+import { ItemSlot } from './newapi';
+import { ItemType } from './newapi';
+import { Item } from './newapi';
 import { Race } from './newapi';
 import { Spec } from './newapi';
-import { Stat } from './newapi';
 
 const shamanRaces = [
     Race.RaceDraenei,
@@ -14,48 +20,69 @@ export const SpecToEligibleRaces: Record<Spec, Array<Race>> = {
   [Spec.ElementalShaman]: shamanRaces,
 };
 
-export const RaceNames: Record<Race, string> = {
-  [Race.RaceUnknown]: 'None',
-  [Race.RaceBloodElf]: 'Blood Elf',
-  [Race.RaceDraenei]: 'Draenei',
-  [Race.RaceDwarf]: 'Dwarf',
-  [Race.RaceGnome]: 'Gnome',
-  [Race.RaceHuman]: 'Human',
-  [Race.RaceNightElf]: 'Night Elf',
-  [Race.RaceOrc]: 'Orc',
-  [Race.RaceTauren]: 'Tauren',
-  [Race.RaceTroll10]: 'Troll (+10% Haste)',
-  [Race.RaceTroll30]: 'Troll (+30% Haste)',
-  [Race.RaceUndead]: 'Undead',
+const itemTypeToSlotsMap: Partial<Record<ItemType, Array<ItemSlot>>> = {
+  [ItemType.ItemTypeUnknown]: [],
+  [ItemType.ItemTypeHead]: [ItemSlot.ItemSlotHead],
+  [ItemType.ItemTypeNeck]: [ItemSlot.ItemSlotNeck],
+  [ItemType.ItemTypeShoulder]: [ItemSlot.ItemSlotShoulder],
+  [ItemType.ItemTypeBack]: [ItemSlot.ItemSlotBack],
+  [ItemType.ItemTypeChest]: [ItemSlot.ItemSlotChest],
+  [ItemType.ItemTypeWrist]: [ItemSlot.ItemSlotWrist],
+  [ItemType.ItemTypeHands]: [ItemSlot.ItemSlotHead],
+  [ItemType.ItemTypeWaist]: [ItemSlot.ItemSlotHead],
+  [ItemType.ItemTypeLegs]: [ItemSlot.ItemSlotLegs],
+  [ItemType.ItemTypeFeet]: [ItemSlot.ItemSlotFeet],
+  [ItemType.ItemTypeFinger]: [ItemSlot.ItemSlotFinger1, ItemSlot.ItemSlotFinger2],
+  [ItemType.ItemTypeTrinket]: [ItemSlot.ItemSlotTrinket1, ItemSlot.ItemSlotTrinket2],
+  [ItemType.ItemTypeRanged]: [ItemSlot.ItemSlotRanged],
 };
 
-export const StatNames: Record<Stat, string> = {
-  [Stat.StatStrength]: 'Strength',
-  [Stat.StatAgility]: 'Agility',
-  [Stat.StatStamina]: 'Stamina',
-  [Stat.StatIntellect]: 'Intellect',
-  [Stat.StatSpirit]: 'Spirit',
-  [Stat.StatSpellPower]: 'Spell Dmg',
-  [Stat.StatHealingPower]: 'Healing Power',
-  [Stat.StatArcaneSpellPower]: 'Arcane Dmg',
-  [Stat.StatFireSpellPower]: 'Fire Dmg',
-  [Stat.StatFrostSpellPower]: 'Frost Dmg',
-  [Stat.StatHolySpellPower]: 'Holy Dmg',
-  [Stat.StatNatureSpellPower]: 'Nature Dmg',
-  [Stat.StatShadowSpellPower]: 'Shadow Dmg',
-  [Stat.StatMP5]: 'MP5',
-  [Stat.StatSpellHit]: 'Spell Hit',
-  [Stat.StatSpellCrit]: 'Spell Crit',
-  [Stat.StatSpellHaste]: 'Spell Haste',
-  [Stat.StatSpellPenetration]: 'Spell Pen',
-  [Stat.StatAttackPower]: 'Attack Power',
-  [Stat.StatMeleeHit]: 'Hit',
-  [Stat.StatMeleeCrit]: 'Crit',
-  [Stat.StatMeleeHaste]: 'Haste',
-  [Stat.StatArmorPenetration]: 'Armor Pen',
-  [Stat.StatExpertise]: 'Expertise',
-  [Stat.StatMana]: 'Mana',
-  [Stat.StatEnergy]: 'Energy',
-  [Stat.StatRage]: 'Rage',
-  [Stat.StatArmor]: 'Armor',
+export function GetEligibleItemSlots(item: Item): Array<ItemSlot> {
+  if (itemTypeToSlotsMap[item.type]) {
+    return itemTypeToSlotsMap[item.type]!;
+  }
+
+  if (item.type == ItemType.ItemTypeWeapon) {
+    if ([HandType.HandTypeMainHand, HandType.HandTypeTwoHand].includes(item.handType)) {
+      return [ItemSlot.ItemSlotMainHand];
+    } else if (item.handType == HandType.HandTypeOffHand) {
+      return [ItemSlot.ItemSlotOffHand];
+    } else {
+      return [ItemSlot.ItemSlotMainHand, ItemSlot.ItemSlotOffHand];
+    }
+  }
+
+  // Should never reach here
+  throw new Error('Could not find item slots for item: ' + Item.toJsonString(item));
+};
+
+/**
+ * Returns all item slots to which the enchant might be applied.
+ *
+ * Note that this alone is not enough; some items have further restrictions,
+ * e.g. some weapon enchants may only be applied to 2H weapons.
+ */
+export function GetEligibleEnchantSlots(enchant: Enchant): Array<ItemSlot> {
+  if (itemTypeToSlotsMap[enchant.type]) {
+    return itemTypeToSlotsMap[enchant.type]!;
+  }
+
+  if (enchant.type == ItemType.ItemTypeWeapon) {
+    return [ItemSlot.ItemSlotMainHand, ItemSlot.ItemSlotOffHand];
+  }
+
+  // Should never reach here
+  throw new Error('Could not find item slots for enchant: ' + Enchant.toJsonString(enchant));
+};
+
+export function EnchantAppliesToItem(enchant: Enchant, item: Item): boolean {
+  const sharedSlots = intersection(GetEligibleEnchantSlots(enchant), GetEligibleItemSlots(item));
+  if (sharedSlots.length == 0)
+    return false;
+
+  if (sharedSlots.includes(ItemSlot.ItemSlotMainHand)) {
+    return !enchant.twoHandedOnly || item.handType == HandType.HandTypeTwoHand;
+  }
+
+  return true;
 };

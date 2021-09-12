@@ -1,6 +1,11 @@
 import { Buffs } from './api/newapi';
+import { Enchant } from './api/newapi';
 import { Encounter } from './api/newapi';
+import { Gem } from './api/newapi';
+import { GemColor } from './api/newapi';
+import { ItemQuality } from './api/newapi';
 import { ItemSlot } from './api/newapi';
+import { ItemType } from './api/newapi';
 import { Item } from './api/newapi';
 import { Player } from './api/newapi';
 import { Race } from './api/newapi';
@@ -13,21 +18,47 @@ import { GearListRequest, GearListResult } from './api/newapi';
 import { IndividualSimRequest, IndividualSimResult } from './api/newapi';
 import { StatWeightsRequest, StatWeightsResult } from './api/newapi';
 
-import { wait } from './utils';
+import { EquippedItem } from './equipped_item';
 import { Listener } from './typed_event';
 import { TypedEvent } from './typed_event';
+import { wait } from './utils';
+
+export type Gear = Array<EquippedItem | null>;
 
 export class Sim {
   readonly spec: Spec;
+  readonly gearListEmitter = new TypedEvent<GearListResult>();
   readonly raceChangeEmitter = new TypedEvent<Race>();
+  readonly gearChangeEmitter = new TypedEvent<Gear>();
+
+  private _items: Record<number, Item> = {};
+  private _enchants: Record<number, Enchant> = {};
+  private _gems: Record<number, Gem> = {};
 
   private _race: Race;
-  private _gear: Partial<Record<ItemSlot, Item>>;
+  private _gear: Gear;
+  private _init = false;
 
   constructor(spec: Spec) {
     this.spec = spec;
     this._race = SpecToEligibleRaces[this.spec][0];
-    this._gear = {};
+    this._gear = [];
+  }
+
+  async init(): Promise<void> {
+    if (this._init)
+      return;
+    this._init = true;
+
+    const result = await this.getGearList(GearListRequest.create({
+      spec: this.spec,
+    }));
+
+    result.items.forEach(item => this._items[item.id] = item);
+    result.enchants.forEach(enchant => this._enchants[enchant.id] = enchant);
+    result.gems.forEach(gem => this._gems[gem.id] = gem);
+
+    this.gearListEmitter.emit(result);
   }
   
   get race() {
@@ -38,6 +69,16 @@ export class Sim {
       this._race = newRace;
       this.raceChangeEmitter.emit(newRace);
     }
+  }
+
+  equipItem(slot: ItemSlot, item: EquippedItem) {
+    this._gear[slot] = item;
+    this.gearChangeEmitter.emit(this._gear);
+  }
+
+  unequipItem(slot: ItemSlot) {
+    this._gear[slot] = null;
+    this.gearChangeEmitter.emit(this._gear);
   }
 
   currentPlayer(): Player {
@@ -60,9 +101,17 @@ export class Sim {
     });
   }
 
-  async getGearList(request: GearListRequest): Promise<GearListResult> {
+  private async getGearList(request: GearListRequest): Promise<GearListResult> {
     return Promise.resolve({
-      items: [],
+      items: [
+        Item.create({
+          id: 32235,
+          type: ItemType.ItemTypeHead,
+          name: 'Cursed Vision of Sargeras',
+          quality: ItemQuality.ItemQualityEpic,
+          gemSockets: [GemColor.GemColorMeta, GemColor.GemColorYellow],
+        }),
+      ],
       enchants: [],
       gems: [],
     });

@@ -9,4 +9,8 @@ export abstract class Theme {
     this.parentElem = parentElem;
     this.sim = new Sim(spec);
   }
+
+  async init(): Promise<void> {
+    await this.sim.init();
+  }
 }

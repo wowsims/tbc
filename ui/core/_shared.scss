@@ -5,12 +5,24 @@
   transform: translateY(-50%);
 }
 
+@mixin horizontal-center {
+  margin: 0;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
 @mixin vertical-horizontal-center {
   margin: 0;
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
+}
+
+@mixin vertical-bottom {
+  position: absolute;
+  bottom: 0;
 }
 
 .loader {
@@ -25,4 +37,40 @@
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
+}
+
+.socket-color-blue {
+  border: 1px solid blue;
+}
+
+.item-quality-junk {
+  color: #fff;
+}
+
+.item-quality-uncommon {
+  color: #1eff00;
+}
+
+.item-quality-rare {
+  color: #0070dd;
+}
+
+.item-quality-epic {
+  color: #a335ee;
+}
+
+.item-quality-legendary {
+  color: #ff8000;
+}
+
+.socket-color-meta {
+  border: 1px solid white;
+}
+
+.socket-color-red {
+  border: 1px solid red;
+}
+
+.socket-color-yellow {
+  border: 1px solid yellow;
 }

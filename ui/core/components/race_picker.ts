@@ -1,6 +1,6 @@
 import { Race } from '../api/newapi';
 import { SpecToEligibleRaces } from '../api/utils';
-import { RaceNames } from '../api/utils';
+import { RaceNames } from '../api/names';
 import { Sim } from '../sim.js';
 
 import { Component } from './component.js';
