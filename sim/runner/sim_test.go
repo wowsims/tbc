@@ -143,7 +143,6 @@ func gearFromStrings(gears []string) core.EquipmentSpec {
 	eq := core.EquipmentSpec{}
 	for i, gear := range gears {
 		item := core.ItemsByName[gear]
-		log.Printf("Found Item: %s (%d) slot: %d", item.Name, item.ID, item.Slot)
 		eq[i].ID = item.ID
 	}
 	return eq
