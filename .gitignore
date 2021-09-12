@@ -1,8 +1,4 @@
 node_modules
 bazel-*
-<<<<<<< HEAD
-ui/core/api
-.vscode
-=======
 ui/core/api/newapi.ts
->>>>>>> 55a74047a1ddeefdc916df4336913dbfc5abf9c6
+.vscode
