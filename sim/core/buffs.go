@@ -1,5 +1,7 @@
 package core
 
+import "time"
+
 type Buffs struct {
 	// Raid buffs
 	ArcaneInt                bool
@@ -8,14 +10,20 @@ type Buffs struct {
 	ImprovedBlessingOfWisdom bool
 	ImprovedDivineSpirit     bool
 
-	// Party Buffs
+	// Party class buffs
 	Moonkin             bool
 	MoonkinRavenGoddess bool   // adds 20 spell crit to moonkin aura
 	SpriestDPS          uint16 // adds Mp5 ~ 25% (dps*5%*5sec = 25%)
-	EyeOfNight          bool   // Eye of night bonus from party member (not you)
-	TwilightOwl         bool   // from party member
+	Bloodlust           int
+	WrathOfAir          bool
+	TotemOfWrath        bool
+	ManaStream          bool
 
-	// Target Debuff
+	// Party item buffs
+	EyeOfNight  bool // Eye of night bonus from party member (not you)
+	TwilightOwl bool // from party member
+
+	// Target debuff
 	JudgementOfWisdom         bool
 	ImprovedSealOfTheCrusader bool
 	Misery                    bool
@@ -39,37 +47,39 @@ const (
 	RaceBonusTypeUndead
 )
 
-type Consumes struct {
-	// Buffs
-	BrilliantWizardOil       bool
-	MajorMageblood           bool
-	FlaskOfBlindingLight     bool
-	FlaskOfMightyRestoration bool
-	BlackendBasilisk         bool
+func TryActivateRacial(sim *Simulation, party *Party, player *Player) {
+	switch player.Race {
+	case RaceBonusTypeOrc:
+		if player.IsOnCD(MagicIDOrcBloodFury, sim.CurrentTime) {
+			return
+		}
 
-	// Used in rotations
-	DestructionPotion bool
-	SuperManaPotion   bool
-	DarkRune          bool
-	DrumsOfBattle     bool
-}
+		const spBonus = 143
+		const dur = time.Second * 15
+		const cd = time.Minute * 2
 
-func (c Consumes) AddStats(s Stats) Stats {
-	if c.BrilliantWizardOil {
-		s[StatSpellCrit] += 14
-		s[StatSpellPower] += 36
+		player.Stats[StatSpellPower] += spBonus
+		player.SetCD(MagicIDOrcBloodFury, cd+sim.CurrentTime)
+		player.AddAura(sim, AuraStatRemoval(sim.CurrentTime, dur, spBonus, StatSpellPower, MagicIDOrcBloodFury))
+
+	case RaceBonusTypeTroll10, RaceBonusTypeTroll30:
+		if player.IsOnCD(MagicIDTrollBerserking, sim.CurrentTime) {
+			return
+		}
+		hasteBonus := time.Duration(11) // 10% haste
+		if player.Race == RaceBonusTypeTroll30 {
+			hasteBonus = time.Duration(13) // 30% haste
+		}
+		const dur = time.Second * 10
+		const cd = time.Minute * 3
+
+		player.SetCD(MagicIDTrollBerserking, cd+sim.CurrentTime)
+		player.AddAura(sim, Aura{
+			ID:      MagicIDTrollBerserking,
+			Expires: sim.CurrentTime + dur,
+			OnCast: func(sim *Simulation, p *Player, c *Cast) {
+				c.CastTime = (c.CastTime * 10) / hasteBonus
+			},
+		})
 	}
-	if c.MajorMageblood {
-		s[StatMP5] += 16.0
-	}
-	if c.FlaskOfBlindingLight {
-		s[StatSpellPower] += 80
-	}
-	if c.FlaskOfMightyRestoration {
-		s[StatMP5] += 25
-	}
-	if c.BlackendBasilisk {
-		s[StatSpellPower] += 23
-	}
-	return s
 }

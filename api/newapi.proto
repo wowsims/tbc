@@ -82,15 +82,19 @@ message Buffs {
     bool moonkin_raven_goddess = 7;
     int32 spriest_dps = 8;
     int32 bloodlust = 9;
+    // Party Totems
+    bool wrath_of_air = 10;
+    int32 totem_of_wrath = 11;
+    bool mana_stream = 12;
 
     // Target Debuff
-    bool judgement_of_wisdom = 10;
-    bool improved_seal_of_the_crusader = 11;
-    bool misery = 12;
+    bool judgement_of_wisdom = 13;
+    bool improved_seal_of_the_crusader = 14;
+    bool misery = 15;
 
     // Item Buffs
-    bool eye_of_the_night = 13;
-    bool chain_of_the_twilight_owl = 14;
+    bool eye_of_the_night = 16;
+    bool chain_of_the_twilight_owl = 17;
 }
 
 message Consumes {
@@ -152,6 +156,7 @@ message Shaman {
         int32 unrelenting_storm = 6;
         int32 call_of_thunder = 7;
         int32 convection = 8;
+        int32 concussion = 9;
     }
     ShamanSpec spec = 2;
     

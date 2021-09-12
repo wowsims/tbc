@@ -36,6 +36,7 @@ func (p *cache) ReturnCasts(casts []*Cast) {
 		v.IsClBounce = false
 		v.CastTime = 0
 		v.ManaCost = 0
+		v.Dmg = 0
 		v.Hit = 0
 		v.Crit = 0
 		v.CritBonus = 0
@@ -43,6 +44,7 @@ func (p *cache) ReturnCasts(casts []*Cast) {
 		v.DidCrit = false
 		v.DidDmg = 0
 		v.Effect = nil
+		v.DoItNow = nil
 	}
 
 	p.castPool = append(p.castPool, casts...)

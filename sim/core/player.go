@@ -1,6 +1,8 @@
 package core
 
 import (
+	"fmt"
+	"log"
 	"strconv"
 	"time"
 )
@@ -17,6 +19,7 @@ type Raid struct {
 // class logic shares.
 //  All players have stats, equipment, auras, etc
 type Player struct {
+	ID       int
 	Consumes Consumes // pretty sure most classes have consumes to care about.
 	Race     RaceBonusType
 
@@ -28,6 +31,9 @@ type Player struct {
 	ActiveEquip []*Item // cache of gear that can activate.
 
 	*AuraTracker
+
+	// mutatable state
+	destructionPotionUsed bool // set to true after using first destruction potion.
 }
 
 func (p *Player) HasteBonus() float64 {
@@ -39,9 +45,8 @@ func (p *Player) GetPlayer() *Player {
 }
 
 func NewPlayer(equipSpec EquipmentSpec, race RaceBonusType, consumes Consumes) *Player {
-	// TODO: configure player here.
-
 	equip := NewEquipmentSet(equipSpec)
+	fmt.Println(equip.Stats().Print())
 	initialStats := CalculateTotalStats(race, equip, consumes)
 
 	if race == RaceBonusTypeDraenei {
@@ -61,6 +66,7 @@ func NewPlayer(equipSpec EquipmentSpec, race RaceBonusType, consumes Consumes) *
 
 	for i, eq := range equip {
 		if eq.Activate != nil {
+			log.Printf("Adding %s to active equipment...", eq.Name)
 			player.ActiveEquip = append(player.ActiveEquip, &equip[i])
 		}
 		for _, g := range eq.Gems {
@@ -80,59 +86,31 @@ func (p *Player) Advance(sim *Simulation, elapsedTime time.Duration, newTime tim
 	if p.Stats[StatMana] > p.InitialStats[StatMana] {
 		p.Stats[StatMana] = p.InitialStats[StatMana]
 	}
+
+	// Advance CDs and Auras
 	p.AuraTracker.Advance(sim, p, newTime)
 }
 
 func (p *Player) Reset() {
-	// sim.Stats = sim.InitialStats
-	// sim.cache.destructionPotion = false
-	// sim.cache.bloodlustCasts = 0
-	// sim.CurrentTime = 0.0
-	// sim.CurrentMana = sim.Stats[StatMana]
-	// sim.CDs = [MagicIDLen]time.Duration{}
-	// sim.auras = [MagicIDLen]Aura{}
-	// if len(sim.activeAuraIDs) > 0 {
-	// 	sim.activeAuraIDs = sim.activeAuraIDs[len(sim.activeAuraIDs)-1:] // chop off end of activeids slice, faster than making a new one
-	// }
-	// sim.metrics = SimMetrics{
-	// 	Casts: make([]*Cast, 0, 1000),
-	// }
+	p.Stats = p.InitialStats
+	p.AuraTracker.ResetAuras()
+}
 
-	// if sim.Debug != nil {
-	// 	sim.Debug("SIM RESET\n")
-	// 	sim.Debug("----------------------\n")
-	// }
+func (p *Player) BuffUp(sim *Simulation, party *Party) {
+	// Activate all permanent item effects.
+	for _, item := range p.ActiveEquip {
+		if item.Activate != nil && item.ActivateCD == NeverExpires {
+			p.AddAura(sim, item.Activate(sim, party, p))
+		}
+		for _, g := range item.Gems {
+			if g.Activate != nil {
+				p.AddAura(sim, g.Activate(sim, party, p))
+			}
+		}
+	}
 
-	// // Activate all talents
-	// if sim.Options.Talents.LightningOverload > 0 {
-	// 	sim.addAura(AuraLightningOverload(sim.Options.Talents.LightningOverload))
-	// }
-
-	// // Chain lightning bounces
-	// if sim.Options.Encounter.NumClTargets > 1 {
-	// 	sim.addAura(ActivateChainLightningBounce(sim))
-	// }
-
-	// // Judgement of Wisdom
-	// if sim.Options.Buffs.JudgementOfWisdom {
-	// 	sim.addAura(AuraJudgementOfWisdom())
-	// }
-
-	// // Activate all permanent item effects.
-	// for _, item := range sim.activeEquip {
-	// 	if item.Activate != nil && item.ActivateCD == NeverExpires {
-	// 		sim.addAura(item.Activate(sim))
-	// 	}
-	// 	for _, g := range item.Gems {
-	// 		if g.Activate != nil {
-	// 			sim.addAura(g.Activate(sim))
-	// 		}
-	// 	}
-	// }
-
-	// sim.ActivateSets()
-	// // Currently no temp hit increase effects in the sim... so lets cache this!
-	// sim.cache.spellHit = 0.83 + sim.Stats[StatSpellHit]/1260.0 // 12.6 hit == 1% hit
+	p.ActivateSets(sim, party)
+	p.TryActivateEquipment(sim, party)
 }
 
 // AddAura on player is a simple wrapper around AuraTracker so the
@@ -148,24 +126,22 @@ func (p *Player) manaRegenPerSecond() float64 {
 
 // Pops any on-use trinkets / gear
 func (p *Player) TryActivateEquipment(sim *Simulation, party *Party) {
-	// TODO: Fix this.
-
-	// 	for _, item := range sim.activeEquip {
-	// 		if item.Activate == nil || item.ActivateCD == NeverExpires { // ignore non-activatable, and always active items.
-	// 			continue
-	// 		}
-	// 		if sim.isOnCD(item.CoolID) {
-	// 			continue
-	// 		}
-	// 		if item.Slot == EquipTrinket && sim.isOnCD(MagicIDAllTrinket) {
-	// 			continue
-	// 		}
-	// 		sim.addAura(item.Activate(sim))
-	// 		sim.setCD(item.CoolID, item.ActivateCD)
-	// 		if item.Slot == EquipTrinket {
-	// 			sim.setCD(MagicIDAllTrinket, time.Second*30)
-	// 		}
-	// 	}
+	for _, item := range p.ActiveEquip {
+		if item.Activate == nil || item.ActivateCD == NeverExpires { // ignore non-activatable, and always active items.
+			continue
+		}
+		if p.IsOnCD(item.CoolID, sim.CurrentTime) {
+			continue
+		}
+		if item.Slot == EquipTrinket && p.IsOnCD(MagicIDAllTrinket, sim.CurrentTime) {
+			continue
+		}
+		p.AddAura(sim, item.Activate(sim, party, p))
+		p.SetCD(item.CoolID, item.ActivateCD+sim.CurrentTime)
+		if item.Slot == EquipTrinket {
+			p.SetCD(MagicIDAllTrinket, time.Second*30+sim.CurrentTime)
+		}
+	}
 }
 
 // Activates set bonuses, returning the list of active bonuses.

@@ -2,7 +2,6 @@ package core
 
 import (
 	"fmt"
-	"math"
 	"math/rand"
 	"sort"
 	"time"
@@ -30,7 +29,7 @@ type Encounter struct {
 }
 
 type Simulation struct {
-	Raid         Raid
+	Raid         *Raid
 	Options      Options
 	Duration     time.Duration
 	*AuraTracker // Global Debuffs mostly.. put on the boss/target
@@ -72,6 +71,7 @@ func NewSim(raid *Raid, options Options) *Simulation {
 	}
 
 	sim := &Simulation{
+		Raid:     raid,
 		Options:  options,
 		Duration: durationFromSeconds(options.Encounter.Duration),
 		Rando:    rand.New(rand.NewSource(options.RSeed)),
@@ -94,10 +94,10 @@ func (sim *Simulation) ReturnCasts(casts []*Cast) {
 	sim.cache.ReturnCasts(casts)
 }
 
-// reset will set sim back and erase all current state.
+// Reset will set sim back and erase all current state.
 // This is automatically called before every 'Run'
 //  This includes resetting and reactivating always on trinkets, auras, set bonuses, etc
-func (sim *Simulation) reset() {
+func (sim *Simulation) Reset() {
 	// sim.rseed++
 	// sim.Rando.Seed(sim.rseed)
 
@@ -122,32 +122,34 @@ func (sim *Simulation) reset() {
 	// Now buff everyone back up!
 	for _, party := range sim.Raid.Parties {
 		for _, pl := range party.Players {
-			pl.ActivateSets(sim, party)
-			pl.TryActivateEquipment(sim, party)
-			pl.BuffUp(sim, party)
+			pl.Player.BuffUp(sim, party)
+			pl.Agent.BuffUp(sim, party)
 		}
 	}
-
-	// TODO: probably need to special case the kings buff here.
 }
 
 type pendingAction struct {
 	Agent PlayerAgent
 	AgentAction
 	ExecuteAt time.Duration
+	Party     *Party
 }
 
 // Run will run the simulation for number of seconds.
 // Returns metrics for what was cast and how much damage was done.
 func (sim *Simulation) Run() SimMetrics {
-	sim.reset()
+	sim.Reset()
 
 	pendingActions := make([]pendingAction, 0, 25)
 	for _, party := range sim.Raid.Parties {
 		for _, pl := range party.Players {
-			action := pl.ChooseAction(sim)
+			action := pl.ChooseAction(sim, party)
+			if action.Wait == NeverExpires {
+				continue // This means agent will not perform any actions at all
+			}
 			pendingActions = append(pendingActions, pendingAction{
 				ExecuteAt:   action.Wait,
+				Party:       party,
 				Agent:       pl,
 				AgentAction: action,
 			})
@@ -165,14 +167,25 @@ func (sim *Simulation) Run() SimMetrics {
 		if action.ExecuteAt > sim.CurrentTime {
 			sim.Advance(action.ExecuteAt - sim.CurrentTime)
 		}
+
+		// Consumes before any casts
+		TryActivateDrums(sim, action.Party, action.Agent.Player)
+		TryActivateRacial(sim, action.Party, action.Agent.Player)
+		TryActivateDestructionPotion(sim, action.Party, action.Agent.Player)
+		TryActivateDarkRune(sim, action.Party, action.Agent.Player)
+		TryActivateSuperManaPotion(sim, action.Party, action.Agent.Player)
+
+		// Pop activatable items if we can.
+		action.Agent.Player.TryActivateEquipment(sim, action.Party)
+
 		if action.Cast != nil {
-			sim.Cast(action.Agent.Player, action.Cast)
-		} else {
+			action.Cast.DoItNow(sim, action.Agent.Player, action.Agent.Agent, action.Cast)
+		} else if action.Wait != 0 {
 			// FUTURE: Swing timers could be handled in this if block.
 			panic("Agent returned nil action")
 		}
 
-		newAction := agent.ChooseAction(sim)
+		newAction := agent.ChooseAction(sim, action.Party)
 		wait := newAction.Wait
 		if newAction.Cast != nil {
 			wait = newAction.Cast.CastTime
@@ -198,6 +211,7 @@ func (sim *Simulation) Run() SimMetrics {
 			ExecuteAt:   sim.CurrentTime + wait,
 			Agent:       agent,
 			AgentAction: newAction,
+			Party:       action.Party,
 		}
 		if len(pendingActions) == 1 {
 			// We know in a single user sim, just always make the next pending action ours.
@@ -214,109 +228,6 @@ func (sim *Simulation) Run() SimMetrics {
 	}
 
 	return sim.Metrics
-}
-
-// Cast will actually cast and treat all casts as having no 'flight time'.
-// This will activate any auras around casting, calculate hit/crit and add to sim metrics.
-func (sim *Simulation) Cast(p *Player, cast *Cast) {
-	if sim.Debug != nil {
-		sim.Debug("Current Mana %0.0f, Cast Cost: %0.0f\n", p.Stats[StatMana], cast.ManaCost)
-	}
-	p.Stats[StatMana] -= cast.ManaCost
-	// sim.Metrics.ManaSpent += cast.ManaCost
-
-	for _, id := range p.ActiveAuraIDs {
-		if p.Auras[id].OnCastComplete != nil {
-			p.Auras[id].OnCastComplete(sim, p, cast)
-		}
-	}
-	hit := 0.83 + p.Stats[StatSpellHit]/1260.0 + cast.Hit // 12.6 hit == 1% hit
-	hit = math.Min(hit, 0.99)                             // can't get away from the 1% miss
-
-	dbgCast := cast.Spell.Name
-	if sim.Debug != nil {
-		sim.Debug("Completed Cast (%s)\n", dbgCast)
-	}
-	if sim.Rando.Float64() < hit {
-		dmg := (sim.Rando.Float64() * cast.Spell.DmgDiff) + cast.Spell.MinDmg + (p.Stats[StatSpellPower] * cast.Spell.Coeff)
-		if cast.DidDmg != 0 { // use the pre-set dmg
-			dmg = cast.DidDmg
-		}
-		cast.DidHit = true
-
-		crit := (p.Stats[StatSpellCrit] / 2208.0) + cast.Crit // 22.08 crit == 1% crit
-		if sim.Rando.Float64() < crit {
-			cast.DidCrit = true
-			dmg *= cast.CritBonus
-			if sim.Debug != nil {
-				dbgCast += " crit"
-			}
-		} else if sim.Debug != nil {
-			dbgCast += " hit"
-		}
-
-		// Average Resistance (AR) = (Target's Resistance / (Caster's Level * 5)) * 0.75
-		// P(x) = 50% - 250%*|x - AR| <- where X is %resisted
-		// Using these stats:
-		//    13.6% chance of
-		//  FUTURE: handle boss resists for fights/classes that are actually impacted by that.
-		resVal := sim.Rando.Float64()
-		if resVal < 0.18 { // 13% chance for 25% resist, 4% for 50%, 1% for 75%
-			if sim.Debug != nil {
-				dbgCast += " (partial resist: "
-			}
-			if resVal < 0.01 {
-				dmg *= .25
-				if sim.Debug != nil {
-					dbgCast += "75%)"
-				}
-			} else if resVal < 0.05 {
-				dmg *= .5
-				if sim.Debug != nil {
-					dbgCast += "50%)"
-				}
-			} else {
-				dmg *= .75
-				if sim.Debug != nil {
-					dbgCast += "25%)"
-				}
-			}
-		}
-		cast.DidDmg = dmg
-		// Apply any effects specific to this cast.
-		if cast.Effect != nil {
-			cast.Effect(sim, p, cast)
-		}
-		// Apply any on spell hit effects.
-		for _, id := range p.ActiveAuraIDs {
-			if p.Auras[id].OnSpellHit != nil {
-				p.Auras[id].OnSpellHit(sim, p, cast)
-			}
-		}
-	} else {
-		if sim.Debug != nil {
-			dbgCast += " miss"
-		}
-		cast.DidDmg = 0
-		cast.DidCrit = false
-		cast.DidHit = false
-		for _, id := range p.ActiveAuraIDs {
-			if p.Auras[id].OnSpellMiss != nil {
-				p.Auras[id].OnSpellMiss(sim, p, cast)
-			}
-		}
-	}
-
-	if cast.Spell.Cooldown > 0 {
-		p.SetCD(cast.Spell.ID, cast.Spell.Cooldown)
-	}
-
-	if sim.Debug != nil {
-		sim.Debug("%s: %0.0f\n", dbgCast, cast.DidDmg)
-	}
-
-	sim.Metrics.Casts = append(sim.Metrics.Casts, cast)
-	sim.Metrics.TotalDamage += cast.DidDmg
 }
 
 // Advance moves time forward counting down auras, CDs, mana regen, etc

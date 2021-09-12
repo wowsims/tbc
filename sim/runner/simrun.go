@@ -7,32 +7,121 @@ import (
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
+	"github.com/wowsims/tbc/sim/druid"
+	"github.com/wowsims/tbc/sim/mage"
+	"github.com/wowsims/tbc/sim/paladin"
+	"github.com/wowsims/tbc/sim/priest"
 )
 
-func RunSim(raid *core.Raid, buffs core.Buffs, options core.Options) {
-	// TODO: Create buff bot players here
-	// TODO: Since buff bots will just be implemented separate from the real
-	//   agent for the class... maybe just add a public "ApplyXX" function for teh buffs
-
-	// TODO: Move these to an "item buff bot"?
-	// Or just the first party member other than you? (create item buff bot if not i guess)
-	// if b.TwilightOwl {
-	// 	s[StatSpellCrit] += 44.16
-	// }
-	// if b.EyeOfNight {
-	// 	s[StatSpellPower] += 34
-	// }
-
+func SetupSim(raid *core.Raid, buffs core.Buffs, options core.Options) *core.Simulation {
 	sim := core.NewSim(raid, options)
 
-	// if sim.Options.Buffs.Misery {
-	// 	sim.cache.elcDmgBonus += 0.05
-	// 	sim.cache.dmgBonus += 0.05
-	// }
+	// These buffs are a one-time apply... no need to add the bots to the raid group.
+	druid.NewBuffBot(sim, raid.Parties[0], buffs.GiftOfTheWild, buffs.Moonkin, buffs.MoonkinRavenGoddess)
+	mage.NewBuffBot(sim, raid.Parties[0], buffs.ArcaneInt)
 
-	// Buffs    Buffs
-	// sim := NewSim(request.Gear, request.Options)
+	// These apply auras on every sim reset
+	priestBot := priest.NewBuffBot(sim, raid.Parties[0], buffs.Misery, float64(buffs.SpriestDPS))
+	paladinBot := paladin.NewBuffBot(sim, raid.Parties[0], buffs.BlessingOfKings, buffs.ImprovedBlessingOfWisdom, buffs.ImprovedSealOfTheCrusader, buffs.JudgementOfWisdom)
 
+	// Create a fake player and add the agent to do the buffing.
+	if buffs.Misery {
+		// Misery bot re-applies misery on every sim reset.
+		sim.Raid.Parties[0].Players = append(sim.Raid.Parties[0].Players, core.PlayerAgent{
+			Player: core.NewPlayer(core.EquipmentSpec{}, core.RaceBonusTypeNone, core.Consumes{}),
+			Agent:  priestBot,
+		})
+	}
+	if buffs.JudgementOfWisdom {
+		// Judgement of wisdom is an aura that has to be reapplied on every reset.
+		// create a bot that acts like a player and rebuffs us.
+		sim.Raid.Parties[0].Players = append(sim.Raid.Parties[0].Players, core.PlayerAgent{
+			Player: core.NewPlayer(core.EquipmentSpec{}, core.RaceBonusTypeNone, core.Consumes{}),
+			Agent:  paladinBot,
+		})
+	}
+
+	if len(sim.Raid.Parties[0].Players) == 1 && (buffs.TwilightOwl) {
+		// Add a new player.
+		sim.Raid.Parties[0].Players = append(sim.Raid.Parties[0].Players, core.PlayerAgent{
+			Player: core.NewPlayer(core.EquipmentSpec{}, core.RaceBonusTypeNone, core.Consumes{}),
+			Agent:  &nullAgent{}, // this player exists to pop items, no agent needed.
+		})
+	}
+
+	if buffs.TwilightOwl {
+		// Add neck to first bot player
+		for i, item := range sim.Raid.Parties[0].Players[1].Equip {
+			if item.ID == 0 { // no item in this slot.
+				sim.Raid.Parties[0].Players[1].Equip[i] = core.ItemsByID[24121]
+				sim.Raid.Parties[0].Players[1].ActiveEquip = append(sim.Raid.Parties[0].Players[1].ActiveEquip, &sim.Raid.Parties[0].Players[1].Equip[i])
+				break
+			}
+		}
+	}
+	if buffs.EyeOfNight {
+		// Add neck to first bot player
+		for i, item := range sim.Raid.Parties[0].Players[1].Equip {
+			if item.ID == 0 { // no item in this slot.
+				sim.Raid.Parties[0].Players[1].Equip[i] = core.ItemsByID[24116]
+				sim.Raid.Parties[0].Players[1].ActiveEquip = append(sim.Raid.Parties[0].Players[1].ActiveEquip, &sim.Raid.Parties[0].Players[1].Equip[i])
+				break
+			}
+		}
+	}
+
+	// Reset all players
+	for _, party := range sim.Raid.Parties {
+		for _, pl := range party.Players {
+			pl.Player.Reset()
+			pl.Agent.Reset(sim)
+		}
+	}
+
+	// Now buff everyone back up!
+	for _, party := range sim.Raid.Parties {
+		for _, pl := range party.Players {
+			pl.Player.BuffUp(sim, party)
+			pl.Agent.BuffUp(sim, party)
+		}
+	}
+
+	for _, raidParty := range sim.Raid.Parties {
+		for _, pl := range raidParty.Players {
+			pl.Player.InitialStats = pl.Player.InitialStats.CalculatedTotal()
+
+			// TODO: Figure out how to handle buffs that buff based on other buffs...
+			//   for now this hardcoded buffing works...
+			if buffs.ImprovedDivineSpirit {
+				pl.Player.InitialStats[core.StatSpirit] += 50
+			}
+			if buffs.BlessingOfKings {
+				pl.Player.InitialStats[core.StatIntellect] *= 1.1
+				pl.Player.InitialStats[core.StatSpirit] *= 1.1
+			}
+			if buffs.ImprovedDivineSpirit {
+				pl.Player.InitialStats[core.StatSpellPower] += pl.Player.InitialStats[core.StatSpirit] * 0.1
+			}
+
+			pl.Player.Stats = pl.Player.InitialStats
+		}
+	}
+
+	return sim
+}
+
+// RunIndividualSim
+//  TODO: Should this accept a 'PlayerSettings' instead of a constructed raid and do that work in here?
+func RunIndividualSim(sim *core.Simulation, options core.Options) SimResult {
+	pid := 0
+	for _, raidParty := range sim.Raid.Parties {
+		for _, pl := range raidParty.Players {
+			pl.ID = pid
+			pl.AuraTracker.PID = pid
+			pid++
+		}
+	}
+	sim.AuraTracker.PID = -1
 	logsBuffer := &strings.Builder{}
 	aggregator := NewMetricsAggregator()
 
@@ -48,9 +137,9 @@ func RunSim(raid *core.Raid, buffs core.Buffs, options core.Options) {
 		sim.ReturnCasts(metrics.Casts)
 	}
 
-	// result := aggregator.getResult()
-	// result.Logs = logsBuffer.String()
-	// return result
+	result := aggregator.getResult()
+	result.Logs = logsBuffer.String()
+	return result
 }
 
 type MetricsAggregator struct {
@@ -60,7 +149,7 @@ type MetricsAggregator struct {
 	dpsSum        float64
 	dpsSumSquared float64
 	dpsMax        float64
-	dpsHist       map[int]int // rounded DPS to count
+	dpsHist       map[int32]int32 // rounded DPS to count
 
 	numOom      int
 	oomAtSum    float64
@@ -76,7 +165,7 @@ type SimResult struct {
 	DpsAvg   float64
 	DpsStDev float64
 	DpsMax   float64
-	DpsHist  map[int]int // rounded DPS to count
+	DpsHist  map[int32]int32 // rounded DPS to count
 
 	NumOom      int
 	OomAtAvg    float64
@@ -94,7 +183,7 @@ type CastMetric struct {
 func NewMetricsAggregator() *MetricsAggregator {
 	return &MetricsAggregator{
 		startTime: time.Now(),
-		dpsHist:   make(map[int]int),
+		dpsHist:   make(map[int32]int32),
 		casts:     make(map[int32]CastMetric),
 	}
 }
@@ -108,7 +197,7 @@ func (aggregator *MetricsAggregator) addMetrics(options core.Options, metrics co
 	aggregator.dpsSumSquared += dps * dps
 	aggregator.dpsMax = math.Max(aggregator.dpsMax, dps)
 
-	dpsRounded := int(math.Round(dps/10) * 10)
+	dpsRounded := int32(math.Round(dps/10) * 10)
 	aggregator.dpsHist[dpsRounded]++
 
 	// TODO: Fix me
@@ -127,6 +216,15 @@ func (aggregator *MetricsAggregator) addMetrics(options core.Options, metrics co
 		} else if cast.DidCrit {
 			idx = 1
 		}
+		if len(cm.Counts) <= idx {
+			newArr := make([]int32, idx+1)
+			copy(newArr, cm.Counts)
+			cm.Counts = newArr
+
+			newDmgs := make([]float64, idx+1)
+			copy(newDmgs, cm.Dmgs)
+			cm.Dmgs = newDmgs
+		}
 		cm.Counts[idx]++
 		cm.Dmgs[idx] += cast.DidDmg
 
@@ -134,6 +232,7 @@ func (aggregator *MetricsAggregator) addMetrics(options core.Options, metrics co
 	}
 }
 
+// TODO: Make sure SimResult matches the proto output
 func (aggregator *MetricsAggregator) getResult() SimResult {
 	result := SimResult{}
 	result.ExecutionDurationMs = time.Since(aggregator.startTime).Milliseconds()
@@ -154,3 +253,17 @@ func (aggregator *MetricsAggregator) getResult() SimResult {
 
 	return result
 }
+
+type nullAgent struct {
+}
+
+func (a *nullAgent) ChooseAction(_ *core.Simulation, party *core.Party) core.AgentAction {
+	return core.AgentAction{Wait: core.NeverExpires} // makes the bot wait forever and do nothing.
+}
+func (a *nullAgent) OnActionAccepted(*core.Simulation, core.AgentAction) {
+}
+func (a *nullAgent) BuffUp(sim *core.Simulation, party *core.Party) {
+}
+func (a *nullAgent) Reset(sim *core.Simulation) {
+}
+func (a *nullAgent) OnSpellHit(*core.Simulation, *core.Player, *core.Cast) {}

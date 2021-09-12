@@ -1,6 +1,7 @@
 package core
 
 import (
+	"math"
 	"time"
 )
 
@@ -14,41 +15,36 @@ type Spell struct {
 	MinDmg     float64
 	MaxDmg     float64
 	DmgDiff    float64 // cached for faster dmg calculations
-	DamageType DamageType
+	DamageType Stat
 	Coeff      float64
 
+	CastType
 	DotDmg float64
 	DotDur time.Duration
 }
 
-// DamageType is currently unused.
-type DamageType byte
+type CastType byte
 
 const (
-	DamageTypeUnknown DamageType = iota
-	DamageTypeFire
-	DamageTypeNature
-	DamageTypeFrost
-
-	// Who cares about these fake damage types.
-	DamageTypeShadow
-	DamageTypeHoly
-	DamageTypeArcane
+	CastTypeNormal CastType = iota
+	CastTypeChain
+	CastTypeAOE
+	CastTypeChannel
 )
 
 // All Spells
-// TODO: Downrank Penalty == (spellrankavailbetobetrained+11)/70
+// FUTURE: Downrank Penalty == (spellrankavailbetobetrained+11)/70
 //    Might not even be worth calculating because I don't think there is much case for ever downranking.
 var spells = []Spell{
-	// {ID: MagicIDLB4,  Name: "LB4",  Coeff: 0.795,  CastTime: time.Millisecond * 2500, MinDmg: 88, MaxDmg: 100, Mana: 50, DamageType: DamageTypeNature},
-	// {ID: MagicIDLB10, Name: "LB10", Coeff: 0.795,  CastTime: time.Millisecond * 2500, MinDmg: 428, MaxDmg: 477, Mana: 265, DamageType: DamageTypeNature},
-	{ID: MagicIDLB12, Name: "LB12", Coeff: 0.794, CastTime: time.Millisecond * 2500, MinDmg: 571, MaxDmg: 652, Mana: 300, DamageType: DamageTypeNature},
-	// {ID: MagicIDCL4,  Name: "CL4",  Coeff: 0.643,  CastTime: time.Millisecond * 2000, Cooldown: time.Second * 6, MinDmg: 505, MaxDmg: 564, Mana: 605, DamageType: DamageTypeNature},
-	{ID: MagicIDCL6, Name: "CL6", Coeff: 0.651, CastTime: time.Millisecond * 2000, Cooldown: time.Second * 6, MinDmg: 734, MaxDmg: 838, Mana: 760, DamageType: DamageTypeNature},
-	// {ID: MagicIDES8,  Name: "ES8",  Coeff: 0.3858, CastTime: time.Millisecond * 1500, Cooldown: time.Second * 6, MinDmg: 658, MaxDmg: 692, Mana: 535, DamageType: DamageTypeNature},
-	// {ID: MagicIDFrS5, Name: "FrS5", Coeff: 0.3858, CastTime: time.Millisecond * 1500, Cooldown: time.Second * 6, MinDmg: 640, MaxDmg: 676, Mana: 525, DamageType: DamageTypeFrost},
-	// {ID: MagicIDFlS7, Name: "FlS7", Coeff: 0.15, CastTime: time.Millisecond * 1500, Cooldown: time.Second * 6, MinDmg: 377, MaxDmg: 420, Mana: 500, DotDmg: 100, DotDur: time.Second * 6, DamageType: DamageTypeFire},
-	{ID: MagicIDTLCLB, Name: "TLCLB", Coeff: 0.0, MinDmg: 694, MaxDmg: 807, Mana: 0, DamageType: DamageTypeNature},
+	// {ID: MagicIDLB4,  Name: "LB4",  Coeff: 0.795,  CastTime: time.Millisecond * 2500, MinDmg: 88, MaxDmg: 100, Mana: 50, DamageType: StatNatureSpellPower},
+	// {ID: MagicIDLB10, Name: "LB10", Coeff: 0.795,  CastTime: time.Millisecond * 2500, MinDmg: 428, MaxDmg: 477, Mana: 265, DamageType: StatNatureSpellPower},
+	{ID: MagicIDLB12, Name: "LB12", Coeff: 0.794, CastTime: time.Millisecond * 2500, MinDmg: 571, MaxDmg: 652, Mana: 300, DamageType: StatNatureSpellPower},
+	// {ID: MagicIDCL4,  Name: "CL4",  Coeff: 0.643,  CastTime: time.Millisecond * 2000, Cooldown: time.Second * 6, MinDmg: 505, MaxDmg: 564, Mana: 605, DamageType: StatNatureSpellPower},
+	{ID: MagicIDCL6, Name: "CL6", Coeff: 0.651, CastTime: time.Millisecond * 2000, Cooldown: time.Second * 6, MinDmg: 734, MaxDmg: 838, Mana: 760, DamageType: StatNatureSpellPower},
+	// {ID: MagicIDES8,  Name: "ES8",  Coeff: 0.3858, CastTime: time.Millisecond * 1500, Cooldown: time.Second * 6, MinDmg: 658, MaxDmg: 692, Mana: 535, DamageType: StatNatureSpellPower},
+	// {ID: MagicIDFrS5, Name: "FrS5", Coeff: 0.3858, CastTime: time.Millisecond * 1500, Cooldown: time.Second * 6, MinDmg: 640, MaxDmg: 676, Mana: 525, DamageType: StatFrostSpellPower},
+	// {ID: MagicIDFlS7, Name: "FlS7", Coeff: 0.15, CastTime: time.Millisecond * 1500, Cooldown: time.Second * 6, MinDmg: 377, MaxDmg: 420, Mana: 500, DotDmg: 100, DotDur: time.Second * 6, DamageType: StatFireSpellPower},
+	{ID: MagicIDTLCLB, Name: "TLCLB", Coeff: 0.0, MinDmg: 694, MaxDmg: 807, Mana: 0, DamageType: StatNatureSpellPower},
 }
 
 // Spell lookup map to make lookups faster.
@@ -77,9 +73,14 @@ type Cast struct {
 	CastTime time.Duration // time to cast the spell
 	ManaCost float64
 
+	Dmg       float64 // Bonus Dmg for only this spell
 	Hit       float64 // Direct % bonus... 0.1 == 10%
 	Crit      float64 // Direct % bonus... 0.1 == 10%
 	CritBonus float64 // Multiplier to critical dmg bonus.
+
+	// Actual spell to call to activate this spell.
+	//  currently named after arnold's "come on, do it now"
+	DoItNow func(sim *Simulation, p *Player, a Agent, cast *Cast)
 
 	// Calculated Values
 	DidHit  bool
@@ -97,5 +98,131 @@ func NewCast(sim *Simulation, sp *Spell) *Cast {
 	cast.ManaCost = float64(sp.Mana)
 	cast.CritBonus = 1.5
 	cast.CastTime = sp.CastTime
+	cast.DoItNow = DirectCast
 	return cast
+}
+
+// Cast will actually cast and treat all casts as having no 'flight time'.
+// This will activate any auras around casting, calculate hit/crit and add to sim metrics.
+func DirectCast(sim *Simulation, p *Player, a Agent, cast *Cast) {
+	if sim.Debug != nil {
+		sim.Debug("(%d) Current Mana %0.0f, Cast Cost: %0.0f\n", p.ID, p.Stats[StatMana], cast.ManaCost)
+	}
+	if cast.ManaCost > 0 {
+		p.Stats[StatMana] -= cast.ManaCost
+		// sim.Metrics.ManaSpent += cast.ManaCost
+	}
+
+	for _, id := range p.ActiveAuraIDs {
+		if p.Auras[id].OnCastComplete != nil {
+			p.Auras[id].OnCastComplete(sim, p, cast)
+		}
+	}
+	for _, id := range sim.ActiveAuraIDs {
+		if sim.Auras[id].OnCastComplete != nil {
+			sim.Auras[id].OnCastComplete(sim, p, cast)
+		}
+	}
+
+	hit := 0.83 + p.Stats[StatSpellHit]/1260.0 + cast.Hit // 12.6 hit == 1% hit
+	hit = math.Min(hit, 0.99)                             // can't get away from the 1% miss
+
+	dbgCast := cast.Spell.Name
+	if sim.Debug != nil {
+		sim.Debug("(%d) Completed Cast (%0.2f hit chance) (%s)\n", p.ID, hit, dbgCast)
+	}
+	if sim.Rando.Float64() < hit {
+		sp := p.Stats[StatSpellPower] + p.Stats[cast.Spell.DamageType] + cast.Dmg
+		dmg := (sim.Rando.Float64() * cast.Spell.DmgDiff) + cast.Spell.MinDmg + (sp * cast.Spell.Coeff)
+		if cast.DidDmg != 0 { // use the pre-set dmg
+			dmg = cast.DidDmg
+		}
+		cast.DidHit = true
+
+		crit := (p.Stats[StatSpellCrit] / 2208.0) + cast.Crit // 22.08 crit == 1% crit
+		if sim.Rando.Float64() < crit {
+			cast.DidCrit = true
+			dmg *= cast.CritBonus
+			if sim.Debug != nil {
+				dbgCast += " crit"
+			}
+		} else if sim.Debug != nil {
+			dbgCast += " hit"
+		}
+
+		// Average Resistance (AR) = (Target's Resistance / (Caster's Level * 5)) * 0.75
+		// P(x) = 50% - 250%*|x - AR| <- where X is %resisted
+		// Using these stats:
+		//    13.6% chance of
+		//  FUTURE: handle boss resists for fights/classes that are actually impacted by that.
+		resVal := sim.Rando.Float64()
+		if resVal < 0.18 { // 13% chance for 25% resist, 4% for 50%, 1% for 75%
+			if sim.Debug != nil {
+				dbgCast += " (partial resist: "
+			}
+			if resVal < 0.01 {
+				dmg *= .25
+				if sim.Debug != nil {
+					dbgCast += "75%)"
+				}
+			} else if resVal < 0.05 {
+				dmg *= .5
+				if sim.Debug != nil {
+					dbgCast += "50%)"
+				}
+			} else {
+				dmg *= .75
+				if sim.Debug != nil {
+					dbgCast += "25%)"
+				}
+			}
+		}
+		cast.DidDmg = dmg
+		// Apply any effects specific to this cast.
+		if cast.Effect != nil {
+			cast.Effect(sim, p, cast)
+		}
+		// Apply any on spell hit effects.
+		for _, id := range p.ActiveAuraIDs {
+			if p.Auras[id].OnSpellHit != nil {
+				p.Auras[id].OnSpellHit(sim, p, cast)
+			}
+		}
+		for _, id := range sim.ActiveAuraIDs {
+			if sim.Auras[id].OnSpellHit != nil {
+				sim.Auras[id].OnSpellHit(sim, p, cast)
+			}
+		}
+		if a != nil {
+			a.OnSpellHit(sim, p, cast)
+		}
+	} else {
+		if sim.Debug != nil {
+			dbgCast += " miss"
+		}
+		cast.DidDmg = 0
+		cast.DidCrit = false
+		cast.DidHit = false
+		for _, id := range p.ActiveAuraIDs {
+			if p.Auras[id].OnSpellMiss != nil {
+				p.Auras[id].OnSpellMiss(sim, p, cast)
+			}
+		}
+		for _, id := range sim.ActiveAuraIDs {
+			if sim.Auras[id].OnSpellMiss != nil {
+				sim.Auras[id].OnSpellMiss(sim, p, cast)
+			}
+		}
+	}
+
+	if cast.Spell.Cooldown > 0 {
+		p.SetCD(cast.Spell.ID, cast.Spell.Cooldown+sim.CurrentTime)
+	}
+
+	if sim.Debug != nil {
+		sim.Debug("(%d) %s: %0.0f\n", p.ID, dbgCast, cast.DidDmg)
+	}
+
+	sim.Metrics.Casts = append(sim.Metrics.Casts, cast)
+	sim.Metrics.TotalDamage += cast.DidDmg
 }

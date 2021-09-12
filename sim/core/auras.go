@@ -1,6 +1,7 @@
 package core
 
 import (
+	"log"
 	"math"
 	"time"
 )
@@ -32,7 +33,10 @@ func NewAuraTracker() *AuraTracker {
 	}
 }
 
+// AuraTracker is a centralized implementation of CD and Aura tracking.
+//  This is currently used by Player and Raid (for global debuffs)
 type AuraTracker struct {
+	PID           int
 	CDs           [MagicIDLen]time.Duration // Map of MagicID to sim duration at which CD is done.
 	Auras         [MagicIDLen]Aura          // this is array instead of map to speed up browser perf.
 	ActiveAuraIDs []int32                   // IDs of auras that are active, in no particular order
@@ -58,9 +62,9 @@ func (at *AuraTracker) Advance(sim *Simulation, player *Player, newTime time.Dur
 // it will be replaced with the newer aura.
 // Auras with duration of 0 will be logged as activating but never added to simulation auras.
 func (at *AuraTracker) AddAura(sim *Simulation, player *Player, newAura Aura) {
-	// if sim.Debug != nil {
-	// 	sim.Debug(" +%s\n", AuraName(newAura.ID))
-	// }
+	if sim.Debug != nil {
+		sim.Debug("(%d) +%s\n", at.PID, AuraName(newAura.ID))
+	}
 	if newAura.Expires < sim.CurrentTime {
 		return // no need to waste time adding aura that doesn't last.
 	}
@@ -92,9 +96,9 @@ func (at *AuraTracker) RemoveAura(sim *Simulation, player *Player, id int32) {
 	// Now we can remove the last element, in constant time
 	at.ActiveAuraIDs = at.ActiveAuraIDs[:len(at.ActiveAuraIDs)-1]
 
-	// if at.Debug != nil {
-	// 	at.Debug(" -%s\n", AuraName(id))
-	// }
+	if sim.Debug != nil {
+		sim.Debug("(%d) -%s\n", at.PID, AuraName(id))
+	}
 }
 
 // Returns whether an aura with the given ID is currently active.
@@ -267,10 +271,6 @@ func AuraName(a int32) string {
 		return "Robes of the Elder Scribe"
 	case MagicIDElderScribeProc:
 		return "Power of Arcanagos"
-	case MagicIDEyeOfTheNightTrink:
-		return "EyeOfTheNight Trinket CD"
-	case MagicIDChainTOTrink:
-		return "ChainTO Trinket CD"
 	case MagicIDHexTrink:
 		return "Hex Trinket CD"
 	case MagicIDShiftingNaaruTrink:
@@ -376,8 +376,6 @@ const (
 	MagicIDScryerTrink
 	MagicIDRubySerpentTrink
 	MagicIDXiriTrink
-	MagicIDEyeOfTheNightTrink
-	MagicIDChainTOTrink
 	MagicIDHexTrink
 	MagicIDShiftingNaaruTrink
 	MagicIDSkullGuldanTrink
@@ -388,23 +386,6 @@ const (
 	// Always at end so we know how many magic IDs there are.
 	MagicIDLen
 )
-
-func AuraJudgementOfWisdom() Aura {
-	const mana = 74 / 2 // 50% proc
-	return Aura{
-		ID:      MagicIDJoW,
-		Expires: NeverExpires,
-		OnSpellHit: func(sim *Simulation, player *Player, c *Cast) {
-			if sim.Debug != nil {
-				sim.Debug(" +Judgement Of Wisdom: 37 mana (74 @ 50%% proc)\n")
-			}
-			// Only apply to players that have mana.
-			if player.InitialStats[StatMana] > 0 {
-				player.Stats[StatMana] += mana
-			}
-		},
-	}
-}
 
 func createHasteActivate(id int32, haste float64, duration time.Duration) ItemActivation {
 	// Implemented haste activate as a buff so that the creation of a new cast gets the correct cast time
@@ -460,6 +441,9 @@ func ActivateNexusHorn(sim *Simulation, party *Party, player *Player) Aura {
 		ID:      MagicIDNexusHorn,
 		Expires: NeverExpires,
 		OnSpellHit: func(sim *Simulation, player *Player, c *Cast) {
+			if c.Spell.ID == MagicIDTLCLB {
+				return // TLC can't proc Sextant
+			}
 			if !icd.isOnCD(sim) && c.DidCrit && sim.Rando.Float64() < 0.2 {
 				icd = InternalCD(sim.CurrentTime + dur)
 				player.Stats[StatSpellPower] += spellBonus
@@ -506,55 +490,6 @@ func AuraStatRemoval(currentTime time.Duration, duration time.Duration, amount f
 			}
 			player.Stats[stat] -= amount
 		},
-	}
-}
-
-func TryActivateDrums(sim *Simulation, party *Party, player *Player) {
-	if player.Consumes.DrumsOfBattle || player.IsOnCD(MagicIDDrums, sim.CurrentTime) {
-		return
-	}
-
-	player.Stats[StatSpellHaste] += 80
-	for _, p := range party.Players {
-		p.SetCD(MagicIDDrums, time.Minute*2+sim.CurrentTime)
-		p.AddAura(sim, AuraStatRemoval(sim.CurrentTime, time.Second*30, 80, StatSpellHaste, MagicIDDrums))
-	}
-}
-
-func TryActivateRacial(sim *Simulation, party *Party, player *Player) {
-	switch player.Race {
-	case RaceBonusTypeOrc:
-		if player.IsOnCD(MagicIDOrcBloodFury, sim.CurrentTime) {
-			return
-		}
-
-		const spBonus = 143
-		const dur = time.Second * 15
-		const cd = time.Minute * 2
-
-		player.Stats[StatSpellPower] += spBonus
-		player.SetCD(MagicIDOrcBloodFury, cd+sim.CurrentTime)
-		player.AddAura(sim, AuraStatRemoval(sim.CurrentTime, dur, spBonus, StatSpellPower, MagicIDOrcBloodFury))
-
-	case RaceBonusTypeTroll10, RaceBonusTypeTroll30:
-		if player.IsOnCD(MagicIDTrollBerserking, sim.CurrentTime) {
-			return
-		}
-		hasteBonus := time.Duration(11) // 10% haste
-		if player.Race == RaceBonusTypeTroll30 {
-			hasteBonus = time.Duration(13) // 30% haste
-		}
-		const dur = time.Second * 10
-		const cd = time.Minute * 3
-
-		player.SetCD(MagicIDTrollBerserking, cd+sim.CurrentTime)
-		player.AddAura(sim, Aura{
-			ID:      MagicIDTrollBerserking,
-			Expires: sim.CurrentTime + dur,
-			OnCast: func(sim *Simulation, p *Player, c *Cast) {
-				c.CastTime = (c.CastTime * 10) / hasteBonus
-			},
-		})
 	}
 }
 
@@ -722,31 +657,35 @@ func ActivateTLC(sim *Simulation, party *Party, player *Player) Aura {
 				}
 				icd = InternalCD(sim.CurrentTime + icdDur)
 				clone := sim.cache.NewCast()
-				// TLC does not get hit talents bonus, subtract them here. (since we dont conditionally apply them)
 				clone.Spell = tlcspell
-				clone.CritBonus = 1.5
 				// FUTURE: does CSD apply to TLC? if so, we should probably apply it.
-				sim.Cast(player, clone)
+				clone.DoItNow(sim, player, nil, clone)
 				charges = 0
 			}
 		},
 	}
 }
 
+// Because this buff actually lasts 30min, lets just assume we never lose the buff.
 func ActivateChainTO(sim *Simulation, party *Party, player *Player) Aura {
+	log.Printf("Activating CHAIN TO")
 	const bonus = 2 * 22.08 // 2% crit
 	for _, p := range party.Players {
 		p.Stats[StatSpellCrit] += bonus
 	}
 	return Aura{
-		ID:      MagicIDChainTO,
-		Expires: sim.CurrentTime + time.Minute*30,
-		// Technically this would never expire in any real sim... should I just make it NeverExpires?
-		OnExpire: func(sim *Simulation, player *Player, c *Cast) {
-			for _, p := range party.Players {
-				p.Stats[StatSpellCrit] -= bonus
-			}
-		},
+		ID: MagicIDChainTO,
+	}
+}
+
+// Because this buff actually lasts 30min, lets just assume we never lose the buff.
+func ActivateEyeOfNight(sim *Simulation, party *Party, player *Player) Aura {
+	const bonus = 34
+	for _, p := range party.Players {
+		p.Stats[StatSpellPower] += bonus
+	}
+	return Aura{
+		ID: MagicIDEyeOfTheNight,
 	}
 }
 
@@ -795,87 +734,6 @@ func ActivateSkyshatterImpLB(sim *Simulation, party *Party, player *Player) Aura
 	}
 }
 
-func TryActivateDestructionPotion(sim *Simulation, party *Party, player *Player) {
-
-	// TODO: add destruction potions
-
-	// if !sim.Options.Consumes.DestructionPotion || player.IsOnCD(MagicIDPotion, sim.CurrentTime) {
-	// 	return
-	// }
-
-	// // Only use dest potion if not using mana or if we haven't used it once.
-	// // If we are using mana, only use destruction potion on the pull.
-	// if sim.cache.destructionPotion && sim.Options.Consumes.SuperManaPotion {
-	// 	return
-	// }
-
-	// const spBonus = 120
-	// const critBonus = 44.16
-	// const dur = time.Second * 15
-
-	// sim.cache.destructionPotion = true
-	// sim.setCD(MagicIDPotion, time.Second*120)
-	// player.Stats[StatSpellPower] += spBonus
-	// player.Stats[StatSpellCrit] += critBonus
-
-	// player.AddAura(sim, Aura{
-	// 	ID:      MagicIDDestructionPotion,
-	// 	Expires: sim.CurrentTime + dur,
-	// 	OnExpire: func(sim *Simulation, player *Player, c *Cast) {
-	// 		player.Stats[StatSpellPower] -= spBonus
-	// 		player.Stats[StatSpellCrit] -= critBonus
-	// 	},
-	// })
-}
-
-// TODO: This function doesn't really belong in auras.go, find a better home for it.
-func TryActivateDarkRune(sim *Simulation, party *Party, player *Player) {
-	if !player.Consumes.DarkRune || player.IsOnCD(MagicIDRune, sim.CurrentTime) {
-		return
-	}
-
-	// Only pop if we have less than the max mana provided by the potion minus 1mp5 tick.
-	totalRegen := player.manaRegenPerSecond() * 5
-	if player.Stats[StatMana]-(player.Stats[StatMana]+totalRegen) < 1500 {
-		return
-	}
-
-	// Restores 900 to 1500 mana. (2 Min Cooldown)
-	player.Stats[StatMana] += 900 + (sim.Rando.Float64() * 600)
-	player.SetCD(MagicIDRune, time.Second*120+sim.CurrentTime)
-	if sim.Debug != nil {
-		sim.Debug("Used Dark Rune\n")
-	}
-	return
-}
-
-// TODO: This function doesn't really belong in auras.go, find a better home for it.
-func TryActivateSuperManaPotion(sim *Simulation, party *Party, player *Player) {
-	if !player.Consumes.SuperManaPotion || player.IsOnCD(MagicIDPotion, sim.CurrentTime) {
-		return
-	}
-
-	// Only pop if we have less than the max mana provided by the potion minus 1mp5 tick.
-	totalRegen := player.manaRegenPerSecond() * 5
-	if player.Stats[StatMana]-(player.Stats[StatMana]+totalRegen) < 3000 {
-		return
-	}
-
-	// Restores 1800 to 3000 mana. (2 Min Cooldown)
-	manaGain := 1800 + (sim.Rando.Float64() * 1200)
-
-	if player.HasAura(MagicIDAlchStone) {
-		manaGain *= 1.4
-	}
-
-	player.Stats[StatMana] += manaGain
-	player.SetCD(MagicIDPotion, time.Second*120+sim.CurrentTime)
-	if sim.Debug != nil {
-		sim.Debug("Used Mana Potion\n")
-	}
-	return
-}
-
 func ActivateSextant(sim *Simulation, party *Party, player *Player) Aura {
 	icd := NewICD()
 	const spellBonus = 190.0
@@ -885,6 +743,9 @@ func ActivateSextant(sim *Simulation, party *Party, player *Player) Aura {
 		ID:      MagicIDSextant,
 		Expires: NeverExpires,
 		OnSpellHit: func(sim *Simulation, player *Player, c *Cast) {
+			if c.Spell.ID == MagicIDTLCLB {
+				return // TLC can't proc Sextant
+			}
 			if c.DidCrit && !icd.isOnCD(sim) && sim.Rando.Float64() < 0.2 {
 				icd = InternalCD(sim.CurrentTime + icdDur)
 				player.Stats[StatSpellPower] += spellBonus
@@ -959,7 +820,7 @@ func ActivateFathomBrooch(sim *Simulation, party *Party, player *Player) Aura {
 			if icd.isOnCD(sim) {
 				return
 			}
-			if c.Spell.DamageType != DamageTypeNature {
+			if c.Spell.DamageType != StatNatureSpellPower {
 				return
 			}
 			if sim.Rando.Float64() < 0.15 {

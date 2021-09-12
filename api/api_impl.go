@@ -159,7 +159,90 @@ func sampleFromDpsHist(hist map[int]int, histNumSamples int) int {
 	panic("Invalid dps histogram")
 }
 
-func createConsumes(c *Consumes) core.Consumes {
+func runSimulationImpl(request *IndividualSimRequest) *IndividualSimResult {
+
+	player := core.NewPlayer(convertEquip(request.Player.Equipment), core.RaceBonusType(request.Player.Options.Race), convertConsumes(request.Player.Options.Consumes))
+
+	// TODO: should this be moved into the player constructor?
+	for k, v := range request.Player.CustomStats {
+		player.Stats[k] += v
+	}
+
+	party := &core.Party{
+		Players: []core.PlayerAgent{
+			{Player: player},
+		},
+	}
+
+	var agent core.Agent
+	switch v := request.Player.Options.Class.(type) {
+	case *PlayerOptions_Shaman:
+		talents := convertShamTalents(v.Shaman.Spec)
+		totems := convertTotems(request.Buffs)
+		agent = shaman.NewShaman(player, party, talents, totems, int(v.Shaman.AgentType), v.Shaman.AgentOptions)
+	default:
+		panic("class not supported")
+	}
+
+	party.Players[0].Agent = agent
+	raid := &core.Raid{Parties: []*core.Party{party}}
+
+	options := core.Options{
+		Encounter: core.Encounter{
+			Duration:   request.Encounter.Duration,
+			NumTargets: int(request.Encounter.NumTargets),
+			Armor:      request.Encounter.TargetArmor,
+		},
+		Iterations: request.Iterations,
+		RSeed:      request.RandomSeed,
+		ExitOnOOM:  request.ExitOnOom,
+		GCDMin:     time.Duration(request.GcdMin),
+		Debug:      request.Debug,
+	}
+
+	buffs := convertBuffs(request.Buffs)
+	sim := runner.SetupSim(raid, buffs, options)
+
+	result := runner.RunIndividualSim(sim, options)
+
+	isr := &IndividualSimResult{
+		DpsAvg:              result.DpsAvg,
+		DpsStdev:            result.DpsStDev,
+		DpsHist:             result.DpsHist,
+		Logs:                result.Logs,
+		DpsMax:              result.DpsMax,
+		ExecutionDurationMs: result.ExecutionDurationMs,
+		NumOom:              int32(result.NumOom),
+		OomAtAvg:            result.OomAtAvg,
+		DpsAtOomAvg:         result.DpsAtOomAvg,
+		// TODO: convert casts
+	}
+	return isr
+}
+
+func convertTotems(inBuff *Buffs) shaman.Totems {
+	return shaman.Totems{
+		TotemOfWrath: int(inBuff.TotemOfWrath),
+		WrathOfAir:   inBuff.WrathOfAir,
+		ManaStream:   inBuff.ManaStream,
+	}
+}
+
+func convertShamTalents(t *Shaman_ShamanSpec) shaman.Talents {
+	return shaman.Talents{
+		LightningOverload:  int(t.LightningOverload),
+		ElementalPrecision: int(t.ElementalPrecision),
+		NaturesGuidance:    int(t.NaturesGuidance),
+		TidalMastery:       int(t.TidalMastery),
+		ElementalMastery:   t.ElementalMastery,
+		UnrelentingStorm:   int(t.UnrelentingStorm),
+		CallOfThunder:      int(t.CallOfThunder),
+		Convection:         int(t.Convection),
+		Concussion:         int(t.Concussion),
+	}
+}
+
+func convertConsumes(c *Consumes) core.Consumes {
 	cconsume := core.Consumes{
 		BrilliantWizardOil:       c.BrilliantWizardOil,
 		MajorMageblood:           c.MajorMageblood,
@@ -175,63 +258,20 @@ func createConsumes(c *Consumes) core.Consumes {
 	return cconsume
 }
 
-func runSimulationImpl(request *IndividualSimRequest) *IndividualSimResult {
+func convertEquip(es *EquipmentSpec) core.EquipmentSpec {
+	coreEquip := core.EquipmentSpec{}
 
-	player := core.NewPlayer(core.EquipmentSpec{}, core.RaceBonusType(request.Player.Options.Race), createConsumes(request.Player.Options.Consumes))
+	for i, item := range es.Items {
+		spec := core.ItemSpec{
+			ID: item.Id,
+		}
+		spec.Gems = item.Gems
+		spec.Enchant = item.Enchant
 
-	// TODO: should this be moved into the player constructor?
-	for k, v := range request.Player.CustomStats {
-		player.Stats[k] += v
+		coreEquip[i] = spec
 	}
 
-	var agent core.Agent
-	switch v := request.Player.Options.Class.(type) {
-	case *PlayerOptions_Shaman:
-		agent = shaman.NewShaman(player, int(v.Shaman.AgentType), v.Shaman.AgentOptions)
-	default:
-		panic("class not supported")
-	}
-
-	raid := &core.Raid{
-		Parties: []*core.Party{
-			{
-				Players: []core.PlayerAgent{
-					{Player: player, Agent: agent},
-				},
-			},
-		},
-	}
-
-	options := core.Options{
-		Encounter: core.Encounter{
-			Duration:   request.Encounter.Duration,
-			NumTargets: int(request.Encounter.NumTargets),
-			Armor:      request.Encounter.TargetArmor,
-		},
-		Iterations: request.Iterations,
-		RSeed:      request.RandomSeed,
-		ExitOnOOM:  request.ExitOnOom,
-		GCDMin:     time.Duration(request.GcdMin),
-		Debug:      request.Debug,
-	}
-
-	isr := &IndividualSimResult{
-		// ExecutionDurationMs int64                 `protobuf:"varint,1,opt,name=execution_duration_ms,json=executionDurationMs,proto3" json:"execution_duration_ms,omitempty"`
-		// Logs                string                `protobuf:"bytes,2,opt,name=logs,proto3" json:"logs,omitempty"`
-		// DpsAvg              float64               `protobuf:"fixed64,3,opt,name=dps_avg,json=dpsAvg,proto3" json:"dps_avg,omitempty"`
-		// DpsStdev            float64               `protobuf:"fixed64,4,opt,name=dps_stdev,json=dpsStdev,proto3" json:"dps_stdev,omitempty"`
-		// DpsMax              float64               `protobuf:"fixed64,5,opt,name=dps_max,json=dpsMax,proto3" json:"dps_max,omitempty"`
-		// DpsHist             map[int32]int32       `protobuf:"bytes,6,rep,name=dps_hist,json=dpsHist,proto3" json:"dps_hist,omitempty" protobuf_key:"varint,1,opt,name=key,proto3" protobuf_val:"varint,2,opt,name=value,proto3"`
-		// NumOom              int32                 `protobuf:"varint,7,opt,name=num_oom,json=numOom,proto3" json:"num_oom,omitempty"`
-		// OomAtAvg            float64               `protobuf:"fixed64,8,opt,name=oom_at_avg,json=oomAtAvg,proto3" json:"oom_at_avg,omitempty"`
-		// DpsAtOomAvg         float64               `protobuf:"fixed64,9,opt,name=dps_at_oom_avg,json=dpsAtOomAvg,proto3" json:"dps_at_oom_avg,omitempty"`
-		// Casts               map[int32]*CastMetric `protobuf:"bytes,10,rep,name=casts,proto3" json:"casts,omitempty" protobuf_key:"varint,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
-	}
-
-	buffs := convertBuffs(request.Buffs)
-	runner.RunSim(raid, buffs, options)
-
-	return isr
+	return coreEquip
 }
 
 func convertBuffs(inBuff *Buffs) core.Buffs {

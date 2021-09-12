@@ -46,36 +46,17 @@ func AuraLightningOverload(lvl int) core.Aura {
 				// Don't set IsClBounce even if this is a bounce, so that the clone does a normal CL and bounces
 				clone.IsLO = true
 				clone.Spell = c.Spell
+
+				// Clone dmg/hit/crit chance?
+				clone.Hit = c.Hit
+				clone.Crit = c.Crit
+				clone.Dmg = c.Dmg
+
 				clone.CritBonus = c.CritBonus
 				clone.Effect = loDmgMod
-				sim.Cast(p, clone)
+				c.DoItNow(sim, p, nil, clone)
 			}
 		},
-	}
-}
-
-func elementalFocusOnCast(sim *core.Simulation, player *core.Player, c *core.Cast) {
-	c.ManaCost *= .6 // reduced by 40%
-}
-
-func elementalFocusOnCastComplete(sim *core.Simulation, player *core.Player, c *core.Cast) {
-	if c.ManaCost <= 0 {
-		return // Don't consume charges from free spells.
-	}
-
-	player.Auras[core.MagicIDEleFocus].Stacks--
-	if player.Auras[core.MagicIDEleFocus].Stacks == 0 {
-		player.RemoveAura(sim, player, core.MagicIDEleFocus)
-	}
-}
-
-func AuraElementalFocus(sim *core.Simulation) core.Aura {
-	return core.Aura{
-		ID:             core.MagicIDEleFocus,
-		Expires:        sim.CurrentTime + time.Second*15,
-		Stacks:         2,
-		OnCast:         elementalFocusOnCast,
-		OnCastComplete: elementalFocusOnCastComplete,
 	}
 }
 
@@ -88,30 +69,15 @@ func TryActivateEleMastery(sim *core.Simulation, player *core.Player) {
 		ID:      core.MagicIDEleMastery,
 		Expires: core.NeverExpires,
 		OnCast: func(sim *core.Simulation, p *core.Player, c *core.Cast) {
-			if c.Spell.ID != core.MagicIDTLCLB {
-				c.ManaCost = 0
-			}
+			c.ManaCost = 0
+			c.Crit += 1.01
 		},
 		OnCastComplete: func(sim *core.Simulation, p *core.Player, c *core.Cast) {
-			c.Crit += 1.01 // 101% chance of crit
 			// Remove the buff and put skill on CD
-			p.SetCD(core.MagicIDEleMastery, time.Second*180)
+			p.SetCD(core.MagicIDEleMastery, time.Second*180+sim.CurrentTime)
 			p.RemoveAura(sim, p, core.MagicIDEleMastery)
 		},
 	})
-}
-
-// TODO: Need to make this always active... (need a new magic ID)
-//  can we have a 'pre-cast' function on agent?
-func AuraElementalFocus2(sim *core.Simulation) core.Aura {
-	// if cast.Spell.ID != core.MagicIDTLCLB {
-	// 	// TLC does not proc focus.
-	// 	player.addAura(AuraElementalFocus(sim))
-	// }
-	return core.Aura{
-		ID:      core.MagicIDEleFocus,
-		Expires: core.NeverExpires,
-	}
 }
 
 // ################################################################
@@ -121,8 +87,8 @@ type LBOnlyAgent struct {
 	lb *core.Spell
 }
 
-func (agent *LBOnlyAgent) ChooseAction(p *Shaman, sim *core.Simulation) core.AgentAction {
-	return NewCastAction(sim, p, agent.lb)
+func (agent *LBOnlyAgent) ChooseAction(s *Shaman, party *core.Party, sim *core.Simulation) core.AgentAction {
+	return NewCastAction(sim, s, agent.lb)
 }
 
 func (agent *LBOnlyAgent) OnActionAccepted(p *Shaman, sim *core.Simulation, action core.AgentAction) {
@@ -235,12 +201,12 @@ type CLOnClearcastAgent struct {
 	cl *core.Spell
 }
 
-func (agent *CLOnClearcastAgent) ChooseAction(p *Shaman, sim *core.Simulation) core.AgentAction {
-	if p.IsOnCD(core.MagicIDCL6, sim.CurrentTime) || !agent.prevPrevCastProccedCC {
-		return core.AgentAction{}
+func (agent *CLOnClearcastAgent) ChooseAction(s *Shaman, party *core.Party, sim *core.Simulation) core.AgentAction {
+	if s.IsOnCD(core.MagicIDCL6, sim.CurrentTime) || !agent.prevPrevCastProccedCC {
+		return NewCastAction(sim, s, agent.lb)
 	}
 
-	return NewCastAction(sim, p, agent.cl)
+	return NewCastAction(sim, s, agent.cl)
 }
 
 func (agent *CLOnClearcastAgent) OnActionAccepted(p *Shaman, sim *core.Simulation, action core.AgentAction) {
@@ -313,7 +279,7 @@ func (agent *AdaptiveAgent) takeSnapshot(sim *core.Simulation) {
 	agent.numSnapshots++
 }
 
-func (agent *AdaptiveAgent) ChooseAction(s *Shaman, sim *core.Simulation) core.AgentAction {
+func (agent *AdaptiveAgent) ChooseAction(s *Shaman, party *core.Party, sim *core.Simulation) core.AgentAction {
 	agent.purgeExpiredSnapshots(sim)
 	oldestSnapshot := agent.getOldestSnapshot()
 
@@ -331,11 +297,16 @@ func (agent *AdaptiveAgent) ChooseAction(s *Shaman, sim *core.Simulation) core.A
 		sim.Debug("[AI] CL Ready: Mana/s: %0.1f, Est Mana Cost: %0.1f, CurrentMana: %0.1f\n", manaSpendingRate, projectedManaCost, s.Stats[core.StatMana])
 	}
 
+	TryActivateBloodlust(sim, party, s.Player)
+	if s.Talents.ElementalMastery {
+		TryActivateEleMastery(sim, s.Player)
+	}
+
 	// If we have enough mana to burn, use the surplus agent.
 	if projectedManaCost < s.Stats[core.StatMana] {
-		return agent.surplusAgent.ChooseAction(s, sim)
+		return agent.surplusAgent.ChooseAction(s, party, sim)
 	} else {
-		return agent.baseAgent.ChooseAction(s, sim)
+		return agent.baseAgent.ChooseAction(s, party, sim)
 	}
 }
 func (agent *AdaptiveAgent) OnActionAccepted(p *Shaman, sim *core.Simulation, action core.AgentAction) {
@@ -378,35 +349,30 @@ func NewAdaptiveAgent(sim *core.Simulation) *AdaptiveAgent {
 	return agent
 }
 
-// NewCastAction is how a shaman creates a new spell
-//  TODO: Decide if we need separate functions for elemental and enhancement?
-func NewCastAction(sim *core.Simulation, player *Shaman, sp *core.Spell) core.AgentAction {
-	cast := core.NewCast(sim, sp)
+// ChainCast is how to cast chain lightning.
+func ChainCast(sim *core.Simulation, p *core.Player, a core.Agent, cast *core.Cast) {
+	core.DirectCast(sim, p, a, cast) // Start with a normal direct cast to start.
 
-	itsElectric := sp.ID == core.MagicIDCL6 || sp.ID == core.MagicIDLB12
-	castTime := cast.CastTime
-
-	if itsElectric {
-		cast.ManaCost *= 1 - (0.02 * float64(player.Talents.Convection))
-
-		// TODO: Add LightningMastery to talent list
-		castTime -= time.Millisecond * 500 // Talent Lightning Mastery
+	// Now chain
+	dmgCoeff := 1.0
+	if cast.IsLO {
+		dmgCoeff = 0.5
 	}
-	// Apply any on cast effects.
-	for _, id := range player.ActiveAuraIDs {
-		if player.Auras[id].OnCast != nil {
-			player.Auras[id].OnCast(sim, player.Player, cast)
+	for i := 1; i < sim.Options.Encounter.NumTargets; i++ {
+		if p.HasAura(core.MagicIDTidefury) {
+			dmgCoeff *= 0.83
+		} else {
+			dmgCoeff *= 0.7
 		}
-	}
-	if itsElectric {
-		// This is written this way to deal with making CSD dmg increase correct.
-		cast.CritBonus *= 2 // This handles the 'Elemental Fury' talent which increases the crit bonus.
-		cast.CritBonus -= 1 // reduce to multiplier instead of percent.
-	}
-	cast.CastTime = time.Duration(float64(castTime) / player.HasteBonus())
-
-	return core.AgentAction{
-		Wait: 0,
-		Cast: cast,
+		clone := &core.Cast{
+			IsLO:       cast.IsLO,
+			IsClBounce: true,
+			Spell:      cast.Spell,
+			Crit:       cast.Crit,
+			CritBonus:  cast.CritBonus,
+			Effect:     func(sim *core.Simulation, p *core.Player, c *core.Cast) { cast.DidDmg *= dmgCoeff },
+			DoItNow:    core.DirectCast,
+		}
+		clone.DoItNow(sim, p, a, clone)
 	}
 }

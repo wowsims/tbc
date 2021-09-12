@@ -13,14 +13,17 @@ type Agent interface {
 	// Any pre-start buffs to apply to the raid/party/self
 	BuffUp(*Simulation, *Party)
 
+	// Returns this Agent to its initial state.
+	Reset(newsim *Simulation)
+
 	// Returns the action this Agent would like to take next.
-	ChooseAction(*Simulation) AgentAction
+	ChooseAction(*Simulation, *Party) AgentAction
 
 	// This will be invoked if the chosen action is actually executed, so the Agent can update its state.
 	OnActionAccepted(*Simulation, AgentAction)
 
-	// Returns this Agent to its initial state.
-	Reset(newsim *Simulation)
+	// OnSpellHit is used by class agents to customize casts before actually applying the damage.
+	OnSpellHit(*Simulation, *Player, *Cast)
 }
 
 // A single action that an Agent can take.

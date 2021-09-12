@@ -113,6 +113,9 @@ func (st Stats) Print() string {
 		if name == "none" {
 			continue
 		}
+		if v == 0 {
+			continue
+		}
 		if printed {
 			printed = false
 			output += ",\n"
@@ -141,19 +144,12 @@ func (s Stats) CalculatedTotal() Stats {
 
 // CalculateTotalStats will take a set of equipment and options and add all stats/buffs/etc together
 func CalculateTotalStats(race RaceBonusType, e Equipment, c Consumes) Stats {
-	gearStats := e.Stats()
 	stats := BaseStats(race)
+	gearStats := e.Stats()
 	for i := range stats {
 		stats[i] += gearStats[i]
 	}
-
-	stats = c.AddStats(stats)
-
-	stats = stats.CalculatedTotal()
-	// Add stat increases from talents
-	// stats[StatMP5] += stats[StatInt] * (0.02 * float64(o.Talents.UnrelentingStorm)
-
-	return stats
+	return c.AddStats(stats)
 }
 
 // TODO: This probably should be moved into each class because they all have different base stats.

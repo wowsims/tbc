@@ -232,22 +232,9 @@ type Equipment [EquipRanged + 1]Item
 
 // Structs used for looking up items/gems/enchants
 type ItemSpec struct {
-	// Only name or ID needs to be set, not both
-	Name string
-	ID   int32
-
-	Enchant EnchantSpec
-	Gems    []GemSpec
-}
-type GemSpec struct {
-	// Only name or ID needs to be set, not both
-	Name string
-	ID   int32
-}
-type EnchantSpec struct {
-	// Only name or ID needs to be set, not both
-	Name string
-	ID   int32
+	ID      int32
+	Enchant int32
+	Gems    []int32
 }
 type EquipmentSpec [EquipRanged + 1]ItemSpec
 
@@ -256,48 +243,34 @@ func NewEquipmentSet(equipSpec EquipmentSpec) Equipment {
 
 	for _, itemSpec := range equipSpec {
 		item := Item{}
-		if foundItem, ok := ItemsByName[itemSpec.Name]; ok {
-			item = foundItem
-		} else if foundItem, ok := ItemsByID[itemSpec.ID]; ok {
+		if foundItem, ok := ItemsByID[itemSpec.ID]; ok {
 			item = foundItem
 		} else {
-			if itemSpec.Name != "" {
-				panic("No item with name: " + itemSpec.Name)
-			} else if itemSpec.ID != 0 {
+			if itemSpec.ID != 0 {
 				panic(fmt.Sprintf("No item with id: %d", itemSpec.ID))
 			}
 			continue
 		}
 
-		if itemSpec.Enchant.Name != "" {
-			if enchant, ok := EnchantsByName[itemSpec.Enchant.Name]; ok {
+		if itemSpec.Enchant != 0 {
+			if enchant, ok := EnchantsByID[itemSpec.Enchant]; ok {
 				item.Enchant = enchant
 			} else {
-				panic("No enchant with name: " + itemSpec.Enchant.Name)
-			}
-		} else if itemSpec.Enchant.ID != 0 {
-			if enchant, ok := EnchantsByID[itemSpec.Enchant.ID]; ok {
-				item.Enchant = enchant
-			} else {
-				panic(fmt.Sprintf("No enchant with id: %d", itemSpec.Enchant.ID))
+				panic(fmt.Sprintf("No enchant with id: %d", itemSpec.Enchant))
 			}
 		}
 
 		if len(itemSpec.Gems) > 0 {
 			item.Gems = make([]Gem, len(item.GemSlots))
-			for gemIdx, gemSpec := range itemSpec.Gems {
+			for gemIdx, gemID := range itemSpec.Gems {
 				if gemIdx >= len(item.GemSlots) {
 					break // in case we get invalid gem settings.
 				}
-				if gem, ok := GemsByName[gemSpec.Name]; ok {
-					item.Gems[gemIdx] = gem
-				} else if gem, ok := GemsByID[gemSpec.ID]; ok {
+				if gem, ok := GemsByID[gemID]; ok {
 					item.Gems[gemIdx] = gem
 				} else {
-					if gemSpec.Name != "" {
-						panic("No gem with name: " + gemSpec.Name)
-					} else if gemSpec.ID != 0 {
-						panic(fmt.Sprintf("No gem with id: %d", gemSpec.ID))
+					if gemID != 0 {
+						panic(fmt.Sprintf("No gem with id: %d", gemID))
 					}
 				}
 			}
@@ -399,155 +372,159 @@ func (e Equipment) Stats() Stats {
 
 var items = []Item{
 	// source: https://docs.google.com/spreadsheets/d/1X-XO9N1_MPIq-UIpTN13LrhXRoho9fe26YEEM48QmPk/edit#gid=2035379487
-	{ID: 27471, Slot: EquipHead, Name: "Gladiator's Mail Helm", Phase: 1, Quality: ItemQualityEpic, SourceZone: "Arena Season 1 Reward", SourceDrop: "", Stats: Stats{15, 54, 18, 0, 37}, GemSlots: []GemColor{0x1, 0x2}},
-	{ID: 24266, Slot: EquipHead, Name: "Spellstrike Hood", Phase: 1, Quality: ItemQualityEpic, SourceZone: "Tailoring BoE", SourceDrop: "", Stats: Stats{12, 16, 24, 16, 46}, GemSlots: []GemColor{0x2, 0x4, 0x3}, SocketBonus: Stats{StatStamina: 6}},
-	{ID: 28278, Slot: EquipHead, Name: "Incanter's Cowl", Phase: 1, Quality: ItemQualityRare, SourceZone: "Mech - Pathaleon the Calculator", SourceDrop: "", Stats: Stats{27, 15, 19, 0, 29}, GemSlots: []GemColor{0x1, 0x4}},
+	{ID: 27471, Slot: EquipHead, Name: "Gladiator's Mail Helm", Phase: 1, Quality: ItemQualityEpic, SourceZone: "Arena Season 1 Reward", SourceDrop: "", Stats: Stats{StatIntellect: 15, StatStamina: 54, StatSpellCrit: 18, StatSpellPower: 37}, GemSlots: []GemColor{0x1, 0x2}},
+	{ID: 24266, Slot: EquipHead, Name: "Spellstrike Hood", Phase: 1, Quality: ItemQualityEpic, SourceZone: "Tailoring BoE", SourceDrop: "", Stats: Stats{StatIntellect: 12, StatStamina: 16, StatSpellCrit: 24, StatSpellHit: 16, StatSpellPower: 46}, GemSlots: []GemColor{0x2, 0x4, 0x3}, SocketBonus: Stats{StatStamina: 6}},
+	{ID: 28278, Slot: EquipHead, Name: "Incanter's Cowl", Phase: 1, Quality: ItemQualityRare, SourceZone: "Mech - Pathaleon the Calculator", SourceDrop: "", Stats: Stats{StatIntellect: 27, StatStamina: 15, StatSpellCrit: 19, StatSpellPower: 29}, GemSlots: []GemColor{0x1, 0x4}},
 	{ID: 31330, Slot: EquipHead, Name: "Lightning Crown", Phase: 1, Quality: ItemQualityEpic, SourceZone: "BoE World Drop", SourceDrop: "", Stats: Stats{0, 0, 43, 0, 66}},
-	{ID: 28415, Slot: EquipHead, Name: "Hood of Oblivion", Phase: 1, Quality: ItemQualityRare, SourceZone: "Arc - Harbinger Skyriss", SourceDrop: "", Stats: Stats{32, 27, 0, 0, 40}, GemSlots: []GemColor{0x1, 0x3}, SocketBonus: Stats{StatSpellPower: 5}},
-	{ID: 28758, Slot: EquipHead, Name: "Exorcist's Mail Helm", Phase: 1, Quality: ItemQualityRare, SourceZone: "18 Spirit Shards", SourceDrop: "", Stats: Stats{16, 30, 24, 0, 29}, GemSlots: []GemColor{0x1}, SocketBonus: Stats{StatSpellCrit: 3}},
-	{ID: 28349, Slot: EquipHead, Name: "Tidefury Helm", Phase: 1, Quality: ItemQualityRare, SourceZone: "Bot - Warp Splinter", SourceDrop: "", Stats: Stats{26, 32, 0, 0, 32, 0, 6}, GemSlots: []GemColor{0x1, 0x4}, SocketBonus: Stats{StatIntellect: 4}},
-	{ID: 29504, Slot: EquipHead, Name: "Windscale Hood", Phase: 1, Quality: ItemQualityEpic, SourceZone: "Leatherworking BoE", SourceDrop: "", Stats: Stats{18, 16, 37, 0, 44, 0, 10}},
-	{ID: 31107, Slot: EquipHead, Name: "Shamanistic Helmet of Second Sight", Phase: 1, Quality: ItemQualityRare, SourceZone: "Teron Gorfiend, I am... - SMV Quest", SourceDrop: "", Stats: Stats{15, 12, 24, 0, 35, 0, 4}, GemSlots: []GemColor{0x4, 0x3, 0x3}, SocketBonus: Stats{StatSpellPower: 5}},
-	{ID: 28193, Slot: EquipHead, Name: "Mana-Etched Crown", Phase: 1, Quality: ItemQualityRare, SourceZone: "BM - Aeonus", SourceDrop: "", Stats: Stats{20, 27, 0, 0, 34}, GemSlots: []GemColor{0x1, 0x2}},
-	{ID: 28169, Slot: EquipHead, Name: "Mag'hari Ritualist's Horns", Phase: 1, Quality: ItemQualityRare, SourceZone: "Hero of the Mag'har - Nagrand quest (Horde)", SourceDrop: "", Stats: Stats{16, 18, 15, 12, 50}},
-	{ID: 27488, Slot: EquipHead, Name: "Mage-Collar of the Firestorm", Phase: 1, Quality: ItemQualityRare, SourceZone: "H BF - The Maker", SourceDrop: "", Stats: Stats{33, 32, 23, 0, 39}},
-	{ID: 30297, Slot: EquipHead, Name: "Circlet of the Starcaller", Phase: 1, Quality: ItemQualityRare, SourceZone: "Dimensius the All-Devouring - NS Quest", SourceDrop: "", Stats: Stats{18, 27, 18, 0, 47}},
-	{ID: 27993, Slot: EquipHead, Name: "Mask of Inner Fire", Phase: 1, Quality: ItemQualityRare, SourceZone: "BM - Chrono Lord Deja", SourceDrop: "", Stats: Stats{33, 30, 22, 0, 37}},
-	{ID: 30946, Slot: EquipHead, Name: "Mooncrest Headdress", Phase: 1, Quality: ItemQualityUncommon, SourceZone: "Blast the Infernals! - SMV Quest", SourceDrop: "", Stats: Stats{16, 0, 21, 0, 44}},
+	{ID: 28415, Slot: EquipHead, Name: "Hood of Oblivion", Phase: 1, Quality: ItemQualityRare, SourceZone: "Arc - Harbinger Skyriss", SourceDrop: "", Stats: Stats{StatIntellect: 32, StatStamina: 27, StatSpellPower: 40}, GemSlots: []GemColor{0x1, 0x3}, SocketBonus: Stats{StatSpellPower: 5}},
+	{ID: 28758, Slot: EquipHead, Name: "Exorcist's Mail Helm", Phase: 1, Quality: ItemQualityRare, SourceZone: "18 Spirit Shards", SourceDrop: "", Stats: Stats{StatIntellect: 16, StatStamina: 30, StatSpellCrit: 24, StatSpellPower: 29}, GemSlots: []GemColor{0x1}, SocketBonus: Stats{StatSpellCrit: 3}},
+	{ID: 28349, Slot: EquipHead, Name: "Tidefury Helm", Phase: 1, Quality: ItemQualityRare, SourceZone: "Bot - Warp Splinter", SourceDrop: "", Stats: Stats{StatIntellect: 26, StatStamina: 32, StatSpellPower: 32, StatMP5: 6}, GemSlots: []GemColor{0x1, 0x4}, SocketBonus: Stats{StatIntellect: 4}},
+	{ID: 29504, Slot: EquipHead, Name: "Windscale Hood", Phase: 1, Quality: ItemQualityEpic, SourceZone: "Leatherworking BoE", SourceDrop: "", Stats: Stats{StatIntellect: 18, StatStamina: 16, StatSpellCrit: 37, StatSpellPower: 44, StatMP5: 10}},
+	{ID: 31107, Slot: EquipHead, Name: "Shamanistic Helmet of Second Sight", Phase: 1, Quality: ItemQualityRare, SourceZone: "Teron Gorfiend, I am... - SMV Quest", SourceDrop: "", Stats: Stats{StatIntellect: 15, StatStamina: 12, StatSpellCrit: 24, StatSpellPower: 35, StatMP5: 4}, GemSlots: []GemColor{0x4, 0x3, 0x3}, SocketBonus: Stats{StatSpellPower: 5}},
+	{ID: 28193, Slot: EquipHead, Name: "Mana-Etched Crown", Phase: 1, Quality: ItemQualityRare, SourceZone: "BM - Aeonus", SourceDrop: "", Stats: Stats{StatIntellect: 20, StatStamina: 27, StatSpellPower: 34}, GemSlots: []GemColor{0x1, 0x2}},
+	{ID: 28169, Slot: EquipHead, Name: "Mag'hari Ritualist's Horns", Phase: 1, Quality: ItemQualityRare, SourceZone: "Hero of the Mag'har - Nagrand quest (Horde)", SourceDrop: "", Stats: Stats{StatIntellect: 16, StatStamina: 18, StatSpellCrit: 15, StatSpellHit: 12, StatSpellPower: 50}},
+	{ID: 27488, Slot: EquipHead, Name: "Mage-Collar of the Firestorm", Phase: 1, Quality: ItemQualityRare, SourceZone: "H BF - The Maker", SourceDrop: "", Stats: Stats{StatIntellect: 33, StatStamina: 32, StatSpellCrit: 23, StatSpellPower: 39}},
+	{ID: 30297, Slot: EquipHead, Name: "Circlet of the Starcaller", Phase: 1, Quality: ItemQualityRare, SourceZone: "Dimensius the All-Devouring - NS Quest", SourceDrop: "", Stats: Stats{StatIntellect: 18, StatStamina: 27, StatSpellCrit: 18, StatSpellPower: 47}},
+	{ID: 27993, Slot: EquipHead, Name: "Mask of Inner Fire", Phase: 1, Quality: ItemQualityRare, SourceZone: "BM - Chrono Lord Deja", SourceDrop: "", Stats: Stats{StatIntellect: 33, StatStamina: 30, StatSpellCrit: 22, StatSpellPower: 37}},
+	{ID: 30946, Slot: EquipHead, Name: "Mooncrest Headdress", Phase: 1, Quality: ItemQualityUncommon, SourceZone: "Blast the Infernals! - SMV Quest", SourceDrop: "", Stats: Stats{StatIntellect: 16, StatSpellCrit: 21, StatSpellPower: 44}},
 	{ID: 28245, Slot: EquipNeck, Name: "Pendant of Dominance", Phase: 1, Quality: ItemQualityEpic, SourceZone: "15,300 Honor & 10 EotS Marks", SourceDrop: "", Stats: Stats{StatIntellect: 12, StatStamina: 31, StatSpellPower: 26}, GemSlots: []GemColor{0x4}, SocketBonus: Stats{StatSpellCrit: 2}},
-	{ID: 28134, Slot: EquipNeck, Name: "Brooch of Heightened Potential", Phase: 1, Quality: ItemQualityRare, SourceZone: "SLabs - Blackheart the Inciter", SourceDrop: "", Stats: Stats{14, 15, 14, 9, 22}},
-	{ID: 29333, Slot: EquipNeck, Name: "Torc of the Sethekk Prophet", Phase: 1, Quality: ItemQualityRare, SourceZone: "Brother Against Brother - Auchindoun ", SourceDrop: "", Stats: Stats{18, 0, 21, 0, 19}},
-	{ID: 31692, Slot: EquipNeck, Name: "Natasha's Ember Necklace", Phase: 1, Quality: ItemQualityRare, SourceZone: "The Hound-Master - BEM Quest", SourceDrop: "", Stats: Stats{15, 0, 10, 0, 29}},
-	{ID: 28254, Slot: EquipNeck, Name: "Warp Engineer's Prismatic Chain", Phase: 1, Quality: ItemQualityRare, SourceZone: "Mech - Mechano Lord Capacitus", SourceDrop: "", Stats: Stats{18, 17, 16, 0, 19}},
-	{ID: 27758, Slot: EquipNeck, Name: "Hydra-fang Necklace", Phase: 1, Quality: ItemQualityEpic, SourceZone: "H UB - Ghaz'an", SourceDrop: "", Stats: Stats{16, 17, 0, 16, 19}},
-	{ID: 31693, Slot: EquipNeck, Name: "Natasha's Arcane Filament", Phase: 1, Quality: ItemQualityEpic, SourceZone: "The Hound-Master - BEM Quest", SourceDrop: "", Stats: Stats{10, 22, 0, 0, 29}},
-	{ID: 27464, Slot: EquipNeck, Name: "Omor's Unyielding Will", Phase: 1, Quality: ItemQualityRare, SourceZone: "H Ramps - Omar the Unscarred", SourceDrop: "", Stats: Stats{19, 19, 0, 0, 25}},
-	{ID: 31338, Slot: EquipNeck, Name: "Charlotte's Ivy", Phase: 1, Quality: ItemQualityEpic, SourceZone: "BoE World Drop", SourceDrop: "", Stats: Stats{19, 18, 0, 0, 23}},
-	{ID: 27473, Slot: EquipShoulder, Name: "Gladiator's Mail Spaulders", Phase: 1, Quality: ItemQualityEpic, SourceZone: "Arena Season 1 Reward", SourceDrop: "", Stats: Stats{17, 33, 20, 0, 22, 0, 6}, GemSlots: []GemColor{0x2, 0x4}},
-	{ID: 32078, Slot: EquipShoulder, Name: "Pauldrons of Wild Magic", Phase: 1, Quality: ItemQualityEpic, SourceZone: "H SP - Quagmirran", SourceDrop: "", Stats: Stats{28, 21, 23, 0, 33}},
-	{ID: 27796, Slot: EquipShoulder, Name: "Mana-Etched Spaulders", Phase: 1, Quality: ItemQualityRare, SourceZone: "H UB - Quagmirran", SourceDrop: "", Stats: Stats{17, 25, 16, 0, 20}, GemSlots: []GemColor{0x2, 0x4}},
-	{ID: 30925, Slot: EquipShoulder, Name: "Spaulders of the Torn-heart", Phase: 1, Quality: ItemQualityRare, SourceZone: "The Cipher of Damnation - SMV Quest", SourceDrop: "", Stats: Stats{7, 10, 18, 0, 40}},
-	{ID: 31797, Slot: EquipShoulder, Name: "Elekk Hide Spaulders", Phase: 1, Quality: ItemQualityUncommon, SourceZone: "The Fallen Exarch - Terokkar Forest Quest", SourceDrop: "", Stats: Stats{12, 0, 28, 0, 25}},
-	{ID: 27778, Slot: EquipShoulder, Name: "Spaulders of Oblivion", Phase: 1, Quality: ItemQualityRare, SourceZone: "SLabs - Murmur", SourceDrop: "", Stats: Stats{17, 25, 0, 0, 29}, GemSlots: []GemColor{0x4, 0x3}, SocketBonus: Stats{StatSpellHit: 3}},
-	{ID: 27802, Slot: EquipShoulder, Name: "Tidefury Shoulderguards", Phase: 1, Quality: ItemQualityRare, SourceZone: "SH - O'mrogg", SourceDrop: "", Stats: Stats{23, 18, 0, 0, 19, 0, 6}, GemSlots: []GemColor{0x2, 0x3}, SocketBonus: Stats{StatSpellPower: 4}},
-	{ID: 27994, Slot: EquipShoulder, Name: "Mantle of Three Terrors", Phase: 1, Quality: ItemQualityRare, SourceZone: "BM - Chrono Lord Deja", SourceDrop: "", Stats: Stats{25, 29, 0, 12, 29}},
-	{ID: 25777, Slot: EquipBack, Name: "Ogre Slayer's Cover", Phase: 1, Quality: ItemQualityRare, SourceZone: "Cho'war the Pillager - Nagrand Quest", SourceDrop: "", Stats: Stats{18, 0, 16, 0, 20}},
-	{ID: 28269, Slot: EquipBack, Name: "Baba's Cloak of Arcanistry", Phase: 1, Quality: ItemQualityRare, SourceZone: "Mech - Pathaleon the Calculator", SourceDrop: "", Stats: Stats{15, 15, 14, 0, 22}},
-	{ID: 29813, Slot: EquipBack, Name: "Cloak of Woven Energy", Phase: 1, Quality: ItemQualityRare, SourceZone: "Hitting the Motherlode - Netherstorm Quest", SourceDrop: "", Stats: Stats{13, 6, 6, 0, 29}},
-	{ID: 27981, Slot: EquipBack, Name: "Sethekk Oracle Cloak", Phase: 1, Quality: ItemQualityRare, SourceZone: "SH - Talon King Ikiss", SourceDrop: "", Stats: Stats{18, 18, 0, 12, 22}},
-	{ID: 32541, Slot: EquipBack, Name: "Terokk's Wisdom", Phase: 1, Quality: ItemQualityEpic, SourceZone: "Terokk - Skettis Summoned Boss", SourceDrop: "", Stats: Stats{16, 18, 0, 0, 33}},
-	{ID: 24252, Slot: EquipBack, Name: "Cloak of the Black Void", Phase: 1, Quality: ItemQualityRare, SourceZone: "Tailoring BoE", SourceDrop: "", Stats: Stats{11, 0, 0, 0, 35}},
-	{ID: 31140, Slot: EquipBack, Name: "Cloak of Entropy", Phase: 1, Quality: ItemQualityRare, SourceZone: "BoE World Drop", SourceDrop: "", Stats: Stats{11, 0, 0, 10, 25}},
-	{ID: 28379, Slot: EquipBack, Name: "Sergeant's Heavy Cape", Phase: 1, Quality: ItemQualityEpic, SourceZone: "9,435 Honor & 20 AB Marks", SourceDrop: "", Stats: Stats{12, 33, 0, 0, 26}},
-	{ID: 27469, Slot: EquipChest, Name: "Gladiator's Mail Armor", Phase: 1, Quality: ItemQualityEpic, SourceZone: "Arena Season 1 Reward", SourceDrop: "", Stats: Stats{23, 42, 23, 0, 32, 0, 7}, GemSlots: []GemColor{0x2, 0x4, 0x4}, SocketBonus: Stats{StatSpellCrit: 4}},
-	{ID: 31340, Slot: EquipChest, Name: "Will of Edward the Odd", Phase: 1, Quality: ItemQualityEpic, SourceZone: "BoE World Drop", SourceDrop: "", Stats: Stats{30, 0, 30, 0, 53}},
-	{ID: 29129, Slot: EquipChest, Name: "Anchorite's Robe", Phase: 1, Quality: ItemQualityEpic, SourceZone: "The Aldor - Honored", SourceDrop: "", Stats: Stats{38, 16, 0, 0, 29, 0, 18}, GemSlots: []GemColor{0x4, 0x4, 0x3}},
-	{ID: 28231, Slot: EquipChest, Name: "Tidefury Chestpiece", Phase: 1, Quality: ItemQualityRare, SourceZone: "Arc - Harbinger Skyriss", SourceDrop: "", Stats: Stats{22, 28, 0, 10, 36, 0, 4}, GemSlots: []GemColor{0x4, 0x4, 0x3}, SocketBonus: Stats{StatSpellPower: 5}},
+	{ID: 28134, Slot: EquipNeck, Name: "Brooch of Heightened Potential", Phase: 1, Quality: ItemQualityRare, SourceZone: "SLabs - Blackheart the Inciter", SourceDrop: "", Stats: Stats{StatIntellect: 14, StatStamina: 15, StatSpellCrit: 14, StatSpellHit: 9, StatSpellPower: 22}},
+	{ID: 29333, Slot: EquipNeck, Name: "Torc of the Sethekk Prophet", Phase: 1, Quality: ItemQualityRare, SourceZone: "Brother Against Brother - Auchindoun ", SourceDrop: "", Stats: Stats{StatIntellect: 18, StatSpellCrit: 21, StatSpellPower: 19}},
+	{ID: 31692, Slot: EquipNeck, Name: "Natasha's Ember Necklace", Phase: 1, Quality: ItemQualityRare, SourceZone: "The Hound-Master - BEM Quest", SourceDrop: "", Stats: Stats{StatIntellect: 15, StatSpellCrit: 10, StatSpellPower: 29}},
+	{ID: 28254, Slot: EquipNeck, Name: "Warp Engineer's Prismatic Chain", Phase: 1, Quality: ItemQualityRare, SourceZone: "Mech - Mechano Lord Capacitus", SourceDrop: "", Stats: Stats{StatIntellect: 18, StatStamina: 17, StatSpellCrit: 16, StatSpellPower: 19}},
+	{ID: 27758, Slot: EquipNeck, Name: "Hydra-fang Necklace", Phase: 1, Quality: ItemQualityEpic, SourceZone: "H UB - Ghaz'an", SourceDrop: "", Stats: Stats{StatIntellect: 16, StatStamina: 17, StatSpellHit: 16, StatSpellPower: 19}},
+	{ID: 31693, Slot: EquipNeck, Name: "Natasha's Arcane Filament", Phase: 1, Quality: ItemQualityEpic, SourceZone: "The Hound-Master - BEM Quest", SourceDrop: "", Stats: Stats{StatIntellect: 10, StatStamina: 22, StatSpellPower: 29}},
+	{ID: 27464, Slot: EquipNeck, Name: "Omor's Unyielding Will", Phase: 1, Quality: ItemQualityRare, SourceZone: "H Ramps - Omar the Unscarred", SourceDrop: "", Stats: Stats{StatIntellect: 19, StatStamina: 19, StatSpellPower: 25}},
+	{ID: 31338, Slot: EquipNeck, Name: "Charlotte's Ivy", Phase: 1, Quality: ItemQualityEpic, SourceZone: "BoE World Drop", SourceDrop: "", Stats: Stats{StatIntellect: 19, StatStamina: 18, StatSpellPower: 23}},
+	{ID: 27473, Slot: EquipShoulder, Name: "Gladiator's Mail Spaulders", Phase: 1, Quality: ItemQualityEpic, SourceZone: "Arena Season 1 Reward", SourceDrop: "", Stats: Stats{StatIntellect: 17, StatStamina: 33, StatSpellCrit: 20, StatSpellPower: 22, StatMP5: 6}, GemSlots: []GemColor{0x2, 0x4}},
+	{ID: 32078, Slot: EquipShoulder, Name: "Pauldrons of Wild Magic", Phase: 1, Quality: ItemQualityEpic, SourceZone: "H SP - Quagmirran", SourceDrop: "", Stats: Stats{StatIntellect: 28, StatStamina: 21, StatSpellCrit: 23, StatSpellPower: 33}},
+	{ID: 27796, Slot: EquipShoulder, Name: "Mana-Etched Spaulders", Phase: 1, Quality: ItemQualityRare, SourceZone: "H UB - Quagmirran", SourceDrop: "", Stats: Stats{StatIntellect: 17, StatStamina: 25, StatSpellCrit: 16, StatSpellPower: 20}, GemSlots: []GemColor{0x2, 0x4}},
+	{ID: 30925, Slot: EquipShoulder, Name: "Spaulders of the Torn-heart", Phase: 1, Quality: ItemQualityRare, SourceZone: "The Cipher of Damnation - SMV Quest", SourceDrop: "", Stats: Stats{StatIntellect: 7, StatStamina: 10, StatSpellCrit: 18, StatSpellPower: 40}},
+	{ID: 31797, Slot: EquipShoulder, Name: "Elekk Hide Spaulders", Phase: 1, Quality: ItemQualityUncommon, SourceZone: "The Fallen Exarch - Terokkar Forest Quest", SourceDrop: "", Stats: Stats{StatIntellect: 12, StatSpellCrit: 28, StatSpellPower: 25}},
+	{ID: 27778, Slot: EquipShoulder, Name: "Spaulders of Oblivion", Phase: 1, Quality: ItemQualityRare, SourceZone: "SLabs - Murmur", SourceDrop: "", Stats: Stats{StatIntellect: 17, StatStamina: 25, StatSpellPower: 29}, GemSlots: []GemColor{0x4, 0x3}, SocketBonus: Stats{StatSpellHit: 3}},
+	{ID: 27802, Slot: EquipShoulder, Name: "Tidefury Shoulderguards", Phase: 1, Quality: ItemQualityRare, SourceZone: "SH - O'mrogg", SourceDrop: "", Stats: Stats{StatIntellect: 23, StatStamina: 18, StatSpellPower: 19, StatMP5: 6}, GemSlots: []GemColor{0x2, 0x3}, SocketBonus: Stats{StatSpellPower: 4}},
+	{ID: 27994, Slot: EquipShoulder, Name: "Mantle of Three Terrors", Phase: 1, Quality: ItemQualityRare, SourceZone: "BM - Chrono Lord Deja", SourceDrop: "", Stats: Stats{StatIntellect: 25, StatStamina: 29, StatSpellHit: 12, StatSpellPower: 29}},
+	{ID: 25777, Slot: EquipBack, Name: "Ogre Slayer's Cover", Phase: 1, Quality: ItemQualityRare, SourceZone: "Cho'war the Pillager - Nagrand Quest", SourceDrop: "", Stats: Stats{StatIntellect: 18, StatSpellCrit: 16, StatSpellPower: 20}},
+	{ID: 28269, Slot: EquipBack, Name: "Baba's Cloak of Arcanistry", Phase: 1, Quality: ItemQualityRare, SourceZone: "Mech - Pathaleon the Calculator", SourceDrop: "", Stats: Stats{StatIntellect: 15, StatStamina: 15, StatSpellCrit: 14, StatSpellPower: 22}},
+	{ID: 29813, Slot: EquipBack, Name: "Cloak of Woven Energy", Phase: 1, Quality: ItemQualityRare, SourceZone: "Hitting the Motherlode - Netherstorm Quest", SourceDrop: "", Stats: Stats{StatIntellect: 13, StatStamina: 6, StatSpellCrit: 6, StatSpellPower: 29}},
+	{ID: 27981, Slot: EquipBack, Name: "Sethekk Oracle Cloak", Phase: 1, Quality: ItemQualityRare, SourceZone: "SH - Talon King Ikiss", SourceDrop: "", Stats: Stats{StatIntellect: 18, StatStamina: 18, StatSpellHit: 12, StatSpellPower: 22}},
+	{ID: 32541, Slot: EquipBack, Name: "Terokk's Wisdom", Phase: 1, Quality: ItemQualityEpic, SourceZone: "Terokk - Skettis Summoned Boss", SourceDrop: "", Stats: Stats{StatIntellect: 16, StatStamina: 18, StatSpellPower: 33}},
+	{ID: 24252, Slot: EquipBack, Name: "Cloak of the Black Void", Phase: 1, Quality: ItemQualityRare, SourceZone: "Tailoring BoE", SourceDrop: "", Stats: Stats{StatIntellect: 11, StatSpellPower: 35}},
+	{ID: 31140, Slot: EquipBack, Name: "Cloak of Entropy", Phase: 1, Quality: ItemQualityRare, SourceZone: "BoE World Drop", SourceDrop: "", Stats: Stats{StatIntellect: 11, StatSpellHit: 10, StatSpellPower: 25}},
+	{ID: 28379, Slot: EquipBack, Name: "Sergeant's Heavy Cape", Phase: 1, Quality: ItemQualityEpic, SourceZone: "9,435 Honor & 20 AB Marks", SourceDrop: "", Stats: Stats{StatIntellect: 12, StatStamina: 33, StatSpellPower: 26}},
+	{ID: 27469, Slot: EquipChest, Name: "Gladiator's Mail Armor", Phase: 1, Quality: ItemQualityEpic, SourceZone: "Arena Season 1 Reward", SourceDrop: "", Stats: Stats{StatIntellect: 23, StatStamina: 42, StatSpellCrit: 23, StatSpellPower: 32, StatMP5: 7}, GemSlots: []GemColor{0x2, 0x4, 0x4}, SocketBonus: Stats{StatSpellCrit: 4}},
+	{ID: 31340, Slot: EquipChest, Name: "Will of Edward the Odd", Phase: 1, Quality: ItemQualityEpic, SourceZone: "BoE World Drop", SourceDrop: "", Stats: Stats{StatIntellect: 30, StatSpellCrit: 30, StatSpellPower: 53}},
+	{ID: 29129, Slot: EquipChest, Name: "Anchorite's Robe", Phase: 1, Quality: ItemQualityEpic, SourceZone: "The Aldor - Honored", SourceDrop: "", Stats: Stats{StatIntellect: 38, StatStamina: 16, StatSpellPower: 29, StatMP5: 18}, GemSlots: []GemColor{0x4, 0x4, 0x3}},
+	{ID: 28231, Slot: EquipChest, Name: "Tidefury Chestpiece", Phase: 1, Quality: ItemQualityRare, SourceZone: "Arc - Harbinger Skyriss", SourceDrop: "", Stats: Stats{StatIntellect: 22, StatStamina: 28, StatSpellHit: 10, StatSpellPower: 36, StatMP5: 4}, GemSlots: []GemColor{0x4, 0x4, 0x3}, SocketBonus: Stats{StatSpellPower: 5}},
 	{ID: 29341, Slot: EquipChest, Name: "Auchenai Anchorite's Robe", Phase: 1, Quality: ItemQualityRare, SourceZone: "Everything Will Be Alright - AC Quest", SourceDrop: "", Stats: Stats{StatIntellect: 24, StatSpellPower: 28, StatSpellHit: 23}, GemSlots: []GemColor{0x2, 0x4, 0x4}, SocketBonus: Stats{StatSpellCrit: 4}},
-	{ID: 28191, Slot: EquipChest, Name: "Mana-Etched Vestments", Phase: 1, Quality: ItemQualityRare, SourceZone: "OHF - Epoch Hunter", SourceDrop: "", Stats: Stats{25, 25, 17, 0, 29, 0, 0}, GemSlots: []GemColor{0x2, 0x4, 0x3}, SocketBonus: Stats{StatSpellPower: 5}},
-	{ID: 31297, Slot: EquipChest, Name: "Robe of the Crimson Order", Phase: 1, Quality: ItemQualityEpic, SourceZone: "BoE World Drop", SourceDrop: "", Stats: Stats{23, 0, 0, 30, 50, 0, 0}},
-	{ID: 28342, Slot: EquipChest, Name: "Warp Infused Drape", Phase: 1, Quality: ItemQualityRare, SourceZone: "Bot - Warp Splinter", SourceDrop: "", Stats: Stats{28, 27, 0, 12, 30, 0, 0}, GemSlots: []GemColor{0x2, 0x4, 0x3}},
-	{ID: 28232, Slot: EquipChest, Name: "Robe of Oblivion", Phase: 1, Quality: ItemQualityRare, SourceZone: "SLabs - Murmur", SourceDrop: "", Stats: Stats{20, 30, 0, 0, 40, 0, 0}, GemSlots: []GemColor{0x2, 0x4, 0x3}},
-	{ID: 28229, Slot: EquipChest, Name: "Incanter's Robe", Phase: 1, Quality: ItemQualityRare, SourceZone: "Bot - Warp Splinter", SourceDrop: "", Stats: Stats{22, 24, 8, 0, 29, 0, 0}, GemSlots: []GemColor{0x2, 0x4, 0x4}},
-	{ID: 27824, Slot: EquipChest, Name: "Robe of the Great Dark Beyond", Phase: 1, Quality: ItemQualityRare, SourceZone: "MT - Tavarok", SourceDrop: "", Stats: Stats{30, 25, 23, 0, 39, 0, 0}},
-	{ID: 28391, Slot: EquipChest, Name: "Worldfire Chestguard", Phase: 1, Quality: ItemQualityRare, SourceZone: "Arc - Dalliah the Doomsayer", SourceDrop: "", Stats: Stats{32, 33, 22, 0, 40, 0, 0}},
-	{ID: 28638, Slot: EquipWrist, Name: "General's Mail Bracers", Phase: 1, Quality: ItemQualityEpic, SourceZone: "7,548 Honor & 20 WSG Marks", SourceDrop: "", Stats: Stats{12, 22, 14, 0, 20, 0, 0}, GemSlots: []GemColor{0x4}},
-	{ID: 27522, Slot: EquipWrist, Name: "World's End Bracers", Phase: 1, Quality: ItemQualityRare, SourceZone: "H BF - Keli'dan the Breaker", SourceDrop: "", Stats: Stats{19, 18, 17, 0, 22, 0, 0}},
-	{ID: 24250, Slot: EquipWrist, Name: "Bracers of Havok", Phase: 1, Quality: ItemQualityRare, SourceZone: "Tailoring BoE", SourceDrop: "", Stats: Stats{12, 0, 0, 0, 30, 0, 0}, GemSlots: []GemColor{0x4}, SocketBonus: Stats{StatSpellCrit: 2}},
-	{ID: 27462, Slot: EquipWrist, Name: "Crimson Bracers of Gloom", Phase: 1, Quality: ItemQualityRare, SourceZone: "H Ramps - Omor the Unscarred", SourceDrop: "", Stats: Stats{18, 18, 0, 12, 22, 0, 0}},
-	{ID: 29240, Slot: EquipWrist, Name: "Bands of Negation", Phase: 1, Quality: ItemQualityEpic, SourceZone: "H MT - Nexus- Prince Shaffar", SourceDrop: "", Stats: Stats{22, 25, 0, 0, 29, 0, 0}},
-	{ID: 27746, Slot: EquipWrist, Name: "Arcanium Signet Bands", Phase: 1, Quality: ItemQualityRare, SourceZone: "H UB - Hungarfen", SourceDrop: "", Stats: Stats{15, 14, 0, 0, 30, 0, 0}},
-	{ID: 29243, Slot: EquipWrist, Name: "Wave-Fury Vambraces", Phase: 1, Quality: ItemQualityEpic, SourceZone: "H SV - Warlod Kalithresh", SourceDrop: "", Stats: Stats{18, 19, 0, 0, 22, 0, 5}},
-	{ID: 29955, Slot: EquipWrist, Name: "Mana Infused Wristguards", Phase: 1, Quality: ItemQualityUncommon, SourceZone: "A Fate Worse Than Death - Netherstorm Quest", SourceDrop: "", Stats: Stats{8, 12, 0, 0, 25, 0, 0}},
-	{ID: 27465, Slot: EquipHands, Name: "Mana-Etched Gloves", Phase: 1, Quality: ItemQualityRare, SourceZone: "H Ramps - Omor the Unscarred", SourceDrop: "", Stats: Stats{17, 25, 16, 0, 20, 0, 0}, GemSlots: []GemColor{0x2, 0x4}},
-	{ID: 27793, Slot: EquipHands, Name: "Earth Mantle Handwraps", Phase: 1, Quality: ItemQualityRare, SourceZone: "SV - Mekgineer Steamrigger", SourceDrop: "", Stats: Stats{18, 21, 16, 0, 19, 0, 0}, GemSlots: []GemColor{0x2, 0x4}, SocketBonus: Stats{StatIntellect: 3}},
-	{ID: 31149, Slot: EquipHands, Name: "Gloves of Pandemonium", Phase: 1, Quality: ItemQualityRare, SourceZone: "BoE World Drop", SourceDrop: "", Stats: Stats{15, 0, 22, 10, 25, 0, 0}},
-	{ID: 27470, Slot: EquipHands, Name: "Gladiator's Mail Gauntlets", Phase: 1, Quality: ItemQualityEpic, SourceZone: "Arena Season 1 Reward", SourceDrop: "", Stats: Stats{18, 36, 21, 0, 32, 0, 0}},
-	{ID: 31280, Slot: EquipHands, Name: "Thundercaller's Gauntlets", Phase: 1, Quality: ItemQualityRare, SourceZone: "BoE World Drop", SourceDrop: "", Stats: Stats{16, 16, 18, 0, 35, 0, 0}},
-	{ID: 30924, Slot: EquipHands, Name: "Gloves of the High Magus", Phase: 1, Quality: ItemQualityRare, SourceZone: "News of Victory - SMV Quest", SourceDrop: "", Stats: Stats{18, 13, 22, 0, 26, 0, 0}},
-	{ID: 29317, Slot: EquipHands, Name: "Tempest's Touch", Phase: 1, Quality: ItemQualityRare, SourceZone: "Return to Andormu - CoT Quest", SourceDrop: "", Stats: Stats{20, 10, 0, 0, 27, 0, 0}, GemSlots: []GemColor{0x3, 0x3}},
-	{ID: 27493, Slot: EquipHands, Name: "Gloves of the Deadwatcher", Phase: 1, Quality: ItemQualityRare, SourceZone: "H AC - Shirrak the Dead Watcher", SourceDrop: "", Stats: Stats{24, 24, 0, 18, 29, 0, 0}},
-	{ID: 27508, Slot: EquipHands, Name: "Incanter's Gloves", Phase: 1, Quality: ItemQualityRare, SourceZone: "SV - Thespia", SourceDrop: "", Stats: Stats{24, 21, 14, 0, 29, 0, 0}},
-	{ID: 24452, Slot: EquipHands, Name: "Starlight Gauntlets", Phase: 1, Quality: ItemQualityRare, SourceZone: "N UB - Hungarfen", SourceDrop: "", Stats: Stats{21, 10, 0, 0, 25, 0, 0}, GemSlots: []GemColor{0x3, 0x3}, SocketBonus: Stats{StatSpellPower: 5}},
-	{ID: 27537, Slot: EquipHands, Name: "Gloves of Oblivion", Phase: 1, Quality: ItemQualityRare, SourceZone: "SH - Kargath", SourceDrop: "", Stats: Stats{21, 33, 0, 20, 26, 0, 0}},
-	{ID: 29784, Slot: EquipHands, Name: "Harmony's Touch", Phase: 1, Quality: ItemQualityUncommon, SourceZone: "Building a Perimeter - Netherstorm Quest", SourceDrop: "", Stats: Stats{0, 18, 16, 0, 33, 0, 0}},
-	{ID: 27743, Slot: EquipWaist, Name: "Girdle of Living Flame", Phase: 1, Quality: ItemQualityRare, SourceZone: "H UB - Hungarfen", SourceDrop: "", Stats: Stats{17, 15, 0, 16, 29, 0, 0}, GemSlots: []GemColor{0x4, 0x3}, SocketBonus: Stats{StatSpellCrit: 3}},
-	{ID: 29244, Slot: EquipWaist, Name: "Wave-Song Girdle", Phase: 1, Quality: ItemQualityEpic, SourceZone: "H AC - Exarch Maladaar", SourceDrop: "", Stats: Stats{25, 25, 23, 0, 32, 0, 0}},
-	{ID: 31461, Slot: EquipWaist, Name: "A'dal's Gift", Phase: 1, Quality: ItemQualityRare, SourceZone: "How to Break Into the Arcatraz - Quest", SourceDrop: "", Stats: Stats{25, 0, 21, 0, 34, 0, 0}},
-	{ID: 29257, Slot: EquipWaist, Name: "Sash of Arcane Visions", Phase: 1, Quality: ItemQualityEpic, SourceZone: "H AC - Exarch Maladaar", SourceDrop: "", Stats: Stats{23, 18, 22, 0, 28, 0, 0}},
-	{ID: 29241, Slot: EquipWaist, Name: "Belt of Depravity", Phase: 1, Quality: ItemQualityEpic, SourceZone: "H Arc - Harbinger Skyriss", SourceDrop: "", Stats: Stats{27, 31, 0, 17, 34, 0, 0}},
-	{ID: 27783, Slot: EquipWaist, Name: "Moonrage Girdle", Phase: 1, Quality: ItemQualityRare, SourceZone: "SV - Hydromancer Thespia", SourceDrop: "", Stats: Stats{22, 0, 20, 0, 25, 0, 0}},
-	{ID: 27795, Slot: EquipWaist, Name: "Sash of Serpentra", Phase: 1, Quality: ItemQualityRare, SourceZone: "SV - Warlord Kalithresh", SourceDrop: "", Stats: Stats{21, 31, 0, 17, 25, 0, 0}},
-	{ID: 31513, Slot: EquipWaist, Name: "Blackwhelp Belt", Phase: 1, Quality: ItemQualityUncommon, SourceZone: "Whelps of the Wyrmcult - BEM Quest", SourceDrop: "", Stats: Stats{11, 0, 10, 0, 32, 0, 0}},
-	{ID: 24262, Slot: EquipLegs, Name: "Spellstrike Pants", Phase: 1, Quality: ItemQualityEpic, SourceZone: "Tailoring BoE", SourceDrop: "", Stats: Stats{8, 12, 26, 22, 46, 0, 0}, GemSlots: []GemColor{0x2, 0x4, 0x3}, SocketBonus: Stats{StatStamina: 6}},
-	{ID: 30541, Slot: EquipLegs, Name: "Stormsong Kilt", Phase: 1, Quality: ItemQualityEpic, SourceZone: "H UB - The Black Stalker", SourceDrop: "", Stats: Stats{30, 25, 26, 0, 35, 0, 0}, GemSlots: []GemColor{0x2, 0x4, 0x3}, SocketBonus: Stats{StatSpellPower: 5}},
-	{ID: 29141, Slot: EquipLegs, Name: "Tempest Leggings", Phase: 1, Quality: ItemQualityRare, SourceZone: "The Mag'har - Revered (Horde)", SourceDrop: "", Stats: Stats{11, 0, 18, 0, 44, 0, 0}, GemSlots: []GemColor{0x2, 0x4, 0x4}, SocketBonus: Stats{StatMP5: 2}},
-	{ID: 29142, Slot: EquipLegs, Name: "Kurenai Kilt", Phase: 1, Quality: ItemQualityRare, SourceZone: "Kurenai - Revered (Ally)", SourceDrop: "", Stats: Stats{11, 0, 18, 0, 44, 0, 0}, GemSlots: []GemColor{0x2, 0x4, 0x4}, SocketBonus: Stats{StatMP5: 2}},
-	{ID: 30531, Slot: EquipLegs, Name: "Breeches of the Occultist", Phase: 1, Quality: ItemQualityEpic, SourceZone: "H BM - Aeonus", SourceDrop: "", Stats: Stats{22, 37, 23, 0, 26, 0, 0}, GemSlots: []GemColor{0x4, 0x4, 0x3}, SocketBonus: Stats{StatSpellPower: 5}},
-	{ID: 30709, Slot: EquipLegs, Name: "Pantaloons of Flaming Wrath", Phase: 1, Quality: ItemQualityRare, SourceZone: "H SH - Blood Guard Porung", SourceDrop: "", Stats: Stats{28, 0, 42, 0, 33, 0, 0}},
-	{ID: 27492, Slot: EquipLegs, Name: "Moonchild Leggings", Phase: 1, Quality: ItemQualityRare, SourceZone: "H BF - Broggok", SourceDrop: "", Stats: Stats{20, 26, 21, 0, 23, 0, 0}, GemSlots: []GemColor{0x2, 0x4, 0x4}, SocketBonus: Stats{StatMP5: 2}},
-	{ID: 29343, Slot: EquipLegs, Name: "Haramad's Leggings of the Third Coin", Phase: 1, Quality: ItemQualityRare, SourceZone: "Undercutting the Competition - MT Quest", SourceDrop: "", Stats: Stats{29, 0, 16, 0, 27, 0, 0}, GemSlots: []GemColor{0x2, 0x4, 0x4}, SocketBonus: Stats{StatSpellPower: 5}},
-	{ID: 27472, Slot: EquipLegs, Name: "Gladiator's Mail Leggings", Phase: 1, Quality: ItemQualityEpic, SourceZone: "Arena Season 1 Reward", SourceDrop: "", Stats: Stats{25, 54, 22, 0, 42, 0, 6}},
-	{ID: 30532, Slot: EquipLegs, Name: "Kirin Tor Master's Trousers", Phase: 1, Quality: ItemQualityEpic, SourceZone: "H SLabs - Murmur", SourceDrop: "", Stats: Stats{29, 27, 0, 0, 36, 0, 0}, GemSlots: []GemColor{0x2, 0x4, 0x3}, SocketBonus: Stats{StatSpellHit: 4}},
-	{ID: 28185, Slot: EquipLegs, Name: "Khadgar's Kilt of Abjuration", Phase: 1, Quality: ItemQualityRare, SourceZone: "BM - Temporus", SourceDrop: "", Stats: Stats{22, 20, 0, 0, 36, 0, 0}, GemSlots: []GemColor{0x4, 0x3, 0x3}, SocketBonus: Stats{StatSpellPower: 5}},
-	{ID: 27838, Slot: EquipLegs, Name: "Incanter's Trousers", Phase: 1, Quality: ItemQualityRare, SourceZone: "SH - Talon King Ikiss", SourceDrop: "", Stats: Stats{30, 25, 18, 0, 42, 0, 0}},
-	{ID: 27907, Slot: EquipLegs, Name: "Mana-Etched Pantaloons", Phase: 1, Quality: ItemQualityRare, SourceZone: "H UB - The Black Stalker", SourceDrop: "", Stats: Stats{32, 34, 21, 0, 33, 0, 0}},
-	{ID: 27909, Slot: EquipLegs, Name: "Tidefury Kilt", Phase: 1, Quality: ItemQualityRare, SourceZone: "SLabs - Murmur", SourceDrop: "", Stats: Stats{31, 39, 19, 0, 35, 0, 0}},
-	{ID: 28266, Slot: EquipLegs, Name: "Molten Earth Kilt", Phase: 1, Quality: ItemQualityRare, SourceZone: "Mech - Pathaleon the Calculator", SourceDrop: "", Stats: Stats{32, 24, 0, 0, 40, 0, 10}},
-	{ID: 27948, Slot: EquipLegs, Name: "Trousers of Oblivion", Phase: 1, Quality: ItemQualityRare, SourceZone: "SH - Talon King Ikiss", SourceDrop: "", Stats: Stats{33, 42, 0, 12, 39, 0, 0}},
-	{ID: 29314, Slot: EquipLegs, Name: "Leggings of the Third Coin", Phase: 1, Quality: ItemQualityRare, SourceZone: "Levixus the Soul Caller - Auchindoun Quest", SourceDrop: "", Stats: Stats{26, 34, 12, 0, 32, 0, 4}},
-	{ID: 28406, Slot: EquipFeet, Name: "Sigil-Laced Boots", Phase: 1, Quality: ItemQualityRare, SourceZone: "Arc - Harbinger Skyriss", SourceDrop: "", Stats: Stats{18, 24, 17, 0, 20, 0, 0}, GemSlots: []GemColor{0x2, 0x4}, SocketBonus: Stats{StatIntellect: 3}},
-	{ID: 28640, Slot: EquipFeet, Name: "General's Mail Sabatons", Phase: 1, Quality: ItemQualityEpic, SourceZone: "11,424 Honor & 40 EotS Marks", SourceDrop: "", Stats: Stats{23, 34, 24, 0, 28, 0, 0}},
-	{ID: 27914, Slot: EquipFeet, Name: "Moonstrider Boots", Phase: 1, Quality: ItemQualityRare, SourceZone: "SH - Darkweaver Syth", SourceDrop: "", Stats: Stats{22, 21, 20, 0, 25, 0, 6}},
-	{ID: 28179, Slot: EquipFeet, Name: "Shattrath Jumpers", Phase: 1, Quality: ItemQualityRare, SourceZone: "Into the Heart of the Labyrinth - Auch. Quest", SourceDrop: "", Stats: Stats{17, 25, 0, 0, 29, 0, 0}, GemSlots: []GemColor{0x4, 0x3}, SocketBonus: Stats{StatIntellect: 3}},
-	{ID: 29245, Slot: EquipFeet, Name: "Wave-Crest Striders", Phase: 1, Quality: ItemQualityEpic, SourceZone: "H BF - Keli'dan the Breaker", SourceDrop: "", Stats: Stats{26, 28, 0, 0, 33, 0, 8}},
-	{ID: 27821, Slot: EquipFeet, Name: "Extravagant Boots of Malice", Phase: 1, Quality: ItemQualityRare, SourceZone: "H MT - Tavarok", SourceDrop: "", Stats: Stats{24, 27, 0, 14, 30, 0, 0}},
-	{ID: 27845, Slot: EquipFeet, Name: "Magma Plume Boots", Phase: 1, Quality: ItemQualityRare, SourceZone: "H AC - Shirrak the Dead Watcher", SourceDrop: "", Stats: Stats{26, 24, 0, 14, 29, 0, 0}},
-	{ID: 29808, Slot: EquipFeet, Name: "Shimmering Azure Boots", Phase: 1, Quality: ItemQualityUncommon, SourceZone: "Securing the Celestial Ridge - NS Quest", SourceDrop: "", Stats: Stats{19, 0, 0, 16, 23, 0, 5}},
-	{ID: 29242, Slot: EquipFeet, Name: "Boots of Blasphemy", Phase: 1, Quality: ItemQualityEpic, SourceZone: "H SP - Quagmirran", SourceDrop: "", Stats: Stats{29, 36, 0, 0, 36, 0, 0}},
-	{ID: 29258, Slot: EquipFeet, Name: "Boots of Ethereal Manipulation", Phase: 1, Quality: ItemQualityEpic, SourceZone: "H Bot - Warp Splinter", SourceDrop: "", Stats: Stats{27, 27, 0, 0, 33, 0, 0}},
-	{ID: 29313, Slot: EquipFeet, Name: "Earthbreaker's Greaves", Phase: 1, Quality: ItemQualityRare, SourceZone: "Levixus the Soul Caller - Auchindoun Quest", SourceDrop: "", Stats: Stats{20, 27, 8, 0, 25, 0, 3}},
-	{ID: 30519, Slot: EquipFeet, Name: "Boots of the Nexus Warden", Phase: 1, Quality: ItemQualityUncommon, SourceZone: "The Flesh Lies... - Netherstorm Quest", SourceDrop: "", Stats: Stats{17, 27, 0, 18, 21, 0, 0}},
-	{ID: 28227, Slot: EquipFinger, Name: "Sparking Arcanite Ring", Phase: 1, Quality: ItemQualityRare, SourceZone: "H OHF - Epoch Hunter", SourceDrop: "", Stats: Stats{14, 13, 14, 10, 22, 0, 0}},
-	{ID: 29126, Slot: EquipFinger, Name: "Seer's Signet", Phase: 1, Quality: ItemQualityEpic, SourceZone: "The Scryers - Exalted", SourceDrop: "", Stats: Stats{0, 24, 12, 0, 34, 0, 0}},
-	{ID: 31922, Slot: EquipFinger, Name: "Ring of Conflict Survival", Phase: 1, Quality: ItemQualityEpic, SourceZone: "H MT - Yor (Summoned Boss)", SourceDrop: "", Stats: Stats{0, 28, 20, 0, 23, 0, 0}},
-	{ID: 28394, Slot: EquipFinger, Name: "Ryngo's Band of Ingenuity", Phase: 1, Quality: ItemQualityRare, SourceZone: "Arc - Wrath-Scryer Soccothrates", SourceDrop: "", Stats: Stats{14, 12, 14, 0, 25, 0, 0}},
-	{ID: 29320, Slot: EquipFinger, Name: "Band of the Guardian", Phase: 1, Quality: ItemQualityRare, SourceZone: "Hero of the Brood - CoT Quest", SourceDrop: "", Stats: Stats{11, 0, 17, 0, 23, 0, 0}},
-	{ID: 27784, Slot: EquipFinger, Name: "Scintillating Coral Band", Phase: 1, Quality: ItemQualityRare, SourceZone: "SV - Hydromancer Thespia", SourceDrop: "", Stats: Stats{15, 14, 17, 0, 21, 0, 0}},
-	{ID: 30366, Slot: EquipFinger, Name: "Manastorm Band", Phase: 1, Quality: ItemQualityRare, SourceZone: "Shutting Down Manaforge Ara - Quest", SourceDrop: "", Stats: Stats{15, 0, 10, 0, 29, 0, 0}},
-	{ID: 29172, Slot: EquipFinger, Name: "Ashyen's Gift", Phase: 1, Quality: ItemQualityEpic, SourceZone: "Cenarion Expedition - Exalted", SourceDrop: "", Stats: Stats{0, 30, 0, 21, 23, 0, 0}},
-	{ID: 29352, Slot: EquipFinger, Name: "Cobalt Band of Tyrigosa", Phase: 1, Quality: ItemQualityEpic, SourceZone: "H MT - Nexus-Prince Shaffar", SourceDrop: "", Stats: Stats{17, 19, 0, 0, 35, 0, 0}},
-	{ID: 28555, Slot: EquipFinger, Name: "Seal of the Exorcist", Phase: 1, Quality: ItemQualityEpic, SourceZone: "50 Spirit Shards ", SourceDrop: "", Stats: Stats{0, 24, 0, 12, 28, 0, 0}},
-	{ID: 31339, Slot: EquipFinger, Name: "Lola's Eve", Phase: 1, Quality: ItemQualityEpic, SourceZone: "BoE World Drop", SourceDrop: "", Stats: Stats{14, 15, 0, 0, 29, 0, 0}},
-	{ID: 31921, Slot: EquipFinger, Name: "Yor's Collapsing Band", Phase: 1, Quality: ItemQualityEpic, SourceZone: "H MT - Yor (Summoned Boss)", SourceDrop: "", Stats: Stats{20, 0, 0, 0, 23, 0, 0}},
-	{ID: 28248, Slot: EquipRanged, Name: "Totem of the Void", Phase: 1, Quality: ItemQualityRare, SourceZone: "Mech - Cache of the Legion", SourceDrop: ""}, // TODO: Add totem aura!
-	{ID: 23199, Slot: EquipRanged, Name: "Totem of the Storm", Phase: 0, Quality: ItemQualityRare, SourceZone: "Boe World Drop", SourceDrop: ""},            // TODO: Add totem aura!
-	{ID: 27543, Slot: EquipWeapon, Name: "Starlight Dagger", Phase: 1, Quality: ItemQualityRare, SourceZone: "H SP - Mennu the Betrayer", SourceDrop: "", Stats: Stats{15, 15, 0, 16, 121, 0, 0}},
-	{ID: 27868, Slot: EquipWeapon, Name: "Runesong Dagger", Phase: 1, Quality: ItemQualityRare, SourceZone: "SH - Warbringer O'mrogg", SourceDrop: "", Stats: Stats{11, 12, 20, 0, 121, 0, 0}},
-	{ID: 27741, Slot: EquipWeapon, Name: "Bleeding Hollow Warhammer", Phase: 1, Quality: ItemQualityRare, SourceZone: "H SP - Quagmirran", SourceDrop: "", Stats: Stats{17, 12, 16, 0, 121, 0, 0}},
-	{ID: 27937, Slot: EquipWeapon, Name: "Sky Breaker", Phase: 1, Quality: ItemQualityRare, SourceZone: "H AC - Avatar of the Martyred", SourceDrop: "", Stats: Stats{20, 13, 0, 0, 132, 0, 0}},
-	{ID: 28412, Slot: EquipOffhand, Name: "Lamp of Peaceful Radiance", Phase: 1, Quality: ItemQualityRare, SourceZone: "Arc - Harbinger Skyriss", SourceDrop: "", Stats: Stats{14, 13, 13, 12, 21, 0, 0}},
-	{ID: 28260, Slot: EquipOffhand, Name: "Manual of the Nethermancer", Phase: 1, Quality: ItemQualityRare, SourceZone: "Mech - Nethermancer Sepethrea", SourceDrop: "", Stats: Stats{15, 12, 19, 0, 21, 0, 0}},
-	{ID: 31287, Slot: EquipOffhand, SubSlot: SubslotShield, Name: "Draenei Honor Guard Shield", Phase: 1, Quality: ItemQualityRare, SourceZone: "BoE World Drop", SourceDrop: "", Stats: Stats{16, 0, 21, 0, 19, 0, 0}},
-	{ID: 28187, Slot: EquipOffhand, Name: "Star-Heart Lamp", Phase: 1, Quality: ItemQualityRare, SourceZone: "BM - Temporus", SourceDrop: "", Stats: Stats{18, 17, 0, 12, 22, 0, 0}},
-	{ID: 29330, Slot: EquipOffhand, Name: "The Saga of Terokk", Phase: 1, Quality: ItemQualityRare, SourceZone: "Terokk's Legacy - Auchindoun Quest", SourceDrop: "", Stats: Stats{23, 0, 0, 0, 28, 0, 0}},
-	{ID: 27910, Slot: EquipOffhand, SubSlot: SubslotShield, Name: "Silvermoon Crest Shield", Phase: 1, Quality: ItemQualityRare, SourceZone: "SLabs - Murmur", SourceDrop: "", Stats: Stats{20, 0, 0, 0, 23, 0, 5}},
-	{ID: 30984, Slot: EquipOffhand, SubSlot: SubslotShield, Name: "Spellbreaker's Buckler", Phase: 1, Quality: ItemQualityRare, SourceZone: "Akama's Promise - SMV Quest", SourceDrop: "", Stats: Stats{10, 22, 0, 0, 29, 0, 0}},
-	{ID: 27534, Slot: EquipOffhand, Name: "Hortus' Seal of Brilliance", Phase: 1, Quality: ItemQualityRare, SourceZone: "SH - Warchief Kargath Bladefist", SourceDrop: "", Stats: Stats{20, 18, 0, 0, 23, 0, 0}},
-	{ID: 29355, Slot: EquipWeapon, SubSlot: SubslotTwoHand, Name: "Terokk's Shadowstaff", Phase: 1, Quality: ItemQualityEpic, SourceZone: "H SH - Talon King Ikiss", SourceDrop: "", Stats: Stats{42, 40, 37, 0, 168, 0, 0}},
-	{ID: 29130, Slot: EquipWeapon, SubSlot: SubslotTwoHand, Name: "Auchenai Staff", Phase: 1, Quality: ItemQualityRare, SourceZone: "The Aldor - Revered", SourceDrop: "", Stats: Stats{46, 0, 26, 19, 121, 0, 0}},
-	{ID: 28341, Slot: EquipWeapon, SubSlot: SubslotTwoHand, Name: "Warpstaff of Arcanum", Phase: 1, Quality: ItemQualityRare, SourceZone: "Bot - Warp Splinter", SourceDrop: "", Stats: Stats{38, 37, 26, 16, 121, 0, 0}},
-	{ID: 31308, Slot: EquipWeapon, SubSlot: SubslotTwoHand, Name: "The Bringer of Death", Phase: 1, Quality: ItemQualityRare, SourceZone: "BoE World Drop", SourceDrop: "", Stats: Stats{31, 32, 42, 0, 121, 0, 0}},
-	{ID: 28188, Slot: EquipWeapon, SubSlot: SubslotTwoHand, Name: "Bloodfire Greatstaff", Phase: 1, Quality: ItemQualityRare, SourceZone: "BM - Aeonus", SourceDrop: "", Stats: Stats{42, 42, 28, 0, 121, 0, 0}},
-	{ID: 30011, Slot: EquipWeapon, SubSlot: SubslotTwoHand, Name: "Ameer's Impulse Taser", Phase: 1, Quality: ItemQualityRare, SourceZone: "Nexus-King Salhadaar - Netherstorm Quest", SourceDrop: "", Stats: Stats{27, 27, 27, 17, 103, 0, 0}},
-	{ID: 27842, Slot: EquipWeapon, SubSlot: SubslotTwoHand, Name: "Grand Scepter of the Nexus-Kings", Phase: 1, Quality: ItemQualityRare, SourceZone: "H MT - Nexus-Prince Shaffar", SourceDrop: "", Stats: Stats{43, 45, 0, 19, 121, 0, 0}},
+	{ID: 28191, Slot: EquipChest, Name: "Mana-Etched Vestments", Phase: 1, Quality: ItemQualityRare, SourceZone: "OHF - Epoch Hunter", SourceDrop: "", Stats: Stats{StatIntellect: 25, StatStamina: 25, StatSpellCrit: 17, StatSpellPower: 29}, GemSlots: []GemColor{0x2, 0x4, 0x3}, SocketBonus: Stats{StatSpellPower: 5}},
+	{ID: 31297, Slot: EquipChest, Name: "Robe of the Crimson Order", Phase: 1, Quality: ItemQualityEpic, SourceZone: "BoE World Drop", SourceDrop: "", Stats: Stats{StatIntellect: 23, StatSpellHit: 30, StatSpellPower: 50}},
+	{ID: 28342, Slot: EquipChest, Name: "Warp Infused Drape", Phase: 1, Quality: ItemQualityRare, SourceZone: "Bot - Warp Splinter", SourceDrop: "", Stats: Stats{StatIntellect: 28, StatStamina: 27, StatSpellHit: 12, StatSpellPower: 30}, GemSlots: []GemColor{0x2, 0x4, 0x3}},
+	{ID: 28232, Slot: EquipChest, Name: "Robe of Oblivion", Phase: 1, Quality: ItemQualityRare, SourceZone: "SLabs - Murmur", SourceDrop: "", Stats: Stats{StatIntellect: 20, StatStamina: 30, StatSpellPower: 40}, GemSlots: []GemColor{0x2, 0x4, 0x3}},
+	{ID: 28229, Slot: EquipChest, Name: "Incanter's Robe", Phase: 1, Quality: ItemQualityRare, SourceZone: "Bot - Warp Splinter", SourceDrop: "", Stats: Stats{StatIntellect: 22, StatStamina: 24, StatSpellCrit: 8, StatSpellPower: 29}, GemSlots: []GemColor{0x2, 0x4, 0x4}},
+	{ID: 27824, Slot: EquipChest, Name: "Robe of the Great Dark Beyond", Phase: 1, Quality: ItemQualityRare, SourceZone: "MT - Tavarok", SourceDrop: "", Stats: Stats{StatIntellect: 30, StatStamina: 25, StatSpellCrit: 23, StatSpellPower: 39}},
+	{ID: 28391, Slot: EquipChest, Name: "Worldfire Chestguard", Phase: 1, Quality: ItemQualityRare, SourceZone: "Arc - Dalliah the Doomsayer", SourceDrop: "", Stats: Stats{StatIntellect: 32, StatStamina: 33, StatSpellCrit: 22, StatSpellPower: 40}},
+	{ID: 28638, Slot: EquipWrist, Name: "General's Mail Bracers", Phase: 1, Quality: ItemQualityEpic, SourceZone: "7,548 Honor & 20 WSG Marks", SourceDrop: "", Stats: Stats{StatIntellect: 12, StatStamina: 22, StatSpellCrit: 14, StatSpellPower: 20}, GemSlots: []GemColor{0x4}},
+	{ID: 27522, Slot: EquipWrist, Name: "World's End Bracers", Phase: 1, Quality: ItemQualityRare, SourceZone: "H BF - Keli'dan the Breaker", SourceDrop: "", Stats: Stats{StatIntellect: 19, StatStamina: 18, StatSpellCrit: 17, StatSpellPower: 22}},
+	{ID: 24250, Slot: EquipWrist, Name: "Bracers of Havok", Phase: 1, Quality: ItemQualityRare, SourceZone: "Tailoring BoE", SourceDrop: "", Stats: Stats{StatIntellect: 12, StatSpellPower: 30}, GemSlots: []GemColor{0x4}, SocketBonus: Stats{StatSpellCrit: 2}},
+	{ID: 27462, Slot: EquipWrist, Name: "Crimson Bracers of Gloom", Phase: 1, Quality: ItemQualityRare, SourceZone: "H Ramps - Omor the Unscarred", SourceDrop: "", Stats: Stats{StatIntellect: 18, StatStamina: 18, StatSpellHit: 12, StatSpellPower: 22}},
+	{ID: 29240, Slot: EquipWrist, Name: "Bands of Negation", Phase: 1, Quality: ItemQualityEpic, SourceZone: "H MT - Nexus- Prince Shaffar", SourceDrop: "", Stats: Stats{StatIntellect: 22, StatStamina: 25, StatSpellPower: 29}},
+	{ID: 27746, Slot: EquipWrist, Name: "Arcanium Signet Bands", Phase: 1, Quality: ItemQualityRare, SourceZone: "H UB - Hungarfen", SourceDrop: "", Stats: Stats{StatIntellect: 15, StatStamina: 14, StatSpellPower: 30}},
+	{ID: 29243, Slot: EquipWrist, Name: "Wave-Fury Vambraces", Phase: 1, Quality: ItemQualityEpic, SourceZone: "H SV - Warlod Kalithresh", SourceDrop: "", Stats: Stats{StatIntellect: 18, StatStamina: 19, StatSpellPower: 22, StatMP5: 5}},
+	{ID: 29955, Slot: EquipWrist, Name: "Mana Infused Wristguards", Phase: 1, Quality: ItemQualityUncommon, SourceZone: "A Fate Worse Than Death - Netherstorm Quest", SourceDrop: "", Stats: Stats{StatIntellect: 8, StatStamina: 12, StatSpellPower: 25}},
+	{ID: 27465, Slot: EquipHands, Name: "Mana-Etched Gloves", Phase: 1, Quality: ItemQualityRare, SourceZone: "H Ramps - Omor the Unscarred", SourceDrop: "", Stats: Stats{StatIntellect: 17, StatStamina: 25, StatSpellCrit: 16, StatSpellPower: 20}, GemSlots: []GemColor{0x2, 0x4}},
+	{ID: 27793, Slot: EquipHands, Name: "Earth Mantle Handwraps", Phase: 1, Quality: ItemQualityRare, SourceZone: "SV - Mekgineer Steamrigger", SourceDrop: "", Stats: Stats{StatIntellect: 18, StatStamina: 21, StatSpellCrit: 16, StatSpellPower: 19}, GemSlots: []GemColor{0x2, 0x4}, SocketBonus: Stats{StatIntellect: 3}},
+	{ID: 31149, Slot: EquipHands, Name: "Gloves of Pandemonium", Phase: 1, Quality: ItemQualityRare, SourceZone: "BoE World Drop", SourceDrop: "", Stats: Stats{StatIntellect: 15, StatSpellCrit: 22, StatSpellHit: 10, StatSpellPower: 25}},
+	{ID: 27470, Slot: EquipHands, Name: "Gladiator's Mail Gauntlets", Phase: 1, Quality: ItemQualityEpic, SourceZone: "Arena Season 1 Reward", SourceDrop: "", Stats: Stats{StatIntellect: 18, StatStamina: 36, StatSpellCrit: 21, StatSpellPower: 32}},
+	{ID: 31280, Slot: EquipHands, Name: "Thundercaller's Gauntlets", Phase: 1, Quality: ItemQualityRare, SourceZone: "BoE World Drop", SourceDrop: "", Stats: Stats{StatIntellect: 16, StatStamina: 16, StatSpellCrit: 18, StatSpellPower: 35}},
+	{ID: 30924, Slot: EquipHands, Name: "Gloves of the High Magus", Phase: 1, Quality: ItemQualityRare, SourceZone: "News of Victory - SMV Quest", SourceDrop: "", Stats: Stats{StatIntellect: 18, StatStamina: 13, StatSpellCrit: 22, StatSpellPower: 26}},
+	{ID: 29317, Slot: EquipHands, Name: "Tempest's Touch", Phase: 1, Quality: ItemQualityRare, SourceZone: "Return to Andormu - CoT Quest", SourceDrop: "", Stats: Stats{StatIntellect: 20, StatStamina: 10, StatSpellPower: 27}, GemSlots: []GemColor{0x3, 0x3}},
+	{ID: 27493, Slot: EquipHands, Name: "Gloves of the Deadwatcher", Phase: 1, Quality: ItemQualityRare, SourceZone: "H AC - Shirrak the Dead Watcher", SourceDrop: "", Stats: Stats{StatIntellect: 24, StatStamina: 24, StatSpellHit: 18, StatSpellPower: 29}},
+	{ID: 27508, Slot: EquipHands, Name: "Incanter's Gloves", Phase: 1, Quality: ItemQualityRare, SourceZone: "SV - Thespia", SourceDrop: "", Stats: Stats{StatIntellect: 24, StatStamina: 21, StatSpellCrit: 14, StatSpellPower: 29}},
+	{ID: 24452, Slot: EquipHands, Name: "Starlight Gauntlets", Phase: 1, Quality: ItemQualityRare, SourceZone: "N UB - Hungarfen", SourceDrop: "", Stats: Stats{StatIntellect: 21, StatStamina: 10, StatSpellPower: 25}, GemSlots: []GemColor{0x3, 0x3}, SocketBonus: Stats{StatSpellPower: 5}},
+	{ID: 27537, Slot: EquipHands, Name: "Gloves of Oblivion", Phase: 1, Quality: ItemQualityRare, SourceZone: "SH - Kargath", SourceDrop: "", Stats: Stats{StatIntellect: 21, StatStamina: 33, StatSpellHit: 20, StatSpellPower: 26}},
+	{ID: 29784, Slot: EquipHands, Name: "Harmony's Touch", Phase: 1, Quality: ItemQualityUncommon, SourceZone: "Building a Perimeter - Netherstorm Quest", SourceDrop: "", Stats: Stats{StatStamina: 18, StatSpellCrit: 16, StatSpellPower: 33}},
+	{ID: 27743, Slot: EquipWaist, Name: "Girdle of Living Flame", Phase: 1, Quality: ItemQualityRare, SourceZone: "H UB - Hungarfen", SourceDrop: "", Stats: Stats{StatIntellect: 17, StatStamina: 15, StatSpellHit: 16, StatSpellPower: 29}, GemSlots: []GemColor{0x4, 0x3}, SocketBonus: Stats{StatSpellCrit: 3}},
+	{ID: 29244, Slot: EquipWaist, Name: "Wave-Song Girdle", Phase: 1, Quality: ItemQualityEpic, SourceZone: "H AC - Exarch Maladaar", SourceDrop: "", Stats: Stats{StatIntellect: 25, StatStamina: 25, StatSpellCrit: 23, StatSpellPower: 32}},
+	{ID: 31461, Slot: EquipWaist, Name: "A'dal's Gift", Phase: 1, Quality: ItemQualityRare, SourceZone: "How to Break Into the Arcatraz - Quest", SourceDrop: "", Stats: Stats{StatIntellect: 25, StatSpellCrit: 21, StatSpellPower: 34}},
+	{ID: 29257, Slot: EquipWaist, Name: "Sash of Arcane Visions", Phase: 1, Quality: ItemQualityEpic, SourceZone: "H AC - Exarch Maladaar", SourceDrop: "", Stats: Stats{StatIntellect: 23, StatStamina: 18, StatSpellCrit: 22, StatSpellPower: 28}},
+	{ID: 29241, Slot: EquipWaist, Name: "Belt of Depravity", Phase: 1, Quality: ItemQualityEpic, SourceZone: "H Arc - Harbinger Skyriss", SourceDrop: "", Stats: Stats{StatIntellect: 27, StatStamina: 31, StatSpellHit: 17, StatSpellPower: 34}},
+	{ID: 27783, Slot: EquipWaist, Name: "Moonrage Girdle", Phase: 1, Quality: ItemQualityRare, SourceZone: "SV - Hydromancer Thespia", SourceDrop: "", Stats: Stats{StatIntellect: 22, StatSpellCrit: 20, StatSpellPower: 25}},
+	{ID: 27795, Slot: EquipWaist, Name: "Sash of Serpentra", Phase: 1, Quality: ItemQualityRare, SourceZone: "SV - Warlord Kalithresh", SourceDrop: "", Stats: Stats{StatIntellect: 21, StatStamina: 31, StatSpellHit: 17, StatSpellPower: 25}},
+	{ID: 31513, Slot: EquipWaist, Name: "Blackwhelp Belt", Phase: 1, Quality: ItemQualityUncommon, SourceZone: "Whelps of the Wyrmcult - BEM Quest", SourceDrop: "", Stats: Stats{StatIntellect: 11, StatSpellCrit: 10, StatSpellPower: 32}},
+	{ID: 24262, Slot: EquipLegs, Name: "Spellstrike Pants", Phase: 1, Quality: ItemQualityEpic, SourceZone: "Tailoring BoE", SourceDrop: "", Stats: Stats{StatIntellect: 8, StatStamina: 12, StatSpellCrit: 26, StatSpellHit: 22, StatSpellPower: 46}, GemSlots: []GemColor{0x2, 0x4, 0x3}, SocketBonus: Stats{StatStamina: 6}},
+	{ID: 30541, Slot: EquipLegs, Name: "Stormsong Kilt", Phase: 1, Quality: ItemQualityEpic, SourceZone: "H UB - The Black Stalker", SourceDrop: "", Stats: Stats{StatIntellect: 30, StatStamina: 25, StatSpellCrit: 26, StatSpellPower: 35}, GemSlots: []GemColor{0x2, 0x4, 0x3}, SocketBonus: Stats{StatSpellPower: 5}},
+	{ID: 29141, Slot: EquipLegs, Name: "Tempest Leggings", Phase: 1, Quality: ItemQualityRare, SourceZone: "The Mag'har - Revered (Horde)", SourceDrop: "", Stats: Stats{StatIntellect: 11, StatSpellCrit: 18, StatSpellPower: 44}, GemSlots: []GemColor{0x2, 0x4, 0x4}, SocketBonus: Stats{StatMP5: 2}},
+	{ID: 29142, Slot: EquipLegs, Name: "Kurenai Kilt", Phase: 1, Quality: ItemQualityRare, SourceZone: "Kurenai - Revered (Ally)", SourceDrop: "", Stats: Stats{StatIntellect: 11, StatSpellCrit: 18, StatSpellPower: 44}, GemSlots: []GemColor{0x2, 0x4, 0x4}, SocketBonus: Stats{StatMP5: 2}},
+	{ID: 30531, Slot: EquipLegs, Name: "Breeches of the Occultist", Phase: 1, Quality: ItemQualityEpic, SourceZone: "H BM - Aeonus", SourceDrop: "", Stats: Stats{StatIntellect: 22, StatStamina: 37, StatSpellCrit: 23, StatSpellPower: 26}, GemSlots: []GemColor{0x4, 0x4, 0x3}, SocketBonus: Stats{StatSpellPower: 5}},
+	{ID: 30709, Slot: EquipLegs, Name: "Pantaloons of Flaming Wrath", Phase: 1, Quality: ItemQualityRare, SourceZone: "H SH - Blood Guard Porung", SourceDrop: "", Stats: Stats{StatIntellect: 28, StatSpellCrit: 42, StatSpellPower: 33}},
+	{ID: 27492, Slot: EquipLegs, Name: "Moonchild Leggings", Phase: 1, Quality: ItemQualityRare, SourceZone: "H BF - Broggok", SourceDrop: "", Stats: Stats{StatIntellect: 20, StatStamina: 26, StatSpellCrit: 21, StatSpellPower: 23}, GemSlots: []GemColor{0x2, 0x4, 0x4}, SocketBonus: Stats{StatMP5: 2}},
+	{ID: 29343, Slot: EquipLegs, Name: "Haramad's Leggings of the Third Coin", Phase: 1, Quality: ItemQualityRare, SourceZone: "Undercutting the Competition - MT Quest", SourceDrop: "", Stats: Stats{StatIntellect: 29, StatSpellCrit: 16, StatSpellPower: 27}, GemSlots: []GemColor{0x2, 0x4, 0x4}, SocketBonus: Stats{StatSpellPower: 5}},
+	{ID: 27472, Slot: EquipLegs, Name: "Gladiator's Mail Leggings", Phase: 1, Quality: ItemQualityEpic, SourceZone: "Arena Season 1 Reward", SourceDrop: "", Stats: Stats{StatIntellect: 25, StatStamina: 54, StatSpellCrit: 22, StatSpellPower: 42, StatMP5: 6}},
+	{ID: 30532, Slot: EquipLegs, Name: "Kirin Tor Master's Trousers", Phase: 1, Quality: ItemQualityEpic, SourceZone: "H SLabs - Murmur", SourceDrop: "", Stats: Stats{StatIntellect: 29, StatStamina: 27, StatSpellPower: 36}, GemSlots: []GemColor{0x2, 0x4, 0x3}, SocketBonus: Stats{StatSpellHit: 4}},
+	{ID: 28185, Slot: EquipLegs, Name: "Khadgar's Kilt of Abjuration", Phase: 1, Quality: ItemQualityRare, SourceZone: "BM - Temporus", SourceDrop: "", Stats: Stats{StatIntellect: 22, StatStamina: 20, StatSpellPower: 36}, GemSlots: []GemColor{0x4, 0x3, 0x3}, SocketBonus: Stats{StatSpellPower: 5}},
+	{ID: 27838, Slot: EquipLegs, Name: "Incanter's Trousers", Phase: 1, Quality: ItemQualityRare, SourceZone: "SH - Talon King Ikiss", SourceDrop: "", Stats: Stats{StatIntellect: 30, StatStamina: 25, StatSpellCrit: 18, StatSpellPower: 42}},
+	{ID: 27907, Slot: EquipLegs, Name: "Mana-Etched Pantaloons", Phase: 1, Quality: ItemQualityRare, SourceZone: "H UB - The Black Stalker", SourceDrop: "", Stats: Stats{StatIntellect: 32, StatStamina: 34, StatSpellCrit: 21, StatSpellPower: 33}},
+	{ID: 27909, Slot: EquipLegs, Name: "Tidefury Kilt", Phase: 1, Quality: ItemQualityRare, SourceZone: "SLabs - Murmur", SourceDrop: "", Stats: Stats{StatIntellect: 31, StatStamina: 39, StatSpellCrit: 19, StatSpellPower: 35}},
+	{ID: 28266, Slot: EquipLegs, Name: "Molten Earth Kilt", Phase: 1, Quality: ItemQualityRare, SourceZone: "Mech - Pathaleon the Calculator", SourceDrop: "", Stats: Stats{StatIntellect: 32, StatStamina: 24, StatSpellPower: 40, StatMP5: 10}},
+	{ID: 27948, Slot: EquipLegs, Name: "Trousers of Oblivion", Phase: 1, Quality: ItemQualityRare, SourceZone: "SH - Talon King Ikiss", SourceDrop: "", Stats: Stats{StatIntellect: 33, StatStamina: 42, StatSpellHit: 12, StatSpellPower: 39}},
+	{ID: 29314, Slot: EquipLegs, Name: "Leggings of the Third Coin", Phase: 1, Quality: ItemQualityRare, SourceZone: "Levixus the Soul Caller - Auchindoun Quest", SourceDrop: "", Stats: Stats{StatIntellect: 26, StatStamina: 34, StatSpellCrit: 12, StatSpellPower: 32, StatMP5: 4}},
+	{ID: 28406, Slot: EquipFeet, Name: "Sigil-Laced Boots", Phase: 1, Quality: ItemQualityRare, SourceZone: "Arc - Harbinger Skyriss", SourceDrop: "", Stats: Stats{StatIntellect: 18, StatStamina: 24, StatSpellCrit: 17, StatSpellPower: 20}, GemSlots: []GemColor{0x2, 0x4}, SocketBonus: Stats{StatIntellect: 3}},
+	{ID: 28640, Slot: EquipFeet, Name: "General's Mail Sabatons", Phase: 1, Quality: ItemQualityEpic, SourceZone: "11,424 Honor & 40 EotS Marks", SourceDrop: "", Stats: Stats{StatIntellect: 23, StatStamina: 34, StatSpellCrit: 24, StatSpellPower: 28}},
+	{ID: 27914, Slot: EquipFeet, Name: "Moonstrider Boots", Phase: 1, Quality: ItemQualityRare, SourceZone: "SH - Darkweaver Syth", SourceDrop: "", Stats: Stats{StatIntellect: 22, StatStamina: 21, StatSpellCrit: 20, StatSpellPower: 25, StatMP5: 6}},
+	{ID: 28179, Slot: EquipFeet, Name: "Shattrath Jumpers", Phase: 1, Quality: ItemQualityRare, SourceZone: "Into the Heart of the Labyrinth - Auch. Quest", SourceDrop: "", Stats: Stats{StatIntellect: 17, StatStamina: 25, StatSpellPower: 29}, GemSlots: []GemColor{0x4, 0x3}, SocketBonus: Stats{StatIntellect: 3}},
+	{ID: 29245, Slot: EquipFeet, Name: "Wave-Crest Striders", Phase: 1, Quality: ItemQualityEpic, SourceZone: "H BF - Keli'dan the Breaker", SourceDrop: "", Stats: Stats{StatIntellect: 26, StatStamina: 28, StatSpellPower: 33, StatMP5: 8}},
+	{ID: 27821, Slot: EquipFeet, Name: "Extravagant Boots of Malice", Phase: 1, Quality: ItemQualityRare, SourceZone: "H MT - Tavarok", SourceDrop: "", Stats: Stats{StatIntellect: 24, StatStamina: 27, StatSpellHit: 14, StatSpellPower: 30}},
+	{ID: 27845, Slot: EquipFeet, Name: "Magma Plume Boots", Phase: 1, Quality: ItemQualityRare, SourceZone: "H AC - Shirrak the Dead Watcher", SourceDrop: "", Stats: Stats{StatIntellect: 26, StatStamina: 24, StatSpellHit: 14, StatSpellPower: 29}},
+	{ID: 29808, Slot: EquipFeet, Name: "Shimmering Azure Boots", Phase: 1, Quality: ItemQualityUncommon, SourceZone: "Securing the Celestial Ridge - NS Quest", SourceDrop: "", Stats: Stats{StatIntellect: 19, StatSpellHit: 16, StatSpellPower: 23, StatMP5: 5}},
+	{ID: 29242, Slot: EquipFeet, Name: "Boots of Blasphemy", Phase: 1, Quality: ItemQualityEpic, SourceZone: "H SP - Quagmirran", SourceDrop: "", Stats: Stats{StatIntellect: 29, StatStamina: 36, StatSpellPower: 36}},
+	{ID: 29258, Slot: EquipFeet, Name: "Boots of Ethereal Manipulation", Phase: 1, Quality: ItemQualityEpic, SourceZone: "H Bot - Warp Splinter", SourceDrop: "", Stats: Stats{StatIntellect: 27, StatStamina: 27, StatSpellPower: 33}},
+	{ID: 29313, Slot: EquipFeet, Name: "Earthbreaker's Greaves", Phase: 1, Quality: ItemQualityRare, SourceZone: "Levixus the Soul Caller - Auchindoun Quest", SourceDrop: "", Stats: Stats{StatIntellect: 20, StatStamina: 27, StatSpellCrit: 8, StatSpellPower: 25, StatMP5: 3}},
+	{ID: 30519, Slot: EquipFeet, Name: "Boots of the Nexus Warden", Phase: 1, Quality: ItemQualityUncommon, SourceZone: "The Flesh Lies... - Netherstorm Quest", SourceDrop: "", Stats: Stats{StatIntellect: 17, StatStamina: 27, StatSpellHit: 18, StatSpellPower: 21}},
+	{ID: 28227, Slot: EquipFinger, Name: "Sparking Arcanite Ring", Phase: 1, Quality: ItemQualityRare, SourceZone: "H OHF - Epoch Hunter", SourceDrop: "", Stats: Stats{StatIntellect: 14, StatStamina: 13, StatSpellCrit: 14, StatSpellHit: 10, StatSpellPower: 22}},
+	{ID: 29126, Slot: EquipFinger, Name: "Seer's Signet", Phase: 1, Quality: ItemQualityEpic, SourceZone: "The Scryers - Exalted", SourceDrop: "", Stats: Stats{StatStamina: 24, StatSpellCrit: 12, StatSpellPower: 34}},
+	{ID: 31922, Slot: EquipFinger, Name: "Ring of Conflict Survival", Phase: 1, Quality: ItemQualityEpic, SourceZone: "H MT - Yor (Summoned Boss)", SourceDrop: "", Stats: Stats{StatStamina: 28, StatSpellCrit: 20, StatSpellPower: 23}},
+	{ID: 28394, Slot: EquipFinger, Name: "Ryngo's Band of Ingenuity", Phase: 1, Quality: ItemQualityRare, SourceZone: "Arc - Wrath-Scryer Soccothrates", SourceDrop: "", Stats: Stats{StatIntellect: 14, StatStamina: 12, StatSpellCrit: 14, StatSpellPower: 25}},
+	{ID: 29320, Slot: EquipFinger, Name: "Band of the Guardian", Phase: 1, Quality: ItemQualityRare, SourceZone: "Hero of the Brood - CoT Quest", SourceDrop: "", Stats: Stats{StatIntellect: 11, StatSpellCrit: 17, StatSpellPower: 23}},
+	{ID: 27784, Slot: EquipFinger, Name: "Scintillating Coral Band", Phase: 1, Quality: ItemQualityRare, SourceZone: "SV - Hydromancer Thespia", SourceDrop: "", Stats: Stats{StatIntellect: 15, StatStamina: 14, StatSpellCrit: 17, StatSpellPower: 21}},
+	{ID: 30366, Slot: EquipFinger, Name: "Manastorm Band", Phase: 1, Quality: ItemQualityRare, SourceZone: "Shutting Down Manaforge Ara - Quest", SourceDrop: "", Stats: Stats{StatIntellect: 15, StatSpellCrit: 10, StatSpellPower: 29}},
+	{ID: 29172, Slot: EquipFinger, Name: "Ashyen's Gift", Phase: 1, Quality: ItemQualityEpic, SourceZone: "Cenarion Expedition - Exalted", SourceDrop: "", Stats: Stats{StatStamina: 30, StatSpellHit: 21, StatSpellPower: 23}},
+	{ID: 29352, Slot: EquipFinger, Name: "Cobalt Band of Tyrigosa", Phase: 1, Quality: ItemQualityEpic, SourceZone: "H MT - Nexus-Prince Shaffar", SourceDrop: "", Stats: Stats{StatIntellect: 17, StatStamina: 19, StatSpellPower: 35}},
+	{ID: 28555, Slot: EquipFinger, Name: "Seal of the Exorcist", Phase: 1, Quality: ItemQualityEpic, SourceZone: "50 Spirit Shards ", SourceDrop: "", Stats: Stats{StatStamina: 24, StatSpellHit: 12, StatSpellPower: 28}},
+	{ID: 31339, Slot: EquipFinger, Name: "Lola's Eve", Phase: 1, Quality: ItemQualityEpic, SourceZone: "BoE World Drop", SourceDrop: "", Stats: Stats{StatIntellect: 14, StatStamina: 15, StatSpellPower: 29}},
+	{ID: 31921, Slot: EquipFinger, Name: "Yor's Collapsing Band", Phase: 1, Quality: ItemQualityEpic, SourceZone: "H MT - Yor (Summoned Boss)", SourceDrop: "", Stats: Stats{StatIntellect: 20, StatSpellPower: 23}},
 
-	{ID: 28346, Slot: EquipOffhand, Name: "Gladiator's Endgame", Phase: 1, Quality: ItemQualityEpic, SourceZone: "Arena Season 1 Reward", SourceDrop: "", Stats: Stats{14, 21, 0, 0, 19, 0, 0}},
-	{ID: 24557, Slot: EquipWeapon, SubSlot: SubslotTwoHand, Name: "Gladiator's War Staff", Phase: 1, Quality: ItemQualityEpic, SourceZone: "Arena Season 1 Reward", SourceDrop: "", Stats: Stats{35, 48, 36, 21, 199, 0, 0}},
+	// FUTURE: just to get this working, shaman "newcast" checks for totems and spell being cast and applies totem bonuses.
+	{ID: 28248, Slot: EquipRanged, Name: "Totem of the Void", Phase: 1, Quality: ItemQualityRare, SourceZone: "Mech - Cache of the Legion", SourceDrop: ""},
+	{ID: 23199, Slot: EquipRanged, Name: "Totem of the Storm", Phase: 0, Quality: ItemQualityRare, SourceZone: "Boe World Drop", SourceDrop: ""},
+	{ID: 32330, Slot: EquipRanged, Name: "Totem of Ancestral Guidance", Phase: 3, Quality: ItemQualityEpic, SourceZone: "BT", SourceDrop: ""},
+
+	{ID: 27543, Slot: EquipWeapon, Name: "Starlight Dagger", Phase: 1, Quality: ItemQualityRare, SourceZone: "H SP - Mennu the Betrayer", SourceDrop: "", Stats: Stats{StatIntellect: 15, StatStamina: 15, StatSpellHit: 16, StatSpellPower: 121}},
+	{ID: 27868, Slot: EquipWeapon, Name: "Runesong Dagger", Phase: 1, Quality: ItemQualityRare, SourceZone: "SH - Warbringer O'mrogg", SourceDrop: "", Stats: Stats{StatIntellect: 11, StatStamina: 12, StatSpellCrit: 20, StatSpellPower: 121}},
+	{ID: 27741, Slot: EquipWeapon, Name: "Bleeding Hollow Warhammer", Phase: 1, Quality: ItemQualityRare, SourceZone: "H SP - Quagmirran", SourceDrop: "", Stats: Stats{StatIntellect: 17, StatStamina: 12, StatSpellCrit: 16, StatSpellPower: 121}},
+	{ID: 27937, Slot: EquipWeapon, Name: "Sky Breaker", Phase: 1, Quality: ItemQualityRare, SourceZone: "H AC - Avatar of the Martyred", SourceDrop: "", Stats: Stats{StatIntellect: 20, StatStamina: 13, StatSpellPower: 132}},
+	{ID: 28412, Slot: EquipOffhand, Name: "Lamp of Peaceful Radiance", Phase: 1, Quality: ItemQualityRare, SourceZone: "Arc - Harbinger Skyriss", SourceDrop: "", Stats: Stats{StatIntellect: 14, StatStamina: 13, StatSpellCrit: 13, StatSpellHit: 12, StatSpellPower: 21}},
+	{ID: 28260, Slot: EquipOffhand, Name: "Manual of the Nethermancer", Phase: 1, Quality: ItemQualityRare, SourceZone: "Mech - Nethermancer Sepethrea", SourceDrop: "", Stats: Stats{StatIntellect: 15, StatStamina: 12, StatSpellCrit: 19, StatSpellPower: 21}},
+	{ID: 31287, Slot: EquipOffhand, SubSlot: SubslotShield, Name: "Draenei Honor Guard Shield", Phase: 1, Quality: ItemQualityRare, SourceZone: "BoE World Drop", SourceDrop: "", Stats: Stats{StatIntellect: 16, StatSpellCrit: 21, StatSpellPower: 19}},
+	{ID: 28187, Slot: EquipOffhand, Name: "Star-Heart Lamp", Phase: 1, Quality: ItemQualityRare, SourceZone: "BM - Temporus", SourceDrop: "", Stats: Stats{StatIntellect: 18, StatStamina: 17, StatSpellHit: 12, StatSpellPower: 22}},
+	{ID: 29330, Slot: EquipOffhand, Name: "The Saga of Terokk", Phase: 1, Quality: ItemQualityRare, SourceZone: "Terokk's Legacy - Auchindoun Quest", SourceDrop: "", Stats: Stats{StatIntellect: 23, StatSpellPower: 28}},
+	{ID: 27910, Slot: EquipOffhand, SubSlot: SubslotShield, Name: "Silvermoon Crest Shield", Phase: 1, Quality: ItemQualityRare, SourceZone: "SLabs - Murmur", SourceDrop: "", Stats: Stats{StatIntellect: 20, StatSpellPower: 23, StatMP5: 5}},
+	{ID: 30984, Slot: EquipOffhand, SubSlot: SubslotShield, Name: "Spellbreaker's Buckler", Phase: 1, Quality: ItemQualityRare, SourceZone: "Akama's Promise - SMV Quest", SourceDrop: "", Stats: Stats{StatIntellect: 10, StatStamina: 22, StatSpellPower: 29}},
+	{ID: 27534, Slot: EquipOffhand, Name: "Hortus' Seal of Brilliance", Phase: 1, Quality: ItemQualityRare, SourceZone: "SH - Warchief Kargath Bladefist", SourceDrop: "", Stats: Stats{StatIntellect: 20, StatStamina: 18, StatSpellPower: 23}},
+	{ID: 29355, Slot: EquipWeapon, SubSlot: SubslotTwoHand, Name: "Terokk's Shadowstaff", Phase: 1, Quality: ItemQualityEpic, SourceZone: "H SH - Talon King Ikiss", SourceDrop: "", Stats: Stats{StatIntellect: 42, StatStamina: 40, StatSpellCrit: 37, StatSpellPower: 168}},
+	{ID: 29130, Slot: EquipWeapon, SubSlot: SubslotTwoHand, Name: "Auchenai Staff", Phase: 1, Quality: ItemQualityRare, SourceZone: "The Aldor - Revered", SourceDrop: "", Stats: Stats{StatIntellect: 46, StatSpellCrit: 26, StatSpellHit: 19, StatSpellPower: 121}},
+	{ID: 28341, Slot: EquipWeapon, SubSlot: SubslotTwoHand, Name: "Warpstaff of Arcanum", Phase: 1, Quality: ItemQualityRare, SourceZone: "Bot - Warp Splinter", SourceDrop: "", Stats: Stats{StatIntellect: 38, StatStamina: 37, StatSpellCrit: 26, StatSpellHit: 16, StatSpellPower: 121}},
+	{ID: 31308, Slot: EquipWeapon, SubSlot: SubslotTwoHand, Name: "The Bringer of Death", Phase: 1, Quality: ItemQualityRare, SourceZone: "BoE World Drop", SourceDrop: "", Stats: Stats{StatIntellect: 31, StatStamina: 32, StatSpellCrit: 42, StatSpellPower: 121}},
+	{ID: 28188, Slot: EquipWeapon, SubSlot: SubslotTwoHand, Name: "Bloodfire Greatstaff", Phase: 1, Quality: ItemQualityRare, SourceZone: "BM - Aeonus", SourceDrop: "", Stats: Stats{StatIntellect: 42, StatStamina: 42, StatSpellCrit: 28, StatSpellPower: 121}},
+	{ID: 30011, Slot: EquipWeapon, SubSlot: SubslotTwoHand, Name: "Ameer's Impulse Taser", Phase: 1, Quality: ItemQualityRare, SourceZone: "Nexus-King Salhadaar - Netherstorm Quest", SourceDrop: "", Stats: Stats{StatIntellect: 27, StatStamina: 27, StatSpellCrit: 27, StatSpellHit: 17, StatSpellPower: 103}},
+	{ID: 27842, Slot: EquipWeapon, SubSlot: SubslotTwoHand, Name: "Grand Scepter of the Nexus-Kings", Phase: 1, Quality: ItemQualityRare, SourceZone: "H MT - Nexus-Prince Shaffar", SourceDrop: "", Stats: Stats{StatIntellect: 43, StatStamina: 45, StatSpellHit: 19, StatSpellPower: 121}},
+
+	{ID: 28346, Slot: EquipOffhand, Name: "Gladiator's Endgame", Phase: 1, Quality: ItemQualityEpic, SourceZone: "Arena Season 1 Reward", SourceDrop: "", Stats: Stats{StatIntellect: 14, StatStamina: 21, StatSpellPower: 19}},
+	{ID: 24557, Slot: EquipWeapon, SubSlot: SubslotTwoHand, Name: "Gladiator's War Staff", Phase: 1, Quality: ItemQualityEpic, SourceZone: "Arena Season 1 Reward", SourceDrop: "", Stats: Stats{StatIntellect: 35, StatStamina: 48, StatSpellCrit: 36, StatSpellHit: 21, StatSpellPower: 199}},
 
 	{ID: 29389, Slot: EquipRanged, Name: "Totem of the Pulsing Earth", Phase: 1, Quality: ItemQualityEpic, SourceZone: "15 Badge of Justice - G'eras", SourceDrop: "", Activate: ActivateTotemOfPulsingEarth, ActivateCD: NeverExpires},
-	// {Slot: EquipRanged, Name: "Totem of Impact", Phase: 1, Quality: ItemQualityRare, SourceZone: "15 Mark of Thrallmar/ Honor Hold", SourceDrop: "", Stats: Stats{0, 0, 0, 0, 0, 0, 0}},
-	// {Slot: EquipRanged, Name: "Totem of Lightning", Phase: 1, Quality: ItemQualityRare, SourceZone: "Colossal Menace - HFP Quest", SourceDrop: "", Stats: Stats{0, 0, 0, 0, 0, 0, 0}},
+	// {Slot: EquipRanged, Name: "Totem of Impact", Phase: 1, Quality: ItemQualityRare, SourceZone: "15 Mark of Thrallmar/ Honor Hold", SourceDrop: "", Stats: Stats{     StatMP5:0}},
+	// {Slot: EquipRanged, Name: "Totem of Lightning", Phase: 1, Quality: ItemQualityRare, SourceZone: "Colossal Menace - HFP Quest", SourceDrop: "", Stats: Stats{     StatMP5:0}},
 
 	// source: https://docs.google.com/spreadsheets/d/1T4DEuq0yroEPb-11okC3qjj7aYfCGu2e6nT9LeT30zg/edit#gid=0
 	{ID: 28744, Slot: EquipHead, Name: "Uni-Mind Headdress", Phase: 1, Quality: ItemQualityEpic, SourceZone: "Kara", SourceDrop: "Netherspite", Stats: Stats{StatStamina: 31, StatIntellect: 40, StatSpellPower: 46, StatSpellCrit: 25, StatSpellHit: 19}},
@@ -555,7 +532,7 @@ var items = []Item{
 	{ID: 29035, Slot: EquipHead, Name: "Cyclone Faceguard (Tier 4)", Phase: 1, Quality: ItemQualityEpic, SourceZone: "Kara", SourceDrop: "Prince", Stats: Stats{StatStamina: 30, StatIntellect: 31, StatSpellPower: 39, StatSpellCrit: 25, StatMP5: 8}, GemSlots: []GemColor{GemColorMeta, GemColorYellow}, SocketBonus: Stats{StatSpellPower: 5}},
 	{ID: 30171, Slot: EquipHead, Name: "Cataclysm Headpiece (Tier 5)", Phase: 2, Quality: ItemQualityEpic, SourceZone: "SSC", SourceDrop: "Lady Vashj", Stats: Stats{StatStamina: 35, StatIntellect: 28, StatSpellPower: 54, StatSpellCrit: 26, StatSpellHit: 18, StatMP5: 7}, GemSlots: []GemColor{GemColorMeta, GemColorYellow}, SocketBonus: Stats{StatSpellHit: 5}},
 	{ID: 29986, Slot: EquipHead, Name: "Cowl of the Grand Engineer", Phase: 2, Quality: ItemQualityEpic, SourceZone: "TK", SourceDrop: "Void Reaver", Stats: Stats{StatStamina: 22, StatIntellect: 27, StatSpellPower: 53, StatSpellCrit: 35, StatSpellHit: 16}, GemSlots: []GemColor{GemColorYellow, GemColorYellow, GemColorBlue}, SocketBonus: Stats{StatSpellPower: 5}},
-	{ID: 32476, Slot: EquipHead, Name: "Gadgetstorm Goggles", Phase: 2, Quality: ItemQualityEpic, SourceZone: "Crafted (Patch 2.1)", SourceDrop: "Engineering (Mail)", Stats: Stats{StatStamina: 28, StatIntellect: 0, StatSpellPower: 55, StatSpellCrit: 40, StatSpellHit: 12}, GemSlots: []GemColor{GemColorMeta, GemColorBlue}, SocketBonus: Stats{StatSpellPower: 5}},
+	{ID: 32476, Slot: EquipHead, Name: "Gadgetstorm Goggles", Phase: 2, Quality: ItemQualityEpic, SourceZone: "Crafted (Patch 2.1)", SourceDrop: "Engineering (Mail)", Stats: Stats{StatStamina: 28, StatSpellPower: 55, StatSpellCrit: 40, StatSpellHit: 12}, GemSlots: []GemColor{GemColorMeta, GemColorBlue}, SocketBonus: Stats{StatSpellPower: 5}},
 	{ID: 31014, Slot: EquipHead, Name: "Skyshatter Headguard (Tier 6)", Phase: 3, Quality: ItemQualityEpic, SourceZone: "Hyjal", SourceDrop: "Archimonde", Stats: Stats{StatStamina: 42, StatIntellect: 37, StatSpellPower: 62, StatSpellCrit: 36, StatMP5: 8}, GemSlots: []GemColor{GemColorMeta, GemColorBlue}, SocketBonus: Stats{StatSpellPower: 5}},
 	{ID: 32525, Slot: EquipHead, Name: "Cowl of the Illidari High Lord", Phase: 3, Quality: ItemQualityEpic, SourceZone: "BT", SourceDrop: "Illidan", Stats: Stats{StatStamina: 33, StatIntellect: 31, StatSpellPower: 64, StatSpellCrit: 47, StatSpellHit: 21}, GemSlots: []GemColor{GemColorMeta, GemColorBlue}, SocketBonus: Stats{StatSpellPower: 5}},
 	{ID: 28530, Slot: EquipNeck, Name: "Brooch of Unquenchable Fury", Phase: 1, Quality: ItemQualityEpic, SourceZone: "Kara", SourceDrop: "Moroes", Stats: Stats{StatStamina: 24, StatIntellect: 21, StatSpellPower: 26, StatSpellHit: 15}},
@@ -563,7 +540,7 @@ var items = []Item{
 	{ID: 30008, Slot: EquipNeck, Name: "Pendant of the Lost Ages", Phase: 2, Quality: ItemQualityEpic, SourceZone: "SSC", SourceDrop: "Tidewalker", Stats: Stats{StatStamina: 27, StatIntellect: 17, StatSpellPower: 36}},
 	{ID: 28762, Slot: EquipNeck, Name: "Adornment of Stolen Souls", Phase: 1, Quality: ItemQualityEpic, SourceZone: "Kara", SourceDrop: "Prince", Stats: Stats{StatStamina: 18, StatIntellect: 20, StatSpellPower: 28, StatSpellCrit: 23}},
 	{ID: 30015, Slot: EquipNeck, Name: "The Sun King's Talisman", Phase: 2, Quality: ItemQualityEpic, SourceZone: "TK", SourceDrop: "Kael Reward", Stats: Stats{StatStamina: 22, StatIntellect: 16, StatSpellPower: 41, StatSpellCrit: 24}},
-	{ID: 32349, Slot: EquipNeck, Name: "Translucent Spellthread Necklace", Phase: 3, Quality: ItemQualityEpic, SourceZone: "BT", SourceDrop: "RoS", Stats: Stats{StatStamina: 0, StatIntellect: 0, StatSpellPower: 46, StatSpellCrit: 24, StatSpellHit: 15}},
+	{ID: 32349, Slot: EquipNeck, Name: "Translucent Spellthread Necklace", Phase: 3, Quality: ItemQualityEpic, SourceZone: "BT", SourceDrop: "RoS", Stats: Stats{StatSpellPower: 46, StatSpellCrit: 24, StatSpellHit: 15}},
 	{ID: 28726, Slot: EquipShoulder, Name: "Mantle of the Mind Flayer", Phase: 1, Quality: ItemQualityEpic, SourceZone: "Kara", SourceDrop: "Aran", Stats: Stats{StatStamina: 33, StatIntellect: 29, StatSpellPower: 35}},
 	{ID: 30024, Slot: EquipShoulder, Name: "Mantle of the Elven Kings", Phase: 2, Quality: ItemQualityEpic, SourceZone: "TK", SourceDrop: "Trash", Stats: Stats{StatStamina: 27, StatIntellect: 18, StatSpellPower: 39, StatSpellCrit: 25, StatSpellHit: 18}},
 	{ID: 29037, Slot: EquipShoulder, Name: "Cyclone Shoulderguards (Tier 4)", Phase: 1, Quality: ItemQualityEpic, SourceZone: "Gruul's Lair", SourceDrop: "Maulgar", Stats: Stats{StatStamina: 28, StatIntellect: 26, StatSpellPower: 36, StatSpellCrit: 12}, GemSlots: []GemColor{GemColorYellow, GemColorYellow}, SocketBonus: Stats{StatSpellPower: 4}},
@@ -578,7 +555,7 @@ var items = []Item{
 	{ID: 29369, Slot: EquipBack, Name: "Shawl of Shifting Probabilities", Phase: 1, Quality: ItemQualityEpic, SourceZone: "Shattrah", SourceDrop: "Badges", Stats: Stats{StatStamina: 18, StatIntellect: 16, StatSpellPower: 21, StatSpellCrit: 22}},
 	{ID: 29992, Slot: EquipBack, Name: "Royal Cloak of the Sunstriders", Phase: 2, Quality: ItemQualityEpic, SourceZone: "TK", SourceDrop: "Kaelthas", Stats: Stats{StatStamina: 27, StatIntellect: 22, StatSpellPower: 44}},
 	{ID: 28797, Slot: EquipBack, Name: "Brute Cloak of the Ogre-Magi", Phase: 1, Quality: ItemQualityEpic, SourceZone: "Gruul's Lair", SourceDrop: "Maulgar", Stats: Stats{StatStamina: 18, StatIntellect: 20, StatSpellPower: 28, StatSpellCrit: 23}},
-	{ID: 30735, Slot: EquipBack, Name: "Ancient Spellcloak of the Highborne", Phase: 1, Quality: ItemQualityEpic, SourceZone: "WorldBoss", SourceDrop: "Kazzak", Stats: Stats{StatStamina: 0, StatIntellect: 15, StatSpellPower: 36, StatSpellCrit: 19}},
+	{ID: 30735, Slot: EquipBack, Name: "Ancient Spellcloak of the Highborne", Phase: 1, Quality: ItemQualityEpic, SourceZone: "WorldBoss", SourceDrop: "Kazzak", Stats: Stats{StatIntellect: 15, StatSpellPower: 36, StatSpellCrit: 19}},
 	{ID: 32331, Slot: EquipBack, Name: "Cloak of the Illidari Council", Phase: 3, Quality: ItemQualityEpic, SourceZone: "BT", SourceDrop: "Illidari Council", Stats: Stats{StatStamina: 24, StatIntellect: 16, StatSpellPower: 42, StatSpellCrit: 25}},
 	{ID: 29033, Slot: EquipChest, Name: "Cyclone Chestguard (Tier 4)", Phase: 1, Quality: ItemQualityEpic, SourceZone: "GruulsLair", SourceDrop: "Maulgar", Stats: Stats{StatStamina: 33, StatIntellect: 32, StatSpellPower: 39, StatSpellCrit: 20, StatMP5: 8}, GemSlots: []GemColor{GemColorRed, GemColorYellow, GemColorBlue}, SocketBonus: Stats{StatSpellHit: 4}},
 	{ID: 29519, Slot: EquipChest, Name: "Netherstrike Breastplate", Phase: 1, Quality: ItemQualityEpic, SourceZone: "Crafted", SourceDrop: "Leatherworking", Stats: Stats{StatStamina: 34, StatIntellect: 23, StatSpellPower: 37, StatSpellCrit: 32, StatMP5: 8}, GemSlots: []GemColor{GemColorBlue, GemColorYellow, GemColorBlue}, SocketBonus: Stats{StatSpellPower: 5}},
@@ -600,7 +577,7 @@ var items = []Item{
 	{ID: 28507, Slot: EquipHands, Name: "Handwraps of Flowing Thought", Phase: 1, Quality: ItemQualityEpic, SourceZone: "Kara", SourceDrop: "Huntsman", Stats: Stats{StatStamina: 24, StatIntellect: 22, StatSpellPower: 35, StatSpellHit: 14}, GemSlots: []GemColor{GemColorYellow, GemColorBlue}, SocketBonus: Stats{StatSpellHit: 3}},
 	{ID: 30170, Slot: EquipHands, Name: "Cataclysm Handgrips (Tier 5)", Phase: 2, Quality: ItemQualityEpic, SourceZone: "TK", SourceDrop: "LeotherastheBlind", Stats: Stats{StatStamina: 25, StatIntellect: 27, StatSpellPower: 41, StatSpellCrit: 19, StatSpellHit: 19, StatMP5: 7}},
 	{ID: 29987, Slot: EquipHands, Name: "Gauntlets of the Sun King", Phase: 2, Quality: ItemQualityEpic, SourceZone: "TK", SourceDrop: "Kaelthas", Stats: Stats{StatStamina: 28, StatIntellect: 29, StatSpellPower: 42, StatSpellCrit: 28}},
-	{ID: 30725, Slot: EquipHands, Name: "Anger-Spark Gloves", Phase: 1, Quality: ItemQualityEpic, SourceZone: "World Boss", SourceDrop: "Doomwalker", Stats: Stats{StatStamina: 0, StatIntellect: 0, StatSpellPower: 30, StatSpellCrit: 25, StatSpellHit: 20}, GemSlots: []GemColor{GemColorRed, GemColorRed}, SocketBonus: Stats{StatSpellCrit: 3}},
+	{ID: 30725, Slot: EquipHands, Name: "Anger-Spark Gloves", Phase: 1, Quality: ItemQualityEpic, SourceZone: "World Boss", SourceDrop: "Doomwalker", Stats: Stats{StatSpellPower: 30, StatSpellCrit: 25, StatSpellHit: 20}, GemSlots: []GemColor{GemColorRed, GemColorRed}, SocketBonus: Stats{StatSpellCrit: 3}},
 	{ID: 28780, Slot: EquipHands, Name: "Soul-Eater's Handwraps", Phase: 1, Quality: ItemQualityEpic, SourceZone: "Magtheridon's Lair", SourceDrop: "Magtheridon", Stats: Stats{StatStamina: 31, StatIntellect: 24, StatSpellPower: 36, StatSpellCrit: 21}, GemSlots: []GemColor{GemColorYellow, GemColorBlue}, SocketBonus: Stats{StatSpellPower: 4}},
 	{ID: 31008, Slot: EquipHands, Name: "Skyshatter Gauntlets (Tier 6)", Phase: 3, Quality: ItemQualityEpic, SourceZone: "Hyjal", SourceDrop: "Azgalor", Stats: Stats{StatStamina: 30, StatIntellect: 31, StatSpellPower: 46, StatSpellCrit: 26, StatSpellHit: 19}, GemSlots: []GemColor{GemColorYellow}, SocketBonus: Stats{StatSpellPower: 2}},
 	{ID: 28565, Slot: EquipWaist, Name: "Nethershard Girdle", Phase: 1, Quality: ItemQualityEpic, SourceZone: "Kara", SourceDrop: "Moroes", Stats: Stats{StatStamina: 22, StatIntellect: 30, StatSpellPower: 35}},
@@ -613,7 +590,7 @@ var items = []Item{
 	{ID: 24256, Slot: EquipWaist, Name: "Girdle of Ruination", Phase: 1, Quality: ItemQualityEpic, SourceZone: "Crafted", SourceDrop: "Tailoring", Stats: Stats{StatStamina: 18, StatIntellect: 13, StatSpellPower: 39, StatSpellCrit: 20}, GemSlots: []GemColor{GemColorRed, GemColorYellow}, SocketBonus: Stats{StatStamina: 4}},
 	{ID: 30914, Slot: EquipWaist, Name: "Belt of the Crescent Moon", Phase: 3, Quality: ItemQualityEpic, SourceZone: "Hyjal", SourceDrop: "Kazrogal", Stats: Stats{StatStamina: 25, StatIntellect: 27, StatSpellPower: 44, StatSpellHaste: 36}},
 	{ID: 32256, Slot: EquipWaist, Name: "Waistwrap of Infinity", Phase: 3, Quality: ItemQualityEpic, SourceZone: "BT", SourceDrop: "Supremus", Stats: Stats{StatStamina: 31, StatIntellect: 22, StatSpellPower: 56, StatSpellHaste: 32}},
-	{ID: 30038, Slot: EquipWaist, Name: "Belt of Blasting", Phase: 2, Quality: ItemQualityEpic, SourceZone: "SSC/TK", SourceDrop: "Tailoring", Stats: Stats{StatStamina: 0, StatIntellect: 0, StatSpellPower: 50, StatSpellCrit: 30, StatSpellHit: 23}, GemSlots: []GemColor{GemColorBlue, GemColorYellow}, SocketBonus: Stats{StatSpellPower: 4}},
+	{ID: 30038, Slot: EquipWaist, Name: "Belt of Blasting", Phase: 2, Quality: ItemQualityEpic, SourceZone: "SSC/TK", SourceDrop: "Tailoring", Stats: Stats{StatSpellPower: 50, StatSpellCrit: 30, StatSpellHit: 23}, GemSlots: []GemColor{GemColorBlue, GemColorYellow}, SocketBonus: Stats{StatSpellPower: 4}},
 	{ID: 30888, Slot: EquipWaist, Name: "Anetheron's Noose", Phase: 3, Quality: ItemQualityEpic, SourceZone: "Hyjal", SourceDrop: "Anetheron", Stats: Stats{StatStamina: 22, StatIntellect: 23, StatSpellPower: 55, StatSpellCrit: 24}, GemSlots: []GemColor{GemColorYellow, GemColorBlue}, SocketBonus: Stats{StatSpellPower: 4}},
 	{ID: 32276, Slot: EquipWaist, Name: "Flashfire Girdle", Phase: 3, Quality: ItemQualityEpic, SourceZone: "BT", SourceDrop: "Akama", Stats: Stats{StatStamina: 27, StatIntellect: 26, StatSpellPower: 44, StatSpellHaste: 37, StatSpellCrit: 18}},
 	{ID: 29036, Slot: EquipLegs, Name: "Cyclone Legguards (Tier 4)", Phase: 1, Quality: ItemQualityEpic, SourceZone: "Gruul's Lair", SourceDrop: "Gruul", Stats: Stats{StatStamina: 40, StatIntellect: 40, StatSpellPower: 49, StatSpellHit: 20, StatMP5: 8}},
@@ -622,7 +599,7 @@ var items = []Item{
 	{ID: 30172, Slot: EquipLegs, Name: "Cataclysm Leggings (Tier 5)", Phase: 2, Quality: ItemQualityEpic, SourceZone: "TK", SourceDrop: "Karathress", Stats: Stats{StatStamina: 48, StatIntellect: 46, StatSpellPower: 54, StatSpellCrit: 24, StatSpellHit: 14}, GemSlots: []GemColor{GemColorYellow}, SocketBonus: Stats{StatSpellPower: 2}},
 	{ID: 32367, Slot: EquipLegs, Name: "Leggings of Devastation", Phase: 3, Quality: ItemQualityEpic, SourceZone: "BT", SourceDrop: "Mother", Stats: Stats{StatStamina: 40, StatIntellect: 42, StatSpellPower: 60, StatSpellHit: 26}, GemSlots: []GemColor{GemColorYellow, GemColorYellow, GemColorBlue}, SocketBonus: Stats{StatSpellPower: 5}},
 	{ID: 31020, Slot: EquipLegs, Name: "Skyshatter Legguards (Tier 6)", Phase: 3, Quality: ItemQualityEpic, SourceZone: "BT", SourceDrop: "Illidari Council", Stats: Stats{StatStamina: 40, StatIntellect: 42, StatSpellPower: 62, StatSpellCrit: 29, StatSpellHit: 20, StatMP5: 11}, GemSlots: []GemColor{GemColorYellow}, SocketBonus: Stats{StatSpellPower: 2}},
-	{ID: 30734, Slot: EquipLegs, Name: "Leggings of the Seventh Circle", Phase: 1, Quality: ItemQualityEpic, SourceZone: "World Boss", SourceDrop: "Kazzak", Stats: Stats{StatStamina: 0, StatIntellect: 22, StatSpellPower: 50, StatSpellCrit: 25, StatSpellHit: 18}, GemSlots: []GemColor{GemColorRed, GemColorYellow, GemColorYellow}, SocketBonus: Stats{StatSpellPower: 5}},
+	{ID: 30734, Slot: EquipLegs, Name: "Leggings of the Seventh Circle", Phase: 1, Quality: ItemQualityEpic, SourceZone: "World Boss", SourceDrop: "Kazzak", Stats: Stats{StatIntellect: 22, StatSpellPower: 50, StatSpellCrit: 25, StatSpellHit: 18}, GemSlots: []GemColor{GemColorRed, GemColorYellow, GemColorYellow}, SocketBonus: Stats{StatSpellPower: 5}},
 	{ID: 30916, Slot: EquipLegs, Name: "Leggings of Channeled Elements", Phase: 3, Quality: ItemQualityEpic, SourceZone: "Hyjal", SourceDrop: "Kazrogal", Stats: Stats{StatStamina: 25, StatIntellect: 28, StatSpellPower: 59, StatSpellCrit: 34, StatSpellHit: 18}, GemSlots: []GemColor{GemColorYellow, GemColorYellow, GemColorBlue}, SocketBonus: Stats{StatSpellPower: 5}},
 	{ID: 28670, Slot: EquipFeet, Name: "Boots of the Infernal Coven", Phase: 1, Quality: ItemQualityEpic, SourceZone: "Kara", SourceDrop: "Aran", Stats: Stats{StatStamina: 27, StatIntellect: 27, StatSpellPower: 34}},
 	{ID: 28585, Slot: EquipFeet, Name: "Ruby Slippers", Phase: 1, Quality: ItemQualityEpic, SourceZone: "Kara", SourceDrop: "Opera", Stats: Stats{StatStamina: 33, StatIntellect: 29, StatSpellPower: 35, StatSpellHit: 16}},
@@ -644,14 +621,14 @@ var items = []Item{
 	{ID: 29285, Slot: EquipFinger, Name: "Violet Signet (H)", Phase: 1, Quality: ItemQualityEpic, SourceZone: "Kara", SourceDrop: "Honored", Stats: Stats{StatStamina: 19, StatIntellect: 21, StatSpellPower: 26, StatSpellCrit: 15}},
 	{ID: 28753, Slot: EquipFinger, Name: "Ring of Recurrence", Phase: 1, Quality: ItemQualityEpic, SourceZone: "Kara", SourceDrop: "Chess", Stats: Stats{StatStamina: 15, StatIntellect: 15, StatSpellPower: 32, StatSpellCrit: 19}},
 	{ID: 29305, Slot: EquipFinger, Name: "Band of the Eternal Sage", Phase: 3, Quality: ItemQualityEpic, SourceZone: "Hyjal", SourceDrop: "Exalted", Stats: Stats{StatStamina: 28, StatIntellect: 25, StatSpellPower: 34, StatSpellCrit: 24}},
-	{ID: 30109, Slot: EquipFinger, Name: "Ring of Endless Coils", Phase: 2, Quality: ItemQualityEpic, SourceZone: "SSC", SourceDrop: "LadyVashj", Stats: Stats{StatStamina: 31, StatIntellect: 0, StatSpellPower: 37, StatSpellCrit: 22}},
-	{ID: 30667, Slot: EquipFinger, Name: "Ring of Unrelenting Storms", Phase: 1, Quality: ItemQualityEpic, SourceZone: "Kara", SourceDrop: "Trash", Stats: Stats{StatStamina: 0, StatIntellect: 15, StatSpellPower: 43, StatSpellCrit: 19}},
-	{ID: 32247, Slot: EquipFinger, Name: "Ring of Captured Storms", Phase: 3, Quality: ItemQualityEpic, SourceZone: "BT", SourceDrop: "Najentus", Stats: Stats{StatStamina: 0, StatIntellect: 0, StatSpellPower: 42, StatSpellCrit: 29, StatSpellHit: 19}},
+	{ID: 30109, Slot: EquipFinger, Name: "Ring of Endless Coils", Phase: 2, Quality: ItemQualityEpic, SourceZone: "SSC", SourceDrop: "LadyVashj", Stats: Stats{StatStamina: 31, StatSpellPower: 37, StatSpellCrit: 22}},
+	{ID: 30667, Slot: EquipFinger, Name: "Ring of Unrelenting Storms", Phase: 1, Quality: ItemQualityEpic, SourceZone: "Kara", SourceDrop: "Trash", Stats: Stats{StatIntellect: 15, StatSpellPower: 43, StatSpellCrit: 19}},
+	{ID: 32247, Slot: EquipFinger, Name: "Ring of Captured Storms", Phase: 3, Quality: ItemQualityEpic, SourceZone: "BT", SourceDrop: "Najentus", Stats: Stats{StatSpellPower: 42, StatSpellCrit: 29, StatSpellHit: 19}},
 	{ID: 32527, Slot: EquipFinger, Name: "Ring of Ancient Knowledge", Phase: 3, Quality: ItemQualityEpic, SourceZone: "BT", SourceDrop: "Trash", Stats: Stats{StatStamina: 30, StatIntellect: 20, StatSpellPower: 39, StatSpellHaste: 31}},
 	{ID: 30832, Slot: EquipWeapon, Name: "Gavel of Unearthed Secrets", Phase: 1, Quality: ItemQualityEpic, SourceZone: "Shattrah", SourceDrop: "Lower City - Exalted", Stats: Stats{StatStamina: 24, StatIntellect: 16, StatSpellPower: 159, StatSpellCrit: 15}},
-	{ID: 23554, Slot: EquipWeapon, Name: "Eternium Runed Blade", Phase: 1, Quality: ItemQualityEpic, SourceZone: "Crafted", SourceDrop: "Blacksmithing", Stats: Stats{StatStamina: 0, StatIntellect: 19, StatSpellPower: 168, StatSpellCrit: 21}},
+	{ID: 23554, Slot: EquipWeapon, Name: "Eternium Runed Blade", Phase: 1, Quality: ItemQualityEpic, SourceZone: "Crafted", SourceDrop: "Blacksmithing", Stats: Stats{StatIntellect: 19, StatSpellPower: 168, StatSpellCrit: 21}},
 	{ID: 28770, Slot: EquipWeapon, Name: "Nathrezim Mindblade", Phase: 1, Quality: ItemQualityEpic, SourceZone: "Kara", SourceDrop: "Prince", Stats: Stats{StatStamina: 18, StatIntellect: 18, StatSpellPower: 203, StatSpellCrit: 23}},
-	{ID: 30723, Slot: EquipWeapon, Name: "Talon of the Tempest", Phase: 1, Quality: ItemQualityEpic, SourceZone: "World Boss", SourceDrop: "Doomwalker", Stats: Stats{StatStamina: 0, StatIntellect: 10, StatSpellPower: 194, StatSpellCrit: 19, StatSpellHit: 9}, GemSlots: []GemColor{GemColorYellow, GemColorYellow}, SocketBonus: Stats{StatIntellect: 3}},
+	{ID: 30723, Slot: EquipWeapon, Name: "Talon of the Tempest", Phase: 1, Quality: ItemQualityEpic, SourceZone: "World Boss", SourceDrop: "Doomwalker", Stats: Stats{StatIntellect: 10, StatSpellPower: 194, StatSpellCrit: 19, StatSpellHit: 9}, GemSlots: []GemColor{GemColorYellow, GemColorYellow}, SocketBonus: Stats{StatIntellect: 3}},
 	{ID: 34009, Slot: EquipWeapon, Name: "Hammer of Judgement", Phase: 3, Quality: ItemQualityEpic, SourceZone: "Hyjal", SourceDrop: "Trash", Stats: Stats{StatStamina: 33, StatIntellect: 22, StatSpellPower: 236, StatSpellHit: 22}},
 	{ID: 32237, Slot: EquipWeapon, Name: "The Maelstrom's Fury", Phase: 3, Quality: ItemQualityEpic, SourceZone: "BT", SourceDrop: "Najentus", Stats: Stats{StatStamina: 33, StatIntellect: 21, StatSpellPower: 236, StatSpellCrit: 22}},
 	{ID: 28633, Slot: EquipWeapon, SubSlot: SubslotTwoHand, Name: "Staff of Infinite Mysteries", Phase: 1, Quality: ItemQualityEpic, SourceZone: "Kara", SourceDrop: "Curator", Stats: Stats{StatStamina: 61, StatIntellect: 51, StatSpellPower: 185, StatSpellHit: 23}},
@@ -677,10 +654,10 @@ var items = []Item{
 	{ID: 19379, Slot: EquipTrinket, Name: "Neltharion's Tear", Phase: 0, Quality: ItemQualityEpic, SourceZone: "BWL", SourceDrop: "Nefarian", Stats: Stats{StatSpellPower: 44, StatSpellHit: 16}},
 	{ID: 23046, Slot: EquipTrinket, Name: "The Restrained Essence of Sapphiron", Phase: 0, Quality: ItemQualityEpic, SourceZone: "Naxx", SourceDrop: "Sapphiron", Stats: Stats{StatSpellPower: 40}, Activate: createSpellDmgActivate(MagicIDSpellPower, 130, time.Second*20), ActivateCD: time.Second * 120, CoolID: MagicIDEssSappTrink},
 	{ID: 23207, Slot: EquipTrinket, Name: "Mark of the Champion", Phase: 0, Quality: ItemQualityEpic, SourceZone: "Naxx", SourceDrop: "KT", Stats: Stats{StatSpellPower: 85}},
-	{ID: 29132, Slot: EquipTrinket, Name: "Scryer's Bloodgem", Phase: 1, Quality: ItemQualityRare, SourceZone: "The Scryers - Revered", SourceDrop: "", Stats: Stats{0, 0, 0, 32, 0, 0, 0}, Activate: createSpellDmgActivate(MagicIDSpellPower, 150, time.Second*15), ActivateCD: time.Second * 90, CoolID: MagicIDScryerTrink},
-	{ID: 24126, Slot: EquipTrinket, Name: "Figurine - Living Ruby Serpent", Phase: 1, Quality: ItemQualityRare, SourceZone: "Jewelcarfting BoP", SourceDrop: "", Stats: Stats{23, 33, 0, 0, 0, 0, 0}, Activate: createSpellDmgActivate(MagicIDRubySerpent, 150, time.Second*20), ActivateCD: time.Second * 300, CoolID: MagicIDRubySerpentTrink},
-	{ID: 29179, Slot: EquipTrinket, Name: "Xi'ri's Gift", Phase: 1, Quality: ItemQualityRare, SourceZone: "The Sha'tar - Revered", SourceDrop: "", Stats: Stats{0, 0, 32, 0, 0, 0, 0}, Activate: createSpellDmgActivate(MagicIDSpellPower, 150, time.Second*15), ActivateCD: time.Second * 90, CoolID: MagicIDXiriTrink},
-	{ID: 28418, Slot: EquipTrinket, Name: "Shiffar's Nexus-Horn", Phase: 1, Quality: ItemQualityRare, SourceZone: "Arc - Harbinger Skyriss", SourceDrop: "", Stats: Stats{0, 0, 30, 0, 0, 0, 0}, Activate: ActivateNexusHorn, ActivateCD: NeverExpires},
+	{ID: 29132, Slot: EquipTrinket, Name: "Scryer's Bloodgem", Phase: 1, Quality: ItemQualityRare, SourceZone: "The Scryers - Revered", SourceDrop: "", Stats: Stats{StatSpellHit: 32}, Activate: createSpellDmgActivate(MagicIDSpellPower, 150, time.Second*15), ActivateCD: time.Second * 90, CoolID: MagicIDScryerTrink},
+	{ID: 24126, Slot: EquipTrinket, Name: "Figurine - Living Ruby Serpent", Phase: 1, Quality: ItemQualityRare, SourceZone: "Jewelcarfting BoP", SourceDrop: "", Stats: Stats{StatIntellect: 23, StatStamina: 33}, Activate: createSpellDmgActivate(MagicIDRubySerpent, 150, time.Second*20), ActivateCD: time.Second * 300, CoolID: MagicIDRubySerpentTrink},
+	{ID: 29179, Slot: EquipTrinket, Name: "Xi'ri's Gift", Phase: 1, Quality: ItemQualityRare, SourceZone: "The Sha'tar - Revered", SourceDrop: "", Stats: Stats{StatSpellCrit: 32}, Activate: createSpellDmgActivate(MagicIDSpellPower, 150, time.Second*15), ActivateCD: time.Second * 90, CoolID: MagicIDXiriTrink},
+	{ID: 28418, Slot: EquipTrinket, Name: "Shiffar's Nexus-Horn", Phase: 1, Quality: ItemQualityRare, SourceZone: "Arc - Harbinger Skyriss", SourceDrop: "", Stats: Stats{StatSpellCrit: 30}, Activate: ActivateNexusHorn, ActivateCD: NeverExpires},
 	{ID: 31856, Slot: EquipTrinket, Name: "Darkmoon Card: Crusade", Phase: 2, Quality: ItemQualityEpic, SourceZone: "Blessings Deck", SourceDrop: "", Activate: ActivateDCC, ActivateCD: NeverExpires},
 	{ID: 28785, Slot: EquipTrinket, Name: "The Lightning Capacitor", Phase: 1, Quality: ItemQualityEpic, SourceZone: "Kara", SourceDrop: "", Activate: ActivateTLC, ActivateCD: NeverExpires},
 	{ID: 28789, Slot: EquipTrinket, Name: "Eye of Magtheridon", Phase: 1, Quality: ItemQualityEpic, SourceZone: "", SourceDrop: "", Stats: Stats{StatSpellPower: 54}, Activate: ActivateEyeOfMag, ActivateCD: NeverExpires},
@@ -693,11 +670,8 @@ var items = []Item{
 	{ID: 30663, Slot: EquipTrinket, Name: "Fathom-Brooch of the Tidewalker", Phase: 2, Quality: ItemQualityEpic, SourceZone: "SSC", SourceDrop: "Fathom-Lord Karathress", Stats: Stats{}, Activate: ActivateFathomBrooch, ActivateCD: NeverExpires},
 	{ID: 35749, Slot: EquipTrinket, Name: "Sorcerer's Alchemist Stone", Phase: 5, Quality: ItemQualityEpic, SourceZone: "Shattered Sun Offensive", SourceDrop: "Exalted", Stats: Stats{StatSpellPower: 63}, Activate: ActivateAlchStone, ActivateCD: NeverExpires},
 
-	{ID: 24116, Slot: EquipNeck, Name: "Eye of the Night", Phase: 1, Quality: ItemQualityRare, SourceZone: "Jewelcrafting", SourceDrop: "", Stats: Stats{StatSpellCrit: 26, StatSpellHit: 16}, Activate: func(sim *Simulation, party *Party, player *Player) Aura {
-		activate := createSpellDmgActivate(MagicIDEyeOfTheNight, 34, time.Minute*30)
-		return activate(sim, party, player)
-	}, ActivateCD: NeverExpires, CoolID: MagicIDEyeOfTheNightTrink},
-	{ID: 24121, Slot: EquipNeck, Name: "Chain of the Twilight Owl", Phase: 1, Quality: ItemQualityRare, SourceZone: "Jewelcrafting", SourceDrop: "", Stats: Stats{StatStamina: 0, StatIntellect: 19, StatSpellPower: 21}, Activate: ActivateChainTO, ActivateCD: NeverExpires, CoolID: MagicIDChainTOTrink},
+	{ID: 24116, Slot: EquipNeck, Name: "Eye of the Night", Phase: 1, Quality: ItemQualityRare, SourceZone: "Jewelcrafting", SourceDrop: "", Stats: Stats{StatSpellCrit: 26, StatSpellHit: 16}, Activate: ActivateEyeOfNight, ActivateCD: NeverExpires},
+	{ID: 24121, Slot: EquipNeck, Name: "Chain of the Twilight Owl", Phase: 1, Quality: ItemQualityRare, SourceZone: "Jewelcrafting", SourceDrop: "", Stats: Stats{StatIntellect: 19, StatSpellPower: 21}, Activate: ActivateChainTO, ActivateCD: NeverExpires},
 	{ID: 31075, Slot: EquipFinger, Name: "Evoker's Mark of the Redemption", Phase: 1, Quality: ItemQualityRare, SourceZone: "Quest SMV", SourceDrop: "Dissension Amongst the Ranks...", Stats: Stats{StatIntellect: 15, StatSpellPower: 29, StatSpellCrit: 10}},
 	{ID: 32664, Slot: EquipFinger, Name: "Dreamcrystal Band", Phase: 1, Quality: ItemQualityRare, SourceZone: "Blades Edge Moutains", SourceDrop: "50 Apexis Shards", Stats: Stats{StatIntellect: 10, StatSpellPower: 38, StatSpellCrit: 15}},
 	{ID: 29522, Slot: EquipChest, Name: "Windhawk Hauberk", Phase: 1, Quality: ItemQualityEpic, SourceZone: "Leatherworking", SourceDrop: "", Stats: Stats{StatStamina: 28, StatIntellect: 29, StatSpirit: 29, StatSpellPower: 46, StatSpellCrit: 19}, GemSlots: []GemColor{GemColorBlue, GemColorYellow, GemColorBlue}, SocketBonus: Stats{StatSpellPower: 5}},
@@ -714,9 +688,9 @@ var items = []Item{
 	{ID: 23664, Slot: EquipShoulder, Name: "Pauldrons of Elemental Fury", Phase: 0, Quality: ItemQualityEpic, SourceZone: "Naxx", SourceDrop: "Trash", Stats: Stats{StatStamina: 19, StatIntellect: 21, StatSpellPower: 26, StatSpellCrit: 14, StatSpellHit: 8}},
 	{ID: 23665, Slot: EquipLegs, Name: "Leggings of Elemental Fury", Phase: 0, Quality: ItemQualityEpic, SourceZone: "Naxx", SourceDrop: "Trash", Stats: Stats{StatStamina: 26, StatIntellect: 27, StatSpellPower: 32, StatSpellCrit: 28}},
 	{ID: 23050, Slot: EquipBack, Name: "Cloak of the Necropolis", Phase: 0, Quality: ItemQualityEpic, SourceZone: "Naxx", SourceDrop: "Sapp", Stats: Stats{StatStamina: 12, StatIntellect: 11, StatSpellPower: 26, StatSpellCrit: 14, StatSpellHit: 8}},
-	{ID: 30682, Slot: EquipFeet, Name: "Glider's Sabatons of Nature's Wrath", Phase: 1, Quality: ItemQualityEpic, SourceZone: "Kara", SourceDrop: "Servants Quarter", Stats: Stats{StatSpellPower: 78}},
-	{ID: 30677, Slot: EquipWaist, Name: "Lurker's Belt of Nature's Wrath", Phase: 1, Quality: ItemQualityEpic, SourceZone: "Kara", SourceDrop: "Servants Quarter", Stats: Stats{StatSpellPower: 78}},
-	{ID: 30686, Slot: EquipWrist, Name: "Ravager's Bands of Nature's Wrath", Phase: 1, Quality: ItemQualityEpic, SourceZone: "Kara", SourceDrop: "Servants Quarter", Stats: Stats{StatSpellPower: 58}},
+	{ID: 30682, Slot: EquipFeet, Name: "Glider's Sabatons of Nature's Wrath", Phase: 1, Quality: ItemQualityEpic, SourceZone: "Kara", SourceDrop: "Servants Quarter", Stats: Stats{StatNatureSpellPower: 78}},
+	{ID: 30677, Slot: EquipWaist, Name: "Lurker's Belt of Nature's Wrath", Phase: 1, Quality: ItemQualityEpic, SourceZone: "Kara", SourceDrop: "Servants Quarter", Stats: Stats{StatNatureSpellPower: 78}},
+	{ID: 30686, Slot: EquipWrist, Name: "Ravager's Bands of Nature's Wrath", Phase: 1, Quality: ItemQualityEpic, SourceZone: "Kara", SourceDrop: "Servants Quarter", Stats: Stats{StatNatureSpellPower: 58}},
 	// {Slot: EquipFeet, Name: "Glider's Sabatons of the Invoker", Phase: 1, Quality: ItemQualityEpic, SourceZone: "Kara", SourceDrop: "Servants Quarter", Stats: Stats{StatSpellPower: 33, StatSpellCrit: 28}},
 	// {Slot: EquipWaist, Name: "Lurker's Belt of the Invoker", Phase: 1, Quality: ItemQualityEpic, SourceZone: "Kara", SourceDrop: "Servants Quarter", Stats: Stats{StatSpellPower: 33, StatSpellCrit: 28}},
 	// {Slot: EquipWrist, Name: "Ravager's Bands of the Invoker", Phase: 1, Quality: ItemQualityEpic, SourceZone: "Kara", SourceDrop: "Servants Quarter", Stats: Stats{StatSpellPower: 25, StatSpellCrit: 21}},
@@ -816,9 +790,8 @@ var items = []Item{
 		SocketBonus: Stats{StatSpellPower: 2},
 	},
 
-	// {Slot:EquipTrinket, Name:"Arcanist's Stone", Phase: 1, Quality: ItemQualityEpic, SourceZone:"H OHF - Epoch Hunter", SourceDrop:"", Stats:Stats{0, 0, 0, 25, 0, 0, 0} }
-	// {Slot:EquipTrinket, Name:"Vengeance of the Illidari", Phase: 1, Quality: ItemQualityEpic, SourceZone:"Cruel's Intentions/Overlord - HFP Quest", SourceDrop:"", Stats:Stats{0, 0, 26, 0, 0, 0, 0} }
-	{ID: 32330, Slot: EquipRanged, Name: "Totem of Ancestral Guidance", Phase: 3, Quality: ItemQualityEpic, SourceZone: "BT", SourceDrop: "", Stats: Stats{StatSpellPower: 85}},
+	// {Slot:EquipTrinket, Name:"Arcanist's Stone", Phase: 1, Quality: ItemQualityEpic, SourceZone:"H OHF - Epoch Hunter", SourceDrop:"", Stats:Stats{  StatSpellHit: 25,   StatMP5:0} }
+	// {Slot:EquipTrinket, Name:"Vengeance of the Illidari", Phase: 1, Quality: ItemQualityEpic, SourceZone:"Cruel's Intentions/Overlord - HFP Quest", SourceDrop:"", Stats:Stats{ StatSpellCrit: 26,    StatMP5:0} }
 	{ID: 33506, Slot: EquipRanged, Name: "Skycall Totem", Phase: 4, Quality: ItemQualityEpic, SourceZone: "Geras", SourceDrop: "20 Badges", Stats: Stats{}, Activate: ActivateSkycall, ActivateCD: NeverExpires},
 	{ID: 32086, Slot: EquipHead, Name: "Storm Master's Helmet", Phase: 1, Quality: ItemQualityRare, SourceZone: "Geras", SourceDrop: "50 Badges", Stats: Stats{StatStamina: 24, StatIntellect: 32, StatSpellCrit: 24, StatSpellPower: 37}, GemSlots: []GemColor{GemColorMeta, GemColorBlue}, SocketBonus: Stats{StatSpellCrit: 4}},
 	{ID: 28602, Slot: EquipChest, Name: "Robe of the Elder Scribes", Phase: 1, Quality: ItemQualityEpic, SourceZone: "Karazhan", SourceDrop: "Nightbane", Stats: Stats{StatStamina: 27, StatIntellect: 29, StatSpirit: 24, StatSpellPower: 32, StatSpellCrit: 24}, Activate: ActivateElderScribes, ActivateCD: NeverExpires},
@@ -889,6 +862,7 @@ var sets = []ItemSet{
 				return Aura{ID: MagicIDTidefury}
 			},
 			4: func(sim *Simulation, party *Party, player *Player) Aura {
+				// TODO: should we even allow for unchecking water shield?
 				// if sim.Options.Buffs.WaterShield {
 				player.Stats[StatMP5] += 3
 				// }
