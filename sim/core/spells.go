@@ -110,7 +110,7 @@ func DirectCast(sim *Simulation, p *Player, a Agent, cast *Cast) {
 	}
 	if cast.ManaCost > 0 {
 		p.Stats[StatMana] -= cast.ManaCost
-		// sim.Metrics.ManaSpent += cast.ManaCost
+		sim.Metrics.IndividualMetrics[p.ID].ManaSpent += cast.ManaCost
 	}
 
 	for _, id := range p.ActiveAuraIDs {

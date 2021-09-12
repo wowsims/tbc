@@ -54,7 +54,7 @@ type SimMetrics struct {
 }
 
 type IndividualMetric struct {
-	// TODO: ID the player somehow?
+	ID          int32
 	TotalDamage float64
 	DamageAtOOM float64
 	OOMAt       float64
@@ -104,7 +104,8 @@ func (sim *Simulation) Reset() {
 	sim.CurrentTime = 0.0
 	sim.ResetAuras()
 	sim.Metrics = SimMetrics{
-		Casts: make([]*Cast, 0, 1000),
+		Casts:             make([]*Cast, 0, 1000),
+		IndividualMetrics: make([]IndividualMetric, 25),
 	}
 	if sim.Debug != nil {
 		sim.Debug("SIM RESET\n")
@@ -147,8 +148,12 @@ func (sim *Simulation) Run() SimMetrics {
 			if action.Wait == NeverExpires {
 				continue // This means agent will not perform any actions at all
 			}
+			wait := action.Wait
+			if action.Cast != nil {
+				wait = action.Cast.CastTime
+			}
 			pendingActions = append(pendingActions, pendingAction{
-				ExecuteAt:   action.Wait,
+				ExecuteAt:   wait,
 				Party:       party,
 				Agent:       pl,
 				AgentAction: action,

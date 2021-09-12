@@ -283,7 +283,7 @@ func AuraName(a int32) string {
 		return "Alchemist's Stone"
 	}
 
-	return "<<TODO: Add Aura name to switch!!>>"
+	return "<<Add Aura name to switch!!>>"
 }
 
 // Stored value is the time at which the ICD will be off CD
@@ -658,7 +658,10 @@ func ActivateTLC(sim *Simulation, party *Party, player *Player) Aura {
 				icd = InternalCD(sim.CurrentTime + icdDur)
 				clone := sim.cache.NewCast()
 				clone.Spell = tlcspell
-				// FUTURE: does CSD apply to TLC? if so, we should probably apply it.
+				// TODO: handle this better...
+				if player.HasAura(MagicIDChaoticSkyfire) {
+					player.Auras[MagicIDChaoticSkyfire].OnCast(sim, player, clone)
+				}
 				clone.DoItNow(sim, player, nil, clone)
 				charges = 0
 			}

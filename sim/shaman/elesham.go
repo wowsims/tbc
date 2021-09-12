@@ -104,28 +104,29 @@ func NewLBOnlyAgent(sim *core.Simulation) *LBOnlyAgent {
 // ################################################################
 //                             CL ON CD
 // ################################################################
-// type CLOnCDAgent struct {
-// 	lb *core.Spell
-// 	cl *core.Spell
-// }
+type CLOnCDAgent struct {
+	lb *core.Spell
+	cl *core.Spell
+}
 
-// func (agent *CLOnCDAgent) ChooseAction(sim *core.Simulation) AgentAction {
-// 	if sim.isOnCD(MagicIDCL6) {
-// 		return NewCastAction(sim, agent.lb)
-// 	} else {
-// 		return NewCastAction(sim, agent.cl)
-// 	}
-// }
+func (agent *CLOnCDAgent) ChooseAction(s *Shaman, party *core.Party, sim *core.Simulation) core.AgentAction {
+	if s.IsOnCD(core.MagicIDCL6, sim.CurrentTime) {
+		return NewCastAction(sim, s, agent.lb)
+	} else {
+		return NewCastAction(sim, s, agent.cl)
+	}
+}
 
-// func (agent *CLOnCDAgent) OnActionAccepted(sim *core.Simulation, action AgentAction) {}
-// func (agent *CLOnCDAgent) Reset(sim *core.Simulation)                                {}
+func (agent *CLOnCDAgent) OnActionAccepted(p *Shaman, sim *core.Simulation, action core.AgentAction) {
+}
+func (agent *CLOnCDAgent) Reset(sim *core.Simulation) {}
 
-// func NewCLOnCDAgent(sim *core.Simulation) *CLOnCDAgent {
-// 	return &CLOnCDAgent{
-// 		lb: spellmap[MagicIDLB12],
-// 		cl: spellmap[MagicIDCL6],
-// 	}
-// }
+func NewCLOnCDAgent(sim *core.Simulation) *CLOnCDAgent {
+	return &CLOnCDAgent{
+		lb: core.Spells[core.MagicIDLB12],
+		cl: core.Spells[core.MagicIDCL6],
+	}
+}
 
 // ################################################################
 //                          FIXED ROTATION
@@ -263,15 +264,14 @@ func (agent *AdaptiveAgent) purgeExpiredSnapshots(sim *core.Simulation) {
 	agent.firstSnapshotIndex = curIndex
 }
 
-func (agent *AdaptiveAgent) takeSnapshot(sim *core.Simulation) {
+func (agent *AdaptiveAgent) takeSnapshot(sim *core.Simulation, s *Shaman) {
 	if agent.numSnapshots >= manaSnapshotsBufferSize {
 		panic("Agent snapshot buffer full")
 	}
 
 	snapshot := ManaSnapshot{
-		time: sim.CurrentTime,
-		// manaSpent: sim.Metrics.ManaSpent,
-		// TODO: Get individual metrics up and working. Probably just need to give every player an 'ID' (order of appearance)
+		time:      sim.CurrentTime,
+		manaSpent: sim.Metrics.IndividualMetrics[s.ID].ManaSpent,
 	}
 
 	nextIndex := (agent.firstSnapshotIndex + agent.numSnapshots) % manaSnapshotsBufferSize
@@ -283,7 +283,10 @@ func (agent *AdaptiveAgent) ChooseAction(s *Shaman, party *core.Party, sim *core
 	agent.purgeExpiredSnapshots(sim)
 	oldestSnapshot := agent.getOldestSnapshot()
 
-	manaSpent := float64(0) //sim.Metrics.ManaSpent - oldestSnapshot.manaSpent
+	manaSpent := 0.0
+	if len(sim.Metrics.IndividualMetrics) > s.ID {
+		manaSpent = sim.Metrics.IndividualMetrics[s.ID].ManaSpent - oldestSnapshot.manaSpent
+	}
 	timeDelta := sim.CurrentTime - oldestSnapshot.time
 	if timeDelta == 0 {
 		timeDelta = 1
@@ -297,6 +300,7 @@ func (agent *AdaptiveAgent) ChooseAction(s *Shaman, party *core.Party, sim *core
 		sim.Debug("[AI] CL Ready: Mana/s: %0.1f, Est Mana Cost: %0.1f, CurrentMana: %0.1f\n", manaSpendingRate, projectedManaCost, s.Stats[core.StatMana])
 	}
 
+	// Before casting, activate shaman powers!
 	TryActivateBloodlust(sim, party, s.Player)
 	if s.Talents.ElementalMastery {
 		TryActivateEleMastery(sim, s.Player)
@@ -310,7 +314,7 @@ func (agent *AdaptiveAgent) ChooseAction(s *Shaman, party *core.Party, sim *core
 	}
 }
 func (agent *AdaptiveAgent) OnActionAccepted(p *Shaman, sim *core.Simulation, action core.AgentAction) {
-	agent.takeSnapshot(sim)
+	agent.takeSnapshot(sim, p)
 	agent.baseAgent.OnActionAccepted(p, sim, action)
 	agent.surplusAgent.OnActionAccepted(p, sim, action)
 }
@@ -339,11 +343,11 @@ func NewAdaptiveAgent(sim *core.Simulation) *AdaptiveAgent {
 	// clearcastResult := core.RunSimulation(clearcastSimRequest)
 
 	// if clearcastResult.NumOom >= 5 {
-	agent.baseAgent = NewLBOnlyAgent(sim)           //NewAgent(sim, AGENT_TYPE_FIXED_LB_ONLY)
-	agent.surplusAgent = NewCLOnClearcastAgent(sim) //NewAgent(sim, AGENT_TYPE_CL_ON_CLEARCAST)
+	// agent.baseAgent = NewLBOnlyAgent(sim)           //NewAgent(sim, AGENT_TYPE_FIXED_LB_ONLY)
+	// agent.surplusAgent = NewCLOnClearcastAgent(sim) //NewAgent(sim, AGENT_TYPE_CL_ON_CLEARCAST)
 	// } else {
-	// 	agent.baseAgent = NewAgent(sim, AGENT_TYPE_CL_ON_CLEARCAST)
-	// 	agent.surplusAgent = NewAgent(sim, AGENT_TYPE_FIXED_CL_ON_CD)
+	agent.baseAgent = NewCLOnClearcastAgent(sim)
+	agent.surplusAgent = NewCLOnCDAgent(sim)
 	// }
 
 	return agent

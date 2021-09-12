@@ -232,7 +232,6 @@ func (aggregator *MetricsAggregator) addMetrics(options core.Options, metrics co
 	}
 }
 
-// TODO: Make sure SimResult matches the proto output
 func (aggregator *MetricsAggregator) getResult() SimResult {
 	result := SimResult{}
 	result.ExecutionDurationMs = time.Since(aggregator.startTime).Milliseconds()

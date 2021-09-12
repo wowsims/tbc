@@ -15,7 +15,7 @@ func TestColorIntersection(t *testing.T) {
 
 func TestAuraNames(t *testing.T) {
 	for i := int32(0); i < MagicIDLen; i++ {
-		if AuraName(i) == "<<TODO: Add Aura name to switch!!>>" {
+		if AuraName(i) == "<<Add Aura name to switch!!>>" {
 			t.Logf("Missing Name for : %#v", i)
 			t.Fail()
 		}
