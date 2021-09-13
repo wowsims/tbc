@@ -184,7 +184,7 @@ export class ShamanTalentsPicker extends TalentsPicker {
         ],
       },
       {
-        name: 'Enchancement',
+        name: 'Enhancement',
         backgroundUrl: 'https://wow.zamimg.com/images/wow/talents/backgrounds/classic/263.jpg',
         talents: [
           {
