@@ -154,7 +154,7 @@ message Buffs {
     bool arcane_int = 1;
     bool gift_of_the_wild = 2;
     bool blessing_of_kings = 3;
-    bool improved_blessing_of_wisdom = 4;
+    int32 blessing_of_wisdom = 4;
     bool improved_divine_spirit = 5;
 
     // Party Buffs

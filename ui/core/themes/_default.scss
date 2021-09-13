@@ -69,9 +69,14 @@
   flex-grow: 1;
 }
 
+$main-background-color: #F0FFFF;
+
 .default-main {
   height: 100%;
   width: 80%;
+  display: flex;
+  flex-direction: column;
+  background-color: $main-background-color;
 }
 
 .default-main > .nav-tabs {
@@ -79,11 +84,11 @@
   padding-top: 15px;
 }
 
-$main-background-color: #F0FFFF;
-
+.default-main > .tab-content {
+  flex-grow: 1;
+}
 .default-main > .tab-content > .tab-pane {
   padding: 25px;
-  background-color: $main-background-color;
 }
 
 .gear-tab {

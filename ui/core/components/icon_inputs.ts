@@ -33,10 +33,10 @@ export const BlessingOfWisdom = {
   states: 3,
   improvedSpellId: 20245,
   changedEvent: (sim: Sim) => sim.buffsChangeEmitter,
-  getValue: (sim: Sim) => Number(sim.buffs.improvedBlessingOfWisdom) * 2,
-  setBooleanValue: (sim: Sim, newValue: boolean) => {
+  getValue: (sim: Sim) => sim.buffs.blessingOfWisdom,
+  setNumberValue: (sim: Sim, newValue: number) => {
     const newBuffs = sim.buffs;
-    newBuffs.improvedBlessingOfWisdom = newValue;
+    newBuffs.blessingOfWisdom = newValue;
     sim.buffs = newBuffs;
   },
 };
