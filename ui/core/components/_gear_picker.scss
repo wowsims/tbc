@@ -23,13 +23,10 @@
 }
 
 .item-picker-icon {
-  background-repeat: no-repeat;
-  background-size: contain;
+  @include wowhead-background-icon;
   width: 70px;
   height: 70px;
   border: 2px solid dimgray;
-  position: relative;
-  cursor: pointer;
 }
 
 .item-picker-sockets-container {
@@ -40,12 +37,10 @@
 }
 
 .item-picker-gem-icon {
-  background-repeat: no-repeat;
-  background-size: contain;
+  @include wowhead-background-icon;
   width: 18px;
   height: 18px;
   margin: 1px;
-  display: inline-block;
 }
 
 .item-picker-labels-container {
@@ -105,12 +100,10 @@
 }
 
 .selector-modal-list-item-icon {
-  background-repeat: no-repeat;
-  background-size: contain;
+  @include wowhead-background-icon;
   width: 50px;
   height: 50px;
   border: 2px solid dimgray;
-  cursor: pointer;
 }
 
 .selector-modal-list-item-name {

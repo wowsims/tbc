@@ -26,19 +26,28 @@ export function GetEmptySlotIconUrl(slot: ItemSlot): string {
   return emptySlotIcons[slot];
 }
 
-const itemToIcon = new Map<number, string>();
-export async function GetItemIconUrl(id: number): Promise<string> {
-  if (itemToIcon.has(id)) {
-    return itemToIcon.get(id) as string;
+async function GetIconUrl(id: number, tooltipPostfix: string, cache: Map<number, string>): Promise<string> {
+  if (cache.has(id)) {
+    return cache.get(id) as string;
   }
 
-  return fetch('https://tbc.wowhead.com/tooltip/item/' + id)
+  return fetch(`https://tbc.wowhead.com/tooltip/${tooltipPostfix}/${id}`)
   .then(response => response.json())
-  .then(itemInfo => {
-    const url = "https://wow.zamimg.com/images/wow/icons/large/" + itemInfo['icon'] + ".jpg";
-    itemToIcon.set(id, url);
+  .then(info => {
+    const url = "https://wow.zamimg.com/images/wow/icons/large/" + info['icon'] + ".jpg";
+    cache.set(id, url);
     return url;
   });
+}
+
+const itemToIconCache = new Map<number, string>();
+export async function GetItemIconUrl(id: number): Promise<string> {
+  return await GetIconUrl(id, 'item', itemToIconCache);
+}
+
+const spellToIconCache = new Map<number, string>();
+export async function GetSpellIconUrl(id: number): Promise<string> {
+  return await GetIconUrl(id, 'spell', spellToIconCache);
 }
 
 const emptyGemSocketIcons: Partial<Record<GemColor, string>> = {

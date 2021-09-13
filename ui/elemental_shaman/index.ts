@@ -1,11 +1,17 @@
-import { GemColor } from '../core/api/newapi';
-import { Item } from '../core/api/newapi';
-import { ItemQuality } from '../core/api/newapi';
-import { ItemSlot } from '../core/api/newapi';
-import { ItemType } from '../core/api/newapi';
 import { Spec } from '../core/api/newapi';
-import { EquippedItem } from '../core/equipped_item';
 import { DefaultTheme } from '../core/themes/default';
+import * as IconInputs from '../core/components/icon_inputs';
 
-const theme = new DefaultTheme(document.body, Spec.ElementalShaman)
+const theme = new DefaultTheme(
+    document.body,
+    Spec.ElementalShaman,
+    {
+      'Buffs': [
+        IconInputs.ArcaneBrilliance,
+        IconInputs.BlessingOfKings,
+        IconInputs.BlessingOfWisdom,
+        IconInputs.Bloodlust,
+        IconInputs.GiftOfTheWild,
+      ],
+    });
 theme.init();

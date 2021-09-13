@@ -329,34 +329,40 @@ message RaidSimRequest {
 
 message Item {
     int32 id = 1;
+    string name = 2;
 
-    ItemType type = 2;
-    ArmorType armor_type = 3;
-    WeaponType weapon_type = 4;
-    HandType hand_type = 5;
-    RangedWeaponType ranged_weapon_type = 6;
+    ItemType type = 3;
+    ArmorType armor_type = 4;
+    WeaponType weapon_type = 5;
+    HandType hand_type = 6;
+    RangedWeaponType ranged_weapon_type = 7;
 
-    string name = 7;
     repeated double stats = 8;
+    repeated GemColor gem_sockets = 11;
+
     int32 phase = 9;
     ItemQuality quality = 10;
-    repeated GemColor gem_sockets = 11;
 }
 message Enchant {
     int32 id = 1;        // ID of the enchant "item".
     int32 effect_id = 2; // ID of the effect (for the item tooltip UI)
     string name = 3;     
-    ItemQuality quality = 4;
 
-    ItemType type = 5;   // Which type of item this enchant can be applied to.
-    bool two_handed_only = 6;
-    bool shield_only = 7;
+    ItemType type = 4;   // Which type of item this enchant can be applied to.
+    bool two_handed_only = 5;
+    bool shield_only = 6;
+
+    repeated double stats = 7;
+
+    ItemQuality quality = 8;
 }
 message Gem {
     int32 id = 1;
     string name = 2;
+
     repeated double stats = 3;
     GemColor color = 4;
+
     int32 phase = 5;
     ItemQuality quality = 6;
 }

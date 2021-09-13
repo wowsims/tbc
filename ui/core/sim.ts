@@ -1,4 +1,5 @@
 import { Buffs } from './api/newapi';
+import { Consumes } from './api/newapi';
 import { Enchant } from './api/newapi';
 import { Encounter } from './api/newapi';
 import { Gem } from './api/newapi';
@@ -30,19 +31,28 @@ export class Sim {
   readonly gearListEmitter = new TypedEvent<GearListResult>();
   readonly raceChangeEmitter = new TypedEvent<Race>();
   readonly gearChangeEmitter = new TypedEvent<Gear>();
+  readonly buffsChangeEmitter = new TypedEvent<Buffs>();
+  readonly consumesChangeEmitter = new TypedEvent<Consumes>();
 
+  // Database
   private _items: Record<number, Item> = {};
   private _enchants: Record<number, Enchant> = {};
   private _gems: Record<number, Gem> = {};
 
+  // Current values
   private _race: Race;
   private _gear: Gear;
+  private _buffs: Buffs;
+  private _consumes: Consumes;
+
   private _init = false;
 
   constructor(spec: Spec) {
     this.spec = spec;
     this._race = SpecToEligibleRaces[this.spec][0];
     this._gear = [];
+    this._buffs = Buffs.create();
+    this._consumes = Consumes.create();
   }
 
   async init(): Promise<void> {
@@ -73,6 +83,28 @@ export class Sim {
       this._race = newRace;
       this.raceChangeEmitter.emit(newRace);
     }
+  }
+
+  get buffs(): Buffs {
+    // Make a defensive copy
+    return Buffs.clone(this._buffs);
+  }
+
+  set buffs(newBuffs: Buffs) {
+    // Make a defensive copy
+    this._buffs = Buffs.clone(newBuffs);
+    this.buffsChangeEmitter.emit(this._buffs);
+  }
+
+  get consumes(): Consumes {
+    // Make a defensive copy
+    return Consumes.clone(this._consumes);
+  }
+
+  set consumes(newConsumes: Consumes) {
+    // Make a defensive copy
+    this._consumes = Consumes.clone(newConsumes);
+    this.consumesChangeEmitter.emit(this._consumes);
   }
 
   equipItem(slot: ItemSlot, item: EquippedItem | null) {

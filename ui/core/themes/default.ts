@@ -3,6 +3,8 @@ import { Stat } from '../api/newapi';
 import { Actions } from '../components/actions.js';
 import { CharacterStats } from '../components/character_stats.js';
 import { GearPicker } from '../components/gear_picker.js';
+import { IconInput } from '../components/icon_picker.js';
+import { IconPicker } from '../components/icon_picker.js';
 import { RacePicker } from '../components/race_picker.js';
 import { Results } from '../components/results.js';
 
@@ -28,12 +30,15 @@ const layoutHTML = `
     </ul>
     <div class="tab-content">
       <div id="gear-tab" class="tab-pane fade in active">
-        <div class="race-picker">
-        </div>
-        <div class="gear-picker">
+        <div class="character-picker">
+          <div class="gear-picker">
+          </div>
         </div>
       </div>
-      <div id="settings-tab" class="tab-pane fade">
+      <div id="settings-tab" class="tab-pane fade"">
+        <section class="settings-section race-picker">
+          <label>Race</label>
+        </section>
       </div>
     </div>
   </section>
@@ -41,7 +46,7 @@ const layoutHTML = `
 `;
 
 export class DefaultTheme extends Theme {
-  constructor(parentElem: HTMLElement, spec: Spec) {
+  constructor(parentElem: HTMLElement, spec: Spec, iconPickers: Record<string, Array<IconInput>>) {
     super(parentElem, spec)
 
     this.parentElem.innerHTML = layoutHTML;
@@ -68,12 +73,21 @@ export class DefaultTheme extends Theme {
     ];
 
     const results = new Results(this.parentElem.getElementsByClassName('default-results')[0] as HTMLElement);
-
     const actions = new Actions(this.parentElem.getElementsByClassName('default-actions')[0] as HTMLElement, this.sim, results, epStats, epReferenceStat);
 
     const characterStats = new CharacterStats(this.parentElem.getElementsByClassName('default-stats')[0] as HTMLElement, displayStats);
 
-    const racePicker = new RacePicker(this.parentElem.getElementsByClassName('race-picker')[0] as HTMLElement, this.sim);
     const gearPicker = new GearPicker(this.parentElem.getElementsByClassName('gear-picker')[0] as HTMLElement, this.sim);
+    const racePicker = new RacePicker(this.parentElem.getElementsByClassName('race-picker')[0] as HTMLElement, this.sim);
+
+    const settingsTab = document.getElementById('settings-tab') as HTMLElement;
+    Object.keys(iconPickers).forEach(pickerName => {
+      const sectionElem = document.createElement('section');
+      sectionElem.classList.add('settings-section', pickerName + '-section');
+      sectionElem.innerHTML = `<label>${pickerName}</label>`;
+      settingsTab.appendChild(sectionElem);
+
+      const iconPicker = new IconPicker(sectionElem, pickerName + '-icon-picker', this.sim, iconPickers[pickerName]);
+    });
   }
 }

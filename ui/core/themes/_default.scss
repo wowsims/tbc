@@ -1,6 +1,7 @@
 @import "../components/actions";
 @import "../components/character_stats";
 @import "../components/gear_picker";
+@import "../components/icon_picker";
 @import "../components/race_picker";
 @import "../components/results";
 
@@ -78,6 +79,46 @@
   padding-top: 15px;
 }
 
+$main-background-color: #F0FFFF;
+
 .default-main > .tab-content > .tab-pane {
-  padding: 20px;
+  padding: 25px;
+  background-color: $main-background-color;
+}
+
+.gear-tab {
+}
+
+.settings-tab {
+  display: flex;
+  flex-direction: row;
+}
+
+.settings-section {
+  border: 4px solid black;
+  border-radius: 8px;
+  position: relative;
+  display: inline-block;
+  padding: 4px;
+  padding-top: 15px;
+  min-width: 100px;
+}
+
+.settings-section>label {
+  position: absolute;
+  left: 12px;
+  top: -20px;
+  font-weight: 900;
+  display: inline-block;
+  background: $main-background-color;
+  padding: 5px 10px 5px 10px;
+  font-size: 18px;
+}
+
+.character-picker {
+  width: 70%;
+}
+
+.race-picker {
+  text-align: center;
 }

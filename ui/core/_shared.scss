@@ -25,6 +25,11 @@
   bottom: 0;
 }
 
+@mixin horizontal-right {
+  position: absolute;
+  right: 0;
+}
+
 @mixin screen-vertical-horizontal-center {
   margin: 0;
   position: fixed;
@@ -81,4 +86,12 @@
 
 .socket-color-yellow {
   border: 1px solid yellow;
+}
+
+@mixin wowhead-background-icon {
+  background-repeat: no-repeat;
+  background-size: cover;
+  position: relative;
+  cursor: pointer;
+  display: inline-block;
 }

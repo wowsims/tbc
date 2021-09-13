@@ -9,11 +9,6 @@ export class RacePicker extends Component {
   constructor(parent: HTMLElement, sim: Sim) {
     super(parent, 'race-picker-root');
 
-    const label = document.createElement('span');
-    label.classList.add('race-picker-label');
-    label.textContent = 'Race:';
-    this.rootElem.appendChild(label);
-
     const raceSelector = document.createElement('select');
     raceSelector.classList.add('race-picker-selector');
     this.rootElem.appendChild(raceSelector);
