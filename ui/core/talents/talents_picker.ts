@@ -1,0 +1,262 @@
+import { GetSpellIconUrl } from '../resources';
+import { Sim } from '../sim';
+import { isRightClick } from '../utils';
+import { sum } from '../utils';
+
+import { Component } from '../components/component';
+
+const MAX_TALENT_POINTS = 61;
+const NUM_ROWS = 9;
+
+export class TalentsPicker extends Component {
+  private readonly trees: Array<TalentTreePicker>;
+
+  constructor(parent: HTMLElement, sim: Sim, treeConfigs: Array<TalentTreeConfig>) {
+    super(parent, 'talents-picker-root');
+    this.trees = treeConfigs.map(treeConfig => new TalentTreePicker(this.rootElem, sim, treeConfig, this));
+  }
+
+  get numPoints() {
+    return sum(this.trees?.map(tree => tree.numPoints) || []);
+  }
+
+  isFull() {
+    return this.numPoints >= MAX_TALENT_POINTS;
+  }
+
+  update() {
+    if (this.isFull()) {
+      this.rootElem.classList.add('talents-full');
+    } else {
+      this.rootElem.classList.remove('talents-full');
+    }
+  }
+}
+
+class TalentTreePicker extends Component {
+  private readonly config: TalentTreeConfig;
+  private readonly _title: HTMLElement;
+
+  readonly talents: Array<TalentPicker>;
+  readonly picker: TalentsPicker;
+
+  // The current number of points in this tree
+  numPoints: number;
+
+  constructor(parent: HTMLElement, sim: Sim, config: TalentTreeConfig, picker: TalentsPicker) {
+    super(parent, 'talent-tree-picker-root');
+    this.config = config;
+    this.numPoints = 0;
+    this.picker = picker;
+
+    this.rootElem.innerHTML = `
+    <div class="talent-tree-header">
+      <span class="talent-tree-title"></span>
+      <span class="talent-tree-reset fa fa-times"></span>
+    </div>
+    <div class="talent-tree-main">
+    </div>
+    `;
+
+    this._title = this.rootElem.getElementsByClassName('talent-tree-title')[0] as HTMLElement;
+
+    const main = this.rootElem.getElementsByClassName('talent-tree-main')[0] as HTMLElement;
+    main.style.backgroundImage = `url('${config.backgroundUrl}')`;
+
+    this.talents = config.talents.map(talent => new TalentPicker(main, sim, talent, this));
+    this.talents.forEach(talent => {
+      if (talent.config.prereqLocation) {
+        this.getTalent(talent.config.prereqLocation).config.prereqOfLocation = talent.config.location;
+      }
+    });
+    this.update();
+
+    const reset = this.rootElem.getElementsByClassName('talent-tree-reset')[0] as HTMLElement;
+    reset.addEventListener('click', event => {
+      this.talents.forEach(talent => talent.setPoints(0, false));
+    });
+  }
+
+  update() {
+    this._title.textContent = this.config.name + ' (' + this.numPoints + ')';
+    this.picker.update();
+  }
+
+  getTalent(location: TalentLocation): TalentPicker {
+    const talent = this.talents.find(talent => talent.getRow() == location.rowIdx && talent.getCol() == location.colIdx);
+    if (!talent)
+      throw new Error('No talent found with location: ' + location);
+    return talent;
+  }
+}
+
+class TalentPicker extends Component {
+  readonly config: TalentConfig;
+  private readonly _tree: TalentTreePicker;
+  private readonly _pointsDisplay: HTMLElement;
+
+  constructor(parent: HTMLElement, sim: Sim, config: TalentConfig, tree: TalentTreePicker) {
+    super(parent, 'talent-picker-root', document.createElement('a'));
+    this.config = config;
+    this._tree = tree;
+
+    this.rootElem.style.gridRow = String(this.config.location.rowIdx + 1);
+    this.rootElem.style.gridColumn = String(this.config.location.colIdx + 1);
+
+    this.rootElem.dataset.maxPoints = String(this.config.maxPoints);
+    this.rootElem.dataset.wowhead = 'noimage';
+
+    this._pointsDisplay = document.createElement('span');
+    this._pointsDisplay.classList.add('talent-picker-points');
+    this.rootElem.appendChild(this._pointsDisplay);
+
+    this.setPoints(0, false);
+
+    this.rootElem.addEventListener('click', event => {
+      event.preventDefault();
+    });
+    this.rootElem.addEventListener('contextmenu', event => {
+      event.preventDefault();
+    });
+    this.rootElem.addEventListener('mousedown', event => {
+      const rightClick = isRightClick(event);
+      if (rightClick) {
+        this.setPoints(this.getPoints() - 1, true);
+      } else {
+        this.setPoints(this.getPoints() + 1, true);
+      }
+    });
+  }
+
+  getRow(): number {
+    return this.config.location.rowIdx;
+  }
+
+  getCol(): number {
+    return this.config.location.colIdx;
+  }
+
+  getPoints(): number {
+    const pts = Number(this.rootElem.dataset.points);
+    return isNaN(pts) ? 0 : pts;
+  }
+
+  isFull(): boolean {
+    return this.getPoints() >= this.config.maxPoints;
+  }
+
+  // Returns whether setting the points to newPoints would be a valid talent tree.
+  canSetPoints(newPoints: number): boolean {
+    const oldPoints = this.getPoints();
+
+    if (newPoints > oldPoints) {
+      const additionalPoints = newPoints - oldPoints;
+
+      if (this._tree.picker.numPoints + additionalPoints > MAX_TALENT_POINTS) {
+        return false;
+      }
+
+      if (this._tree.numPoints < this.getRow() * 5) {
+        return false;
+      }
+
+      if (this.config.prereqLocation) {
+        if (!this._tree.getTalent(this.config.prereqLocation).isFull())
+          return false;
+      }
+    } else {
+      const removedPoints = oldPoints - newPoints;
+
+      // Figure out whether any lower talents would have the row requirement
+      // broken by subtracting points.
+      const pointTotalsByRow = [...Array(NUM_ROWS).keys()]
+          .map(rowIdx => this._tree.talents.filter(talent => talent.getRow() == rowIdx))
+          .map(talentsInRow => sum(talentsInRow.map(talent => talent.getPoints())));
+      pointTotalsByRow[this.getRow()] -= removedPoints;
+
+      const cumulativeTotalsByRow = pointTotalsByRow.map((_, rowIdx) => sum(pointTotalsByRow.slice(0, rowIdx+1)));
+
+      if (!this._tree.talents.every(talent => 
+            talent.getPoints() == 0 
+            || talent.getRow() == 0
+            || cumulativeTotalsByRow[talent.getRow() - 1] >= talent.getRow() * 5)) {
+        return false;
+      }
+
+      if (this.config.prereqOfLocation) {
+        if (this._tree.getTalent(this.config.prereqOfLocation).getPoints() > 0)
+          return false;
+      }
+    }
+    return true;
+  }
+
+  setPoints(newPoints: number, checkValidity: boolean) {
+    const oldPoints = this.getPoints();
+    newPoints = Math.max(0, newPoints);
+    newPoints = Math.min(this.config.maxPoints, newPoints);
+
+    if (checkValidity && !this.canSetPoints(newPoints))
+      return;
+
+    this._tree.numPoints += newPoints - oldPoints;
+    this.rootElem.dataset.points = String(newPoints);
+    this._tree.update();
+
+    this._pointsDisplay.textContent = newPoints + '/' + this.config.maxPoints;
+
+    if (this.isFull()) {
+      this.rootElem.classList.add('talent-full');
+    } else {
+      this.rootElem.classList.remove('talent-full');
+    }
+
+    const spellId = this.getSpellIdForPoints(newPoints);
+    (this.rootElem as HTMLAnchorElement).href = 'https://tbc.wowhead.com/spell=' + spellId;
+    GetSpellIconUrl(spellId).then(url => {
+      this.rootElem.style.backgroundImage = `url('${url}')`;
+    });
+  }
+
+  getSpellIdForPoints(numPoints: number): number {
+    // 0-indexed rank of talent
+    const rank = Math.max(0, numPoints - 1);
+
+    if (this.config.spellIds[rank])
+      return this.config.spellIds[rank];
+
+    // Increment from the last provided rank id
+    const lastRank = this.config.spellIds.length - 1;
+    const lastRankId = this.config.spellIds[lastRank];
+    return lastRankId + (rank - lastRank);
+  }
+}
+
+export type TalentTreeConfig = {
+  name: string;
+  backgroundUrl: string;
+  talents: Array<TalentConfig>;
+};
+
+export type TalentLocation = {
+  // 0-indexed row in the tree
+  rowIdx: number;
+  // 0-indexed column in the tree
+  colIdx: number;
+};
+
+export type TalentConfig = {
+  location: TalentLocation;
+
+  // Location of a prerequisite talent, if any
+  prereqLocation?: TalentLocation;
+
+  // Reverse of prereqLocation. This is populated automatically.
+  prereqOfLocation?: TalentLocation;
+  
+  // Spell ID for each rank of this talent.
+  // Omitted ranks will be inferred by incrementing from the last provided rank.
+  spellIds: Array<number>;
+
+  maxPoints: number;
+};

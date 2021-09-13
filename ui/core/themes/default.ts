@@ -1,12 +1,13 @@
 import { Spec } from '../api/newapi';
 import { Stat } from '../api/newapi';
 import { Actions } from '../components/actions.js';
-import { CharacterStats } from '../components/character_stats.js';
-import { GearPicker } from '../components/gear_picker.js';
-import { IconInput } from '../components/icon_picker.js';
-import { IconPicker } from '../components/icon_picker.js';
-import { RacePicker } from '../components/race_picker.js';
-import { Results } from '../components/results.js';
+import { CharacterStats } from '../components/character_stats';
+import { GearPicker } from '../components/gear_picker';
+import { IconInput } from '../components/icon_picker';
+import { IconPicker } from '../components/icon_picker';
+import { RacePicker } from '../components/race_picker';
+import { Results } from '../components/results';
+import { ShamanTalentsPicker } from '../talents/shaman';
 
 import { Theme } from './theme.js';
 
@@ -27,6 +28,7 @@ const layoutHTML = `
     <ul class="nav nav-tabs">
       <li class="active"><a data-toggle="tab" href="#gear-tab">Gear</a></li>
       <li><a data-toggle="tab" href="#settings-tab">Settings</a></li>
+      <li><a data-toggle="tab" href="#talents-tab">Talents</a></li>
     </ul>
     <div class="tab-content">
       <div id="gear-tab" class="tab-pane fade in active">
@@ -39,6 +41,10 @@ const layoutHTML = `
         <section class="settings-section race-picker">
           <label>Race</label>
         </section>
+      </div>
+      <div id="talents-tab" class="tab-pane fade"">
+        <div class="talents-picker">
+        </div>
       </div>
     </div>
   </section>
@@ -79,6 +85,7 @@ export class DefaultTheme extends Theme {
 
     const gearPicker = new GearPicker(this.parentElem.getElementsByClassName('gear-picker')[0] as HTMLElement, this.sim);
     const racePicker = new RacePicker(this.parentElem.getElementsByClassName('race-picker')[0] as HTMLElement, this.sim);
+    const talentsPicker = new ShamanTalentsPicker(this.parentElem.getElementsByClassName('talents-picker')[0] as HTMLElement, this.sim);
 
     const settingsTab = document.getElementById('settings-tab') as HTMLElement;
     Object.keys(iconPickers).forEach(pickerName => {
