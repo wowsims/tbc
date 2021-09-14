@@ -2,6 +2,7 @@
 @import "../components/character_stats";
 @import "../components/gear_picker";
 @import "../components/icon_picker";
+@import "../components/number_picker";
 @import "../components/race_picker";
 @import "../components/results";
 @import "../talents/talents_picker";
@@ -128,4 +129,9 @@ $main-background-color: #F0FFFF;
 
 .race-picker {
   text-align: center;
+}
+
+.encounter-section .number-picker-root {
+  display: flex;
+  justify-content: space-between;
 }

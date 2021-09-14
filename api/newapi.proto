@@ -215,6 +215,12 @@ message Consumes {
     bool drums_of_restoration = 19;
 }
 
+message Encounter {
+    double duration = 1;
+    int32 num_targets = 2;
+    int32 target_armor = 3;
+}
+
 message PlayerOptions {
     Race race = 1;
     oneof class {
@@ -300,12 +306,6 @@ message Party {
 
 message Raid {
     repeated Party parties = 1; 
-}
-
-message Encounter {
-    int32 target_armor = 1;
-    double duration = 2;
-    int32 num_targets = 3;
 }
 
 // RPC IndividualSim

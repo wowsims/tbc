@@ -17,7 +17,7 @@ export class Actions extends Component {
 
     const statWeightsButton = document.createElement('button');
     statWeightsButton.classList.add('actions-button');
-    statWeightsButton.textContent = 'Calculate EP';
+    statWeightsButton.textContent = 'EP Weights';
     this.rootElem.appendChild(statWeightsButton);
 
     const iterationsDiv = document.createElement('div');

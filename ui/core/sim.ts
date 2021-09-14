@@ -34,6 +34,7 @@ export class Sim {
   readonly gearChangeEmitter = new TypedEvent<Gear>();
   readonly buffsChangeEmitter = new TypedEvent<Buffs>();
   readonly consumesChangeEmitter = new TypedEvent<Consumes>();
+  readonly encounterChangeEmitter = new TypedEvent<Encounter>();
 
   // Database
   private _items: Record<number, Item> = {};
@@ -42,18 +43,16 @@ export class Sim {
 
   // Current values
   private _race: Race;
-  private _gear: Gear;
-  private _buffs: Buffs;
-  private _consumes: Consumes;
+  private _gear: Gear = [];
+  private _buffs: Buffs = Buffs.create();
+  private _consumes: Consumes = Consumes.create();
+  private _encounter: Encounter = Encounter.create();
 
   private _init = false;
 
   constructor(spec: Spec) {
     this.spec = spec;
     this._race = SpecToEligibleRaces[this.spec][0];
-    this._gear = [];
-    this._buffs = Buffs.create();
-    this._consumes = Consumes.create();
   }
 
   async init(): Promise<void> {
@@ -114,6 +113,20 @@ export class Sim {
     this.consumesChangeEmitter.emit(this._consumes);
   }
 
+  get encounter(): Encounter {
+    // Make a defensive copy
+    return Encounter.clone(this._encounter);
+  }
+
+  set encounter(newEncounter: Encounter) {
+    if (Encounter.equals(this._encounter, newEncounter))
+      return;
+
+    // Make a defensive copy
+    this._encounter = Encounter.clone(newEncounter);
+    this.encounterChangeEmitter.emit(this._encounter);
+  }
+
   equipItem(slot: ItemSlot, newItem: EquippedItem | null) {
     if (equalsOrBothNull(this._gear[slot], newItem, (a, b) => a.equals(b)))
       return;
@@ -126,23 +139,11 @@ export class Sim {
     return this._gear[slot];
   }
 
-  currentPlayer(): Player {
-    return Player.create();
-  }
-
-  currentBuffs(): Buffs {
-    return Buffs.create();
-  }
-
-  currentEncounter(): Encounter {
-    return Encounter.create();
-  }
-
   createSimRequest(): IndividualSimRequest {
     return IndividualSimRequest.create({
-      player: this.currentPlayer(),
-      buffs: this.currentBuffs(),
-      encounter: this.currentEncounter(),
+      player: Player.create(),
+      buffs: this._buffs,
+      encounter: this._encounter,
     });
   }
 

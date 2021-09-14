@@ -8,6 +8,13 @@ export class NumberPicker extends Component {
   constructor(parent: HTMLElement, sim: Sim, config: NumberPickerConfig) {
     super(parent, 'number-picker-root');
 
+    if (config.label) {
+      const label = document.createElement('span');
+      label.classList.add('number-picker-label');
+      label.textContent = config.label;
+      this.rootElem.appendChild(label);
+    }
+
     const input = document.createElement('input');
     input.type = "number";
     input.classList.add('number-picker-input');
@@ -28,6 +35,7 @@ export class NumberPicker extends Component {
  * Data for creating a number picker.
  */
 export type NumberPickerConfig = {
+  label?: string,
   changedEvent: (sim: Sim) => TypedEvent<any>;
   getValue: (sim: Sim) => number;
   setValue: (sim: Sim, newValue: number) => void;
