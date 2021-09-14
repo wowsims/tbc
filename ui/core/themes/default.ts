@@ -7,7 +7,7 @@ import { IconInput } from '../components/icon_picker';
 import { IconPicker } from '../components/icon_picker';
 import { RacePicker } from '../components/race_picker';
 import { Results } from '../components/results';
-import { ShamanTalentsPicker } from '../talents/shaman';
+import { newTalentsPicker } from '../talents/factory';
 
 import { Theme } from './theme.js';
 
@@ -85,7 +85,7 @@ export class DefaultTheme extends Theme {
 
     const gearPicker = new GearPicker(this.parentElem.getElementsByClassName('gear-picker')[0] as HTMLElement, this.sim);
     const racePicker = new RacePicker(this.parentElem.getElementsByClassName('race-picker')[0] as HTMLElement, this.sim);
-    const talentsPicker = new ShamanTalentsPicker(this.parentElem.getElementsByClassName('talents-picker')[0] as HTMLElement, this.sim);
+    const talentsPicker = newTalentsPicker(spec, this.parentElem.getElementsByClassName('talents-picker')[0] as HTMLElement, this.sim);
 
     const settingsTab = document.getElementById('settings-tab') as HTMLElement;
     Object.keys(iconPickers).forEach(pickerName => {

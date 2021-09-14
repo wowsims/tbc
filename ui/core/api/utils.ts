@@ -1,5 +1,6 @@
 import { intersection } from '../utils';
 
+import { Class } from './newapi';
 import { Enchant } from './newapi';
 import { Gem } from './newapi';
 import { GemColor } from './newapi';
@@ -11,6 +12,10 @@ import { Race } from './newapi';
 import { RangedWeaponType } from './newapi';
 import { Spec } from './newapi';
 import { WeaponType } from './newapi';
+
+export const SpecToClass: Record<Spec, Class> = {
+  [Spec.ElementalShaman]: Class.ClassShaman,
+};
 
 const shamanRaces = [
     Race.RaceDraenei,

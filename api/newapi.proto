@@ -18,6 +18,19 @@ enum Race {
     RaceUndead = 11;
 }
 
+enum Class {
+  ClassUnknown = 0;
+  ClassDruid = 1;
+  ClassHunter = 2;
+  ClassMage = 3;
+  ClassPaladin = 4;
+  ClassPriest = 5;
+  ClassRogue = 6;
+  ClassShaman = 7;
+  ClassWarlock = 8;
+  ClassWarrior = 9;
+}
+
 enum Stat {
     StatStrength = 0;
     StatAgility = 1;
