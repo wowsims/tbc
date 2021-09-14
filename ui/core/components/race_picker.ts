@@ -1,9 +1,9 @@
 import { Race } from '../api/newapi';
 import { SpecToEligibleRaces } from '../api/utils';
 import { RaceNames } from '../api/names';
-import { Sim } from '../sim.js';
+import { Sim } from '../sim';
 
-import { Component } from './component.js';
+import { Component } from './component';
 
 export class RacePicker extends Component {
   constructor(parent: HTMLElement, sim: Sim) {

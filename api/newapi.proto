@@ -158,31 +158,48 @@ message Buffs {
     bool improved_divine_spirit = 5;
 
     // Party Buffs
-    bool moonkin = 6;
-    bool moonkin_raven_goddess = 7;
-    int32 spriest_dps = 8;
-    int32 bloodlust = 9;
+    int32 moonkin_aura = 6;
+    int32 spriest_dps = 7;
+    int32 bloodlust = 8;
 
     // Target Debuff
-    bool judgement_of_wisdom = 10;
-    bool improved_seal_of_the_crusader = 11;
-    bool misery = 12;
+    bool judgement_of_wisdom = 9;
+    bool improved_seal_of_the_crusader = 10;
+    bool misery = 11;
 
     // Item Buffs
-    bool eye_of_the_night = 13;
-    bool chain_of_the_twilight_owl = 14;
+    bool eye_of_the_night = 12;
+    bool chain_of_the_twilight_owl = 13;
+    bool jade_pendant_of_blasting = 14;
 }
 
 message Consumes {
-    bool brilliant_wizard_oil = 1; 
-    bool major_mageblood = 2;
-    bool flask_of_blinding_light = 3;
-    bool flask_of_mighty_restoration = 4;
-    bool blackend_basilisk = 5;
-    bool destruction_potion = 6;
-    bool super_mana_potion = 7;
-    bool dark_rune = 8;
-    bool drums_of_battle = 9;
+    bool flask_of_blinding_light = 1;
+    bool flask_of_mighty_restoration = 2;
+    bool flask_of_pure_death = 3;
+    bool flask_of_supreme_power = 4;
+
+    bool adepts_elixir = 5;
+    bool elixir_of_major_fire_power = 6;
+    bool elixir_of_major_frost_power = 7;
+    bool elixir_of_major_shadow_power = 8;
+
+    bool elixir_of_draenic_wisdom = 9;
+    bool elixir_of_major_mageblood = 10;
+
+    bool brilliant_wizard_oil = 11; 
+    bool superior_wizard_oil = 12; 
+
+    bool blackened_basilisk = 13;
+    bool skullfish_soup = 14;
+
+    bool destruction_potion = 15;
+    bool super_mana_potion = 16;
+
+    bool dark_rune = 17;
+
+    bool drums_of_battle = 18;
+    bool drums_of_restoration = 19;
 }
 
 message PlayerOptions {

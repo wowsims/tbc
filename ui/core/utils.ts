@@ -1,3 +1,14 @@
+// Returns if the two items are equal, or if both are null / undefined.
+export function equalsOrBothNull<T>(a: T, b: T, comparator?: (_a: NonNullable<T>, _b: NonNullable<T>) => boolean): boolean {
+  if (a == null && b == null)
+    return true;
+
+  if (a == null || b == null)
+    return false;
+
+  return (comparator || ((_a: NonNullable<T>, _b: NonNullable<T>) => a == b))(a!, b!);
+}
+
 export function sum(arr: Array<number>): number {
   return arr.reduce((total, cur) => total + cur, 0);
 }

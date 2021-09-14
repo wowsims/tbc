@@ -3,6 +3,8 @@ import { GetSpellIconUrl } from '../resources';
 import { Sim } from '../sim';
 import { TypedEvent } from '../typed_event';
 import { isRightClick } from '../utils';
+import { ExclusivityTag } from '../themes/theme';
+import { Theme } from '../themes/theme';
 
 import { Component } from './component';
 
@@ -10,11 +12,11 @@ import { Component } from './component';
 export class IconPicker extends Component {
   private readonly _inputs: Array<IconInputComponent>;
 
-  constructor(parent: HTMLElement, rootClass: string, sim: Sim, inputs: Array<IconInput>) {
+  constructor(parent: HTMLElement, rootClass: string, sim: Sim, inputs: Array<IconInput>, theme: Theme) {
     super(parent, 'icon-picker-root');
     this.rootElem.classList.add(rootClass);
 
-    this._inputs = inputs.map(input => new IconInputComponent(this.rootElem, sim, input));
+    this._inputs = inputs.map(input => new IconInputComponent(this.rootElem, sim, input, theme));
   }
 }
 
@@ -25,8 +27,9 @@ class IconInputComponent extends Component {
   private readonly _rootAnchor: HTMLAnchorElement;
   private readonly _improvedAnchor: HTMLAnchorElement;
   private readonly _counterElem: HTMLElement;
+  private readonly _clickedEmitter = new TypedEvent<void>();
 
-  constructor(parent: HTMLElement, sim: Sim, input: IconInput) {
+  constructor(parent: HTMLElement, sim: Sim, input: IconInput, theme: Theme) {
     super(parent, 'icon-input', document.createElement('a'));
     this._input = input;
     this._sim = sim;
@@ -97,7 +100,17 @@ class IconInputComponent extends Component {
           this.setValue(value + 1);
         }
       }
+      this._clickedEmitter.emit();
     });
+
+    if (this._input.exclusivityTags) {
+      theme.registerExclusiveEffect({
+        tags: this._input.exclusivityTags,
+        changedEvent: this._clickedEmitter,
+        isActive: () => Boolean(this.getValue()),
+        deactivate: () => this.setValue(0),
+      });
+    }
   }
 
   // Instead of dealing with bool | number, just convert everything to numbers
@@ -137,25 +150,27 @@ class IconInputComponent extends Component {
   }
 }
 
-/**
- * Data for creating an icon-based input component.
- *
- * E.g. one of these for arcane brilliance, another for kings, etc.
- */
+// Data for creating an icon-based input component.
+// 
+// E.g. one of these for arcane brilliance, another for kings, etc.
 export type IconInput = {
   // Exactly one of these should be set.
   itemId?: number;
   spellId?: number;
 
-  /**
-   * The number of possible 'states' this icon can have. Most inputs will use 2
-   * for a bi-state icon (on or off). 0 indicates an unlimited number of states.
-   */
+  
+  // The number of possible 'states' this icon can have. Most inputs will use 2
+  // for a bi-state icon (on or off). 0 indicates an unlimited number of states.
   states: number;
 
   // At most one of these should be set. Only used if states == 3.
   improvedItemId?: number;
   improvedSpellId?: number;
+
+  
+  // If set, all effects with matching tags will be deactivated when this
+  // effect is enabled.
+  exclusivityTags?: Array<ExclusivityTag>;
 
   changedEvent: (sim: Sim) => TypedEvent<any>;
   getValue: (sim: Sim) => boolean | number;

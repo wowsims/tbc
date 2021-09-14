@@ -94,7 +94,7 @@ export class DefaultTheme extends Theme {
       sectionElem.innerHTML = `<label>${pickerName}</label>`;
       settingsTab.appendChild(sectionElem);
 
-      const iconPicker = new IconPicker(sectionElem, pickerName + '-icon-picker', this.sim, iconPickers[pickerName]);
+      const iconPicker = new IconPicker(sectionElem, pickerName + '-icon-picker', this.sim, iconPickers[pickerName], this);
     });
   }
 }

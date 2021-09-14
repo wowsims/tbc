@@ -7,11 +7,35 @@ const theme = new DefaultTheme(
     Spec.ElementalShaman,
     {
       'Buffs': [
+        IconInputs.Bloodlust,
+        IconInputs.DrumsOfBattle,
+        IconInputs.DrumsOfRestoration,
         IconInputs.ArcaneBrilliance,
         IconInputs.BlessingOfKings,
         IconInputs.BlessingOfWisdom,
-        IconInputs.Bloodlust,
         IconInputs.GiftOfTheWild,
+        IconInputs.MoonkinAura,
+        IconInputs.EyeOfTheNight,
+        IconInputs.ChainOfTheTwilightOwl,
+        IconInputs.JadePendantOfBlasting,
+      ],
+      'Debuffs': [
+        IconInputs.JudgementOfWisdom,
+        IconInputs.ImprovedSealOfTheCrusader,
+        IconInputs.Misery,
+      ],
+      'Consumes': [
+        IconInputs.SuperManaPotion,
+        IconInputs.DestructionPotion,
+        IconInputs.FlaskOfBlindingLight,
+        IconInputs.FlaskOfSupremePower,
+        IconInputs.AdeptsElixir,
+        IconInputs.ElixirOfMajorMageblood,
+        IconInputs.ElixirOfDraenicWisdom,
+        IconInputs.BrilliantWizardOil,
+        IconInputs.SuperiorWizardOil,
+        IconInputs.BlackenedBasilisk,
+        IconInputs.SkullfishSoup,
       ],
     });
 theme.init();

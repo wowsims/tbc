@@ -22,6 +22,7 @@ import { StatWeightsRequest, StatWeightsResult } from './api/newapi';
 import { EquippedItem } from './equipped_item';
 import { Listener } from './typed_event';
 import { TypedEvent } from './typed_event';
+import { equalsOrBothNull } from './utils';
 import { wait } from './utils';
 
 export type Gear = Array<EquippedItem | null>;
@@ -91,6 +92,9 @@ export class Sim {
   }
 
   set buffs(newBuffs: Buffs) {
+    if (Buffs.equals(this._buffs, newBuffs))
+      return;
+
     // Make a defensive copy
     this._buffs = Buffs.clone(newBuffs);
     this.buffsChangeEmitter.emit(this._buffs);
@@ -102,13 +106,19 @@ export class Sim {
   }
 
   set consumes(newConsumes: Consumes) {
+    if (Consumes.equals(this._consumes, newConsumes))
+      return;
+
     // Make a defensive copy
     this._consumes = Consumes.clone(newConsumes);
     this.consumesChangeEmitter.emit(this._consumes);
   }
 
-  equipItem(slot: ItemSlot, item: EquippedItem | null) {
-    this._gear[slot] = item;
+  equipItem(slot: ItemSlot, newItem: EquippedItem | null) {
+    if (equalsOrBothNull(this._gear[slot], newItem, (a, b) => a.equals(b)))
+      return;
+
+    this._gear[slot] = newItem;
     this.gearChangeEmitter.emit(this._gear);
   }
 

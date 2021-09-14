@@ -1,66 +1,131 @@
+import { Buffs } from '../api/newapi'
+import { Consumes } from '../api/newapi'
 import { Sim } from '../sim'
 
+import { ExclusivityTag } from '../themes/theme';
 import { IconInput } from './icon_picker'
 
-// Keep these in alphabetical order.
+// Keep each section in alphabetical order.
+// Buffs
+export const ArcaneBrilliance = makeBooleanBuffSpellInput(27127, 'arcaneInt');
+export const BlessingOfKings = makeBooleanBuffSpellInput(25898, 'blessingOfKings');
+export const BlessingOfWisdom = makeTristateBuffSpellInput(27143, 20245, 'blessingOfWisdom');
+export const Bloodlust = makeMultistateBuffSpellInput(2825, 11, 'bloodlust');
+export const ChainOfTheTwilightOwl = makeBooleanBuffSpellInput(31035, 'chainOfTheTwilightOwl');
+export const EyeOfTheNight = makeBooleanBuffSpellInput(31033, 'eyeOfTheNight');
+export const GiftOfTheWild = makeBooleanBuffSpellInput(26991, 'giftOfTheWild');
+export const JadePendantOfBlasting = makeBooleanBuffSpellInput(25607, 'jadePendantOfBlasting');
+export const MoonkinAura = makeTristateBuffSpellItemInput(24907, 32387, 'moonkinAura');
 
-export const ArcaneBrilliance = {
-  spellId: 27127,
-  states: 2,
-  changedEvent: (sim: Sim) => sim.buffsChangeEmitter,
-  getValue: (sim: Sim) => sim.buffs.arcaneInt,
-  setBooleanValue: (sim: Sim, newValue: boolean) => {
-    const newBuffs = sim.buffs;
-    newBuffs.arcaneInt = newValue;
-    sim.buffs = newBuffs;
-  },
-};
+// Debuffs
+export const ImprovedSealOfTheCrusader = makeBooleanBuffSpellInput(20337, 'improvedSealOfTheCrusader');
+export const JudgementOfWisdom = makeBooleanBuffSpellInput(27164, 'judgementOfWisdom');
+export const Misery = makeBooleanBuffSpellInput(33195, 'misery');
 
-export const BlessingOfKings = {
-  spellId: 25898,
-  states: 2,
-  changedEvent: (sim: Sim) => sim.buffsChangeEmitter,
-  getValue: (sim: Sim) => sim.buffs.blessingOfKings,
-  setBooleanValue: (sim: Sim, newValue: boolean) => {
-    const newBuffs = sim.buffs;
-    newBuffs.blessingOfKings = newValue;
-    sim.buffs = newBuffs;
-  },
-};
+// Consumes
+export const AdeptsElixir = makeBooleanConsumeItemInput(28103, 'adeptsElixir', ['Battle Elixir']);
+export const BlackenedBasilisk = makeBooleanConsumeItemInput(27657, 'blackenedBasilisk', ['Food']);
+export const BrilliantWizardOil = makeBooleanConsumeItemInput(20749, 'brilliantWizardOil', ['Weapon Imbue']);
+export const DestructionPotion = makeBooleanConsumeItemInput(22839, 'destructionPotion', ['Potion']);
+export const DrumsOfBattle = makeBooleanConsumeSpellInput(35476, 'drumsOfBattle', ['Drums']);
+export const DrumsOfRestoration = makeBooleanConsumeSpellInput(35478, 'drumsOfRestoration', ['Drums']);
+export const ElixirOfDraenicWisdom = makeBooleanConsumeItemInput(32067, 'elixirOfDraenicWisdom', ['Guardian Elixir']);
+export const ElixirOfMajorFirePower = makeBooleanConsumeItemInput(22833, 'elixirOfMajorFirePower', ['Battle Elixir']);
+export const ElixirOfMajorFrostPower = makeBooleanConsumeItemInput(22827, 'elixirOfMajorFrostPower', ['Battle Elixir']);
+export const ElixirOfMajorMageblood = makeBooleanConsumeItemInput(22840, 'elixirOfMajorMageblood', ['Guardian Elixir']);
+export const ElixirOfMajorShadowPower = makeBooleanConsumeItemInput(22835, 'elixirOfMajorShadowPower', ['Battle Elixir']);
+export const FlaskOfBlindingLight = makeBooleanConsumeItemInput(22861, 'flaskOfBlindingLight', ['Battle Elixir', 'Guardian Elixir']);
+export const FlaskOfMightyRestoration = makeBooleanConsumeItemInput(22853, 'flaskOfMightyRestoration', ['Battle Elixir', 'Guardian Elixir']);
+export const FlaskOfPureDeath = makeBooleanConsumeItemInput(22866, 'flaskOfPureDeath', ['Battle Elixir', 'Guardian Elixir']);
+export const FlaskOfSupremePower = makeBooleanConsumeItemInput(13512, 'flaskOfSupremePower', ['Battle Elixir', 'Guardian Elixir']);
+export const SkullfishSoup = makeBooleanConsumeItemInput(33825, 'skullfishSoup', ['Food']);
+export const SuperManaPotion = makeBooleanConsumeItemInput(22832, 'superManaPotion', ['Potion']);
+export const SuperiorWizardOil = makeBooleanConsumeItemInput(22522, 'superiorWizardOil', ['Weapon Imbue']);
 
-export const BlessingOfWisdom = {
-  spellId: 27143,
-  states: 3,
-  improvedSpellId: 20245,
-  changedEvent: (sim: Sim) => sim.buffsChangeEmitter,
-  getValue: (sim: Sim) => sim.buffs.blessingOfWisdom,
-  setNumberValue: (sim: Sim, newValue: number) => {
-    const newBuffs = sim.buffs;
-    newBuffs.blessingOfWisdom = newValue;
-    sim.buffs = newBuffs;
-  },
-};
+function makeBooleanBuffSpellInput(spellId: number, buffsFieldName: keyof Buffs): IconInput {
+  return {
+    spellId: spellId,
+    states: 2,
+    changedEvent: (sim: Sim) => sim.buffsChangeEmitter,
+    getValue: (sim: Sim) => sim.buffs[buffsFieldName],
+    setBooleanValue: (sim: Sim, newValue: boolean) => {
+      const newBuffs = sim.buffs;
+      (newBuffs[buffsFieldName] as boolean) = newValue;
+      sim.buffs = newBuffs;
+    },
+  }
+}
 
-export const Bloodlust = {
-  spellId: 2825,
-  states: 0,
-  changedEvent: (sim: Sim) => sim.buffsChangeEmitter,
-  getValue: (sim: Sim) => sim.buffs.bloodlust,
-  setNumberValue: (sim: Sim, newValue: number) => {
-    const newBuffs = sim.buffs;
-    newBuffs.bloodlust = newValue;
-    sim.buffs = newBuffs;
-  },
-};
+function makeTristateBuffSpellInput(spellId: number, impSpellId: number, buffsFieldName: keyof Buffs): IconInput {
+  return {
+    spellId: spellId,
+    states: 3,
+    improvedSpellId: impSpellId,
+    changedEvent: (sim: Sim) => sim.buffsChangeEmitter,
+    getValue: (sim: Sim) => sim.buffs[buffsFieldName],
+    setNumberValue: (sim: Sim, newValue: number) => {
+      const newBuffs = sim.buffs;
+      (newBuffs[buffsFieldName] as number) = newValue;
+      sim.buffs = newBuffs;
+    },
+  }
+}
 
-export const GiftOfTheWild = {
-  spellId: 26991,
-  states: 2,
-  changedEvent: (sim: Sim) => sim.buffsChangeEmitter,
-  getValue: (sim: Sim) => sim.buffs.giftOfTheWild,
-  setBooleanValue: (sim: Sim, newValue: boolean) => {
-    const newBuffs = sim.buffs;
-    newBuffs.giftOfTheWild = newValue;
-    sim.buffs = newBuffs;
-  },
-};
+function makeTristateBuffSpellItemInput(spellId: number, impItemId: number, buffsFieldName: keyof Buffs): IconInput {
+  return {
+    spellId: spellId,
+    states: 3,
+    improvedItemId: impItemId,
+    changedEvent: (sim: Sim) => sim.buffsChangeEmitter,
+    getValue: (sim: Sim) => sim.buffs[buffsFieldName],
+    setNumberValue: (sim: Sim, newValue: number) => {
+      const newBuffs = sim.buffs;
+      (newBuffs[buffsFieldName] as number) = newValue;
+      sim.buffs = newBuffs;
+    },
+  }
+}
+
+function makeMultistateBuffSpellInput(spellId: number, numStates: number, buffsFieldName: keyof Buffs): IconInput {
+  return {
+    spellId: spellId,
+    states: numStates,
+    changedEvent: (sim: Sim) => sim.buffsChangeEmitter,
+    getValue: (sim: Sim) => sim.buffs[buffsFieldName],
+    setNumberValue: (sim: Sim, newValue: number) => {
+      const newBuffs = sim.buffs;
+      (newBuffs[buffsFieldName] as number) = newValue;
+      sim.buffs = newBuffs;
+    },
+  }
+}
+
+function makeBooleanConsumeItemInput(itemId: number, consumesFieldName: keyof Consumes, exclusivityTags?: Array<ExclusivityTag>): IconInput {
+  return {
+    itemId: itemId,
+    states: 2,
+    exclusivityTags: exclusivityTags,
+    changedEvent: (sim: Sim) => sim.consumesChangeEmitter,
+    getValue: (sim: Sim) => sim.consumes[consumesFieldName],
+    setBooleanValue: (sim: Sim, newValue: boolean) => {
+      const newBuffs = sim.consumes;
+      (newBuffs[consumesFieldName] as boolean) = newValue;
+      sim.consumes = newBuffs;
+    },
+  }
+}
+
+function makeBooleanConsumeSpellInput(spellId: number, consumesFieldName: keyof Consumes, exclusivityTags?: Array<ExclusivityTag>): IconInput {
+  return {
+    spellId: spellId,
+    states: 2,
+    exclusivityTags: exclusivityTags,
+    changedEvent: (sim: Sim) => sim.consumesChangeEmitter,
+    getValue: (sim: Sim) => sim.consumes[consumesFieldName],
+    setBooleanValue: (sim: Sim, newValue: boolean) => {
+      const newBuffs = sim.consumes;
+      (newBuffs[consumesFieldName] as boolean) = newValue;
+      sim.consumes = newBuffs;
+    },
+  }
+}
