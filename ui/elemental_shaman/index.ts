@@ -11,6 +11,7 @@ const theme = new DefaultTheme(
         IconInputs.DrumsOfBattle,
         IconInputs.DrumsOfRestoration,
         IconInputs.ArcaneBrilliance,
+        IconInputs.ImprovedDivineSpirit,
         IconInputs.BlessingOfKings,
         IconInputs.BlessingOfWisdom,
         IconInputs.GiftOfTheWild,
@@ -27,6 +28,7 @@ const theme = new DefaultTheme(
       'Consumes': [
         IconInputs.SuperManaPotion,
         IconInputs.DestructionPotion,
+        IconInputs.DarkRune,
         IconInputs.FlaskOfBlindingLight,
         IconInputs.FlaskOfSupremePower,
         IconInputs.AdeptsElixir,

@@ -14,6 +14,7 @@ export const Bloodlust = makeMultistateBuffSpellInput(2825, 11, 'bloodlust');
 export const ChainOfTheTwilightOwl = makeBooleanBuffSpellInput(31035, 'chainOfTheTwilightOwl');
 export const EyeOfTheNight = makeBooleanBuffSpellInput(31033, 'eyeOfTheNight');
 export const GiftOfTheWild = makeBooleanBuffSpellInput(26991, 'giftOfTheWild');
+export const ImprovedDivineSpirit = makeBooleanBuffSpellInput(33182, 'improvedDivineSpirit');
 export const JadePendantOfBlasting = makeBooleanBuffSpellInput(25607, 'jadePendantOfBlasting');
 export const MoonkinAura = makeTristateBuffSpellItemInput(24907, 32387, 'moonkinAura');
 
@@ -26,6 +27,7 @@ export const Misery = makeBooleanBuffSpellInput(33195, 'misery');
 export const AdeptsElixir = makeBooleanConsumeItemInput(28103, 'adeptsElixir', ['Battle Elixir']);
 export const BlackenedBasilisk = makeBooleanConsumeItemInput(27657, 'blackenedBasilisk', ['Food']);
 export const BrilliantWizardOil = makeBooleanConsumeItemInput(20749, 'brilliantWizardOil', ['Weapon Imbue']);
+export const DarkRune = makeBooleanConsumeItemInput(12662, 'darkRune', ['Rune']);
 export const DestructionPotion = makeBooleanConsumeItemInput(22839, 'destructionPotion', ['Potion']);
 export const DrumsOfBattle = makeBooleanConsumeSpellInput(35476, 'drumsOfBattle', ['Drums']);
 export const DrumsOfRestoration = makeBooleanConsumeSpellInput(35478, 'drumsOfRestoration', ['Drums']);

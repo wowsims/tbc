@@ -18,6 +18,7 @@ export abstract class Theme {
       'Food': [],
       'Guardian Elixir': [],
       'Potion': [],
+      'Rune': [],
       'Weapon Imbue': [],
     };
   }
@@ -51,6 +52,7 @@ export type ExclusivityTag =
     | 'Food'
     | 'Guardian Elixir'
     | 'Potion'
+    | 'Rune'
     | 'Weapon Imbue';
 
 export interface ExclusiveEffect {
