@@ -24,6 +24,10 @@ export class NumberPicker extends Component {
     config.changedEvent(sim).on(() => {
       input.value = String(config.getValue(sim));
     });
+    
+    if (config.defaultValue) {
+      config.setValue(sim, config.defaultValue);
+    }
 
     input.addEventListener('input', event => {
       config.setValue(sim, parseInt(input.value || '') || 0);
@@ -36,6 +40,8 @@ export class NumberPicker extends Component {
  */
 export type NumberPickerConfig = {
   label?: string,
+  defaultValue?: number,
+
   changedEvent: (sim: Sim) => TypedEvent<any>;
   getValue: (sim: Sim) => number;
   setValue: (sim: Sim, newValue: number) => void;

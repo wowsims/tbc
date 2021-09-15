@@ -25,7 +25,21 @@ import { TypedEvent } from './typed_event';
 import { equalsOrBothNull } from './utils';
 import { wait } from './utils';
 
+const STATS_LEN = Object.keys(Stat).length;
+
 export type Gear = Array<EquippedItem | null>;
+export type CustomStats = Array<number>;
+
+export interface SimConfig {
+  spec: Spec;
+  epStats: Array<Stat>;
+  epReferenceStat: Stat;
+  defaults: {
+    encounter: Encounter,
+    buffs: Buffs,
+    consumes: Consumes,
+  },
+}
 
 export class Sim {
   readonly spec: Spec;
@@ -35,6 +49,7 @@ export class Sim {
   readonly buffsChangeEmitter = new TypedEvent<Buffs>();
   readonly consumesChangeEmitter = new TypedEvent<Consumes>();
   readonly encounterChangeEmitter = new TypedEvent<Encounter>();
+  readonly customStatsChangeEmitter = new TypedEvent<CustomStats>();
 
   // Database
   private _items: Record<number, Item> = {};
@@ -44,15 +59,21 @@ export class Sim {
   // Current values
   private _race: Race;
   private _gear: Gear = [];
-  private _buffs: Buffs = Buffs.create();
-  private _consumes: Consumes = Consumes.create();
-  private _encounter: Encounter = Encounter.create();
+  private _buffs: Buffs;
+  private _consumes: Consumes;
+  private _encounter: Encounter;
+  private _customStats: CustomStats;
 
   private _init = false;
 
-  constructor(spec: Spec) {
-    this.spec = spec;
+  constructor(config: SimConfig) {
+    this.spec = config.spec;
     this._race = SpecToEligibleRaces[this.spec][0];
+
+    this._encounter = config.defaults.encounter;
+    this._buffs = config.defaults.buffs;
+    this._consumes = config.defaults.consumes;
+    this._customStats = new Array(STATS_LEN).fill(0);
   }
 
   async init(): Promise<void> {
@@ -137,6 +158,24 @@ export class Sim {
 
   getEquippedItem(slot: ItemSlot): EquippedItem | null {
     return this._gear[slot];
+  }
+
+  get customStats(): CustomStats {
+    // Make a defensive copy
+    return this._customStats.slice();
+  }
+
+  set customStats(newCustomStats: CustomStats) {
+    if (newCustomStats.length != STATS_LEN) {
+      throw new Error('Custom stats must have length = ' + STATS_LEN);
+    }
+
+    if (newCustomStats.every((newStat, statIdx) => newStat == this._customStats[statIdx]))
+      return;
+
+    // Make a defensive copy
+    this._customStats = newCustomStats.slice();
+    this.customStatsChangeEmitter.emit(this._customStats);
   }
 
   createSimRequest(): IndividualSimRequest {

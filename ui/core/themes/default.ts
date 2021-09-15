@@ -3,6 +3,7 @@ import { Spec } from '../api/newapi';
 import { Stat } from '../api/newapi';
 import { Actions } from '../components/actions.js';
 import { CharacterStats } from '../components/character_stats';
+import { CustomStatsPicker } from '../components/custom_stats_picker';
 import { GearPicker } from '../components/gear_picker';
 import { IconInput } from '../components/icon_picker';
 import { IconPicker } from '../components/icon_picker';
@@ -11,12 +12,9 @@ import { RacePicker } from '../components/race_picker';
 import { Results } from '../components/results';
 import { newTalentsPicker } from '../talents/factory';
 
-import { Theme } from './theme.js';
+import { Theme, ThemeConfig } from './theme.js';
 
-export interface DefaultThemeConfig {
-  spec: Spec;
-  epStats: Array<Stat>;
-  epReferenceStat: Stat;
+export interface DefaultThemeConfig extends ThemeConfig {
   displayStats: Array<Stat>;
   iconSections: Record<string, Array<IconInput>>;
   showTargetArmor: boolean,
@@ -25,7 +23,7 @@ export interface DefaultThemeConfig {
 
 export class DefaultTheme extends Theme {
   constructor(parentElem: HTMLElement, config: DefaultThemeConfig) {
-    super(parentElem, config.spec)
+    super(parentElem, config)
 
     this.parentElem.innerHTML = layoutHTML;
 
@@ -35,10 +33,11 @@ export class DefaultTheme extends Theme {
     const characterStats = new CharacterStats(this.parentElem.getElementsByClassName('default-stats')[0] as HTMLElement, config.displayStats);
 
     const gearPicker = new GearPicker(this.parentElem.getElementsByClassName('gear-picker')[0] as HTMLElement, this.sim);
+    const customStatsPicker = new CustomStatsPicker(this.parentElem.getElementsByClassName('custom-stats-picker')[0] as HTMLElement, this.sim, config.epStats);
     const racePicker = new RacePicker(this.parentElem.getElementsByClassName('race-picker')[0] as HTMLElement, this.sim);
     const talentsPicker = newTalentsPicker(config.spec, this.parentElem.getElementsByClassName('talents-picker')[0] as HTMLElement, this.sim);
 
-    const settingsTab = document.getElementById('settings-tab') as HTMLElement;
+    const settingsTab = document.getElementsByClassName('settings-tab')[0] as HTMLElement;
     Object.keys(config.iconSections).forEach(pickerName => {
       const section = config.iconSections[pickerName];
 
@@ -92,10 +91,6 @@ export class DefaultTheme extends Theme {
           sim.encounter = encounter;
         },
       });
-    } else {
-      const encounter = this.sim.encounter;
-      encounter.numTargets = 1
-      this.sim.encounter = encounter;
     }
   }
 }
@@ -121,18 +116,28 @@ const layoutHTML = `
     </ul>
     <div class="tab-content">
       <div id="gear-tab" class="tab-pane fade in active">
-        <div class="character-picker">
-          <div class="gear-picker">
+        <div class="gear-tab">
+          <div class="left-gear-panel">
+            <div class="gear-picker">
+            </div>
+          </div>
+          <div class="right-gear-panel">
+            <div class="custom-stats-picker">
+            </div>
           </div>
         </div>
       </div>
       <div id="settings-tab" class="tab-pane fade"">
-        <section class="settings-section race-picker">
-          <label>Race</label>
-        </section>
+        <div class="settings-tab">
+          <section class="settings-section race-picker">
+            <label>Race</label>
+          </section>
+        </div>
       </div>
       <div id="talents-tab" class="tab-pane fade"">
-        <div class="talents-picker">
+        <div class="talents-tab">
+          <div class="talents-picker">
+          </div>
         </div>
       </div>
     </div>

@@ -7,7 +7,7 @@ import { IconInput } from './icon_picker'
 
 // Keep each section in alphabetical order.
 // Buffs
-export const ArcaneBrilliance = makeBooleanBuffSpellInput(27127, 'arcaneInt');
+export const ArcaneBrilliance = makeBooleanBuffSpellInput(27127, 'arcaneBrilliance');
 export const BlessingOfKings = makeBooleanBuffSpellInput(25898, 'blessingOfKings');
 export const BlessingOfWisdom = makeTristateBuffSpellInput(27143, 20245, 'blessingOfWisdom');
 export const Bloodlust = makeMultistateBuffSpellInput(2825, 11, 'bloodlust');

@@ -1,11 +1,16 @@
 @import "../components/actions";
 @import "../components/character_stats";
+@import "../components/custom_stats_picker";
 @import "../components/gear_picker";
 @import "../components/icon_picker";
 @import "../components/number_picker";
 @import "../components/race_picker";
 @import "../components/results";
 @import "../talents/talents_picker";
+
+td, th {
+  padding: auto;
+}
 
 .actions-button {
   background: transparent;
@@ -37,8 +42,8 @@
 
 .character-stats-table-row {
   border-bottom: 1px solid black;
-  padding: 7px 10px;
-  font-size: 12px;
+  font-size: 16px;
+  font-weight: 600;
 }
 
 .default-root {
@@ -94,11 +99,32 @@ $main-background-color: #F0FFFF;
 }
 
 .gear-tab {
+  display: flex;
 }
 
 .settings-tab {
-  display: flex;
-  flex-direction: row;
+}
+
+.talents-tab {
+}
+
+.left-gear-panel {
+  width: 70%;
+}
+
+.right-gear-panel {
+  width: 30%;
+  text-align: center;
+  border-left: 3px solid black;
+}
+
+.custom-stats-root {
+  justify-content: end;
+  text-align: right;
+}
+
+.custom-stats-root .number-picker-root {
+  justify-content: end;
 }
 
 .settings-section {
@@ -123,10 +149,6 @@ $main-background-color: #F0FFFF;
   font-size: 18px;
 }
 
-.character-picker {
-  width: 70%;
-}
-
 .race-picker {
   text-align: center;
 }
@@ -134,4 +156,5 @@ $main-background-color: #F0FFFF;
 .encounter-section .number-picker-root {
   display: flex;
   justify-content: space-between;
+  align-items: center;
 }

@@ -1,6 +1,9 @@
-import { Sim } from '../sim';
+import { Sim, SimConfig } from '../sim';
 import { TypedEvent } from '../typed_event';
 import { Spec } from '../api/newapi';
+
+export interface ThemeConfig extends SimConfig {
+}
 
 export abstract class Theme {
   readonly parentElem: HTMLElement;
@@ -8,9 +11,9 @@ export abstract class Theme {
 
   private readonly exclusivityMap: Record<ExclusivityTag, Array<ExclusiveEffect>>;
 
-  constructor(parentElem: HTMLElement, spec: Spec) {
+  constructor(parentElem: HTMLElement, config: ThemeConfig) {
     this.parentElem = parentElem;
-    this.sim = new Sim(spec);
+    this.sim = new Sim(config);
 
     this.exclusivityMap = {
       'Battle Elixir': [],

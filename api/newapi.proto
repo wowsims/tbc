@@ -164,7 +164,7 @@ enum GemColor {
 
 message Buffs {
     // Raid buffs
-    bool arcane_int = 1;
+    bool arcane_brilliance = 1;
     bool gift_of_the_wild = 2;
     bool blessing_of_kings = 3;
     int32 blessing_of_wisdom = 4;

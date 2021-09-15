@@ -1,3 +1,6 @@
+import { Buffs } from '../core/api/newapi';
+import { Consumes } from '../core/api/newapi';
+import { Encounter } from '../core/api/newapi';
 import { Spec } from '../core/api/newapi';
 import { Stat } from '../core/api/newapi';
 import { DefaultTheme } from '../core/themes/default';
@@ -61,5 +64,26 @@ const theme = new DefaultTheme(document.body, {
   },
   showTargetArmor: false,
   showNumTargets: true,
+  defaults: {
+    encounter: Encounter.create({
+      duration: 300,
+      numTargets: 1,
+    }),
+    buffs: Buffs.create({
+      bloodlust: 1,
+      arcaneBrilliance: true,
+      improvedDivineSpirit: true,
+      blessingOfKings: true,
+      blessingOfWisdom: 2,
+      giftOfTheWild: true,
+
+      judgementOfWisdom: true,
+      misery: true,
+    }),
+    consumes: Consumes.create({
+      drumsOfBattle: true,
+      superManaPotion: true,
+    }),
+  },
 });
 theme.init();
