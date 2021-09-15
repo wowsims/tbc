@@ -78,6 +78,7 @@ class TalentTreePicker extends Component {
     const reset = this.rootElem.getElementsByClassName('talent-tree-reset')[0] as HTMLElement;
     reset.addEventListener('click', event => {
       this.talents.forEach(talent => talent.setPoints(0, false));
+      this.picker.update();
     });
   }
 
