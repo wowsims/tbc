@@ -10,7 +10,8 @@ import { GetEligibleItemSlots } from '../api/utils';
 import { EquippedItem } from '../equipped_item';
 import { GetEmptyGemSocketIconUrl } from '../resources';
 import { GetEmptySlotIconUrl } from '../resources';
-import { GetItemIconUrl } from '../resources';
+import { GetIconUrl } from '../resources';
+import { SetWowheadHref } from '../resources';
 import { SetGemSocketCssClass } from '../css_utils';
 import { SetItemQualityCssClass } from '../css_utils';
 import { Sim } from '../sim';
@@ -66,7 +67,7 @@ class ItemPicker extends Component {
   readonly slot: ItemSlot;
 
   private readonly sim: Sim;
-  private readonly iconElem: HTMLElement;
+  private readonly iconElem: HTMLAnchorElement;
   private readonly nameElem: HTMLElement;
   private readonly enchantElem: HTMLElement;
   private readonly socketsContainerElem: HTMLElement;
@@ -94,7 +95,7 @@ class ItemPicker extends Component {
       </div>
     `;
 
-    this.iconElem = this.rootElem.getElementsByClassName('item-picker-icon')[0] as HTMLElement;
+    this.iconElem = this.rootElem.getElementsByClassName('item-picker-icon')[0] as HTMLAnchorElement;
     this.nameElem = this.rootElem.getElementsByClassName('item-picker-name')[0] as HTMLElement;
     this.enchantElem = this.rootElem.getElementsByClassName('item-picker-enchant')[0] as HTMLElement;
     this.socketsContainerElem = this.rootElem.getElementsByClassName('item-picker-sockets-container')[0] as HTMLElement;
@@ -132,8 +133,8 @@ class ItemPicker extends Component {
       SetItemQualityCssClass(this.nameElem, newItem.item.quality);
 
       this.sim.setWowheadData(newItem, this.iconElem);
-      this.iconElem.setAttribute('href', 'https://tbc.wowhead.com/item=' + newItem.item.id);
-      GetItemIconUrl(newItem.item.id).then(url => {
+      SetWowheadHref(this.iconElem, {itemId: newItem.item.id});
+      GetIconUrl({itemId: newItem.item.id}).then(url => {
         this.iconElem.style.backgroundImage = `url('${url}')`;
       });
 
@@ -149,7 +150,7 @@ class ItemPicker extends Component {
         if (newItem.gems[gemIdx] == null) {
           gemIconElem.style.backgroundImage = `url('${GetEmptyGemSocketIconUrl(socketColor)}')`;
         } else {
-          GetItemIconUrl(newItem.gems[gemIdx]!.id).then(url => {
+          GetIconUrl({itemId: newItem.gems[gemIdx]!.id}).then(url => {
             gemIconElem.style.backgroundImage = `url('${url}')`;
           });
         }
@@ -259,7 +260,7 @@ class SelectorModal extends Component {
           'Gem ' + (socketIdx + 1),
           slot,
           equippedItem,
-          this.sim.gems.filter(gem => GemEligibleForSocket(gem, socketColor)),
+          this.sim.getGems().filter(gem => GemEligibleForSocket(gem, socketColor)),
           equippedItem => equippedItem?.gems[socketIdx]?.id || 0,
           gem => {
             return {
@@ -342,12 +343,14 @@ class SelectorModal extends Component {
       listItemElem.dataset.name = itemData.name;
 
       listItemElem.innerHTML = `
-        <a class="selector-modal-list-item-icon" href="https://tbc.wowhead.com/item=${itemData.id}"></a>
-        <a class="selector-modal-list-item-name" href="https://tbc.wowhead.com/item=${itemData.id}">${itemData.name}</a>
+        <a class="selector-modal-list-item-icon"></a>
+        <a class="selector-modal-list-item-name">${itemData.name}</a>
       `;
+      SetWowheadHref(listItemElem.children[0] as HTMLAnchorElement, {itemId: itemData.id});
+      SetWowheadHref(listItemElem.children[1] as HTMLAnchorElement, {itemId: itemData.id});
 
       const iconElem = listItemElem.getElementsByClassName('selector-modal-list-item-icon')[0] as HTMLImageElement;
-      GetItemIconUrl(itemData.id).then(url => {
+      GetIconUrl({itemId: itemData.id}).then(url => {
         iconElem.style.backgroundImage = `url('${url}')`;
       });
 

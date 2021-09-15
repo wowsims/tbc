@@ -21,13 +21,13 @@ export class RacePicker extends Component {
       raceSelector.appendChild(option);
     });
 
-    raceSelector.value = String(sim.race);
+    raceSelector.value = String(sim.getRace());
     sim.raceChangeEmitter.on(newRace => {
       raceSelector.value = String(newRace);
     });
 
     raceSelector.addEventListener('change', event => {
-      sim.race = parseInt(raceSelector.value) as Race;
+      sim.setRace(parseInt(raceSelector.value) as Race);
     });
   }
 }

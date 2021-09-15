@@ -58,11 +58,11 @@ export class DefaultTheme extends Theme {
     new NumberPicker(encounterSectionElem, this.sim, {
       label: 'Duration',
       changedEvent: (sim: Sim) => sim.encounterChangeEmitter,
-      getValue: (sim: Sim) => sim.encounter.duration,
+      getValue: (sim: Sim) => sim.getEncounter().duration,
       setValue: (sim: Sim, newValue: number) => {
-        const encounter = sim.encounter;
+        const encounter = sim.getEncounter();
         encounter.duration = newValue;
-        sim.encounter = encounter;
+        sim.setEncounter(encounter);
       },
     });
 
@@ -70,11 +70,11 @@ export class DefaultTheme extends Theme {
       new NumberPicker(encounterSectionElem, this.sim, {
         label: 'Target Armor',
         changedEvent: (sim: Sim) => sim.encounterChangeEmitter,
-        getValue: (sim: Sim) => sim.encounter.targetArmor,
+        getValue: (sim: Sim) => sim.getEncounter().targetArmor,
         setValue: (sim: Sim, newValue: number) => {
-          const encounter = sim.encounter;
+          const encounter = sim.getEncounter();
           encounter.targetArmor = newValue;
-          sim.encounter = encounter;
+          sim.setEncounter(encounter);
         },
       });
     } else {
@@ -84,11 +84,11 @@ export class DefaultTheme extends Theme {
       new NumberPicker(encounterSectionElem, this.sim, {
         label: '# of Targets',
         changedEvent: (sim: Sim) => sim.encounterChangeEmitter,
-        getValue: (sim: Sim) => sim.encounter.numTargets,
+        getValue: (sim: Sim) => sim.getEncounter().numTargets,
         setValue: (sim: Sim, newValue: number) => {
-          const encounter = sim.encounter;
+          const encounter = sim.getEncounter();
           encounter.numTargets = newValue;
-          sim.encounter = encounter;
+          sim.setEncounter(encounter);
         },
       });
     }

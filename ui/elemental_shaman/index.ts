@@ -1,4 +1,5 @@
 import { Buffs } from '../core/api/newapi';
+import { TristateEffect } from '../core/api/newapi'
 import { Consumes } from '../core/api/newapi';
 import { Encounter } from '../core/api/newapi';
 import { Spec } from '../core/api/newapi';
@@ -33,7 +34,7 @@ const theme = new DefaultTheme(document.body, {
       IconInputs.DrumsOfBattle,
       IconInputs.DrumsOfRestoration,
       IconInputs.ArcaneBrilliance,
-      IconInputs.ImprovedDivineSpirit,
+      IconInputs.DivineSpirit,
       IconInputs.BlessingOfKings,
       IconInputs.BlessingOfWisdom,
       IconInputs.GiftOfTheWild,
@@ -72,10 +73,10 @@ const theme = new DefaultTheme(document.body, {
     buffs: Buffs.create({
       bloodlust: 1,
       arcaneBrilliance: true,
-      improvedDivineSpirit: true,
+      divineSpirit: TristateEffect.TristateEffectImproved,
       blessingOfKings: true,
       blessingOfWisdom: 2,
-      giftOfTheWild: true,
+      giftOfTheWild: TristateEffect.TristateEffectImproved,
 
       judgementOfWisdom: true,
       misery: true,

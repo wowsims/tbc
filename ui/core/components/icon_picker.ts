@@ -1,5 +1,6 @@
-import { GetItemIconUrl } from '../resources';
-import { GetSpellIconUrl } from '../resources';
+import { GetIconUrl } from '../resources';
+import { ItemOrSpellId } from '../resources';
+import { SetWowheadHref } from '../resources';
 import { Sim } from '../sim';
 import { TypedEvent } from '../typed_event';
 import { isRightClick } from '../utils';
@@ -48,29 +49,15 @@ class IconInputComponent extends Component {
     this._improvedAnchor = this._rootAnchor.getElementsByClassName('icon-input-improved')[0] as HTMLAnchorElement;
     this._counterElem = this._rootAnchor.getElementsByClassName('icon-input-counter')[0] as HTMLAnchorElement;
 
-    if (this._input.itemId) {
-      this._rootAnchor.href = 'https://tbc.wowhead.com/item=' + this._input.itemId;
-      GetItemIconUrl(this._input.itemId).then(url => {
-        this._rootAnchor.style.backgroundImage = `url('${url}')`;
-      });
-    } else if (this._input.spellId) {
-      this._rootAnchor.href = 'https://tbc.wowhead.com/spell=' + this._input.spellId;
-      GetSpellIconUrl(this._input.spellId).then(url => {
-        this._rootAnchor.style.backgroundImage = `url('${url}')`;
-      });
-    } else {
-      throw new Error('IconInput missing icon id');
-    }
+    SetWowheadHref(this._rootAnchor, this._input.id);
+    GetIconUrl(this._input.id).then(url => {
+      this._rootAnchor.style.backgroundImage = `url('${url}')`;
+    });
 
     if (this._input.states == 3) {
-      if (this._input.improvedItemId) {
-        this._improvedAnchor.href = 'https://tbc.wowhead.com/item=' + this._input.improvedItemId;
-        GetItemIconUrl(this._input.improvedItemId).then(url => {
-          this._improvedAnchor.style.backgroundImage = `url('${url}')`;
-        });
-      } else if (this._input.improvedSpellId) {
-        this._improvedAnchor.href = 'https://tbc.wowhead.com/spell=' + this._input.improvedSpellId;
-        GetSpellIconUrl(this._input.improvedSpellId).then(url => {
+      if (this._input.improvedId) {
+        SetWowheadHref(this._improvedAnchor, this._input.improvedId);
+        GetIconUrl(this._input.improvedId).then(url => {
           this._improvedAnchor.style.backgroundImage = `url('${url}')`;
         });
       } else {
@@ -154,19 +141,14 @@ class IconInputComponent extends Component {
 // 
 // E.g. one of these for arcane brilliance, another for kings, etc.
 export type IconInput = {
-  // Exactly one of these should be set.
-  itemId?: number;
-  spellId?: number;
-
+  id: ItemOrSpellId;
   
   // The number of possible 'states' this icon can have. Most inputs will use 2
   // for a bi-state icon (on or off). 0 indicates an unlimited number of states.
   states: number;
 
-  // At most one of these should be set. Only used if states == 3.
-  improvedItemId?: number;
-  improvedSpellId?: number;
-
+  // Only used if states == 3.
+  improvedId?: ItemOrSpellId;
   
   // If set, all effects with matching tags will be deactivated when this
   // effect is enabled.

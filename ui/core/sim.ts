@@ -92,26 +92,26 @@ export class Sim {
     this.gearListEmitter.emit(result);
   }
 
-  get gems(): Array<Gem> {
+  getGems(): Array<Gem> {
     return Object.values(this._gems);
   }
   
-  get race() {
+  getRace() {
     return this._race;
   }
-  set race(newRace: Race) {
+  setRace(newRace: Race) {
     if (newRace != this._race) {
       this._race = newRace;
       this.raceChangeEmitter.emit(newRace);
     }
   }
 
-  get buffs(): Buffs {
+  getBuffs(): Buffs {
     // Make a defensive copy
     return Buffs.clone(this._buffs);
   }
 
-  set buffs(newBuffs: Buffs) {
+  setBuffs(newBuffs: Buffs) {
     if (Buffs.equals(this._buffs, newBuffs))
       return;
 
@@ -120,12 +120,12 @@ export class Sim {
     this.buffsChangeEmitter.emit(this._buffs);
   }
 
-  get consumes(): Consumes {
+  getConsumes(): Consumes {
     // Make a defensive copy
     return Consumes.clone(this._consumes);
   }
 
-  set consumes(newConsumes: Consumes) {
+  setConsumes(newConsumes: Consumes) {
     if (Consumes.equals(this._consumes, newConsumes))
       return;
 
@@ -134,12 +134,12 @@ export class Sim {
     this.consumesChangeEmitter.emit(this._consumes);
   }
 
-  get encounter(): Encounter {
+  getEncounter(): Encounter {
     // Make a defensive copy
     return Encounter.clone(this._encounter);
   }
 
-  set encounter(newEncounter: Encounter) {
+  setEncounter(newEncounter: Encounter) {
     if (Encounter.equals(this._encounter, newEncounter))
       return;
 
@@ -160,12 +160,12 @@ export class Sim {
     return this._gear[slot];
   }
 
-  get customStats(): CustomStats {
+  getCustomStats(): CustomStats {
     // Make a defensive copy
     return this._customStats.slice();
   }
 
-  set customStats(newCustomStats: CustomStats) {
+  setCustomStats(newCustomStats: CustomStats) {
     if (newCustomStats.length != STATS_LEN) {
       throw new Error('Custom stats must have length = ' + STATS_LEN);
     }

@@ -162,16 +162,22 @@ enum GemColor {
     GemColorPrismatic = 8;
 }
 
+enum TristateEffect {
+    TristateEffectMissing = 0;
+    TristateEffectRegular = 1;
+    TristateEffectImproved = 2;
+}
+
 message Buffs {
     // Raid buffs
     bool arcane_brilliance = 1;
-    bool gift_of_the_wild = 2;
     bool blessing_of_kings = 3;
-    int32 blessing_of_wisdom = 4;
-    bool improved_divine_spirit = 5;
+    TristateEffect blessing_of_wisdom = 4;
+    TristateEffect divine_spirit = 5;
+    TristateEffect gift_of_the_wild = 2;
 
     // Party Buffs
-    int32 moonkin_aura = 6;
+    TristateEffect moonkin_aura = 6;
     int32 spriest_dps = 7;
     int32 bloodlust = 8;
 

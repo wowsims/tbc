@@ -1,4 +1,5 @@
-import { GetSpellIconUrl } from '../resources';
+import { GetIconUrl } from '../resources';
+import { SetWowheadHref } from '../resources';
 import { Sim } from '../sim';
 import { isRightClick } from '../utils';
 import { sum } from '../utils';
@@ -14,11 +15,12 @@ export class TalentsPicker extends Component {
   constructor(parent: HTMLElement, sim: Sim, treeConfigs: Array<TalentTreeConfig>) {
     super(parent, 'talents-picker-root');
     this.trees = treeConfigs.map(treeConfig => new TalentTreePicker(this.rootElem, sim, treeConfig, this));
+    this.trees.forEach(tree => tree.talents.forEach(talent => talent.setPoints(0, false)));
     this.update();
   }
 
   get numPoints() {
-    return sum(this.trees?.map(tree => tree.numPoints) || []);
+    return sum(this.trees.map(tree => tree.numPoints));
   }
 
   isFull() {
@@ -32,15 +34,7 @@ export class TalentsPicker extends Component {
       this.rootElem.classList.remove('talents-full');
     }
 
-    this.trees?.forEach(tree => {
-      tree.talents.forEach(talent => {
-        if (talent.canSetPoints(talent.getPoints() + 1)) {
-          talent.rootElem.classList.add('talent-picker-can-add');
-        } else {
-          talent.rootElem.classList.remove('talent-picker-can-add');
-        }
-      });
-    });
+    this.trees.forEach(tree => tree.update());
   }
 }
 
@@ -80,7 +74,6 @@ class TalentTreePicker extends Component {
         this.getTalent(talent.config.prereqLocation).config.prereqOfLocation = talent.config.location;
       }
     });
-    this.update();
 
     const reset = this.rootElem.getElementsByClassName('talent-tree-reset')[0] as HTMLElement;
     reset.addEventListener('click', event => {
@@ -90,7 +83,7 @@ class TalentTreePicker extends Component {
 
   update() {
     this._title.textContent = this.config.name + ' (' + this.numPoints + ')';
-    this.picker.update();
+    this.talents.forEach(talent => talent.update());
   }
 
   getTalent(location: TalentLocation): TalentPicker {
@@ -121,8 +114,6 @@ class TalentPicker extends Component {
     this._pointsDisplay.classList.add('talent-picker-points');
     this.rootElem.appendChild(this._pointsDisplay);
 
-    this.setPoints(0, false);
-
     this.rootElem.addEventListener('click', event => {
       event.preventDefault();
     });
@@ -136,6 +127,7 @@ class TalentPicker extends Component {
       } else {
         this.setPoints(this.getPoints() + 1, true);
       }
+      this._tree.picker.update();
     });
   }
 
@@ -212,7 +204,6 @@ class TalentPicker extends Component {
 
     this._tree.numPoints += newPoints - oldPoints;
     this.rootElem.dataset.points = String(newPoints);
-    this._tree.update();
 
     this._pointsDisplay.textContent = newPoints + '/' + this.config.maxPoints;
 
@@ -223,8 +214,8 @@ class TalentPicker extends Component {
     }
 
     const spellId = this.getSpellIdForPoints(newPoints);
-    (this.rootElem as HTMLAnchorElement).href = 'https://tbc.wowhead.com/spell=' + spellId;
-    GetSpellIconUrl(spellId).then(url => {
+    SetWowheadHref(this.rootElem as HTMLAnchorElement, {spellId: spellId});
+    GetIconUrl({spellId: spellId}).then(url => {
       this.rootElem.style.backgroundImage = `url('${url}')`;
     });
   }
@@ -240,6 +231,14 @@ class TalentPicker extends Component {
     const lastRank = this.config.spellIds.length - 1;
     const lastRankId = this.config.spellIds[lastRank];
     return lastRankId + (rank - lastRank);
+  }
+
+  update() {
+    if (this.canSetPoints(this.getPoints() + 1)) {
+      this.rootElem.classList.add('talent-picker-can-add');
+    } else {
+      this.rootElem.classList.remove('talent-picker-can-add');
+    }
   }
 }
 

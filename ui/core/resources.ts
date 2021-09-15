@@ -26,7 +26,15 @@ export function GetEmptySlotIconUrl(slot: ItemSlot): string {
   return emptySlotIcons[slot];
 }
 
-async function GetIconUrl(id: number, tooltipPostfix: string, cache: Map<number, string>): Promise<string> {
+export type IconId = {
+  itemId: number;
+};
+export type SpellId = {
+  spellId: number;
+};
+export type ItemOrSpellId = IconId | SpellId;
+
+async function GetIconUrlHelper(id: number, tooltipPostfix: string, cache: Map<number, string>): Promise<string> {
   if (cache.has(id)) {
     return cache.get(id) as string;
   }
@@ -41,13 +49,21 @@ async function GetIconUrl(id: number, tooltipPostfix: string, cache: Map<number,
 }
 
 const itemToIconCache = new Map<number, string>();
-export async function GetItemIconUrl(id: number): Promise<string> {
-  return await GetIconUrl(id, 'item', itemToIconCache);
+const spellToIconCache = new Map<number, string>();
+export async function GetIconUrl(id: ItemOrSpellId): Promise<string> {
+  if ('itemId' in id) {
+    return await GetIconUrlHelper(id.itemId, 'item', itemToIconCache);
+  } else {
+    return await GetIconUrlHelper(id.spellId, 'spell', spellToIconCache);
+  }
 }
 
-const spellToIconCache = new Map<number, string>();
-export async function GetSpellIconUrl(id: number): Promise<string> {
-  return await GetIconUrl(id, 'spell', spellToIconCache);
+export function SetWowheadHref(elem: HTMLAnchorElement, id: ItemOrSpellId) {
+  if ('itemId' in id) {
+    elem.href = 'https://tbc.wowhead.com/item=' + id.itemId;
+  } else {
+    elem.href = 'https://tbc.wowhead.com/spell=' + id.spellId;
+  }
 }
 
 const emptyGemSocketIcons: Partial<Record<GemColor, string>> = {

@@ -21,11 +21,11 @@ export class CustomStatsPicker extends Component {
     this.statPickers = this.stats.map(stat => new NumberPicker(this.rootElem, sim, {
       label: StatNames[stat],
       changedEvent: (sim: Sim) => sim.customStatsChangeEmitter,
-      getValue: (sim: Sim) => sim.customStats[stat],
+      getValue: (sim: Sim) => sim.getCustomStats()[stat],
       setValue: (sim: Sim, newValue: number) => {
-        const customStats = sim.customStats;
+        const customStats = sim.getCustomStats();
         customStats[stat] = newValue;
-        sim.customStats = customStats;
+        sim.setCustomStats(customStats);
       },
     }));
   }
