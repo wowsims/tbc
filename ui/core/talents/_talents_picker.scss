@@ -66,7 +66,7 @@ $talent-full-color: #ffd100;
   color: $talent-partial-color;
   background-color: black;
 }
-.talent-picker-root[data-points="0"] .talent-picker-points {
+.talent-picker-root[data-points="0"]:not(.talent-picker-can-add) .talent-picker-points {
   filter: grayscale(100%);
 }
 .talent-picker-root.talent-full .talent-picker-points {
