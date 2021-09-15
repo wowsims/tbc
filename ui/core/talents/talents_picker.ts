@@ -14,6 +14,7 @@ export class TalentsPicker extends Component {
   constructor(parent: HTMLElement, sim: Sim, treeConfigs: Array<TalentTreeConfig>) {
     super(parent, 'talents-picker-root');
     this.trees = treeConfigs.map(treeConfig => new TalentTreePicker(this.rootElem, sim, treeConfig, this));
+    this.update();
   }
 
   get numPoints() {
@@ -30,6 +31,16 @@ export class TalentsPicker extends Component {
     } else {
       this.rootElem.classList.remove('talents-full');
     }
+
+    this.trees?.forEach(tree => {
+      tree.talents.forEach(talent => {
+        if (talent.canSetPoints(talent.getPoints() + 1)) {
+          talent.rootElem.classList.add('talent-picker-can-add');
+        } else {
+          talent.rootElem.classList.remove('talent-picker-can-add');
+        }
+      });
+    });
   }
 }
 

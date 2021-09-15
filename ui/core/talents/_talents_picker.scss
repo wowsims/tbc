@@ -52,7 +52,7 @@ $talent-full-color: #ffd100;
   border-radius: 4px;
   margin: 10px;
 }
-.talent-picker-root[data-points="0"] {
+.talent-picker-root[data-points="0"]:not(.talent-picker-can-add) {
   filter: grayscale(100%);
 }
 .talent-picker-root.talent-full {
