@@ -2,6 +2,7 @@ import { Enchant } from './api/newapi';
 import { Gem } from './api/newapi';
 import { Item } from './api/newapi';
 import { ItemSlot } from './api/newapi';
+import { ItemSpec } from './api/newapi';
 import { EnchantAppliesToItem } from './api/utils';
 import { GemEligibleForSocket } from './api/utils';
 import { GemMatchesSocket } from './api/utils';
@@ -12,39 +13,54 @@ import { GemMatchesSocket } from './api/utils';
  * This is an immutable type.
  */
 export class EquippedItem {
-  readonly item: Item;
-  readonly enchant: Enchant | null;
-  readonly gems: Array<Gem | null>;
+  readonly _item: Item;
+  readonly _enchant: Enchant | null;
+  readonly _gems: Array<Gem | null>;
 
   constructor(item: Item, enchant?: Enchant | null, gems?: Array<Gem | null>) {
-    this.item = item;
-    this.enchant = enchant || null;
-    this.gems = gems || [];
+    this._item = item;
+    this._enchant = enchant || null;
+    this._gems = gems || [];
 
     // Fill gems with null so we always have the same number of gems as gem slots.
-    if (this.gems.length < item.gemSockets.length) {
-      this.gems = this.gems.concat(new Array(item.gemSockets.length - this.gems.length).fill(null));
+    if (this._gems.length < item.gemSockets.length) {
+      this._gems = this._gems.concat(new Array(item.gemSockets.length - this._gems.length).fill(null));
     }
   }
 
+  get item(): Item {
+    // Make a defensive copy
+    return Item.clone(this._item);
+  }
+
+  get enchant(): Enchant | null {
+    // Make a defensive copy
+    return this._enchant ? Enchant.clone(this._enchant) : null;
+  }
+
+  get gems(): Array<Gem | null> {
+    // Make a defensive copy
+    return this._gems.map(gem => gem == null ? null : Gem.clone(gem));
+  }
+
   equals(other: EquippedItem) {
-    if (Item.equals(this.item, other.item))
+    if (!Item.equals(this._item, other.item))
       return false;
 
-    if ((this.enchant == null) != (other.enchant == null))
+    if ((this._enchant == null) != (other.enchant == null))
       return false;
 
-    if (this.enchant && other.enchant && !Enchant.equals(this.enchant, other.enchant))
+    if (this._enchant && other.enchant && !Enchant.equals(this._enchant, other.enchant))
       return false;
 
-    if (this.gems.length != other.gems.length)
+    if (this._gems.length != other.gems.length)
       return false;
 
-    for (let i = 0; i < this.gems.length; i++) {
-      if ((this.gems[i] == null) != (other.gems[i] == null))
+    for (let i = 0; i < this._gems.length; i++) {
+      if ((this._gems[i] == null) != (other.gems[i] == null))
         return false;
 
-      if (this.gems[i] && other.gems[i] && !Gem.equals(this.gems[i]!, other.gems[i]!))
+      if (this._gems[i] && other.gems[i] && !Gem.equals(this._gems[i]!, other.gems[i]!))
         return false;
     }
 
@@ -56,12 +72,12 @@ export class EquippedItem {
    */
   withItem(item: Item): EquippedItem {
     let newEnchant = null;
-    if (this.enchant && EnchantAppliesToItem(this.enchant, item))
-      newEnchant = this.enchant;
+    if (this._enchant && EnchantAppliesToItem(this._enchant, item))
+      newEnchant = this._enchant;
     
     // Reorganize gems to match as many colors in the new item as possible.
     const newGems = new Array(item.gemSockets.length).fill(null);
-    this.gems.filter(gem => gem != null).forEach(gem => {
+    this._gems.filter(gem => gem != null).forEach(gem => {
       const firstMatchingIndex = item.gemSockets.findIndex((socketColor, socketIdx) => !newGems[socketIdx] && GemMatchesSocket(gem!, socketColor));
       const firstEligibleIndex = item.gemSockets.findIndex((socketColor, socketIdx) => !newGems[socketIdx] && GemEligibleForSocket(gem!, socketColor));
       if (firstMatchingIndex != -1) {
@@ -78,20 +94,28 @@ export class EquippedItem {
    * Returns a new EquippedItem with the given enchant applied.
    */
   withEnchant(enchant: Enchant | null): EquippedItem {
-    return new EquippedItem(this.item, enchant, this.gems);
+    return new EquippedItem(this._item, enchant, this._gems);
   }
 
   /**
    * Returns a new EquippedItem with the given gem socketed.
    */
   withGem(gem: Gem | null, socketIdx: number): EquippedItem {
-    if (this.gems.length <= socketIdx) {
+    if (this._gems.length <= socketIdx) {
       throw new Error('No gem socket with index ' + socketIdx);
     }
 
-    const newGems = this.gems.slice();
+    const newGems = this._gems.slice();
     newGems[socketIdx] = gem;
 
-    return new EquippedItem(this.item, this.enchant, newGems);
+    return new EquippedItem(this._item, this._enchant, newGems);
+  }
+
+  asSpec(): ItemSpec {
+    return ItemSpec.create({
+      id: this._item.id,
+      enchant: this._enchant?.id,
+      gems: this._gems.map(gem => gem?.id || 0),
+    });
   }
 };

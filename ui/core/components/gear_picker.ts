@@ -109,8 +109,8 @@ class ItemPicker extends Component {
         selectorModal.setData(this.slot, this._equippedItem, this._items, this._enchants);
       });
     });
-    sim.gearChangeEmitter.on(newGear => {
-      this.item = newGear[this.slot];
+    sim.gearChangeEmitter.on(() => {
+      this.item = sim.getEquippedItem(slot);
     });
   }
 
@@ -379,8 +379,8 @@ class SelectorModal extends Component {
       onRemove();
     });
 
-    this.sim.gearChangeEmitter.on(newGear => {
-      const newEquippedItem = newGear[slot];
+    this.sim.gearChangeEmitter.on(() => {
+      const newEquippedItem = this.sim.getEquippedItem(slot);
       listItemElems.forEach(elem => {
         elem.classList.remove('active');
         if (parseInt(elem.dataset.id!) == equippedToIdFn(newEquippedItem)) {

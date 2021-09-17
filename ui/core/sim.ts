@@ -2,17 +2,20 @@ import { Buffs } from './api/newapi';
 import { Consumes } from './api/newapi';
 import { Enchant } from './api/newapi';
 import { Encounter } from './api/newapi';
+import { EquipmentSpec } from './api/newapi';
 import { Gem } from './api/newapi';
 import { GemColor } from './api/newapi';
 import { ItemQuality } from './api/newapi';
 import { ItemSlot } from './api/newapi';
+import { ItemSpec } from './api/newapi';
 import { ItemType } from './api/newapi';
 import { Item } from './api/newapi';
 import { Player } from './api/newapi';
 import { Race } from './api/newapi';
 import { Spec } from './api/newapi';
-import { SpecToEligibleRaces } from './api/utils';
 import { Stat } from './api/newapi';
+import { SpecToEligibleRaces } from './api/utils';
+import { GetEligibleItemSlots } from './api/utils';
 
 import { ComputeStatsRequest, ComputeStatsResult } from './api/newapi';
 import { GearListRequest, GearListResult } from './api/newapi';
@@ -20,14 +23,18 @@ import { IndividualSimRequest, IndividualSimResult } from './api/newapi';
 import { StatWeightsRequest, StatWeightsResult } from './api/newapi';
 
 import { EquippedItem } from './equipped_item';
+import { Gear } from './gear';
 import { Listener } from './typed_event';
 import { TypedEvent } from './typed_event';
-import { equalsOrBothNull } from './utils';
 import { wait } from './utils';
+
+// These imports are not used, but they are needed to make sure these files
+// are included in the compiled js.
+import * as Enchants from './enchants';
+import * as Gems from './gems';
 
 const STATS_LEN = Object.keys(Stat).length;
 
-export type Gear = Array<EquippedItem | null>;
 export type CustomStats = Array<number>;
 
 export interface SimConfig {
@@ -44,12 +51,12 @@ export interface SimConfig {
 export class Sim {
   readonly spec: Spec;
   readonly gearListEmitter = new TypedEvent<GearListResult>();
-  readonly raceChangeEmitter = new TypedEvent<Race>();
-  readonly gearChangeEmitter = new TypedEvent<Gear>();
-  readonly buffsChangeEmitter = new TypedEvent<Buffs>();
-  readonly consumesChangeEmitter = new TypedEvent<Consumes>();
-  readonly encounterChangeEmitter = new TypedEvent<Encounter>();
-  readonly customStatsChangeEmitter = new TypedEvent<CustomStats>();
+  readonly raceChangeEmitter = new TypedEvent<void>();
+  readonly gearChangeEmitter = new TypedEvent<void>();
+  readonly buffsChangeEmitter = new TypedEvent<void>();
+  readonly consumesChangeEmitter = new TypedEvent<void>();
+  readonly encounterChangeEmitter = new TypedEvent<void>();
+  readonly customStatsChangeEmitter = new TypedEvent<void>();
 
   // Database
   private _items: Record<number, Item> = {};
@@ -58,7 +65,7 @@ export class Sim {
 
   // Current values
   private _race: Race;
-  private _gear: Gear = [];
+  private _gear: Gear;
   private _buffs: Buffs;
   private _consumes: Consumes;
   private _encounter: Encounter;
@@ -70,6 +77,7 @@ export class Sim {
     this.spec = config.spec;
     this._race = SpecToEligibleRaces[this.spec][0];
 
+    this._gear = new Gear({});
     this._encounter = config.defaults.encounter;
     this._buffs = config.defaults.buffs;
     this._consumes = config.defaults.consumes;
@@ -102,7 +110,7 @@ export class Sim {
   setRace(newRace: Race) {
     if (newRace != this._race) {
       this._race = newRace;
-      this.raceChangeEmitter.emit(newRace);
+      this.raceChangeEmitter.emit();
     }
   }
 
@@ -117,7 +125,7 @@ export class Sim {
 
     // Make a defensive copy
     this._buffs = Buffs.clone(newBuffs);
-    this.buffsChangeEmitter.emit(this._buffs);
+    this.buffsChangeEmitter.emit();
   }
 
   getConsumes(): Consumes {
@@ -131,7 +139,7 @@ export class Sim {
 
     // Make a defensive copy
     this._consumes = Consumes.clone(newConsumes);
-    this.consumesChangeEmitter.emit(this._consumes);
+    this.consumesChangeEmitter.emit();
   }
 
   getEncounter(): Encounter {
@@ -145,19 +153,32 @@ export class Sim {
 
     // Make a defensive copy
     this._encounter = Encounter.clone(newEncounter);
-    this.encounterChangeEmitter.emit(this._encounter);
+    this.encounterChangeEmitter.emit();
   }
 
   equipItem(slot: ItemSlot, newItem: EquippedItem | null) {
-    if (equalsOrBothNull(this._gear[slot], newItem, (a, b) => a.equals(b)))
+    const newGear = this._gear.withEquippedItem(slot, newItem);
+    if (newGear.equals(this._gear))
       return;
 
-    this._gear[slot] = newItem;
-    this.gearChangeEmitter.emit(this._gear);
+    this._gear = newGear;
+    this.gearChangeEmitter.emit();
   }
 
   getEquippedItem(slot: ItemSlot): EquippedItem | null {
-    return this._gear[slot];
+    return this._gear.getEquippedItem(slot);
+  }
+
+  getGear(): Gear {
+    return this._gear;
+  }
+
+  setGear(newGear: Gear) {
+    if (newGear.equals(this._gear))
+      return;
+
+    this._gear = newGear;
+    this.gearChangeEmitter.emit();
   }
 
   getCustomStats(): CustomStats {
@@ -175,7 +196,40 @@ export class Sim {
 
     // Make a defensive copy
     this._customStats = newCustomStats.slice();
-    this.customStatsChangeEmitter.emit(this._customStats);
+    this.customStatsChangeEmitter.emit();
+  }
+
+  lookupItemSpec(itemSpec: ItemSpec): EquippedItem | null {
+    const item = this._items[itemSpec.id];
+    if (!item)
+      return null;
+
+    const enchant = this._enchants[itemSpec.enchant] || null;
+    const gems = itemSpec.gems.map(gemId => this._gems[gemId] || null);
+
+    return new EquippedItem(item, enchant, gems);
+  }
+
+  lookupEquipmentSpec(equipSpec: EquipmentSpec): Gear {
+    // EquipmentSpec is supposed to be indexed by slot, but here we assume
+    // it isn't just in case.
+    const gearMap: Partial<Record<ItemSlot, EquippedItem | null>> = {};
+
+    equipSpec.items.forEach(itemSpec => {
+      const item = this.lookupItemSpec(itemSpec);
+      if (!item)
+        return;
+
+      const itemSlots = GetEligibleItemSlots(item.item);
+
+      const assignedSlot = itemSlots.find(slot => !gearMap[slot]);
+      if (assignedSlot == null)
+        throw new Error('No slots left to equip ' + Item.toJsonString(item.item));
+
+      gearMap[assignedSlot] = item;
+    });
+
+    return new Gear(gearMap);
   }
 
   createSimRequest(): IndividualSimRequest {
@@ -305,7 +359,7 @@ export class Sim {
     if (equippedItem.enchant != null) {
       parts.push('ench=' + equippedItem.enchant.effectId);
     }
-    parts.push('pcs=' + this._gear.filter(ei => ei != null).map(ei => ei!.item.id).join(':'));
+    parts.push('pcs=' + this._gear.asArray().filter(ei => ei != null).map(ei => ei!.item.id).join(':'));
 
     elem.setAttribute('data-wowhead', parts.join('&'));
   }

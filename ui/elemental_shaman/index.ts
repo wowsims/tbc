@@ -1,10 +1,15 @@
 import { Buffs } from '../core/api/newapi';
-import { TristateEffect } from '../core/api/newapi'
 import { Consumes } from '../core/api/newapi';
 import { Encounter } from '../core/api/newapi';
+import { EquipmentSpec } from '../core/api/newapi';
+import { ItemSlot } from '../core/api/newapi';
+import { ItemSpec } from '../core/api/newapi';
 import { Spec } from '../core/api/newapi';
 import { Stat } from '../core/api/newapi';
+import { TristateEffect } from '../core/api/newapi'
 import { DefaultTheme } from '../core/themes/default';
+import * as Enchants from '../core/enchants';
+import * as Gems from '../core/gems';
 import * as IconInputs from '../core/components/icon_inputs';
 
 const theme = new DefaultTheme(document.body, {
@@ -85,6 +90,22 @@ const theme = new DefaultTheme(document.body, {
       drumsOfBattle: true,
       superManaPotion: true,
     }),
+  },
+  presets: {
+    gear: {
+      'P1 BIS': EquipmentSpec.create({
+        items: [
+          ItemSpec.create({
+            id: 29035, // Cyclone Faceguard
+            enchant: Enchants.GLYPH_OF_POWER,
+            gems: [
+              Gems.CHAOTIC_SKYFIRE_DIAMOND,
+              Gems.POTENT_NOBLE_TOPAZ,
+            ],
+          }),
+        ],
+      }),
+    },
   },
 });
 theme.init();

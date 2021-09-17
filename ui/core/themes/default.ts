@@ -1,7 +1,9 @@
+import { Gear } from '../gear';
 import { Sim } from '../sim';
+import { EquipmentSpec } from '../api/newapi';
 import { Spec } from '../api/newapi';
 import { Stat } from '../api/newapi';
-import { Actions } from '../components/actions.js';
+import { Actions } from '../components/actions';
 import { CharacterStats } from '../components/character_stats';
 import { CustomStatsPicker } from '../components/custom_stats_picker';
 import { GearPicker } from '../components/gear_picker';
@@ -10,21 +12,27 @@ import { IconPicker } from '../components/icon_picker';
 import { NumberPicker } from '../components/number_picker';
 import { RacePicker } from '../components/race_picker';
 import { Results } from '../components/results';
+import { SavedDataManager } from '../components/saved_data_manager';
 import { newTalentsPicker } from '../talents/factory';
 
-import { Theme, ThemeConfig } from './theme.js';
+import { Theme, ThemeConfig } from './theme';
 
 export interface DefaultThemeConfig extends ThemeConfig {
   displayStats: Array<Stat>;
   iconSections: Record<string, Array<IconInput>>;
-  showTargetArmor: boolean,
-  showNumTargets: boolean,
+  showTargetArmor: boolean;
+  showNumTargets: boolean;
+  presets: {
+    gear: Record<string, EquipmentSpec>;
+  },
 }
 
 export class DefaultTheme extends Theme {
+  private readonly _config: DefaultThemeConfig;
+
   constructor(parentElem: HTMLElement, config: DefaultThemeConfig) {
     super(parentElem, config)
-
+    this._config = config;
     this.parentElem.innerHTML = layoutHTML;
 
     const results = new Results(this.parentElem.getElementsByClassName('default-results')[0] as HTMLElement);
@@ -34,6 +42,7 @@ export class DefaultTheme extends Theme {
 
     const gearPicker = new GearPicker(this.parentElem.getElementsByClassName('gear-picker')[0] as HTMLElement, this.sim);
     const customStatsPicker = new CustomStatsPicker(this.parentElem.getElementsByClassName('custom-stats-picker')[0] as HTMLElement, this.sim, config.epStats);
+
     const racePicker = new RacePicker(this.parentElem.getElementsByClassName('race-picker')[0] as HTMLElement, this.sim);
     const talentsPicker = newTalentsPicker(config.spec, this.parentElem.getElementsByClassName('talents-picker')[0] as HTMLElement, this.sim);
 
@@ -93,6 +102,24 @@ export class DefaultTheme extends Theme {
       });
     }
   }
+
+  async init(): Promise<void> {
+    const savedGearManager = new SavedDataManager<Gear>(this.parentElem.getElementsByClassName('saved-gear-manager')[0] as HTMLElement, this.sim, {
+      label: 'Gear',
+      presets: {},
+      getData: (sim: Sim) => sim.getGear(),
+      setData: (sim: Sim, newGear: Gear) => sim.setGear(newGear),
+      changeEmitter: this.sim.gearChangeEmitter,
+      equals: (a: Gear, b: Gear) => a.equals(b),
+    });
+
+    await super.init();
+
+    Object.keys(this._config.presets.gear).forEach(setName => {
+      const gear = this.sim.lookupEquipmentSpec(this._config.presets.gear[setName]);
+      savedGearManager.addSavedData(setName, gear, true);
+    });
+  }
 }
 
 const layoutHTML = `
@@ -119,6 +146,8 @@ const layoutHTML = `
         <div class="gear-tab">
           <div class="left-gear-panel">
             <div class="gear-picker">
+            </div>
+            <div class="saved-gear-manager">
             </div>
           </div>
           <div class="right-gear-panel">
