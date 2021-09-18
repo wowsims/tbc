@@ -1,5 +1,7 @@
-import { GetIconUrl } from '../resources';
-import { SetWowheadHref } from '../resources';
+import { Class } from '../api/newapi';
+import { ClassTalents } from '../api/utils';
+import { getIconUrl } from '../resources';
+import { setWowheadHref } from '../resources';
 import { Sim } from '../sim';
 import { isRightClick } from '../utils';
 import { sum } from '../utils';
@@ -8,14 +10,22 @@ import { Component } from '../components/component';
 
 const MAX_TALENT_POINTS = 61;
 const NUM_ROWS = 9;
+const TALENTS_STORAGE_KEY = 'Talents';
 
-export class TalentsPicker extends Component {
-  private readonly trees: Array<TalentTreePicker>;
+export abstract class TalentsPicker<ClassType extends Class> extends Component {
+  readonly trees: Array<TalentTreePicker<ClassType>>;
+  private readonly sim: Sim<ClassType>;
 
-  constructor(parent: HTMLElement, sim: Sim, treeConfigs: Array<TalentTreeConfig>) {
+  constructor(parent: HTMLElement, sim: Sim<ClassType>, treeConfigs: Array<TalentTreeConfig<ClassType>>) {
     super(parent, 'talents-picker-root');
+    this.sim = sim;
     this.trees = treeConfigs.map(treeConfig => new TalentTreePicker(this.rootElem, sim, treeConfig, this));
     this.trees.forEach(tree => tree.talents.forEach(talent => talent.setPoints(0, false)));
+
+    this.sim.talentsStringChangeEmitter.on(() => {
+      this.setTalentsString(this.sim.getTalentsString());
+    });
+
     this.update();
   }
 
@@ -35,20 +45,43 @@ export class TalentsPicker extends Component {
     }
 
     this.trees.forEach(tree => tree.update());
+
+    this.sim.setTalentsString(this.getTalentsString());
+    this.sim.setTalents(this.getTalents());
   }
+
+  abstract getTalents(): ClassTalents<ClassType>;
+
+  getTalentsString(): string {
+    return this.trees.map(tree => tree.getTalentsString()).join('-').replace(/-+$/g, '');
+  }
+
+  setTalentsString(str: string) {
+    const parts = str.split('-');
+    this.trees.forEach((tree, idx) => tree.setTalentsString(parts[idx] || ''));
+    this.update();
+  }
+
+  //saveUserData() {
+  //  window.localStorage.setItem(TALENTS_STORAGE_KEY, this.getTalentsString());
+  //}
+
+  //loadUserData() {
+  //  this.setTalentsString(window.localStorage.getItem(TALENTS_STORAGE_KEY));
+  //}
 }
 
-class TalentTreePicker extends Component {
-  private readonly config: TalentTreeConfig;
-  private readonly _title: HTMLElement;
+class TalentTreePicker<ClassType extends Class> extends Component {
+  private readonly config: TalentTreeConfig<ClassType>;
+  private readonly title: HTMLElement;
 
-  readonly talents: Array<TalentPicker>;
-  readonly picker: TalentsPicker;
+  readonly talents: Array<TalentPicker<ClassType>>;
+  readonly picker: TalentsPicker<ClassType>;
 
   // The current number of points in this tree
   numPoints: number;
 
-  constructor(parent: HTMLElement, sim: Sim, config: TalentTreeConfig, picker: TalentsPicker) {
+  constructor(parent: HTMLElement, sim: Sim<ClassType>, config: TalentTreeConfig<ClassType>, picker: TalentsPicker<ClassType>) {
     super(parent, 'talent-tree-picker-root');
     this.config = config;
     this.numPoints = 0;
@@ -63,7 +96,7 @@ class TalentTreePicker extends Component {
     </div>
     `;
 
-    this._title = this.rootElem.getElementsByClassName('talent-tree-title')[0] as HTMLElement;
+    this.title = this.rootElem.getElementsByClassName('talent-tree-title')[0] as HTMLElement;
 
     const main = this.rootElem.getElementsByClassName('talent-tree-main')[0] as HTMLElement;
     main.style.backgroundImage = `url('${config.backgroundUrl}')`;
@@ -83,27 +116,35 @@ class TalentTreePicker extends Component {
   }
 
   update() {
-    this._title.textContent = this.config.name + ' (' + this.numPoints + ')';
+    this.title.textContent = this.config.name + ' (' + this.numPoints + ')';
     this.talents.forEach(talent => talent.update());
   }
 
-  getTalent(location: TalentLocation): TalentPicker {
+  getTalent(location: TalentLocation): TalentPicker<ClassType> {
     const talent = this.talents.find(talent => talent.getRow() == location.rowIdx && talent.getCol() == location.colIdx);
     if (!talent)
       throw new Error('No talent found with location: ' + location);
     return talent;
   }
+
+  getTalentsString(): string {
+    return this.talents.map(talent => String(talent.getPoints())).join('').replace(/0+$/g, '');
+  }
+
+  setTalentsString(str: string) {
+    this.talents.forEach((talent, idx) => talent.setPoints(Number(str.charAt(idx)), false));
+  }
 }
 
-class TalentPicker extends Component {
-  readonly config: TalentConfig;
-  private readonly _tree: TalentTreePicker;
-  private readonly _pointsDisplay: HTMLElement;
+class TalentPicker<ClassType extends Class> extends Component {
+  readonly config: TalentConfig<ClassType>;
+  private readonly tree: TalentTreePicker<ClassType>;
+  private readonly pointsDisplay: HTMLElement;
 
-  constructor(parent: HTMLElement, sim: Sim, config: TalentConfig, tree: TalentTreePicker) {
+  constructor(parent: HTMLElement, sim: Sim<ClassType>, config: TalentConfig<ClassType>, tree: TalentTreePicker<ClassType>) {
     super(parent, 'talent-picker-root', document.createElement('a'));
     this.config = config;
-    this._tree = tree;
+    this.tree = tree;
 
     this.rootElem.style.gridRow = String(this.config.location.rowIdx + 1);
     this.rootElem.style.gridColumn = String(this.config.location.colIdx + 1);
@@ -111,9 +152,9 @@ class TalentPicker extends Component {
     this.rootElem.dataset.maxPoints = String(this.config.maxPoints);
     this.rootElem.dataset.wowhead = 'noimage';
 
-    this._pointsDisplay = document.createElement('span');
-    this._pointsDisplay.classList.add('talent-picker-points');
-    this.rootElem.appendChild(this._pointsDisplay);
+    this.pointsDisplay = document.createElement('span');
+    this.pointsDisplay.classList.add('talent-picker-points');
+    this.rootElem.appendChild(this.pointsDisplay);
 
     this.rootElem.addEventListener('click', event => {
       event.preventDefault();
@@ -128,7 +169,7 @@ class TalentPicker extends Component {
       } else {
         this.setPoints(this.getPoints() + 1, true);
       }
-      this._tree.picker.update();
+      this.tree.picker.update();
     });
   }
 
@@ -156,16 +197,16 @@ class TalentPicker extends Component {
     if (newPoints > oldPoints) {
       const additionalPoints = newPoints - oldPoints;
 
-      if (this._tree.picker.numPoints + additionalPoints > MAX_TALENT_POINTS) {
+      if (this.tree.picker.numPoints + additionalPoints > MAX_TALENT_POINTS) {
         return false;
       }
 
-      if (this._tree.numPoints < this.getRow() * 5) {
+      if (this.tree.numPoints < this.getRow() * 5) {
         return false;
       }
 
       if (this.config.prereqLocation) {
-        if (!this._tree.getTalent(this.config.prereqLocation).isFull())
+        if (!this.tree.getTalent(this.config.prereqLocation).isFull())
           return false;
       }
     } else {
@@ -174,13 +215,13 @@ class TalentPicker extends Component {
       // Figure out whether any lower talents would have the row requirement
       // broken by subtracting points.
       const pointTotalsByRow = [...Array(NUM_ROWS).keys()]
-          .map(rowIdx => this._tree.talents.filter(talent => talent.getRow() == rowIdx))
+          .map(rowIdx => this.tree.talents.filter(talent => talent.getRow() == rowIdx))
           .map(talentsInRow => sum(talentsInRow.map(talent => talent.getPoints())));
       pointTotalsByRow[this.getRow()] -= removedPoints;
 
       const cumulativeTotalsByRow = pointTotalsByRow.map((_, rowIdx) => sum(pointTotalsByRow.slice(0, rowIdx+1)));
 
-      if (!this._tree.talents.every(talent => 
+      if (!this.tree.talents.every(talent => 
             talent.getPoints() == 0 
             || talent.getRow() == 0
             || cumulativeTotalsByRow[talent.getRow() - 1] >= talent.getRow() * 5)) {
@@ -188,7 +229,7 @@ class TalentPicker extends Component {
       }
 
       if (this.config.prereqOfLocation) {
-        if (this._tree.getTalent(this.config.prereqOfLocation).getPoints() > 0)
+        if (this.tree.getTalent(this.config.prereqOfLocation).getPoints() > 0)
           return false;
       }
     }
@@ -203,10 +244,10 @@ class TalentPicker extends Component {
     if (checkValidity && !this.canSetPoints(newPoints))
       return;
 
-    this._tree.numPoints += newPoints - oldPoints;
+    this.tree.numPoints += newPoints - oldPoints;
     this.rootElem.dataset.points = String(newPoints);
 
-    this._pointsDisplay.textContent = newPoints + '/' + this.config.maxPoints;
+    this.pointsDisplay.textContent = newPoints + '/' + this.config.maxPoints;
 
     if (this.isFull()) {
       this.rootElem.classList.add('talent-full');
@@ -215,8 +256,8 @@ class TalentPicker extends Component {
     }
 
     const spellId = this.getSpellIdForPoints(newPoints);
-    SetWowheadHref(this.rootElem as HTMLAnchorElement, {spellId: spellId});
-    GetIconUrl({spellId: spellId}).then(url => {
+    setWowheadHref(this.rootElem as HTMLAnchorElement, {spellId: spellId});
+    getIconUrl({spellId: spellId}).then(url => {
       this.rootElem.style.backgroundImage = `url('${url}')`;
     });
   }
@@ -243,10 +284,10 @@ class TalentPicker extends Component {
   }
 }
 
-export type TalentTreeConfig = {
+export type TalentTreeConfig<ClassType extends Class> = {
   name: string;
   backgroundUrl: string;
-  talents: Array<TalentConfig>;
+  talents: Array<TalentConfig<ClassType>>;
 };
 
 export type TalentLocation = {
@@ -256,7 +297,9 @@ export type TalentLocation = {
   colIdx: number;
 };
 
-export type TalentConfig = {
+export type TalentConfig<ClassType extends Class> = {
+  fieldName?: keyof ClassTalents<ClassType>
+
   location: TalentLocation;
 
   // Location of a prerequisite talent, if any

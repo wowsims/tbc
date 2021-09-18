@@ -1,19 +1,19 @@
+import { EquippedItem } from '../api/equipped_item';
 import { Enchant } from '../api/newapi';
 import { Item } from '../api/newapi';
 import { ItemQuality } from '../api/newapi';
 import { ItemSlot } from '../api/newapi';
-import { EnchantDescriptions } from '../api/names';
-import { SlotNames } from '../api/names';
-import { GemEligibleForSocket } from '../api/utils';
-import { GetEligibleEnchantSlots } from '../api/utils';
-import { GetEligibleItemSlots } from '../api/utils';
-import { EquippedItem } from '../equipped_item';
-import { GetEmptyGemSocketIconUrl } from '../resources';
-import { GetEmptySlotIconUrl } from '../resources';
-import { GetIconUrl } from '../resources';
-import { SetWowheadHref } from '../resources';
-import { SetGemSocketCssClass } from '../css_utils';
-import { SetItemQualityCssClass } from '../css_utils';
+import { enchantDescriptions } from '../api/names';
+import { slotNames } from '../api/names';
+import { gemEligibleForSocket } from '../api/utils';
+import { getEligibleEnchantSlots } from '../api/utils';
+import { getEligibleItemSlots } from '../api/utils';
+import { getEmptyGemSocketIconUrl } from '../resources';
+import { getEmptySlotIconUrl } from '../resources';
+import { getIconUrl } from '../resources';
+import { setWowheadHref } from '../resources';
+import { setGemSocketCssClass } from '../css_utils';
+import { setItemQualityCssClass } from '../css_utils';
 import { Sim } from '../sim';
 import { getEnumValues } from '../utils';
 
@@ -23,7 +23,7 @@ export class GearPicker extends Component {
   // ItemSlot is used as the index
   readonly itemPickers: Array<ItemPicker>;
 
-  constructor(parent: HTMLElement, sim: Sim) {
+  constructor(parent: HTMLElement, sim: Sim<any>) {
     super(parent, 'gear-picker-root');
 
     const leftSide = document.createElement('div');
@@ -66,7 +66,7 @@ export class GearPicker extends Component {
 class ItemPicker extends Component {
   readonly slot: ItemSlot;
 
-  private readonly sim: Sim;
+  private readonly sim: Sim<any>;
   private readonly iconElem: HTMLAnchorElement;
   private readonly nameElem: HTMLElement;
   private readonly enchantElem: HTMLElement;
@@ -79,7 +79,7 @@ class ItemPicker extends Component {
   private _equippedItem: EquippedItem | null = null;
   
 
-  constructor(parent: HTMLElement, sim: Sim, slot: ItemSlot, selectorModal: SelectorModal) {
+  constructor(parent: HTMLElement, sim: Sim<any>, slot: ItemSlot, selectorModal: SelectorModal) {
     super(parent, 'item-picker-root');
     this.slot = slot;
     this.sim = sim;
@@ -102,8 +102,8 @@ class ItemPicker extends Component {
 
     this.item = null;
     sim.gearListEmitter.on(gearListResult => {
-      this._items = gearListResult.items.filter(item => GetEligibleItemSlots(item).includes(this.slot));
-      this._enchants = gearListResult.enchants.filter(enchant => GetEligibleEnchantSlots(enchant).includes(this.slot));
+      this._items = gearListResult.items.filter(item => getEligibleItemSlots(item).includes(this.slot));
+      this._enchants = gearListResult.enchants.filter(enchant => getEligibleEnchantSlots(enchant).includes(this.slot));
 
       this.iconElem.addEventListener('click', event => {
         selectorModal.setData(this.slot, this._equippedItem, this._items, this._enchants);
@@ -116,12 +116,12 @@ class ItemPicker extends Component {
 
   set item(newItem: EquippedItem | null) {
     // Clear everything first
-    this.iconElem.style.backgroundImage = `url('${GetEmptySlotIconUrl(this.slot)}')`;
+    this.iconElem.style.backgroundImage = `url('${getEmptySlotIconUrl(this.slot)}')`;
     this.iconElem.removeAttribute('data-wowhead');
     this.iconElem.removeAttribute('href');
 
-    this.nameElem.textContent = SlotNames[this.slot];
-    SetItemQualityCssClass(this.nameElem, null);
+    this.nameElem.textContent = slotNames[this.slot];
+    setItemQualityCssClass(this.nameElem, null);
 
     this.enchantElem.textContent = '';
     //this.enchantElem.removeAttribute('data-wowhead');
@@ -130,27 +130,27 @@ class ItemPicker extends Component {
 
     if (newItem != null) {
       this.nameElem.textContent = newItem.item.name;
-      SetItemQualityCssClass(this.nameElem, newItem.item.quality);
+      setItemQualityCssClass(this.nameElem, newItem.item.quality);
 
       this.sim.setWowheadData(newItem, this.iconElem);
-      SetWowheadHref(this.iconElem, {itemId: newItem.item.id});
-      GetIconUrl({itemId: newItem.item.id}).then(url => {
+      setWowheadHref(this.iconElem, {itemId: newItem.item.id});
+      getIconUrl({itemId: newItem.item.id}).then(url => {
         this.iconElem.style.backgroundImage = `url('${url}')`;
       });
 
       if (newItem.enchant) {
-        this.enchantElem.textContent = EnchantDescriptions.get(newItem.enchant.id) || newItem.enchant.name;
+        this.enchantElem.textContent = enchantDescriptions.get(newItem.enchant.id) || newItem.enchant.name;
         //this.enchantElem.setAttribute('href', 'https://tbc.wowhead.com/item=' + newItem.enchant.id);
       }
 
       newItem.item.gemSockets.forEach((socketColor, gemIdx) => {
         const gemIconElem = document.createElement('div');
         gemIconElem.classList.add('item-picker-gem-icon');
-        SetGemSocketCssClass(gemIconElem, socketColor);
+        setGemSocketCssClass(gemIconElem, socketColor);
         if (newItem.gems[gemIdx] == null) {
-          gemIconElem.style.backgroundImage = `url('${GetEmptyGemSocketIconUrl(socketColor)}')`;
+          gemIconElem.style.backgroundImage = `url('${getEmptyGemSocketIconUrl(socketColor)}')`;
         } else {
-          GetIconUrl({itemId: newItem.gems[gemIdx]!.id}).then(url => {
+          getIconUrl({itemId: newItem.gems[gemIdx]!.id}).then(url => {
             gemIconElem.style.backgroundImage = `url('${url}')`;
           });
         }
@@ -162,12 +162,12 @@ class ItemPicker extends Component {
 }
 
 class SelectorModal extends Component {
-  private readonly sim: Sim;
+  private readonly sim: Sim<any>;
   private readonly tabsElem: HTMLElement;
   private readonly contentElem: HTMLElement;
   private readonly closeButton: HTMLButtonElement;
 
-  constructor(parent: HTMLElement, sim: Sim) {
+  constructor(parent: HTMLElement, sim: Sim<any>) {
     super(parent, 'selector-model-root');
     this.sim = sim;
 
@@ -260,7 +260,7 @@ class SelectorModal extends Component {
           'Gem ' + (socketIdx + 1),
           slot,
           equippedItem,
-          this.sim.getGems().filter(gem => GemEligibleForSocket(gem, socketColor)),
+          this.sim.getGems().filter(gem => gemEligibleForSocket(gem, socketColor)),
           equippedItem => equippedItem?.gems[socketIdx]?.id || 0,
           gem => {
             return {
@@ -346,16 +346,16 @@ class SelectorModal extends Component {
         <a class="selector-modal-list-item-icon"></a>
         <a class="selector-modal-list-item-name">${itemData.name}</a>
       `;
-      SetWowheadHref(listItemElem.children[0] as HTMLAnchorElement, {itemId: itemData.id});
-      SetWowheadHref(listItemElem.children[1] as HTMLAnchorElement, {itemId: itemData.id});
+      setWowheadHref(listItemElem.children[0] as HTMLAnchorElement, {itemId: itemData.id});
+      setWowheadHref(listItemElem.children[1] as HTMLAnchorElement, {itemId: itemData.id});
 
       const iconElem = listItemElem.getElementsByClassName('selector-modal-list-item-icon')[0] as HTMLImageElement;
-      GetIconUrl({itemId: itemData.id}).then(url => {
+      getIconUrl({itemId: itemData.id}).then(url => {
         iconElem.style.backgroundImage = `url('${url}')`;
       });
 
       const nameElem = listItemElem.getElementsByClassName('selector-modal-list-item-name')[0] as HTMLImageElement;
-      SetItemQualityCssClass(nameElem, itemData.quality);
+      setItemQualityCssClass(nameElem, itemData.quality);
 
       const onclick = (event: Event) => {
         event.preventDefault();

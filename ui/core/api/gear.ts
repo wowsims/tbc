@@ -1,8 +1,9 @@
-import { ItemSlot } from './api/newapi';
-import { ItemSpec } from './api/newapi';
-import { EquipmentSpec } from './api/newapi';
+import { equalsOrBothNull } from '../utils';
+
 import { EquippedItem } from './equipped_item';
-import { equalsOrBothNull } from './utils';
+import { ItemSlot } from './newapi';
+import { ItemSpec } from './newapi';
+import { EquipmentSpec } from './newapi';
 
 type InternalGear = Record<ItemSlot, EquippedItem | null>;
 
@@ -12,14 +13,14 @@ type InternalGear = Record<ItemSlot, EquippedItem | null>;
  * This is an immutable type.
  */
 export class Gear {
-  private readonly _gear: InternalGear;
+  private readonly gear: InternalGear;
 
   constructor(gear: Partial<InternalGear>) {
     for (let slot in ItemSlot) {
       if (!gear[Number(slot) as ItemSlot])
         gear[Number(slot) as ItemSlot] = null;
     }
-    this._gear = gear as InternalGear;
+    this.gear = gear as InternalGear;
   }
 
   equals(other: Gear): boolean {
@@ -39,11 +40,11 @@ export class Gear {
   }
 
   getEquippedItem(slot: ItemSlot): EquippedItem | null {
-    return this._gear[slot];
+    return this.gear[slot];
   }
 
   asArray(): Array<EquippedItem | null> {
-    return Object.values(this._gear);
+    return Object.values(this.gear);
   }
 
   asSpec(): EquipmentSpec {

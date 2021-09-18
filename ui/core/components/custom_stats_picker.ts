@@ -1,5 +1,6 @@
 import { Stat } from '../api/newapi';
-import { StatNames } from '../api/names';
+import { statNames } from '../api/names';
+import { Stats } from '../api/stats';
 import { Sim } from '../sim';
 
 import { Component } from './component';
@@ -9,7 +10,7 @@ export class CustomStatsPicker extends Component {
   readonly stats: Array<Stat>;
   readonly statPickers: Array<NumberPicker>;
 
-  constructor(parent: HTMLElement, sim: Sim, stats: Array<Stat>) {
+  constructor(parent: HTMLElement, sim: Sim<any>, stats: Array<Stat>) {
     super(parent, 'custom-stats-root');
     this.stats = stats;
 
@@ -19,12 +20,11 @@ export class CustomStatsPicker extends Component {
     this.rootElem.appendChild(label);
 
     this.statPickers = this.stats.map(stat => new NumberPicker(this.rootElem, sim, {
-      label: StatNames[stat],
-      changedEvent: (sim: Sim) => sim.customStatsChangeEmitter,
-      getValue: (sim: Sim) => sim.getCustomStats()[stat],
-      setValue: (sim: Sim, newValue: number) => {
-        const customStats = sim.getCustomStats();
-        customStats[stat] = newValue;
+      label: statNames[stat],
+      changedEvent: (sim: Sim<any>) => sim.customStatsChangeEmitter,
+      getValue: (sim: Sim<any>) => sim.getCustomStats().getStat(stat),
+      setValue: (sim: Sim<any>, newValue: number) => {
+        const customStats = sim.getCustomStats().withStat(stat, newValue);
         sim.setCustomStats(customStats);
       },
     }));

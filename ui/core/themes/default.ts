@@ -1,29 +1,31 @@
-import { Gear } from '../gear';
-import { CustomStats } from '../sim';
-import { NewCustomStats } from '../sim';
 import { Sim } from '../sim';
+import { Gear } from '../api/gear';
+import { raceNames } from '../api/names';
 import { Buffs } from '../api/newapi';
+import { Class } from '../api/newapi';
 import { Consumes } from '../api/newapi';
 import { Encounter } from '../api/newapi';
 import { EquipmentSpec } from '../api/newapi';
 import { Race } from '../api/newapi';
 import { Spec } from '../api/newapi';
 import { Stat } from '../api/newapi';
+import { Stats } from '../api/stats';
+import { specToEligibleRaces } from '../api/utils';
 import { Actions } from '../components/actions';
 import { CharacterStats } from '../components/character_stats';
 import { CustomStatsPicker } from '../components/custom_stats_picker';
+import { EnumPicker } from '../components/enum_picker';
 import { GearPicker } from '../components/gear_picker';
 import { IconInput } from '../components/icon_picker';
 import { IconPicker } from '../components/icon_picker';
 import { NumberPicker } from '../components/number_picker';
-import { RacePicker } from '../components/race_picker';
 import { Results } from '../components/results';
 import { SavedDataManager } from '../components/saved_data_manager';
 import { newTalentsPicker } from '../talents/factory';
 
 import { Theme, ThemeConfig } from './theme';
 
-export interface DefaultThemeConfig extends ThemeConfig {
+export interface DefaultThemeConfig<ClassType extends Class> extends ThemeConfig<ClassType> {
   displayStats: Array<Stat>;
   iconSections: Record<string, Array<IconInput>>;
   showTargetArmor: boolean;
@@ -39,12 +41,17 @@ export interface DefaultThemeConfig extends ThemeConfig {
       tooltip?: string,
       encounter: Encounter,
     }>;
+    talents: Array<{
+      name: string,
+      tooltip?: string,
+      talents: string,
+    }>;
   },
 }
 
 export interface GearAndStats {
   gear: Gear,
-  customStats: CustomStats,
+  customStats: Stats,
 }
 
 export interface Settings {
@@ -53,10 +60,10 @@ export interface Settings {
   race: Race,
 }
 
-export class DefaultTheme extends Theme {
-  private readonly _config: DefaultThemeConfig;
+export class DefaultTheme<ClassType extends Class> extends Theme<ClassType> {
+  private readonly _config: DefaultThemeConfig<ClassType>;
 
-  constructor(parentElem: HTMLElement, config: DefaultThemeConfig) {
+  constructor(parentElem: HTMLElement, config: DefaultThemeConfig<ClassType>) {
     super(parentElem, config)
     this._config = config;
     this.parentElem.innerHTML = layoutHTML;
@@ -83,14 +90,21 @@ export class DefaultTheme extends Theme {
       const iconPicker = new IconPicker(sectionElem, pickerName + '-icon-picker', this.sim, section, this);
     });
 
-    const racePicker = new RacePicker(this.parentElem.getElementsByClassName('race-picker')[0] as HTMLElement, this.sim);
+    const races = specToEligibleRaces[this.sim.spec];
+    const racePicker = new EnumPicker(this.parentElem.getElementsByClassName('race-picker')[0] as HTMLElement, this.sim, {
+      names: races.map(race => raceNames[race]),
+      values: races,
+      changedEvent: sim => sim.raceChangeEmitter,
+      getValue: sim => sim.getRace(),
+      setValue: (sim, newValue) => sim.setRace(newValue),
+    });
 
     const encounterSectionElem = settingsTab.getElementsByClassName('encounter-section')[0] as HTMLElement;
     new NumberPicker(encounterSectionElem, this.sim, {
       label: 'Duration',
-      changedEvent: (sim: Sim) => sim.encounterChangeEmitter,
-      getValue: (sim: Sim) => sim.getEncounter().duration,
-      setValue: (sim: Sim, newValue: number) => {
+      changedEvent: (sim: Sim<any>) => sim.encounterChangeEmitter,
+      getValue: (sim: Sim<any>) => sim.getEncounter().duration,
+      setValue: (sim: Sim<any>, newValue: number) => {
         const encounter = sim.getEncounter();
         encounter.duration = newValue;
         sim.setEncounter(encounter);
@@ -100,9 +114,9 @@ export class DefaultTheme extends Theme {
     if (config.showTargetArmor) {
       new NumberPicker(encounterSectionElem, this.sim, {
         label: 'Target Armor',
-        changedEvent: (sim: Sim) => sim.encounterChangeEmitter,
-        getValue: (sim: Sim) => sim.getEncounter().targetArmor,
-        setValue: (sim: Sim, newValue: number) => {
+        changedEvent: (sim: Sim<any>) => sim.encounterChangeEmitter,
+        getValue: (sim: Sim<any>) => sim.getEncounter().targetArmor,
+        setValue: (sim: Sim<any>, newValue: number) => {
           const encounter = sim.getEncounter();
           encounter.targetArmor = newValue;
           sim.setEncounter(encounter);
@@ -114,9 +128,9 @@ export class DefaultTheme extends Theme {
     if (config.showNumTargets) {
       new NumberPicker(encounterSectionElem, this.sim, {
         label: '# of Targets',
-        changedEvent: (sim: Sim) => sim.encounterChangeEmitter,
-        getValue: (sim: Sim) => sim.getEncounter().numTargets,
-        setValue: (sim: Sim, newValue: number) => {
+        changedEvent: (sim: Sim<any>) => sim.encounterChangeEmitter,
+        getValue: (sim: Sim<any>) => sim.getEncounter().numTargets,
+        setValue: (sim: Sim<any>, newValue: number) => {
           const encounter = sim.getEncounter();
           encounter.numTargets = newValue;
           sim.setEncounter(encounter);
@@ -128,36 +142,36 @@ export class DefaultTheme extends Theme {
   async init(): Promise<void> {
     const savedGearManager = new SavedDataManager<GearAndStats>(this.parentElem.getElementsByClassName('saved-gear-manager')[0] as HTMLElement, this.sim, {
       label: 'Gear',
-      getData: (sim: Sim) => {
+      getData: (sim: Sim<any>) => {
         return {
           gear: sim.getGear(),
           customStats: sim.getCustomStats(),
         };
       },
-      setData: (sim: Sim, newGearAndStats: GearAndStats) => {
+      setData: (sim: Sim<any>, newGearAndStats: GearAndStats) => {
         sim.setGear(newGearAndStats.gear);
         sim.setCustomStats(newGearAndStats.customStats);
       },
       changeEmitters: [this.sim.gearChangeEmitter, this.sim.customStatsChangeEmitter],
-      equals: (a: GearAndStats, b: GearAndStats) => a.gear.equals(b.gear) && JSON.stringify(a.customStats) == JSON.stringify(b.customStats),
+      equals: (a: GearAndStats, b: GearAndStats) => a.gear.equals(b.gear) && a.customStats.equals(b.customStats),
       toJson: (a: GearAndStats) => {
         return {
           gear: EquipmentSpec.toJson(a.gear.asSpec()),
-          customStats: a.customStats,
+          customStats: a.customStats.toJson(),
         };
       },
       fromJson: (obj: any) => {
         return {
           gear: this.sim.lookupEquipmentSpec(EquipmentSpec.fromJson(obj['gear'])),
-          customStats: obj['customStats'],
+          customStats: Stats.fromJson(obj['customStats']),
         };
       },
     });
 
     const savedEncounterManager = new SavedDataManager<Encounter>(this.parentElem.getElementsByClassName('saved-encounter-manager')[0] as HTMLElement, this.sim, {
       label: 'Encounter',
-      getData: (sim: Sim) => sim.getEncounter(),
-      setData: (sim: Sim, newEncounter: Encounter) => sim.setEncounter(newEncounter),
+      getData: (sim: Sim<any>) => sim.getEncounter(),
+      setData: (sim: Sim<any>, newEncounter: Encounter) => sim.setEncounter(newEncounter),
       changeEmitters: [this.sim.encounterChangeEmitter],
       equals: (a: Encounter, b: Encounter) => Encounter.equals(a, b),
       toJson: (a: Encounter) => Encounter.toJson(a),
@@ -166,14 +180,14 @@ export class DefaultTheme extends Theme {
 
     const savedSettingsManager = new SavedDataManager<Settings>(this.parentElem.getElementsByClassName('saved-settings-manager')[0] as HTMLElement, this.sim, {
       label: 'Settings',
-      getData: (sim: Sim) => {
+      getData: (sim: Sim<any>) => {
         return {
           buffs: sim.getBuffs(),
           consumes: sim.getConsumes(),
           race: sim.getRace(),
         };
       },
-      setData: (sim: Sim, newSettings: Settings) => {
+      setData: (sim: Sim<any>, newSettings: Settings) => {
         sim.setBuffs(newSettings.buffs);
         sim.setConsumes(newSettings.consumes);
         sim.setRace(newSettings.race);
@@ -196,12 +210,22 @@ export class DefaultTheme extends Theme {
       },
     });
 
+    const savedTalentsManager = new SavedDataManager<string>(this.parentElem.getElementsByClassName('saved-talents-manager')[0] as HTMLElement, this.sim, {
+      label: 'Talents',
+      getData: (sim: Sim<any>) => sim.getTalentsString(),
+      setData: (sim: Sim<any>, newTalentsString: string) => sim.setTalentsString(newTalentsString),
+      changeEmitters: [this.sim.talentsStringChangeEmitter],
+      equals: (a: string, b: string) => a == b,
+      toJson: (a: string) => a,
+      fromJson: (obj: any) => obj,
+    });
+
     await super.init();
 
     savedGearManager.loadUserData();
     this._config.presets.gear.forEach(gearConfig => {
       const gear = this.sim.lookupEquipmentSpec(gearConfig.equipment);
-      savedGearManager.addSavedData(gearConfig.name, { gear: gear, customStats: NewCustomStats(), }, true, gearConfig.tooltip);
+      savedGearManager.addSavedData(gearConfig.name, { gear: gear, customStats: new Stats(), }, true, gearConfig.tooltip);
     });
 
     savedEncounterManager.loadUserData();
@@ -210,6 +234,11 @@ export class DefaultTheme extends Theme {
     });
 
     savedSettingsManager.loadUserData();
+
+    savedTalentsManager.loadUserData();
+    this._config.presets.talents.forEach(talentsConfig => {
+      savedTalentsManager.addSavedData(talentsConfig.name, talentsConfig.talents, true, talentsConfig.tooltip);
+    });
   }
 }
 
@@ -270,6 +299,8 @@ const layoutHTML = `
       <div id="talents-tab" class="tab-pane fade"">
         <div class="talents-tab">
           <div class="talents-picker">
+          </div>
+          <div class="saved-talents-manager">
           </div>
         </div>
       </div>

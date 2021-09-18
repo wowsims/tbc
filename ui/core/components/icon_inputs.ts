@@ -17,7 +17,11 @@ export const DivineSpirit = makeTristateBuffInput({spellId:25312}, {spellId:3318
 export const EyeOfTheNight = makeBooleanBuffInput({spellId:31033}, 'eyeOfTheNight');
 export const GiftOfTheWild = makeTristateBuffInput({spellId:26991}, {spellId:17055}, 'giftOfTheWild');
 export const JadePendantOfBlasting = makeBooleanBuffInput({spellId:25607}, 'jadePendantOfBlasting');
+export const ManaSpringTotem = makeTristateBuffInput({spellId:25570}, {spellId:16208}, 'manaSpringTotem');
+export const ManaTideTotem = makeBooleanBuffInput({spellId:16190}, 'manaTideTotem');
 export const MoonkinAura = makeTristateBuffInput({spellId:24907}, {itemId:32387}, 'moonkinAura');
+export const TotemOfWrath = makeMultistateBuffInput({spellId:30706}, 6, 'totemOfWrath');
+export const WrathOfAirTotem = makeTristateBuffInput({spellId:3738}, {spellId:37212}, 'wrathOfAirTotem');
 
 // Debuffs
 export const ImprovedSealOfTheCrusader = makeBooleanBuffInput({spellId:20337}, 'improvedSealOfTheCrusader');
@@ -49,9 +53,9 @@ function makeBooleanBuffInput(id: ItemOrSpellId, buffsFieldName: keyof Buffs): I
   return {
     id: id,
     states: 2,
-    changedEvent: (sim: Sim) => sim.buffsChangeEmitter,
-    getValue: (sim: Sim) => sim.getBuffs()[buffsFieldName],
-    setBooleanValue: (sim: Sim, newValue: boolean) => {
+    changedEvent: (sim: Sim<any>) => sim.buffsChangeEmitter,
+    getValue: (sim: Sim<any>) => sim.getBuffs()[buffsFieldName],
+    setBooleanValue: (sim: Sim<any>, newValue: boolean) => {
       const newBuffs = sim.getBuffs();
       (newBuffs[buffsFieldName] as boolean) = newValue;
       sim.setBuffs(newBuffs);
@@ -64,9 +68,9 @@ function makeTristateBuffInput(id: ItemOrSpellId, impId: ItemOrSpellId, buffsFie
     id: id,
     states: 3,
     improvedId: impId,
-    changedEvent: (sim: Sim) => sim.buffsChangeEmitter,
-    getValue: (sim: Sim) => sim.getBuffs()[buffsFieldName],
-    setNumberValue: (sim: Sim, newValue: number) => {
+    changedEvent: (sim: Sim<any>) => sim.buffsChangeEmitter,
+    getValue: (sim: Sim<any>) => sim.getBuffs()[buffsFieldName],
+    setNumberValue: (sim: Sim<any>, newValue: number) => {
       const newBuffs = sim.getBuffs();
       (newBuffs[buffsFieldName] as number) = newValue;
       sim.setBuffs(newBuffs);
@@ -78,9 +82,9 @@ function makeMultistateBuffInput(id: ItemOrSpellId, numStates: number, buffsFiel
   return {
     id: id,
     states: numStates,
-    changedEvent: (sim: Sim) => sim.buffsChangeEmitter,
-    getValue: (sim: Sim) => sim.getBuffs()[buffsFieldName],
-    setNumberValue: (sim: Sim, newValue: number) => {
+    changedEvent: (sim: Sim<any>) => sim.buffsChangeEmitter,
+    getValue: (sim: Sim<any>) => sim.getBuffs()[buffsFieldName],
+    setNumberValue: (sim: Sim<any>, newValue: number) => {
       const newBuffs = sim.getBuffs();
       (newBuffs[buffsFieldName] as number) = newValue;
       sim.setBuffs(newBuffs);
@@ -93,9 +97,9 @@ function makeBooleanConsumeInput(id: ItemOrSpellId, consumesFieldName: keyof Con
     id: id,
     states: 2,
     exclusivityTags: exclusivityTags,
-    changedEvent: (sim: Sim) => sim.consumesChangeEmitter,
-    getValue: (sim: Sim) => sim.getConsumes()[consumesFieldName],
-    setBooleanValue: (sim: Sim, newValue: boolean) => {
+    changedEvent: (sim: Sim<any>) => sim.consumesChangeEmitter,
+    getValue: (sim: Sim<any>) => sim.getConsumes()[consumesFieldName],
+    setBooleanValue: (sim: Sim<any>, newValue: boolean) => {
       const newBuffs = sim.getConsumes();
       (newBuffs[consumesFieldName] as boolean) = newValue;
       sim.setConsumes(newBuffs);

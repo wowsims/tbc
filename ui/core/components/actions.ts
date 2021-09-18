@@ -7,7 +7,7 @@ import { Component } from './component.js';
 import { Results } from './results.js';
 
 export class Actions extends Component {
-  constructor(parent: HTMLElement, sim: Sim, results: Results, epStats: Array<Stat>, epReferenceStat: Stat) {
+  constructor(parent: HTMLElement, sim: Sim<any>, results: Results, epStats: Array<Stat>, epReferenceStat: Stat) {
     super(parent, 'actions-root');
 
     const simButton = document.createElement('button');
@@ -30,17 +30,17 @@ export class Actions extends Component {
     const iterationsInput = iterationsDiv.getElementsByClassName('iterations-input')[0] as HTMLInputElement;
 
     simButton.addEventListener('click', async () => {
-      const request = sim.createSimRequest();
-      request.iterations = parseInt(iterationsInput.value);
+      const iterations = parseInt(iterationsInput.value);
+      const simRequest = sim.makeCurrentIndividualSimRequest(iterations, false);
 
       results.setPending();
-      const result = await sim.individualSim(request);
+      const result = await sim.individualSim(simRequest);
       results.setSimResult(result);
     });
 
     statWeightsButton.addEventListener('click', async () => {
-      const simRequest = sim.createSimRequest();
-      simRequest.iterations = parseInt(iterationsInput.value);
+      const iterations = parseInt(iterationsInput.value);
+      const simRequest = sim.makeCurrentIndividualSimRequest(iterations, false);
 
       const statWeightsRequest = StatWeightsRequest.create({
         options: simRequest,

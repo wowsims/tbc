@@ -1,4 +1,5 @@
 import { Buffs } from '../core/api/newapi';
+import { Class } from '../core/api/newapi';
 import { Consumes } from '../core/api/newapi';
 import { Encounter } from '../core/api/newapi';
 import { EquipmentSpec } from '../core/api/newapi';
@@ -7,13 +8,18 @@ import { ItemSpec } from '../core/api/newapi';
 import { Spec } from '../core/api/newapi';
 import { Stat } from '../core/api/newapi';
 import { TristateEffect } from '../core/api/newapi'
+import { Sim } from '../core/sim';
 import { DefaultTheme } from '../core/themes/default';
-import * as Enchants from '../core/enchants';
-import * as Gems from '../core/gems';
-import * as Tooltips from '../core/tooltips';
-import * as IconInputs from '../core/components/icon_inputs';
 
-const theme = new DefaultTheme(document.body, {
+import { Shaman, Shaman_ShamanAgent as ShamanAgent, Shaman_ShamanTalents as ShamanTalents, Shaman_ShamanOptions as ShamanOptions } from '../core/api/newapi';
+
+import * as IconInputs from '../core/components/icon_inputs';
+import * as Enchants from '../core/constants/enchants';
+import * as Gems from '../core/constants/gems';
+import * as Tooltips from '../core/constants/tooltips';
+
+
+const theme = new DefaultTheme<Class.ClassShaman>(document.body, {
   spec: Spec.ElementalShaman,
   epStats: [
     Stat.StatIntellect,
@@ -36,6 +42,21 @@ const theme = new DefaultTheme(document.body, {
   ],
   iconSections: {
     'Buffs': [
+      {
+        id: { spellId: 33736 },
+        states: 2,
+        changedEvent: (sim: Sim<Class.ClassShaman>) => sim.classOptionsChangeEmitter,
+        getValue: (sim: Sim<Class.ClassShaman>) => sim.getClassOptions().waterShield,
+        setBooleanValue: (sim: Sim<Class.ClassShaman>, newValue: boolean) => {
+          const newOptions = sim.getClassOptions();
+          newOptions.waterShield = newValue;
+          sim.setClassOptions(newOptions);
+        },
+      },
+      IconInputs.WrathOfAirTotem,
+      IconInputs.TotemOfWrath,
+      IconInputs.ManaSpringTotem,
+      IconInputs.ManaTideTotem,
       IconInputs.Bloodlust,
       IconInputs.DrumsOfBattle,
       IconInputs.DrumsOfRestoration,
@@ -86,10 +107,17 @@ const theme = new DefaultTheme(document.body, {
 
       judgementOfWisdom: true,
       misery: true,
+
+      wrathOfAirTotem: TristateEffect.TristateEffectRegular,
+      totemOfWrath: 1,
+      manaSpringTotem: TristateEffect.TristateEffectRegular,
     }),
     consumes: Consumes.create({
       drumsOfBattle: true,
       superManaPotion: true,
+    }),
+    classOptions: ShamanOptions.create({
+      waterShield: true,
     }),
   },
   presets: {
@@ -112,6 +140,12 @@ const theme = new DefaultTheme(document.body, {
       },
     ],
     encounters: [
+    ],
+    talents: [
+      {
+        name: 'Standard',
+        talents: '55030105100213351051--05105301005',
+      },
     ],
   },
 });

@@ -1,5 +1,5 @@
 import { Stat } from '../api/newapi';
-import { StatNames } from '../api/names';
+import { statNames } from '../api/names';
 
 import { Component } from './component';
 
@@ -23,7 +23,7 @@ export class CharacterStats extends Component {
 
       const label = document.createElement('td');
       label.classList.add('character-stats-table-label');
-      label.textContent = StatNames[stat];
+      label.textContent = statNames[stat];
       row.appendChild(label);
 
       const value = document.createElement('td');

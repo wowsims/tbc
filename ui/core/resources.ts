@@ -22,7 +22,7 @@ const emptySlotIcons: Record<ItemSlot, string> = {
   [ItemSlot.ItemSlotOffHand]: 'https://cdn.seventyupgrades.com/item-slots/OffHand.jpg',
   [ItemSlot.ItemSlotRanged]: 'https://cdn.seventyupgrades.com/item-slots/Ranged.jpg',
 };
-export function GetEmptySlotIconUrl(slot: ItemSlot): string {
+export function getEmptySlotIconUrl(slot: ItemSlot): string {
   return emptySlotIcons[slot];
 }
 
@@ -34,7 +34,7 @@ export type SpellId = {
 };
 export type ItemOrSpellId = IconId | SpellId;
 
-async function GetIconUrlHelper(id: number, tooltipPostfix: string, cache: Map<number, string>): Promise<string> {
+async function getIconUrlHelper(id: number, tooltipPostfix: string, cache: Map<number, string>): Promise<string> {
   if (cache.has(id)) {
     return cache.get(id) as string;
   }
@@ -50,15 +50,15 @@ async function GetIconUrlHelper(id: number, tooltipPostfix: string, cache: Map<n
 
 const itemToIconCache = new Map<number, string>();
 const spellToIconCache = new Map<number, string>();
-export async function GetIconUrl(id: ItemOrSpellId): Promise<string> {
+export async function getIconUrl(id: ItemOrSpellId): Promise<string> {
   if ('itemId' in id) {
-    return await GetIconUrlHelper(id.itemId, 'item', itemToIconCache);
+    return await getIconUrlHelper(id.itemId, 'item', itemToIconCache);
   } else {
-    return await GetIconUrlHelper(id.spellId, 'spell', spellToIconCache);
+    return await getIconUrlHelper(id.spellId, 'spell', spellToIconCache);
   }
 }
 
-export function SetWowheadHref(elem: HTMLAnchorElement, id: ItemOrSpellId) {
+export function setWowheadHref(elem: HTMLAnchorElement, id: ItemOrSpellId) {
   if ('itemId' in id) {
     elem.href = 'https://tbc.wowhead.com/item=' + id.itemId;
   } else {
@@ -72,7 +72,7 @@ const emptyGemSocketIcons: Partial<Record<GemColor, string>> = {
   [GemColor.GemColorRed]: 'https://wow.zamimg.com/images/icons/socket-red.gif',
   [GemColor.GemColorYellow]: 'https://wow.zamimg.com/images/icons/socket-yellow.gif',
 };
-export function GetEmptyGemSocketIconUrl(color: GemColor): string {
+export function getEmptyGemSocketIconUrl(color: GemColor): string {
   if (emptyGemSocketIcons[color])
     return emptyGemSocketIcons[color] as string;
 

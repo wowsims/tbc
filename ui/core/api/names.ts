@@ -2,7 +2,7 @@ import { ItemSlot } from './newapi';
 import { Race } from './newapi';
 import { Stat } from './newapi';
 
-export const RaceNames: Record<Race, string> = {
+export const raceNames: Record<Race, string> = {
   [Race.RaceUnknown]: 'None',
   [Race.RaceBloodElf]: 'Blood Elf',
   [Race.RaceDraenei]: 'Draenei',
@@ -17,7 +17,7 @@ export const RaceNames: Record<Race, string> = {
   [Race.RaceUndead]: 'Undead',
 };
 
-export const StatNames: Record<Stat, string> = {
+export const statNames: Record<Stat, string> = {
   [Stat.StatStrength]: 'Strength',
   [Stat.StatAgility]: 'Agility',
   [Stat.StatStamina]: 'Stamina',
@@ -48,7 +48,7 @@ export const StatNames: Record<Stat, string> = {
   [Stat.StatArmor]: 'Armor',
 };
 
-export const SlotNames: Record<ItemSlot, string> = {
+export const slotNames: Record<ItemSlot, string> = {
   [ItemSlot.ItemSlotHead]: 'Head',
   [ItemSlot.ItemSlotNeck]: 'Neck',
   [ItemSlot.ItemSlotShoulder]: 'Shoulders',
@@ -68,5 +68,5 @@ export const SlotNames: Record<ItemSlot, string> = {
   [ItemSlot.ItemSlotRanged]: 'Ranged',
 };
 
-export const EnchantDescriptions = new Map<number, string>();
-EnchantDescriptions.set(29191, '+22 Spell Damage and 14 Spell Hit Rating');
+export const enchantDescriptions = new Map<number, string>();
+enchantDescriptions.set(29191, '+22 Spell Damage and 14 Spell Hit Rating');

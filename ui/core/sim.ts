@@ -1,4 +1,7 @@
+import { EquippedItem } from './api/equipped_item';
+import { Gear } from './api/gear';
 import { Buffs } from './api/newapi';
+import { Class } from './api/newapi';
 import { Consumes } from './api/newapi';
 import { Enchant } from './api/newapi';
 import { Encounter } from './api/newapi';
@@ -11,35 +14,37 @@ import { ItemSpec } from './api/newapi';
 import { ItemType } from './api/newapi';
 import { Item } from './api/newapi';
 import { Player } from './api/newapi';
+import { PlayerOptions } from './api/newapi';
 import { Race } from './api/newapi';
 import { Spec } from './api/newapi';
 import { Stat } from './api/newapi';
-import { SpecToEligibleRaces } from './api/utils';
-import { GetEligibleItemSlots } from './api/utils';
+import { makeIndividualSimRequest } from './api/request_helpers';
+import { Stats } from './api/stats';
+import { ClassAgent } from './api/utils';
+import { ClassTalents } from './api/utils';
+import { ClassTypeFunctions } from './api/utils';
+import { classTypeFunctions } from './api/utils';
+import { ClassOptions } from './api/utils';
+import { specToClass } from './api/utils';
+import { specToEligibleRaces } from './api/utils';
+import { getEligibleItemSlots } from './api/utils';
 
 import { ComputeStatsRequest, ComputeStatsResult } from './api/newapi';
 import { GearListRequest, GearListResult } from './api/newapi';
 import { IndividualSimRequest, IndividualSimResult } from './api/newapi';
 import { StatWeightsRequest, StatWeightsResult } from './api/newapi';
 
-import { EquippedItem } from './equipped_item';
-import { Gear } from './gear';
 import { Listener } from './typed_event';
 import { TypedEvent } from './typed_event';
 import { wait } from './utils';
 
 // These imports are not used, but they are needed to make sure these files
 // are included in the compiled js.
-import * as Enchants from './enchants';
-import * as Gems from './gems';
+import * as Enchants from './constants/enchants';
+import * as Gems from './constants/gems';
+import * as Tooltips from './constants/tooltips';
 
-const STATS_LEN = Object.keys(Stat).length;
-export type CustomStats = Array<number>;
-export function NewCustomStats(): CustomStats {
-  return new Array(STATS_LEN).fill(0);
-}
-
-export interface SimConfig {
+export interface SimConfig<ClassType extends Class> {
   spec: Spec;
   epStats: Array<Stat>;
   epReferenceStat: Stat;
@@ -47,18 +52,25 @@ export interface SimConfig {
     encounter: Encounter,
     buffs: Buffs,
     consumes: Consumes,
+    classOptions: ClassOptions<ClassType>,
   },
 }
 
-export class Sim {
+export class Sim<ClassType extends Class> {
   readonly spec: Spec;
-  readonly gearListEmitter = new TypedEvent<GearListResult>();
-  readonly raceChangeEmitter = new TypedEvent<void>();
-  readonly gearChangeEmitter = new TypedEvent<void>();
+
   readonly buffsChangeEmitter = new TypedEvent<void>();
   readonly consumesChangeEmitter = new TypedEvent<void>();
-  readonly encounterChangeEmitter = new TypedEvent<void>();
   readonly customStatsChangeEmitter = new TypedEvent<void>();
+  readonly encounterChangeEmitter = new TypedEvent<void>();
+  readonly gearChangeEmitter = new TypedEvent<void>();
+  readonly gearListEmitter = new TypedEvent<GearListResult>();
+  readonly raceChangeEmitter = new TypedEvent<void>();
+  readonly agentChangeEmitter = new TypedEvent<void>();
+  readonly talentsChangeEmitter = new TypedEvent<void>();
+  // Talents dont have all fields so we need this
+  readonly talentsStringChangeEmitter = new TypedEvent<void>();
+  readonly classOptionsChangeEmitter = new TypedEvent<void>();
 
   // Database
   private _items: Record<number, Item> = {};
@@ -66,24 +78,37 @@ export class Sim {
   private _gems: Record<number, Gem> = {};
 
   // Current values
-  private _race: Race;
-  private _gear: Gear;
   private _buffs: Buffs;
   private _consumes: Consumes;
+  private _customStats: Stats;
+  private _gear: Gear;
   private _encounter: Encounter;
-  private _customStats: CustomStats;
+  private _race: Race;
+  private _agent: ClassAgent<ClassType>;
+  private _talents: ClassTalents<ClassType>;
+  private _talentsString: string;
+  private _classOptions: ClassOptions<ClassType>;
+
+  private readonly _classTypeFunctions: ClassTypeFunctions<ClassType>;
 
   private _init = false;
 
-  constructor(config: SimConfig) {
+  constructor(config: SimConfig<ClassType>) {
     this.spec = config.spec;
-    this._race = SpecToEligibleRaces[this.spec][0];
+    this._race = specToEligibleRaces[this.spec][0];
+
+    const playerClass = specToClass[this.spec];
+    this._classTypeFunctions = classTypeFunctions[playerClass] as ClassTypeFunctions<ClassType>;
 
     this._gear = new Gear({});
     this._encounter = config.defaults.encounter;
     this._buffs = config.defaults.buffs;
     this._consumes = config.defaults.consumes;
-    this._customStats = NewCustomStats();
+    this._customStats = new Stats();
+    this._agent = this._classTypeFunctions.agentCreate();
+    this._talents = this._classTypeFunctions.talentsCreate();
+    this._talentsString = '';
+    this._classOptions = config.defaults.classOptions;
   }
 
   async init(): Promise<void> {
@@ -183,22 +208,65 @@ export class Sim {
     this.gearChangeEmitter.emit();
   }
 
-  getCustomStats(): CustomStats {
-    // Make a defensive copy
-    return this._customStats.slice();
+  getCustomStats(): Stats {
+    return this._customStats;
   }
 
-  setCustomStats(newCustomStats: CustomStats) {
-    if (newCustomStats.length != STATS_LEN) {
-      throw new Error('Custom stats must have length = ' + STATS_LEN);
-    }
-
-    if (newCustomStats.every((newStat, statIdx) => newStat == this._customStats[statIdx]))
+  setCustomStats(newCustomStats: Stats) {
+    if (newCustomStats.equals(this._customStats))
       return;
 
-    // Make a defensive copy
-    this._customStats = newCustomStats.slice();
+    this._customStats = newCustomStats;
     this.customStatsChangeEmitter.emit();
+  }
+
+  getAgent(): ClassAgent<ClassType> {
+    return this._classTypeFunctions.agentCopy(this._agent);
+  }
+
+  setAgent(newAgent: ClassAgent<ClassType>) {
+    if (this._classTypeFunctions.agentEquals(newAgent, this._agent))
+      return;
+
+    this._agent = this._classTypeFunctions.agentCopy(newAgent);
+    this.agentChangeEmitter.emit();
+  }
+
+  // Commented because this should NOT be used; all external uses should be able to use getTalentsString()
+  //getTalents(): ClassTalents<ClassType> {
+  //  return this._classTypeFunctions.talentsCopy(this._talents);
+  //}
+
+  setTalents(newTalents: ClassTalents<ClassType>) {
+    if (this._classTypeFunctions.talentsEquals(newTalents, this._talents))
+      return;
+
+    this._talents = this._classTypeFunctions.talentsCopy(newTalents);
+    this.talentsChangeEmitter.emit();
+  }
+
+  getTalentsString(): string {
+    return this._talentsString;
+  }
+
+  setTalentsString(newTalentsString: string) {
+    if (newTalentsString == this._talentsString)
+      return;
+
+    this._talentsString = newTalentsString;
+    this.talentsStringChangeEmitter.emit();
+  }
+
+  getClassOptions(): ClassOptions<ClassType> {
+    return this._classTypeFunctions.optionsCopy(this._classOptions);
+  }
+
+  setClassOptions(newClassOptions: ClassOptions<ClassType>) {
+    if (this._classTypeFunctions.optionsEquals(newClassOptions, this._classOptions))
+      return;
+
+    this._classOptions = this._classTypeFunctions.optionsCopy(newClassOptions);
+    this.classOptionsChangeEmitter.emit();
   }
 
   lookupItemSpec(itemSpec: ItemSpec): EquippedItem | null {
@@ -222,7 +290,7 @@ export class Sim {
       if (!item)
         return;
 
-      const itemSlots = GetEligibleItemSlots(item.item);
+      const itemSlots = getEligibleItemSlots(item.item);
 
       const assignedSlot = itemSlots.find(slot => !gearMap[slot]);
       if (assignedSlot == null)
@@ -232,14 +300,6 @@ export class Sim {
     });
 
     return new Gear(gearMap);
-  }
-
-  createSimRequest(): IndividualSimRequest {
-    return IndividualSimRequest.create({
-      player: Player.create(),
-      buffs: this._buffs,
-      encounter: this._encounter,
-    });
   }
 
   private async getGearList(request: GearListRequest): Promise<GearListResult> {
@@ -351,6 +411,21 @@ export class Sim {
     result.dpsStdev = Math.random() * 200;
     console.log('Individual sim result: ' + IndividualSimResult.toJsonString(result));
     return result;
+  }
+
+  makeCurrentIndividualSimRequest(iterations: number, debug: boolean): IndividualSimRequest {
+    return makeIndividualSimRequest(
+      this._buffs,
+      this._consumes,
+      this._customStats,
+      this._encounter,
+      this._gear,
+      this._race,
+      this._agent,
+      this._talents,
+      this._classOptions,
+      iterations,
+      debug);
   }
 
   setWowheadData(equippedItem: EquippedItem, elem: HTMLElement) {

@@ -1,11 +1,11 @@
-import { Enchant } from './api/newapi';
-import { Gem } from './api/newapi';
-import { Item } from './api/newapi';
-import { ItemSlot } from './api/newapi';
-import { ItemSpec } from './api/newapi';
-import { EnchantAppliesToItem } from './api/utils';
-import { GemEligibleForSocket } from './api/utils';
-import { GemMatchesSocket } from './api/utils';
+import { Enchant } from './newapi';
+import { Gem } from './newapi';
+import { Item } from './newapi';
+import { ItemSlot } from './newapi';
+import { ItemSpec } from './newapi';
+import { enchantAppliesToItem } from './utils';
+import { gemEligibleForSocket } from './utils';
+import { gemMatchesSocket } from './utils';
 
 /**
  * Represents an equipped item along with enchants/gems attached to it.
@@ -72,14 +72,14 @@ export class EquippedItem {
    */
   withItem(item: Item): EquippedItem {
     let newEnchant = null;
-    if (this._enchant && EnchantAppliesToItem(this._enchant, item))
+    if (this._enchant && enchantAppliesToItem(this._enchant, item))
       newEnchant = this._enchant;
     
     // Reorganize gems to match as many colors in the new item as possible.
     const newGems = new Array(item.gemSockets.length).fill(null);
     this._gems.filter(gem => gem != null).forEach(gem => {
-      const firstMatchingIndex = item.gemSockets.findIndex((socketColor, socketIdx) => !newGems[socketIdx] && GemMatchesSocket(gem!, socketColor));
-      const firstEligibleIndex = item.gemSockets.findIndex((socketColor, socketIdx) => !newGems[socketIdx] && GemEligibleForSocket(gem!, socketColor));
+      const firstMatchingIndex = item.gemSockets.findIndex((socketColor, socketIdx) => !newGems[socketIdx] && gemMatchesSocket(gem!, socketColor));
+      const firstEligibleIndex = item.gemSockets.findIndex((socketColor, socketIdx) => !newGems[socketIdx] && gemEligibleForSocket(gem!, socketColor));
       if (firstMatchingIndex != -1) {
         newGems[firstMatchingIndex] = gem;
       } else if (firstEligibleIndex != -1) {

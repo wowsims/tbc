@@ -7,7 +7,7 @@ const gemSocketCssClasses: Partial<Record<GemColor, string>> = {
   [GemColor.GemColorRed]: 'socket-color-red',
   [GemColor.GemColorYellow]: 'socket-color-yellow',
 };
-export function SetGemSocketCssClass(elem: HTMLElement, color: GemColor) {
+export function setGemSocketCssClass(elem: HTMLElement, color: GemColor) {
   Object.values(gemSocketCssClasses).forEach(cssClass => elem.classList.remove(cssClass));
 
   if (gemSocketCssClasses[color]) {
@@ -25,7 +25,7 @@ const itemQualityCssClasses: Record<ItemQuality, string> = {
   [ItemQuality.ItemQualityEpic]: 'item-quality-epic',
   [ItemQuality.ItemQualityLegendary]: 'item-quality-legendary',
 };
-export function SetItemQualityCssClass(elem: HTMLElement, quality: ItemQuality | null) {
+export function setItemQualityCssClass(elem: HTMLElement, quality: ItemQuality | null) {
   Object.values(itemQualityCssClasses).forEach(cssClass => elem.classList.remove(cssClass));
 
   if (quality) {

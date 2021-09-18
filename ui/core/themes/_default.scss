@@ -1,10 +1,10 @@
 @import "../components/actions";
 @import "../components/character_stats";
 @import "../components/custom_stats_picker";
+@import "../components/enum_picker";
 @import "../components/gear_picker";
 @import "../components/icon_picker";
 @import "../components/number_picker";
-@import "../components/race_picker";
 @import "../components/results";
 @import "../components/saved_data_manager";
 @import "../shared";
@@ -191,4 +191,12 @@ $main-background-color: #F0FFFF;
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+.saved-talents-manager {
+  text-align: center;
+}
+
+.saved-talents-manager .saved-data-container, .saved-talents-manager .saved-data-create-container {
+  display: inline-block;
 }

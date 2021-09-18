@@ -3,9 +3,21 @@ import { TypedEvent } from '../typed_event.js';
 
 import { Component } from './component.js';
 
+/**
+ * Data for creating a number picker.
+ */
+export type NumberPickerConfig = {
+  label?: string,
+  defaultValue?: number,
+
+  changedEvent: (sim: Sim<any>) => TypedEvent<any>;
+  getValue: (sim: Sim<any>) => number;
+  setValue: (sim: Sim<any>, newValue: number) => void;
+};
+
 // UI element for picking an arbitrary number field.
 export class NumberPicker extends Component {
-  constructor(parent: HTMLElement, sim: Sim, config: NumberPickerConfig) {
+  constructor(parent: HTMLElement, sim: Sim<any>, config: NumberPickerConfig) {
     super(parent, 'number-picker-root');
 
     if (config.label) {
@@ -34,15 +46,3 @@ export class NumberPicker extends Component {
     });
   }
 }
-
-/**
- * Data for creating a number picker.
- */
-export type NumberPickerConfig = {
-  label?: string,
-  defaultValue?: number,
-
-  changedEvent: (sim: Sim) => TypedEvent<any>;
-  getValue: (sim: Sim) => number;
-  setValue: (sim: Sim, newValue: number) => void;
-};

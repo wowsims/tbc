@@ -1,15 +1,18 @@
+import { Class } from '../api/newapi';
+import { Shaman_ShamanTalents as ShamanTalents } from '../api/newapi';
 import { Sim } from '../sim';
 
 import { TalentsPicker } from './talents_picker';
 
-export class ShamanTalentsPicker extends TalentsPicker {
-  constructor(parent: HTMLElement, sim: Sim) {
+export class ShamanTalentsPicker extends TalentsPicker<Class.ClassShaman> {
+  constructor(parent: HTMLElement, sim: Sim<Class.ClassShaman>) {
     super(parent, sim, [
       {
         name: 'Elemental',
         backgroundUrl: 'https://wow.zamimg.com/images/wow/talents/backgrounds/classic/261.jpg',
         talents: [
           {
+            fieldName: 'convection',
             location: {
               rowIdx: 0,
               colIdx: 1,
@@ -18,6 +21,7 @@ export class ShamanTalentsPicker extends TalentsPicker {
             maxPoints: 5,
           },
           {
+            fieldName: 'concussion',
             location: {
               rowIdx: 0,
               colIdx: 2,
@@ -26,6 +30,7 @@ export class ShamanTalentsPicker extends TalentsPicker {
             maxPoints: 5,
           },
           {
+            //fieldName: 'earthsGrasp',
             location: {
               rowIdx: 1,
               colIdx: 0,
@@ -34,6 +39,7 @@ export class ShamanTalentsPicker extends TalentsPicker {
             maxPoints: 2,
           },
           {
+            //fieldName: 'elementalWarding',
             location: {
               rowIdx: 1,
               colIdx: 1,
@@ -42,6 +48,7 @@ export class ShamanTalentsPicker extends TalentsPicker {
             maxPoints: 3,
           },
           {
+            fieldName: 'callOfFlame',
             location: {
               rowIdx: 1,
               colIdx: 2,
@@ -50,6 +57,7 @@ export class ShamanTalentsPicker extends TalentsPicker {
             maxPoints: 3,
           },
           {
+            fieldName: 'elementalFocus',
             location: {
               rowIdx: 2,
               colIdx: 0,
@@ -58,6 +66,7 @@ export class ShamanTalentsPicker extends TalentsPicker {
             maxPoints: 1,
           },
           {
+            fieldName: 'reverberation',
             location: {
               rowIdx: 2,
               colIdx: 1,
@@ -66,6 +75,7 @@ export class ShamanTalentsPicker extends TalentsPicker {
             maxPoints: 5,
           },
           {
+            fieldName: 'callOfThunder',
             location: {
               rowIdx: 2,
               colIdx: 2,
@@ -74,6 +84,7 @@ export class ShamanTalentsPicker extends TalentsPicker {
             maxPoints: 5,
           },
           {
+            fieldName: 'improvedFireTotems',
             location: {
               rowIdx: 3,
               colIdx: 0,
@@ -82,6 +93,7 @@ export class ShamanTalentsPicker extends TalentsPicker {
             maxPoints: 2,
           },
           {
+            //fieldName: 'eyeOfTheStorm',
             location: {
               rowIdx: 3,
               colIdx: 1,
@@ -90,6 +102,7 @@ export class ShamanTalentsPicker extends TalentsPicker {
             maxPoints: 3,
           },
           {
+            fieldName: 'elementalDevastation',
             location: {
               rowIdx: 3,
               colIdx: 3,
@@ -98,6 +111,7 @@ export class ShamanTalentsPicker extends TalentsPicker {
             maxPoints: 3,
           },
           {
+            //fieldName: 'stormReach',
             location: {
               rowIdx: 4,
               colIdx: 0,
@@ -106,6 +120,7 @@ export class ShamanTalentsPicker extends TalentsPicker {
             maxPoints: 2,
           },
           {
+            fieldName: 'elementalFury',
             location: {
               rowIdx: 4,
               colIdx: 1,
@@ -114,6 +129,7 @@ export class ShamanTalentsPicker extends TalentsPicker {
             maxPoints: 1,
           },
           {
+            fieldName: 'unrelentingStorm',
             location: {
               rowIdx: 4,
               colIdx: 3,
@@ -122,6 +138,7 @@ export class ShamanTalentsPicker extends TalentsPicker {
             maxPoints: 5,
           },
           {
+            fieldName: 'elementalPrecision',
             location: {
               rowIdx: 5,
               colIdx: 0,
@@ -130,6 +147,7 @@ export class ShamanTalentsPicker extends TalentsPicker {
             maxPoints: 3,
           },
           {
+            fieldName: 'lightningMastery',
             location: {
               rowIdx: 5,
               colIdx: 2,
@@ -142,6 +160,7 @@ export class ShamanTalentsPicker extends TalentsPicker {
             maxPoints: 5,
           },
           {
+            fieldName: 'elementalMastery',
             location: {
               rowIdx: 6,
               colIdx: 1,
@@ -154,6 +173,7 @@ export class ShamanTalentsPicker extends TalentsPicker {
             maxPoints: 1,
           },
           {
+            //fieldName: 'elementalShields',
             location: {
               rowIdx: 6,
               colIdx: 2,
@@ -162,6 +182,7 @@ export class ShamanTalentsPicker extends TalentsPicker {
             maxPoints: 3,
           },
           {
+            fieldName: 'lightningOverload',
             location: {
               rowIdx: 7,
               colIdx: 1,
@@ -170,6 +191,7 @@ export class ShamanTalentsPicker extends TalentsPicker {
             maxPoints: 5,
           },
           {
+            //fieldName: 'totemOfWrath',
             location: {
               rowIdx: 8,
               colIdx: 1,
@@ -188,6 +210,7 @@ export class ShamanTalentsPicker extends TalentsPicker {
         backgroundUrl: 'https://wow.zamimg.com/images/wow/talents/backgrounds/classic/263.jpg',
         talents: [
           {
+            fieldName: 'ancestralKnowledge',
             location: {
               rowIdx: 0,
               colIdx: 1,
@@ -196,6 +219,7 @@ export class ShamanTalentsPicker extends TalentsPicker {
             maxPoints: 5,
           },
           {
+            //fieldName: 'shieldSpecialization',
             location: {
               rowIdx: 0,
               colIdx: 2,
@@ -204,6 +228,7 @@ export class ShamanTalentsPicker extends TalentsPicker {
             maxPoints: 5,
           },
           {
+            //fieldName: 'guardianTotems',
             location: {
               rowIdx: 1,
               colIdx: 0,
@@ -212,6 +237,7 @@ export class ShamanTalentsPicker extends TalentsPicker {
             maxPoints: 2,
           },
           {
+            fieldName: 'thunderingStrikes',
             location: {
               rowIdx: 1,
               colIdx: 1,
@@ -220,6 +246,7 @@ export class ShamanTalentsPicker extends TalentsPicker {
             maxPoints: 5,
           },
           {
+            //fieldName: 'improvedGhostWolf',
             location: {
               rowIdx: 1,
               colIdx: 2,
@@ -228,6 +255,7 @@ export class ShamanTalentsPicker extends TalentsPicker {
             maxPoints: 2,
           },
           {
+            //fieldName: 'improvedLightningShield',
             location: {
               rowIdx: 1,
               colIdx: 3,
@@ -236,6 +264,7 @@ export class ShamanTalentsPicker extends TalentsPicker {
             maxPoints: 3,
           },
           {
+            fieldName: 'enhancingTotems',
             location: {
               rowIdx: 2,
               colIdx: 0,
@@ -244,6 +273,7 @@ export class ShamanTalentsPicker extends TalentsPicker {
             maxPoints: 2,
           },
           {
+            fieldName: 'shamanisticFocus',
             location: {
               rowIdx: 2,
               colIdx: 2,
@@ -252,6 +282,7 @@ export class ShamanTalentsPicker extends TalentsPicker {
             maxPoints: 1,
           },
           {
+            //fieldName: 'anticipation',
             location: {
               rowIdx: 2,
               colIdx: 3,
@@ -260,6 +291,7 @@ export class ShamanTalentsPicker extends TalentsPicker {
             maxPoints: 5,
           },
           {
+            fieldName: 'flurry',
             location: {
               rowIdx: 3,
               colIdx: 1,
@@ -272,6 +304,7 @@ export class ShamanTalentsPicker extends TalentsPicker {
             maxPoints: 5,
           },
           {
+            //fieldName: 'toughness',
             location: {
               rowIdx: 3,
               colIdx: 2,
@@ -280,6 +313,7 @@ export class ShamanTalentsPicker extends TalentsPicker {
             maxPoints: 5,
           },
           {
+            fieldName: 'improvedWeaponTotems',
             location: {
               rowIdx: 4,
               colIdx: 0,
@@ -288,6 +322,7 @@ export class ShamanTalentsPicker extends TalentsPicker {
             maxPoints: 2,
           },
           {
+            //fieldName: 'spiritWeapons',
             location: {
               rowIdx: 4,
               colIdx: 1,
@@ -296,6 +331,7 @@ export class ShamanTalentsPicker extends TalentsPicker {
             maxPoints: 1,
           },
           {
+            fieldName: 'elementalWeapons',
             location: {
               rowIdx: 4,
               colIdx: 2,
@@ -304,6 +340,7 @@ export class ShamanTalentsPicker extends TalentsPicker {
             maxPoints: 3,
           },
           {
+            fieldName: 'mentalQuickness',
             location: {
               rowIdx: 5,
               colIdx: 0,
@@ -312,6 +349,7 @@ export class ShamanTalentsPicker extends TalentsPicker {
             maxPoints: 3,
           },
           {
+            fieldName: 'weaponMastery',
             location: {
               rowIdx: 5,
               colIdx: 3,
@@ -320,6 +358,7 @@ export class ShamanTalentsPicker extends TalentsPicker {
             maxPoints: 5,
           },
           {
+            fieldName: 'dualWieldSpecialization',
             location: {
               rowIdx: 6,
               colIdx: 0,
@@ -332,6 +371,7 @@ export class ShamanTalentsPicker extends TalentsPicker {
             maxPoints: 3,
           },
           {
+            //fieldName: 'dualWield',
             location: {
               rowIdx: 6,
               colIdx: 1,
@@ -344,6 +384,7 @@ export class ShamanTalentsPicker extends TalentsPicker {
             maxPoints: 1,
           },
           {
+            //fieldName: 'stormstrike',
             location: {
               rowIdx: 6,
               colIdx: 2,
@@ -356,6 +397,7 @@ export class ShamanTalentsPicker extends TalentsPicker {
             maxPoints: 1,
           },
           {
+            fieldName: 'unleashedRage',
             location: {
               rowIdx: 7,
               colIdx: 1,
@@ -364,6 +406,7 @@ export class ShamanTalentsPicker extends TalentsPicker {
             maxPoints: 5,
           },
           {
+            //fieldName: 'shamanisticRage',
             location: {
               rowIdx: 8,
               colIdx: 1,
@@ -378,6 +421,7 @@ export class ShamanTalentsPicker extends TalentsPicker {
         backgroundUrl: 'https://wow.zamimg.com/images/wow/talents/backgrounds/classic/262.jpg',
         talents: [
           {
+            //fieldName: 'improvedHealingWave',
             location: {
               rowIdx: 0,
               colIdx: 1,
@@ -386,6 +430,7 @@ export class ShamanTalentsPicker extends TalentsPicker {
             maxPoints: 5,
           },
           {
+            //fieldName: 'tidalFocus',
             location: {
               rowIdx: 0,
               colIdx: 2,
@@ -394,6 +439,7 @@ export class ShamanTalentsPicker extends TalentsPicker {
             maxPoints: 5,
           },
           {
+            //fieldName: 'improvedReincarnation',
             location: {
               rowIdx: 1,
               colIdx: 0,
@@ -402,6 +448,7 @@ export class ShamanTalentsPicker extends TalentsPicker {
             maxPoints: 2,
           },
           {
+            //fieldName: 'ancestralUealing',
             location: {
               rowIdx: 1,
               colIdx: 1,
@@ -410,6 +457,7 @@ export class ShamanTalentsPicker extends TalentsPicker {
             maxPoints: 3,
           },
           {
+            fieldName: 'totemicFocus',
             location: {
               rowIdx: 1,
               colIdx: 2,
@@ -418,6 +466,7 @@ export class ShamanTalentsPicker extends TalentsPicker {
             maxPoints: 5,
           },
           {
+            fieldName: 'naturesGuidance',
             location: {
               rowIdx: 2,
               colIdx: 0,
@@ -426,6 +475,7 @@ export class ShamanTalentsPicker extends TalentsPicker {
             maxPoints: 3,
           },
           {
+            //fieldName: 'healingFocus',
             location: {
               rowIdx: 2,
               colIdx: 1,
@@ -434,6 +484,7 @@ export class ShamanTalentsPicker extends TalentsPicker {
             maxPoints: 5,
           },
           {
+            //fieldName: 'totemicMastery',
             location: {
               rowIdx: 2,
               colIdx: 2,
@@ -442,6 +493,7 @@ export class ShamanTalentsPicker extends TalentsPicker {
             maxPoints: 1,
           },
           {
+            //fieldName: 'healingGrace',
             location: {
               rowIdx: 2,
               colIdx: 3,
@@ -450,6 +502,7 @@ export class ShamanTalentsPicker extends TalentsPicker {
             maxPoints: 3,
           },
           {
+            fieldName: 'restorativeTotems',
             location: {
               rowIdx: 3,
               colIdx: 1,
@@ -458,6 +511,7 @@ export class ShamanTalentsPicker extends TalentsPicker {
             maxPoints: 5,
           },
           {
+            fieldName: 'tidalMastery',
             location: {
               rowIdx: 3,
               colIdx: 2,
@@ -466,6 +520,7 @@ export class ShamanTalentsPicker extends TalentsPicker {
             maxPoints: 5,
           },
           {
+            //fieldName: 'healingWay',
             location: {
               rowIdx: 4,
               colIdx: 0,
@@ -474,6 +529,7 @@ export class ShamanTalentsPicker extends TalentsPicker {
             maxPoints: 3,
           },
           {
+            fieldName: 'naturesSwiftness',
             location: {
               rowIdx: 4,
               colIdx: 2,
@@ -482,6 +538,7 @@ export class ShamanTalentsPicker extends TalentsPicker {
             maxPoints: 1,
           },
           {
+            //fieldName: 'focusedMind',
             location: {
               rowIdx: 4,
               colIdx: 3,
@@ -490,6 +547,7 @@ export class ShamanTalentsPicker extends TalentsPicker {
             maxPoints: 3,
           },
           {
+            //fieldName: 'purification',
             location: {
               rowIdx: 5,
               colIdx: 2,
@@ -498,6 +556,7 @@ export class ShamanTalentsPicker extends TalentsPicker {
             maxPoints: 5,
           },
           {
+            //fieldName: 'manaTideTotem',
             location: {
               rowIdx: 6,
               colIdx: 1,
@@ -510,6 +569,7 @@ export class ShamanTalentsPicker extends TalentsPicker {
             maxPoints: 1,
           },
           {
+            //fieldName: 'naturesGuardian',
             location: {
               rowIdx: 6,
               colIdx: 2,
@@ -518,6 +578,7 @@ export class ShamanTalentsPicker extends TalentsPicker {
             maxPoints: 5,
           },
           {
+            fieldName: 'naturesBlessing',
             location: {
               rowIdx: 7,
               colIdx: 1,
@@ -526,6 +587,7 @@ export class ShamanTalentsPicker extends TalentsPicker {
             maxPoints: 3,
           },
           {
+            //fieldName: 'improvedChainHeal',
             location: {
               rowIdx: 7,
               colIdx: 2,
@@ -534,6 +596,7 @@ export class ShamanTalentsPicker extends TalentsPicker {
             maxPoints: 2,
           },
           {
+            //fieldName: 'earthShield',
             location: {
               rowIdx: 8,
               colIdx: 1,
@@ -548,5 +611,21 @@ export class ShamanTalentsPicker extends TalentsPicker {
         ],
       },
     ]);
+  }
+
+  getTalents(): ShamanTalents {
+    const talents = ShamanTalents.create();
+
+    this.trees.forEach(tree => tree.talents.forEach(talent => {
+      if (talent.config.fieldName) {
+        if (talent.config.maxPoints == 1) {
+          (talents[talent.config.fieldName] as boolean) = talent.getPoints() > 0;
+        } else {
+          (talents[talent.config.fieldName] as number) = talent.getPoints();
+        }
+      }
+    }));
+
+    return talents;
   }
 }

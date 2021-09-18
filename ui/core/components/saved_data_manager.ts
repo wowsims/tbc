@@ -9,8 +9,8 @@ export type SavedDataManagerConfig<T> = {
   label: string;
   changeEmitters: Array<TypedEvent<any>>,
   equals: (a: T, b: T) => boolean;
-  getData: (sim: Sim) => T;
-  setData: (sim: Sim, data: T) => void;
+  getData: (sim: Sim<any>) => T;
+  setData: (sim: Sim<any>, data: T) => void;
   toJson: (a: T) => any;
   fromJson: (obj: any) => T;
 };
@@ -22,7 +22,7 @@ type SavedData<T> = {
 };
 
 export class SavedDataManager<T> extends Component {
-  private readonly _sim: Sim;
+  private readonly _sim: Sim<any>;
   private readonly _config: SavedDataManagerConfig<T>;
 
   private readonly _userData: Array<SavedData<T>>;
@@ -31,7 +31,7 @@ export class SavedDataManager<T> extends Component {
   private readonly _savedDataDiv: HTMLElement;
   private readonly _saveInput: HTMLInputElement;
 
-  constructor(parent: HTMLElement, sim: Sim, config: SavedDataManagerConfig<T>) {
+  constructor(parent: HTMLElement, sim: Sim<any>, config: SavedDataManagerConfig<T>) {
     super(parent, 'saved-data-manager-root');
     this._sim = sim;
     this._config = config;

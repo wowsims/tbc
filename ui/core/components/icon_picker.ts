@@ -1,6 +1,6 @@
-import { GetIconUrl } from '../resources';
+import { getIconUrl } from '../resources';
 import { ItemOrSpellId } from '../resources';
-import { SetWowheadHref } from '../resources';
+import { setWowheadHref } from '../resources';
 import { Sim } from '../sim';
 import { TypedEvent } from '../typed_event';
 import { isRightClick } from '../utils';
@@ -13,7 +13,7 @@ import { Component } from './component';
 export class IconPicker extends Component {
   private readonly _inputs: Array<IconInputComponent>;
 
-  constructor(parent: HTMLElement, rootClass: string, sim: Sim, inputs: Array<IconInput>, theme: Theme) {
+  constructor(parent: HTMLElement, rootClass: string, sim: Sim<any>, inputs: Array<IconInput>, theme: Theme<any>) {
     super(parent, 'icon-picker-root');
     this.rootElem.classList.add(rootClass);
 
@@ -23,14 +23,14 @@ export class IconPicker extends Component {
 
 class IconInputComponent extends Component {
   private readonly _input: IconInput;
-  private readonly _sim: Sim;
+  private readonly _sim: Sim<any>;
 
   private readonly _rootAnchor: HTMLAnchorElement;
   private readonly _improvedAnchor: HTMLAnchorElement;
   private readonly _counterElem: HTMLElement;
   private readonly _clickedEmitter = new TypedEvent<void>();
 
-  constructor(parent: HTMLElement, sim: Sim, input: IconInput, theme: Theme) {
+  constructor(parent: HTMLElement, sim: Sim<any>, input: IconInput, theme: Theme<any>) {
     super(parent, 'icon-input', document.createElement('a'));
     this._input = input;
     this._sim = sim;
@@ -49,15 +49,15 @@ class IconInputComponent extends Component {
     this._improvedAnchor = this._rootAnchor.getElementsByClassName('icon-input-improved')[0] as HTMLAnchorElement;
     this._counterElem = this._rootAnchor.getElementsByClassName('icon-input-counter')[0] as HTMLAnchorElement;
 
-    SetWowheadHref(this._rootAnchor, this._input.id);
-    GetIconUrl(this._input.id).then(url => {
+    setWowheadHref(this._rootAnchor, this._input.id);
+    getIconUrl(this._input.id).then(url => {
       this._rootAnchor.style.backgroundImage = `url('${url}')`;
     });
 
     if (this._input.states == 3) {
       if (this._input.improvedId) {
-        SetWowheadHref(this._improvedAnchor, this._input.improvedId);
-        GetIconUrl(this._input.improvedId).then(url => {
+        setWowheadHref(this._improvedAnchor, this._input.improvedId);
+        getIconUrl(this._input.improvedId).then(url => {
           this._improvedAnchor.style.backgroundImage = `url('${url}')`;
         });
       } else {
@@ -154,10 +154,10 @@ export type IconInput = {
   // effect is enabled.
   exclusivityTags?: Array<ExclusivityTag>;
 
-  changedEvent: (sim: Sim) => TypedEvent<any>;
-  getValue: (sim: Sim) => boolean | number;
+  changedEvent: (sim: Sim<any>) => TypedEvent<any>;
+  getValue: (sim: Sim<any>) => boolean | number;
 
   // Exactly one of these should be set.
-  setBooleanValue?: (sim: Sim, newValue: boolean) => void;
-  setNumberValue?: (sim: Sim, newValue: number) => void;
+  setBooleanValue?: (sim: Sim<any>, newValue: boolean) => void;
+  setNumberValue?: (sim: Sim<any>, newValue: number) => void;
 };
