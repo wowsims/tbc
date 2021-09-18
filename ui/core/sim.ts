@@ -34,8 +34,10 @@ import * as Enchants from './enchants';
 import * as Gems from './gems';
 
 const STATS_LEN = Object.keys(Stat).length;
-
 export type CustomStats = Array<number>;
+export function NewCustomStats(): CustomStats {
+  return new Array(STATS_LEN).fill(0);
+}
 
 export interface SimConfig {
   spec: Spec;
@@ -81,7 +83,7 @@ export class Sim {
     this._encounter = config.defaults.encounter;
     this._buffs = config.defaults.buffs;
     this._consumes = config.defaults.consumes;
-    this._customStats = new Array(STATS_LEN).fill(0);
+    this._customStats = NewCustomStats();
   }
 
   async init(): Promise<void> {

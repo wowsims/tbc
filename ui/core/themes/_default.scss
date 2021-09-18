@@ -7,6 +7,7 @@
 @import "../components/race_picker";
 @import "../components/results";
 @import "../components/saved_data_manager";
+@import "../shared";
 @import "../talents/talents_picker";
 
 td, th {
@@ -117,6 +118,7 @@ $main-background-color: #F0FFFF;
   width: 30%;
   text-align: center;
   border-left: 3px solid black;
+  position: relative;
 }
 
 .custom-stats-root {
@@ -128,6 +130,12 @@ $main-background-color: #F0FFFF;
   justify-content: end;
 }
 
+.saved-gear-manager {
+  @include vertical-bottom;
+  @include horizontal-right;
+  text-align: right;
+}
+
 .settings-section {
   border: 4px solid black;
   border-radius: 8px;
@@ -135,8 +143,9 @@ $main-background-color: #F0FFFF;
   display: inline-block;
   padding: 4px;
   padding-top: 15px;
-  margin: 10px;
+  margin: 20px;
   min-width: 100px;
+  vertical-align: top;
 }
 
 .settings-section>label {
@@ -150,8 +159,32 @@ $main-background-color: #F0FFFF;
   font-size: 18px;
 }
 
+.settings-left-bar {
+  display: inline-block;
+}
+
+.settings-bottom-bar {
+  margin: 20px;
+  display: flex;
+  justify-content: space-around;
+}
+
+.saved-encounter-manager {
+  display: inline-block;
+  text-align: left;
+}
+
+.saved-settings-manager {
+  display: inline-block;
+  text-align: right;
+}
+
 .race-picker {
   text-align: center;
+}
+
+.race-picker, .encounter-section {
+  display: block;
 }
 
 .encounter-section .number-picker-root {

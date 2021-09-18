@@ -1,6 +1,12 @@
 import { Gear } from '../gear';
+import { CustomStats } from '../sim';
+import { NewCustomStats } from '../sim';
 import { Sim } from '../sim';
+import { Buffs } from '../api/newapi';
+import { Consumes } from '../api/newapi';
+import { Encounter } from '../api/newapi';
 import { EquipmentSpec } from '../api/newapi';
+import { Race } from '../api/newapi';
 import { Spec } from '../api/newapi';
 import { Stat } from '../api/newapi';
 import { Actions } from '../components/actions';
@@ -23,8 +29,28 @@ export interface DefaultThemeConfig extends ThemeConfig {
   showTargetArmor: boolean;
   showNumTargets: boolean;
   presets: {
-    gear: Record<string, EquipmentSpec>;
+    gear: Array<{
+      name: string,
+      tooltip?: string,
+      equipment: EquipmentSpec,
+    }>;
+    encounters: Array<{
+      name: string,
+      tooltip?: string,
+      encounter: Encounter,
+    }>;
   },
+}
+
+export interface GearAndStats {
+  gear: Gear,
+  customStats: CustomStats,
+}
+
+export interface Settings {
+  buffs: Buffs,
+  consumes: Consumes,
+  race: Race,
 }
 
 export class DefaultTheme extends Theme {
@@ -43,10 +69,9 @@ export class DefaultTheme extends Theme {
     const gearPicker = new GearPicker(this.parentElem.getElementsByClassName('gear-picker')[0] as HTMLElement, this.sim);
     const customStatsPicker = new CustomStatsPicker(this.parentElem.getElementsByClassName('custom-stats-picker')[0] as HTMLElement, this.sim, config.epStats);
 
-    const racePicker = new RacePicker(this.parentElem.getElementsByClassName('race-picker')[0] as HTMLElement, this.sim);
     const talentsPicker = newTalentsPicker(config.spec, this.parentElem.getElementsByClassName('talents-picker')[0] as HTMLElement, this.sim);
 
-    const settingsTab = document.getElementsByClassName('settings-tab')[0] as HTMLElement;
+    const settingsTab = document.getElementsByClassName('settings-inputs')[0] as HTMLElement;
     Object.keys(config.iconSections).forEach(pickerName => {
       const section = config.iconSections[pickerName];
 
@@ -58,12 +83,9 @@ export class DefaultTheme extends Theme {
       const iconPicker = new IconPicker(sectionElem, pickerName + '-icon-picker', this.sim, section, this);
     });
 
+    const racePicker = new RacePicker(this.parentElem.getElementsByClassName('race-picker')[0] as HTMLElement, this.sim);
 
-    const encounterSectionElem = document.createElement('section');
-    encounterSectionElem.classList.add('settings-section', 'encounter-section');
-    encounterSectionElem.innerHTML = `<label>Encounter</label>`;
-    settingsTab.appendChild(encounterSectionElem);
-
+    const encounterSectionElem = settingsTab.getElementsByClassName('encounter-section')[0] as HTMLElement;
     new NumberPicker(encounterSectionElem, this.sim, {
       label: 'Duration',
       changedEvent: (sim: Sim) => sim.encounterChangeEmitter,
@@ -104,21 +126,90 @@ export class DefaultTheme extends Theme {
   }
 
   async init(): Promise<void> {
-    const savedGearManager = new SavedDataManager<Gear>(this.parentElem.getElementsByClassName('saved-gear-manager')[0] as HTMLElement, this.sim, {
+    const savedGearManager = new SavedDataManager<GearAndStats>(this.parentElem.getElementsByClassName('saved-gear-manager')[0] as HTMLElement, this.sim, {
       label: 'Gear',
-      presets: {},
-      getData: (sim: Sim) => sim.getGear(),
-      setData: (sim: Sim, newGear: Gear) => sim.setGear(newGear),
-      changeEmitter: this.sim.gearChangeEmitter,
-      equals: (a: Gear, b: Gear) => a.equals(b),
+      getData: (sim: Sim) => {
+        return {
+          gear: sim.getGear(),
+          customStats: sim.getCustomStats(),
+        };
+      },
+      setData: (sim: Sim, newGearAndStats: GearAndStats) => {
+        sim.setGear(newGearAndStats.gear);
+        sim.setCustomStats(newGearAndStats.customStats);
+      },
+      changeEmitters: [this.sim.gearChangeEmitter, this.sim.customStatsChangeEmitter],
+      equals: (a: GearAndStats, b: GearAndStats) => a.gear.equals(b.gear) && JSON.stringify(a.customStats) == JSON.stringify(b.customStats),
+      toJson: (a: GearAndStats) => {
+        return {
+          gear: EquipmentSpec.toJson(a.gear.asSpec()),
+          customStats: a.customStats,
+        };
+      },
+      fromJson: (obj: any) => {
+        return {
+          gear: this.sim.lookupEquipmentSpec(EquipmentSpec.fromJson(obj['gear'])),
+          customStats: obj['customStats'],
+        };
+      },
+    });
+
+    const savedEncounterManager = new SavedDataManager<Encounter>(this.parentElem.getElementsByClassName('saved-encounter-manager')[0] as HTMLElement, this.sim, {
+      label: 'Encounter',
+      getData: (sim: Sim) => sim.getEncounter(),
+      setData: (sim: Sim, newEncounter: Encounter) => sim.setEncounter(newEncounter),
+      changeEmitters: [this.sim.encounterChangeEmitter],
+      equals: (a: Encounter, b: Encounter) => Encounter.equals(a, b),
+      toJson: (a: Encounter) => Encounter.toJson(a),
+      fromJson: (obj: any) => Encounter.fromJson(obj),
+    });
+
+    const savedSettingsManager = new SavedDataManager<Settings>(this.parentElem.getElementsByClassName('saved-settings-manager')[0] as HTMLElement, this.sim, {
+      label: 'Settings',
+      getData: (sim: Sim) => {
+        return {
+          buffs: sim.getBuffs(),
+          consumes: sim.getConsumes(),
+          race: sim.getRace(),
+        };
+      },
+      setData: (sim: Sim, newSettings: Settings) => {
+        sim.setBuffs(newSettings.buffs);
+        sim.setConsumes(newSettings.consumes);
+        sim.setRace(newSettings.race);
+      },
+      changeEmitters: [this.sim.buffsChangeEmitter, this.sim.consumesChangeEmitter, this.sim.raceChangeEmitter],
+      equals: (a: Settings, b: Settings) => Buffs.equals(a.buffs, b.buffs) && Consumes.equals(a.consumes, b.consumes) && a.race == b.race,
+      toJson: (a: Settings) => {
+        return {
+          buffs: Buffs.toJson(a.buffs),
+          consumes: Consumes.toJson(a.consumes),
+          race: a.race,
+        };
+      },
+      fromJson: (obj: any) => {
+        return {
+          buffs: Buffs.fromJson(obj['buffs']),
+          consumes: Consumes.fromJson(obj['consumes']),
+          race: Number(obj['race']),
+        };
+      },
     });
 
     await super.init();
 
-    Object.keys(this._config.presets.gear).forEach(setName => {
-      const gear = this.sim.lookupEquipmentSpec(this._config.presets.gear[setName]);
-      savedGearManager.addSavedData(setName, gear, true);
+    savedGearManager.loadUserData();
+    this._config.presets.gear.forEach(gearConfig => {
+      const gear = this.sim.lookupEquipmentSpec(gearConfig.equipment);
+      savedGearManager.addSavedData(gearConfig.name, { gear: gear, customStats: NewCustomStats(), }, true, gearConfig.tooltip);
     });
+
+    savedEncounterManager.loadUserData();
+    this._config.presets.encounters.forEach(encounterConfig => {
+      savedEncounterManager.addSavedData(encounterConfig.name, encounterConfig.encounter, true, encounterConfig.tooltip);
+    });
+
+    savedSettingsManager.loadUserData();
   }
 }
 
@@ -147,20 +238,33 @@ const layoutHTML = `
           <div class="left-gear-panel">
             <div class="gear-picker">
             </div>
-            <div class="saved-gear-manager">
-            </div>
           </div>
           <div class="right-gear-panel">
             <div class="custom-stats-picker">
+            </div>
+            <div class="saved-gear-manager">
             </div>
           </div>
         </div>
       </div>
       <div id="settings-tab" class="tab-pane fade"">
         <div class="settings-tab">
-          <section class="settings-section race-picker">
-            <label>Race</label>
-          </section>
+          <div class="settings-inputs">
+            <div class="settings-left-bar">
+              <section class="settings-section encounter-section">
+                <label>Encounter</label>
+              </section>
+              <section class="settings-section race-picker">
+                <label>Race</label>
+              </section>
+            </div>
+          </div>
+          <div class="settings-bottom-bar">
+            <div class="saved-encounter-manager">
+            </div>
+            <div class="saved-settings-manager">
+            </div>
+          </div>
         </div>
       </div>
       <div id="talents-tab" class="tab-pane fade"">

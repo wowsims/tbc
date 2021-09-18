@@ -25,6 +25,11 @@
   bottom: 0;
 }
 
+@mixin horizontal-left {
+  position: absolute;
+  left: 0;
+}
+
 @mixin horizontal-right {
   position: absolute;
   right: 0;

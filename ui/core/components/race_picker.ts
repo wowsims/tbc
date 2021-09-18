@@ -22,8 +22,8 @@ export class RacePicker extends Component {
     });
 
     raceSelector.value = String(sim.getRace());
-    sim.raceChangeEmitter.on(newRace => {
-      raceSelector.value = String(newRace);
+    sim.raceChangeEmitter.on(() => {
+      raceSelector.value = String(sim.getRace());
     });
 
     raceSelector.addEventListener('change', event => {

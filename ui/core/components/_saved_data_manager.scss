@@ -23,6 +23,14 @@
   color: yellow;
 }
 
+.saved-data-set-chip:not(.saved-data-has-tooltip) .saved-data-set-tooltip {
+  display: none;
+}
+
 .saved-data-set-chip.saved-data-preset .saved-data-set-delete {
   display: none;
+}
+
+.saved-data-save-input {
+  width: 100px;
 }
