@@ -52,6 +52,7 @@ export interface SimConfig<SpecType extends Spec> {
   },
 }
 
+// Core Sim module which deals only with api types, no UI-related stuff.
 export class Sim<SpecType extends Spec> {
   readonly spec: Spec;
 
@@ -60,13 +61,17 @@ export class Sim<SpecType extends Spec> {
   readonly customStatsChangeEmitter = new TypedEvent<void>();
   readonly encounterChangeEmitter = new TypedEvent<void>();
   readonly gearChangeEmitter = new TypedEvent<void>();
-  readonly gearListEmitter = new TypedEvent<GearListResult>();
   readonly raceChangeEmitter = new TypedEvent<void>();
   readonly agentChangeEmitter = new TypedEvent<void>();
   readonly talentsChangeEmitter = new TypedEvent<void>();
   // Talents dont have all fields so we need this
   readonly talentsStringChangeEmitter = new TypedEvent<void>();
   readonly specOptionsChangeEmitter = new TypedEvent<void>();
+
+  // Emits when any of the above emitters emit.
+  readonly changeEmitter = new TypedEvent<void>();
+
+  readonly gearListEmitter = new TypedEvent<GearListResult>();
 
   // Database
   private _items: Record<number, Item> = {};
@@ -104,6 +109,19 @@ export class Sim<SpecType extends Spec> {
     this._talents = this.specTypeFunctions.talentsCreate();
     this._talentsString = config.defaults.talents;
     this._specOptions = config.defaults.specOptions;
+
+    [
+      this.buffsChangeEmitter,
+      this.consumesChangeEmitter,
+      this.customStatsChangeEmitter,
+      this.encounterChangeEmitter,
+      this.gearChangeEmitter,
+      this.raceChangeEmitter,
+      this.agentChangeEmitter,
+      this.talentsChangeEmitter,
+      this.talentsStringChangeEmitter,
+      this.specOptionsChangeEmitter,
+    ].forEach(emitter => emitter.on(() => this.changeEmitter.emit()));
   }
 
   async init(): Promise<void> {
@@ -434,5 +452,33 @@ export class Sim<SpecType extends Spec> {
     parts.push('pcs=' + this._gear.asArray().filter(ei => ei != null).map(ei => ei!.item.id).join(':'));
 
     elem.setAttribute('data-wowhead', parts.join('&'));
+  }
+
+  // Returns JSON representing all the current values.
+  toJson(): Object {
+    return {
+      'buffs': Buffs.toJson(this._buffs),
+      'consumes': Consumes.toJson(this._consumes),
+      'customStats': this._customStats.toJson(),
+      'encounter': Encounter.toJson(this._encounter),
+      'gear': EquipmentSpec.toJson(this._gear.asSpec()),
+      'race': this._race,
+      'agent': this.specTypeFunctions.agentToJson(this._agent),
+      'talents': this._talentsString,
+      'specOptions': this.specTypeFunctions.optionsToJson(this._specOptions),
+    };
+  }
+
+  // Set all the current values, assumes obj is the same type returned by toJson().
+  fromJson(obj: any) {
+    this.setBuffs(Buffs.fromJson(obj['buffs']));
+    this.setConsumes(Consumes.fromJson(obj['consumes']));
+    this.setCustomStats(Stats.fromJson(obj['customStats']));
+    this.setEncounter(Encounter.fromJson(obj['encounter']));
+    this.setGear(this.lookupEquipmentSpec(EquipmentSpec.fromJson(obj['gear'])));
+    this.setRace(obj['race']);
+    this.setAgent(this.specTypeFunctions.agentFromJson(obj['agent']));
+    this.setTalentsString(obj['talents']);
+    this.setSpecOptions(this.specTypeFunctions.optionsFromJson(obj['specOptions']));
   }
 }

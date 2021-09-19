@@ -3,6 +3,8 @@ import { TypedEvent } from '../typed_event';
 import { Class } from '../api/newapi';
 import { Spec } from '../api/newapi';
 
+const CURRENT_SETTINGS_KEY = 'current';
+
 export interface ThemeConfig<SpecType extends Spec> extends SimConfig<SpecType> {
 }
 
@@ -29,6 +31,38 @@ export abstract class Theme<SpecType extends Spec> {
 
   async init(): Promise<void> {
     await this.sim.init();
+
+    let loadedSettings = false;
+
+    let hash = window.location.hash;
+    if (hash.length > 1) {
+      // Remove leading '#'
+      hash = hash.substring(1);
+      try {
+        const simJsonStr = atob(hash);
+        this.sim.fromJson(JSON.parse(simJsonStr));
+        loadedSettings = true;
+      } catch (e) {
+        console.warn('Failed to parse settings from window hash: ' + e);
+      }
+    }
+
+    const savedSettings = window.localStorage.getItem(CURRENT_SETTINGS_KEY);
+    if (!loadedSettings && savedSettings != null) {
+      try {
+        this.sim.fromJson(JSON.parse(savedSettings));
+      } catch (e) {
+        console.warn('Failed to parse saved settings: ' + e);
+      }
+    }
+
+    this.sim.changeEmitter.on(() => {
+      const simJsonStr = JSON.stringify(this.sim.toJson());
+      window.localStorage.setItem(CURRENT_SETTINGS_KEY, simJsonStr);
+
+      const b64Str = btoa(simJsonStr);
+      window.location.hash = b64Str;
+    });
   }
 
   registerExclusiveEffect(effect: ExclusiveEffect) {
