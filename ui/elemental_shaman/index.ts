@@ -69,6 +69,7 @@ const theme = new DefaultTheme<Spec.SpecElementalShaman>(document.body, {
     Stat.StatStamina,
     Stat.StatIntellect,
     Stat.StatSpellPower,
+    Stat.StatNatureSpellPower,
     Stat.StatSpellHit,
     Stat.StatSpellCrit,
     Stat.StatSpellHaste,
