@@ -4,8 +4,8 @@ import { setWowheadHref } from '../resources';
 import { Sim } from '../sim';
 import { TypedEvent } from '../typed_event';
 import { isRightClick } from '../utils';
-import { ExclusivityTag } from '../themes/theme';
-import { Theme } from '../themes/theme';
+import { ExclusivityTag } from '../sim_ui';
+import { SimUI } from '../sim_ui';
 
 import { Component } from './component';
 
@@ -13,11 +13,11 @@ import { Component } from './component';
 export class IconPicker extends Component {
   private readonly _inputs: Array<IconInputComponent>;
 
-  constructor(parent: HTMLElement, rootClass: string, sim: Sim<any>, inputs: Array<IconInput>, theme: Theme<any>) {
+  constructor(parent: HTMLElement, rootClass: string, sim: Sim<any>, inputs: Array<IconInput>, simUI: SimUI<any>) {
     super(parent, 'icon-picker-root');
     this.rootElem.classList.add(rootClass);
 
-    this._inputs = inputs.map(input => new IconInputComponent(this.rootElem, sim, input, theme));
+    this._inputs = inputs.map(input => new IconInputComponent(this.rootElem, sim, input, simUI));
   }
 }
 
@@ -30,7 +30,7 @@ class IconInputComponent extends Component {
   private readonly _counterElem: HTMLElement;
   private readonly _clickedEmitter = new TypedEvent<void>();
 
-  constructor(parent: HTMLElement, sim: Sim<any>, input: IconInput, theme: Theme<any>) {
+  constructor(parent: HTMLElement, sim: Sim<any>, input: IconInput, simUI: SimUI<any>) {
     super(parent, 'icon-input', document.createElement('a'));
     this._input = input;
     this._sim = sim;
@@ -91,7 +91,7 @@ class IconInputComponent extends Component {
     });
 
     if (this._input.exclusivityTags) {
-      theme.registerExclusiveEffect({
+      simUI.registerExclusiveEffect({
         tags: this._input.exclusivityTags,
         changedEvent: this._clickedEmitter,
         isActive: () => Boolean(this.getValue()),

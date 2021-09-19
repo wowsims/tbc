@@ -26,9 +26,9 @@ import { Results } from '../components/results';
 import { SavedDataManager } from '../components/saved_data_manager';
 import { newTalentsPicker } from '../talents/factory';
 
-import { Theme, ThemeConfig } from './theme';
+import { SimUI, SimUIConfig } from '../sim_ui';
 
-export interface DefaultThemeConfig<SpecType extends Spec> extends ThemeConfig<SpecType> {
+export interface DefaultThemeConfig<SpecType extends Spec> extends SimUIConfig<SpecType> {
   displayStats: Array<Stat>;
   iconSections: Record<string, Array<IconInput>>;
   otherSections: Record<string, Array<
@@ -75,7 +75,7 @@ export interface Settings {
   race: Race,
 }
 
-export class DefaultTheme<SpecType extends Spec> extends Theme<SpecType> {
+export class DefaultTheme<SpecType extends Spec> extends SimUI<SpecType> {
   private readonly _config: DefaultThemeConfig<SpecType>;
 
   constructor(parentElem: HTMLElement, config: DefaultThemeConfig<SpecType>) {

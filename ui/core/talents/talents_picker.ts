@@ -76,14 +76,6 @@ export abstract class TalentsPicker<SpecType extends Spec> extends Component {
     this.trees.forEach((tree, idx) => tree.setTalentsString(parts[idx] || ''));
     this.update();
   }
-
-  //saveUserData() {
-  //  window.localStorage.setItem(TALENTS_STORAGE_KEY, this.getTalentsString());
-  //}
-
-  //loadUserData() {
-  //  this.setTalentsString(window.localStorage.getItem(TALENTS_STORAGE_KEY));
-  //}
 }
 
 class TalentTreePicker<SpecType extends Spec> extends Component {

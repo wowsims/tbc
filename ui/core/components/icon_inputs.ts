@@ -3,7 +3,7 @@ import { Consumes } from '../api/newapi'
 import { ItemOrSpellId } from '../resources'
 import { Sim } from '../sim'
 
-import { ExclusivityTag } from '../themes/theme';
+import { ExclusivityTag } from '../sim_ui';
 import { IconInput } from './icon_picker'
 
 // Keep each section in alphabetical order.

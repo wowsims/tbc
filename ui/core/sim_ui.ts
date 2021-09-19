@@ -1,20 +1,21 @@
-import { Sim, SimConfig } from '../sim';
-import { TypedEvent } from '../typed_event';
-import { Class } from '../api/newapi';
-import { Spec } from '../api/newapi';
+import { Sim, SimConfig } from './sim';
+import { TypedEvent } from './typed_event';
+import { Class } from './api/newapi';
+import { Spec } from './api/newapi';
 
 const CURRENT_SETTINGS_KEY = 'current';
 
-export interface ThemeConfig<SpecType extends Spec> extends SimConfig<SpecType> {
+export interface SimUIConfig<SpecType extends Spec> extends SimConfig<SpecType> {
 }
 
-export abstract class Theme<SpecType extends Spec> {
+// Core UI module.
+export abstract class SimUI<SpecType extends Spec> {
   readonly parentElem: HTMLElement;
   readonly sim: Sim<SpecType>;
 
   private readonly exclusivityMap: Record<ExclusivityTag, Array<ExclusiveEffect>>;
 
-  constructor(parentElem: HTMLElement, config: ThemeConfig<SpecType>) {
+  constructor(parentElem: HTMLElement, config: SimUIConfig<SpecType>) {
     this.parentElem = parentElem;
     this.sim = new Sim<SpecType>(config);
 
