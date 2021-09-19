@@ -3,7 +3,7 @@ import { TypedEvent } from './typed_event';
 import { Class } from './api/newapi';
 import { Spec } from './api/newapi';
 
-const CURRENT_SETTINGS_KEY = 'current';
+const CURRENT_SETTINGS_KEY = '__currentSettings__';
 
 export interface SimUIConfig<SpecType extends Spec> extends SimConfig<SpecType> {
 }
