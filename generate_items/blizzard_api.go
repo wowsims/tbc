@@ -1,5 +1,8 @@
 package main
 
+// This module is not used, because apparently blizzard API does not provide gem sockets on items.
+// Just in case this is useful later it is being kept for now.
+
 import (
   "bytes"
   "encoding/json"
