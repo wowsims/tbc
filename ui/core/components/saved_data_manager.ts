@@ -1,3 +1,4 @@
+import { Spec } from '../api/newapi';
 import { Sim } from '../sim';
 import { TypedEvent } from '../typed_event';
 
@@ -5,12 +6,12 @@ import { Component } from '../components/component';
 
 declare var tippy: any;
 
-export type SavedDataManagerConfig<T> = {
+export type SavedDataManagerConfig<SpecType extends Spec, T> = {
   label: string;
   changeEmitters: Array<TypedEvent<any>>,
   equals: (a: T, b: T) => boolean;
-  getData: (sim: Sim<any>) => T;
-  setData: (sim: Sim<any>, data: T) => void;
+  getData: (sim: Sim<SpecType>) => T;
+  setData: (sim: Sim<SpecType>, data: T) => void;
   toJson: (a: T) => any;
   fromJson: (obj: any) => T;
 };
@@ -21,9 +22,9 @@ type SavedData<T> = {
   elem: HTMLElement;
 };
 
-export class SavedDataManager<T> extends Component {
-  private readonly _sim: Sim<any>;
-  private readonly _config: SavedDataManagerConfig<T>;
+export class SavedDataManager<SpecType extends Spec, T> extends Component {
+  private readonly _sim: Sim<SpecType>;
+  private readonly _config: SavedDataManagerConfig<SpecType, T>;
 
   private readonly _userData: Array<SavedData<T>>;
   private readonly _presets: Array<SavedData<T>>;
@@ -31,7 +32,7 @@ export class SavedDataManager<T> extends Component {
   private readonly _savedDataDiv: HTMLElement;
   private readonly _saveInput: HTMLInputElement;
 
-  constructor(parent: HTMLElement, sim: Sim<any>, config: SavedDataManagerConfig<T>) {
+  constructor(parent: HTMLElement, sim: Sim<Spec>, config: SavedDataManagerConfig<SpecType, T>) {
     super(parent, 'saved-data-manager-root');
     this._sim = sim;
     this._config = config;

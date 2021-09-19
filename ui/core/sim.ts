@@ -20,11 +20,11 @@ import { Spec } from './api/newapi';
 import { Stat } from './api/newapi';
 import { makeIndividualSimRequest } from './api/request_helpers';
 import { Stats } from './api/stats';
-import { ClassAgent } from './api/utils';
-import { ClassTalents } from './api/utils';
-import { ClassTypeFunctions } from './api/utils';
-import { classTypeFunctions } from './api/utils';
-import { ClassOptions } from './api/utils';
+import { SpecAgent } from './api/utils';
+import { SpecTalents } from './api/utils';
+import { SpecTypeFunctions } from './api/utils';
+import { specTypeFunctions } from './api/utils';
+import { SpecOptions } from './api/utils';
 import { specToClass } from './api/utils';
 import { specToEligibleRaces } from './api/utils';
 import { getEligibleItemSlots } from './api/utils';
@@ -38,13 +38,7 @@ import { Listener } from './typed_event';
 import { TypedEvent } from './typed_event';
 import { wait } from './utils';
 
-// These imports are not used, but they are needed to make sure these files
-// are included in the compiled js.
-import * as Enchants from './constants/enchants';
-import * as Gems from './constants/gems';
-import * as Tooltips from './constants/tooltips';
-
-export interface SimConfig<ClassType extends Class> {
+export interface SimConfig<SpecType extends Spec> {
   spec: Spec;
   epStats: Array<Stat>;
   epReferenceStat: Stat;
@@ -52,11 +46,13 @@ export interface SimConfig<ClassType extends Class> {
     encounter: Encounter,
     buffs: Buffs,
     consumes: Consumes,
-    classOptions: ClassOptions<ClassType>,
+    agent: SpecAgent<SpecType>,
+    talents: string,
+    specOptions: SpecOptions<SpecType>,
   },
 }
 
-export class Sim<ClassType extends Class> {
+export class Sim<SpecType extends Spec> {
   readonly spec: Spec;
 
   readonly buffsChangeEmitter = new TypedEvent<void>();
@@ -70,7 +66,7 @@ export class Sim<ClassType extends Class> {
   readonly talentsChangeEmitter = new TypedEvent<void>();
   // Talents dont have all fields so we need this
   readonly talentsStringChangeEmitter = new TypedEvent<void>();
-  readonly classOptionsChangeEmitter = new TypedEvent<void>();
+  readonly specOptionsChangeEmitter = new TypedEvent<void>();
 
   // Database
   private _items: Record<number, Item> = {};
@@ -84,31 +80,30 @@ export class Sim<ClassType extends Class> {
   private _gear: Gear;
   private _encounter: Encounter;
   private _race: Race;
-  private _agent: ClassAgent<ClassType>;
-  private _talents: ClassTalents<ClassType>;
+  private _agent: SpecAgent<SpecType>;
+  private _talents: SpecTalents<SpecType>;
   private _talentsString: string;
-  private _classOptions: ClassOptions<ClassType>;
+  private _specOptions: SpecOptions<SpecType>;
 
-  private readonly _classTypeFunctions: ClassTypeFunctions<ClassType>;
+  readonly specTypeFunctions: SpecTypeFunctions<SpecType>;
 
   private _init = false;
 
-  constructor(config: SimConfig<ClassType>) {
+  constructor(config: SimConfig<SpecType>) {
     this.spec = config.spec;
     this._race = specToEligibleRaces[this.spec][0];
 
-    const playerClass = specToClass[this.spec];
-    this._classTypeFunctions = classTypeFunctions[playerClass] as ClassTypeFunctions<ClassType>;
+    this.specTypeFunctions = specTypeFunctions[this.spec] as SpecTypeFunctions<SpecType>;
 
     this._gear = new Gear({});
     this._encounter = config.defaults.encounter;
     this._buffs = config.defaults.buffs;
     this._consumes = config.defaults.consumes;
     this._customStats = new Stats();
-    this._agent = this._classTypeFunctions.agentCreate();
-    this._talents = this._classTypeFunctions.talentsCreate();
-    this._talentsString = '';
-    this._classOptions = config.defaults.classOptions;
+    this._agent = config.defaults.agent;
+    this._talents = this.specTypeFunctions.talentsCreate();
+    this._talentsString = config.defaults.talents;
+    this._specOptions = config.defaults.specOptions;
   }
 
   async init(): Promise<void> {
@@ -220,28 +215,28 @@ export class Sim<ClassType extends Class> {
     this.customStatsChangeEmitter.emit();
   }
 
-  getAgent(): ClassAgent<ClassType> {
-    return this._classTypeFunctions.agentCopy(this._agent);
+  getAgent(): SpecAgent<SpecType> {
+    return this.specTypeFunctions.agentCopy(this._agent);
   }
 
-  setAgent(newAgent: ClassAgent<ClassType>) {
-    if (this._classTypeFunctions.agentEquals(newAgent, this._agent))
+  setAgent(newAgent: SpecAgent<SpecType>) {
+    if (this.specTypeFunctions.agentEquals(newAgent, this._agent))
       return;
 
-    this._agent = this._classTypeFunctions.agentCopy(newAgent);
+    this._agent = this.specTypeFunctions.agentCopy(newAgent);
     this.agentChangeEmitter.emit();
   }
 
   // Commented because this should NOT be used; all external uses should be able to use getTalentsString()
-  //getTalents(): ClassTalents<ClassType> {
-  //  return this._classTypeFunctions.talentsCopy(this._talents);
+  //getTalents(): SpecTalents<SpecType> {
+  //  return this.specTypeFunctions.talentsCopy(this._talents);
   //}
 
-  setTalents(newTalents: ClassTalents<ClassType>) {
-    if (this._classTypeFunctions.talentsEquals(newTalents, this._talents))
+  setTalents(newTalents: SpecTalents<SpecType>) {
+    if (this.specTypeFunctions.talentsEquals(newTalents, this._talents))
       return;
 
-    this._talents = this._classTypeFunctions.talentsCopy(newTalents);
+    this._talents = this.specTypeFunctions.talentsCopy(newTalents);
     this.talentsChangeEmitter.emit();
   }
 
@@ -257,16 +252,16 @@ export class Sim<ClassType extends Class> {
     this.talentsStringChangeEmitter.emit();
   }
 
-  getClassOptions(): ClassOptions<ClassType> {
-    return this._classTypeFunctions.optionsCopy(this._classOptions);
+  getSpecOptions(): SpecOptions<SpecType> {
+    return this.specTypeFunctions.optionsCopy(this._specOptions);
   }
 
-  setClassOptions(newClassOptions: ClassOptions<ClassType>) {
-    if (this._classTypeFunctions.optionsEquals(newClassOptions, this._classOptions))
+  setSpecOptions(newSpecOptions: SpecOptions<SpecType>) {
+    if (this.specTypeFunctions.optionsEquals(newSpecOptions, this._specOptions))
       return;
 
-    this._classOptions = this._classTypeFunctions.optionsCopy(newClassOptions);
-    this.classOptionsChangeEmitter.emit();
+    this._specOptions = this.specTypeFunctions.optionsCopy(newSpecOptions);
+    this.specOptionsChangeEmitter.emit();
   }
 
   lookupItemSpec(itemSpec: ItemSpec): EquippedItem | null {
@@ -423,7 +418,7 @@ export class Sim<ClassType extends Class> {
       this._race,
       this._agent,
       this._talents,
-      this._classOptions,
+      this._specOptions,
       iterations,
       debug);
   }

@@ -34,6 +34,10 @@ export type SpellId = {
 };
 export type ItemOrSpellId = IconId | SpellId;
 
+// Some items/spells have weird icons, so use this to show a different icon instead.
+const idOverrides: Record<string, ItemOrSpellId> = {};
+idOverrides[JSON.stringify({spellId: 37212})] = { itemId: 29035 }; // Improved Wrath of Air Totem
+
 async function getIconUrlHelper(id: number, tooltipPostfix: string, cache: Map<number, string>): Promise<string> {
   if (cache.has(id)) {
     return cache.get(id) as string;
@@ -51,6 +55,10 @@ async function getIconUrlHelper(id: number, tooltipPostfix: string, cache: Map<n
 const itemToIconCache = new Map<number, string>();
 const spellToIconCache = new Map<number, string>();
 export async function getIconUrl(id: ItemOrSpellId): Promise<string> {
+  const idString = JSON.stringify(id);
+  if (idOverrides[idString])
+    id = idOverrides[idString];
+
   if ('itemId' in id) {
     return await getIconUrlHelper(id.itemId, 'item', itemToIconCache);
   } else {

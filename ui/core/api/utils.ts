@@ -10,50 +10,52 @@ import { ItemType } from './newapi';
 import { Item } from './newapi';
 import { Race } from './newapi';
 import { RangedWeaponType } from './newapi';
-import { Druid, Druid_DruidAgent as DruidAgent, Druid_DruidTalents as DruidTalents, Druid_DruidOptions as DruidOptions} from './newapi';
-import { Shaman, Shaman_ShamanAgent as ShamanAgent, Shaman_ShamanTalents as ShamanTalents, Shaman_ShamanOptions as ShamanOptions } from './newapi';
+import { BalanceDruid, BalanceDruid_BalanceDruidAgent as BalanceDruidAgent, DruidTalents, BalanceDruid_BalanceDruidOptions as BalanceDruidOptions} from './newapi';
+import { ElementalShaman, ElementalShaman_ElementalShamanAgent as ElementalShamanAgent, ShamanTalents, ElementalShaman_ElementalShamanOptions as ElementalShamanOptions } from './newapi';
 import { Spec } from './newapi';
 import { WeaponType } from './newapi';
 
-export type AgentUnion = DruidAgent | ShamanAgent;
-export type ClassAgent<T extends Class> = T extends Class.ClassDruid ? DruidAgent : ShamanAgent;
+export type ShamanSpecs = Spec.SpecElementalShaman;
+
+export type AgentUnion = BalanceDruidAgent | ElementalShamanAgent;
+export type SpecAgent<T extends Spec> = T extends Spec.SpecBalanceDruid ? BalanceDruidAgent : ElementalShamanAgent;
 
 export type TalentsUnion = DruidTalents | ShamanTalents;
-export type ClassTalents<T extends Class> = T extends Class.ClassDruid ? DruidTalents: ShamanTalents;
+export type SpecTalents<T extends Spec> = T extends Spec.SpecBalanceDruid ? DruidTalents: ShamanTalents;
 
-export type ClassOptionsUnion = DruidOptions | ShamanOptions;
-export type ClassOptions<T extends Class> = T extends Class.ClassDruid ? DruidOptions : ShamanOptions;
+export type SpecOptionsUnion = BalanceDruidOptions | ElementalShamanOptions;
+export type SpecOptions<T extends Spec> = T extends Spec.SpecBalanceDruid ? BalanceDruidOptions : ElementalShamanOptions;
 
-export type ClassProtoUnion = Druid | Shaman;
-export type ClassProto<T extends Class> = T extends Class.ClassDruid ? Druid : Shaman;
+export type SpecProtoUnion = BalanceDruid | ElementalShaman;
+export type SpecProto<T extends Spec> = T extends Spec.SpecBalanceDruid ? BalanceDruid : ElementalShaman;
 
-export type ClassTypeFunctions<ClassType extends Class> = {
-  agentCreate: () => ClassAgent<ClassType>;
-  agentEquals: (a: ClassAgent<ClassType>, b: ClassAgent<ClassType>) => boolean;
-  agentCopy: (a: ClassAgent<ClassType>) => ClassAgent<ClassType>;
-  agentToJson: (a: ClassAgent<ClassType>) => any;
-  agentFromJson: (obj: any) => ClassAgent<ClassType>;
+export type SpecTypeFunctions<SpecType extends Spec> = {
+  agentCreate: () => SpecAgent<SpecType>;
+  agentEquals: (a: SpecAgent<SpecType>, b: SpecAgent<SpecType>) => boolean;
+  agentCopy: (a: SpecAgent<SpecType>) => SpecAgent<SpecType>;
+  agentToJson: (a: SpecAgent<SpecType>) => any;
+  agentFromJson: (obj: any) => SpecAgent<SpecType>;
 
-  talentsCreate: () => ClassTalents<ClassType>;
-  talentsEquals: (a: ClassTalents<ClassType>, b: ClassTalents<ClassType>) => boolean;
-  talentsCopy: (a: ClassTalents<ClassType>) => ClassTalents<ClassType>;
-  talentsToJson: (a: ClassTalents<ClassType>) => any;
-  talentsFromJson: (obj: any) => ClassTalents<ClassType>;
+  talentsCreate: () => SpecTalents<SpecType>;
+  talentsEquals: (a: SpecTalents<SpecType>, b: SpecTalents<SpecType>) => boolean;
+  talentsCopy: (a: SpecTalents<SpecType>) => SpecTalents<SpecType>;
+  talentsToJson: (a: SpecTalents<SpecType>) => any;
+  talentsFromJson: (obj: any) => SpecTalents<SpecType>;
 
-  optionsCreate: () => ClassOptions<ClassType>;
-  optionsEquals: (a: ClassOptions<ClassType>, b: ClassOptions<ClassType>) => boolean;
-  optionsCopy: (a: ClassOptions<ClassType>) => ClassOptions<ClassType>;
-  optionsToJson: (a: ClassOptions<ClassType>) => any;
-  optionsFromJson: (obj: any) => ClassOptions<ClassType>;
+  optionsCreate: () => SpecOptions<SpecType>;
+  optionsEquals: (a: SpecOptions<SpecType>, b: SpecOptions<SpecType>) => boolean;
+  optionsCopy: (a: SpecOptions<SpecType>) => SpecOptions<SpecType>;
+  optionsToJson: (a: SpecOptions<SpecType>) => any;
+  optionsFromJson: (obj: any) => SpecOptions<SpecType>;
 };
 
-export const classTypeFunctions: Partial<Record<Class, ClassTypeFunctions<any>>> = {
-  [Class.ClassDruid]: {
-    agentCreate: () => DruidAgent.create(),
-    agentEquals: (a, b) => DruidAgent.equals(a as DruidAgent, b as DruidAgent),
-    agentCopy: (a) => DruidAgent.clone(a as DruidAgent),
-    agentToJson: (a) => DruidAgent.toJson(a as DruidAgent),
-    agentFromJson: (obj) => DruidAgent.fromJson(obj),
+export const specTypeFunctions: Partial<Record<Spec, SpecTypeFunctions<any>>> = {
+  [Spec.SpecBalanceDruid]: {
+    agentCreate: () => BalanceDruidAgent.create(),
+    agentEquals: (a, b) => BalanceDruidAgent.equals(a as BalanceDruidAgent, b as BalanceDruidAgent),
+    agentCopy: (a) => BalanceDruidAgent.clone(a as BalanceDruidAgent),
+    agentToJson: (a) => BalanceDruidAgent.toJson(a as BalanceDruidAgent),
+    agentFromJson: (obj) => BalanceDruidAgent.fromJson(obj),
 
     talentsCreate: () => DruidTalents.create(),
     talentsEquals: (a, b) => DruidTalents.equals(a as DruidTalents, b as DruidTalents),
@@ -61,18 +63,18 @@ export const classTypeFunctions: Partial<Record<Class, ClassTypeFunctions<any>>>
     talentsToJson: (a) => DruidTalents.toJson(a as DruidTalents),
     talentsFromJson: (obj) => DruidTalents.fromJson(obj),
 
-    optionsCreate: () => DruidOptions.create(),
-    optionsEquals: (a, b) => DruidOptions.equals(a as DruidOptions, b as DruidOptions),
-    optionsCopy: (a) => DruidOptions.clone(a as DruidOptions),
-    optionsToJson: (a) => DruidOptions.toJson(a as DruidOptions),
-    optionsFromJson: (obj) => DruidOptions.fromJson(obj),
+    optionsCreate: () => BalanceDruidOptions.create(),
+    optionsEquals: (a, b) => BalanceDruidOptions.equals(a as BalanceDruidOptions, b as BalanceDruidOptions),
+    optionsCopy: (a) => BalanceDruidOptions.clone(a as BalanceDruidOptions),
+    optionsToJson: (a) => BalanceDruidOptions.toJson(a as BalanceDruidOptions),
+    optionsFromJson: (obj) => BalanceDruidOptions.fromJson(obj),
   },
-  [Class.ClassShaman]: {
-    agentCreate: () => ShamanAgent.create(),
-    agentEquals: (a, b) => ShamanAgent.equals(a as ShamanAgent, b as ShamanAgent),
-    agentCopy: (a) => ShamanAgent.clone(a as ShamanAgent),
-    agentToJson: (a) => ShamanAgent.toJson(a as ShamanAgent),
-    agentFromJson: (obj) => ShamanAgent.fromJson(obj),
+  [Spec.SpecElementalShaman]: {
+    agentCreate: () => ElementalShamanAgent.create(),
+    agentEquals: (a, b) => ElementalShamanAgent.equals(a as ElementalShamanAgent, b as ElementalShamanAgent),
+    agentCopy: (a) => ElementalShamanAgent.clone(a as ElementalShamanAgent),
+    agentToJson: (a) => ElementalShamanAgent.toJson(a as ElementalShamanAgent),
+    agentFromJson: (obj) => ElementalShamanAgent.fromJson(obj),
 
     talentsCreate: () => ShamanTalents.create(),
     talentsEquals: (a, b) => ShamanTalents.equals(a as ShamanTalents, b as ShamanTalents),
@@ -80,18 +82,23 @@ export const classTypeFunctions: Partial<Record<Class, ClassTypeFunctions<any>>>
     talentsToJson: (a) => ShamanTalents.toJson(a as ShamanTalents),
     talentsFromJson: (obj) => ShamanTalents.fromJson(obj),
 
-    optionsCreate: () => ShamanOptions.create(),
-    optionsEquals: (a, b) => ShamanOptions.equals(a as ShamanOptions, b as ShamanOptions),
-    optionsCopy: (a) => ShamanOptions.clone(a as ShamanOptions),
-    optionsToJson: (a) => ShamanOptions.toJson(a as ShamanOptions),
-    optionsFromJson: (obj) => ShamanOptions.fromJson(obj),
+    optionsCreate: () => ElementalShamanOptions.create(),
+    optionsEquals: (a, b) => ElementalShamanOptions.equals(a as ElementalShamanOptions, b as ElementalShamanOptions),
+    optionsCopy: (a) => ElementalShamanOptions.clone(a as ElementalShamanOptions),
+    optionsToJson: (a) => ElementalShamanOptions.toJson(a as ElementalShamanOptions),
+    optionsFromJson: (obj) => ElementalShamanOptions.fromJson(obj),
   },
 };
 
 export const specToClass: Record<Spec, Class> = {
-  [Spec.ElementalShaman]: Class.ClassShaman,
+  [Spec.SpecBalanceDruid]: Class.ClassDruid,
+  [Spec.SpecElementalShaman]: Class.ClassShaman,
 };
 
+const druidRaces = [
+    Race.RaceNightElf,
+    Race.RaceTauren,
+];
 const shamanRaces = [
     Race.RaceDraenei,
     Race.RaceOrc,
@@ -101,7 +108,8 @@ const shamanRaces = [
 ];
 
 export const specToEligibleRaces: Record<Spec, Array<Race>> = {
-  [Spec.ElementalShaman]: shamanRaces,
+  [Spec.SpecBalanceDruid]: druidRaces,
+  [Spec.SpecElementalShaman]: shamanRaces,
 };
 
 const itemTypeToSlotsMap: Partial<Record<ItemType, Array<ItemSlot>>> = {

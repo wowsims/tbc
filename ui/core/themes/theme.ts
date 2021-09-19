@@ -3,18 +3,18 @@ import { TypedEvent } from '../typed_event';
 import { Class } from '../api/newapi';
 import { Spec } from '../api/newapi';
 
-export interface ThemeConfig<ClassType extends Class> extends SimConfig<ClassType> {
+export interface ThemeConfig<SpecType extends Spec> extends SimConfig<SpecType> {
 }
 
-export abstract class Theme<ClassType extends Class> {
+export abstract class Theme<SpecType extends Spec> {
   readonly parentElem: HTMLElement;
-  readonly sim: Sim<ClassType>;
+  readonly sim: Sim<SpecType>;
 
   private readonly exclusivityMap: Record<ExclusivityTag, Array<ExclusiveEffect>>;
 
-  constructor(parentElem: HTMLElement, config: ThemeConfig<ClassType>) {
+  constructor(parentElem: HTMLElement, config: ThemeConfig<SpecType>) {
     this.parentElem = parentElem;
-    this.sim = new Sim<ClassType>(config);
+    this.sim = new Sim<SpecType>(config);
 
     this.exclusivityMap = {
       'Battle Elixir': [],

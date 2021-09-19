@@ -6,14 +6,13 @@ import { specToClass } from '../api/utils';
 import { ShamanTalentsPicker } from './shaman';
 import { TalentsPicker } from './talents_picker';
 
-export function newTalentsPicker<ClassType extends Class>(spec: Spec, parent: HTMLElement, sim: Sim<ClassType>): TalentsPicker<ClassType> {
-  const playerClass = specToClass[spec];
-
-  switch (playerClass) {
-    case Class.ClassShaman:
-      return new ShamanTalentsPicker(parent, sim as Sim<Class.ClassShaman>) as TalentsPicker<ClassType>;
+export function newTalentsPicker<SpecType extends Spec>(spec: Spec, parent: HTMLElement, sim: Sim<SpecType>): TalentsPicker<SpecType> {
+  switch (spec) {
+    case Spec.SpecElementalShaman:
+      return new ShamanTalentsPicker(parent, sim as Sim<Spec.SpecElementalShaman>) as TalentsPicker<SpecType>;
       break;
     default:
+      const playerClass = specToClass[spec];
       throw new Error('Unimplemented class talents: ' + playerClass);
   }
 }

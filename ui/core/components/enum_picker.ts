@@ -8,6 +8,7 @@ import { Component } from './component';
 
 export interface EnumPickerConfig {
   label?: string,
+  defaultValue?: number,
 
   // names and values are parallel arrays
   names: Array<string>;
@@ -44,6 +45,10 @@ export class EnumPicker extends Component {
     config.changedEvent(sim).on(() => {
       selector.value = String(config.getValue(sim));
     });
+
+    if (config.defaultValue) {
+      config.setValue(sim, config.defaultValue);
+    }
 
     selector.addEventListener('change', event => {
       config.setValue(sim, parseInt(selector.value));

@@ -10,24 +10,39 @@ import { Race } from '../api/newapi';
 import { Spec } from '../api/newapi';
 import { Stat } from '../api/newapi';
 import { Stats } from '../api/stats';
+import { SpecAgent } from '../api/utils';
 import { specToEligibleRaces } from '../api/utils';
 import { Actions } from '../components/actions';
 import { CharacterStats } from '../components/character_stats';
 import { CustomStatsPicker } from '../components/custom_stats_picker';
 import { EnumPicker } from '../components/enum_picker';
+import { EnumPickerConfig } from '../components/enum_picker';
 import { GearPicker } from '../components/gear_picker';
 import { IconInput } from '../components/icon_picker';
 import { IconPicker } from '../components/icon_picker';
 import { NumberPicker } from '../components/number_picker';
+import { NumberPickerConfig } from '../components/number_picker';
 import { Results } from '../components/results';
 import { SavedDataManager } from '../components/saved_data_manager';
 import { newTalentsPicker } from '../talents/factory';
 
 import { Theme, ThemeConfig } from './theme';
 
-export interface DefaultThemeConfig<ClassType extends Class> extends ThemeConfig<ClassType> {
+export interface DefaultThemeConfig<SpecType extends Spec> extends ThemeConfig<SpecType> {
   displayStats: Array<Stat>;
   iconSections: Record<string, Array<IconInput>>;
+  otherSections: Record<string, Array<
+    {
+      type: 'number',
+      cssClass: string,
+      config: NumberPickerConfig,
+    } |
+    {
+      type: 'enum',
+      cssClass: string,
+      config: EnumPickerConfig,
+    }
+  >>;
   showTargetArmor: boolean;
   showNumTargets: boolean;
   presets: {
@@ -60,10 +75,10 @@ export interface Settings {
   race: Race,
 }
 
-export class DefaultTheme<ClassType extends Class> extends Theme<ClassType> {
-  private readonly _config: DefaultThemeConfig<ClassType>;
+export class DefaultTheme<SpecType extends Spec> extends Theme<SpecType> {
+  private readonly _config: DefaultThemeConfig<SpecType>;
 
-  constructor(parentElem: HTMLElement, config: DefaultThemeConfig<ClassType>) {
+  constructor(parentElem: HTMLElement, config: DefaultThemeConfig<SpecType>) {
     super(parentElem, config)
     this._config = config;
     this.parentElem.innerHTML = layoutHTML;
@@ -79,15 +94,32 @@ export class DefaultTheme<ClassType extends Class> extends Theme<ClassType> {
     const talentsPicker = newTalentsPicker(config.spec, this.parentElem.getElementsByClassName('talents-picker')[0] as HTMLElement, this.sim);
 
     const settingsTab = document.getElementsByClassName('settings-inputs')[0] as HTMLElement;
-    Object.keys(config.iconSections).forEach(pickerName => {
-      const section = config.iconSections[pickerName];
+    Object.keys(config.iconSections).forEach(sectionName => {
+      const sectionConfig = config.iconSections[sectionName];
 
       const sectionElem = document.createElement('section');
-      sectionElem.classList.add('settings-section', pickerName + '-section');
-      sectionElem.innerHTML = `<label>${pickerName}</label>`;
+      sectionElem.classList.add('settings-section', sectionName + '-section');
+      sectionElem.innerHTML = `<label>${sectionName}</label>`;
       settingsTab.appendChild(sectionElem);
 
-      const iconPicker = new IconPicker(sectionElem, pickerName + '-icon-picker', this.sim, section, this);
+      const iconPicker = new IconPicker(sectionElem, sectionName + '-icon-picker', this.sim, sectionConfig, this);
+    });
+
+    Object.keys(config.otherSections).forEach(sectionName => {
+      const sectionConfig = config.otherSections[sectionName];
+
+      const sectionElem = document.createElement('section');
+      sectionElem.classList.add('settings-section', sectionName + '-section');
+      sectionElem.innerHTML = `<label>${sectionName}</label>`;
+      settingsTab.appendChild(sectionElem);
+
+      sectionConfig.forEach(inputConfig => {
+        if (inputConfig.type == 'number') {
+          const picker = new NumberPicker(sectionElem, this.sim, inputConfig.config);
+        } else if (inputConfig.type == 'enum') {
+          const picker = new EnumPicker(sectionElem, this.sim, inputConfig.config);
+        }
+      });
     });
 
     const races = specToEligibleRaces[this.sim.spec];
@@ -140,7 +172,7 @@ export class DefaultTheme<ClassType extends Class> extends Theme<ClassType> {
   }
 
   async init(): Promise<void> {
-    const savedGearManager = new SavedDataManager<GearAndStats>(this.parentElem.getElementsByClassName('saved-gear-manager')[0] as HTMLElement, this.sim, {
+    const savedGearManager = new SavedDataManager<SpecType, GearAndStats>(this.parentElem.getElementsByClassName('saved-gear-manager')[0] as HTMLElement, this.sim, {
       label: 'Gear',
       getData: (sim: Sim<any>) => {
         return {
@@ -168,7 +200,7 @@ export class DefaultTheme<ClassType extends Class> extends Theme<ClassType> {
       },
     });
 
-    const savedEncounterManager = new SavedDataManager<Encounter>(this.parentElem.getElementsByClassName('saved-encounter-manager')[0] as HTMLElement, this.sim, {
+    const savedEncounterManager = new SavedDataManager<SpecType, Encounter>(this.parentElem.getElementsByClassName('saved-encounter-manager')[0] as HTMLElement, this.sim, {
       label: 'Encounter',
       getData: (sim: Sim<any>) => sim.getEncounter(),
       setData: (sim: Sim<any>, newEncounter: Encounter) => sim.setEncounter(newEncounter),
@@ -178,7 +210,17 @@ export class DefaultTheme<ClassType extends Class> extends Theme<ClassType> {
       fromJson: (obj: any) => Encounter.fromJson(obj),
     });
 
-    const savedSettingsManager = new SavedDataManager<Settings>(this.parentElem.getElementsByClassName('saved-settings-manager')[0] as HTMLElement, this.sim, {
+    const savedAgentManager = new SavedDataManager<SpecType, SpecAgent<SpecType>>(this.parentElem.getElementsByClassName('saved-agent-manager')[0] as HTMLElement, this.sim, {
+      label: 'Rotation',
+      getData: (sim: Sim<SpecType>) => sim.getAgent(),
+      setData: (sim: Sim<SpecType>, newAgent: SpecAgent<SpecType>) => sim.setAgent(newAgent),
+      changeEmitters: [this.sim.agentChangeEmitter],
+      equals: (a: SpecAgent<SpecType>, b: SpecAgent<SpecType>) => this.sim.specTypeFunctions.agentEquals(a, b),
+      toJson: (a: SpecAgent<SpecType>) => this.sim.specTypeFunctions.agentToJson(a),
+      fromJson: (obj: any) => this.sim.specTypeFunctions.agentFromJson(obj),
+    });
+
+    const savedSettingsManager = new SavedDataManager<SpecType, Settings>(this.parentElem.getElementsByClassName('saved-settings-manager')[0] as HTMLElement, this.sim, {
       label: 'Settings',
       getData: (sim: Sim<any>) => {
         return {
@@ -210,7 +252,7 @@ export class DefaultTheme<ClassType extends Class> extends Theme<ClassType> {
       },
     });
 
-    const savedTalentsManager = new SavedDataManager<string>(this.parentElem.getElementsByClassName('saved-talents-manager')[0] as HTMLElement, this.sim, {
+    const savedTalentsManager = new SavedDataManager<SpecType, string>(this.parentElem.getElementsByClassName('saved-talents-manager')[0] as HTMLElement, this.sim, {
       label: 'Talents',
       getData: (sim: Sim<any>) => sim.getTalentsString(),
       setData: (sim: Sim<any>, newTalentsString: string) => sim.setTalentsString(newTalentsString),
@@ -290,6 +332,8 @@ const layoutHTML = `
           </div>
           <div class="settings-bottom-bar">
             <div class="saved-encounter-manager">
+            </div>
+            <div class="saved-agent-manager">
             </div>
             <div class="saved-settings-manager">
             </div>

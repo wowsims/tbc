@@ -1,5 +1,5 @@
-import { Class } from '../api/newapi';
-import { ClassTalents } from '../api/utils';
+import { Spec } from '../api/newapi';
+import { SpecTalents } from '../api/utils';
 import { getIconUrl } from '../resources';
 import { setWowheadHref } from '../resources';
 import { Sim } from '../sim';
@@ -12,16 +12,17 @@ const MAX_TALENT_POINTS = 61;
 const NUM_ROWS = 9;
 const TALENTS_STORAGE_KEY = 'Talents';
 
-export abstract class TalentsPicker<ClassType extends Class> extends Component {
-  readonly trees: Array<TalentTreePicker<ClassType>>;
-  private readonly sim: Sim<ClassType>;
+export abstract class TalentsPicker<SpecType extends Spec> extends Component {
+  readonly trees: Array<TalentTreePicker<SpecType>>;
+  private readonly sim: Sim<SpecType>;
 
-  constructor(parent: HTMLElement, sim: Sim<ClassType>, treeConfigs: Array<TalentTreeConfig<ClassType>>) {
+  constructor(parent: HTMLElement, sim: Sim<SpecType>, treeConfigs: Array<TalentTreeConfig<SpecType>>) {
     super(parent, 'talents-picker-root');
     this.sim = sim;
     this.trees = treeConfigs.map(treeConfig => new TalentTreePicker(this.rootElem, sim, treeConfig, this));
     this.trees.forEach(tree => tree.talents.forEach(talent => talent.setPoints(0, false)));
 
+    this.setTalentsString(this.sim.getTalentsString());
     this.sim.talentsStringChangeEmitter.on(() => {
       this.setTalentsString(this.sim.getTalentsString());
     });
@@ -50,7 +51,21 @@ export abstract class TalentsPicker<ClassType extends Class> extends Component {
     this.sim.setTalents(this.getTalents());
   }
 
-  abstract getTalents(): ClassTalents<ClassType>;
+  getTalents(): SpecTalents<SpecType> {
+    const talents = this.sim.specTypeFunctions.talentsCreate();
+
+    this.trees.forEach(tree => tree.talents.forEach(talent => {
+      if (talent.config.fieldName) {
+        if (talent.config.maxPoints == 1) {
+          (talents[talent.config.fieldName] as unknown as boolean) = talent.getPoints() > 0;
+        } else {
+          (talents[talent.config.fieldName] as unknown as number) = talent.getPoints();
+        }
+      }
+    }));
+
+    return talents;
+  }
 
   getTalentsString(): string {
     return this.trees.map(tree => tree.getTalentsString()).join('-').replace(/-+$/g, '');
@@ -71,17 +86,17 @@ export abstract class TalentsPicker<ClassType extends Class> extends Component {
   //}
 }
 
-class TalentTreePicker<ClassType extends Class> extends Component {
-  private readonly config: TalentTreeConfig<ClassType>;
+class TalentTreePicker<SpecType extends Spec> extends Component {
+  private readonly config: TalentTreeConfig<SpecType>;
   private readonly title: HTMLElement;
 
-  readonly talents: Array<TalentPicker<ClassType>>;
-  readonly picker: TalentsPicker<ClassType>;
+  readonly talents: Array<TalentPicker<SpecType>>;
+  readonly picker: TalentsPicker<SpecType>;
 
   // The current number of points in this tree
   numPoints: number;
 
-  constructor(parent: HTMLElement, sim: Sim<ClassType>, config: TalentTreeConfig<ClassType>, picker: TalentsPicker<ClassType>) {
+  constructor(parent: HTMLElement, sim: Sim<SpecType>, config: TalentTreeConfig<SpecType>, picker: TalentsPicker<SpecType>) {
     super(parent, 'talent-tree-picker-root');
     this.config = config;
     this.numPoints = 0;
@@ -120,7 +135,7 @@ class TalentTreePicker<ClassType extends Class> extends Component {
     this.talents.forEach(talent => talent.update());
   }
 
-  getTalent(location: TalentLocation): TalentPicker<ClassType> {
+  getTalent(location: TalentLocation): TalentPicker<SpecType> {
     const talent = this.talents.find(talent => talent.getRow() == location.rowIdx && talent.getCol() == location.colIdx);
     if (!talent)
       throw new Error('No talent found with location: ' + location);
@@ -136,12 +151,12 @@ class TalentTreePicker<ClassType extends Class> extends Component {
   }
 }
 
-class TalentPicker<ClassType extends Class> extends Component {
-  readonly config: TalentConfig<ClassType>;
-  private readonly tree: TalentTreePicker<ClassType>;
+class TalentPicker<SpecType extends Spec> extends Component {
+  readonly config: TalentConfig<SpecType>;
+  private readonly tree: TalentTreePicker<SpecType>;
   private readonly pointsDisplay: HTMLElement;
 
-  constructor(parent: HTMLElement, sim: Sim<ClassType>, config: TalentConfig<ClassType>, tree: TalentTreePicker<ClassType>) {
+  constructor(parent: HTMLElement, sim: Sim<SpecType>, config: TalentConfig<SpecType>, tree: TalentTreePicker<SpecType>) {
     super(parent, 'talent-picker-root', document.createElement('a'));
     this.config = config;
     this.tree = tree;
@@ -284,10 +299,10 @@ class TalentPicker<ClassType extends Class> extends Component {
   }
 }
 
-export type TalentTreeConfig<ClassType extends Class> = {
+export type TalentTreeConfig<SpecType extends Spec> = {
   name: string;
   backgroundUrl: string;
-  talents: Array<TalentConfig<ClassType>>;
+  talents: Array<TalentConfig<SpecType>>;
 };
 
 export type TalentLocation = {
@@ -297,8 +312,8 @@ export type TalentLocation = {
   colIdx: number;
 };
 
-export type TalentConfig<ClassType extends Class> = {
-  fieldName?: keyof ClassTalents<ClassType>
+export type TalentConfig<SpecType extends Spec> = {
+  fieldName?: keyof SpecTalents<SpecType>
 
   location: TalentLocation;
 

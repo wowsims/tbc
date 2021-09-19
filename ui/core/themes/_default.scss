@@ -167,11 +167,17 @@ $main-background-color: #F0FFFF;
   margin: 20px;
   display: flex;
   justify-content: space-around;
+  align-items: flex-end;
 }
 
 .saved-encounter-manager {
   display: inline-block;
   text-align: left;
+}
+
+.saved-agent-manager {
+  display: inline-block;
+  text-align: center;
 }
 
 .saved-settings-manager {

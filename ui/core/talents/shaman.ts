@@ -1,11 +1,13 @@
-import { Class } from '../api/newapi';
-import { Shaman_ShamanTalents as ShamanTalents } from '../api/newapi';
+import { Spec } from '../api/newapi';
+import { ShamanTalents as ShamanTalents } from '../api/newapi';
+import { ShamanSpecs } from '../api/utils';
 import { Sim } from '../sim';
 
 import { TalentsPicker } from './talents_picker';
 
-export class ShamanTalentsPicker extends TalentsPicker<Class.ClassShaman> {
-  constructor(parent: HTMLElement, sim: Sim<Class.ClassShaman>) {
+// Talents are the same for all Shaman specs, so its ok to just use ElementalShaman here
+export class ShamanTalentsPicker extends TalentsPicker<Spec.SpecElementalShaman> {
+  constructor(parent: HTMLElement, sim: Sim<Spec.SpecElementalShaman>) {
     super(parent, sim, [
       {
         name: 'Elemental',
@@ -611,21 +613,5 @@ export class ShamanTalentsPicker extends TalentsPicker<Class.ClassShaman> {
         ],
       },
     ]);
-  }
-
-  getTalents(): ShamanTalents {
-    const talents = ShamanTalents.create();
-
-    this.trees.forEach(tree => tree.talents.forEach(talent => {
-      if (talent.config.fieldName) {
-        if (talent.config.maxPoints == 1) {
-          (talents[talent.config.fieldName] as boolean) = talent.getPoints() > 0;
-        } else {
-          (talents[talent.config.fieldName] as number) = talent.getPoints();
-        }
-      }
-    }));
-
-    return talents;
   }
 }
