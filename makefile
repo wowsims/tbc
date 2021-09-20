@@ -40,3 +40,6 @@ dist/%/index.html: index_template.html
 	echo $(title)
 	mkdir -p $(@D)
 	cat index_template.html | sed 's/@@TITLE@@/$(title)/g' > $@
+
+generate_items/api/api.go:
+	protoc -I api/ --go_out=generate_items/ api/*.proto

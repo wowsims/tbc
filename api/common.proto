@@ -149,10 +149,11 @@ enum ItemSlot {
 
 enum ItemQuality {
     ItemQualityJunk = 0;
-    ItemQualityUncommon = 1;
-    ItemQualityRare = 2;
-    ItemQualityEpic = 3;
-    ItemQualityLegendary = 4;
+    ItemQualityCommon = 1;
+    ItemQualityUncommon = 2;
+    ItemQualityRare = 3;
+    ItemQualityEpic = 4;
+    ItemQualityLegendary = 5;
 }
 
 enum GemColor {

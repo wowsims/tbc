@@ -15,4 +15,5 @@ var ItemDeclarations = []ItemDeclaration{
   { ID: 29097, Specs: []string{EleSham}, },
   { ID: 29055, Specs: []string{EleSham}, },
   { ID: 29523, Specs: []string{EleSham}, },
+  { ID: 30153, Specs: []string{EleSham}, },
 }
