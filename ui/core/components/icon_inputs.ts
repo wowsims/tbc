@@ -1,5 +1,5 @@
-import { Buffs } from '../api/newapi'
-import { Consumes } from '../api/newapi'
+import { Buffs } from '../api/common'
+import { Consumes } from '../api/common'
 import { ItemOrSpellId } from '../resources'
 import { Sim } from '../sim'
 

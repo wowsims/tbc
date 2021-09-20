@@ -1,19 +1,20 @@
 import { intersection } from '../utils';
 
-import { Class } from './newapi';
-import { Enchant } from './newapi';
-import { Gem } from './newapi';
-import { GemColor } from './newapi';
-import { HandType } from './newapi';
-import { ItemSlot } from './newapi';
-import { ItemType } from './newapi';
-import { Item } from './newapi';
-import { Race } from './newapi';
-import { RangedWeaponType } from './newapi';
-import { BalanceDruid, BalanceDruid_BalanceDruidAgent as BalanceDruidAgent, DruidTalents, BalanceDruid_BalanceDruidOptions as BalanceDruidOptions} from './newapi';
-import { ElementalShaman, ElementalShaman_ElementalShamanAgent as ElementalShamanAgent, ShamanTalents, ElementalShaman_ElementalShamanOptions as ElementalShamanOptions } from './newapi';
-import { Spec } from './newapi';
-import { WeaponType } from './newapi';
+import { Class } from './common';
+import { Enchant } from './common';
+import { Gem } from './common';
+import { GemColor } from './common';
+import { HandType } from './common';
+import { ItemSlot } from './common';
+import { ItemType } from './common';
+import { Item } from './common';
+import { Race } from './common';
+import { RangedWeaponType } from './common';
+import { Spec } from './common';
+import { WeaponType } from './common';
+
+import { BalanceDruid, BalanceDruid_BalanceDruidAgent as BalanceDruidAgent, DruidTalents, BalanceDruid_BalanceDruidOptions as BalanceDruidOptions} from './druid';
+import { ElementalShaman, ElementalShaman_ElementalShamanAgent as ElementalShamanAgent, ShamanTalents, ElementalShaman_ElementalShamanOptions as ElementalShamanOptions } from './shaman';
 
 export type ShamanSpecs = Spec.SpecElementalShaman;
 

@@ -1,8 +1,8 @@
-import { Enchant } from './newapi';
-import { Gem } from './newapi';
-import { Item } from './newapi';
-import { ItemSlot } from './newapi';
-import { ItemSpec } from './newapi';
+import { Enchant } from './common';
+import { Gem } from './common';
+import { Item } from './common';
+import { ItemSlot } from './common';
+import { ItemSpec } from './common';
 import { enchantAppliesToItem } from './utils';
 import { gemEligibleForSocket } from './utils';
 import { gemMatchesSocket } from './utils';

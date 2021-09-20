@@ -1,8 +1,8 @@
 import { EquippedItem } from '../api/equipped_item';
-import { Enchant } from '../api/newapi';
-import { Item } from '../api/newapi';
-import { ItemQuality } from '../api/newapi';
-import { ItemSlot } from '../api/newapi';
+import { Enchant } from '../api/common';
+import { Item } from '../api/common';
+import { ItemQuality } from '../api/common';
+import { ItemSlot } from '../api/common';
 import { enchantDescriptions } from '../api/names';
 import { slotNames } from '../api/names';
 import { gemEligibleForSocket } from '../api/utils';

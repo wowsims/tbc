@@ -1,6 +1,6 @@
-import { ItemSlot } from './newapi';
-import { Race } from './newapi';
-import { Stat } from './newapi';
+import { ItemSlot } from './common';
+import { Race } from './common';
+import { Stat } from './common';
 
 export const raceNames: Record<Race, string> = {
   [Race.RaceUnknown]: 'None',

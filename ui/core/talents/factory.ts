@@ -1,6 +1,6 @@
 import { Sim } from '../sim';
-import { Class } from '../api/newapi';
-import { Spec } from '../api/newapi';
+import { Class } from '../api/common';
+import { Spec } from '../api/common';
 import { specToClass } from '../api/utils';
 
 import { ShamanTalentsPicker } from './shaman';

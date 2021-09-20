@@ -1,7 +1,7 @@
 import { Sim, SimConfig } from './sim';
 import { TypedEvent } from './typed_event';
-import { Class } from './api/newapi';
-import { Spec } from './api/newapi';
+import { Class } from './api/common';
+import { Spec } from './api/common';
 
 const CURRENT_SETTINGS_KEY = '__currentSettings__';
 

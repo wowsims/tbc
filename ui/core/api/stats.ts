@@ -1,4 +1,4 @@
-import { Stat } from './newapi';
+import { Stat } from './common';
 
 const STATS_LEN = Object.keys(Stat).length;
 

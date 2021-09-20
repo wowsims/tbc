@@ -1,10 +1,10 @@
-import { IndividualSimRequest } from '../api/newapi';
-import { Stat } from '../api/newapi';
-import { StatWeightsRequest } from '../api/newapi';
-import { Sim } from '../sim.js';
+import { IndividualSimRequest } from '../api/api';
+import { Stat } from '../api/common';
+import { StatWeightsRequest } from '../api/api';
+import { Sim } from '../sim';
 
-import { Component } from './component.js';
-import { Results } from './results.js';
+import { Component } from './component';
+import { Results } from './results';
 
 export class Actions extends Component {
   constructor(parent: HTMLElement, sim: Sim<any>, results: Results, epStats: Array<Stat>, epReferenceStat: Stat) {

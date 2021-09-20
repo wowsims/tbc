@@ -1,4 +1,4 @@
-import { Race } from '../api/newapi';
+import { Race } from '../api/common';
 import { specToEligibleRaces } from '../api/utils';
 import { raceNames } from '../api/names';
 import { Sim } from '../sim';

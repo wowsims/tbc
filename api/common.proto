@@ -1,5 +1,5 @@
 syntax = "proto3";
-package newapi;
+package api;
 
 option go_package = "api/";
 
@@ -19,16 +19,21 @@ enum Race {
 }
 
 enum Class {
-  ClassUnknown = 0;
-  ClassDruid = 1;
-  ClassHunter = 2;
-  ClassMage = 3;
-  ClassPaladin = 4;
-  ClassPriest = 5;
-  ClassRogue = 6;
-  ClassShaman = 7;
-  ClassWarlock = 8;
-  ClassWarrior = 9;
+    ClassUnknown = 0;
+    ClassDruid = 1;
+    ClassHunter = 2;
+    ClassMage = 3;
+    ClassPaladin = 4;
+    ClassPriest = 5;
+    ClassRogue = 6;
+    ClassShaman = 7;
+    ClassWarlock = 8;
+    ClassWarrior = 9;
+}
+
+enum Spec {
+    SpecBalanceDruid = 0;
+    SpecElementalShaman = 1;
 }
 
 enum Stat {
@@ -233,110 +238,6 @@ message Encounter {
     int32 target_armor = 3;
 }
 
-message PlayerOptions {
-    Race race = 1;
-    oneof spec {
-        BalanceDruid balance_druid = 2;
-        Hunter hunter = 3;
-        Mage mage = 4;
-        Paladin paladin = 5;
-        Priest priest = 6;
-        Rogue rogue = 7;
-        ElementalShaman elemental_shaman = 8;
-        Warlock warlock = 9;
-        Warrior warrior = 10;
-    }
-    Consumes consumes = 11; // What consumes this player is going to be using.
-}
-
-message DruidTalents {
-    int32 starlight_wrath = 1;
-}
-message BalanceDruid {
-    message BalanceDruidAgent {
-    }
-    BalanceDruidAgent agent = 1;
-
-    DruidTalents talents = 2;
-    
-    message BalanceDruidOptions {
-    }
-    BalanceDruidOptions options = 3;
-}
-message Hunter {
-}
-message Mage {
-}
-message Paladin {
-}
-message Priest {
-}
-message Rogue {
-}
-message ShamanTalents {
-    // Elemental
-    int32 convection = 1;
-    int32 concussion = 2;
-    int32 call_of_flame = 3;
-    bool elemental_focus = 4;
-    int32 reverberation = 5;
-    int32 call_of_thunder = 6;
-    int32 improved_fire_totems = 7;
-    int32 elemental_devastation = 8;
-    bool elemental_fury = 9;
-    int32 unrelenting_storm = 10;
-    int32 elemental_precision = 11;
-    int32 lightning_mastery = 12;
-    bool elemental_mastery = 13;
-    int32 lightning_overload = 14;
-
-    // Enhancement
-    int32 ancestral_knowledge = 15;
-    int32 thundering_strikes = 16;
-    int32 enhancing_totems = 17;
-    bool shamanistic_focus = 18;
-    int32 flurry = 19;
-    int32 improved_weapon_totems = 20;
-    int32 elemental_weapons = 21;
-    int32 mental_quickness = 22;
-    int32 weapon_mastery = 23;
-    int32 dual_wield_specialization = 24;
-    int32 unleashed_rage = 25;
-
-    // Restoration
-    int32 totemic_focus = 26;
-    int32 natures_guidance = 27;
-    int32 restorative_totems = 28;
-    int32 tidal_mastery = 29;
-    bool natures_swiftness = 30;
-    bool mana_tide_totem = 31;
-    int32 natures_blessing = 32;
-}
-message ElementalShaman {
-    message ElementalShamanAgent {
-      enum AgentType {
-          Unknown = 0;
-          FixedLBCL = 1;
-          CLOnClearcast = 2;
-          Adaptive = 3;
-      }
-      AgentType type = 1;
-    }
-    ElementalShamanAgent agent = 1;
-
-    ShamanTalents talents = 2;
-    
-    message ElementalShamanOptions {
-        bool water_shield = 1;
-        // int32 WaterShieldPPM
-    }
-    ElementalShamanOptions options = 3;
-}
-message Warlock {
-}
-message Warrior {
-}
-
 message ItemSpec {
     int32 id = 2;
     int32 enchant = 3;
@@ -345,69 +246,6 @@ message ItemSpec {
 
 message EquipmentSpec {
     repeated ItemSpec items = 1;
-}
-
-message Player {
-    PlayerOptions options = 1;
-    EquipmentSpec equipment = 2;
-    repeated double custom_stats = 3;
-}
-
-message Party {
-    repeated Player players = 1;
-}
-
-message Raid {
-    repeated Party parties = 1; 
-}
-
-// RPC IndividualSim
-message IndividualSimRequest {
-    Player player = 1;
-    Buffs buffs = 2;
-    Encounter encounter = 3;
-    int32 iterations = 4;
-    int64 random_seed = 5;
-    double gcd_min = 6; // sets the minimum GCD
-    bool debug = 7; // enables debug logging.
-    bool exit_on_oom = 8;
-}
-
-message IndividualSimResult {
-    int64 execution_duration_ms = 1;
-    string logs = 2;
-
-    double dps_avg   = 3;
-    double dps_stdev = 4;
-    double dps_max   = 5;
-    map<int32, int32> dps_hist = 6;
-
-    int32 num_oom = 7;
-    double oom_at_avg = 8;
-    double dps_at_oom_avg = 9;
-
-    map<int32, CastMetric> casts = 10;
-    // FUTURE: melee
-    // map<int32, AttackMetric> attacks = 11; 
-
-    string error = 11; 
-}
-
-// CastMetric holds a collection of counts of casts and 
-// 
-message CastMetric {
-    repeated int32 counts = 1;
-    repeated double dmgs = 2;
-    repeated int32 tags = 3;
-}
-
-// RPC RaidSim
-message RaidSimRequest {
-    Raid raid = 1;
-    Encounter encounter = 2;
-    int64 random_seed = 3;
-    double gcd_min = 4; // sets the minimum GCD
-    bool debug = 5; // enables debug printing.
 }
 
 message Item {
@@ -426,6 +264,7 @@ message Item {
     int32 phase = 9;
     ItemQuality quality = 10;
 }
+
 message Enchant {
     int32 id = 1;        // ID of the enchant "item".
     int32 effect_id = 2; // ID of the effect (for the item tooltip UI)
@@ -439,6 +278,7 @@ message Enchant {
 
     ItemQuality quality = 8;
 }
+
 message Gem {
     int32 id = 1;
     string name = 2;
@@ -448,43 +288,4 @@ message Gem {
 
     int32 phase = 5;
     ItemQuality quality = 6;
-}
-
-// RPC GearList
-enum Spec {
-    SpecBalanceDruid = 0;
-    SpecElementalShaman = 1;
-}
-message GearListRequest {
-    Spec spec = 1; // Each spec has a custom gear list
-}
-message GearListResult {
-    repeated Item items = 1;
-    repeated Enchant enchants = 2;
-    repeated Gem gems = 3;
-}
-
-// RPC ComputeStats
-message ComputeStatsRequest {
-    Player player = 1;
-    Buffs buffs = 2;
-    EquipmentSpec gear = 3;
-}
-message ComputeStatsResult {
-    repeated double gear_only = 1;
-    repeated double finalStats = 2;
-    repeated string sets = 3;
-}
-
-// RPC StatWeights
-message StatWeightsRequest {
-    IndividualSimRequest options = 1;
-    repeated Stat stats_to_weigh = 2;
-    Stat ep_reference_stat = 3;
-}
-message StatWeightsResult {
-    repeated double weights = 1;
-    repeated double weights_stdev = 2;
-    repeated double ep_values = 3;
-    repeated double ep_values_stdev = 4;
 }

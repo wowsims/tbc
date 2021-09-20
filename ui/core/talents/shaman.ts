@@ -1,5 +1,5 @@
-import { Spec } from '../api/newapi';
-import { ShamanTalents as ShamanTalents } from '../api/newapi';
+import { Spec } from '../api/common';
+import { ShamanTalents as ShamanTalents } from '../api/shaman';
 import { ShamanSpecs } from '../api/utils';
 import { Sim } from '../sim';
 

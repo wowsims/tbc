@@ -1,18 +1,18 @@
-import { Buffs } from '../core/api/newapi';
-import { Class } from '../core/api/newapi';
-import { Consumes } from '../core/api/newapi';
-import { Encounter } from '../core/api/newapi';
-import { EquipmentSpec } from '../core/api/newapi';
-import { ItemSlot } from '../core/api/newapi';
-import { ItemSpec } from '../core/api/newapi';
-import { Spec } from '../core/api/newapi';
-import { Stat } from '../core/api/newapi';
-import { TristateEffect } from '../core/api/newapi'
+import { Buffs } from '../core/api/common';
+import { Class } from '../core/api/common';
+import { Consumes } from '../core/api/common';
+import { Encounter } from '../core/api/common';
+import { EquipmentSpec } from '../core/api/common';
+import { ItemSlot } from '../core/api/common';
+import { ItemSpec } from '../core/api/common';
+import { Spec } from '../core/api/common';
+import { Stat } from '../core/api/common';
+import { TristateEffect } from '../core/api/common'
 import { Sim } from '../core/sim';
 import { DefaultTheme } from '../core/themes/default';
 
-import { ElementalShaman, ElementalShaman_ElementalShamanAgent as ElementalShamanAgent, ShamanTalents as ShamanTalents, ElementalShaman_ElementalShamanOptions as ElementalShamanOptions } from '../core/api/newapi';
-import { ElementalShaman_ElementalShamanAgent_AgentType as AgentType } from '../core/api/newapi';
+import { ElementalShaman, ElementalShaman_ElementalShamanAgent as ElementalShamanAgent, ShamanTalents as ShamanTalents, ElementalShaman_ElementalShamanOptions as ElementalShamanOptions } from '../core/api/shaman';
+import { ElementalShaman_ElementalShamanAgent_AgentType as AgentType } from '../core/api/shaman';
 
 import * as IconInputs from '../core/components/icon_inputs';
 import * as OtherInputs from '../core/components/other_inputs';

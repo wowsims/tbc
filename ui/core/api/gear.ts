@@ -1,9 +1,9 @@
 import { equalsOrBothNull } from '../utils';
 
 import { EquippedItem } from './equipped_item';
-import { ItemSlot } from './newapi';
-import { ItemSpec } from './newapi';
-import { EquipmentSpec } from './newapi';
+import { ItemSlot } from './common';
+import { ItemSpec } from './common';
+import { EquipmentSpec } from './common';
 
 type InternalGear = Record<ItemSlot, EquippedItem | null>;
 

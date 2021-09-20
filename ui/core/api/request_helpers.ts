@@ -1,21 +1,21 @@
 import { Gear } from './gear';
-import { Buffs } from './newapi';
-import { Consumes } from './newapi';
-import { Class } from './newapi';
-import { Encounter } from './newapi';
-import { Player } from './newapi';
-import { PlayerOptions } from './newapi';
-import { Race } from './newapi';
-import { Spec } from './newapi';
+import { Buffs } from './common';
+import { Consumes } from './common';
+import { Class } from './common';
+import { Encounter } from './common';
+import { Race } from './common';
+import { Spec } from './common';
 import { Stats } from './stats';
 import { SpecAgent } from './utils';
 import { SpecTalents } from './utils';
 import { SpecOptions } from './utils';
 
-import { BalanceDruid, BalanceDruid_BalanceDruidAgent as BalanceDruidAgent, DruidTalents, BalanceDruid_BalanceDruidOptions as BalanceDruidOptions} from './newapi';
-import { ElementalShaman, ElementalShaman_ElementalShamanAgent as ElementalShamanAgent, ShamanTalents, ElementalShaman_ElementalShamanOptions as ElementalShamanOptions } from './newapi';
+import { Player } from './api';
+import { PlayerOptions } from './api';
+import { BalanceDruid, BalanceDruid_BalanceDruidAgent as BalanceDruidAgent, DruidTalents, BalanceDruid_BalanceDruidOptions as BalanceDruidOptions} from './druid';
+import { ElementalShaman, ElementalShaman_ElementalShamanAgent as ElementalShamanAgent, ShamanTalents, ElementalShaman_ElementalShamanOptions as ElementalShamanOptions } from './shaman';
 
-import { IndividualSimRequest, IndividualSimResult } from './newapi';
+import { IndividualSimRequest, IndividualSimResult } from './api';
 
 export function makeIndividualSimRequest<SpecType extends Spec>(
     buffs: Buffs,

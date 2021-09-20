@@ -1,4 +1,4 @@
-import { Spec } from '../api/newapi';
+import { Spec } from '../api/common';
 import { Sim } from '../sim';
 import { TypedEvent } from '../typed_event';
 

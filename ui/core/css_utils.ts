@@ -1,5 +1,5 @@
-import { GemColor } from './api/newapi';
-import { ItemQuality } from './api/newapi';
+import { GemColor } from './api/common';
+import { ItemQuality } from './api/common';
 
 const gemSocketCssClasses: Partial<Record<GemColor, string>> = {
   [GemColor.GemColorBlue]: 'socket-color-blue',

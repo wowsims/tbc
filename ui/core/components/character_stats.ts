@@ -1,4 +1,4 @@
-import { Stat } from '../api/newapi';
+import { Stat } from '../api/common';
 import { statNames } from '../api/names';
 
 import { Component } from './component';

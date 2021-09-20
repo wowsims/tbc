@@ -1,4 +1,4 @@
-import { Spec } from '../api/newapi';
+import { Spec } from '../api/common';
 import { SpecTalents } from '../api/utils';
 import { getIconUrl } from '../resources';
 import { setWowheadHref } from '../resources';

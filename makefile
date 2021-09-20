@@ -7,19 +7,22 @@ dist: elemental_shaman
 elemental_shaman: dist/elemental_shaman/index.js dist/elemental_shaman/index.css dist/elemental_shaman/index.html
 
 clean:
-	rm -f ui/core/api/newapi.ts
+	rm -f ui/core/api/api.ts
+	rm -f ui/core/api/common.ts
+	rm -f ui/core/api/druid.ts
+	rm -f ui/core/api/shaman.ts
 	rm -rf dist
 
 # Host a local server, for dev testing
 host: dist
 	npx http-server dist
 
-ui/core/api/newapi.ts: api/newapi.proto
+ui/core/api/api.ts: api/api.proto
 	npx r.js -convert node_modules/@protobuf-ts/runtime/build/commonjs/ dist/@protobuf-ts
 	mkdir -p ui/core/api
-	npx protoc --ts_opt generate_dependencies --ts_out ui/core/api --proto_path api api/newapi.proto
+	npx protoc --ts_opt generate_dependencies --ts_out ui/core/api --proto_path api api/api.proto
 
-dist/core/tsconfig.tsbuildinfo: $(call rwildcard,ui/core,*.ts) ui/core/api/newapi.ts
+dist/core/tsconfig.tsbuildinfo: $(call rwildcard,ui/core,*.ts) ui/core/api/api.ts
 	npx tsc -p ui/core
 
 # Generic rule for building index.js for any class directory
