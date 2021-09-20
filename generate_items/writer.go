@@ -1,8 +1,8 @@
 package main
 
 import (
-  "github.com/wowsims/tbc/generate_items/api"
   "fmt"
+  "github.com/wowsims/tbc/generate_items/api"
   "os"
   "regexp"
   "strings"
@@ -18,15 +18,25 @@ func ToSnakeCase(str string) string {
 }
 
 // Converts api.Spec_SpecElementalShaman into 'elemental_shaman'
-func SpecToFileName(spec api.Spec) string {
+func SpecToFileName(spec *api.Spec) string {
+  if spec == nil {
+    return "all"
+  }
+
   return ToSnakeCase(spec.String()[4:])
 }
 
-func writeItemFiles(outDir string, itemDeclarations []ItemDeclaration, itemResponses []WowheadItemResponse) {
+func specInSlice(a api.Spec, list []api.Spec) bool {
+  for _, b := range list {
+    if b == a {
+      return true
+    }
+  }
+  return false
+}
 
-  file, err := os.Create(fmt.Sprintf("%s/%s.go",
-      outDir,
-      SpecToFileName(api.Spec_SpecElementalShaman)))
+func writeItemFile(outDir string, itemDeclarations []ItemDeclaration, itemResponses []WowheadItemResponse, spec *api.Spec) {
+  file, err := os.Create(fmt.Sprintf("%s/%s.go", outDir, SpecToFileName(spec)))
   if err != nil {
     panic(err)
   }
@@ -40,8 +50,10 @@ func writeItemFiles(outDir string, itemDeclarations []ItemDeclaration, itemRespo
   file.WriteString("var items = []Item{\n")
 
   for idx, itemDeclaration := range itemDeclarations {
-    itemResponse := itemResponses[idx]
-    file.WriteString(fmt.Sprintf("\t%s,\n", itemToGoString(itemDeclaration, itemResponse)))
+    if spec == nil || specInSlice(*spec, itemDeclaration.Specs) {
+      itemResponse := itemResponses[idx]
+      file.WriteString(fmt.Sprintf("\t%s,\n", itemToGoString(itemDeclaration, itemResponse)))
+    }
   }
 
   file.WriteString("}\n")

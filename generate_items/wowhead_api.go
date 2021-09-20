@@ -1,9 +1,9 @@
 package main
 
 import (
-  "github.com/wowsims/tbc/generate_items/api"
   "encoding/json"
   "fmt"
+  "github.com/wowsims/tbc/generate_items/api"
   "io/ioutil"
   "log"
   "math"
