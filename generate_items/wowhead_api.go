@@ -124,6 +124,104 @@ func (item WowheadItemResponse) GetPhase() int {
   return item.GetIntValue(phaseRegex)
 }
 
+var itemTypePatterns = map[api.ItemType]*regexp.Regexp{
+  api.ItemType_ItemTypeHead: regexp.MustCompile("<td>Head</td>"),
+  api.ItemType_ItemTypeNeck: regexp.MustCompile("<td>Neck</td>"),
+  api.ItemType_ItemTypeShoulder: regexp.MustCompile("<td>Shoulder</td>"),
+  api.ItemType_ItemTypeBack: regexp.MustCompile("<td>Back</td>"),
+  api.ItemType_ItemTypeChest: regexp.MustCompile("<td>Chest</td>"),
+  api.ItemType_ItemTypeWrist: regexp.MustCompile("<td>Wrist</td>"),
+  api.ItemType_ItemTypeHands: regexp.MustCompile("<td>Hands</td>"),
+  api.ItemType_ItemTypeWaist: regexp.MustCompile("<td>Waist</td>"),
+  api.ItemType_ItemTypeLegs: regexp.MustCompile("<td>Legs</td>"),
+  api.ItemType_ItemTypeFeet: regexp.MustCompile("<td>Feet</td>"),
+  api.ItemType_ItemTypeFinger: regexp.MustCompile("<td>Finger</td>"),
+  api.ItemType_ItemTypeTrinket: regexp.MustCompile("<td>Trinket</td>"),
+  api.ItemType_ItemTypeWeapon: regexp.MustCompile("<td>((Main Hand)|(Two-Hand)|(One-Hand)|(Off Hand)|(Held In Off-hand))</td>"),
+  api.ItemType_ItemTypeRanged: regexp.MustCompile("<td>(Ranged|Thrown|Relic)</td>"),
+}
+
+func (item WowheadItemResponse) GetItemType() api.ItemType {
+  for itemType, pattern := range itemTypePatterns {
+    if pattern.MatchString(item.Tooltip) {
+      return itemType
+    }
+  }
+  panic("Could not find item type from tooltip: " + item.Tooltip)
+}
+
+var armorTypePatterns = map[api.ArmorType]*regexp.Regexp{
+  api.ArmorType_ArmorTypeCloth: regexp.MustCompile("<span class=\\\"q1\\\">Cloth</span>"),
+  api.ArmorType_ArmorTypeLeather: regexp.MustCompile("<span class=\\\"q1\\\">Leather</span>"),
+  api.ArmorType_ArmorTypeMail: regexp.MustCompile("<span class=\\\"q1\\\">Mail</span>"),
+  api.ArmorType_ArmorTypePlate: regexp.MustCompile("<span class=\\\"q1\\\">Plate</span>"),
+}
+
+func (item WowheadItemResponse) GetArmorType() api.ArmorType {
+  for armorType, pattern := range armorTypePatterns {
+    if pattern.MatchString(item.Tooltip) {
+      return armorType
+    }
+  }
+  return api.ArmorType_ArmorTypeUnknown
+}
+
+var weaponTypePatterns = map[api.WeaponType]*regexp.Regexp{
+  api.WeaponType_WeaponTypeAxe: regexp.MustCompile("<span class=\\\"q1\\\">Axe</span>"),
+  api.WeaponType_WeaponTypeDagger: regexp.MustCompile("<span class=\\\"q1\\\">Dagger</span>"),
+  api.WeaponType_WeaponTypeFist: regexp.MustCompile("<span class=\\\"q1\\\">Fist Weapon</span>"),
+  api.WeaponType_WeaponTypeMace: regexp.MustCompile("<span class=\\\"q1\\\">Mace</span>"),
+  api.WeaponType_WeaponTypeOffHand: regexp.MustCompile("<td>Held In Off-hand</td>"),
+  api.WeaponType_WeaponTypePolearm: regexp.MustCompile("<span class=\\\"q1\\\">Polearm</span>"),
+  api.WeaponType_WeaponTypeShield: regexp.MustCompile("<span class=\\\"q1\\\">Shield</span>"),
+  api.WeaponType_WeaponTypeStaff: regexp.MustCompile("<span class=\\\"q1\\\">Staff</span>"),
+  api.WeaponType_WeaponTypeSword: regexp.MustCompile("<span class=\\\"q1\\\">Sword</span>"),
+}
+
+func (item WowheadItemResponse) GetWeaponType() api.WeaponType {
+  for weaponType, pattern := range weaponTypePatterns {
+    if pattern.MatchString(item.Tooltip) {
+      return weaponType
+    }
+  }
+  return api.WeaponType_WeaponTypeUnknown
+}
+
+var handTypePatterns = map[api.HandType]*regexp.Regexp{
+  api.HandType_HandTypeMainHand: regexp.MustCompile("<td>Main Hand</td>"),
+  api.HandType_HandTypeOneHand: regexp.MustCompile("<td>One-Hand</td>"),
+  api.HandType_HandTypeOffHand: regexp.MustCompile("<td>((Off Hand)|(Held In Off-hand))</td>"),
+  api.HandType_HandTypeTwoHand: regexp.MustCompile("<td>Two-Hand</td>"),
+}
+func (item WowheadItemResponse) GetHandType() api.HandType {
+  for handType, pattern := range handTypePatterns {
+    if pattern.MatchString(item.Tooltip) {
+      return handType
+    }
+  }
+  return api.HandType_HandTypeUnknown
+}
+
+var rangedWeaponTypePatterns = map[api.RangedWeaponType]*regexp.Regexp{
+  api.RangedWeaponType_RangedWeaponTypeBow: regexp.MustCompile("<span class=\\\"q1\\\">Bow</span>"),
+  api.RangedWeaponType_RangedWeaponTypeCrossbow: regexp.MustCompile("<span class=\\\"q1\\\">Crossbow</span>"),
+  api.RangedWeaponType_RangedWeaponTypeGun: regexp.MustCompile("<span class=\\\"q1\\\">Gun</span>"),
+  api.RangedWeaponType_RangedWeaponTypeIdol: regexp.MustCompile("<span class=\\\"q1\\\">Idol</span>"),
+  api.RangedWeaponType_RangedWeaponTypeLibram: regexp.MustCompile("<span class=\\\"q1\\\">Libram</span>"),
+  api.RangedWeaponType_RangedWeaponTypeThrown: regexp.MustCompile("<span class=\\\"q1\\\">Thrown</span>"),
+  api.RangedWeaponType_RangedWeaponTypeTotem: regexp.MustCompile("<span class=\\\"q1\\\">Totem</span>"),
+  api.RangedWeaponType_RangedWeaponTypeWand: regexp.MustCompile("<span class=\\\"q1\\\">Wand</span>"),
+}
+
+func (item WowheadItemResponse) GetRangedWeaponType() api.RangedWeaponType {
+  for rangedWeaponType, pattern := range rangedWeaponTypePatterns {
+    if pattern.MatchString(item.Tooltip) {
+      return rangedWeaponType
+    }
+  }
+  return api.RangedWeaponType_RangedWeaponTypeUnknown
+}
+
 var gemColorsRegex, _ = regexp.Compile("(Meta|Yellow|Blue|Red) Socket")
 func (item WowheadItemResponse) GetGemSockets() []api.GemColor {
   matches := gemColorsRegex.FindAllStringSubmatch(item.Tooltip, -1)

@@ -36,6 +36,11 @@ func specInSlice(a api.Spec, list []api.Spec) bool {
 }
 
 func writeItemFile(outDir string, itemDeclarations []ItemDeclaration, itemResponses []WowheadItemResponse, spec *api.Spec) {
+  err := os.MkdirAll(outDir, os.ModePerm)
+  if err != nil {
+    panic(err)
+  }
+
   file, err := os.Create(fmt.Sprintf("%s/%s.go", outDir, SpecToFileName(spec)))
   if err != nil {
     panic(err)
@@ -64,24 +69,47 @@ func writeItemFile(outDir string, itemDeclarations []ItemDeclaration, itemRespon
 func itemToGoString(itemDeclaration ItemDeclaration, itemResponse WowheadItemResponse) string {
   itemStr := "{"
 
-  itemStr += fmt.Sprintf("Name: \"%s\",", itemResponse.Name)
-  itemStr += fmt.Sprintf("ID: %d,", itemDeclaration.ID)
+  itemStr += fmt.Sprintf("Name:\"%s\", ", itemResponse.Name)
+  itemStr += fmt.Sprintf("ID:%d, ", itemDeclaration.ID)
 
-  itemStr += fmt.Sprintf("Phase: %d,", itemResponse.GetPhase())
-  itemStr += fmt.Sprintf("Quality: api.ItemQuality_%s,", api.ItemQuality(itemResponse.Quality).String())
+  itemStr += fmt.Sprintf("Type:api.ItemType_%s, ", itemResponse.GetItemType().String())
 
-  itemStr += fmt.Sprintf("Stats: %s,", statsToGoString(itemResponse.GetStats()))
+  armorType := itemResponse.GetArmorType()
+  if armorType != api.ArmorType_ArmorTypeUnknown {
+    itemStr += fmt.Sprintf("ArmorType:api.ArmorType_%s, ", armorType.String())
+  }
+
+  weaponType := itemResponse.GetWeaponType()
+  if weaponType != api.WeaponType_WeaponTypeUnknown {
+    itemStr += fmt.Sprintf("WeaponType:api.WeaponType_%s, ", weaponType.String())
+
+    handType := itemResponse.GetHandType()
+    if handType == api.HandType_HandTypeUnknown {
+      panic("Unknown hand type for item: " + itemResponse.Tooltip)
+    }
+    itemStr += fmt.Sprintf("HandType:api.HandType_%s, ", handType.String())
+  } else {
+    rangedWeaponType := itemResponse.GetRangedWeaponType()
+    if rangedWeaponType != api.RangedWeaponType_RangedWeaponTypeUnknown {
+      itemStr += fmt.Sprintf("RangedWeaponType:api.RangedWeaponType_%s, ", rangedWeaponType.String())
+    }
+  }
+
+  itemStr += fmt.Sprintf("Phase:%d, ", itemResponse.GetPhase())
+  itemStr += fmt.Sprintf("Quality:api.ItemQuality_%s, ", api.ItemQuality(itemResponse.Quality).String())
+
+  itemStr += fmt.Sprintf("Stats:%s, ", statsToGoString(itemResponse.GetStats()))
 
   gemSockets := itemResponse.GetGemSockets()
   if len(gemSockets) > 0 {
-    itemStr += "GemSlots: []GemColor{"
+    itemStr += "GemSlots:[]GemColor{"
     for _, gemColor := range gemSockets {
       itemStr += fmt.Sprintf("api.GemColor_%s,", gemColor.String())
     }
-    itemStr += "},"
+    itemStr += "}, "
   }
 
-  itemStr += fmt.Sprintf("SocketBonus: %s,", statsToGoString(itemResponse.GetSocketBonus()))
+  itemStr += fmt.Sprintf("SocketBonus:%s", statsToGoString(itemResponse.GetSocketBonus()))
 
   itemStr += "}"
   return itemStr

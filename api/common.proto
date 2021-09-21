@@ -99,11 +99,11 @@ enum WeaponType {
     WeaponTypeDagger = 2;
     WeaponTypeFist = 3;
     WeaponTypeMace = 4;
-    WeaponTypePolearm = 5;
-    WeaponTypeOffHand = 6;
-    WeaponTypeStaff = 7;
-    WeaponTypeSword = 8;
-    WeaponTypeShield = 9;
+    WeaponTypeOffHand = 5;
+    WeaponTypePolearm = 6;
+    WeaponTypeShield = 7;
+    WeaponTypeStaff = 8;
+    WeaponTypeSword = 9;
 }
 
 enum HandType {
@@ -119,11 +119,11 @@ enum RangedWeaponType {
     RangedWeaponTypeBow = 1;
     RangedWeaponTypeCrossbow = 2;
     RangedWeaponTypeGun = 3;
+    RangedWeaponTypeIdol = 4;
     RangedWeaponTypeLibram = 5;
-    RangedWeaponTypeRelic = 6;
-    RangedWeaponTypeThrown = 7;
-    RangedWeaponTypeTotem = 8;
-    RangedWeaponTypeWand = 9;
+    RangedWeaponTypeThrown = 6;
+    RangedWeaponTypeTotem = 7;
+    RangedWeaponTypeWand = 8;
 }
 
 // All slots on the gear menu where a single item can be worn.

@@ -21,7 +21,9 @@ func main() {
     itemResponses[idx] = itemResponse
   }
 
-  // TODO: Loop through all specs found in declarations
-  spec := api.Spec_SpecElementalShaman
-  writeItemFile(*outDir, ItemDeclarations, itemResponses, &spec)
+  for specVal, _ := range api.Spec_name {
+    spec := api.Spec(specVal)
+    writeItemFile(*outDir, ItemDeclarations, itemResponses, &spec)
+  }
+  writeItemFile(*outDir, ItemDeclarations, itemResponses, nil)
 }
