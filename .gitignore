@@ -1,4 +1,15 @@
 node_modules
 bazel-*
-ui/core/api/newapi.ts
+generate_items/api
+ui/core/api/api.ts
+ui/core/api/common.ts
+ui/core/api/druid.ts
+ui/core/api/hunter.ts
+ui/core/api/mage.ts
+ui/core/api/paladin.ts
+ui/core/api/priest.ts
+ui/core/api/rogue.ts
+ui/core/api/shaman.ts
+ui/core/api/warrior.ts
+ui/core/api/warlock.ts
 .vscode

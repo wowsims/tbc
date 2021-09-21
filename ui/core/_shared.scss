@@ -25,6 +25,24 @@
   bottom: 0;
 }
 
+@mixin horizontal-left {
+  position: absolute;
+  left: 0;
+}
+
+@mixin horizontal-right {
+  position: absolute;
+  right: 0;
+}
+
+@mixin screen-vertical-horizontal-center {
+  margin: 0;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) !important;
+}
+
 .loader {
   border: 16px solid #f3f3f3; /* Light grey */
   border-top: 16px solid #3498db; /* Blue */
@@ -44,23 +62,23 @@
 }
 
 .item-quality-junk {
-  color: #fff;
+  color: #fff !important;
 }
 
 .item-quality-uncommon {
-  color: #1eff00;
+  color: #1eff00 !important;
 }
 
 .item-quality-rare {
-  color: #0070dd;
+  color: #0070dd !important;
 }
 
 .item-quality-epic {
-  color: #a335ee;
+  color: #a335ee !important;
 }
 
 .item-quality-legendary {
-  color: #ff8000;
+  color: #ff8000 !important;
 }
 
 .socket-color-meta {
@@ -73,4 +91,12 @@
 
 .socket-color-yellow {
   border: 1px solid yellow;
+}
+
+@mixin wowhead-background-icon {
+  background-repeat: no-repeat;
+  background-size: cover;
+  position: relative;
+  cursor: pointer;
+  display: inline-block;
 }

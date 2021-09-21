@@ -1,8 +1,8 @@
 export abstract class Component {
-  readonly rootElem: HTMLDivElement;
+  readonly rootElem: HTMLElement;
 
-  constructor(parentElem: HTMLElement, rootCssClass: string) {
-    this.rootElem = document.createElement('div');
+  constructor(parentElem: HTMLElement, rootCssClass: string, rootElem?: HTMLElement) {
+    this.rootElem = rootElem || document.createElement('div');
     this.rootElem.classList.add(rootCssClass);
     parentElem.appendChild(this.rootElem);
   }

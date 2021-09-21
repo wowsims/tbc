@@ -23,12 +23,10 @@
 }
 
 .item-picker-icon {
-  background-repeat: no-repeat;
-  background-size: contain;
-  width: 70px;
-  height: 70px;
+  @include wowhead-background-icon;
+  width: 8vh;
+  height: 8vh;
   border: 2px solid dimgray;
-  position: relative;
 }
 
 .item-picker-sockets-container {
@@ -39,21 +37,77 @@
 }
 
 .item-picker-gem-icon {
-  background-repeat: no-repeat;
-  background-size: contain;
+  @include wowhead-background-icon;
   width: 18px;
   height: 18px;
   margin: 1px;
-  display: inline-block;
 }
 
 .item-picker-labels-container {
+  padding: 3px;
 }
 
 .item-picker-name {
   display: block;
+  font-size: 18px;
 }
 
 .item-picker-enchant {
   display: block;
+  font-size: 14px;
+  color: lawngreen;
+}
+
+.selector-modal {
+}
+
+.selector-modal .modal-dialog {
+  @include screen-vertical-horizontal-center;
+}
+
+.selector-modal-search {
+  border: 1px inset black;
+  border-radius: 4px;
+}
+
+.selector-modal-tab-content-header {
+  margin: 5px;
+}
+
+.selector-modal-list {
+  padding: 0;
+}
+
+.selector-modal-list li {
+  background: LightGrey;
+}
+.selector-modal-list li:nth-child(odd) {
+  background: DarkGrey;
+}
+.selector-modal-list li:hover {
+  background: Grey;
+}
+
+.selector-modal-list-item {
+  display: flex;
+  align-items: center;
+  padding: 2px;
+}
+
+.selector-modal-list-item.active .selector-modal-list-item-icon {
+  border: 3px solid lawngreen;
+}
+
+.selector-modal-list-item-icon {
+  @include wowhead-background-icon;
+  width: 50px;
+  height: 50px;
+  border: 2px solid dimgray;
+}
+
+.selector-modal-list-item-name {
+  font-size: 18px;
+  text-decoration: none !important;
+  cursor: pointer;
+  margin-left: 10px;
 }

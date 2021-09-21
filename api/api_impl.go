@@ -22,7 +22,7 @@ func coreGemColorToColor(s []core.GemColor) []GemColor {
 func getGearListImpl(request *GearListRequest) *GearListResult {
 	result := &GearListResult{}
 
-	if request.Spec == Spec_ElementalShaman {
+	if request.Spec == Spec_SpecElementalShaman {
 		for _, v := range shaman.ElementalItems {
 			item := core.ItemsByID[v]
 			result.Items = append(result.Items,
@@ -194,11 +194,11 @@ func runSimulationImpl(request *IndividualSimRequest) *IndividualSimResult {
 	}
 
 	var agent core.Agent
-	switch v := request.Player.Options.Class.(type) {
-	case *PlayerOptions_Shaman:
-		talents := convertShamTalents(v.Shaman.Spec)
+	switch v := request.Player.Options.Spec.(type) {
+	case *PlayerOptions_ElementalShaman:
+		talents := convertShamTalents(v.ElementalShaman.Talents)
 		totems := convertTotems(request.Buffs)
-		agent = shaman.NewShaman(player, party, talents, totems, int(v.Shaman.AgentType), v.Shaman.AgentOptions)
+		agent = shaman.NewShaman(player, party, talents, totems, int(v.ElementalShaman.Agent.Type))
 	default:
 		panic("class not supported")
 	}
@@ -242,12 +242,12 @@ func runSimulationImpl(request *IndividualSimRequest) *IndividualSimResult {
 func convertTotems(inBuff *Buffs) shaman.Totems {
 	return shaman.Totems{
 		TotemOfWrath: int(inBuff.TotemOfWrath),
-		WrathOfAir:   inBuff.WrathOfAir,
-		ManaStream:   inBuff.ManaStream,
+		WrathOfAir:   inBuff.WrathOfAirTotem != 0,
+		ManaStream:   inBuff.ManaSpringTotem != 0,
 	}
 }
 
-func convertShamTalents(t *Shaman_ShamanSpec) shaman.Talents {
+func convertShamTalents(t *ShamanTalents) shaman.Talents {
 	return shaman.Talents{
 		LightningOverload:  int(t.LightningOverload),
 		ElementalPrecision: int(t.ElementalPrecision),
@@ -264,10 +264,10 @@ func convertShamTalents(t *Shaman_ShamanSpec) shaman.Talents {
 func convertConsumes(c *Consumes) core.Consumes {
 	cconsume := core.Consumes{
 		BrilliantWizardOil:       c.BrilliantWizardOil,
-		MajorMageblood:           c.MajorMageblood,
+		MajorMageblood:           c.ElixirOfMajorMageblood,
 		FlaskOfBlindingLight:     c.FlaskOfBlindingLight,
 		FlaskOfMightyRestoration: c.FlaskOfMightyRestoration,
-		BlackendBasilisk:         c.BlackendBasilisk,
+		BlackendBasilisk:         c.BlackenedBasilisk,
 		DestructionPotion:        c.DestructionPotion,
 		SuperManaPotion:          c.SuperManaPotion,
 		DarkRune:                 c.DarkRune,
@@ -294,15 +294,16 @@ func convertEquip(es *EquipmentSpec) core.EquipmentSpec {
 }
 
 func convertBuffs(inBuff *Buffs) core.Buffs {
+	// TODO: support tri-state
 	return core.Buffs{
-		ArcaneInt:                 inBuff.ArcaneInt,
-		GiftOfTheWild:             inBuff.GiftOfTheWild,
+		ArcaneInt:                 inBuff.ArcaneBrilliance,
+		GiftOfTheWild:             inBuff.GiftOfTheWild != TristateEffect_TristateEffectMissing,
 		BlessingOfKings:           inBuff.BlessingOfKings,
-		ImprovedBlessingOfWisdom:  inBuff.ImprovedBlessingOfWisdom,
-		ImprovedDivineSpirit:      inBuff.ImprovedDivineSpirit,
-		Moonkin:                   inBuff.Moonkin,
-		MoonkinRavenGoddess:       inBuff.MoonkinRavenGoddess,
-		SpriestDPS:                uint16(inBuff.SpriestDps),
+		ImprovedBlessingOfWisdom:  inBuff.BlessingOfWisdom != TristateEffect_TristateEffectMissing,
+		ImprovedDivineSpirit:      inBuff.DivineSpirit != TristateEffect_TristateEffectMissing,
+		Moonkin:                   inBuff.MoonkinAura != TristateEffect_TristateEffectMissing,
+		MoonkinRavenGoddess:       inBuff.MoonkinAura == TristateEffect_TristateEffectImproved,
+		SpriestDPS:                uint16(inBuff.ShadowPriestDps),
 		EyeOfNight:                inBuff.EyeOfTheNight,
 		TwilightOwl:               inBuff.ChainOfTheTwilightOwl,
 		JudgementOfWisdom:         inBuff.JudgementOfWisdom,

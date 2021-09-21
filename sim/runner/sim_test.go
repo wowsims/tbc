@@ -284,7 +284,7 @@ func doSimulateTest(label string, t *testing.T, eq core.EquipmentSpec, options c
 	player := core.NewPlayer(eq, core.RaceBonusTypeOrc, fullConsumes)
 	party := &core.Party{Players: []core.PlayerAgent{{Player: player}}}
 	raid := &core.Raid{Parties: []*core.Party{party}}
-	party.Players[0].Agent = shaman.NewShaman(player, party, shamTalents, shamTotems, 1, map[string]string{})
+	party.Players[0].Agent = shaman.NewShaman(player, party, shamTalents, shamTotems, 1)
 
 	options.Debug = true
 

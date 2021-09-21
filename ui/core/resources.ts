@@ -1,7 +1,7 @@
-import { GemColor } from './api/newapi';
-import { Item } from './api/newapi';
-import { ItemQuality } from './api/newapi';
-import { ItemSlot } from './api/newapi';
+import { GemColor } from './api/common';
+import { Item } from './api/common';
+import { ItemQuality } from './api/common';
+import { ItemSlot } from './api/common';
 
 const emptySlotIcons: Record<ItemSlot, string> = {
   [ItemSlot.ItemSlotHead]: 'https://cdn.seventyupgrades.com/item-slots/Head.jpg',
@@ -22,23 +22,56 @@ const emptySlotIcons: Record<ItemSlot, string> = {
   [ItemSlot.ItemSlotOffHand]: 'https://cdn.seventyupgrades.com/item-slots/OffHand.jpg',
   [ItemSlot.ItemSlotRanged]: 'https://cdn.seventyupgrades.com/item-slots/Ranged.jpg',
 };
-export function GetEmptySlotIconUrl(slot: ItemSlot): string {
+export function getEmptySlotIconUrl(slot: ItemSlot): string {
   return emptySlotIcons[slot];
 }
 
-const itemToIcon = new Map<number, string>();
-export async function GetItemIconUrl(id: number): Promise<string> {
-  if (itemToIcon.has(id)) {
-    return itemToIcon.get(id) as string;
+export type IconId = {
+  itemId: number;
+};
+export type SpellId = {
+  spellId: number;
+};
+export type ItemOrSpellId = IconId | SpellId;
+
+// Some items/spells have weird icons, so use this to show a different icon instead.
+const idOverrides: Record<string, ItemOrSpellId> = {};
+idOverrides[JSON.stringify({spellId: 37212})] = { itemId: 29035 }; // Improved Wrath of Air Totem
+
+async function getIconUrlHelper(id: number, tooltipPostfix: string, cache: Map<number, string>): Promise<string> {
+  if (cache.has(id)) {
+    return cache.get(id) as string;
   }
 
-  return fetch('https://tbc.wowhead.com/tooltip/item/' + id)
+  return fetch(`https://tbc.wowhead.com/tooltip/${tooltipPostfix}/${id}`)
   .then(response => response.json())
-  .then(itemInfo => {
-    const url = "https://wow.zamimg.com/images/wow/icons/large/" + itemInfo['icon'] + ".jpg";
-    itemToIcon.set(id, url);
+  .then(info => {
+    const url = "https://wow.zamimg.com/images/wow/icons/large/" + info['icon'] + ".jpg";
+    cache.set(id, url);
     return url;
   });
+}
+
+const itemToIconCache = new Map<number, string>();
+const spellToIconCache = new Map<number, string>();
+export async function getIconUrl(id: ItemOrSpellId): Promise<string> {
+  const idString = JSON.stringify(id);
+  if (idOverrides[idString])
+    id = idOverrides[idString];
+
+  if ('itemId' in id) {
+    return await getIconUrlHelper(id.itemId, 'item', itemToIconCache);
+  } else {
+    return await getIconUrlHelper(id.spellId, 'spell', spellToIconCache);
+  }
+}
+
+export function setWowheadHref(elem: HTMLAnchorElement, id: ItemOrSpellId) {
+  if ('itemId' in id) {
+    elem.href = 'https://tbc.wowhead.com/item=' + id.itemId;
+  } else {
+    elem.href = 'https://tbc.wowhead.com/spell=' + id.spellId;
+  }
 }
 
 const emptyGemSocketIcons: Partial<Record<GemColor, string>> = {
@@ -47,7 +80,7 @@ const emptyGemSocketIcons: Partial<Record<GemColor, string>> = {
   [GemColor.GemColorRed]: 'https://wow.zamimg.com/images/icons/socket-red.gif',
   [GemColor.GemColorYellow]: 'https://wow.zamimg.com/images/icons/socket-yellow.gif',
 };
-export function GetEmptyGemSocketIconUrl(color: GemColor): string {
+export function getEmptyGemSocketIconUrl(color: GemColor): string {
   if (emptyGemSocketIcons[color])
     return emptyGemSocketIcons[color] as string;
 

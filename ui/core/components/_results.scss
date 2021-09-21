@@ -35,6 +35,7 @@
 }
 .results-sim-dps-stdev:before {
   content: " \00b1";
+  padding: 2px;
 }
 
 .results-ep {
@@ -44,16 +45,20 @@
   margin: auto;
 }
 
+.results-ep-table td {
+  padding: 3px;
+}
+
 .results-ep-table tr td:nth-child(1) {
   text-align: right;
   font-size: 18px;
-  font-weight: 500;
+  font-weight: 700;
 }
 
 .results-ep-table tr td:nth-child(2), .results-ep-table tr td:nth-child(4) {
   text-align: left;
   font-size: 20px;
-  font-weight: 500;
+  font-weight: 700;
 }
 .results-ep-table tr td:nth-child(2):after {
   content: " DPS";
@@ -64,13 +69,14 @@
   font-size: 18px;
 }
 
-.results-ep-table tr td:nth-child(3), .results-ep-table tr td:nth-child(3) {
+.results-ep-table tr td:nth-child(3), .results-ep-table tr td:nth-child(5) {
   text-align: left;
   font-size: 15px;
-  font-weight: 500;
+  font-weight: 700;
 }
 .results-ep-table tr td:nth-child(3):before, .results-ep-table tr td:nth-child(5):before {
   content: " \00b1";
+  padding: 1px;
 }
 
 // Uncomment one of these, to control whether DPS or EP values are displayed

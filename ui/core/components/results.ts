@@ -1,7 +1,7 @@
-import { IndividualSimResult } from '../api/newapi';
-import { Stat } from '../api/newapi';
-import { StatWeightsResult } from '../api/newapi';
-import { StatNames } from '../api/names';
+import { IndividualSimResult } from '../api/api';
+import { StatWeightsResult } from '../api/api';
+import { Stat } from '../api/common';
+import { statNames } from '../api/names';
 import { Component } from './component.js';
 
 export class Results extends Component {
@@ -53,7 +53,7 @@ export class Results extends Component {
     this.epElem.style.display = 'initial';
     this.epElem.innerHTML = '<table class="results-ep-table">'
         + epStats.map(stat => `<tr>
-            <td>${StatNames[stat]}:</td>
+            <td>${statNames[stat]}:</td>
             <td>${result.weights[stat].toFixed(2)}</td>
             <td>${result.weightsStdev[stat].toFixed(2)}</td>
             <td>${result.epValues[stat].toFixed(2)}</td>

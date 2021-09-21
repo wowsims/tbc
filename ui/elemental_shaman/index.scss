@@ -3,3 +3,18 @@
 body {
   margin: 0;
 }
+
+.Buffs-icon-picker {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+}
+
+.Consumes-icon-picker {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+}
+
+.Debuffs-icon-picker {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+}

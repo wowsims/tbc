@@ -1,13 +1,105 @@
 import { intersection } from '../utils';
 
-import { Enchant } from './newapi';
-import { HandType } from './newapi';
-import { ItemSlot } from './newapi';
-import { ItemType } from './newapi';
-import { Item } from './newapi';
-import { Race } from './newapi';
-import { Spec } from './newapi';
+import { Class } from './common';
+import { Enchant } from './common';
+import { Gem } from './common';
+import { GemColor } from './common';
+import { HandType } from './common';
+import { ItemSlot } from './common';
+import { ItemType } from './common';
+import { Item } from './common';
+import { Race } from './common';
+import { RangedWeaponType } from './common';
+import { Spec } from './common';
+import { WeaponType } from './common';
 
+import { BalanceDruid, BalanceDruid_BalanceDruidAgent as BalanceDruidAgent, DruidTalents, BalanceDruid_BalanceDruidOptions as BalanceDruidOptions} from './druid';
+import { ElementalShaman, ElementalShaman_ElementalShamanAgent as ElementalShamanAgent, ShamanTalents, ElementalShaman_ElementalShamanOptions as ElementalShamanOptions } from './shaman';
+
+export type ShamanSpecs = Spec.SpecElementalShaman;
+
+export type AgentUnion = BalanceDruidAgent | ElementalShamanAgent;
+export type SpecAgent<T extends Spec> = T extends Spec.SpecBalanceDruid ? BalanceDruidAgent : ElementalShamanAgent;
+
+export type TalentsUnion = DruidTalents | ShamanTalents;
+export type SpecTalents<T extends Spec> = T extends Spec.SpecBalanceDruid ? DruidTalents: ShamanTalents;
+
+export type SpecOptionsUnion = BalanceDruidOptions | ElementalShamanOptions;
+export type SpecOptions<T extends Spec> = T extends Spec.SpecBalanceDruid ? BalanceDruidOptions : ElementalShamanOptions;
+
+export type SpecProtoUnion = BalanceDruid | ElementalShaman;
+export type SpecProto<T extends Spec> = T extends Spec.SpecBalanceDruid ? BalanceDruid : ElementalShaman;
+
+export type SpecTypeFunctions<SpecType extends Spec> = {
+  agentCreate: () => SpecAgent<SpecType>;
+  agentEquals: (a: SpecAgent<SpecType>, b: SpecAgent<SpecType>) => boolean;
+  agentCopy: (a: SpecAgent<SpecType>) => SpecAgent<SpecType>;
+  agentToJson: (a: SpecAgent<SpecType>) => any;
+  agentFromJson: (obj: any) => SpecAgent<SpecType>;
+
+  talentsCreate: () => SpecTalents<SpecType>;
+  talentsEquals: (a: SpecTalents<SpecType>, b: SpecTalents<SpecType>) => boolean;
+  talentsCopy: (a: SpecTalents<SpecType>) => SpecTalents<SpecType>;
+  talentsToJson: (a: SpecTalents<SpecType>) => any;
+  talentsFromJson: (obj: any) => SpecTalents<SpecType>;
+
+  optionsCreate: () => SpecOptions<SpecType>;
+  optionsEquals: (a: SpecOptions<SpecType>, b: SpecOptions<SpecType>) => boolean;
+  optionsCopy: (a: SpecOptions<SpecType>) => SpecOptions<SpecType>;
+  optionsToJson: (a: SpecOptions<SpecType>) => any;
+  optionsFromJson: (obj: any) => SpecOptions<SpecType>;
+};
+
+export const specTypeFunctions: Partial<Record<Spec, SpecTypeFunctions<any>>> = {
+  [Spec.SpecBalanceDruid]: {
+    agentCreate: () => BalanceDruidAgent.create(),
+    agentEquals: (a, b) => BalanceDruidAgent.equals(a as BalanceDruidAgent, b as BalanceDruidAgent),
+    agentCopy: (a) => BalanceDruidAgent.clone(a as BalanceDruidAgent),
+    agentToJson: (a) => BalanceDruidAgent.toJson(a as BalanceDruidAgent),
+    agentFromJson: (obj) => BalanceDruidAgent.fromJson(obj),
+
+    talentsCreate: () => DruidTalents.create(),
+    talentsEquals: (a, b) => DruidTalents.equals(a as DruidTalents, b as DruidTalents),
+    talentsCopy: (a) => DruidTalents.clone(a as DruidTalents),
+    talentsToJson: (a) => DruidTalents.toJson(a as DruidTalents),
+    talentsFromJson: (obj) => DruidTalents.fromJson(obj),
+
+    optionsCreate: () => BalanceDruidOptions.create(),
+    optionsEquals: (a, b) => BalanceDruidOptions.equals(a as BalanceDruidOptions, b as BalanceDruidOptions),
+    optionsCopy: (a) => BalanceDruidOptions.clone(a as BalanceDruidOptions),
+    optionsToJson: (a) => BalanceDruidOptions.toJson(a as BalanceDruidOptions),
+    optionsFromJson: (obj) => BalanceDruidOptions.fromJson(obj),
+  },
+  [Spec.SpecElementalShaman]: {
+    agentCreate: () => ElementalShamanAgent.create(),
+    agentEquals: (a, b) => ElementalShamanAgent.equals(a as ElementalShamanAgent, b as ElementalShamanAgent),
+    agentCopy: (a) => ElementalShamanAgent.clone(a as ElementalShamanAgent),
+    agentToJson: (a) => ElementalShamanAgent.toJson(a as ElementalShamanAgent),
+    agentFromJson: (obj) => ElementalShamanAgent.fromJson(obj),
+
+    talentsCreate: () => ShamanTalents.create(),
+    talentsEquals: (a, b) => ShamanTalents.equals(a as ShamanTalents, b as ShamanTalents),
+    talentsCopy: (a) => ShamanTalents.clone(a as ShamanTalents),
+    talentsToJson: (a) => ShamanTalents.toJson(a as ShamanTalents),
+    talentsFromJson: (obj) => ShamanTalents.fromJson(obj),
+
+    optionsCreate: () => ElementalShamanOptions.create(),
+    optionsEquals: (a, b) => ElementalShamanOptions.equals(a as ElementalShamanOptions, b as ElementalShamanOptions),
+    optionsCopy: (a) => ElementalShamanOptions.clone(a as ElementalShamanOptions),
+    optionsToJson: (a) => ElementalShamanOptions.toJson(a as ElementalShamanOptions),
+    optionsFromJson: (obj) => ElementalShamanOptions.fromJson(obj),
+  },
+};
+
+export const specToClass: Record<Spec, Class> = {
+  [Spec.SpecBalanceDruid]: Class.ClassDruid,
+  [Spec.SpecElementalShaman]: Class.ClassShaman,
+};
+
+const druidRaces = [
+    Race.RaceNightElf,
+    Race.RaceTauren,
+];
 const shamanRaces = [
     Race.RaceDraenei,
     Race.RaceOrc,
@@ -16,8 +108,9 @@ const shamanRaces = [
     Race.RaceTroll30,
 ];
 
-export const SpecToEligibleRaces: Record<Spec, Array<Race>> = {
-  [Spec.ElementalShaman]: shamanRaces,
+export const specToEligibleRaces: Record<Spec, Array<Race>> = {
+  [Spec.SpecBalanceDruid]: druidRaces,
+  [Spec.SpecElementalShaman]: shamanRaces,
 };
 
 const itemTypeToSlotsMap: Partial<Record<ItemType, Array<ItemSlot>>> = {
@@ -37,7 +130,7 @@ const itemTypeToSlotsMap: Partial<Record<ItemType, Array<ItemSlot>>> = {
   [ItemType.ItemTypeRanged]: [ItemSlot.ItemSlotRanged],
 };
 
-export function GetEligibleItemSlots(item: Item): Array<ItemSlot> {
+export function getEligibleItemSlots(item: Item): Array<ItemSlot> {
   if (itemTypeToSlotsMap[item.type]) {
     return itemTypeToSlotsMap[item.type]!;
   }
@@ -62,7 +155,7 @@ export function GetEligibleItemSlots(item: Item): Array<ItemSlot> {
  * Note that this alone is not enough; some items have further restrictions,
  * e.g. some weapon enchants may only be applied to 2H weapons.
  */
-export function GetEligibleEnchantSlots(enchant: Enchant): Array<ItemSlot> {
+export function getEligibleEnchantSlots(enchant: Enchant): Array<ItemSlot> {
   if (itemTypeToSlotsMap[enchant.type]) {
     return itemTypeToSlotsMap[enchant.type]!;
   }
@@ -75,14 +168,45 @@ export function GetEligibleEnchantSlots(enchant: Enchant): Array<ItemSlot> {
   throw new Error('Could not find item slots for enchant: ' + Enchant.toJsonString(enchant));
 };
 
-export function EnchantAppliesToItem(enchant: Enchant, item: Item): boolean {
-  const sharedSlots = intersection(GetEligibleEnchantSlots(enchant), GetEligibleItemSlots(item));
+export function enchantAppliesToItem(enchant: Enchant, item: Item): boolean {
+  const sharedSlots = intersection(getEligibleEnchantSlots(enchant), getEligibleItemSlots(item));
   if (sharedSlots.length == 0)
     return false;
 
   if (sharedSlots.includes(ItemSlot.ItemSlotMainHand)) {
-    return !enchant.twoHandedOnly || item.handType == HandType.HandTypeTwoHand;
+    if (enchant.twoHandedOnly && item.handType != HandType.HandTypeTwoHand)
+      return false;
+  }
+
+  if (sharedSlots.includes(ItemSlot.ItemSlotOffHand)) {
+    if (enchant.shieldOnly && item.weaponType != WeaponType.WeaponTypeShield)
+      return false;
+  }
+
+  if (sharedSlots.includes(ItemSlot.ItemSlotRanged)) {
+    if (![
+          RangedWeaponType.RangedWeaponTypeBow,
+          RangedWeaponType.RangedWeaponTypeCrossbow,
+          RangedWeaponType.RangedWeaponTypeGun,
+        ].includes(item.rangedWeaponType))
+      return false;
   }
 
   return true;
 };
+
+const socketToMatchingColors = new Map<GemColor, Array<GemColor>>();
+socketToMatchingColors.set(GemColor.GemColorMeta,   [GemColor.GemColorMeta]);
+socketToMatchingColors.set(GemColor.GemColorBlue,   [GemColor.GemColorBlue, GemColor.GemColorPurple, GemColor.GemColorGreen]);
+socketToMatchingColors.set(GemColor.GemColorRed,    [GemColor.GemColorRed, GemColor.GemColorPurple, GemColor.GemColorOrange]);
+socketToMatchingColors.set(GemColor.GemColorYellow, [GemColor.GemColorYellow, GemColor.GemColorOrange, GemColor.GemColorGreen]);
+
+// Whether the gem matches the given socket color, for the purposes of gaining the socket bonuses.
+export function gemMatchesSocket(gem: Gem, socketColor: GemColor) {
+  return socketToMatchingColors.has(socketColor) && socketToMatchingColors.get(socketColor)!.includes(gem.color);
+}
+
+// Whether the gem is capable of slotting into a socket of the given color.
+export function gemEligibleForSocket(gem: Gem, socketColor: GemColor) {
+  return (gem.color == GemColor.GemColorMeta) == (socketColor == GemColor.GemColorMeta);
+}

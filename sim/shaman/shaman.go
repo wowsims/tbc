@@ -16,7 +16,7 @@ const (
 	AgentTypeEnhancer      = 4
 )
 
-func NewShaman(player *core.Player, party *core.Party, talents Talents, totems Totems, agentID int, options map[string]string) *Shaman {
+func NewShaman(player *core.Player, party *core.Party, talents Talents, totems Totems, agentID int) *Shaman {
 	agent := NewAdaptiveAgent(nil)
 
 	// if WaterShield {

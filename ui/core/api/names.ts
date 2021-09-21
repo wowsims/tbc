@@ -1,8 +1,8 @@
-import { ItemSlot } from './newapi';
-import { Race } from './newapi';
-import { Stat } from './newapi';
+import { ItemSlot } from './common';
+import { Race } from './common';
+import { Stat } from './common';
 
-export const RaceNames: Record<Race, string> = {
+export const raceNames: Record<Race, string> = {
   [Race.RaceUnknown]: 'None',
   [Race.RaceBloodElf]: 'Blood Elf',
   [Race.RaceDraenei]: 'Draenei',
@@ -17,7 +17,7 @@ export const RaceNames: Record<Race, string> = {
   [Race.RaceUndead]: 'Undead',
 };
 
-export const StatNames: Record<Stat, string> = {
+export const statNames: Record<Stat, string> = {
   [Stat.StatStrength]: 'Strength',
   [Stat.StatAgility]: 'Agility',
   [Stat.StatStamina]: 'Stamina',
@@ -48,17 +48,17 @@ export const StatNames: Record<Stat, string> = {
   [Stat.StatArmor]: 'Armor',
 };
 
-export const SlotNames: Record<ItemSlot, string> = {
+export const slotNames: Record<ItemSlot, string> = {
   [ItemSlot.ItemSlotHead]: 'Head',
   [ItemSlot.ItemSlotNeck]: 'Neck',
   [ItemSlot.ItemSlotShoulder]: 'Shoulders',
   [ItemSlot.ItemSlotBack]: 'Back',
-  [ItemSlot.ItemSlotChest]: 'Check',
+  [ItemSlot.ItemSlotChest]: 'Chest',
   [ItemSlot.ItemSlotWrist]: 'Wrist',
   [ItemSlot.ItemSlotHands]: 'Hands',
   [ItemSlot.ItemSlotWaist]: 'Waist',
   [ItemSlot.ItemSlotLegs]: 'Legs',
-  [ItemSlot.ItemSlotFeet]: 'Feed',
+  [ItemSlot.ItemSlotFeet]: 'Feet',
   [ItemSlot.ItemSlotFinger1]: 'Finger 1',
   [ItemSlot.ItemSlotFinger2]: 'Finger 2',
   [ItemSlot.ItemSlotTrinket1]: 'Trinket 1',
@@ -67,3 +67,6 @@ export const SlotNames: Record<ItemSlot, string> = {
   [ItemSlot.ItemSlotOffHand]: 'Off Hand',
   [ItemSlot.ItemSlotRanged]: 'Ranged',
 };
+
+export const enchantDescriptions = new Map<number, string>();
+enchantDescriptions.set(29191, '+22 Spell Damage and 14 Spell Hit Rating');
