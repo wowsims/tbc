@@ -20,6 +20,7 @@ export function setGemSocketCssClass(elem: HTMLElement, color: GemColor) {
 
 const itemQualityCssClasses: Record<ItemQuality, string> = {
   [ItemQuality.ItemQualityJunk]: 'item-quality-junk',
+  [ItemQuality.ItemQualityCommon]: 'item-quality-common',
   [ItemQuality.ItemQualityUncommon]: 'item-quality-uncommon',
   [ItemQuality.ItemQualityRare]: 'item-quality-rare',
   [ItemQuality.ItemQualityEpic]: 'item-quality-epic',
