@@ -1,29 +1,29 @@
 package main
 
 import (
-  "flag"
-  "github.com/wowsims/tbc/generate_items/api"
-  //"fmt"
+	"flag"
+	"github.com/wowsims/tbc/generate_items/api"
+	//"fmt"
 )
 
 func main() {
-  outDir := flag.String("outDir", "", "Path to output directory for writing generated .go files.")
-  flag.Parse()
+	outDir := flag.String("outDir", "", "Path to output directory for writing generated .go files.")
+	flag.Parse()
 
-  if *outDir == "" {
-    panic("outDir flag is required!")
-  }
+	if *outDir == "" {
+		panic("outDir flag is required!")
+	}
 
-  itemResponses := make([]WowheadItemResponse, len(ItemDeclarations))
-  for idx, itemDeclaration := range ItemDeclarations {
-    itemResponse := getWowheadItemResponse(itemDeclaration.ID)
-    //fmt.Printf("\n\n%+v\n", itemResponse)
-    itemResponses[idx] = itemResponse
-  }
+	itemResponses := make([]WowheadItemResponse, len(ItemDeclarations))
+	for idx, itemDeclaration := range ItemDeclarations {
+		itemResponse := getWowheadItemResponse(itemDeclaration.ID)
+		//fmt.Printf("\n\n%+v\n", itemResponse)
+		itemResponses[idx] = itemResponse
+	}
 
-  for specVal, _ := range api.Spec_name {
-    spec := api.Spec(specVal)
-    writeItemFile(*outDir, ItemDeclarations, itemResponses, &spec)
-  }
-  writeItemFile(*outDir, ItemDeclarations, itemResponses, nil)
+	for specVal, _ := range api.Spec_name {
+		spec := api.Spec(specVal)
+		writeItemFile(*outDir, ItemDeclarations, itemResponses, &spec)
+	}
+	writeItemFile(*outDir, ItemDeclarations, itemResponses, nil)
 }
