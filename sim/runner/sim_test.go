@@ -42,6 +42,7 @@ var basicBuffs = core.Buffs{
 }
 
 var shamTalents = shaman.Talents{
+	LightningMastery:   5,
 	LightningOverload:  5,
 	ElementalPrecision: 3,
 	NaturesGuidance:    3,

@@ -258,6 +258,8 @@ func convertShamTalents(t *ShamanTalents) shaman.Talents {
 		CallOfThunder:      int(t.CallOfThunder),
 		Convection:         int(t.Convection),
 		Concussion:         int(t.Concussion),
+		LightningMastery:   int(t.LightningMastery),
+		ElementalFocus:     t.ElementalFocus,
 	}
 }
 

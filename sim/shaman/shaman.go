@@ -100,7 +100,7 @@ func (s *Shaman) OnSpellHit(sim *core.Simulation, _ core.PlayerAgent, cast *core
 	}
 	cast.DidDmg *= s.concussionBonus // add concussion
 
-	if cast.DidCrit {
+	if cast.DidCrit && s.Talents.ElementalFocus {
 		a := core.Aura{
 			ID:             core.MagicIDEleFocus,
 			Expires:        sim.CurrentTime + time.Second*15,
@@ -161,6 +161,8 @@ func (tt Totems) AddStats(s core.Stats) core.Stats {
 }
 
 type Talents struct {
+	ElementalFocus     bool
+	LightningMastery   int
 	LightningOverload  int
 	ElementalPrecision int
 	NaturesGuidance    int
@@ -229,8 +231,9 @@ func NewCastAction(sim *core.Simulation, player *Shaman, sp *core.Spell) core.Ag
 		}
 		cast.ManaCost *= player.convectionBonus
 
-		// TODO: Add LightningMastery to talent list
-		cast.CastTime -= time.Millisecond * 500 // Talent Lightning Mastery
+		if player.Talents.LightningMastery > 0 {
+			cast.CastTime -= time.Millisecond * 100 * time.Duration(player.Talents.LightningMastery)
+		}
 	}
 	cast.CastTime = time.Duration(float64(cast.CastTime) / player.HasteBonus())
 
