@@ -13,11 +13,19 @@ const (
 	AgentTypeFixedLBCL     = 1
 	AgentTypeCLOnClearcast = 2
 	AgentTypeAdaptive      = 3
-	AgentTypeEnhancer      = 4
 )
 
-func NewShaman(player *core.Player, party *core.Party, talents Talents, totems Totems, agentID int) *Shaman {
-	agent := NewAdaptiveAgent(nil)
+func NewShaman(player *core.Player, party *core.Party, talents Talents, totems Totems, agentID AgentType) *Shaman {
+	var agent shamanAgent
+
+	switch agentID {
+	case AgentTypeAdaptive:
+		agent = NewAdaptiveAgent(nil)
+	case AgentTypeCLOnClearcast:
+		agent = NewCLOnClearcastAgent(nil)
+		// case AgentTypeFixedLBCL:
+		// 	agent = NewFixedRotationAgent()
+	}
 
 	// if WaterShield {
 	player.InitialStats[core.StatMP5] += 50
@@ -28,7 +36,7 @@ func NewShaman(player *core.Player, party *core.Party, talents Talents, totems T
 		pl.Stats = pl.InitialStats
 	}
 
-	player.InitialStats[core.StatMP5] += player.InitialStats[core.StatIntellect] * (0.02 * float64(talents.UnrelentingStorm))
+	// player.InitialStats[core.StatMP5] += player.InitialStats[core.StatIntellect] * (0.02 * float64(talents.UnrelentingStorm))
 	player.Stats = player.InitialStats
 
 	return &Shaman{
@@ -47,6 +55,13 @@ type Shaman struct {
 	Talents      Talents     // Shaman Talents
 	*core.Player             // State of player
 
+	// HACK HACK HACK
+	// TODO: do we actually need a 'on start' method for agents?
+	//   This particular use case could also be solved by the 'OnStatAdd' event...
+	//    but are there other things we want to do once all buffs are applied right before starting?
+	//   Unrelenting storm could also be calculated on the fly if we can allow agents to override the 'Advance' function.
+	started bool
+
 	// cache
 	convectionBonus float64
 	concussionBonus float64
@@ -59,18 +74,33 @@ func (s *Shaman) BuffUp(sim *core.Simulation, party *core.Party) {
 	}
 }
 func (s *Shaman) ChooseAction(sim *core.Simulation, party *core.Party) core.AgentAction {
+	if !s.started {
+		s.started = true
+		// we need to apply regen once all buffs are applied.
+		s.Stats[core.StatMP5] += s.Stats[core.StatIntellect] * (0.02 * float64(s.Talents.UnrelentingStorm))
+	}
+	// Before casting, activate shaman powers!
+	TryActivateBloodlust(sim, party, s.Player)
+	if s.Talents.ElementalMastery {
+		TryActivateEleMastery(sim, s.Player)
+	}
+
 	return s.agent.ChooseAction(s, party, sim)
 }
 func (s *Shaman) OnActionAccepted(sim *core.Simulation, action core.AgentAction) {
 	s.agent.OnActionAccepted(s, sim, action)
 }
 func (s *Shaman) Reset(newsim *core.Simulation) {
-	// Do we need to reset anything special?
+	s.started = false
+	s.agent.Reset(newsim)
 }
-func (s *Shaman) OnSpellHit(sim *core.Simulation, _ *core.Player, cast *core.Cast) {
-	cast.DidDmg *= s.concussionBonus // add convection
+func (s *Shaman) OnSpellHit(sim *core.Simulation, _ core.PlayerAgent, cast *core.Cast) {
+	if cast.Spell.ID == core.MagicIDTLCLB { // TLC does not benefit from shaman talents
+		return
+	}
+	cast.DidDmg *= s.concussionBonus // add concussion
 
-	if cast.DidCrit && cast.Spell.ID != core.MagicIDTLCLB { // TLC does not proc focus.
+	if cast.DidCrit {
 		a := core.Aura{
 			ID:             core.MagicIDEleFocus,
 			Expires:        sim.CurrentTime + time.Second*15,
@@ -82,11 +112,14 @@ func (s *Shaman) OnSpellHit(sim *core.Simulation, _ *core.Player, cast *core.Cas
 	}
 }
 
-func elementalFocusOnCast(sim *core.Simulation, player *core.Player, c *core.Cast) {
+func elementalFocusOnCast(sim *core.Simulation, player core.PlayerAgent, c *core.Cast) {
 	c.ManaCost *= .6 // reduced by 40%
+	if sim.Debug != nil {
+		sim.Debug("ELE FOCUS: MANA COST: %0.1f\n", c.ManaCost)
+	}
 }
 
-func elementalFocusOnCastComplete(sim *core.Simulation, player *core.Player, c *core.Cast) {
+func elementalFocusOnCastComplete(sim *core.Simulation, player core.PlayerAgent, c *core.Cast) {
 	if c.ManaCost <= 0 {
 		return // Don't consume charges from free spells.
 	}
@@ -151,7 +184,7 @@ func TryActivateBloodlust(sim *core.Simulation, party *core.Party, player *core.
 		p.AddAura(sim, core.Aura{
 			ID:      core.MagicIDBloodlust,
 			Expires: sim.CurrentTime + dur,
-			OnCast: func(sim *core.Simulation, p *core.Player, c *core.Cast) {
+			OnCast: func(sim *core.Simulation, p core.PlayerAgent, c *core.Cast) {
 				c.CastTime = (c.CastTime * 10) / 13 // 30% faster
 			},
 		})
@@ -204,7 +237,7 @@ func NewCastAction(sim *core.Simulation, player *Shaman, sp *core.Spell) core.Ag
 	// Apply any on cast effects.
 	for _, id := range player.ActiveAuraIDs {
 		if player.Auras[id].OnCast != nil {
-			player.Auras[id].OnCast(sim, player.Player, cast)
+			player.Auras[id].OnCast(sim, core.PlayerAgent{Agent: player, Player: player.Player}, cast)
 		}
 	}
 	if itsElectric { // TODO: Add ElementalFury talent

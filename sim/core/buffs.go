@@ -15,9 +15,11 @@ type Buffs struct {
 	MoonkinRavenGoddess bool   // adds 20 spell crit to moonkin aura
 	SpriestDPS          uint16 // adds Mp5 ~ 25% (dps*5%*5sec = 25%)
 	Bloodlust           int
-	WrathOfAir          bool
-	TotemOfWrath        bool
-	ManaStream          bool
+
+	// TODO: Do these need to be here? Should I just use this instead of the shaman.Totems struct?
+	// WrathOfAir          bool
+	// TotemOfWrath        bool
+	// ManaStream          bool
 
 	// Party item buffs
 	EyeOfNight  bool // Eye of night bonus from party member (not you)
@@ -77,7 +79,7 @@ func TryActivateRacial(sim *Simulation, party *Party, player *Player) {
 		player.AddAura(sim, Aura{
 			ID:      MagicIDTrollBerserking,
 			Expires: sim.CurrentTime + dur,
-			OnCast: func(sim *Simulation, p *Player, c *Cast) {
+			OnCast: func(sim *Simulation, p PlayerAgent, c *Cast) {
 				c.CastTime = (c.CastTime * 10) / hasteBonus
 			},
 		})

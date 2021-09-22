@@ -71,27 +71,11 @@ func SetupSim(raid *core.Raid, buffs core.Buffs, options core.Options) *core.Sim
 		}
 	}
 
-	// Reset all players
-	for _, party := range sim.Raid.Parties {
-		for _, pl := range party.Players {
-			pl.Player.Reset()
-			pl.Agent.Reset(sim)
-		}
-	}
+	sim.Reset()
 
-	// Now buff everyone back up!
-	for _, party := range sim.Raid.Parties {
-		for _, pl := range party.Players {
-			pl.Player.BuffUp(sim, party)
-			pl.Agent.BuffUp(sim, party)
-		}
-	}
-
+	// Now apply all the 'final' stat improvements.
 	for _, raidParty := range sim.Raid.Parties {
 		for _, pl := range raidParty.Players {
-			// Add SpellCrit from Int and Mana from Int
-			pl.Player.InitialStats = pl.Player.InitialStats.CalculatedTotal()
-
 			// TODO: Figure out how to handle buffs that buff based on other buffs...
 			//   for now this hardcoded buffing works...
 			if buffs.ImprovedDivineSpirit {
@@ -105,6 +89,8 @@ func SetupSim(raid *core.Raid, buffs core.Buffs, options core.Options) *core.Sim
 				pl.Player.InitialStats[core.StatSpellPower] += pl.Player.InitialStats[core.StatSpirit] * 0.1
 			}
 
+			// Add SpellCrit from Int and Mana from Int
+			pl.Player.InitialStats = pl.Player.InitialStats.CalculatedTotal()
 			pl.Player.Stats = pl.Player.InitialStats
 		}
 	}
@@ -194,6 +180,7 @@ func (aggregator *MetricsAggregator) addMetrics(options core.Options, metrics co
 	aggregator.numSims++
 
 	dps := metrics.TotalDamage / options.Encounter.Duration
+	// log.Printf("total: %0.1f, dur: %0.1f, dps: %0.1f", metrics.TotalDamage, options.Encounter.Duration, dps)
 
 	aggregator.dpsSum += dps
 	aggregator.dpsSumSquared += dps * dps
@@ -267,4 +254,4 @@ func (a *nullAgent) BuffUp(sim *core.Simulation, party *core.Party) {
 }
 func (a *nullAgent) Reset(sim *core.Simulation) {
 }
-func (a *nullAgent) OnSpellHit(*core.Simulation, *core.Player, *core.Cast) {}
+func (a *nullAgent) OnSpellHit(*core.Simulation, core.PlayerAgent, *core.Cast) {}

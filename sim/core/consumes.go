@@ -75,7 +75,7 @@ func TryActivateDestructionPotion(sim *Simulation, party *Party, player *Player)
 	player.AddAura(sim, Aura{
 		ID:      MagicIDDestructionPotion,
 		Expires: sim.CurrentTime + dur,
-		OnExpire: func(sim *Simulation, player *Player, c *Cast) {
+		OnExpire: func(sim *Simulation, player PlayerAgent, c *Cast) {
 			player.Stats[StatSpellPower] -= spBonus
 			player.Stats[StatSpellCrit] -= critBonus
 		},
@@ -89,17 +89,16 @@ func TryActivateDarkRune(sim *Simulation, party *Party, player *Player) {
 
 	// Only pop if we have less than the max mana provided by the potion minus 1mp5 tick.
 	totalRegen := player.manaRegenPerSecond() * 5
-	if player.Stats[StatMana]-(player.Stats[StatMana]+totalRegen) < 1500 {
+	if player.InitialStats[StatMana]-(player.Stats[StatMana]+totalRegen) < 1500 {
 		return
 	}
 
 	// Restores 900 to 1500 mana. (2 Min Cooldown)
-	player.Stats[StatMana] += 900 + (sim.Rando.Float64() * 600)
+	player.Stats[StatMana] += 900 + (sim.Rando.Float64("dark rune") * 600)
 	player.SetCD(MagicIDRune, time.Second*120+sim.CurrentTime)
 	if sim.Debug != nil {
 		sim.Debug("Used Dark Rune\n")
 	}
-	return
 }
 
 func TryActivateSuperManaPotion(sim *Simulation, party *Party, player *Player) {
@@ -114,7 +113,7 @@ func TryActivateSuperManaPotion(sim *Simulation, party *Party, player *Player) {
 	}
 
 	// Restores 1800 to 3000 mana. (2 Min Cooldown)
-	manaGain := 1800 + (sim.Rando.Float64() * 1200)
+	manaGain := 1800 + (sim.Rando.Float64("super mana") * 1200)
 
 	if player.HasAura(MagicIDAlchStone) {
 		manaGain *= 1.4
@@ -125,5 +124,4 @@ func TryActivateSuperManaPotion(sim *Simulation, party *Party, player *Player) {
 	if sim.Debug != nil {
 		sim.Debug("Used Mana Potion\n")
 	}
-	return
 }

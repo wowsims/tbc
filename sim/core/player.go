@@ -1,8 +1,6 @@
 package core
 
 import (
-	"fmt"
-	"log"
 	"strconv"
 	"time"
 )
@@ -13,6 +11,28 @@ type Party struct {
 
 type Raid struct {
 	Parties []*Party
+}
+
+type PlayerAgent struct {
+	Agent
+	*Player
+}
+
+// Advance moves time forward counting down auras, CDs, mana regen, etc
+func (pa PlayerAgent) Advance(sim *Simulation, elapsedTime time.Duration, newTime time.Duration) {
+	// MP5 regen
+	regen := pa.manaRegenPerSecond() * elapsedTime.Seconds()
+	pa.Stats[StatMana] += regen
+	if pa.Stats[StatMana] > pa.InitialStats[StatMana] {
+		pa.Stats[StatMana] = pa.InitialStats[StatMana]
+	}
+	if sim.Debug != nil {
+		sim.Debug("Advanced.... Regenerated: %0.1f mana. Total: %0.1f\n", regen, pa.Stats[StatMana])
+	}
+
+	// Advance CDs and Auras
+	// TODO: should we just accept the PlayerAgent as input? Perhaps this doesn't belong on player at all then...
+	pa.AuraTracker.Advance(sim, pa, newTime)
 }
 
 // Player is a data structure to hold all the shared values that all
@@ -46,7 +66,6 @@ func (p *Player) GetPlayer() *Player {
 
 func NewPlayer(equipSpec EquipmentSpec, race RaceBonusType, consumes Consumes) *Player {
 	equip := NewEquipmentSet(equipSpec)
-	fmt.Println(equip.Stats().Print())
 	initialStats := CalculateTotalStats(race, equip, consumes)
 
 	if race == RaceBonusTypeDraenei {
@@ -66,7 +85,6 @@ func NewPlayer(equipSpec EquipmentSpec, race RaceBonusType, consumes Consumes) *
 
 	for i, eq := range equip {
 		if eq.Activate != nil {
-			log.Printf("Adding %s to active equipment...", eq.Name)
 			player.ActiveEquip = append(player.ActiveEquip, &equip[i])
 		}
 		for _, g := range eq.Gems {
@@ -79,19 +97,8 @@ func NewPlayer(equipSpec EquipmentSpec, race RaceBonusType, consumes Consumes) *
 	return player
 }
 
-// Advance moves time forward counting down auras, CDs, mana regen, etc
-func (p *Player) Advance(sim *Simulation, elapsedTime time.Duration, newTime time.Duration) {
-	// MP5 regen
-	p.Stats[StatMana] += p.manaRegenPerSecond() * elapsedTime.Seconds()
-	if p.Stats[StatMana] > p.InitialStats[StatMana] {
-		p.Stats[StatMana] = p.InitialStats[StatMana]
-	}
-
-	// Advance CDs and Auras
-	p.AuraTracker.Advance(sim, p, newTime)
-}
-
 func (p *Player) Reset() {
+	p.destructionPotionUsed = false
 	p.Stats = p.InitialStats
 	p.AuraTracker.ResetAuras()
 }
@@ -100,11 +107,11 @@ func (p *Player) BuffUp(sim *Simulation, party *Party) {
 	// Activate all permanent item effects.
 	for _, item := range p.ActiveEquip {
 		if item.Activate != nil && item.ActivateCD == NeverExpires {
-			p.AddAura(sim, item.Activate(sim, party, p))
+			p.AddAura(sim, item.Activate(sim, party, PlayerAgent{Player: p}))
 		}
 		for _, g := range item.Gems {
 			if g.Activate != nil {
-				p.AddAura(sim, g.Activate(sim, party, p))
+				p.AddAura(sim, g.Activate(sim, party, PlayerAgent{Player: p}))
 			}
 		}
 	}
@@ -116,7 +123,7 @@ func (p *Player) BuffUp(sim *Simulation, party *Party) {
 // AddAura on player is a simple wrapper around AuraTracker so the
 // consumer doesn't need to pass player back into itself.
 func (p *Player) AddAura(sim *Simulation, a Aura) {
-	p.AuraTracker.AddAura(sim, p, a)
+	p.AuraTracker.AddAura(sim, PlayerAgent{Player: p}, a)
 }
 
 // Returns rate of mana regen, as mana / second
@@ -126,20 +133,19 @@ func (p *Player) manaRegenPerSecond() float64 {
 
 // Pops any on-use trinkets / gear
 func (p *Player) TryActivateEquipment(sim *Simulation, party *Party) {
+	const sharedCD = time.Second * 20
+
 	for _, item := range p.ActiveEquip {
 		if item.Activate == nil || item.ActivateCD == NeverExpires { // ignore non-activatable, and always active items.
 			continue
 		}
-		if p.IsOnCD(item.CoolID, sim.CurrentTime) {
+		if p.IsOnCD(item.CoolID, sim.CurrentTime) || (item.SharedID != 0 && p.IsOnCD(item.SharedID, sim.CurrentTime)) {
 			continue
 		}
-		if item.ItemType == ItemTypeTrinket && p.IsOnCD(MagicIDAllTrinket, sim.CurrentTime) {
-			continue
-		}
-		p.AddAura(sim, item.Activate(sim, party, p))
-		p.SetCD(item.CoolID, item.ActivateCD+sim.CurrentTime)
-		if item.ItemType == ItemTypeTrinket {
-			p.SetCD(MagicIDAllTrinket, time.Second*30+sim.CurrentTime)
+		p.AddAura(sim, item.Activate(sim, party, PlayerAgent{Player: p}))
+		p.SetCD(item.CoolID, item.ActivateCD+sim.CurrentTime) // put item on CD
+		if item.SharedID != 0 {                               // put all shared CDs on
+			p.SetCD(item.SharedID, sharedCD+sim.CurrentTime)
 		}
 	}
 }
@@ -155,7 +161,7 @@ func (p *Player) ActivateSets(sim *Simulation, party *Party) []string {
 			setItemCount[set.Name]++
 			if bonus, ok := set.Bonuses[setItemCount[set.Name]]; ok {
 				active = append(active, set.Name+" ("+strconv.Itoa(setItemCount[set.Name])+"pc)")
-				p.AddAura(sim, bonus(sim, party, p))
+				p.AddAura(sim, bonus(sim, party, PlayerAgent{Player: p}))
 			}
 		}
 	}

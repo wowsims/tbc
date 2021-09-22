@@ -147,6 +147,7 @@ type Item struct {
 	Activate   ItemActivation `json:"-"` // Activatable Ability, produces an aura
 	ActivateCD time.Duration  `json:"-"` // cooldown on activation
 	CoolID     int32          `json:"-"` // ID used for cooldown
+	SharedID   int32          `json:"-"` // ID used for shared item cooldowns (trinkets etc)
 }
 
 type ItemQuality byte
@@ -228,7 +229,7 @@ func (gm GemColor) Intersects(o GemColor) bool {
 
 // ItemActivation needs the state from simulator, party, and player
 //  because items can impact all 3. (potions, drums, JC necks, etc)
-type ItemActivation func(*Simulation, *Party, *Player) Aura
+type ItemActivation func(*Simulation, *Party, PlayerAgent) Aura
 
 type Equipment [ItemSlotRanged + 1]Item
 
@@ -290,8 +291,19 @@ func NewEquipmentSet(equipSpec EquipmentSpec) Equipment {
 			} else {
 				equipment[ItemSlotTrinket2] = item
 			}
+		} else if item.ItemType == ItemTypeWeapon {
+			if item.WeaponType == WeaponTypeShield {
+				if equipment[ItemSlotMainHand].HandType != HandTypeTwoHand {
+					equipment[ItemSlotOffHand] = item
+				}
+			} else if item.HandType == HandTypeMainHand || item.HandType == HandTypeUnknown {
+				equipment[ItemSlotMainHand] = item
+			} else if item.HandType == HandTypeTwoHand {
+				equipment[ItemSlotMainHand] = item
+				equipment[ItemSlotOffHand] = Item{} // clear offhand
+			}
 		} else {
-			equipment[item.ItemType] = item
+			equipment[item.ItemType.Slot()] = item
 		}
 	}
 	return equipment
@@ -356,6 +368,41 @@ const (
 	ItemTypeRanged
 )
 
+func (it ItemType) Slot() ItemSlot {
+	switch it {
+	case ItemTypeHead:
+		return ItemSlotHead
+	case ItemTypeNeck:
+		return ItemSlotNeck
+	case ItemTypeShoulder:
+		return ItemSlotShoulder
+	case ItemTypeBack:
+		return ItemSlotBack
+	case ItemTypeChest:
+		return ItemSlotChest
+	case ItemTypeWrist:
+		return ItemSlotWrist
+	case ItemTypeHands:
+		return ItemSlotHands
+	case ItemTypeWaist:
+		return ItemSlotWaist
+	case ItemTypeLegs:
+		return ItemSlotLegs
+	case ItemTypeFeet:
+		return ItemSlotFeet
+	case ItemTypeFinger:
+		return ItemSlotFinger1
+	case ItemTypeTrinket:
+		return ItemSlotTrinket1
+	case ItemTypeWeapon:
+		return ItemSlotMainHand
+	case ItemTypeRanged:
+		return ItemSlotRanged
+	}
+
+	return 255
+}
+
 type ItemSlot byte
 
 const (
@@ -391,25 +438,29 @@ func (e Equipment) Stats() Stats {
 	s := Stats{}
 	for _, item := range e {
 		for k, v := range item.Stats {
+			if v == 0 {
+				continue
+			}
 			s[k] += v
 		}
-		isMatched := len(item.Gems) == len(item.GemSockets) && len(item.GemSockets) > 0
-		for gi, g := range item.Gems {
-			for k, v := range g.Stats {
-				s[k] += v
-			}
-			isMatched = isMatched && g.Color.Intersects(item.GemSockets[gi])
-			if !isMatched {
-			}
-		}
 		if len(item.GemSockets) > 0 {
-		}
-		if isMatched {
-			for k, v := range item.SocketBonus {
-				if v == 0 {
-					continue
+			isMatched := len(item.Gems) == len(item.GemSockets) && len(item.GemSockets) > 0
+			for gi, g := range item.Gems {
+				for k, v := range g.Stats {
+					s[k] += v
 				}
-				s[k] += v
+				isMatched = isMatched && g.Color.Intersects(item.GemSockets[gi])
+				if !isMatched {
+					break
+				}
+			}
+			if isMatched {
+				for k, v := range item.SocketBonus {
+					if v == 0 {
+						continue
+					}
+					s[k] += v
+				}
 			}
 		}
 		for k, v := range item.Enchant.Bonus {
@@ -700,27 +751,27 @@ var items = []Item{
 	{ID: 28297, ItemType: ItemTypeWeapon, Name: "Gladiator's Gavel / Gladiator's Spellblade", Phase: 1, Quality: ItemQualityEpic, SourceZone: "PvP", SourceDrop: "PvP", Stats: Stats{StatStamina: 28, StatIntellect: 18, StatSpellPower: 199}},
 
 	// Hand Written
-	{ID: 27683, ItemType: ItemTypeTrinket, Name: "Quagmirran's Eye", Phase: 1, Quality: ItemQualityRare, SourceZone: "The Slave Pens", SourceDrop: "Quagmirran", Stats: Stats{StatSpellPower: 37}, Activate: ActivateQuagsEye, ActivateCD: NeverExpires},
-	{ID: 29370, ItemType: ItemTypeTrinket, Name: "Icon of the Silver Crescent", Phase: 1, Quality: ItemQualityEpic, SourceZone: "Shattrath", SourceDrop: "G'eras - 41 Badges", Stats: Stats{StatSpellPower: 43}, Activate: createSpellDmgActivate(MagicIDBlessingSilverCrescent, 155, time.Second*20), ActivateCD: time.Second * 120, CoolID: MagicIDISCTrink},
-	{ID: 19344, ItemType: ItemTypeTrinket, Name: "Natural Alignment Crystal", Phase: 0, Quality: ItemQualityEpic, SourceZone: "BWL", SourceDrop: "", Stats: Stats{}, Activate: ActivateNAC, ActivateCD: time.Second * 300, CoolID: MagicIDNACTrink},
-	{ID: 19379, ItemType: ItemTypeTrinket, Name: "Neltharion's Tear", Phase: 0, Quality: ItemQualityEpic, SourceZone: "BWL", SourceDrop: "Nefarian", Stats: Stats{StatSpellPower: 44, StatSpellHit: 16}},
-	{ID: 23046, ItemType: ItemTypeTrinket, Name: "The Restrained Essence of Sapphiron", Phase: 0, Quality: ItemQualityEpic, SourceZone: "Naxx", SourceDrop: "Sapphiron", Stats: Stats{StatSpellPower: 40}, Activate: createSpellDmgActivate(MagicIDSpellPower, 130, time.Second*20), ActivateCD: time.Second * 120, CoolID: MagicIDEssSappTrink},
-	{ID: 23207, ItemType: ItemTypeTrinket, Name: "Mark of the Champion", Phase: 0, Quality: ItemQualityEpic, SourceZone: "Naxx", SourceDrop: "KT", Stats: Stats{StatSpellPower: 85}},
-	{ID: 29132, ItemType: ItemTypeTrinket, Name: "Scryer's Bloodgem", Phase: 1, Quality: ItemQualityRare, SourceZone: "The Scryers - Revered", SourceDrop: "", Stats: Stats{StatSpellHit: 32}, Activate: createSpellDmgActivate(MagicIDSpellPower, 150, time.Second*15), ActivateCD: time.Second * 90, CoolID: MagicIDScryerTrink},
-	{ID: 24126, ItemType: ItemTypeTrinket, Name: "Figurine - Living Ruby Serpent", Phase: 1, Quality: ItemQualityRare, SourceZone: "Jewelcarfting BoP", SourceDrop: "", Stats: Stats{StatIntellect: 23, StatStamina: 33}, Activate: createSpellDmgActivate(MagicIDRubySerpent, 150, time.Second*20), ActivateCD: time.Second * 300, CoolID: MagicIDRubySerpentTrink},
-	{ID: 29179, ItemType: ItemTypeTrinket, Name: "Xi'ri's Gift", Phase: 1, Quality: ItemQualityRare, SourceZone: "The Sha'tar - Revered", SourceDrop: "", Stats: Stats{StatSpellCrit: 32}, Activate: createSpellDmgActivate(MagicIDSpellPower, 150, time.Second*15), ActivateCD: time.Second * 90, CoolID: MagicIDXiriTrink},
-	{ID: 28418, ItemType: ItemTypeTrinket, Name: "Shiffar's Nexus-Horn", Phase: 1, Quality: ItemQualityRare, SourceZone: "Arc - Harbinger Skyriss", SourceDrop: "", Stats: Stats{StatSpellCrit: 30}, Activate: ActivateNexusHorn, ActivateCD: NeverExpires},
-	{ID: 31856, ItemType: ItemTypeTrinket, Name: "Darkmoon Card: Crusade", Phase: 2, Quality: ItemQualityEpic, SourceZone: "Blessings Deck", SourceDrop: "", Activate: ActivateDCC, ActivateCD: NeverExpires},
-	{ID: 28785, ItemType: ItemTypeTrinket, Name: "The Lightning Capacitor", Phase: 1, Quality: ItemQualityEpic, SourceZone: "Kara", SourceDrop: "", Activate: ActivateTLC, ActivateCD: NeverExpires},
-	{ID: 28789, ItemType: ItemTypeTrinket, Name: "Eye of Magtheridon", Phase: 1, Quality: ItemQualityEpic, SourceZone: "", SourceDrop: "", Stats: Stats{StatSpellPower: 54}, Activate: ActivateEyeOfMag, ActivateCD: NeverExpires},
-	{ID: 30626, ItemType: ItemTypeTrinket, Name: "Sextant of Unstable Currents", Phase: 2, Quality: ItemQualityEpic, SourceZone: "SSC", SourceDrop: "", Stats: Stats{StatSpellCrit: 40}, Activate: ActivateSextant, ActivateCD: NeverExpires},
-	{ID: 34429, ItemType: ItemTypeTrinket, Name: "Shifting Naaru Sliver", Phase: 5, Quality: ItemQualityEpic, SourceZone: "Sunwell", SourceDrop: "", Stats: Stats{StatSpellHaste: 54}, Activate: createSpellDmgActivate(MagicIDShiftingNaaru, 320, time.Second*15), ActivateCD: time.Second * 90, CoolID: MagicIDShiftingNaaruTrink},
-	{ID: 32483, ItemType: ItemTypeTrinket, Name: "The Skull of Gul'dan", Phase: 3, Quality: ItemQualityEpic, SourceZone: "Black Temple", SourceDrop: "", Stats: Stats{StatSpellHit: 25, StatSpellPower: 55}, Activate: createHasteActivate(MagicIDSkullGuldan, 175, time.Second*20), ActivateCD: time.Second * 120, CoolID: MagicIDSkullGuldanTrink},
-	{ID: 33829, ItemType: ItemTypeTrinket, Name: "Hex Shrunken Head", Phase: 4, Quality: ItemQualityEpic, SourceZone: "ZA", SourceDrop: "", Stats: Stats{StatSpellPower: 53}, Activate: createSpellDmgActivate(MagicIDHexShunkHead, 211, time.Second*20), ActivateCD: time.Second * 120, CoolID: MagicIDHexTrink},
-	{ID: 29376, ItemType: ItemTypeTrinket, Name: "Essence of the Martyr", Phase: 1, Quality: ItemQualityRare, SourceZone: "G'eras", SourceDrop: "Badges", Stats: Stats{StatSpellPower: 28}, Activate: createSpellDmgActivate(MagicIDSpellPower, 99, time.Second*20), ActivateCD: time.Second * 120, CoolID: MagicIDEssMartyrTrink},
-	{ID: 38290, ItemType: ItemTypeTrinket, Name: "Dark Iron Smoking Pipe", Phase: 2, Quality: ItemQualityEpic, SourceZone: "Brewfest", SourceDrop: "Corin Direbrew", Stats: Stats{StatSpellPower: 43}, Activate: createSpellDmgActivate(MagicIDDarkIronPipeweed, 155, time.Second*20), ActivateCD: time.Second * 120, CoolID: MagicIDDITrink},
-	{ID: 30663, ItemType: ItemTypeTrinket, Name: "Fathom-Brooch of the Tidewalker", Phase: 2, Quality: ItemQualityEpic, SourceZone: "SSC", SourceDrop: "Fathom-Lord Karathress", Stats: Stats{}, Activate: ActivateFathomBrooch, ActivateCD: NeverExpires},
-	{ID: 35749, ItemType: ItemTypeTrinket, Name: "Sorcerer's Alchemist Stone", Phase: 5, Quality: ItemQualityEpic, SourceZone: "Shattered Sun Offensive", SourceDrop: "Exalted", Stats: Stats{StatSpellPower: 63}, Activate: ActivateAlchStone, ActivateCD: NeverExpires},
+	{ID: 27683, ItemType: ItemTypeTrinket, Name: "Quagmirran's Eye", Phase: 1, Quality: ItemQualityRare, SourceZone: "The Slave Pens", SourceDrop: "Quagmirran", Stats: Stats{StatSpellPower: 37}, Activate: ActivateQuagsEye, ActivateCD: NeverExpires, SharedID: MagicIDAtkTrinket},
+	{ID: 29370, ItemType: ItemTypeTrinket, Name: "Icon of the Silver Crescent", Phase: 1, Quality: ItemQualityEpic, SourceZone: "Shattrath", SourceDrop: "G'eras - 41 Badges", Stats: Stats{StatSpellPower: 43}, Activate: createSpellDmgActivate(MagicIDBlessingSilverCrescent, 155, time.Second*20), ActivateCD: time.Second * 120, CoolID: MagicIDISCTrink, SharedID: MagicIDAtkTrinket},
+	{ID: 19344, ItemType: ItemTypeTrinket, Name: "Natural Alignment Crystal", Phase: 0, Quality: ItemQualityEpic, SourceZone: "BWL", SourceDrop: "", Stats: Stats{}, Activate: ActivateNAC, ActivateCD: time.Second * 300, CoolID: MagicIDNACTrink, SharedID: MagicIDAtkTrinket},
+	{ID: 19379, ItemType: ItemTypeTrinket, Name: "Neltharion's Tear", Phase: 0, Quality: ItemQualityEpic, SourceZone: "BWL", SourceDrop: "Nefarian", Stats: Stats{StatSpellPower: 44, StatSpellHit: 16}, SharedID: MagicIDAtkTrinket},
+	{ID: 23046, ItemType: ItemTypeTrinket, Name: "The Restrained Essence of Sapphiron", Phase: 0, Quality: ItemQualityEpic, SourceZone: "Naxx", SourceDrop: "Sapphiron", Stats: Stats{StatSpellPower: 40}, Activate: createSpellDmgActivate(MagicIDSpellPower, 130, time.Second*20), ActivateCD: time.Second * 120, CoolID: MagicIDEssSappTrink, SharedID: MagicIDAtkTrinket},
+	{ID: 23207, ItemType: ItemTypeTrinket, Name: "Mark of the Champion", Phase: 0, Quality: ItemQualityEpic, SourceZone: "Naxx", SourceDrop: "KT", Stats: Stats{StatSpellPower: 85}, SharedID: MagicIDAtkTrinket},
+	{ID: 29132, ItemType: ItemTypeTrinket, Name: "Scryer's Bloodgem", Phase: 1, Quality: ItemQualityRare, SourceZone: "The Scryers - Revered", SourceDrop: "", Stats: Stats{StatSpellHit: 32}, Activate: createSpellDmgActivate(MagicIDSpellPower, 150, time.Second*15), ActivateCD: time.Second * 90, CoolID: MagicIDScryerTrink, SharedID: MagicIDAtkTrinket},
+	{ID: 24126, ItemType: ItemTypeTrinket, Name: "Figurine - Living Ruby Serpent", Phase: 1, Quality: ItemQualityRare, SourceZone: "Jewelcarfting BoP", SourceDrop: "", Stats: Stats{StatIntellect: 23, StatStamina: 33}, Activate: createSpellDmgActivate(MagicIDRubySerpent, 150, time.Second*20), ActivateCD: time.Second * 300, CoolID: MagicIDRubySerpentTrink, SharedID: MagicIDAtkTrinket},
+	{ID: 29179, ItemType: ItemTypeTrinket, Name: "Xi'ri's Gift", Phase: 1, Quality: ItemQualityRare, SourceZone: "The Sha'tar - Revered", SourceDrop: "", Stats: Stats{StatSpellCrit: 32}, Activate: createSpellDmgActivate(MagicIDSpellPower, 150, time.Second*15), ActivateCD: time.Second * 90, CoolID: MagicIDXiriTrink, SharedID: MagicIDAtkTrinket},
+	{ID: 28418, ItemType: ItemTypeTrinket, Name: "Shiffar's Nexus-Horn", Phase: 1, Quality: ItemQualityRare, SourceZone: "Arc - Harbinger Skyriss", SourceDrop: "", Stats: Stats{StatSpellCrit: 30}, Activate: ActivateNexusHorn, ActivateCD: NeverExpires, SharedID: MagicIDAtkTrinket},
+	{ID: 31856, ItemType: ItemTypeTrinket, Name: "Darkmoon Card: Crusade", Phase: 2, Quality: ItemQualityEpic, SourceZone: "Blessings Deck", SourceDrop: "", Activate: ActivateDCC, ActivateCD: NeverExpires, SharedID: MagicIDAtkTrinket},
+	{ID: 28785, ItemType: ItemTypeTrinket, Name: "The Lightning Capacitor", Phase: 1, Quality: ItemQualityEpic, SourceZone: "Kara", SourceDrop: "", Activate: ActivateTLC, ActivateCD: NeverExpires, SharedID: MagicIDAtkTrinket},
+	{ID: 28789, ItemType: ItemTypeTrinket, Name: "Eye of Magtheridon", Phase: 1, Quality: ItemQualityEpic, SourceZone: "", SourceDrop: "", Stats: Stats{StatSpellPower: 54}, Activate: ActivateEyeOfMag, ActivateCD: NeverExpires, SharedID: MagicIDAtkTrinket},
+	{ID: 30626, ItemType: ItemTypeTrinket, Name: "Sextant of Unstable Currents", Phase: 2, Quality: ItemQualityEpic, SourceZone: "SSC", SourceDrop: "", Stats: Stats{StatSpellCrit: 40}, Activate: ActivateSextant, ActivateCD: NeverExpires, SharedID: MagicIDAtkTrinket},
+	{ID: 34429, ItemType: ItemTypeTrinket, Name: "Shifting Naaru Sliver", Phase: 5, Quality: ItemQualityEpic, SourceZone: "Sunwell", SourceDrop: "", Stats: Stats{StatSpellHaste: 54}, Activate: createSpellDmgActivate(MagicIDShiftingNaaru, 320, time.Second*15), ActivateCD: time.Second * 90, CoolID: MagicIDShiftingNaaruTrink, SharedID: MagicIDAtkTrinket},
+	{ID: 32483, ItemType: ItemTypeTrinket, Name: "The Skull of Gul'dan", Phase: 3, Quality: ItemQualityEpic, SourceZone: "Black Temple", SourceDrop: "", Stats: Stats{StatSpellHit: 25, StatSpellPower: 55}, Activate: createHasteActivate(MagicIDSkullGuldan, 175, time.Second*20), ActivateCD: time.Second * 120, CoolID: MagicIDSkullGuldanTrink, SharedID: MagicIDAtkTrinket},
+	{ID: 33829, ItemType: ItemTypeTrinket, Name: "Hex Shrunken Head", Phase: 4, Quality: ItemQualityEpic, SourceZone: "ZA", SourceDrop: "", Stats: Stats{StatSpellPower: 53}, Activate: createSpellDmgActivate(MagicIDHexShunkHead, 211, time.Second*20), ActivateCD: time.Second * 120, CoolID: MagicIDHexTrink, SharedID: MagicIDAtkTrinket},
+	{ID: 29376, ItemType: ItemTypeTrinket, Name: "Essence of the Martyr", Phase: 1, Quality: ItemQualityRare, SourceZone: "G'eras", SourceDrop: "Badges", Stats: Stats{StatSpellPower: 28}, Activate: createSpellDmgActivate(MagicIDSpellPower, 99, time.Second*20), ActivateCD: time.Second * 120, CoolID: MagicIDEssMartyrTrink, SharedID: MagicIDHealTrinket},
+	{ID: 38290, ItemType: ItemTypeTrinket, Name: "Dark Iron Smoking Pipe", Phase: 2, Quality: ItemQualityEpic, SourceZone: "Brewfest", SourceDrop: "Corin Direbrew", Stats: Stats{StatSpellPower: 43}, Activate: createSpellDmgActivate(MagicIDDarkIronPipeweed, 155, time.Second*20), ActivateCD: time.Second * 120, CoolID: MagicIDDITrink, SharedID: MagicIDAtkTrinket},
+	{ID: 30663, ItemType: ItemTypeTrinket, Name: "Fathom-Brooch of the Tidewalker", Phase: 2, Quality: ItemQualityEpic, SourceZone: "SSC", SourceDrop: "Fathom-Lord Karathress", Stats: Stats{}, Activate: ActivateFathomBrooch, ActivateCD: NeverExpires, SharedID: MagicIDAtkTrinket},
+	{ID: 35749, ItemType: ItemTypeTrinket, Name: "Sorcerer's Alchemist Stone", Phase: 5, Quality: ItemQualityEpic, SourceZone: "Shattered Sun Offensive", SourceDrop: "Exalted", Stats: Stats{StatSpellPower: 63}, Activate: ActivateAlchStone, ActivateCD: NeverExpires, SharedID: MagicIDAtkTrinket},
 
 	{ID: 24116, ItemType: ItemTypeNeck, Name: "Eye of the Night", Phase: 1, Quality: ItemQualityRare, SourceZone: "Jewelcrafting", SourceDrop: "", Stats: Stats{StatSpellCrit: 26, StatSpellHit: 16}, Activate: ActivateEyeOfNight, ActivateCD: NeverExpires},
 	{ID: 24121, ItemType: ItemTypeNeck, Name: "Chain of the Twilight Owl", Phase: 1, Quality: ItemQualityRare, SourceZone: "Jewelcrafting", SourceDrop: "", Stats: Stats{StatIntellect: 19, StatSpellPower: 21}, Activate: ActivateChainTO, ActivateCD: NeverExpires},
@@ -893,7 +944,7 @@ var sets = []ItemSet{
 	{
 		Name:  "Netherstrike",
 		Items: map[string]bool{"Netherstrike Breastplate": true, "Netherstrike Bracers": true, "Netherstrike Belt": true},
-		Bonuses: map[int]ItemActivation{3: func(sim *Simulation, party *Party, player *Player) Aura {
+		Bonuses: map[int]ItemActivation{3: func(sim *Simulation, party *Party, player PlayerAgent) Aura {
 			player.Stats[StatSpellPower] += 23
 			return Aura{ID: MagicIDNetherstrike}
 		}},
@@ -901,7 +952,7 @@ var sets = []ItemSet{
 	{
 		Name:  "The Twin Stars",
 		Items: map[string]bool{"Charlotte's Ivy": true, "Lola's Eve": true},
-		Bonuses: map[int]ItemActivation{2: func(sim *Simulation, party *Party, player *Player) Aura {
+		Bonuses: map[int]ItemActivation{2: func(sim *Simulation, party *Party, player PlayerAgent) Aura {
 			player.Stats[StatSpellPower] += 15
 			return Aura{ID: MagicIDNetherstrike}
 		}},
@@ -910,10 +961,10 @@ var sets = []ItemSet{
 		Name:  "Tidefury",
 		Items: map[string]bool{"Tidefury Helm": true, "Tidefury Shoulderguards": true, "Tidefury Chestpiece": true, "Tidefury Kilt": true, "Tidefury Gauntlets": true},
 		Bonuses: map[int]ItemActivation{
-			2: func(sim *Simulation, party *Party, player *Player) Aura {
+			2: func(sim *Simulation, party *Party, player PlayerAgent) Aura {
 				return Aura{ID: MagicIDTidefury}
 			},
-			4: func(sim *Simulation, party *Party, player *Player) Aura {
+			4: func(sim *Simulation, party *Party, player PlayerAgent) Aura {
 				// TODO: should we even allow for unchecking water shield?
 				// if sim.Options.Buffs.WaterShield {
 				player.Stats[StatMP5] += 3
@@ -930,7 +981,7 @@ var sets = []ItemSet{
 	{
 		Name:  "Mana Etched",
 		Items: map[string]bool{"Mana-Etched Crown": true, "Mana-Etched Spaulders": true, "Mana-Etched Vestments": true, "Mana-Etched Gloves": true, "Mana-Etched Pantaloons": true},
-		Bonuses: map[int]ItemActivation{4: ActivateManaEtched, 2: func(sim *Simulation, party *Party, player *Player) Aura {
+		Bonuses: map[int]ItemActivation{4: ActivateManaEtched, 2: func(sim *Simulation, party *Party, player PlayerAgent) Aura {
 			player.Stats[StatSpellHit] += 35
 			return Aura{ID: MagicIDManaEtchedHit}
 		}},
@@ -938,10 +989,10 @@ var sets = []ItemSet{
 	{
 		Name:  "Cyclone Regalia",
 		Items: map[string]bool{"Cyclone Faceguard (Tier 4)": true, "Cyclone Shoulderguards (Tier 4)": true, "Cyclone Chestguard (Tier 4)": true, "Cyclone Handguards (Tier 4)": true, "Cyclone Legguards (Tier 4)": true},
-		Bonuses: map[int]ItemActivation{4: ActivateCycloneManaReduce, 2: func(sim *Simulation, party *Party, player *Player) Aura {
+		Bonuses: map[int]ItemActivation{4: ActivateCycloneManaReduce, 2: func(sim *Simulation, party *Party, player PlayerAgent) Aura {
 			// if sim.Options.Totems.WrathOfAir {
 
-			// TODO: Only one ele shaman in the party can use this at a time.
+			// FUTURE: Only one ele shaman in the party can use this at a time.
 			//   not a big deal now but will need to be fixed to support full raid sim.
 			for _, p := range party.Players {
 				p.Stats[StatSpellPower] += 20
@@ -954,7 +1005,7 @@ var sets = []ItemSet{
 	{
 		Name:  "Windhawk",
 		Items: map[string]bool{"Windhawk Hauberk": true, "Windhawk Belt": true, "Windhawk Bracers": true},
-		Bonuses: map[int]ItemActivation{3: func(sim *Simulation, party *Party, player *Player) Aura {
+		Bonuses: map[int]ItemActivation{3: func(sim *Simulation, party *Party, player PlayerAgent) Aura {
 			// TODO: check if player has water shield on?
 			player.Stats[StatMP5] += 8
 			return Aura{ID: MagicIDWindhawk}
@@ -977,7 +1028,7 @@ var sets = []ItemSet{
 			"Skyshatter Treads":               true,
 			"Skyshatter Bands":                true,
 		},
-		Bonuses: map[int]ItemActivation{2: func(sim *Simulation, party *Party, player *Player) Aura {
+		Bonuses: map[int]ItemActivation{2: func(sim *Simulation, party *Party, player PlayerAgent) Aura {
 			player.Stats[StatMP5] += 15
 			player.Stats[StatSpellCrit] += 35
 			player.Stats[StatSpellPower] += 45

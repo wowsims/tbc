@@ -32,18 +32,18 @@ func (p *Priest) OnActionAccepted(*core.Simulation, core.AgentAction) {
 
 func (p *Priest) BuffUp(sim *core.Simulation, party *core.Party) {
 	if p.misery {
-		sim.AddAura(sim, nil, MiseryAura())
+		sim.AddAura(sim, core.PlayerAgent{}, MiseryAura())
 	}
 }
 
-func (p *Priest) Reset(sim *core.Simulation)                            {}
-func (p *Priest) OnSpellHit(*core.Simulation, *core.Player, *core.Cast) {}
+func (p *Priest) Reset(sim *core.Simulation)                                {}
+func (p *Priest) OnSpellHit(*core.Simulation, core.PlayerAgent, *core.Cast) {}
 
 func MiseryAura() core.Aura {
 	return core.Aura{
 		ID:      core.MagicIDMisery,
 		Expires: core.NeverExpires,
-		OnSpellHit: func(sim *core.Simulation, p *core.Player, c *core.Cast) {
+		OnSpellHit: func(sim *core.Simulation, p core.PlayerAgent, c *core.Cast) {
 			c.DidDmg *= 1.05
 		},
 	}

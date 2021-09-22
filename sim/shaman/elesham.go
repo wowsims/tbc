@@ -18,7 +18,7 @@ var ElementalEnchants = []int32{
 	29191, 28909, 28886, 24421, 20076, 23545, 27960, 27917, 22534, 33997, 28272, 24274, 24273, 27975, 22555, 35445, 27945,
 }
 
-func loDmgMod(sim *core.Simulation, p *core.Player, c *core.Cast) {
+func loDmgMod(sim *core.Simulation, p core.PlayerAgent, c *core.Cast) {
 	c.DidDmg /= 2
 }
 
@@ -27,7 +27,7 @@ func AuraLightningOverload(lvl int) core.Aura {
 	return core.Aura{
 		ID:      core.MagicIDLOTalent,
 		Expires: core.NeverExpires,
-		OnSpellHit: func(sim *core.Simulation, p *core.Player, c *core.Cast) {
+		OnSpellHit: func(sim *core.Simulation, p core.PlayerAgent, c *core.Cast) {
 			if c.Spell.ID != core.MagicIDLB12 && c.Spell.ID != core.MagicIDCL6 {
 				return
 			}
@@ -38,9 +38,9 @@ func AuraLightningOverload(lvl int) core.Aura {
 			if c.Spell.ID == core.MagicIDCL6 {
 				actualChance /= 3 // 33% chance of regular for CL LO
 			}
-			if sim.Rando.Float64() < actualChance {
+			if sim.Rando.Float64("LO") < actualChance {
 				if sim.Debug != nil {
-					sim.Debug(" +Lightning Overload\n")
+					sim.Debug(" - Lightning Overload -\n")
 				}
 				clone := sim.NewCast()
 				// Don't set IsClBounce even if this is a bounce, so that the clone does a normal CL and bounces
@@ -54,7 +54,13 @@ func AuraLightningOverload(lvl int) core.Aura {
 
 				clone.CritBonus = c.CritBonus
 				clone.Effect = loDmgMod
-				c.DoItNow(sim, p, nil, clone)
+
+				// Use the cast function from the original cast.
+				clone.DoItNow = c.DoItNow
+				clone.DoItNow(sim, p, clone)
+				if sim.Debug != nil {
+					sim.Debug(" - Lightning Overload Complete -\n")
+				}
 			}
 		},
 	}
@@ -68,11 +74,11 @@ func TryActivateEleMastery(sim *core.Simulation, player *core.Player) {
 	player.AddAura(sim, core.Aura{
 		ID:      core.MagicIDEleMastery,
 		Expires: core.NeverExpires,
-		OnCast: func(sim *core.Simulation, p *core.Player, c *core.Cast) {
+		OnCast: func(sim *core.Simulation, p core.PlayerAgent, c *core.Cast) {
 			c.ManaCost = 0
 			c.Crit += 1.01
 		},
-		OnCastComplete: func(sim *core.Simulation, p *core.Player, c *core.Cast) {
+		OnCastComplete: func(sim *core.Simulation, p core.PlayerAgent, c *core.Cast) {
 			// Remove the buff and put skill on CD
 			p.SetCD(core.MagicIDEleMastery, time.Second*180+sim.CurrentTime)
 			p.RemoveAura(sim, p, core.MagicIDEleMastery)
@@ -233,6 +239,8 @@ type AdaptiveAgent struct {
 	manaSnapshots      [manaSnapshotsBufferSize]ManaSnapshot
 	numSnapshots       int32
 	firstSnapshotIndex int32
+	timesOOM           int  // count of times gone oom.
+	wentOOM            bool // if agent went OOM this time.
 
 	baseAgent    shamanAgent // The agent used most of the time
 	surplusAgent shamanAgent // The agent used when we have extra mana
@@ -300,12 +308,6 @@ func (agent *AdaptiveAgent) ChooseAction(s *Shaman, party *core.Party, sim *core
 		sim.Debug("[AI] CL Ready: Mana/s: %0.1f, Est Mana Cost: %0.1f, CurrentMana: %0.1f\n", manaSpendingRate, projectedManaCost, s.Stats[core.StatMana])
 	}
 
-	// Before casting, activate shaman powers!
-	TryActivateBloodlust(sim, party, s.Player)
-	if s.Talents.ElementalMastery {
-		TryActivateEleMastery(sim, s.Player)
-	}
-
 	// If we have enough mana to burn, use the surplus agent.
 	if projectedManaCost < s.Stats[core.StatMana] {
 		return agent.surplusAgent.ChooseAction(s, party, sim)
@@ -313,13 +315,22 @@ func (agent *AdaptiveAgent) ChooseAction(s *Shaman, party *core.Party, sim *core
 		return agent.baseAgent.ChooseAction(s, party, sim)
 	}
 }
-func (agent *AdaptiveAgent) OnActionAccepted(p *Shaman, sim *core.Simulation, action core.AgentAction) {
-	agent.takeSnapshot(sim, p)
-	agent.baseAgent.OnActionAccepted(p, sim, action)
-	agent.surplusAgent.OnActionAccepted(p, sim, action)
+func (agent *AdaptiveAgent) OnActionAccepted(s *Shaman, sim *core.Simulation, action core.AgentAction) {
+	if !agent.wentOOM && action.Cast != nil && action.Cast.ManaCost > s.Stats[core.StatMana] {
+		agent.timesOOM++
+		agent.wentOOM = true
+	}
+	agent.takeSnapshot(sim, s)
+	agent.baseAgent.OnActionAccepted(s, sim, action)
+	agent.surplusAgent.OnActionAccepted(s, sim, action)
 }
 
 func (agent *AdaptiveAgent) Reset(sim *core.Simulation) {
+	if agent.timesOOM == 5 {
+		agent.baseAgent = NewLBOnlyAgent(sim)           //NewAgent(sim, AGENT_TYPE_FIXED_LB_ONLY)
+		agent.surplusAgent = NewCLOnClearcastAgent(sim) //NewAgent(sim, AGENT_TYPE_CL_ON_CLEARCAST)
+	}
+	agent.wentOOM = false
 	agent.manaSnapshots = [manaSnapshotsBufferSize]ManaSnapshot{}
 	agent.firstSnapshotIndex = 0
 	agent.numSnapshots = 0
@@ -334,28 +345,15 @@ func NewAdaptiveAgent(sim *core.Simulation) *AdaptiveAgent {
 	//   not as deterministic... but probably averages out the same?
 	// Otherwise we need to figure out how to do this after all other agents are setup (in the eventual 'raid' sim setup)
 
-	// clearcastSimRequest := core.SimRequest{
-	// 	Options:    sim.Options,
-	// 	Gear:       sim.EquipSpec,
-	// 	Iterations: 100,
-	// }
-	// clearcastSimRequest.Options.AgentType = AGENT_TYPE_CL_ON_CLEARCAST
-	// clearcastResult := core.RunSimulation(clearcastSimRequest)
-
-	// if clearcastResult.NumOom >= 5 {
-	// agent.baseAgent = NewLBOnlyAgent(sim)           //NewAgent(sim, AGENT_TYPE_FIXED_LB_ONLY)
-	// agent.surplusAgent = NewCLOnClearcastAgent(sim) //NewAgent(sim, AGENT_TYPE_CL_ON_CLEARCAST)
-	// } else {
 	agent.baseAgent = NewCLOnClearcastAgent(sim)
 	agent.surplusAgent = NewCLOnCDAgent(sim)
-	// }
 
 	return agent
 }
 
 // ChainCast is how to cast chain lightning.
-func ChainCast(sim *core.Simulation, p *core.Player, a core.Agent, cast *core.Cast) {
-	core.DirectCast(sim, p, a, cast) // Start with a normal direct cast to start.
+func ChainCast(sim *core.Simulation, p core.PlayerAgent, cast *core.Cast) {
+	core.DirectCast(sim, p, cast) // Start with a normal direct cast to start.
 
 	// Now chain
 	dmgCoeff := 1.0
@@ -374,9 +372,9 @@ func ChainCast(sim *core.Simulation, p *core.Player, a core.Agent, cast *core.Ca
 			Spell:      cast.Spell,
 			Crit:       cast.Crit,
 			CritBonus:  cast.CritBonus,
-			Effect:     func(sim *core.Simulation, p *core.Player, c *core.Cast) { cast.DidDmg *= dmgCoeff },
+			Effect:     func(sim *core.Simulation, p core.PlayerAgent, c *core.Cast) { cast.DidDmg *= dmgCoeff },
 			DoItNow:    core.DirectCast,
 		}
-		clone.DoItNow(sim, p, a, clone)
+		clone.DoItNow(sim, p, clone)
 	}
 }

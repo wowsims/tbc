@@ -1,7 +1,6 @@
 package runner
 
 import (
-	"fmt"
 	"log"
 	"testing"
 
@@ -10,9 +9,7 @@ import (
 )
 
 // TODO:
-//  1. Figure out why starting mana is still low/
-//  2. First cast is at 0 instead of 1.4
-//  3. How to handle buffs that modify stats based on stats? Kings, Unrelenting Storms, etc.
+//  1. How to handle buffs that modify stats based on stats? Kings, Unrelenting Storms, etc.
 //		Possible: Add a function on player like 'AddStats' and a 'onstatbuff' aura effect?
 
 // Use same seed to get same result on every run.
@@ -163,19 +160,21 @@ func TestSimulatePreRaid(t *testing.T) {
 	})
 }
 
-// func TestSimulateP1(t *testing.T) {
-// 	simAllEncountersTest(AllEncountersTestOptions{
-// 		label: "p1",
-// 		t:     t,
+func TestSimulateP1(t *testing.T) {
 
-// 		Options:   fullOptions,
-// 		Gear:      p1Gear,
-// 		AgentType: AGENT_TYPE_ADAPTIVE,
+	simAllEncountersTest(AllEncountersTestOptions{
+		label: "phase1",
+		t:     t,
 
-// 		ExpectedDpsShort: 1539.5,
-// 		ExpectedDpsLong:  1359,
-// 	})
-// }
+		Options:         basicOptions,
+		Gear:            gearFromStrings(p1Gear),
+		ShamanAgentType: shaman.AgentTypeAdaptive,
+		Buffs:           fullBuffs,
+
+		ExpectedDpsShort: 1527,
+		ExpectedDpsLong:  1226.6,
+	})
+}
 
 // func TestMultiTarget(t *testing.T) {
 // 	doSimulateTest(
@@ -220,19 +219,40 @@ func TestSimulatePreRaid(t *testing.T) {
 // 	})
 // }
 
-// func TestClearcastAgent(t *testing.T) {
-// 	simAllEncountersTest(AllEncountersTestOptions{
-// 		label: "clOnClearcast",
-// 		t:     t,
+func TestClearcastAgent(t *testing.T) {
+	simAllEncountersTest(AllEncountersTestOptions{
+		label: "clearcast",
+		t:     t,
 
-// 		Options:   fullOptions,
-// 		Gear:      p1Gear,
-// 		AgentType: AGENT_TYPE_CL_ON_CLEARCAST,
+		Options:         basicOptions,
+		Gear:            gearFromStrings(p1Gear),
+		ShamanAgentType: shaman.AgentTypeCLOnClearcast,
+		Buffs:           fullBuffs,
 
-// 		ExpectedDpsShort: 1667,
-// 		ExpectedDpsLong:  1359.1,
-// 	})
-// }
+		ExpectedDpsShort: 1468.4,
+		ExpectedDpsLong:  1214.2,
+	})
+}
+
+func TestAverageDPS(t *testing.T) {
+	eq := gearFromStrings(p1Gear)
+	player := core.NewPlayer(eq, core.RaceBonusTypeOrc, fullConsumes)
+	party := &core.Party{Players: []core.PlayerAgent{{Player: player}}}
+	raid := &core.Raid{Parties: []*core.Party{party}}
+	party.Players[0].Agent = shaman.NewShaman(player, party, shamTalents, shamTotems, shaman.AgentTypeAdaptive)
+
+	options := basicOptions
+	options.Iterations = 5
+	options.Encounter = shortEncounter
+	buffs := fullBuffs
+	options.Debug = true
+
+	sim := SetupSim(raid, buffs, options)
+	result := RunIndividualSim(sim, options)
+
+	log.Printf("result.DpsAvg: %0.1f", result.DpsAvg)
+	log.Printf("LOGS:\n %s\n", result.Logs)
+}
 
 // func BenchmarkSimulate(b *testing.B) {
 // 	for i := 0; i < b.N; i++ {
@@ -263,35 +283,34 @@ func simAllEncountersTest(testOpts AllEncountersTestOptions) {
 	doSimulateTest(
 		testOpts.label+"-short",
 		testOpts.t,
+		testOpts.ShamanAgentType,
 		testOpts.Gear,
 		makeOptions(testOpts.Options, shortEncounter),
 		testOpts.Buffs,
 		testOpts.ExpectedDpsShort)
 
-	doSimulateTest(
-		testOpts.label+"-long",
-		testOpts.t,
-		testOpts.Gear,
-		makeOptions(testOpts.Options, longEncounter),
-		testOpts.Buffs,
-		testOpts.ExpectedDpsLong)
+	// doSimulateTest(
+	// 	testOpts.label+"-long",
+	// 	testOpts.t,
+	// 	testOpts.Gear,
+	// 	makeOptions(testOpts.Options, longEncounter),
+	// 	testOpts.Buffs,
+	// 	testOpts.ExpectedDpsLong)
 }
 
 // Performs a basic end-to-end test of the simulator.
 //   This is where we can add more sophisticated checks if we would like.
 //   Any changes to the damage output of an item set
-func doSimulateTest(label string, t *testing.T, eq core.EquipmentSpec, options core.Options, buffs core.Buffs, expectedDps float64) {
+func doSimulateTest(label string, t *testing.T, agent shaman.AgentType, eq core.EquipmentSpec, options core.Options, buffs core.Buffs, expectedDps float64) {
 	player := core.NewPlayer(eq, core.RaceBonusTypeOrc, fullConsumes)
 	party := &core.Party{Players: []core.PlayerAgent{{Player: player}}}
 	raid := &core.Raid{Parties: []*core.Party{party}}
-	party.Players[0].Agent = shaman.NewShaman(player, party, shamTalents, shamTotems, 1)
+	party.Players[0].Agent = shaman.NewShaman(player, party, shamTalents, shamTotems, agent)
 
 	options.Debug = true
 
 	sim := SetupSim(raid, buffs, options)
 	result := RunIndividualSim(sim, options)
-	fmt.Printf("Player Stats After: ")
-	fmt.Printf(player.Stats.Print() + "\n")
 
 	log.Printf("LOGS:\n%s\n", result.Logs)
 	tolerance := 0.5

@@ -149,7 +149,8 @@ func CalculateTotalStats(race RaceBonusType, e Equipment, c Consumes) Stats {
 	for i := range stats {
 		stats[i] += gearStats[i]
 	}
-	return c.AddStats(stats)
+	stats = c.AddStats(stats)
+	return stats
 }
 
 // TODO: This probably should be moved into each class because they all have different base stats.

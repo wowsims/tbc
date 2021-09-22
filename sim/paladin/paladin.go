@@ -39,26 +39,26 @@ func (p *Paladin) OnActionAccepted(*core.Simulation, core.AgentAction) {
 func (p *Paladin) BuffUp(sim *core.Simulation, party *core.Party) {
 	// Judgement of Wisdom
 	if p.useJoW {
-		sim.AddAura(sim, nil, AuraJudgementOfWisdom())
+		sim.AddAura(sim, core.PlayerAgent{}, AuraJudgementOfWisdom()) // no player for global auras
 	}
 }
 
 func (p *Paladin) Reset(sim *core.Simulation) {
 
 }
-func (p *Paladin) OnSpellHit(*core.Simulation, *core.Player, *core.Cast) {}
+func (p *Paladin) OnSpellHit(*core.Simulation, core.PlayerAgent, *core.Cast) {}
 
 func AuraJudgementOfWisdom() core.Aura {
 	const mana = 74 / 2 // 50% proc
 	return core.Aura{
 		ID:      core.MagicIDJoW,
 		Expires: core.NeverExpires,
-		OnSpellHit: func(sim *core.Simulation, player *core.Player, c *core.Cast) {
+		OnSpellHit: func(sim *core.Simulation, player core.PlayerAgent, c *core.Cast) {
 			if c.Spell.ID == core.MagicIDTLCLB {
 				return // TLC cant proc JoW
 			}
 			if sim.Debug != nil {
-				sim.Debug(" +Judgement Of Wisdom: 37 mana (74 @ 50%% proc)\n")
+				sim.Debug("(%d) +Judgement Of Wisdom: 37 mana (74 @ 50%% proc)\n", player.ID)
 			}
 			// Only apply to players that have mana.
 			if player.InitialStats[core.StatMana] > 0 {

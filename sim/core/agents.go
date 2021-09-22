@@ -4,11 +4,6 @@ import (
 	"time"
 )
 
-type PlayerAgent struct {
-	Agent
-	*Player
-}
-
 type Agent interface {
 	// Any pre-start buffs to apply to the raid/party/self
 	BuffUp(*Simulation, *Party)
@@ -23,7 +18,7 @@ type Agent interface {
 	OnActionAccepted(*Simulation, AgentAction)
 
 	// OnSpellHit is used by class agents to customize casts before actually applying the damage.
-	OnSpellHit(*Simulation, *Player, *Cast)
+	OnSpellHit(*Simulation, PlayerAgent, *Cast)
 }
 
 // A single action that an Agent can take.

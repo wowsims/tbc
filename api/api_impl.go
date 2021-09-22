@@ -198,7 +198,7 @@ func runSimulationImpl(request *IndividualSimRequest) *IndividualSimResult {
 	case *PlayerOptions_ElementalShaman:
 		talents := convertShamTalents(v.ElementalShaman.Talents)
 		totems := convertTotems(request.Buffs)
-		agent = shaman.NewShaman(player, party, talents, totems, int(v.ElementalShaman.Agent.Type))
+		agent = shaman.NewShaman(player, party, talents, totems, shaman.AgentType(v.ElementalShaman.Agent.Type))
 	default:
 		panic("class not supported")
 	}
@@ -294,7 +294,7 @@ func convertEquip(es *EquipmentSpec) core.EquipmentSpec {
 }
 
 func convertBuffs(inBuff *Buffs) core.Buffs {
-	// TODO: support tri-state
+	// TODO: support tri-state better
 	return core.Buffs{
 		ArcaneInt:                 inBuff.ArcaneBrilliance,
 		GiftOfTheWild:             inBuff.GiftOfTheWild != TristateEffect_TristateEffectMissing,

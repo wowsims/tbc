@@ -37,7 +37,7 @@ type Simulation struct {
 	// Clears and regenerates on each Run call.
 	Metrics SimMetrics
 
-	Rando       *rand.Rand
+	Rando       *wrappedRandom
 	rseed       int64
 	CurrentTime time.Duration // duration that has elapsed in the sim since starting
 
@@ -45,6 +45,18 @@ type Simulation struct {
 
 	// caches to speed up perf and store temp state
 	cache *cache
+}
+
+type wrappedRandom struct {
+	sim *Simulation
+	*rand.Rand
+}
+
+func (wr *wrappedRandom) Float64(src string) float64 {
+	if wr.sim.Debug != nil {
+		wr.sim.Debug("FLOAT64 FROM: %s\n", src)
+	}
+	return wr.Rand.Float64()
 }
 
 type SimMetrics struct {
@@ -74,13 +86,14 @@ func NewSim(raid *Raid, options Options) *Simulation {
 		Raid:     raid,
 		Options:  options,
 		Duration: durationFromSeconds(options.Encounter.Duration),
-		Rando:    rand.New(rand.NewSource(options.RSeed)),
-		Debug:    nil,
+		// Rando:    ,
+		Debug: nil,
 		cache: &cache{
 			castPool: make([]*Cast, 0, 1000),
 		},
 		AuraTracker: NewAuraTracker(),
 	}
+	sim.Rando = &wrappedRandom{sim: sim, Rand: rand.New(rand.NewSource(options.RSeed))}
 
 	sim.cache.fillCasts()
 
@@ -115,16 +128,16 @@ func (sim *Simulation) Reset() {
 	// Reset all players
 	for _, party := range sim.Raid.Parties {
 		for _, pl := range party.Players {
-			pl.Player.Reset()
 			pl.Agent.Reset(sim)
+			pl.Player.Reset()
 		}
 	}
 
 	// Now buff everyone back up!
 	for _, party := range sim.Raid.Parties {
 		for _, pl := range party.Players {
-			pl.Player.BuffUp(sim, party)
 			pl.Agent.BuffUp(sim, party)
+			pl.Player.BuffUp(sim, party)
 		}
 	}
 }
@@ -136,14 +149,28 @@ type pendingAction struct {
 	Party     *Party
 }
 
+func (sim *Simulation) playerConsumes(agent PlayerAgent, party *Party) {
+	// Consumes before any casts
+	TryActivateDrums(sim, party, agent.Player)
+	TryActivateRacial(sim, party, agent.Player)
+	TryActivateDestructionPotion(sim, party, agent.Player)
+	TryActivateDarkRune(sim, party, agent.Player)
+	TryActivateSuperManaPotion(sim, party, agent.Player)
+
+	// Pop activatable items if we can.
+	agent.Player.TryActivateEquipment(sim, party)
+}
+
 // Run will run the simulation for number of seconds.
 // Returns metrics for what was cast and how much damage was done.
 func (sim *Simulation) Run() SimMetrics {
 	sim.Reset()
 
 	pendingActions := make([]pendingAction, 0, 25)
+	// setup initial actions.
 	for _, party := range sim.Raid.Parties {
 		for _, pl := range party.Players {
+			sim.playerConsumes(pl, party)
 			action := pl.ChooseAction(sim, party)
 			if action.Wait == NeverExpires {
 				continue // This means agent will not perform any actions at all
@@ -173,26 +200,20 @@ func (sim *Simulation) Run() SimMetrics {
 			sim.Advance(action.ExecuteAt - sim.CurrentTime)
 		}
 
-		// Consumes before any casts
-		TryActivateDrums(sim, action.Party, action.Agent.Player)
-		TryActivateRacial(sim, action.Party, action.Agent.Player)
-		TryActivateDestructionPotion(sim, action.Party, action.Agent.Player)
-		TryActivateDarkRune(sim, action.Party, action.Agent.Player)
-		TryActivateSuperManaPotion(sim, action.Party, action.Agent.Player)
-
-		// Pop activatable items if we can.
-		action.Agent.Player.TryActivateEquipment(sim, action.Party)
-
 		if action.Cast != nil {
-			action.Cast.DoItNow(sim, action.Agent.Player, action.Agent.Agent, action.Cast)
+			action.Cast.DoItNow(sim, action.Agent, action.Cast)
 		} else if action.Wait != 0 {
 			// FUTURE: Swing timers could be handled in this if block.
 			panic("Agent returned nil action")
 		}
 
+		sim.playerConsumes(agent, action.Party)
 		newAction := agent.ChooseAction(sim, action.Party)
 		wait := newAction.Wait
 		if newAction.Cast != nil {
+			if newAction.Cast.CastTime < sim.Options.GCDMin {
+				newAction.Cast.CastTime = sim.Options.GCDMin
+			}
 			wait = newAction.Cast.CastTime
 			if agent.Stats[StatMana] < newAction.Cast.ManaCost {
 				// Not enough mana, wait until there is enough mana to cast the desired spell
@@ -200,16 +221,13 @@ func (sim *Simulation) Run() SimMetrics {
 				if regenTime > wait {
 					wait = regenTime
 				}
-
 				if sim.Options.ExitOnOOM {
 					// TODO: implement this... first player to OOM ends sim (probably only makes sense in an individual sim)
+
 				}
 			}
-			if newAction.Cast.CastTime < sim.Options.GCDMin {
-				newAction.Cast.CastTime = sim.Options.GCDMin
-			}
 			if sim.Debug != nil {
-				sim.Debug("Start Casting %s Cast Time: %0.1fs\n", newAction.Cast.Spell.Name, newAction.Cast.CastTime.Seconds())
+				sim.Debug("(%d) Start Casting %s Cast Time: %0.1fs\n", agent.ID, newAction.Cast.Spell.Name, newAction.Cast.CastTime.Seconds())
 			}
 		}
 		pa := pendingAction{
@@ -249,7 +267,7 @@ func (sim *Simulation) Advance(elapsedTime time.Duration) {
 	for i := len(sim.ActiveAuraIDs) - 1; i >= 0; i-- {
 		id := sim.ActiveAuraIDs[i]
 		if sim.Auras[id].Expires != 0 && sim.Auras[id].Expires <= newTime {
-			sim.RemoveAura(sim, nil, id) // auras on the sim have no player attached.
+			sim.RemoveAura(sim, PlayerAgent{}, id) // auras on the sim have no player attached.
 		}
 	}
 	sim.CurrentTime = newTime
