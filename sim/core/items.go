@@ -5,6 +5,9 @@ import (
 	"time"
 )
 
+// TODO:
+//   This is a temporary place to house all item definitions. Next body of work should probably be to use the generated item definitions instead of these.
+
 var Gems = []Gem{
 	{ID: 34220, Name: "Chaotic Skyfire Diamond", Quality: ItemQualityRare, Phase: 1, Color: GemColorMeta, Stats: Stats{StatSpellCrit: 12}, Activate: ActivateCSD},
 	{ID: 25897, Name: "Bracing Earthstorm Diamond", Quality: ItemQualityRare, Phase: 1, Color: GemColorMeta, Stats: Stats{StatSpellPower: 14}},
@@ -598,9 +601,9 @@ var items = []Item{
 	{ID: 31921, ItemType: ItemTypeFinger, Name: "Yor's Collapsing Band", Phase: 1, Quality: ItemQualityEpic, SourceZone: "H MT - Yor (Summoned Boss)", SourceDrop: "", Stats: Stats{StatIntellect: 20, StatSpellPower: 23}},
 
 	// FUTURE: just to get this working, shaman "newcast" checks for totems and spell being cast and applies totem bonuses.
-	{ID: 28248, ItemType: ItemTypeRanged, Name: "Totem of the Void", Phase: 1, Quality: ItemQualityRare, SourceZone: "Mech - Cache of the Legion", SourceDrop: ""},
-	{ID: 23199, ItemType: ItemTypeRanged, Name: "Totem of the Storm", Phase: 0, Quality: ItemQualityRare, SourceZone: "Boe World Drop", SourceDrop: ""},
-	{ID: 32330, ItemType: ItemTypeRanged, Name: "Totem of Ancestral Guidance", Phase: 3, Quality: ItemQualityEpic, SourceZone: "BT", SourceDrop: ""},
+	{ID: 28248, ItemType: ItemTypeRanged, RangedWeaponType: RangedWeaponTypeTotem, Name: "Totem of the Void", Phase: 1, Quality: ItemQualityRare, SourceZone: "Mech - Cache of the Legion", SourceDrop: ""},
+	{ID: 23199, ItemType: ItemTypeRanged, RangedWeaponType: RangedWeaponTypeTotem, Name: "Totem of the Storm", Phase: 0, Quality: ItemQualityRare, SourceZone: "Boe World Drop", SourceDrop: ""},
+	{ID: 32330, ItemType: ItemTypeRanged, RangedWeaponType: RangedWeaponTypeTotem, Name: "Totem of Ancestral Guidance", Phase: 3, Quality: ItemQualityEpic, SourceZone: "BT", SourceDrop: ""},
 
 	{ID: 27543, ItemType: ItemTypeWeapon, Name: "Starlight Dagger", Phase: 1, Quality: ItemQualityRare, SourceZone: "H SP - Mennu the Betrayer", SourceDrop: "", Stats: Stats{StatIntellect: 15, StatStamina: 15, StatSpellHit: 16, StatSpellPower: 121}},
 	{ID: 27868, ItemType: ItemTypeWeapon, Name: "Runesong Dagger", Phase: 1, Quality: ItemQualityRare, SourceZone: "SH - Warbringer O'mrogg", SourceDrop: "", Stats: Stats{StatIntellect: 11, StatStamina: 12, StatSpellCrit: 20, StatSpellPower: 121}},
@@ -608,11 +611,11 @@ var items = []Item{
 	{ID: 27937, ItemType: ItemTypeWeapon, Name: "Sky Breaker", Phase: 1, Quality: ItemQualityRare, SourceZone: "H AC - Avatar of the Martyred", SourceDrop: "", Stats: Stats{StatIntellect: 20, StatStamina: 13, StatSpellPower: 132}},
 	{ID: 28412, ItemType: ItemTypeWeapon, Name: "Lamp of Peaceful Radiance", Phase: 1, Quality: ItemQualityRare, SourceZone: "Arc - Harbinger Skyriss", SourceDrop: "", Stats: Stats{StatIntellect: 14, StatStamina: 13, StatSpellCrit: 13, StatSpellHit: 12, StatSpellPower: 21}},
 	{ID: 28260, ItemType: ItemTypeWeapon, Name: "Manual of the Nethermancer", Phase: 1, Quality: ItemQualityRare, SourceZone: "Mech - Nethermancer Sepethrea", SourceDrop: "", Stats: Stats{StatIntellect: 15, StatStamina: 12, StatSpellCrit: 19, StatSpellPower: 21}},
-	{ID: 31287, ItemType: ItemTypeWeapon, WeaponType: WeaponTypeShield, Name: "Draenei Honor Guard Shield", Phase: 1, Quality: ItemQualityRare, SourceZone: "BoE World Drop", SourceDrop: "", Stats: Stats{StatIntellect: 16, StatSpellCrit: 21, StatSpellPower: 19}},
+	{ID: 31287, ItemType: ItemTypeWeapon, HandType: HandTypeOffHand, WeaponType: WeaponTypeShield, Name: "Draenei Honor Guard Shield", Phase: 1, Quality: ItemQualityRare, SourceZone: "BoE World Drop", SourceDrop: "", Stats: Stats{StatIntellect: 16, StatSpellCrit: 21, StatSpellPower: 19}},
 	{ID: 28187, ItemType: ItemTypeWeapon, Name: "Star-Heart Lamp", Phase: 1, Quality: ItemQualityRare, SourceZone: "BM - Temporus", SourceDrop: "", Stats: Stats{StatIntellect: 18, StatStamina: 17, StatSpellHit: 12, StatSpellPower: 22}},
 	{ID: 29330, ItemType: ItemTypeWeapon, Name: "The Saga of Terokk", Phase: 1, Quality: ItemQualityRare, SourceZone: "Terokk's Legacy - Auchindoun Quest", SourceDrop: "", Stats: Stats{StatIntellect: 23, StatSpellPower: 28}},
-	{ID: 27910, ItemType: ItemTypeWeapon, WeaponType: WeaponTypeShield, Name: "Silvermoon Crest Shield", Phase: 1, Quality: ItemQualityRare, SourceZone: "SLabs - Murmur", SourceDrop: "", Stats: Stats{StatIntellect: 20, StatSpellPower: 23, StatMP5: 5}},
-	{ID: 30984, ItemType: ItemTypeWeapon, WeaponType: WeaponTypeShield, Name: "Spellbreaker's Buckler", Phase: 1, Quality: ItemQualityRare, SourceZone: "Akama's Promise - SMV Quest", SourceDrop: "", Stats: Stats{StatIntellect: 10, StatStamina: 22, StatSpellPower: 29}},
+	{ID: 27910, ItemType: ItemTypeWeapon, HandType: HandTypeOffHand, WeaponType: WeaponTypeShield, Name: "Silvermoon Crest Shield", Phase: 1, Quality: ItemQualityRare, SourceZone: "SLabs - Murmur", SourceDrop: "", Stats: Stats{StatIntellect: 20, StatSpellPower: 23, StatMP5: 5}},
+	{ID: 30984, ItemType: ItemTypeWeapon, HandType: HandTypeOffHand, WeaponType: WeaponTypeShield, Name: "Spellbreaker's Buckler", Phase: 1, Quality: ItemQualityRare, SourceZone: "Akama's Promise - SMV Quest", SourceDrop: "", Stats: Stats{StatIntellect: 10, StatStamina: 22, StatSpellPower: 29}},
 	{ID: 27534, ItemType: ItemTypeWeapon, Name: "Hortus' Seal of Brilliance", Phase: 1, Quality: ItemQualityRare, SourceZone: "SH - Warchief Kargath Bladefist", SourceDrop: "", Stats: Stats{StatIntellect: 20, StatStamina: 18, StatSpellPower: 23}},
 	{ID: 29355, ItemType: ItemTypeWeapon, HandType: HandTypeTwoHand, Name: "Terokk's Shadowstaff", Phase: 1, Quality: ItemQualityEpic, SourceZone: "H SH - Talon King Ikiss", SourceDrop: "", Stats: Stats{StatIntellect: 42, StatStamina: 40, StatSpellCrit: 37, StatSpellPower: 168}},
 	{ID: 29130, ItemType: ItemTypeWeapon, HandType: HandTypeTwoHand, Name: "Auchenai Staff", Phase: 1, Quality: ItemQualityRare, SourceZone: "The Aldor - Revered", SourceDrop: "", Stats: Stats{StatIntellect: 46, StatSpellCrit: 26, StatSpellHit: 19, StatSpellPower: 121}},
@@ -625,7 +628,7 @@ var items = []Item{
 	{ID: 28346, ItemType: ItemTypeWeapon, Name: "Gladiator's Endgame", Phase: 1, Quality: ItemQualityEpic, SourceZone: "Arena Season 1 Reward", SourceDrop: "", Stats: Stats{StatIntellect: 14, StatStamina: 21, StatSpellPower: 19}},
 	{ID: 24557, ItemType: ItemTypeWeapon, HandType: HandTypeTwoHand, Name: "Gladiator's War Staff", Phase: 1, Quality: ItemQualityEpic, SourceZone: "Arena Season 1 Reward", SourceDrop: "", Stats: Stats{StatIntellect: 35, StatStamina: 48, StatSpellCrit: 36, StatSpellHit: 21, StatSpellPower: 199}},
 
-	{ID: 29389, ItemType: ItemTypeRanged, Name: "Totem of the Pulsing Earth", Phase: 1, Quality: ItemQualityEpic, SourceZone: "15 Badge of Justice - G'eras", SourceDrop: "", Activate: ActivateTotemOfPulsingEarth, ActivateCD: NeverExpires},
+	{ID: 29389, ItemType: ItemTypeRanged, RangedWeaponType: RangedWeaponTypeTotem, Name: "Totem of the Pulsing Earth", Phase: 1, Quality: ItemQualityEpic, SourceZone: "15 Badge of Justice - G'eras", SourceDrop: "", Activate: ActivateTotemOfPulsingEarth, ActivateCD: NeverExpires},
 	// {ItemType: ItemTypeRanged, Name: "Totem of Impact", Phase: 1, Quality: ItemQualityRare, SourceZone: "15 Mark of Thrallmar/ Honor Hold", SourceDrop: "", Stats: Stats{     StatMP5:0}},
 	// {ItemType: ItemTypeRanged, Name: "Totem of Lightning", Phase: 1, Quality: ItemQualityRare, SourceZone: "Colossal Menace - HFP Quest", SourceDrop: "", Stats: Stats{     StatMP5:0}},
 
@@ -738,15 +741,15 @@ var items = []Item{
 	{ID: 29988, ItemType: ItemTypeWeapon, HandType: HandTypeTwoHand, Name: "The Nexus Key", Phase: 2, Quality: ItemQualityEpic, SourceZone: "TK", SourceDrop: "Kaelthas", Stats: Stats{StatStamina: 76, StatIntellect: 52, StatSpellPower: 236, StatSpellCrit: 51}},
 	{ID: 32374, ItemType: ItemTypeWeapon, HandType: HandTypeTwoHand, Name: "Zhar'doom, Greatstaff of the Devourer", Phase: 3, Quality: ItemQualityEpic, SourceZone: "BT", SourceDrop: "Illidan", Stats: Stats{StatStamina: 70, StatIntellect: 47, StatSpellPower: 259, StatSpellHaste: 55, StatSpellCrit: 36}},
 	{ID: 28734, ItemType: ItemTypeWeapon, Name: "Jewel of Infinite Possibilities", Phase: 1, Quality: ItemQualityEpic, SourceZone: "Kara", SourceDrop: "Netherspite", Stats: Stats{StatStamina: 19, StatIntellect: 18, StatSpellPower: 23, StatSpellHit: 21}},
-	{ID: 28611, ItemType: ItemTypeWeapon, WeaponType: WeaponTypeShield, Name: "Dragonheart Flameshield", Phase: 1, Quality: ItemQualityEpic, SourceZone: "Kara", SourceDrop: "Nightbane", Stats: Stats{StatStamina: 19, StatIntellect: 33, StatSpellPower: 23, StatMP5: 7}},
-	{ID: 34011, ItemType: ItemTypeWeapon, WeaponType: WeaponTypeShield, Name: "Illidari Runeshield", Phase: 3, Quality: ItemQualityEpic, SourceZone: "BT", SourceDrop: "Trash", Stats: Stats{StatStamina: 45, StatIntellect: 39, StatSpellPower: 34}},
+	{ID: 28611, ItemType: ItemTypeWeapon, HandType: HandTypeOffHand, WeaponType: WeaponTypeShield, Name: "Dragonheart Flameshield", Phase: 1, Quality: ItemQualityEpic, SourceZone: "Kara", SourceDrop: "Nightbane", Stats: Stats{StatStamina: 19, StatIntellect: 33, StatSpellPower: 23, StatMP5: 7}},
+	{ID: 34011, ItemType: ItemTypeWeapon, HandType: HandTypeOffHand, WeaponType: WeaponTypeShield, Name: "Illidari Runeshield", Phase: 3, Quality: ItemQualityEpic, SourceZone: "BT", SourceDrop: "Trash", Stats: Stats{StatStamina: 45, StatIntellect: 39, StatSpellPower: 34}},
 	{ID: 28781, ItemType: ItemTypeWeapon, Name: "Karaborian Talisman", Phase: 1, Quality: ItemQualityEpic, SourceZone: "Magtheridon's Lair", SourceDrop: "Magtheridon", Stats: Stats{StatStamina: 23, StatIntellect: 23, StatSpellPower: 35}},
-	{ID: 29268, ItemType: ItemTypeWeapon, WeaponType: WeaponTypeShield, Name: "Mazthoril Honor Shield", Phase: 1, Quality: ItemQualityEpic, SourceZone: "Shattrah", SourceDrop: "Badges", Stats: Stats{StatStamina: 16, StatIntellect: 17, StatSpellPower: 23, StatSpellCrit: 21}},
+	{ID: 29268, ItemType: ItemTypeWeapon, HandType: HandTypeOffHand, WeaponType: WeaponTypeShield, Name: "Mazthoril Honor Shield", Phase: 1, Quality: ItemQualityEpic, SourceZone: "Shattrah", SourceDrop: "Badges", Stats: Stats{StatStamina: 16, StatIntellect: 17, StatSpellPower: 23, StatSpellCrit: 21}},
 	{ID: 28603, ItemType: ItemTypeWeapon, Name: "Talisman of Nightbane", Phase: 1, Quality: ItemQualityEpic, SourceZone: "Kara", SourceDrop: "Nightbane", Stats: Stats{StatStamina: 19, StatIntellect: 19, StatSpellPower: 28, StatSpellCrit: 17}},
 	{ID: 32361, ItemType: ItemTypeWeapon, Name: "Blind-Seers Icon", Phase: 3, Quality: ItemQualityEpic, SourceZone: "BT", SourceDrop: "Akama", Stats: Stats{StatStamina: 25, StatIntellect: 16, StatSpellPower: 42, StatSpellHit: 24}},
 	{ID: 29273, ItemType: ItemTypeWeapon, Name: "Khadgar's Knapsack", Phase: 1, Quality: ItemQualityEpic, SourceZone: "Shattrah", SourceDrop: "Badges", Stats: Stats{StatSpellPower: 49}},
 	{ID: 30049, ItemType: ItemTypeWeapon, Name: "FathomStone", Phase: 2, Quality: ItemQualityEpic, SourceZone: "SSC", SourceDrop: "Lurker", Stats: Stats{StatStamina: 16, StatIntellect: 12, StatSpellPower: 36, StatSpellCrit: 23}},
-	{ID: 30909, ItemType: ItemTypeWeapon, WeaponType: WeaponTypeShield, Name: "Antonidas's Aegis of Rapt Concentration", Phase: 3, Quality: ItemQualityEpic, SourceZone: "Hyjal", SourceDrop: "Archimonde", Stats: Stats{StatStamina: 28, StatIntellect: 32, StatSpellPower: 42, StatSpellCrit: 20}},
+	{ID: 30909, ItemType: ItemTypeWeapon, HandType: HandTypeOffHand, WeaponType: WeaponTypeShield, Name: "Antonidas's Aegis of Rapt Concentration", Phase: 3, Quality: ItemQualityEpic, SourceZone: "Hyjal", SourceDrop: "Archimonde", Stats: Stats{StatStamina: 28, StatIntellect: 32, StatSpellPower: 42, StatSpellCrit: 20}},
 	{ID: 30872, ItemType: ItemTypeWeapon, Name: "Chronicle of Dark Secrets", Phase: 3, Quality: ItemQualityEpic, SourceZone: "Hyjal", SourceDrop: "Winterchill", Stats: Stats{StatStamina: 16, StatIntellect: 12, StatSpellPower: 42, StatSpellCrit: 23, StatSpellHit: 17}},
 	{ID: 28297, ItemType: ItemTypeWeapon, Name: "Gladiator's Gavel / Gladiator's Spellblade", Phase: 1, Quality: ItemQualityEpic, SourceZone: "PvP", SourceDrop: "PvP", Stats: Stats{StatStamina: 28, StatIntellect: 18, StatSpellPower: 199}},
 
@@ -895,7 +898,7 @@ var items = []Item{
 
 	// {Slot:EquipTrinket, Name:"Arcanist's Stone", Phase: 1, Quality: ItemQualityEpic, SourceZone:"H OHF - Epoch Hunter", SourceDrop:"", Stats:Stats{  StatSpellHit: 25,   StatMP5:0} }
 	// {Slot:EquipTrinket, Name:"Vengeance of the Illidari", Phase: 1, Quality: ItemQualityEpic, SourceZone:"Cruel's Intentions/Overlord - HFP Quest", SourceDrop:"", Stats:Stats{ StatSpellCrit: 26,    StatMP5:0} }
-	{ID: 33506, ItemType: ItemTypeRanged, Name: "Skycall Totem", Phase: 4, Quality: ItemQualityEpic, SourceZone: "Geras", SourceDrop: "20 Badges", Stats: Stats{}, Activate: ActivateSkycall, ActivateCD: NeverExpires},
+	{ID: 33506, ItemType: ItemTypeRanged, RangedWeaponType: RangedWeaponTypeTotem, Name: "Skycall Totem", Phase: 4, Quality: ItemQualityEpic, SourceZone: "Geras", SourceDrop: "20 Badges", Stats: Stats{}, Activate: ActivateSkycall, ActivateCD: NeverExpires},
 	{ID: 32086, ItemType: ItemTypeHead, Name: "Storm Master's Helmet", Phase: 1, Quality: ItemQualityRare, SourceZone: "Geras", SourceDrop: "50 Badges", Stats: Stats{StatStamina: 24, StatIntellect: 32, StatSpellCrit: 24, StatSpellPower: 37}, GemSockets: []GemColor{GemColorMeta, GemColorBlue}, SocketBonus: Stats{StatSpellCrit: 4}},
 	{ID: 28602, ItemType: ItemTypeChest, Name: "Robe of the Elder Scribes", Phase: 1, Quality: ItemQualityEpic, SourceZone: "Karazhan", SourceDrop: "Nightbane", Stats: Stats{StatStamina: 27, StatIntellect: 29, StatSpirit: 24, StatSpellPower: 32, StatSpellCrit: 24}, Activate: ActivateElderScribes, ActivateCD: NeverExpires},
 

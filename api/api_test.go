@@ -101,3 +101,11 @@ func TestIndividualSim(t *testing.T) {
 		t.Fatalf("DPS: %0.1f", res.DpsAvg)
 	}
 }
+
+func TestGearList(t *testing.T) {
+	glr := &GearListRequest{Spec: Spec_SpecElementalShaman}
+	res := GetGearList(glr)
+
+	// Print first item
+	log.Printf("GEAR: %#v", res.Items[0])
+}

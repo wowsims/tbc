@@ -47,8 +47,13 @@ dist/%/index.html: index_template.html
 wasm: proto_go
 	GOOS=js GOARCH=wasm go build -o ./dist/lib.wasm ./cmd/simwasm/
 
-web: proto_go
+# Just builds the server binary
+simweb: proto_go
 	go build -o simweb ./cmd/simweb/web.go
+
+# Starts up a webserver hosting the dist/ and API endpoints.
+runweb: proto_go
+	go run ./cmd/simweb/web.go
 
 proto_go:
 	protoc -I=./api/ --go_out=. ./api/*.proto

@@ -27,17 +27,17 @@ func getGearListImpl(request *GearListRequest) *GearListResult {
 			item := core.ItemsByID[v]
 			result.Items = append(result.Items,
 				&Item{
-					Id:         item.ID,
-					Type:       ItemType(item.ItemType),
-					ArmorType:  ArmorType(item.ArmorType),
-					WeaponType: WeaponType(item.WeaponType),
-					HandType:   HandType(item.HandType),
-					// RangedWeaponType:
-					Name:       item.Name,
-					Stats:      item.Stats[:],
-					Phase:      int32(item.Phase),
-					Quality:    ItemQuality(item.Quality),
-					GemSockets: coreGemColorToColor(item.GemSockets),
+					Id:               item.ID,
+					Type:             ItemType(item.ItemType),
+					ArmorType:        ArmorType(item.ArmorType),
+					WeaponType:       WeaponType(item.WeaponType),
+					HandType:         HandType(item.HandType),
+					RangedWeaponType: RangedWeaponType(item.RangedWeaponType),
+					Name:             item.Name,
+					Stats:            item.Stats[:],
+					Phase:            int32(item.Phase),
+					Quality:          ItemQuality(item.Quality),
+					GemSockets:       coreGemColorToColor(item.GemSockets),
 				},
 			)
 		}
