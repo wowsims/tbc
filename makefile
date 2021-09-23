@@ -44,6 +44,20 @@ dist/%/index.html: index_template.html
 	mkdir -p $(@D)
 	cat index_template.html | sed 's/@@TITLE@@/$(title)/g' > $@
 
+wasm: proto_go
+	GOOS=js GOARCH=wasm go build -o ./dist/lib.wasm ./cmd/simwasm/
+
+# Just builds the server binary
+simweb: proto_go
+	go build -o simweb ./cmd/simweb/web.go
+
+# Starts up a webserver hosting the dist/ and API endpoints.
+runweb: proto_go
+	go run ./cmd/simweb/web.go
+
+proto_go:
+	protoc -I=./api/ --go_out=. ./api/*.proto
+
 .PHONY: items
 items: $(itemsOutDir)/all.go
 

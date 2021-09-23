@@ -12,3 +12,4 @@ ui/core/api/rogue.ts
 ui/core/api/shaman.ts
 ui/core/api/warrior.ts
 ui/core/api/warlock.ts
+.vscode
