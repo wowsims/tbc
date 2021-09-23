@@ -1,6 +1,8 @@
+import { getEnumValues } from '../utils';
+
 import { Stat } from './common';
 
-const STATS_LEN = Object.keys(Stat).length;
+const STATS_LEN = getEnumValues(Stat).length;
 
 /**
  * Represents values for all character stats (stam, agi, spell power, hit raiting, etc).
@@ -11,7 +13,11 @@ export class Stats {
   private readonly stats: Array<number>;
 
   constructor(stats?: Array<number>) {
-    this.stats = (stats?.slice(0, STATS_LEN) || []).concat(new Array(STATS_LEN - (stats?.length || 0)).fill(0));
+    this.stats = stats?.slice(0, STATS_LEN) || [];
+
+		if (this.stats.length < STATS_LEN) {
+			this.stats = this.stats.concat(new Array(STATS_LEN - (stats?.length || 0)).fill(0));
+		}
   }
 
   equals(other: Stats): boolean {

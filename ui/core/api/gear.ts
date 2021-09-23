@@ -1,4 +1,5 @@
 import { equalsOrBothNull } from '../utils';
+import { getEnumValues } from '../utils';
 
 import { EquippedItem } from './equipped_item';
 import { ItemSlot } from './common';
@@ -16,10 +17,10 @@ export class Gear {
   private readonly gear: InternalGear;
 
   constructor(gear: Partial<InternalGear>) {
-    for (let slot in ItemSlot) {
-      if (!gear[Number(slot) as ItemSlot])
-        gear[Number(slot) as ItemSlot] = null;
-    }
+		getEnumValues(ItemSlot).forEach(slot => {
+      if (!gear[slot as ItemSlot])
+        gear[slot as ItemSlot] = null;
+    });
     this.gear = gear as InternalGear;
   }
 
@@ -29,13 +30,13 @@ export class Gear {
 
   withEquippedItem(newSlot: ItemSlot, newItem: EquippedItem | null): Gear {
     const newInternalGear: Partial<InternalGear> = {};
-    for (let slot in ItemSlot) {
+		getEnumValues(ItemSlot).forEach(slot => {
       if (Number(slot) == newSlot) {
         newInternalGear[Number(slot) as ItemSlot] = newItem;
       } else {
         newInternalGear[Number(slot) as ItemSlot] = this.getEquippedItem(Number(slot));
       }
-    }
+    });
     return new Gear(newInternalGear);
   }
 

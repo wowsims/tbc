@@ -50,7 +50,7 @@ wasm: dist/lib.wasm
 dist/sim_worker.js: ui/worker/sim_worker.js
 	cp ui/worker/sim_worker.js dist
 
-dist/lib.wasm: cmd/simwasm/* api/api.pb.go
+dist/lib.wasm: cmd/simwasm/* api/*.go $(call rwildcard,sim,*.go)
 	GOOS=js GOARCH=wasm go build -o ./dist/lib.wasm ./cmd/simwasm/
 
 # Just builds the server binary

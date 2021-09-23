@@ -170,6 +170,91 @@ const theme = new DefaultTheme<Spec.SpecElementalShaman>(document.body, {
                 Gems.POTENT_NOBLE_TOPAZ,
               ],
             }),
+            ItemSpec.create({
+              id: 28762, // Adornment of Stolen Souls
+            }),
+            ItemSpec.create({
+              id: 29037, // Cyclone Shoulderguards
+              enchant: Enchants.GREATER_INSCRIPTION_OF_DISCIPLINE,
+              gems: [
+                Gems.POTENT_NOBLE_TOPAZ,
+                Gems.POTENT_NOBLE_TOPAZ,
+              ],
+            }),
+            ItemSpec.create({
+              id: 28797, // Brute Cloak of the Ogre-Magi
+            }),
+            ItemSpec.create({
+              id: 29519, // Netherstrike Breastplate
+              enchant: Enchants.CHEST_EXCEPTIONAL_STATS,
+              gems: [
+                Gems.RUNED_LIVING_RUBY,
+                Gems.RUNED_LIVING_RUBY,
+                Gems.RUNED_LIVING_RUBY,
+              ],
+            }),
+            ItemSpec.create({
+              id: 29521, // Netherstrike Bracers
+              enchant: Enchants.WRIST_SPELLPOWER,
+              gems: [
+                Gems.POTENT_NOBLE_TOPAZ,
+              ],
+            }),
+            ItemSpec.create({
+              id: 28780, // Soul-Eaters's Handwraps
+              enchant: Enchants.GLOVES_SPELLPOWER,
+              gems: [
+                Gems.POTENT_NOBLE_TOPAZ,
+                Gems.GLOWING_NIGHTSEYE,
+              ],
+            }),
+            ItemSpec.create({
+              id: 29520, // Netherstrike Belt
+              gems: [
+                Gems.GLOWING_NIGHTSEYE,
+                Gems.POTENT_NOBLE_TOPAZ,
+              ],
+            }),
+            ItemSpec.create({
+              id: 24262, // Spellstrike Pants
+              enchant: Enchants.RUNIC_SPELLTHREAD,
+              gems: [
+                Gems.RUNED_LIVING_RUBY,
+                Gems.RUNED_LIVING_RUBY,
+                Gems.RUNED_LIVING_RUBY,
+              ],
+            }),
+            ItemSpec.create({
+              id: 28517, // Boots of Foretelling
+              gems: [
+                Gems.RUNED_LIVING_RUBY,
+                Gems.RUNED_LIVING_RUBY,
+              ],
+            }),
+            ItemSpec.create({
+              id: 30667, // Ring of Unrelenting Storms
+              enchant: Enchants.RING_SPELLPOWER,
+            }),
+            ItemSpec.create({
+              id: 28753, // Ring of Recurrence
+              enchant: Enchants.RING_SPELLPOWER,
+            }),
+            ItemSpec.create({
+              id: 29370, // Icon of the Silver Crescent
+            }),
+            ItemSpec.create({
+              id: 28785, // Lightning Capacitor
+            }),
+            ItemSpec.create({
+              id: 28770, // Nathrezim Mindblade
+              enchant: Enchants.WEAPON_SPELLPOWER,
+            }),
+            ItemSpec.create({
+              id: 29273, // Khadgar's Knapsack
+            }),
+            ItemSpec.create({
+              id: 28248, // Totem of the Void
+            }),
           ],
         }),
       },

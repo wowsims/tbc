@@ -25,6 +25,7 @@ func getGearListImpl(request *GearListRequest) *GearListResult {
 	if request.Spec == Spec_SpecElementalShaman {
 		for _, v := range shaman.ElementalItems {
 			item := core.ItemsByID[v]
+
 			result.Items = append(result.Items,
 				&Item{
 					Id:               item.ID,
@@ -36,7 +37,7 @@ func getGearListImpl(request *GearListRequest) *GearListResult {
 					Name:             item.Name,
 					Stats:            item.Stats[:],
 					Phase:            int32(item.Phase),
-					Quality:          ItemQuality(item.Quality),
+					Quality:          ItemQuality(item.Quality + 1), // Hack until we use generated items
 					GemSockets:       coreGemColorToColor(item.GemSockets),
 				},
 			)
@@ -49,7 +50,18 @@ func getGearListImpl(request *GearListRequest) *GearListResult {
 				Stats:   gem.Stats[:],
 				Color:   GemColor(gem.Color),
 				Phase:   int32(gem.Phase),
-				Quality: ItemQuality(gem.Quality),
+				Quality: ItemQuality(gem.Quality + 1), // Hack until we use generated items
+			})
+		}
+		for _, v := range shaman.ElementalEnchants {
+			enchant := core.EnchantsByID[v]
+			result.Enchants = append(result.Enchants, &Enchant{
+				Id:       enchant.ID,
+				EffectId: enchant.EffectID,
+				Name:     enchant.Name,
+				Type:     ItemType(enchant.ItemType),
+				Stats:    enchant.Bonus[:],
+				Quality:  ItemQuality(4),
 			})
 		}
 	}
