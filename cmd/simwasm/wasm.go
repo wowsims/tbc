@@ -19,8 +19,8 @@ func main() {
 }
 
 func gearList(this js.Value, args []js.Value) interface{} {
-	data := make([]byte, args[0].Call("length").Int())
-	// Assumes input is a JSON object as a string
+	// Assumes args[0] is a Uint8Array
+	data := make([]byte, args[0].Get("length").Int())
 	js.CopyBytesToGo(data, args[0])
 
 	glr := &api.GearListRequest{}
@@ -36,13 +36,15 @@ func gearList(this js.Value, args []js.Value) interface{} {
 		return nil
 	}
 
-	// TODO: do I need to create a new Uint8Array and js.CopyBytesToJS?
-	return outbytes
+	outArray := js.Global().Get("Uint8Array").New(len(outbytes))
+	js.CopyBytesToJS(outArray, outbytes)
+
+	return outArray
 }
 
 func individualSim(this js.Value, args []js.Value) interface{} {
-	data := make([]byte, args[0].Call("length").Int())
-	// Assumes input is a JSON object as a string
+	// Assumes args[0] is a Uint8Array
+	data := make([]byte, args[0].Get("length").Int())
 	js.CopyBytesToGo(data, args[0])
 
 	isr := &api.IndividualSimRequest{}
@@ -58,6 +60,8 @@ func individualSim(this js.Value, args []js.Value) interface{} {
 		return nil
 	}
 
-	// TODO: do I need to create a new Uint8Array and js.CopyBytesToJS?
-	return outbytes
+	outArray := js.Global().Get("Uint8Array").New(len(outbytes))
+	js.CopyBytesToJS(outArray, outbytes)
+
+	return outArray
 }

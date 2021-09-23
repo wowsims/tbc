@@ -75,6 +75,8 @@
 }
 
 .selector-modal-list {
+	max-height: 70vh;
+	overflow: scroll;
   padding: 0;
 }
 

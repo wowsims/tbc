@@ -5,7 +5,7 @@ rwildcard=$(foreach d,$(wildcard $(1:=/*)),$(call rwildcard,$d,$2) $(filter $(su
 itemsOutDir=items
 
 # Make everything. Keep this first so it's the default rule.
-dist: elemental_shaman dist/lib.wasm
+dist: elemental_shaman dist/lib.wasm dist/sim_worker.js
 
 elemental_shaman: dist/elemental_shaman/index.js dist/elemental_shaman/index.css dist/elemental_shaman/index.html
 
@@ -47,7 +47,10 @@ dist/%/index.html: index_template.html
 .PHONY: wasm
 wasm: dist/lib.wasm
 
-dist/lib.wasm: api/api.pb.go
+dist/sim_worker.js: ui/worker/sim_worker.js
+	cp ui/worker/sim_worker.js dist
+
+dist/lib.wasm: cmd/simwasm/* api/api.pb.go
 	GOOS=js GOARCH=wasm go build -o ./dist/lib.wasm ./cmd/simwasm/
 
 # Just builds the server binary

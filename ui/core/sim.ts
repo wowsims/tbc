@@ -37,6 +37,7 @@ import { StatWeightsRequest, StatWeightsResult } from './api/api';
 import { Listener } from './typed_event';
 import { TypedEvent } from './typed_event';
 import { wait } from './utils';
+import { WorkerPool } from './worker_pool';
 
 export interface SimConfig<SpecType extends Spec> {
   spec: Spec;
@@ -53,7 +54,7 @@ export interface SimConfig<SpecType extends Spec> {
 }
 
 // Core Sim module which deals only with api types, no UI-related stuff.
-export class Sim<SpecType extends Spec> {
+export class Sim<SpecType extends Spec> extends WorkerPool {
   readonly spec: Spec;
 
   readonly buffsChangeEmitter = new TypedEvent<void>();
@@ -95,6 +96,8 @@ export class Sim<SpecType extends Spec> {
   private _init = false;
 
   constructor(config: SimConfig<SpecType>) {
+		super(3);
+
     this.spec = config.spec;
     this._race = specToEligibleRaces[this.spec][0];
 
@@ -313,117 +316,6 @@ export class Sim<SpecType extends Spec> {
     });
 
     return new Gear(gearMap);
-  }
-
-  private async getGearList(request: GearListRequest): Promise<GearListResult> {
-    return Promise.resolve({
-      items: [
-        Item.create({
-          id: 29035,
-          type: ItemType.ItemTypeHead,
-          name: 'Cyclone Facegaurd',
-          quality: ItemQuality.ItemQualityEpic,
-          gemSockets: [GemColor.GemColorMeta, GemColor.GemColorYellow],
-        }),
-        Item.create({
-          id: 30171,
-          type: ItemType.ItemTypeHead,
-          name: 'Cataclysm Headpiece',
-          quality: ItemQuality.ItemQualityEpic,
-          gemSockets: [GemColor.GemColorMeta, GemColor.GemColorYellow],
-        }),
-        Item.create({
-          id: 30169,
-          type: ItemType.ItemTypeChest,
-          name: 'Cataclysm Chestpiece',
-          quality: ItemQuality.ItemQualityEpic,
-          gemSockets: [GemColor.GemColorBlue, GemColor.GemColorYellow, GemColor.GemColorYellow],
-        }),
-        Item.create({
-          id: 32235,
-          type: ItemType.ItemTypeHead,
-          name: 'Cursed Vision of Sargeras',
-          quality: ItemQuality.ItemQualityEpic,
-          gemSockets: [GemColor.GemColorMeta, GemColor.GemColorYellow],
-        }),
-      ],
-      enchants: [
-        Enchant.create({
-          id: 29191,
-          effectId: 3002,
-          name: 'Glyph of Power',
-          type: ItemType.ItemTypeHead,
-          quality: ItemQuality.ItemQualityUncommon,
-        }),
-      ],
-      gems: [
-        Gem.create({
-          id: 34220,
-          name: 'Chaotic Skyfire Diamond',
-          quality: ItemQuality.ItemQualityRare,
-          color: GemColor.GemColorMeta,
-        }),
-        Gem.create({
-          id: 23096,
-          name: 'Runed Blood Garnet',
-          quality: ItemQuality.ItemQualityUncommon,
-          color: GemColor.GemColorRed,
-        }),
-        Gem.create({
-          id: 24030,
-          name: 'Runed Living Ruby',
-          quality: ItemQuality.ItemQualityRare,
-          color: GemColor.GemColorRed,
-        }),
-        Gem.create({
-          id: 24059,
-          name: 'Potent Noble Topaz',
-          quality: ItemQuality.ItemQualityRare,
-          color: GemColor.GemColorOrange
-        }),
-      ],
-    });
-  }
-
-  async computeStats(request: ComputeStatsRequest): Promise<ComputeStatsResult> {
-    return Promise.resolve(ComputeStatsResult.create());
-  }
-
-  async statWeights(request: StatWeightsRequest): Promise<StatWeightsResult> {
-    const epValues = [];
-    epValues[Stat.StatSpellPower] = Math.random() * 2;
-    epValues[Stat.StatIntellect] = Math.random() * 2;
-    epValues[Stat.StatMP5] = Math.random() * 2;
-    epValues[Stat.StatNatureSpellPower] = Math.random() * 2;
-    epValues[Stat.StatSpellHit] = Math.random() * 2;
-    epValues[Stat.StatSpellCrit] = Math.random() * 2;
-    epValues[Stat.StatSpellHaste] = Math.random() * 2;
-
-    const epStDevs = [];
-    epStDevs[Stat.StatSpellPower] = Math.random() * 0.5;
-    epStDevs[Stat.StatIntellect] = Math.random() * 0.5;
-    epStDevs[Stat.StatMP5] = Math.random() * 0.5;
-    epStDevs[Stat.StatNatureSpellPower] = Math.random() * 0.5;
-    epStDevs[Stat.StatSpellHit] = Math.random() * 0.5;
-    epStDevs[Stat.StatSpellCrit] = Math.random() * 0.5;
-    epStDevs[Stat.StatSpellHaste] = Math.random() * 0.5;
-
-    return Promise.resolve(StatWeightsResult.create({
-      weights: epValues,
-      weightsStdev: epStDevs,
-      epValues: epValues,
-      epValuesStdev: epStDevs,
-    }));
-  }
-
-  async individualSim(request: IndividualSimRequest): Promise<IndividualSimResult> {
-    console.log('Individual sim request: ' + IndividualSimRequest.toJsonString(request));
-    await wait(3000);
-    const result = await Promise.resolve(IndividualSimResult.create());
-    result.dpsAvg = Math.random() * 2000;
-    result.dpsStdev = Math.random() * 200;
-    console.log('Individual sim result: ' + IndividualSimResult.toJsonString(result));
-    return result;
   }
 
   makeCurrentIndividualSimRequest(iterations: number, debug: boolean): IndividualSimRequest {
