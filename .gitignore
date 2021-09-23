@@ -1,5 +1,5 @@
 node_modules
-bazel-*
+*.pb.go
 generate_items/api
 ui/core/api/api.ts
 ui/core/api/common.ts

@@ -5,7 +5,7 @@ rwildcard=$(foreach d,$(wildcard $(1:=/*)),$(call rwildcard,$d,$2) $(filter $(su
 itemsOutDir=items
 
 # Make everything. Keep this first so it's the default rule.
-dist: elemental_shaman
+dist: elemental_shaman dist/lib.wasm
 
 elemental_shaman: dist/elemental_shaman/index.js dist/elemental_shaman/index.css dist/elemental_shaman/index.html
 
@@ -44,18 +44,21 @@ dist/%/index.html: index_template.html
 	mkdir -p $(@D)
 	cat index_template.html | sed 's/@@TITLE@@/$(title)/g' > $@
 
-wasm: proto_go
+.PHONY: wasm
+wasm: dist/lib.wasm
+
+dist/lib.wasm: api/api.pb.go
 	GOOS=js GOARCH=wasm go build -o ./dist/lib.wasm ./cmd/simwasm/
 
 # Just builds the server binary
-simweb: proto_go
+simweb: api/api.pb.go
 	go build -o simweb ./cmd/simweb/web.go
 
 # Starts up a webserver hosting the dist/ and API endpoints.
-runweb: proto_go
+runweb: api/api.pb.go
 	go run ./cmd/simweb/web.go
 
-proto_go:
+api/api.pb.go: api/*.proto
 	protoc -I=./api/ --go_out=. ./api/*.proto
 
 .PHONY: items
