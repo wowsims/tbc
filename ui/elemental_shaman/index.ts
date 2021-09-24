@@ -94,6 +94,8 @@ const theme = new DefaultTheme<Spec.SpecElementalShaman>(document.body, {
       IconInputs.EyeOfTheNight,
       IconInputs.ChainOfTheTwilightOwl,
       IconInputs.JadePendantOfBlasting,
+      IconInputs.AtieshWarlock,
+      IconInputs.AtieshMage,
     ],
     'Debuffs': [
       IconInputs.JudgementOfWisdom,

@@ -9,9 +9,12 @@ import { IconInput } from './icon_picker'
 // Keep each section in alphabetical order.
 // Buffs
 export const ArcaneBrilliance = makeBooleanBuffInput({spellId:27127}, 'arcaneBrilliance');
+export const AtieshMage = makeMultistateBuffInput({spellId:28142}, 6, 'atieshMage');
+export const AtieshWarlock = makeMultistateBuffInput({spellId:28143}, 6, 'atieshWarlock');
 export const BlessingOfKings = makeBooleanBuffInput({spellId:25898}, 'blessingOfKings');
 export const BlessingOfWisdom = makeTristateBuffInput({spellId:27143}, {spellId:20245}, 'blessingOfWisdom');
 export const Bloodlust = makeMultistateBuffInput({spellId:2825}, 11, 'bloodlust');
+export const BraidedEterniumChain = makeBooleanBuffInput({spellId:31025}, 'braidedEterniumChain');
 export const ChainOfTheTwilightOwl = makeBooleanBuffInput({spellId:31035}, 'chainOfTheTwilightOwl');
 export const DivineSpirit = makeTristateBuffInput({spellId:25312}, {spellId:33182}, 'divineSpirit');
 export const EyeOfTheNight = makeBooleanBuffInput({spellId:31033}, 'eyeOfTheNight');
