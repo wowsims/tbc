@@ -258,6 +258,98 @@ const theme = new DefaultTheme<Spec.SpecElementalShaman>(document.body, {
           ],
         }),
       },
+      {
+        name: 'P2 BIS',
+        tooltip: Tooltips.BASIC_BIS_DISCLAIMER,
+        equipment: EquipmentSpec.create({
+          items: [
+            ItemSpec.create({
+              id: 29035, // Cyclone Faceguard
+              enchant: Enchants.GLYPH_OF_POWER,
+              gems: [
+                Gems.CHAOTIC_SKYFIRE_DIAMOND,
+                Gems.POTENT_NOBLE_TOPAZ,
+              ],
+            }),
+            ItemSpec.create({
+              id: 30015, // The Sun King's Talisman
+            }),
+            ItemSpec.create({
+              id: 29037, // Cyclone Shoulderguards
+              enchant: Enchants.GREATER_INSCRIPTION_OF_DISCIPLINE,
+              gems: [
+                Gems.POTENT_NOBLE_TOPAZ,
+                Gems.POTENT_NOBLE_TOPAZ,
+              ],
+            }),
+            ItemSpec.create({
+              id: 28797, // Brute Cloak of the Ogre-Magi
+            }),
+            ItemSpec.create({
+              id: 30169, // Cataclysm Chestpiece
+              enchant: Enchants.CHEST_EXCEPTIONAL_STATS,
+              gems: [
+                Gems.RUNED_LIVING_RUBY,
+                Gems.RUNED_LIVING_RUBY,
+                Gems.RUNED_LIVING_RUBY,
+              ],
+            }),
+            ItemSpec.create({
+              id: 29523, // Windhawk Bracers
+              enchant: Enchants.WRIST_SPELLPOWER,
+              gems: [
+                Gems.RUNED_LIVING_RUBY,
+              ],
+            }),
+            ItemSpec.create({
+              id: 28780, // Soul-Eaters's Handwraps
+              enchant: Enchants.GLOVES_SPELLPOWER,
+              gems: [
+                Gems.POTENT_NOBLE_TOPAZ,
+                Gems.GLOWING_NIGHTSEYE,
+              ],
+            }),
+            ItemSpec.create({
+              id: 30038, // Belt of Blasting
+              gems: [
+                Gems.GLOWING_NIGHTSEYE,
+                Gems.POTENT_NOBLE_TOPAZ,
+              ],
+            }),
+            ItemSpec.create({
+              id: 30172, // Cataclysm Leggings
+              enchant: Enchants.RUNIC_SPELLTHREAD,
+              gems: [
+                Gems.POTENT_NOBLE_TOPAZ,
+              ],
+            }),
+            ItemSpec.create({
+              id: 30067, // Velvet Boots of the Guardian
+            }),
+            ItemSpec.create({
+              id: 30667, // Ring of Unrelenting Storms
+              enchant: Enchants.RING_SPELLPOWER,
+            }),
+            ItemSpec.create({
+              id: 30109, // Ring of Endless Coils
+              enchant: Enchants.RING_SPELLPOWER,
+            }),
+            ItemSpec.create({
+              id: 29370, // Icon of the Silver Crescent
+            }),
+            ItemSpec.create({
+              id: 28785, // Lightning Capacitor
+            }),
+            ItemSpec.create({
+              id: 29988, // The Nexus Key
+              enchant: Enchants.WEAPON_SPELLPOWER,
+            }),
+            ItemSpec.create({
+              id: 28248, // Totem of the Void
+            }),
+          ],
+        }),
+      },
     ],
     encounters: [
     ],
