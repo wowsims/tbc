@@ -13,12 +13,14 @@ const NUM_ROWS = 9;
 const TALENTS_STORAGE_KEY = 'Talents';
 
 export abstract class TalentsPicker<SpecType extends Spec> extends Component {
-  readonly trees: Array<TalentTreePicker<SpecType>>;
   private readonly sim: Sim<SpecType>;
+	frozen: boolean;
+  readonly trees: Array<TalentTreePicker<SpecType>>;
 
   constructor(parent: HTMLElement, sim: Sim<SpecType>, treeConfigs: Array<TalentTreeConfig<SpecType>>) {
     super(parent, 'talents-picker-root');
     this.sim = sim;
+		this.frozen = false;
     this.trees = treeConfigs.map(treeConfig => new TalentTreePicker(this.rootElem, sim, treeConfig, this));
     this.trees.forEach(tree => tree.talents.forEach(talent => talent.setPoints(0, false)));
 
@@ -76,6 +78,12 @@ export abstract class TalentsPicker<SpecType extends Spec> extends Component {
     this.trees.forEach((tree, idx) => tree.setTalentsString(parts[idx] || ''));
     this.update();
   }
+
+	// Freezes the talent calculator so that user input cannot change it.
+	freeze() {
+		this.frozen = true;
+		this.rootElem.classList.add('frozen');
+	}
 }
 
 class TalentTreePicker<SpecType extends Spec> extends Component {
@@ -117,8 +125,10 @@ class TalentTreePicker<SpecType extends Spec> extends Component {
 
     const reset = this.rootElem.getElementsByClassName('talent-tree-reset')[0] as HTMLElement;
     reset.addEventListener('click', event => {
-      this.talents.forEach(talent => talent.setPoints(0, false));
-      this.picker.update();
+			if (!this.picker.frozen) {
+				this.talents.forEach(talent => talent.setPoints(0, false));
+				this.picker.update();
+			}
     });
   }
 
@@ -170,6 +180,9 @@ class TalentPicker<SpecType extends Spec> extends Component {
       event.preventDefault();
     });
     this.rootElem.addEventListener('mousedown', event => {
+			if (this.tree.picker.frozen)
+				return;
+
       const rightClick = isRightClick(event);
       if (rightClick) {
         this.setPoints(this.getPoints() - 1, true);

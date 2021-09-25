@@ -23,22 +23,24 @@ type SavedData<T> = {
 };
 
 export class SavedDataManager<SpecType extends Spec, T> extends Component {
-  private readonly _sim: Sim<SpecType>;
-  private readonly _config: SavedDataManagerConfig<SpecType, T>;
+  private readonly sim: Sim<SpecType>;
+  private readonly config: SavedDataManagerConfig<SpecType, T>;
 
-  private readonly _userData: Array<SavedData<T>>;
-  private readonly _presets: Array<SavedData<T>>;
+  private readonly userData: Array<SavedData<T>>;
+  private readonly presets: Array<SavedData<T>>;
 
-  private readonly _savedDataDiv: HTMLElement;
-  private readonly _saveInput: HTMLInputElement;
+  private readonly savedDataDiv: HTMLElement;
+  private readonly saveInput: HTMLInputElement;
+	private frozen: boolean;
 
   constructor(parent: HTMLElement, sim: Sim<Spec>, config: SavedDataManagerConfig<SpecType, T>) {
     super(parent, 'saved-data-manager-root');
-    this._sim = sim;
-    this._config = config;
+    this.sim = sim;
+    this.config = config;
 
-    this._userData = [];
-    this._presets = [];
+    this.userData = [];
+    this.presets = [];
+		this.frozen = false;
 
     this.rootElem.innerHTML = `
     <div class="saved-data-container">
@@ -49,18 +51,21 @@ export class SavedDataManager<SpecType extends Spec, T> extends Component {
     </div>
     `;
 
-    this._savedDataDiv = this.rootElem.getElementsByClassName('saved-data-container')[0] as HTMLElement;
+    this.savedDataDiv = this.rootElem.getElementsByClassName('saved-data-container')[0] as HTMLElement;
 
-    this._saveInput = this.rootElem.getElementsByClassName('saved-data-save-input')[0] as HTMLInputElement;
+    this.saveInput = this.rootElem.getElementsByClassName('saved-data-save-input')[0] as HTMLInputElement;
     const saveButton = this.rootElem.getElementsByClassName('saved-data-save-button')[0] as HTMLButtonElement;
     saveButton.addEventListener('click', event => {
-      const newName = this._saveInput.value;
+			if (this.frozen)
+				return;
+
+      const newName = this.saveInput.value;
       if (!newName) {
         alert(`Choose a label for your saved ${config.label}!`);
         return;
       }
 
-      if (newName in this._presets) {
+      if (newName in this.presets) {
         alert(`${config.label} with name ${newName} already exists.`);
         return;
       }
@@ -73,18 +78,18 @@ export class SavedDataManager<SpecType extends Spec, T> extends Component {
   addSavedData(newName: string, data: T, isPreset: boolean, tooltipInfo?: string) {
     const newData = this.makeSavedData(newName, data, isPreset, tooltipInfo);
 
-    const dataArr = isPreset ? this._presets : this._userData;
+    const dataArr = isPreset ? this.presets : this.userData;
 
     const oldIdx = dataArr.findIndex(data => data.name == newName);
     if (oldIdx == -1) {
-      if (isPreset || this._presets.length == 0) {
-        this._savedDataDiv.appendChild(newData.elem);
+      if (isPreset || this.presets.length == 0) {
+        this.savedDataDiv.appendChild(newData.elem);
       } else {
-        this._savedDataDiv.insertBefore(newData.elem, this._presets[0].elem);
+        this.savedDataDiv.insertBefore(newData.elem, this.presets[0].elem);
       }
       dataArr.push(newData);
     } else {
-      this._savedDataDiv.replaceChild(newData.elem, dataArr[oldIdx].elem);
+      this.savedDataDiv.replaceChild(newData.elem, dataArr[oldIdx].elem);
       dataArr[oldIdx] = newData;
     }
   }
@@ -99,8 +104,8 @@ export class SavedDataManager<SpecType extends Spec, T> extends Component {
     `;
 
     dataElem.addEventListener('click', event => {
-      this._config.setData(this._sim, data);
-      this._saveInput.value = dataName;
+      this.config.setData(this.sim, data);
+      this.saveInput.value = dataName;
     });
 
     if (isPreset) {
@@ -109,13 +114,13 @@ export class SavedDataManager<SpecType extends Spec, T> extends Component {
       const deleteButton = dataElem.getElementsByClassName('saved-data-set-delete')[0] as HTMLElement;
       deleteButton.addEventListener('click', event => {
         event.stopPropagation();
-        const shouldDelete = confirm(`Delete saved ${this._config.label} '${dataName}'?`);
+        const shouldDelete = confirm(`Delete saved ${this.config.label} '${dataName}'?`);
         if (!shouldDelete)
           return;
 
-        const idx = this._userData.findIndex(data => data.name == dataName);
-        this._userData[idx].elem.remove();
-        this._userData.splice(idx, 1);
+        const idx = this.userData.findIndex(data => data.name == dataName);
+        this.userData[idx].elem.remove();
+        this.userData.splice(idx, 1);
         this.saveUserData();
       });
     }
@@ -129,7 +134,7 @@ export class SavedDataManager<SpecType extends Spec, T> extends Component {
     }
 
     const checkActive = () => {
-      if (this._config.equals(data, this._config.getData(this._sim))) {
+      if (this.config.equals(data, this.config.getData(this.sim))) {
         dataElem.classList.add('active');
       } else {
         dataElem.classList.remove('active');
@@ -137,7 +142,7 @@ export class SavedDataManager<SpecType extends Spec, T> extends Component {
     };
 
     checkActive();
-    this._config.changeEmitters.forEach(emitter => emitter.on(checkActive));
+    this.config.changeEmitters.forEach(emitter => emitter.on(checkActive));
 
     return {
       name: dataName,
@@ -149,22 +154,28 @@ export class SavedDataManager<SpecType extends Spec, T> extends Component {
   // Save data to window.localStorage.
   private saveUserData() {
     const gearData: Record<string, Object> = {};
-    this._userData.forEach(savedData => {
-      gearData[savedData.name] = this._config.toJson(savedData.data);
+    this.userData.forEach(savedData => {
+      gearData[savedData.name] = this.config.toJson(savedData.data);
     });
 
-    window.localStorage.setItem(this._config.label, JSON.stringify(gearData));
+    window.localStorage.setItem(this.config.label, JSON.stringify(gearData));
   }
 
   // Load data from window.localStorage.
   loadUserData() {
-    const dataStr = window.localStorage.getItem(this._config.label);
+    const dataStr = window.localStorage.getItem(this.config.label);
     if (!dataStr)
       return;
 
     const jsonData = JSON.parse(dataStr);
     for (let name in jsonData) {
-      this.addSavedData(name, this._config.fromJson(jsonData[name]), false);
+      this.addSavedData(name, this.config.fromJson(jsonData[name]), false);
     }
   }
+
+	// Prevent user input from creating / deleting saved data.
+	freeze() {
+		this.frozen = true;
+		this.rootElem.classList.add('frozen');
+	}
 }

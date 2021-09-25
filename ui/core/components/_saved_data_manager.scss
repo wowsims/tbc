@@ -23,6 +23,16 @@
   color: yellow;
 }
 
+.saved-data-manager-root.frozen .saved-data-set-delete {
+	display: none;
+}
+.saved-data-manager-root.frozen .saved-data-create-container {
+	display: none;
+}
+.saved-data-manager-root.frozen .saved-data-set-chip:first-child:nth-last-child(1) {
+	display: none;
+}
+
 .saved-data-set-chip:not(.saved-data-has-tooltip) .saved-data-set-tooltip {
   display: none;
 }

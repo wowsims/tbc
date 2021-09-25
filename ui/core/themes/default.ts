@@ -47,6 +47,7 @@ export interface DefaultThemeConfig<SpecType extends Spec> extends SimUIConfig<S
   >>;
   showTargetArmor: boolean;
   showNumTargets: boolean;
+	freezeTalents: boolean;
   presets: {
     gear: Array<{
       name: string,
@@ -96,6 +97,9 @@ export class DefaultTheme<SpecType extends Spec> extends SimUI<SpecType> {
     const customStatsPicker = new CustomStatsPicker(this.parentElem.getElementsByClassName('custom-stats-picker')[0] as HTMLElement, this.sim, config.epStats);
 
     const talentsPicker = newTalentsPicker(config.spec, this.parentElem.getElementsByClassName('talents-picker')[0] as HTMLElement, this.sim);
+		if (this._config.freezeTalents) {
+			talentsPicker.freeze();
+		}
 
     const settingsTab = document.getElementsByClassName('settings-inputs')[0] as HTMLElement;
     Object.keys(config.iconSections).forEach(sectionName => {
@@ -265,6 +269,9 @@ export class DefaultTheme<SpecType extends Spec> extends SimUI<SpecType> {
       toJson: (a: string) => a,
       fromJson: (obj: any) => obj,
     });
+		if (this._config.freezeTalents) {
+			savedTalentsManager.freeze();
+		}
 
     await super.init();
 

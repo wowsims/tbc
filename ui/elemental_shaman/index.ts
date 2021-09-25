@@ -123,6 +123,7 @@ const theme = new DefaultTheme<Spec.SpecElementalShaman>(document.body, {
       OtherInputs.ShadowPriestDPS,
     ],
   },
+	freezeTalents: true,
   showTargetArmor: false,
   showNumTargets: true,
   defaults: {

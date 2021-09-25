@@ -30,6 +30,9 @@
   font-size: 20px !important;
   cursor: pointer;
 }
+.talents-picker-root.frozen .talent-tree-reset {
+	display: none;
+}
 
 .talent-tree-main {
   display: grid;
