@@ -20,6 +20,7 @@ import { EnumPickerConfig } from '../components/enum_picker';
 import { GearPicker } from '../components/gear_picker';
 import { IconInput } from '../components/icon_picker';
 import { IconPicker } from '../components/icon_picker';
+import { LogRunner } from '../components/log_runner';
 import { NumberPicker } from '../components/number_picker';
 import { NumberPickerConfig } from '../components/number_picker';
 import { Results } from '../components/results';
@@ -85,6 +86,7 @@ export class DefaultTheme<SpecType extends Spec> extends SimUI<SpecType> {
 
     const results = new Results(this.parentElem.getElementsByClassName('default-results')[0] as HTMLElement);
     const actions = new Actions(this.parentElem.getElementsByClassName('default-actions')[0] as HTMLElement, this.sim, results, config.epStats, config.epReferenceStat);
+    const logRunner = new LogRunner(this.parentElem.getElementsByClassName('log-runner')[0] as HTMLElement, this.sim, results);
 
     const characterStats = new CharacterStats(this.parentElem.getElementsByClassName('default-stats')[0] as HTMLElement, config.displayStats);
 
@@ -302,6 +304,7 @@ const layoutHTML = `
       <li class="active"><a data-toggle="tab" href="#gear-tab">Gear</a></li>
       <li><a data-toggle="tab" href="#settings-tab">Settings</a></li>
       <li><a data-toggle="tab" href="#talents-tab">Talents</a></li>
+      <li><a data-toggle="tab" href="#log-tab">Log</a></li>
       <li class="default-top-bar">
 				<span class="share-link fa fa-link"></span
 			</li>
@@ -350,6 +353,10 @@ const layoutHTML = `
           <div class="saved-talents-manager">
           </div>
         </div>
+      </div>
+      <div id="log-tab" class="tab-pane fade">
+				<div class="log-runner">
+				</div>
       </div>
     </div>
   </section>
