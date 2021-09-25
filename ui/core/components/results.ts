@@ -2,7 +2,7 @@ import { IndividualSimResult } from '../api/api';
 import { StatWeightsResult } from '../api/api';
 import { Stat } from '../api/common';
 import { statNames } from '../api/names';
-import { Component } from './component.js';
+import { Component } from './component';
 
 export class Results extends Component {
   readonly pendingElem: HTMLDivElement;

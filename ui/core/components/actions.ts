@@ -4,10 +4,11 @@ import { StatWeightsRequest } from '../api/api';
 import { Sim } from '../sim';
 
 import { Component } from './component';
+import { DetailedResults } from './detailed_results';
 import { Results } from './results';
 
 export class Actions extends Component {
-  constructor(parent: HTMLElement, sim: Sim<any>, results: Results, epStats: Array<Stat>, epReferenceStat: Stat) {
+  constructor(parent: HTMLElement, sim: Sim<any>, epStats: Array<Stat>, epReferenceStat: Stat, results: Results, detailedResults: DetailedResults) {
     super(parent, 'actions-root');
 
     const simButton = document.createElement('button');
@@ -34,8 +35,10 @@ export class Actions extends Component {
       const simRequest = sim.makeCurrentIndividualSimRequest(iterations, false);
 
       results.setPending();
+      detailedResults.setPending();
       const result = await sim.individualSim(simRequest);
       results.setSimResult(result);
+      detailedResults.setSimResult(result);
     });
 
     statWeightsButton.addEventListener('click', async () => {

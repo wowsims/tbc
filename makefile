@@ -7,7 +7,9 @@ itemsOutDir=items
 # Make everything. Keep this first so it's the default rule.
 dist: elemental_shaman dist/lib.wasm dist/sim_worker.js
 
-elemental_shaman: dist/elemental_shaman/index.js dist/elemental_shaman/index.css dist/elemental_shaman/index.html
+elemental_shaman: dist/elemental_shaman/index.js dist/elemental_shaman/index.css dist/elemental_shaman/index.html detailed_results
+
+detailed_results: dist/detailed_results/index.js dist/detailed_results/index.css dist/detailed_results/index.html
 
 clean:
 	rm -f ui/core/api/api.ts
@@ -29,11 +31,11 @@ dist/core/tsconfig.tsbuildinfo: $(call rwildcard,ui/core,*.ts) ui/core/api/api.t
 	npx tsc -p ui/core
 
 # Generic rule for building index.js for any class directory
-dist/%/index.js: ui/%/index.ts dist/core/tsconfig.tsbuildinfo
+dist/%/index.js: ui/%/index.ts ui/%/*.ts dist/core/tsconfig.tsbuildinfo
 	npx tsc -p $(<D) 
 
 # Generic rule for building index.css for any class directory
-dist/%/index.css: ui/%/index.scss $(call rwildcard,ui/core,*.scss)
+dist/%/index.css: ui/%/index.scss ui/%/*.scss $(call rwildcard,ui/core,*.scss)
 	mkdir -p $(@D)
 	npx sass $< $@
 
@@ -42,7 +44,7 @@ dist/%/index.html: index_template.html
 	$(eval title := $(shell echo $(shell basename $(@D)) | sed -r 's/(^|_)([a-z])/\U \2/g' | cut -c 2-))
 	echo $(title)
 	mkdir -p $(@D)
-	cat index_template.html | sed 's/@@TITLE@@/$(title)/g' > $@
+	cat index_template.html | sed 's/@@TITLE@@/TBC $(title) Simulator/g' > $@
 
 .PHONY: wasm
 wasm: dist/lib.wasm

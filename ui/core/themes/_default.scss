@@ -1,6 +1,7 @@
 @import "../components/actions";
 @import "../components/character_stats";
 @import "../components/custom_stats_picker";
+@import "../components/detailed_results";
 @import "../components/enum_picker";
 @import "../components/gear_picker";
 @import "../components/icon_picker";
@@ -98,6 +99,7 @@ $main-background-color: #F0FFFF;
   flex-grow: 1;
 }
 .default-main > .tab-content > .tab-pane {
+	height: 100%;
   padding: 25px;
 }
 

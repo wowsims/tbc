@@ -4,10 +4,11 @@ import { StatWeightsRequest } from '../api/api';
 import { Sim } from '../sim';
 
 import { Component } from './component';
+import { DetailedResults } from './detailed_results';
 import { Results } from './results';
 
 export class LogRunner extends Component {
-  constructor(parent: HTMLElement, sim: Sim<any>, results: Results) {
+  constructor(parent: HTMLElement, sim: Sim<any>, results: Results, detailedResults: DetailedResults) {
     super(parent, 'log-runner-root');
 
     const simButton = document.createElement('button');
@@ -23,8 +24,10 @@ export class LogRunner extends Component {
       const simRequest = sim.makeCurrentIndividualSimRequest(1, true);
 
       results.setPending();
+      detailedResults.setPending();
       const result = await sim.individualSim(simRequest);
       results.setSimResult(result);
+      detailedResults.setSimResult(result);
 
 			const lines = result.logs.split('\n');
 			logsDiv.textContent = '';
