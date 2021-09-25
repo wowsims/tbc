@@ -1,3 +1,12 @@
+:root {
+	--main-bg-color: DarkSlateGrey;
+	--main-text-color: White;
+	--main-secondary-color: Black;
+	--sidebar-bg-color: DarkKhaki;
+	--sidebar-text-color: White;
+	--sidebar-highlight-color: Blue;
+}
+
 @mixin vertical-center {
   margin: 0;
   position: absolute;

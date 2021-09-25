@@ -2,11 +2,16 @@ import { IndividualSimResult } from '../core/api/api';
 import { Component } from '../core/components/component';
 import { TypedEvent } from '../core/typed_event';
 
+import { ColorSettings } from './color_settings';
+
 declare var Chart: any;
 
 export class DpsHistogram extends Component {
-  constructor(parent: HTMLElement, resultsEmitter: TypedEvent<IndividualSimResult | null>) {
+	private readonly colorSettings: ColorSettings;
+
+  constructor(parent: HTMLElement, resultsEmitter: TypedEvent<IndividualSimResult | null>, colorSettings: ColorSettings) {
     super(parent, 'dps-histogram-root');
+		this.colorSettings = colorSettings;
 
 		resultsEmitter.on(simResult => {
 			if (!simResult)
