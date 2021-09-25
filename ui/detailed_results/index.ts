@@ -7,14 +7,14 @@ declare var Chart: any;
 
 const urlParams = new URLSearchParams(window.location.search);
 if (urlParams.has('mainBgColor')) {
-	document.documentElement.style.setProperty('--main-bg-color', urlParams.get('mainBgColor')!);
+	document.body.style.setProperty('--main-bg-color', urlParams.get('mainBgColor')!);
 }
 if (urlParams.has('mainTextColor')) {
-	document.documentElement.style.setProperty('--main-text-color', urlParams.get('mainTextColor')!);
+	document.body.style.setProperty('--main-text-color', urlParams.get('mainTextColor')!);
 }
 
 const colorSettings = {
-	mainTextColor: document.documentElement.style.getPropertyValue('--main-text-color'),
+	mainTextColor: document.body.style.getPropertyValue('--main-text-color'),
 };
 
 Chart.defaults.color = colorSettings.mainTextColor;

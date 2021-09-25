@@ -40,6 +40,7 @@ td, th {
   font-size: 20px;
   font-weight: 900;
   color: var(--sidebar-text-color);
+	text-shadow: 0 0 10px var(--sidebar-highlight-color);
 }
 
 .default-results {
@@ -95,10 +96,21 @@ td, th {
   color: var(--main-text-color);
 }
 
+.default-main input, .default-main select {
+	color: black;
+}
+
 .default-main > .nav-tabs {
   padding-left: 40px;
   padding-top: 15px;
 	border-bottom-color: var(--main-text-color);
+}
+.nav-tabs>li>a {
+	color: var(--main-text-color);
+}
+.nav-tabs>li>a:hover, .nav-tabs>li.active>a {
+	color: var(--main-secondary-color);
+	background-color: var(--main-text-color);
 }
 
 .default-main > .tab-content {
