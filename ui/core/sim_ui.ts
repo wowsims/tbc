@@ -3,6 +3,8 @@ import { TypedEvent } from './typed_event';
 import { Class } from './api/common';
 import { Spec } from './api/common';
 
+declare var tippy: any;
+
 const CURRENT_SETTINGS_KEY = '__currentSettings__';
 
 export interface SimUIConfig<SpecType extends Spec> extends SimConfig<SpecType> {
@@ -47,6 +49,7 @@ export abstract class SimUI<SpecType extends Spec> {
         console.warn('Failed to parse settings from window hash: ' + e);
       }
     }
+		window.location.hash = '';
 
     const savedSettings = window.localStorage.getItem(CURRENT_SETTINGS_KEY);
     if (!loadedSettings && savedSettings != null) {
@@ -60,10 +63,25 @@ export abstract class SimUI<SpecType extends Spec> {
     this.sim.changeEmitter.on(() => {
       const simJsonStr = JSON.stringify(this.sim.toJson());
       window.localStorage.setItem(CURRENT_SETTINGS_KEY, simJsonStr);
-
-      const b64Str = btoa(simJsonStr);
-      window.location.hash = b64Str;
     });
+
+		
+		Array.from(document.getElementsByClassName('share-link')).forEach(element => {
+			tippy(element, {
+				'content': 'Shareable link',
+				'allowHTML': true,
+			});
+
+			element.addEventListener('click', event => {
+				const linkUrl = new URL(window.location.href);
+				const simJsonStr = JSON.stringify(this.sim.toJson());
+				const simEncoded = btoa(simJsonStr);
+				linkUrl.hash = simEncoded;
+
+				navigator.clipboard.writeText(linkUrl.toString());
+				alert('Current settings copied to clipboard!');
+			});
+		});
   }
 
   registerExclusiveEffect(effect: ExclusiveEffect) {

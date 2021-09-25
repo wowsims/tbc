@@ -302,6 +302,9 @@ const layoutHTML = `
       <li class="active"><a data-toggle="tab" href="#gear-tab">Gear</a></li>
       <li><a data-toggle="tab" href="#settings-tab">Settings</a></li>
       <li><a data-toggle="tab" href="#talents-tab">Talents</a></li>
+      <li class="default-top-bar">
+				<span class="share-link fa fa-link"></span
+			</li>
     </ul>
     <div class="tab-content">
       <div id="gear-tab" class="tab-pane fade in active">
