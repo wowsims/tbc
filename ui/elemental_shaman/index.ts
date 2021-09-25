@@ -297,11 +297,8 @@ const theme = new DefaultTheme<Spec.SpecElementalShaman>(document.body, {
               ],
             }),
             ItemSpec.create({
-              id: 29523, // Windhawk Bracers
+              id: 29918, // Mindstorm Wristbands
               enchant: Enchants.WRIST_SPELLPOWER,
-              gems: [
-                Gems.RUNED_LIVING_RUBY,
-              ],
             }),
             ItemSpec.create({
               id: 28780, // Soul-Eaters's Handwraps
