@@ -128,6 +128,7 @@ const theme = new DefaultTheme<Spec.SpecElementalShaman>(document.body, {
   showTargetArmor: false,
   showNumTargets: true,
   defaults: {
+		phase: 2,
 		epWeights: Stats.fromMap({
 			[Stat.StatIntellect]: 0.41,
 			[Stat.StatSpellPower]: 1,

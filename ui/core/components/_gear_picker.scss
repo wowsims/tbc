@@ -65,17 +65,21 @@
   @include screen-vertical-horizontal-center;
 }
 
-.selector-modal-search {
-  border: 1px inset black;
-  border-radius: 4px;
+.selector-modal-item-tab {
+	color: black;
 }
 
 .selector-modal-tab-content-header {
   margin: 5px;
 }
 
-.selector-modal-item-tab {
-	color: black;
+.selector-modal-search {
+  border: 1px inset black;
+  border-radius: 4px;
+}
+
+.selector-modal-phase-select {
+	float: right;
 }
 
 .selector-modal-list {

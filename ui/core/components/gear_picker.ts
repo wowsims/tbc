@@ -211,6 +211,7 @@ class SelectorModal extends Component {
             id: item.id,
             name: item.name,
             quality: item.quality,
+						phase: item.phase,
             onEquip: item => {
               const equippedItem = this.sim.getEquippedItem(slot);
               if (equippedItem) {
@@ -237,6 +238,7 @@ class SelectorModal extends Component {
             id: enchant.id,
             name: enchant.name,
             quality: enchant.quality,
+						phase: 1,
             onEquip: enchant => {
               const equippedItem = this.sim.getEquippedItem(slot);
               if (equippedItem)
@@ -267,6 +269,7 @@ class SelectorModal extends Component {
               id: gem.id,
               name: gem.name,
               quality: gem.quality,
+							phase: gem.phase,
               onEquip: gem => {
                 const equippedItem = this.sim.getEquippedItem(slot);
                 if (equippedItem)
@@ -299,6 +302,7 @@ class SelectorModal extends Component {
           id: number,
           name: string,
           quality: ItemQuality,
+					phase: number,
           onEquip: (item: T) => void,
         },
         onRemove: () => void) {
@@ -321,6 +325,13 @@ class SelectorModal extends Component {
     <div class="selector-modal-tab-content-header">
       <button class="selector-modal-remove-button">Remove</button>
       <input class="selector-modal-search" type="text" placeholder="Search...">
+      <select class="selector-modal-phase-select">
+				<option value="1">Phase 1</option>
+				<option value="2">Phase 2</option>
+				<option value="3">Phase 3</option>
+				<option value="4">Phase 4</option>
+				<option value="5">Phase 5</option>
+			</select>
     </div>
     <ul class="selector-modal-list"></ul>
     `;
@@ -344,6 +355,7 @@ class SelectorModal extends Component {
 
       listItemElem.dataset.id = String(itemData.id);
       listItemElem.dataset.name = itemData.name;
+      listItemElem.dataset.phase = String(Math.max(itemData.phase, 1));
 
       listItemElem.innerHTML = `
         <a class="selector-modal-list-item-icon"></a>
@@ -392,16 +404,35 @@ class SelectorModal extends Component {
       });
     });
 
-    const searchInput = tabContent.getElementsByClassName('selector-modal-search')[0] as HTMLInputElement;
-    searchInput.addEventListener('input', event => {
+		const applyFilters = () => {
+			const searchQuery = searchInput.value.toLowerCase();
+			const phase = this.sim.getPhase();
+
       listItemElems.forEach(elem => {
-        if (elem.dataset.name!.toLowerCase().includes(searchInput.value.toLowerCase())) {
+        if (elem.dataset.name!.toLowerCase().includes(searchQuery) && Number(elem.dataset.phase!) <= phase) {
           elem.style.display = 'flex';
         } else {
           elem.style.display = 'none';
         }
       });
-    });
+		};
+
+    const searchInput = tabContent.getElementsByClassName('selector-modal-search')[0] as HTMLInputElement;
+    searchInput.addEventListener('input', applyFilters);
+
+    const phaseSelect = tabContent.getElementsByClassName('selector-modal-phase-select')[0] as HTMLSelectElement;
+		phaseSelect.value = String(this.sim.getPhase());
+		tabContent.dataset.phase = String(this.sim.getPhase());
+		phaseSelect.addEventListener('input', event => {
+			this.sim.setPhase(Number(phaseSelect.value));
+		});
+		this.sim.phaseChangeEmitter.on(() => {
+			tabContent.dataset.phase = String(this.sim.getPhase());
+			phaseSelect.value = String(this.sim.getPhase());
+			applyFilters();
+		});
+
+		applyFilters();
   }
 
   private removeTabs(labelSubstring: string) {

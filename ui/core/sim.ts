@@ -47,6 +47,7 @@ export interface SimConfig<SpecType extends Spec> {
   epStats: Array<Stat>;
   epReferenceStat: Stat;
   defaults: {
+		phase: number,
 		epWeights: Stats,
     encounter: Encounter,
     buffs: Buffs,
@@ -61,6 +62,7 @@ export interface SimConfig<SpecType extends Spec> {
 export class Sim<SpecType extends Spec> extends WorkerPool {
   readonly spec: Spec;
 
+  readonly phaseChangeEmitter = new TypedEvent<void>();
   readonly buffsChangeEmitter = new TypedEvent<void>();
   readonly consumesChangeEmitter = new TypedEvent<void>();
   readonly customStatsChangeEmitter = new TypedEvent<void>();
@@ -84,6 +86,7 @@ export class Sim<SpecType extends Spec> extends WorkerPool {
   private _gems: Record<number, Gem> = {};
 
   // Current values
+  private _phase: number;
   private _buffs: Buffs;
   private _consumes: Consumes;
   private _customStats: Stats;
@@ -108,11 +111,12 @@ export class Sim<SpecType extends Spec> extends WorkerPool {
 
     this.specTypeFunctions = specTypeFunctions[this.spec] as SpecTypeFunctions<SpecType>;
 
-    this._gear = new Gear({});
-    this._encounter = config.defaults.encounter;
+		this._phase = config.defaults.phase;
     this._buffs = config.defaults.buffs;
     this._consumes = config.defaults.consumes;
     this._customStats = new Stats();
+    this._encounter = config.defaults.encounter;
+    this._gear = new Gear({});
     this._agent = config.defaults.agent;
     this._talents = this.specTypeFunctions.talentsCreate();
     this._talentsString = config.defaults.talents;
@@ -152,7 +156,6 @@ export class Sim<SpecType extends Spec> extends WorkerPool {
   async statWeights(request: StatWeightsRequest): Promise<StatWeightsResult> {
 		const result = await super.statWeights(request);
 		this._epWeights = new Stats(result.epValues);
-		console.log('updating weights');
 		return result;
 	}
 
@@ -184,7 +187,17 @@ export class Sim<SpecType extends Spec> extends WorkerPool {
     return Object.values(this._gems).filter(gem => gemMatchesSocket(gem, socketColor));
 	}
   
-  getRace() {
+  getPhase(): number {
+    return this._phase;
+  }
+  setPhase(newPhase: number) {
+    if (newPhase != this._phase) {
+      this._phase = newPhase;
+      this.phaseChangeEmitter.emit();
+    }
+  }
+  
+  getRace(): Race {
     return this._race;
   }
   setRace(newRace: Race) {
