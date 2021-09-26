@@ -15,7 +15,31 @@ import { PlayerOptions } from './api';
 import { BalanceDruid, BalanceDruid_BalanceDruidAgent as BalanceDruidAgent, DruidTalents, BalanceDruid_BalanceDruidOptions as BalanceDruidOptions} from './druid';
 import { ElementalShaman, ElementalShaman_ElementalShamanAgent as ElementalShamanAgent, ShamanTalents, ElementalShaman_ElementalShamanOptions as ElementalShamanOptions } from './shaman';
 
+import { ComputeStatsRequest, ComputeStatsResult } from './api';
 import { IndividualSimRequest, IndividualSimResult } from './api';
+
+export function makeComputeStatsRequest<SpecType extends Spec>(
+    buffs: Buffs,
+    consumes: Consumes,
+    customStats: Stats,
+    encounter: Encounter,
+    gear: Gear,
+    race: Race,
+    agent: SpecAgent<SpecType>,
+    talents: SpecTalents<SpecType>,
+    classOptions: SpecOptions<SpecType>): ComputeStatsRequest {
+  return ComputeStatsRequest.create({
+    player: Player.create({
+      customStats: customStats.asArray(),
+      equipment: gear.asSpec(),
+      options: withSpecProto(PlayerOptions.create({
+        consumes: consumes,
+        race: race,
+      }), agent, talents, classOptions),
+    }),
+    buffs: buffs,
+  });
+}
 
 export function makeIndividualSimRequest<SpecType extends Spec>(
     buffs: Buffs,

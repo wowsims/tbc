@@ -614,8 +614,10 @@ addEventListener('message', async (e) => {
 	let handled = false;
 
 	[
+		['computeStats', computeStats],
 		['gearList', gearList],
 		['individualSim', individualSim],
+		['statWeights', statWeights],
 	].forEach(funcData => {
 		const funcName = funcData[0];
 		const func = funcData[1];

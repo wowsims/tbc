@@ -16,6 +16,7 @@ import { Item } from './api/common';
 import { Race } from './api/common';
 import { Spec } from './api/common';
 import { Stat } from './api/common';
+import { makeComputeStatsRequest } from './api/request_helpers';
 import { makeIndividualSimRequest } from './api/request_helpers';
 import { Stats } from './api/stats';
 import { SpecAgent } from './api/utils';
@@ -79,6 +80,7 @@ export class Sim<SpecType extends Spec> extends WorkerPool {
   readonly changeEmitter = new TypedEvent<void>();
 
   readonly gearListEmitter = new TypedEvent<void>();
+  readonly characterStatsEmitter = new TypedEvent<ComputeStatsResult>();
 
   // Database
   private _items: Record<number, Item> = {};
@@ -135,6 +137,10 @@ export class Sim<SpecType extends Spec> extends WorkerPool {
       this.talentsStringChangeEmitter,
       this.specOptionsChangeEmitter,
     ].forEach(emitter => emitter.on(() => this.changeEmitter.emit()));
+
+		this.changeEmitter.on(() => {
+			this.updateCharacterStats();
+		});
   }
 
   async init(): Promise<void> {
@@ -157,6 +163,22 @@ export class Sim<SpecType extends Spec> extends WorkerPool {
 		const result = await super.statWeights(request);
 		this._epWeights = new Stats(result.epValues);
 		return result;
+	}
+
+	// This should be invoked internally whenever stats might have changed.
+	private async updateCharacterStats() {
+		const computeStatsResult = await this.computeStats(makeComputeStatsRequest(
+      this._buffs,
+      this._consumes,
+      this._customStats,
+      this._encounter,
+      this._gear,
+      this._race,
+      this._agent,
+      this._talents,
+      this._specOptions));
+
+		this.characterStatsEmitter.emit(computeStatsResult);
 	}
 
 	getItems(slot: ItemSlot | undefined): Array<Item> {

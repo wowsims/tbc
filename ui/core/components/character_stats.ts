@@ -1,5 +1,7 @@
 import { Stat } from '../api/common';
 import { statNames } from '../api/names';
+import { Stats } from '../api/stats';
+import { Sim } from '../sim';
 
 import { Component } from './component';
 
@@ -7,7 +9,7 @@ export class CharacterStats extends Component {
   readonly stats: Array<Stat>;
   readonly valueElems: Array<HTMLTableCellElement>;
 
-  constructor(parent: HTMLElement, stats: Array<Stat>) {
+  constructor(parent: HTMLElement, stats: Array<Stat>, sim: Sim<any>) {
     super(parent, 'character-stats-root');
     this.stats = stats;
 
@@ -29,8 +31,18 @@ export class CharacterStats extends Component {
       const value = document.createElement('td');
       value.classList.add('character-stats-table-value');
       row.appendChild(value);
-      value.textContent = String(Math.floor(Math.random() * 100));
       this.valueElems.push(value);
     });
+
+		this.updateStats(new Stats());
+		sim.characterStatsEmitter.on(computeStatsResult => {
+			this.updateStats(new Stats(computeStatsResult.finalStats));
+		});
   }
+
+	private updateStats(newStats: Stats) {
+		this.stats.forEach((stat, idx) => {
+			this.valueElems[idx].textContent = String(newStats.getStat(stat));
+		});
+	}
 }

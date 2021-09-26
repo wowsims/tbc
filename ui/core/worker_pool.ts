@@ -42,34 +42,13 @@ export class WorkerPool {
   }
 
   async computeStats(request: ComputeStatsRequest): Promise<ComputeStatsResult> {
-    return Promise.resolve(ComputeStatsResult.create());
+		const result = await this.makeApiCall('computeStats', ComputeStatsRequest.toBinary(request));
+		return ComputeStatsResult.fromBinary(result);
   }
 
   async statWeights(request: StatWeightsRequest): Promise<StatWeightsResult> {
-    const epValues = [];
-    epValues[Stat.StatSpellPower] = Math.random() * 2;
-    epValues[Stat.StatIntellect] = Math.random() * 2;
-    epValues[Stat.StatMP5] = Math.random() * 2;
-    epValues[Stat.StatNatureSpellPower] = Math.random() * 2;
-    epValues[Stat.StatSpellHit] = Math.random() * 2;
-    epValues[Stat.StatSpellCrit] = Math.random() * 2;
-    epValues[Stat.StatSpellHaste] = Math.random() * 2;
-
-    const epStDevs = [];
-    epStDevs[Stat.StatSpellPower] = Math.random() * 0.5;
-    epStDevs[Stat.StatIntellect] = Math.random() * 0.5;
-    epStDevs[Stat.StatMP5] = Math.random() * 0.5;
-    epStDevs[Stat.StatNatureSpellPower] = Math.random() * 0.5;
-    epStDevs[Stat.StatSpellHit] = Math.random() * 0.5;
-    epStDevs[Stat.StatSpellCrit] = Math.random() * 0.5;
-    epStDevs[Stat.StatSpellHaste] = Math.random() * 0.5;
-
-    return Promise.resolve(StatWeightsResult.create({
-      weights: epValues,
-      weightsStdev: epStDevs,
-      epValues: epValues,
-      epValuesStdev: epStDevs,
-    }));
+		const result = await this.makeApiCall('statWeights', StatWeightsRequest.toBinary(request));
+		return StatWeightsResult.fromBinary(result);
   }
 
   async individualSim(request: IndividualSimRequest): Promise<IndividualSimResult> {
