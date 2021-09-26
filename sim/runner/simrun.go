@@ -13,6 +13,8 @@ import (
 	"github.com/wowsims/tbc/sim/priest"
 )
 
+// TODO: Should we move the 'buff bots' to a subpackage so we dont have to import the full class unless we want to?
+
 type AgentCreator interface {
 	CreateAgent(player *core.Player, party *core.Party) core.Agent
 }

@@ -56,15 +56,15 @@ dist/lib.wasm: cmd/simwasm/* api/*.go $(call rwildcard,sim,*.go)
 	GOOS=js GOARCH=wasm go build -o ./dist/lib.wasm ./cmd/simwasm/
 
 # Just builds the server binary
-simweb: api/api.pb.go
+simweb: api/genapi/api.pb.go
 	go build -o simweb ./cmd/simweb/web.go
 
 # Starts up a webserver hosting the dist/ and API endpoints.
-runweb: api/api.pb.go
+runweb: api/genapi/api.pb.go
 	go run ./cmd/simweb/web.go
 
-api/api.pb.go: api/*.proto
-	protoc -I=./api/ --go_out=. ./api/*.proto
+api/genapi/api.pb.go: api/genapi/*.proto
+	protoc -I=./api/genapi --go_out=. ./api/genapi/*.proto
 
 .PHONY: items
 items: $(itemsOutDir)/all.go

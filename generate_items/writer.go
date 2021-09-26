@@ -2,10 +2,11 @@ package main
 
 import (
 	"fmt"
-	"github.com/wowsims/tbc/generate_items/api"
 	"os"
 	"regexp"
 	"strings"
+
+	"github.com/wowsims/tbc/generate_items/api"
 )
 
 var matchFirstCap = regexp.MustCompile("(.)([A-Z][a-z]+)")

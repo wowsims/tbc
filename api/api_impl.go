@@ -1,65 +1,66 @@
-// Top-level implementations for the go functions.
+// Proto based function interface for the simulator
 package api
 
 import (
 	"time"
 
+	"github.com/wowsims/tbc/api/genapi"
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/runner"
 	"github.com/wowsims/tbc/sim/shaman"
 )
 
-func coreGemColorToColor(s []core.GemColor) []GemColor {
-	newColors := make([]GemColor, len(s))
+func coreGemColorToColor(s []core.GemColor) []genapi.GemColor {
+	newColors := make([]genapi.GemColor, len(s))
 	for k, v := range s {
-		newColors[k] = GemColor(v)
+		newColors[k] = genapi.GemColor(v)
 	}
 	return newColors
 }
 
-func getGearListImpl(request *GearListRequest) *GearListResult {
-	result := &GearListResult{}
+func getGearListImpl(request *genapi.GearListRequest) *genapi.GearListResult {
+	result := &genapi.GearListResult{}
 
-	if request.Spec == Spec_SpecElementalShaman {
+	if request.Spec == genapi.Spec_SpecElementalShaman {
 		for _, v := range shaman.ElementalItems {
 			item := core.ItemsByID[v]
 
 			result.Items = append(result.Items,
-				&Item{
+				&genapi.Item{
 					Id:               item.ID,
-					Type:             ItemType(item.ItemType),
-					ArmorType:        ArmorType(item.ArmorType),
-					WeaponType:       WeaponType(item.WeaponType),
-					HandType:         HandType(item.HandType),
-					RangedWeaponType: RangedWeaponType(item.RangedWeaponType),
+					Type:             genapi.ItemType(item.ItemType),
+					ArmorType:        genapi.ArmorType(item.ArmorType),
+					WeaponType:       genapi.WeaponType(item.WeaponType),
+					HandType:         genapi.HandType(item.HandType),
+					RangedWeaponType: genapi.RangedWeaponType(item.RangedWeaponType),
 					Name:             item.Name,
 					Stats:            item.Stats[:],
 					Phase:            int32(item.Phase),
-					Quality:          ItemQuality(item.Quality + 1), // Hack until we use generated items
+					Quality:          genapi.ItemQuality(item.Quality + 1), // Hack until we use generated items
 					GemSockets:       coreGemColorToColor(item.GemSockets),
 				},
 			)
 		}
 		for _, v := range shaman.ElementalGems {
 			gem := core.GemsByID[v]
-			result.Gems = append(result.Gems, &Gem{
+			result.Gems = append(result.Gems, &genapi.Gem{
 				Id:      gem.ID,
 				Name:    gem.Name,
 				Stats:   gem.Stats[:],
-				Color:   GemColor(gem.Color),
+				Color:   genapi.GemColor(gem.Color),
 				Phase:   int32(gem.Phase),
-				Quality: ItemQuality(gem.Quality + 1), // Hack until we use generated items
+				Quality: genapi.ItemQuality(gem.Quality + 1), // Hack until we use generated items
 			})
 		}
 		for _, v := range shaman.ElementalEnchants {
 			enchant := core.EnchantsByID[v]
-			result.Enchants = append(result.Enchants, &Enchant{
+			result.Enchants = append(result.Enchants, &genapi.Enchant{
 				Id:       enchant.ID,
 				EffectId: enchant.EffectID,
 				Name:     enchant.Name,
-				Type:     ItemType(enchant.ItemType),
+				Type:     genapi.ItemType(enchant.ItemType),
 				Stats:    enchant.Bonus[:],
-				Quality:  ItemQuality(4),
+				Quality:  genapi.ItemQuality(4),
 			})
 		}
 	}
@@ -68,27 +69,27 @@ func getGearListImpl(request *GearListRequest) *GearListResult {
 	return result
 }
 
-func computeStatsImpl(request *ComputeStatsRequest) *ComputeStatsResult {
-	return statsFromIndSimRequest(&IndividualSimRequest{Player: request.Player, Buffs: request.Buffs})
+func computeStatsImpl(request *genapi.ComputeStatsRequest) *genapi.ComputeStatsResult {
+	return statsFromIndSimRequest(&genapi.IndividualSimRequest{Player: request.Player, Buffs: request.Buffs})
 }
 
-func statsFromIndSimRequest(isr *IndividualSimRequest) *ComputeStatsResult {
+func statsFromIndSimRequest(isr *genapi.IndividualSimRequest) *genapi.ComputeStatsResult {
 	sim := createSim(isr)
 	gearStats := sim.Raid.Parties[0].Players[0].Equip.Stats()
-	return &ComputeStatsResult{
+	return &genapi.ComputeStatsResult{
 		GearOnly:   gearStats[:],
 		FinalStats: sim.Raid.Parties[0].Players[0].Stats[:], // createSim includes a call to buff up all party members.
 		Sets:       []string{},
 	}
 }
 
-func statWeightsImpl(request *StatWeightsRequest) *StatWeightsResult {
+func statWeightsImpl(request *genapi.StatWeightsRequest) *genapi.StatWeightsResult {
 	statsToWeight := make([]core.Stat, len(request.StatsToWeigh))
 	for i, v := range request.StatsToWeigh {
 		statsToWeight[i] = core.Stat(v)
 	}
 	result := runner.CalcStatWeight(convertSimParams(request.Options), statsToWeight, core.Stat(request.EpReferenceStat))
-	return &StatWeightsResult{
+	return &genapi.StatWeightsResult{
 		Weights:       result.Weights,
 		WeightsStdev:  result.WeightsStdev,
 		EpValues:      result.EpValues,
@@ -96,7 +97,7 @@ func statWeightsImpl(request *StatWeightsRequest) *StatWeightsResult {
 	}
 }
 
-func convertSimParams(request *IndividualSimRequest) runner.IndividualParams {
+func convertSimParams(request *genapi.IndividualSimRequest) runner.IndividualParams {
 	options := core.Options{
 		Iterations: int(request.Iterations),
 		RSeed:      request.RandomSeed,
@@ -121,7 +122,7 @@ func convertSimParams(request *IndividualSimRequest) runner.IndividualParams {
 	}
 
 	switch v := request.Player.Options.Spec.(type) {
-	case *PlayerOptions_ElementalShaman:
+	case *genapi.PlayerOptions_ElementalShaman:
 		talents := convertShamTalents(v.ElementalShaman.Talents)
 		totems := convertTotems(request.Buffs)
 		params.Spec = shaman.ElementalSpec{
@@ -137,18 +138,18 @@ func convertSimParams(request *IndividualSimRequest) runner.IndividualParams {
 	return params
 }
 
-func createSim(request *IndividualSimRequest) *core.Simulation {
+func createSim(request *genapi.IndividualSimRequest) *core.Simulation {
 	params := convertSimParams(request)
 	sim := runner.SetupIndividualSim(params)
 
 	return sim
 }
 
-func runSimulationImpl(request *IndividualSimRequest) *IndividualSimResult {
+func runSimulationImpl(request *genapi.IndividualSimRequest) *genapi.IndividualSimResult {
 	sim := createSim(request)
 	result := runner.RunIndividualSim(sim)
 
-	isr := &IndividualSimResult{
+	isr := &genapi.IndividualSimResult{
 		DpsAvg:              result.DpsAvg,
 		DpsStdev:            result.DpsStDev,
 		DpsHist:             result.DpsHist,
@@ -163,7 +164,7 @@ func runSimulationImpl(request *IndividualSimRequest) *IndividualSimResult {
 	return isr
 }
 
-func convertTotems(inBuff *Buffs) shaman.Totems {
+func convertTotems(inBuff *genapi.Buffs) shaman.Totems {
 	return shaman.Totems{
 		TotemOfWrath: int(inBuff.TotemOfWrath),
 		WrathOfAir:   inBuff.WrathOfAirTotem != 0,
@@ -171,7 +172,7 @@ func convertTotems(inBuff *Buffs) shaman.Totems {
 	}
 }
 
-func convertShamTalents(t *ShamanTalents) shaman.Talents {
+func convertShamTalents(t *genapi.ShamanTalents) shaman.Talents {
 	return shaman.Talents{
 		LightningOverload:  int(t.LightningOverload),
 		ElementalPrecision: int(t.ElementalPrecision),
@@ -187,7 +188,7 @@ func convertShamTalents(t *ShamanTalents) shaman.Talents {
 	}
 }
 
-func convertConsumes(c *Consumes) core.Consumes {
+func convertConsumes(c *genapi.Consumes) core.Consumes {
 	cconsume := core.Consumes{
 		BrilliantWizardOil:       c.BrilliantWizardOil,
 		MajorMageblood:           c.ElixirOfMajorMageblood,
@@ -203,7 +204,7 @@ func convertConsumes(c *Consumes) core.Consumes {
 	return cconsume
 }
 
-func convertEquip(es *EquipmentSpec) core.EquipmentSpec {
+func convertEquip(es *genapi.EquipmentSpec) core.EquipmentSpec {
 	coreEquip := core.EquipmentSpec{}
 
 	for i, item := range es.Items {
@@ -219,16 +220,16 @@ func convertEquip(es *EquipmentSpec) core.EquipmentSpec {
 	return coreEquip
 }
 
-func convertBuffs(inBuff *Buffs) core.Buffs {
+func convertBuffs(inBuff *genapi.Buffs) core.Buffs {
 	// TODO: support tri-state better
 	return core.Buffs{
 		ArcaneInt:                 inBuff.ArcaneBrilliance,
-		GiftOfTheWild:             inBuff.GiftOfTheWild != TristateEffect_TristateEffectMissing,
+		GiftOfTheWild:             inBuff.GiftOfTheWild != genapi.TristateEffect_TristateEffectMissing,
 		BlessingOfKings:           inBuff.BlessingOfKings,
-		ImprovedBlessingOfWisdom:  inBuff.BlessingOfWisdom != TristateEffect_TristateEffectMissing,
-		ImprovedDivineSpirit:      inBuff.DivineSpirit != TristateEffect_TristateEffectMissing,
-		Moonkin:                   inBuff.MoonkinAura != TristateEffect_TristateEffectMissing,
-		MoonkinRavenGoddess:       inBuff.MoonkinAura == TristateEffect_TristateEffectImproved,
+		ImprovedBlessingOfWisdom:  inBuff.BlessingOfWisdom != genapi.TristateEffect_TristateEffectMissing,
+		ImprovedDivineSpirit:      inBuff.DivineSpirit != genapi.TristateEffect_TristateEffectMissing,
+		Moonkin:                   inBuff.MoonkinAura != genapi.TristateEffect_TristateEffectMissing,
+		MoonkinRavenGoddess:       inBuff.MoonkinAura == genapi.TristateEffect_TristateEffectImproved,
 		SpriestDPS:                uint16(inBuff.ShadowPriestDps),
 		EyeOfNight:                inBuff.EyeOfTheNight,
 		TwilightOwl:               inBuff.ChainOfTheTwilightOwl,

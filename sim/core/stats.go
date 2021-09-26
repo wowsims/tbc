@@ -134,10 +134,11 @@ func (st Stats) Print() string {
 }
 
 // CalculatedTotal will add Mana and Crit from Int and return the new stats.
+//   TODO: These numbers might change from class to class and so we might need to make this per-class.
 func (s Stats) CalculatedTotal() Stats {
 	stats := s
 	// Add crit/mana from int
-	stats[StatSpellCrit] += (stats[StatIntellect] / 80) * 22.08
+	stats[StatSpellCrit] += (stats[StatIntellect] / 78.1) * 22.08
 	stats[StatMana] += stats[StatIntellect] * 15
 	return stats
 }
@@ -167,3 +168,32 @@ func BaseStats(race RaceBonusType) Stats {
 	}
 	return stats
 }
+
+// TODO: more stat calculations
+
+// INT
+
+// Warlocks receive 1% Spell Critical Strike chance for every 81.9 points of intellect.
+// Druids receive 1% Spell Critical Strike chance for every 79.4 points of intellect.
+// Shamans receive 1% Spell Critical Strike chance for every 78.1 points of intellect.
+// Mages receive 1% Spell Critical Strike chance for every 81 points of intellect.
+// Priests receive 1% Spell Critical Strike chance for every 80 points of intellect.
+// Paladins receive 1% Spell Critical Strike chance for every 79.4 points of intellect.
+
+// AGI
+
+// Rogues, Hunters, and Warriors gain 1 ranged Attack Power per point of Agility.
+// Druids in Cat Form, Hunters and Rogues gain 1 melee Attack Power per point of Agility.
+// You gain 2 Armor for every point of Agility.
+
+// You gain Critical Strike Chance at varying rates, depending on your class:
+// 	Paladins, Druids, and Shamans receive 1% Critical Strike Chance for every 25 points of Agility.
+// 	Rogues and Hunters receive 1% Critical Strike Chance for every 40 points of Agility.
+// 	Warriors receive 1% Critical Strike Chance for every 33 points of Agility.
+
+// STR
+
+// Feral Druids receive 2 melee Attack Power per point of Strength.
+// Protection and Retribution Paladins receive 1 melee Attack Power per point of Strength.
+// Rogues receive 1 melee Attack Power per point of Strength.
+// Enhancement Shaman receive 2 melee Attack Power per point of Strength.

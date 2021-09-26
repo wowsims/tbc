@@ -27,15 +27,3 @@ type AgentAction struct {
 	Wait time.Duration // Duration to wait
 	Cast *Cast
 }
-
-func NewWaitAction(duration time.Duration) AgentAction {
-	return AgentAction{
-		Wait: duration,
-	}
-}
-
-// func NewCastAction(sim *Simulation, sp *Spell) AgentAction {
-// 	return AgentAction{
-// 		Cast: NewCast(sim, sp),
-// 	}
-// }
