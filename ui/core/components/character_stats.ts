@@ -42,7 +42,7 @@ export class CharacterStats extends Component {
 
 	private updateStats(newStats: Stats) {
 		this.stats.forEach((stat, idx) => {
-			this.valueElems[idx].textContent = String(newStats.getStat(stat));
+			this.valueElems[idx].textContent = String(Math.round(newStats.getStat(stat)));
 		});
 	}
 }
