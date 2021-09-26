@@ -31,8 +31,8 @@ ui/core/api/api.ts: api/*.proto
 
 dist/core/tsconfig.tsbuildinfo: $(call rwildcard,ui/core,*.ts) ui/core/api/api.ts
 	npx tsc -p ui/core
-	sed -i 's/@protobuf-ts\/runtime/\/protobuf-ts\/index/g' dist/core/api/*
-	sed -i -E "s/from \"(.*?)(\.js)?\";/from '\1\.js';/g" dist/core/api/*
+	sed -i 's/@protobuf-ts\/runtime/\/protobuf-ts\/index/g' dist/core/api/*.js
+	sed -i -E "s/from \"(.*?)(\.js)?\";/from '\1\.js';/g" dist/core/api/*.js
 
 # Generic rule for building index.js for any class directory
 dist/%/index.js: ui/%/index.ts ui/%/*.ts dist/core/tsconfig.tsbuildinfo
