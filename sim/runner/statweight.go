@@ -48,7 +48,7 @@ func CalcStatWeight(params IndividualParams, statsToWeigh []core.Stat, reference
 	statMods := core.Stats{}
 	statMods[referenceStat] = 50 // make sure reference stat is included
 	for _, v := range statsToWeigh {
-		statMods[v] = 100
+		statMods[v] = 50
 		if v == core.StatSpellHit {
 			statMods[v] = spellHitMod
 		}

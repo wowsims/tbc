@@ -105,15 +105,20 @@ func main() {
 	}
 }
 
-// type apiHandler struct {
-// 	msg    func() proto.Message
-// 	handle func(proto.Message)
-// }
+type apiHandler struct {
+	msg    func() proto.Message
+	handle func(proto.Message) proto.Message
+}
 
-// var handlers = map[string]apiHandler{
-// 	"/individualSim": {msg: func() proto.Message}
-// }
+// Handlers to decode and handle each proto function
+var handlers = map[string]apiHandler{
+	"/individualSim": {msg: func() proto.Message { return &api.IndividualSimRequest{} }, handle: func(msg proto.Message) proto.Message { return api.RunSimulation(msg.(*api.IndividualSimRequest)) }},
+	"/statWeights":   {msg: func() proto.Message { return &api.StatWeightsRequest{} }, handle: func(msg proto.Message) proto.Message { return api.StatWeights(msg.(*api.StatWeightsRequest)) }},
+	"/computeStats":  {msg: func() proto.Message { return &api.ComputeStatsRequest{} }, handle: func(msg proto.Message) proto.Message { return api.ComputeStats(msg.(*api.ComputeStatsRequest)) }},
+	"/gearList":      {msg: func() proto.Message { return &api.GearListRequest{} }, handle: func(msg proto.Message) proto.Message { return api.GetGearList(msg.(*api.GearListRequest)) }},
+}
 
+// handleAPI is generic handler for any api function using protos.
 func handleAPI(w http.ResponseWriter, r *http.Request) {
 	endpoint := r.URL.Path
 
@@ -122,39 +127,20 @@ func handleAPI(w http.ResponseWriter, r *http.Request) {
 
 		return
 	}
-	var msg proto.Message
-	switch endpoint {
-	case "/individualSim":
-		msg = &api.IndividualSimRequest{}
-	case "/statWeights":
-		msg = &api.StatWeightsRequest{}
-	case "/computeStats":
-		msg = &api.ComputeStatsRequest{}
-	case "/gearList":
-		msg = &api.GearListRequest{}
-	default:
+	handler, ok := handlers[endpoint]
+	if !ok {
 		log.Printf("Invalid Endpoint: %s", endpoint)
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
 
+	msg := handler.msg()
 	if err := proto.Unmarshal(body, msg); err != nil {
 		log.Printf("Failed to parse request: %s", err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-
-	var result proto.Message
-	switch endpoint {
-	case "/individualSim":
-		result = api.RunSimulation(msg.(*api.IndividualSimRequest))
-	case "/statWeights":
-		result = api.StatWeights(msg.(*api.StatWeightsRequest))
-	case "/computeStats":
-		result = api.ComputeStats(msg.(*api.ComputeStatsRequest))
-	case "/gearList":
-		result = api.GetGearList(msg.(*api.GearListRequest))
-	}
+	result := handler.handle(msg)
 
 	outbytes, err := proto.Marshal(result)
 	if err != nil {

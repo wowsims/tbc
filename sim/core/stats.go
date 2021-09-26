@@ -14,25 +14,25 @@ const (
 	StatStamina
 	StatIntellect
 	StatSpirit
-	StatSpellCrit
-	StatSpellHit
-	StatHealing
 	StatSpellPower
-	StatSpellHaste
-	StatMP5
-	StatSpellpen
-	StatFireSpellPower
-	StatNatureSpellPower
-	StatFrostSpellPower
-	StatShadowSpellPower
-	StatHolySpellPower
+	StatHealingPower
 	StatArcaneSpellPower
+	StatFireSpellPower
+	StatFrostSpellPower
+	StatHolySpellPower
+	StatNatureSpellPower
+	StatShadowSpellPower
+	StatMP5
+	StatSpellHit
+	StatSpellCrit
+	StatSpellHaste
+	StatSpellPenetration
 	StatAttackPower
 	StatMeleeHit
-	StatMeleeHaste
 	StatMeleeCrit
-	StatExpertise
+	StatMeleeHaste
 	StatArmorPenetration
+	StatExpertise
 	StatMana
 	StatEnergy
 	StatRage
@@ -57,16 +57,16 @@ func (s Stat) StatName() string {
 		return "SpellCrit"
 	case StatSpellHit:
 		return "SpellHit"
-	case StatHealing:
-		return "Healing"
+	case StatHealingPower:
+		return "HealingPower"
 	case StatSpellPower:
-		return "SpellPower"
+		return "Spell Power"
 	case StatSpellHaste:
 		return "SpellHaste"
 	case StatMP5:
 		return "MP5"
-	case StatSpellpen:
-		return "Spellpen"
+	case StatSpellPenetration:
+		return "StatSpellPenetration"
 	case StatFireSpellPower:
 		return "FireSpellPower"
 	case StatNatureSpellPower:

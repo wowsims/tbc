@@ -162,7 +162,7 @@ func TestCalcStatWeight(t *testing.T) {
 		return
 	}
 
-	isr := &api.IndividualSimResult{}
+	isr := &api.StatWeightsResult{}
 	if err := proto.Unmarshal(body, isr); err != nil {
 		t.Fatalf("Failed to parse request: %s", err.Error())
 		return
