@@ -295,16 +295,14 @@ func NewEquipmentSet(equipSpec EquipmentSpec) Equipment {
 				equipment[ItemSlotTrinket2] = item
 			}
 		} else if item.ItemType == ItemTypeWeapon {
-			if item.WeaponType == WeaponTypeShield {
-				if equipment[ItemSlotMainHand].HandType != HandTypeTwoHand {
-					equipment[ItemSlotOffHand] = item
-				}
+			if item.WeaponType == WeaponTypeShield && equipment[ItemSlotMainHand].HandType != HandTypeTwoHand {
+				equipment[ItemSlotOffHand] = item
 			} else if item.HandType == HandTypeMainHand || item.HandType == HandTypeUnknown {
 				equipment[ItemSlotMainHand] = item
 			} else if item.HandType == HandTypeTwoHand {
 				equipment[ItemSlotMainHand] = item
 				equipment[ItemSlotOffHand] = Item{} // clear offhand
-			} else if item.HandType == HandTypeOffHand {
+			} else if item.HandType == HandTypeOffHand && equipment[ItemSlotMainHand].HandType != HandTypeTwoHand {
 				equipment[ItemSlotOffHand] = item
 			}
 		} else {

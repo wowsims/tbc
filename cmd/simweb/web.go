@@ -35,10 +35,10 @@ func main() {
 		// fs = http.FileServer(http.FS(dist.FS))
 	}
 
-	http.HandleFunc("/statWeights", handleStatWeights)
-	http.HandleFunc("/computeStats", handleComputeStats)
-	http.HandleFunc("/individualSim", handleIndividualSim)
-	http.HandleFunc("/gearList", handleGearList)
+	http.HandleFunc("/statWeights", handleAPI)
+	http.HandleFunc("/computeStats", handleAPI)
+	http.HandleFunc("/individualSim", handleAPI)
+	http.HandleFunc("/gearList", handleAPI)
 
 	http.HandleFunc("/", func(resp http.ResponseWriter, req *http.Request) {
 		resp.Header().Add("Cache-Control", "no-cache")
@@ -105,29 +105,47 @@ func main() {
 	}
 }
 
-// result := GetGearList(*request.GearList)
-// return ApiResult{GearList: &result}
-// } else if request.ComputeStats != nil {
-// result := ComputeStats(*request.ComputeStats)
-// return ApiResult{ComputeStats: &result}
-// } else if request.StatWeights != nil {
-// result := StatWeights(*request.StatWeights)
-// return ApiResult{StatWeights: &result}
-// } else if request.Sim != nil {
+func handleAPI(w http.ResponseWriter, r *http.Request) {
+	endpoint := r.URL.Path
 
-func handleIndividualSim(w http.ResponseWriter, r *http.Request) {
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 
 		return
 	}
-	isr := &api.IndividualSimRequest{}
-	if err := proto.Unmarshal(body, isr); err != nil {
+	var msg proto.Message
+	switch endpoint {
+	case "/individualSim":
+		msg = &api.IndividualSimRequest{}
+	case "/statWeights":
+		msg = &api.StatWeightsRequest{}
+	case "/computeStats":
+		msg = &api.ComputeStatsRequest{}
+	case "/gearList":
+		msg = &api.GearListRequest{}
+	default:
+		log.Printf("Invalid Endpoint: %s", endpoint)
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+
+	if err := proto.Unmarshal(body, msg); err != nil {
 		log.Printf("Failed to parse request: %s", err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	result := api.RunSimulation(isr)
+
+	var result proto.Message
+	switch endpoint {
+	case "/individualSim":
+		result = api.RunSimulation(msg.(*api.IndividualSimRequest))
+	case "/statWeights":
+		result = api.StatWeights(msg.(*api.StatWeightsRequest))
+	case "/computeStats":
+		result = api.ComputeStats(msg.(*api.ComputeStatsRequest))
+	case "/gearList":
+		result = api.GetGearList(msg.(*api.GearListRequest))
+	}
 
 	outbytes, err := proto.Marshal(result)
 	if err != nil {
@@ -135,74 +153,7 @@ func handleIndividualSim(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	w.Header().Add("Content-Type", "application/x-protobuf")
-	w.Write(outbytes)
-}
-func handleRaidSim(w http.ResponseWriter, r *http.Request) {
 
-}
-func handleGearList(w http.ResponseWriter, r *http.Request) {
-	body, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-
-		return
-	}
-	glr := &api.GearListRequest{}
-	if err := proto.Unmarshal(body, glr); err != nil {
-		log.Printf("Failed to parse request: %s", err.Error())
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-	result := api.GetGearList(glr)
-
-	outbytes, err := proto.Marshal(result)
-	if err != nil {
-		log.Printf("[ERROR] Failed to marshal result: %s", err.Error())
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-	w.Header().Add("Content-Type", "application/x-protobuf")
-	w.Write(outbytes)
-}
-func handleComputeStats(w http.ResponseWriter, r *http.Request) {
-	body, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		return
-	}
-	csr := &api.ComputeStatsRequest{}
-	if err := proto.Unmarshal(body, csr); err != nil {
-		log.Printf("Failed to parse request: %s", err.Error())
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-	result := api.ComputeStats(csr)
-	outbytes, err := proto.Marshal(result)
-	if err != nil {
-		log.Printf("[ERROR] Failed to marshal result: %s", err.Error())
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-	w.Header().Add("Content-Type", "application/x-protobuf")
-	w.Write(outbytes)
-}
-func handleStatWeights(w http.ResponseWriter, r *http.Request) {
-	body, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		return
-	}
-	swr := &api.StatWeightsRequest{}
-	if err := proto.Unmarshal(body, swr); err != nil {
-		log.Printf("Failed to parse request: %s", err.Error())
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-	result := api.StatWeights(swr)
-	outbytes, err := proto.Marshal(result)
-	if err != nil {
-		log.Printf("[ERROR] Failed to marshal result: %s", err.Error())
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
 	w.Header().Add("Content-Type", "application/x-protobuf")
 	w.Write(outbytes)
 }

@@ -84,7 +84,9 @@ func statsFromIndSimRequest(isr *IndividualSimRequest) *ComputeStatsResult {
 
 func statWeightsImpl(request *StatWeightsRequest) *StatWeightsResult {
 	statsToWeight := make([]core.Stat, len(request.StatsToWeigh))
-
+	for i, v := range request.StatsToWeigh {
+		statsToWeight[i] = core.Stat(v)
+	}
 	result := runner.CalcStatWeight(convertSimParams(request.Options), statsToWeight, core.Stat(request.EpReferenceStat))
 	return &StatWeightsResult{
 		Weights:       result.Weights,
