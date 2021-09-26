@@ -151,7 +151,7 @@ func TestCalcStatWeight(t *testing.T) {
 		t.Fatalf("Failed to encode request: %s", err.Error())
 	}
 
-	r, err := http.Post("http://localhost:3333/individualSim", "application/x-protobuf", bytes.NewReader(msgBytes))
+	r, err := http.Post("http://localhost:3333/statWeights", "application/x-protobuf", bytes.NewReader(msgBytes))
 	if err != nil {
 		t.Fatalf("Failed to POST request: %s", err.Error())
 	}
