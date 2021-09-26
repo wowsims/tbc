@@ -18,7 +18,7 @@ var basicSpec = &api.PlayerOptions_ElementalShaman{
 		},
 		Talents: &api.ShamanTalents{
 			// ElementalDevastation
-			// ElementalFury
+			ElementalFury:      true,
 			Convection:         5,
 			Concussion:         5,
 			ElementalFocus:     true,
@@ -98,6 +98,55 @@ func TestIndividualSim(t *testing.T) {
 	}
 
 	msgBytes, err := proto.Marshal(req)
+	if err != nil {
+		t.Fatalf("Failed to encode request: %s", err.Error())
+	}
+
+	r, err := http.Post("http://localhost:3333/individualSim", "application/x-protobuf", bytes.NewReader(msgBytes))
+	if err != nil {
+		t.Fatalf("Failed to POST request: %s", err.Error())
+	}
+
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		t.Fatalf("Failed to read result body: %s", err.Error())
+		return
+	}
+
+	isr := &api.IndividualSimResult{}
+	if err := proto.Unmarshal(body, isr); err != nil {
+		t.Fatalf("Failed to parse request: %s", err.Error())
+		return
+	}
+
+	log.Printf("RESULT: %#v", isr)
+}
+
+func TestCalcStatWeight(t *testing.T) {
+	req := &api.IndividualSimRequest{
+		Player: &api.Player{
+			Options: &api.PlayerOptions{
+				Race:     api.Race_RaceTroll10,
+				Spec:     basicSpec,
+				Consumes: basicConsumes,
+			},
+			Equipment: p1Equip,
+		},
+		Buffs: basicBuffs,
+		Encounter: &api.Encounter{
+			Duration:   120,
+			NumTargets: 1,
+		},
+		Iterations: 5000,
+		RandomSeed: 1,
+		Debug:      false,
+	}
+
+	msgBytes, err := proto.Marshal(&api.StatWeightsRequest{
+		Options:         req,
+		StatsToWeigh:    []api.Stat{api.Stat_StatSpellPower, api.Stat_StatSpellCrit, api.Stat_StatSpellHit},
+		EpReferenceStat: api.Stat_StatSpellPower,
+	})
 	if err != nil {
 		t.Fatalf("Failed to encode request: %s", err.Error())
 	}

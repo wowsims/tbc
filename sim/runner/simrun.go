@@ -111,10 +111,10 @@ func SetupIndividualSim(params IndividualParams) *core.Simulation {
 	sim.Reset()
 
 	// Now apply all the 'final' stat improvements.
+	// TODO: Figure out how to handle buffs that buff based on other buffs...
+	//   for now this hardcoded buffing works...
 	for _, raidParty := range sim.Raid.Parties {
 		for _, pl := range raidParty.Players {
-			// TODO: Figure out how to handle buffs that buff based on other buffs...
-			//   for now this hardcoded buffing works...
 			if buffs.ImprovedDivineSpirit {
 				pl.Player.InitialStats[core.StatSpirit] += 50
 			}
@@ -125,7 +125,6 @@ func SetupIndividualSim(params IndividualParams) *core.Simulation {
 			if buffs.ImprovedDivineSpirit {
 				pl.Player.InitialStats[core.StatSpellPower] += pl.Player.InitialStats[core.StatSpirit] * 0.1
 			}
-
 			// Add SpellCrit from Int and Mana from Int
 			pl.Player.InitialStats = pl.Player.InitialStats.CalculatedTotal()
 			pl.Player.Stats = pl.Player.InitialStats

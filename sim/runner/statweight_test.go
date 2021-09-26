@@ -10,7 +10,7 @@ import (
 
 func TestCalcStatWeight(t *testing.T) {
 	options := basicOptions
-	options.Iterations = 1000
+	options.Iterations = 5000
 	options.Encounter = shortEncounter
 
 	params := IndividualParams{
@@ -33,7 +33,7 @@ func TestCalcStatWeight(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := CalcStatWeight(tt.params); !reflect.DeepEqual(got, tt.want) {
+			if got := CalcStatWeight(tt.params, []core.Stat{core.StatSpellPower, core.StatSpellHit, core.StatIntellect, core.StatSpellCrit}, core.StatSpellPower); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("CalcStatWeight() = %v, want %v", got, tt.want)
 			}
 		})

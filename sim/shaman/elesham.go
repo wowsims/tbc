@@ -19,13 +19,14 @@ var ElementalEnchants = []int32{
 }
 
 type ElementalSpec struct {
-	Talents Talents
-	Totems  Totems
-	AgentID AgentType
+	Talents      Talents
+	Totems       Totems
+	AgentID      AgentType
+	AgentOptions map[string]int
 }
 
 func (es ElementalSpec) CreateAgent(player *core.Player, party *core.Party) core.Agent {
-	return NewShaman(player, party, es.Talents, es.Totems, es.AgentID)
+	return NewShaman(player, party, es.Talents, es.Totems, es.AgentID, es.AgentOptions)
 }
 
 func loDmgMod(sim *core.Simulation, p core.PlayerAgent, c *core.Cast) {
@@ -127,8 +128,10 @@ type CLOnCDAgent struct {
 
 func (agent *CLOnCDAgent) ChooseAction(s *Shaman, party *core.Party, sim *core.Simulation) core.AgentAction {
 	if s.IsOnCD(core.MagicIDCL6, sim.CurrentTime) {
+		// sim.Debug("[CLonCD] LB\n")
 		return NewCastAction(sim, s, agent.lb)
 	} else {
+		// sim.Debug("[CLonCD] CL\n")
 		return NewCastAction(sim, s, agent.cl)
 	}
 }
@@ -147,65 +150,65 @@ func NewCLOnCDAgent(sim *core.Simulation) *CLOnCDAgent {
 // ################################################################
 //                          FIXED ROTATION
 // ################################################################
-// type FixedRotationAgent struct {
-// 	numLBsPerCL       int
-// 	numLBsSinceLastCL int
-// 	lb                *core.Spell
-// 	cl                *core.Spell
-// }
+type FixedRotationAgent struct {
+	numLBsPerCL       int
+	numLBsSinceLastCL int
+	lb                *core.Spell
+	cl                *core.Spell
+}
 
-// // Returns if any temporary haste buff is currently active.
-// // TODO: Figure out a way to make this automatic
-// func (agent *FixedRotationAgent) temporaryHasteActive(sim *core.Simulation) bool {
-// 	return sim.hasAura(MagicIDBloodlust) ||
-// 		sim.hasAura(MagicIDDrums) ||
-// 		sim.hasAura(MagicIDTrollBerserking) ||
-// 		sim.hasAura(MagicIDSkullGuldan) ||
-// 		sim.hasAura(MagicIDFungalFrenzy)
-// }
+// Returns if any temporary haste buff is currently active.
+// TODO: Figure out a way to make this automatic
+func (agent *FixedRotationAgent) temporaryHasteActive(s *Shaman) bool {
+	return s.HasAura(core.MagicIDBloodlust) ||
+		s.HasAura(core.MagicIDDrums) ||
+		s.HasAura(core.MagicIDTrollBerserking) ||
+		s.HasAura(core.MagicIDSkullGuldan) ||
+		s.HasAura(core.MagicIDFungalFrenzy)
+}
 
-// func (agent *FixedRotationAgent) ChooseAction(sim *core.Simulation) AgentAction {
-// 	if agent.numLBsSinceLastCL < agent.numLBsPerCL {
-// 		return NewCastAction(sim, agent.lb)
-// 	}
+func (agent *FixedRotationAgent) ChooseAction(s *Shaman, party *core.Party, sim *core.Simulation) core.AgentAction {
+	if agent.numLBsSinceLastCL < agent.numLBsPerCL {
+		return NewCastAction(sim, s, agent.lb)
+	}
 
-// 	if !sim.isOnCD(MagicIDCL6) {
-// 		return NewCastAction(sim, agent.cl)
-// 	}
+	if !s.IsOnCD(core.MagicIDCL6, sim.CurrentTime) {
+		return NewCastAction(sim, s, agent.cl)
+	}
 
-// 	// If we have a temporary haste effect (like bloodlust or quags eye) then
-// 	// we should add LB casts instead of waiting
-// 	if agent.temporaryHasteActive(sim) {
-// 		return NewCastAction(sim, agent.lb)
-// 	}
+	// If we have a temporary haste effect (like bloodlust or quags eye) then
+	// we should add LB casts instead of waiting
+	if agent.temporaryHasteActive(s) {
+		return NewCastAction(sim, s, agent.lb)
+	}
 
-// 	return NewWaitAction(sim.getRemainingCD(MagicIDCL6))
-// }
+	return core.AgentAction{Wait: s.GetRemainingCD(core.MagicIDCL6, sim.CurrentTime)}
+}
 
-// func (agent *FixedRotationAgent) OnActionAccepted(sim *core.Simulation, action AgentAction) {
-// 	if action.Cast == nil {
-// 		return
-// 	}
+func (agent *FixedRotationAgent) OnActionAccepted(s *Shaman, sim *core.Simulation, action core.AgentAction) {
+	if action.Cast == nil {
+		return
+	}
 
-// 	if action.Cast.Spell.ID == MagicIDLB12 {
-// 		agent.numLBsSinceLastCL++
-// 	} else if action.Cast.Spell.ID == MagicIDCL6 {
-// 		agent.numLBsSinceLastCL = 0
-// 	}
-// }
+	if action.Cast.Spell.ID == core.MagicIDLB12 {
+		agent.numLBsSinceLastCL++
+	} else if action.Cast.Spell.ID == core.MagicIDCL6 {
+		agent.numLBsSinceLastCL = 0
+	}
+}
 
-// func (agent *FixedRotationAgent) Reset(sim *core.Simulation) {
-// 	agent.numLBsSinceLastCL = agent.numLBsPerCL
-// }
+func (agent *FixedRotationAgent) Reset(sim *core.Simulation) {
+	agent.numLBsSinceLastCL = agent.numLBsPerCL
+}
 
-// func NewFixedRotationAgent(sim *core.Simulation, numLBsPerCL int) *FixedRotationAgent {
-// 	return &FixedRotationAgent{
-// 		numLBsPerCL:       numLBsPerCL,
-// 		numLBsSinceLastCL: numLBsPerCL, // This lets us cast CL first
-// 		lb:                spellmap[MagicIDLB12],
-// 		cl:                spellmap[MagicIDCL6],
-// 	}
-// }
+func NewFixedRotationAgent(sim *core.Simulation, numLBsPerCL int) *FixedRotationAgent {
+	return &FixedRotationAgent{
+		numLBsPerCL:       numLBsPerCL,
+		numLBsSinceLastCL: numLBsPerCL, // This lets us cast CL first
+		lb:                core.Spells[core.MagicIDLB12],
+		cl:                core.Spells[core.MagicIDCL6],
+	}
+}
 
 // ################################################################
 //                          CL ON CLEARCAST
@@ -220,9 +223,11 @@ type CLOnClearcastAgent struct {
 
 func (agent *CLOnClearcastAgent) ChooseAction(s *Shaman, party *core.Party, sim *core.Simulation) core.AgentAction {
 	if s.IsOnCD(core.MagicIDCL6, sim.CurrentTime) || !agent.prevPrevCastProccedCC {
+		// sim.Debug("[CLonCC] - LB")
 		return NewCastAction(sim, s, agent.lb)
 	}
 
+	// sim.Debug("[CLonCC] - CL")
 	return NewCastAction(sim, s, agent.cl)
 }
 
@@ -337,8 +342,8 @@ func (agent *AdaptiveAgent) OnActionAccepted(s *Shaman, sim *core.Simulation, ac
 
 func (agent *AdaptiveAgent) Reset(sim *core.Simulation) {
 	if agent.timesOOM == 5 {
-		agent.baseAgent = NewLBOnlyAgent(sim)           //NewAgent(sim, AGENT_TYPE_FIXED_LB_ONLY)
-		agent.surplusAgent = NewCLOnClearcastAgent(sim) //NewAgent(sim, AGENT_TYPE_CL_ON_CLEARCAST)
+		agent.baseAgent = NewLBOnlyAgent(sim)
+		agent.surplusAgent = NewCLOnClearcastAgent(sim)
 	}
 	agent.wentOOM = false
 	agent.manaSnapshots = [manaSnapshotsBufferSize]ManaSnapshot{}

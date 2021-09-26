@@ -42,6 +42,7 @@ var basicBuffs = core.Buffs{
 }
 
 var shamTalents = shaman.Talents{
+	ElementalFocus:     true,
 	LightningMastery:   5,
 	LightningOverload:  5,
 	ElementalPrecision: 3,
@@ -128,16 +129,16 @@ func TestSimulatePreRaidNoBuffs(t *testing.T) {
 		label: "preRaid",
 		t:     t,
 
-		Options:  basicOptions,
-		Consumes: fullConsumes,
-		Buffs:    basicBuffs,
-		Race:     core.RaceBonusTypeOrc,
+		Options: basicOptions,
+		// no consumes
+		Buffs: basicBuffs,
+		Race:  core.RaceBonusTypeOrc,
 
-		Spec: shaman.ElementalSpec{Talents: shamTalents, Totems: shamTotems, AgentID: shaman.AgentTypeAdaptive},
+		Spec: shaman.ElementalSpec{Talents: shamTalents, AgentID: shaman.AgentTypeAdaptive},
 		Gear: gearFromStrings(preRaidGear),
 
-		ExpectedDpsShort: 1406,
-		ExpectedDpsLong:  1017,
+		ExpectedDpsShort: 867,
+		ExpectedDpsLong:  276,
 	})
 }
 
@@ -251,8 +252,8 @@ func TestAverageDPS(t *testing.T) {
 	eq := gearFromStrings(p1Gear)
 
 	options := basicOptions
-	options.Iterations = 5
-	options.Encounter = shortEncounter
+	options.Iterations = 10000
+	options.Encounter = longEncounter
 	// options.Debug = true
 
 	params := IndividualParams{
@@ -308,11 +309,11 @@ func simAllEncountersTest(testOpts AllEncountersTestOptions) {
 		Spec:        testOpts.Spec,
 		CustomStats: []float64{},
 	}
-	doSimulateTest(
-		testOpts.label+"-short",
-		testOpts.t,
-		params,
-		testOpts.ExpectedDpsShort)
+	// doSimulateTest(
+	// 	testOpts.label+"-short",
+	// 	testOpts.t,
+	// 	params,
+	// 	testOpts.ExpectedDpsShort)
 
 	params.Options = makeOptions(testOpts.Options, longEncounter)
 	doSimulateTest(
@@ -326,7 +327,7 @@ func simAllEncountersTest(testOpts AllEncountersTestOptions) {
 //   This is where we can add more sophisticated checks if we would like.
 //   Any changes to the damage output of an item set
 func doSimulateTest(label string, t *testing.T, params IndividualParams, expectedDps float64) {
-	// options.Debug = true
+	// params.Options.Debug = true
 
 	sim := SetupIndividualSim(params)
 	result := RunIndividualSim(sim)

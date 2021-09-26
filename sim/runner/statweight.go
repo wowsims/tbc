@@ -1,6 +1,7 @@
 package runner
 
 import (
+	"log"
 	"math"
 	"math/rand"
 	"sync"
@@ -15,7 +16,7 @@ type StatWeightsResult struct {
 	EpValuesStdev []float64
 }
 
-func CalcStatWeight(params IndividualParams) StatWeightsResult {
+func CalcStatWeight(params IndividualParams, statsToWeigh []core.Stat, referenceStat core.Stat) StatWeightsResult {
 	baseSim := SetupIndividualSim(params)
 	baseStats := baseSim.Raid.Parties[0].Players[0].Stats
 	baselineResult := RunIndividualSim(baseSim)
@@ -44,15 +45,14 @@ func CalcStatWeight(params IndividualParams) StatWeightsResult {
 	// Spell hit mod shouldn't go over hit cap.
 	spellHitMod := math.Max(0, math.Min(10, 202-baseStats[core.StatSpellHit]))
 
-	statMods := core.Stats{
-		core.StatIntellect:  50,
-		core.StatSpellPower: 50,
-		core.StatSpellCrit:  50,
-		core.StatSpellHit:   spellHitMod,
-		core.StatSpellHaste: 50,
-		core.StatMP5:        50,
+	statMods := core.Stats{}
+	statMods[referenceStat] = 50 // make sure reference stat is included
+	for _, v := range statsToWeigh {
+		statMods[v] = 100
+		if v == core.StatSpellHit {
+			statMods[v] = spellHitMod
+		}
 	}
-
 	for stat, mod := range statMods {
 		if mod == 0 {
 			continue
@@ -63,15 +63,14 @@ func CalcStatWeight(params IndividualParams) StatWeightsResult {
 
 	waitGroup.Wait()
 
-	for stat, mod := range statMods {
-		if mod == 0 {
-			continue
-		}
-
+	for _, stat := range statsToWeigh {
+		mod := statMods[stat]
 		result.EpValues[stat] = result.Weights[stat] / result.Weights[core.StatSpellPower]
-		result.WeightsStdev[stat] = computeStDevFromHists(params.Options.Iterations, mod, dpsHists[stat], baselineResult.DpsHist, nil, statMods[core.StatSpellPower])
-		result.EpValuesStdev[stat] = computeStDevFromHists(params.Options.Iterations, mod, dpsHists[stat], baselineResult.DpsHist, dpsHists[core.StatSpellPower], statMods[core.StatSpellPower])
+		log.Printf("%s Weight: %0.2f", stat.StatName(), result.EpValues[stat])
+		result.WeightsStdev[stat] = computeStDevFromHists(params.Options.Iterations, mod, dpsHists[stat], baselineResult.DpsHist, nil, statMods[referenceStat])
+		result.EpValuesStdev[stat] = computeStDevFromHists(params.Options.Iterations, mod, dpsHists[stat], baselineResult.DpsHist, dpsHists[referenceStat], statMods[referenceStat])
 	}
+
 	return result
 }
 

@@ -304,6 +304,8 @@ func NewEquipmentSet(equipSpec EquipmentSpec) Equipment {
 			} else if item.HandType == HandTypeTwoHand {
 				equipment[ItemSlotMainHand] = item
 				equipment[ItemSlotOffHand] = Item{} // clear offhand
+			} else if item.HandType == HandTypeOffHand {
+				equipment[ItemSlotOffHand] = item
 			}
 		} else {
 			equipment[item.ItemType.Slot()] = item

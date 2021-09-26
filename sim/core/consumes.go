@@ -105,10 +105,13 @@ func TryActivateSuperManaPotion(sim *Simulation, party *Party, player *Player) {
 	if !player.Consumes.SuperManaPotion || player.IsOnCD(MagicIDPotion, sim.CurrentTime) {
 		return
 	}
+	if sim.Debug != nil {
+		sim.Debug("SOMETHING SUPER MANA\n")
+	}
 
 	// Only pop if we have less than the max mana provided by the potion minus 1mp5 tick.
 	totalRegen := player.manaRegenPerSecond() * 5
-	if player.Stats[StatMana]-(player.Stats[StatMana]+totalRegen) < 3000 {
+	if player.InitialStats[StatMana]-(player.Stats[StatMana]+totalRegen) < 3000 {
 		return
 	}
 

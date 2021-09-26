@@ -13,9 +13,10 @@ const (
 	AgentTypeFixedLBCL     = 1
 	AgentTypeCLOnClearcast = 2
 	AgentTypeAdaptive      = 3
+	AgentTypeCLOnCD        = 4
 )
 
-func NewShaman(player *core.Player, party *core.Party, talents Talents, totems Totems, agentID AgentType) *Shaman {
+func NewShaman(player *core.Player, party *core.Party, talents Talents, totems Totems, agentID AgentType, agentOptions map[string]int) *Shaman {
 	var agent shamanAgent
 
 	switch agentID {
@@ -23,8 +24,15 @@ func NewShaman(player *core.Player, party *core.Party, talents Talents, totems T
 		agent = NewAdaptiveAgent(nil)
 	case AgentTypeCLOnClearcast:
 		agent = NewCLOnClearcastAgent(nil)
-		// case AgentTypeFixedLBCL:
-		// 	agent = NewFixedRotationAgent()
+	case AgentTypeFixedLBCL:
+		numLB := agentOptions["numLBtoCL"]
+		if numLB == -1 {
+			agent = NewLBOnlyAgent(nil)
+		} else {
+			agent = NewFixedRotationAgent(nil, numLB)
+		}
+	case AgentTypeCLOnCD:
+		agent = NewCLOnCDAgent(nil)
 	}
 
 	// if WaterShield {
@@ -36,7 +44,6 @@ func NewShaman(player *core.Player, party *core.Party, talents Talents, totems T
 		pl.Stats = pl.InitialStats
 	}
 
-	// player.InitialStats[core.StatMP5] += player.InitialStats[core.StatIntellect] * (0.02 * float64(talents.UnrelentingStorm))
 	player.Stats = player.InitialStats
 
 	return &Shaman{
@@ -114,9 +121,6 @@ func (s *Shaman) OnSpellHit(sim *core.Simulation, _ core.PlayerAgent, cast *core
 
 func elementalFocusOnCast(sim *core.Simulation, player core.PlayerAgent, c *core.Cast) {
 	c.ManaCost *= .6 // reduced by 40%
-	if sim.Debug != nil {
-		sim.Debug("ELE FOCUS: MANA COST: %0.1f\n", c.ManaCost)
-	}
 }
 
 func elementalFocusOnCastComplete(sim *core.Simulation, player core.PlayerAgent, c *core.Cast) {

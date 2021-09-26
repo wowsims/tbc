@@ -12,7 +12,7 @@ var basicSpec = &PlayerOptions_ElementalShaman{
 		},
 		Talents: &ShamanTalents{
 			// ElementalDevastation
-			// ElementalFury
+			ElementalFury:      true,
 			Convection:         5,
 			Concussion:         5,
 			ElementalFocus:     true,

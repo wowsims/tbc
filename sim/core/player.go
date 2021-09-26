@@ -26,8 +26,8 @@ func (pa PlayerAgent) Advance(sim *Simulation, elapsedTime time.Duration, newTim
 	if pa.Stats[StatMana] > pa.InitialStats[StatMana] {
 		pa.Stats[StatMana] = pa.InitialStats[StatMana]
 	}
-	if sim.Debug != nil {
-		sim.Debug("Advanced.... Regenerated: %0.1f mana. Total: %0.1f\n", regen, pa.Stats[StatMana])
+	if sim.Debug != nil && regen != 0 {
+		sim.Debug("-> [%0.1f] Regenerated: %0.1f mana. Total: %0.1f\n", newTime.Seconds(), regen, pa.Stats[StatMana])
 	}
 
 	// Advance CDs and Auras

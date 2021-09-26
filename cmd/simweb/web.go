@@ -35,6 +35,8 @@ func main() {
 		// fs = http.FileServer(http.FS(dist.FS))
 	}
 
+	http.HandleFunc("/statWeights", handleStatWeights)
+	http.HandleFunc("/computeStats", handleComputeStats)
 	http.HandleFunc("/individualSim", handleIndividualSim)
 	http.HandleFunc("/gearList", handleGearList)
 
@@ -163,7 +165,44 @@ func handleGearList(w http.ResponseWriter, r *http.Request) {
 	w.Write(outbytes)
 }
 func handleComputeStats(w http.ResponseWriter, r *http.Request) {
-
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		return
+	}
+	csr := &api.ComputeStatsRequest{}
+	if err := proto.Unmarshal(body, csr); err != nil {
+		log.Printf("Failed to parse request: %s", err.Error())
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	result := api.ComputeStats(csr)
+	outbytes, err := proto.Marshal(result)
+	if err != nil {
+		log.Printf("[ERROR] Failed to marshal result: %s", err.Error())
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	w.Header().Add("Content-Type", "application/x-protobuf")
+	w.Write(outbytes)
 }
 func handleStatWeights(w http.ResponseWriter, r *http.Request) {
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		return
+	}
+	swr := &api.StatWeightsRequest{}
+	if err := proto.Unmarshal(body, swr); err != nil {
+		log.Printf("Failed to parse request: %s", err.Error())
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	result := api.StatWeights(swr)
+	outbytes, err := proto.Marshal(result)
+	if err != nil {
+		log.Printf("[ERROR] Failed to marshal result: %s", err.Error())
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	w.Header().Add("Content-Type", "application/x-protobuf")
+	w.Write(outbytes)
 }

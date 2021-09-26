@@ -50,6 +50,7 @@ message ElementalShaman {
           FixedLBCL = 1;
           CLOnClearcast = 2;
           Adaptive = 3;
+          CLOnCD = 4;
       }
       AgentType type = 1;
     }

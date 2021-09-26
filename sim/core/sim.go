@@ -53,9 +53,9 @@ type wrappedRandom struct {
 }
 
 func (wr *wrappedRandom) Float64(src string) float64 {
-	if wr.sim.Debug != nil {
-		wr.sim.Debug("FLOAT64 FROM: %s\n", src)
-	}
+	// if wr.sim.Debug != nil {
+	// 	wr.sim.Debug("FLOAT64 FROM: %s\n", src)
+	// }
 	return wr.Rand.Float64()
 }
 
@@ -202,7 +202,7 @@ func (sim *Simulation) Run() SimMetrics {
 
 		if action.Cast != nil {
 			action.Cast.DoItNow(sim, action.Agent, action.Cast)
-		} else if action.Wait != 0 {
+		} else if action.Wait == 0 {
 			// FUTURE: Swing timers could be handled in this if block.
 			panic("Agent returned nil action")
 		}
@@ -218,6 +218,10 @@ func (sim *Simulation) Run() SimMetrics {
 			if agent.Stats[StatMana] < newAction.Cast.ManaCost {
 				// Not enough mana, wait until there is enough mana to cast the desired spell
 				regenTime := durationFromSeconds((newAction.Cast.ManaCost-agent.Stats[StatMana])/agent.manaRegenPerSecond()) + 1
+				if sim.Debug != nil {
+					sim.Debug("Not enough mana to cast... regen for %0.1f seconds before casting.\n", regenTime.Seconds())
+				}
+				regenTime += newAction.Cast.CastTime
 				if regenTime > wait {
 					wait = regenTime
 				}

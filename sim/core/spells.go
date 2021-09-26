@@ -136,9 +136,9 @@ func DirectCast(sim *Simulation, p PlayerAgent, cast *Cast) {
 		baseDmg := (sim.Rando.Float64("cast dmg") * cast.Spell.DmgDiff)
 		bonus := (sp * cast.Spell.Coeff)
 		dmg := baseDmg + cast.Spell.MinDmg + bonus
-		if sim.Debug != nil {
-			sim.Debug("base dmg: %0.1f, bonus: %0.1f, total: %0.1f\n", baseDmg, bonus, dmg)
-		}
+		// if sim.Debug != nil {
+		// 	sim.Debug("base dmg: %0.1f, bonus: %0.1f, total: %0.1f\n", baseDmg, bonus, dmg)
+		// }
 		if cast.DidDmg != 0 { // use the pre-set dmg
 			dmg = cast.DidDmg
 		}
@@ -199,9 +199,9 @@ func DirectCast(sim *Simulation, p PlayerAgent, cast *Cast) {
 			}
 		}
 		p.OnSpellHit(sim, p, cast)
-		if sim.Debug != nil {
-			sim.Debug("FINAL DMG: %0.1f\n", cast.DidDmg)
-		}
+		// if sim.Debug != nil {
+		// 	sim.Debug("FINAL DMG: %0.1f\n", cast.DidDmg)
+		// }
 	} else {
 		if sim.Debug != nil {
 			dbgCast += " miss"
@@ -231,7 +231,7 @@ func DirectCast(sim *Simulation, p PlayerAgent, cast *Cast) {
 
 	sim.Metrics.Casts = append(sim.Metrics.Casts, cast)
 	sim.Metrics.TotalDamage += cast.DidDmg
-	if sim.Debug != nil {
-		sim.Debug("Total Dmg: %0.1f\n", sim.Metrics.TotalDamage)
-	}
+	// if sim.Debug != nil {
+	// 	sim.Debug("Total Dmg: %0.1f\n", sim.Metrics.TotalDamage)
+	// }
 }
