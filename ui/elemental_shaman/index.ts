@@ -132,6 +132,7 @@ const theme = new DefaultTheme<Spec.SpecElementalShaman>(document.body, {
 		epWeights: Stats.fromMap({
 			[Stat.StatIntellect]: 0.41,
 			[Stat.StatSpellPower]: 1,
+			[Stat.StatNatureSpellPower]: 1,
 			[Stat.StatSpellCrit]: 0.88,
 			[Stat.StatSpellHaste]: 1.21,
 			[Stat.StatMP5]: 0.37,
