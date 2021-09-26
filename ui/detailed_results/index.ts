@@ -1,7 +1,7 @@
-import { IndividualSimResult } from '../core/api/api';
-import { TypedEvent } from '../core/typed_event';
+import { IndividualSimResult } from '../core/api/api.js';
+import { TypedEvent } from '../core/typed_event.js';
 
-import { DpsHistogram } from './dps_histogram';
+import { DpsHistogram } from './dps_histogram.js';
 
 declare var Chart: any;
 

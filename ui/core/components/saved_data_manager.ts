@@ -1,8 +1,8 @@
-import { Spec } from '../api/common';
-import { Sim } from '../sim';
-import { TypedEvent } from '../typed_event';
+import { Spec } from '../api/common.js';
+import { Sim } from '../sim.js';
+import { TypedEvent } from '../typed_event.js';
 
-import { Component } from '../components/component';
+import { Component } from '../components/component.js';
 
 declare var tippy: any;
 

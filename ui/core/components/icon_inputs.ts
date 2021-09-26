@@ -1,10 +1,10 @@
-import { Buffs } from '../api/common'
-import { Consumes } from '../api/common'
-import { ItemOrSpellId } from '../resources'
-import { Sim } from '../sim'
+import { Buffs } from '../api/common.js';
+import { Consumes } from '../api/common.js';
+import { ItemOrSpellId } from '../resources.js';
+import { Sim } from '../sim.js';
 
-import { ExclusivityTag } from '../sim_ui';
-import { IconInput } from './icon_picker'
+import { ExclusivityTag } from '../sim_ui.js';
+import { IconInput } from './icon_picker.js';
 
 // Keep each section in alphabetical order.
 // Buffs

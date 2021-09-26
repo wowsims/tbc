@@ -1,8 +1,8 @@
-import { IndividualSimResult } from '../core/api/api';
-import { Component } from '../core/components/component';
-import { TypedEvent } from '../core/typed_event';
+import { IndividualSimResult } from '../core/api/api.js';
+import { Component } from '../core/components/component.js';
+import { TypedEvent } from '../core/typed_event.js';
 
-import { ColorSettings } from './color_settings';
+import { ColorSettings } from './color_settings.js';
 
 declare var Chart: any;
 

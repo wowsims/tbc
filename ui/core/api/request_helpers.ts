@@ -1,22 +1,22 @@
-import { Gear } from './gear';
-import { Buffs } from './common';
-import { Consumes } from './common';
-import { Class } from './common';
-import { Encounter } from './common';
-import { Race } from './common';
-import { Spec } from './common';
-import { Stats } from './stats';
-import { SpecAgent } from './utils';
-import { SpecTalents } from './utils';
-import { SpecOptions } from './utils';
+import { Gear } from './gear.js';
+import { Buffs } from './common.js';
+import { Consumes } from './common.js';
+import { Class } from './common.js';
+import { Encounter } from './common.js';
+import { Race } from './common.js';
+import { Spec } from './common.js';
+import { Stats } from './stats.js';
+import { SpecAgent } from './utils.js';
+import { SpecTalents } from './utils.js';
+import { SpecOptions } from './utils.js';
 
-import { Player } from './api';
-import { PlayerOptions } from './api';
-import { BalanceDruid, BalanceDruid_BalanceDruidAgent as BalanceDruidAgent, DruidTalents, BalanceDruid_BalanceDruidOptions as BalanceDruidOptions} from './druid';
-import { ElementalShaman, ElementalShaman_ElementalShamanAgent as ElementalShamanAgent, ShamanTalents, ElementalShaman_ElementalShamanOptions as ElementalShamanOptions } from './shaman';
+import { Player } from './api.js';
+import { PlayerOptions } from './api.js';
+import { BalanceDruid, BalanceDruid_BalanceDruidAgent as BalanceDruidAgent, DruidTalents, BalanceDruid_BalanceDruidOptions as BalanceDruidOptions} from './druid.js';
+import { ElementalShaman, ElementalShaman_ElementalShamanAgent as ElementalShamanAgent, ShamanTalents, ElementalShaman_ElementalShamanOptions as ElementalShamanOptions } from './shaman.js';
 
-import { ComputeStatsRequest, ComputeStatsResult } from './api';
-import { IndividualSimRequest, IndividualSimResult } from './api';
+import { ComputeStatsRequest, ComputeStatsResult } from './api.js';
+import { IndividualSimRequest, IndividualSimResult } from './api.js';
 
 export function makeComputeStatsRequest<SpecType extends Spec>(
     buffs: Buffs,

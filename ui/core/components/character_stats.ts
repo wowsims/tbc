@@ -1,9 +1,9 @@
-import { Stat } from '../api/common';
-import { statNames } from '../api/names';
-import { Stats } from '../api/stats';
-import { Sim } from '../sim';
+import { Stat } from '../api/common.js';
+import { statNames } from '../api/names.js';
+import { Stats } from '../api/stats.js';
+import { Sim } from '../sim.js';
 
-import { Component } from './component';
+import { Component } from './component.js';
 
 export class CharacterStats extends Component {
   readonly stats: Array<Stat>;

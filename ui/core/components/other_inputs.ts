@@ -1,4 +1,4 @@
-import { Sim } from '../sim'
+import { Sim } from '../sim.js';
 
 export const ShadowPriestDPS = {
   type: 'number' as const,

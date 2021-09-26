@@ -1,7 +1,7 @@
-import { Sim, SimConfig } from './sim';
-import { TypedEvent } from './typed_event';
-import { Class } from './api/common';
-import { Spec } from './api/common';
+import { Sim, SimConfig } from './sim.js';
+import { TypedEvent } from './typed_event.js';
+import { Class } from './api/common.js';
+import { Spec } from './api/common.js';
 
 declare var tippy: any;
 

@@ -1,5 +1,5 @@
-import { IndividualSimResult } from '../api/api';
-import { Component } from './component';
+import { IndividualSimResult } from '../api/api.js';
+import { Component } from './component.js';
 
 export class DetailedResults extends Component {
 	private readonly iframeElem: HTMLIFrameElement;

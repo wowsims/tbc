@@ -1,10 +1,10 @@
-import { Sim } from '../sim';
-import { Class } from '../api/common';
-import { Spec } from '../api/common';
-import { specToClass } from '../api/utils';
+import { Sim } from '../sim.js';
+import { Class } from '../api/common.js';
+import { Spec } from '../api/common.js';
+import { specToClass } from '../api/utils.js';
 
-import { ShamanTalentsPicker } from './shaman';
-import { TalentsPicker } from './talents_picker';
+import { ShamanTalentsPicker } from './shaman.js';
+import { TalentsPicker } from './talents_picker.js';
 
 export function newTalentsPicker<SpecType extends Spec>(spec: Spec, parent: HTMLElement, sim: Sim<SpecType>): TalentsPicker<SpecType> {
   switch (spec) {

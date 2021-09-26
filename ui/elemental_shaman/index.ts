@@ -1,25 +1,25 @@
-import { Buffs } from '../core/api/common';
-import { Class } from '../core/api/common';
-import { Consumes } from '../core/api/common';
-import { Encounter } from '../core/api/common';
-import { EquipmentSpec } from '../core/api/common';
-import { ItemSlot } from '../core/api/common';
-import { ItemSpec } from '../core/api/common';
-import { Spec } from '../core/api/common';
-import { Stat } from '../core/api/common';
-import { TristateEffect } from '../core/api/common'
-import { Stats } from '../core/api/stats';
-import { Sim } from '../core/sim';
-import { DefaultTheme } from '../core/themes/default';
+import { Buffs } from '../core/api/common.js';
+import { Class } from '../core/api/common.js';
+import { Consumes } from '../core/api/common.js';
+import { Encounter } from '../core/api/common.js';
+import { EquipmentSpec } from '../core/api/common.js';
+import { ItemSlot } from '../core/api/common.js';
+import { ItemSpec } from '../core/api/common.js';
+import { Spec } from '../core/api/common.js';
+import { Stat } from '../core/api/common.js';
+import { TristateEffect } from '../core/api/common.js'
+import { Stats } from '../core/api/stats.js';
+import { Sim } from '../core/sim.js';
+import { DefaultTheme } from '../core/themes/default.js';
 
-import { ElementalShaman, ElementalShaman_ElementalShamanAgent as ElementalShamanAgent, ShamanTalents as ShamanTalents, ElementalShaman_ElementalShamanOptions as ElementalShamanOptions } from '../core/api/shaman';
-import { ElementalShaman_ElementalShamanAgent_AgentType as AgentType } from '../core/api/shaman';
+import { ElementalShaman, ElementalShaman_ElementalShamanAgent as ElementalShamanAgent, ShamanTalents as ShamanTalents, ElementalShaman_ElementalShamanOptions as ElementalShamanOptions } from '../core/api/shaman.js';
+import { ElementalShaman_ElementalShamanAgent_AgentType as AgentType } from '../core/api/shaman.js';
 
-import * as IconInputs from '../core/components/icon_inputs';
-import * as OtherInputs from '../core/components/other_inputs';
-import * as Enchants from '../core/constants/enchants';
-import * as Gems from '../core/constants/gems';
-import * as Tooltips from '../core/constants/tooltips';
+import * as IconInputs from '../core/components/icon_inputs.js';
+import * as OtherInputs from '../core/components/other_inputs.js';
+import * as Enchants from '../core/constants/enchants.js';
+import * as Gems from '../core/constants/gems.js';
+import * as Tooltips from '../core/constants/tooltips.js';
 
 
 const IconInputWaterShield = {

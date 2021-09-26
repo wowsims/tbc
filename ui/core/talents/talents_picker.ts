@@ -1,12 +1,12 @@
-import { Spec } from '../api/common';
-import { SpecTalents } from '../api/utils';
-import { getIconUrl } from '../resources';
-import { setWowheadHref } from '../resources';
-import { Sim } from '../sim';
-import { isRightClick } from '../utils';
-import { sum } from '../utils';
+import { Spec } from '../api/common.js';
+import { SpecTalents } from '../api/utils.js';
+import { getIconUrl } from '../resources.js';
+import { setWowheadHref } from '../resources.js';
+import { Sim } from '../sim.js';
+import { isRightClick } from '../utils.js';
+import { sum } from '../utils.js';
 
-import { Component } from '../components/component';
+import { Component } from '../components/component.js';
 
 const MAX_TALENT_POINTS = 61;
 const NUM_ROWS = 9;

@@ -1,20 +1,20 @@
-import { EquippedItem } from '../api/equipped_item';
-import { Enchant } from '../api/common';
-import { Item } from '../api/common';
-import { ItemQuality } from '../api/common';
-import { ItemSlot } from '../api/common';
-import { enchantDescriptions } from '../api/names';
-import { slotNames } from '../api/names';
-import { getEmptyGemSocketIconUrl } from '../resources';
-import { getEmptySlotIconUrl } from '../resources';
-import { getIconUrl } from '../resources';
-import { setWowheadHref } from '../resources';
-import { setGemSocketCssClass } from '../css_utils';
-import { setItemQualityCssClass } from '../css_utils';
-import { Sim } from '../sim';
-import { getEnumValues } from '../utils';
+import { EquippedItem } from '../api/equipped_item.js';
+import { Enchant } from '../api/common.js';
+import { Item } from '../api/common.js';
+import { ItemQuality } from '../api/common.js';
+import { ItemSlot } from '../api/common.js';
+import { enchantDescriptions } from '../api/names.js';
+import { slotNames } from '../api/names.js';
+import { getEmptyGemSocketIconUrl } from '../resources.js';
+import { getEmptySlotIconUrl } from '../resources.js';
+import { getIconUrl } from '../resources.js';
+import { setWowheadHref } from '../resources.js';
+import { setGemSocketCssClass } from '../css_utils.js';
+import { setItemQualityCssClass } from '../css_utils.js';
+import { Sim } from '../sim.js';
+import { getEnumValues } from '../utils.js';
 
-import { Component } from './component';
+import { Component } from './component.js';
 
 export class GearPicker extends Component {
   // ItemSlot is used as the index

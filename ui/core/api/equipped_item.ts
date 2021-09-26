@@ -1,11 +1,11 @@
-import { Enchant } from './common';
-import { Gem } from './common';
-import { Item } from './common';
-import { ItemSlot } from './common';
-import { ItemSpec } from './common';
-import { enchantAppliesToItem } from './utils';
-import { gemEligibleForSocket } from './utils';
-import { gemMatchesSocket } from './utils';
+import { Enchant } from './common.js';
+import { Gem } from './common.js';
+import { Item } from './common.js';
+import { ItemSlot } from './common.js';
+import { ItemSpec } from './common.js';
+import { enchantAppliesToItem } from './utils.js';
+import { gemEligibleForSocket } from './utils.js';
+import { gemMatchesSocket } from './utils.js';
 
 /**
  * Represents an equipped item along with enchants/gems attached to it.
