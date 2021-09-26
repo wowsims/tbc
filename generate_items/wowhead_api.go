@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/wowsims/tbc/generate_items/api"
 	"io/ioutil"
 	"log"
 	"math"
@@ -11,6 +10,8 @@ import (
 	"regexp"
 	"strconv"
 	"time"
+
+	"github.com/wowsims/tbc/generate_items/api"
 )
 
 type Stats [28]float64

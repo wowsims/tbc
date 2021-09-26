@@ -1,7 +1,7 @@
 syntax = "proto3";
-package api;
+package genapi;
 
-option go_package = "api/";
+option go_package = "api/genapi";
 
 import "common.proto";
 import "druid.proto";

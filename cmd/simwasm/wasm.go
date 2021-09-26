@@ -7,6 +7,7 @@ import (
 	"syscall/js"
 
 	"github.com/wowsims/tbc/api"
+	"github.com/wowsims/tbc/api/genapi"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -26,7 +27,7 @@ func computeStats(this js.Value, args []js.Value) interface{} {
 	data := make([]byte, args[0].Get("length").Int())
 	js.CopyBytesToGo(data, args[0])
 
-	csr := &api.ComputeStatsRequest{}
+	csr := &genapi.ComputeStatsRequest{}
 	if err := proto.Unmarshal(data, csr); err != nil {
 		log.Printf("Failed to parse request: %s", err)
 		return nil
@@ -50,7 +51,7 @@ func gearList(this js.Value, args []js.Value) interface{} {
 	data := make([]byte, args[0].Get("length").Int())
 	js.CopyBytesToGo(data, args[0])
 
-	glr := &api.GearListRequest{}
+	glr := &genapi.GearListRequest{}
 	if err := proto.Unmarshal(data, glr); err != nil {
 		log.Printf("Failed to parse request: %s", err)
 		return nil
@@ -74,7 +75,7 @@ func individualSim(this js.Value, args []js.Value) interface{} {
 	data := make([]byte, args[0].Get("length").Int())
 	js.CopyBytesToGo(data, args[0])
 
-	isr := &api.IndividualSimRequest{}
+	isr := &genapi.IndividualSimRequest{}
 	if err := proto.Unmarshal(data, isr); err != nil {
 		log.Printf("Failed to parse request: %s", err)
 		return nil
@@ -98,7 +99,7 @@ func statWeights(this js.Value, args []js.Value) interface{} {
 	data := make([]byte, args[0].Get("length").Int())
 	js.CopyBytesToGo(data, args[0])
 
-	swr := &api.StatWeightsRequest{}
+	swr := &genapi.StatWeightsRequest{}
 	if err := proto.Unmarshal(data, swr); err != nil {
 		log.Printf("Failed to parse request: %s", err)
 		return nil
