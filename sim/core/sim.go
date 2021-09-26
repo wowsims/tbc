@@ -15,7 +15,7 @@ func debugFunc(sim *Simulation) func(string, ...interface{}) {
 
 type Options struct {
 	Encounter  Encounter
-	Iterations int32
+	Iterations int
 	RSeed      int64
 	ExitOnOOM  bool
 	GCDMin     time.Duration // sets the minimum GCD

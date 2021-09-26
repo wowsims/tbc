@@ -115,7 +115,6 @@ message GearListResult {
 message ComputeStatsRequest {
     Player player = 1;
     Buffs buffs = 2;
-    EquipmentSpec gear = 3;
 }
 message ComputeStatsResult {
     repeated double gear_only = 1;

@@ -123,19 +123,23 @@ var p1Gear = []string{
 	"Mazthoril Honor Shield",
 }
 
-// func TestSimulatePreRaidNoBuffs(t *testing.T) {
-// 	simAllEncountersTest(AllEncountersTestOptions{
-// 		label: "preRaidNoBuffs",
-// 		t:     t,
+func TestSimulatePreRaidNoBuffs(t *testing.T) {
+	simAllEncountersTest(AllEncountersTestOptions{
+		label: "preRaid",
+		t:     t,
 
-// 		Options:   basicOptions,
-// 		Gear:      preRaidGear,
-// 		AgentType: AGENT_TYPE_ADAPTIVE,
+		Options:  basicOptions,
+		Consumes: fullConsumes,
+		Buffs:    basicBuffs,
+		Race:     core.RaceBonusTypeOrc,
 
-// 		ExpectedDpsShort: 867,
-// 		ExpectedDpsLong:  277,
-// 	})
-// }
+		Spec: shaman.ElementalSpec{Talents: shamTalents, Totems: shamTotems, AgentID: shaman.AgentTypeAdaptive},
+		Gear: gearFromStrings(preRaidGear),
+
+		ExpectedDpsShort: 1406,
+		ExpectedDpsLong:  1017,
+	})
+}
 
 func gearFromStrings(gears []string) core.EquipmentSpec {
 	eq := core.EquipmentSpec{}
@@ -151,10 +155,13 @@ func TestSimulatePreRaid(t *testing.T) {
 		label: "preRaid",
 		t:     t,
 
-		Options:         basicOptions,
-		Gear:            gearFromStrings(preRaidGear),
-		ShamanAgentType: shaman.AgentTypeAdaptive,
-		Buffs:           fullBuffs,
+		Options:  basicOptions,
+		Consumes: fullConsumes,
+		Buffs:    fullBuffs,
+		Race:     core.RaceBonusTypeOrc,
+
+		Spec: shaman.ElementalSpec{Talents: shamTalents, Totems: shamTotems, AgentID: shaman.AgentTypeAdaptive},
+		Gear: gearFromStrings(preRaidGear),
 
 		ExpectedDpsShort: 1406,
 		ExpectedDpsLong:  1017,
@@ -162,15 +169,17 @@ func TestSimulatePreRaid(t *testing.T) {
 }
 
 func TestSimulateP1(t *testing.T) {
-
 	simAllEncountersTest(AllEncountersTestOptions{
 		label: "phase1",
 		t:     t,
 
-		Options:         basicOptions,
-		Gear:            gearFromStrings(p1Gear),
-		ShamanAgentType: shaman.AgentTypeAdaptive,
-		Buffs:           fullBuffs,
+		Options:  basicOptions,
+		Consumes: fullConsumes,
+		Buffs:    fullBuffs,
+		Race:     core.RaceBonusTypeOrc,
+
+		Spec: shaman.ElementalSpec{Talents: shamTalents, Totems: shamTotems, AgentID: shaman.AgentTypeAdaptive},
+		Gear: gearFromStrings(p1Gear),
 
 		ExpectedDpsShort: 1527,
 		ExpectedDpsLong:  1226.6,
@@ -225,10 +234,13 @@ func TestClearcastAgent(t *testing.T) {
 		label: "clearcast",
 		t:     t,
 
-		Options:         basicOptions,
-		Gear:            gearFromStrings(p1Gear),
-		ShamanAgentType: shaman.AgentTypeCLOnClearcast,
-		Buffs:           fullBuffs,
+		Options:  basicOptions,
+		Consumes: fullConsumes,
+		Buffs:    fullBuffs,
+		Race:     core.RaceBonusTypeOrc,
+
+		Spec: shaman.ElementalSpec{Talents: shamTalents, Totems: shamTotems, AgentID: shaman.AgentTypeCLOnClearcast},
+		Gear: gearFromStrings(p1Gear),
 
 		ExpectedDpsShort: 1468.4,
 		ExpectedDpsLong:  1214.2,
@@ -237,19 +249,24 @@ func TestClearcastAgent(t *testing.T) {
 
 func TestAverageDPS(t *testing.T) {
 	eq := gearFromStrings(p1Gear)
-	player := core.NewPlayer(eq, core.RaceBonusTypeOrc, fullConsumes)
-	party := &core.Party{Players: []core.PlayerAgent{{Player: player}}}
-	raid := &core.Raid{Parties: []*core.Party{party}}
-	party.Players[0].Agent = shaman.NewShaman(player, party, shamTalents, shamTotems, shaman.AgentTypeAdaptive)
 
 	options := basicOptions
 	options.Iterations = 5
 	options.Encounter = shortEncounter
-	buffs := fullBuffs
-	options.Debug = true
+	// options.Debug = true
 
-	sim := SetupSim(raid, buffs, options)
-	result := RunIndividualSim(sim, options)
+	params := IndividualParams{
+		Equip:       eq,
+		Race:        core.RaceBonusTypeOrc,
+		Consumes:    fullConsumes,
+		Buffs:       fullBuffs,
+		Options:     options,
+		Spec:        shaman.ElementalSpec{Talents: shamTalents, Totems: shamTotems, AgentID: shaman.AgentTypeAdaptive},
+		CustomStats: []float64{},
+	}
+
+	sim := SetupIndividualSim(params)
+	result := RunIndividualSim(sim)
 
 	log.Printf("result.DpsAvg: %0.1f", result.DpsAvg)
 	log.Printf("LOGS:\n %s\n", result.Logs)
@@ -270,48 +287,49 @@ type AllEncountersTestOptions struct {
 	label string
 	t     *testing.T
 
-	Options core.Options
-	Gear    core.EquipmentSpec
-	Buffs   core.Buffs
-
-	ShamanAgentType shaman.AgentType
+	Options  core.Options
+	Gear     core.EquipmentSpec
+	Buffs    core.Buffs
+	Consumes core.Consumes
+	Race     core.RaceBonusType
+	Spec     AgentCreator
 
 	ExpectedDpsShort float64
 	ExpectedDpsLong  float64
 }
 
 func simAllEncountersTest(testOpts AllEncountersTestOptions) {
+	params := IndividualParams{
+		Equip:       testOpts.Gear,
+		Race:        testOpts.Race,
+		Consumes:    testOpts.Consumes,
+		Buffs:       testOpts.Buffs,
+		Options:     makeOptions(testOpts.Options, shortEncounter),
+		Spec:        testOpts.Spec,
+		CustomStats: []float64{},
+	}
 	doSimulateTest(
 		testOpts.label+"-short",
 		testOpts.t,
-		testOpts.ShamanAgentType,
-		testOpts.Gear,
-		makeOptions(testOpts.Options, shortEncounter),
-		testOpts.Buffs,
+		params,
 		testOpts.ExpectedDpsShort)
 
-	// doSimulateTest(
-	// 	testOpts.label+"-long",
-	// 	testOpts.t,
-	// 	testOpts.Gear,
-	// 	makeOptions(testOpts.Options, longEncounter),
-	// 	testOpts.Buffs,
-	// 	testOpts.ExpectedDpsLong)
+	params.Options = makeOptions(testOpts.Options, longEncounter)
+	doSimulateTest(
+		testOpts.label+"-long",
+		testOpts.t,
+		params,
+		testOpts.ExpectedDpsLong)
 }
 
 // Performs a basic end-to-end test of the simulator.
 //   This is where we can add more sophisticated checks if we would like.
 //   Any changes to the damage output of an item set
-func doSimulateTest(label string, t *testing.T, agent shaman.AgentType, eq core.EquipmentSpec, options core.Options, buffs core.Buffs, expectedDps float64) {
-	player := core.NewPlayer(eq, core.RaceBonusTypeOrc, fullConsumes)
-	party := &core.Party{Players: []core.PlayerAgent{{Player: player}}}
-	raid := &core.Raid{Parties: []*core.Party{party}}
-	party.Players[0].Agent = shaman.NewShaman(player, party, shamTalents, shamTotems, agent)
+func doSimulateTest(label string, t *testing.T, params IndividualParams, expectedDps float64) {
+	// options.Debug = true
 
-	options.Debug = true
-
-	sim := SetupSim(raid, buffs, options)
-	result := RunIndividualSim(sim, options)
+	sim := SetupIndividualSim(params)
+	result := RunIndividualSim(sim)
 
 	log.Printf("LOGS:\n%s\n", result.Logs)
 	tolerance := 0.5

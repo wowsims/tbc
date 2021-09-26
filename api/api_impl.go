@@ -2,8 +2,6 @@
 package api
 
 import (
-	"math"
-	"math/rand"
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
@@ -71,170 +69,78 @@ func getGearListImpl(request *GearListRequest) *GearListResult {
 }
 
 func computeStatsImpl(request *ComputeStatsRequest) *ComputeStatsResult {
-	panic("not implemented")
-	// fakeSim := core.NewSim(request.Gear, request.Options)
+	return statsFromIndSimRequest(&IndividualSimRequest{Player: request.Player, Buffs: request.Buffs})
+}
 
-	// sets := fakeSim.ActivateSets()
-	// fakeSim.reset() // this will activate any perm-effect items as well
-
-	// gearOnlyStats := fakeSim.Equip.Stats().CalculatedTotal()
-	// finalStats := fakeSim.Stats
-
-	// return &ComputeStatsResult{
-	// 	GearOnly:   gearOnlyStats,
-	// 	FinalStats: finalStats,
-	// 	Sets:       sets,
-	// }
+func statsFromIndSimRequest(isr *IndividualSimRequest) *ComputeStatsResult {
+	sim := createSim(isr)
+	gearStats := sim.Raid.Parties[0].Players[0].Equip.Stats()
+	return &ComputeStatsResult{
+		GearOnly:   gearStats[:],
+		FinalStats: sim.Raid.Parties[0].Players[0].Stats[:], // createSim includes a call to buff up all party members.
+		Sets:       []string{},
+	}
 }
 
 func statWeightsImpl(request *StatWeightsRequest) *StatWeightsResult {
-	panic("not implemented")
-
-	// request.Options.AgentType = AGENT_TYPE_ADAPTIVE
-
-	// baselineSimRequest := SimRequest{
-	// 	Options:    request.Options,
-	// 	Gear:       request.Gear,
-	// 	Iterations: request.Iterations,
-	// }
-	// baselineResult := RunSimulation(baselineSimRequest)
-
-	// var waitGroup sync.WaitGroup
-	// result := StatWeightsResult{}
-	// dpsHists := [StatLen]map[int]int{}
-
-	// doStat := func(stat Stat, value float64) {
-	// 	defer waitGroup.Done()
-
-	// 	simRequest := baselineSimRequest
-	// 	simRequest.Options.Buffs.Custom[stat] += value
-
-	// 	simResult := RunSimulation(simRequest)
-	// 	result.Weights[stat] = (simResult.DpsAvg - baselineResult.DpsAvg) / value
-	// 	dpsHists[stat] = simResult.DpsHist
-	// }
-
-	// // Spell hit mod shouldn't go over hit cap.
-	// computeStatsResult := ComputeStats(ComputeStatsRequest{
-	// 	Options: request.Options,
-	// 	Gear:    request.Gear,
-	// })
-	// spellHitMod := math.Max(0, math.Min(10, 202-computeStatsResult.FinalStats[StatSpellHit]))
-
-	// statMods := Stats{
-	// 	StatInt:       50,
-	// 	StatSpellDmg:  50,
-	// 	StatSpellCrit: 50,
-	// 	StatSpellHit:  spellHitMod,
-	// 	StatHaste:     50,
-	// 	StatMP5:       50,
-	// }
-
-	// for stat, mod := range statMods {
-	// 	if mod == 0 {
-	// 		continue
-	// 	}
-
-	// 	waitGroup.Add(1)
-	// 	go doStat(Stat(stat), mod)
-	// }
-
-	// waitGroup.Wait()
-
-	// for stat, mod := range statMods {
-	// 	if mod == 0 {
-	// 		continue
-	// 	}
-
-	// 	result.EpValues[stat] = result.Weights[stat] / result.Weights[StatSpellPower]
-	// 	result.WeightsStDev[stat] = computeStDevFromHists(request.Iterations, mod, dpsHists[stat], baselineResult.DpsHist, nil, statMods[StatSpellDmg])
-	// 	result.EpValuesStDev[stat] = computeStDevFromHists(request.Iterations, mod, dpsHists[stat], baselineResult.DpsHist, dpsHists[StatSpellDmg], statMods[StatSpellDmg])
-	// }
-	// return result
+	result := runner.CalcStatWeight(convertSimParams(request.Options))
+	return &StatWeightsResult{
+		Weights:       result.Weights,
+		WeightsStdev:  result.WeightsStdev,
+		EpValues:      result.EpValues,
+		EpValuesStdev: result.EpValuesStdev,
+	}
 }
 
-func computeStDevFromHists(iters int, modValue float64, moddedStatDpsHist map[int]int, baselineDpsHist map[int]int, spellDmgDpsHist map[int]int, spellDmgModValue float64) float64 {
-	sum := 0.0
-	sumSquared := 0.0
-	n := iters * 10
-	for i := 0; i < n; {
-		denominator := 1.0
-		if spellDmgDpsHist != nil {
-			denominator = float64(sampleFromDpsHist(spellDmgDpsHist, iters)-sampleFromDpsHist(baselineDpsHist, iters)) / spellDmgModValue
-		}
-
-		if denominator != 0 {
-			ep := (float64(sampleFromDpsHist(moddedStatDpsHist, iters)-sampleFromDpsHist(baselineDpsHist, iters)) / modValue) / denominator
-			sum += ep
-			sumSquared += ep * ep
-			i++
-		}
-	}
-	epAvg := sum / float64(n)
-	epStDev := math.Sqrt((sumSquared / float64(n)) - (epAvg * epAvg))
-	return epStDev
-}
-
-func sampleFromDpsHist(hist map[int]int, histNumSamples int) int {
-	r := rand.Float64()
-	sampleIdx := int(math.Floor(float64(histNumSamples) * r))
-
-	curSampleIdx := 0
-	for roundedDps, count := range hist {
-		curSampleIdx += count
-		if curSampleIdx >= sampleIdx {
-			return roundedDps
-		}
-	}
-
-	panic("Invalid dps histogram")
-}
-
-func runSimulationImpl(request *IndividualSimRequest) *IndividualSimResult {
-
-	player := core.NewPlayer(convertEquip(request.Player.Equipment), core.RaceBonusType(request.Player.Options.Race), convertConsumes(request.Player.Options.Consumes))
-
-	// TODO: should this be moved into the player constructor?
-	for k, v := range request.Player.CustomStats {
-		player.Stats[k] += v
-	}
-
-	party := &core.Party{
-		Players: []core.PlayerAgent{
-			{Player: player},
-		},
-	}
-
-	var agent core.Agent
-	switch v := request.Player.Options.Spec.(type) {
-	case *PlayerOptions_ElementalShaman:
-		talents := convertShamTalents(v.ElementalShaman.Talents)
-		totems := convertTotems(request.Buffs)
-		agent = shaman.NewShaman(player, party, talents, totems, shaman.AgentType(v.ElementalShaman.Agent.Type))
-	default:
-		panic("class not supported")
-	}
-
-	party.Players[0].Agent = agent
-	raid := &core.Raid{Parties: []*core.Party{party}}
-
+func convertSimParams(request *IndividualSimRequest) runner.IndividualParams {
 	options := core.Options{
 		Encounter: core.Encounter{
 			Duration:   request.Encounter.Duration,
 			NumTargets: int(request.Encounter.NumTargets),
 			Armor:      request.Encounter.TargetArmor,
 		},
-		Iterations: request.Iterations,
+		Iterations: int(request.Iterations),
 		RSeed:      request.RandomSeed,
 		ExitOnOOM:  request.ExitOnOom,
 		GCDMin:     time.Duration(request.GcdMin),
 		Debug:      request.Debug,
 	}
 
-	buffs := convertBuffs(request.Buffs)
-	sim := runner.SetupSim(raid, buffs, options)
+	params := runner.IndividualParams{
+		Equip:    convertEquip(request.Player.Equipment),
+		Race:     core.RaceBonusType(request.Player.Options.Race),
+		Consumes: convertConsumes(request.Player.Options.Consumes),
+		Buffs:    convertBuffs(request.Buffs),
+		Options:  options,
+	}
 
-	result := runner.RunIndividualSim(sim, options)
+	switch v := request.Player.Options.Spec.(type) {
+	case *PlayerOptions_ElementalShaman:
+		talents := convertShamTalents(v.ElementalShaman.Talents)
+		totems := convertTotems(request.Buffs)
+		params.Spec = shaman.ElementalSpec{
+			Talents: talents,
+			Totems:  totems,
+			AgentID: shaman.AgentType(v.ElementalShaman.Agent.Type),
+		}
+
+	default:
+		panic("class not supported")
+	}
+
+	return params
+}
+
+func createSim(request *IndividualSimRequest) *core.Simulation {
+	params := convertSimParams(request)
+	sim := runner.SetupIndividualSim(params)
+
+	return sim
+}
+
+func runSimulationImpl(request *IndividualSimRequest) *IndividualSimResult {
+	sim := createSim(request)
+	result := runner.RunIndividualSim(sim)
 
 	isr := &IndividualSimResult{
 		DpsAvg:              result.DpsAvg,

@@ -18,6 +18,16 @@ var ElementalEnchants = []int32{
 	29191, 28909, 28886, 24421, 20076, 23545, 27960, 27917, 22534, 33997, 28272, 24274, 24273, 27975, 22555, 35445, 27945,
 }
 
+type ElementalSpec struct {
+	Talents Talents
+	Totems  Totems
+	AgentID AgentType
+}
+
+func (es ElementalSpec) CreateAgent(player *core.Player, party *core.Party) core.Agent {
+	return NewShaman(player, party, es.Talents, es.Totems, es.AgentID)
+}
+
 func loDmgMod(sim *core.Simulation, p core.PlayerAgent, c *core.Cast) {
 	c.DidDmg /= 2
 }

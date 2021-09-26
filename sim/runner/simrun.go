@@ -13,7 +13,44 @@ import (
 	"github.com/wowsims/tbc/sim/priest"
 )
 
-func SetupSim(raid *core.Raid, buffs core.Buffs, options core.Options) *core.Simulation {
+type AgentCreator interface {
+	CreateAgent(player *core.Player, party *core.Party) core.Agent
+}
+
+type IndividualParams struct {
+	Equip    core.EquipmentSpec
+	Race     core.RaceBonusType
+	Consumes core.Consumes
+	Buffs    core.Buffs
+	Options  core.Options
+
+	Spec        AgentCreator // TODO: solve this better
+	CustomStats []float64
+}
+
+func SetupIndividualSim(params IndividualParams) *core.Simulation {
+	player := core.NewPlayer(params.Equip, params.Race, params.Consumes)
+
+	// TODO: should this be moved into the player constructor?
+	for k, v := range params.CustomStats {
+		player.Stats[k] += v
+		player.InitialStats[k] += v
+	}
+
+	party := &core.Party{
+		Players: []core.PlayerAgent{
+			{Player: player},
+		},
+	}
+
+	agent := params.Spec.CreateAgent(player, party)
+
+	party.Players[0].Agent = agent
+	raid := &core.Raid{Parties: []*core.Party{party}}
+
+	buffs := params.Buffs
+	options := params.Options
+
 	sim := core.NewSim(raid, options)
 
 	// These buffs are a one-time apply... no need to add the bots to the raid group.
@@ -100,7 +137,7 @@ func SetupSim(raid *core.Raid, buffs core.Buffs, options core.Options) *core.Sim
 
 // RunIndividualSim
 //  TODO: Should this accept a 'PlayerSettings' instead of a constructed raid and do that work in here?
-func RunIndividualSim(sim *core.Simulation, options core.Options) SimResult {
+func RunIndividualSim(sim *core.Simulation) SimResult {
 	pid := 0
 	for _, raidParty := range sim.Raid.Parties {
 		for _, pl := range raidParty.Players {
@@ -109,19 +146,19 @@ func RunIndividualSim(sim *core.Simulation, options core.Options) SimResult {
 			pid++
 		}
 	}
-	sim.AuraTracker.PID = -1
+	sim.AuraTracker.PID = -1 // set main sim auras to be -1 player ID.
 	logsBuffer := &strings.Builder{}
 	aggregator := NewMetricsAggregator()
 
-	if options.Debug {
+	if sim.Options.Debug {
 		sim.Debug = func(s string, vals ...interface{}) {
 			logsBuffer.WriteString(fmt.Sprintf("[%0.1f] "+s, append([]interface{}{sim.CurrentTime.Seconds()}, vals...)...))
 		}
 	}
 
-	for i := int32(0); i < options.Iterations; i++ {
+	for i := 0; i < sim.Options.Iterations; i++ {
 		metrics := sim.Run()
-		aggregator.addMetrics(options, metrics)
+		aggregator.addMetrics(sim.Options, metrics)
 		sim.ReturnCasts(metrics.Casts)
 	}
 
