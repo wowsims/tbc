@@ -1,19 +1,19 @@
-import { Enchant } from './api/common';
-import { Gem } from './api/common';
-import { GemColor } from './api/common';
-import { Item } from './api/common';
-import { ItemQuality } from './api/common';
-import { ItemSlot } from './api/common';
-import { ItemSpec } from './api/common';
-import { ItemType } from './api/common';
-import { Stat } from './api/common';
+import { Enchant } from './api/common.js';
+import { Gem } from './api/common.js';
+import { GemColor } from './api/common.js';
+import { Item } from './api/common.js';
+import { ItemQuality } from './api/common.js';
+import { ItemSlot } from './api/common.js';
+import { ItemSpec } from './api/common.js';
+import { ItemType } from './api/common.js';
+import { Stat } from './api/common.js';
 
-import { ComputeStatsRequest, ComputeStatsResult } from './api/api';
-import { GearListRequest, GearListResult } from './api/api';
-import { IndividualSimRequest, IndividualSimResult } from './api/api';
-import { StatWeightsRequest, StatWeightsResult } from './api/api';
+import { ComputeStatsRequest, ComputeStatsResult } from './api/api.js';
+import { GearListRequest, GearListResult } from './api/api.js';
+import { IndividualSimRequest, IndividualSimResult } from './api/api.js';
+import { StatWeightsRequest, StatWeightsResult } from './api/api.js';
 
-import { wait } from './utils';
+import { wait } from './utils.js';
 
 const SIM_WORKER_URL = '/sim_worker.js';
 

@@ -1,20 +1,20 @@
-import { intersection } from '../utils';
+import { intersection } from '../utils.js';
 
-import { Class } from './common';
-import { Enchant } from './common';
-import { Gem } from './common';
-import { GemColor } from './common';
-import { HandType } from './common';
-import { ItemSlot } from './common';
-import { ItemType } from './common';
-import { Item } from './common';
-import { Race } from './common';
-import { RangedWeaponType } from './common';
-import { Spec } from './common';
-import { WeaponType } from './common';
+import { Class } from './common.js';
+import { Enchant } from './common.js';
+import { Gem } from './common.js';
+import { GemColor } from './common.js';
+import { HandType } from './common.js';
+import { ItemSlot } from './common.js';
+import { ItemType } from './common.js';
+import { Item } from './common.js';
+import { Race } from './common.js';
+import { RangedWeaponType } from './common.js';
+import { Spec } from './common.js';
+import { WeaponType } from './common.js';
 
-import { BalanceDruid, BalanceDruid_BalanceDruidAgent as BalanceDruidAgent, DruidTalents, BalanceDruid_BalanceDruidOptions as BalanceDruidOptions} from './druid';
-import { ElementalShaman, ElementalShaman_ElementalShamanAgent as ElementalShamanAgent, ShamanTalents, ElementalShaman_ElementalShamanOptions as ElementalShamanOptions } from './shaman';
+import { BalanceDruid, BalanceDruid_BalanceDruidAgent as BalanceDruidAgent, DruidTalents, BalanceDruid_BalanceDruidOptions as BalanceDruidOptions} from './druid.js';
+import { ElementalShaman, ElementalShaman_ElementalShamanAgent as ElementalShamanAgent, ShamanTalents, ElementalShaman_ElementalShamanOptions as ElementalShamanOptions } from './shaman.js';
 
 export type ShamanSpecs = Spec.SpecElementalShaman;
 

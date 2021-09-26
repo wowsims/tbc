@@ -1,11 +1,11 @@
-import { IndividualSimRequest } from '../api/api';
-import { Stat } from '../api/common';
-import { StatWeightsRequest } from '../api/api';
-import { Sim } from '../sim';
+import { IndividualSimRequest } from '../api/api.js';
+import { Stat } from '../api/common.js';
+import { StatWeightsRequest } from '../api/api.js';
+import { Sim } from '../sim.js';
 
-import { Component } from './component';
-import { DetailedResults } from './detailed_results';
-import { Results } from './results';
+import { Component } from './component.js';
+import { DetailedResults } from './detailed_results.js';
+import { Results } from './results.js';
 
 export class LogRunner extends Component {
   constructor(parent: HTMLElement, sim: Sim<any>, results: Results, detailedResults: DetailedResults) {

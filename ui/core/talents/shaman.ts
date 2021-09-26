@@ -1,9 +1,9 @@
-import { Spec } from '../api/common';
-import { ShamanTalents as ShamanTalents } from '../api/shaman';
-import { ShamanSpecs } from '../api/utils';
-import { Sim } from '../sim';
+import { Spec } from '../api/common.js';
+import { ShamanTalents as ShamanTalents } from '../api/shaman.js';
+import { ShamanSpecs } from '../api/utils.js';
+import { Sim } from '../sim.js';
 
-import { TalentsPicker } from './talents_picker';
+import { TalentsPicker } from './talents_picker.js';
 
 // Talents are the same for all Shaman specs, so its ok to just use ElementalShaman here
 export class ShamanTalentsPicker extends TalentsPicker<Spec.SpecElementalShaman> {

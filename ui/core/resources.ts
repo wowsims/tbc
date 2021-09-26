@@ -1,7 +1,7 @@
-import { GemColor } from './api/common';
-import { Item } from './api/common';
-import { ItemQuality } from './api/common';
-import { ItemSlot } from './api/common';
+import { GemColor } from './api/common.js';
+import { Item } from './api/common.js';
+import { ItemQuality } from './api/common.js';
+import { ItemSlot } from './api/common.js';
 
 const emptySlotIcons: Record<ItemSlot, string> = {
   [ItemSlot.ItemSlotHead]: 'https://cdn.seventyupgrades.com/item-slots/Head.jpg',

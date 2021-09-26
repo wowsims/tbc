@@ -1,6 +1,6 @@
-import { getEnumValues } from '../utils';
+import { getEnumValues } from '../utils.js';
 
-import { Stat } from './common';
+import { Stat } from './common.js';
 
 const STATS_LEN = getEnumValues(Stat).length;
 

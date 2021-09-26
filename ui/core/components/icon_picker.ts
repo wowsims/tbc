@@ -1,13 +1,13 @@
-import { getIconUrl } from '../resources';
-import { ItemOrSpellId } from '../resources';
-import { setWowheadHref } from '../resources';
-import { Sim } from '../sim';
-import { TypedEvent } from '../typed_event';
-import { isRightClick } from '../utils';
-import { ExclusivityTag } from '../sim_ui';
-import { SimUI } from '../sim_ui';
+import { getIconUrl } from '../resources.js';
+import { ItemOrSpellId } from '../resources.js';
+import { setWowheadHref } from '../resources.js';
+import { Sim } from '../sim.js';
+import { TypedEvent } from '../typed_event.js';
+import { isRightClick } from '../utils.js';
+import { ExclusivityTag } from '../sim_ui.js';
+import { SimUI } from '../sim_ui.js';
 
-import { Component } from './component';
+import { Component } from './component.js';
 
 // Icon-based UI for picking buffs / consumes / etc
 export class IconPicker extends Component {

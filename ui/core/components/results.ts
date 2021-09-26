@@ -1,8 +1,8 @@
-import { IndividualSimResult } from '../api/api';
-import { StatWeightsResult } from '../api/api';
-import { Stat } from '../api/common';
-import { statNames } from '../api/names';
-import { Component } from './component';
+import { IndividualSimResult } from '../api/api.js';
+import { StatWeightsResult } from '../api/api.js';
+import { Stat } from '../api/common.js';
+import { statNames } from '../api/names.js';
+import { Component } from './component.js';
 
 export class Results extends Component {
   readonly pendingElem: HTMLDivElement;

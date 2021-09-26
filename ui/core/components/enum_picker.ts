@@ -1,10 +1,10 @@
-import { Race } from '../api/common';
-import { specToEligibleRaces } from '../api/utils';
-import { raceNames } from '../api/names';
-import { Sim } from '../sim';
-import { TypedEvent } from '../typed_event';
+import { Race } from '../api/common.js';
+import { specToEligibleRaces } from '../api/utils.js';
+import { raceNames } from '../api/names.js';
+import { Sim } from '../sim.js';
+import { TypedEvent } from '../typed_event.js';
 
-import { Component } from './component';
+import { Component } from './component.js';
 
 export interface EnumPickerConfig {
   label?: string,

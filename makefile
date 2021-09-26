@@ -23,12 +23,16 @@ host: dist
 	npx http-server dist
 
 ui/core/api/api.ts: api/*.proto
-	npx r.js -convert node_modules/@protobuf-ts/runtime/build/commonjs/ dist/@protobuf-ts
-	mkdir -p ui/core/api
+	mkdir -p dist/protobuf-ts
+	cp -r node_modules/@protobuf-ts/runtime/build/es2015/* dist/protobuf-ts
+	sed -i -E "s/from '(.*)';/from '\1\.js';/g" dist/protobuf-ts/*
+	sed -i -E "s/from \"(.*)\";/from '\1\.js';/g" dist/protobuf-ts/*
 	npx protoc --ts_opt generate_dependencies --ts_out ui/core/api --proto_path api api/api.proto
 
 dist/core/tsconfig.tsbuildinfo: $(call rwildcard,ui/core,*.ts) ui/core/api/api.ts
 	npx tsc -p ui/core
+	sed -i 's/@protobuf-ts\/runtime/\/protobuf-ts\/index/g' dist/core/api/*
+	sed -i -E "s/from \"(.*?)(\.js)?\";/from '\1\.js';/g" dist/core/api/*
 
 # Generic rule for building index.js for any class directory
 dist/%/index.js: ui/%/index.ts ui/%/*.ts dist/core/tsconfig.tsbuildinfo
