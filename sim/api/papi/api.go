@@ -1,32 +1,32 @@
 // The interface to the sim. All interactions with the sim should go through this file.
-package api
+package papi
 
-import "github.com/wowsims/tbc/api/genapi"
+import "github.com/wowsims/tbc/sim/api"
 
 /**
  * Returns all items, enchants, and gems recognized by the sim.
  */
-func GetGearList(request *genapi.GearListRequest) *genapi.GearListResult {
+func GetGearList(request *api.GearListRequest) *api.GearListResult {
 	return getGearListImpl(request)
 }
 
 /**
  * Returns character stats taking into account gear / buffs / consumes / etc
  */
-func ComputeStats(request *genapi.ComputeStatsRequest) *genapi.ComputeStatsResult {
+func ComputeStats(request *api.ComputeStatsRequest) *api.ComputeStatsResult {
 	return computeStatsImpl(request)
 }
 
 /**
  * Returns stat weights and EP values, with standard deviations, for all stats.
  */
-func StatWeights(request *genapi.StatWeightsRequest) *genapi.StatWeightsResult {
+func StatWeights(request *api.StatWeightsRequest) *api.StatWeightsResult {
 	return statWeightsImpl(request)
 }
 
 /**
  * Runs multiple iterations of the sim with a single set of options / gear.
  */
-func RunSimulation(request *genapi.IndividualSimRequest) *genapi.IndividualSimResult {
+func RunSimulation(request *api.IndividualSimRequest) *api.IndividualSimResult {
 	return runSimulationImpl(request)
 }

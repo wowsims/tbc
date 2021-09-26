@@ -1,18 +1,18 @@
-package api
+package papi
 
 import (
 	"log"
 	"testing"
 
-	"github.com/wowsims/tbc/api/genapi"
+	"github.com/wowsims/tbc/sim/api"
 )
 
-var basicSpec = &genapi.PlayerOptions_ElementalShaman{
-	ElementalShaman: &genapi.ElementalShaman{
-		Agent: &genapi.ElementalShaman_ElementalShamanAgent{
-			Type: genapi.ElementalShaman_ElementalShamanAgent_Adaptive,
+var basicSpec = &api.PlayerOptions_ElementalShaman{
+	ElementalShaman: &api.ElementalShaman{
+		Agent: &api.ElementalShaman_ElementalShamanAgent{
+			Type: api.ElementalShaman_ElementalShamanAgent_Adaptive,
 		},
-		Talents: &genapi.ShamanTalents{
+		Talents: &api.ShamanTalents{
 			// ElementalDevastation
 			ElementalFury:      true,
 			Convection:         5,
@@ -25,13 +25,13 @@ var basicSpec = &genapi.PlayerOptions_ElementalShaman{
 			ElementalMastery:   true,
 			LightningOverload:  5,
 		},
-		Options: &genapi.ElementalShaman_ElementalShamanOptions{
+		Options: &api.ElementalShaman_ElementalShamanOptions{
 			WaterShield: true,
 		},
 	},
 }
 
-var basicConsumes = &genapi.Consumes{
+var basicConsumes = &api.Consumes{
 	FlaskOfBlindingLight: true,
 	BlackenedBasilisk:    true,
 	BrilliantWizardOil:   true,
@@ -39,18 +39,18 @@ var basicConsumes = &genapi.Consumes{
 	DarkRune:             true,
 }
 
-var basicBuffs = &genapi.Buffs{
+var basicBuffs = &api.Buffs{
 	ArcaneBrilliance: true,
 	BlessingOfKings:  true,
 	Bloodlust:        1,
-	MoonkinAura:      genapi.TristateEffect_TristateEffectRegular,
-	ManaSpringTotem:  genapi.TristateEffect_TristateEffectRegular,
+	MoonkinAura:      api.TristateEffect_TristateEffectRegular,
+	ManaSpringTotem:  api.TristateEffect_TristateEffectRegular,
 	TotemOfWrath:     1,
-	WrathOfAirTotem:  genapi.TristateEffect_TristateEffectRegular,
+	WrathOfAirTotem:  api.TristateEffect_TristateEffectRegular,
 }
 
-var p1Equip = &genapi.EquipmentSpec{
-	Items: []*genapi.ItemSpec{
+var p1Equip = &api.EquipmentSpec{
+	Items: []*api.ItemSpec{
 		{Id: 29035, Gems: []int32{34220, 24059}, Enchant: 29191},
 		{Id: 28762},
 		{Id: 29037, Gems: []int32{24059, 24059}, Enchant: 28909},
@@ -76,17 +76,17 @@ var p1Equip = &genapi.EquipmentSpec{
 //  It might be worth adding more features to ensure they all convert properly though!
 //  Perhaps instead of running a real sim we just test that the output objects from the conversion functions work properly.
 func TestIndividualSim(t *testing.T) {
-	req := &genapi.IndividualSimRequest{
-		Player: &genapi.Player{
-			Options: &genapi.PlayerOptions{
-				Race:     genapi.Race_RaceTroll10,
+	req := &api.IndividualSimRequest{
+		Player: &api.Player{
+			Options: &api.PlayerOptions{
+				Race:     api.Race_RaceTroll10,
 				Spec:     basicSpec,
 				Consumes: basicConsumes,
 			},
 			Equipment: p1Equip,
 		},
 		Buffs: basicBuffs,
-		Encounter: &genapi.Encounter{
+		Encounter: &api.Encounter{
 			Duration:   120,
 			NumTargets: 1,
 		},
@@ -102,7 +102,7 @@ func TestIndividualSim(t *testing.T) {
 }
 
 func TestGearList(t *testing.T) {
-	glr := &genapi.GearListRequest{Spec: genapi.Spec_SpecElementalShaman}
+	glr := &api.GearListRequest{Spec: api.Spec_SpecElementalShaman}
 	res := GetGearList(glr)
 
 	// Print first item
@@ -110,10 +110,10 @@ func TestGearList(t *testing.T) {
 }
 
 func TestComputeStat(t *testing.T) {
-	req := &genapi.ComputeStatsRequest{
-		Player: &genapi.Player{
-			Options: &genapi.PlayerOptions{
-				Race:     genapi.Race_RaceTroll10,
+	req := &api.ComputeStatsRequest{
+		Player: &api.Player{
+			Options: &api.PlayerOptions{
+				Race:     api.Race_RaceTroll10,
 				Spec:     basicSpec,
 				Consumes: basicConsumes,
 			},

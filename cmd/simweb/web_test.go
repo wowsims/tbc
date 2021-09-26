@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/wowsims/tbc/api"
+	"github.com/wowsims/tbc/sim/api"
 	"google.golang.org/protobuf/proto"
 )
 
