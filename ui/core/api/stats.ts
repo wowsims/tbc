@@ -18,6 +18,11 @@ export class Stats {
 		if (this.stats.length < STATS_LEN) {
 			this.stats = this.stats.concat(new Array(STATS_LEN - (stats?.length || 0)).fill(0));
 		}
+
+		for (let i = 0; i < STATS_LEN; i++) {
+			if (this.stats[i] == null)
+				this.stats[i] = 0;
+		}
   }
 
   equals(other: Stats): boolean {
@@ -34,6 +39,14 @@ export class Stats {
     return new Stats(newStats);
   }
 
+	computeEP(epWeights: Stats): number {
+		let total = 0;
+		this.stats.forEach((stat, idx) => {
+			total += stat * epWeights.stats[idx];
+		});
+		return total;
+	}
+
   asArray(): Array<number> {
     return this.stats.slice();
   }
@@ -45,4 +58,13 @@ export class Stats {
   static fromJson(obj: any): Stats {
     return new Stats(obj as Array<number>);
   }
+
+	static fromMap(statsMap: Partial<Record<Stat, number>>): Stats {
+		const statsArr = new Array(STATS_LEN).fill(0);
+		Object.entries(statsMap).forEach(entry => {
+			const [statStr, value] = entry;
+			statsArr[Number(statStr)] = value;
+		});
+		return new Stats(statsArr);
+	}
 }

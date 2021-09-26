@@ -5,9 +5,6 @@ import { ItemQuality } from '../api/common';
 import { ItemSlot } from '../api/common';
 import { enchantDescriptions } from '../api/names';
 import { slotNames } from '../api/names';
-import { gemEligibleForSocket } from '../api/utils';
-import { getEligibleEnchantSlots } from '../api/utils';
-import { getEligibleItemSlots } from '../api/utils';
 import { getEmptyGemSocketIconUrl } from '../resources';
 import { getEmptySlotIconUrl } from '../resources';
 import { getIconUrl } from '../resources';
@@ -101,9 +98,9 @@ class ItemPicker extends Component {
     this.socketsContainerElem = this.rootElem.getElementsByClassName('item-picker-sockets-container')[0] as HTMLElement;
 
     this.item = null;
-    sim.gearListEmitter.on(gearListResult => {
-      this._items = gearListResult.items.filter(item => getEligibleItemSlots(item).includes(this.slot));
-      this._enchants = gearListResult.enchants.filter(enchant => getEligibleEnchantSlots(enchant).includes(this.slot));
+    sim.gearListEmitter.on(() => {
+      this._items = this.sim.getItems(this.slot);
+      this._enchants = this.sim.getEnchants(this.slot);
 
       this.iconElem.addEventListener('click', event => {
         selectorModal.setData(this.slot, this._equippedItem, this._items, this._enchants);
@@ -207,6 +204,7 @@ class SelectorModal extends Component {
         slot,
         equippedItem,
         eligibleItems,
+				item => this.sim.computeItemEP(item),
         equippedItem => equippedItem?.item.id || 0,
         item => {
           return {
@@ -232,6 +230,7 @@ class SelectorModal extends Component {
         slot,
         equippedItem,
         eligibleEnchants,
+				enchant => this.sim.computeEnchantEP(enchant),
         equippedItem => equippedItem?.enchant?.id || 0,
         enchant => {
           return {
@@ -260,7 +259,8 @@ class SelectorModal extends Component {
           'Gem ' + (socketIdx + 1),
           slot,
           equippedItem,
-          this.sim.getGems().filter(gem => gemEligibleForSocket(gem, socketColor)),
+          this.sim.getGems(socketColor),
+					gem => this.sim.computeGemEP(gem),
           equippedItem => equippedItem?.gems[socketIdx]?.id || 0,
           gem => {
             return {
@@ -293,6 +293,7 @@ class SelectorModal extends Component {
         slot: ItemSlot,
         equippedItem: EquippedItem | null,
         items: Array<T>,
+				computeEP: (item: T) => number,
         equippedToIdFn: (equippedItem: EquippedItem | null) => number,
         getItemData: (item: T) => {
           id: number,
@@ -304,6 +305,8 @@ class SelectorModal extends Component {
     if (items.length == 0) {
       return;
     }
+
+		items.sort((itemA, itemB) => computeEP(itemB) - computeEP(itemA));
 
     const tabElem = document.createElement('li');
     this.tabsElem.insertBefore(tabElem, this.tabsElem.lastChild);

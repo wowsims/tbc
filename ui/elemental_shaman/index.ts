@@ -8,6 +8,7 @@ import { ItemSpec } from '../core/api/common';
 import { Spec } from '../core/api/common';
 import { Stat } from '../core/api/common';
 import { TristateEffect } from '../core/api/common'
+import { Stats } from '../core/api/stats';
 import { Sim } from '../core/sim';
 import { DefaultTheme } from '../core/themes/default';
 
@@ -127,6 +128,13 @@ const theme = new DefaultTheme<Spec.SpecElementalShaman>(document.body, {
   showTargetArmor: false,
   showNumTargets: true,
   defaults: {
+		epWeights: Stats.fromMap({
+			[Stat.StatIntellect]: 0.41,
+			[Stat.StatSpellPower]: 1,
+			[Stat.StatSpellCrit]: 0.88,
+			[Stat.StatSpellHaste]: 1.21,
+			[Stat.StatMP5]: 0.37,
+		}),
     encounter: Encounter.create({
       duration: 300,
       numTargets: 1,

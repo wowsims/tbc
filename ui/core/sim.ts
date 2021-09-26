@@ -26,6 +26,9 @@ import { SpecOptions } from './api/utils';
 import { specToClass } from './api/utils';
 import { specToEligibleRaces } from './api/utils';
 import { getEligibleItemSlots } from './api/utils';
+import { getEligibleEnchantSlots } from './api/utils';
+import { gemEligibleForSocket } from './api/utils';
+import { gemMatchesSocket } from './api/utils';
 
 import { Player } from './api/api';
 import { PlayerOptions } from './api/api';
@@ -44,6 +47,7 @@ export interface SimConfig<SpecType extends Spec> {
   epStats: Array<Stat>;
   epReferenceStat: Stat;
   defaults: {
+		epWeights: Stats,
     encounter: Encounter,
     buffs: Buffs,
     consumes: Consumes,
@@ -72,7 +76,7 @@ export class Sim<SpecType extends Spec> extends WorkerPool {
   // Emits when any of the above emitters emit.
   readonly changeEmitter = new TypedEvent<void>();
 
-  readonly gearListEmitter = new TypedEvent<GearListResult>();
+  readonly gearListEmitter = new TypedEvent<void>();
 
   // Database
   private _items: Record<number, Item> = {};
@@ -90,6 +94,7 @@ export class Sim<SpecType extends Spec> extends WorkerPool {
   private _talents: SpecTalents<SpecType>;
   private _talentsString: string;
   private _specOptions: SpecOptions<SpecType>;
+	private _epWeights: Stats;
 
   readonly specTypeFunctions: SpecTypeFunctions<SpecType>;
 
@@ -111,6 +116,7 @@ export class Sim<SpecType extends Spec> extends WorkerPool {
     this._agent = config.defaults.agent;
     this._talents = this.specTypeFunctions.talentsCreate();
     this._talentsString = config.defaults.talents;
+		this._epWeights = config.defaults.epWeights;
     this._specOptions = config.defaults.specOptions;
 
     [
@@ -140,12 +146,43 @@ export class Sim<SpecType extends Spec> extends WorkerPool {
     result.enchants.forEach(enchant => this._enchants[enchant.id] = enchant);
     result.gems.forEach(gem => this._gems[gem.id] = gem);
 
-    this.gearListEmitter.emit(result);
+    this.gearListEmitter.emit();
   }
 
-  getGems(): Array<Gem> {
-    return Object.values(this._gems);
+  async statWeights(request: StatWeightsRequest): Promise<StatWeightsResult> {
+		const result = await super.statWeights(request);
+		this._epWeights = new Stats(result.epValues);
+		console.log('updating weights');
+		return result;
+	}
+
+	getItems(slot: ItemSlot | undefined): Array<Item> {
+		let items = Object.values(this._items);
+		if (slot != undefined) {
+			items = items.filter(item => getEligibleItemSlots(item).includes(slot));
+		}
+		return items;
+	}
+
+	getEnchants(slot: ItemSlot | undefined): Array<Enchant> {
+		let enchants = Object.values(this._enchants);
+		if (slot != undefined) {
+			enchants = enchants.filter(enchant => getEligibleEnchantSlots(enchant).includes(slot));
+		}
+		return enchants;
+	}
+
+  getGems(socketColor: GemColor | undefined): Array<Gem> {
+    let gems = Object.values(this._gems);
+		if (socketColor) {
+			gems = gems.filter(gem => gemEligibleForSocket(gem, socketColor));
+		}
+		return gems;
   }
+
+	getMatchingGems(socketColor: GemColor): Array<Gem> {
+    return Object.values(this._gems).filter(gem => gemMatchesSocket(gem, socketColor));
+	}
   
   getRace() {
     return this._race;
@@ -317,6 +354,37 @@ export class Sim<SpecType extends Spec> extends WorkerPool {
 
     return new Gear(gearMap);
   }
+
+	computeGemEP(gem: Gem): number {
+		return new Stats(gem.stats).computeEP(this._epWeights);
+	}
+
+	computeEnchantEP(enchant: Enchant): number {
+		return new Stats(enchant.stats).computeEP(this._epWeights);
+	}
+
+	computeItemEP(item: Item): number {
+		if (item == null)
+			return 0;
+
+		let ep = new Stats(item.stats).computeEP(this._epWeights);
+
+		const slot = getEligibleItemSlots(item)[0];
+		const enchants = this.getEnchants(slot);
+		if (enchants.length > 0) {
+			ep += Math.max(...enchants.map(enchant => this.computeEnchantEP(enchant)));
+		}
+
+		item.gemSockets.forEach(socketColor => {
+			const gems = this.getGems(socketColor);
+			if (gems.length > 0) {
+				ep += Math.max(...gems.map(gem => this.computeGemEP(gem)));
+			}
+		});
+
+		console.log(item.name + ': ' + ep);
+		return ep;
+	}
 
   makeCurrentIndividualSimRequest(iterations: number, debug: boolean): IndividualSimRequest {
     return makeIndividualSimRequest(
