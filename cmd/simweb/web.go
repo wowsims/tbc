@@ -105,6 +105,15 @@ func main() {
 	}
 }
 
+// type apiHandler struct {
+// 	msg    func() proto.Message
+// 	handle func(proto.Message)
+// }
+
+// var handlers = map[string]apiHandler{
+// 	"/individualSim": {msg: func() proto.Message}
+// }
+
 func handleAPI(w http.ResponseWriter, r *http.Request) {
 	endpoint := r.URL.Path
 

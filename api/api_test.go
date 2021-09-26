@@ -109,3 +109,19 @@ func TestGearList(t *testing.T) {
 	// Print first item
 	log.Printf("GEAR: %#v", res.Items[0])
 }
+
+func TestComputeStat(t *testing.T) {
+	req := &ComputeStatsRequest{
+		Player: &Player{
+			Options: &PlayerOptions{
+				Race:     Race_RaceTroll10,
+				Spec:     basicSpec,
+				Consumes: basicConsumes,
+			},
+			Equipment: p1Equip,
+		},
+		Buffs: basicBuffs,
+	}
+
+	ComputeStats(req)
+}

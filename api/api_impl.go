@@ -98,16 +98,18 @@ func statWeightsImpl(request *StatWeightsRequest) *StatWeightsResult {
 
 func convertSimParams(request *IndividualSimRequest) runner.IndividualParams {
 	options := core.Options{
-		Encounter: core.Encounter{
-			Duration:   request.Encounter.Duration,
-			NumTargets: int(request.Encounter.NumTargets),
-			Armor:      request.Encounter.TargetArmor,
-		},
 		Iterations: int(request.Iterations),
 		RSeed:      request.RandomSeed,
 		ExitOnOOM:  request.ExitOnOom,
 		GCDMin:     time.Duration(request.GcdMin),
 		Debug:      request.Debug,
+	}
+	if request.Encounter != nil {
+		options.Encounter = core.Encounter{
+			Duration:   request.Encounter.Duration,
+			NumTargets: int(request.Encounter.NumTargets),
+			Armor:      request.Encounter.TargetArmor,
+		}
 	}
 
 	params := runner.IndividualParams{
