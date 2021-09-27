@@ -35,8 +35,8 @@ export class CharacterStats extends Component {
     });
 
 		this.updateStats(new Stats());
-		sim.characterStatsEmitter.on(computeStatsResult => {
-			this.updateStats(new Stats(computeStatsResult.finalStats));
+		sim.characterStatsEmitter.on(() => {
+			this.updateStats(new Stats(sim.getCurrentStats().finalStats));
 		});
   }
 
@@ -50,9 +50,9 @@ export class CharacterStats extends Component {
 			} else if (stat == Stat.StatSpellHit) {
 				displayStr += ` (${(rawValue / 12.6).toFixed(2)}%)`;
 			} else if (stat == Stat.StatMeleeCrit || stat == Stat.StatSpellCrit) {
-				displayStr += ` (${(rawValue / 22.1).toFixed(2)}%)`;
+				displayStr += ` (${(rawValue / 22.08).toFixed(2)}%)`;
 			} else if (stat == Stat.StatMeleeHaste || stat == Stat.StatSpellHaste) {
-				displayStr += ` (${(rawValue / 15.8).toFixed(2)}%)`;
+				displayStr += ` (${(rawValue / 15.76).toFixed(2)}%)`;
 			}
 
 			this.valueElems[idx].textContent = displayStr;

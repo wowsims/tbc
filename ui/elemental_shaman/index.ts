@@ -370,5 +370,13 @@ const theme = new DefaultTheme<Spec.SpecElementalShaman>(document.body, {
       },
     ],
   },
+	metaGemEffectEP: (gem, sim) => {
+		if (gem.id == Gems.CHAOTIC_SKYFIRE_DIAMOND) {
+			const finalStats = new Stats(sim.getCurrentStats().finalStats);
+			return (((finalStats.getStat(Stat.StatSpellPower) * 0.795) + 603) * 2 * (finalStats.getStat(Stat.StatSpellCrit) / 2208) * 0.045) / 0.795;
+		}
+
+		return 0;
+	},
 });
 theme.init();

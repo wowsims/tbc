@@ -57,6 +57,7 @@ export interface SimConfig<SpecType extends Spec> {
     talents: string,
     specOptions: SpecOptions<SpecType>,
   },
+	metaGemEffectEP?: ((gem: Gem, sim: Sim<SpecType>) => number),
 }
 
 // Core Sim module which deals only with api types, no UI-related stuff.
@@ -80,7 +81,8 @@ export class Sim<SpecType extends Spec> extends WorkerPool {
   readonly changeEmitter = new TypedEvent<void>();
 
   readonly gearListEmitter = new TypedEvent<void>();
-  readonly characterStatsEmitter = new TypedEvent<ComputeStatsResult>();
+  readonly characterStatsEmitter = new TypedEvent<void>();
+	private _currentStats: ComputeStatsResult;
 
   // Database
   private _items: Record<number, Item> = {};
@@ -102,6 +104,7 @@ export class Sim<SpecType extends Spec> extends WorkerPool {
 	private _epWeights: Stats;
 
   readonly specTypeFunctions: SpecTypeFunctions<SpecType>;
+	private readonly _metaGemEffectEP: (gem: Gem, sim: Sim<SpecType>) => number;
 
   private _init = false;
 
@@ -112,6 +115,7 @@ export class Sim<SpecType extends Spec> extends WorkerPool {
     this._race = specToEligibleRaces[this.spec][0];
 
     this.specTypeFunctions = specTypeFunctions[this.spec] as SpecTypeFunctions<SpecType>;
+		this._metaGemEffectEP = config.metaGemEffectEP || (() => 0);
 
 		this._phase = config.defaults.phase;
     this._buffs = config.defaults.buffs;
@@ -138,6 +142,7 @@ export class Sim<SpecType extends Spec> extends WorkerPool {
       this.specOptionsChangeEmitter,
     ].forEach(emitter => emitter.on(() => this.changeEmitter.emit()));
 
+		this._currentStats = ComputeStatsResult.create();
 		this.changeEmitter.on(() => {
 			this.updateCharacterStats();
 		});
@@ -178,7 +183,12 @@ export class Sim<SpecType extends Spec> extends WorkerPool {
       this._talents,
       this._specOptions));
 
-		this.characterStatsEmitter.emit(computeStatsResult);
+		this._currentStats = computeStatsResult;
+		this.characterStatsEmitter.emit();
+	}
+
+	getCurrentStats(): ComputeStatsResult {
+		return ComputeStatsResult.clone(this._currentStats);
 	}
 
 	getItems(slot: ItemSlot | undefined): Array<Item> {
@@ -391,7 +401,9 @@ export class Sim<SpecType extends Spec> extends WorkerPool {
   }
 
 	computeGemEP(gem: Gem): number {
-		return new Stats(gem.stats).computeEP(this._epWeights);
+		const epFromStats = new Stats(gem.stats).computeEP(this._epWeights);
+		const epFromEffect = this._metaGemEffectEP(gem, this);
+		return epFromStats + epFromEffect;
 	}
 
 	computeEnchantEP(enchant: Enchant): number {
@@ -417,7 +429,6 @@ export class Sim<SpecType extends Spec> extends WorkerPool {
 			}
 		});
 
-		console.log(item.name + ': ' + ep);
 		return ep;
 	}
 
