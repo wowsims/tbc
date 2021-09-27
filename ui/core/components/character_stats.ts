@@ -46,13 +46,13 @@ export class CharacterStats extends Component {
 			let displayStr = String(Math.round(rawValue));
 
 			if (stat == Stat.StatMeleeHit) {
-				displayStr += ` (${(rawValue / 15.8).toFixed()}%)`;
+				displayStr += ` (${(rawValue / 15.8).toFixed(2)}%)`;
 			} else if (stat == Stat.StatSpellHit) {
-				displayStr += ` (${(rawValue / 12.6).toFixed()}%)`;
+				displayStr += ` (${(rawValue / 12.6).toFixed(2)}%)`;
 			} else if (stat == Stat.StatMeleeCrit || stat == Stat.StatSpellCrit) {
-				displayStr += ` (${(rawValue / 22.1).toFixed()}%)`;
+				displayStr += ` (${(rawValue / 22.1).toFixed(2)}%)`;
 			} else if (stat == Stat.StatMeleeHaste || stat == Stat.StatSpellHaste) {
-				displayStr += ` (${(rawValue / 15.8).toFixed()}%)`;
+				displayStr += ` (${(rawValue / 15.8).toFixed(2)}%)`;
 			}
 
 			this.valueElems[idx].textContent = displayStr;
