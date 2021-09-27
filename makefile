@@ -56,25 +56,22 @@ wasm: dist/lib.wasm
 dist/sim_worker.js: ui/worker/sim_worker.js
 	cp ui/worker/sim_worker.js dist
 
-dist/lib.wasm: cmd/simwasm/* api/*.go $(call rwildcard,sim,*.go)
+dist/lib.wasm: cmd/simwasm/* sim/api/*.go $(call rwildcard,sim,*.go)
 	GOOS=js GOARCH=wasm go build -o ./dist/lib.wasm ./cmd/simwasm/
 
 # Just builds the server binary
-simweb: api/api.pb.go
+simweb: sim/api/api.pb.go
 	go build -o simweb ./cmd/simweb/web.go
 
 # Starts up a webserver hosting the dist/ and API endpoints.
-runweb: api/api.pb.go
+runweb: sim/api/api.pb.go
 	go run ./cmd/simweb/web.go
 
-api/api.pb.go: api/*.proto
+sim/api/api.pb.go: api/*.proto
 	protoc -I=./api --go_out=./sim ./api/*.proto
 
 .PHONY: items
 items: $(itemsOutDir)/all.go
 
-$(itemsOutDir)/all.go: generate_items/*.go generate_items/api/api.go
+$(itemsOutDir)/all.go: generate_items/*.go $(call rwildcard,sim/api,*.go)
 	go run generate_items/*.go -outDir=$(itemsOutDir)
-
-generate_items/api/api.go: api/*.proto
-	protoc -I api/ --go_out=generate_items/ api/*.proto

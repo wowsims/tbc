@@ -11,7 +11,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/wowsims/tbc/generate_items/api"
+	"github.com/wowsims/tbc/sim/api"
 )
 
 type Stats [28]float64

@@ -42,7 +42,20 @@ export class CharacterStats extends Component {
 
 	private updateStats(newStats: Stats) {
 		this.stats.forEach((stat, idx) => {
-			this.valueElems[idx].textContent = String(Math.round(newStats.getStat(stat)));
+			const rawValue = newStats.getStat(stat);
+			let displayStr = String(Math.round(rawValue));
+
+			if (stat == Stat.StatMeleeHit) {
+				displayStr += ` (${(rawValue / 15.8).toFixed()}%)`;
+			} else if (stat == Stat.StatSpellHit) {
+				displayStr += ` (${(rawValue / 12.6).toFixed()}%)`;
+			} else if (stat == Stat.StatMeleeCrit || stat == Stat.StatSpellCrit) {
+				displayStr += ` (${(rawValue / 22.1).toFixed()}%)`;
+			} else if (stat == Stat.StatMeleeHaste || stat == Stat.StatSpellHaste) {
+				displayStr += ` (${(rawValue / 15.8).toFixed()}%)`;
+			}
+
+			this.valueElems[idx].textContent = displayStr;
 		});
 	}
 }

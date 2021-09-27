@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/wowsims/tbc/generate_items/api"
+	"github.com/wowsims/tbc/sim/api"
 )
 
 type ItemDeclaration struct {
