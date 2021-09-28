@@ -1,8 +1,8 @@
-import { WireType } from '/protobuf-ts/index.js';
-import { UnknownFieldHandler } from '/protobuf-ts/index.js';
-import { reflectionMergePartial } from '/protobuf-ts/index.js';
-import { MESSAGE_TYPE } from '/protobuf-ts/index.js';
-import { MessageType } from '/protobuf-ts/index.js';
+import { WireType } from '/tbc/protobuf-ts/index.js';
+import { UnknownFieldHandler } from '/tbc/protobuf-ts/index.js';
+import { reflectionMergePartial } from '/tbc/protobuf-ts/index.js';
+import { MESSAGE_TYPE } from '/tbc/protobuf-ts/index.js';
+import { MessageType } from '/tbc/protobuf-ts/index.js';
 /**
  * @generated from protobuf enum api.ElementalShaman.ElementalShamanAgent.AgentType
  */
