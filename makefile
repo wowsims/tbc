@@ -59,7 +59,7 @@ wasm: docs/lib.wasm
 docs/sim_worker.js: ui/worker/sim_worker.js
 	cp ui/worker/sim_worker.js docs
 
-docs/lib.wasm: cmd/simwasm/* sim/api/*.go $(call rwildcard,sim,*.go)
+docs/lib.wasm: cmd/simwasm/* sim/api/api.pb.go $(call rwildcard,sim,*.go)
 	GOOS=js GOARCH=wasm go build -o ./docs/lib.wasm ./cmd/simwasm/
 
 # Just builds the server binary
