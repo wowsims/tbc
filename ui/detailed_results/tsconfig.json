@@ -2,7 +2,7 @@
   "extends": "../../tsconfig-base",
   "compilerOptions": {
     "declaration": false,
-    "outDir": "../../docs/detailed_results",
+    "outDir": "../../dist/detailed_results",
   },
   "include": [
     "**/*.ts",

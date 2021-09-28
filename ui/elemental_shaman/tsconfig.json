@@ -2,7 +2,7 @@
   "extends": "../../tsconfig-base",
   "compilerOptions": {
     "declaration": false,
-    "outDir": "../../docs/elemental_shaman",
+    "outDir": "../../dist/elemental_shaman",
   },
   "include": [
     "**/*.ts",
