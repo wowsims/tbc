@@ -7,15 +7,17 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Install Protoc
-        uses: arduino/setup-protoc@v1
-        with:
-          version: 3.x
-
       - name: Install Go
         uses: actions/setup-go@v2
         with:
           go-version: 1.16.x
+
+      - name: Install Protoc
+        uses: arduino/setup-protoc@v1
+        with:
+          version: 3.x
+        run: |
+          go get -u -v github.com/golang/protobuf/protoc-gen-go
 
       - name: Install Node
         uses: actions/setup-node@v2
