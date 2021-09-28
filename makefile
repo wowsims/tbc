@@ -27,11 +27,14 @@ ui/core/api/api.ts: api/*.proto
 	cp -r node_modules/@protobuf-ts/runtime/build/es2015/* docs/protobuf-ts
 	sed -i -E "s/from '(.*)';/from '\1\.js';/g" docs/protobuf-ts/*
 	sed -i -E "s/from \"(.*)\";/from '\1\.js';/g" docs/protobuf-ts/*
+	# This is needed for local hosting, since github pages serves under the 'tbc' directory.
+	mkdir -p docs/tbc/protobuf-ts
+	cp -r docs/protobuf-ts docs/tbc/protobuf-ts
 	npx protoc --ts_opt generate_dependencies --ts_out ui/core/api --proto_path api api/api.proto
 
 docs/core/tsconfig.tsbuildinfo: $(call rwildcard,ui/core,*.ts) ui/core/api/api.ts
 	npx tsc -p ui/core
-	sed -i 's/@protobuf-ts\/runtime/\/protobuf-ts\/index/g' docs/core/api/*.js
+	sed -i 's/@protobuf-ts\/runtime/\/tbc\/protobuf-ts\/index/g' docs/core/api/*.js
 	sed -i -E "s/from \"(.*?)(\.js)?\";/from '\1\.js';/g" docs/core/api/*.js
 
 # Generic rule for building index.js for any class directory
