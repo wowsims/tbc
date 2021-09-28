@@ -123,9 +123,14 @@
 }
 
 .selector-modal-list-item-ep {
-	margin: 10px;
 	font-size: 16px;
 	font-weight: 800;
+}
+
+.selector-modal-list-item-ep > span {
+	display: inline-block;
+	width: 30px;
+	margin: 5px;
 }
 
 .selector-modal-list-item-ep-delta.positive {

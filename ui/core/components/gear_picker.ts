@@ -365,8 +365,8 @@ class SelectorModal extends Component {
         <a class="selector-modal-list-item-name">${itemData.name}</a>
         <div class="selector-modal-list-item-padding"></div>
         <div class="selector-modal-list-item-ep">
-					<span class="selector-modal-list-item-ep-value">${Math.round(itemEP)}<span>
-					<span class="selector-modal-list-item-ep-delta"><span>
+					<span class="selector-modal-list-item-ep-value">${Math.round(itemEP)}</span>
+					<span class="selector-modal-list-item-ep-delta"></span>
 				</div>
       `;
       setWowheadHref(listItemElem.children[0] as HTMLAnchorElement, {itemId: itemData.id});
