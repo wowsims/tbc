@@ -5,65 +5,65 @@ rwildcard=$(foreach d,$(wildcard $(1:=/*)),$(call rwildcard,$d,$2) $(filter $(su
 itemsOutDir=items
 
 # Make everything. Keep this first so it's the default rule.
-dist: elemental_shaman dist/lib.wasm dist/sim_worker.js
+docs: elemental_shaman docs/lib.wasm docs/sim_worker.js
 
-elemental_shaman: dist/elemental_shaman/index.js dist/elemental_shaman/index.css dist/elemental_shaman/index.html detailed_results
+elemental_shaman: docs/elemental_shaman/index.js docs/elemental_shaman/index.css docs/elemental_shaman/index.html detailed_results
 
-detailed_results: dist/detailed_results/index.js dist/detailed_results/index.css dist/detailed_results/index.html
+detailed_results: docs/detailed_results/index.js docs/detailed_results/index.css docs/detailed_results/index.html
 
 clean:
 	rm -f ui/core/api/api.ts
 	rm -f ui/core/api/common.ts
 	rm -f ui/core/api/druid.ts
 	rm -f ui/core/api/shaman.ts
-	rm -rf dist
+	rm -rf docs
 
 # Host a local server, for dev testing
-host: dist
-	npx http-server dist
+host: docs
+	npx http-server docs
 
 ui/core/api/api.ts: api/*.proto
-	mkdir -p dist/protobuf-ts
-	cp -r node_modules/@protobuf-ts/runtime/build/es2015/* dist/protobuf-ts
-	sed -i -E "s/from '(.*)';/from '\1\.js';/g" dist/protobuf-ts/*
-	sed -i -E "s/from \"(.*)\";/from '\1\.js';/g" dist/protobuf-ts/*
+	mkdir -p docs/protobuf-ts
+	cp -r node_modules/@protobuf-ts/runtime/build/es2015/* docs/protobuf-ts
+	sed -i -E "s/from '(.*)';/from '\1\.js';/g" docs/protobuf-ts/*
+	sed -i -E "s/from \"(.*)\";/from '\1\.js';/g" docs/protobuf-ts/*
 	npx protoc --ts_opt generate_dependencies --ts_out ui/core/api --proto_path api api/api.proto
 
-dist/core/tsconfig.tsbuildinfo: $(call rwildcard,ui/core,*.ts) ui/core/api/api.ts
+docs/core/tsconfig.tsbuildinfo: $(call rwildcard,ui/core,*.ts) ui/core/api/api.ts
 	npx tsc -p ui/core
-	sed -i 's/@protobuf-ts\/runtime/\/protobuf-ts\/index/g' dist/core/api/*.js
-	sed -i -E "s/from \"(.*?)(\.js)?\";/from '\1\.js';/g" dist/core/api/*.js
+	sed -i 's/@protobuf-ts\/runtime/\/protobuf-ts\/index/g' docs/core/api/*.js
+	sed -i -E "s/from \"(.*?)(\.js)?\";/from '\1\.js';/g" docs/core/api/*.js
 
 # Generic rule for building index.js for any class directory
-dist/%/index.js: ui/%/index.ts ui/%/*.ts dist/core/tsconfig.tsbuildinfo
+docs/%/index.js: ui/%/index.ts ui/%/*.ts docs/core/tsconfig.tsbuildinfo
 	npx tsc -p $(<D) 
 
 # Generic rule for building index.css for any class directory
-dist/%/index.css: ui/%/index.scss ui/%/*.scss $(call rwildcard,ui/core,*.scss)
+docs/%/index.css: ui/%/index.scss ui/%/*.scss $(call rwildcard,ui/core,*.scss)
 	mkdir -p $(@D)
 	npx sass $< $@
 
 # Generic rule for building index.html for any class directory
-dist/%/index.html: index_template.html
+docs/%/index.html: index_template.html
 	$(eval title := $(shell echo $(shell basename $(@D)) | sed -r 's/(^|_)([a-z])/\U \2/g' | cut -c 2-))
 	echo $(title)
 	mkdir -p $(@D)
 	cat index_template.html | sed 's/@@TITLE@@/TBC $(title) Simulator/g' > $@
 
 .PHONY: wasm
-wasm: dist/lib.wasm
+wasm: docs/lib.wasm
 
-dist/sim_worker.js: ui/worker/sim_worker.js
-	cp ui/worker/sim_worker.js dist
+docs/sim_worker.js: ui/worker/sim_worker.js
+	cp ui/worker/sim_worker.js docs
 
-dist/lib.wasm: cmd/simwasm/* sim/api/*.go $(call rwildcard,sim,*.go)
-	GOOS=js GOARCH=wasm go build -o ./dist/lib.wasm ./cmd/simwasm/
+docs/lib.wasm: cmd/simwasm/* sim/api/*.go $(call rwildcard,sim,*.go)
+	GOOS=js GOARCH=wasm go build -o ./docs/lib.wasm ./cmd/simwasm/
 
 # Just builds the server binary
 simweb: sim/api/api.pb.go
 	go build -o simweb ./cmd/simweb/web.go
 
-# Starts up a webserver hosting the dist/ and API endpoints.
+# Starts up a webserver hosting the docs/ and API endpoints.
 runweb: sim/api/api.pb.go
 	go run ./cmd/simweb/web.go
 
