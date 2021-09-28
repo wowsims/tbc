@@ -2,7 +2,8 @@ import { ComputeStatsRequest, ComputeStatsResult } from './api/api.js';
 import { GearListRequest, GearListResult } from './api/api.js';
 import { IndividualSimRequest, IndividualSimResult } from './api/api.js';
 import { StatWeightsRequest, StatWeightsResult } from './api/api.js';
-const SIM_WORKER_URL = '/sim_worker.js';
+import { urlPathPrefix } from './resources.js';
+const SIM_WORKER_URL = `${urlPathPrefix}/sim_worker.js`;
 export class WorkerPool {
     constructor(numWorkers) {
         this.workers = [];
