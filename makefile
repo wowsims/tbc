@@ -78,3 +78,6 @@ items: $(itemsOutDir)/all.go
 
 $(itemsOutDir)/all.go: generate_items/*.go $(call rwildcard,sim/api,*.go)
 	go run generate_items/*.go -outDir=$(itemsOutDir)
+
+test: dist/lib.wasm
+	go test ./...

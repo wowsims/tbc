@@ -1,10 +1,10 @@
-name: Build and Deploy
+name: Run Tests
 on:
-  push:
+  pull-request:
     branches:
       - master
 jobs:
-  build-and-deploy:
+  build-and-test:
     runs-on: ubuntu-latest
     steps:
       - name: Install Go
@@ -20,21 +20,8 @@ jobs:
       - name: Install Protoc Go plugin
         run: go get -u -v github.com/golang/protobuf/protoc-gen-go
 
-      - name: Install Node
-        uses: actions/setup-node@v2
-        with:
-          node-version: '14'
-
       - name: Checkout 🛎️
         uses: actions/checkout@v2.3.1
 
       - name: Build 🔧
-        run: |
-          npm install
-          make
-
-      - name: Deploy 🚀
-        uses: JamesIves/github-pages-deploy-action@4.1.5
-        with:
-          branch: gh-pages
-          folder: dist
+        run: make test
