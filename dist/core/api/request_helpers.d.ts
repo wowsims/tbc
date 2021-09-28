@@ -1,0 +1,14 @@
+import { Gear } from './gear.js';
+import { Buffs } from './common.js';
+import { Consumes } from './common.js';
+import { Encounter } from './common.js';
+import { Race } from './common.js';
+import { Spec } from './common.js';
+import { Stats } from './stats.js';
+import { SpecAgent } from './utils.js';
+import { SpecTalents } from './utils.js';
+import { SpecOptions } from './utils.js';
+import { ComputeStatsRequest } from './api.js';
+import { IndividualSimRequest } from './api.js';
+export declare function makeComputeStatsRequest<SpecType extends Spec>(buffs: Buffs, consumes: Consumes, customStats: Stats, encounter: Encounter, gear: Gear, race: Race, agent: SpecAgent<SpecType>, talents: SpecTalents<SpecType>, classOptions: SpecOptions<SpecType>): ComputeStatsRequest;
+export declare function makeIndividualSimRequest<SpecType extends Spec>(buffs: Buffs, consumes: Consumes, customStats: Stats, encounter: Encounter, gear: Gear, race: Race, agent: SpecAgent<SpecType>, talents: SpecTalents<SpecType>, classOptions: SpecOptions<SpecType>, iterations: number, debug: boolean): IndividualSimRequest;

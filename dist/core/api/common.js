@@ -1,0 +1,1475 @@
+import { WireType } from '/protobuf-ts/index.js';
+import { UnknownFieldHandler } from '/protobuf-ts/index.js';
+import { reflectionMergePartial } from '/protobuf-ts/index.js';
+import { MESSAGE_TYPE } from '/protobuf-ts/index.js';
+import { MessageType } from '/protobuf-ts/index.js';
+/**
+ * @generated from protobuf enum api.Race
+ */
+export var Race;
+(function (Race) {
+    /**
+     * @generated from protobuf enum value: RaceUnknown = 0;
+     */
+    Race[Race["RaceUnknown"] = 0] = "RaceUnknown";
+    /**
+     * @generated from protobuf enum value: RaceBloodElf = 1;
+     */
+    Race[Race["RaceBloodElf"] = 1] = "RaceBloodElf";
+    /**
+     * @generated from protobuf enum value: RaceDraenei = 2;
+     */
+    Race[Race["RaceDraenei"] = 2] = "RaceDraenei";
+    /**
+     * @generated from protobuf enum value: RaceDwarf = 3;
+     */
+    Race[Race["RaceDwarf"] = 3] = "RaceDwarf";
+    /**
+     * @generated from protobuf enum value: RaceGnome = 4;
+     */
+    Race[Race["RaceGnome"] = 4] = "RaceGnome";
+    /**
+     * @generated from protobuf enum value: RaceHuman = 5;
+     */
+    Race[Race["RaceHuman"] = 5] = "RaceHuman";
+    /**
+     * @generated from protobuf enum value: RaceNightElf = 6;
+     */
+    Race[Race["RaceNightElf"] = 6] = "RaceNightElf";
+    /**
+     * @generated from protobuf enum value: RaceOrc = 7;
+     */
+    Race[Race["RaceOrc"] = 7] = "RaceOrc";
+    /**
+     * @generated from protobuf enum value: RaceTauren = 8;
+     */
+    Race[Race["RaceTauren"] = 8] = "RaceTauren";
+    /**
+     * @generated from protobuf enum value: RaceTroll10 = 9;
+     */
+    Race[Race["RaceTroll10"] = 9] = "RaceTroll10";
+    /**
+     * @generated from protobuf enum value: RaceTroll30 = 10;
+     */
+    Race[Race["RaceTroll30"] = 10] = "RaceTroll30";
+    /**
+     * @generated from protobuf enum value: RaceUndead = 11;
+     */
+    Race[Race["RaceUndead"] = 11] = "RaceUndead";
+})(Race || (Race = {}));
+/**
+ * @generated from protobuf enum api.Class
+ */
+export var Class;
+(function (Class) {
+    /**
+     * @generated from protobuf enum value: ClassUnknown = 0;
+     */
+    Class[Class["ClassUnknown"] = 0] = "ClassUnknown";
+    /**
+     * @generated from protobuf enum value: ClassDruid = 1;
+     */
+    Class[Class["ClassDruid"] = 1] = "ClassDruid";
+    /**
+     * @generated from protobuf enum value: ClassHunter = 2;
+     */
+    Class[Class["ClassHunter"] = 2] = "ClassHunter";
+    /**
+     * @generated from protobuf enum value: ClassMage = 3;
+     */
+    Class[Class["ClassMage"] = 3] = "ClassMage";
+    /**
+     * @generated from protobuf enum value: ClassPaladin = 4;
+     */
+    Class[Class["ClassPaladin"] = 4] = "ClassPaladin";
+    /**
+     * @generated from protobuf enum value: ClassPriest = 5;
+     */
+    Class[Class["ClassPriest"] = 5] = "ClassPriest";
+    /**
+     * @generated from protobuf enum value: ClassRogue = 6;
+     */
+    Class[Class["ClassRogue"] = 6] = "ClassRogue";
+    /**
+     * @generated from protobuf enum value: ClassShaman = 7;
+     */
+    Class[Class["ClassShaman"] = 7] = "ClassShaman";
+    /**
+     * @generated from protobuf enum value: ClassWarlock = 8;
+     */
+    Class[Class["ClassWarlock"] = 8] = "ClassWarlock";
+    /**
+     * @generated from protobuf enum value: ClassWarrior = 9;
+     */
+    Class[Class["ClassWarrior"] = 9] = "ClassWarrior";
+})(Class || (Class = {}));
+/**
+ * @generated from protobuf enum api.Spec
+ */
+export var Spec;
+(function (Spec) {
+    /**
+     * @generated from protobuf enum value: SpecBalanceDruid = 0;
+     */
+    Spec[Spec["SpecBalanceDruid"] = 0] = "SpecBalanceDruid";
+    /**
+     * @generated from protobuf enum value: SpecElementalShaman = 1;
+     */
+    Spec[Spec["SpecElementalShaman"] = 1] = "SpecElementalShaman";
+})(Spec || (Spec = {}));
+/**
+ * @generated from protobuf enum api.Stat
+ */
+export var Stat;
+(function (Stat) {
+    /**
+     * @generated from protobuf enum value: StatStrength = 0;
+     */
+    Stat[Stat["StatStrength"] = 0] = "StatStrength";
+    /**
+     * @generated from protobuf enum value: StatAgility = 1;
+     */
+    Stat[Stat["StatAgility"] = 1] = "StatAgility";
+    /**
+     * @generated from protobuf enum value: StatStamina = 2;
+     */
+    Stat[Stat["StatStamina"] = 2] = "StatStamina";
+    /**
+     * @generated from protobuf enum value: StatIntellect = 3;
+     */
+    Stat[Stat["StatIntellect"] = 3] = "StatIntellect";
+    /**
+     * @generated from protobuf enum value: StatSpirit = 4;
+     */
+    Stat[Stat["StatSpirit"] = 4] = "StatSpirit";
+    /**
+     * @generated from protobuf enum value: StatSpellPower = 5;
+     */
+    Stat[Stat["StatSpellPower"] = 5] = "StatSpellPower";
+    /**
+     * @generated from protobuf enum value: StatHealingPower = 6;
+     */
+    Stat[Stat["StatHealingPower"] = 6] = "StatHealingPower";
+    /**
+     * @generated from protobuf enum value: StatArcaneSpellPower = 7;
+     */
+    Stat[Stat["StatArcaneSpellPower"] = 7] = "StatArcaneSpellPower";
+    /**
+     * @generated from protobuf enum value: StatFireSpellPower = 8;
+     */
+    Stat[Stat["StatFireSpellPower"] = 8] = "StatFireSpellPower";
+    /**
+     * @generated from protobuf enum value: StatFrostSpellPower = 9;
+     */
+    Stat[Stat["StatFrostSpellPower"] = 9] = "StatFrostSpellPower";
+    /**
+     * @generated from protobuf enum value: StatHolySpellPower = 10;
+     */
+    Stat[Stat["StatHolySpellPower"] = 10] = "StatHolySpellPower";
+    /**
+     * @generated from protobuf enum value: StatNatureSpellPower = 11;
+     */
+    Stat[Stat["StatNatureSpellPower"] = 11] = "StatNatureSpellPower";
+    /**
+     * @generated from protobuf enum value: StatShadowSpellPower = 12;
+     */
+    Stat[Stat["StatShadowSpellPower"] = 12] = "StatShadowSpellPower";
+    /**
+     * @generated from protobuf enum value: StatMP5 = 13;
+     */
+    Stat[Stat["StatMP5"] = 13] = "StatMP5";
+    /**
+     * @generated from protobuf enum value: StatSpellHit = 14;
+     */
+    Stat[Stat["StatSpellHit"] = 14] = "StatSpellHit";
+    /**
+     * @generated from protobuf enum value: StatSpellCrit = 15;
+     */
+    Stat[Stat["StatSpellCrit"] = 15] = "StatSpellCrit";
+    /**
+     * @generated from protobuf enum value: StatSpellHaste = 16;
+     */
+    Stat[Stat["StatSpellHaste"] = 16] = "StatSpellHaste";
+    /**
+     * @generated from protobuf enum value: StatSpellPenetration = 17;
+     */
+    Stat[Stat["StatSpellPenetration"] = 17] = "StatSpellPenetration";
+    /**
+     * @generated from protobuf enum value: StatAttackPower = 18;
+     */
+    Stat[Stat["StatAttackPower"] = 18] = "StatAttackPower";
+    /**
+     * @generated from protobuf enum value: StatMeleeHit = 19;
+     */
+    Stat[Stat["StatMeleeHit"] = 19] = "StatMeleeHit";
+    /**
+     * @generated from protobuf enum value: StatMeleeCrit = 20;
+     */
+    Stat[Stat["StatMeleeCrit"] = 20] = "StatMeleeCrit";
+    /**
+     * @generated from protobuf enum value: StatMeleeHaste = 21;
+     */
+    Stat[Stat["StatMeleeHaste"] = 21] = "StatMeleeHaste";
+    /**
+     * @generated from protobuf enum value: StatArmorPenetration = 22;
+     */
+    Stat[Stat["StatArmorPenetration"] = 22] = "StatArmorPenetration";
+    /**
+     * @generated from protobuf enum value: StatExpertise = 23;
+     */
+    Stat[Stat["StatExpertise"] = 23] = "StatExpertise";
+    /**
+     * @generated from protobuf enum value: StatMana = 24;
+     */
+    Stat[Stat["StatMana"] = 24] = "StatMana";
+    /**
+     * @generated from protobuf enum value: StatEnergy = 25;
+     */
+    Stat[Stat["StatEnergy"] = 25] = "StatEnergy";
+    /**
+     * @generated from protobuf enum value: StatRage = 26;
+     */
+    Stat[Stat["StatRage"] = 26] = "StatRage";
+    /**
+     * @generated from protobuf enum value: StatArmor = 27;
+     */
+    Stat[Stat["StatArmor"] = 27] = "StatArmor";
+})(Stat || (Stat = {}));
+/**
+ * @generated from protobuf enum api.ItemType
+ */
+export var ItemType;
+(function (ItemType) {
+    /**
+     * @generated from protobuf enum value: ItemTypeUnknown = 0;
+     */
+    ItemType[ItemType["ItemTypeUnknown"] = 0] = "ItemTypeUnknown";
+    /**
+     * @generated from protobuf enum value: ItemTypeHead = 1;
+     */
+    ItemType[ItemType["ItemTypeHead"] = 1] = "ItemTypeHead";
+    /**
+     * @generated from protobuf enum value: ItemTypeNeck = 2;
+     */
+    ItemType[ItemType["ItemTypeNeck"] = 2] = "ItemTypeNeck";
+    /**
+     * @generated from protobuf enum value: ItemTypeShoulder = 3;
+     */
+    ItemType[ItemType["ItemTypeShoulder"] = 3] = "ItemTypeShoulder";
+    /**
+     * @generated from protobuf enum value: ItemTypeBack = 4;
+     */
+    ItemType[ItemType["ItemTypeBack"] = 4] = "ItemTypeBack";
+    /**
+     * @generated from protobuf enum value: ItemTypeChest = 5;
+     */
+    ItemType[ItemType["ItemTypeChest"] = 5] = "ItemTypeChest";
+    /**
+     * @generated from protobuf enum value: ItemTypeWrist = 6;
+     */
+    ItemType[ItemType["ItemTypeWrist"] = 6] = "ItemTypeWrist";
+    /**
+     * @generated from protobuf enum value: ItemTypeHands = 7;
+     */
+    ItemType[ItemType["ItemTypeHands"] = 7] = "ItemTypeHands";
+    /**
+     * @generated from protobuf enum value: ItemTypeWaist = 8;
+     */
+    ItemType[ItemType["ItemTypeWaist"] = 8] = "ItemTypeWaist";
+    /**
+     * @generated from protobuf enum value: ItemTypeLegs = 9;
+     */
+    ItemType[ItemType["ItemTypeLegs"] = 9] = "ItemTypeLegs";
+    /**
+     * @generated from protobuf enum value: ItemTypeFeet = 10;
+     */
+    ItemType[ItemType["ItemTypeFeet"] = 10] = "ItemTypeFeet";
+    /**
+     * @generated from protobuf enum value: ItemTypeFinger = 11;
+     */
+    ItemType[ItemType["ItemTypeFinger"] = 11] = "ItemTypeFinger";
+    /**
+     * @generated from protobuf enum value: ItemTypeTrinket = 12;
+     */
+    ItemType[ItemType["ItemTypeTrinket"] = 12] = "ItemTypeTrinket";
+    /**
+     * @generated from protobuf enum value: ItemTypeWeapon = 13;
+     */
+    ItemType[ItemType["ItemTypeWeapon"] = 13] = "ItemTypeWeapon";
+    /**
+     * @generated from protobuf enum value: ItemTypeRanged = 14;
+     */
+    ItemType[ItemType["ItemTypeRanged"] = 14] = "ItemTypeRanged";
+})(ItemType || (ItemType = {}));
+/**
+ * @generated from protobuf enum api.ArmorType
+ */
+export var ArmorType;
+(function (ArmorType) {
+    /**
+     * @generated from protobuf enum value: ArmorTypeUnknown = 0;
+     */
+    ArmorType[ArmorType["ArmorTypeUnknown"] = 0] = "ArmorTypeUnknown";
+    /**
+     * @generated from protobuf enum value: ArmorTypeCloth = 1;
+     */
+    ArmorType[ArmorType["ArmorTypeCloth"] = 1] = "ArmorTypeCloth";
+    /**
+     * @generated from protobuf enum value: ArmorTypeLeather = 2;
+     */
+    ArmorType[ArmorType["ArmorTypeLeather"] = 2] = "ArmorTypeLeather";
+    /**
+     * @generated from protobuf enum value: ArmorTypeMail = 3;
+     */
+    ArmorType[ArmorType["ArmorTypeMail"] = 3] = "ArmorTypeMail";
+    /**
+     * @generated from protobuf enum value: ArmorTypePlate = 4;
+     */
+    ArmorType[ArmorType["ArmorTypePlate"] = 4] = "ArmorTypePlate";
+})(ArmorType || (ArmorType = {}));
+/**
+ * @generated from protobuf enum api.WeaponType
+ */
+export var WeaponType;
+(function (WeaponType) {
+    /**
+     * @generated from protobuf enum value: WeaponTypeUnknown = 0;
+     */
+    WeaponType[WeaponType["WeaponTypeUnknown"] = 0] = "WeaponTypeUnknown";
+    /**
+     * @generated from protobuf enum value: WeaponTypeAxe = 1;
+     */
+    WeaponType[WeaponType["WeaponTypeAxe"] = 1] = "WeaponTypeAxe";
+    /**
+     * @generated from protobuf enum value: WeaponTypeDagger = 2;
+     */
+    WeaponType[WeaponType["WeaponTypeDagger"] = 2] = "WeaponTypeDagger";
+    /**
+     * @generated from protobuf enum value: WeaponTypeFist = 3;
+     */
+    WeaponType[WeaponType["WeaponTypeFist"] = 3] = "WeaponTypeFist";
+    /**
+     * @generated from protobuf enum value: WeaponTypeMace = 4;
+     */
+    WeaponType[WeaponType["WeaponTypeMace"] = 4] = "WeaponTypeMace";
+    /**
+     * @generated from protobuf enum value: WeaponTypeOffHand = 5;
+     */
+    WeaponType[WeaponType["WeaponTypeOffHand"] = 5] = "WeaponTypeOffHand";
+    /**
+     * @generated from protobuf enum value: WeaponTypePolearm = 6;
+     */
+    WeaponType[WeaponType["WeaponTypePolearm"] = 6] = "WeaponTypePolearm";
+    /**
+     * @generated from protobuf enum value: WeaponTypeShield = 7;
+     */
+    WeaponType[WeaponType["WeaponTypeShield"] = 7] = "WeaponTypeShield";
+    /**
+     * @generated from protobuf enum value: WeaponTypeStaff = 8;
+     */
+    WeaponType[WeaponType["WeaponTypeStaff"] = 8] = "WeaponTypeStaff";
+    /**
+     * @generated from protobuf enum value: WeaponTypeSword = 9;
+     */
+    WeaponType[WeaponType["WeaponTypeSword"] = 9] = "WeaponTypeSword";
+})(WeaponType || (WeaponType = {}));
+/**
+ * @generated from protobuf enum api.HandType
+ */
+export var HandType;
+(function (HandType) {
+    /**
+     * @generated from protobuf enum value: HandTypeUnknown = 0;
+     */
+    HandType[HandType["HandTypeUnknown"] = 0] = "HandTypeUnknown";
+    /**
+     * @generated from protobuf enum value: HandTypeMainHand = 1;
+     */
+    HandType[HandType["HandTypeMainHand"] = 1] = "HandTypeMainHand";
+    /**
+     * @generated from protobuf enum value: HandTypeOneHand = 2;
+     */
+    HandType[HandType["HandTypeOneHand"] = 2] = "HandTypeOneHand";
+    /**
+     * @generated from protobuf enum value: HandTypeOffHand = 3;
+     */
+    HandType[HandType["HandTypeOffHand"] = 3] = "HandTypeOffHand";
+    /**
+     * @generated from protobuf enum value: HandTypeTwoHand = 4;
+     */
+    HandType[HandType["HandTypeTwoHand"] = 4] = "HandTypeTwoHand";
+})(HandType || (HandType = {}));
+/**
+ * @generated from protobuf enum api.RangedWeaponType
+ */
+export var RangedWeaponType;
+(function (RangedWeaponType) {
+    /**
+     * @generated from protobuf enum value: RangedWeaponTypeUnknown = 0;
+     */
+    RangedWeaponType[RangedWeaponType["RangedWeaponTypeUnknown"] = 0] = "RangedWeaponTypeUnknown";
+    /**
+     * @generated from protobuf enum value: RangedWeaponTypeBow = 1;
+     */
+    RangedWeaponType[RangedWeaponType["RangedWeaponTypeBow"] = 1] = "RangedWeaponTypeBow";
+    /**
+     * @generated from protobuf enum value: RangedWeaponTypeCrossbow = 2;
+     */
+    RangedWeaponType[RangedWeaponType["RangedWeaponTypeCrossbow"] = 2] = "RangedWeaponTypeCrossbow";
+    /**
+     * @generated from protobuf enum value: RangedWeaponTypeGun = 3;
+     */
+    RangedWeaponType[RangedWeaponType["RangedWeaponTypeGun"] = 3] = "RangedWeaponTypeGun";
+    /**
+     * @generated from protobuf enum value: RangedWeaponTypeIdol = 4;
+     */
+    RangedWeaponType[RangedWeaponType["RangedWeaponTypeIdol"] = 4] = "RangedWeaponTypeIdol";
+    /**
+     * @generated from protobuf enum value: RangedWeaponTypeLibram = 5;
+     */
+    RangedWeaponType[RangedWeaponType["RangedWeaponTypeLibram"] = 5] = "RangedWeaponTypeLibram";
+    /**
+     * @generated from protobuf enum value: RangedWeaponTypeThrown = 6;
+     */
+    RangedWeaponType[RangedWeaponType["RangedWeaponTypeThrown"] = 6] = "RangedWeaponTypeThrown";
+    /**
+     * @generated from protobuf enum value: RangedWeaponTypeTotem = 7;
+     */
+    RangedWeaponType[RangedWeaponType["RangedWeaponTypeTotem"] = 7] = "RangedWeaponTypeTotem";
+    /**
+     * @generated from protobuf enum value: RangedWeaponTypeWand = 8;
+     */
+    RangedWeaponType[RangedWeaponType["RangedWeaponTypeWand"] = 8] = "RangedWeaponTypeWand";
+})(RangedWeaponType || (RangedWeaponType = {}));
+/**
+ * All slots on the gear menu where a single item can be worn.
+ *
+ * @generated from protobuf enum api.ItemSlot
+ */
+export var ItemSlot;
+(function (ItemSlot) {
+    /**
+     * @generated from protobuf enum value: ItemSlotHead = 0;
+     */
+    ItemSlot[ItemSlot["ItemSlotHead"] = 0] = "ItemSlotHead";
+    /**
+     * @generated from protobuf enum value: ItemSlotNeck = 1;
+     */
+    ItemSlot[ItemSlot["ItemSlotNeck"] = 1] = "ItemSlotNeck";
+    /**
+     * @generated from protobuf enum value: ItemSlotShoulder = 2;
+     */
+    ItemSlot[ItemSlot["ItemSlotShoulder"] = 2] = "ItemSlotShoulder";
+    /**
+     * @generated from protobuf enum value: ItemSlotBack = 3;
+     */
+    ItemSlot[ItemSlot["ItemSlotBack"] = 3] = "ItemSlotBack";
+    /**
+     * @generated from protobuf enum value: ItemSlotChest = 4;
+     */
+    ItemSlot[ItemSlot["ItemSlotChest"] = 4] = "ItemSlotChest";
+    /**
+     * @generated from protobuf enum value: ItemSlotWrist = 5;
+     */
+    ItemSlot[ItemSlot["ItemSlotWrist"] = 5] = "ItemSlotWrist";
+    /**
+     * @generated from protobuf enum value: ItemSlotHands = 6;
+     */
+    ItemSlot[ItemSlot["ItemSlotHands"] = 6] = "ItemSlotHands";
+    /**
+     * @generated from protobuf enum value: ItemSlotWaist = 7;
+     */
+    ItemSlot[ItemSlot["ItemSlotWaist"] = 7] = "ItemSlotWaist";
+    /**
+     * @generated from protobuf enum value: ItemSlotLegs = 8;
+     */
+    ItemSlot[ItemSlot["ItemSlotLegs"] = 8] = "ItemSlotLegs";
+    /**
+     * @generated from protobuf enum value: ItemSlotFeet = 9;
+     */
+    ItemSlot[ItemSlot["ItemSlotFeet"] = 9] = "ItemSlotFeet";
+    /**
+     * @generated from protobuf enum value: ItemSlotFinger1 = 10;
+     */
+    ItemSlot[ItemSlot["ItemSlotFinger1"] = 10] = "ItemSlotFinger1";
+    /**
+     * @generated from protobuf enum value: ItemSlotFinger2 = 11;
+     */
+    ItemSlot[ItemSlot["ItemSlotFinger2"] = 11] = "ItemSlotFinger2";
+    /**
+     * @generated from protobuf enum value: ItemSlotTrinket1 = 12;
+     */
+    ItemSlot[ItemSlot["ItemSlotTrinket1"] = 12] = "ItemSlotTrinket1";
+    /**
+     * @generated from protobuf enum value: ItemSlotTrinket2 = 13;
+     */
+    ItemSlot[ItemSlot["ItemSlotTrinket2"] = 13] = "ItemSlotTrinket2";
+    /**
+     * can be 1h or 2h
+     *
+     * @generated from protobuf enum value: ItemSlotMainHand = 14;
+     */
+    ItemSlot[ItemSlot["ItemSlotMainHand"] = 14] = "ItemSlotMainHand";
+    /**
+     * @generated from protobuf enum value: ItemSlotOffHand = 15;
+     */
+    ItemSlot[ItemSlot["ItemSlotOffHand"] = 15] = "ItemSlotOffHand";
+    /**
+     * @generated from protobuf enum value: ItemSlotRanged = 16;
+     */
+    ItemSlot[ItemSlot["ItemSlotRanged"] = 16] = "ItemSlotRanged";
+})(ItemSlot || (ItemSlot = {}));
+/**
+ * @generated from protobuf enum api.ItemQuality
+ */
+export var ItemQuality;
+(function (ItemQuality) {
+    /**
+     * @generated from protobuf enum value: ItemQualityJunk = 0;
+     */
+    ItemQuality[ItemQuality["ItemQualityJunk"] = 0] = "ItemQualityJunk";
+    /**
+     * @generated from protobuf enum value: ItemQualityCommon = 1;
+     */
+    ItemQuality[ItemQuality["ItemQualityCommon"] = 1] = "ItemQualityCommon";
+    /**
+     * @generated from protobuf enum value: ItemQualityUncommon = 2;
+     */
+    ItemQuality[ItemQuality["ItemQualityUncommon"] = 2] = "ItemQualityUncommon";
+    /**
+     * @generated from protobuf enum value: ItemQualityRare = 3;
+     */
+    ItemQuality[ItemQuality["ItemQualityRare"] = 3] = "ItemQualityRare";
+    /**
+     * @generated from protobuf enum value: ItemQualityEpic = 4;
+     */
+    ItemQuality[ItemQuality["ItemQualityEpic"] = 4] = "ItemQualityEpic";
+    /**
+     * @generated from protobuf enum value: ItemQualityLegendary = 5;
+     */
+    ItemQuality[ItemQuality["ItemQualityLegendary"] = 5] = "ItemQualityLegendary";
+})(ItemQuality || (ItemQuality = {}));
+/**
+ * @generated from protobuf enum api.GemColor
+ */
+export var GemColor;
+(function (GemColor) {
+    /**
+     * @generated from protobuf enum value: GemColorUnknown = 0;
+     */
+    GemColor[GemColor["GemColorUnknown"] = 0] = "GemColorUnknown";
+    /**
+     * @generated from protobuf enum value: GemColorMeta = 1;
+     */
+    GemColor[GemColor["GemColorMeta"] = 1] = "GemColorMeta";
+    /**
+     * @generated from protobuf enum value: GemColorRed = 2;
+     */
+    GemColor[GemColor["GemColorRed"] = 2] = "GemColorRed";
+    /**
+     * @generated from protobuf enum value: GemColorBlue = 3;
+     */
+    GemColor[GemColor["GemColorBlue"] = 3] = "GemColorBlue";
+    /**
+     * @generated from protobuf enum value: GemColorYellow = 4;
+     */
+    GemColor[GemColor["GemColorYellow"] = 4] = "GemColorYellow";
+    /**
+     * @generated from protobuf enum value: GemColorGreen = 5;
+     */
+    GemColor[GemColor["GemColorGreen"] = 5] = "GemColorGreen";
+    /**
+     * @generated from protobuf enum value: GemColorOrange = 6;
+     */
+    GemColor[GemColor["GemColorOrange"] = 6] = "GemColorOrange";
+    /**
+     * @generated from protobuf enum value: GemColorPurple = 7;
+     */
+    GemColor[GemColor["GemColorPurple"] = 7] = "GemColorPurple";
+    /**
+     * @generated from protobuf enum value: GemColorPrismatic = 8;
+     */
+    GemColor[GemColor["GemColorPrismatic"] = 8] = "GemColorPrismatic";
+})(GemColor || (GemColor = {}));
+/**
+ * @generated from protobuf enum api.TristateEffect
+ */
+export var TristateEffect;
+(function (TristateEffect) {
+    /**
+     * @generated from protobuf enum value: TristateEffectMissing = 0;
+     */
+    TristateEffect[TristateEffect["TristateEffectMissing"] = 0] = "TristateEffectMissing";
+    /**
+     * @generated from protobuf enum value: TristateEffectRegular = 1;
+     */
+    TristateEffect[TristateEffect["TristateEffectRegular"] = 1] = "TristateEffectRegular";
+    /**
+     * @generated from protobuf enum value: TristateEffectImproved = 2;
+     */
+    TristateEffect[TristateEffect["TristateEffectImproved"] = 2] = "TristateEffectImproved";
+})(TristateEffect || (TristateEffect = {}));
+// @generated message type with reflection information, may provide speed optimized methods
+class Buffs$Type extends MessageType {
+    constructor() {
+        super("api.Buffs", [
+            { no: 1, name: "arcane_brilliance", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 2, name: "blessing_of_kings", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 3, name: "blessing_of_wisdom", kind: "enum", T: () => ["api.TristateEffect", TristateEffect] },
+            { no: 4, name: "divine_spirit", kind: "enum", T: () => ["api.TristateEffect", TristateEffect] },
+            { no: 5, name: "gift_of_the_wild", kind: "enum", T: () => ["api.TristateEffect", TristateEffect] },
+            { no: 6, name: "bloodlust", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 7, name: "moonkin_aura", kind: "enum", T: () => ["api.TristateEffect", TristateEffect] },
+            { no: 8, name: "shadow_priest_dps", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 9, name: "judgement_of_wisdom", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 10, name: "improved_seal_of_the_crusader", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 11, name: "misery", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 12, name: "atiesh_mage", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 13, name: "atiesh_warlock", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 14, name: "braided_eternium_chain", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 15, name: "eye_of_the_night", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 16, name: "chain_of_the_twilight_owl", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 17, name: "jade_pendant_of_blasting", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 18, name: "mana_spring_totem", kind: "enum", T: () => ["api.TristateEffect", TristateEffect] },
+            { no: 19, name: "mana_tide_totem", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 20, name: "totem_of_wrath", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 21, name: "wrath_of_air_totem", kind: "enum", T: () => ["api.TristateEffect", TristateEffect] }
+        ]);
+    }
+    create(value) {
+        const message = { arcaneBrilliance: false, blessingOfKings: false, blessingOfWisdom: 0, divineSpirit: 0, giftOfTheWild: 0, bloodlust: 0, moonkinAura: 0, shadowPriestDps: 0, judgementOfWisdom: false, improvedSealOfTheCrusader: false, misery: false, atieshMage: 0, atieshWarlock: 0, braidedEterniumChain: false, eyeOfTheNight: false, chainOfTheTwilightOwl: false, jadePendantOfBlasting: false, manaSpringTotem: 0, manaTideTotem: false, totemOfWrath: 0, wrathOfAirTotem: 0 };
+        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader, length, options, target) {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* bool arcane_brilliance */ 1:
+                    message.arcaneBrilliance = reader.bool();
+                    break;
+                case /* bool blessing_of_kings */ 2:
+                    message.blessingOfKings = reader.bool();
+                    break;
+                case /* api.TristateEffect blessing_of_wisdom */ 3:
+                    message.blessingOfWisdom = reader.int32();
+                    break;
+                case /* api.TristateEffect divine_spirit */ 4:
+                    message.divineSpirit = reader.int32();
+                    break;
+                case /* api.TristateEffect gift_of_the_wild */ 5:
+                    message.giftOfTheWild = reader.int32();
+                    break;
+                case /* int32 bloodlust */ 6:
+                    message.bloodlust = reader.int32();
+                    break;
+                case /* api.TristateEffect moonkin_aura */ 7:
+                    message.moonkinAura = reader.int32();
+                    break;
+                case /* int32 shadow_priest_dps */ 8:
+                    message.shadowPriestDps = reader.int32();
+                    break;
+                case /* bool judgement_of_wisdom */ 9:
+                    message.judgementOfWisdom = reader.bool();
+                    break;
+                case /* bool improved_seal_of_the_crusader */ 10:
+                    message.improvedSealOfTheCrusader = reader.bool();
+                    break;
+                case /* bool misery */ 11:
+                    message.misery = reader.bool();
+                    break;
+                case /* int32 atiesh_mage */ 12:
+                    message.atieshMage = reader.int32();
+                    break;
+                case /* int32 atiesh_warlock */ 13:
+                    message.atieshWarlock = reader.int32();
+                    break;
+                case /* bool braided_eternium_chain */ 14:
+                    message.braidedEterniumChain = reader.bool();
+                    break;
+                case /* bool eye_of_the_night */ 15:
+                    message.eyeOfTheNight = reader.bool();
+                    break;
+                case /* bool chain_of_the_twilight_owl */ 16:
+                    message.chainOfTheTwilightOwl = reader.bool();
+                    break;
+                case /* bool jade_pendant_of_blasting */ 17:
+                    message.jadePendantOfBlasting = reader.bool();
+                    break;
+                case /* api.TristateEffect mana_spring_totem */ 18:
+                    message.manaSpringTotem = reader.int32();
+                    break;
+                case /* bool mana_tide_totem */ 19:
+                    message.manaTideTotem = reader.bool();
+                    break;
+                case /* int32 totem_of_wrath */ 20:
+                    message.totemOfWrath = reader.int32();
+                    break;
+                case /* api.TristateEffect wrath_of_air_totem */ 21:
+                    message.wrathOfAirTotem = reader.int32();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message, writer, options) {
+        /* bool arcane_brilliance = 1; */
+        if (message.arcaneBrilliance !== false)
+            writer.tag(1, WireType.Varint).bool(message.arcaneBrilliance);
+        /* bool blessing_of_kings = 2; */
+        if (message.blessingOfKings !== false)
+            writer.tag(2, WireType.Varint).bool(message.blessingOfKings);
+        /* api.TristateEffect blessing_of_wisdom = 3; */
+        if (message.blessingOfWisdom !== 0)
+            writer.tag(3, WireType.Varint).int32(message.blessingOfWisdom);
+        /* api.TristateEffect divine_spirit = 4; */
+        if (message.divineSpirit !== 0)
+            writer.tag(4, WireType.Varint).int32(message.divineSpirit);
+        /* api.TristateEffect gift_of_the_wild = 5; */
+        if (message.giftOfTheWild !== 0)
+            writer.tag(5, WireType.Varint).int32(message.giftOfTheWild);
+        /* int32 bloodlust = 6; */
+        if (message.bloodlust !== 0)
+            writer.tag(6, WireType.Varint).int32(message.bloodlust);
+        /* api.TristateEffect moonkin_aura = 7; */
+        if (message.moonkinAura !== 0)
+            writer.tag(7, WireType.Varint).int32(message.moonkinAura);
+        /* int32 shadow_priest_dps = 8; */
+        if (message.shadowPriestDps !== 0)
+            writer.tag(8, WireType.Varint).int32(message.shadowPriestDps);
+        /* bool judgement_of_wisdom = 9; */
+        if (message.judgementOfWisdom !== false)
+            writer.tag(9, WireType.Varint).bool(message.judgementOfWisdom);
+        /* bool improved_seal_of_the_crusader = 10; */
+        if (message.improvedSealOfTheCrusader !== false)
+            writer.tag(10, WireType.Varint).bool(message.improvedSealOfTheCrusader);
+        /* bool misery = 11; */
+        if (message.misery !== false)
+            writer.tag(11, WireType.Varint).bool(message.misery);
+        /* int32 atiesh_mage = 12; */
+        if (message.atieshMage !== 0)
+            writer.tag(12, WireType.Varint).int32(message.atieshMage);
+        /* int32 atiesh_warlock = 13; */
+        if (message.atieshWarlock !== 0)
+            writer.tag(13, WireType.Varint).int32(message.atieshWarlock);
+        /* bool braided_eternium_chain = 14; */
+        if (message.braidedEterniumChain !== false)
+            writer.tag(14, WireType.Varint).bool(message.braidedEterniumChain);
+        /* bool eye_of_the_night = 15; */
+        if (message.eyeOfTheNight !== false)
+            writer.tag(15, WireType.Varint).bool(message.eyeOfTheNight);
+        /* bool chain_of_the_twilight_owl = 16; */
+        if (message.chainOfTheTwilightOwl !== false)
+            writer.tag(16, WireType.Varint).bool(message.chainOfTheTwilightOwl);
+        /* bool jade_pendant_of_blasting = 17; */
+        if (message.jadePendantOfBlasting !== false)
+            writer.tag(17, WireType.Varint).bool(message.jadePendantOfBlasting);
+        /* api.TristateEffect mana_spring_totem = 18; */
+        if (message.manaSpringTotem !== 0)
+            writer.tag(18, WireType.Varint).int32(message.manaSpringTotem);
+        /* bool mana_tide_totem = 19; */
+        if (message.manaTideTotem !== false)
+            writer.tag(19, WireType.Varint).bool(message.manaTideTotem);
+        /* int32 totem_of_wrath = 20; */
+        if (message.totemOfWrath !== 0)
+            writer.tag(20, WireType.Varint).int32(message.totemOfWrath);
+        /* api.TristateEffect wrath_of_air_totem = 21; */
+        if (message.wrathOfAirTotem !== 0)
+            writer.tag(21, WireType.Varint).int32(message.wrathOfAirTotem);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message api.Buffs
+ */
+export const Buffs = new Buffs$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class Consumes$Type extends MessageType {
+    constructor() {
+        super("api.Consumes", [
+            { no: 1, name: "flask_of_blinding_light", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 2, name: "flask_of_mighty_restoration", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 3, name: "flask_of_pure_death", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 4, name: "flask_of_supreme_power", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 5, name: "adepts_elixir", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 6, name: "elixir_of_major_fire_power", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 7, name: "elixir_of_major_frost_power", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 8, name: "elixir_of_major_shadow_power", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 9, name: "elixir_of_draenic_wisdom", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 10, name: "elixir_of_major_mageblood", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 11, name: "brilliant_wizard_oil", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 12, name: "superior_wizard_oil", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 13, name: "blackened_basilisk", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 14, name: "skullfish_soup", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 15, name: "destruction_potion", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 16, name: "super_mana_potion", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 17, name: "dark_rune", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 18, name: "drums_of_battle", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 19, name: "drums_of_restoration", kind: "scalar", T: 8 /*ScalarType.BOOL*/ }
+        ]);
+    }
+    create(value) {
+        const message = { flaskOfBlindingLight: false, flaskOfMightyRestoration: false, flaskOfPureDeath: false, flaskOfSupremePower: false, adeptsElixir: false, elixirOfMajorFirePower: false, elixirOfMajorFrostPower: false, elixirOfMajorShadowPower: false, elixirOfDraenicWisdom: false, elixirOfMajorMageblood: false, brilliantWizardOil: false, superiorWizardOil: false, blackenedBasilisk: false, skullfishSoup: false, destructionPotion: false, superManaPotion: false, darkRune: false, drumsOfBattle: false, drumsOfRestoration: false };
+        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader, length, options, target) {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* bool flask_of_blinding_light */ 1:
+                    message.flaskOfBlindingLight = reader.bool();
+                    break;
+                case /* bool flask_of_mighty_restoration */ 2:
+                    message.flaskOfMightyRestoration = reader.bool();
+                    break;
+                case /* bool flask_of_pure_death */ 3:
+                    message.flaskOfPureDeath = reader.bool();
+                    break;
+                case /* bool flask_of_supreme_power */ 4:
+                    message.flaskOfSupremePower = reader.bool();
+                    break;
+                case /* bool adepts_elixir */ 5:
+                    message.adeptsElixir = reader.bool();
+                    break;
+                case /* bool elixir_of_major_fire_power */ 6:
+                    message.elixirOfMajorFirePower = reader.bool();
+                    break;
+                case /* bool elixir_of_major_frost_power */ 7:
+                    message.elixirOfMajorFrostPower = reader.bool();
+                    break;
+                case /* bool elixir_of_major_shadow_power */ 8:
+                    message.elixirOfMajorShadowPower = reader.bool();
+                    break;
+                case /* bool elixir_of_draenic_wisdom */ 9:
+                    message.elixirOfDraenicWisdom = reader.bool();
+                    break;
+                case /* bool elixir_of_major_mageblood */ 10:
+                    message.elixirOfMajorMageblood = reader.bool();
+                    break;
+                case /* bool brilliant_wizard_oil */ 11:
+                    message.brilliantWizardOil = reader.bool();
+                    break;
+                case /* bool superior_wizard_oil */ 12:
+                    message.superiorWizardOil = reader.bool();
+                    break;
+                case /* bool blackened_basilisk */ 13:
+                    message.blackenedBasilisk = reader.bool();
+                    break;
+                case /* bool skullfish_soup */ 14:
+                    message.skullfishSoup = reader.bool();
+                    break;
+                case /* bool destruction_potion */ 15:
+                    message.destructionPotion = reader.bool();
+                    break;
+                case /* bool super_mana_potion */ 16:
+                    message.superManaPotion = reader.bool();
+                    break;
+                case /* bool dark_rune */ 17:
+                    message.darkRune = reader.bool();
+                    break;
+                case /* bool drums_of_battle */ 18:
+                    message.drumsOfBattle = reader.bool();
+                    break;
+                case /* bool drums_of_restoration */ 19:
+                    message.drumsOfRestoration = reader.bool();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message, writer, options) {
+        /* bool flask_of_blinding_light = 1; */
+        if (message.flaskOfBlindingLight !== false)
+            writer.tag(1, WireType.Varint).bool(message.flaskOfBlindingLight);
+        /* bool flask_of_mighty_restoration = 2; */
+        if (message.flaskOfMightyRestoration !== false)
+            writer.tag(2, WireType.Varint).bool(message.flaskOfMightyRestoration);
+        /* bool flask_of_pure_death = 3; */
+        if (message.flaskOfPureDeath !== false)
+            writer.tag(3, WireType.Varint).bool(message.flaskOfPureDeath);
+        /* bool flask_of_supreme_power = 4; */
+        if (message.flaskOfSupremePower !== false)
+            writer.tag(4, WireType.Varint).bool(message.flaskOfSupremePower);
+        /* bool adepts_elixir = 5; */
+        if (message.adeptsElixir !== false)
+            writer.tag(5, WireType.Varint).bool(message.adeptsElixir);
+        /* bool elixir_of_major_fire_power = 6; */
+        if (message.elixirOfMajorFirePower !== false)
+            writer.tag(6, WireType.Varint).bool(message.elixirOfMajorFirePower);
+        /* bool elixir_of_major_frost_power = 7; */
+        if (message.elixirOfMajorFrostPower !== false)
+            writer.tag(7, WireType.Varint).bool(message.elixirOfMajorFrostPower);
+        /* bool elixir_of_major_shadow_power = 8; */
+        if (message.elixirOfMajorShadowPower !== false)
+            writer.tag(8, WireType.Varint).bool(message.elixirOfMajorShadowPower);
+        /* bool elixir_of_draenic_wisdom = 9; */
+        if (message.elixirOfDraenicWisdom !== false)
+            writer.tag(9, WireType.Varint).bool(message.elixirOfDraenicWisdom);
+        /* bool elixir_of_major_mageblood = 10; */
+        if (message.elixirOfMajorMageblood !== false)
+            writer.tag(10, WireType.Varint).bool(message.elixirOfMajorMageblood);
+        /* bool brilliant_wizard_oil = 11; */
+        if (message.brilliantWizardOil !== false)
+            writer.tag(11, WireType.Varint).bool(message.brilliantWizardOil);
+        /* bool superior_wizard_oil = 12; */
+        if (message.superiorWizardOil !== false)
+            writer.tag(12, WireType.Varint).bool(message.superiorWizardOil);
+        /* bool blackened_basilisk = 13; */
+        if (message.blackenedBasilisk !== false)
+            writer.tag(13, WireType.Varint).bool(message.blackenedBasilisk);
+        /* bool skullfish_soup = 14; */
+        if (message.skullfishSoup !== false)
+            writer.tag(14, WireType.Varint).bool(message.skullfishSoup);
+        /* bool destruction_potion = 15; */
+        if (message.destructionPotion !== false)
+            writer.tag(15, WireType.Varint).bool(message.destructionPotion);
+        /* bool super_mana_potion = 16; */
+        if (message.superManaPotion !== false)
+            writer.tag(16, WireType.Varint).bool(message.superManaPotion);
+        /* bool dark_rune = 17; */
+        if (message.darkRune !== false)
+            writer.tag(17, WireType.Varint).bool(message.darkRune);
+        /* bool drums_of_battle = 18; */
+        if (message.drumsOfBattle !== false)
+            writer.tag(18, WireType.Varint).bool(message.drumsOfBattle);
+        /* bool drums_of_restoration = 19; */
+        if (message.drumsOfRestoration !== false)
+            writer.tag(19, WireType.Varint).bool(message.drumsOfRestoration);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message api.Consumes
+ */
+export const Consumes = new Consumes$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class Encounter$Type extends MessageType {
+    constructor() {
+        super("api.Encounter", [
+            { no: 1, name: "duration", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
+            { no: 2, name: "num_targets", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 3, name: "target_armor", kind: "scalar", T: 5 /*ScalarType.INT32*/ }
+        ]);
+    }
+    create(value) {
+        const message = { duration: 0, numTargets: 0, targetArmor: 0 };
+        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader, length, options, target) {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* double duration */ 1:
+                    message.duration = reader.double();
+                    break;
+                case /* int32 num_targets */ 2:
+                    message.numTargets = reader.int32();
+                    break;
+                case /* int32 target_armor */ 3:
+                    message.targetArmor = reader.int32();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message, writer, options) {
+        /* double duration = 1; */
+        if (message.duration !== 0)
+            writer.tag(1, WireType.Bit64).double(message.duration);
+        /* int32 num_targets = 2; */
+        if (message.numTargets !== 0)
+            writer.tag(2, WireType.Varint).int32(message.numTargets);
+        /* int32 target_armor = 3; */
+        if (message.targetArmor !== 0)
+            writer.tag(3, WireType.Varint).int32(message.targetArmor);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message api.Encounter
+ */
+export const Encounter = new Encounter$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class ItemSpec$Type extends MessageType {
+    constructor() {
+        super("api.ItemSpec", [
+            { no: 2, name: "id", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 3, name: "enchant", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 4, name: "gems", kind: "scalar", repeat: 1 /*RepeatType.PACKED*/, T: 5 /*ScalarType.INT32*/ }
+        ]);
+    }
+    create(value) {
+        const message = { id: 0, enchant: 0, gems: [] };
+        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader, length, options, target) {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* int32 id */ 2:
+                    message.id = reader.int32();
+                    break;
+                case /* int32 enchant */ 3:
+                    message.enchant = reader.int32();
+                    break;
+                case /* repeated int32 gems */ 4:
+                    if (wireType === WireType.LengthDelimited)
+                        for (let e = reader.int32() + reader.pos; reader.pos < e;)
+                            message.gems.push(reader.int32());
+                    else
+                        message.gems.push(reader.int32());
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message, writer, options) {
+        /* int32 id = 2; */
+        if (message.id !== 0)
+            writer.tag(2, WireType.Varint).int32(message.id);
+        /* int32 enchant = 3; */
+        if (message.enchant !== 0)
+            writer.tag(3, WireType.Varint).int32(message.enchant);
+        /* repeated int32 gems = 4; */
+        if (message.gems.length) {
+            writer.tag(4, WireType.LengthDelimited).fork();
+            for (let i = 0; i < message.gems.length; i++)
+                writer.int32(message.gems[i]);
+            writer.join();
+        }
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message api.ItemSpec
+ */
+export const ItemSpec = new ItemSpec$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class EquipmentSpec$Type extends MessageType {
+    constructor() {
+        super("api.EquipmentSpec", [
+            { no: 1, name: "items", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => ItemSpec }
+        ]);
+    }
+    create(value) {
+        const message = { items: [] };
+        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader, length, options, target) {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* repeated api.ItemSpec items */ 1:
+                    message.items.push(ItemSpec.internalBinaryRead(reader, reader.uint32(), options));
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message, writer, options) {
+        /* repeated api.ItemSpec items = 1; */
+        for (let i = 0; i < message.items.length; i++)
+            ItemSpec.internalBinaryWrite(message.items[i], writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message api.EquipmentSpec
+ */
+export const EquipmentSpec = new EquipmentSpec$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class Item$Type extends MessageType {
+    constructor() {
+        super("api.Item", [
+            { no: 1, name: "id", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 2, name: "name", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 3, name: "type", kind: "enum", T: () => ["api.ItemType", ItemType] },
+            { no: 4, name: "armor_type", kind: "enum", T: () => ["api.ArmorType", ArmorType] },
+            { no: 5, name: "weapon_type", kind: "enum", T: () => ["api.WeaponType", WeaponType] },
+            { no: 6, name: "hand_type", kind: "enum", T: () => ["api.HandType", HandType] },
+            { no: 7, name: "ranged_weapon_type", kind: "enum", T: () => ["api.RangedWeaponType", RangedWeaponType] },
+            { no: 8, name: "stats", kind: "scalar", repeat: 1 /*RepeatType.PACKED*/, T: 1 /*ScalarType.DOUBLE*/ },
+            { no: 11, name: "gem_sockets", kind: "enum", repeat: 1 /*RepeatType.PACKED*/, T: () => ["api.GemColor", GemColor] },
+            { no: 9, name: "phase", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 10, name: "quality", kind: "enum", T: () => ["api.ItemQuality", ItemQuality] }
+        ]);
+    }
+    create(value) {
+        const message = { id: 0, name: "", type: 0, armorType: 0, weaponType: 0, handType: 0, rangedWeaponType: 0, stats: [], gemSockets: [], phase: 0, quality: 0 };
+        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader, length, options, target) {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* int32 id */ 1:
+                    message.id = reader.int32();
+                    break;
+                case /* string name */ 2:
+                    message.name = reader.string();
+                    break;
+                case /* api.ItemType type */ 3:
+                    message.type = reader.int32();
+                    break;
+                case /* api.ArmorType armor_type */ 4:
+                    message.armorType = reader.int32();
+                    break;
+                case /* api.WeaponType weapon_type */ 5:
+                    message.weaponType = reader.int32();
+                    break;
+                case /* api.HandType hand_type */ 6:
+                    message.handType = reader.int32();
+                    break;
+                case /* api.RangedWeaponType ranged_weapon_type */ 7:
+                    message.rangedWeaponType = reader.int32();
+                    break;
+                case /* repeated double stats */ 8:
+                    if (wireType === WireType.LengthDelimited)
+                        for (let e = reader.int32() + reader.pos; reader.pos < e;)
+                            message.stats.push(reader.double());
+                    else
+                        message.stats.push(reader.double());
+                    break;
+                case /* repeated api.GemColor gem_sockets */ 11:
+                    if (wireType === WireType.LengthDelimited)
+                        for (let e = reader.int32() + reader.pos; reader.pos < e;)
+                            message.gemSockets.push(reader.int32());
+                    else
+                        message.gemSockets.push(reader.int32());
+                    break;
+                case /* int32 phase */ 9:
+                    message.phase = reader.int32();
+                    break;
+                case /* api.ItemQuality quality */ 10:
+                    message.quality = reader.int32();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message, writer, options) {
+        /* int32 id = 1; */
+        if (message.id !== 0)
+            writer.tag(1, WireType.Varint).int32(message.id);
+        /* string name = 2; */
+        if (message.name !== "")
+            writer.tag(2, WireType.LengthDelimited).string(message.name);
+        /* api.ItemType type = 3; */
+        if (message.type !== 0)
+            writer.tag(3, WireType.Varint).int32(message.type);
+        /* api.ArmorType armor_type = 4; */
+        if (message.armorType !== 0)
+            writer.tag(4, WireType.Varint).int32(message.armorType);
+        /* api.WeaponType weapon_type = 5; */
+        if (message.weaponType !== 0)
+            writer.tag(5, WireType.Varint).int32(message.weaponType);
+        /* api.HandType hand_type = 6; */
+        if (message.handType !== 0)
+            writer.tag(6, WireType.Varint).int32(message.handType);
+        /* api.RangedWeaponType ranged_weapon_type = 7; */
+        if (message.rangedWeaponType !== 0)
+            writer.tag(7, WireType.Varint).int32(message.rangedWeaponType);
+        /* repeated double stats = 8; */
+        if (message.stats.length) {
+            writer.tag(8, WireType.LengthDelimited).fork();
+            for (let i = 0; i < message.stats.length; i++)
+                writer.double(message.stats[i]);
+            writer.join();
+        }
+        /* repeated api.GemColor gem_sockets = 11; */
+        if (message.gemSockets.length) {
+            writer.tag(11, WireType.LengthDelimited).fork();
+            for (let i = 0; i < message.gemSockets.length; i++)
+                writer.int32(message.gemSockets[i]);
+            writer.join();
+        }
+        /* int32 phase = 9; */
+        if (message.phase !== 0)
+            writer.tag(9, WireType.Varint).int32(message.phase);
+        /* api.ItemQuality quality = 10; */
+        if (message.quality !== 0)
+            writer.tag(10, WireType.Varint).int32(message.quality);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message api.Item
+ */
+export const Item = new Item$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class Enchant$Type extends MessageType {
+    constructor() {
+        super("api.Enchant", [
+            { no: 1, name: "id", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 2, name: "effect_id", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 3, name: "name", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 4, name: "type", kind: "enum", T: () => ["api.ItemType", ItemType] },
+            { no: 5, name: "two_handed_only", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 6, name: "shield_only", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 7, name: "stats", kind: "scalar", repeat: 1 /*RepeatType.PACKED*/, T: 1 /*ScalarType.DOUBLE*/ },
+            { no: 8, name: "quality", kind: "enum", T: () => ["api.ItemQuality", ItemQuality] }
+        ]);
+    }
+    create(value) {
+        const message = { id: 0, effectId: 0, name: "", type: 0, twoHandedOnly: false, shieldOnly: false, stats: [], quality: 0 };
+        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader, length, options, target) {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* int32 id */ 1:
+                    message.id = reader.int32();
+                    break;
+                case /* int32 effect_id */ 2:
+                    message.effectId = reader.int32();
+                    break;
+                case /* string name */ 3:
+                    message.name = reader.string();
+                    break;
+                case /* api.ItemType type */ 4:
+                    message.type = reader.int32();
+                    break;
+                case /* bool two_handed_only */ 5:
+                    message.twoHandedOnly = reader.bool();
+                    break;
+                case /* bool shield_only */ 6:
+                    message.shieldOnly = reader.bool();
+                    break;
+                case /* repeated double stats */ 7:
+                    if (wireType === WireType.LengthDelimited)
+                        for (let e = reader.int32() + reader.pos; reader.pos < e;)
+                            message.stats.push(reader.double());
+                    else
+                        message.stats.push(reader.double());
+                    break;
+                case /* api.ItemQuality quality */ 8:
+                    message.quality = reader.int32();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message, writer, options) {
+        /* int32 id = 1; */
+        if (message.id !== 0)
+            writer.tag(1, WireType.Varint).int32(message.id);
+        /* int32 effect_id = 2; */
+        if (message.effectId !== 0)
+            writer.tag(2, WireType.Varint).int32(message.effectId);
+        /* string name = 3; */
+        if (message.name !== "")
+            writer.tag(3, WireType.LengthDelimited).string(message.name);
+        /* api.ItemType type = 4; */
+        if (message.type !== 0)
+            writer.tag(4, WireType.Varint).int32(message.type);
+        /* bool two_handed_only = 5; */
+        if (message.twoHandedOnly !== false)
+            writer.tag(5, WireType.Varint).bool(message.twoHandedOnly);
+        /* bool shield_only = 6; */
+        if (message.shieldOnly !== false)
+            writer.tag(6, WireType.Varint).bool(message.shieldOnly);
+        /* repeated double stats = 7; */
+        if (message.stats.length) {
+            writer.tag(7, WireType.LengthDelimited).fork();
+            for (let i = 0; i < message.stats.length; i++)
+                writer.double(message.stats[i]);
+            writer.join();
+        }
+        /* api.ItemQuality quality = 8; */
+        if (message.quality !== 0)
+            writer.tag(8, WireType.Varint).int32(message.quality);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message api.Enchant
+ */
+export const Enchant = new Enchant$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class Gem$Type extends MessageType {
+    constructor() {
+        super("api.Gem", [
+            { no: 1, name: "id", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 2, name: "name", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 3, name: "stats", kind: "scalar", repeat: 1 /*RepeatType.PACKED*/, T: 1 /*ScalarType.DOUBLE*/ },
+            { no: 4, name: "color", kind: "enum", T: () => ["api.GemColor", GemColor] },
+            { no: 5, name: "phase", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 6, name: "quality", kind: "enum", T: () => ["api.ItemQuality", ItemQuality] }
+        ]);
+    }
+    create(value) {
+        const message = { id: 0, name: "", stats: [], color: 0, phase: 0, quality: 0 };
+        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader, length, options, target) {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* int32 id */ 1:
+                    message.id = reader.int32();
+                    break;
+                case /* string name */ 2:
+                    message.name = reader.string();
+                    break;
+                case /* repeated double stats */ 3:
+                    if (wireType === WireType.LengthDelimited)
+                        for (let e = reader.int32() + reader.pos; reader.pos < e;)
+                            message.stats.push(reader.double());
+                    else
+                        message.stats.push(reader.double());
+                    break;
+                case /* api.GemColor color */ 4:
+                    message.color = reader.int32();
+                    break;
+                case /* int32 phase */ 5:
+                    message.phase = reader.int32();
+                    break;
+                case /* api.ItemQuality quality */ 6:
+                    message.quality = reader.int32();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message, writer, options) {
+        /* int32 id = 1; */
+        if (message.id !== 0)
+            writer.tag(1, WireType.Varint).int32(message.id);
+        /* string name = 2; */
+        if (message.name !== "")
+            writer.tag(2, WireType.LengthDelimited).string(message.name);
+        /* repeated double stats = 3; */
+        if (message.stats.length) {
+            writer.tag(3, WireType.LengthDelimited).fork();
+            for (let i = 0; i < message.stats.length; i++)
+                writer.double(message.stats[i]);
+            writer.join();
+        }
+        /* api.GemColor color = 4; */
+        if (message.color !== 0)
+            writer.tag(4, WireType.Varint).int32(message.color);
+        /* int32 phase = 5; */
+        if (message.phase !== 0)
+            writer.tag(5, WireType.Varint).int32(message.phase);
+        /* api.ItemQuality quality = 6; */
+        if (message.quality !== 0)
+            writer.tag(6, WireType.Varint).int32(message.quality);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message api.Gem
+ */
+export const Gem = new Gem$Type();
