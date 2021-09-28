@@ -1,6 +1,6 @@
 name: Run Tests
 on:
-  pull-request:
+  pull_request:
     branches:
       - master
 jobs:
