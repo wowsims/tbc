@@ -29,7 +29,7 @@ ui/core/api/api.ts: api/*.proto
 	sed -i -E "s/from \"(.*)\";/from '\1\.js';/g" docs/protobuf-ts/*
 	# This is needed for local hosting, since github pages serves under the 'tbc' directory.
 	mkdir -p docs/tbc/protobuf-ts
-	cp -r docs/protobuf-ts docs/tbc/protobuf-ts
+	cp -r docs/protobuf-ts docs/tbc
 	npx protoc --ts_opt generate_dependencies --ts_out ui/core/api --proto_path api api/api.proto
 
 docs/core/tsconfig.tsbuildinfo: $(call rwildcard,ui/core,*.ts) ui/core/api/api.ts
