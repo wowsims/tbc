@@ -7,6 +7,11 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     steps:
+      - name: Install Protoc
+        uses: actions/setup-protoc@v1
+        with:
+          version: 3.x
+
       - name: Install Go
         uses: actions/setup-go@v2
         with:
