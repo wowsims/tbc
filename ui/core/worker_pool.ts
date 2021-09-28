@@ -13,9 +13,10 @@ import { GearListRequest, GearListResult } from './api/api.js';
 import { IndividualSimRequest, IndividualSimResult } from './api/api.js';
 import { StatWeightsRequest, StatWeightsResult } from './api/api.js';
 
+import { urlPathPrefix } from './resources.js';
 import { wait } from './utils.js';
 
-const SIM_WORKER_URL = '/sim_worker.js';
+const SIM_WORKER_URL = `${urlPathPrefix}/sim_worker.js`;
 
 export class WorkerPool {
 	private workers: Array<SimWorker>;
