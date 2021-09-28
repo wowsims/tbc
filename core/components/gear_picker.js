@@ -152,7 +152,7 @@ class SelectorModal extends Component {
       <span aria-hidden="true">&times;</span>
     </button>
     `;
-        this.addTab('Items', slot, equippedItem, eligibleItems, item => this.sim.computeItemEP(item), equippedItem => equippedItem?.item.id || 0, item => {
+        this.addTab('Items', slot, equippedItem, eligibleItems, item => this.sim.computeItemEP(item), equippedItem => equippedItem?.item, item => {
             return {
                 id: item.id,
                 name: item.name,
@@ -171,7 +171,7 @@ class SelectorModal extends Component {
         }, () => {
             this.sim.equipItem(slot, null);
         });
-        this.addTab('Enchants', slot, equippedItem, eligibleEnchants, enchant => this.sim.computeEnchantEP(enchant), equippedItem => equippedItem?.enchant?.id || 0, enchant => {
+        this.addTab('Enchants', slot, equippedItem, eligibleEnchants, enchant => this.sim.computeEnchantEP(enchant), equippedItem => equippedItem?.enchant, enchant => {
             return {
                 id: enchant.id,
                 name: enchant.name,
@@ -192,7 +192,7 @@ class SelectorModal extends Component {
     }
     addGemTabs(slot, equippedItem) {
         equippedItem?.item.gemSockets.forEach((socketColor, socketIdx) => {
-            this.addTab('Gem ' + (socketIdx + 1), slot, equippedItem, this.sim.getGems(socketColor), gem => this.sim.computeGemEP(gem), equippedItem => equippedItem?.gems[socketIdx]?.id || 0, gem => {
+            this.addTab('Gem ' + (socketIdx + 1), slot, equippedItem, this.sim.getGems(socketColor), gem => this.sim.computeGemEP(gem), equippedItem => equippedItem?.gems[socketIdx], gem => {
                 return {
                     id: gem.id,
                     name: gem.name,
@@ -217,10 +217,14 @@ class SelectorModal extends Component {
      * T is expected to be Item, Enchant, or Gem. Tab menus for all 3 looks extremely
      * similar so this function uses extra functions to do it generically.
      */
-    addTab(label, slot, equippedItem, items, computeEP, equippedToIdFn, getItemData, onRemove) {
+    addTab(label, slot, equippedItem, items, computeEP, equippedToItemFn, getItemData, onRemove) {
         if (items.length == 0) {
             return;
         }
+        const equippedToIdFn = (equippedItem) => {
+            const item = equippedToItemFn(equippedItem);
+            return item ? getItemData(item).id : 0;
+        };
         items.sort((itemA, itemB) => computeEP(itemB) - computeEP(itemA));
         const tabElem = document.createElement('li');
         this.tabsElem.insertBefore(tabElem, this.tabsElem.lastChild);
@@ -251,11 +255,9 @@ class SelectorModal extends Component {
         const listElem = tabContent.getElementsByClassName('selector-modal-list')[0];
         const listItemElems = items.map(item => {
             const itemData = getItemData(item);
+            const itemEP = computeEP(item);
             const listItemElem = document.createElement('li');
             listItemElem.classList.add('selector-modal-list-item');
-            if (itemData.id == equippedToIdFn(equippedItem)) {
-                listItemElem.classList.add('active');
-            }
             listElem.appendChild(listItemElem);
             listItemElem.dataset.id = String(itemData.id);
             listItemElem.dataset.name = itemData.name;
@@ -263,6 +265,11 @@ class SelectorModal extends Component {
             listItemElem.innerHTML = `
         <a class="selector-modal-list-item-icon"></a>
         <a class="selector-modal-list-item-name">${itemData.name}</a>
+        <div class="selector-modal-list-item-padding"></div>
+        <div class="selector-modal-list-item-ep">
+					<span class="selector-modal-list-item-ep-value">${Math.round(itemEP)}<span>
+					<span class="selector-modal-list-item-ep-delta"><span>
+				</div>
       `;
             setWowheadHref(listItemElem.children[0], { itemId: itemData.id });
             setWowheadHref(listItemElem.children[1], { itemId: itemData.id });
@@ -290,15 +297,40 @@ class SelectorModal extends Component {
             listItemElems.forEach(elem => elem.classList.remove('active'));
             onRemove();
         });
-        this.sim.gearChangeEmitter.on(() => {
+        const updateSelected = () => {
             const newEquippedItem = this.sim.getEquippedItem(slot);
+            const newItem = equippedToItemFn(newEquippedItem);
+            if (!newItem)
+                return;
+            const newItemId = equippedToIdFn(newEquippedItem);
+            const newEP = computeEP(newItem);
             listItemElems.forEach(elem => {
+                const listItemId = parseInt(elem.dataset.id);
+                const listItem = items.find(item => getItemData(item).id == listItemId);
                 elem.classList.remove('active');
-                if (parseInt(elem.dataset.id) == equippedToIdFn(newEquippedItem)) {
+                if (listItemId == newItemId) {
                     elem.classList.add('active');
                 }
+                const epDeltaElem = elem.getElementsByClassName('selector-modal-list-item-ep-delta')[0];
+                epDeltaElem.textContent = '';
+                if (listItem) {
+                    const listItemEP = computeEP(listItem);
+                    const delta = Math.round(listItemEP) - Math.round(newEP);
+                    if (delta > 0) {
+                        epDeltaElem.textContent = '+' + delta;
+                        epDeltaElem.classList.remove('negative');
+                        epDeltaElem.classList.add('positive');
+                    }
+                    else if (delta < 0) {
+                        epDeltaElem.textContent = '' + delta;
+                        epDeltaElem.classList.remove('positive');
+                        epDeltaElem.classList.add('negative');
+                    }
+                }
             });
-        });
+        };
+        updateSelected();
+        this.sim.gearChangeEmitter.on(updateSelected);
         const applyFilters = () => {
             const searchQuery = searchInput.value.toLowerCase();
             const phase = this.sim.getPhase();

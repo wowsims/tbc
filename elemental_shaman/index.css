@@ -362,6 +362,24 @@
   margin-left: 10px;
 }
 
+.selector-modal-list-item-padding {
+  flex-grow: 1;
+}
+
+.selector-modal-list-item-ep {
+  margin: 10px;
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.selector-modal-list-item-ep-delta.positive {
+  color: lawngreen;
+}
+
+.selector-modal-list-item-ep-delta.negative {
+  color: red;
+}
+
 :root {
   --main-bg-color: DarkSlateGrey;
   --main-text-color: White;
