@@ -100,15 +100,15 @@ td, th {
 	color: black;
 }
 
-.default-main > .nav-tabs {
+.nav-tabs {
   padding-left: 40px;
   padding-top: 15px;
 	border-bottom-color: var(--main-text-color);
 }
-.default-main > .nav-tabs>li>a {
+ .nav-tabs>li>a {
 	color: var(--main-text-color);
 }
-.default-main > .nav-tabs>li>a:hover, .nav-tabs>li.active>a {
+.nav-tabs>li>a:hover, .nav-tabs>li.active>a {
 	color: var(--main-secondary-color);
 	background-color: var(--main-text-color);
 }

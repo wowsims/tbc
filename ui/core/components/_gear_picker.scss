@@ -61,6 +61,19 @@
 .selector-modal {
 }
 
+.selector-modal .modal-content {
+	background-color: #666;
+}
+
+.selector-modal-tabs .close {
+	color: red;
+	opacity: 0.5;
+	text-shadow: none;
+}
+.selector-modal-tabs .close:hover {
+	opacity: 1;
+}
+
 .selector-modal .modal-dialog {
   @include screen-vertical-horizontal-center;
 }
@@ -80,18 +93,18 @@
 
 .selector-modal-list {
 	max-height: 70vh;
-	overflow: scroll;
+	overflow-y: scroll;
   padding: 0;
 }
 
 .selector-modal-list li {
-  background: LightGrey;
+  background: #666;
 }
 .selector-modal-list li:nth-child(odd) {
-  background: DarkGrey;
+  background: #444;
 }
 .selector-modal-list li:hover {
-  background: Grey;
+  background: #333;
 }
 
 .selector-modal-list-item {
@@ -108,7 +121,7 @@
   @include wowhead-background-icon;
   width: 50px;
   height: 50px;
-  border: 2px solid dimgray;
+  border: 2px solid #888;
 }
 
 .selector-modal-list-item-name {
@@ -131,6 +144,7 @@
 	display: inline-block;
 	width: 30px;
 	margin: 5px;
+	color: white;
 }
 
 .selector-modal-list-item-ep-delta.positive {
