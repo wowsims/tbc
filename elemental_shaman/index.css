@@ -295,6 +295,20 @@
   color: lawngreen;
 }
 
+.selector-modal .modal-content {
+  background-color: #666;
+}
+
+.selector-modal-tabs .close {
+  color: red;
+  opacity: 0.5;
+  text-shadow: none;
+}
+
+.selector-modal-tabs .close:hover {
+  opacity: 1;
+}
+
 .selector-modal .modal-dialog {
   margin: 0;
   position: fixed;
@@ -318,20 +332,20 @@
 
 .selector-modal-list {
   max-height: 70vh;
-  overflow: scroll;
+  overflow-y: scroll;
   padding: 0;
 }
 
 .selector-modal-list li {
-  background: LightGrey;
+  background: #666;
 }
 
 .selector-modal-list li:nth-child(odd) {
-  background: DarkGrey;
+  background: #444;
 }
 
 .selector-modal-list li:hover {
-  background: Grey;
+  background: #333;
 }
 
 .selector-modal-list-item {
@@ -352,7 +366,7 @@
   display: inline-block;
   width: 50px;
   height: 50px;
-  border: 2px solid dimgray;
+  border: 2px solid #888;
 }
 
 .selector-modal-list-item-name {
@@ -375,6 +389,7 @@
   display: inline-block;
   width: 30px;
   margin: 5px;
+  color: white;
 }
 
 .selector-modal-list-item-ep-delta.positive {
@@ -1061,17 +1076,17 @@ td, th {
   color: black;
 }
 
-.default-main > .nav-tabs {
+.nav-tabs {
   padding-left: 40px;
   padding-top: 15px;
   border-bottom-color: var(--main-text-color);
 }
 
-.default-main > .nav-tabs > li > a {
+.nav-tabs > li > a {
   color: var(--main-text-color);
 }
 
-.default-main > .nav-tabs > li > a:hover, .nav-tabs > li.active > a {
+.nav-tabs > li > a:hover, .nav-tabs > li.active > a {
   color: var(--main-secondary-color);
   background-color: var(--main-text-color);
 }
