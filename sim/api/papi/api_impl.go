@@ -15,7 +15,8 @@ import (
 func getGearListImpl(request *api.GearListRequest) *api.GearListResult {
 	result := &api.GearListResult{}
 
-	for _, item := range items.Items {
+	for _, it := range items.Items {
+		item := it
 		result.Items = append(result.Items,
 			&api.Item{
 				Id:               item.ID,

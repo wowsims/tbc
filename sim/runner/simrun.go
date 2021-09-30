@@ -257,8 +257,8 @@ func (aggregator *MetricsAggregator) addMetrics(options core.Options, metrics co
 				copy(newDmgs, cm.CritDmgs)
 				cm.CritDmgs = newDmgs
 			}
-			cm.Counts[idx]++
-			cm.Dmgs[idx] += cast.DidDmg
+			cm.CritCounts[idx]++
+			cm.CritDmgs[idx] += cast.DidDmg
 		} else {
 			if len(cm.Counts) <= idx {
 				newArr := make([]int32, idx+1)
