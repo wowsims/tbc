@@ -62,15 +62,15 @@ dist/sim_worker.js: ui/worker/sim_worker.js
 # TODO: make different wasm generators per spec
 # TODO: how to make this understand 
 dist/lib.wasm: cmd/simwasm/* sim/api/*.go $(call rwildcard,sim,*.go)
-	GOOS=js GOARCH=wasm go build --tags=eleshaman -o ./dist/lib.wasm ./cmd/simwasm/
+	GOOS=js GOARCH=wasm go build --tags=elemental_shaman -o ./dist/lib.wasm ./cmd/simwasm/
 
 # Just builds the server binary
 elesimweb: sim/api/api.pb.go
-	go build --tags=eleshaman -o simweb ./cmd/simweb/web.go
+	go build --tags=elemental_shaman -o simweb ./cmd/simweb/web.go
 
 # Starts up a webserver hosting the dist/ and API endpoints.
 elerunweb: sim/api/api.pb.go
-	go run --tags=eleshaman ./cmd/simweb/web.go
+	go run --tags=elemental_shaman ./cmd/simweb/web.go
 
 sim/api/api.pb.go: api/*.proto
 	protoc -I=./api --go_out=./sim ./api/*.proto
