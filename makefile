@@ -27,12 +27,15 @@ ui/core/api/api.ts: api/*.proto
 	cp -r node_modules/@protobuf-ts/runtime/build/es2015/* dist/protobuf-ts
 	sed -i -E "s/from '(.*)';/from '\1\.js';/g" dist/protobuf-ts/*
 	sed -i -E "s/from \"(.*)\";/from '\1\.js';/g" dist/protobuf-ts/*
+	# This is needed for local hosting, since github pages serves under the 'tbc' directory.
+	mkdir -p dist/tbc/protobuf-ts
+	cp -r dist/protobuf-ts dist/tbc
 	npx protoc --ts_opt generate_dependencies --ts_out ui/core/api --proto_path api api/api.proto
 
 dist/core/tsconfig.tsbuildinfo: $(call rwildcard,ui/core,*.ts) ui/core/api/api.ts
 	npx tsc -p ui/core
-	sed -i 's/@protobuf-ts\/runtime/\/protobuf-ts\/index/g' dist/core/api/*
-	sed -i -E "s/from \"(.*?)(\.js)?\";/from '\1\.js';/g" dist/core/api/*
+	sed -i 's/@protobuf-ts\/runtime/\/tbc\/protobuf-ts\/index/g' dist/core/api/*.js
+	sed -i -E "s/from \"(.*?)(\.js)?\";/from '\1\.js';/g" dist/core/api/*.js
 
 # Generic rule for building index.js for any class directory
 dist/%/index.js: ui/%/index.ts ui/%/*.ts dist/core/tsconfig.tsbuildinfo
@@ -75,5 +78,8 @@ sim/api/api.pb.go: api/*.proto
 .PHONY: items
 items: $(itemsOutDir)/all.go
 
-$(itemsOutDir)/all.go: generate_items/*.go sim/api/api.pb.go
+$(itemsOutDir)/all.go: generate_items/*.go $(call rwildcard,sim/api,*.go)
 	go run generate_items/*.go -outDir=$(itemsOutDir)
+
+test: dist/lib.wasm
+	go test ./...

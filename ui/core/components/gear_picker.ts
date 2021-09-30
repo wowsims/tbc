@@ -205,7 +205,7 @@ class SelectorModal extends Component {
         equippedItem,
         eligibleItems,
 				item => this.sim.computeItemEP(item),
-        equippedItem => equippedItem?.item.id || 0,
+        equippedItem => equippedItem?.item,
         item => {
           return {
             id: item.id,
@@ -232,7 +232,7 @@ class SelectorModal extends Component {
         equippedItem,
         eligibleEnchants,
 				enchant => this.sim.computeEnchantEP(enchant),
-        equippedItem => equippedItem?.enchant?.id || 0,
+        equippedItem => equippedItem?.enchant,
         enchant => {
           return {
             id: enchant.id,
@@ -263,7 +263,7 @@ class SelectorModal extends Component {
           equippedItem,
           this.sim.getGems(socketColor),
 					gem => this.sim.computeGemEP(gem),
-          equippedItem => equippedItem?.gems[socketIdx]?.id || 0,
+          equippedItem => equippedItem?.gems[socketIdx],
           gem => {
             return {
               id: gem.id,
@@ -297,7 +297,7 @@ class SelectorModal extends Component {
         equippedItem: EquippedItem | null,
         items: Array<T>,
 				computeEP: (item: T) => number,
-        equippedToIdFn: (equippedItem: EquippedItem | null) => number,
+        equippedToItemFn: (equippedItem: EquippedItem | null) => (T | null | undefined),
         getItemData: (item: T) => {
           id: number,
           name: string,
@@ -309,6 +309,11 @@ class SelectorModal extends Component {
     if (items.length == 0) {
       return;
     }
+
+		const equippedToIdFn = (equippedItem: EquippedItem | null) => {
+			const item = equippedToItemFn(equippedItem);
+			return item ? getItemData(item).id : 0;
+		};
 
 		items.sort((itemA, itemB) => computeEP(itemB) - computeEP(itemA));
 
@@ -345,12 +350,10 @@ class SelectorModal extends Component {
 
     const listItemElems = items.map(item => {
       const itemData = getItemData(item);
+			const itemEP = computeEP(item);
 
       const listItemElem = document.createElement('li');
       listItemElem.classList.add('selector-modal-list-item');
-      if (itemData.id == equippedToIdFn(equippedItem)) {
-        listItemElem.classList.add('active');
-      }
       listElem.appendChild(listItemElem);
 
       listItemElem.dataset.id = String(itemData.id);
@@ -360,6 +363,11 @@ class SelectorModal extends Component {
       listItemElem.innerHTML = `
         <a class="selector-modal-list-item-icon"></a>
         <a class="selector-modal-list-item-name">${itemData.name}</a>
+        <div class="selector-modal-list-item-padding"></div>
+        <div class="selector-modal-list-item-ep">
+					<span class="selector-modal-list-item-ep-value">${Math.round(itemEP)}</span>
+					<span class="selector-modal-list-item-ep-delta"></span>
+				</div>
       `;
       setWowheadHref(listItemElem.children[0] as HTMLAnchorElement, {itemId: itemData.id});
       setWowheadHref(listItemElem.children[1] as HTMLAnchorElement, {itemId: itemData.id});
@@ -394,15 +402,43 @@ class SelectorModal extends Component {
       onRemove();
     });
 
-    this.sim.gearChangeEmitter.on(() => {
+    const updateSelected = () => {
       const newEquippedItem = this.sim.getEquippedItem(slot);
+			const newItem = equippedToItemFn(newEquippedItem);
+			if (!newItem)
+				return;
+
+			const newItemId = equippedToIdFn(newEquippedItem);
+			const newEP = computeEP(newItem);
+
       listItemElems.forEach(elem => {
+				const listItemId = parseInt(elem.dataset.id!);
+				const listItem = items.find(item => getItemData(item).id == listItemId);
+
         elem.classList.remove('active');
-        if (parseInt(elem.dataset.id!) == equippedToIdFn(newEquippedItem)) {
+        if (listItemId == newItemId) {
           elem.classList.add('active');
         }
+
+				const epDeltaElem = elem.getElementsByClassName('selector-modal-list-item-ep-delta')[0] as HTMLSpanElement;
+				epDeltaElem.textContent = '';
+				if (listItem) {
+					const listItemEP = computeEP(listItem);
+					const delta = Math.round(listItemEP) - Math.round(newEP);
+					if (delta > 0) {
+						epDeltaElem.textContent = '+' + delta;
+						epDeltaElem.classList.remove('negative');
+						epDeltaElem.classList.add('positive');
+					} else if (delta < 0) {
+						epDeltaElem.textContent = '' + delta;
+						epDeltaElem.classList.remove('positive');
+						epDeltaElem.classList.add('negative');
+					}
+				}
       });
-    });
+    };
+		updateSelected();
+    this.sim.gearChangeEmitter.on(updateSelected);
 
 		const applyFilters = () => {
 			const searchQuery = searchInput.value.toLowerCase();

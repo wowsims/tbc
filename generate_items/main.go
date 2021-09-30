@@ -4,7 +4,6 @@ import (
 	"flag"
 
 	"github.com/wowsims/tbc/sim/api"
-	//"fmt"
 )
 
 func main() {

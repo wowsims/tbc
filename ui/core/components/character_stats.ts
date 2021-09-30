@@ -35,14 +35,27 @@ export class CharacterStats extends Component {
     });
 
 		this.updateStats(new Stats());
-		sim.characterStatsEmitter.on(computeStatsResult => {
-			this.updateStats(new Stats(computeStatsResult.finalStats));
+		sim.characterStatsEmitter.on(() => {
+			this.updateStats(new Stats(sim.getCurrentStats().finalStats));
 		});
   }
 
 	private updateStats(newStats: Stats) {
 		this.stats.forEach((stat, idx) => {
-			this.valueElems[idx].textContent = String(Math.round(newStats.getStat(stat)));
+			const rawValue = newStats.getStat(stat);
+			let displayStr = String(Math.round(rawValue));
+
+			if (stat == Stat.StatMeleeHit) {
+				displayStr += ` (${(rawValue / 15.8).toFixed(2)}%)`;
+			} else if (stat == Stat.StatSpellHit) {
+				displayStr += ` (${(rawValue / 12.6).toFixed(2)}%)`;
+			} else if (stat == Stat.StatMeleeCrit || stat == Stat.StatSpellCrit) {
+				displayStr += ` (${(rawValue / 22.08).toFixed(2)}%)`;
+			} else if (stat == Stat.StatMeleeHaste || stat == Stat.StatSpellHaste) {
+				displayStr += ` (${(rawValue / 15.76).toFixed(2)}%)`;
+			}
+
+			this.valueElems[idx].textContent = displayStr;
 		});
 	}
 }
