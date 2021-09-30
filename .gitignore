@@ -1,6 +1,5 @@
 node_modules
 *.pb.go
-generate_items/api
 ui/core/api/api.ts
 ui/core/api/common.ts
 ui/core/api/druid.ts

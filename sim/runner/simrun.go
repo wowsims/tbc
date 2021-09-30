@@ -6,21 +6,23 @@ import (
 	"strings"
 	"time"
 
+	"github.com/wowsims/tbc/items"
 	"github.com/wowsims/tbc/sim/core"
+	"github.com/wowsims/tbc/sim/core/stats"
 	"github.com/wowsims/tbc/sim/druid"
 	"github.com/wowsims/tbc/sim/mage"
 	"github.com/wowsims/tbc/sim/paladin"
 	"github.com/wowsims/tbc/sim/priest"
 )
 
-// TODO: Should we move the 'buff bots' to a subpackage so we dont have to import the full class unless we want to?
+// TODO: Should we move the 'buff bots' to a subpackage so we dont have to import the full class unless we are actually wanting the whole class?
 
 type AgentCreator interface {
 	CreateAgent(player *core.Player, party *core.Party) core.Agent
 }
 
 type IndividualParams struct {
-	Equip    core.EquipmentSpec
+	Equip    items.EquipmentSpec
 	Race     core.RaceBonusType
 	Consumes core.Consumes
 	Buffs    core.Buffs
@@ -68,7 +70,7 @@ func SetupIndividualSim(params IndividualParams) *core.Simulation {
 	if buffs.Misery {
 		// Misery bot re-applies misery on every sim reset.
 		sim.Raid.Parties[0].Players = append(sim.Raid.Parties[0].Players, core.PlayerAgent{
-			Player: core.NewPlayer(core.EquipmentSpec{}, core.RaceBonusTypeNone, core.Consumes{}),
+			Player: core.NewPlayer(items.EquipmentSpec{}, core.RaceBonusTypeNone, core.Consumes{}),
 			Agent:  priestBot,
 		})
 	}
@@ -76,7 +78,7 @@ func SetupIndividualSim(params IndividualParams) *core.Simulation {
 		// Judgement of wisdom is an aura that has to be reapplied on every reset.
 		// create a bot that acts like a player and rebuffs us.
 		sim.Raid.Parties[0].Players = append(sim.Raid.Parties[0].Players, core.PlayerAgent{
-			Player: core.NewPlayer(core.EquipmentSpec{}, core.RaceBonusTypeNone, core.Consumes{}),
+			Player: core.NewPlayer(items.EquipmentSpec{}, core.RaceBonusTypeNone, core.Consumes{}),
 			Agent:  paladinBot,
 		})
 	}
@@ -84,7 +86,7 @@ func SetupIndividualSim(params IndividualParams) *core.Simulation {
 	if len(sim.Raid.Parties[0].Players) == 1 && (buffs.TwilightOwl) {
 		// Add a new player.
 		sim.Raid.Parties[0].Players = append(sim.Raid.Parties[0].Players, core.PlayerAgent{
-			Player: core.NewPlayer(core.EquipmentSpec{}, core.RaceBonusTypeNone, core.Consumes{}),
+			Player: core.NewPlayer(items.EquipmentSpec{}, core.RaceBonusTypeNone, core.Consumes{}),
 			Agent:  &nullAgent{}, // this player exists to pop items, no agent needed.
 		})
 	}
@@ -93,8 +95,9 @@ func SetupIndividualSim(params IndividualParams) *core.Simulation {
 		// Add neck to first bot player
 		for i, item := range sim.Raid.Parties[0].Players[1].Equip {
 			if item.ID == 0 { // no item in this slot.
-				sim.Raid.Parties[0].Players[1].Equip[i] = core.ItemsByID[24121]
-				sim.Raid.Parties[0].Players[1].ActiveEquip = append(sim.Raid.Parties[0].Players[1].ActiveEquip, &sim.Raid.Parties[0].Players[1].Equip[i])
+				sim.Raid.Parties[0].Players[1].Equip[i] = items.ByID[24121]
+				active := core.ActiveItemByID[24121]
+				sim.Raid.Parties[0].Players[1].ActiveEquip = append(sim.Raid.Parties[0].Players[1].ActiveEquip, &active)
 				break
 			}
 		}
@@ -103,8 +106,9 @@ func SetupIndividualSim(params IndividualParams) *core.Simulation {
 		// Add neck to first bot player
 		for i, item := range sim.Raid.Parties[0].Players[1].Equip {
 			if item.ID == 0 { // no item in this slot.
-				sim.Raid.Parties[0].Players[1].Equip[i] = core.ItemsByID[24116]
-				sim.Raid.Parties[0].Players[1].ActiveEquip = append(sim.Raid.Parties[0].Players[1].ActiveEquip, &sim.Raid.Parties[0].Players[1].Equip[i])
+				sim.Raid.Parties[0].Players[1].Equip[i] = items.ByID[24116]
+				active := core.ActiveItemByID[24116]
+				sim.Raid.Parties[0].Players[1].ActiveEquip = append(sim.Raid.Parties[0].Players[1].ActiveEquip, &active)
 				break
 			}
 		}
@@ -118,14 +122,14 @@ func SetupIndividualSim(params IndividualParams) *core.Simulation {
 	for _, raidParty := range sim.Raid.Parties {
 		for _, pl := range raidParty.Players {
 			if buffs.ImprovedDivineSpirit {
-				pl.Player.InitialStats[core.StatSpirit] += 50
+				pl.Player.InitialStats[stats.Spirit] += 50
 			}
 			if buffs.BlessingOfKings {
-				pl.Player.InitialStats[core.StatIntellect] *= 1.1
-				pl.Player.InitialStats[core.StatSpirit] *= 1.1
+				pl.Player.InitialStats[stats.Intellect] *= 1.1
+				pl.Player.InitialStats[stats.Spirit] *= 1.1
 			}
 			if buffs.ImprovedDivineSpirit {
-				pl.Player.InitialStats[core.StatSpellPower] += pl.Player.InitialStats[core.StatSpirit] * 0.1
+				pl.Player.InitialStats[stats.SpellPower] += pl.Player.InitialStats[stats.Spirit] * 0.1
 			}
 			// Add SpellCrit from Int and Mana from Int
 			pl.Player.InitialStats = pl.Player.InitialStats.CalculatedTotal()
@@ -137,7 +141,6 @@ func SetupIndividualSim(params IndividualParams) *core.Simulation {
 }
 
 // RunIndividualSim
-//  TODO: Should this accept a 'PlayerSettings' instead of a constructed raid and do that work in here?
 func RunIndividualSim(sim *core.Simulation) SimResult {
 	pid := 0
 	for _, raidParty := range sim.Raid.Parties {
@@ -201,9 +204,15 @@ type SimResult struct {
 }
 
 type CastMetric struct {
+	// Index 0 of each slice is the 'normal' cast data.
+
+	// Count & Dmg of spells cast by Tag
 	Counts []int32
 	Dmgs   []float64
-	Tags   []int32
+
+	// Count & Dmg of spell criticals cast by Tag
+	CritCounts []int32
+	CritDmgs   []float64
 }
 
 func NewMetricsAggregator() *MetricsAggregator {
@@ -237,23 +246,32 @@ func (aggregator *MetricsAggregator) addMetrics(options core.Options, metrics co
 	for _, cast := range metrics.Casts {
 		var id = cast.Spell.ID
 		cm := aggregator.casts[id]
-		idx := 0
-		if cast.IsLO {
-			idx = 2
-		} else if cast.DidCrit {
-			idx = 1
-		}
-		if len(cm.Counts) <= idx {
-			newArr := make([]int32, idx+1)
-			copy(newArr, cm.Counts)
-			cm.Counts = newArr
+		idx := int(cast.Tag)
 
-			newDmgs := make([]float64, idx+1)
-			copy(newDmgs, cm.Dmgs)
-			cm.Dmgs = newDmgs
+		if cast.DidCrit {
+			if len(cm.CritCounts) <= idx {
+				newArr := make([]int32, idx+1)
+				copy(newArr, cm.CritCounts)
+				cm.CritCounts = newArr
+				newDmgs := make([]float64, idx+1)
+				copy(newDmgs, cm.CritDmgs)
+				cm.CritDmgs = newDmgs
+			}
+			cm.Counts[idx]++
+			cm.Dmgs[idx] += cast.DidDmg
+		} else {
+			if len(cm.Counts) <= idx {
+				newArr := make([]int32, idx+1)
+				copy(newArr, cm.Counts)
+				cm.Counts = newArr
+
+				newDmgs := make([]float64, idx+1)
+				copy(newDmgs, cm.Dmgs)
+				cm.Dmgs = newDmgs
+			}
+			cm.Counts[idx]++
+			cm.Dmgs[idx] += cast.DidDmg
 		}
-		cm.Counts[idx]++
-		cm.Dmgs[idx] += cast.DidDmg
 
 		aggregator.casts[id] = cm
 	}

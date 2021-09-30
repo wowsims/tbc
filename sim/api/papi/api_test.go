@@ -98,7 +98,7 @@ func TestIndividualSim(t *testing.T) {
 	res := RunSimulation(req)
 	log.Printf("LOGS:\n%s\n", res.Logs)
 
-	// TODO: validate something that wont' break if we change core logic.
+	// TODO: validate something that wont break if we change core logic.
 }
 
 func TestGearList(t *testing.T) {

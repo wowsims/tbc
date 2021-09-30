@@ -1,18 +1,21 @@
 package paladin
 
-import "github.com/wowsims/tbc/sim/core"
+import (
+	"github.com/wowsims/tbc/sim/core"
+	"github.com/wowsims/tbc/sim/core/stats"
+)
 
 func NewBuffBot(sim *core.Simulation, party *core.Party, blessingOfKings, improvedBlessingOfWisdom, improvedSealOfTheCrusader, judgementOfWisdom bool) *Paladin {
 
 	for _, raidParty := range sim.Raid.Parties {
 		for _, pl := range raidParty.Players {
 			if improvedBlessingOfWisdom {
-				pl.Stats[core.StatMP5] += 42
-				pl.InitialStats[core.StatMP5] += 42
+				pl.Stats[stats.MP5] += 42
+				pl.InitialStats[stats.MP5] += 42
 			}
 			if improvedSealOfTheCrusader {
-				pl.Stats[core.StatSpellCrit] += 66.24        // 3% crit
-				pl.InitialStats[core.StatSpellCrit] += 66.24 // 3% crit
+				pl.Stats[stats.SpellCrit] += 66.24        // 3% crit
+				pl.InitialStats[stats.SpellCrit] += 66.24 // 3% crit
 				// FUTURE: melee crit bonus, research actual value
 			}
 		}
@@ -61,8 +64,8 @@ func AuraJudgementOfWisdom() core.Aura {
 				sim.Debug("(%d) +Judgement Of Wisdom: 37 mana (74 @ 50%% proc)\n", player.ID)
 			}
 			// Only apply to players that have mana.
-			if player.InitialStats[core.StatMana] > 0 {
-				player.Stats[core.StatMana] += mana
+			if player.InitialStats[stats.Mana] > 0 {
+				player.Stats[stats.Mana] += mana
 			}
 		},
 	}

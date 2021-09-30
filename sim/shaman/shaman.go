@@ -3,7 +3,9 @@ package shaman
 import (
 	"time"
 
+	"github.com/wowsims/tbc/items"
 	"github.com/wowsims/tbc/sim/core"
+	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 type AgentType int
@@ -36,7 +38,7 @@ func NewShaman(player *core.Player, party *core.Party, talents Talents, totems T
 	}
 
 	// if WaterShield {
-	player.InitialStats[core.StatMP5] += 50
+	player.InitialStats[stats.MP5] += 50
 	// }
 
 	for _, pl := range party.Players {
@@ -84,7 +86,7 @@ func (s *Shaman) ChooseAction(sim *core.Simulation, party *core.Party) core.Agen
 	if !s.started {
 		s.started = true
 		// we need to apply regen once all buffs are applied.
-		s.Stats[core.StatMP5] += s.Stats[core.StatIntellect] * (0.02 * float64(s.Talents.UnrelentingStorm))
+		s.Stats[stats.MP5] += s.Stats[stats.Intellect] * (0.02 * float64(s.Talents.UnrelentingStorm))
 	}
 	// Before casting, activate shaman powers!
 	TryActivateBloodlust(sim, party, s.Player)
@@ -152,14 +154,14 @@ type Totems struct {
 	ManaStream   bool
 }
 
-func (tt Totems) AddStats(s core.Stats) core.Stats {
-	s[core.StatSpellCrit] += 66.24 * float64(tt.TotemOfWrath)
-	s[core.StatSpellHit] += 37.8 * float64(tt.TotemOfWrath)
+func (tt Totems) AddStats(s stats.Stats) stats.Stats {
+	s[stats.SpellCrit] += 66.24 * float64(tt.TotemOfWrath)
+	s[stats.SpellHit] += 37.8 * float64(tt.TotemOfWrath)
 	if tt.WrathOfAir {
-		s[core.StatSpellPower] += 101
+		s[stats.SpellPower] += 101
 	}
 	if tt.ManaStream {
-		s[core.StatMP5] += 50
+		s[stats.MP5] += 50
 	}
 	return s
 }
@@ -197,6 +199,50 @@ func TryActivateBloodlust(sim *core.Simulation, party *core.Party, player *core.
 	}
 }
 
+// func createBaseLB(sim *core.Simulation) *core.Cast {
+// 	return &core.Spell{}
+// }
+
+func createBaseCL(player *Shaman, sim *core.Simulation) *core.Cast {
+	cast := core.NewCast(sim, core.Spells[core.MagicIDCL6])
+
+	if player.Talents.ElementalPrecision > 0 {
+		// FUTURE: This only impacts "frost fire and nature" spells.
+		//  We know it doesnt impact TLC.
+		//  Are there any other spells that a shaman can cast?
+		cast.Hit += float64(player.Talents.ElementalPrecision) * 0.02
+	}
+	if player.Talents.NaturesGuidance > 0 {
+		cast.Hit += float64(player.Talents.NaturesGuidance) * 0.01
+	}
+	if player.Talents.TidalMastery > 0 {
+		cast.Crit += float64(player.Talents.TidalMastery) * 0.01
+	}
+
+	// TODO: Should we change these to be full auras?
+	//   Doesnt seem needed since they can only be used by shaman right here.
+	if player.Equip[items.ItemSlotRanged].ID == 28248 {
+		cast.Dmg += 55
+	} else if player.Equip[items.ItemSlotRanged].ID == 23199 {
+		cast.Dmg += 33
+	} else if player.Equip[items.ItemSlotRanged].ID == 32330 {
+		cast.Dmg += 85
+	}
+	if player.Talents.CallOfThunder > 0 { // only applies to CL and LB
+		cast.Crit += float64(player.Talents.CallOfThunder) * 0.01
+	}
+	if sim.Options.Encounter.NumTargets > 1 {
+		cast.DoItNow = ChainCast
+	}
+	cast.ManaCost *= player.convectionBonus
+
+	if player.Talents.LightningMastery > 0 {
+		cast.CastTime -= time.Millisecond * 100 * time.Duration(player.Talents.LightningMastery)
+	}
+
+	return cast
+}
+
 // NewCastAction is how a shaman creates a new spell
 //  TODO: Decide if we need separate functions for elemental and enhancement?
 func NewCastAction(sim *core.Simulation, player *Shaman, sp *core.Spell) core.AgentAction {
@@ -220,11 +266,11 @@ func NewCastAction(sim *core.Simulation, player *Shaman, sp *core.Spell) core.Ag
 	if itsElectric {
 		// TODO: Should we change these to be full auras?
 		//   Doesnt seem needed since they can only be used by shaman right here.
-		if player.Equip[core.ItemSlotRanged].ID == 28248 {
+		if player.Equip[items.ItemSlotRanged].ID == 28248 {
 			cast.Dmg += 55
-		} else if player.Equip[core.ItemSlotRanged].ID == 23199 {
+		} else if player.Equip[items.ItemSlotRanged].ID == 23199 {
 			cast.Dmg += 33
-		} else if player.Equip[core.ItemSlotRanged].ID == 32330 {
+		} else if player.Equip[items.ItemSlotRanged].ID == 32330 {
 			cast.Dmg += 85
 		}
 		if player.Talents.CallOfThunder > 0 { // only applies to CL and LB

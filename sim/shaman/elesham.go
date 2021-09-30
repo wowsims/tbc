@@ -4,19 +4,8 @@ import (
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
+	"github.com/wowsims/tbc/sim/core/stats"
 )
-
-var ElementalItems = []int32{
-	27471, 24266, 28278, 31330, 28415, 28758, 28349, 29504, 31107, 28193, 28169, 27488, 30297, 27993, 30946, 28245, 28134, 29333, 31692, 28254, 27758, 31693, 27464, 31338, 27473, 32078, 27796, 30925, 31797, 27778, 27802, 27994, 25777, 28269, 29813, 27981, 32541, 24252, 31140, 28379, 27469, 31340, 29129, 28231, 29341, 28191, 31297, 28342, 28232, 28229, 27824, 28391, 28638, 27522, 24250, 27462, 29240, 27746, 29243, 29955, 27465, 27793, 31149, 27470, 31280, 30924, 29317, 27493, 27508, 24452, 27537, 29784, 27743, 29244, 31461, 29257, 29241, 27783, 27795, 31513, 24262, 30541, 29141, 29142, 30531, 30709, 27492, 29343, 27472, 30532, 28185, 27838, 27907, 27909, 28266, 27948, 29314, 28406, 28640, 27914, 28179, 29245, 27821, 27845, 29808, 29242, 29258, 29313, 30519, 28227, 29126, 31922, 28394, 29320, 27784, 30366, 29172, 29352, 28555, 31339, 31921, 28248, 23199, 27543, 27868, 27741, 27937, 28412, 28260, 31287, 28187, 29330, 27910, 30984, 27534, 29355, 29130, 28341, 31308, 28188, 30011, 27842, 28346, 24557, 29389, 28744, 28586, 29035, 30171, 29986, 32476, 31014, 32525, 28530, 29368, 30008, 28762, 30015, 32349, 28726, 30024, 29037, 30079, 32338, 30173, 32587, 31023, 30884, 28766, 28570, 29369, 29992, 28797, 30735, 32331, 29033, 29519, 30056, 32327, 30913, 30169, 30107, 32592, 31017, 28515, 32351, 32270, 29521, 32259, 29918, 30870, 29034, 28507, 30170, 29987, 30725, 28780, 31008, 28565, 28639, 28654, 30044, 29520, 28799, 30064, 24256, 30914, 32256, 30038, 30888, 32276, 29036, 28594, 29972, 30172, 32367, 31020, 30734, 30916, 28670, 28585, 28810, 30894, 30037, 28517, 30043, 30067, 32242, 32352, 32239, 28793, 28510, 29922, 29367, 29287, 29286, 29285, 28753, 29305, 30109, 30667, 32247, 32527, 30832, 23554, 28770, 30723, 34009, 32237, 28633, 29988, 32374, 28734, 28611, 34011, 28781, 29268, 28603, 32361, 29273, 30049, 30909, 30872, 28297, 27683, 29370, 19344, 19379, 23046, 23207, 29132, 24126, 29179, 28418, 31856, 28785, 28789, 30626, 34429, 32483, 33829, 29376, 38290, 30663, 35749, 24116, 24121, 31075, 32664, 29522, 29524, 29523, 27510, 22730, 23070, 21709, 23031, 23025, 23057, 21608, 23664, 23665, 23050, 30682, 30677, 30686, 28583, 32586, 23049, 25778, 28174, 31283, 30004, 31290, 34336, 34179, 34350, 34542, 34186, 34566, 34437, 34230, 34362, 34204, 34332, 34242, 34396, 34390, 33970, 33965, 33588, 33537, 33534, 34359, 32330, 33506, 32086, 28602, 32963, 32524, 33357, 33533, 33354, 33283, 33466, 33591, 32817, 32792, 32328, 33281, 33334, 34344,
-}
-
-var ElementalGems = []int32{
-	34220, 25897, 32641, 35503, 28557, 25893, 25901, 23096, 24030, 32196, 28118, 33133, 23121, 24037, 32202, 23113, 24047, 32204, 23114, 24050, 32207, 30551, 23101, 24059, 32218, 35760, 30588, 28123, 31866, 31867, 32221, 30564, 30560, 24065, 35759, 24056, 30555, 32215, 31116, 30600, 30605,
-}
-
-var ElementalEnchants = []int32{
-	29191, 28909, 28886, 24421, 20076, 23545, 27960, 27917, 22534, 33997, 28272, 24274, 24273, 27975, 22555, 35445, 27945,
-}
 
 type ElementalSpec struct {
 	Talents      Talents
@@ -33,6 +22,10 @@ func loDmgMod(sim *core.Simulation, p core.PlayerAgent, c *core.Cast) {
 	c.DidDmg /= 2
 }
 
+const (
+	CastTagLightningOverload int32 = 1 // This could be value or bitflag if we ended up needing multiple flags at the same time.
+)
+
 func AuraLightningOverload(lvl int) core.Aura {
 	chance := 0.04 * float64(lvl)
 	return core.Aura{
@@ -42,7 +35,7 @@ func AuraLightningOverload(lvl int) core.Aura {
 			if c.Spell.ID != core.MagicIDLB12 && c.Spell.ID != core.MagicIDCL6 {
 				return
 			}
-			if c.IsLO {
+			if c.Tag == CastTagLightningOverload {
 				return // can't proc LO on LO
 			}
 			actualChance := chance
@@ -55,7 +48,7 @@ func AuraLightningOverload(lvl int) core.Aura {
 				}
 				clone := sim.NewCast()
 				// Don't set IsClBounce even if this is a bounce, so that the clone does a normal CL and bounces
-				clone.IsLO = true
+				clone.Tag = CastTagLightningOverload
 				clone.Spell = c.Spell
 
 				// Clone dmg/hit/crit chance?
@@ -320,18 +313,18 @@ func (agent *AdaptiveAgent) ChooseAction(s *Shaman, party *core.Party, sim *core
 
 	if sim.Debug != nil {
 		manaSpendingRate := manaSpent / timeDelta.Seconds()
-		sim.Debug("[AI] CL Ready: Mana/s: %0.1f, Est Mana Cost: %0.1f, CurrentMana: %0.1f\n", manaSpendingRate, projectedManaCost, s.Stats[core.StatMana])
+		sim.Debug("[AI] CL Ready: Mana/s: %0.1f, Est Mana Cost: %0.1f, CurrentMana: %0.1f\n", manaSpendingRate, projectedManaCost, s.Stats[stats.Mana])
 	}
 
 	// If we have enough mana to burn, use the surplus agent.
-	if projectedManaCost < s.Stats[core.StatMana] {
+	if projectedManaCost < s.Stats[stats.Mana] {
 		return agent.surplusAgent.ChooseAction(s, party, sim)
 	} else {
 		return agent.baseAgent.ChooseAction(s, party, sim)
 	}
 }
 func (agent *AdaptiveAgent) OnActionAccepted(s *Shaman, sim *core.Simulation, action core.AgentAction) {
-	if !agent.wentOOM && action.Cast != nil && action.Cast.ManaCost > s.Stats[core.StatMana] {
+	if !agent.wentOOM && action.Cast != nil && action.Cast.ManaCost > s.Stats[stats.Mana] {
 		agent.timesOOM++
 		agent.wentOOM = true
 	}
@@ -372,7 +365,7 @@ func ChainCast(sim *core.Simulation, p core.PlayerAgent, cast *core.Cast) {
 
 	// Now chain
 	dmgCoeff := 1.0
-	if cast.IsLO {
+	if cast.Tag == CastTagLightningOverload {
 		dmgCoeff = 0.5
 	}
 	for i := 1; i < sim.Options.Encounter.NumTargets; i++ {
@@ -382,13 +375,12 @@ func ChainCast(sim *core.Simulation, p core.PlayerAgent, cast *core.Cast) {
 			dmgCoeff *= 0.7
 		}
 		clone := &core.Cast{
-			IsLO:       cast.IsLO,
-			IsClBounce: true,
-			Spell:      cast.Spell,
-			Crit:       cast.Crit,
-			CritBonus:  cast.CritBonus,
-			Effect:     func(sim *core.Simulation, p core.PlayerAgent, c *core.Cast) { cast.DidDmg *= dmgCoeff },
-			DoItNow:    core.DirectCast,
+			Tag:       cast.Tag, // pass along lightning overload
+			Spell:     cast.Spell,
+			Crit:      cast.Crit,
+			CritBonus: cast.CritBonus,
+			Effect:    func(sim *core.Simulation, p core.PlayerAgent, c *core.Cast) { cast.DidDmg *= dmgCoeff },
+			DoItNow:   core.DirectCast,
 		}
 		clone.DoItNow(sim, p, clone)
 	}

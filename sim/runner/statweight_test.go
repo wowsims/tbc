@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/wowsims/tbc/sim/core"
+	"github.com/wowsims/tbc/sim/core/stats"
 	"github.com/wowsims/tbc/sim/shaman"
 )
 
@@ -33,7 +34,7 @@ func TestCalcStatWeight(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := CalcStatWeight(tt.params, []core.Stat{core.StatSpellPower, core.StatSpellHit, core.StatIntellect, core.StatSpellCrit}, core.StatSpellPower); !reflect.DeepEqual(got, tt.want) {
+			if got := CalcStatWeight(tt.params, []stats.Stat{stats.SpellPower, stats.SpellHit, stats.Intellect, stats.SpellCrit}, stats.SpellPower); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("CalcStatWeight() = %v, want %v", got, tt.want)
 			}
 		})

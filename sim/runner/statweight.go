@@ -6,7 +6,7 @@ import (
 	"math/rand"
 	"sync"
 
-	"github.com/wowsims/tbc/sim/core"
+	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 type StatWeightsResult struct {
@@ -16,25 +16,25 @@ type StatWeightsResult struct {
 	EpValuesStdev []float64
 }
 
-func CalcStatWeight(params IndividualParams, statsToWeigh []core.Stat, referenceStat core.Stat) StatWeightsResult {
+func CalcStatWeight(params IndividualParams, statsToWeigh []stats.Stat, referenceStat stats.Stat) StatWeightsResult {
 	baseSim := SetupIndividualSim(params)
 	baseStats := baseSim.Raid.Parties[0].Players[0].Stats
 	baselineResult := RunIndividualSim(baseSim)
 
 	var waitGroup sync.WaitGroup
 	result := StatWeightsResult{
-		Weights:       make([]float64, core.StatLen),
-		WeightsStdev:  make([]float64, core.StatLen),
-		EpValues:      make([]float64, core.StatLen),
-		EpValuesStdev: make([]float64, core.StatLen),
+		Weights:       make([]float64, stats.Len),
+		WeightsStdev:  make([]float64, stats.Len),
+		EpValues:      make([]float64, stats.Len),
+		EpValuesStdev: make([]float64, stats.Len),
 	}
-	dpsHists := [core.StatLen]map[int32]int32{}
+	dpsHists := [stats.Len]map[int32]int32{}
 
-	doStat := func(stat core.Stat, value float64) {
+	doStat := func(stat stats.Stat, value float64) {
 		defer waitGroup.Done()
 
 		newParams := params
-		newParams.CustomStats = make([]float64, core.StatLen)
+		newParams.CustomStats = make([]float64, stats.Len)
 		newParams.CustomStats[stat] = value
 		newSim := SetupIndividualSim(newParams)
 		simResult := RunIndividualSim(newSim)
@@ -43,13 +43,13 @@ func CalcStatWeight(params IndividualParams, statsToWeigh []core.Stat, reference
 	}
 
 	// Spell hit mod shouldn't go over hit cap.
-	spellHitMod := math.Max(0, math.Min(10, 202-baseStats[core.StatSpellHit]))
+	spellHitMod := math.Max(0, math.Min(10, 202-baseStats[stats.SpellHit]))
 
-	statMods := core.Stats{}
+	statMods := stats.Stats{}
 	statMods[referenceStat] = 50 // make sure reference stat is included
 	for _, v := range statsToWeigh {
 		statMods[v] = 50
-		if v == core.StatSpellHit {
+		if v == stats.SpellHit {
 			statMods[v] = spellHitMod
 		}
 	}
@@ -58,14 +58,14 @@ func CalcStatWeight(params IndividualParams, statsToWeigh []core.Stat, reference
 			continue
 		}
 		waitGroup.Add(1)
-		go doStat(core.Stat(stat), mod)
+		go doStat(stats.Stat(stat), mod)
 	}
 
 	waitGroup.Wait()
 
 	for _, stat := range statsToWeigh {
 		mod := statMods[stat]
-		result.EpValues[stat] = result.Weights[stat] / result.Weights[core.StatSpellPower]
+		result.EpValues[stat] = result.Weights[stat] / result.Weights[stats.SpellPower]
 		log.Printf("%s Weight: %0.2f", stat.StatName(), result.EpValues[stat])
 		result.WeightsStdev[stat] = computeStDevFromHists(params.Options.Iterations, mod, dpsHists[stat], baselineResult.DpsHist, nil, statMods[referenceStat])
 		result.EpValuesStdev[stat] = computeStDevFromHists(params.Options.Iterations, mod, dpsHists[stat], baselineResult.DpsHist, dpsHists[referenceStat], statMods[referenceStat])

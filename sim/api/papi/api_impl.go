@@ -4,67 +4,54 @@ package papi
 import (
 	"time"
 
+	"github.com/wowsims/tbc/items"
 	"github.com/wowsims/tbc/sim/api"
 	"github.com/wowsims/tbc/sim/core"
+	"github.com/wowsims/tbc/sim/core/stats"
 	"github.com/wowsims/tbc/sim/runner"
 	"github.com/wowsims/tbc/sim/shaman"
 )
 
-func coreGemColorToColor(s []core.GemColor) []api.GemColor {
-	newColors := make([]api.GemColor, len(s))
-	for k, v := range s {
-		newColors[k] = api.GemColor(v)
-	}
-	return newColors
-}
-
 func getGearListImpl(request *api.GearListRequest) *api.GearListResult {
 	result := &api.GearListResult{}
 
-	if request.Spec == api.Spec_SpecElementalShaman {
-		for _, v := range shaman.ElementalItems {
-			item := core.ItemsByID[v]
-
-			result.Items = append(result.Items,
-				&api.Item{
-					Id:               item.ID,
-					Type:             api.ItemType(item.ItemType),
-					ArmorType:        api.ArmorType(item.ArmorType),
-					WeaponType:       api.WeaponType(item.WeaponType),
-					HandType:         api.HandType(item.HandType),
-					RangedWeaponType: api.RangedWeaponType(item.RangedWeaponType),
-					Name:             item.Name,
-					Stats:            item.Stats[:],
-					Phase:            int32(item.Phase),
-					Quality:          api.ItemQuality(item.Quality + 1), // Hack until we use generated items
-					GemSockets:       coreGemColorToColor(item.GemSockets),
-				},
-			)
-		}
-		for _, v := range shaman.ElementalGems {
-			gem := core.GemsByID[v]
-			result.Gems = append(result.Gems, &api.Gem{
-				Id:      gem.ID,
-				Name:    gem.Name,
-				Stats:   gem.Stats[:],
-				Color:   api.GemColor(gem.Color),
-				Phase:   int32(gem.Phase),
-				Quality: api.ItemQuality(gem.Quality + 1), // Hack until we use generated items
-			})
-		}
-		for _, v := range shaman.ElementalEnchants {
-			enchant := core.EnchantsByID[v]
-			result.Enchants = append(result.Enchants, &api.Enchant{
-				Id:       enchant.ID,
-				EffectId: enchant.EffectID,
-				Name:     enchant.Name,
-				Type:     api.ItemType(enchant.ItemType),
-				Stats:    enchant.Bonus[:],
-				Quality:  api.ItemQuality(4),
-			})
-		}
+	for _, item := range items.Items {
+		result.Items = append(result.Items,
+			&api.Item{
+				Id:               item.ID,
+				Type:             api.ItemType(item.Type),
+				ArmorType:        api.ArmorType(item.ArmorType),
+				WeaponType:       api.WeaponType(item.WeaponType),
+				HandType:         api.HandType(item.HandType),
+				RangedWeaponType: api.RangedWeaponType(item.RangedWeaponType),
+				Name:             item.Name,
+				Stats:            item.Stats[:],
+				Phase:            int32(item.Phase),
+				Quality:          item.Quality, // Hack until we use generated items
+				GemSockets:       item.GemSockets,
+			},
+		)
 	}
-	// Enchants: Enchants,
+	for _, gem := range items.Gems {
+		result.Gems = append(result.Gems, &api.Gem{
+			Id:      gem.ID,
+			Name:    gem.Name,
+			Stats:   gem.Stats[:],
+			Color:   gem.Color,
+			Phase:   int32(gem.Phase),
+			Quality: gem.Quality, // Hack until we use generated items
+		})
+	}
+	for _, enchant := range items.Enchants {
+		result.Enchants = append(result.Enchants, &api.Enchant{
+			Id:       enchant.ID,
+			EffectId: enchant.EffectID,
+			Name:     enchant.Name,
+			Type:     enchant.ItemType,
+			Stats:    enchant.Bonus[:],
+			Quality:  api.ItemQuality(4),
+		})
+	}
 
 	return result
 }
@@ -84,11 +71,11 @@ func statsFromIndSimRequest(isr *api.IndividualSimRequest) *api.ComputeStatsResu
 }
 
 func statWeightsImpl(request *api.StatWeightsRequest) *api.StatWeightsResult {
-	statsToWeight := make([]core.Stat, len(request.StatsToWeigh))
+	statsToWeight := make([]stats.Stat, len(request.StatsToWeigh))
 	for i, v := range request.StatsToWeigh {
-		statsToWeight[i] = core.Stat(v)
+		statsToWeight[i] = stats.Stat(v)
 	}
-	result := runner.CalcStatWeight(convertSimParams(request.Options), statsToWeight, core.Stat(request.EpReferenceStat))
+	result := runner.CalcStatWeight(convertSimParams(request.Options), statsToWeight, stats.Stat(request.EpReferenceStat))
 	return &api.StatWeightsResult{
 		Weights:       result.Weights,
 		WeightsStdev:  result.WeightsStdev,
@@ -204,16 +191,15 @@ func convertConsumes(c *api.Consumes) core.Consumes {
 	return cconsume
 }
 
-func convertEquip(es *api.EquipmentSpec) core.EquipmentSpec {
-	coreEquip := core.EquipmentSpec{}
+func convertEquip(es *api.EquipmentSpec) items.EquipmentSpec {
+	coreEquip := items.EquipmentSpec{}
 
 	for i, item := range es.Items {
-		spec := core.ItemSpec{
+		spec := items.ItemSpec{
 			ID: item.Id,
 		}
 		spec.Gems = item.Gems
 		spec.Enchant = item.Enchant
-
 		coreEquip[i] = spec
 	}
 

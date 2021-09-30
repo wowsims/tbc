@@ -3,6 +3,8 @@ package core
 import (
 	"math"
 	"time"
+
+	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 // Spell represents a single castable spell. This is all the data needed to begin a cast.
@@ -15,7 +17,7 @@ type Spell struct {
 	MinDmg     float64
 	MaxDmg     float64
 	DmgDiff    float64 // cached for faster dmg calculations
-	DamageType Stat
+	DamageType stats.Stat
 	Coeff      float64
 
 	CastType
@@ -38,13 +40,13 @@ const (
 var spells = []Spell{
 	// {ID: MagicIDLB4,  Name: "LB4",  Coeff: 0.795,  CastTime: time.Millisecond * 2500, MinDmg: 88, MaxDmg: 100, Mana: 50, DamageType: StatNatureSpellPower},
 	// {ID: MagicIDLB10, Name: "LB10", Coeff: 0.795,  CastTime: time.Millisecond * 2500, MinDmg: 428, MaxDmg: 477, Mana: 265, DamageType: StatNatureSpellPower},
-	{ID: MagicIDLB12, Name: "LB12", Coeff: 0.794, CastTime: time.Millisecond * 2500, MinDmg: 571, MaxDmg: 652, Mana: 300, DamageType: StatNatureSpellPower},
-	// {ID: MagicIDCL4,  Name: "CL4",  Coeff: 0.643,  CastTime: time.Millisecond * 2000, Cooldown: time.Second * 6, MinDmg: 505, MaxDmg: 564, Mana: 605, DamageType: StatNatureSpellPower},
-	{ID: MagicIDCL6, Name: "CL6", Coeff: 0.651, CastTime: time.Millisecond * 2000, Cooldown: time.Second * 6, MinDmg: 734, MaxDmg: 838, Mana: 760, DamageType: StatNatureSpellPower},
-	// {ID: MagicIDES8,  Name: "ES8",  Coeff: 0.3858, CastTime: time.Millisecond * 1500, Cooldown: time.Second * 6, MinDmg: 658, MaxDmg: 692, Mana: 535, DamageType: StatNatureSpellPower},
+	{ID: MagicIDLB12, Name: "LB12", Coeff: 0.794, CastTime: time.Millisecond * 2500, MinDmg: 571, MaxDmg: 652, Mana: 300, DamageType: stats.NatureSpellPower},
+	// {ID: MagicIDCL4,  Name: "CL4",  Coeff: 0.643,  CastTime: time.Millisecond * 2000, Cooldown: time.Second * 6, MinDmg: 505, MaxDmg: 564, Mana: 605, DamageType: stats.NatureSpellPower},
+	{ID: MagicIDCL6, Name: "CL6", Coeff: 0.651, CastTime: time.Millisecond * 2000, Cooldown: time.Second * 6, MinDmg: 734, MaxDmg: 838, Mana: 760, DamageType: stats.NatureSpellPower},
+	// {ID: MagicIDES8,  Name: "ES8",  Coeff: 0.3858, CastTime: time.Millisecond * 1500, Cooldown: time.Second * 6, MinDmg: 658, MaxDmg: 692, Mana: 535, DamageType: stats.NatureSpellPower},
 	// {ID: MagicIDFrS5, Name: "FrS5", Coeff: 0.3858, CastTime: time.Millisecond * 1500, Cooldown: time.Second * 6, MinDmg: 640, MaxDmg: 676, Mana: 525, DamageType: StatFrostSpellPower},
 	// {ID: MagicIDFlS7, Name: "FlS7", Coeff: 0.15, CastTime: time.Millisecond * 1500, Cooldown: time.Second * 6, MinDmg: 377, MaxDmg: 420, Mana: 500, DotDmg: 100, DotDur: time.Second * 6, DamageType: StatFireSpellPower},
-	{ID: MagicIDTLCLB, Name: "TLCLB", Coeff: 0.0, MinDmg: 694, MaxDmg: 807, Mana: 0, DamageType: StatNatureSpellPower},
+	{ID: MagicIDTLCLB, Name: "TLCLB", Coeff: 0.0, MinDmg: 694, MaxDmg: 807, Mana: 0, DamageType: stats.NatureSpellPower},
 }
 
 // Spell lookup map to make lookups faster.
@@ -64,10 +66,7 @@ func init() {
 type Cast struct {
 	Spell  *Spell
 	Caster *Player
-
-	// Probably should generalize this... "Tags" map?
-	IsLO       bool // stupid hack
-	IsClBounce bool // stupider hack
+	Tag    int32 // Allow any class to create an enum for what tags the cast needs.
 
 	// Pre-hit Mutatable State
 	CastTime time.Duration // time to cast the spell
@@ -82,7 +81,7 @@ type Cast struct {
 	//  currently named after arnold's "come on, do it now"
 	DoItNow func(sim *Simulation, p PlayerAgent, cast *Cast)
 
-	// Calculated Values
+	// Calculated Values, can be modified only in 'OnSpellHit'
 	DidHit  bool
 	DidCrit bool
 	DidDmg  float64
@@ -106,10 +105,10 @@ func NewCast(sim *Simulation, sp *Spell) *Cast {
 // This will activate any auras around casting, calculate hit/crit and add to sim metrics.
 func DirectCast(sim *Simulation, p PlayerAgent, cast *Cast) {
 	if sim.Debug != nil {
-		sim.Debug("(%d) Current Mana %0.0f, Cast Cost: %0.0f\n", p.ID, p.Stats[StatMana], cast.ManaCost)
+		sim.Debug("(%d) Current Mana %0.0f, Cast Cost: %0.0f\n", p.ID, p.Stats[stats.Mana], cast.ManaCost)
 	}
 	if cast.ManaCost > 0 {
-		p.Stats[StatMana] -= cast.ManaCost
+		p.Stats[stats.Mana] -= cast.ManaCost
 		sim.Metrics.IndividualMetrics[p.ID].ManaSpent += cast.ManaCost
 	}
 
@@ -124,15 +123,15 @@ func DirectCast(sim *Simulation, p PlayerAgent, cast *Cast) {
 		}
 	}
 
-	hit := 0.83 + p.Stats[StatSpellHit]/1260.0 + cast.Hit // 12.6 hit == 1% hit
-	hit = math.Min(hit, 0.99)                             // can't get away from the 1% miss
+	hit := 0.83 + p.Stats[stats.SpellHit]/1260.0 + cast.Hit // 12.6 hit == 1% hit
+	hit = math.Min(hit, 0.99)                               // can't get away from the 1% miss
 
 	dbgCast := cast.Spell.Name
 	if sim.Debug != nil {
 		sim.Debug("(%d) Completed Cast (%0.2f hit chance) (%s)\n", p.ID, hit, dbgCast)
 	}
 	if sim.Rando.Float64("cast hit") < hit {
-		sp := p.Stats[StatSpellPower] + p.Stats[cast.Spell.DamageType] + cast.Dmg
+		sp := p.Stats[stats.SpellPower] + p.Stats[cast.Spell.DamageType] + cast.Dmg
 		baseDmg := (sim.Rando.Float64("cast dmg") * cast.Spell.DmgDiff)
 		bonus := (sp * cast.Spell.Coeff)
 		dmg := baseDmg + cast.Spell.MinDmg + bonus
@@ -144,7 +143,7 @@ func DirectCast(sim *Simulation, p PlayerAgent, cast *Cast) {
 		}
 		cast.DidHit = true
 
-		crit := (p.Stats[StatSpellCrit] / 2208.0) + cast.Crit // 22.08 crit == 1% crit
+		crit := (p.Stats[stats.SpellCrit] / 2208.0) + cast.Crit // 22.08 crit == 1% crit
 		if sim.Rando.Float64("cast crit") < crit {
 			cast.DidCrit = true
 			dmg *= cast.CritBonus

@@ -4,6 +4,7 @@ import (
 	"log"
 	"testing"
 
+	"github.com/wowsims/tbc/items"
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/shaman"
 )
@@ -142,10 +143,10 @@ func TestSimulatePreRaidNoBuffs(t *testing.T) {
 	})
 }
 
-func gearFromStrings(gears []string) core.EquipmentSpec {
-	eq := core.EquipmentSpec{}
+func gearFromStrings(gears []string) items.EquipmentSpec {
+	eq := items.EquipmentSpec{}
 	for i, gear := range gears {
-		item := core.ItemsByName[gear]
+		item := items.ByName[gear]
 		eq[i].ID = item.ID
 	}
 	return eq
@@ -289,7 +290,7 @@ type AllEncountersTestOptions struct {
 	t     *testing.T
 
 	Options  core.Options
-	Gear     core.EquipmentSpec
+	Gear     items.EquipmentSpec
 	Buffs    core.Buffs
 	Consumes core.Consumes
 	Race     core.RaceBonusType

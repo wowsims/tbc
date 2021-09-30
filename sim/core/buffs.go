@@ -1,6 +1,10 @@
 package core
 
-import "time"
+import (
+	"time"
+
+	"github.com/wowsims/tbc/sim/core/stats"
+)
 
 type Buffs struct {
 	// Raid buffs
@@ -17,6 +21,7 @@ type Buffs struct {
 	Bloodlust           int
 
 	// TODO: Do these need to be here? Should I just use this instead of the shaman.Totems struct?
+	//  Balance druids wouldnt want to import shaman.Totems probably? Or maybe those can go in a reduced package that can be shared.
 	// WrathOfAir          bool
 	// TotemOfWrath        bool
 	// ManaStream          bool
@@ -60,9 +65,9 @@ func TryActivateRacial(sim *Simulation, party *Party, player *Player) {
 		const dur = time.Second * 15
 		const cd = time.Minute * 2
 
-		player.Stats[StatSpellPower] += spBonus
+		player.Stats[stats.SpellPower] += spBonus
 		player.SetCD(MagicIDOrcBloodFury, cd+sim.CurrentTime)
-		player.AddAura(sim, AuraStatRemoval(sim.CurrentTime, dur, spBonus, StatSpellPower, MagicIDOrcBloodFury))
+		player.AddAura(sim, AuraStatRemoval(sim.CurrentTime, dur, spBonus, stats.SpellPower, MagicIDOrcBloodFury))
 
 	case RaceBonusTypeTroll10, RaceBonusTypeTroll30:
 		if player.IsOnCD(MagicIDTrollBerserking, sim.CurrentTime) {

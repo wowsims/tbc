@@ -1,103 +1,103 @@
-package core
+package stats
 
 import (
 	"strconv"
 )
 
-type Stats [StatLen]float64
+type Stats [Len]float64
 
 type Stat byte
 
 const (
-	StatStrength Stat = iota
-	StatAgility
-	StatStamina
-	StatIntellect
-	StatSpirit
-	StatSpellPower
-	StatHealingPower
-	StatArcaneSpellPower
-	StatFireSpellPower
-	StatFrostSpellPower
-	StatHolySpellPower
-	StatNatureSpellPower
-	StatShadowSpellPower
-	StatMP5
-	StatSpellHit
-	StatSpellCrit
-	StatSpellHaste
-	StatSpellPenetration
-	StatAttackPower
-	StatMeleeHit
-	StatMeleeCrit
-	StatMeleeHaste
-	StatArmorPenetration
-	StatExpertise
-	StatMana
-	StatEnergy
-	StatRage
-	StatArmor
+	Strength Stat = iota
+	Agility
+	Stamina
+	Intellect
+	Spirit
+	SpellPower
+	HealingPower
+	ArcaneSpellPower
+	FireSpellPower
+	FrostSpellPower
+	HolySpellPower
+	NatureSpellPower
+	ShadowSpellPower
+	MP5
+	SpellHit
+	SpellCrit
+	SpellHaste
+	SpellPenetration
+	AttackPower
+	MeleeHit
+	MeleeCrit
+	MeleeHaste
+	ArmorPenetration
+	Expertise
+	Mana
+	Energy
+	Rage
+	Armor
 
-	StatLen
+	Len
 )
 
 func (s Stat) StatName() string {
 	switch s {
-	case StatStrength:
+	case Strength:
 		return "Strength"
-	case StatAgility:
+	case Agility:
 		return "Agility"
-	case StatStamina:
+	case Stamina:
 		return "Stamina"
-	case StatIntellect:
+	case Intellect:
 		return "Intellect"
-	case StatSpirit:
+	case Spirit:
 		return "Spirit"
-	case StatSpellCrit:
+	case SpellCrit:
 		return "SpellCrit"
-	case StatSpellHit:
+	case SpellHit:
 		return "SpellHit"
-	case StatHealingPower:
+	case HealingPower:
 		return "HealingPower"
-	case StatSpellPower:
-		return "Spell Power"
-	case StatSpellHaste:
+	case SpellPower:
+		return "SpellPower"
+	case SpellHaste:
 		return "SpellHaste"
-	case StatMP5:
+	case MP5:
 		return "MP5"
-	case StatSpellPenetration:
+	case SpellPenetration:
 		return "StatSpellPenetration"
-	case StatFireSpellPower:
+	case FireSpellPower:
 		return "FireSpellPower"
-	case StatNatureSpellPower:
+	case NatureSpellPower:
 		return "NatureSpellPower"
-	case StatFrostSpellPower:
+	case FrostSpellPower:
 		return "FrostSpellPower"
-	case StatShadowSpellPower:
+	case ShadowSpellPower:
 		return "ShadowSpellPower"
-	case StatHolySpellPower:
+	case HolySpellPower:
 		return "HolySpellPower"
-	case StatArcaneSpellPower:
+	case ArcaneSpellPower:
 		return "ArcaneSpellPower"
-	case StatAttackPower:
+	case AttackPower:
 		return "AttackPower"
-	case StatMeleeHit:
+	case MeleeHit:
 		return "MeleeHit"
-	case StatMeleeHaste:
+	case MeleeHaste:
 		return "MeleeHaste"
-	case StatMeleeCrit:
+	case MeleeCrit:
 		return "MeleeCrit"
-	case StatExpertise:
+	case Expertise:
 		return "Expertise"
-	case StatArmorPenetration:
+	case ArmorPenetration:
 		return "ArmorPenetration"
-	case StatMana:
+	case Mana:
 		return "Mana"
-	case StatEnergy:
+	case Energy:
 		return "Energy"
-	case StatRage:
+	case Rage:
 		return "Rage"
-	case StatArmor:
+	case Armor:
 		return "Armor"
 	}
 
@@ -138,34 +138,8 @@ func (st Stats) Print() string {
 func (s Stats) CalculatedTotal() Stats {
 	stats := s
 	// Add crit/mana from int
-	stats[StatSpellCrit] += (stats[StatIntellect] / 78.1) * 22.08
-	stats[StatMana] += stats[StatIntellect] * 15
-	return stats
-}
-
-// CalculateTotalStats will take a set of equipment and options and add all stats/buffs/etc together
-func CalculateTotalStats(race RaceBonusType, e Equipment, c Consumes) Stats {
-	stats := BaseStats(race)
-	gearStats := e.Stats()
-	for i := range stats {
-		stats[i] += gearStats[i]
-	}
-	stats = c.AddStats(stats)
-	return stats
-}
-
-// TODO: This probably should be moved into each class because they all have different base stats.
-func BaseStats(race RaceBonusType) Stats {
-	stats := Stats{
-		StatIntellect: 104,    // Base int for troll,
-		StatMana:      2678,   // level 70 shaman
-		StatSpirit:    135,    // lvl 70 shaman
-		StatSpellCrit: 48.576, // base crit for 70 sham
-	}
-	// TODO: Find race differences.
-	switch race {
-	case RaceBonusTypeOrc:
-	}
+	stats[SpellCrit] += (stats[Intellect] / 78.1) * 22.08
+	stats[Mana] += stats[Intellect] * 15
 	return stats
 }
 

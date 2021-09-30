@@ -1,13 +1,12 @@
 package main
 
 import (
-	"github.com/wowsims/tbc/generate_items/api"
+	"github.com/wowsims/tbc/sim/api"
 )
 
 type ItemDeclaration struct {
-	ID             int
-	EffectDataName string     // Should correspond to an ItemEffectData object
-	Specs          []api.Spec // Which specs use this item
+	ID    int
+	Specs []api.Spec // Which specs use this item
 }
 
 // Keep these sorted alphabetically by item Name.

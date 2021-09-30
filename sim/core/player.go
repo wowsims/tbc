@@ -3,6 +3,9 @@ package core
 import (
 	"strconv"
 	"time"
+
+	"github.com/wowsims/tbc/items"
+	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 type Party struct {
@@ -22,16 +25,15 @@ type PlayerAgent struct {
 func (pa PlayerAgent) Advance(sim *Simulation, elapsedTime time.Duration, newTime time.Duration) {
 	// MP5 regen
 	regen := pa.manaRegenPerSecond() * elapsedTime.Seconds()
-	pa.Stats[StatMana] += regen
-	if pa.Stats[StatMana] > pa.InitialStats[StatMana] {
-		pa.Stats[StatMana] = pa.InitialStats[StatMana]
+	pa.Stats[stats.Mana] += regen
+	if pa.Stats[stats.Mana] > pa.InitialStats[stats.Mana] {
+		pa.Stats[stats.Mana] = pa.InitialStats[stats.Mana]
 	}
 	if sim.Debug != nil && regen != 0 {
-		sim.Debug("-> [%0.1f] Regenerated: %0.1f mana. Total: %0.1f\n", newTime.Seconds(), regen, pa.Stats[StatMana])
+		sim.Debug("-> [%0.1f] Regenerated: %0.1f mana. Total: %0.1f\n", newTime.Seconds(), regen, pa.Stats[stats.Mana])
 	}
 
 	// Advance CDs and Auras
-	// TODO: should we just accept the PlayerAgent as input? Perhaps this doesn't belong on player at all then...
 	pa.AuraTracker.Advance(sim, pa, newTime)
 }
 
@@ -43,12 +45,12 @@ type Player struct {
 	Consumes Consumes // pretty sure most classes have consumes to care about.
 	Race     RaceBonusType
 
-	InitialStats Stats
-	Stats        Stats
+	InitialStats stats.Stats
+	Stats        stats.Stats
 
-	Equip       Equipment // Current Gear
-	EquipSpec   EquipmentSpec
-	ActiveEquip []*Item // cache of gear that can activate.
+	Equip       items.Equipment // Current Gear
+	EquipSpec   items.EquipmentSpec
+	ActiveEquip []*ActiveItem // cache of gear that can activate.
 
 	*AuraTracker
 
@@ -57,19 +59,19 @@ type Player struct {
 }
 
 func (p *Player) HasteBonus() float64 {
-	return 1 + (p.Stats[StatSpellHaste] / 1576)
+	return 1 + (p.Stats[stats.SpellHaste] / 1576)
 }
 
 func (p *Player) GetPlayer() *Player {
 	return p
 }
 
-func NewPlayer(equipSpec EquipmentSpec, race RaceBonusType, consumes Consumes) *Player {
-	equip := NewEquipmentSet(equipSpec)
+func NewPlayer(equipSpec items.EquipmentSpec, race RaceBonusType, consumes Consumes) *Player {
+	equip := items.NewEquipmentSet(equipSpec)
 	initialStats := CalculateTotalStats(race, equip, consumes)
 
 	if race == RaceBonusTypeDraenei {
-		initialStats[StatSpellHit] += 12.60 // 1% hit
+		initialStats[stats.SpellHit] += 12.60 // 1% hit
 	}
 
 	player := &Player{
@@ -79,18 +81,24 @@ func NewPlayer(equipSpec EquipmentSpec, race RaceBonusType, consumes Consumes) *
 		Stats:        initialStats,
 		Equip:        equip,
 		EquipSpec:    equipSpec,
-		ActiveEquip:  []*Item{},
+		ActiveEquip:  []*ActiveItem{},
 		AuraTracker:  NewAuraTracker(),
 	}
 
-	for i, eq := range equip {
-		if eq.Activate != nil {
-			player.ActiveEquip = append(player.ActiveEquip, &equip[i])
+	// Cache the active abilities for all equipped items.
+	for _, eq := range equip {
+		act, ok := ActiveItemByID[eq.ID]
+		if !ok {
+			continue
 		}
+		player.ActiveEquip = append(player.ActiveEquip, &act)
+
 		for _, g := range eq.Gems {
-			if g.Activate != nil {
-				player.ActiveEquip = append(player.ActiveEquip, &equip[i])
+			gemAct, ok := ActiveItemByID[g.ID]
+			if !ok {
+				continue
 			}
+			player.ActiveEquip = append(player.ActiveEquip, &gemAct)
 		}
 	}
 
@@ -105,15 +113,11 @@ func (p *Player) Reset() {
 
 func (p *Player) BuffUp(sim *Simulation, party *Party) {
 	// Activate all permanent item effects.
-	for _, item := range p.ActiveEquip {
-		if item.Activate != nil && item.ActivateCD == NeverExpires {
-			p.AddAura(sim, item.Activate(sim, party, PlayerAgent{Player: p}))
+	for _, actItem := range p.ActiveEquip {
+		if actItem.ActivateCD != NeverExpires {
+			continue
 		}
-		for _, g := range item.Gems {
-			if g.Activate != nil {
-				p.AddAura(sim, g.Activate(sim, party, PlayerAgent{Player: p}))
-			}
-		}
+		p.AddAura(sim, actItem.Activate(sim, party, PlayerAgent{Player: p}))
 	}
 
 	p.ActivateSets(sim, party)
@@ -128,7 +132,7 @@ func (p *Player) AddAura(sim *Simulation, a Aura) {
 
 // Returns rate of mana regen, as mana / second
 func (p *Player) manaRegenPerSecond() float64 {
-	return p.Stats[StatMP5] / 5.0
+	return p.Stats[stats.MP5] / 5.0
 }
 
 // Pops any on-use trinkets / gear
@@ -155,6 +159,7 @@ func (p *Player) ActivateSets(sim *Simulation, party *Party) []string {
 	active := []string{}
 	// Activate Set Bonuses
 	setItemCount := map[string]int{}
+
 	for _, i := range p.Equip {
 		set := itemSetLookup[i.ID]
 		if set != nil {
@@ -167,4 +172,30 @@ func (p *Player) ActivateSets(sim *Simulation, party *Party) []string {
 	}
 
 	return active
+}
+
+// TODO: This probably should be moved into each class because they all have different base stats.
+func BaseStats(race RaceBonusType) stats.Stats {
+	stats := stats.Stats{
+		stats.Intellect: 104,    // Base int for troll,
+		stats.Mana:      2678,   // level 70 shaman
+		stats.Spirit:    135,    // lvl 70 shaman
+		stats.SpellCrit: 48.576, // base crit for 70 sham
+	}
+	// TODO: Find race differences.
+	switch race {
+	case RaceBonusTypeOrc:
+	}
+	return stats
+}
+
+// CalculateTotalStats will take a set of equipment and options and add all stats/buffs/etc together
+func CalculateTotalStats(race RaceBonusType, e items.Equipment, c Consumes) stats.Stats {
+	stats := BaseStats(race)
+	gearStats := e.Stats()
+	for i := range stats {
+		stats[i] += gearStats[i]
+	}
+	stats = c.AddStats(stats)
+	return stats
 }

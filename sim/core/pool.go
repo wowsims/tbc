@@ -32,8 +32,6 @@ func (p *cache) fillCasts() {
 func (p *cache) ReturnCasts(casts []*Cast) {
 	for _, v := range casts {
 		v.Spell = nil
-		v.IsLO = false
-		v.IsClBounce = false
 		v.CastTime = 0
 		v.ManaCost = 0
 		v.Dmg = 0

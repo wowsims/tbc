@@ -1,13 +1,16 @@
 package priest
 
-import "github.com/wowsims/tbc/sim/core"
+import (
+	"github.com/wowsims/tbc/sim/core"
+	"github.com/wowsims/tbc/sim/core/stats"
+)
 
 func NewBuffBot(sim *core.Simulation, party *core.Party, misery bool, spriestDPS float64) *Priest {
 
 	// shadow priest buff bot just statically applies mp5
 	if spriestDPS > 0 {
 		for _, pl := range party.Players {
-			pl.InitialStats[core.StatMP5] += float64(spriestDPS) * 0.25
+			pl.InitialStats[stats.MP5] += float64(spriestDPS) * 0.25
 			pl.Stats = pl.InitialStats
 		}
 	}

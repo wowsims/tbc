@@ -5,6 +5,8 @@ import (
 	"math/rand"
 	"sort"
 	"time"
+
+	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 func debugFunc(sim *Simulation) func(string, ...interface{}) {
@@ -215,9 +217,9 @@ func (sim *Simulation) Run() SimMetrics {
 				newAction.Cast.CastTime = sim.Options.GCDMin
 			}
 			wait = newAction.Cast.CastTime
-			if agent.Stats[StatMana] < newAction.Cast.ManaCost {
+			if agent.Stats[stats.Mana] < newAction.Cast.ManaCost {
 				// Not enough mana, wait until there is enough mana to cast the desired spell
-				regenTime := durationFromSeconds((newAction.Cast.ManaCost-agent.Stats[StatMana])/agent.manaRegenPerSecond()) + 1
+				regenTime := durationFromSeconds((newAction.Cast.ManaCost-agent.Stats[stats.Mana])/agent.manaRegenPerSecond()) + 1
 				if sim.Debug != nil {
 					sim.Debug("Not enough mana to cast... regen for %0.1f seconds before casting.\n", regenTime.Seconds())
 				}

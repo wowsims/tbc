@@ -2,6 +2,8 @@ package core
 
 import (
 	"time"
+
+	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 type Consumes struct {
@@ -19,22 +21,22 @@ type Consumes struct {
 	DrumsOfBattle     bool
 }
 
-func (c Consumes) AddStats(s Stats) Stats {
+func (c Consumes) AddStats(s stats.Stats) stats.Stats {
 	if c.BrilliantWizardOil {
-		s[StatSpellCrit] += 14
-		s[StatSpellPower] += 36
+		s[stats.SpellCrit] += 14
+		s[stats.SpellPower] += 36
 	}
 	if c.MajorMageblood {
-		s[StatMP5] += 16.0
+		s[stats.MP5] += 16.0
 	}
 	if c.FlaskOfBlindingLight {
-		s[StatSpellPower] += 80
+		s[stats.SpellPower] += 80
 	}
 	if c.FlaskOfMightyRestoration {
-		s[StatMP5] += 25
+		s[stats.MP5] += 25
 	}
 	if c.BlackendBasilisk {
-		s[StatSpellPower] += 23
+		s[stats.SpellPower] += 23
 	}
 	return s
 }
@@ -46,9 +48,9 @@ func TryActivateDrums(sim *Simulation, party *Party, player *Player) {
 
 	const hasteBonus = 80
 	for _, p := range party.Players {
-		p.Stats[StatSpellHaste] += hasteBonus
+		p.Stats[stats.SpellHaste] += hasteBonus
 		p.SetCD(MagicIDDrums, time.Minute*2+sim.CurrentTime) // tinnitus
-		p.AddAura(sim, AuraStatRemoval(sim.CurrentTime, time.Second*30, hasteBonus, StatSpellHaste, MagicIDDrums))
+		p.AddAura(sim, AuraStatRemoval(sim.CurrentTime, time.Second*30, hasteBonus, stats.SpellHaste, MagicIDDrums))
 	}
 }
 
@@ -69,15 +71,15 @@ func TryActivateDestructionPotion(sim *Simulation, party *Party, player *Player)
 
 	player.destructionPotionUsed = true
 	player.SetCD(MagicIDPotion, time.Second*120+sim.CurrentTime)
-	player.Stats[StatSpellPower] += spBonus
-	player.Stats[StatSpellCrit] += critBonus
+	player.Stats[stats.SpellPower] += spBonus
+	player.Stats[stats.SpellCrit] += critBonus
 
 	player.AddAura(sim, Aura{
 		ID:      MagicIDDestructionPotion,
 		Expires: sim.CurrentTime + dur,
 		OnExpire: func(sim *Simulation, player PlayerAgent, c *Cast) {
-			player.Stats[StatSpellPower] -= spBonus
-			player.Stats[StatSpellCrit] -= critBonus
+			player.Stats[stats.SpellPower] -= spBonus
+			player.Stats[stats.SpellCrit] -= critBonus
 		},
 	})
 }
@@ -89,12 +91,12 @@ func TryActivateDarkRune(sim *Simulation, party *Party, player *Player) {
 
 	// Only pop if we have less than the max mana provided by the potion minus 1mp5 tick.
 	totalRegen := player.manaRegenPerSecond() * 5
-	if player.InitialStats[StatMana]-(player.Stats[StatMana]+totalRegen) < 1500 {
+	if player.InitialStats[stats.Mana]-(player.Stats[stats.Mana]+totalRegen) < 1500 {
 		return
 	}
 
 	// Restores 900 to 1500 mana. (2 Min Cooldown)
-	player.Stats[StatMana] += 900 + (sim.Rando.Float64("dark rune") * 600)
+	player.Stats[stats.Mana] += 900 + (sim.Rando.Float64("dark rune") * 600)
 	player.SetCD(MagicIDRune, time.Second*120+sim.CurrentTime)
 	if sim.Debug != nil {
 		sim.Debug("Used Dark Rune\n")
@@ -105,13 +107,10 @@ func TryActivateSuperManaPotion(sim *Simulation, party *Party, player *Player) {
 	if !player.Consumes.SuperManaPotion || player.IsOnCD(MagicIDPotion, sim.CurrentTime) {
 		return
 	}
-	if sim.Debug != nil {
-		sim.Debug("SOMETHING SUPER MANA\n")
-	}
 
 	// Only pop if we have less than the max mana provided by the potion minus 1mp5 tick.
 	totalRegen := player.manaRegenPerSecond() * 5
-	if player.InitialStats[StatMana]-(player.Stats[StatMana]+totalRegen) < 3000 {
+	if player.InitialStats[stats.Mana]-(player.Stats[stats.Mana]+totalRegen) < 3000 {
 		return
 	}
 
@@ -122,7 +121,7 @@ func TryActivateSuperManaPotion(sim *Simulation, party *Party, player *Player) {
 		manaGain *= 1.4
 	}
 
-	player.Stats[StatMana] += manaGain
+	player.Stats[stats.Mana] += manaGain
 	player.SetCD(MagicIDPotion, time.Second*120+sim.CurrentTime)
 	if sim.Debug != nil {
 		sim.Debug("Used Mana Potion\n")
