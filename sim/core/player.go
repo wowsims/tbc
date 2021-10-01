@@ -68,6 +68,7 @@ func (p *Player) GetPlayer() *Player {
 
 func NewPlayer(equipSpec items.EquipmentSpec, race RaceBonusType, consumes Consumes) *Player {
 	equip := items.NewEquipmentSet(equipSpec)
+	// log.Printf("Gear Stats: %s", equip.Stats().Print())
 	initialStats := CalculateTotalStats(race, equip, consumes)
 
 	if race == RaceBonusTypeDraenei {

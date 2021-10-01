@@ -124,7 +124,7 @@ var sets = []ItemSet{
 	},
 	{
 		Name:  "Cyclone Regalia",
-		Items: map[string]bool{"Cyclone Faceguard (Tier 4)": true, "Cyclone Shoulderguards (Tier 4)": true, "Cyclone Chestguard (Tier 4)": true, "Cyclone Handguards (Tier 4)": true, "Cyclone Legguards (Tier 4)": true},
+		Items: map[string]bool{"Cyclone Faceguard": true, "Cyclone Shoulderguards": true, "Cyclone Chestguard": true, "Cyclone Handguards": true, "Cyclone Legguards": true},
 		Bonuses: map[int]ItemActivation{4: ActivateCycloneManaReduce, 2: func(sim *Simulation, party *Party, player PlayerAgent) Aura {
 			// if sim.Options.Totems.WrathOfAir {
 
@@ -149,20 +149,20 @@ var sets = []ItemSet{
 	},
 	{
 		Name:    "Cataclysm Regalia",
-		Items:   map[string]bool{"Cataclysm Headpiece (Tier 5)": true, "Cataclysm Shoulderpads (Tier 5)": true, "Cataclysm Chestpiece (Tier 5)": true, "Cataclysm Handgrips (Tier 5)": true, "Cataclysm Leggings (Tier 5)": true},
+		Items:   map[string]bool{"Cataclysm Headpiece": true, "Cataclysm Shoulderpads": true, "Cataclysm Chestpiece": true, "Cataclysm Handgrips": true, "Cataclysm Leggings": true},
 		Bonuses: map[int]ItemActivation{4: ActivateCataclysmLBDiscount},
 	},
 	{
 		Name: "Skyshatter Regalia",
 		Items: map[string]bool{
-			"Skyshatter Headguard (Tier 6)":   true,
-			"Skyshatter Mantle (Tier 6)":      true,
-			"Skyshatter Breastplate (Tier 6)": true,
-			"Skyshatter Gauntlets (Tier 6)":   true,
-			"Skyshatter Legguards (Tier 6)":   true,
-			"Skyshatter Cord":                 true,
-			"Skyshatter Treads":               true,
-			"Skyshatter Bands":                true,
+			"Skyshatter Headguard":   true,
+			"Skyshatter Mantle":      true,
+			"Skyshatter Breastplate": true,
+			"Skyshatter Gauntlets":   true,
+			"Skyshatter Legguards":   true,
+			"Skyshatter Cord":        true,
+			"Skyshatter Treads":      true,
+			"Skyshatter Bands":       true,
 		},
 		Bonuses: map[int]ItemActivation{2: func(sim *Simulation, party *Party, player PlayerAgent) Aura {
 			player.Stats[stats.MP5] += 15

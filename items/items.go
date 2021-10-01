@@ -180,8 +180,8 @@ func (e Equipment) Clone() Equipment {
 	return ne
 }
 
-func (e Equipment) Stats() []float64 {
-	s := make([]float64, api.Stat_StatArmor+1) // TODO: perhaps scan the Stat enum and find max value and cache it so if it changes this doesnt break.
+func (e Equipment) Stats() stats.Stats {
+	s := stats.Stats{}
 	for _, item := range e {
 		for k, v := range item.Stats {
 			if v == 0 {

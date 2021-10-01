@@ -106,9 +106,9 @@ var preRaidGear = []string{
 }
 
 var p1Gear = []string{
-	"Cyclone Faceguard (Tier 4)",
+	"Cyclone Faceguard",
 	"Adornment of Stolen Souls",
-	"Cyclone Shoulderguards (Tier 4)",
+	"Cyclone Shoulderguards",
 	"Ruby Drape of the Mysticant",
 	"Netherstrike Breastplate",
 	"Netherstrike Bracers",
@@ -138,7 +138,7 @@ func TestSimulatePreRaidNoBuffs(t *testing.T) {
 		Spec: shaman.ElementalSpec{Talents: shamTalents, AgentID: shaman.AgentTypeAdaptive},
 		Gear: gearFromStrings(preRaidGear),
 
-		ExpectedDpsShort: 867,
+		ExpectedDpsShort: 952,
 		ExpectedDpsLong:  276,
 	})
 }
@@ -147,6 +147,9 @@ func gearFromStrings(gears []string) items.EquipmentSpec {
 	eq := items.EquipmentSpec{}
 	for i, gear := range gears {
 		item := items.ByName[gear]
+		if item.ID == 0 {
+			log.Fatalf("Item not found: %s", gear)
+		}
 		eq[i].ID = item.ID
 	}
 	return eq
@@ -166,7 +169,7 @@ func TestSimulatePreRaid(t *testing.T) {
 		Gear: gearFromStrings(preRaidGear),
 
 		ExpectedDpsShort: 1406,
-		ExpectedDpsLong:  1017,
+		ExpectedDpsLong:  1093,
 	})
 }
 
@@ -310,11 +313,11 @@ func simAllEncountersTest(testOpts AllEncountersTestOptions) {
 		Spec:        testOpts.Spec,
 		CustomStats: []float64{},
 	}
-	// doSimulateTest(
-	// 	testOpts.label+"-short",
-	// 	testOpts.t,
-	// 	params,
-	// 	testOpts.ExpectedDpsShort)
+	doSimulateTest(
+		testOpts.label+"-short",
+		testOpts.t,
+		params,
+		testOpts.ExpectedDpsShort)
 
 	params.Options = makeOptions(testOpts.Options, longEncounter)
 	doSimulateTest(
@@ -329,6 +332,7 @@ func simAllEncountersTest(testOpts AllEncountersTestOptions) {
 //   Any changes to the damage output of an item set
 func doSimulateTest(label string, t *testing.T, params IndividualParams, expectedDps float64) {
 	// params.Options.Debug = true
+	// params.Options.Iterations = 1
 
 	sim := SetupIndividualSim(params)
 	result := RunIndividualSim(sim)
