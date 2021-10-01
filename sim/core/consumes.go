@@ -9,35 +9,87 @@ import (
 type Consumes struct {
 	// Buffs
 	BrilliantWizardOil       bool
-	MajorMageblood           bool
+	SuperiorWizardOil        bool
+	ElixirOfMajorMageblood   bool
 	FlaskOfBlindingLight     bool
 	FlaskOfMightyRestoration bool
-	BlackendBasilisk         bool
+	FlaskOfPureDeath         bool
+	FlaskOfSupremePower      bool
+	BlackenedBasilisk        bool
+	SkullfishSoup            bool
+	AdeptsElixir             bool
+	ElixirOfMajorFirePower   bool
+	ElixirOfMajorFrostPower  bool
+	ElixirOfMajorShadowPower bool
+	ElixirOfDraenicWisdom    bool
 
 	// Used in rotations
-	DestructionPotion bool
-	SuperManaPotion   bool
-	DarkRune          bool
-	DrumsOfBattle     bool
+	DestructionPotion  bool
+	SuperManaPotion    bool
+	DarkRune           bool
+	DrumsOfBattle      bool
+	DrumsOfRestoration bool
 }
 
 func (c Consumes) AddStats(s stats.Stats) stats.Stats {
 	if c.BrilliantWizardOil {
 		s[stats.SpellCrit] += 14
 		s[stats.SpellPower] += 36
+		s[stats.HealingPower] += 36
 	}
-	if c.MajorMageblood {
+	if c.SuperiorWizardOil {
+		s[stats.SpellPower] += 42
+		s[stats.HealingPower] += 42
+	}
+
+	if c.ElixirOfMajorMageblood {
 		s[stats.MP5] += 16.0
 	}
+	if c.AdeptsElixir {
+		s[stats.SpellCrit] += 24
+		s[stats.SpellPower] += 24
+		s[stats.HealingPower] += 24
+	}
+	if c.ElixirOfMajorFirePower {
+		s[stats.FireSpellPower] += 55
+	}
+	if c.ElixirOfMajorFrostPower {
+		s[stats.FrostSpellPower] += 55
+	}
+	if c.ElixirOfMajorShadowPower {
+		s[stats.ShadowSpellPower] += 55
+	}
+	if c.ElixirOfDraenicWisdom {
+		s[stats.Intellect] += 30
+		s[stats.Spirit] += 30
+	}
+
+	if c.FlaskOfSupremePower {
+		s[stats.SpellPower] += 70
+	}
 	if c.FlaskOfBlindingLight {
-		s[stats.SpellPower] += 80
+		s[stats.NatureSpellPower] += 80
+		s[stats.ArcaneSpellPower] += 80
+		s[stats.HolySpellPower] += 80
+	}
+	if c.FlaskOfPureDeath {
+		s[stats.FireSpellPower] += 80
+		s[stats.FrostSpellPower] += 80
+		s[stats.ShadowSpellPower] += 80
 	}
 	if c.FlaskOfMightyRestoration {
 		s[stats.MP5] += 25
 	}
-	if c.BlackendBasilisk {
+	if c.BlackenedBasilisk {
 		s[stats.SpellPower] += 23
+		s[stats.HealingPower] += 23
+		s[stats.Spirit] += 20
 	}
+	if c.SkullfishSoup {
+		s[stats.SpellCrit] += 20
+		s[stats.Spirit] += 20
+	}
+
 	return s
 }
 

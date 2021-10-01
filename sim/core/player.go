@@ -89,11 +89,9 @@ func NewPlayer(equipSpec items.EquipmentSpec, race RaceBonusType, consumes Consu
 	// Cache the active abilities for all equipped items.
 	for _, eq := range equip {
 		act, ok := ActiveItemByID[eq.ID]
-		if !ok {
-			continue
+		if ok {
+			player.ActiveEquip = append(player.ActiveEquip, &act)
 		}
-		player.ActiveEquip = append(player.ActiveEquip, &act)
-
 		for _, g := range eq.Gems {
 			gemAct, ok := ActiveItemByID[g.ID]
 			if !ok {

@@ -178,15 +178,25 @@ func convertShamTalents(t *api.ShamanTalents) shaman.Talents {
 
 func convertConsumes(c *api.Consumes) core.Consumes {
 	cconsume := core.Consumes{
-		BrilliantWizardOil:       c.BrilliantWizardOil,
-		MajorMageblood:           c.ElixirOfMajorMageblood,
 		FlaskOfBlindingLight:     c.FlaskOfBlindingLight,
 		FlaskOfMightyRestoration: c.FlaskOfMightyRestoration,
-		BlackendBasilisk:         c.BlackenedBasilisk,
+		FlaskOfPureDeath:         c.FlaskOfPureDeath,
+		FlaskOfSupremePower:      c.FlaskOfSupremePower,
+		AdeptsElixir:             c.AdeptsElixir,
+		ElixirOfMajorFirePower:   c.ElixirOfMajorFirePower,
+		ElixirOfMajorFrostPower:  c.ElixirOfMajorFrostPower,
+		ElixirOfMajorShadowPower: c.ElixirOfMajorShadowPower,
+		ElixirOfDraenicWisdom:    c.ElixirOfDraenicWisdom,
+		ElixirOfMajorMageblood:   c.ElixirOfMajorMageblood,
+		BrilliantWizardOil:       c.BrilliantWizardOil,
+		SuperiorWizardOil:        c.SuperiorWizardOil,
+		BlackenedBasilisk:        c.BlackenedBasilisk,
+		SkullfishSoup:            c.SkullfishSoup,
 		DestructionPotion:        c.DestructionPotion,
 		SuperManaPotion:          c.SuperManaPotion,
 		DarkRune:                 c.DarkRune,
 		DrumsOfBattle:            c.DrumsOfBattle,
+		DrumsOfRestoration:       c.DrumsOfRestoration,
 	}
 
 	return cconsume
