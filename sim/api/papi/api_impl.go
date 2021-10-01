@@ -155,8 +155,8 @@ func runSimulationImpl(request *api.IndividualSimRequest) *api.IndividualSimResu
 func convertTotems(inBuff *api.Buffs) shaman.Totems {
 	return shaman.Totems{
 		TotemOfWrath: int(inBuff.TotemOfWrath),
-		WrathOfAir:   inBuff.WrathOfAirTotem != 0,
-		ManaStream:   inBuff.ManaSpringTotem != 0,
+		WrathOfAir:   inBuff.WrathOfAirTotem != api.TristateEffect_TristateEffectMissing,
+		ManaStream:   inBuff.ManaSpringTotem != api.TristateEffect_TristateEffectMissing,
 	}
 }
 

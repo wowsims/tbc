@@ -78,7 +78,7 @@ type IndividualMetric struct {
 // New sim contructs a simulator with the given equipment / options.
 func NewSim(raid *Raid, options Options) *Simulation {
 	if options.GCDMin == 0 {
-		options.GCDMin = durationFromSeconds(0.75) // default to 0.75s GCD
+		options.GCDMin = durationFromSeconds(1.0) // default to 0.75s GCD
 	}
 	if options.RSeed == 0 {
 		options.RSeed = time.Now().Unix()

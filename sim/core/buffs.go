@@ -7,6 +7,37 @@ import (
 )
 
 type Buffs struct {
+	// // Raid Buff
+	// ArcaneBrilliance bool
+	// BlessingOfKings  bool
+	// BlessingOfWisdom TristateEffect
+	// DivineSpirit     TristateEffect
+	// GiftOfTheWild    TristateEffect
+
+	// // Party Buff
+	// Bloodlust       int32
+	// MoonkinAura     TristateEffect
+	// ShadowPriestDps int32
+
+	// // Target Debuff
+	// JudgementOfWisdom         bool
+	// ImprovedSealOfTheCrusader bool
+	// Misery                    bool
+
+	// // Items
+	// AtieshMage            int32
+	// AtieshWarlock         int32
+	// BraidedEterniumChain  bool
+	// EyeOfTheNight         bool
+	// ChainOfTheTwilightOwl bool
+	// JadePendantOfBlasting bool
+
+	// // Totems
+	// ManaSpringTotem TristateEffect
+	// ManaTideTotem   bool
+	// TotemOfWrath    int32
+	// WrathOfAirTotem TristateEffect
+
 	// Raid buffs
 	ArcaneInt                bool
 	GiftOfTheWild            bool

@@ -75,14 +75,14 @@ var fullBuffs = core.Buffs{
 }
 
 var fullConsumes = core.Consumes{
-	FlaskOfBlindingLight: true,
-	BrilliantWizardOil:   true,
-	MajorMageblood:       false,
-	BlackendBasilisk:     true,
-	DestructionPotion:    true,
-	SuperManaPotion:      true,
-	DarkRune:             true,
-	DrumsOfBattle:        true,
+	FlaskOfBlindingLight:   true,
+	BrilliantWizardOil:     true,
+	ElixirOfMajorMageblood: false,
+	BlackenedBasilisk:      true,
+	DestructionPotion:      true,
+	SuperManaPotion:        true,
+	DarkRune:               true,
+	DrumsOfBattle:          true,
 }
 
 var preRaidGear = []string{
@@ -169,7 +169,7 @@ func TestSimulatePreRaid(t *testing.T) {
 		Gear: gearFromStrings(preRaidGear),
 
 		ExpectedDpsShort: 1406,
-		ExpectedDpsLong:  1093,
+		ExpectedDpsLong:  1098,
 	})
 }
 

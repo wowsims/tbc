@@ -264,7 +264,6 @@ message Item {
 
     repeated double stats = 8;
     repeated GemColor gem_sockets = 11;
-    repeated double socket_bonus = 12;
 
     int32 phase = 9;
     ItemQuality quality = 10;
