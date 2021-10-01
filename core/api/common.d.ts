@@ -268,10 +268,6 @@ export interface Item {
      */
     gemSockets: GemColor[];
     /**
-     * @generated from protobuf field: repeated double socket_bonus = 12;
-     */
-    socketBonus: number[];
-    /**
      * @generated from protobuf field: int32 phase = 9;
      */
     phase: number;

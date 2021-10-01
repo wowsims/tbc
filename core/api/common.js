@@ -1159,13 +1159,12 @@ class Item$Type extends MessageType {
             { no: 7, name: "ranged_weapon_type", kind: "enum", T: () => ["api.RangedWeaponType", RangedWeaponType] },
             { no: 8, name: "stats", kind: "scalar", repeat: 1 /*RepeatType.PACKED*/, T: 1 /*ScalarType.DOUBLE*/ },
             { no: 11, name: "gem_sockets", kind: "enum", repeat: 1 /*RepeatType.PACKED*/, T: () => ["api.GemColor", GemColor] },
-            { no: 12, name: "socket_bonus", kind: "scalar", repeat: 1 /*RepeatType.PACKED*/, T: 1 /*ScalarType.DOUBLE*/ },
             { no: 9, name: "phase", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 10, name: "quality", kind: "enum", T: () => ["api.ItemQuality", ItemQuality] }
         ]);
     }
     create(value) {
-        const message = { id: 0, name: "", type: 0, armorType: 0, weaponType: 0, handType: 0, rangedWeaponType: 0, stats: [], gemSockets: [], socketBonus: [], phase: 0, quality: 0 };
+        const message = { id: 0, name: "", type: 0, armorType: 0, weaponType: 0, handType: 0, rangedWeaponType: 0, stats: [], gemSockets: [], phase: 0, quality: 0 };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -1210,13 +1209,6 @@ class Item$Type extends MessageType {
                             message.gemSockets.push(reader.int32());
                     else
                         message.gemSockets.push(reader.int32());
-                    break;
-                case /* repeated double socket_bonus */ 12:
-                    if (wireType === WireType.LengthDelimited)
-                        for (let e = reader.int32() + reader.pos; reader.pos < e;)
-                            message.socketBonus.push(reader.double());
-                    else
-                        message.socketBonus.push(reader.double());
                     break;
                 case /* int32 phase */ 9:
                     message.phase = reader.int32();
@@ -1269,13 +1261,6 @@ class Item$Type extends MessageType {
             writer.tag(11, WireType.LengthDelimited).fork();
             for (let i = 0; i < message.gemSockets.length; i++)
                 writer.int32(message.gemSockets[i]);
-            writer.join();
-        }
-        /* repeated double socket_bonus = 12; */
-        if (message.socketBonus.length) {
-            writer.tag(12, WireType.LengthDelimited).fork();
-            for (let i = 0; i < message.socketBonus.length; i++)
-                writer.double(message.socketBonus[i]);
             writer.join();
         }
         /* int32 phase = 9; */
