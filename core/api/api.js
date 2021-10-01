@@ -757,13 +757,14 @@ export const IndividualSimResult = new IndividualSimResult$Type();
 class CastMetric$Type extends MessageType {
     constructor() {
         super("api.CastMetric", [
-            { no: 1, name: "counts", kind: "scalar", repeat: 1 /*RepeatType.PACKED*/, T: 5 /*ScalarType.INT32*/ },
-            { no: 2, name: "dmgs", kind: "scalar", repeat: 1 /*RepeatType.PACKED*/, T: 1 /*ScalarType.DOUBLE*/ },
-            { no: 3, name: "tags", kind: "scalar", repeat: 1 /*RepeatType.PACKED*/, T: 5 /*ScalarType.INT32*/ }
+            { no: 1, name: "casts", kind: "scalar", repeat: 1 /*RepeatType.PACKED*/, T: 5 /*ScalarType.INT32*/ },
+            { no: 2, name: "crits", kind: "scalar", repeat: 1 /*RepeatType.PACKED*/, T: 5 /*ScalarType.INT32*/ },
+            { no: 3, name: "misses", kind: "scalar", repeat: 1 /*RepeatType.PACKED*/, T: 5 /*ScalarType.INT32*/ },
+            { no: 4, name: "dmgs", kind: "scalar", repeat: 1 /*RepeatType.PACKED*/, T: 1 /*ScalarType.DOUBLE*/ }
         ]);
     }
     create(value) {
-        const message = { counts: [], dmgs: [], tags: [] };
+        const message = { casts: [], crits: [], misses: [], dmgs: [] };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -774,26 +775,33 @@ class CastMetric$Type extends MessageType {
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
-                case /* repeated int32 counts */ 1:
+                case /* repeated int32 casts */ 1:
                     if (wireType === WireType.LengthDelimited)
                         for (let e = reader.int32() + reader.pos; reader.pos < e;)
-                            message.counts.push(reader.int32());
+                            message.casts.push(reader.int32());
                     else
-                        message.counts.push(reader.int32());
+                        message.casts.push(reader.int32());
                     break;
-                case /* repeated double dmgs */ 2:
+                case /* repeated int32 crits */ 2:
+                    if (wireType === WireType.LengthDelimited)
+                        for (let e = reader.int32() + reader.pos; reader.pos < e;)
+                            message.crits.push(reader.int32());
+                    else
+                        message.crits.push(reader.int32());
+                    break;
+                case /* repeated int32 misses */ 3:
+                    if (wireType === WireType.LengthDelimited)
+                        for (let e = reader.int32() + reader.pos; reader.pos < e;)
+                            message.misses.push(reader.int32());
+                    else
+                        message.misses.push(reader.int32());
+                    break;
+                case /* repeated double dmgs */ 4:
                     if (wireType === WireType.LengthDelimited)
                         for (let e = reader.int32() + reader.pos; reader.pos < e;)
                             message.dmgs.push(reader.double());
                     else
                         message.dmgs.push(reader.double());
-                    break;
-                case /* repeated int32 tags */ 3:
-                    if (wireType === WireType.LengthDelimited)
-                        for (let e = reader.int32() + reader.pos; reader.pos < e;)
-                            message.tags.push(reader.int32());
-                    else
-                        message.tags.push(reader.int32());
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -807,25 +815,32 @@ class CastMetric$Type extends MessageType {
         return message;
     }
     internalBinaryWrite(message, writer, options) {
-        /* repeated int32 counts = 1; */
-        if (message.counts.length) {
+        /* repeated int32 casts = 1; */
+        if (message.casts.length) {
             writer.tag(1, WireType.LengthDelimited).fork();
-            for (let i = 0; i < message.counts.length; i++)
-                writer.int32(message.counts[i]);
+            for (let i = 0; i < message.casts.length; i++)
+                writer.int32(message.casts[i]);
             writer.join();
         }
-        /* repeated double dmgs = 2; */
-        if (message.dmgs.length) {
+        /* repeated int32 crits = 2; */
+        if (message.crits.length) {
             writer.tag(2, WireType.LengthDelimited).fork();
+            for (let i = 0; i < message.crits.length; i++)
+                writer.int32(message.crits[i]);
+            writer.join();
+        }
+        /* repeated int32 misses = 3; */
+        if (message.misses.length) {
+            writer.tag(3, WireType.LengthDelimited).fork();
+            for (let i = 0; i < message.misses.length; i++)
+                writer.int32(message.misses[i]);
+            writer.join();
+        }
+        /* repeated double dmgs = 4; */
+        if (message.dmgs.length) {
+            writer.tag(4, WireType.LengthDelimited).fork();
             for (let i = 0; i < message.dmgs.length; i++)
                 writer.double(message.dmgs[i]);
-            writer.join();
-        }
-        /* repeated int32 tags = 3; */
-        if (message.tags.length) {
-            writer.tag(3, WireType.LengthDelimited).fork();
-            for (let i = 0; i < message.tags.length; i++)
-                writer.int32(message.tags[i]);
             writer.join();
         }
         let u = options.writeUnknownFields;

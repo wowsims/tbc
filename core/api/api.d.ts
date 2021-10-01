@@ -259,17 +259,21 @@ export interface IndividualSimResult {
  */
 export interface CastMetric {
     /**
-     * @generated from protobuf field: repeated int32 counts = 1;
+     * @generated from protobuf field: repeated int32 casts = 1;
      */
-    counts: number[];
+    casts: number[];
     /**
-     * @generated from protobuf field: repeated double dmgs = 2;
+     * @generated from protobuf field: repeated int32 crits = 2;
+     */
+    crits: number[];
+    /**
+     * @generated from protobuf field: repeated int32 misses = 3;
+     */
+    misses: number[];
+    /**
+     * @generated from protobuf field: repeated double dmgs = 4;
      */
     dmgs: number[];
-    /**
-     * @generated from protobuf field: repeated int32 tags = 3;
-     */
-    tags: number[];
 }
 /**
  * RPC RaidSim
