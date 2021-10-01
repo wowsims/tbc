@@ -23,18 +23,18 @@ func NewShaman(player *core.Player, party *core.Party, talents Talents, totems T
 
 	switch agentID {
 	case AgentTypeAdaptive:
-		agent = NewAdaptiveAgent(nil)
+		agent = NewAdaptiveAgent()
 	case AgentTypeCLOnClearcast:
-		agent = NewCLOnClearcastAgent(nil)
+		agent = NewCLOnClearcastAgent()
 	case AgentTypeFixedLBCL:
 		numLB := agentOptions["numLBtoCL"]
 		if numLB == -1 {
-			agent = NewLBOnlyAgent(nil)
+			agent = NewLBOnlyAgent()
 		} else {
-			agent = NewFixedRotationAgent(nil, numLB)
+			agent = NewFixedRotationAgent(numLB)
 		}
 	case AgentTypeCLOnCD:
-		agent = NewCLOnCDAgent(nil)
+		agent = NewCLOnCDAgent()
 	}
 
 	// if WaterShield {

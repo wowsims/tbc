@@ -87,9 +87,10 @@ message IndividualSimResult {
 // CastMetric holds a collection of counts of casts and 
 // 
 message CastMetric {
-    repeated int32 counts = 1;
-    repeated double dmgs = 2;
-    repeated int32 tags = 3;
+    repeated int32 casts = 1; // Count of Casts
+    repeated int32 crits = 2; // Count of Crit (subset of casts)
+    repeated int32 misses = 3; // Count of Misses (subset of casts)
+    repeated double dmgs = 4; // Total Damage
 }
 
 // RPC RaidSim

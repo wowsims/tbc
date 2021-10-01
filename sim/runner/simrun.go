@@ -205,14 +205,12 @@ type SimResult struct {
 
 type CastMetric struct {
 	// Index 0 of each slice is the 'normal' cast data.
-
 	// Count & Dmg of spells cast by Tag
-	Counts []int32
-	Dmgs   []float64
-
-	// Count & Dmg of spell criticals cast by Tag
-	CritCounts []int32
-	CritDmgs   []float64
+	Casts  []int32 // Total Count of Casts
+	Crits  []int32 // Count of Crits
+	Misses []int32 // Count of Misses
+	// Resists []int32   // Count of Resists
+	Dmgs []float64 // Total Damage
 }
 
 func NewMetricsAggregator() *MetricsAggregator {
@@ -237,42 +235,44 @@ func (aggregator *MetricsAggregator) addMetrics(options core.Options, metrics co
 	aggregator.dpsHist[dpsRounded]++
 
 	// TODO: Fix me
-	// if metrics.OOMAt > 0 {
-	// 	aggregator.numOom++
-	// 	aggregator.oomAtSum += float64(metrics.OOMAt)
-	// 	aggregator.dpsAtOomSum += float64(metrics.DamageAtOOM) / float64(metrics.OOMAt)
-	// }
+	firstPlayer := metrics.IndividualMetrics[0]
+	if firstPlayer.OOMAt > 0 {
+		aggregator.numOom++
+		aggregator.oomAtSum += float64(firstPlayer.OOMAt)
+		aggregator.dpsAtOomSum += float64(firstPlayer.DamageAtOOM) / float64(firstPlayer.OOMAt)
+	}
 
 	for _, cast := range metrics.Casts {
 		var id = cast.Spell.ID
 		cm := aggregator.casts[id]
 		idx := int(cast.Tag)
 
-		if cast.DidCrit {
-			if len(cm.CritCounts) <= idx {
-				newArr := make([]int32, idx+1)
-				copy(newArr, cm.CritCounts)
-				cm.CritCounts = newArr
-				newDmgs := make([]float64, idx+1)
-				copy(newDmgs, cm.CritDmgs)
-				cm.CritDmgs = newDmgs
-			}
-			cm.CritCounts[idx]++
-			cm.CritDmgs[idx] += cast.DidDmg
-		} else {
-			if len(cm.Counts) <= idx {
-				newArr := make([]int32, idx+1)
-				copy(newArr, cm.Counts)
-				cm.Counts = newArr
+		if len(cm.Casts) <= idx {
+			newArr := make([]int32, idx+1)
+			copy(newArr, cm.Casts)
+			cm.Casts = newArr
 
-				newDmgs := make([]float64, idx+1)
-				copy(newDmgs, cm.Dmgs)
-				cm.Dmgs = newDmgs
-			}
-			cm.Counts[idx]++
-			cm.Dmgs[idx] += cast.DidDmg
+			newDmgs := make([]float64, idx+1)
+			copy(newDmgs, cm.Dmgs)
+			cm.Dmgs = newDmgs
 		}
-
+		cm.Casts[idx]++
+		if cast.DidCrit {
+			if len(cm.Crits) <= idx {
+				newArr := make([]int32, idx+1)
+				copy(newArr, cm.Crits)
+				cm.Crits = newArr
+			}
+			cm.Crits[idx]++
+		} else if !cast.DidHit {
+			if len(cm.Misses) <= idx {
+				newArr := make([]int32, idx+1)
+				copy(newArr, cm.Misses)
+				cm.Misses = newArr
+			}
+			cm.Misses[idx]++
+		}
+		cm.Dmgs[idx] += cast.DidDmg
 		aggregator.casts[id] = cm
 	}
 }

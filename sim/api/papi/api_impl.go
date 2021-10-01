@@ -137,6 +137,15 @@ func runSimulationImpl(request *api.IndividualSimRequest) *api.IndividualSimResu
 	sim := createSim(request)
 	result := runner.RunIndividualSim(sim)
 
+	castMetrics := map[int32]*api.CastMetric{}
+	for k, v := range result.Casts {
+		castMetrics[k] = &api.CastMetric{
+			Casts:  v.Casts,
+			Crits:  v.Crits,
+			Misses: v.Misses,
+			Dmgs:   v.Dmgs,
+		}
+	}
 	isr := &api.IndividualSimResult{
 		DpsAvg:              result.DpsAvg,
 		DpsStdev:            result.DpsStDev,
@@ -147,7 +156,7 @@ func runSimulationImpl(request *api.IndividualSimRequest) *api.IndividualSimResu
 		NumOom:              int32(result.NumOom),
 		OomAtAvg:            result.OomAtAvg,
 		DpsAtOomAvg:         result.DpsAtOomAvg,
-		// TODO: convert casts
+		Casts:               castMetrics,
 	}
 	return isr
 }

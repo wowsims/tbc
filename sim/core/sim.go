@@ -194,6 +194,7 @@ func (sim *Simulation) Run() SimMetrics {
 		return pendingActions[i].ExecuteAt < pendingActions[j].ExecuteAt
 	})
 
+simloop:
 	for sim.CurrentTime < sim.Duration {
 		action := pendingActions[0]
 		agent := action.Agent
@@ -228,9 +229,10 @@ func (sim *Simulation) Run() SimMetrics {
 					wait = regenTime
 				}
 				if sim.Options.ExitOnOOM {
-					// TODO: implement this... first player to OOM ends sim (probably only makes sense in an individual sim)
-
+					break simloop // named for clarity since this is pretty deep nested.
 				}
+				sim.Metrics.IndividualMetrics[agent.ID].DamageAtOOM = sim.Metrics.IndividualMetrics[agent.ID].TotalDamage
+				sim.Metrics.IndividualMetrics[agent.ID].OOMAt = sim.CurrentTime.Seconds()
 			}
 			if sim.Debug != nil {
 				sim.Debug("(%d) Start Casting %s Cast Time: %0.1fs\n", agent.ID, newAction.Cast.Spell.Name, newAction.Cast.CastTime.Seconds())

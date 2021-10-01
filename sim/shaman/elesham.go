@@ -105,7 +105,7 @@ func (agent *LBOnlyAgent) OnActionAccepted(p *Shaman, sim *core.Simulation, acti
 }
 func (agent *LBOnlyAgent) Reset(sim *core.Simulation) {}
 
-func NewLBOnlyAgent(sim *core.Simulation) *LBOnlyAgent {
+func NewLBOnlyAgent() *LBOnlyAgent {
 	return &LBOnlyAgent{
 		lb: core.Spells[core.MagicIDLB12],
 	}
@@ -133,7 +133,7 @@ func (agent *CLOnCDAgent) OnActionAccepted(p *Shaman, sim *core.Simulation, acti
 }
 func (agent *CLOnCDAgent) Reset(sim *core.Simulation) {}
 
-func NewCLOnCDAgent(sim *core.Simulation) *CLOnCDAgent {
+func NewCLOnCDAgent() *CLOnCDAgent {
 	return &CLOnCDAgent{
 		lb: core.Spells[core.MagicIDLB12],
 		cl: core.Spells[core.MagicIDCL6],
@@ -194,7 +194,7 @@ func (agent *FixedRotationAgent) Reset(sim *core.Simulation) {
 	agent.numLBsSinceLastCL = agent.numLBsPerCL
 }
 
-func NewFixedRotationAgent(sim *core.Simulation, numLBsPerCL int) *FixedRotationAgent {
+func NewFixedRotationAgent(numLBsPerCL int) *FixedRotationAgent {
 	return &FixedRotationAgent{
 		numLBsPerCL:       numLBsPerCL,
 		numLBsSinceLastCL: numLBsPerCL, // This lets us cast CL first
@@ -232,7 +232,7 @@ func (agent *CLOnClearcastAgent) Reset(sim *core.Simulation) {
 	agent.prevPrevCastProccedCC = true // Lets us cast CL first
 }
 
-func NewCLOnClearcastAgent(sim *core.Simulation) *CLOnClearcastAgent {
+func NewCLOnClearcastAgent() *CLOnClearcastAgent {
 	return &CLOnClearcastAgent{
 		lb: core.Spells[core.MagicIDLB12],
 		cl: core.Spells[core.MagicIDCL6],
@@ -335,8 +335,8 @@ func (agent *AdaptiveAgent) OnActionAccepted(s *Shaman, sim *core.Simulation, ac
 
 func (agent *AdaptiveAgent) Reset(sim *core.Simulation) {
 	if agent.timesOOM == 5 {
-		agent.baseAgent = NewLBOnlyAgent(sim)
-		agent.surplusAgent = NewCLOnClearcastAgent(sim)
+		agent.baseAgent = NewLBOnlyAgent()
+		agent.surplusAgent = NewCLOnClearcastAgent()
 	}
 	agent.wentOOM = false
 	agent.manaSnapshots = [manaSnapshotsBufferSize]ManaSnapshot{}
@@ -346,15 +346,15 @@ func (agent *AdaptiveAgent) Reset(sim *core.Simulation) {
 	agent.surplusAgent.Reset(sim)
 }
 
-func NewAdaptiveAgent(sim *core.Simulation) *AdaptiveAgent {
+func NewAdaptiveAgent() *AdaptiveAgent {
 	agent := &AdaptiveAgent{}
 
 	// TODO: Can we just start with more aggressive agent and drop to less aggressive if we go OOM 5 times?
 	//   not as deterministic... but probably averages out the same?
 	// Otherwise we need to figure out how to do this after all other agents are setup (in the eventual 'raid' sim setup)
 
-	agent.baseAgent = NewCLOnClearcastAgent(sim)
-	agent.surplusAgent = NewCLOnCDAgent(sim)
+	agent.baseAgent = NewCLOnClearcastAgent()
+	agent.surplusAgent = NewCLOnCDAgent()
 
 	return agent
 }

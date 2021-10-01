@@ -230,6 +230,7 @@ func DirectCast(sim *Simulation, p PlayerAgent, cast *Cast) {
 
 	sim.Metrics.Casts = append(sim.Metrics.Casts, cast)
 	sim.Metrics.TotalDamage += cast.DidDmg
+	sim.Metrics.IndividualMetrics[p.ID].TotalDamage += cast.DidDmg
 	// if sim.Debug != nil {
 	// 	sim.Debug("Total Dmg: %0.1f\n", sim.Metrics.TotalDamage)
 	// }
