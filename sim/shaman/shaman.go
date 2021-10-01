@@ -53,7 +53,7 @@ func NewShaman(player *core.Player, party *core.Party, talents Talents, totems T
 		Player:  player,
 		Talents: talents,
 
-		convectionBonus: 1 - 0.02*float64(talents.Convection),
+		convectionBonus: 0.02 * float64(talents.Convection),
 		concussionBonus: 1 + 0.01*float64(talents.Concussion),
 	}
 }
@@ -279,8 +279,6 @@ func NewCastAction(sim *core.Simulation, player *Shaman, sp *core.Spell) core.Ag
 		if sp.ID == core.MagicIDCL6 && sim.Options.Encounter.NumTargets > 1 {
 			cast.DoItNow = ChainCast
 		}
-		cast.ManaCost *= player.convectionBonus
-
 		if player.Talents.LightningMastery > 0 {
 			cast.CastTime -= time.Millisecond * 100 * time.Duration(player.Talents.LightningMastery)
 		}
@@ -298,6 +296,9 @@ func NewCastAction(sim *core.Simulation, player *Shaman, sp *core.Spell) core.Ag
 		// The 'OnCast' auras include CSD
 		cast.CritBonus *= 2 // This handles the 'Elemental Fury' talent which increases the crit bonus.
 		cast.CritBonus -= 1 // reduce to multiplier instead of percent.
+
+		// Convection applies against the base cost of the spell.
+		cast.ManaCost -= sp.Mana * player.convectionBonus
 	}
 
 	return core.AgentAction{
