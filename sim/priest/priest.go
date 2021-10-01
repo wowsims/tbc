@@ -9,10 +9,7 @@ func NewBuffBot(sim *core.Simulation, party *core.Party, misery bool, spriestDPS
 
 	// shadow priest buff bot just statically applies mp5
 	if spriestDPS > 0 {
-		for _, pl := range party.Players {
-			pl.InitialStats[stats.MP5] += float64(spriestDPS) * 0.25
-			pl.Stats = pl.InitialStats
-		}
+		party.AddInitialStats(stats.Stats{stats.MP5: float64(spriestDPS) * 0.25})
 	}
 
 	return &Priest{

@@ -130,10 +130,7 @@ var sets = []ItemSet{
 
 			// FUTURE: Only one ele shaman in the party can use this at a time.
 			//   not a big deal now but will need to be fixed to support full raid sim.
-			for _, p := range party.Players {
-				p.Stats[stats.SpellPower] += 20
-			}
-
+			party.AddStats(stats.Stats{stats.SpellPower: 20})
 			// }
 			return Aura{ID: MagicIDCyclone2pc}
 		}},

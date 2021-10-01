@@ -43,7 +43,8 @@ type Simulation struct {
 	rseed       int64
 	CurrentTime time.Duration // duration that has elapsed in the sim since starting
 
-	Debug func(string, ...interface{})
+	Log  func(string, ...interface{})
+	logs []string
 
 	// caches to speed up perf and store temp state
 	cache *cache
@@ -55,8 +56,8 @@ type wrappedRandom struct {
 }
 
 func (wr *wrappedRandom) Float64(src string) float64 {
-	// if wr.sim.Debug != nil {
-	// 	wr.sim.Debug("FLOAT64 FROM: %s\n", src)
+	// if wr.sim.Log != nil {
+	// 	wr.sim.Log("FLOAT64 FROM: %s\n", src)
 	// }
 	return wr.Rand.Float64()
 }
@@ -89,7 +90,7 @@ func NewSim(raid *Raid, options Options) *Simulation {
 		Options:  options,
 		Duration: durationFromSeconds(options.Encounter.Duration),
 		// Rando:    ,
-		Debug: nil,
+		Log: nil,
 		cache: &cache{
 			castPool: make([]*Cast, 0, 1000),
 		},
@@ -122,9 +123,9 @@ func (sim *Simulation) Reset() {
 		Casts:             make([]*Cast, 0, 1000),
 		IndividualMetrics: make([]IndividualMetric, 25),
 	}
-	if sim.Debug != nil {
-		sim.Debug("SIM RESET\n")
-		sim.Debug("----------------------\n")
+	if sim.Log != nil {
+		sim.Log("SIM RESET\n")
+		sim.Log("----------------------\n")
 	}
 
 	// Reset all players
@@ -221,8 +222,8 @@ simloop:
 			if agent.Stats[stats.Mana] < newAction.Cast.ManaCost {
 				// Not enough mana, wait until there is enough mana to cast the desired spell
 				regenTime := durationFromSeconds((newAction.Cast.ManaCost-agent.Stats[stats.Mana])/agent.manaRegenPerSecond()) + 1
-				if sim.Debug != nil {
-					sim.Debug("Not enough mana to cast... regen for %0.1f seconds before casting.\n", regenTime.Seconds())
+				if sim.Log != nil {
+					sim.Log("Not enough mana to cast... regen for %0.1f seconds before casting.\n", regenTime.Seconds())
 				}
 				regenTime += newAction.Cast.CastTime
 				if regenTime > wait {
@@ -234,8 +235,8 @@ simloop:
 				sim.Metrics.IndividualMetrics[agent.ID].DamageAtOOM = sim.Metrics.IndividualMetrics[agent.ID].TotalDamage
 				sim.Metrics.IndividualMetrics[agent.ID].OOMAt = sim.CurrentTime.Seconds()
 			}
-			if sim.Debug != nil {
-				sim.Debug("(%d) Start Casting %s Cast Time: %0.1fs\n", agent.ID, newAction.Cast.Spell.Name, newAction.Cast.CastTime.Seconds())
+			if sim.Log != nil {
+				sim.Log("(%d) Start Casting %s Cast Time: %0.1fs\n", agent.ID, newAction.Cast.Spell.Name, newAction.Cast.CastTime.Seconds())
 			}
 		}
 		pa := pendingAction{

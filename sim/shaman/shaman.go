@@ -41,12 +41,7 @@ func NewShaman(player *core.Player, party *core.Party, talents Talents, totems T
 	player.InitialStats[stats.MP5] += 50
 	// }
 
-	for _, pl := range party.Players {
-		pl.InitialStats = totems.AddStats(pl.InitialStats)
-		pl.Stats = pl.InitialStats
-	}
-
-	player.Stats = player.InitialStats
+	party.AddInitialStats(totems.Stats())
 
 	return &Shaman{
 		agent:   agent,
@@ -154,9 +149,13 @@ type Totems struct {
 	ManaStream   bool
 }
 
-func (tt Totems) AddStats(s stats.Stats) stats.Stats {
-	s[stats.SpellCrit] += 66.24 * float64(tt.TotemOfWrath)
-	s[stats.SpellHit] += 37.8 * float64(tt.TotemOfWrath)
+func (tt Totems) Stats() stats.Stats {
+	s := stats.Stats{
+		stats.SpellCrit:  66.24 * float64(tt.TotemOfWrath),
+		stats.SpellHit:   37.8 * float64(tt.TotemOfWrath),
+		stats.SpellPower: 0,
+		stats.MP5:        0,
+	}
 	if tt.WrathOfAir {
 		s[stats.SpellPower] += 101
 	}
@@ -188,15 +187,13 @@ func TryActivateBloodlust(sim *core.Simulation, party *core.Party, player *core.
 	dur := time.Second * 40 // assumes that multiple BLs are different shaman.
 	player.SetCD(core.MagicIDBloodlust, time.Minute*10+sim.CurrentTime)
 
-	for _, p := range party.Players {
-		p.AddAura(sim, core.Aura{
-			ID:      core.MagicIDBloodlust,
-			Expires: sim.CurrentTime + dur,
-			OnCast: func(sim *core.Simulation, p core.PlayerAgent, c *core.Cast) {
-				c.CastTime = (c.CastTime * 10) / 13 // 30% faster
-			},
-		})
-	}
+	party.AddAura(sim, core.Aura{
+		ID:      core.MagicIDBloodlust,
+		Expires: sim.CurrentTime + dur,
+		OnCast: func(sim *core.Simulation, p core.PlayerAgent, c *core.Cast) {
+			c.CastTime = (c.CastTime * 10) / 13 // 30% faster
+		},
+	})
 }
 
 // FUTURE: We can cache like 75% of the calculation for a spell cast ahead of time.
@@ -243,6 +240,13 @@ func TryActivateBloodlust(sim *core.Simulation, party *core.Party, player *core.
 // 	return cast
 // }
 
+// Totem Item IDs
+const (
+	TotemOfTheVoid           = 28248
+	TotemOfStorms            = 23199
+	TotemOfAncestralGuidance = 32330
+)
+
 // NewCastAction is how a shaman creates a new spell
 //  TODO: Decide if we need separate functions for elemental and enhancement?
 func NewCastAction(sim *core.Simulation, player *Shaman, sp *core.Spell) core.AgentAction {
@@ -266,11 +270,11 @@ func NewCastAction(sim *core.Simulation, player *Shaman, sp *core.Spell) core.Ag
 	if itsElectric {
 		// TODO: Should we change these to be full auras?
 		//   Doesnt seem needed since they can only be used by shaman right here.
-		if player.Equip[items.ItemSlotRanged].ID == 28248 {
+		if player.Equip[items.ItemSlotRanged].ID == TotemOfTheVoid {
 			cast.Dmg += 55
-		} else if player.Equip[items.ItemSlotRanged].ID == 23199 {
+		} else if player.Equip[items.ItemSlotRanged].ID == TotemOfStorms {
 			cast.Dmg += 33
-		} else if player.Equip[items.ItemSlotRanged].ID == 32330 {
+		} else if player.Equip[items.ItemSlotRanged].ID == TotemOfAncestralGuidance {
 			cast.Dmg += 85
 		}
 		if player.Talents.CallOfThunder > 0 { // only applies to CL and LB

@@ -43,8 +43,8 @@ func AuraLightningOverload(lvl int) core.Aura {
 				actualChance /= 3 // 33% chance of regular for CL LO
 			}
 			if sim.Rando.Float64("LO") < actualChance {
-				if sim.Debug != nil {
-					sim.Debug(" - Lightning Overload -\n")
+				if sim.Log != nil {
+					sim.Log(" - Lightning Overload -\n")
 				}
 				clone := sim.NewCast()
 				// Don't set IsClBounce even if this is a bounce, so that the clone does a normal CL and bounces
@@ -62,8 +62,8 @@ func AuraLightningOverload(lvl int) core.Aura {
 				// Use the cast function from the original cast.
 				clone.DoItNow = c.DoItNow
 				clone.DoItNow(sim, p, clone)
-				if sim.Debug != nil {
-					sim.Debug(" - Lightning Overload Complete -\n")
+				if sim.Log != nil {
+					sim.Log(" - Lightning Overload Complete -\n")
 				}
 			}
 		},
@@ -121,10 +121,10 @@ type CLOnCDAgent struct {
 
 func (agent *CLOnCDAgent) ChooseAction(s *Shaman, party *core.Party, sim *core.Simulation) core.AgentAction {
 	if s.IsOnCD(core.MagicIDCL6, sim.CurrentTime) {
-		// sim.Debug("[CLonCD] LB\n")
+		// sim.Log("[CLonCD] LB\n")
 		return NewCastAction(sim, s, agent.lb)
 	} else {
-		// sim.Debug("[CLonCD] CL\n")
+		// sim.Log("[CLonCD] CL\n")
 		return NewCastAction(sim, s, agent.cl)
 	}
 }
@@ -216,11 +216,11 @@ type CLOnClearcastAgent struct {
 
 func (agent *CLOnClearcastAgent) ChooseAction(s *Shaman, party *core.Party, sim *core.Simulation) core.AgentAction {
 	if s.IsOnCD(core.MagicIDCL6, sim.CurrentTime) || !agent.prevPrevCastProccedCC {
-		// sim.Debug("[CLonCC] - LB")
+		// sim.Log("[CLonCC] - LB")
 		return NewCastAction(sim, s, agent.lb)
 	}
 
-	// sim.Debug("[CLonCC] - CL")
+	// sim.Log("[CLonCC] - CL")
 	return NewCastAction(sim, s, agent.cl)
 }
 
@@ -311,9 +311,9 @@ func (agent *AdaptiveAgent) ChooseAction(s *Shaman, party *core.Party, sim *core
 	timeRemaining := sim.Duration - sim.CurrentTime
 	projectedManaCost := manaSpent * (timeRemaining.Seconds() / timeDelta.Seconds())
 
-	if sim.Debug != nil {
+	if sim.Log != nil {
 		manaSpendingRate := manaSpent / timeDelta.Seconds()
-		sim.Debug("[AI] CL Ready: Mana/s: %0.1f, Est Mana Cost: %0.1f, CurrentMana: %0.1f\n", manaSpendingRate, projectedManaCost, s.Stats[stats.Mana])
+		sim.Log("[AI] CL Ready: Mana/s: %0.1f, Est Mana Cost: %0.1f, CurrentMana: %0.1f\n", manaSpendingRate, projectedManaCost, s.Stats[stats.Mana])
 	}
 
 	// If we have enough mana to burn, use the surplus agent.

@@ -60,8 +60,8 @@ func AuraJudgementOfWisdom() core.Aura {
 			if c.Spell.ID == core.MagicIDTLCLB {
 				return // TLC cant proc JoW
 			}
-			if sim.Debug != nil {
-				sim.Debug("(%d) +Judgement Of Wisdom: 37 mana (74 @ 50%% proc)\n", player.ID)
+			if sim.Log != nil {
+				sim.Log("(%d) +Judgement Of Wisdom: 37 mana (74 @ 50%% proc)\n", player.ID)
 			}
 			// Only apply to players that have mana.
 			if player.InitialStats[stats.Mana] > 0 {

@@ -19,16 +19,11 @@ func NewBuffBot(sim *core.Simulation, party *core.Party, gotw, moonkin, ravenIdo
 	}
 
 	if moonkin {
-		for _, pl := range party.Players {
-			pl.Stats[stats.SpellCrit] += 110.4
-			pl.InitialStats[stats.SpellCrit] += 110.4
-
-			if ravenIdol {
-				pl.Stats[stats.SpellCrit] += 20
-				pl.InitialStats[stats.SpellCrit] += 20
-			}
+		s := stats.Stats{stats.SpellCrit: 110.4}
+		if ravenIdol {
+			s[stats.SpellCrit] += 20
 		}
-
+		party.AddInitialStats(s)
 	}
 
 	return &Druid{}

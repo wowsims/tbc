@@ -155,7 +155,7 @@ func RunIndividualSim(sim *core.Simulation) SimResult {
 	aggregator := NewMetricsAggregator()
 
 	if sim.Options.Debug {
-		sim.Debug = func(s string, vals ...interface{}) {
+		sim.Log = func(s string, vals ...interface{}) {
 			logsBuffer.WriteString(fmt.Sprintf("[%0.1f] "+s, append([]interface{}{sim.CurrentTime.Seconds()}, vals...)...))
 		}
 	}

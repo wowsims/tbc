@@ -104,8 +104,8 @@ func NewCast(sim *Simulation, sp *Spell) *Cast {
 // Cast will actually cast and treat all casts as having no 'flight time'.
 // This will activate any auras around casting, calculate hit/crit and add to sim metrics.
 func DirectCast(sim *Simulation, p PlayerAgent, cast *Cast) {
-	if sim.Debug != nil {
-		sim.Debug("(%d) Current Mana %0.0f, Cast Cost: %0.0f\n", p.ID, p.Stats[stats.Mana], cast.ManaCost)
+	if sim.Log != nil {
+		sim.Log("(%d) Current Mana %0.0f, Cast Cost: %0.0f\n", p.ID, p.Stats[stats.Mana], cast.ManaCost)
 	}
 	if cast.ManaCost > 0 {
 		p.Stats[stats.Mana] -= cast.ManaCost
@@ -127,16 +127,16 @@ func DirectCast(sim *Simulation, p PlayerAgent, cast *Cast) {
 	hit = math.Min(hit, 0.99)                               // can't get away from the 1% miss
 
 	dbgCast := cast.Spell.Name
-	if sim.Debug != nil {
-		sim.Debug("(%d) Completed Cast (%0.2f hit chance) (%s)\n", p.ID, hit, dbgCast)
+	if sim.Log != nil {
+		sim.Log("(%d) Completed Cast (%0.2f hit chance) (%s)\n", p.ID, hit, dbgCast)
 	}
 	if sim.Rando.Float64("cast hit") < hit {
 		sp := p.Stats[stats.SpellPower] + p.Stats[cast.Spell.DamageType] + cast.Dmg
 		baseDmg := (sim.Rando.Float64("cast dmg") * cast.Spell.DmgDiff)
 		bonus := (sp * cast.Spell.Coeff)
 		dmg := baseDmg + cast.Spell.MinDmg + bonus
-		// if sim.Debug != nil {
-		// 	sim.Debug("base dmg: %0.1f, bonus: %0.1f, total: %0.1f\n", baseDmg, bonus, dmg)
+		// if sim.Log != nil {
+		// 	sim.Log("base dmg: %0.1f, bonus: %0.1f, total: %0.1f\n", baseDmg, bonus, dmg)
 		// }
 		if cast.DidDmg != 0 { // use the pre-set dmg
 			dmg = cast.DidDmg
@@ -147,10 +147,10 @@ func DirectCast(sim *Simulation, p PlayerAgent, cast *Cast) {
 		if sim.Rando.Float64("cast crit") < crit {
 			cast.DidCrit = true
 			dmg *= cast.CritBonus
-			if sim.Debug != nil {
+			if sim.Log != nil {
 				dbgCast += " crit"
 			}
-		} else if sim.Debug != nil {
+		} else if sim.Log != nil {
 			dbgCast += " hit"
 		}
 
@@ -161,22 +161,22 @@ func DirectCast(sim *Simulation, p PlayerAgent, cast *Cast) {
 		//  FUTURE: handle boss resists for fights/classes that are actually impacted by that.
 		resVal := sim.Rando.Float64("cast resist")
 		if resVal < 0.18 { // 13% chance for 25% resist, 4% for 50%, 1% for 75%
-			if sim.Debug != nil {
+			if sim.Log != nil {
 				dbgCast += " (partial resist: "
 			}
 			if resVal < 0.01 {
 				dmg *= .25
-				if sim.Debug != nil {
+				if sim.Log != nil {
 					dbgCast += "75%)"
 				}
 			} else if resVal < 0.05 {
 				dmg *= .5
-				if sim.Debug != nil {
+				if sim.Log != nil {
 					dbgCast += "50%)"
 				}
 			} else {
 				dmg *= .75
-				if sim.Debug != nil {
+				if sim.Log != nil {
 					dbgCast += "25%)"
 				}
 			}
@@ -198,11 +198,11 @@ func DirectCast(sim *Simulation, p PlayerAgent, cast *Cast) {
 			}
 		}
 		p.OnSpellHit(sim, p, cast)
-		// if sim.Debug != nil {
-		// 	sim.Debug("FINAL DMG: %0.1f\n", cast.DidDmg)
+		// if sim.Log != nil {
+		// 	sim.Log("FINAL DMG: %0.1f\n", cast.DidDmg)
 		// }
 	} else {
-		if sim.Debug != nil {
+		if sim.Log != nil {
 			dbgCast += " miss"
 		}
 		cast.DidDmg = 0
@@ -224,14 +224,14 @@ func DirectCast(sim *Simulation, p PlayerAgent, cast *Cast) {
 		p.SetCD(cast.Spell.ID, cast.Spell.Cooldown+sim.CurrentTime)
 	}
 
-	if sim.Debug != nil {
-		sim.Debug("(%d) %s: %0.0f\n", p.ID, dbgCast, cast.DidDmg)
+	if sim.Log != nil {
+		sim.Log("(%d) %s: %0.0f\n", p.ID, dbgCast, cast.DidDmg)
 	}
 
 	sim.Metrics.Casts = append(sim.Metrics.Casts, cast)
 	sim.Metrics.TotalDamage += cast.DidDmg
 	sim.Metrics.IndividualMetrics[p.ID].TotalDamage += cast.DidDmg
-	// if sim.Debug != nil {
-	// 	sim.Debug("Total Dmg: %0.1f\n", sim.Metrics.TotalDamage)
+	// if sim.Log != nil {
+	// 	sim.Log("Total Dmg: %0.1f\n", sim.Metrics.TotalDamage)
 	// }
 }

@@ -150,8 +150,8 @@ func TryActivateDarkRune(sim *Simulation, party *Party, player *Player) {
 	// Restores 900 to 1500 mana. (2 Min Cooldown)
 	player.Stats[stats.Mana] += 900 + (sim.Rando.Float64("dark rune") * 600)
 	player.SetCD(MagicIDRune, time.Second*120+sim.CurrentTime)
-	if sim.Debug != nil {
-		sim.Debug("Used Dark Rune\n")
+	if sim.Log != nil {
+		sim.Log("Used Dark Rune\n")
 	}
 }
 
@@ -175,7 +175,7 @@ func TryActivateSuperManaPotion(sim *Simulation, party *Party, player *Player) {
 
 	player.Stats[stats.Mana] += manaGain
 	player.SetCD(MagicIDPotion, time.Second*120+sim.CurrentTime)
-	if sim.Debug != nil {
-		sim.Debug("Used Mana Potion\n")
+	if sim.Log != nil {
+		sim.Log("Used Mana Potion\n")
 	}
 }

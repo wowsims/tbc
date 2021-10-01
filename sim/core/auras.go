@@ -75,8 +75,8 @@ func (at *AuraTracker) AddAura(sim *Simulation, player PlayerAgent, newAura Aura
 	at.Auras[newAura.ID].activeIndex = int32(len(at.ActiveAuraIDs))
 	at.ActiveAuraIDs = append(at.ActiveAuraIDs, newAura.ID)
 
-	if sim.Debug != nil {
-		sim.Debug("(%d) +%s\n", at.PID, AuraName(newAura.ID))
+	if sim.Log != nil {
+		sim.Log("(%d) +%s\n", at.PID, AuraName(newAura.ID))
 	}
 }
 
@@ -98,8 +98,8 @@ func (at *AuraTracker) RemoveAura(sim *Simulation, player PlayerAgent, id int32)
 	// Now we can remove the last element, in constant time
 	at.ActiveAuraIDs = at.ActiveAuraIDs[:len(at.ActiveAuraIDs)-1]
 
-	if sim.Debug != nil {
-		sim.Debug("(%d) -%s\n", at.PID, AuraName(id))
+	if sim.Log != nil {
+		sim.Log("(%d) -%s\n", at.PID, AuraName(id))
 	}
 }
 
@@ -491,8 +491,8 @@ func AuraStatRemoval(currentTime time.Duration, duration time.Duration, amount f
 		ID:      id,
 		Expires: currentTime + duration,
 		OnExpire: func(sim *Simulation, player PlayerAgent, c *Cast) {
-			if sim.Debug != nil {
-				sim.Debug(" -%0.0f %s from %s\n", amount, stat.StatName(), AuraName(id))
+			if sim.Log != nil {
+				sim.Log(" -%0.0f %s from %s\n", amount, stat.StatName(), AuraName(id))
 			}
 			player.Stats[stat] -= amount
 		},
@@ -520,8 +520,8 @@ func ActivateIED(sim *Simulation, party *Party, player PlayerAgent) Aura {
 		OnCastComplete: func(sim *Simulation, player PlayerAgent, c *Cast) {
 			if !icd.isOnCD(sim) && sim.Rando.Float64("unmarked") < 0.04 {
 				icd = InternalCD(sim.CurrentTime + dur)
-				if sim.Debug != nil {
-					sim.Debug(" *Insightful Earthstorm Mana Restore - 300\n")
+				if sim.Log != nil {
+					sim.Log(" *Insightful Earthstorm Mana Restore - 300\n")
 				}
 				player.Stats[stats.Mana] += 300
 			}
@@ -616,12 +616,12 @@ func ActivateTLC(sim *Simulation, party *Party, player PlayerAgent) Aura {
 				return
 			}
 			charges++
-			if sim.Debug != nil {
-				sim.Debug(" Lightning Capacitor Charges: %d\n", charges)
+			if sim.Log != nil {
+				sim.Log(" Lightning Capacitor Charges: %d\n", charges)
 			}
 			if charges >= 3 {
-				if sim.Debug != nil {
-					sim.Debug(" Lightning Capacitor Triggered!\n")
+				if sim.Log != nil {
+					sim.Log(" Lightning Capacitor Triggered!\n")
 				}
 				icd = InternalCD(sim.CurrentTime + icdDur)
 				clone := NewCast(sim, tlcspell)
@@ -639,9 +639,7 @@ func ActivateTLC(sim *Simulation, party *Party, player PlayerAgent) Aura {
 // Because this buff actually lasts 30min, lets just assume we never lose the buff.
 func ActivateChainTO(sim *Simulation, party *Party, player PlayerAgent) Aura {
 	const bonus = 2 * 22.08 // 2% crit
-	for _, p := range party.Players {
-		p.Stats[stats.SpellCrit] += bonus
-	}
+	party.AddStats(stats.Stats{stats.SpellCrit: bonus})
 	return Aura{
 		ID: MagicIDChainTO,
 	}
@@ -650,9 +648,7 @@ func ActivateChainTO(sim *Simulation, party *Party, player PlayerAgent) Aura {
 // Because this buff actually lasts 30min, lets just assume we never lose the buff.
 func ActivateEyeOfNight(sim *Simulation, party *Party, player PlayerAgent) Aura {
 	const bonus = 34
-	for _, p := range party.Players {
-		p.Stats[stats.SpellPower] += bonus
-	}
+	party.AddStats(stats.Stats{stats.SpellPower: bonus})
 	return Aura{
 		ID: MagicIDEyeOfTheNight,
 	}

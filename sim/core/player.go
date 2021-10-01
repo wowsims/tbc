@@ -12,6 +12,37 @@ type Party struct {
 	Players []PlayerAgent
 }
 
+func (p Party) AddAura(sim *Simulation, a Aura) {
+	for _, pl := range p.Players {
+		pl.AddAura(sim, a)
+	}
+}
+
+func (p Party) AddInitialStats(s stats.Stats) {
+	for _, pl := range p.Players {
+		for k, v := range s {
+			if v == 0 {
+				continue
+			}
+			pl.InitialStats[k] += v
+		}
+		pl.Stats = pl.InitialStats
+	}
+}
+
+// AddStats adds a temporary increase to each players stats.
+//  This will be reset at the end of the simulation. (using player InitialStats)
+func (p Party) AddStats(s stats.Stats) {
+	for _, pl := range p.Players {
+		for k, v := range s {
+			if v == 0 {
+				continue
+			}
+			pl.Stats[k] += v
+		}
+	}
+}
+
 type Raid struct {
 	Parties []*Party
 }
@@ -29,8 +60,8 @@ func (pa PlayerAgent) Advance(sim *Simulation, elapsedTime time.Duration, newTim
 	if pa.Stats[stats.Mana] > pa.InitialStats[stats.Mana] {
 		pa.Stats[stats.Mana] = pa.InitialStats[stats.Mana]
 	}
-	if sim.Debug != nil && regen != 0 {
-		sim.Debug("-> [%0.1f] Regenerated: %0.1f mana. Total: %0.1f\n", newTime.Seconds(), regen, pa.Stats[stats.Mana])
+	if sim.Log != nil && regen != 0 {
+		sim.Log("-> [%0.1f] Regenerated: %0.1f mana. Total: %0.1f\n", newTime.Seconds(), regen, pa.Stats[stats.Mana])
 	}
 
 	// Advance CDs and Auras

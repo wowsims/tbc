@@ -14,7 +14,8 @@ type Agent interface {
 	// Returns the action this Agent would like to take next.
 	ChooseAction(*Simulation, *Party) AgentAction
 
-	// This will be invoked if the chosen action is actually executed, so the Agent can update its state.
+	// This will be invoked right before the chosen action is actually executed, so the Agent can update its state.
+	// Note that the action may be different from the action chosen by this agent
 	OnActionAccepted(*Simulation, AgentAction)
 
 	// OnSpellHit is used by class agents to customize casts before actually applying the damage.
