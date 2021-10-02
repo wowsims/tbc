@@ -1,44 +1,32 @@
-import { IndividualSimResult } from '../core/api/api.js';
-import { Component } from '../core/components/component.js';
-import { TypedEvent } from '../core/typed_event.js';
+import { IndividualSimRequest, IndividualSimResult } from '../core/api/api.js';
 
-import { ColorSettings } from './color_settings.js';
+import { ResultComponent, ResultComponentConfig } from './result_component.js';
 
 declare var Chart: any;
 
-export class DpsHistogram extends Component {
-	private readonly colorSettings: ColorSettings;
-
-  constructor(parent: HTMLElement, resultsEmitter: TypedEvent<IndividualSimResult | null>, colorSettings: ColorSettings) {
-    super(parent, 'dps-histogram-root');
-		this.colorSettings = colorSettings;
-
-		resultsEmitter.on(simResult => {
-			if (!simResult)
-				return;
-
-			const bounds = this.rootElem.getBoundingClientRect();
-			const chartCanvas = this.createDpsChartFromSimResult(simResult, bounds);
-
-			this.rootElem.textContent = '';
-			this.rootElem.appendChild(chartCanvas);
-		});
+export class DpsHistogram extends ResultComponent {
+  constructor(config: ResultComponentConfig) {
+		config.rootCssClass = 'dps-histogram-root';
+    super(config);
 	}
 
-	private createDpsChartFromSimResult(simResult: IndividualSimResult, chartBounds: DOMRect): HTMLCanvasElement {
+	onSimResult(request: IndividualSimRequest, result: IndividualSimResult) {
+		const chartBounds = this.rootElem.getBoundingClientRect();
+
+		this.rootElem.textContent = '';
 		const chartCanvas = document.createElement("canvas");
 		chartCanvas.height = chartBounds.height;
 		chartCanvas.width = chartBounds.width;
 
 
-		const min = simResult.dpsAvg - simResult.dpsStdev;
-		const max = simResult.dpsAvg + simResult.dpsStdev;
+		const min = result.dpsAvg - result.dpsStdev;
+		const max = result.dpsAvg + result.dpsStdev;
 		const vals: Array<number> = [];
 		const colors: Array<string> = [];
 
-		const labels = Object.keys(simResult.dpsHist);
+		const labels = Object.keys(result.dpsHist);
 		labels.forEach((k, i) => {
-			vals.push(simResult.dpsHist[Number(k)]);
+			vals.push(result.dpsHist[Number(k)]);
 			const val = parseInt(k);
 			if (val > min && val < max) {
 				colors.push('#1E87F0');
@@ -78,6 +66,6 @@ export class DpsHistogram extends Component {
 				},
 			},
 		});
-		return chartCanvas;
+		this.rootElem.appendChild(chartCanvas);
 	}
 }

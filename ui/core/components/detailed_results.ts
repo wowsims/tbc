@@ -1,12 +1,17 @@
-import { IndividualSimResult } from '../api/api.js';
+import { IndividualSimRequest, IndividualSimResult } from '../api/api.js';
 import { urlPathPrefix } from '../resources.js';
 
 import { Component } from './component.js';
 
+export type IndividualSimData = {
+	request: IndividualSimRequest;
+	result: IndividualSimResult;
+};
+
 export class DetailedResults extends Component {
 	private readonly iframeElem: HTMLIFrameElement;
 	private tabWindow: Window | null;
-	private latestResult: IndividualSimResult | null;
+	private latestResult: IndividualSimData | null;
 
   constructor(parent: HTMLElement) {
     super(parent, 'detailed-results-manager-root');
@@ -35,7 +40,7 @@ export class DetailedResults extends Component {
 				this.tabWindow = window.open(url.href, 'Detailed Results');
 				this.tabWindow!.addEventListener('load', event => {
 					if (this.latestResult) {
-						this.setSimResult(this.latestResult);
+						this.setSimResult(this.latestResult.request, this.latestResult.result);
 					}
 				});
 			} else {
@@ -52,11 +57,16 @@ export class DetailedResults extends Component {
 		}
 	}
 
-  setSimResult(result: IndividualSimResult) {
-		this.latestResult = result;
-		this.iframeElem.contentWindow!.postMessage(result, '*');
+  setSimResult(request: IndividualSimRequest, result: IndividualSimResult) {
+		const data = {
+			request: request,
+			result: result,
+		};
+
+		this.latestResult = data;
+		this.iframeElem.contentWindow!.postMessage(data, '*');
 		if (this.tabWindow) {
-			this.tabWindow.postMessage(result, '*');
+			this.tabWindow.postMessage(data, '*');
 		}
   }
 }
