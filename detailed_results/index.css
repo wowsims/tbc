@@ -123,6 +123,11 @@
   font-weight: 700;
 }
 
+.source-chart-root {
+  height: 30vh;
+  width: 30vh;
+}
+
 body {
   background-color: var(--main-bg-color);
 }
