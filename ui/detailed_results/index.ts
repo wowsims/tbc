@@ -4,6 +4,7 @@ import { TypedEvent } from '../core/typed_event.js';
 import { DpsHistogram } from './dps_histogram.js';
 import { DpsResult } from './dps_result.js';
 import { PercentOom } from './percent_oom.js';
+import { SourceChart } from './source_chart.js';
 
 declare var Chart: any;
 
@@ -25,6 +26,10 @@ const layoutHTML = `
 <div class="dr-root">
 	<div class="dr-row topline-results">
 	</div>
+	<div class="dr-row source-stats">
+		<div class="source-chart">
+		</div>
+	</div>
 	<div class="dr-row dps-histogram">
 	</div>
 </div>
@@ -44,4 +49,5 @@ const toplineResultsDiv = document.body.getElementsByClassName('topline-results'
 const dpsResult = new DpsResult({ parent: toplineResultsDiv, resultsEmitter: resultsEmitter, colorSettings: colorSettings });
 const percentOom = new PercentOom({ parent: toplineResultsDiv, resultsEmitter: resultsEmitter, colorSettings: colorSettings });
 
+const sourceChart = new SourceChart({ parent: document.body.getElementsByClassName('source-chart')[0] as HTMLElement, resultsEmitter: resultsEmitter, colorSettings: colorSettings });
 const dpsHistogram = new DpsHistogram({ parent: document.body.getElementsByClassName('dps-histogram')[0] as HTMLElement, resultsEmitter: resultsEmitter, colorSettings: colorSettings });
