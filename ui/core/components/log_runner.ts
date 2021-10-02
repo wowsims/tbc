@@ -11,10 +11,14 @@ export class LogRunner extends Component {
   constructor(parent: HTMLElement, sim: Sim<any>, results: Results, detailedResults: DetailedResults) {
     super(parent, 'log-runner-root');
 
+		const controlBar = document.createElement('div');
+		controlBar.classList.add('log-runner-control-bar');
+		this.rootElem.appendChild(controlBar);
+
     const simButton = document.createElement('button');
     simButton.classList.add('log-runner-button');
     simButton.textContent = 'Sim once with logs';
-    this.rootElem.appendChild(simButton);
+    controlBar.appendChild(simButton);
 
 		const logsDiv = document.createElement('div');
 		logsDiv.classList.add('log-runner-logs');

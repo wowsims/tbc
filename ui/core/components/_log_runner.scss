@@ -1,3 +1,12 @@
+.log-runner-root {
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+}
+
+.log-runner-control-bar {
+}
+
 .log-runner-button {
 	margin: 5px;
 	color: black;
@@ -5,7 +14,7 @@
 
 .log-runner-logs {
 	overflow-y: scroll;
-	height: 85vh;
+	flex-grow: 1;
 }
 
 .log-runner-logs > span {

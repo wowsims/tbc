@@ -12,6 +12,10 @@
 @import "../shared";
 @import "../talents/talents_picker";
 
+html {
+	overflow: hidden;
+}
+
 td, th {
   padding: auto;
 }
@@ -115,6 +119,7 @@ td, th {
 
 .default-main > .tab-content {
   flex-grow: 1;
+	height: 80%;
 }
 .default-main > .tab-content > .tab-pane {
 	height: 100%;
