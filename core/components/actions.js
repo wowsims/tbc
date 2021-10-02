@@ -26,7 +26,7 @@ export class Actions extends Component {
             detailedResults.setPending();
             const result = await sim.individualSim(simRequest);
             results.setSimResult(result);
-            detailedResults.setSimResult(result);
+            detailedResults.setSimResult(simRequest, result);
         });
         statWeightsButton.addEventListener('click', async () => {
             const iterations = parseInt(iterationsInput.value);

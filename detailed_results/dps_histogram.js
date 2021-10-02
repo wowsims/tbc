@@ -1,28 +1,22 @@
-import { Component } from '../core/components/component.js';
-export class DpsHistogram extends Component {
-    constructor(parent, resultsEmitter, colorSettings) {
-        super(parent, 'dps-histogram-root');
-        this.colorSettings = colorSettings;
-        resultsEmitter.on(simResult => {
-            if (!simResult)
-                return;
-            const bounds = this.rootElem.getBoundingClientRect();
-            const chartCanvas = this.createDpsChartFromSimResult(simResult, bounds);
-            this.rootElem.textContent = '';
-            this.rootElem.appendChild(chartCanvas);
-        });
+import { ResultComponent } from './result_component.js';
+export class DpsHistogram extends ResultComponent {
+    constructor(config) {
+        config.rootCssClass = 'dps-histogram-root';
+        super(config);
     }
-    createDpsChartFromSimResult(simResult, chartBounds) {
+    onSimResult(request, result) {
+        const chartBounds = this.rootElem.getBoundingClientRect();
+        this.rootElem.textContent = '';
         const chartCanvas = document.createElement("canvas");
         chartCanvas.height = chartBounds.height;
         chartCanvas.width = chartBounds.width;
-        const min = simResult.dpsAvg - simResult.dpsStdev;
-        const max = simResult.dpsAvg + simResult.dpsStdev;
+        const min = result.dpsAvg - result.dpsStdev;
+        const max = result.dpsAvg + result.dpsStdev;
         const vals = [];
         const colors = [];
-        const labels = Object.keys(simResult.dpsHist);
+        const labels = Object.keys(result.dpsHist);
         labels.forEach((k, i) => {
-            vals.push(simResult.dpsHist[Number(k)]);
+            vals.push(result.dpsHist[Number(k)]);
             const val = parseInt(k);
             if (val > min && val < max) {
                 colors.push('#1E87F0');
@@ -62,6 +56,6 @@ export class DpsHistogram extends Component {
                 },
             },
         });
-        return chartCanvas;
+        this.rootElem.appendChild(chartCanvas);
     }
 }

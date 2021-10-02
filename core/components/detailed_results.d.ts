@@ -1,10 +1,14 @@
-import { IndividualSimResult } from '../api/api.js';
+import { IndividualSimRequest, IndividualSimResult } from '../api/api.js';
 import { Component } from './component.js';
+export declare type IndividualSimData = {
+    request: IndividualSimRequest;
+    result: IndividualSimResult;
+};
 export declare class DetailedResults extends Component {
     private readonly iframeElem;
     private tabWindow;
     private latestResult;
     constructor(parent: HTMLElement);
     setPending(): void;
-    setSimResult(result: IndividualSimResult): void;
+    setSimResult(request: IndividualSimRequest, result: IndividualSimResult): void;
 }

@@ -1,3 +1,4 @@
+@charset "UTF-8";
 :root {
   --main-bg-color: DarkSlateGrey;
   --main-text-color: White;
@@ -72,12 +73,71 @@
   margin: auto;
 }
 
+.dps-result {
+  color: var(--main-text-color);
+}
+
+.results-sim-dps-avg {
+  font-size: 30px;
+  font-weight: 700;
+}
+
+.results-sim-dps-avg:after {
+  content: " DPS";
+  font-size: 18px;
+}
+
+.results-sim-dps-stdev {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.results-sim-dps-stdev:before {
+  content: " ±";
+  padding: 2px;
+}
+
+.percent-oom {
+  color: var(--main-text-color);
+}
+
+.percent-oom.safe {
+  color: lawngreen;
+}
+
+.percent-oom.warning {
+  color: yellow;
+}
+
+.percent-oom.danger {
+  color: red;
+}
+
+.percent-oom-value {
+  font-size: 30px;
+  font-weight: 700;
+}
+
+.percent-oom-label {
+  font-size: 18px;
+  font-weight: 700;
+}
+
 body {
   background-color: var(--main-bg-color);
 }
 
 .dr-root {
   margin: 10px;
+}
+
+.dr-row {
+  margin: 10px;
+}
+
+.topline-results {
+  display: flex;
+  justify-content: space-around;
 }
 
 /*# sourceMappingURL=index.css.map */

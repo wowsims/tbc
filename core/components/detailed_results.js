@@ -23,7 +23,7 @@ export class DetailedResults extends Component {
                 this.tabWindow = window.open(url.href, 'Detailed Results');
                 this.tabWindow.addEventListener('load', event => {
                     if (this.latestResult) {
-                        this.setSimResult(this.latestResult);
+                        this.setSimResult(this.latestResult.request, this.latestResult.result);
                     }
                 });
             }
@@ -39,11 +39,15 @@ export class DetailedResults extends Component {
             this.tabWindow.postMessage(null, '*');
         }
     }
-    setSimResult(result) {
-        this.latestResult = result;
-        this.iframeElem.contentWindow.postMessage(result, '*');
+    setSimResult(request, result) {
+        const data = {
+            request: request,
+            result: result,
+        };
+        this.latestResult = data;
+        this.iframeElem.contentWindow.postMessage(data, '*');
         if (this.tabWindow) {
-            this.tabWindow.postMessage(result, '*');
+            this.tabWindow.postMessage(data, '*');
         }
     }
 }
