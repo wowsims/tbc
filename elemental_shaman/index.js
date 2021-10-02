@@ -117,12 +117,12 @@ const theme = new DefaultTheme(document.body, {
     defaults: {
         phase: 2,
         epWeights: Stats.fromMap({
-            [Stat.StatIntellect]: 0.41,
+            [Stat.StatIntellect]: 0.33,
             [Stat.StatSpellPower]: 1,
             [Stat.StatNatureSpellPower]: 1,
-            [Stat.StatSpellCrit]: 0.88,
-            [Stat.StatSpellHaste]: 1.21,
-            [Stat.StatMP5]: 0.37,
+            [Stat.StatSpellCrit]: 0.78,
+            [Stat.StatSpellHaste]: 1.25,
+            [Stat.StatMP5]: 0.08,
         }),
         encounter: Encounter.create({
             duration: 300,
