@@ -1,5 +1,5 @@
 import { IndividualSimResult } from '../api/api.js';
-import { StatWeightsResult } from '../api/api.js';
+import { StatWeightsRequest, StatWeightsResult } from '../api/api.js';
 import { Stat } from '../api/common.js';
 import { Component } from './component.js';
 export declare class Results extends Component {
@@ -10,5 +10,5 @@ export declare class Results extends Component {
     hideAll(): void;
     setPending(): void;
     setSimResult(result: IndividualSimResult): void;
-    setStatWeights(result: StatWeightsResult, epStats: Array<Stat>): void;
+    setStatWeights(request: StatWeightsRequest, result: StatWeightsResult, epStats: Array<Stat>): void;
 }

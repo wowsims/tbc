@@ -13,6 +13,9 @@ export function sum(arr) {
 export function intersection(a, b) {
     return a.filter(value => b.includes(value));
 }
+export function stDevToConf90(stDev, N) {
+    return 1.645 * stDev / Math.sqrt(N);
+}
 export async function wait(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
