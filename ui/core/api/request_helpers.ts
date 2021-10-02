@@ -12,8 +12,8 @@ import { SpecOptions } from './utils.js';
 
 import { Player } from './api.js';
 import { PlayerOptions } from './api.js';
-import { BalanceDruid, BalanceDruid_BalanceDruidAgent as BalanceDruidAgent, DruidTalents, BalanceDruid_BalanceDruidOptions as BalanceDruidOptions} from './druid.js';
-import { ElementalShaman, ElementalShaman_ElementalShamanAgent as ElementalShamanAgent, ShamanTalents, ElementalShaman_ElementalShamanOptions as ElementalShamanOptions } from './shaman.js';
+import { BalanceDruid, BalanceDruid_Agent as BalanceDruidAgent, DruidTalents, BalanceDruid_Options as BalanceDruidOptions} from './druid.js';
+import { ElementalShaman, ElementalShaman_Agent as ElementalShamanAgent, ShamanTalents, ElementalShaman_Options as ElementalShamanOptions } from './shaman.js';
 
 import { ComputeStatsRequest, ComputeStatsResult } from './api.js';
 import { IndividualSimRequest, IndividualSimResult } from './api.js';

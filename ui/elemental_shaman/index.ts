@@ -10,8 +10,8 @@ import { Stats } from '../core/api/stats.js';
 import { Sim } from '../core/sim.js';
 import { DefaultTheme } from '../core/themes/default.js';
 
-import { ElementalShaman, ElementalShaman_ElementalShamanAgent as ElementalShamanAgent, ShamanTalents as ShamanTalents, ElementalShaman_ElementalShamanOptions as ElementalShamanOptions } from '../core/api/shaman.js';
-import { ElementalShaman_ElementalShamanAgent_AgentType as AgentType } from '../core/api/shaman.js';
+import { ElementalShaman, ElementalShaman_Agent as ElementalShamanAgent, ShamanTalents as ShamanTalents, ElementalShaman_Options as ElementalShamanOptions } from '../core/api/shaman.js';
+import { ElementalShaman_Agent_AgentType as AgentType } from '../core/api/shaman.js';
 
 import * as IconInputs from '../core/components/icon_inputs.js';
 import * as OtherInputs from '../core/components/other_inputs.js';

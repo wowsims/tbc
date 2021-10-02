@@ -8,13 +8,13 @@ message DruidTalents {
 }
 
 message BalanceDruid {
-    message BalanceDruidAgent {
+    message Agent {
     }
-    BalanceDruidAgent agent = 1;
+    Agent agent = 1;
 
     DruidTalents talents = 2;
     
-    message BalanceDruidOptions {
+    message Options {
     }
-    BalanceDruidOptions options = 3;
+    Options options = 3;
 }

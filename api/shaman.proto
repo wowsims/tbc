@@ -44,7 +44,7 @@ message ShamanTalents {
 }
 
 message ElementalShaman {
-    message ElementalShamanAgent {
+    message Agent {
       enum AgentType {
           Unknown = 0;
           FixedLBCL = 1;
@@ -54,13 +54,13 @@ message ElementalShaman {
       }
       AgentType type = 1;
     }
-    ElementalShamanAgent agent = 1;
+    Agent agent = 1;
 
     ShamanTalents talents = 2;
     
-    message ElementalShamanOptions {
+    message Options {
         bool water_shield = 1;
         // int32 WaterShieldPPM
     }
-    ElementalShamanOptions options = 3;
+    Options options = 3;
 }
