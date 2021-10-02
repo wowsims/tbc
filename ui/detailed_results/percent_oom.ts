@@ -9,10 +9,10 @@ export class PercentOom extends ResultComponent {
   }
 
 	onSimResult(request: IndividualSimRequest, result: IndividualSimResult) {
-		const percentOom = Math.round(result.numOom / request.iterations);
+		const percentOom = result.numOom / request.iterations;
 
     this.rootElem.innerHTML = `
-      <span class="percent-oom-value">${percentOom}%</span>
+      <span class="percent-oom-value">${Math.round(percentOom * 100)}%</span>
       <span class="percent-oom-label">of simulations went OOM</span>
     `;
 
