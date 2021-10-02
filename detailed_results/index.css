@@ -67,6 +67,31 @@
   border: 1px solid yellow;
 }
 
+.cast-metrics-table {
+  color: var(--main-text-color);
+  width: 100%;
+}
+
+.cast-metrics-table-header-row {
+  border-bottom: 3px solid var(--main-text-color);
+}
+
+.cast-metrics-table-header-cell {
+  padding: 3px 1px;
+}
+
+.cast-metrics-table-body tr {
+  border-bottom: 1px solid var(--main-text-color);
+}
+
+.cast-metrics-table-body tr:hover {
+  background-color: rgba(255, 255, 0, 0.2);
+}
+
+.cast-metrics-table-body td {
+  padding: 2px 1px;
+}
+
 .dps-histogram-root {
   height: 30vh;
   width: 90vw;

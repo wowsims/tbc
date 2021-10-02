@@ -1,4 +1,5 @@
 import { TypedEvent } from '../core/typed_event.js';
+import { CastMetrics } from './cast_metrics.js';
 import { DpsHistogram } from './dps_histogram.js';
 import { DpsResult } from './dps_result.js';
 import { PercentOom } from './percent_oom.js';
@@ -18,6 +19,8 @@ const layoutHTML = `
 <div class="dr-root">
 	<div class="dr-row topline-results">
 	</div>
+	<div class="dr-row cast-metrics">
+	</div>
 	<div class="dr-row source-stats">
 		<div class="source-chart">
 		</div>
@@ -36,5 +39,6 @@ document.body.innerHTML = layoutHTML;
 const toplineResultsDiv = document.body.getElementsByClassName('topline-results')[0];
 const dpsResult = new DpsResult({ parent: toplineResultsDiv, resultsEmitter: resultsEmitter, colorSettings: colorSettings });
 const percentOom = new PercentOom({ parent: toplineResultsDiv, resultsEmitter: resultsEmitter, colorSettings: colorSettings });
+const castMetrics = new CastMetrics({ parent: document.body.getElementsByClassName('cast-metrics')[0], resultsEmitter: resultsEmitter, colorSettings: colorSettings });
 const sourceChart = new SourceChart({ parent: document.body.getElementsByClassName('source-chart')[0], resultsEmitter: resultsEmitter, colorSettings: colorSettings });
 const dpsHistogram = new DpsHistogram({ parent: document.body.getElementsByClassName('dps-histogram')[0], resultsEmitter: resultsEmitter, colorSettings: colorSettings });
