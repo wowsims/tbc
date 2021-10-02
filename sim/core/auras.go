@@ -506,7 +506,7 @@ func ActivateCSD(sim *Simulation, party *Party, player PlayerAgent) Aura {
 		OnCast: func(sim *Simulation, p PlayerAgent, c *Cast) {
 			// TODO: Figure out how to make this work properly/easily with crit bonus
 			//  and classes with crit bonus modifiers
-			c.CritBonus *= 1.03
+			c.CritDamageMultipier *= 1.03
 		},
 	}
 }

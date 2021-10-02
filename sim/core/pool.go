@@ -36,10 +36,10 @@ func (p *cache) ReturnCasts(casts []*Cast) {
 		v.Tag = 0
 		v.CastTime = 0
 		v.ManaCost = 0
-		v.Dmg = 0
-		v.Hit = 0
-		v.Crit = 0
-		v.CritBonus = 0
+		v.BonusSpellPower = 0
+		v.BonusHit = 0
+		v.BonusCrit = 0
+		v.CritDamageMultipier = 0
 		v.DidHit = false
 		v.DidCrit = false
 		v.DidDmg = 0

@@ -52,11 +52,11 @@ func AuraLightningOverload(lvl int) core.Aura {
 				clone.Spell = c.Spell
 
 				// Clone dmg/hit/crit chance?
-				clone.Hit = c.Hit
-				clone.Crit = c.Crit
-				clone.Dmg = c.Dmg
+				clone.BonusHit = c.BonusHit
+				clone.BonusCrit = c.BonusCrit
+				clone.BonusSpellPower = c.BonusSpellPower
 
-				clone.CritBonus = c.CritBonus
+				clone.CritDamageMultipier = c.CritDamageMultipier
 				clone.Effect = loDmgMod
 
 				// Use the cast function from the original cast.
@@ -80,7 +80,7 @@ func TryActivateEleMastery(sim *core.Simulation, player *core.Player) {
 		Expires: core.NeverExpires,
 		OnCast: func(sim *core.Simulation, p core.PlayerAgent, c *core.Cast) {
 			c.ManaCost = 0
-			c.Crit += 1.01
+			c.BonusCrit += 1.01
 		},
 		OnCastComplete: func(sim *core.Simulation, p core.PlayerAgent, c *core.Cast) {
 			// Remove the buff and put skill on CD
@@ -375,12 +375,12 @@ func ChainCast(sim *core.Simulation, p core.PlayerAgent, cast *core.Cast) {
 			dmgCoeff *= 0.7
 		}
 		clone := &core.Cast{
-			Tag:       cast.Tag, // pass along lightning overload
-			Spell:     cast.Spell,
-			Crit:      cast.Crit,
-			CritBonus: cast.CritBonus,
-			Effect:    func(sim *core.Simulation, p core.PlayerAgent, c *core.Cast) { cast.DidDmg *= dmgCoeff },
-			DoItNow:   core.DirectCast,
+			Tag:                 cast.Tag, // pass along lightning overload
+			Spell:               cast.Spell,
+			BonusCrit:           cast.BonusCrit,
+			CritDamageMultipier: cast.CritDamageMultipier,
+			Effect:              func(sim *core.Simulation, p core.PlayerAgent, c *core.Cast) { cast.DidDmg *= dmgCoeff },
+			DoItNow:             core.DirectCast,
 		}
 		clone.DoItNow(sim, p, clone)
 	}

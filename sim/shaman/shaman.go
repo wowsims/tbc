@@ -207,26 +207,26 @@ func TryActivateBloodlust(sim *core.Simulation, party *core.Party, player *core.
 // 		// FUTURE: This only impacts "frost fire and nature" spells.
 // 		//  We know it doesnt impact TLC.
 // 		//  Are there any other spells that a shaman can cast?
-// 		cast.Hit += float64(player.Talents.ElementalPrecision) * 0.02
+// 		cast.BonusHit += float64(player.Talents.ElementalPrecision) * 0.02
 // 	}
 // 	if player.Talents.NaturesGuidance > 0 {
-// 		cast.Hit += float64(player.Talents.NaturesGuidance) * 0.01
+// 		cast.BonusHit += float64(player.Talents.NaturesGuidance) * 0.01
 // 	}
 // 	if player.Talents.TidalMastery > 0 {
-// 		cast.Crit += float64(player.Talents.TidalMastery) * 0.01
+// 		cast.BonusCrit += float64(player.Talents.TidalMastery) * 0.01
 // 	}
 
 // 	// TODO: Should we change these to be full auras?
 // 	//   Doesnt seem needed since they can only be used by shaman right here.
 // 	if player.Equip[items.ItemSlotRanged].ID == 28248 {
-// 		cast.Dmg += 55
+// 		cast.BonusSpellPower += 55
 // 	} else if player.Equip[items.ItemSlotRanged].ID == 23199 {
-// 		cast.Dmg += 33
+// 		cast.BonusSpellPower += 33
 // 	} else if player.Equip[items.ItemSlotRanged].ID == 32330 {
-// 		cast.Dmg += 85
+// 		cast.BonusSpellPower += 85
 // 	}
 // 	if player.Talents.CallOfThunder > 0 { // only applies to CL and LB
-// 		cast.Crit += float64(player.Talents.CallOfThunder) * 0.01
+// 		cast.BonusCrit += float64(player.Talents.CallOfThunder) * 0.01
 // 	}
 // 	if sim.Options.Encounter.NumTargets > 1 {
 // 		cast.DoItNow = ChainCast
@@ -258,27 +258,27 @@ func NewCastAction(sim *core.Simulation, player *Shaman, sp *core.Spell) core.Ag
 		// FUTURE: This only impacts "frost fire and nature" spells.
 		//  We know it doesnt impact TLC.
 		//  Are there any other spells that a shaman can cast?
-		cast.Hit += float64(player.Talents.ElementalPrecision) * 0.02
+		cast.BonusHit += float64(player.Talents.ElementalPrecision) * 0.02
 	}
 	if player.Talents.NaturesGuidance > 0 {
-		cast.Hit += float64(player.Talents.NaturesGuidance) * 0.01
+		cast.BonusHit += float64(player.Talents.NaturesGuidance) * 0.01
 	}
 	if player.Talents.TidalMastery > 0 {
-		cast.Crit += float64(player.Talents.TidalMastery) * 0.01
+		cast.BonusCrit += float64(player.Talents.TidalMastery) * 0.01
 	}
 
 	if itsElectric {
 		// TODO: Should we change these to be full auras?
 		//   Doesnt seem needed since they can only be used by shaman right here.
 		if player.Equip[items.ItemSlotRanged].ID == TotemOfTheVoid {
-			cast.Dmg += 55
+			cast.BonusSpellPower += 55
 		} else if player.Equip[items.ItemSlotRanged].ID == TotemOfStorms {
-			cast.Dmg += 33
+			cast.BonusSpellPower += 33
 		} else if player.Equip[items.ItemSlotRanged].ID == TotemOfAncestralGuidance {
-			cast.Dmg += 85
+			cast.BonusSpellPower += 85
 		}
 		if player.Talents.CallOfThunder > 0 { // only applies to CL and LB
-			cast.Crit += float64(player.Talents.CallOfThunder) * 0.01
+			cast.BonusCrit += float64(player.Talents.CallOfThunder) * 0.01
 		}
 		if sp.ID == core.MagicIDCL6 && sim.Options.Encounter.NumTargets > 1 {
 			cast.DoItNow = ChainCast
@@ -298,8 +298,8 @@ func NewCastAction(sim *core.Simulation, player *Shaman, sp *core.Spell) core.Ag
 	if itsElectric { // TODO: Add ElementalFury talent
 		// This is written this way to deal with making CSD dmg increase correct.
 		// The 'OnCast' auras include CSD
-		cast.CritBonus *= 2 // This handles the 'Elemental Fury' talent which increases the crit bonus.
-		cast.CritBonus -= 1 // reduce to multiplier instead of percent.
+		cast.CritDamageMultipier *= 2 // This handles the 'Elemental Fury' talent which increases the crit bonus.
+		cast.CritDamageMultipier -= 1 // reduce to multiplier instead of percent.
 
 		// Convection applies against the base cost of the spell.
 		cast.ManaCost -= sp.Mana * player.convectionBonus

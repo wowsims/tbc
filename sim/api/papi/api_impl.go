@@ -15,8 +15,8 @@ import (
 func getGearListImpl(request *api.GearListRequest) *api.GearListResult {
 	result := &api.GearListResult{}
 
-	for _, it := range items.Items {
-		item := it
+	for i := range items.Items {
+		item := items.Items[i]
 		result.Items = append(result.Items,
 			&api.Item{
 				Id:               item.ID,
@@ -33,7 +33,8 @@ func getGearListImpl(request *api.GearListRequest) *api.GearListResult {
 			},
 		)
 	}
-	for _, gem := range items.Gems {
+	for i := range items.Gems {
+		gem := items.Gems[i]
 		result.Gems = append(result.Gems, &api.Gem{
 			Id:      gem.ID,
 			Name:    gem.Name,
@@ -43,7 +44,8 @@ func getGearListImpl(request *api.GearListRequest) *api.GearListResult {
 			Quality: gem.Quality, // Hack until we use generated items
 		})
 	}
-	for _, enchant := range items.Enchants {
+	for i := range items.Enchants {
+		enchant := items.Enchants[i]
 		result.Enchants = append(result.Enchants, &api.Enchant{
 			Id:       enchant.ID,
 			EffectId: enchant.EffectID,

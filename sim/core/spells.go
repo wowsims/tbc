@@ -72,10 +72,10 @@ type Cast struct {
 	CastTime time.Duration // time to cast the spell
 	ManaCost float64
 
-	Dmg       float64 // Bonus Dmg for only this spell
-	Hit       float64 // Direct % bonus... 0.1 == 10%
-	Crit      float64 // Direct % bonus... 0.1 == 10%
-	CritBonus float64 // Multiplier to critical dmg bonus.
+	BonusSpellPower     float64 // Bonus spell power for only this spell
+	BonusHit            float64 // Direct % bonus... 0.1 == 10%
+	BonusCrit           float64 // Direct % bonus... 0.1 == 10%
+	CritDamageMultipier float64 // Multiplier to critical dmg
 
 	// Actual spell to call to activate this spell.
 	//  currently named after arnold's "come on, do it now"
@@ -95,7 +95,7 @@ func NewCast(sim *Simulation, sp *Spell) *Cast {
 	cast := sim.cache.NewCast()
 	cast.Spell = sp
 	cast.ManaCost = float64(sp.Mana)
-	cast.CritBonus = 1.5
+	cast.CritDamageMultipier = 1.5
 	cast.CastTime = sp.CastTime
 	cast.DoItNow = DirectCast
 	return cast
@@ -123,15 +123,15 @@ func DirectCast(sim *Simulation, p PlayerAgent, cast *Cast) {
 		}
 	}
 
-	hit := 0.83 + p.Stats[stats.SpellHit]/1260.0 + cast.Hit // 12.6 hit == 1% hit
-	hit = math.Min(hit, 0.99)                               // can't get away from the 1% miss
+	hit := 0.83 + p.Stats[stats.SpellHit]/1260.0 + cast.BonusHit // 12.6 hit == 1% hit
+	hit = math.Min(hit, 0.99)                                    // can't get away from the 1% miss
 
 	dbgCast := cast.Spell.Name
 	if sim.Log != nil {
 		sim.Log("(%d) Completed Cast (%0.2f hit chance) (%s)\n", p.ID, hit, dbgCast)
 	}
 	if sim.Rando.Float64("cast hit") < hit {
-		sp := p.Stats[stats.SpellPower] + p.Stats[cast.Spell.DamageType] + cast.Dmg
+		sp := p.Stats[stats.SpellPower] + p.Stats[cast.Spell.DamageType] + cast.BonusSpellPower
 		baseDmg := (sim.Rando.Float64("cast dmg") * cast.Spell.DmgDiff)
 		bonus := (sp * cast.Spell.Coeff)
 		dmg := baseDmg + cast.Spell.MinDmg + bonus
@@ -143,10 +143,10 @@ func DirectCast(sim *Simulation, p PlayerAgent, cast *Cast) {
 		}
 		cast.DidHit = true
 
-		crit := (p.Stats[stats.SpellCrit] / 2208.0) + cast.Crit // 22.08 crit == 1% crit
+		crit := (p.Stats[stats.SpellCrit] / 2208.0) + cast.BonusCrit // 22.08 crit == 1% crit
 		if sim.Rando.Float64("cast crit") < crit {
 			cast.DidCrit = true
-			dmg *= cast.CritBonus
+			dmg *= cast.CritDamageMultipier
 			if sim.Log != nil {
 				dbgCast += " crit"
 			}
