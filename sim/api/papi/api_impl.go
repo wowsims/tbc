@@ -104,11 +104,12 @@ func convertSimParams(request *api.IndividualSimRequest) runner.IndividualParams
 	}
 
 	params := runner.IndividualParams{
-		Equip:    convertEquip(request.Player.Equipment),
-		Race:     core.RaceBonusType(request.Player.Options.Race),
-		Consumes: convertConsumes(request.Player.Options.Consumes),
-		Buffs:    convertBuffs(request.Buffs),
-		Options:  options,
+		Equip:       convertEquip(request.Player.Equipment),
+		Race:        core.RaceBonusType(request.Player.Options.Race),
+		Consumes:    convertConsumes(request.Player.Options.Consumes),
+		Buffs:       convertBuffs(request.Buffs),
+		Options:     options,
+		CustomStats: request.Player.CustomStats,
 	}
 
 	switch v := request.Player.Options.Spec.(type) {
