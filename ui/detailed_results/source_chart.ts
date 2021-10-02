@@ -1,12 +1,13 @@
 import { IndividualSimRequest, IndividualSimResult } from '../core/api/api.js';
+import { sum } from '../core/utils.js';
 
 import { ResultComponent, ResultComponentConfig } from './result_component.js';
 
 declare var Chart: any;
 
-export class DpsHistogram extends ResultComponent {
+export class SourceChart extends ResultComponent {
   constructor(config: ResultComponentConfig) {
-		config.rootCssClass = 'dps-histogram-root';
+		config.rootCssClass = 'source-chart-root';
     super(config);
 	}
 
@@ -18,26 +19,15 @@ export class DpsHistogram extends ResultComponent {
 		chartCanvas.height = chartBounds.height;
 		chartCanvas.width = chartBounds.width;
 
+		const colors: Array<string> = ['red', 'blue', 'lawngreen'];
 
-		const min = result.dpsAvg - result.dpsStdev;
-		const max = result.dpsAvg + result.dpsStdev;
-		const vals: Array<number> = [];
-		const colors: Array<string> = [];
-
-		const labels = Object.keys(result.dpsHist);
-		labels.forEach((k, i) => {
-			vals.push(result.dpsHist[Number(k)]);
-			const val = parseInt(k);
-			if (val > min && val < max) {
-				colors.push('#1E87F0');
-			} else {
-				colors.push('#FF6961');
-			}
-		});
+		const labels = Object.keys(result.casts);
+		const totalDmg = sum(Object.values(result.casts).map(castMetrics => castMetrics.dmgs[0]));
+		const vals = labels.map(label => result.casts[parseInt(label)].dmgs[0] / totalDmg);
 
 		const ctx = chartCanvas.getContext('2d');
 		const chart = new Chart(ctx, {
-			type: 'bar',
+			type: 'pie',
 			data: {
 				labels: labels,
 				datasets: [{
@@ -47,22 +37,10 @@ export class DpsHistogram extends ResultComponent {
 			},
 			options: {
 				plugins: {
-					title: {
-						display: true,
-						text: 'DPS Histogram',
-					},
 					legend: {
-						display: false,
-						labels: {},
+						display: true,
+						position: 'right',
 					}
-				},
-				scales: {
-					y: {
-						beginAtZero: true,
-						ticks: {
-							display: false
-						},
-					},
 				},
 			},
 		});

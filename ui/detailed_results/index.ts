@@ -1,7 +1,10 @@
-import { IndividualSimResult } from '../core/api/api.js';
+import { IndividualSimData } from '../core/components/detailed_results.js';
 import { TypedEvent } from '../core/typed_event.js';
 
 import { DpsHistogram } from './dps_histogram.js';
+import { DpsResult } from './dps_result.js';
+import { PercentOom } from './percent_oom.js';
+import { SourceChart } from './source_chart.js';
 
 declare var Chart: any;
 
@@ -21,18 +24,30 @@ Chart.defaults.color = colorSettings.mainTextColor;
 
 const layoutHTML = `
 <div class="dr-root">
-	<div class="dps-histogram">
+	<div class="dr-row topline-results">
+	</div>
+	<div class="dr-row source-stats">
+		<div class="source-chart">
+		</div>
+	</div>
+	<div class="dr-row dps-histogram">
 	</div>
 </div>
 `;
 
-const resultsEmitter = new TypedEvent<IndividualSimResult | null>();
+const resultsEmitter = new TypedEvent<IndividualSimData | null>();
 window.addEventListener('message', event => {
 	// Null indicates pending results
-	const data: IndividualSimResult | null = event.data;
+	const data: IndividualSimData | null = event.data;
 
 	resultsEmitter.emit(event.data);
 });
 
 document.body.innerHTML = layoutHTML;
-const dpsHistogram = new DpsHistogram(document.body.getElementsByClassName('dps-histogram')[0] as HTMLElement, resultsEmitter, colorSettings);
+
+const toplineResultsDiv = document.body.getElementsByClassName('topline-results')[0] as HTMLElement;
+const dpsResult = new DpsResult({ parent: toplineResultsDiv, resultsEmitter: resultsEmitter, colorSettings: colorSettings });
+const percentOom = new PercentOom({ parent: toplineResultsDiv, resultsEmitter: resultsEmitter, colorSettings: colorSettings });
+
+const sourceChart = new SourceChart({ parent: document.body.getElementsByClassName('source-chart')[0] as HTMLElement, resultsEmitter: resultsEmitter, colorSettings: colorSettings });
+const dpsHistogram = new DpsHistogram({ parent: document.body.getElementsByClassName('dps-histogram')[0] as HTMLElement, resultsEmitter: resultsEmitter, colorSettings: colorSettings });

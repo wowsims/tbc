@@ -1,5 +1,8 @@
 @import "../core/shared";
 @import "dps_histogram";
+@import "dps_result";
+@import "percent_oom";
+@import "source_chart";
 
 body {
 	background-color: var(--main-bg-color);
@@ -7,4 +10,13 @@ body {
 
 .dr-root {
 	margin: 10px;
+}
+
+.dr-row {
+	margin: 10px;
+}
+
+.topline-results {
+	display: flex;
+	justify-content: space-around;
 }

@@ -27,7 +27,7 @@ export class LogRunner extends Component {
       detailedResults.setPending();
       const result = await sim.individualSim(simRequest);
       results.setSimResult(result);
-      detailedResults.setSimResult(result);
+      detailedResults.setSimResult(simRequest, result);
 
 			const lines = result.logs.split('\n');
 			logsDiv.textContent = '';

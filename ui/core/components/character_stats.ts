@@ -5,6 +5,15 @@ import { Sim } from '../sim.js';
 
 import { Component } from './component.js';
 
+const spellPowerTypeStats = [
+	Stat.StatArcaneSpellPower,
+	Stat.StatFireSpellPower,
+	Stat.StatFrostSpellPower,
+	Stat.StatHolySpellPower,
+	Stat.StatNatureSpellPower,
+	Stat.StatShadowSpellPower,
+];
+
 export class CharacterStats extends Component {
   readonly stats: Array<Stat>;
   readonly valueElems: Array<HTMLTableCellElement>;
@@ -42,7 +51,11 @@ export class CharacterStats extends Component {
 
 	private updateStats(newStats: Stats) {
 		this.stats.forEach((stat, idx) => {
-			const rawValue = newStats.getStat(stat);
+			let rawValue = newStats.getStat(stat);
+			if (spellPowerTypeStats.includes(stat)) {
+				rawValue = rawValue + newStats.getStat(Stat.StatSpellPower);
+			}
+
 			let displayStr = String(Math.round(rawValue));
 
 			if (stat == Stat.StatMeleeHit) {

@@ -1,0 +1,21 @@
+.dps-result {
+  color: var(--main-text-color);
+}
+
+.results-sim-dps-avg {
+  font-size: 30px;
+  font-weight: 700;
+}
+.results-sim-dps-avg:after {
+  content: " DPS";
+  font-size: 18px;
+}
+
+.results-sim-dps-stdev {
+  font-size: 18px;
+  font-weight: 700;
+}
+.results-sim-dps-stdev:before {
+  content: " \00b1";
+  padding: 2px;
+}
