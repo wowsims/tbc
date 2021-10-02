@@ -18,6 +18,10 @@ export function intersection<T>(a: Array<T>, b: Array<T>): Array<T> {
   return a.filter(value => b.includes(value));
 }
 
+export function stDevToConf90(stDev: number, N: number) {
+  return 1.645 * stDev / Math.sqrt(N);
+}
+
 export async function wait(ms: number): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, ms));
 }

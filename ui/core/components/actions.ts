@@ -53,7 +53,7 @@ export class Actions extends Component {
 
       results.setPending();
       const result = await sim.statWeights(statWeightsRequest);
-      results.setStatWeights(result, epStats);
+      results.setStatWeights(statWeightsRequest, result, epStats);
     });
   }
 }

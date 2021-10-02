@@ -80,10 +80,10 @@ func statWeightsImpl(request *api.StatWeightsRequest) *api.StatWeightsResult {
 	}
 	result := runner.CalcStatWeight(convertSimParams(request.Options), statsToWeight, stats.Stat(request.EpReferenceStat))
 	return &api.StatWeightsResult{
-		Weights:       result.Weights,
-		WeightsStdev:  result.WeightsStdev,
-		EpValues:      result.EpValues,
-		EpValuesStdev: result.EpValuesStdev,
+		Weights:       result.Weights[:],
+		WeightsStdev:  result.WeightsStdev[:],
+		EpValues:      result.EpValues[:],
+		EpValuesStdev: result.EpValuesStdev[:],
 	}
 }
 
@@ -109,8 +109,8 @@ func convertSimParams(request *api.IndividualSimRequest) runner.IndividualParams
 		Consumes:    convertConsumes(request.Player.Options.Consumes),
 		Buffs:       convertBuffs(request.Buffs),
 		Options:     options,
-		CustomStats: request.Player.CustomStats,
 	}
+	copy(params.CustomStats[:], request.Player.CustomStats[:])
 
 	switch v := request.Player.Options.Spec.(type) {
 	case *api.PlayerOptions_ElementalShaman:

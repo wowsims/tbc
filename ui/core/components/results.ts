@@ -1,7 +1,8 @@
 import { IndividualSimResult } from '../api/api.js';
-import { StatWeightsResult } from '../api/api.js';
+import { StatWeightsRequest, StatWeightsResult } from '../api/api.js';
 import { Stat } from '../api/common.js';
 import { statNames } from '../api/names.js';
+import { stDevToConf90 } from '../utils.js';
 import { Component } from './component.js';
 
 export class Results extends Component {
@@ -48,16 +49,18 @@ export class Results extends Component {
     `;
   }
 
-  setStatWeights(result: StatWeightsResult, epStats: Array<Stat>) {
+  setStatWeights(request: StatWeightsRequest, result: StatWeightsResult, epStats: Array<Stat>) {
+		const iterations = request.options!.iterations;
+
     this.hideAll();
     this.epElem.style.display = 'initial';
     this.epElem.innerHTML = '<table class="results-ep-table">'
         + epStats.map(stat => `<tr>
             <td>${statNames[stat]}:</td>
             <td>${result.weights[stat].toFixed(2)}</td>
-            <td>${result.weightsStdev[stat].toFixed(2)}</td>
+            <td>${stDevToConf90(result.weightsStdev[stat], iterations).toFixed(2)}</td>
             <td>${result.epValues[stat].toFixed(2)}</td>
-            <td>${result.epValuesStdev[stat].toFixed(2)}</td>
+            <td>${stDevToConf90(result.epValuesStdev[stat], iterations).toFixed(2)}</td>
             </tr>`)
         .join('')
         + '</table';

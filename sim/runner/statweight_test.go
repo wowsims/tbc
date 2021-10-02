@@ -20,7 +20,7 @@ func TestCalcStatWeight(t *testing.T) {
 		Buffs:       fullBuffs,
 		Options:     options,
 		Spec:        shaman.ElementalSpec{Talents: shamTalents, Totems: shamTotems, AgentID: shaman.AgentTypeAdaptive},
-		CustomStats: []float64{},
+		CustomStats: stats.Stats{},
 	}
 
 	tests := []struct {
@@ -29,24 +29,21 @@ func TestCalcStatWeight(t *testing.T) {
 		want   StatWeightsResult
 	}{
 		{name: "First Test", params: params, want: StatWeightsResult{
-			EpValues: []float64{stats.Intellect: 0.18, stats.SpellPower: 1, stats.SpellHit: 1.75, stats.SpellCrit: 0.72, stats.Armor: 0}, // armor at the end makes the array the right length....
+			EpValues: stats.Stats{stats.Intellect: 0.23, stats.SpellPower: 1, stats.SpellHit: 1.90, stats.SpellCrit: 0.65},
 		}},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := CalcStatWeight(tt.params, []stats.Stat{stats.SpellPower, stats.SpellHit, stats.Intellect, stats.SpellCrit}, stats.SpellPower); !floatArrayEqual(got.EpValues, tt.want.EpValues) {
+			if got := CalcStatWeight(tt.params, []stats.Stat{stats.SpellPower, stats.SpellHit, stats.Intellect, stats.SpellCrit}, stats.SpellPower); !statsEqual(got.EpValues, tt.want.EpValues) {
 				t.Errorf("CalcStatWeight() = %v, want %v", got.EpValues, tt.want.EpValues)
 			}
 		})
 	}
 }
 
-func floatArrayEqual(got, want []float64) bool {
-	if len(got) != len(want) {
-		return false
-	}
-	const tolerance = 0.5
+func statsEqual(got stats.Stats, want stats.Stats) bool {
+	const tolerance = 0.05
 	for i := range got {
 		if got[i] < want[i]-tolerance || got[i] > want[i]+tolerance {
 			return false

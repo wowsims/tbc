@@ -29,7 +29,7 @@ type IndividualParams struct {
 	Options  core.Options
 
 	Spec        AgentCreator // TODO: solve this better
-	CustomStats []float64
+	CustomStats stats.Stats
 }
 
 func SetupIndividualSim(params IndividualParams) *core.Simulation {

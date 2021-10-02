@@ -10,10 +10,10 @@ import (
 )
 
 type StatWeightsResult struct {
-	Weights       []float64
-	WeightsStdev  []float64
-	EpValues      []float64
-	EpValuesStdev []float64
+	Weights       stats.Stats
+	WeightsStdev  stats.Stats
+	EpValues      stats.Stats
+	EpValuesStdev stats.Stats
 }
 
 func CalcStatWeight(params IndividualParams, statsToWeigh []stats.Stat, referenceStat stats.Stat) StatWeightsResult {
@@ -22,21 +22,14 @@ func CalcStatWeight(params IndividualParams, statsToWeigh []stats.Stat, referenc
 	baselineResult := RunIndividualSim(baseSim)
 
 	var waitGroup sync.WaitGroup
-	result := StatWeightsResult{
-		Weights:       make([]float64, stats.Len),
-		WeightsStdev:  make([]float64, stats.Len),
-		EpValues:      make([]float64, stats.Len),
-		EpValuesStdev: make([]float64, stats.Len),
-	}
+	result := StatWeightsResult{}
 	dpsHists := [stats.Len]map[int32]int32{}
 
 	doStat := func(stat stats.Stat, value float64) {
 		defer waitGroup.Done()
 
 		newParams := params
-		newParams.CustomStats = make([]float64, stats.Len)
-		newParams.CustomStats[stat] = value
-		//newParams.CustomStats[stat] += value
+		newParams.CustomStats[stat] += value
 		newSim := SetupIndividualSim(newParams)
 		simResult := RunIndividualSim(newSim)
 		result.Weights[stat] = (simResult.DpsAvg - baselineResult.DpsAvg) / value

@@ -6,6 +6,7 @@ import (
 
 	"github.com/wowsims/tbc/items"
 	"github.com/wowsims/tbc/sim/core"
+	"github.com/wowsims/tbc/sim/core/stats"
 	"github.com/wowsims/tbc/sim/shaman"
 )
 
@@ -267,7 +268,7 @@ func TestAverageDPS(t *testing.T) {
 		Buffs:       fullBuffs,
 		Options:     options,
 		Spec:        shaman.ElementalSpec{Talents: shamTalents, Totems: shamTotems, AgentID: shaman.AgentTypeAdaptive},
-		CustomStats: []float64{},
+		CustomStats: stats.Stats{},
 	}
 
 	sim := SetupIndividualSim(params)
@@ -311,7 +312,7 @@ func simAllEncountersTest(testOpts AllEncountersTestOptions) {
 		Buffs:       testOpts.Buffs,
 		Options:     makeOptions(testOpts.Options, shortEncounter),
 		Spec:        testOpts.Spec,
-		CustomStats: []float64{},
+		CustomStats: stats.Stats{},
 	}
 	doSimulateTest(
 		testOpts.label+"-short",
