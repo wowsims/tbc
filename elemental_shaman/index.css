@@ -275,8 +275,7 @@
   position: relative;
   cursor: pointer;
   display: inline-block;
-  width: 18px;
-  height: 18px;
+  width: 28%;
   margin: 1px;
 }
 
@@ -526,6 +525,12 @@
   display: none;
 }
 
+.log-runner-root {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
 .log-runner-button {
   margin: 5px;
   color: black;
@@ -533,7 +538,7 @@
 
 .log-runner-logs {
   overflow-y: scroll;
-  height: 85vh;
+  flex-grow: 1;
 }
 
 .log-runner-logs > span {
@@ -988,6 +993,10 @@
   border-color: dimgray;
 }
 
+html {
+  overflow: hidden;
+}
+
 td, th {
   padding: auto;
 }
@@ -1093,6 +1102,7 @@ td, th {
 
 .default-main > .tab-content {
   flex-grow: 1;
+  height: 80%;
 }
 
 .default-main > .tab-content > .tab-pane {

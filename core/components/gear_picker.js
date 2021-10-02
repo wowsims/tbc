@@ -103,15 +103,15 @@ class ItemPicker extends Component {
                 //this.enchantElem.setAttribute('href', 'https://tbc.wowhead.com/item=' + newItem.enchant.id);
             }
             newItem.item.gemSockets.forEach((socketColor, gemIdx) => {
-                const gemIconElem = document.createElement('div');
+                const gemIconElem = document.createElement('img');
                 gemIconElem.classList.add('item-picker-gem-icon');
                 setGemSocketCssClass(gemIconElem, socketColor);
                 if (newItem.gems[gemIdx] == null) {
-                    gemIconElem.style.backgroundImage = `url('${getEmptyGemSocketIconUrl(socketColor)}')`;
+                    gemIconElem.src = getEmptyGemSocketIconUrl(socketColor);
                 }
                 else {
                     getIconUrl({ itemId: newItem.gems[gemIdx].id }).then(url => {
-                        gemIconElem.style.backgroundImage = `url('${url}')`;
+                        gemIconElem.src = url;
                     });
                 }
                 this.socketsContainerElem.appendChild(gemIconElem);
