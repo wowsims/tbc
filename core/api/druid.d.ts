@@ -18,27 +18,27 @@ export interface DruidTalents {
  */
 export interface BalanceDruid {
     /**
-     * @generated from protobuf field: api.BalanceDruid.BalanceDruidAgent agent = 1;
+     * @generated from protobuf field: api.BalanceDruid.Agent agent = 1;
      */
-    agent?: BalanceDruid_BalanceDruidAgent;
+    agent?: BalanceDruid_Agent;
     /**
      * @generated from protobuf field: api.DruidTalents talents = 2;
      */
     talents?: DruidTalents;
     /**
-     * @generated from protobuf field: api.BalanceDruid.BalanceDruidOptions options = 3;
+     * @generated from protobuf field: api.BalanceDruid.Options options = 3;
      */
-    options?: BalanceDruid_BalanceDruidOptions;
+    options?: BalanceDruid_Options;
 }
 /**
- * @generated from protobuf message api.BalanceDruid.BalanceDruidAgent
+ * @generated from protobuf message api.BalanceDruid.Agent
  */
-export interface BalanceDruid_BalanceDruidAgent {
+export interface BalanceDruid_Agent {
 }
 /**
- * @generated from protobuf message api.BalanceDruid.BalanceDruidOptions
+ * @generated from protobuf message api.BalanceDruid.Options
  */
-export interface BalanceDruid_BalanceDruidOptions {
+export interface BalanceDruid_Options {
 }
 declare class DruidTalents$Type extends MessageType<DruidTalents> {
     constructor();
@@ -60,24 +60,24 @@ declare class BalanceDruid$Type extends MessageType<BalanceDruid> {
  * @generated MessageType for protobuf message api.BalanceDruid
  */
 export declare const BalanceDruid: BalanceDruid$Type;
-declare class BalanceDruid_BalanceDruidAgent$Type extends MessageType<BalanceDruid_BalanceDruidAgent> {
+declare class BalanceDruid_Agent$Type extends MessageType<BalanceDruid_Agent> {
     constructor();
-    create(value?: PartialMessage<BalanceDruid_BalanceDruidAgent>): BalanceDruid_BalanceDruidAgent;
-    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: BalanceDruid_BalanceDruidAgent): BalanceDruid_BalanceDruidAgent;
-    internalBinaryWrite(message: BalanceDruid_BalanceDruidAgent, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+    create(value?: PartialMessage<BalanceDruid_Agent>): BalanceDruid_Agent;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: BalanceDruid_Agent): BalanceDruid_Agent;
+    internalBinaryWrite(message: BalanceDruid_Agent, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
- * @generated MessageType for protobuf message api.BalanceDruid.BalanceDruidAgent
+ * @generated MessageType for protobuf message api.BalanceDruid.Agent
  */
-export declare const BalanceDruid_BalanceDruidAgent: BalanceDruid_BalanceDruidAgent$Type;
-declare class BalanceDruid_BalanceDruidOptions$Type extends MessageType<BalanceDruid_BalanceDruidOptions> {
+export declare const BalanceDruid_Agent: BalanceDruid_Agent$Type;
+declare class BalanceDruid_Options$Type extends MessageType<BalanceDruid_Options> {
     constructor();
-    create(value?: PartialMessage<BalanceDruid_BalanceDruidOptions>): BalanceDruid_BalanceDruidOptions;
-    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: BalanceDruid_BalanceDruidOptions): BalanceDruid_BalanceDruidOptions;
-    internalBinaryWrite(message: BalanceDruid_BalanceDruidOptions, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+    create(value?: PartialMessage<BalanceDruid_Options>): BalanceDruid_Options;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: BalanceDruid_Options): BalanceDruid_Options;
+    internalBinaryWrite(message: BalanceDruid_Options, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
- * @generated MessageType for protobuf message api.BalanceDruid.BalanceDruidOptions
+ * @generated MessageType for protobuf message api.BalanceDruid.Options
  */
-export declare const BalanceDruid_BalanceDruidOptions: BalanceDruid_BalanceDruidOptions$Type;
+export declare const BalanceDruid_Options: BalanceDruid_Options$Type;
 export {};

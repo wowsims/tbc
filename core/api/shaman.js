@@ -4,31 +4,31 @@ import { reflectionMergePartial } from '/tbc/protobuf-ts/index.js';
 import { MESSAGE_TYPE } from '/tbc/protobuf-ts/index.js';
 import { MessageType } from '/tbc/protobuf-ts/index.js';
 /**
- * @generated from protobuf enum api.ElementalShaman.ElementalShamanAgent.AgentType
+ * @generated from protobuf enum api.ElementalShaman.Agent.AgentType
  */
-export var ElementalShaman_ElementalShamanAgent_AgentType;
-(function (ElementalShaman_ElementalShamanAgent_AgentType) {
+export var ElementalShaman_Agent_AgentType;
+(function (ElementalShaman_Agent_AgentType) {
     /**
      * @generated from protobuf enum value: Unknown = 0;
      */
-    ElementalShaman_ElementalShamanAgent_AgentType[ElementalShaman_ElementalShamanAgent_AgentType["Unknown"] = 0] = "Unknown";
+    ElementalShaman_Agent_AgentType[ElementalShaman_Agent_AgentType["Unknown"] = 0] = "Unknown";
     /**
      * @generated from protobuf enum value: FixedLBCL = 1;
      */
-    ElementalShaman_ElementalShamanAgent_AgentType[ElementalShaman_ElementalShamanAgent_AgentType["FixedLBCL"] = 1] = "FixedLBCL";
+    ElementalShaman_Agent_AgentType[ElementalShaman_Agent_AgentType["FixedLBCL"] = 1] = "FixedLBCL";
     /**
      * @generated from protobuf enum value: CLOnClearcast = 2;
      */
-    ElementalShaman_ElementalShamanAgent_AgentType[ElementalShaman_ElementalShamanAgent_AgentType["CLOnClearcast"] = 2] = "CLOnClearcast";
+    ElementalShaman_Agent_AgentType[ElementalShaman_Agent_AgentType["CLOnClearcast"] = 2] = "CLOnClearcast";
     /**
      * @generated from protobuf enum value: Adaptive = 3;
      */
-    ElementalShaman_ElementalShamanAgent_AgentType[ElementalShaman_ElementalShamanAgent_AgentType["Adaptive"] = 3] = "Adaptive";
+    ElementalShaman_Agent_AgentType[ElementalShaman_Agent_AgentType["Adaptive"] = 3] = "Adaptive";
     /**
      * @generated from protobuf enum value: CLOnCD = 4;
      */
-    ElementalShaman_ElementalShamanAgent_AgentType[ElementalShaman_ElementalShamanAgent_AgentType["CLOnCD"] = 4] = "CLOnCD";
-})(ElementalShaman_ElementalShamanAgent_AgentType || (ElementalShaman_ElementalShamanAgent_AgentType = {}));
+    ElementalShaman_Agent_AgentType[ElementalShaman_Agent_AgentType["CLOnCD"] = 4] = "CLOnCD";
+})(ElementalShaman_Agent_AgentType || (ElementalShaman_Agent_AgentType = {}));
 // @generated message type with reflection information, may provide speed optimized methods
 class ShamanTalents$Type extends MessageType {
     constructor() {
@@ -297,9 +297,9 @@ export const ShamanTalents = new ShamanTalents$Type();
 class ElementalShaman$Type extends MessageType {
     constructor() {
         super("api.ElementalShaman", [
-            { no: 1, name: "agent", kind: "message", T: () => ElementalShaman_ElementalShamanAgent },
+            { no: 1, name: "agent", kind: "message", T: () => ElementalShaman_Agent },
             { no: 2, name: "talents", kind: "message", T: () => ShamanTalents },
-            { no: 3, name: "options", kind: "message", T: () => ElementalShaman_ElementalShamanOptions }
+            { no: 3, name: "options", kind: "message", T: () => ElementalShaman_Options }
         ]);
     }
     create(value) {
@@ -314,14 +314,14 @@ class ElementalShaman$Type extends MessageType {
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
-                case /* api.ElementalShaman.ElementalShamanAgent agent */ 1:
-                    message.agent = ElementalShaman_ElementalShamanAgent.internalBinaryRead(reader, reader.uint32(), options, message.agent);
+                case /* api.ElementalShaman.Agent agent */ 1:
+                    message.agent = ElementalShaman_Agent.internalBinaryRead(reader, reader.uint32(), options, message.agent);
                     break;
                 case /* api.ShamanTalents talents */ 2:
                     message.talents = ShamanTalents.internalBinaryRead(reader, reader.uint32(), options, message.talents);
                     break;
-                case /* api.ElementalShaman.ElementalShamanOptions options */ 3:
-                    message.options = ElementalShaman_ElementalShamanOptions.internalBinaryRead(reader, reader.uint32(), options, message.options);
+                case /* api.ElementalShaman.Options options */ 3:
+                    message.options = ElementalShaman_Options.internalBinaryRead(reader, reader.uint32(), options, message.options);
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -335,15 +335,15 @@ class ElementalShaman$Type extends MessageType {
         return message;
     }
     internalBinaryWrite(message, writer, options) {
-        /* api.ElementalShaman.ElementalShamanAgent agent = 1; */
+        /* api.ElementalShaman.Agent agent = 1; */
         if (message.agent)
-            ElementalShaman_ElementalShamanAgent.internalBinaryWrite(message.agent, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+            ElementalShaman_Agent.internalBinaryWrite(message.agent, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
         /* api.ShamanTalents talents = 2; */
         if (message.talents)
             ShamanTalents.internalBinaryWrite(message.talents, writer.tag(2, WireType.LengthDelimited).fork(), options).join();
-        /* api.ElementalShaman.ElementalShamanOptions options = 3; */
+        /* api.ElementalShaman.Options options = 3; */
         if (message.options)
-            ElementalShaman_ElementalShamanOptions.internalBinaryWrite(message.options, writer.tag(3, WireType.LengthDelimited).fork(), options).join();
+            ElementalShaman_Options.internalBinaryWrite(message.options, writer.tag(3, WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -355,10 +355,10 @@ class ElementalShaman$Type extends MessageType {
  */
 export const ElementalShaman = new ElementalShaman$Type();
 // @generated message type with reflection information, may provide speed optimized methods
-class ElementalShaman_ElementalShamanAgent$Type extends MessageType {
+class ElementalShaman_Agent$Type extends MessageType {
     constructor() {
-        super("api.ElementalShaman.ElementalShamanAgent", [
-            { no: 1, name: "type", kind: "enum", T: () => ["api.ElementalShaman.ElementalShamanAgent.AgentType", ElementalShaman_ElementalShamanAgent_AgentType] }
+        super("api.ElementalShaman.Agent", [
+            { no: 1, name: "type", kind: "enum", T: () => ["api.ElementalShaman.Agent.AgentType", ElementalShaman_Agent_AgentType] }
         ]);
     }
     create(value) {
@@ -373,7 +373,7 @@ class ElementalShaman_ElementalShamanAgent$Type extends MessageType {
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
-                case /* api.ElementalShaman.ElementalShamanAgent.AgentType type */ 1:
+                case /* api.ElementalShaman.Agent.AgentType type */ 1:
                     message.type = reader.int32();
                     break;
                 default:
@@ -388,7 +388,7 @@ class ElementalShaman_ElementalShamanAgent$Type extends MessageType {
         return message;
     }
     internalBinaryWrite(message, writer, options) {
-        /* api.ElementalShaman.ElementalShamanAgent.AgentType type = 1; */
+        /* api.ElementalShaman.Agent.AgentType type = 1; */
         if (message.type !== 0)
             writer.tag(1, WireType.Varint).int32(message.type);
         let u = options.writeUnknownFields;
@@ -398,13 +398,13 @@ class ElementalShaman_ElementalShamanAgent$Type extends MessageType {
     }
 }
 /**
- * @generated MessageType for protobuf message api.ElementalShaman.ElementalShamanAgent
+ * @generated MessageType for protobuf message api.ElementalShaman.Agent
  */
-export const ElementalShaman_ElementalShamanAgent = new ElementalShaman_ElementalShamanAgent$Type();
+export const ElementalShaman_Agent = new ElementalShaman_Agent$Type();
 // @generated message type with reflection information, may provide speed optimized methods
-class ElementalShaman_ElementalShamanOptions$Type extends MessageType {
+class ElementalShaman_Options$Type extends MessageType {
     constructor() {
-        super("api.ElementalShaman.ElementalShamanOptions", [
+        super("api.ElementalShaman.Options", [
             { no: 1, name: "water_shield", kind: "scalar", T: 8 /*ScalarType.BOOL*/ }
         ]);
     }
@@ -445,6 +445,6 @@ class ElementalShaman_ElementalShamanOptions$Type extends MessageType {
     }
 }
 /**
- * @generated MessageType for protobuf message api.ElementalShaman.ElementalShamanOptions
+ * @generated MessageType for protobuf message api.ElementalShaman.Options
  */
-export const ElementalShaman_ElementalShamanOptions = new ElementalShaman_ElementalShamanOptions$Type();
+export const ElementalShaman_Options = new ElementalShaman_Options$Type();

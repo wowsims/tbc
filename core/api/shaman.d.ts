@@ -148,31 +148,31 @@ export interface ShamanTalents {
  */
 export interface ElementalShaman {
     /**
-     * @generated from protobuf field: api.ElementalShaman.ElementalShamanAgent agent = 1;
+     * @generated from protobuf field: api.ElementalShaman.Agent agent = 1;
      */
-    agent?: ElementalShaman_ElementalShamanAgent;
+    agent?: ElementalShaman_Agent;
     /**
      * @generated from protobuf field: api.ShamanTalents talents = 2;
      */
     talents?: ShamanTalents;
     /**
-     * @generated from protobuf field: api.ElementalShaman.ElementalShamanOptions options = 3;
+     * @generated from protobuf field: api.ElementalShaman.Options options = 3;
      */
-    options?: ElementalShaman_ElementalShamanOptions;
+    options?: ElementalShaman_Options;
 }
 /**
- * @generated from protobuf message api.ElementalShaman.ElementalShamanAgent
+ * @generated from protobuf message api.ElementalShaman.Agent
  */
-export interface ElementalShaman_ElementalShamanAgent {
+export interface ElementalShaman_Agent {
     /**
-     * @generated from protobuf field: api.ElementalShaman.ElementalShamanAgent.AgentType type = 1;
+     * @generated from protobuf field: api.ElementalShaman.Agent.AgentType type = 1;
      */
-    type: ElementalShaman_ElementalShamanAgent_AgentType;
+    type: ElementalShaman_Agent_AgentType;
 }
 /**
- * @generated from protobuf enum api.ElementalShaman.ElementalShamanAgent.AgentType
+ * @generated from protobuf enum api.ElementalShaman.Agent.AgentType
  */
-export declare enum ElementalShaman_ElementalShamanAgent_AgentType {
+export declare enum ElementalShaman_Agent_AgentType {
     /**
      * @generated from protobuf enum value: Unknown = 0;
      */
@@ -195,9 +195,9 @@ export declare enum ElementalShaman_ElementalShamanAgent_AgentType {
     CLOnCD = 4
 }
 /**
- * @generated from protobuf message api.ElementalShaman.ElementalShamanOptions
+ * @generated from protobuf message api.ElementalShaman.Options
  */
-export interface ElementalShaman_ElementalShamanOptions {
+export interface ElementalShaman_Options {
     /**
      * @generated from protobuf field: bool water_shield = 1;
      */
@@ -223,24 +223,24 @@ declare class ElementalShaman$Type extends MessageType<ElementalShaman> {
  * @generated MessageType for protobuf message api.ElementalShaman
  */
 export declare const ElementalShaman: ElementalShaman$Type;
-declare class ElementalShaman_ElementalShamanAgent$Type extends MessageType<ElementalShaman_ElementalShamanAgent> {
+declare class ElementalShaman_Agent$Type extends MessageType<ElementalShaman_Agent> {
     constructor();
-    create(value?: PartialMessage<ElementalShaman_ElementalShamanAgent>): ElementalShaman_ElementalShamanAgent;
-    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: ElementalShaman_ElementalShamanAgent): ElementalShaman_ElementalShamanAgent;
-    internalBinaryWrite(message: ElementalShaman_ElementalShamanAgent, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+    create(value?: PartialMessage<ElementalShaman_Agent>): ElementalShaman_Agent;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: ElementalShaman_Agent): ElementalShaman_Agent;
+    internalBinaryWrite(message: ElementalShaman_Agent, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
- * @generated MessageType for protobuf message api.ElementalShaman.ElementalShamanAgent
+ * @generated MessageType for protobuf message api.ElementalShaman.Agent
  */
-export declare const ElementalShaman_ElementalShamanAgent: ElementalShaman_ElementalShamanAgent$Type;
-declare class ElementalShaman_ElementalShamanOptions$Type extends MessageType<ElementalShaman_ElementalShamanOptions> {
+export declare const ElementalShaman_Agent: ElementalShaman_Agent$Type;
+declare class ElementalShaman_Options$Type extends MessageType<ElementalShaman_Options> {
     constructor();
-    create(value?: PartialMessage<ElementalShaman_ElementalShamanOptions>): ElementalShaman_ElementalShamanOptions;
-    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: ElementalShaman_ElementalShamanOptions): ElementalShaman_ElementalShamanOptions;
-    internalBinaryWrite(message: ElementalShaman_ElementalShamanOptions, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+    create(value?: PartialMessage<ElementalShaman_Options>): ElementalShaman_Options;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: ElementalShaman_Options): ElementalShaman_Options;
+    internalBinaryWrite(message: ElementalShaman_Options, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
- * @generated MessageType for protobuf message api.ElementalShaman.ElementalShamanOptions
+ * @generated MessageType for protobuf message api.ElementalShaman.Options
  */
-export declare const ElementalShaman_ElementalShamanOptions: ElementalShaman_ElementalShamanOptions$Type;
+export declare const ElementalShaman_Options: ElementalShaman_Options$Type;
 export {};

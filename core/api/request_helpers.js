@@ -1,7 +1,7 @@
 import { Player } from './api.js';
 import { PlayerOptions } from './api.js';
-import { BalanceDruid, BalanceDruid_BalanceDruidAgent as BalanceDruidAgent } from './druid.js';
-import { ElementalShaman, ElementalShaman_ElementalShamanAgent as ElementalShamanAgent } from './shaman.js';
+import { BalanceDruid, BalanceDruid_Agent as BalanceDruidAgent } from './druid.js';
+import { ElementalShaman, ElementalShaman_Agent as ElementalShamanAgent } from './shaman.js';
 import { ComputeStatsRequest } from './api.js';
 import { IndividualSimRequest } from './api.js';
 export function makeComputeStatsRequest(buffs, consumes, customStats, encounter, gear, race, agent, talents, classOptions) {
