@@ -2,6 +2,14 @@ import { Stat } from '../api/common.js';
 import { statNames } from '../api/names.js';
 import { Stats } from '../api/stats.js';
 import { Component } from './component.js';
+const spellPowerTypeStats = [
+    Stat.StatArcaneSpellPower,
+    Stat.StatFireSpellPower,
+    Stat.StatFrostSpellPower,
+    Stat.StatHolySpellPower,
+    Stat.StatNatureSpellPower,
+    Stat.StatShadowSpellPower,
+];
 export class CharacterStats extends Component {
     constructor(parent, stats, sim) {
         super(parent, 'character-stats-root');
@@ -30,7 +38,10 @@ export class CharacterStats extends Component {
     }
     updateStats(newStats) {
         this.stats.forEach((stat, idx) => {
-            const rawValue = newStats.getStat(stat);
+            let rawValue = newStats.getStat(stat);
+            if (spellPowerTypeStats.includes(stat)) {
+                rawValue = rawValue + newStats.getStat(Stat.StatSpellPower);
+            }
             let displayStr = String(Math.round(rawValue));
             if (stat == Stat.StatMeleeHit) {
                 displayStr += ` (${(rawValue / 15.8).toFixed(2)}%)`;

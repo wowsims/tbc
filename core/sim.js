@@ -17,6 +17,7 @@ import { gemMatchesSocket } from './api/utils.js';
 import { ComputeStatsResult } from './api/api.js';
 import { GearListRequest } from './api/api.js';
 import { TypedEvent } from './typed_event.js';
+import { wait } from './utils.js';
 import { WorkerPool } from './worker_pool.js';
 // Core Sim module which deals only with api types, no UI-related stuff.
 export class Sim extends WorkerPool {
@@ -94,6 +95,9 @@ export class Sim extends WorkerPool {
     }
     // This should be invoked internally whenever stats might have changed.
     async updateCharacterStats() {
+        // Sometimes a ui change triggers other changes, so waiting a bit makes sure
+        // we get all of them.
+        await wait(10);
         const computeStatsResult = await this.computeStats(makeComputeStatsRequest(this._buffs, this._consumes, this._customStats, this._encounter, this._gear, this._race, this._agent, this._talents, this._specOptions));
         this._currentStats = computeStatsResult;
         this.characterStatsEmitter.emit();
