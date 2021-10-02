@@ -172,6 +172,10 @@ export class Sim<SpecType extends Spec> extends WorkerPool {
 
 	// This should be invoked internally whenever stats might have changed.
 	private async updateCharacterStats() {
+		// Sometimes a ui change triggers other changes, so waiting a bit makes sure
+		// we get all of them.
+		await wait(10);
+
 		const computeStatsResult = await this.computeStats(makeComputeStatsRequest(
       this._buffs,
       this._consumes,
