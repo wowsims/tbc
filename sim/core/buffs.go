@@ -3,6 +3,7 @@ package core
 import (
 	"time"
 
+	"github.com/wowsims/tbc/sim/api"
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
@@ -32,11 +33,11 @@ type Buffs struct {
 	// ChainOfTheTwilightOwl bool
 	// JadePendantOfBlasting bool
 
-	// // Totems
-	// ManaSpringTotem TristateEffect
-	// ManaTideTotem   bool
-	// TotemOfWrath    int32
-	// WrathOfAirTotem TristateEffect
+	// Totems
+	ManaSpringTotem api.TristateEffect
+	ManaTideTotem   bool
+	TotemOfWrath    int32
+	WrathOfAirTotem api.TristateEffect
 
 	// Raid buffs
 	ArcaneInt                bool
@@ -85,10 +86,10 @@ const (
 	RaceBonusTypeUndead
 )
 
-func TryActivateRacial(sim *Simulation, party *Party, player *Player) {
-	switch player.Race {
+func TryActivateRacial(sim *Simulation, agent Agent) {
+	switch agent.GetCharacter().Race {
 	case RaceBonusTypeOrc:
-		if player.IsOnCD(MagicIDOrcBloodFury, sim.CurrentTime) {
+		if agent.GetCharacter().IsOnCD(MagicIDOrcBloodFury, sim.CurrentTime) {
 			return
 		}
 
@@ -96,26 +97,25 @@ func TryActivateRacial(sim *Simulation, party *Party, player *Player) {
 		const dur = time.Second * 15
 		const cd = time.Minute * 2
 
-		player.Stats[stats.SpellPower] += spBonus
-		player.SetCD(MagicIDOrcBloodFury, cd+sim.CurrentTime)
-		player.AddAura(sim, AuraStatRemoval(sim.CurrentTime, dur, spBonus, stats.SpellPower, MagicIDOrcBloodFury))
+		agent.GetCharacter().SetCD(MagicIDOrcBloodFury, cd+sim.CurrentTime)
+		AddAuraWithTemporaryStats(sim, agent, MagicIDOrcBloodFury, stats.SpellPower, spBonus, dur)
 
 	case RaceBonusTypeTroll10, RaceBonusTypeTroll30:
-		if player.IsOnCD(MagicIDTrollBerserking, sim.CurrentTime) {
+		if agent.GetCharacter().IsOnCD(MagicIDTrollBerserking, sim.CurrentTime) {
 			return
 		}
 		hasteBonus := time.Duration(11) // 10% haste
-		if player.Race == RaceBonusTypeTroll30 {
+		if agent.GetCharacter().Race == RaceBonusTypeTroll30 {
 			hasteBonus = time.Duration(13) // 30% haste
 		}
 		const dur = time.Second * 10
 		const cd = time.Minute * 3
 
-		player.SetCD(MagicIDTrollBerserking, cd+sim.CurrentTime)
-		player.AddAura(sim, Aura{
+		agent.GetCharacter().SetCD(MagicIDTrollBerserking, cd+sim.CurrentTime)
+		agent.GetCharacter().AddAura(sim, Aura{
 			ID:      MagicIDTrollBerserking,
 			Expires: sim.CurrentTime + dur,
-			OnCast: func(sim *Simulation, p PlayerAgent, c *Cast) {
+			OnCast: func(sim *Simulation, agent Agent, c *Cast) {
 				c.CastTime = (c.CastTime * 10) / hasteBonus
 			},
 		})
