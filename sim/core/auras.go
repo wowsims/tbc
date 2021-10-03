@@ -557,14 +557,7 @@ func ActivateSpellstrike(sim *Simulation, agent Agent) Aura {
 		Expires: NeverExpires,
 		OnCastComplete: func(sim *Simulation, agent Agent, c *Cast) {
 			if sim.Rando.Float64("unmarked") < 0.05 {
-				agent.GetCharacter().Stats[stats.SpellPower] += spellBonus
-				agent.GetCharacter().AddAura(sim, Aura{
-					ID:      MagicIDSpellstrikeInfusion,
-					Expires: sim.CurrentTime + duration,
-					OnExpire: func(sim *Simulation, agent Agent, c *Cast) {
-						agent.GetCharacter().Stats[stats.SpellPower] -= spellBonus
-					},
-				})
+				AddAuraWithTemporaryStats(sim, agent, MagicIDSpellstrikeInfusion, stats.SpellPower, spellBonus, duration)
 			}
 		},
 	}
@@ -578,14 +571,7 @@ func ActivateManaEtched(sim *Simulation, agent Agent) Aura {
 		Expires: NeverExpires,
 		OnCastComplete: func(sim *Simulation, agent Agent, c *Cast) {
 			if sim.Rando.Float64("unmarked") < 0.02 {
-				agent.GetCharacter().Stats[stats.SpellPower] += spellBonus
-				agent.GetCharacter().AddAura(sim, Aura{
-					ID:      MagicIDManaEtchedInsight,
-					Expires: sim.CurrentTime + duration,
-					OnExpire: func(sim *Simulation, agent Agent, c *Cast) {
-						agent.GetCharacter().Stats[stats.SpellPower] -= spellBonus
-					},
-				})
+				AddAuraWithTemporaryStats(sim, agent, MagicIDManaEtchedInsight, stats.SpellPower, spellBonus, duration)
 			}
 		},
 	}
@@ -719,14 +705,7 @@ func ActivateEyeOfMag(sim *Simulation, agent Agent) Aura {
 		ID:      MagicIDEyeOfMag,
 		Expires: NeverExpires,
 		OnSpellMiss: func(sim *Simulation, p Agent, c *Cast) {
-			agent.GetCharacter().Stats[stats.SpellPower] += spellBonus
-			agent.GetCharacter().AddAura(sim, Aura{
-				ID:      MagicIDRecurringPower,
-				Expires: sim.CurrentTime + dur,
-				OnExpire: func(sim *Simulation, agent Agent, c *Cast) {
-					agent.GetCharacter().Stats[stats.SpellPower] -= spellBonus
-				},
-			})
+			AddAuraWithTemporaryStats(sim, agent, MagicIDRecurringPower, stats.SpellPower, spellBonus, dur)
 		},
 	}
 }
