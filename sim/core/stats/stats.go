@@ -104,6 +104,17 @@ func (s Stat) StatName() string {
 	return "none"
 }
 
+// Adds two Stats together, returning the new Stats.
+func (this Stats) Add(other Stats) Stats {
+	newStats := Stats{}
+
+	for i, thisStat := range this {
+		newStats[i] = thisStat + other[i]
+	}
+
+	return newStats
+}
+
 // Print is debug print function
 func (st Stats) Print() string {
 	output := "{ "

@@ -14,50 +14,43 @@ func init() {
 	core.AddActiveItem(19344, core.ActiveItem{Activate: ActivateNAC, ActivateCD: time.Second * 300, CoolID: core.MagicIDNACTrink, SharedID: core.MagicIDAtkTrinket})
 }
 
-func ActivateSkycall(sim *core.Simulation, party *core.Party, player core.PlayerAgent) core.Aura {
+func ActivateSkycall(sim *core.Simulation, agent core.Agent) core.Aura {
 	const hasteBonus = 101
 	const dur = time.Second * 10
 	return core.Aura{
 		ID:      core.MagicIDSkycall,
 		Expires: core.NeverExpires,
-		OnCastComplete: func(sim *core.Simulation, player core.PlayerAgent, c *core.Cast) {
-			if c.Spell.ID == core.MagicIDLB12 && sim.Rando.Float64("skycall") < 0.15 {
-				player.Stats[stats.SpellHaste] += hasteBonus
-				player.AddAura(sim, core.Aura{
-					ID:      core.MagicIDEnergized,
-					Expires: sim.CurrentTime + dur,
-					OnExpire: func(sim *core.Simulation, player core.PlayerAgent, c *core.Cast) {
-						player.Stats[stats.SpellHaste] -= hasteBonus
-					},
-				})
+		OnCastComplete: func(sim *core.Simulation, agent core.Agent, cast *core.Cast) {
+			if cast.Spell.ID == core.MagicIDLB12 && sim.Rando.Float64("skycall") < 0.15 {
+				core.AddAuraWithTemporaryStats(sim, agent, core.MagicIDEnergized, stats.SpellHaste, hasteBonus, dur)
 			}
 		},
 	}
 }
 
-func ActivateNAC(sim *core.Simulation, party *core.Party, player core.PlayerAgent) core.Aura {
+func ActivateNAC(sim *core.Simulation, agent core.Agent) core.Aura {
 	const sp = 250
-	player.Stats[stats.SpellPower] += sp
+	agent.GetCharacter().Stats[stats.SpellPower] += sp
 	return core.Aura{
 		ID:      core.MagicIDNAC,
 		Expires: sim.CurrentTime + time.Second*20,
-		OnCast: func(sim *core.Simulation, p core.PlayerAgent, c *core.Cast) {
-			c.ManaCost *= 1.2
+		OnCast: func(sim *core.Simulation, agent core.Agent, cast *core.Cast) {
+			cast.ManaCost *= 1.2
 		},
-		OnExpire: func(sim *core.Simulation, player core.PlayerAgent, c *core.Cast) {
-			player.Stats[stats.SpellPower] -= sp
+		OnExpire: func(sim *core.Simulation, agent core.Agent, cast *core.Cast) {
+			agent.GetCharacter().Stats[stats.SpellPower] -= sp
 		},
 	}
 }
 
-func ActivateTotemOfPulsingEarth(sim *core.Simulation, party *core.Party, player core.PlayerAgent) core.Aura {
+func ActivateTotemOfPulsingEarth(sim *core.Simulation, agent core.Agent) core.Aura {
 	return core.Aura{
 		ID:      core.MagicIDTotemOfPulsingEarth,
 		Expires: core.NeverExpires,
-		OnCast: func(sim *core.Simulation, p core.PlayerAgent, c *core.Cast) {
-			if c.Spell.ID == core.MagicIDLB12 {
+		OnCast: func(sim *core.Simulation, p core.Agent, cast *core.Cast) {
+			if cast.Spell.ID == core.MagicIDLB12 {
 				// TODO: how to make sure this goes in before clearcasting?
-				c.ManaCost = math.Max(c.ManaCost-27, 0)
+				cast.ManaCost = math.Max(cast.ManaCost-27, 0)
 			}
 		},
 	}

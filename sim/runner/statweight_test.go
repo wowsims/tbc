@@ -5,7 +5,6 @@ import (
 
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/stats"
-	"github.com/wowsims/tbc/sim/shaman"
 )
 
 func TestCalcStatWeight(t *testing.T) {
@@ -19,7 +18,7 @@ func TestCalcStatWeight(t *testing.T) {
 		Consumes:    fullConsumes,
 		Buffs:       fullBuffs,
 		Options:     options,
-		Spec:        shaman.ElementalSpec{Talents: shamTalents, Totems: shamTotems, AgentID: shaman.AgentTypeAdaptive},
+		PlayerOptions: &playerOptionsAdaptive,
 		CustomStats: stats.Stats{},
 	}
 

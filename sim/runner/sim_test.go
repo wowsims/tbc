@@ -5,9 +5,9 @@ import (
 	"testing"
 
 	"github.com/wowsims/tbc/items"
+	"github.com/wowsims/tbc/sim/api"
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/stats"
-	"github.com/wowsims/tbc/sim/shaman"
 )
 
 // TODO:
@@ -41,9 +41,13 @@ var basicBuffs = core.Buffs{
 	Moonkin:                  false,
 	SpriestDPS:               0,
 	Bloodlust:                1,
+
+	ManaSpringTotem:   api.TristateEffect_TristateEffectRegular,
+	TotemOfWrath: 1,
+	WrathOfAirTotem:   api.TristateEffect_TristateEffectRegular,
 }
 
-var shamTalents = shaman.Talents{
+var shamTalents = api.ShamanTalents{
 	ElementalFocus:     true,
 	LightningMastery:   5,
 	LightningOverload:  5,
@@ -57,10 +61,32 @@ var shamTalents = shaman.Talents{
 	Convection:         5,
 }
 
-var shamTotems = shaman.Totems{
-	WrathOfAir:   true,
-	TotemOfWrath: 1,
-	ManaStream:   true,
+var playerOptionsAdaptive = api.PlayerOptions{
+	Spec: &api.PlayerOptions_ElementalShaman{
+		ElementalShaman: &api.ElementalShaman{
+			Talents: &shamTalents,
+			Options: &api.ElementalShaman_Options{
+				WaterShield: true,
+			},
+			Agent: &api.ElementalShaman_Agent{
+				Type: api.ElementalShaman_Agent_Adaptive,
+			},
+		},
+	},
+}
+
+var playerOptionsCLOnClearcast = api.PlayerOptions{
+	Spec: &api.PlayerOptions_ElementalShaman{
+		ElementalShaman: &api.ElementalShaman{
+			Talents: &shamTalents,
+			Options: &api.ElementalShaman_Options{
+				WaterShield: true,
+			},
+			Agent: &api.ElementalShaman_Agent{
+				Type: api.ElementalShaman_Agent_CLOnClearcast,
+			},
+		},
+	},
 }
 
 var fullBuffs = core.Buffs{
@@ -136,7 +162,7 @@ func TestSimulatePreRaidNoBuffs(t *testing.T) {
 		Buffs: basicBuffs,
 		Race:  core.RaceBonusTypeOrc,
 
-		Spec: shaman.ElementalSpec{Talents: shamTalents, AgentID: shaman.AgentTypeAdaptive},
+		PlayerOptions: &playerOptionsAdaptive,
 		Gear: gearFromStrings(preRaidGear),
 
 		ExpectedDpsShort: 952,
@@ -166,7 +192,7 @@ func TestSimulatePreRaid(t *testing.T) {
 		Buffs:    fullBuffs,
 		Race:     core.RaceBonusTypeOrc,
 
-		Spec: shaman.ElementalSpec{Talents: shamTalents, Totems: shamTotems, AgentID: shaman.AgentTypeAdaptive},
+		PlayerOptions: &playerOptionsAdaptive,
 		Gear: gearFromStrings(preRaidGear),
 
 		ExpectedDpsShort: 1406,
@@ -184,7 +210,7 @@ func TestSimulateP1(t *testing.T) {
 		Buffs:    fullBuffs,
 		Race:     core.RaceBonusTypeOrc,
 
-		Spec: shaman.ElementalSpec{Talents: shamTalents, Totems: shamTotems, AgentID: shaman.AgentTypeAdaptive},
+		PlayerOptions: &playerOptionsAdaptive,
 		Gear: gearFromStrings(p1Gear),
 
 		ExpectedDpsShort: 1527,
@@ -245,7 +271,7 @@ func TestClearcastAgent(t *testing.T) {
 		Buffs:    fullBuffs,
 		Race:     core.RaceBonusTypeOrc,
 
-		Spec: shaman.ElementalSpec{Talents: shamTalents, Totems: shamTotems, AgentID: shaman.AgentTypeCLOnClearcast},
+		PlayerOptions: &playerOptionsCLOnClearcast,
 		Gear: gearFromStrings(p1Gear),
 
 		ExpectedDpsShort: 1468.4,
@@ -267,7 +293,7 @@ func TestAverageDPS(t *testing.T) {
 		Consumes:    fullConsumes,
 		Buffs:       fullBuffs,
 		Options:     options,
-		Spec:        shaman.ElementalSpec{Talents: shamTalents, Totems: shamTotems, AgentID: shaman.AgentTypeAdaptive},
+		PlayerOptions: &playerOptionsAdaptive,
 		CustomStats: stats.Stats{},
 	}
 
@@ -298,7 +324,8 @@ type AllEncountersTestOptions struct {
 	Buffs    core.Buffs
 	Consumes core.Consumes
 	Race     core.RaceBonusType
-	Spec     AgentCreator
+
+	PlayerOptions *api.PlayerOptions
 
 	ExpectedDpsShort float64
 	ExpectedDpsLong  float64
@@ -311,8 +338,9 @@ func simAllEncountersTest(testOpts AllEncountersTestOptions) {
 		Consumes:    testOpts.Consumes,
 		Buffs:       testOpts.Buffs,
 		Options:     makeOptions(testOpts.Options, shortEncounter),
-		Spec:        testOpts.Spec,
-		CustomStats: stats.Stats{},
+
+		PlayerOptions: testOpts.PlayerOptions,
+		CustomStats:   stats.Stats{},
 	}
 	doSimulateTest(
 		testOpts.label+"-short",

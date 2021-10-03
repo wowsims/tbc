@@ -4,60 +4,68 @@ import (
 	"time"
 
 	"github.com/wowsims/tbc/items"
+	"github.com/wowsims/tbc/sim/api"
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-type AgentType int
+func newShaman(character *core.Character, talents Talents, totems Totems, waterShield bool, agent shamanAgent) *Shaman {
+	character.InitialStats[stats.MP5] += 50
 
-const (
-	AgentTypeUnknown       = 0
-	AgentTypeFixedLBCL     = 1
-	AgentTypeCLOnClearcast = 2
-	AgentTypeAdaptive      = 3
-	AgentTypeCLOnCD        = 4
-)
+	character.InitialStats = character.InitialStats.Add(totems.Stats())
 
-func NewShaman(player *core.Player, party *core.Party, talents Talents, totems Totems, agentID AgentType, agentOptions map[string]int) *Shaman {
-	var agent shamanAgent
-
-	switch agentID {
-	case AgentTypeAdaptive:
-		agent = NewAdaptiveAgent()
-	case AgentTypeCLOnClearcast:
-		agent = NewCLOnClearcastAgent()
-	case AgentTypeFixedLBCL:
-		numLB := agentOptions["numLBtoCL"]
-		if numLB == -1 {
-			agent = NewLBOnlyAgent()
-		} else {
-			agent = NewFixedRotationAgent(numLB)
-		}
-	case AgentTypeCLOnCD:
-		agent = NewCLOnCDAgent()
-	}
-
-	// if WaterShield {
-	player.InitialStats[stats.MP5] += 50
-	// }
-
-	party.AddInitialStats(totems.Stats())
-
-	return &Shaman{
-		agent:   agent,
-		Player:  player,
-		Talents: talents,
+	shaman := &Shaman{
+		Character: character,
+		agent  :   agent,
+		Talents:   talents,
 
 		convectionBonus: 0.02 * float64(talents.Convection),
 		concussionBonus: 1 + 0.01*float64(talents.Concussion),
 	}
+	character.Agent = shaman
+	return shaman
 }
 
-// Shaman represents a shaman player.
+type Totems struct {
+	TotemOfWrath int
+	WrathOfAir   bool
+	ManaStream   bool
+}
+
+func (tt Totems) Stats() stats.Stats {
+	totemStats := stats.Stats{}
+	if tt.TotemOfWrath > 0 {
+		totemStats[stats.SpellCrit] += 66.24 * float64(tt.TotemOfWrath)
+		totemStats[stats.SpellHit] += 37.8 * float64(tt.TotemOfWrath)
+	}
+	if tt.WrathOfAir {
+		totemStats[stats.SpellPower] += 101
+	}
+	if tt.ManaStream {
+		totemStats[stats.MP5] += 50
+	}
+	return totemStats
+}
+
+// Agent is shaman specific agent for behavior.
+type shamanAgent interface {
+	// Returns the action this Agent would like to take next.
+	ChooseAction(*Shaman, *core.Simulation) core.AgentAction
+
+	// This will be invoked if the chosen action is actually executed, so the Agent can update its state.
+	OnActionAccepted(*Shaman, *core.Simulation, core.AgentAction)
+
+	// Returns this Agent to its initial state.
+	Reset(*Shaman, *core.Simulation)
+}
+
+// Shaman represents a shaman character.
 type Shaman struct {
-	agent        shamanAgent // Controller logic
+	*core.Character
+
+	agent shamanAgent
+
 	Talents      Talents     // Shaman Talents
-	*core.Player             // State of player
 
 	// HACK HACK HACK
 	// TODO: do we actually need a 'on start' method for agents?
@@ -71,40 +79,23 @@ type Shaman struct {
 	concussionBonus float64
 }
 
-// BuffUp lets you buff up all players in sim (and yourself)
-func (s *Shaman) BuffUp(sim *core.Simulation, party *core.Party) {
-	if s.Talents.LightningOverload > 0 {
-		s.AddAura(sim, AuraLightningOverload(s.Talents.LightningOverload))
-	}
+func (shaman *Shaman) GetCharacter() *core.Character {
+	return shaman.Character
 }
-func (s *Shaman) ChooseAction(sim *core.Simulation, party *core.Party) core.AgentAction {
-	if !s.started {
-		s.started = true
-		// we need to apply regen once all buffs are applied.
-		s.Stats[stats.MP5] += s.Stats[stats.Intellect] * (0.02 * float64(s.Talents.UnrelentingStorm))
-	}
-	// Before casting, activate shaman powers!
-	TryActivateBloodlust(sim, party, s.Player)
-	if s.Talents.ElementalMastery {
-		TryActivateEleMastery(sim, s.Player)
-	}
 
-	return s.agent.ChooseAction(s, party, sim)
+// BuffUp lets you buff up all characters in sim (and yourself)
+func (shaman *Shaman) BuffUp(sim *core.Simulation) {
+	if shaman.Talents.LightningOverload > 0 {
+		shaman.AddAura(sim, AuraLightningOverload(shaman.Talents.LightningOverload))
+	}
 }
-func (s *Shaman) OnActionAccepted(sim *core.Simulation, action core.AgentAction) {
-	s.agent.OnActionAccepted(s, sim, action)
-}
-func (s *Shaman) Reset(newsim *core.Simulation) {
-	s.started = false
-	s.agent.Reset(newsim)
-}
-func (s *Shaman) OnSpellHit(sim *core.Simulation, _ core.PlayerAgent, cast *core.Cast) {
+func (shaman *Shaman) OnSpellHit(sim *core.Simulation, cast *core.Cast) {
 	if cast.Spell.ID == core.MagicIDTLCLB { // TLC does not benefit from shaman talents
 		return
 	}
-	cast.DidDmg *= s.concussionBonus // add concussion
+	cast.DidDmg *= shaman.concussionBonus // add concussion
 
-	if cast.DidCrit && s.Talents.ElementalFocus {
+	if cast.DidCrit && shaman.Talents.ElementalFocus {
 		a := core.Aura{
 			ID:             core.MagicIDEleFocus,
 			Expires:        sim.CurrentTime + time.Second*15,
@@ -112,57 +103,44 @@ func (s *Shaman) OnSpellHit(sim *core.Simulation, _ core.PlayerAgent, cast *core
 			OnCast:         elementalFocusOnCast,
 			OnCastComplete: elementalFocusOnCastComplete,
 		}
-		s.AddAura(sim, a)
+		shaman.AddAura(sim, a)
 	}
 }
+func (shaman *Shaman) ChooseAction(sim *core.Simulation) core.AgentAction {
+	if !shaman.started {
+		shaman.started = true
+		// we need to apply regen once all buffs are applied.
+		shaman.Stats[stats.MP5] += shaman.Stats[stats.Intellect] * (0.02 * float64(shaman.Talents.UnrelentingStorm))
+	}
+	// Before casting, activate shaman powers!
+	TryActivateBloodlust(sim, shaman)
+	if shaman.Talents.ElementalMastery {
+		TryActivateEleMastery(sim, shaman)
+	}
 
-func elementalFocusOnCast(sim *core.Simulation, player core.PlayerAgent, c *core.Cast) {
-	c.ManaCost *= .6 // reduced by 40%
+	return shaman.agent.ChooseAction(shaman, sim)
+}
+func (shaman *Shaman) OnActionAccepted(sim *core.Simulation, action core.AgentAction) {
+	shaman.agent.OnActionAccepted(shaman, sim, action)
+}
+func (shaman *Shaman) Reset(newsim *core.Simulation) {
+	shaman.started = false
+	shaman.agent.Reset(shaman, newsim)
 }
 
-func elementalFocusOnCastComplete(sim *core.Simulation, player core.PlayerAgent, c *core.Cast) {
-	if c.ManaCost <= 0 {
+func elementalFocusOnCast(sim *core.Simulation, agent core.Agent, cast *core.Cast) {
+	cast.ManaCost *= .6 // reduced by 40%
+}
+
+func elementalFocusOnCastComplete(sim *core.Simulation, agent core.Agent, cast *core.Cast) {
+	if cast.ManaCost <= 0 {
 		return // Don't consume charges from free spells.
 	}
 
-	player.Auras[core.MagicIDEleFocus].Stacks--
-	if player.Auras[core.MagicIDEleFocus].Stacks == 0 {
-		player.RemoveAura(sim, player, core.MagicIDEleFocus)
+	agent.GetCharacter().Auras[core.MagicIDEleFocus].Stacks--
+	if agent.GetCharacter().Auras[core.MagicIDEleFocus].Stacks == 0 {
+		agent.GetCharacter().RemoveAura(sim, &agent, core.MagicIDEleFocus)
 	}
-}
-
-// Agent is shaman specific agent for behavior.
-type shamanAgent interface {
-	// Returns the action this Agent would like to take next.
-	ChooseAction(*Shaman, *core.Party, *core.Simulation) core.AgentAction
-
-	// This will be invoked if the chosen action is actually executed, so the Agent can update its state.
-	OnActionAccepted(*Shaman, *core.Simulation, core.AgentAction)
-
-	// Returns this Agent to its initial state.
-	Reset(*core.Simulation)
-}
-
-type Totems struct {
-	TotemOfWrath int
-	WrathOfAir   bool
-	ManaStream   bool
-}
-
-func (tt Totems) Stats() stats.Stats {
-	s := stats.Stats{
-		stats.SpellCrit:  66.24 * float64(tt.TotemOfWrath),
-		stats.SpellHit:   37.8 * float64(tt.TotemOfWrath),
-		stats.SpellPower: 0,
-		stats.MP5:        0,
-	}
-	if tt.WrathOfAir {
-		s[stats.SpellPower] += 101
-	}
-	if tt.ManaStream {
-		s[stats.MP5] += 50
-	}
-	return s
 }
 
 type Talents struct {
@@ -179,18 +157,34 @@ type Talents struct {
 	Concussion         int
 }
 
-func TryActivateBloodlust(sim *core.Simulation, party *core.Party, player *core.Player) {
-	if player.IsOnCD(core.MagicIDBloodlust, sim.CurrentTime) {
+func convertShamTalents(t *api.ShamanTalents) Talents {
+	return Talents{
+		LightningOverload:  int(t.LightningOverload),
+		ElementalPrecision: int(t.ElementalPrecision),
+		NaturesGuidance:    int(t.NaturesGuidance),
+		TidalMastery:       int(t.TidalMastery),
+		ElementalMastery:   t.ElementalMastery,
+		UnrelentingStorm:   int(t.UnrelentingStorm),
+		CallOfThunder:      int(t.CallOfThunder),
+		Convection:         int(t.Convection),
+		Concussion:         int(t.Concussion),
+		LightningMastery:   int(t.LightningMastery),
+		ElementalFocus:     t.ElementalFocus,
+	}
+}
+
+func TryActivateBloodlust(sim *core.Simulation, shaman *Shaman) {
+	if shaman.IsOnCD(core.MagicIDBloodlust, sim.CurrentTime) {
 		return
 	}
 
 	dur := time.Second * 40 // assumes that multiple BLs are different shaman.
-	player.SetCD(core.MagicIDBloodlust, time.Minute*10+sim.CurrentTime)
+	shaman.SetCD(core.MagicIDBloodlust, time.Minute*10+sim.CurrentTime)
 
-	party.AddAura(sim, core.Aura{
+	shaman.Party.AddAura(sim, core.Aura{
 		ID:      core.MagicIDBloodlust,
 		Expires: sim.CurrentTime + dur,
-		OnCast: func(sim *core.Simulation, p core.PlayerAgent, c *core.Cast) {
+		OnCast: func(sim *core.Simulation, agent core.Agent, c *core.Cast) {
 			c.CastTime = (c.CastTime * 10) / 13 // 30% faster
 		},
 	})
@@ -200,41 +194,41 @@ func TryActivateBloodlust(sim *core.Simulation, party *core.Party, player *core.
 //   First time we cast we should create and cache this cast object for better performance.
 //   This would get rid of the individual cached floats on Shaman.
 
-// func createBaseCast(player *Shaman, sim *core.Simulation, sp *core.Spell) *core.Cast {
+// func createBaseCast(character *Shaman, sim *core.Simulation, sp *core.Spell) *core.Cast {
 // 	cast := core.NewCast(sim, sp)
 
-// 	if player.Talents.ElementalPrecision > 0 {
+// 	if character.Talents.ElementalPrecision > 0 {
 // 		// FUTURE: This only impacts "frost fire and nature" spells.
 // 		//  We know it doesnt impact TLC.
 // 		//  Are there any other spells that a shaman can cast?
-// 		cast.BonusHit += float64(player.Talents.ElementalPrecision) * 0.02
+// 		cast.BonusHit += float64(character.Talents.ElementalPrecision) * 0.02
 // 	}
-// 	if player.Talents.NaturesGuidance > 0 {
-// 		cast.BonusHit += float64(player.Talents.NaturesGuidance) * 0.01
+// 	if character.Talents.NaturesGuidance > 0 {
+// 		cast.BonusHit += float64(character.Talents.NaturesGuidance) * 0.01
 // 	}
-// 	if player.Talents.TidalMastery > 0 {
-// 		cast.BonusCrit += float64(player.Talents.TidalMastery) * 0.01
+// 	if character.Talents.TidalMastery > 0 {
+// 		cast.BonusCrit += float64(character.Talents.TidalMastery) * 0.01
 // 	}
 
 // 	// TODO: Should we change these to be full auras?
 // 	//   Doesnt seem needed since they can only be used by shaman right here.
-// 	if player.Equip[items.ItemSlotRanged].ID == 28248 {
+// 	if character.Equip[items.ItemSlotRanged].ID == 28248 {
 // 		cast.BonusSpellPower += 55
-// 	} else if player.Equip[items.ItemSlotRanged].ID == 23199 {
+// 	} else if character.Equip[items.ItemSlotRanged].ID == 23199 {
 // 		cast.BonusSpellPower += 33
-// 	} else if player.Equip[items.ItemSlotRanged].ID == 32330 {
+// 	} else if character.Equip[items.ItemSlotRanged].ID == 32330 {
 // 		cast.BonusSpellPower += 85
 // 	}
-// 	if player.Talents.CallOfThunder > 0 { // only applies to CL and LB
-// 		cast.BonusCrit += float64(player.Talents.CallOfThunder) * 0.01
+// 	if character.Talents.CallOfThunder > 0 { // only applies to CL and LB
+// 		cast.BonusCrit += float64(character.Talents.CallOfThunder) * 0.01
 // 	}
 // 	if sim.Options.Encounter.NumTargets > 1 {
 // 		cast.DoItNow = ChainCast
 // 	}
-// 	cast.ManaCost *= player.convectionBonus
+// 	cast.ManaCost *= character.convectionBonus
 
-// 	if player.Talents.LightningMastery > 0 {
-// 		cast.CastTime -= time.Millisecond * 100 * time.Duration(player.Talents.LightningMastery)
+// 	if character.Talents.LightningMastery > 0 {
+// 		cast.CastTime -= time.Millisecond * 100 * time.Duration(character.Talents.LightningMastery)
 // 	}
 
 // 	return cast
@@ -249,50 +243,50 @@ const (
 
 // NewCastAction is how a shaman creates a new spell
 //  TODO: Decide if we need separate functions for elemental and enhancement?
-func NewCastAction(sim *core.Simulation, player *Shaman, sp *core.Spell) core.AgentAction {
+func NewCastAction(shaman *Shaman, sim *core.Simulation, sp *core.Spell) core.AgentAction {
 	cast := core.NewCast(sim, sp)
 
 	itsElectric := sp.ID == core.MagicIDCL6 || sp.ID == core.MagicIDLB12
 
-	if player.Talents.ElementalPrecision > 0 {
+	if shaman.Talents.ElementalPrecision > 0 {
 		// FUTURE: This only impacts "frost fire and nature" spells.
 		//  We know it doesnt impact TLC.
 		//  Are there any other spells that a shaman can cast?
-		cast.BonusHit += float64(player.Talents.ElementalPrecision) * 0.02
+		cast.BonusHit += float64(shaman.Talents.ElementalPrecision) * 0.02
 	}
-	if player.Talents.NaturesGuidance > 0 {
-		cast.BonusHit += float64(player.Talents.NaturesGuidance) * 0.01
+	if shaman.Talents.NaturesGuidance > 0 {
+		cast.BonusHit += float64(shaman.Talents.NaturesGuidance) * 0.01
 	}
-	if player.Talents.TidalMastery > 0 {
-		cast.BonusCrit += float64(player.Talents.TidalMastery) * 0.01
+	if shaman.Talents.TidalMastery > 0 {
+		cast.BonusCrit += float64(shaman.Talents.TidalMastery) * 0.01
 	}
 
 	if itsElectric {
 		// TODO: Should we change these to be full auras?
 		//   Doesnt seem needed since they can only be used by shaman right here.
-		if player.Equip[items.ItemSlotRanged].ID == TotemOfTheVoid {
+		if shaman.Equip[items.ItemSlotRanged].ID == TotemOfTheVoid {
 			cast.BonusSpellPower += 55
-		} else if player.Equip[items.ItemSlotRanged].ID == TotemOfStorms {
+		} else if shaman.Equip[items.ItemSlotRanged].ID == TotemOfStorms {
 			cast.BonusSpellPower += 33
-		} else if player.Equip[items.ItemSlotRanged].ID == TotemOfAncestralGuidance {
+		} else if shaman.Equip[items.ItemSlotRanged].ID == TotemOfAncestralGuidance {
 			cast.BonusSpellPower += 85
 		}
-		if player.Talents.CallOfThunder > 0 { // only applies to CL and LB
-			cast.BonusCrit += float64(player.Talents.CallOfThunder) * 0.01
+		if shaman.Talents.CallOfThunder > 0 { // only applies to CL and LB
+			cast.BonusCrit += float64(shaman.Talents.CallOfThunder) * 0.01
 		}
 		if sp.ID == core.MagicIDCL6 && sim.Options.Encounter.NumTargets > 1 {
 			cast.DoItNow = ChainCast
 		}
-		if player.Talents.LightningMastery > 0 {
-			cast.CastTime -= time.Millisecond * 100 * time.Duration(player.Talents.LightningMastery)
+		if shaman.Talents.LightningMastery > 0 {
+			cast.CastTime -= time.Millisecond * 100 * time.Duration(shaman.Talents.LightningMastery)
 		}
 	}
-	cast.CastTime = time.Duration(float64(cast.CastTime) / player.HasteBonus())
+	cast.CastTime = time.Duration(float64(cast.CastTime) / shaman.HasteBonus())
 
 	// Apply any on cast effects.
-	for _, id := range player.ActiveAuraIDs {
-		if player.Auras[id].OnCast != nil {
-			player.Auras[id].OnCast(sim, core.PlayerAgent{Agent: player, Player: player.Player}, cast)
+	for _, id := range shaman.ActiveAuraIDs {
+		if shaman.Auras[id].OnCast != nil {
+			shaman.Auras[id].OnCast(sim, shaman, cast)
 		}
 	}
 	if itsElectric { // TODO: Add ElementalFury talent
@@ -302,7 +296,7 @@ func NewCastAction(sim *core.Simulation, player *Shaman, sp *core.Spell) core.Ag
 		cast.CritDamageMultipier -= 1 // reduce to multiplier instead of percent.
 
 		// Convection applies against the base cost of the spell.
-		cast.ManaCost -= sp.Mana * player.convectionBonus
+		cast.ManaCost -= sp.Mana * shaman.convectionBonus
 	}
 
 	return core.AgentAction{

@@ -8,9 +8,9 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-// ItemActivation needs the state from simulator, party, and player
+// ItemActivation needs the state from simulator, party, and agent
 //  because items can impact all 3. (potions, drums, JC necks, etc)
-type ItemActivation func(*Simulation, *Party, PlayerAgent) Aura
+type ItemActivation func(*Simulation, Agent) Aura
 
 type ActiveItem struct {
 	Activate   ItemActivation `json:"-"` // Activatable Ability, produces an aura
@@ -55,8 +55,9 @@ var ActiveItemByID = map[int32]ActiveItem{
 	35749: {Activate: ActivateAlchStone, ActivateCD: NeverExpires, SharedID: MagicIDAtkTrinket},
 
 	// Necks
-	24116: {Activate: ActivateEyeOfNight, ActivateCD: NeverExpires},
-	24121: {Activate: ActivateChainTO, ActivateCD: NeverExpires},
+	// These are handled specially for now.
+	//24116: {Activate: ActivateEyeOfNight, ActivateCD: NeverExpires},
+	//24121: {Activate: ActivateChainTO, ActivateCD: NeverExpires},
 
 	// Armor
 	28602: {Activate: ActivateElderScribes, ActivateCD: NeverExpires},
@@ -80,16 +81,16 @@ var sets = []ItemSet{
 	{
 		Name:  "Netherstrike",
 		Items: map[string]bool{"Netherstrike Breastplate": true, "Netherstrike Bracers": true, "Netherstrike Belt": true},
-		Bonuses: map[int]ItemActivation{3: func(sim *Simulation, party *Party, player PlayerAgent) Aura {
-			player.Stats[stats.SpellPower] += 23
+		Bonuses: map[int]ItemActivation{3: func(sim *Simulation, agent Agent) Aura {
+			agent.GetCharacter().Stats[stats.SpellPower] += 23
 			return Aura{ID: MagicIDNetherstrike}
 		}},
 	},
 	{
 		Name:  "The Twin Stars",
 		Items: map[string]bool{"Charlotte's Ivy": true, "Lola's Eve": true},
-		Bonuses: map[int]ItemActivation{2: func(sim *Simulation, party *Party, player PlayerAgent) Aura {
-			player.Stats[stats.SpellPower] += 15
+		Bonuses: map[int]ItemActivation{2: func(sim *Simulation, agent Agent) Aura {
+			agent.GetCharacter().Stats[stats.SpellPower] += 15
 			return Aura{ID: MagicIDNetherstrike}
 		}},
 	},
@@ -97,13 +98,13 @@ var sets = []ItemSet{
 		Name:  "Tidefury",
 		Items: map[string]bool{"Tidefury Helm": true, "Tidefury Shoulderguards": true, "Tidefury Chestpiece": true, "Tidefury Kilt": true, "Tidefury Gauntlets": true},
 		Bonuses: map[int]ItemActivation{
-			2: func(sim *Simulation, party *Party, player PlayerAgent) Aura {
+			2: func(sim *Simulation, agent Agent) Aura {
 				return Aura{ID: MagicIDTidefury}
 			},
-			4: func(sim *Simulation, party *Party, player PlayerAgent) Aura {
+			4: func(sim *Simulation, agent Agent) Aura {
 				// TODO: should we even allow for unchecking water shield?
 				// if sim.Options.Buffs.WaterShield {
-				player.Stats[stats.MP5] += 3
+				agent.GetCharacter().Stats[stats.MP5] += 3
 				// }
 				return Aura{ID: MagicIDTidefury}
 			},
@@ -117,20 +118,20 @@ var sets = []ItemSet{
 	{
 		Name:  "Mana Etched",
 		Items: map[string]bool{"Mana-Etched Crown": true, "Mana-Etched Spaulders": true, "Mana-Etched Vestments": true, "Mana-Etched Gloves": true, "Mana-Etched Pantaloons": true},
-		Bonuses: map[int]ItemActivation{4: ActivateManaEtched, 2: func(sim *Simulation, party *Party, player PlayerAgent) Aura {
-			player.Stats[stats.SpellHit] += 35
+		Bonuses: map[int]ItemActivation{4: ActivateManaEtched, 2: func(sim *Simulation, agent Agent) Aura {
+			agent.GetCharacter().Stats[stats.SpellHit] += 35
 			return Aura{ID: MagicIDManaEtchedHit}
 		}},
 	},
 	{
 		Name:  "Cyclone Regalia",
 		Items: map[string]bool{"Cyclone Faceguard": true, "Cyclone Shoulderguards": true, "Cyclone Chestguard": true, "Cyclone Handguards": true, "Cyclone Legguards": true},
-		Bonuses: map[int]ItemActivation{4: ActivateCycloneManaReduce, 2: func(sim *Simulation, party *Party, player PlayerAgent) Aura {
+		Bonuses: map[int]ItemActivation{4: ActivateCycloneManaReduce, 2: func(sim *Simulation, agent Agent) Aura {
 			// if sim.Options.Totems.WrathOfAir {
 
 			// FUTURE: Only one ele shaman in the party can use this at a time.
 			//   not a big deal now but will need to be fixed to support full raid sim.
-			party.AddStats(stats.Stats{stats.SpellPower: 20})
+			agent.GetCharacter().Party.AddStats(stats.Stats{stats.SpellPower: 20})
 			// }
 			return Aura{ID: MagicIDCyclone2pc}
 		}},
@@ -138,9 +139,8 @@ var sets = []ItemSet{
 	{
 		Name:  "Windhawk",
 		Items: map[string]bool{"Windhawk Hauberk": true, "Windhawk Belt": true, "Windhawk Bracers": true},
-		Bonuses: map[int]ItemActivation{3: func(sim *Simulation, party *Party, player PlayerAgent) Aura {
-			// TODO: check if player has water shield on?
-			player.Stats[stats.MP5] += 8
+		Bonuses: map[int]ItemActivation{3: func(sim *Simulation, agent Agent) Aura {
+			agent.GetCharacter().Stats[stats.MP5] += 8
 			return Aura{ID: MagicIDWindhawk}
 		}},
 	},
@@ -161,10 +161,10 @@ var sets = []ItemSet{
 			"Skyshatter Treads":      true,
 			"Skyshatter Bands":       true,
 		},
-		Bonuses: map[int]ItemActivation{2: func(sim *Simulation, party *Party, player PlayerAgent) Aura {
-			player.Stats[stats.MP5] += 15
-			player.Stats[stats.SpellCrit] += 35
-			player.Stats[stats.SpellPower] += 45
+		Bonuses: map[int]ItemActivation{2: func(sim *Simulation, agent Agent) Aura {
+			agent.GetCharacter().Stats[stats.MP5] += 15
+			agent.GetCharacter().Stats[stats.SpellCrit] += 35
+			agent.GetCharacter().Stats[stats.SpellPower] += 45
 			return Aura{ID: MagicIDSkyshatter2pc}
 		}, 4: ActivateSkyshatterImpLB},
 	},
