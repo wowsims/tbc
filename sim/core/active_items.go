@@ -54,11 +54,6 @@ var ActiveItemByID = map[int32]ActiveItem{
 	30663: {Activate: ActivateFathomBrooch, ActivateCD: NeverExpires, SharedID: MagicIDAtkTrinket},
 	35749: {Activate: ActivateAlchStone, ActivateCD: NeverExpires, SharedID: MagicIDAtkTrinket},
 
-	// Necks
-	// These are handled specially for now.
-	//24116: {Activate: ActivateEyeOfNight, ActivateCD: NeverExpires},
-	//24121: {Activate: ActivateChainTO, ActivateCD: NeverExpires},
-
 	// Armor
 	28602: {Activate: ActivateElderScribes, ActivateCD: NeverExpires},
 }

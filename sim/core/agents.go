@@ -1,7 +1,10 @@
 package core
 
 import (
+	"reflect"
 	"time"
+
+	"github.com/wowsims/tbc/sim/api"
 )
 
 // Agent can be thought of as the 'Player', i.e. the thing controlling the Character.
@@ -37,4 +40,29 @@ type AgentAction struct {
 	// Exactly one of these should be set.
 	Wait time.Duration // Duration to wait
 	Cast *Cast
+}
+
+type AgentFactory func(*Simulation, *Character, *api.PlayerOptions) Agent
+
+var agentFactories map[string]AgentFactory = make(map[string]AgentFactory)
+
+func RegisterAgentFactory(emptyOptions interface{}, factory AgentFactory) {
+	typeName := reflect.TypeOf(emptyOptions).Name()
+	if _, ok := agentFactories[typeName]; ok {
+		panic("Aleady registered agent factory: " + typeName)
+	}
+	//fmt.Printf("Registering type: %s", typeName)
+
+	agentFactories[typeName] = factory
+}
+
+func NewAgent(sim *Simulation, character *Character, playerOptions *api.PlayerOptions) Agent {
+	typeName := reflect.TypeOf(playerOptions.GetSpec()).Elem().Name()
+
+	factory, ok := agentFactories[typeName]
+	if !ok {
+		panic("No agent factory for type: " + typeName)
+	}
+
+	return factory(sim, character, playerOptions)
 }
