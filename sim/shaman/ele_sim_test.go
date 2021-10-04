@@ -38,10 +38,6 @@ var basicOptions = core.Options{
 
 var basicBuffs = core.Buffs{
 	Bloodlust: 1,
-
-	ManaSpringTotem:   api.TristateEffect_TristateEffectRegular,
-	TotemOfWrath: 1,
-	WrathOfAirTotem:   api.TristateEffect_TristateEffectRegular,
 }
 
 var shamTalents = api.ShamanTalents{
@@ -96,12 +92,15 @@ var fullBuffs = core.Buffs{
 	ShadowPriestDPS:          500,
 	Bloodlust:                1,
 	// Misery:                   true,
+
+	ManaSpringTotem:   api.TristateEffect_TristateEffectRegular,
+	TotemOfWrath: 1,
+	WrathOfAirTotem:   api.TristateEffect_TristateEffectRegular,
 }
 
 var fullConsumes = core.Consumes{
 	FlaskOfBlindingLight:   true,
 	BrilliantWizardOil:     true,
-	ElixirOfMajorMageblood: false,
 	BlackenedBasilisk:      true,
 	DestructionPotion:      true,
 	SuperManaPotion:        true,
@@ -149,24 +148,6 @@ var p1Gear = []string{
 	"Mazthoril Honor Shield",
 }
 
-func TestSimulatePreRaidNoBuffs(t *testing.T) {
-	simAllEncountersTest(AllEncountersTestOptions{
-		label: "preRaid",
-		t:     t,
-
-		Options: basicOptions,
-		// no consumes
-		Buffs: basicBuffs,
-		Race:  core.RaceBonusTypeOrc,
-
-		PlayerOptions: &playerOptionsAdaptive,
-		Gear: gearFromStrings(preRaidGear),
-
-		ExpectedDpsShort: 952,
-		ExpectedDpsLong:  276,
-	})
-}
-
 func gearFromStrings(gears []string) items.EquipmentSpec {
 	eq := items.EquipmentSpec{}
 	for i, gear := range gears {
@@ -177,6 +158,24 @@ func gearFromStrings(gears []string) items.EquipmentSpec {
 		eq[i].ID = item.ID
 	}
 	return eq
+}
+
+func TestSimulatePreRaidNoBuffs(t *testing.T) {
+	simAllEncountersTest(AllEncountersTestOptions{
+		label: "preRaid",
+		t:     t,
+
+		Options: basicOptions,
+		// no consumes
+		Buffs: basicBuffs,
+		Race:  core.RaceBonusTypeTroll10,
+
+		PlayerOptions: &playerOptionsAdaptive,
+		Gear: gearFromStrings(preRaidGear),
+
+		ExpectedDpsShort: 867,
+		ExpectedDpsLong:  276,
+	})
 }
 
 func TestSimulatePreRaid(t *testing.T) {
