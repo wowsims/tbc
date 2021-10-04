@@ -4,8 +4,11 @@ import (
 	"fmt"
 	"math/rand"
 	"sort"
+	"strings"
 	"time"
 
+	"github.com/wowsims/tbc/items"
+	"github.com/wowsims/tbc/sim/api"
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
@@ -30,11 +33,28 @@ type Encounter struct {
 	Armor      int32
 }
 
+type IndividualParams struct {
+	Equip    items.EquipmentSpec
+	Race     RaceBonusType
+	Consumes Consumes
+	Buffs    Buffs
+	Options  Options
+
+	PlayerOptions *api.PlayerOptions
+
+	CustomStats stats.Stats
+}
+
+type InitialAura func(*Simulation) Aura
+
 type Simulation struct {
 	Raid         *Raid
 	Options      Options
 	Duration     time.Duration
 	*AuraTracker // Global Debuffs mostly.. put on the boss/target
+
+	// Auras which are automatically applied on sim reset.
+	InitialAuras []InitialAura
 
 	// Clears and regenerates on each Run call.
 	Metrics SimMetrics
@@ -48,6 +68,9 @@ type Simulation struct {
 
 	// caches to speed up perf and store temp state
 	cache *cache
+
+	// Holds the params used to create this sim, so similar sims can be run if needed.
+	IndividualParams IndividualParams
 }
 
 type wrappedRandom struct {
@@ -76,8 +99,48 @@ type IndividualMetric struct {
 	ManaSpent   float64
 }
 
+func NewIndividualSim(params IndividualParams) *Simulation {
+	raid := NewRaid(params.Buffs)
+	sim := newSim(raid, params.Options)
+	sim.IndividualParams = params
+
+	character := NewCharacter(params.Equip, params.Race, params.Consumes, params.CustomStats)
+	agent := NewAgent(sim, character, params.PlayerOptions)
+	raid.AddPlayer(agent)
+	raid.AddPlayerBuffs()
+
+	raid.ApplyBuffs(sim)
+
+	sim.Reset()
+
+	// Now apply all the 'final' stat improvements.
+	// TODO: Figure out how to handle buffs that buff based on other buffs...
+	//   for now this hardcoded buffing works...
+	for _, raidParty := range sim.Raid.Parties {
+		for _, player := range raidParty.Players {
+			if raid.Buffs.BlessingOfKings {
+				player.GetCharacter().InitialStats[stats.Stamina] *= 1.1
+				player.GetCharacter().InitialStats[stats.Agility] *= 1.1
+				player.GetCharacter().InitialStats[stats.Strength] *= 1.1
+				player.GetCharacter().InitialStats[stats.Intellect] *= 1.1
+				player.GetCharacter().InitialStats[stats.Spirit] *= 1.1
+			}
+			if raid.Buffs.DivineSpirit == api.TristateEffect_TristateEffectImproved {
+				player.GetCharacter().InitialStats[stats.SpellPower] += player.GetCharacter().InitialStats[stats.Spirit] * 0.1
+			}
+			// Add SpellCrit from Int and Mana from Int
+			player.GetCharacter().InitialStats = player.GetCharacter().InitialStats.CalculatedTotal()
+		}
+	}
+
+	// Reset again to make sure updated initial stats are propagated.
+	sim.Reset()
+
+	return sim
+}
+
 // New sim contructs a simulator with the given equipment / options.
-func NewSim(raid *Raid, options Options) *Simulation {
+func newSim(raid *Raid, options Options) *Simulation {
 	if options.GCDMin == 0 {
 		options.GCDMin = durationFromSeconds(1.0) // default to 0.75s GCD
 	}
@@ -86,9 +149,10 @@ func NewSim(raid *Raid, options Options) *Simulation {
 	}
 
 	sim := &Simulation{
-		Raid:     raid,
-		Options:  options,
-		Duration: durationFromSeconds(options.Encounter.Duration),
+		Raid:         raid,
+		Options:      options,
+		Duration:     durationFromSeconds(options.Encounter.Duration),
+		InitialAuras: []InitialAura{},
 		// Rando:    ,
 		Log: nil,
 		cache: &cache{
@@ -108,6 +172,10 @@ func (sim *Simulation) NewCast() *Cast {
 }
 func (sim *Simulation) ReturnCasts(casts []*Cast) {
 	sim.cache.ReturnCasts(casts)
+}
+
+func (sim *Simulation) AddInitialAura(initialAura InitialAura) {
+	sim.InitialAuras = append(sim.InitialAuras, initialAura)
 }
 
 // Reset will set sim back and erase all current state.
@@ -130,51 +198,86 @@ func (sim *Simulation) Reset() {
 
 	// Reset all players
 	for _, party := range sim.Raid.Parties {
-		for _, pl := range party.Players {
-			pl.Agent.Reset(sim)
-			pl.Player.Reset()
+		for _, agent := range party.Players {
+			agent.GetCharacter().Reset()
+			agent.Reset(sim)
 		}
 	}
 
 	// Now buff everyone back up!
 	for _, party := range sim.Raid.Parties {
-		for _, pl := range party.Players {
-			pl.Agent.BuffUp(sim, party)
-			pl.Player.BuffUp(sim, party)
+		for _, agent := range party.Players {
+			agent.BuffUp(sim) // for now do this first to match order of adding auras as original sim.
+			agent.GetCharacter().BuffUp(sim)
 		}
+	}
+
+	for _, initialAura := range sim.InitialAuras {
+		sim.AddAura(sim, nil, initialAura(sim))
 	}
 }
 
 type pendingAction struct {
-	Agent PlayerAgent
+	Agent Agent
 	AgentAction
 	ExecuteAt time.Duration
-	Party     *Party
 }
 
-func (sim *Simulation) playerConsumes(agent PlayerAgent, party *Party) {
+func (sim *Simulation) playerConsumes(agent Agent) {
 	// Consumes before any casts
-	TryActivateDrums(sim, party, agent.Player)
-	TryActivateRacial(sim, party, agent.Player)
-	TryActivateDestructionPotion(sim, party, agent.Player)
-	TryActivateDarkRune(sim, party, agent.Player)
-	TryActivateSuperManaPotion(sim, party, agent.Player)
+	TryActivateDrums(sim, agent)
+	TryActivateRacial(sim, agent)
+	TryActivateDestructionPotion(sim, agent)
+	TryActivateDarkRune(sim, agent)
+	TryActivateSuperManaPotion(sim, agent)
 
 	// Pop activatable items if we can.
-	agent.Player.TryActivateEquipment(sim, party)
+	agent.GetCharacter().TryActivateEquipment(sim)
 }
 
-// Run will run the simulation for number of seconds.
+// Run runs the simulation for the configured number of iterations, and
+// collects all the metrics together.
+func (sim *Simulation) Run() SimResult {
+	pid := 0
+	for _, raidParty := range sim.Raid.Parties {
+		for _, player := range raidParty.Players {
+			player.GetCharacter().ID = pid
+			player.GetCharacter().AuraTracker.PID = pid
+			pid++
+		}
+	}
+	sim.AuraTracker.PID = -1 // set main sim auras to be -1 character ID.
+	logsBuffer := &strings.Builder{}
+	aggregator := NewMetricsAggregator()
+
+	if sim.Options.Debug {
+		sim.Log = func(s string, vals ...interface{}) {
+			logsBuffer.WriteString(fmt.Sprintf("[%0.1f] "+s, append([]interface{}{sim.CurrentTime.Seconds()}, vals...)...))
+		}
+	}
+
+	for i := 0; i < sim.Options.Iterations; i++ {
+		metrics := sim.RunOnce()
+		aggregator.addMetrics(sim.Options, metrics)
+		sim.ReturnCasts(metrics.Casts)
+	}
+
+	result := aggregator.getResult()
+	result.Logs = logsBuffer.String()
+	return result
+}
+
+// RunOnce will run the simulation for number of seconds.
 // Returns metrics for what was cast and how much damage was done.
-func (sim *Simulation) Run() SimMetrics {
+func (sim *Simulation) RunOnce() SimMetrics {
 	sim.Reset()
 
 	pendingActions := make([]pendingAction, 0, 25)
 	// setup initial actions.
 	for _, party := range sim.Raid.Parties {
-		for _, pl := range party.Players {
-			sim.playerConsumes(pl, party)
-			action := pl.ChooseAction(sim, party)
+		for _, agent := range party.Players {
+			sim.playerConsumes(agent)
+			action := agent.ChooseAction(sim)
 			if action.Wait == NeverExpires {
 				continue // This means agent will not perform any actions at all
 			}
@@ -184,8 +287,7 @@ func (sim *Simulation) Run() SimMetrics {
 			}
 			pendingActions = append(pendingActions, pendingAction{
 				ExecuteAt:   wait,
-				Party:       party,
-				Agent:       pl,
+				Agent:       agent,
 				AgentAction: action,
 			})
 		}
@@ -205,45 +307,46 @@ simloop:
 		}
 
 		if action.Cast != nil {
-			action.Cast.DoItNow(sim, action.Agent, action.Cast)
+			action.Cast.DoItNow(sim, agent, action.Cast)
 		} else if action.Wait == 0 {
 			// FUTURE: Swing timers could be handled in this if block.
 			panic("Agent returned nil action")
 		}
 
-		sim.playerConsumes(agent, action.Party)
-		newAction := agent.ChooseAction(sim, action.Party)
+		sim.playerConsumes(agent)
+		newAction := agent.ChooseAction(sim)
 		wait := newAction.Wait
 		if newAction.Cast != nil {
 			if newAction.Cast.CastTime < sim.Options.GCDMin {
 				newAction.Cast.CastTime = sim.Options.GCDMin
 			}
 			wait = newAction.Cast.CastTime
-			if agent.Stats[stats.Mana] < newAction.Cast.ManaCost {
+			if agent.GetCharacter().Stats[stats.Mana] < newAction.Cast.ManaCost {
 				// Not enough mana, wait until there is enough mana to cast the desired spell
-				regenTime := durationFromSeconds((newAction.Cast.ManaCost-agent.Stats[stats.Mana])/agent.manaRegenPerSecond()) + 1
+				regenTime := durationFromSeconds((newAction.Cast.ManaCost-agent.GetCharacter().Stats[stats.Mana])/agent.GetCharacter().manaRegenPerSecond()) + 1
 				if sim.Log != nil {
 					sim.Log("Not enough mana to cast... regen for %0.1f seconds before casting.\n", regenTime.Seconds())
 				}
-				regenTime += newAction.Cast.CastTime
-				if regenTime > wait {
-					wait = regenTime
-				}
+				wait = regenTime
 				if sim.Options.ExitOnOOM {
 					break simloop // named for clarity since this is pretty deep nested.
 				}
-				sim.Metrics.IndividualMetrics[agent.ID].DamageAtOOM = sim.Metrics.IndividualMetrics[agent.ID].TotalDamage
-				sim.Metrics.IndividualMetrics[agent.ID].OOMAt = sim.CurrentTime.Seconds()
-			}
-			if sim.Log != nil {
-				sim.Log("(%d) Start Casting %s Cast Time: %0.1fs\n", agent.ID, newAction.Cast.Spell.Name, newAction.Cast.CastTime.Seconds())
+
+				// Cancel cast for now.
+				newAction.Cast = nil
+				newAction.Wait = wait
+				sim.Metrics.IndividualMetrics[agent.GetCharacter().ID].DamageAtOOM = sim.Metrics.IndividualMetrics[agent.GetCharacter().ID].TotalDamage
+				sim.Metrics.IndividualMetrics[agent.GetCharacter().ID].OOMAt = sim.CurrentTime.Seconds()
+			} else {
+				if sim.Log != nil {
+					sim.Log("(%d) Start Casting %s Cast Time: %0.1fs\n", agent.GetCharacter().ID, newAction.Cast.Spell.Name, newAction.Cast.CastTime.Seconds())
+				}
 			}
 		}
 		pa := pendingAction{
 			ExecuteAt:   sim.CurrentTime + wait,
 			Agent:       agent,
 			AgentAction: newAction,
-			Party:       action.Party,
 		}
 		if len(pendingActions) == 1 {
 			// We know in a single user sim, just always make the next pending action ours.
@@ -267,16 +370,16 @@ func (sim *Simulation) Advance(elapsedTime time.Duration) {
 	newTime := sim.CurrentTime + elapsedTime
 
 	for _, party := range sim.Raid.Parties {
-		for _, pl := range party.Players {
+		for _, agent := range party.Players {
 			// FUTURE: Do agents need to be notified or just advance the player state?
-			pl.Advance(sim, elapsedTime, newTime)
+			agent.GetCharacter().Advance(sim, elapsedTime, newTime)
 		}
 	}
 	// Go in reverse order so we can safely delete while looping
 	for i := len(sim.ActiveAuraIDs) - 1; i >= 0; i-- {
 		id := sim.ActiveAuraIDs[i]
 		if sim.Auras[id].Expires != 0 && sim.Auras[id].Expires <= newTime {
-			sim.RemoveAura(sim, PlayerAgent{}, id) // auras on the sim have no player attached.
+			sim.RemoveAura(sim, nil, id) // auras on the sim have no player attached.
 		}
 	}
 	sim.CurrentTime = newTime

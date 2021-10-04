@@ -34,6 +34,8 @@ const (
 	CastTypeChannel
 )
 
+const SpellCritRatingPerCritChance = 22.08
+
 // All Spells
 // FUTURE: Downrank Penalty == (spellrankavailbetobetrained+11)/70
 //    Might not even be worth calculating because I don't think there is much case for ever downranking.
@@ -65,7 +67,7 @@ func init() {
 
 type Cast struct {
 	Spell  *Spell
-	Caster *Player
+	Caster *Agent
 	Tag    int32 // Allow any class to create an enum for what tags the cast needs.
 
 	// Pre-hit Mutatable State
@@ -79,7 +81,7 @@ type Cast struct {
 
 	// Actual spell to call to activate this spell.
 	//  currently named after arnold's "come on, do it now"
-	DoItNow func(sim *Simulation, p PlayerAgent, cast *Cast)
+	DoItNow func(sim *Simulation, agent Agent, cast *Cast)
 
 	// Calculated Values, can be modified only in 'OnSpellHit'
 	DidHit  bool
@@ -103,35 +105,37 @@ func NewCast(sim *Simulation, sp *Spell) *Cast {
 
 // Cast will actually cast and treat all casts as having no 'flight time'.
 // This will activate any auras around casting, calculate hit/crit and add to sim metrics.
-func DirectCast(sim *Simulation, p PlayerAgent, cast *Cast) {
+func DirectCast(sim *Simulation, agent Agent, cast *Cast) {
+	character := agent.GetCharacter()
+
 	if sim.Log != nil {
-		sim.Log("(%d) Current Mana %0.0f, Cast Cost: %0.0f\n", p.ID, p.Stats[stats.Mana], cast.ManaCost)
+		sim.Log("(%d) Current Mana %0.0f, Cast Cost: %0.0f\n", character.ID, character.Stats[stats.Mana], cast.ManaCost)
 	}
 	if cast.ManaCost > 0 {
-		p.Stats[stats.Mana] -= cast.ManaCost
-		sim.Metrics.IndividualMetrics[p.ID].ManaSpent += cast.ManaCost
+		character.Stats[stats.Mana] -= cast.ManaCost
+		sim.Metrics.IndividualMetrics[character.ID].ManaSpent += cast.ManaCost
 	}
 
-	for _, id := range p.ActiveAuraIDs {
-		if p.Auras[id].OnCastComplete != nil {
-			p.Auras[id].OnCastComplete(sim, p, cast)
+	for _, id := range character.ActiveAuraIDs {
+		if character.Auras[id].OnCastComplete != nil {
+			character.Auras[id].OnCastComplete(sim, agent, cast)
 		}
 	}
 	for _, id := range sim.ActiveAuraIDs {
 		if sim.Auras[id].OnCastComplete != nil {
-			sim.Auras[id].OnCastComplete(sim, p, cast)
+			sim.Auras[id].OnCastComplete(sim, agent, cast)
 		}
 	}
 
-	hit := 0.83 + p.Stats[stats.SpellHit]/1260.0 + cast.BonusHit // 12.6 hit == 1% hit
+	hit := 0.83 + character.Stats[stats.SpellHit]/1260.0 + cast.BonusHit // 12.6 hit == 1% hit
 	hit = math.Min(hit, 0.99)                                    // can't get away from the 1% miss
 
 	dbgCast := cast.Spell.Name
 	if sim.Log != nil {
-		sim.Log("(%d) Completed Cast (%0.2f hit chance) (%s)\n", p.ID, hit, dbgCast)
+		sim.Log("(%d) Completed Cast (%0.2f hit chance) (%s)\n", character.ID, hit, dbgCast)
 	}
 	if sim.Rando.Float64("cast hit") < hit {
-		sp := p.Stats[stats.SpellPower] + p.Stats[cast.Spell.DamageType] + cast.BonusSpellPower
+		sp := character.Stats[stats.SpellPower] + character.Stats[cast.Spell.DamageType] + cast.BonusSpellPower
 		baseDmg := (sim.Rando.Float64("cast dmg") * cast.Spell.DmgDiff)
 		bonus := (sp * cast.Spell.Coeff)
 		dmg := baseDmg + cast.Spell.MinDmg + bonus
@@ -143,7 +147,7 @@ func DirectCast(sim *Simulation, p PlayerAgent, cast *Cast) {
 		}
 		cast.DidHit = true
 
-		crit := (p.Stats[stats.SpellCrit] / 2208.0) + cast.BonusCrit // 22.08 crit == 1% crit
+		crit := (character.Stats[stats.SpellCrit] / (SpellCritRatingPerCritChance * 100)) + cast.BonusCrit
 		if sim.Rando.Float64("cast crit") < crit {
 			cast.DidCrit = true
 			dmg *= cast.CritDamageMultipier
@@ -184,20 +188,20 @@ func DirectCast(sim *Simulation, p PlayerAgent, cast *Cast) {
 		cast.DidDmg = dmg
 		// Apply any effects specific to this cast.
 		if cast.Effect != nil {
-			cast.Effect(sim, p, cast)
+			cast.Effect(sim, agent, cast)
 		}
 		// Apply any on spell hit effects.
-		for _, id := range p.ActiveAuraIDs {
-			if p.Auras[id].OnSpellHit != nil {
-				p.Auras[id].OnSpellHit(sim, p, cast)
+		for _, id := range character.ActiveAuraIDs {
+			if character.Auras[id].OnSpellHit != nil {
+				character.Auras[id].OnSpellHit(sim, agent, cast)
 			}
 		}
 		for _, id := range sim.ActiveAuraIDs {
 			if sim.Auras[id].OnSpellHit != nil {
-				sim.Auras[id].OnSpellHit(sim, p, cast)
+				sim.Auras[id].OnSpellHit(sim, agent, cast)
 			}
 		}
-		p.OnSpellHit(sim, p, cast)
+		agent.OnSpellHit(sim, cast)
 		// if sim.Log != nil {
 		// 	sim.Log("FINAL DMG: %0.1f\n", cast.DidDmg)
 		// }
@@ -208,29 +212,29 @@ func DirectCast(sim *Simulation, p PlayerAgent, cast *Cast) {
 		cast.DidDmg = 0
 		cast.DidCrit = false
 		cast.DidHit = false
-		for _, id := range p.ActiveAuraIDs {
-			if p.Auras[id].OnSpellMiss != nil {
-				p.Auras[id].OnSpellMiss(sim, p, cast)
+		for _, id := range character.ActiveAuraIDs {
+			if character.Auras[id].OnSpellMiss != nil {
+				character.Auras[id].OnSpellMiss(sim, agent, cast)
 			}
 		}
 		for _, id := range sim.ActiveAuraIDs {
 			if sim.Auras[id].OnSpellMiss != nil {
-				sim.Auras[id].OnSpellMiss(sim, p, cast)
+				sim.Auras[id].OnSpellMiss(sim, agent, cast)
 			}
 		}
 	}
 
 	if cast.Spell.Cooldown > 0 {
-		p.SetCD(cast.Spell.ID, cast.Spell.Cooldown+sim.CurrentTime)
+		character.SetCD(cast.Spell.ID, cast.Spell.Cooldown+sim.CurrentTime)
 	}
 
 	if sim.Log != nil {
-		sim.Log("(%d) %s: %0.0f\n", p.ID, dbgCast, cast.DidDmg)
+		sim.Log("(%d) %s: %0.0f\n", character.ID, dbgCast, cast.DidDmg)
 	}
 
 	sim.Metrics.Casts = append(sim.Metrics.Casts, cast)
 	sim.Metrics.TotalDamage += cast.DidDmg
-	sim.Metrics.IndividualMetrics[p.ID].TotalDamage += cast.DidDmg
+	sim.Metrics.IndividualMetrics[character.ID].TotalDamage += cast.DidDmg
 	// if sim.Log != nil {
 	// 	sim.Log("Total Dmg: %0.1f\n", sim.Metrics.TotalDamage)
 	// }

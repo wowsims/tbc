@@ -1,38 +1,36 @@
 package druid
 
 import (
+	"github.com/wowsims/tbc/sim/api"
 	"github.com/wowsims/tbc/sim/core"
-	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-func NewBuffBot(sim *core.Simulation, party *core.Party, gotw, moonkin, ravenIdol bool) *Druid {
-
-	if gotw {
-		for _, raidParty := range sim.Raid.Parties {
-			for _, pl := range raidParty.Players {
-				// assumes improved gotw, rounded down to nearest int... not sure if that is accurate.
-				pl.Stats[stats.Intellect] += 18
-				pl.InitialStats[stats.Intellect] += 18
-				// FUTURE: Add melee stats here.
-			}
-		}
-	}
-
-	if moonkin {
-		s := stats.Stats{stats.SpellCrit: 110.4}
-		if ravenIdol {
-			s[stats.SpellCrit] += 20
-		}
-		party.AddInitialStats(s)
-	}
-
-	return &Druid{}
-}
-
 type Druid struct {
-	core.Agent
+	*core.Character
 }
 
-func (m *Druid) BuffUp(sim *core.Simulation, party *core.Party) {
+func (druid *Druid) GetCharacter() *core.Character {
+	return druid.Character
+}
 
+func (druid *Druid) AddRaidBuffs(buffs *core.Buffs) {
+	// TODO: Use talents to check for imp gotw
+	buffs.GiftOfTheWild = api.TristateEffect_TristateEffectRegular
+}
+func (druid *Druid) AddPartyBuffs(buffs *core.Buffs) {
+	//buffs.Moonkin = api.TristateEffect_TristateEffectRegular
+	// check for idol of raven goddess equipped
+}
+
+func (druid *Druid) BuffUp(sim *core.Simulation) {
+}
+
+func (druid *Druid) OnSpellHit(sim *core.Simulation, cast *core.Cast) {
+}
+func (druid *Druid) ChooseAction(sim *core.Simulation) core.AgentAction {
+	return core.AgentAction{Wait: core.NeverExpires} // makes the bot wait forever and do nothing.
+}
+func (druid *Druid) OnActionAccepted(sim *core.Simulation, action core.AgentAction) {
+}
+func (druid *Druid) Reset(newsim *core.Simulation) {
 }

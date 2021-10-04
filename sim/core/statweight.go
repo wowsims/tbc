@@ -1,4 +1,4 @@
-package runner
+package core
 
 import (
 	"log"
@@ -17,9 +17,9 @@ type StatWeightsResult struct {
 }
 
 func CalcStatWeight(params IndividualParams, statsToWeigh []stats.Stat, referenceStat stats.Stat) StatWeightsResult {
-	baseSim := SetupIndividualSim(params)
-	baseStats := baseSim.Raid.Parties[0].Players[0].Stats
-	baselineResult := RunIndividualSim(baseSim)
+	baseSim := NewIndividualSim(params)
+	baseStats := baseSim.Raid.Parties[0].Players[0].GetCharacter().Stats
+	baselineResult := baseSim.Run()
 
 	var waitGroup sync.WaitGroup
 	result := StatWeightsResult{}
@@ -30,8 +30,8 @@ func CalcStatWeight(params IndividualParams, statsToWeigh []stats.Stat, referenc
 
 		newParams := params
 		newParams.CustomStats[stat] += value
-		newSim := SetupIndividualSim(newParams)
-		simResult := RunIndividualSim(newSim)
+		newSim := NewIndividualSim(newParams)
+		simResult := newSim.Run()
 		result.Weights[stat] = (simResult.DpsAvg - baselineResult.DpsAvg) / value
 		dpsHists[stat] = simResult.DpsHist
 	}

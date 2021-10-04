@@ -2,13 +2,13 @@ package shaman
 
 import "github.com/wowsims/tbc/sim/core"
 
-func NewEnhancement(p *core.Player, agent int, options map[string]string) *Enhancement {
-	return &Enhancement{Player: p}
+func NewEnhancement(character *core.Character, agent int, options map[string]string) *Enhancement {
+	return &Enhancement{Character: character}
 }
 
 type Enhancement struct {
-	shamanAgent
-	*core.Player
+	core.Agent
+	*core.Character
 }
 
 // BuffUp lets you buff up all players in sim.

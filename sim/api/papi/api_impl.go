@@ -5,12 +5,15 @@ import (
 	"time"
 
 	"github.com/wowsims/tbc/items"
+	"github.com/wowsims/tbc/sim"
 	"github.com/wowsims/tbc/sim/api"
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/stats"
-	"github.com/wowsims/tbc/sim/runner"
-	"github.com/wowsims/tbc/sim/shaman"
 )
+
+func init() {
+	sim.RegisterAll()
+}
 
 func getGearListImpl(request *api.GearListRequest) *api.GearListResult {
 	result := &api.GearListResult{}
@@ -65,10 +68,10 @@ func computeStatsImpl(request *api.ComputeStatsRequest) *api.ComputeStatsResult 
 
 func statsFromIndSimRequest(isr *api.IndividualSimRequest) *api.ComputeStatsResult {
 	sim := createSim(isr)
-	gearStats := sim.Raid.Parties[0].Players[0].Equip.Stats()
+	gearStats := sim.Raid.Parties[0].Players[0].GetCharacter().Equip.Stats()
 	return &api.ComputeStatsResult{
 		GearOnly:   gearStats[:],
-		FinalStats: sim.Raid.Parties[0].Players[0].Stats[:], // createSim includes a call to buff up all party members.
+		FinalStats: sim.Raid.Parties[0].Players[0].GetCharacter().Stats[:], // createSim includes a call to buff up all party members.
 		Sets:       []string{},
 	}
 }
@@ -78,7 +81,7 @@ func statWeightsImpl(request *api.StatWeightsRequest) *api.StatWeightsResult {
 	for i, v := range request.StatsToWeigh {
 		statsToWeight[i] = stats.Stat(v)
 	}
-	result := runner.CalcStatWeight(convertSimParams(request.Options), statsToWeight, stats.Stat(request.EpReferenceStat))
+	result := core.CalcStatWeight(convertSimParams(request.Options), statsToWeight, stats.Stat(request.EpReferenceStat))
 	return &api.StatWeightsResult{
 		Weights:       result.Weights[:],
 		WeightsStdev:  result.WeightsStdev[:],
@@ -87,7 +90,7 @@ func statWeightsImpl(request *api.StatWeightsRequest) *api.StatWeightsResult {
 	}
 }
 
-func convertSimParams(request *api.IndividualSimRequest) runner.IndividualParams {
+func convertSimParams(request *api.IndividualSimRequest) core.IndividualParams {
 	options := core.Options{
 		Iterations: int(request.Iterations),
 		RSeed:      request.RandomSeed,
@@ -103,42 +106,29 @@ func convertSimParams(request *api.IndividualSimRequest) runner.IndividualParams
 		}
 	}
 
-	params := runner.IndividualParams{
-		Equip:       convertEquip(request.Player.Equipment),
-		Race:        core.RaceBonusType(request.Player.Options.Race),
-		Consumes:    convertConsumes(request.Player.Options.Consumes),
-		Buffs:       convertBuffs(request.Buffs),
-		Options:     options,
+	params := core.IndividualParams{
+		Equip:    convertEquip(request.Player.Equipment),
+		Race:     core.RaceBonusType(request.Player.Options.Race),
+		Consumes: convertConsumes(request.Player.Options.Consumes),
+		Buffs:    convertBuffs(request.Buffs),
+		Options:  options,
+
+		PlayerOptions: request.Player.Options,
 	}
 	copy(params.CustomStats[:], request.Player.CustomStats[:])
-
-	switch v := request.Player.Options.Spec.(type) {
-	case *api.PlayerOptions_ElementalShaman:
-		talents := convertShamTalents(v.ElementalShaman.Talents)
-		totems := convertTotems(request.Buffs)
-		params.Spec = shaman.ElementalSpec{
-			Talents: talents,
-			Totems:  totems,
-			AgentID: shaman.AgentType(v.ElementalShaman.Agent.Type),
-		}
-
-	default:
-		panic("class not supported")
-	}
 
 	return params
 }
 
 func createSim(request *api.IndividualSimRequest) *core.Simulation {
 	params := convertSimParams(request)
-	sim := runner.SetupIndividualSim(params)
-
+	sim := core.NewIndividualSim(params)
 	return sim
 }
 
 func runSimulationImpl(request *api.IndividualSimRequest) *api.IndividualSimResult {
 	sim := createSim(request)
-	result := runner.RunIndividualSim(sim)
+	result := sim.Run()
 
 	castMetrics := map[int32]*api.CastMetric{}
 	for k, v := range result.Casts {
@@ -162,30 +152,6 @@ func runSimulationImpl(request *api.IndividualSimRequest) *api.IndividualSimResu
 		Casts:               castMetrics,
 	}
 	return isr
-}
-
-func convertTotems(inBuff *api.Buffs) shaman.Totems {
-	return shaman.Totems{
-		TotemOfWrath: int(inBuff.TotemOfWrath),
-		WrathOfAir:   inBuff.WrathOfAirTotem != api.TristateEffect_TristateEffectMissing,
-		ManaStream:   inBuff.ManaSpringTotem != api.TristateEffect_TristateEffectMissing,
-	}
-}
-
-func convertShamTalents(t *api.ShamanTalents) shaman.Talents {
-	return shaman.Talents{
-		LightningOverload:  int(t.LightningOverload),
-		ElementalPrecision: int(t.ElementalPrecision),
-		NaturesGuidance:    int(t.NaturesGuidance),
-		TidalMastery:       int(t.TidalMastery),
-		ElementalMastery:   t.ElementalMastery,
-		UnrelentingStorm:   int(t.UnrelentingStorm),
-		CallOfThunder:      int(t.CallOfThunder),
-		Convection:         int(t.Convection),
-		Concussion:         int(t.Concussion),
-		LightningMastery:   int(t.LightningMastery),
-		ElementalFocus:     t.ElementalFocus,
-	}
 }
 
 func convertConsumes(c *api.Consumes) core.Consumes {
@@ -232,18 +198,28 @@ func convertEquip(es *api.EquipmentSpec) items.EquipmentSpec {
 func convertBuffs(inBuff *api.Buffs) core.Buffs {
 	// TODO: support tri-state better
 	return core.Buffs{
-		ArcaneInt:                 inBuff.ArcaneBrilliance,
-		GiftOfTheWild:             inBuff.GiftOfTheWild != api.TristateEffect_TristateEffectMissing,
+		ArcaneBrilliance:          inBuff.ArcaneBrilliance,
+		GiftOfTheWild:             inBuff.GiftOfTheWild,
 		BlessingOfKings:           inBuff.BlessingOfKings,
-		ImprovedBlessingOfWisdom:  inBuff.BlessingOfWisdom != api.TristateEffect_TristateEffectMissing,
-		ImprovedDivineSpirit:      inBuff.DivineSpirit != api.TristateEffect_TristateEffectMissing,
-		Moonkin:                   inBuff.MoonkinAura != api.TristateEffect_TristateEffectMissing,
-		MoonkinRavenGoddess:       inBuff.MoonkinAura == api.TristateEffect_TristateEffectImproved,
-		SpriestDPS:                uint16(inBuff.ShadowPriestDps),
-		EyeOfNight:                inBuff.EyeOfTheNight,
-		TwilightOwl:               inBuff.ChainOfTheTwilightOwl,
+		BlessingOfWisdom:          inBuff.BlessingOfWisdom,
+		DivineSpirit:              inBuff.DivineSpirit,
+		MoonkinAura:               inBuff.MoonkinAura,
+		ShadowPriestDPS:           uint16(inBuff.ShadowPriestDps),
+
 		JudgementOfWisdom:         inBuff.JudgementOfWisdom,
 		ImprovedSealOfTheCrusader: inBuff.ImprovedSealOfTheCrusader,
 		Misery:                    inBuff.Misery,
+
+		ManaSpringTotem:           inBuff.ManaSpringTotem,
+		ManaTideTotem:             inBuff.ManaTideTotem,
+		TotemOfWrath:              inBuff.TotemOfWrath,
+		WrathOfAirTotem:           inBuff.WrathOfAirTotem,
+
+		AtieshMage:                inBuff.AtieshMage,
+		AtieshWarlock:             inBuff.AtieshWarlock,
+		BraidedEterniumChain:      inBuff.BraidedEterniumChain,
+		ChainOfTheTwilightOwl:     inBuff.ChainOfTheTwilightOwl,
+		EyeOfTheNight:             inBuff.EyeOfTheNight,
+		JadePendantOfBlasting:     inBuff.JadePendantOfBlasting,
 	}
 }

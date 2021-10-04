@@ -9,8 +9,8 @@ import (
 
 var basicSpec = &api.PlayerOptions_ElementalShaman{
 	ElementalShaman: &api.ElementalShaman{
-		Agent: &api.ElementalShaman_ElementalShamanAgent{
-			Type: api.ElementalShaman_ElementalShamanAgent_Adaptive,
+		Agent: &api.ElementalShaman_Agent{
+			Type: api.ElementalShaman_Agent_Adaptive,
 		},
 		Talents: &api.ShamanTalents{
 			// ElementalDevastation
@@ -25,7 +25,7 @@ var basicSpec = &api.PlayerOptions_ElementalShaman{
 			ElementalMastery:   true,
 			LightningOverload:  5,
 		},
-		Options: &api.ElementalShaman_ElementalShamanOptions{
+		Options: &api.ElementalShaman_Options{
 			WaterShield: true,
 		},
 	},

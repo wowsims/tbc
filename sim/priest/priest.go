@@ -1,28 +1,27 @@
 package priest
 
 import (
+	"github.com/wowsims/tbc/sim/api"
 	"github.com/wowsims/tbc/sim/core"
-	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-func NewBuffBot(sim *core.Simulation, party *core.Party, misery bool, spriestDPS float64) *Priest {
-
-	// shadow priest buff bot just statically applies mp5
-	if spriestDPS > 0 {
-		party.AddInitialStats(stats.Stats{stats.MP5: float64(spriestDPS) * 0.25})
-	}
-
-	return &Priest{
-		misery: misery,
-	}
-}
-
 type Priest struct {
-	misery bool
-	core.Agent
+	*core.Character
 }
 
-func (p *Priest) ChooseAction(_ *core.Simulation, party *core.Party) core.AgentAction {
+func (priest *Priest) GetCharacter() *core.Character {
+	return priest.Character
+}
+
+func (priest *Priest) AddRaidBuffs(buffs *core.Buffs) {
+	buffs.Misery = true
+	buffs.DivineSpirit = api.TristateEffect_TristateEffectRegular
+}
+func (priest *Priest) AddPartyBuffs(buffs *core.Buffs) {
+	buffs.ShadowPriestDPS += 0
+}
+
+func (p *Priest) ChooseAction(_ *core.Simulation) core.AgentAction {
 	return core.AgentAction{Wait: core.NeverExpires} // makes the bot wait forever and do nothing.
 }
 
@@ -30,21 +29,8 @@ func (p *Priest) OnActionAccepted(*core.Simulation, core.AgentAction) {
 
 }
 
-func (p *Priest) BuffUp(sim *core.Simulation, party *core.Party) {
-	if p.misery {
-		sim.AddAura(sim, core.PlayerAgent{}, MiseryAura())
-	}
+func (p *Priest) BuffUp(sim *core.Simulation) {
 }
 
 func (p *Priest) Reset(sim *core.Simulation)                                {}
-func (p *Priest) OnSpellHit(*core.Simulation, core.PlayerAgent, *core.Cast) {}
-
-func MiseryAura() core.Aura {
-	return core.Aura{
-		ID:      core.MagicIDMisery,
-		Expires: core.NeverExpires,
-		OnSpellHit: func(sim *core.Simulation, p core.PlayerAgent, c *core.Cast) {
-			c.DidDmg *= 1.05
-		},
-	}
-}
+func (p *Priest) OnSpellHit(*core.Simulation, *core.Cast) {}

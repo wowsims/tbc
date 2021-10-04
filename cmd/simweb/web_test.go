@@ -1,11 +1,13 @@
 package main
 
 import (
+	"bufio"
 	"bytes"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"testing"
+	"time"
 
 	"github.com/wowsims/tbc/sim/api"
 	"google.golang.org/protobuf/proto"
@@ -13,8 +15,8 @@ import (
 
 var basicSpec = &api.PlayerOptions_ElementalShaman{
 	ElementalShaman: &api.ElementalShaman{
-		Agent: &api.ElementalShaman_ElementalShamanAgent{
-			Type: api.ElementalShaman_ElementalShamanAgent_Adaptive,
+		Agent: &api.ElementalShaman_Agent{
+			Type: api.ElementalShaman_Agent_Adaptive,
 		},
 		Talents: &api.ShamanTalents{
 			// ElementalDevastation
@@ -29,7 +31,7 @@ var basicSpec = &api.PlayerOptions_ElementalShaman{
 			ElementalMastery:   true,
 			LightningOverload:  5,
 		},
-		Options: &api.ElementalShaman_ElementalShamanOptions{
+		Options: &api.ElementalShaman_Options{
 			WaterShield: true,
 		},
 	},
@@ -73,6 +75,14 @@ var p1Equip = &api.EquipmentSpec{
 		{Id: 28770, Enchant: 22555},
 		{Id: 29268},
 	},
+}
+
+func init() {
+	go func() {
+		runServer(true, ":3333", false, bufio.NewReader(bytes.NewBuffer([]byte{})))
+	}()
+
+	time.Sleep(time.Second) // hack so we have time for server to startup. Probably could repeatedly curl the endpoint until it responds.
 }
 
 // TestIndividualSim is just a smoke test to make sure the http server works as expected.

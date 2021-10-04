@@ -1,14 +1,18 @@
-package runner
+package shaman
 
 import (
 	"log"
 	"testing"
 
 	"github.com/wowsims/tbc/items"
+	"github.com/wowsims/tbc/sim/api"
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/stats"
-	"github.com/wowsims/tbc/sim/shaman"
 )
+
+func init() {
+	RegisterElementalShaman()
+}
 
 // TODO:
 //  1. How to handle buffs that modify stats based on stats? Kings, Unrelenting Storms, etc.
@@ -33,17 +37,10 @@ var basicOptions = core.Options{
 }
 
 var basicBuffs = core.Buffs{
-	ArcaneInt:                false,
-	GiftOfTheWild:            false,
-	BlessingOfKings:          false,
-	ImprovedBlessingOfWisdom: false,
-	JudgementOfWisdom:        false,
-	Moonkin:                  false,
-	SpriestDPS:               0,
-	Bloodlust:                1,
+	Bloodlust: 1,
 }
 
-var shamTalents = shaman.Talents{
+var shamTalents = api.ShamanTalents{
 	ElementalFocus:     true,
 	LightningMastery:   5,
 	LightningOverload:  5,
@@ -57,33 +54,72 @@ var shamTalents = shaman.Talents{
 	Convection:         5,
 }
 
-var shamTotems = shaman.Totems{
-	WrathOfAir:   true,
-	TotemOfWrath: 1,
-	ManaStream:   true,
+var playerOptionsAdaptive = api.PlayerOptions{
+	Spec: &api.PlayerOptions_ElementalShaman{
+		ElementalShaman: &api.ElementalShaman{
+			Talents: &shamTalents,
+			Options: &api.ElementalShaman_Options{
+				WaterShield: true,
+			},
+			Agent: &api.ElementalShaman_Agent{
+				Type: api.ElementalShaman_Agent_Adaptive,
+			},
+		},
+	},
+}
+
+var playerOptionsLBOnly = api.PlayerOptions{
+	Spec: &api.PlayerOptions_ElementalShaman{
+		ElementalShaman: &api.ElementalShaman{
+			Talents: &shamTalents,
+			Options: &api.ElementalShaman_Options{
+				WaterShield: true,
+			},
+			Agent: &api.ElementalShaman_Agent{
+				Type: api.ElementalShaman_Agent_FixedLBCL,
+			},
+		},
+	},
+}
+
+var playerOptionsCLOnClearcast = api.PlayerOptions{
+	Spec: &api.PlayerOptions_ElementalShaman{
+		ElementalShaman: &api.ElementalShaman{
+			Talents: &shamTalents,
+			Options: &api.ElementalShaman_Options{
+				WaterShield: true,
+			},
+			Agent: &api.ElementalShaman_Agent{
+				Type: api.ElementalShaman_Agent_CLOnClearcast,
+			},
+		},
+	},
 }
 
 var fullBuffs = core.Buffs{
-	ArcaneInt:                true,
-	GiftOfTheWild:            true,
-	BlessingOfKings:          true,
-	ImprovedBlessingOfWisdom: true,
-	JudgementOfWisdom:        true,
-	Moonkin:                  true,
-	SpriestDPS:               500,
-	Bloodlust:                1,
+	ArcaneBrilliance:  true,
+	GiftOfTheWild:     api.TristateEffect_TristateEffectRegular,
+	BlessingOfKings:   true,
+	BlessingOfWisdom:  api.TristateEffect_TristateEffectRegular,
+	JudgementOfWisdom: true,
+	MoonkinAura:       api.TristateEffect_TristateEffectRegular,
+	ShadowPriestDPS:   500,
+	Bloodlust:         1,
 	// Misery:                   true,
+
+	ManaSpringTotem: api.TristateEffect_TristateEffectRegular,
+	TotemOfWrath:    1,
+	WrathOfAirTotem: api.TristateEffect_TristateEffectRegular,
 }
 
 var fullConsumes = core.Consumes{
-	FlaskOfBlindingLight:   true,
-	BrilliantWizardOil:     true,
-	ElixirOfMajorMageblood: false,
-	BlackenedBasilisk:      true,
-	DestructionPotion:      true,
-	SuperManaPotion:        true,
-	DarkRune:               true,
-	DrumsOfBattle:          true,
+	FlaskOfBlindingLight: true,
+	BrilliantWizardOil:   true,
+	BlackenedBasilisk:    true,
+	DestructionPotion:    true,
+	SuperManaPotion:      true,
+	DarkRune:             true,
+	DrumsOfBattle:        true,
 }
 
 var preRaidGear = []string{
@@ -126,24 +162,6 @@ var p1Gear = []string{
 	"Mazthoril Honor Shield",
 }
 
-func TestSimulatePreRaidNoBuffs(t *testing.T) {
-	simAllEncountersTest(AllEncountersTestOptions{
-		label: "preRaid",
-		t:     t,
-
-		Options: basicOptions,
-		// no consumes
-		Buffs: basicBuffs,
-		Race:  core.RaceBonusTypeOrc,
-
-		Spec: shaman.ElementalSpec{Talents: shamTalents, AgentID: shaman.AgentTypeAdaptive},
-		Gear: gearFromStrings(preRaidGear),
-
-		ExpectedDpsShort: 952,
-		ExpectedDpsLong:  276,
-	})
-}
-
 func gearFromStrings(gears []string) items.EquipmentSpec {
 	eq := items.EquipmentSpec{}
 	for i, gear := range gears {
@@ -156,6 +174,24 @@ func gearFromStrings(gears []string) items.EquipmentSpec {
 	return eq
 }
 
+func TestSimulatePreRaidNoBuffs(t *testing.T) {
+	simAllEncountersTest(AllEncountersTestOptions{
+		label: "preRaid",
+		t:     t,
+
+		Options: basicOptions,
+		// no consumes
+		Buffs: basicBuffs,
+		Race:  core.RaceBonusTypeTroll10,
+
+		PlayerOptions: &playerOptionsAdaptive,
+		Gear:          gearFromStrings(preRaidGear),
+
+		ExpectedDpsShort: 867,
+		ExpectedDpsLong:  269,
+	})
+}
+
 func TestSimulatePreRaid(t *testing.T) {
 	simAllEncountersTest(AllEncountersTestOptions{
 		label: "preRaid",
@@ -166,11 +202,11 @@ func TestSimulatePreRaid(t *testing.T) {
 		Buffs:    fullBuffs,
 		Race:     core.RaceBonusTypeOrc,
 
-		Spec: shaman.ElementalSpec{Talents: shamTalents, Totems: shamTotems, AgentID: shaman.AgentTypeAdaptive},
-		Gear: gearFromStrings(preRaidGear),
+		PlayerOptions: &playerOptionsAdaptive,
+		Gear:          gearFromStrings(preRaidGear),
 
-		ExpectedDpsShort: 1406,
-		ExpectedDpsLong:  1098,
+		ExpectedDpsShort: 1398.5,
+		ExpectedDpsLong:  1096.3,
 	})
 }
 
@@ -184,11 +220,11 @@ func TestSimulateP1(t *testing.T) {
 		Buffs:    fullBuffs,
 		Race:     core.RaceBonusTypeOrc,
 
-		Spec: shaman.ElementalSpec{Talents: shamTalents, Totems: shamTotems, AgentID: shaman.AgentTypeAdaptive},
-		Gear: gearFromStrings(p1Gear),
+		PlayerOptions: &playerOptionsAdaptive,
+		Gear:          gearFromStrings(p1Gear),
 
-		ExpectedDpsShort: 1527,
-		ExpectedDpsLong:  1226.6,
+		ExpectedDpsShort: 1539.5,
+		ExpectedDpsLong:  1260.3,
 	})
 }
 
@@ -204,22 +240,26 @@ func TestSimulateP1(t *testing.T) {
 // 			},
 // 			AGENT_TYPE_ADAPTIVE),
 // 		p1Gear,
-// 		1678.5)
+//      1533.5)
 // }
 
-// func TestLBOnlyAgent(t *testing.T) {
-// 	simAllEncountersTest(AllEncountersTestOptions{
-// 		label: "lbOnly",
-// 		t:     t,
+func TestLBOnlyAgent(t *testing.T) {
+	simAllEncountersTest(AllEncountersTestOptions{
+		label: "lbonly",
+		t:     t,
 
-// 		Options:   fullOptions,
-// 		Gear:      p1Gear,
-// 		AgentType: AGENT_TYPE_FIXED_LB_ONLY,
+		Options:  basicOptions,
+		Consumes: fullConsumes,
+		Buffs:    fullBuffs,
+		Race:     core.RaceBonusTypeOrc,
 
-// 		ExpectedDpsShort: 1581.1,
-// 		ExpectedDpsLong:  1227.6,
-// 	})
-// }
+		PlayerOptions: &playerOptionsLBOnly,
+		Gear:          gearFromStrings(p1Gear),
+
+		ExpectedDpsShort: 1581.1,
+		ExpectedDpsLong:  1271.9,
+	})
+}
 
 // func TestFixedAgent(t *testing.T) {
 // 	simAllEncountersTest(AllEncountersTestOptions{
@@ -245,11 +285,11 @@ func TestClearcastAgent(t *testing.T) {
 		Buffs:    fullBuffs,
 		Race:     core.RaceBonusTypeOrc,
 
-		Spec: shaman.ElementalSpec{Talents: shamTalents, Totems: shamTotems, AgentID: shaman.AgentTypeCLOnClearcast},
-		Gear: gearFromStrings(p1Gear),
+		PlayerOptions: &playerOptionsCLOnClearcast,
+		Gear:          gearFromStrings(p1Gear),
 
-		ExpectedDpsShort: 1468.4,
-		ExpectedDpsLong:  1214.2,
+		ExpectedDpsShort: 1459.8,
+		ExpectedDpsLong:  1221.8,
 	})
 }
 
@@ -261,18 +301,18 @@ func TestAverageDPS(t *testing.T) {
 	options.Encounter = longEncounter
 	// options.Debug = true
 
-	params := IndividualParams{
-		Equip:       eq,
-		Race:        core.RaceBonusTypeOrc,
-		Consumes:    fullConsumes,
-		Buffs:       fullBuffs,
-		Options:     options,
-		Spec:        shaman.ElementalSpec{Talents: shamTalents, Totems: shamTotems, AgentID: shaman.AgentTypeAdaptive},
-		CustomStats: stats.Stats{},
+	params := core.IndividualParams{
+		Equip:         eq,
+		Race:          core.RaceBonusTypeOrc,
+		Consumes:      fullConsumes,
+		Buffs:         fullBuffs,
+		Options:       options,
+		PlayerOptions: &playerOptionsAdaptive,
+		CustomStats:   stats.Stats{},
 	}
 
-	sim := SetupIndividualSim(params)
-	result := RunIndividualSim(sim)
+	sim := core.NewIndividualSim(params)
+	result := sim.Run()
 
 	log.Printf("result.DpsAvg: %0.1f", result.DpsAvg)
 	log.Printf("LOGS:\n %s\n", result.Logs)
@@ -298,21 +338,23 @@ type AllEncountersTestOptions struct {
 	Buffs    core.Buffs
 	Consumes core.Consumes
 	Race     core.RaceBonusType
-	Spec     AgentCreator
+
+	PlayerOptions *api.PlayerOptions
 
 	ExpectedDpsShort float64
 	ExpectedDpsLong  float64
 }
 
 func simAllEncountersTest(testOpts AllEncountersTestOptions) {
-	params := IndividualParams{
-		Equip:       testOpts.Gear,
-		Race:        testOpts.Race,
-		Consumes:    testOpts.Consumes,
-		Buffs:       testOpts.Buffs,
-		Options:     makeOptions(testOpts.Options, shortEncounter),
-		Spec:        testOpts.Spec,
-		CustomStats: stats.Stats{},
+	params := core.IndividualParams{
+		Equip:    testOpts.Gear,
+		Race:     testOpts.Race,
+		Consumes: testOpts.Consumes,
+		Buffs:    testOpts.Buffs,
+		Options:  makeOptions(testOpts.Options, shortEncounter),
+
+		PlayerOptions: testOpts.PlayerOptions,
+		CustomStats:   stats.Stats{},
 	}
 	doSimulateTest(
 		testOpts.label+"-short",
@@ -331,12 +373,12 @@ func simAllEncountersTest(testOpts AllEncountersTestOptions) {
 // Performs a basic end-to-end test of the simulator.
 //   This is where we can add more sophisticated checks if we would like.
 //   Any changes to the damage output of an item set
-func doSimulateTest(label string, t *testing.T, params IndividualParams, expectedDps float64) {
+func doSimulateTest(label string, t *testing.T, params core.IndividualParams, expectedDps float64) {
 	// params.Options.Debug = true
 	// params.Options.Iterations = 1
 
-	sim := SetupIndividualSim(params)
-	result := RunIndividualSim(sim)
+	sim := core.NewIndividualSim(params)
+	result := sim.Run()
 
 	log.Printf("LOGS:\n%s\n", result.Logs)
 	tolerance := 0.5

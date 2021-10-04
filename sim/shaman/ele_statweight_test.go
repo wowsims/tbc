@@ -1,11 +1,10 @@
-package runner
+package shaman
 
 import (
 	"testing"
 
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/stats"
-	"github.com/wowsims/tbc/sim/shaman"
 )
 
 func TestCalcStatWeight(t *testing.T) {
@@ -13,29 +12,29 @@ func TestCalcStatWeight(t *testing.T) {
 	options.Iterations = 5000
 	options.Encounter = shortEncounter
 
-	params := IndividualParams{
+	params := core.IndividualParams{
 		Equip:       gearFromStrings(p1Gear),
 		Race:        core.RaceBonusTypeTroll10,
 		Consumes:    fullConsumes,
 		Buffs:       fullBuffs,
 		Options:     options,
-		Spec:        shaman.ElementalSpec{Talents: shamTalents, Totems: shamTotems, AgentID: shaman.AgentTypeAdaptive},
+		PlayerOptions: &playerOptionsAdaptive,
 		CustomStats: stats.Stats{},
 	}
 
 	tests := []struct {
 		name   string
-		params IndividualParams
-		want   StatWeightsResult
+		params core.IndividualParams
+		want   core.StatWeightsResult
 	}{
-		{name: "First Test", params: params, want: StatWeightsResult{
+		{name: "First Test", params: params, want: core.StatWeightsResult{
 			EpValues: stats.Stats{stats.Intellect: 0.23, stats.SpellPower: 1, stats.SpellHit: 1.90, stats.SpellCrit: 0.65},
 		}},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := CalcStatWeight(tt.params, []stats.Stat{stats.SpellPower, stats.SpellHit, stats.Intellect, stats.SpellCrit}, stats.SpellPower); !statsEqual(got.EpValues, tt.want.EpValues) {
+			if got := core.CalcStatWeight(tt.params, []stats.Stat{stats.SpellPower, stats.SpellHit, stats.Intellect, stats.SpellCrit}, stats.SpellPower); !statsEqual(got.EpValues, tt.want.EpValues) {
 				t.Errorf("CalcStatWeight() = %v, want %v", got.EpValues, tt.want.EpValues)
 			}
 		})
