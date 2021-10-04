@@ -129,7 +129,7 @@ type LBOnlyAgent struct {
 	lb *core.Spell
 }
 
-func (agent *LBOnlyAgent) ChooseAction(shaman* Shaman, sim *core.Simulation) core.AgentAction {
+func (agent *LBOnlyAgent) ChooseAction(shaman *Shaman, sim *core.Simulation) core.AgentAction {
 	return NewCastAction(shaman, sim, agent.lb)
 }
 
@@ -373,10 +373,22 @@ func NewAdaptiveAgent(sim *core.Simulation) *AdaptiveAgent {
 	clearcastParams := sim.IndividualParams
 	clearcastParams.Options.Debug = false
 	clearcastParams.Options.Iterations = 100
-	eleShamParams := *clearcastParams.PlayerOptions.GetElementalShaman()
-	eleShamParams.Agent.Type = api.ElementalShaman_Agent_CLOnClearcast
-	clearcastParams.PlayerOptions.Spec = &api.PlayerOptions_ElementalShaman{
-		ElementalShaman: &eleShamParams,
+
+	// eleShamParams := *clearcastParams.PlayerOptions.GetElementalShaman()
+	// eleShamParams.Agent.Type = api.ElementalShaman_Agent_CLOnClearcast
+	params := *clearcastParams.PlayerOptions.GetElementalShaman()
+
+	eleShamParams := params                                                                         // clone
+	eleShamParams.Agent = &api.ElementalShaman_Agent{Type: api.ElementalShaman_Agent_CLOnClearcast} // create new agent.
+
+	// Assign new eleShamParams
+	clearcastParams.PlayerOptions = &api.PlayerOptions{
+		Race: sim.IndividualParams.PlayerOptions.Race, //primitive, no pointer
+		Spec: &api.PlayerOptions_ElementalShaman{
+			ElementalShaman: &eleShamParams,
+		},
+		// reuse pointer since this isn't mutated
+		Consumes: sim.IndividualParams.PlayerOptions.Consumes,
 	}
 
 	clearcastSim := core.NewIndividualSim(clearcastParams)
