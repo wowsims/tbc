@@ -68,6 +68,20 @@ var playerOptionsAdaptive = api.PlayerOptions{
 	},
 }
 
+var playerOptionsLBOnly = api.PlayerOptions{
+	Spec: &api.PlayerOptions_ElementalShaman{
+		ElementalShaman: &api.ElementalShaman{
+			Talents: &shamTalents,
+			Options: &api.ElementalShaman_Options{
+				WaterShield: true,
+			},
+			Agent: &api.ElementalShaman_Agent{
+				Type: api.ElementalShaman_Agent_FixedLBCL,
+			},
+		},
+	},
+}
+
 var playerOptionsCLOnClearcast = api.PlayerOptions{
 	Spec: &api.PlayerOptions_ElementalShaman{
 		ElementalShaman: &api.ElementalShaman{
@@ -83,29 +97,29 @@ var playerOptionsCLOnClearcast = api.PlayerOptions{
 }
 
 var fullBuffs = core.Buffs{
-	ArcaneBrilliance:         true,
-	GiftOfTheWild:            api.TristateEffect_TristateEffectRegular,
-	BlessingOfKings:          true,
-	BlessingOfWisdom:         api.TristateEffect_TristateEffectRegular,
-	JudgementOfWisdom:        true,
-	MoonkinAura:              api.TristateEffect_TristateEffectRegular,
-	ShadowPriestDPS:          500,
-	Bloodlust:                1,
+	ArcaneBrilliance:  true,
+	GiftOfTheWild:     api.TristateEffect_TristateEffectRegular,
+	BlessingOfKings:   true,
+	BlessingOfWisdom:  api.TristateEffect_TristateEffectRegular,
+	JudgementOfWisdom: true,
+	MoonkinAura:       api.TristateEffect_TristateEffectRegular,
+	ShadowPriestDPS:   500,
+	Bloodlust:         1,
 	// Misery:                   true,
 
-	ManaSpringTotem:   api.TristateEffect_TristateEffectRegular,
-	TotemOfWrath: 1,
-	WrathOfAirTotem:   api.TristateEffect_TristateEffectRegular,
+	ManaSpringTotem: api.TristateEffect_TristateEffectRegular,
+	TotemOfWrath:    1,
+	WrathOfAirTotem: api.TristateEffect_TristateEffectRegular,
 }
 
 var fullConsumes = core.Consumes{
-	FlaskOfBlindingLight:   true,
-	BrilliantWizardOil:     true,
-	BlackenedBasilisk:      true,
-	DestructionPotion:      true,
-	SuperManaPotion:        true,
-	DarkRune:               true,
-	DrumsOfBattle:          true,
+	FlaskOfBlindingLight: true,
+	BrilliantWizardOil:   true,
+	BlackenedBasilisk:    true,
+	DestructionPotion:    true,
+	SuperManaPotion:      true,
+	DarkRune:             true,
+	DrumsOfBattle:        true,
 }
 
 var preRaidGear = []string{
@@ -171,10 +185,10 @@ func TestSimulatePreRaidNoBuffs(t *testing.T) {
 		Race:  core.RaceBonusTypeTroll10,
 
 		PlayerOptions: &playerOptionsAdaptive,
-		Gear: gearFromStrings(preRaidGear),
+		Gear:          gearFromStrings(preRaidGear),
 
 		ExpectedDpsShort: 867,
-		ExpectedDpsLong:  276,
+		ExpectedDpsLong:  269,
 	})
 }
 
@@ -189,10 +203,10 @@ func TestSimulatePreRaid(t *testing.T) {
 		Race:     core.RaceBonusTypeOrc,
 
 		PlayerOptions: &playerOptionsAdaptive,
-		Gear: gearFromStrings(preRaidGear),
+		Gear:          gearFromStrings(preRaidGear),
 
-		ExpectedDpsShort: 1406,
-		ExpectedDpsLong:  1098,
+		ExpectedDpsShort: 1398.5,
+		ExpectedDpsLong:  1082,
 	})
 }
 
@@ -207,10 +221,10 @@ func TestSimulateP1(t *testing.T) {
 		Race:     core.RaceBonusTypeOrc,
 
 		PlayerOptions: &playerOptionsAdaptive,
-		Gear: gearFromStrings(p1Gear),
+		Gear:          gearFromStrings(p1Gear),
 
-		ExpectedDpsShort: 1527,
-		ExpectedDpsLong:  1226.6,
+		ExpectedDpsShort: 1539.5,
+		ExpectedDpsLong:  1260.3,
 	})
 }
 
@@ -226,22 +240,26 @@ func TestSimulateP1(t *testing.T) {
 // 			},
 // 			AGENT_TYPE_ADAPTIVE),
 // 		p1Gear,
-// 		1678.5)
+//      1533.5)
 // }
 
-// func TestLBOnlyAgent(t *testing.T) {
-// 	simAllEncountersTest(AllEncountersTestOptions{
-// 		label: "lbOnly",
-// 		t:     t,
+func TestLBOnlyAgent(t *testing.T) {
+	simAllEncountersTest(AllEncountersTestOptions{
+		label: "lbonly",
+		t:     t,
 
-// 		Options:   fullOptions,
-// 		Gear:      p1Gear,
-// 		AgentType: AGENT_TYPE_FIXED_LB_ONLY,
+		Options:  basicOptions,
+		Consumes: fullConsumes,
+		Buffs:    fullBuffs,
+		Race:     core.RaceBonusTypeOrc,
 
-// 		ExpectedDpsShort: 1581.1,
-// 		ExpectedDpsLong:  1227.6,
-// 	})
-// }
+		PlayerOptions: &playerOptionsLBOnly,
+		Gear:          gearFromStrings(p1Gear),
+
+		ExpectedDpsShort: 1581.1,
+		ExpectedDpsLong:  1271.9,
+	})
+}
 
 // func TestFixedAgent(t *testing.T) {
 // 	simAllEncountersTest(AllEncountersTestOptions{
@@ -268,10 +286,10 @@ func TestClearcastAgent(t *testing.T) {
 		Race:     core.RaceBonusTypeOrc,
 
 		PlayerOptions: &playerOptionsCLOnClearcast,
-		Gear: gearFromStrings(p1Gear),
+		Gear:          gearFromStrings(p1Gear),
 
-		ExpectedDpsShort: 1468.4,
-		ExpectedDpsLong:  1214.2,
+		ExpectedDpsShort: 1459.8,
+		ExpectedDpsLong:  1221.8,
 	})
 }
 
@@ -284,13 +302,13 @@ func TestAverageDPS(t *testing.T) {
 	// options.Debug = true
 
 	params := core.IndividualParams{
-		Equip:       eq,
-		Race:        core.RaceBonusTypeOrc,
-		Consumes:    fullConsumes,
-		Buffs:       fullBuffs,
-		Options:     options,
+		Equip:         eq,
+		Race:          core.RaceBonusTypeOrc,
+		Consumes:      fullConsumes,
+		Buffs:         fullBuffs,
+		Options:       options,
 		PlayerOptions: &playerOptionsAdaptive,
-		CustomStats: stats.Stats{},
+		CustomStats:   stats.Stats{},
 	}
 
 	sim := core.NewIndividualSim(params)
@@ -329,11 +347,11 @@ type AllEncountersTestOptions struct {
 
 func simAllEncountersTest(testOpts AllEncountersTestOptions) {
 	params := core.IndividualParams{
-		Equip:       testOpts.Gear,
-		Race:        testOpts.Race,
-		Consumes:    testOpts.Consumes,
-		Buffs:       testOpts.Buffs,
-		Options:     makeOptions(testOpts.Options, shortEncounter),
+		Equip:    testOpts.Gear,
+		Race:     testOpts.Race,
+		Consumes: testOpts.Consumes,
+		Buffs:    testOpts.Buffs,
+		Options:  makeOptions(testOpts.Options, shortEncounter),
 
 		PlayerOptions: testOpts.PlayerOptions,
 		CustomStats:   stats.Stats{},
