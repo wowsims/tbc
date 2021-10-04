@@ -6,6 +6,7 @@ import (
 	"math/rand"
 	"sync"
 
+	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
@@ -16,7 +17,7 @@ type StatWeightsResult struct {
 	EpValuesStdev stats.Stats
 }
 
-func CalcStatWeight(params IndividualParams, statsToWeigh []stats.Stat, referenceStat stats.Stat) StatWeightsResult {
+func CalcStatWeight(params core.IndividualParams, statsToWeigh []stats.Stat, referenceStat stats.Stat) StatWeightsResult {
 	baseSim := SetupIndividualSim(params)
 	baseStats := baseSim.Raid.Parties[0].Players[0].GetCharacter().Stats
 	baselineResult := RunIndividualSim(baseSim)

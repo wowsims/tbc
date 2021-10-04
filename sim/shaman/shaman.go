@@ -10,14 +10,14 @@ import (
 )
 
 func newShaman(character *core.Character, talents Talents, totems Totems, waterShield bool, agent shamanAgent) *Shaman {
+	// Water shield
 	character.InitialStats[stats.MP5] += 50
-
-	character.InitialStats = character.InitialStats.Add(totems.Stats())
 
 	shaman := &Shaman{
 		Character: character,
 		agent  :   agent,
 		Talents:   talents,
+		Totems:    totems,
 
 		convectionBonus: 0.02 * float64(talents.Convection),
 		concussionBonus: 1 + 0.01*float64(talents.Concussion),
@@ -26,25 +26,11 @@ func newShaman(character *core.Character, talents Talents, totems Totems, waterS
 	return shaman
 }
 
+// Which totems this shaman is dropping.
 type Totems struct {
-	TotemOfWrath int
+	TotemOfWrath bool
 	WrathOfAir   bool
-	ManaStream   bool
-}
-
-func (tt Totems) Stats() stats.Stats {
-	totemStats := stats.Stats{}
-	if tt.TotemOfWrath > 0 {
-		totemStats[stats.SpellCrit] += 66.24 * float64(tt.TotemOfWrath)
-		totemStats[stats.SpellHit] += 37.8 * float64(tt.TotemOfWrath)
-	}
-	if tt.WrathOfAir {
-		totemStats[stats.SpellPower] += 101
-	}
-	if tt.ManaStream {
-		totemStats[stats.MP5] += 50
-	}
-	return totemStats
+	ManaSpring   bool
 }
 
 // Agent is shaman specific agent for behavior.
@@ -65,7 +51,8 @@ type Shaman struct {
 
 	agent shamanAgent
 
-	Talents      Talents     // Shaman Talents
+	Talents Talents
+	Totems  Totems
 
 	// HACK HACK HACK
 	// TODO: do we actually need a 'on start' method for agents?
@@ -81,6 +68,26 @@ type Shaman struct {
 
 func (shaman *Shaman) GetCharacter() *core.Character {
 	return shaman.Character
+}
+
+func (shaman *Shaman) AddRaidBuffs(buffs *core.Buffs) {
+}
+func (shaman *Shaman) AddPartyBuffs(buffs *core.Buffs) {
+	// TODO: Figure out how to do this w/o messing with existing settings
+	//buffs.Bloodlust += 1
+
+	if shaman.Totems.TotemOfWrath {
+		buffs.TotemOfWrath += 1
+	}
+
+	if shaman.Totems.ManaSpring {
+		buffs.ManaSpringTotem = api.TristateEffect_TristateEffectRegular
+	}
+
+	if shaman.Totems.WrathOfAir {
+		// TODO: Check for t4 set bonus
+		buffs.WrathOfAirTotem = api.TristateEffect_TristateEffectRegular
+	}
 }
 
 // BuffUp lets you buff up all characters in sim (and yourself)

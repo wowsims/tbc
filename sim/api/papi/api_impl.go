@@ -86,7 +86,7 @@ func statWeightsImpl(request *api.StatWeightsRequest) *api.StatWeightsResult {
 	}
 }
 
-func convertSimParams(request *api.IndividualSimRequest) runner.IndividualParams {
+func convertSimParams(request *api.IndividualSimRequest) core.IndividualParams {
 	options := core.Options{
 		Iterations: int(request.Iterations),
 		RSeed:      request.RandomSeed,
@@ -102,7 +102,7 @@ func convertSimParams(request *api.IndividualSimRequest) runner.IndividualParams
 		}
 	}
 
-	params := runner.IndividualParams{
+	params := core.IndividualParams{
 		Equip:    convertEquip(request.Player.Equipment),
 		Race:     core.RaceBonusType(request.Player.Options.Race),
 		Consumes: convertConsumes(request.Player.Options.Consumes),
@@ -195,16 +195,14 @@ func convertEquip(es *api.EquipmentSpec) items.EquipmentSpec {
 func convertBuffs(inBuff *api.Buffs) core.Buffs {
 	// TODO: support tri-state better
 	return core.Buffs{
-		ArcaneInt:                 inBuff.ArcaneBrilliance,
-		GiftOfTheWild:             inBuff.GiftOfTheWild != api.TristateEffect_TristateEffectMissing,
+		ArcaneBrilliance:          inBuff.ArcaneBrilliance,
+		GiftOfTheWild:             inBuff.GiftOfTheWild,
 		BlessingOfKings:           inBuff.BlessingOfKings,
-		ImprovedBlessingOfWisdom:  inBuff.BlessingOfWisdom != api.TristateEffect_TristateEffectMissing,
-		ImprovedDivineSpirit:      inBuff.DivineSpirit != api.TristateEffect_TristateEffectMissing,
-		Moonkin:                   inBuff.MoonkinAura != api.TristateEffect_TristateEffectMissing,
-		MoonkinRavenGoddess:       inBuff.MoonkinAura == api.TristateEffect_TristateEffectImproved,
-		SpriestDPS:                uint16(inBuff.ShadowPriestDps),
-		EyeOfNight:                inBuff.EyeOfTheNight,
-		TwilightOwl:               inBuff.ChainOfTheTwilightOwl,
+		BlessingOfWisdom:          inBuff.BlessingOfWisdom,
+		DivineSpirit:              inBuff.DivineSpirit,
+		MoonkinAura:               inBuff.MoonkinAura,
+		ShadowPriestDPS:           uint16(inBuff.ShadowPriestDps),
+
 		JudgementOfWisdom:         inBuff.JudgementOfWisdom,
 		ImprovedSealOfTheCrusader: inBuff.ImprovedSealOfTheCrusader,
 		Misery:                    inBuff.Misery,
@@ -213,5 +211,12 @@ func convertBuffs(inBuff *api.Buffs) core.Buffs {
 		ManaTideTotem:             inBuff.ManaTideTotem,
 		TotemOfWrath:              inBuff.TotemOfWrath,
 		WrathOfAirTotem:           inBuff.WrathOfAirTotem,
+
+		AtieshMage:                inBuff.AtieshMage,
+		AtieshWarlock:             inBuff.AtieshWarlock,
+		BraidedEterniumChain:      inBuff.BraidedEterniumChain,
+		ChainOfTheTwilightOwl:     inBuff.ChainOfTheTwilightOwl,
+		EyeOfTheNight:             inBuff.EyeOfTheNight,
+		JadePendantOfBlasting:     inBuff.JadePendantOfBlasting,
 	}
 }

@@ -8,51 +8,6 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-type Party struct {
-	Players []Agent
-}
-
-func (party *Party) AddPlayer(player Agent) {
-	party.Players = append(party.Players, player)
-	player.GetCharacter().Party = party
-}
-
-func (party *Party) AddAura(sim *Simulation, aura Aura) {
-	for _, agent := range party.Players {
-		agent.GetCharacter().AddAura(sim, aura)
-	}
-}
-
-func (party *Party) AddInitialStats(s stats.Stats) {
-	for _, agent := range party.Players {
-		agent.GetCharacter().AddInitialStats(s)
-	}
-}
-
-// AddStats adds a temporary increase to each players stats.
-//  This will be reset at the end of the simulation. (using player InitialStats)
-func (p *Party) AddStats(s stats.Stats) {
-	for _, agent := range p.Players {
-		agent.GetCharacter().AddStats(s)
-	}
-}
-
-type Raid struct {
-	Parties []*Party
-}
-
-func (raid Raid) AddInitialStats(s stats.Stats) {
-	for _, party := range raid.Parties {
-		party.AddInitialStats(s)
-	}
-}
-
-func (raid Raid) AddStats(s stats.Stats) {
-	for _, party := range raid.Parties {
-		party.AddStats(s)
-	}
-}
-
 // Character is a data structure to hold all the shared values that all
 // class logic shares.
 // All players have stats, equipment, auras, etc
@@ -89,7 +44,6 @@ func (character *Character) AddStats(s stats.Stats) {
 func (character *Character) HasteBonus() float64 {
 	return 1 + (character.Stats[stats.SpellHaste] / 1576)
 }
-
 func NewCharacter(equipSpec items.EquipmentSpec, race RaceBonusType, consumes Consumes, customStats stats.Stats) *Character {
 	equip := items.NewEquipmentSet(equipSpec)
 	// log.Printf("Gear Stats: %s", equip.Stats().Print())
@@ -207,6 +161,40 @@ func (character *Character) ActivateSets(sim *Simulation) []string {
 	}
 
 	return active
+}
+
+const (
+	AtieshMage            = 22589
+	AtieshWarlock         = 22630
+	BraidedEterniumChain  = 24114
+	ChainOfTheTwilightOwl = 24121
+	EyeOfTheNight         = 24116
+	JadePendantOfBlasting = 20966
+)
+
+func (character *Character) AddRaidBuffs(buffs *Buffs) {
+}
+func (character *Character) AddPartyBuffs(buffs *Buffs) {
+	// TODO: Figure out how to sync these with general settings
+	//if character.Equip[items.ItemSlotMainHand].ID == AtieshMage {
+	//	buffs.AtieshMage += 1
+	//}
+	//if character.Equip[items.ItemSlotMainHand].ID == AtieshWarlock {
+	//	buffs.AtieshWarlock += 1
+	//}
+
+	if character.Equip[items.ItemSlotNeck].ID == BraidedEterniumChain {
+		buffs.BraidedEterniumChain = true
+	}
+	if character.Equip[items.ItemSlotNeck].ID == ChainOfTheTwilightOwl {
+		buffs.ChainOfTheTwilightOwl = true
+	}
+	if character.Equip[items.ItemSlotNeck].ID == EyeOfTheNight {
+		buffs.EyeOfTheNight = true
+	}
+	if character.Equip[items.ItemSlotNeck].ID == JadePendantOfBlasting {
+		buffs.JadePendantOfBlasting = true
+	}
 }
 
 // TODO: This probably should be moved into each class because they all have different base stats.
