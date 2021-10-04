@@ -206,7 +206,7 @@ func TestSimulatePreRaid(t *testing.T) {
 		Gear:          gearFromStrings(preRaidGear),
 
 		ExpectedDpsShort: 1398.5,
-		ExpectedDpsLong:  1082,
+		ExpectedDpsLong:  1096.3,
 	})
 }
 
