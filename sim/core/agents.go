@@ -4,8 +4,16 @@ import (
 	"time"
 )
 
+// Agent can be thought of as the 'Player', i.e. the thing controlling the Character.
+// This is the interface implemented by each class/spec.
 type Agent interface {
+	// The Character controller by this Agent.
 	GetCharacter() *Character
+
+	// Updates the input Buffs to include raid-wide buffs provided by this Agent.
+	AddRaidBuffs(*Buffs)
+	// Updates the input Buffs to include party-wide buffs provided by this Agent.
+	AddPartyBuffs(*Buffs)
 
 	// Any pre-start buffs to apply to the raid/party/self
 	BuffUp(*Simulation)

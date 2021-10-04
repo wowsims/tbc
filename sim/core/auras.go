@@ -615,24 +615,6 @@ func ActivateTLC(sim *Simulation, agent Agent) Aura {
 	}
 }
 
-//// Because this buff actually lasts 30min, lets just assume we never lose the buff.
-//func ActivateChainTO(sim *Simulation, agent Agent) Aura {
-//	const bonus = 2 * 22.08 // 2% crit
-//	agent.GetCharacter().Party.AddStats(stats.Stats{stats.SpellCrit: bonus})
-//	return Aura{
-//		ID: MagicIDChainTO,
-//	}
-//}
-//
-//// Because this buff actually lasts 30min, lets just assume we never lose the buff.
-//func ActivateEyeOfNight(sim *Simulation, agent Agent) Aura {
-//	const bonus = 34
-//	agent.GetCharacter().Party.AddStats(stats.Stats{stats.SpellPower: bonus})
-//	return Aura{
-//		ID: MagicIDEyeOfTheNight,
-//	}
-//}
-
 func ActivateCycloneManaReduce(sim *Simulation, agent Agent) Aura {
 	return Aura{
 		ID:      MagicIDCyclone4pc,

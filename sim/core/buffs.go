@@ -8,31 +8,6 @@ import (
 )
 
 type Buffs struct {
-	// // Raid Buff
-	// ArcaneBrilliance bool
-	// BlessingOfKings  bool
-	// BlessingOfWisdom TristateEffect
-	// DivineSpirit     TristateEffect
-	// GiftOfTheWild    TristateEffect
-
-	// // Party Buff
-	// Bloodlust       int32
-	// MoonkinAura     TristateEffect
-	// ShadowPriestDps int32
-
-	// // Target Debuff
-	// JudgementOfWisdom         bool
-	// ImprovedSealOfTheCrusader bool
-	// Misery                    bool
-
-	// // Items
-	// AtieshMage            int32
-	// AtieshWarlock         int32
-	// BraidedEterniumChain  bool
-	// EyeOfTheNight         bool
-	// ChainOfTheTwilightOwl bool
-	// JadePendantOfBlasting bool
-
 	// Totems
 	ManaSpringTotem api.TristateEffect
 	ManaTideTotem   bool
@@ -40,32 +15,170 @@ type Buffs struct {
 	WrathOfAirTotem api.TristateEffect
 
 	// Raid buffs
-	ArcaneInt                bool
-	GiftOfTheWild            bool
-	BlessingOfKings          bool
-	ImprovedBlessingOfWisdom bool
-	ImprovedDivineSpirit     bool
+	ArcaneBrilliance bool
+	GiftOfTheWild    api.TristateEffect
+	BlessingOfKings  bool
+	BlessingOfWisdom api.TristateEffect
+	DivineSpirit     api.TristateEffect
 
 	// Party class buffs
-	Moonkin             bool
-	MoonkinRavenGoddess bool   // adds 20 spell crit to moonkin aura
-	SpriestDPS          uint16 // adds Mp5 ~ 25% (dps*5%*5sec = 25%)
+	MoonkinAura         api.TristateEffect
+	ShadowPriestDPS     uint16 // adds Mp5 ~ 25% (dps*5%*5sec = 25%)
 	Bloodlust           int
 
-	// TODO: Do these need to be here? Should I just use this instead of the shaman.Totems struct?
-	//  Balance druids wouldnt want to import shaman.Totems probably? Or maybe those can go in a reduced package that can be shared.
-	// WrathOfAir          bool
-	// TotemOfWrath        bool
-	// ManaStream          bool
-
 	// Party item buffs
-	EyeOfNight  bool // Eye of night bonus from party member (not you)
-	TwilightOwl bool // from party member
+	AtieshMage            int32
+	AtieshWarlock         int32
+	BraidedEterniumChain  bool
+	ChainOfTheTwilightOwl bool
+	EyeOfTheNight         bool
+	JadePendantOfBlasting bool
 
 	// Target debuff
 	JudgementOfWisdom         bool
 	ImprovedSealOfTheCrusader bool
 	Misery                    bool
+}
+
+//func TristateMax(a api.TristateEffect, b api.TristateEffect) api.TristateEffect {
+//}
+
+func GetTristateValueFloat(effect api.TristateEffect, regularValue float64, impValue float64) float64 {
+	if effect == api.TristateEffect_TristateEffectRegular {
+		return regularValue
+	} else if effect == api.TristateEffect_TristateEffectImproved {
+		return impValue
+	} else {
+		return 0
+	}
+}
+
+// Applies buffs that affect the sim as a whole.
+func (buffs Buffs) ApplyToSim(sim *Simulation) {
+	if buffs.Misery {
+		sim.AddInitialAura(func(sim *Simulation) Aura {
+			return MiseryAura()
+		})
+	}
+
+	if buffs.JudgementOfWisdom {
+		sim.AddInitialAura(func(sim *Simulation) Aura {
+			return AuraJudgementOfWisdom()
+		})
+	}
+}
+
+// Applies buffs that affect individual players.
+func (buffs Buffs) ApplyToPlayer(agent Agent) {
+	character := agent.GetCharacter()
+
+	if buffs.ArcaneBrilliance {
+		character.AddInitialStats(stats.Stats{
+			stats.Intellect: 40,
+		})
+	}
+
+	// TODO: Figure out imp value
+	gotwAmount := GetTristateValueFloat(buffs.GiftOfTheWild, 18.0, 18.0)
+	// TODO: Pretty sure some of these dont stack with fort/ai/divine spirit
+	character.AddInitialStats(stats.Stats{
+		stats.Stamina: gotwAmount,
+		stats.Agility: gotwAmount,
+		stats.Strength: gotwAmount,
+		stats.Intellect: gotwAmount,
+		stats.Spirit: gotwAmount,
+	})
+
+	character.AddInitialStats(stats.Stats{
+		stats.SpellCrit: GetTristateValueFloat(buffs.MoonkinAura, 5 * SpellCritRatingPerCritChance, 5 * SpellCritRatingPerCritChance + 20),
+	})
+
+	character.AddInitialStats(stats.Stats{
+		stats.Spirit: GetTristateValueFloat(buffs.DivineSpirit, 50.0, 50.0),
+	})
+
+	// shadow priest buff bot just statically applies mp5
+	if buffs.ShadowPriestDPS > 0 {
+		character.AddInitialStats(stats.Stats{
+			stats.MP5: float64(buffs.ShadowPriestDPS) * 0.25,
+		})
+	}
+
+	// TODO: Double-check these numbers
+	character.AddInitialStats(stats.Stats{
+		stats.MP5: GetTristateValueFloat(buffs.BlessingOfWisdom, 42.0, 50.0),
+	})
+
+	if buffs.ImprovedSealOfTheCrusader {
+		character.AddInitialStats(stats.Stats{
+			stats.SpellCrit: 3 * SpellCritRatingPerCritChance,
+		})
+		// FUTURE: melee crit bonus, research actual value
+	}
+
+	if buffs.TotemOfWrath > 0 {
+		character.AddInitialStats(stats.Stats{
+			stats.SpellCrit: 3 * SpellCritRatingPerCritChance * float64(buffs.TotemOfWrath),
+			stats.SpellHit: 37.8 * float64(buffs.TotemOfWrath),
+		})
+	}
+	character.AddInitialStats(stats.Stats{
+		stats.SpellPower: GetTristateValueFloat(buffs.WrathOfAirTotem, 101.0, 121.0),
+	})
+	character.AddInitialStats(stats.Stats{
+		stats.MP5: GetTristateValueFloat(buffs.ManaSpringTotem, 50, 62.5),
+	})
+
+	character.AddInitialStats(stats.Stats{
+		stats.SpellCrit: 28 * float64(buffs.AtieshMage),
+	})
+	character.AddInitialStats(stats.Stats{
+		stats.SpellPower: 33 * float64(buffs.AtieshWarlock),
+		stats.HealingPower: 33 * float64(buffs.AtieshWarlock),
+	})
+
+	if buffs.BraidedEterniumChain {
+		character.AddInitialStats(stats.Stats{stats.MeleeCrit: 28})
+	}
+	if buffs.EyeOfTheNight {
+		character.AddInitialStats(stats.Stats{stats.SpellPower: 34})
+	}
+	if buffs.JadePendantOfBlasting {
+		character.AddInitialStats(stats.Stats{stats.SpellPower: 15})
+	}
+	if buffs.ChainOfTheTwilightOwl {
+		character.AddInitialStats(stats.Stats{stats.SpellCrit: 2 * SpellCritRatingPerCritChance })
+	}
+}
+
+func MiseryAura() Aura {
+	return Aura{
+		ID:      MagicIDMisery,
+		Expires: NeverExpires,
+		OnSpellHit: func(sim *Simulation, agent Agent, cast *Cast) {
+			cast.DidDmg *= 1.05
+		},
+	}
+}
+
+func AuraJudgementOfWisdom() Aura {
+	const mana = 74 / 2 // 50% proc
+	return Aura{
+		ID:      MagicIDJoW,
+		Expires: NeverExpires,
+		OnSpellHit: func(sim *Simulation, agent Agent, c *Cast) {
+			if c.Spell.ID == MagicIDTLCLB {
+				return // TLC cant proc JoW
+			}
+			if sim.Log != nil {
+				sim.Log("(%d) +Judgement Of Wisdom: 37 mana (74 @ 50%% proc)\n", agent.GetCharacter().ID)
+			}
+			// Only apply to agents that have mana.
+			if agent.GetCharacter().InitialStats[stats.Mana] > 0 {
+				agent.GetCharacter().Stats[stats.Mana] += mana
+			}
+		},
+	}
 }
 
 type RaceBonusType byte

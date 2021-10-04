@@ -12,7 +12,7 @@ func TestCalcStatWeight(t *testing.T) {
 	options.Iterations = 5000
 	options.Encounter = shortEncounter
 
-	params := IndividualParams{
+	params := core.IndividualParams{
 		Equip:       gearFromStrings(p1Gear),
 		Race:        core.RaceBonusTypeTroll10,
 		Consumes:    fullConsumes,
@@ -24,7 +24,7 @@ func TestCalcStatWeight(t *testing.T) {
 
 	tests := []struct {
 		name   string
-		params IndividualParams
+		params core.IndividualParams
 		want   StatWeightsResult
 	}{
 		{name: "First Test", params: params, want: StatWeightsResult{

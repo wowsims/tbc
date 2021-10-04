@@ -4,32 +4,15 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/wowsims/tbc/items"
 	"github.com/wowsims/tbc/sim/api"
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/stats"
-	"github.com/wowsims/tbc/sim/druid"
-	"github.com/wowsims/tbc/sim/mage"
-	"github.com/wowsims/tbc/sim/paladin"
-	"github.com/wowsims/tbc/sim/priest"
 	"github.com/wowsims/tbc/sim/shaman"
 )
 
 // TODO: Should we move the 'buff bots' to a subpackage so we dont have to import the full class unless we are actually wanting the whole class?
 
-type IndividualParams struct {
-	Equip    items.EquipmentSpec
-	Race     core.RaceBonusType
-	Consumes core.Consumes
-	Buffs    core.Buffs
-	Options  core.Options
-
-	PlayerOptions *api.PlayerOptions
-
-	CustomStats stats.Stats
-}
-
-func SetupIndividualSim(params IndividualParams) *core.Simulation {
+func SetupIndividualSim(params core.IndividualParams) *core.Simulation {
 	character := core.NewCharacter(params.Equip, params.Race, params.Consumes, params.CustomStats)
 
 	var agent core.Agent
@@ -42,40 +25,16 @@ func SetupIndividualSim(params IndividualParams) *core.Simulation {
 		panic(fmt.Sprintf("Class not supported: %v\n", v))
 	}
 
-	party := &core.Party{
-		Players: []core.Agent{},
-	}
-	raid := &core.Raid{Parties: []*core.Party{party}}
+	raid := core.NewRaid(params.Buffs)
+	raid.AddPlayer(agent)
 
-	party.AddPlayer(agent)
+	raid.AddPlayerBuffs()
 
-
-	buffs := params.Buffs
 	options := params.Options
 
 	sim := core.NewSim(raid, options)
-
-	// These buffs are a one-time apply... no need to add the bots to the raid group.
-	//  the constructors apply their buffs to the party.
-	party.AddPlayer(druid.NewBuffBot(sim, party, buffs.GiftOfTheWild, buffs.Moonkin, buffs.MoonkinRavenGoddess))
-	party.AddPlayer(mage.NewBuffBot(sim, party, buffs.ArcaneInt))
-
-	// These apply auras on every sim reset
-	party.AddPlayer(priest.NewBuffBot(sim, party, buffs.Misery, float64(buffs.SpriestDPS)))
-	party.AddPlayer(paladin.NewBuffBot(sim, party, buffs.BlessingOfKings, buffs.ImprovedBlessingOfWisdom, buffs.ImprovedSealOfTheCrusader, buffs.JudgementOfWisdom))
-
-	// TODO: Buffs as a whole needs refactoring
-	if buffs.TwilightOwl {
-		const bonus = 2 * 22.08 // 2% crit
-		party.AddInitialStats(stats.Stats{stats.SpellCrit: bonus})
-	}
-	if buffs.EyeOfNight {
-		const bonus = 34
-		party.AddInitialStats(stats.Stats{stats.SpellPower: bonus})
-	}
-	if buffs.ImprovedDivineSpirit {
-		raid.AddInitialStats(stats.Stats{stats.Spirit: 50})
-	}
+	sim.IndividualParams = params
+	raid.ApplyBuffs(sim)
 
 	sim.Reset()
 
@@ -84,14 +43,14 @@ func SetupIndividualSim(params IndividualParams) *core.Simulation {
 	//   for now this hardcoded buffing works...
 	for _, raidParty := range sim.Raid.Parties {
 		for _, player := range raidParty.Players {
-			if buffs.BlessingOfKings {
+			if raid.Buffs.BlessingOfKings {
 				player.GetCharacter().InitialStats[stats.Stamina] *= 1.1
 				player.GetCharacter().InitialStats[stats.Agility] *= 1.1
 				player.GetCharacter().InitialStats[stats.Strength] *= 1.1
 				player.GetCharacter().InitialStats[stats.Intellect] *= 1.1
 				player.GetCharacter().InitialStats[stats.Spirit] *= 1.1
 			}
-			if buffs.ImprovedDivineSpirit {
+			if raid.Buffs.DivineSpirit == api.TristateEffect_TristateEffectImproved {
 				player.GetCharacter().InitialStats[stats.SpellPower] += player.GetCharacter().InitialStats[stats.Spirit] * 0.1
 			}
 			// Add SpellCrit from Int and Mana from Int

@@ -6,6 +6,8 @@ import (
 	"sort"
 	"time"
 
+	"github.com/wowsims/tbc/items"
+	"github.com/wowsims/tbc/sim/api"
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
@@ -30,11 +32,28 @@ type Encounter struct {
 	Armor      int32
 }
 
+type IndividualParams struct {
+	Equip    items.EquipmentSpec
+	Race     RaceBonusType
+	Consumes Consumes
+	Buffs    Buffs
+	Options  Options
+
+	PlayerOptions *api.PlayerOptions
+
+	CustomStats stats.Stats
+}
+
+type InitialAura func(*Simulation) Aura
+
 type Simulation struct {
 	Raid         *Raid
 	Options      Options
 	Duration     time.Duration
 	*AuraTracker // Global Debuffs mostly.. put on the boss/target
+
+	// Auras which are automatically applied on sim reset.
+	InitialAuras []InitialAura
 
 	// Clears and regenerates on each Run call.
 	Metrics SimMetrics
@@ -48,6 +67,9 @@ type Simulation struct {
 
 	// caches to speed up perf and store temp state
 	cache *cache
+
+	// Holds the params used to create this sim, so similar sims can be run if needed.
+	IndividualParams IndividualParams
 }
 
 type wrappedRandom struct {
@@ -89,6 +111,7 @@ func NewSim(raid *Raid, options Options) *Simulation {
 		Raid:     raid,
 		Options:  options,
 		Duration: durationFromSeconds(options.Encounter.Duration),
+		InitialAuras: []InitialAura{},
 		// Rando:    ,
 		Log: nil,
 		cache: &cache{
@@ -108,6 +131,10 @@ func (sim *Simulation) NewCast() *Cast {
 }
 func (sim *Simulation) ReturnCasts(casts []*Cast) {
 	sim.cache.ReturnCasts(casts)
+}
+
+func (sim *Simulation) AddInitialAura(initialAura InitialAura) {
+	sim.InitialAuras = append(sim.InitialAuras, initialAura)
 }
 
 // Reset will set sim back and erase all current state.
@@ -142,6 +169,10 @@ func (sim *Simulation) Reset() {
 			agent.GetCharacter().BuffUp(sim)
 			agent.BuffUp(sim)
 		}
+	}
+
+	for _, initialAura := range sim.InitialAuras {
+		sim.AddAura(sim, nil, initialAura(sim))
 	}
 }
 

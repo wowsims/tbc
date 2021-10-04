@@ -33,14 +33,7 @@ var basicOptions = core.Options{
 }
 
 var basicBuffs = core.Buffs{
-	ArcaneInt:                false,
-	GiftOfTheWild:            false,
-	BlessingOfKings:          false,
-	ImprovedBlessingOfWisdom: false,
-	JudgementOfWisdom:        false,
-	Moonkin:                  false,
-	SpriestDPS:               0,
-	Bloodlust:                1,
+	Bloodlust: 1,
 
 	ManaSpringTotem:   api.TristateEffect_TristateEffectRegular,
 	TotemOfWrath: 1,
@@ -90,13 +83,13 @@ var playerOptionsCLOnClearcast = api.PlayerOptions{
 }
 
 var fullBuffs = core.Buffs{
-	ArcaneInt:                true,
-	GiftOfTheWild:            true,
+	ArcaneBrilliance:         true,
+	GiftOfTheWild:            api.TristateEffect_TristateEffectRegular,
 	BlessingOfKings:          true,
-	ImprovedBlessingOfWisdom: true,
+	BlessingOfWisdom:         api.TristateEffect_TristateEffectRegular,
 	JudgementOfWisdom:        true,
-	Moonkin:                  true,
-	SpriestDPS:               500,
+	MoonkinAura:              api.TristateEffect_TristateEffectRegular,
+	ShadowPriestDPS:          500,
 	Bloodlust:                1,
 	// Misery:                   true,
 }
@@ -287,7 +280,7 @@ func TestAverageDPS(t *testing.T) {
 	options.Encounter = longEncounter
 	// options.Debug = true
 
-	params := IndividualParams{
+	params := core.IndividualParams{
 		Equip:       eq,
 		Race:        core.RaceBonusTypeOrc,
 		Consumes:    fullConsumes,
@@ -332,7 +325,7 @@ type AllEncountersTestOptions struct {
 }
 
 func simAllEncountersTest(testOpts AllEncountersTestOptions) {
-	params := IndividualParams{
+	params := core.IndividualParams{
 		Equip:       testOpts.Gear,
 		Race:        testOpts.Race,
 		Consumes:    testOpts.Consumes,
@@ -359,7 +352,7 @@ func simAllEncountersTest(testOpts AllEncountersTestOptions) {
 // Performs a basic end-to-end test of the simulator.
 //   This is where we can add more sophisticated checks if we would like.
 //   Any changes to the damage output of an item set
-func doSimulateTest(label string, t *testing.T, params IndividualParams, expectedDps float64) {
+func doSimulateTest(label string, t *testing.T, params core.IndividualParams, expectedDps float64) {
 	// params.Options.Debug = true
 	// params.Options.Iterations = 1
 

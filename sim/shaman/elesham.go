@@ -15,9 +15,9 @@ func NewElementalShaman(character *core.Character, options *api.PlayerOptions, b
 	// TODO: Probably should get this from shaman options rather than buffs.
 	// However, other classes will need totem buffs so it has to be on buffs too.
 	totems := Totems{
-		TotemOfWrath: int(buffs.TotemOfWrath),
+		TotemOfWrath: buffs.TotemOfWrath > 0,
 		WrathOfAir:   buffs.WrathOfAirTotem != api.TristateEffect_TristateEffectMissing,
-		ManaStream:   buffs.ManaSpringTotem != api.TristateEffect_TristateEffectMissing,
+		ManaSpring:   buffs.ManaSpringTotem != api.TristateEffect_TristateEffectMissing,
 	}
 
 	var agent shamanAgent
@@ -359,6 +359,16 @@ func (agent *AdaptiveAgent) OnActionAccepted(shaman *Shaman, sim *core.Simulatio
 }
 
 func (agent *AdaptiveAgent) Reset(shaman *Shaman, sim *core.Simulation) {
+	//clearcastParams = sim.IndividualParams
+	//clearcastParams.Options.Debug = false
+	//clearcastParams.Options.Iterations = 100
+	//eleShamParams = *clearcastParams.PlayerOptions.GetElementalShaman()
+	//eleShamParams.Agent.Type = api.ElementalShaman_Agent_CLOnClearcast
+	//clearcastParams.PlayerOptions.Spec = &eleShamParams
+
+	//clearcatsSim := SetupIndividualSim(clearcastParams)
+	//clearcastResult := RunIndividualSim(clearcastSim)
+
 	if agent.timesOOM == 5 {
 		agent.baseAgent = NewLBOnlyAgent()
 		agent.surplusAgent = NewCLOnClearcastAgent()

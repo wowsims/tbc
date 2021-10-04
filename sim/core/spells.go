@@ -34,6 +34,8 @@ const (
 	CastTypeChannel
 )
 
+const SpellCritRatingPerCritChance = 22.08
+
 // All Spells
 // FUTURE: Downrank Penalty == (spellrankavailbetobetrained+11)/70
 //    Might not even be worth calculating because I don't think there is much case for ever downranking.
@@ -145,7 +147,7 @@ func DirectCast(sim *Simulation, agent Agent, cast *Cast) {
 		}
 		cast.DidHit = true
 
-		crit := (character.Stats[stats.SpellCrit] / 2208.0) + cast.BonusCrit // 22.08 crit == 1% crit
+		crit := (character.Stats[stats.SpellCrit] / (SpellCritRatingPerCritChance * 100)) + cast.BonusCrit
 		if sim.Rando.Float64("cast crit") < crit {
 			cast.DidCrit = true
 			dmg *= cast.CritDamageMultipier
