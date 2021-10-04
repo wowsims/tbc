@@ -8,27 +8,34 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-func NewElementalShaman(character *core.Character, options *api.PlayerOptions, buffs core.Buffs) *Shaman {
+func RegisterElementalShaman() {
+	core.RegisterAgentFactory(api.PlayerOptions_ElementalShaman{}, func(sim *core.Simulation, character *core.Character, options *api.PlayerOptions) core.Agent {
+		return NewElementalShaman(sim, character, options)
+	})
+}
+
+func NewElementalShaman(sim *core.Simulation, character *core.Character, options *api.PlayerOptions) *Shaman {
 	eleShamOptions := options.GetElementalShaman()
 	talents := convertShamTalents(eleShamOptions.Talents)
 
 	// TODO: Probably should get this from shaman options rather than buffs.
 	// However, other classes will need totem buffs so it has to be on buffs too.
-	totems := Totems{
-		TotemOfWrath: buffs.TotemOfWrath > 0,
-		WrathOfAir:   buffs.WrathOfAirTotem != api.TristateEffect_TristateEffectMissing,
-		ManaSpring:   buffs.ManaSpringTotem != api.TristateEffect_TristateEffectMissing,
-	}
+	//totems := Totems{
+	//	TotemOfWrath: buffs.TotemOfWrath > 0,
+	//	WrathOfAir:   buffs.WrathOfAirTotem != api.TristateEffect_TristateEffectMissing,
+	//	ManaSpring:   buffs.ManaSpringTotem != api.TristateEffect_TristateEffectMissing,
+	//}
+	totems := Totems{}
 
 	var agent shamanAgent
 
 	switch eleShamOptions.Agent.Type {
 	case api.ElementalShaman_Agent_Adaptive:
-		agent = NewAdaptiveAgent()
+		agent = NewAdaptiveAgent(sim)
 	case api.ElementalShaman_Agent_CLOnClearcast:
-		agent = NewCLOnClearcastAgent()
+		agent = NewCLOnClearcastAgent(sim)
 	case api.ElementalShaman_Agent_FixedLBCL:
-		agent = NewLBOnlyAgent()
+		agent = NewLBOnlyAgent(sim)
 		// TODO: Add option for this
 		//numLB := agentOptions["numLBtoCL"]
 		//if numLB == -1 {
@@ -37,7 +44,7 @@ func NewElementalShaman(character *core.Character, options *api.PlayerOptions, b
 		//	agent = NewFixedRotationAgent(numLB)
 		//}
 	case api.ElementalShaman_Agent_CLOnCD:
-		agent = NewCLOnCDAgent()
+		agent = NewCLOnCDAgent(sim)
 	}
 
 	return newShaman(character, talents, totems, eleShamOptions.Options.WaterShield, agent)
@@ -130,7 +137,7 @@ func (agent *LBOnlyAgent) OnActionAccepted(shaman *Shaman, sim *core.Simulation,
 }
 func (agent *LBOnlyAgent) Reset(shaman *Shaman, sim *core.Simulation) {}
 
-func NewLBOnlyAgent() *LBOnlyAgent {
+func NewLBOnlyAgent(sim *core.Simulation) *LBOnlyAgent {
 	return &LBOnlyAgent{
 		lb: core.Spells[core.MagicIDLB12],
 	}
@@ -158,7 +165,7 @@ func (agent *CLOnCDAgent) OnActionAccepted(shaman *Shaman, sim *core.Simulation,
 }
 func (agent *CLOnCDAgent) Reset(shaman *Shaman, sim *core.Simulation) {}
 
-func NewCLOnCDAgent() *CLOnCDAgent {
+func NewCLOnCDAgent(sim *core.Simulation) *CLOnCDAgent {
 	return &CLOnCDAgent{
 		lb: core.Spells[core.MagicIDLB12],
 		cl: core.Spells[core.MagicIDCL6],
@@ -219,7 +226,7 @@ func (agent *FixedRotationAgent) Reset(shaman *Shaman, sim *core.Simulation) {
 	agent.numLBsSinceLastCL = agent.numLBsPerCL
 }
 
-func NewFixedRotationAgent(numLBsPerCL int) *FixedRotationAgent {
+func NewFixedRotationAgent(sim *core.Simulation, numLBsPerCL int) *FixedRotationAgent {
 	return &FixedRotationAgent{
 		numLBsPerCL:       numLBsPerCL,
 		numLBsSinceLastCL: numLBsPerCL, // This lets us cast CL first
@@ -257,7 +264,7 @@ func (agent *CLOnClearcastAgent) Reset(shaman *Shaman, sim *core.Simulation) {
 	agent.prevPrevCastProccedCC = true // Lets us cast CL first
 }
 
-func NewCLOnClearcastAgent() *CLOnClearcastAgent {
+func NewCLOnClearcastAgent(sim *core.Simulation) *CLOnClearcastAgent {
 	return &CLOnClearcastAgent{
 		lb: core.Spells[core.MagicIDLB12],
 		cl: core.Spells[core.MagicIDCL6],
@@ -272,8 +279,6 @@ type AdaptiveAgent struct {
 	manaSnapshots      [manaSnapshotsBufferSize]ManaSnapshot
 	numSnapshots       int32
 	firstSnapshotIndex int32
-	timesOOM           int  // count of times gone oom.
-	wentOOM            bool // if agent went OOM this time.
 
 	baseAgent    shamanAgent // The agent used most of the time
 	surplusAgent shamanAgent // The agent used when we have extra mana
@@ -349,31 +354,12 @@ func (agent *AdaptiveAgent) ChooseAction(shaman *Shaman, sim *core.Simulation) c
 	}
 }
 func (agent *AdaptiveAgent) OnActionAccepted(shaman *Shaman, sim *core.Simulation, action core.AgentAction) {
-	if !agent.wentOOM && action.Cast != nil && action.Cast.ManaCost > shaman.Stats[stats.Mana] {
-		agent.timesOOM++
-		agent.wentOOM = true
-	}
 	agent.takeSnapshot(sim, shaman)
 	agent.baseAgent.OnActionAccepted(shaman, sim, action)
 	agent.surplusAgent.OnActionAccepted(shaman, sim, action)
 }
 
 func (agent *AdaptiveAgent) Reset(shaman *Shaman, sim *core.Simulation) {
-	//clearcastParams = sim.IndividualParams
-	//clearcastParams.Options.Debug = false
-	//clearcastParams.Options.Iterations = 100
-	//eleShamParams = *clearcastParams.PlayerOptions.GetElementalShaman()
-	//eleShamParams.Agent.Type = api.ElementalShaman_Agent_CLOnClearcast
-	//clearcastParams.PlayerOptions.Spec = &eleShamParams
-
-	//clearcatsSim := SetupIndividualSim(clearcastParams)
-	//clearcastResult := RunIndividualSim(clearcastSim)
-
-	if agent.timesOOM == 5 {
-		agent.baseAgent = NewLBOnlyAgent()
-		agent.surplusAgent = NewCLOnClearcastAgent()
-	}
-	agent.wentOOM = false
 	agent.manaSnapshots = [manaSnapshotsBufferSize]ManaSnapshot{}
 	agent.firstSnapshotIndex = 0
 	agent.numSnapshots = 0
@@ -381,15 +367,28 @@ func (agent *AdaptiveAgent) Reset(shaman *Shaman, sim *core.Simulation) {
 	agent.surplusAgent.Reset(shaman, sim)
 }
 
-func NewAdaptiveAgent() *AdaptiveAgent {
+func NewAdaptiveAgent(sim *core.Simulation) *AdaptiveAgent {
 	agent := &AdaptiveAgent{}
 
-	// TODO: Can we just start with more aggressive agent and drop to less aggressive if we go OOM 5 times?
-	//   not as deterministic... but probably averages out the same?
-	// Otherwise we need to figure out how to do this after all other agents are setup (in the eventual 'raid' sim setup)
+	clearcastParams := sim.IndividualParams
+	clearcastParams.Options.Debug = false
+	clearcastParams.Options.Iterations = 100
+	eleShamParams := *clearcastParams.PlayerOptions.GetElementalShaman()
+	eleShamParams.Agent.Type = api.ElementalShaman_Agent_CLOnClearcast
+	clearcastParams.PlayerOptions.Spec = &api.PlayerOptions_ElementalShaman{
+		ElementalShaman: &eleShamParams,
+	}
 
-	agent.baseAgent = NewCLOnClearcastAgent()
-	agent.surplusAgent = NewCLOnCDAgent()
+	clearcastSim := core.NewIndividualSim(clearcastParams)
+	clearcastResult := clearcastSim.Run()
+
+	if clearcastResult.NumOom >= 5 {
+		agent.baseAgent = NewLBOnlyAgent(sim)
+		agent.surplusAgent = NewCLOnClearcastAgent(sim)
+	} else {
+		agent.baseAgent = NewCLOnClearcastAgent(sim)
+		agent.surplusAgent = NewCLOnCDAgent(sim)
+	}
 
 	return agent
 }

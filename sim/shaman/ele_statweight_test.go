@@ -1,4 +1,4 @@
-package runner
+package shaman
 
 import (
 	"testing"
@@ -25,16 +25,16 @@ func TestCalcStatWeight(t *testing.T) {
 	tests := []struct {
 		name   string
 		params core.IndividualParams
-		want   StatWeightsResult
+		want   core.StatWeightsResult
 	}{
-		{name: "First Test", params: params, want: StatWeightsResult{
+		{name: "First Test", params: params, want: core.StatWeightsResult{
 			EpValues: stats.Stats{stats.Intellect: 0.23, stats.SpellPower: 1, stats.SpellHit: 1.90, stats.SpellCrit: 0.65},
 		}},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := CalcStatWeight(tt.params, []stats.Stat{stats.SpellPower, stats.SpellHit, stats.Intellect, stats.SpellCrit}, stats.SpellPower); !statsEqual(got.EpValues, tt.want.EpValues) {
+			if got := core.CalcStatWeight(tt.params, []stats.Stat{stats.SpellPower, stats.SpellHit, stats.Intellect, stats.SpellCrit}, stats.SpellPower); !statsEqual(got.EpValues, tt.want.EpValues) {
 				t.Errorf("CalcStatWeight() = %v, want %v", got.EpValues, tt.want.EpValues)
 			}
 		})

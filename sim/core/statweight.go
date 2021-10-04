@@ -1,4 +1,4 @@
-package runner
+package core
 
 import (
 	"log"
@@ -6,7 +6,6 @@ import (
 	"math/rand"
 	"sync"
 
-	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
@@ -17,10 +16,10 @@ type StatWeightsResult struct {
 	EpValuesStdev stats.Stats
 }
 
-func CalcStatWeight(params core.IndividualParams, statsToWeigh []stats.Stat, referenceStat stats.Stat) StatWeightsResult {
-	baseSim := SetupIndividualSim(params)
+func CalcStatWeight(params IndividualParams, statsToWeigh []stats.Stat, referenceStat stats.Stat) StatWeightsResult {
+	baseSim := NewIndividualSim(params)
 	baseStats := baseSim.Raid.Parties[0].Players[0].GetCharacter().Stats
-	baselineResult := RunIndividualSim(baseSim)
+	baselineResult := baseSim.Run()
 
 	var waitGroup sync.WaitGroup
 	result := StatWeightsResult{}
@@ -31,8 +30,8 @@ func CalcStatWeight(params core.IndividualParams, statsToWeigh []stats.Stat, ref
 
 		newParams := params
 		newParams.CustomStats[stat] += value
-		newSim := SetupIndividualSim(newParams)
-		simResult := RunIndividualSim(newSim)
+		newSim := NewIndividualSim(newParams)
+		simResult := newSim.Run()
 		result.Weights[stat] = (simResult.DpsAvg - baselineResult.DpsAvg) / value
 		dpsHists[stat] = simResult.DpsHist
 	}

@@ -5,11 +5,15 @@ import (
 	"time"
 
 	"github.com/wowsims/tbc/items"
+	"github.com/wowsims/tbc/sim"
 	"github.com/wowsims/tbc/sim/api"
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/stats"
-	"github.com/wowsims/tbc/sim/runner"
 )
+
+func init() {
+	sim.RegisterAll()
+}
 
 func getGearListImpl(request *api.GearListRequest) *api.GearListResult {
 	result := &api.GearListResult{}
@@ -77,7 +81,7 @@ func statWeightsImpl(request *api.StatWeightsRequest) *api.StatWeightsResult {
 	for i, v := range request.StatsToWeigh {
 		statsToWeight[i] = stats.Stat(v)
 	}
-	result := runner.CalcStatWeight(convertSimParams(request.Options), statsToWeight, stats.Stat(request.EpReferenceStat))
+	result := core.CalcStatWeight(convertSimParams(request.Options), statsToWeight, stats.Stat(request.EpReferenceStat))
 	return &api.StatWeightsResult{
 		Weights:       result.Weights[:],
 		WeightsStdev:  result.WeightsStdev[:],
@@ -118,14 +122,13 @@ func convertSimParams(request *api.IndividualSimRequest) core.IndividualParams {
 
 func createSim(request *api.IndividualSimRequest) *core.Simulation {
 	params := convertSimParams(request)
-	sim := runner.SetupIndividualSim(params)
-
+	sim := core.NewIndividualSim(params)
 	return sim
 }
 
 func runSimulationImpl(request *api.IndividualSimRequest) *api.IndividualSimResult {
 	sim := createSim(request)
-	result := runner.RunIndividualSim(sim)
+	result := sim.Run()
 
 	castMetrics := map[int32]*api.CastMetric{}
 	for k, v := range result.Casts {

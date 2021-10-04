@@ -1,4 +1,4 @@
-package runner
+package shaman
 
 import (
 	"log"
@@ -9,6 +9,10 @@ import (
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/stats"
 )
+
+func init() {
+	RegisterElementalShaman()
+}
 
 // TODO:
 //  1. How to handle buffs that modify stats based on stats? Kings, Unrelenting Storms, etc.
@@ -290,8 +294,8 @@ func TestAverageDPS(t *testing.T) {
 		CustomStats: stats.Stats{},
 	}
 
-	sim := SetupIndividualSim(params)
-	result := RunIndividualSim(sim)
+	sim := core.NewIndividualSim(params)
+	result := sim.Run()
 
 	log.Printf("result.DpsAvg: %0.1f", result.DpsAvg)
 	log.Printf("LOGS:\n %s\n", result.Logs)
@@ -356,8 +360,8 @@ func doSimulateTest(label string, t *testing.T, params core.IndividualParams, ex
 	// params.Options.Debug = true
 	// params.Options.Iterations = 1
 
-	sim := SetupIndividualSim(params)
-	result := RunIndividualSim(sim)
+	sim := core.NewIndividualSim(params)
+	result := sim.Run()
 
 	log.Printf("LOGS:\n%s\n", result.Logs)
 	tolerance := 0.5
