@@ -9,9 +9,11 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
+	"os/signal"
 	"runtime"
 	"runtime/pprof"
 	"strings"
+	"syscall"
 	"time"
 
 	"github.com/wowsims/tbc/sim/api"
@@ -25,11 +27,16 @@ func main() {
 	var useFS = flag.Bool("usefs", true, "Use local file system and wasm. Set to true for dev")
 	// TODO: usefs for now is set to true until we can solve how to embed the dist.
 	var host = flag.String("host", ":3333", "URL to host the interface on.")
+	var launch = flag.Bool("launch", true, "auto launch browser")
 
 	flag.Parse()
 
+	runServer(*useFS, *host, *launch, bufio.NewReader(os.Stdin))
+}
+
+func runServer(useFS bool, host string, launchBrowser bool, inputReader *bufio.Reader) {
 	var fs http.Handler
-	if *useFS {
+	if useFS {
 		log.Printf("Using local file system for development.")
 		fs = http.FileServer(http.Dir("./dist"))
 	} else {
@@ -50,30 +57,42 @@ func main() {
 		fs.ServeHTTP(resp, req)
 	})
 
-	url := fmt.Sprintf("http://localhost%s/elemental_shaman/", *host)
-	log.Printf("Launching interface on %s", url)
+	if launchBrowser {
+		url := fmt.Sprintf("http://localhost%s/elemental_shaman/", host)
+		log.Printf("Launching interface on %s", url)
+		go func() {
+			var cmd *exec.Cmd
+			if runtime.GOOS == "windows" {
+				cmd = exec.Command("explorer", url)
+			} else if runtime.GOOS == "darwin" {
+				cmd = exec.Command("open", url)
+			} else if runtime.GOOS == "linux" {
+				cmd = exec.Command("xdg-open", url)
+			}
+			err := cmd.Start()
+			if err != nil {
+				log.Printf("Error launching browser: %#v", err.Error())
+			}
+		}()
+	}
 
 	go func() {
-		var cmd *exec.Cmd
-		if runtime.GOOS == "windows" {
-			cmd = exec.Command("explorer", url)
-		} else if runtime.GOOS == "darwin" {
-			cmd = exec.Command("open", url)
-		} else if runtime.GOOS == "linux" {
-			cmd = exec.Command("xdg-open", url)
-		}
-		err := cmd.Start()
-		if err != nil {
-			log.Printf("Error launching browser: %#v", err.Error())
-		}
-		log.Printf("Closing: %s", http.ListenAndServe(*host, nil))
+		// Launch server!
+		log.Printf("Closing: %s", http.ListenAndServe(host, nil))
 	}()
+
+	// used to read a CTRL+C
+	c := make(chan os.Signal, 10)
+	signal.Notify(c, syscall.SIGINT)
 
 	fmt.Printf("Enter Command... '?' for list\n")
 	for {
 		fmt.Printf("> ")
-		reader := bufio.NewReader(os.Stdin)
-		text, _ := reader.ReadString('\n')
+		text, err := inputReader.ReadString('\n')
+		if err != nil {
+			// block forever
+			<-c
+		}
 		if len(text) == 0 {
 			continue
 		}
