@@ -3,7 +3,9 @@ package core
 import (
 	"fmt"
 	"math/rand"
+	"reflect"
 	"sort"
+	"strings"
 	"time"
 
 	"github.com/wowsims/tbc/items"
@@ -15,6 +17,31 @@ func debugFunc(sim *Simulation) func(string, ...interface{}) {
 	return func(s string, vals ...interface{}) {
 		fmt.Printf("[%0.1f] "+s, append([]interface{}{sim.CurrentTime.Seconds()}, vals...)...)
 	}
+}
+
+type AgentFactory func(*Simulation, *Character, *api.PlayerOptions) Agent
+
+var agentFactories map[string]AgentFactory = make(map[string]AgentFactory)
+
+func RegisterAgentFactory(emptyOptions interface{}, factory AgentFactory) {
+	typeName := reflect.TypeOf(emptyOptions).Name()
+	if _, ok := agentFactories[typeName]; ok {
+		panic("Aleady registered agent factory: " + typeName)
+	}
+	//fmt.Printf("Registering type: %s", typeName)
+
+	agentFactories[typeName] = factory
+}
+
+func makeAgent(sim *Simulation, character *Character, playerOptions *api.PlayerOptions) Agent {
+	typeName := reflect.TypeOf(playerOptions.GetSpec()).Elem().Name()
+
+	factory, ok := agentFactories[typeName]
+	if !ok {
+		panic("No agent factory for type: " + typeName)
+	}
+
+	return factory(sim, character, playerOptions)
 }
 
 type Options struct {
@@ -98,8 +125,48 @@ type IndividualMetric struct {
 	ManaSpent   float64
 }
 
+func NewIndividualSim(params IndividualParams) *Simulation {
+	raid := NewRaid(params.Buffs)
+	sim := newSim(raid, params.Options)
+	sim.IndividualParams = params
+
+	character := NewCharacter(params.Equip, params.Race, params.Consumes, params.CustomStats)
+	agent := makeAgent(sim, character, params.PlayerOptions)
+	raid.AddPlayer(agent)
+	raid.AddPlayerBuffs()
+
+	raid.ApplyBuffs(sim)
+
+	sim.Reset()
+
+	// Now apply all the 'final' stat improvements.
+	// TODO: Figure out how to handle buffs that buff based on other buffs...
+	//   for now this hardcoded buffing works...
+	for _, raidParty := range sim.Raid.Parties {
+		for _, player := range raidParty.Players {
+			if raid.Buffs.BlessingOfKings {
+				player.GetCharacter().InitialStats[stats.Stamina] *= 1.1
+				player.GetCharacter().InitialStats[stats.Agility] *= 1.1
+				player.GetCharacter().InitialStats[stats.Strength] *= 1.1
+				player.GetCharacter().InitialStats[stats.Intellect] *= 1.1
+				player.GetCharacter().InitialStats[stats.Spirit] *= 1.1
+			}
+			if raid.Buffs.DivineSpirit == api.TristateEffect_TristateEffectImproved {
+				player.GetCharacter().InitialStats[stats.SpellPower] += player.GetCharacter().InitialStats[stats.Spirit] * 0.1
+			}
+			// Add SpellCrit from Int and Mana from Int
+			player.GetCharacter().InitialStats = player.GetCharacter().InitialStats.CalculatedTotal()
+		}
+	}
+
+	// Reset again to make sure updated initial stats are propagated.
+	sim.Reset()
+
+	return sim
+}
+
 // New sim contructs a simulator with the given equipment / options.
-func NewSim(raid *Raid, options Options) *Simulation {
+func newSim(raid *Raid, options Options) *Simulation {
 	if options.GCDMin == 0 {
 		options.GCDMin = durationFromSeconds(1.0) // default to 0.75s GCD
 	}
@@ -194,9 +261,41 @@ func (sim *Simulation) playerConsumes(agent Agent) {
 	agent.GetCharacter().TryActivateEquipment(sim)
 }
 
-// Run will run the simulation for number of seconds.
+// Run runs the simulation for the configured number of iterations, and
+// collects all the metrics together.
+func (sim *Simulation) Run() SimResult {
+	pid := 0
+	for _, raidParty := range sim.Raid.Parties {
+		for _, player := range raidParty.Players {
+			player.GetCharacter().ID = pid
+			player.GetCharacter().AuraTracker.PID = pid
+			pid++
+		}
+	}
+	sim.AuraTracker.PID = -1 // set main sim auras to be -1 character ID.
+	logsBuffer := &strings.Builder{}
+	aggregator := NewMetricsAggregator()
+
+	if sim.Options.Debug {
+		sim.Log = func(s string, vals ...interface{}) {
+			logsBuffer.WriteString(fmt.Sprintf("[%0.1f] "+s, append([]interface{}{sim.CurrentTime.Seconds()}, vals...)...))
+		}
+	}
+
+	for i := 0; i < sim.Options.Iterations; i++ {
+		metrics := sim.RunOnce()
+		aggregator.addMetrics(sim.Options, metrics)
+		sim.ReturnCasts(metrics.Casts)
+	}
+
+	result := aggregator.getResult()
+	result.Logs = logsBuffer.String()
+	return result
+}
+
+// RunOnce will run the simulation for number of seconds.
 // Returns metrics for what was cast and how much damage was done.
-func (sim *Simulation) Run() SimMetrics {
+func (sim *Simulation) RunOnce() SimMetrics {
 	sim.Reset()
 
 	pendingActions := make([]pendingAction, 0, 25)

@@ -1,10 +1,8 @@
-package runner
+package core
 
 import (
 	"math"
 	"time"
-
-	"github.com/wowsims/tbc/sim/core"
 )
 
 type MetricsAggregator struct {
@@ -57,7 +55,7 @@ func NewMetricsAggregator() *MetricsAggregator {
 	}
 }
 
-func (aggregator *MetricsAggregator) addMetrics(options core.Options, metrics core.SimMetrics) {
+func (aggregator *MetricsAggregator) addMetrics(options Options, metrics SimMetrics) {
 	aggregator.numSims++
 
 	dps := metrics.TotalDamage / options.Encounter.Duration
