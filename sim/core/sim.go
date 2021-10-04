@@ -327,18 +327,20 @@ simloop:
 				if sim.Log != nil {
 					sim.Log("Not enough mana to cast... regen for %0.1f seconds before casting.\n", regenTime.Seconds())
 				}
-				regenTime += newAction.Cast.CastTime
-				if regenTime > wait {
-					wait = regenTime
-				}
+				wait = regenTime
 				if sim.Options.ExitOnOOM {
 					break simloop // named for clarity since this is pretty deep nested.
 				}
+
+				// Cancel cast for now.
+				newAction.Cast = nil
+				newAction.Wait = wait
 				sim.Metrics.IndividualMetrics[agent.GetCharacter().ID].DamageAtOOM = sim.Metrics.IndividualMetrics[agent.GetCharacter().ID].TotalDamage
 				sim.Metrics.IndividualMetrics[agent.GetCharacter().ID].OOMAt = sim.CurrentTime.Seconds()
-			}
-			if sim.Log != nil {
-				sim.Log("(%d) Start Casting %s Cast Time: %0.1fs\n", agent.GetCharacter().ID, newAction.Cast.Spell.Name, newAction.Cast.CastTime.Seconds())
+			} else {
+				if sim.Log != nil {
+					sim.Log("(%d) Start Casting %s Cast Time: %0.1fs\n", agent.GetCharacter().ID, newAction.Cast.Spell.Name, newAction.Cast.CastTime.Seconds())
+				}
 			}
 		}
 		pa := pendingAction{
