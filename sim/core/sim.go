@@ -149,9 +149,9 @@ func newSim(raid *Raid, options Options) *Simulation {
 	}
 
 	sim := &Simulation{
-		Raid:     raid,
-		Options:  options,
-		Duration: durationFromSeconds(options.Encounter.Duration),
+		Raid:         raid,
+		Options:      options,
+		Duration:     durationFromSeconds(options.Encounter.Duration),
 		InitialAuras: []InitialAura{},
 		// Rando:    ,
 		Log: nil,
@@ -207,8 +207,8 @@ func (sim *Simulation) Reset() {
 	// Now buff everyone back up!
 	for _, party := range sim.Raid.Parties {
 		for _, agent := range party.Players {
+			agent.BuffUp(sim) // for now do this first to match order of adding auras as original sim.
 			agent.GetCharacter().BuffUp(sim)
-			agent.BuffUp(sim)
 		}
 	}
 
@@ -220,7 +220,7 @@ func (sim *Simulation) Reset() {
 type pendingAction struct {
 	Agent Agent
 	AgentAction
-	ExecuteAt   time.Duration
+	ExecuteAt time.Duration
 }
 
 func (sim *Simulation) playerConsumes(agent Agent) {
@@ -287,7 +287,7 @@ func (sim *Simulation) RunOnce() SimMetrics {
 			}
 			pendingActions = append(pendingActions, pendingAction{
 				ExecuteAt:   wait,
-				Agent: agent,
+				Agent:       agent,
 				AgentAction: action,
 			})
 		}
@@ -343,7 +343,7 @@ simloop:
 		}
 		pa := pendingAction{
 			ExecuteAt:   sim.CurrentTime + wait,
-			Agent: agent,
+			Agent:       agent,
 			AgentAction: newAction,
 		}
 		if len(pendingActions) == 1 {
