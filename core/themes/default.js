@@ -44,11 +44,12 @@ export class DefaultTheme extends SimUI {
         const settingsTab = document.getElementsByClassName('settings-inputs')[0];
         Object.keys(config.iconSections).forEach(sectionName => {
             const sectionConfig = config.iconSections[sectionName];
+            const sectionCssPrefix = sectionName.replace(/\s+/g, '');
             const sectionElem = document.createElement('section');
-            sectionElem.classList.add('settings-section', sectionName + '-section');
+            sectionElem.classList.add('settings-section', sectionCssPrefix + '-section');
             sectionElem.innerHTML = `<label>${sectionName}</label>`;
             settingsTab.appendChild(sectionElem);
-            const iconPicker = new IconPicker(sectionElem, sectionName + '-icon-picker', this.sim, sectionConfig, this);
+            const iconPicker = new IconPicker(sectionElem, sectionCssPrefix + '-icon-picker', this.sim, sectionConfig, this);
         });
         Object.keys(config.otherSections).forEach(sectionName => {
             const sectionConfig = config.otherSections[sectionName];

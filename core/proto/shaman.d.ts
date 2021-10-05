@@ -202,6 +202,22 @@ export interface ElementalShaman_Options {
      * @generated from protobuf field: bool water_shield = 1;
      */
     waterShield: boolean;
+    /**
+     * @generated from protobuf field: bool bloodlust = 2;
+     */
+    bloodlust: boolean;
+    /**
+     * @generated from protobuf field: bool mana_spring_totem = 3;
+     */
+    manaSpringTotem: boolean;
+    /**
+     * @generated from protobuf field: bool totem_of_wrath = 4;
+     */
+    totemOfWrath: boolean;
+    /**
+     * @generated from protobuf field: bool wrath_of_air_totem = 5;
+     */
+    wrathOfAirTotem: boolean;
 }
 declare class ShamanTalents$Type extends MessageType<ShamanTalents> {
     constructor();

@@ -12,35 +12,8 @@ import * as IconInputs from '../core/components/icon_inputs.js';
 import * as OtherInputs from '../core/components/other_inputs.js';
 import * as Gems from '../core/constants/gems.js';
 import * as Tooltips from '../core/constants/tooltips.js';
+import * as ShamanInputs from './inputs.js';
 import * as Presets from './presets.js';
-const IconInputWaterShield = {
-    id: { spellId: 33736 },
-    states: 2,
-    changedEvent: (sim) => sim.specOptionsChangeEmitter,
-    getValue: (sim) => sim.getSpecOptions().waterShield,
-    setBooleanValue: (sim, newValue) => {
-        const newOptions = sim.getSpecOptions();
-        newOptions.waterShield = newValue;
-        sim.setSpecOptions(newOptions);
-    },
-};
-const ElementalShamanRotationConfig = [
-    {
-        type: 'enum',
-        cssClass: 'rotation-enum-picker',
-        config: {
-            names: ['Adaptive', 'CL On Clearcast', 'Fixed LB+CL'],
-            values: [AgentType.Adaptive, AgentType.CLOnClearcast, AgentType.FixedLBCL],
-            changedEvent: (sim) => sim.agentChangeEmitter,
-            getValue: (sim) => sim.getAgent().type,
-            setValue: (sim, newValue) => {
-                const newAgent = sim.getAgent();
-                newAgent.type = newValue;
-                sim.setAgent(newAgent);
-            },
-        },
-    },
-];
 const theme = new DefaultTheme(document.body, {
     releaseStatus: 'Beta',
     knownIssues: [
@@ -69,8 +42,14 @@ const theme = new DefaultTheme(document.body, {
         Stat.StatMP5,
     ],
     iconSections: {
-        'Buffs': [
-            IconInputWaterShield,
+        'Self Buffs': [
+            ShamanInputs.IconWaterShield,
+            ShamanInputs.IconBloodlust,
+            ShamanInputs.IconWrathOfAirTotem,
+            ShamanInputs.IconTotemOfWrath,
+            ShamanInputs.IconManaSpringTotem,
+        ],
+        'Other Buffs': [
             IconInputs.WrathOfAirTotem,
             IconInputs.TotemOfWrath,
             IconInputs.ManaSpringTotem,
@@ -111,7 +90,7 @@ const theme = new DefaultTheme(document.body, {
         ],
     },
     otherSections: {
-        'Rotation': ElementalShamanRotationConfig,
+        'Rotation': ShamanInputs.ElementalShamanRotationConfig,
         'Other': [
             OtherInputs.ShadowPriestDPS,
         ],

@@ -405,11 +405,15 @@ export const ElementalShaman_Agent = new ElementalShaman_Agent$Type();
 class ElementalShaman_Options$Type extends MessageType {
     constructor() {
         super("proto.ElementalShaman.Options", [
-            { no: 1, name: "water_shield", kind: "scalar", T: 8 /*ScalarType.BOOL*/ }
+            { no: 1, name: "water_shield", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 2, name: "bloodlust", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 3, name: "mana_spring_totem", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 4, name: "totem_of_wrath", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 5, name: "wrath_of_air_totem", kind: "scalar", T: 8 /*ScalarType.BOOL*/ }
         ]);
     }
     create(value) {
-        const message = { waterShield: false };
+        const message = { waterShield: false, bloodlust: false, manaSpringTotem: false, totemOfWrath: false, wrathOfAirTotem: false };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -422,6 +426,18 @@ class ElementalShaman_Options$Type extends MessageType {
             switch (fieldNo) {
                 case /* bool water_shield */ 1:
                     message.waterShield = reader.bool();
+                    break;
+                case /* bool bloodlust */ 2:
+                    message.bloodlust = reader.bool();
+                    break;
+                case /* bool mana_spring_totem */ 3:
+                    message.manaSpringTotem = reader.bool();
+                    break;
+                case /* bool totem_of_wrath */ 4:
+                    message.totemOfWrath = reader.bool();
+                    break;
+                case /* bool wrath_of_air_totem */ 5:
+                    message.wrathOfAirTotem = reader.bool();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -438,6 +454,18 @@ class ElementalShaman_Options$Type extends MessageType {
         /* bool water_shield = 1; */
         if (message.waterShield !== false)
             writer.tag(1, WireType.Varint).bool(message.waterShield);
+        /* bool bloodlust = 2; */
+        if (message.bloodlust !== false)
+            writer.tag(2, WireType.Varint).bool(message.bloodlust);
+        /* bool mana_spring_totem = 3; */
+        if (message.manaSpringTotem !== false)
+            writer.tag(3, WireType.Varint).bool(message.manaSpringTotem);
+        /* bool totem_of_wrath = 4; */
+        if (message.totemOfWrath !== false)
+            writer.tag(4, WireType.Varint).bool(message.totemOfWrath);
+        /* bool wrath_of_air_totem = 5; */
+        if (message.wrathOfAirTotem !== false)
+            writer.tag(5, WireType.Varint).bool(message.wrathOfAirTotem);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

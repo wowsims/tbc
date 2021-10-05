@@ -1261,7 +1261,12 @@ body {
   margin: 0;
 }
 
-.Buffs-icon-picker {
+.SelfBuffs-icon-picker {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+}
+
+.OtherBuffs-icon-picker {
   display: grid;
   grid-template-columns: repeat(8, 1fr);
 }
@@ -1273,7 +1278,7 @@ body {
 
 .Debuffs-icon-picker {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, 1fr);
 }
 
 /*# sourceMappingURL=index.css.map */
