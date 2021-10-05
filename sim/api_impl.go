@@ -32,6 +32,7 @@ func getGearListImpl(request *proto.GearListRequest) *proto.GearListResult {
 				Phase:            int32(item.Phase),
 				Quality:          item.Quality, // Hack until we use generated items
 				GemSockets:       item.GemSockets,
+				SocketBonus:      item.SocketBonus[:],
 			},
 		)
 	}
@@ -44,6 +45,7 @@ func getGearListImpl(request *proto.GearListRequest) *proto.GearListResult {
 			Color:   gem.Color,
 			Phase:   int32(gem.Phase),
 			Quality: gem.Quality, // Hack until we use generated items
+			Unique:  gem.Unique,
 		})
 	}
 	for i := range items.Enchants {

@@ -263,10 +263,11 @@ message Item {
     RangedWeaponType ranged_weapon_type = 7;
 
     repeated double stats = 8;
-    repeated GemColor gem_sockets = 11;
+    repeated GemColor gem_sockets = 9;
+    repeated double socketBonus = 10;
 
-    int32 phase = 9;
-    ItemQuality quality = 10;
+    int32 phase = 11;
+    ItemQuality quality = 12;
 }
 
 message Enchant {
@@ -292,4 +293,5 @@ message Gem {
 
     int32 phase = 5;
     ItemQuality quality = 6;
+		bool unique = 7;
 }
