@@ -42,7 +42,7 @@ dist/%/index.css: ui/%/index.scss ui/%/*.scss $(call rwildcard,ui/core,*.scss)
 	npx sass $< $@
 
 # Generic rule for building index.html for any class directory
-dist/%/index.html: index_template.html
+dist/%/index.html: ui/index_template.html
 	$(eval title := $(shell echo $(shell basename $(@D)) | sed -r 's/(^|_)([a-z])/\U \2/g' | cut -c 2-))
 	echo $(title)
 	mkdir -p $(@D)
