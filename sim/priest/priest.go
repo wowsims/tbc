@@ -1,7 +1,7 @@
 package priest
 
 import (
-	"github.com/wowsims/tbc/sim/api"
+	"github.com/wowsims/tbc/sim/core/proto"
 	"github.com/wowsims/tbc/sim/core"
 )
 
@@ -15,7 +15,7 @@ func (priest *Priest) GetCharacter() *core.Character {
 
 func (priest *Priest) AddRaidBuffs(buffs *core.Buffs) {
 	buffs.Misery = true
-	buffs.DivineSpirit = api.TristateEffect_TristateEffectRegular
+	buffs.DivineSpirit = proto.TristateEffect_TristateEffectRegular
 }
 func (priest *Priest) AddPartyBuffs(buffs *core.Buffs) {
 	buffs.ShadowPriestDPS += 0

@@ -1,5 +1,5 @@
-import { EquipmentSpec } from '../core/api/common.js';
-import { ItemSpec } from '../core/api/common.js';
+import { EquipmentSpec } from '../core/proto/common.js';
+import { ItemSpec } from '../core/proto/common.js';
 
 import * as Enchants from '../core/constants/enchants.js';
 import * as Gems from '../core/constants/gems.js';

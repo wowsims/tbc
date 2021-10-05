@@ -1,8 +1,8 @@
 import { EquippedItem } from '../api/equipped_item.js';
-import { Enchant } from '../api/common.js';
-import { Item } from '../api/common.js';
-import { ItemQuality } from '../api/common.js';
-import { ItemSlot } from '../api/common.js';
+import { Enchant } from '../proto/common.js';
+import { Item } from '../proto/common.js';
+import { ItemQuality } from '../proto/common.js';
+import { ItemSlot } from '../proto/common.js';
 import { enchantDescriptions } from '../api/names.js';
 import { slotNames } from '../api/names.js';
 import { getEmptyGemSocketIconUrl } from '../resources.js';

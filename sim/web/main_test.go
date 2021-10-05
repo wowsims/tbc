@@ -9,16 +9,16 @@ import (
 	"testing"
 	"time"
 
-	"github.com/wowsims/tbc/sim/api"
-	"google.golang.org/protobuf/proto"
+	"github.com/wowsims/tbc/sim/core/proto"
+	googleProto "google.golang.org/protobuf/proto"
 )
 
-var basicSpec = &api.PlayerOptions_ElementalShaman{
-	ElementalShaman: &api.ElementalShaman{
-		Agent: &api.ElementalShaman_Agent{
-			Type: api.ElementalShaman_Agent_Adaptive,
+var basicSpec = &proto.PlayerOptions_ElementalShaman{
+	ElementalShaman: &proto.ElementalShaman{
+		Agent: &proto.ElementalShaman_Agent{
+			Type: proto.ElementalShaman_Agent_Adaptive,
 		},
-		Talents: &api.ShamanTalents{
+		Talents: &proto.ShamanTalents{
 			// ElementalDevastation
 			ElementalFury:      true,
 			Convection:         5,
@@ -31,13 +31,13 @@ var basicSpec = &api.PlayerOptions_ElementalShaman{
 			ElementalMastery:   true,
 			LightningOverload:  5,
 		},
-		Options: &api.ElementalShaman_Options{
+		Options: &proto.ElementalShaman_Options{
 			WaterShield: true,
 		},
 	},
 }
 
-var basicConsumes = &api.Consumes{
+var basicConsumes = &proto.Consumes{
 	FlaskOfBlindingLight: true,
 	BlackenedBasilisk:    true,
 	BrilliantWizardOil:   true,
@@ -45,18 +45,18 @@ var basicConsumes = &api.Consumes{
 	DarkRune:             true,
 }
 
-var basicBuffs = &api.Buffs{
+var basicBuffs = &proto.Buffs{
 	ArcaneBrilliance: true,
 	BlessingOfKings:  true,
 	Bloodlust:        1,
-	MoonkinAura:      api.TristateEffect_TristateEffectRegular,
-	ManaSpringTotem:  api.TristateEffect_TristateEffectRegular,
+	MoonkinAura:      proto.TristateEffect_TristateEffectRegular,
+	ManaSpringTotem:  proto.TristateEffect_TristateEffectRegular,
 	TotemOfWrath:     1,
-	WrathOfAirTotem:  api.TristateEffect_TristateEffectRegular,
+	WrathOfAirTotem:  proto.TristateEffect_TristateEffectRegular,
 }
 
-var p1Equip = &api.EquipmentSpec{
-	Items: []*api.ItemSpec{
+var p1Equip = &proto.EquipmentSpec{
+	Items: []*proto.ItemSpec{
 		{Id: 29035, Gems: []int32{34220, 24059}, Enchant: 29191},
 		{Id: 28762},
 		{Id: 29037, Gems: []int32{24059, 24059}, Enchant: 28909},
@@ -88,17 +88,17 @@ func init() {
 // TestIndividualSim is just a smoke test to make sure the http server works as expected.
 //   Don't modify this test unless the proto defintions change and this no longer compiles.
 func TestIndividualSim(t *testing.T) {
-	req := &api.IndividualSimRequest{
-		Player: &api.Player{
-			Options: &api.PlayerOptions{
-				Race:     api.Race_RaceTroll10,
+	req := &proto.IndividualSimRequest{
+		Player: &proto.Player{
+			Options: &proto.PlayerOptions{
+				Race:     proto.Race_RaceTroll10,
 				Spec:     basicSpec,
 				Consumes: basicConsumes,
 			},
 			Equipment: p1Equip,
 		},
 		Buffs: basicBuffs,
-		Encounter: &api.Encounter{
+		Encounter: &proto.Encounter{
 			Duration:   120,
 			NumTargets: 1,
 		},
@@ -107,7 +107,7 @@ func TestIndividualSim(t *testing.T) {
 		Debug:      false,
 	}
 
-	msgBytes, err := proto.Marshal(req)
+	msgBytes, err := googleProto.Marshal(req)
 	if err != nil {
 		t.Fatalf("Failed to encode request: %s", err.Error())
 	}
@@ -123,8 +123,8 @@ func TestIndividualSim(t *testing.T) {
 		return
 	}
 
-	isr := &api.IndividualSimResult{}
-	if err := proto.Unmarshal(body, isr); err != nil {
+	isr := &proto.IndividualSimResult{}
+	if err := googleProto.Unmarshal(body, isr); err != nil {
 		t.Fatalf("Failed to parse request: %s", err.Error())
 		return
 	}
@@ -133,17 +133,17 @@ func TestIndividualSim(t *testing.T) {
 }
 
 func TestCalcStatWeight(t *testing.T) {
-	req := &api.IndividualSimRequest{
-		Player: &api.Player{
-			Options: &api.PlayerOptions{
-				Race:     api.Race_RaceTroll10,
+	req := &proto.IndividualSimRequest{
+		Player: &proto.Player{
+			Options: &proto.PlayerOptions{
+				Race:     proto.Race_RaceTroll10,
 				Spec:     basicSpec,
 				Consumes: basicConsumes,
 			},
 			Equipment: p1Equip,
 		},
 		Buffs: basicBuffs,
-		Encounter: &api.Encounter{
+		Encounter: &proto.Encounter{
 			Duration:   120,
 			NumTargets: 1,
 		},
@@ -152,10 +152,10 @@ func TestCalcStatWeight(t *testing.T) {
 		Debug:      false,
 	}
 
-	msgBytes, err := proto.Marshal(&api.StatWeightsRequest{
+	msgBytes, err := googleProto.Marshal(&proto.StatWeightsRequest{
 		Options:         req,
-		StatsToWeigh:    []api.Stat{api.Stat_StatSpellPower, api.Stat_StatSpellCrit, api.Stat_StatSpellHit},
-		EpReferenceStat: api.Stat_StatSpellPower,
+		StatsToWeigh:    []proto.Stat{proto.Stat_StatSpellPower, proto.Stat_StatSpellCrit, proto.Stat_StatSpellHit},
+		EpReferenceStat: proto.Stat_StatSpellPower,
 	})
 	if err != nil {
 		t.Fatalf("Failed to encode request: %s", err.Error())
@@ -172,8 +172,8 @@ func TestCalcStatWeight(t *testing.T) {
 		return
 	}
 
-	isr := &api.StatWeightsResult{}
-	if err := proto.Unmarshal(body, isr); err != nil {
+	isr := &proto.StatWeightsResult{}
+	if err := googleProto.Unmarshal(body, isr); err != nil {
 		t.Fatalf("Failed to parse request: %s", err.Error())
 		return
 	}

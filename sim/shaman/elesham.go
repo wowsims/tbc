@@ -3,18 +3,18 @@ package shaman
 import (
 	"time"
 
-	"github.com/wowsims/tbc/sim/api"
 	"github.com/wowsims/tbc/sim/core"
+	"github.com/wowsims/tbc/sim/core/proto"
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 func RegisterElementalShaman() {
-	core.RegisterAgentFactory(api.PlayerOptions_ElementalShaman{}, func(sim *core.Simulation, character *core.Character, options *api.PlayerOptions) core.Agent {
+	core.RegisterAgentFactory(proto.PlayerOptions_ElementalShaman{}, func(sim *core.Simulation, character *core.Character, options *proto.PlayerOptions) core.Agent {
 		return NewElementalShaman(sim, character, options)
 	})
 }
 
-func NewElementalShaman(sim *core.Simulation, character *core.Character, options *api.PlayerOptions) *Shaman {
+func NewElementalShaman(sim *core.Simulation, character *core.Character, options *proto.PlayerOptions) *Shaman {
 	eleShamOptions := options.GetElementalShaman()
 	talents := convertShamTalents(eleShamOptions.Talents)
 
@@ -22,19 +22,19 @@ func NewElementalShaman(sim *core.Simulation, character *core.Character, options
 	// However, other classes will need totem buffs so it has to be on buffs too.
 	//totems := Totems{
 	//	TotemOfWrath: buffs.TotemOfWrath > 0,
-	//	WrathOfAir:   buffs.WrathOfAirTotem != api.TristateEffect_TristateEffectMissing,
-	//	ManaSpring:   buffs.ManaSpringTotem != api.TristateEffect_TristateEffectMissing,
+	//	WrathOfAir:   buffs.WrathOfAirTotem != proto.TristateEffect_TristateEffectMissing,
+	//	ManaSpring:   buffs.ManaSpringTotem != proto.TristateEffect_TristateEffectMissing,
 	//}
 	totems := Totems{}
 
 	var agent shamanAgent
 
 	switch eleShamOptions.Agent.Type {
-	case api.ElementalShaman_Agent_Adaptive:
+	case proto.ElementalShaman_Agent_Adaptive:
 		agent = NewAdaptiveAgent(sim)
-	case api.ElementalShaman_Agent_CLOnClearcast:
+	case proto.ElementalShaman_Agent_CLOnClearcast:
 		agent = NewCLOnClearcastAgent(sim)
-	case api.ElementalShaman_Agent_FixedLBCL:
+	case proto.ElementalShaman_Agent_FixedLBCL:
 		agent = NewLBOnlyAgent(sim)
 		// TODO: Add option for this
 		//numLB := agentOptions["numLBtoCL"]
@@ -43,7 +43,7 @@ func NewElementalShaman(sim *core.Simulation, character *core.Character, options
 		//} else {
 		//	agent = NewFixedRotationAgent(numLB)
 		//}
-	case api.ElementalShaman_Agent_CLOnCD:
+	case proto.ElementalShaman_Agent_CLOnCD:
 		agent = NewCLOnCDAgent(sim)
 	}
 
@@ -375,16 +375,16 @@ func NewAdaptiveAgent(sim *core.Simulation) *AdaptiveAgent {
 	clearcastParams.Options.Iterations = 100
 
 	// eleShamParams := *clearcastParams.PlayerOptions.GetElementalShaman()
-	// eleShamParams.Agent.Type = api.ElementalShaman_Agent_CLOnClearcast
+	// eleShamParams.Agent.Type = proto.ElementalShaman_Agent_CLOnClearcast
 	params := *clearcastParams.PlayerOptions.GetElementalShaman()
 
 	eleShamParams := params                                                                         // clone
-	eleShamParams.Agent = &api.ElementalShaman_Agent{Type: api.ElementalShaman_Agent_CLOnClearcast} // create new agent.
+	eleShamParams.Agent = &proto.ElementalShaman_Agent{Type: proto.ElementalShaman_Agent_CLOnClearcast} // create new agent.
 
 	// Assign new eleShamParams
-	clearcastParams.PlayerOptions = &api.PlayerOptions{
+	clearcastParams.PlayerOptions = &proto.PlayerOptions{
 		Race: sim.IndividualParams.PlayerOptions.Race, //primitive, no pointer
-		Spec: &api.PlayerOptions_ElementalShaman{
+		Spec: &proto.PlayerOptions_ElementalShaman{
 			ElementalShaman: &eleShamParams,
 		},
 		// reuse pointer since this isn't mutated

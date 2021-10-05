@@ -3,7 +3,7 @@ package items
 import (
 	"fmt"
 
-	"github.com/wowsims/tbc/sim/api"
+	"github.com/wowsims/tbc/sim/core/proto"
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
@@ -51,20 +51,20 @@ func init() {
 
 type Item struct {
 	ID               int32
-	Type             api.ItemType
-	ArmorType        api.ArmorType
-	WeaponType       api.WeaponType
-	HandType         api.HandType
-	RangedWeaponType api.RangedWeaponType
+	Type             proto.ItemType
+	ArmorType        proto.ArmorType
+	WeaponType       proto.WeaponType
+	HandType         proto.HandType
+	RangedWeaponType proto.RangedWeaponType
 
 	Name       string
 	SourceZone string
 	SourceDrop string
 	Stats      stats.Stats // Stats applied to wearer
 	Phase      byte
-	Quality    api.ItemQuality
+	Quality    proto.ItemQuality
 
-	GemSockets  []api.GemColor
+	GemSockets  []proto.GemColor
 	SocketBonus stats.Stats
 
 	// Modified for each instance of the item.
@@ -77,18 +77,18 @@ type Enchant struct {
 	EffectID   int32 // Used by UI to apply effect to tooltip
 	Name       string
 	Bonus      stats.Stats
-	ItemType   api.ItemType // which slot does the enchant go on.
-	HandType   api.HandType // If ItemType is weapon, check hand type / weapon type
-	WeaponType api.WeaponType
+	ItemType   proto.ItemType // which slot does the enchant go on.
+	HandType   proto.HandType // If ItemType is weapon, check hand type / weapon type
+	WeaponType proto.WeaponType
 }
 
 type Gem struct {
 	ID      int32
 	Name    string
 	Stats   stats.Stats // flat stats gem adds
-	Color   api.GemColor
+	Color   proto.GemColor
 	Phase   byte
-	Quality api.ItemQuality
+	Quality proto.ItemQuality
 	// Requirements  // Validate the gem can be used... later
 }
 
@@ -98,10 +98,10 @@ type ItemSpec struct {
 	Gems    []int32
 }
 
-type Equipment [api.ItemSlot_ItemSlotRanged + 1]Item
+type Equipment [proto.ItemSlot_ItemSlotRanged + 1]Item
 
 // Structs used for looking up items/gems/enchants
-type EquipmentSpec [api.ItemSlot_ItemSlotRanged + 1]ItemSpec
+type EquipmentSpec [proto.ItemSlot_ItemSlotRanged + 1]ItemSpec
 
 func NewEquipmentSet(equipSpec EquipmentSpec) Equipment {
 	equipment := Equipment{}
@@ -141,27 +141,27 @@ func NewEquipmentSet(equipSpec EquipmentSpec) Equipment {
 			}
 		}
 
-		if item.Type == api.ItemType_ItemTypeFinger {
+		if item.Type == proto.ItemType_ItemTypeFinger {
 			if equipment[ItemSlotFinger1].Name == "" {
 				equipment[ItemSlotFinger1] = item
 			} else {
 				equipment[ItemSlotFinger2] = item
 			}
-		} else if item.Type == api.ItemType_ItemTypeTrinket {
+		} else if item.Type == proto.ItemType_ItemTypeTrinket {
 			if equipment[ItemSlotTrinket1].Name == "" {
 				equipment[ItemSlotTrinket1] = item
 			} else {
 				equipment[ItemSlotTrinket2] = item
 			}
-		} else if item.Type == api.ItemType_ItemTypeWeapon {
-			if item.WeaponType == api.WeaponType_WeaponTypeShield && equipment[ItemSlotMainHand].HandType != api.HandType_HandTypeTwoHand {
+		} else if item.Type == proto.ItemType_ItemTypeWeapon {
+			if item.WeaponType == proto.WeaponType_WeaponTypeShield && equipment[ItemSlotMainHand].HandType != proto.HandType_HandTypeTwoHand {
 				equipment[ItemSlotOffHand] = item
-			} else if item.HandType == api.HandType_HandTypeMainHand || item.HandType == api.HandType_HandTypeUnknown {
+			} else if item.HandType == proto.HandType_HandTypeMainHand || item.HandType == proto.HandType_HandTypeUnknown {
 				equipment[ItemSlotMainHand] = item
-			} else if item.HandType == api.HandType_HandTypeTwoHand {
+			} else if item.HandType == proto.HandType_HandTypeTwoHand {
 				equipment[ItemSlotMainHand] = item
 				equipment[ItemSlotOffHand] = Item{} // clear offhand
-			} else if item.HandType == api.HandType_HandTypeOffHand && equipment[ItemSlotMainHand].HandType != api.HandType_HandTypeTwoHand {
+			} else if item.HandType == proto.HandType_HandTypeOffHand && equipment[ItemSlotMainHand].HandType != proto.HandType_HandTypeTwoHand {
 				equipment[ItemSlotOffHand] = item
 			}
 		} else {
@@ -238,68 +238,68 @@ const (
 	ItemSlotRanged
 )
 
-func ItemTypeToSlot(it api.ItemType) ItemSlot {
+func ItemTypeToSlot(it proto.ItemType) ItemSlot {
 	switch it {
-	case api.ItemType_ItemTypeHead:
+	case proto.ItemType_ItemTypeHead:
 		return ItemSlotHead
-	case api.ItemType_ItemTypeNeck:
+	case proto.ItemType_ItemTypeNeck:
 		return ItemSlotNeck
-	case api.ItemType_ItemTypeShoulder:
+	case proto.ItemType_ItemTypeShoulder:
 		return ItemSlotShoulder
-	case api.ItemType_ItemTypeBack:
+	case proto.ItemType_ItemTypeBack:
 		return ItemSlotBack
-	case api.ItemType_ItemTypeChest:
+	case proto.ItemType_ItemTypeChest:
 		return ItemSlotChest
-	case api.ItemType_ItemTypeWrist:
+	case proto.ItemType_ItemTypeWrist:
 		return ItemSlotWrist
-	case api.ItemType_ItemTypeHands:
+	case proto.ItemType_ItemTypeHands:
 		return ItemSlotHands
-	case api.ItemType_ItemTypeWaist:
+	case proto.ItemType_ItemTypeWaist:
 		return ItemSlotWaist
-	case api.ItemType_ItemTypeLegs:
+	case proto.ItemType_ItemTypeLegs:
 		return ItemSlotLegs
-	case api.ItemType_ItemTypeFeet:
+	case proto.ItemType_ItemTypeFeet:
 		return ItemSlotFeet
-	case api.ItemType_ItemTypeFinger:
+	case proto.ItemType_ItemTypeFinger:
 		return ItemSlotFinger1
-	case api.ItemType_ItemTypeTrinket:
+	case proto.ItemType_ItemTypeTrinket:
 		return ItemSlotTrinket1
-	case api.ItemType_ItemTypeWeapon:
+	case proto.ItemType_ItemTypeWeapon:
 		return ItemSlotMainHand
-	case api.ItemType_ItemTypeRanged:
+	case proto.ItemType_ItemTypeRanged:
 		return ItemSlotRanged
 	}
 
 	return 255
 }
 
-func ColorIntersects(g api.GemColor, o api.GemColor) bool {
+func ColorIntersects(g proto.GemColor, o proto.GemColor) bool {
 	if g == o {
 		return true
 	}
-	if g == api.GemColor_GemColorPrismatic || o == api.GemColor_GemColorPrismatic {
+	if g == proto.GemColor_GemColorPrismatic || o == proto.GemColor_GemColorPrismatic {
 		return true
 	}
-	if g == api.GemColor_GemColorMeta {
+	if g == proto.GemColor_GemColorMeta {
 		return false // meta gems o nothing.
 	}
-	if g == api.GemColor_GemColorRed {
-		return o == api.GemColor_GemColorOrange || o == api.GemColor_GemColorPurple
+	if g == proto.GemColor_GemColorRed {
+		return o == proto.GemColor_GemColorOrange || o == proto.GemColor_GemColorPurple
 	}
-	if g == api.GemColor_GemColorBlue {
-		return o == api.GemColor_GemColorGreen || o == api.GemColor_GemColorPurple
+	if g == proto.GemColor_GemColorBlue {
+		return o == proto.GemColor_GemColorGreen || o == proto.GemColor_GemColorPurple
 	}
-	if g == api.GemColor_GemColorYellow {
-		return o == api.GemColor_GemColorGreen || o == api.GemColor_GemColorOrange
+	if g == proto.GemColor_GemColorYellow {
+		return o == proto.GemColor_GemColorGreen || o == proto.GemColor_GemColorOrange
 	}
-	if g == api.GemColor_GemColorOrange {
-		return o == api.GemColor_GemColorYellow || o == api.GemColor_GemColorRed
+	if g == proto.GemColor_GemColorOrange {
+		return o == proto.GemColor_GemColorYellow || o == proto.GemColor_GemColorRed
 	}
-	if g == api.GemColor_GemColorGreen {
-		return o == api.GemColor_GemColorYellow || o == api.GemColor_GemColorBlue
+	if g == proto.GemColor_GemColorGreen {
+		return o == proto.GemColor_GemColorYellow || o == proto.GemColor_GemColorBlue
 	}
-	if g == api.GemColor_GemColorPurple {
-		return o == api.GemColor_GemColorBlue || o == api.GemColor_GemColorRed
+	if g == proto.GemColor_GemColorPurple {
+		return o == proto.GemColor_GemColorBlue || o == proto.GemColor_GemColorRed
 	}
 
 	return false // dunno what else could be.

@@ -1,33 +1,32 @@
 // Proto based function interface for the simulator
-package papi
+package sim
 
 import (
 	"time"
 
-	"github.com/wowsims/tbc/items"
-	"github.com/wowsims/tbc/sim"
-	"github.com/wowsims/tbc/sim/api"
 	"github.com/wowsims/tbc/sim/core"
+	"github.com/wowsims/tbc/sim/core/items"
+	"github.com/wowsims/tbc/sim/core/proto"
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 func init() {
-	sim.RegisterAll()
+	RegisterAll()
 }
 
-func getGearListImpl(request *api.GearListRequest) *api.GearListResult {
-	result := &api.GearListResult{}
+func getGearListImpl(request *proto.GearListRequest) *proto.GearListResult {
+	result := &proto.GearListResult{}
 
 	for i := range items.Items {
 		item := items.Items[i]
 		result.Items = append(result.Items,
-			&api.Item{
+			&proto.Item{
 				Id:               item.ID,
-				Type:             api.ItemType(item.Type),
-				ArmorType:        api.ArmorType(item.ArmorType),
-				WeaponType:       api.WeaponType(item.WeaponType),
-				HandType:         api.HandType(item.HandType),
-				RangedWeaponType: api.RangedWeaponType(item.RangedWeaponType),
+				Type:             proto.ItemType(item.Type),
+				ArmorType:        proto.ArmorType(item.ArmorType),
+				WeaponType:       proto.WeaponType(item.WeaponType),
+				HandType:         proto.HandType(item.HandType),
+				RangedWeaponType: proto.RangedWeaponType(item.RangedWeaponType),
 				Name:             item.Name,
 				Stats:            item.Stats[:],
 				Phase:            int32(item.Phase),
@@ -38,7 +37,7 @@ func getGearListImpl(request *api.GearListRequest) *api.GearListResult {
 	}
 	for i := range items.Gems {
 		gem := items.Gems[i]
-		result.Gems = append(result.Gems, &api.Gem{
+		result.Gems = append(result.Gems, &proto.Gem{
 			Id:      gem.ID,
 			Name:    gem.Name,
 			Stats:   gem.Stats[:],
@@ -49,40 +48,40 @@ func getGearListImpl(request *api.GearListRequest) *api.GearListResult {
 	}
 	for i := range items.Enchants {
 		enchant := items.Enchants[i]
-		result.Enchants = append(result.Enchants, &api.Enchant{
+		result.Enchants = append(result.Enchants, &proto.Enchant{
 			Id:       enchant.ID,
 			EffectId: enchant.EffectID,
 			Name:     enchant.Name,
 			Type:     enchant.ItemType,
 			Stats:    enchant.Bonus[:],
-			Quality:  api.ItemQuality(4),
+			Quality:  proto.ItemQuality(4),
 		})
 	}
 
 	return result
 }
 
-func computeStatsImpl(request *api.ComputeStatsRequest) *api.ComputeStatsResult {
-	return statsFromIndSimRequest(&api.IndividualSimRequest{Player: request.Player, Buffs: request.Buffs})
+func computeStatsImpl(request *proto.ComputeStatsRequest) *proto.ComputeStatsResult {
+	return statsFromIndSimRequest(&proto.IndividualSimRequest{Player: request.Player, Buffs: request.Buffs})
 }
 
-func statsFromIndSimRequest(isr *api.IndividualSimRequest) *api.ComputeStatsResult {
+func statsFromIndSimRequest(isr *proto.IndividualSimRequest) *proto.ComputeStatsResult {
 	sim := createSim(isr)
 	gearStats := sim.Raid.Parties[0].Players[0].GetCharacter().Equip.Stats()
-	return &api.ComputeStatsResult{
+	return &proto.ComputeStatsResult{
 		GearOnly:   gearStats[:],
 		FinalStats: sim.Raid.Parties[0].Players[0].GetCharacter().Stats[:], // createSim includes a call to buff up all party members.
 		Sets:       []string{},
 	}
 }
 
-func statWeightsImpl(request *api.StatWeightsRequest) *api.StatWeightsResult {
+func statWeightsImpl(request *proto.StatWeightsRequest) *proto.StatWeightsResult {
 	statsToWeight := make([]stats.Stat, len(request.StatsToWeigh))
 	for i, v := range request.StatsToWeigh {
 		statsToWeight[i] = stats.Stat(v)
 	}
 	result := core.CalcStatWeight(convertSimParams(request.Options), statsToWeight, stats.Stat(request.EpReferenceStat))
-	return &api.StatWeightsResult{
+	return &proto.StatWeightsResult{
 		Weights:       result.Weights[:],
 		WeightsStdev:  result.WeightsStdev[:],
 		EpValues:      result.EpValues[:],
@@ -90,7 +89,7 @@ func statWeightsImpl(request *api.StatWeightsRequest) *api.StatWeightsResult {
 	}
 }
 
-func convertSimParams(request *api.IndividualSimRequest) core.IndividualParams {
+func convertSimParams(request *proto.IndividualSimRequest) core.IndividualParams {
 	options := core.Options{
 		Iterations: int(request.Iterations),
 		RSeed:      request.RandomSeed,
@@ -120,26 +119,26 @@ func convertSimParams(request *api.IndividualSimRequest) core.IndividualParams {
 	return params
 }
 
-func createSim(request *api.IndividualSimRequest) *core.Simulation {
+func createSim(request *proto.IndividualSimRequest) *core.Simulation {
 	params := convertSimParams(request)
 	sim := core.NewIndividualSim(params)
 	return sim
 }
 
-func runSimulationImpl(request *api.IndividualSimRequest) *api.IndividualSimResult {
+func runSimulationImpl(request *proto.IndividualSimRequest) *proto.IndividualSimResult {
 	sim := createSim(request)
 	result := sim.Run()
 
-	castMetrics := map[int32]*api.CastMetric{}
+	castMetrics := map[int32]*proto.CastMetric{}
 	for k, v := range result.Casts {
-		castMetrics[k] = &api.CastMetric{
+		castMetrics[k] = &proto.CastMetric{
 			Casts:  v.Casts,
 			Crits:  v.Crits,
 			Misses: v.Misses,
 			Dmgs:   v.Dmgs,
 		}
 	}
-	isr := &api.IndividualSimResult{
+	isr := &proto.IndividualSimResult{
 		DpsAvg:              result.DpsAvg,
 		DpsStdev:            result.DpsStDev,
 		DpsHist:             result.DpsHist,
@@ -154,7 +153,7 @@ func runSimulationImpl(request *api.IndividualSimRequest) *api.IndividualSimResu
 	return isr
 }
 
-func convertConsumes(c *api.Consumes) core.Consumes {
+func convertConsumes(c *proto.Consumes) core.Consumes {
 	cconsume := core.Consumes{
 		FlaskOfBlindingLight:     c.FlaskOfBlindingLight,
 		FlaskOfMightyRestoration: c.FlaskOfMightyRestoration,
@@ -180,7 +179,7 @@ func convertConsumes(c *api.Consumes) core.Consumes {
 	return cconsume
 }
 
-func convertEquip(es *api.EquipmentSpec) items.EquipmentSpec {
+func convertEquip(es *proto.EquipmentSpec) items.EquipmentSpec {
 	coreEquip := items.EquipmentSpec{}
 
 	for i, item := range es.Items {
@@ -195,7 +194,7 @@ func convertEquip(es *api.EquipmentSpec) items.EquipmentSpec {
 	return coreEquip
 }
 
-func convertBuffs(inBuff *api.Buffs) core.Buffs {
+func convertBuffs(inBuff *proto.Buffs) core.Buffs {
 	// TODO: support tri-state better
 	return core.Buffs{
 		ArcaneBrilliance:          inBuff.ArcaneBrilliance,

@@ -1,6 +1,6 @@
-import { IndividualSimRequest } from '../api/api.js';
-import { Stat } from '../api/common.js';
-import { StatWeightsRequest } from '../api/api.js';
+import { IndividualSimRequest } from '../proto/api.js';
+import { Stat } from '../proto/common.js';
+import { StatWeightsRequest } from '../proto/api.js';
 import { Sim } from '../sim.js';
 
 import { Component } from './component.js';

@@ -6,9 +6,9 @@ import (
 	"log"
 	"syscall/js"
 
-	"github.com/wowsims/tbc/sim/api"
-	"github.com/wowsims/tbc/sim/api/papi"
-	"google.golang.org/protobuf/proto"
+	"github.com/wowsims/tbc/sim"
+	"github.com/wowsims/tbc/sim/core/proto"
+	googleProto "google.golang.org/protobuf/proto"
 )
 
 func main() {
@@ -27,14 +27,14 @@ func computeStats(this js.Value, args []js.Value) interface{} {
 	data := make([]byte, args[0].Get("length").Int())
 	js.CopyBytesToGo(data, args[0])
 
-	csr := &api.ComputeStatsRequest{}
-	if err := proto.Unmarshal(data, csr); err != nil {
+	csr := &proto.ComputeStatsRequest{}
+	if err := googleProto.Unmarshal(data, csr); err != nil {
 		log.Printf("Failed to parse request: %s", err)
 		return nil
 	}
-	result := papi.ComputeStats(csr)
+	result := sim.ComputeStats(csr)
 
-	outbytes, err := proto.Marshal(result)
+	outbytes, err := googleProto.Marshal(result)
 	if err != nil {
 		log.Printf("[ERROR] Failed to marshal result: %s", err.Error())
 		return nil
@@ -51,14 +51,14 @@ func gearList(this js.Value, args []js.Value) interface{} {
 	data := make([]byte, args[0].Get("length").Int())
 	js.CopyBytesToGo(data, args[0])
 
-	glr := &api.GearListRequest{}
-	if err := proto.Unmarshal(data, glr); err != nil {
+	glr := &proto.GearListRequest{}
+	if err := googleProto.Unmarshal(data, glr); err != nil {
 		log.Printf("Failed to parse request: %s", err)
 		return nil
 	}
-	result := papi.GetGearList(glr)
+	result := sim.GetGearList(glr)
 
-	outbytes, err := proto.Marshal(result)
+	outbytes, err := googleProto.Marshal(result)
 	if err != nil {
 		log.Printf("[ERROR] Failed to marshal result: %s", err.Error())
 		return nil
@@ -75,14 +75,14 @@ func individualSim(this js.Value, args []js.Value) interface{} {
 	data := make([]byte, args[0].Get("length").Int())
 	js.CopyBytesToGo(data, args[0])
 
-	isr := &api.IndividualSimRequest{}
-	if err := proto.Unmarshal(data, isr); err != nil {
+	isr := &proto.IndividualSimRequest{}
+	if err := googleProto.Unmarshal(data, isr); err != nil {
 		log.Printf("Failed to parse request: %s", err)
 		return nil
 	}
-	result := papi.RunSimulation(isr)
+	result := sim.RunSimulation(isr)
 
-	outbytes, err := proto.Marshal(result)
+	outbytes, err := googleProto.Marshal(result)
 	if err != nil {
 		log.Printf("[ERROR] Failed to marshal result: %s", err.Error())
 		return nil
@@ -99,14 +99,14 @@ func statWeights(this js.Value, args []js.Value) interface{} {
 	data := make([]byte, args[0].Get("length").Int())
 	js.CopyBytesToGo(data, args[0])
 
-	swr := &api.StatWeightsRequest{}
-	if err := proto.Unmarshal(data, swr); err != nil {
+	swr := &proto.StatWeightsRequest{}
+	if err := googleProto.Unmarshal(data, swr); err != nil {
 		log.Printf("Failed to parse request: %s", err)
 		return nil
 	}
-	result := papi.StatWeights(swr)
+	result := sim.StatWeights(swr)
 
-	outbytes, err := proto.Marshal(result)
+	outbytes, err := googleProto.Marshal(result)
 	if err != nil {
 		log.Printf("[ERROR] Failed to marshal result: %s", err.Error())
 		return nil

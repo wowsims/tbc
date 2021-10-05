@@ -3,26 +3,26 @@ package core
 import (
 	"time"
 
-	"github.com/wowsims/tbc/sim/api"
+	"github.com/wowsims/tbc/sim/core/proto"
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 type Buffs struct {
 	// Totems
-	ManaSpringTotem api.TristateEffect
+	ManaSpringTotem proto.TristateEffect
 	ManaTideTotem   bool
 	TotemOfWrath    int32
-	WrathOfAirTotem api.TristateEffect
+	WrathOfAirTotem proto.TristateEffect
 
 	// Raid buffs
 	ArcaneBrilliance bool
-	GiftOfTheWild    api.TristateEffect
+	GiftOfTheWild    proto.TristateEffect
 	BlessingOfKings  bool
-	BlessingOfWisdom api.TristateEffect
-	DivineSpirit     api.TristateEffect
+	BlessingOfWisdom proto.TristateEffect
+	DivineSpirit     proto.TristateEffect
 
 	// Party class buffs
-	MoonkinAura         api.TristateEffect
+	MoonkinAura         proto.TristateEffect
 	ShadowPriestDPS     uint16 // adds Mp5 ~ 25% (dps*5%*5sec = 25%)
 	Bloodlust           int
 
@@ -40,13 +40,13 @@ type Buffs struct {
 	Misery                    bool
 }
 
-//func TristateMax(a api.TristateEffect, b api.TristateEffect) api.TristateEffect {
+//func TristateMax(a proto.TristateEffect, b proto.TristateEffect) api.TristateEffect {
 //}
 
-func GetTristateValueFloat(effect api.TristateEffect, regularValue float64, impValue float64) float64 {
-	if effect == api.TristateEffect_TristateEffectRegular {
+func GetTristateValueFloat(effect proto.TristateEffect, regularValue float64, impValue float64) float64 {
+	if effect == proto.TristateEffect_TristateEffectRegular {
 		return regularValue
-	} else if effect == api.TristateEffect_TristateEffectImproved {
+	} else if effect == proto.TristateEffect_TristateEffectImproved {
 		return impValue
 	} else {
 		return 0

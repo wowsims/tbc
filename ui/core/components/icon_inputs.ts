@@ -1,5 +1,5 @@
-import { Buffs } from '../api/common.js';
-import { Consumes } from '../api/common.js';
+import { Buffs } from '../proto/common.js';
+import { Consumes } from '../proto/common.js';
 import { ItemOrSpellId } from '../resources.js';
 import { Sim } from '../sim.js';
 

@@ -16,11 +16,10 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/wowsims/tbc/sim/api"
-	"github.com/wowsims/tbc/sim/api/papi"
+	"github.com/wowsims/tbc/sim"
+	"github.com/wowsims/tbc/sim/core/proto"
 
-	// "github.com/wowsims/tbc/dist"
-	"google.golang.org/protobuf/proto"
+	googleProto "google.golang.org/protobuf/proto"
 )
 
 func main() {
@@ -127,16 +126,16 @@ func runServer(useFS bool, host string, launchBrowser bool, inputReader *bufio.R
 }
 
 type apiHandler struct {
-	msg    func() proto.Message
-	handle func(proto.Message) proto.Message
+	msg    func() googleProto.Message
+	handle func(googleProto.Message) googleProto.Message
 }
 
 // Handlers to decode and handle each proto function
 var handlers = map[string]apiHandler{
-	"/individualSim": {msg: func() proto.Message { return &api.IndividualSimRequest{} }, handle: func(msg proto.Message) proto.Message { return papi.RunSimulation(msg.(*api.IndividualSimRequest)) }},
-	"/statWeights":   {msg: func() proto.Message { return &api.StatWeightsRequest{} }, handle: func(msg proto.Message) proto.Message { return papi.StatWeights(msg.(*api.StatWeightsRequest)) }},
-	"/computeStats":  {msg: func() proto.Message { return &api.ComputeStatsRequest{} }, handle: func(msg proto.Message) proto.Message { return papi.ComputeStats(msg.(*api.ComputeStatsRequest)) }},
-	"/gearList":      {msg: func() proto.Message { return &api.GearListRequest{} }, handle: func(msg proto.Message) proto.Message { return papi.GetGearList(msg.(*api.GearListRequest)) }},
+	"/individualSim": {msg: func() googleProto.Message { return &proto.IndividualSimRequest{} }, handle: func(msg googleProto.Message) googleProto.Message { return sim.RunSimulation(msg.(*proto.IndividualSimRequest)) }},
+	"/statWeights":   {msg: func() googleProto.Message { return &proto.StatWeightsRequest{} }, handle: func(msg googleProto.Message) googleProto.Message { return sim.StatWeights(msg.(*proto.StatWeightsRequest)) }},
+	"/computeStats":  {msg: func() googleProto.Message { return &proto.ComputeStatsRequest{} }, handle: func(msg googleProto.Message) googleProto.Message { return sim.ComputeStats(msg.(*proto.ComputeStatsRequest)) }},
+	"/gearList":      {msg: func() googleProto.Message { return &proto.GearListRequest{} }, handle: func(msg googleProto.Message) googleProto.Message { return sim.GetGearList(msg.(*proto.GearListRequest)) }},
 }
 
 // handleAPI is generic handler for any api function using protos.
@@ -156,14 +155,14 @@ func handleAPI(w http.ResponseWriter, r *http.Request) {
 	}
 
 	msg := handler.msg()
-	if err := proto.Unmarshal(body, msg); err != nil {
+	if err := googleProto.Unmarshal(body, msg); err != nil {
 		log.Printf("Failed to parse request: %s", err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 	result := handler.handle(msg)
 
-	outbytes, err := proto.Marshal(result)
+	outbytes, err := googleProto.Marshal(result)
 	if err != nil {
 		log.Printf("[ERROR] Failed to marshal result: %s", err.Error())
 		w.WriteHeader(http.StatusInternalServerError)

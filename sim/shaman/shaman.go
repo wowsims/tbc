@@ -3,8 +3,8 @@ package shaman
 import (
 	"time"
 
-	"github.com/wowsims/tbc/items"
-	"github.com/wowsims/tbc/sim/api"
+	"github.com/wowsims/tbc/sim/core/items"
+	"github.com/wowsims/tbc/sim/core/proto"
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/stats"
 )
@@ -81,12 +81,12 @@ func (shaman *Shaman) AddPartyBuffs(buffs *core.Buffs) {
 	}
 
 	if shaman.Totems.ManaSpring {
-		buffs.ManaSpringTotem = api.TristateEffect_TristateEffectRegular
+		buffs.ManaSpringTotem = proto.TristateEffect_TristateEffectRegular
 	}
 
 	if shaman.Totems.WrathOfAir {
 		// TODO: Check for t4 set bonus
-		buffs.WrathOfAirTotem = api.TristateEffect_TristateEffectRegular
+		buffs.WrathOfAirTotem = proto.TristateEffect_TristateEffectRegular
 	}
 }
 
@@ -164,7 +164,7 @@ type Talents struct {
 	Concussion         int
 }
 
-func convertShamTalents(t *api.ShamanTalents) Talents {
+func convertShamTalents(t *proto.ShamanTalents) Talents {
 	return Talents{
 		LightningOverload:  int(t.LightningOverload),
 		ElementalPrecision: int(t.ElementalPrecision),

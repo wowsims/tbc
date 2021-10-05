@@ -6,7 +6,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/wowsims/tbc/sim/api"
+	"github.com/wowsims/tbc/sim/core/proto"
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
@@ -19,8 +19,8 @@ func ToSnakeCase(str string) string {
 	return strings.ToLower(snake)
 }
 
-// Converts api.Spec_SpecElementalShaman into 'elemental_shaman'
-func SpecToFileName(spec *api.Spec) string {
+// Converts proto.Spec_SpecElementalShaman into 'elemental_shaman'
+func SpecToFileName(spec *proto.Spec) string {
 	if spec == nil {
 		return "all"
 	}
@@ -28,7 +28,7 @@ func SpecToFileName(spec *api.Spec) string {
 	return ToSnakeCase(spec.String()[4:])
 }
 
-func specInSlice(a api.Spec, list []api.Spec) bool {
+func specInSlice(a proto.Spec, list []proto.Spec) bool {
 	for _, b := range list {
 		if b == a {
 			return true
@@ -37,7 +37,7 @@ func specInSlice(a api.Spec, list []api.Spec) bool {
 	return false
 }
 
-func writeItemFile(outDir string, itemDeclarations []ItemDeclaration, itemResponses []WowheadItemResponse, spec *api.Spec) {
+func writeItemFile(outDir string, itemDeclarations []ItemDeclaration, itemResponses []WowheadItemResponse, spec *proto.Spec) {
 	err := os.MkdirAll(outDir, os.ModePerm)
 	if err != nil {
 		panic(err)
@@ -52,8 +52,8 @@ func writeItemFile(outDir string, itemDeclarations []ItemDeclaration, itemRespon
 
 	if spec == nil {
 		// all.go should be used when none of the spec tags are specified
-		for specVal, _ := range api.Spec_name {
-			spec := api.Spec(specVal)
+		for specVal, _ := range proto.Spec_name {
+			spec := proto.Spec(specVal)
 			file.WriteString(fmt.Sprintf("// +build !%s\n", SpecToFileName(&spec)))
 		}
 		file.WriteString("\n")
@@ -66,7 +66,7 @@ func writeItemFile(outDir string, itemDeclarations []ItemDeclaration, itemRespon
 package items
 	
 import (
-	"github.com/wowsims/tbc/sim/api"
+	"github.com/wowsims/tbc/sim/core/proto"
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
@@ -91,39 +91,39 @@ func itemToGoString(itemDeclaration ItemDeclaration, itemResponse WowheadItemRes
 	itemStr += fmt.Sprintf("Name:\"%s\", ", itemResponse.Name)
 	itemStr += fmt.Sprintf("ID:%d, ", itemDeclaration.ID)
 
-	itemStr += fmt.Sprintf("Type:api.ItemType_%s, ", itemResponse.GetItemType().String())
+	itemStr += fmt.Sprintf("Type:proto.ItemType_%s, ", itemResponse.GetItemType().String())
 
 	armorType := itemResponse.GetArmorType()
-	if armorType != api.ArmorType_ArmorTypeUnknown {
-		itemStr += fmt.Sprintf("ArmorType:api.ArmorType_%s, ", armorType.String())
+	if armorType != proto.ArmorType_ArmorTypeUnknown {
+		itemStr += fmt.Sprintf("ArmorType:proto.ArmorType_%s, ", armorType.String())
 	}
 
 	weaponType := itemResponse.GetWeaponType()
-	if weaponType != api.WeaponType_WeaponTypeUnknown {
-		itemStr += fmt.Sprintf("WeaponType:api.WeaponType_%s, ", weaponType.String())
+	if weaponType != proto.WeaponType_WeaponTypeUnknown {
+		itemStr += fmt.Sprintf("WeaponType:proto.WeaponType_%s, ", weaponType.String())
 
 		handType := itemResponse.GetHandType()
-		if handType == api.HandType_HandTypeUnknown {
+		if handType == proto.HandType_HandTypeUnknown {
 			panic("Unknown hand type for item: " + itemResponse.Tooltip)
 		}
-		itemStr += fmt.Sprintf("HandType:api.HandType_%s, ", handType.String())
+		itemStr += fmt.Sprintf("HandType:proto.HandType_%s, ", handType.String())
 	} else {
 		rangedWeaponType := itemResponse.GetRangedWeaponType()
-		if rangedWeaponType != api.RangedWeaponType_RangedWeaponTypeUnknown {
-			itemStr += fmt.Sprintf("RangedWeaponType:api.RangedWeaponType_%s, ", rangedWeaponType.String())
+		if rangedWeaponType != proto.RangedWeaponType_RangedWeaponTypeUnknown {
+			itemStr += fmt.Sprintf("RangedWeaponType:proto.RangedWeaponType_%s, ", rangedWeaponType.String())
 		}
 	}
 
 	itemStr += fmt.Sprintf("Phase:%d, ", itemResponse.GetPhase())
-	itemStr += fmt.Sprintf("Quality:api.ItemQuality_%s, ", api.ItemQuality(itemResponse.Quality).String())
+	itemStr += fmt.Sprintf("Quality:proto.ItemQuality_%s, ", proto.ItemQuality(itemResponse.Quality).String())
 
 	itemStr += fmt.Sprintf("Stats: %s, ", statsToGoString(itemResponse.GetStats()))
 
 	gemSockets := itemResponse.GetGemSockets()
 	if len(gemSockets) > 0 {
-		itemStr += "GemSockets: []api.GemColor{"
+		itemStr += "GemSockets: []proto.GemColor{"
 		for _, gemColor := range gemSockets {
-			itemStr += fmt.Sprintf("api.GemColor_%s,", gemColor.String())
+			itemStr += fmt.Sprintf("proto.GemColor_%s,", gemColor.String())
 		}
 		itemStr += "}, "
 	}

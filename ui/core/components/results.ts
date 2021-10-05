@@ -1,6 +1,6 @@
-import { IndividualSimResult } from '../api/api.js';
-import { StatWeightsRequest, StatWeightsResult } from '../api/api.js';
-import { Stat } from '../api/common.js';
+import { IndividualSimResult } from '../proto/api.js';
+import { StatWeightsRequest, StatWeightsResult } from '../proto/api.js';
+import { Stat } from '../proto/common.js';
 import { statNames } from '../api/names.js';
 import { stDevToConf90 } from '../utils.js';
 import { Component } from './component.js';

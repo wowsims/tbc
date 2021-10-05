@@ -1,17 +1,17 @@
-import { Buffs } from '../core/api/common.js';
-import { Class } from '../core/api/common.js';
-import { Consumes } from '../core/api/common.js';
-import { Encounter } from '../core/api/common.js';
-import { ItemSlot } from '../core/api/common.js';
-import { Spec } from '../core/api/common.js';
-import { Stat } from '../core/api/common.js';
-import { TristateEffect } from '../core/api/common.js'
+import { Buffs } from '../core/proto/common.js';
+import { Class } from '../core/proto/common.js';
+import { Consumes } from '../core/proto/common.js';
+import { Encounter } from '../core/proto/common.js';
+import { ItemSlot } from '../core/proto/common.js';
+import { Spec } from '../core/proto/common.js';
+import { Stat } from '../core/proto/common.js';
+import { TristateEffect } from '../core/proto/common.js'
 import { Stats } from '../core/api/stats.js';
 import { Sim } from '../core/sim.js';
 import { DefaultTheme } from '../core/themes/default.js';
 
-import { ElementalShaman, ElementalShaman_Agent as ElementalShamanAgent, ShamanTalents as ShamanTalents, ElementalShaman_Options as ElementalShamanOptions } from '../core/api/shaman.js';
-import { ElementalShaman_Agent_AgentType as AgentType } from '../core/api/shaman.js';
+import { ElementalShaman, ElementalShaman_Agent as ElementalShamanAgent, ShamanTalents as ShamanTalents, ElementalShaman_Options as ElementalShamanOptions } from '../core/proto/shaman.js';
+import { ElementalShaman_Agent_AgentType as AgentType } from '../core/proto/shaman.js';
 
 import * as IconInputs from '../core/components/icon_inputs.js';
 import * as OtherInputs from '../core/components/other_inputs.js';

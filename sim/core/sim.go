@@ -7,8 +7,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/wowsims/tbc/items"
-	"github.com/wowsims/tbc/sim/api"
+	"github.com/wowsims/tbc/sim/core/items"
+	"github.com/wowsims/tbc/sim/core/proto"
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
@@ -40,7 +40,7 @@ type IndividualParams struct {
 	Buffs    Buffs
 	Options  Options
 
-	PlayerOptions *api.PlayerOptions
+	PlayerOptions *proto.PlayerOptions
 
 	CustomStats stats.Stats
 }
@@ -125,7 +125,7 @@ func NewIndividualSim(params IndividualParams) *Simulation {
 				player.GetCharacter().InitialStats[stats.Intellect] *= 1.1
 				player.GetCharacter().InitialStats[stats.Spirit] *= 1.1
 			}
-			if raid.Buffs.DivineSpirit == api.TristateEffect_TristateEffectImproved {
+			if raid.Buffs.DivineSpirit == proto.TristateEffect_TristateEffectImproved {
 				player.GetCharacter().InitialStats[stats.SpellPower] += player.GetCharacter().InitialStats[stats.Spirit] * 0.1
 			}
 			// Add SpellCrit from Int and Mana from Int
