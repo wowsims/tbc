@@ -100,7 +100,7 @@ func getAccessToken(clientId string, clientSecret string) string {
 }
 
 func getItemData(itemId int, accessToken string) BlizzardItemResponse {
-	url := fmt.Sprintf("https://us.proto.blizzard.com/data/wow/item/%d?namespace=static-classic-us&locale=en_US&access_token=%s", itemId, accessToken)
+	url := fmt.Sprintf("https://us.api.blizzard.com/data/wow/item/%d?namespace=static-classic-us&locale=en_US&access_token=%s", itemId, accessToken)
 
 	httpClient := http.Client{
 		Timeout: 10 * time.Second,
