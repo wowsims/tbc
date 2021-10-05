@@ -17,11 +17,11 @@ import { ElementalShaman } from "./shaman";
 import { BalanceDruid } from "./druid";
 import { Race } from "./common";
 /**
- * @generated from protobuf message api.PlayerOptions
+ * @generated from protobuf message proto.PlayerOptions
  */
 export interface PlayerOptions {
     /**
-     * @generated from protobuf field: api.Race race = 1;
+     * @generated from protobuf field: proto.Race race = 1;
      */
     race: Race;
     /**
@@ -30,110 +30,110 @@ export interface PlayerOptions {
     spec: {
         oneofKind: "balanceDruid";
         /**
-         * @generated from protobuf field: api.BalanceDruid balance_druid = 2;
+         * @generated from protobuf field: proto.BalanceDruid balance_druid = 2;
          */
         balanceDruid: BalanceDruid;
     } | {
         oneofKind: "hunter";
         /**
-         * @generated from protobuf field: api.Hunter hunter = 3;
+         * @generated from protobuf field: proto.Hunter hunter = 3;
          */
         hunter: Hunter;
     } | {
         oneofKind: "mage";
         /**
-         * @generated from protobuf field: api.Mage mage = 4;
+         * @generated from protobuf field: proto.Mage mage = 4;
          */
         mage: Mage;
     } | {
         oneofKind: "paladin";
         /**
-         * @generated from protobuf field: api.Paladin paladin = 5;
+         * @generated from protobuf field: proto.Paladin paladin = 5;
          */
         paladin: Paladin;
     } | {
         oneofKind: "priest";
         /**
-         * @generated from protobuf field: api.Priest priest = 6;
+         * @generated from protobuf field: proto.Priest priest = 6;
          */
         priest: Priest;
     } | {
         oneofKind: "rogue";
         /**
-         * @generated from protobuf field: api.Rogue rogue = 7;
+         * @generated from protobuf field: proto.Rogue rogue = 7;
          */
         rogue: Rogue;
     } | {
         oneofKind: "elementalShaman";
         /**
-         * @generated from protobuf field: api.ElementalShaman elemental_shaman = 8;
+         * @generated from protobuf field: proto.ElementalShaman elemental_shaman = 8;
          */
         elementalShaman: ElementalShaman;
     } | {
         oneofKind: "warlock";
         /**
-         * @generated from protobuf field: api.Warlock warlock = 9;
+         * @generated from protobuf field: proto.Warlock warlock = 9;
          */
         warlock: Warlock;
     } | {
         oneofKind: "warrior";
         /**
-         * @generated from protobuf field: api.Warrior warrior = 10;
+         * @generated from protobuf field: proto.Warrior warrior = 10;
          */
         warrior: Warrior;
     } | {
         oneofKind: undefined;
     };
     /**
-     * @generated from protobuf field: api.Consumes consumes = 11;
+     * @generated from protobuf field: proto.Consumes consumes = 11;
      */
     consumes?: Consumes;
 }
 /**
- * @generated from protobuf message api.Hunter
+ * @generated from protobuf message proto.Hunter
  */
 export interface Hunter {
 }
 /**
- * @generated from protobuf message api.Mage
+ * @generated from protobuf message proto.Mage
  */
 export interface Mage {
 }
 /**
- * @generated from protobuf message api.Paladin
+ * @generated from protobuf message proto.Paladin
  */
 export interface Paladin {
 }
 /**
- * @generated from protobuf message api.Priest
+ * @generated from protobuf message proto.Priest
  */
 export interface Priest {
 }
 /**
- * @generated from protobuf message api.Rogue
+ * @generated from protobuf message proto.Rogue
  */
 export interface Rogue {
 }
 /**
- * @generated from protobuf message api.Warlock
+ * @generated from protobuf message proto.Warlock
  */
 export interface Warlock {
 }
 /**
- * @generated from protobuf message api.Warrior
+ * @generated from protobuf message proto.Warrior
  */
 export interface Warrior {
 }
 /**
- * @generated from protobuf message api.Player
+ * @generated from protobuf message proto.Player
  */
 export interface Player {
     /**
-     * @generated from protobuf field: api.PlayerOptions options = 1;
+     * @generated from protobuf field: proto.PlayerOptions options = 1;
      */
     options?: PlayerOptions;
     /**
-     * @generated from protobuf field: api.EquipmentSpec equipment = 2;
+     * @generated from protobuf field: proto.EquipmentSpec equipment = 2;
      */
     equipment?: EquipmentSpec;
     /**
@@ -142,39 +142,39 @@ export interface Player {
     customStats: number[];
 }
 /**
- * @generated from protobuf message api.Party
+ * @generated from protobuf message proto.Party
  */
 export interface Party {
     /**
-     * @generated from protobuf field: repeated api.Player players = 1;
+     * @generated from protobuf field: repeated proto.Player players = 1;
      */
     players: Player[];
 }
 /**
- * @generated from protobuf message api.Raid
+ * @generated from protobuf message proto.Raid
  */
 export interface Raid {
     /**
-     * @generated from protobuf field: repeated api.Party parties = 1;
+     * @generated from protobuf field: repeated proto.Party parties = 1;
      */
     parties: Party[];
 }
 /**
  * RPC IndividualSim
  *
- * @generated from protobuf message api.IndividualSimRequest
+ * @generated from protobuf message proto.IndividualSimRequest
  */
 export interface IndividualSimRequest {
     /**
-     * @generated from protobuf field: api.Player player = 1;
+     * @generated from protobuf field: proto.Player player = 1;
      */
     player?: Player;
     /**
-     * @generated from protobuf field: api.Buffs buffs = 2;
+     * @generated from protobuf field: proto.Buffs buffs = 2;
      */
     buffs?: Buffs;
     /**
-     * @generated from protobuf field: api.Encounter encounter = 3;
+     * @generated from protobuf field: proto.Encounter encounter = 3;
      */
     encounter?: Encounter;
     /**
@@ -199,7 +199,7 @@ export interface IndividualSimRequest {
     exitOnOom: boolean;
 }
 /**
- * @generated from protobuf message api.IndividualSimResult
+ * @generated from protobuf message proto.IndividualSimResult
  */
 export interface IndividualSimResult {
     /**
@@ -241,7 +241,7 @@ export interface IndividualSimResult {
      */
     dpsAtOomAvg: number;
     /**
-     * @generated from protobuf field: map<int32, api.CastMetric> casts = 10;
+     * @generated from protobuf field: map<int32, proto.CastMetric> casts = 10;
      */
     casts: {
         [key: number]: CastMetric;
@@ -255,7 +255,7 @@ export interface IndividualSimResult {
  * CastMetric holds a collection of counts of casts and
  *
  *
- * @generated from protobuf message api.CastMetric
+ * @generated from protobuf message proto.CastMetric
  */
 export interface CastMetric {
     /**
@@ -278,15 +278,15 @@ export interface CastMetric {
 /**
  * RPC RaidSim
  *
- * @generated from protobuf message api.RaidSimRequest
+ * @generated from protobuf message proto.RaidSimRequest
  */
 export interface RaidSimRequest {
     /**
-     * @generated from protobuf field: api.Raid raid = 1;
+     * @generated from protobuf field: proto.Raid raid = 1;
      */
     raid?: Raid;
     /**
-     * @generated from protobuf field: api.Encounter encounter = 2;
+     * @generated from protobuf field: proto.Encounter encounter = 2;
      */
     encounter?: Encounter;
     /**
@@ -305,48 +305,48 @@ export interface RaidSimRequest {
 /**
  * RPC GearList
  *
- * @generated from protobuf message api.GearListRequest
+ * @generated from protobuf message proto.GearListRequest
  */
 export interface GearListRequest {
     /**
-     * @generated from protobuf field: api.Spec spec = 1;
+     * @generated from protobuf field: proto.Spec spec = 1;
      */
     spec: Spec;
 }
 /**
- * @generated from protobuf message api.GearListResult
+ * @generated from protobuf message proto.GearListResult
  */
 export interface GearListResult {
     /**
-     * @generated from protobuf field: repeated api.Item items = 1;
+     * @generated from protobuf field: repeated proto.Item items = 1;
      */
     items: Item[];
     /**
-     * @generated from protobuf field: repeated api.Enchant enchants = 2;
+     * @generated from protobuf field: repeated proto.Enchant enchants = 2;
      */
     enchants: Enchant[];
     /**
-     * @generated from protobuf field: repeated api.Gem gems = 3;
+     * @generated from protobuf field: repeated proto.Gem gems = 3;
      */
     gems: Gem[];
 }
 /**
  * RPC ComputeStats
  *
- * @generated from protobuf message api.ComputeStatsRequest
+ * @generated from protobuf message proto.ComputeStatsRequest
  */
 export interface ComputeStatsRequest {
     /**
-     * @generated from protobuf field: api.Player player = 1;
+     * @generated from protobuf field: proto.Player player = 1;
      */
     player?: Player;
     /**
-     * @generated from protobuf field: api.Buffs buffs = 2;
+     * @generated from protobuf field: proto.Buffs buffs = 2;
      */
     buffs?: Buffs;
 }
 /**
- * @generated from protobuf message api.ComputeStatsResult
+ * @generated from protobuf message proto.ComputeStatsResult
  */
 export interface ComputeStatsResult {
     /**
@@ -365,24 +365,24 @@ export interface ComputeStatsResult {
 /**
  * RPC StatWeights
  *
- * @generated from protobuf message api.StatWeightsRequest
+ * @generated from protobuf message proto.StatWeightsRequest
  */
 export interface StatWeightsRequest {
     /**
-     * @generated from protobuf field: api.IndividualSimRequest options = 1;
+     * @generated from protobuf field: proto.IndividualSimRequest options = 1;
      */
     options?: IndividualSimRequest;
     /**
-     * @generated from protobuf field: repeated api.Stat stats_to_weigh = 2;
+     * @generated from protobuf field: repeated proto.Stat stats_to_weigh = 2;
      */
     statsToWeigh: Stat[];
     /**
-     * @generated from protobuf field: api.Stat ep_reference_stat = 3;
+     * @generated from protobuf field: proto.Stat ep_reference_stat = 3;
      */
     epReferenceStat: Stat;
 }
 /**
- * @generated from protobuf message api.StatWeightsResult
+ * @generated from protobuf message proto.StatWeightsResult
  */
 export interface StatWeightsResult {
     /**
@@ -409,7 +409,7 @@ declare class PlayerOptions$Type extends MessageType<PlayerOptions> {
     internalBinaryWrite(message: PlayerOptions, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
- * @generated MessageType for protobuf message api.PlayerOptions
+ * @generated MessageType for protobuf message proto.PlayerOptions
  */
 export declare const PlayerOptions: PlayerOptions$Type;
 declare class Hunter$Type extends MessageType<Hunter> {
@@ -419,7 +419,7 @@ declare class Hunter$Type extends MessageType<Hunter> {
     internalBinaryWrite(message: Hunter, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
- * @generated MessageType for protobuf message api.Hunter
+ * @generated MessageType for protobuf message proto.Hunter
  */
 export declare const Hunter: Hunter$Type;
 declare class Mage$Type extends MessageType<Mage> {
@@ -429,7 +429,7 @@ declare class Mage$Type extends MessageType<Mage> {
     internalBinaryWrite(message: Mage, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
- * @generated MessageType for protobuf message api.Mage
+ * @generated MessageType for protobuf message proto.Mage
  */
 export declare const Mage: Mage$Type;
 declare class Paladin$Type extends MessageType<Paladin> {
@@ -439,7 +439,7 @@ declare class Paladin$Type extends MessageType<Paladin> {
     internalBinaryWrite(message: Paladin, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
- * @generated MessageType for protobuf message api.Paladin
+ * @generated MessageType for protobuf message proto.Paladin
  */
 export declare const Paladin: Paladin$Type;
 declare class Priest$Type extends MessageType<Priest> {
@@ -449,7 +449,7 @@ declare class Priest$Type extends MessageType<Priest> {
     internalBinaryWrite(message: Priest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
- * @generated MessageType for protobuf message api.Priest
+ * @generated MessageType for protobuf message proto.Priest
  */
 export declare const Priest: Priest$Type;
 declare class Rogue$Type extends MessageType<Rogue> {
@@ -459,7 +459,7 @@ declare class Rogue$Type extends MessageType<Rogue> {
     internalBinaryWrite(message: Rogue, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
- * @generated MessageType for protobuf message api.Rogue
+ * @generated MessageType for protobuf message proto.Rogue
  */
 export declare const Rogue: Rogue$Type;
 declare class Warlock$Type extends MessageType<Warlock> {
@@ -469,7 +469,7 @@ declare class Warlock$Type extends MessageType<Warlock> {
     internalBinaryWrite(message: Warlock, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
- * @generated MessageType for protobuf message api.Warlock
+ * @generated MessageType for protobuf message proto.Warlock
  */
 export declare const Warlock: Warlock$Type;
 declare class Warrior$Type extends MessageType<Warrior> {
@@ -479,7 +479,7 @@ declare class Warrior$Type extends MessageType<Warrior> {
     internalBinaryWrite(message: Warrior, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
- * @generated MessageType for protobuf message api.Warrior
+ * @generated MessageType for protobuf message proto.Warrior
  */
 export declare const Warrior: Warrior$Type;
 declare class Player$Type extends MessageType<Player> {
@@ -489,7 +489,7 @@ declare class Player$Type extends MessageType<Player> {
     internalBinaryWrite(message: Player, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
- * @generated MessageType for protobuf message api.Player
+ * @generated MessageType for protobuf message proto.Player
  */
 export declare const Player: Player$Type;
 declare class Party$Type extends MessageType<Party> {
@@ -499,7 +499,7 @@ declare class Party$Type extends MessageType<Party> {
     internalBinaryWrite(message: Party, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
- * @generated MessageType for protobuf message api.Party
+ * @generated MessageType for protobuf message proto.Party
  */
 export declare const Party: Party$Type;
 declare class Raid$Type extends MessageType<Raid> {
@@ -509,7 +509,7 @@ declare class Raid$Type extends MessageType<Raid> {
     internalBinaryWrite(message: Raid, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
- * @generated MessageType for protobuf message api.Raid
+ * @generated MessageType for protobuf message proto.Raid
  */
 export declare const Raid: Raid$Type;
 declare class IndividualSimRequest$Type extends MessageType<IndividualSimRequest> {
@@ -519,7 +519,7 @@ declare class IndividualSimRequest$Type extends MessageType<IndividualSimRequest
     internalBinaryWrite(message: IndividualSimRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
- * @generated MessageType for protobuf message api.IndividualSimRequest
+ * @generated MessageType for protobuf message proto.IndividualSimRequest
  */
 export declare const IndividualSimRequest: IndividualSimRequest$Type;
 declare class IndividualSimResult$Type extends MessageType<IndividualSimResult> {
@@ -531,7 +531,7 @@ declare class IndividualSimResult$Type extends MessageType<IndividualSimResult> 
     internalBinaryWrite(message: IndividualSimResult, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
- * @generated MessageType for protobuf message api.IndividualSimResult
+ * @generated MessageType for protobuf message proto.IndividualSimResult
  */
 export declare const IndividualSimResult: IndividualSimResult$Type;
 declare class CastMetric$Type extends MessageType<CastMetric> {
@@ -541,7 +541,7 @@ declare class CastMetric$Type extends MessageType<CastMetric> {
     internalBinaryWrite(message: CastMetric, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
- * @generated MessageType for protobuf message api.CastMetric
+ * @generated MessageType for protobuf message proto.CastMetric
  */
 export declare const CastMetric: CastMetric$Type;
 declare class RaidSimRequest$Type extends MessageType<RaidSimRequest> {
@@ -551,7 +551,7 @@ declare class RaidSimRequest$Type extends MessageType<RaidSimRequest> {
     internalBinaryWrite(message: RaidSimRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
- * @generated MessageType for protobuf message api.RaidSimRequest
+ * @generated MessageType for protobuf message proto.RaidSimRequest
  */
 export declare const RaidSimRequest: RaidSimRequest$Type;
 declare class GearListRequest$Type extends MessageType<GearListRequest> {
@@ -561,7 +561,7 @@ declare class GearListRequest$Type extends MessageType<GearListRequest> {
     internalBinaryWrite(message: GearListRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
- * @generated MessageType for protobuf message api.GearListRequest
+ * @generated MessageType for protobuf message proto.GearListRequest
  */
 export declare const GearListRequest: GearListRequest$Type;
 declare class GearListResult$Type extends MessageType<GearListResult> {
@@ -571,7 +571,7 @@ declare class GearListResult$Type extends MessageType<GearListResult> {
     internalBinaryWrite(message: GearListResult, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
- * @generated MessageType for protobuf message api.GearListResult
+ * @generated MessageType for protobuf message proto.GearListResult
  */
 export declare const GearListResult: GearListResult$Type;
 declare class ComputeStatsRequest$Type extends MessageType<ComputeStatsRequest> {
@@ -581,7 +581,7 @@ declare class ComputeStatsRequest$Type extends MessageType<ComputeStatsRequest> 
     internalBinaryWrite(message: ComputeStatsRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
- * @generated MessageType for protobuf message api.ComputeStatsRequest
+ * @generated MessageType for protobuf message proto.ComputeStatsRequest
  */
 export declare const ComputeStatsRequest: ComputeStatsRequest$Type;
 declare class ComputeStatsResult$Type extends MessageType<ComputeStatsResult> {
@@ -591,7 +591,7 @@ declare class ComputeStatsResult$Type extends MessageType<ComputeStatsResult> {
     internalBinaryWrite(message: ComputeStatsResult, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
- * @generated MessageType for protobuf message api.ComputeStatsResult
+ * @generated MessageType for protobuf message proto.ComputeStatsResult
  */
 export declare const ComputeStatsResult: ComputeStatsResult$Type;
 declare class StatWeightsRequest$Type extends MessageType<StatWeightsRequest> {
@@ -601,7 +601,7 @@ declare class StatWeightsRequest$Type extends MessageType<StatWeightsRequest> {
     internalBinaryWrite(message: StatWeightsRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
- * @generated MessageType for protobuf message api.StatWeightsRequest
+ * @generated MessageType for protobuf message proto.StatWeightsRequest
  */
 export declare const StatWeightsRequest: StatWeightsRequest$Type;
 declare class StatWeightsResult$Type extends MessageType<StatWeightsResult> {
@@ -611,7 +611,7 @@ declare class StatWeightsResult$Type extends MessageType<StatWeightsResult> {
     internalBinaryWrite(message: StatWeightsResult, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
- * @generated MessageType for protobuf message api.StatWeightsResult
+ * @generated MessageType for protobuf message proto.StatWeightsResult
  */
 export declare const StatWeightsResult: StatWeightsResult$Type;
 export {};

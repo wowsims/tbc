@@ -1,4 +1,4 @@
-import { Stat } from '../api/common.js';
+import { Stat } from '../proto/common.js';
 import { statNames } from '../api/names.js';
 import { Stats } from '../api/stats.js';
 import { Component } from './component.js';

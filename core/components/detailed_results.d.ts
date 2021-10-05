@@ -1,4 +1,4 @@
-import { IndividualSimRequest, IndividualSimResult } from '../api/api.js';
+import { IndividualSimRequest, IndividualSimResult } from '../proto/api.js';
 import { Component } from './component.js';
 export declare type IndividualSimData = {
     request: IndividualSimRequest;

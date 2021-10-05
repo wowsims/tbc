@@ -1,6 +1,6 @@
-import { IndividualSimResult } from '../api/api.js';
-import { StatWeightsRequest, StatWeightsResult } from '../api/api.js';
-import { Stat } from '../api/common.js';
+import { IndividualSimResult } from '../proto/api.js';
+import { StatWeightsRequest, StatWeightsResult } from '../proto/api.js';
+import { Stat } from '../proto/common.js';
 import { Component } from './component.js';
 export declare class Results extends Component {
     readonly pendingElem: HTMLDivElement;

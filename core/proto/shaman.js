@@ -4,7 +4,7 @@ import { reflectionMergePartial } from '/tbc/protobuf-ts/index.js';
 import { MESSAGE_TYPE } from '/tbc/protobuf-ts/index.js';
 import { MessageType } from '/tbc/protobuf-ts/index.js';
 /**
- * @generated from protobuf enum api.ElementalShaman.Agent.AgentType
+ * @generated from protobuf enum proto.ElementalShaman.Agent.AgentType
  */
 export var ElementalShaman_Agent_AgentType;
 (function (ElementalShaman_Agent_AgentType) {
@@ -32,7 +32,7 @@ export var ElementalShaman_Agent_AgentType;
 // @generated message type with reflection information, may provide speed optimized methods
 class ShamanTalents$Type extends MessageType {
     constructor() {
-        super("api.ShamanTalents", [
+        super("proto.ShamanTalents", [
             { no: 1, name: "convection", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 2, name: "concussion", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 3, name: "call_of_flame", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
@@ -290,13 +290,13 @@ class ShamanTalents$Type extends MessageType {
     }
 }
 /**
- * @generated MessageType for protobuf message api.ShamanTalents
+ * @generated MessageType for protobuf message proto.ShamanTalents
  */
 export const ShamanTalents = new ShamanTalents$Type();
 // @generated message type with reflection information, may provide speed optimized methods
 class ElementalShaman$Type extends MessageType {
     constructor() {
-        super("api.ElementalShaman", [
+        super("proto.ElementalShaman", [
             { no: 1, name: "agent", kind: "message", T: () => ElementalShaman_Agent },
             { no: 2, name: "talents", kind: "message", T: () => ShamanTalents },
             { no: 3, name: "options", kind: "message", T: () => ElementalShaman_Options }
@@ -314,13 +314,13 @@ class ElementalShaman$Type extends MessageType {
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
-                case /* api.ElementalShaman.Agent agent */ 1:
+                case /* proto.ElementalShaman.Agent agent */ 1:
                     message.agent = ElementalShaman_Agent.internalBinaryRead(reader, reader.uint32(), options, message.agent);
                     break;
-                case /* api.ShamanTalents talents */ 2:
+                case /* proto.ShamanTalents talents */ 2:
                     message.talents = ShamanTalents.internalBinaryRead(reader, reader.uint32(), options, message.talents);
                     break;
-                case /* api.ElementalShaman.Options options */ 3:
+                case /* proto.ElementalShaman.Options options */ 3:
                     message.options = ElementalShaman_Options.internalBinaryRead(reader, reader.uint32(), options, message.options);
                     break;
                 default:
@@ -335,13 +335,13 @@ class ElementalShaman$Type extends MessageType {
         return message;
     }
     internalBinaryWrite(message, writer, options) {
-        /* api.ElementalShaman.Agent agent = 1; */
+        /* proto.ElementalShaman.Agent agent = 1; */
         if (message.agent)
             ElementalShaman_Agent.internalBinaryWrite(message.agent, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
-        /* api.ShamanTalents talents = 2; */
+        /* proto.ShamanTalents talents = 2; */
         if (message.talents)
             ShamanTalents.internalBinaryWrite(message.talents, writer.tag(2, WireType.LengthDelimited).fork(), options).join();
-        /* api.ElementalShaman.Options options = 3; */
+        /* proto.ElementalShaman.Options options = 3; */
         if (message.options)
             ElementalShaman_Options.internalBinaryWrite(message.options, writer.tag(3, WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
@@ -351,14 +351,14 @@ class ElementalShaman$Type extends MessageType {
     }
 }
 /**
- * @generated MessageType for protobuf message api.ElementalShaman
+ * @generated MessageType for protobuf message proto.ElementalShaman
  */
 export const ElementalShaman = new ElementalShaman$Type();
 // @generated message type with reflection information, may provide speed optimized methods
 class ElementalShaman_Agent$Type extends MessageType {
     constructor() {
-        super("api.ElementalShaman.Agent", [
-            { no: 1, name: "type", kind: "enum", T: () => ["api.ElementalShaman.Agent.AgentType", ElementalShaman_Agent_AgentType] }
+        super("proto.ElementalShaman.Agent", [
+            { no: 1, name: "type", kind: "enum", T: () => ["proto.ElementalShaman.Agent.AgentType", ElementalShaman_Agent_AgentType] }
         ]);
     }
     create(value) {
@@ -373,7 +373,7 @@ class ElementalShaman_Agent$Type extends MessageType {
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
-                case /* api.ElementalShaman.Agent.AgentType type */ 1:
+                case /* proto.ElementalShaman.Agent.AgentType type */ 1:
                     message.type = reader.int32();
                     break;
                 default:
@@ -388,7 +388,7 @@ class ElementalShaman_Agent$Type extends MessageType {
         return message;
     }
     internalBinaryWrite(message, writer, options) {
-        /* api.ElementalShaman.Agent.AgentType type = 1; */
+        /* proto.ElementalShaman.Agent.AgentType type = 1; */
         if (message.type !== 0)
             writer.tag(1, WireType.Varint).int32(message.type);
         let u = options.writeUnknownFields;
@@ -398,13 +398,13 @@ class ElementalShaman_Agent$Type extends MessageType {
     }
 }
 /**
- * @generated MessageType for protobuf message api.ElementalShaman.Agent
+ * @generated MessageType for protobuf message proto.ElementalShaman.Agent
  */
 export const ElementalShaman_Agent = new ElementalShaman_Agent$Type();
 // @generated message type with reflection information, may provide speed optimized methods
 class ElementalShaman_Options$Type extends MessageType {
     constructor() {
-        super("api.ElementalShaman.Options", [
+        super("proto.ElementalShaman.Options", [
             { no: 1, name: "water_shield", kind: "scalar", T: 8 /*ScalarType.BOOL*/ }
         ]);
     }
@@ -445,6 +445,6 @@ class ElementalShaman_Options$Type extends MessageType {
     }
 }
 /**
- * @generated MessageType for protobuf message api.ElementalShaman.Options
+ * @generated MessageType for protobuf message proto.ElementalShaman.Options
  */
 export const ElementalShaman_Options = new ElementalShaman_Options$Type();

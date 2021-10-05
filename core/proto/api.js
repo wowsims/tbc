@@ -18,8 +18,8 @@ import { Race } from './common.js';
 // @generated message type with reflection information, may provide speed optimized methods
 class PlayerOptions$Type extends MessageType {
     constructor() {
-        super("api.PlayerOptions", [
-            { no: 1, name: "race", kind: "enum", T: () => ["api.Race", Race] },
+        super("proto.PlayerOptions", [
+            { no: 1, name: "race", kind: "enum", T: () => ["proto.Race", Race] },
             { no: 2, name: "balance_druid", kind: "message", oneof: "spec", T: () => BalanceDruid },
             { no: 3, name: "hunter", kind: "message", oneof: "spec", T: () => Hunter },
             { no: 4, name: "mage", kind: "message", oneof: "spec", T: () => Mage },
@@ -44,64 +44,64 @@ class PlayerOptions$Type extends MessageType {
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
-                case /* api.Race race */ 1:
+                case /* proto.Race race */ 1:
                     message.race = reader.int32();
                     break;
-                case /* api.BalanceDruid balance_druid */ 2:
+                case /* proto.BalanceDruid balance_druid */ 2:
                     message.spec = {
                         oneofKind: "balanceDruid",
                         balanceDruid: BalanceDruid.internalBinaryRead(reader, reader.uint32(), options, message.spec.balanceDruid)
                     };
                     break;
-                case /* api.Hunter hunter */ 3:
+                case /* proto.Hunter hunter */ 3:
                     message.spec = {
                         oneofKind: "hunter",
                         hunter: Hunter.internalBinaryRead(reader, reader.uint32(), options, message.spec.hunter)
                     };
                     break;
-                case /* api.Mage mage */ 4:
+                case /* proto.Mage mage */ 4:
                     message.spec = {
                         oneofKind: "mage",
                         mage: Mage.internalBinaryRead(reader, reader.uint32(), options, message.spec.mage)
                     };
                     break;
-                case /* api.Paladin paladin */ 5:
+                case /* proto.Paladin paladin */ 5:
                     message.spec = {
                         oneofKind: "paladin",
                         paladin: Paladin.internalBinaryRead(reader, reader.uint32(), options, message.spec.paladin)
                     };
                     break;
-                case /* api.Priest priest */ 6:
+                case /* proto.Priest priest */ 6:
                     message.spec = {
                         oneofKind: "priest",
                         priest: Priest.internalBinaryRead(reader, reader.uint32(), options, message.spec.priest)
                     };
                     break;
-                case /* api.Rogue rogue */ 7:
+                case /* proto.Rogue rogue */ 7:
                     message.spec = {
                         oneofKind: "rogue",
                         rogue: Rogue.internalBinaryRead(reader, reader.uint32(), options, message.spec.rogue)
                     };
                     break;
-                case /* api.ElementalShaman elemental_shaman */ 8:
+                case /* proto.ElementalShaman elemental_shaman */ 8:
                     message.spec = {
                         oneofKind: "elementalShaman",
                         elementalShaman: ElementalShaman.internalBinaryRead(reader, reader.uint32(), options, message.spec.elementalShaman)
                     };
                     break;
-                case /* api.Warlock warlock */ 9:
+                case /* proto.Warlock warlock */ 9:
                     message.spec = {
                         oneofKind: "warlock",
                         warlock: Warlock.internalBinaryRead(reader, reader.uint32(), options, message.spec.warlock)
                     };
                     break;
-                case /* api.Warrior warrior */ 10:
+                case /* proto.Warrior warrior */ 10:
                     message.spec = {
                         oneofKind: "warrior",
                         warrior: Warrior.internalBinaryRead(reader, reader.uint32(), options, message.spec.warrior)
                     };
                     break;
-                case /* api.Consumes consumes */ 11:
+                case /* proto.Consumes consumes */ 11:
                     message.consumes = Consumes.internalBinaryRead(reader, reader.uint32(), options, message.consumes);
                     break;
                 default:
@@ -116,37 +116,37 @@ class PlayerOptions$Type extends MessageType {
         return message;
     }
     internalBinaryWrite(message, writer, options) {
-        /* api.Race race = 1; */
+        /* proto.Race race = 1; */
         if (message.race !== 0)
             writer.tag(1, WireType.Varint).int32(message.race);
-        /* api.BalanceDruid balance_druid = 2; */
+        /* proto.BalanceDruid balance_druid = 2; */
         if (message.spec.oneofKind === "balanceDruid")
             BalanceDruid.internalBinaryWrite(message.spec.balanceDruid, writer.tag(2, WireType.LengthDelimited).fork(), options).join();
-        /* api.Hunter hunter = 3; */
+        /* proto.Hunter hunter = 3; */
         if (message.spec.oneofKind === "hunter")
             Hunter.internalBinaryWrite(message.spec.hunter, writer.tag(3, WireType.LengthDelimited).fork(), options).join();
-        /* api.Mage mage = 4; */
+        /* proto.Mage mage = 4; */
         if (message.spec.oneofKind === "mage")
             Mage.internalBinaryWrite(message.spec.mage, writer.tag(4, WireType.LengthDelimited).fork(), options).join();
-        /* api.Paladin paladin = 5; */
+        /* proto.Paladin paladin = 5; */
         if (message.spec.oneofKind === "paladin")
             Paladin.internalBinaryWrite(message.spec.paladin, writer.tag(5, WireType.LengthDelimited).fork(), options).join();
-        /* api.Priest priest = 6; */
+        /* proto.Priest priest = 6; */
         if (message.spec.oneofKind === "priest")
             Priest.internalBinaryWrite(message.spec.priest, writer.tag(6, WireType.LengthDelimited).fork(), options).join();
-        /* api.Rogue rogue = 7; */
+        /* proto.Rogue rogue = 7; */
         if (message.spec.oneofKind === "rogue")
             Rogue.internalBinaryWrite(message.spec.rogue, writer.tag(7, WireType.LengthDelimited).fork(), options).join();
-        /* api.ElementalShaman elemental_shaman = 8; */
+        /* proto.ElementalShaman elemental_shaman = 8; */
         if (message.spec.oneofKind === "elementalShaman")
             ElementalShaman.internalBinaryWrite(message.spec.elementalShaman, writer.tag(8, WireType.LengthDelimited).fork(), options).join();
-        /* api.Warlock warlock = 9; */
+        /* proto.Warlock warlock = 9; */
         if (message.spec.oneofKind === "warlock")
             Warlock.internalBinaryWrite(message.spec.warlock, writer.tag(9, WireType.LengthDelimited).fork(), options).join();
-        /* api.Warrior warrior = 10; */
+        /* proto.Warrior warrior = 10; */
         if (message.spec.oneofKind === "warrior")
             Warrior.internalBinaryWrite(message.spec.warrior, writer.tag(10, WireType.LengthDelimited).fork(), options).join();
-        /* api.Consumes consumes = 11; */
+        /* proto.Consumes consumes = 11; */
         if (message.consumes)
             Consumes.internalBinaryWrite(message.consumes, writer.tag(11, WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
@@ -156,13 +156,13 @@ class PlayerOptions$Type extends MessageType {
     }
 }
 /**
- * @generated MessageType for protobuf message api.PlayerOptions
+ * @generated MessageType for protobuf message proto.PlayerOptions
  */
 export const PlayerOptions = new PlayerOptions$Type();
 // @generated message type with reflection information, may provide speed optimized methods
 class Hunter$Type extends MessageType {
     constructor() {
-        super("api.Hunter", []);
+        super("proto.Hunter", []);
     }
     create(value) {
         const message = {};
@@ -182,13 +182,13 @@ class Hunter$Type extends MessageType {
     }
 }
 /**
- * @generated MessageType for protobuf message api.Hunter
+ * @generated MessageType for protobuf message proto.Hunter
  */
 export const Hunter = new Hunter$Type();
 // @generated message type with reflection information, may provide speed optimized methods
 class Mage$Type extends MessageType {
     constructor() {
-        super("api.Mage", []);
+        super("proto.Mage", []);
     }
     create(value) {
         const message = {};
@@ -208,13 +208,13 @@ class Mage$Type extends MessageType {
     }
 }
 /**
- * @generated MessageType for protobuf message api.Mage
+ * @generated MessageType for protobuf message proto.Mage
  */
 export const Mage = new Mage$Type();
 // @generated message type with reflection information, may provide speed optimized methods
 class Paladin$Type extends MessageType {
     constructor() {
-        super("api.Paladin", []);
+        super("proto.Paladin", []);
     }
     create(value) {
         const message = {};
@@ -234,13 +234,13 @@ class Paladin$Type extends MessageType {
     }
 }
 /**
- * @generated MessageType for protobuf message api.Paladin
+ * @generated MessageType for protobuf message proto.Paladin
  */
 export const Paladin = new Paladin$Type();
 // @generated message type with reflection information, may provide speed optimized methods
 class Priest$Type extends MessageType {
     constructor() {
-        super("api.Priest", []);
+        super("proto.Priest", []);
     }
     create(value) {
         const message = {};
@@ -260,13 +260,13 @@ class Priest$Type extends MessageType {
     }
 }
 /**
- * @generated MessageType for protobuf message api.Priest
+ * @generated MessageType for protobuf message proto.Priest
  */
 export const Priest = new Priest$Type();
 // @generated message type with reflection information, may provide speed optimized methods
 class Rogue$Type extends MessageType {
     constructor() {
-        super("api.Rogue", []);
+        super("proto.Rogue", []);
     }
     create(value) {
         const message = {};
@@ -286,13 +286,13 @@ class Rogue$Type extends MessageType {
     }
 }
 /**
- * @generated MessageType for protobuf message api.Rogue
+ * @generated MessageType for protobuf message proto.Rogue
  */
 export const Rogue = new Rogue$Type();
 // @generated message type with reflection information, may provide speed optimized methods
 class Warlock$Type extends MessageType {
     constructor() {
-        super("api.Warlock", []);
+        super("proto.Warlock", []);
     }
     create(value) {
         const message = {};
@@ -312,13 +312,13 @@ class Warlock$Type extends MessageType {
     }
 }
 /**
- * @generated MessageType for protobuf message api.Warlock
+ * @generated MessageType for protobuf message proto.Warlock
  */
 export const Warlock = new Warlock$Type();
 // @generated message type with reflection information, may provide speed optimized methods
 class Warrior$Type extends MessageType {
     constructor() {
-        super("api.Warrior", []);
+        super("proto.Warrior", []);
     }
     create(value) {
         const message = {};
@@ -338,13 +338,13 @@ class Warrior$Type extends MessageType {
     }
 }
 /**
- * @generated MessageType for protobuf message api.Warrior
+ * @generated MessageType for protobuf message proto.Warrior
  */
 export const Warrior = new Warrior$Type();
 // @generated message type with reflection information, may provide speed optimized methods
 class Player$Type extends MessageType {
     constructor() {
-        super("api.Player", [
+        super("proto.Player", [
             { no: 1, name: "options", kind: "message", T: () => PlayerOptions },
             { no: 2, name: "equipment", kind: "message", T: () => EquipmentSpec },
             { no: 3, name: "custom_stats", kind: "scalar", repeat: 1 /*RepeatType.PACKED*/, T: 1 /*ScalarType.DOUBLE*/ }
@@ -362,10 +362,10 @@ class Player$Type extends MessageType {
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
-                case /* api.PlayerOptions options */ 1:
+                case /* proto.PlayerOptions options */ 1:
                     message.options = PlayerOptions.internalBinaryRead(reader, reader.uint32(), options, message.options);
                     break;
-                case /* api.EquipmentSpec equipment */ 2:
+                case /* proto.EquipmentSpec equipment */ 2:
                     message.equipment = EquipmentSpec.internalBinaryRead(reader, reader.uint32(), options, message.equipment);
                     break;
                 case /* repeated double custom_stats */ 3:
@@ -387,10 +387,10 @@ class Player$Type extends MessageType {
         return message;
     }
     internalBinaryWrite(message, writer, options) {
-        /* api.PlayerOptions options = 1; */
+        /* proto.PlayerOptions options = 1; */
         if (message.options)
             PlayerOptions.internalBinaryWrite(message.options, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
-        /* api.EquipmentSpec equipment = 2; */
+        /* proto.EquipmentSpec equipment = 2; */
         if (message.equipment)
             EquipmentSpec.internalBinaryWrite(message.equipment, writer.tag(2, WireType.LengthDelimited).fork(), options).join();
         /* repeated double custom_stats = 3; */
@@ -407,13 +407,13 @@ class Player$Type extends MessageType {
     }
 }
 /**
- * @generated MessageType for protobuf message api.Player
+ * @generated MessageType for protobuf message proto.Player
  */
 export const Player = new Player$Type();
 // @generated message type with reflection information, may provide speed optimized methods
 class Party$Type extends MessageType {
     constructor() {
-        super("api.Party", [
+        super("proto.Party", [
             { no: 1, name: "players", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => Player }
         ]);
     }
@@ -429,7 +429,7 @@ class Party$Type extends MessageType {
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
-                case /* repeated api.Player players */ 1:
+                case /* repeated proto.Player players */ 1:
                     message.players.push(Player.internalBinaryRead(reader, reader.uint32(), options));
                     break;
                 default:
@@ -444,7 +444,7 @@ class Party$Type extends MessageType {
         return message;
     }
     internalBinaryWrite(message, writer, options) {
-        /* repeated api.Player players = 1; */
+        /* repeated proto.Player players = 1; */
         for (let i = 0; i < message.players.length; i++)
             Player.internalBinaryWrite(message.players[i], writer.tag(1, WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
@@ -454,13 +454,13 @@ class Party$Type extends MessageType {
     }
 }
 /**
- * @generated MessageType for protobuf message api.Party
+ * @generated MessageType for protobuf message proto.Party
  */
 export const Party = new Party$Type();
 // @generated message type with reflection information, may provide speed optimized methods
 class Raid$Type extends MessageType {
     constructor() {
-        super("api.Raid", [
+        super("proto.Raid", [
             { no: 1, name: "parties", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => Party }
         ]);
     }
@@ -476,7 +476,7 @@ class Raid$Type extends MessageType {
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
-                case /* repeated api.Party parties */ 1:
+                case /* repeated proto.Party parties */ 1:
                     message.parties.push(Party.internalBinaryRead(reader, reader.uint32(), options));
                     break;
                 default:
@@ -491,7 +491,7 @@ class Raid$Type extends MessageType {
         return message;
     }
     internalBinaryWrite(message, writer, options) {
-        /* repeated api.Party parties = 1; */
+        /* repeated proto.Party parties = 1; */
         for (let i = 0; i < message.parties.length; i++)
             Party.internalBinaryWrite(message.parties[i], writer.tag(1, WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
@@ -501,13 +501,13 @@ class Raid$Type extends MessageType {
     }
 }
 /**
- * @generated MessageType for protobuf message api.Raid
+ * @generated MessageType for protobuf message proto.Raid
  */
 export const Raid = new Raid$Type();
 // @generated message type with reflection information, may provide speed optimized methods
 class IndividualSimRequest$Type extends MessageType {
     constructor() {
-        super("api.IndividualSimRequest", [
+        super("proto.IndividualSimRequest", [
             { no: 1, name: "player", kind: "message", T: () => Player },
             { no: 2, name: "buffs", kind: "message", T: () => Buffs },
             { no: 3, name: "encounter", kind: "message", T: () => Encounter },
@@ -530,13 +530,13 @@ class IndividualSimRequest$Type extends MessageType {
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
-                case /* api.Player player */ 1:
+                case /* proto.Player player */ 1:
                     message.player = Player.internalBinaryRead(reader, reader.uint32(), options, message.player);
                     break;
-                case /* api.Buffs buffs */ 2:
+                case /* proto.Buffs buffs */ 2:
                     message.buffs = Buffs.internalBinaryRead(reader, reader.uint32(), options, message.buffs);
                     break;
-                case /* api.Encounter encounter */ 3:
+                case /* proto.Encounter encounter */ 3:
                     message.encounter = Encounter.internalBinaryRead(reader, reader.uint32(), options, message.encounter);
                     break;
                 case /* int32 iterations */ 4:
@@ -566,13 +566,13 @@ class IndividualSimRequest$Type extends MessageType {
         return message;
     }
     internalBinaryWrite(message, writer, options) {
-        /* api.Player player = 1; */
+        /* proto.Player player = 1; */
         if (message.player)
             Player.internalBinaryWrite(message.player, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
-        /* api.Buffs buffs = 2; */
+        /* proto.Buffs buffs = 2; */
         if (message.buffs)
             Buffs.internalBinaryWrite(message.buffs, writer.tag(2, WireType.LengthDelimited).fork(), options).join();
-        /* api.Encounter encounter = 3; */
+        /* proto.Encounter encounter = 3; */
         if (message.encounter)
             Encounter.internalBinaryWrite(message.encounter, writer.tag(3, WireType.LengthDelimited).fork(), options).join();
         /* int32 iterations = 4; */
@@ -597,13 +597,13 @@ class IndividualSimRequest$Type extends MessageType {
     }
 }
 /**
- * @generated MessageType for protobuf message api.IndividualSimRequest
+ * @generated MessageType for protobuf message proto.IndividualSimRequest
  */
 export const IndividualSimRequest = new IndividualSimRequest$Type();
 // @generated message type with reflection information, may provide speed optimized methods
 class IndividualSimResult$Type extends MessageType {
     constructor() {
-        super("api.IndividualSimResult", [
+        super("proto.IndividualSimResult", [
             { no: 1, name: "execution_duration_ms", kind: "scalar", T: 3 /*ScalarType.INT64*/, L: 0 /*LongType.BIGINT*/ },
             { no: 2, name: "logs", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
             { no: 3, name: "dps_avg", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
@@ -656,7 +656,7 @@ class IndividualSimResult$Type extends MessageType {
                 case /* double dps_at_oom_avg */ 9:
                     message.dpsAtOomAvg = reader.double();
                     break;
-                case /* map<int32, api.CastMetric> casts */ 10:
+                case /* map<int32, proto.CastMetric> casts */ 10:
                     this.binaryReadMap10(message.casts, reader, options);
                     break;
                 case /* string error */ 11:
@@ -684,7 +684,7 @@ class IndividualSimResult$Type extends MessageType {
                 case 2:
                     val = reader.int32();
                     break;
-                default: throw new globalThis.Error("unknown map entry field for field api.IndividualSimResult.dps_hist");
+                default: throw new globalThis.Error("unknown map entry field for field proto.IndividualSimResult.dps_hist");
             }
         }
         map[key ?? 0] = val ?? 0;
@@ -700,7 +700,7 @@ class IndividualSimResult$Type extends MessageType {
                 case 2:
                     val = CastMetric.internalBinaryRead(reader, reader.uint32(), options);
                     break;
-                default: throw new globalThis.Error("unknown map entry field for field api.IndividualSimResult.casts");
+                default: throw new globalThis.Error("unknown map entry field for field proto.IndividualSimResult.casts");
             }
         }
         map[key ?? 0] = val ?? CastMetric.create();
@@ -733,7 +733,7 @@ class IndividualSimResult$Type extends MessageType {
         /* double dps_at_oom_avg = 9; */
         if (message.dpsAtOomAvg !== 0)
             writer.tag(9, WireType.Bit64).double(message.dpsAtOomAvg);
-        /* map<int32, api.CastMetric> casts = 10; */
+        /* map<int32, proto.CastMetric> casts = 10; */
         for (let k of Object.keys(message.casts)) {
             writer.tag(10, WireType.LengthDelimited).fork().tag(1, WireType.Varint).int32(parseInt(k));
             writer.tag(2, WireType.LengthDelimited).fork();
@@ -750,13 +750,13 @@ class IndividualSimResult$Type extends MessageType {
     }
 }
 /**
- * @generated MessageType for protobuf message api.IndividualSimResult
+ * @generated MessageType for protobuf message proto.IndividualSimResult
  */
 export const IndividualSimResult = new IndividualSimResult$Type();
 // @generated message type with reflection information, may provide speed optimized methods
 class CastMetric$Type extends MessageType {
     constructor() {
-        super("api.CastMetric", [
+        super("proto.CastMetric", [
             { no: 1, name: "casts", kind: "scalar", repeat: 1 /*RepeatType.PACKED*/, T: 5 /*ScalarType.INT32*/ },
             { no: 2, name: "crits", kind: "scalar", repeat: 1 /*RepeatType.PACKED*/, T: 5 /*ScalarType.INT32*/ },
             { no: 3, name: "misses", kind: "scalar", repeat: 1 /*RepeatType.PACKED*/, T: 5 /*ScalarType.INT32*/ },
@@ -850,13 +850,13 @@ class CastMetric$Type extends MessageType {
     }
 }
 /**
- * @generated MessageType for protobuf message api.CastMetric
+ * @generated MessageType for protobuf message proto.CastMetric
  */
 export const CastMetric = new CastMetric$Type();
 // @generated message type with reflection information, may provide speed optimized methods
 class RaidSimRequest$Type extends MessageType {
     constructor() {
-        super("api.RaidSimRequest", [
+        super("proto.RaidSimRequest", [
             { no: 1, name: "raid", kind: "message", T: () => Raid },
             { no: 2, name: "encounter", kind: "message", T: () => Encounter },
             { no: 3, name: "random_seed", kind: "scalar", T: 3 /*ScalarType.INT64*/, L: 0 /*LongType.BIGINT*/ },
@@ -876,10 +876,10 @@ class RaidSimRequest$Type extends MessageType {
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
-                case /* api.Raid raid */ 1:
+                case /* proto.Raid raid */ 1:
                     message.raid = Raid.internalBinaryRead(reader, reader.uint32(), options, message.raid);
                     break;
-                case /* api.Encounter encounter */ 2:
+                case /* proto.Encounter encounter */ 2:
                     message.encounter = Encounter.internalBinaryRead(reader, reader.uint32(), options, message.encounter);
                     break;
                 case /* int64 random_seed */ 3:
@@ -903,10 +903,10 @@ class RaidSimRequest$Type extends MessageType {
         return message;
     }
     internalBinaryWrite(message, writer, options) {
-        /* api.Raid raid = 1; */
+        /* proto.Raid raid = 1; */
         if (message.raid)
             Raid.internalBinaryWrite(message.raid, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
-        /* api.Encounter encounter = 2; */
+        /* proto.Encounter encounter = 2; */
         if (message.encounter)
             Encounter.internalBinaryWrite(message.encounter, writer.tag(2, WireType.LengthDelimited).fork(), options).join();
         /* int64 random_seed = 3; */
@@ -925,14 +925,14 @@ class RaidSimRequest$Type extends MessageType {
     }
 }
 /**
- * @generated MessageType for protobuf message api.RaidSimRequest
+ * @generated MessageType for protobuf message proto.RaidSimRequest
  */
 export const RaidSimRequest = new RaidSimRequest$Type();
 // @generated message type with reflection information, may provide speed optimized methods
 class GearListRequest$Type extends MessageType {
     constructor() {
-        super("api.GearListRequest", [
-            { no: 1, name: "spec", kind: "enum", T: () => ["api.Spec", Spec] }
+        super("proto.GearListRequest", [
+            { no: 1, name: "spec", kind: "enum", T: () => ["proto.Spec", Spec] }
         ]);
     }
     create(value) {
@@ -947,7 +947,7 @@ class GearListRequest$Type extends MessageType {
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
-                case /* api.Spec spec */ 1:
+                case /* proto.Spec spec */ 1:
                     message.spec = reader.int32();
                     break;
                 default:
@@ -962,7 +962,7 @@ class GearListRequest$Type extends MessageType {
         return message;
     }
     internalBinaryWrite(message, writer, options) {
-        /* api.Spec spec = 1; */
+        /* proto.Spec spec = 1; */
         if (message.spec !== 0)
             writer.tag(1, WireType.Varint).int32(message.spec);
         let u = options.writeUnknownFields;
@@ -972,13 +972,13 @@ class GearListRequest$Type extends MessageType {
     }
 }
 /**
- * @generated MessageType for protobuf message api.GearListRequest
+ * @generated MessageType for protobuf message proto.GearListRequest
  */
 export const GearListRequest = new GearListRequest$Type();
 // @generated message type with reflection information, may provide speed optimized methods
 class GearListResult$Type extends MessageType {
     constructor() {
-        super("api.GearListResult", [
+        super("proto.GearListResult", [
             { no: 1, name: "items", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => Item },
             { no: 2, name: "enchants", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => Enchant },
             { no: 3, name: "gems", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => Gem }
@@ -996,13 +996,13 @@ class GearListResult$Type extends MessageType {
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
-                case /* repeated api.Item items */ 1:
+                case /* repeated proto.Item items */ 1:
                     message.items.push(Item.internalBinaryRead(reader, reader.uint32(), options));
                     break;
-                case /* repeated api.Enchant enchants */ 2:
+                case /* repeated proto.Enchant enchants */ 2:
                     message.enchants.push(Enchant.internalBinaryRead(reader, reader.uint32(), options));
                     break;
-                case /* repeated api.Gem gems */ 3:
+                case /* repeated proto.Gem gems */ 3:
                     message.gems.push(Gem.internalBinaryRead(reader, reader.uint32(), options));
                     break;
                 default:
@@ -1017,13 +1017,13 @@ class GearListResult$Type extends MessageType {
         return message;
     }
     internalBinaryWrite(message, writer, options) {
-        /* repeated api.Item items = 1; */
+        /* repeated proto.Item items = 1; */
         for (let i = 0; i < message.items.length; i++)
             Item.internalBinaryWrite(message.items[i], writer.tag(1, WireType.LengthDelimited).fork(), options).join();
-        /* repeated api.Enchant enchants = 2; */
+        /* repeated proto.Enchant enchants = 2; */
         for (let i = 0; i < message.enchants.length; i++)
             Enchant.internalBinaryWrite(message.enchants[i], writer.tag(2, WireType.LengthDelimited).fork(), options).join();
-        /* repeated api.Gem gems = 3; */
+        /* repeated proto.Gem gems = 3; */
         for (let i = 0; i < message.gems.length; i++)
             Gem.internalBinaryWrite(message.gems[i], writer.tag(3, WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
@@ -1033,13 +1033,13 @@ class GearListResult$Type extends MessageType {
     }
 }
 /**
- * @generated MessageType for protobuf message api.GearListResult
+ * @generated MessageType for protobuf message proto.GearListResult
  */
 export const GearListResult = new GearListResult$Type();
 // @generated message type with reflection information, may provide speed optimized methods
 class ComputeStatsRequest$Type extends MessageType {
     constructor() {
-        super("api.ComputeStatsRequest", [
+        super("proto.ComputeStatsRequest", [
             { no: 1, name: "player", kind: "message", T: () => Player },
             { no: 2, name: "buffs", kind: "message", T: () => Buffs }
         ]);
@@ -1056,10 +1056,10 @@ class ComputeStatsRequest$Type extends MessageType {
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
-                case /* api.Player player */ 1:
+                case /* proto.Player player */ 1:
                     message.player = Player.internalBinaryRead(reader, reader.uint32(), options, message.player);
                     break;
-                case /* api.Buffs buffs */ 2:
+                case /* proto.Buffs buffs */ 2:
                     message.buffs = Buffs.internalBinaryRead(reader, reader.uint32(), options, message.buffs);
                     break;
                 default:
@@ -1074,10 +1074,10 @@ class ComputeStatsRequest$Type extends MessageType {
         return message;
     }
     internalBinaryWrite(message, writer, options) {
-        /* api.Player player = 1; */
+        /* proto.Player player = 1; */
         if (message.player)
             Player.internalBinaryWrite(message.player, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
-        /* api.Buffs buffs = 2; */
+        /* proto.Buffs buffs = 2; */
         if (message.buffs)
             Buffs.internalBinaryWrite(message.buffs, writer.tag(2, WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
@@ -1087,13 +1087,13 @@ class ComputeStatsRequest$Type extends MessageType {
     }
 }
 /**
- * @generated MessageType for protobuf message api.ComputeStatsRequest
+ * @generated MessageType for protobuf message proto.ComputeStatsRequest
  */
 export const ComputeStatsRequest = new ComputeStatsRequest$Type();
 // @generated message type with reflection information, may provide speed optimized methods
 class ComputeStatsResult$Type extends MessageType {
     constructor() {
-        super("api.ComputeStatsResult", [
+        super("proto.ComputeStatsResult", [
             { no: 1, name: "gear_only", kind: "scalar", repeat: 1 /*RepeatType.PACKED*/, T: 1 /*ScalarType.DOUBLE*/ },
             { no: 2, name: "finalStats", kind: "scalar", repeat: 1 /*RepeatType.PACKED*/, T: 1 /*ScalarType.DOUBLE*/ },
             { no: 3, name: "sets", kind: "scalar", repeat: 2 /*RepeatType.UNPACKED*/, T: 9 /*ScalarType.STRING*/ }
@@ -1164,16 +1164,16 @@ class ComputeStatsResult$Type extends MessageType {
     }
 }
 /**
- * @generated MessageType for protobuf message api.ComputeStatsResult
+ * @generated MessageType for protobuf message proto.ComputeStatsResult
  */
 export const ComputeStatsResult = new ComputeStatsResult$Type();
 // @generated message type with reflection information, may provide speed optimized methods
 class StatWeightsRequest$Type extends MessageType {
     constructor() {
-        super("api.StatWeightsRequest", [
+        super("proto.StatWeightsRequest", [
             { no: 1, name: "options", kind: "message", T: () => IndividualSimRequest },
-            { no: 2, name: "stats_to_weigh", kind: "enum", repeat: 1 /*RepeatType.PACKED*/, T: () => ["api.Stat", Stat] },
-            { no: 3, name: "ep_reference_stat", kind: "enum", T: () => ["api.Stat", Stat] }
+            { no: 2, name: "stats_to_weigh", kind: "enum", repeat: 1 /*RepeatType.PACKED*/, T: () => ["proto.Stat", Stat] },
+            { no: 3, name: "ep_reference_stat", kind: "enum", T: () => ["proto.Stat", Stat] }
         ]);
     }
     create(value) {
@@ -1188,17 +1188,17 @@ class StatWeightsRequest$Type extends MessageType {
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
-                case /* api.IndividualSimRequest options */ 1:
+                case /* proto.IndividualSimRequest options */ 1:
                     message.options = IndividualSimRequest.internalBinaryRead(reader, reader.uint32(), options, message.options);
                     break;
-                case /* repeated api.Stat stats_to_weigh */ 2:
+                case /* repeated proto.Stat stats_to_weigh */ 2:
                     if (wireType === WireType.LengthDelimited)
                         for (let e = reader.int32() + reader.pos; reader.pos < e;)
                             message.statsToWeigh.push(reader.int32());
                     else
                         message.statsToWeigh.push(reader.int32());
                     break;
-                case /* api.Stat ep_reference_stat */ 3:
+                case /* proto.Stat ep_reference_stat */ 3:
                     message.epReferenceStat = reader.int32();
                     break;
                 default:
@@ -1213,17 +1213,17 @@ class StatWeightsRequest$Type extends MessageType {
         return message;
     }
     internalBinaryWrite(message, writer, options) {
-        /* api.IndividualSimRequest options = 1; */
+        /* proto.IndividualSimRequest options = 1; */
         if (message.options)
             IndividualSimRequest.internalBinaryWrite(message.options, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
-        /* repeated api.Stat stats_to_weigh = 2; */
+        /* repeated proto.Stat stats_to_weigh = 2; */
         if (message.statsToWeigh.length) {
             writer.tag(2, WireType.LengthDelimited).fork();
             for (let i = 0; i < message.statsToWeigh.length; i++)
                 writer.int32(message.statsToWeigh[i]);
             writer.join();
         }
-        /* api.Stat ep_reference_stat = 3; */
+        /* proto.Stat ep_reference_stat = 3; */
         if (message.epReferenceStat !== 0)
             writer.tag(3, WireType.Varint).int32(message.epReferenceStat);
         let u = options.writeUnknownFields;
@@ -1233,13 +1233,13 @@ class StatWeightsRequest$Type extends MessageType {
     }
 }
 /**
- * @generated MessageType for protobuf message api.StatWeightsRequest
+ * @generated MessageType for protobuf message proto.StatWeightsRequest
  */
 export const StatWeightsRequest = new StatWeightsRequest$Type();
 // @generated message type with reflection information, may provide speed optimized methods
 class StatWeightsResult$Type extends MessageType {
     constructor() {
-        super("api.StatWeightsResult", [
+        super("proto.StatWeightsResult", [
             { no: 1, name: "weights", kind: "scalar", repeat: 1 /*RepeatType.PACKED*/, T: 1 /*ScalarType.DOUBLE*/ },
             { no: 2, name: "weights_stdev", kind: "scalar", repeat: 1 /*RepeatType.PACKED*/, T: 1 /*ScalarType.DOUBLE*/ },
             { no: 3, name: "ep_values", kind: "scalar", repeat: 1 /*RepeatType.PACKED*/, T: 1 /*ScalarType.DOUBLE*/ },
@@ -1333,6 +1333,6 @@ class StatWeightsResult$Type extends MessageType {
     }
 }
 /**
- * @generated MessageType for protobuf message api.StatWeightsResult
+ * @generated MessageType for protobuf message proto.StatWeightsResult
  */
 export const StatWeightsResult = new StatWeightsResult$Type();

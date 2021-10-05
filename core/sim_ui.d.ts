@@ -1,6 +1,6 @@
 import { Sim, SimConfig } from './sim.js';
 import { TypedEvent } from './typed_event.js';
-import { Spec } from './api/common.js';
+import { Spec } from './proto/common.js';
 export interface SimUIConfig<SpecType extends Spec> extends SimConfig<SpecType> {
 }
 export declare abstract class SimUI<SpecType extends Spec> {

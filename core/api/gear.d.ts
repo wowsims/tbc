@@ -1,6 +1,6 @@
+import { ItemSlot } from '../proto/common.js';
+import { EquipmentSpec } from '../proto/common.js';
 import { EquippedItem } from './equipped_item.js';
-import { ItemSlot } from './common.js';
-import { EquipmentSpec } from './common.js';
 declare type InternalGear = Record<ItemSlot, EquippedItem | null>;
 /**
  * Represents a full gear set, including items/enchants/gems for every slot.

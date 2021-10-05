@@ -5,7 +5,7 @@ import type { IBinaryReader } from "@protobuf-ts/runtime";
 import type { PartialMessage } from "@protobuf-ts/runtime";
 import { MessageType } from "@protobuf-ts/runtime";
 /**
- * @generated from protobuf message api.ShamanTalents
+ * @generated from protobuf message proto.ShamanTalents
  */
 export interface ShamanTalents {
     /**
@@ -144,33 +144,33 @@ export interface ShamanTalents {
     naturesBlessing: number;
 }
 /**
- * @generated from protobuf message api.ElementalShaman
+ * @generated from protobuf message proto.ElementalShaman
  */
 export interface ElementalShaman {
     /**
-     * @generated from protobuf field: api.ElementalShaman.Agent agent = 1;
+     * @generated from protobuf field: proto.ElementalShaman.Agent agent = 1;
      */
     agent?: ElementalShaman_Agent;
     /**
-     * @generated from protobuf field: api.ShamanTalents talents = 2;
+     * @generated from protobuf field: proto.ShamanTalents talents = 2;
      */
     talents?: ShamanTalents;
     /**
-     * @generated from protobuf field: api.ElementalShaman.Options options = 3;
+     * @generated from protobuf field: proto.ElementalShaman.Options options = 3;
      */
     options?: ElementalShaman_Options;
 }
 /**
- * @generated from protobuf message api.ElementalShaman.Agent
+ * @generated from protobuf message proto.ElementalShaman.Agent
  */
 export interface ElementalShaman_Agent {
     /**
-     * @generated from protobuf field: api.ElementalShaman.Agent.AgentType type = 1;
+     * @generated from protobuf field: proto.ElementalShaman.Agent.AgentType type = 1;
      */
     type: ElementalShaman_Agent_AgentType;
 }
 /**
- * @generated from protobuf enum api.ElementalShaman.Agent.AgentType
+ * @generated from protobuf enum proto.ElementalShaman.Agent.AgentType
  */
 export declare enum ElementalShaman_Agent_AgentType {
     /**
@@ -195,7 +195,7 @@ export declare enum ElementalShaman_Agent_AgentType {
     CLOnCD = 4
 }
 /**
- * @generated from protobuf message api.ElementalShaman.Options
+ * @generated from protobuf message proto.ElementalShaman.Options
  */
 export interface ElementalShaman_Options {
     /**
@@ -210,7 +210,7 @@ declare class ShamanTalents$Type extends MessageType<ShamanTalents> {
     internalBinaryWrite(message: ShamanTalents, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
- * @generated MessageType for protobuf message api.ShamanTalents
+ * @generated MessageType for protobuf message proto.ShamanTalents
  */
 export declare const ShamanTalents: ShamanTalents$Type;
 declare class ElementalShaman$Type extends MessageType<ElementalShaman> {
@@ -220,7 +220,7 @@ declare class ElementalShaman$Type extends MessageType<ElementalShaman> {
     internalBinaryWrite(message: ElementalShaman, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
- * @generated MessageType for protobuf message api.ElementalShaman
+ * @generated MessageType for protobuf message proto.ElementalShaman
  */
 export declare const ElementalShaman: ElementalShaman$Type;
 declare class ElementalShaman_Agent$Type extends MessageType<ElementalShaman_Agent> {
@@ -230,7 +230,7 @@ declare class ElementalShaman_Agent$Type extends MessageType<ElementalShaman_Age
     internalBinaryWrite(message: ElementalShaman_Agent, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
- * @generated MessageType for protobuf message api.ElementalShaman.Agent
+ * @generated MessageType for protobuf message proto.ElementalShaman.Agent
  */
 export declare const ElementalShaman_Agent: ElementalShaman_Agent$Type;
 declare class ElementalShaman_Options$Type extends MessageType<ElementalShaman_Options> {
@@ -240,7 +240,7 @@ declare class ElementalShaman_Options$Type extends MessageType<ElementalShaman_O
     internalBinaryWrite(message: ElementalShaman_Options, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
- * @generated MessageType for protobuf message api.ElementalShaman.Options
+ * @generated MessageType for protobuf message proto.ElementalShaman.Options
  */
 export declare const ElementalShaman_Options: ElementalShaman_Options$Type;
 export {};

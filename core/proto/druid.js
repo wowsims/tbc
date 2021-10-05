@@ -6,7 +6,7 @@ import { MessageType } from '/tbc/protobuf-ts/index.js';
 // @generated message type with reflection information, may provide speed optimized methods
 class DruidTalents$Type extends MessageType {
     constructor() {
-        super("api.DruidTalents", [
+        super("proto.DruidTalents", [
             { no: 1, name: "starlight_wrath", kind: "scalar", T: 5 /*ScalarType.INT32*/ }
         ]);
     }
@@ -47,13 +47,13 @@ class DruidTalents$Type extends MessageType {
     }
 }
 /**
- * @generated MessageType for protobuf message api.DruidTalents
+ * @generated MessageType for protobuf message proto.DruidTalents
  */
 export const DruidTalents = new DruidTalents$Type();
 // @generated message type with reflection information, may provide speed optimized methods
 class BalanceDruid$Type extends MessageType {
     constructor() {
-        super("api.BalanceDruid", [
+        super("proto.BalanceDruid", [
             { no: 1, name: "agent", kind: "message", T: () => BalanceDruid_Agent },
             { no: 2, name: "talents", kind: "message", T: () => DruidTalents },
             { no: 3, name: "options", kind: "message", T: () => BalanceDruid_Options }
@@ -71,13 +71,13 @@ class BalanceDruid$Type extends MessageType {
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
-                case /* api.BalanceDruid.Agent agent */ 1:
+                case /* proto.BalanceDruid.Agent agent */ 1:
                     message.agent = BalanceDruid_Agent.internalBinaryRead(reader, reader.uint32(), options, message.agent);
                     break;
-                case /* api.DruidTalents talents */ 2:
+                case /* proto.DruidTalents talents */ 2:
                     message.talents = DruidTalents.internalBinaryRead(reader, reader.uint32(), options, message.talents);
                     break;
-                case /* api.BalanceDruid.Options options */ 3:
+                case /* proto.BalanceDruid.Options options */ 3:
                     message.options = BalanceDruid_Options.internalBinaryRead(reader, reader.uint32(), options, message.options);
                     break;
                 default:
@@ -92,13 +92,13 @@ class BalanceDruid$Type extends MessageType {
         return message;
     }
     internalBinaryWrite(message, writer, options) {
-        /* api.BalanceDruid.Agent agent = 1; */
+        /* proto.BalanceDruid.Agent agent = 1; */
         if (message.agent)
             BalanceDruid_Agent.internalBinaryWrite(message.agent, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
-        /* api.DruidTalents talents = 2; */
+        /* proto.DruidTalents talents = 2; */
         if (message.talents)
             DruidTalents.internalBinaryWrite(message.talents, writer.tag(2, WireType.LengthDelimited).fork(), options).join();
-        /* api.BalanceDruid.Options options = 3; */
+        /* proto.BalanceDruid.Options options = 3; */
         if (message.options)
             BalanceDruid_Options.internalBinaryWrite(message.options, writer.tag(3, WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
@@ -108,13 +108,13 @@ class BalanceDruid$Type extends MessageType {
     }
 }
 /**
- * @generated MessageType for protobuf message api.BalanceDruid
+ * @generated MessageType for protobuf message proto.BalanceDruid
  */
 export const BalanceDruid = new BalanceDruid$Type();
 // @generated message type with reflection information, may provide speed optimized methods
 class BalanceDruid_Agent$Type extends MessageType {
     constructor() {
-        super("api.BalanceDruid.Agent", []);
+        super("proto.BalanceDruid.Agent", []);
     }
     create(value) {
         const message = {};
@@ -134,13 +134,13 @@ class BalanceDruid_Agent$Type extends MessageType {
     }
 }
 /**
- * @generated MessageType for protobuf message api.BalanceDruid.Agent
+ * @generated MessageType for protobuf message proto.BalanceDruid.Agent
  */
 export const BalanceDruid_Agent = new BalanceDruid_Agent$Type();
 // @generated message type with reflection information, may provide speed optimized methods
 class BalanceDruid_Options$Type extends MessageType {
     constructor() {
-        super("api.BalanceDruid.Options", []);
+        super("proto.BalanceDruid.Options", []);
     }
     create(value) {
         const message = {};
@@ -160,6 +160,6 @@ class BalanceDruid_Options$Type extends MessageType {
     }
 }
 /**
- * @generated MessageType for protobuf message api.BalanceDruid.Options
+ * @generated MessageType for protobuf message proto.BalanceDruid.Options
  */
 export const BalanceDruid_Options = new BalanceDruid_Options$Type();

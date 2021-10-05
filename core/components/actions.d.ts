@@ -1,4 +1,4 @@
-import { Stat } from '../api/common.js';
+import { Stat } from '../proto/common.js';
 import { Sim } from '../sim.js';
 import { Component } from './component.js';
 import { DetailedResults } from './detailed_results.js';

@@ -5,7 +5,7 @@ import type { IBinaryReader } from "@protobuf-ts/runtime";
 import type { PartialMessage } from "@protobuf-ts/runtime";
 import { MessageType } from "@protobuf-ts/runtime";
 /**
- * @generated from protobuf message api.Buffs
+ * @generated from protobuf message proto.Buffs
  */
 export interface Buffs {
     /**
@@ -19,15 +19,15 @@ export interface Buffs {
      */
     blessingOfKings: boolean;
     /**
-     * @generated from protobuf field: api.TristateEffect blessing_of_wisdom = 3;
+     * @generated from protobuf field: proto.TristateEffect blessing_of_wisdom = 3;
      */
     blessingOfWisdom: TristateEffect;
     /**
-     * @generated from protobuf field: api.TristateEffect divine_spirit = 4;
+     * @generated from protobuf field: proto.TristateEffect divine_spirit = 4;
      */
     divineSpirit: TristateEffect;
     /**
-     * @generated from protobuf field: api.TristateEffect gift_of_the_wild = 5;
+     * @generated from protobuf field: proto.TristateEffect gift_of_the_wild = 5;
      */
     giftOfTheWild: TristateEffect;
     /**
@@ -37,7 +37,7 @@ export interface Buffs {
      */
     bloodlust: number;
     /**
-     * @generated from protobuf field: api.TristateEffect moonkin_aura = 7;
+     * @generated from protobuf field: proto.TristateEffect moonkin_aura = 7;
      */
     moonkinAura: TristateEffect;
     /**
@@ -87,7 +87,7 @@ export interface Buffs {
     /**
      * Totems
      *
-     * @generated from protobuf field: api.TristateEffect mana_spring_totem = 18;
+     * @generated from protobuf field: proto.TristateEffect mana_spring_totem = 18;
      */
     manaSpringTotem: TristateEffect;
     /**
@@ -99,12 +99,12 @@ export interface Buffs {
      */
     totemOfWrath: number;
     /**
-     * @generated from protobuf field: api.TristateEffect wrath_of_air_totem = 21;
+     * @generated from protobuf field: proto.TristateEffect wrath_of_air_totem = 21;
      */
     wrathOfAirTotem: TristateEffect;
 }
 /**
- * @generated from protobuf message api.Consumes
+ * @generated from protobuf message proto.Consumes
  */
 export interface Consumes {
     /**
@@ -185,7 +185,7 @@ export interface Consumes {
     drumsOfRestoration: boolean;
 }
 /**
- * @generated from protobuf message api.Encounter
+ * @generated from protobuf message proto.Encounter
  */
 export interface Encounter {
     /**
@@ -202,7 +202,7 @@ export interface Encounter {
     targetArmor: number;
 }
 /**
- * @generated from protobuf message api.ItemSpec
+ * @generated from protobuf message proto.ItemSpec
  */
 export interface ItemSpec {
     /**
@@ -219,16 +219,16 @@ export interface ItemSpec {
     gems: number[];
 }
 /**
- * @generated from protobuf message api.EquipmentSpec
+ * @generated from protobuf message proto.EquipmentSpec
  */
 export interface EquipmentSpec {
     /**
-     * @generated from protobuf field: repeated api.ItemSpec items = 1;
+     * @generated from protobuf field: repeated proto.ItemSpec items = 1;
      */
     items: ItemSpec[];
 }
 /**
- * @generated from protobuf message api.Item
+ * @generated from protobuf message proto.Item
  */
 export interface Item {
     /**
@@ -240,23 +240,23 @@ export interface Item {
      */
     name: string;
     /**
-     * @generated from protobuf field: api.ItemType type = 3;
+     * @generated from protobuf field: proto.ItemType type = 3;
      */
     type: ItemType;
     /**
-     * @generated from protobuf field: api.ArmorType armor_type = 4;
+     * @generated from protobuf field: proto.ArmorType armor_type = 4;
      */
     armorType: ArmorType;
     /**
-     * @generated from protobuf field: api.WeaponType weapon_type = 5;
+     * @generated from protobuf field: proto.WeaponType weapon_type = 5;
      */
     weaponType: WeaponType;
     /**
-     * @generated from protobuf field: api.HandType hand_type = 6;
+     * @generated from protobuf field: proto.HandType hand_type = 6;
      */
     handType: HandType;
     /**
-     * @generated from protobuf field: api.RangedWeaponType ranged_weapon_type = 7;
+     * @generated from protobuf field: proto.RangedWeaponType ranged_weapon_type = 7;
      */
     rangedWeaponType: RangedWeaponType;
     /**
@@ -264,7 +264,7 @@ export interface Item {
      */
     stats: number[];
     /**
-     * @generated from protobuf field: repeated api.GemColor gem_sockets = 11;
+     * @generated from protobuf field: repeated proto.GemColor gem_sockets = 11;
      */
     gemSockets: GemColor[];
     /**
@@ -272,12 +272,12 @@ export interface Item {
      */
     phase: number;
     /**
-     * @generated from protobuf field: api.ItemQuality quality = 10;
+     * @generated from protobuf field: proto.ItemQuality quality = 10;
      */
     quality: ItemQuality;
 }
 /**
- * @generated from protobuf message api.Enchant
+ * @generated from protobuf message proto.Enchant
  */
 export interface Enchant {
     /**
@@ -293,7 +293,7 @@ export interface Enchant {
      */
     name: string;
     /**
-     * @generated from protobuf field: api.ItemType type = 4;
+     * @generated from protobuf field: proto.ItemType type = 4;
      */
     type: ItemType;
     /**
@@ -309,12 +309,12 @@ export interface Enchant {
      */
     stats: number[];
     /**
-     * @generated from protobuf field: api.ItemQuality quality = 8;
+     * @generated from protobuf field: proto.ItemQuality quality = 8;
      */
     quality: ItemQuality;
 }
 /**
- * @generated from protobuf message api.Gem
+ * @generated from protobuf message proto.Gem
  */
 export interface Gem {
     /**
@@ -330,7 +330,7 @@ export interface Gem {
      */
     stats: number[];
     /**
-     * @generated from protobuf field: api.GemColor color = 4;
+     * @generated from protobuf field: proto.GemColor color = 4;
      */
     color: GemColor;
     /**
@@ -338,12 +338,12 @@ export interface Gem {
      */
     phase: number;
     /**
-     * @generated from protobuf field: api.ItemQuality quality = 6;
+     * @generated from protobuf field: proto.ItemQuality quality = 6;
      */
     quality: ItemQuality;
 }
 /**
- * @generated from protobuf enum api.Race
+ * @generated from protobuf enum proto.Race
  */
 export declare enum Race {
     /**
@@ -396,7 +396,7 @@ export declare enum Race {
     RaceUndead = 11
 }
 /**
- * @generated from protobuf enum api.Class
+ * @generated from protobuf enum proto.Class
  */
 export declare enum Class {
     /**
@@ -441,7 +441,7 @@ export declare enum Class {
     ClassWarrior = 9
 }
 /**
- * @generated from protobuf enum api.Spec
+ * @generated from protobuf enum proto.Spec
  */
 export declare enum Spec {
     /**
@@ -454,7 +454,7 @@ export declare enum Spec {
     SpecElementalShaman = 1
 }
 /**
- * @generated from protobuf enum api.Stat
+ * @generated from protobuf enum proto.Stat
  */
 export declare enum Stat {
     /**
@@ -571,7 +571,7 @@ export declare enum Stat {
     StatArmor = 27
 }
 /**
- * @generated from protobuf enum api.ItemType
+ * @generated from protobuf enum proto.ItemType
  */
 export declare enum ItemType {
     /**
@@ -636,7 +636,7 @@ export declare enum ItemType {
     ItemTypeRanged = 14
 }
 /**
- * @generated from protobuf enum api.ArmorType
+ * @generated from protobuf enum proto.ArmorType
  */
 export declare enum ArmorType {
     /**
@@ -661,7 +661,7 @@ export declare enum ArmorType {
     ArmorTypePlate = 4
 }
 /**
- * @generated from protobuf enum api.WeaponType
+ * @generated from protobuf enum proto.WeaponType
  */
 export declare enum WeaponType {
     /**
@@ -706,7 +706,7 @@ export declare enum WeaponType {
     WeaponTypeSword = 9
 }
 /**
- * @generated from protobuf enum api.HandType
+ * @generated from protobuf enum proto.HandType
  */
 export declare enum HandType {
     /**
@@ -731,7 +731,7 @@ export declare enum HandType {
     HandTypeTwoHand = 4
 }
 /**
- * @generated from protobuf enum api.RangedWeaponType
+ * @generated from protobuf enum proto.RangedWeaponType
  */
 export declare enum RangedWeaponType {
     /**
@@ -774,7 +774,7 @@ export declare enum RangedWeaponType {
 /**
  * All slots on the gear menu where a single item can be worn.
  *
- * @generated from protobuf enum api.ItemSlot
+ * @generated from protobuf enum proto.ItemSlot
  */
 export declare enum ItemSlot {
     /**
@@ -849,7 +849,7 @@ export declare enum ItemSlot {
     ItemSlotRanged = 16
 }
 /**
- * @generated from protobuf enum api.ItemQuality
+ * @generated from protobuf enum proto.ItemQuality
  */
 export declare enum ItemQuality {
     /**
@@ -878,7 +878,7 @@ export declare enum ItemQuality {
     ItemQualityLegendary = 5
 }
 /**
- * @generated from protobuf enum api.GemColor
+ * @generated from protobuf enum proto.GemColor
  */
 export declare enum GemColor {
     /**
@@ -919,7 +919,7 @@ export declare enum GemColor {
     GemColorPrismatic = 8
 }
 /**
- * @generated from protobuf enum api.TristateEffect
+ * @generated from protobuf enum proto.TristateEffect
  */
 export declare enum TristateEffect {
     /**
@@ -942,7 +942,7 @@ declare class Buffs$Type extends MessageType<Buffs> {
     internalBinaryWrite(message: Buffs, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
- * @generated MessageType for protobuf message api.Buffs
+ * @generated MessageType for protobuf message proto.Buffs
  */
 export declare const Buffs: Buffs$Type;
 declare class Consumes$Type extends MessageType<Consumes> {
@@ -952,7 +952,7 @@ declare class Consumes$Type extends MessageType<Consumes> {
     internalBinaryWrite(message: Consumes, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
- * @generated MessageType for protobuf message api.Consumes
+ * @generated MessageType for protobuf message proto.Consumes
  */
 export declare const Consumes: Consumes$Type;
 declare class Encounter$Type extends MessageType<Encounter> {
@@ -962,7 +962,7 @@ declare class Encounter$Type extends MessageType<Encounter> {
     internalBinaryWrite(message: Encounter, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
- * @generated MessageType for protobuf message api.Encounter
+ * @generated MessageType for protobuf message proto.Encounter
  */
 export declare const Encounter: Encounter$Type;
 declare class ItemSpec$Type extends MessageType<ItemSpec> {
@@ -972,7 +972,7 @@ declare class ItemSpec$Type extends MessageType<ItemSpec> {
     internalBinaryWrite(message: ItemSpec, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
- * @generated MessageType for protobuf message api.ItemSpec
+ * @generated MessageType for protobuf message proto.ItemSpec
  */
 export declare const ItemSpec: ItemSpec$Type;
 declare class EquipmentSpec$Type extends MessageType<EquipmentSpec> {
@@ -982,7 +982,7 @@ declare class EquipmentSpec$Type extends MessageType<EquipmentSpec> {
     internalBinaryWrite(message: EquipmentSpec, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
- * @generated MessageType for protobuf message api.EquipmentSpec
+ * @generated MessageType for protobuf message proto.EquipmentSpec
  */
 export declare const EquipmentSpec: EquipmentSpec$Type;
 declare class Item$Type extends MessageType<Item> {
@@ -992,7 +992,7 @@ declare class Item$Type extends MessageType<Item> {
     internalBinaryWrite(message: Item, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
- * @generated MessageType for protobuf message api.Item
+ * @generated MessageType for protobuf message proto.Item
  */
 export declare const Item: Item$Type;
 declare class Enchant$Type extends MessageType<Enchant> {
@@ -1002,7 +1002,7 @@ declare class Enchant$Type extends MessageType<Enchant> {
     internalBinaryWrite(message: Enchant, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
- * @generated MessageType for protobuf message api.Enchant
+ * @generated MessageType for protobuf message proto.Enchant
  */
 export declare const Enchant: Enchant$Type;
 declare class Gem$Type extends MessageType<Gem> {
@@ -1012,7 +1012,7 @@ declare class Gem$Type extends MessageType<Gem> {
     internalBinaryWrite(message: Gem, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
- * @generated MessageType for protobuf message api.Gem
+ * @generated MessageType for protobuf message proto.Gem
  */
 export declare const Gem: Gem$Type;
 export {};

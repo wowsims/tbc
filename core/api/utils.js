@@ -1,17 +1,17 @@
 import { intersection } from '../utils.js';
-import { Class } from './common.js';
-import { Enchant } from './common.js';
-import { GemColor } from './common.js';
-import { HandType } from './common.js';
-import { ItemSlot } from './common.js';
-import { ItemType } from './common.js';
-import { Item } from './common.js';
-import { Race } from './common.js';
-import { RangedWeaponType } from './common.js';
-import { Spec } from './common.js';
-import { WeaponType } from './common.js';
-import { BalanceDruid_Agent as BalanceDruidAgent, DruidTalents, BalanceDruid_Options as BalanceDruidOptions } from './druid.js';
-import { ElementalShaman_Agent as ElementalShamanAgent, ShamanTalents, ElementalShaman_Options as ElementalShamanOptions } from './shaman.js';
+import { Class } from '../proto/common.js';
+import { Enchant } from '../proto/common.js';
+import { GemColor } from '../proto/common.js';
+import { HandType } from '../proto/common.js';
+import { ItemSlot } from '../proto/common.js';
+import { ItemType } from '../proto/common.js';
+import { Item } from '../proto/common.js';
+import { Race } from '../proto/common.js';
+import { RangedWeaponType } from '../proto/common.js';
+import { Spec } from '../proto/common.js';
+import { WeaponType } from '../proto/common.js';
+import { BalanceDruid_Agent as BalanceDruidAgent, DruidTalents, BalanceDruid_Options as BalanceDruidOptions } from '../proto/druid.js';
+import { ElementalShaman_Agent as ElementalShamanAgent, ShamanTalents, ElementalShaman_Options as ElementalShamanOptions } from '../proto/shaman.js';
 export const specTypeFunctions = {
     [Spec.SpecBalanceDruid]: {
         agentCreate: () => BalanceDruidAgent.create(),

@@ -1,5 +1,5 @@
-import { GemColor } from './api/common.js';
-import { ItemSlot } from './api/common.js';
+import { GemColor } from './proto/common.js';
+import { ItemSlot } from './proto/common.js';
 export declare const urlPathPrefix: string;
 export declare function getEmptySlotIconUrl(slot: ItemSlot): string;
 export declare type IconId = {

@@ -1,8 +1,8 @@
 import { raceNames } from '../api/names.js';
-import { Buffs } from '../api/common.js';
-import { Consumes } from '../api/common.js';
-import { Encounter } from '../api/common.js';
-import { EquipmentSpec } from '../api/common.js';
+import { Buffs } from '../proto/common.js';
+import { Consumes } from '../proto/common.js';
+import { Encounter } from '../proto/common.js';
+import { EquipmentSpec } from '../proto/common.js';
 import { Stats } from '../api/stats.js';
 import { specToEligibleRaces } from '../api/utils.js';
 import { Actions } from '../components/actions.js';

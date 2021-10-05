@@ -1,4 +1,4 @@
-import { Spec } from '../api/common.js';
+import { Spec } from '../proto/common.js';
 import { specToClass } from '../api/utils.js';
 import { ShamanTalentsPicker } from './shaman.js';
 export function newTalentsPicker(spec, parent, sim) {

@@ -1,7 +1,7 @@
-import { Enchant } from './common.js';
-import { Gem } from './common.js';
-import { Item } from './common.js';
-import { ItemSpec } from './common.js';
+import { Enchant } from '../proto/common.js';
+import { Gem } from '../proto/common.js';
+import { Item } from '../proto/common.js';
+import { ItemSpec } from '../proto/common.js';
 /**
  * Represents an equipped item along with enchants/gems attached to it.
  *

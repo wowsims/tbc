@@ -4,7 +4,7 @@ import { reflectionMergePartial } from '/tbc/protobuf-ts/index.js';
 import { MESSAGE_TYPE } from '/tbc/protobuf-ts/index.js';
 import { MessageType } from '/tbc/protobuf-ts/index.js';
 /**
- * @generated from protobuf enum api.Race
+ * @generated from protobuf enum proto.Race
  */
 export var Race;
 (function (Race) {
@@ -58,7 +58,7 @@ export var Race;
     Race[Race["RaceUndead"] = 11] = "RaceUndead";
 })(Race || (Race = {}));
 /**
- * @generated from protobuf enum api.Class
+ * @generated from protobuf enum proto.Class
  */
 export var Class;
 (function (Class) {
@@ -104,7 +104,7 @@ export var Class;
     Class[Class["ClassWarrior"] = 9] = "ClassWarrior";
 })(Class || (Class = {}));
 /**
- * @generated from protobuf enum api.Spec
+ * @generated from protobuf enum proto.Spec
  */
 export var Spec;
 (function (Spec) {
@@ -118,7 +118,7 @@ export var Spec;
     Spec[Spec["SpecElementalShaman"] = 1] = "SpecElementalShaman";
 })(Spec || (Spec = {}));
 /**
- * @generated from protobuf enum api.Stat
+ * @generated from protobuf enum proto.Stat
  */
 export var Stat;
 (function (Stat) {
@@ -236,7 +236,7 @@ export var Stat;
     Stat[Stat["StatArmor"] = 27] = "StatArmor";
 })(Stat || (Stat = {}));
 /**
- * @generated from protobuf enum api.ItemType
+ * @generated from protobuf enum proto.ItemType
  */
 export var ItemType;
 (function (ItemType) {
@@ -302,7 +302,7 @@ export var ItemType;
     ItemType[ItemType["ItemTypeRanged"] = 14] = "ItemTypeRanged";
 })(ItemType || (ItemType = {}));
 /**
- * @generated from protobuf enum api.ArmorType
+ * @generated from protobuf enum proto.ArmorType
  */
 export var ArmorType;
 (function (ArmorType) {
@@ -328,7 +328,7 @@ export var ArmorType;
     ArmorType[ArmorType["ArmorTypePlate"] = 4] = "ArmorTypePlate";
 })(ArmorType || (ArmorType = {}));
 /**
- * @generated from protobuf enum api.WeaponType
+ * @generated from protobuf enum proto.WeaponType
  */
 export var WeaponType;
 (function (WeaponType) {
@@ -374,7 +374,7 @@ export var WeaponType;
     WeaponType[WeaponType["WeaponTypeSword"] = 9] = "WeaponTypeSword";
 })(WeaponType || (WeaponType = {}));
 /**
- * @generated from protobuf enum api.HandType
+ * @generated from protobuf enum proto.HandType
  */
 export var HandType;
 (function (HandType) {
@@ -400,7 +400,7 @@ export var HandType;
     HandType[HandType["HandTypeTwoHand"] = 4] = "HandTypeTwoHand";
 })(HandType || (HandType = {}));
 /**
- * @generated from protobuf enum api.RangedWeaponType
+ * @generated from protobuf enum proto.RangedWeaponType
  */
 export var RangedWeaponType;
 (function (RangedWeaponType) {
@@ -444,7 +444,7 @@ export var RangedWeaponType;
 /**
  * All slots on the gear menu where a single item can be worn.
  *
- * @generated from protobuf enum api.ItemSlot
+ * @generated from protobuf enum proto.ItemSlot
  */
 export var ItemSlot;
 (function (ItemSlot) {
@@ -520,7 +520,7 @@ export var ItemSlot;
     ItemSlot[ItemSlot["ItemSlotRanged"] = 16] = "ItemSlotRanged";
 })(ItemSlot || (ItemSlot = {}));
 /**
- * @generated from protobuf enum api.ItemQuality
+ * @generated from protobuf enum proto.ItemQuality
  */
 export var ItemQuality;
 (function (ItemQuality) {
@@ -550,7 +550,7 @@ export var ItemQuality;
     ItemQuality[ItemQuality["ItemQualityLegendary"] = 5] = "ItemQualityLegendary";
 })(ItemQuality || (ItemQuality = {}));
 /**
- * @generated from protobuf enum api.GemColor
+ * @generated from protobuf enum proto.GemColor
  */
 export var GemColor;
 (function (GemColor) {
@@ -592,7 +592,7 @@ export var GemColor;
     GemColor[GemColor["GemColorPrismatic"] = 8] = "GemColorPrismatic";
 })(GemColor || (GemColor = {}));
 /**
- * @generated from protobuf enum api.TristateEffect
+ * @generated from protobuf enum proto.TristateEffect
  */
 export var TristateEffect;
 (function (TristateEffect) {
@@ -612,14 +612,14 @@ export var TristateEffect;
 // @generated message type with reflection information, may provide speed optimized methods
 class Buffs$Type extends MessageType {
     constructor() {
-        super("api.Buffs", [
+        super("proto.Buffs", [
             { no: 1, name: "arcane_brilliance", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 2, name: "blessing_of_kings", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
-            { no: 3, name: "blessing_of_wisdom", kind: "enum", T: () => ["api.TristateEffect", TristateEffect] },
-            { no: 4, name: "divine_spirit", kind: "enum", T: () => ["api.TristateEffect", TristateEffect] },
-            { no: 5, name: "gift_of_the_wild", kind: "enum", T: () => ["api.TristateEffect", TristateEffect] },
+            { no: 3, name: "blessing_of_wisdom", kind: "enum", T: () => ["proto.TristateEffect", TristateEffect] },
+            { no: 4, name: "divine_spirit", kind: "enum", T: () => ["proto.TristateEffect", TristateEffect] },
+            { no: 5, name: "gift_of_the_wild", kind: "enum", T: () => ["proto.TristateEffect", TristateEffect] },
             { no: 6, name: "bloodlust", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
-            { no: 7, name: "moonkin_aura", kind: "enum", T: () => ["api.TristateEffect", TristateEffect] },
+            { no: 7, name: "moonkin_aura", kind: "enum", T: () => ["proto.TristateEffect", TristateEffect] },
             { no: 8, name: "shadow_priest_dps", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 9, name: "judgement_of_wisdom", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 10, name: "improved_seal_of_the_crusader", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
@@ -630,10 +630,10 @@ class Buffs$Type extends MessageType {
             { no: 15, name: "eye_of_the_night", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 16, name: "chain_of_the_twilight_owl", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 17, name: "jade_pendant_of_blasting", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
-            { no: 18, name: "mana_spring_totem", kind: "enum", T: () => ["api.TristateEffect", TristateEffect] },
+            { no: 18, name: "mana_spring_totem", kind: "enum", T: () => ["proto.TristateEffect", TristateEffect] },
             { no: 19, name: "mana_tide_totem", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 20, name: "totem_of_wrath", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
-            { no: 21, name: "wrath_of_air_totem", kind: "enum", T: () => ["api.TristateEffect", TristateEffect] }
+            { no: 21, name: "wrath_of_air_totem", kind: "enum", T: () => ["proto.TristateEffect", TristateEffect] }
         ]);
     }
     create(value) {
@@ -654,19 +654,19 @@ class Buffs$Type extends MessageType {
                 case /* bool blessing_of_kings */ 2:
                     message.blessingOfKings = reader.bool();
                     break;
-                case /* api.TristateEffect blessing_of_wisdom */ 3:
+                case /* proto.TristateEffect blessing_of_wisdom */ 3:
                     message.blessingOfWisdom = reader.int32();
                     break;
-                case /* api.TristateEffect divine_spirit */ 4:
+                case /* proto.TristateEffect divine_spirit */ 4:
                     message.divineSpirit = reader.int32();
                     break;
-                case /* api.TristateEffect gift_of_the_wild */ 5:
+                case /* proto.TristateEffect gift_of_the_wild */ 5:
                     message.giftOfTheWild = reader.int32();
                     break;
                 case /* int32 bloodlust */ 6:
                     message.bloodlust = reader.int32();
                     break;
-                case /* api.TristateEffect moonkin_aura */ 7:
+                case /* proto.TristateEffect moonkin_aura */ 7:
                     message.moonkinAura = reader.int32();
                     break;
                 case /* int32 shadow_priest_dps */ 8:
@@ -699,7 +699,7 @@ class Buffs$Type extends MessageType {
                 case /* bool jade_pendant_of_blasting */ 17:
                     message.jadePendantOfBlasting = reader.bool();
                     break;
-                case /* api.TristateEffect mana_spring_totem */ 18:
+                case /* proto.TristateEffect mana_spring_totem */ 18:
                     message.manaSpringTotem = reader.int32();
                     break;
                 case /* bool mana_tide_totem */ 19:
@@ -708,7 +708,7 @@ class Buffs$Type extends MessageType {
                 case /* int32 totem_of_wrath */ 20:
                     message.totemOfWrath = reader.int32();
                     break;
-                case /* api.TristateEffect wrath_of_air_totem */ 21:
+                case /* proto.TristateEffect wrath_of_air_totem */ 21:
                     message.wrathOfAirTotem = reader.int32();
                     break;
                 default:
@@ -729,19 +729,19 @@ class Buffs$Type extends MessageType {
         /* bool blessing_of_kings = 2; */
         if (message.blessingOfKings !== false)
             writer.tag(2, WireType.Varint).bool(message.blessingOfKings);
-        /* api.TristateEffect blessing_of_wisdom = 3; */
+        /* proto.TristateEffect blessing_of_wisdom = 3; */
         if (message.blessingOfWisdom !== 0)
             writer.tag(3, WireType.Varint).int32(message.blessingOfWisdom);
-        /* api.TristateEffect divine_spirit = 4; */
+        /* proto.TristateEffect divine_spirit = 4; */
         if (message.divineSpirit !== 0)
             writer.tag(4, WireType.Varint).int32(message.divineSpirit);
-        /* api.TristateEffect gift_of_the_wild = 5; */
+        /* proto.TristateEffect gift_of_the_wild = 5; */
         if (message.giftOfTheWild !== 0)
             writer.tag(5, WireType.Varint).int32(message.giftOfTheWild);
         /* int32 bloodlust = 6; */
         if (message.bloodlust !== 0)
             writer.tag(6, WireType.Varint).int32(message.bloodlust);
-        /* api.TristateEffect moonkin_aura = 7; */
+        /* proto.TristateEffect moonkin_aura = 7; */
         if (message.moonkinAura !== 0)
             writer.tag(7, WireType.Varint).int32(message.moonkinAura);
         /* int32 shadow_priest_dps = 8; */
@@ -774,7 +774,7 @@ class Buffs$Type extends MessageType {
         /* bool jade_pendant_of_blasting = 17; */
         if (message.jadePendantOfBlasting !== false)
             writer.tag(17, WireType.Varint).bool(message.jadePendantOfBlasting);
-        /* api.TristateEffect mana_spring_totem = 18; */
+        /* proto.TristateEffect mana_spring_totem = 18; */
         if (message.manaSpringTotem !== 0)
             writer.tag(18, WireType.Varint).int32(message.manaSpringTotem);
         /* bool mana_tide_totem = 19; */
@@ -783,7 +783,7 @@ class Buffs$Type extends MessageType {
         /* int32 totem_of_wrath = 20; */
         if (message.totemOfWrath !== 0)
             writer.tag(20, WireType.Varint).int32(message.totemOfWrath);
-        /* api.TristateEffect wrath_of_air_totem = 21; */
+        /* proto.TristateEffect wrath_of_air_totem = 21; */
         if (message.wrathOfAirTotem !== 0)
             writer.tag(21, WireType.Varint).int32(message.wrathOfAirTotem);
         let u = options.writeUnknownFields;
@@ -793,13 +793,13 @@ class Buffs$Type extends MessageType {
     }
 }
 /**
- * @generated MessageType for protobuf message api.Buffs
+ * @generated MessageType for protobuf message proto.Buffs
  */
 export const Buffs = new Buffs$Type();
 // @generated message type with reflection information, may provide speed optimized methods
 class Consumes$Type extends MessageType {
     constructor() {
-        super("api.Consumes", [
+        super("proto.Consumes", [
             { no: 1, name: "flask_of_blinding_light", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 2, name: "flask_of_mighty_restoration", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 3, name: "flask_of_pure_death", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
@@ -966,13 +966,13 @@ class Consumes$Type extends MessageType {
     }
 }
 /**
- * @generated MessageType for protobuf message api.Consumes
+ * @generated MessageType for protobuf message proto.Consumes
  */
 export const Consumes = new Consumes$Type();
 // @generated message type with reflection information, may provide speed optimized methods
 class Encounter$Type extends MessageType {
     constructor() {
-        super("api.Encounter", [
+        super("proto.Encounter", [
             { no: 1, name: "duration", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
             { no: 2, name: "num_targets", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 3, name: "target_armor", kind: "scalar", T: 5 /*ScalarType.INT32*/ }
@@ -1027,13 +1027,13 @@ class Encounter$Type extends MessageType {
     }
 }
 /**
- * @generated MessageType for protobuf message api.Encounter
+ * @generated MessageType for protobuf message proto.Encounter
  */
 export const Encounter = new Encounter$Type();
 // @generated message type with reflection information, may provide speed optimized methods
 class ItemSpec$Type extends MessageType {
     constructor() {
-        super("api.ItemSpec", [
+        super("proto.ItemSpec", [
             { no: 2, name: "id", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 3, name: "enchant", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 4, name: "gems", kind: "scalar", repeat: 1 /*RepeatType.PACKED*/, T: 5 /*ScalarType.INT32*/ }
@@ -1096,13 +1096,13 @@ class ItemSpec$Type extends MessageType {
     }
 }
 /**
- * @generated MessageType for protobuf message api.ItemSpec
+ * @generated MessageType for protobuf message proto.ItemSpec
  */
 export const ItemSpec = new ItemSpec$Type();
 // @generated message type with reflection information, may provide speed optimized methods
 class EquipmentSpec$Type extends MessageType {
     constructor() {
-        super("api.EquipmentSpec", [
+        super("proto.EquipmentSpec", [
             { no: 1, name: "items", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => ItemSpec }
         ]);
     }
@@ -1118,7 +1118,7 @@ class EquipmentSpec$Type extends MessageType {
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
-                case /* repeated api.ItemSpec items */ 1:
+                case /* repeated proto.ItemSpec items */ 1:
                     message.items.push(ItemSpec.internalBinaryRead(reader, reader.uint32(), options));
                     break;
                 default:
@@ -1133,7 +1133,7 @@ class EquipmentSpec$Type extends MessageType {
         return message;
     }
     internalBinaryWrite(message, writer, options) {
-        /* repeated api.ItemSpec items = 1; */
+        /* repeated proto.ItemSpec items = 1; */
         for (let i = 0; i < message.items.length; i++)
             ItemSpec.internalBinaryWrite(message.items[i], writer.tag(1, WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
@@ -1143,24 +1143,24 @@ class EquipmentSpec$Type extends MessageType {
     }
 }
 /**
- * @generated MessageType for protobuf message api.EquipmentSpec
+ * @generated MessageType for protobuf message proto.EquipmentSpec
  */
 export const EquipmentSpec = new EquipmentSpec$Type();
 // @generated message type with reflection information, may provide speed optimized methods
 class Item$Type extends MessageType {
     constructor() {
-        super("api.Item", [
+        super("proto.Item", [
             { no: 1, name: "id", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 2, name: "name", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
-            { no: 3, name: "type", kind: "enum", T: () => ["api.ItemType", ItemType] },
-            { no: 4, name: "armor_type", kind: "enum", T: () => ["api.ArmorType", ArmorType] },
-            { no: 5, name: "weapon_type", kind: "enum", T: () => ["api.WeaponType", WeaponType] },
-            { no: 6, name: "hand_type", kind: "enum", T: () => ["api.HandType", HandType] },
-            { no: 7, name: "ranged_weapon_type", kind: "enum", T: () => ["api.RangedWeaponType", RangedWeaponType] },
+            { no: 3, name: "type", kind: "enum", T: () => ["proto.ItemType", ItemType] },
+            { no: 4, name: "armor_type", kind: "enum", T: () => ["proto.ArmorType", ArmorType] },
+            { no: 5, name: "weapon_type", kind: "enum", T: () => ["proto.WeaponType", WeaponType] },
+            { no: 6, name: "hand_type", kind: "enum", T: () => ["proto.HandType", HandType] },
+            { no: 7, name: "ranged_weapon_type", kind: "enum", T: () => ["proto.RangedWeaponType", RangedWeaponType] },
             { no: 8, name: "stats", kind: "scalar", repeat: 1 /*RepeatType.PACKED*/, T: 1 /*ScalarType.DOUBLE*/ },
-            { no: 11, name: "gem_sockets", kind: "enum", repeat: 1 /*RepeatType.PACKED*/, T: () => ["api.GemColor", GemColor] },
+            { no: 11, name: "gem_sockets", kind: "enum", repeat: 1 /*RepeatType.PACKED*/, T: () => ["proto.GemColor", GemColor] },
             { no: 9, name: "phase", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
-            { no: 10, name: "quality", kind: "enum", T: () => ["api.ItemQuality", ItemQuality] }
+            { no: 10, name: "quality", kind: "enum", T: () => ["proto.ItemQuality", ItemQuality] }
         ]);
     }
     create(value) {
@@ -1181,19 +1181,19 @@ class Item$Type extends MessageType {
                 case /* string name */ 2:
                     message.name = reader.string();
                     break;
-                case /* api.ItemType type */ 3:
+                case /* proto.ItemType type */ 3:
                     message.type = reader.int32();
                     break;
-                case /* api.ArmorType armor_type */ 4:
+                case /* proto.ArmorType armor_type */ 4:
                     message.armorType = reader.int32();
                     break;
-                case /* api.WeaponType weapon_type */ 5:
+                case /* proto.WeaponType weapon_type */ 5:
                     message.weaponType = reader.int32();
                     break;
-                case /* api.HandType hand_type */ 6:
+                case /* proto.HandType hand_type */ 6:
                     message.handType = reader.int32();
                     break;
-                case /* api.RangedWeaponType ranged_weapon_type */ 7:
+                case /* proto.RangedWeaponType ranged_weapon_type */ 7:
                     message.rangedWeaponType = reader.int32();
                     break;
                 case /* repeated double stats */ 8:
@@ -1203,7 +1203,7 @@ class Item$Type extends MessageType {
                     else
                         message.stats.push(reader.double());
                     break;
-                case /* repeated api.GemColor gem_sockets */ 11:
+                case /* repeated proto.GemColor gem_sockets */ 11:
                     if (wireType === WireType.LengthDelimited)
                         for (let e = reader.int32() + reader.pos; reader.pos < e;)
                             message.gemSockets.push(reader.int32());
@@ -1213,7 +1213,7 @@ class Item$Type extends MessageType {
                 case /* int32 phase */ 9:
                     message.phase = reader.int32();
                     break;
-                case /* api.ItemQuality quality */ 10:
+                case /* proto.ItemQuality quality */ 10:
                     message.quality = reader.int32();
                     break;
                 default:
@@ -1234,19 +1234,19 @@ class Item$Type extends MessageType {
         /* string name = 2; */
         if (message.name !== "")
             writer.tag(2, WireType.LengthDelimited).string(message.name);
-        /* api.ItemType type = 3; */
+        /* proto.ItemType type = 3; */
         if (message.type !== 0)
             writer.tag(3, WireType.Varint).int32(message.type);
-        /* api.ArmorType armor_type = 4; */
+        /* proto.ArmorType armor_type = 4; */
         if (message.armorType !== 0)
             writer.tag(4, WireType.Varint).int32(message.armorType);
-        /* api.WeaponType weapon_type = 5; */
+        /* proto.WeaponType weapon_type = 5; */
         if (message.weaponType !== 0)
             writer.tag(5, WireType.Varint).int32(message.weaponType);
-        /* api.HandType hand_type = 6; */
+        /* proto.HandType hand_type = 6; */
         if (message.handType !== 0)
             writer.tag(6, WireType.Varint).int32(message.handType);
-        /* api.RangedWeaponType ranged_weapon_type = 7; */
+        /* proto.RangedWeaponType ranged_weapon_type = 7; */
         if (message.rangedWeaponType !== 0)
             writer.tag(7, WireType.Varint).int32(message.rangedWeaponType);
         /* repeated double stats = 8; */
@@ -1256,7 +1256,7 @@ class Item$Type extends MessageType {
                 writer.double(message.stats[i]);
             writer.join();
         }
-        /* repeated api.GemColor gem_sockets = 11; */
+        /* repeated proto.GemColor gem_sockets = 11; */
         if (message.gemSockets.length) {
             writer.tag(11, WireType.LengthDelimited).fork();
             for (let i = 0; i < message.gemSockets.length; i++)
@@ -1266,7 +1266,7 @@ class Item$Type extends MessageType {
         /* int32 phase = 9; */
         if (message.phase !== 0)
             writer.tag(9, WireType.Varint).int32(message.phase);
-        /* api.ItemQuality quality = 10; */
+        /* proto.ItemQuality quality = 10; */
         if (message.quality !== 0)
             writer.tag(10, WireType.Varint).int32(message.quality);
         let u = options.writeUnknownFields;
@@ -1276,21 +1276,21 @@ class Item$Type extends MessageType {
     }
 }
 /**
- * @generated MessageType for protobuf message api.Item
+ * @generated MessageType for protobuf message proto.Item
  */
 export const Item = new Item$Type();
 // @generated message type with reflection information, may provide speed optimized methods
 class Enchant$Type extends MessageType {
     constructor() {
-        super("api.Enchant", [
+        super("proto.Enchant", [
             { no: 1, name: "id", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 2, name: "effect_id", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 3, name: "name", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
-            { no: 4, name: "type", kind: "enum", T: () => ["api.ItemType", ItemType] },
+            { no: 4, name: "type", kind: "enum", T: () => ["proto.ItemType", ItemType] },
             { no: 5, name: "two_handed_only", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 6, name: "shield_only", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 7, name: "stats", kind: "scalar", repeat: 1 /*RepeatType.PACKED*/, T: 1 /*ScalarType.DOUBLE*/ },
-            { no: 8, name: "quality", kind: "enum", T: () => ["api.ItemQuality", ItemQuality] }
+            { no: 8, name: "quality", kind: "enum", T: () => ["proto.ItemQuality", ItemQuality] }
         ]);
     }
     create(value) {
@@ -1314,7 +1314,7 @@ class Enchant$Type extends MessageType {
                 case /* string name */ 3:
                     message.name = reader.string();
                     break;
-                case /* api.ItemType type */ 4:
+                case /* proto.ItemType type */ 4:
                     message.type = reader.int32();
                     break;
                 case /* bool two_handed_only */ 5:
@@ -1330,7 +1330,7 @@ class Enchant$Type extends MessageType {
                     else
                         message.stats.push(reader.double());
                     break;
-                case /* api.ItemQuality quality */ 8:
+                case /* proto.ItemQuality quality */ 8:
                     message.quality = reader.int32();
                     break;
                 default:
@@ -1354,7 +1354,7 @@ class Enchant$Type extends MessageType {
         /* string name = 3; */
         if (message.name !== "")
             writer.tag(3, WireType.LengthDelimited).string(message.name);
-        /* api.ItemType type = 4; */
+        /* proto.ItemType type = 4; */
         if (message.type !== 0)
             writer.tag(4, WireType.Varint).int32(message.type);
         /* bool two_handed_only = 5; */
@@ -1370,7 +1370,7 @@ class Enchant$Type extends MessageType {
                 writer.double(message.stats[i]);
             writer.join();
         }
-        /* api.ItemQuality quality = 8; */
+        /* proto.ItemQuality quality = 8; */
         if (message.quality !== 0)
             writer.tag(8, WireType.Varint).int32(message.quality);
         let u = options.writeUnknownFields;
@@ -1380,19 +1380,19 @@ class Enchant$Type extends MessageType {
     }
 }
 /**
- * @generated MessageType for protobuf message api.Enchant
+ * @generated MessageType for protobuf message proto.Enchant
  */
 export const Enchant = new Enchant$Type();
 // @generated message type with reflection information, may provide speed optimized methods
 class Gem$Type extends MessageType {
     constructor() {
-        super("api.Gem", [
+        super("proto.Gem", [
             { no: 1, name: "id", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 2, name: "name", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
             { no: 3, name: "stats", kind: "scalar", repeat: 1 /*RepeatType.PACKED*/, T: 1 /*ScalarType.DOUBLE*/ },
-            { no: 4, name: "color", kind: "enum", T: () => ["api.GemColor", GemColor] },
+            { no: 4, name: "color", kind: "enum", T: () => ["proto.GemColor", GemColor] },
             { no: 5, name: "phase", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
-            { no: 6, name: "quality", kind: "enum", T: () => ["api.ItemQuality", ItemQuality] }
+            { no: 6, name: "quality", kind: "enum", T: () => ["proto.ItemQuality", ItemQuality] }
         ]);
     }
     create(value) {
@@ -1420,13 +1420,13 @@ class Gem$Type extends MessageType {
                     else
                         message.stats.push(reader.double());
                     break;
-                case /* api.GemColor color */ 4:
+                case /* proto.GemColor color */ 4:
                     message.color = reader.int32();
                     break;
                 case /* int32 phase */ 5:
                     message.phase = reader.int32();
                     break;
-                case /* api.ItemQuality quality */ 6:
+                case /* proto.ItemQuality quality */ 6:
                     message.quality = reader.int32();
                     break;
                 default:
@@ -1454,13 +1454,13 @@ class Gem$Type extends MessageType {
                 writer.double(message.stats[i]);
             writer.join();
         }
-        /* api.GemColor color = 4; */
+        /* proto.GemColor color = 4; */
         if (message.color !== 0)
             writer.tag(4, WireType.Varint).int32(message.color);
         /* int32 phase = 5; */
         if (message.phase !== 0)
             writer.tag(5, WireType.Varint).int32(message.phase);
-        /* api.ItemQuality quality = 6; */
+        /* proto.ItemQuality quality = 6; */
         if (message.quality !== 0)
             writer.tag(6, WireType.Varint).int32(message.quality);
         let u = options.writeUnknownFields;
@@ -1470,6 +1470,6 @@ class Gem$Type extends MessageType {
     }
 }
 /**
- * @generated MessageType for protobuf message api.Gem
+ * @generated MessageType for protobuf message proto.Gem
  */
 export const Gem = new Gem$Type();

@@ -5,7 +5,7 @@ import type { IBinaryReader } from "@protobuf-ts/runtime";
 import type { PartialMessage } from "@protobuf-ts/runtime";
 import { MessageType } from "@protobuf-ts/runtime";
 /**
- * @generated from protobuf message api.DruidTalents
+ * @generated from protobuf message proto.DruidTalents
  */
 export interface DruidTalents {
     /**
@@ -14,29 +14,29 @@ export interface DruidTalents {
     starlightWrath: number;
 }
 /**
- * @generated from protobuf message api.BalanceDruid
+ * @generated from protobuf message proto.BalanceDruid
  */
 export interface BalanceDruid {
     /**
-     * @generated from protobuf field: api.BalanceDruid.Agent agent = 1;
+     * @generated from protobuf field: proto.BalanceDruid.Agent agent = 1;
      */
     agent?: BalanceDruid_Agent;
     /**
-     * @generated from protobuf field: api.DruidTalents talents = 2;
+     * @generated from protobuf field: proto.DruidTalents talents = 2;
      */
     talents?: DruidTalents;
     /**
-     * @generated from protobuf field: api.BalanceDruid.Options options = 3;
+     * @generated from protobuf field: proto.BalanceDruid.Options options = 3;
      */
     options?: BalanceDruid_Options;
 }
 /**
- * @generated from protobuf message api.BalanceDruid.Agent
+ * @generated from protobuf message proto.BalanceDruid.Agent
  */
 export interface BalanceDruid_Agent {
 }
 /**
- * @generated from protobuf message api.BalanceDruid.Options
+ * @generated from protobuf message proto.BalanceDruid.Options
  */
 export interface BalanceDruid_Options {
 }
@@ -47,7 +47,7 @@ declare class DruidTalents$Type extends MessageType<DruidTalents> {
     internalBinaryWrite(message: DruidTalents, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
- * @generated MessageType for protobuf message api.DruidTalents
+ * @generated MessageType for protobuf message proto.DruidTalents
  */
 export declare const DruidTalents: DruidTalents$Type;
 declare class BalanceDruid$Type extends MessageType<BalanceDruid> {
@@ -57,7 +57,7 @@ declare class BalanceDruid$Type extends MessageType<BalanceDruid> {
     internalBinaryWrite(message: BalanceDruid, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
- * @generated MessageType for protobuf message api.BalanceDruid
+ * @generated MessageType for protobuf message proto.BalanceDruid
  */
 export declare const BalanceDruid: BalanceDruid$Type;
 declare class BalanceDruid_Agent$Type extends MessageType<BalanceDruid_Agent> {
@@ -67,7 +67,7 @@ declare class BalanceDruid_Agent$Type extends MessageType<BalanceDruid_Agent> {
     internalBinaryWrite(message: BalanceDruid_Agent, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
- * @generated MessageType for protobuf message api.BalanceDruid.Agent
+ * @generated MessageType for protobuf message proto.BalanceDruid.Agent
  */
 export declare const BalanceDruid_Agent: BalanceDruid_Agent$Type;
 declare class BalanceDruid_Options$Type extends MessageType<BalanceDruid_Options> {
@@ -77,7 +77,7 @@ declare class BalanceDruid_Options$Type extends MessageType<BalanceDruid_Options
     internalBinaryWrite(message: BalanceDruid_Options, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
- * @generated MessageType for protobuf message api.BalanceDruid.Options
+ * @generated MessageType for protobuf message proto.BalanceDruid.Options
  */
 export declare const BalanceDruid_Options: BalanceDruid_Options$Type;
 export {};

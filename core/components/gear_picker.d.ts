@@ -1,7 +1,7 @@
 import { EquippedItem } from '../api/equipped_item.js';
-import { Enchant } from '../api/common.js';
-import { Item } from '../api/common.js';
-import { ItemSlot } from '../api/common.js';
+import { Enchant } from '../proto/common.js';
+import { Item } from '../proto/common.js';
+import { ItemSlot } from '../proto/common.js';
 import { Sim } from '../sim.js';
 import { Component } from './component.js';
 export declare class GearPicker extends Component {

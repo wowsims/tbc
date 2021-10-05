@@ -1,7 +1,7 @@
-import { ComputeStatsRequest, ComputeStatsResult } from './api/api.js';
-import { GearListRequest, GearListResult } from './api/api.js';
-import { IndividualSimRequest, IndividualSimResult } from './api/api.js';
-import { StatWeightsRequest, StatWeightsResult } from './api/api.js';
+import { ComputeStatsRequest, ComputeStatsResult } from './proto/api.js';
+import { GearListRequest, GearListResult } from './proto/api.js';
+import { IndividualSimRequest, IndividualSimResult } from './proto/api.js';
+import { StatWeightsRequest, StatWeightsResult } from './proto/api.js';
 export declare class WorkerPool {
     private workers;
     constructor(numWorkers: number);
