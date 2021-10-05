@@ -30,6 +30,7 @@ import { newTalentsPicker } from '../talents/factory.js';
 
 import { SimUI, SimUIConfig } from '../sim_ui.js';
 
+
 export interface DefaultThemeConfig<SpecType extends Spec> extends SimUIConfig<SpecType> {
   displayStats: Array<Stat>;
   iconSections: Record<string, Array<IconInput>>;
@@ -85,6 +86,13 @@ export class DefaultTheme<SpecType extends Spec> extends SimUI<SpecType> {
     super(parentElem, config)
     this._config = config;
     this.parentElem.innerHTML = layoutHTML;
+
+		const titleElem = this.parentElem.getElementsByClassName('default-title')[0];
+		if (config.releaseStatus == 'Alpha') {
+			titleElem.textContent += ' Alpha';
+		} else if (config.releaseStatus == 'Beta') {
+			titleElem.textContent += ' Beta';
+		}
 
     const results = new Results(this.parentElem.getElementsByClassName('default-results')[0] as HTMLElement);
     const detailedResults = new DetailedResults(this.parentElem.getElementsByClassName('detailed-results')[0] as HTMLElement);
@@ -316,6 +324,7 @@ const layoutHTML = `
       <li><a data-toggle="tab" href="#detailed-results-tab">Detailed Results</a></li>
       <li><a data-toggle="tab" href="#log-tab">Log</a></li>
       <li class="default-top-bar">
+				<div class="known-issues">Known Issues</div>
 				<span class="share-link fa fa-link"></span
 			</li>
     </ul>
