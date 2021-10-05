@@ -1,7 +1,7 @@
 package paladin
 
 import (
-	"github.com/wowsims/tbc/sim/api"
+	"github.com/wowsims/tbc/sim/core/proto"
 	"github.com/wowsims/tbc/sim/core"
 )
 
@@ -14,7 +14,7 @@ func (paladin *Paladin) GetCharacter() *core.Character {
 }
 
 func (paladin *Paladin) AddRaidBuffs(buffs *core.Buffs) {
-	buffs.BlessingOfWisdom = api.TristateEffect_TristateEffectImproved
+	buffs.BlessingOfWisdom = proto.TristateEffect_TristateEffectImproved
 	buffs.BlessingOfKings = true
 	buffs.JudgementOfWisdom = true
 	buffs.ImprovedSealOfTheCrusader = true

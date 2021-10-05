@@ -1,4 +1,4 @@
-import { Spec } from '../api/common.js';
+import { Spec } from '../proto/common.js';
 import { SpecTalents } from '../api/utils.js';
 import { getIconUrl } from '../resources.js';
 import { setWowheadHref } from '../resources.js';

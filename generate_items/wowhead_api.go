@@ -11,7 +11,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/wowsims/tbc/sim/api"
+	"github.com/wowsims/tbc/sim/core/proto"
 )
 
 type Stats [28]float64
@@ -91,31 +91,31 @@ func (item WowheadItemResponse) GetStats() Stats {
 	healingPower := spellPower + healingPowerFromHealing
 
 	return Stats{
-		api.Stat_StatArmor:            float64(item.GetIntValue(armorRegex)),
-		api.Stat_StatStrength:         float64(item.GetIntValue(strengthRegex)),
-		api.Stat_StatAgility:          float64(item.GetIntValue(agilityRegex)),
-		api.Stat_StatStamina:          float64(item.GetIntValue(staminaRegex)),
-		api.Stat_StatIntellect:        float64(item.GetIntValue(intellectRegex)),
-		api.Stat_StatSpirit:           float64(item.GetIntValue(spiritRegex)),
-		api.Stat_StatSpellPower:       float64(spellPower),
-		api.Stat_StatHealingPower:     float64(healingPower),
-		api.Stat_StatArcaneSpellPower: float64(item.GetIntValue(arcaneSpellPowerRegex)),
-		api.Stat_StatFireSpellPower:   float64(item.GetIntValue(fireSpellPowerRegex)),
-		api.Stat_StatFrostSpellPower:  float64(item.GetIntValue(frostSpellPowerRegex)),
-		api.Stat_StatHolySpellPower:   float64(item.GetIntValue(holySpellPowerRegex)),
-		api.Stat_StatNatureSpellPower: float64(item.GetIntValue(natureSpellPowerRegex)),
-		api.Stat_StatShadowSpellPower: float64(item.GetIntValue(shadowSpellPowerRegex)),
-		api.Stat_StatSpellHit:         float64(item.GetIntValue(spellHitRegex)),
-		api.Stat_StatSpellCrit:        float64(item.GetIntValue(spellCritRegex)),
-		api.Stat_StatSpellHaste:       float64(item.GetIntValue(spellHasteRegex)),
-		api.Stat_StatSpellPenetration: float64(item.GetIntValue(spellPenetrationRegex)),
-		api.Stat_StatMP5:              float64(item.GetIntValue(mp5Regex)),
-		api.Stat_StatAttackPower:      float64(item.GetIntValue(attackPowerRegex)),
-		api.Stat_StatMeleeHit:         float64(item.GetIntValue(meleeHitRegex)),
-		api.Stat_StatMeleeCrit:        float64(item.GetIntValue(meleeCritRegex)),
-		api.Stat_StatMeleeHaste:       float64(item.GetIntValue(meleeHasteRegex)),
-		api.Stat_StatArmorPenetration: float64(item.GetIntValue(armorPenetrationRegex)),
-		api.Stat_StatExpertise:        float64(item.GetIntValue(expertiseRegex)),
+		proto.Stat_StatArmor:            float64(item.GetIntValue(armorRegex)),
+		proto.Stat_StatStrength:         float64(item.GetIntValue(strengthRegex)),
+		proto.Stat_StatAgility:          float64(item.GetIntValue(agilityRegex)),
+		proto.Stat_StatStamina:          float64(item.GetIntValue(staminaRegex)),
+		proto.Stat_StatIntellect:        float64(item.GetIntValue(intellectRegex)),
+		proto.Stat_StatSpirit:           float64(item.GetIntValue(spiritRegex)),
+		proto.Stat_StatSpellPower:       float64(spellPower),
+		proto.Stat_StatHealingPower:     float64(healingPower),
+		proto.Stat_StatArcaneSpellPower: float64(item.GetIntValue(arcaneSpellPowerRegex)),
+		proto.Stat_StatFireSpellPower:   float64(item.GetIntValue(fireSpellPowerRegex)),
+		proto.Stat_StatFrostSpellPower:  float64(item.GetIntValue(frostSpellPowerRegex)),
+		proto.Stat_StatHolySpellPower:   float64(item.GetIntValue(holySpellPowerRegex)),
+		proto.Stat_StatNatureSpellPower: float64(item.GetIntValue(natureSpellPowerRegex)),
+		proto.Stat_StatShadowSpellPower: float64(item.GetIntValue(shadowSpellPowerRegex)),
+		proto.Stat_StatSpellHit:         float64(item.GetIntValue(spellHitRegex)),
+		proto.Stat_StatSpellCrit:        float64(item.GetIntValue(spellCritRegex)),
+		proto.Stat_StatSpellHaste:       float64(item.GetIntValue(spellHasteRegex)),
+		proto.Stat_StatSpellPenetration: float64(item.GetIntValue(spellPenetrationRegex)),
+		proto.Stat_StatMP5:              float64(item.GetIntValue(mp5Regex)),
+		proto.Stat_StatAttackPower:      float64(item.GetIntValue(attackPowerRegex)),
+		proto.Stat_StatMeleeHit:         float64(item.GetIntValue(meleeHitRegex)),
+		proto.Stat_StatMeleeCrit:        float64(item.GetIntValue(meleeCritRegex)),
+		proto.Stat_StatMeleeHaste:       float64(item.GetIntValue(meleeHasteRegex)),
+		proto.Stat_StatArmorPenetration: float64(item.GetIntValue(armorPenetrationRegex)),
+		proto.Stat_StatExpertise:        float64(item.GetIntValue(expertiseRegex)),
 	}
 }
 
@@ -125,24 +125,24 @@ func (item WowheadItemResponse) GetPhase() int {
 	return item.GetIntValue(phaseRegex)
 }
 
-var itemTypePatterns = map[api.ItemType]*regexp.Regexp{
-	api.ItemType_ItemTypeHead:     regexp.MustCompile("<td>Head</td>"),
-	api.ItemType_ItemTypeNeck:     regexp.MustCompile("<td>Neck</td>"),
-	api.ItemType_ItemTypeShoulder: regexp.MustCompile("<td>Shoulder</td>"),
-	api.ItemType_ItemTypeBack:     regexp.MustCompile("<td>Back</td>"),
-	api.ItemType_ItemTypeChest:    regexp.MustCompile("<td>Chest</td>"),
-	api.ItemType_ItemTypeWrist:    regexp.MustCompile("<td>Wrist</td>"),
-	api.ItemType_ItemTypeHands:    regexp.MustCompile("<td>Hands</td>"),
-	api.ItemType_ItemTypeWaist:    regexp.MustCompile("<td>Waist</td>"),
-	api.ItemType_ItemTypeLegs:     regexp.MustCompile("<td>Legs</td>"),
-	api.ItemType_ItemTypeFeet:     regexp.MustCompile("<td>Feet</td>"),
-	api.ItemType_ItemTypeFinger:   regexp.MustCompile("<td>Finger</td>"),
-	api.ItemType_ItemTypeTrinket:  regexp.MustCompile("<td>Trinket</td>"),
-	api.ItemType_ItemTypeWeapon:   regexp.MustCompile("<td>((Main Hand)|(Two-Hand)|(One-Hand)|(Off Hand)|(Held In Off-hand))</td>"),
-	api.ItemType_ItemTypeRanged:   regexp.MustCompile("<td>(Ranged|Thrown|Relic)</td>"),
+var itemTypePatterns = map[proto.ItemType]*regexp.Regexp{
+	proto.ItemType_ItemTypeHead:     regexp.MustCompile("<td>Head</td>"),
+	proto.ItemType_ItemTypeNeck:     regexp.MustCompile("<td>Neck</td>"),
+	proto.ItemType_ItemTypeShoulder: regexp.MustCompile("<td>Shoulder</td>"),
+	proto.ItemType_ItemTypeBack:     regexp.MustCompile("<td>Back</td>"),
+	proto.ItemType_ItemTypeChest:    regexp.MustCompile("<td>Chest</td>"),
+	proto.ItemType_ItemTypeWrist:    regexp.MustCompile("<td>Wrist</td>"),
+	proto.ItemType_ItemTypeHands:    regexp.MustCompile("<td>Hands</td>"),
+	proto.ItemType_ItemTypeWaist:    regexp.MustCompile("<td>Waist</td>"),
+	proto.ItemType_ItemTypeLegs:     regexp.MustCompile("<td>Legs</td>"),
+	proto.ItemType_ItemTypeFeet:     regexp.MustCompile("<td>Feet</td>"),
+	proto.ItemType_ItemTypeFinger:   regexp.MustCompile("<td>Finger</td>"),
+	proto.ItemType_ItemTypeTrinket:  regexp.MustCompile("<td>Trinket</td>"),
+	proto.ItemType_ItemTypeWeapon:   regexp.MustCompile("<td>((Main Hand)|(Two-Hand)|(One-Hand)|(Off Hand)|(Held In Off-hand))</td>"),
+	proto.ItemType_ItemTypeRanged:   regexp.MustCompile("<td>(Ranged|Thrown|Relic)</td>"),
 }
 
-func (item WowheadItemResponse) GetItemType() api.ItemType {
+func (item WowheadItemResponse) GetItemType() proto.ItemType {
 	for itemType, pattern := range itemTypePatterns {
 		if pattern.MatchString(item.Tooltip) {
 			return itemType
@@ -151,92 +151,92 @@ func (item WowheadItemResponse) GetItemType() api.ItemType {
 	panic("Could not find item type from tooltip: " + item.Tooltip)
 }
 
-var armorTypePatterns = map[api.ArmorType]*regexp.Regexp{
-	api.ArmorType_ArmorTypeCloth:   regexp.MustCompile("<span class=\\\"q1\\\">Cloth</span>"),
-	api.ArmorType_ArmorTypeLeather: regexp.MustCompile("<span class=\\\"q1\\\">Leather</span>"),
-	api.ArmorType_ArmorTypeMail:    regexp.MustCompile("<span class=\\\"q1\\\">Mail</span>"),
-	api.ArmorType_ArmorTypePlate:   regexp.MustCompile("<span class=\\\"q1\\\">Plate</span>"),
+var armorTypePatterns = map[proto.ArmorType]*regexp.Regexp{
+	proto.ArmorType_ArmorTypeCloth:   regexp.MustCompile("<span class=\\\"q1\\\">Cloth</span>"),
+	proto.ArmorType_ArmorTypeLeather: regexp.MustCompile("<span class=\\\"q1\\\">Leather</span>"),
+	proto.ArmorType_ArmorTypeMail:    regexp.MustCompile("<span class=\\\"q1\\\">Mail</span>"),
+	proto.ArmorType_ArmorTypePlate:   regexp.MustCompile("<span class=\\\"q1\\\">Plate</span>"),
 }
 
-func (item WowheadItemResponse) GetArmorType() api.ArmorType {
+func (item WowheadItemResponse) GetArmorType() proto.ArmorType {
 	for armorType, pattern := range armorTypePatterns {
 		if pattern.MatchString(item.Tooltip) {
 			return armorType
 		}
 	}
-	return api.ArmorType_ArmorTypeUnknown
+	return proto.ArmorType_ArmorTypeUnknown
 }
 
-var weaponTypePatterns = map[api.WeaponType]*regexp.Regexp{
-	api.WeaponType_WeaponTypeAxe:     regexp.MustCompile("<span class=\\\"q1\\\">Axe</span>"),
-	api.WeaponType_WeaponTypeDagger:  regexp.MustCompile("<span class=\\\"q1\\\">Dagger</span>"),
-	api.WeaponType_WeaponTypeFist:    regexp.MustCompile("<span class=\\\"q1\\\">Fist Weapon</span>"),
-	api.WeaponType_WeaponTypeMace:    regexp.MustCompile("<span class=\\\"q1\\\">Mace</span>"),
-	api.WeaponType_WeaponTypeOffHand: regexp.MustCompile("<td>Held In Off-hand</td>"),
-	api.WeaponType_WeaponTypePolearm: regexp.MustCompile("<span class=\\\"q1\\\">Polearm</span>"),
-	api.WeaponType_WeaponTypeShield:  regexp.MustCompile("<span class=\\\"q1\\\">Shield</span>"),
-	api.WeaponType_WeaponTypeStaff:   regexp.MustCompile("<span class=\\\"q1\\\">Staff</span>"),
-	api.WeaponType_WeaponTypeSword:   regexp.MustCompile("<span class=\\\"q1\\\">Sword</span>"),
+var weaponTypePatterns = map[proto.WeaponType]*regexp.Regexp{
+	proto.WeaponType_WeaponTypeAxe:     regexp.MustCompile("<span class=\\\"q1\\\">Axe</span>"),
+	proto.WeaponType_WeaponTypeDagger:  regexp.MustCompile("<span class=\\\"q1\\\">Dagger</span>"),
+	proto.WeaponType_WeaponTypeFist:    regexp.MustCompile("<span class=\\\"q1\\\">Fist Weapon</span>"),
+	proto.WeaponType_WeaponTypeMace:    regexp.MustCompile("<span class=\\\"q1\\\">Mace</span>"),
+	proto.WeaponType_WeaponTypeOffHand: regexp.MustCompile("<td>Held In Off-hand</td>"),
+	proto.WeaponType_WeaponTypePolearm: regexp.MustCompile("<span class=\\\"q1\\\">Polearm</span>"),
+	proto.WeaponType_WeaponTypeShield:  regexp.MustCompile("<span class=\\\"q1\\\">Shield</span>"),
+	proto.WeaponType_WeaponTypeStaff:   regexp.MustCompile("<span class=\\\"q1\\\">Staff</span>"),
+	proto.WeaponType_WeaponTypeSword:   regexp.MustCompile("<span class=\\\"q1\\\">Sword</span>"),
 }
 
-func (item WowheadItemResponse) GetWeaponType() api.WeaponType {
+func (item WowheadItemResponse) GetWeaponType() proto.WeaponType {
 	for weaponType, pattern := range weaponTypePatterns {
 		if pattern.MatchString(item.Tooltip) {
 			return weaponType
 		}
 	}
-	return api.WeaponType_WeaponTypeUnknown
+	return proto.WeaponType_WeaponTypeUnknown
 }
 
-var handTypePatterns = map[api.HandType]*regexp.Regexp{
-	api.HandType_HandTypeMainHand: regexp.MustCompile("<td>Main Hand</td>"),
-	api.HandType_HandTypeOneHand:  regexp.MustCompile("<td>One-Hand</td>"),
-	api.HandType_HandTypeOffHand:  regexp.MustCompile("<td>((Off Hand)|(Held In Off-hand))</td>"),
-	api.HandType_HandTypeTwoHand:  regexp.MustCompile("<td>Two-Hand</td>"),
+var handTypePatterns = map[proto.HandType]*regexp.Regexp{
+	proto.HandType_HandTypeMainHand: regexp.MustCompile("<td>Main Hand</td>"),
+	proto.HandType_HandTypeOneHand:  regexp.MustCompile("<td>One-Hand</td>"),
+	proto.HandType_HandTypeOffHand:  regexp.MustCompile("<td>((Off Hand)|(Held In Off-hand))</td>"),
+	proto.HandType_HandTypeTwoHand:  regexp.MustCompile("<td>Two-Hand</td>"),
 }
 
-func (item WowheadItemResponse) GetHandType() api.HandType {
+func (item WowheadItemResponse) GetHandType() proto.HandType {
 	for handType, pattern := range handTypePatterns {
 		if pattern.MatchString(item.Tooltip) {
 			return handType
 		}
 	}
-	return api.HandType_HandTypeUnknown
+	return proto.HandType_HandTypeUnknown
 }
 
-var rangedWeaponTypePatterns = map[api.RangedWeaponType]*regexp.Regexp{
-	api.RangedWeaponType_RangedWeaponTypeBow:      regexp.MustCompile("<span class=\\\"q1\\\">Bow</span>"),
-	api.RangedWeaponType_RangedWeaponTypeCrossbow: regexp.MustCompile("<span class=\\\"q1\\\">Crossbow</span>"),
-	api.RangedWeaponType_RangedWeaponTypeGun:      regexp.MustCompile("<span class=\\\"q1\\\">Gun</span>"),
-	api.RangedWeaponType_RangedWeaponTypeIdol:     regexp.MustCompile("<span class=\\\"q1\\\">Idol</span>"),
-	api.RangedWeaponType_RangedWeaponTypeLibram:   regexp.MustCompile("<span class=\\\"q1\\\">Libram</span>"),
-	api.RangedWeaponType_RangedWeaponTypeThrown:   regexp.MustCompile("<span class=\\\"q1\\\">Thrown</span>"),
-	api.RangedWeaponType_RangedWeaponTypeTotem:    regexp.MustCompile("<span class=\\\"q1\\\">Totem</span>"),
-	api.RangedWeaponType_RangedWeaponTypeWand:     regexp.MustCompile("<span class=\\\"q1\\\">Wand</span>"),
+var rangedWeaponTypePatterns = map[proto.RangedWeaponType]*regexp.Regexp{
+	proto.RangedWeaponType_RangedWeaponTypeBow:      regexp.MustCompile("<span class=\\\"q1\\\">Bow</span>"),
+	proto.RangedWeaponType_RangedWeaponTypeCrossbow: regexp.MustCompile("<span class=\\\"q1\\\">Crossbow</span>"),
+	proto.RangedWeaponType_RangedWeaponTypeGun:      regexp.MustCompile("<span class=\\\"q1\\\">Gun</span>"),
+	proto.RangedWeaponType_RangedWeaponTypeIdol:     regexp.MustCompile("<span class=\\\"q1\\\">Idol</span>"),
+	proto.RangedWeaponType_RangedWeaponTypeLibram:   regexp.MustCompile("<span class=\\\"q1\\\">Libram</span>"),
+	proto.RangedWeaponType_RangedWeaponTypeThrown:   regexp.MustCompile("<span class=\\\"q1\\\">Thrown</span>"),
+	proto.RangedWeaponType_RangedWeaponTypeTotem:    regexp.MustCompile("<span class=\\\"q1\\\">Totem</span>"),
+	proto.RangedWeaponType_RangedWeaponTypeWand:     regexp.MustCompile("<span class=\\\"q1\\\">Wand</span>"),
 }
 
-func (item WowheadItemResponse) GetRangedWeaponType() api.RangedWeaponType {
+func (item WowheadItemResponse) GetRangedWeaponType() proto.RangedWeaponType {
 	for rangedWeaponType, pattern := range rangedWeaponTypePatterns {
 		if pattern.MatchString(item.Tooltip) {
 			return rangedWeaponType
 		}
 	}
-	return api.RangedWeaponType_RangedWeaponTypeUnknown
+	return proto.RangedWeaponType_RangedWeaponTypeUnknown
 }
 
 var gemColorsRegex, _ = regexp.Compile("(Meta|Yellow|Blue|Red) Socket")
 
-func (item WowheadItemResponse) GetGemSockets() []api.GemColor {
+func (item WowheadItemResponse) GetGemSockets() []proto.GemColor {
 	matches := gemColorsRegex.FindAllStringSubmatch(item.Tooltip, -1)
 	if matches == nil {
-		return []api.GemColor{}
+		return []proto.GemColor{}
 	}
 
 	numSockets := len(matches)
-	gemColors := make([]api.GemColor, numSockets)
+	gemColors := make([]proto.GemColor, numSockets)
 	for socketIdx, match := range matches {
 		gemColorName := "GemColor" + match[1]
-		gemColors[socketIdx] = api.GemColor(api.GemColor_value[gemColorName])
+		gemColors[socketIdx] = proto.GemColor(proto.GemColor_value[gemColorName])
 	}
 	return gemColors
 }
@@ -272,25 +272,25 @@ func (item WowheadItemResponse) GetSocketBonus() Stats {
 	//fmt.Printf("\n%s\n", bonusStr)
 
 	stats := Stats{
-		api.Stat_StatStrength:    float64(GetBestRegexIntValue(bonusStr, strengthSocketBonusRegexes, 1)),
-		api.Stat_StatAgility:     float64(GetBestRegexIntValue(bonusStr, agilitySocketBonusRegexes, 1)),
-		api.Stat_StatStamina:     float64(GetBestRegexIntValue(bonusStr, staminaSocketBonusRegexes, 1)),
-		api.Stat_StatIntellect:   float64(GetBestRegexIntValue(bonusStr, intellectSocketBonusRegexes, 1)),
-		api.Stat_StatSpirit:      float64(GetBestRegexIntValue(bonusStr, spiritSocketBonusRegexes, 1)),
-		api.Stat_StatSpellHit:    float64(GetBestRegexIntValue(bonusStr, spellHitSocketBonusRegexes, 1)),
-		api.Stat_StatSpellCrit:   float64(GetBestRegexIntValue(bonusStr, spellCritSocketBonusRegexes, 1)),
-		api.Stat_StatMP5:         float64(GetBestRegexIntValue(bonusStr, mp5SocketBonusRegexes, 1)),
-		api.Stat_StatAttackPower: float64(GetBestRegexIntValue(bonusStr, attackPowerSocketBonusRegexes, 1)),
-		api.Stat_StatMeleeHit:    float64(GetBestRegexIntValue(bonusStr, meleeHitSocketBonusRegexes, 1)),
-		api.Stat_StatMeleeCrit:   float64(GetBestRegexIntValue(bonusStr, meleeCritSocketBonusRegexes, 1)),
+		proto.Stat_StatStrength:    float64(GetBestRegexIntValue(bonusStr, strengthSocketBonusRegexes, 1)),
+		proto.Stat_StatAgility:     float64(GetBestRegexIntValue(bonusStr, agilitySocketBonusRegexes, 1)),
+		proto.Stat_StatStamina:     float64(GetBestRegexIntValue(bonusStr, staminaSocketBonusRegexes, 1)),
+		proto.Stat_StatIntellect:   float64(GetBestRegexIntValue(bonusStr, intellectSocketBonusRegexes, 1)),
+		proto.Stat_StatSpirit:      float64(GetBestRegexIntValue(bonusStr, spiritSocketBonusRegexes, 1)),
+		proto.Stat_StatSpellHit:    float64(GetBestRegexIntValue(bonusStr, spellHitSocketBonusRegexes, 1)),
+		proto.Stat_StatSpellCrit:   float64(GetBestRegexIntValue(bonusStr, spellCritSocketBonusRegexes, 1)),
+		proto.Stat_StatMP5:         float64(GetBestRegexIntValue(bonusStr, mp5SocketBonusRegexes, 1)),
+		proto.Stat_StatAttackPower: float64(GetBestRegexIntValue(bonusStr, attackPowerSocketBonusRegexes, 1)),
+		proto.Stat_StatMeleeHit:    float64(GetBestRegexIntValue(bonusStr, meleeHitSocketBonusRegexes, 1)),
+		proto.Stat_StatMeleeCrit:   float64(GetBestRegexIntValue(bonusStr, meleeCritSocketBonusRegexes, 1)),
 	}
 
 	spellPower := GetBestRegexIntValue(bonusStr, spellPowerSocketBonusRegexes, 1)
 	healingPower := GetBestRegexIntValue(bonusStr, healingPowerSocketBonusRegexes, 1)
 	spellPowerFromHealing := GetBestRegexIntValue(bonusStr, healingPowerSocketBonusRegexes, 2)
 
-	stats[api.Stat_StatSpellPower] = math.Max(float64(spellPower), float64(spellPowerFromHealing))
-	stats[api.Stat_StatHealingPower] = math.Max(float64(spellPower), float64(healingPower))
+	stats[proto.Stat_StatSpellPower] = math.Max(float64(spellPower), float64(spellPowerFromHealing))
+	stats[proto.Stat_StatHealingPower] = math.Max(float64(spellPower), float64(healingPower))
 
 	return stats
 }

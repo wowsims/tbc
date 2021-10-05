@@ -1,10 +1,10 @@
-import { equalsOrBothNull } from '../utils.js';
-import { getEnumValues } from '../utils.js';
+import { ItemSlot } from '../proto/common.js';
+import { ItemSpec } from '../proto/common.js';
+import { EquipmentSpec } from '../proto/common.js';
 
 import { EquippedItem } from './equipped_item.js';
-import { ItemSlot } from './common.js';
-import { ItemSpec } from './common.js';
-import { EquipmentSpec } from './common.js';
+import { equalsOrBothNull } from '../utils.js';
+import { getEnumValues } from '../utils.js';
 
 type InternalGear = Record<ItemSlot, EquippedItem | null>;
 

@@ -1,4 +1,4 @@
-import { Spec } from '../api/common.js';
+import { Spec } from '../proto/common.js';
 import { Sim } from '../sim.js';
 import { TypedEvent } from '../typed_event.js';
 

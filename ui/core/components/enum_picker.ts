@@ -1,4 +1,4 @@
-import { Race } from '../api/common.js';
+import { Race } from '../proto/common.js';
 import { specToEligibleRaces } from '../api/utils.js';
 import { raceNames } from '../api/names.js';
 import { Sim } from '../sim.js';

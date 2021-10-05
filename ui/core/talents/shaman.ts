@@ -1,5 +1,5 @@
-import { Spec } from '../api/common.js';
-import { ShamanTalents as ShamanTalents } from '../api/shaman.js';
+import { Spec } from '../proto/common.js';
+import { ShamanTalents as ShamanTalents } from '../proto/shaman.js';
 import { ShamanSpecs } from '../api/utils.js';
 import { Sim } from '../sim.js';
 

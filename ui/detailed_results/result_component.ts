@@ -1,4 +1,4 @@
-import { IndividualSimRequest, IndividualSimResult } from '../core/api/api.js';
+import { IndividualSimRequest, IndividualSimResult } from '../core/proto/api.js';
 import { IndividualSimData } from '../core/components/detailed_results.js';
 import { Component } from '../core/components/component.js';
 import { TypedEvent } from '../core/typed_event.js';

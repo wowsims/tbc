@@ -1,6 +1,6 @@
-import { ItemSlot } from './common.js';
-import { Race } from './common.js';
-import { Stat } from './common.js';
+import { ItemSlot } from '../proto/common.js';
+import { Race } from '../proto/common.js';
+import { Stat } from '../proto/common.js';
 
 export const raceNames: Record<Race, string> = {
   [Race.RaceUnknown]: 'None',

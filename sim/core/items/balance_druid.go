@@ -5,7 +5,7 @@
 package items
 	
 import (
-	"github.com/wowsims/tbc/sim/api"
+	"github.com/wowsims/tbc/sim/core/proto"
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 

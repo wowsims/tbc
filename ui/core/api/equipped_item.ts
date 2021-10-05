@@ -1,8 +1,8 @@
-import { Enchant } from './common.js';
-import { Gem } from './common.js';
-import { Item } from './common.js';
-import { ItemSlot } from './common.js';
-import { ItemSpec } from './common.js';
+import { Enchant } from '../proto/common.js';
+import { Gem } from '../proto/common.js';
+import { Item } from '../proto/common.js';
+import { ItemSlot } from '../proto/common.js';
+import { ItemSpec } from '../proto/common.js';
 import { enchantAppliesToItem } from './utils.js';
 import { gemEligibleForSocket } from './utils.js';
 import { gemMatchesSocket } from './utils.js';
