@@ -1,5 +1,5 @@
 // The interface to the sim. All interactions with the sim should go through this file.
-package papi
+package sim
 
 import "github.com/wowsims/tbc/sim/api"
 

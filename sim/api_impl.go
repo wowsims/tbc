@@ -1,18 +1,17 @@
 // Proto based function interface for the simulator
-package papi
+package sim
 
 import (
 	"time"
 
 	"github.com/wowsims/tbc/sim/core/items"
-	"github.com/wowsims/tbc/sim"
 	"github.com/wowsims/tbc/sim/api"
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 func init() {
-	sim.RegisterAll()
+	RegisterAll()
 }
 
 func getGearListImpl(request *api.GearListRequest) *api.GearListResult {
