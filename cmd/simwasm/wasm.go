@@ -6,8 +6,8 @@ import (
 	"log"
 	"syscall/js"
 
+	"github.com/wowsims/tbc/sim"
 	"github.com/wowsims/tbc/sim/api"
-	"github.com/wowsims/tbc/sim/api/papi"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -32,7 +32,7 @@ func computeStats(this js.Value, args []js.Value) interface{} {
 		log.Printf("Failed to parse request: %s", err)
 		return nil
 	}
-	result := papi.ComputeStats(csr)
+	result := sim.ComputeStats(csr)
 
 	outbytes, err := proto.Marshal(result)
 	if err != nil {
@@ -56,7 +56,7 @@ func gearList(this js.Value, args []js.Value) interface{} {
 		log.Printf("Failed to parse request: %s", err)
 		return nil
 	}
-	result := papi.GetGearList(glr)
+	result := sim.GetGearList(glr)
 
 	outbytes, err := proto.Marshal(result)
 	if err != nil {
@@ -80,7 +80,7 @@ func individualSim(this js.Value, args []js.Value) interface{} {
 		log.Printf("Failed to parse request: %s", err)
 		return nil
 	}
-	result := papi.RunSimulation(isr)
+	result := sim.RunSimulation(isr)
 
 	outbytes, err := proto.Marshal(result)
 	if err != nil {
@@ -104,7 +104,7 @@ func statWeights(this js.Value, args []js.Value) interface{} {
 		log.Printf("Failed to parse request: %s", err)
 		return nil
 	}
-	result := papi.StatWeights(swr)
+	result := sim.StatWeights(swr)
 
 	outbytes, err := proto.Marshal(result)
 	if err != nil {

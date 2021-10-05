@@ -1,4 +1,4 @@
-package papi
+package sim
 
 import (
 	"log"

@@ -16,8 +16,8 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/wowsims/tbc/sim"
 	"github.com/wowsims/tbc/sim/api"
-	"github.com/wowsims/tbc/sim/api/papi"
 
 	// "github.com/wowsims/tbc/dist"
 	"google.golang.org/protobuf/proto"
@@ -133,10 +133,10 @@ type apiHandler struct {
 
 // Handlers to decode and handle each proto function
 var handlers = map[string]apiHandler{
-	"/individualSim": {msg: func() proto.Message { return &api.IndividualSimRequest{} }, handle: func(msg proto.Message) proto.Message { return papi.RunSimulation(msg.(*api.IndividualSimRequest)) }},
-	"/statWeights":   {msg: func() proto.Message { return &api.StatWeightsRequest{} }, handle: func(msg proto.Message) proto.Message { return papi.StatWeights(msg.(*api.StatWeightsRequest)) }},
-	"/computeStats":  {msg: func() proto.Message { return &api.ComputeStatsRequest{} }, handle: func(msg proto.Message) proto.Message { return papi.ComputeStats(msg.(*api.ComputeStatsRequest)) }},
-	"/gearList":      {msg: func() proto.Message { return &api.GearListRequest{} }, handle: func(msg proto.Message) proto.Message { return papi.GetGearList(msg.(*api.GearListRequest)) }},
+	"/individualSim": {msg: func() proto.Message { return &api.IndividualSimRequest{} }, handle: func(msg proto.Message) proto.Message { return sim.RunSimulation(msg.(*api.IndividualSimRequest)) }},
+	"/statWeights":   {msg: func() proto.Message { return &api.StatWeightsRequest{} }, handle: func(msg proto.Message) proto.Message { return sim.StatWeights(msg.(*api.StatWeightsRequest)) }},
+	"/computeStats":  {msg: func() proto.Message { return &api.ComputeStatsRequest{} }, handle: func(msg proto.Message) proto.Message { return sim.ComputeStats(msg.(*api.ComputeStatsRequest)) }},
+	"/gearList":      {msg: func() proto.Message { return &api.GearListRequest{} }, handle: func(msg proto.Message) proto.Message { return sim.GetGearList(msg.(*api.GearListRequest)) }},
 }
 
 // handleAPI is generic handler for any api function using protos.
