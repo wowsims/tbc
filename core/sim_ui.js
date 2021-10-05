@@ -5,6 +5,7 @@ export class SimUI {
     constructor(parentElem, config) {
         this.parentElem = parentElem;
         this.sim = new Sim(config);
+        this.simUiConfig = config;
         this.exclusivityMap = {
             'Battle Elixir': [],
             'Drums': [],
@@ -57,6 +58,20 @@ export class SimUI {
                 linkUrl.hash = simEncoded;
                 navigator.clipboard.writeText(linkUrl.toString());
                 alert('Current settings copied to clipboard!');
+            });
+        });
+        Array.from(document.getElementsByClassName('known-issues')).forEach(element => {
+            if (!this.simUiConfig.knownIssues?.length) {
+                element.style.display = 'none';
+                return;
+            }
+            tippy(element, {
+                'content': `
+				<ul class="known-issues-tooltip">
+					${this.simUiConfig.knownIssues.map(issue => '<li>' + issue + '</li>').join('')}
+				</ul>
+				`,
+                'allowHTML': true,
             });
         });
     }

@@ -1121,6 +1121,15 @@ td, th {
   height: 100% !important;
 }
 
+.known-issues {
+  background-color: red;
+  border: 2px solid var(--main-text-color);
+  padding: 2px;
+  margin: 0 10px;
+  font-size: 14px;
+  font-weight: 900;
+}
+
 .share-link {
   margin: 10px;
   font-size: 20px;

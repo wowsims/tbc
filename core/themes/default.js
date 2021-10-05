@@ -23,6 +23,13 @@ export class DefaultTheme extends SimUI {
         super(parentElem, config);
         this._config = config;
         this.parentElem.innerHTML = layoutHTML;
+        const titleElem = this.parentElem.getElementsByClassName('default-title')[0];
+        if (config.releaseStatus == 'Alpha') {
+            titleElem.textContent += ' Alpha';
+        }
+        else if (config.releaseStatus == 'Beta') {
+            titleElem.textContent += ' Beta';
+        }
         const results = new Results(this.parentElem.getElementsByClassName('default-results')[0]);
         const detailedResults = new DetailedResults(this.parentElem.getElementsByClassName('detailed-results')[0]);
         const actions = new Actions(this.parentElem.getElementsByClassName('default-actions')[0], this.sim, config.epStats, config.epReferenceStat, results, detailedResults);
@@ -231,6 +238,7 @@ const layoutHTML = `
       <li><a data-toggle="tab" href="#detailed-results-tab">Detailed Results</a></li>
       <li><a data-toggle="tab" href="#log-tab">Log</a></li>
       <li class="default-top-bar">
+				<div class="known-issues">Known Issues</div>
 				<span class="share-link fa fa-link"></span
 			</li>
     </ul>
