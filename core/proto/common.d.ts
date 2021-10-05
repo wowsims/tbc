@@ -264,15 +264,19 @@ export interface Item {
      */
     stats: number[];
     /**
-     * @generated from protobuf field: repeated proto.GemColor gem_sockets = 11;
+     * @generated from protobuf field: repeated proto.GemColor gem_sockets = 9;
      */
     gemSockets: GemColor[];
     /**
-     * @generated from protobuf field: int32 phase = 9;
+     * @generated from protobuf field: repeated double socketBonus = 10;
+     */
+    socketBonus: number[];
+    /**
+     * @generated from protobuf field: int32 phase = 11;
      */
     phase: number;
     /**
-     * @generated from protobuf field: proto.ItemQuality quality = 10;
+     * @generated from protobuf field: proto.ItemQuality quality = 12;
      */
     quality: ItemQuality;
 }
@@ -341,6 +345,10 @@ export interface Gem {
      * @generated from protobuf field: proto.ItemQuality quality = 6;
      */
     quality: ItemQuality;
+    /**
+     * @generated from protobuf field: bool unique = 7;
+     */
+    unique: boolean;
 }
 /**
  * @generated from protobuf enum proto.Race

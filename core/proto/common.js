@@ -1158,13 +1158,14 @@ class Item$Type extends MessageType {
             { no: 6, name: "hand_type", kind: "enum", T: () => ["proto.HandType", HandType] },
             { no: 7, name: "ranged_weapon_type", kind: "enum", T: () => ["proto.RangedWeaponType", RangedWeaponType] },
             { no: 8, name: "stats", kind: "scalar", repeat: 1 /*RepeatType.PACKED*/, T: 1 /*ScalarType.DOUBLE*/ },
-            { no: 11, name: "gem_sockets", kind: "enum", repeat: 1 /*RepeatType.PACKED*/, T: () => ["proto.GemColor", GemColor] },
-            { no: 9, name: "phase", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
-            { no: 10, name: "quality", kind: "enum", T: () => ["proto.ItemQuality", ItemQuality] }
+            { no: 9, name: "gem_sockets", kind: "enum", repeat: 1 /*RepeatType.PACKED*/, T: () => ["proto.GemColor", GemColor] },
+            { no: 10, name: "socketBonus", kind: "scalar", repeat: 1 /*RepeatType.PACKED*/, T: 1 /*ScalarType.DOUBLE*/ },
+            { no: 11, name: "phase", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 12, name: "quality", kind: "enum", T: () => ["proto.ItemQuality", ItemQuality] }
         ]);
     }
     create(value) {
-        const message = { id: 0, name: "", type: 0, armorType: 0, weaponType: 0, handType: 0, rangedWeaponType: 0, stats: [], gemSockets: [], phase: 0, quality: 0 };
+        const message = { id: 0, name: "", type: 0, armorType: 0, weaponType: 0, handType: 0, rangedWeaponType: 0, stats: [], gemSockets: [], socketBonus: [], phase: 0, quality: 0 };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -1203,17 +1204,24 @@ class Item$Type extends MessageType {
                     else
                         message.stats.push(reader.double());
                     break;
-                case /* repeated proto.GemColor gem_sockets */ 11:
+                case /* repeated proto.GemColor gem_sockets */ 9:
                     if (wireType === WireType.LengthDelimited)
                         for (let e = reader.int32() + reader.pos; reader.pos < e;)
                             message.gemSockets.push(reader.int32());
                     else
                         message.gemSockets.push(reader.int32());
                     break;
-                case /* int32 phase */ 9:
+                case /* repeated double socketBonus */ 10:
+                    if (wireType === WireType.LengthDelimited)
+                        for (let e = reader.int32() + reader.pos; reader.pos < e;)
+                            message.socketBonus.push(reader.double());
+                    else
+                        message.socketBonus.push(reader.double());
+                    break;
+                case /* int32 phase */ 11:
                     message.phase = reader.int32();
                     break;
-                case /* proto.ItemQuality quality */ 10:
+                case /* proto.ItemQuality quality */ 12:
                     message.quality = reader.int32();
                     break;
                 default:
@@ -1256,19 +1264,26 @@ class Item$Type extends MessageType {
                 writer.double(message.stats[i]);
             writer.join();
         }
-        /* repeated proto.GemColor gem_sockets = 11; */
+        /* repeated proto.GemColor gem_sockets = 9; */
         if (message.gemSockets.length) {
-            writer.tag(11, WireType.LengthDelimited).fork();
+            writer.tag(9, WireType.LengthDelimited).fork();
             for (let i = 0; i < message.gemSockets.length; i++)
                 writer.int32(message.gemSockets[i]);
             writer.join();
         }
-        /* int32 phase = 9; */
+        /* repeated double socketBonus = 10; */
+        if (message.socketBonus.length) {
+            writer.tag(10, WireType.LengthDelimited).fork();
+            for (let i = 0; i < message.socketBonus.length; i++)
+                writer.double(message.socketBonus[i]);
+            writer.join();
+        }
+        /* int32 phase = 11; */
         if (message.phase !== 0)
-            writer.tag(9, WireType.Varint).int32(message.phase);
-        /* proto.ItemQuality quality = 10; */
+            writer.tag(11, WireType.Varint).int32(message.phase);
+        /* proto.ItemQuality quality = 12; */
         if (message.quality !== 0)
-            writer.tag(10, WireType.Varint).int32(message.quality);
+            writer.tag(12, WireType.Varint).int32(message.quality);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -1392,11 +1407,12 @@ class Gem$Type extends MessageType {
             { no: 3, name: "stats", kind: "scalar", repeat: 1 /*RepeatType.PACKED*/, T: 1 /*ScalarType.DOUBLE*/ },
             { no: 4, name: "color", kind: "enum", T: () => ["proto.GemColor", GemColor] },
             { no: 5, name: "phase", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
-            { no: 6, name: "quality", kind: "enum", T: () => ["proto.ItemQuality", ItemQuality] }
+            { no: 6, name: "quality", kind: "enum", T: () => ["proto.ItemQuality", ItemQuality] },
+            { no: 7, name: "unique", kind: "scalar", T: 8 /*ScalarType.BOOL*/ }
         ]);
     }
     create(value) {
-        const message = { id: 0, name: "", stats: [], color: 0, phase: 0, quality: 0 };
+        const message = { id: 0, name: "", stats: [], color: 0, phase: 0, quality: 0, unique: false };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -1428,6 +1444,9 @@ class Gem$Type extends MessageType {
                     break;
                 case /* proto.ItemQuality quality */ 6:
                     message.quality = reader.int32();
+                    break;
+                case /* bool unique */ 7:
+                    message.unique = reader.bool();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -1463,6 +1482,9 @@ class Gem$Type extends MessageType {
         /* proto.ItemQuality quality = 6; */
         if (message.quality !== 0)
             writer.tag(6, WireType.Varint).int32(message.quality);
+        /* bool unique = 7; */
+        if (message.unique !== false)
+            writer.tag(7, WireType.Varint).bool(message.unique);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

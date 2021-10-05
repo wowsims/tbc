@@ -17,6 +17,7 @@ import { gemMatchesSocket } from './api/utils.js';
 import { ComputeStatsResult } from './proto/api.js';
 import { GearListRequest } from './proto/api.js';
 import { TypedEvent } from './typed_event.js';
+import { sum } from './utils.js';
 import { wait } from './utils.js';
 import { WorkerPool } from './worker_pool.js';
 // Core Sim module which deals only with api types, no UI-related stuff.
@@ -286,12 +287,26 @@ export class Sim extends WorkerPool {
         if (enchants.length > 0) {
             ep += Math.max(...enchants.map(enchant => this.computeEnchantEP(enchant)));
         }
-        item.gemSockets.forEach(socketColor => {
-            const gems = this.getGems(socketColor);
+        // Compare whether its better to match sockets + get socket bonus, or just use best gems.
+        const bestGemEPNotMatchingSockets = sum(item.gemSockets.map(socketColor => {
+            const gems = this.getGems(socketColor).filter(gem => !gem.unique && gem.phase <= this.getPhase());
             if (gems.length > 0) {
-                ep += Math.max(...gems.map(gem => this.computeGemEP(gem)));
+                return Math.max(...gems.map(gem => this.computeGemEP(gem)));
             }
-        });
+            else {
+                return 0;
+            }
+        }));
+        const bestGemEPMatchingSockets = sum(item.gemSockets.map(socketColor => {
+            const gems = this.getGems(socketColor).filter(gem => !gem.unique && gem.phase <= this.getPhase() && gemMatchesSocket(gem, socketColor));
+            if (gems.length > 0) {
+                return Math.max(...gems.map(gem => this.computeGemEP(gem)));
+            }
+            else {
+                return 0;
+            }
+        })) + new Stats(item.socketBonus).computeEP(this._epWeights);
+        ep += Math.max(bestGemEPMatchingSockets, bestGemEPNotMatchingSockets);
         return ep;
     }
     makeCurrentIndividualSimRequest(iterations, debug) {
