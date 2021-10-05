@@ -46,7 +46,7 @@ dist/%/index.html: ui/index_template.html
 	$(eval title := $(shell echo $(shell basename $(@D)) | sed -r 's/(^|_)([a-z])/\U \2/g' | cut -c 2-))
 	echo $(title)
 	mkdir -p $(@D)
-	cat index_template.html | sed 's/@@TITLE@@/TBC $(title) Simulator/g' > $@
+	cat ui/index_template.html | sed 's/@@TITLE@@/TBC $(title) Simulator/g' > $@
 
 .PHONY: wasm
 wasm: dist/lib.wasm

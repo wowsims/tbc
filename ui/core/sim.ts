@@ -40,6 +40,7 @@ import { StatWeightsRequest, StatWeightsResult } from './proto/api.js';
 
 import { Listener } from './typed_event.js';
 import { TypedEvent } from './typed_event.js';
+import { sum } from './utils.js';
 import { wait } from './utils.js';
 import { WorkerPool } from './worker_pool.js';
 
@@ -426,12 +427,26 @@ export class Sim<SpecType extends Spec> extends WorkerPool {
 			ep += Math.max(...enchants.map(enchant => this.computeEnchantEP(enchant)));
 		}
 
-		item.gemSockets.forEach(socketColor => {
-			const gems = this.getGems(socketColor);
+		// Compare whether its better to match sockets + get socket bonus, or just use best gems.
+		const bestGemEPNotMatchingSockets = sum(item.gemSockets.map(socketColor => {
+			const gems = this.getGems(socketColor).filter(gem => !gem.unique && gem.phase <= this.getPhase());
 			if (gems.length > 0) {
-				ep += Math.max(...gems.map(gem => this.computeGemEP(gem)));
+				return Math.max(...gems.map(gem => this.computeGemEP(gem)));
+			} else {
+				return 0;
 			}
-		});
+		}));
+
+		const bestGemEPMatchingSockets = sum(item.gemSockets.map(socketColor => {
+			const gems = this.getGems(socketColor).filter(gem => !gem.unique && gem.phase <= this.getPhase() && gemMatchesSocket(gem, socketColor));
+			if (gems.length > 0) {
+				return Math.max(...gems.map(gem => this.computeGemEP(gem)));
+			} else {
+				return 0;
+			}
+		})) + new Stats(item.socketBonus).computeEP(this._epWeights);
+
+		ep += Math.max(bestGemEPMatchingSockets, bestGemEPNotMatchingSockets);
 
 		return ep;
 	}
