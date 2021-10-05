@@ -60,6 +60,10 @@ message ElementalShaman {
     
     message Options {
         bool water_shield = 1;
+				bool bloodlust = 2;
+				bool mana_spring_totem = 3;
+				bool totem_of_wrath = 4;
+				bool wrath_of_air_totem = 5;
         // int32 WaterShieldPPM
     }
     Options options = 3;

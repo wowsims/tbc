@@ -18,14 +18,13 @@ func NewElementalShaman(sim *core.Simulation, character *core.Character, options
 	eleShamOptions := options.GetElementalShaman()
 	talents := convertShamTalents(eleShamOptions.Talents)
 
-	// TODO: Probably should get this from shaman options rather than buffs.
-	// However, other classes will need totem buffs so it has to be on buffs too.
-	//totems := Totems{
-	//	TotemOfWrath: buffs.TotemOfWrath > 0,
-	//	WrathOfAir:   buffs.WrathOfAirTotem != proto.TristateEffect_TristateEffectMissing,
-	//	ManaSpring:   buffs.ManaSpringTotem != proto.TristateEffect_TristateEffectMissing,
-	//}
-	totems := Totems{}
+	selfBuffs := SelfBuffs{
+		Bloodlust: eleShamOptions.Options.Bloodlust,
+		ManaSpring: eleShamOptions.Options.ManaSpringTotem,
+		TotemOfWrath: eleShamOptions.Options.TotemOfWrath,
+		WrathOfAir: eleShamOptions.Options.WrathOfAirTotem,
+		WaterShield: eleShamOptions.Options.WaterShield,
+	}
 
 	var agent shamanAgent
 
@@ -47,7 +46,7 @@ func NewElementalShaman(sim *core.Simulation, character *core.Character, options
 		agent = NewCLOnCDAgent(sim)
 	}
 
-	return newShaman(character, talents, totems, eleShamOptions.Options.WaterShield, agent)
+	return newShaman(character, talents, selfBuffs, agent)
 }
 
 func loDmgMod(sim *core.Simulation, agent core.Agent, c *core.Cast) {

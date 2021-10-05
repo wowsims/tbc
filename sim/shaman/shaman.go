@@ -9,15 +9,16 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-func newShaman(character *core.Character, talents Talents, totems Totems, waterShield bool, agent shamanAgent) *Shaman {
-	// Water shield
-	character.InitialStats[stats.MP5] += 50
+func newShaman(character *core.Character, talents Talents, selfBuffs SelfBuffs, agent shamanAgent) *Shaman {
+	if selfBuffs.WaterShield {
+		character.InitialStats[stats.MP5] += 50
+	}
 
 	shaman := &Shaman{
 		Character: character,
 		agent  :   agent,
 		Talents:   talents,
-		Totems:    totems,
+		SelfBuffs:    selfBuffs,
 
 		convectionBonus: 0.02 * float64(talents.Convection),
 		concussionBonus: 1 + 0.01*float64(talents.Concussion),
@@ -27,7 +28,9 @@ func newShaman(character *core.Character, talents Talents, totems Totems, waterS
 }
 
 // Which totems this shaman is dropping.
-type Totems struct {
+type SelfBuffs struct {
+	Bloodlust    bool
+	WaterShield  bool
 	TotemOfWrath bool
 	WrathOfAir   bool
 	ManaSpring   bool
@@ -51,8 +54,8 @@ type Shaman struct {
 
 	agent shamanAgent
 
-	Talents Talents
-	Totems  Totems
+	Talents   Talents
+	SelfBuffs SelfBuffs
 
 	// HACK HACK HACK
 	// TODO: do we actually need a 'on start' method for agents?
@@ -73,18 +76,19 @@ func (shaman *Shaman) GetCharacter() *core.Character {
 func (shaman *Shaman) AddRaidBuffs(buffs *core.Buffs) {
 }
 func (shaman *Shaman) AddPartyBuffs(buffs *core.Buffs) {
-	// TODO: Figure out how to do this w/o messing with existing settings
-	//buffs.Bloodlust += 1
+	if shaman.SelfBuffs.Bloodlust {
+		buffs.Bloodlust += 1
+	}
 
-	if shaman.Totems.TotemOfWrath {
+	if shaman.SelfBuffs.TotemOfWrath {
 		buffs.TotemOfWrath += 1
 	}
 
-	if shaman.Totems.ManaSpring {
+	if shaman.SelfBuffs.ManaSpring {
 		buffs.ManaSpringTotem = proto.TristateEffect_TristateEffectRegular
 	}
 
-	if shaman.Totems.WrathOfAir {
+	if shaman.SelfBuffs.WrathOfAir {
 		// TODO: Check for t4 set bonus
 		buffs.WrathOfAirTotem = proto.TristateEffect_TristateEffectRegular
 	}
