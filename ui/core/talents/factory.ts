@@ -1,6 +1,6 @@
 import { Sim } from '../sim.js';
-import { Class } from '../api/common.js';
-import { Spec } from '../api/common.js';
+import { Class } from '../proto/common.js';
+import { Spec } from '../proto/common.js';
 import { specToClass } from '../api/utils.js';
 
 import { ShamanTalentsPicker } from './shaman.js';

@@ -1,22 +1,23 @@
+import { Buffs } from '../proto/common.js';
+import { Consumes } from '../proto/common.js';
+import { Class } from '../proto/common.js';
+import { Encounter } from '../proto/common.js';
+import { Race } from '../proto/common.js';
+import { Spec } from '../proto/common.js';
+
 import { Gear } from './gear.js';
-import { Buffs } from './common.js';
-import { Consumes } from './common.js';
-import { Class } from './common.js';
-import { Encounter } from './common.js';
-import { Race } from './common.js';
-import { Spec } from './common.js';
 import { Stats } from './stats.js';
 import { SpecAgent } from './utils.js';
 import { SpecTalents } from './utils.js';
 import { SpecOptions } from './utils.js';
 
-import { Player } from './api.js';
-import { PlayerOptions } from './api.js';
-import { BalanceDruid, BalanceDruid_Agent as BalanceDruidAgent, DruidTalents, BalanceDruid_Options as BalanceDruidOptions} from './druid.js';
-import { ElementalShaman, ElementalShaman_Agent as ElementalShamanAgent, ShamanTalents, ElementalShaman_Options as ElementalShamanOptions } from './shaman.js';
+import { Player } from '../proto/api.js';
+import { PlayerOptions } from '../proto/api.js';
+import { BalanceDruid, BalanceDruid_Agent as BalanceDruidAgent, DruidTalents, BalanceDruid_Options as BalanceDruidOptions} from '../proto/druid.js';
+import { ElementalShaman, ElementalShaman_Agent as ElementalShamanAgent, ShamanTalents, ElementalShaman_Options as ElementalShamanOptions } from '../proto/shaman.js';
 
-import { ComputeStatsRequest, ComputeStatsResult } from './api.js';
-import { IndividualSimRequest, IndividualSimResult } from './api.js';
+import { ComputeStatsRequest, ComputeStatsResult } from '../proto/api.js';
+import { IndividualSimRequest, IndividualSimResult } from '../proto/api.js';
 
 export function makeComputeStatsRequest<SpecType extends Spec>(
     buffs: Buffs,

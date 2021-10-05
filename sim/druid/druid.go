@@ -1,7 +1,7 @@
 package druid
 
 import (
-	"github.com/wowsims/tbc/sim/api"
+	"github.com/wowsims/tbc/sim/core/proto"
 	"github.com/wowsims/tbc/sim/core"
 )
 
@@ -15,10 +15,10 @@ func (druid *Druid) GetCharacter() *core.Character {
 
 func (druid *Druid) AddRaidBuffs(buffs *core.Buffs) {
 	// TODO: Use talents to check for imp gotw
-	buffs.GiftOfTheWild = api.TristateEffect_TristateEffectRegular
+	buffs.GiftOfTheWild = proto.TristateEffect_TristateEffectRegular
 }
 func (druid *Druid) AddPartyBuffs(buffs *core.Buffs) {
-	//buffs.Moonkin = api.TristateEffect_TristateEffectRegular
+	//buffs.Moonkin = proto.TristateEffect_TristateEffectRegular
 	// check for idol of raven goddess equipped
 }
 
