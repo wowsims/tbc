@@ -292,4 +292,5 @@ message Gem {
 
     int32 phase = 5;
     ItemQuality quality = 6;
+		bool unique = 7;
 }

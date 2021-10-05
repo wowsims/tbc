@@ -89,6 +89,7 @@ type Gem struct {
 	Color   proto.GemColor
 	Phase   byte
 	Quality proto.ItemQuality
+	Unique  bool
 	// Requirements  // Validate the gem can be used... later
 }
 
