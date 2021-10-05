@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/wowsims/tbc/items"
+	"github.com/wowsims/tbc/sim/core/items"
 	"github.com/wowsims/tbc/sim/api"
 	"github.com/wowsims/tbc/sim/core/stats"
 )
