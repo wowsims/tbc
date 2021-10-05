@@ -4,7 +4,7 @@ import (
 	"log"
 	"time"
 
-	"github.com/wowsims/tbc/items"
+	"github.com/wowsims/tbc/sim/core/items"
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
