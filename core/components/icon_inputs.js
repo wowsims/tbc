@@ -1,8 +1,8 @@
 // Keep each section in alphabetical order.
 // Buffs
 export const ArcaneBrilliance = makeBooleanBuffInput({ spellId: 27127 }, 'arcaneBrilliance');
-export const AtieshMage = makeMultistateBuffInput({ spellId: 28142 }, 6, 'atieshMage');
-export const AtieshWarlock = makeMultistateBuffInput({ spellId: 28143 }, 6, 'atieshWarlock');
+export const AtieshMage = makeMultistateBuffInput({ spellId: 28142 }, 5, 'atieshMage');
+export const AtieshWarlock = makeMultistateBuffInput({ spellId: 28143 }, 5, 'atieshWarlock');
 export const BlessingOfKings = makeBooleanBuffInput({ spellId: 25898 }, 'blessingOfKings');
 export const BlessingOfWisdom = makeTristateBuffInput({ spellId: 27143 }, { spellId: 20245 }, 'blessingOfWisdom');
 export const Bloodlust = makeMultistateBuffInput({ spellId: 2825 }, 11, 'bloodlust');
