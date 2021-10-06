@@ -2,7 +2,7 @@ import { ElementalShaman_Agent_AgentType as AgentType } from '../core/proto/sham
 export const IconBloodlust = makeBooleanShamanBuffInput({ spellId: 2825 }, 'bloodlust');
 export const IconManaSpringTotem = makeBooleanShamanBuffInput({ spellId: 25570 }, 'manaSpringTotem');
 export const IconTotemOfWrath = makeBooleanShamanBuffInput({ spellId: 30706 }, 'totemOfWrath');
-export const IconWaterShield = makeBooleanShamanBuffInput({ spellId: 33737 }, 'waterShield');
+export const IconWaterShield = makeBooleanShamanBuffInput({ spellId: 33736 }, 'waterShield');
 export const IconWrathOfAirTotem = makeBooleanShamanBuffInput({ spellId: 3738 }, 'wrathOfAirTotem');
 export const ElementalShamanRotationConfig = {
     inputs: [
