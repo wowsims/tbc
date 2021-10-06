@@ -30,12 +30,18 @@ import { newTalentsPicker } from '../talents/factory.js';
 
 import { SimUI, SimUIConfig } from '../sim_ui.js';
 
+declare var tippy: any;
+
 
 export interface DefaultThemeConfig<SpecType extends Spec> extends SimUIConfig<SpecType> {
   displayStats: Array<Stat>;
-  iconSections: Record<string, Array<IconInput>>;
-  otherSections: Record<string, Array<
-    {
+  iconSections: Record<string, {
+		tooltip?: string,
+		icons: Array<IconInput>,
+	}>;
+  otherSections: Record<string, {
+		tooltip?: string,
+		inputs: Array<{
       type: 'number',
       cssClass: string,
       config: NumberPickerConfig,
@@ -44,8 +50,8 @@ export interface DefaultThemeConfig<SpecType extends Spec> extends SimUIConfig<S
       type: 'enum',
       cssClass: string,
       config: EnumPickerConfig,
-    }
-  >>;
+    }>,
+  }>;
   showTargetArmor: boolean;
   showNumTargets: boolean;
 	freezeTalents: boolean;
@@ -117,9 +123,15 @@ export class DefaultTheme<SpecType extends Spec> extends SimUI<SpecType> {
       const sectionElem = document.createElement('section');
       sectionElem.classList.add('settings-section', sectionCssPrefix + '-section');
       sectionElem.innerHTML = `<label>${sectionName}</label>`;
+			if (sectionConfig.tooltip) {
+				tippy(sectionElem, {
+					'content': sectionConfig.tooltip,
+					'allowHTML': true,
+				});
+			}
       settingsTab.appendChild(sectionElem);
 
-      const iconPicker = new IconPicker(sectionElem, sectionCssPrefix + '-icon-picker', this.sim, sectionConfig, this);
+      const iconPicker = new IconPicker(sectionElem, sectionCssPrefix + '-icon-picker', this.sim, sectionConfig.icons, this);
     });
 
     Object.keys(config.otherSections).forEach(sectionName => {
@@ -128,9 +140,15 @@ export class DefaultTheme<SpecType extends Spec> extends SimUI<SpecType> {
       const sectionElem = document.createElement('section');
       sectionElem.classList.add('settings-section', sectionName + '-section');
       sectionElem.innerHTML = `<label>${sectionName}</label>`;
+			if (sectionConfig.tooltip) {
+				tippy(sectionElem, {
+					'content': sectionConfig.tooltip,
+					'allowHTML': true,
+				});
+			}
       settingsTab.appendChild(sectionElem);
 
-      sectionConfig.forEach(inputConfig => {
+      sectionConfig.inputs.forEach(inputConfig => {
         if (inputConfig.type == 'number') {
           const picker = new NumberPicker(sectionElem, this.sim, inputConfig.config);
         } else if (inputConfig.type == 'enum') {
