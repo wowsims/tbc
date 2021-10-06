@@ -6,7 +6,7 @@ import { ItemSlot } from '/tbc/core/proto/common.js';
 import { Spec } from '/tbc/core/proto/common.js';
 import { Stat } from '/tbc/core/proto/common.js';
 import { TristateEffect } from '/tbc/core/proto/common.js'
-import { Stats } from '/tbc/core/api/stats.js';
+import { Stats } from '/tbc/core/proto_utils/stats.js';
 import { Sim } from '/tbc/core/sim.js';
 import { DefaultTheme } from '/tbc/core/themes/default.js';
 

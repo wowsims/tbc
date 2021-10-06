@@ -1,10 +1,10 @@
-import { EquippedItem } from '/tbc/core/api/equipped_item.js';
+import { EquippedItem } from '/tbc/core/proto_utils/equipped_item.js';
 import { Enchant } from '/tbc/core/proto/common.js';
 import { Item } from '/tbc/core/proto/common.js';
 import { ItemQuality } from '/tbc/core/proto/common.js';
 import { ItemSlot } from '/tbc/core/proto/common.js';
-import { enchantDescriptions } from '/tbc/core/api/names.js';
-import { slotNames } from '/tbc/core/api/names.js';
+import { enchantDescriptions } from '/tbc/core/proto_utils/names.js';
+import { slotNames } from '/tbc/core/proto_utils/names.js';
 import { getEmptyGemSocketIconUrl } from '/tbc/core/resources.js';
 import { getEmptySlotIconUrl } from '/tbc/core/resources.js';
 import { getIconUrl } from '/tbc/core/resources.js';

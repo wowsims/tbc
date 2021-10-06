@@ -1,6 +1,6 @@
 import { Stat } from '/tbc/core/proto/common.js';
-import { statNames } from '/tbc/core/api/names.js';
-import { Stats } from '/tbc/core/api/stats.js';
+import { statNames } from '/tbc/core/proto_utils/names.js';
+import { Stats } from '/tbc/core/proto_utils/stats.js';
 import { Sim } from '/tbc/core/sim.js';
 
 import { Component } from './component.js';
