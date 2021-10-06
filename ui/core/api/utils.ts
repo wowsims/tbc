@@ -1,20 +1,20 @@
-import { intersection } from '../utils.js';
+import { intersection } from '/tbc/core/utils.js';
 
-import { Class } from '../proto/common.js';
-import { Enchant } from '../proto/common.js';
-import { Gem } from '../proto/common.js';
-import { GemColor } from '../proto/common.js';
-import { HandType } from '../proto/common.js';
-import { ItemSlot } from '../proto/common.js';
-import { ItemType } from '../proto/common.js';
-import { Item } from '../proto/common.js';
-import { Race } from '../proto/common.js';
-import { RangedWeaponType } from '../proto/common.js';
-import { Spec } from '../proto/common.js';
-import { WeaponType } from '../proto/common.js';
+import { Class } from '/tbc/core/proto/common.js';
+import { Enchant } from '/tbc/core/proto/common.js';
+import { Gem } from '/tbc/core/proto/common.js';
+import { GemColor } from '/tbc/core/proto/common.js';
+import { HandType } from '/tbc/core/proto/common.js';
+import { ItemSlot } from '/tbc/core/proto/common.js';
+import { ItemType } from '/tbc/core/proto/common.js';
+import { Item } from '/tbc/core/proto/common.js';
+import { Race } from '/tbc/core/proto/common.js';
+import { RangedWeaponType } from '/tbc/core/proto/common.js';
+import { Spec } from '/tbc/core/proto/common.js';
+import { WeaponType } from '/tbc/core/proto/common.js';
 
-import { BalanceDruid, BalanceDruid_Agent as BalanceDruidAgent, DruidTalents, BalanceDruid_Options as BalanceDruidOptions} from '../proto/druid.js';
-import { ElementalShaman, ElementalShaman_Agent as ElementalShamanAgent, ShamanTalents, ElementalShaman_Options as ElementalShamanOptions } from '../proto/shaman.js';
+import { BalanceDruid, BalanceDruid_Agent as BalanceDruidAgent, DruidTalents, BalanceDruid_Options as BalanceDruidOptions} from '/tbc/core/proto/druid.js';
+import { ElementalShaman, ElementalShaman_Agent as ElementalShamanAgent, ShamanTalents, ElementalShaman_Options as ElementalShamanOptions } from '/tbc/core/proto/shaman.js';
 
 export type ShamanSpecs = Spec.SpecElementalShaman;
 

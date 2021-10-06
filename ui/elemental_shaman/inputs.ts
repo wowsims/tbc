@@ -1,9 +1,9 @@
-import { IconInput } from '../core/components/icon_picker.js';
-import { ElementalShaman_Agent_AgentType as AgentType } from '../core/proto/shaman.js';
-import { ElementalShaman_Options as ShamanOptions } from '../core/proto/shaman.js';
-import { Spec } from '../core/proto/common.js';
-import { ItemOrSpellId } from '../core/resources.js';
-import { Sim } from '../core/sim.js';
+import { IconInput } from '/tbc/core/components/icon_picker.js';
+import { ElementalShaman_Agent_AgentType as AgentType } from '/tbc/core/proto/shaman.js';
+import { ElementalShaman_Options as ShamanOptions } from '/tbc/core/proto/shaman.js';
+import { Spec } from '/tbc/core/proto/common.js';
+import { ItemOrSpellId } from '/tbc/core/resources.js';
+import { Sim } from '/tbc/core/sim.js';
 
 export const IconBloodlust = makeBooleanShamanBuffInput({ spellId: 2825 }, 'bloodlust');
 export const IconManaSpringTotem = makeBooleanShamanBuffInput({ spellId: 25570 }, 'manaSpringTotem');

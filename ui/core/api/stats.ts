@@ -1,6 +1,5 @@
-import { getEnumValues } from '../utils.js';
-
-import { Stat } from '../proto/common.js';
+import { Stat } from '/tbc/core/proto/common.js';
+import { getEnumValues } from '/tbc/core/utils.js';
 
 const STATS_LEN = getEnumValues(Stat).length;
 

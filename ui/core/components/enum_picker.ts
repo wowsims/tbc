@@ -1,8 +1,8 @@
-import { Race } from '../proto/common.js';
-import { specToEligibleRaces } from '../api/utils.js';
-import { raceNames } from '../api/names.js';
-import { Sim } from '../sim.js';
-import { TypedEvent } from '../typed_event.js';
+import { Race } from '/tbc/core/proto/common.js';
+import { specToEligibleRaces } from '/tbc/core/api/utils.js';
+import { raceNames } from '/tbc/core/api/names.js';
+import { Sim } from '/tbc/core/sim.js';
+import { TypedEvent } from '/tbc/core/typed_event.js';
 
 import { Component } from './component.js';
 

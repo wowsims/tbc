@@ -1,5 +1,5 @@
-import { IndividualSimData } from '../core/components/detailed_results.js';
-import { TypedEvent } from '../core/typed_event.js';
+import { IndividualSimData } from '/tbc/core/components/detailed_results.js';
+import { TypedEvent } from '/tbc/core/typed_event.js';
 
 import { CastMetrics } from './cast_metrics.js';
 import { DpsHistogram } from './dps_histogram.js';

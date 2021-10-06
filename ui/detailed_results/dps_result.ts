@@ -1,4 +1,4 @@
-import { IndividualSimRequest, IndividualSimResult } from '../core/proto/api.js';
+import { IndividualSimRequest, IndividualSimResult } from '/tbc/core/proto/api.js';
 
 import { ResultComponent, ResultComponentConfig } from './result_component.js';
 

@@ -1,5 +1,5 @@
-import { IndividualSimRequest, IndividualSimResult } from '../proto/api.js';
-import { repoName } from '../resources.js';
+import { IndividualSimRequest, IndividualSimResult } from '/tbc/core/proto/api.js';
+import { repoName } from '/tbc/core/resources.js';
 
 import { Component } from './component.js';
 

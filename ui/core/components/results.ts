@@ -1,8 +1,8 @@
-import { IndividualSimResult } from '../proto/api.js';
-import { StatWeightsRequest, StatWeightsResult } from '../proto/api.js';
-import { Stat } from '../proto/common.js';
-import { statNames } from '../api/names.js';
-import { stDevToConf90 } from '../utils.js';
+import { IndividualSimResult } from '/tbc/core/proto/api.js';
+import { StatWeightsRequest, StatWeightsResult } from '/tbc/core/proto/api.js';
+import { Stat } from '/tbc/core/proto/common.js';
+import { statNames } from '/tbc/core/api/names.js';
+import { stDevToConf90 } from '/tbc/core/utils.js';
 import { Component } from './component.js';
 
 export class Results extends Component {

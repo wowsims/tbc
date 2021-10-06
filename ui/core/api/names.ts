@@ -1,6 +1,6 @@
-import { ItemSlot } from '../proto/common.js';
-import { Race } from '../proto/common.js';
-import { Stat } from '../proto/common.js';
+import { ItemSlot } from '/tbc/core/proto/common.js';
+import { Race } from '/tbc/core/proto/common.js';
+import { Stat } from '/tbc/core/proto/common.js';
 
 export const raceNames: Record<Race, string> = {
   [Race.RaceUnknown]: 'None',

@@ -1,10 +1,10 @@
-import { ItemSlot } from '../proto/common.js';
-import { ItemSpec } from '../proto/common.js';
-import { EquipmentSpec } from '../proto/common.js';
+import { ItemSlot } from '/tbc/core/proto/common.js';
+import { ItemSpec } from '/tbc/core/proto/common.js';
+import { EquipmentSpec } from '/tbc/core/proto/common.js';
+import { equalsOrBothNull } from '/tbc/core/utils.js';
+import { getEnumValues } from '/tbc/core/utils.js';
 
 import { EquippedItem } from './equipped_item.js';
-import { equalsOrBothNull } from '../utils.js';
-import { getEnumValues } from '../utils.js';
 
 type InternalGear = Record<ItemSlot, EquippedItem | null>;
 

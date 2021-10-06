@@ -1,9 +1,9 @@
-import { Buffs } from '../proto/common.js';
-import { Consumes } from '../proto/common.js';
-import { ItemOrSpellId } from '../resources.js';
-import { Sim } from '../sim.js';
+import { Buffs } from '/tbc/core/proto/common.js';
+import { Consumes } from '/tbc/core/proto/common.js';
+import { ItemOrSpellId } from '/tbc/core/resources.js';
+import { Sim } from '/tbc/core/sim.js';
 
-import { ExclusivityTag } from '../sim_ui.js';
+import { ExclusivityTag } from '/tbc/core/sim_ui.js';
 import { IconInput } from './icon_picker.js';
 
 // Keep each section in alphabetical order.

@@ -1,23 +1,23 @@
-import { Buffs } from '../proto/common.js';
-import { Consumes } from '../proto/common.js';
-import { Class } from '../proto/common.js';
-import { Encounter } from '../proto/common.js';
-import { Race } from '../proto/common.js';
-import { Spec } from '../proto/common.js';
+import { Buffs } from '/tbc/core/proto/common.js';
+import { Consumes } from '/tbc/core/proto/common.js';
+import { Class } from '/tbc/core/proto/common.js';
+import { Encounter } from '/tbc/core/proto/common.js';
+import { Race } from '/tbc/core/proto/common.js';
+import { Spec } from '/tbc/core/proto/common.js';
+
+import { Player } from '/tbc/core/proto/api.js';
+import { PlayerOptions } from '/tbc/core/proto/api.js';
+import { BalanceDruid, BalanceDruid_Agent as BalanceDruidAgent, DruidTalents, BalanceDruid_Options as BalanceDruidOptions} from '/tbc/core/proto/druid.js';
+import { ElementalShaman, ElementalShaman_Agent as ElementalShamanAgent, ShamanTalents, ElementalShaman_Options as ElementalShamanOptions } from '/tbc/core/proto/shaman.js';
+
+import { ComputeStatsRequest, ComputeStatsResult } from '/tbc/core/proto/api.js';
+import { IndividualSimRequest, IndividualSimResult } from '/tbc/core/proto/api.js';
 
 import { Gear } from './gear.js';
 import { Stats } from './stats.js';
 import { SpecAgent } from './utils.js';
 import { SpecTalents } from './utils.js';
 import { SpecOptions } from './utils.js';
-
-import { Player } from '../proto/api.js';
-import { PlayerOptions } from '../proto/api.js';
-import { BalanceDruid, BalanceDruid_Agent as BalanceDruidAgent, DruidTalents, BalanceDruid_Options as BalanceDruidOptions} from '../proto/druid.js';
-import { ElementalShaman, ElementalShaman_Agent as ElementalShamanAgent, ShamanTalents, ElementalShaman_Options as ElementalShamanOptions } from '../proto/shaman.js';
-
-import { ComputeStatsRequest, ComputeStatsResult } from '../proto/api.js';
-import { IndividualSimRequest, IndividualSimResult } from '../proto/api.js';
 
 export function makeComputeStatsRequest<SpecType extends Spec>(
     buffs: Buffs,

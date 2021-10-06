@@ -1,18 +1,18 @@
-import { EquippedItem } from '../api/equipped_item.js';
-import { Enchant } from '../proto/common.js';
-import { Item } from '../proto/common.js';
-import { ItemQuality } from '../proto/common.js';
-import { ItemSlot } from '../proto/common.js';
-import { enchantDescriptions } from '../api/names.js';
-import { slotNames } from '../api/names.js';
-import { getEmptyGemSocketIconUrl } from '../resources.js';
-import { getEmptySlotIconUrl } from '../resources.js';
-import { getIconUrl } from '../resources.js';
-import { setWowheadHref } from '../resources.js';
-import { setGemSocketCssClass } from '../css_utils.js';
-import { setItemQualityCssClass } from '../css_utils.js';
-import { Sim } from '../sim.js';
-import { getEnumValues } from '../utils.js';
+import { EquippedItem } from '/tbc/core/api/equipped_item.js';
+import { Enchant } from '/tbc/core/proto/common.js';
+import { Item } from '/tbc/core/proto/common.js';
+import { ItemQuality } from '/tbc/core/proto/common.js';
+import { ItemSlot } from '/tbc/core/proto/common.js';
+import { enchantDescriptions } from '/tbc/core/api/names.js';
+import { slotNames } from '/tbc/core/api/names.js';
+import { getEmptyGemSocketIconUrl } from '/tbc/core/resources.js';
+import { getEmptySlotIconUrl } from '/tbc/core/resources.js';
+import { getIconUrl } from '/tbc/core/resources.js';
+import { setWowheadHref } from '/tbc/core/resources.js';
+import { setGemSocketCssClass } from '/tbc/core/css_utils.js';
+import { setItemQualityCssClass } from '/tbc/core/css_utils.js';
+import { Sim } from '/tbc/core/sim.js';
+import { getEnumValues } from '/tbc/core/utils.js';
 
 import { Component } from './component.js';
 

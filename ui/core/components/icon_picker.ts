@@ -1,11 +1,11 @@
-import { getIconUrl } from '../resources.js';
-import { ItemOrSpellId } from '../resources.js';
-import { setWowheadHref } from '../resources.js';
-import { Sim } from '../sim.js';
-import { TypedEvent } from '../typed_event.js';
-import { isRightClick } from '../utils.js';
-import { ExclusivityTag } from '../sim_ui.js';
-import { SimUI } from '../sim_ui.js';
+import { getIconUrl } from '/tbc/core/resources.js';
+import { ItemOrSpellId } from '/tbc/core/resources.js';
+import { setWowheadHref } from '/tbc/core/resources.js';
+import { Sim } from '/tbc/core/sim.js';
+import { TypedEvent } from '/tbc/core/typed_event.js';
+import { isRightClick } from '/tbc/core/utils.js';
+import { ExclusivityTag } from '/tbc/core/sim_ui.js';
+import { SimUI } from '/tbc/core/sim_ui.js';
 
 import { Component } from './component.js';
 

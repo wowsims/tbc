@@ -13,13 +13,13 @@ detailed_results: $(OUT_DIR)/detailed_results/index.js $(OUT_DIR)/detailed_resul
 clean:
 	rm -f ui/core/proto/*.ts
 	rm -f sim/core/proto/*.pb.go
-	rm -rf $(OUT_DIR)
+	rm -rf dist
 
 # Host a local server, for dev testing
 host: $(OUT_DIR)
 	# Intentionally serve one level up, so the local site has 'tbc' as the first
 	# directory just like github pages.
-	npx http-server dist
+	npx http-server $(OUT_DIR)/..
 
 ui/core/proto/proto.ts: proto/*.proto
 	mkdir -p $(OUT_DIR)/protobuf-ts

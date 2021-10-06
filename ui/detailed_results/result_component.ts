@@ -1,7 +1,7 @@
-import { IndividualSimRequest, IndividualSimResult } from '../core/proto/api.js';
-import { IndividualSimData } from '../core/components/detailed_results.js';
-import { Component } from '../core/components/component.js';
-import { TypedEvent } from '../core/typed_event.js';
+import { IndividualSimRequest, IndividualSimResult } from '/tbc/core/proto/api.js';
+import { IndividualSimData } from '/tbc/core/components/detailed_results.js';
+import { Component } from '/tbc/core/components/component.js';
+import { TypedEvent } from '/tbc/core/typed_event.js';
 
 import { ColorSettings } from './color_settings.js';
 

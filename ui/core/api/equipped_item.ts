@@ -1,8 +1,9 @@
-import { Enchant } from '../proto/common.js';
-import { Gem } from '../proto/common.js';
-import { Item } from '../proto/common.js';
-import { ItemSlot } from '../proto/common.js';
-import { ItemSpec } from '../proto/common.js';
+import { Enchant } from '/tbc/core/proto/common.js';
+import { Gem } from '/tbc/core/proto/common.js';
+import { Item } from '/tbc/core/proto/common.js';
+import { ItemSlot } from '/tbc/core/proto/common.js';
+import { ItemSpec } from '/tbc/core/proto/common.js';
+
 import { enchantAppliesToItem } from './utils.js';
 import { gemEligibleForSocket } from './utils.js';
 import { gemMatchesSocket } from './utils.js';

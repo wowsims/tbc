@@ -1,22 +1,22 @@
-import { Buffs } from '../core/proto/common.js';
-import { Class } from '../core/proto/common.js';
-import { Consumes } from '../core/proto/common.js';
-import { Encounter } from '../core/proto/common.js';
-import { ItemSlot } from '../core/proto/common.js';
-import { Spec } from '../core/proto/common.js';
-import { Stat } from '../core/proto/common.js';
-import { TristateEffect } from '../core/proto/common.js'
-import { Stats } from '../core/api/stats.js';
-import { Sim } from '../core/sim.js';
-import { DefaultTheme } from '../core/themes/default.js';
+import { Buffs } from '/tbc/core/proto/common.js';
+import { Class } from '/tbc/core/proto/common.js';
+import { Consumes } from '/tbc/core/proto/common.js';
+import { Encounter } from '/tbc/core/proto/common.js';
+import { ItemSlot } from '/tbc/core/proto/common.js';
+import { Spec } from '/tbc/core/proto/common.js';
+import { Stat } from '/tbc/core/proto/common.js';
+import { TristateEffect } from '/tbc/core/proto/common.js'
+import { Stats } from '/tbc/core/api/stats.js';
+import { Sim } from '/tbc/core/sim.js';
+import { DefaultTheme } from '/tbc/core/themes/default.js';
 
-import { ElementalShaman, ElementalShaman_Agent as ElementalShamanAgent, ShamanTalents as ShamanTalents, ElementalShaman_Options as ElementalShamanOptions } from '../core/proto/shaman.js';
-import { ElementalShaman_Agent_AgentType as AgentType } from '../core/proto/shaman.js';
+import { ElementalShaman, ElementalShaman_Agent as ElementalShamanAgent, ShamanTalents as ShamanTalents, ElementalShaman_Options as ElementalShamanOptions } from '/tbc/core/proto/shaman.js';
+import { ElementalShaman_Agent_AgentType as AgentType } from '/tbc/core/proto/shaman.js';
 
-import * as IconInputs from '../core/components/icon_inputs.js';
-import * as OtherInputs from '../core/components/other_inputs.js';
-import * as Gems from '../core/constants/gems.js';
-import * as Tooltips from '../core/constants/tooltips.js';
+import * as IconInputs from '/tbc/core/components/icon_inputs.js';
+import * as OtherInputs from '/tbc/core/components/other_inputs.js';
+import * as Gems from '/tbc/core/constants/gems.js';
+import * as Tooltips from '/tbc/core/constants/tooltips.js';
 
 import * as ShamanInputs from './inputs.js';
 import * as Presets from './presets.js';
