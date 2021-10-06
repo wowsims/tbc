@@ -162,16 +162,26 @@ func TestAverageDPS(t *testing.T) {
 	log.Printf("LOGS:\n %s\n", result.Logs)
 }
 
-// func BenchmarkSimulate(b *testing.B) {
-// 	for i := 0; i < b.N; i++ {
-// 		RunSimulation(SimRequest{
-// 			Options:     FullOptions,
-// 			Gear:        p1Gear,
-// 			Iterations:  1000,
-// 			IncludeLogs: false,
-// 		})
-// 	}
-// }
+func BenchmarkSimulate(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		options := BasicOptions
+		options.Iterations = 1000
+		options.Encounter = LongEncounter
+
+		params := core.IndividualParams{
+			Equip:    P1Gear,
+			Race:     core.RaceBonusTypeOrc,
+			Consumes: FullConsumes,
+			Buffs:    FullBuffs,
+			Options:  options,
+
+			PlayerOptions: &PlayerOptionsAdaptive,
+			CustomStats:   stats.Stats{},
+		}
+		sim := core.NewIndividualSim(params)
+		sim.Run()
+	}
+}
 
 type AllEncountersTestOptions struct {
 	label string
