@@ -9,8 +9,9 @@ func NewBuffBot(sim *core.Simulation, party *core.Party, malediction int) *Warlo
 }
 
 type Warlock struct {
-	malediction int // bonus level of coe
 	core.Agent
+
+	malediction int // bonus level of coe
 }
 
 func (p *Warlock) ChooseAction(_ *core.Simulation) core.AgentAction {
@@ -22,7 +23,7 @@ func (p *Warlock) OnActionAccepted(*core.Simulation, core.AgentAction) {
 }
 
 func (p *Warlock) BuffUp(sim *core.Simulation) {
-	sim.AddAura(sim, nil, CurseOfElementsAura(p.malediction))
+	sim.AddAura(sim, CurseOfElementsAura(p.malediction))
 }
 
 func (p *Warlock) Reset(sim *core.Simulation)                                {}
@@ -33,7 +34,7 @@ func CurseOfElementsAura(malediction int) core.Aura {
 	return core.Aura{
 		ID:      core.MagicIDCurseOfElements,
 		Expires: core.NeverExpires,
-		OnSpellHit: func(sim *core.Simulation, agent core.Agent, cast *core.Cast) {
+		OnSpellHit: func(sim *core.Simulation, cast *core.Cast) {
 			cast.DidDmg *= multiplier
 		},
 	}

@@ -183,7 +183,7 @@ func MiseryAura() Aura {
 	return Aura{
 		ID:      MagicIDMisery,
 		Expires: NeverExpires,
-		OnSpellHit: func(sim *Simulation, agent Agent, cast *Cast) {
+		OnSpellHit: func(sim *Simulation, cast *Cast) {
 			cast.DidDmg *= 1.05
 		},
 	}
@@ -194,16 +194,16 @@ func AuraJudgementOfWisdom() Aura {
 	return Aura{
 		ID:      MagicIDJoW,
 		Expires: NeverExpires,
-		OnSpellHit: func(sim *Simulation, agent Agent, c *Cast) {
-			if c.Spell.ID == MagicIDTLCLB {
+		OnSpellHit: func(sim *Simulation, cast *Cast) {
+			if cast.Spell.ID == MagicIDTLCLB {
 				return // TLC cant proc JoW
 			}
 			if sim.Log != nil {
-				sim.Log("(%d) +Judgement Of Wisdom: 37 mana (74 @ 50%% proc)\n", agent.GetCharacter().ID)
+				sim.Log("(%d) +Judgement Of Wisdom: 37 mana (74 @ 50%% proc)\n", cast.Caster.GetCharacter().ID)
 			}
 			// Only apply to agents that have mana.
-			if agent.GetCharacter().InitialStats[stats.Mana] > 0 {
-				agent.GetCharacter().Stats[stats.Mana] += mana
+			if cast.Caster.GetCharacter().InitialStats[stats.Mana] > 0 {
+				cast.Caster.GetCharacter().Stats[stats.Mana] += mana
 			}
 		},
 	}
@@ -256,8 +256,8 @@ func TryActivateRacial(sim *Simulation, agent Agent) {
 		agent.GetCharacter().AddAura(sim, Aura{
 			ID:      MagicIDTrollBerserking,
 			Expires: sim.CurrentTime + dur,
-			OnCast: func(sim *Simulation, agent Agent, c *Cast) {
-				c.CastTime = (c.CastTime * 10) / hasteBonus
+			OnCast: func(sim *Simulation, cast *Cast) {
+				cast.CastTime = (cast.CastTime * 10) / hasteBonus
 			},
 		})
 	}

@@ -49,8 +49,8 @@ func NewElementalShaman(sim *core.Simulation, character *core.Character, options
 	return newShaman(character, talents, selfBuffs, agent)
 }
 
-func loDmgMod(sim *core.Simulation, agent core.Agent, c *core.Cast) {
-	c.DidDmg /= 2
+func loDmgMod(sim *core.Simulation, cast *core.Cast) {
+	cast.DidDmg /= 2
 }
 
 const (
@@ -62,15 +62,15 @@ func AuraLightningOverload(lvl int) core.Aura {
 	return core.Aura{
 		ID:      core.MagicIDLOTalent,
 		Expires: core.NeverExpires,
-		OnSpellHit: func(sim *core.Simulation, agent core.Agent, c *core.Cast) {
-			if c.Spell.ID != core.MagicIDLB12 && c.Spell.ID != core.MagicIDCL6 {
+		OnSpellHit: func(sim *core.Simulation, cast *core.Cast) {
+			if cast.Spell.ID != core.MagicIDLB12 && cast.Spell.ID != core.MagicIDCL6 {
 				return
 			}
-			if c.Tag == CastTagLightningOverload {
+			if cast.Tag == CastTagLightningOverload {
 				return // can't proc LO on LO
 			}
 			actualChance := chance
-			if c.Spell.ID == core.MagicIDCL6 {
+			if cast.Spell.ID == core.MagicIDCL6 {
 				actualChance /= 3 // 33% chance of regular for CL LO
 			}
 			if sim.Rando.Float64("LO") < actualChance {
@@ -78,21 +78,22 @@ func AuraLightningOverload(lvl int) core.Aura {
 					sim.Log(" - Lightning Overload -\n")
 				}
 				clone := sim.NewCast()
+				clone.Caster = cast.Caster
 				// Don't set IsClBounce even if this is a bounce, so that the clone does a normal CL and bounces
 				clone.Tag = CastTagLightningOverload
-				clone.Spell = c.Spell
+				clone.Spell = cast.Spell
 
 				// Clone dmg/hit/crit chance?
-				clone.BonusHit = c.BonusHit
-				clone.BonusCrit = c.BonusCrit
-				clone.BonusSpellPower = c.BonusSpellPower
+				clone.BonusHit = cast.BonusHit
+				clone.BonusCrit = cast.BonusCrit
+				clone.BonusSpellPower = cast.BonusSpellPower
 
-				clone.CritDamageMultipier = c.CritDamageMultipier
+				clone.CritDamageMultipier = cast.CritDamageMultipier
 				clone.Effect = loDmgMod
 
 				// Use the cast function from the original cast.
-				clone.DoItNow = c.DoItNow
-				clone.DoItNow(sim, agent, clone)
+				clone.DoItNow = cast.DoItNow
+				clone.DoItNow(sim, clone)
 				if sim.Log != nil {
 					sim.Log(" - Lightning Overload Complete -\n")
 				}
@@ -101,22 +102,22 @@ func AuraLightningOverload(lvl int) core.Aura {
 	}
 }
 
-func TryActivateEleMastery(sim *core.Simulation, agent core.Agent) {
-	if agent.GetCharacter().IsOnCD(core.MagicIDEleMastery, sim.CurrentTime) {
+func TryActivateEleMastery(sim *core.Simulation, shaman *Shaman) {
+	if shaman.IsOnCD(core.MagicIDEleMastery, sim.CurrentTime) {
 		return
 	}
 
-	agent.GetCharacter().AddAura(sim, core.Aura{
+	shaman.AddAura(sim, core.Aura{
 		ID:      core.MagicIDEleMastery,
 		Expires: core.NeverExpires,
-		OnCast: func(sim *core.Simulation, agent core.Agent, c *core.Cast) {
-			c.ManaCost = 0
-			c.BonusCrit += 1.01
+		OnCast: func(sim *core.Simulation, cast *core.Cast) {
+			cast.ManaCost = 0
+			cast.BonusCrit += 1.01
 		},
-		OnCastComplete: func(sim *core.Simulation, agent core.Agent, c *core.Cast) {
+		OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
 			// Remove the buff and put skill on CD
-			agent.GetCharacter().SetCD(core.MagicIDEleMastery, time.Second*180+sim.CurrentTime)
-			agent.GetCharacter().RemoveAura(sim, &agent, core.MagicIDEleMastery)
+			shaman.SetCD(core.MagicIDEleMastery, time.Second*180+sim.CurrentTime)
+			shaman.RemoveAura(sim, core.MagicIDEleMastery)
 		},
 	})
 }
@@ -405,29 +406,31 @@ func NewAdaptiveAgent(sim *core.Simulation) *AdaptiveAgent {
 }
 
 // ChainCast is how to cast chain lightning.
-func ChainCast(sim *core.Simulation, agent core.Agent, cast *core.Cast) {
-	shaman := agent.(*Shaman)
-	core.DirectCast(sim, agent, cast) // Start with a normal direct cast to start.
+func ChainCastHandler(shaman *Shaman) func(sim *core.Simulation, cast *core.Cast) {
+	return func(sim *core.Simulation, cast *core.Cast) {
+		core.DirectCast(sim, cast) // Start with a normal direct cast to start.
 
-	// Now chain
-	dmgCoeff := 1.0
-	if cast.Tag == CastTagLightningOverload {
-		dmgCoeff = 0.5
-	}
-	for i := 1; i < sim.Options.Encounter.NumTargets; i++ {
-		if shaman.HasAura(core.MagicIDTidefury) {
-			dmgCoeff *= 0.83
-		} else {
-			dmgCoeff *= 0.7
+		// Now chain
+		dmgCoeff := 1.0
+		if cast.Tag == CastTagLightningOverload {
+			dmgCoeff = 0.5
 		}
-		clone := &core.Cast{
-			Tag:                 cast.Tag, // pass along lightning overload
-			Spell:               cast.Spell,
-			BonusCrit:           cast.BonusCrit,
-			CritDamageMultipier: cast.CritDamageMultipier,
-			Effect:              func(sim *core.Simulation, agent core.Agent, c *core.Cast) { cast.DidDmg *= dmgCoeff },
-			DoItNow:             core.DirectCast,
+		for i := 1; i < sim.Options.Encounter.NumTargets; i++ {
+			if shaman.HasAura(core.MagicIDTidefury) {
+				dmgCoeff *= 0.83
+			} else {
+				dmgCoeff *= 0.7
+			}
+			clone := &core.Cast{
+				Caster:              cast.Caster,
+				Tag:                 cast.Tag, // pass along lightning overload
+				Spell:               cast.Spell,
+				BonusCrit:           cast.BonusCrit,
+				CritDamageMultipier: cast.CritDamageMultipier,
+				Effect:              func(sim *core.Simulation, cast *core.Cast) { cast.DidDmg *= dmgCoeff },
+				DoItNow:             core.DirectCast,
+			}
+			clone.DoItNow(sim, clone)
 		}
-		clone.DoItNow(sim, shaman, clone)
 	}
 }

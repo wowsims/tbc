@@ -14,7 +14,7 @@ func newShaman(character *core.Character, talents Talents, selfBuffs SelfBuffs, 
 		character.InitialStats[stats.MP5] += 50
 	}
 
-	shaman := &Shaman{
+	return &Shaman{
 		Character: character,
 		agent  :   agent,
 		Talents:   talents,
@@ -23,8 +23,6 @@ func newShaman(character *core.Character, talents Talents, selfBuffs SelfBuffs, 
 		convectionBonus: 0.02 * float64(talents.Convection),
 		concussionBonus: 1 + 0.01*float64(talents.Concussion),
 	}
-	character.Agent = shaman
-	return shaman
 }
 
 // Which totems this shaman is dropping.
@@ -112,7 +110,7 @@ func (shaman *Shaman) OnSpellHit(sim *core.Simulation, cast *core.Cast) {
 			Expires:        sim.CurrentTime + time.Second*15,
 			Stacks:         2,
 			OnCast:         elementalFocusOnCast,
-			OnCastComplete: elementalFocusOnCastComplete,
+			OnCastComplete: makeElementalFocusOnCastComplete(shaman),
 		}
 		shaman.AddAura(sim, a)
 	}
@@ -139,18 +137,20 @@ func (shaman *Shaman) Reset(newsim *core.Simulation) {
 	shaman.agent.Reset(shaman, newsim)
 }
 
-func elementalFocusOnCast(sim *core.Simulation, agent core.Agent, cast *core.Cast) {
+func elementalFocusOnCast(sim *core.Simulation, cast *core.Cast) {
 	cast.ManaCost *= .6 // reduced by 40%
 }
 
-func elementalFocusOnCastComplete(sim *core.Simulation, agent core.Agent, cast *core.Cast) {
-	if cast.ManaCost <= 0 {
-		return // Don't consume charges from free spells.
-	}
+func makeElementalFocusOnCastComplete(shaman *Shaman) core.AuraEffect {
+	return func(sim *core.Simulation, cast *core.Cast) {
+		if cast.ManaCost <= 0 {
+			return // Don't consume charges from free spells.
+		}
 
-	agent.GetCharacter().Auras[core.MagicIDEleFocus].Stacks--
-	if agent.GetCharacter().Auras[core.MagicIDEleFocus].Stacks == 0 {
-		agent.GetCharacter().RemoveAura(sim, &agent, core.MagicIDEleFocus)
+		shaman.Auras[core.MagicIDEleFocus].Stacks--
+		if shaman.Auras[core.MagicIDEleFocus].Stacks == 0 {
+			shaman.RemoveAura(sim, core.MagicIDEleFocus)
+		}
 	}
 }
 
@@ -195,8 +195,8 @@ func TryActivateBloodlust(sim *core.Simulation, shaman *Shaman) {
 	shaman.Party.AddAura(sim, core.Aura{
 		ID:      core.MagicIDBloodlust,
 		Expires: sim.CurrentTime + dur,
-		OnCast: func(sim *core.Simulation, agent core.Agent, c *core.Cast) {
-			c.CastTime = (c.CastTime * 10) / 13 // 30% faster
+		OnCast: func(sim *core.Simulation, cast *core.Cast) {
+			cast.CastTime = (cast.CastTime * 10) / 13 // 30% faster
 		},
 	})
 }
@@ -255,7 +255,7 @@ const (
 // NewCastAction is how a shaman creates a new spell
 //  TODO: Decide if we need separate functions for elemental and enhancement?
 func NewCastAction(shaman *Shaman, sim *core.Simulation, sp *core.Spell) core.AgentAction {
-	cast := core.NewCast(sim, sp)
+	cast := core.NewCast(sim, shaman, sp)
 
 	itsElectric := sp.ID == core.MagicIDCL6 || sp.ID == core.MagicIDLB12
 
@@ -286,7 +286,7 @@ func NewCastAction(shaman *Shaman, sim *core.Simulation, sp *core.Spell) core.Ag
 			cast.BonusCrit += float64(shaman.Talents.CallOfThunder) * 0.01
 		}
 		if sp.ID == core.MagicIDCL6 && sim.Options.Encounter.NumTargets > 1 {
-			cast.DoItNow = ChainCast
+			cast.DoItNow = ChainCastHandler(shaman)
 		}
 		if shaman.Talents.LightningMastery > 0 {
 			cast.CastTime -= time.Millisecond * 100 * time.Duration(shaman.Talents.LightningMastery)
@@ -297,7 +297,7 @@ func NewCastAction(shaman *Shaman, sim *core.Simulation, sp *core.Spell) core.Ag
 	// Apply any on cast effects.
 	for _, id := range shaman.ActiveAuraIDs {
 		if shaman.Auras[id].OnCast != nil {
-			shaman.Auras[id].OnCast(sim, shaman, cast)
+			shaman.Auras[id].OnCast(sim, cast)
 		}
 	}
 	if itsElectric { // TODO: Add ElementalFury talent
