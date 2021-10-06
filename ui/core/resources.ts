@@ -4,8 +4,7 @@ import { ItemQuality } from './proto/common.js';
 import { ItemSlot } from './proto/common.js';
 
 // Github pages serves our site under the /tbc directory (because the repo name is tbc)
-// but the /tbc directory is not present when running a locally hosted site.
-export const urlPathPrefix = window.location.pathname.startsWith('/tbc') ? '/tbc' : '';
+export const repoName = 'tbc';
 
 const emptySlotIcons: Record<ItemSlot, string> = {
   [ItemSlot.ItemSlotHead]: 'https://cdn.seventyupgrades.com/item-slots/Head.jpg',
