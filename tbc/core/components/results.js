@@ -1,4 +1,4 @@
-import { statNames } from '/tbc/core/api/names.js';
+import { statNames } from '/tbc/core/proto_utils/names.js';
 import { stDevToConf90 } from '/tbc/core/utils.js';
 import { Component } from './component.js';
 export class Results extends Component {

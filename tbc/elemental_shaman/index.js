@@ -4,7 +4,7 @@ import { Encounter } from '/tbc/core/proto/common.js';
 import { Spec } from '/tbc/core/proto/common.js';
 import { Stat } from '/tbc/core/proto/common.js';
 import { TristateEffect } from '/tbc/core/proto/common.js';
-import { Stats } from '/tbc/core/api/stats.js';
+import { Stats } from '/tbc/core/proto_utils/stats.js';
 import { DefaultTheme } from '/tbc/core/themes/default.js';
 import { ElementalShaman_Agent as ElementalShamanAgent, ElementalShaman_Options as ElementalShamanOptions } from '/tbc/core/proto/shaman.js';
 import { ElementalShaman_Agent_AgentType as AgentType } from '/tbc/core/proto/shaman.js';

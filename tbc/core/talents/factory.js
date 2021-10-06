@@ -1,5 +1,5 @@
-import { Spec } from '../proto/common.js';
-import { specToClass } from '../api/utils.js';
+import { Spec } from '/tbc/core/proto/common.js';
+import { specToClass } from '/tbc/core/proto_utils/utils.js';
 import { ShamanTalentsPicker } from './shaman.js';
 export function newTalentsPicker(spec, parent, sim) {
     switch (spec) {

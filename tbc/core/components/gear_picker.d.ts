@@ -1,4 +1,4 @@
-import { EquippedItem } from '/tbc/core/api/equipped_item.js';
+import { EquippedItem } from '/tbc/core/proto_utils/equipped_item.js';
 import { Enchant } from '/tbc/core/proto/common.js';
 import { Item } from '/tbc/core/proto/common.js';
 import { ItemSlot } from '/tbc/core/proto/common.js';

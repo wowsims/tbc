@@ -1,7 +1,7 @@
-import { Spec } from '../proto/common.js';
-import { SpecTalents } from '../api/utils.js';
-import { Sim } from '../sim.js';
-import { Component } from '../components/component.js';
+import { Component } from '/tbc/core/components/component.js';
+import { Spec } from '/tbc/core/proto/common.js';
+import { SpecTalents } from '/tbc/core/proto_utils/utils.js';
+import { Sim } from '/tbc/core/sim.js';
 export declare abstract class TalentsPicker<SpecType extends Spec> extends Component {
     private readonly sim;
     frozen: boolean;

@@ -1,8 +1,8 @@
-import { getIconUrl } from '../resources.js';
-import { setWowheadHref } from '../resources.js';
-import { isRightClick } from '../utils.js';
-import { sum } from '../utils.js';
-import { Component } from '../components/component.js';
+import { Component } from '/tbc/core/components/component.js';
+import { getIconUrl } from '/tbc/core/resources.js';
+import { setWowheadHref } from '/tbc/core/resources.js';
+import { isRightClick } from '/tbc/core/utils.js';
+import { sum } from '/tbc/core/utils.js';
 const MAX_TALENT_POINTS = 61;
 const NUM_ROWS = 9;
 const TALENTS_STORAGE_KEY = 'Talents';
