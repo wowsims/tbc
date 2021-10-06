@@ -9,6 +9,7 @@ export class Results extends Component {
   readonly pendingElem: HTMLDivElement;
   readonly simElem: HTMLDivElement;
   readonly epElem: HTMLDivElement;
+	private statsType: string;
 
   constructor(parent: HTMLElement) {
     super(parent, 'results-root');
@@ -26,6 +27,7 @@ export class Results extends Component {
     this.pendingElem = this.rootElem.getElementsByClassName('results-pending')[0] as HTMLDivElement;
     this.simElem = this.rootElem.getElementsByClassName('results-sim')[0] as HTMLDivElement;
     this.epElem = this.rootElem.getElementsByClassName('results-ep')[0] as HTMLDivElement;
+		this.statsType = 'ep';
     this.hideAll();
   }
 
@@ -54,15 +56,39 @@ export class Results extends Component {
 
     this.hideAll();
     this.epElem.style.display = 'initial';
-    this.epElem.innerHTML = '<table class="results-ep-table">'
-        + epStats.map(stat => `<tr>
-            <td>${statNames[stat]}:</td>
-            <td>${result.weights[stat].toFixed(2)}</td>
-            <td>${stDevToConf90(result.weightsStdev[stat], iterations).toFixed(2)}</td>
-            <td>${result.epValues[stat].toFixed(2)}</td>
-            <td>${stDevToConf90(result.epValuesStdev[stat], iterations).toFixed(2)}</td>
-            </tr>`)
-        .join('')
-        + '</table';
+    this.epElem.innerHTML = `
+		<select class="results-ep-type-select">
+			<option value="ep">EP</option>
+			<option value="weight">DPS / Stat</option>
+		</select>
+		<table class="results-ep-table">
+		` + epStats.map(stat => `<tr>
+					<td>${statNames[stat]}:</td>
+					<td>${result.weights[stat].toFixed(2)}</td>
+					<td>${stDevToConf90(result.weightsStdev[stat], iterations).toFixed(2)}</td>
+					<td>${result.epValues[stat].toFixed(2)}</td>
+					<td>${stDevToConf90(result.epValuesStdev[stat], iterations).toFixed(2)}</td>
+					</tr>`)
+			.join('')
+			+ '</table';
+
+		const setType = (type: string) => {
+			if (type == 'ep') {
+				this.epElem.classList.remove('stats-type-dps');
+				this.epElem.classList.add('stats-type-ep');
+			} else {
+				this.epElem.classList.add('stats-type-dps');
+				this.epElem.classList.remove('stats-type-ep');
+			}
+
+			this.statsType = type;
+		};
+
+		const selectElem = this.epElem.getElementsByClassName('results-ep-type-select')[0] as HTMLSelectElement;
+		selectElem.addEventListener('input', event => {
+			setType(selectElem.value);
+		});
+		selectElem.value = this.statsType;
+		setType(this.statsType);
   }
 }
