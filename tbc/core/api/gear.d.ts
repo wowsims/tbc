@@ -1,5 +1,5 @@
-import { ItemSlot } from '../proto/common.js';
-import { EquipmentSpec } from '../proto/common.js';
+import { ItemSlot } from '/tbc/core/proto/common.js';
+import { EquipmentSpec } from '/tbc/core/proto/common.js';
 import { EquippedItem } from './equipped_item.js';
 declare type InternalGear = Record<ItemSlot, EquippedItem | null>;
 /**

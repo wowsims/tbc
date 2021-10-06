@@ -1,7 +1,7 @@
-import { Spec } from '../proto/common.js';
-import { Sim } from '../sim.js';
-import { TypedEvent } from '../typed_event.js';
-import { Component } from '../components/component.js';
+import { Spec } from '/tbc/core/proto/common.js';
+import { Sim } from '/tbc/core/sim.js';
+import { TypedEvent } from '/tbc/core/typed_event.js';
+import { Component } from '/tbc/core/components/component.js';
 export declare type SavedDataManagerConfig<SpecType extends Spec, T> = {
     label: string;
     changeEmitters: Array<TypedEvent<any>>;

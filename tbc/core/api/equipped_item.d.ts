@@ -1,7 +1,7 @@
-import { Enchant } from '../proto/common.js';
-import { Gem } from '../proto/common.js';
-import { Item } from '../proto/common.js';
-import { ItemSpec } from '../proto/common.js';
+import { Enchant } from '/tbc/core/proto/common.js';
+import { Gem } from '/tbc/core/proto/common.js';
+import { Item } from '/tbc/core/proto/common.js';
+import { ItemSpec } from '/tbc/core/proto/common.js';
 /**
  * Represents an equipped item along with enchants/gems attached to it.
  *

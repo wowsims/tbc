@@ -1,4 +1,4 @@
-import { Component } from '../components/component.js';
+import { Component } from '/tbc/core/components/component.js';
 export class SavedDataManager extends Component {
     constructor(parent, sim, config) {
         super(parent, 'saved-data-manager-root');

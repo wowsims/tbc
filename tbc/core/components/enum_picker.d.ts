@@ -1,5 +1,5 @@
-import { Sim } from '../sim.js';
-import { TypedEvent } from '../typed_event.js';
+import { Sim } from '/tbc/core/sim.js';
+import { TypedEvent } from '/tbc/core/typed_event.js';
 import { Component } from './component.js';
 export interface EnumPickerConfig {
     label?: string;

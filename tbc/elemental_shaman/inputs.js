@@ -1,4 +1,4 @@
-import { ElementalShaman_Agent_AgentType as AgentType } from '../core/proto/shaman.js';
+import { ElementalShaman_Agent_AgentType as AgentType } from '/tbc/core/proto/shaman.js';
 export const IconBloodlust = makeBooleanShamanBuffInput({ spellId: 2825 }, 'bloodlust');
 export const IconManaSpringTotem = makeBooleanShamanBuffInput({ spellId: 25570 }, 'manaSpringTotem');
 export const IconTotemOfWrath = makeBooleanShamanBuffInput({ spellId: 30706 }, 'totemOfWrath');

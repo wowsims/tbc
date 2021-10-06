@@ -1,4 +1,4 @@
-import { Sim } from '../sim.js';
+import { Sim } from '/tbc/core/sim.js';
 import { Component } from './component.js';
 import { DetailedResults } from './detailed_results.js';
 import { Results } from './results.js';

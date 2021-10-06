@@ -1,7 +1,7 @@
-import { EquipmentSpec } from '../core/proto/common.js';
-import { ItemSpec } from '../core/proto/common.js';
-import * as Enchants from '../core/constants/enchants.js';
-import * as Gems from '../core/constants/gems.js';
+import { EquipmentSpec } from '/tbc/core/proto/common.js';
+import { ItemSpec } from '/tbc/core/proto/common.js';
+import * as Enchants from '/tbc/core/constants/enchants.js';
+import * as Gems from '/tbc/core/constants/gems.js';
 export const StandardTalents = '55030105100213351051--05105301005';
 export const P1_BIS = EquipmentSpec.create({
     items: [

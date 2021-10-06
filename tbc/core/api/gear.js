@@ -1,8 +1,8 @@
-import { ItemSlot } from '../proto/common.js';
-import { ItemSpec } from '../proto/common.js';
-import { EquipmentSpec } from '../proto/common.js';
-import { equalsOrBothNull } from '../utils.js';
-import { getEnumValues } from '../utils.js';
+import { ItemSlot } from '/tbc/core/proto/common.js';
+import { ItemSpec } from '/tbc/core/proto/common.js';
+import { EquipmentSpec } from '/tbc/core/proto/common.js';
+import { equalsOrBothNull } from '/tbc/core/utils.js';
+import { getEnumValues } from '/tbc/core/utils.js';
 /**
  * Represents a full gear set, including items/enchants/gems for every slot.
  *

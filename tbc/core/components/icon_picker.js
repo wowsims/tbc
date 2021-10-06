@@ -1,7 +1,7 @@
-import { getIconUrl } from '../resources.js';
-import { setWowheadHref } from '../resources.js';
-import { TypedEvent } from '../typed_event.js';
-import { isRightClick } from '../utils.js';
+import { getIconUrl } from '/tbc/core/resources.js';
+import { setWowheadHref } from '/tbc/core/resources.js';
+import { TypedEvent } from '/tbc/core/typed_event.js';
+import { isRightClick } from '/tbc/core/utils.js';
 import { Component } from './component.js';
 // Icon-based UI for picking buffs / consumes / etc
 export class IconPicker extends Component {

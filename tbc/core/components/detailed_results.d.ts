@@ -1,4 +1,4 @@
-import { IndividualSimRequest, IndividualSimResult } from '../proto/api.js';
+import { IndividualSimRequest, IndividualSimResult } from '/tbc/core/proto/api.js';
 import { Component } from './component.js';
 export declare type IndividualSimData = {
     request: IndividualSimRequest;

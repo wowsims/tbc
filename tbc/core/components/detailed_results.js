@@ -1,4 +1,4 @@
-import { repoName } from '../resources.js';
+import { repoName } from '/tbc/core/resources.js';
 import { Component } from './component.js';
 export class DetailedResults extends Component {
     constructor(parent) {

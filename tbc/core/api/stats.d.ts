@@ -1,4 +1,4 @@
-import { Stat } from '../proto/common.js';
+import { Stat } from '/tbc/core/proto/common.js';
 /**
  * Represents values for all character stats (stam, agi, spell power, hit raiting, etc).
  *

@@ -1,4 +1,4 @@
-import { TypedEvent } from '../core/typed_event.js';
+import { TypedEvent } from '/tbc/core/typed_event.js';
 import { CastMetrics } from './cast_metrics.js';
 import { DpsHistogram } from './dps_histogram.js';
 import { DpsResult } from './dps_result.js';

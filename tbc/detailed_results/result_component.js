@@ -1,4 +1,4 @@
-import { Component } from '../core/components/component.js';
+import { Component } from '/tbc/core/components/component.js';
 export class ResultComponent extends Component {
     constructor(config) {
         super(config.parent, config.rootCssClass || '');

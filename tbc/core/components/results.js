@@ -1,5 +1,5 @@
-import { statNames } from '../api/names.js';
-import { stDevToConf90 } from '../utils.js';
+import { statNames } from '/tbc/core/api/names.js';
+import { stDevToConf90 } from '/tbc/core/utils.js';
 import { Component } from './component.js';
 export class Results extends Component {
     constructor(parent) {

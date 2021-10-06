@@ -1,5 +1,5 @@
-import { Stat } from '../proto/common.js';
-import { Sim } from '../sim.js';
+import { Stat } from '/tbc/core/proto/common.js';
+import { Sim } from '/tbc/core/sim.js';
 import { Component } from './component.js';
 import { NumberPicker } from './number_picker.js';
 export declare class CustomStatsPicker extends Component {

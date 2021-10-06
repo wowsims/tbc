@@ -1,4 +1,4 @@
-import { sum } from '../core/utils.js';
+import { sum } from '/tbc/core/utils.js';
 import { ResultComponent } from './result_component.js';
 export class CastMetrics extends ResultComponent {
     constructor(config) {

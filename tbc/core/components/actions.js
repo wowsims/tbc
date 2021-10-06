@@ -1,4 +1,4 @@
-import { StatWeightsRequest } from '../proto/api.js';
+import { StatWeightsRequest } from '/tbc/core/proto/api.js';
 import { Component } from './component.js';
 export class Actions extends Component {
     constructor(parent, sim, epStats, epReferenceStat, results, detailedResults) {

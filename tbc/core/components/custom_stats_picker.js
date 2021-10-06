@@ -1,4 +1,4 @@
-import { statNames } from '../api/names.js';
+import { statNames } from '/tbc/core/api/names.js';
 import { Component } from './component.js';
 import { NumberPicker } from './number_picker.js';
 export class CustomStatsPicker extends Component {

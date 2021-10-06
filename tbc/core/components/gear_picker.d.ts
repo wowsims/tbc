@@ -1,8 +1,8 @@
-import { EquippedItem } from '../api/equipped_item.js';
-import { Enchant } from '../proto/common.js';
-import { Item } from '../proto/common.js';
-import { ItemSlot } from '../proto/common.js';
-import { Sim } from '../sim.js';
+import { EquippedItem } from '/tbc/core/api/equipped_item.js';
+import { Enchant } from '/tbc/core/proto/common.js';
+import { Item } from '/tbc/core/proto/common.js';
+import { ItemSlot } from '/tbc/core/proto/common.js';
+import { Sim } from '/tbc/core/sim.js';
 import { Component } from './component.js';
 export declare class GearPicker extends Component {
     readonly itemPickers: Array<ItemPicker>;
