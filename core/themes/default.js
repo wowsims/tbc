@@ -48,16 +48,28 @@ export class DefaultTheme extends SimUI {
             const sectionElem = document.createElement('section');
             sectionElem.classList.add('settings-section', sectionCssPrefix + '-section');
             sectionElem.innerHTML = `<label>${sectionName}</label>`;
+            if (sectionConfig.tooltip) {
+                tippy(sectionElem, {
+                    'content': sectionConfig.tooltip,
+                    'allowHTML': true,
+                });
+            }
             settingsTab.appendChild(sectionElem);
-            const iconPicker = new IconPicker(sectionElem, sectionCssPrefix + '-icon-picker', this.sim, sectionConfig, this);
+            const iconPicker = new IconPicker(sectionElem, sectionCssPrefix + '-icon-picker', this.sim, sectionConfig.icons, this);
         });
         Object.keys(config.otherSections).forEach(sectionName => {
             const sectionConfig = config.otherSections[sectionName];
             const sectionElem = document.createElement('section');
             sectionElem.classList.add('settings-section', sectionName + '-section');
             sectionElem.innerHTML = `<label>${sectionName}</label>`;
+            if (sectionConfig.tooltip) {
+                tippy(sectionElem, {
+                    'content': sectionConfig.tooltip,
+                    'allowHTML': true,
+                });
+            }
             settingsTab.appendChild(sectionElem);
-            sectionConfig.forEach(inputConfig => {
+            sectionConfig.inputs.forEach(inputConfig => {
                 if (inputConfig.type == 'number') {
                     const picker = new NumberPicker(sectionElem, this.sim, inputConfig.config);
                 }

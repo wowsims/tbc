@@ -13,16 +13,22 @@ import { NumberPickerConfig } from '../components/number_picker.js';
 import { SimUI, SimUIConfig } from '../sim_ui.js';
 export interface DefaultThemeConfig<SpecType extends Spec> extends SimUIConfig<SpecType> {
     displayStats: Array<Stat>;
-    iconSections: Record<string, Array<IconInput>>;
-    otherSections: Record<string, Array<{
-        type: 'number';
-        cssClass: string;
-        config: NumberPickerConfig;
-    } | {
-        type: 'enum';
-        cssClass: string;
-        config: EnumPickerConfig;
-    }>>;
+    iconSections: Record<string, {
+        tooltip?: string;
+        icons: Array<IconInput>;
+    }>;
+    otherSections: Record<string, {
+        tooltip?: string;
+        inputs: Array<{
+            type: 'number';
+            cssClass: string;
+            config: NumberPickerConfig;
+        } | {
+            type: 'enum';
+            cssClass: string;
+            config: EnumPickerConfig;
+        }>;
+    }>;
     showTargetArmor: boolean;
     showNumTargets: boolean;
     freezeTalents: boolean;
