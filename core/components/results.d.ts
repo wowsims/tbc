@@ -6,6 +6,7 @@ export declare class Results extends Component {
     readonly pendingElem: HTMLDivElement;
     readonly simElem: HTMLDivElement;
     readonly epElem: HTMLDivElement;
+    private statsType;
     constructor(parent: HTMLElement);
     hideAll(): void;
     setPending(): void;
