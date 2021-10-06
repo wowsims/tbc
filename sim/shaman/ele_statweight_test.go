@@ -8,17 +8,17 @@ import (
 )
 
 func TestCalcStatWeight(t *testing.T) {
-	options := basicOptions
+	options := BasicOptions
 	options.Iterations = 5000
-	options.Encounter = shortEncounter
+	options.Encounter = ShortEncounter
 
 	params := core.IndividualParams{
-		Equip:       gearFromStrings(p1Gear),
+		Equip:       P1Gear,
 		Race:        core.RaceBonusTypeTroll10,
-		Consumes:    fullConsumes,
-		Buffs:       fullBuffs,
+		Consumes:    FullConsumes,
+		Buffs:       FullBuffs,
 		Options:     options,
-		PlayerOptions: &playerOptionsAdaptive,
+		PlayerOptions: &PlayerOptionsAdaptive,
 		CustomStats: stats.Stats{},
 	}
 

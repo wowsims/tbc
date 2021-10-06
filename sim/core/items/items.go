@@ -2,6 +2,7 @@ package items
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/wowsims/tbc/sim/core/proto"
 	"github.com/wowsims/tbc/sim/core/stats"
@@ -72,6 +73,23 @@ type Item struct {
 	Enchant Enchant
 }
 
+func (item Item) ToProto() *proto.Item {
+	return &proto.Item{
+		Id:               item.ID,
+		Type:             proto.ItemType(item.Type),
+		ArmorType:        proto.ArmorType(item.ArmorType),
+		WeaponType:       proto.WeaponType(item.WeaponType),
+		HandType:         proto.HandType(item.HandType),
+		RangedWeaponType: proto.RangedWeaponType(item.RangedWeaponType),
+		Name:             item.Name,
+		Stats:            item.Stats[:],
+		Phase:            int32(item.Phase),
+		Quality:          item.Quality, // Hack until we use generated items
+		GemSockets:       item.GemSockets,
+		SocketBonus:      item.SocketBonus[:],
+	}
+}
+
 type Enchant struct {
 	ID         int32 // ID of the enchant item.
 	EffectID   int32 // Used by UI to apply effect to tooltip
@@ -80,6 +98,17 @@ type Enchant struct {
 	ItemType   proto.ItemType // which slot does the enchant go on.
 	HandType   proto.HandType // If ItemType is weapon, check hand type / weapon type
 	WeaponType proto.WeaponType
+}
+
+func (enchant Enchant) ToProto() *proto.Enchant {
+	return &proto.Enchant{
+		Id:       enchant.ID,
+		EffectId: enchant.EffectID,
+		Name:     enchant.Name,
+		Type:     enchant.ItemType,
+		Stats:    enchant.Bonus[:],
+		Quality:  proto.ItemQuality(4),
+	}
 }
 
 type Gem struct {
@@ -93,6 +122,18 @@ type Gem struct {
 	// Requirements  // Validate the gem can be used... later
 }
 
+func (gem Gem) ToProto() *proto.Gem {
+	return &proto.Gem{
+		Id:      gem.ID,
+		Name:    gem.Name,
+		Stats:   gem.Stats[:],
+		Color:   gem.Color,
+		Phase:   int32(gem.Phase),
+		Quality: gem.Quality, // Hack until we use generated items
+		Unique:  gem.Unique,
+	}
+}
+
 type ItemSpec struct {
 	ID      int32
 	Enchant int32
@@ -103,6 +144,21 @@ type Equipment [proto.ItemSlot_ItemSlotRanged + 1]Item
 
 // Structs used for looking up items/gems/enchants
 type EquipmentSpec [proto.ItemSlot_ItemSlotRanged + 1]ItemSpec
+
+func ProtoToEquipmentSpec(es *proto.EquipmentSpec) EquipmentSpec {
+	coreEquip := EquipmentSpec{}
+
+	for i, item := range es.Items {
+		spec := ItemSpec{
+			ID: item.Id,
+		}
+		spec.Gems = item.Gems
+		spec.Enchant = item.Enchant
+		coreEquip[i] = spec
+	}
+
+	return coreEquip
+}
 
 func NewEquipmentSet(equipSpec EquipmentSpec) Equipment {
 	equipment := Equipment{}
@@ -170,6 +226,18 @@ func NewEquipmentSet(equipSpec EquipmentSpec) Equipment {
 		}
 	}
 	return equipment
+}
+
+func EquipmentSpecFromStrings(itemNames []string) EquipmentSpec {
+	eq := EquipmentSpec{}
+	for i, itemName := range itemNames {
+		item := ByName[itemName]
+		if item.ID == 0 {
+			log.Fatalf("Item not found: %s", itemName)
+		}
+		eq[i].ID = item.ID
+	}
+	return eq
 }
 
 func (e Equipment) Clone() Equipment {

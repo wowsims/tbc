@@ -3,6 +3,7 @@ package core
 import (
 	"time"
 
+	"github.com/wowsims/tbc/sim/core/proto"
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
@@ -29,6 +30,30 @@ type Consumes struct {
 	DarkRune           bool
 	DrumsOfBattle      bool
 	DrumsOfRestoration bool
+}
+
+func ProtoToConsumes(c *proto.Consumes) Consumes {
+	return Consumes{
+		FlaskOfBlindingLight:     c.FlaskOfBlindingLight,
+		FlaskOfMightyRestoration: c.FlaskOfMightyRestoration,
+		FlaskOfPureDeath:         c.FlaskOfPureDeath,
+		FlaskOfSupremePower:      c.FlaskOfSupremePower,
+		AdeptsElixir:             c.AdeptsElixir,
+		ElixirOfMajorFirePower:   c.ElixirOfMajorFirePower,
+		ElixirOfMajorFrostPower:  c.ElixirOfMajorFrostPower,
+		ElixirOfMajorShadowPower: c.ElixirOfMajorShadowPower,
+		ElixirOfDraenicWisdom:    c.ElixirOfDraenicWisdom,
+		ElixirOfMajorMageblood:   c.ElixirOfMajorMageblood,
+		BrilliantWizardOil:       c.BrilliantWizardOil,
+		SuperiorWizardOil:        c.SuperiorWizardOil,
+		BlackenedBasilisk:        c.BlackenedBasilisk,
+		SkullfishSoup:            c.SkullfishSoup,
+		DestructionPotion:        c.DestructionPotion,
+		SuperManaPotion:          c.SuperManaPotion,
+		DarkRune:                 c.DarkRune,
+		DrumsOfBattle:            c.DrumsOfBattle,
+		DrumsOfRestoration:       c.DrumsOfRestoration,
+	}
 }
 
 func (c Consumes) Stats() stats.Stats {

@@ -40,6 +40,34 @@ type Buffs struct {
 	Misery                    bool
 }
 
+func ProtoToBuffs(inBuff *proto.Buffs) Buffs {
+	return Buffs{
+		ArcaneBrilliance:          inBuff.ArcaneBrilliance,
+		GiftOfTheWild:             inBuff.GiftOfTheWild,
+		BlessingOfKings:           inBuff.BlessingOfKings,
+		BlessingOfWisdom:          inBuff.BlessingOfWisdom,
+		DivineSpirit:              inBuff.DivineSpirit,
+		MoonkinAura:               inBuff.MoonkinAura,
+		ShadowPriestDPS:           uint16(inBuff.ShadowPriestDps),
+
+		JudgementOfWisdom:         inBuff.JudgementOfWisdom,
+		ImprovedSealOfTheCrusader: inBuff.ImprovedSealOfTheCrusader,
+		Misery:                    inBuff.Misery,
+
+		ManaSpringTotem:           inBuff.ManaSpringTotem,
+		ManaTideTotem:             inBuff.ManaTideTotem,
+		TotemOfWrath:              inBuff.TotemOfWrath,
+		WrathOfAirTotem:           inBuff.WrathOfAirTotem,
+
+		AtieshMage:                inBuff.AtieshMage,
+		AtieshWarlock:             inBuff.AtieshWarlock,
+		BraidedEterniumChain:      inBuff.BraidedEterniumChain,
+		ChainOfTheTwilightOwl:     inBuff.ChainOfTheTwilightOwl,
+		EyeOfTheNight:             inBuff.EyeOfTheNight,
+		JadePendantOfBlasting:     inBuff.JadePendantOfBlasting,
+	}
+}
+
 //func TristateMax(a proto.TristateEffect, b proto.TristateEffect) api.TristateEffect {
 //}
 

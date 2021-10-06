@@ -19,45 +19,15 @@ func getGearListImpl(request *proto.GearListRequest) *proto.GearListResult {
 
 	for i := range items.Items {
 		item := items.Items[i]
-		result.Items = append(result.Items,
-			&proto.Item{
-				Id:               item.ID,
-				Type:             proto.ItemType(item.Type),
-				ArmorType:        proto.ArmorType(item.ArmorType),
-				WeaponType:       proto.WeaponType(item.WeaponType),
-				HandType:         proto.HandType(item.HandType),
-				RangedWeaponType: proto.RangedWeaponType(item.RangedWeaponType),
-				Name:             item.Name,
-				Stats:            item.Stats[:],
-				Phase:            int32(item.Phase),
-				Quality:          item.Quality, // Hack until we use generated items
-				GemSockets:       item.GemSockets,
-				SocketBonus:      item.SocketBonus[:],
-			},
-		)
+		result.Items = append(result.Items, item.ToProto())
 	}
 	for i := range items.Gems {
 		gem := items.Gems[i]
-		result.Gems = append(result.Gems, &proto.Gem{
-			Id:      gem.ID,
-			Name:    gem.Name,
-			Stats:   gem.Stats[:],
-			Color:   gem.Color,
-			Phase:   int32(gem.Phase),
-			Quality: gem.Quality, // Hack until we use generated items
-			Unique:  gem.Unique,
-		})
+		result.Gems = append(result.Gems, gem.ToProto())
 	}
 	for i := range items.Enchants {
 		enchant := items.Enchants[i]
-		result.Enchants = append(result.Enchants, &proto.Enchant{
-			Id:       enchant.ID,
-			EffectId: enchant.EffectID,
-			Name:     enchant.Name,
-			Type:     enchant.ItemType,
-			Stats:    enchant.Bonus[:],
-			Quality:  proto.ItemQuality(4),
-		})
+		result.Enchants = append(result.Enchants, enchant.ToProto())
 	}
 
 	return result
@@ -108,10 +78,10 @@ func convertSimParams(request *proto.IndividualSimRequest) core.IndividualParams
 	}
 
 	params := core.IndividualParams{
-		Equip:    convertEquip(request.Player.Equipment),
+		Equip:    items.ProtoToEquipmentSpec(request.Player.Equipment),
 		Race:     core.RaceBonusType(request.Player.Options.Race),
-		Consumes: convertConsumes(request.Player.Options.Consumes),
-		Buffs:    convertBuffs(request.Buffs),
+		Consumes: core.ProtoToConsumes(request.Player.Options.Consumes),
+		Buffs:    core.ProtoToBuffs(request.Buffs),
 		Options:  options,
 
 		PlayerOptions: request.Player.Options,
@@ -153,74 +123,4 @@ func runSimulationImpl(request *proto.IndividualSimRequest) *proto.IndividualSim
 		Casts:               castMetrics,
 	}
 	return isr
-}
-
-func convertConsumes(c *proto.Consumes) core.Consumes {
-	cconsume := core.Consumes{
-		FlaskOfBlindingLight:     c.FlaskOfBlindingLight,
-		FlaskOfMightyRestoration: c.FlaskOfMightyRestoration,
-		FlaskOfPureDeath:         c.FlaskOfPureDeath,
-		FlaskOfSupremePower:      c.FlaskOfSupremePower,
-		AdeptsElixir:             c.AdeptsElixir,
-		ElixirOfMajorFirePower:   c.ElixirOfMajorFirePower,
-		ElixirOfMajorFrostPower:  c.ElixirOfMajorFrostPower,
-		ElixirOfMajorShadowPower: c.ElixirOfMajorShadowPower,
-		ElixirOfDraenicWisdom:    c.ElixirOfDraenicWisdom,
-		ElixirOfMajorMageblood:   c.ElixirOfMajorMageblood,
-		BrilliantWizardOil:       c.BrilliantWizardOil,
-		SuperiorWizardOil:        c.SuperiorWizardOil,
-		BlackenedBasilisk:        c.BlackenedBasilisk,
-		SkullfishSoup:            c.SkullfishSoup,
-		DestructionPotion:        c.DestructionPotion,
-		SuperManaPotion:          c.SuperManaPotion,
-		DarkRune:                 c.DarkRune,
-		DrumsOfBattle:            c.DrumsOfBattle,
-		DrumsOfRestoration:       c.DrumsOfRestoration,
-	}
-
-	return cconsume
-}
-
-func convertEquip(es *proto.EquipmentSpec) items.EquipmentSpec {
-	coreEquip := items.EquipmentSpec{}
-
-	for i, item := range es.Items {
-		spec := items.ItemSpec{
-			ID: item.Id,
-		}
-		spec.Gems = item.Gems
-		spec.Enchant = item.Enchant
-		coreEquip[i] = spec
-	}
-
-	return coreEquip
-}
-
-func convertBuffs(inBuff *proto.Buffs) core.Buffs {
-	// TODO: support tri-state better
-	return core.Buffs{
-		ArcaneBrilliance:          inBuff.ArcaneBrilliance,
-		GiftOfTheWild:             inBuff.GiftOfTheWild,
-		BlessingOfKings:           inBuff.BlessingOfKings,
-		BlessingOfWisdom:          inBuff.BlessingOfWisdom,
-		DivineSpirit:              inBuff.DivineSpirit,
-		MoonkinAura:               inBuff.MoonkinAura,
-		ShadowPriestDPS:           uint16(inBuff.ShadowPriestDps),
-
-		JudgementOfWisdom:         inBuff.JudgementOfWisdom,
-		ImprovedSealOfTheCrusader: inBuff.ImprovedSealOfTheCrusader,
-		Misery:                    inBuff.Misery,
-
-		ManaSpringTotem:           inBuff.ManaSpringTotem,
-		ManaTideTotem:             inBuff.ManaTideTotem,
-		TotemOfWrath:              inBuff.TotemOfWrath,
-		WrathOfAirTotem:           inBuff.WrathOfAirTotem,
-
-		AtieshMage:                inBuff.AtieshMage,
-		AtieshWarlock:             inBuff.AtieshWarlock,
-		BraidedEterniumChain:      inBuff.BraidedEterniumChain,
-		ChainOfTheTwilightOwl:     inBuff.ChainOfTheTwilightOwl,
-		EyeOfTheNight:             inBuff.EyeOfTheNight,
-		JadePendantOfBlasting:     inBuff.JadePendantOfBlasting,
-	}
 }
