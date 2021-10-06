@@ -1,4 +1,4 @@
-import { urlPathPrefix } from '../resources.js';
+import { repoName } from '../resources.js';
 import { Component } from './component.js';
 export class DetailedResults extends Component {
     constructor(parent) {
@@ -6,7 +6,7 @@ export class DetailedResults extends Component {
         this.tabWindow = null;
         this.latestResult = null;
         const computedStyles = window.getComputedStyle(document.body);
-        const url = new URL(`${window.location.protocol}//${window.location.host}${urlPathPrefix}/detailed_results/index.html`);
+        const url = new URL(`${window.location.protocol}//${window.location.host}/${repoName}/detailed_results/index.html`);
         url.searchParams.append('mainBgColor', computedStyles.getPropertyValue('--main-bg-color').trim());
         url.searchParams.append('mainTextColor', computedStyles.getPropertyValue('--main-text-color').trim());
         const cssFilePath = '/elemental_shaman/index.css';

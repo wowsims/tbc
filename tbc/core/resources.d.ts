@@ -1,6 +1,6 @@
 import { GemColor } from './proto/common.js';
 import { ItemSlot } from './proto/common.js';
-export declare const urlPathPrefix: string;
+export declare const repoName = "tbc";
 export declare function getEmptySlotIconUrl(slot: ItemSlot): string;
 export declare type IconId = {
     itemId: number;
