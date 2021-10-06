@@ -57,10 +57,11 @@ func CalcStatWeight(params IndividualParams, statsToWeigh []stats.Stat, referenc
 
 	waitGroup.Wait()
 
-	for stat, mod := range statMods {
+	for statIdx, mod := range statMods {
 		if mod == 0 {
 			continue
 		}
+		stat := stats.Stat(statIdx)
 
 		result.EpValues[stat] = result.Weights[stat] / result.Weights[referenceStat]
 		result.WeightsStdev[stat] = computeStDevFromHists(params.Options.Iterations, mod, dpsHists[stat], baselineResult.DpsHist, nil, statMods[referenceStat])
