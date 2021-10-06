@@ -15,7 +15,7 @@ export const JadePendantOfBlasting = makeBooleanBuffInput({ spellId: 25607 }, 'j
 export const ManaSpringTotem = makeTristateBuffInput({ spellId: 25570 }, { spellId: 16208 }, 'manaSpringTotem');
 export const ManaTideTotem = makeBooleanBuffInput({ spellId: 16190 }, 'manaTideTotem');
 export const MoonkinAura = makeTristateBuffInput({ spellId: 24907 }, { itemId: 32387 }, 'moonkinAura');
-export const TotemOfWrath = makeMultistateBuffInput({ spellId: 30706 }, 6, 'totemOfWrath');
+export const TotemOfWrath = makeMultistateBuffInput({ spellId: 30706 }, 5, 'totemOfWrath');
 export const WrathOfAirTotem = makeTristateBuffInput({ spellId: 3738 }, { spellId: 37212 }, 'wrathOfAirTotem');
 // Debuffs
 export const ImprovedSealOfTheCrusader = makeBooleanBuffInput({ spellId: 20337 }, 'improvedSealOfTheCrusader');
