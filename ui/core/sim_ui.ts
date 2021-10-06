@@ -61,10 +61,15 @@ export abstract class SimUI<SpecType extends Spec> {
     if (!loadedSettings && savedSettings != null) {
       try {
         this.sim.fromJson(JSON.parse(savedSettings));
+        loadedSettings = true;
       } catch (e) {
         console.warn('Failed to parse saved settings: ' + e);
       }
     }
+
+		if (!loadedSettings) {
+			this.sim.setGear(this.sim.lookupEquipmentSpec(this.simUiConfig.defaults.gear));
+		}
 
     this.sim.changeEmitter.on(() => {
       const simJsonStr = JSON.stringify(this.sim.toJson());

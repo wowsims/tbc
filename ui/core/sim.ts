@@ -50,6 +50,7 @@ export interface SimConfig<SpecType extends Spec> {
   epReferenceStat: Stat;
   defaults: {
 		phase: number,
+		gear: EquipmentSpec,
 		epWeights: Stats,
     encounter: Encounter,
     buffs: Buffs,
@@ -108,6 +109,7 @@ export class Sim<SpecType extends Spec> extends WorkerPool {
 	private readonly _metaGemEffectEP: (gem: Gem, sim: Sim<SpecType>) => number;
 
   private _init = false;
+	private readonly _defaultGear: EquipmentSpec;
 
   constructor(config: SimConfig<SpecType>) {
 		super(3);
@@ -129,6 +131,7 @@ export class Sim<SpecType extends Spec> extends WorkerPool {
     this._talentsString = config.defaults.talents;
 		this._epWeights = config.defaults.epWeights;
     this._specOptions = config.defaults.specOptions;
+		this._defaultGear = config.defaults.gear;
 
     [
       this.buffsChangeEmitter,
