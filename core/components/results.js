@@ -2,22 +2,72 @@ import { statNames } from '/tbc/core/proto_utils/names.js';
 import { stDevToConf90 } from '/tbc/core/utils.js';
 import { Component } from './component.js';
 export class Results extends Component {
-    constructor(parent) {
+    constructor(parent, sim) {
         super(parent, 'results-root');
+        this.currentData = null;
+        this.referenceData = null;
+        this.sim = sim;
         this.rootElem.innerHTML = `
       <div class="results-pending">
         <div class="loader"></div>
       </div>
       <div class="results-sim">
+				<div class="results-sim-dps">
+				</div>
+				<div class="results-sim-reference">
+					<span class="results-sim-set-reference fa fa-bookmark"></span>
+					<div class="results-sim-reference-bar">
+						<span class="results-sim-reference-diff"></span>
+						<span class="results-sim-reference-text"> vs. reference</span>
+						<span class="results-sim-reference-swap fa fa-retweet"></span>
+						<span class="results-sim-reference-delete fa fa-times"></span>
+					</div>
+				</div>
       </div>
       <div class="results-ep">
       </div>
     `;
         this.pendingElem = this.rootElem.getElementsByClassName('results-pending')[0];
         this.simElem = this.rootElem.getElementsByClassName('results-sim')[0];
+        this.simDpsElem = this.rootElem.getElementsByClassName('results-sim-dps')[0];
         this.epElem = this.rootElem.getElementsByClassName('results-ep')[0];
         this.statsType = 'ep';
         this.hideAll();
+        this.simReferenceElem = this.rootElem.getElementsByClassName('results-sim-reference')[0];
+        this.simReferenceDiffElem = this.rootElem.getElementsByClassName('results-sim-reference-diff')[0];
+        const simReferenceSetButton = this.rootElem.getElementsByClassName('results-sim-set-reference')[0];
+        simReferenceSetButton.addEventListener('click', event => {
+            this.referenceData = this.currentData;
+            this.updateReference();
+        });
+        tippy(simReferenceSetButton, {
+            'content': 'Use as reference',
+            'allowHTML': true,
+        });
+        const simReferenceSwapButton = this.rootElem.getElementsByClassName('results-sim-reference-swap')[0];
+        simReferenceSwapButton.addEventListener('click', event => {
+            if (this.currentData && this.referenceData) {
+                const tmpData = this.currentData;
+                this.currentData = this.referenceData;
+                this.referenceData = tmpData;
+                this.sim.fromJson(this.currentData.settings);
+                this.setSimResult(this.currentData.request, this.currentData.result);
+                this.updateReference();
+            }
+        });
+        tippy(simReferenceSwapButton, {
+            'content': 'Swap reference with current',
+            'allowHTML': true,
+        });
+        const simReferenceDeleteButton = this.rootElem.getElementsByClassName('results-sim-reference-delete')[0];
+        simReferenceDeleteButton.addEventListener('click', event => {
+            this.referenceData = null;
+            this.updateReference();
+        });
+        tippy(simReferenceDeleteButton, {
+            'content': 'Remove reference',
+            'allowHTML': true,
+        });
     }
     hideAll() {
         this.pendingElem.style.display = 'none';
@@ -28,13 +78,19 @@ export class Results extends Component {
         this.hideAll();
         this.pendingElem.style.display = 'initial';
     }
-    setSimResult(result) {
+    setSimResult(request, result) {
+        this.currentData = {
+            request: request,
+            result: result,
+            settings: this.sim.toJson(),
+        };
         this.hideAll();
         this.simElem.style.display = 'initial';
-        this.simElem.innerHTML = `
+        this.simDpsElem.innerHTML = `
       <span class="results-sim-dps-avg">${result.dpsAvg.toFixed(2)}</span>
       <span class="results-sim-dps-stdev">${result.dpsStdev.toFixed(2)}</span>
     `;
+        this.updateReference();
     }
     setStatWeights(request, result, epStats) {
         const iterations = request.options.iterations;
@@ -72,5 +128,24 @@ export class Results extends Component {
         });
         selectElem.value = this.statsType;
         setType(this.statsType);
+    }
+    updateReference() {
+        if (!this.referenceData || !this.currentData) {
+            this.simReferenceElem.classList.remove('has-reference');
+            return;
+        }
+        this.simReferenceElem.classList.add('has-reference');
+        const delta = this.currentData.result.dpsAvg - this.referenceData.result.dpsAvg;
+        const deltaStr = delta.toFixed(2);
+        if (delta >= 0) {
+            this.simReferenceDiffElem.textContent = '+' + deltaStr;
+            this.simReferenceDiffElem.classList.remove('negative');
+            this.simReferenceDiffElem.classList.add('positive');
+        }
+        else {
+            this.simReferenceDiffElem.textContent = '' + deltaStr;
+            this.simReferenceDiffElem.classList.remove('positive');
+            this.simReferenceDiffElem.classList.add('negative');
+        }
     }
 }

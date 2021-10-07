@@ -30,7 +30,7 @@ export class DefaultTheme extends SimUI {
         else if (config.releaseStatus == 'Beta') {
             titleElem.textContent += ' Beta';
         }
-        const results = new Results(this.parentElem.getElementsByClassName('default-results')[0]);
+        const results = new Results(this.parentElem.getElementsByClassName('default-results')[0], this.sim);
         const detailedResults = new DetailedResults(this.parentElem.getElementsByClassName('detailed-results')[0]);
         const actions = new Actions(this.parentElem.getElementsByClassName('default-actions')[0], this.sim, config.epStats, config.epReferenceStat, results, detailedResults);
         const logRunner = new LogRunner(this.parentElem.getElementsByClassName('log-runner')[0], this.sim, results, detailedResults);
@@ -252,7 +252,7 @@ const layoutHTML = `
       <li><a data-toggle="tab" href="#log-tab">Log</a></li>
       <li class="default-top-bar">
 				<div class="known-issues">Known Issues</div>
-				<span class="share-link fa fa-link"></span
+				<span class="share-link fa fa-link"></span>
 			</li>
     </ul>
     <div class="tab-content">

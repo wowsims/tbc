@@ -57,14 +57,14 @@ const theme = new DefaultTheme(document.body, {
         'Other Buffs': {
             tooltip: Tooltips.OTHER_BUFFS_SECTION,
             icons: [
-                IconInputs.DrumsOfBattleBuff,
-                IconInputs.DrumsOfRestorationBuff,
                 IconInputs.ArcaneBrilliance,
                 IconInputs.DivineSpirit,
                 IconInputs.BlessingOfKings,
                 IconInputs.BlessingOfWisdom,
                 IconInputs.GiftOfTheWild,
                 IconInputs.MoonkinAura,
+                IconInputs.DrumsOfBattleBuff,
+                IconInputs.DrumsOfRestorationBuff,
                 IconInputs.Bloodlust,
                 IconInputs.WrathOfAirTotem,
                 IconInputs.TotemOfWrath,

@@ -1,15 +1,23 @@
-import { IndividualSimResult } from '/tbc/core/proto/api.js';
+import { IndividualSimRequest, IndividualSimResult } from '/tbc/core/proto/api.js';
 import { StatWeightsRequest, StatWeightsResult } from '/tbc/core/proto/api.js';
 import { Stat } from '/tbc/core/proto/common.js';
+import { Sim } from '/tbc/core/sim.js';
 import { Component } from './component.js';
 export declare class Results extends Component {
-    readonly pendingElem: HTMLDivElement;
-    readonly simElem: HTMLDivElement;
-    readonly epElem: HTMLDivElement;
+    private readonly sim;
+    private readonly pendingElem;
+    private readonly simElem;
+    private readonly simDpsElem;
+    private readonly epElem;
+    private readonly simReferenceElem;
+    private readonly simReferenceDiffElem;
     private statsType;
-    constructor(parent: HTMLElement);
+    private currentData;
+    private referenceData;
+    constructor(parent: HTMLElement, sim: Sim<any>);
     hideAll(): void;
     setPending(): void;
-    setSimResult(result: IndividualSimResult): void;
+    setSimResult(request: IndividualSimRequest, result: IndividualSimResult): void;
     setStatWeights(request: StatWeightsRequest, result: StatWeightsResult, epStats: Array<Stat>): void;
+    updateReference(): void;
 }
