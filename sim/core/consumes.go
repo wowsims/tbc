@@ -161,7 +161,7 @@ func TryActivateDestructionPotion(sim *Simulation, agent Agent) {
 	agent.GetCharacter().AddAura(sim, Aura{
 		ID:      MagicIDDestructionPotion,
 		Expires: sim.CurrentTime + dur,
-		OnExpire: func(sim *Simulation, agent Agent, c *Cast) {
+		OnExpire: func(sim *Simulation, cast *Cast) {
 			agent.GetCharacter().Stats[stats.SpellPower] -= spBonus
 			agent.GetCharacter().Stats[stats.SpellCrit] -= critBonus
 		},
