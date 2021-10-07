@@ -37,7 +37,7 @@ export class Actions extends Component {
       results.setPending();
       detailedResults.setPending();
       const result = await sim.individualSim(simRequest);
-      results.setSimResult(result);
+      results.setSimResult(simRequest, result);
       detailedResults.setSimResult(simRequest, result);
     });
 

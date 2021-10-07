@@ -21,6 +21,10 @@
   text-align: center;
 }
 
+.results-sim-dps {
+  text-align: center;
+}
+
 .results-sim-dps-avg {
   font-size: 30px;
   font-weight: 700;
@@ -85,4 +89,34 @@
 }
 .stats-type-dps .results-ep-table tr td:nth-child(4), .stats-type-dps .results-ep-table tr td:nth-child(5) {
   display: none;
+}
+
+.results-sim-reference.has-reference .results-sim-set-reference {
+	display: none;
+}
+.results-sim-reference:not(.has-reference) .results-sim-reference-bar {
+	display: none;
+}
+
+.results-sim-set-reference {
+	cursor: pointer;
+}
+
+.results-sim-reference-diff.positive {
+	color: lawngreen;
+}
+.results-sim-reference-diff.negative {
+	color: red;
+}
+
+.results-sim-reference-swap {
+	color: blue;
+	cursor: pointer;
+	user-select: none;
+}
+
+.results-sim-reference-delete {
+	color: red;
+	cursor: pointer;
+	user-select: none;
 }
