@@ -7,4 +7,4 @@ export declare const GLOVES_SPELLPOWER = 28272;
 export declare const RUNIC_SPELLTHREAD = 24274;
 export declare const WEAPON_SPELLPOWER = 22555;
 export declare const SHIELD_INTELLECT = 22539;
-export declare const RING_SPELLPOWER = 22555;
+export declare const RING_SPELLPOWER = 22536;
