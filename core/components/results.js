@@ -99,7 +99,7 @@ export class Results extends Component {
         this.epElem.innerHTML = `
 		<select class="results-ep-type-select">
 			<option value="ep">EP</option>
-			<option value="weight">DPS / Stat</option>
+			<option value="weight">DPS</option>
 		</select>
 		<table class="results-ep-table">
 		` + epStats.map(stat => `<tr>
