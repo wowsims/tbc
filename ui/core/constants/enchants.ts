@@ -26,4 +26,4 @@ export const WEAPON_SPELLPOWER = 22555;
 export const SHIELD_INTELLECT = 22539;
 
 // Ring
-export const RING_SPELLPOWER = 22555;
+export const RING_SPELLPOWER = 22536;
