@@ -228,20 +228,23 @@ func TestSimulateP1(t *testing.T) {
 	})
 }
 
-// func TestMultiTarget(t *testing.T) {
-// 	doSimulateTest(
-// 		"multiTarget",
-// 		t,
-// 		makeOptions(
-// 			fullOptions,
-// 			Encounter{
-// 				Duration:     300,
-// 				NumClTargets: 3,
-// 			},
-// 			AGENT_TYPE_ADAPTIVE),
-// 		p1Gear,
-//      1533.5)
-// }
+func TestMultiTarget(t *testing.T) {
+	params := core.IndividualParams{
+		Equip:         gearFromStrings(p1Gear),
+		Race:          core.RaceBonusTypeOrc,
+		Consumes:      fullConsumes,
+		Buffs:         fullBuffs,
+		Options:       makeOptions(basicOptions, longEncounter),
+		PlayerOptions: &playerOptionsAdaptive,
+	}
+	params.Options.Encounter.NumTargets = 3
+
+	doSimulateTest(
+		"multiTarget",
+		t,
+		params,
+		1533.5)
+}
 
 func TestLBOnlyAgent(t *testing.T) {
 	simAllEncountersTest(AllEncountersTestOptions{
@@ -299,6 +302,7 @@ func TestAverageDPS(t *testing.T) {
 	options := basicOptions
 	options.Iterations = 10000
 	options.Encounter = longEncounter
+	options.Encounter.NumTargets = 3
 	// options.Debug = true
 
 	params := core.IndividualParams{
@@ -374,8 +378,8 @@ func simAllEncountersTest(testOpts AllEncountersTestOptions) {
 //   This is where we can add more sophisticated checks if we would like.
 //   Any changes to the damage output of an item set
 func doSimulateTest(label string, t *testing.T, params core.IndividualParams, expectedDps float64) {
-	// params.Options.Debug = true
-	// params.Options.Iterations = 1
+	params.Options.Debug = true
+	params.Options.Iterations = 1
 
 	sim := core.NewIndividualSim(params)
 	result := sim.Run()

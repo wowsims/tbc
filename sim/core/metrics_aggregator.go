@@ -18,7 +18,7 @@ type MetricsAggregator struct {
 	oomAtSum    float64
 	dpsAtOomSum float64
 
-	casts map[int32]CastMetric
+	casts map[int32]ActionMetric
 }
 
 type SimResult struct {
@@ -34,10 +34,12 @@ type SimResult struct {
 	OomAtAvg    float64
 	DpsAtOomAvg float64
 
-	Casts map[int32]CastMetric
+	Casts map[int32]ActionMetric
 }
 
-type CastMetric struct {
+type ActionMetric struct {
+	ActionID int32 // Mapped to the real ID
+
 	// Index 0 of each slice is the 'normal' cast data.
 	// Count & Dmg of spells cast by Tag
 	Casts  []int32 // Total Count of Casts
@@ -51,7 +53,7 @@ func NewMetricsAggregator() *MetricsAggregator {
 	return &MetricsAggregator{
 		startTime: time.Now(),
 		dpsHist:   make(map[int32]int32),
-		casts:     make(map[int32]CastMetric),
+		casts:     make(map[int32]ActionMetric),
 	}
 }
 
@@ -81,29 +83,29 @@ func (aggregator *MetricsAggregator) addMetrics(options Options, metrics SimMetr
 		cm := aggregator.casts[id]
 		idx := int(cast.Tag)
 
+		// Construct new arrays for a tag we haven't seen before.
 		if len(cm.Casts) <= idx {
 			newArr := make([]int32, idx+1)
 			copy(newArr, cm.Casts)
 			cm.Casts = newArr
 
+			newCritsArr := make([]int32, idx+1)
+			copy(newCritsArr, cm.Crits)
+			cm.Crits = newCritsArr
+
 			newDmgs := make([]float64, idx+1)
 			copy(newDmgs, cm.Dmgs)
 			cm.Dmgs = newDmgs
+
+			newMissArr := make([]int32, idx+1)
+			copy(newMissArr, cm.Misses)
+			cm.Misses = newMissArr
 		}
+
 		cm.Casts[idx]++
 		if cast.DidCrit {
-			if len(cm.Crits) <= idx {
-				newArr := make([]int32, idx+1)
-				copy(newArr, cm.Crits)
-				cm.Crits = newArr
-			}
 			cm.Crits[idx]++
 		} else if !cast.DidHit {
-			if len(cm.Misses) <= idx {
-				newArr := make([]int32, idx+1)
-				copy(newArr, cm.Misses)
-				cm.Misses = newArr
-			}
 			cm.Misses[idx]++
 		}
 		cm.Dmgs[idx] += cast.DidDmg

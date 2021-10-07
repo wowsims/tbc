@@ -167,10 +167,6 @@ func AuraName(a int32) string {
 		return "Mystic Focus"
 	case MagicIDEmberSkyfire:
 		return "Ember Skyfire"
-	case MagicIDLB12:
-		return "LB12"
-	case MagicIDCL6:
-		return "CL6"
 	case MagicIDTLCLB:
 		return "TLC-LB"
 	case MagicIDISCTrink:
@@ -305,8 +301,6 @@ func NewICD() InternalCD {
 const (
 	MagicIDUnknown int32 = iota
 	//Spells
-	MagicIDLB12
-	MagicIDCL6
 	MagicIDTLCLB
 
 	// Auras

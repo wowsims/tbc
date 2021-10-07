@@ -423,12 +423,16 @@ func ChainCast(sim *core.Simulation, agent core.Agent, cast *core.Cast) {
 		}
 		clone := &core.Cast{
 			Tag:                 cast.Tag, // pass along lightning overload
+			Caster:              cast.Caster,
 			Spell:               cast.Spell,
 			BonusCrit:           cast.BonusCrit,
+			BonusHit:            cast.BonusHit,
+			BonusSpellPower:     cast.BonusSpellPower,
 			CritDamageMultipier: cast.CritDamageMultipier,
 			Effect:              func(sim *core.Simulation, agent core.Agent, c *core.Cast) { cast.DidDmg *= dmgCoeff },
-			DoItNow:             core.DirectCast,
+			DoItNow:             ChainCast, // so that LO will call ChainCast instead of DirectCast.
 		}
-		clone.DoItNow(sim, shaman, clone)
+		// Now direct cast the jump
+		core.DirectCast(sim, shaman, clone)
 	}
 }

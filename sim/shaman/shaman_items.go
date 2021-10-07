@@ -21,7 +21,7 @@ func ActivateSkycall(sim *core.Simulation, agent core.Agent) core.Aura {
 		ID:      core.MagicIDSkycall,
 		Expires: core.NeverExpires,
 		OnCastComplete: func(sim *core.Simulation, agent core.Agent, cast *core.Cast) {
-			if cast.Spell.ID == core.MagicIDLB12 && sim.Rando.Float64("skycall") < 0.15 {
+			if cast.Spell.ID == MagicIDLB12 && sim.Rando.Float64("skycall") < 0.15 {
 				core.AddAuraWithTemporaryStats(sim, agent, core.MagicIDEnergized, stats.SpellHaste, hasteBonus, dur)
 			}
 		},
@@ -48,7 +48,7 @@ func ActivateTotemOfPulsingEarth(sim *core.Simulation, agent core.Agent) core.Au
 		ID:      core.MagicIDTotemOfPulsingEarth,
 		Expires: core.NeverExpires,
 		OnCast: func(sim *core.Simulation, p core.Agent, cast *core.Cast) {
-			if cast.Spell.ID == core.MagicIDLB12 {
+			if cast.Spell.ID == MagicIDLB12 {
 				// TODO: how to make sure this goes in before clearcasting?
 				cast.ManaCost = math.Max(cast.ManaCost-27, 0)
 			}

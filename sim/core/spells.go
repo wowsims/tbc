@@ -20,34 +20,14 @@ type Spell struct {
 	DamageType stats.Stat
 	Coeff      float64
 
-	CastType
 	DotDmg float64
 	DotDur time.Duration
 }
 
-type CastType byte
-
-const (
-	CastTypeNormal CastType = iota
-	CastTypeChain
-	CastTypeAOE
-	CastTypeChannel
-)
-
 const SpellCritRatingPerCritChance = 22.08
 
-// All Spells
-// FUTURE: Downrank Penalty == (spellrankavailbetobetrained+11)/70
-//    Might not even be worth calculating because I don't think there is much case for ever downranking.
+// Global Spells (things that any class could cast)
 var spells = []Spell{
-	// {ID: MagicIDLB4,  Name: "LB4",  Coeff: 0.795,  CastTime: time.Millisecond * 2500, MinDmg: 88, MaxDmg: 100, Mana: 50, DamageType: StatNatureSpellPower},
-	// {ID: MagicIDLB10, Name: "LB10", Coeff: 0.795,  CastTime: time.Millisecond * 2500, MinDmg: 428, MaxDmg: 477, Mana: 265, DamageType: StatNatureSpellPower},
-	{ID: MagicIDLB12, Name: "LB12", Coeff: 0.794, CastTime: time.Millisecond * 2500, MinDmg: 571, MaxDmg: 652, Mana: 300, DamageType: stats.NatureSpellPower},
-	// {ID: MagicIDCL4,  Name: "CL4",  Coeff: 0.643,  CastTime: time.Millisecond * 2000, Cooldown: time.Second * 6, MinDmg: 505, MaxDmg: 564, Mana: 605, DamageType: stats.NatureSpellPower},
-	{ID: MagicIDCL6, Name: "CL6", Coeff: 0.651, CastTime: time.Millisecond * 2000, Cooldown: time.Second * 6, MinDmg: 734, MaxDmg: 838, Mana: 760, DamageType: stats.NatureSpellPower},
-	// {ID: MagicIDES8,  Name: "ES8",  Coeff: 0.3858, CastTime: time.Millisecond * 1500, Cooldown: time.Second * 6, MinDmg: 658, MaxDmg: 692, Mana: 535, DamageType: stats.NatureSpellPower},
-	// {ID: MagicIDFrS5, Name: "FrS5", Coeff: 0.3858, CastTime: time.Millisecond * 1500, Cooldown: time.Second * 6, MinDmg: 640, MaxDmg: 676, Mana: 525, DamageType: StatFrostSpellPower},
-	// {ID: MagicIDFlS7, Name: "FlS7", Coeff: 0.15, CastTime: time.Millisecond * 1500, Cooldown: time.Second * 6, MinDmg: 377, MaxDmg: 420, Mana: 500, DotDmg: 100, DotDur: time.Second * 6, DamageType: StatFireSpellPower},
 	{ID: MagicIDTLCLB, Name: "TLCLB", Coeff: 0.0, MinDmg: 694, MaxDmg: 807, Mana: 0, DamageType: stats.NatureSpellPower},
 }
 
@@ -128,7 +108,7 @@ func DirectCast(sim *Simulation, agent Agent, cast *Cast) {
 	}
 
 	hit := 0.83 + character.Stats[stats.SpellHit]/1260.0 + cast.BonusHit // 12.6 hit == 1% hit
-	hit = math.Min(hit, 0.99)                                    // can't get away from the 1% miss
+	hit = math.Min(hit, 0.99)                                            // can't get away from the 1% miss
 
 	dbgCast := cast.Spell.Name
 	if sim.Log != nil {

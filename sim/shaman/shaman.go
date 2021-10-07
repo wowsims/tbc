@@ -15,7 +15,7 @@ func newShaman(character *core.Character, talents Talents, totems Totems, waterS
 
 	shaman := &Shaman{
 		Character: character,
-		agent  :   agent,
+		agent:     agent,
 		Talents:   talents,
 		Totems:    totems,
 
@@ -253,7 +253,7 @@ const (
 func NewCastAction(shaman *Shaman, sim *core.Simulation, sp *core.Spell) core.AgentAction {
 	cast := core.NewCast(sim, sp)
 
-	itsElectric := sp.ID == core.MagicIDCL6 || sp.ID == core.MagicIDLB12
+	itsElectric := sp.ID == MagicIDCL6 || sp.ID == MagicIDLB12
 
 	if shaman.Talents.ElementalPrecision > 0 {
 		// FUTURE: This only impacts "frost fire and nature" spells.
@@ -281,7 +281,7 @@ func NewCastAction(shaman *Shaman, sim *core.Simulation, sp *core.Spell) core.Ag
 		if shaman.Talents.CallOfThunder > 0 { // only applies to CL and LB
 			cast.BonusCrit += float64(shaman.Talents.CallOfThunder) * 0.01
 		}
-		if sp.ID == core.MagicIDCL6 && sim.Options.Encounter.NumTargets > 1 {
+		if sp.ID == MagicIDCL6 && sim.Options.Encounter.NumTargets > 1 {
 			cast.DoItNow = ChainCast
 		}
 		if shaman.Talents.LightningMastery > 0 {

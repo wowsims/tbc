@@ -130,14 +130,16 @@ func runSimulationImpl(request *api.IndividualSimRequest) *api.IndividualSimResu
 	sim := createSim(request)
 	result := sim.Run()
 
-	castMetrics := map[int32]*api.CastMetric{}
-	for k, v := range result.Casts {
-		castMetrics[k] = &api.CastMetric{
+	actionMetrics := []*api.ActionMetric{}
+	for _, v := range result.Casts {
+		metric := &api.ActionMetric{
 			Casts:  v.Casts,
 			Crits:  v.Crits,
 			Misses: v.Misses,
 			Dmgs:   v.Dmgs,
 		}
+
+		actionMetrics = append(actionMetrics, metric)
 	}
 	isr := &api.IndividualSimResult{
 		DpsAvg:              result.DpsAvg,
@@ -149,7 +151,7 @@ func runSimulationImpl(request *api.IndividualSimRequest) *api.IndividualSimResu
 		NumOom:              int32(result.NumOom),
 		OomAtAvg:            result.OomAtAvg,
 		DpsAtOomAvg:         result.DpsAtOomAvg,
-		Casts:               castMetrics,
+		ActionMetrics:       actionMetrics,
 	}
 	return isr
 }
@@ -198,28 +200,28 @@ func convertEquip(es *api.EquipmentSpec) items.EquipmentSpec {
 func convertBuffs(inBuff *api.Buffs) core.Buffs {
 	// TODO: support tri-state better
 	return core.Buffs{
-		ArcaneBrilliance:          inBuff.ArcaneBrilliance,
-		GiftOfTheWild:             inBuff.GiftOfTheWild,
-		BlessingOfKings:           inBuff.BlessingOfKings,
-		BlessingOfWisdom:          inBuff.BlessingOfWisdom,
-		DivineSpirit:              inBuff.DivineSpirit,
-		MoonkinAura:               inBuff.MoonkinAura,
-		ShadowPriestDPS:           uint16(inBuff.ShadowPriestDps),
+		ArcaneBrilliance: inBuff.ArcaneBrilliance,
+		GiftOfTheWild:    inBuff.GiftOfTheWild,
+		BlessingOfKings:  inBuff.BlessingOfKings,
+		BlessingOfWisdom: inBuff.BlessingOfWisdom,
+		DivineSpirit:     inBuff.DivineSpirit,
+		MoonkinAura:      inBuff.MoonkinAura,
+		ShadowPriestDPS:  uint16(inBuff.ShadowPriestDps),
 
 		JudgementOfWisdom:         inBuff.JudgementOfWisdom,
 		ImprovedSealOfTheCrusader: inBuff.ImprovedSealOfTheCrusader,
 		Misery:                    inBuff.Misery,
 
-		ManaSpringTotem:           inBuff.ManaSpringTotem,
-		ManaTideTotem:             inBuff.ManaTideTotem,
-		TotemOfWrath:              inBuff.TotemOfWrath,
-		WrathOfAirTotem:           inBuff.WrathOfAirTotem,
+		ManaSpringTotem: inBuff.ManaSpringTotem,
+		ManaTideTotem:   inBuff.ManaTideTotem,
+		TotemOfWrath:    inBuff.TotemOfWrath,
+		WrathOfAirTotem: inBuff.WrathOfAirTotem,
 
-		AtieshMage:                inBuff.AtieshMage,
-		AtieshWarlock:             inBuff.AtieshWarlock,
-		BraidedEterniumChain:      inBuff.BraidedEterniumChain,
-		ChainOfTheTwilightOwl:     inBuff.ChainOfTheTwilightOwl,
-		EyeOfTheNight:             inBuff.EyeOfTheNight,
-		JadePendantOfBlasting:     inBuff.JadePendantOfBlasting,
+		AtieshMage:            inBuff.AtieshMage,
+		AtieshWarlock:         inBuff.AtieshWarlock,
+		BraidedEterniumChain:  inBuff.BraidedEterniumChain,
+		ChainOfTheTwilightOwl: inBuff.ChainOfTheTwilightOwl,
+		EyeOfTheNight:         inBuff.EyeOfTheNight,
+		JadePendantOfBlasting: inBuff.JadePendantOfBlasting,
 	}
 }
