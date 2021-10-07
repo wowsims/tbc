@@ -29,6 +29,7 @@ export interface SimConfig<SpecType extends Spec> {
     epReferenceStat: Stat;
     defaults: {
         phase: number;
+        gear: EquipmentSpec;
         epWeights: Stats;
         encounter: Encounter;
         buffs: Buffs;
@@ -74,6 +75,7 @@ export declare class Sim<SpecType extends Spec> extends WorkerPool {
     readonly specTypeFunctions: SpecTypeFunctions<SpecType>;
     private readonly _metaGemEffectEP;
     private _init;
+    private readonly _defaultGear;
     constructor(config: SimConfig<SpecType>);
     init(): Promise<void>;
     statWeights(request: StatWeightsRequest): Promise<StatWeightsResult>;

@@ -112,6 +112,7 @@ const theme = new DefaultTheme(document.body, {
     showNumTargets: true,
     defaults: {
         phase: 2,
+        gear: Presets.PRERAID_GEAR,
         epWeights: Stats.fromMap({
             [Stat.StatIntellect]: 0.33,
             [Stat.StatSpellPower]: 1,

@@ -60,6 +60,7 @@ export class Sim extends WorkerPool {
         this._talentsString = config.defaults.talents;
         this._epWeights = config.defaults.epWeights;
         this._specOptions = config.defaults.specOptions;
+        this._defaultGear = config.defaults.gear;
         [
             this.buffsChangeEmitter,
             this.consumesChangeEmitter,
