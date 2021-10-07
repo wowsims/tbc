@@ -1,0 +1,297 @@
+syntax = "proto3";
+package proto;
+
+option go_package = "./proto";
+
+enum Race {
+    RaceUnknown = 0;
+    RaceBloodElf = 1;
+    RaceDraenei = 2;
+    RaceDwarf = 3;
+    RaceGnome = 4;
+    RaceHuman = 5;
+    RaceNightElf = 6;
+    RaceOrc = 7;
+    RaceTauren = 8;
+    RaceTroll10 = 9;
+    RaceTroll30 = 10;
+    RaceUndead = 11;
+}
+
+enum Class {
+    ClassUnknown = 0;
+    ClassDruid = 1;
+    ClassHunter = 2;
+    ClassMage = 3;
+    ClassPaladin = 4;
+    ClassPriest = 5;
+    ClassRogue = 6;
+    ClassShaman = 7;
+    ClassWarlock = 8;
+    ClassWarrior = 9;
+}
+
+enum Spec {
+    SpecBalanceDruid = 0;
+    SpecElementalShaman = 1;
+}
+
+enum Stat {
+    StatStrength = 0;
+    StatAgility = 1;
+    StatStamina = 2;
+    StatIntellect = 3;
+    StatSpirit = 4;
+    StatSpellPower = 5;
+    StatHealingPower = 6;
+    StatArcaneSpellPower = 7;
+    StatFireSpellPower = 8;
+    StatFrostSpellPower = 9;
+    StatHolySpellPower = 10;
+    StatNatureSpellPower = 11;
+    StatShadowSpellPower = 12;
+    StatMP5 = 13;
+    StatSpellHit = 14;
+    StatSpellCrit = 15;
+    StatSpellHaste = 16;
+    StatSpellPenetration = 17;
+    StatAttackPower = 18;
+    StatMeleeHit = 19;
+    StatMeleeCrit = 20;
+    StatMeleeHaste = 21;
+    StatArmorPenetration = 22;
+    StatExpertise = 23;
+    StatMana = 24;
+    StatEnergy = 25;
+    StatRage = 26;
+    StatArmor = 27;
+}
+
+enum ItemType {
+    ItemTypeUnknown = 0;
+    ItemTypeHead = 1;
+    ItemTypeNeck = 2;
+    ItemTypeShoulder = 3;
+    ItemTypeBack = 4;
+    ItemTypeChest = 5;
+    ItemTypeWrist = 6;
+    ItemTypeHands = 7;
+    ItemTypeWaist = 8;
+    ItemTypeLegs = 9;
+    ItemTypeFeet = 10;
+    ItemTypeFinger = 11;
+    ItemTypeTrinket = 12;
+    ItemTypeWeapon = 13;
+    ItemTypeRanged = 14;
+}
+
+enum ArmorType {
+    ArmorTypeUnknown = 0;
+    ArmorTypeCloth = 1;
+    ArmorTypeLeather = 2;
+    ArmorTypeMail = 3;
+    ArmorTypePlate = 4;
+}
+
+enum WeaponType {
+    WeaponTypeUnknown = 0;
+    WeaponTypeAxe = 1;
+    WeaponTypeDagger = 2;
+    WeaponTypeFist = 3;
+    WeaponTypeMace = 4;
+    WeaponTypeOffHand = 5;
+    WeaponTypePolearm = 6;
+    WeaponTypeShield = 7;
+    WeaponTypeStaff = 8;
+    WeaponTypeSword = 9;
+}
+
+enum HandType {
+    HandTypeUnknown = 0;
+    HandTypeMainHand = 1;
+    HandTypeOneHand = 2;
+    HandTypeOffHand = 3;
+    HandTypeTwoHand = 4;
+}
+
+enum RangedWeaponType {
+    RangedWeaponTypeUnknown = 0;
+    RangedWeaponTypeBow = 1;
+    RangedWeaponTypeCrossbow = 2;
+    RangedWeaponTypeGun = 3;
+    RangedWeaponTypeIdol = 4;
+    RangedWeaponTypeLibram = 5;
+    RangedWeaponTypeThrown = 6;
+    RangedWeaponTypeTotem = 7;
+    RangedWeaponTypeWand = 8;
+}
+
+// All slots on the gear menu where a single item can be worn.
+enum ItemSlot {
+    ItemSlotHead = 0;
+    ItemSlotNeck = 1;
+    ItemSlotShoulder = 2;
+    ItemSlotBack = 3;
+    ItemSlotChest = 4;
+    ItemSlotWrist = 5;
+    ItemSlotHands = 6;
+    ItemSlotWaist = 7;
+    ItemSlotLegs = 8;
+    ItemSlotFeet = 9;
+    ItemSlotFinger1 = 10;
+    ItemSlotFinger2 = 11;
+    ItemSlotTrinket1 = 12;
+    ItemSlotTrinket2 = 13;
+    ItemSlotMainHand = 14; // can be 1h or 2h
+    ItemSlotOffHand = 15;
+    ItemSlotRanged = 16;
+}
+
+enum ItemQuality {
+    ItemQualityJunk = 0;
+    ItemQualityCommon = 1;
+    ItemQualityUncommon = 2;
+    ItemQualityRare = 3;
+    ItemQualityEpic = 4;
+    ItemQualityLegendary = 5;
+}
+
+enum GemColor {
+    GemColorUnknown = 0;
+    GemColorMeta = 1;
+    GemColorRed = 2;
+    GemColorBlue = 3;
+    GemColorYellow = 4;
+    GemColorGreen = 5;
+    GemColorOrange = 6;
+    GemColorPurple = 7;
+    GemColorPrismatic = 8;
+}
+
+enum TristateEffect {
+    TristateEffectMissing = 0;
+    TristateEffectRegular = 1;
+    TristateEffectImproved = 2;
+}
+
+message Buffs {
+    // Raid buffs
+    bool arcane_brilliance = 1;
+    bool blessing_of_kings = 2;
+    TristateEffect blessing_of_wisdom = 3;
+    TristateEffect divine_spirit = 4;
+    TristateEffect gift_of_the_wild = 5;
+
+    // Party Buffs
+    int32 bloodlust = 6;
+    TristateEffect moonkin_aura = 7;
+    int32 shadow_priest_dps = 8;
+
+    // Target Debuff
+    bool judgement_of_wisdom = 9;
+    bool improved_seal_of_the_crusader = 10;
+    bool misery = 11;
+
+    // Item Buffs
+    int32 atiesh_mage = 12;
+    int32 atiesh_warlock = 13;
+    bool braided_eternium_chain = 14;
+    bool eye_of_the_night = 15;
+    bool chain_of_the_twilight_owl = 16;
+    bool jade_pendant_of_blasting = 17;
+
+    // Totems
+    TristateEffect mana_spring_totem = 18;
+    bool mana_tide_totem = 19;
+    int32 totem_of_wrath = 20;
+    TristateEffect wrath_of_air_totem = 21;
+}
+
+message Consumes {
+    bool flask_of_blinding_light = 1;
+    bool flask_of_mighty_restoration = 2;
+    bool flask_of_pure_death = 3;
+    bool flask_of_supreme_power = 4;
+
+    bool adepts_elixir = 5;
+    bool elixir_of_major_fire_power = 6;
+    bool elixir_of_major_frost_power = 7;
+    bool elixir_of_major_shadow_power = 8;
+
+    bool elixir_of_draenic_wisdom = 9;
+    bool elixir_of_major_mageblood = 10;
+
+    bool brilliant_wizard_oil = 11; 
+    bool superior_wizard_oil = 12; 
+
+    bool blackened_basilisk = 13;
+    bool skullfish_soup = 14;
+
+    bool destruction_potion = 15;
+    bool super_mana_potion = 16;
+
+    bool dark_rune = 17;
+
+    bool drums_of_battle = 18;
+    bool drums_of_restoration = 19;
+}
+
+message Encounter {
+    double duration = 1;
+    int32 num_targets = 2;
+    int32 target_armor = 3;
+}
+
+message ItemSpec {
+    int32 id = 2;
+    int32 enchant = 3;
+    repeated int32 gems = 4;
+}
+
+message EquipmentSpec {
+    repeated ItemSpec items = 1;
+}
+
+message Item {
+    int32 id = 1;
+    string name = 2;
+
+    ItemType type = 3;
+    ArmorType armor_type = 4;
+    WeaponType weapon_type = 5;
+    HandType hand_type = 6;
+    RangedWeaponType ranged_weapon_type = 7;
+
+    repeated double stats = 8;
+    repeated GemColor gem_sockets = 9;
+    repeated double socketBonus = 10;
+
+    int32 phase = 11;
+    ItemQuality quality = 12;
+}
+
+message Enchant {
+    int32 id = 1;        // ID of the enchant "item".
+    int32 effect_id = 2; // ID of the effect (for the item tooltip UI)
+    string name = 3;     
+
+    ItemType type = 4;   // Which type of item this enchant can be applied to.
+    bool two_handed_only = 5;
+    bool shield_only = 6;
+
+    repeated double stats = 7;
+
+    ItemQuality quality = 8;
+}
+
+message Gem {
+    int32 id = 1;
+    string name = 2;
+
+    repeated double stats = 3;
+    GemColor color = 4;
+
+    int32 phase = 5;
+    ItemQuality quality = 6;
+		bool unique = 7;
+}

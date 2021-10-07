@@ -1,7 +1,7 @@
-import { Sim } from '../sim.js';
-import { Class } from '../api/common.js';
-import { Spec } from '../api/common.js';
-import { specToClass } from '../api/utils.js';
+import { Sim } from '/tbc/core/sim.js';
+import { Class } from '/tbc/core/proto/common.js';
+import { Spec } from '/tbc/core/proto/common.js';
+import { specToClass } from '/tbc/core/proto_utils/utils.js';
 
 import { ShamanTalentsPicker } from './shaman.js';
 import { TalentsPicker } from './talents_picker.js';

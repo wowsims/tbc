@@ -1,12 +1,11 @@
-import { Spec } from '../api/common.js';
-import { SpecTalents } from '../api/utils.js';
-import { getIconUrl } from '../resources.js';
-import { setWowheadHref } from '../resources.js';
-import { Sim } from '../sim.js';
-import { isRightClick } from '../utils.js';
-import { sum } from '../utils.js';
-
-import { Component } from '../components/component.js';
+import { Component } from '/tbc/core/components/component.js';
+import { Spec } from '/tbc/core/proto/common.js';
+import { SpecTalents } from '/tbc/core/proto_utils/utils.js';
+import { getIconUrl } from '/tbc/core/resources.js';
+import { setWowheadHref } from '/tbc/core/resources.js';
+import { Sim } from '/tbc/core/sim.js';
+import { isRightClick } from '/tbc/core/utils.js';
+import { sum } from '/tbc/core/utils.js';
 
 const MAX_TALENT_POINTS = 61;
 const NUM_ROWS = 9;

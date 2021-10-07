@@ -51,6 +51,10 @@ td, th {
   flex-grow: 1;
 }
 
+.default-actions, .default-stats {
+	margin: 0 !important;
+}
+
 .actions-button {
   background: transparent;
   color: var(--sidebar-text-color);
@@ -141,6 +145,15 @@ td, th {
 	display: flex !important;
 	align-items: center !important;
 	height: 100% !important;
+}
+
+.known-issues {
+	background-color: red;
+	border: 2px solid var(--main-text-color);
+	padding: 2px;
+	margin: 0 10px;
+	font-size: 14px;
+	font-weight: 900;
 }
 
 .share-link {

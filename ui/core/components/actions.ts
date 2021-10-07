@@ -1,7 +1,7 @@
-import { IndividualSimRequest } from '../api/api.js';
-import { Stat } from '../api/common.js';
-import { StatWeightsRequest } from '../api/api.js';
-import { Sim } from '../sim.js';
+import { IndividualSimRequest } from '/tbc/core/proto/api.js';
+import { Stat } from '/tbc/core/proto/common.js';
+import { StatWeightsRequest } from '/tbc/core/proto/api.js';
+import { Sim } from '/tbc/core/sim.js';
 
 import { Component } from './component.js';
 import { DetailedResults } from './detailed_results.js';

@@ -1,25 +1,31 @@
 import { Sim, SimConfig } from './sim.js';
 import { TypedEvent } from './typed_event.js';
-import { Class } from './api/common.js';
-import { Spec } from './api/common.js';
+import { Class } from './proto/common.js';
+import { Spec } from './proto/common.js';
 
 declare var tippy: any;
 
 const CURRENT_SETTINGS_KEY = '__currentSettings__';
 
+export type ReleaseStatus = 'Alpha' | 'Beta' | 'Live';
+
 export interface SimUIConfig<SpecType extends Spec> extends SimConfig<SpecType> {
+  releaseStatus: ReleaseStatus;
+	knownIssues?: Array<string>;
 }
 
 // Core UI module.
 export abstract class SimUI<SpecType extends Spec> {
   readonly parentElem: HTMLElement;
   readonly sim: Sim<SpecType>;
+	readonly simUiConfig: SimUIConfig<SpecType>;
 
   private readonly exclusivityMap: Record<ExclusivityTag, Array<ExclusiveEffect>>;
 
   constructor(parentElem: HTMLElement, config: SimUIConfig<SpecType>) {
     this.parentElem = parentElem;
     this.sim = new Sim<SpecType>(config);
+		this.simUiConfig = config;
 
     this.exclusivityMap = {
       'Battle Elixir': [],
@@ -55,10 +61,15 @@ export abstract class SimUI<SpecType extends Spec> {
     if (!loadedSettings && savedSettings != null) {
       try {
         this.sim.fromJson(JSON.parse(savedSettings));
+        loadedSettings = true;
       } catch (e) {
         console.warn('Failed to parse saved settings: ' + e);
       }
     }
+
+		if (!loadedSettings) {
+			this.sim.setGear(this.sim.lookupEquipmentSpec(this.simUiConfig.defaults.gear));
+		}
 
     this.sim.changeEmitter.on(() => {
       const simJsonStr = JSON.stringify(this.sim.toJson());
@@ -80,6 +91,23 @@ export abstract class SimUI<SpecType extends Spec> {
 
 				navigator.clipboard.writeText(linkUrl.toString());
 				alert('Current settings copied to clipboard!');
+			});
+		});
+
+		Array.from(document.getElementsByClassName('known-issues')).forEach(element => {
+			if (!this.simUiConfig.knownIssues?.length) {
+				(element as HTMLElement).style.display = 'none';
+				return;
+			}
+
+			
+			tippy(element, {
+				'content': `
+				<ul class="known-issues-tooltip">
+					${this.simUiConfig.knownIssues.map(issue => '<li>' + issue + '</li>').join('')}
+				</ul>
+				`,
+				'allowHTML': true,
 			});
 		});
   }

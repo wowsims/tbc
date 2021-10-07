@@ -1,0 +1,20 @@
+syntax = "proto3";
+package proto;
+
+option go_package = "./proto";
+
+message DruidTalents {
+    int32 starlight_wrath = 1;
+}
+
+message BalanceDruid {
+    message Agent {
+    }
+    Agent agent = 1;
+
+    DruidTalents talents = 2;
+    
+    message Options {
+    }
+    Options options = 3;
+}

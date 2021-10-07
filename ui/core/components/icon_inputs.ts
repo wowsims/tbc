@@ -1,16 +1,16 @@
-import { Buffs } from '../api/common.js';
-import { Consumes } from '../api/common.js';
-import { ItemOrSpellId } from '../resources.js';
-import { Sim } from '../sim.js';
+import { Buffs } from '/tbc/core/proto/common.js';
+import { Consumes } from '/tbc/core/proto/common.js';
+import { ItemOrSpellId } from '/tbc/core/resources.js';
+import { Sim } from '/tbc/core/sim.js';
 
-import { ExclusivityTag } from '../sim_ui.js';
+import { ExclusivityTag } from '/tbc/core/sim_ui.js';
 import { IconInput } from './icon_picker.js';
 
 // Keep each section in alphabetical order.
 // Buffs
 export const ArcaneBrilliance = makeBooleanBuffInput({spellId:27127}, 'arcaneBrilliance');
-export const AtieshMage = makeMultistateBuffInput({spellId:28142}, 6, 'atieshMage');
-export const AtieshWarlock = makeMultistateBuffInput({spellId:28143}, 6, 'atieshWarlock');
+export const AtieshMage = makeMultistateBuffInput({spellId:28142}, 5, 'atieshMage');
+export const AtieshWarlock = makeMultistateBuffInput({spellId:28143}, 5, 'atieshWarlock');
 export const BlessingOfKings = makeBooleanBuffInput({spellId:25898}, 'blessingOfKings');
 export const BlessingOfWisdom = makeTristateBuffInput({spellId:27143}, {spellId:20245}, 'blessingOfWisdom');
 export const Bloodlust = makeMultistateBuffInput({spellId:2825}, 11, 'bloodlust');
@@ -23,7 +23,7 @@ export const JadePendantOfBlasting = makeBooleanBuffInput({spellId:25607}, 'jade
 export const ManaSpringTotem = makeTristateBuffInput({spellId:25570}, {spellId:16208}, 'manaSpringTotem');
 export const ManaTideTotem = makeBooleanBuffInput({spellId:16190}, 'manaTideTotem');
 export const MoonkinAura = makeTristateBuffInput({spellId:24907}, {itemId:32387}, 'moonkinAura');
-export const TotemOfWrath = makeMultistateBuffInput({spellId:30706}, 6, 'totemOfWrath');
+export const TotemOfWrath = makeMultistateBuffInput({spellId:30706}, 5, 'totemOfWrath');
 export const WrathOfAirTotem = makeTristateBuffInput({spellId:3738}, {spellId:37212}, 'wrathOfAirTotem');
 
 // Debuffs

@@ -1,22 +1,22 @@
-import { Enchant } from './api/common.js';
-import { Gem } from './api/common.js';
-import { GemColor } from './api/common.js';
-import { Item } from './api/common.js';
-import { ItemQuality } from './api/common.js';
-import { ItemSlot } from './api/common.js';
-import { ItemSpec } from './api/common.js';
-import { ItemType } from './api/common.js';
-import { Stat } from './api/common.js';
+import { Enchant } from './proto/common.js';
+import { Gem } from './proto/common.js';
+import { GemColor } from './proto/common.js';
+import { Item } from './proto/common.js';
+import { ItemQuality } from './proto/common.js';
+import { ItemSlot } from './proto/common.js';
+import { ItemSpec } from './proto/common.js';
+import { ItemType } from './proto/common.js';
+import { Stat } from './proto/common.js';
 
-import { ComputeStatsRequest, ComputeStatsResult } from './api/api.js';
-import { GearListRequest, GearListResult } from './api/api.js';
-import { IndividualSimRequest, IndividualSimResult } from './api/api.js';
-import { StatWeightsRequest, StatWeightsResult } from './api/api.js';
+import { ComputeStatsRequest, ComputeStatsResult } from './proto/api.js';
+import { GearListRequest, GearListResult } from './proto/api.js';
+import { IndividualSimRequest, IndividualSimResult } from './proto/api.js';
+import { StatWeightsRequest, StatWeightsResult } from './proto/api.js';
 
-import { urlPathPrefix } from './resources.js';
+import { repoName } from './resources.js';
 import { wait } from './utils.js';
 
-const SIM_WORKER_URL = `${urlPathPrefix}/sim_worker.js`;
+const SIM_WORKER_URL = `/${repoName}/sim_worker.js`;
 
 export class WorkerPool {
 	private workers: Array<SimWorker>;

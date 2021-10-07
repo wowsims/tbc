@@ -23,5 +23,5 @@ jobs:
       - name: Checkout 🛎️
         uses: actions/checkout@v2.3.1
 
-      - name: Build 🔧
+      - name: Test
         run: make test

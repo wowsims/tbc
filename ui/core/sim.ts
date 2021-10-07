@@ -1,45 +1,46 @@
-import { EquippedItem } from './api/equipped_item.js';
-import { Gear } from './api/gear.js';
-import { Buffs } from './api/common.js';
-import { Class } from './api/common.js';
-import { Consumes } from './api/common.js';
-import { Enchant } from './api/common.js';
-import { Encounter } from './api/common.js';
-import { EquipmentSpec } from './api/common.js';
-import { Gem } from './api/common.js';
-import { GemColor } from './api/common.js';
-import { ItemQuality } from './api/common.js';
-import { ItemSlot } from './api/common.js';
-import { ItemSpec } from './api/common.js';
-import { ItemType } from './api/common.js';
-import { Item } from './api/common.js';
-import { Race } from './api/common.js';
-import { Spec } from './api/common.js';
-import { Stat } from './api/common.js';
-import { makeComputeStatsRequest } from './api/request_helpers.js';
-import { makeIndividualSimRequest } from './api/request_helpers.js';
-import { Stats } from './api/stats.js';
-import { SpecAgent } from './api/utils.js';
-import { SpecTalents } from './api/utils.js';
-import { SpecTypeFunctions } from './api/utils.js';
-import { specTypeFunctions } from './api/utils.js';
-import { SpecOptions } from './api/utils.js';
-import { specToClass } from './api/utils.js';
-import { specToEligibleRaces } from './api/utils.js';
-import { getEligibleItemSlots } from './api/utils.js';
-import { getEligibleEnchantSlots } from './api/utils.js';
-import { gemEligibleForSocket } from './api/utils.js';
-import { gemMatchesSocket } from './api/utils.js';
+import { Buffs } from '/tbc/core/proto/common.js';
+import { Class } from '/tbc/core/proto/common.js';
+import { Consumes } from '/tbc/core/proto/common.js';
+import { Enchant } from '/tbc/core/proto/common.js';
+import { Encounter } from '/tbc/core/proto/common.js';
+import { EquipmentSpec } from '/tbc/core/proto/common.js';
+import { Gem } from '/tbc/core/proto/common.js';
+import { GemColor } from '/tbc/core/proto/common.js';
+import { ItemQuality } from '/tbc/core/proto/common.js';
+import { ItemSlot } from '/tbc/core/proto/common.js';
+import { ItemSpec } from '/tbc/core/proto/common.js';
+import { ItemType } from '/tbc/core/proto/common.js';
+import { Item } from '/tbc/core/proto/common.js';
+import { Race } from '/tbc/core/proto/common.js';
+import { Spec } from '/tbc/core/proto/common.js';
+import { Stat } from '/tbc/core/proto/common.js';
+import { Player } from '/tbc/core/proto/api.js';
+import { PlayerOptions } from '/tbc/core/proto/api.js';
+import { ComputeStatsRequest, ComputeStatsResult } from '/tbc/core/proto/api.js';
+import { GearListRequest, GearListResult } from '/tbc/core/proto/api.js';
+import { IndividualSimRequest, IndividualSimResult } from '/tbc/core/proto/api.js';
+import { StatWeightsRequest, StatWeightsResult } from '/tbc/core/proto/api.js';
 
-import { Player } from './api/api.js';
-import { PlayerOptions } from './api/api.js';
-import { ComputeStatsRequest, ComputeStatsResult } from './api/api.js';
-import { GearListRequest, GearListResult } from './api/api.js';
-import { IndividualSimRequest, IndividualSimResult } from './api/api.js';
-import { StatWeightsRequest, StatWeightsResult } from './api/api.js';
+import { EquippedItem } from '/tbc/core/proto_utils/equipped_item.js';
+import { Gear } from '/tbc/core/proto_utils/gear.js';
+import { makeComputeStatsRequest } from '/tbc/core/proto_utils/request_helpers.js';
+import { makeIndividualSimRequest } from '/tbc/core/proto_utils/request_helpers.js';
+import { Stats } from '/tbc/core/proto_utils/stats.js';
+import { SpecAgent } from '/tbc/core/proto_utils/utils.js';
+import { SpecTalents } from '/tbc/core/proto_utils/utils.js';
+import { SpecTypeFunctions } from '/tbc/core/proto_utils/utils.js';
+import { specTypeFunctions } from '/tbc/core/proto_utils/utils.js';
+import { SpecOptions } from '/tbc/core/proto_utils/utils.js';
+import { specToClass } from '/tbc/core/proto_utils/utils.js';
+import { specToEligibleRaces } from '/tbc/core/proto_utils/utils.js';
+import { getEligibleItemSlots } from '/tbc/core/proto_utils/utils.js';
+import { getEligibleEnchantSlots } from '/tbc/core/proto_utils/utils.js';
+import { gemEligibleForSocket } from '/tbc/core/proto_utils/utils.js';
+import { gemMatchesSocket } from '/tbc/core/proto_utils/utils.js';
 
 import { Listener } from './typed_event.js';
 import { TypedEvent } from './typed_event.js';
+import { sum } from './utils.js';
 import { wait } from './utils.js';
 import { WorkerPool } from './worker_pool.js';
 
@@ -49,6 +50,7 @@ export interface SimConfig<SpecType extends Spec> {
   epReferenceStat: Stat;
   defaults: {
 		phase: number,
+		gear: EquipmentSpec,
 		epWeights: Stats,
     encounter: Encounter,
     buffs: Buffs,
@@ -107,6 +109,7 @@ export class Sim<SpecType extends Spec> extends WorkerPool {
 	private readonly _metaGemEffectEP: (gem: Gem, sim: Sim<SpecType>) => number;
 
   private _init = false;
+	private readonly _defaultGear: EquipmentSpec;
 
   constructor(config: SimConfig<SpecType>) {
 		super(3);
@@ -128,6 +131,7 @@ export class Sim<SpecType extends Spec> extends WorkerPool {
     this._talentsString = config.defaults.talents;
 		this._epWeights = config.defaults.epWeights;
     this._specOptions = config.defaults.specOptions;
+		this._defaultGear = config.defaults.gear;
 
     [
       this.buffsChangeEmitter,
@@ -426,12 +430,26 @@ export class Sim<SpecType extends Spec> extends WorkerPool {
 			ep += Math.max(...enchants.map(enchant => this.computeEnchantEP(enchant)));
 		}
 
-		item.gemSockets.forEach(socketColor => {
-			const gems = this.getGems(socketColor);
+		// Compare whether its better to match sockets + get socket bonus, or just use best gems.
+		const bestGemEPNotMatchingSockets = sum(item.gemSockets.map(socketColor => {
+			const gems = this.getGems(socketColor).filter(gem => !gem.unique && gem.phase <= this.getPhase());
 			if (gems.length > 0) {
-				ep += Math.max(...gems.map(gem => this.computeGemEP(gem)));
+				return Math.max(...gems.map(gem => this.computeGemEP(gem)));
+			} else {
+				return 0;
 			}
-		});
+		}));
+
+		const bestGemEPMatchingSockets = sum(item.gemSockets.map(socketColor => {
+			const gems = this.getGems(socketColor).filter(gem => !gem.unique && gem.phase <= this.getPhase() && gemMatchesSocket(gem, socketColor));
+			if (gems.length > 0) {
+				return Math.max(...gems.map(gem => this.computeGemEP(gem)));
+			} else {
+				return 0;
+			}
+		})) + new Stats(item.socketBonus).computeEP(this._epWeights);
+
+		ep += Math.max(bestGemEPMatchingSockets, bestGemEPNotMatchingSockets);
 
 		return ep;
 	}

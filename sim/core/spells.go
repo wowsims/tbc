@@ -47,7 +47,7 @@ func init() {
 
 type Cast struct {
 	Spell  *Spell
-	Caster *Agent
+	Caster Agent
 	Tag    int32 // Allow any class to create an enum for what tags the cast needs.
 
 	// Pre-hit Mutatable State
@@ -61,7 +61,7 @@ type Cast struct {
 
 	// Actual spell to call to activate this spell.
 	//  currently named after arnold's "come on, do it now"
-	DoItNow func(sim *Simulation, agent Agent, cast *Cast)
+	DoItNow func(sim *Simulation, cast *Cast)
 
 	// Calculated Values, can be modified only in 'OnSpellHit'
 	DidHit  bool
@@ -73,8 +73,9 @@ type Cast struct {
 
 // NewCast constructs a Cast from the current simulation and selected spell.
 //  OnCast mechanics are applied at this time (anything that modifies the cast before its cast, usually just mana cost stuff)
-func NewCast(sim *Simulation, sp *Spell) *Cast {
+func NewCast(sim *Simulation, agent Agent, sp *Spell) *Cast {
 	cast := sim.cache.NewCast()
+	cast.Caster = agent
 	cast.Spell = sp
 	cast.ManaCost = float64(sp.Mana)
 	cast.CritDamageMultipier = 1.5
@@ -85,8 +86,8 @@ func NewCast(sim *Simulation, sp *Spell) *Cast {
 
 // Cast will actually cast and treat all casts as having no 'flight time'.
 // This will activate any auras around casting, calculate hit/crit and add to sim metrics.
-func DirectCast(sim *Simulation, agent Agent, cast *Cast) {
-	character := agent.GetCharacter()
+func DirectCast(sim *Simulation, cast *Cast) {
+	character := cast.Caster.GetCharacter()
 
 	if sim.Log != nil {
 		sim.Log("(%d) Current Mana %0.0f, Cast Cost: %0.0f\n", character.ID, character.Stats[stats.Mana], cast.ManaCost)
@@ -98,12 +99,12 @@ func DirectCast(sim *Simulation, agent Agent, cast *Cast) {
 
 	for _, id := range character.ActiveAuraIDs {
 		if character.Auras[id].OnCastComplete != nil {
-			character.Auras[id].OnCastComplete(sim, agent, cast)
+			character.Auras[id].OnCastComplete(sim, cast)
 		}
 	}
 	for _, id := range sim.ActiveAuraIDs {
 		if sim.Auras[id].OnCastComplete != nil {
-			sim.Auras[id].OnCastComplete(sim, agent, cast)
+			sim.Auras[id].OnCastComplete(sim, cast)
 		}
 	}
 
@@ -168,20 +169,20 @@ func DirectCast(sim *Simulation, agent Agent, cast *Cast) {
 		cast.DidDmg = dmg
 		// Apply any effects specific to this cast.
 		if cast.Effect != nil {
-			cast.Effect(sim, agent, cast)
+			cast.Effect(sim, cast)
 		}
 		// Apply any on spell hit effects.
 		for _, id := range character.ActiveAuraIDs {
 			if character.Auras[id].OnSpellHit != nil {
-				character.Auras[id].OnSpellHit(sim, agent, cast)
+				character.Auras[id].OnSpellHit(sim, cast)
 			}
 		}
 		for _, id := range sim.ActiveAuraIDs {
 			if sim.Auras[id].OnSpellHit != nil {
-				sim.Auras[id].OnSpellHit(sim, agent, cast)
+				sim.Auras[id].OnSpellHit(sim, cast)
 			}
 		}
-		agent.OnSpellHit(sim, cast)
+		cast.Caster.OnSpellHit(sim, cast)
 		// if sim.Log != nil {
 		// 	sim.Log("FINAL DMG: %0.1f\n", cast.DidDmg)
 		// }
@@ -194,12 +195,12 @@ func DirectCast(sim *Simulation, agent Agent, cast *Cast) {
 		cast.DidHit = false
 		for _, id := range character.ActiveAuraIDs {
 			if character.Auras[id].OnSpellMiss != nil {
-				character.Auras[id].OnSpellMiss(sim, agent, cast)
+				character.Auras[id].OnSpellMiss(sim, cast)
 			}
 		}
 		for _, id := range sim.ActiveAuraIDs {
 			if sim.Auras[id].OnSpellMiss != nil {
-				sim.Auras[id].OnSpellMiss(sim, agent, cast)
+				sim.Auras[id].OnSpellMiss(sim, cast)
 			}
 		}
 	}

@@ -1,7 +1,7 @@
-import { Stat } from '../api/common.js';
-import { statNames } from '../api/names.js';
-import { Stats } from '../api/stats.js';
-import { Sim } from '../sim.js';
+import { Stat } from '/tbc/core/proto/common.js';
+import { statNames } from '/tbc/core/proto_utils/names.js';
+import { Stats } from '/tbc/core/proto_utils/stats.js';
+import { Sim } from '/tbc/core/sim.js';
 
 import { Component } from './component.js';
 import { NumberPicker } from './number_picker.js';

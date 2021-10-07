@@ -1,5 +1,5 @@
-import { IndividualSimRequest, IndividualSimResult } from '../api/api.js';
-import { urlPathPrefix } from '../resources.js';
+import { IndividualSimRequest, IndividualSimResult } from '/tbc/core/proto/api.js';
+import { repoName } from '/tbc/core/resources.js';
 
 import { Component } from './component.js';
 
@@ -20,7 +20,7 @@ export class DetailedResults extends Component {
 
 		const computedStyles = window.getComputedStyle(document.body);
 
-		const url = new URL(`${window.location.protocol}//${window.location.host}${urlPathPrefix}/detailed_results/index.html`);
+		const url = new URL(`${window.location.protocol}//${window.location.host}/${repoName}/detailed_results/index.html`);
 		url.searchParams.append('mainBgColor', computedStyles.getPropertyValue('--main-bg-color').trim());
 		url.searchParams.append('mainTextColor', computedStyles.getPropertyValue('--main-text-color').trim());
 

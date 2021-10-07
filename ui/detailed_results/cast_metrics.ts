@@ -1,5 +1,5 @@
-import { IndividualSimRequest, IndividualSimResult } from '../core/api/api.js';
-import { sum } from '../core/utils.js';
+import { IndividualSimRequest, IndividualSimResult } from '/tbc/core/proto/api.js';
+import { sum } from '/tbc/core/utils.js';
 
 import { ResultComponent, ResultComponentConfig } from './result_component.js';
 

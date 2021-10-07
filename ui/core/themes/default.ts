@@ -1,40 +1,47 @@
-import { Sim } from '../sim.js';
-import { Gear } from '../api/gear.js';
-import { raceNames } from '../api/names.js';
-import { Buffs } from '../api/common.js';
-import { Class } from '../api/common.js';
-import { Consumes } from '../api/common.js';
-import { Encounter } from '../api/common.js';
-import { EquipmentSpec } from '../api/common.js';
-import { Race } from '../api/common.js';
-import { Spec } from '../api/common.js';
-import { Stat } from '../api/common.js';
-import { Stats } from '../api/stats.js';
-import { SpecAgent } from '../api/utils.js';
-import { specToEligibleRaces } from '../api/utils.js';
-import { Actions } from '../components/actions.js';
-import { CharacterStats } from '../components/character_stats.js';
-import { CustomStatsPicker } from '../components/custom_stats_picker.js';
-import { DetailedResults } from '../components/detailed_results.js';
-import { EnumPicker } from '../components/enum_picker.js';
-import { EnumPickerConfig } from '../components/enum_picker.js';
-import { GearPicker } from '../components/gear_picker.js';
-import { IconInput } from '../components/icon_picker.js';
-import { IconPicker } from '../components/icon_picker.js';
-import { LogRunner } from '../components/log_runner.js';
-import { NumberPicker } from '../components/number_picker.js';
-import { NumberPickerConfig } from '../components/number_picker.js';
-import { Results } from '../components/results.js';
-import { SavedDataManager } from '../components/saved_data_manager.js';
-import { newTalentsPicker } from '../talents/factory.js';
+import { Sim } from '/tbc/core/sim.js';
+import { Actions } from '/tbc/core/components/actions.js';
+import { CharacterStats } from '/tbc/core/components/character_stats.js';
+import { CustomStatsPicker } from '/tbc/core/components/custom_stats_picker.js';
+import { DetailedResults } from '/tbc/core/components/detailed_results.js';
+import { EnumPicker } from '/tbc/core/components/enum_picker.js';
+import { EnumPickerConfig } from '/tbc/core/components/enum_picker.js';
+import { GearPicker } from '/tbc/core/components/gear_picker.js';
+import { IconInput } from '/tbc/core/components/icon_picker.js';
+import { IconPicker } from '/tbc/core/components/icon_picker.js';
+import { LogRunner } from '/tbc/core/components/log_runner.js';
+import { NumberPicker } from '/tbc/core/components/number_picker.js';
+import { NumberPickerConfig } from '/tbc/core/components/number_picker.js';
+import { Results } from '/tbc/core/components/results.js';
+import { SavedDataManager } from '/tbc/core/components/saved_data_manager.js';
+import { Buffs } from '/tbc/core/proto/common.js';
+import { Class } from '/tbc/core/proto/common.js';
+import { Consumes } from '/tbc/core/proto/common.js';
+import { Encounter } from '/tbc/core/proto/common.js';
+import { EquipmentSpec } from '/tbc/core/proto/common.js';
+import { Race } from '/tbc/core/proto/common.js';
+import { Spec } from '/tbc/core/proto/common.js';
+import { Stat } from '/tbc/core/proto/common.js';
+import { Gear } from '/tbc/core/proto_utils/gear.js';
+import { raceNames } from '/tbc/core/proto_utils/names.js';
+import { Stats } from '/tbc/core/proto_utils/stats.js';
+import { SpecAgent } from '/tbc/core/proto_utils/utils.js';
+import { specToEligibleRaces } from '/tbc/core/proto_utils/utils.js';
+import { newTalentsPicker } from '/tbc/core/talents/factory.js';
 
-import { SimUI, SimUIConfig } from '../sim_ui.js';
+import { SimUI, SimUIConfig } from '/tbc/core/sim_ui.js';
+
+declare var tippy: any;
+
 
 export interface DefaultThemeConfig<SpecType extends Spec> extends SimUIConfig<SpecType> {
   displayStats: Array<Stat>;
-  iconSections: Record<string, Array<IconInput>>;
-  otherSections: Record<string, Array<
-    {
+  iconSections: Record<string, {
+		tooltip?: string,
+		icons: Array<IconInput>,
+	}>;
+  otherSections: Record<string, {
+		tooltip?: string,
+		inputs: Array<{
       type: 'number',
       cssClass: string,
       config: NumberPickerConfig,
@@ -43,8 +50,8 @@ export interface DefaultThemeConfig<SpecType extends Spec> extends SimUIConfig<S
       type: 'enum',
       cssClass: string,
       config: EnumPickerConfig,
-    }
-  >>;
+    }>,
+  }>;
   showTargetArmor: boolean;
   showNumTargets: boolean;
 	freezeTalents: boolean;
@@ -86,6 +93,13 @@ export class DefaultTheme<SpecType extends Spec> extends SimUI<SpecType> {
     this._config = config;
     this.parentElem.innerHTML = layoutHTML;
 
+		const titleElem = this.parentElem.getElementsByClassName('default-title')[0];
+		if (config.releaseStatus == 'Alpha') {
+			titleElem.textContent += ' Alpha';
+		} else if (config.releaseStatus == 'Beta') {
+			titleElem.textContent += ' Beta';
+		}
+
     const results = new Results(this.parentElem.getElementsByClassName('default-results')[0] as HTMLElement);
     const detailedResults = new DetailedResults(this.parentElem.getElementsByClassName('detailed-results')[0] as HTMLElement);
     const actions = new Actions(this.parentElem.getElementsByClassName('default-actions')[0] as HTMLElement, this.sim, config.epStats, config.epReferenceStat, results, detailedResults);
@@ -104,13 +118,20 @@ export class DefaultTheme<SpecType extends Spec> extends SimUI<SpecType> {
     const settingsTab = document.getElementsByClassName('settings-inputs')[0] as HTMLElement;
     Object.keys(config.iconSections).forEach(sectionName => {
       const sectionConfig = config.iconSections[sectionName];
+			const sectionCssPrefix = sectionName.replace(/\s+/g, '');
 
       const sectionElem = document.createElement('section');
-      sectionElem.classList.add('settings-section', sectionName + '-section');
+      sectionElem.classList.add('settings-section', sectionCssPrefix + '-section');
       sectionElem.innerHTML = `<label>${sectionName}</label>`;
+			if (sectionConfig.tooltip) {
+				tippy(sectionElem, {
+					'content': sectionConfig.tooltip,
+					'allowHTML': true,
+				});
+			}
       settingsTab.appendChild(sectionElem);
 
-      const iconPicker = new IconPicker(sectionElem, sectionName + '-icon-picker', this.sim, sectionConfig, this);
+      const iconPicker = new IconPicker(sectionElem, sectionCssPrefix + '-icon-picker', this.sim, sectionConfig.icons, this);
     });
 
     Object.keys(config.otherSections).forEach(sectionName => {
@@ -119,9 +140,15 @@ export class DefaultTheme<SpecType extends Spec> extends SimUI<SpecType> {
       const sectionElem = document.createElement('section');
       sectionElem.classList.add('settings-section', sectionName + '-section');
       sectionElem.innerHTML = `<label>${sectionName}</label>`;
+			if (sectionConfig.tooltip) {
+				tippy(sectionElem, {
+					'content': sectionConfig.tooltip,
+					'allowHTML': true,
+				});
+			}
       settingsTab.appendChild(sectionElem);
 
-      sectionConfig.forEach(inputConfig => {
+      sectionConfig.inputs.forEach(inputConfig => {
         if (inputConfig.type == 'number') {
           const picker = new NumberPicker(sectionElem, this.sim, inputConfig.config);
         } else if (inputConfig.type == 'enum') {
@@ -316,6 +343,7 @@ const layoutHTML = `
       <li><a data-toggle="tab" href="#detailed-results-tab">Detailed Results</a></li>
       <li><a data-toggle="tab" href="#log-tab">Log</a></li>
       <li class="default-top-bar">
+				<div class="known-issues">Known Issues</div>
 				<span class="share-link fa fa-link"></span
 			</li>
     </ul>

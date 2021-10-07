@@ -3,26 +3,26 @@ package core
 import (
 	"time"
 
-	"github.com/wowsims/tbc/sim/api"
+	"github.com/wowsims/tbc/sim/core/proto"
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 type Buffs struct {
 	// Totems
-	ManaSpringTotem api.TristateEffect
+	ManaSpringTotem proto.TristateEffect
 	ManaTideTotem   bool
 	TotemOfWrath    int32
-	WrathOfAirTotem api.TristateEffect
+	WrathOfAirTotem proto.TristateEffect
 
 	// Raid buffs
 	ArcaneBrilliance bool
-	GiftOfTheWild    api.TristateEffect
+	GiftOfTheWild    proto.TristateEffect
 	BlessingOfKings  bool
-	BlessingOfWisdom api.TristateEffect
-	DivineSpirit     api.TristateEffect
+	BlessingOfWisdom proto.TristateEffect
+	DivineSpirit     proto.TristateEffect
 
 	// Party class buffs
-	MoonkinAura         api.TristateEffect
+	MoonkinAura         proto.TristateEffect
 	ShadowPriestDPS     uint16 // adds Mp5 ~ 25% (dps*5%*5sec = 25%)
 	Bloodlust           int
 
@@ -40,13 +40,41 @@ type Buffs struct {
 	Misery                    bool
 }
 
-//func TristateMax(a api.TristateEffect, b api.TristateEffect) api.TristateEffect {
+func ProtoToBuffs(inBuff *proto.Buffs) Buffs {
+	return Buffs{
+		ArcaneBrilliance:          inBuff.ArcaneBrilliance,
+		GiftOfTheWild:             inBuff.GiftOfTheWild,
+		BlessingOfKings:           inBuff.BlessingOfKings,
+		BlessingOfWisdom:          inBuff.BlessingOfWisdom,
+		DivineSpirit:              inBuff.DivineSpirit,
+		MoonkinAura:               inBuff.MoonkinAura,
+		ShadowPriestDPS:           uint16(inBuff.ShadowPriestDps),
+
+		JudgementOfWisdom:         inBuff.JudgementOfWisdom,
+		ImprovedSealOfTheCrusader: inBuff.ImprovedSealOfTheCrusader,
+		Misery:                    inBuff.Misery,
+
+		ManaSpringTotem:           inBuff.ManaSpringTotem,
+		ManaTideTotem:             inBuff.ManaTideTotem,
+		TotemOfWrath:              inBuff.TotemOfWrath,
+		WrathOfAirTotem:           inBuff.WrathOfAirTotem,
+
+		AtieshMage:                inBuff.AtieshMage,
+		AtieshWarlock:             inBuff.AtieshWarlock,
+		BraidedEterniumChain:      inBuff.BraidedEterniumChain,
+		ChainOfTheTwilightOwl:     inBuff.ChainOfTheTwilightOwl,
+		EyeOfTheNight:             inBuff.EyeOfTheNight,
+		JadePendantOfBlasting:     inBuff.JadePendantOfBlasting,
+	}
+}
+
+//func TristateMax(a proto.TristateEffect, b proto.TristateEffect) api.TristateEffect {
 //}
 
-func GetTristateValueFloat(effect api.TristateEffect, regularValue float64, impValue float64) float64 {
-	if effect == api.TristateEffect_TristateEffectRegular {
+func GetTristateValueFloat(effect proto.TristateEffect, regularValue float64, impValue float64) float64 {
+	if effect == proto.TristateEffect_TristateEffectRegular {
 		return regularValue
-	} else if effect == api.TristateEffect_TristateEffectImproved {
+	} else if effect == proto.TristateEffect_TristateEffectImproved {
 		return impValue
 	} else {
 		return 0
@@ -155,7 +183,7 @@ func MiseryAura() Aura {
 	return Aura{
 		ID:      MagicIDMisery,
 		Expires: NeverExpires,
-		OnSpellHit: func(sim *Simulation, agent Agent, cast *Cast) {
+		OnSpellHit: func(sim *Simulation, cast *Cast) {
 			cast.DidDmg *= 1.05
 		},
 	}
@@ -166,16 +194,16 @@ func AuraJudgementOfWisdom() Aura {
 	return Aura{
 		ID:      MagicIDJoW,
 		Expires: NeverExpires,
-		OnSpellHit: func(sim *Simulation, agent Agent, c *Cast) {
-			if c.Spell.ID == MagicIDTLCLB {
+		OnSpellHit: func(sim *Simulation, cast *Cast) {
+			if cast.Spell.ID == MagicIDTLCLB {
 				return // TLC cant proc JoW
 			}
 			if sim.Log != nil {
-				sim.Log("(%d) +Judgement Of Wisdom: 37 mana (74 @ 50%% proc)\n", agent.GetCharacter().ID)
+				sim.Log("(%d) +Judgement Of Wisdom: 37 mana (74 @ 50%% proc)\n", cast.Caster.GetCharacter().ID)
 			}
 			// Only apply to agents that have mana.
-			if agent.GetCharacter().InitialStats[stats.Mana] > 0 {
-				agent.GetCharacter().Stats[stats.Mana] += mana
+			if cast.Caster.GetCharacter().InitialStats[stats.Mana] > 0 {
+				cast.Caster.GetCharacter().Stats[stats.Mana] += mana
 			}
 		},
 	}
@@ -228,8 +256,8 @@ func TryActivateRacial(sim *Simulation, agent Agent) {
 		agent.GetCharacter().AddAura(sim, Aura{
 			ID:      MagicIDTrollBerserking,
 			Expires: sim.CurrentTime + dur,
-			OnCast: func(sim *Simulation, agent Agent, c *Cast) {
-				c.CastTime = (c.CastTime * 10) / hasteBonus
+			OnCast: func(sim *Simulation, cast *Cast) {
+				cast.CastTime = (cast.CastTime * 10) / hasteBonus
 			},
 		})
 	}

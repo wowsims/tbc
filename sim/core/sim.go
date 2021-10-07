@@ -7,8 +7,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/wowsims/tbc/items"
-	"github.com/wowsims/tbc/sim/api"
+	"github.com/wowsims/tbc/sim/core/items"
+	"github.com/wowsims/tbc/sim/core/proto"
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
@@ -40,7 +40,7 @@ type IndividualParams struct {
 	Buffs    Buffs
 	Options  Options
 
-	PlayerOptions *api.PlayerOptions
+	PlayerOptions *proto.PlayerOptions
 
 	CustomStats stats.Stats
 }
@@ -125,7 +125,7 @@ func NewIndividualSim(params IndividualParams) *Simulation {
 				player.GetCharacter().InitialStats[stats.Intellect] *= 1.1
 				player.GetCharacter().InitialStats[stats.Spirit] *= 1.1
 			}
-			if raid.Buffs.DivineSpirit == api.TristateEffect_TristateEffectImproved {
+			if raid.Buffs.DivineSpirit == proto.TristateEffect_TristateEffectImproved {
 				player.GetCharacter().InitialStats[stats.SpellPower] += player.GetCharacter().InitialStats[stats.Spirit] * 0.1
 			}
 			// Add SpellCrit from Int and Mana from Int
@@ -208,12 +208,12 @@ func (sim *Simulation) Reset() {
 	for _, party := range sim.Raid.Parties {
 		for _, agent := range party.Players {
 			agent.BuffUp(sim) // for now do this first to match order of adding auras as original sim.
-			agent.GetCharacter().BuffUp(sim)
+			agent.GetCharacter().BuffUp(sim, agent)
 		}
 	}
 
 	for _, initialAura := range sim.InitialAuras {
-		sim.AddAura(sim, nil, initialAura(sim))
+		sim.AddAura(sim, initialAura(sim))
 	}
 }
 
@@ -232,7 +232,7 @@ func (sim *Simulation) playerConsumes(agent Agent) {
 	TryActivateSuperManaPotion(sim, agent)
 
 	// Pop activatable items if we can.
-	agent.GetCharacter().TryActivateEquipment(sim)
+	agent.GetCharacter().TryActivateEquipment(sim, agent)
 }
 
 // Run runs the simulation for the configured number of iterations, and
@@ -307,7 +307,7 @@ simloop:
 		}
 
 		if action.Cast != nil {
-			action.Cast.DoItNow(sim, agent, action.Cast)
+			action.Cast.DoItNow(sim, action.Cast)
 		} else if action.Wait == 0 {
 			// FUTURE: Swing timers could be handled in this if block.
 			panic("Agent returned nil action")
@@ -375,13 +375,7 @@ func (sim *Simulation) Advance(elapsedTime time.Duration) {
 			agent.GetCharacter().Advance(sim, elapsedTime, newTime)
 		}
 	}
-	// Go in reverse order so we can safely delete while looping
-	for i := len(sim.ActiveAuraIDs) - 1; i >= 0; i-- {
-		id := sim.ActiveAuraIDs[i]
-		if sim.Auras[id].Expires != 0 && sim.Auras[id].Expires <= newTime {
-			sim.RemoveAura(sim, nil, id) // auras on the sim have no player attached.
-		}
-	}
+	sim.AuraTracker.Advance(sim, elapsedTime)
 	sim.CurrentTime = newTime
 }
 

@@ -1,4 +1,4 @@
-import { Sim } from '../sim.js';
+import { Sim } from '/tbc/core/sim.js';
 
 export const ShadowPriestDPS = {
   type: 'number' as const,

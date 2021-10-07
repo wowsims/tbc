@@ -4,7 +4,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/wowsims/tbc/items"
+	"github.com/wowsims/tbc/sim/core/items"
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
@@ -25,7 +25,6 @@ type Character struct {
 
 	// Up references to the Party and Agent for this Character
 	Party *Party
-	Agent Agent
 
 	*AuraTracker
 
@@ -84,23 +83,23 @@ func (character *Character) Reset() {
 	character.AuraTracker.ResetAuras()
 }
 
-func (character *Character) BuffUp(sim *Simulation) {
+func (character *Character) BuffUp(sim *Simulation, agent Agent) {
 	// Activate all permanent item effects.
 	for _, actItem := range character.ActiveEquip {
 		if actItem.ActivateCD != NeverExpires {
 			continue
 		}
-		character.AddAura(sim, actItem.Activate(sim, character.Agent))
+		character.AddAura(sim, actItem.Activate(sim, agent))
 	}
 
-	character.ActivateSets(sim)
-	character.TryActivateEquipment(sim)
+	character.ActivateSets(sim, agent)
+	character.TryActivateEquipment(sim, agent)
 }
 
 // AddAura on player is a simple wrapper around AuraTracker so the
 // consumer doesn't need to pass player back into itself.
 func (character *Character) AddAura(sim *Simulation, aura Aura) {
-	character.AuraTracker.AddAura(sim, &character.Agent, aura)
+	character.AuraTracker.AddAura(sim, aura)
 }
 
 // Returns rate of mana regen, as mana / second
@@ -121,11 +120,11 @@ func (character *Character) Advance(sim *Simulation, elapsedTime time.Duration, 
 	}
 
 	// Advance CDs and Auras
-	character.AuraTracker.Advance(sim, &character.Agent, newTime)
+	character.AuraTracker.Advance(sim, newTime)
 }
 
 // Pops any on-use trinkets / gear
-func (character *Character) TryActivateEquipment(sim *Simulation) {
+func (character *Character) TryActivateEquipment(sim *Simulation, agent Agent) {
 	const sharedCD = time.Second * 20
 
 	for _, item := range character.ActiveEquip {
@@ -135,7 +134,7 @@ func (character *Character) TryActivateEquipment(sim *Simulation) {
 		if character.IsOnCD(item.CoolID, sim.CurrentTime) || (item.SharedID != 0 && character.IsOnCD(item.SharedID, sim.CurrentTime)) {
 			continue
 		}
-		character.AddAura(sim, item.Activate(sim, character.Agent))
+		character.AddAura(sim, item.Activate(sim, agent))
 		character.SetCD(item.CoolID, item.ActivateCD+sim.CurrentTime) // put item on CD
 		if item.SharedID != 0 {                               // put all shared CDs on
 			character.SetCD(item.SharedID, sharedCD+sim.CurrentTime)
@@ -144,7 +143,7 @@ func (character *Character) TryActivateEquipment(sim *Simulation) {
 }
 
 // Activates set bonuses, returning the list of active bonuses.
-func (character *Character) ActivateSets(sim *Simulation) []string {
+func (character *Character) ActivateSets(sim *Simulation, agent Agent) []string {
 	active := []string{}
 	// Activate Set Bonuses
 	setItemCount := map[string]int{}
@@ -155,7 +154,7 @@ func (character *Character) ActivateSets(sim *Simulation) []string {
 			setItemCount[set.Name]++
 			if bonus, ok := set.Bonuses[setItemCount[set.Name]]; ok {
 				active = append(active, set.Name+" ("+strconv.Itoa(setItemCount[set.Name])+"pc)")
-				character.AddAura(sim, bonus(sim, character.Agent))
+				character.AddAura(sim, bonus(sim, agent))
 			}
 		}
 	}
