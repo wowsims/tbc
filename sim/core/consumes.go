@@ -121,7 +121,13 @@ func (c Consumes) Stats() stats.Stats {
 }
 
 func TryActivateDrums(sim *Simulation, agent Agent) {
-	if !agent.GetCharacter().Consumes.DrumsOfBattle || agent.GetCharacter().IsOnCD(MagicIDDrums, sim.CurrentTime) {
+	if agent.GetCharacter().IsOnCD(MagicIDDrums, sim.CurrentTime) {
+		return
+	}
+
+	selfCast := agent.GetCharacter().Consumes.DrumsOfBattle
+	partyCast := agent.GetCharacter().Party.Buffs.DrumsOfBattle
+	if !selfCast && !partyCast {
 		return
 	}
 

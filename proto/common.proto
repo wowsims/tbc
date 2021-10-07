@@ -192,19 +192,23 @@ message Buffs {
     bool improved_seal_of_the_crusader = 10;
     bool misery = 11;
 
+		// Drums
+    bool drums_of_battle = 12;
+    bool drums_of_restoration = 13;
+
     // Item Buffs
-    int32 atiesh_mage = 12;
-    int32 atiesh_warlock = 13;
-    bool braided_eternium_chain = 14;
-    bool eye_of_the_night = 15;
-    bool chain_of_the_twilight_owl = 16;
-    bool jade_pendant_of_blasting = 17;
+    int32 atiesh_mage = 14;
+    int32 atiesh_warlock = 15;
+    bool braided_eternium_chain = 16;
+    bool eye_of_the_night = 17;
+    bool chain_of_the_twilight_owl = 18;
+    bool jade_pendant_of_blasting = 19;
 
     // Totems
-    TristateEffect mana_spring_totem = 18;
-    bool mana_tide_totem = 19;
-    int32 totem_of_wrath = 20;
-    TristateEffect wrath_of_air_totem = 21;
+    TristateEffect mana_spring_totem = 20;
+    bool mana_tide_totem = 21;
+    int32 totem_of_wrath = 22;
+    TristateEffect wrath_of_air_totem = 23;
 }
 
 message Consumes {

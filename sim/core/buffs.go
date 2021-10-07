@@ -8,12 +8,6 @@ import (
 )
 
 type Buffs struct {
-	// Totems
-	ManaSpringTotem proto.TristateEffect
-	ManaTideTotem   bool
-	TotemOfWrath    int32
-	WrathOfAirTotem proto.TristateEffect
-
 	// Raid buffs
 	ArcaneBrilliance bool
 	GiftOfTheWild    proto.TristateEffect
@@ -24,7 +18,22 @@ type Buffs struct {
 	// Party class buffs
 	MoonkinAura         proto.TristateEffect
 	ShadowPriestDPS     uint16 // adds Mp5 ~ 25% (dps*5%*5sec = 25%)
-	Bloodlust           int
+	Bloodlust           int32
+
+	// Totems
+	ManaSpringTotem proto.TristateEffect
+	ManaTideTotem   bool
+	TotemOfWrath    int32
+	WrathOfAirTotem proto.TristateEffect
+
+	// Target debuff
+	JudgementOfWisdom         bool
+	ImprovedSealOfTheCrusader bool
+	Misery                    bool
+
+	// Drums
+	DrumsOfBattle      bool
+	DrumsOfRestoration bool
 
 	// Party item buffs
 	AtieshMage            int32
@@ -33,16 +42,12 @@ type Buffs struct {
 	ChainOfTheTwilightOwl bool
 	EyeOfTheNight         bool
 	JadePendantOfBlasting bool
-
-	// Target debuff
-	JudgementOfWisdom         bool
-	ImprovedSealOfTheCrusader bool
-	Misery                    bool
 }
 
 func ProtoToBuffs(inBuff *proto.Buffs) Buffs {
 	return Buffs{
 		ArcaneBrilliance:          inBuff.ArcaneBrilliance,
+		Bloodlust:                 inBuff.Bloodlust,
 		GiftOfTheWild:             inBuff.GiftOfTheWild,
 		BlessingOfKings:           inBuff.BlessingOfKings,
 		BlessingOfWisdom:          inBuff.BlessingOfWisdom,
@@ -58,6 +63,9 @@ func ProtoToBuffs(inBuff *proto.Buffs) Buffs {
 		ManaTideTotem:             inBuff.ManaTideTotem,
 		TotemOfWrath:              inBuff.TotemOfWrath,
 		WrathOfAirTotem:           inBuff.WrathOfAirTotem,
+
+		DrumsOfBattle:             inBuff.DrumsOfBattle,
+		DrumsOfRestoration:        inBuff.DrumsOfRestoration,
 
 		AtieshMage:                inBuff.AtieshMage,
 		AtieshWarlock:             inBuff.AtieshWarlock,
