@@ -174,6 +174,13 @@ const (
 func (character *Character) AddRaidBuffs(buffs *Buffs) {
 }
 func (character *Character) AddPartyBuffs(buffs *Buffs) {
+	if character.Consumes.DrumsOfBattle {
+		buffs.DrumsOfBattle = true
+	}
+	if character.Consumes.DrumsOfRestoration {
+		buffs.DrumsOfRestoration = true
+	}
+
 	// TODO: Figure out how to sync these with general settings
 	//if character.Equip[items.ItemSlotMainHand].ID == AtieshMage {
 	//	buffs.AtieshMage += 1

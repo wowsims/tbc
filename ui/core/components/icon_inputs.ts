@@ -25,6 +25,8 @@ export const ManaTideTotem = makeBooleanBuffInput({spellId:16190}, 'manaTideTote
 export const MoonkinAura = makeTristateBuffInput({spellId:24907}, {itemId:32387}, 'moonkinAura');
 export const TotemOfWrath = makeMultistateBuffInput({spellId:30706}, 5, 'totemOfWrath');
 export const WrathOfAirTotem = makeTristateBuffInput({spellId:3738}, {spellId:37212}, 'wrathOfAirTotem');
+export const DrumsOfBattleBuff = makeBooleanBuffInput({spellId:35476}, 'drumsOfBattle', ['Drums']);
+export const DrumsOfRestorationBuff = makeBooleanBuffInput({spellId:35478}, 'drumsOfRestoration', ['Drums']);
 
 // Debuffs
 export const ImprovedSealOfTheCrusader = makeBooleanBuffInput({spellId:20337}, 'improvedSealOfTheCrusader');
@@ -37,8 +39,8 @@ export const BlackenedBasilisk = makeBooleanConsumeInput({itemId:27657}, 'blacke
 export const BrilliantWizardOil = makeBooleanConsumeInput({itemId:20749}, 'brilliantWizardOil', ['Weapon Imbue']);
 export const DarkRune = makeBooleanConsumeInput({itemId:12662}, 'darkRune', ['Rune']);
 export const DestructionPotion = makeBooleanConsumeInput({itemId:22839}, 'destructionPotion', ['Potion']);
-export const DrumsOfBattle = makeBooleanConsumeInput({spellId:35476}, 'drumsOfBattle', ['Drums']);
-export const DrumsOfRestoration = makeBooleanConsumeInput({spellId:35478}, 'drumsOfRestoration', ['Drums']);
+export const DrumsOfBattleConsume = makeBooleanConsumeInput({spellId:35476}, 'drumsOfBattle', ['Drums']);
+export const DrumsOfRestorationConsume = makeBooleanConsumeInput({spellId:35478}, 'drumsOfRestoration', ['Drums']);
 export const ElixirOfDraenicWisdom = makeBooleanConsumeInput({itemId:32067}, 'elixirOfDraenicWisdom', ['Guardian Elixir']);
 export const ElixirOfMajorFirePower = makeBooleanConsumeInput({itemId:22833}, 'elixirOfMajorFirePower', ['Battle Elixir']);
 export const ElixirOfMajorFrostPower = makeBooleanConsumeInput({itemId:22827}, 'elixirOfMajorFrostPower', ['Battle Elixir']);
@@ -52,10 +54,11 @@ export const SkullfishSoup = makeBooleanConsumeInput({itemId:33825}, 'skullfishS
 export const SuperManaPotion = makeBooleanConsumeInput({itemId:22832}, 'superManaPotion', ['Potion']);
 export const SuperiorWizardOil = makeBooleanConsumeInput({itemId:22522}, 'superiorWizardOil', ['Weapon Imbue']);
 
-function makeBooleanBuffInput(id: ItemOrSpellId, buffsFieldName: keyof Buffs): IconInput {
+function makeBooleanBuffInput(id: ItemOrSpellId, buffsFieldName: keyof Buffs, exclusivityTags?: Array<ExclusivityTag>): IconInput {
   return {
     id: id,
     states: 2,
+    exclusivityTags: exclusivityTags,
     changedEvent: (sim: Sim<any>) => sim.buffsChangeEmitter,
     getValue: (sim: Sim<any>) => sim.getBuffs()[buffsFieldName],
     setBooleanValue: (sim: Sim<any>, newValue: boolean) => {
