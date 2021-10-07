@@ -38,12 +38,7 @@ export declare const specTypeFunctions: Partial<Record<Spec, SpecTypeFunctions<a
 export declare const specToClass: Record<Spec, Class>;
 export declare const specToEligibleRaces: Record<Spec, Array<Race>>;
 export declare function getEligibleItemSlots(item: Item): Array<ItemSlot>;
-/**
- * Returns all item slots to which the enchant might be applied.
- *
- * Note that this alone is not enough; some items have further restrictions,
- * e.g. some weapon enchants may only be applied to 2H weapons.
- */
+export declare function validWeaponCombo(mainHand: Item | null | undefined, offHand: Item | null | undefined): boolean;
 export declare function getEligibleEnchantSlots(enchant: Enchant): Array<ItemSlot>;
 export declare function enchantAppliesToItem(enchant: Enchant, item: Item): boolean;
 export declare function gemMatchesSocket(gem: Gem, socketColor: GemColor): boolean;

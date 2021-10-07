@@ -3,6 +3,7 @@ import { ItemSpec } from '/tbc/core/proto/common.js';
 import { EquipmentSpec } from '/tbc/core/proto/common.js';
 import { equalsOrBothNull } from '/tbc/core/utils.js';
 import { getEnumValues } from '/tbc/core/utils.js';
+import { validWeaponCombo } from './utils.js';
 /**
  * Represents a full gear set, including items/enchants/gems for every slot.
  *
@@ -29,6 +30,14 @@ export class Gear {
                 newInternalGear[Number(slot)] = this.getEquippedItem(Number(slot));
             }
         });
+        if (!validWeaponCombo(newInternalGear[ItemSlot.ItemSlotMainHand]?.item, newInternalGear[ItemSlot.ItemSlotOffHand]?.item)) {
+            if (newSlot == ItemSlot.ItemSlotMainHand) {
+                newInternalGear[ItemSlot.ItemSlotOffHand] = null;
+            }
+            else {
+                newInternalGear[ItemSlot.ItemSlotMainHand] = null;
+            }
+        }
         return new Gear(newInternalGear);
     }
     getEquippedItem(slot) {
