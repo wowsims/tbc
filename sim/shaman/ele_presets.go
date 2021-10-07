@@ -1,9 +1,9 @@
 package shaman
 
 import (
+	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/items"
 	"github.com/wowsims/tbc/sim/core/proto"
-	"github.com/wowsims/tbc/sim/core"
 )
 
 // Use same seed to get same result on every run.
@@ -42,13 +42,37 @@ var StandardTalents = proto.ShamanTalents{
 	Convection:         5,
 }
 
+var eleShamOptionsNoBuffs = &proto.ElementalShaman_Options{
+	WaterShield: true,
+	// Bloodlust:       true,
+	// ManaSpringTotem: true,
+	// TotemOfWrath:    true,
+	// WrathOfAirTotem: true,
+}
+var PlayerOptionsAdaptiveNoBuffs = proto.PlayerOptions{
+	Spec: &proto.PlayerOptions_ElementalShaman{
+		ElementalShaman: &proto.ElementalShaman{
+			Talents: &StandardTalents,
+			Options: eleShamOptionsNoBuffs,
+			Agent: &proto.ElementalShaman_Agent{
+				Type: proto.ElementalShaman_Agent_Adaptive,
+			},
+		},
+	},
+}
+
+var eleShamOptions = &proto.ElementalShaman_Options{
+	WaterShield:     true,
+	Bloodlust:       true,
+	ManaSpringTotem: true,
+	TotemOfWrath:    true,
+	WrathOfAirTotem: true,
+}
 var PlayerOptionsAdaptive = proto.PlayerOptions{
 	Spec: &proto.PlayerOptions_ElementalShaman{
 		ElementalShaman: &proto.ElementalShaman{
 			Talents: &StandardTalents,
-			Options: &proto.ElementalShaman_Options{
-				WaterShield: true,
-			},
+			Options: eleShamOptions,
 			Agent: &proto.ElementalShaman_Agent{
 				Type: proto.ElementalShaman_Agent_Adaptive,
 			},
@@ -60,9 +84,7 @@ var PlayerOptionsLBOnly = proto.PlayerOptions{
 	Spec: &proto.PlayerOptions_ElementalShaman{
 		ElementalShaman: &proto.ElementalShaman{
 			Talents: &StandardTalents,
-			Options: &proto.ElementalShaman_Options{
-				WaterShield: true,
-			},
+			Options: eleShamOptions,
 			Agent: &proto.ElementalShaman_Agent{
 				Type: proto.ElementalShaman_Agent_FixedLBCL,
 			},
@@ -74,9 +96,7 @@ var PlayerOptionsCLOnClearcast = proto.PlayerOptions{
 	Spec: &proto.PlayerOptions_ElementalShaman{
 		ElementalShaman: &proto.ElementalShaman{
 			Talents: &StandardTalents,
-			Options: &proto.ElementalShaman_Options{
-				WaterShield: true,
-			},
+			Options: eleShamOptions,
 			Agent: &proto.ElementalShaman_Agent{
 				Type: proto.ElementalShaman_Agent_CLOnClearcast,
 			},
@@ -92,12 +112,6 @@ var FullBuffs = core.Buffs{
 	JudgementOfWisdom: true,
 	MoonkinAura:       proto.TristateEffect_TristateEffectRegular,
 	ShadowPriestDPS:   500,
-	Bloodlust:         1,
-	// Misery:                   true,
-
-	ManaSpringTotem: proto.TristateEffect_TristateEffectRegular,
-	TotemOfWrath:    1,
-	WrathOfAirTotem: proto.TristateEffect_TristateEffectRegular,
 }
 
 var FullConsumes = core.Consumes{

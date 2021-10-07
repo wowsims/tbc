@@ -28,13 +28,9 @@ var spells = []core.Spell{
 var Spells = map[int32]*core.Spell{}
 
 func init() {
-	for _, sp := range spells {
-		// Turns out to increase efficiency go 'range' will actually only allocate a single struct and mutate.
-		// If we want to create a pointer we need to clone the struct.
-		sp2 := sp
-		sp2.DmgDiff = sp2.MaxDmg - sp2.MinDmg
-		spp := &sp2
+	for idx, sp := range spells {
+		spells[idx].DmgDiff = sp.MaxDmg - sp.MinDmg
 		// safe because we know no conflicting IDs in shaman package.
-		Spells[sp.ActionID.SpellID] = spp
+		Spells[sp.ActionID.SpellID] = &spells[idx]
 	}
 }

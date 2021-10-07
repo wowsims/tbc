@@ -68,10 +68,10 @@ func AddItemSet(set ItemSet) {
 	// TODO: validate the set doesnt exist already?
 
 	setIdx := len(sets)
+	sets = append(sets, set)
 	for itemID := range set.Items {
 		itemSetLookup[itemID] = &sets[setIdx]
 	}
-	sets = append(sets, set)
 }
 
 // cache for mapping item to set for fast resetting of sim.

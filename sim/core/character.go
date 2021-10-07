@@ -136,7 +136,7 @@ func (character *Character) TryActivateEquipment(sim *Simulation, agent Agent) {
 		}
 		character.AddAura(sim, item.Activate(sim, agent))
 		character.SetCD(item.CoolID, item.ActivateCD+sim.CurrentTime) // put item on CD
-		if item.SharedID != 0 {                               // put all shared CDs on
+		if item.SharedID != 0 {                                       // put all shared CDs on
 			character.SetCD(item.SharedID, sharedCD+sim.CurrentTime)
 		}
 	}

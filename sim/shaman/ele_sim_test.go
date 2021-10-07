@@ -28,7 +28,7 @@ func TestSimulatePreRaidNoBuffs(t *testing.T) {
 		Buffs: BasicBuffs,
 		Race:  core.RaceBonusTypeTroll10,
 
-		PlayerOptions: &PlayerOptionsAdaptive,
+		PlayerOptions: &PlayerOptionsAdaptiveNoBuffs,
 		Gear:          PreRaidGear,
 
 		ExpectedDpsShort: 867,
@@ -72,23 +72,23 @@ func TestSimulateP1(t *testing.T) {
 	})
 }
 
-func TestMultiTarget(t *testing.T) {
-	params := core.IndividualParams{
-		Equip:         P1Gear,
-		Race:          core.RaceBonusTypeOrc,
-		Consumes:      FullConsumes,
-		Buffs:         FullBuffs,
-		Options:       makeOptions(BasicOptions, LongEncounter),
-		PlayerOptions: &PlayerOptionsAdaptive,
-	}
-	params.Options.Encounter.NumTargets = 3
+// func TestMultiTarget(t *testing.T) {
+// 	params := core.IndividualParams{
+// 		Equip:         P1Gear,
+// 		Race:          core.RaceBonusTypeOrc,
+// 		Consumes:      FullConsumes,
+// 		Buffs:         FullBuffs,
+// 		Options:       makeOptions(BasicOptions, LongEncounter),
+// 		PlayerOptions: &PlayerOptionsAdaptive,
+// 	}
+// 	params.Options.Encounter.NumTargets = 3
 
-	doSimulateTest(
-		"multiTarget",
-		t,
-		params,
-		1533.5)
-}
+// 	doSimulateTest(
+// 		"multiTarget",
+// 		t,
+// 		params,
+// 		1533.5)
+// }
 
 func TestLBOnlyAgent(t *testing.T) {
 	simAllEncountersTest(AllEncountersTestOptions{
@@ -232,8 +232,8 @@ func simAllEncountersTest(testOpts AllEncountersTestOptions) {
 //   This is where we can add more sophisticated checks if we would like.
 //   Any changes to the damage output of an item set
 func doSimulateTest(label string, t *testing.T, params core.IndividualParams, expectedDps float64) {
-	params.Options.Debug = true
-	params.Options.Iterations = 1
+	// params.Options.Debug = true
+	// params.Options.Iterations = 1
 
 	sim := core.NewIndividualSim(params)
 	result := sim.Run()

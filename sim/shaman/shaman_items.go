@@ -14,10 +14,12 @@ func init() {
 	core.AddActiveItem(29389, core.ActiveItem{Activate: ActivateTotemOfPulsingEarth, ActivateCD: core.NeverExpires})
 	core.AddActiveItem(19344, core.ActiveItem{Activate: ActivateNAC, ActivateCD: time.Second * 300, CoolID: core.MagicIDNACTrink, SharedID: core.MagicIDAtkTrinket})
 
-	// core.AddItemSet()
+	for _, set := range shamanSets {
+		core.AddItemSet(set)
+	}
 }
 
-var shaman_sets = []core.ItemSet{
+var shamanSets = []core.ItemSet{
 	// Netherstrike is technically not shaman exclusive, but no other class that can wear it would want it.
 	{
 		Name:  "Netherstrike",
@@ -70,6 +72,9 @@ var shaman_sets = []core.ItemSet{
 				},
 			}
 			// Give the party stats, and the aura.
+			if sim.Log != nil {
+				sim.Log("Adding aura/sp from Cyclone!\n")
+			}
 			agent.GetCharacter().Party.AddStats(stats.Stats{stats.SpellPower: 20})
 			agent.GetCharacter().Party.AddAura(sim, a)
 

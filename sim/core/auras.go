@@ -63,7 +63,7 @@ func (at *AuraTracker) Advance(sim *Simulation, newTime time.Duration) {
 // it will be replaced with the newer aura.
 // Auras with duration of 0 will be logged as activating but never added to simulation auras.
 func (at *AuraTracker) AddAura(sim *Simulation, newAura Aura) {
-	if newAura.Expires < sim.CurrentTime {
+	if newAura.Expires <= sim.CurrentTime {
 		return // no need to waste time adding aura that doesn't last.
 	}
 
@@ -129,8 +129,6 @@ func AuraName(a int32) string {
 	switch a {
 	case MagicIDUnknown:
 		return "Unknown"
-	case MagicIDClBounce:
-		return "Chain Lightning Bounce"
 	case MagicIDLOTalent:
 		return "Lightning Overload Talent"
 	case MagicIDJoW:
@@ -139,8 +137,6 @@ func AuraName(a int32) string {
 		return "Elemental Focus"
 	case MagicIDEleMastery:
 		return "Elemental Mastery"
-	case MagicIDStormcaller:
-		return "Stormcaller"
 	case MagicIDBlessingSilverCrescent:
 		return "Blessing of the Silver Crescent"
 	case MagicIDDarkIronPipeweed:
@@ -303,12 +299,10 @@ const (
 	// MagicIDFlameShock
 
 	// Auras
-	MagicIDClBounce
 	MagicIDLOTalent
 	MagicIDJoW
 	MagicIDEleFocus
 	MagicIDEleMastery
-	MagicIDStormcaller
 	MagicIDBlessingSilverCrescent
 	MagicIDDarkIronPipeweed
 	MagicIDQuagsEye
@@ -579,6 +573,8 @@ func ActivateTLC(sim *Simulation, agent Agent) Aura {
 		ActionID: ActionID{ItemID: ItemIDTLC},
 		Coeff:    0.0, MinDmg: 694, MaxDmg: 807, Mana: 0, DamageType: stats.NatureSpellPower,
 	}
+	// TODO: make this not have to be done by hand...
+	tlcspell.DmgDiff = tlcspell.MaxDmg - tlcspell.MinDmg
 
 	charges := 0
 	icd := NewICD()
