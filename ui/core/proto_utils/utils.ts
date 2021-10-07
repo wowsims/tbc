@@ -149,12 +149,24 @@ export function getEligibleItemSlots(item: Item): Array<ItemSlot> {
   throw new Error('Could not find item slots for item: ' + Item.toJsonString(item));
 };
 
-/**
- * Returns all item slots to which the enchant might be applied.
- *
- * Note that this alone is not enough; some items have further restrictions,
- * e.g. some weapon enchants may only be applied to 2H weapons.
- */
+// Returns whether the given main-hand and off-hand items can be worn at the
+// same time.
+export function validWeaponCombo(mainHand: Item | null | undefined, offHand: Item | null | undefined): boolean {
+	if (mainHand == null || offHand == null) {
+		return true;
+	}
+
+	if (mainHand.handType == HandType.HandTypeTwoHand) {
+		return false;
+	}
+
+	return true;
+}
+
+// Returns all item slots to which the enchant might be applied.
+// 
+// Note that this alone is not enough; some items have further restrictions,
+// e.g. some weapon enchants may only be applied to 2H weapons.
 export function getEligibleEnchantSlots(enchant: Enchant): Array<ItemSlot> {
   if (itemTypeToSlotsMap[enchant.type]) {
     return itemTypeToSlotsMap[enchant.type]!;

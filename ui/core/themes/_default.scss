@@ -51,6 +51,10 @@ td, th {
   flex-grow: 1;
 }
 
+.default-actions, .default-stats {
+	margin: 0 !important;
+}
+
 .actions-button {
   background: transparent;
   color: var(--sidebar-text-color);

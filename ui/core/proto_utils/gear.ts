@@ -5,6 +5,7 @@ import { equalsOrBothNull } from '/tbc/core/utils.js';
 import { getEnumValues } from '/tbc/core/utils.js';
 
 import { EquippedItem } from './equipped_item.js';
+import { validWeaponCombo } from './utils.js';
 
 type InternalGear = Record<ItemSlot, EquippedItem | null>;
 
@@ -37,6 +38,15 @@ export class Gear {
         newInternalGear[Number(slot) as ItemSlot] = this.getEquippedItem(Number(slot));
       }
     });
+
+		if (!validWeaponCombo(newInternalGear[ItemSlot.ItemSlotMainHand]?.item, newInternalGear[ItemSlot.ItemSlotOffHand]?.item)) {
+			if (newSlot == ItemSlot.ItemSlotMainHand) {
+				newInternalGear[ItemSlot.ItemSlotOffHand] = null;
+			} else {
+				newInternalGear[ItemSlot.ItemSlotMainHand] = null;
+			}
+		}
+
     return new Gear(newInternalGear);
   }
 

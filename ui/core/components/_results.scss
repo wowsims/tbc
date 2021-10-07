@@ -8,6 +8,7 @@
 .results-root > div {
   @include vertical-horizontal-center;
   width: 100%;
+	text-align: center;
 }
 
 .results-pending {
@@ -51,27 +52,27 @@
 
 .results-ep-table tr td:nth-child(1) {
   text-align: right;
-  font-size: 18px;
+  font-size: 14px;
   font-weight: 700;
 }
 
 .results-ep-table tr td:nth-child(2), .results-ep-table tr td:nth-child(4) {
   text-align: left;
-  font-size: 20px;
+  font-size: 14px;
   font-weight: 700;
 }
 .results-ep-table tr td:nth-child(2):after {
   content: " DPS";
-  font-size: 18px;
+  font-size: 13px;
 }
 .results-ep-table tr td:nth-child(4):after {
   content: " EP";
-  font-size: 18px;
+  font-size: 13px;
 }
 
 .results-ep-table tr td:nth-child(3), .results-ep-table tr td:nth-child(5) {
   text-align: left;
-  font-size: 15px;
+  font-size: 12px;
   font-weight: 700;
 }
 .results-ep-table tr td:nth-child(3):before, .results-ep-table tr td:nth-child(5):before {
@@ -79,10 +80,9 @@
   padding: 1px;
 }
 
-// Uncomment one of these, to control whether DPS or EP values are displayed
-.results-ep-table tr td:nth-child(2), .results-ep-table tr td:nth-child(3) {
+.stats-type-ep .results-ep-table tr td:nth-child(2), .stats-type-ep .results-ep-table tr td:nth-child(3) {
   display: none;
 }
-//.results-ep-table tr td:nth-child(4), .results-ep-table tr td:nth-child(5) {
-//  display: none;
-//}
+.stats-type-dps .results-ep-table tr td:nth-child(4), .stats-type-dps .results-ep-table tr td:nth-child(5) {
+  display: none;
+}

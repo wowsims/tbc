@@ -84,7 +84,7 @@ func (item Item) ToProto() *proto.Item {
 		Name:             item.Name,
 		Stats:            item.Stats[:],
 		Phase:            int32(item.Phase),
-		Quality:          item.Quality, // Hack until we use generated items
+		Quality:          item.Quality,
 		GemSockets:       item.GemSockets,
 		SocketBonus:      item.SocketBonus[:],
 	}
@@ -94,6 +94,7 @@ type Enchant struct {
 	ID         int32 // ID of the enchant item.
 	EffectID   int32 // Used by UI to apply effect to tooltip
 	Name       string
+	Quality    proto.ItemQuality
 	Bonus      stats.Stats
 	ItemType   proto.ItemType // which slot does the enchant go on.
 	HandType   proto.HandType // If ItemType is weapon, check hand type / weapon type
@@ -107,7 +108,7 @@ func (enchant Enchant) ToProto() *proto.Enchant {
 		Name:     enchant.Name,
 		Type:     enchant.ItemType,
 		Stats:    enchant.Bonus[:],
-		Quality:  proto.ItemQuality(4),
+		Quality:  enchant.Quality,
 	}
 }
 
@@ -129,7 +130,7 @@ func (gem Gem) ToProto() *proto.Gem {
 		Stats:   gem.Stats[:],
 		Color:   gem.Color,
 		Phase:   int32(gem.Phase),
-		Quality: gem.Quality, // Hack until we use generated items
+		Quality: gem.Quality,
 		Unique:  gem.Unique,
 	}
 }
