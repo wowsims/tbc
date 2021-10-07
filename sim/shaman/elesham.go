@@ -63,14 +63,14 @@ func AuraLightningOverload(lvl int) core.Aura {
 		ID:      core.MagicIDLOTalent,
 		Expires: core.NeverExpires,
 		OnSpellHit: func(sim *core.Simulation, cast *core.Cast) {
-			if cast.Spell.ID != MagicIDLB12 && cast.Spell.ID != MagicIDCL6 {
+			if cast.Spell.ActionID.SpellID != SpellIDLB12 && cast.Spell.ActionID.SpellID != SpellIDCL6 {
 				return
 			}
 			if cast.Tag == CastTagLightningOverload {
 				return // can't proc LO on LO
 			}
 			actualChance := chance
-			if cast.Spell.ID == MagicIDCL6 {
+			if cast.Spell.ActionID.SpellID == SpellIDCL6 {
 				actualChance /= 3 // 33% chance of regular for CL LO
 			}
 			if sim.Rando.Float64("LO") < actualChance {
@@ -139,7 +139,7 @@ func (agent *LBOnlyAgent) Reset(shaman *Shaman, sim *core.Simulation) {}
 
 func NewLBOnlyAgent(sim *core.Simulation) *LBOnlyAgent {
 	return &LBOnlyAgent{
-		lb: Spells[MagicIDLB12],
+		lb: Spells[SpellIDLB12],
 	}
 }
 
@@ -152,7 +152,7 @@ type CLOnCDAgent struct {
 }
 
 func (agent *CLOnCDAgent) ChooseAction(shaman *Shaman, sim *core.Simulation) core.AgentAction {
-	if shaman.IsOnCD(MagicIDCL6, sim.CurrentTime) {
+	if shaman.IsOnCD(core.MagicIDChainLightning6, sim.CurrentTime) {
 		// sim.Log("[CLonCD] LB\n")
 		return NewCastAction(shaman, sim, agent.lb)
 	} else {
@@ -167,8 +167,8 @@ func (agent *CLOnCDAgent) Reset(shaman *Shaman, sim *core.Simulation) {}
 
 func NewCLOnCDAgent(sim *core.Simulation) *CLOnCDAgent {
 	return &CLOnCDAgent{
-		lb: Spells[MagicIDLB12],
-		cl: Spells[MagicIDCL6],
+		lb: Spells[SpellIDLB12],
+		cl: Spells[SpellIDCL6],
 	}
 }
 
@@ -197,7 +197,7 @@ func (agent *FixedRotationAgent) ChooseAction(shaman *Shaman, sim *core.Simulati
 		return NewCastAction(shaman, sim, agent.lb)
 	}
 
-	if !shaman.IsOnCD(MagicIDCL6, sim.CurrentTime) {
+	if !shaman.IsOnCD(core.MagicIDChainLightning6, sim.CurrentTime) {
 		return NewCastAction(shaman, sim, agent.cl)
 	}
 
@@ -207,7 +207,7 @@ func (agent *FixedRotationAgent) ChooseAction(shaman *Shaman, sim *core.Simulati
 		return NewCastAction(shaman, sim, agent.lb)
 	}
 
-	return core.AgentAction{Wait: shaman.GetRemainingCD(MagicIDCL6, sim.CurrentTime)}
+	return core.AgentAction{Wait: shaman.GetRemainingCD(SpellIDCL6, sim.CurrentTime)}
 }
 
 func (agent *FixedRotationAgent) OnActionAccepted(shaman *Shaman, sim *core.Simulation, action core.AgentAction) {
@@ -215,9 +215,9 @@ func (agent *FixedRotationAgent) OnActionAccepted(shaman *Shaman, sim *core.Simu
 		return
 	}
 
-	if action.Cast.Spell.ID == MagicIDLB12 {
+	if action.Cast.Spell.ActionID.SpellID == SpellIDLB12 {
 		agent.numLBsSinceLastCL++
-	} else if action.Cast.Spell.ID == MagicIDCL6 {
+	} else if action.Cast.Spell.ActionID.SpellID == SpellIDCL6 {
 		agent.numLBsSinceLastCL = 0
 	}
 }
@@ -230,8 +230,8 @@ func NewFixedRotationAgent(sim *core.Simulation, numLBsPerCL int) *FixedRotation
 	return &FixedRotationAgent{
 		numLBsPerCL:       numLBsPerCL,
 		numLBsSinceLastCL: numLBsPerCL, // This lets us cast CL first
-		lb:                Spells[MagicIDLB12],
-		cl:                Spells[MagicIDCL6],
+		lb:                Spells[SpellIDLB12],
+		cl:                Spells[SpellIDCL6],
 	}
 }
 
@@ -247,7 +247,7 @@ type CLOnClearcastAgent struct {
 }
 
 func (agent *CLOnClearcastAgent) ChooseAction(shaman *Shaman, sim *core.Simulation) core.AgentAction {
-	if shaman.IsOnCD(MagicIDCL6, sim.CurrentTime) || !agent.prevPrevCastProccedCC {
+	if shaman.IsOnCD(core.MagicIDChainLightning6, sim.CurrentTime) || !agent.prevPrevCastProccedCC {
 		// sim.Log("[CLonCC] - LB")
 		return NewCastAction(shaman, sim, agent.lb)
 	}
@@ -266,8 +266,8 @@ func (agent *CLOnClearcastAgent) Reset(shaman *Shaman, sim *core.Simulation) {
 
 func NewCLOnClearcastAgent(sim *core.Simulation) *CLOnClearcastAgent {
 	return &CLOnClearcastAgent{
-		lb: Spells[MagicIDLB12],
-		cl: Spells[MagicIDCL6],
+		lb: Spells[SpellIDLB12],
+		cl: Spells[SpellIDCL6],
 	}
 }
 
@@ -432,7 +432,7 @@ func ChainCastHandler(shaman *Shaman) func(sim *core.Simulation, cast *core.Cast
 				Effect:              func(sim *core.Simulation, cast *core.Cast) { cast.DidDmg *= dmgCoeff },
 				DoItNow:             ChainCastHandler(shaman), // so that LO will call ChainCast instead of DirectCast.
 			}
-			clone.DoItNow(sim, clone)
+			core.DirectCast(sim, clone)
 		}
 	}
 }

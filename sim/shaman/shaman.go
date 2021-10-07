@@ -99,7 +99,7 @@ func (shaman *Shaman) BuffUp(sim *core.Simulation) {
 	}
 }
 func (shaman *Shaman) OnSpellHit(sim *core.Simulation, cast *core.Cast) {
-	if cast.Spell.ID == core.MagicIDTLCLB { // TLC does not benefit from shaman talents
+	if cast.Spell.ActionID.ItemID == core.ItemIDTLC { // TLC does not benefit from shaman talents
 		return
 	}
 	cast.DidDmg *= shaman.concussionBonus // add concussion
@@ -257,7 +257,7 @@ const (
 func NewCastAction(shaman *Shaman, sim *core.Simulation, sp *core.Spell) core.AgentAction {
 	cast := core.NewCast(sim, shaman, sp)
 
-	itsElectric := sp.ID == MagicIDCL6 || sp.ID == MagicIDLB12
+	itsElectric := sp.ActionID.SpellID == SpellIDCL6 || sp.ActionID.SpellID == SpellIDLB12
 
 	if shaman.Talents.ElementalPrecision > 0 {
 		// FUTURE: This only impacts "frost fire and nature" spells.
@@ -285,7 +285,7 @@ func NewCastAction(shaman *Shaman, sim *core.Simulation, sp *core.Spell) core.Ag
 		if shaman.Talents.CallOfThunder > 0 { // only applies to CL and LB
 			cast.BonusCrit += float64(shaman.Talents.CallOfThunder) * 0.01
 		}
-		if sp.ID == MagicIDCL6 && sim.Options.Encounter.NumTargets > 1 {
+		if sp.ActionID.SpellID == SpellIDCL6 && sim.Options.Encounter.NumTargets > 1 {
 			cast.DoItNow = ChainCastHandler(shaman)
 		}
 		if shaman.Talents.LightningMastery > 0 {

@@ -102,12 +102,18 @@ func runSimulationImpl(request *proto.IndividualSimRequest) *proto.IndividualSim
 	result := sim.Run()
 
 	actionMetrics := []*proto.ActionMetric{}
-	for _, v := range result.Casts {
+	for _, v := range result.Actions {
 		metric := &proto.ActionMetric{
 			Casts:  v.Casts,
 			Crits:  v.Crits,
 			Misses: v.Misses,
 			Dmgs:   v.Dmgs,
+		}
+		if v.ActionID.SpellID != 0 {
+			metric.ActionId = &proto.ActionMetric_SpellId{SpellId: v.ActionID.SpellID}
+		}
+		if v.ActionID.ItemID != 0 {
+			metric.ActionId = &proto.ActionMetric_ItemId{ItemId: v.ActionID.ItemID}
 		}
 		actionMetrics = append(actionMetrics, metric)
 	}

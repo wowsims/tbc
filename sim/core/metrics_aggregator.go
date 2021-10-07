@@ -18,7 +18,11 @@ type MetricsAggregator struct {
 	oomAtSum    float64
 	dpsAtOomSum float64
 
+	// Actions metrics
+	// IDs can overlap so create separate maps
+	// We could probably use a couple bits of a map[int64] so we only need 1 map.
 	casts map[int32]ActionMetric
+	items map[int32]ActionMetric
 }
 
 type SimResult struct {
@@ -34,11 +38,11 @@ type SimResult struct {
 	OomAtAvg    float64
 	DpsAtOomAvg float64
 
-	Casts map[int32]ActionMetric
+	Actions []ActionMetric
 }
 
 type ActionMetric struct {
-	ActionID int32 // Mapped to the real ID
+	ActionID ActionID
 
 	// Index 0 of each slice is the 'normal' cast data.
 	// Count & Dmg of spells cast by Tag
@@ -54,6 +58,7 @@ func NewMetricsAggregator() *MetricsAggregator {
 		startTime: time.Now(),
 		dpsHist:   make(map[int32]int32),
 		casts:     make(map[int32]ActionMetric),
+		items:     make(map[int32]ActionMetric),
 	}
 }
 
@@ -79,37 +84,46 @@ func (aggregator *MetricsAggregator) addMetrics(options Options, metrics SimMetr
 	}
 
 	for _, cast := range metrics.Casts {
-		var id = cast.Spell.ID
-		cm := aggregator.casts[id]
+		var metric ActionMetric
+		if cast.Spell.ActionID.SpellID != 0 {
+			metric = aggregator.casts[cast.Spell.ActionID.SpellID]
+		} else if cast.Spell.ActionID.ItemID != 0 {
+			metric = aggregator.items[cast.Spell.ActionID.ItemID]
+		}
 		idx := int(cast.Tag)
 
 		// Construct new arrays for a tag we haven't seen before.
-		if len(cm.Casts) <= idx {
+		if len(metric.Casts) <= idx {
 			newArr := make([]int32, idx+1)
-			copy(newArr, cm.Casts)
-			cm.Casts = newArr
+			copy(newArr, metric.Casts)
+			metric.Casts = newArr
 
 			newCritsArr := make([]int32, idx+1)
-			copy(newCritsArr, cm.Crits)
-			cm.Crits = newCritsArr
+			copy(newCritsArr, metric.Crits)
+			metric.Crits = newCritsArr
 
 			newDmgs := make([]float64, idx+1)
-			copy(newDmgs, cm.Dmgs)
-			cm.Dmgs = newDmgs
+			copy(newDmgs, metric.Dmgs)
+			metric.Dmgs = newDmgs
 
 			newMissArr := make([]int32, idx+1)
-			copy(newMissArr, cm.Misses)
-			cm.Misses = newMissArr
+			copy(newMissArr, metric.Misses)
+			metric.Misses = newMissArr
 		}
 
-		cm.Casts[idx]++
+		metric.Casts[idx]++
 		if cast.DidCrit {
-			cm.Crits[idx]++
+			metric.Crits[idx]++
 		} else if !cast.DidHit {
-			cm.Misses[idx]++
+			metric.Misses[idx]++
 		}
-		cm.Dmgs[idx] += cast.DidDmg
-		aggregator.casts[id] = cm
+		metric.Dmgs[idx] += cast.DidDmg
+
+		if cast.Spell.ActionID.SpellID != 0 {
+			aggregator.casts[cast.Spell.ActionID.SpellID] = metric
+		} else if cast.Spell.ActionID.ItemID != 0 {
+			aggregator.items[cast.Spell.ActionID.ItemID] = metric
+		}
 	}
 }
 
@@ -129,7 +143,15 @@ func (aggregator *MetricsAggregator) getResult() SimResult {
 		result.DpsAtOomAvg = aggregator.dpsAtOomSum / float64(aggregator.numOom)
 	}
 
-	result.Casts = aggregator.casts
+	for id, v := range aggregator.casts {
+		v.ActionID.SpellID = id
+		result.Actions = append(result.Actions, v)
+	}
+
+	for id, v := range aggregator.items {
+		v.ActionID.ItemID = id
+		result.Actions = append(result.Actions, v)
+	}
 
 	return result
 }

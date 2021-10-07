@@ -167,8 +167,6 @@ func AuraName(a int32) string {
 		return "Mystic Focus"
 	case MagicIDEmberSkyfire:
 		return "Ember Skyfire"
-	case MagicIDTLCLB:
-		return "TLC-LB"
 	case MagicIDISCTrink:
 		return "Icon Trinket"
 	case MagicIDNACTrink:
@@ -300,8 +298,9 @@ func NewICD() InternalCD {
 // List of all magic effects and spells and items and stuff that can go on CD or have an aura.
 const (
 	MagicIDUnknown int32 = iota
-	//Spells
-	MagicIDTLCLB
+	// Spells, used for tracking CDs
+	MagicIDChainLightning6
+	// MagicIDFlameShock
 
 	// Auras
 	MagicIDClBounce
@@ -451,7 +450,7 @@ func ActivateNexusHorn(sim *Simulation, agent Agent) Aura {
 		ID:      MagicIDNexusHorn,
 		Expires: NeverExpires,
 		OnSpellHit: func(sim *Simulation, cast *Cast) {
-			if cast.Spell.ID == MagicIDTLCLB {
+			if cast.Spell.ActionID.ItemID == ItemIDTLC {
 				return // TLC can't proc Sextant
 			}
 			if !icd.isOnCD(sim) && cast.DidCrit && sim.Rando.Float64("unmarked") < 0.2 {
@@ -571,9 +570,15 @@ func ActivateManaEtched(sim *Simulation, agent Agent) Aura {
 	}
 }
 
+const ItemIDTLC = 28785
+
 func ActivateTLC(sim *Simulation, agent Agent) Aura {
 	const icdDur = time.Millisecond * 2500
-	tlcspell := Spells[MagicIDTLCLB]
+	tlcspell := &Spell{
+		Name:     "TLCLB",
+		ActionID: ActionID{ItemID: ItemIDTLC},
+		Coeff:    0.0, MinDmg: 694, MaxDmg: 807, Mana: 0, DamageType: stats.NatureSpellPower,
+	}
 
 	charges := 0
 	icd := NewICD()
@@ -618,7 +623,7 @@ func ActivateSextant(sim *Simulation, agent Agent) Aura {
 		ID:      MagicIDSextant,
 		Expires: NeverExpires,
 		OnSpellHit: func(sim *Simulation, cast *Cast) {
-			if cast.Spell.ID == MagicIDTLCLB {
+			if cast.Spell.ActionID.ItemID == ItemIDTLC {
 				return // TLC can't proc Sextant
 			}
 			if cast.DidCrit && !icd.isOnCD(sim) && sim.Rando.Float64("unmarked") < 0.2 {

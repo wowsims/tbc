@@ -7,9 +7,16 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
+type ActionID struct {
+	SpellID    int32
+	ItemID     int32
+	CooldownID int32 // used only for tracking CDs internally
+	// Can add future id types here.
+}
+
 // Spell represents a single castable spell. This is all the data needed to begin a cast.
 type Spell struct {
-	ID         int32
+	ActionID   ActionID
 	Name       string
 	CastTime   time.Duration
 	Cooldown   time.Duration
@@ -25,25 +32,6 @@ type Spell struct {
 }
 
 const SpellCritRatingPerCritChance = 22.08
-
-// Global Spells (things that any class could cast)
-var spells = []Spell{
-	{ID: MagicIDTLCLB, Name: "TLCLB", Coeff: 0.0, MinDmg: 694, MaxDmg: 807, Mana: 0, DamageType: stats.NatureSpellPower},
-}
-
-// Spell lookup map to make lookups faster.
-var Spells = map[int32]*Spell{}
-
-func init() {
-	for _, sp := range spells {
-		// Turns out to increase efficiency go 'range' will actually only allocate a single struct and mutate.
-		// If we want to create a pointer we need to clone the struct.
-		sp2 := sp
-		sp2.DmgDiff = sp2.MaxDmg - sp2.MinDmg
-		spp := &sp2
-		Spells[sp.ID] = spp
-	}
-}
 
 type Cast struct {
 	Spell  *Spell
@@ -206,7 +194,7 @@ func DirectCast(sim *Simulation, cast *Cast) {
 	}
 
 	if cast.Spell.Cooldown > 0 {
-		character.SetCD(cast.Spell.ID, cast.Spell.Cooldown+sim.CurrentTime)
+		character.SetCD(cast.Spell.ActionID.CooldownID, cast.Spell.Cooldown+sim.CurrentTime)
 	}
 
 	if sim.Log != nil {

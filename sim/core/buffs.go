@@ -16,9 +16,9 @@ type Buffs struct {
 	DivineSpirit     proto.TristateEffect
 
 	// Party class buffs
-	MoonkinAura         proto.TristateEffect
-	ShadowPriestDPS     uint16 // adds Mp5 ~ 25% (dps*5%*5sec = 25%)
-	Bloodlust           int32
+	MoonkinAura     proto.TristateEffect
+	ShadowPriestDPS uint16 // adds Mp5 ~ 25% (dps*5%*5sec = 25%)
+	Bloodlust       int32
 
 	// Totems
 	ManaSpringTotem proto.TristateEffect
@@ -46,33 +46,33 @@ type Buffs struct {
 
 func ProtoToBuffs(inBuff *proto.Buffs) Buffs {
 	return Buffs{
-		ArcaneBrilliance:          inBuff.ArcaneBrilliance,
-		Bloodlust:                 inBuff.Bloodlust,
-		GiftOfTheWild:             inBuff.GiftOfTheWild,
-		BlessingOfKings:           inBuff.BlessingOfKings,
-		BlessingOfWisdom:          inBuff.BlessingOfWisdom,
-		DivineSpirit:              inBuff.DivineSpirit,
-		MoonkinAura:               inBuff.MoonkinAura,
-		ShadowPriestDPS:           uint16(inBuff.ShadowPriestDps),
+		ArcaneBrilliance: inBuff.ArcaneBrilliance,
+		Bloodlust:        inBuff.Bloodlust,
+		GiftOfTheWild:    inBuff.GiftOfTheWild,
+		BlessingOfKings:  inBuff.BlessingOfKings,
+		BlessingOfWisdom: inBuff.BlessingOfWisdom,
+		DivineSpirit:     inBuff.DivineSpirit,
+		MoonkinAura:      inBuff.MoonkinAura,
+		ShadowPriestDPS:  uint16(inBuff.ShadowPriestDps),
 
 		JudgementOfWisdom:         inBuff.JudgementOfWisdom,
 		ImprovedSealOfTheCrusader: inBuff.ImprovedSealOfTheCrusader,
 		Misery:                    inBuff.Misery,
 
-		ManaSpringTotem:           inBuff.ManaSpringTotem,
-		ManaTideTotem:             inBuff.ManaTideTotem,
-		TotemOfWrath:              inBuff.TotemOfWrath,
-		WrathOfAirTotem:           inBuff.WrathOfAirTotem,
+		ManaSpringTotem: inBuff.ManaSpringTotem,
+		ManaTideTotem:   inBuff.ManaTideTotem,
+		TotemOfWrath:    inBuff.TotemOfWrath,
+		WrathOfAirTotem: inBuff.WrathOfAirTotem,
 
-		DrumsOfBattle:             inBuff.DrumsOfBattle,
-		DrumsOfRestoration:        inBuff.DrumsOfRestoration,
+		DrumsOfBattle:      inBuff.DrumsOfBattle,
+		DrumsOfRestoration: inBuff.DrumsOfRestoration,
 
-		AtieshMage:                inBuff.AtieshMage,
-		AtieshWarlock:             inBuff.AtieshWarlock,
-		BraidedEterniumChain:      inBuff.BraidedEterniumChain,
-		ChainOfTheTwilightOwl:     inBuff.ChainOfTheTwilightOwl,
-		EyeOfTheNight:             inBuff.EyeOfTheNight,
-		JadePendantOfBlasting:     inBuff.JadePendantOfBlasting,
+		AtieshMage:            inBuff.AtieshMage,
+		AtieshWarlock:         inBuff.AtieshWarlock,
+		BraidedEterniumChain:  inBuff.BraidedEterniumChain,
+		ChainOfTheTwilightOwl: inBuff.ChainOfTheTwilightOwl,
+		EyeOfTheNight:         inBuff.EyeOfTheNight,
+		JadePendantOfBlasting: inBuff.JadePendantOfBlasting,
 	}
 }
 
@@ -118,15 +118,15 @@ func (buffs Buffs) ApplyToPlayer(agent Agent) {
 	gotwAmount := GetTristateValueFloat(buffs.GiftOfTheWild, 18.0, 18.0)
 	// TODO: Pretty sure some of these dont stack with fort/ai/divine spirit
 	character.AddInitialStats(stats.Stats{
-		stats.Stamina: gotwAmount,
-		stats.Agility: gotwAmount,
-		stats.Strength: gotwAmount,
+		stats.Stamina:   gotwAmount,
+		stats.Agility:   gotwAmount,
+		stats.Strength:  gotwAmount,
 		stats.Intellect: gotwAmount,
-		stats.Spirit: gotwAmount,
+		stats.Spirit:    gotwAmount,
 	})
 
 	character.AddInitialStats(stats.Stats{
-		stats.SpellCrit: GetTristateValueFloat(buffs.MoonkinAura, 5 * SpellCritRatingPerCritChance, 5 * SpellCritRatingPerCritChance + 20),
+		stats.SpellCrit: GetTristateValueFloat(buffs.MoonkinAura, 5*SpellCritRatingPerCritChance, 5*SpellCritRatingPerCritChance+20),
 	})
 
 	character.AddInitialStats(stats.Stats{
@@ -155,7 +155,7 @@ func (buffs Buffs) ApplyToPlayer(agent Agent) {
 	if buffs.TotemOfWrath > 0 {
 		character.AddInitialStats(stats.Stats{
 			stats.SpellCrit: 3 * SpellCritRatingPerCritChance * float64(buffs.TotemOfWrath),
-			stats.SpellHit: 37.8 * float64(buffs.TotemOfWrath),
+			stats.SpellHit:  37.8 * float64(buffs.TotemOfWrath),
 		})
 	}
 	character.AddInitialStats(stats.Stats{
@@ -169,7 +169,7 @@ func (buffs Buffs) ApplyToPlayer(agent Agent) {
 		stats.SpellCrit: 28 * float64(buffs.AtieshMage),
 	})
 	character.AddInitialStats(stats.Stats{
-		stats.SpellPower: 33 * float64(buffs.AtieshWarlock),
+		stats.SpellPower:   33 * float64(buffs.AtieshWarlock),
 		stats.HealingPower: 33 * float64(buffs.AtieshWarlock),
 	})
 
@@ -183,7 +183,7 @@ func (buffs Buffs) ApplyToPlayer(agent Agent) {
 		character.AddInitialStats(stats.Stats{stats.SpellPower: 15})
 	}
 	if buffs.ChainOfTheTwilightOwl {
-		character.AddInitialStats(stats.Stats{stats.SpellCrit: 2 * SpellCritRatingPerCritChance })
+		character.AddInitialStats(stats.Stats{stats.SpellCrit: 2 * SpellCritRatingPerCritChance})
 	}
 }
 
@@ -203,7 +203,7 @@ func AuraJudgementOfWisdom() Aura {
 		ID:      MagicIDJoW,
 		Expires: NeverExpires,
 		OnSpellHit: func(sim *Simulation, cast *Cast) {
-			if cast.Spell.ID == MagicIDTLCLB {
+			if cast.Spell.ActionID.ItemID == ItemIDTLC {
 				return // TLC cant proc JoW
 			}
 			if sim.Log != nil {
