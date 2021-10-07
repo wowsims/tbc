@@ -8,7 +8,7 @@ export const GREATER_INSCRIPTION_OF_DISCIPLINE = 28886;
 export const GREATER_INSCRIPTION_OF_THE_ORB = 28909;
 
 // Chest
-export const CHEST_EXCEPTIONAL_STATS = 27960;
+export const CHEST_EXCEPTIONAL_STATS = 24003;
 
 // Wrist
 export const WRIST_SPELLPOWER = 22534;
@@ -23,7 +23,7 @@ export const RUNIC_SPELLTHREAD = 24274;
 export const WEAPON_SPELLPOWER = 22555;
 
 // Shield
-export const SHIELD_INTELLECT = 27945;
+export const SHIELD_INTELLECT = 22539;
 
 // Ring
-export const RING_SPELLPOWER = 35445;
+export const RING_SPELLPOWER = 22555;
