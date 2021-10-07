@@ -50,13 +50,15 @@ const theme = new DefaultTheme(document.body, {
                 ShamanInputs.IconWrathOfAirTotem,
                 ShamanInputs.IconTotemOfWrath,
                 ShamanInputs.IconManaSpringTotem,
+                IconInputs.DrumsOfBattleConsume,
+                IconInputs.DrumsOfRestorationConsume,
             ],
         },
         'Other Buffs': {
             tooltip: Tooltips.OTHER_BUFFS_SECTION,
             icons: [
-                IconInputs.DrumsOfBattle,
-                IconInputs.DrumsOfRestoration,
+                IconInputs.DrumsOfBattleBuff,
+                IconInputs.DrumsOfRestorationBuff,
                 IconInputs.ArcaneBrilliance,
                 IconInputs.DivineSpirit,
                 IconInputs.BlessingOfKings,
