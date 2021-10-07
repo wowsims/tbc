@@ -29,44 +29,67 @@ export function getEmptySlotIconUrl(slot: ItemSlot): string {
   return emptySlotIcons[slot];
 }
 
-export type IconId = {
+export type ItemId = {
   itemId: number;
 };
 export type SpellId = {
   spellId: number;
 };
-export type ItemOrSpellId = IconId | SpellId;
+export type OtherId = {
+  otherId: number;
+};
+export type ItemOrSpellId = ItemId | SpellId;
+export type ActionId = ItemId | SpellId | OtherId;
 
 // Some items/spells have weird icons, so use this to show a different icon instead.
 const idOverrides: Record<string, ItemOrSpellId> = {};
 idOverrides[JSON.stringify({spellId: 37212})] = { itemId: 29035 }; // Improved Wrath of Air Totem
 
-async function getIconUrlHelper(id: number, tooltipPostfix: string, cache: Map<number, string>): Promise<string> {
-  if (cache.has(id)) {
-    return cache.get(id) as string;
+async function getTooltipDataHelper(id: number, tooltipPostfix: string, cache: Map<number, Promise<any>>): Promise<any> {
+  if (!cache.has(id)) {
+		cache.set(id,
+				fetch(`https://tbc.wowhead.com/tooltip/${tooltipPostfix}/${id}`)
+				.then(response => response.json()));
   }
 
-  return fetch(`https://tbc.wowhead.com/tooltip/${tooltipPostfix}/${id}`)
-  .then(response => response.json())
-  .then(info => {
-    const url = "https://wow.zamimg.com/images/wow/icons/large/" + info['icon'] + ".jpg";
-    cache.set(id, url);
-    return url;
-  });
+	return cache.get(id) as Promise<any>;
 }
 
-const itemToIconCache = new Map<number, string>();
-const spellToIconCache = new Map<number, string>();
-export async function getIconUrl(id: ItemOrSpellId): Promise<string> {
+const itemToTooltipDataCache = new Map<number, Promise<any>>();
+const spellToTooltipDataCache = new Map<number, Promise<any>>();
+export async function getTooltipData(id: ItemOrSpellId): Promise<any> {
   const idString = JSON.stringify(id);
   if (idOverrides[idString])
     id = idOverrides[idString];
 
   if ('itemId' in id) {
-    return await getIconUrlHelper(id.itemId, 'item', itemToIconCache);
+    return await getTooltipDataHelper(id.itemId, 'item', itemToTooltipDataCache);
   } else {
-    return await getIconUrlHelper(id.spellId, 'spell', spellToIconCache);
+    return await getTooltipDataHelper(id.spellId, 'spell', spellToTooltipDataCache);
   }
+}
+function getOtherActionIconUrl(id: number): string {
+	throw new Error('No other actions!');
+}
+export async function getIconUrl(id: ActionId): Promise<string> {
+	if ('otherId' in id) {
+		return getOtherActionIconUrl(id.otherId);
+	}
+
+	const tooltipData = await getTooltipData(id);
+	return "https://wow.zamimg.com/images/wow/icons/large/" + tooltipData['icon'] + ".jpg";
+}
+
+function getOtherActionName(id: number): string {
+	throw new Error('No other actions!');
+}
+export async function getName(id: ItemOrSpellId | ActionId): Promise<string> {
+	if ('otherId' in id) {
+		return getOtherActionName(id.otherId);
+	}
+
+	const tooltipData = await getTooltipData(id);
+	return tooltipData['name'];
 }
 
 export function setWowheadHref(elem: HTMLAnchorElement, id: ItemOrSpellId) {

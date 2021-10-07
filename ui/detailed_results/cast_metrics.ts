@@ -1,6 +1,7 @@
 import { IndividualSimRequest, IndividualSimResult } from '/tbc/core/proto/api.js';
 import { sum } from '/tbc/core/utils.js';
 
+import { parseActionMetrics } from './metrics_helpers.js';
 import { ResultComponent, ResultComponentConfig } from './result_component.js';
 
 declare var $: any;
@@ -43,28 +44,36 @@ export class CastMetrics extends ResultComponent {
 
 		const iterations = request.iterations;
 		const duration = request.encounter?.duration || 1;
-		const totalDmg = sum(Object.values(result.casts).map(castMetrics => castMetrics.dmgs[0]));
 
-		for (const [id, castMetrics] of Object.entries(result.casts)) {
-			const rowElem = document.createElement('tr');
-			this.bodyElem.appendChild(rowElem);
+		parseActionMetrics(result.actionMetrics).then(actionMetrics => {
+			actionMetrics.forEach(actionMetric => {
+				const rowElem = document.createElement('tr');
+				this.bodyElem.appendChild(rowElem);
 
-			const addCell = (value: string | number) => {
-				const cellElem = document.createElement('td');
-				cellElem.textContent = String(value);
-				rowElem.appendChild(cellElem);
-			};
+				const nameCellElem = document.createElement('td');
+				rowElem.appendChild(nameCellElem);
+				nameCellElem.innerHTML = `
+				<img class="cast-metrics-action-icon" src="${actionMetric.iconUrl}"></img>
+				<span class="cast-metrics-action-name">${actionMetric.name}</span>
+				`;
 
-			addCell(id); // Name
-			addCell((castMetrics.dmgs[0] / iterations / duration).toFixed(1)); // DPS
-			addCell((castMetrics.casts[0] / iterations).toFixed(1)); // Casts
-			addCell((castMetrics.dmgs[0] / castMetrics.casts[0]).toFixed(1)); // Avg Cast
-			addCell(((castMetrics.casts[0] - castMetrics.misses[0]) / iterations).toFixed(1)); // Hits
-			addCell((castMetrics.dmgs[0] / (castMetrics.casts[0] - castMetrics.misses[0])).toFixed(1)); // Avg Hit
-			addCell(((castMetrics.crits[0] / castMetrics.casts[0]) * 100).toFixed(2) + ' %'); // Crit %
-			addCell(((castMetrics.misses[0] / castMetrics.casts[0]) * 100).toFixed(2) + ' %'); // Miss %
-		}
+				const addCell = (value: string | number): HTMLElement => {
+					const cellElem = document.createElement('td');
+					cellElem.textContent = String(value);
+					rowElem.appendChild(cellElem);
+					return cellElem;
+				};
 
-		$(this.tableElem).trigger('update');
+				addCell((actionMetric.totalDmg / iterations / duration).toFixed(1)); // DPS
+				addCell((actionMetric.casts / iterations).toFixed(1)); // Casts
+				addCell((actionMetric.totalDmg / actionMetric.casts).toFixed(1)); // Avg Cast
+				addCell(((actionMetric.casts - actionMetric.misses) / iterations).toFixed(1)); // Hits
+				addCell((actionMetric.totalDmg / (actionMetric.casts - actionMetric.misses)).toFixed(1)); // Avg Hit
+				addCell(((actionMetric.crits / actionMetric.casts) * 100).toFixed(2) + ' %'); // Crit %
+				addCell(((actionMetric.misses / actionMetric.casts) * 100).toFixed(2) + ' %'); // Miss %
+			});
+
+			$(this.tableElem).trigger('update');
+		});
 	}
 }
