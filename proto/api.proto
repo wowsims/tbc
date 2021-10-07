@@ -77,20 +77,27 @@ message IndividualSimResult {
     double oom_at_avg = 8;
     double dps_at_oom_avg = 9;
 
-    map<int32, CastMetric> casts = 10;
-    // FUTURE: melee
-    // map<int32, AttackMetric> attacks = 11; 
+    repeated ActionMetric action_metrics = 10;
 
     string error = 11; 
 }
 
-// CastMetric holds a collection of counts of casts and 
+// ActionMetric holds a collection of counts of casts and 
 // 
-message CastMetric {
-    repeated int32 casts = 1; // Count of Casts
-    repeated int32 crits = 2; // Count of Crit (subset of casts)
-    repeated int32 misses = 3; // Count of Misses (subset of casts)
-    repeated double dmgs = 4; // Total Damage
+message ActionMetric {
+    // Action that is being tracked in the metric.
+    oneof action_id {
+        int32 spell_id = 1;
+        int32 item_id = 2;
+        int32 other_id = 3;
+    }
+
+    // These arrays are indexed by tag (index 0 is untagged casts)
+    //  Currently the only use-case for this is shaman Lightning Overload.
+    repeated int32 casts = 4; // Count of usages of the action.
+    repeated int32 crits = 5; // Count of critical effects of the action (subset of casts)
+    repeated int32 misses = 6; // Count of misses (subset of casts)
+    repeated double dmgs = 7; // Total damage done to target from actions.
 }
 
 // RPC RaidSim
