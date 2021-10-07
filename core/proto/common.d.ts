@@ -59,47 +59,57 @@ export interface Buffs {
      */
     misery: boolean;
     /**
+     * Drums
+     *
+     * @generated from protobuf field: bool drums_of_battle = 12;
+     */
+    drumsOfBattle: boolean;
+    /**
+     * @generated from protobuf field: bool drums_of_restoration = 13;
+     */
+    drumsOfRestoration: boolean;
+    /**
      * Item Buffs
      *
-     * @generated from protobuf field: int32 atiesh_mage = 12;
+     * @generated from protobuf field: int32 atiesh_mage = 14;
      */
     atieshMage: number;
     /**
-     * @generated from protobuf field: int32 atiesh_warlock = 13;
+     * @generated from protobuf field: int32 atiesh_warlock = 15;
      */
     atieshWarlock: number;
     /**
-     * @generated from protobuf field: bool braided_eternium_chain = 14;
+     * @generated from protobuf field: bool braided_eternium_chain = 16;
      */
     braidedEterniumChain: boolean;
     /**
-     * @generated from protobuf field: bool eye_of_the_night = 15;
+     * @generated from protobuf field: bool eye_of_the_night = 17;
      */
     eyeOfTheNight: boolean;
     /**
-     * @generated from protobuf field: bool chain_of_the_twilight_owl = 16;
+     * @generated from protobuf field: bool chain_of_the_twilight_owl = 18;
      */
     chainOfTheTwilightOwl: boolean;
     /**
-     * @generated from protobuf field: bool jade_pendant_of_blasting = 17;
+     * @generated from protobuf field: bool jade_pendant_of_blasting = 19;
      */
     jadePendantOfBlasting: boolean;
     /**
      * Totems
      *
-     * @generated from protobuf field: proto.TristateEffect mana_spring_totem = 18;
+     * @generated from protobuf field: proto.TristateEffect mana_spring_totem = 20;
      */
     manaSpringTotem: TristateEffect;
     /**
-     * @generated from protobuf field: bool mana_tide_totem = 19;
+     * @generated from protobuf field: bool mana_tide_totem = 21;
      */
     manaTideTotem: boolean;
     /**
-     * @generated from protobuf field: int32 totem_of_wrath = 20;
+     * @generated from protobuf field: int32 totem_of_wrath = 22;
      */
     totemOfWrath: number;
     /**
-     * @generated from protobuf field: proto.TristateEffect wrath_of_air_totem = 21;
+     * @generated from protobuf field: proto.TristateEffect wrath_of_air_totem = 23;
      */
     wrathOfAirTotem: TristateEffect;
 }

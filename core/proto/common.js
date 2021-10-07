@@ -624,20 +624,22 @@ class Buffs$Type extends MessageType {
             { no: 9, name: "judgement_of_wisdom", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 10, name: "improved_seal_of_the_crusader", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 11, name: "misery", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
-            { no: 12, name: "atiesh_mage", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
-            { no: 13, name: "atiesh_warlock", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
-            { no: 14, name: "braided_eternium_chain", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
-            { no: 15, name: "eye_of_the_night", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
-            { no: 16, name: "chain_of_the_twilight_owl", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
-            { no: 17, name: "jade_pendant_of_blasting", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
-            { no: 18, name: "mana_spring_totem", kind: "enum", T: () => ["proto.TristateEffect", TristateEffect] },
-            { no: 19, name: "mana_tide_totem", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
-            { no: 20, name: "totem_of_wrath", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
-            { no: 21, name: "wrath_of_air_totem", kind: "enum", T: () => ["proto.TristateEffect", TristateEffect] }
+            { no: 12, name: "drums_of_battle", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 13, name: "drums_of_restoration", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 14, name: "atiesh_mage", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 15, name: "atiesh_warlock", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 16, name: "braided_eternium_chain", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 17, name: "eye_of_the_night", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 18, name: "chain_of_the_twilight_owl", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 19, name: "jade_pendant_of_blasting", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 20, name: "mana_spring_totem", kind: "enum", T: () => ["proto.TristateEffect", TristateEffect] },
+            { no: 21, name: "mana_tide_totem", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 22, name: "totem_of_wrath", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 23, name: "wrath_of_air_totem", kind: "enum", T: () => ["proto.TristateEffect", TristateEffect] }
         ]);
     }
     create(value) {
-        const message = { arcaneBrilliance: false, blessingOfKings: false, blessingOfWisdom: 0, divineSpirit: 0, giftOfTheWild: 0, bloodlust: 0, moonkinAura: 0, shadowPriestDps: 0, judgementOfWisdom: false, improvedSealOfTheCrusader: false, misery: false, atieshMage: 0, atieshWarlock: 0, braidedEterniumChain: false, eyeOfTheNight: false, chainOfTheTwilightOwl: false, jadePendantOfBlasting: false, manaSpringTotem: 0, manaTideTotem: false, totemOfWrath: 0, wrathOfAirTotem: 0 };
+        const message = { arcaneBrilliance: false, blessingOfKings: false, blessingOfWisdom: 0, divineSpirit: 0, giftOfTheWild: 0, bloodlust: 0, moonkinAura: 0, shadowPriestDps: 0, judgementOfWisdom: false, improvedSealOfTheCrusader: false, misery: false, drumsOfBattle: false, drumsOfRestoration: false, atieshMage: 0, atieshWarlock: 0, braidedEterniumChain: false, eyeOfTheNight: false, chainOfTheTwilightOwl: false, jadePendantOfBlasting: false, manaSpringTotem: 0, manaTideTotem: false, totemOfWrath: 0, wrathOfAirTotem: 0 };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -681,34 +683,40 @@ class Buffs$Type extends MessageType {
                 case /* bool misery */ 11:
                     message.misery = reader.bool();
                     break;
-                case /* int32 atiesh_mage */ 12:
+                case /* bool drums_of_battle */ 12:
+                    message.drumsOfBattle = reader.bool();
+                    break;
+                case /* bool drums_of_restoration */ 13:
+                    message.drumsOfRestoration = reader.bool();
+                    break;
+                case /* int32 atiesh_mage */ 14:
                     message.atieshMage = reader.int32();
                     break;
-                case /* int32 atiesh_warlock */ 13:
+                case /* int32 atiesh_warlock */ 15:
                     message.atieshWarlock = reader.int32();
                     break;
-                case /* bool braided_eternium_chain */ 14:
+                case /* bool braided_eternium_chain */ 16:
                     message.braidedEterniumChain = reader.bool();
                     break;
-                case /* bool eye_of_the_night */ 15:
+                case /* bool eye_of_the_night */ 17:
                     message.eyeOfTheNight = reader.bool();
                     break;
-                case /* bool chain_of_the_twilight_owl */ 16:
+                case /* bool chain_of_the_twilight_owl */ 18:
                     message.chainOfTheTwilightOwl = reader.bool();
                     break;
-                case /* bool jade_pendant_of_blasting */ 17:
+                case /* bool jade_pendant_of_blasting */ 19:
                     message.jadePendantOfBlasting = reader.bool();
                     break;
-                case /* proto.TristateEffect mana_spring_totem */ 18:
+                case /* proto.TristateEffect mana_spring_totem */ 20:
                     message.manaSpringTotem = reader.int32();
                     break;
-                case /* bool mana_tide_totem */ 19:
+                case /* bool mana_tide_totem */ 21:
                     message.manaTideTotem = reader.bool();
                     break;
-                case /* int32 totem_of_wrath */ 20:
+                case /* int32 totem_of_wrath */ 22:
                     message.totemOfWrath = reader.int32();
                     break;
-                case /* proto.TristateEffect wrath_of_air_totem */ 21:
+                case /* proto.TristateEffect wrath_of_air_totem */ 23:
                     message.wrathOfAirTotem = reader.int32();
                     break;
                 default:
@@ -756,36 +764,42 @@ class Buffs$Type extends MessageType {
         /* bool misery = 11; */
         if (message.misery !== false)
             writer.tag(11, WireType.Varint).bool(message.misery);
-        /* int32 atiesh_mage = 12; */
+        /* bool drums_of_battle = 12; */
+        if (message.drumsOfBattle !== false)
+            writer.tag(12, WireType.Varint).bool(message.drumsOfBattle);
+        /* bool drums_of_restoration = 13; */
+        if (message.drumsOfRestoration !== false)
+            writer.tag(13, WireType.Varint).bool(message.drumsOfRestoration);
+        /* int32 atiesh_mage = 14; */
         if (message.atieshMage !== 0)
-            writer.tag(12, WireType.Varint).int32(message.atieshMage);
-        /* int32 atiesh_warlock = 13; */
+            writer.tag(14, WireType.Varint).int32(message.atieshMage);
+        /* int32 atiesh_warlock = 15; */
         if (message.atieshWarlock !== 0)
-            writer.tag(13, WireType.Varint).int32(message.atieshWarlock);
-        /* bool braided_eternium_chain = 14; */
+            writer.tag(15, WireType.Varint).int32(message.atieshWarlock);
+        /* bool braided_eternium_chain = 16; */
         if (message.braidedEterniumChain !== false)
-            writer.tag(14, WireType.Varint).bool(message.braidedEterniumChain);
-        /* bool eye_of_the_night = 15; */
+            writer.tag(16, WireType.Varint).bool(message.braidedEterniumChain);
+        /* bool eye_of_the_night = 17; */
         if (message.eyeOfTheNight !== false)
-            writer.tag(15, WireType.Varint).bool(message.eyeOfTheNight);
-        /* bool chain_of_the_twilight_owl = 16; */
+            writer.tag(17, WireType.Varint).bool(message.eyeOfTheNight);
+        /* bool chain_of_the_twilight_owl = 18; */
         if (message.chainOfTheTwilightOwl !== false)
-            writer.tag(16, WireType.Varint).bool(message.chainOfTheTwilightOwl);
-        /* bool jade_pendant_of_blasting = 17; */
+            writer.tag(18, WireType.Varint).bool(message.chainOfTheTwilightOwl);
+        /* bool jade_pendant_of_blasting = 19; */
         if (message.jadePendantOfBlasting !== false)
-            writer.tag(17, WireType.Varint).bool(message.jadePendantOfBlasting);
-        /* proto.TristateEffect mana_spring_totem = 18; */
+            writer.tag(19, WireType.Varint).bool(message.jadePendantOfBlasting);
+        /* proto.TristateEffect mana_spring_totem = 20; */
         if (message.manaSpringTotem !== 0)
-            writer.tag(18, WireType.Varint).int32(message.manaSpringTotem);
-        /* bool mana_tide_totem = 19; */
+            writer.tag(20, WireType.Varint).int32(message.manaSpringTotem);
+        /* bool mana_tide_totem = 21; */
         if (message.manaTideTotem !== false)
-            writer.tag(19, WireType.Varint).bool(message.manaTideTotem);
-        /* int32 totem_of_wrath = 20; */
+            writer.tag(21, WireType.Varint).bool(message.manaTideTotem);
+        /* int32 totem_of_wrath = 22; */
         if (message.totemOfWrath !== 0)
-            writer.tag(20, WireType.Varint).int32(message.totemOfWrath);
-        /* proto.TristateEffect wrath_of_air_totem = 21; */
+            writer.tag(22, WireType.Varint).int32(message.totemOfWrath);
+        /* proto.TristateEffect wrath_of_air_totem = 23; */
         if (message.wrathOfAirTotem !== 0)
-            writer.tag(21, WireType.Varint).int32(message.wrathOfAirTotem);
+            writer.tag(23, WireType.Varint).int32(message.wrathOfAirTotem);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
