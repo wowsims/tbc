@@ -241,37 +241,62 @@ export interface IndividualSimResult {
      */
     dpsAtOomAvg: number;
     /**
-     * @generated from protobuf field: map<int32, proto.CastMetric> casts = 10;
+     * @generated from protobuf field: repeated proto.ActionMetric action_metrics = 10;
      */
-    casts: {
-        [key: number]: CastMetric;
-    };
+    actionMetrics: ActionMetric[];
     /**
      * @generated from protobuf field: string error = 11;
      */
     error: string;
 }
 /**
- * CastMetric holds a collection of counts of casts and
+ * ActionMetric holds a collection of counts of casts and
  *
  *
- * @generated from protobuf message proto.CastMetric
+ * @generated from protobuf message proto.ActionMetric
  */
-export interface CastMetric {
+export interface ActionMetric {
     /**
-     * @generated from protobuf field: repeated int32 casts = 1;
+     * @generated from protobuf oneof: action_id
+     */
+    actionId: {
+        oneofKind: "spellId";
+        /**
+         * @generated from protobuf field: int32 spell_id = 1;
+         */
+        spellId: number;
+    } | {
+        oneofKind: "itemId";
+        /**
+         * @generated from protobuf field: int32 item_id = 2;
+         */
+        itemId: number;
+    } | {
+        oneofKind: "otherId";
+        /**
+         * @generated from protobuf field: int32 other_id = 3;
+         */
+        otherId: number;
+    } | {
+        oneofKind: undefined;
+    };
+    /**
+     * These arrays are indexed by tag (index 0 is untagged casts)
+     *  Currently the only use-case for this is shaman Lightning Overload.
+     *
+     * @generated from protobuf field: repeated int32 casts = 4;
      */
     casts: number[];
     /**
-     * @generated from protobuf field: repeated int32 crits = 2;
+     * @generated from protobuf field: repeated int32 crits = 5;
      */
     crits: number[];
     /**
-     * @generated from protobuf field: repeated int32 misses = 3;
+     * @generated from protobuf field: repeated int32 misses = 6;
      */
     misses: number[];
     /**
-     * @generated from protobuf field: repeated double dmgs = 4;
+     * @generated from protobuf field: repeated double dmgs = 7;
      */
     dmgs: number[];
 }
@@ -527,23 +552,22 @@ declare class IndividualSimResult$Type extends MessageType<IndividualSimResult> 
     create(value?: PartialMessage<IndividualSimResult>): IndividualSimResult;
     internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: IndividualSimResult): IndividualSimResult;
     private binaryReadMap6;
-    private binaryReadMap10;
     internalBinaryWrite(message: IndividualSimResult, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
  * @generated MessageType for protobuf message proto.IndividualSimResult
  */
 export declare const IndividualSimResult: IndividualSimResult$Type;
-declare class CastMetric$Type extends MessageType<CastMetric> {
+declare class ActionMetric$Type extends MessageType<ActionMetric> {
     constructor();
-    create(value?: PartialMessage<CastMetric>): CastMetric;
-    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: CastMetric): CastMetric;
-    internalBinaryWrite(message: CastMetric, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+    create(value?: PartialMessage<ActionMetric>): ActionMetric;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: ActionMetric): ActionMetric;
+    internalBinaryWrite(message: ActionMetric, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
- * @generated MessageType for protobuf message proto.CastMetric
+ * @generated MessageType for protobuf message proto.ActionMetric
  */
-export declare const CastMetric: CastMetric$Type;
+export declare const ActionMetric: ActionMetric$Type;
 declare class RaidSimRequest$Type extends MessageType<RaidSimRequest> {
     constructor();
     create(value?: PartialMessage<RaidSimRequest>): RaidSimRequest;

@@ -613,12 +613,12 @@ class IndividualSimResult$Type extends MessageType {
             { no: 7, name: "num_oom", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 8, name: "oom_at_avg", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
             { no: 9, name: "dps_at_oom_avg", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
-            { no: 10, name: "casts", kind: "map", K: 5 /*ScalarType.INT32*/, V: { kind: "message", T: () => CastMetric } },
+            { no: 10, name: "action_metrics", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => ActionMetric },
             { no: 11, name: "error", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
         ]);
     }
     create(value) {
-        const message = { executionDurationMs: 0n, logs: "", dpsAvg: 0, dpsStdev: 0, dpsMax: 0, dpsHist: {}, numOom: 0, oomAtAvg: 0, dpsAtOomAvg: 0, casts: {}, error: "" };
+        const message = { executionDurationMs: 0n, logs: "", dpsAvg: 0, dpsStdev: 0, dpsMax: 0, dpsHist: {}, numOom: 0, oomAtAvg: 0, dpsAtOomAvg: 0, actionMetrics: [], error: "" };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -656,8 +656,8 @@ class IndividualSimResult$Type extends MessageType {
                 case /* double dps_at_oom_avg */ 9:
                     message.dpsAtOomAvg = reader.double();
                     break;
-                case /* map<int32, proto.CastMetric> casts */ 10:
-                    this.binaryReadMap10(message.casts, reader, options);
+                case /* repeated proto.ActionMetric action_metrics */ 10:
+                    message.actionMetrics.push(ActionMetric.internalBinaryRead(reader, reader.uint32(), options));
                     break;
                 case /* string error */ 11:
                     message.error = reader.string();
@@ -689,22 +689,6 @@ class IndividualSimResult$Type extends MessageType {
         }
         map[key ?? 0] = val ?? 0;
     }
-    binaryReadMap10(map, reader, options) {
-        let len = reader.uint32(), end = reader.pos + len, key, val;
-        while (reader.pos < end) {
-            let [fieldNo, wireType] = reader.tag();
-            switch (fieldNo) {
-                case 1:
-                    key = reader.int32();
-                    break;
-                case 2:
-                    val = CastMetric.internalBinaryRead(reader, reader.uint32(), options);
-                    break;
-                default: throw new globalThis.Error("unknown map entry field for field proto.IndividualSimResult.casts");
-            }
-        }
-        map[key ?? 0] = val ?? CastMetric.create();
-    }
     internalBinaryWrite(message, writer, options) {
         /* int64 execution_duration_ms = 1; */
         if (message.executionDurationMs !== 0n)
@@ -733,13 +717,9 @@ class IndividualSimResult$Type extends MessageType {
         /* double dps_at_oom_avg = 9; */
         if (message.dpsAtOomAvg !== 0)
             writer.tag(9, WireType.Bit64).double(message.dpsAtOomAvg);
-        /* map<int32, proto.CastMetric> casts = 10; */
-        for (let k of Object.keys(message.casts)) {
-            writer.tag(10, WireType.LengthDelimited).fork().tag(1, WireType.Varint).int32(parseInt(k));
-            writer.tag(2, WireType.LengthDelimited).fork();
-            CastMetric.internalBinaryWrite(message.casts[k], writer, options);
-            writer.join().join();
-        }
+        /* repeated proto.ActionMetric action_metrics = 10; */
+        for (let i = 0; i < message.actionMetrics.length; i++)
+            ActionMetric.internalBinaryWrite(message.actionMetrics[i], writer.tag(10, WireType.LengthDelimited).fork(), options).join();
         /* string error = 11; */
         if (message.error !== "")
             writer.tag(11, WireType.LengthDelimited).string(message.error);
@@ -754,17 +734,20 @@ class IndividualSimResult$Type extends MessageType {
  */
 export const IndividualSimResult = new IndividualSimResult$Type();
 // @generated message type with reflection information, may provide speed optimized methods
-class CastMetric$Type extends MessageType {
+class ActionMetric$Type extends MessageType {
     constructor() {
-        super("proto.CastMetric", [
-            { no: 1, name: "casts", kind: "scalar", repeat: 1 /*RepeatType.PACKED*/, T: 5 /*ScalarType.INT32*/ },
-            { no: 2, name: "crits", kind: "scalar", repeat: 1 /*RepeatType.PACKED*/, T: 5 /*ScalarType.INT32*/ },
-            { no: 3, name: "misses", kind: "scalar", repeat: 1 /*RepeatType.PACKED*/, T: 5 /*ScalarType.INT32*/ },
-            { no: 4, name: "dmgs", kind: "scalar", repeat: 1 /*RepeatType.PACKED*/, T: 1 /*ScalarType.DOUBLE*/ }
+        super("proto.ActionMetric", [
+            { no: 1, name: "spell_id", kind: "scalar", oneof: "actionId", T: 5 /*ScalarType.INT32*/ },
+            { no: 2, name: "item_id", kind: "scalar", oneof: "actionId", T: 5 /*ScalarType.INT32*/ },
+            { no: 3, name: "other_id", kind: "scalar", oneof: "actionId", T: 5 /*ScalarType.INT32*/ },
+            { no: 4, name: "casts", kind: "scalar", repeat: 1 /*RepeatType.PACKED*/, T: 5 /*ScalarType.INT32*/ },
+            { no: 5, name: "crits", kind: "scalar", repeat: 1 /*RepeatType.PACKED*/, T: 5 /*ScalarType.INT32*/ },
+            { no: 6, name: "misses", kind: "scalar", repeat: 1 /*RepeatType.PACKED*/, T: 5 /*ScalarType.INT32*/ },
+            { no: 7, name: "dmgs", kind: "scalar", repeat: 1 /*RepeatType.PACKED*/, T: 1 /*ScalarType.DOUBLE*/ }
         ]);
     }
     create(value) {
-        const message = { casts: [], crits: [], misses: [], dmgs: [] };
+        const message = { actionId: { oneofKind: undefined }, casts: [], crits: [], misses: [], dmgs: [] };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -775,28 +758,46 @@ class CastMetric$Type extends MessageType {
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
-                case /* repeated int32 casts */ 1:
+                case /* int32 spell_id */ 1:
+                    message.actionId = {
+                        oneofKind: "spellId",
+                        spellId: reader.int32()
+                    };
+                    break;
+                case /* int32 item_id */ 2:
+                    message.actionId = {
+                        oneofKind: "itemId",
+                        itemId: reader.int32()
+                    };
+                    break;
+                case /* int32 other_id */ 3:
+                    message.actionId = {
+                        oneofKind: "otherId",
+                        otherId: reader.int32()
+                    };
+                    break;
+                case /* repeated int32 casts */ 4:
                     if (wireType === WireType.LengthDelimited)
                         for (let e = reader.int32() + reader.pos; reader.pos < e;)
                             message.casts.push(reader.int32());
                     else
                         message.casts.push(reader.int32());
                     break;
-                case /* repeated int32 crits */ 2:
+                case /* repeated int32 crits */ 5:
                     if (wireType === WireType.LengthDelimited)
                         for (let e = reader.int32() + reader.pos; reader.pos < e;)
                             message.crits.push(reader.int32());
                     else
                         message.crits.push(reader.int32());
                     break;
-                case /* repeated int32 misses */ 3:
+                case /* repeated int32 misses */ 6:
                     if (wireType === WireType.LengthDelimited)
                         for (let e = reader.int32() + reader.pos; reader.pos < e;)
                             message.misses.push(reader.int32());
                     else
                         message.misses.push(reader.int32());
                     break;
-                case /* repeated double dmgs */ 4:
+                case /* repeated double dmgs */ 7:
                     if (wireType === WireType.LengthDelimited)
                         for (let e = reader.int32() + reader.pos; reader.pos < e;)
                             message.dmgs.push(reader.double());
@@ -815,30 +816,39 @@ class CastMetric$Type extends MessageType {
         return message;
     }
     internalBinaryWrite(message, writer, options) {
-        /* repeated int32 casts = 1; */
+        /* int32 spell_id = 1; */
+        if (message.actionId.oneofKind === "spellId")
+            writer.tag(1, WireType.Varint).int32(message.actionId.spellId);
+        /* int32 item_id = 2; */
+        if (message.actionId.oneofKind === "itemId")
+            writer.tag(2, WireType.Varint).int32(message.actionId.itemId);
+        /* int32 other_id = 3; */
+        if (message.actionId.oneofKind === "otherId")
+            writer.tag(3, WireType.Varint).int32(message.actionId.otherId);
+        /* repeated int32 casts = 4; */
         if (message.casts.length) {
-            writer.tag(1, WireType.LengthDelimited).fork();
+            writer.tag(4, WireType.LengthDelimited).fork();
             for (let i = 0; i < message.casts.length; i++)
                 writer.int32(message.casts[i]);
             writer.join();
         }
-        /* repeated int32 crits = 2; */
+        /* repeated int32 crits = 5; */
         if (message.crits.length) {
-            writer.tag(2, WireType.LengthDelimited).fork();
+            writer.tag(5, WireType.LengthDelimited).fork();
             for (let i = 0; i < message.crits.length; i++)
                 writer.int32(message.crits[i]);
             writer.join();
         }
-        /* repeated int32 misses = 3; */
+        /* repeated int32 misses = 6; */
         if (message.misses.length) {
-            writer.tag(3, WireType.LengthDelimited).fork();
+            writer.tag(6, WireType.LengthDelimited).fork();
             for (let i = 0; i < message.misses.length; i++)
                 writer.int32(message.misses[i]);
             writer.join();
         }
-        /* repeated double dmgs = 4; */
+        /* repeated double dmgs = 7; */
         if (message.dmgs.length) {
-            writer.tag(4, WireType.LengthDelimited).fork();
+            writer.tag(7, WireType.LengthDelimited).fork();
             for (let i = 0; i < message.dmgs.length; i++)
                 writer.double(message.dmgs[i]);
             writer.join();
@@ -850,9 +860,9 @@ class CastMetric$Type extends MessageType {
     }
 }
 /**
- * @generated MessageType for protobuf message proto.CastMetric
+ * @generated MessageType for protobuf message proto.ActionMetric
  */
-export const CastMetric = new CastMetric$Type();
+export const ActionMetric = new ActionMetric$Type();
 // @generated message type with reflection information, may provide speed optimized methods
 class RaidSimRequest$Type extends MessageType {
     constructor() {

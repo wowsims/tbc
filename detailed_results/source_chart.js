@@ -1,4 +1,5 @@
 import { sum } from '/tbc/core/utils.js';
+import { parseActionMetrics } from './metrics_helpers.js';
 import { ResultComponent } from './result_component.js';
 export class SourceChart extends ResultComponent {
     constructor(config) {
@@ -12,28 +13,30 @@ export class SourceChart extends ResultComponent {
         chartCanvas.height = chartBounds.height;
         chartCanvas.width = chartBounds.width;
         const colors = ['red', 'blue', 'lawngreen'];
-        const labels = Object.keys(result.casts);
-        const totalDmg = sum(Object.values(result.casts).map(castMetrics => castMetrics.dmgs[0]));
-        const vals = labels.map(label => result.casts[parseInt(label)].dmgs[0] / totalDmg);
-        const ctx = chartCanvas.getContext('2d');
-        const chart = new Chart(ctx, {
-            type: 'pie',
-            data: {
-                labels: labels,
-                datasets: [{
-                        data: vals,
-                        backgroundColor: colors,
-                    }],
-            },
-            options: {
-                plugins: {
-                    legend: {
-                        display: true,
-                        position: 'right',
-                    }
+        parseActionMetrics(result.actionMetrics).then(actionMetrics => {
+            const names = actionMetrics.map(am => am.name);
+            const totalDmg = sum(actionMetrics.map(actionMetric => actionMetric.totalDmg));
+            const vals = actionMetrics.map(actionMetric => actionMetric.totalDmg / totalDmg);
+            const ctx = chartCanvas.getContext('2d');
+            const chart = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: names,
+                    datasets: [{
+                            data: vals,
+                            backgroundColor: colors,
+                        }],
                 },
-            },
+                options: {
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'right',
+                        }
+                    },
+                },
+            });
+            this.rootElem.appendChild(chartCanvas);
         });
-        this.rootElem.appendChild(chartCanvas);
     }
 }
