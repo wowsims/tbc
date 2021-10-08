@@ -21,11 +21,11 @@ export function getActionId(actionMetric: ActionMetricProto): ActionId {
 		};
 	} else if (actionMetric.actionId.oneofKind == 'itemId') {
 		return {
-			spellId: actionMetric.actionId.itemId,
+			itemId: actionMetric.actionId.itemId,
 		};
 	} else if (actionMetric.actionId.oneofKind == 'otherId') {
 		return {
-			spellId: actionMetric.actionId.otherId,
+			otherId: actionMetric.actionId.otherId,
 		};
 	} else {
 		throw new Error('Invalid action metric with no ID');
@@ -48,7 +48,13 @@ export function parseActionMetrics(actionMetricProtos: Array<ActionMetricProto>)
 
 	return Promise.all(actionMetrics.map(actionMetric => 
 		getName(actionMetric.actionId)
-		.then(name => actionMetric.name = name)
+		.then(name => {
+			if (actionMetric.tagIndex == 0) {
+				actionMetric.name = name;
+			} else {
+				actionMetric.name = name + ' (LO)';
+			}
+		})
 		.then(() => getIconUrl(actionMetric.actionId))
 		.then(iconUrl => actionMetric.iconUrl = iconUrl)
 	))

@@ -36,7 +36,7 @@ export class CastMetrics extends ResultComponent {
 		this.tableElem = this.rootElem.getElementsByClassName('cast-metrics-table')[0] as HTMLTableSectionElement;
 		this.bodyElem = this.rootElem.getElementsByClassName('cast-metrics-table-body')[0] as HTMLTableSectionElement;
 
-		$(this.tableElem).tablesorter({ sortList: [1, 0] });
+		$(this.tableElem).tablesorter({ sortList: [2, 1] });
 	}
 
 	onSimResult(request: IndividualSimRequest, result: IndividualSimResult) {
