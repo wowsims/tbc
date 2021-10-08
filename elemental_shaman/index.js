@@ -18,7 +18,6 @@ const theme = new DefaultTheme(document.body, {
     releaseStatus: 'Beta',
     knownIssues: [
         'Can only use 1 type of potion, cannot use 1 Destruction Potion and then Super Mana Potions after that.',
-        'Detailed results labels are numbers instead of names, and LO procs are missing.',
     ],
     spec: Spec.SpecElementalShaman,
     epStats: [

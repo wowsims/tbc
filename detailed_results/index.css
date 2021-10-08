@@ -92,6 +92,10 @@
   padding: 2px 1px;
 }
 
+.cast-metrics-action-icon {
+  height: 5vh;
+}
+
 .dps-histogram-root {
   height: 30vh;
   width: 90vw;
