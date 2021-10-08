@@ -101,14 +101,21 @@ func runSimulationImpl(request *proto.IndividualSimRequest) *proto.IndividualSim
 	sim := createSim(request)
 	result := sim.Run()
 
-	castMetrics := map[int32]*proto.CastMetric{}
-	for k, v := range result.Casts {
-		castMetrics[k] = &proto.CastMetric{
+	actionMetrics := []*proto.ActionMetric{}
+	for _, v := range result.Actions {
+		metric := &proto.ActionMetric{
 			Casts:  v.Casts,
 			Crits:  v.Crits,
 			Misses: v.Misses,
 			Dmgs:   v.Dmgs,
 		}
+		if v.ActionID.SpellID != 0 {
+			metric.ActionId = &proto.ActionMetric_SpellId{SpellId: v.ActionID.SpellID}
+		}
+		if v.ActionID.ItemID != 0 {
+			metric.ActionId = &proto.ActionMetric_ItemId{ItemId: v.ActionID.ItemID}
+		}
+		actionMetrics = append(actionMetrics, metric)
 	}
 	isr := &proto.IndividualSimResult{
 		DpsAvg:              result.DpsAvg,
@@ -120,7 +127,7 @@ func runSimulationImpl(request *proto.IndividualSimRequest) *proto.IndividualSim
 		NumOom:              int32(result.NumOom),
 		OomAtAvg:            result.OomAtAvg,
 		DpsAtOomAvg:         result.DpsAtOomAvg,
-		Casts:               castMetrics,
+		ActionMetrics:       actionMetrics,
 	}
 	return isr
 }

@@ -63,7 +63,7 @@ func (at *AuraTracker) Advance(sim *Simulation, newTime time.Duration) {
 // it will be replaced with the newer aura.
 // Auras with duration of 0 will be logged as activating but never added to simulation auras.
 func (at *AuraTracker) AddAura(sim *Simulation, newAura Aura) {
-	if newAura.Expires < sim.CurrentTime {
+	if newAura.Expires <= sim.CurrentTime {
 		return // no need to waste time adding aura that doesn't last.
 	}
 
@@ -129,8 +129,6 @@ func AuraName(a int32) string {
 	switch a {
 	case MagicIDUnknown:
 		return "Unknown"
-	case MagicIDClBounce:
-		return "Chain Lightning Bounce"
 	case MagicIDLOTalent:
 		return "Lightning Overload Talent"
 	case MagicIDJoW:
@@ -139,8 +137,6 @@ func AuraName(a int32) string {
 		return "Elemental Focus"
 	case MagicIDEleMastery:
 		return "Elemental Mastery"
-	case MagicIDStormcaller:
-		return "Stormcaller"
 	case MagicIDBlessingSilverCrescent:
 		return "Blessing of the Silver Crescent"
 	case MagicIDDarkIronPipeweed:
@@ -167,12 +163,6 @@ func AuraName(a int32) string {
 		return "Mystic Focus"
 	case MagicIDEmberSkyfire:
 		return "Ember Skyfire"
-	case MagicIDLB12:
-		return "LB12"
-	case MagicIDCL6:
-		return "CL6"
-	case MagicIDTLCLB:
-		return "TLC-LB"
 	case MagicIDISCTrink:
 		return "Icon Trinket"
 	case MagicIDNACTrink:
@@ -304,18 +294,15 @@ func NewICD() InternalCD {
 // List of all magic effects and spells and items and stuff that can go on CD or have an aura.
 const (
 	MagicIDUnknown int32 = iota
-	//Spells
-	MagicIDLB12
-	MagicIDCL6
-	MagicIDTLCLB
+	// Spells, used for tracking CDs
+	MagicIDChainLightning6
+	// MagicIDFlameShock
 
 	// Auras
-	MagicIDClBounce
 	MagicIDLOTalent
 	MagicIDJoW
 	MagicIDEleFocus
 	MagicIDEleMastery
-	MagicIDStormcaller
 	MagicIDBlessingSilverCrescent
 	MagicIDDarkIronPipeweed
 	MagicIDQuagsEye
@@ -457,7 +444,7 @@ func ActivateNexusHorn(sim *Simulation, agent Agent) Aura {
 		ID:      MagicIDNexusHorn,
 		Expires: NeverExpires,
 		OnSpellHit: func(sim *Simulation, cast *Cast) {
-			if cast.Spell.ID == MagicIDTLCLB {
+			if cast.Spell.ActionID.ItemID == ItemIDTLC {
 				return // TLC can't proc Sextant
 			}
 			if !icd.isOnCD(sim) && cast.DidCrit && sim.Rando.Float64("unmarked") < 0.2 {
@@ -577,9 +564,17 @@ func ActivateManaEtched(sim *Simulation, agent Agent) Aura {
 	}
 }
 
+const ItemIDTLC = 28785
+
 func ActivateTLC(sim *Simulation, agent Agent) Aura {
 	const icdDur = time.Millisecond * 2500
-	tlcspell := Spells[MagicIDTLCLB]
+	tlcspell := &Spell{
+		Name:     "TLCLB",
+		ActionID: ActionID{ItemID: ItemIDTLC},
+		Coeff:    0.0, MinDmg: 694, MaxDmg: 807, Mana: 0, DamageType: stats.NatureSpellPower,
+	}
+	// TODO: make this not have to be done by hand...
+	tlcspell.DmgDiff = tlcspell.MaxDmg - tlcspell.MinDmg
 
 	charges := 0
 	icd := NewICD()
@@ -615,51 +610,6 @@ func ActivateTLC(sim *Simulation, agent Agent) Aura {
 	}
 }
 
-func ActivateCycloneManaReduce(sim *Simulation, agent Agent) Aura {
-	return Aura{
-		ID:      MagicIDCyclone4pc,
-		Expires: NeverExpires,
-		OnSpellHit: func(sim *Simulation, cast *Cast) {
-			if cast.DidCrit && sim.Rando.Float64("unmarked") < 0.11 {
-				agent.GetCharacter().AddAura(sim, Aura{
-					ID: MagicIDCycloneMana,
-					OnCast: func(sim *Simulation, cast *Cast) {
-						// TODO: how to make sure this goes in before clearcasting?
-						cast.ManaCost -= 270
-					},
-					OnCastComplete: func(sim *Simulation, cast *Cast) {
-						agent.GetCharacter().RemoveAura(sim, MagicIDCycloneMana)
-					},
-				})
-			}
-		},
-	}
-}
-
-func ActivateCataclysmLBDiscount(sim *Simulation, agent Agent) Aura {
-	return Aura{
-		ID:      MagicIDCataclysm4pc,
-		Expires: NeverExpires,
-		OnSpellHit: func(sim *Simulation, cast *Cast) {
-			if cast.DidCrit && sim.Rando.Float64("unmarked") < 0.25 {
-				agent.GetCharacter().Stats[stats.Mana] += 120
-			}
-		},
-	}
-}
-
-func ActivateSkyshatterImpLB(sim *Simulation, agent Agent) Aura {
-	return Aura{
-		ID:      MagicIDSkyshatter4pc,
-		Expires: NeverExpires,
-		OnSpellHit: func(sim *Simulation, cast *Cast) {
-			if cast.Spell.ID == MagicIDLB12 {
-				cast.DidDmg *= 1.05
-			}
-		},
-	}
-}
-
 func ActivateSextant(sim *Simulation, agent Agent) Aura {
 	icd := NewICD()
 	const spellBonus = 190.0
@@ -669,7 +619,7 @@ func ActivateSextant(sim *Simulation, agent Agent) Aura {
 		ID:      MagicIDSextant,
 		Expires: NeverExpires,
 		OnSpellHit: func(sim *Simulation, cast *Cast) {
-			if cast.Spell.ID == MagicIDTLCLB {
+			if cast.Spell.ActionID.ItemID == ItemIDTLC {
 				return // TLC can't proc Sextant
 			}
 			if cast.DidCrit && !icd.isOnCD(sim) && sim.Rando.Float64("unmarked") < 0.2 {

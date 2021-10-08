@@ -4,9 +4,9 @@ import (
 	"log"
 	"testing"
 
+	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/items"
 	"github.com/wowsims/tbc/sim/core/proto"
-	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
@@ -28,7 +28,7 @@ func TestSimulatePreRaidNoBuffs(t *testing.T) {
 		Buffs: BasicBuffs,
 		Race:  core.RaceBonusTypeTroll10,
 
-		PlayerOptions: &PlayerOptionsAdaptive,
+		PlayerOptions: &PlayerOptionsAdaptiveNoBuffs,
 		Gear:          PreRaidGear,
 
 		ExpectedDpsShort: 867,
@@ -73,18 +73,21 @@ func TestSimulateP1(t *testing.T) {
 }
 
 // func TestMultiTarget(t *testing.T) {
+// 	params := core.IndividualParams{
+// 		Equip:         P1Gear,
+// 		Race:          core.RaceBonusTypeOrc,
+// 		Consumes:      FullConsumes,
+// 		Buffs:         FullBuffs,
+// 		Options:       makeOptions(BasicOptions, LongEncounter),
+// 		PlayerOptions: &PlayerOptionsAdaptive,
+// 	}
+// 	params.Options.Encounter.NumTargets = 3
+
 // 	doSimulateTest(
 // 		"multiTarget",
 // 		t,
-// 		makeOptions(
-// 			FullOptions,
-// 			Encounter{
-// 				Duration:     300,
-// 				NumClTargets: 3,
-// 			},
-// 			AGENT_TYPE_ADAPTIVE),
-// 		p1Gear,
-//      1533.5)
+// 		params,
+// 		1533.5)
 // }
 
 func TestLBOnlyAgent(t *testing.T) {
@@ -143,6 +146,7 @@ func TestAverageDPS(t *testing.T) {
 	options := BasicOptions
 	options.Iterations = 10000
 	options.Encounter = LongEncounter
+	// options.Encounter.NumTargets = 3
 	// options.Debug = true
 
 	params := core.IndividualParams{

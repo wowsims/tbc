@@ -60,13 +60,18 @@ var ActiveItemByID = map[int32]ActiveItem{
 
 type ItemSet struct {
 	Name    string
-	Items   map[string]bool
+	Items   map[int32]struct{}     // map[key]struct{} is roughly a set in go.
 	Bonuses map[int]ItemActivation // maps item count to activations
 }
 
 func AddItemSet(set ItemSet) {
-	// TODO: validate the set doesnt exist already probably?
+	// TODO: validate the set doesnt exist already?
+
+	setIdx := len(sets)
 	sets = append(sets, set)
+	for itemID := range set.Items {
+		itemSetLookup[itemID] = &sets[setIdx]
+	}
 }
 
 // cache for mapping item to set for fast resetting of sim.
@@ -74,94 +79,33 @@ var itemSetLookup = map[int32]*ItemSet{}
 
 var sets = []ItemSet{
 	{
-		Name:  "Netherstrike",
-		Items: map[string]bool{"Netherstrike Breastplate": true, "Netherstrike Bracers": true, "Netherstrike Belt": true},
-		Bonuses: map[int]ItemActivation{3: func(sim *Simulation, agent Agent) Aura {
-			agent.GetCharacter().Stats[stats.SpellPower] += 23
-			return Aura{ID: MagicIDNetherstrike}
-		}},
-	},
-	{
 		Name:  "The Twin Stars",
-		Items: map[string]bool{"Charlotte's Ivy": true, "Lola's Eve": true},
+		Items: map[int32]struct{}{31338: {}, 31339: {}},
 		Bonuses: map[int]ItemActivation{2: func(sim *Simulation, agent Agent) Aura {
 			agent.GetCharacter().Stats[stats.SpellPower] += 15
 			return Aura{ID: MagicIDNetherstrike}
 		}},
 	},
 	{
-		Name:  "Tidefury",
-		Items: map[string]bool{"Tidefury Helm": true, "Tidefury Shoulderguards": true, "Tidefury Chestpiece": true, "Tidefury Kilt": true, "Tidefury Gauntlets": true},
-		Bonuses: map[int]ItemActivation{
-			2: func(sim *Simulation, agent Agent) Aura {
-				return Aura{ID: MagicIDTidefury}
-			},
-			4: func(sim *Simulation, agent Agent) Aura {
-				// TODO: should we even allow for unchecking water shield?
-				// if sim.Options.Buffs.WaterShield {
-				agent.GetCharacter().Stats[stats.MP5] += 3
-				// }
-				return Aura{ID: MagicIDTidefury}
-			},
-		},
-	},
-	{
 		Name:    "Spellstrike",
-		Items:   map[string]bool{"Spellstrike Hood": true, "Spellstrike Pants": true},
+		Items:   map[int32]struct{}{24266: {}, 24262: {}},
 		Bonuses: map[int]ItemActivation{2: ActivateSpellstrike},
 	},
 	{
 		Name:  "Mana Etched",
-		Items: map[string]bool{"Mana-Etched Crown": true, "Mana-Etched Spaulders": true, "Mana-Etched Vestments": true, "Mana-Etched Gloves": true, "Mana-Etched Pantaloons": true},
+		Items: map[int32]struct{}{28193: {}, 27465: {}, 27907: {}, 27796: {}, 28191: {}},
 		Bonuses: map[int]ItemActivation{4: ActivateManaEtched, 2: func(sim *Simulation, agent Agent) Aura {
 			agent.GetCharacter().Stats[stats.SpellHit] += 35
 			return Aura{ID: MagicIDManaEtchedHit}
 		}},
 	},
 	{
-		Name:  "Cyclone Regalia",
-		Items: map[string]bool{"Cyclone Faceguard": true, "Cyclone Shoulderguards": true, "Cyclone Chestguard": true, "Cyclone Handguards": true, "Cyclone Legguards": true},
-		Bonuses: map[int]ItemActivation{4: ActivateCycloneManaReduce, 2: func(sim *Simulation, agent Agent) Aura {
-			// if sim.Options.Totems.WrathOfAir {
-
-			// FUTURE: Only one ele shaman in the party can use this at a time.
-			//   not a big deal now but will need to be fixed to support full raid sim.
-			agent.GetCharacter().Party.AddStats(stats.Stats{stats.SpellPower: 20})
-			// }
-			return Aura{ID: MagicIDCyclone2pc}
-		}},
-	},
-	{
 		Name:  "Windhawk",
-		Items: map[string]bool{"Windhawk Hauberk": true, "Windhawk Belt": true, "Windhawk Bracers": true},
+		Items: map[int32]struct{}{29524: {}, 29523: {}, 29522: {}},
 		Bonuses: map[int]ItemActivation{3: func(sim *Simulation, agent Agent) Aura {
 			agent.GetCharacter().Stats[stats.MP5] += 8
 			return Aura{ID: MagicIDWindhawk}
 		}},
-	},
-	{
-		Name:    "Cataclysm Regalia",
-		Items:   map[string]bool{"Cataclysm Headpiece": true, "Cataclysm Shoulderpads": true, "Cataclysm Chestpiece": true, "Cataclysm Handgrips": true, "Cataclysm Leggings": true},
-		Bonuses: map[int]ItemActivation{4: ActivateCataclysmLBDiscount},
-	},
-	{
-		Name: "Skyshatter Regalia",
-		Items: map[string]bool{
-			"Skyshatter Headguard":   true,
-			"Skyshatter Mantle":      true,
-			"Skyshatter Breastplate": true,
-			"Skyshatter Gauntlets":   true,
-			"Skyshatter Legguards":   true,
-			"Skyshatter Cord":        true,
-			"Skyshatter Treads":      true,
-			"Skyshatter Bands":       true,
-		},
-		Bonuses: map[int]ItemActivation{2: func(sim *Simulation, agent Agent) Aura {
-			agent.GetCharacter().Stats[stats.MP5] += 15
-			agent.GetCharacter().Stats[stats.SpellCrit] += 35
-			agent.GetCharacter().Stats[stats.SpellPower] += 45
-			return Aura{ID: MagicIDSkyshatter2pc}
-		}, 4: ActivateSkyshatterImpLB},
 	},
 }
 
@@ -170,7 +114,7 @@ func init() {
 	for _, v := range items.Items {
 		setFound := false
 		for setIdx, set := range sets {
-			if set.Items[v.Name] {
+			if _, ok := set.Items[v.ID]; ok {
 				itemSetLookup[v.ID] = &sets[setIdx]
 				setFound = true
 				break

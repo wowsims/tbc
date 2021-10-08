@@ -91,6 +91,7 @@ func runServer(useFS bool, host string, launchBrowser bool, inputReader *bufio.R
 		if err != nil {
 			// block forever
 			<-c
+			os.Exit(-1)
 		}
 		if len(text) == 0 {
 			continue

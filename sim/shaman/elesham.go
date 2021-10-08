@@ -19,11 +19,11 @@ func NewElementalShaman(sim *core.Simulation, character *core.Character, options
 	talents := convertShamTalents(eleShamOptions.Talents)
 
 	selfBuffs := SelfBuffs{
-		Bloodlust: eleShamOptions.Options.Bloodlust,
-		ManaSpring: eleShamOptions.Options.ManaSpringTotem,
+		Bloodlust:    eleShamOptions.Options.Bloodlust,
+		ManaSpring:   eleShamOptions.Options.ManaSpringTotem,
 		TotemOfWrath: eleShamOptions.Options.TotemOfWrath,
-		WrathOfAir: eleShamOptions.Options.WrathOfAirTotem,
-		WaterShield: eleShamOptions.Options.WaterShield,
+		WrathOfAir:   eleShamOptions.Options.WrathOfAirTotem,
+		WaterShield:  eleShamOptions.Options.WaterShield,
 	}
 
 	var agent shamanAgent
@@ -63,14 +63,14 @@ func AuraLightningOverload(lvl int) core.Aura {
 		ID:      core.MagicIDLOTalent,
 		Expires: core.NeverExpires,
 		OnSpellHit: func(sim *core.Simulation, cast *core.Cast) {
-			if cast.Spell.ID != core.MagicIDLB12 && cast.Spell.ID != core.MagicIDCL6 {
+			if cast.Spell.ActionID.SpellID != SpellIDLB12 && cast.Spell.ActionID.SpellID != SpellIDCL6 {
 				return
 			}
 			if cast.Tag == CastTagLightningOverload {
 				return // can't proc LO on LO
 			}
 			actualChance := chance
-			if cast.Spell.ID == core.MagicIDCL6 {
+			if cast.Spell.ActionID.SpellID == SpellIDCL6 {
 				actualChance /= 3 // 33% chance of regular for CL LO
 			}
 			if sim.Rando.Float64("LO") < actualChance {
@@ -139,7 +139,7 @@ func (agent *LBOnlyAgent) Reset(shaman *Shaman, sim *core.Simulation) {}
 
 func NewLBOnlyAgent(sim *core.Simulation) *LBOnlyAgent {
 	return &LBOnlyAgent{
-		lb: core.Spells[core.MagicIDLB12],
+		lb: Spells[SpellIDLB12],
 	}
 }
 
@@ -152,7 +152,7 @@ type CLOnCDAgent struct {
 }
 
 func (agent *CLOnCDAgent) ChooseAction(shaman *Shaman, sim *core.Simulation) core.AgentAction {
-	if shaman.IsOnCD(core.MagicIDCL6, sim.CurrentTime) {
+	if shaman.IsOnCD(core.MagicIDChainLightning6, sim.CurrentTime) {
 		// sim.Log("[CLonCD] LB\n")
 		return NewCastAction(shaman, sim, agent.lb)
 	} else {
@@ -167,8 +167,8 @@ func (agent *CLOnCDAgent) Reset(shaman *Shaman, sim *core.Simulation) {}
 
 func NewCLOnCDAgent(sim *core.Simulation) *CLOnCDAgent {
 	return &CLOnCDAgent{
-		lb: core.Spells[core.MagicIDLB12],
-		cl: core.Spells[core.MagicIDCL6],
+		lb: Spells[SpellIDLB12],
+		cl: Spells[SpellIDCL6],
 	}
 }
 
@@ -197,7 +197,7 @@ func (agent *FixedRotationAgent) ChooseAction(shaman *Shaman, sim *core.Simulati
 		return NewCastAction(shaman, sim, agent.lb)
 	}
 
-	if !shaman.IsOnCD(core.MagicIDCL6, sim.CurrentTime) {
+	if !shaman.IsOnCD(core.MagicIDChainLightning6, sim.CurrentTime) {
 		return NewCastAction(shaman, sim, agent.cl)
 	}
 
@@ -207,7 +207,7 @@ func (agent *FixedRotationAgent) ChooseAction(shaman *Shaman, sim *core.Simulati
 		return NewCastAction(shaman, sim, agent.lb)
 	}
 
-	return core.AgentAction{Wait: shaman.GetRemainingCD(core.MagicIDCL6, sim.CurrentTime)}
+	return core.AgentAction{Wait: shaman.GetRemainingCD(core.MagicIDChainLightning6, sim.CurrentTime)}
 }
 
 func (agent *FixedRotationAgent) OnActionAccepted(shaman *Shaman, sim *core.Simulation, action core.AgentAction) {
@@ -215,9 +215,9 @@ func (agent *FixedRotationAgent) OnActionAccepted(shaman *Shaman, sim *core.Simu
 		return
 	}
 
-	if action.Cast.Spell.ID == core.MagicIDLB12 {
+	if action.Cast.Spell.ActionID.SpellID == SpellIDLB12 {
 		agent.numLBsSinceLastCL++
-	} else if action.Cast.Spell.ID == core.MagicIDCL6 {
+	} else if action.Cast.Spell.ActionID.SpellID == SpellIDCL6 {
 		agent.numLBsSinceLastCL = 0
 	}
 }
@@ -230,8 +230,8 @@ func NewFixedRotationAgent(sim *core.Simulation, numLBsPerCL int) *FixedRotation
 	return &FixedRotationAgent{
 		numLBsPerCL:       numLBsPerCL,
 		numLBsSinceLastCL: numLBsPerCL, // This lets us cast CL first
-		lb:                core.Spells[core.MagicIDLB12],
-		cl:                core.Spells[core.MagicIDCL6],
+		lb:                Spells[SpellIDLB12],
+		cl:                Spells[SpellIDCL6],
 	}
 }
 
@@ -247,7 +247,7 @@ type CLOnClearcastAgent struct {
 }
 
 func (agent *CLOnClearcastAgent) ChooseAction(shaman *Shaman, sim *core.Simulation) core.AgentAction {
-	if shaman.IsOnCD(core.MagicIDCL6, sim.CurrentTime) || !agent.prevPrevCastProccedCC {
+	if shaman.IsOnCD(core.MagicIDChainLightning6, sim.CurrentTime) || !agent.prevPrevCastProccedCC {
 		// sim.Log("[CLonCC] - LB")
 		return NewCastAction(shaman, sim, agent.lb)
 	}
@@ -266,8 +266,8 @@ func (agent *CLOnClearcastAgent) Reset(shaman *Shaman, sim *core.Simulation) {
 
 func NewCLOnClearcastAgent(sim *core.Simulation) *CLOnClearcastAgent {
 	return &CLOnClearcastAgent{
-		lb: core.Spells[core.MagicIDLB12],
-		cl: core.Spells[core.MagicIDCL6],
+		lb: Spells[SpellIDLB12],
+		cl: Spells[SpellIDCL6],
 	}
 }
 
@@ -378,7 +378,7 @@ func NewAdaptiveAgent(sim *core.Simulation) *AdaptiveAgent {
 	// eleShamParams.Agent.Type = proto.ElementalShaman_Agent_CLOnClearcast
 	params := *clearcastParams.PlayerOptions.GetElementalShaman()
 
-	eleShamParams := params                                                                         // clone
+	eleShamParams := params                                                                             // clone
 	eleShamParams.Agent = &proto.ElementalShaman_Agent{Type: proto.ElementalShaman_Agent_CLOnClearcast} // create new agent.
 
 	// Assign new eleShamParams
@@ -403,34 +403,4 @@ func NewAdaptiveAgent(sim *core.Simulation) *AdaptiveAgent {
 	}
 
 	return agent
-}
-
-// ChainCast is how to cast chain lightning.
-func ChainCastHandler(shaman *Shaman) func(sim *core.Simulation, cast *core.Cast) {
-	return func(sim *core.Simulation, cast *core.Cast) {
-		core.DirectCast(sim, cast) // Start with a normal direct cast to start.
-
-		// Now chain
-		dmgCoeff := 1.0
-		if cast.Tag == CastTagLightningOverload {
-			dmgCoeff = 0.5
-		}
-		for i := 1; i < sim.Options.Encounter.NumTargets; i++ {
-			if shaman.HasAura(core.MagicIDTidefury) {
-				dmgCoeff *= 0.83
-			} else {
-				dmgCoeff *= 0.7
-			}
-			clone := &core.Cast{
-				Caster:              cast.Caster,
-				Tag:                 cast.Tag, // pass along lightning overload
-				Spell:               cast.Spell,
-				BonusCrit:           cast.BonusCrit,
-				CritDamageMultipier: cast.CritDamageMultipier,
-				Effect:              func(sim *core.Simulation, cast *core.Cast) { cast.DidDmg *= dmgCoeff },
-				DoItNow:             core.DirectCast,
-			}
-			clone.DoItNow(sim, clone)
-		}
-	}
 }

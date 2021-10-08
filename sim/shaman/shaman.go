@@ -3,9 +3,8 @@ package shaman
 import (
 	"time"
 
-	"github.com/wowsims/tbc/sim/core/items"
-	"github.com/wowsims/tbc/sim/core/proto"
 	"github.com/wowsims/tbc/sim/core"
+	"github.com/wowsims/tbc/sim/core/proto"
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
@@ -16,9 +15,9 @@ func newShaman(character *core.Character, talents Talents, selfBuffs SelfBuffs, 
 
 	return &Shaman{
 		Character: character,
-		agent  :   agent,
+		agent:     agent,
 		Talents:   talents,
-		SelfBuffs:    selfBuffs,
+		SelfBuffs: selfBuffs,
 
 		convectionBonus: 0.02 * float64(talents.Convection),
 		concussionBonus: 1 + 0.01*float64(talents.Concussion),
@@ -99,7 +98,7 @@ func (shaman *Shaman) BuffUp(sim *core.Simulation) {
 	}
 }
 func (shaman *Shaman) OnSpellHit(sim *core.Simulation, cast *core.Cast) {
-	if cast.Spell.ID == core.MagicIDTLCLB { // TLC does not benefit from shaman talents
+	if cast.Spell.ActionID.ItemID == core.ItemIDTLC { // TLC does not benefit from shaman talents
 		return
 	}
 	cast.DidDmg *= shaman.concussionBonus // add concussion
@@ -199,119 +198,4 @@ func TryActivateBloodlust(sim *core.Simulation, shaman *Shaman) {
 			cast.CastTime = (cast.CastTime * 10) / 13 // 30% faster
 		},
 	})
-}
-
-// FUTURE: We can cache like 75% of the calculation for a spell cast ahead of time.
-//   First time we cast we should create and cache this cast object for better performance.
-//   This would get rid of the individual cached floats on Shaman.
-
-// func createBaseCast(character *Shaman, sim *core.Simulation, sp *core.Spell) *core.Cast {
-// 	cast := core.NewCast(sim, sp)
-
-// 	if character.Talents.ElementalPrecision > 0 {
-// 		// FUTURE: This only impacts "frost fire and nature" spells.
-// 		//  We know it doesnt impact TLC.
-// 		//  Are there any other spells that a shaman can cast?
-// 		cast.BonusHit += float64(character.Talents.ElementalPrecision) * 0.02
-// 	}
-// 	if character.Talents.NaturesGuidance > 0 {
-// 		cast.BonusHit += float64(character.Talents.NaturesGuidance) * 0.01
-// 	}
-// 	if character.Talents.TidalMastery > 0 {
-// 		cast.BonusCrit += float64(character.Talents.TidalMastery) * 0.01
-// 	}
-
-// 	// TODO: Should we change these to be full auras?
-// 	//   Doesnt seem needed since they can only be used by shaman right here.
-// 	if character.Equip[items.ItemSlotRanged].ID == 28248 {
-// 		cast.BonusSpellPower += 55
-// 	} else if character.Equip[items.ItemSlotRanged].ID == 23199 {
-// 		cast.BonusSpellPower += 33
-// 	} else if character.Equip[items.ItemSlotRanged].ID == 32330 {
-// 		cast.BonusSpellPower += 85
-// 	}
-// 	if character.Talents.CallOfThunder > 0 { // only applies to CL and LB
-// 		cast.BonusCrit += float64(character.Talents.CallOfThunder) * 0.01
-// 	}
-// 	if sim.Options.Encounter.NumTargets > 1 {
-// 		cast.DoItNow = ChainCast
-// 	}
-// 	cast.ManaCost *= character.convectionBonus
-
-// 	if character.Talents.LightningMastery > 0 {
-// 		cast.CastTime -= time.Millisecond * 100 * time.Duration(character.Talents.LightningMastery)
-// 	}
-
-// 	return cast
-// }
-
-// Totem Item IDs
-const (
-	TotemOfTheVoid           = 28248
-	TotemOfStorms            = 23199
-	TotemOfAncestralGuidance = 32330
-)
-
-// NewCastAction is how a shaman creates a new spell
-//  TODO: Decide if we need separate functions for elemental and enhancement?
-func NewCastAction(shaman *Shaman, sim *core.Simulation, sp *core.Spell) core.AgentAction {
-	cast := core.NewCast(sim, shaman, sp)
-
-	itsElectric := sp.ID == core.MagicIDCL6 || sp.ID == core.MagicIDLB12
-
-	if shaman.Talents.ElementalPrecision > 0 {
-		// FUTURE: This only impacts "frost fire and nature" spells.
-		//  We know it doesnt impact TLC.
-		//  Are there any other spells that a shaman can cast?
-		cast.BonusHit += float64(shaman.Talents.ElementalPrecision) * 0.02
-	}
-	if shaman.Talents.NaturesGuidance > 0 {
-		cast.BonusHit += float64(shaman.Talents.NaturesGuidance) * 0.01
-	}
-	if shaman.Talents.TidalMastery > 0 {
-		cast.BonusCrit += float64(shaman.Talents.TidalMastery) * 0.01
-	}
-
-	if itsElectric {
-		// TODO: Should we change these to be full auras?
-		//   Doesnt seem needed since they can only be used by shaman right here.
-		if shaman.Equip[items.ItemSlotRanged].ID == TotemOfTheVoid {
-			cast.BonusSpellPower += 55
-		} else if shaman.Equip[items.ItemSlotRanged].ID == TotemOfStorms {
-			cast.BonusSpellPower += 33
-		} else if shaman.Equip[items.ItemSlotRanged].ID == TotemOfAncestralGuidance {
-			cast.BonusSpellPower += 85
-		}
-		if shaman.Talents.CallOfThunder > 0 { // only applies to CL and LB
-			cast.BonusCrit += float64(shaman.Talents.CallOfThunder) * 0.01
-		}
-		if sp.ID == core.MagicIDCL6 && sim.Options.Encounter.NumTargets > 1 {
-			cast.DoItNow = ChainCastHandler(shaman)
-		}
-		if shaman.Talents.LightningMastery > 0 {
-			cast.CastTime -= time.Millisecond * 100 * time.Duration(shaman.Talents.LightningMastery)
-		}
-	}
-	cast.CastTime = time.Duration(float64(cast.CastTime) / shaman.HasteBonus())
-
-	// Apply any on cast effects.
-	for _, id := range shaman.ActiveAuraIDs {
-		if shaman.Auras[id].OnCast != nil {
-			shaman.Auras[id].OnCast(sim, cast)
-		}
-	}
-	if itsElectric { // TODO: Add ElementalFury talent
-		// This is written this way to deal with making CSD dmg increase correct.
-		// The 'OnCast' auras include CSD
-		cast.CritDamageMultipier *= 2 // This handles the 'Elemental Fury' talent which increases the crit bonus.
-		cast.CritDamageMultipier -= 1 // reduce to multiplier instead of percent.
-
-		// Convection applies against the base cost of the spell.
-		cast.ManaCost -= sp.Mana * shaman.convectionBonus
-	}
-
-	return core.AgentAction{
-		Wait: 0,
-		Cast: cast,
-	}
 }
