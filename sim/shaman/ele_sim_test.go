@@ -146,7 +146,7 @@ func TestAverageDPS(t *testing.T) {
 	options := BasicOptions
 	options.Iterations = 10000
 	options.Encounter = LongEncounter
-	options.Encounter.NumTargets = 3
+	// options.Encounter.NumTargets = 3
 	// options.Debug = true
 
 	params := core.IndividualParams{

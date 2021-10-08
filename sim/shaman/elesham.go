@@ -207,7 +207,7 @@ func (agent *FixedRotationAgent) ChooseAction(shaman *Shaman, sim *core.Simulati
 		return NewCastAction(shaman, sim, agent.lb)
 	}
 
-	return core.AgentAction{Wait: shaman.GetRemainingCD(SpellIDCL6, sim.CurrentTime)}
+	return core.AgentAction{Wait: shaman.GetRemainingCD(core.MagicIDChainLightning6, sim.CurrentTime)}
 }
 
 func (agent *FixedRotationAgent) OnActionAccepted(shaman *Shaman, sim *core.Simulation, action core.AgentAction) {
@@ -403,36 +403,4 @@ func NewAdaptiveAgent(sim *core.Simulation) *AdaptiveAgent {
 	}
 
 	return agent
-}
-
-// ChainCast is how to cast chain lightning.
-func ChainCastHandler(shaman *Shaman) func(sim *core.Simulation, cast *core.Cast) {
-	return func(sim *core.Simulation, cast *core.Cast) {
-		core.DirectCast(sim, cast) // Start with a normal direct cast to start.
-
-		// Now chain
-		dmgCoeff := 1.0
-		if cast.Tag == CastTagLightningOverload {
-			dmgCoeff = 0.5
-		}
-		for i := 1; i < sim.Options.Encounter.NumTargets; i++ {
-			if shaman.HasAura(core.MagicIDTidefury) {
-				dmgCoeff *= 0.83
-			} else {
-				dmgCoeff *= 0.7
-			}
-			clone := &core.Cast{
-				Caster:              cast.Caster,
-				Tag:                 cast.Tag, // pass along lightning overload
-				Spell:               cast.Spell,
-				BonusCrit:           cast.BonusCrit,
-				BonusHit:            cast.BonusHit,
-				BonusSpellPower:     cast.BonusSpellPower,
-				CritDamageMultipier: cast.CritDamageMultipier,
-				Effect:              func(sim *core.Simulation, cast *core.Cast) { cast.DidDmg *= dmgCoeff },
-				DoItNow:             ChainCastHandler(shaman), // so that LO will call ChainCast instead of DirectCast.
-			}
-			core.DirectCast(sim, clone)
-		}
-	}
 }
