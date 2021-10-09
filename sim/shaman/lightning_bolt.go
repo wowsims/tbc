@@ -1,6 +1,7 @@
 package shaman
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
@@ -110,6 +111,7 @@ func (lb LightningBolt) GetHitInputs(sim *core.Simulation, cast *core.DirectCast
 
 	if lb.shaman.EquippedMetaGem(core.ChaoticSkyfireDiamond) {
 		hitInput.CritMultiplier *= 1.03
+		fmt.Printf("Got csd, Crit multiplier: %0.2f", hitInput.CritMultiplier)
 	}
 	if lb.shaman.Talents.ElementalFury {
 		hitInput.CritMultiplier *= 2
