@@ -32,7 +32,7 @@ func TestSimulatePreRaidNoBuffs(t *testing.T) {
 		Gear:          PreRaidGear,
 
 		ExpectedDpsShort: 867,
-		ExpectedDpsLong:  269,
+		ExpectedDpsLong:  277,
 	})
 }
 
@@ -49,8 +49,8 @@ func TestSimulatePreRaid(t *testing.T) {
 		PlayerOptions: &PlayerOptionsAdaptive,
 		Gear:          PreRaidGear,
 
-		ExpectedDpsShort: 1398.5,
-		ExpectedDpsLong:  1096.3,
+		ExpectedDpsShort: 1406.3,
+		ExpectedDpsLong:  1098.0,
 	})
 }
 
@@ -67,8 +67,8 @@ func TestSimulateP1(t *testing.T) {
 		PlayerOptions: &PlayerOptionsAdaptive,
 		Gear:          P1Gear,
 
-		ExpectedDpsShort: 1539.5,
-		ExpectedDpsLong:  1260.3,
+		ExpectedDpsShort: 1527.1,
+		ExpectedDpsLong:  1226.6,
 	})
 }
 
@@ -104,7 +104,7 @@ func TestLBOnlyAgent(t *testing.T) {
 		Gear:          P1Gear,
 
 		ExpectedDpsShort: 1581.1,
-		ExpectedDpsLong:  1271.9,
+		ExpectedDpsLong:  1210.4,
 	})
 }
 
@@ -135,8 +135,8 @@ func TestClearcastAgent(t *testing.T) {
 		PlayerOptions: &PlayerOptionsCLOnClearcast,
 		Gear:          P1Gear,
 
-		ExpectedDpsShort: 1459.8,
-		ExpectedDpsLong:  1221.8,
+		ExpectedDpsShort: 1468.4,
+		ExpectedDpsLong:  1214.2,
 	})
 }
 
@@ -162,9 +162,13 @@ func TestAverageDPS(t *testing.T) {
 	sim := core.NewIndividualSim(params)
 	result := sim.Run()
 
-	log.Printf("result.DpsAvg: %0.1f", result.DpsAvg)
-	log.Printf("LOGS:\n %s\n", result.Logs)
-	t.Fatalf("%s failed: expected %0f dps from sim but was %0f", "Average", 1200.0, result.DpsAvg)
+	//log.Printf("LOGS:\n %s\n", result.Logs)
+
+	expectedDps := 1248.4
+	tolerance := 0.5
+	if result.DpsAvg < expectedDps-tolerance || result.DpsAvg > expectedDps+tolerance {
+		t.Fatalf("%s failed: expected %0f dps from sim but was %0f", "Average", expectedDps, result.DpsAvg)
+	}
 }
 
 func BenchmarkSimulate(b *testing.B) {
@@ -239,7 +243,10 @@ func doSimulateTest(label string, t *testing.T, params core.IndividualParams, ex
 	sim := core.NewIndividualSim(params)
 	result := sim.Run()
 
-	log.Printf("LOGS:\n%s\n", result.Logs)
+	if params.Options.Debug {
+		log.Printf("LOGS:\n%s\n", result.Logs)
+	}
+
 	tolerance := 0.5
 	if result.DpsAvg < expectedDps-tolerance || result.DpsAvg > expectedDps+tolerance {
 		t.Fatalf("%s failed: expected %0f dps from sim but was %0f", label, expectedDps, result.DpsAvg)
