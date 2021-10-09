@@ -37,16 +37,15 @@ func (cl ChainLightning) GetHitInputs(sim *core.Simulation, cast *core.DirectCas
 	hitInputs := make([]core.DirectCastDamageInput, 0, numHits)
 	hitInputs = append(hitInputs, hitInput)
 
-	chainMultiplier := 1.0
 	for i := int32(1); i < numHits; i++ {
+		bounceHit := hitInputs[i - 1] // Makes a copy
+
 		if cl.Shaman.HasAura(core.MagicIDTidefury) {
-			chainMultiplier *= 0.83
+			bounceHit.DamageMultiplier *= 0.83
 		} else {
-			chainMultiplier *= 0.7
+			bounceHit.DamageMultiplier *= 0.7
 		}
 
-		bounceHit := hitInputs[0] // Makes a copy
-		bounceHit.DamageMultiplier *= chainMultiplier
 		hitInputs = append(hitInputs, bounceHit)
 	}
 
