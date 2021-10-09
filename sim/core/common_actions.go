@@ -91,19 +91,16 @@ func (lcc LightningCapacitorCast) GetCooldown() time.Duration {
 }
 
 func (lcc LightningCapacitorCast) GetCastInput(sim *Simulation, cast *DirectCastAction) DirectCastInput {
-	return DirectCastInput{}
+	return DirectCastInput{
+		CritMultiplier: 1.5,
+	}
 }
 
 func (lcc LightningCapacitorCast) GetHitInputs(sim *Simulation, cast *DirectCastAction) []DirectCastDamageInput{
 	hitInput := DirectCastDamageInput{
 		MinBaseDamage: 694,
 		MaxBaseDamage: 807,
-		CritMultiplier: 1.5,
 		DamageMultiplier: 1,
-	}
-
-	if lcc.agent.GetCharacter().EquippedMetaGem(ChaoticSkyfireDiamond) {
-		hitInput.CritMultiplier *= 1.03
 	}
 
 	return []DirectCastDamageInput{hitInput}

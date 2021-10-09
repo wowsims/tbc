@@ -481,6 +481,20 @@ func ActivateDCC(sim *Simulation, agent Agent) Aura {
 	}
 }
 
+func ActivateCSD(sim *Simulation, agent Agent) Aura {
+	return Aura{
+		ID:      MagicIDChaoticSkyfire,
+		Expires: NeverExpires,
+		OnCast: func(sim *Simulation, cast *DirectCastAction, input *DirectCastInput) {
+			// For a normal spell with crit multiplier of 1.5, this will be 1.
+			// For a spell with a multiplier of 2 (i.e. 100% increased critical damage) this will be 2.
+			improvedCritRatio := (input.CritMultiplier - 1) / 0.5
+
+			input.CritMultiplier += 0.045 * improvedCritRatio
+		},
+	}
+}
+
 func ActivateIED(sim *Simulation, agent Agent) Aura {
 	icd := NewICD()
 	const dur = time.Second * 15
