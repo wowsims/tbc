@@ -16,6 +16,9 @@ type DirectCastInput struct {
 
 	CastTime time.Duration
 
+	// How much to multiply damage by, if this cast crits.
+	CritMultiplier float64
+
 	// If true, will force the cast to crit (if it doesnt miss).
 	GuaranteedCrit bool
 }
@@ -27,9 +30,6 @@ type DirectCastDamageInput struct {
 
 	// Increase in damage per point of spell power.
 	SpellCoefficient float64
-
-	// How much to multiply damage by, if this cast crits.
-	CritMultiplier float64
 
 	// Additional multiplier that is always applied.
 	DamageMultiplier float64
@@ -225,7 +225,7 @@ func (action *DirectCastAction) calculateDirectCastDamage(sim *Simulation, damag
 	// TODO: Put guaranteed crit first, to short-circuit the random roll. Keeping it this way for now for tests.
 	if sim.Rando.Float64("action crit") < crit || action.castInput.GuaranteedCrit {
 		result.Crit = true
-		damage *= damageInput.CritMultiplier
+		damage *= action.castInput.CritMultiplier
 	}
 
 	// Average Resistance (AR) = (Target's Resistance / (Caster's Level * 5)) * 0.75
