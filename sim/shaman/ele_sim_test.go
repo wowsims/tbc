@@ -164,6 +164,7 @@ func TestAverageDPS(t *testing.T) {
 
 	log.Printf("result.DpsAvg: %0.1f", result.DpsAvg)
 	log.Printf("LOGS:\n %s\n", result.Logs)
+	t.Fatalf("%s failed: expected %0f dps from sim but was %0f", "Average", 1200, result.DpsAvg)
 }
 
 func BenchmarkSimulate(b *testing.B) {
