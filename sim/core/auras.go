@@ -7,9 +7,6 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-// AuraEffects will mutate a cast or simulation state.
-type AuraEffect func(sim *Simulation, c *Cast)
-
 const NeverExpires = time.Duration(math.MaxInt64)
 
 type Aura struct {
@@ -21,11 +18,21 @@ type Aura struct {
 	// about charges, is just 0.
 	Stacks int32
 
-	OnCast         AuraEffect
-	OnCastComplete AuraEffect
-	OnSpellHit     AuraEffect
-	OnSpellMiss    AuraEffect
-	OnExpire       AuraEffect
+	// Invoked at creation time for a spell cast.
+	OnCast         func(sim *Simulation, cast *DirectCastAction, castInput *DirectCastInput)
+
+	// Invoked when a spell cast completes casting, before results are calculated.
+	OnCastComplete func(sim *Simulation, cast *DirectCastAction)
+
+	// Invoked when a spell is fully resisted.
+	OnSpellMiss    func(sim *Simulation, cast *DirectCastAction)
+
+	// Invoked when a spell hits, after results are calculated. Results can be modified by changing
+	// properties of result.
+	OnSpellHit     func(sim *Simulation, cast *DirectCastAction, result *DirectCastDamageResult)
+
+	// Invoked when this Aura expires.
+	OnExpire       func(sim *Simulation)
 }
 
 func NewAuraTracker() *AuraTracker {
@@ -83,7 +90,7 @@ func (at *AuraTracker) AddAura(sim *Simulation, newAura Aura) {
 // Remove an aura by its ID
 func (at *AuraTracker) RemoveAura(sim *Simulation, id int32) {
 	if at.Auras[id].OnExpire != nil {
-		at.Auras[id].OnExpire(sim, nil)
+		at.Auras[id].OnExpire(sim)
 	}
 	removeActiveIndex := at.Auras[id].activeIndex
 	at.Auras[id] = Aura{}
@@ -133,8 +140,6 @@ func AuraName(a int32) string {
 		return "Lightning Overload Talent"
 	case MagicIDJoW:
 		return "Judgement Of Wisdom Aura"
-	case MagicIDEleFocus:
-		return "Elemental Focus"
 	case MagicIDEleMastery:
 		return "Elemental Mastery"
 	case MagicIDBlessingSilverCrescent:
@@ -253,8 +258,6 @@ func AuraName(a int32) string {
 		return "Skyshatter 2pc Set Bonus"
 	case MagicIDSkyshatter4pc:
 		return "Skyshatter 4pc Set Bonus"
-	case MagicIDTotemOfPulsingEarth:
-		return "Totem of Pulsing Earth"
 	case MagicIDEssMartyrTrink:
 		return "Essence of the Martyr Trinket"
 	case MagicIDEssSappTrink:
@@ -301,7 +304,6 @@ const (
 	// Auras
 	MagicIDLOTalent
 	MagicIDJoW
-	MagicIDEleFocus
 	MagicIDEleMastery
 	MagicIDBlessingSilverCrescent
 	MagicIDDarkIronPipeweed
@@ -354,7 +356,6 @@ const (
 	MagicIDSkyshatter4pc    // skyshatter 4pc aura
 	MagicIDElderScribe      // elder scribe robe item aura
 	MagicIDElderScribeProc  // elder scribe robe temp buff
-	MagicIDTotemOfPulsingEarth
 	MagicIDRegainMana // effect from fathom brooch
 	MagicIDAlchStone
 	MagicIDCurseOfElements
@@ -391,7 +392,7 @@ func AddTemporaryStats(sim *Simulation, agent Agent, auraID int32, stat stats.St
 	return Aura{
 		ID:      auraID,
 		Expires: sim.CurrentTime + duration,
-		OnExpire: func(sim *Simulation, cast *Cast) {
+		OnExpire: func(sim *Simulation) {
 			if sim.Log != nil {
 				sim.Log(" -%0.0f %s from %s\n", amount, stat.StatName(), AuraName(auraID))
 			}
@@ -427,7 +428,7 @@ func ActivateQuagsEye(sim *Simulation, agent Agent) Aura {
 	return Aura{
 		ID:      MagicIDQuagsEye,
 		Expires: NeverExpires,
-		OnCastComplete: func(sim *Simulation, cast *Cast) {
+		OnCastComplete: func(sim *Simulation, cast *DirectCastAction) {
 			if !icd.isOnCD(sim) && sim.Rando.Float64("quags") < 0.1 {
 				icd = InternalCD(sim.CurrentTime + dur)
 				AddAuraWithTemporaryStats(sim, agent, MagicIDFungalFrenzy, stats.SpellHaste, hasteBonus, time.Second*6)
@@ -443,11 +444,11 @@ func ActivateNexusHorn(sim *Simulation, agent Agent) Aura {
 	return Aura{
 		ID:      MagicIDNexusHorn,
 		Expires: NeverExpires,
-		OnSpellHit: func(sim *Simulation, cast *Cast) {
-			if cast.Spell.ActionID.ItemID == ItemIDTLC {
+		OnSpellHit: func(sim *Simulation, cast *DirectCastAction, result *DirectCastDamageResult) {
+			if cast.GetActionID().ItemID == ItemIDTLC {
 				return // TLC can't proc Sextant
 			}
-			if !icd.isOnCD(sim) && cast.DidCrit && sim.Rando.Float64("unmarked") < 0.2 {
+			if !icd.isOnCD(sim) && result.Crit && sim.Rando.Float64("unmarked") < 0.2 {
 				icd = InternalCD(sim.CurrentTime + dur)
 				AddAuraWithTemporaryStats(sim, agent, MagicIDCallOfTheNexus, stats.SpellPower, spellBonus, time.Second*10)
 			}
@@ -461,7 +462,7 @@ func ActivateDCC(sim *Simulation, agent Agent) Aura {
 	return Aura{
 		ID:      MagicIDDCC,
 		Expires: NeverExpires,
-		OnCastComplete: func(sim *Simulation, cast *Cast) {
+		OnCastComplete: func(sim *Simulation, cast *DirectCastAction) {
 			if stacks < 10 {
 				stacks++
 				agent.GetCharacter().Stats[stats.SpellPower] += spellBonus
@@ -471,23 +472,11 @@ func ActivateDCC(sim *Simulation, agent Agent) Aura {
 			agent.GetCharacter().AddAura(sim, Aura{
 				ID:      MagicIDDCCBonus,
 				Expires: sim.CurrentTime + time.Second*10,
-				OnExpire: func(sim *Simulation, cast *Cast) {
+				OnExpire: func(sim *Simulation) {
 					agent.GetCharacter().Stats[stats.SpellPower] -= spellBonus * float64(stacks)
 					stacks = 0
 				},
 			})
-		},
-	}
-}
-
-func ActivateCSD(sim *Simulation, agent Agent) Aura {
-	return Aura{
-		ID:      MagicIDChaoticSkyfire,
-		Expires: NeverExpires,
-		OnCast: func(sim *Simulation, cast *Cast) {
-			// TODO: Figure out how to make this work properly/easily with crit bonus
-			//  and classes with crit bonus modifiers
-			cast.CritDamageMultipier *= 1.03
 		},
 	}
 }
@@ -498,7 +487,7 @@ func ActivateIED(sim *Simulation, agent Agent) Aura {
 	return Aura{
 		ID:      MagicIDInsightfulEarthstorm,
 		Expires: NeverExpires,
-		OnCastComplete: func(sim *Simulation, cast *Cast) {
+		OnCastComplete: func(sim *Simulation, cast *DirectCastAction) {
 			if !icd.isOnCD(sim) && sim.Rando.Float64("unmarked") < 0.04 {
 				icd = InternalCD(sim.CurrentTime + dur)
 				if sim.Log != nil {
@@ -518,7 +507,7 @@ func ActivateMSD(sim *Simulation, agent Agent) Aura {
 	return Aura{
 		ID:      MagicIDMysticSkyfire,
 		Expires: NeverExpires,
-		OnCastComplete: func(sim *Simulation, cast *Cast) {
+		OnCastComplete: func(sim *Simulation, cast *DirectCastAction) {
 			if !icd.isOnCD(sim) && sim.Rando.Float64("unmarked") < 0.15 {
 				icd = InternalCD(sim.CurrentTime + icdDur)
 				AddAuraWithTemporaryStats(sim, agent, MagicIDMysticFocus, stats.SpellHaste, hasteBonus, dur)
@@ -542,7 +531,7 @@ func ActivateSpellstrike(sim *Simulation, agent Agent) Aura {
 	return Aura{
 		ID:      MagicIDSpellstrike,
 		Expires: NeverExpires,
-		OnCastComplete: func(sim *Simulation, cast *Cast) {
+		OnCastComplete: func(sim *Simulation, cast *DirectCastAction) {
 			if sim.Rando.Float64("unmarked") < 0.05 {
 				AddAuraWithTemporaryStats(sim, agent, MagicIDSpellstrikeInfusion, stats.SpellPower, spellBonus, duration)
 			}
@@ -556,7 +545,7 @@ func ActivateManaEtched(sim *Simulation, agent Agent) Aura {
 	return Aura{
 		ID:      MagicIDManaEtched,
 		Expires: NeverExpires,
-		OnCastComplete: func(sim *Simulation, cast *Cast) {
+		OnCastComplete: func(sim *Simulation, cast *DirectCastAction) {
 			if sim.Rando.Float64("unmarked") < 0.02 {
 				AddAuraWithTemporaryStats(sim, agent, MagicIDManaEtchedInsight, stats.SpellPower, spellBonus, duration)
 			}
@@ -564,47 +553,30 @@ func ActivateManaEtched(sim *Simulation, agent Agent) Aura {
 	}
 }
 
-const ItemIDTLC = 28785
-
 func ActivateTLC(sim *Simulation, agent Agent) Aura {
-	const icdDur = time.Millisecond * 2500
-	tlcspell := &Spell{
-		Name:     "TLCLB",
-		ActionID: ActionID{ItemID: ItemIDTLC},
-		Coeff:    0.0, MinDmg: 694, MaxDmg: 807, Mana: 0, DamageType: stats.NatureSpellPower,
-	}
-	// TODO: make this not have to be done by hand...
-	tlcspell.DmgDiff = tlcspell.MaxDmg - tlcspell.MinDmg
-
 	charges := 0
+
+	const icdDur = time.Millisecond * 2500
 	icd := NewICD()
 
 	return Aura{
 		ID:      MagicIDTLC,
 		Expires: NeverExpires,
-		OnSpellHit: func(sim *Simulation, cast *Cast) {
+		OnSpellHit: func(sim *Simulation, cast *DirectCastAction, result *DirectCastDamageResult) {
 			if icd.isOnCD(sim) {
 				return
 			}
-			if !cast.DidCrit {
+
+			if !result.Crit {
 				return
 			}
+
 			charges++
-			if sim.Log != nil {
-				sim.Log(" Lightning Capacitor Charges: %d\n", charges)
-			}
 			if charges >= 3 {
-				if sim.Log != nil {
-					sim.Log(" Lightning Capacitor Triggered!\n")
-				}
 				icd = InternalCD(sim.CurrentTime + icdDur)
-				clone := NewCast(sim, agent, tlcspell)
-				// TODO: handle CSD for TLC better...
-				if agent.GetCharacter().HasAura(MagicIDChaoticSkyfire) {
-					agent.GetCharacter().Auras[MagicIDChaoticSkyfire].OnCast(sim, clone)
-				}
-				DirectCast(sim, clone)
 				charges = 0
+				castAction := NewLightningCapacitorCast(sim, agent)
+				castAction.Act(sim)
 			}
 		},
 	}
@@ -618,11 +590,11 @@ func ActivateSextant(sim *Simulation, agent Agent) Aura {
 	return Aura{
 		ID:      MagicIDSextant,
 		Expires: NeverExpires,
-		OnSpellHit: func(sim *Simulation, cast *Cast) {
-			if cast.Spell.ActionID.ItemID == ItemIDTLC {
+		OnSpellHit: func(sim *Simulation, cast *DirectCastAction, result *DirectCastDamageResult) {
+			if cast.GetActionID().ItemID == ItemIDTLC {
 				return // TLC can't proc Sextant
 			}
-			if cast.DidCrit && !icd.isOnCD(sim) && sim.Rando.Float64("unmarked") < 0.2 {
+			if result.Crit && !icd.isOnCD(sim) && sim.Rando.Float64("unmarked") < 0.2 {
 				icd = InternalCD(sim.CurrentTime + icdDur)
 				AddAuraWithTemporaryStats(sim, agent, MagicIDUnstableCurrents, stats.SpellPower, spellBonus, dur)
 			}
@@ -636,7 +608,7 @@ func ActivateEyeOfMag(sim *Simulation, agent Agent) Aura {
 	return Aura{
 		ID:      MagicIDEyeOfMag,
 		Expires: NeverExpires,
-		OnSpellMiss: func(sim *Simulation, cast *Cast) {
+		OnSpellMiss: func(sim *Simulation, cast *DirectCastAction) {
 			AddAuraWithTemporaryStats(sim, agent, MagicIDRecurringPower, stats.SpellPower, spellBonus, dur)
 		},
 	}
@@ -652,7 +624,7 @@ func ActivateElderScribes(sim *Simulation, agent Agent) Aura {
 	return Aura{
 		ID:      MagicIDElderScribe,
 		Expires: NeverExpires,
-		OnSpellHit: func(sim *Simulation, cast *Cast) {
+		OnSpellHit: func(sim *Simulation, cast *DirectCastAction, result *DirectCastDamageResult) {
 			// This code is starting to look a lot like other ICD buff items. Perhaps we could DRY this out.
 			if !icd.isOnCD(sim) && sim.Rando.Float64("unmarked") < proc {
 				icd = InternalCD(sim.CurrentTime + icdDur)
@@ -670,11 +642,11 @@ func ActivateFathomBrooch(sim *Simulation, agent Agent) Aura {
 	return Aura{
 		ID:      MagicIDRegainMana,
 		Expires: NeverExpires,
-		OnCastComplete: func(sim *Simulation, cast *Cast) {
+		OnCastComplete: func(sim *Simulation, cast *DirectCastAction) {
 			if icd.isOnCD(sim) {
 				return
 			}
-			if cast.Spell.DamageType != stats.NatureSpellPower {
+			if cast.GetSpellSchool() != stats.NatureSpellPower {
 				return
 			}
 			if sim.Rando.Float64("unmarked") < 0.15 {

@@ -24,7 +24,7 @@ func newShaman(character *core.Character, talents Talents, selfBuffs SelfBuffs, 
 	}
 }
 
-// Which totems this shaman is dropping.
+// Which buffs this shaman is using.
 type SelfBuffs struct {
 	Bloodlust    bool
 	WaterShield  bool
@@ -64,6 +64,8 @@ type Shaman struct {
 	// cache
 	convectionBonus float64
 	concussionBonus float64
+
+	elementalFocusStacks byte
 }
 
 func (shaman *Shaman) GetCharacter() *core.Character {
@@ -93,33 +95,15 @@ func (shaman *Shaman) AddPartyBuffs(buffs *core.Buffs) {
 
 // BuffUp lets you buff up all characters in sim (and yourself)
 func (shaman *Shaman) BuffUp(sim *core.Simulation) {
-	if shaman.Talents.LightningOverload > 0 {
-		shaman.AddAura(sim, AuraLightningOverload(shaman.Talents.LightningOverload))
-	}
-}
-func (shaman *Shaman) OnSpellHit(sim *core.Simulation, cast *core.Cast) {
-	if cast.Spell.ActionID.ItemID == core.ItemIDTLC { // TLC does not benefit from shaman talents
-		return
-	}
-	cast.DidDmg *= shaman.concussionBonus // add concussion
-
-	if cast.DidCrit && shaman.Talents.ElementalFocus {
-		a := core.Aura{
-			ID:             core.MagicIDEleFocus,
-			Expires:        sim.CurrentTime + time.Second*15,
-			Stacks:         2,
-			OnCast:         elementalFocusOnCast,
-			OnCastComplete: makeElementalFocusOnCastComplete(shaman),
-		}
-		shaman.AddAura(sim, a)
-	}
 }
 func (shaman *Shaman) ChooseAction(sim *core.Simulation) core.AgentAction {
+	// TODO: Move this to BuffUp?
 	if !shaman.started {
 		shaman.started = true
 		// we need to apply regen once all buffs are applied.
 		shaman.Stats[stats.MP5] += shaman.Stats[stats.Intellect] * (0.02 * float64(shaman.Talents.UnrelentingStorm))
 	}
+
 	// Before casting, activate shaman powers!
 	TryActivateBloodlust(sim, shaman)
 	if shaman.Talents.ElementalMastery {
@@ -136,23 +120,6 @@ func (shaman *Shaman) Reset(newsim *core.Simulation) {
 	shaman.agent.Reset(shaman, newsim)
 }
 
-func elementalFocusOnCast(sim *core.Simulation, cast *core.Cast) {
-	cast.ManaCost *= .6 // reduced by 40%
-}
-
-func makeElementalFocusOnCastComplete(shaman *Shaman) core.AuraEffect {
-	return func(sim *core.Simulation, cast *core.Cast) {
-		if cast.ManaCost <= 0 {
-			return // Don't consume charges from free spells.
-		}
-
-		shaman.Auras[core.MagicIDEleFocus].Stacks--
-		if shaman.Auras[core.MagicIDEleFocus].Stacks == 0 {
-			shaman.RemoveAura(sim, core.MagicIDEleFocus)
-		}
-	}
-}
-
 type Talents struct {
 	ElementalFocus     bool
 	LightningMastery   int
@@ -161,6 +128,7 @@ type Talents struct {
 	NaturesGuidance    int
 	TidalMastery       int
 	ElementalMastery   bool
+	ElementalFury      bool
 	UnrelentingStorm   int
 	CallOfThunder      int
 	Convection         int
@@ -174,6 +142,7 @@ func convertShamTalents(t *proto.ShamanTalents) Talents {
 		NaturesGuidance:    int(t.NaturesGuidance),
 		TidalMastery:       int(t.TidalMastery),
 		ElementalMastery:   t.ElementalMastery,
+		ElementalFury:      t.ElementalFury,
 		UnrelentingStorm:   int(t.UnrelentingStorm),
 		CallOfThunder:      int(t.CallOfThunder),
 		Convection:         int(t.Convection),
@@ -194,8 +163,28 @@ func TryActivateBloodlust(sim *core.Simulation, shaman *Shaman) {
 	shaman.Party.AddAura(sim, core.Aura{
 		ID:      core.MagicIDBloodlust,
 		Expires: sim.CurrentTime + dur,
-		OnCast: func(sim *core.Simulation, cast *core.Cast) {
-			cast.CastTime = (cast.CastTime * 10) / 13 // 30% faster
+		OnCast: func(sim *core.Simulation, cast *core.DirectCastAction, input *core.DirectCastInput) {
+			input.CastTime = (input.CastTime * 10) / 13 // 30% faster
+		},
+	})
+}
+
+func TryActivateEleMastery(sim *core.Simulation, shaman *Shaman) {
+	if shaman.IsOnCD(core.MagicIDEleMastery, sim.CurrentTime) {
+		return
+	}
+
+	shaman.AddAura(sim, core.Aura{
+		ID:      core.MagicIDEleMastery,
+		Expires: core.NeverExpires,
+		OnCast: func(sim *core.Simulation, cast *core.DirectCastAction, input *core.DirectCastInput) {
+			input.ManaCost = 0
+			input.GuaranteedCrit = true
+		},
+		OnCastComplete: func(sim *core.Simulation, cast *core.DirectCastAction) {
+			// Remove the buff and put skill on CD
+			shaman.SetCD(core.MagicIDEleMastery, time.Second*180+sim.CurrentTime)
+			shaman.RemoveAura(sim, core.MagicIDEleMastery)
 		},
 	})
 }

@@ -72,7 +72,7 @@ func convertSimParams(request *proto.IndividualSimRequest) core.IndividualParams
 	if request.Encounter != nil {
 		options.Encounter = core.Encounter{
 			Duration:   request.Encounter.Duration,
-			NumTargets: int(request.Encounter.NumTargets),
+			NumTargets: int32(request.Encounter.NumTargets),
 			Armor:      request.Encounter.TargetArmor,
 		}
 	}

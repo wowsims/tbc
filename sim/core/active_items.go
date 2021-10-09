@@ -29,7 +29,6 @@ func AddActiveItem(id int32, ai ActiveItem) {
 
 var ActiveItemByID = map[int32]ActiveItem{
 	// Gems
-	34220: {Activate: ActivateCSD, ActivateCD: NeverExpires},
 	35503: {Activate: ActivateESD, ActivateCD: NeverExpires},
 	25893: {Activate: ActivateMSD, ActivateCD: NeverExpires},
 	25901: {Activate: ActivateIED, ActivateCD: NeverExpires},

@@ -21,10 +21,8 @@ func (mage *Mage) AddPartyBuffs(buffs *core.Buffs) {
 func (mage *Mage) BuffUp(sim *core.Simulation) {
 }
 
-func (mage *Mage) OnSpellHit(sim *core.Simulation, cast *core.Cast) {
-}
 func (mage *Mage) ChooseAction(sim *core.Simulation) core.AgentAction {
-	return core.AgentAction{Wait: core.NeverExpires} // makes the bot wait forever and do nothing.
+	return core.NewWaitAction(sim, mage, core.NeverExpires) // makes the bot wait forever and do nothing.
 }
 func (mage *Mage) OnActionAccepted(sim *core.Simulation, action core.AgentAction) {
 }
