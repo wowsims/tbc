@@ -2,7 +2,6 @@ package core
 
 import (
 	"fmt"
-	"math"
 	"strings"
 	"time"
 
@@ -37,7 +36,7 @@ type DirectCastDamageInput struct {
 
 	BonusSpellPower float64
 	BonusHit        float64 // Direct % bonus... 0.1 == 10%
-  BonusCrit       float64 // Direct % bonus... 0.1 == 10%
+	BonusCrit       float64 // Direct % bonus... 0.1 == 10%
 }
 
 type DirectCastDamageResult struct {
@@ -89,7 +88,7 @@ type DirectCastImpl interface {
 	// calculated from the base mana cost.
 	GetBaseManaCost() float64
 
-	// I.e. for nature spells, return Stat.StatNatureSpellPower
+	// I.e. for nature spells, return stats.NatureSpellPower
 	GetSpellSchool() stats.Stat
 
 	GetCooldown() time.Duration
@@ -208,7 +207,7 @@ func (action *DirectCastAction) calculateDirectCastDamage(sim *Simulation, damag
 	character := action.GetAgent().GetCharacter()
 
 	hit := 0.83 + character.Stats[stats.SpellHit]/1260.0 + damageInput.BonusHit // 12.6 hit == 1% hit
-	hit = math.Min(hit, 0.99)                                                    // can't get away from the 1% miss
+	hit = MinFloat(hit, 0.99)                                                    // can't get away from the 1% miss
 
 	if sim.Rando.Float64("action hit") >= hit { // Miss
 		return result
