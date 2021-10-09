@@ -2,7 +2,6 @@ package shaman
 
 import (
 	"log"
-	"math"
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
@@ -11,7 +10,6 @@ import (
 
 func init() {
 	core.AddActiveItem(33506, core.ActiveItem{Activate: ActivateSkycall, ActivateCD: core.NeverExpires})
-	core.AddActiveItem(29389, core.ActiveItem{Activate: ActivateTotemOfPulsingEarth, ActivateCD: core.NeverExpires})
 	core.AddActiveItem(19344, core.ActiveItem{Activate: ActivateNAC, ActivateCD: time.Second * 300, CoolID: core.MagicIDNACTrink, SharedID: core.MagicIDAtkTrinket})
 
 	for _, set := range shamanSets {
@@ -67,7 +65,7 @@ var shamanSets = []core.ItemSet{
 			a := core.Aura{
 				ID:      core.MagicIDCyclone2pc,
 				Expires: core.NeverExpires,
-				OnExpire: func(sim *core.Simulation, c *core.Cast) {
+				OnExpire: func(sim *core.Simulation) {
 					agent.GetCharacter().Party.AddStats(stats.Stats{stats.SpellPower: -20})
 				},
 			}
@@ -105,8 +103,8 @@ func ActivateSkycall(sim *core.Simulation, agent core.Agent) core.Aura {
 	return core.Aura{
 		ID:      core.MagicIDSkycall,
 		Expires: core.NeverExpires,
-		OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
-			if cast.Spell.ActionID.SpellID == SpellIDLB12 && sim.Rando.Float64("skycall") < 0.15 {
+		OnCastComplete: func(sim *core.Simulation, cast *core.DirectCastAction) {
+			if cast.GetActionID().SpellID == SpellIDLB12 && sim.Rando.Float64("skycall") < 0.15 {
 				core.AddAuraWithTemporaryStats(sim, agent, core.MagicIDEnergized, stats.SpellHaste, hasteBonus, dur)
 			}
 		},
@@ -119,24 +117,11 @@ func ActivateNAC(sim *core.Simulation, agent core.Agent) core.Aura {
 	return core.Aura{
 		ID:      core.MagicIDNAC,
 		Expires: sim.CurrentTime + time.Second*20,
-		OnCast: func(sim *core.Simulation, cast *core.Cast) {
-			cast.ManaCost *= 1.2
+		OnCast: func(sim *core.Simulation, cast *core.DirectCastAction, input *core.DirectCastInput) {
+			input.ManaCost *= 1.2
 		},
-		OnExpire: func(sim *core.Simulation, cast *core.Cast) {
+		OnExpire: func(sim *core.Simulation) {
 			agent.GetCharacter().Stats[stats.SpellPower] -= sp
-		},
-	}
-}
-
-func ActivateTotemOfPulsingEarth(sim *core.Simulation, agent core.Agent) core.Aura {
-	return core.Aura{
-		ID:      core.MagicIDTotemOfPulsingEarth,
-		Expires: core.NeverExpires,
-		OnCast: func(sim *core.Simulation, cast *core.Cast) {
-			if cast.Spell.ActionID.SpellID == SpellIDLB12 {
-				// TODO: how to make sure this goes in before clearcasting?
-				cast.ManaCost = math.Max(cast.ManaCost-27, 0)
-			}
 		},
 	}
 }
@@ -145,15 +130,15 @@ func ActivateCycloneManaReduce(sim *core.Simulation, agent core.Agent) core.Aura
 	return core.Aura{
 		ID:      core.MagicIDCyclone4pc,
 		Expires: core.NeverExpires,
-		OnSpellHit: func(sim *core.Simulation, cast *core.Cast) {
-			if cast.DidCrit && sim.Rando.Float64("cycl4p") < 0.11 {
+		OnSpellHit: func(sim *core.Simulation, cast *core.DirectCastAction, result *core.DirectCastDamageResult) {
+			if result.Crit && sim.Rando.Float64("cycl4p") < 0.11 {
 				agent.GetCharacter().AddAura(sim, core.Aura{
 					ID: core.MagicIDCycloneMana,
-					OnCast: func(sim *core.Simulation, cast *core.Cast) {
+					OnCast: func(sim *core.Simulation, cast *core.DirectCastAction, input *core.DirectCastInput) {
 						// TODO: how to make sure this goes in before clearcasting?
-						cast.ManaCost -= 270
+						input.ManaCost -= 270
 					},
-					OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
+					OnCastComplete: func(sim *core.Simulation, cast *core.DirectCastAction) {
 						agent.GetCharacter().RemoveAura(sim, core.MagicIDCycloneMana)
 					},
 				})
@@ -166,8 +151,8 @@ func ActivateCataclysmLBDiscount(sim *core.Simulation, agent core.Agent) core.Au
 	return core.Aura{
 		ID:      core.MagicIDCataclysm4pc,
 		Expires: core.NeverExpires,
-		OnSpellHit: func(sim *core.Simulation, cast *core.Cast) {
-			if cast.DidCrit && sim.Rando.Float64("cata4p") < 0.25 {
+		OnSpellHit: func(sim *core.Simulation, cast *core.DirectCastAction, result *core.DirectCastDamageResult) {
+			if result.Crit && sim.Rando.Float64("cata4p") < 0.25 {
 				agent.GetCharacter().Stats[stats.Mana] += 120
 			}
 		},
@@ -178,9 +163,9 @@ func ActivateSkyshatterImpLB(sim *core.Simulation, agent core.Agent) core.Aura {
 	return core.Aura{
 		ID:      core.MagicIDSkyshatter4pc,
 		Expires: core.NeverExpires,
-		OnSpellHit: func(sim *core.Simulation, cast *core.Cast) {
-			if cast.Spell.ActionID.SpellID == SpellIDLB12 {
-				cast.DidDmg *= 1.05
+		OnSpellHit: func(sim *core.Simulation, cast *core.DirectCastAction, result *core.DirectCastDamageResult) {
+			if cast.GetActionID().SpellID == SpellIDLB12 {
+				result.Damage *= 1.05
 			}
 		},
 	}

@@ -25,10 +25,8 @@ func (druid *Druid) AddPartyBuffs(buffs *core.Buffs) {
 func (druid *Druid) BuffUp(sim *core.Simulation) {
 }
 
-func (druid *Druid) OnSpellHit(sim *core.Simulation, cast *core.Cast) {
-}
 func (druid *Druid) ChooseAction(sim *core.Simulation) core.AgentAction {
-	return core.AgentAction{Wait: core.NeverExpires} // makes the bot wait forever and do nothing.
+	return core.NewWaitAction(sim, druid, core.NeverExpires) // makes the bot wait forever and do nothing.
 }
 func (druid *Druid) OnActionAccepted(sim *core.Simulation, action core.AgentAction) {
 }

@@ -22,18 +22,15 @@ func (paladin *Paladin) AddRaidBuffs(buffs *core.Buffs) {
 func (paladin *Paladin) AddPartyBuffs(buffs *core.Buffs) {
 }
 
-func (p *Paladin) ChooseAction(_ *core.Simulation) core.AgentAction {
-	return core.AgentAction{Wait: core.NeverExpires} // makes the bot wait forever and do nothing.
+func (paladin *Paladin) ChooseAction(sim *core.Simulation) core.AgentAction {
+	return core.NewWaitAction(sim, paladin, core.NeverExpires) // makes the bot wait forever and do nothing.
 }
 
-func (p *Paladin) OnActionAccepted(*core.Simulation, core.AgentAction) {
-
+func (paladin *Paladin) OnActionAccepted(*core.Simulation, core.AgentAction) {
 }
 
-func (p *Paladin) BuffUp(sim *core.Simulation) {
+func (paladin *Paladin) BuffUp(sim *core.Simulation) {
 }
 
-func (p *Paladin) Reset(sim *core.Simulation) {
-
+func (paladin *Paladin) Reset(sim *core.Simulation) {
 }
-func (p *Paladin) OnSpellHit(*core.Simulation, *core.Cast) {}

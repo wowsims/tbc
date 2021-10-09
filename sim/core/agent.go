@@ -30,17 +30,45 @@ type Agent interface {
 	// This will be invoked right before the chosen action is actually executed, so the Agent can update its state.
 	// Note that the action may be different from the action chosen by this agent
 	OnActionAccepted(*Simulation, AgentAction)
+}
 
-	// OnSpellHit is used by class agents to customize casts before actually applying the damage.
-	OnSpellHit(*Simulation, *Cast)
+type ActionID struct {
+	SpellID    int32
+	ItemID     int32
+	CooldownID int32 // used only for tracking CDs internally
+	OtherID    proto.OtherAction
+	// Can add future id types here.
 }
 
 // A single action that an Agent can take.
-type AgentAction struct {
-	// Exactly one of these should be set.
-	Wait time.Duration // Duration to wait
-	Cast *Cast
+type AgentAction interface {
+	GetActionID() ActionID
+
+	// For logging / debugging.
+	GetName() string
+
+	GetTag() int32
+
+	// The Agent performing this action.
+	GetAgent() Agent
+
+	// How long this action takes to cast/channel/etc.
+	// In other words, how long until another action should be chosen.
+	GetDuration() time.Duration
+
+	// TODO: Maybe change this to 'ResourceCost'
+	// Amount of mana required to perform the action.
+	GetManaCost() float64
+
+	// Do the action.
+	Act(sim *Simulation)
 }
+
+//type AgentAction struct {
+//	// Exactly one of these should be set.
+//	Wait time.Duration // Duration to wait
+//	Cast *Cast
+//}
 
 type AgentFactory func(*Simulation, *Character, *proto.PlayerOptions) Agent
 

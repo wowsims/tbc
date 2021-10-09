@@ -62,6 +62,7 @@ func NewMetricsAggregator() *MetricsAggregator {
 	}
 }
 
+// Adds the metrics from a single Sim iteration into the aggregator.
 func (aggregator *MetricsAggregator) addMetrics(options Options, metrics SimMetrics) {
 	aggregator.numSims++
 
@@ -83,14 +84,20 @@ func (aggregator *MetricsAggregator) addMetrics(options Options, metrics SimMetr
 		aggregator.dpsAtOomSum += float64(firstPlayer.DamageAtOOM) / float64(firstPlayer.OOMAt)
 	}
 
-	for _, cast := range metrics.Casts {
-		var metric ActionMetric
-		if cast.Spell.ActionID.SpellID != 0 {
-			metric = aggregator.casts[cast.Spell.ActionID.SpellID]
-		} else if cast.Spell.ActionID.ItemID != 0 {
-			metric = aggregator.items[cast.Spell.ActionID.ItemID]
+	for _, action := range metrics.Actions {
+		cast, isCast := action.(*DirectCastAction)
+		if !isCast {
+			// Skip other types of actions for now
+			continue
 		}
-		idx := int(cast.Tag)
+
+		var metric ActionMetric
+		if cast.GetActionID().SpellID != 0 {
+			metric = aggregator.casts[cast.GetActionID().SpellID]
+		} else if cast.GetActionID().ItemID != 0 {
+			metric = aggregator.items[cast.GetActionID().ItemID]
+		}
+		idx := int(cast.GetTag())
 
 		// Construct new arrays for a tag we haven't seen before.
 		if len(metric.Casts) <= idx {
@@ -112,17 +119,21 @@ func (aggregator *MetricsAggregator) addMetrics(options Options, metrics SimMetr
 		}
 
 		metric.Casts[idx]++
-		if cast.DidCrit {
-			metric.Crits[idx]++
-		} else if !cast.DidHit {
-			metric.Misses[idx]++
-		}
-		metric.Dmgs[idx] += cast.DidDmg
 
-		if cast.Spell.ActionID.SpellID != 0 {
-			aggregator.casts[cast.Spell.ActionID.SpellID] = metric
-		} else if cast.Spell.ActionID.ItemID != 0 {
-			aggregator.items[cast.Spell.ActionID.ItemID] = metric
+		castResults := cast.GetResults()
+		for _, result := range castResults {
+			if result.Crit {
+				metric.Crits[idx]++
+			} else if !result.Hit {
+				metric.Misses[idx]++
+			}
+			metric.Dmgs[idx] += result.Damage
+		}
+
+		if cast.GetActionID().SpellID != 0 {
+			aggregator.casts[cast.GetActionID().SpellID] = metric
+		} else if cast.GetActionID().ItemID != 0 {
+			aggregator.items[cast.GetActionID().ItemID] = metric
 		}
 	}
 }
