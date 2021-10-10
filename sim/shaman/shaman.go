@@ -8,6 +8,8 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
+const cyclonePiece int32 = 29033
+
 func NewShaman(character core.Character, talents Talents, selfBuffs SelfBuffs, rotation Rotation) *Shaman {
 	if selfBuffs.WaterShield {
 		character.InitialStats[stats.MP5] += 50
@@ -56,13 +58,6 @@ type Shaman struct {
 
 	ElementalFocusStacks byte
 
-	// HACK HACK HACK
-	// TODO: do we actually need a 'on start' method for agents?
-	//   This particular use case could also be solved by the 'OnStatAdd' event...
-	//    but are there other things we want to do once all buffs are applied right before starting?
-	//   Unrelenting storm could also be calculated on the fly if we can allow agents to override the 'Advance' function.
-	started bool
-
 	// cache
 	convectionBonus float64
 	concussionBonus float64
@@ -84,26 +79,23 @@ func (shaman *Shaman) AddPartyBuffs(buffs *core.Buffs) {
 	}
 
 	if shaman.SelfBuffs.ManaSpring {
-		buffs.ManaSpringTotem = proto.TristateEffect_TristateEffectRegular
+		buffs.ManaSpringTotem = core.MaxTristate(buffs.ManaSpringTotem, proto.TristateEffect_TristateEffectRegular)
 	}
 
 	if shaman.SelfBuffs.WrathOfAir {
-		// TODO: Check for t4 set bonus
-		buffs.WrathOfAirTotem = proto.TristateEffect_TristateEffectRegular
+		woaValue := proto.TristateEffect_TristateEffectRegular
+		if shaman.HasSetBonus(cyclonePiece, 2) {
+			woaValue = proto.TristateEffect_TristateEffectImproved
+		}
+		buffs.WrathOfAirTotem = core.MaxTristate(buffs.WrathOfAirTotem, woaValue)
 	}
 }
 
-// BuffUp lets you buff up all characters in sim (and yourself)
 func (shaman *Shaman) BuffUp(sim *core.Simulation) {
+	shaman.Stats[stats.MP5] += shaman.Stats[stats.Intellect] * (0.02 * float64(shaman.Talents.UnrelentingStorm))
 }
-func (shaman *Shaman) ChooseAction(sim *core.Simulation) core.AgentAction {
-	// TODO: Move this to BuffUp?
-	if !shaman.started {
-		shaman.started = true
-		// we need to apply regen once all buffs are applied.
-		shaman.Stats[stats.MP5] += shaman.Stats[stats.Intellect] * (0.02 * float64(shaman.Talents.UnrelentingStorm))
-	}
 
+func (shaman *Shaman) ChooseAction(sim *core.Simulation) core.AgentAction {
 	// Before casting, activate shaman powers!
 	TryActivateBloodlust(sim, shaman)
 	if shaman.Talents.ElementalMastery {
@@ -116,7 +108,6 @@ func (shaman *Shaman) OnActionAccepted(sim *core.Simulation, action core.AgentAc
 	shaman.rotation.OnActionAccepted(shaman, sim, action)
 }
 func (shaman *Shaman) Reset(newsim *core.Simulation) {
-	shaman.started = false
 	shaman.rotation.Reset(shaman, newsim)
 }
 

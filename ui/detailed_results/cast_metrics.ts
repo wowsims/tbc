@@ -67,7 +67,7 @@ export class CastMetrics extends ResultComponent {
 				addCell((actionMetric.totalDmg / iterations / duration).toFixed(1)); // DPS
 				addCell((actionMetric.casts / iterations).toFixed(1)); // Casts
 				addCell((actionMetric.totalDmg / actionMetric.casts).toFixed(1)); // Avg Cast
-				addCell(((actionMetric.casts - actionMetric.misses) / iterations).toFixed(1)); // Hits
+				addCell((actionMetric.hits / iterations).toFixed(1)); // Hits
 				addCell((actionMetric.totalDmg / (actionMetric.casts - actionMetric.misses)).toFixed(1)); // Avg Hit
 				addCell(((actionMetric.crits / actionMetric.casts) * 100).toFixed(2) + ' %'); // Crit %
 				addCell(((actionMetric.misses / actionMetric.casts) * 100).toFixed(2) + ' %'); // Miss %

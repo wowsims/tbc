@@ -26,7 +26,7 @@ import { Gear } from '/tbc/core/proto_utils/gear.js';
 import { makeComputeStatsRequest } from '/tbc/core/proto_utils/request_helpers.js';
 import { makeIndividualSimRequest } from '/tbc/core/proto_utils/request_helpers.js';
 import { Stats } from '/tbc/core/proto_utils/stats.js';
-import { SpecAgent } from '/tbc/core/proto_utils/utils.js';
+import { SpecRotation } from '/tbc/core/proto_utils/utils.js';
 import { SpecTalents } from '/tbc/core/proto_utils/utils.js';
 import { SpecTypeFunctions } from '/tbc/core/proto_utils/utils.js';
 import { specTypeFunctions } from '/tbc/core/proto_utils/utils.js';
@@ -55,7 +55,7 @@ export interface SimConfig<SpecType extends Spec> {
     encounter: Encounter,
     buffs: Buffs,
     consumes: Consumes,
-    agent: SpecAgent<SpecType>,
+    rotation: SpecRotation<SpecType>,
     talents: string,
     specOptions: SpecOptions<SpecType>,
   },
@@ -73,7 +73,7 @@ export class Sim<SpecType extends Spec> extends WorkerPool {
   readonly encounterChangeEmitter = new TypedEvent<void>();
   readonly gearChangeEmitter = new TypedEvent<void>();
   readonly raceChangeEmitter = new TypedEvent<void>();
-  readonly agentChangeEmitter = new TypedEvent<void>();
+  readonly rotationChangeEmitter = new TypedEvent<void>();
   readonly talentsChangeEmitter = new TypedEvent<void>();
   // Talents dont have all fields so we need this
   readonly talentsStringChangeEmitter = new TypedEvent<void>();
@@ -99,7 +99,7 @@ export class Sim<SpecType extends Spec> extends WorkerPool {
   private _gear: Gear;
   private _encounter: Encounter;
   private _race: Race;
-  private _agent: SpecAgent<SpecType>;
+  private _rotation: SpecRotation<SpecType>;
   private _talents: SpecTalents<SpecType>;
   private _talentsString: string;
   private _specOptions: SpecOptions<SpecType>;
@@ -126,7 +126,7 @@ export class Sim<SpecType extends Spec> extends WorkerPool {
     this._customStats = new Stats();
     this._encounter = config.defaults.encounter;
     this._gear = new Gear({});
-    this._agent = config.defaults.agent;
+    this._rotation = config.defaults.rotation;
     this._talents = this.specTypeFunctions.talentsCreate();
     this._talentsString = config.defaults.talents;
 		this._epWeights = config.defaults.epWeights;
@@ -140,7 +140,7 @@ export class Sim<SpecType extends Spec> extends WorkerPool {
       this.encounterChangeEmitter,
       this.gearChangeEmitter,
       this.raceChangeEmitter,
-      this.agentChangeEmitter,
+      this.rotationChangeEmitter,
       this.talentsChangeEmitter,
       this.talentsStringChangeEmitter,
       this.specOptionsChangeEmitter,
@@ -187,7 +187,7 @@ export class Sim<SpecType extends Spec> extends WorkerPool {
       this._encounter,
       this._gear,
       this._race,
-      this._agent,
+      this._rotation,
       this._talents,
       this._specOptions));
 
@@ -326,16 +326,16 @@ export class Sim<SpecType extends Spec> extends WorkerPool {
     this.customStatsChangeEmitter.emit();
   }
 
-  getAgent(): SpecAgent<SpecType> {
-    return this.specTypeFunctions.agentCopy(this._agent);
+  getRotation(): SpecRotation<SpecType> {
+    return this.specTypeFunctions.rotationCopy(this._rotation);
   }
 
-  setAgent(newAgent: SpecAgent<SpecType>) {
-    if (this.specTypeFunctions.agentEquals(newAgent, this._agent))
+  setRotation(newRotation: SpecRotation<SpecType>) {
+    if (this.specTypeFunctions.rotationEquals(newRotation, this._rotation))
       return;
 
-    this._agent = this.specTypeFunctions.agentCopy(newAgent);
-    this.agentChangeEmitter.emit();
+    this._rotation = this.specTypeFunctions.rotationCopy(newRotation);
+    this.rotationChangeEmitter.emit();
   }
 
   // Commented because this should NOT be used; all external uses should be able to use getTalentsString()
@@ -462,7 +462,7 @@ export class Sim<SpecType extends Spec> extends WorkerPool {
       this._encounter,
       this._gear,
       this._race,
-      this._agent,
+      this._rotation,
       this._talents,
       this._specOptions,
       iterations,
@@ -491,7 +491,7 @@ export class Sim<SpecType extends Spec> extends WorkerPool {
       'encounter': Encounter.toJson(this._encounter),
       'gear': EquipmentSpec.toJson(this._gear.asSpec()),
       'race': this._race,
-      'agent': this.specTypeFunctions.agentToJson(this._agent),
+      'rotation': this.specTypeFunctions.rotationToJson(this._rotation),
       'talents': this._talentsString,
       'specOptions': this.specTypeFunctions.optionsToJson(this._specOptions),
     };
@@ -505,7 +505,7 @@ export class Sim<SpecType extends Spec> extends WorkerPool {
     this.setEncounter(Encounter.fromJson(obj['encounter']));
     this.setGear(this.lookupEquipmentSpec(EquipmentSpec.fromJson(obj['gear'])));
     this.setRace(obj['race']);
-    this.setAgent(this.specTypeFunctions.agentFromJson(obj['agent']));
+    this.setRotation(this.specTypeFunctions.rotationFromJson(obj['rotation']));
     this.setTalentsString(obj['talents']);
     this.setSpecOptions(this.specTypeFunctions.optionsFromJson(obj['specOptions']));
   }

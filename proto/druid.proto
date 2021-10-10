@@ -8,9 +8,9 @@ message DruidTalents {
 }
 
 message BalanceDruid {
-    message Agent {
+    message Rotation {
     }
-    Agent agent = 1;
+    Rotation rotation = 1;
 
     DruidTalents talents = 2;
     
