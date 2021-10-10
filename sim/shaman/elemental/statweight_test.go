@@ -1,4 +1,4 @@
-package shaman
+package elemental
 
 import (
 	"testing"

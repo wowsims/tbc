@@ -1,4 +1,4 @@
-package shaman
+package elemental
 
 import (
 	"github.com/wowsims/tbc/sim/core"
@@ -55,8 +55,8 @@ var PlayerOptionsAdaptiveNoBuffs = proto.PlayerOptions{
 		ElementalShaman: &proto.ElementalShaman{
 			Talents: &StandardTalents,
 			Options: eleShamOptionsNoBuffs,
-			Agent: &proto.ElementalShaman_Agent{
-				Type: proto.ElementalShaman_Agent_Adaptive,
+			Rotation: &proto.ElementalShaman_Rotation{
+				Type: proto.ElementalShaman_Rotation_Adaptive,
 			},
 		},
 	},
@@ -74,8 +74,8 @@ var PlayerOptionsAdaptive = proto.PlayerOptions{
 		ElementalShaman: &proto.ElementalShaman{
 			Talents: &StandardTalents,
 			Options: eleShamOptions,
-			Agent: &proto.ElementalShaman_Agent{
-				Type: proto.ElementalShaman_Agent_Adaptive,
+			Rotation: &proto.ElementalShaman_Rotation{
+				Type: proto.ElementalShaman_Rotation_Adaptive,
 			},
 		},
 	},
@@ -86,8 +86,8 @@ var PlayerOptionsLBOnly = proto.PlayerOptions{
 		ElementalShaman: &proto.ElementalShaman{
 			Talents: &StandardTalents,
 			Options: eleShamOptions,
-			Agent: &proto.ElementalShaman_Agent{
-				Type: proto.ElementalShaman_Agent_FixedLBCL,
+			Rotation: &proto.ElementalShaman_Rotation{
+				Type: proto.ElementalShaman_Rotation_FixedLBCL,
 			},
 		},
 	},
@@ -98,8 +98,8 @@ var PlayerOptionsCLOnClearcast = proto.PlayerOptions{
 		ElementalShaman: &proto.ElementalShaman{
 			Talents: &StandardTalents,
 			Options: eleShamOptions,
-			Agent: &proto.ElementalShaman_Agent{
-				Type: proto.ElementalShaman_Agent_CLOnClearcast,
+			Rotation: &proto.ElementalShaman_Rotation{
+				Type: proto.ElementalShaman_Rotation_CLOnClearcast,
 			},
 		},
 	},
