@@ -167,10 +167,9 @@ func TryActivatePotion(sim *Simulation, agent Agent) {
 
 	if potionToUse == proto.Potions_DestructionPotion {
 		const spBonus = 120
-		const critBonus = 44.16
+		const critBonus = 2 * SpellCritRatingPerCritChance
 		const dur = time.Second * 15
 
-		character.SetCD(MagicIDPotion, time.Second*120+sim.CurrentTime)
 		character.Stats[stats.SpellPower] += spBonus
 		character.Stats[stats.SpellCrit] += critBonus
 
@@ -197,12 +196,12 @@ func TryActivatePotion(sim *Simulation, agent Agent) {
 		}
 
 		character.Stats[stats.Mana] += manaGain
-		character.SetCD(MagicIDPotion, time.Second*120+sim.CurrentTime)
 		if sim.Log != nil {
 			sim.Log("Used Mana Potion\n")
 		}
 	}
 
+	character.SetCD(MagicIDPotion, time.Second*120+sim.CurrentTime)
 	character.potionsUsed++
 }
 
