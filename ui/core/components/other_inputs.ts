@@ -7,8 +7,11 @@ export const StartingPotion = {
 	config: {
 		label: 'Starting Potion',
 		labelTooltip: 'If set, this potion will be used instead of the default potion for the first few uses.',
-		names: ['None', 'Destruction', 'Super Mana'],
-		values: [Potions.UnknownPotion, Potions.DestructionPotion, Potions.SuperManaPotion],
+		values: [
+			{ name: 'None', value: Potions.UnknownPotion },
+			{ name: 'Destruction', value: Potions.DestructionPotion },
+			{ name: 'Super Mana', value: Potions.SuperManaPotion },
+		],
 		changedEvent: (sim: Sim<any>) => sim.consumesChangeEmitter,
 		getValue: (sim: Sim<any>) => sim.getConsumes().startingPotion,
 		setValue: (sim: Sim<any>, newValue: number) => {

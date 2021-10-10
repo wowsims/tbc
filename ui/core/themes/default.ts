@@ -159,8 +159,12 @@ export class DefaultTheme<SpecType extends Spec> extends SimUI<SpecType> {
 
     const races = specToEligibleRaces[this.sim.spec];
     const racePicker = new EnumPicker(this.parentElem.getElementsByClassName('race-picker')[0] as HTMLElement, this.sim, {
-      names: races.map(race => raceNames[race]),
-      values: races,
+			values: races.map(race => {
+				return {
+					name: raceNames[race],
+					value: race,
+				};
+			}),
       changedEvent: sim => sim.raceChangeEmitter,
       getValue: sim => sim.getRace(),
       setValue: (sim, newValue) => sim.setRace(newValue),

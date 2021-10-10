@@ -8,14 +8,19 @@ import { Component } from './component.js';
 
 declare var tippy: any;
 
+export interface EnumValueConfig {
+	name: string,
+	value: number,
+	tooltip?: string,
+}
+
 export interface EnumPickerConfig {
   label?: string,
 	labelTooltip?: string,
   defaultValue?: number,
 
-  // names and values are parallel arrays
-  names: Array<string>;
-  values: Array<number>;
+  // Parallel arrays for each enum value
+	values: Array<EnumValueConfig>;
 
   changedEvent: (sim: Sim<any>) => TypedEvent<any>;
   getValue: (sim: Sim<any>) => number;
@@ -44,11 +49,15 @@ export class EnumPicker extends Component {
     selector.classList.add('enum-picker-selector');
     this.rootElem.appendChild(selector);
 
-    config.values.forEach((value, idx) => {
+    config.values.forEach((value) => {
       const option = document.createElement('option');
-      option.value = String(value);
-      option.textContent = config.names[idx];
+      option.value = String(value.value);
+      option.textContent = value.name;
       selector.appendChild(option);
+
+			if (value.tooltip) {
+				option.title = value.tooltip;
+			}
     });
 
     selector.value = String(config.getValue(sim));

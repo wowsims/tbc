@@ -87,7 +87,7 @@ var PlayerOptionsLBOnly = proto.PlayerOptions{
 			Talents: &StandardTalents,
 			Options: eleShamOptions,
 			Rotation: &proto.ElementalShaman_Rotation{
-				Type: proto.ElementalShaman_Rotation_FixedLBCL,
+				Type: proto.ElementalShaman_Rotation_LBOnly,
 			},
 		},
 	},
