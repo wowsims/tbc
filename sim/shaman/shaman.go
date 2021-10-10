@@ -8,8 +8,6 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-const cyclonePiece int32 = 29033
-
 func NewShaman(character core.Character, talents Talents, selfBuffs SelfBuffs, rotation Rotation) *Shaman {
 	if selfBuffs.WaterShield {
 		character.InitialStats[stats.MP5] += 50
@@ -84,7 +82,7 @@ func (shaman *Shaman) AddPartyBuffs(buffs *core.Buffs) {
 
 	if shaman.SelfBuffs.WrathOfAir {
 		woaValue := proto.TristateEffect_TristateEffectRegular
-		if shaman.HasSetBonus(cyclonePiece, 2) {
+		if ItemSetCycloneRegalia.CharacterHasSetBonus(shaman.GetCharacter(), 2) {
 			woaValue = proto.TristateEffect_TristateEffectImproved
 		}
 		buffs.WrathOfAirTotem = core.MaxTristate(buffs.WrathOfAirTotem, woaValue)

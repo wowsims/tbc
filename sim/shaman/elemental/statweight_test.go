@@ -28,7 +28,7 @@ func TestCalcStatWeight(t *testing.T) {
 		want   core.StatWeightsResult
 	}{
 		{name: "First Test", params: params, want: core.StatWeightsResult{
-			EpValues: stats.Stats{stats.Intellect: 0.18, stats.SpellPower: 1, stats.SpellHit: 1.79, stats.SpellCrit: 0.66},
+			EpValues: stats.Stats{stats.Intellect: 0.24, stats.SpellPower: 1, stats.SpellHit: 1.65, stats.SpellCrit: 0.68},
 		}},
 	}
 
