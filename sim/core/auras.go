@@ -199,7 +199,7 @@ func AuraName(a int32) string {
 	case MagicIDXiriTrink:
 		return "Xiri Trinket"
 	case MagicIDDrums:
-		return "Drums of Battle"
+		return "Drums"
 	case MagicIDNetherstrike:
 		return "Netherstrike Set"
 	case MagicIDTwinStars:

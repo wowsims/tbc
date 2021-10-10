@@ -50,7 +50,7 @@ type DirectCastDamageResult struct {
 	Damage float64 // Damage done by this cast.
 }
 
-func (result *DirectCastDamageResult) String() string {
+func (result DirectCastDamageResult) String() string {
 	if !result.Hit {
 		return "Miss"
 	}

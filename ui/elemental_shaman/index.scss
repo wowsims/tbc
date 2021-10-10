@@ -33,7 +33,7 @@ body {
   grid-template-columns: repeat(3, 1fr);
 }
 
-.Other-section > div {
+.Rotation-section > div, .Other-section > div {
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
