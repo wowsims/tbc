@@ -211,8 +211,7 @@ func (action DirectCastAction) calculateDirectCastDamage(sim *Simulation, damage
 	damage *= damageInput.DamageMultiplier
 
 	crit := (character.Stats[stats.SpellCrit] / (SpellCritRatingPerCritChance * 100)) + damageInput.BonusCrit
-	// TODO: Put guaranteed crit first, to short-circuit the random roll. Keeping it this way for now for tests.
-	if sim.Rando.Float64("action crit") < crit || action.castInput.GuaranteedCrit {
+	if action.castInput.GuaranteedCrit || sim.Rando.Float64("action crit") < crit {
 		result.Crit = true
 		damage *= action.castInput.CritMultiplier
 	}

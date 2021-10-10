@@ -4,6 +4,7 @@ import (
 	"log"
 	"time"
 
+	_ "github.com/wowsims/tbc/sim/common"
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/stats"
 )
@@ -11,65 +12,59 @@ import (
 func init() {
 	core.AddActiveItem(33506, core.ActiveItem{Activate: ActivateSkycall, ActivateCD: core.NeverExpires})
 	core.AddActiveItem(19344, core.ActiveItem{Activate: ActivateNAC, ActivateCD: time.Second * 300, CoolID: core.MagicIDNACTrink, SharedID: core.MagicIDAtkTrinket})
+	core.AddActiveItem(30663, core.ActiveItem{Activate: ActivateFathomBrooch, ActivateCD: core.NeverExpires})
 
-	for _, set := range shamanSets {
-		core.AddItemSet(set)
-	}
+	core.AddItemSet(ItemSetTidefury)
+	core.AddItemSet(ItemSetCycloneRegalia)
+	core.AddItemSet(ItemSetCataclysmRegalia)
+	core.AddItemSet(ItemSetSkyshatterRegalia)
 }
 
-var shamanSets = []core.ItemSet{
-	// Netherstrike is technically not shaman exclusive, but no other class that can wear it would want it.
-	{
-		Name:  "Netherstrike",
-		Items: map[int32]struct{}{29519: {}, 29521: {}, 29520: {}},
-		Bonuses: map[int]core.ItemActivation{3: func(sim *core.Simulation, agent core.Agent) core.Aura {
-			agent.GetCharacter().Stats[stats.SpellPower] += 23
-			return core.Aura{ID: core.MagicIDNetherstrike}
-		}},
-	},
-	{
-		Name:  "Tidefury",
-		Items: map[int32]struct{}{28231: {}, 27510: {}, 28349: {}, 27909: {}, 27802: {}},
-		Bonuses: map[int]core.ItemActivation{
-			2: func(sim *core.Simulation, agent core.Agent) core.Aura {
-				return core.Aura{ID: core.MagicIDTidefury, Expires: core.NeverExpires}
-			},
-			4: func(sim *core.Simulation, agent core.Agent) core.Aura {
-				shaman, ok := agent.(*Shaman)
-				if !ok {
-					log.Fatalf("Non-shaman attempted to activate shaman cyclone set bonus.")
-				}
-				if !shaman.SelfBuffs.WaterShield {
-					return core.Aura{}
-				}
+var ItemSetTidefury = core.ItemSet{
+	Name:  "Tidefury",
+	Items: map[int32]struct{}{28231: {}, 27510: {}, 28349: {}, 27909: {}, 27802: {}},
+	Bonuses: map[int]core.ItemActivation{
+		2: func(sim *core.Simulation, agent core.Agent) core.Aura {
+			return core.Aura{ID: core.MagicIDTidefury, Expires: core.NeverExpires}
+		},
+		4: func(sim *core.Simulation, agent core.Agent) core.Aura {
+			shaman, ok := agent.(*Shaman)
+			if !ok {
+				log.Fatalf("Non-shaman attempted to activate shaman cyclone set bonus.")
+			}
+			if !shaman.SelfBuffs.WaterShield {
+				return core.Aura{}
+			}
 
-				agent.GetCharacter().Stats[stats.MP5] += 3
-				return core.Aura{} // no aura to add
-			},
+			agent.GetCharacter().Stats[stats.MP5] += 3
+			return core.Aura{} // no aura to add
 		},
 	},
-	{
-		Name:  "Cyclone Regalia",
-		Items: map[int32]struct{}{29033: {}, 29035: {}, 29034: {}, 29036: {}, 29037: {}},
-		Bonuses: map[int]core.ItemActivation{4: ActivateCycloneManaReduce, 2: func(sim *core.Simulation, agent core.Agent) core.Aura {
-			return core.Aura{}
-		}},
-	},
-	{
-		Name:    "Cataclysm Regalia",
-		Items:   map[int32]struct{}{30169: {}, 30170: {}, 30171: {}, 30172: {}, 30173: {}},
-		Bonuses: map[int]core.ItemActivation{4: ActivateCataclysmLBDiscount},
-	},
-	{
-		Name:  "Skyshatter Regalia",
-		Items: map[int32]struct{}{34437: {}, 31017: {}, 34542: {}, 31008: {}, 31014: {}, 31020: {}, 31023: {}, 34566: {}},
-		Bonuses: map[int]core.ItemActivation{2: func(sim *core.Simulation, agent core.Agent) core.Aura {
-			agent.GetCharacter().Stats[stats.MP5] += 15
-			agent.GetCharacter().Stats[stats.SpellCrit] += 35
-			agent.GetCharacter().Stats[stats.SpellPower] += 45
-			return core.Aura{ID: core.MagicIDSkyshatter2pc}
-		}, 4: ActivateSkyshatterImpLB},
-	},
+}
+
+var ItemSetCycloneRegalia = core.ItemSet{
+	Name:  "Cyclone Regalia",
+	Items: map[int32]struct{}{29033: {}, 29035: {}, 29034: {}, 29036: {}, 29037: {}},
+	Bonuses: map[int]core.ItemActivation{4: ActivateCycloneManaReduce, 2: func(sim *core.Simulation, agent core.Agent) core.Aura {
+		return core.Aura{}
+	}},
+}
+
+var ItemSetCataclysmRegalia = core.ItemSet{
+	Name:    "Cataclysm Regalia",
+	Items:   map[int32]struct{}{30169: {}, 30170: {}, 30171: {}, 30172: {}, 30173: {}},
+	Bonuses: map[int]core.ItemActivation{4: ActivateCataclysmLBDiscount},
+}
+
+var ItemSetSkyshatterRegalia = core.ItemSet{
+	Name:  "Skyshatter Regalia",
+	Items: map[int32]struct{}{34437: {}, 31017: {}, 34542: {}, 31008: {}, 31014: {}, 31020: {}, 31023: {}, 34566: {}},
+	Bonuses: map[int]core.ItemActivation{2: func(sim *core.Simulation, agent core.Agent) core.Aura {
+		agent.GetCharacter().Stats[stats.MP5] += 15
+		agent.GetCharacter().Stats[stats.SpellCrit] += 35
+		agent.GetCharacter().Stats[stats.SpellPower] += 45
+		return core.Aura{ID: core.MagicIDSkyshatter2pc}
+	}, 4: ActivateSkyshatterImpLB},
 }
 
 func ActivateSkycall(sim *core.Simulation, agent core.Agent) core.Aura {
@@ -141,6 +136,29 @@ func ActivateSkyshatterImpLB(sim *core.Simulation, agent core.Agent) core.Aura {
 		OnSpellHit: func(sim *core.Simulation, cast core.DirectCastAction, result *core.DirectCastDamageResult) {
 			if cast.GetActionID().SpellID == SpellIDLB12 {
 				result.Damage *= 1.05
+			}
+		},
+	}
+}
+
+// ActivateFathomBrooch adds an aura that has a chance on cast of nature spell
+//  to restore 335 mana. 40s ICD
+func ActivateFathomBrooch(sim *core.Simulation, agent core.Agent) core.Aura {
+	icd := core.NewICD()
+	const icdDur = time.Second * 40
+	return core.Aura{
+		ID:      core.MagicIDRegainMana,
+		Expires: core.NeverExpires,
+		OnCastComplete: func(sim *core.Simulation, cast core.DirectCastAction) {
+			if icd.IsOnCD(sim) {
+				return
+			}
+			if cast.GetSpellSchool() != stats.NatureSpellPower {
+				return
+			}
+			if sim.Rando.Float64("unmarked") < 0.15 {
+				icd = core.InternalCD(sim.CurrentTime + icdDur)
+				agent.GetCharacter().Stats[stats.Mana] += 335
 			}
 		},
 	}

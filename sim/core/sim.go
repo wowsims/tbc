@@ -273,10 +273,7 @@ simloop:
 			sim.Advance(action.ExecuteAt - sim.CurrentTime)
 		}
 
-		//manaBefore := agent.GetCharacter().Stats[stats.Mana]
 		action.Act(sim)
-		//manaAfter := agent.GetCharacter().Stats[stats.Mana]
-		//fmt.Printf("Mana actually lost: %0.0f", manaBefore - manaAfter)
 
 		sim.playerConsumes(agent)
 		newAction := agent.ChooseAction(sim)

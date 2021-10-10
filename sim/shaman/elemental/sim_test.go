@@ -31,8 +31,8 @@ func TestSimulatePreRaidNoBuffs(t *testing.T) {
 		PlayerOptions: &PlayerOptionsAdaptiveNoBuffs,
 		Gear:          PreRaidGear,
 
-		ExpectedDpsShort: 867,
-		ExpectedDpsLong:  277,
+		ExpectedDpsShort: 973.7,
+		ExpectedDpsLong:  293.9,
 	})
 }
 
@@ -49,8 +49,8 @@ func TestSimulatePreRaid(t *testing.T) {
 		PlayerOptions: &PlayerOptionsAdaptive,
 		Gear:          PreRaidGear,
 
-		ExpectedDpsShort: 1406.3,
-		ExpectedDpsLong:  1098.0,
+		ExpectedDpsShort: 1435.9,
+		ExpectedDpsLong:  1074.9,
 	})
 }
 
@@ -67,8 +67,8 @@ func TestSimulateP1(t *testing.T) {
 		PlayerOptions: &PlayerOptionsAdaptive,
 		Gear:          P1Gear,
 
-		ExpectedDpsShort: 1527.1,
-		ExpectedDpsLong:  1226.6,
+		ExpectedDpsShort: 1385.0,
+		ExpectedDpsLong:  1237.8,
 	})
 }
 
@@ -103,8 +103,8 @@ func TestLBOnlyAgent(t *testing.T) {
 		PlayerOptions: &PlayerOptionsLBOnly,
 		Gear:          P1Gear,
 
-		ExpectedDpsShort: 1581.1,
-		ExpectedDpsLong:  1210.4,
+		ExpectedDpsShort: 1413.8,
+		ExpectedDpsLong:  1187.8,
 	})
 }
 
@@ -135,8 +135,8 @@ func TestClearcastAgent(t *testing.T) {
 		PlayerOptions: &PlayerOptionsCLOnClearcast,
 		Gear:          P1Gear,
 
-		ExpectedDpsShort: 1468.4,
-		ExpectedDpsLong:  1214.2,
+		ExpectedDpsShort: 1528.3,
+		ExpectedDpsLong:  1222.6,
 	})
 }
 

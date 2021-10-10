@@ -1,7 +1,6 @@
 package core
 
 import (
-	"fmt"
 	"strconv"
 	"time"
 
@@ -141,28 +140,6 @@ func (character *Character) TryActivateEquipment(sim *Simulation, agent Agent) {
 			character.SetCD(item.SharedID, sharedCD+sim.CurrentTime)
 		}
 	}
-}
-
-// itemID can be any item in the set, regardless of whether that specific item is equipped.
-func (character *Character) HasSetBonus(itemID int32, numItemsForBonus int) bool {
-	desiredSet := itemSetLookup[itemID]
-	if desiredSet == nil {
-		panic(fmt.Sprintf("Item %d is not part of a set.", itemID))
-	}
-
-	if _, ok := desiredSet.Bonuses[numItemsForBonus]; !ok {
-		panic(fmt.Sprintf("Set with item %d does not have a bonus with %d pieces.", itemID, numItemsForBonus))
-	}
-
-	count := 0
-	for _, i := range character.Equip {
-		set := itemSetLookup[i.ID]
-		if set == desiredSet {
-			count++
-		}
-	}
-
-	return count >= numItemsForBonus
 }
 
 // Activates set bonuses, returning the list of active bonuses.
