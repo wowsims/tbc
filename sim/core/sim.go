@@ -195,9 +195,8 @@ func (sim *Simulation) playerConsumes(agent Agent) {
 	// Consumes before any casts
 	TryActivateDrums(sim, agent)
 	TryActivateRacial(sim, agent)
-	TryActivateDestructionPotion(sim, agent)
+	TryActivatePotion(sim, agent)
 	TryActivateDarkRune(sim, agent)
-	TryActivateSuperManaPotion(sim, agent)
 
 	// Pop activatable items if we can.
 	agent.GetCharacter().TryActivateEquipment(sim, agent)

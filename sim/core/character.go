@@ -30,7 +30,7 @@ type Character struct {
 	*AuraTracker
 
 	// mutatable state
-	destructionPotionUsed bool // set to true after using first destruction potion.
+	potionsUsed int32 // Number of potions used
 }
 
 func (character *Character) AddInitialStats(s stats.Stats) {
@@ -79,7 +79,7 @@ func NewCharacter(equipSpec items.EquipmentSpec, race RaceBonusType, consumes Co
 }
 
 func (character *Character) Reset() {
-	character.destructionPotionUsed = false
+	character.potionsUsed = 0
 	character.Stats = character.InitialStats
 	character.AuraTracker.ResetAuras()
 }
@@ -198,11 +198,11 @@ const (
 func (character *Character) AddRaidBuffs(buffs *Buffs) {
 }
 func (character *Character) AddPartyBuffs(buffs *Buffs) {
-	if character.Consumes.DrumsOfBattle {
-		buffs.DrumsOfBattle = true
-	}
-	if character.Consumes.DrumsOfRestoration {
-		buffs.DrumsOfRestoration = true
+	if character.Consumes.Drums > 0 {
+		if buffs.Drums > 0 {
+			panic("Multiple drummers in the same party!")
+		}
+		buffs.Drums = character.Consumes.Drums
 	}
 
 	if character.Equip[items.ItemSlotMainHand].ID == AtieshMage {

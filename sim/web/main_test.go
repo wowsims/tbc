@@ -41,7 +41,7 @@ var basicConsumes = &proto.Consumes{
 	FlaskOfBlindingLight: true,
 	BlackenedBasilisk:    true,
 	BrilliantWizardOil:   true,
-	SuperManaPotion:      true,
+	DefaultPotion:        proto.Potions_SuperManaPotion,
 	DarkRune:             true,
 }
 

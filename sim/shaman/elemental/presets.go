@@ -119,10 +119,11 @@ var FullConsumes = core.Consumes{
 	FlaskOfBlindingLight: true,
 	BrilliantWizardOil:   true,
 	BlackenedBasilisk:    true,
-	DestructionPotion:    true,
-	SuperManaPotion:      true,
+	DefaultPotion:        proto.Potions_SuperManaPotion,
+	StartingPotion:       proto.Potions_DestructionPotion,
+	NumStartingPotions:   1,
 	DarkRune:             true,
-	DrumsOfBattle:        true,
+	Drums:                proto.Drums_DrumsOfBattle,
 }
 
 var PreRaidGear = items.EquipmentSpecFromStrings([]string{
