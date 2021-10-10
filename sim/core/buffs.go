@@ -32,8 +32,7 @@ type Buffs struct {
 	Misery                    bool
 
 	// Drums
-	DrumsOfBattle      bool
-	DrumsOfRestoration bool
+	Drums proto.Drums
 
 	// Party item buffs
 	AtieshMage            int32
@@ -64,8 +63,7 @@ func ProtoToBuffs(inBuff *proto.Buffs) Buffs {
 		TotemOfWrath:    inBuff.TotemOfWrath,
 		WrathOfAirTotem: inBuff.WrathOfAirTotem,
 
-		DrumsOfBattle:      inBuff.DrumsOfBattle,
-		DrumsOfRestoration: inBuff.DrumsOfRestoration,
+		Drums: inBuff.Drums,
 
 		AtieshMage:            inBuff.AtieshMage,
 		AtieshWarlock:         inBuff.AtieshWarlock,
