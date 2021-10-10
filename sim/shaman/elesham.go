@@ -222,7 +222,7 @@ func (agent *AdaptiveAgent) takeSnapshot(sim *core.Simulation, shaman *Shaman) {
 
 	snapshot := ManaSnapshot{
 		time:      sim.CurrentTime,
-		manaSpent: sim.Metrics.IndividualMetrics[shaman.ID].ManaSpent,
+		manaSpent: sim.GetIndividualMetrics(shaman.ID).ManaSpent,
 	}
 
 	nextIndex := (agent.firstSnapshotIndex + agent.numSnapshots) % manaSnapshotsBufferSize
@@ -234,10 +234,7 @@ func (agent *AdaptiveAgent) ChooseAction(shaman *Shaman, sim *core.Simulation) c
 	agent.purgeExpiredSnapshots(sim)
 	oldestSnapshot := agent.getOldestSnapshot()
 
-	manaSpent := 0.0
-	if len(sim.Metrics.IndividualMetrics) > shaman.ID {
-		manaSpent = sim.Metrics.IndividualMetrics[shaman.ID].ManaSpent - oldestSnapshot.manaSpent
-	}
+	manaSpent := sim.GetIndividualMetrics(shaman.ID).ManaSpent - oldestSnapshot.manaSpent
 	timeDelta := sim.CurrentTime - oldestSnapshot.time
 	if timeDelta == 0 {
 		timeDelta = 1
@@ -299,7 +296,7 @@ func NewAdaptiveAgent(sim *core.Simulation) *AdaptiveAgent {
 	clearcastSim := core.NewIndividualSim(clearcastParams)
 	clearcastResult := clearcastSim.Run()
 
-	if clearcastResult.NumOom >= 5 {
+	if clearcastResult.Agents[0].NumOom >= 5 {
 		agent.baseAgent = NewLBOnlyAgent(sim)
 		agent.surplusAgent = NewCLOnClearcastAgent(sim)
 	} else {
