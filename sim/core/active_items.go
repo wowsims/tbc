@@ -53,6 +53,7 @@ var ActiveItemByID = map[int32]ActiveItem{
 	38290: {Activate: createSpellDmgActivate(MagicIDDarkIronPipeweed, 155, time.Second*20), ActivateCD: time.Second * 120, CoolID: MagicIDDITrink, SharedID: MagicIDAtkTrinket},
 	30663: {Activate: ActivateFathomBrooch, ActivateCD: NeverExpires, SharedID: MagicIDAtkTrinket},
 	35749: {Activate: ActivateAlchStone, ActivateCD: NeverExpires, SharedID: MagicIDAtkTrinket},
+	23207: {Activate: ActivateMarkOfTheChampion, ActivateCD: NeverExpires},
 
 	// Armor
 	28602: {Activate: ActivateElderScribes, ActivateCD: NeverExpires},
