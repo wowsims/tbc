@@ -6,6 +6,7 @@ import { parseActionMetrics } from './metrics_helpers.js';
 import { ResultComponent, ResultComponentConfig } from './result_component.js';
 
 declare var $: any;
+declare var tippy: any;
 
 export class CastMetrics extends ResultComponent {
 	private readonly tableElem: HTMLTableSectionElement;
@@ -36,6 +37,50 @@ export class CastMetrics extends ResultComponent {
 
 		this.tableElem = this.rootElem.getElementsByClassName('cast-metrics-table')[0] as HTMLTableSectionElement;
 		this.bodyElem = this.rootElem.getElementsByClassName('cast-metrics-table-body')[0] as HTMLTableSectionElement;
+
+		const headerElems = Array.from(this.tableElem.querySelectorAll('th'));
+
+		// DPS
+		tippy(headerElems[1], {
+			'content': 'Damage / Encounter Duration',
+			'allowHTML': true,
+		});
+
+		// Casts
+		tippy(headerElems[2], {
+			'content': 'Casts',
+			'allowHTML': true,
+		});
+
+		// Avg Cast
+		tippy(headerElems[3], {
+			'content': 'Damage / Casts',
+			'allowHTML': true,
+		});
+
+		// Hits
+		tippy(headerElems[4], {
+			'content': 'Hits',
+			'allowHTML': true,
+		});
+
+		// Avg Hit
+		tippy(headerElems[5], {
+			'content': 'Damage / Hits',
+			'allowHTML': true,
+		});
+
+		// Crit %
+		tippy(headerElems[6], {
+			'content': 'Crits / Hits',
+			'allowHTML': true,
+		});
+
+		// Miss %
+		tippy(headerElems[7], {
+			'content': 'Misses / (Hits + Misses)',
+			'allowHTML': true,
+		});
 
 		$(this.tableElem).tablesorter({ sortList: [[1, 1]] });
 	}
@@ -75,9 +120,9 @@ export class CastMetrics extends ResultComponent {
 				addCell((actionMetric.casts / iterations).toFixed(1)); // Casts
 				addCell((actionMetric.totalDmg / actionMetric.casts).toFixed(1)); // Avg Cast
 				addCell((actionMetric.hits / iterations).toFixed(1)); // Hits
-				addCell((actionMetric.totalDmg / (actionMetric.casts - actionMetric.misses)).toFixed(1)); // Avg Hit
-				addCell(((actionMetric.crits / actionMetric.casts) * 100).toFixed(2) + ' %'); // Crit %
-				addCell(((actionMetric.misses / actionMetric.casts) * 100).toFixed(2) + ' %'); // Miss %
+				addCell((actionMetric.totalDmg / actionMetric.hits).toFixed(1)); // Avg Hit
+				addCell(((actionMetric.crits / actionMetric.hits) * 100).toFixed(2) + ' %'); // Crit %
+				addCell(((actionMetric.misses / (actionMetric.hits + actionMetric.misses)) * 100).toFixed(2) + ' %'); // Miss %
 			});
 
 			$(this.tableElem).trigger('update');
