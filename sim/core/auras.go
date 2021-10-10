@@ -676,3 +676,8 @@ func ActivateAlchStone(sim *Simulation, agent Agent) Aura {
 		Expires: math.MaxInt32,
 	}
 }
+
+func ActivateMarkOfTheChampion(sim *Simulation, agent Agent) Aura {
+	agent.GetCharacter().Stats[stats.SpellPower] += 85
+	return Aura{}
+}
