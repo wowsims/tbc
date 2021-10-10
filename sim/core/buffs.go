@@ -76,9 +76,6 @@ func ProtoToBuffs(inBuff *proto.Buffs) Buffs {
 	}
 }
 
-//func TristateMax(a proto.TristateEffect, b proto.TristateEffect) api.TristateEffect {
-//}
-
 func GetTristateValueFloat(effect proto.TristateEffect, regularValue float64, impValue float64) float64 {
 	if effect == proto.TristateEffect_TristateEffectRegular {
 		return regularValue

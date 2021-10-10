@@ -5,6 +5,21 @@ import (
 	"time"
 )
 
+// Returns a unique number based on an ActionID.
+// This works by making item IDs negative to avoid collisions, and assumes
+// there are no collisions with OtherID.
+// Actual key values dont matter, just need something unique and fast to compute.
+type ActionKey struct {
+	ActionID int32
+	Tag      int32
+}
+func NewActionKey(actionID ActionID, tag int32) ActionKey {
+	return ActionKey{
+		ActionID: int32(actionID.OtherID) + actionID.SpellID - actionID.ItemID,
+		Tag: tag,
+	}
+}
+
 type MetricsAggregator struct {
 	// Duration of each iteration, in seconds
 	encounterDuration float64
@@ -36,7 +51,7 @@ type AgentAggregateMetrics struct {
 	OomAtSum    float64
 	DpsAtOomSum float64
 
-	Actions map[int32]ActionMetric
+	Actions map[ActionKey]ActionMetric
 }
 
 type SimResult struct {
@@ -62,14 +77,15 @@ type AgentResult struct {
 type ActionMetric struct {
 	ActionID ActionID
 
-	// Index 0 of each slice is the 'normal' cast data.
-	// Count & Dmg of spells cast by Tag
-	Casts  []int32 // Total Count of Casts
-	Hits   []int32 // Count of Hits
-	Crits  []int32 // Count of Crits
-	Misses []int32 // Count of Misses
+	Tag int32
+
+	Casts  int32
+	Hits   int32
+	Crits  int32
+	Misses int32
 	// Resists []int32   // Count of Resists
-	Dmgs []float64 // Total Damage
+
+	Damage float64
 }
 
 func NewMetricsAggregator(numAgents int, encounterDuration float64) *MetricsAggregator {
@@ -82,7 +98,7 @@ func NewMetricsAggregator(numAgents int, encounterDuration float64) *MetricsAggr
 		aggregator.agentIterations = append(aggregator.agentIterations, AgentIterationMetrics{})
 		aggregator.agentAggregates = append(aggregator.agentAggregates, AgentAggregateMetrics{})
 
-		aggregator.agentAggregates[i].Actions = make(map[int32]ActionMetric)
+		aggregator.agentAggregates[i].Actions = make(map[ActionKey]ActionMetric)
 		aggregator.agentAggregates[i].DpsHist = make(map[int32]int32)
 	}
 
@@ -92,11 +108,9 @@ func NewMetricsAggregator(numAgents int, encounterDuration float64) *MetricsAggr
 // Adds the results of an action to the aggregated metrics.
 func (aggregator *MetricsAggregator) addCastAction(cast DirectCastAction, castResults []DirectCastDamageResult) {
 	actionID := cast.GetActionID()
+	tag := cast.GetTag()
 
-	// This works by making item IDs negative to avoid collisions, and assumes
-	// there are no collisions with OtherID.
-	// Actual key values dont matter, just need something unique and fast to compute.
-	actionKey := int32(actionID.OtherID) + actionID.SpellID - actionID.ItemID
+	actionKey := NewActionKey(actionID, tag)
 
 	agentID := cast.GetAgent().GetCharacter().ID
 
@@ -104,44 +118,26 @@ func (aggregator *MetricsAggregator) addCastAction(cast DirectCastAction, castRe
 	iterationMetrics.ManaSpent += cast.castInput.ManaCost
 
 	aggregateMetrics := &aggregator.agentAggregates[agentID]
-	actionMetrics := aggregateMetrics.Actions[actionKey]
+	actionMetrics, ok := aggregateMetrics.Actions[actionKey]
 
-	tag := int(cast.GetTag())
-	// Construct new arrays for a tag we haven't seen before.
-	if len(actionMetrics.Casts) <= tag {
+	if !ok {
 		actionMetrics.ActionID = actionID
-
-		newArr := make([]int32, tag+1)
-		copy(newArr, actionMetrics.Casts)
-		actionMetrics.Casts = newArr
-
-		newHitsArr := make([]int32, tag+1)
-		copy(newHitsArr, actionMetrics.Hits)
-		actionMetrics.Hits = newHitsArr
-
-		newCritsArr := make([]int32, tag+1)
-		copy(newCritsArr, actionMetrics.Crits)
-		actionMetrics.Crits = newCritsArr
-
-		newDmgs := make([]float64, tag+1)
-		copy(newDmgs, actionMetrics.Dmgs)
-		actionMetrics.Dmgs = newDmgs
-
-		newMissArr := make([]int32, tag+1)
-		copy(newMissArr, actionMetrics.Misses)
-		actionMetrics.Misses = newMissArr
+		actionMetrics.Tag = tag
 	}
 
-	actionMetrics.Casts[tag]++
+	actionMetrics.Casts++
 	for _, result := range castResults {
-		if result.Crit {
-			actionMetrics.Crits[tag]++
-		} else if result.Hit {
-			actionMetrics.Hits[tag]++
+		if result.Hit {
+			actionMetrics.Hits++
 		} else {
-			actionMetrics.Misses[tag]++
+			actionMetrics.Misses++
 		}
-		actionMetrics.Dmgs[tag] += result.Damage
+
+		if result.Crit {
+			actionMetrics.Crits++
+		}
+
+		actionMetrics.Damage += result.Damage
 		iterationMetrics.TotalDamage += result.Damage
 	}
 

@@ -13,13 +13,13 @@ import { RangedWeaponType } from '/tbc/core/proto/common.js';
 import { Spec } from '/tbc/core/proto/common.js';
 import { WeaponType } from '/tbc/core/proto/common.js';
 
-import { BalanceDruid, BalanceDruid_Agent as BalanceDruidAgent, DruidTalents, BalanceDruid_Options as BalanceDruidOptions} from '/tbc/core/proto/druid.js';
-import { ElementalShaman, ElementalShaman_Agent as ElementalShamanAgent, ShamanTalents, ElementalShaman_Options as ElementalShamanOptions } from '/tbc/core/proto/shaman.js';
+import { BalanceDruid, BalanceDruid_Rotation as BalanceDruidRotation, DruidTalents, BalanceDruid_Options as BalanceDruidOptions} from '/tbc/core/proto/druid.js';
+import { ElementalShaman, ElementalShaman_Rotation as ElementalShamanRotation, ShamanTalents, ElementalShaman_Options as ElementalShamanOptions } from '/tbc/core/proto/shaman.js';
 
 export type ShamanSpecs = Spec.SpecElementalShaman;
 
-export type AgentUnion = BalanceDruidAgent | ElementalShamanAgent;
-export type SpecAgent<T extends Spec> = T extends Spec.SpecBalanceDruid ? BalanceDruidAgent : ElementalShamanAgent;
+export type RotationUnion = BalanceDruidRotation | ElementalShamanRotation;
+export type SpecRotation<T extends Spec> = T extends Spec.SpecBalanceDruid ? BalanceDruidRotation : ElementalShamanRotation;
 
 export type TalentsUnion = DruidTalents | ShamanTalents;
 export type SpecTalents<T extends Spec> = T extends Spec.SpecBalanceDruid ? DruidTalents: ShamanTalents;
@@ -31,11 +31,11 @@ export type SpecProtoUnion = BalanceDruid | ElementalShaman;
 export type SpecProto<T extends Spec> = T extends Spec.SpecBalanceDruid ? BalanceDruid : ElementalShaman;
 
 export type SpecTypeFunctions<SpecType extends Spec> = {
-  agentCreate: () => SpecAgent<SpecType>;
-  agentEquals: (a: SpecAgent<SpecType>, b: SpecAgent<SpecType>) => boolean;
-  agentCopy: (a: SpecAgent<SpecType>) => SpecAgent<SpecType>;
-  agentToJson: (a: SpecAgent<SpecType>) => any;
-  agentFromJson: (obj: any) => SpecAgent<SpecType>;
+  rotationCreate: () => SpecRotation<SpecType>;
+  rotationEquals: (a: SpecRotation<SpecType>, b: SpecRotation<SpecType>) => boolean;
+  rotationCopy: (a: SpecRotation<SpecType>) => SpecRotation<SpecType>;
+  rotationToJson: (a: SpecRotation<SpecType>) => any;
+  rotationFromJson: (obj: any) => SpecRotation<SpecType>;
 
   talentsCreate: () => SpecTalents<SpecType>;
   talentsEquals: (a: SpecTalents<SpecType>, b: SpecTalents<SpecType>) => boolean;
@@ -52,11 +52,11 @@ export type SpecTypeFunctions<SpecType extends Spec> = {
 
 export const specTypeFunctions: Partial<Record<Spec, SpecTypeFunctions<any>>> = {
   [Spec.SpecBalanceDruid]: {
-    agentCreate: () => BalanceDruidAgent.create(),
-    agentEquals: (a, b) => BalanceDruidAgent.equals(a as BalanceDruidAgent, b as BalanceDruidAgent),
-    agentCopy: (a) => BalanceDruidAgent.clone(a as BalanceDruidAgent),
-    agentToJson: (a) => BalanceDruidAgent.toJson(a as BalanceDruidAgent),
-    agentFromJson: (obj) => BalanceDruidAgent.fromJson(obj),
+    rotationCreate: () => BalanceDruidRotation.create(),
+    rotationEquals: (a, b) => BalanceDruidRotation.equals(a as BalanceDruidRotation, b as BalanceDruidRotation),
+    rotationCopy: (a) => BalanceDruidRotation.clone(a as BalanceDruidRotation),
+    rotationToJson: (a) => BalanceDruidRotation.toJson(a as BalanceDruidRotation),
+    rotationFromJson: (obj) => BalanceDruidRotation.fromJson(obj),
 
     talentsCreate: () => DruidTalents.create(),
     talentsEquals: (a, b) => DruidTalents.equals(a as DruidTalents, b as DruidTalents),
@@ -71,11 +71,11 @@ export const specTypeFunctions: Partial<Record<Spec, SpecTypeFunctions<any>>> = 
     optionsFromJson: (obj) => BalanceDruidOptions.fromJson(obj),
   },
   [Spec.SpecElementalShaman]: {
-    agentCreate: () => ElementalShamanAgent.create(),
-    agentEquals: (a, b) => ElementalShamanAgent.equals(a as ElementalShamanAgent, b as ElementalShamanAgent),
-    agentCopy: (a) => ElementalShamanAgent.clone(a as ElementalShamanAgent),
-    agentToJson: (a) => ElementalShamanAgent.toJson(a as ElementalShamanAgent),
-    agentFromJson: (obj) => ElementalShamanAgent.fromJson(obj),
+    rotationCreate: () => ElementalShamanRotation.create(),
+    rotationEquals: (a, b) => ElementalShamanRotation.equals(a as ElementalShamanRotation, b as ElementalShamanRotation),
+    rotationCopy: (a) => ElementalShamanRotation.clone(a as ElementalShamanRotation),
+    rotationToJson: (a) => ElementalShamanRotation.toJson(a as ElementalShamanRotation),
+    rotationFromJson: (obj) => ElementalShamanRotation.fromJson(obj),
 
     talentsCreate: () => ShamanTalents.create(),
     talentsEquals: (a, b) => ShamanTalents.equals(a as ShamanTalents, b as ShamanTalents),

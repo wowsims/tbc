@@ -52,31 +52,6 @@ var shamanSets = []core.ItemSet{
 		Name:  "Cyclone Regalia",
 		Items: map[int32]struct{}{29033: {}, 29035: {}, 29034: {}, 29036: {}, 29037: {}},
 		Bonuses: map[int]core.ItemActivation{4: ActivateCycloneManaReduce, 2: func(sim *core.Simulation, agent core.Agent) core.Aura {
-			shaman, ok := agent.(*Shaman)
-			if !ok {
-				log.Fatalf("Non-shaman attempted to activate shaman cyclone set bonus.")
-			}
-			if !shaman.SelfBuffs.WrathOfAir {
-				return core.Aura{}
-			}
-			if shaman.HasAura(core.MagicIDCyclone2pc) {
-				return core.Aura{} // only can activate 2pc bonus once
-			}
-			a := core.Aura{
-				ID:      core.MagicIDCyclone2pc,
-				Expires: core.NeverExpires,
-				OnExpire: func(sim *core.Simulation) {
-					agent.GetCharacter().Party.AddStats(stats.Stats{stats.SpellPower: -20})
-				},
-			}
-			// Give the party stats, and the aura.
-			if sim.Log != nil {
-				sim.Log("Adding aura/sp from Cyclone!\n")
-			}
-			agent.GetCharacter().Party.AddStats(stats.Stats{stats.SpellPower: 20})
-			agent.GetCharacter().Party.AddAura(sim, a)
-
-			// Return no aura to be directly added because we added the aura already.
 			return core.Aura{}
 		}},
 	},

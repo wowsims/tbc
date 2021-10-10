@@ -1,5 +1,5 @@
 import { IconInput } from '/tbc/core/components/icon_picker.js';
-import { ElementalShaman_Agent_AgentType as AgentType } from '/tbc/core/proto/shaman.js';
+import { ElementalShaman_Rotation_RotationType as RotationType } from '/tbc/core/proto/shaman.js';
 import { ElementalShaman_Options as ShamanOptions } from '/tbc/core/proto/shaman.js';
 import { Spec } from '/tbc/core/proto/common.js';
 import { ItemOrSpellId } from '/tbc/core/resources.js';
@@ -18,13 +18,13 @@ export const ElementalShamanRotationConfig = {
 			cssClass: 'rotation-enum-picker',
 			config: {
 				names: ['Adaptive', 'CL On Clearcast', 'Fixed LB+CL'],
-				values: [AgentType.Adaptive, AgentType.CLOnClearcast, AgentType.FixedLBCL],
-				changedEvent: (sim: Sim<Spec.SpecElementalShaman>) => sim.agentChangeEmitter,
-				getValue: (sim: Sim<Spec.SpecElementalShaman>) => sim.getAgent().type,
+				values: [RotationType.Adaptive, RotationType.CLOnClearcast, RotationType.FixedLBCL],
+				changedEvent: (sim: Sim<Spec.SpecElementalShaman>) => sim.rotationChangeEmitter,
+				getValue: (sim: Sim<Spec.SpecElementalShaman>) => sim.getRotation().type,
 				setValue: (sim: Sim<Spec.SpecElementalShaman>, newValue: number) => {
-					const newAgent = sim.getAgent();
-					newAgent.type = newValue;
-					sim.setAgent(newAgent);
+					const newRotation = sim.getRotation();
+					newRotation.type = newValue;
+					sim.setRotation(newRotation);
 				},
 			},
 		},

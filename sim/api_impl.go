@@ -106,9 +106,10 @@ func runSimulationImpl(request *proto.IndividualSimRequest) *proto.IndividualSim
 	for _, v := range result.Agents[0].Actions {
 		metric := &proto.ActionMetric{
 			Casts:  v.Casts,
+			Hits:   v.Hits,
 			Crits:  v.Crits,
 			Misses: v.Misses,
-			Dmgs:   v.Dmgs,
+			Damage: v.Damage,
 		}
 		if v.ActionID.SpellID != 0 {
 			metric.ActionId = &proto.ActionMetric_SpellId{SpellId: v.ActionID.SpellID}

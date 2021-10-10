@@ -10,8 +10,8 @@ import { Stats } from '/tbc/core/proto_utils/stats.js';
 import { Sim } from '/tbc/core/sim.js';
 import { DefaultTheme } from '/tbc/core/themes/default.js';
 
-import { ElementalShaman, ElementalShaman_Agent as ElementalShamanAgent, ShamanTalents as ShamanTalents, ElementalShaman_Options as ElementalShamanOptions } from '/tbc/core/proto/shaman.js';
-import { ElementalShaman_Agent_AgentType as AgentType } from '/tbc/core/proto/shaman.js';
+import { ElementalShaman, ElementalShaman_Rotation as ElementalShamanRotation, ShamanTalents as ShamanTalents, ElementalShaman_Options as ElementalShamanOptions } from '/tbc/core/proto/shaman.js';
+import { ElementalShaman_Rotation_RotationType as RotationType } from '/tbc/core/proto/shaman.js';
 
 import * as IconInputs from '/tbc/core/components/icon_inputs.js';
 import * as OtherInputs from '/tbc/core/components/other_inputs.js';
@@ -148,8 +148,8 @@ const theme = new DefaultTheme<Spec.SpecElementalShaman>(document.body, {
       drumsOfBattle: true,
       superManaPotion: true,
     }),
-    agent: ElementalShamanAgent.create({
-      type: AgentType.Adaptive,
+    rotation: ElementalShamanRotation.create({
+      type: RotationType.Adaptive,
     }),
     talents: Presets.StandardTalents,
     specOptions: ElementalShamanOptions.create({

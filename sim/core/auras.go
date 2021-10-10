@@ -226,8 +226,6 @@ func AuraName(a int32) string {
 		return "EyeOfTheNight"
 	case MagicIDChainTO:
 		return "Chain of the Twilight Owl"
-	case MagicIDCyclone2pc:
-		return "Cyclone 2pc Bonus"
 	case MagicIDCyclone4pc:
 		return "Cyclone 4pc Bonus"
 	case MagicIDCycloneMana:
@@ -335,7 +333,6 @@ const (
 	MagicIDMisery
 	MagicIDEyeOfTheNight
 	MagicIDChainTO
-	MagicIDCyclone2pc
 	MagicIDCyclone4pc
 	MagicIDCycloneMana // proc from 4pc
 	MagicIDWindhawk

@@ -24,7 +24,7 @@ import { Stat } from '/tbc/core/proto/common.js';
 import { Gear } from '/tbc/core/proto_utils/gear.js';
 import { raceNames } from '/tbc/core/proto_utils/names.js';
 import { Stats } from '/tbc/core/proto_utils/stats.js';
-import { SpecAgent } from '/tbc/core/proto_utils/utils.js';
+import { SpecRotation } from '/tbc/core/proto_utils/utils.js';
 import { specToEligibleRaces } from '/tbc/core/proto_utils/utils.js';
 import { newTalentsPicker } from '/tbc/core/talents/factory.js';
 
@@ -245,14 +245,14 @@ export class DefaultTheme<SpecType extends Spec> extends SimUI<SpecType> {
       fromJson: (obj: any) => Encounter.fromJson(obj),
     });
 
-    const savedAgentManager = new SavedDataManager<SpecType, SpecAgent<SpecType>>(this.parentElem.getElementsByClassName('saved-agent-manager')[0] as HTMLElement, this.sim, {
+    const savedRotationManager = new SavedDataManager<SpecType, SpecRotation<SpecType>>(this.parentElem.getElementsByClassName('saved-rotation-manager')[0] as HTMLElement, this.sim, {
       label: 'Rotation',
-      getData: (sim: Sim<SpecType>) => sim.getAgent(),
-      setData: (sim: Sim<SpecType>, newAgent: SpecAgent<SpecType>) => sim.setAgent(newAgent),
-      changeEmitters: [this.sim.agentChangeEmitter],
-      equals: (a: SpecAgent<SpecType>, b: SpecAgent<SpecType>) => this.sim.specTypeFunctions.agentEquals(a, b),
-      toJson: (a: SpecAgent<SpecType>) => this.sim.specTypeFunctions.agentToJson(a),
-      fromJson: (obj: any) => this.sim.specTypeFunctions.agentFromJson(obj),
+      getData: (sim: Sim<SpecType>) => sim.getRotation(),
+      setData: (sim: Sim<SpecType>, newRotation: SpecRotation<SpecType>) => sim.setRotation(newRotation),
+      changeEmitters: [this.sim.rotationChangeEmitter],
+      equals: (a: SpecRotation<SpecType>, b: SpecRotation<SpecType>) => this.sim.specTypeFunctions.rotationEquals(a, b),
+      toJson: (a: SpecRotation<SpecType>) => this.sim.specTypeFunctions.rotationToJson(a),
+      fromJson: (obj: any) => this.sim.specTypeFunctions.rotationFromJson(obj),
     });
 
     const savedSettingsManager = new SavedDataManager<SpecType, Settings>(this.parentElem.getElementsByClassName('saved-settings-manager')[0] as HTMLElement, this.sim, {
@@ -377,7 +377,7 @@ const layoutHTML = `
           <div class="settings-bottom-bar">
             <div class="saved-encounter-manager">
             </div>
-            <div class="saved-agent-manager">
+            <div class="saved-rotation-manager">
             </div>
             <div class="saved-settings-manager">
             </div>
