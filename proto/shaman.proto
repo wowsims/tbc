@@ -47,12 +47,16 @@ message ElementalShaman {
     message Rotation {
       enum RotationType {
           Unknown = 0;
-          FixedLBCL = 1;
+          Adaptive = 1;
           CLOnClearcast = 2;
-          Adaptive = 3;
-          CLOnCD = 4;
+          CLOnCD = 3;
+          FixedLBCL = 4;
+          LBOnly = 5;
       }
       RotationType type = 1;
+
+			// Only used if type == FixedLBCL
+      int32 lbs_per_cl = 2;
     }
     Rotation rotation = 1;
 

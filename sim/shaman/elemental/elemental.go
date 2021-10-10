@@ -34,17 +34,12 @@ func NewElementalShaman(sim *core.Simulation, character core.Character, options 
 		rotation = NewAdaptiveRotation(sim)
 	case proto.ElementalShaman_Rotation_CLOnClearcast:
 		rotation = NewCLOnClearcastRotation(sim)
-	case proto.ElementalShaman_Rotation_FixedLBCL:
-		rotation = NewLBOnlyRotation(sim)
-		// TODO: Add option for this
-		//numLB := rotationOptions["numLBtoCL"]
-		//if numLB == -1 {
-		//	rotation = NewLBOnlyRotation()
-		//} else {
-		//	rotation = NewFixedRotationRotation(numLB)
-		//}
 	case proto.ElementalShaman_Rotation_CLOnCD:
 		rotation = NewCLOnCDRotation(sim)
+	case proto.ElementalShaman_Rotation_FixedLBCL:
+		rotation = NewFixedRotation(sim, eleShamOptions.Rotation.LbsPerCl)
+	case proto.ElementalShaman_Rotation_LBOnly:
+		rotation = NewLBOnlyRotation(sim)
 	}
 
 	return NewShaman(character, talents, selfBuffs, rotation)
@@ -93,14 +88,14 @@ func NewCLOnCDRotation(sim *core.Simulation) *CLOnCDRotation {
 // ################################################################
 //                          FIXED ROTATION
 // ################################################################
-type FixedRotationRotation struct {
-	numLBsPerCL       int
-	numLBsSinceLastCL int
+type FixedRotation struct {
+	numLBsPerCL       int32
+	numLBsSinceLastCL int32
 }
 
 // Returns if any temporary haste buff is currently active.
 // TODO: Figure out a way to make this automatic
-func (agent *FixedRotationRotation) temporaryHasteActive(shaman *Shaman) bool {
+func (agent *FixedRotation) temporaryHasteActive(shaman *Shaman) bool {
 	return shaman.HasAura(core.MagicIDBloodlust) ||
 		shaman.HasAura(core.MagicIDDrums) ||
 		shaman.HasAura(core.MagicIDTrollBerserking) ||
@@ -108,7 +103,7 @@ func (agent *FixedRotationRotation) temporaryHasteActive(shaman *Shaman) bool {
 		shaman.HasAura(core.MagicIDFungalFrenzy)
 }
 
-func (agent *FixedRotationRotation) ChooseAction(shaman *Shaman, sim *core.Simulation) core.AgentAction {
+func (agent *FixedRotation) ChooseAction(shaman *Shaman, sim *core.Simulation) core.AgentAction {
 	if agent.numLBsSinceLastCL < agent.numLBsPerCL {
 		return NewLightningBolt(sim, shaman, false)
 	}
@@ -126,7 +121,7 @@ func (agent *FixedRotationRotation) ChooseAction(shaman *Shaman, sim *core.Simul
 	return core.NewWaitAction(sim, shaman, shaman.GetRemainingCD(core.MagicIDChainLightning6, sim.CurrentTime))
 }
 
-func (agent *FixedRotationRotation) OnActionAccepted(shaman *Shaman, sim *core.Simulation, action core.AgentAction) {
+func (agent *FixedRotation) OnActionAccepted(shaman *Shaman, sim *core.Simulation, action core.AgentAction) {
 	cast, isCastAction := action.(*core.DirectCastAction)
 	if !isCastAction {
 		return
@@ -139,13 +134,13 @@ func (agent *FixedRotationRotation) OnActionAccepted(shaman *Shaman, sim *core.S
 	}
 }
 
-func (agent *FixedRotationRotation) Reset(shaman *Shaman, sim *core.Simulation) {
+func (agent *FixedRotation) Reset(shaman *Shaman, sim *core.Simulation) {
 	agent.numLBsSinceLastCL = agent.numLBsPerCL // This lets us cast CL first
 }
 
-func NewFixedRotationRotation(sim *core.Simulation, numLBsPerCL int) *FixedRotationRotation {
-	return &FixedRotationRotation{
-		numLBsPerCL:       numLBsPerCL,
+func NewFixedRotation(sim *core.Simulation, numLBsPerCL int32) *FixedRotation {
+	return &FixedRotation{
+		numLBsPerCL: numLBsPerCL,
 	}
 }
 
@@ -277,11 +272,7 @@ func NewAdaptiveRotation(sim *core.Simulation) *AdaptiveRotation {
 	clearcastParams.Options.Debug = false
 	clearcastParams.Options.Iterations = 100
 
-	// eleShamParams := *clearcastParams.PlayerOptions.GetElementalShaman()
-	// eleShamParams.Rotation.Type = proto.ElementalShaman_Rotation_CLOnClearcast
-	params := *clearcastParams.PlayerOptions.GetElementalShaman()
-
-	eleShamParams := params                                                                             // clone
+	eleShamParams := *clearcastParams.PlayerOptions.GetElementalShaman()
 	eleShamParams.Rotation = &proto.ElementalShaman_Rotation{Type: proto.ElementalShaman_Rotation_CLOnClearcast} // create new agent.
 
 	// Assign new eleShamParams

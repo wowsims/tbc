@@ -105,6 +105,7 @@ func runSimulationImpl(request *proto.IndividualSimRequest) *proto.IndividualSim
 	// TODO: Actually return results for all agents
 	for _, v := range result.Agents[0].Actions {
 		metric := &proto.ActionMetric{
+			Tag:    v.Tag,
 			Casts:  v.Casts,
 			Hits:   v.Hits,
 			Crits:  v.Crits,

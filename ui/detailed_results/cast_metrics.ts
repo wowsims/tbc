@@ -1,4 +1,5 @@
 import { IndividualSimRequest, IndividualSimResult } from '/tbc/core/proto/api.js';
+import { setWowheadHref } from '/tbc/core/resources.js';
 import { sum } from '/tbc/core/utils.js';
 
 import { parseActionMetrics } from './metrics_helpers.js';
@@ -36,7 +37,7 @@ export class CastMetrics extends ResultComponent {
 		this.tableElem = this.rootElem.getElementsByClassName('cast-metrics-table')[0] as HTMLTableSectionElement;
 		this.bodyElem = this.rootElem.getElementsByClassName('cast-metrics-table-body')[0] as HTMLTableSectionElement;
 
-		$(this.tableElem).tablesorter({ sortList: [2, 1] });
+		$(this.tableElem).tablesorter({ sortList: [[1, 1]] });
 	}
 
 	onSimResult(request: IndividualSimRequest, result: IndividualSimResult) {
@@ -53,9 +54,15 @@ export class CastMetrics extends ResultComponent {
 				const nameCellElem = document.createElement('td');
 				rowElem.appendChild(nameCellElem);
 				nameCellElem.innerHTML = `
-				<img class="cast-metrics-action-icon" src="${actionMetric.iconUrl}"></img>
+				<a class="cast-metrics-action-icon"></a>
 				<span class="cast-metrics-action-name">${actionMetric.name}</span>
 				`;
+
+				const iconElem = nameCellElem.getElementsByClassName('cast-metrics-action-icon')[0] as HTMLAnchorElement;
+				iconElem.style.backgroundImage = `url('${actionMetric.iconUrl}')`;
+				if (!('otherId' in actionMetric.actionId)) {
+					setWowheadHref(iconElem, actionMetric.actionId);
+				}
 
 				const addCell = (value: string | number): HTMLElement => {
 					const cellElem = document.createElement('td');

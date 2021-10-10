@@ -17,13 +17,49 @@ export const ElementalShamanRotationConfig = {
 			type: 'enum' as const,
 			cssClass: 'rotation-enum-picker',
 			config: {
-				names: ['Adaptive', 'CL On Clearcast', 'Fixed LB+CL'],
-				values: [RotationType.Adaptive, RotationType.CLOnClearcast, RotationType.FixedLBCL],
+				label: 'Type',
+				values: [
+					{
+						name: 'Adaptive', value: RotationType.Adaptive,
+						tooltip: 'Dynamically adapts based on available mana to maximize CL casts without going OOM.',
+					},
+					{
+						name: 'CL On Clearcast', value: RotationType.CLOnClearcast,
+						tooltip: 'Casts CL only after Clearcast procs.',
+					},
+					{
+						name: 'CL On CD', value: RotationType.CLOnCD,
+						tooltip: 'Casts CL if it is ready, otherwise LB.',
+					},
+					{
+						name: 'Fixed LB+CL', value: RotationType.FixedLBCL,
+						tooltip: 'Casts a fixed number of LBs between each CL (specified below), even if that means waiting. While temporary haste effects are active (drums, lust, etc) will cast extra LBs instead of waiting.',
+					},
+					{
+						name: 'LB Only', value: RotationType.LBOnly,
+						tooltip: 'Only casts Lightning Bolt.',
+					},
+				],
 				changedEvent: (sim: Sim<Spec.SpecElementalShaman>) => sim.rotationChangeEmitter,
 				getValue: (sim: Sim<Spec.SpecElementalShaman>) => sim.getRotation().type,
 				setValue: (sim: Sim<Spec.SpecElementalShaman>, newValue: number) => {
 					const newRotation = sim.getRotation();
 					newRotation.type = newValue;
+					sim.setRotation(newRotation);
+				},
+			},
+		},
+		{
+			type: 'number' as const,
+			cssClass: 'num-lbs-per-cl-picker',
+			config: {
+				label: 'LBs per CL',
+				labelTooltip: 'The number of Lightning Bolts to cast between each Chain Lightning. Only used if Rotation is set to \'Fixed LB+CL\'.',
+				changedEvent: (sim: Sim<Spec.SpecElementalShaman>) => sim.rotationChangeEmitter,
+				getValue: (sim: Sim<Spec.SpecElementalShaman>) => sim.getRotation().lbsPerCl,
+				setValue: (sim: Sim<Spec.SpecElementalShaman>, newValue: number) => {
+					const newRotation = sim.getRotation();
+					newRotation.lbsPerCl = newValue;
 					sim.setRotation(newRotation);
 				},
 			},
