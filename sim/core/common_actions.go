@@ -43,7 +43,7 @@ func (action *WaitAction) Act(sim *Simulation) {
 	if sim.Log != nil {
 		sim.Log("Doing nothing for %0.1f seconds.\n", action.GetDuration())
 	}
-	sim.Metrics.Actions = append(sim.Metrics.Actions, action)
+	sim.metricsAggregator.addAction(action)
 }
 
 func NewWaitAction(sim *Simulation, agent Agent, duration time.Duration) *WaitAction {

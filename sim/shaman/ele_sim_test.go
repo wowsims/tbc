@@ -166,8 +166,8 @@ func TestAverageDPS(t *testing.T) {
 
 	expectedDps := 1248.4
 	tolerance := 0.5
-	if result.DpsAvg < expectedDps-tolerance || result.DpsAvg > expectedDps+tolerance {
-		t.Fatalf("%s failed: expected %0f dps from sim but was %0f", "Average", expectedDps, result.DpsAvg)
+	if result.Agents[0].DpsAvg < expectedDps-tolerance || result.Agents[0].DpsAvg > expectedDps+tolerance {
+		t.Fatalf("%s failed: expected %0f dps from sim but was %0f", "Average", expectedDps, result.Agents[0].DpsAvg)
 	}
 }
 
@@ -248,8 +248,8 @@ func doSimulateTest(label string, t *testing.T, params core.IndividualParams, ex
 	}
 
 	tolerance := 0.5
-	if result.DpsAvg < expectedDps-tolerance || result.DpsAvg > expectedDps+tolerance {
-		t.Fatalf("%s failed: expected %0f dps from sim but was %0f", label, expectedDps, result.DpsAvg)
+	if result.Agents[0].DpsAvg < expectedDps-tolerance || result.Agents[0].DpsAvg > expectedDps+tolerance {
+		t.Fatalf("%s failed: expected %0f dps from sim but was %0f", label, expectedDps, result.Agents[0].DpsAvg)
 	}
 }
 

@@ -72,6 +72,18 @@ func NewRaid(baseBuffs Buffs) *Raid {
 	}
 }
 
+func (raid *Raid) Size() int {
+	totalPlayers := 0
+	for _, party := range raid.Parties {
+		totalPlayers += party.Size()
+	}
+	return totalPlayers
+}
+
+func (raid *Raid) IsFull() bool {
+	return raid.Size() >= 25
+}
+
 // Adds the player to the first non-full party in the raid and returns the
 // party to which it was added.
 func (raid *Raid) AddPlayer(player Agent) *Party {

@@ -136,7 +136,6 @@ func (action *DirectCastAction) Act(sim *Simulation) {
 
 	if action.castInput.ManaCost > 0 {
 		character.Stats[stats.Mana] -= action.castInput.ManaCost
-		sim.Metrics.IndividualMetrics[character.ID].ManaSpent += action.castInput.ManaCost
 	}
 
 	action.OnCastComplete(sim, action)
@@ -188,9 +187,6 @@ func (action *DirectCastAction) Act(sim *Simulation) {
 		if sim.Log != nil {
 			sim.Log("(%d) %s result: %s\n", character.ID, action.GetName(), result)
 		}
-
-		sim.Metrics.TotalDamage += result.Damage
-		sim.Metrics.IndividualMetrics[character.ID].TotalDamage += result.Damage
 	}
 
 	cooldown := action.GetCooldown()
@@ -198,7 +194,7 @@ func (action *DirectCastAction) Act(sim *Simulation) {
 		character.SetCD(action.GetActionID().CooldownID, sim.CurrentTime+cooldown)
 	}
 
-	sim.Metrics.Actions = append(sim.Metrics.Actions, action)
+	sim.metricsAggregator.addAction(action)
 }
 
 func (action *DirectCastAction) calculateDirectCastDamage(sim *Simulation, damageInput DirectCastDamageInput) DirectCastDamageResult {
