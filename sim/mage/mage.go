@@ -5,11 +5,11 @@ import (
 )
 
 type Mage struct {
-	*core.Character
+	core.Character
 }
 
 func (mage *Mage) GetCharacter() *core.Character {
-	return mage.Character
+	return &mage.Character
 }
 
 func (mage *Mage) AddRaidBuffs(buffs *core.Buffs) {

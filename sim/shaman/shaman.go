@@ -8,7 +8,7 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-func newShaman(character *core.Character, talents Talents, selfBuffs SelfBuffs, agent shamanAgent) *Shaman {
+func newShaman(character core.Character, talents Talents, selfBuffs SelfBuffs, agent shamanAgent) *Shaman {
 	if selfBuffs.WaterShield {
 		character.InitialStats[stats.MP5] += 50
 	}
@@ -47,7 +47,7 @@ type shamanAgent interface {
 
 // Shaman represents a shaman character.
 type Shaman struct {
-	*core.Character
+	core.Character
 
 	agent shamanAgent
 
@@ -69,7 +69,7 @@ type Shaman struct {
 }
 
 func (shaman *Shaman) GetCharacter() *core.Character {
-	return shaman.Character
+	return &shaman.Character
 }
 
 func (shaman *Shaman) AddRaidBuffs(buffs *core.Buffs) {

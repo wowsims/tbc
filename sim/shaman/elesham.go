@@ -9,12 +9,12 @@ import (
 )
 
 func RegisterElementalShaman() {
-	core.RegisterAgentFactory(proto.PlayerOptions_ElementalShaman{}, func(sim *core.Simulation, character *core.Character, options *proto.PlayerOptions) core.Agent {
+	core.RegisterAgentFactory(proto.PlayerOptions_ElementalShaman{}, func(sim *core.Simulation, character core.Character, options *proto.PlayerOptions) core.Agent {
 		return NewElementalShaman(sim, character, options)
 	})
 }
 
-func NewElementalShaman(sim *core.Simulation, character *core.Character, options *proto.PlayerOptions) *Shaman {
+func NewElementalShaman(sim *core.Simulation, character core.Character, options *proto.PlayerOptions) *Shaman {
 	eleShamOptions := options.GetElementalShaman()
 	talents := convertShamTalents(eleShamOptions.Talents)
 
