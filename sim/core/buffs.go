@@ -109,8 +109,8 @@ func (buffs Buffs) ApplyToPlayer(agent Agent) {
 		})
 	}
 
-	// TODO: Figure out imp value
-	gotwAmount := GetTristateValueFloat(buffs.GiftOfTheWild, 18.0, 18.0)
+	// TODO: Double-check these numbers.
+	gotwAmount := GetTristateValueFloat(buffs.GiftOfTheWild, 14.0, 14.0 * 1.35)
 	// TODO: Pretty sure some of these dont stack with fort/ai/divine spirit
 	character.AddInitialStats(stats.Stats{
 		stats.Stamina:   gotwAmount,
