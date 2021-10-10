@@ -13,41 +13,41 @@ type WaitAction struct {
 	duration time.Duration
 }
 
-func (action *WaitAction) GetActionID() ActionID {
+func (action WaitAction) GetActionID() ActionID {
 	return ActionID{
 		OtherID: proto.OtherAction_OtherActionWait,
 	}
 }
 
-func (action *WaitAction) GetName() string {
+func (action WaitAction) GetName() string {
 	return "Wait"
 }
 
-func (action *WaitAction) GetTag() int32 {
+func (action WaitAction) GetTag() int32 {
 	return 0
 }
 
-func (action *WaitAction) GetAgent() Agent {
+func (action WaitAction) GetAgent() Agent {
 	return action.agent
 }
 
-func (action *WaitAction) GetDuration() time.Duration {
+func (action WaitAction) GetDuration() time.Duration {
 	return action.duration
 }
 
-func (action *WaitAction) GetManaCost() float64 {
+func (action WaitAction) GetManaCost() float64 {
 	return 0
 }
 
-func (action *WaitAction) Act(sim *Simulation) {
+func (action WaitAction) Act(sim *Simulation) {
 	if sim.Log != nil {
 		sim.Log("Doing nothing for %0.1f seconds.\n", action.GetDuration())
 	}
-	sim.metricsAggregator.addAction(action)
+	//sim.metricsAggregator.addAction(action)
 }
 
-func NewWaitAction(sim *Simulation, agent Agent, duration time.Duration) *WaitAction {
-	return &WaitAction{
+func NewWaitAction(sim *Simulation, agent Agent, duration time.Duration) WaitAction {
+	return WaitAction{
 		agent: agent,
 		duration: duration,
 	}
@@ -90,13 +90,13 @@ func (lcc LightningCapacitorCast) GetCooldown() time.Duration {
 	return 0
 }
 
-func (lcc LightningCapacitorCast) GetCastInput(sim *Simulation, cast *DirectCastAction) DirectCastInput {
+func (lcc LightningCapacitorCast) GetCastInput(sim *Simulation, cast DirectCastAction) DirectCastInput {
 	return DirectCastInput{
 		CritMultiplier: 1.5,
 	}
 }
 
-func (lcc LightningCapacitorCast) GetHitInputs(sim *Simulation, cast *DirectCastAction) []DirectCastDamageInput{
+func (lcc LightningCapacitorCast) GetHitInputs(sim *Simulation, cast DirectCastAction) []DirectCastDamageInput{
 	hitInput := DirectCastDamageInput{
 		MinBaseDamage: 694,
 		MaxBaseDamage: 807,
@@ -106,13 +106,13 @@ func (lcc LightningCapacitorCast) GetHitInputs(sim *Simulation, cast *DirectCast
 	return []DirectCastDamageInput{hitInput}
 }
 
-func (lcc LightningCapacitorCast) OnCastComplete(sim *Simulation, cast *DirectCastAction) {
+func (lcc LightningCapacitorCast) OnCastComplete(sim *Simulation, cast DirectCastAction) {
 }
-func (lcc LightningCapacitorCast) OnSpellHit(sim *Simulation, cast *DirectCastAction, result *DirectCastDamageResult) {
+func (lcc LightningCapacitorCast) OnSpellHit(sim *Simulation, cast DirectCastAction, result *DirectCastDamageResult) {
 }
-func (lcc LightningCapacitorCast) OnSpellMiss(sim *Simulation, cast *DirectCastAction) {
+func (lcc LightningCapacitorCast) OnSpellMiss(sim *Simulation, cast DirectCastAction) {
 }
 
-func NewLightningCapacitorCast(sim *Simulation, agent Agent) *DirectCastAction {
+func NewLightningCapacitorCast(sim *Simulation, agent Agent) DirectCastAction {
 	return NewDirectCastAction(sim, LightningCapacitorCast{agent: agent})
 }

@@ -163,7 +163,7 @@ func TryActivateBloodlust(sim *core.Simulation, shaman *Shaman) {
 	shaman.Party.AddAura(sim, core.Aura{
 		ID:      core.MagicIDBloodlust,
 		Expires: sim.CurrentTime + dur,
-		OnCast: func(sim *core.Simulation, cast *core.DirectCastAction, input *core.DirectCastInput) {
+		OnCast: func(sim *core.Simulation, cast core.DirectCastAction, input *core.DirectCastInput) {
 			input.CastTime = (input.CastTime * 10) / 13 // 30% faster
 		},
 	})
@@ -177,11 +177,11 @@ func TryActivateEleMastery(sim *core.Simulation, shaman *Shaman) {
 	shaman.AddAura(sim, core.Aura{
 		ID:      core.MagicIDEleMastery,
 		Expires: core.NeverExpires,
-		OnCast: func(sim *core.Simulation, cast *core.DirectCastAction, input *core.DirectCastInput) {
+		OnCast: func(sim *core.Simulation, cast core.DirectCastAction, input *core.DirectCastInput) {
 			input.ManaCost = 0
 			input.GuaranteedCrit = true
 		},
-		OnCastComplete: func(sim *core.Simulation, cast *core.DirectCastAction) {
+		OnCastComplete: func(sim *core.Simulation, cast core.DirectCastAction) {
 			// Remove the buff and put skill on CD
 			shaman.SetCD(core.MagicIDEleMastery, time.Second*180+sim.CurrentTime)
 			shaman.RemoveAura(sim, core.MagicIDEleMastery)

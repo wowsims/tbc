@@ -23,7 +23,7 @@ func (cl ChainLightning) GetCooldown() time.Duration {
 	return time.Second*6
 }
 
-func (cl ChainLightning) GetHitInputs(sim *core.Simulation, cast *core.DirectCastAction) []core.DirectCastDamageInput{
+func (cl ChainLightning) GetHitInputs(sim *core.Simulation, cast core.DirectCastAction) []core.DirectCastDamageInput{
 	hitInput := core.DirectCastDamageInput{
 		MinBaseDamage: 734,
 		MaxBaseDamage: 838,
@@ -53,7 +53,7 @@ func (cl ChainLightning) GetHitInputs(sim *core.Simulation, cast *core.DirectCas
 }
 
 
-func (cl ChainLightning) OnSpellHit(sim *core.Simulation, cast *core.DirectCastAction, result *core.DirectCastDamageResult) {
+func (cl ChainLightning) OnSpellHit(sim *core.Simulation, cast core.DirectCastAction, result *core.DirectCastDamageResult) {
 	cl.OnElectricSpellHit(sim, cast, result)
 
 	if !cl.IsLightningOverload {
@@ -65,7 +65,7 @@ func (cl ChainLightning) OnSpellHit(sim *core.Simulation, cast *core.DirectCastA
 	}
 }
 
-func NewChainLightning(sim *core.Simulation, shaman *Shaman, IsLightningOverload bool) *core.DirectCastAction {
+func NewChainLightning(sim *core.Simulation, shaman *Shaman, IsLightningOverload bool) core.DirectCastAction {
 	return core.NewDirectCastAction(
 		sim,
 		ChainLightning{ElectricSpell{
