@@ -1,8 +1,10 @@
 import { Buffs } from '/tbc/core/proto/common.js';
 import { Class } from '/tbc/core/proto/common.js';
 import { Consumes } from '/tbc/core/proto/common.js';
+import { Drums } from '/tbc/core/proto/common.js';
 import { Encounter } from '/tbc/core/proto/common.js';
 import { ItemSlot } from '/tbc/core/proto/common.js';
+import { Potions } from '/tbc/core/proto/common.js';
 import { Spec } from '/tbc/core/proto/common.js';
 import { Stat } from '/tbc/core/proto/common.js';
 import { TristateEffect } from '/tbc/core/proto/common.js'
@@ -24,7 +26,6 @@ import * as Presets from './presets.js';
 const theme = new DefaultTheme<Spec.SpecElementalShaman>(document.body, {
 	releaseStatus: 'Beta',
 	knownIssues: [
-		'Can only use 1 type of potion, cannot use 1 Destruction Potion and then Super Mana Potions after that.',
 	],
   spec: Spec.SpecElementalShaman,
   epStats: [
@@ -92,8 +93,8 @@ const theme = new DefaultTheme<Spec.SpecElementalShaman>(document.body, {
 		},
     'Consumes': {
 			icons: [
-				IconInputs.SuperManaPotion,
-				IconInputs.DestructionPotion,
+				IconInputs.DefaultSuperManaPotion,
+				IconInputs.DefaultDestructionPotion,
 				IconInputs.DarkRune,
 				IconInputs.FlaskOfBlindingLight,
 				IconInputs.FlaskOfSupremePower,
@@ -112,6 +113,8 @@ const theme = new DefaultTheme<Spec.SpecElementalShaman>(document.body, {
     'Other': {
 			inputs: [
 				OtherInputs.ShadowPriestDPS,
+				OtherInputs.StartingPotion,
+				OtherInputs.NumStartingPotions,
 			],
 		},
   },
@@ -145,8 +148,8 @@ const theme = new DefaultTheme<Spec.SpecElementalShaman>(document.body, {
       misery: true,
     }),
     consumes: Consumes.create({
-      drumsOfBattle: true,
-      superManaPotion: true,
+      drums: Drums.DrumsOfBattle,
+      defaultPotion: Potions.SuperManaPotion,
     }),
     rotation: ElementalShamanRotation.create({
       type: RotationType.Adaptive,

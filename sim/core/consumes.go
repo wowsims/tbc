@@ -152,13 +152,17 @@ func TryActivateDrums(sim *Simulation, agent Agent) {
 
 func TryActivatePotion(sim *Simulation, agent Agent) {
 	character := agent.GetCharacter()
-	if character.Consumes.DefaultPotion == proto.Potions_UnknownPotion || character.IsOnCD(MagicIDPotion, sim.CurrentTime) {
+	if character.IsOnCD(MagicIDPotion, sim.CurrentTime) {
 		return
 	}
 
 	potionToUse := character.Consumes.DefaultPotion
 	if character.Consumes.StartingPotion != proto.Potions_UnknownPotion && character.potionsUsed < character.Consumes.NumStartingPotions {
 		potionToUse = character.Consumes.StartingPotion
+	}
+
+	if potionToUse == proto.Potions_UnknownPotion {
+		return
 	}
 
 	if potionToUse == proto.Potions_DestructionPotion {

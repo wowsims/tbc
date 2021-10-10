@@ -1,5 +1,7 @@
 import { Buffs } from '/tbc/core/proto/common.js';
 import { Consumes } from '/tbc/core/proto/common.js';
+import { Drums } from '/tbc/core/proto/common.js';
+import { Potions } from '/tbc/core/proto/common.js';
 import { ItemOrSpellId } from '/tbc/core/resources.js';
 import { Sim } from '/tbc/core/sim.js';
 
@@ -25,8 +27,9 @@ export const ManaTideTotem = makeBooleanBuffInput({spellId:16190}, 'manaTideTote
 export const MoonkinAura = makeTristateBuffInput({spellId:24907}, {itemId:32387}, 'moonkinAura');
 export const TotemOfWrath = makeMultistateBuffInput({spellId:30706}, 5, 'totemOfWrath');
 export const WrathOfAirTotem = makeTristateBuffInput({spellId:3738}, {spellId:37212}, 'wrathOfAirTotem');
-export const DrumsOfBattleBuff = makeBooleanBuffInput({spellId:35476}, 'drumsOfBattle', ['Drums']);
-export const DrumsOfRestorationBuff = makeBooleanBuffInput({spellId:35478}, 'drumsOfRestoration', ['Drums']);
+
+export const DrumsOfBattleBuff = makeEnumValueBuffInput({spellId:35476}, 'drums', Drums.DrumsOfBattle, ['Drums']);
+export const DrumsOfRestorationBuff = makeEnumValueBuffInput({spellId:35478}, 'drums', Drums.DrumsOfRestoration, ['Drums']);
 
 // Debuffs
 export const ImprovedSealOfTheCrusader = makeBooleanBuffInput({spellId:20337}, 'improvedSealOfTheCrusader');
@@ -38,9 +41,6 @@ export const AdeptsElixir = makeBooleanConsumeInput({itemId:28103}, 'adeptsElixi
 export const BlackenedBasilisk = makeBooleanConsumeInput({itemId:27657}, 'blackenedBasilisk', ['Food']);
 export const BrilliantWizardOil = makeBooleanConsumeInput({itemId:20749}, 'brilliantWizardOil', ['Weapon Imbue']);
 export const DarkRune = makeBooleanConsumeInput({itemId:12662}, 'darkRune', ['Rune']);
-export const DestructionPotion = makeBooleanConsumeInput({itemId:22839}, 'destructionPotion', ['Potion']);
-export const DrumsOfBattleConsume = makeBooleanConsumeInput({spellId:35476}, 'drumsOfBattle', ['Drums']);
-export const DrumsOfRestorationConsume = makeBooleanConsumeInput({spellId:35478}, 'drumsOfRestoration', ['Drums']);
 export const ElixirOfDraenicWisdom = makeBooleanConsumeInput({itemId:32067}, 'elixirOfDraenicWisdom', ['Guardian Elixir']);
 export const ElixirOfMajorFirePower = makeBooleanConsumeInput({itemId:22833}, 'elixirOfMajorFirePower', ['Battle Elixir']);
 export const ElixirOfMajorFrostPower = makeBooleanConsumeInput({itemId:22827}, 'elixirOfMajorFrostPower', ['Battle Elixir']);
@@ -51,8 +51,13 @@ export const FlaskOfMightyRestoration = makeBooleanConsumeInput({itemId:22853}, 
 export const FlaskOfPureDeath = makeBooleanConsumeInput({itemId:22866}, 'flaskOfPureDeath', ['Battle Elixir', 'Guardian Elixir']);
 export const FlaskOfSupremePower = makeBooleanConsumeInput({itemId:13512}, 'flaskOfSupremePower', ['Battle Elixir', 'Guardian Elixir']);
 export const SkullfishSoup = makeBooleanConsumeInput({itemId:33825}, 'skullfishSoup', ['Food']);
-export const SuperManaPotion = makeBooleanConsumeInput({itemId:22832}, 'superManaPotion', ['Potion']);
 export const SuperiorWizardOil = makeBooleanConsumeInput({itemId:22522}, 'superiorWizardOil', ['Weapon Imbue']);
+
+export const DefaultDestructionPotion = makeEnumValueConsumeInput({itemId:22839}, 'defaultPotion', Potions.DestructionPotion, ['Potion']);
+export const DefaultSuperManaPotion = makeEnumValueConsumeInput({itemId:22832}, 'defaultPotion', Potions.SuperManaPotion, ['Potion']);
+
+export const DrumsOfBattleConsume = makeEnumValueConsumeInput({spellId:35476}, 'drums', Drums.DrumsOfBattle, ['Drums']);
+export const DrumsOfRestorationConsume = makeEnumValueConsumeInput({spellId:35478}, 'drums', Drums.DrumsOfRestoration, ['Drums']);
 
 function makeBooleanBuffInput(id: ItemOrSpellId, buffsFieldName: keyof Buffs, exclusivityTags?: Array<ExclusivityTag>): IconInput {
   return {
@@ -98,6 +103,21 @@ function makeMultistateBuffInput(id: ItemOrSpellId, numStates: number, buffsFiel
   }
 }
 
+function makeEnumValueBuffInput(id: ItemOrSpellId, buffsFieldName: keyof Buffs, enumValue: number, exclusivityTags?: Array<ExclusivityTag>): IconInput {
+  return {
+    id: id,
+    states: 2,
+    exclusivityTags: exclusivityTags,
+    changedEvent: (sim: Sim<any>) => sim.buffsChangeEmitter,
+    getValue: (sim: Sim<any>) => sim.getBuffs()[buffsFieldName] == enumValue,
+    setBooleanValue: (sim: Sim<any>, newValue: boolean) => {
+			const newBuffs = sim.getBuffs();
+			(newBuffs[buffsFieldName] as number) = newValue ? enumValue : 0;
+			sim.setBuffs(newBuffs);
+    },
+  }
+}
+
 function makeBooleanConsumeInput(id: ItemOrSpellId, consumesFieldName: keyof Consumes, exclusivityTags?: Array<ExclusivityTag>): IconInput {
   return {
     id: id,
@@ -109,6 +129,21 @@ function makeBooleanConsumeInput(id: ItemOrSpellId, consumesFieldName: keyof Con
       const newBuffs = sim.getConsumes();
       (newBuffs[consumesFieldName] as boolean) = newValue;
       sim.setConsumes(newBuffs);
+    },
+  }
+}
+
+function makeEnumValueConsumeInput(id: ItemOrSpellId, consumesFieldName: keyof Consumes, enumValue: number, exclusivityTags?: Array<ExclusivityTag>): IconInput {
+  return {
+    id: id,
+    states: 2,
+    exclusivityTags: exclusivityTags,
+    changedEvent: (sim: Sim<any>) => sim.consumesChangeEmitter,
+    getValue: (sim: Sim<any>) => sim.getConsumes()[consumesFieldName] == enumValue,
+    setBooleanValue: (sim: Sim<any>, newValue: boolean) => {
+			const newConsumes = sim.getConsumes();
+			(newConsumes[consumesFieldName] as number) = newValue ? enumValue : 0;
+			sim.setConsumes(newConsumes);
     },
   }
 }

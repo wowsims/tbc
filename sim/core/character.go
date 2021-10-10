@@ -199,9 +199,6 @@ func (character *Character) AddRaidBuffs(buffs *Buffs) {
 }
 func (character *Character) AddPartyBuffs(buffs *Buffs) {
 	if character.Consumes.Drums > 0 {
-		if buffs.Drums > 0 {
-			panic("Multiple drummers in the same party!")
-		}
 		buffs.Drums = character.Consumes.Drums
 	}
 
