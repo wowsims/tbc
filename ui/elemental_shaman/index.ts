@@ -76,7 +76,6 @@ const theme = new DefaultTheme<Spec.SpecElementalShaman>(document.body, {
 				IconInputs.WrathOfAirTotem,
 				IconInputs.TotemOfWrath,
 				IconInputs.ManaSpringTotem,
-				IconInputs.ManaTideTotem,
 				IconInputs.EyeOfTheNight,
 				IconInputs.ChainOfTheTwilightOwl,
 				IconInputs.JadePendantOfBlasting,
