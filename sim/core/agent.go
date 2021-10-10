@@ -21,7 +21,7 @@ type Agent interface {
 	// Any pre-start buffs to apply to the raid/party/self
 	BuffUp(*Simulation)
 
-	// Returns this Agent to its initial state.
+	// Returns this Agent to its initial state. Called before each Sim iteration.
 	Reset(newsim *Simulation)
 
 	// Returns the action this Agent would like to take next.
@@ -63,12 +63,6 @@ type AgentAction interface {
 	// Do the action.
 	Act(sim *Simulation)
 }
-
-//type AgentAction struct {
-//	// Exactly one of these should be set.
-//	Wait time.Duration // Duration to wait
-//	Cast *Cast
-//}
 
 type AgentFactory func(*Simulation, Character, *proto.PlayerOptions) Agent
 

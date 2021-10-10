@@ -90,21 +90,15 @@ func NewMetricsAggregator(numAgents int, encounterDuration float64) *MetricsAggr
 }
 
 // Adds the results of an action to the aggregated metrics.
-func (aggregator *MetricsAggregator) addAction(action AgentAction) {
-	actionID := action.GetActionID()
+func (aggregator *MetricsAggregator) addCastAction(cast DirectCastAction, castResults []DirectCastDamageResult) {
+	actionID := cast.GetActionID()
 
 	// This works by making item IDs negative to avoid collisions, and assumes
 	// there are no collisions with OtherID.
 	// Actual key values dont matter, just need something unique and fast to compute.
 	actionKey := int32(actionID.OtherID) + actionID.SpellID - actionID.ItemID
 
-	agentID := action.GetAgent().GetCharacter().ID
-
-	cast, isCast := action.(*DirectCastAction)
-	if !isCast {
-		// Skip other types of actions for now
-		return
-	}
+	agentID := cast.GetAgent().GetCharacter().ID
 
 	iterationMetrics := &aggregator.agentIterations[agentID]
 	iterationMetrics.ManaSpent += cast.castInput.ManaCost
@@ -138,7 +132,6 @@ func (aggregator *MetricsAggregator) addAction(action AgentAction) {
 		actionMetrics.Misses = newMissArr
 	}
 
-	castResults := cast.GetResults()
 	actionMetrics.Casts[tag]++
 	for _, result := range castResults {
 		if result.Crit {

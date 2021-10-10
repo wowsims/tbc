@@ -67,7 +67,7 @@ func (spell ElectricSpell) GetSpellSchool() stats.Stat {
 func (spell ElectricSpell) ApplyCastInputModifiers(input *core.DirectCastInput) {
 }
 
-func (spell ElectricSpell) GetCastInput(sim *core.Simulation, cast *core.DirectCastAction) core.DirectCastInput {
+func (spell ElectricSpell) GetCastInput(sim *core.Simulation, cast core.DirectCastAction) core.DirectCastInput {
 	input := core.DirectCastInput{
 		ManaCost: spell.baseManaCost,
 		CastTime: spell.baseCastTime,
@@ -116,15 +116,15 @@ func (spell ElectricSpell) ApplyHitInputModifiers(hitInput *core.DirectCastDamag
 	}
 }
 
-func (spell ElectricSpell) OnCastComplete(sim *core.Simulation, cast *core.DirectCastAction) {
+func (spell ElectricSpell) OnCastComplete(sim *core.Simulation, cast core.DirectCastAction) {
 	if !spell.IsLightningOverload && spell.Shaman.elementalFocusStacks > 0 {
 		spell.Shaman.elementalFocusStacks--
 	}
 }
-func (spell ElectricSpell) OnElectricSpellHit(sim *core.Simulation, cast *core.DirectCastAction, result *core.DirectCastDamageResult) {
+func (spell ElectricSpell) OnElectricSpellHit(sim *core.Simulation, cast core.DirectCastAction, result *core.DirectCastDamageResult) {
 	if result.Crit {
 		spell.Shaman.elementalFocusStacks = 2
 	}
 }
-func (spell ElectricSpell) OnSpellMiss(sim *core.Simulation, cast *core.DirectCastAction) {
+func (spell ElectricSpell) OnSpellMiss(sim *core.Simulation, cast core.DirectCastAction) {
 }

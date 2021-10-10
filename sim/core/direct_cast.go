@@ -93,13 +93,13 @@ type DirectCastImpl interface {
 
 	GetCooldown() time.Duration
 
-	GetCastInput(sim *Simulation, cast *DirectCastAction) DirectCastInput
-	GetHitInputs(sim *Simulation, cast *DirectCastAction) []DirectCastDamageInput
+	GetCastInput(sim *Simulation, cast DirectCastAction) DirectCastInput
+	GetHitInputs(sim *Simulation, cast DirectCastAction) []DirectCastDamageInput
 
 	// Lifecycle callbacks for additional custom effects.
-	OnCastComplete(sim *Simulation, cast *DirectCastAction)
-	OnSpellHit(sim *Simulation, cast *DirectCastAction, result *DirectCastDamageResult)
-	OnSpellMiss(sim *Simulation, cast *DirectCastAction)
+	OnCastComplete(sim *Simulation, cast DirectCastAction)
+	OnSpellHit(sim *Simulation, cast DirectCastAction, result *DirectCastDamageResult)
+	OnSpellMiss(sim *Simulation, cast DirectCastAction)
 }
 
 type DirectCastAction struct {
@@ -108,25 +108,17 @@ type DirectCastAction struct {
 	// The inputs to the cast. Auras are given a reference to these to modify them
 	// before the spell begins casting.
 	castInput DirectCastInput
-
-	// Results of the main calculation. Auras are given a reference to these to modify
-	// them after the calculation happens.
-	results []DirectCastDamageResult
 }
 
-func (action *DirectCastAction) GetManaCost() float64 {
+func (action DirectCastAction) GetManaCost() float64 {
 	return action.castInput.ManaCost
 }
 
-func (action *DirectCastAction) GetDuration() time.Duration {
+func (action DirectCastAction) GetDuration() time.Duration {
 	return action.castInput.CastTime
 }
 
-func (action *DirectCastAction) GetResults() []DirectCastDamageResult {
-	return action.results
-}
-
-func (action *DirectCastAction) Act(sim *Simulation) {
+func (action DirectCastAction) Act(sim *Simulation) {
 	character := action.GetAgent().GetCharacter()
 
 	if sim.Log != nil {
@@ -135,6 +127,7 @@ func (action *DirectCastAction) Act(sim *Simulation) {
 	}
 
 	if action.castInput.ManaCost > 0 {
+		//fmt.Printf("Subtracting mana: %0.0f", action.castInput.ManaCost)
 		character.Stats[stats.Mana] -= action.castInput.ManaCost
 	}
 
@@ -152,10 +145,10 @@ func (action *DirectCastAction) Act(sim *Simulation) {
 
 	hitInputs := action.GetHitInputs(sim, action)
 
-	action.results = make([]DirectCastDamageResult, 0, len(hitInputs))
+	results := make([]DirectCastDamageResult, 0, len(hitInputs))
 	for _, hitInput := range hitInputs {
 		result := action.calculateDirectCastDamage(sim, hitInput)
-		action.results = append(action.results, result)
+		results = append(results, result)
 
 		if result.Hit {
 			// Apply any on spell hit effects.
@@ -194,10 +187,10 @@ func (action *DirectCastAction) Act(sim *Simulation) {
 		character.SetCD(action.GetActionID().CooldownID, sim.CurrentTime+cooldown)
 	}
 
-	sim.metricsAggregator.addAction(action)
+	sim.metricsAggregator.addCastAction(action, results)
 }
 
-func (action *DirectCastAction) calculateDirectCastDamage(sim *Simulation, damageInput DirectCastDamageInput) DirectCastDamageResult {
+func (action DirectCastAction) calculateDirectCastDamage(sim *Simulation, damageInput DirectCastDamageInput) DirectCastDamageResult {
 	result := DirectCastDamageResult{}
 
 	character := action.GetAgent().GetCharacter()
@@ -248,8 +241,8 @@ func (action *DirectCastAction) calculateDirectCastDamage(sim *Simulation, damag
 	return result
 }
 
-func NewDirectCastAction(sim *Simulation, impl DirectCastImpl) *DirectCastAction {
-	action := &DirectCastAction{
+func NewDirectCastAction(sim *Simulation, impl DirectCastImpl) DirectCastAction {
+	action := DirectCastAction{
 		DirectCastImpl: impl,
 	}
 

@@ -19,17 +19,17 @@ type Aura struct {
 	Stacks int32
 
 	// Invoked at creation time for a spell cast.
-	OnCast         func(sim *Simulation, cast *DirectCastAction, castInput *DirectCastInput)
+	OnCast         func(sim *Simulation, cast DirectCastAction, castInput *DirectCastInput)
 
 	// Invoked when a spell cast completes casting, before results are calculated.
-	OnCastComplete func(sim *Simulation, cast *DirectCastAction)
+	OnCastComplete func(sim *Simulation, cast DirectCastAction)
 
 	// Invoked when a spell is fully resisted.
-	OnSpellMiss    func(sim *Simulation, cast *DirectCastAction)
+	OnSpellMiss    func(sim *Simulation, cast DirectCastAction)
 
 	// Invoked when a spell hits, after results are calculated. Results can be modified by changing
 	// properties of result.
-	OnSpellHit     func(sim *Simulation, cast *DirectCastAction, result *DirectCastDamageResult)
+	OnSpellHit     func(sim *Simulation, cast DirectCastAction, result *DirectCastDamageResult)
 
 	// Invoked when this Aura expires.
 	OnExpire       func(sim *Simulation)
@@ -428,7 +428,7 @@ func ActivateQuagsEye(sim *Simulation, agent Agent) Aura {
 	return Aura{
 		ID:      MagicIDQuagsEye,
 		Expires: NeverExpires,
-		OnCastComplete: func(sim *Simulation, cast *DirectCastAction) {
+		OnCastComplete: func(sim *Simulation, cast DirectCastAction) {
 			if !icd.isOnCD(sim) && sim.Rando.Float64("quags") < 0.1 {
 				icd = InternalCD(sim.CurrentTime + dur)
 				AddAuraWithTemporaryStats(sim, agent, MagicIDFungalFrenzy, stats.SpellHaste, hasteBonus, time.Second*6)
@@ -444,7 +444,7 @@ func ActivateNexusHorn(sim *Simulation, agent Agent) Aura {
 	return Aura{
 		ID:      MagicIDNexusHorn,
 		Expires: NeverExpires,
-		OnSpellHit: func(sim *Simulation, cast *DirectCastAction, result *DirectCastDamageResult) {
+		OnSpellHit: func(sim *Simulation, cast DirectCastAction, result *DirectCastDamageResult) {
 			if cast.GetActionID().ItemID == ItemIDTLC {
 				return // TLC can't proc Sextant
 			}
@@ -462,7 +462,7 @@ func ActivateDCC(sim *Simulation, agent Agent) Aura {
 	return Aura{
 		ID:      MagicIDDCC,
 		Expires: NeverExpires,
-		OnCastComplete: func(sim *Simulation, cast *DirectCastAction) {
+		OnCastComplete: func(sim *Simulation, cast DirectCastAction) {
 			if stacks < 10 {
 				stacks++
 				agent.GetCharacter().Stats[stats.SpellPower] += spellBonus
@@ -485,7 +485,7 @@ func ActivateCSD(sim *Simulation, agent Agent) Aura {
 	return Aura{
 		ID:      MagicIDChaoticSkyfire,
 		Expires: NeverExpires,
-		OnCast: func(sim *Simulation, cast *DirectCastAction, input *DirectCastInput) {
+		OnCast: func(sim *Simulation, cast DirectCastAction, input *DirectCastInput) {
 			// For a normal spell with crit multiplier of 1.5, this will be 1.
 			// For a spell with a multiplier of 2 (i.e. 100% increased critical damage) this will be 2.
 			improvedCritRatio := (input.CritMultiplier - 1) / 0.5
@@ -501,7 +501,7 @@ func ActivateIED(sim *Simulation, agent Agent) Aura {
 	return Aura{
 		ID:      MagicIDInsightfulEarthstorm,
 		Expires: NeverExpires,
-		OnCastComplete: func(sim *Simulation, cast *DirectCastAction) {
+		OnCastComplete: func(sim *Simulation, cast DirectCastAction) {
 			if !icd.isOnCD(sim) && sim.Rando.Float64("unmarked") < 0.04 {
 				icd = InternalCD(sim.CurrentTime + dur)
 				if sim.Log != nil {
@@ -521,7 +521,7 @@ func ActivateMSD(sim *Simulation, agent Agent) Aura {
 	return Aura{
 		ID:      MagicIDMysticSkyfire,
 		Expires: NeverExpires,
-		OnCastComplete: func(sim *Simulation, cast *DirectCastAction) {
+		OnCastComplete: func(sim *Simulation, cast DirectCastAction) {
 			if !icd.isOnCD(sim) && sim.Rando.Float64("unmarked") < 0.15 {
 				icd = InternalCD(sim.CurrentTime + icdDur)
 				AddAuraWithTemporaryStats(sim, agent, MagicIDMysticFocus, stats.SpellHaste, hasteBonus, dur)
@@ -545,7 +545,7 @@ func ActivateSpellstrike(sim *Simulation, agent Agent) Aura {
 	return Aura{
 		ID:      MagicIDSpellstrike,
 		Expires: NeverExpires,
-		OnCastComplete: func(sim *Simulation, cast *DirectCastAction) {
+		OnCastComplete: func(sim *Simulation, cast DirectCastAction) {
 			if sim.Rando.Float64("unmarked") < 0.05 {
 				AddAuraWithTemporaryStats(sim, agent, MagicIDSpellstrikeInfusion, stats.SpellPower, spellBonus, duration)
 			}
@@ -559,7 +559,7 @@ func ActivateManaEtched(sim *Simulation, agent Agent) Aura {
 	return Aura{
 		ID:      MagicIDManaEtched,
 		Expires: NeverExpires,
-		OnCastComplete: func(sim *Simulation, cast *DirectCastAction) {
+		OnCastComplete: func(sim *Simulation, cast DirectCastAction) {
 			if sim.Rando.Float64("unmarked") < 0.02 {
 				AddAuraWithTemporaryStats(sim, agent, MagicIDManaEtchedInsight, stats.SpellPower, spellBonus, duration)
 			}
@@ -576,7 +576,7 @@ func ActivateTLC(sim *Simulation, agent Agent) Aura {
 	return Aura{
 		ID:      MagicIDTLC,
 		Expires: NeverExpires,
-		OnSpellHit: func(sim *Simulation, cast *DirectCastAction, result *DirectCastDamageResult) {
+		OnSpellHit: func(sim *Simulation, cast DirectCastAction, result *DirectCastDamageResult) {
 			if icd.isOnCD(sim) {
 				return
 			}
@@ -604,7 +604,7 @@ func ActivateSextant(sim *Simulation, agent Agent) Aura {
 	return Aura{
 		ID:      MagicIDSextant,
 		Expires: NeverExpires,
-		OnSpellHit: func(sim *Simulation, cast *DirectCastAction, result *DirectCastDamageResult) {
+		OnSpellHit: func(sim *Simulation, cast DirectCastAction, result *DirectCastDamageResult) {
 			if cast.GetActionID().ItemID == ItemIDTLC {
 				return // TLC can't proc Sextant
 			}
@@ -622,7 +622,7 @@ func ActivateEyeOfMag(sim *Simulation, agent Agent) Aura {
 	return Aura{
 		ID:      MagicIDEyeOfMag,
 		Expires: NeverExpires,
-		OnSpellMiss: func(sim *Simulation, cast *DirectCastAction) {
+		OnSpellMiss: func(sim *Simulation, cast DirectCastAction) {
 			AddAuraWithTemporaryStats(sim, agent, MagicIDRecurringPower, stats.SpellPower, spellBonus, dur)
 		},
 	}
@@ -638,7 +638,7 @@ func ActivateElderScribes(sim *Simulation, agent Agent) Aura {
 	return Aura{
 		ID:      MagicIDElderScribe,
 		Expires: NeverExpires,
-		OnSpellHit: func(sim *Simulation, cast *DirectCastAction, result *DirectCastDamageResult) {
+		OnSpellHit: func(sim *Simulation, cast DirectCastAction, result *DirectCastDamageResult) {
 			// This code is starting to look a lot like other ICD buff items. Perhaps we could DRY this out.
 			if !icd.isOnCD(sim) && sim.Rando.Float64("unmarked") < proc {
 				icd = InternalCD(sim.CurrentTime + icdDur)
@@ -656,7 +656,7 @@ func ActivateFathomBrooch(sim *Simulation, agent Agent) Aura {
 	return Aura{
 		ID:      MagicIDRegainMana,
 		Expires: NeverExpires,
-		OnCastComplete: func(sim *Simulation, cast *DirectCastAction) {
+		OnCastComplete: func(sim *Simulation, cast DirectCastAction) {
 			if icd.isOnCD(sim) {
 				return
 			}

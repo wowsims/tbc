@@ -191,7 +191,7 @@ func MiseryAura() Aura {
 	return Aura{
 		ID:      MagicIDMisery,
 		Expires: NeverExpires,
-		OnSpellHit: func(sim *Simulation, cast *DirectCastAction, result *DirectCastDamageResult) {
+		OnSpellHit: func(sim *Simulation, cast DirectCastAction, result *DirectCastDamageResult) {
 			result.Damage *= 1.05
 		},
 	}
@@ -202,7 +202,7 @@ func AuraJudgementOfWisdom() Aura {
 	return Aura{
 		ID:      MagicIDJoW,
 		Expires: NeverExpires,
-		OnSpellHit: func(sim *Simulation, cast *DirectCastAction, result *DirectCastDamageResult) {
+		OnSpellHit: func(sim *Simulation, cast DirectCastAction, result *DirectCastDamageResult) {
 			if cast.GetActionID().ItemID == ItemIDTLC {
 				return // TLC cant proc JoW
 			}
@@ -266,7 +266,7 @@ func TryActivateRacial(sim *Simulation, agent Agent) {
 		agent.GetCharacter().AddAura(sim, Aura{
 			ID:      MagicIDTrollBerserking,
 			Expires: sim.CurrentTime + dur,
-			OnCast: func(sim *Simulation, cast *DirectCastAction, inputs *DirectCastInput) {
+			OnCast: func(sim *Simulation, cast DirectCastAction, inputs *DirectCastInput) {
 				inputs.CastTime = (inputs.CastTime * 10) / hasteBonus
 			},
 		})

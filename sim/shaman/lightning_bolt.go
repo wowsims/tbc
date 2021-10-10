@@ -23,7 +23,7 @@ func (lb LightningBolt) GetCooldown() time.Duration {
 	return 0
 }
 
-func (lb LightningBolt) GetHitInputs(sim *core.Simulation, cast *core.DirectCastAction) []core.DirectCastDamageInput{
+func (lb LightningBolt) GetHitInputs(sim *core.Simulation, cast core.DirectCastAction) []core.DirectCastDamageInput{
 	hitInput := core.DirectCastDamageInput{
 		MinBaseDamage: 571,
 		MaxBaseDamage: 652,
@@ -36,7 +36,7 @@ func (lb LightningBolt) GetHitInputs(sim *core.Simulation, cast *core.DirectCast
 	return []core.DirectCastDamageInput{hitInput}
 }
 
-func (lb LightningBolt) OnSpellHit(sim *core.Simulation, cast *core.DirectCastAction, result *core.DirectCastDamageResult) {
+func (lb LightningBolt) OnSpellHit(sim *core.Simulation, cast core.DirectCastAction, result *core.DirectCastDamageResult) {
 	lb.OnElectricSpellHit(sim, cast, result)
 
 	if !lb.IsLightningOverload {
@@ -48,7 +48,7 @@ func (lb LightningBolt) OnSpellHit(sim *core.Simulation, cast *core.DirectCastAc
 	}
 }
 
-func NewLightningBolt(sim *core.Simulation, shaman *Shaman, IsLightningOverload bool) *core.DirectCastAction {
+func NewLightningBolt(sim *core.Simulation, shaman *Shaman, IsLightningOverload bool) core.DirectCastAction {
 	baseManaCost := 300.0
 	if shaman.Equip[items.ItemSlotRanged].ID == TotemOfThePulsingEarth {
 		baseManaCost -= 27.0
