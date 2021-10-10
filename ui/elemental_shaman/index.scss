@@ -32,3 +32,9 @@ body {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
 }
+
+.Other-section > div {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}

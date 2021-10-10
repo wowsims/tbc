@@ -36,6 +36,24 @@ export abstract class SimUI<SpecType extends Spec> {
       'Rune': [],
       'Weapon Imbue': [],
     };
+
+		Array.from(document.getElementsByClassName('known-issues')).forEach(element => {
+			if (this.simUiConfig.knownIssues?.length) {
+				(element as HTMLElement).style.display = 'initial';
+			} else {
+				return;
+			}
+
+			
+			tippy(element, {
+				'content': `
+				<ul class="known-issues-tooltip">
+					${this.simUiConfig.knownIssues.map(issue => '<li>' + issue + '</li>').join('')}
+				</ul>
+				`,
+				'allowHTML': true,
+			});
+		});
   }
 
   async init(): Promise<void> {
@@ -91,23 +109,6 @@ export abstract class SimUI<SpecType extends Spec> {
 
 				navigator.clipboard.writeText(linkUrl.toString());
 				alert('Current settings copied to clipboard!');
-			});
-		});
-
-		Array.from(document.getElementsByClassName('known-issues')).forEach(element => {
-			if (!this.simUiConfig.knownIssues?.length) {
-				(element as HTMLElement).style.display = 'none';
-				return;
-			}
-
-			
-			tippy(element, {
-				'content': `
-				<ul class="known-issues-tooltip">
-					${this.simUiConfig.knownIssues.map(issue => '<li>' + issue + '</li>').join('')}
-				</ul>
-				`,
-				'allowHTML': true,
 			});
 		});
   }

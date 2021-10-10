@@ -3,11 +3,14 @@ import { TypedEvent } from '/tbc/core/typed_event.js';
 
 import { Component } from './component.js';
 
+declare var tippy: any;
+
 /**
  * Data for creating a number picker.
  */
 export type NumberPickerConfig = {
   label?: string,
+	labelTooltip?: string,
   defaultValue?: number,
 
   changedEvent: (sim: Sim<any>) => TypedEvent<any>;
@@ -25,6 +28,13 @@ export class NumberPicker extends Component {
       label.classList.add('number-picker-label');
       label.textContent = config.label;
       this.rootElem.appendChild(label);
+
+			if (config.labelTooltip) {
+				tippy(label, {
+					'content': config.labelTooltip,
+					'allowHTML': true,
+				});
+			}
     }
 
     const input = document.createElement('input');
