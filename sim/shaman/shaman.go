@@ -8,14 +8,14 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-func newShaman(character core.Character, talents Talents, selfBuffs SelfBuffs, agent shamanAgent) *Shaman {
+func NewShaman(character core.Character, talents Talents, selfBuffs SelfBuffs, rotation Rotation) *Shaman {
 	if selfBuffs.WaterShield {
 		character.InitialStats[stats.MP5] += 50
 	}
 
 	return &Shaman{
 		Character: character,
-		agent:     agent,
+		rotation:  rotation,
 		Talents:   talents,
 		SelfBuffs: selfBuffs,
 
@@ -33,8 +33,8 @@ type SelfBuffs struct {
 	ManaSpring   bool
 }
 
-// Agent is shaman specific agent for behavior.
-type shamanAgent interface {
+// Picks which attacks / abilities the Shaman does.
+type Rotation interface {
 	// Returns the action this Agent would like to take next.
 	ChooseAction(*Shaman, *core.Simulation) core.AgentAction
 
@@ -49,10 +49,12 @@ type shamanAgent interface {
 type Shaman struct {
 	core.Character
 
-	agent shamanAgent
+	rotation Rotation
 
 	Talents   Talents
 	SelfBuffs SelfBuffs
+
+	ElementalFocusStacks byte
 
 	// HACK HACK HACK
 	// TODO: do we actually need a 'on start' method for agents?
@@ -64,8 +66,6 @@ type Shaman struct {
 	// cache
 	convectionBonus float64
 	concussionBonus float64
-
-	elementalFocusStacks byte
 }
 
 func (shaman *Shaman) GetCharacter() *core.Character {
@@ -110,14 +110,14 @@ func (shaman *Shaman) ChooseAction(sim *core.Simulation) core.AgentAction {
 		TryActivateEleMastery(sim, shaman)
 	}
 
-	return shaman.agent.ChooseAction(shaman, sim)
+	return shaman.rotation.ChooseAction(shaman, sim)
 }
 func (shaman *Shaman) OnActionAccepted(sim *core.Simulation, action core.AgentAction) {
-	shaman.agent.OnActionAccepted(shaman, sim, action)
+	shaman.rotation.OnActionAccepted(shaman, sim, action)
 }
 func (shaman *Shaman) Reset(newsim *core.Simulation) {
 	shaman.started = false
-	shaman.agent.Reset(shaman, newsim)
+	shaman.rotation.Reset(shaman, newsim)
 }
 
 type Talents struct {
@@ -135,7 +135,7 @@ type Talents struct {
 	Concussion         int
 }
 
-func convertShamTalents(t *proto.ShamanTalents) Talents {
+func ConvertShamTalents(t *proto.ShamanTalents) Talents {
 	return Talents{
 		LightningOverload:  int(t.LightningOverload),
 		ElementalPrecision: int(t.ElementalPrecision),

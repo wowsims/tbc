@@ -44,17 +44,17 @@ message ShamanTalents {
 }
 
 message ElementalShaman {
-    message Agent {
-      enum AgentType {
+    message Rotation {
+      enum RotationType {
           Unknown = 0;
           FixedLBCL = 1;
           CLOnClearcast = 2;
           Adaptive = 3;
           CLOnCD = 4;
       }
-      AgentType type = 1;
+      RotationType type = 1;
     }
-    Agent agent = 1;
+    Rotation rotation = 1;
 
     ShamanTalents talents = 2;
     

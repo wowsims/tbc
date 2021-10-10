@@ -9,8 +9,8 @@ import (
 
 var basicSpec = &proto.PlayerOptions_ElementalShaman{
 	ElementalShaman: &proto.ElementalShaman{
-		Agent: &proto.ElementalShaman_Agent{
-			Type: proto.ElementalShaman_Agent_Adaptive,
+		Rotation: &proto.ElementalShaman_Rotation{
+			Type: proto.ElementalShaman_Rotation_Adaptive,
 		},
 		Talents: &proto.ShamanTalents{
 			// ElementalDevastation

@@ -84,7 +84,7 @@ func (spell ElectricSpell) GetCastInput(sim *core.Simulation, cast core.DirectCa
 		input.CastTime -= time.Millisecond * 100 * time.Duration(spell.Shaman.Talents.LightningMastery)
 	}
 
-	if spell.Shaman.elementalFocusStacks > 0 {
+	if spell.Shaman.ElementalFocusStacks > 0 {
 		// TODO: This should subtract 40% of base cost
 		input.ManaCost *= .6 // reduced by 40%
 	}
@@ -117,13 +117,13 @@ func (spell ElectricSpell) ApplyHitInputModifiers(hitInput *core.DirectCastDamag
 }
 
 func (spell ElectricSpell) OnCastComplete(sim *core.Simulation, cast core.DirectCastAction) {
-	if !spell.IsLightningOverload && spell.Shaman.elementalFocusStacks > 0 {
-		spell.Shaman.elementalFocusStacks--
+	if !spell.IsLightningOverload && spell.Shaman.ElementalFocusStacks > 0 {
+		spell.Shaman.ElementalFocusStacks--
 	}
 }
 func (spell ElectricSpell) OnElectricSpellHit(sim *core.Simulation, cast core.DirectCastAction, result *core.DirectCastDamageResult) {
 	if result.Crit {
-		spell.Shaman.elementalFocusStacks = 2
+		spell.Shaman.ElementalFocusStacks = 2
 	}
 }
 func (spell ElectricSpell) OnSpellMiss(sim *core.Simulation, cast core.DirectCastAction) {
