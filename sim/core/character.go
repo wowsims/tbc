@@ -43,12 +43,12 @@ func (character *Character) AddStats(s stats.Stats) {
 func (character *Character) HasteBonus() float64 {
 	return 1 + (character.Stats[stats.SpellHaste] / 1576)
 }
-func NewCharacter(equipSpec items.EquipmentSpec, race RaceBonusType, consumes Consumes, customStats stats.Stats) *Character {
+func NewCharacter(equipSpec items.EquipmentSpec, race RaceBonusType, consumes Consumes, customStats stats.Stats) Character {
 	equip := items.NewEquipmentSet(equipSpec)
 	// log.Printf("Gear Stats: %s", equip.Stats().Print())
 	initialStats := CalculateTotalStats(race, equip, consumes).Add(customStats)
 
-	character := &Character{
+	character := Character{
 		Race:         race,
 		Consumes:     consumes,
 		InitialStats: initialStats,

@@ -3,13 +3,13 @@ package warlock
 import "github.com/wowsims/tbc/sim/core"
 
 type Warlock struct {
-	*core.Character
+	core.Character
 
 	malediction int // bonus level of coe
 }
 
 func (warlock *Warlock) GetCharacter() *core.Character {
-	return warlock.Character
+	return &warlock.Character
 }
 
 func (warlock *Warlock) ChooseAction(sim *core.Simulation) core.AgentAction {

@@ -6,11 +6,11 @@ import (
 )
 
 type Paladin struct {
-	*core.Character
+	core.Character
 }
 
 func (paladin *Paladin) GetCharacter() *core.Character {
-	return paladin.Character
+	return &paladin.Character
 }
 
 func (paladin *Paladin) AddRaidBuffs(buffs *core.Buffs) {

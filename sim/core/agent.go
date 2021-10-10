@@ -70,7 +70,7 @@ type AgentAction interface {
 //	Cast *Cast
 //}
 
-type AgentFactory func(*Simulation, *Character, *proto.PlayerOptions) Agent
+type AgentFactory func(*Simulation, Character, *proto.PlayerOptions) Agent
 
 var agentFactories map[string]AgentFactory = make(map[string]AgentFactory)
 
@@ -84,7 +84,7 @@ func RegisterAgentFactory(emptyOptions interface{}, factory AgentFactory) {
 	agentFactories[typeName] = factory
 }
 
-func NewAgent(sim *Simulation, character *Character, playerOptions *proto.PlayerOptions) Agent {
+func NewAgent(sim *Simulation, character Character, playerOptions *proto.PlayerOptions) Agent {
 	typeName := reflect.TypeOf(playerOptions.GetSpec()).Elem().Name()
 
 	factory, ok := agentFactories[typeName]

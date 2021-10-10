@@ -6,11 +6,11 @@ import (
 )
 
 type Druid struct {
-	*core.Character
+	core.Character
 }
 
 func (druid *Druid) GetCharacter() *core.Character {
-	return druid.Character
+	return &druid.Character
 }
 
 func (druid *Druid) AddRaidBuffs(buffs *core.Buffs) {
