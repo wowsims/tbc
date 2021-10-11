@@ -66,7 +66,6 @@ export function makeIndividualSimRequest<SpecType extends Spec>(
     buffs: buffs,
     encounter: encounter,
     iterations: iterations,
-    gcdMin: 0.75,
     debug: debug,
   });
 }

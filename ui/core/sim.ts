@@ -499,14 +499,58 @@ export class Sim<SpecType extends Spec> extends WorkerPool {
 
   // Set all the current values, assumes obj is the same type returned by toJson().
   fromJson(obj: any) {
-    this.setBuffs(Buffs.fromJson(obj['buffs']));
-    this.setConsumes(Consumes.fromJson(obj['consumes']));
-    this.setCustomStats(Stats.fromJson(obj['customStats']));
-    this.setEncounter(Encounter.fromJson(obj['encounter']));
-    this.setGear(this.lookupEquipmentSpec(EquipmentSpec.fromJson(obj['gear'])));
-    this.setRace(obj['race']);
-    this.setRotation(this.specTypeFunctions.rotationFromJson(obj['rotation']));
-    this.setTalentsString(obj['talents']);
-    this.setSpecOptions(this.specTypeFunctions.optionsFromJson(obj['specOptions']));
+		try {
+			this.setBuffs(Buffs.fromJson(obj['buffs']));
+		} catch (e) {
+			console.warn('Failed to parse buffs: ' + e);
+		}
+
+		try {
+			this.setConsumes(Consumes.fromJson(obj['consumes']));
+		} catch (e) {
+			console.warn('Failed to parse consumes: ' + e);
+		}
+
+		try {
+			this.setCustomStats(Stats.fromJson(obj['customStats']));
+		} catch (e) {
+			console.warn('Failed to parse custom stats: ' + e);
+		}
+
+		try {
+			this.setEncounter(Encounter.fromJson(obj['encounter']));
+		} catch (e) {
+			console.warn('Failed to parse encounter: ' + e);
+		}
+
+		try {
+			this.setGear(this.lookupEquipmentSpec(EquipmentSpec.fromJson(obj['gear'])));
+		} catch (e) {
+			console.warn('Failed to parse gear: ' + e);
+		}
+
+		try {
+			this.setRace(obj['race']);
+		} catch (e) {
+			console.warn('Failed to parse race: ' + e);
+		}
+
+		try {
+			this.setRotation(this.specTypeFunctions.rotationFromJson(obj['rotation']));
+		} catch (e) {
+			console.warn('Failed to parse rotation: ' + e);
+		}
+
+		try {
+			this.setTalentsString(obj['talents']);
+		} catch (e) {
+			console.warn('Failed to parse talents: ' + e);
+		}
+
+		try {
+			this.setSpecOptions(this.specTypeFunctions.optionsFromJson(obj['specOptions']));
+		} catch (e) {
+			console.warn('Failed to parse spec options: ' + e);
+		}
   }
 }
