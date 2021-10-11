@@ -427,6 +427,19 @@ export interface StatWeightsResult {
      */
     epValuesStdev: number[];
 }
+/**
+ * @generated from protobuf enum proto.OtherAction
+ */
+export declare enum OtherAction {
+    /**
+     * @generated from protobuf enum value: OtherActionNone = 0;
+     */
+    OtherActionNone = 0,
+    /**
+     * @generated from protobuf enum value: OtherActionWait = 1;
+     */
+    OtherActionWait = 1
+}
 declare class PlayerOptions$Type extends MessageType<PlayerOptions> {
     constructor();
     create(value?: PartialMessage<PlayerOptions>): PlayerOptions;

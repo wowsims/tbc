@@ -15,6 +15,20 @@ import { Consumes } from './common.js';
 import { ElementalShaman } from './shaman.js';
 import { BalanceDruid } from './druid.js';
 import { Race } from './common.js';
+/**
+ * @generated from protobuf enum proto.OtherAction
+ */
+export var OtherAction;
+(function (OtherAction) {
+    /**
+     * @generated from protobuf enum value: OtherActionNone = 0;
+     */
+    OtherAction[OtherAction["OtherActionNone"] = 0] = "OtherActionNone";
+    /**
+     * @generated from protobuf enum value: OtherActionWait = 1;
+     */
+    OtherAction[OtherAction["OtherActionWait"] = 1] = "OtherActionWait";
+})(OtherAction || (OtherAction = {}));
 // @generated message type with reflection information, may provide speed optimized methods
 class PlayerOptions$Type extends MessageType {
     constructor() {
