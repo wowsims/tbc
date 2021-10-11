@@ -45,10 +45,10 @@ make host
 
 # Adding a Sim
 So you want to make a new sim for your class/spec! The basic steps are as follows:
- - Create the proto to describe the interface between sim and UI.
- - Add items your spec uses to the Items Generator.
- - Implement the sim.
- - Implement the UI.
+ - [Create the proto to describe the interface between sim and UI.](#create-the-proto-interface-between-sim-and-ui)
+ - [Add items your spec uses to the Items Generator.](#add-items-to-the-items-generator)
+ - [Implement the sim.](#implement-the-sim)
+ - [Implement the UI.](#implement-the-ui)
 
 
 # Create the proto interface between Sim and UI
