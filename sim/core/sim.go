@@ -29,7 +29,7 @@ type Options struct {
 
 type Encounter struct {
 	Duration   float64
-	NumTargets int
+	NumTargets int32
 	Armor      int32
 }
 
@@ -56,8 +56,7 @@ type Simulation struct {
 	// Auras which are automatically applied on sim reset.
 	InitialAuras []InitialAura
 
-	// Clears and regenerates on each Run call.
-	Metrics SimMetrics
+	metricsAggregator *MetricsAggregator
 
 	Rando       *wrappedRandom
 	rseed       int64
@@ -65,9 +64,6 @@ type Simulation struct {
 
 	Log  func(string, ...interface{})
 	logs []string
-
-	// caches to speed up perf and store temp state
-	cache *cache
 
 	// Holds the params used to create this sim, so similar sims can be run if needed.
 	IndividualParams IndividualParams
@@ -85,23 +81,9 @@ func (wr *wrappedRandom) Float64(src string) float64 {
 	return wr.Rand.Float64()
 }
 
-type SimMetrics struct {
-	TotalDamage       float64
-	Casts             []*Cast
-	IndividualMetrics []IndividualMetric
-}
-
-type IndividualMetric struct {
-	ID          int32
-	TotalDamage float64
-	DamageAtOOM float64
-	OOMAt       float64
-	ManaSpent   float64
-}
-
 func NewIndividualSim(params IndividualParams) *Simulation {
 	raid := NewRaid(params.Buffs)
-	sim := newSim(raid, params.Options)
+	sim := newSim(raid, params.Options, 1)
 	sim.IndividualParams = params
 
 	character := NewCharacter(params.Equip, params.Race, params.Consumes, params.CustomStats)
@@ -140,7 +122,7 @@ func NewIndividualSim(params IndividualParams) *Simulation {
 }
 
 // New sim contructs a simulator with the given equipment / options.
-func newSim(raid *Raid, options Options) *Simulation {
+func newSim(raid *Raid, options Options, numPlayers int) *Simulation {
 	if options.GCDMin == 0 {
 		options.GCDMin = durationFromSeconds(1.0) // default to 0.75s GCD
 	}
@@ -153,25 +135,18 @@ func newSim(raid *Raid, options Options) *Simulation {
 		Options:      options,
 		Duration:     durationFromSeconds(options.Encounter.Duration),
 		InitialAuras: []InitialAura{},
-		// Rando:    ,
 		Log: nil,
-		cache: &cache{
-			castPool: make([]*Cast, 0, 1000),
-		},
 		AuraTracker: NewAuraTracker(),
+		metricsAggregator: NewMetricsAggregator(numPlayers, options.Encounter.Duration),
 	}
 	sim.Rando = &wrappedRandom{sim: sim, Rand: rand.New(rand.NewSource(options.RSeed))}
-
-	sim.cache.fillCasts()
 
 	return sim
 }
 
-func (sim *Simulation) NewCast() *Cast {
-	return sim.cache.NewCast()
-}
-func (sim *Simulation) ReturnCasts(casts []*Cast) {
-	sim.cache.ReturnCasts(casts)
+// Get the metrics for an invidual Agent, for the current iteration.
+func (sim *Simulation) GetIndividualMetrics(agentID int) AgentIterationMetrics {
+	return sim.metricsAggregator.agentIterations[agentID]
 }
 
 func (sim *Simulation) AddInitialAura(initialAura InitialAura) {
@@ -182,15 +157,8 @@ func (sim *Simulation) AddInitialAura(initialAura InitialAura) {
 // This is automatically called before every 'Run'
 //  This includes resetting and reactivating always on trinkets, auras, set bonuses, etc
 func (sim *Simulation) Reset() {
-	// sim.rseed++
-	// sim.Rando.Seed(sim.rseed)
-
 	sim.CurrentTime = 0.0
 	sim.ResetAuras()
-	sim.Metrics = SimMetrics{
-		Casts:             make([]*Cast, 0, 1000),
-		IndividualMetrics: make([]IndividualMetric, 25),
-	}
 	if sim.Log != nil {
 		sim.Log("SIM RESET\n")
 		sim.Log("----------------------\n")
@@ -248,7 +216,6 @@ func (sim *Simulation) Run() SimResult {
 	}
 	sim.AuraTracker.PID = -1 // set main sim auras to be -1 character ID.
 	logsBuffer := &strings.Builder{}
-	aggregator := NewMetricsAggregator()
 
 	if sim.Options.Debug {
 		sim.Log = func(s string, vals ...interface{}) {
@@ -257,19 +224,18 @@ func (sim *Simulation) Run() SimResult {
 	}
 
 	for i := 0; i < sim.Options.Iterations; i++ {
-		metrics := sim.RunOnce()
-		aggregator.addMetrics(sim.Options, metrics)
-		sim.ReturnCasts(metrics.Casts)
+		sim.RunOnce()
+		sim.metricsAggregator.doneIteration()
 	}
 
-	result := aggregator.getResult()
+	result := sim.metricsAggregator.getResult()
 	result.Logs = logsBuffer.String()
 	return result
 }
 
 // RunOnce will run the simulation for number of seconds.
 // Returns metrics for what was cast and how much damage was done.
-func (sim *Simulation) RunOnce() SimMetrics {
+func (sim *Simulation) RunOnce() {
 	sim.Reset()
 
 	pendingActions := make([]pendingAction, 0, 25)
@@ -277,16 +243,18 @@ func (sim *Simulation) RunOnce() SimMetrics {
 	for _, party := range sim.Raid.Parties {
 		for _, agent := range party.Players {
 			sim.playerConsumes(agent)
+
 			action := agent.ChooseAction(sim)
-			if action.Wait == NeverExpires {
+
+			// sim.CurrentTime is 0, so dont need to add it
+			executeAt := action.GetDuration()
+
+			if executeAt == NeverExpires {
 				continue // This means agent will not perform any actions at all
 			}
-			wait := action.Wait
-			if action.Cast != nil {
-				wait = action.Cast.CastTime
-			}
+
 			pendingActions = append(pendingActions, pendingAction{
-				ExecuteAt:   wait,
+				ExecuteAt:   executeAt,
 				Agent:       agent,
 				AgentAction: action,
 			})
@@ -306,45 +274,41 @@ simloop:
 			sim.Advance(action.ExecuteAt - sim.CurrentTime)
 		}
 
-		if action.Cast != nil {
-			action.Cast.DoItNow(sim, action.Cast)
-		} else if action.Wait == 0 {
-			// FUTURE: Swing timers could be handled in this if block.
-			panic("Agent returned nil action")
-		}
+		//manaBefore := agent.GetCharacter().Stats[stats.Mana]
+		action.Act(sim)
+		//manaAfter := agent.GetCharacter().Stats[stats.Mana]
+		//fmt.Printf("Mana actually lost: %0.0f", manaBefore - manaAfter)
 
 		sim.playerConsumes(agent)
 		newAction := agent.ChooseAction(sim)
-		wait := newAction.Wait
-		if newAction.Cast != nil {
-			if newAction.Cast.CastTime < sim.Options.GCDMin {
-				newAction.Cast.CastTime = sim.Options.GCDMin
-			}
-			wait = newAction.Cast.CastTime
-			if agent.GetCharacter().Stats[stats.Mana] < newAction.Cast.ManaCost {
+		actionDuration := newAction.GetDuration()
+
+		castAction, isCastAction := newAction.(DirectCastAction)
+		if isCastAction {
+			// TODO: This delays the cast damage until GCD is ready, even if the cast time is less than GCD.
+			// How to handle this?
+			actionDuration = MaxDuration(actionDuration, sim.Options.GCDMin)
+
+			manaCost := castAction.GetManaCost()
+			if agent.GetCharacter().Stats[stats.Mana] < manaCost {
 				// Not enough mana, wait until there is enough mana to cast the desired spell
-				regenTime := durationFromSeconds((newAction.Cast.ManaCost-agent.GetCharacter().Stats[stats.Mana])/agent.GetCharacter().manaRegenPerSecond()) + 1
+				// TODO: Doesn't account for spirit-based mana
+				regenTime := durationFromSeconds((manaCost-agent.GetCharacter().Stats[stats.Mana])/agent.GetCharacter().manaRegenPerSecond()) + 1
 				if sim.Log != nil {
 					sim.Log("Not enough mana to cast... regen for %0.1f seconds before casting.\n", regenTime.Seconds())
 				}
-				wait = regenTime
+				actionDuration = regenTime
 				if sim.Options.ExitOnOOM {
 					break simloop // named for clarity since this is pretty deep nested.
 				}
 
 				// Cancel cast for now.
-				newAction.Cast = nil
-				newAction.Wait = wait
-				sim.Metrics.IndividualMetrics[agent.GetCharacter().ID].DamageAtOOM = sim.Metrics.IndividualMetrics[agent.GetCharacter().ID].TotalDamage
-				sim.Metrics.IndividualMetrics[agent.GetCharacter().ID].OOMAt = sim.CurrentTime.Seconds()
-			} else {
-				if sim.Log != nil {
-					sim.Log("(%d) Start Casting %s Cast Time: %0.1fs\n", agent.GetCharacter().ID, newAction.Cast.Spell.Name, newAction.Cast.CastTime.Seconds())
-				}
+				newAction = NewWaitAction(sim, agent, actionDuration)
+				sim.metricsAggregator.markOOM(agent, sim.CurrentTime)
 			}
 		}
 		pa := pendingAction{
-			ExecuteAt:   sim.CurrentTime + wait,
+			ExecuteAt:   sim.CurrentTime + actionDuration,
 			Agent:       agent,
 			AgentAction: newAction,
 		}
@@ -361,8 +325,6 @@ simloop:
 			}
 		}
 	}
-
-	return sim.Metrics
 }
 
 // Advance moves time forward counting down auras, CDs, mana regen, etc

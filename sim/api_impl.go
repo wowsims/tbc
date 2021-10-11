@@ -72,7 +72,7 @@ func convertSimParams(request *proto.IndividualSimRequest) core.IndividualParams
 	if request.Encounter != nil {
 		options.Encounter = core.Encounter{
 			Duration:   request.Encounter.Duration,
-			NumTargets: int(request.Encounter.NumTargets),
+			NumTargets: int32(request.Encounter.NumTargets),
 			Armor:      request.Encounter.TargetArmor,
 		}
 	}
@@ -102,7 +102,8 @@ func runSimulationImpl(request *proto.IndividualSimRequest) *proto.IndividualSim
 	result := sim.Run()
 
 	actionMetrics := []*proto.ActionMetric{}
-	for _, v := range result.Actions {
+	// TODO: Actually return results for all agents
+	for _, v := range result.Agents[0].Actions {
 		metric := &proto.ActionMetric{
 			Casts:  v.Casts,
 			Crits:  v.Crits,
@@ -118,15 +119,15 @@ func runSimulationImpl(request *proto.IndividualSimRequest) *proto.IndividualSim
 		actionMetrics = append(actionMetrics, metric)
 	}
 	isr := &proto.IndividualSimResult{
-		DpsAvg:              result.DpsAvg,
-		DpsStdev:            result.DpsStDev,
-		DpsHist:             result.DpsHist,
+		DpsAvg:              result.Agents[0].DpsAvg,
+		DpsStdev:            result.Agents[0].DpsStDev,
+		DpsHist:             result.Agents[0].DpsHist,
 		Logs:                result.Logs,
-		DpsMax:              result.DpsMax,
+		DpsMax:              result.Agents[0].DpsMax,
 		ExecutionDurationMs: result.ExecutionDurationMs,
-		NumOom:              int32(result.NumOom),
-		OomAtAvg:            result.OomAtAvg,
-		DpsAtOomAvg:         result.DpsAtOomAvg,
+		NumOom:              int32(result.Agents[0].NumOom),
+		OomAtAvg:            result.Agents[0].OomAtAvg,
+		DpsAtOomAvg:         result.Agents[0].DpsAtOomAvg,
 		ActionMetrics:       actionMetrics,
 	}
 	return isr

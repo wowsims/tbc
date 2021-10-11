@@ -43,12 +43,12 @@ func (character *Character) AddStats(s stats.Stats) {
 func (character *Character) HasteBonus() float64 {
 	return 1 + (character.Stats[stats.SpellHaste] / 1576)
 }
-func NewCharacter(equipSpec items.EquipmentSpec, race RaceBonusType, consumes Consumes, customStats stats.Stats) *Character {
+func NewCharacter(equipSpec items.EquipmentSpec, race RaceBonusType, consumes Consumes, customStats stats.Stats) Character {
 	equip := items.NewEquipmentSet(equipSpec)
 	// log.Printf("Gear Stats: %s", equip.Stats().Print())
 	initialStats := CalculateTotalStats(race, equip, consumes).Add(customStats)
 
-	character := &Character{
+	character := Character{
 		Race:         race,
 		Consumes:     consumes,
 		InitialStats: initialStats,
@@ -169,6 +169,7 @@ const (
 	ChainOfTheTwilightOwl = 24121
 	EyeOfTheNight         = 24116
 	JadePendantOfBlasting = 20966
+	ChaoticSkyfireDiamond = 34220
 )
 
 func (character *Character) AddRaidBuffs(buffs *Buffs) {
@@ -181,13 +182,12 @@ func (character *Character) AddPartyBuffs(buffs *Buffs) {
 		buffs.DrumsOfRestoration = true
 	}
 
-	// TODO: Figure out how to sync these with general settings
-	//if character.Equip[items.ItemSlotMainHand].ID == AtieshMage {
-	//	buffs.AtieshMage += 1
-	//}
-	//if character.Equip[items.ItemSlotMainHand].ID == AtieshWarlock {
-	//	buffs.AtieshWarlock += 1
-	//}
+	if character.Equip[items.ItemSlotMainHand].ID == AtieshMage {
+		buffs.AtieshMage += 1
+	}
+	if character.Equip[items.ItemSlotMainHand].ID == AtieshWarlock {
+		buffs.AtieshWarlock += 1
+	}
 
 	if character.Equip[items.ItemSlotNeck].ID == BraidedEterniumChain {
 		buffs.BraidedEterniumChain = true
@@ -201,6 +201,15 @@ func (character *Character) AddPartyBuffs(buffs *Buffs) {
 	if character.Equip[items.ItemSlotNeck].ID == JadePendantOfBlasting {
 		buffs.JadePendantOfBlasting = true
 	}
+}
+
+func (character *Character) EquippedMetaGem(gemID int32) bool {
+	for _, gem := range character.Equip[items.ItemSlotHead].Gems {
+		if gem.ID == gemID {
+			return true
+		}
+	}
+	return false
 }
 
 // TODO: This probably should be moved into each class because they all have different base stats.

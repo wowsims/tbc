@@ -9,12 +9,12 @@ import (
 )
 
 func RegisterElementalShaman() {
-	core.RegisterAgentFactory(proto.PlayerOptions_ElementalShaman{}, func(sim *core.Simulation, character *core.Character, options *proto.PlayerOptions) core.Agent {
+	core.RegisterAgentFactory(proto.PlayerOptions_ElementalShaman{}, func(sim *core.Simulation, character core.Character, options *proto.PlayerOptions) core.Agent {
 		return NewElementalShaman(sim, character, options)
 	})
 }
 
-func NewElementalShaman(sim *core.Simulation, character *core.Character, options *proto.PlayerOptions) *Shaman {
+func NewElementalShaman(sim *core.Simulation, character core.Character, options *proto.PlayerOptions) *Shaman {
 	eleShamOptions := options.GetElementalShaman()
 	talents := convertShamTalents(eleShamOptions.Talents)
 
@@ -49,88 +49,14 @@ func NewElementalShaman(sim *core.Simulation, character *core.Character, options
 	return newShaman(character, talents, selfBuffs, agent)
 }
 
-func loDmgMod(sim *core.Simulation, cast *core.Cast) {
-	cast.DidDmg /= 2
-}
-
-const (
-	CastTagLightningOverload int32 = 1 // This could be value or bitflag if we ended up needing multiple flags at the same time.
-)
-
-func AuraLightningOverload(lvl int) core.Aura {
-	chance := 0.04 * float64(lvl)
-	return core.Aura{
-		ID:      core.MagicIDLOTalent,
-		Expires: core.NeverExpires,
-		OnSpellHit: func(sim *core.Simulation, cast *core.Cast) {
-			if cast.Spell.ActionID.SpellID != SpellIDLB12 && cast.Spell.ActionID.SpellID != SpellIDCL6 {
-				return
-			}
-			if cast.Tag == CastTagLightningOverload {
-				return // can't proc LO on LO
-			}
-			actualChance := chance
-			if cast.Spell.ActionID.SpellID == SpellIDCL6 {
-				actualChance /= 3 // 33% chance of regular for CL LO
-			}
-			if sim.Rando.Float64("LO") < actualChance {
-				if sim.Log != nil {
-					sim.Log(" - Lightning Overload -\n")
-				}
-				clone := sim.NewCast()
-				clone.Caster = cast.Caster
-				// Don't set IsClBounce even if this is a bounce, so that the clone does a normal CL and bounces
-				clone.Tag = CastTagLightningOverload
-				clone.Spell = cast.Spell
-
-				// Clone dmg/hit/crit chance?
-				clone.BonusHit = cast.BonusHit
-				clone.BonusCrit = cast.BonusCrit
-				clone.BonusSpellPower = cast.BonusSpellPower
-
-				clone.CritDamageMultipier = cast.CritDamageMultipier
-				clone.Effect = loDmgMod
-
-				// Use the cast function from the original cast.
-				clone.DoItNow = cast.DoItNow
-				clone.DoItNow(sim, clone)
-				if sim.Log != nil {
-					sim.Log(" - Lightning Overload Complete -\n")
-				}
-			}
-		},
-	}
-}
-
-func TryActivateEleMastery(sim *core.Simulation, shaman *Shaman) {
-	if shaman.IsOnCD(core.MagicIDEleMastery, sim.CurrentTime) {
-		return
-	}
-
-	shaman.AddAura(sim, core.Aura{
-		ID:      core.MagicIDEleMastery,
-		Expires: core.NeverExpires,
-		OnCast: func(sim *core.Simulation, cast *core.Cast) {
-			cast.ManaCost = 0
-			cast.BonusCrit += 1.01
-		},
-		OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
-			// Remove the buff and put skill on CD
-			shaman.SetCD(core.MagicIDEleMastery, time.Second*180+sim.CurrentTime)
-			shaman.RemoveAura(sim, core.MagicIDEleMastery)
-		},
-	})
-}
-
 // ################################################################
 //                              LB ONLY
 // ################################################################
 type LBOnlyAgent struct {
-	lb *core.Spell
 }
 
 func (agent *LBOnlyAgent) ChooseAction(shaman *Shaman, sim *core.Simulation) core.AgentAction {
-	return NewCastAction(shaman, sim, agent.lb)
+	return NewLightningBolt(sim, shaman, false)
 }
 
 func (agent *LBOnlyAgent) OnActionAccepted(shaman *Shaman, sim *core.Simulation, action core.AgentAction) {
@@ -138,26 +64,20 @@ func (agent *LBOnlyAgent) OnActionAccepted(shaman *Shaman, sim *core.Simulation,
 func (agent *LBOnlyAgent) Reset(shaman *Shaman, sim *core.Simulation) {}
 
 func NewLBOnlyAgent(sim *core.Simulation) *LBOnlyAgent {
-	return &LBOnlyAgent{
-		lb: Spells[SpellIDLB12],
-	}
+	return &LBOnlyAgent{}
 }
 
 // ################################################################
 //                             CL ON CD
 // ################################################################
 type CLOnCDAgent struct {
-	lb *core.Spell
-	cl *core.Spell
 }
 
 func (agent *CLOnCDAgent) ChooseAction(shaman *Shaman, sim *core.Simulation) core.AgentAction {
 	if shaman.IsOnCD(core.MagicIDChainLightning6, sim.CurrentTime) {
-		// sim.Log("[CLonCD] LB\n")
-		return NewCastAction(shaman, sim, agent.lb)
+		return NewLightningBolt(sim, shaman, false)
 	} else {
-		// sim.Log("[CLonCD] CL\n")
-		return NewCastAction(shaman, sim, agent.cl)
+		return NewChainLightning(sim, shaman, false)
 	}
 }
 
@@ -166,10 +86,7 @@ func (agent *CLOnCDAgent) OnActionAccepted(shaman *Shaman, sim *core.Simulation,
 func (agent *CLOnCDAgent) Reset(shaman *Shaman, sim *core.Simulation) {}
 
 func NewCLOnCDAgent(sim *core.Simulation) *CLOnCDAgent {
-	return &CLOnCDAgent{
-		lb: Spells[SpellIDLB12],
-		cl: Spells[SpellIDCL6],
-	}
+	return &CLOnCDAgent{}
 }
 
 // ################################################################
@@ -178,8 +95,6 @@ func NewCLOnCDAgent(sim *core.Simulation) *CLOnCDAgent {
 type FixedRotationAgent struct {
 	numLBsPerCL       int
 	numLBsSinceLastCL int
-	lb                *core.Spell
-	cl                *core.Spell
 }
 
 // Returns if any temporary haste buff is currently active.
@@ -194,44 +109,42 @@ func (agent *FixedRotationAgent) temporaryHasteActive(shaman *Shaman) bool {
 
 func (agent *FixedRotationAgent) ChooseAction(shaman *Shaman, sim *core.Simulation) core.AgentAction {
 	if agent.numLBsSinceLastCL < agent.numLBsPerCL {
-		return NewCastAction(shaman, sim, agent.lb)
+		return NewLightningBolt(sim, shaman, false)
 	}
 
 	if !shaman.IsOnCD(core.MagicIDChainLightning6, sim.CurrentTime) {
-		return NewCastAction(shaman, sim, agent.cl)
+		return NewChainLightning(sim, shaman, false)
 	}
 
 	// If we have a temporary haste effect (like bloodlust or quags eye) then
 	// we should add LB casts instead of waiting
 	if agent.temporaryHasteActive(shaman) {
-		return NewCastAction(shaman, sim, agent.lb)
+		return NewLightningBolt(sim, shaman, false)
 	}
 
-	return core.AgentAction{Wait: shaman.GetRemainingCD(core.MagicIDChainLightning6, sim.CurrentTime)}
+	return core.NewWaitAction(sim, shaman, shaman.GetRemainingCD(core.MagicIDChainLightning6, sim.CurrentTime))
 }
 
 func (agent *FixedRotationAgent) OnActionAccepted(shaman *Shaman, sim *core.Simulation, action core.AgentAction) {
-	if action.Cast == nil {
+	cast, isCastAction := action.(*core.DirectCastAction)
+	if !isCastAction {
 		return
 	}
 
-	if action.Cast.Spell.ActionID.SpellID == SpellIDLB12 {
+	if cast.GetActionID().SpellID == SpellIDLB12 {
 		agent.numLBsSinceLastCL++
-	} else if action.Cast.Spell.ActionID.SpellID == SpellIDCL6 {
+	} else if cast.GetActionID().SpellID == SpellIDCL6 {
 		agent.numLBsSinceLastCL = 0
 	}
 }
 
 func (agent *FixedRotationAgent) Reset(shaman *Shaman, sim *core.Simulation) {
-	agent.numLBsSinceLastCL = agent.numLBsPerCL
+	agent.numLBsSinceLastCL = agent.numLBsPerCL // This lets us cast CL first
 }
 
 func NewFixedRotationAgent(sim *core.Simulation, numLBsPerCL int) *FixedRotationAgent {
 	return &FixedRotationAgent{
 		numLBsPerCL:       numLBsPerCL,
-		numLBsSinceLastCL: numLBsPerCL, // This lets us cast CL first
-		lb:                Spells[SpellIDLB12],
-		cl:                Spells[SpellIDCL6],
 	}
 }
 
@@ -241,23 +154,18 @@ func NewFixedRotationAgent(sim *core.Simulation, numLBsPerCL int) *FixedRotation
 type CLOnClearcastAgent struct {
 	// Whether the second-to-last spell procced clearcasting
 	prevPrevCastProccedCC bool
-
-	lb *core.Spell
-	cl *core.Spell
 }
 
 func (agent *CLOnClearcastAgent) ChooseAction(shaman *Shaman, sim *core.Simulation) core.AgentAction {
 	if shaman.IsOnCD(core.MagicIDChainLightning6, sim.CurrentTime) || !agent.prevPrevCastProccedCC {
-		// sim.Log("[CLonCC] - LB")
-		return NewCastAction(shaman, sim, agent.lb)
+		return NewLightningBolt(sim, shaman, false)
 	}
 
-	// sim.Log("[CLonCC] - CL")
-	return NewCastAction(shaman, sim, agent.cl)
+	return NewChainLightning(sim, shaman, false)
 }
 
 func (agent *CLOnClearcastAgent) OnActionAccepted(shaman *Shaman, sim *core.Simulation, action core.AgentAction) {
-	agent.prevPrevCastProccedCC = shaman.Auras[core.MagicIDEleFocus].Stacks == 2
+	agent.prevPrevCastProccedCC = shaman.elementalFocusStacks == 2
 }
 
 func (agent *CLOnClearcastAgent) Reset(shaman *Shaman, sim *core.Simulation) {
@@ -265,10 +173,7 @@ func (agent *CLOnClearcastAgent) Reset(shaman *Shaman, sim *core.Simulation) {
 }
 
 func NewCLOnClearcastAgent(sim *core.Simulation) *CLOnClearcastAgent {
-	return &CLOnClearcastAgent{
-		lb: Spells[SpellIDLB12],
-		cl: Spells[SpellIDCL6],
-	}
+	return &CLOnClearcastAgent{}
 }
 
 // ################################################################
@@ -317,7 +222,7 @@ func (agent *AdaptiveAgent) takeSnapshot(sim *core.Simulation, shaman *Shaman) {
 
 	snapshot := ManaSnapshot{
 		time:      sim.CurrentTime,
-		manaSpent: sim.Metrics.IndividualMetrics[shaman.ID].ManaSpent,
+		manaSpent: sim.GetIndividualMetrics(shaman.ID).ManaSpent,
 	}
 
 	nextIndex := (agent.firstSnapshotIndex + agent.numSnapshots) % manaSnapshotsBufferSize
@@ -329,10 +234,7 @@ func (agent *AdaptiveAgent) ChooseAction(shaman *Shaman, sim *core.Simulation) c
 	agent.purgeExpiredSnapshots(sim)
 	oldestSnapshot := agent.getOldestSnapshot()
 
-	manaSpent := 0.0
-	if len(sim.Metrics.IndividualMetrics) > shaman.ID {
-		manaSpent = sim.Metrics.IndividualMetrics[shaman.ID].ManaSpent - oldestSnapshot.manaSpent
-	}
+	manaSpent := sim.GetIndividualMetrics(shaman.ID).ManaSpent - oldestSnapshot.manaSpent
 	timeDelta := sim.CurrentTime - oldestSnapshot.time
 	if timeDelta == 0 {
 		timeDelta = 1
@@ -394,7 +296,7 @@ func NewAdaptiveAgent(sim *core.Simulation) *AdaptiveAgent {
 	clearcastSim := core.NewIndividualSim(clearcastParams)
 	clearcastResult := clearcastSim.Run()
 
-	if clearcastResult.NumOom >= 5 {
+	if clearcastResult.Agents[0].NumOom >= 5 {
 		agent.baseAgent = NewLBOnlyAgent(sim)
 		agent.surplusAgent = NewCLOnClearcastAgent(sim)
 	} else {

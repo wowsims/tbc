@@ -32,8 +32,8 @@ func CalcStatWeight(params IndividualParams, statsToWeigh []stats.Stat, referenc
 		newParams.CustomStats[stat] += value
 		newSim := NewIndividualSim(newParams)
 		simResult := newSim.Run()
-		result.Weights[stat] = (simResult.DpsAvg - baselineResult.DpsAvg) / value
-		dpsHists[stat] = simResult.DpsHist
+		result.Weights[stat] = (simResult.Agents[0].DpsAvg - baselineResult.Agents[0].DpsAvg) / value
+		dpsHists[stat] = simResult.Agents[0].DpsHist
 	}
 
 	// Spell hit mod shouldn't go over hit cap.
@@ -64,8 +64,8 @@ func CalcStatWeight(params IndividualParams, statsToWeigh []stats.Stat, referenc
 		stat := stats.Stat(statIdx)
 
 		result.EpValues[stat] = result.Weights[stat] / result.Weights[referenceStat]
-		result.WeightsStdev[stat] = computeStDevFromHists(params.Options.Iterations, mod, dpsHists[stat], baselineResult.DpsHist, nil, statMods[referenceStat])
-		result.EpValuesStdev[stat] = computeStDevFromHists(params.Options.Iterations, mod, dpsHists[stat], baselineResult.DpsHist, dpsHists[referenceStat], statMods[referenceStat])
+		result.WeightsStdev[stat] = computeStDevFromHists(params.Options.Iterations, mod, dpsHists[stat], baselineResult.Agents[0].DpsHist, nil, statMods[referenceStat])
+		result.EpValuesStdev[stat] = computeStDevFromHists(params.Options.Iterations, mod, dpsHists[stat], baselineResult.Agents[0].DpsHist, dpsHists[referenceStat], statMods[referenceStat])
 		log.Printf("%s Weight: %0.2f +/- %0.2f", stat.StatName(), result.Weights[stat], result.WeightsStdev[stat])
 	}
 

@@ -36,6 +36,7 @@ var StandardTalents = proto.ShamanTalents{
 	NaturesGuidance:    3,
 	TidalMastery:       5,
 	ElementalMastery:   true,
+	ElementalFury:      true,
 	UnrelentingStorm:   3,
 	CallOfThunder:      5,
 	Concussion:         5,

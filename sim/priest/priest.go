@@ -6,11 +6,11 @@ import (
 )
 
 type Priest struct {
-	*core.Character
+	core.Character
 }
 
 func (priest *Priest) GetCharacter() *core.Character {
-	return priest.Character
+	return &priest.Character
 }
 
 func (priest *Priest) AddRaidBuffs(buffs *core.Buffs) {
@@ -21,16 +21,15 @@ func (priest *Priest) AddPartyBuffs(buffs *core.Buffs) {
 	buffs.ShadowPriestDPS += 0
 }
 
-func (p *Priest) ChooseAction(_ *core.Simulation) core.AgentAction {
-	return core.AgentAction{Wait: core.NeverExpires} // makes the bot wait forever and do nothing.
+func (priest *Priest) ChooseAction(sim *core.Simulation) core.AgentAction {
+	return core.NewWaitAction(sim, priest, core.NeverExpires) // makes the bot wait forever and do nothing.
 }
 
-func (p *Priest) OnActionAccepted(*core.Simulation, core.AgentAction) {
+func (priest *Priest) OnActionAccepted(*core.Simulation, core.AgentAction) {
 
 }
 
-func (p *Priest) BuffUp(sim *core.Simulation) {
+func (priest *Priest) BuffUp(sim *core.Simulation) {
 }
 
-func (p *Priest) Reset(sim *core.Simulation)                                {}
-func (p *Priest) OnSpellHit(*core.Simulation, *core.Cast) {}
+func (priest *Priest) Reset(sim *core.Simulation) {}

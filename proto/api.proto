@@ -82,6 +82,11 @@ message IndividualSimResult {
     string error = 11; 
 }
 
+enum OtherAction {
+    OtherActionNone = 0;
+    OtherActionWait = 1;
+}
+
 // ActionMetric holds a collection of counts of casts and 
 // 
 message ActionMetric {
