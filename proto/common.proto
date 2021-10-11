@@ -3,6 +3,11 @@ package proto;
 
 option go_package = "./proto";
 
+enum Spec {
+    SpecBalanceDruid = 0;
+    SpecElementalShaman = 1;
+}
+
 enum Race {
     RaceUnknown = 0;
     RaceBloodElf = 1;
@@ -29,11 +34,6 @@ enum Class {
     ClassShaman = 7;
     ClassWarlock = 8;
     ClassWarrior = 9;
-}
-
-enum Spec {
-    SpecBalanceDruid = 0;
-    SpecElementalShaman = 1;
 }
 
 enum Stat {
