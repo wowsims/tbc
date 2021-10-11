@@ -95,8 +95,8 @@ type AllEncountersTestOptions struct {
 
 	Options  Options
 	Gear     items.EquipmentSpec
-	Buffs    Buffs
-	Consumes Consumes
+	Buffs    proto.Buffs
+	Consumes proto.Consumes
 	Race     RaceBonusType
 	Class    proto.Class
 

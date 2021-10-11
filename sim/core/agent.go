@@ -14,9 +14,9 @@ type Agent interface {
 	GetCharacter() *Character
 
 	// Updates the input Buffs to include raid-wide buffs provided by this Agent.
-	AddRaidBuffs(*Buffs)
+	AddRaidBuffs(*proto.Buffs)
 	// Updates the input Buffs to include party-wide buffs provided by this Agent.
-	AddPartyBuffs(*Buffs)
+	AddPartyBuffs(*proto.Buffs)
 
 	// Any pre-start buffs to apply to the raid/party/self
 	BuffUp(*Simulation)

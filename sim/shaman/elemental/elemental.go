@@ -17,7 +17,6 @@ func RegisterElementalShaman() {
 
 func NewElementalShaman(sim *core.Simulation, character core.Character, options *proto.PlayerOptions) *Shaman {
 	eleShamOptions := options.GetElementalShaman()
-	talents := ConvertShamTalents(eleShamOptions.Talents)
 
 	selfBuffs := SelfBuffs{
 		Bloodlust:    eleShamOptions.Options.Bloodlust,
@@ -42,7 +41,7 @@ func NewElementalShaman(sim *core.Simulation, character core.Character, options 
 		rotation = NewLBOnlyRotation(sim)
 	}
 
-	return NewShaman(character, talents, selfBuffs, rotation)
+	return NewShaman(character, *eleShamOptions.Talents, selfBuffs, rotation)
 }
 
 // ################################################################

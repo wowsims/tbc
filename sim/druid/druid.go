@@ -13,11 +13,11 @@ func (druid *Druid) GetCharacter() *core.Character {
 	return &druid.Character
 }
 
-func (druid *Druid) AddRaidBuffs(buffs *core.Buffs) {
+func (druid *Druid) AddRaidBuffs(buffs *proto.Buffs) {
 	// TODO: Use talents to check for imp gotw
 	buffs.GiftOfTheWild = proto.TristateEffect_TristateEffectRegular
 }
-func (druid *Druid) AddPartyBuffs(buffs *core.Buffs) {
+func (druid *Druid) AddPartyBuffs(buffs *proto.Buffs) {
 	//buffs.Moonkin = proto.TristateEffect_TristateEffectRegular
 	// check for idol of raven goddess equipped
 }

@@ -1,12 +1,11 @@
 package elemental
 
 import (
-	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/items"
 	"github.com/wowsims/tbc/sim/core/proto"
 )
 
-var BasicBuffs = core.Buffs{
+var BasicBuffs = proto.Buffs{
 	Bloodlust: 1,
 }
 
@@ -87,17 +86,17 @@ var PlayerOptionsCLOnClearcast = proto.PlayerOptions{
 	},
 }
 
-var FullBuffs = core.Buffs{
+var FullBuffs = proto.Buffs{
 	ArcaneBrilliance:  true,
 	GiftOfTheWild:     proto.TristateEffect_TristateEffectImproved,
 	BlessingOfKings:   true,
 	BlessingOfWisdom:  proto.TristateEffect_TristateEffectImproved,
 	JudgementOfWisdom: true,
 	MoonkinAura:       proto.TristateEffect_TristateEffectRegular,
-	ShadowPriestDPS:   500,
+	ShadowPriestDps:   500,
 }
 
-var FullConsumes = core.Consumes{
+var FullConsumes = proto.Consumes{
 	FlaskOfBlindingLight: true,
 	BrilliantWizardOil:   true,
 	BlackenedBasilisk:    true,

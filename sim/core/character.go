@@ -14,7 +14,7 @@ import (
 // All players have stats, equipment, auras, etc
 type Character struct {
 	ID       int
-	Consumes Consumes // pretty sure most classes have consumes to care about.
+	Consumes proto.Consumes
 	Race     RaceBonusType
 	Class    proto.Class
 
@@ -45,7 +45,7 @@ func (character *Character) AddStats(s stats.Stats) {
 func (character *Character) HasteBonus() float64 {
 	return 1 + (character.Stats[stats.SpellHaste] / (HasteRatingPerHastePercent * 100))
 }
-func NewCharacter(equipSpec items.EquipmentSpec, race RaceBonusType, class proto.Class, consumes Consumes, customStats stats.Stats) Character {
+func NewCharacter(equipSpec items.EquipmentSpec, race RaceBonusType, class proto.Class, consumes proto.Consumes, customStats stats.Stats) Character {
 	equip := items.NewEquipmentSet(equipSpec)
 	// log.Printf("Gear Stats: %s", equip.Stats().Print())
 	initialStats := CalculateTotalStats(race, class, equip, consumes).Add(customStats)
@@ -165,9 +165,9 @@ func (character *Character) ActivateSets(sim *Simulation, agent Agent) []string 
 	return active
 }
 
-func (character *Character) AddRaidBuffs(buffs *Buffs) {
+func (character *Character) AddRaidBuffs(buffs *proto.Buffs) {
 }
-func (character *Character) AddPartyBuffs(buffs *Buffs) {
+func (character *Character) AddPartyBuffs(buffs *proto.Buffs) {
 	if character.Race == RaceBonusTypeDraenei {
 		class := character.Class
 		if class == proto.Class_ClassHunter ||
@@ -223,6 +223,6 @@ type BaseStatsKey struct {
 var BaseStats = map[BaseStatsKey]stats.Stats{}
 
 // CalculateTotalStats will take a set of equipment and options and add all stats/buffs/etc together
-func CalculateTotalStats(race RaceBonusType, class proto.Class, equipment items.Equipment, consumes Consumes) stats.Stats {
-	return BaseStats[BaseStatsKey{ Race: race, Class: class }].Add(equipment.Stats()).Add(consumes.Stats())
+func CalculateTotalStats(race RaceBonusType, class proto.Class, equipment items.Equipment, consumes proto.Consumes) stats.Stats {
+	return BaseStats[BaseStatsKey{ Race: race, Class: class }].Add(equipment.Stats()).Add(ConsumesStats(consumes))
 }
