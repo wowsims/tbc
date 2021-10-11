@@ -35,13 +35,14 @@ type SelfBuffs struct {
 
 // Picks which attacks / abilities the Shaman does.
 type Rotation interface {
-	// Returns the action this Agent would like to take next.
+	// Returns the action this rotation would like to take next.
 	ChooseAction(*Shaman, *core.Simulation) core.AgentAction
 
-	// This will be invoked if the chosen action is actually executed, so the Agent can update its state.
+	// This will be invoked right before the chosen action is actually executed, so the rotation can update its state.
+	// Note that the action may be different from the action chosen by this rotation.
 	OnActionAccepted(*Shaman, *core.Simulation, core.AgentAction)
 
-	// Returns this Agent to its initial state.
+	// Returns this rotation to its initial state. Called before each Sim iteration.
 	Reset(*Shaman, *core.Simulation)
 }
 

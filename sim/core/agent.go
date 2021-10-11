@@ -28,7 +28,7 @@ type Agent interface {
 	ChooseAction(*Simulation) AgentAction
 
 	// This will be invoked right before the chosen action is actually executed, so the Agent can update its state.
-	// Note that the action may be different from the action chosen by this agent
+	// Note that the action may be different from the action chosen by this agent.
 	OnActionAccepted(*Simulation, AgentAction)
 }
 
