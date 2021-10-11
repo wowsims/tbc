@@ -1,7 +1,8 @@
 package stats
 
 import (
-	"strconv"
+	"fmt"
+	"strings"
 )
 
 type Stats [Len]float64
@@ -115,33 +116,31 @@ func (this Stats) Add(other Stats) Stats {
 	return newStats
 }
 
-// Print is debug print function
-func (st Stats) Print() string {
-	output := "{ "
-	printed := false
-	for k, v := range st {
-		name := Stat(k).StatName()
-		if name == "none" {
-			continue
-		}
-		if v == 0 {
-			continue
-		}
-		if printed {
-			printed = false
-			output += ",\n"
-		}
-		output += "\t"
-		if v < 50 {
-			printed = true
-			output += "\"" + name + "\": " + strconv.FormatFloat(v, 'f', 3, 64)
-		} else {
-			printed = true
-			output += "\"" + name + "\": " + strconv.FormatFloat(v, 'f', 0, 64)
+func (this Stats) EqualsWithTolerance(other Stats, tolerance float64) bool {
+	for i := range this {
+		if this[i] < other[i]-tolerance || this[i] > other[i]+tolerance {
+			return false
 		}
 	}
-	output += " }"
-	return output
+
+	return true
+}
+
+func (this Stats) String() string {
+	var sb strings.Builder
+	sb.WriteString("\n{\n")
+
+	for statIdx, statValue := range this {
+		name := Stat(statIdx).StatName()
+		if name == "none" || statValue == 0 {
+			continue
+		}
+
+		fmt.Fprintf(&sb, "\t%s: %0.3f,\n", name, statValue)
+	}
+
+	sb.WriteString("\n}")
+	return sb.String()
 }
 
 // CalculatedTotal will add Mana and Crit from Int and return the new stats.

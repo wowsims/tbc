@@ -12,6 +12,8 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
+var GCDMin = DurationFromSeconds(1.0) // default to 1s GCD
+
 func debugFunc(sim *Simulation) func(string, ...interface{}) {
 	return func(s string, vals ...interface{}) {
 		fmt.Printf("[%0.1f] "+s, append([]interface{}{sim.CurrentTime.Seconds()}, vals...)...)
@@ -23,7 +25,6 @@ type Options struct {
 	Iterations int
 	RSeed      int64
 	ExitOnOOM  bool
-	GCDMin     time.Duration // sets the minimum GCD
 	Debug      bool          // enables debug printing.
 }
 
@@ -123,9 +124,6 @@ func NewIndividualSim(params IndividualParams) *Simulation {
 
 // New sim contructs a simulator with the given equipment / options.
 func newSim(raid *Raid, options Options, numPlayers int) *Simulation {
-	if options.GCDMin == 0 {
-		options.GCDMin = durationFromSeconds(1.0) // default to 0.75s GCD
-	}
 	if options.RSeed == 0 {
 		options.RSeed = time.Now().Unix()
 	}
@@ -133,7 +131,7 @@ func newSim(raid *Raid, options Options, numPlayers int) *Simulation {
 	sim := &Simulation{
 		Raid:         raid,
 		Options:      options,
-		Duration:     durationFromSeconds(options.Encounter.Duration),
+		Duration:     DurationFromSeconds(options.Encounter.Duration),
 		InitialAuras: []InitialAura{},
 		Log: nil,
 		AuraTracker: NewAuraTracker(),
@@ -283,13 +281,13 @@ simloop:
 		if isCastAction {
 			// TODO: This delays the cast damage until GCD is ready, even if the cast time is less than GCD.
 			// How to handle this?
-			actionDuration = MaxDuration(actionDuration, sim.Options.GCDMin)
+			actionDuration = MaxDuration(actionDuration, GCDMin)
 
 			manaCost := castAction.GetManaCost()
 			if agent.GetCharacter().Stats[stats.Mana] < manaCost {
 				// Not enough mana, wait until there is enough mana to cast the desired spell
 				// TODO: Doesn't account for spirit-based mana
-				regenTime := durationFromSeconds((manaCost-agent.GetCharacter().Stats[stats.Mana])/agent.GetCharacter().manaRegenPerSecond()) + 1
+				regenTime := DurationFromSeconds((manaCost-agent.GetCharacter().Stats[stats.Mana])/agent.GetCharacter().manaRegenPerSecond()) + 1
 				if sim.Log != nil {
 					sim.Log("Not enough mana to cast... regen for %0.1f seconds before casting.\n", regenTime.Seconds())
 				}
@@ -335,8 +333,4 @@ func (sim *Simulation) Advance(elapsedTime time.Duration) {
 	}
 	sim.AuraTracker.Advance(sim, elapsedTime)
 	sim.CurrentTime = newTime
-}
-
-func durationFromSeconds(numSeconds float64) time.Duration {
-	return time.Duration(float64(time.Second) * numSeconds)
 }

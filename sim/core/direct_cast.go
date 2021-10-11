@@ -56,7 +56,6 @@ func (result DirectCastDamageResult) String() string {
 	}
 
 	var sb strings.Builder
-	sb.WriteString("")
 
 	if result.PartialResist_1_4 {
 		sb.WriteString("25% Resist ")

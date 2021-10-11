@@ -69,3 +69,7 @@ func MaxTristate(a proto.TristateEffect, b proto.TristateEffect) proto.TristateE
 		return b
 	}
 }
+
+func DurationFromSeconds(numSeconds float64) time.Duration {
+	return time.Duration(float64(time.Second) * numSeconds)
+}
