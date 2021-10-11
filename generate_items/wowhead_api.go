@@ -119,10 +119,14 @@ func (item WowheadItemResponse) GetStats() Stats {
 	}
 }
 
-var phaseRegex, _ = regexp.Compile("Phase ([0-9])")
-
+var phaseRegex = regexp.MustCompile("Phase ([0-9])")
 func (item WowheadItemResponse) GetPhase() int {
 	return item.GetIntValue(phaseRegex)
+}
+
+var uniqueRegex = regexp.MustCompile("Unique")
+func (item WowheadItemResponse) GetUnique() bool {
+	return uniqueRegex.MatchString(item.Tooltip)
 }
 
 var itemTypePatterns = map[proto.ItemType]*regexp.Regexp{
