@@ -6,24 +6,6 @@ import (
 	"github.com/wowsims/tbc/sim/core/proto"
 )
 
-// Use same seed to get same result on every run.
-var RSeed = int64(1)
-
-var ShortEncounter = core.Encounter{
-	Duration:   60,
-	NumTargets: 1,
-}
-var LongEncounter = core.Encounter{
-	Duration:   300,
-	NumTargets: 1,
-}
-
-var BasicOptions = core.Options{
-	Iterations: 1,
-	RSeed:      RSeed,
-	Debug:      false,
-}
-
 var BasicBuffs = core.Buffs{
 	Bloodlust: 1,
 }
@@ -107,9 +89,9 @@ var PlayerOptionsCLOnClearcast = proto.PlayerOptions{
 
 var FullBuffs = core.Buffs{
 	ArcaneBrilliance:  true,
-	GiftOfTheWild:     proto.TristateEffect_TristateEffectRegular,
+	GiftOfTheWild:     proto.TristateEffect_TristateEffectImproved,
 	BlessingOfKings:   true,
-	BlessingOfWisdom:  proto.TristateEffect_TristateEffectRegular,
+	BlessingOfWisdom:  proto.TristateEffect_TristateEffectImproved,
 	JudgementOfWisdom: true,
 	MoonkinAura:       proto.TristateEffect_TristateEffectRegular,
 	ShadowPriestDPS:   500,

@@ -2,8 +2,6 @@
 package sim
 
 import (
-	"time"
-
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/items"
 	"github.com/wowsims/tbc/sim/core/proto"
@@ -66,7 +64,6 @@ func convertSimParams(request *proto.IndividualSimRequest) core.IndividualParams
 		Iterations: int(request.Iterations),
 		RSeed:      request.RandomSeed,
 		ExitOnOOM:  request.ExitOnOom,
-		GCDMin:     time.Duration(request.GcdMin),
 		Debug:      request.Debug,
 	}
 	if request.Encounter != nil {

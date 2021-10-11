@@ -59,9 +59,8 @@ message IndividualSimRequest {
     Encounter encounter = 3;
     int32 iterations = 4;
     int64 random_seed = 5;
-    double gcd_min = 6; // sets the minimum GCD
-    bool debug = 7; // enables debug logging.
-    bool exit_on_oom = 8;
+    bool debug = 6; // enables debug logging.
+    bool exit_on_oom = 7;
 }
 
 message IndividualSimResult {
