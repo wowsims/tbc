@@ -36,8 +36,8 @@ type IndividualParams struct {
 	Equip    items.EquipmentSpec
 	Race     RaceBonusType
 	Class    proto.Class
-	Consumes Consumes
-	Buffs    Buffs
+	Consumes proto.Consumes
+	Buffs    proto.Buffs
 	Options  Options
 
 	PlayerOptions *proto.PlayerOptions

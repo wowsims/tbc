@@ -73,3 +73,13 @@ func MaxTristate(a proto.TristateEffect, b proto.TristateEffect) proto.TristateE
 func DurationFromSeconds(numSeconds float64) time.Duration {
 	return time.Duration(float64(time.Second) * numSeconds)
 }
+
+func GetTristateValueFloat(effect proto.TristateEffect, regularValue float64, impValue float64) float64 {
+	if effect == proto.TristateEffect_TristateEffectRegular {
+		return regularValue
+	} else if effect == proto.TristateEffect_TristateEffectImproved {
+		return impValue
+	} else {
+		return 0
+	}
+}

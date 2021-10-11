@@ -13,13 +13,13 @@ func (paladin *Paladin) GetCharacter() *core.Character {
 	return &paladin.Character
 }
 
-func (paladin *Paladin) AddRaidBuffs(buffs *core.Buffs) {
+func (paladin *Paladin) AddRaidBuffs(buffs *proto.Buffs) {
 	buffs.BlessingOfWisdom = proto.TristateEffect_TristateEffectImproved
 	buffs.BlessingOfKings = true
 	buffs.JudgementOfWisdom = true
 	buffs.ImprovedSealOfTheCrusader = true
 }
-func (paladin *Paladin) AddPartyBuffs(buffs *core.Buffs) {
+func (paladin *Paladin) AddPartyBuffs(buffs *proto.Buffs) {
 }
 
 func (paladin *Paladin) ChooseAction(sim *core.Simulation) core.AgentAction {

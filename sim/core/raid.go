@@ -3,6 +3,7 @@ package core
 import (
 	"fmt"
 
+	"github.com/wowsims/tbc/sim/core/proto"
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
@@ -10,7 +11,7 @@ type Party struct {
 	Players []Agent
 
 	// Party-wide buffs for this party + raid-wide buffs
-	Buffs Buffs
+	Buffs proto.Buffs
 }
 
 func (party *Party) Size() int {
@@ -55,11 +56,11 @@ type Raid struct {
 	Parties []*Party
 
 	// Raid-wide buffs
-	Buffs Buffs
+	Buffs proto.Buffs
 }
 
 // Makes a new raid. baseBuffs are extra additional buffs applied to all players in the raid.
-func NewRaid(baseBuffs Buffs) *Raid {
+func NewRaid(baseBuffs proto.Buffs) *Raid {
 	return &Raid{
 		Parties: []*Party{
 			&Party{ Players: []Agent{}, },
@@ -122,11 +123,11 @@ func (raid *Raid) AddPlayerBuffs() {
 
 // Applies buffs to the sim and all the players.
 func (raid *Raid) ApplyBuffs(sim *Simulation) {
-	raid.Buffs.ApplyToSim(sim)
+	ApplyBuffsToSim(sim, raid.Buffs)
 
 	for _, party := range raid.Parties {
 		for _, player := range party.Players {
-			party.Buffs.ApplyToPlayer(player)
+			ApplyBuffsToPlayer(player, party.Buffs)
 		}
 	}
 }

@@ -78,8 +78,8 @@ func convertSimParams(request *proto.IndividualSimRequest) core.IndividualParams
 		Equip:    items.ProtoToEquipmentSpec(request.Player.Equipment),
 		Race:     core.RaceBonusType(request.Player.Options.Race),
 		Class:    request.Player.Options.Class,
-		Consumes: core.ProtoToConsumes(request.Player.Options.Consumes),
-		Buffs:    core.ProtoToBuffs(request.Buffs),
+		Consumes: *request.Player.Options.Consumes,
+		Buffs:    *request.Buffs,
 		Options:  options,
 
 		PlayerOptions: request.Player.Options,

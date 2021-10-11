@@ -2,6 +2,7 @@ package mage
 
 import (
 	"github.com/wowsims/tbc/sim/core"
+	"github.com/wowsims/tbc/sim/core/proto"
 )
 
 type Mage struct {
@@ -12,10 +13,10 @@ func (mage *Mage) GetCharacter() *core.Character {
 	return &mage.Character
 }
 
-func (mage *Mage) AddRaidBuffs(buffs *core.Buffs) {
+func (mage *Mage) AddRaidBuffs(buffs *proto.Buffs) {
 	buffs.ArcaneBrilliance = true
 }
-func (mage *Mage) AddPartyBuffs(buffs *core.Buffs) {
+func (mage *Mage) AddPartyBuffs(buffs *proto.Buffs) {
 }
 
 func (mage *Mage) BuffUp(sim *core.Simulation) {

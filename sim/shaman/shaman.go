@@ -8,7 +8,7 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-func NewShaman(character core.Character, talents Talents, selfBuffs SelfBuffs, rotation Rotation) *Shaman {
+func NewShaman(character core.Character, talents proto.ShamanTalents, selfBuffs SelfBuffs, rotation Rotation) *Shaman {
 	if selfBuffs.WaterShield {
 		character.InitialStats[stats.MP5] += 50
 	}
@@ -51,7 +51,7 @@ type Shaman struct {
 
 	rotation Rotation
 
-	Talents   Talents
+	Talents   proto.ShamanTalents
 	SelfBuffs SelfBuffs
 
 	ElementalFocusStacks byte
@@ -65,9 +65,9 @@ func (shaman *Shaman) GetCharacter() *core.Character {
 	return &shaman.Character
 }
 
-func (shaman *Shaman) AddRaidBuffs(buffs *core.Buffs) {
+func (shaman *Shaman) AddRaidBuffs(buffs *proto.Buffs) {
 }
-func (shaman *Shaman) AddPartyBuffs(buffs *core.Buffs) {
+func (shaman *Shaman) AddPartyBuffs(buffs *proto.Buffs) {
 	if shaman.SelfBuffs.Bloodlust {
 		buffs.Bloodlust += 1
 	}
@@ -107,38 +107,6 @@ func (shaman *Shaman) OnActionAccepted(sim *core.Simulation, action core.AgentAc
 }
 func (shaman *Shaman) Reset(newsim *core.Simulation) {
 	shaman.rotation.Reset(shaman, newsim)
-}
-
-type Talents struct {
-	ElementalFocus     bool
-	LightningMastery   int
-	LightningOverload  int
-	ElementalPrecision int
-	NaturesGuidance    int
-	TidalMastery       int
-	ElementalMastery   bool
-	ElementalFury      bool
-	UnrelentingStorm   int
-	CallOfThunder      int
-	Convection         int
-	Concussion         int
-}
-
-func ConvertShamTalents(t *proto.ShamanTalents) Talents {
-	return Talents{
-		LightningOverload:  int(t.LightningOverload),
-		ElementalPrecision: int(t.ElementalPrecision),
-		NaturesGuidance:    int(t.NaturesGuidance),
-		TidalMastery:       int(t.TidalMastery),
-		ElementalMastery:   t.ElementalMastery,
-		ElementalFury:      t.ElementalFury,
-		UnrelentingStorm:   int(t.UnrelentingStorm),
-		CallOfThunder:      int(t.CallOfThunder),
-		Convection:         int(t.Convection),
-		Concussion:         int(t.Concussion),
-		LightningMastery:   int(t.LightningMastery),
-		ElementalFocus:     t.ElementalFocus,
-	}
 }
 
 func TryActivateBloodlust(sim *core.Simulation, shaman *Shaman) {

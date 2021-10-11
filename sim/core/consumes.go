@@ -7,56 +7,7 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-type Consumes struct {
-	// Buffs
-	BrilliantWizardOil       bool
-	SuperiorWizardOil        bool
-	ElixirOfMajorMageblood   bool
-	FlaskOfBlindingLight     bool
-	FlaskOfMightyRestoration bool
-	FlaskOfPureDeath         bool
-	FlaskOfSupremePower      bool
-	BlackenedBasilisk        bool
-	SkullfishSoup            bool
-	AdeptsElixir             bool
-	ElixirOfMajorFirePower   bool
-	ElixirOfMajorFrostPower  bool
-	ElixirOfMajorShadowPower bool
-	ElixirOfDraenicWisdom    bool
-
-	// Used in rotations
-	DefaultPotion      proto.Potions
-	StartingPotion     proto.Potions
-	NumStartingPotions int32
-	DarkRune           bool
-	Drums              proto.Drums
-}
-
-func ProtoToConsumes(c *proto.Consumes) Consumes {
-	return Consumes{
-		FlaskOfBlindingLight:     c.FlaskOfBlindingLight,
-		FlaskOfMightyRestoration: c.FlaskOfMightyRestoration,
-		FlaskOfPureDeath:         c.FlaskOfPureDeath,
-		FlaskOfSupremePower:      c.FlaskOfSupremePower,
-		AdeptsElixir:             c.AdeptsElixir,
-		ElixirOfMajorFirePower:   c.ElixirOfMajorFirePower,
-		ElixirOfMajorFrostPower:  c.ElixirOfMajorFrostPower,
-		ElixirOfMajorShadowPower: c.ElixirOfMajorShadowPower,
-		ElixirOfDraenicWisdom:    c.ElixirOfDraenicWisdom,
-		ElixirOfMajorMageblood:   c.ElixirOfMajorMageblood,
-		BrilliantWizardOil:       c.BrilliantWizardOil,
-		SuperiorWizardOil:        c.SuperiorWizardOil,
-		BlackenedBasilisk:        c.BlackenedBasilisk,
-		SkullfishSoup:            c.SkullfishSoup,
-		DefaultPotion:            c.DefaultPotion,
-		StartingPotion:           c.StartingPotion,
-		NumStartingPotions:       c.NumStartingPotions,
-		DarkRune:                 c.DarkRune,
-		Drums:                    c.Drums,
-	}
-}
-
-func (c Consumes) Stats() stats.Stats {
+func ConsumesStats(c proto.Consumes) stats.Stats {
 	s := stats.Stats{}
 
 	if c.BrilliantWizardOil {

@@ -7,90 +7,8 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-type Buffs struct {
-	// Raid buffs
-	ArcaneBrilliance bool
-	GiftOfTheWild    proto.TristateEffect
-	BlessingOfKings  bool
-	BlessingOfWisdom proto.TristateEffect
-	DivineSpirit     proto.TristateEffect
-
-	// Party class buffs
-	Bloodlust           int32
-	MoonkinAura         proto.TristateEffect
-	DraeneiRacialMelee  bool
-	DraeneiRacialCaster bool
-	ShadowPriestDPS     uint16 // adds Mp5 ~ 25% (dps*5%*5sec = 25%)
-
-	// Totems
-	ManaSpringTotem proto.TristateEffect
-	ManaTideTotem   bool
-	TotemOfWrath    int32
-	WrathOfAirTotem proto.TristateEffect
-
-	// Target debuff
-	JudgementOfWisdom         bool
-	ImprovedSealOfTheCrusader bool
-	Misery                    bool
-
-	// Drums
-	Drums proto.Drums
-
-	// Party item buffs
-	AtieshMage            int32
-	AtieshWarlock         int32
-	BraidedEterniumChain  bool
-	ChainOfTheTwilightOwl bool
-	EyeOfTheNight         bool
-	JadePendantOfBlasting bool
-}
-
-func ProtoToBuffs(inBuff *proto.Buffs) Buffs {
-	return Buffs{
-		ArcaneBrilliance: inBuff.ArcaneBrilliance,
-		Bloodlust:        inBuff.Bloodlust,
-		GiftOfTheWild:    inBuff.GiftOfTheWild,
-		BlessingOfKings:  inBuff.BlessingOfKings,
-		BlessingOfWisdom: inBuff.BlessingOfWisdom,
-		DivineSpirit:     inBuff.DivineSpirit,
-
-		MoonkinAura:         inBuff.MoonkinAura,
-		DraeneiRacialMelee:  inBuff.DraeneiRacialMelee,
-		DraeneiRacialCaster: inBuff.DraeneiRacialCaster,
-		ShadowPriestDPS:     uint16(inBuff.ShadowPriestDps),
-
-		JudgementOfWisdom:         inBuff.JudgementOfWisdom,
-		ImprovedSealOfTheCrusader: inBuff.ImprovedSealOfTheCrusader,
-		Misery:                    inBuff.Misery,
-
-		ManaSpringTotem: inBuff.ManaSpringTotem,
-		ManaTideTotem:   inBuff.ManaTideTotem,
-		TotemOfWrath:    inBuff.TotemOfWrath,
-		WrathOfAirTotem: inBuff.WrathOfAirTotem,
-
-		Drums: inBuff.Drums,
-
-		AtieshMage:            inBuff.AtieshMage,
-		AtieshWarlock:         inBuff.AtieshWarlock,
-		BraidedEterniumChain:  inBuff.BraidedEterniumChain,
-		ChainOfTheTwilightOwl: inBuff.ChainOfTheTwilightOwl,
-		EyeOfTheNight:         inBuff.EyeOfTheNight,
-		JadePendantOfBlasting: inBuff.JadePendantOfBlasting,
-	}
-}
-
-func GetTristateValueFloat(effect proto.TristateEffect, regularValue float64, impValue float64) float64 {
-	if effect == proto.TristateEffect_TristateEffectRegular {
-		return regularValue
-	} else if effect == proto.TristateEffect_TristateEffectImproved {
-		return impValue
-	} else {
-		return 0
-	}
-}
-
 // Applies buffs that affect the sim as a whole.
-func (buffs Buffs) ApplyToSim(sim *Simulation) {
+func ApplyBuffsToSim(sim *Simulation, buffs proto.Buffs) {
 	if buffs.Misery {
 		sim.AddInitialAura(func(sim *Simulation) Aura {
 			return MiseryAura()
@@ -105,7 +23,7 @@ func (buffs Buffs) ApplyToSim(sim *Simulation) {
 }
 
 // Applies buffs that affect individual players.
-func (buffs Buffs) ApplyToPlayer(agent Agent) {
+func ApplyBuffsToPlayer(agent Agent, buffs proto.Buffs) {
 	character := agent.GetCharacter()
 
 	if buffs.ArcaneBrilliance {
@@ -146,9 +64,9 @@ func (buffs Buffs) ApplyToPlayer(agent Agent) {
 	})
 
 	// shadow priest buff bot just statically applies mp5
-	if buffs.ShadowPriestDPS > 0 {
+	if buffs.ShadowPriestDps > 0 {
 		character.AddInitialStats(stats.Stats{
-			stats.MP5: float64(buffs.ShadowPriestDPS) * 0.25,
+			stats.MP5: float64(buffs.ShadowPriestDps) * 0.25,
 		})
 	}
 
