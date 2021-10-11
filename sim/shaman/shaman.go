@@ -177,3 +177,36 @@ func TryActivateEleMastery(sim *core.Simulation, shaman *Shaman) {
 		},
 	})
 }
+
+func init() {
+	core.BaseStats[core.BaseStatsKey{ Race: core.RaceBonusTypeDraenei, Class: proto.Class_ClassShaman }] = stats.Stats{
+		stats.Strength:  103,
+		stats.Agility:   61,
+		stats.Stamina:   113,
+		stats.Intellect: 109,
+		stats.Spirit:    122,
+		stats.Mana:      2678,
+		stats.SpellCrit: 48.576,
+	}
+	core.BaseStats[core.BaseStatsKey{ Race: core.RaceBonusTypeOrc, Class: proto.Class_ClassShaman }] = stats.Stats{
+		stats.Intellect: 104,
+		stats.Mana:      2678,
+		stats.Spirit:    135,
+		stats.SpellCrit: 48.576,
+	}
+	core.BaseStats[core.BaseStatsKey{ Race: core.RaceBonusTypeTauren, Class: proto.Class_ClassShaman }] = stats.Stats{
+		stats.Intellect: 104,
+		stats.Mana:      2678,
+		stats.Spirit:    135,
+		stats.SpellCrit: 48.576,
+	}
+
+	trollStats := stats.Stats{
+		stats.Intellect: 104,
+		stats.Mana:      2678,
+		stats.Spirit:    135,
+		stats.SpellCrit: 48.576,
+	}
+	core.BaseStats[core.BaseStatsKey{ Race: core.RaceBonusTypeTroll10, Class: proto.Class_ClassShaman }] = trollStats
+	core.BaseStats[core.BaseStatsKey{ Race: core.RaceBonusTypeTroll30, Class: proto.Class_ClassShaman }] = trollStats
+}

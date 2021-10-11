@@ -9,18 +9,21 @@ import "shaman.proto";
 
 message PlayerOptions {
     Race race = 1;
+    Class class = 2;
+
     oneof spec {
-        BalanceDruid balance_druid = 2;
-        Hunter hunter = 3;
-        Mage mage = 4;
-        Paladin paladin = 5;
-        Priest priest = 6;
-        Rogue rogue = 7;
-        ElementalShaman elemental_shaman = 8;
-        Warlock warlock = 9;
-        Warrior warrior = 10;
+        BalanceDruid balance_druid = 3;
+        Hunter hunter = 4;
+        Mage mage = 5;
+        Paladin paladin = 6;
+        Priest priest = 7;
+        Rogue rogue = 8;
+        ElementalShaman elemental_shaman = 9;
+        Warlock warlock = 10;
+        Warrior warrior = 11;
     }
-    Consumes consumes = 11; // What consumes this player is going to be using.
+
+    Consumes consumes = 12; // What consumes this player is going to be using.
 }
 
 message Hunter {

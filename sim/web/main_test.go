@@ -92,6 +92,7 @@ func TestIndividualSim(t *testing.T) {
 		Player: &proto.Player{
 			Options: &proto.PlayerOptions{
 				Race:     proto.Race_RaceTroll10,
+				Class:    proto.Class_ClassShaman,
 				Spec:     basicSpec,
 				Consumes: basicConsumes,
 			},

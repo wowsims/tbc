@@ -98,6 +98,7 @@ type AllEncountersTestOptions struct {
 	Buffs    Buffs
 	Consumes Consumes
 	Race     RaceBonusType
+	Class    proto.Class
 
 	PlayerOptions *proto.PlayerOptions
 
@@ -109,6 +110,7 @@ func IndividualSimAllEncountersTest(testOpts AllEncountersTestOptions) {
 	params := IndividualParams{
 		Equip:    testOpts.Gear,
 		Race:     testOpts.Race,
+		Class:    testOpts.Class,
 		Consumes: testOpts.Consumes,
 		Buffs:    testOpts.Buffs,
 		Options:  ShortEncounterOptions,

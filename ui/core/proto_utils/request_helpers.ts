@@ -78,6 +78,7 @@ function withSpecProto<SpecType extends Spec>(
     specOptions: SpecOptions<SpecType>): PlayerOptions {
   const copy = PlayerOptions.clone(playerOptions);
   if (BalanceDruidRotation.is(rotation)) {
+		copy.class = Class.ClassDruid;
     copy.spec = {
       oneofKind: 'balanceDruid',
       balanceDruid: BalanceDruid.create({
@@ -87,6 +88,7 @@ function withSpecProto<SpecType extends Spec>(
       }),
     };
   } else if (ElementalShamanRotation.is(rotation)) {
+		copy.class = Class.ClassShaman;
     copy.spec = {
       oneofKind: 'elementalShaman',
       elementalShaman: ElementalShaman.create({

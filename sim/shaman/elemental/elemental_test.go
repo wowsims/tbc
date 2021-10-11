@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/wowsims/tbc/sim/core"
+	"github.com/wowsims/tbc/sim/core/proto"
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
@@ -15,6 +16,7 @@ func TestP1FullCharacterStats(t *testing.T) {
 	params := core.IndividualParams{
 		Equip:       P1Gear,
 		Race:        core.RaceBonusTypeTroll10,
+		Class:       proto.Class_ClassShaman,
 		Consumes:    FullConsumes,
 		Buffs:       FullBuffs,
 		PlayerOptions: &PlayerOptionsAdaptive,
@@ -56,6 +58,7 @@ func TestCalcStatWeight(t *testing.T) {
 	params := core.IndividualParams{
 		Equip:       P1Gear,
 		Race:        core.RaceBonusTypeTroll10,
+		Class:       proto.Class_ClassShaman,
 		Consumes:    FullConsumes,
 		Buffs:       FullBuffs,
 		PlayerOptions: &PlayerOptionsAdaptive,
@@ -82,6 +85,7 @@ func TestSimulatePreRaidNoBuffs(t *testing.T) {
 		// no consumes
 		Buffs: BasicBuffs,
 		Race:  core.RaceBonusTypeTroll10,
+		Class: proto.Class_ClassShaman,
 
 		PlayerOptions: &PlayerOptionsAdaptiveNoBuffs,
 		Gear:          PreRaidGear,
@@ -99,6 +103,7 @@ func TestSimulatePreRaid(t *testing.T) {
 		Consumes: FullConsumes,
 		Buffs:    FullBuffs,
 		Race:     core.RaceBonusTypeOrc,
+		Class:    proto.Class_ClassShaman,
 
 		PlayerOptions: &PlayerOptionsAdaptive,
 		Gear:          PreRaidGear,
@@ -116,6 +121,7 @@ func TestSimulateP1(t *testing.T) {
 		Consumes: FullConsumes,
 		Buffs:    FullBuffs,
 		Race:     core.RaceBonusTypeOrc,
+		Class:    proto.Class_ClassShaman,
 
 		PlayerOptions: &PlayerOptionsAdaptive,
 		Gear:          P1Gear,
@@ -129,6 +135,7 @@ func TestSimulateP1(t *testing.T) {
 // 	params := core.IndividualParams{
 // 		Equip:         P1Gear,
 // 		Race:          core.RaceBonusTypeOrc,
+//    Class:         proto.Class_ClassShaman,
 // 		Consumes:      FullConsumes,
 // 		Buffs:         FullBuffs,
 // 		Options:       makeOptions(core.BasicOptions, LongEncounter),
@@ -151,6 +158,7 @@ func TestLBOnlyAgent(t *testing.T) {
 		Consumes: FullConsumes,
 		Buffs:    FullBuffs,
 		Race:     core.RaceBonusTypeOrc,
+		Class:    proto.Class_ClassShaman,
 
 		PlayerOptions: &PlayerOptionsLBOnly,
 		Gear:          P1Gear,
@@ -182,6 +190,7 @@ func TestClearcastAgent(t *testing.T) {
 		Consumes: FullConsumes,
 		Buffs:    FullBuffs,
 		Race:     core.RaceBonusTypeOrc,
+    Class:    proto.Class_ClassShaman,
 
 		PlayerOptions: &PlayerOptionsCLOnClearcast,
 		Gear:          P1Gear,
@@ -195,6 +204,7 @@ func TestAverageDPS(t *testing.T) {
 	params := core.IndividualParams{
 		Equip:         P1Gear,
 		Race:          core.RaceBonusTypeOrc,
+    Class:         proto.Class_ClassShaman,
 		Consumes:      FullConsumes,
 		Buffs:         FullBuffs,
 		PlayerOptions: &PlayerOptionsAdaptive,
@@ -208,6 +218,7 @@ func BenchmarkSimulate(b *testing.B) {
 	params := core.IndividualParams{
 		Equip:    P1Gear,
 		Race:     core.RaceBonusTypeOrc,
+    Class:    proto.Class_ClassShaman,
 		Consumes: FullConsumes,
 		Buffs:    FullBuffs,
 

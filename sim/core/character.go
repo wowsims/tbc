@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/wowsims/tbc/sim/core/items"
+	"github.com/wowsims/tbc/sim/core/proto"
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
@@ -15,6 +16,7 @@ type Character struct {
 	ID       int
 	Consumes Consumes // pretty sure most classes have consumes to care about.
 	Race     RaceBonusType
+	Class    proto.Class
 
 	InitialStats stats.Stats
 	Stats        stats.Stats
@@ -43,13 +45,14 @@ func (character *Character) AddStats(s stats.Stats) {
 func (character *Character) HasteBonus() float64 {
 	return 1 + (character.Stats[stats.SpellHaste] / 1576)
 }
-func NewCharacter(equipSpec items.EquipmentSpec, race RaceBonusType, consumes Consumes, customStats stats.Stats) Character {
+func NewCharacter(equipSpec items.EquipmentSpec, race RaceBonusType, class proto.Class, consumes Consumes, customStats stats.Stats) Character {
 	equip := items.NewEquipmentSet(equipSpec)
 	// log.Printf("Gear Stats: %s", equip.Stats().Print())
-	initialStats := CalculateTotalStats(race, equip, consumes).Add(customStats)
+	initialStats := CalculateTotalStats(race, class, equip, consumes).Add(customStats)
 
 	character := Character{
 		Race:         race,
+		Class:        class,
 		Consumes:     consumes,
 		InitialStats: initialStats,
 		Stats:        initialStats,
@@ -209,24 +212,16 @@ func (character *Character) EquippedMetaGem(gemID int32) bool {
 	return false
 }
 
-// TODO: This probably should be moved into each class because they all have different base stats.
-func BaseStats(race RaceBonusType) stats.Stats {
-	stats := stats.Stats{
-		stats.Intellect: 104,    // Base int for troll,
-		stats.Mana:      2678,   // level 70 shaman
-		stats.Spirit:    135,    // lvl 70 shaman
-		stats.SpellCrit: 48.576, // base crit for 70 sham
-	}
-	// TODO: Find race differences.
-	switch race {
-	case RaceBonusTypeOrc:
-	}
-	return stats
+type BaseStatsKey struct {
+	Race  RaceBonusType
+	Class proto.Class
 }
 
+var BaseStats = map[BaseStatsKey]stats.Stats{}
+
 // CalculateTotalStats will take a set of equipment and options and add all stats/buffs/etc together
-func CalculateTotalStats(race RaceBonusType, equipment items.Equipment, consumes Consumes) stats.Stats {
-	totalStats := BaseStats(race).Add(equipment.Stats()).Add(consumes.Stats())
+func CalculateTotalStats(race RaceBonusType, class proto.Class, equipment items.Equipment, consumes Consumes) stats.Stats {
+	totalStats := BaseStats[BaseStatsKey{ Race: race, Class: class }].Add(equipment.Stats()).Add(consumes.Stats())
 
 	if race == RaceBonusTypeDraenei {
 		totalStats[stats.SpellHit] += 12.60 // 1% hit
