@@ -12,8 +12,6 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-var GCDMin = DurationFromSeconds(1.0) // default to 1s GCD
-
 func debugFunc(sim *Simulation) func(string, ...interface{}) {
 	return func(s string, vals ...interface{}) {
 		fmt.Printf("[%0.1f] "+s, append([]interface{}{sim.CurrentTime.Seconds()}, vals...)...)

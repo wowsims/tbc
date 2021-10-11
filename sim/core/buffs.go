@@ -16,9 +16,11 @@ type Buffs struct {
 	DivineSpirit     proto.TristateEffect
 
 	// Party class buffs
-	MoonkinAura     proto.TristateEffect
-	ShadowPriestDPS uint16 // adds Mp5 ~ 25% (dps*5%*5sec = 25%)
-	Bloodlust       int32
+	Bloodlust           int32
+	MoonkinAura         proto.TristateEffect
+	DraeneiRacialMelee  bool
+	DraeneiRacialCaster bool
+	ShadowPriestDPS     uint16 // adds Mp5 ~ 25% (dps*5%*5sec = 25%)
 
 	// Totems
 	ManaSpringTotem proto.TristateEffect
@@ -51,8 +53,11 @@ func ProtoToBuffs(inBuff *proto.Buffs) Buffs {
 		BlessingOfKings:  inBuff.BlessingOfKings,
 		BlessingOfWisdom: inBuff.BlessingOfWisdom,
 		DivineSpirit:     inBuff.DivineSpirit,
-		MoonkinAura:      inBuff.MoonkinAura,
-		ShadowPriestDPS:  uint16(inBuff.ShadowPriestDps),
+
+		MoonkinAura:         inBuff.MoonkinAura,
+		DraeneiRacialMelee:  inBuff.DraeneiRacialMelee,
+		DraeneiRacialCaster: inBuff.DraeneiRacialCaster,
+		ShadowPriestDPS:     uint16(inBuff.ShadowPriestDps),
 
 		JudgementOfWisdom:         inBuff.JudgementOfWisdom,
 		ImprovedSealOfTheCrusader: inBuff.ImprovedSealOfTheCrusader,
@@ -124,6 +129,18 @@ func (buffs Buffs) ApplyToPlayer(agent Agent) {
 		stats.SpellCrit: GetTristateValueFloat(buffs.MoonkinAura, 5*SpellCritRatingPerCritChance, 5*SpellCritRatingPerCritChance+20),
 	})
 
+	if (buffs.DraeneiRacialMelee) {
+		character.AddInitialStats(stats.Stats{
+			stats.MeleeHit: 1 * MeleeHitRatingPerHitChance,
+		})
+	}
+
+	if (buffs.DraeneiRacialCaster) {
+		character.AddInitialStats(stats.Stats{
+			stats.SpellHit: 1 * SpellHitRatingPerHitChance,
+		})
+	}
+
 	character.AddInitialStats(stats.Stats{
 		stats.Spirit: GetTristateValueFloat(buffs.DivineSpirit, 50.0, 50.0),
 	})
@@ -150,7 +167,7 @@ func (buffs Buffs) ApplyToPlayer(agent Agent) {
 	if buffs.TotemOfWrath > 0 {
 		character.AddInitialStats(stats.Stats{
 			stats.SpellCrit: 3 * SpellCritRatingPerCritChance * float64(buffs.TotemOfWrath),
-			stats.SpellHit:  37.8 * float64(buffs.TotemOfWrath),
+			stats.SpellHit:  3 * SpellHitRatingPerHitChance * float64(buffs.TotemOfWrath),
 		})
 	}
 	character.AddInitialStats(stats.Stats{
@@ -198,7 +215,7 @@ func AuraJudgementOfWisdom() Aura {
 		ID:      MagicIDJoW,
 		Expires: NeverExpires,
 		OnSpellHit: func(sim *Simulation, cast DirectCastAction, result *DirectCastDamageResult) {
-			if cast.GetActionID().ItemID == ItemIDTLC {
+			if cast.GetActionID().ItemID == ItemIDTheLightningCapacitor {
 				return // TLC cant proc JoW
 			}
 

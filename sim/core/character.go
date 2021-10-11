@@ -43,7 +43,7 @@ func (character *Character) AddStats(s stats.Stats) {
 }
 
 func (character *Character) HasteBonus() float64 {
-	return 1 + (character.Stats[stats.SpellHaste] / 1576)
+	return 1 + (character.Stats[stats.SpellHaste] / (HasteRatingPerHastePercent * 100))
 }
 func NewCharacter(equipSpec items.EquipmentSpec, race RaceBonusType, class proto.Class, consumes Consumes, customStats stats.Stats) Character {
 	equip := items.NewEquipmentSet(equipSpec)
@@ -165,40 +165,43 @@ func (character *Character) ActivateSets(sim *Simulation, agent Agent) []string 
 	return active
 }
 
-const (
-	AtieshMage            = 22589
-	AtieshWarlock         = 22630
-	BraidedEterniumChain  = 24114
-	ChainOfTheTwilightOwl = 24121
-	EyeOfTheNight         = 24116
-	JadePendantOfBlasting = 20966
-	ChaoticSkyfireDiamond = 34220
-)
-
 func (character *Character) AddRaidBuffs(buffs *Buffs) {
 }
 func (character *Character) AddPartyBuffs(buffs *Buffs) {
+	if character.Race == RaceBonusTypeDraenei {
+		class := character.Class
+		if class == proto.Class_ClassHunter ||
+				class == proto.Class_ClassPaladin ||
+				class == proto.Class_ClassWarrior {
+			buffs.DraeneiRacialMelee = true
+		} else if class == proto.Class_ClassMage ||
+				class == proto.Class_ClassPriest ||
+				class == proto.Class_ClassShaman {
+			buffs.DraeneiRacialCaster = true
+		}
+	}
+
 	if character.Consumes.Drums > 0 {
 		buffs.Drums = character.Consumes.Drums
 	}
 
-	if character.Equip[items.ItemSlotMainHand].ID == AtieshMage {
+	if character.Equip[items.ItemSlotMainHand].ID == ItemIDAtieshMage {
 		buffs.AtieshMage += 1
 	}
-	if character.Equip[items.ItemSlotMainHand].ID == AtieshWarlock {
+	if character.Equip[items.ItemSlotMainHand].ID == ItemIDAtieshWarlock {
 		buffs.AtieshWarlock += 1
 	}
 
-	if character.Equip[items.ItemSlotNeck].ID == BraidedEterniumChain {
+	if character.Equip[items.ItemSlotNeck].ID == ItemIDBraidedEterniumChain {
 		buffs.BraidedEterniumChain = true
 	}
-	if character.Equip[items.ItemSlotNeck].ID == ChainOfTheTwilightOwl {
+	if character.Equip[items.ItemSlotNeck].ID == ItemIDChainOfTheTwilightOwl {
 		buffs.ChainOfTheTwilightOwl = true
 	}
-	if character.Equip[items.ItemSlotNeck].ID == EyeOfTheNight {
+	if character.Equip[items.ItemSlotNeck].ID == ItemIDEyeOfTheNight {
 		buffs.EyeOfTheNight = true
 	}
-	if character.Equip[items.ItemSlotNeck].ID == JadePendantOfBlasting {
+	if character.Equip[items.ItemSlotNeck].ID == ItemIDJadePendantOfBlasting {
 		buffs.JadePendantOfBlasting = true
 	}
 }
@@ -221,11 +224,5 @@ var BaseStats = map[BaseStatsKey]stats.Stats{}
 
 // CalculateTotalStats will take a set of equipment and options and add all stats/buffs/etc together
 func CalculateTotalStats(race RaceBonusType, class proto.Class, equipment items.Equipment, consumes Consumes) stats.Stats {
-	totalStats := BaseStats[BaseStatsKey{ Race: race, Class: class }].Add(equipment.Stats()).Add(consumes.Stats())
-
-	if race == RaceBonusTypeDraenei {
-		totalStats[stats.SpellHit] += 12.60 // 1% hit
-	}
-
-	return totalStats
+	return BaseStats[BaseStatsKey{ Race: race, Class: class }].Add(equipment.Stats()).Add(consumes.Stats())
 }

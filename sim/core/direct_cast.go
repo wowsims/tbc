@@ -8,8 +8,6 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-const SpellCritRatingPerCritChance = 22.08
-
 // Input needed to start casting a spell.
 type DirectCastInput struct {
 	ManaCost float64
@@ -194,8 +192,8 @@ func (action DirectCastAction) calculateDirectCastDamage(sim *Simulation, damage
 
 	character := action.GetAgent().GetCharacter()
 
-	hit := 0.83 + character.Stats[stats.SpellHit]/1260.0 + damageInput.BonusHit // 12.6 hit == 1% hit
-	hit = MinFloat(hit, 0.99)                                                    // can't get away from the 1% miss
+	hit := 0.83 + character.Stats[stats.SpellHit]/(SpellHitRatingPerHitChance*100) + damageInput.BonusHit
+	hit = MinFloat(hit, 0.99) // can't get away from the 1% miss
 
 	if sim.Rando.Float64("action hit") >= hit { // Miss
 		return result
