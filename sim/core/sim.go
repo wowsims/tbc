@@ -37,6 +37,7 @@ type Encounter struct {
 type IndividualParams struct {
 	Equip    items.EquipmentSpec
 	Race     RaceBonusType
+	Class    proto.Class
 	Consumes Consumes
 	Buffs    Buffs
 	Options  Options
@@ -87,7 +88,7 @@ func NewIndividualSim(params IndividualParams) *Simulation {
 	sim := newSim(raid, params.Options, 1)
 	sim.IndividualParams = params
 
-	character := NewCharacter(params.Equip, params.Race, params.Consumes, params.CustomStats)
+	character := NewCharacter(params.Equip, params.Race, params.Class, params.Consumes, params.CustomStats)
 	agent := NewAgent(sim, character, params.PlayerOptions)
 	raid.AddPlayer(agent)
 	raid.AddPlayerBuffs()
