@@ -117,6 +117,10 @@ func itemToGoString(itemDeclaration ItemDeclaration, itemResponse WowheadItemRes
 	itemStr += fmt.Sprintf("Phase:%d, ", itemResponse.GetPhase())
 	itemStr += fmt.Sprintf("Quality:proto.ItemQuality_%s, ", proto.ItemQuality(itemResponse.Quality).String())
 
+	if itemResponse.GetUnique() {
+		itemStr += fmt.Sprintf("Unique:true, ")
+	}
+
 	itemStr += fmt.Sprintf("Stats: %s, ", statsToGoString(itemResponse.GetStats()))
 
 	gemSockets := itemResponse.GetGemSockets()
