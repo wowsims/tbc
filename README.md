@@ -1,4 +1,4 @@
-Welcome to the WoW TBC Classic simulator! 
+Welcome to the WoW TBC Classic simulator! If you have questions or are thinking about contributing, [join our discord](https://discord.gg/jJMPr9JWwx "https://discord.gg/jJMPr9JWwx") to chat!
 
 The primary goal of this project is to provide a framework that makes it easy to build a DPS sim for any class/spec, with a polished UI and accurate results. Each community will have ownership / responsibility over their portion of the sim, to ensure accuracy and that their community is represented. When enough classes/specs are implemented, we also hope to build a "raid sim".
 
@@ -6,7 +6,7 @@ Live sims:
 [Elemental Shaman](https://wowsims.github.io/tbc/elemental_shaman/ "https://wowsims.github.io/tbc/elemental_shaman/")
 
 # Installation
-The backend for this project has dependencies on Go, protobuf-compiler and the corresponding Go plugins, and node >= 14.0. To install them on Ubuntu:
+This project has dependencies on Go, protobuf-compiler and the corresponding Go plugins, and node >= 14.0. To install them on Ubuntu:
 
 ```sh
 # Install Go
@@ -81,3 +81,6 @@ Don't forget to write unit tests!
 
 # Implement the UI
 If you've made it this far, you're almost there! The UI is very generalized and it doesn't take much work to build an entire sim UI using our template. TODO
+
+# Deployment
+Thanks to the workflow defined in `.github/workflows/deploy.yml`, pushes to `master` automatically build and deploy a new site so there's nothing to do here. Sit back and appreciate your new sim!
