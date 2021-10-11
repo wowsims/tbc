@@ -57,7 +57,7 @@ func ActivateNexusHorn(sim *core.Simulation, agent core.Agent) core.Aura {
 		ID:      core.MagicIDNexusHorn,
 		Expires: core.NeverExpires,
 		OnSpellHit: func(sim *core.Simulation, cast core.DirectCastAction, result *core.DirectCastDamageResult) {
-			if cast.GetActionID().ItemID == core.ItemIDTLC {
+			if cast.GetActionID().ItemID == core.ItemIDTheLightningCapacitor {
 				return // TLC can't proc Sextant
 			}
 			if !icd.IsOnCD(sim) && result.Crit && sim.Rando.Float64("unmarked") < 0.2 {
@@ -89,7 +89,7 @@ func ActivateSextant(sim *core.Simulation, agent core.Agent) core.Aura {
 		ID:      core.MagicIDSextant,
 		Expires: core.NeverExpires,
 		OnSpellHit: func(sim *core.Simulation, cast core.DirectCastAction, result *core.DirectCastDamageResult) {
-			if cast.GetActionID().ItemID == core.ItemIDTLC {
+			if cast.GetActionID().ItemID == core.ItemIDTheLightningCapacitor {
 				return // TLC can't proc Sextant
 			}
 			if result.Crit && !icd.IsOnCD(sim) && sim.Rando.Float64("unmarked") < 0.2 {

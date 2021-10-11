@@ -8,7 +8,7 @@ import (
 )
 
 func init() {
-	core.AddActiveItem(core.ItemIDTLC, core.ActiveItem{Activate: ActivateTLC, ActivateCD: core.NeverExpires, SharedID: core.MagicIDAtkTrinket})
+	core.AddActiveItem(core.ItemIDTheLightningCapacitor, core.ActiveItem{Activate: ActivateTLC, ActivateCD: core.NeverExpires, SharedID: core.MagicIDAtkTrinket})
 }
 
 func ActivateTLC(sim *core.Simulation, agent core.Agent) core.Aura {
@@ -46,7 +46,7 @@ type LightningCapacitorCast struct {
 
 func (lcc LightningCapacitorCast) GetActionID() core.ActionID {
 	return core.ActionID{
-		ItemID: core.ItemIDTLC,
+		ItemID: core.ItemIDTheLightningCapacitor,
 	}
 }
 

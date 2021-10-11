@@ -8,9 +8,6 @@ import (
 	"github.com/wowsims/tbc/sim/core/items"
 )
 
-// TODO: Find a better place for this.
-const ItemIDTLC = 28785
-
 // ItemActivation needs the state from simulator, party, and agent
 //  because items can impact all 3. (potions, drums, JC necks, etc)
 type ItemActivation func(*Simulation, Agent) Aura
