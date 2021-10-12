@@ -14,9 +14,10 @@ import { IndividualSimRequest, IndividualSimResult } from './proto/api.js';
 import { StatWeightsRequest, StatWeightsResult } from './proto/api.js';
 
 import { repoName } from './resources.js';
+import { specDirectory } from './resources.js';
 import { wait } from './utils.js';
 
-const SIM_WORKER_URL = `/${repoName}/sim_worker.js`;
+const SIM_WORKER_URL = `/${repoName}/${specDirectory}/sim_worker.js`;
 
 export class WorkerPool {
 	private workers: Array<SimWorker>;
