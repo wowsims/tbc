@@ -1,5 +1,7 @@
 import { intersection } from '/tbc/core/utils.js';
 
+import { Player } from '/tbc/core/proto/api.js';
+import { PlayerOptions } from '/tbc/core/proto/api.js';
 import { Class } from '/tbc/core/proto/common.js';
 import { Enchant } from '/tbc/core/proto/common.js';
 import { Gem } from '/tbc/core/proto/common.js';
@@ -112,6 +114,39 @@ export const specToEligibleRaces: Record<Spec, Array<Race>> = {
   [Spec.SpecBalanceDruid]: druidRaces,
   [Spec.SpecElementalShaman]: shamanRaces,
 };
+
+// Returns a copy of playerOptions, with the class field set.
+export function withSpecProto<SpecType extends Spec>(
+    playerOptions: PlayerOptions,
+    rotation: SpecRotation<SpecType>,
+    talents: SpecTalents<SpecType>,
+    specOptions: SpecOptions<SpecType>): PlayerOptions {
+  const copy = PlayerOptions.clone(playerOptions);
+  if (BalanceDruidRotation.is(rotation)) {
+		copy.class = Class.ClassDruid;
+    copy.spec = {
+      oneofKind: 'balanceDruid',
+      balanceDruid: BalanceDruid.create({
+        rotation: rotation,
+        talents: talents as DruidTalents,
+        options: specOptions as BalanceDruidOptions,
+      }),
+    };
+  } else if (ElementalShamanRotation.is(rotation)) {
+		copy.class = Class.ClassShaman;
+    copy.spec = {
+      oneofKind: 'elementalShaman',
+      elementalShaman: ElementalShaman.create({
+        rotation: rotation,
+        talents: talents as ShamanTalents,
+        options: specOptions as ElementalShamanOptions,
+      }),
+    };
+  } else {
+    throw new Error('Unrecognized talents with options: ' + PlayerOptions.toJsonString(playerOptions));
+  }
+  return copy;
+}
 
 const itemTypeToSlotsMap: Partial<Record<ItemType, Array<ItemSlot>>> = {
   [ItemType.ItemTypeUnknown]: [],

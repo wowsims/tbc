@@ -6,6 +6,7 @@ OUT_DIR=dist/tbc
 # Make everything. Keep this first so it's the default rule.
 $(OUT_DIR): elemental_shaman
 
+# Add new sim rules here! Don't forget to add it as a dependency to the default rule above.
 elemental_shaman: $(OUT_DIR)/elemental_shaman/index.js $(OUT_DIR)/elemental_shaman/index.css $(OUT_DIR)/elemental_shaman/index.html $(OUT_DIR)/elemental_shaman/lib.wasm $(OUT_DIR)/elemental_shaman/sim_worker.js detailed_results
 
 detailed_results: $(OUT_DIR)/detailed_results/index.js $(OUT_DIR)/detailed_results/index.css $(OUT_DIR)/detailed_results/index.html

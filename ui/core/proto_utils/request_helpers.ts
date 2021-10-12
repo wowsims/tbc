@@ -7,8 +7,6 @@ import { Spec } from '/tbc/core/proto/common.js';
 
 import { Player } from '/tbc/core/proto/api.js';
 import { PlayerOptions } from '/tbc/core/proto/api.js';
-import { BalanceDruid, BalanceDruid_Rotation as BalanceDruidRotation, DruidTalents, BalanceDruid_Options as BalanceDruidOptions} from '/tbc/core/proto/druid.js';
-import { ElementalShaman, ElementalShaman_Rotation as ElementalShamanRotation, ShamanTalents, ElementalShaman_Options as ElementalShamanOptions } from '/tbc/core/proto/shaman.js';
 
 import { ComputeStatsRequest, ComputeStatsResult } from '/tbc/core/proto/api.js';
 import { IndividualSimRequest, IndividualSimResult } from '/tbc/core/proto/api.js';
@@ -18,6 +16,7 @@ import { Stats } from './stats.js';
 import { SpecRotation } from './utils.js';
 import { SpecTalents } from './utils.js';
 import { SpecOptions } from './utils.js';
+import { withSpecProto } from './utils.js';
 
 export function makeComputeStatsRequest<SpecType extends Spec>(
     buffs: Buffs,
@@ -68,37 +67,4 @@ export function makeIndividualSimRequest<SpecType extends Spec>(
     iterations: iterations,
     debug: debug,
   });
-}
-
-// Returns a copy of playerOptions, with the class field set.
-function withSpecProto<SpecType extends Spec>(
-    playerOptions: PlayerOptions,
-    rotation: SpecRotation<SpecType>,
-    talents: SpecTalents<SpecType>,
-    specOptions: SpecOptions<SpecType>): PlayerOptions {
-  const copy = PlayerOptions.clone(playerOptions);
-  if (BalanceDruidRotation.is(rotation)) {
-		copy.class = Class.ClassDruid;
-    copy.spec = {
-      oneofKind: 'balanceDruid',
-      balanceDruid: BalanceDruid.create({
-        rotation: rotation,
-        talents: talents as DruidTalents,
-        options: specOptions as BalanceDruidOptions,
-      }),
-    };
-  } else if (ElementalShamanRotation.is(rotation)) {
-		copy.class = Class.ClassShaman;
-    copy.spec = {
-      oneofKind: 'elementalShaman',
-      elementalShaman: ElementalShaman.create({
-        rotation: rotation,
-        talents: talents as ShamanTalents,
-        options: specOptions as ElementalShamanOptions,
-      }),
-    };
-  } else {
-    throw new Error('Unrecognized talents with options: ' + PlayerOptions.toJsonString(playerOptions));
-  }
-  return copy;
 }
