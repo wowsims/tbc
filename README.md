@@ -55,7 +55,7 @@ So you want to make a new sim for your class/spec! The basic steps are as follow
 This project uses [Google Protocol Buffers](https://developers.google.com/protocol-buffers/docs/gotutorial "https://developers.google.com/protocol-buffers/docs/gotutorial") to pass data between the sim and the UI. TLDR; Describe data strctures in .proto files, and the tool can generate code in any programming language. It lets us avoid repeating the same code in our Go and Typescript worlds without losing type safety.
 
 For a new sim, make the following changes:
-  - Add a new value to the `Spec` enum in proto/common.proto.
+  - Add a new value to the `Spec` enum in proto/common.proto. __NOTE: The name you give to this enum value is not just a name, it is used in our templating system. This guide will refer to this name as `$SPEC` elsewhere.__
   - Add a 'proto/YOUR_CLASS.proto' file if it doesn't already exist and add data messages containing all the class/spec-specific information needed to run your sim. In general, there will be 3 pieces of information you need:
     - Talents
     - Rotation (the order in which your sim will use spells/abilities)
@@ -80,7 +80,23 @@ Read through the core code and some examples from other classes/specs to get a f
 Don't forget to write unit tests!
 
 # Implement the UI
-If you've made it this far, you're almost there! The UI is very generalized and it doesn't take much work to build an entire sim UI using our template. TODO
+If you've made it this far, you're almost there! The UI is very generalized and it doesn't take much work to build an entire sim UI using our templating system. To use it:
+  - Create a directory 'ui/$SPEC'. So if your Spec enum value was named, 'elemental_shaman', create a directory, 'ui/elemental_shaman'.
+  - This directory must contain a file, 'index.ts'.
+  - This directory must contain a file, 'index.scss'.
+
+No .html is needed, it will be generated based on `ui/index_template.html` and the `$SPEC` name.
+
+Steps for building a new UI:
+  - Modify `ui/core/proto_utils/utils.ts` to include boilerplate for your `$SPEC` name.
+  - If it doesn't already exist, create a Talents picker at `ui/core/talents/YOUR_CLASS.ts` for your class. This part can be annoying but it isn't difficult.
+    - When filling out the `spellIds` field, note that talent levels will sometimes (but not always) have incremental spell IDs. When `spellIds.length < maxPoints` the code will assume the remaining IDs are incremental from the last one, so only fill as many as necessary.
+    - Note that the `fieldName` field must match a field name on the talents proto message you defined in `proto/YOUR_CLASS.proto`. This maps the talents onto the proto for making sim requests.
+    - When the new talents are done, update `ui/core/talents/factory.ts` to map the spec enum onto the talents picker.
+  - Configure the UI by writing `ui/$SPEC/index.ts` and `ui/$SPEC/index.scss`. Start by copying from another spec's code, and change the configuration as needed.
+  - Finally, add a rule to the `makefile` for the new sim site. Just copy from the other site rules already there and change the `$SPEC` names.
+
+When you're ready to try out the site, run `make host` and navigate to `http://localhost:8080/tbc/$SPEC`.
 
 # Deployment
 Thanks to the workflow defined in `.github/workflows/deploy.yml`, pushes to `master` automatically build and deploy a new site so there's nothing to do here. Sit back and appreciate your new sim!
