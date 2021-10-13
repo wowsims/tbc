@@ -235,6 +235,28 @@ td, th {
   align-items: flex-end;
 }
 
+.SelfBuffs-icon-picker {
+  display: grid;
+}
+
+.OtherBuffs-icon-picker {
+  display: grid;
+}
+
+.Consumes-icon-picker {
+  display: grid;
+}
+
+.Debuffs-icon-picker {
+  display: grid;
+}
+
+.Rotation-section > div, .Other-section > div {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
 .saved-encounter-manager {
   display: inline-block;
   text-align: left;

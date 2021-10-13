@@ -33,25 +33,34 @@ import { SimUI, SimUIConfig } from '/tbc/core/sim_ui.js';
 declare var tippy: any;
 
 
+export interface IconSection {
+	tooltip?: string,
+	icons: Array<IconInput>,
+}
+
+export interface InputSection {
+	tooltip?: string,
+	inputs: Array<{
+		type: 'number',
+		cssClass: string,
+		config: NumberPickerConfig,
+	} |
+	{
+		type: 'enum',
+		cssClass: string,
+		config: EnumPickerConfig,
+	}>,
+}
+
 export interface DefaultThemeConfig<SpecType extends Spec> extends SimUIConfig<SpecType> {
   displayStats: Array<Stat>;
-  iconSections: Record<string, {
-		tooltip?: string,
-		icons: Array<IconInput>,
-	}>;
-  otherSections: Record<string, {
-		tooltip?: string,
-		inputs: Array<{
-      type: 'number',
-      cssClass: string,
-      config: NumberPickerConfig,
-    } |
-    {
-      type: 'enum',
-      cssClass: string,
-      config: EnumPickerConfig,
-    }>,
-  }>;
+	selfBuffInputs: IconSection;
+	buffInputs: IconSection;
+	debuffInputs: IconSection;
+	consumeInputs: IconSection;
+	rotationInputs: InputSection;
+	otherInputs?: InputSection;
+  additionalSections?: Record<string, InputSection>;
   showTargetArmor: boolean;
   showNumTargets: boolean;
 	freezeTalents: boolean;
@@ -116,8 +125,8 @@ export class DefaultTheme<SpecType extends Spec> extends SimUI<SpecType> {
 		}
 
     const settingsTab = document.getElementsByClassName('settings-inputs')[0] as HTMLElement;
-    Object.keys(config.iconSections).forEach(sectionName => {
-      const sectionConfig = config.iconSections[sectionName];
+
+		const makeIconSection = (sectionName: string, sectionConfig: IconSection) => {
 			const sectionCssPrefix = sectionName.replace(/\s+/g, '');
 
       const sectionElem = document.createElement('section');
@@ -132,11 +141,13 @@ export class DefaultTheme<SpecType extends Spec> extends SimUI<SpecType> {
       settingsTab.appendChild(sectionElem);
 
       const iconPicker = new IconPicker(sectionElem, sectionCssPrefix + '-icon-picker', this.sim, sectionConfig.icons, this);
-    });
+		};
+		makeIconSection('Self Buffs', config.selfBuffInputs);
+		makeIconSection('Other Buffs', config.buffInputs);
+		makeIconSection('Debuffs', config.debuffInputs);
+		makeIconSection('Consumes', config.consumeInputs);
 
-    Object.keys(config.otherSections).forEach(sectionName => {
-      const sectionConfig = config.otherSections[sectionName];
-
+		const makeInputSection = (sectionName: string, sectionConfig: InputSection) => {
       const sectionElem = document.createElement('section');
       sectionElem.classList.add('settings-section', sectionName + '-section');
       sectionElem.innerHTML = `<label>${sectionName}</label>`;
@@ -155,7 +166,15 @@ export class DefaultTheme<SpecType extends Spec> extends SimUI<SpecType> {
           const picker = new EnumPicker(sectionElem, this.sim, inputConfig.config);
         }
       });
-    });
+		};
+		makeInputSection('Rotation', config.rotationInputs);
+		if (config.otherInputs?.inputs.length) {
+			makeInputSection('Other', config.otherInputs);
+		}
+
+		for (const [sectionName, sectionConfig] of Object.entries(config.additionalSections || {})) {
+			makeInputSection(sectionName, sectionConfig);
+    };
 
     const races = specToEligibleRaces[this.sim.spec];
     const racePicker = new EnumPicker(this.parentElem.getElementsByClassName('race-picker')[0] as HTMLElement, this.sim, {
