@@ -37,10 +37,10 @@ git clone https://github.com/wowsims/tbc.git
 cd tbc
 
 # Build the docker images (only need to run these once)
-docker build --tag wowsims-tbc-base -f docker/Dockerfile.base ./docker
-docker build --tag wowsims-tbc-items -f docker/Dockerfile.items ./docker
-docker build --tag wowsims-tbc-test -f docker/Dockerfile.test ./docker
-docker build --tag wowsims-tbc-host -f docker/Dockerfile.host ./docker
+docker build --tag wowsims-tbc-base -f docker/Dockerfile.base .
+docker build --tag wowsims-tbc-items -f docker/Dockerfile.items .
+docker build --tag wowsims-tbc-test -f docker/Dockerfile.test .
+docker build --tag wowsims-tbc-host -f docker/Dockerfile.host .
 
 # ... update the items ...
 
