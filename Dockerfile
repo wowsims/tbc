@@ -19,9 +19,3 @@ RUN . "$NVM_DIR/nvm.sh" && nvm alias default v${NODE_VERSION}
 ENV PATH="/root/.nvm/versions/node/v${NODE_VERSION}/bin/:${PATH}"
 
 EXPOSE 8080/tcp
-
-#COPY package.json ./
-#COPY package-lock.json ./
-#RUN npm install --prefix / .
-#
-#CMD ln -s /node_modules ./node_modules ; make host
