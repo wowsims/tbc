@@ -1,5 +1,0 @@
-# syntax=docker/dockerfile:1
-
-FROM wowsims-tbc-base:latest
-
-CMD make test
