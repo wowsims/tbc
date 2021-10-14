@@ -36,34 +36,33 @@ Alternatively, install Docker and your workflow will look something like this:
 git clone https://github.com/wowsims/tbc.git
 cd tbc
 
-# Build the docker images (only need to run these once)
-docker build --tag wowsims-tbc-base -f docker/Dockerfile.base .
-docker build --tag wowsims-tbc-items -f docker/Dockerfile.items .
-docker build --tag wowsims-tbc-test -f docker/Dockerfile.test .
-docker build --tag wowsims-tbc-host -f docker/Dockerfile.host .
+# Build the docker image and install npm dependencies (only need to run these once).
+docker build --tag wowsims-tbc .
+docker run --rm -v $(pwd):/tbc wowsims-tbc npm install
+
+# Now you can run the commands as shown in the Commands sections, preceding everything with, "docker run --rm -it -p 8080:8080 -v $(pwd):/tbc wowsims-tbc".
+# For convenience, set this as an environment variable:
+TBC_CMD="docker run --rm -it -p 8080:8080 -v $(pwd):/tbc wowsims-tbc"
 
 # ... update the items ...
 
 # Update items
-docker run --rm -v $(pwd):/tbc wowsims-tbc-items
+$TBC_CMD make items
 
 # ... do some coding on the sim ...
 
 # Run tests
-docker run --rm -v $(pwd):/tbc wowsims-tbc-test
+$TBC_CMD make test
 
 # ... do some coding on the UI ...
 
 # Host a local site
-docker run --rm -t -i -p 8080:8080 -v $(pwd):/tbc wowsims-tbc-host
+$TBC_CMD make host
 ```
 
 # Commands
-We use a makefile for our build system. If not using Docker, you'll use these commands:
+We use a makefile for our build system. These commands will usually be all you need while developing for this project:
 ```sh
-# Build everything
-make
-
 # Generate code for items. Only necessary if you changed the items generator.
 make items
 
@@ -73,6 +72,9 @@ make test
 # Host a local version of the UI at http://localhost:8080. Visit it by pointing a browser to
 # http://localhost:8080/tbc/YOUR_SPEC_HERE, where YOUR_SPEC_HERE is the directory under ui/ with your custom code.
 make host
+
+# Delete all generated files (.pb.go and .ts proto files, and dist/)
+make clean
 ```
 
 # Adding a Sim
