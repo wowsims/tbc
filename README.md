@@ -28,7 +28,7 @@ npm install
 ```
 
 ## Windows
-If you want to develop on Windows, we recommend setting up Docker using [this guide](https://ubuntu.com/tutorials/windows-ubuntu-hyperv-containers#1-overview "https://ubuntu.com/tutorials/windows-ubuntu-hyperv-containers#1-overview") and then following the Docker instructions below.
+If you want to develop on Windows, we recommend setting up Docker using [this guide](https://docs.docker.com/desktop/windows/wsl/ "https://docs.docker.com/desktop/windows/wsl/") and then following the Docker instructions below.
 
 ## Docker
 Alternatively, install Docker and your workflow will look something like this:
