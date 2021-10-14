@@ -45,17 +45,17 @@ docker build --tag wowsims-tbc-host -f docker/Dockerfile.host ./docker
 # ... update the items ...
 
 # Update items
-docker run -v $(pwd):/tbc wowsims-tbc-items
+docker run --rm -v $(pwd):/tbc wowsims-tbc-items
 
 # ... do some coding on the sim ...
 
 # Run tests
-docker run -v $(pwd):/tbc wowsims-tbc-test
+docker run --rm -v $(pwd):/tbc wowsims-tbc-test
 
 # ... do some coding on the UI ...
 
 # Host a local site
-docker run -t -i -p 8080:8080 -v $(pwd):/tbc wowsims-tbc-host
+docker run --rm -t -i -p 8080:8080 -v $(pwd):/tbc wowsims-tbc-host
 ```
 
 # Commands
