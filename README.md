@@ -27,8 +27,11 @@ cd tbc
 npm install
 ```
 
+## Windows
+If you want to develop on Windows, we recommend setting up Docker using [this guide](https://ubuntu.com/tutorials/windows-ubuntu-hyperv-containers#1-overview "https://ubuntu.com/tutorials/windows-ubuntu-hyperv-containers#1-overview) and then following the Docker instructions below.
+
 ## Docker
-Alternatively, just install Docker and your workflow will look something like this:
+Alternatively, install Docker and your workflow will look something like this:
 ```sh
 git clone https://github.com/wowsims/tbc.git
 cd tbc
