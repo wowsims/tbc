@@ -79,14 +79,14 @@ make clean
 
 # Adding a Sim
 So you want to make a new sim for your class/spec! The basic steps are as follows:
- - [Create the proto to describe the interface between sim and UI.](#create-the-proto-interface-between-sim-and-ui)
+ - [Create the proto interface between sim and UI.](#create-the-proto-interface-between-sim-and-ui)
  - [Add items your spec uses to the Items Generator.](#add-items-to-the-items-generator)
  - [Implement the sim.](#implement-the-sim)
  - [Implement the UI.](#implement-the-ui)
 
 
 ## Create the proto interface between Sim and UI
-This project uses [Google Protocol Buffers](https://developers.google.com/protocol-buffers/docs/gotutorial "https://developers.google.com/protocol-buffers/docs/gotutorial") to pass data between the sim and the UI. TLDR; Describe data strctures in .proto files, and the tool can generate code in any programming language. It lets us avoid repeating the same code in our Go and Typescript worlds without losing type safety.
+This project uses [Google Protocol Buffers](https://developers.google.com/protocol-buffers/docs/gotutorial "https://developers.google.com/protocol-buffers/docs/gotutorial") to pass data between the sim and the UI. TLDR; Describe data structures in .proto files, and the tool can generate code in any programming language. It lets us avoid repeating the same code in our Go and Typescript worlds without losing type safety.
 
 For a new sim, make the following changes:
   - Add a new value to the `Spec` enum in proto/common.proto. __NOTE: The name you give to this enum value is not just a name, it is used in our templating system. This guide will refer to this name as `$SPEC` elsewhere.__
