@@ -6,8 +6,9 @@ Live sims:
 [Elemental Shaman](https://wowsims.github.io/tbc/elemental_shaman/ "https://wowsims.github.io/tbc/elemental_shaman/")
 
 # Installation
-This project has dependencies on Go, protobuf-compiler and the corresponding Go plugins, and node >= 14.0. To install them on Ubuntu:
+This project has dependencies on Go, protobuf-compiler and the corresponding Go plugins, and node >= 14.0.
 
+## Ubuntu
 ```sh
 # Install Go
 sudo apt install golang-go
@@ -26,8 +27,36 @@ cd tbc
 npm install
 ```
 
+## Docker
+Alternatively, just install Docker and your workflow will look something like this:
+```sh
+git clone https://github.com/wowsims/tbc.git
+cd tbc
+
+# Build the docker images (only need to run these once)
+docker build --tag wowsims-tbc-base -f docker/Dockerfile.base ./docker
+docker build --tag wowsims-tbc-items -f docker/Dockerfile.items ./docker
+docker build --tag wowsims-tbc-test -f docker/Dockerfile.test ./docker
+docker build --tag wowsims-tbc-host -f docker/Dockerfile.host ./docker
+
+# ... update the items ...
+
+# Update items
+docker run -v $(pwd):/tbc wowsims-tbc-items
+
+# ... do some coding on the sim ...
+
+# Run tests
+docker run -v $(pwd):/tbc wowsims-tbc-test
+
+# ... do some coding on the UI ...
+
+# Host a local site
+docker run -t -i -p 8080:8080 -v $(pwd):/tbc wowsims-tbc-host
+```
+
 # Commands
-We use a makefile for our build system. These commands should be all that's needed:
+We use a makefile for our build system. If not using Docker, you'll use these commands:
 ```sh
 # Build everything
 make
