@@ -83,7 +83,7 @@ So you want to make a new sim for your class/spec! The basic steps are as follow
  - [Implement the UI.](#implement-the-ui)
 
 
-# Create the proto interface between Sim and UI
+## Create the proto interface between Sim and UI
 This project uses [Google Protocol Buffers](https://developers.google.com/protocol-buffers/docs/gotutorial "https://developers.google.com/protocol-buffers/docs/gotutorial") to pass data between the sim and the UI. TLDR; Describe data strctures in .proto files, and the tool can generate code in any programming language. It lets us avoid repeating the same code in our Go and Typescript worlds without losing type safety.
 
 For a new sim, make the following changes:
@@ -96,10 +96,10 @@ For a new sim, make the following changes:
 
 That's it! Now when you run `make` there will be generated .go and .ts code in `sim/core/proto` and `ui/core/proto` respectively. If you aren't familiar with protos, take a quick look at them to see what's happening.
 
-# Add items to the Items Generator
+## Add items to the Items Generator
 `generate_items/item_declarations.go` contains a list of all items known to the sim, as well as which sims that care about each item. Add the items needed by your sim and make sure your spec is listed under all of them. Run `make items` when you're done.
 
-# Implement the Sim
+## Implement the Sim
 This step is where most of the magic happens. A few good places to start understanding the sim code:
   - `sim/core/agent.go` Agent is the interface you'll be implementing. This file also contains AgentAction, which you'll implement for each spell/ability.
   - `sim/core/character.go` In this sim, a Character holds all the stats/settings/etc common to any WoW character.
@@ -111,7 +111,7 @@ Read through the core code and some examples from other classes/specs to get a f
 
 Don't forget to write unit tests!
 
-# Implement the UI
+## Implement the UI
 If you've made it this far, you're almost there! The UI is very generalized and it doesn't take much work to build an entire sim UI using our templating system. To use it:
   - Create a directory 'ui/$SPEC'. So if your Spec enum value was named, 'elemental_shaman', create a directory, 'ui/elemental_shaman'.
   - This directory must contain a file, 'index.ts'.
