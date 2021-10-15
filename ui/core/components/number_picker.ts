@@ -1,58 +1,42 @@
 import { Sim } from '/tbc/core/sim.js';
 import { TypedEvent } from '/tbc/core/typed_event.js';
 
-import { Component } from './component.js';
-
-declare var tippy: any;
+import { Input, InputConfig } from './input.js';
 
 /**
  * Data for creating a number picker.
  */
-export type NumberPickerConfig = {
-  label?: string,
-	labelTooltip?: string,
-  defaultValue?: number,
-
-  changedEvent: (sim: Sim<any>) => TypedEvent<any>;
-  getValue: (sim: Sim<any>) => number;
-  setValue: (sim: Sim<any>, newValue: number) => void;
-};
+export interface NumberPickerConfig extends InputConfig<number> {
+}
 
 // UI element for picking an arbitrary number field.
-export class NumberPicker extends Component {
+export class NumberPicker extends Input<number> {
+	private readonly inputElem: HTMLInputElement;
+
   constructor(parent: HTMLElement, sim: Sim<any>, config: NumberPickerConfig) {
-    super(parent, 'number-picker-root');
+    super(parent, 'number-picker-root', sim, config);
 
-    if (config.label) {
-      const label = document.createElement('span');
-      label.classList.add('number-picker-label');
-      label.textContent = config.label;
-      this.rootElem.appendChild(label);
+    this.inputElem = document.createElement('input');
+    this.inputElem.type = "number";
+    this.inputElem.classList.add('number-picker-input');
+    this.rootElem.appendChild(this.inputElem);
 
-			if (config.labelTooltip) {
-				tippy(label, {
-					'content': config.labelTooltip,
-					'allowHTML': true,
-				});
-			}
-    }
+		this.init();
 
-    const input = document.createElement('input');
-    input.type = "number";
-    input.classList.add('number-picker-input');
-    this.rootElem.appendChild(input);
-
-    input.value = String(config.getValue(sim));
-    config.changedEvent(sim).on(() => {
-      input.value = String(config.getValue(sim));
-    });
-    
-    if (config.defaultValue) {
-      config.setValue(sim, config.defaultValue);
-    }
-
-    input.addEventListener('input', event => {
-      config.setValue(sim, parseInt(input.value || '') || 0);
+    this.inputElem.addEventListener('input', event => {
+			this.inputChanged();
     });
   }
+
+	getInputElem(): HTMLElement {
+		return this.inputElem;
+	}
+
+	getInputValue(): number {
+		return parseInt(this.inputElem.value || '') || 0;
+	}
+
+	setInputValue(newValue: number) {
+		this.inputElem.value = String(newValue);
+	}
 }

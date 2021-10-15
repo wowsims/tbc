@@ -35,6 +35,7 @@ export const NumStartingPotions = {
 			newConsumes.numStartingPotions = newValue;
 			sim.setConsumes(newConsumes);
 		},
+		enableWhen: (sim: Sim<any>) => sim.getConsumes().startingPotion != Potions.UnknownPotion,
 	},
 };
 

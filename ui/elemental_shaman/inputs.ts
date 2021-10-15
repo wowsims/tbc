@@ -62,6 +62,7 @@ export const ElementalShamanRotationConfig = {
 					newRotation.lbsPerCl = newValue;
 					sim.setRotation(newRotation);
 				},
+				enableWhen: (sim: Sim<Spec.SpecElementalShaman>) => sim.getRotation().type == RotationType.FixedLBCL,
 			},
 		},
 	],
