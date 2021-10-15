@@ -30,6 +30,7 @@ import { newTalentsPicker } from '/tbc/core/talents/factory.js';
 
 import { SimUI, SimUIConfig } from '/tbc/core/sim_ui.js';
 
+declare var Muuri: any;
 declare var tippy: any;
 
 
@@ -126,38 +127,28 @@ export class DefaultTheme<SpecType extends Spec> extends SimUI<SpecType> {
 
     const settingsTab = document.getElementsByClassName('settings-inputs')[0] as HTMLElement;
 
-		const makeIconSection = (sectionName: string, sectionConfig: IconSection) => {
-			const sectionCssPrefix = sectionName.replace(/\s+/g, '');
-
-      const sectionElem = document.createElement('section');
-      sectionElem.classList.add('settings-section', sectionCssPrefix + '-section');
-      sectionElem.innerHTML = `<label>${sectionName}</label>`;
+		const configureIconSection = (sectionElem: HTMLElement, sectionConfig: IconSection) => {
 			if (sectionConfig.tooltip) {
 				tippy(sectionElem, {
 					'content': sectionConfig.tooltip,
 					'allowHTML': true,
 				});
 			}
-      settingsTab.appendChild(sectionElem);
 
-      const iconPicker = new IconPicker(sectionElem, sectionCssPrefix + '-icon-picker', this.sim, sectionConfig.icons, this);
+      const iconPicker = new IconPicker(sectionElem, this.sim, sectionConfig.icons, this);
 		};
-		makeIconSection('Self Buffs', config.selfBuffInputs);
-		makeIconSection('Other Buffs', config.buffInputs);
-		makeIconSection('Debuffs', config.debuffInputs);
-		makeIconSection('Consumes', config.consumeInputs);
+    configureIconSection(this.parentElem.getElementsByClassName('self-buffs-section')[0] as HTMLElement, config.selfBuffInputs);
+    configureIconSection(this.parentElem.getElementsByClassName('buffs-section')[0] as HTMLElement, config.buffInputs);
+    configureIconSection(this.parentElem.getElementsByClassName('debuffs-section')[0] as HTMLElement, config.debuffInputs);
+    configureIconSection(this.parentElem.getElementsByClassName('consumes-section')[0] as HTMLElement, config.consumeInputs);
 
-		const makeInputSection = (sectionName: string, sectionConfig: InputSection) => {
-      const sectionElem = document.createElement('section');
-      sectionElem.classList.add('settings-section', sectionName + '-section');
-      sectionElem.innerHTML = `<label>${sectionName}</label>`;
+		const configureInputSection = (sectionElem: HTMLElement, sectionConfig: InputSection) => {
 			if (sectionConfig.tooltip) {
 				tippy(sectionElem, {
 					'content': sectionConfig.tooltip,
 					'allowHTML': true,
 				});
 			}
-      settingsTab.appendChild(sectionElem);
 
       sectionConfig.inputs.forEach(inputConfig => {
         if (inputConfig.type == 'number') {
@@ -167,17 +158,25 @@ export class DefaultTheme<SpecType extends Spec> extends SimUI<SpecType> {
         }
       });
 		};
-		makeInputSection('Rotation', config.rotationInputs);
+    configureInputSection(this.parentElem.getElementsByClassName('rotation-section')[0] as HTMLElement, config.rotationInputs);
 		if (config.otherInputs?.inputs.length) {
-			makeInputSection('Other', config.otherInputs);
+      configureInputSection(this.parentElem.getElementsByClassName('other-settings-section')[0] as HTMLElement, config.otherInputs);
 		}
 
+		const makeInputSection = (sectionName: string, sectionConfig: InputSection) => {
+			const sectionCssPrefix = sectionName.replace(/\s+/g, '');
+      const sectionElem = document.createElement('section');
+      sectionElem.classList.add('settings-section', sectionCssPrefix + '-section');
+      sectionElem.innerHTML = `<label>${sectionName}</label>`;
+      settingsTab.appendChild(sectionElem);
+      configureInputSection(sectionElem, sectionConfig);
+    };
 		for (const [sectionName, sectionConfig] of Object.entries(config.additionalSections || {})) {
 			makeInputSection(sectionName, sectionConfig);
     };
 
     const races = specToEligibleRaces[this.sim.spec];
-    const racePicker = new EnumPicker(this.parentElem.getElementsByClassName('race-picker')[0] as HTMLElement, this.sim, {
+    const racePicker = new EnumPicker(this.parentElem.getElementsByClassName('race-section')[0] as HTMLElement, this.sim, {
 			values: races.map(race => {
 				return {
 					name: raceNames[race],
@@ -227,6 +226,19 @@ export class DefaultTheme<SpecType extends Spec> extends SimUI<SpecType> {
         },
       });
     }
+
+    // Init Muuri layout only when settings tab is clicked, because it needs the elements
+    // to be shown so it can calculate sizes.
+    let muuriInit = false;
+    document.getElementById('settings-tab-toggle')!.addEventListener('click', event => {
+      if (muuriInit) {
+        return;
+      }
+      muuriInit = true;
+      setTimeout(() => {
+        new Muuri('.settings-inputs');
+      }, 200); // Magic amount of time before Muuri init seems to work
+    });
   }
 
   async init(): Promise<void> {
@@ -361,7 +373,7 @@ const layoutHTML = `
   <section class="default-main">
     <ul class="nav nav-tabs">
       <li class="active"><a data-toggle="tab" href="#gear-tab">Gear</a></li>
-      <li><a data-toggle="tab" href="#settings-tab">Settings</a></li>
+      <li><a id="settings-tab-toggle" data-toggle="tab" href="#settings-tab">Settings</a></li>
       <li><a data-toggle="tab" href="#talents-tab">Talents</a></li>
       <li><a data-toggle="tab" href="#detailed-results-tab">Detailed Results</a></li>
       <li><a data-toggle="tab" href="#log-tab">Log</a></li>
@@ -385,25 +397,51 @@ const layoutHTML = `
           </div>
         </div>
       </div>
-      <div id="settings-tab" class="tab-pane fade"">
-        <div class="settings-tab">
-          <div class="settings-inputs">
-            <div class="settings-left-bar">
-              <section class="settings-section encounter-section">
-                <label>Encounter</label>
-              </section>
-              <section class="settings-section race-picker">
-                <label>Race</label>
-              </section>
-            </div>
+      <div id="settings-tab" class="settings-tab tab-pane fade"">
+        <div class="settings-inputs">
+          <div class="settings-section-container">
+            <section class="settings-section encounter-section">
+              <label>Encounter</label>
+            </section>
+            <section class="settings-section race-section">
+              <label>Race</label>
+            </section>
+            <section class="settings-section rotation-section">
+              <label>Rotation</label>
+            </section>
           </div>
-          <div class="settings-bottom-bar">
-            <div class="saved-encounter-manager">
-            </div>
-            <div class="saved-rotation-manager">
-            </div>
-            <div class="saved-settings-manager">
-            </div>
+          <div class="settings-section-container">
+            <section class="settings-section self-buffs-section">
+              <label>Self Buffs</label>
+            </section>
+          </div>
+          <div class="settings-section-container">
+            <section class="settings-section buffs-section">
+              <label>Other Buffs</label>
+            </section>
+          </div>
+          <div class="settings-section-container">
+            <section class="settings-section consumes-section">
+              <label>Consumes</label>
+            </section>
+          </div>
+          <div class="settings-section-container">
+            <section class="settings-section debuffs-section">
+              <label>Debuffs</label>
+            </section>
+          </div>
+          <div class="settings-section-container">
+            <section class="settings-section other-settings-section">
+              <label>Other</label>
+            </section>
+          </div>
+        </div>
+        <div class="settings-bottom-bar">
+          <div class="saved-encounter-manager">
+          </div>
+          <div class="saved-rotation-manager">
+          </div>
+          <div class="saved-settings-manager">
           </div>
         </div>
       </div>

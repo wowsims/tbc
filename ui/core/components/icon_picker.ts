@@ -13,9 +13,8 @@ import { Component } from './component.js';
 export class IconPicker extends Component {
   private readonly _inputs: Array<IconInputComponent>;
 
-  constructor(parent: HTMLElement, rootClass: string, sim: Sim<any>, inputs: Array<IconInput>, simUI: SimUI<any>) {
+  constructor(parent: HTMLElement, sim: Sim<any>, inputs: Array<IconInput>, simUI: SimUI<any>) {
     super(parent, 'icon-picker-root');
-    this.rootElem.classList.add(rootClass);
 
     this._inputs = inputs.map(input => new IconInputComponent(this.rootElem, sim, input, simUI));
   }

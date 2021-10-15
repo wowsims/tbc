@@ -14,15 +14,15 @@ body {
 }
 
 // Set grid width for icon sections based on how many buffs we configured
-.SelfBuffs-icon-picker {
-  grid-template-columns: repeat(5, 1fr);
+.self-buffs-section>div {
+  grid-template-columns: repeat(4, 1fr);
 }
-.OtherBuffs-icon-picker {
-  grid-template-columns: repeat(8, 1fr);
+.consumes-section>div {
+  grid-template-columns: repeat(4, 1fr);
 }
-.Consumes-icon-picker {
+.buffs-section>div {
   grid-template-columns: repeat(6, 1fr);
 }
-.Debuffs-icon-picker {
+.debuffs-section>div {
   grid-template-columns: repeat(3, 1fr);
 }
