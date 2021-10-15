@@ -11,9 +11,13 @@ declare var tippy: any;
 export interface InputConfig<T> {
   label?: string,
 	labelTooltip?: string,
+
   defaultValue?: T,
 
+	// Returns the event indicating the mapped Sim value has changed.
   changedEvent: (sim: Sim<any>) => TypedEvent<any>,
+
+	// Get and set the mapped Sim value.
   getValue: (sim: Sim<any>) => T,
   setValue: (sim: Sim<any>, newValue: T) => void,
 
