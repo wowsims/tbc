@@ -79,14 +79,14 @@ make clean
 
 # Adding a Sim
 So you want to make a new sim for your class/spec! The basic steps are as follows:
- - [Create the proto to describe the interface between sim and UI.](#create-the-proto-interface-between-sim-and-ui)
+ - [Create the proto interface between sim and UI.](#create-the-proto-interface-between-sim-and-ui)
  - [Add items your spec uses to the Items Generator.](#add-items-to-the-items-generator)
  - [Implement the sim.](#implement-the-sim)
  - [Implement the UI.](#implement-the-ui)
 
 
 ## Create the proto interface between Sim and UI
-This project uses [Google Protocol Buffers](https://developers.google.com/protocol-buffers/docs/gotutorial "https://developers.google.com/protocol-buffers/docs/gotutorial") to pass data between the sim and the UI. TLDR; Describe data strctures in .proto files, and the tool can generate code in any programming language. It lets us avoid repeating the same code in our Go and Typescript worlds without losing type safety.
+This project uses [Google Protocol Buffers](https://developers.google.com/protocol-buffers/docs/gotutorial "https://developers.google.com/protocol-buffers/docs/gotutorial") to pass data between the sim and the UI. TLDR; Describe data structures in .proto files, and the tool can generate code in any programming language. It lets us avoid repeating the same code in our Go and Typescript worlds without losing type safety.
 
 For a new sim, make the following changes:
   - Add a new value to the `Spec` enum in proto/common.proto. __NOTE: The name you give to this enum value is not just a name, it is used in our templating system. This guide will refer to this name as `$SPEC` elsewhere.__
@@ -102,16 +102,16 @@ That's it! Now when you run `make` there will be generated .go and .ts code in `
 `generate_items/item_declarations.go` contains a list of all items known to the sim, as well as which sims that care about each item. Add the items needed by your sim and make sure your spec is listed under all of them. Run `make items` when you're done.
 
 ## Implement the Sim
-This step is where most of the magic happens. A few good places to start understanding the sim code:
-  - `sim/core/agent.go` Agent is the interface you'll be implementing. This file also contains AgentAction, which you'll implement for each spell/ability.
-  - `sim/core/character.go` In this sim, a Character holds all the stats/settings/etc common to any WoW character.
-  - `sim/core/sim.go` Orchestrates everything. Main event loop is in `Simulation.RunOnce`.
-  - `sim/api.go` and `sim/api_impl.go` This is where the action starts. These files implement the request/response messages defined in `proto/api.proto`.
+This step is where most of the magic happens. A few highlights to start understanding the sim code:
   - `sim/wasm/main.go` This file is the actual main function, for the [.wasm binary](https://webassembly.org/ "https://webassembly.org/") used by the UI. You shouldn't ever need to touch this, but just know its here.
+  - `sim/api.go` and `sim/api_impl.go` This is where the action starts. These files implement the request/response messages defined in `proto/api.proto`.
+  - `sim/core/sim.go` Orchestrates everything. Main event loop is in `Simulation.RunOnce`.
+  - `sim/core/agent.go` Agent is the interface you'll be implementing. This file also contains AgentAction, which you'll implement for each spell/ability.
+  - `sim/core/character.go` A Character holds all the stats/cooldowns/gear/etc common to any WoW character. Each Agent has a Character that it controls.
 
 Read through the core code and some examples from other classes/specs to get a feel for what's needed. Hopefully `sim/core` already includes what you need, but most classes have at least 1 unique mechanic so you may need to touch `core` as well.
 
-Don't forget to write unit tests!
+Don't forget to write unit tests! Again, look at existing tests for examples. Run them with `make test` when you're ready.
 
 ## Implement the UI
 If you've made it this far, you're almost there! The UI is very generalized and it doesn't take much work to build an entire sim UI using our templating system. To use it:
