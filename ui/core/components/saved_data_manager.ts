@@ -8,6 +8,7 @@ declare var tippy: any;
 
 export type SavedDataManagerConfig<SpecType extends Spec, T> = {
   label: string;
+  storageKey: string;
   changeEmitters: Array<TypedEvent<any>>,
   equals: (a: T, b: T) => boolean;
   getData: (sim: Sim<SpecType>) => T;
@@ -70,7 +71,7 @@ export class SavedDataManager<SpecType extends Spec, T> extends Component {
         return;
       }
 
-      this.addSavedData(newName, config.getData(sim), false);
+      this.addSavedData(newName, config.getData(this.sim), false);
       this.saveUserData();
     });
   }
@@ -158,12 +159,12 @@ export class SavedDataManager<SpecType extends Spec, T> extends Component {
       gearData[savedData.name] = this.config.toJson(savedData.data);
     });
 
-    window.localStorage.setItem(this.config.label, JSON.stringify(gearData));
+    window.localStorage.setItem(this.config.storageKey, JSON.stringify(gearData));
   }
 
   // Load data from window.localStorage.
   loadUserData() {
-    const dataStr = window.localStorage.getItem(this.config.label);
+    const dataStr = window.localStorage.getItem(this.config.storageKey);
     if (!dataStr)
       return;
 

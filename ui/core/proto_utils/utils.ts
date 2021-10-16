@@ -115,6 +115,13 @@ export const specToEligibleRaces: Record<Spec, Array<Race>> = {
   [Spec.SpecElementalShaman]: shamanRaces,
 };
 
+// Prefixes used for storing browser data for each site. Even if a Spec is
+// renamed, DO NOT change these values or people will lose their saved data.
+export const specToLocalStorageKey: Record<Spec, string> = {
+  [Spec.SpecBalanceDruid]: '__balance_druid',
+  [Spec.SpecElementalShaman]: '__elemental_shaman',
+};
+
 // Returns a copy of playerOptions, with the class field set.
 export function withSpecProto<SpecType extends Spec>(
     playerOptions: PlayerOptions,

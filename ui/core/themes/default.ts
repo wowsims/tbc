@@ -244,6 +244,7 @@ export class DefaultTheme<SpecType extends Spec> extends SimUI<SpecType> {
   async init(): Promise<void> {
     const savedGearManager = new SavedDataManager<SpecType, GearAndStats>(this.parentElem.getElementsByClassName('saved-gear-manager')[0] as HTMLElement, this.sim, {
       label: 'Gear',
+			storageKey: this.getSavedGearStorageKey(),
       getData: (sim: Sim<any>) => {
         return {
           gear: sim.getGear(),
@@ -272,6 +273,7 @@ export class DefaultTheme<SpecType extends Spec> extends SimUI<SpecType> {
 
     const savedEncounterManager = new SavedDataManager<SpecType, Encounter>(this.parentElem.getElementsByClassName('saved-encounter-manager')[0] as HTMLElement, this.sim, {
       label: 'Encounter',
+			storageKey: this.getSavedEncounterStorageKey(),
       getData: (sim: Sim<any>) => sim.getEncounter(),
       setData: (sim: Sim<any>, newEncounter: Encounter) => sim.setEncounter(newEncounter),
       changeEmitters: [this.sim.encounterChangeEmitter],
@@ -282,6 +284,7 @@ export class DefaultTheme<SpecType extends Spec> extends SimUI<SpecType> {
 
     const savedRotationManager = new SavedDataManager<SpecType, SpecRotation<SpecType>>(this.parentElem.getElementsByClassName('saved-rotation-manager')[0] as HTMLElement, this.sim, {
       label: 'Rotation',
+			storageKey: this.getSavedRotationStorageKey(),
       getData: (sim: Sim<SpecType>) => sim.getRotation(),
       setData: (sim: Sim<SpecType>, newRotation: SpecRotation<SpecType>) => sim.setRotation(newRotation),
       changeEmitters: [this.sim.rotationChangeEmitter],
@@ -292,6 +295,7 @@ export class DefaultTheme<SpecType extends Spec> extends SimUI<SpecType> {
 
     const savedSettingsManager = new SavedDataManager<SpecType, Settings>(this.parentElem.getElementsByClassName('saved-settings-manager')[0] as HTMLElement, this.sim, {
       label: 'Settings',
+			storageKey: this.getSavedSettingsStorageKey(),
       getData: (sim: Sim<any>) => {
         return {
           buffs: sim.getBuffs(),
@@ -324,6 +328,7 @@ export class DefaultTheme<SpecType extends Spec> extends SimUI<SpecType> {
 
     const savedTalentsManager = new SavedDataManager<SpecType, string>(this.parentElem.getElementsByClassName('saved-talents-manager')[0] as HTMLElement, this.sim, {
       label: 'Talents',
+			storageKey: this.getSavedTalentsStorageKey(),
       getData: (sim: Sim<any>) => sim.getTalentsString(),
       setData: (sim: Sim<any>, newTalentsString: string) => sim.setTalentsString(newTalentsString),
       changeEmitters: [this.sim.talentsStringChangeEmitter],
