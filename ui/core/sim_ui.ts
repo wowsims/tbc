@@ -160,6 +160,8 @@ export abstract class SimUI<SpecType extends Spec> {
 
 	// Returns the actual key to use for local storage, based on the given key part and the site context.
 	private getStorageKey(keyPart: string): string {
+		// Local storage is shared by all sites under the same domain, so we need to use
+		// different keys for each spec site.
 		return specToLocalStorageKey[this.simUiConfig.spec] + keyPart;
 	}
 }

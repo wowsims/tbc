@@ -1,5 +1,6 @@
 @import "../core/themes/default";
 
+// Set color variables which control the site theme.
 :root {
 	--main-bg-color: MidnightBlue;
 	--main-text-color: White;
@@ -13,7 +14,7 @@ body {
   margin: 0;
 }
 
-// Set grid width for icon sections based on how many buffs we configured
+// Set grid width for icon sections based on how many buffs we configured.
 .self-buffs-section>div {
   grid-template-columns: repeat(4, 1fr);
 }

@@ -24,10 +24,13 @@ import * as ShamanInputs from './inputs.js';
 import * as Presets from './presets.js';
 
 const theme = new DefaultTheme<Spec.SpecElementalShaman>(document.body, {
+	// Can be 'Alpha', 'Beta', or 'Live'. Just adds a postfix to the generated title.
 	releaseStatus: 'Beta',
+	// List any known bugs / issues here and they'll be shown on the site.
 	knownIssues: [
 	],
   spec: Spec.SpecElementalShaman,
+	// All stats for which EP should be calculated.
   epStats: [
     Stat.StatIntellect,
     Stat.StatSpellPower,
@@ -37,7 +40,9 @@ const theme = new DefaultTheme<Spec.SpecElementalShaman>(document.body, {
     Stat.StatSpellHaste,
     Stat.StatMP5,
   ],
+	// Reference stat against which to calculate EP. I think all classes use either spell power or attack power.
   epReferenceStat: Stat.StatSpellPower,
+	// Which stats to display in the Character Stats section, at the bottom of the left-hand sidebar.
   displayStats: [
     Stat.StatStamina,
     Stat.StatIntellect,
@@ -48,6 +53,7 @@ const theme = new DefaultTheme<Spec.SpecElementalShaman>(document.body, {
     Stat.StatSpellHaste,
     Stat.StatMP5,
   ],
+	// IconInputs to include in the 'Self Buffs' section on the settings tab.
 	selfBuffInputs: {
 		tooltip: Tooltips.SELF_BUFFS_SECTION,
 		icons: [
@@ -60,6 +66,7 @@ const theme = new DefaultTheme<Spec.SpecElementalShaman>(document.body, {
 			IconInputs.DrumsOfRestorationConsume,
 		],
 	},
+	// IconInputs to include in the 'Other Buffs' section on the settings tab.
 	buffInputs: {
 		tooltip: Tooltips.OTHER_BUFFS_SECTION,
 		icons: [
@@ -82,6 +89,7 @@ const theme = new DefaultTheme<Spec.SpecElementalShaman>(document.body, {
 			IconInputs.AtieshMage,
 		],
 	},
+	// IconInputs to include in the 'Debuffs' section on the settings tab.
 	debuffInputs: {
 		icons: [
 			IconInputs.JudgementOfWisdom,
@@ -89,6 +97,7 @@ const theme = new DefaultTheme<Spec.SpecElementalShaman>(document.body, {
 			IconInputs.Misery,
 		],
 	},
+	// IconInputs to include in the 'Consumes' section on the settings tab.
 	consumeInputs: {
 		icons: [
 			IconInputs.DefaultSuperManaPotion,
@@ -105,7 +114,9 @@ const theme = new DefaultTheme<Spec.SpecElementalShaman>(document.body, {
 			IconInputs.SkullfishSoup,
 		],
 	},
+	// Inputs to include in the 'Rotation' section on the settings tab.
 	rotationInputs: ShamanInputs.ElementalShamanRotationConfig,
+	// Inputs to include in the 'Other' section on the settings tab.
 	otherInputs: {
 		inputs: [
 			OtherInputs.ShadowPriestDPS,
@@ -113,12 +124,20 @@ const theme = new DefaultTheme<Spec.SpecElementalShaman>(document.body, {
 			OtherInputs.NumStartingPotions,
 		],
 	},
+	// If true, the talents on the talents tab will not be individually modifiable by the user.
+	// Note that the use can still pick between preset talents, if there is more than 1.
 	freezeTalents: true,
+	// Whether to include 'Target Armor' in the 'Encounter' section of the settings tab.
   showTargetArmor: false,
+	// Whether to include 'Num Targets' in the 'Encounter' section of the settings tab.
   showNumTargets: true,
+	// Default values for most sim settings, for when a user visits for the first time.
   defaults: {
+		// TBC Release Phase, i.e. Black Temple is phase 3.
 		phase: 2,
+		// Default equipped gear.
 		gear: Presets.PRERAID_GEAR,
+		// Default EP weights for sorting gear in the gear picker.
 		epWeights: Stats.fromMap({
 			[Stat.StatIntellect]: 0.33,
 			[Stat.StatSpellPower]: 1,
@@ -127,10 +146,12 @@ const theme = new DefaultTheme<Spec.SpecElementalShaman>(document.body, {
 			[Stat.StatSpellHaste]: 1.25,
 			[Stat.StatMP5]: 0.08,
 		}),
+		// Default encounter settings.
     encounter: Encounter.create({
       duration: 300,
       numTargets: 1,
     }),
+		// Default raid/party buffs settings.
     buffs: Buffs.create({
       bloodlust: 0,
       arcaneBrilliance: true,
@@ -142,14 +163,19 @@ const theme = new DefaultTheme<Spec.SpecElementalShaman>(document.body, {
       judgementOfWisdom: true,
       misery: true,
     }),
+		// Default consumes settings.
     consumes: Consumes.create({
       drums: Drums.DrumsOfBattle,
       defaultPotion: Potions.SuperManaPotion,
     }),
+		// Default rotation settings.
     rotation: ElementalShamanRotation.create({
       type: RotationType.Adaptive,
     }),
+		// Default talents. Uses the wowhead calculator format, make the talents on
+		// https://tbc.wowhead.com/talent-calc and copy the numbers in the url.
     talents: Presets.StandardTalents,
+		// Default spec-specific settings.
     specOptions: ElementalShamanOptions.create({
       waterShield: true,
 			bloodlust: true,
@@ -159,12 +185,14 @@ const theme = new DefaultTheme<Spec.SpecElementalShaman>(document.body, {
     }),
   },
   presets: {
+		// Preset talents that the user can quickly select.
     talents: [
 			{
 				name: 'Standard',
 				talents: Presets.StandardTalents,
 			},
 		],
+		// Preset gear configurations that the user can quickly select.
     gear: [
       {
         name: 'P1 BIS',
@@ -177,9 +205,9 @@ const theme = new DefaultTheme<Spec.SpecElementalShaman>(document.body, {
         equipment: Presets.P2_BIS,
       },
     ],
-    encounters: [
-    ],
   },
+	// Custom function for determining the EP value of meta gem effects.
+	// Default meta effect EP value is 0, so just handle the ones relevant to your spec.
 	metaGemEffectEP: (gem, sim) => {
 		if (gem.id == Gems.CHAOTIC_SKYFIRE_DIAMOND) {
 			const finalStats = new Stats(sim.getCurrentStats().finalStats);

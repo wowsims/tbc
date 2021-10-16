@@ -5,6 +5,9 @@ import { Spec } from '/tbc/core/proto/common.js';
 import { ItemOrSpellId } from '/tbc/core/resources.js';
 import { Sim } from '/tbc/core/sim.js';
 
+// Configuration for spec-specific UI elements on the settings tab.
+// These don't need to be in a separate file but it keeps things cleaner.
+
 export const IconBloodlust = makeBooleanShamanBuffInput({ spellId: 2825 }, 'bloodlust');
 export const IconManaSpringTotem = makeBooleanShamanBuffInput({ spellId: 25570 }, 'manaSpringTotem');
 export const IconTotemOfWrath = makeBooleanShamanBuffInput({ spellId: 30706 }, 'totemOfWrath');
