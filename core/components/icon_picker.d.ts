@@ -6,7 +6,7 @@ import { SimUI } from '/tbc/core/sim_ui.js';
 import { Component } from './component.js';
 export declare class IconPicker extends Component {
     private readonly _inputs;
-    constructor(parent: HTMLElement, rootClass: string, sim: Sim<any>, inputs: Array<IconInput>, simUI: SimUI<any>);
+    constructor(parent: HTMLElement, sim: Sim<any>, inputs: Array<IconInput>, simUI: SimUI<any>);
 }
 export declare type IconInput = {
     id: ItemOrSpellId;

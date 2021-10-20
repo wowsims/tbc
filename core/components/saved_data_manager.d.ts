@@ -4,6 +4,7 @@ import { TypedEvent } from '/tbc/core/typed_event.js';
 import { Component } from '/tbc/core/components/component.js';
 export declare type SavedDataManagerConfig<SpecType extends Spec, T> = {
     label: string;
+    storageKey: string;
     changeEmitters: Array<TypedEvent<any>>;
     equals: (a: T, b: T) => boolean;
     getData: (sim: Sim<SpecType>) => T;

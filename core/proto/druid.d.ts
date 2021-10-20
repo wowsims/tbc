@@ -18,9 +18,9 @@ export interface DruidTalents {
  */
 export interface BalanceDruid {
     /**
-     * @generated from protobuf field: proto.BalanceDruid.Agent agent = 1;
+     * @generated from protobuf field: proto.BalanceDruid.Rotation rotation = 1;
      */
-    agent?: BalanceDruid_Agent;
+    rotation?: BalanceDruid_Rotation;
     /**
      * @generated from protobuf field: proto.DruidTalents talents = 2;
      */
@@ -31,9 +31,9 @@ export interface BalanceDruid {
     options?: BalanceDruid_Options;
 }
 /**
- * @generated from protobuf message proto.BalanceDruid.Agent
+ * @generated from protobuf message proto.BalanceDruid.Rotation
  */
-export interface BalanceDruid_Agent {
+export interface BalanceDruid_Rotation {
 }
 /**
  * @generated from protobuf message proto.BalanceDruid.Options
@@ -60,16 +60,16 @@ declare class BalanceDruid$Type extends MessageType<BalanceDruid> {
  * @generated MessageType for protobuf message proto.BalanceDruid
  */
 export declare const BalanceDruid: BalanceDruid$Type;
-declare class BalanceDruid_Agent$Type extends MessageType<BalanceDruid_Agent> {
+declare class BalanceDruid_Rotation$Type extends MessageType<BalanceDruid_Rotation> {
     constructor();
-    create(value?: PartialMessage<BalanceDruid_Agent>): BalanceDruid_Agent;
-    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: BalanceDruid_Agent): BalanceDruid_Agent;
-    internalBinaryWrite(message: BalanceDruid_Agent, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+    create(value?: PartialMessage<BalanceDruid_Rotation>): BalanceDruid_Rotation;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: BalanceDruid_Rotation): BalanceDruid_Rotation;
+    internalBinaryWrite(message: BalanceDruid_Rotation, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
- * @generated MessageType for protobuf message proto.BalanceDruid.Agent
+ * @generated MessageType for protobuf message proto.BalanceDruid.Rotation
  */
-export declare const BalanceDruid_Agent: BalanceDruid_Agent$Type;
+export declare const BalanceDruid_Rotation: BalanceDruid_Rotation$Type;
 declare class BalanceDruid_Options$Type extends MessageType<BalanceDruid_Options> {
     constructor();
     create(value?: PartialMessage<BalanceDruid_Options>): BalanceDruid_Options;

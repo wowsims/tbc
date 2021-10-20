@@ -147,11 +147,15 @@
   border: 1px solid var(--main-text-color);
 }
 
-.enum-picker-root {
-  display: inline-block;
+.input-label {
+  margin: 5px;
 }
 
-.enum-picker-label {
+.input-root.disabled .input-label {
+  filter: opacity(0.5);
+}
+
+.enum-picker-selector {
   margin: 5px;
 }
 
@@ -545,12 +549,12 @@
   display: block;
 }
 
-.number-picker-root {
-  display: inline-block;
+.input-label {
+  margin: 5px;
 }
 
-.number-picker-label {
-  margin: 5px;
+.input-root.disabled .input-label {
+  filter: opacity(0.5);
 }
 
 .number-picker-input {
@@ -1159,6 +1163,10 @@ td, th {
   display: flex;
 }
 
+.settings-tab {
+  overflow-y: auto;
+}
+
 .default-top-bar {
   float: right !important;
   display: flex !important;
@@ -1167,6 +1175,7 @@ td, th {
 }
 
 .known-issues {
+  display: none;
   background-color: red;
   border: 2px solid var(--main-text-color);
   padding: 2px;
@@ -1221,16 +1230,22 @@ td, th {
   background-color: var(--main-text-color);
 }
 
+.settings-inputs {
+  position: relative;
+}
+
+.settings-section-container {
+  position: absolute;
+}
+
 .settings-section {
   border: 4px solid var(--main-text-color);
   border-radius: 8px;
   position: relative;
-  display: inline-block;
   padding: 4px;
   padding-top: 15px;
-  margin: 20px;
-  min-width: 100px;
-  vertical-align: top;
+  margin: 10px;
+  margin-top: 20px;
 }
 
 .settings-section > label {
@@ -1245,10 +1260,6 @@ td, th {
   font-size: 18px;
 }
 
-.settings-left-bar {
-  display: inline-block;
-}
-
 .settings-bottom-bar {
   margin: 20px;
   display: flex;
@@ -1256,12 +1267,44 @@ td, th {
   align-items: flex-end;
 }
 
+.encounter-section .number-picker-root {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.race-section {
+  text-align: center;
+}
+
+.rotation-section > div, .other-settings-section > div {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.self-buffs-section > div {
+  display: grid;
+}
+
+.buffs-section > div {
+  display: grid;
+}
+
+.consumes-section > div {
+  display: grid;
+}
+
+.debuffs-section > div {
+  display: grid;
+}
+
 .saved-encounter-manager {
   display: inline-block;
   text-align: left;
 }
 
-.saved-agent-manager {
+.saved-rotation-manager {
   display: inline-block;
   text-align: center;
 }
@@ -1269,20 +1312,6 @@ td, th {
 .saved-settings-manager {
   display: inline-block;
   text-align: right;
-}
-
-.race-picker {
-  text-align: center;
-}
-
-.race-picker, .encounter-section {
-  display: block;
-}
-
-.encounter-section .number-picker-root {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
 }
 
 .saved-talents-manager {
@@ -1306,23 +1335,19 @@ body {
   margin: 0;
 }
 
-.SelfBuffs-icon-picker {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
+.self-buffs-section > div {
+  grid-template-columns: repeat(4, 1fr);
 }
 
-.OtherBuffs-icon-picker {
-  display: grid;
-  grid-template-columns: repeat(8, 1fr);
+.consumes-section > div {
+  grid-template-columns: repeat(4, 1fr);
 }
 
-.Consumes-icon-picker {
-  display: grid;
+.buffs-section > div {
   grid-template-columns: repeat(6, 1fr);
 }
 
-.Debuffs-icon-picker {
-  display: grid;
+.debuffs-section > div {
   grid-template-columns: repeat(3, 1fr);
 }
 

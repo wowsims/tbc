@@ -1,3 +1,4 @@
+import { PlayerOptions } from '/tbc/core/proto/api.js';
 import { Class } from '/tbc/core/proto/common.js';
 import { Enchant } from '/tbc/core/proto/common.js';
 import { Gem } from '/tbc/core/proto/common.js';
@@ -6,11 +7,11 @@ import { ItemSlot } from '/tbc/core/proto/common.js';
 import { Item } from '/tbc/core/proto/common.js';
 import { Race } from '/tbc/core/proto/common.js';
 import { Spec } from '/tbc/core/proto/common.js';
-import { BalanceDruid, BalanceDruid_Agent as BalanceDruidAgent, DruidTalents, BalanceDruid_Options as BalanceDruidOptions } from '/tbc/core/proto/druid.js';
-import { ElementalShaman, ElementalShaman_Agent as ElementalShamanAgent, ShamanTalents, ElementalShaman_Options as ElementalShamanOptions } from '/tbc/core/proto/shaman.js';
+import { BalanceDruid, BalanceDruid_Rotation as BalanceDruidRotation, DruidTalents, BalanceDruid_Options as BalanceDruidOptions } from '/tbc/core/proto/druid.js';
+import { ElementalShaman, ElementalShaman_Rotation as ElementalShamanRotation, ShamanTalents, ElementalShaman_Options as ElementalShamanOptions } from '/tbc/core/proto/shaman.js';
 export declare type ShamanSpecs = Spec.SpecElementalShaman;
-export declare type AgentUnion = BalanceDruidAgent | ElementalShamanAgent;
-export declare type SpecAgent<T extends Spec> = T extends Spec.SpecBalanceDruid ? BalanceDruidAgent : ElementalShamanAgent;
+export declare type RotationUnion = BalanceDruidRotation | ElementalShamanRotation;
+export declare type SpecRotation<T extends Spec> = T extends Spec.SpecBalanceDruid ? BalanceDruidRotation : ElementalShamanRotation;
 export declare type TalentsUnion = DruidTalents | ShamanTalents;
 export declare type SpecTalents<T extends Spec> = T extends Spec.SpecBalanceDruid ? DruidTalents : ShamanTalents;
 export declare type SpecOptionsUnion = BalanceDruidOptions | ElementalShamanOptions;
@@ -18,11 +19,11 @@ export declare type SpecOptions<T extends Spec> = T extends Spec.SpecBalanceDrui
 export declare type SpecProtoUnion = BalanceDruid | ElementalShaman;
 export declare type SpecProto<T extends Spec> = T extends Spec.SpecBalanceDruid ? BalanceDruid : ElementalShaman;
 export declare type SpecTypeFunctions<SpecType extends Spec> = {
-    agentCreate: () => SpecAgent<SpecType>;
-    agentEquals: (a: SpecAgent<SpecType>, b: SpecAgent<SpecType>) => boolean;
-    agentCopy: (a: SpecAgent<SpecType>) => SpecAgent<SpecType>;
-    agentToJson: (a: SpecAgent<SpecType>) => any;
-    agentFromJson: (obj: any) => SpecAgent<SpecType>;
+    rotationCreate: () => SpecRotation<SpecType>;
+    rotationEquals: (a: SpecRotation<SpecType>, b: SpecRotation<SpecType>) => boolean;
+    rotationCopy: (a: SpecRotation<SpecType>) => SpecRotation<SpecType>;
+    rotationToJson: (a: SpecRotation<SpecType>) => any;
+    rotationFromJson: (obj: any) => SpecRotation<SpecType>;
     talentsCreate: () => SpecTalents<SpecType>;
     talentsEquals: (a: SpecTalents<SpecType>, b: SpecTalents<SpecType>) => boolean;
     talentsCopy: (a: SpecTalents<SpecType>) => SpecTalents<SpecType>;
@@ -37,6 +38,8 @@ export declare type SpecTypeFunctions<SpecType extends Spec> = {
 export declare const specTypeFunctions: Partial<Record<Spec, SpecTypeFunctions<any>>>;
 export declare const specToClass: Record<Spec, Class>;
 export declare const specToEligibleRaces: Record<Spec, Array<Race>>;
+export declare const specToLocalStorageKey: Record<Spec, string>;
+export declare function withSpecProto<SpecType extends Spec>(playerOptions: PlayerOptions, rotation: SpecRotation<SpecType>, talents: SpecTalents<SpecType>, specOptions: SpecOptions<SpecType>): PlayerOptions;
 export declare function getEligibleItemSlots(item: Item): Array<ItemSlot>;
 export declare function validWeaponCombo(mainHand: Item | null | undefined, offHand: Item | null | undefined): boolean;
 export declare function getEligibleEnchantSlots(enchant: Enchant): Array<ItemSlot>;

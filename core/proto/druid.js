@@ -54,7 +54,7 @@ export const DruidTalents = new DruidTalents$Type();
 class BalanceDruid$Type extends MessageType {
     constructor() {
         super("proto.BalanceDruid", [
-            { no: 1, name: "agent", kind: "message", T: () => BalanceDruid_Agent },
+            { no: 1, name: "rotation", kind: "message", T: () => BalanceDruid_Rotation },
             { no: 2, name: "talents", kind: "message", T: () => DruidTalents },
             { no: 3, name: "options", kind: "message", T: () => BalanceDruid_Options }
         ]);
@@ -71,8 +71,8 @@ class BalanceDruid$Type extends MessageType {
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
-                case /* proto.BalanceDruid.Agent agent */ 1:
-                    message.agent = BalanceDruid_Agent.internalBinaryRead(reader, reader.uint32(), options, message.agent);
+                case /* proto.BalanceDruid.Rotation rotation */ 1:
+                    message.rotation = BalanceDruid_Rotation.internalBinaryRead(reader, reader.uint32(), options, message.rotation);
                     break;
                 case /* proto.DruidTalents talents */ 2:
                     message.talents = DruidTalents.internalBinaryRead(reader, reader.uint32(), options, message.talents);
@@ -92,9 +92,9 @@ class BalanceDruid$Type extends MessageType {
         return message;
     }
     internalBinaryWrite(message, writer, options) {
-        /* proto.BalanceDruid.Agent agent = 1; */
-        if (message.agent)
-            BalanceDruid_Agent.internalBinaryWrite(message.agent, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+        /* proto.BalanceDruid.Rotation rotation = 1; */
+        if (message.rotation)
+            BalanceDruid_Rotation.internalBinaryWrite(message.rotation, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
         /* proto.DruidTalents talents = 2; */
         if (message.talents)
             DruidTalents.internalBinaryWrite(message.talents, writer.tag(2, WireType.LengthDelimited).fork(), options).join();
@@ -112,9 +112,9 @@ class BalanceDruid$Type extends MessageType {
  */
 export const BalanceDruid = new BalanceDruid$Type();
 // @generated message type with reflection information, may provide speed optimized methods
-class BalanceDruid_Agent$Type extends MessageType {
+class BalanceDruid_Rotation$Type extends MessageType {
     constructor() {
-        super("proto.BalanceDruid.Agent", []);
+        super("proto.BalanceDruid.Rotation", []);
     }
     create(value) {
         const message = {};
@@ -134,9 +134,9 @@ class BalanceDruid_Agent$Type extends MessageType {
     }
 }
 /**
- * @generated MessageType for protobuf message proto.BalanceDruid.Agent
+ * @generated MessageType for protobuf message proto.BalanceDruid.Rotation
  */
-export const BalanceDruid_Agent = new BalanceDruid_Agent$Type();
+export const BalanceDruid_Rotation = new BalanceDruid_Rotation$Type();
 // @generated message type with reflection information, may provide speed optimized methods
 class BalanceDruid_Options$Type extends MessageType {
     constructor() {

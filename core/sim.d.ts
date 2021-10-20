@@ -17,7 +17,7 @@ import { StatWeightsRequest, StatWeightsResult } from '/tbc/core/proto/api.js';
 import { EquippedItem } from '/tbc/core/proto_utils/equipped_item.js';
 import { Gear } from '/tbc/core/proto_utils/gear.js';
 import { Stats } from '/tbc/core/proto_utils/stats.js';
-import { SpecAgent } from '/tbc/core/proto_utils/utils.js';
+import { SpecRotation } from '/tbc/core/proto_utils/utils.js';
 import { SpecTalents } from '/tbc/core/proto_utils/utils.js';
 import { SpecTypeFunctions } from '/tbc/core/proto_utils/utils.js';
 import { SpecOptions } from '/tbc/core/proto_utils/utils.js';
@@ -34,7 +34,7 @@ export interface SimConfig<SpecType extends Spec> {
         encounter: Encounter;
         buffs: Buffs;
         consumes: Consumes;
-        agent: SpecAgent<SpecType>;
+        rotation: SpecRotation<SpecType>;
         talents: string;
         specOptions: SpecOptions<SpecType>;
     };
@@ -49,7 +49,7 @@ export declare class Sim<SpecType extends Spec> extends WorkerPool {
     readonly encounterChangeEmitter: TypedEvent<void>;
     readonly gearChangeEmitter: TypedEvent<void>;
     readonly raceChangeEmitter: TypedEvent<void>;
-    readonly agentChangeEmitter: TypedEvent<void>;
+    readonly rotationChangeEmitter: TypedEvent<void>;
     readonly talentsChangeEmitter: TypedEvent<void>;
     readonly talentsStringChangeEmitter: TypedEvent<void>;
     readonly specOptionsChangeEmitter: TypedEvent<void>;
@@ -67,7 +67,7 @@ export declare class Sim<SpecType extends Spec> extends WorkerPool {
     private _gear;
     private _encounter;
     private _race;
-    private _agent;
+    private _rotation;
     private _talents;
     private _talentsString;
     private _specOptions;
@@ -101,8 +101,8 @@ export declare class Sim<SpecType extends Spec> extends WorkerPool {
     setGear(newGear: Gear): void;
     getCustomStats(): Stats;
     setCustomStats(newCustomStats: Stats): void;
-    getAgent(): SpecAgent<SpecType>;
-    setAgent(newAgent: SpecAgent<SpecType>): void;
+    getRotation(): SpecRotation<SpecType>;
+    setRotation(newRotation: SpecRotation<SpecType>): void;
     setTalents(newTalents: SpecTalents<SpecType>): void;
     getTalentsString(): string;
     setTalentsString(newTalentsString: string): void;

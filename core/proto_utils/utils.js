@@ -1,4 +1,5 @@
 import { intersection } from '/tbc/core/utils.js';
+import { PlayerOptions } from '/tbc/core/proto/api.js';
 import { Class } from '/tbc/core/proto/common.js';
 import { Enchant } from '/tbc/core/proto/common.js';
 import { GemColor } from '/tbc/core/proto/common.js';
@@ -10,15 +11,15 @@ import { Race } from '/tbc/core/proto/common.js';
 import { RangedWeaponType } from '/tbc/core/proto/common.js';
 import { Spec } from '/tbc/core/proto/common.js';
 import { WeaponType } from '/tbc/core/proto/common.js';
-import { BalanceDruid_Agent as BalanceDruidAgent, DruidTalents, BalanceDruid_Options as BalanceDruidOptions } from '/tbc/core/proto/druid.js';
-import { ElementalShaman_Agent as ElementalShamanAgent, ShamanTalents, ElementalShaman_Options as ElementalShamanOptions } from '/tbc/core/proto/shaman.js';
+import { BalanceDruid, BalanceDruid_Rotation as BalanceDruidRotation, DruidTalents, BalanceDruid_Options as BalanceDruidOptions } from '/tbc/core/proto/druid.js';
+import { ElementalShaman, ElementalShaman_Rotation as ElementalShamanRotation, ShamanTalents, ElementalShaman_Options as ElementalShamanOptions } from '/tbc/core/proto/shaman.js';
 export const specTypeFunctions = {
     [Spec.SpecBalanceDruid]: {
-        agentCreate: () => BalanceDruidAgent.create(),
-        agentEquals: (a, b) => BalanceDruidAgent.equals(a, b),
-        agentCopy: (a) => BalanceDruidAgent.clone(a),
-        agentToJson: (a) => BalanceDruidAgent.toJson(a),
-        agentFromJson: (obj) => BalanceDruidAgent.fromJson(obj),
+        rotationCreate: () => BalanceDruidRotation.create(),
+        rotationEquals: (a, b) => BalanceDruidRotation.equals(a, b),
+        rotationCopy: (a) => BalanceDruidRotation.clone(a),
+        rotationToJson: (a) => BalanceDruidRotation.toJson(a),
+        rotationFromJson: (obj) => BalanceDruidRotation.fromJson(obj),
         talentsCreate: () => DruidTalents.create(),
         talentsEquals: (a, b) => DruidTalents.equals(a, b),
         talentsCopy: (a) => DruidTalents.clone(a),
@@ -31,11 +32,11 @@ export const specTypeFunctions = {
         optionsFromJson: (obj) => BalanceDruidOptions.fromJson(obj),
     },
     [Spec.SpecElementalShaman]: {
-        agentCreate: () => ElementalShamanAgent.create(),
-        agentEquals: (a, b) => ElementalShamanAgent.equals(a, b),
-        agentCopy: (a) => ElementalShamanAgent.clone(a),
-        agentToJson: (a) => ElementalShamanAgent.toJson(a),
-        agentFromJson: (obj) => ElementalShamanAgent.fromJson(obj),
+        rotationCreate: () => ElementalShamanRotation.create(),
+        rotationEquals: (a, b) => ElementalShamanRotation.equals(a, b),
+        rotationCopy: (a) => ElementalShamanRotation.clone(a),
+        rotationToJson: (a) => ElementalShamanRotation.toJson(a),
+        rotationFromJson: (obj) => ElementalShamanRotation.fromJson(obj),
         talentsCreate: () => ShamanTalents.create(),
         talentsEquals: (a, b) => ShamanTalents.equals(a, b),
         talentsCopy: (a) => ShamanTalents.clone(a),
@@ -67,6 +68,42 @@ export const specToEligibleRaces = {
     [Spec.SpecBalanceDruid]: druidRaces,
     [Spec.SpecElementalShaman]: shamanRaces,
 };
+// Prefixes used for storing browser data for each site. Even if a Spec is
+// renamed, DO NOT change these values or people will lose their saved data.
+export const specToLocalStorageKey = {
+    [Spec.SpecBalanceDruid]: '__balance_druid',
+    [Spec.SpecElementalShaman]: '__elemental_shaman',
+};
+// Returns a copy of playerOptions, with the class field set.
+export function withSpecProto(playerOptions, rotation, talents, specOptions) {
+    const copy = PlayerOptions.clone(playerOptions);
+    if (BalanceDruidRotation.is(rotation)) {
+        copy.class = Class.ClassDruid;
+        copy.spec = {
+            oneofKind: 'balanceDruid',
+            balanceDruid: BalanceDruid.create({
+                rotation: rotation,
+                talents: talents,
+                options: specOptions,
+            }),
+        };
+    }
+    else if (ElementalShamanRotation.is(rotation)) {
+        copy.class = Class.ClassShaman;
+        copy.spec = {
+            oneofKind: 'elementalShaman',
+            elementalShaman: ElementalShaman.create({
+                rotation: rotation,
+                talents: talents,
+                options: specOptions,
+            }),
+        };
+    }
+    else {
+        throw new Error('Unrecognized talents with options: ' + PlayerOptions.toJsonString(playerOptions));
+    }
+    return copy;
+}
 const itemTypeToSlotsMap = {
     [ItemType.ItemTypeUnknown]: [],
     [ItemType.ItemTypeHead]: [ItemSlot.ItemSlotHead],

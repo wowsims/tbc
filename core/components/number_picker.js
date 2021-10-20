@@ -1,27 +1,24 @@
-import { Component } from './component.js';
+import { Input } from './input.js';
 // UI element for picking an arbitrary number field.
-export class NumberPicker extends Component {
+export class NumberPicker extends Input {
     constructor(parent, sim, config) {
-        super(parent, 'number-picker-root');
-        if (config.label) {
-            const label = document.createElement('span');
-            label.classList.add('number-picker-label');
-            label.textContent = config.label;
-            this.rootElem.appendChild(label);
-        }
-        const input = document.createElement('input');
-        input.type = "number";
-        input.classList.add('number-picker-input');
-        this.rootElem.appendChild(input);
-        input.value = String(config.getValue(sim));
-        config.changedEvent(sim).on(() => {
-            input.value = String(config.getValue(sim));
+        super(parent, 'number-picker-root', sim, config);
+        this.inputElem = document.createElement('input');
+        this.inputElem.type = "number";
+        this.inputElem.classList.add('number-picker-input');
+        this.rootElem.appendChild(this.inputElem);
+        this.init();
+        this.inputElem.addEventListener('input', event => {
+            this.inputChanged();
         });
-        if (config.defaultValue) {
-            config.setValue(sim, config.defaultValue);
-        }
-        input.addEventListener('input', event => {
-            config.setValue(sim, parseInt(input.value || '') || 0);
-        });
+    }
+    getInputElem() {
+        return this.inputElem;
+    }
+    getInputValue() {
+        return parseInt(this.inputElem.value || '') || 0;
+    }
+    setInputValue(newValue) {
+        this.inputElem.value = String(newValue);
     }
 }

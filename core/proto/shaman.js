@@ -4,31 +4,35 @@ import { reflectionMergePartial } from '/tbc/protobuf-ts/index.js';
 import { MESSAGE_TYPE } from '/tbc/protobuf-ts/index.js';
 import { MessageType } from '/tbc/protobuf-ts/index.js';
 /**
- * @generated from protobuf enum proto.ElementalShaman.Agent.AgentType
+ * @generated from protobuf enum proto.ElementalShaman.Rotation.RotationType
  */
-export var ElementalShaman_Agent_AgentType;
-(function (ElementalShaman_Agent_AgentType) {
+export var ElementalShaman_Rotation_RotationType;
+(function (ElementalShaman_Rotation_RotationType) {
     /**
      * @generated from protobuf enum value: Unknown = 0;
      */
-    ElementalShaman_Agent_AgentType[ElementalShaman_Agent_AgentType["Unknown"] = 0] = "Unknown";
+    ElementalShaman_Rotation_RotationType[ElementalShaman_Rotation_RotationType["Unknown"] = 0] = "Unknown";
     /**
-     * @generated from protobuf enum value: FixedLBCL = 1;
+     * @generated from protobuf enum value: Adaptive = 1;
      */
-    ElementalShaman_Agent_AgentType[ElementalShaman_Agent_AgentType["FixedLBCL"] = 1] = "FixedLBCL";
+    ElementalShaman_Rotation_RotationType[ElementalShaman_Rotation_RotationType["Adaptive"] = 1] = "Adaptive";
     /**
      * @generated from protobuf enum value: CLOnClearcast = 2;
      */
-    ElementalShaman_Agent_AgentType[ElementalShaman_Agent_AgentType["CLOnClearcast"] = 2] = "CLOnClearcast";
+    ElementalShaman_Rotation_RotationType[ElementalShaman_Rotation_RotationType["CLOnClearcast"] = 2] = "CLOnClearcast";
     /**
-     * @generated from protobuf enum value: Adaptive = 3;
+     * @generated from protobuf enum value: CLOnCD = 3;
      */
-    ElementalShaman_Agent_AgentType[ElementalShaman_Agent_AgentType["Adaptive"] = 3] = "Adaptive";
+    ElementalShaman_Rotation_RotationType[ElementalShaman_Rotation_RotationType["CLOnCD"] = 3] = "CLOnCD";
     /**
-     * @generated from protobuf enum value: CLOnCD = 4;
+     * @generated from protobuf enum value: FixedLBCL = 4;
      */
-    ElementalShaman_Agent_AgentType[ElementalShaman_Agent_AgentType["CLOnCD"] = 4] = "CLOnCD";
-})(ElementalShaman_Agent_AgentType || (ElementalShaman_Agent_AgentType = {}));
+    ElementalShaman_Rotation_RotationType[ElementalShaman_Rotation_RotationType["FixedLBCL"] = 4] = "FixedLBCL";
+    /**
+     * @generated from protobuf enum value: LBOnly = 5;
+     */
+    ElementalShaman_Rotation_RotationType[ElementalShaman_Rotation_RotationType["LBOnly"] = 5] = "LBOnly";
+})(ElementalShaman_Rotation_RotationType || (ElementalShaman_Rotation_RotationType = {}));
 // @generated message type with reflection information, may provide speed optimized methods
 class ShamanTalents$Type extends MessageType {
     constructor() {
@@ -297,7 +301,7 @@ export const ShamanTalents = new ShamanTalents$Type();
 class ElementalShaman$Type extends MessageType {
     constructor() {
         super("proto.ElementalShaman", [
-            { no: 1, name: "agent", kind: "message", T: () => ElementalShaman_Agent },
+            { no: 1, name: "rotation", kind: "message", T: () => ElementalShaman_Rotation },
             { no: 2, name: "talents", kind: "message", T: () => ShamanTalents },
             { no: 3, name: "options", kind: "message", T: () => ElementalShaman_Options }
         ]);
@@ -314,8 +318,8 @@ class ElementalShaman$Type extends MessageType {
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
-                case /* proto.ElementalShaman.Agent agent */ 1:
-                    message.agent = ElementalShaman_Agent.internalBinaryRead(reader, reader.uint32(), options, message.agent);
+                case /* proto.ElementalShaman.Rotation rotation */ 1:
+                    message.rotation = ElementalShaman_Rotation.internalBinaryRead(reader, reader.uint32(), options, message.rotation);
                     break;
                 case /* proto.ShamanTalents talents */ 2:
                     message.talents = ShamanTalents.internalBinaryRead(reader, reader.uint32(), options, message.talents);
@@ -335,9 +339,9 @@ class ElementalShaman$Type extends MessageType {
         return message;
     }
     internalBinaryWrite(message, writer, options) {
-        /* proto.ElementalShaman.Agent agent = 1; */
-        if (message.agent)
-            ElementalShaman_Agent.internalBinaryWrite(message.agent, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+        /* proto.ElementalShaman.Rotation rotation = 1; */
+        if (message.rotation)
+            ElementalShaman_Rotation.internalBinaryWrite(message.rotation, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
         /* proto.ShamanTalents talents = 2; */
         if (message.talents)
             ShamanTalents.internalBinaryWrite(message.talents, writer.tag(2, WireType.LengthDelimited).fork(), options).join();
@@ -355,14 +359,15 @@ class ElementalShaman$Type extends MessageType {
  */
 export const ElementalShaman = new ElementalShaman$Type();
 // @generated message type with reflection information, may provide speed optimized methods
-class ElementalShaman_Agent$Type extends MessageType {
+class ElementalShaman_Rotation$Type extends MessageType {
     constructor() {
-        super("proto.ElementalShaman.Agent", [
-            { no: 1, name: "type", kind: "enum", T: () => ["proto.ElementalShaman.Agent.AgentType", ElementalShaman_Agent_AgentType] }
+        super("proto.ElementalShaman.Rotation", [
+            { no: 1, name: "type", kind: "enum", T: () => ["proto.ElementalShaman.Rotation.RotationType", ElementalShaman_Rotation_RotationType] },
+            { no: 2, name: "lbs_per_cl", kind: "scalar", T: 5 /*ScalarType.INT32*/ }
         ]);
     }
     create(value) {
-        const message = { type: 0 };
+        const message = { type: 0, lbsPerCl: 0 };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -373,8 +378,11 @@ class ElementalShaman_Agent$Type extends MessageType {
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
-                case /* proto.ElementalShaman.Agent.AgentType type */ 1:
+                case /* proto.ElementalShaman.Rotation.RotationType type */ 1:
                     message.type = reader.int32();
+                    break;
+                case /* int32 lbs_per_cl */ 2:
+                    message.lbsPerCl = reader.int32();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -388,9 +396,12 @@ class ElementalShaman_Agent$Type extends MessageType {
         return message;
     }
     internalBinaryWrite(message, writer, options) {
-        /* proto.ElementalShaman.Agent.AgentType type = 1; */
+        /* proto.ElementalShaman.Rotation.RotationType type = 1; */
         if (message.type !== 0)
             writer.tag(1, WireType.Varint).int32(message.type);
+        /* int32 lbs_per_cl = 2; */
+        if (message.lbsPerCl !== 0)
+            writer.tag(2, WireType.Varint).int32(message.lbsPerCl);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -398,9 +409,9 @@ class ElementalShaman_Agent$Type extends MessageType {
     }
 }
 /**
- * @generated MessageType for protobuf message proto.ElementalShaman.Agent
+ * @generated MessageType for protobuf message proto.ElementalShaman.Rotation
  */
-export const ElementalShaman_Agent = new ElementalShaman_Agent$Type();
+export const ElementalShaman_Rotation = new ElementalShaman_Rotation$Type();
 // @generated message type with reflection information, may provide speed optimized methods
 class ElementalShaman_Options$Type extends MessageType {
     constructor() {

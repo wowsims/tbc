@@ -41,75 +41,79 @@ export interface Buffs {
      */
     moonkinAura: TristateEffect;
     /**
-     * @generated from protobuf field: int32 shadow_priest_dps = 8;
+     * @generated from protobuf field: bool draenei_racial_melee = 8;
+     */
+    draeneiRacialMelee: boolean;
+    /**
+     * @generated from protobuf field: bool draenei_racial_caster = 9;
+     */
+    draeneiRacialCaster: boolean;
+    /**
+     * @generated from protobuf field: int32 shadow_priest_dps = 10;
      */
     shadowPriestDps: number;
     /**
      * Target Debuff
      *
-     * @generated from protobuf field: bool judgement_of_wisdom = 9;
+     * @generated from protobuf field: bool judgement_of_wisdom = 11;
      */
     judgementOfWisdom: boolean;
     /**
-     * @generated from protobuf field: bool improved_seal_of_the_crusader = 10;
+     * @generated from protobuf field: bool improved_seal_of_the_crusader = 12;
      */
     improvedSealOfTheCrusader: boolean;
     /**
-     * @generated from protobuf field: bool misery = 11;
+     * @generated from protobuf field: bool misery = 13;
      */
     misery: boolean;
     /**
      * Drums
      *
-     * @generated from protobuf field: bool drums_of_battle = 12;
+     * @generated from protobuf field: proto.Drums drums = 14;
      */
-    drumsOfBattle: boolean;
-    /**
-     * @generated from protobuf field: bool drums_of_restoration = 13;
-     */
-    drumsOfRestoration: boolean;
+    drums: Drums;
     /**
      * Item Buffs
      *
-     * @generated from protobuf field: int32 atiesh_mage = 14;
+     * @generated from protobuf field: int32 atiesh_mage = 15;
      */
     atieshMage: number;
     /**
-     * @generated from protobuf field: int32 atiesh_warlock = 15;
+     * @generated from protobuf field: int32 atiesh_warlock = 16;
      */
     atieshWarlock: number;
     /**
-     * @generated from protobuf field: bool braided_eternium_chain = 16;
+     * @generated from protobuf field: bool braided_eternium_chain = 17;
      */
     braidedEterniumChain: boolean;
     /**
-     * @generated from protobuf field: bool eye_of_the_night = 17;
+     * @generated from protobuf field: bool eye_of_the_night = 18;
      */
     eyeOfTheNight: boolean;
     /**
-     * @generated from protobuf field: bool chain_of_the_twilight_owl = 18;
+     * @generated from protobuf field: bool chain_of_the_twilight_owl = 19;
      */
     chainOfTheTwilightOwl: boolean;
     /**
-     * @generated from protobuf field: bool jade_pendant_of_blasting = 19;
+     * @generated from protobuf field: bool jade_pendant_of_blasting = 20;
      */
     jadePendantOfBlasting: boolean;
     /**
      * Totems
      *
-     * @generated from protobuf field: proto.TristateEffect mana_spring_totem = 20;
+     * @generated from protobuf field: proto.TristateEffect mana_spring_totem = 21;
      */
     manaSpringTotem: TristateEffect;
     /**
-     * @generated from protobuf field: bool mana_tide_totem = 21;
+     * @generated from protobuf field: bool mana_tide_totem = 22;
      */
     manaTideTotem: boolean;
     /**
-     * @generated from protobuf field: int32 totem_of_wrath = 22;
+     * @generated from protobuf field: int32 totem_of_wrath = 23;
      */
     totemOfWrath: number;
     /**
-     * @generated from protobuf field: proto.TristateEffect wrath_of_air_totem = 23;
+     * @generated from protobuf field: proto.TristateEffect wrath_of_air_totem = 24;
      */
     wrathOfAirTotem: TristateEffect;
 }
@@ -174,25 +178,25 @@ export interface Consumes {
      */
     skullfishSoup: boolean;
     /**
-     * @generated from protobuf field: bool destruction_potion = 15;
+     * @generated from protobuf field: proto.Potions default_potion = 15;
      */
-    destructionPotion: boolean;
+    defaultPotion: Potions;
     /**
-     * @generated from protobuf field: bool super_mana_potion = 16;
+     * @generated from protobuf field: proto.Potions starting_potion = 16;
      */
-    superManaPotion: boolean;
+    startingPotion: Potions;
     /**
-     * @generated from protobuf field: bool dark_rune = 17;
+     * @generated from protobuf field: int32 num_starting_potions = 17;
+     */
+    numStartingPotions: number;
+    /**
+     * @generated from protobuf field: bool dark_rune = 18;
      */
     darkRune: boolean;
     /**
-     * @generated from protobuf field: bool drums_of_battle = 18;
+     * @generated from protobuf field: proto.Drums drums = 19;
      */
-    drumsOfBattle: boolean;
-    /**
-     * @generated from protobuf field: bool drums_of_restoration = 19;
-     */
-    drumsOfRestoration: boolean;
+    drums: Drums;
 }
 /**
  * @generated from protobuf message proto.Encounter
@@ -289,6 +293,10 @@ export interface Item {
      * @generated from protobuf field: proto.ItemQuality quality = 12;
      */
     quality: ItemQuality;
+    /**
+     * @generated from protobuf field: bool unique = 13;
+     */
+    unique: boolean;
 }
 /**
  * @generated from protobuf message proto.Enchant
@@ -359,6 +367,19 @@ export interface Gem {
      * @generated from protobuf field: bool unique = 7;
      */
     unique: boolean;
+}
+/**
+ * @generated from protobuf enum proto.Spec
+ */
+export declare enum Spec {
+    /**
+     * @generated from protobuf enum value: SpecBalanceDruid = 0;
+     */
+    SpecBalanceDruid = 0,
+    /**
+     * @generated from protobuf enum value: SpecElementalShaman = 1;
+     */
+    SpecElementalShaman = 1
 }
 /**
  * @generated from protobuf enum proto.Race
@@ -457,19 +478,6 @@ export declare enum Class {
      * @generated from protobuf enum value: ClassWarrior = 9;
      */
     ClassWarrior = 9
-}
-/**
- * @generated from protobuf enum proto.Spec
- */
-export declare enum Spec {
-    /**
-     * @generated from protobuf enum value: SpecBalanceDruid = 0;
-     */
-    SpecBalanceDruid = 0,
-    /**
-     * @generated from protobuf enum value: SpecElementalShaman = 1;
-     */
-    SpecElementalShaman = 1
 }
 /**
  * @generated from protobuf enum proto.Stat
@@ -952,6 +960,40 @@ export declare enum TristateEffect {
      * @generated from protobuf enum value: TristateEffectImproved = 2;
      */
     TristateEffectImproved = 2
+}
+/**
+ * @generated from protobuf enum proto.Drums
+ */
+export declare enum Drums {
+    /**
+     * @generated from protobuf enum value: DrumsUnknown = 0;
+     */
+    DrumsUnknown = 0,
+    /**
+     * @generated from protobuf enum value: DrumsOfBattle = 1;
+     */
+    DrumsOfBattle = 1,
+    /**
+     * @generated from protobuf enum value: DrumsOfRestoration = 2;
+     */
+    DrumsOfRestoration = 2
+}
+/**
+ * @generated from protobuf enum proto.Potions
+ */
+export declare enum Potions {
+    /**
+     * @generated from protobuf enum value: UnknownPotion = 0;
+     */
+    UnknownPotion = 0,
+    /**
+     * @generated from protobuf enum value: DestructionPotion = 1;
+     */
+    DestructionPotion = 1,
+    /**
+     * @generated from protobuf enum value: SuperManaPotion = 2;
+     */
+    SuperManaPotion = 2
 }
 declare class Buffs$Type extends MessageType<Buffs> {
     constructor();

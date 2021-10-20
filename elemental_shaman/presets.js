@@ -2,6 +2,11 @@ import { EquipmentSpec } from '/tbc/core/proto/common.js';
 import { ItemSpec } from '/tbc/core/proto/common.js';
 import * as Enchants from '/tbc/core/constants/enchants.js';
 import * as Gems from '/tbc/core/constants/gems.js';
+// Preset options for this spec.
+// Eventually we will import these values for the raid sim too, so its good to
+// keep them in a separate file.
+// Default talents. Uses the wowhead calculator format, make the talents on
+// https://tbc.wowhead.com/talent-calc and copy the numbers in the url.
 export const StandardTalents = '55030105100213351051--05105301005';
 export const PRERAID_GEAR = EquipmentSpec.create({
     items: [

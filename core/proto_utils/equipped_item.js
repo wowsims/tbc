@@ -79,13 +79,35 @@ export class EquippedItem {
     /**
      * Returns a new EquippedItem with the given gem socketed.
      */
-    withGem(gem, socketIdx) {
+    withGemHelper(gem, socketIdx) {
         if (this._gems.length <= socketIdx) {
             throw new Error('No gem socket with index ' + socketIdx);
         }
         const newGems = this._gems.slice();
         newGems[socketIdx] = gem;
         return new EquippedItem(this._item, this._enchant, newGems);
+    }
+    /**
+     * Returns a new EquippedItem with the given gem socketed.
+       *
+       * Also ensures validity of the item on its own. Currently this just means enforcing unique gems.
+     */
+    withGem(gem, socketIdx) {
+        let curItem = this;
+        if (gem && gem.unique) {
+            curItem = curItem.removeGemsWithId(gem.id);
+        }
+        return curItem.withGemHelper(gem, socketIdx);
+    }
+    removeGemsWithId(gemId) {
+        let curItem = this;
+        // Remove any currently socketed identical gems.
+        for (let i = 0; i < curItem._gems.length; i++) {
+            if (curItem._gems[i]?.id == gemId) {
+                curItem = curItem.withGemHelper(null, i);
+            }
+        }
+        return curItem;
     }
     asSpec() {
         return ItemSpec.create({

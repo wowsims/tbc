@@ -30,7 +30,7 @@ export class SavedDataManager extends Component {
                 alert(`${config.label} with name ${newName} already exists.`);
                 return;
             }
-            this.addSavedData(newName, config.getData(sim), false);
+            this.addSavedData(newName, config.getData(this.sim), false);
             this.saveUserData();
         });
     }
@@ -109,11 +109,11 @@ export class SavedDataManager extends Component {
         this.userData.forEach(savedData => {
             gearData[savedData.name] = this.config.toJson(savedData.data);
         });
-        window.localStorage.setItem(this.config.label, JSON.stringify(gearData));
+        window.localStorage.setItem(this.config.storageKey, JSON.stringify(gearData));
     }
     // Load data from window.localStorage.
     loadUserData() {
-        const dataStr = window.localStorage.getItem(this.config.label);
+        const dataStr = window.localStorage.getItem(this.config.storageKey);
         if (!dataStr)
             return;
         const jsonData = JSON.parse(dataStr);

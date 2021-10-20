@@ -15,6 +15,7 @@ import { EquipmentSpec } from "./common";
 import { Consumes } from "./common";
 import { ElementalShaman } from "./shaman";
 import { BalanceDruid } from "./druid";
+import { Class } from "./common";
 import { Race } from "./common";
 /**
  * @generated from protobuf message proto.PlayerOptions
@@ -25,67 +26,71 @@ export interface PlayerOptions {
      */
     race: Race;
     /**
+     * @generated from protobuf field: proto.Class class = 2;
+     */
+    class: Class;
+    /**
      * @generated from protobuf oneof: spec
      */
     spec: {
         oneofKind: "balanceDruid";
         /**
-         * @generated from protobuf field: proto.BalanceDruid balance_druid = 2;
+         * @generated from protobuf field: proto.BalanceDruid balance_druid = 3;
          */
         balanceDruid: BalanceDruid;
     } | {
         oneofKind: "hunter";
         /**
-         * @generated from protobuf field: proto.Hunter hunter = 3;
+         * @generated from protobuf field: proto.Hunter hunter = 4;
          */
         hunter: Hunter;
     } | {
         oneofKind: "mage";
         /**
-         * @generated from protobuf field: proto.Mage mage = 4;
+         * @generated from protobuf field: proto.Mage mage = 5;
          */
         mage: Mage;
     } | {
         oneofKind: "paladin";
         /**
-         * @generated from protobuf field: proto.Paladin paladin = 5;
+         * @generated from protobuf field: proto.Paladin paladin = 6;
          */
         paladin: Paladin;
     } | {
         oneofKind: "priest";
         /**
-         * @generated from protobuf field: proto.Priest priest = 6;
+         * @generated from protobuf field: proto.Priest priest = 7;
          */
         priest: Priest;
     } | {
         oneofKind: "rogue";
         /**
-         * @generated from protobuf field: proto.Rogue rogue = 7;
+         * @generated from protobuf field: proto.Rogue rogue = 8;
          */
         rogue: Rogue;
     } | {
         oneofKind: "elementalShaman";
         /**
-         * @generated from protobuf field: proto.ElementalShaman elemental_shaman = 8;
+         * @generated from protobuf field: proto.ElementalShaman elemental_shaman = 9;
          */
         elementalShaman: ElementalShaman;
     } | {
         oneofKind: "warlock";
         /**
-         * @generated from protobuf field: proto.Warlock warlock = 9;
+         * @generated from protobuf field: proto.Warlock warlock = 10;
          */
         warlock: Warlock;
     } | {
         oneofKind: "warrior";
         /**
-         * @generated from protobuf field: proto.Warrior warrior = 10;
+         * @generated from protobuf field: proto.Warrior warrior = 11;
          */
         warrior: Warrior;
     } | {
         oneofKind: undefined;
     };
     /**
-     * @generated from protobuf field: proto.Consumes consumes = 11;
+     * @generated from protobuf field: proto.Consumes consumes = 12;
      */
     consumes?: Consumes;
 }
@@ -186,15 +191,11 @@ export interface IndividualSimRequest {
      */
     randomSeed: bigint;
     /**
-     * @generated from protobuf field: double gcd_min = 6;
-     */
-    gcdMin: number;
-    /**
-     * @generated from protobuf field: bool debug = 7;
+     * @generated from protobuf field: bool debug = 6;
      */
     debug: boolean;
     /**
-     * @generated from protobuf field: bool exit_on_oom = 8;
+     * @generated from protobuf field: bool exit_on_oom = 7;
      */
     exitOnOom: boolean;
 }
@@ -250,8 +251,7 @@ export interface IndividualSimResult {
     error: string;
 }
 /**
- * ActionMetric holds a collection of counts of casts and
- *
+ * The aggregated results from all uses of a particular action.
  *
  * @generated from protobuf message proto.ActionMetric
  */
@@ -274,31 +274,49 @@ export interface ActionMetric {
     } | {
         oneofKind: "otherId";
         /**
-         * @generated from protobuf field: int32 other_id = 3;
+         * @generated from protobuf field: proto.OtherAction other_id = 3;
          */
-        otherId: number;
+        otherId: OtherAction;
     } | {
         oneofKind: undefined;
     };
     /**
-     * These arrays are indexed by tag (index 0 is untagged casts)
-     *  Currently the only use-case for this is shaman Lightning Overload.
+     * Distinguishes between different versions of the same action.
+     * Currently the only use for this is Shaman Lightning Overload.
      *
-     * @generated from protobuf field: repeated int32 casts = 4;
+     * @generated from protobuf field: int32 tag = 4;
      */
-    casts: number[];
+    tag: number;
     /**
-     * @generated from protobuf field: repeated int32 crits = 5;
+     * # of times this action was used by the agent.
+     *
+     * @generated from protobuf field: int32 casts = 5;
      */
-    crits: number[];
+    casts: number;
     /**
-     * @generated from protobuf field: repeated int32 misses = 6;
+     * # of times this action hit a target. For cleave spells this can be larger than casts.
+     *
+     * @generated from protobuf field: int32 hits = 6;
      */
-    misses: number[];
+    hits: number;
     /**
-     * @generated from protobuf field: repeated double dmgs = 7;
+     * # of times this action was a critical strike.
+     *
+     * @generated from protobuf field: int32 crits = 7;
      */
-    dmgs: number[];
+    crits: number;
+    /**
+     * # of times this action was a Miss or Resist.
+     *
+     * @generated from protobuf field: int32 misses = 8;
+     */
+    misses: number;
+    /**
+     * Total damage done to all targets by this action.
+     *
+     * @generated from protobuf field: double damage = 9;
+     */
+    damage: number;
 }
 /**
  * RPC RaidSim
@@ -428,6 +446,8 @@ export interface StatWeightsResult {
     epValuesStdev: number[];
 }
 /**
+ * ID for actions that aren't spells or items.
+ *
  * @generated from protobuf enum proto.OtherAction
  */
 export declare enum OtherAction {

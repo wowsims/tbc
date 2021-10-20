@@ -148,9 +148,9 @@ export interface ShamanTalents {
  */
 export interface ElementalShaman {
     /**
-     * @generated from protobuf field: proto.ElementalShaman.Agent agent = 1;
+     * @generated from protobuf field: proto.ElementalShaman.Rotation rotation = 1;
      */
-    agent?: ElementalShaman_Agent;
+    rotation?: ElementalShaman_Rotation;
     /**
      * @generated from protobuf field: proto.ShamanTalents talents = 2;
      */
@@ -161,38 +161,48 @@ export interface ElementalShaman {
     options?: ElementalShaman_Options;
 }
 /**
- * @generated from protobuf message proto.ElementalShaman.Agent
+ * @generated from protobuf message proto.ElementalShaman.Rotation
  */
-export interface ElementalShaman_Agent {
+export interface ElementalShaman_Rotation {
     /**
-     * @generated from protobuf field: proto.ElementalShaman.Agent.AgentType type = 1;
+     * @generated from protobuf field: proto.ElementalShaman.Rotation.RotationType type = 1;
      */
-    type: ElementalShaman_Agent_AgentType;
+    type: ElementalShaman_Rotation_RotationType;
+    /**
+     * Only used if type == FixedLBCL
+     *
+     * @generated from protobuf field: int32 lbs_per_cl = 2;
+     */
+    lbsPerCl: number;
 }
 /**
- * @generated from protobuf enum proto.ElementalShaman.Agent.AgentType
+ * @generated from protobuf enum proto.ElementalShaman.Rotation.RotationType
  */
-export declare enum ElementalShaman_Agent_AgentType {
+export declare enum ElementalShaman_Rotation_RotationType {
     /**
      * @generated from protobuf enum value: Unknown = 0;
      */
     Unknown = 0,
     /**
-     * @generated from protobuf enum value: FixedLBCL = 1;
+     * @generated from protobuf enum value: Adaptive = 1;
      */
-    FixedLBCL = 1,
+    Adaptive = 1,
     /**
      * @generated from protobuf enum value: CLOnClearcast = 2;
      */
     CLOnClearcast = 2,
     /**
-     * @generated from protobuf enum value: Adaptive = 3;
+     * @generated from protobuf enum value: CLOnCD = 3;
      */
-    Adaptive = 3,
+    CLOnCD = 3,
     /**
-     * @generated from protobuf enum value: CLOnCD = 4;
+     * @generated from protobuf enum value: FixedLBCL = 4;
      */
-    CLOnCD = 4
+    FixedLBCL = 4,
+    /**
+     * @generated from protobuf enum value: LBOnly = 5;
+     */
+    LBOnly = 5
 }
 /**
  * @generated from protobuf message proto.ElementalShaman.Options
@@ -239,16 +249,16 @@ declare class ElementalShaman$Type extends MessageType<ElementalShaman> {
  * @generated MessageType for protobuf message proto.ElementalShaman
  */
 export declare const ElementalShaman: ElementalShaman$Type;
-declare class ElementalShaman_Agent$Type extends MessageType<ElementalShaman_Agent> {
+declare class ElementalShaman_Rotation$Type extends MessageType<ElementalShaman_Rotation> {
     constructor();
-    create(value?: PartialMessage<ElementalShaman_Agent>): ElementalShaman_Agent;
-    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: ElementalShaman_Agent): ElementalShaman_Agent;
-    internalBinaryWrite(message: ElementalShaman_Agent, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+    create(value?: PartialMessage<ElementalShaman_Rotation>): ElementalShaman_Rotation;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: ElementalShaman_Rotation): ElementalShaman_Rotation;
+    internalBinaryWrite(message: ElementalShaman_Rotation, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
- * @generated MessageType for protobuf message proto.ElementalShaman.Agent
+ * @generated MessageType for protobuf message proto.ElementalShaman.Rotation
  */
-export declare const ElementalShaman_Agent: ElementalShaman_Agent$Type;
+export declare const ElementalShaman_Rotation: ElementalShaman_Rotation$Type;
 declare class ElementalShaman_Options$Type extends MessageType<ElementalShaman_Options> {
     constructor();
     create(value?: PartialMessage<ElementalShaman_Options>): ElementalShaman_Options;

@@ -11,24 +11,31 @@ import { Stat } from '/tbc/core/proto/common.js';
 import { Gear } from '/tbc/core/proto_utils/gear.js';
 import { Stats } from '/tbc/core/proto_utils/stats.js';
 import { SimUI, SimUIConfig } from '/tbc/core/sim_ui.js';
+export interface IconSection {
+    tooltip?: string;
+    icons: Array<IconInput>;
+}
+export interface InputSection {
+    tooltip?: string;
+    inputs: Array<{
+        type: 'number';
+        cssClass: string;
+        config: NumberPickerConfig;
+    } | {
+        type: 'enum';
+        cssClass: string;
+        config: EnumPickerConfig;
+    }>;
+}
 export interface DefaultThemeConfig<SpecType extends Spec> extends SimUIConfig<SpecType> {
     displayStats: Array<Stat>;
-    iconSections: Record<string, {
-        tooltip?: string;
-        icons: Array<IconInput>;
-    }>;
-    otherSections: Record<string, {
-        tooltip?: string;
-        inputs: Array<{
-            type: 'number';
-            cssClass: string;
-            config: NumberPickerConfig;
-        } | {
-            type: 'enum';
-            cssClass: string;
-            config: EnumPickerConfig;
-        }>;
-    }>;
+    selfBuffInputs: IconSection;
+    buffInputs: IconSection;
+    debuffInputs: IconSection;
+    consumeInputs: IconSection;
+    rotationInputs: InputSection;
+    otherInputs?: InputSection;
+    additionalSections?: Record<string, InputSection>;
     showTargetArmor: boolean;
     showNumTargets: boolean;
     freezeTalents: boolean;

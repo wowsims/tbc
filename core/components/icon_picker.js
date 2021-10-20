@@ -5,9 +5,8 @@ import { isRightClick } from '/tbc/core/utils.js';
 import { Component } from './component.js';
 // Icon-based UI for picking buffs / consumes / etc
 export class IconPicker extends Component {
-    constructor(parent, rootClass, sim, inputs, simUI) {
+    constructor(parent, sim, inputs, simUI) {
         super(parent, 'icon-picker-root');
-        this.rootElem.classList.add(rootClass);
         this._inputs = inputs.map(input => new IconInputComponent(this.rootElem, sim, input, simUI));
     }
 }

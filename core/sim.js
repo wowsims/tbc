@@ -31,7 +31,7 @@ export class Sim extends WorkerPool {
         this.encounterChangeEmitter = new TypedEvent();
         this.gearChangeEmitter = new TypedEvent();
         this.raceChangeEmitter = new TypedEvent();
-        this.agentChangeEmitter = new TypedEvent();
+        this.rotationChangeEmitter = new TypedEvent();
         this.talentsChangeEmitter = new TypedEvent();
         // Talents dont have all fields so we need this
         this.talentsStringChangeEmitter = new TypedEvent();
@@ -55,7 +55,7 @@ export class Sim extends WorkerPool {
         this._customStats = new Stats();
         this._encounter = config.defaults.encounter;
         this._gear = new Gear({});
-        this._agent = config.defaults.agent;
+        this._rotation = config.defaults.rotation;
         this._talents = this.specTypeFunctions.talentsCreate();
         this._talentsString = config.defaults.talents;
         this._epWeights = config.defaults.epWeights;
@@ -68,7 +68,7 @@ export class Sim extends WorkerPool {
             this.encounterChangeEmitter,
             this.gearChangeEmitter,
             this.raceChangeEmitter,
-            this.agentChangeEmitter,
+            this.rotationChangeEmitter,
             this.talentsChangeEmitter,
             this.talentsStringChangeEmitter,
             this.specOptionsChangeEmitter,
@@ -100,7 +100,7 @@ export class Sim extends WorkerPool {
         // Sometimes a ui change triggers other changes, so waiting a bit makes sure
         // we get all of them.
         await wait(10);
-        const computeStatsResult = await this.computeStats(makeComputeStatsRequest(this._buffs, this._consumes, this._customStats, this._encounter, this._gear, this._race, this._agent, this._talents, this._specOptions));
+        const computeStatsResult = await this.computeStats(makeComputeStatsRequest(this._buffs, this._consumes, this._customStats, this._encounter, this._gear, this._race, this._rotation, this._talents, this._specOptions));
         this._currentStats = computeStatsResult;
         this.characterStatsEmitter.emit();
     }
@@ -210,14 +210,14 @@ export class Sim extends WorkerPool {
         this._customStats = newCustomStats;
         this.customStatsChangeEmitter.emit();
     }
-    getAgent() {
-        return this.specTypeFunctions.agentCopy(this._agent);
+    getRotation() {
+        return this.specTypeFunctions.rotationCopy(this._rotation);
     }
-    setAgent(newAgent) {
-        if (this.specTypeFunctions.agentEquals(newAgent, this._agent))
+    setRotation(newRotation) {
+        if (this.specTypeFunctions.rotationEquals(newRotation, this._rotation))
             return;
-        this._agent = this.specTypeFunctions.agentCopy(newAgent);
-        this.agentChangeEmitter.emit();
+        this._rotation = this.specTypeFunctions.rotationCopy(newRotation);
+        this.rotationChangeEmitter.emit();
     }
     // Commented because this should NOT be used; all external uses should be able to use getTalentsString()
     //getTalents(): SpecTalents<SpecType> {
@@ -311,7 +311,7 @@ export class Sim extends WorkerPool {
         return ep;
     }
     makeCurrentIndividualSimRequest(iterations, debug) {
-        return makeIndividualSimRequest(this._buffs, this._consumes, this._customStats, this._encounter, this._gear, this._race, this._agent, this._talents, this._specOptions, iterations, debug);
+        return makeIndividualSimRequest(this._buffs, this._consumes, this._customStats, this._encounter, this._gear, this._race, this._rotation, this._talents, this._specOptions, iterations, debug);
     }
     setWowheadData(equippedItem, elem) {
         let parts = [];
@@ -333,21 +333,66 @@ export class Sim extends WorkerPool {
             'encounter': Encounter.toJson(this._encounter),
             'gear': EquipmentSpec.toJson(this._gear.asSpec()),
             'race': this._race,
-            'agent': this.specTypeFunctions.agentToJson(this._agent),
+            'rotation': this.specTypeFunctions.rotationToJson(this._rotation),
             'talents': this._talentsString,
             'specOptions': this.specTypeFunctions.optionsToJson(this._specOptions),
         };
     }
     // Set all the current values, assumes obj is the same type returned by toJson().
     fromJson(obj) {
-        this.setBuffs(Buffs.fromJson(obj['buffs']));
-        this.setConsumes(Consumes.fromJson(obj['consumes']));
-        this.setCustomStats(Stats.fromJson(obj['customStats']));
-        this.setEncounter(Encounter.fromJson(obj['encounter']));
-        this.setGear(this.lookupEquipmentSpec(EquipmentSpec.fromJson(obj['gear'])));
-        this.setRace(obj['race']);
-        this.setAgent(this.specTypeFunctions.agentFromJson(obj['agent']));
-        this.setTalentsString(obj['talents']);
-        this.setSpecOptions(this.specTypeFunctions.optionsFromJson(obj['specOptions']));
+        try {
+            this.setBuffs(Buffs.fromJson(obj['buffs']));
+        }
+        catch (e) {
+            console.warn('Failed to parse buffs: ' + e);
+        }
+        try {
+            this.setConsumes(Consumes.fromJson(obj['consumes']));
+        }
+        catch (e) {
+            console.warn('Failed to parse consumes: ' + e);
+        }
+        try {
+            this.setCustomStats(Stats.fromJson(obj['customStats']));
+        }
+        catch (e) {
+            console.warn('Failed to parse custom stats: ' + e);
+        }
+        try {
+            this.setEncounter(Encounter.fromJson(obj['encounter']));
+        }
+        catch (e) {
+            console.warn('Failed to parse encounter: ' + e);
+        }
+        try {
+            this.setGear(this.lookupEquipmentSpec(EquipmentSpec.fromJson(obj['gear'])));
+        }
+        catch (e) {
+            console.warn('Failed to parse gear: ' + e);
+        }
+        try {
+            this.setRace(obj['race']);
+        }
+        catch (e) {
+            console.warn('Failed to parse race: ' + e);
+        }
+        try {
+            this.setRotation(this.specTypeFunctions.rotationFromJson(obj['rotation']));
+        }
+        catch (e) {
+            console.warn('Failed to parse rotation: ' + e);
+        }
+        try {
+            this.setTalentsString(obj['talents']);
+        }
+        catch (e) {
+            console.warn('Failed to parse talents: ' + e);
+        }
+        try {
+            this.setSpecOptions(this.specTypeFunctions.optionsFromJson(obj['specOptions']));
+        }
+        catch (e) {
+            console.warn('Failed to parse spec options: ' + e);
+        }
     }
 }

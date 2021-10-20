@@ -21,18 +21,19 @@ export function getActionId(actionMetric) {
     }
 }
 export function parseActionMetrics(actionMetricProtos) {
-    const actionMetrics = actionMetricProtos.map(actionMetric => actionMetric.casts.map((_, i) => {
+    const actionMetrics = actionMetricProtos.map(actionMetric => {
         return {
             actionId: getActionId(actionMetric),
             name: '',
             iconUrl: '',
-            tagIndex: i,
-            casts: actionMetric.casts[i],
-            crits: actionMetric.crits[i],
-            misses: actionMetric.misses[i],
-            totalDmg: actionMetric.dmgs[i],
+            tagIndex: actionMetric.tag,
+            casts: actionMetric.casts,
+            hits: actionMetric.hits,
+            crits: actionMetric.crits,
+            misses: actionMetric.misses,
+            totalDmg: actionMetric.damage,
         };
-    })).flat();
+    });
     return Promise.all(actionMetrics.map(actionMetric => getName(actionMetric.actionId)
         .then(name => {
         if (actionMetric.tagIndex == 0) {

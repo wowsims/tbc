@@ -1,15 +1,17 @@
 import { Sim } from '/tbc/core/sim.js';
-import { TypedEvent } from '/tbc/core/typed_event.js';
-import { Component } from './component.js';
-export interface EnumPickerConfig {
-    label?: string;
-    defaultValue?: number;
-    names: Array<string>;
-    values: Array<number>;
-    changedEvent: (sim: Sim<any>) => TypedEvent<any>;
-    getValue: (sim: Sim<any>) => number;
-    setValue: (sim: Sim<any>, newValue: number) => void;
+import { Input, InputConfig } from './input.js';
+export interface EnumValueConfig {
+    name: string;
+    value: number;
+    tooltip?: string;
 }
-export declare class EnumPicker extends Component {
+export interface EnumPickerConfig extends InputConfig<number> {
+    values: Array<EnumValueConfig>;
+}
+export declare class EnumPicker extends Input<number> {
+    private readonly selectElem;
     constructor(parent: HTMLElement, sim: Sim<any>, config: EnumPickerConfig);
+    getInputElem(): HTMLElement;
+    getInputValue(): number;
+    setInputValue(newValue: number): void;
 }
