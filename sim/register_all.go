@@ -1,6 +1,7 @@
 package sim
 
 import (
+	_ "github.com/wowsims/tbc/sim/common"
 	"github.com/wowsims/tbc/sim/shaman/elemental"
 )
 

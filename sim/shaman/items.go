@@ -4,7 +4,6 @@ import (
 	"log"
 	"time"
 
-	_ "github.com/wowsims/tbc/sim/common"
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/stats"
 )
