@@ -2,6 +2,8 @@ package core
 
 import (
 	"time"
+
+	"github.com/wowsims/tbc/sim/core/proto"
 )
 
 func MinInt32(a int32, b int32) int32 {
@@ -49,5 +51,35 @@ func MaxDuration(a time.Duration, b time.Duration) time.Duration {
 		return a
 	} else {
 		return b
+	}
+}
+
+func MinTristate(a proto.TristateEffect, b proto.TristateEffect) proto.TristateEffect {
+	if a < b {
+		return a
+	} else {
+		return b
+	}
+}
+
+func MaxTristate(a proto.TristateEffect, b proto.TristateEffect) proto.TristateEffect {
+	if a > b {
+		return a
+	} else {
+		return b
+	}
+}
+
+func DurationFromSeconds(numSeconds float64) time.Duration {
+	return time.Duration(float64(time.Second) * numSeconds)
+}
+
+func GetTristateValueFloat(effect proto.TristateEffect, regularValue float64, impValue float64) float64 {
+	if effect == proto.TristateEffect_TristateEffectRegular {
+		return regularValue
+	} else if effect == proto.TristateEffect_TristateEffectImproved {
+		return impValue
+	} else {
+		return 0
 	}
 }

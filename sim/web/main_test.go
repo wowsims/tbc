@@ -15,8 +15,8 @@ import (
 
 var basicSpec = &proto.PlayerOptions_ElementalShaman{
 	ElementalShaman: &proto.ElementalShaman{
-		Agent: &proto.ElementalShaman_Agent{
-			Type: proto.ElementalShaman_Agent_Adaptive,
+		Rotation: &proto.ElementalShaman_Rotation{
+			Type: proto.ElementalShaman_Rotation_Adaptive,
 		},
 		Talents: &proto.ShamanTalents{
 			// ElementalDevastation
@@ -41,7 +41,7 @@ var basicConsumes = &proto.Consumes{
 	FlaskOfBlindingLight: true,
 	BlackenedBasilisk:    true,
 	BrilliantWizardOil:   true,
-	SuperManaPotion:      true,
+	DefaultPotion:        proto.Potions_SuperManaPotion,
 	DarkRune:             true,
 }
 
@@ -92,6 +92,7 @@ func TestIndividualSim(t *testing.T) {
 		Player: &proto.Player{
 			Options: &proto.PlayerOptions{
 				Race:     proto.Race_RaceTroll10,
+				Class:    proto.Class_ClassShaman,
 				Spec:     basicSpec,
 				Consumes: basicConsumes,
 			},

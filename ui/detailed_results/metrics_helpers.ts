@@ -9,6 +9,7 @@ export type ActionMetric = {
 	tagIndex: number,
 	iconUrl: string,
 	casts: number,
+	hits: number,
 	crits: number,
 	misses: number,
 	totalDmg: number,
@@ -33,18 +34,19 @@ export function getActionId(actionMetric: ActionMetricProto): ActionId {
 }
 
 export function parseActionMetrics(actionMetricProtos: Array<ActionMetricProto>): Promise<Array<ActionMetric>> {
-	const actionMetrics = actionMetricProtos.map(actionMetric => actionMetric.casts.map((_, i) => {
+	const actionMetrics = actionMetricProtos.map(actionMetric => {
 		return {
 			actionId: getActionId(actionMetric),
 			name: '',
 			iconUrl: '',
-			tagIndex: i,
-			casts: actionMetric.casts[i],
-			crits: actionMetric.crits[i],
-			misses: actionMetric.misses[i],
-			totalDmg: actionMetric.dmgs[i],
+			tagIndex: actionMetric.tag,
+			casts: actionMetric.casts,
+			hits: actionMetric.hits,
+			crits: actionMetric.crits,
+			misses: actionMetric.misses,
+			totalDmg: actionMetric.damage,
 		};
-	})).flat();
+	});
 
 	return Promise.all(actionMetrics.map(actionMetric => 
 		getName(actionMetric.actionId)

@@ -1,5 +1,6 @@
 @import "../core/themes/default";
 
+// Set color variables which control the site theme.
 :root {
 	--main-bg-color: MidnightBlue;
 	--main-text-color: White;
@@ -13,22 +14,16 @@ body {
   margin: 0;
 }
 
-.SelfBuffs-icon-picker {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
+// Set grid width for icon sections based on how many buffs we configured.
+.self-buffs-section>div {
+  grid-template-columns: repeat(4, 1fr);
 }
-
-.OtherBuffs-icon-picker {
-  display: grid;
-  grid-template-columns: repeat(8, 1fr);
+.consumes-section>div {
+  grid-template-columns: repeat(4, 1fr);
 }
-
-.Consumes-icon-picker {
-  display: grid;
+.buffs-section>div {
   grid-template-columns: repeat(6, 1fr);
 }
-
-.Debuffs-icon-picker {
-  display: grid;
+.debuffs-section>div {
   grid-template-columns: repeat(3, 1fr);
 }

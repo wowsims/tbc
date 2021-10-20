@@ -1,0 +1,7 @@
+.input-label {
+  margin: 5px;
+}
+
+.input-root.disabled .input-label {
+	filter: opacity(0.5);
+}

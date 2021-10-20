@@ -1,10 +1,8 @@
-.enum-picker-root {
-  display: inline-block;
-}
+@import "./input";
 
-.enum-picker-label {
-  margin: 5px;
+.enum-picker-root {
 }
 
 .enum-picker-selector {
+  margin: 5px;
 }

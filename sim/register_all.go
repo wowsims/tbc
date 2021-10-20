@@ -1,7 +1,8 @@
 package sim
 
 import (
-	"github.com/wowsims/tbc/sim/shaman"
+	_ "github.com/wowsims/tbc/sim/common"
+	"github.com/wowsims/tbc/sim/shaman/elemental"
 )
 
 var registered = false
@@ -11,5 +12,5 @@ func RegisterAll() {
 	}
 	registered = true
 
-	shaman.RegisterElementalShaman()
+	elemental.RegisterElementalShaman()
 }

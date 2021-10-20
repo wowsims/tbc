@@ -8,8 +8,6 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-const SpellCritRatingPerCritChance = 22.08
-
 // Input needed to start casting a spell.
 type DirectCastInput struct {
 	ManaCost float64
@@ -50,13 +48,12 @@ type DirectCastDamageResult struct {
 	Damage float64 // Damage done by this cast.
 }
 
-func (result *DirectCastDamageResult) String() string {
+func (result DirectCastDamageResult) String() string {
 	if !result.Hit {
 		return "Miss"
 	}
 
 	var sb strings.Builder
-	sb.WriteString("")
 
 	if result.PartialResist_1_4 {
 		sb.WriteString("25% Resist ")
@@ -195,8 +192,8 @@ func (action DirectCastAction) calculateDirectCastDamage(sim *Simulation, damage
 
 	character := action.GetAgent().GetCharacter()
 
-	hit := 0.83 + character.Stats[stats.SpellHit]/1260.0 + damageInput.BonusHit // 12.6 hit == 1% hit
-	hit = MinFloat(hit, 0.99)                                                    // can't get away from the 1% miss
+	hit := 0.83 + character.Stats[stats.SpellHit]/(SpellHitRatingPerHitChance*100) + damageInput.BonusHit
+	hit = MinFloat(hit, 0.99) // can't get away from the 1% miss
 
 	if sim.Rando.Float64("action hit") >= hit { // Miss
 		return result
@@ -211,8 +208,7 @@ func (action DirectCastAction) calculateDirectCastDamage(sim *Simulation, damage
 	damage *= damageInput.DamageMultiplier
 
 	crit := (character.Stats[stats.SpellCrit] / (SpellCritRatingPerCritChance * 100)) + damageInput.BonusCrit
-	// TODO: Put guaranteed crit first, to short-circuit the random roll. Keeping it this way for now for tests.
-	if sim.Rando.Float64("action crit") < crit || action.castInput.GuaranteedCrit {
+	if action.castInput.GuaranteedCrit || sim.Rando.Float64("action crit") < crit {
 		result.Crit = true
 		damage *= action.castInput.CritMultiplier
 	}

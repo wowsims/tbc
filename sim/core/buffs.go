@@ -7,90 +7,8 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-type Buffs struct {
-	// Raid buffs
-	ArcaneBrilliance bool
-	GiftOfTheWild    proto.TristateEffect
-	BlessingOfKings  bool
-	BlessingOfWisdom proto.TristateEffect
-	DivineSpirit     proto.TristateEffect
-
-	// Party class buffs
-	MoonkinAura     proto.TristateEffect
-	ShadowPriestDPS uint16 // adds Mp5 ~ 25% (dps*5%*5sec = 25%)
-	Bloodlust       int32
-
-	// Totems
-	ManaSpringTotem proto.TristateEffect
-	ManaTideTotem   bool
-	TotemOfWrath    int32
-	WrathOfAirTotem proto.TristateEffect
-
-	// Target debuff
-	JudgementOfWisdom         bool
-	ImprovedSealOfTheCrusader bool
-	Misery                    bool
-
-	// Drums
-	DrumsOfBattle      bool
-	DrumsOfRestoration bool
-
-	// Party item buffs
-	AtieshMage            int32
-	AtieshWarlock         int32
-	BraidedEterniumChain  bool
-	ChainOfTheTwilightOwl bool
-	EyeOfTheNight         bool
-	JadePendantOfBlasting bool
-}
-
-func ProtoToBuffs(inBuff *proto.Buffs) Buffs {
-	return Buffs{
-		ArcaneBrilliance: inBuff.ArcaneBrilliance,
-		Bloodlust:        inBuff.Bloodlust,
-		GiftOfTheWild:    inBuff.GiftOfTheWild,
-		BlessingOfKings:  inBuff.BlessingOfKings,
-		BlessingOfWisdom: inBuff.BlessingOfWisdom,
-		DivineSpirit:     inBuff.DivineSpirit,
-		MoonkinAura:      inBuff.MoonkinAura,
-		ShadowPriestDPS:  uint16(inBuff.ShadowPriestDps),
-
-		JudgementOfWisdom:         inBuff.JudgementOfWisdom,
-		ImprovedSealOfTheCrusader: inBuff.ImprovedSealOfTheCrusader,
-		Misery:                    inBuff.Misery,
-
-		ManaSpringTotem: inBuff.ManaSpringTotem,
-		ManaTideTotem:   inBuff.ManaTideTotem,
-		TotemOfWrath:    inBuff.TotemOfWrath,
-		WrathOfAirTotem: inBuff.WrathOfAirTotem,
-
-		DrumsOfBattle:      inBuff.DrumsOfBattle,
-		DrumsOfRestoration: inBuff.DrumsOfRestoration,
-
-		AtieshMage:            inBuff.AtieshMage,
-		AtieshWarlock:         inBuff.AtieshWarlock,
-		BraidedEterniumChain:  inBuff.BraidedEterniumChain,
-		ChainOfTheTwilightOwl: inBuff.ChainOfTheTwilightOwl,
-		EyeOfTheNight:         inBuff.EyeOfTheNight,
-		JadePendantOfBlasting: inBuff.JadePendantOfBlasting,
-	}
-}
-
-//func TristateMax(a proto.TristateEffect, b proto.TristateEffect) api.TristateEffect {
-//}
-
-func GetTristateValueFloat(effect proto.TristateEffect, regularValue float64, impValue float64) float64 {
-	if effect == proto.TristateEffect_TristateEffectRegular {
-		return regularValue
-	} else if effect == proto.TristateEffect_TristateEffectImproved {
-		return impValue
-	} else {
-		return 0
-	}
-}
-
 // Applies buffs that affect the sim as a whole.
-func (buffs Buffs) ApplyToSim(sim *Simulation) {
+func ApplyBuffsToSim(sim *Simulation, buffs proto.Buffs) {
 	if buffs.Misery {
 		sim.AddInitialAura(func(sim *Simulation) Aura {
 			return MiseryAura()
@@ -105,7 +23,7 @@ func (buffs Buffs) ApplyToSim(sim *Simulation) {
 }
 
 // Applies buffs that affect individual players.
-func (buffs Buffs) ApplyToPlayer(agent Agent) {
+func ApplyBuffsToPlayer(agent Agent, buffs proto.Buffs) {
 	character := agent.GetCharacter()
 
 	if buffs.ArcaneBrilliance {
@@ -114,8 +32,8 @@ func (buffs Buffs) ApplyToPlayer(agent Agent) {
 		})
 	}
 
-	// TODO: Figure out imp value
-	gotwAmount := GetTristateValueFloat(buffs.GiftOfTheWild, 18.0, 18.0)
+	// TODO: Double-check these numbers.
+	gotwAmount := GetTristateValueFloat(buffs.GiftOfTheWild, 14.0, 14.0 * 1.35)
 	// TODO: Pretty sure some of these dont stack with fort/ai/divine spirit
 	character.AddInitialStats(stats.Stats{
 		stats.Stamina:   gotwAmount,
@@ -129,14 +47,26 @@ func (buffs Buffs) ApplyToPlayer(agent Agent) {
 		stats.SpellCrit: GetTristateValueFloat(buffs.MoonkinAura, 5*SpellCritRatingPerCritChance, 5*SpellCritRatingPerCritChance+20),
 	})
 
+	if (buffs.DraeneiRacialMelee) {
+		character.AddInitialStats(stats.Stats{
+			stats.MeleeHit: 1 * MeleeHitRatingPerHitChance,
+		})
+	}
+
+	if (buffs.DraeneiRacialCaster) {
+		character.AddInitialStats(stats.Stats{
+			stats.SpellHit: 1 * SpellHitRatingPerHitChance,
+		})
+	}
+
 	character.AddInitialStats(stats.Stats{
 		stats.Spirit: GetTristateValueFloat(buffs.DivineSpirit, 50.0, 50.0),
 	})
 
 	// shadow priest buff bot just statically applies mp5
-	if buffs.ShadowPriestDPS > 0 {
+	if buffs.ShadowPriestDps > 0 {
 		character.AddInitialStats(stats.Stats{
-			stats.MP5: float64(buffs.ShadowPriestDPS) * 0.25,
+			stats.MP5: float64(buffs.ShadowPriestDps) * 0.25,
 		})
 	}
 
@@ -155,7 +85,7 @@ func (buffs Buffs) ApplyToPlayer(agent Agent) {
 	if buffs.TotemOfWrath > 0 {
 		character.AddInitialStats(stats.Stats{
 			stats.SpellCrit: 3 * SpellCritRatingPerCritChance * float64(buffs.TotemOfWrath),
-			stats.SpellHit:  37.8 * float64(buffs.TotemOfWrath),
+			stats.SpellHit:  3 * SpellHitRatingPerHitChance * float64(buffs.TotemOfWrath),
 		})
 	}
 	character.AddInitialStats(stats.Stats{
@@ -203,7 +133,7 @@ func AuraJudgementOfWisdom() Aura {
 		ID:      MagicIDJoW,
 		Expires: NeverExpires,
 		OnSpellHit: func(sim *Simulation, cast DirectCastAction, result *DirectCastDamageResult) {
-			if cast.GetActionID().ItemID == ItemIDTLC {
+			if cast.GetActionID().ItemID == ItemIDTheLightningCapacitor {
 				return // TLC cant proc JoW
 			}
 

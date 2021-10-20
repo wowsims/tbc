@@ -8,14 +8,14 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-func newShaman(character core.Character, talents Talents, selfBuffs SelfBuffs, agent shamanAgent) *Shaman {
+func NewShaman(character core.Character, talents proto.ShamanTalents, selfBuffs SelfBuffs, rotation Rotation) *Shaman {
 	if selfBuffs.WaterShield {
 		character.InitialStats[stats.MP5] += 50
 	}
 
 	return &Shaman{
 		Character: character,
-		agent:     agent,
+		rotation:  rotation,
 		Talents:   talents,
 		SelfBuffs: selfBuffs,
 
@@ -33,15 +33,16 @@ type SelfBuffs struct {
 	ManaSpring   bool
 }
 
-// Agent is shaman specific agent for behavior.
-type shamanAgent interface {
-	// Returns the action this Agent would like to take next.
+// Picks which attacks / abilities the Shaman does.
+type Rotation interface {
+	// Returns the action this rotation would like to take next.
 	ChooseAction(*Shaman, *core.Simulation) core.AgentAction
 
-	// This will be invoked if the chosen action is actually executed, so the Agent can update its state.
+	// This will be invoked right before the chosen action is actually executed, so the rotation can update its state.
+	// Note that the action may be different from the action chosen by this rotation.
 	OnActionAccepted(*Shaman, *core.Simulation, core.AgentAction)
 
-	// Returns this Agent to its initial state.
+	// Returns this rotation to its initial state. Called before each Sim iteration.
 	Reset(*Shaman, *core.Simulation)
 }
 
@@ -49,32 +50,25 @@ type shamanAgent interface {
 type Shaman struct {
 	core.Character
 
-	agent shamanAgent
+	rotation Rotation
 
-	Talents   Talents
+	Talents   proto.ShamanTalents
 	SelfBuffs SelfBuffs
 
-	// HACK HACK HACK
-	// TODO: do we actually need a 'on start' method for agents?
-	//   This particular use case could also be solved by the 'OnStatAdd' event...
-	//    but are there other things we want to do once all buffs are applied right before starting?
-	//   Unrelenting storm could also be calculated on the fly if we can allow agents to override the 'Advance' function.
-	started bool
+	ElementalFocusStacks byte
 
 	// cache
 	convectionBonus float64
 	concussionBonus float64
-
-	elementalFocusStacks byte
 }
 
 func (shaman *Shaman) GetCharacter() *core.Character {
 	return &shaman.Character
 }
 
-func (shaman *Shaman) AddRaidBuffs(buffs *core.Buffs) {
+func (shaman *Shaman) AddRaidBuffs(buffs *proto.Buffs) {
 }
-func (shaman *Shaman) AddPartyBuffs(buffs *core.Buffs) {
+func (shaman *Shaman) AddPartyBuffs(buffs *proto.Buffs) {
 	if shaman.SelfBuffs.Bloodlust {
 		buffs.Bloodlust += 1
 	}
@@ -84,72 +78,36 @@ func (shaman *Shaman) AddPartyBuffs(buffs *core.Buffs) {
 	}
 
 	if shaman.SelfBuffs.ManaSpring {
-		buffs.ManaSpringTotem = proto.TristateEffect_TristateEffectRegular
+		buffs.ManaSpringTotem = core.MaxTristate(buffs.ManaSpringTotem, proto.TristateEffect_TristateEffectRegular)
 	}
 
 	if shaman.SelfBuffs.WrathOfAir {
-		// TODO: Check for t4 set bonus
-		buffs.WrathOfAirTotem = proto.TristateEffect_TristateEffectRegular
+		woaValue := proto.TristateEffect_TristateEffectRegular
+		if ItemSetCycloneRegalia.CharacterHasSetBonus(shaman.GetCharacter(), 2) {
+			woaValue = proto.TristateEffect_TristateEffectImproved
+		}
+		buffs.WrathOfAirTotem = core.MaxTristate(buffs.WrathOfAirTotem, woaValue)
 	}
 }
 
-// BuffUp lets you buff up all characters in sim (and yourself)
 func (shaman *Shaman) BuffUp(sim *core.Simulation) {
+	shaman.Stats[stats.MP5] += shaman.Stats[stats.Intellect] * (0.02 * float64(shaman.Talents.UnrelentingStorm))
 }
-func (shaman *Shaman) ChooseAction(sim *core.Simulation) core.AgentAction {
-	// TODO: Move this to BuffUp?
-	if !shaman.started {
-		shaman.started = true
-		// we need to apply regen once all buffs are applied.
-		shaman.Stats[stats.MP5] += shaman.Stats[stats.Intellect] * (0.02 * float64(shaman.Talents.UnrelentingStorm))
-	}
 
+func (shaman *Shaman) ChooseAction(sim *core.Simulation) core.AgentAction {
 	// Before casting, activate shaman powers!
 	TryActivateBloodlust(sim, shaman)
 	if shaman.Talents.ElementalMastery {
 		TryActivateEleMastery(sim, shaman)
 	}
 
-	return shaman.agent.ChooseAction(shaman, sim)
+	return shaman.rotation.ChooseAction(shaman, sim)
 }
 func (shaman *Shaman) OnActionAccepted(sim *core.Simulation, action core.AgentAction) {
-	shaman.agent.OnActionAccepted(shaman, sim, action)
+	shaman.rotation.OnActionAccepted(shaman, sim, action)
 }
 func (shaman *Shaman) Reset(newsim *core.Simulation) {
-	shaman.started = false
-	shaman.agent.Reset(shaman, newsim)
-}
-
-type Talents struct {
-	ElementalFocus     bool
-	LightningMastery   int
-	LightningOverload  int
-	ElementalPrecision int
-	NaturesGuidance    int
-	TidalMastery       int
-	ElementalMastery   bool
-	ElementalFury      bool
-	UnrelentingStorm   int
-	CallOfThunder      int
-	Convection         int
-	Concussion         int
-}
-
-func convertShamTalents(t *proto.ShamanTalents) Talents {
-	return Talents{
-		LightningOverload:  int(t.LightningOverload),
-		ElementalPrecision: int(t.ElementalPrecision),
-		NaturesGuidance:    int(t.NaturesGuidance),
-		TidalMastery:       int(t.TidalMastery),
-		ElementalMastery:   t.ElementalMastery,
-		ElementalFury:      t.ElementalFury,
-		UnrelentingStorm:   int(t.UnrelentingStorm),
-		CallOfThunder:      int(t.CallOfThunder),
-		Convection:         int(t.Convection),
-		Concussion:         int(t.Concussion),
-		LightningMastery:   int(t.LightningMastery),
-		ElementalFocus:     t.ElementalFocus,
-	}
+	shaman.rotation.Reset(shaman, newsim)
 }
 
 func TryActivateBloodlust(sim *core.Simulation, shaman *Shaman) {
@@ -187,4 +145,37 @@ func TryActivateEleMastery(sim *core.Simulation, shaman *Shaman) {
 			shaman.RemoveAura(sim, core.MagicIDEleMastery)
 		},
 	})
+}
+
+func init() {
+	core.BaseStats[core.BaseStatsKey{ Race: core.RaceBonusTypeDraenei, Class: proto.Class_ClassShaman }] = stats.Stats{
+		stats.Strength:  103,
+		stats.Agility:   61,
+		stats.Stamina:   113,
+		stats.Intellect: 109,
+		stats.Spirit:    122,
+		stats.Mana:      2678,
+		stats.SpellCrit: 48.576,
+	}
+	core.BaseStats[core.BaseStatsKey{ Race: core.RaceBonusTypeOrc, Class: proto.Class_ClassShaman }] = stats.Stats{
+		stats.Intellect: 104,
+		stats.Mana:      2678,
+		stats.Spirit:    135,
+		stats.SpellCrit: 48.576,
+	}
+	core.BaseStats[core.BaseStatsKey{ Race: core.RaceBonusTypeTauren, Class: proto.Class_ClassShaman }] = stats.Stats{
+		stats.Intellect: 104,
+		stats.Mana:      2678,
+		stats.Spirit:    135,
+		stats.SpellCrit: 48.576,
+	}
+
+	trollStats := stats.Stats{
+		stats.Intellect: 104,
+		stats.Mana:      2678,
+		stats.Spirit:    135,
+		stats.SpellCrit: 48.576,
+	}
+	core.BaseStats[core.BaseStatsKey{ Race: core.RaceBonusTypeTroll10, Class: proto.Class_ClassShaman }] = trollStats
+	core.BaseStats[core.BaseStatsKey{ Race: core.RaceBonusTypeTroll30, Class: proto.Class_ClassShaman }] = trollStats
 }

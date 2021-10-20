@@ -4,9 +4,10 @@ rwildcard=$(foreach d,$(wildcard $(1:=/*)),$(call rwildcard,$d,$2) $(filter $(su
 OUT_DIR=dist/tbc
 
 # Make everything. Keep this first so it's the default rule.
-$(OUT_DIR): elemental_shaman $(OUT_DIR)/lib.wasm $(OUT_DIR)/sim_worker.js
+$(OUT_DIR): elemental_shaman
 
-elemental_shaman: $(OUT_DIR)/elemental_shaman/index.js $(OUT_DIR)/elemental_shaman/index.css $(OUT_DIR)/elemental_shaman/index.html detailed_results
+# Add new sim rules here! Don't forget to add it as a dependency to the default rule above.
+elemental_shaman: $(OUT_DIR)/elemental_shaman/index.js $(OUT_DIR)/elemental_shaman/index.css $(OUT_DIR)/elemental_shaman/index.html $(OUT_DIR)/elemental_shaman/lib.wasm $(OUT_DIR)/elemental_shaman/sim_worker.js detailed_results
 
 detailed_results: $(OUT_DIR)/detailed_results/index.js $(OUT_DIR)/detailed_results/index.css $(OUT_DIR)/detailed_results/index.html
 
@@ -49,16 +50,24 @@ $(OUT_DIR)/%/index.html: ui/index_template.html
 	mkdir -p $(@D)
 	cat ui/index_template.html | sed 's/@@TITLE@@/TBC $(title) Simulator/g' > $@
 
+# Generic rule for building lib.wasm for any class directory
+$(OUT_DIR)/%/lib.wasm: sim/wasm/* sim/core/proto/api.pb.go $(filter-out $(wildcard sim/core/items/*), $(call rwildcard,sim,*.go))
+	GOOS=js GOARCH=wasm go build --tags=$(shell basename $(@D)) -o ./$(@D)/lib.wasm ./sim/wasm/
+
+# Generic sim_worker that uses the lib.wasm for any class directory
+$(OUT_DIR)/%/sim_worker.js: ui/worker/sim_worker.js
+	cp ui/worker/sim_worker.js $(@D)/sim_worker.js
+
 .PHONY: wasm
 wasm: $(OUT_DIR)/lib.wasm
 
+# Builds the generic .wasm, with all items included.
+$(OUT_DIR)/lib.wasm: sim/wasm/* sim/core/proto/api.pb.go $(filter-out $(wildcard sim/core/items/*), $(call rwildcard,sim,*.go))
+	GOOS=js GOARCH=wasm go build -o ./$(OUT_DIR)/lib.wasm ./sim/wasm/
+
+# Generic sim_worker that uses the generic lib.wasm
 $(OUT_DIR)/sim_worker.js: ui/worker/sim_worker.js
 	cp ui/worker/sim_worker.js $(OUT_DIR)
-
-# TODO: make different wasm generators per spec
-# TODO: how to make this understand 
-$(OUT_DIR)/lib.wasm: sim/wasm/* sim/core/proto/api.pb.go $(filter-out $(wildcard sim/core/items/*), $(call rwildcard,sim,*.go))
-	GOOS=js GOARCH=wasm go build --tags=elemental_shaman -o ./$(OUT_DIR)/lib.wasm ./sim/wasm/
 
 # Just builds the server binary
 elesimweb: sim/core/proto/api.pb.go $(filter-out $(wildcard sim/core/items/*), $(call rwildcard,sim,*.go))

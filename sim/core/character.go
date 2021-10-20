@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/wowsims/tbc/sim/core/items"
+	"github.com/wowsims/tbc/sim/core/proto"
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
@@ -13,8 +14,9 @@ import (
 // All players have stats, equipment, auras, etc
 type Character struct {
 	ID       int
-	Consumes Consumes // pretty sure most classes have consumes to care about.
+	Consumes proto.Consumes
 	Race     RaceBonusType
+	Class    proto.Class
 
 	InitialStats stats.Stats
 	Stats        stats.Stats
@@ -29,7 +31,7 @@ type Character struct {
 	*AuraTracker
 
 	// mutatable state
-	destructionPotionUsed bool // set to true after using first destruction potion.
+	potionsUsed int32 // Number of potions used
 }
 
 func (character *Character) AddInitialStats(s stats.Stats) {
@@ -41,15 +43,16 @@ func (character *Character) AddStats(s stats.Stats) {
 }
 
 func (character *Character) HasteBonus() float64 {
-	return 1 + (character.Stats[stats.SpellHaste] / 1576)
+	return 1 + (character.Stats[stats.SpellHaste] / (HasteRatingPerHastePercent * 100))
 }
-func NewCharacter(equipSpec items.EquipmentSpec, race RaceBonusType, consumes Consumes, customStats stats.Stats) Character {
+func NewCharacter(equipSpec items.EquipmentSpec, race RaceBonusType, class proto.Class, consumes proto.Consumes, customStats stats.Stats) Character {
 	equip := items.NewEquipmentSet(equipSpec)
 	// log.Printf("Gear Stats: %s", equip.Stats().Print())
-	initialStats := CalculateTotalStats(race, equip, consumes).Add(customStats)
+	initialStats := CalculateTotalStats(race, class, equip, consumes).Add(customStats)
 
 	character := Character{
 		Race:         race,
+		Class:        class,
 		Consumes:     consumes,
 		InitialStats: initialStats,
 		Stats:        initialStats,
@@ -78,7 +81,7 @@ func NewCharacter(equipSpec items.EquipmentSpec, race RaceBonusType, consumes Co
 }
 
 func (character *Character) Reset() {
-	character.destructionPotionUsed = false
+	character.potionsUsed = 0
 	character.Stats = character.InitialStats
 	character.AuraTracker.ResetAuras()
 }
@@ -162,43 +165,43 @@ func (character *Character) ActivateSets(sim *Simulation, agent Agent) []string 
 	return active
 }
 
-const (
-	AtieshMage            = 22589
-	AtieshWarlock         = 22630
-	BraidedEterniumChain  = 24114
-	ChainOfTheTwilightOwl = 24121
-	EyeOfTheNight         = 24116
-	JadePendantOfBlasting = 20966
-	ChaoticSkyfireDiamond = 34220
-)
-
-func (character *Character) AddRaidBuffs(buffs *Buffs) {
+func (character *Character) AddRaidBuffs(buffs *proto.Buffs) {
 }
-func (character *Character) AddPartyBuffs(buffs *Buffs) {
-	if character.Consumes.DrumsOfBattle {
-		buffs.DrumsOfBattle = true
-	}
-	if character.Consumes.DrumsOfRestoration {
-		buffs.DrumsOfRestoration = true
+func (character *Character) AddPartyBuffs(buffs *proto.Buffs) {
+	if character.Race == RaceBonusTypeDraenei {
+		class := character.Class
+		if class == proto.Class_ClassHunter ||
+				class == proto.Class_ClassPaladin ||
+				class == proto.Class_ClassWarrior {
+			buffs.DraeneiRacialMelee = true
+		} else if class == proto.Class_ClassMage ||
+				class == proto.Class_ClassPriest ||
+				class == proto.Class_ClassShaman {
+			buffs.DraeneiRacialCaster = true
+		}
 	}
 
-	if character.Equip[items.ItemSlotMainHand].ID == AtieshMage {
+	if character.Consumes.Drums > 0 {
+		buffs.Drums = character.Consumes.Drums
+	}
+
+	if character.Equip[items.ItemSlotMainHand].ID == ItemIDAtieshMage {
 		buffs.AtieshMage += 1
 	}
-	if character.Equip[items.ItemSlotMainHand].ID == AtieshWarlock {
+	if character.Equip[items.ItemSlotMainHand].ID == ItemIDAtieshWarlock {
 		buffs.AtieshWarlock += 1
 	}
 
-	if character.Equip[items.ItemSlotNeck].ID == BraidedEterniumChain {
+	if character.Equip[items.ItemSlotNeck].ID == ItemIDBraidedEterniumChain {
 		buffs.BraidedEterniumChain = true
 	}
-	if character.Equip[items.ItemSlotNeck].ID == ChainOfTheTwilightOwl {
+	if character.Equip[items.ItemSlotNeck].ID == ItemIDChainOfTheTwilightOwl {
 		buffs.ChainOfTheTwilightOwl = true
 	}
-	if character.Equip[items.ItemSlotNeck].ID == EyeOfTheNight {
+	if character.Equip[items.ItemSlotNeck].ID == ItemIDEyeOfTheNight {
 		buffs.EyeOfTheNight = true
 	}
-	if character.Equip[items.ItemSlotNeck].ID == JadePendantOfBlasting {
+	if character.Equip[items.ItemSlotNeck].ID == ItemIDJadePendantOfBlasting {
 		buffs.JadePendantOfBlasting = true
 	}
 }
@@ -212,28 +215,14 @@ func (character *Character) EquippedMetaGem(gemID int32) bool {
 	return false
 }
 
-// TODO: This probably should be moved into each class because they all have different base stats.
-func BaseStats(race RaceBonusType) stats.Stats {
-	stats := stats.Stats{
-		stats.Intellect: 104,    // Base int for troll,
-		stats.Mana:      2678,   // level 70 shaman
-		stats.Spirit:    135,    // lvl 70 shaman
-		stats.SpellCrit: 48.576, // base crit for 70 sham
-	}
-	// TODO: Find race differences.
-	switch race {
-	case RaceBonusTypeOrc:
-	}
-	return stats
+type BaseStatsKey struct {
+	Race  RaceBonusType
+	Class proto.Class
 }
 
+var BaseStats = map[BaseStatsKey]stats.Stats{}
+
 // CalculateTotalStats will take a set of equipment and options and add all stats/buffs/etc together
-func CalculateTotalStats(race RaceBonusType, equipment items.Equipment, consumes Consumes) stats.Stats {
-	totalStats := BaseStats(race).Add(equipment.Stats()).Add(consumes.Stats())
-
-	if race == RaceBonusTypeDraenei {
-		totalStats[stats.SpellHit] += 12.60 // 1% hit
-	}
-
-	return totalStats
+func CalculateTotalStats(race RaceBonusType, class proto.Class, equipment items.Equipment, consumes proto.Consumes) stats.Stats {
+	return BaseStats[BaseStatsKey{ Race: race, Class: class }].Add(equipment.Stats()).Add(ConsumesStats(consumes))
 }

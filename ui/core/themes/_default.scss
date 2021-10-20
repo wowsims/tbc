@@ -135,6 +135,7 @@ td, th {
 }
 
 .settings-tab {
+  overflow-y: auto;
 }
 
 .talents-tab {
@@ -148,6 +149,7 @@ td, th {
 }
 
 .known-issues {
+	display: none;
 	background-color: red;
 	border: 2px solid var(--main-text-color);
 	padding: 2px;
@@ -199,16 +201,20 @@ td, th {
 	background-color: var(--main-text-color);
 }
 
+.settings-inputs {
+  position: relative;
+}
+.settings-section-container {
+  position: absolute;
+}
 .settings-section {
   border: 4px solid var(--main-text-color);
   border-radius: 8px;
   position: relative;
-  display: inline-block;
   padding: 4px;
   padding-top: 15px;
-  margin: 20px;
-  min-width: 100px;
-  vertical-align: top;
+  margin: 10px;
+  margin-top: 20px;
 }
 
 .settings-section>label {
@@ -223,10 +229,6 @@ td, th {
   font-size: 18px;
 }
 
-.settings-left-bar {
-  display: inline-block;
-}
-
 .settings-bottom-bar {
   margin: 20px;
   display: flex;
@@ -234,12 +236,44 @@ td, th {
   align-items: flex-end;
 }
 
+.encounter-section .number-picker-root {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.race-section {
+  text-align: center;
+}
+
+.rotation-section > div, .other-settings-section > div {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.self-buffs-section>div {
+  display: grid;
+}
+
+.buffs-section>div {
+  display: grid;
+}
+
+.consumes-section>div {
+  display: grid;
+}
+
+.debuffs-section>div {
+  display: grid;
+}
+
 .saved-encounter-manager {
   display: inline-block;
   text-align: left;
 }
 
-.saved-agent-manager {
+.saved-rotation-manager {
   display: inline-block;
   text-align: center;
 }
@@ -247,20 +281,6 @@ td, th {
 .saved-settings-manager {
   display: inline-block;
   text-align: right;
-}
-
-.race-picker {
-  text-align: center;
-}
-
-.race-picker, .encounter-section {
-  display: block;
-}
-
-.encounter-section .number-picker-root {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
 }
 
 .saved-talents-manager {

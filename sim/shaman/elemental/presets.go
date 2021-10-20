@@ -1,30 +1,11 @@
-package shaman
+package elemental
 
 import (
-	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/items"
 	"github.com/wowsims/tbc/sim/core/proto"
 )
 
-// Use same seed to get same result on every run.
-var RSeed = int64(1)
-
-var ShortEncounter = core.Encounter{
-	Duration:   60,
-	NumTargets: 1,
-}
-var LongEncounter = core.Encounter{
-	Duration:   300,
-	NumTargets: 1,
-}
-
-var BasicOptions = core.Options{
-	Iterations: 1,
-	RSeed:      RSeed,
-	Debug:      false,
-}
-
-var BasicBuffs = core.Buffs{
+var BasicBuffs = proto.Buffs{
 	Bloodlust: 1,
 }
 
@@ -55,8 +36,8 @@ var PlayerOptionsAdaptiveNoBuffs = proto.PlayerOptions{
 		ElementalShaman: &proto.ElementalShaman{
 			Talents: &StandardTalents,
 			Options: eleShamOptionsNoBuffs,
-			Agent: &proto.ElementalShaman_Agent{
-				Type: proto.ElementalShaman_Agent_Adaptive,
+			Rotation: &proto.ElementalShaman_Rotation{
+				Type: proto.ElementalShaman_Rotation_Adaptive,
 			},
 		},
 	},
@@ -74,8 +55,8 @@ var PlayerOptionsAdaptive = proto.PlayerOptions{
 		ElementalShaman: &proto.ElementalShaman{
 			Talents: &StandardTalents,
 			Options: eleShamOptions,
-			Agent: &proto.ElementalShaman_Agent{
-				Type: proto.ElementalShaman_Agent_Adaptive,
+			Rotation: &proto.ElementalShaman_Rotation{
+				Type: proto.ElementalShaman_Rotation_Adaptive,
 			},
 		},
 	},
@@ -86,8 +67,8 @@ var PlayerOptionsLBOnly = proto.PlayerOptions{
 		ElementalShaman: &proto.ElementalShaman{
 			Talents: &StandardTalents,
 			Options: eleShamOptions,
-			Agent: &proto.ElementalShaman_Agent{
-				Type: proto.ElementalShaman_Agent_FixedLBCL,
+			Rotation: &proto.ElementalShaman_Rotation{
+				Type: proto.ElementalShaman_Rotation_LBOnly,
 			},
 		},
 	},
@@ -98,31 +79,32 @@ var PlayerOptionsCLOnClearcast = proto.PlayerOptions{
 		ElementalShaman: &proto.ElementalShaman{
 			Talents: &StandardTalents,
 			Options: eleShamOptions,
-			Agent: &proto.ElementalShaman_Agent{
-				Type: proto.ElementalShaman_Agent_CLOnClearcast,
+			Rotation: &proto.ElementalShaman_Rotation{
+				Type: proto.ElementalShaman_Rotation_CLOnClearcast,
 			},
 		},
 	},
 }
 
-var FullBuffs = core.Buffs{
+var FullBuffs = proto.Buffs{
 	ArcaneBrilliance:  true,
-	GiftOfTheWild:     proto.TristateEffect_TristateEffectRegular,
+	GiftOfTheWild:     proto.TristateEffect_TristateEffectImproved,
 	BlessingOfKings:   true,
-	BlessingOfWisdom:  proto.TristateEffect_TristateEffectRegular,
+	BlessingOfWisdom:  proto.TristateEffect_TristateEffectImproved,
 	JudgementOfWisdom: true,
 	MoonkinAura:       proto.TristateEffect_TristateEffectRegular,
-	ShadowPriestDPS:   500,
+	ShadowPriestDps:   500,
 }
 
-var FullConsumes = core.Consumes{
+var FullConsumes = proto.Consumes{
 	FlaskOfBlindingLight: true,
 	BrilliantWizardOil:   true,
 	BlackenedBasilisk:    true,
-	DestructionPotion:    true,
-	SuperManaPotion:      true,
+	DefaultPotion:        proto.Potions_SuperManaPotion,
+	StartingPotion:       proto.Potions_DestructionPotion,
+	NumStartingPotions:   1,
 	DarkRune:             true,
-	DrumsOfBattle:        true,
+	Drums:                proto.Drums_DrumsOfBattle,
 }
 
 var PreRaidGear = items.EquipmentSpecFromStrings([]string{

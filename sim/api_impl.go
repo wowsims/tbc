@@ -2,8 +2,6 @@
 package sim
 
 import (
-	"time"
-
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/items"
 	"github.com/wowsims/tbc/sim/core/proto"
@@ -66,7 +64,6 @@ func convertSimParams(request *proto.IndividualSimRequest) core.IndividualParams
 		Iterations: int(request.Iterations),
 		RSeed:      request.RandomSeed,
 		ExitOnOOM:  request.ExitOnOom,
-		GCDMin:     time.Duration(request.GcdMin),
 		Debug:      request.Debug,
 	}
 	if request.Encounter != nil {
@@ -80,8 +77,9 @@ func convertSimParams(request *proto.IndividualSimRequest) core.IndividualParams
 	params := core.IndividualParams{
 		Equip:    items.ProtoToEquipmentSpec(request.Player.Equipment),
 		Race:     core.RaceBonusType(request.Player.Options.Race),
-		Consumes: core.ProtoToConsumes(request.Player.Options.Consumes),
-		Buffs:    core.ProtoToBuffs(request.Buffs),
+		Class:    request.Player.Options.Class,
+		Consumes: *request.Player.Options.Consumes,
+		Buffs:    *request.Buffs,
 		Options:  options,
 
 		PlayerOptions: request.Player.Options,
@@ -105,10 +103,12 @@ func runSimulationImpl(request *proto.IndividualSimRequest) *proto.IndividualSim
 	// TODO: Actually return results for all agents
 	for _, v := range result.Agents[0].Actions {
 		metric := &proto.ActionMetric{
+			Tag:    v.Tag,
 			Casts:  v.Casts,
+			Hits:   v.Hits,
 			Crits:  v.Crits,
 			Misses: v.Misses,
-			Dmgs:   v.Dmgs,
+			Damage: v.Damage,
 		}
 		if v.ActionID.SpellID != 0 {
 			metric.ActionId = &proto.ActionMetric_SpellId{SpellId: v.ActionID.SpellID}

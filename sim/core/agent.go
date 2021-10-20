@@ -14,9 +14,9 @@ type Agent interface {
 	GetCharacter() *Character
 
 	// Updates the input Buffs to include raid-wide buffs provided by this Agent.
-	AddRaidBuffs(*Buffs)
+	AddRaidBuffs(*proto.Buffs)
 	// Updates the input Buffs to include party-wide buffs provided by this Agent.
-	AddPartyBuffs(*Buffs)
+	AddPartyBuffs(*proto.Buffs)
 
 	// Any pre-start buffs to apply to the raid/party/self
 	BuffUp(*Simulation)
@@ -28,7 +28,7 @@ type Agent interface {
 	ChooseAction(*Simulation) AgentAction
 
 	// This will be invoked right before the chosen action is actually executed, so the Agent can update its state.
-	// Note that the action may be different from the action chosen by this agent
+	// Note that the action may be different from the action chosen by this agent.
 	OnActionAccepted(*Simulation, AgentAction)
 }
 

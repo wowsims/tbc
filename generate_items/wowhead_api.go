@@ -61,25 +61,25 @@ var strengthRegex = regexp.MustCompile("<!--stat4-->\\+([0-9]+) Strength")
 var intellectRegex = regexp.MustCompile("<!--stat5-->\\+([0-9]+) Intellect")
 var spiritRegex = regexp.MustCompile("<!--stat6-->\\+([0-9]+) Spirit")
 var staminaRegex = regexp.MustCompile("<!--stat7-->\\+([0-9]+) Stamina")
-var spellPowerRegex = regexp.MustCompile("Increases damage and healing done by magical spells and effects by up to ([0-9]+).")
-var healingPowerRegex = regexp.MustCompile("Increases healing done by up to ([0-9]+) and damage done by up to ([0-9]+) for all magical spells and effects.")
-var arcaneSpellPowerRegex = regexp.MustCompile("Increases damage done by Arcane spells and effects by up to ([0-9]+).")
-var fireSpellPowerRegex = regexp.MustCompile("Increases damage done by Fire spells and effects by up to ([0-9]+).")
-var frostSpellPowerRegex = regexp.MustCompile("Increases damage done by Frost spells and effects by up to ([0-9]+).")
-var holySpellPowerRegex = regexp.MustCompile("Increases damage done by Holy spells and effects by up to ([0-9]+).")
-var natureSpellPowerRegex = regexp.MustCompile("Increases damage done by Nature spells and effects by up to ([0-9]+).")
-var shadowSpellPowerRegex = regexp.MustCompile("Increases damage done by Shadow spells and effects by up to ([0-9]+).")
-var spellHitRegex = regexp.MustCompile("Improves spell hit rating by <!--rtg18-->([0-9]+).")
-var spellCritRegex = regexp.MustCompile("Improves spell critical strike rating by <!--rtg21-->([0-9]+).")
-var spellHasteRegex = regexp.MustCompile("Improves spell haste rating by <!--rtg30-->([0-9]+).")
-var spellPenetrationRegex = regexp.MustCompile("Improves your spell penetration by ([0-9]+).")
-var mp5Regex = regexp.MustCompile("Restores ([0-9]+) mana per 5 sec.")
-var attackPowerRegex = regexp.MustCompile("Increases attack power by ([0-9]+).")
-var meleeHitRegex = regexp.MustCompile("Increases your hit rating by ([0-9]+).")
-var meleeCritRegex = regexp.MustCompile("Increases your critical strike rating by ([0-9]+).")
-var meleeHasteRegex = regexp.MustCompile("Improves haste rating by <!--rtg36-->([0-9]+).")
-var armorPenetrationRegex = regexp.MustCompile("Your attacks ignore ([0-9]+) of your opponent's armor.")
-var expertiseRegex = regexp.MustCompile("Increases your expertise rating by <!--rtg37-->([0-9]+).")
+var spellPowerRegex = regexp.MustCompile("Increases damage and healing done by magical spells and effects by up to ([0-9]+)\\.")
+var healingPowerRegex = regexp.MustCompile("Increases healing done by up to ([0-9]+) and damage done by up to ([0-9]+) for all magical spells and effects\\.")
+var arcaneSpellPowerRegex = regexp.MustCompile("Increases damage done by Arcane spells and effects by up to ([0-9]+)\\.")
+var fireSpellPowerRegex = regexp.MustCompile("Increases damage done by Fire spells and effects by up to ([0-9]+)\\.")
+var frostSpellPowerRegex = regexp.MustCompile("Increases damage done by Frost spells and effects by up to ([0-9]+)\\.")
+var holySpellPowerRegex = regexp.MustCompile("Increases damage done by Holy spells and effects by up to ([0-9]+)\\.")
+var natureSpellPowerRegex = regexp.MustCompile("Increases damage done by Nature spells and effects by up to ([0-9]+)\\.")
+var shadowSpellPowerRegex = regexp.MustCompile("Increases damage done by Shadow spells and effects by up to ([0-9]+)\\.")
+var spellHitRegex = regexp.MustCompile("Improves spell hit rating by <!--rtg18-->([0-9]+)\\.")
+var spellCritRegex = regexp.MustCompile("Improves spell critical strike rating by <!--rtg21-->([0-9]+)\\.")
+var spellHasteRegex = regexp.MustCompile("Improves spell haste rating by <!--rtg30-->([0-9]+)\\.")
+var spellPenetrationRegex = regexp.MustCompile("Improves your spell penetration by ([0-9]+)\\.")
+var mp5Regex = regexp.MustCompile("Restores ([0-9]+) mana per 5 sec\\.")
+var attackPowerRegex = regexp.MustCompile("Increases attack power by ([0-9]+)\\.")
+var meleeHitRegex = regexp.MustCompile("Increases your hit rating by ([0-9]+)\\.")
+var meleeCritRegex = regexp.MustCompile("Increases your critical strike rating by ([0-9]+)\\.")
+var meleeHasteRegex = regexp.MustCompile("Improves haste rating by <!--rtg36-->([0-9]+)\\.")
+var armorPenetrationRegex = regexp.MustCompile("Your attacks ignore ([0-9]+) of your opponent's armor\\.")
+var expertiseRegex = regexp.MustCompile("Increases your expertise rating by <!--rtg37-->([0-9]+)\\.")
 
 func (item WowheadItemResponse) GetStats() Stats {
 	spellPower := item.GetIntValue(spellPowerRegex)
@@ -119,10 +119,14 @@ func (item WowheadItemResponse) GetStats() Stats {
 	}
 }
 
-var phaseRegex, _ = regexp.Compile("Phase ([0-9])")
-
+var phaseRegex = regexp.MustCompile("Phase ([0-9])")
 func (item WowheadItemResponse) GetPhase() int {
 	return item.GetIntValue(phaseRegex)
+}
+
+var uniqueRegex = regexp.MustCompile("Unique")
+func (item WowheadItemResponse) GetUnique() bool {
+	return uniqueRegex.MatchString(item.Tooltip)
 }
 
 var itemTypePatterns = map[proto.ItemType]*regexp.Regexp{

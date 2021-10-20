@@ -1,10 +1,12 @@
 import { IndividualSimRequest, IndividualSimResult } from '/tbc/core/proto/api.js';
+import { setWowheadHref } from '/tbc/core/resources.js';
 import { sum } from '/tbc/core/utils.js';
 
 import { parseActionMetrics } from './metrics_helpers.js';
 import { ResultComponent, ResultComponentConfig } from './result_component.js';
 
 declare var $: any;
+declare var tippy: any;
 
 export class CastMetrics extends ResultComponent {
 	private readonly tableElem: HTMLTableSectionElement;
@@ -36,7 +38,51 @@ export class CastMetrics extends ResultComponent {
 		this.tableElem = this.rootElem.getElementsByClassName('cast-metrics-table')[0] as HTMLTableSectionElement;
 		this.bodyElem = this.rootElem.getElementsByClassName('cast-metrics-table-body')[0] as HTMLTableSectionElement;
 
-		$(this.tableElem).tablesorter({ sortList: [2, 1] });
+		const headerElems = Array.from(this.tableElem.querySelectorAll('th'));
+
+		// DPS
+		tippy(headerElems[1], {
+			'content': 'Damage / Encounter Duration',
+			'allowHTML': true,
+		});
+
+		// Casts
+		tippy(headerElems[2], {
+			'content': 'Casts',
+			'allowHTML': true,
+		});
+
+		// Avg Cast
+		tippy(headerElems[3], {
+			'content': 'Damage / Casts',
+			'allowHTML': true,
+		});
+
+		// Hits
+		tippy(headerElems[4], {
+			'content': 'Hits',
+			'allowHTML': true,
+		});
+
+		// Avg Hit
+		tippy(headerElems[5], {
+			'content': 'Damage / Hits',
+			'allowHTML': true,
+		});
+
+		// Crit %
+		tippy(headerElems[6], {
+			'content': 'Crits / Hits',
+			'allowHTML': true,
+		});
+
+		// Miss %
+		tippy(headerElems[7], {
+			'content': 'Misses / (Hits + Misses)',
+			'allowHTML': true,
+		});
+
+		$(this.tableElem).tablesorter({ sortList: [[1, 1]] });
 	}
 
 	onSimResult(request: IndividualSimRequest, result: IndividualSimResult) {
@@ -53,9 +99,15 @@ export class CastMetrics extends ResultComponent {
 				const nameCellElem = document.createElement('td');
 				rowElem.appendChild(nameCellElem);
 				nameCellElem.innerHTML = `
-				<img class="cast-metrics-action-icon" src="${actionMetric.iconUrl}"></img>
+				<a class="cast-metrics-action-icon"></a>
 				<span class="cast-metrics-action-name">${actionMetric.name}</span>
 				`;
+
+				const iconElem = nameCellElem.getElementsByClassName('cast-metrics-action-icon')[0] as HTMLAnchorElement;
+				iconElem.style.backgroundImage = `url('${actionMetric.iconUrl}')`;
+				if (!('otherId' in actionMetric.actionId)) {
+					setWowheadHref(iconElem, actionMetric.actionId);
+				}
 
 				const addCell = (value: string | number): HTMLElement => {
 					const cellElem = document.createElement('td');
@@ -67,10 +119,10 @@ export class CastMetrics extends ResultComponent {
 				addCell((actionMetric.totalDmg / iterations / duration).toFixed(1)); // DPS
 				addCell((actionMetric.casts / iterations).toFixed(1)); // Casts
 				addCell((actionMetric.totalDmg / actionMetric.casts).toFixed(1)); // Avg Cast
-				addCell(((actionMetric.casts - actionMetric.misses) / iterations).toFixed(1)); // Hits
-				addCell((actionMetric.totalDmg / (actionMetric.casts - actionMetric.misses)).toFixed(1)); // Avg Hit
-				addCell(((actionMetric.crits / actionMetric.casts) * 100).toFixed(2) + ' %'); // Crit %
-				addCell(((actionMetric.misses / actionMetric.casts) * 100).toFixed(2) + ' %'); // Miss %
+				addCell((actionMetric.hits / iterations).toFixed(1)); // Hits
+				addCell((actionMetric.totalDmg / actionMetric.hits).toFixed(1)); // Avg Hit
+				addCell(((actionMetric.crits / actionMetric.hits) * 100).toFixed(2) + ' %'); // Crit %
+				addCell(((actionMetric.misses / (actionMetric.hits + actionMetric.misses)) * 100).toFixed(2) + ' %'); // Miss %
 			});
 
 			$(this.tableElem).trigger('update');
