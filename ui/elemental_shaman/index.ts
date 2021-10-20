@@ -172,8 +172,7 @@ const theme = new DefaultTheme<Spec.SpecElementalShaman>(document.body, {
     rotation: ElementalShamanRotation.create({
       type: RotationType.Adaptive,
     }),
-		// Default talents. Uses the wowhead calculator format, make the talents on
-		// https://tbc.wowhead.com/talent-calc and copy the numbers in the url.
+		// Default talents.
     talents: Presets.StandardTalents,
 		// Default spec-specific settings.
     specOptions: ElementalShamanOptions.create({
@@ -205,6 +204,9 @@ const theme = new DefaultTheme<Spec.SpecElementalShaman>(document.body, {
         equipment: Presets.P2_BIS,
       },
     ],
+		// Preset encounter settings that the user can quickly select.
+		encounters: [
+		],
   },
 	// Custom function for determining the EP value of meta gem effects.
 	// Default meta effect EP value is 0, so just handle the ones relevant to your spec.
