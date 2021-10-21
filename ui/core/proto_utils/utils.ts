@@ -17,20 +17,37 @@ import { WeaponType } from '/tbc/core/proto/common.js';
 
 import { BalanceDruid, BalanceDruid_Rotation as BalanceDruidRotation, DruidTalents, BalanceDruid_Options as BalanceDruidOptions} from '/tbc/core/proto/druid.js';
 import { ElementalShaman, ElementalShaman_Rotation as ElementalShamanRotation, ShamanTalents, ElementalShaman_Options as ElementalShamanOptions } from '/tbc/core/proto/shaman.js';
+import { ShadowPriest, ShadowPriest_Rotation as ShadowPriestRotation, PriestTalents, ShadowPriest_Options as ShadowPriestOptions } from '/tbc/core/proto/priest.js';
 
 export type ShamanSpecs = Spec.SpecElementalShaman;
 
-export type RotationUnion = BalanceDruidRotation | ElementalShamanRotation;
-export type SpecRotation<T extends Spec> = T extends Spec.SpecBalanceDruid ? BalanceDruidRotation : ElementalShamanRotation;
+export type RotationUnion = BalanceDruidRotation | ElementalShamanRotation | ShadowPriestRotation;
+export type SpecRotation<T extends Spec> =
+		T extends Spec.SpecBalanceDruid ? BalanceDruidRotation :
+		T extends Spec.SpecElementalShaman ? ElementalShamanRotation :
+		T extends Spec.SpecShadowPriest ? ShadowPriestRotation :
+		ElementalShamanRotation; // Should never reach this case
 
-export type TalentsUnion = DruidTalents | ShamanTalents;
-export type SpecTalents<T extends Spec> = T extends Spec.SpecBalanceDruid ? DruidTalents: ShamanTalents;
+export type TalentsUnion = DruidTalents | PriestTalents | ShamanTalents;
+export type SpecTalents<T extends Spec> =
+		T extends Spec.SpecBalanceDruid ? DruidTalents :
+		T extends Spec.SpecElementalShaman ? ShamanTalents :
+		T extends Spec.SpecShadowPriest ? PriestTalents :
+		ShamanTalents; // Should never reach this case
 
-export type SpecOptionsUnion = BalanceDruidOptions | ElementalShamanOptions;
-export type SpecOptions<T extends Spec> = T extends Spec.SpecBalanceDruid ? BalanceDruidOptions : ElementalShamanOptions;
+export type SpecOptionsUnion = BalanceDruidOptions | ElementalShamanOptions | ShadowPriestOptions;
+export type SpecOptions<T extends Spec> =
+		T extends Spec.SpecBalanceDruid ? BalanceDruidOptions :
+		T extends Spec.SpecElementalShaman ? ElementalShamanOptions :
+		T extends Spec.SpecShadowPriest ? ShadowPriestOptions :
+		ElementalShamanOptions; // Should never reach this case
 
-export type SpecProtoUnion = BalanceDruid | ElementalShaman;
-export type SpecProto<T extends Spec> = T extends Spec.SpecBalanceDruid ? BalanceDruid : ElementalShaman;
+export type SpecProtoUnion = BalanceDruid | ElementalShaman | ShadowPriest;
+export type SpecProto<T extends Spec> =
+		T extends Spec.SpecBalanceDruid ? BalanceDruid :
+		T extends Spec.SpecElementalShaman ? ElementalShaman :
+		T extends Spec.SpecShadowPriest ? ShadowPriest :
+		ElementalShaman; // Should never reach this case
 
 export type SpecTypeFunctions<SpecType extends Spec> = {
   rotationCreate: () => SpecRotation<SpecType>;
@@ -91,16 +108,47 @@ export const specTypeFunctions: Partial<Record<Spec, SpecTypeFunctions<any>>> = 
     optionsToJson: (a) => ElementalShamanOptions.toJson(a as ElementalShamanOptions),
     optionsFromJson: (obj) => ElementalShamanOptions.fromJson(obj),
   },
+  [Spec.SpecShadowPriest]: {
+    rotationCreate: () => ShadowPriestRotation.create(),
+    rotationEquals: (a, b) => ShadowPriestRotation.equals(a as ShadowPriestRotation, b as ShadowPriestRotation),
+    rotationCopy: (a) => ShadowPriestRotation.clone(a as ShadowPriestRotation),
+    rotationToJson: (a) => ShadowPriestRotation.toJson(a as ShadowPriestRotation),
+    rotationFromJson: (obj) => ShadowPriestRotation.fromJson(obj),
+
+    talentsCreate: () => PriestTalents.create(),
+    talentsEquals: (a, b) => PriestTalents.equals(a as PriestTalents, b as PriestTalents),
+    talentsCopy: (a) => PriestTalents.clone(a as PriestTalents),
+    talentsToJson: (a) => PriestTalents.toJson(a as PriestTalents),
+    talentsFromJson: (obj) => PriestTalents.fromJson(obj),
+
+    optionsCreate: () => ShadowPriestOptions.create(),
+    optionsEquals: (a, b) => ShadowPriestOptions.equals(a as ShadowPriestOptions, b as ShadowPriestOptions),
+    optionsCopy: (a) => ShadowPriestOptions.clone(a as ShadowPriestOptions),
+    optionsToJson: (a) => ShadowPriestOptions.toJson(a as ShadowPriestOptions),
+    optionsFromJson: (obj) => ShadowPriestOptions.fromJson(obj),
+  },
 };
 
 export const specToClass: Record<Spec, Class> = {
   [Spec.SpecBalanceDruid]: Class.ClassDruid,
   [Spec.SpecElementalShaman]: Class.ClassShaman,
+  [Spec.SpecShadowPriest]: Class.ClassPriest,
 };
 
 const druidRaces = [
     Race.RaceNightElf,
     Race.RaceTauren,
+];
+const priestRaces = [
+    Race.RaceBloodElf,
+    Race.RaceDraenei,
+    Race.RaceDwarf,
+    Race.RaceHuman,
+    Race.RaceNightElf,
+    Race.RaceOrc,
+    Race.RaceTroll10,
+    Race.RaceTroll30,
+    Race.RaceUndead,
 ];
 const shamanRaces = [
     Race.RaceDraenei,
@@ -113,6 +161,7 @@ const shamanRaces = [
 export const specToEligibleRaces: Record<Spec, Array<Race>> = {
   [Spec.SpecBalanceDruid]: druidRaces,
   [Spec.SpecElementalShaman]: shamanRaces,
+  [Spec.SpecShadowPriest]: priestRaces,
 };
 
 // Prefixes used for storing browser data for each site. Even if a Spec is
@@ -120,6 +169,7 @@ export const specToEligibleRaces: Record<Spec, Array<Race>> = {
 export const specToLocalStorageKey: Record<Spec, string> = {
   [Spec.SpecBalanceDruid]: '__balance_druid',
   [Spec.SpecElementalShaman]: '__elemental_shaman',
+  [Spec.SpecShadowPriest]: '__shadow_priest',
 };
 
 // Returns a copy of playerOptions, with the class field set.
@@ -147,6 +197,16 @@ export function withSpecProto<SpecType extends Spec>(
         rotation: rotation,
         talents: talents as ShamanTalents,
         options: specOptions as ElementalShamanOptions,
+      }),
+    };
+  } else if (ShadowPriestRotation.is(rotation)) {
+		copy.class = Class.ClassPriest;
+    copy.spec = {
+      oneofKind: 'shadowPriest',
+      shadowPriest: ShadowPriest.create({
+        rotation: rotation,
+        talents: talents as PriestTalents,
+        options: specOptions as ShadowPriestOptions,
       }),
     };
   } else {
