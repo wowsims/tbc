@@ -110,6 +110,16 @@ func (character *Character) manaRegenPerSecond() float64 {
 	return character.Stats[stats.MP5] / 5.0
 }
 
+// Returns the amount of time this Character would need to wait in order to reach
+// the desired amount of mana, via mana regen.
+//
+// Assumes that desiredMana > currentMana. Calculation assumes the Character
+// will not take any actions during this period that would reset the 5-second rule.
+func (character *Character) TimeUntilManaRegen(desiredMana float64) time.Duration {
+	// +1 at the end is to deal with floating point math rounding errors.
+	return DurationFromSeconds((desiredMana-character.Stats[stats.Mana])/character.manaRegenPerSecond()) + 1
+}
+
 // Advance moves time forward counting down auras, CDs, mana regen, etc
 func (character *Character) Advance(sim *Simulation, elapsedTime time.Duration, newTime time.Duration) {
 	// MP5 regen

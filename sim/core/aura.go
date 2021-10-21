@@ -59,9 +59,13 @@ func (at *AuraTracker) ResetAuras() {
 func (at *AuraTracker) Advance(sim *Simulation, newTime time.Duration) {
 	// Go in reverse order so we can safely delete while looping
 	for i := len(at.ActiveAuraIDs) - 1; i >= 0; i-- {
-		id := at.ActiveAuraIDs[i]
-		if at.Auras[id].Expires != 0 && at.Auras[id].Expires <= newTime {
-			at.RemoveAura(sim, id)
+		// Need to check again because its possible for multiple auras to be removed
+		// within a single OnExpire call.
+		if i < len(at.ActiveAuraIDs) {
+			id := at.ActiveAuraIDs[i]
+			if at.Auras[id].Expires != 0 && at.Auras[id].Expires <= newTime {
+				at.RemoveAura(sim, id)
+			}
 		}
 	}
 }
@@ -295,6 +299,18 @@ func NewICD() InternalCD {
 // List of all magic effects and spells and items and stuff that can go on CD or have an aura.
 const (
 	MagicIDUnknown int32 = iota
+
+	// Basic CDs
+	MagicIDGCD
+	MagicIDMainHandSwing
+	MagicIDOffHandSwing
+	MagicIDRangedSwing
+
+	// Used for applying the effects of hardcast / channeled spells at a later time.
+	// By definition there can be only 1 hardcast spell being cast at any moment
+	// so no need to make separate IDs for every spell.
+	MagicIDHardcast
+
 	// Spells, used for tracking CDs
 	MagicIDChainLightning6
 	// MagicIDFlameShock

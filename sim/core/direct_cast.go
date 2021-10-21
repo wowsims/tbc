@@ -10,6 +10,13 @@ import (
 
 // Input needed to start casting a spell.
 type DirectCastInput struct {
+	// If set, CD for this action and GCD CD will be ignored, and this action
+	// will not set new values for those CDs either.
+	IgnoreCooldowns bool
+
+	// If set, this spell will have its mana cost ignored.
+	IgnoreManaCost bool
+
 	ManaCost float64
 
 	CastTime time.Duration
@@ -115,16 +122,54 @@ func (action DirectCastAction) GetDuration() time.Duration {
 	return action.castInput.CastTime
 }
 
-func (action DirectCastAction) Act(sim *Simulation) {
+func (action DirectCastAction) Act(sim *Simulation) bool {
 	character := action.GetAgent().GetCharacter()
 
+	if !action.castInput.IgnoreManaCost && action.castInput.ManaCost > 0 {
+		if character.Stats[stats.Mana] < action.castInput.ManaCost {
+			if sim.Log != nil {
+				sim.Log("(%d) Failed casting %s, not enough mana. (Current Mana = %0.0f, Mana Cost = %0.0f)\n",
+						character.ID, action.GetName(), character.Stats[stats.Mana], action.castInput.ManaCost)
+			}
+			sim.MetricsAggregator.MarkOOM(action.GetAgent(), sim.CurrentTime)
+
+			return false
+		}
+	}
+
 	if sim.Log != nil {
-		sim.Log("(%d) Casting %s (Current Mana = %0.0f, Mana Cost = %0.0f, Cast Time = %s\n",
+		sim.Log("(%d) Casting %s (Current Mana = %0.0f, Mana Cost = %0.0f, Cast Time = %s)\n",
 				character.ID, action.GetName(), character.Stats[stats.Mana], action.castInput.ManaCost, action.castInput.CastTime)
 	}
 
-	if action.castInput.ManaCost > 0 {
-		//fmt.Printf("Subtracting mana: %0.0f", action.castInput.ManaCost)
+	// For instead-cast spells we can skip creating an aura.
+	if action.castInput.CastTime == 0 {
+		action.internalOnCastComplete(sim)
+	} else {
+		character.AddAura(sim, Aura{
+			ID:      MagicIDHardcast,
+			Expires: sim.CurrentTime + action.castInput.CastTime,
+			OnExpire: func(sim *Simulation) {
+				action.internalOnCastComplete(sim)
+			},
+		})
+	}
+
+	if !action.castInput.IgnoreCooldowns {
+		// Prevent any actions on the GCD until the cast AND the GCD are done.
+		gcdCD := MaxDuration(GCDMin, action.castInput.CastTime)
+		character.SetCD(MagicIDGCD, sim.CurrentTime+gcdCD)
+
+		// TODO: Hardcasts seem to also reset swing timers, so we should set those CDs as well.
+	}
+
+	return true
+}
+
+func (action DirectCastAction) internalOnCastComplete(sim *Simulation) {
+	character := action.GetAgent().GetCharacter()
+
+	if !action.castInput.IgnoreManaCost && action.castInput.ManaCost > 0 {
 		character.Stats[stats.Mana] -= action.castInput.ManaCost
 	}
 
@@ -179,12 +224,15 @@ func (action DirectCastAction) Act(sim *Simulation) {
 		}
 	}
 
-	cooldown := action.GetCooldown()
-	if cooldown > 0 {
-		character.SetCD(action.GetActionID().CooldownID, sim.CurrentTime+cooldown)
+
+	if !action.castInput.IgnoreCooldowns {
+		cooldown := action.GetCooldown()
+		if cooldown > 0 {
+			character.SetCD(action.GetActionID().CooldownID, sim.CurrentTime+cooldown)
+		}
 	}
 
-	sim.metricsAggregator.addCastAction(action, results)
+	sim.MetricsAggregator.AddCastAction(action, results)
 }
 
 func (action DirectCastAction) calculateDirectCastDamage(sim *Simulation, damageInput DirectCastDamageInput) DirectCastDamageResult {
@@ -242,14 +290,26 @@ func NewDirectCastAction(sim *Simulation, impl DirectCastImpl) DirectCastAction 
 		DirectCastImpl: impl,
 	}
 
+	character := action.GetAgent().GetCharacter()
+	cooldownID := action.GetActionID().CooldownID
+
 	castInput := impl.GetCastInput(sim, action)
 	castInput.CastTime = time.Duration(float64(castInput.CastTime) / impl.GetAgent().GetCharacter().HasteBonus())
 
 	// Apply on-cast effects.
-	character := action.GetAgent().GetCharacter()
 	for _, id := range character.ActiveAuraIDs {
 		if character.Auras[id].OnCast != nil {
 			character.Auras[id].OnCast(sim, action, &castInput)
+		}
+	}
+
+	// By panicking if spell is on CD, we force each sim to properly check for their own CDs.
+	if !castInput.IgnoreCooldowns {
+		if character.IsOnCD(MagicIDGCD, sim.CurrentTime) {
+			panic(fmt.Sprintf("Trying to cast %s but GCD on cooldown for %s", action.GetName(), character.GetRemainingCD(MagicIDGCD, sim.CurrentTime)))
+		}
+		if character.IsOnCD(cooldownID, sim.CurrentTime) {
+			panic(fmt.Sprintf("Trying to cast %s but is still on cooldown for %s", action.GetName(), character.GetRemainingCD(cooldownID, sim.CurrentTime)))
 		}
 	}
 
