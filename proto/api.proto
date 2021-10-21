@@ -5,6 +5,7 @@ option go_package = "./proto";
 
 import "common.proto";
 import "druid.proto";
+import "priest.proto";
 import "shaman.proto";
 
 message PlayerOptions {
@@ -16,7 +17,7 @@ message PlayerOptions {
         Hunter hunter = 4;
         Mage mage = 5;
         Paladin paladin = 6;
-        Priest priest = 7;
+        ShadowPriest shadow_priest = 7;
         Rogue rogue = 8;
         ElementalShaman elemental_shaman = 9;
         Warlock warlock = 10;
@@ -31,8 +32,6 @@ message Hunter {
 message Mage {
 }
 message Paladin {
-}
-message Priest {
 }
 message Rogue {
 }
