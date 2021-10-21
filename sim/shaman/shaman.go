@@ -108,15 +108,6 @@ func (shaman *Shaman) OnActionAccepted(sim *core.Simulation, action core.AgentAc
 }
 
 func (shaman *Shaman) Act(sim *core.Simulation) time.Duration {
-	// Consumes before any casts
-	core.TryActivateDrums(sim, shaman)
-	core.TryActivateRacial(sim, shaman)
-	core.TryActivatePotion(sim, shaman)
-	core.TryActivateDarkRune(sim, shaman)
-
-	// Pop activatable items if we can.
-	shaman.TryActivateEquipment(sim, shaman)
-
 	// Before casting, activate shaman powers!
 	TryActivateBloodlust(sim, shaman)
 	if shaman.Talents.ElementalMastery {

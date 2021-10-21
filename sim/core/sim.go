@@ -187,6 +187,17 @@ type pendingAgent struct {
 	NextActionAt time.Duration
 }
 
+func (sim *Simulation) playerConsumes(agent Agent) {
+	// Consumes before any casts
+	TryActivateDrums(sim, agent)
+	TryActivateRacial(sim, agent)
+	TryActivatePotion(sim, agent)
+	TryActivateDarkRune(sim, agent)
+
+	// Pop activatable items if we can.
+	agent.GetCharacter().TryActivateEquipment(sim, agent)
+}
+
 // Run runs the simulation for the configured number of iterations, and
 // collects all the metrics together.
 func (sim *Simulation) Run() SimResult {
@@ -226,6 +237,7 @@ func (sim *Simulation) RunOnce() {
 	// setup initial actions.
 	for _, party := range sim.Raid.Parties {
 		for _, agent := range party.Players {
+			sim.playerConsumes(agent)
 			nextActionAt := agent.Start(sim)
 
 			if nextActionAt == NeverExpires {
@@ -250,6 +262,7 @@ func (sim *Simulation) RunOnce() {
 			sim.Advance(pa.NextActionAt - sim.CurrentTime)
 		}
 
+		sim.playerConsumes(pa.Agent)
 		pa.NextActionAt = pa.Agent.Act(sim)
 
 		if len(pendingAgents) == 1 {
