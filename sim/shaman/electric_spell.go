@@ -119,12 +119,12 @@ func (spell ElectricSpell) ApplyHitInputModifiers(hitInput *core.DirectCastDamag
 }
 
 func (spell ElectricSpell) OnCastComplete(sim *core.Simulation, cast core.DirectCastAction) {
-	if spell.Shaman.Talents.ElementalFocus && !spell.IsLightningOverload && spell.Shaman.ElementalFocusStacks > 0 {
+	if !spell.IsLightningOverload && spell.Shaman.ElementalFocusStacks > 0 {
 		spell.Shaman.ElementalFocusStacks--
 	}
 }
 func (spell ElectricSpell) OnElectricSpellHit(sim *core.Simulation, cast core.DirectCastAction, result *core.DirectCastDamageResult) {
-	if result.Crit {
+	if spell.Shaman.Talents.ElementalFocus && result.Crit {
 		spell.Shaman.ElementalFocusStacks = 2
 	}
 }

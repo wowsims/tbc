@@ -127,6 +127,7 @@ func (shaman *Shaman) Act(sim *core.Simulation) time.Duration {
 
 	actionSuccessful := newAction.Act(sim)
 	if actionSuccessful {
+		shaman.rotation.OnActionAccepted(shaman, sim, newAction)
 		return sim.CurrentTime + core.MaxDuration(
 				shaman.GetRemainingCD(core.MagicIDGCD, sim.CurrentTime),
 				newAction.GetDuration())
@@ -136,6 +137,7 @@ func (shaman *Shaman) Act(sim *core.Simulation) time.Duration {
 		// TODO: This logic should be in ele shaman code, because enhance react differently to going oom.
 		regenTime := shaman.TimeUntilManaRegen(newAction.GetManaCost())
 		newAction = core.NewWaitAction(sim, shaman, regenTime)
+		shaman.rotation.OnActionAccepted(shaman, sim, newAction)
 		return sim.CurrentTime + regenTime
 	}
 }

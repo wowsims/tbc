@@ -59,13 +59,9 @@ func (at *AuraTracker) ResetAuras() {
 func (at *AuraTracker) Advance(sim *Simulation, newTime time.Duration) {
 	// Go in reverse order so we can safely delete while looping
 	for i := len(at.ActiveAuraIDs) - 1; i >= 0; i-- {
-		// Need to check again because its possible for multiple auras to be removed
-		// within a single OnExpire call.
-		if i < len(at.ActiveAuraIDs) {
-			id := at.ActiveAuraIDs[i]
-			if at.Auras[id].Expires != 0 && at.Auras[id].Expires <= newTime {
-				at.RemoveAura(sim, id)
-			}
+		id := at.ActiveAuraIDs[i]
+		if at.Auras[id].Expires != 0 && at.Auras[id].Expires <= newTime {
+			at.RemoveAura(sim, id)
 		}
 	}
 }

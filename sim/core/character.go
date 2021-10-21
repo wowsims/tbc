@@ -31,6 +31,10 @@ type Character struct {
 	*AuraTracker
 
 	// mutatable state
+
+	// Aura used to handle results of hardcast after the cast completes
+	HardcastAura Aura
+
 	potionsUsed int32 // Number of potions used
 }
 
@@ -134,6 +138,11 @@ func (character *Character) Advance(sim *Simulation, elapsedTime time.Duration, 
 
 	// Advance CDs and Auras
 	character.AuraTracker.Advance(sim, newTime)
+
+	if character.HardcastAura.Expires != 0 && character.HardcastAura.Expires <= newTime {
+		character.HardcastAura.OnExpire(sim)
+		character.HardcastAura = Aura{}
+	}
 }
 
 // Pops any on-use trinkets / gear

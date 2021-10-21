@@ -142,17 +142,17 @@ func (action DirectCastAction) Act(sim *Simulation) bool {
 				character.ID, action.GetName(), character.Stats[stats.Mana], action.castInput.ManaCost, action.castInput.CastTime)
 	}
 
-	// For instead-cast spells we can skip creating an aura.
+	// For instant-cast spells we can skip creating an aura.
 	if action.castInput.CastTime == 0 {
 		action.internalOnCastComplete(sim)
 	} else {
-		character.AddAura(sim, Aura{
+		character.HardcastAura = Aura{
 			ID:      MagicIDHardcast,
 			Expires: sim.CurrentTime + action.castInput.CastTime,
 			OnExpire: func(sim *Simulation) {
 				action.internalOnCastComplete(sim)
 			},
-		})
+		}
 	}
 
 	if !action.castInput.IgnoreCooldowns {

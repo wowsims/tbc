@@ -244,7 +244,6 @@ func (sim *Simulation) RunOnce() {
 	})
 
 	for sim.CurrentTime < sim.Duration {
-		//fmt.Printf("Sim action\n")
 		pa := pendingAgents[0]
 
 		if pa.NextActionAt > sim.CurrentTime {
@@ -271,7 +270,7 @@ func (sim *Simulation) RunOnce() {
 // Advance moves time forward counting down auras, CDs, mana regen, etc
 func (sim *Simulation) Advance(elapsedTime time.Duration) {
 	newTime := sim.CurrentTime + elapsedTime
-	//fmt.Printf("Cur time: %s\n", newTime)
+	sim.CurrentTime = newTime
 
 	for _, party := range sim.Raid.Parties {
 		for _, agent := range party.Players {
@@ -280,5 +279,4 @@ func (sim *Simulation) Advance(elapsedTime time.Duration) {
 		}
 	}
 	sim.AuraTracker.Advance(sim, elapsedTime)
-	sim.CurrentTime = newTime
 }
