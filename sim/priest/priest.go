@@ -1,6 +1,8 @@
 package priest
 
 import (
+	"time"
+
 	"github.com/wowsims/tbc/sim/core/proto"
 	"github.com/wowsims/tbc/sim/core"
 )
@@ -18,15 +20,14 @@ func (priest *Priest) AddRaidBuffs(buffs *proto.Buffs) {
 	buffs.DivineSpirit = proto.TristateEffect_TristateEffectRegular
 }
 func (priest *Priest) AddPartyBuffs(buffs *proto.Buffs) {
-	buffs.ShadowPriestDps += 0
 }
 
-func (priest *Priest) ChooseAction(sim *core.Simulation) core.AgentAction {
-	return core.NewWaitAction(sim, priest, core.NeverExpires) // makes the bot wait forever and do nothing.
+func (priest *Priest) Act(sim *core.Simulation) time.Duration {
+	return core.NeverExpires // makes the bot wait forever and do nothing.
 }
 
-func (priest *Priest) OnActionAccepted(*core.Simulation, core.AgentAction) {
-
+func (priest *Priest) Start(sim *core.Simulation) time.Duration {
+		return priest.Act(sim)
 }
 
 func (priest *Priest) BuffUp(sim *core.Simulation) {

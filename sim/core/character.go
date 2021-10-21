@@ -31,6 +31,11 @@ type Character struct {
 	*AuraTracker
 
 	// mutatable state
+
+	// Used for applying the effects of hardcast / channeled spells at a later time.
+	// By definition there can be only 1 hardcast spell being cast at any moment.
+	HardcastAura Aura
+
 	potionsUsed int32 // Number of potions used
 }
 
@@ -110,6 +115,16 @@ func (character *Character) manaRegenPerSecond() float64 {
 	return character.Stats[stats.MP5] / 5.0
 }
 
+// Returns the amount of time this Character would need to wait in order to reach
+// the desired amount of mana, via mana regen.
+//
+// Assumes that desiredMana > currentMana. Calculation assumes the Character
+// will not take any actions during this period that would reset the 5-second rule.
+func (character *Character) TimeUntilManaRegen(desiredMana float64) time.Duration {
+	// +1 at the end is to deal with floating point math rounding errors.
+	return DurationFromSeconds((desiredMana-character.Stats[stats.Mana])/character.manaRegenPerSecond()) + 1
+}
+
 // Advance moves time forward counting down auras, CDs, mana regen, etc
 func (character *Character) Advance(sim *Simulation, elapsedTime time.Duration, newTime time.Duration) {
 	// MP5 regen
@@ -124,6 +139,11 @@ func (character *Character) Advance(sim *Simulation, elapsedTime time.Duration, 
 
 	// Advance CDs and Auras
 	character.AuraTracker.Advance(sim, newTime)
+
+	if character.HardcastAura.Expires != 0 && character.HardcastAura.Expires <= newTime {
+		character.HardcastAura.OnExpire(sim)
+		character.HardcastAura = Aura{}
+	}
 }
 
 // Pops any on-use trinkets / gear

@@ -76,6 +76,8 @@ func (lcc LightningCapacitorCast) GetCooldown() time.Duration {
 
 func (lcc LightningCapacitorCast) GetCastInput(sim *core.Simulation, cast core.DirectCastAction) core.DirectCastInput {
 	return core.DirectCastInput{
+		IgnoreCooldowns: true,
+		IgnoreManaCost: true,
 		CritMultiplier: 1.5,
 	}
 }

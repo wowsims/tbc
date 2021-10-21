@@ -295,6 +295,13 @@ func NewICD() InternalCD {
 // List of all magic effects and spells and items and stuff that can go on CD or have an aura.
 const (
 	MagicIDUnknown int32 = iota
+
+	// Basic CDs
+	MagicIDGCD
+	MagicIDMainHandSwing
+	MagicIDOffHandSwing
+	MagicIDRangedSwing
+
 	// Spells, used for tracking CDs
 	MagicIDChainLightning6
 	// MagicIDFlameShock

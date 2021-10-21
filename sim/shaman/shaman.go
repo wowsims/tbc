@@ -106,6 +106,37 @@ func (shaman *Shaman) ChooseAction(sim *core.Simulation) core.AgentAction {
 func (shaman *Shaman) OnActionAccepted(sim *core.Simulation, action core.AgentAction) {
 	shaman.rotation.OnActionAccepted(shaman, sim, action)
 }
+
+func (shaman *Shaman) Act(sim *core.Simulation) time.Duration {
+	// Before casting, activate shaman powers!
+	TryActivateBloodlust(sim, shaman)
+	if shaman.Talents.ElementalMastery {
+		TryActivateEleMastery(sim, shaman)
+	}
+
+	newAction := shaman.rotation.ChooseAction(shaman, sim)
+
+	actionSuccessful := newAction.Act(sim)
+	if actionSuccessful {
+		shaman.rotation.OnActionAccepted(shaman, sim, newAction)
+		return sim.CurrentTime + core.MaxDuration(
+				shaman.GetRemainingCD(core.MagicIDGCD, sim.CurrentTime),
+				newAction.GetDuration())
+	} else {
+		// Only way for a shaman spell to fail is due to mana cost.
+		// Wait until we have enough mana to cast.
+		// TODO: This logic should be in ele shaman code, because enhance react differently to going oom.
+		regenTime := shaman.TimeUntilManaRegen(newAction.GetManaCost())
+		newAction = core.NewWaitAction(sim, shaman, regenTime)
+		shaman.rotation.OnActionAccepted(shaman, sim, newAction)
+		return sim.CurrentTime + regenTime
+	}
+}
+func (shaman *Shaman) Start(sim *core.Simulation) time.Duration {
+	return shaman.Act(sim)
+}
+
+
 func (shaman *Shaman) Reset(newsim *core.Simulation) {
 	shaman.rotation.Reset(shaman, newsim)
 }

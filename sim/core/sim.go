@@ -56,7 +56,7 @@ type Simulation struct {
 	// Auras which are automatically applied on sim reset.
 	InitialAuras []InitialAura
 
-	metricsAggregator *MetricsAggregator
+	MetricsAggregator *MetricsAggregator
 
 	Rando       *wrappedRandom
 	rseed       int64
@@ -134,7 +134,7 @@ func newSim(raid *Raid, options Options, numPlayers int) *Simulation {
 		InitialAuras: []InitialAura{},
 		Log: nil,
 		AuraTracker: NewAuraTracker(),
-		metricsAggregator: NewMetricsAggregator(numPlayers, options.Encounter.Duration),
+		MetricsAggregator: NewMetricsAggregator(numPlayers, options.Encounter.Duration),
 	}
 	sim.Rando = &wrappedRandom{sim: sim, Rand: rand.New(rand.NewSource(options.RSeed))}
 
@@ -143,7 +143,7 @@ func newSim(raid *Raid, options Options, numPlayers int) *Simulation {
 
 // Get the metrics for an invidual Agent, for the current iteration.
 func (sim *Simulation) GetIndividualMetrics(agentID int) AgentIterationMetrics {
-	return sim.metricsAggregator.agentIterations[agentID]
+	return sim.MetricsAggregator.agentIterations[agentID]
 }
 
 func (sim *Simulation) AddInitialAura(initialAura InitialAura) {
@@ -182,10 +182,9 @@ func (sim *Simulation) Reset() {
 	}
 }
 
-type pendingAction struct {
+type pendingAgent struct {
 	Agent Agent
-	AgentAction
-	ExecuteAt time.Duration
+	NextActionAt time.Duration
 }
 
 func (sim *Simulation) playerConsumes(agent Agent) {
@@ -221,10 +220,10 @@ func (sim *Simulation) Run() SimResult {
 
 	for i := 0; i < sim.Options.Iterations; i++ {
 		sim.RunOnce()
-		sim.metricsAggregator.doneIteration()
+		sim.MetricsAggregator.doneIteration()
 	}
 
-	result := sim.metricsAggregator.getResult()
+	result := sim.MetricsAggregator.getResult()
 	result.Logs = logsBuffer.String()
 	return result
 }
@@ -234,86 +233,47 @@ func (sim *Simulation) Run() SimResult {
 func (sim *Simulation) RunOnce() {
 	sim.Reset()
 
-	pendingActions := make([]pendingAction, 0, 25)
+	pendingAgents := make([]pendingAgent, 0, 25)
 	// setup initial actions.
 	for _, party := range sim.Raid.Parties {
 		for _, agent := range party.Players {
 			sim.playerConsumes(agent)
+			nextActionAt := agent.Start(sim)
 
-			action := agent.ChooseAction(sim)
-
-			// sim.CurrentTime is 0, so dont need to add it
-			executeAt := action.GetDuration()
-
-			if executeAt == NeverExpires {
+			if nextActionAt == NeverExpires {
 				continue // This means agent will not perform any actions at all
 			}
 
-			pendingActions = append(pendingActions, pendingAction{
-				ExecuteAt:   executeAt,
-				Agent:       agent,
-				AgentAction: action,
+			pendingAgents = append(pendingAgents, pendingAgent{
+				NextActionAt: nextActionAt,
+				Agent:        agent,
 			})
 		}
 	}
 	// order pending by execution time.
-	sort.Slice(pendingActions, func(i, j int) bool {
-		return pendingActions[i].ExecuteAt < pendingActions[j].ExecuteAt
+	sort.Slice(pendingAgents, func(i, j int) bool {
+		return pendingAgents[i].NextActionAt < pendingAgents[j].NextActionAt
 	})
 
-simloop:
 	for sim.CurrentTime < sim.Duration {
-		action := pendingActions[0]
-		agent := action.Agent
-		agent.OnActionAccepted(sim, action.AgentAction)
-		if action.ExecuteAt > sim.CurrentTime {
-			sim.Advance(action.ExecuteAt - sim.CurrentTime)
+		pa := pendingAgents[0]
+
+		if pa.NextActionAt > sim.CurrentTime {
+			sim.Advance(pa.NextActionAt - sim.CurrentTime)
 		}
 
-		action.Act(sim)
+		sim.playerConsumes(pa.Agent)
+		pa.NextActionAt = pa.Agent.Act(sim)
 
-		sim.playerConsumes(agent)
-		newAction := agent.ChooseAction(sim)
-		actionDuration := newAction.GetDuration()
-
-		castAction, isCastAction := newAction.(DirectCastAction)
-		if isCastAction {
-			// TODO: This delays the cast damage until GCD is ready, even if the cast time is less than GCD.
-			// How to handle this?
-			actionDuration = MaxDuration(actionDuration, GCDMin)
-
-			manaCost := castAction.GetManaCost()
-			if agent.GetCharacter().Stats[stats.Mana] < manaCost {
-				// Not enough mana, wait until there is enough mana to cast the desired spell
-				// TODO: Doesn't account for spirit-based mana
-				regenTime := DurationFromSeconds((manaCost-agent.GetCharacter().Stats[stats.Mana])/agent.GetCharacter().manaRegenPerSecond()) + 1
-				if sim.Log != nil {
-					sim.Log("Not enough mana to cast... regen for %0.1f seconds before casting.\n", regenTime.Seconds())
-				}
-				actionDuration = regenTime
-				if sim.Options.ExitOnOOM {
-					break simloop // named for clarity since this is pretty deep nested.
-				}
-
-				// Cancel cast for now.
-				newAction = NewWaitAction(sim, agent, actionDuration)
-				sim.metricsAggregator.markOOM(agent, sim.CurrentTime)
-			}
-		}
-		pa := pendingAction{
-			ExecuteAt:   sim.CurrentTime + actionDuration,
-			Agent:       agent,
-			AgentAction: newAction,
-		}
-		if len(pendingActions) == 1 {
+		if len(pendingAgents) == 1 {
 			// We know in a single user sim, just always make the next pending action ours.
-			pendingActions[0] = pa
+			pendingAgents[0] = pa
 		} else {
 			// Insert into the list the correct execution time.
-			for i, v := range pendingActions {
-				if v.ExecuteAt >= pa.ExecuteAt {
-					copy(pendingActions, pendingActions[:i])
-					pendingActions[i] = pa
+			for i, v := range pendingAgents {
+				if v.NextActionAt >= pa.NextActionAt {
+					copy(pendingAgents, pendingAgents[:i])
+					pendingAgents[i] = pa
 				}
 			}
 		}
@@ -323,6 +283,7 @@ simloop:
 // Advance moves time forward counting down auras, CDs, mana regen, etc
 func (sim *Simulation) Advance(elapsedTime time.Duration) {
 	newTime := sim.CurrentTime + elapsedTime
+	sim.CurrentTime = newTime
 
 	for _, party := range sim.Raid.Parties {
 		for _, agent := range party.Players {
@@ -331,5 +292,4 @@ func (sim *Simulation) Advance(elapsedTime time.Duration) {
 		}
 	}
 	sim.AuraTracker.Advance(sim, elapsedTime)
-	sim.CurrentTime = newTime
 }
