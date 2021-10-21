@@ -1,6 +1,8 @@
 package mage
 
 import (
+	"time"
+
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/proto"
 )
@@ -22,10 +24,11 @@ func (mage *Mage) AddPartyBuffs(buffs *proto.Buffs) {
 func (mage *Mage) BuffUp(sim *core.Simulation) {
 }
 
-func (mage *Mage) ChooseAction(sim *core.Simulation) core.AgentAction {
-	return core.NewWaitAction(sim, mage, core.NeverExpires) // makes the bot wait forever and do nothing.
+func (mage *Mage) Act(sim *core.Simulation) time.Duration {
+	return core.NeverExpires // makes the bot wait forever and do nothing.
 }
-func (mage *Mage) OnActionAccepted(sim *core.Simulation, action core.AgentAction) {
+func (mage *Mage) Start(sim *core.Simulation) time.Duration {
+	return mage.Act(sim)
 }
 func (mage *Mage) Reset(newsim *core.Simulation) {
 }

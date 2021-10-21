@@ -32,7 +32,8 @@ type Character struct {
 
 	// mutatable state
 
-	// Aura used to handle results of hardcast after the cast completes
+	// Used for applying the effects of hardcast / channeled spells at a later time.
+	// By definition there can be only 1 hardcast spell being cast at any moment.
 	HardcastAura Aura
 
 	potionsUsed int32 // Number of potions used

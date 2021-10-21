@@ -147,7 +147,6 @@ func (action DirectCastAction) Act(sim *Simulation) bool {
 		action.internalOnCastComplete(sim)
 	} else {
 		character.HardcastAura = Aura{
-			ID:      MagicIDHardcast,
 			Expires: sim.CurrentTime + action.castInput.CastTime,
 			OnExpire: func(sim *Simulation) {
 				action.internalOnCastComplete(sim)

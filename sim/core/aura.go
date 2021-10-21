@@ -302,11 +302,6 @@ const (
 	MagicIDOffHandSwing
 	MagicIDRangedSwing
 
-	// Used for applying the effects of hardcast / channeled spells at a later time.
-	// By definition there can be only 1 hardcast spell being cast at any moment
-	// so no need to make separate IDs for every spell.
-	MagicIDHardcast
-
 	// Spells, used for tracking CDs
 	MagicIDChainLightning6
 	// MagicIDFlameShock

@@ -1,6 +1,11 @@
 package warlock
 
-import "github.com/wowsims/tbc/sim/core"
+import (
+	"time"
+
+	"github.com/wowsims/tbc/sim/core"
+	"github.com/wowsims/tbc/sim/core/proto"
+)
 
 type Warlock struct {
 	core.Character
@@ -12,11 +17,17 @@ func (warlock *Warlock) GetCharacter() *core.Character {
 	return &warlock.Character
 }
 
-func (warlock *Warlock) ChooseAction(sim *core.Simulation) core.AgentAction {
-	return core.NewWaitAction(sim, warlock, core.NeverExpires) // makes the bot wait forever and do nothing.
+func (warlock *Warlock) AddRaidBuffs(buffs *proto.Buffs) {
+}
+func (warlock *Warlock) AddPartyBuffs(buffs *proto.Buffs) {
 }
 
-func (warlock *Warlock) OnActionAccepted(*core.Simulation, core.AgentAction) {
+func (warlock *Warlock) Act(sim *core.Simulation) time.Duration {
+	return core.NeverExpires // makes the bot wait forever and do nothing.
+}
+
+func (warlock *Warlock) Start(sim *core.Simulation) time.Duration {
+	return warlock.Act(sim)
 }
 
 func (warlock *Warlock) BuffUp(sim *core.Simulation) {
