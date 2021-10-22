@@ -11,12 +11,17 @@ This project has dependencies on Go, protobuf-compiler and the corresponding Go 
 ## Ubuntu
 ```sh
 # Install Go
-sudo apt install golang-go
+sudo apt-get install golang-go
 
 # Install protobuf compiler and Go plugins
-sudo apt install protobuf-compiler
+sudo apt-get install protobuf-compiler
 go get -u -v github.com/golang/protobuf/proto
 go get -u -v github.com/golang/protobuf/protoc-gen-go
+
+# You should be able to run 'make test' now. If you see an error like, 'protoc-gen-go: program not found or is not executable', run the following commands:
+echo 'export GOPATH=$HOME/go' >> $HOME/.bashrc
+echo 'export PATH=$PATH:$GOPATH/bin' >> $HOME/.bashrc
+source $HOME/.bashrc
 
 # Install node
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash
