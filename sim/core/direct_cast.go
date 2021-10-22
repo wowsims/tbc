@@ -79,7 +79,7 @@ type DirectCastImpl interface {
 	GetActionID() ActionID
 	GetName() string
 	GetTag() int32
-	GetAgent() Agent
+	GetCharacter() *Character
 
 	// This is needed because a lot of effects that 'reduce mana cost by X%' are
 	// calculated from the base mana cost.
@@ -116,7 +116,7 @@ func (action DirectCastAction) GetDuration() time.Duration {
 }
 
 func (action DirectCastAction) Act(sim *Simulation) {
-	character := action.GetAgent().GetCharacter()
+	character := action.GetCharacter()
 
 	if sim.Log != nil {
 		sim.Log("(%d) Casting %s (Current Mana = %0.0f, Mana Cost = %0.0f, Cast Time = %s\n",
@@ -190,7 +190,7 @@ func (action DirectCastAction) Act(sim *Simulation) {
 func (action DirectCastAction) calculateDirectCastDamage(sim *Simulation, damageInput DirectCastDamageInput) DirectCastDamageResult {
 	result := DirectCastDamageResult{}
 
-	character := action.GetAgent().GetCharacter()
+	character := action.GetCharacter()
 
 	hit := 0.83 + character.Stats[stats.SpellHit]/(SpellHitRatingPerHitChance*100) + damageInput.BonusHit
 	hit = MinFloat(hit, 0.99) // can't get away from the 1% miss
@@ -241,12 +241,12 @@ func NewDirectCastAction(sim *Simulation, impl DirectCastImpl) DirectCastAction 
 	action := DirectCastAction{
 		DirectCastImpl: impl,
 	}
+	character := action.GetCharacter()
 
 	castInput := impl.GetCastInput(sim, action)
-	castInput.CastTime = time.Duration(float64(castInput.CastTime) / impl.GetAgent().GetCharacter().HasteBonus())
+	castInput.CastTime = time.Duration(float64(castInput.CastTime) / character.HasteBonus())
 
 	// Apply on-cast effects.
-	character := action.GetAgent().GetCharacter()
 	for _, id := range character.ActiveAuraIDs {
 		if character.Auras[id].OnCast != nil {
 			character.Auras[id].OnCast(sim, action, &castInput)
