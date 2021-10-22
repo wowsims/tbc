@@ -51,7 +51,7 @@ func (action WaitAction) Act(sim *Simulation) bool {
 
 func NewWaitAction(sim *Simulation, character *Character, duration time.Duration) WaitAction {
 	return WaitAction{
-		character: Character,
+		character: character,
 		duration: duration,
 	}
 }

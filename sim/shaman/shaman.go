@@ -127,7 +127,7 @@ func (shaman *Shaman) Act(sim *core.Simulation) time.Duration {
 		// Wait until we have enough mana to cast.
 		// TODO: This logic should be in ele shaman code, because enhance react differently to going oom.
 		regenTime := shaman.TimeUntilManaRegen(newAction.GetManaCost())
-		newAction = core.NewWaitAction(sim, shaman, regenTime)
+		newAction = core.NewWaitAction(sim, shaman.GetCharacter(), regenTime)
 		shaman.rotation.OnActionAccepted(shaman, sim, newAction)
 		return sim.CurrentTime + regenTime
 	}

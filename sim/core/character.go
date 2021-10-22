@@ -94,20 +94,12 @@ func (character *Character) Reset() {
 func (character *Character) BuffUp(sim *Simulation, agent Agent) {
 	// Activate all permanent item effects.
 	for _, actItem := range character.ActiveEquip {
-		if actItem.ActivateCD != NeverExpires {
-			continue
+		if actItem.BuffUp != nil {
+			actItem.BuffUp(sim, agent)
 		}
-		character.AddAura(sim, actItem.Activate(sim, agent))
 	}
 
 	character.ActivateSets(sim, agent)
-	character.TryActivateEquipment(sim, agent)
-}
-
-// AddAura on player is a simple wrapper around AuraTracker so the
-// consumer doesn't need to pass player back into itself.
-func (character *Character) AddAura(sim *Simulation, aura Aura) {
-	character.AuraTracker.AddAura(sim, aura)
 }
 
 // Returns rate of mana regen, as mana / second
@@ -146,18 +138,30 @@ func (character *Character) Advance(sim *Simulation, elapsedTime time.Duration, 
 	}
 }
 
+func (character *Character) TryActivateConsumes(sim *Simulation) {
+	// Consumes before any casts
+	TryActivateDrums(sim, character)
+	TryActivateRacial(sim, character)
+	TryActivatePotion(sim, character)
+	TryActivateDarkRune(sim, character)
+
+	// Pop activatable items if we can.
+	character.TryActivateEquipment(sim)
+}
+
 // Pops any on-use trinkets / gear
-func (character *Character) TryActivateEquipment(sim *Simulation, agent Agent) {
+func (character *Character) TryActivateEquipment(sim *Simulation) {
 	const sharedCD = time.Second * 20
 
 	for _, item := range character.ActiveEquip {
+		// TODO: Remove this check once we split permanent / temporary item actives
 		if item.Activate == nil || item.ActivateCD == NeverExpires { // ignore non-activatable, and always active items.
 			continue
 		}
 		if character.IsOnCD(item.CoolID, sim.CurrentTime) || (item.SharedID != 0 && character.IsOnCD(item.SharedID, sim.CurrentTime)) {
 			continue
 		}
-		character.AddAura(sim, item.Activate(sim, agent))
+		character.AddAura(sim, item.Activate(sim, character))
 		character.SetCD(item.CoolID, item.ActivateCD+sim.CurrentTime) // put item on CD
 		if item.SharedID != 0 {                                       // put all shared CDs on
 			character.SetCD(item.SharedID, sharedCD+sim.CurrentTime)
@@ -175,9 +179,9 @@ func (character *Character) ActivateSets(sim *Simulation, agent Agent) []string 
 		set := itemSetLookup[i.ID]
 		if set != nil {
 			setItemCount[set.Name]++
-			if bonus, ok := set.Bonuses[setItemCount[set.Name]]; ok {
+			if setBonusFunc, ok := set.Bonuses[setItemCount[set.Name]]; ok {
 				active = append(active, set.Name+" ("+strconv.Itoa(setItemCount[set.Name])+"pc)")
-				character.AddAura(sim, bonus(sim, agent))
+				setBonusFunc(sim, agent)
 			}
 		}
 	}

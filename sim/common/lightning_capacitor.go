@@ -8,16 +8,17 @@ import (
 )
 
 func init() {
-	core.AddActiveItem(core.ItemIDTheLightningCapacitor, core.ActiveItem{Activate: ActivateTLC, ActivateCD: core.NeverExpires, SharedID: core.MagicIDAtkTrinket})
+	core.AddActiveItem(core.ItemIDTheLightningCapacitor, core.ActiveItem{BuffUp: ActivateTLC, ActivateCD: core.NeverExpires, SharedID: core.MagicIDAtkTrinket})
 }
 
-func ActivateTLC(sim *core.Simulation, character *core.Character) core.Aura {
+func ActivateTLC(sim *core.Simulation, agent core.Agent) {
+	character := agent.GetCharacter()
 	charges := 0
 
 	const icdDur = time.Millisecond * 2500
 	icd := core.NewICD()
 
-	return core.Aura{
+	character.AddAura(sim, core.Aura{
 		ID:      core.MagicIDTLC,
 		Expires: core.NeverExpires,
 		OnSpellHit: func(sim *core.Simulation, cast core.DirectCastAction, result *core.DirectCastDamageResult) {
@@ -37,7 +38,7 @@ func ActivateTLC(sim *core.Simulation, character *core.Character) core.Aura {
 				castAction.Act(sim)
 			}
 		},
-	}
+	})
 }
 
 type LightningCapacitorCast struct {

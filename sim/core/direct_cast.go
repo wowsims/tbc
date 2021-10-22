@@ -131,7 +131,7 @@ func (action DirectCastAction) Act(sim *Simulation) bool {
 				sim.Log("(%d) Failed casting %s, not enough mana. (Current Mana = %0.0f, Mana Cost = %0.0f)\n",
 						character.ID, action.GetName(), character.Stats[stats.Mana], action.castInput.ManaCost)
 			}
-			sim.MetricsAggregator.MarkOOM(action.GetAgent(), sim.CurrentTime)
+			sim.MetricsAggregator.MarkOOM(character, sim.CurrentTime)
 
 			return false
 		}
@@ -166,7 +166,7 @@ func (action DirectCastAction) Act(sim *Simulation) bool {
 }
 
 func (action DirectCastAction) internalOnCastComplete(sim *Simulation) {
-	character := action.GetAgent().GetCharacter()
+	character := action.GetCharacter()
 
 	if !action.castInput.IgnoreManaCost && action.castInput.ManaCost > 0 {
 		character.Stats[stats.Mana] -= action.castInput.ManaCost
@@ -290,7 +290,6 @@ func NewDirectCastAction(sim *Simulation, impl DirectCastImpl) DirectCastAction 
 	}
 	character := action.GetCharacter()
 
-	character := action.GetAgent().GetCharacter()
 	cooldownID := action.GetActionID().CooldownID
 
 	castInput := impl.GetCastInput(sim, action)

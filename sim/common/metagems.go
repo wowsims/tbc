@@ -14,7 +14,7 @@ func init() {
 	core.AddActiveItem(25893, core.ActiveItem{Activate: ActivateMSD, ActivateCD: core.NeverExpires})
 }
 
-func ActivateCSD(sim *core.Simulation, agent core.Agent) core.Aura {
+func ActivateCSD(sim *core.Simulation, character *core.Character) core.Aura {
 	return core.Aura{
 		ID:      core.MagicIDChaoticSkyfire,
 		Expires: core.NeverExpires,
@@ -28,16 +28,16 @@ func ActivateCSD(sim *core.Simulation, agent core.Agent) core.Aura {
 	}
 }
 
-func ActivateESD(sim *core.Simulation, agent core.Agent) core.Aura {
+func ActivateESD(sim *core.Simulation, character *core.Character) core.Aura {
 	// FUTURE: this technically should be modified by blessing of kings?
-	agent.GetCharacter().Stats[stats.Intellect] += agent.GetCharacter().Stats[stats.Intellect] * 0.02
+	character.Stats[stats.Intellect] += character.Stats[stats.Intellect] * 0.02
 	return core.Aura{
 		ID:      core.MagicIDEmberSkyfire,
 		Expires: core.NeverExpires,
 	}
 }
 
-func ActivateIED(sim *core.Simulation, agent core.Agent) core.Aura {
+func ActivateIED(sim *core.Simulation, character *core.Character) core.Aura {
 	icd := core.NewICD()
 	const dur = time.Second * 15
 	return core.Aura{
@@ -49,13 +49,13 @@ func ActivateIED(sim *core.Simulation, agent core.Agent) core.Aura {
 				if sim.Log != nil {
 					sim.Log(" *Insightful Earthstorm Mana Restore - 300\n")
 				}
-				agent.GetCharacter().Stats[stats.Mana] += 300
+				character.Stats[stats.Mana] += 300
 			}
 		},
 	}
 }
 
-func ActivateMSD(sim *core.Simulation, agent core.Agent) core.Aura {
+func ActivateMSD(sim *core.Simulation, character *core.Character) core.Aura {
 	const hasteBonus = 320.0
 	const dur = time.Second * 4
 	const icdDur = time.Second * 35
@@ -66,7 +66,7 @@ func ActivateMSD(sim *core.Simulation, agent core.Agent) core.Aura {
 		OnCastComplete: func(sim *core.Simulation, cast core.DirectCastAction) {
 			if !icd.IsOnCD(sim) && sim.Rando.Float64("unmarked") < 0.15 {
 				icd = core.InternalCD(sim.CurrentTime + icdDur)
-				core.AddAuraWithTemporaryStats(sim, agent, core.MagicIDMysticFocus, stats.SpellHaste, hasteBonus, dur)
+				core.AddAuraWithTemporaryStats(sim, character, core.MagicIDMysticFocus, stats.SpellHaste, hasteBonus, dur)
 			}
 		},
 	}
