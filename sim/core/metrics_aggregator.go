@@ -112,7 +112,7 @@ func (aggregator *MetricsAggregator) AddCastAction(cast DirectCastAction, castRe
 
 	actionKey := NewActionKey(actionID, tag)
 
-	agentID := cast.GetAgent().GetCharacter().ID
+	agentID := cast.GetCharacter().ID
 
 	iterationMetrics := &aggregator.agentIterations[agentID]
 	if !cast.castInput.IgnoreManaCost {
@@ -146,8 +146,8 @@ func (aggregator *MetricsAggregator) AddCastAction(cast DirectCastAction, castRe
 	aggregateMetrics.Actions[actionKey] = actionMetrics
 }
 
-func (aggregator *MetricsAggregator) MarkOOM(agent Agent, oomAtTime time.Duration) {
-	agentID := agent.GetCharacter().ID
+func (aggregator *MetricsAggregator) MarkOOM(character *Character, oomAtTime time.Duration) {
+	agentID := character.ID
 
 	if aggregator.agentIterations[agentID].OOMAt == 0 {
 		aggregator.agentIterations[agentID].DamageAtOOM = aggregator.agentIterations[agentID].TotalDamage

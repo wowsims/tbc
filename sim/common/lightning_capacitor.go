@@ -8,16 +8,17 @@ import (
 )
 
 func init() {
-	core.AddActiveItem(core.ItemIDTheLightningCapacitor, core.ActiveItem{Activate: ActivateTLC, ActivateCD: core.NeverExpires, SharedID: core.MagicIDAtkTrinket})
+	core.AddActiveItem(core.ItemIDTheLightningCapacitor, core.ActiveItem{BuffUp: ActivateTLC, ActivateCD: core.NeverExpires, SharedID: core.MagicIDAtkTrinket})
 }
 
-func ActivateTLC(sim *core.Simulation, agent core.Agent) core.Aura {
+func ActivateTLC(sim *core.Simulation, agent core.Agent) {
+	character := agent.GetCharacter()
 	charges := 0
 
 	const icdDur = time.Millisecond * 2500
 	icd := core.NewICD()
 
-	return core.Aura{
+	character.AddAura(sim, core.Aura{
 		ID:      core.MagicIDTLC,
 		Expires: core.NeverExpires,
 		OnSpellHit: func(sim *core.Simulation, cast core.DirectCastAction, result *core.DirectCastDamageResult) {
@@ -33,15 +34,15 @@ func ActivateTLC(sim *core.Simulation, agent core.Agent) core.Aura {
 			if charges >= 3 {
 				icd = core.InternalCD(sim.CurrentTime + icdDur)
 				charges = 0
-				castAction := NewLightningCapacitorCast(sim, agent)
+				castAction := NewLightningCapacitorCast(sim, character)
 				castAction.Act(sim)
 			}
 		},
-	}
+	})
 }
 
 type LightningCapacitorCast struct {
-	agent core.Agent
+	character *core.Character
 }
 
 func (lcc LightningCapacitorCast) GetActionID() core.ActionID {
@@ -58,8 +59,8 @@ func (lcc LightningCapacitorCast) GetTag() int32 {
 	return 0
 }
 
-func (lcc LightningCapacitorCast) GetAgent() core.Agent {
-	return lcc.agent
+func (lcc LightningCapacitorCast) GetCharacter() *core.Character {
+	return lcc.character
 }
 
 func (lcc LightningCapacitorCast) GetBaseManaCost() float64 {
@@ -99,6 +100,6 @@ func (lcc LightningCapacitorCast) OnSpellHit(sim *core.Simulation, cast core.Dir
 func (lcc LightningCapacitorCast) OnSpellMiss(sim *core.Simulation, cast core.DirectCastAction) {
 }
 
-func NewLightningCapacitorCast(sim *core.Simulation, agent core.Agent) core.DirectCastAction {
-	return core.NewDirectCastAction(sim, LightningCapacitorCast{agent: agent})
+func NewLightningCapacitorCast(sim *core.Simulation, character *core.Character) core.DirectCastAction {
+	return core.NewDirectCastAction(sim, LightningCapacitorCast{character: character})
 }

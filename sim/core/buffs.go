@@ -137,7 +137,7 @@ func AuraJudgementOfWisdom() Aura {
 				return // TLC cant proc JoW
 			}
 
-			character := cast.GetAgent().GetCharacter()
+			character := cast.GetCharacter()
 			// Only apply to agents that have mana.
 			if character.InitialStats[stats.Mana] > 0 {
 				character.Stats[stats.Mana] += mana
@@ -167,10 +167,10 @@ const (
 	RaceBonusTypeUndead
 )
 
-func TryActivateRacial(sim *Simulation, agent Agent) {
-	switch agent.GetCharacter().Race {
+func TryActivateRacial(sim *Simulation, character *Character) {
+	switch character.Race {
 	case RaceBonusTypeOrc:
-		if agent.GetCharacter().IsOnCD(MagicIDOrcBloodFury, sim.CurrentTime) {
+		if character.IsOnCD(MagicIDOrcBloodFury, sim.CurrentTime) {
 			return
 		}
 
@@ -178,22 +178,22 @@ func TryActivateRacial(sim *Simulation, agent Agent) {
 		const dur = time.Second * 15
 		const cd = time.Minute * 2
 
-		agent.GetCharacter().SetCD(MagicIDOrcBloodFury, cd+sim.CurrentTime)
-		AddAuraWithTemporaryStats(sim, agent, MagicIDOrcBloodFury, stats.SpellPower, spBonus, dur)
+		character.SetCD(MagicIDOrcBloodFury, cd+sim.CurrentTime)
+		AddAuraWithTemporaryStats(sim, character, MagicIDOrcBloodFury, stats.SpellPower, spBonus, dur)
 
 	case RaceBonusTypeTroll10, RaceBonusTypeTroll30:
-		if agent.GetCharacter().IsOnCD(MagicIDTrollBerserking, sim.CurrentTime) {
+		if character.IsOnCD(MagicIDTrollBerserking, sim.CurrentTime) {
 			return
 		}
 		hasteBonus := time.Duration(11) // 10% haste
-		if agent.GetCharacter().Race == RaceBonusTypeTroll30 {
+		if character.Race == RaceBonusTypeTroll30 {
 			hasteBonus = time.Duration(13) // 30% haste
 		}
 		const dur = time.Second * 10
 		const cd = time.Minute * 3
 
-		agent.GetCharacter().SetCD(MagicIDTrollBerserking, cd+sim.CurrentTime)
-		agent.GetCharacter().AddAura(sim, Aura{
+		character.SetCD(MagicIDTrollBerserking, cd+sim.CurrentTime)
+		character.AddAura(sim, Aura{
 			ID:      MagicIDTrollBerserking,
 			Expires: sim.CurrentTime + dur,
 			OnCast: func(sim *Simulation, cast DirectCastAction, inputs *DirectCastInput) {

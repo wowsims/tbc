@@ -31,7 +31,7 @@ func TestP1FullCharacterStats(t *testing.T) {
 		stats.Intellect:  511.4,
 		stats.Spirit:     191.3,
 
-		stats.SpellPower:       989,
+		stats.SpellPower:       834,
 		stats.HealingPower:     690,
 		stats.ArcaneSpellPower: 80,
 		stats.HolySpellPower:   80,

@@ -71,8 +71,7 @@ func ConsumesStats(c proto.Consumes) stats.Stats {
 	return s
 }
 
-func TryActivateDrums(sim *Simulation, agent Agent) {
-	character := agent.GetCharacter()
+func TryActivateDrums(sim *Simulation, character *Character) {
 	if character.IsOnCD(MagicIDDrums, sim.CurrentTime) {
 		return
 	}
@@ -89,20 +88,19 @@ func TryActivateDrums(sim *Simulation, agent Agent) {
 		const hasteBonus = 80
 		for _, agent := range character.Party.Players {
 			agent.GetCharacter().SetCD(MagicIDDrums, time.Minute*2+sim.CurrentTime) // tinnitus
-			AddAuraWithTemporaryStats(sim, agent, MagicIDDrums, stats.SpellHaste, hasteBonus, time.Second*30)
+			AddAuraWithTemporaryStats(sim, agent.GetCharacter(), MagicIDDrums, stats.SpellHaste, hasteBonus, time.Second*30)
 		}
 	} else if partyCast == proto.Drums_DrumsOfRestoration {
 		// 600 mana over 15 seconds == 200 mp5
 		const mp5Bonus = 200
 		for _, agent := range character.Party.Players {
 			agent.GetCharacter().SetCD(MagicIDDrums, time.Minute*2+sim.CurrentTime) // tinnitus
-			AddAuraWithTemporaryStats(sim, agent, MagicIDDrums, stats.MP5, mp5Bonus, time.Second*15)
+			AddAuraWithTemporaryStats(sim, agent.GetCharacter(), MagicIDDrums, stats.MP5, mp5Bonus, time.Second*15)
 		}
 	}
 }
 
-func TryActivatePotion(sim *Simulation, agent Agent) {
-	character := agent.GetCharacter()
+func TryActivatePotion(sim *Simulation, character *Character) {
 	if character.IsOnCD(MagicIDPotion, sim.CurrentTime) {
 		return
 	}
@@ -156,8 +154,7 @@ func TryActivatePotion(sim *Simulation, agent Agent) {
 	character.potionsUsed++
 }
 
-func TryActivateDarkRune(sim *Simulation, agent Agent) {
-	character := agent.GetCharacter()
+func TryActivateDarkRune(sim *Simulation, character *Character) {
 	if !character.Consumes.DarkRune || character.IsOnCD(MagicIDRune, sim.CurrentTime) {
 		return
 	}

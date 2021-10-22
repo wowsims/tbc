@@ -10,9 +10,15 @@ import (
 
 // ItemActivation needs the state from simulator, party, and agent
 //  because items can impact all 3. (potions, drums, JC necks, etc)
-type ItemActivation func(*Simulation, Agent) Aura
+type ItemActivation func(*Simulation, *Character) Aura
+
+type ItemBuffUpFunc func(*Simulation, Agent)
 
 type ActiveItem struct {
+	// Called once after each Sim reset. This is where any permanent effects
+	// or auras provided by the item should be applied.
+	BuffUp ItemBuffUpFunc
+
 	Activate   ItemActivation `json:"-"` // Activatable Ability, produces an aura
 	ActivateCD time.Duration  `json:"-"` // cooldown on activation
 	CoolID     int32          `json:"-"` // ID used for cooldown
@@ -31,8 +37,13 @@ var ActiveItemByID = map[int32]ActiveItem{}
 
 type ItemSet struct {
 	Name    string
-	Items   map[int32]struct{}     // map[key]struct{} is roughly a set in go.
-	Bonuses map[int]ItemActivation // maps item count to activations
+
+	// IDs of items that are part of this set. map[key]struct{} is roughly a set in go.
+	Items map[int32]struct{}
+
+	// Maps set piece requirement to a 'BuffUp' function that should apply
+	// benefits provided by the set bonus.
+	Bonuses map[int]ItemBuffUpFunc
 }
 
 func (set ItemSet) ItemIsInSet(itemID int32) bool {

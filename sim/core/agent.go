@@ -53,8 +53,8 @@ type AgentAction interface {
 
 	GetTag() int32
 
-	// The Agent performing this action.
-	GetAgent() Agent
+	// The Character performing this action.
+	GetCharacter() *Character
 
 	// How long this action takes to cast/channel/etc.
 	// In other words, how long until another action should be chosen.

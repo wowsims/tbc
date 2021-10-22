@@ -117,7 +117,7 @@ func (agent *FixedRotation) ChooseAction(shaman *Shaman, sim *core.Simulation) c
 		return NewLightningBolt(sim, shaman, false)
 	}
 
-	return core.NewWaitAction(sim, shaman, shaman.GetRemainingCD(core.MagicIDChainLightning6, sim.CurrentTime))
+	return core.NewWaitAction(sim, shaman.GetCharacter(), shaman.GetRemainingCD(core.MagicIDChainLightning6, sim.CurrentTime))
 }
 
 func (agent *FixedRotation) OnActionAccepted(shaman *Shaman, sim *core.Simulation, action core.AgentAction) {

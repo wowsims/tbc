@@ -200,8 +200,6 @@ func AuraName(a int32) string {
 		return "Xiri Trinket"
 	case MagicIDDrums:
 		return "Drums"
-	case MagicIDNetherstrike:
-		return "Netherstrike Set"
 	case MagicIDTwinStars:
 		return "Twin Stars Set"
 	case MagicIDTidefury:
@@ -212,12 +210,8 @@ func AuraName(a int32) string {
 		return "Spellstrike Infusion"
 	case MagicIDManaEtched:
 		return "Mana-Etched Set"
-	case MagicIDManaEtchedHit:
-		return "Mana-EtchedHit"
 	case MagicIDManaEtchedInsight:
 		return "Mana-EtchedInsight"
-	case MagicIDWindhawk:
-		return "Windhawk Set Bonus"
 	case MagicIDOrcBloodFury:
 		return "Orc Blood Fury"
 	case MagicIDTrollBerserking:
@@ -252,8 +246,6 @@ func AuraName(a int32) string {
 		return "Recurring Power"
 	case MagicIDCataclysm4pc:
 		return "Cataclysm 4pc Set Bonus"
-	case MagicIDSkyshatter2pc:
-		return "Skyshatter 2pc Set Bonus"
 	case MagicIDSkyshatter4pc:
 		return "Skyshatter 4pc Set Bonus"
 	case MagicIDEssMartyrTrink:
@@ -329,20 +321,17 @@ const (
 	MagicIDDCC
 	MagicIDDCCBonus
 	MagicIDDrums // drums effect
-	MagicIDNetherstrike
 	MagicIDTwinStars
 	MagicIDTidefury
 	MagicIDSpellstrike
 	MagicIDSpellstrikeInfusion
 	MagicIDManaEtched
-	MagicIDManaEtchedHit
 	MagicIDManaEtchedInsight
 	MagicIDMisery
 	MagicIDEyeOfTheNight
 	MagicIDChainTO
 	MagicIDCyclone4pc
 	MagicIDCycloneMana // proc from 4pc
-	MagicIDWindhawk
 	MagicIDOrcBloodFury    // orc racials
 	MagicIDTrollBerserking // troll racial
 	MagicIDTLC             // aura on equip of TLC, stores charges
@@ -356,7 +345,6 @@ const (
 	MagicIDEyeOfMag         // trinket aura
 	MagicIDRecurringPower   // eye of mag proc aura
 	MagicIDCataclysm4pc     // cyclone 4pc aura
-	MagicIDSkyshatter2pc    // skyshatter 2pc aura
 	MagicIDSkyshatter4pc    // skyshatter 4pc aura
 	MagicIDElderScribe      // elder scribe robe item aura
 	MagicIDElderScribeProc  // elder scribe robe temp buff
@@ -385,13 +373,13 @@ const (
 	MagicIDLen
 )
 
-// Add stats to an agent, and return an aura that removes them when expired.
+// Add stats to a character, and return an aura that removes them when expired.
 // NOTE: In most cases, use AddAuraWithTemporaryStats() instead.
-func AddTemporaryStats(sim *Simulation, agent Agent, auraID int32, stat stats.Stat, amount float64, duration time.Duration) Aura {
+func AddTemporaryStats(sim *Simulation, character *Character, auraID int32, stat stats.Stat, amount float64, duration time.Duration) Aura {
 	if sim.Log != nil {
 		sim.Log(" +%0.0f %s from %s\n", amount, stat.StatName(), AuraName(auraID))
 	}
-	agent.GetCharacter().Stats[stat] += amount
+	character.Stats[stat] += amount
 
 	return Aura{
 		ID:      auraID,
@@ -400,27 +388,27 @@ func AddTemporaryStats(sim *Simulation, agent Agent, auraID int32, stat stats.St
 			if sim.Log != nil {
 				sim.Log(" -%0.0f %s from %s\n", amount, stat.StatName(), AuraName(auraID))
 			}
-			agent.GetCharacter().Stats[stat] -= amount
+			character.Stats[stat] -= amount
 		},
 	}
 }
 
-// Like AddTemporaryStats(), but also adds the aura to the agent.
-func AddAuraWithTemporaryStats(sim *Simulation, agent Agent, auraID int32, stat stats.Stat, amount float64, duration time.Duration) {
-	agent.GetCharacter().AddAura(sim, AddTemporaryStats(sim, agent, auraID, stat, amount, duration))
+// Like AddTemporaryStats(), but also adds the aura to the character.
+func AddAuraWithTemporaryStats(sim *Simulation, character *Character, auraID int32, stat stats.Stat, amount float64, duration time.Duration) {
+	character.AddAura(sim, AddTemporaryStats(sim, character, auraID, stat, amount, duration))
 }
 
 func CreateHasteActivate(id int32, haste float64, duration time.Duration) ItemActivation {
 	// Implemented haste activate as a buff so that the creation of a new cast gets the correct cast time
-	return func(sim *Simulation, agent Agent) Aura {
-		return AddTemporaryStats(sim, agent, id, stats.SpellHaste, haste, duration)
+	return func(sim *Simulation, character *Character) Aura {
+		return AddTemporaryStats(sim, character, id, stats.SpellHaste, haste, duration)
 	}
 }
 
 // createSpellDmgActivate creates a function for trinket activation that uses +spellpower
 //  This is so we don't need a separate function for every spell power trinket.
 func CreateSpellDmgActivate(id int32, sp float64, duration time.Duration) ItemActivation {
-	return func(sim *Simulation, agent Agent) Aura {
-		return AddTemporaryStats(sim, agent, id, stats.SpellPower, sp, duration)
+	return func(sim *Simulation, character *Character) Aura {
+		return AddTemporaryStats(sim, character, id, stats.SpellPower, sp, duration)
 	}
 }
