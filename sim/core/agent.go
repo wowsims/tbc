@@ -24,12 +24,16 @@ type Agent interface {
 	// Returns this Agent to its initial state. Called before each Sim iteration.
 	Reset(newsim *Simulation)
 
-	// Returns the action this Agent would like to take next.
-	ChooseAction(*Simulation) AgentAction
+	// Allows the Agent to take whatever actions it wants to. This is called by
+	// the main event loop. The return value determines when the main event loop
+	// will call this again; it will call Act() at the time specified by the return
+	// value.
+	Act(*Simulation) time.Duration
 
-	// This will be invoked right before the chosen action is actually executed, so the Agent can update its state.
-	// Note that the action may be different from the action chosen by this agent.
-	OnActionAccepted(*Simulation, AgentAction)
+	// This will be called instead of Act() for the very first loop iteration after each
+	// Simulation reset. Like Act(), the return value is the time at which the Agent
+	// would like Act() to be called.
+	Start(*Simulation) time.Duration
 }
 
 type ActionID struct {
@@ -60,8 +64,9 @@ type AgentAction interface {
 	// Amount of mana required to perform the action.
 	GetManaCost() float64
 
-	// Do the action.
-	Act(sim *Simulation)
+	// Do the action. Returns whether the action was successful. An unsuccessful
+	// action indicates that the prerequisites, like resource cost, were not met.
+	Act(sim *Simulation) bool
 }
 
 type AgentFactory func(*Simulation, Character, *proto.PlayerOptions) Agent

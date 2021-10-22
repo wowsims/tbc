@@ -75,8 +75,10 @@ func (spell ElectricSpell) GetCastInput(sim *core.Simulation, cast core.DirectCa
 	}
 
 	if spell.IsLightningOverload {
-		input.ManaCost = 0
 		input.CastTime = 0
+		input.ManaCost = 0
+		input.IgnoreCooldowns = true
+		input.IgnoreManaCost = true
 	} else if spell.Shaman.Talents.LightningMastery > 0 {
 		// Convection applies against the base cost of the spell.
 		input.ManaCost -= spell.GetBaseManaCost() * spell.Shaman.convectionBonus
@@ -122,7 +124,7 @@ func (spell ElectricSpell) OnCastComplete(sim *core.Simulation, cast core.Direct
 	}
 }
 func (spell ElectricSpell) OnElectricSpellHit(sim *core.Simulation, cast core.DirectCastAction, result *core.DirectCastDamageResult) {
-	if result.Crit {
+	if spell.Shaman.Talents.ElementalFocus && result.Crit {
 		spell.Shaman.ElementalFocusStacks = 2
 	}
 }
