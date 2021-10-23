@@ -9,10 +9,11 @@ import (
 
 // Keep these (and their functions) in alphabetical order.
 func init() {
-	core.AddActiveItem(28602, core.ActiveItem{BuffUp: ActivateElderScribes, ActivateCD: core.NeverExpires})
+	// Proc effects. Keep these in order by item ID.
+	core.AddItemEffect(28602, ApplyRobeOfTheElderScribes)
 }
 
-func ActivateElderScribes(sim *core.Simulation, agent core.Agent) {
+func ApplyRobeOfTheElderScribes(agent core.Agent) {
 	character := agent.GetCharacter()
 	// Gives a chance when your harmful spells land to increase the damage of your spells and effects by up to 130 for 10 sec. (Proc chance: 20%, 50s cooldown)
 	icd := core.NewICD()
@@ -21,11 +22,9 @@ func ActivateElderScribes(sim *core.Simulation, agent core.Agent) {
 	const icdDur = time.Second * 50
 	const proc = 0.2
 
-	character.AddAura(sim, core.Aura{
+	character.AddPermanentAura(core.Aura{
 		ID:      core.MagicIDElderScribe,
-		Expires: core.NeverExpires,
 		OnSpellHit: func(sim *core.Simulation, cast core.DirectCastAction, result *core.DirectCastDamageResult) {
-			// This code is starting to look a lot like other ICD buff items. Perhaps we could DRY this out.
 			if !icd.IsOnCD(sim) && sim.Rando.Float64("unmarked") < proc {
 				icd = core.InternalCD(sim.CurrentTime + icdDur)
 				core.AddAuraWithTemporaryStats(sim, character, core.MagicIDElderScribeProc, stats.SpellPower, spellBonus, dur)

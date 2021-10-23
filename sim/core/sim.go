@@ -34,7 +34,7 @@ type Encounter struct {
 
 type IndividualParams struct {
 	Equip    items.EquipmentSpec
-	Race     RaceBonusType
+	Race     proto.Race
 	Class    proto.Class
 	Consumes proto.Consumes
 	Buffs    proto.Buffs
@@ -91,32 +91,8 @@ func NewIndividualSim(params IndividualParams) *Simulation {
 	raid.AddPlayer(agent)
 	raid.AddPlayerBuffs()
 
-	raid.ApplyBuffs(sim)
-
-	sim.Reset()
-
-	// Now apply all the 'final' stat improvements.
-	// TODO: Figure out how to handle buffs that buff based on other buffs...
-	//   for now this hardcoded buffing works...
-	for _, raidParty := range sim.Raid.Parties {
-		for _, player := range raidParty.Players {
-			if raid.Buffs.BlessingOfKings {
-				player.GetCharacter().InitialStats[stats.Stamina] *= 1.1
-				player.GetCharacter().InitialStats[stats.Agility] *= 1.1
-				player.GetCharacter().InitialStats[stats.Strength] *= 1.1
-				player.GetCharacter().InitialStats[stats.Intellect] *= 1.1
-				player.GetCharacter().InitialStats[stats.Spirit] *= 1.1
-			}
-			if raid.Buffs.DivineSpirit == proto.TristateEffect_TristateEffectImproved {
-				player.GetCharacter().InitialStats[stats.SpellPower] += player.GetCharacter().InitialStats[stats.Spirit] * 0.1
-			}
-			// Add SpellCrit from Int and Mana from Int
-			player.GetCharacter().InitialStats = player.GetCharacter().InitialStats.CalculatedTotal()
-		}
-	}
-
-	// Reset again to make sure updated initial stats are propagated.
-	sim.Reset()
+	raid.ApplyAllEffects(sim)
+	raid.Finalize()
 
 	return sim
 }
@@ -164,16 +140,8 @@ func (sim *Simulation) Reset() {
 	// Reset all players
 	for _, party := range sim.Raid.Parties {
 		for _, agent := range party.Players {
-			agent.GetCharacter().Reset()
+			agent.GetCharacter().Reset(sim)
 			agent.Reset(sim)
-		}
-	}
-
-	// Now buff everyone back up!
-	for _, party := range sim.Raid.Parties {
-		for _, agent := range party.Players {
-			agent.BuffUp(sim) // for now do this first to match order of adding auras as original sim.
-			agent.GetCharacter().BuffUp(sim, agent)
 		}
 	}
 
@@ -226,15 +194,8 @@ func (sim *Simulation) RunOnce() {
 	// setup initial actions.
 	for _, party := range sim.Raid.Parties {
 		for _, agent := range party.Players {
-			agent.GetCharacter().TryActivateConsumes(sim)
-			nextActionAt := agent.Start(sim)
-
-			if nextActionAt == NeverExpires {
-				continue // This means agent will not perform any actions at all
-			}
-
 			pendingAgents = append(pendingAgents, pendingAgent{
-				NextActionAt: nextActionAt,
+				NextActionAt: 0,
 				Agent:        agent,
 			})
 		}
@@ -251,7 +212,7 @@ func (sim *Simulation) RunOnce() {
 			sim.Advance(pa.NextActionAt - sim.CurrentTime)
 		}
 
-		pa.Agent.GetCharacter().TryActivateConsumes(sim)
+		pa.Agent.GetCharacter().TryUseCooldowns(sim)
 		pa.NextActionAt = pa.Agent.Act(sim)
 
 		if len(pendingAgents) == 1 {

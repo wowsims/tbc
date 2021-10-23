@@ -9,11 +9,7 @@ import (
 )
 
 func NewShaman(character core.Character, talents proto.ShamanTalents, selfBuffs SelfBuffs, rotation Rotation) *Shaman {
-	if selfBuffs.WaterShield {
-		character.InitialStats[stats.MP5] += 50
-	}
-
-	return &Shaman{
+	shaman := &Shaman{
 		Character: character,
 		rotation:  rotation,
 		Talents:   talents,
@@ -22,6 +18,34 @@ func NewShaman(character core.Character, talents proto.ShamanTalents, selfBuffs 
 		convectionBonus: 0.02 * float64(talents.Convection),
 		concussionBonus: 1 + 0.01*float64(talents.Concussion),
 	}
+
+	// Add Shaman stat dependencies
+	shaman.AddStatDependency(stats.StatDependency{
+		SourceStat: stats.Intellect,
+		ModifiedStat: stats.SpellCrit,
+		Modifier: func(intellect float64, spellCrit float64) float64 {
+			return spellCrit + (intellect / 78.1) * core.SpellCritRatingPerCritChance
+		},
+	})
+
+	if shaman.Talents.UnrelentingStorm > 0 {
+		coeff := 0.02 * float64(shaman.Talents.UnrelentingStorm)
+		shaman.AddStatDependency(stats.StatDependency{
+			SourceStat: stats.Intellect,
+			ModifiedStat: stats.MP5,
+			Modifier: func(intellect float64, mp5 float64) float64 {
+				return mp5 + intellect * coeff
+			},
+		})
+	}
+
+	if selfBuffs.WaterShield {
+		shaman.AddStat(stats.MP5, 50)
+	}
+
+	shaman.registerElementalMasteryCD()
+
+	return shaman
 }
 
 // Which buffs this shaman is using.
@@ -90,30 +114,11 @@ func (shaman *Shaman) AddPartyBuffs(buffs *proto.Buffs) {
 	}
 }
 
-func (shaman *Shaman) BuffUp(sim *core.Simulation) {
-	shaman.Stats[stats.MP5] += shaman.Stats[stats.Intellect] * (0.02 * float64(shaman.Talents.UnrelentingStorm))
-}
-
-func (shaman *Shaman) ChooseAction(sim *core.Simulation) core.AgentAction {
-	// Before casting, activate shaman powers!
-	TryActivateBloodlust(sim, shaman)
-	if shaman.Talents.ElementalMastery {
-		TryActivateEleMastery(sim, shaman)
-	}
-
-	return shaman.rotation.ChooseAction(shaman, sim)
-}
-func (shaman *Shaman) OnActionAccepted(sim *core.Simulation, action core.AgentAction) {
-	shaman.rotation.OnActionAccepted(shaman, sim, action)
+func (shaman *Shaman) Reset(newsim *core.Simulation) {
+	shaman.rotation.Reset(shaman, newsim)
 }
 
 func (shaman *Shaman) Act(sim *core.Simulation) time.Duration {
-	// Before casting, activate shaman powers!
-	TryActivateBloodlust(sim, shaman)
-	if shaman.Talents.ElementalMastery {
-		TryActivateEleMastery(sim, shaman)
-	}
-
 	newAction := shaman.rotation.ChooseAction(shaman, sim)
 
 	actionSuccessful := newAction.Act(sim)
@@ -132,54 +137,36 @@ func (shaman *Shaman) Act(sim *core.Simulation) time.Duration {
 		return sim.CurrentTime + regenTime
 	}
 }
-func (shaman *Shaman) Start(sim *core.Simulation) time.Duration {
-	return shaman.Act(sim)
-}
 
-
-func (shaman *Shaman) Reset(newsim *core.Simulation) {
-	shaman.rotation.Reset(shaman, newsim)
-}
-
-func TryActivateBloodlust(sim *core.Simulation, shaman *Shaman) {
-	if shaman.IsOnCD(core.MagicIDBloodlust, sim.CurrentTime) {
+func (shaman *Shaman) registerElementalMasteryCD() {
+	if !shaman.Talents.ElementalMastery {
 		return
 	}
 
-	dur := time.Second * 40 // assumes that multiple BLs are different shaman.
-	shaman.SetCD(core.MagicIDBloodlust, time.Minute*10+sim.CurrentTime)
-
-	shaman.Party.AddAura(sim, core.Aura{
-		ID:      core.MagicIDBloodlust,
-		Expires: sim.CurrentTime + dur,
-		OnCast: func(sim *core.Simulation, cast core.DirectCastAction, input *core.DirectCastInput) {
-			input.CastTime = (input.CastTime * 10) / 13 // 30% faster
-		},
-	})
-}
-
-func TryActivateEleMastery(sim *core.Simulation, shaman *Shaman) {
-	if shaman.IsOnCD(core.MagicIDEleMastery, sim.CurrentTime) {
-		return
-	}
-
-	shaman.AddAura(sim, core.Aura{
-		ID:      core.MagicIDEleMastery,
-		Expires: core.NeverExpires,
-		OnCast: func(sim *core.Simulation, cast core.DirectCastAction, input *core.DirectCastInput) {
-			input.ManaCost = 0
-			input.GuaranteedCrit = true
-		},
-		OnCastComplete: func(sim *core.Simulation, cast core.DirectCastAction) {
-			// Remove the buff and put skill on CD
-			shaman.SetCD(core.MagicIDEleMastery, time.Second*180+sim.CurrentTime)
-			shaman.RemoveAura(sim, core.MagicIDEleMastery)
+	shaman.AddMajorCooldown(core.MajorCooldown{
+		CooldownID: core.MagicIDEleMastery,
+		Cooldown: time.Minute*3,
+		TryActivate: func(sim *core.Simulation, character *core.Character) bool {
+			character.AddAura(sim, core.Aura{
+				ID:      core.MagicIDEleMastery,
+				Expires: core.NeverExpires,
+				OnCast: func(sim *core.Simulation, cast core.DirectCastAction, input *core.DirectCastInput) {
+					input.ManaCost = 0
+					input.GuaranteedCrit = true
+				},
+				OnCastComplete: func(sim *core.Simulation, cast core.DirectCastAction) {
+					// Remove the buff and put skill on CD
+					character.SetCD(core.MagicIDEleMastery, time.Minute*3+sim.CurrentTime)
+					character.RemoveAura(sim, core.MagicIDEleMastery)
+				},
+			})
+			return true
 		},
 	})
 }
 
 func init() {
-	core.BaseStats[core.BaseStatsKey{ Race: core.RaceBonusTypeDraenei, Class: proto.Class_ClassShaman }] = stats.Stats{
+	core.BaseStats[core.BaseStatsKey{ Race: proto.Race_RaceDraenei, Class: proto.Class_ClassShaman }] = stats.Stats{
 		stats.Strength:  103,
 		stats.Agility:   61,
 		stats.Stamina:   113,
@@ -188,13 +175,13 @@ func init() {
 		stats.Mana:      2678,
 		stats.SpellCrit: 48.576,
 	}
-	core.BaseStats[core.BaseStatsKey{ Race: core.RaceBonusTypeOrc, Class: proto.Class_ClassShaman }] = stats.Stats{
+	core.BaseStats[core.BaseStatsKey{ Race: proto.Race_RaceOrc, Class: proto.Class_ClassShaman }] = stats.Stats{
 		stats.Intellect: 104,
 		stats.Mana:      2678,
 		stats.Spirit:    135,
 		stats.SpellCrit: 48.576,
 	}
-	core.BaseStats[core.BaseStatsKey{ Race: core.RaceBonusTypeTauren, Class: proto.Class_ClassShaman }] = stats.Stats{
+	core.BaseStats[core.BaseStatsKey{ Race: proto.Race_RaceTauren, Class: proto.Class_ClassShaman }] = stats.Stats{
 		stats.Intellect: 104,
 		stats.Mana:      2678,
 		stats.Spirit:    135,
@@ -207,6 +194,6 @@ func init() {
 		stats.Spirit:    135,
 		stats.SpellCrit: 48.576,
 	}
-	core.BaseStats[core.BaseStatsKey{ Race: core.RaceBonusTypeTroll10, Class: proto.Class_ClassShaman }] = trollStats
-	core.BaseStats[core.BaseStatsKey{ Race: core.RaceBonusTypeTroll30, Class: proto.Class_ClassShaman }] = trollStats
+	core.BaseStats[core.BaseStatsKey{ Race: proto.Race_RaceTroll10, Class: proto.Class_ClassShaman }] = trollStats
+	core.BaseStats[core.BaseStatsKey{ Race: proto.Race_RaceTroll30, Class: proto.Class_ClassShaman }] = trollStats
 }

@@ -23,11 +23,11 @@ func ApplyBuffsToSim(sim *Simulation, buffs proto.Buffs) {
 }
 
 // Applies buffs that affect individual players.
-func ApplyBuffsToPlayer(agent Agent, buffs proto.Buffs) {
+func ApplyBuffEffects(agent Agent, buffs proto.Buffs) {
 	character := agent.GetCharacter()
 
 	if buffs.ArcaneBrilliance {
-		character.AddInitialStats(stats.Stats{
+		character.AddStats(stats.Stats{
 			stats.Intellect: 40,
 		})
 	}
@@ -35,7 +35,7 @@ func ApplyBuffsToPlayer(agent Agent, buffs proto.Buffs) {
 	// TODO: Double-check these numbers.
 	gotwAmount := GetTristateValueFloat(buffs.GiftOfTheWild, 14.0, 14.0 * 1.35)
 	// TODO: Pretty sure some of these dont stack with fort/ai/divine spirit
-	character.AddInitialStats(stats.Stats{
+	character.AddStats(stats.Stats{
 		stats.Stamina:   gotwAmount,
 		stats.Agility:   gotwAmount,
 		stats.Strength:  gotwAmount,
@@ -43,78 +43,141 @@ func ApplyBuffsToPlayer(agent Agent, buffs proto.Buffs) {
 		stats.Spirit:    gotwAmount,
 	})
 
-	character.AddInitialStats(stats.Stats{
+	character.AddStats(stats.Stats{
 		stats.SpellCrit: GetTristateValueFloat(buffs.MoonkinAura, 5*SpellCritRatingPerCritChance, 5*SpellCritRatingPerCritChance+20),
 	})
 
 	if (buffs.DraeneiRacialMelee) {
-		character.AddInitialStats(stats.Stats{
+		character.AddStats(stats.Stats{
 			stats.MeleeHit: 1 * MeleeHitRatingPerHitChance,
 		})
 	}
 
 	if (buffs.DraeneiRacialCaster) {
-		character.AddInitialStats(stats.Stats{
+		character.AddStats(stats.Stats{
 			stats.SpellHit: 1 * SpellHitRatingPerHitChance,
 		})
 	}
 
-	character.AddInitialStats(stats.Stats{
+	character.AddStats(stats.Stats{
 		stats.Spirit: GetTristateValueFloat(buffs.DivineSpirit, 50.0, 50.0),
 	})
+	if buffs.DivineSpirit == proto.TristateEffect_TristateEffectImproved {
+		character.AddStatDependency(stats.StatDependency{
+			SourceStat: stats.Spirit,
+			ModifiedStat: stats.SpellPower,
+			Modifier: func(spirit float64, spellPower float64) float64 {
+				return spellPower + spirit * 0.1
+			},
+		})
+	}
 
 	// shadow priest buff bot just statically applies mp5
 	if buffs.ShadowPriestDps > 0 {
-		character.AddInitialStats(stats.Stats{
+		character.AddStats(stats.Stats{
 			stats.MP5: float64(buffs.ShadowPriestDps) * 0.25,
 		})
 	}
 
 	// TODO: Double-check these numbers
-	character.AddInitialStats(stats.Stats{
+	character.AddStats(stats.Stats{
 		stats.MP5: GetTristateValueFloat(buffs.BlessingOfWisdom, 42.0, 50.0),
 	})
 
+	if buffs.BlessingOfKings {
+		bokStats := [5]stats.Stat{
+			stats.Agility,
+			stats.Strength,
+			stats.Stamina,
+			stats.Intellect,
+			stats.Spirit,
+		}
+
+		for _, stat := range bokStats {
+			character.AddStatDependency(stats.StatDependency{
+				SourceStat: stat,
+				ModifiedStat: stat,
+				Modifier: func(curValue float64, _ float64) float64 {
+					return curValue * 1.1
+				},
+			})
+		}
+	}
+
 	if buffs.ImprovedSealOfTheCrusader {
-		character.AddInitialStats(stats.Stats{
+		character.AddStats(stats.Stats{
 			stats.SpellCrit: 3 * SpellCritRatingPerCritChance,
 		})
 		// FUTURE: melee crit bonus, research actual value
 	}
 
 	if buffs.TotemOfWrath > 0 {
-		character.AddInitialStats(stats.Stats{
+		character.AddStats(stats.Stats{
 			stats.SpellCrit: 3 * SpellCritRatingPerCritChance * float64(buffs.TotemOfWrath),
 			stats.SpellHit:  3 * SpellHitRatingPerHitChance * float64(buffs.TotemOfWrath),
 		})
 	}
-	character.AddInitialStats(stats.Stats{
+	character.AddStats(stats.Stats{
 		stats.SpellPower: GetTristateValueFloat(buffs.WrathOfAirTotem, 101.0, 121.0),
 	})
-	character.AddInitialStats(stats.Stats{
+	character.AddStats(stats.Stats{
 		stats.MP5: GetTristateValueFloat(buffs.ManaSpringTotem, 50, 62.5),
 	})
 
-	character.AddInitialStats(stats.Stats{
+	registerBloodlustCD(agent, buffs)
+
+	character.AddStats(stats.Stats{
 		stats.SpellCrit: 28 * float64(buffs.AtieshMage),
 	})
-	character.AddInitialStats(stats.Stats{
+	character.AddStats(stats.Stats{
 		stats.SpellPower:   33 * float64(buffs.AtieshWarlock),
 		stats.HealingPower: 33 * float64(buffs.AtieshWarlock),
 	})
 
 	if buffs.BraidedEterniumChain {
-		character.AddInitialStats(stats.Stats{stats.MeleeCrit: 28})
+		character.AddStats(stats.Stats{stats.MeleeCrit: 28})
 	}
 	if buffs.EyeOfTheNight {
-		character.AddInitialStats(stats.Stats{stats.SpellPower: 34})
+		character.AddStats(stats.Stats{stats.SpellPower: 34})
 	}
 	if buffs.JadePendantOfBlasting {
-		character.AddInitialStats(stats.Stats{stats.SpellPower: 15})
+		character.AddStats(stats.Stats{stats.SpellPower: 15})
 	}
 	if buffs.ChainOfTheTwilightOwl {
-		character.AddInitialStats(stats.Stats{stats.SpellCrit: 2 * SpellCritRatingPerCritChance})
+		character.AddStats(stats.Stats{stats.SpellCrit: 2 * SpellCritRatingPerCritChance})
 	}
+}
+
+func registerBloodlustCD(agent Agent, buffs proto.Buffs) {
+	if buffs.Bloodlust == 0 {
+		return
+	}
+
+	dur := time.Second * 40
+	numBloodlusts := buffs.Bloodlust
+
+	agent.GetCharacter().AddMajorCooldown(MajorCooldown{
+		CooldownID: MagicIDBloodlust,
+		Cooldown: dur, // assumes that multiple BLs are different shaman.
+		Priority: CooldownPriorityBloodlust,
+		TryActivate: func(sim *Simulation, character *Character) bool {
+			if character.bloodlustsUsed < numBloodlusts {
+				character.SetCD(MagicIDBloodlust, dur+sim.CurrentTime)
+				character.Party.AddAura(sim, Aura{
+					ID:      MagicIDBloodlust,
+					Expires: sim.CurrentTime + dur,
+					OnCast: func(sim *Simulation, cast DirectCastAction, input *DirectCastInput) {
+						input.CastTime = (input.CastTime * 10) / 13 // 30% faster
+					},
+				})
+				character.bloodlustsUsed++
+				return true
+			} else {
+				character.SetCD(MagicIDBloodlust, NeverExpires)
+				return false
+			}
+		},
+	})
 }
 
 func MiseryAura() Aura {
@@ -139,66 +202,12 @@ func AuraJudgementOfWisdom() Aura {
 
 			character := cast.GetCharacter()
 			// Only apply to agents that have mana.
-			if character.InitialStats[stats.Mana] > 0 {
-				character.Stats[stats.Mana] += mana
+			if character.MaxMana() > 0 {
+				character.AddStat(stats.Mana, mana)
 				if sim.Log != nil {
 					sim.Log("(%d) +Judgement Of Wisdom: 37 mana (74 @ 50%% proc)\n", character.ID)
 				}
 			}
 		},
-	}
-}
-
-type RaceBonusType byte
-
-// These values are used directly in the dropdown in index.html
-const (
-	RaceBonusTypeNone RaceBonusType = iota
-	RaceBonusTypeBloodElf
-	RaceBonusTypeDraenei
-	RaceBonusTypeDwarf
-	RaceBonusTypeGnome
-	RaceBonusTypeHuman
-	RaceBonusTypeNightElf
-	RaceBonusTypeOrc
-	RaceBonusTypeTauren
-	RaceBonusTypeTroll10
-	RaceBonusTypeTroll30
-	RaceBonusTypeUndead
-)
-
-func TryActivateRacial(sim *Simulation, character *Character) {
-	switch character.Race {
-	case RaceBonusTypeOrc:
-		if character.IsOnCD(MagicIDOrcBloodFury, sim.CurrentTime) {
-			return
-		}
-
-		const spBonus = 143
-		const dur = time.Second * 15
-		const cd = time.Minute * 2
-
-		character.SetCD(MagicIDOrcBloodFury, cd+sim.CurrentTime)
-		AddAuraWithTemporaryStats(sim, character, MagicIDOrcBloodFury, stats.SpellPower, spBonus, dur)
-
-	case RaceBonusTypeTroll10, RaceBonusTypeTroll30:
-		if character.IsOnCD(MagicIDTrollBerserking, sim.CurrentTime) {
-			return
-		}
-		hasteBonus := time.Duration(11) // 10% haste
-		if character.Race == RaceBonusTypeTroll30 {
-			hasteBonus = time.Duration(13) // 30% haste
-		}
-		const dur = time.Second * 10
-		const cd = time.Minute * 3
-
-		character.SetCD(MagicIDTrollBerserking, cd+sim.CurrentTime)
-		character.AddAura(sim, Aura{
-			ID:      MagicIDTrollBerserking,
-			Expires: sim.CurrentTime + dur,
-			OnCast: func(sim *Simulation, cast DirectCastAction, inputs *DirectCastInput) {
-				inputs.CastTime = (inputs.CastTime * 10) / hasteBonus
-			},
-		})
 	}
 }

@@ -5,7 +5,6 @@ import (
 
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/proto"
-	"github.com/wowsims/tbc/sim/core/stats"
 	. "github.com/wowsims/tbc/sim/shaman"
 )
 
@@ -240,11 +239,11 @@ func (agent *AdaptiveRotation) ChooseAction(shaman *Shaman, sim *core.Simulation
 
 	if sim.Log != nil {
 		manaSpendingRate := manaSpent / timeDelta.Seconds()
-		sim.Log("[AI] CL Ready: Mana/s: %0.1f, Est Mana Cost: %0.1f, CurrentMana: %0.1f\n", manaSpendingRate, projectedManaCost, shaman.Stats[stats.Mana])
+		sim.Log("[AI] CL Ready: Mana/s: %0.1f, Est Mana Cost: %0.1f, CurrentMana: %0.1f\n", manaSpendingRate, projectedManaCost, shaman.CurrentMana())
 	}
 
 	// If we have enough mana to burn, use the surplus agent.
-	if projectedManaCost < shaman.Stats[stats.Mana] {
+	if projectedManaCost < shaman.CurrentMana() {
 		return agent.surplusRotation.ChooseAction(shaman, sim)
 	} else {
 		return agent.baseRotation.ChooseAction(shaman, sim)

@@ -35,7 +35,7 @@ var LongEncounterOptions = MakeOptions(BaseOptions, Encounter{
 func CharacterStatsTest(label string, t *testing.T, params IndividualParams, expectedStats stats.Stats) {
 	sim := NewIndividualSim(params)
 
-	finalStats := sim.Raid.Parties[0].Players[0].GetCharacter().Stats
+	finalStats := sim.Raid.Parties[0].Players[0].GetCharacter().GetStats()
 
 	const tolerance = 0.5
 	if !finalStats.EqualsWithTolerance(expectedStats, tolerance) {
@@ -97,7 +97,7 @@ type AllEncountersTestOptions struct {
 	Gear     items.EquipmentSpec
 	Buffs    proto.Buffs
 	Consumes proto.Consumes
-	Race     RaceBonusType
+	Race     proto.Race
 	Class    proto.Class
 
 	PlayerOptions *proto.PlayerOptions

@@ -126,10 +126,10 @@ func (action DirectCastAction) Act(sim *Simulation) bool {
 	character := action.GetCharacter()
 
 	if !action.castInput.IgnoreManaCost && action.castInput.ManaCost > 0 {
-		if character.Stats[stats.Mana] < action.castInput.ManaCost {
+		if character.CurrentMana() < action.castInput.ManaCost {
 			if sim.Log != nil {
 				sim.Log("(%d) Failed casting %s, not enough mana. (Current Mana = %0.0f, Mana Cost = %0.0f)\n",
-						character.ID, action.GetName(), character.Stats[stats.Mana], action.castInput.ManaCost)
+						character.ID, action.GetName(), character.CurrentMana(), action.castInput.ManaCost)
 			}
 			sim.MetricsAggregator.MarkOOM(character, sim.CurrentTime)
 
@@ -139,7 +139,7 @@ func (action DirectCastAction) Act(sim *Simulation) bool {
 
 	if sim.Log != nil {
 		sim.Log("(%d) Casting %s (Current Mana = %0.0f, Mana Cost = %0.0f, Cast Time = %s)\n",
-				character.ID, action.GetName(), character.Stats[stats.Mana], action.castInput.ManaCost, action.castInput.CastTime)
+				character.ID, action.GetName(), character.CurrentMana(), action.castInput.ManaCost, action.castInput.CastTime)
 	}
 
 	// For instant-cast spells we can skip creating an aura.
@@ -169,7 +169,7 @@ func (action DirectCastAction) internalOnCastComplete(sim *Simulation) {
 	character := action.GetCharacter()
 
 	if !action.castInput.IgnoreManaCost && action.castInput.ManaCost > 0 {
-		character.Stats[stats.Mana] -= action.castInput.ManaCost
+		character.AddStat(stats.Mana, -action.castInput.ManaCost)
 	}
 
 	action.OnCastComplete(sim, action)
@@ -239,7 +239,7 @@ func (action DirectCastAction) calculateDirectCastDamage(sim *Simulation, damage
 
 	character := action.GetCharacter()
 
-	hit := 0.83 + character.Stats[stats.SpellHit]/(SpellHitRatingPerHitChance*100) + damageInput.BonusHit
+	hit := 0.83 + character.GetStat(stats.SpellHit)/(SpellHitRatingPerHitChance*100) + damageInput.BonusHit
 	hit = MinFloat(hit, 0.99) // can't get away from the 1% miss
 
 	if sim.Rando.Float64("action hit") >= hit { // Miss
@@ -248,13 +248,13 @@ func (action DirectCastAction) calculateDirectCastDamage(sim *Simulation, damage
 	result.Hit = true
 
 	baseDamage := damageInput.MinBaseDamage + sim.Rando.Float64("action dmg")*(damageInput.MaxBaseDamage - damageInput.MinBaseDamage)
-	totalSpellPower := character.Stats[stats.SpellPower] + character.Stats[action.GetSpellSchool()] + damageInput.BonusSpellPower
+	totalSpellPower := character.GetStat(stats.SpellPower) + character.GetStat(action.GetSpellSchool()) + damageInput.BonusSpellPower
 	damageFromSpellPower := (totalSpellPower * damageInput.SpellCoefficient)
 	damage := baseDamage + damageFromSpellPower
 
 	damage *= damageInput.DamageMultiplier
 
-	crit := (character.Stats[stats.SpellCrit] / (SpellCritRatingPerCritChance * 100)) + damageInput.BonusCrit
+	crit := (character.GetStat(stats.SpellCrit) / (SpellCritRatingPerCritChance * 100)) + damageInput.BonusCrit
 	if action.castInput.GuaranteedCrit || sim.Rando.Float64("action crit") < crit {
 		result.Crit = true
 		damage *= action.castInput.CritMultiplier

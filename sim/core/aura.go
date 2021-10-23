@@ -166,8 +166,6 @@ func AuraName(a int32) string {
 		return "Mystic Skyfire"
 	case MagicIDMysticFocus:
 		return "Mystic Focus"
-	case MagicIDEmberSkyfire:
-		return "Ember Skyfire"
 	case MagicIDISCTrink:
 		return "Icon Trinket"
 	case MagicIDNACTrink:
@@ -266,8 +264,6 @@ func AuraName(a int32) string {
 		return "SkullGuldan Trinket CD"
 	case MagicIDRegainMana:
 		return "Fathom-Brooch Regain Mana"
-	case MagicIDAlchStone:
-		return "Alchemist's Stone"
 	}
 
 	return "<<Add Aura name to switch!!>>"
@@ -314,7 +310,6 @@ const (
 	MagicIDInsightfulEarthstorm
 	MagicIDMysticSkyfire
 	MagicIDMysticFocus
-	MagicIDEmberSkyfire
 	MagicIDSpellPower
 	MagicIDRubySerpent
 	MagicIDCallOfTheNexus
@@ -349,7 +344,6 @@ const (
 	MagicIDElderScribe      // elder scribe robe item aura
 	MagicIDElderScribeProc  // elder scribe robe temp buff
 	MagicIDRegainMana // effect from fathom brooch
-	MagicIDAlchStone
 	MagicIDCurseOfElements
 
 	// Items  (Usually individual trinket CDs)
@@ -379,7 +373,7 @@ func AddTemporaryStats(sim *Simulation, character *Character, auraID int32, stat
 	if sim.Log != nil {
 		sim.Log(" +%0.0f %s from %s\n", amount, stat.StatName(), AuraName(auraID))
 	}
-	character.Stats[stat] += amount
+	character.AddStat(stat, amount)
 
 	return Aura{
 		ID:      auraID,
@@ -388,7 +382,7 @@ func AddTemporaryStats(sim *Simulation, character *Character, auraID int32, stat
 			if sim.Log != nil {
 				sim.Log(" -%0.0f %s from %s\n", amount, stat.StatName(), AuraName(auraID))
 			}
-			character.Stats[stat] -= amount
+			character.AddStat(stat, -amount)
 		},
 	}
 }
@@ -396,19 +390,4 @@ func AddTemporaryStats(sim *Simulation, character *Character, auraID int32, stat
 // Like AddTemporaryStats(), but also adds the aura to the character.
 func AddAuraWithTemporaryStats(sim *Simulation, character *Character, auraID int32, stat stats.Stat, amount float64, duration time.Duration) {
 	character.AddAura(sim, AddTemporaryStats(sim, character, auraID, stat, amount, duration))
-}
-
-func CreateHasteActivate(id int32, haste float64, duration time.Duration) ItemActivation {
-	// Implemented haste activate as a buff so that the creation of a new cast gets the correct cast time
-	return func(sim *Simulation, character *Character) Aura {
-		return AddTemporaryStats(sim, character, id, stats.SpellHaste, haste, duration)
-	}
-}
-
-// createSpellDmgActivate creates a function for trinket activation that uses +spellpower
-//  This is so we don't need a separate function for every spell power trinket.
-func CreateSpellDmgActivate(id int32, sp float64, duration time.Duration) ItemActivation {
-	return func(sim *Simulation, character *Character) Aura {
-		return AddTemporaryStats(sim, character, id, stats.SpellPower, sp, duration)
-	}
 }

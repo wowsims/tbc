@@ -1,7 +1,7 @@
 package core
 
 import (
-	"strconv"
+	"sort"
 	"time"
 
 	"github.com/wowsims/tbc/sim/core/items"
@@ -13,98 +13,216 @@ import (
 // class logic shares.
 // All players have stats, equipment, auras, etc
 type Character struct {
-	ID       int
-	Consumes proto.Consumes
-	Race     RaceBonusType
-	Class    proto.Class
-
-	InitialStats stats.Stats
-	Stats        stats.Stats
+	ID    int
+	Race  proto.Race
+	Class proto.Class
 
 	Equip       items.Equipment // Current Gear
 	EquipSpec   items.EquipmentSpec
-	ActiveEquip []*ActiveItem // cache of gear that can activate.
 
-	// Up references to the Party and Agent for this Character
+	// Consumables this Character will be using.
+	consumes proto.Consumes
+
+	// Stats this Character will have at the very start of each Sim iteration.
+	// Includes all equipment / buffs / permanent effects but not temporary
+	// effects from items / abilities.
+	initialStats stats.Stats
+
+	// Auras that never expire and should always be active.
+	// These are automatically applied on each Sim reset.
+	permanentAuras []Aura
+
+	// Cached list of major cooldowns sorted by priority, for resetting quickly.
+	initialMajorCooldowns []MajorCooldown
+
+	// Manages stat dependencies.
+	stats.StatDependencyManager
+
+	// Up reference to this Character's Party.
 	Party *Party
+
+	// Whether Finalize() has been called yet for this Character.
+	// All fields above this may not be altered once finalized is set.
+	finalized bool
 
 	*AuraTracker
 
-	// mutatable state
+	// Current stats, including temporary effects.
+	stats stats.Stats
+
+	// Major cooldowns, ordered by next available. This should always contain
+	// the same cooldows as initialMajorCooldowns, but the order will change over
+	// the course of the sim.
+	majorCooldowns        []MajorCooldown
 
 	// Used for applying the effects of hardcast / channeled spells at a later time.
 	// By definition there can be only 1 hardcast spell being cast at any moment.
 	HardcastAura Aura
 
 	potionsUsed int32 // Number of potions used
+	bloodlustsUsed int32 // Number of bloodlusts used
 }
-
-func (character *Character) AddInitialStats(s stats.Stats) {
-	character.InitialStats = character.InitialStats.Add(s)
-}
-
-func (character *Character) AddStats(s stats.Stats) {
-	character.Stats = character.Stats.Add(s)
-}
-
-func (character *Character) HasteBonus() float64 {
-	return 1 + (character.Stats[stats.SpellHaste] / (HasteRatingPerHastePercent * 100))
-}
-func NewCharacter(equipSpec items.EquipmentSpec, race RaceBonusType, class proto.Class, consumes proto.Consumes, customStats stats.Stats) Character {
+func NewCharacter(equipSpec items.EquipmentSpec, race proto.Race, class proto.Class, consumes proto.Consumes, customStats stats.Stats) Character {
 	equip := items.NewEquipmentSet(equipSpec)
-	// log.Printf("Gear Stats: %s", equip.Stats().Print())
-	initialStats := CalculateTotalStats(race, class, equip, consumes).Add(customStats)
 
 	character := Character{
 		Race:         race,
 		Class:        class,
-		Consumes:     consumes,
-		InitialStats: initialStats,
-		Stats:        initialStats,
 		Equip:        equip,
 		EquipSpec:    equipSpec,
-		ActiveEquip:  []*ActiveItem{},
+		consumes:     consumes,
+
+		permanentAuras: []Aura{},
+
+		initialMajorCooldowns: []MajorCooldown{},
+
 		AuraTracker:  NewAuraTracker(),
 	}
 
-	// Cache the active abilities for all equipped items.
-	for _, eq := range equip {
-		act, ok := ActiveItemByID[eq.ID]
-		if ok {
-			character.ActiveEquip = append(character.ActiveEquip, &act)
-		}
-		for _, g := range eq.Gems {
-			gemAct, ok := ActiveItemByID[g.ID]
-			if !ok {
-				continue
-			}
-			character.ActiveEquip = append(character.ActiveEquip, &gemAct)
-		}
-	}
+	character.AddStats(BaseStats[BaseStatsKey{ Race: race, Class: class }])
+	character.AddStats(equip.Stats())
+
+	// Universal stat dependencies
+	character.AddStatDependency(stats.StatDependency{
+		SourceStat: stats.Agility,
+		ModifiedStat: stats.Armor,
+		Modifier: func(agility float64, armor float64) float64 {
+			return armor + agility * 2
+		},
+	})
+	character.AddStatDependency(stats.StatDependency{
+		SourceStat: stats.Intellect,
+		ModifiedStat: stats.Mana,
+		Modifier: func(intellect float64, mana float64) float64 {
+			return mana + intellect * 15
+		},
+	})
 
 	return character
 }
 
-func (character *Character) Reset() {
-	character.potionsUsed = 0
-	character.Stats = character.InitialStats
-	character.AuraTracker.ResetAuras()
+func (character *Character) ApplyAllEffects(agent Agent, buffs proto.Buffs) {
+	ApplyRaceEffects(agent)
+	character.ApplyItemEffects(agent)
+	character.ApplyItemSetBonusEffects(agent)
+	ApplyConsumeEffects(agent)
+	ApplyBuffEffects(agent, buffs)
 }
 
-func (character *Character) BuffUp(sim *Simulation, agent Agent) {
-	// Activate all permanent item effects.
-	for _, actItem := range character.ActiveEquip {
-		if actItem.BuffUp != nil {
-			actItem.BuffUp(sim, agent)
+// Apply effects from all equipped items.
+func (character *Character) ApplyItemEffects(agent Agent) {
+	for _, eq := range character.Equip {
+		applyItemEffect, ok := itemEffects[eq.ID]
+		if ok {
+			applyItemEffect(agent)
+		}
+
+		for _, g := range eq.Gems {
+			applyGemEffect, ok := itemEffects[g.ID]
+			if ok {
+				applyGemEffect(agent)
+			}
 		}
 	}
+}
 
-	character.ActivateSets(sim, agent)
+// Registers a permanent aura to this Character which will be re-applied on
+// every Sim reset.
+func (character *Character) AddPermanentAura(aura Aura) {
+	if character.finalized {
+		panic("Permanent auras may not be added once finalized!")
+	}
+
+	aura.Expires = NeverExpires
+	character.permanentAuras = append(character.permanentAuras, aura)
+}
+
+// Registers a major cooldown to the Character, which will be automatically
+// used when available.
+func (character *Character) AddMajorCooldown(mcd MajorCooldown) {
+	if character.finalized {
+		panic("Major cooldowns may not be added once finalized!")
+	}
+
+	character.initialMajorCooldowns = append(character.initialMajorCooldowns, mcd)
+}
+
+func (character *Character) AddStats(stat stats.Stats) {
+	character.stats = character.stats.Add(stat)
+}
+func (character *Character) AddStat(stat stats.Stat, amount float64) {
+	character.stats[stat] += amount
+}
+func (character *Character) GetInitialStat(stat stats.Stat) float64 {
+	return character.initialStats[stat]
+}
+func (character *Character) GetStats() stats.Stats {
+	return character.stats
+}
+func (character *Character) GetStat(stat stats.Stat) float64 {
+	return character.stats[stat]
+}
+func (character *Character) MaxMana() float64 {
+	return character.GetInitialStat(stats.Mana)
+}
+func (character *Character) CurrentMana() float64 {
+	return character.GetStat(stats.Mana)
+}
+
+func (character *Character) HasteBonus() float64 {
+	return 1 + (character.stats[stats.SpellHaste] / (HasteRatingPerHastePercent * 100))
+}
+
+func (character *Character) Finalize() {
+	if character.finalized {
+		return
+	}
+	character.finalized = true
+
+	// Make sure we dont accidentally set initial stats instead of stats.
+	if !character.initialStats.Equals(stats.Stats{}) {
+		panic("Initial stats may not be set before finalized!")
+	}
+	character.StatDependencyManager.Finalize()
+	character.stats = character.ApplyStatDependencies(character.stats)
+
+	// All stats added up to this point are part of the 'initial' stats.
+	character.initialStats = character.stats
+
+	// Sort major cooldowns by descending priority so they get used in the correct order.
+	sort.SliceStable(character.initialMajorCooldowns, func(i, j int) bool {
+		return character.initialMajorCooldowns[i].Priority > character.initialMajorCooldowns[j].Priority
+	})
+}
+
+func (character *Character) TryUseCooldowns(sim *Simulation) {
+	for curIdx := 0; !character.majorCooldowns[curIdx].IsOnCD(sim, character); curIdx++ {
+		character.majorCooldowns[curIdx].TryActivate(sim, character)
+	}
+
+	// Re-sort by availability. 
+	// TODO: Probably a much faster way to do this, especially since we know which cooldowns need to be re-ordered.
+	sort.Slice(character.majorCooldowns, func(i, j int) bool {
+		return character.majorCooldowns[i].GetRemainingCD(sim, character) > character.majorCooldowns[j].GetRemainingCD(sim, character)
+	})
+}
+
+func (character *Character) Reset(sim *Simulation) {
+	character.potionsUsed = 0
+	character.bloodlustsUsed = 0
+	character.stats = character.initialStats
+
+	copy(character.majorCooldowns, character.initialMajorCooldowns)
+
+	character.AuraTracker.ResetAuras()
+	for _, aura := range character.permanentAuras {
+		character.AddAura(sim, aura)
+	}
 }
 
 // Returns rate of mana regen, as mana / second
 func (character *Character) manaRegenPerSecond() float64 {
-	return character.Stats[stats.MP5] / 5.0
+	return character.stats[stats.MP5] / 5.0
 }
 
 // Returns the amount of time this Character would need to wait in order to reach
@@ -114,19 +232,19 @@ func (character *Character) manaRegenPerSecond() float64 {
 // will not take any actions during this period that would reset the 5-second rule.
 func (character *Character) TimeUntilManaRegen(desiredMana float64) time.Duration {
 	// +1 at the end is to deal with floating point math rounding errors.
-	return DurationFromSeconds((desiredMana-character.Stats[stats.Mana])/character.manaRegenPerSecond()) + 1
+	return DurationFromSeconds((desiredMana-character.CurrentMana())/character.manaRegenPerSecond()) + 1
 }
 
 // Advance moves time forward counting down auras, CDs, mana regen, etc
 func (character *Character) Advance(sim *Simulation, elapsedTime time.Duration, newTime time.Duration) {
 	// MP5 regen
 	regen := character.manaRegenPerSecond() * elapsedTime.Seconds()
-	character.Stats[stats.Mana] += regen
-	if character.Stats[stats.Mana] > character.InitialStats[stats.Mana] {
-		character.Stats[stats.Mana] = character.InitialStats[stats.Mana]
+	character.stats[stats.Mana] += regen
+	if character.CurrentMana() > character.MaxMana() {
+		character.stats[stats.Mana] = character.MaxMana()
 	}
 	if sim.Log != nil && regen != 0 {
-		sim.Log("-> [%0.1f] Regenerated: %0.1f mana. Total: %0.1f\n", newTime.Seconds(), regen, character.Stats[stats.Mana])
+		sim.Log("-> [%0.1f] Regenerated: %0.1f mana. Total: %0.1f\n", newTime.Seconds(), regen, character.CurrentMana())
 	}
 
 	// Advance CDs and Auras
@@ -138,61 +256,10 @@ func (character *Character) Advance(sim *Simulation, elapsedTime time.Duration, 
 	}
 }
 
-func (character *Character) TryActivateConsumes(sim *Simulation) {
-	// Consumes before any casts
-	TryActivateDrums(sim, character)
-	TryActivateRacial(sim, character)
-	TryActivatePotion(sim, character)
-	TryActivateDarkRune(sim, character)
-
-	// Pop activatable items if we can.
-	character.TryActivateEquipment(sim)
-}
-
-// Pops any on-use trinkets / gear
-func (character *Character) TryActivateEquipment(sim *Simulation) {
-	const sharedCD = time.Second * 20
-
-	for _, item := range character.ActiveEquip {
-		// TODO: Remove this check once we split permanent / temporary item actives
-		if item.Activate == nil || item.ActivateCD == NeverExpires { // ignore non-activatable, and always active items.
-			continue
-		}
-		if character.IsOnCD(item.CoolID, sim.CurrentTime) || (item.SharedID != 0 && character.IsOnCD(item.SharedID, sim.CurrentTime)) {
-			continue
-		}
-		character.AddAura(sim, item.Activate(sim, character))
-		character.SetCD(item.CoolID, item.ActivateCD+sim.CurrentTime) // put item on CD
-		if item.SharedID != 0 {                                       // put all shared CDs on
-			character.SetCD(item.SharedID, sharedCD+sim.CurrentTime)
-		}
-	}
-}
-
-// Activates set bonuses, returning the list of active bonuses.
-func (character *Character) ActivateSets(sim *Simulation, agent Agent) []string {
-	active := []string{}
-	// Activate Set Bonuses
-	setItemCount := map[string]int{}
-
-	for _, i := range character.Equip {
-		set := itemSetLookup[i.ID]
-		if set != nil {
-			setItemCount[set.Name]++
-			if setBonusFunc, ok := set.Bonuses[setItemCount[set.Name]]; ok {
-				active = append(active, set.Name+" ("+strconv.Itoa(setItemCount[set.Name])+"pc)")
-				setBonusFunc(sim, agent)
-			}
-		}
-	}
-
-	return active
-}
-
 func (character *Character) AddRaidBuffs(buffs *proto.Buffs) {
 }
 func (character *Character) AddPartyBuffs(buffs *proto.Buffs) {
-	if character.Race == RaceBonusTypeDraenei {
+	if character.Race == proto.Race_RaceDraenei {
 		class := character.Class
 		if class == proto.Class_ClassHunter ||
 				class == proto.Class_ClassPaladin ||
@@ -205,8 +272,8 @@ func (character *Character) AddPartyBuffs(buffs *proto.Buffs) {
 		}
 	}
 
-	if character.Consumes.Drums > 0 {
-		buffs.Drums = character.Consumes.Drums
+	if character.consumes.Drums > 0 {
+		buffs.Drums = character.consumes.Drums
 	}
 
 	if character.Equip[items.ItemSlotMainHand].ID == ItemIDAtieshMage {
@@ -230,7 +297,12 @@ func (character *Character) AddPartyBuffs(buffs *proto.Buffs) {
 	}
 }
 
-func (character *Character) EquippedMetaGem(gemID int32) bool {
+func (character *Character) HasTrinketEquipped(itemID int32) bool {
+	return character.Equip[items.ItemSlotTrinket1].ID == itemID ||
+			character.Equip[items.ItemSlotTrinket2].ID == itemID
+}
+
+func (character *Character) HasMetaGemEquipped(gemID int32) bool {
 	for _, gem := range character.Equip[items.ItemSlotHead].Gems {
 		if gem.ID == gemID {
 			return true
@@ -240,13 +312,8 @@ func (character *Character) EquippedMetaGem(gemID int32) bool {
 }
 
 type BaseStatsKey struct {
-	Race  RaceBonusType
+	Race  proto.Race
 	Class proto.Class
 }
 
 var BaseStats = map[BaseStatsKey]stats.Stats{}
-
-// CalculateTotalStats will take a set of equipment and options and add all stats/buffs/etc together
-func CalculateTotalStats(race RaceBonusType, class proto.Class, equipment items.Equipment, consumes proto.Consumes) stats.Stats {
-	return BaseStats[BaseStatsKey{ Race: race, Class: class }].Add(equipment.Stats()).Add(ConsumesStats(consumes))
-}
