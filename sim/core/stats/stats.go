@@ -252,6 +252,7 @@ func (sdm *StatDependencyManager) Finalize() {
 
 			// Mark this stat as processed.
 			processedStats[stat] = struct{}{}
+			numNewlyProcessed++
 		}
 
 		// If we couldn't process any new stats but there are still stats left,

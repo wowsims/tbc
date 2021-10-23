@@ -67,6 +67,10 @@ func RegisterTemporaryStatsOnUseCD(agent Agent, id int32, stat stats.Stat, amoun
 
 	mcd.TryActivate = func(sim *Simulation, character *Character) bool {
 		AddAuraWithTemporaryStats(sim, character, id, stat, amount, duration)
+		character.SetCD(mcd.CooldownID, sim.CurrentTime+mcd.Cooldown)
+		if mcd.SharedCooldownID != 0 {
+			character.SetCD(mcd.SharedCooldownID, sim.CurrentTime+mcd.SharedCooldown)
+		}
 		return true
 	}
 

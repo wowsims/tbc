@@ -134,98 +134,103 @@ func ApplyMarkOfTheChampion(agent core.Agent) {
 }
 
 func ApplyQuagmirransEye(agent core.Agent) {
-	character := agent.GetCharacter()
-	const hasteBonus = 320.0
-	const dur = time.Second * 45
-	icd := core.NewICD()
+	agent.GetCharacter().AddPermanentAura(func(sim *core.Simulation, character *core.Character) core.Aura {
+		const hasteBonus = 320.0
+		const dur = time.Second * 45
+		icd := core.NewICD()
 
-	character.AddPermanentAura(core.Aura{
-		ID:      core.MagicIDQuagsEye,
-		OnCastComplete: func(sim *core.Simulation, cast core.DirectCastAction) {
-			if !icd.IsOnCD(sim) && sim.Rando.Float64("quags") < 0.1 {
-				icd = core.InternalCD(sim.CurrentTime + dur)
-				core.AddAuraWithTemporaryStats(sim, character, core.MagicIDFungalFrenzy, stats.SpellHaste, hasteBonus, time.Second*6)
-			}
-		},
+		return core.Aura{
+			ID:      core.MagicIDQuagsEye,
+			OnCastComplete: func(sim *core.Simulation, cast core.DirectCastAction) {
+				if !icd.IsOnCD(sim) && sim.Rando.Float64("quags") < 0.1 {
+					icd = core.InternalCD(sim.CurrentTime + dur)
+					core.AddAuraWithTemporaryStats(sim, character, core.MagicIDFungalFrenzy, stats.SpellHaste, hasteBonus, time.Second*6)
+				}
+			},
+		}
 	})
 }
 
 func ApplyShiffarsNexusHorn(agent core.Agent) {
-	character := agent.GetCharacter()
-	icd := core.NewICD()
-	const spellBonus = 225.0
-	const dur = time.Second * 45
+	agent.GetCharacter().AddPermanentAura(func(sim *core.Simulation, character *core.Character) core.Aura {
+		icd := core.NewICD()
+		const spellBonus = 225.0
+		const dur = time.Second * 45
 
-	character.AddPermanentAura(core.Aura{
-		ID:      core.MagicIDNexusHorn,
-		OnSpellHit: func(sim *core.Simulation, cast core.DirectCastAction, result *core.DirectCastDamageResult) {
-			if cast.GetActionID().ItemID == core.ItemIDTheLightningCapacitor {
-				return // TLC can't proc Sextant
-			}
-			if !icd.IsOnCD(sim) && result.Crit && sim.Rando.Float64("unmarked") < 0.2 {
-				icd = core.InternalCD(sim.CurrentTime + dur)
-				core.AddAuraWithTemporaryStats(sim, character, core.MagicIDCallOfTheNexus, stats.SpellPower, spellBonus, time.Second*10)
-			}
-		},
+		return core.Aura{
+			ID:      core.MagicIDNexusHorn,
+			OnSpellHit: func(sim *core.Simulation, cast core.DirectCastAction, result *core.DirectCastDamageResult) {
+				if cast.GetActionID().ItemID == core.ItemIDTheLightningCapacitor {
+					return // TLC can't proc Sextant
+				}
+				if !icd.IsOnCD(sim) && result.Crit && sim.Rando.Float64("unmarked") < 0.2 {
+					icd = core.InternalCD(sim.CurrentTime + dur)
+					core.AddAuraWithTemporaryStats(sim, character, core.MagicIDCallOfTheNexus, stats.SpellPower, spellBonus, time.Second*10)
+				}
+			},
+		}
 	})
 }
 
 func ApplyEyeOfMagtheridon(agent core.Agent) {
-	character := agent.GetCharacter()
-	const spellBonus = 170.0
-	const dur = time.Second * 10
+	agent.GetCharacter().AddPermanentAura(func(sim *core.Simulation, character *core.Character) core.Aura {
+		const spellBonus = 170.0
+		const dur = time.Second * 10
 
-	character.AddPermanentAura(core.Aura{
-		ID:      core.MagicIDEyeOfMag,
-		OnSpellMiss: func(sim *core.Simulation, cast core.DirectCastAction) {
-			core.AddAuraWithTemporaryStats(sim, character, core.MagicIDRecurringPower, stats.SpellPower, spellBonus, dur)
-		},
+		return core.Aura{
+			ID:      core.MagicIDEyeOfMag,
+			OnSpellMiss: func(sim *core.Simulation, cast core.DirectCastAction) {
+				core.AddAuraWithTemporaryStats(sim, character, core.MagicIDRecurringPower, stats.SpellPower, spellBonus, dur)
+			},
+		}
 	})
 }
 
 func ApplySextantOfUnstableCurrents(agent core.Agent) {
-	character := agent.GetCharacter()
-	icd := core.NewICD()
-	const spellBonus = 190.0
-	const dur = time.Second * 15
-	const icdDur = time.Second * 45
+	agent.GetCharacter().AddPermanentAura(func(sim *core.Simulation, character *core.Character) core.Aura {
+		icd := core.NewICD()
+		const spellBonus = 190.0
+		const dur = time.Second * 15
+		const icdDur = time.Second * 45
 
-	character.AddPermanentAura(core.Aura{
-		ID:      core.MagicIDSextant,
-		OnSpellHit: func(sim *core.Simulation, cast core.DirectCastAction, result *core.DirectCastDamageResult) {
-			if cast.GetActionID().ItemID == core.ItemIDTheLightningCapacitor {
-				return // TLC can't proc Sextant
-			}
-			if result.Crit && !icd.IsOnCD(sim) && sim.Rando.Float64("unmarked") < 0.2 {
-				icd = core.InternalCD(sim.CurrentTime + icdDur)
-				core.AddAuraWithTemporaryStats(sim, character, core.MagicIDUnstableCurrents, stats.SpellPower, spellBonus, dur)
-			}
-		},
+		return core.Aura{
+			ID:      core.MagicIDSextant,
+			OnSpellHit: func(sim *core.Simulation, cast core.DirectCastAction, result *core.DirectCastDamageResult) {
+				if cast.GetActionID().ItemID == core.ItemIDTheLightningCapacitor {
+					return // TLC can't proc Sextant
+				}
+				if result.Crit && !icd.IsOnCD(sim) && sim.Rando.Float64("unmarked") < 0.2 {
+					icd = core.InternalCD(sim.CurrentTime + icdDur)
+					core.AddAuraWithTemporaryStats(sim, character, core.MagicIDUnstableCurrents, stats.SpellPower, spellBonus, dur)
+				}
+			},
+		}
 	})
 }
 
 func ApplyDarkmoonCardCrusade(agent core.Agent) {
-	character := agent.GetCharacter()
-	const spellBonus = 8.0
-	stacks := 0
+	agent.GetCharacter().AddPermanentAura(func(sim *core.Simulation, character *core.Character) core.Aura {
+		const spellBonus = 8.0
+		stacks := 0
 
-	character.AddPermanentAura(core.Aura{
-		ID:      core.MagicIDDCC,
-		OnCastComplete: func(sim *core.Simulation, cast core.DirectCastAction) {
-			if stacks < 10 {
-				stacks++
-				character.AddStat(stats.SpellPower, spellBonus)
-			}
-			// Removal aura will refresh with new total spellpower based on stacks.
-			//  This will remove the old stack removal buff.
-			character.AddAura(sim, core.Aura{
-				ID:      core.MagicIDDCCBonus,
-				Expires: sim.CurrentTime + time.Second*10,
-				OnExpire: func(sim *core.Simulation) {
-					character.AddStat(stats.SpellPower, -spellBonus * float64(stacks))
-					stacks = 0
-				},
-			})
-		},
+		return core.Aura{
+			ID:      core.MagicIDDCC,
+			OnCastComplete: func(sim *core.Simulation, cast core.DirectCastAction) {
+				if stacks < 10 {
+					stacks++
+					character.AddStat(stats.SpellPower, spellBonus)
+				}
+				// Removal aura will refresh with new total spellpower based on stacks.
+				//  This will remove the old stack removal buff.
+				character.AddAura(sim, core.Aura{
+					ID:      core.MagicIDDCCBonus,
+					Expires: sim.CurrentTime + time.Second*10,
+					OnExpire: func(sim *core.Simulation) {
+						character.AddStat(stats.SpellPower, -spellBonus * float64(stacks))
+						stacks = 0
+					},
+				})
+			},
+		}
 	})
 }

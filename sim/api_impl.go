@@ -36,12 +36,17 @@ func computeStatsImpl(request *proto.ComputeStatsRequest) *proto.ComputeStatsRes
 }
 
 func statsFromIndSimRequest(isr *proto.IndividualSimRequest) *proto.ComputeStatsResult {
+	// createSim includes a call to buff up all party members.
 	sim := createSim(isr)
-	gearStats := sim.Raid.Parties[0].Players[0].GetCharacter().Equip.Stats()
+	character := sim.Raid.Parties[0].Players[0].GetCharacter()
+	gearStats := character.Equip.Stats()
+	finalStats := character.GetStats()
+	setBonusNames := character.GetActiveSetBonusNames()
+
 	return &proto.ComputeStatsResult{
 		GearOnly:   gearStats[:],
-		FinalStats: sim.Raid.Parties[0].Players[0].GetCharacter().Stats[:], // createSim includes a call to buff up all party members.
-		Sets:       []string{},
+		FinalStats: finalStats[:],
+		Sets:       setBonusNames,
 	}
 }
 
@@ -76,7 +81,7 @@ func convertSimParams(request *proto.IndividualSimRequest) core.IndividualParams
 
 	params := core.IndividualParams{
 		Equip:    items.ProtoToEquipmentSpec(request.Player.Equipment),
-		Race:     core.RaceBonusType(request.Player.Options.Race),
+		Race:     request.Player.Options.Race,
 		Class:    request.Player.Options.Class,
 		Consumes: *request.Player.Options.Consumes,
 		Buffs:    *request.Buffs,

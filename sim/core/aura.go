@@ -45,8 +45,8 @@ func NewAuraTracker() *AuraTracker {
 //  This is currently used by Player and Raid (for global debuffs)
 type AuraTracker struct {
 	PID           int                       // used to track which agent ID auras are coming on/off (mosly for debugging)
-	CDs           [MagicIDLen]time.Duration // Map of MagicID to sim duration at which CD is done.
-	Auras         [MagicIDLen]Aura          // this is array instead of map to speed up browser perf.
+	CDs           [MagicIDLen]time.Duration // Maps MagicIDs to sim duration at which CD is done. Using array for perf.
+	Auras         [MagicIDLen]Aura          // Maps MagicIDs to aura for that ID. Using array for perf.
 	ActiveAuraIDs []int32                   // IDs of auras that are active, in no particular order
 }
 

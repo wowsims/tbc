@@ -149,12 +149,12 @@ func ApplyBuffEffects(agent Agent, buffs proto.Buffs) {
 }
 
 func registerBloodlustCD(agent Agent, buffs proto.Buffs) {
-	if buffs.Bloodlust == 0 {
+	numBloodlusts := buffs.Bloodlust
+	if numBloodlusts == 0 {
 		return
 	}
 
 	dur := time.Second * 40
-	numBloodlusts := buffs.Bloodlust
 
 	agent.GetCharacter().AddMajorCooldown(MajorCooldown{
 		CooldownID: MagicIDBloodlust,
@@ -162,19 +162,20 @@ func registerBloodlustCD(agent Agent, buffs proto.Buffs) {
 		Priority: CooldownPriorityBloodlust,
 		TryActivate: func(sim *Simulation, character *Character) bool {
 			if character.bloodlustsUsed < numBloodlusts {
-				character.SetCD(MagicIDBloodlust, dur+sim.CurrentTime)
+				character.SetCD(MagicIDBloodlust, sim.CurrentTime+dur)
 				character.Party.AddAura(sim, Aura{
 					ID:      MagicIDBloodlust,
 					Expires: sim.CurrentTime + dur,
 					OnCast: func(sim *Simulation, cast DirectCastAction, input *DirectCastInput) {
+						// Multiply and divide lets us use integer math, which is better for perf.
 						input.CastTime = (input.CastTime * 10) / 13 // 30% faster
 					},
 				})
 				character.bloodlustsUsed++
 				return true
 			} else {
-				character.SetCD(MagicIDBloodlust, NeverExpires)
-				return false
+				character.SetCD(MagicIDBloodlust, sim.CurrentTime+time.Minute*10)
+				return true
 			}
 		},
 	})

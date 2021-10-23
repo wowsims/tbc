@@ -12,31 +12,32 @@ func init() {
 }
 
 func ApplyTheLightningCapacitor(agent core.Agent) {
-	character := agent.GetCharacter()
-	charges := 0
+	agent.GetCharacter().AddPermanentAura(func(sim *core.Simulation, character *core.Character) core.Aura {
+		charges := 0
 
-	const icdDur = time.Millisecond * 2500
-	icd := core.NewICD()
+		const icdDur = time.Millisecond * 2500
+		icd := core.NewICD()
 
-	character.AddPermanentAura(core.Aura{
-		ID:      core.MagicIDTLC,
-		OnSpellHit: func(sim *core.Simulation, cast core.DirectCastAction, result *core.DirectCastDamageResult) {
-			if icd.IsOnCD(sim) {
-				return
-			}
+		return core.Aura{
+			ID:      core.MagicIDTLC,
+			OnSpellHit: func(sim *core.Simulation, cast core.DirectCastAction, result *core.DirectCastDamageResult) {
+				if icd.IsOnCD(sim) {
+					return
+				}
 
-			if !result.Crit {
-				return
-			}
+				if !result.Crit {
+					return
+				}
 
-			charges++
-			if charges >= 3 {
-				icd = core.InternalCD(sim.CurrentTime + icdDur)
-				charges = 0
-				castAction := NewLightningCapacitorCast(sim, character)
-				castAction.Act(sim)
-			}
-		},
+				charges++
+				if charges >= 3 {
+					icd = core.InternalCD(sim.CurrentTime + icdDur)
+					charges = 0
+					castAction := NewLightningCapacitorCast(sim, character)
+					castAction.Act(sim)
+				}
+			},
+		}
 	})
 }
 

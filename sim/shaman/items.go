@@ -24,7 +24,9 @@ var ItemSetTidefury = core.ItemSet{
 	Items: map[int32]struct{}{28231: {}, 27510: {}, 28349: {}, 27909: {}, 27802: {}},
 	Bonuses: map[int32]core.ApplyEffect{
 		2: func(agent core.Agent) {
-			agent.GetCharacter().AddPermanentAura(core.Aura{ID: core.MagicIDTidefury})
+			agent.GetCharacter().AddPermanentAura(func(sim *core.Simulation, character *core.Character) core.Aura {
+				return core.Aura{ID: core.MagicIDTidefury}
+			})
 		},
 		4: func(agent core.Agent) {
 			shaman, ok := agent.(*Shaman)
@@ -47,23 +49,24 @@ var ItemSetCycloneRegalia = core.ItemSet{
 			// Handled in shaman.go
 		},
 		4: func(agent core.Agent) {
-			character := agent.GetCharacter()
-			character.AddPermanentAura(core.Aura{
-				ID:      core.MagicIDCyclone4pc,
-				OnSpellHit: func(sim *core.Simulation, cast core.DirectCastAction, result *core.DirectCastDamageResult) {
-					if result.Crit && sim.Rando.Float64("cycl4p") < 0.11 {
-						character.AddAura(sim, core.Aura{
-							ID: core.MagicIDCycloneMana,
-							OnCast: func(sim *core.Simulation, cast core.DirectCastAction, input *core.DirectCastInput) {
-								// TODO: how to make sure this goes in before clearcasting?
-								input.ManaCost -= 270
-							},
-							OnCastComplete: func(sim *core.Simulation, cast core.DirectCastAction) {
-								character.RemoveAura(sim, core.MagicIDCycloneMana)
-							},
-						})
-					}
-				},
+			agent.GetCharacter().AddPermanentAura(func(sim *core.Simulation, character *core.Character) core.Aura {
+				return core.Aura{
+					ID:      core.MagicIDCyclone4pc,
+					OnSpellHit: func(sim *core.Simulation, cast core.DirectCastAction, result *core.DirectCastDamageResult) {
+						if result.Crit && sim.Rando.Float64("cycl4p") < 0.11 {
+							character.AddAura(sim, core.Aura{
+								ID: core.MagicIDCycloneMana,
+								OnCast: func(sim *core.Simulation, cast core.DirectCastAction, input *core.DirectCastInput) {
+									// TODO: how to make sure this goes in before clearcasting?
+									input.ManaCost -= 270
+								},
+								OnCastComplete: func(sim *core.Simulation, cast core.DirectCastAction) {
+									character.RemoveAura(sim, core.MagicIDCycloneMana)
+								},
+							})
+						}
+					},
+				}
 			})
 		},
 	},
@@ -74,14 +77,15 @@ var ItemSetCataclysmRegalia = core.ItemSet{
 	Items:   map[int32]struct{}{30169: {}, 30170: {}, 30171: {}, 30172: {}, 30173: {}},
 	Bonuses: map[int32]core.ApplyEffect{
 		4: func(agent core.Agent) {
-			character := agent.GetCharacter()
-			character.AddPermanentAura(core.Aura{
-				ID:      core.MagicIDCataclysm4pc,
-				OnSpellHit: func(sim *core.Simulation, cast core.DirectCastAction, result *core.DirectCastDamageResult) {
-					if result.Crit && sim.Rando.Float64("cata4p") < 0.25 {
-						character.AddStat(stats.Mana, 120)
-					}
-				},
+			agent.GetCharacter().AddPermanentAura(func(sim *core.Simulation, character *core.Character) core.Aura {
+				return core.Aura{
+					ID:      core.MagicIDCataclysm4pc,
+					OnSpellHit: func(sim *core.Simulation, cast core.DirectCastAction, result *core.DirectCastDamageResult) {
+						if result.Crit && sim.Rando.Float64("cata4p") < 0.25 {
+							character.AddStat(stats.Mana, 120)
+						}
+					},
+				}
 			})
 		},
 	},
@@ -97,13 +101,15 @@ var ItemSetSkyshatterRegalia = core.ItemSet{
 			agent.GetCharacter().AddStat(stats.SpellPower, 45)
 		},
 		4: func(agent core.Agent) {
-			agent.GetCharacter().AddPermanentAura(core.Aura{
-				ID:      core.MagicIDSkyshatter4pc,
-				OnSpellHit: func(sim *core.Simulation, cast core.DirectCastAction, result *core.DirectCastDamageResult) {
-					if cast.GetActionID().SpellID == SpellIDLB12 {
-						result.Damage *= 1.05
-					}
-				},
+			agent.GetCharacter().AddPermanentAura(func(sim *core.Simulation, character *core.Character) core.Aura {
+				return core.Aura{
+					ID:      core.MagicIDSkyshatter4pc,
+					OnSpellHit: func(sim *core.Simulation, cast core.DirectCastAction, result *core.DirectCastDamageResult) {
+						if cast.GetActionID().SpellID == SpellIDLB12 {
+							result.Damage *= 1.05
+						}
+					},
+				}
 			})
 		},
 	},
@@ -140,39 +146,41 @@ func ApplyNaturalAlignmentCrystal(agent core.Agent) {
 // ActivateFathomBrooch adds an aura that has a chance on cast of nature spell
 //  to restore 335 mana. 40s ICD
 func ApplyFathomBroochOfTheTidewalker(agent core.Agent) {
-	character := agent.GetCharacter()
-	icd := core.NewICD()
-	const icdDur = time.Second * 40
+	agent.GetCharacter().AddPermanentAura(func(sim *core.Simulation, character *core.Character) core.Aura {
+		icd := core.NewICD()
+		const icdDur = time.Second * 40
 
-	character.AddPermanentAura(core.Aura{
-		ID:      core.MagicIDRegainMana,
-		OnCastComplete: func(sim *core.Simulation, cast core.DirectCastAction) {
-			if icd.IsOnCD(sim) {
-				return
-			}
-			if cast.GetSpellSchool() != stats.NatureSpellPower {
-				return
-			}
-			if sim.Rando.Float64("unmarked") < 0.15 {
-				icd = core.InternalCD(sim.CurrentTime + icdDur)
-				character.AddStat(stats.Mana, 335)
-			}
-		},
+		return core.Aura{
+			ID:      core.MagicIDRegainMana,
+			OnCastComplete: func(sim *core.Simulation, cast core.DirectCastAction) {
+				if icd.IsOnCD(sim) {
+					return
+				}
+				if cast.GetSpellSchool() != stats.NatureSpellPower {
+					return
+				}
+				if sim.Rando.Float64("unmarked") < 0.15 {
+					icd = core.InternalCD(sim.CurrentTime + icdDur)
+					character.AddStat(stats.Mana, 335)
+				}
+			},
+		}
 	})
 }
 
 func ApplySkycallTotem(agent core.Agent) {
-	character := agent.GetCharacter()
-	const hasteBonus = 101
-	const dur = time.Second * 10
+	agent.GetCharacter().AddPermanentAura(func(sim *core.Simulation, character *core.Character) core.Aura {
+		const hasteBonus = 101
+		const dur = time.Second * 10
 
-	character.AddPermanentAura(core.Aura{
-		ID:      core.MagicIDSkycall,
-		Expires: core.NeverExpires,
-		OnCastComplete: func(sim *core.Simulation, cast core.DirectCastAction) {
-			if cast.GetActionID().SpellID == SpellIDLB12 && sim.Rando.Float64("skycall") < 0.15 {
-				core.AddAuraWithTemporaryStats(sim, character, core.MagicIDEnergized, stats.SpellHaste, hasteBonus, dur)
-			}
-		},
+		return core.Aura{
+			ID:      core.MagicIDSkycall,
+			Expires: core.NeverExpires,
+			OnCastComplete: func(sim *core.Simulation, cast core.DirectCastAction) {
+				if cast.GetActionID().SpellID == SpellIDLB12 && sim.Rando.Float64("skycall") < 0.15 {
+					core.AddAuraWithTemporaryStats(sim, character, core.MagicIDEnergized, stats.SpellHaste, hasteBonus, dur)
+				}
+			},
+		}
 	})
 }

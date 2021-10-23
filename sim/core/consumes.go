@@ -162,7 +162,7 @@ func registerPotionCD(agent Agent, consumes proto.Consumes) {
 				return startingPotionActivation(sim, character)
 			} else {
 				character.SetCD(MagicIDPotion, NeverExpires)
-				return false
+				return true
 			}
 		}
 	}

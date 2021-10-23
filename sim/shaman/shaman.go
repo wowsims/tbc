@@ -156,8 +156,9 @@ func (shaman *Shaman) registerElementalMasteryCD() {
 				},
 				OnCastComplete: func(sim *core.Simulation, cast core.DirectCastAction) {
 					// Remove the buff and put skill on CD
-					character.SetCD(core.MagicIDEleMastery, time.Minute*3+sim.CurrentTime)
+					character.SetCD(core.MagicIDEleMastery, sim.CurrentTime+time.Minute*3)
 					character.RemoveAura(sim, core.MagicIDEleMastery)
+					character.UpdateMajorCooldowns(sim)
 				},
 			})
 			return true

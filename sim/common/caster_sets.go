@@ -24,17 +24,18 @@ var ItemSetManaEtched = core.ItemSet{
 			agent.GetCharacter().AddStat(stats.SpellHit, 35)
 		},
 		4: func(agent core.Agent) {
-			character := agent.GetCharacter()
-			const spellBonus = 110.0
-			const duration = time.Second * 15
+			agent.GetCharacter().AddPermanentAura(func(sim *core.Simulation, character *core.Character) core.Aura {
+				const spellBonus = 110.0
+				const duration = time.Second * 15
 
-			character.AddPermanentAura(core.Aura{
-				ID:      core.MagicIDManaEtched,
-				OnCastComplete: func(sim *core.Simulation, cast core.DirectCastAction) {
-					if sim.Rando.Float64("unmarked") < 0.02 {
-						core.AddAuraWithTemporaryStats(sim, character, core.MagicIDManaEtchedInsight, stats.SpellPower, spellBonus, duration)
-					}
-				},
+				return core.Aura{
+					ID:      core.MagicIDManaEtched,
+					OnCastComplete: func(sim *core.Simulation, cast core.DirectCastAction) {
+						if sim.Rando.Float64("unmarked") < 0.02 {
+							core.AddAuraWithTemporaryStats(sim, character, core.MagicIDManaEtchedInsight, stats.SpellPower, spellBonus, duration)
+						}
+					},
+				}
 			})
 		},
 	},
@@ -55,17 +56,18 @@ var ItemSetSpellstrike = core.ItemSet{
 	Items:   map[int32]struct{}{24266: {}, 24262: {}},
 	Bonuses: map[int32]core.ApplyEffect{
 		2: func(agent core.Agent) {
-			character := agent.GetCharacter()
-			const spellBonus = 92.0
-			const duration = time.Second * 10
+			agent.GetCharacter().AddPermanentAura(func(sim *core.Simulation, character *core.Character) core.Aura {
+				const spellBonus = 92.0
+				const duration = time.Second * 10
 
-			character.AddPermanentAura(core.Aura{
-				ID:      core.MagicIDSpellstrike,
-				OnCastComplete: func(sim *core.Simulation, cast core.DirectCastAction) {
-					if sim.Rando.Float64("spellstrike") < 0.05 {
-						core.AddAuraWithTemporaryStats(sim, character, core.MagicIDSpellstrikeInfusion, stats.SpellPower, spellBonus, duration)
-					}
-				},
+				return core.Aura{
+					ID:      core.MagicIDSpellstrike,
+					OnCastComplete: func(sim *core.Simulation, cast core.DirectCastAction) {
+						if sim.Rando.Float64("spellstrike") < 0.05 {
+							core.AddAuraWithTemporaryStats(sim, character, core.MagicIDSpellstrikeInfusion, stats.SpellPower, spellBonus, duration)
+						}
+					},
+				}
 			})
 		},
 	},
