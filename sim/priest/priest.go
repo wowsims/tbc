@@ -22,15 +22,8 @@ func (priest *Priest) AddRaidBuffs(buffs *proto.Buffs) {
 func (priest *Priest) AddPartyBuffs(buffs *proto.Buffs) {
 }
 
+func (priest *Priest) Reset(sim *core.Simulation) {}
+
 func (priest *Priest) Act(sim *core.Simulation) time.Duration {
 	return core.NeverExpires // makes the bot wait forever and do nothing.
 }
-
-func (priest *Priest) Start(sim *core.Simulation) time.Duration {
-		return priest.Act(sim)
-}
-
-func (priest *Priest) BuffUp(sim *core.Simulation) {
-}
-
-func (priest *Priest) Reset(sim *core.Simulation) {}

@@ -24,14 +24,9 @@ func (druid *Druid) AddPartyBuffs(buffs *proto.Buffs) {
 	// check for idol of raven goddess equipped
 }
 
-func (druid *Druid) BuffUp(sim *core.Simulation) {
+func (druid *Druid) Reset(newsim *core.Simulation) {
 }
 
 func (druid *Druid) Act(sim *core.Simulation) time.Duration {
 	return core.NeverExpires // makes the bot wait forever and do nothing.
-}
-func (druid *Druid) Start(sim *core.Simulation) time.Duration {
-	return druid.Act(sim)
-}
-func (druid *Druid) Reset(newsim *core.Simulation) {
 }

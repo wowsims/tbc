@@ -64,9 +64,6 @@ type Simulation struct {
 
 	Log  func(string, ...interface{})
 	logs []string
-
-	// Holds the params used to create this sim, so similar sims can be run if needed.
-	IndividualParams IndividualParams
 }
 
 type wrappedRandom struct {
@@ -83,22 +80,15 @@ func (wr *wrappedRandom) Float64(src string) float64 {
 
 func NewIndividualSim(params IndividualParams) *Simulation {
 	raid := NewRaid(params.Buffs)
-	sim := newSim(raid, params.Options, 1)
-	sim.IndividualParams = params
-
-	character := NewCharacter(params.Equip, params.Race, params.Class, params.Consumes, params.CustomStats)
-	agent := NewAgent(sim, character, params.PlayerOptions)
-	raid.AddPlayer(agent)
-	raid.AddPlayerBuffs()
-
-	raid.ApplyAllEffects(sim)
-	raid.Finalize()
+	raid.AddPlayer(NewAgent(params))
+	sim := newSim(raid, params.Options)
+	raid.Finalize(sim)
 
 	return sim
 }
 
 // New sim contructs a simulator with the given equipment / options.
-func newSim(raid *Raid, options Options, numPlayers int) *Simulation {
+func newSim(raid *Raid, options Options) *Simulation {
 	if options.RSeed == 0 {
 		options.RSeed = time.Now().Unix()
 	}
@@ -110,7 +100,7 @@ func newSim(raid *Raid, options Options, numPlayers int) *Simulation {
 		InitialAuras: []InitialAura{},
 		Log: nil,
 		AuraTracker: NewAuraTracker(),
-		MetricsAggregator: NewMetricsAggregator(numPlayers, options.Encounter.Duration),
+		MetricsAggregator: NewMetricsAggregator(raid.Size(), options.Encounter.Duration),
 	}
 	sim.Rando = &wrappedRandom{sim: sim, Rand: rand.New(rand.NewSource(options.RSeed))}
 

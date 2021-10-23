@@ -94,7 +94,7 @@ func (raid *Raid) AddPlayer(player Agent) *Party {
 }
 
 // Adds buffs from every player to the raid and party buffs.
-func (raid *Raid) AddPlayerBuffs() {
+func (raid *Raid) addPlayerBuffs() {
 	// Add raid-wide buffs first.
 	for _, party := range raid.Parties {
 		for _, player := range party.Players {
@@ -114,7 +114,7 @@ func (raid *Raid) AddPlayerBuffs() {
 }
 
 // Applies buffs to the sim and all the players.
-func (raid *Raid) ApplyAllEffects(sim *Simulation) {
+func (raid *Raid) applyAllEffects(sim *Simulation) {
 	ApplyBuffsToSim(sim, raid.buffs)
 
 	for _, party := range raid.Parties {
@@ -125,7 +125,10 @@ func (raid *Raid) ApplyAllEffects(sim *Simulation) {
 }
 
 // Finalize the raid.
-func (raid *Raid) Finalize() {
+func (raid *Raid) Finalize(sim *Simulation) {
+	raid.addPlayerBuffs()
+	raid.applyAllEffects(sim)
+
 	for _, party := range raid.Parties {
 		for _, player := range party.Players {
 			player.GetCharacter().Finalize()
