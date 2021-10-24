@@ -48,7 +48,7 @@ func applyRaceEffects(agent Agent) {
 			ActivationFactory: func(sim *Simulation) CooldownActivation {
 				return func(sim *Simulation, character *Character) bool {
 					character.SetCD(MagicIDOrcBloodFury, cd+sim.CurrentTime)
-					AddAuraWithTemporaryStats(sim, character, MagicIDOrcBloodFury, stats.SpellPower, spBonus, dur)
+					character.AddAuraWithTemporaryStats(sim, MagicIDOrcBloodFury, stats.SpellPower, spBonus, dur)
 					return true
 				}
 			},

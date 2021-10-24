@@ -72,7 +72,7 @@ type majorCooldownManager struct {
 	// Cached list of major cooldowns sorted by priority, for resetting quickly.
 	initialMajorCooldowns []MajorCooldown
 
-	// Whether Finalize() has been called on this object.
+	// Whether finalize() has been called on this object.
 	finalized bool
 
 	// Major cooldowns, ordered by next available. This should always contain
@@ -161,7 +161,7 @@ func RegisterTemporaryStatsOnUseCD(agent Agent, id int32, stat stats.Stat, amoun
 
 	mcd.ActivationFactory = func(sim *Simulation) CooldownActivation {
 		return func(sim *Simulation, character *Character) bool {
-			AddAuraWithTemporaryStats(sim, character, id, stat, amount, duration)
+			character.AddAuraWithTemporaryStats(sim, id, stat, amount, duration)
 			character.SetCD(mcd.CooldownID, sim.CurrentTime+mcd.Cooldown)
 			if mcd.SharedCooldownID != 0 {
 				character.SetCD(mcd.SharedCooldownID, sim.CurrentTime+mcd.SharedCooldown)

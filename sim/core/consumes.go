@@ -110,7 +110,7 @@ func registerDrumsCD(agent Agent, consumes proto.Consumes) {
 				const hasteBonus = 80
 				for _, agent := range character.Party.Players {
 					agent.GetCharacter().SetCD(MagicIDDrums, time.Minute*2+sim.CurrentTime) // tinnitus
-					AddAuraWithTemporaryStats(sim, agent.GetCharacter(), MagicIDDrums, stats.SpellHaste, hasteBonus, time.Second*30)
+					agent.GetCharacter().AddAuraWithTemporaryStats(sim, MagicIDDrums, stats.SpellHaste, hasteBonus, time.Second*30)
 				}
 				return true
 			}
@@ -122,7 +122,7 @@ func registerDrumsCD(agent Agent, consumes proto.Consumes) {
 				const mp5Bonus = 200
 				for _, agent := range character.Party.Players {
 					agent.GetCharacter().SetCD(MagicIDDrums, time.Minute*2+sim.CurrentTime) // tinnitus
-					AddAuraWithTemporaryStats(sim, agent.GetCharacter(), MagicIDDrums, stats.MP5, mp5Bonus, time.Second*15)
+					agent.GetCharacter().AddAuraWithTemporaryStats(sim, MagicIDDrums, stats.MP5, mp5Bonus, time.Second*15)
 				}
 				return true
 			}

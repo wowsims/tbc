@@ -186,7 +186,7 @@ func ApplySkycallTotem(agent core.Agent) {
 			Expires: core.NeverExpires,
 			OnCastComplete: func(sim *core.Simulation, cast core.DirectCastAction) {
 				if cast.GetActionID().SpellID == SpellIDLB12 && sim.Rando.Float64("skycall") < 0.15 {
-					core.AddAuraWithTemporaryStats(sim, character, core.MagicIDEnergized, stats.SpellHaste, hasteBonus, dur)
+					character.AddAuraWithTemporaryStats(sim, core.MagicIDEnergized, stats.SpellHaste, hasteBonus, dur)
 				}
 			},
 		}

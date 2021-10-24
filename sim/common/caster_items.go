@@ -28,7 +28,7 @@ func ApplyRobeOfTheElderScribes(agent core.Agent) {
 			OnSpellHit: func(sim *core.Simulation, cast core.DirectCastAction, result *core.DirectCastDamageResult) {
 				if !icd.IsOnCD(sim) && sim.Rando.Float64("unmarked") < proc {
 					icd = core.InternalCD(sim.CurrentTime + icdDur)
-					core.AddAuraWithTemporaryStats(sim, character, core.MagicIDElderScribeProc, stats.SpellPower, spellBonus, dur)
+					character.AddAuraWithTemporaryStats(sim, core.MagicIDElderScribeProc, stats.SpellPower, spellBonus, dur)
 				}
 			},
 		}

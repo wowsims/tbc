@@ -28,7 +28,7 @@ func ApplyMysticalSkyfireDiamond(agent core.Agent) {
 			OnCastComplete: func(sim *core.Simulation, cast core.DirectCastAction) {
 				if !icd.IsOnCD(sim) && sim.Rando.Float64("unmarked") < 0.15 {
 					icd = core.InternalCD(sim.CurrentTime + icdDur)
-					core.AddAuraWithTemporaryStats(sim, character, core.MagicIDMysticFocus, stats.SpellHaste, hasteBonus, dur)
+					character.AddAuraWithTemporaryStats(sim, core.MagicIDMysticFocus, stats.SpellHaste, hasteBonus, dur)
 				}
 			},
 		}

@@ -145,7 +145,7 @@ func ApplyQuagmirransEye(agent core.Agent) {
 			OnCastComplete: func(sim *core.Simulation, cast core.DirectCastAction) {
 				if !icd.IsOnCD(sim) && sim.Rando.Float64("quags") < 0.1 {
 					icd = core.InternalCD(sim.CurrentTime + dur)
-					core.AddAuraWithTemporaryStats(sim, character, core.MagicIDFungalFrenzy, stats.SpellHaste, hasteBonus, time.Second*6)
+					character.AddAuraWithTemporaryStats(sim, core.MagicIDFungalFrenzy, stats.SpellHaste, hasteBonus, time.Second*6)
 				}
 			},
 		}
@@ -167,7 +167,7 @@ func ApplyShiffarsNexusHorn(agent core.Agent) {
 				}
 				if !icd.IsOnCD(sim) && result.Crit && sim.Rando.Float64("unmarked") < 0.2 {
 					icd = core.InternalCD(sim.CurrentTime + dur)
-					core.AddAuraWithTemporaryStats(sim, character, core.MagicIDCallOfTheNexus, stats.SpellPower, spellBonus, time.Second*10)
+					character.AddAuraWithTemporaryStats(sim, core.MagicIDCallOfTheNexus, stats.SpellPower, spellBonus, time.Second*10)
 				}
 			},
 		}
@@ -183,7 +183,7 @@ func ApplyEyeOfMagtheridon(agent core.Agent) {
 		return core.Aura{
 			ID:      core.MagicIDEyeOfMag,
 			OnSpellMiss: func(sim *core.Simulation, cast core.DirectCastAction) {
-				core.AddAuraWithTemporaryStats(sim, character, core.MagicIDRecurringPower, stats.SpellPower, spellBonus, dur)
+				character.AddAuraWithTemporaryStats(sim, core.MagicIDRecurringPower, stats.SpellPower, spellBonus, dur)
 			},
 		}
 	})
@@ -205,7 +205,7 @@ func ApplySextantOfUnstableCurrents(agent core.Agent) {
 				}
 				if result.Crit && !icd.IsOnCD(sim) && sim.Rando.Float64("unmarked") < 0.2 {
 					icd = core.InternalCD(sim.CurrentTime + icdDur)
-					core.AddAuraWithTemporaryStats(sim, character, core.MagicIDUnstableCurrents, stats.SpellPower, spellBonus, dur)
+					character.AddAuraWithTemporaryStats(sim, core.MagicIDUnstableCurrents, stats.SpellPower, spellBonus, dur)
 				}
 			},
 		}

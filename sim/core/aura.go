@@ -409,15 +409,14 @@ const (
 	MagicIDLen
 )
 
-// Add stats to a character, and return an aura that removes them when expired.
-// NOTE: In most cases, use AddAuraWithTemporaryStats() instead.
-func AddTemporaryStats(sim *Simulation, character *Character, auraID int32, stat stats.Stat, amount float64, duration time.Duration) Aura {
+// Helper for the common case of adding an Aura that gives a temporary stat boost.
+func (character *Character) AddAuraWithTemporaryStats(sim *Simulation, auraID int32, stat stats.Stat, amount float64, duration time.Duration) {
 	if sim.Log != nil {
 		sim.Log(" +%0.0f %s from %s\n", amount, stat.StatName(), AuraName(auraID))
 	}
 	character.AddStat(stat, amount)
 
-	return Aura{
+	character.AddAura(sim, Aura{
 		ID:      auraID,
 		Expires: sim.CurrentTime + duration,
 		OnExpire: func(sim *Simulation) {
@@ -426,10 +425,5 @@ func AddTemporaryStats(sim *Simulation, character *Character, auraID int32, stat
 			}
 			character.AddStat(stat, -amount)
 		},
-	}
-}
-
-// Like AddTemporaryStats(), but also adds the aura to the character.
-func AddAuraWithTemporaryStats(sim *Simulation, character *Character, auraID int32, stat stats.Stat, amount float64, duration time.Duration) {
-	character.AddAura(sim, AddTemporaryStats(sim, character, auraID, stat, amount, duration))
+	})
 }
