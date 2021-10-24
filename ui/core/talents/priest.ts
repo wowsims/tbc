@@ -229,6 +229,203 @@ export class PriestTalentsPicker extends TalentsPicker<Spec.SpecShadowPriest> {
         name: 'Holy',
         backgroundUrl: 'https://wow.zamimg.com/images/wow/talents/backgrounds/tbc/202.jpg',
         talents: [
+          {
+            //fieldName: 'healingFocus',
+            location: {
+              rowIdx: 0,
+              colIdx: 0,
+            },
+            spellIds: [14913, 15012],
+            maxPoints: 2,
+          },
+          {
+            fieldName: 'holySpecialization',
+            location: {
+              rowIdx: 0,
+              colIdx: 2,
+            },
+            spellIds: [14889, 15008],
+            maxPoints: 5,
+          },
+          {
+            //fieldName: 'improvedRenew',
+            location: {
+              rowIdx: 0,
+              colIdx: 1,
+            },
+            spellIds: [14908, 15020, 17191],
+            maxPoints: 3,
+          },
+          {
+            //fieldName: 'spellWarding',
+            location: {
+              rowIdx: 1,
+              colIdx: 1,
+            },
+            spellIds: [27900],
+            maxPoints: 5,
+          },
+          {
+            fieldName: 'divineFury',
+            location: {
+              rowIdx: 1,
+              colIdx: 2,
+            },
+            spellIds: [18530, 18531, 18533],
+            maxPoints: 5,
+          },
+          {
+            fieldName: 'holyNova',
+            location: {
+              rowIdx: 2,
+              colIdx: 0,
+            },
+            spellIds: [15237],
+            maxPoints: 1,
+          },
+          {
+            //fieldName: 'blessedRecovery',
+            location: {
+              rowIdx: 2,
+              colIdx: 1,
+            },
+            spellIds: [27811, 27815],
+            maxPoints: 3,
+          },
+          {
+            //fieldName: 'inspiration',
+            location: {
+              rowIdx: 2,
+              colIdx: 3,
+            },
+            spellIds: [14892, 15362],
+            maxPoints: 3,
+          },
+          {
+            //fieldName: 'holyReach',
+            location: {
+              rowIdx: 3,
+              colIdx: 0,
+            },
+            spellIds: [27789],
+            maxPoints: 2,
+          },
+          {
+            //fieldName: 'improvedHealing',
+            location: {
+              rowIdx: 3,
+              colIdx: 1,
+            },
+            spellIds: [14912, 15013],
+            maxPoints: 3,
+          },
+          {
+            fieldName: 'searingLight',
+            location: {
+              rowIdx: 3,
+              colIdx: 2,
+            },
+            prereqLocation: {
+              rowIdx: 1,
+              colIdx: 2,
+            },
+            spellIds: [14909, 15017],
+            maxPoints: 2,
+          },
+          {
+            //fieldName: 'healingPrayers',
+            location: {
+              rowIdx: 4,
+              colIdx: 0,
+            },
+            spellIds: [14911, 15018],
+            maxPoints: 2,
+          },
+          {
+            //fieldName: 'spiritOfRedemption',
+            location: {
+              rowIdx: 4,
+              colIdx: 1,
+            },
+            spellIds: [20711],
+            maxPoints: 1,
+          },
+          {
+            fieldName: 'spiritualGuidance',
+            location: {
+              rowIdx: 4,
+              colIdx: 2,
+            },
+            spellIds: [14901, 15028],
+            maxPoints: 5,
+          },
+          {
+            fieldName: 'surgeOfLight',
+            location: {
+              rowIdx: 5,
+              colIdx: 0,
+            },
+            spellIds: [33150, 33154],
+            maxPoints: 2,
+          },
+          {
+            //fieldName: 'spiritualHealing',
+            location: {
+              rowIdx: 5,
+              colIdx: 2,
+            },
+            spellIds: [14898, 15349, 15354],
+            maxPoints: 5,
+          },
+          {
+            //fieldName: 'holyConcentration',
+            location: {
+              rowIdx: 6,
+              colIdx: 0,
+            },
+            spellIds: [34753, 34859],
+            maxPoints: 3,
+          },
+          {
+            //fieldName: 'lightwell',
+            location: {
+              rowIdx: 6,
+              colIdx: 1,
+            },
+            prereqLocation: {
+              rowIdx: 4,
+              colIdx: 1,
+            },
+            spellIds: [724],
+            maxPoints: 1,
+          },
+          {
+            //fieldName: 'blessedResilience',
+            location: {
+              rowIdx: 6,
+              colIdx: 2,
+            },
+            spellIds: [33142, 33145],
+            maxPoints: 3,
+          },
+          {
+            //fieldName: 'empoweredHealing',
+            location: {
+              rowIdx: 7,
+              colIdx: 1,
+            },
+            spellIds: [33158],
+            maxPoints: 5,
+          },
+          {
+            //fieldName: 'circleOfHealing',
+            location: {
+              rowIdx: 8,
+              colIdx: 1,
+            },
+            spellIds: [34861],
+            maxPoints: 1,
+          },
         ],
       },
       {
