@@ -20,6 +20,7 @@ import { ElementalShaman, ElementalShaman_Rotation as ElementalShamanRotation, S
 import { ShadowPriest, ShadowPriest_Rotation as ShadowPriestRotation, PriestTalents, ShadowPriest_Options as ShadowPriestOptions } from '/tbc/core/proto/priest.js';
 
 export type ShamanSpecs = Spec.SpecElementalShaman;
+export type PriestSpecs = Spec.SpecShadowPriest;
 
 export type RotationUnion = BalanceDruidRotation | ElementalShamanRotation | ShadowPriestRotation;
 export type SpecRotation<T extends Spec> =
