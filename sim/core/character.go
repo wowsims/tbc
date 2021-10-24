@@ -1,17 +1,12 @@
 package core
 
 import (
-	"sort"
 	"time"
 
 	"github.com/wowsims/tbc/sim/core/items"
 	"github.com/wowsims/tbc/sim/core/proto"
 	"github.com/wowsims/tbc/sim/core/stats"
 )
-
-// Need to be a function that returns an Aura rather than an Aura, so captured
-// local variables can be reset on Sim reset.
-type PermanentAura func(*Simulation, *Character) Aura
 
 // Character is a data structure to hold all the shared values that all
 // class logic shares.
@@ -32,15 +27,14 @@ type Character struct {
 	// effects from items / abilities.
 	initialStats stats.Stats
 
-	// Auras that never expire and should always be active.
-	// These are automatically applied on each Sim reset.
-	permanentAuras []PermanentAura
-
-	// Cached list of major cooldowns sorted by priority, for resetting quickly.
-	initialMajorCooldowns []MajorCooldown
-
-	// Embeddded stat dependency manager.
+	// Provides stat dependency management behavior.
 	stats.StatDependencyManager
+
+	// Provides aura tracking behavior.
+	auraTracker
+
+	// Provides major cooldown management behavior.
+	majorCooldownManager
 
 	// Up reference to this Character's Party.
 	Party *Party
@@ -49,40 +43,25 @@ type Character struct {
 	// All fields above this may not be altered once finalized is set.
 	finalized bool
 
-	// Embeddded aura tracker.
-	*AuraTracker
-
 	// Current stats, including temporary effects.
 	stats stats.Stats
-
-	// Major cooldowns, ordered by next available. This should always contain
-	// the same cooldows as initialMajorCooldowns, but the order will change over
-	// the course of the sim.
-	majorCooldowns []MajorCooldown
 
 	// Used for applying the effects of hardcast / channeled spells at a later time.
 	// By definition there can be only 1 hardcast spell being cast at any moment.
 	HardcastAura Aura
-
-	potionsUsed int32 // Number of potions used
-	bloodlustsUsed int32 // Number of bloodlusts used
 }
 
 func NewCharacter(equipSpec items.EquipmentSpec, race proto.Race, class proto.Class, consumes proto.Consumes, customStats stats.Stats) Character {
 	equip := items.NewEquipmentSet(equipSpec)
 
 	character := Character{
-		Race:         race,
-		Class:        class,
-		Equip:        equip,
-		EquipSpec:    equipSpec,
-		consumes:     consumes,
+		Race:      race,
+		Class:     class,
+		Equip:     equip,
+		EquipSpec: equipSpec,
+		consumes:  consumes,
 
-		permanentAuras: []PermanentAura{},
-
-		initialMajorCooldowns: []MajorCooldown{},
-
-		AuraTracker:  NewAuraTracker(),
+		auraTracker: newAuraTracker(),
 	}
 
 	character.AddStats(BaseStats[BaseStatsKey{ Race: race, Class: class }])
@@ -108,12 +87,12 @@ func NewCharacter(equipSpec items.EquipmentSpec, race proto.Race, class proto.Cl
 	return character
 }
 
-func (character *Character) ApplyAllEffects(agent Agent, buffs proto.Buffs) {
-	ApplyRaceEffects(agent)
+func (character *Character) applyAllEffects(agent Agent, buffs proto.Buffs) {
+	applyRaceEffects(agent)
 	character.applyItemEffects(agent)
 	character.applyItemSetBonusEffects(agent)
-	ApplyConsumeEffects(agent)
-	ApplyBuffEffects(agent, buffs)
+	applyConsumeEffects(agent)
+	applyBuffEffects(agent, buffs)
 }
 
 // Apply effects from all equipped items.
@@ -131,26 +110,6 @@ func (character *Character) applyItemEffects(agent Agent) {
 			}
 		}
 	}
-}
-
-// Registers a permanent aura to this Character which will be re-applied on
-// every Sim reset.
-func (character *Character) AddPermanentAura(permAura PermanentAura) {
-	if character.finalized {
-		panic("Permanent auras may not be added once finalized!")
-	}
-
-	character.permanentAuras = append(character.permanentAuras, permAura)
-}
-
-// Registers a major cooldown to the Character, which will be automatically
-// used when available.
-func (character *Character) AddMajorCooldown(mcd MajorCooldown) {
-	if character.finalized {
-		panic("Major cooldowns may not be added once finalized!")
-	}
-
-	character.initialMajorCooldowns = append(character.initialMajorCooldowns, mcd)
 }
 
 func (character *Character) AddStats(stat stats.Stats) {
@@ -195,50 +154,15 @@ func (character *Character) Finalize() {
 	// All stats added up to this point are part of the 'initial' stats.
 	character.initialStats = character.stats
 
-	// Sort major cooldowns by descending priority so they get used in the correct order.
-	sort.SliceStable(character.initialMajorCooldowns, func(i, j int) bool {
-		return character.initialMajorCooldowns[i].Priority > character.initialMajorCooldowns[j].Priority
-	})
+	character.majorCooldownManager.finalize(character)
 }
 
 func (character *Character) Reset(sim *Simulation) {
-	character.potionsUsed = 0
-	character.bloodlustsUsed = 0
 	character.stats = character.initialStats
 
-	character.majorCooldowns = make([]MajorCooldown, len(character.initialMajorCooldowns))
-	copy(character.majorCooldowns, character.initialMajorCooldowns)
+	character.auraTracker.reset(sim)
 
-	character.AuraTracker.ResetAuras()
-	for _, permAura := range character.permanentAuras {
-		aura := permAura(sim, character)
-		aura.Expires = NeverExpires
-		character.AddAura(sim, aura)
-	}
-}
-
-func (character *Character) TryUseCooldowns(sim *Simulation) {
-	anyCooldownsUsed := false
-	for curIdx := 0; curIdx < len(character.majorCooldowns) && !character.majorCooldowns[curIdx].IsOnCD(sim, character); curIdx++ {
-		success := character.majorCooldowns[curIdx].TryActivate(sim, character)
-		anyCooldownsUsed = anyCooldownsUsed || success
-	}
-
-	if anyCooldownsUsed {
-		// Re-sort by availability. 
-		// TODO: Probably a much faster way to do this, especially since we know which cooldowns need to be re-ordered.
-		sort.Slice(character.majorCooldowns, func(i, j int) bool {
-			return character.majorCooldowns[i].GetRemainingCD(sim, character) < character.majorCooldowns[j].GetRemainingCD(sim, character)
-		})
-	}
-}
-
-// This function should be called if the CD for a major cooldown changes outside
-// of its TryActivate() call.
-func (character *Character) UpdateMajorCooldowns(sim *Simulation) {
-	sort.Slice(character.majorCooldowns, func(i, j int) bool {
-		return character.majorCooldowns[i].GetRemainingCD(sim, character) < character.majorCooldowns[j].GetRemainingCD(sim, character)
-	})
+	character.majorCooldownManager.reset(sim)
 }
 
 // Returns rate of mana regen, as mana / second
@@ -269,7 +193,7 @@ func (character *Character) Advance(sim *Simulation, elapsedTime time.Duration, 
 	}
 
 	// Advance CDs and Auras
-	character.AuraTracker.Advance(sim, newTime)
+	character.auraTracker.advance(sim, newTime)
 
 	if character.HardcastAura.Expires != 0 && character.HardcastAura.Expires <= newTime {
 		character.HardcastAura.OnExpire(sim)

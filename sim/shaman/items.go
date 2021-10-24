@@ -24,7 +24,8 @@ var ItemSetTidefury = core.ItemSet{
 	Items: map[int32]struct{}{28231: {}, 27510: {}, 28349: {}, 27909: {}, 27802: {}},
 	Bonuses: map[int32]core.ApplyEffect{
 		2: func(agent core.Agent) {
-			agent.GetCharacter().AddPermanentAura(func(sim *core.Simulation, character *core.Character) core.Aura {
+			character := agent.GetCharacter()
+			character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 				return core.Aura{ID: core.MagicIDTidefury}
 			})
 		},
@@ -49,7 +50,8 @@ var ItemSetCycloneRegalia = core.ItemSet{
 			// Handled in shaman.go
 		},
 		4: func(agent core.Agent) {
-			agent.GetCharacter().AddPermanentAura(func(sim *core.Simulation, character *core.Character) core.Aura {
+			character := agent.GetCharacter()
+			character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 				return core.Aura{
 					ID:      core.MagicIDCyclone4pc,
 					OnSpellHit: func(sim *core.Simulation, cast core.DirectCastAction, result *core.DirectCastDamageResult) {
@@ -77,7 +79,8 @@ var ItemSetCataclysmRegalia = core.ItemSet{
 	Items:   map[int32]struct{}{30169: {}, 30170: {}, 30171: {}, 30172: {}, 30173: {}},
 	Bonuses: map[int32]core.ApplyEffect{
 		4: func(agent core.Agent) {
-			agent.GetCharacter().AddPermanentAura(func(sim *core.Simulation, character *core.Character) core.Aura {
+			character := agent.GetCharacter()
+			character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 				return core.Aura{
 					ID:      core.MagicIDCataclysm4pc,
 					OnSpellHit: func(sim *core.Simulation, cast core.DirectCastAction, result *core.DirectCastDamageResult) {
@@ -101,7 +104,8 @@ var ItemSetSkyshatterRegalia = core.ItemSet{
 			agent.GetCharacter().AddStat(stats.SpellPower, 45)
 		},
 		4: func(agent core.Agent) {
-			agent.GetCharacter().AddPermanentAura(func(sim *core.Simulation, character *core.Character) core.Aura {
+			character := agent.GetCharacter()
+			character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 				return core.Aura{
 					ID:      core.MagicIDSkyshatter4pc,
 					OnSpellHit: func(sim *core.Simulation, cast core.DirectCastAction, result *core.DirectCastDamageResult) {
@@ -124,21 +128,23 @@ func ApplyNaturalAlignmentCrystal(agent core.Agent) {
 		Cooldown: time.Minute * 5,
 		SharedCooldownID: core.MagicIDAtkTrinket,
 		SharedCooldown: dur,
-		TryActivate: func(sim *core.Simulation, character *core.Character) bool {
-			character.AddStat(stats.SpellPower, sp)
+		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
+			return func(sim *core.Simulation, character *core.Character) bool {
+				character.AddStat(stats.SpellPower, sp)
 
-			character.AddAura(sim, core.Aura{
-				ID:      core.MagicIDNAC,
-				Expires: sim.CurrentTime + dur,
-				OnCast: func(sim *core.Simulation, cast core.DirectCastAction, input *core.DirectCastInput) {
-					input.ManaCost *= 1.2
-				},
-				OnExpire: func(sim *core.Simulation) {
-					character.AddStat(stats.SpellPower, -sp)
-				},
-			})
+				character.AddAura(sim, core.Aura{
+					ID:      core.MagicIDNAC,
+					Expires: sim.CurrentTime + dur,
+					OnCast: func(sim *core.Simulation, cast core.DirectCastAction, input *core.DirectCastInput) {
+						input.ManaCost *= 1.2
+					},
+					OnExpire: func(sim *core.Simulation) {
+						character.AddStat(stats.SpellPower, -sp)
+					},
+				})
 
-			return true
+				return true
+			}
 		},
 	})
 }
@@ -146,7 +152,8 @@ func ApplyNaturalAlignmentCrystal(agent core.Agent) {
 // ActivateFathomBrooch adds an aura that has a chance on cast of nature spell
 //  to restore 335 mana. 40s ICD
 func ApplyFathomBroochOfTheTidewalker(agent core.Agent) {
-	agent.GetCharacter().AddPermanentAura(func(sim *core.Simulation, character *core.Character) core.Aura {
+	character := agent.GetCharacter()
+	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		icd := core.NewICD()
 		const icdDur = time.Second * 40
 
@@ -169,7 +176,8 @@ func ApplyFathomBroochOfTheTidewalker(agent core.Agent) {
 }
 
 func ApplySkycallTotem(agent core.Agent) {
-	agent.GetCharacter().AddPermanentAura(func(sim *core.Simulation, character *core.Character) core.Aura {
+	character := agent.GetCharacter()
+	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		const hasteBonus = 101
 		const dur = time.Second * 10
 

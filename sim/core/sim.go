@@ -51,10 +51,7 @@ type Simulation struct {
 	Raid         *Raid
 	Options      Options
 	Duration     time.Duration
-	*AuraTracker // Global Debuffs mostly.. put on the boss/target
-
-	// Auras which are automatically applied on sim reset.
-	InitialAuras []InitialAura
+	auraTracker // Global Debuffs mostly.. put on the boss/target
 
 	MetricsAggregator *MetricsAggregator
 
@@ -97,9 +94,8 @@ func newSim(raid *Raid, options Options) *Simulation {
 		Raid:         raid,
 		Options:      options,
 		Duration:     DurationFromSeconds(options.Encounter.Duration),
-		InitialAuras: []InitialAura{},
 		Log: nil,
-		AuraTracker: NewAuraTracker(),
+		auraTracker: newAuraTracker(),
 		MetricsAggregator: NewMetricsAggregator(raid.Size(), options.Encounter.Duration),
 	}
 	sim.Rando = &wrappedRandom{sim: sim, Rand: rand.New(rand.NewSource(options.RSeed))}
@@ -112,16 +108,11 @@ func (sim *Simulation) GetIndividualMetrics(agentID int) AgentIterationMetrics {
 	return sim.MetricsAggregator.agentIterations[agentID]
 }
 
-func (sim *Simulation) AddInitialAura(initialAura InitialAura) {
-	sim.InitialAuras = append(sim.InitialAuras, initialAura)
-}
-
 // Reset will set sim back and erase all current state.
-// This is automatically called before every 'Run'
-//  This includes resetting and reactivating always on trinkets, auras, set bonuses, etc
-func (sim *Simulation) Reset() {
+// This is automatically called before every 'Run'.
+func (sim *Simulation) reset() {
 	sim.CurrentTime = 0.0
-	sim.ResetAuras()
+	sim.auraTracker.reset(sim)
 	if sim.Log != nil {
 		sim.Log("SIM RESET\n")
 		sim.Log("----------------------\n")
@@ -133,10 +124,6 @@ func (sim *Simulation) Reset() {
 			agent.GetCharacter().Reset(sim)
 			agent.Reset(sim)
 		}
-	}
-
-	for _, initialAura := range sim.InitialAuras {
-		sim.AddAura(sim, initialAura(sim))
 	}
 }
 
@@ -152,11 +139,11 @@ func (sim *Simulation) Run() SimResult {
 	for _, raidParty := range sim.Raid.Parties {
 		for _, player := range raidParty.Players {
 			player.GetCharacter().ID = pid
-			player.GetCharacter().AuraTracker.PID = pid
+			player.GetCharacter().auraTracker.playerID = pid
 			pid++
 		}
 	}
-	sim.AuraTracker.PID = -1 // set main sim auras to be -1 character ID.
+	sim.auraTracker.playerID = -1 // set main sim auras to be -1 character ID.
 	logsBuffer := &strings.Builder{}
 
 	if sim.Options.Debug {
@@ -175,10 +162,9 @@ func (sim *Simulation) Run() SimResult {
 	return result
 }
 
-// RunOnce will run the simulation for number of seconds.
-// Returns metrics for what was cast and how much damage was done.
+// RunOnce is the main event loop. It will run the simulation for number of seconds.
 func (sim *Simulation) RunOnce() {
-	sim.Reset()
+	sim.reset()
 
 	pendingAgents := make([]pendingAgent, 0, 25)
 	// setup initial actions.
@@ -231,5 +217,5 @@ func (sim *Simulation) Advance(elapsedTime time.Duration) {
 			agent.GetCharacter().Advance(sim, elapsedTime, newTime)
 		}
 	}
-	sim.AuraTracker.Advance(sim, elapsedTime)
+	sim.auraTracker.advance(sim, elapsedTime)
 }

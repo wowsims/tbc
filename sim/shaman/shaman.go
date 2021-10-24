@@ -146,22 +146,24 @@ func (shaman *Shaman) registerElementalMasteryCD() {
 	shaman.AddMajorCooldown(core.MajorCooldown{
 		CooldownID: core.MagicIDEleMastery,
 		Cooldown: time.Minute*3,
-		TryActivate: func(sim *core.Simulation, character *core.Character) bool {
-			character.AddAura(sim, core.Aura{
-				ID:      core.MagicIDEleMastery,
-				Expires: core.NeverExpires,
-				OnCast: func(sim *core.Simulation, cast core.DirectCastAction, input *core.DirectCastInput) {
-					input.ManaCost = 0
-					input.GuaranteedCrit = true
-				},
-				OnCastComplete: func(sim *core.Simulation, cast core.DirectCastAction) {
-					// Remove the buff and put skill on CD
-					character.SetCD(core.MagicIDEleMastery, sim.CurrentTime+time.Minute*3)
-					character.RemoveAura(sim, core.MagicIDEleMastery)
-					character.UpdateMajorCooldowns(sim)
-				},
-			})
-			return true
+		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
+			return func(sim *core.Simulation, character *core.Character) bool {
+				character.AddAura(sim, core.Aura{
+					ID:      core.MagicIDEleMastery,
+					Expires: core.NeverExpires,
+					OnCast: func(sim *core.Simulation, cast core.DirectCastAction, input *core.DirectCastInput) {
+						input.ManaCost = 0
+						input.GuaranteedCrit = true
+					},
+					OnCastComplete: func(sim *core.Simulation, cast core.DirectCastAction) {
+						// Remove the buff and put skill on CD
+						character.SetCD(core.MagicIDEleMastery, sim.CurrentTime+time.Minute*3)
+						character.RemoveAura(sim, core.MagicIDEleMastery)
+						character.UpdateMajorCooldowns(sim)
+					},
+				})
+				return true
+			}
 		},
 	})
 }

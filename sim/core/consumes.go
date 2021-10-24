@@ -8,7 +8,7 @@ import (
 )
 
 // Registers all consume-related effects to the Agent.
-func ApplyConsumeEffects(agent Agent) {
+func applyConsumeEffects(agent Agent) {
 	consumes := agent.GetCharacter().consumes
 
 	agent.GetCharacter().AddStats(consumesStats(consumes))
@@ -97,10 +97,6 @@ func registerDrumsCD(agent Agent, consumes proto.Consumes) {
 		drumsType = character.Party.buffs.Drums
 	}
 
-	if drumsType == proto.Drums_DrumsUnknown {
-		return
-	}
-
 	// TODO: If drumsSelfCast == true, then do a cast time
 	mcd := MajorCooldown{
 		CooldownID: MagicIDDrums,
@@ -109,27 +105,33 @@ func registerDrumsCD(agent Agent, consumes proto.Consumes) {
 	}
 
 	if drumsType == proto.Drums_DrumsOfBattle {
-		mcd.TryActivate = func(sim *Simulation, character *Character) bool {
-			const hasteBonus = 80
-			for _, agent := range character.Party.Players {
-				agent.GetCharacter().SetCD(MagicIDDrums, time.Minute*2+sim.CurrentTime) // tinnitus
-				AddAuraWithTemporaryStats(sim, agent.GetCharacter(), MagicIDDrums, stats.SpellHaste, hasteBonus, time.Second*30)
+		mcd.ActivationFactory = func(sim *Simulation) CooldownActivation {
+			return func(sim *Simulation, character *Character) bool {
+				const hasteBonus = 80
+				for _, agent := range character.Party.Players {
+					agent.GetCharacter().SetCD(MagicIDDrums, time.Minute*2+sim.CurrentTime) // tinnitus
+					AddAuraWithTemporaryStats(sim, agent.GetCharacter(), MagicIDDrums, stats.SpellHaste, hasteBonus, time.Second*30)
+				}
+				return true
 			}
-			return true
 		}
 	} else if drumsType == proto.Drums_DrumsOfRestoration {
-		mcd.TryActivate = func(sim *Simulation, character *Character) bool {
-			// 600 mana over 15 seconds == 200 mp5
-			const mp5Bonus = 200
-			for _, agent := range character.Party.Players {
-				agent.GetCharacter().SetCD(MagicIDDrums, time.Minute*2+sim.CurrentTime) // tinnitus
-				AddAuraWithTemporaryStats(sim, agent.GetCharacter(), MagicIDDrums, stats.MP5, mp5Bonus, time.Second*15)
+		mcd.ActivationFactory = func(sim *Simulation) CooldownActivation {
+			return func(sim *Simulation, character *Character) bool {
+				// 600 mana over 15 seconds == 200 mp5
+				const mp5Bonus = 200
+				for _, agent := range character.Party.Players {
+					agent.GetCharacter().SetCD(MagicIDDrums, time.Minute*2+sim.CurrentTime) // tinnitus
+					AddAuraWithTemporaryStats(sim, agent.GetCharacter(), MagicIDDrums, stats.MP5, mp5Bonus, time.Second*15)
+				}
+				return true
 			}
-			return true
 		}
 	}
 
-	agent.GetCharacter().AddMajorCooldown(mcd);
+	if mcd.ActivationFactory != nil {
+		agent.GetCharacter().AddMajorCooldown(mcd);
+	}
 }
 
 func registerPotionCD(agent Agent, consumes proto.Consumes) {
@@ -146,28 +148,50 @@ func registerPotionCD(agent Agent, consumes proto.Consumes) {
 
 	if defaultPotionActivation != nil {
 		if startingPotionActivation != nil && numStartingPotions > 0 {
-			mcd.TryActivate = func(sim *Simulation, character *Character) bool {
-				if character.potionsUsed < numStartingPotions {
-					return startingPotionActivation(sim, character)
-				} else {
-					return defaultPotionActivation(sim, character)
+			mcd.ActivationFactory = func(sim *Simulation) CooldownActivation {
+				// Capture this inside ActivationFactory so it resets on Sim reset.
+				numPotionsUsed := int32(0)
+
+				return func(sim *Simulation, character *Character) bool {
+					usedPotion := false
+					if numPotionsUsed < numStartingPotions {
+						usedPotion = startingPotionActivation(sim, character)
+					} else {
+						usedPotion = defaultPotionActivation(sim, character)
+					}
+					if usedPotion {
+						numPotionsUsed++
+					}
+					return usedPotion
 				}
 			}
 		} else {
-			mcd.TryActivate = defaultPotionActivation
+			mcd.ActivationFactory = func(sim *Simulation) CooldownActivation {
+				return defaultPotionActivation
+			}
 		}
 	} else if startingPotionActivation != nil && numStartingPotions > 0 {
-		mcd.TryActivate = func(sim *Simulation, character *Character) bool {
-			if character.potionsUsed < numStartingPotions {
-				return startingPotionActivation(sim, character)
-			} else {
-				character.SetCD(MagicIDPotion, NeverExpires)
-				return true
+		mcd.ActivationFactory = func(sim *Simulation) CooldownActivation {
+			// Capture this inside ActivationFactory so it resets on Sim reset.
+			numPotionsUsed := int32(0)
+
+			return func(sim *Simulation, character *Character) bool {
+				usedPotion := false
+				if numPotionsUsed < numStartingPotions {
+					usedPotion = startingPotionActivation(sim, character)
+					if usedPotion {
+						numPotionsUsed++
+					}
+					return usedPotion
+				} else {
+					character.SetCD(MagicIDPotion, NeverExpires)
+					return true
+				}
 			}
 		}
 	}
 
-	if mcd.TryActivate != nil {
+	if mcd.ActivationFactory != nil {
 		agent.GetCharacter().AddMajorCooldown(mcd)
 	}
 }
@@ -193,7 +217,6 @@ func makePotionActivation(potionType proto.Potions, character *Character) Cooldo
 			})
 
 			character.SetCD(MagicIDPotion, time.Minute*2+sim.CurrentTime)
-			character.potionsUsed++
 			return true
 		}
 	} else if potionType == proto.Potions_SuperManaPotion {
@@ -218,7 +241,6 @@ func makePotionActivation(potionType proto.Potions, character *Character) Cooldo
 			}
 
 			character.SetCD(MagicIDPotion, time.Minute*2+sim.CurrentTime)
-			character.potionsUsed++
 			return true
 		}
 	} else {
@@ -235,21 +257,23 @@ func registerDarkRuneCD(agent Agent, consumes proto.Consumes) {
 		CooldownID: MagicIDRune,
 		Cooldown: time.Minute * 2,
 		Priority: CooldownPriorityDefault,
-		TryActivate: func(sim *Simulation, character *Character) bool {
-			// Only pop if we have less than the max mana provided by the potion minus 1mp5 tick.
-			totalRegen := character.manaRegenPerSecond() * 5
-			if character.MaxMana()-(character.CurrentMana()+totalRegen) < 1500 {
-				return false
-			}
+		ActivationFactory: func(sim *Simulation) CooldownActivation {
+			return func(sim *Simulation, character *Character) bool {
+				// Only pop if we have less than the max mana provided by the potion minus 1mp5 tick.
+				totalRegen := character.manaRegenPerSecond() * 5
+				if character.MaxMana()-(character.CurrentMana()+totalRegen) < 1500 {
+					return false
+				}
 
-			// Restores 900 to 1500 mana. (2 Min Cooldown)
-			character.AddStat(stats.Mana, 900 + (sim.Rando.Float64("dark rune") * 600))
-			character.SetCD(MagicIDRune, time.Minute*2+sim.CurrentTime)
-			if sim.Log != nil {
-				sim.Log("Used Dark Rune\n")
-			}
+				// Restores 900 to 1500 mana. (2 Min Cooldown)
+				character.AddStat(stats.Mana, 900 + (sim.Rando.Float64("dark rune") * 600))
+				character.SetCD(MagicIDRune, time.Minute*2+sim.CurrentTime)
+				if sim.Log != nil {
+					sim.Log("Used Dark Rune\n")
+				}
 
-			return true
+				return true
+			}
 		},
 	})
 }

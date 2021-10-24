@@ -14,7 +14,8 @@ func init() {
 }
 
 func ApplyRobeOfTheElderScribes(agent core.Agent) {
-	agent.GetCharacter().AddPermanentAura(func(sim *core.Simulation, character *core.Character) core.Aura {
+	character := agent.GetCharacter()
+	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		// Gives a chance when your harmful spells land to increase the damage of your spells and effects by up to 130 for 10 sec. (Proc chance: 20%, 50s cooldown)
 		icd := core.NewICD()
 		const spellBonus = 130.0

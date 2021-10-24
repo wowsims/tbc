@@ -16,7 +16,8 @@ func init() {
 }
 
 func ApplyMysticalSkyfireDiamond(agent core.Agent) {
-	agent.GetCharacter().AddPermanentAura(func(sim *core.Simulation, character *core.Character) core.Aura {
+	character := agent.GetCharacter()
+	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		const hasteBonus = 320.0
 		const dur = time.Second * 4
 		const icdDur = time.Second * 35
@@ -35,7 +36,8 @@ func ApplyMysticalSkyfireDiamond(agent core.Agent) {
 }
 
 func ApplyInsightfulEarthstormDiamond(agent core.Agent) {
-	agent.GetCharacter().AddPermanentAura(func(sim *core.Simulation, character *core.Character) core.Aura {
+	character := agent.GetCharacter()
+	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		icd := core.NewICD()
 		const dur = time.Second * 15
 
@@ -55,7 +57,8 @@ func ApplyInsightfulEarthstormDiamond(agent core.Agent) {
 }
 
 func ApplyChaoticSkyfireDiamond(agent core.Agent) {
-	agent.GetCharacter().AddPermanentAura(func(sim *core.Simulation, character *core.Character) core.Aura {
+	character := agent.GetCharacter()
+	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		return core.Aura{
 			ID:      core.MagicIDChaoticSkyfire,
 			OnCast: func(sim *core.Simulation, cast core.DirectCastAction, input *core.DirectCastInput) {

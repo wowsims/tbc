@@ -115,11 +115,11 @@ func (raid *Raid) addPlayerBuffs() {
 
 // Applies buffs to the sim and all the players.
 func (raid *Raid) applyAllEffects(sim *Simulation) {
-	ApplyBuffsToSim(sim, raid.buffs)
+	applyBuffsToSim(sim, raid.buffs)
 
 	for _, party := range raid.Parties {
 		for _, player := range party.Players {
-			player.GetCharacter().ApplyAllEffects(player, party.buffs)
+			player.GetCharacter().applyAllEffects(player, party.buffs)
 		}
 	}
 }

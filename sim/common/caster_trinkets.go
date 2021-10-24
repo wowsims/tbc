@@ -134,7 +134,8 @@ func ApplyMarkOfTheChampion(agent core.Agent) {
 }
 
 func ApplyQuagmirransEye(agent core.Agent) {
-	agent.GetCharacter().AddPermanentAura(func(sim *core.Simulation, character *core.Character) core.Aura {
+	character := agent.GetCharacter()
+	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		const hasteBonus = 320.0
 		const dur = time.Second * 45
 		icd := core.NewICD()
@@ -152,7 +153,8 @@ func ApplyQuagmirransEye(agent core.Agent) {
 }
 
 func ApplyShiffarsNexusHorn(agent core.Agent) {
-	agent.GetCharacter().AddPermanentAura(func(sim *core.Simulation, character *core.Character) core.Aura {
+	character := agent.GetCharacter()
+	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		icd := core.NewICD()
 		const spellBonus = 225.0
 		const dur = time.Second * 45
@@ -173,7 +175,8 @@ func ApplyShiffarsNexusHorn(agent core.Agent) {
 }
 
 func ApplyEyeOfMagtheridon(agent core.Agent) {
-	agent.GetCharacter().AddPermanentAura(func(sim *core.Simulation, character *core.Character) core.Aura {
+	character := agent.GetCharacter()
+	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		const spellBonus = 170.0
 		const dur = time.Second * 10
 
@@ -187,7 +190,8 @@ func ApplyEyeOfMagtheridon(agent core.Agent) {
 }
 
 func ApplySextantOfUnstableCurrents(agent core.Agent) {
-	agent.GetCharacter().AddPermanentAura(func(sim *core.Simulation, character *core.Character) core.Aura {
+	character := agent.GetCharacter()
+	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		icd := core.NewICD()
 		const spellBonus = 190.0
 		const dur = time.Second * 15
@@ -209,7 +213,8 @@ func ApplySextantOfUnstableCurrents(agent core.Agent) {
 }
 
 func ApplyDarkmoonCardCrusade(agent core.Agent) {
-	agent.GetCharacter().AddPermanentAura(func(sim *core.Simulation, character *core.Character) core.Aura {
+	character := agent.GetCharacter()
+	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		const spellBonus = 8.0
 		stacks := 0
 

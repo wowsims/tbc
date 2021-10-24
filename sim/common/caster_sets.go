@@ -24,7 +24,8 @@ var ItemSetManaEtched = core.ItemSet{
 			agent.GetCharacter().AddStat(stats.SpellHit, 35)
 		},
 		4: func(agent core.Agent) {
-			agent.GetCharacter().AddPermanentAura(func(sim *core.Simulation, character *core.Character) core.Aura {
+			character := agent.GetCharacter()
+			character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 				const spellBonus = 110.0
 				const duration = time.Second * 15
 
@@ -56,7 +57,8 @@ var ItemSetSpellstrike = core.ItemSet{
 	Items:   map[int32]struct{}{24266: {}, 24262: {}},
 	Bonuses: map[int32]core.ApplyEffect{
 		2: func(agent core.Agent) {
-			agent.GetCharacter().AddPermanentAura(func(sim *core.Simulation, character *core.Character) core.Aura {
+			character := agent.GetCharacter()
+			character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 				const spellBonus = 92.0
 				const duration = time.Second * 10
 

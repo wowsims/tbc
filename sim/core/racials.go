@@ -7,7 +7,7 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-func ApplyRaceEffects(agent Agent) {
+func applyRaceEffects(agent Agent) {
 	character := agent.GetCharacter()
 
 	switch character.Race {
@@ -45,10 +45,12 @@ func ApplyRaceEffects(agent Agent) {
 			CooldownID: MagicIDOrcBloodFury,
 			Cooldown: cd,
 			Priority: CooldownPriorityDefault,
-			TryActivate: func(sim *Simulation, character *Character) bool {
-				character.SetCD(MagicIDOrcBloodFury, cd+sim.CurrentTime)
-				AddAuraWithTemporaryStats(sim, character, MagicIDOrcBloodFury, stats.SpellPower, spBonus, dur)
-				return true
+			ActivationFactory: func(sim *Simulation) CooldownActivation {
+				return func(sim *Simulation, character *Character) bool {
+					character.SetCD(MagicIDOrcBloodFury, cd+sim.CurrentTime)
+					AddAuraWithTemporaryStats(sim, character, MagicIDOrcBloodFury, stats.SpellPower, spBonus, dur)
+					return true
+				}
 			},
 		})
 
@@ -67,17 +69,19 @@ func ApplyRaceEffects(agent Agent) {
 			CooldownID: MagicIDTrollBerserking,
 			Cooldown: cd,
 			Priority: CooldownPriorityDefault,
-			TryActivate: func(sim *Simulation, character *Character) bool {
-				character.SetCD(MagicIDTrollBerserking, cd+sim.CurrentTime)
-				character.AddAura(sim, Aura{
-					ID:      MagicIDTrollBerserking,
-					Expires: sim.CurrentTime + dur,
-					OnCast: func(sim *Simulation, cast DirectCastAction, inputs *DirectCastInput) {
-						// Multiplying and then dividing lets us use integer multiplication/division which is faster.
-						inputs.CastTime = (inputs.CastTime * 10) / hasteBonus
-					},
-				})
-				return true
+			ActivationFactory: func(sim *Simulation) CooldownActivation {
+				return func(sim *Simulation, character *Character) bool {
+					character.SetCD(MagicIDTrollBerserking, cd+sim.CurrentTime)
+					character.AddAura(sim, Aura{
+						ID:      MagicIDTrollBerserking,
+						Expires: sim.CurrentTime + dur,
+						OnCast: func(sim *Simulation, cast DirectCastAction, inputs *DirectCastInput) {
+							// Multiplying and then dividing lets us use integer multiplication/division which is faster.
+							inputs.CastTime = (inputs.CastTime * 10) / hasteBonus
+						},
+					})
+					return true
+				}
 			},
 		})
 	case proto.Race_RaceUndead:

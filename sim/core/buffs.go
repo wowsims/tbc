@@ -8,22 +8,22 @@ import (
 )
 
 // Applies buffs that affect the sim as a whole.
-func ApplyBuffsToSim(sim *Simulation, buffs proto.Buffs) {
+func applyBuffsToSim(sim *Simulation, buffs proto.Buffs) {
 	if buffs.Misery {
-		sim.AddInitialAura(func(sim *Simulation) Aura {
+		sim.AddPermanentAura(func(sim *Simulation) Aura {
 			return MiseryAura()
 		})
 	}
 
 	if buffs.JudgementOfWisdom {
-		sim.AddInitialAura(func(sim *Simulation) Aura {
+		sim.AddPermanentAura(func(sim *Simulation) Aura {
 			return AuraJudgementOfWisdom()
 		})
 	}
 }
 
 // Applies buffs that affect individual players.
-func ApplyBuffEffects(agent Agent, buffs proto.Buffs) {
+func applyBuffEffects(agent Agent, buffs proto.Buffs) {
 	character := agent.GetCharacter()
 
 	if buffs.ArcaneBrilliance {
@@ -154,28 +154,33 @@ func registerBloodlustCD(agent Agent, buffs proto.Buffs) {
 		return
 	}
 
-	dur := time.Second * 40
+	const dur = time.Second * 40
 
 	agent.GetCharacter().AddMajorCooldown(MajorCooldown{
 		CooldownID: MagicIDBloodlust,
 		Cooldown: dur, // assumes that multiple BLs are different shaman.
 		Priority: CooldownPriorityBloodlust,
-		TryActivate: func(sim *Simulation, character *Character) bool {
-			if character.bloodlustsUsed < numBloodlusts {
-				character.SetCD(MagicIDBloodlust, sim.CurrentTime+dur)
-				character.Party.AddAura(sim, Aura{
-					ID:      MagicIDBloodlust,
-					Expires: sim.CurrentTime + dur,
-					OnCast: func(sim *Simulation, cast DirectCastAction, input *DirectCastInput) {
-						// Multiply and divide lets us use integer math, which is better for perf.
-						input.CastTime = (input.CastTime * 10) / 13 // 30% faster
-					},
-				})
-				character.bloodlustsUsed++
-				return true
-			} else {
-				character.SetCD(MagicIDBloodlust, sim.CurrentTime+time.Minute*10)
-				return true
+		ActivationFactory: func(sim *Simulation) CooldownActivation {
+			// Capture this inside ActivationFactory so it resets on Sim reset.
+			bloodlustsUsed := int32(0)
+
+			return func(sim *Simulation, character *Character) bool {
+				if bloodlustsUsed < numBloodlusts {
+					character.SetCD(MagicIDBloodlust, sim.CurrentTime+dur)
+					character.Party.AddAura(sim, Aura{
+						ID:      MagicIDBloodlust,
+						Expires: sim.CurrentTime + dur,
+						OnCast: func(sim *Simulation, cast DirectCastAction, input *DirectCastInput) {
+							// Multiply and divide lets us use integer math, which is better for perf.
+							input.CastTime = (input.CastTime * 10) / 13 // 30% faster
+						},
+					})
+					bloodlustsUsed++
+					return true
+				} else {
+					character.SetCD(MagicIDBloodlust, sim.CurrentTime+time.Minute*10)
+					return true
+				}
 			}
 		},
 	})

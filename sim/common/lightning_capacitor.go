@@ -12,7 +12,8 @@ func init() {
 }
 
 func ApplyTheLightningCapacitor(agent core.Agent) {
-	agent.GetCharacter().AddPermanentAura(func(sim *core.Simulation, character *core.Character) core.Aura {
+	character := agent.GetCharacter()
+	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		charges := 0
 
 		const icdDur = time.Millisecond * 2500
