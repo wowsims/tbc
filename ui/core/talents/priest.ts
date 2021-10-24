@@ -432,6 +432,207 @@ export class PriestTalentsPicker extends TalentsPicker<Spec.SpecShadowPriest> {
         name: 'Shadow',
         backgroundUrl: 'https://wow.zamimg.com/images/wow/talents/backgrounds/tbc/203.jpg',
         talents: [
+          {
+            //fieldName: 'spiritTap',
+            location: {
+              rowIdx: 0,
+              colIdx: 1,
+            },
+            spellIds: [15270, 15335],
+            maxPoints: 5,
+          },
+          {
+            //fieldName: 'blackout',
+            location: {
+              rowIdx: 0,
+              colIdx: 2,
+            },
+            spellIds: [15268, 15323],
+            maxPoints: 5,
+          },
+          {
+            //fieldName: 'shadowAffinity',
+            location: {
+              rowIdx: 1,
+              colIdx: 0,
+            },
+            spellIds: [15318, 15272, 15320],
+            maxPoints: 3,
+          },
+          {
+            fieldName: 'improvedShadowWordPain',
+            location: {
+              rowIdx: 1,
+              colIdx: 1,
+            },
+            spellIds: [15275, 15317],
+            maxPoints: 2,
+          },
+          {
+            fieldName: 'shadowFocus',
+            location: {
+              rowIdx: 1,
+              colIdx: 2,
+            },
+            spellIds: [15260, 15327],
+            maxPoints: 5,
+          },
+          {
+            //fieldName: 'improvedPsychicScream',
+            location: {
+              rowIdx: 2,
+              colIdx: 0,
+            },
+            spellIds: [15392, 15448],
+            maxPoints: 2,
+          },
+          {
+            fieldName: 'improvedMindBlast',
+            location: {
+              rowIdx: 2,
+              colIdx: 1,
+            },
+            spellIds: [15273, 15312, 15313, 15314, 15316],
+            maxPoints: 5,
+          },
+          {
+            fieldName: 'mindFlay',
+            location: {
+              rowIdx: 2,
+              colIdx: 2,
+            },
+            spellIds: [15407],
+            maxPoints: 1,
+          },
+          {
+            //fieldName: 'improvedFade',
+            location: {
+              rowIdx: 3,
+              colIdx: 1,
+            },
+            spellIds: [15274, 15311],
+            maxPoints: 2,
+          },
+          {
+            //fieldName: 'shadowReach',
+            location: {
+              rowIdx: 3,
+              colIdx: 2,
+            },
+            spellIds: [17322],
+            maxPoints: 2,
+          },
+          {
+            fieldName: 'shadowWeaving',
+            location: {
+              rowIdx: 3,
+              colIdx: 3,
+            },
+            spellIds: [15257, 15331],
+            maxPoints: 5,
+          },
+          {
+            //fieldName: 'silence',
+            location: {
+              rowIdx: 4,
+              colIdx: 0,
+            },
+            prereqLocation: {
+              rowIdx: 2,
+              colIdx: 0,
+            },
+            spellIds: [15487],
+            maxPoints: 1,
+          },
+          {
+            fieldName: 'vampiricEmbrace',
+            location: {
+              rowIdx: 4,
+              colIdx: 1,
+            },
+            spellIds: [15286],
+            maxPoints: 1,
+          },
+          {
+            fieldName: 'improvedVampiricEmbrace',
+            location: {
+              rowIdx: 4,
+              colIdx: 2,
+            },
+            spellIds: [27839],
+            maxPoints: 2,
+          },
+          {
+            fieldName: 'focusedMind',
+            location: {
+              rowIdx: 4,
+              colIdx: 3,
+            },
+            spellIds: [33213],
+            maxPoints: 3,
+          },
+          {
+            //fieldName: 'shadowResilience',
+            location: {
+              rowIdx: 5,
+              colIdx: 0,
+            },
+            spellIds: [14910, 33371],
+            maxPoints: 2,
+          },
+          {
+            fieldName: 'darkness',
+            location: {
+              rowIdx: 5,
+              colIdx: 2,
+            },
+            spellIds: [15259, 15307],
+            maxPoints: 5,
+          },
+          {
+            fieldName: 'shadowform',
+            location: {
+              rowIdx: 6,
+              colIdx: 1,
+            },
+            prereqLocation: {
+              rowIdx: 4,
+              colIdx: 1,
+            },
+            spellIds: [15473],
+            maxPoints: 1,
+          },
+          {
+            fieldName: 'shadowPower',
+            location: {
+              rowIdx: 6,
+              colIdx: 2,
+            },
+            spellIds: [33221],
+            maxPoints: 5,
+          },
+          {
+            fieldName: 'misery',
+            location: {
+              rowIdx: 7,
+              colIdx: 2,
+            },
+            spellIds: [33191],
+            maxPoints: 5,
+          },
+          {
+            fieldName: 'vampiricTouch',
+            location: {
+              rowIdx: 8,
+              colIdx: 1,
+            },
+            prereqLocation: {
+              rowIdx: 6,
+              colIdx: 1,
+            },
+            spellIds: [34914],
+            maxPoints: 1,
+          },
         ],
       },
     ]);
