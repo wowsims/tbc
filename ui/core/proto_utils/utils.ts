@@ -19,6 +19,7 @@ import { BalanceDruid, BalanceDruid_Rotation as BalanceDruidRotation, DruidTalen
 import { ElementalShaman, ElementalShaman_Rotation as ElementalShamanRotation, ShamanTalents, ElementalShaman_Options as ElementalShamanOptions } from '/tbc/core/proto/shaman.js';
 import { ShadowPriest, ShadowPriest_Rotation as ShadowPriestRotation, PriestTalents, ShadowPriest_Options as ShadowPriestOptions } from '/tbc/core/proto/priest.js';
 
+export type DruidSpecs = Spec.SpecBalanceDruid;
 export type ShamanSpecs = Spec.SpecElementalShaman;
 export type PriestSpecs = Spec.SpecShadowPriest;
 
