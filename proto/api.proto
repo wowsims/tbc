@@ -7,6 +7,7 @@ import "common.proto";
 import "druid.proto";
 import "priest.proto";
 import "shaman.proto";
+import "warlock.proto";
 
 message PlayerOptions {
     Race race = 1;
@@ -34,8 +35,6 @@ message Mage {
 message Paladin {
 }
 message Rogue {
-}
-message Warlock {
 }
 message Warrior {
 }

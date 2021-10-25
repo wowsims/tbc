@@ -18,16 +18,23 @@ import { WeaponType } from '/tbc/core/proto/common.js';
 import { BalanceDruid, BalanceDruid_Rotation as BalanceDruidRotation, DruidTalents, BalanceDruid_Options as BalanceDruidOptions} from '/tbc/core/proto/druid.js';
 import { ElementalShaman, ElementalShaman_Rotation as ElementalShamanRotation, ShamanTalents, ElementalShaman_Options as ElementalShamanOptions } from '/tbc/core/proto/shaman.js';
 import { ShadowPriest, ShadowPriest_Rotation as ShadowPriestRotation, PriestTalents, ShadowPriest_Options as ShadowPriestOptions } from '/tbc/core/proto/priest.js';
+import { Warlock, Warlock_Rotation as WarlockRotation, WarlockTalents, Warlock_Options as WarlockOptions } from '/tbc/core/proto/warlock.js';
 
 export type DruidSpecs = Spec.SpecBalanceDruid;
 export type ShamanSpecs = Spec.SpecElementalShaman;
 export type PriestSpecs = Spec.SpecShadowPriest;
+export type WarlockSpecs = Spec.SpecWarlock;
 
-export type RotationUnion = BalanceDruidRotation | ElementalShamanRotation | ShadowPriestRotation;
+export type RotationUnion =
+		BalanceDruidRotation |
+		ElementalShamanRotation |
+		ShadowPriestRotation |
+		WarlockRotation;
 export type SpecRotation<T extends Spec> =
 		T extends Spec.SpecBalanceDruid ? BalanceDruidRotation :
 		T extends Spec.SpecElementalShaman ? ElementalShamanRotation :
 		T extends Spec.SpecShadowPriest ? ShadowPriestRotation :
+		T extends Spec.SpecWarlock ? WarlockRotation :
 		ElementalShamanRotation; // Should never reach this case
 
 export type TalentsUnion = DruidTalents | PriestTalents | ShamanTalents;
@@ -35,20 +42,31 @@ export type SpecTalents<T extends Spec> =
 		T extends Spec.SpecBalanceDruid ? DruidTalents :
 		T extends Spec.SpecElementalShaman ? ShamanTalents :
 		T extends Spec.SpecShadowPriest ? PriestTalents :
+		T extends Spec.SpecWarlock ? WarlockTalents :
 		ShamanTalents; // Should never reach this case
 
-export type SpecOptionsUnion = BalanceDruidOptions | ElementalShamanOptions | ShadowPriestOptions;
+export type SpecOptionsUnion =
+		BalanceDruidOptions |
+		ElementalShamanOptions |
+		ShadowPriestOptions |
+		WarlockOptions;
 export type SpecOptions<T extends Spec> =
 		T extends Spec.SpecBalanceDruid ? BalanceDruidOptions :
 		T extends Spec.SpecElementalShaman ? ElementalShamanOptions :
 		T extends Spec.SpecShadowPriest ? ShadowPriestOptions :
+		T extends Spec.SpecWarlock ? WarlockOptions :
 		ElementalShamanOptions; // Should never reach this case
 
-export type SpecProtoUnion = BalanceDruid | ElementalShaman | ShadowPriest;
+export type SpecProtoUnion =
+		BalanceDruid |
+		ElementalShaman |
+		ShadowPriest |
+		Warlock;
 export type SpecProto<T extends Spec> =
 		T extends Spec.SpecBalanceDruid ? BalanceDruid :
 		T extends Spec.SpecElementalShaman ? ElementalShaman :
 		T extends Spec.SpecShadowPriest ? ShadowPriest :
+		T extends Spec.SpecWarlock ? Warlock :
 		ElementalShaman; // Should never reach this case
 
 export type SpecTypeFunctions<SpecType extends Spec> = {
@@ -129,12 +147,32 @@ export const specTypeFunctions: Partial<Record<Spec, SpecTypeFunctions<any>>> = 
     optionsToJson: (a) => ShadowPriestOptions.toJson(a as ShadowPriestOptions),
     optionsFromJson: (obj) => ShadowPriestOptions.fromJson(obj),
   },
+  [Spec.SpecWarlock]: {
+    rotationCreate: () => WarlockRotation.create(),
+    rotationEquals: (a, b) => WarlockRotation.equals(a as WarlockRotation, b as WarlockRotation),
+    rotationCopy: (a) => WarlockRotation.clone(a as WarlockRotation),
+    rotationToJson: (a) => WarlockRotation.toJson(a as WarlockRotation),
+    rotationFromJson: (obj) => WarlockRotation.fromJson(obj),
+
+    talentsCreate: () => WarlockTalents.create(),
+    talentsEquals: (a, b) => WarlockTalents.equals(a as WarlockTalents, b as WarlockTalents),
+    talentsCopy: (a) => WarlockTalents.clone(a as WarlockTalents),
+    talentsToJson: (a) => WarlockTalents.toJson(a as WarlockTalents),
+    talentsFromJson: (obj) => WarlockTalents.fromJson(obj),
+
+    optionsCreate: () => WarlockOptions.create(),
+    optionsEquals: (a, b) => WarlockOptions.equals(a as WarlockOptions, b as WarlockOptions),
+    optionsCopy: (a) => WarlockOptions.clone(a as WarlockOptions),
+    optionsToJson: (a) => WarlockOptions.toJson(a as WarlockOptions),
+    optionsFromJson: (obj) => WarlockOptions.fromJson(obj),
+  },
 };
 
 export const specToClass: Record<Spec, Class> = {
   [Spec.SpecBalanceDruid]: Class.ClassDruid,
   [Spec.SpecElementalShaman]: Class.ClassShaman,
   [Spec.SpecShadowPriest]: Class.ClassPriest,
+  [Spec.SpecWarlock]: Class.ClassWarlock,
 };
 
 const druidRaces = [
@@ -159,11 +197,19 @@ const shamanRaces = [
     Race.RaceTroll10,
     Race.RaceTroll30,
 ];
+const warlockRaces = [
+    Race.RaceBloodElf,
+    Race.RaceGnome,
+    Race.RaceHuman,
+    Race.RaceOrc,
+    Race.RaceUndead,
+];
 
 export const specToEligibleRaces: Record<Spec, Array<Race>> = {
   [Spec.SpecBalanceDruid]: druidRaces,
   [Spec.SpecElementalShaman]: shamanRaces,
   [Spec.SpecShadowPriest]: priestRaces,
+  [Spec.SpecWarlock]: warlockRaces,
 };
 
 // Prefixes used for storing browser data for each site. Even if a Spec is
@@ -172,6 +218,7 @@ export const specToLocalStorageKey: Record<Spec, string> = {
   [Spec.SpecBalanceDruid]: '__balance_druid',
   [Spec.SpecElementalShaman]: '__elemental_shaman',
   [Spec.SpecShadowPriest]: '__shadow_priest',
+  [Spec.SpecWarlock]: '__warlock',
 };
 
 // Returns a copy of playerOptions, with the class field set.
@@ -209,6 +256,16 @@ export function withSpecProto<SpecType extends Spec>(
         rotation: rotation,
         talents: talents as PriestTalents,
         options: specOptions as ShadowPriestOptions,
+      }),
+    };
+  } else if (WarlockRotation.is(rotation)) {
+		copy.class = Class.ClassWarlock;
+    copy.spec = {
+      oneofKind: 'warlock',
+      warlock: Warlock.create({
+        rotation: rotation,
+        talents: talents as WarlockTalents,
+        options: specOptions as WarlockOptions,
       }),
     };
   } else {
