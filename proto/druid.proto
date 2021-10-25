@@ -25,7 +25,7 @@ message DruidTalents {
 		// Feral Combat
     int32 ferocity = 17;
     int32 feral_aggresion = 18;
-    int32 shapened_claws = 19;
+    int32 sharpened_claws = 19;
     int32 shredding_attacks = 20;
     int32 predatory_strikes = 21;
     int32 primal_fury = 22;
