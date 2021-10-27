@@ -5,7 +5,6 @@ import { Sim } from '/tbc/core/sim.js';
 
 import { TalentsPicker } from './talents_picker.js';
 
-// Talents are the same for all Warlock specs, so its ok to just use Warlock here
 export class WarlockTalentsPicker extends TalentsPicker<Spec.SpecWarlock> {
   constructor(parent: HTMLElement, sim: Sim<Spec.SpecWarlock>) {
     super(parent, sim, [
