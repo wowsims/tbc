@@ -12,7 +12,7 @@ const NeverExpires = time.Duration(math.MaxInt64)
 type Aura struct {
 	ID          int32
 	Expires     time.Duration // time at which aura will be removed
-	activeIndex int32         // Position of this aura's index in the sim.ActiveAuraIDs array
+	activeIndex int32         // Position of this aura's index in the sim.activeAuraIDs array
 
 	// The number of stacks, or charges, of this aura. If this aura doesn't care
 	// about charges, is just 0.
@@ -56,16 +56,16 @@ type auraTracker struct {
 	cooldowns [MagicIDLen]time.Duration
 
 	// Maps MagicIDs to aura for that ID. Using array for perf.
-	Auras [MagicIDLen]Aura
+	auras [MagicIDLen]Aura
 
 	// IDs of Auras that are active, in no particular order
-	ActiveAuraIDs []int32
+	activeAuraIDs []int32
 }
 
 func newAuraTracker() auraTracker {
 	return auraTracker{
 		permanentAuras: []PermanentAura{},
-		ActiveAuraIDs: make([]int32, 0, 5),
+		activeAuraIDs: make([]int32, 0, 5),
 	}
 }
 
@@ -87,9 +87,9 @@ func (at *auraTracker) finalize() {
 }
 
 func (at *auraTracker) reset(sim *Simulation) {
-	at.Auras = [MagicIDLen]Aura{}
+	at.auras = [MagicIDLen]Aura{}
 	at.cooldowns = [MagicIDLen]time.Duration{}
-	at.ActiveAuraIDs = at.ActiveAuraIDs[:0]
+	at.activeAuraIDs = at.activeAuraIDs[:0]
 
 	for _, permAura := range at.permanentAuras {
 		aura := permAura(sim)
@@ -100,9 +100,9 @@ func (at *auraTracker) reset(sim *Simulation) {
 
 func (at *auraTracker) advance(sim *Simulation, newTime time.Duration) {
 	// Go in reverse order so we can safely delete while looping
-	for i := len(at.ActiveAuraIDs) - 1; i >= 0; i-- {
-		id := at.ActiveAuraIDs[i]
-		if at.Auras[id].Expires != 0 && at.Auras[id].Expires <= newTime {
+	for i := len(at.activeAuraIDs) - 1; i >= 0; i-- {
+		id := at.activeAuraIDs[i]
+		if at.auras[id].Expires != 0 && at.auras[id].Expires <= newTime {
 			at.RemoveAura(sim, id)
 		}
 	}
@@ -120,9 +120,9 @@ func (at *auraTracker) AddAura(sim *Simulation, newAura Aura) {
 		at.RemoveAura(sim, newAura.ID)
 	}
 
-	at.Auras[newAura.ID] = newAura
-	at.Auras[newAura.ID].activeIndex = int32(len(at.ActiveAuraIDs))
-	at.ActiveAuraIDs = append(at.ActiveAuraIDs, newAura.ID)
+	at.auras[newAura.ID] = newAura
+	at.auras[newAura.ID].activeIndex = int32(len(at.activeAuraIDs))
+	at.activeAuraIDs = append(at.activeAuraIDs, newAura.ID)
 
 	if sim.Log != nil {
 		sim.Log("(%d) +%s\n", at.playerID, AuraName(newAura.ID))
@@ -131,21 +131,21 @@ func (at *auraTracker) AddAura(sim *Simulation, newAura Aura) {
 
 // Remove an aura by its ID
 func (at *auraTracker) RemoveAura(sim *Simulation, id int32) {
-	if at.Auras[id].OnExpire != nil {
-		at.Auras[id].OnExpire(sim)
+	if at.auras[id].OnExpire != nil {
+		at.auras[id].OnExpire(sim)
 	}
-	removeActiveIndex := at.Auras[id].activeIndex
-	at.Auras[id] = Aura{}
+	removeActiveIndex := at.auras[id].activeIndex
+	at.auras[id] = Aura{}
 
 	// Overwrite the element being removed with the last element
-	otherAuraID := at.ActiveAuraIDs[len(at.ActiveAuraIDs)-1]
+	otherAuraID := at.activeAuraIDs[len(at.activeAuraIDs)-1]
 	if id != otherAuraID {
-		at.ActiveAuraIDs[removeActiveIndex] = otherAuraID
-		at.Auras[otherAuraID].activeIndex = removeActiveIndex
+		at.activeAuraIDs[removeActiveIndex] = otherAuraID
+		at.auras[otherAuraID].activeIndex = removeActiveIndex
 	}
 
 	// Now we can remove the last element, in constant time
-	at.ActiveAuraIDs = at.ActiveAuraIDs[:len(at.ActiveAuraIDs)-1]
+	at.activeAuraIDs = at.activeAuraIDs[:len(at.activeAuraIDs)-1]
 
 	if sim.Log != nil {
 		sim.Log("(%d) -%s\n", at.playerID, AuraName(id))
@@ -154,7 +154,7 @@ func (at *auraTracker) RemoveAura(sim *Simulation, id int32) {
 
 // Returns whether an aura with the given ID is currently active.
 func (at *auraTracker) HasAura(id int32) bool {
-	return at.Auras[id].ID != 0
+	return at.auras[id].ID != 0
 }
 
 func (at *auraTracker) IsOnCD(magicID int32, currentTime time.Duration) bool {
@@ -172,6 +172,42 @@ func (at *auraTracker) GetRemainingCD(magicID int32, currentTime time.Duration) 
 
 func (at *auraTracker) SetCD(magicID int32, newCD time.Duration) {
 	at.cooldowns[magicID] = newCD
+}
+
+// Invokes the OnCast event for all tracked Auras.
+func (at *auraTracker) OnCast(sim *Simulation, cast DirectCastAction, castInput *DirectCastInput) {
+	for _, id := range at.activeAuraIDs {
+		if at.auras[id].OnCast != nil {
+			at.auras[id].OnCast(sim, cast, castInput)
+		}
+	}
+}
+
+// Invokes the OnCastComplete event for all tracked Auras.
+func (at *auraTracker) OnCastComplete(sim *Simulation, cast DirectCastAction) {
+	for _, id := range at.activeAuraIDs {
+		if at.auras[id].OnCastComplete != nil {
+			at.auras[id].OnCastComplete(sim, cast)
+		}
+	}
+}
+
+// Invokes the OnSpellMiss event for all tracked Auras.
+func (at *auraTracker) OnSpellMiss(sim *Simulation, cast DirectCastAction) {
+	for _, id := range at.activeAuraIDs {
+		if at.auras[id].OnSpellMiss != nil {
+			at.auras[id].OnSpellMiss(sim, cast)
+		}
+	}
+}
+
+// Invokes the OnSpellHit event for all tracked Auras.
+func (at *auraTracker) OnSpellHit(sim *Simulation, cast DirectCastAction, result *DirectCastDamageResult) {
+	for _, id := range at.activeAuraIDs {
+		if at.auras[id].OnSpellHit != nil {
+			at.auras[id].OnSpellHit(sim, cast, result)
+		}
+	}
 }
 
 func AuraName(a int32) string {

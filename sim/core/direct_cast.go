@@ -173,16 +173,8 @@ func (action DirectCastAction) internalOnCastComplete(sim *Simulation) {
 	}
 
 	action.OnCastComplete(sim, action)
-	for _, id := range character.ActiveAuraIDs {
-		if character.Auras[id].OnCastComplete != nil {
-			character.Auras[id].OnCastComplete(sim, action)
-		}
-	}
-	for _, id := range sim.ActiveAuraIDs {
-		if sim.Auras[id].OnCastComplete != nil {
-			sim.Auras[id].OnCastComplete(sim, action)
-		}
-	}
+	character.OnCastComplete(sim, action)
+	sim.OnCastComplete(sim, action)
 
 	hitInputs := action.GetHitInputs(sim, action)
 
@@ -194,28 +186,12 @@ func (action DirectCastAction) internalOnCastComplete(sim *Simulation) {
 		if result.Hit {
 			// Apply any on spell hit effects.
 			action.OnSpellHit(sim, action, &result)
-			for _, id := range character.ActiveAuraIDs {
-				if character.Auras[id].OnSpellHit != nil {
-					character.Auras[id].OnSpellHit(sim, action, &result)
-				}
-			}
-			for _, id := range sim.ActiveAuraIDs {
-				if sim.Auras[id].OnSpellHit != nil {
-					sim.Auras[id].OnSpellHit(sim, action, &result)
-				}
-			}
+			character.OnSpellHit(sim, action, &result)
+			sim.OnSpellHit(sim, action, &result)
 		} else {
 			action.OnSpellMiss(sim, action)
-			for _, id := range character.ActiveAuraIDs {
-				if character.Auras[id].OnSpellMiss != nil {
-					character.Auras[id].OnSpellMiss(sim, action)
-				}
-			}
-			for _, id := range sim.ActiveAuraIDs {
-				if sim.Auras[id].OnSpellMiss != nil {
-					sim.Auras[id].OnSpellMiss(sim, action)
-				}
-			}
+			character.OnSpellMiss(sim, action)
+			sim.OnSpellMiss(sim, action)
 		}
 
 		if sim.Log != nil {
@@ -296,11 +272,7 @@ func NewDirectCastAction(sim *Simulation, impl DirectCastImpl) DirectCastAction 
 	castInput.CastTime = time.Duration(float64(castInput.CastTime) / character.HasteBonus())
 
 	// Apply on-cast effects.
-	for _, id := range character.ActiveAuraIDs {
-		if character.Auras[id].OnCast != nil {
-			character.Auras[id].OnCast(sim, action, &castInput)
-		}
-	}
+	character.OnCast(sim, action, &castInput)
 
 	// By panicking if spell is on CD, we force each sim to properly check for their own CDs.
 	if !castInput.IgnoreCooldowns {
