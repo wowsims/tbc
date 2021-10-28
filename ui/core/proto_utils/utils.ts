@@ -17,30 +17,40 @@ import { WeaponType } from '/tbc/core/proto/common.js';
 
 import { BalanceDruid, BalanceDruid_Rotation as BalanceDruidRotation, DruidTalents, BalanceDruid_Options as BalanceDruidOptions} from '/tbc/core/proto/druid.js';
 import { ElementalShaman, ElementalShaman_Rotation as ElementalShamanRotation, ShamanTalents, ElementalShaman_Options as ElementalShamanOptions } from '/tbc/core/proto/shaman.js';
+import { Mage, Mage_Rotation as MageRotation, MageTalents, Mage_Options as MageOptions } from '/tbc/core/proto/mage.js';
 import { ShadowPriest, ShadowPriest_Rotation as ShadowPriestRotation, PriestTalents, ShadowPriest_Options as ShadowPriestOptions } from '/tbc/core/proto/priest.js';
 import { Warlock, Warlock_Rotation as WarlockRotation, WarlockTalents, Warlock_Options as WarlockOptions } from '/tbc/core/proto/warlock.js';
 
 export type DruidSpecs = Spec.SpecBalanceDruid;
-export type ShamanSpecs = Spec.SpecElementalShaman;
+export type MageSpecs = Spec.SpecMage;
 export type PriestSpecs = Spec.SpecShadowPriest;
+export type ShamanSpecs = Spec.SpecElementalShaman;
 export type WarlockSpecs = Spec.SpecWarlock;
 
 export type RotationUnion =
 		BalanceDruidRotation |
 		ElementalShamanRotation |
+		MageRotation |
 		ShadowPriestRotation |
 		WarlockRotation;
 export type SpecRotation<T extends Spec> =
 		T extends Spec.SpecBalanceDruid ? BalanceDruidRotation :
 		T extends Spec.SpecElementalShaman ? ElementalShamanRotation :
+		T extends Spec.SpecMage ? MageRotation :
 		T extends Spec.SpecShadowPriest ? ShadowPriestRotation :
 		T extends Spec.SpecWarlock ? WarlockRotation :
 		ElementalShamanRotation; // Should never reach this case
 
-export type TalentsUnion = DruidTalents | PriestTalents | ShamanTalents;
+export type TalentsUnion =
+		DruidTalents |
+		MageTalents |
+		PriestTalents |
+		ShamanTalents |
+		WarlockTalents;
 export type SpecTalents<T extends Spec> =
 		T extends Spec.SpecBalanceDruid ? DruidTalents :
 		T extends Spec.SpecElementalShaman ? ShamanTalents :
+		T extends Spec.SpecMage ? MageTalents :
 		T extends Spec.SpecShadowPriest ? PriestTalents :
 		T extends Spec.SpecWarlock ? WarlockTalents :
 		ShamanTalents; // Should never reach this case
@@ -48,11 +58,13 @@ export type SpecTalents<T extends Spec> =
 export type SpecOptionsUnion =
 		BalanceDruidOptions |
 		ElementalShamanOptions |
+		MageOptions |
 		ShadowPriestOptions |
 		WarlockOptions;
 export type SpecOptions<T extends Spec> =
 		T extends Spec.SpecBalanceDruid ? BalanceDruidOptions :
 		T extends Spec.SpecElementalShaman ? ElementalShamanOptions :
+		T extends Spec.SpecMage ? MageOptions :
 		T extends Spec.SpecShadowPriest ? ShadowPriestOptions :
 		T extends Spec.SpecWarlock ? WarlockOptions :
 		ElementalShamanOptions; // Should never reach this case
@@ -60,11 +72,13 @@ export type SpecOptions<T extends Spec> =
 export type SpecProtoUnion =
 		BalanceDruid |
 		ElementalShaman |
+		Mage |
 		ShadowPriest |
 		Warlock;
 export type SpecProto<T extends Spec> =
 		T extends Spec.SpecBalanceDruid ? BalanceDruid :
 		T extends Spec.SpecElementalShaman ? ElementalShaman :
+		T extends Spec.SpecMage ? Mage :
 		T extends Spec.SpecShadowPriest ? ShadowPriest :
 		T extends Spec.SpecWarlock ? Warlock :
 		ElementalShaman; // Should never reach this case
@@ -128,6 +142,25 @@ export const specTypeFunctions: Partial<Record<Spec, SpecTypeFunctions<any>>> = 
     optionsToJson: (a) => ElementalShamanOptions.toJson(a as ElementalShamanOptions),
     optionsFromJson: (obj) => ElementalShamanOptions.fromJson(obj),
   },
+  [Spec.SpecMage]: {
+    rotationCreate: () => MageRotation.create(),
+    rotationEquals: (a, b) => MageRotation.equals(a as MageRotation, b as MageRotation),
+    rotationCopy: (a) => MageRotation.clone(a as MageRotation),
+    rotationToJson: (a) => MageRotation.toJson(a as MageRotation),
+    rotationFromJson: (obj) => MageRotation.fromJson(obj),
+
+    talentsCreate: () => MageTalents.create(),
+    talentsEquals: (a, b) => MageTalents.equals(a as MageTalents, b as MageTalents),
+    talentsCopy: (a) => MageTalents.clone(a as MageTalents),
+    talentsToJson: (a) => MageTalents.toJson(a as MageTalents),
+    talentsFromJson: (obj) => MageTalents.fromJson(obj),
+
+    optionsCreate: () => MageOptions.create(),
+    optionsEquals: (a, b) => MageOptions.equals(a as MageOptions, b as MageOptions),
+    optionsCopy: (a) => MageOptions.clone(a as MageOptions),
+    optionsToJson: (a) => MageOptions.toJson(a as MageOptions),
+    optionsFromJson: (obj) => MageOptions.fromJson(obj),
+  },
   [Spec.SpecShadowPriest]: {
     rotationCreate: () => ShadowPriestRotation.create(),
     rotationEquals: (a, b) => ShadowPriestRotation.equals(a as ShadowPriestRotation, b as ShadowPriestRotation),
@@ -171,6 +204,7 @@ export const specTypeFunctions: Partial<Record<Spec, SpecTypeFunctions<any>>> = 
 export const specToClass: Record<Spec, Class> = {
   [Spec.SpecBalanceDruid]: Class.ClassDruid,
   [Spec.SpecElementalShaman]: Class.ClassShaman,
+  [Spec.SpecMage]: Class.ClassMage,
   [Spec.SpecShadowPriest]: Class.ClassPriest,
   [Spec.SpecWarlock]: Class.ClassWarlock,
 };
@@ -178,6 +212,15 @@ export const specToClass: Record<Spec, Class> = {
 const druidRaces = [
     Race.RaceNightElf,
     Race.RaceTauren,
+];
+const mageRaces = [
+    Race.RaceBloodElf,
+    Race.RaceDraenei,
+    Race.RaceGnome,
+    Race.RaceHuman,
+    Race.RaceTroll10,
+    Race.RaceTroll30,
+    Race.RaceUndead,
 ];
 const priestRaces = [
     Race.RaceBloodElf,
@@ -208,6 +251,7 @@ const warlockRaces = [
 export const specToEligibleRaces: Record<Spec, Array<Race>> = {
   [Spec.SpecBalanceDruid]: druidRaces,
   [Spec.SpecElementalShaman]: shamanRaces,
+  [Spec.SpecMage]: mageRaces,
   [Spec.SpecShadowPriest]: priestRaces,
   [Spec.SpecWarlock]: warlockRaces,
 };
@@ -217,6 +261,7 @@ export const specToEligibleRaces: Record<Spec, Array<Race>> = {
 export const specToLocalStorageKey: Record<Spec, string> = {
   [Spec.SpecBalanceDruid]: '__balance_druid',
   [Spec.SpecElementalShaman]: '__elemental_shaman',
+  [Spec.SpecMage]: '__mage',
   [Spec.SpecShadowPriest]: '__shadow_priest',
   [Spec.SpecWarlock]: '__warlock',
 };
@@ -246,6 +291,16 @@ export function withSpecProto<SpecType extends Spec>(
         rotation: rotation,
         talents: talents as ShamanTalents,
         options: specOptions as ElementalShamanOptions,
+      }),
+    };
+  } else if (MageRotation.is(rotation)) {
+		copy.class = Class.ClassMage;
+    copy.spec = {
+      oneofKind: 'mage',
+      mage: Mage.create({
+        rotation: rotation,
+        talents: talents as MageTalents,
+        options: specOptions as MageOptions,
       }),
     };
   } else if (ShadowPriestRotation.is(rotation)) {

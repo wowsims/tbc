@@ -5,6 +5,7 @@ option go_package = "./proto";
 
 import "common.proto";
 import "druid.proto";
+import "mage.proto";
 import "priest.proto";
 import "shaman.proto";
 import "warlock.proto";
@@ -29,8 +30,6 @@ message PlayerOptions {
 }
 
 message Hunter {
-}
-message Mage {
 }
 message Paladin {
 }
