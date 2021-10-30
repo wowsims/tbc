@@ -4,6 +4,7 @@ import { Spec } from '/tbc/core/proto/common.js';
 import { specToClass } from '/tbc/core/proto_utils/utils.js';
 
 import { DruidTalentsPicker } from './druid.js';
+import { MageTalentsPicker } from './mage.js';
 import { PriestTalentsPicker } from './priest.js';
 import { ShamanTalentsPicker } from './shaman.js';
 import { WarlockTalentsPicker } from './warlock.js';
@@ -16,6 +17,9 @@ export function newTalentsPicker<SpecType extends Spec>(spec: Spec, parent: HTML
       break;
     case Spec.SpecElementalShaman:
       return new ShamanTalentsPicker(parent, sim as Sim<Spec.SpecElementalShaman>) as TalentsPicker<SpecType>;
+      break;
+    case Spec.SpecMage:
+      return new MageTalentsPicker(parent, sim as Sim<Spec.SpecMage>) as TalentsPicker<SpecType>;
       break;
     case Spec.SpecShadowPriest:
       return new PriestTalentsPicker(parent, sim as Sim<Spec.SpecShadowPriest>) as TalentsPicker<SpecType>;

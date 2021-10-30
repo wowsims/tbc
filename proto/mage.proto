@@ -10,7 +10,7 @@ message MageTalents {
 	int32 wand_specialization = 3;
 	int32 arcane_concentration = 4;
 	int32 arcane_impact = 5;
-	int32 arcane_medidation = 6;
+	int32 arcane_meditation = 6;
 	bool presence_of_mind = 7;
 	int32 arcane_mind = 8;
 	int32 arcane_instability = 9;
