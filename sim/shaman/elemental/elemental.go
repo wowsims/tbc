@@ -5,17 +5,16 @@ import (
 
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/proto"
-	"github.com/wowsims/tbc/sim/core/stats"
 	. "github.com/wowsims/tbc/sim/shaman"
 )
 
 func RegisterElementalShaman() {
-	core.RegisterAgentFactory(proto.PlayerOptions_ElementalShaman{}, func(sim *core.Simulation, character core.Character, options *proto.PlayerOptions) core.Agent {
-		return NewElementalShaman(sim, character, options)
+	core.RegisterAgentFactory(proto.PlayerOptions_ElementalShaman{}, func(simParams core.IndividualParams, character core.Character, options *proto.PlayerOptions) core.Agent {
+		return NewElementalShaman(simParams, character, options)
 	})
 }
 
-func NewElementalShaman(sim *core.Simulation, character core.Character, options *proto.PlayerOptions) *Shaman {
+func NewElementalShaman(simParams core.IndividualParams, character core.Character, options *proto.PlayerOptions) *Shaman {
 	eleShamOptions := options.GetElementalShaman()
 
 	selfBuffs := SelfBuffs{
@@ -30,15 +29,15 @@ func NewElementalShaman(sim *core.Simulation, character core.Character, options 
 
 	switch eleShamOptions.Rotation.Type {
 	case proto.ElementalShaman_Rotation_Adaptive:
-		rotation = NewAdaptiveRotation(sim)
+		rotation = NewAdaptiveRotation(simParams)
 	case proto.ElementalShaman_Rotation_CLOnClearcast:
-		rotation = NewCLOnClearcastRotation(sim)
+		rotation = NewCLOnClearcastRotation()
 	case proto.ElementalShaman_Rotation_CLOnCD:
-		rotation = NewCLOnCDRotation(sim)
+		rotation = NewCLOnCDRotation()
 	case proto.ElementalShaman_Rotation_FixedLBCL:
-		rotation = NewFixedRotation(sim, eleShamOptions.Rotation.LbsPerCl)
+		rotation = NewFixedRotation(eleShamOptions.Rotation.LbsPerCl)
 	case proto.ElementalShaman_Rotation_LBOnly:
-		rotation = NewLBOnlyRotation(sim)
+		rotation = NewLBOnlyRotation()
 	}
 
 	return NewShaman(character, *eleShamOptions.Talents, selfBuffs, rotation)
@@ -58,7 +57,7 @@ func (agent *LBOnlyRotation) OnActionAccepted(shaman *Shaman, sim *core.Simulati
 }
 func (agent *LBOnlyRotation) Reset(shaman *Shaman, sim *core.Simulation) {}
 
-func NewLBOnlyRotation(sim *core.Simulation) *LBOnlyRotation {
+func NewLBOnlyRotation() *LBOnlyRotation {
 	return &LBOnlyRotation{}
 }
 
@@ -80,7 +79,7 @@ func (agent *CLOnCDRotation) OnActionAccepted(shaman *Shaman, sim *core.Simulati
 }
 func (agent *CLOnCDRotation) Reset(shaman *Shaman, sim *core.Simulation) {}
 
-func NewCLOnCDRotation(sim *core.Simulation) *CLOnCDRotation {
+func NewCLOnCDRotation() *CLOnCDRotation {
 	return &CLOnCDRotation{}
 }
 
@@ -137,7 +136,7 @@ func (agent *FixedRotation) Reset(shaman *Shaman, sim *core.Simulation) {
 	agent.numLBsSinceLastCL = agent.numLBsPerCL // This lets us cast CL first
 }
 
-func NewFixedRotation(sim *core.Simulation, numLBsPerCL int32) *FixedRotation {
+func NewFixedRotation(numLBsPerCL int32) *FixedRotation {
 	return &FixedRotation{
 		numLBsPerCL: numLBsPerCL,
 	}
@@ -167,7 +166,7 @@ func (agent *CLOnClearcastRotation) Reset(shaman *Shaman, sim *core.Simulation) 
 	agent.prevPrevCastProccedCC = true // Lets us cast CL first
 }
 
-func NewCLOnClearcastRotation(sim *core.Simulation) *CLOnClearcastRotation {
+func NewCLOnClearcastRotation() *CLOnClearcastRotation {
 	return &CLOnClearcastRotation{}
 }
 
@@ -240,11 +239,11 @@ func (agent *AdaptiveRotation) ChooseAction(shaman *Shaman, sim *core.Simulation
 
 	if sim.Log != nil {
 		manaSpendingRate := manaSpent / timeDelta.Seconds()
-		sim.Log("[AI] CL Ready: Mana/s: %0.1f, Est Mana Cost: %0.1f, CurrentMana: %0.1f\n", manaSpendingRate, projectedManaCost, shaman.Stats[stats.Mana])
+		sim.Log("[AI] CL Ready: Mana/s: %0.1f, Est Mana Cost: %0.1f, CurrentMana: %0.1f\n", manaSpendingRate, projectedManaCost, shaman.CurrentMana())
 	}
 
 	// If we have enough mana to burn, use the surplus agent.
-	if projectedManaCost < shaman.Stats[stats.Mana] {
+	if projectedManaCost < shaman.CurrentMana() {
 		return agent.surplusRotation.ChooseAction(shaman, sim)
 	} else {
 		return agent.baseRotation.ChooseAction(shaman, sim)
@@ -264,10 +263,10 @@ func (agent *AdaptiveRotation) Reset(shaman *Shaman, sim *core.Simulation) {
 	agent.surplusRotation.Reset(shaman, sim)
 }
 
-func NewAdaptiveRotation(sim *core.Simulation) *AdaptiveRotation {
+func NewAdaptiveRotation(simParams core.IndividualParams) *AdaptiveRotation {
 	agent := &AdaptiveRotation{}
 
-	clearcastParams := sim.IndividualParams
+	clearcastParams := simParams
 	clearcastParams.Options.Debug = false
 	clearcastParams.Options.Iterations = 100
 
@@ -276,23 +275,23 @@ func NewAdaptiveRotation(sim *core.Simulation) *AdaptiveRotation {
 
 	// Assign new eleShamParams
 	clearcastParams.PlayerOptions = &proto.PlayerOptions{
-		Race: sim.IndividualParams.PlayerOptions.Race, //primitive, no pointer
+		Race: simParams.PlayerOptions.Race, //primitive, no pointer
 		Spec: &proto.PlayerOptions_ElementalShaman{
 			ElementalShaman: &eleShamParams,
 		},
 		// reuse pointer since this isn't mutated
-		Consumes: sim.IndividualParams.PlayerOptions.Consumes,
+		Consumes: simParams.PlayerOptions.Consumes,
 	}
 
 	clearcastSim := core.NewIndividualSim(clearcastParams)
 	clearcastResult := clearcastSim.Run()
 
 	if clearcastResult.Agents[0].NumOom >= 5 {
-		agent.baseRotation = NewLBOnlyRotation(sim)
-		agent.surplusRotation = NewCLOnClearcastRotation(sim)
+		agent.baseRotation = NewLBOnlyRotation()
+		agent.surplusRotation = NewCLOnClearcastRotation()
 	} else {
-		agent.baseRotation = NewCLOnClearcastRotation(sim)
-		agent.surplusRotation = NewCLOnCDRotation(sim)
+		agent.baseRotation = NewCLOnClearcastRotation()
+		agent.surplusRotation = NewCLOnCDRotation()
 	}
 
 	return agent

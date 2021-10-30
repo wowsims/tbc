@@ -16,7 +16,7 @@ func init() {
 func TestP1FullCharacterStats(t *testing.T) {
 	params := core.IndividualParams{
 		Equip:       P1Gear,
-		Race:        core.RaceBonusTypeTroll10,
+		Race:        proto.Race_RaceTroll10,
 		Class:       proto.Class_ClassShaman,
 		Consumes:    FullConsumes,
 		Buffs:       FullBuffs,
@@ -42,7 +42,7 @@ func TestP1FullCharacterStats(t *testing.T) {
 		stats.SpellCrit: 637.8,
 
 		stats.Mana:  10349,
-		stats.Armor: 9170,
+		stats.Armor: 9211.5,
 	})
 }
 
@@ -58,7 +58,7 @@ var ReferenceStat = stats.SpellPower
 func TestCalcStatWeight(t *testing.T) {
 	params := core.IndividualParams{
 		Equip:       P1Gear,
-		Race:        core.RaceBonusTypeTroll10,
+		Race:        proto.Race_RaceTroll10,
 		Class:       proto.Class_ClassShaman,
 		Consumes:    FullConsumes,
 		Buffs:       FullBuffs,
@@ -85,7 +85,7 @@ func TestSimulatePreRaidNoBuffs(t *testing.T) {
 
 		// no consumes
 		Buffs: BasicBuffs,
-		Race:  core.RaceBonusTypeTroll10,
+		Race:  proto.Race_RaceTroll10,
 		Class: proto.Class_ClassShaman,
 
 		PlayerOptions: &PlayerOptionsAdaptiveNoBuffs,
@@ -103,7 +103,7 @@ func TestSimulatePreRaid(t *testing.T) {
 
 		Consumes: FullConsumes,
 		Buffs:    FullBuffs,
-		Race:     core.RaceBonusTypeOrc,
+		Race:     proto.Race_RaceOrc,
 		Class:    proto.Class_ClassShaman,
 
 		PlayerOptions: &PlayerOptionsAdaptive,
@@ -121,7 +121,7 @@ func TestSimulateP1(t *testing.T) {
 
 		Consumes: FullConsumes,
 		Buffs:    FullBuffs,
-		Race:     core.RaceBonusTypeOrc,
+		Race:     proto.Race_RaceOrc,
 		Class:    proto.Class_ClassShaman,
 
 		PlayerOptions: &PlayerOptionsAdaptive,
@@ -135,7 +135,7 @@ func TestSimulateP1(t *testing.T) {
 // func TestMultiTarget(t *testing.T) {
 // 	params := core.IndividualParams{
 // 		Equip:         P1Gear,
-// 		Race:          core.RaceBonusTypeOrc,
+// 		Race:          proto.Race_RaceOrc,
 //    Class:         proto.Class_ClassShaman,
 // 		Consumes:      FullConsumes,
 // 		Buffs:         FullBuffs,
@@ -158,7 +158,7 @@ func TestLBOnlyAgent(t *testing.T) {
 
 		Consumes: FullConsumes,
 		Buffs:    FullBuffs,
-		Race:     core.RaceBonusTypeOrc,
+		Race:     proto.Race_RaceOrc,
 		Class:    proto.Class_ClassShaman,
 
 		PlayerOptions: &PlayerOptionsLBOnly,
@@ -190,7 +190,7 @@ func TestClearcastAgent(t *testing.T) {
 
 		Consumes: FullConsumes,
 		Buffs:    FullBuffs,
-		Race:     core.RaceBonusTypeOrc,
+		Race:     proto.Race_RaceOrc,
     Class:    proto.Class_ClassShaman,
 
 		PlayerOptions: &PlayerOptionsCLOnClearcast,
@@ -204,7 +204,7 @@ func TestClearcastAgent(t *testing.T) {
 func TestAverageDPS(t *testing.T) {
 	params := core.IndividualParams{
 		Equip:         P1Gear,
-		Race:          core.RaceBonusTypeOrc,
+		Race:          proto.Race_RaceOrc,
     Class:         proto.Class_ClassShaman,
 		Consumes:      FullConsumes,
 		Buffs:         FullBuffs,
@@ -218,7 +218,7 @@ func TestAverageDPS(t *testing.T) {
 func BenchmarkSimulate(b *testing.B) {
 	params := core.IndividualParams{
 		Equip:    P1Gear,
-		Race:     core.RaceBonusTypeOrc,
+		Race:     proto.Race_RaceOrc,
     Class:    proto.Class_ClassShaman,
 		Consumes: FullConsumes,
 		Buffs:    FullBuffs,

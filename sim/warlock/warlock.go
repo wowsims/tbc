@@ -18,23 +18,16 @@ func (warlock *Warlock) GetCharacter() *core.Character {
 }
 
 func (warlock *Warlock) AddRaidBuffs(buffs *proto.Buffs) {
+	//sim.AddAura(sim, CurseOfElementsAura(warlock.malediction))
 }
 func (warlock *Warlock) AddPartyBuffs(buffs *proto.Buffs) {
 }
 
+func (warlock *Warlock) Reset(sim *core.Simulation) {}
+
 func (warlock *Warlock) Act(sim *core.Simulation) time.Duration {
 	return core.NeverExpires // makes the bot wait forever and do nothing.
 }
-
-func (warlock *Warlock) Start(sim *core.Simulation) time.Duration {
-	return warlock.Act(sim)
-}
-
-func (warlock *Warlock) BuffUp(sim *core.Simulation) {
-	sim.AddAura(sim, CurseOfElementsAura(warlock.malediction))
-}
-
-func (warlock *Warlock) Reset(sim *core.Simulation) {}
 
 func CurseOfElementsAura(malediction int) core.Aura {
 	multiplier := 1.10 + 0.1*float64(malediction)

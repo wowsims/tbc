@@ -8,36 +8,37 @@ import (
 )
 
 func init() {
-	core.AddActiveItem(core.ItemIDTheLightningCapacitor, core.ActiveItem{BuffUp: ActivateTLC, ActivateCD: core.NeverExpires, SharedID: core.MagicIDAtkTrinket})
+	core.AddItemEffect(core.ItemIDTheLightningCapacitor, ApplyTheLightningCapacitor)
 }
 
-func ActivateTLC(sim *core.Simulation, agent core.Agent) {
+func ApplyTheLightningCapacitor(agent core.Agent) {
 	character := agent.GetCharacter()
-	charges := 0
+	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
+		charges := 0
 
-	const icdDur = time.Millisecond * 2500
-	icd := core.NewICD()
+		const icdDur = time.Millisecond * 2500
+		icd := core.NewICD()
 
-	character.AddAura(sim, core.Aura{
-		ID:      core.MagicIDTLC,
-		Expires: core.NeverExpires,
-		OnSpellHit: func(sim *core.Simulation, cast core.DirectCastAction, result *core.DirectCastDamageResult) {
-			if icd.IsOnCD(sim) {
-				return
-			}
+		return core.Aura{
+			ID:      core.MagicIDTLC,
+			OnSpellHit: func(sim *core.Simulation, cast core.DirectCastAction, result *core.DirectCastDamageResult) {
+				if icd.IsOnCD(sim) {
+					return
+				}
 
-			if !result.Crit {
-				return
-			}
+				if !result.Crit {
+					return
+				}
 
-			charges++
-			if charges >= 3 {
-				icd = core.InternalCD(sim.CurrentTime + icdDur)
-				charges = 0
-				castAction := NewLightningCapacitorCast(sim, character)
-				castAction.Act(sim)
-			}
-		},
+				charges++
+				if charges >= 3 {
+					icd = core.InternalCD(sim.CurrentTime + icdDur)
+					charges = 0
+					castAction := NewLightningCapacitorCast(sim, character)
+					castAction.Act(sim)
+				}
+			},
+		}
 	})
 }
 

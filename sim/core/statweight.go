@@ -18,7 +18,7 @@ type StatWeightsResult struct {
 
 func CalcStatWeight(params IndividualParams, statsToWeigh []stats.Stat, referenceStat stats.Stat) StatWeightsResult {
 	baseSim := NewIndividualSim(params)
-	baseStats := baseSim.Raid.Parties[0].Players[0].GetCharacter().Stats
+	baseStats := baseSim.Raid.Parties[0].Players[0].GetCharacter().GetStats()
 	baselineResult := baseSim.Run()
 
 	var waitGroup sync.WaitGroup

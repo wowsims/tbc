@@ -10,16 +10,13 @@ import (
 // Agent can be thought of as the 'Player', i.e. the thing controlling the Character.
 // This is the interface implemented by each class/spec.
 type Agent interface {
-	// The Character controller by this Agent.
+	// The Character controlled by this Agent.
 	GetCharacter() *Character
 
 	// Updates the input Buffs to include raid-wide buffs provided by this Agent.
 	AddRaidBuffs(*proto.Buffs)
 	// Updates the input Buffs to include party-wide buffs provided by this Agent.
 	AddPartyBuffs(*proto.Buffs)
-
-	// Any pre-start buffs to apply to the raid/party/self
-	BuffUp(*Simulation)
 
 	// Returns this Agent to its initial state. Called before each Sim iteration.
 	Reset(newsim *Simulation)
@@ -29,11 +26,6 @@ type Agent interface {
 	// will call this again; it will call Act() at the time specified by the return
 	// value.
 	Act(*Simulation) time.Duration
-
-	// This will be called instead of Act() for the very first loop iteration after each
-	// Simulation reset. Like Act(), the return value is the time at which the Agent
-	// would like Act() to be called.
-	Start(*Simulation) time.Duration
 }
 
 type ActionID struct {
@@ -69,7 +61,7 @@ type AgentAction interface {
 	Act(sim *Simulation) bool
 }
 
-type AgentFactory func(*Simulation, Character, *proto.PlayerOptions) Agent
+type AgentFactory func(IndividualParams, Character, *proto.PlayerOptions) Agent
 
 var agentFactories map[string]AgentFactory = make(map[string]AgentFactory)
 
@@ -83,13 +75,14 @@ func RegisterAgentFactory(emptyOptions interface{}, factory AgentFactory) {
 	agentFactories[typeName] = factory
 }
 
-func NewAgent(sim *Simulation, character Character, playerOptions *proto.PlayerOptions) Agent {
-	typeName := reflect.TypeOf(playerOptions.GetSpec()).Elem().Name()
+func NewAgent(params IndividualParams) Agent {
+	typeName := reflect.TypeOf(params.PlayerOptions.GetSpec()).Elem().Name()
 
 	factory, ok := agentFactories[typeName]
 	if !ok {
 		panic("No agent factory for type: " + typeName)
 	}
 
-	return factory(sim, character, playerOptions)
+	character := NewCharacter(params.Equip, params.Race, params.Class, params.Consumes, params.CustomStats)
+	return factory(params, character, params.PlayerOptions)
 }

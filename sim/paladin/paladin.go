@@ -24,16 +24,9 @@ func (paladin *Paladin) AddRaidBuffs(buffs *proto.Buffs) {
 func (paladin *Paladin) AddPartyBuffs(buffs *proto.Buffs) {
 }
 
+func (paladin *Paladin) Reset(sim *core.Simulation) {
+}
+
 func (paladin *Paladin) Act(sim *core.Simulation) time.Duration {
 	return core.NeverExpires // makes the bot wait forever and do nothing.
-}
-
-func (paladin *Paladin) Start(sim *core.Simulation) time.Duration {
-	return paladin.Act(sim)
-}
-
-func (paladin *Paladin) BuffUp(sim *core.Simulation) {
-}
-
-func (paladin *Paladin) Reset(sim *core.Simulation) {
 }

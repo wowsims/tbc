@@ -34,7 +34,7 @@ type Encounter struct {
 
 type IndividualParams struct {
 	Equip    items.EquipmentSpec
-	Race     RaceBonusType
+	Race     proto.Race
 	Class    proto.Class
 	Consumes proto.Consumes
 	Buffs    proto.Buffs
@@ -51,10 +51,7 @@ type Simulation struct {
 	Raid         *Raid
 	Options      Options
 	Duration     time.Duration
-	*AuraTracker // Global Debuffs mostly.. put on the boss/target
-
-	// Auras which are automatically applied on sim reset.
-	InitialAuras []InitialAura
+	auraTracker // Global Debuffs mostly.. put on the boss/target
 
 	MetricsAggregator *MetricsAggregator
 
@@ -64,9 +61,6 @@ type Simulation struct {
 
 	Log  func(string, ...interface{})
 	logs []string
-
-	// Holds the params used to create this sim, so similar sims can be run if needed.
-	IndividualParams IndividualParams
 }
 
 type wrappedRandom struct {
@@ -83,46 +77,15 @@ func (wr *wrappedRandom) Float64(src string) float64 {
 
 func NewIndividualSim(params IndividualParams) *Simulation {
 	raid := NewRaid(params.Buffs)
-	sim := newSim(raid, params.Options, 1)
-	sim.IndividualParams = params
-
-	character := NewCharacter(params.Equip, params.Race, params.Class, params.Consumes, params.CustomStats)
-	agent := NewAgent(sim, character, params.PlayerOptions)
-	raid.AddPlayer(agent)
-	raid.AddPlayerBuffs()
-
-	raid.ApplyBuffs(sim)
-
-	sim.Reset()
-
-	// Now apply all the 'final' stat improvements.
-	// TODO: Figure out how to handle buffs that buff based on other buffs...
-	//   for now this hardcoded buffing works...
-	for _, raidParty := range sim.Raid.Parties {
-		for _, player := range raidParty.Players {
-			if raid.Buffs.BlessingOfKings {
-				player.GetCharacter().InitialStats[stats.Stamina] *= 1.1
-				player.GetCharacter().InitialStats[stats.Agility] *= 1.1
-				player.GetCharacter().InitialStats[stats.Strength] *= 1.1
-				player.GetCharacter().InitialStats[stats.Intellect] *= 1.1
-				player.GetCharacter().InitialStats[stats.Spirit] *= 1.1
-			}
-			if raid.Buffs.DivineSpirit == proto.TristateEffect_TristateEffectImproved {
-				player.GetCharacter().InitialStats[stats.SpellPower] += player.GetCharacter().InitialStats[stats.Spirit] * 0.1
-			}
-			// Add SpellCrit from Int and Mana from Int
-			player.GetCharacter().InitialStats = player.GetCharacter().InitialStats.CalculatedTotal()
-		}
-	}
-
-	// Reset again to make sure updated initial stats are propagated.
-	sim.Reset()
+	raid.AddPlayer(NewAgent(params))
+	sim := newSim(raid, params.Options)
+	raid.Finalize(sim)
 
 	return sim
 }
 
 // New sim contructs a simulator with the given equipment / options.
-func newSim(raid *Raid, options Options, numPlayers int) *Simulation {
+func newSim(raid *Raid, options Options) *Simulation {
 	if options.RSeed == 0 {
 		options.RSeed = time.Now().Unix()
 	}
@@ -131,10 +94,9 @@ func newSim(raid *Raid, options Options, numPlayers int) *Simulation {
 		Raid:         raid,
 		Options:      options,
 		Duration:     DurationFromSeconds(options.Encounter.Duration),
-		InitialAuras: []InitialAura{},
 		Log: nil,
-		AuraTracker: NewAuraTracker(),
-		MetricsAggregator: NewMetricsAggregator(numPlayers, options.Encounter.Duration),
+		auraTracker: newAuraTracker(),
+		MetricsAggregator: NewMetricsAggregator(raid.Size(), options.Encounter.Duration),
 	}
 	sim.Rando = &wrappedRandom{sim: sim, Rand: rand.New(rand.NewSource(options.RSeed))}
 
@@ -146,16 +108,11 @@ func (sim *Simulation) GetIndividualMetrics(agentID int) AgentIterationMetrics {
 	return sim.MetricsAggregator.agentIterations[agentID]
 }
 
-func (sim *Simulation) AddInitialAura(initialAura InitialAura) {
-	sim.InitialAuras = append(sim.InitialAuras, initialAura)
-}
-
 // Reset will set sim back and erase all current state.
-// This is automatically called before every 'Run'
-//  This includes resetting and reactivating always on trinkets, auras, set bonuses, etc
-func (sim *Simulation) Reset() {
+// This is automatically called before every 'Run'.
+func (sim *Simulation) reset() {
 	sim.CurrentTime = 0.0
-	sim.ResetAuras()
+	sim.auraTracker.reset(sim)
 	if sim.Log != nil {
 		sim.Log("SIM RESET\n")
 		sim.Log("----------------------\n")
@@ -164,21 +121,9 @@ func (sim *Simulation) Reset() {
 	// Reset all players
 	for _, party := range sim.Raid.Parties {
 		for _, agent := range party.Players {
-			agent.GetCharacter().Reset()
+			agent.GetCharacter().Reset(sim)
 			agent.Reset(sim)
 		}
-	}
-
-	// Now buff everyone back up!
-	for _, party := range sim.Raid.Parties {
-		for _, agent := range party.Players {
-			agent.BuffUp(sim) // for now do this first to match order of adding auras as original sim.
-			agent.GetCharacter().BuffUp(sim, agent)
-		}
-	}
-
-	for _, initialAura := range sim.InitialAuras {
-		sim.AddAura(sim, initialAura(sim))
 	}
 }
 
@@ -194,11 +139,11 @@ func (sim *Simulation) Run() SimResult {
 	for _, raidParty := range sim.Raid.Parties {
 		for _, player := range raidParty.Players {
 			player.GetCharacter().ID = pid
-			player.GetCharacter().AuraTracker.PID = pid
+			player.GetCharacter().auraTracker.playerID = pid
 			pid++
 		}
 	}
-	sim.AuraTracker.PID = -1 // set main sim auras to be -1 character ID.
+	sim.auraTracker.playerID = -1 // set main sim auras to be -1 character ID.
 	logsBuffer := &strings.Builder{}
 
 	if sim.Options.Debug {
@@ -217,24 +162,16 @@ func (sim *Simulation) Run() SimResult {
 	return result
 }
 
-// RunOnce will run the simulation for number of seconds.
-// Returns metrics for what was cast and how much damage was done.
+// RunOnce is the main event loop. It will run the simulation for number of seconds.
 func (sim *Simulation) RunOnce() {
-	sim.Reset()
+	sim.reset()
 
 	pendingAgents := make([]pendingAgent, 0, 25)
 	// setup initial actions.
 	for _, party := range sim.Raid.Parties {
 		for _, agent := range party.Players {
-			agent.GetCharacter().TryActivateConsumes(sim)
-			nextActionAt := agent.Start(sim)
-
-			if nextActionAt == NeverExpires {
-				continue // This means agent will not perform any actions at all
-			}
-
 			pendingAgents = append(pendingAgents, pendingAgent{
-				NextActionAt: nextActionAt,
+				NextActionAt: 0,
 				Agent:        agent,
 			})
 		}
@@ -251,7 +188,7 @@ func (sim *Simulation) RunOnce() {
 			sim.Advance(pa.NextActionAt - sim.CurrentTime)
 		}
 
-		pa.Agent.GetCharacter().TryActivateConsumes(sim)
+		pa.Agent.GetCharacter().TryUseCooldowns(sim)
 		pa.NextActionAt = pa.Agent.Act(sim)
 
 		if len(pendingAgents) == 1 {
@@ -280,5 +217,5 @@ func (sim *Simulation) Advance(elapsedTime time.Duration) {
 			agent.GetCharacter().Advance(sim, elapsedTime, newTime)
 		}
 	}
-	sim.AuraTracker.Advance(sim, elapsedTime)
+	sim.auraTracker.advance(sim, elapsedTime)
 }

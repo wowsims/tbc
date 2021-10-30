@@ -9,6 +9,10 @@ type Stats [Len]float64
 
 type Stat byte
 
+// Use internal representation instead of proto.Stat so we can add functions
+// and use 'byte' as the data type.
+//
+// This needs to stay synced with proto.Stat.
 const (
 	Strength Stat = iota
 	Agility
@@ -116,6 +120,16 @@ func (this Stats) Add(other Stats) Stats {
 	return newStats
 }
 
+func (this Stats) Equals(other Stats) bool {
+	for i := range this {
+		if this[i] != other[i] {
+			return false
+		}
+	}
+
+	return true
+}
+
 func (this Stats) EqualsWithTolerance(other Stats, tolerance float64) bool {
 	for i := range this {
 		if this[i] < other[i]-tolerance || this[i] > other[i]+tolerance {
@@ -143,15 +157,123 @@ func (this Stats) String() string {
 	return sb.String()
 }
 
-// CalculatedTotal will add Mana and Crit from Int and return the new stats.
-//   TODO: These numbers might change from class to class and so we might need to make this per-class.
-func (s Stats) CalculatedTotal() Stats {
-	stats := s
-	// Add crit/mana from int
-	stats[SpellCrit] += (stats[Intellect] / 78.1) * 22.08
-	stats[Mana] += stats[Intellect] * 15
-	return stats
+// Given the current values for source and mod stats, should return the new
+// value for the mod stat.
+type StatModifier func(sourceValue float64, modValue float64) float64
+
+// Represents a dependency between two stats, whereby the value of one stat
+// modifies the value of the other.
+//
+// For example, many casters have a talent to increase their spell power by
+// a percentage of their intellect.
+type StatDependency struct {
+	// The stat which will be used to control the amount of increase.
+	SourceStat Stat
+
+	// The stat which will be modified, depending on the value of SourceStat.
+	ModifiedStat Stat
+
+	// Applies the stat modification.
+	Modifier StatModifier
 }
+
+type StatDependencyManager struct {
+	// Stat dependencies for each stat.
+	// First dimension is the modified stat. For each modified stat, stores a list of
+	// dependencies for that stat.
+	deps [Len][]StatDependency
+
+	// Whether Finalize() has been called.
+	finalized bool
+
+	// Dependencies being managed, sorted so that their modifiers can be applied
+	// in-order without any issues.
+	sortedDeps []StatDependency
+}
+
+func (sdm *StatDependencyManager) AddStatDependency(dep StatDependency) {
+	if sdm.finalized {
+		panic("Stat dependencies may not be added once finalized!")
+	}
+
+	sdm.deps[dep.ModifiedStat] = append(sdm.deps[dep.ModifiedStat], dep)
+}
+
+// Populates sortedDeps. Panics if there are any dependency cycles.
+// TODO: Figure out if we need to separate additive / multiplicative dependencies.
+func (sdm *StatDependencyManager) Finalize() {
+	if sdm.finalized {
+		return
+	}
+	sdm.finalized = true
+
+	sdm.sortedDeps = []StatDependency{}
+
+	// Set of stats we're done processing.
+	processedStats := map[Stat]struct{}{}
+
+	for len(processedStats) < int(Len) {
+		numNewlyProcessed := 0
+		for i := 0; i < int(Len); i++ {
+			stat := Stat(i)
+
+			if _, alreadyProcessed := processedStats[stat]; alreadyProcessed {
+				continue
+			}
+
+			// If all deps for this stat have been processed or are the same stat, we can process it.
+			allDepsProcessed := true
+			for _, dep := range sdm.deps[stat] {
+				_, depAlreadyProcessed := processedStats[dep.SourceStat]
+
+				if !depAlreadyProcessed && dep.SourceStat != stat {
+					allDepsProcessed = false
+				}
+			}
+			if !allDepsProcessed {
+				continue
+			}
+
+			// Process this stat by adding its deps to sortedDeps.
+
+			// Add deps from other stats first.
+			for _, dep := range sdm.deps[stat] {
+				if dep.SourceStat != stat {
+					sdm.sortedDeps = append(sdm.sortedDeps, dep)
+				}
+			}
+
+			// Now add deps from the same stat.
+			for _, dep := range sdm.deps[stat] {
+				if dep.SourceStat == stat {
+					sdm.sortedDeps = append(sdm.sortedDeps, dep)
+				}
+			}
+
+			// Mark this stat as processed.
+			processedStats[stat] = struct{}{}
+			numNewlyProcessed++
+		}
+
+		// If we couldn't process any new stats but there are still stats left,
+		// there must be a circular dependency.
+		if numNewlyProcessed == 0 {
+			panic("Circular stat dependency detected")
+		}
+	}
+}
+
+// Applies all stat dependencies and returns the new Stats.
+func (sdm *StatDependencyManager) ApplyStatDependencies(stats Stats) Stats {
+	newStats := stats
+
+	for _, dep := range sdm.sortedDeps {
+		newStats[dep.ModifiedStat] = dep.Modifier(newStats[dep.SourceStat], newStats[dep.ModifiedStat])
+	}
+
+	return newStats
+}
+
 
 // TODO: more stat calculations
 
