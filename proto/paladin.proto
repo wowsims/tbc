@@ -1,0 +1,58 @@
+syntax = "proto3";
+package proto;
+
+option go_package = "./proto";
+
+message PaladinTalents {
+	// Holy
+	int32 divine_strength = 1;
+	int32 divine_intellect = 2;
+	int32 improved_seal_of_righteousness = 3;
+	int32 illumination = 34;
+	int32 improved_blessing_of_wisdom = 4;
+	bool divine_favor = 5;
+	int32 purifying_power = 6;
+	int32 holy_power = 7;
+	bool holy_shock = 8;
+	int32 holy_guidance = 9;
+	bool divine_illumination = 10;
+
+	// Protection
+	int32 precision = 11;
+	bool blessing_of_kings = 12;
+	int32 reckoning = 13;
+	int32 sacred_duty = 14;
+	int32 one_handed_weapon_specialization = 15;
+	int32 combat_expertise = 16;
+	bool avengers_shield = 17;
+
+	// Retribution
+	int32 improved_blessing_of_might = 18;
+	int32 benediction = 19;
+	int32 improved_judgement = 20;
+	int32 improved_seal_of_the_crusader = 21;
+	int32 vindication = 22;
+	int32 conviction = 23;
+	bool seal_of_command = 24;
+	int32 crusade = 25;
+	int32 two_handed_weapon_specialization = 26;
+	bool sanctity_aura = 27;
+	int32 improved_sanctity_aura = 28;
+	int32 vengeance = 29;
+	int32 sanctified_judgement = 30;
+	int32 sanctified_seals = 31;
+	int32 fanaticism = 32;
+	bool crusader_strike = 33;
+}
+
+message RetributionPaladin {
+    message Rotation {
+    }
+    Rotation rotation = 1;
+
+    PaladinTalents talents = 2;
+    
+    message Options {
+    }
+    Options options = 3;
+}

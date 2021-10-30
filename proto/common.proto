@@ -7,8 +7,9 @@ enum Spec {
     SpecBalanceDruid = 0;
     SpecElementalShaman = 1;
     SpecMage = 2;
-    SpecShadowPriest = 3;
-    SpecWarlock = 4;
+    SpecRetributionPaladin = 3;
+    SpecShadowPriest = 4;
+    SpecWarlock = 5;
 }
 
 enum Race {
