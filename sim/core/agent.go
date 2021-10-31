@@ -61,7 +61,7 @@ type AgentAction interface {
 	Act(sim *Simulation) bool
 }
 
-type AgentFactory func(IndividualParams, Character, *proto.PlayerOptions) Agent
+type AgentFactory func(Character, proto.PlayerOptions, proto.IndividualSimRequest) Agent
 
 var agentFactories map[string]AgentFactory = make(map[string]AgentFactory)
 
@@ -75,14 +75,19 @@ func RegisterAgentFactory(emptyOptions interface{}, factory AgentFactory) {
 	agentFactories[typeName] = factory
 }
 
-func NewAgent(params IndividualParams) Agent {
-	typeName := reflect.TypeOf(params.PlayerOptions.GetSpec()).Elem().Name()
+// Constructs a new Agent. isr is only used for presims.
+func NewAgent(player proto.Player, isr proto.IndividualSimRequest) Agent {
+	if player.Options == nil {
+		panic("No player options provided!")
+	}
+
+	typeName := reflect.TypeOf(player.Options.GetSpec()).Elem().Name()
 
 	factory, ok := agentFactories[typeName]
 	if !ok {
 		panic("No agent factory for type: " + typeName)
 	}
 
-	character := NewCharacter(params.Equip, params.Race, params.Class, params.Consumes, params.CustomStats)
-	return factory(params, character, params.PlayerOptions)
+	character := NewCharacter(player)
+	return factory(character, *player.Options, isr)
 }

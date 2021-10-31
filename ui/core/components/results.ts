@@ -131,7 +131,7 @@ export class Results extends Component {
   }
 
   setStatWeights(request: StatWeightsRequest, result: StatWeightsResult, epStats: Array<Stat>) {
-		const iterations = request.options!.iterations;
+		const iterations = request.options!.simOptions!.iterations;
 
     this.hideAll();
     this.epElem.style.display = 'initial';

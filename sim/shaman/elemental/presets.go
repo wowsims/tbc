@@ -1,16 +1,15 @@
 package elemental
 
 import (
-	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/items"
 	"github.com/wowsims/tbc/sim/core/proto"
 )
 
-var BasicBuffs = proto.Buffs{
+var BasicBuffs = &proto.Buffs{
 	Bloodlust: 1,
 }
 
-var StandardTalents = proto.ShamanTalents{
+var StandardTalents = &proto.ShamanTalents{
 	ElementalFocus:     true,
 	LightningMastery:   5,
 	LightningOverload:  5,
@@ -32,10 +31,10 @@ var eleShamOptionsNoBuffs = &proto.ElementalShaman_Options{
 	// TotemOfWrath:    true,
 	// WrathOfAirTotem: true,
 }
-var PlayerOptionsAdaptiveNoBuffs = proto.PlayerOptions{
+var PlayerOptionsAdaptiveNoBuffs = &proto.PlayerOptions{
 	Spec: &proto.PlayerOptions_ElementalShaman{
 		ElementalShaman: &proto.ElementalShaman{
-			Talents: &StandardTalents,
+			Talents: StandardTalents,
 			Options: eleShamOptionsNoBuffs,
 			Rotation: &proto.ElementalShaman_Rotation{
 				Type: proto.ElementalShaman_Rotation_Adaptive,
@@ -51,10 +50,10 @@ var eleShamOptions = &proto.ElementalShaman_Options{
 	TotemOfWrath:    true,
 	WrathOfAirTotem: true,
 }
-var PlayerOptionsAdaptive = proto.PlayerOptions{
+var PlayerOptionsAdaptive = &proto.PlayerOptions{
 	Spec: &proto.PlayerOptions_ElementalShaman{
 		ElementalShaman: &proto.ElementalShaman{
-			Talents: &StandardTalents,
+			Talents: StandardTalents,
 			Options: eleShamOptions,
 			Rotation: &proto.ElementalShaman_Rotation{
 				Type: proto.ElementalShaman_Rotation_Adaptive,
@@ -63,10 +62,10 @@ var PlayerOptionsAdaptive = proto.PlayerOptions{
 	},
 }
 
-var PlayerOptionsLBOnly = proto.PlayerOptions{
+var PlayerOptionsLBOnly = &proto.PlayerOptions{
 	Spec: &proto.PlayerOptions_ElementalShaman{
 		ElementalShaman: &proto.ElementalShaman{
-			Talents: &StandardTalents,
+			Talents: StandardTalents,
 			Options: eleShamOptions,
 			Rotation: &proto.ElementalShaman_Rotation{
 				Type: proto.ElementalShaman_Rotation_LBOnly,
@@ -75,10 +74,10 @@ var PlayerOptionsLBOnly = proto.PlayerOptions{
 	},
 }
 
-var PlayerOptionsCLOnClearcast = proto.PlayerOptions{
+var PlayerOptionsCLOnClearcast = &proto.PlayerOptions{
 	Spec: &proto.PlayerOptions_ElementalShaman{
 		ElementalShaman: &proto.ElementalShaman{
-			Talents: &StandardTalents,
+			Talents: StandardTalents,
 			Options: eleShamOptions,
 			Rotation: &proto.ElementalShaman_Rotation{
 				Type: proto.ElementalShaman_Rotation_CLOnClearcast,
@@ -87,7 +86,7 @@ var PlayerOptionsCLOnClearcast = proto.PlayerOptions{
 	},
 }
 
-var FullBuffs = proto.Buffs{
+var FullBuffs = &proto.Buffs{
 	ArcaneBrilliance:  true,
 	GiftOfTheWild:     proto.TristateEffect_TristateEffectImproved,
 	BlessingOfKings:   true,
@@ -96,7 +95,7 @@ var FullBuffs = proto.Buffs{
 	ShadowPriestDps:   500,
 }
 
-var FullConsumes = proto.Consumes{
+var FullConsumes = &proto.Consumes{
 	FlaskOfBlindingLight: true,
 	BrilliantWizardOil:   true,
 	BlackenedBasilisk:    true,
@@ -107,11 +106,16 @@ var FullConsumes = proto.Consumes{
 	Drums:                proto.Drums_DrumsOfBattle,
 }
 
-var NoDebuffOptions = core.MakeSingleTargetOptions(proto.Debuffs{})
+var NoDebuffTarget = &proto.Target{
+	Debuffs: &proto.Debuffs{
+	},
+}
 
-var FullDebuffOptions = core.MakeSingleTargetOptions(proto.Debuffs{
-	JudgementOfWisdom: true,
-})
+var FullDebuffTarget = &proto.Target{
+	Debuffs: &proto.Debuffs{
+		JudgementOfWisdom: true,
+	},
+}
 
 var PreRaidGear = items.EquipmentSpecFromStrings([]string{
 	"Tidefury Helm",

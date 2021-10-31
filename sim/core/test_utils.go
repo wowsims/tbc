@@ -4,7 +4,6 @@ import (
 	"log"
 	"testing"
 
-	"github.com/wowsims/tbc/sim/core/items"
 	"github.com/wowsims/tbc/sim/core/proto"
 	"github.com/wowsims/tbc/sim/core/stats"
 )
@@ -15,26 +14,66 @@ const RSeed = int64(1)
 const ShortDuration = 60
 const LongDuration = 300
 
-func MakeSingleTargetOptions(debuffs proto.Debuffs) Options {
-	debuffsCopy := debuffs
-	return Options{
-		Encounter: NewEncounter(proto.Encounter{
-			Targets: []*proto.Target{
-				&proto.Target{
-					Debuffs: &debuffsCopy,
-				},
-			},
-		}),
-	}
+type IndividualSimInputs struct {
+	SimOptions  *proto.SimOptions
+	Gear     *proto.EquipmentSpec
+	Buffs    *proto.Buffs
+	Consumes *proto.Consumes
+	Race     proto.Race
+	Class    proto.Class
+
+	Duration int
+
+	// Convenience field if only 1 target is desired
+	Target   *proto.Target
+	Targets  []*proto.Target
+
+	PlayerOptions *proto.PlayerOptions
 }
 
-func CharacterStatsTest(label string, t *testing.T, params IndividualParams, expectedStats stats.Stats) {
-	agent := NewAgent(params)
-	raid := NewRaid(params.Buffs)
-	raid.AddPlayer(agent)
-	raid.Finalize()
+func NewIndividualSimRequest(inputs IndividualSimInputs) *proto.IndividualSimRequest {
+	isr := &proto.IndividualSimRequest{
+		Player: &proto.Player{
+			Equipment: inputs.Gear,
+			Options: inputs.PlayerOptions,
+		},
+		Buffs: inputs.Buffs,
+		Encounter: &proto.Encounter{},
+		SimOptions: inputs.SimOptions,
+	}
 
-	finalStats := agent.GetCharacter().GetStats()
+	if isr.Player.Options == nil {
+		isr.Player.Options = &proto.PlayerOptions{}
+	}
+	isr.Player.Options.Race = inputs.Race
+	isr.Player.Options.Class = inputs.Class
+	isr.Player.Options.Consumes = inputs.Consumes
+
+	isr.Encounter.Duration = float64(inputs.Duration)
+	if inputs.Target != nil {
+		isr.Encounter.Targets = []*proto.Target{inputs.Target}
+	} else {
+		isr.Encounter.Targets = inputs.Targets
+	}
+
+	if isr.SimOptions == nil {
+		isr.SimOptions = &proto.SimOptions{}
+	}
+	isr.SimOptions.Iterations = 1
+	isr.SimOptions.RandomSeed = RSeed
+	isr.SimOptions.Debug = false
+
+	return isr
+}
+
+func CharacterStatsTest(label string, t *testing.T, isr *proto.IndividualSimRequest, expectedStats stats.Stats) {
+	csr := &proto.ComputeStatsRequest{
+		Player: isr.Player,
+		Buffs: isr.Buffs,
+	}
+
+	result := ComputeStats(csr)
+	finalStats := stats.FromFloatArray(result.FinalStats)
 
 	const tolerance = 0.5
 	if !finalStats.EqualsWithTolerance(expectedStats, tolerance) {
@@ -42,28 +81,33 @@ func CharacterStatsTest(label string, t *testing.T, params IndividualParams, exp
 	}
 }
 
-func StatWeightsTest(label string, t *testing.T, params IndividualParams, statsToTest []stats.Stat, referenceStat stats.Stat, expectedStatWeights stats.Stats) {
-	params.Options.Encounter.Duration = LongDuration
-	params.Options.Iterations = 5000
-	params.Options.RSeed = RSeed
-	params.Options.Debug = false
+func StatWeightsTest(label string, t *testing.T, isr *proto.IndividualSimRequest, statsToTest []proto.Stat, referenceStat proto.Stat, expectedStatWeights stats.Stats) {
+	isr.Encounter.Duration = LongDuration
+	isr.SimOptions.Iterations = 5000
 
-	results := CalcStatWeight(params, statsToTest, referenceStat)
+	swr := &proto.StatWeightsRequest{
+		Options: isr,
+		StatsToWeigh: statsToTest,
+		EpReferenceStat: referenceStat,
+	}
+
+	result := StatWeights(swr)
+	resultWeights := stats.FromFloatArray(result.Weights)
 
 	const tolerance = 0.05
-	if !results.Weights.EqualsWithTolerance(expectedStatWeights, tolerance) {
-		t.Fatalf("%s failed: CalcStatWeight() = %v, expected %v", label, results.Weights, expectedStatWeights)
+	if !resultWeights.EqualsWithTolerance(expectedStatWeights, tolerance) {
+		t.Fatalf("%s failed: CalcStatWeight() = %v, expected %v", label, resultWeights, expectedStatWeights)
 	}
 }
 
 // Performs a basic end-to-end test of the simulator.
 //   This is where we can add more sophisticated checks if we would like.
 //   Any changes to the damage output of an item set
-func IndividualSimTest(label string, t *testing.T, params IndividualParams, expectedDps float64) {
-	sim := NewIndividualSim(params)
+func IndividualSimTest(label string, t *testing.T, isr *proto.IndividualSimRequest, expectedDps float64) {
+	sim := NewIndividualSim(*isr)
 	result := sim.Run()
 
-	if params.Options.Debug {
+	if isr.SimOptions.Debug {
 		log.Printf("LOGS:\n%s\n", result.Logs)
 	}
 
@@ -73,16 +117,14 @@ func IndividualSimTest(label string, t *testing.T, params IndividualParams, expe
 	}
 }
 
-func IndividualSimAverageTest(label string, t *testing.T, params IndividualParams, expectedDps float64) {
-	params.Options.Encounter.Duration = LongDuration
-	params.Options.Iterations = 10000
-	params.Options.RSeed = RSeed
-	params.Options.Debug = false
+func IndividualSimAverageTest(label string, t *testing.T, isr *proto.IndividualSimRequest, expectedDps float64) {
+	isr.Encounter.Duration = LongDuration
+	isr.SimOptions.Iterations = 10000
 
-	sim := NewIndividualSim(params)
+	sim := NewIndividualSim(*isr)
 	result := sim.Run()
 
-	if params.Options.Debug {
+	if isr.SimOptions.Debug {
 		log.Printf("LOGS:\n%s\n", result.Logs)
 	}
 
@@ -96,59 +138,36 @@ type AllEncountersTestOptions struct {
 	Label string
 	T     *testing.T
 
-	Options  Options
-	Gear     items.EquipmentSpec
-	Buffs    proto.Buffs
-	Consumes proto.Consumes
-	Race     proto.Race
-	Class    proto.Class
-
-	PlayerOptions *proto.PlayerOptions
+	Inputs IndividualSimInputs
 
 	ExpectedDpsShort float64
 	ExpectedDpsLong  float64
 }
 
 func IndividualSimAllEncountersTest(testOpts AllEncountersTestOptions) {
-	params := IndividualParams{
-		Equip:    testOpts.Gear,
-		Race:     testOpts.Race,
-		Class:    testOpts.Class,
-		Consumes: testOpts.Consumes,
-		Buffs:    testOpts.Buffs,
-		Options:  testOpts.Options,
+	isr := NewIndividualSimRequest(testOpts.Inputs)
 
-		PlayerOptions: testOpts.PlayerOptions,
-		CustomStats:   stats.Stats{},
-	}
-
-	params.Options.Iterations = 1
-	params.Options.RSeed = RSeed
-	params.Options.Debug = false
-
-	params.Options.Encounter.Duration = ShortDuration
+	isr.Encounter.Duration = ShortDuration
 	IndividualSimTest(
 		testOpts.Label+"-short",
 		testOpts.T,
-		params,
+		isr,
 		testOpts.ExpectedDpsShort)
 
-	params.Options.Encounter.Duration = LongDuration
+	isr.Encounter.Duration = LongDuration
 	IndividualSimTest(
 		testOpts.Label+"-long",
 		testOpts.T,
-		params,
+		isr,
 		testOpts.ExpectedDpsLong)
 }
 
-func IndividualBenchmark(b *testing.B, params IndividualParams) {
-	params.Options.Encounter.Duration = LongDuration
-	params.Options.Iterations = 1000
-	params.Options.RSeed = RSeed
-	params.Options.Debug = false
+func IndividualBenchmark(b *testing.B, isr *proto.IndividualSimRequest) {
+	isr.Encounter.Duration = LongDuration
+	isr.SimOptions.Iterations = 1000
 
 	for i := 0; i < b.N; i++ {
-		sim := NewIndividualSim(params)
+		sim := NewIndividualSim(*isr)
 		sim.Run()
 	}
 }

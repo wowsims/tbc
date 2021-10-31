@@ -26,6 +26,12 @@ func NewEncounter(options proto.Encounter) Encounter {
 	return encounter
 }
 
+func (encounter *Encounter) Finalize() {
+	for _, target := range encounter.Targets {
+		target.Finalize()
+	}
+}
+
 // Target is an enemy that can be the target of attacks/spells.
 // Currently targets are basically just lvl 73 target dummies.
 type Target struct {

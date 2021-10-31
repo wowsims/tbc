@@ -105,9 +105,11 @@ func TestIndividualSim(t *testing.T) {
 				&proto.Target{},
 			},
 		},
-		Iterations: 5000,
-		RandomSeed: 1,
-		Debug:      false,
+		SimOptions: &proto.SimOptions{
+			Iterations: 5000,
+			RandomSeed: 1,
+			Debug:      false,
+		},
 	}
 
 	msgBytes, err := googleProto.Marshal(req)
@@ -152,9 +154,11 @@ func TestCalcStatWeight(t *testing.T) {
 				&proto.Target{},
 			},
 		},
-		Iterations: 5000,
-		RandomSeed: 1,
-		Debug:      false,
+		SimOptions: &proto.SimOptions{
+			Iterations: 5000,
+			RandomSeed: 1,
+			Debug:      false,
+		},
 	}
 
 	msgBytes, err := googleProto.Marshal(&proto.StatWeightsRequest{

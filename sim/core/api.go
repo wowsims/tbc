@@ -1,18 +1,16 @@
-// Proto based function interface for the simulator
-package sim
+// Proto-based function interface for the simulator
+package core
 
 import (
-	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/items"
 	"github.com/wowsims/tbc/sim/core/proto"
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-func init() {
-	RegisterAll()
-}
-
-func getGearListImpl(request *proto.GearListRequest) *proto.GearListResult {
+/**
+ * Returns all items, enchants, and gems recognized by the sim.
+ */
+func GetGearList(request *proto.GearListRequest) *proto.GearListResult {
 	result := &proto.GearListResult{}
 
 	for i := range items.Items {
@@ -31,14 +29,12 @@ func getGearListImpl(request *proto.GearListRequest) *proto.GearListResult {
 	return result
 }
 
-func computeStatsImpl(request *proto.ComputeStatsRequest) *proto.ComputeStatsResult {
-	return statsFromIndSimRequest(&proto.IndividualSimRequest{Player: request.Player, Buffs: request.Buffs})
-}
-
-func statsFromIndSimRequest(isr *proto.IndividualSimRequest) *proto.ComputeStatsResult {
-	params := convertSimParams(isr)
-	agent := core.NewAgent(params)
-	raid := core.NewRaid(params.Buffs)
+/**
+ * Returns character stats taking into account gear / buffs / consumes / etc
+ */
+func ComputeStats(request *proto.ComputeStatsRequest) *proto.ComputeStatsResult {
+	agent := NewAgent(*request.Player, proto.IndividualSimRequest{Player: request.Player, Buffs: request.Buffs})
+	raid := NewRaid(*request.Buffs)
 	raid.AddPlayer(agent)
 	raid.Finalize()
 
@@ -53,12 +49,14 @@ func statsFromIndSimRequest(isr *proto.IndividualSimRequest) *proto.ComputeStats
 	}
 }
 
-func statWeightsImpl(request *proto.StatWeightsRequest) *proto.StatWeightsResult {
-	statsToWeight := make([]stats.Stat, len(request.StatsToWeigh))
-	for i, v := range request.StatsToWeigh {
-		statsToWeight[i] = stats.Stat(v)
-	}
-	result := core.CalcStatWeight(convertSimParams(request.Options), statsToWeight, stats.Stat(request.EpReferenceStat))
+/**
+ * Returns stat weights and EP values, with standard deviations, for all stats.
+ */
+func StatWeights(request *proto.StatWeightsRequest) *proto.StatWeightsResult {
+	statsToWeigh := stats.ProtoArrayToStatsList(request.StatsToWeigh)
+
+	result := CalcStatWeight(*request.Options, statsToWeigh, stats.Stat(request.EpReferenceStat))
+
 	return &proto.StatWeightsResult{
 		Weights:       result.Weights[:],
 		WeightsStdev:  result.WeightsStdev[:],
@@ -67,40 +65,11 @@ func statWeightsImpl(request *proto.StatWeightsRequest) *proto.StatWeightsResult
 	}
 }
 
-func convertSimParams(request *proto.IndividualSimRequest) core.IndividualParams {
-	options := core.Options{
-		Iterations: int(request.Iterations),
-		RSeed:      request.RandomSeed,
-		ExitOnOOM:  request.ExitOnOom,
-		Debug:      request.Debug,
-	}
-	if request.Encounter != nil {
-		options.Encounter = core.NewEncounter(*request.Encounter)
-	}
-
-	params := core.IndividualParams{
-		Equip:    items.ProtoToEquipmentSpec(request.Player.Equipment),
-		Race:     request.Player.Options.Race,
-		Class:    request.Player.Options.Class,
-		Consumes: *request.Player.Options.Consumes,
-		Buffs:    *request.Buffs,
-		Options:  options,
-
-		PlayerOptions: request.Player.Options,
-	}
-	copy(params.CustomStats[:], request.Player.CustomStats[:])
-
-	return params
-}
-
-func createSim(request *proto.IndividualSimRequest) *core.Simulation {
-	params := convertSimParams(request)
-	sim := core.NewIndividualSim(params)
-	return sim
-}
-
-func runSimulationImpl(request *proto.IndividualSimRequest) *proto.IndividualSimResult {
-	sim := createSim(request)
+/**
+ * Runs multiple iterations of the sim with a single set of options / gear.
+ */
+func RunSimulation(request *proto.IndividualSimRequest) *proto.IndividualSimResult {
+	sim := NewIndividualSim(*request)
 	result := sim.Run()
 
 	actionMetrics := []*proto.ActionMetric{}

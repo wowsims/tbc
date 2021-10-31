@@ -7,9 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/wowsims/tbc/sim/core/items"
 	"github.com/wowsims/tbc/sim/core/proto"
-	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 func debugFunc(sim *Simulation) func(string, ...interface{}) {
@@ -18,34 +16,13 @@ func debugFunc(sim *Simulation) func(string, ...interface{}) {
 	}
 }
 
-type Options struct {
-	Encounter  Encounter
-	Iterations int
-	RSeed      int64
-	ExitOnOOM  bool
-	Debug      bool          // enables debug printing.
-}
-
-type IndividualParams struct {
-	Equip    items.EquipmentSpec
-	Race     proto.Race
-	Class    proto.Class
-	Consumes proto.Consumes
-	Buffs    proto.Buffs
-	Options  Options
-
-	PlayerOptions *proto.PlayerOptions
-
-	CustomStats stats.Stats
-}
-
 type InitialAura func(*Simulation) Aura
 
 type Simulation struct {
-	Raid         *Raid
-	targets      []*Target
-	Options      Options
-	Duration     time.Duration
+	Raid     *Raid
+	targets  []*Target
+	Options  proto.SimOptions
+	Duration time.Duration
 
 	MetricsAggregator *MetricsAggregator
 
@@ -69,37 +46,38 @@ func (wr *wrappedRandom) Float64(src string) float64 {
 	return wr.Rand.Float64()
 }
 
-func NewIndividualSim(params IndividualParams) *Simulation {
-	raid := NewRaid(params.Buffs)
-	raid.AddPlayer(NewAgent(params))
+func NewIndividualSim(isr proto.IndividualSimRequest) *Simulation {
+	raid := NewRaid(*isr.Buffs)
+	raid.AddPlayer(NewAgent(*isr.Player, isr))
 	raid.Finalize()
 
-	for _, target := range params.Options.Encounter.Targets {
-		target.Finalize()
-	}
+	encounter := NewEncounter(*isr.Encounter)
+	encounter.Finalize()
 
-	return newSim(raid, params.Options)
+	return newSim(raid, encounter, *isr.SimOptions)
 }
 
 // New sim contructs a simulator with the given raid and target settings.
-func newSim(raid *Raid, options Options) *Simulation {
-	if options.RSeed == 0 {
-		options.RSeed = time.Now().Unix()
-	}
-
-	if len(options.Encounter.Targets) == 0 {
+func newSim(raid *Raid, encounter Encounter, simOptions proto.SimOptions) *Simulation {
+	if len(encounter.Targets) == 0 {
 		panic("Must have at least 1 target!")
 	}
 
 	sim := &Simulation{
-		Raid:         raid,
-		targets:      options.Encounter.Targets,
-		Options:      options,
-		Duration:     DurationFromSeconds(options.Encounter.Duration),
+		Raid:     raid,
+		targets:  encounter.Targets,
+		Options:  simOptions,
+		Duration: DurationFromSeconds(encounter.Duration),
 		Log: nil,
-		MetricsAggregator: NewMetricsAggregator(raid.Size(), options.Encounter.Duration),
+
+		MetricsAggregator: NewMetricsAggregator(raid.Size(), encounter.Duration),
 	}
-	sim.Rando = &wrappedRandom{sim: sim, Rand: rand.New(rand.NewSource(options.RSeed))}
+
+	sim.rseed = simOptions.RandomSeed
+	if sim.rseed == 0 {
+		sim.rseed = time.Now().Unix()
+	}
+	sim.Rando = &wrappedRandom{sim: sim, Rand: rand.New(rand.NewSource(sim.rseed))}
 
 	return sim
 }
@@ -156,7 +134,7 @@ func (sim *Simulation) Run() SimResult {
 		}
 	}
 
-	for i := 0; i < sim.Options.Iterations; i++ {
+	for i := int32(0); i < sim.Options.Iterations; i++ {
 		sim.RunOnce()
 		sim.MetricsAggregator.doneIteration()
 	}

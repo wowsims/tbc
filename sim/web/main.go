@@ -17,10 +17,15 @@ import (
 	"time"
 
 	"github.com/wowsims/tbc/sim"
+	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/proto"
 
 	googleProto "google.golang.org/protobuf/proto"
 )
+
+func init() {
+	sim.RegisterAll()
+}
 
 func main() {
 	var useFS = flag.Bool("usefs", true, "Use local file system and wasm. Set to true for dev")
@@ -133,10 +138,10 @@ type apiHandler struct {
 
 // Handlers to decode and handle each proto function
 var handlers = map[string]apiHandler{
-	"/individualSim": {msg: func() googleProto.Message { return &proto.IndividualSimRequest{} }, handle: func(msg googleProto.Message) googleProto.Message { return sim.RunSimulation(msg.(*proto.IndividualSimRequest)) }},
-	"/statWeights":   {msg: func() googleProto.Message { return &proto.StatWeightsRequest{} }, handle: func(msg googleProto.Message) googleProto.Message { return sim.StatWeights(msg.(*proto.StatWeightsRequest)) }},
-	"/computeStats":  {msg: func() googleProto.Message { return &proto.ComputeStatsRequest{} }, handle: func(msg googleProto.Message) googleProto.Message { return sim.ComputeStats(msg.(*proto.ComputeStatsRequest)) }},
-	"/gearList":      {msg: func() googleProto.Message { return &proto.GearListRequest{} }, handle: func(msg googleProto.Message) googleProto.Message { return sim.GetGearList(msg.(*proto.GearListRequest)) }},
+	"/individualSim": {msg: func() googleProto.Message { return &proto.IndividualSimRequest{} }, handle: func(msg googleProto.Message) googleProto.Message { return core.RunSimulation(msg.(*proto.IndividualSimRequest)) }},
+	"/statWeights":   {msg: func() googleProto.Message { return &proto.StatWeightsRequest{} }, handle: func(msg googleProto.Message) googleProto.Message { return core.StatWeights(msg.(*proto.StatWeightsRequest)) }},
+	"/computeStats":  {msg: func() googleProto.Message { return &proto.ComputeStatsRequest{} }, handle: func(msg googleProto.Message) googleProto.Message { return core.ComputeStats(msg.(*proto.ComputeStatsRequest)) }},
+	"/gearList":      {msg: func() googleProto.Message { return &proto.GearListRequest{} }, handle: func(msg googleProto.Message) googleProto.Message { return core.GetGearList(msg.(*proto.GearListRequest)) }},
 }
 
 // handleAPI is generic handler for any api function using protos.
