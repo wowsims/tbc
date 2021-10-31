@@ -143,7 +143,7 @@ func ApplyQuagmirransEye(agent core.Agent) {
 		return core.Aura{
 			ID:      core.MagicIDQuagsEye,
 			OnCastComplete: func(sim *core.Simulation, cast core.DirectCastAction) {
-				if !icd.IsOnCD(sim) && sim.Rando.Float64("quags") < 0.1 {
+				if !icd.IsOnCD(sim) && sim.RandomFloat("quags") < 0.1 {
 					icd = core.InternalCD(sim.CurrentTime + dur)
 					character.AddAuraWithTemporaryStats(sim, core.MagicIDFungalFrenzy, stats.SpellHaste, hasteBonus, time.Second*6)
 				}
@@ -165,7 +165,7 @@ func ApplyShiffarsNexusHorn(agent core.Agent) {
 				if cast.GetActionID().ItemID == core.ItemIDTheLightningCapacitor {
 					return // TLC can't proc Sextant
 				}
-				if !icd.IsOnCD(sim) && result.Crit && sim.Rando.Float64("unmarked") < 0.2 {
+				if !icd.IsOnCD(sim) && result.Crit && sim.RandomFloat("unmarked") < 0.2 {
 					icd = core.InternalCD(sim.CurrentTime + dur)
 					character.AddAuraWithTemporaryStats(sim, core.MagicIDCallOfTheNexus, stats.SpellPower, spellBonus, time.Second*10)
 				}
@@ -203,7 +203,7 @@ func ApplySextantOfUnstableCurrents(agent core.Agent) {
 				if cast.GetActionID().ItemID == core.ItemIDTheLightningCapacitor {
 					return // TLC can't proc Sextant
 				}
-				if result.Crit && !icd.IsOnCD(sim) && sim.Rando.Float64("unmarked") < 0.2 {
+				if result.Crit && !icd.IsOnCD(sim) && sim.RandomFloat("unmarked") < 0.2 {
 					icd = core.InternalCD(sim.CurrentTime + icdDur)
 					character.AddAuraWithTemporaryStats(sim, core.MagicIDUnstableCurrents, stats.SpellPower, spellBonus, dur)
 				}

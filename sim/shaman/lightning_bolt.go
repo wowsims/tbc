@@ -42,7 +42,7 @@ func (lb LightningBolt) OnSpellHit(sim *core.Simulation, cast core.DirectCastAct
 
 	if !lb.IsLightningOverload {
 		lightningOverloadChance := float64(lb.Shaman.Talents.LightningOverload) * 0.04
-		if sim.Rando.Float64("LO") < lightningOverloadChance {
+		if sim.RandomFloat("LO") < lightningOverloadChance {
 			overloadAction := NewLightningBolt(sim, lb.Shaman, true)
 			overloadAction.Act(sim)
 		}

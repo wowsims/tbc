@@ -229,7 +229,7 @@ func makePotionActivation(potionType proto.Potions, character *Character) Cooldo
 			}
 
 			// Restores 1800 to 3000 mana. (2 Min Cooldown)
-			manaGain := 1800 + (sim.Rando.Float64("super mana") * 1200)
+			manaGain := 1800 + (sim.RandomFloat("super mana") * 1200)
 
 			if alchStoneEquipped {
 				manaGain *= 1.4
@@ -266,7 +266,7 @@ func registerDarkRuneCD(agent Agent, consumes proto.Consumes) {
 				}
 
 				// Restores 900 to 1500 mana. (2 Min Cooldown)
-				character.AddStat(stats.Mana, 900 + (sim.Rando.Float64("dark rune") * 600))
+				character.AddStat(stats.Mana, 900 + (sim.RandomFloat("dark rune") * 600))
 				character.SetCD(MagicIDRune, time.Minute*2+sim.CurrentTime)
 				if sim.Log != nil {
 					sim.Log("Used Dark Rune\n")

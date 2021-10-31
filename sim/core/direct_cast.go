@@ -224,12 +224,12 @@ func (action DirectCastAction) calculateDirectCastDamage(sim *Simulation, damage
 	hit := 0.83 + character.GetStat(stats.SpellHit)/(SpellHitRatingPerHitChance*100) + damageInput.BonusHit
 	hit = MinFloat(hit, 0.99) // can't get away from the 1% miss
 
-	if sim.Rando.Float64("action hit") >= hit { // Miss
+	if sim.RandomFloat("action hit") >= hit { // Miss
 		return result
 	}
 	result.Hit = true
 
-	baseDamage := damageInput.MinBaseDamage + sim.Rando.Float64("action dmg")*(damageInput.MaxBaseDamage - damageInput.MinBaseDamage)
+	baseDamage := damageInput.MinBaseDamage + sim.RandomFloat("action dmg")*(damageInput.MaxBaseDamage - damageInput.MinBaseDamage)
 	totalSpellPower := character.GetStat(stats.SpellPower) + character.GetStat(action.GetSpellSchool()) + damageInput.BonusSpellPower
 	damageFromSpellPower := (totalSpellPower * damageInput.SpellCoefficient)
 	damage := baseDamage + damageFromSpellPower
@@ -237,7 +237,7 @@ func (action DirectCastAction) calculateDirectCastDamage(sim *Simulation, damage
 	damage *= damageInput.DamageMultiplier
 
 	crit := (character.GetStat(stats.SpellCrit) / (SpellCritRatingPerCritChance * 100)) + damageInput.BonusCrit
-	if action.castInput.GuaranteedCrit || sim.Rando.Float64("action crit") < crit {
+	if action.castInput.GuaranteedCrit || sim.RandomFloat("action crit") < crit {
 		result.Crit = true
 		damage *= action.castInput.CritMultiplier
 	}
@@ -247,7 +247,7 @@ func (action DirectCastAction) calculateDirectCastDamage(sim *Simulation, damage
 	// Using these stats:
 	//    13.6% chance of
 	//  FUTURE: handle boss resists for fights/classes that are actually impacted by that.
-	resVal := sim.Rando.Float64("action resist")
+	resVal := sim.RandomFloat("action resist")
 	if resVal < 0.18 { // 13% chance for 25% resist, 4% for 50%, 1% for 75%
 		if resVal < 0.01 {
 			result.PartialResist_3_4 = true

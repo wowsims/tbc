@@ -55,7 +55,7 @@ var ItemSetCycloneRegalia = core.ItemSet{
 				return core.Aura{
 					ID:      core.MagicIDCyclone4pc,
 					OnSpellHit: func(sim *core.Simulation, cast core.DirectCastAction, result *core.DirectCastDamageResult) {
-						if result.Crit && sim.Rando.Float64("cycl4p") < 0.11 {
+						if result.Crit && sim.RandomFloat("cycl4p") < 0.11 {
 							character.AddAura(sim, core.Aura{
 								ID: core.MagicIDCycloneMana,
 								OnCast: func(sim *core.Simulation, cast core.DirectCastAction, input *core.DirectCastInput) {
@@ -84,7 +84,7 @@ var ItemSetCataclysmRegalia = core.ItemSet{
 				return core.Aura{
 					ID:      core.MagicIDCataclysm4pc,
 					OnSpellHit: func(sim *core.Simulation, cast core.DirectCastAction, result *core.DirectCastDamageResult) {
-						if result.Crit && sim.Rando.Float64("cata4p") < 0.25 {
+						if result.Crit && sim.RandomFloat("cata4p") < 0.25 {
 							character.AddStat(stats.Mana, 120)
 						}
 					},
@@ -166,7 +166,7 @@ func ApplyFathomBroochOfTheTidewalker(agent core.Agent) {
 				if cast.GetSpellSchool() != stats.NatureSpellPower {
 					return
 				}
-				if sim.Rando.Float64("unmarked") < 0.15 {
+				if sim.RandomFloat("unmarked") < 0.15 {
 					icd = core.InternalCD(sim.CurrentTime + icdDur)
 					character.AddStat(stats.Mana, 335)
 				}
@@ -185,7 +185,7 @@ func ApplySkycallTotem(agent core.Agent) {
 			ID:      core.MagicIDSkycall,
 			Expires: core.NeverExpires,
 			OnCastComplete: func(sim *core.Simulation, cast core.DirectCastAction) {
-				if cast.GetActionID().SpellID == SpellIDLB12 && sim.Rando.Float64("skycall") < 0.15 {
+				if cast.GetActionID().SpellID == SpellIDLB12 && sim.RandomFloat("skycall") < 0.15 {
 					character.AddAuraWithTemporaryStats(sim, core.MagicIDEnergized, stats.SpellHaste, hasteBonus, dur)
 				}
 			},

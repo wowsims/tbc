@@ -26,24 +26,12 @@ type Simulation struct {
 
 	MetricsAggregator *MetricsAggregator
 
-	Rando       *wrappedRandom
-	rseed       int64
+	rand *rand.Rand
+
 	CurrentTime time.Duration // duration that has elapsed in the sim since starting
 
 	Log  func(string, ...interface{})
 	logs []string
-}
-
-type wrappedRandom struct {
-	sim *Simulation
-	*rand.Rand
-}
-
-func (wr *wrappedRandom) Float64(src string) float64 {
-	// if wr.sim.Log != nil {
-	// 	wr.sim.Log("FLOAT64 FROM: %s\n", src)
-	// }
-	return wr.Rand.Float64()
 }
 
 func NewIndividualSim(isr proto.IndividualSimRequest) *Simulation {
@@ -63,23 +51,31 @@ func newSim(raid *Raid, encounter Encounter, simOptions proto.SimOptions) *Simul
 		panic("Must have at least 1 target!")
 	}
 
-	sim := &Simulation{
+	rseed := simOptions.RandomSeed
+	if rseed == 0 {
+		rseed = time.Now().Unix()
+	}
+
+	return &Simulation{
 		Raid:     raid,
 		targets:  encounter.Targets,
 		Options:  simOptions,
 		Duration: DurationFromSeconds(encounter.Duration),
 		Log: nil,
 
+		rand: rand.New(rand.NewSource(rseed)),
+
 		MetricsAggregator: NewMetricsAggregator(raid.Size(), encounter.Duration),
 	}
+}
 
-	sim.rseed = simOptions.RandomSeed
-	if sim.rseed == 0 {
-		sim.rseed = time.Now().Unix()
-	}
-	sim.Rando = &wrappedRandom{sim: sim, Rand: rand.New(rand.NewSource(sim.rseed))}
-
-	return sim
+// Returns a random float. Label is for debugging, to check whether the order
+// of RandomFloat() calls has changed. Uncomment the log statements to use it.
+func (sim *Simulation) RandomFloat(label string) float64 {
+	// if sim.Log != nil {
+	// 	sim.Log("FLOAT64 FROM: %s\n", label)
+	// }
+	return sim.rand.Float64()
 }
 
 // Get the metrics for an invidual Agent, for the current iteration.

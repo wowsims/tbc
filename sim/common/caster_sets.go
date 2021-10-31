@@ -32,7 +32,7 @@ var ItemSetManaEtched = core.ItemSet{
 				return core.Aura{
 					ID:      core.MagicIDManaEtched,
 					OnCastComplete: func(sim *core.Simulation, cast core.DirectCastAction) {
-						if sim.Rando.Float64("unmarked") < 0.02 {
+						if sim.RandomFloat("unmarked") < 0.02 {
 							character.AddAuraWithTemporaryStats(sim, core.MagicIDManaEtchedInsight, stats.SpellPower, spellBonus, duration)
 						}
 					},
@@ -65,7 +65,7 @@ var ItemSetSpellstrike = core.ItemSet{
 				return core.Aura{
 					ID:      core.MagicIDSpellstrike,
 					OnCastComplete: func(sim *core.Simulation, cast core.DirectCastAction) {
-						if sim.Rando.Float64("spellstrike") < 0.05 {
+						if sim.RandomFloat("spellstrike") < 0.05 {
 							character.AddAuraWithTemporaryStats(sim, core.MagicIDSpellstrikeInfusion, stats.SpellPower, spellBonus, duration)
 						}
 					},

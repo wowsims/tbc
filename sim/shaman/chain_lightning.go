@@ -60,7 +60,7 @@ func (cl ChainLightning) OnSpellHit(sim *core.Simulation, cast core.DirectCastAc
 
 	if !cl.IsLightningOverload {
 		lightningOverloadChance := float64(cl.Shaman.Talents.LightningOverload) * 0.04 / 3
-		if sim.Rando.Float64("LO") < lightningOverloadChance {
+		if sim.RandomFloat("LO") < lightningOverloadChance {
 			overloadAction := NewChainLightning(sim, cl.Shaman, true)
 			overloadAction.Act(sim)
 		}
