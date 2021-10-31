@@ -11,6 +11,7 @@ const NeverExpires = time.Duration(math.MaxInt64)
 
 type Aura struct {
 	ID          int32
+	Name        string        // Label used for logging.
 	Expires     time.Duration // time at which aura will be removed
 	activeIndex int32         // Position of this aura's index in the sim.activeAuraIDs array
 
@@ -128,7 +129,7 @@ func (at *auraTracker) AddAura(sim *Simulation, newAura Aura) {
 	at.activeAuraIDs = append(at.activeAuraIDs, newAura.ID)
 
 	if sim.Log != nil {
-		sim.Log("(%d) +%s\n", at.playerID, AuraName(newAura.ID))
+		sim.Log("(%d) +%s\n", at.playerID, newAura.Name)
 	}
 }
 
@@ -137,6 +138,11 @@ func (at *auraTracker) RemoveAura(sim *Simulation, id int32) {
 	if at.auras[id].OnExpire != nil {
 		at.auras[id].OnExpire(sim)
 	}
+
+	if sim.Log != nil {
+		sim.Log("(%d) -%s\n", at.playerID, at.auras[id].Name)
+	}
+
 	removeActiveIndex := at.auras[id].activeIndex
 	at.auras[id] = Aura{}
 
@@ -149,10 +155,6 @@ func (at *auraTracker) RemoveAura(sim *Simulation, id int32) {
 
 	// Now we can remove the last element, in constant time
 	at.activeAuraIDs = at.activeAuraIDs[:len(at.activeAuraIDs)-1]
-
-	if sim.Log != nil {
-		sim.Log("(%d) -%s\n", at.playerID, AuraName(id))
-	}
 }
 
 // Returns whether an aura with the given ID is currently active.
@@ -220,145 +222,6 @@ func (at *auraTracker) OnSpellHit(sim *Simulation, cast DirectCastAction, result
 			at.auras[id].OnSpellHit(sim, cast, result)
 		}
 	}
-}
-
-func AuraName(a int32) string {
-	switch a {
-	case MagicIDUnknown:
-		return "Unknown"
-	case MagicIDLOTalent:
-		return "Lightning Overload Talent"
-	case MagicIDJoW:
-		return "Judgement Of Wisdom Aura"
-	case MagicIDEleMastery:
-		return "Elemental Mastery"
-	case MagicIDBlessingSilverCrescent:
-		return "Blessing of the Silver Crescent"
-	case MagicIDDarkIronPipeweed:
-		return "Dark Iron Pipeweed"
-	case MagicIDQuagsEye:
-		return "Quags Eye"
-	case MagicIDFungalFrenzy:
-		return "Fungal Frenzy"
-	case MagicIDBloodlust:
-		return "Bloodlust"
-	case MagicIDSkycall:
-		return "Skycall"
-	case MagicIDEnergized:
-		return "Energized"
-	case MagicIDNAC:
-		return "Nature Alignment Crystal"
-	case MagicIDChaoticSkyfire:
-		return "Chaotic Skyfire"
-	case MagicIDInsightfulEarthstorm:
-		return "Insightful Earthstorm"
-	case MagicIDMysticSkyfire:
-		return "Mystic Skyfire"
-	case MagicIDMysticFocus:
-		return "Mystic Focus"
-	case MagicIDISCTrink:
-		return "Icon Trinket"
-	case MagicIDNACTrink:
-		return "NAC Trinket"
-	case MagicIDDITrink:
-		return "Dark Iron Trinket"
-	case MagicIDPotion:
-		return "Potion"
-	case MagicIDRune:
-		return "Rune"
-	case MagicIDAtkTrinket:
-		return "Shared Attack Trinkets CD"
-	case MagicIDHealTrinket:
-		return "Shared Heal Trinkets CD"
-	case MagicIDSpellPower:
-		return "SpellPower"
-	case MagicIDRubySerpent:
-		return "RubySerpent"
-	case MagicIDCallOfTheNexus:
-		return "CallOfTheNexus"
-	case MagicIDDCC:
-		return "Darkmoon Card Crusade"
-	case MagicIDDCCBonus:
-		return "Aura of the Crusade"
-	case MagicIDScryerTrink:
-		return "Scryer Trinket"
-	case MagicIDRubySerpentTrink:
-		return "Ruby Serpent Trinket"
-	case MagicIDXiriTrink:
-		return "Xiri Trinket"
-	case MagicIDDrums:
-		return "Drums"
-	case MagicIDTwinStars:
-		return "Twin Stars Set"
-	case MagicIDTidefury:
-		return "Tidefury Set"
-	case MagicIDSpellstrike:
-		return "Spellstrike Set"
-	case MagicIDSpellstrikeInfusion:
-		return "Spellstrike Infusion"
-	case MagicIDManaEtched:
-		return "Mana-Etched Set"
-	case MagicIDManaEtchedInsight:
-		return "Mana-EtchedInsight"
-	case MagicIDOrcBloodFury:
-		return "Orc Blood Fury"
-	case MagicIDTrollBerserking:
-		return "Troll Berserking"
-	case MagicIDEyeOfTheNight:
-		return "EyeOfTheNight"
-	case MagicIDChainTO:
-		return "Chain of the Twilight Owl"
-	case MagicIDCyclone4pc:
-		return "Cyclone 4pc Bonus"
-	case MagicIDCycloneMana:
-		return "Cyclone Mana Cost Reduction"
-	case MagicIDTLC:
-		return "The Lightning Capacitor Aura"
-	case MagicIDDestructionPotion:
-		return "Destruction Potion"
-	case MagicIDHexShunkHead:
-		return "Hex Shunken Head"
-	case MagicIDShiftingNaaru:
-		return "Shifting Naaru Sliver"
-	case MagicIDSkullGuldan:
-		return "Skull of Guldan"
-	case MagicIDNexusHorn:
-		return "Nexus-Horn"
-	case MagicIDSextant:
-		return "Sextant of Unstable Currents"
-	case MagicIDUnstableCurrents:
-		return "Unstable Currents"
-	case MagicIDEyeOfMag:
-		return "Eye Of Mag"
-	case MagicIDRecurringPower:
-		return "Recurring Power"
-	case MagicIDCataclysm4pc:
-		return "Cataclysm 4pc Set Bonus"
-	case MagicIDSkyshatter4pc:
-		return "Skyshatter 4pc Set Bonus"
-	case MagicIDEssMartyrTrink:
-		return "Essence of the Martyr Trinket"
-	case MagicIDEssSappTrink:
-		return "Restrained Essence of Sapphiron Trinket"
-	case MagicIDMisery:
-		return "Misery"
-	case MagicIDElderScribe:
-		return "Robes of the Elder Scribe"
-	case MagicIDElderScribeProc:
-		return "Power of Arcanagos"
-	case MagicIDHexTrink:
-		return "Hex Trinket CD"
-	case MagicIDShiftingNaaruTrink:
-		return "ShiftingNaaru Trinket CD"
-	case MagicIDSkullGuldanTrink:
-		return "SkullGuldan Trinket CD"
-	case MagicIDRegainMana:
-		return "Fathom-Brooch Regain Mana"
-	case MagicIDImprovedSealOfTheCrusader:
-		return "Improved Seal of the Crusader"
-	}
-
-	return "<<Add Aura name to switch!!>>"
 }
 
 // Stored value is the time at which the ICD will be off CD
@@ -461,18 +324,19 @@ const (
 )
 
 // Helper for the common case of adding an Aura that gives a temporary stat boost.
-func (character *Character) AddAuraWithTemporaryStats(sim *Simulation, auraID int32, stat stats.Stat, amount float64, duration time.Duration) {
+func (character *Character) AddAuraWithTemporaryStats(sim *Simulation, auraID int32, auraName string, stat stats.Stat, amount float64, duration time.Duration) {
 	if sim.Log != nil {
-		sim.Log(" +%0.0f %s from %s\n", amount, stat.StatName(), AuraName(auraID))
+		sim.Log(" +%0.0f %s from %s\n", amount, stat.StatName(), auraName)
 	}
 	character.AddStat(stat, amount)
 
 	character.AddAura(sim, Aura{
 		ID:      auraID,
+		Name:    auraName,
 		Expires: sim.CurrentTime + duration,
 		OnExpire: func(sim *Simulation) {
 			if sim.Log != nil {
-				sim.Log(" -%0.0f %s from %s\n", amount, stat.StatName(), AuraName(auraID))
+				sim.Log(" -%0.0f %s from %s\n", amount, stat.StatName(), auraName)
 			}
 			character.AddStat(stat, -amount)
 		},

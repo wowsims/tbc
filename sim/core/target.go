@@ -77,6 +77,7 @@ func applyDebuffEffects(target *Target, debuffs proto.Debuffs) {
 		target.AddPermanentAura(func(sim *Simulation) Aura {
 			return Aura{
 				ID: MagicIDImprovedSealOfTheCrusader,
+				Name: "Improved Seal of the Crusader",
 				OnBeforeSpellHit: func(sim *Simulation, hitInput *DirectCastDamageInput) {
 					hitInput.BonusCrit += 3
 					// FUTURE: melee crit bonus, research actual value
@@ -88,7 +89,8 @@ func applyDebuffEffects(target *Target, debuffs proto.Debuffs) {
 
 func miseryAura() Aura {
 	return Aura{
-		ID:      MagicIDMisery,
+		ID: MagicIDMisery,
+		Name: "Misery",
 		OnSpellHit: func(sim *Simulation, cast DirectCastAction, result *DirectCastDamageResult) {
 			result.Damage *= 1.05
 		},
@@ -98,7 +100,8 @@ func miseryAura() Aura {
 func auraJudgementOfWisdom() Aura {
 	const mana = 74 / 2 // 50% proc
 	return Aura{
-		ID:      MagicIDJoW,
+		ID: MagicIDJoW,
+		Name: "Judgement of Wisdom",
 		OnSpellHit: func(sim *Simulation, cast DirectCastAction, result *DirectCastDamageResult) {
 			if cast.GetActionID().ItemID == ItemIDTheLightningCapacitor {
 				return // TLC cant proc JoW

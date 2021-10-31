@@ -150,6 +150,7 @@ func (shaman *Shaman) registerElementalMasteryCD() {
 			return func(sim *core.Simulation, character *core.Character) bool {
 				character.AddAura(sim, core.Aura{
 					ID:      core.MagicIDEleMastery,
+					Name:    "Elemental Mastery",
 					Expires: core.NeverExpires,
 					OnCast: func(sim *core.Simulation, cast core.DirectCastAction, input *core.DirectCastInput) {
 						input.ManaCost = 0

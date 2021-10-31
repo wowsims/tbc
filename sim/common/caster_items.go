@@ -25,10 +25,11 @@ func ApplyRobeOfTheElderScribes(agent core.Agent) {
 
 		return core.Aura{
 			ID:      core.MagicIDElderScribe,
+			Name:    "Robes of the Elder Scibe",
 			OnSpellHit: func(sim *core.Simulation, cast core.DirectCastAction, result *core.DirectCastDamageResult) {
 				if !icd.IsOnCD(sim) && sim.RandomFloat("unmarked") < proc {
 					icd = core.InternalCD(sim.CurrentTime + icdDur)
-					character.AddAuraWithTemporaryStats(sim, core.MagicIDElderScribeProc, stats.SpellPower, spellBonus, dur)
+					character.AddAuraWithTemporaryStats(sim, core.MagicIDElderScribeProc, "Power of Arcanagos", stats.SpellPower, spellBonus, dur)
 				}
 			},
 		}

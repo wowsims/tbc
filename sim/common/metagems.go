@@ -25,10 +25,11 @@ func ApplyMysticalSkyfireDiamond(agent core.Agent) {
 
 		return core.Aura{
 			ID:      core.MagicIDMysticSkyfire,
+			Name:    "Mystical Skyfire Diamond",
 			OnCastComplete: func(sim *core.Simulation, cast core.DirectCastAction) {
 				if !icd.IsOnCD(sim) && sim.RandomFloat("unmarked") < 0.15 {
 					icd = core.InternalCD(sim.CurrentTime + icdDur)
-					character.AddAuraWithTemporaryStats(sim, core.MagicIDMysticFocus, stats.SpellHaste, hasteBonus, dur)
+					character.AddAuraWithTemporaryStats(sim, core.MagicIDMysticFocus, "Mystic Focus", stats.SpellHaste, hasteBonus, dur)
 				}
 			},
 		}
@@ -43,6 +44,7 @@ func ApplyInsightfulEarthstormDiamond(agent core.Agent) {
 
 		return core.Aura{
 			ID:      core.MagicIDInsightfulEarthstorm,
+			Name:    "Insightful Earthstorm Diamond",
 			OnCastComplete: func(sim *core.Simulation, cast core.DirectCastAction) {
 				if !icd.IsOnCD(sim) && sim.RandomFloat("unmarked") < 0.04 {
 					icd = core.InternalCD(sim.CurrentTime + dur)
@@ -61,6 +63,7 @@ func ApplyChaoticSkyfireDiamond(agent core.Agent) {
 	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		return core.Aura{
 			ID:      core.MagicIDChaoticSkyfire,
+			Name:    "Chaotic Skyfire Diamond",
 			OnCast: func(sim *core.Simulation, cast core.DirectCastAction, input *core.DirectCastInput) {
 				// For a normal spell with crit multiplier of 1.5, this will be 1.
 				// For a spell with a multiplier of 2 (i.e. 100% increased critical damage) this will be 2.

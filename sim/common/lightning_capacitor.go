@@ -21,6 +21,7 @@ func ApplyTheLightningCapacitor(agent core.Agent) {
 
 		return core.Aura{
 			ID:      core.MagicIDTLC,
+			Name:    "The Lightning Capacitor",
 			OnSpellHit: func(sim *core.Simulation, cast core.DirectCastAction, result *core.DirectCastDamageResult) {
 				if icd.IsOnCD(sim) {
 					return

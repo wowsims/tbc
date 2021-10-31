@@ -147,6 +147,7 @@ func registerBloodlustCD(agent Agent, buffs proto.Buffs) {
 					character.SetCD(MagicIDBloodlust, sim.CurrentTime+dur)
 					character.Party.AddAura(sim, Aura{
 						ID:      MagicIDBloodlust,
+						Name:    "Bloodlust",
 						Expires: sim.CurrentTime + dur,
 						OnCast: func(sim *Simulation, cast DirectCastAction, input *DirectCastInput) {
 							// Multiply and divide lets us use integer math, which is better for perf.

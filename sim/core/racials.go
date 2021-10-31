@@ -48,7 +48,7 @@ func applyRaceEffects(agent Agent) {
 			ActivationFactory: func(sim *Simulation) CooldownActivation {
 				return func(sim *Simulation, character *Character) bool {
 					character.SetCD(MagicIDOrcBloodFury, cd+sim.CurrentTime)
-					character.AddAuraWithTemporaryStats(sim, MagicIDOrcBloodFury, stats.SpellPower, spBonus, dur)
+					character.AddAuraWithTemporaryStats(sim, MagicIDOrcBloodFury, "Orc Blood Fury", stats.SpellPower, spBonus, dur)
 					return true
 				}
 			},
@@ -74,6 +74,7 @@ func applyRaceEffects(agent Agent) {
 					character.SetCD(MagicIDTrollBerserking, cd+sim.CurrentTime)
 					character.AddAura(sim, Aura{
 						ID:      MagicIDTrollBerserking,
+						Name:    "Troll Berserking",
 						Expires: sim.CurrentTime + dur,
 						OnCast: func(sim *Simulation, cast DirectCastAction, inputs *DirectCastInput) {
 							// Multiplying and then dividing lets us use integer multiplication/division which is faster.
