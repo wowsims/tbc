@@ -223,7 +223,7 @@ func (sim *Simulation) Advance(elapsedTime time.Duration) {
 	}
 
 	for _, target := range sim.targets {
-		target.advance(sim, elapsedTime)
+		target.Advance(sim, elapsedTime)
 	}
 }
 

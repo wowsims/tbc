@@ -106,6 +106,9 @@ func (at *auraTracker) reset(sim *Simulation) {
 		}
 		at.AddAura(sim, aura)
 	}
+	if at.playerID == -1 {
+		fmt.Printf("Done Resetting\n")
+	}
 }
 
 func (at *auraTracker) advance(sim *Simulation, newTime time.Duration) {
@@ -164,7 +167,7 @@ func (at *auraTracker) RemoveAura(sim *Simulation, id int32) {
 
 // Returns whether an aura with the given ID is currently active.
 func (at *auraTracker) HasAura(id int32) bool {
-	if len(at.activeAuraIDs) == 0 {
+	if at.playerID == -1 && len(at.activeAuraIDs) == 0 {
 		fmt.Printf("Checking for aura %s, cur id: %d\n", AuraName(id), at.auras[id].ID)
 	}
 	return at.auras[id].ID != 0
