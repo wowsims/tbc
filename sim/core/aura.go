@@ -1,6 +1,7 @@
 package core
 
 import (
+	"fmt"
 	"math"
 	"time"
 
@@ -90,6 +91,9 @@ func (at *auraTracker) finalize() {
 }
 
 func (at *auraTracker) reset(sim *Simulation) {
+	if at.playerID == -1 {
+		fmt.Printf("Resetting\n")
+	}
 	at.auras = [MagicIDLen]Aura{}
 	at.cooldowns = [MagicIDLen]time.Duration{}
 	at.activeAuraIDs = at.activeAuraIDs[:0]
@@ -97,6 +101,9 @@ func (at *auraTracker) reset(sim *Simulation) {
 	for _, permAura := range at.permanentAuras {
 		aura := permAura(sim)
 		aura.Expires = NeverExpires
+		if at.playerID == -1 {
+			fmt.Printf("Re-adding perm aura %s\n", AuraName(aura.ID))
+		}
 		at.AddAura(sim, aura)
 	}
 }
