@@ -21,12 +21,12 @@ func CalcStatWeight(params IndividualParams, statsToWeigh []stats.Stat, referenc
 	baseStats := baseSim.Raid.Parties[0].Players[0].GetCharacter().GetStats()
 	baselineResult := baseSim.Run()
 
-	var waitGroup sync.WaitGroup
+	//var waitGroup sync.WaitGroup
 	result := StatWeightsResult{}
 	dpsHists := [stats.Len]map[int32]int32{}
 
 	doStat := func(stat stats.Stat, value float64) {
-		defer waitGroup.Done()
+		//defer waitGroup.Done()
 
 		newParams := params
 		newParams.CustomStats[stat] += value
@@ -51,8 +51,9 @@ func CalcStatWeight(params IndividualParams, statsToWeigh []stats.Stat, referenc
 		if mod == 0 {
 			continue
 		}
-		waitGroup.Add(1)
-		go doStat(stats.Stat(stat), mod)
+		//waitGroup.Add(1)
+		//go doStat(stats.Stat(stat), mod)
+		doStat(stats.Stat(stat), mod)
 	}
 
 	waitGroup.Wait()

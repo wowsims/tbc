@@ -6,6 +6,7 @@ import (
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/proto"
 	. "github.com/wowsims/tbc/sim/shaman"
+	googleProto "google.golang.org/protobuf/proto"
 )
 
 func RegisterElementalShaman() {
@@ -270,39 +271,30 @@ func NewAdaptiveRotation(simParams core.IndividualParams) *AdaptiveRotation {
 	clearcastParams.Options.Debug = false
 	clearcastParams.Options.Iterations = 100
 
-	eleShamParams := *clearcastParams.PlayerOptions.GetElementalShaman()
-	eleShamParams.Rotation = &proto.ElementalShaman_Rotation{Type: proto.ElementalShaman_Rotation_CLOnClearcast} // create new agent.
-
-	// Assign new eleShamParams
-	clearcastParams.PlayerOptions = &proto.PlayerOptions{
-		Race: simParams.PlayerOptions.Race, //primitive, no pointer
-		Spec: &proto.PlayerOptions_ElementalShaman{
-			ElementalShaman: &eleShamParams,
-		},
-		// reuse pointer since this isn't mutated
-		Consumes: simParams.PlayerOptions.Consumes,
-	}
+	playerOptions := googleProto.Clone(clearcastParams.PlayerOptions).(*proto.PlayerOptions)
+	playerOptions.Spec.(*proto.PlayerOptions_ElementalShaman).ElementalShaman.Rotation.Type = proto.ElementalShaman_Rotation_CLOnClearcast
+	clearcastParams.PlayerOptions = playerOptions
 
 	// If no encounter is set, it means we aren't going to run a sim at all.
 	// So just return something valid.
 	// TODO: Probably need some organized way of doing presims so we dont have
 	// to check these types of things.
-	//if len(clearcastParams.Options.Encounter.Targets) == 0 {
+	if len(clearcastParams.Options.Encounter.Targets) == 0 {
 		agent.baseRotation = NewLBOnlyRotation()
 		agent.surplusRotation = NewCLOnClearcastRotation()
 		return agent
-	//}
+	}
 
-	//clearcastSim := core.NewIndividualSim(clearcastParams)
-	//clearcastResult := clearcastSim.Run()
+	clearcastSim := core.NewIndividualSim(clearcastParams)
+	clearcastResult := clearcastSim.Run()
 
-	//if clearcastResult.Agents[0].NumOom >= 5 {
-	//	agent.baseRotation = NewLBOnlyRotation()
-	//	agent.surplusRotation = NewCLOnClearcastRotation()
-	//} else {
-	//	agent.baseRotation = NewCLOnClearcastRotation()
-	//	agent.surplusRotation = NewCLOnCDRotation()
-	//}
+	if clearcastResult.Agents[0].NumOom >= 5 {
+		agent.baseRotation = NewLBOnlyRotation()
+		agent.surplusRotation = NewCLOnClearcastRotation()
+	} else {
+		agent.baseRotation = NewCLOnClearcastRotation()
+		agent.surplusRotation = NewCLOnCDRotation()
+	}
 
 	return agent
 }
