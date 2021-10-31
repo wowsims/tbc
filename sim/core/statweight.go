@@ -4,7 +4,7 @@ import (
 	"log"
 	"math"
 	"math/rand"
-	"sync"
+	//"sync"
 
 	"github.com/wowsims/tbc/sim/core/stats"
 )
@@ -56,7 +56,7 @@ func CalcStatWeight(params IndividualParams, statsToWeigh []stats.Stat, referenc
 		doStat(stats.Stat(stat), mod)
 	}
 
-	waitGroup.Wait()
+	//waitGroup.Wait()
 
 	for statIdx, mod := range statMods {
 		if mod == 0 {
