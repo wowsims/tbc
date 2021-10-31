@@ -1,4 +1,3 @@
-import { Sim } from '/tbc/core/sim.js';
 import { TypedEvent } from '/tbc/core/typed_event.js';
 
 import { Input, InputConfig } from './input.js';
@@ -6,15 +5,15 @@ import { Input, InputConfig } from './input.js';
 /**
  * Data for creating a number picker.
  */
-export interface NumberPickerConfig extends InputConfig<number> {
+export interface NumberPickerConfig<ModObject> extends InputConfig<ModObject, number> {
 }
 
 // UI element for picking an arbitrary number field.
-export class NumberPicker extends Input<number> {
+export class NumberPicker<ModObject> extends Input<ModObject, number> {
 	private readonly inputElem: HTMLInputElement;
 
-  constructor(parent: HTMLElement, sim: Sim<any>, config: NumberPickerConfig) {
-    super(parent, 'number-picker-root', sim, config);
+  constructor(parent: HTMLElement, modObject: ModObject, config: NumberPickerConfig<ModObject>) {
+    super(parent, 'number-picker-root', modObject, config);
 
     this.inputElem = document.createElement('input');
     this.inputElem.type = "number";

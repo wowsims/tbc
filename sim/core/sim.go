@@ -43,7 +43,7 @@ type InitialAura func(*Simulation) Aura
 
 type Simulation struct {
 	Raid         *Raid
-	targets      []Target
+	targets      []*Target
 	Options      Options
 	Duration     time.Duration
 
@@ -232,7 +232,7 @@ func (sim *Simulation) GetNumTargets() int32 {
 }
 
 func (sim *Simulation) GetTarget(index int32) *Target {
-	return &sim.targets[index]
+	return sim.targets[index]
 }
 
 func (sim *Simulation) GetPrimaryTarget() *Target {

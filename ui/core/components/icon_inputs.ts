@@ -1,9 +1,12 @@
 import { Buffs } from '/tbc/core/proto/common.js';
 import { Consumes } from '/tbc/core/proto/common.js';
+import { Debuffs } from '/tbc/core/proto/common.js';
 import { Drums } from '/tbc/core/proto/common.js';
 import { Potions } from '/tbc/core/proto/common.js';
 import { ItemOrSpellId } from '/tbc/core/resources.js';
+import { Player } from '/tbc/core/player.js';
 import { Sim } from '/tbc/core/sim.js';
+import { Target } from '/tbc/core/target.js';
 
 import { ExclusivityTag } from '/tbc/core/sim_ui.js';
 import { IconInput } from './icon_picker.js';
@@ -34,9 +37,9 @@ export const DrumsOfBattleBuff = makeEnumValueBuffInput({spellId:35476}, 'drums'
 export const DrumsOfRestorationBuff = makeEnumValueBuffInput({spellId:35478}, 'drums', Drums.DrumsOfRestoration, ['Drums']);
 
 // Debuffs
-export const ImprovedSealOfTheCrusader = makeBooleanBuffInput({spellId:20337}, 'improvedSealOfTheCrusader');
-export const JudgementOfWisdom = makeBooleanBuffInput({spellId:27164}, 'judgementOfWisdom');
-export const Misery = makeBooleanBuffInput({spellId:33195}, 'misery');
+export const ImprovedSealOfTheCrusader = makeBooleanDebuffInput({spellId:20337}, 'improvedSealOfTheCrusader');
+export const JudgementOfWisdom = makeBooleanDebuffInput({spellId:27164}, 'judgementOfWisdom');
+export const Misery = makeBooleanDebuffInput({spellId:33195}, 'misery');
 
 // Consumes
 export const AdeptsElixir = makeBooleanConsumeInput({itemId:28103}, 'adeptsElixir', ['Battle Elixir']);
@@ -61,14 +64,14 @@ export const DefaultSuperManaPotion = makeEnumValueConsumeInput({itemId:22832}, 
 export const DrumsOfBattleConsume = makeEnumValueConsumeInput({spellId:35476}, 'drums', Drums.DrumsOfBattle, ['Drums']);
 export const DrumsOfRestorationConsume = makeEnumValueConsumeInput({spellId:35478}, 'drums', Drums.DrumsOfRestoration, ['Drums']);
 
-function makeBooleanBuffInput(id: ItemOrSpellId, buffsFieldName: keyof Buffs, exclusivityTags?: Array<ExclusivityTag>): IconInput {
+function makeBooleanBuffInput(id: ItemOrSpellId, buffsFieldName: keyof Buffs, exclusivityTags?: Array<ExclusivityTag>): IconInput<Sim> {
   return {
     id: id,
     states: 2,
     exclusivityTags: exclusivityTags,
-    changedEvent: (sim: Sim<any>) => sim.buffsChangeEmitter,
-    getValue: (sim: Sim<any>) => sim.getBuffs()[buffsFieldName],
-    setBooleanValue: (sim: Sim<any>, newValue: boolean) => {
+    changedEvent: (sim: Sim) => sim.buffsChangeEmitter,
+    getValue: (sim: Sim) => sim.getBuffs()[buffsFieldName],
+    setBooleanValue: (sim: Sim, newValue: boolean) => {
       const newBuffs = sim.getBuffs();
       (newBuffs[buffsFieldName] as boolean) = newValue;
       sim.setBuffs(newBuffs);
@@ -76,14 +79,14 @@ function makeBooleanBuffInput(id: ItemOrSpellId, buffsFieldName: keyof Buffs, ex
   }
 }
 
-function makeTristateBuffInput(id: ItemOrSpellId, impId: ItemOrSpellId, buffsFieldName: keyof Buffs): IconInput {
+function makeTristateBuffInput(id: ItemOrSpellId, impId: ItemOrSpellId, buffsFieldName: keyof Buffs): IconInput<Sim> {
   return {
     id: id,
     states: 3,
     improvedId: impId,
-    changedEvent: (sim: Sim<any>) => sim.buffsChangeEmitter,
-    getValue: (sim: Sim<any>) => sim.getBuffs()[buffsFieldName],
-    setNumberValue: (sim: Sim<any>, newValue: number) => {
+    changedEvent: (sim: Sim) => sim.buffsChangeEmitter,
+    getValue: (sim: Sim) => sim.getBuffs()[buffsFieldName],
+    setNumberValue: (sim: Sim, newValue: number) => {
       const newBuffs = sim.getBuffs();
       (newBuffs[buffsFieldName] as number) = newValue;
       sim.setBuffs(newBuffs);
@@ -91,13 +94,13 @@ function makeTristateBuffInput(id: ItemOrSpellId, impId: ItemOrSpellId, buffsFie
   }
 }
 
-function makeMultistateBuffInput(id: ItemOrSpellId, numStates: number, buffsFieldName: keyof Buffs): IconInput {
+function makeMultistateBuffInput(id: ItemOrSpellId, numStates: number, buffsFieldName: keyof Buffs): IconInput<Sim> {
   return {
     id: id,
     states: numStates,
-    changedEvent: (sim: Sim<any>) => sim.buffsChangeEmitter,
-    getValue: (sim: Sim<any>) => sim.getBuffs()[buffsFieldName],
-    setNumberValue: (sim: Sim<any>, newValue: number) => {
+    changedEvent: (sim: Sim) => sim.buffsChangeEmitter,
+    getValue: (sim: Sim) => sim.getBuffs()[buffsFieldName],
+    setNumberValue: (sim: Sim, newValue: number) => {
       const newBuffs = sim.getBuffs();
       (newBuffs[buffsFieldName] as number) = newValue;
       sim.setBuffs(newBuffs);
@@ -105,14 +108,14 @@ function makeMultistateBuffInput(id: ItemOrSpellId, numStates: number, buffsFiel
   }
 }
 
-function makeEnumValueBuffInput(id: ItemOrSpellId, buffsFieldName: keyof Buffs, enumValue: number, exclusivityTags?: Array<ExclusivityTag>): IconInput {
+function makeEnumValueBuffInput(id: ItemOrSpellId, buffsFieldName: keyof Buffs, enumValue: number, exclusivityTags?: Array<ExclusivityTag>): IconInput<Sim> {
   return {
     id: id,
     states: 2,
     exclusivityTags: exclusivityTags,
-    changedEvent: (sim: Sim<any>) => sim.buffsChangeEmitter,
-    getValue: (sim: Sim<any>) => sim.getBuffs()[buffsFieldName] == enumValue,
-    setBooleanValue: (sim: Sim<any>, newValue: boolean) => {
+    changedEvent: (sim: Sim) => sim.buffsChangeEmitter,
+    getValue: (sim: Sim) => sim.getBuffs()[buffsFieldName] == enumValue,
+    setBooleanValue: (sim: Sim, newValue: boolean) => {
 			const newBuffs = sim.getBuffs();
 			(newBuffs[buffsFieldName] as number) = newValue ? enumValue : 0;
 			sim.setBuffs(newBuffs);
@@ -120,32 +123,47 @@ function makeEnumValueBuffInput(id: ItemOrSpellId, buffsFieldName: keyof Buffs, 
   }
 }
 
-function makeBooleanConsumeInput(id: ItemOrSpellId, consumesFieldName: keyof Consumes, exclusivityTags?: Array<ExclusivityTag>): IconInput {
+function makeBooleanDebuffInput(id: ItemOrSpellId, debuffsFieldName: keyof Debuffs, exclusivityTags?: Array<ExclusivityTag>): IconInput<Target> {
   return {
     id: id,
     states: 2,
     exclusivityTags: exclusivityTags,
-    changedEvent: (sim: Sim<any>) => sim.consumesChangeEmitter,
-    getValue: (sim: Sim<any>) => sim.getConsumes()[consumesFieldName],
-    setBooleanValue: (sim: Sim<any>, newValue: boolean) => {
-      const newBuffs = sim.getConsumes();
-      (newBuffs[consumesFieldName] as boolean) = newValue;
-      sim.setConsumes(newBuffs);
+    changedEvent: (target: Target) => target.debuffsChangeEmitter,
+    getValue: (target: Target) => target.getDebuffs()[debuffsFieldName],
+    setBooleanValue: (target: Target, newValue: boolean) => {
+      const newDebuffs = target.getDebuffs();
+      (newDebuffs[debuffsFieldName] as boolean) = newValue;
+      target.setDebuffs(newDebuffs);
     },
   }
 }
 
-function makeEnumValueConsumeInput(id: ItemOrSpellId, consumesFieldName: keyof Consumes, enumValue: number, exclusivityTags?: Array<ExclusivityTag>): IconInput {
+function makeBooleanConsumeInput(id: ItemOrSpellId, consumesFieldName: keyof Consumes, exclusivityTags?: Array<ExclusivityTag>): IconInput<Player<any>> {
   return {
     id: id,
     states: 2,
     exclusivityTags: exclusivityTags,
-    changedEvent: (sim: Sim<any>) => sim.consumesChangeEmitter,
-    getValue: (sim: Sim<any>) => sim.getConsumes()[consumesFieldName] == enumValue,
-    setBooleanValue: (sim: Sim<any>, newValue: boolean) => {
-			const newConsumes = sim.getConsumes();
+    changedEvent: (player: Player<any>) => player.consumesChangeEmitter,
+    getValue: (player: Player<any>) => player.getConsumes()[consumesFieldName],
+    setBooleanValue: (player: Player<any>, newValue: boolean) => {
+      const newBuffs = player.getConsumes();
+      (newBuffs[consumesFieldName] as boolean) = newValue;
+      player.setConsumes(newBuffs);
+    },
+  }
+}
+
+function makeEnumValueConsumeInput(id: ItemOrSpellId, consumesFieldName: keyof Consumes, enumValue: number, exclusivityTags?: Array<ExclusivityTag>): IconInput<Player<any>> {
+  return {
+    id: id,
+    states: 2,
+    exclusivityTags: exclusivityTags,
+    changedEvent: (player: Player<any>) => player.consumesChangeEmitter,
+    getValue: (player: Player<any>) => player.getConsumes()[consumesFieldName] == enumValue,
+    setBooleanValue: (player: Player<any>, newValue: boolean) => {
+			const newConsumes = player.getConsumes();
 			(newConsumes[consumesFieldName] as number) = newValue ? enumValue : 0;
-			sim.setConsumes(newConsumes);
+			player.setConsumes(newConsumes);
     },
   }
 }

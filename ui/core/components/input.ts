@@ -8,32 +8,32 @@ declare var tippy: any;
 /**
  * Data for creating a new input UI element.
  */
-export interface InputConfig<T> {
+export interface InputConfig<ModObject, T> {
   label?: string,
 	labelTooltip?: string,
 
   defaultValue?: T,
 
-	// Returns the event indicating the mapped Sim value has changed.
-  changedEvent: (sim: Sim<any>) => TypedEvent<any>,
+	// Returns the event indicating the mapped value has changed.
+  changedEvent: (obj: ModObject) => TypedEvent<any>,
 
-	// Get and set the mapped Sim value.
-  getValue: (sim: Sim<any>) => T,
-  setValue: (sim: Sim<any>, newValue: T) => void,
+	// Get and set the mapped value.
+  getValue: (obj: ModObject) => T,
+  setValue: (obj: ModObject, newValue: T) => void,
 
 	// If set, will automatically disable the input when this evaluates to false.
-	enableWhen?: (sim: Sim<any>) => boolean,
+	enableWhen?: (obj: ModObject) => boolean,
 }
 
-// Shared logic for UI elements that are mapped to Sim values.
-export abstract class Input<T> extends Component {
-	private readonly inputConfig: InputConfig<T>;
-	readonly sim: Sim<any>;
+// Shared logic for UI elements that are mapped to a value for some modifiable object.
+export abstract class Input<ModObject, T> extends Component {
+	private readonly inputConfig: InputConfig<ModObject, T>;
+	readonly modObject: ModObject;
 
-  constructor(parent: HTMLElement, cssClass: string, sim: Sim<any>, config: InputConfig<T>) {
+  constructor(parent: HTMLElement, cssClass: string, modObject: ModObject, config: InputConfig<ModObject, T>) {
     super(parent, 'input-root');
 		this.inputConfig = config;
-		this.sim = sim;
+		this.modObject = modObject;
 		this.rootElem.classList.add(cssClass);
 
     if (config.label) {
@@ -50,14 +50,14 @@ export abstract class Input<T> extends Component {
 			}
     }
 
-    config.changedEvent(this.sim).on(() => {
-			this.setInputValue(config.getValue(this.sim));
+    config.changedEvent(this.modObject).on(() => {
+			this.setInputValue(config.getValue(this.modObject));
 			this.update();
     });
 	}
 
 	private update() {
-		const enable = !this.inputConfig.enableWhen || this.inputConfig.enableWhen(this.sim);
+		const enable = !this.inputConfig.enableWhen || this.inputConfig.enableWhen(this.modObject);
 		if (enable) {
 			this.rootElem.classList.remove('disabled');
 			this.getInputElem().removeAttribute('disabled');
@@ -72,7 +72,7 @@ export abstract class Input<T> extends Component {
 		if (this.inputConfig.defaultValue) {
 			this.setInputValue(this.inputConfig.defaultValue);
 		} else {
-			this.setInputValue(this.inputConfig.getValue(this.sim));
+			this.setInputValue(this.inputConfig.getValue(this.modObject));
 		}
 		this.update();
 	}
@@ -85,6 +85,6 @@ export abstract class Input<T> extends Component {
 
 	// Child classes should call this method when the value in the input element changes.
 	inputChanged() {
-		this.inputConfig.setValue(this.sim, this.getInputValue());
+		this.inputConfig.setValue(this.modObject, this.getInputValue());
 	}
 }

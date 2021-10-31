@@ -11,7 +11,7 @@ import { getIconUrl } from '/tbc/core/resources.js';
 import { setWowheadHref } from '/tbc/core/resources.js';
 import { setGemSocketCssClass } from '/tbc/core/css_utils.js';
 import { setItemQualityCssClass } from '/tbc/core/css_utils.js';
-import { Sim } from '/tbc/core/sim.js';
+import { Player } from '/tbc/core/player.js';
 import { getEnumValues } from '/tbc/core/utils.js';
 
 import { Component } from './component.js';
@@ -20,7 +20,7 @@ export class GearPicker extends Component {
   // ItemSlot is used as the index
   readonly itemPickers: Array<ItemPicker>;
 
-  constructor(parent: HTMLElement, sim: Sim<any>) {
+  constructor(parent: HTMLElement, player: Player<any>) {
     super(parent, 'gear-picker-root');
 
     const leftSide = document.createElement('div');
@@ -31,7 +31,7 @@ export class GearPicker extends Component {
     rightSide.classList.add('gear-picker-right');
     this.rootElem.appendChild(rightSide);
 
-    const selectorModal = new SelectorModal(document.body, sim);
+    const selectorModal = new SelectorModal(document.body, player);
 
     const leftItemPickers = [
       ItemSlot.ItemSlotHead,
@@ -42,7 +42,7 @@ export class GearPicker extends Component {
       ItemSlot.ItemSlotWrist,
       ItemSlot.ItemSlotMainHand,
       ItemSlot.ItemSlotOffHand,
-    ].map(slot => new ItemPicker(leftSide, sim, slot, selectorModal));
+    ].map(slot => new ItemPicker(leftSide, player, slot, selectorModal));
 
     const rightItemPickers = [
       ItemSlot.ItemSlotHands,
@@ -54,7 +54,7 @@ export class GearPicker extends Component {
       ItemSlot.ItemSlotTrinket1,
       ItemSlot.ItemSlotTrinket2,
       ItemSlot.ItemSlotRanged,
-    ].map(slot => new ItemPicker(rightSide, sim, slot, selectorModal));
+    ].map(slot => new ItemPicker(rightSide, player, slot, selectorModal));
 
     this.itemPickers = leftItemPickers.concat(rightItemPickers).sort((a, b) => a.slot - b.slot);
   }
@@ -63,7 +63,7 @@ export class GearPicker extends Component {
 class ItemPicker extends Component {
   readonly slot: ItemSlot;
 
-  private readonly sim: Sim<any>;
+  private readonly player: Player<any>;
   private readonly iconElem: HTMLAnchorElement;
   private readonly nameElem: HTMLElement;
   private readonly enchantElem: HTMLElement;
@@ -76,10 +76,10 @@ class ItemPicker extends Component {
   private _equippedItem: EquippedItem | null = null;
   
 
-  constructor(parent: HTMLElement, sim: Sim<any>, slot: ItemSlot, selectorModal: SelectorModal) {
+  constructor(parent: HTMLElement, player: Player<any>, slot: ItemSlot, selectorModal: SelectorModal) {
     super(parent, 'item-picker-root');
     this.slot = slot;
-    this.sim = sim;
+    this.player = player;
 
     this.rootElem.innerHTML = `
       <a class="item-picker-icon" target="_blank" data-toggle="modal" data-target="#selectorModal">
@@ -98,16 +98,16 @@ class ItemPicker extends Component {
     this.socketsContainerElem = this.rootElem.getElementsByClassName('item-picker-sockets-container')[0] as HTMLElement;
 
     this.item = null;
-    sim.gearListEmitter.on(() => {
-      this._items = this.sim.getItems(this.slot);
-      this._enchants = this.sim.getEnchants(this.slot);
+    player.gearListEmitter.on(() => {
+      this._items = this.player.sim.getItems(this.slot);
+      this._enchants = this.player.sim.getEnchants(this.slot);
 
       this.iconElem.addEventListener('click', event => {
         selectorModal.setData(this.slot, this._equippedItem, this._items, this._enchants);
       });
     });
-    sim.gearChangeEmitter.on(() => {
-      this.item = sim.getEquippedItem(slot);
+    player.gearChangeEmitter.on(() => {
+      this.item = player.getEquippedItem(slot);
     });
   }
 
@@ -129,7 +129,7 @@ class ItemPicker extends Component {
       this.nameElem.textContent = newItem.item.name;
       setItemQualityCssClass(this.nameElem, newItem.item.quality);
 
-      this.sim.setWowheadData(newItem, this.iconElem);
+      this.player.setWowheadData(newItem, this.iconElem);
       setWowheadHref(this.iconElem, {itemId: newItem.item.id});
       getIconUrl({itemId: newItem.item.id}).then(url => {
         this.iconElem.style.backgroundImage = `url('${url}')`;
@@ -159,14 +159,14 @@ class ItemPicker extends Component {
 }
 
 class SelectorModal extends Component {
-  private readonly sim: Sim<any>;
+  private readonly player: Player<any>;
   private readonly tabsElem: HTMLElement;
   private readonly contentElem: HTMLElement;
   private readonly closeButton: HTMLButtonElement;
 
-  constructor(parent: HTMLElement, sim: Sim<any>) {
+  constructor(parent: HTMLElement, player: Player<any>) {
     super(parent, 'selector-model-root');
-    this.sim = sim;
+    this.player = player;
 
     this.rootElem.innerHTML = `
     <div class="modal fade selector-modal" id="selectorModal" tabindex="-1" role="dialog" aria-labelledby="selectorModalTitle" aria-hidden="true">
@@ -204,7 +204,7 @@ class SelectorModal extends Component {
         slot,
         equippedItem,
         eligibleItems,
-				item => this.sim.computeItemEP(item),
+				item => this.player.computeItemEP(item),
         equippedItem => equippedItem?.item,
         item => {
           return {
@@ -213,17 +213,17 @@ class SelectorModal extends Component {
             quality: item.quality,
 						phase: item.phase,
             onEquip: item => {
-              const equippedItem = this.sim.getEquippedItem(slot);
+              const equippedItem = this.player.getEquippedItem(slot);
               if (equippedItem) {
-                this.sim.equipItem(slot, equippedItem.withItem(item));
+                this.player.equipItem(slot, equippedItem.withItem(item));
               } else {
-                this.sim.equipItem(slot, new EquippedItem(item));
+                this.player.equipItem(slot, new EquippedItem(item));
               }
             },
           };
         },
         () => {
-          this.sim.equipItem(slot, null);
+          this.player.equipItem(slot, null);
         });
 
     this.addTab(
@@ -231,7 +231,7 @@ class SelectorModal extends Component {
         slot,
         equippedItem,
         eligibleEnchants,
-				enchant => this.sim.computeEnchantEP(enchant),
+				enchant => this.player.computeEnchantEP(enchant),
         equippedItem => equippedItem?.enchant,
         enchant => {
           return {
@@ -240,16 +240,16 @@ class SelectorModal extends Component {
             quality: enchant.quality,
 						phase: 1,
             onEquip: enchant => {
-              const equippedItem = this.sim.getEquippedItem(slot);
+              const equippedItem = this.player.getEquippedItem(slot);
               if (equippedItem)
-                this.sim.equipItem(slot, equippedItem.withEnchant(enchant));
+                this.player.equipItem(slot, equippedItem.withEnchant(enchant));
             },
           };
         },
         () => {
-          const equippedItem = this.sim.getEquippedItem(slot);
+          const equippedItem = this.player.getEquippedItem(slot);
           if (equippedItem)
-            this.sim.equipItem(slot, equippedItem.withEnchant(null));
+            this.player.equipItem(slot, equippedItem.withEnchant(null));
         });
 
     this.addGemTabs(slot, equippedItem);
@@ -261,8 +261,8 @@ class SelectorModal extends Component {
           'Gem ' + (socketIdx + 1),
           slot,
           equippedItem,
-          this.sim.getGems(socketColor),
-					gem => this.sim.computeGemEP(gem),
+          this.player.sim.getGems(socketColor),
+					gem => this.player.computeGemEP(gem),
           equippedItem => equippedItem?.gems[socketIdx],
           gem => {
             return {
@@ -271,16 +271,16 @@ class SelectorModal extends Component {
               quality: gem.quality,
 							phase: gem.phase,
               onEquip: gem => {
-                const equippedItem = this.sim.getEquippedItem(slot);
+                const equippedItem = this.player.getEquippedItem(slot);
                 if (equippedItem)
-                  this.sim.equipItem(slot, equippedItem.withGem(gem, socketIdx));
+                  this.player.equipItem(slot, equippedItem.withGem(gem, socketIdx));
               },
             };
           },
           () => {
-            const equippedItem = this.sim.getEquippedItem(slot);
+            const equippedItem = this.player.getEquippedItem(slot);
             if (equippedItem)
-              this.sim.equipItem(slot, equippedItem.withGem(null, socketIdx));
+              this.player.equipItem(slot, equippedItem.withGem(null, socketIdx));
           });
     });
   }
@@ -387,7 +387,7 @@ class SelectorModal extends Component {
         // If the item changes, the gem slots might change, so remove and recreate the gem tabs
         if (Item.is(item)) {
           this.removeTabs('Gem');
-          this.addGemTabs(slot, this.sim.getEquippedItem(slot));
+          this.addGemTabs(slot, this.player.getEquippedItem(slot));
         }
       };
       nameElem.addEventListener('click', onclick);
@@ -403,7 +403,7 @@ class SelectorModal extends Component {
     });
 
     const updateSelected = () => {
-      const newEquippedItem = this.sim.getEquippedItem(slot);
+      const newEquippedItem = this.player.getEquippedItem(slot);
 			const newItem = equippedToItemFn(newEquippedItem);
 			if (!newItem)
 				return;
@@ -438,11 +438,11 @@ class SelectorModal extends Component {
       });
     };
 		updateSelected();
-    this.sim.gearChangeEmitter.on(updateSelected);
+    this.player.gearChangeEmitter.on(updateSelected);
 
 		const applyFilters = () => {
 			const searchQuery = searchInput.value.toLowerCase();
-			const phase = this.sim.getPhase();
+			const phase = this.player.sim.getPhase();
 
       listItemElems.forEach(elem => {
         if (elem.dataset.name!.toLowerCase().includes(searchQuery) && Number(elem.dataset.phase!) <= phase) {
@@ -457,14 +457,14 @@ class SelectorModal extends Component {
     searchInput.addEventListener('input', applyFilters);
 
     const phaseSelect = tabContent.getElementsByClassName('selector-modal-phase-select')[0] as HTMLSelectElement;
-		phaseSelect.value = String(this.sim.getPhase());
-		tabContent.dataset.phase = String(this.sim.getPhase());
+		phaseSelect.value = String(this.player.sim.getPhase());
+		tabContent.dataset.phase = String(this.player.sim.getPhase());
 		phaseSelect.addEventListener('input', event => {
-			this.sim.setPhase(Number(phaseSelect.value));
+			this.player.sim.setPhase(Number(phaseSelect.value));
 		});
-		this.sim.phaseChangeEmitter.on(() => {
-			tabContent.dataset.phase = String(this.sim.getPhase());
-			phaseSelect.value = String(this.sim.getPhase());
+		this.player.sim.phaseChangeEmitter.on(() => {
+			tabContent.dataset.phase = String(this.player.sim.getPhase());
+			phaseSelect.value = String(this.player.sim.getPhase());
 			applyFilters();
 		});
 

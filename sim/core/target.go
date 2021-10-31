@@ -7,13 +7,13 @@ import (
 
 type Encounter struct {
 	Duration   float64
-	Targets    []Target
+	Targets    []*Target
 }
 
 func NewEncounter(options proto.Encounter) Encounter {
 	encounter := Encounter{
 		Duration: options.Duration,
-		Targets: []Target{},
+		Targets: []*Target{},
 	}
 
 	for _, targetOptions := range options.Targets {
@@ -37,8 +37,8 @@ type Target struct {
 	finalized bool
 }
 
-func NewTarget(options proto.Target) Target {
-	target := Target{
+func NewTarget(options proto.Target) *Target {
+	target := &Target{
 		armor: options.Armor,
 		auraTracker: newAuraTracker(),
 	}
@@ -46,7 +46,7 @@ func NewTarget(options proto.Target) Target {
 	target.auraTracker.playerID = -1
 
 	if options.Debuffs != nil {
-		applyDebuffEffects(&target, *options.Debuffs)
+		applyDebuffEffects(target, *options.Debuffs)
 	}
 
 	return target

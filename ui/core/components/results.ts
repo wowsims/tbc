@@ -2,7 +2,7 @@ import { IndividualSimRequest, IndividualSimResult } from '/tbc/core/proto/api.j
 import { StatWeightsRequest, StatWeightsResult } from '/tbc/core/proto/api.js';
 import { Stat } from '/tbc/core/proto/common.js';
 import { statNames } from '/tbc/core/proto_utils/names.js';
-import { Sim } from '/tbc/core/sim.js';
+import { SimUI } from '/tbc/core/sim_ui.js';
 import { stDevToConf90 } from '/tbc/core/utils.js';
 
 import { Component } from './component.js';
@@ -16,7 +16,7 @@ type ReferenceData = {
 };
 
 export class Results extends Component {
-	private readonly sim: Sim<any>;
+	private readonly simUI: SimUI<any>;
   private readonly pendingElem: HTMLDivElement;
   private readonly simElem: HTMLDivElement;
   private readonly simDpsElem: HTMLDivElement;
@@ -29,9 +29,9 @@ export class Results extends Component {
 	private currentData: ReferenceData | null = null;
 	private referenceData: ReferenceData | null = null;
 
-  constructor(parent: HTMLElement, sim: Sim<any>) {
+  constructor(parent: HTMLElement, simUI: SimUI<any>) {
     super(parent, 'results-root');
-		this.sim = sim;
+		this.simUI = simUI;
 
     this.rootElem.innerHTML = `
       <div class="results-pending">
@@ -81,7 +81,7 @@ export class Results extends Component {
 				this.currentData = this.referenceData;
 				this.referenceData = tmpData;
 
-				this.sim.fromJson(this.currentData.settings);
+				this.simUI.fromJson(this.currentData.settings);
 				this.setSimResult(this.currentData.request, this.currentData.result);
 				this.updateReference();
 			}
@@ -117,7 +117,7 @@ export class Results extends Component {
 		this.currentData = {
 			request: request,
 			result: result,
-			settings: this.sim.toJson(),
+			settings: this.simUI.toJson(),
 		};
 
     this.hideAll();

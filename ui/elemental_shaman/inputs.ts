@@ -3,7 +3,10 @@ import { ElementalShaman_Rotation_RotationType as RotationType } from '/tbc/core
 import { ElementalShaman_Options as ShamanOptions } from '/tbc/core/proto/shaman.js';
 import { Spec } from '/tbc/core/proto/common.js';
 import { ItemOrSpellId } from '/tbc/core/resources.js';
+import { Player } from '/tbc/core/player.js';
 import { Sim } from '/tbc/core/sim.js';
+import { SimUI } from '/tbc/core/sim_ui.js';
+import { Target } from '/tbc/core/target.js';
 
 // Configuration for spec-specific UI elements on the settings tab.
 // These don't need to be in a separate file but it keeps things cleaner.
@@ -17,8 +20,8 @@ export const IconWrathOfAirTotem = makeBooleanShamanBuffInput({ spellId: 3738 },
 export const ElementalShamanRotationConfig = {
 	inputs: [
 		{
-			type: 'enum' as const,
-			cssClass: 'rotation-enum-picker',
+			type: 'enum' as const, cssClass: 'rotation-enum-picker',
+			getModObject: (simUI: SimUI<any>) => simUI.player,
 			config: {
 				label: 'Type',
 				values: [
@@ -43,44 +46,45 @@ export const ElementalShamanRotationConfig = {
 						tooltip: 'Only casts Lightning Bolt.',
 					},
 				],
-				changedEvent: (sim: Sim<Spec.SpecElementalShaman>) => sim.rotationChangeEmitter,
-				getValue: (sim: Sim<Spec.SpecElementalShaman>) => sim.getRotation().type,
-				setValue: (sim: Sim<Spec.SpecElementalShaman>, newValue: number) => {
-					const newRotation = sim.getRotation();
+				changedEvent: (player: Player<Spec.SpecElementalShaman>) => player.rotationChangeEmitter,
+				getValue: (player: Player<Spec.SpecElementalShaman>) => player.getRotation().type,
+				setValue: (player: Player<Spec.SpecElementalShaman>, newValue: number) => {
+					const newRotation = player.getRotation();
 					newRotation.type = newValue;
-					sim.setRotation(newRotation);
+					player.setRotation(newRotation);
 				},
 			},
 		},
 		{
 			type: 'number' as const,
 			cssClass: 'num-lbs-per-cl-picker',
+			getModObject: (simUI: SimUI<any>) => simUI.player,
 			config: {
 				label: 'LBs per CL',
 				labelTooltip: 'The number of Lightning Bolts to cast between each Chain Lightning. Only used if Rotation is set to \'Fixed LB+CL\'.',
-				changedEvent: (sim: Sim<Spec.SpecElementalShaman>) => sim.rotationChangeEmitter,
-				getValue: (sim: Sim<Spec.SpecElementalShaman>) => sim.getRotation().lbsPerCl,
-				setValue: (sim: Sim<Spec.SpecElementalShaman>, newValue: number) => {
-					const newRotation = sim.getRotation();
+				changedEvent: (player: Player<Spec.SpecElementalShaman>) => player.rotationChangeEmitter,
+				getValue: (player: Player<Spec.SpecElementalShaman>) => player.getRotation().lbsPerCl,
+				setValue: (player: Player<Spec.SpecElementalShaman>, newValue: number) => {
+					const newRotation = player.getRotation();
 					newRotation.lbsPerCl = newValue;
-					sim.setRotation(newRotation);
+					player.setRotation(newRotation);
 				},
-				enableWhen: (sim: Sim<Spec.SpecElementalShaman>) => sim.getRotation().type == RotationType.FixedLBCL,
+				enableWhen: (player: Player<Spec.SpecElementalShaman>) => player.getRotation().type == RotationType.FixedLBCL,
 			},
 		},
 	],
 };
 
-function makeBooleanShamanBuffInput(id: ItemOrSpellId, optionsFieldName: keyof ShamanOptions): IconInput {
+function makeBooleanShamanBuffInput(id: ItemOrSpellId, optionsFieldName: keyof ShamanOptions): IconInput<Player<any>> {
   return {
     id: id,
     states: 2,
-		changedEvent: (sim: Sim<Spec.SpecElementalShaman>) => sim.specOptionsChangeEmitter,
-		getValue: (sim: Sim<Spec.SpecElementalShaman>) => sim.getSpecOptions()[optionsFieldName],
-		setBooleanValue: (sim: Sim<Spec.SpecElementalShaman>, newValue: boolean) => {
-			const newOptions = sim.getSpecOptions();
+		changedEvent: (player: Player<Spec.SpecElementalShaman>) => player.specOptionsChangeEmitter,
+		getValue: (player: Player<Spec.SpecElementalShaman>) => player.getSpecOptions()[optionsFieldName],
+		setBooleanValue: (player: Player<Spec.SpecElementalShaman>, newValue: boolean) => {
+			const newOptions = player.getSpecOptions();
       (newOptions[optionsFieldName] as boolean) = newValue;
-			sim.setSpecOptions(newOptions);
+			player.setSpecOptions(newOptions);
 		},
   }
 }

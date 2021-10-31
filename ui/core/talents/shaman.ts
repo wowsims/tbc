@@ -1,14 +1,14 @@
 import { Spec } from '/tbc/core/proto/common.js';
 import { ShamanTalents as ShamanTalents } from '/tbc/core/proto/shaman.js';
 import { ShamanSpecs } from '/tbc/core/proto_utils/utils.js';
-import { Sim } from '/tbc/core/sim.js';
+import { Player } from '/tbc/core/player.js';
 
 import { TalentsPicker } from './talents_picker.js';
 
 // Talents are the same for all Shaman specs, so its ok to just use ElementalShaman here
 export class ShamanTalentsPicker extends TalentsPicker<Spec.SpecElementalShaman> {
-  constructor(parent: HTMLElement, sim: Sim<Spec.SpecElementalShaman>) {
-    super(parent, sim, [
+  constructor(parent: HTMLElement, player: Player<Spec.SpecElementalShaman>) {
+    super(parent, player, [
       {
         name: 'Elemental',
         backgroundUrl: 'https://wow.zamimg.com/images/wow/talents/backgrounds/classic/261.jpg',

@@ -1,14 +1,14 @@
 import { IndividualSimRequest } from '/tbc/core/proto/api.js';
 import { Stat } from '/tbc/core/proto/common.js';
 import { StatWeightsRequest } from '/tbc/core/proto/api.js';
-import { Sim } from '/tbc/core/sim.js';
+import { SimUI } from '/tbc/core/sim_ui.js';
 
 import { Component } from './component.js';
 import { DetailedResults } from './detailed_results.js';
 import { Results } from './results.js';
 
 export class Actions extends Component {
-  constructor(parent: HTMLElement, sim: Sim<any>, epStats: Array<Stat>, epReferenceStat: Stat, results: Results, detailedResults: DetailedResults) {
+  constructor(parent: HTMLElement, simUI: SimUI<any>, epStats: Array<Stat>, epReferenceStat: Stat, results: Results, detailedResults: DetailedResults) {
     super(parent, 'actions-root');
 
     const simButton = document.createElement('button');
@@ -32,18 +32,18 @@ export class Actions extends Component {
 
     simButton.addEventListener('click', async () => {
       const iterations = parseInt(iterationsInput.value);
-      const simRequest = sim.makeCurrentIndividualSimRequest(iterations, false);
+      const simRequest = simUI.makeCurrentIndividualSimRequest(iterations, false);
 
       results.setPending();
       detailedResults.setPending();
-      const result = await sim.individualSim(simRequest);
+      const result = await simUI.sim.individualSim(simRequest);
       results.setSimResult(simRequest, result);
       detailedResults.setSimResult(simRequest, result);
     });
 
     statWeightsButton.addEventListener('click', async () => {
       const iterations = parseInt(iterationsInput.value);
-      const simRequest = sim.makeCurrentIndividualSimRequest(iterations, false);
+      const simRequest = simUI.makeCurrentIndividualSimRequest(iterations, false);
 
       const statWeightsRequest = StatWeightsRequest.create({
         options: simRequest,
@@ -52,7 +52,7 @@ export class Actions extends Component {
       });
 
       results.setPending();
-      const result = await sim.statWeights(statWeightsRequest);
+      const result = await simUI.sim.statWeights(statWeightsRequest);
       results.setStatWeights(statWeightsRequest, result, epStats);
     });
   }
