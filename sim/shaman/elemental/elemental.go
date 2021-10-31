@@ -287,22 +287,22 @@ func NewAdaptiveRotation(simParams core.IndividualParams) *AdaptiveRotation {
 	// So just return something valid.
 	// TODO: Probably need some organized way of doing presims so we dont have
 	// to check these types of things.
-	if len(clearcastParams.Options.Encounter.Targets) == 0 {
+	//if len(clearcastParams.Options.Encounter.Targets) == 0 {
 		agent.baseRotation = NewLBOnlyRotation()
 		agent.surplusRotation = NewCLOnClearcastRotation()
 		return agent
-	}
+	//}
 
-	clearcastSim := core.NewIndividualSim(clearcastParams)
-	clearcastResult := clearcastSim.Run()
+	//clearcastSim := core.NewIndividualSim(clearcastParams)
+	//clearcastResult := clearcastSim.Run()
 
-	if clearcastResult.Agents[0].NumOom >= 5 {
-		agent.baseRotation = NewLBOnlyRotation()
-		agent.surplusRotation = NewCLOnClearcastRotation()
-	} else {
-		agent.baseRotation = NewCLOnClearcastRotation()
-		agent.surplusRotation = NewCLOnCDRotation()
-	}
+	//if clearcastResult.Agents[0].NumOom >= 5 {
+	//	agent.baseRotation = NewLBOnlyRotation()
+	//	agent.surplusRotation = NewCLOnClearcastRotation()
+	//} else {
+	//	agent.baseRotation = NewCLOnClearcastRotation()
+	//	agent.surplusRotation = NewCLOnCDRotation()
+	//}
 
 	return agent
 }
