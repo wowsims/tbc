@@ -16,8 +16,8 @@ type Character struct {
 	Race  proto.Race
 	Class proto.Class
 
-	Equip       items.Equipment // Current Gear
-	EquipSpec   items.EquipmentSpec
+	// Current gear.
+	Equip items.Equipment
 
 	// Consumables this Character will be using.
 	consumes proto.Consumes
@@ -51,22 +51,27 @@ type Character struct {
 	HardcastAura Aura
 }
 
-func NewCharacter(equipSpec items.EquipmentSpec, race proto.Race, class proto.Class, consumes proto.Consumes, customStats stats.Stats) Character {
-	equip := items.NewEquipmentSet(equipSpec)
-
+func NewCharacter(player proto.Player) Character {
 	character := Character{
-		Race:      race,
-		Class:     class,
-		Equip:     equip,
-		EquipSpec: equipSpec,
-		consumes:  consumes,
+		Race:     player.Options.Race,
+		Class:    player.Options.Class,
+		Equip:    items.ProtoToEquipment(*player.Equipment),
 
 		auraTracker: newAuraTracker(),
 	}
 
-	character.AddStats(BaseStats[BaseStatsKey{ Race: race, Class: class }])
-	character.AddStats(equip.Stats())
-	character.AddStats(customStats)
+	if player.Options.Consumes != nil {
+		character.consumes = *player.Options.Consumes
+	}
+
+	character.AddStats(BaseStats[BaseStatsKey{ Race: character.Race, Class: character.Class }])
+	character.AddStats(character.Equip.Stats())
+
+	if player.CustomStats != nil {
+		customStats := stats.Stats{}
+		copy(customStats[:], player.CustomStats[:])
+		character.AddStats(customStats)
+	}
 
 	// Universal stat dependencies
 	character.AddStatDependency(stats.StatDependency{
@@ -154,6 +159,7 @@ func (character *Character) Finalize() {
 	// All stats added up to this point are part of the 'initial' stats.
 	character.initialStats = character.stats
 
+	character.auraTracker.finalize()
 	character.majorCooldownManager.finalize(character)
 }
 

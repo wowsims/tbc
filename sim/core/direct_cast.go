@@ -30,6 +30,9 @@ type DirectCastInput struct {
 
 // Input needed to calculate the damage of a spell.
 type DirectCastDamageInput struct {
+	// Target of the spell.
+	Target *Target
+
 	MinBaseDamage float64
 	MaxBaseDamage float64
 
@@ -45,6 +48,8 @@ type DirectCastDamageInput struct {
 }
 
 type DirectCastDamageResult struct {
+	Target *Target
+
 	Hit  bool // True = hit, False = resisted
 	Crit bool // Whether this cast was a critical strike.
 
@@ -174,12 +179,12 @@ func (action DirectCastAction) internalOnCastComplete(sim *Simulation) {
 
 	action.OnCastComplete(sim, action)
 	character.OnCastComplete(sim, action)
-	sim.OnCastComplete(sim, action)
 
 	hitInputs := action.GetHitInputs(sim, action)
 
 	results := make([]DirectCastDamageResult, 0, len(hitInputs))
 	for _, hitInput := range hitInputs {
+		hitInput.Target.OnBeforeSpellHit(sim, &hitInput)
 		result := action.calculateDirectCastDamage(sim, hitInput)
 		results = append(results, result)
 
@@ -187,13 +192,12 @@ func (action DirectCastAction) internalOnCastComplete(sim *Simulation) {
 			// Apply any on spell hit effects.
 			action.OnSpellHit(sim, action, &result)
 			character.OnSpellHit(sim, action, &result)
-			sim.OnSpellHit(sim, action, &result)
+			hitInput.Target.OnSpellHit(sim, action, &result)
 		} else {
 			action.OnSpellMiss(sim, action)
 			character.OnSpellMiss(sim, action)
-			sim.OnSpellMiss(sim, action)
+			hitInput.Target.OnSpellMiss(sim, action)
 		}
-
 		if sim.Log != nil {
 			sim.Log("(%d) %s result: %s\n", character.ID, action.GetName(), result)
 		}
@@ -211,7 +215,9 @@ func (action DirectCastAction) internalOnCastComplete(sim *Simulation) {
 }
 
 func (action DirectCastAction) calculateDirectCastDamage(sim *Simulation, damageInput DirectCastDamageInput) DirectCastDamageResult {
-	result := DirectCastDamageResult{}
+	result := DirectCastDamageResult{
+		Target: damageInput.Target,
+	}
 
 	character := action.GetCharacter()
 

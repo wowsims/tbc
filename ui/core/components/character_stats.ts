@@ -1,7 +1,7 @@
 import { Stat } from '/tbc/core/proto/common.js';
 import { statNames } from '/tbc/core/proto_utils/names.js';
 import { Stats } from '/tbc/core/proto_utils/stats.js';
-import { Sim } from '/tbc/core/sim.js';
+import { Player } from '/tbc/core/player.js';
 
 import { Component } from './component.js';
 
@@ -18,7 +18,7 @@ export class CharacterStats extends Component {
   readonly stats: Array<Stat>;
   readonly valueElems: Array<HTMLTableCellElement>;
 
-  constructor(parent: HTMLElement, stats: Array<Stat>, sim: Sim<any>) {
+  constructor(parent: HTMLElement, stats: Array<Stat>, player: Player<any>) {
     super(parent, 'character-stats-root');
     this.stats = stats;
 
@@ -44,8 +44,8 @@ export class CharacterStats extends Component {
     });
 
 		this.updateStats(new Stats());
-		sim.characterStatsEmitter.on(() => {
-			this.updateStats(new Stats(sim.getCurrentStats().finalStats));
+		player.characterStatsEmitter.on(() => {
+			this.updateStats(new Stats(player.getCurrentStats().finalStats));
 		});
   }
 

@@ -14,17 +14,17 @@ func init() {
 }
 
 func TestP1FullCharacterStats(t *testing.T) {
-	params := core.IndividualParams{
-		Equip:       P1Gear,
-		Race:        proto.Race_RaceTroll10,
-		Class:       proto.Class_ClassShaman,
-		Consumes:    FullConsumes,
-		Buffs:       FullBuffs,
-		PlayerOptions: &PlayerOptionsAdaptive,
-		CustomStats: stats.Stats{},
-	}
+	isr := core.NewIndividualSimRequest(core.IndividualSimInputs{
+		Gear:     P1Gear,
+		Race:     proto.Race_RaceTroll10,
+		Class:    proto.Class_ClassShaman,
+		Consumes: FullConsumes,
+		Buffs:    FullBuffs,
 
-	core.CharacterStatsTest("p1Full", t, params, stats.Stats{
+		PlayerOptions: PlayerOptionsAdaptive,
+	})
+
+	core.CharacterStatsTest("p1Full", t, isr, stats.Stats{
 		stats.Strength:   20.8,
 		stats.Agility:    20.8,
 		stats.Stamina:    347.5,
@@ -46,27 +46,27 @@ func TestP1FullCharacterStats(t *testing.T) {
 	})
 }
 
-var StatsToTest = []stats.Stat{
-	stats.SpellPower,
-	stats.SpellHit,
-	stats.Intellect,
-	stats.SpellCrit,
+var StatsToTest = []proto.Stat{
+	proto.Stat_StatIntellect,
+	proto.Stat_StatSpellPower,
+	proto.Stat_StatSpellHit,
+	proto.Stat_StatSpellCrit,
 }
 
-var ReferenceStat = stats.SpellPower
+var ReferenceStat = proto.Stat_StatSpellPower
 
 func TestCalcStatWeight(t *testing.T) {
-	params := core.IndividualParams{
-		Equip:       P1Gear,
+	isr := core.NewIndividualSimRequest(core.IndividualSimInputs{
+		Gear:        P1Gear,
 		Race:        proto.Race_RaceTroll10,
 		Class:       proto.Class_ClassShaman,
 		Consumes:    FullConsumes,
 		Buffs:       FullBuffs,
-		PlayerOptions: &PlayerOptionsAdaptive,
-		CustomStats: stats.Stats{},
-	}
+		Target:      FullDebuffTarget,
+		PlayerOptions: PlayerOptionsAdaptive,
+	})
 
-	core.StatWeightsTest("p1Full", t, params, StatsToTest, ReferenceStat, stats.Stats{
+	core.StatWeightsTest("p1Full", t, isr, StatsToTest, ReferenceStat, stats.Stats{
 		stats.Intellect:  0.14,
 		stats.SpellPower: 0.63,
 		stats.SpellHit:   1.26,
@@ -83,13 +83,17 @@ func TestSimulatePreRaidNoBuffs(t *testing.T) {
 		Label: "preRaid",
 	  T:     t,
 
-		// no consumes
-		Buffs: BasicBuffs,
-		Race:  proto.Race_RaceTroll10,
-		Class: proto.Class_ClassShaman,
+		Inputs: core.IndividualSimInputs{
+			// no consumes
+			Buffs:   BasicBuffs,
+			Target:  NoDebuffTarget,
 
-		PlayerOptions: &PlayerOptionsAdaptiveNoBuffs,
-		Gear:          PreRaidGear,
+			Race:  proto.Race_RaceTroll10,
+			Class: proto.Class_ClassShaman,
+
+			PlayerOptions: PlayerOptionsAdaptiveNoBuffs,
+			Gear:          PreRaidGear,
+		},
 
 		ExpectedDpsShort: 973.7,
 		ExpectedDpsLong:  293.9,
@@ -101,13 +105,16 @@ func TestSimulatePreRaid(t *testing.T) {
 		Label: "preRaid",
 	  T:     t,
 
-		Consumes: FullConsumes,
-		Buffs:    FullBuffs,
-		Race:     proto.Race_RaceOrc,
-		Class:    proto.Class_ClassShaman,
+		Inputs: core.IndividualSimInputs{
+			Consumes: FullConsumes,
+			Buffs:    FullBuffs,
+			Target:   FullDebuffTarget,
+			Race:     proto.Race_RaceOrc,
+			Class:    proto.Class_ClassShaman,
 
-		PlayerOptions: &PlayerOptionsAdaptive,
-		Gear:          PreRaidGear,
+			PlayerOptions: PlayerOptionsAdaptive,
+			Gear:          PreRaidGear,
+		},
 
 		ExpectedDpsShort: 1435.9,
 		ExpectedDpsLong:  1078.5,
@@ -119,13 +126,16 @@ func TestSimulateP1(t *testing.T) {
 		Label: "phase1",
 	  T:     t,
 
-		Consumes: FullConsumes,
-		Buffs:    FullBuffs,
-		Race:     proto.Race_RaceOrc,
-		Class:    proto.Class_ClassShaman,
+		Inputs: core.IndividualSimInputs{
+			Consumes: FullConsumes,
+			Buffs:    FullBuffs,
+			Target:   FullDebuffTarget,
+			Race:     proto.Race_RaceOrc,
+			Class:    proto.Class_ClassShaman,
 
-		PlayerOptions: &PlayerOptionsAdaptive,
-		Gear:          P1Gear,
+			PlayerOptions: PlayerOptionsAdaptive,
+			Gear:          P1Gear,
+		},
 
 		ExpectedDpsShort: 1385.0,
 		ExpectedDpsLong:  1317.3,
@@ -139,6 +149,7 @@ func TestSimulateP1(t *testing.T) {
 //    Class:         proto.Class_ClassShaman,
 // 		Consumes:      FullConsumes,
 // 		Buffs:         FullBuffs,
+//    Options:       FullDebuffOptions,
 // 		Options:       makeOptions(core.BasicOptions, LongEncounter),
 // 		PlayerOptions: &PlayerOptionsAdaptive,
 // 	}
@@ -156,13 +167,16 @@ func TestLBOnlyAgent(t *testing.T) {
 		Label: "lbonly",
 	  T:     t,
 
-		Consumes: FullConsumes,
-		Buffs:    FullBuffs,
-		Race:     proto.Race_RaceOrc,
-		Class:    proto.Class_ClassShaman,
+		Inputs: core.IndividualSimInputs{
+			Consumes: FullConsumes,
+			Buffs:    FullBuffs,
+			Target:   FullDebuffTarget,
+			Race:     proto.Race_RaceOrc,
+			Class:    proto.Class_ClassShaman,
 
-		PlayerOptions: &PlayerOptionsLBOnly,
-		Gear:          P1Gear,
+			PlayerOptions: PlayerOptionsLBOnly,
+			Gear:          P1Gear,
+		},
 
 		ExpectedDpsShort: 1413.8,
 		ExpectedDpsLong:  1205.8,
@@ -188,13 +202,16 @@ func TestClearcastAgent(t *testing.T) {
 		Label: "clearcast",
 	  T:     t,
 
-		Consumes: FullConsumes,
-		Buffs:    FullBuffs,
-		Race:     proto.Race_RaceOrc,
-    Class:    proto.Class_ClassShaman,
+		Inputs: core.IndividualSimInputs{
+			Consumes: FullConsumes,
+			Buffs:    FullBuffs,
+			Target:   FullDebuffTarget,
+			Race:     proto.Race_RaceOrc,
+			Class:    proto.Class_ClassShaman,
 
-		PlayerOptions: &PlayerOptionsCLOnClearcast,
-		Gear:          P1Gear,
+			PlayerOptions: PlayerOptionsCLOnClearcast,
+			Gear:          P1Gear,
+		},
 
 		ExpectedDpsShort: 1607.6,
 		ExpectedDpsLong:  1315.1,
@@ -202,30 +219,30 @@ func TestClearcastAgent(t *testing.T) {
 }
 
 func TestAverageDPS(t *testing.T) {
-	params := core.IndividualParams{
-		Equip:         P1Gear,
+	isr := core.NewIndividualSimRequest(core.IndividualSimInputs{
+		Gear:          P1Gear,
 		Race:          proto.Race_RaceOrc,
     Class:         proto.Class_ClassShaman,
 		Consumes:      FullConsumes,
 		Buffs:         FullBuffs,
-		PlayerOptions: &PlayerOptionsAdaptive,
-		CustomStats:   stats.Stats{},
-	}
+		Target:        FullDebuffTarget,
+		PlayerOptions: PlayerOptionsAdaptive,
+	})
 
-	core.IndividualSimAverageTest("P1Average", t, params, 1248.1)
+	core.IndividualSimAverageTest("P1Average", t, isr, 1248.1)
 }
 
 func BenchmarkSimulate(b *testing.B) {
-	params := core.IndividualParams{
-		Equip:    P1Gear,
+	isr := core.NewIndividualSimRequest(core.IndividualSimInputs{
+		Gear:     P1Gear,
 		Race:     proto.Race_RaceOrc,
     Class:    proto.Class_ClassShaman,
 		Consumes: FullConsumes,
 		Buffs:    FullBuffs,
+		Target:   FullDebuffTarget,
 
-		PlayerOptions: &PlayerOptionsAdaptive,
-		CustomStats:   stats.Stats{},
-	}
+		PlayerOptions: PlayerOptionsAdaptive,
+	})
 
-	core.IndividualBenchmark(b, params)
+	core.IndividualBenchmark(b, isr)
 }

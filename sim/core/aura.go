@@ -24,6 +24,9 @@ type Aura struct {
 	// Invoked when a spell cast completes casting, before results are calculated.
 	OnCastComplete func(sim *Simulation, cast DirectCastAction)
 
+	// Invoked before a spell lands, but after the target is selected.
+	OnBeforeSpellHit func(sim *Simulation, hitInput *DirectCastDamageInput)
+
 	// Invoked when a spell is fully resisted.
 	OnSpellMiss    func(sim *Simulation, cast DirectCastAction)
 
@@ -192,6 +195,15 @@ func (at *auraTracker) OnCastComplete(sim *Simulation, cast DirectCastAction) {
 	}
 }
 
+// Invokes the OnBeforeSpellHit event for all tracked Auras.
+func (at *auraTracker) OnBeforeSpellHit(sim *Simulation, hitInput *DirectCastDamageInput) {
+	for _, id := range at.activeAuraIDs {
+		if at.auras[id].OnBeforeSpellHit != nil {
+			at.auras[id].OnBeforeSpellHit(sim, hitInput)
+		}
+	}
+}
+
 // Invokes the OnSpellMiss event for all tracked Auras.
 func (at *auraTracker) OnSpellMiss(sim *Simulation, cast DirectCastAction) {
 	for _, id := range at.activeAuraIDs {
@@ -342,6 +354,8 @@ func AuraName(a int32) string {
 		return "SkullGuldan Trinket CD"
 	case MagicIDRegainMana:
 		return "Fathom-Brooch Regain Mana"
+	case MagicIDImprovedSealOfTheCrusader:
+		return "Improved Seal of the Crusader"
 	}
 
 	return "<<Add Aura name to switch!!>>"
@@ -423,6 +437,7 @@ const (
 	MagicIDElderScribeProc  // elder scribe robe temp buff
 	MagicIDRegainMana // effect from fathom brooch
 	MagicIDCurseOfElements
+	MagicIDImprovedSealOfTheCrusader
 
 	// Items  (Usually individual trinket CDs)
 	MagicIDISCTrink

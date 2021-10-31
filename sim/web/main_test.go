@@ -100,12 +100,16 @@ func TestIndividualSim(t *testing.T) {
 		},
 		Buffs: basicBuffs,
 		Encounter: &proto.Encounter{
-			Duration:   120,
-			NumTargets: 1,
+			Duration: 120,
+			Targets: []*proto.Target{
+				&proto.Target{},
+			},
 		},
-		Iterations: 5000,
-		RandomSeed: 1,
-		Debug:      false,
+		SimOptions: &proto.SimOptions{
+			Iterations: 5000,
+			RandomSeed: 1,
+			Debug:      false,
+		},
 	}
 
 	msgBytes, err := googleProto.Marshal(req)
@@ -145,12 +149,16 @@ func TestCalcStatWeight(t *testing.T) {
 		},
 		Buffs: basicBuffs,
 		Encounter: &proto.Encounter{
-			Duration:   120,
-			NumTargets: 1,
+			Duration: 120,
+			Targets: []*proto.Target{
+				&proto.Target{},
+			},
 		},
-		Iterations: 5000,
-		RandomSeed: 1,
-		Debug:      false,
+		SimOptions: &proto.SimOptions{
+			Iterations: 5000,
+			RandomSeed: 1,
+			Debug:      false,
+		},
 	}
 
 	msgBytes, err := googleProto.Marshal(&proto.StatWeightsRequest{

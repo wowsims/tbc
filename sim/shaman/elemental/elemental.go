@@ -6,15 +6,16 @@ import (
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/proto"
 	. "github.com/wowsims/tbc/sim/shaman"
+	googleProto "google.golang.org/protobuf/proto"
 )
 
 func RegisterElementalShaman() {
-	core.RegisterAgentFactory(proto.PlayerOptions_ElementalShaman{}, func(simParams core.IndividualParams, character core.Character, options *proto.PlayerOptions) core.Agent {
-		return NewElementalShaman(simParams, character, options)
+	core.RegisterAgentFactory(proto.PlayerOptions_ElementalShaman{}, func(character core.Character, options proto.PlayerOptions, isr proto.IndividualSimRequest) core.Agent {
+		return NewElementalShaman(character, options, isr)
 	})
 }
 
-func NewElementalShaman(simParams core.IndividualParams, character core.Character, options *proto.PlayerOptions) *Shaman {
+func NewElementalShaman(character core.Character, options proto.PlayerOptions, isr proto.IndividualSimRequest) *Shaman {
 	eleShamOptions := options.GetElementalShaman()
 
 	selfBuffs := SelfBuffs{
@@ -29,7 +30,7 @@ func NewElementalShaman(simParams core.IndividualParams, character core.Characte
 
 	switch eleShamOptions.Rotation.Type {
 	case proto.ElementalShaman_Rotation_Adaptive:
-		rotation = NewAdaptiveRotation(simParams)
+		rotation = NewAdaptiveRotation(isr)
 	case proto.ElementalShaman_Rotation_CLOnClearcast:
 		rotation = NewCLOnClearcastRotation()
 	case proto.ElementalShaman_Rotation_CLOnCD:
@@ -263,27 +264,25 @@ func (agent *AdaptiveRotation) Reset(shaman *Shaman, sim *core.Simulation) {
 	agent.surplusRotation.Reset(shaman, sim)
 }
 
-func NewAdaptiveRotation(simParams core.IndividualParams) *AdaptiveRotation {
+func NewAdaptiveRotation(isr proto.IndividualSimRequest) *AdaptiveRotation {
 	agent := &AdaptiveRotation{}
 
-	clearcastParams := simParams
-	clearcastParams.Options.Debug = false
-	clearcastParams.Options.Iterations = 100
-
-	eleShamParams := *clearcastParams.PlayerOptions.GetElementalShaman()
-	eleShamParams.Rotation = &proto.ElementalShaman_Rotation{Type: proto.ElementalShaman_Rotation_CLOnClearcast} // create new agent.
-
-	// Assign new eleShamParams
-	clearcastParams.PlayerOptions = &proto.PlayerOptions{
-		Race: simParams.PlayerOptions.Race, //primitive, no pointer
-		Spec: &proto.PlayerOptions_ElementalShaman{
-			ElementalShaman: &eleShamParams,
-		},
-		// reuse pointer since this isn't mutated
-		Consumes: simParams.PlayerOptions.Consumes,
+	// If no encounter is set, it means we aren't going to run a sim at all.
+	// So just return something valid.
+	// TODO: Probably need some organized way of doing presims so we dont have
+	// to check these types of things.
+	if isr.Encounter == nil || len(isr.Encounter.Targets) == 0 {
+		agent.baseRotation = NewLBOnlyRotation()
+		agent.surplusRotation = NewCLOnClearcastRotation()
+		return agent
 	}
 
-	clearcastSim := core.NewIndividualSim(clearcastParams)
+	clearcastRequest := googleProto.Clone(&isr).(*proto.IndividualSimRequest)
+	clearcastRequest.SimOptions.Debug = false
+	clearcastRequest.SimOptions.Iterations = 100
+	clearcastRequest.Player.Options.Spec.(*proto.PlayerOptions_ElementalShaman).ElementalShaman.Rotation.Type = proto.ElementalShaman_Rotation_CLOnClearcast
+
+	clearcastSim := core.NewIndividualSim(*clearcastRequest)
 	clearcastResult := clearcastSim.Run()
 
 	if clearcastResult.Agents[0].NumOom >= 5 {

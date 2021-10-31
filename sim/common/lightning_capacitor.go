@@ -86,6 +86,7 @@ func (lcc LightningCapacitorCast) GetCastInput(sim *core.Simulation, cast core.D
 
 func (lcc LightningCapacitorCast) GetHitInputs(sim *core.Simulation, cast core.DirectCastAction) []core.DirectCastDamageInput{
 	hitInput := core.DirectCastDamageInput{
+		Target: sim.GetPrimaryTarget(),
 		MinBaseDamage: 694,
 		MaxBaseDamage: 807,
 		DamageMultiplier: 1,

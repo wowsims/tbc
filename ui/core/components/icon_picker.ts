@@ -1,7 +1,6 @@
 import { getIconUrl } from '/tbc/core/resources.js';
 import { ItemOrSpellId } from '/tbc/core/resources.js';
 import { setWowheadHref } from '/tbc/core/resources.js';
-import { Sim } from '/tbc/core/sim.js';
 import { TypedEvent } from '/tbc/core/typed_event.js';
 import { isRightClick } from '/tbc/core/utils.js';
 import { ExclusivityTag } from '/tbc/core/sim_ui.js';
@@ -10,29 +9,31 @@ import { SimUI } from '/tbc/core/sim_ui.js';
 import { Component } from './component.js';
 
 // Icon-based UI for picking buffs / consumes / etc
-export class IconPicker extends Component {
-  private readonly _inputs: Array<IconInputComponent>;
+// ModObject is the object being modified (Sim, Player, or Target).
+export class IconPicker<ModObject> extends Component {
+  private readonly _inputs: Array<IconInputComponent<ModObject>>;
 
-  constructor(parent: HTMLElement, sim: Sim<any>, inputs: Array<IconInput>, simUI: SimUI<any>) {
+  constructor(parent: HTMLElement, modObj: ModObject, inputs: Array<IconInput<ModObject>>, simUI: SimUI<any>) {
     super(parent, 'icon-picker-root');
 
-    this._inputs = inputs.map(input => new IconInputComponent(this.rootElem, sim, input, simUI));
+    this._inputs = inputs.map(input => new IconInputComponent(this.rootElem, modObj, input, simUI));
   }
 }
 
-class IconInputComponent extends Component {
-  private readonly _input: IconInput;
-  private readonly _sim: Sim<any>;
+// ModObject is the object being modified (Sim, Player, or Target).
+class IconInputComponent<ModObject> extends Component {
+  private readonly _input: IconInput<ModObject>;
+  private readonly _modObject: ModObject;
 
   private readonly _rootAnchor: HTMLAnchorElement;
   private readonly _improvedAnchor: HTMLAnchorElement;
   private readonly _counterElem: HTMLElement;
   private readonly _clickedEmitter = new TypedEvent<void>();
 
-  constructor(parent: HTMLElement, sim: Sim<any>, input: IconInput, simUI: SimUI<any>) {
+  constructor(parent: HTMLElement, modObj: ModObject, input: IconInput<ModObject>, simUI: SimUI<any>) {
     super(parent, 'icon-input', document.createElement('a'));
     this._input = input;
-    this._sim = sim;
+    this._modObject = modObj;
 
     this._rootAnchor = this.rootElem as HTMLAnchorElement;
     this._rootAnchor.target = '_blank';
@@ -65,7 +66,7 @@ class IconInputComponent extends Component {
     }
 
     this.updateIcon();
-    this._input.changedEvent(sim).on(() => this.updateIcon());
+    this._input.changedEvent(this._modObject).on(() => this.updateIcon());
 
     this._rootAnchor.addEventListener('click', event => {
       event.preventDefault();
@@ -101,14 +102,14 @@ class IconInputComponent extends Component {
 
   // Instead of dealing with bool | number, just convert everything to numbers
   private getValue(): number {
-    return Number(this._input.getValue(this._sim));
+    return Number(this._input.getValue(this._modObject));
   }
 
   private setValue(newValue: number) {
     if (this._input.setBooleanValue) {
-      this._input.setBooleanValue(this._sim, newValue > 0);
+      this._input.setBooleanValue(this._modObject, newValue > 0);
     } else if (this._input.setNumberValue) {
-      this._input.setNumberValue(this._sim, newValue);
+      this._input.setNumberValue(this._modObject, newValue);
     }
   }
 
@@ -139,7 +140,8 @@ class IconInputComponent extends Component {
 // Data for creating an icon-based input component.
 // 
 // E.g. one of these for arcane brilliance, another for kings, etc.
-export type IconInput = {
+// ModObject is the object being modified (Sim, Player, or Target).
+export type IconInput<ModObject> = {
   id: ItemOrSpellId;
   
   // The number of possible 'states' this icon can have. Most inputs will use 2
@@ -153,10 +155,10 @@ export type IconInput = {
   // effect is enabled.
   exclusivityTags?: Array<ExclusivityTag>;
 
-  changedEvent: (sim: Sim<any>) => TypedEvent<any>;
-  getValue: (sim: Sim<any>) => boolean | number;
+  changedEvent: (obj: ModObject) => TypedEvent<any>;
+  getValue: (obj: ModObject) => boolean | number;
 
   // Exactly one of these should be set.
-  setBooleanValue?: (sim: Sim<any>, newValue: boolean) => void;
-  setNumberValue?: (sim: Sim<any>, newValue: number) => void;
+  setBooleanValue?: (obj: ModObject, newValue: boolean) => void;
+  setNumberValue?: (obj: ModObject, newValue: number) => void;
 };

@@ -3,6 +3,8 @@ package stats
 import (
 	"fmt"
 	"strings"
+
+	"github.com/wowsims/tbc/sim/core/proto"
 )
 
 type Stats [Len]float64
@@ -45,6 +47,14 @@ const (
 
 	Len
 )
+
+func ProtoArrayToStatsList(protoStats []proto.Stat) []Stat {
+	stats := make([]Stat, len(protoStats))
+	for i, v := range protoStats {
+		stats[i] = Stat(v)
+	}
+	return stats
+}
 
 func (s Stat) StatName() string {
 	switch s {
@@ -107,6 +117,14 @@ func (s Stat) StatName() string {
 	}
 
 	return "none"
+}
+
+func FromFloatArray(values []float64) Stats {
+	stats := Stats{}
+	for i, v := range values {
+		stats[i] = v
+	}
+	return stats
 }
 
 // Adds two Stats together, returning the new Stats.

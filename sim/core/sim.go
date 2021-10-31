@@ -7,9 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/wowsims/tbc/sim/core/items"
 	"github.com/wowsims/tbc/sim/core/proto"
-	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 func debugFunc(sim *Simulation) func(string, ...interface{}) {
@@ -18,40 +16,13 @@ func debugFunc(sim *Simulation) func(string, ...interface{}) {
 	}
 }
 
-type Options struct {
-	Encounter  Encounter
-	Iterations int
-	RSeed      int64
-	ExitOnOOM  bool
-	Debug      bool          // enables debug printing.
-}
-
-type Encounter struct {
-	Duration   float64
-	NumTargets int32
-	Armor      int32
-}
-
-type IndividualParams struct {
-	Equip    items.EquipmentSpec
-	Race     proto.Race
-	Class    proto.Class
-	Consumes proto.Consumes
-	Buffs    proto.Buffs
-	Options  Options
-
-	PlayerOptions *proto.PlayerOptions
-
-	CustomStats stats.Stats
-}
-
 type InitialAura func(*Simulation) Aura
 
 type Simulation struct {
-	Raid         *Raid
-	Options      Options
-	Duration     time.Duration
-	auraTracker // Global Debuffs mostly.. put on the boss/target
+	Raid     *Raid
+	targets  []*Target
+	Options  proto.SimOptions
+	Duration time.Duration
 
 	MetricsAggregator *MetricsAggregator
 
@@ -75,30 +46,38 @@ func (wr *wrappedRandom) Float64(src string) float64 {
 	return wr.Rand.Float64()
 }
 
-func NewIndividualSim(params IndividualParams) *Simulation {
-	raid := NewRaid(params.Buffs)
-	raid.AddPlayer(NewAgent(params))
-	sim := newSim(raid, params.Options)
-	raid.Finalize(sim)
+func NewIndividualSim(isr proto.IndividualSimRequest) *Simulation {
+	raid := NewRaid(*isr.Buffs)
+	raid.AddPlayer(NewAgent(*isr.Player, isr))
+	raid.Finalize()
 
-	return sim
+	encounter := NewEncounter(*isr.Encounter)
+	encounter.Finalize()
+
+	return newSim(raid, encounter, *isr.SimOptions)
 }
 
-// New sim contructs a simulator with the given equipment / options.
-func newSim(raid *Raid, options Options) *Simulation {
-	if options.RSeed == 0 {
-		options.RSeed = time.Now().Unix()
+// New sim contructs a simulator with the given raid and target settings.
+func newSim(raid *Raid, encounter Encounter, simOptions proto.SimOptions) *Simulation {
+	if len(encounter.Targets) == 0 {
+		panic("Must have at least 1 target!")
 	}
 
 	sim := &Simulation{
-		Raid:         raid,
-		Options:      options,
-		Duration:     DurationFromSeconds(options.Encounter.Duration),
+		Raid:     raid,
+		targets:  encounter.Targets,
+		Options:  simOptions,
+		Duration: DurationFromSeconds(encounter.Duration),
 		Log: nil,
-		auraTracker: newAuraTracker(),
-		MetricsAggregator: NewMetricsAggregator(raid.Size(), options.Encounter.Duration),
+
+		MetricsAggregator: NewMetricsAggregator(raid.Size(), encounter.Duration),
 	}
-	sim.Rando = &wrappedRandom{sim: sim, Rand: rand.New(rand.NewSource(options.RSeed))}
+
+	sim.rseed = simOptions.RandomSeed
+	if sim.rseed == 0 {
+		sim.rseed = time.Now().Unix()
+	}
+	sim.Rando = &wrappedRandom{sim: sim, Rand: rand.New(rand.NewSource(sim.rseed))}
 
 	return sim
 }
@@ -112,7 +91,7 @@ func (sim *Simulation) GetIndividualMetrics(agentID int) AgentIterationMetrics {
 // This is automatically called before every 'Run'.
 func (sim *Simulation) reset() {
 	sim.CurrentTime = 0.0
-	sim.auraTracker.reset(sim)
+
 	if sim.Log != nil {
 		sim.Log("SIM RESET\n")
 		sim.Log("----------------------\n")
@@ -124,6 +103,10 @@ func (sim *Simulation) reset() {
 			agent.GetCharacter().Reset(sim)
 			agent.Reset(sim)
 		}
+	}
+
+	for _, target := range sim.targets {
+		target.Reset(sim)
 	}
 }
 
@@ -143,7 +126,6 @@ func (sim *Simulation) Run() SimResult {
 			pid++
 		}
 	}
-	sim.auraTracker.playerID = -1 // set main sim auras to be -1 character ID.
 	logsBuffer := &strings.Builder{}
 
 	if sim.Options.Debug {
@@ -152,7 +134,7 @@ func (sim *Simulation) Run() SimResult {
 		}
 	}
 
-	for i := 0; i < sim.Options.Iterations; i++ {
+	for i := int32(0); i < sim.Options.Iterations; i++ {
 		sim.RunOnce()
 		sim.MetricsAggregator.doneIteration()
 	}
@@ -217,5 +199,20 @@ func (sim *Simulation) Advance(elapsedTime time.Duration) {
 			agent.GetCharacter().Advance(sim, elapsedTime, newTime)
 		}
 	}
-	sim.auraTracker.advance(sim, elapsedTime)
+
+	for _, target := range sim.targets {
+		target.Advance(sim, elapsedTime)
+	}
+}
+
+func (sim *Simulation) GetNumTargets() int32 {
+	return int32(len(sim.targets))
+}
+
+func (sim *Simulation) GetTarget(index int32) *Target {
+	return sim.targets[index]
+}
+
+func (sim *Simulation) GetPrimaryTarget() *Target {
+	return sim.GetTarget(0)
 }
