@@ -7,15 +7,15 @@ const MAX_TALENT_POINTS = 61;
 const NUM_ROWS = 9;
 const TALENTS_STORAGE_KEY = 'Talents';
 export class TalentsPicker extends Component {
-    constructor(parent, sim, treeConfigs) {
+    constructor(parent, player, treeConfigs) {
         super(parent, 'talents-picker-root');
-        this.sim = sim;
+        this.player = player;
         this.frozen = false;
-        this.trees = treeConfigs.map(treeConfig => new TalentTreePicker(this.rootElem, sim, treeConfig, this));
+        this.trees = treeConfigs.map(treeConfig => new TalentTreePicker(this.rootElem, player, treeConfig, this));
         this.trees.forEach(tree => tree.talents.forEach(talent => talent.setPoints(0, false)));
-        this.setTalentsString(this.sim.getTalentsString());
-        this.sim.talentsStringChangeEmitter.on(() => {
-            this.setTalentsString(this.sim.getTalentsString());
+        this.setTalentsString(this.player.getTalentsString());
+        this.player.talentsStringChangeEmitter.on(() => {
+            this.setTalentsString(this.player.getTalentsString());
         });
         this.update();
     }
@@ -33,11 +33,11 @@ export class TalentsPicker extends Component {
             this.rootElem.classList.remove('talents-full');
         }
         this.trees.forEach(tree => tree.update());
-        this.sim.setTalentsString(this.getTalentsString());
-        this.sim.setTalents(this.getTalents());
+        this.player.setTalentsString(this.getTalentsString());
+        this.player.setTalents(this.getTalents());
     }
     getTalents() {
-        const talents = this.sim.specTypeFunctions.talentsCreate();
+        const talents = this.player.specTypeFunctions.talentsCreate();
         this.trees.forEach(tree => tree.talents.forEach(talent => {
             if (talent.config.fieldName) {
                 if (talent.config.maxPoints == 1) {
@@ -65,7 +65,7 @@ export class TalentsPicker extends Component {
     }
 }
 class TalentTreePicker extends Component {
-    constructor(parent, sim, config, picker) {
+    constructor(parent, player, config, picker) {
         super(parent, 'talent-tree-picker-root');
         this.config = config;
         this.numPoints = 0;
@@ -81,7 +81,7 @@ class TalentTreePicker extends Component {
         this.title = this.rootElem.getElementsByClassName('talent-tree-title')[0];
         const main = this.rootElem.getElementsByClassName('talent-tree-main')[0];
         main.style.backgroundImage = `url('${config.backgroundUrl}')`;
-        this.talents = config.talents.map(talent => new TalentPicker(main, sim, talent, this));
+        this.talents = config.talents.map(talent => new TalentPicker(main, player, talent, this));
         this.talents.forEach(talent => {
             if (talent.config.prereqLocation) {
                 this.getTalent(talent.config.prereqLocation).config.prereqOfLocation = talent.config.location;
@@ -113,7 +113,7 @@ class TalentTreePicker extends Component {
     }
 }
 class TalentPicker extends Component {
-    constructor(parent, sim, config, tree) {
+    constructor(parent, player, config, tree) {
         super(parent, 'talent-picker-root', document.createElement('a'));
         this.config = config;
         this.tree = tree;

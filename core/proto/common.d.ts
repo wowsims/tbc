@@ -53,67 +53,53 @@ export interface Buffs {
      */
     shadowPriestDps: number;
     /**
-     * Target Debuff
-     *
-     * @generated from protobuf field: bool judgement_of_wisdom = 11;
-     */
-    judgementOfWisdom: boolean;
-    /**
-     * @generated from protobuf field: bool improved_seal_of_the_crusader = 12;
-     */
-    improvedSealOfTheCrusader: boolean;
-    /**
-     * @generated from protobuf field: bool misery = 13;
-     */
-    misery: boolean;
-    /**
      * Drums
      *
-     * @generated from protobuf field: proto.Drums drums = 14;
+     * @generated from protobuf field: proto.Drums drums = 11;
      */
     drums: Drums;
     /**
      * Item Buffs
      *
-     * @generated from protobuf field: int32 atiesh_mage = 15;
+     * @generated from protobuf field: int32 atiesh_mage = 12;
      */
     atieshMage: number;
     /**
-     * @generated from protobuf field: int32 atiesh_warlock = 16;
+     * @generated from protobuf field: int32 atiesh_warlock = 13;
      */
     atieshWarlock: number;
     /**
-     * @generated from protobuf field: bool braided_eternium_chain = 17;
+     * @generated from protobuf field: bool braided_eternium_chain = 14;
      */
     braidedEterniumChain: boolean;
     /**
-     * @generated from protobuf field: bool eye_of_the_night = 18;
+     * @generated from protobuf field: bool eye_of_the_night = 15;
      */
     eyeOfTheNight: boolean;
     /**
-     * @generated from protobuf field: bool chain_of_the_twilight_owl = 19;
+     * @generated from protobuf field: bool chain_of_the_twilight_owl = 16;
      */
     chainOfTheTwilightOwl: boolean;
     /**
-     * @generated from protobuf field: bool jade_pendant_of_blasting = 20;
+     * @generated from protobuf field: bool jade_pendant_of_blasting = 17;
      */
     jadePendantOfBlasting: boolean;
     /**
      * Totems
      *
-     * @generated from protobuf field: proto.TristateEffect mana_spring_totem = 21;
+     * @generated from protobuf field: proto.TristateEffect mana_spring_totem = 18;
      */
     manaSpringTotem: TristateEffect;
     /**
-     * @generated from protobuf field: bool mana_tide_totem = 22;
+     * @generated from protobuf field: bool mana_tide_totem = 19;
      */
     manaTideTotem: boolean;
     /**
-     * @generated from protobuf field: int32 totem_of_wrath = 23;
+     * @generated from protobuf field: int32 totem_of_wrath = 20;
      */
     totemOfWrath: number;
     /**
-     * @generated from protobuf field: proto.TristateEffect wrath_of_air_totem = 24;
+     * @generated from protobuf field: proto.TristateEffect wrath_of_air_totem = 21;
      */
     wrathOfAirTotem: TristateEffect;
 }
@@ -199,6 +185,36 @@ export interface Consumes {
     drums: Drums;
 }
 /**
+ * @generated from protobuf message proto.Debuffs
+ */
+export interface Debuffs {
+    /**
+     * @generated from protobuf field: bool judgement_of_wisdom = 1;
+     */
+    judgementOfWisdom: boolean;
+    /**
+     * @generated from protobuf field: bool improved_seal_of_the_crusader = 2;
+     */
+    improvedSealOfTheCrusader: boolean;
+    /**
+     * @generated from protobuf field: bool misery = 3;
+     */
+    misery: boolean;
+}
+/**
+ * @generated from protobuf message proto.Target
+ */
+export interface Target {
+    /**
+     * @generated from protobuf field: int32 armor = 1;
+     */
+    armor: number;
+    /**
+     * @generated from protobuf field: proto.Debuffs debuffs = 2;
+     */
+    debuffs?: Debuffs;
+}
+/**
  * @generated from protobuf message proto.Encounter
  */
 export interface Encounter {
@@ -207,13 +223,9 @@ export interface Encounter {
      */
     duration: number;
     /**
-     * @generated from protobuf field: int32 num_targets = 2;
+     * @generated from protobuf field: repeated proto.Target targets = 2;
      */
-    numTargets: number;
-    /**
-     * @generated from protobuf field: int32 target_armor = 3;
-     */
-    targetArmor: number;
+    targets: Target[];
 }
 /**
  * @generated from protobuf message proto.ItemSpec
@@ -1015,6 +1027,26 @@ declare class Consumes$Type extends MessageType<Consumes> {
  * @generated MessageType for protobuf message proto.Consumes
  */
 export declare const Consumes: Consumes$Type;
+declare class Debuffs$Type extends MessageType<Debuffs> {
+    constructor();
+    create(value?: PartialMessage<Debuffs>): Debuffs;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: Debuffs): Debuffs;
+    internalBinaryWrite(message: Debuffs, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message proto.Debuffs
+ */
+export declare const Debuffs: Debuffs$Type;
+declare class Target$Type extends MessageType<Target> {
+    constructor();
+    create(value?: PartialMessage<Target>): Target;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: Target): Target;
+    internalBinaryWrite(message: Target, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message proto.Target
+ */
+export declare const Target: Target$Type;
 declare class Encounter$Type extends MessageType<Encounter> {
     constructor();
     create(value?: PartialMessage<Encounter>): Encounter;

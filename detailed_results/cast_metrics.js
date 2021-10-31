@@ -65,7 +65,7 @@ export class CastMetrics extends ResultComponent {
     }
     onSimResult(request, result) {
         this.bodyElem.textContent = '';
-        const iterations = request.iterations;
+        const iterations = request.simOptions.iterations;
         const duration = request.encounter?.duration || 1;
         parseActionMetrics(result.actionMetrics).then(actionMetrics => {
             actionMetrics.forEach(actionMetric => {

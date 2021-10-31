@@ -1,16 +1,15 @@
-import { Sim } from '/tbc/core/sim.js';
 import { Input, InputConfig } from './input.js';
 export interface EnumValueConfig {
     name: string;
     value: number;
     tooltip?: string;
 }
-export interface EnumPickerConfig extends InputConfig<number> {
+export interface EnumPickerConfig<ModObject> extends InputConfig<ModObject, number> {
     values: Array<EnumValueConfig>;
 }
-export declare class EnumPicker extends Input<number> {
+export declare class EnumPicker<ModObject> extends Input<ModObject, number> {
     private readonly selectElem;
-    constructor(parent: HTMLElement, sim: Sim<any>, config: EnumPickerConfig);
+    constructor(parent: HTMLElement, modObject: ModObject, config: EnumPickerConfig<ModObject>);
     getInputElem(): HTMLElement;
     getInputValue(): number;
     setInputValue(newValue: number): void;

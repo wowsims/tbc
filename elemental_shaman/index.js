@@ -1,5 +1,6 @@
 import { Buffs } from '/tbc/core/proto/common.js';
 import { Consumes } from '/tbc/core/proto/common.js';
+import { Debuffs } from '/tbc/core/proto/common.js';
 import { Drums } from '/tbc/core/proto/common.js';
 import { Encounter } from '/tbc/core/proto/common.js';
 import { Potions } from '/tbc/core/proto/common.js';
@@ -21,30 +22,101 @@ const theme = new DefaultTheme(document.body, {
     releaseStatus: 'Beta',
     // List any known bugs / issues here and they'll be shown on the site.
     knownIssues: [],
-    spec: Spec.SpecElementalShaman,
-    // All stats for which EP should be calculated.
-    epStats: [
-        Stat.StatIntellect,
-        Stat.StatSpellPower,
-        Stat.StatNatureSpellPower,
-        Stat.StatSpellHit,
-        Stat.StatSpellCrit,
-        Stat.StatSpellHaste,
-        Stat.StatMP5,
-    ],
-    // Reference stat against which to calculate EP. I think all classes use either spell power or attack power.
-    epReferenceStat: Stat.StatSpellPower,
-    // Which stats to display in the Character Stats section, at the bottom of the left-hand sidebar.
-    displayStats: [
-        Stat.StatStamina,
-        Stat.StatIntellect,
-        Stat.StatSpellPower,
-        Stat.StatNatureSpellPower,
-        Stat.StatSpellHit,
-        Stat.StatSpellCrit,
-        Stat.StatSpellHaste,
-        Stat.StatMP5,
-    ],
+    player: {
+        spec: Spec.SpecElementalShaman,
+        // All stats for which EP should be calculated.
+        epStats: [
+            Stat.StatIntellect,
+            Stat.StatSpellPower,
+            Stat.StatNatureSpellPower,
+            Stat.StatSpellHit,
+            Stat.StatSpellCrit,
+            Stat.StatSpellHaste,
+            Stat.StatMP5,
+        ],
+        // Reference stat against which to calculate EP. I think all classes use either spell power or attack power.
+        epReferenceStat: Stat.StatSpellPower,
+        // Which stats to display in the Character Stats section, at the bottom of the left-hand sidebar.
+        displayStats: [
+            Stat.StatStamina,
+            Stat.StatIntellect,
+            Stat.StatSpellPower,
+            Stat.StatNatureSpellPower,
+            Stat.StatSpellHit,
+            Stat.StatSpellCrit,
+            Stat.StatSpellHaste,
+            Stat.StatMP5,
+        ],
+        defaults: {
+            // Default equipped gear.
+            gear: Presets.PRERAID_GEAR,
+            // Default EP weights for sorting gear in the gear picker.
+            epWeights: Stats.fromMap({
+                [Stat.StatIntellect]: 0.33,
+                [Stat.StatSpellPower]: 1,
+                [Stat.StatNatureSpellPower]: 1,
+                [Stat.StatSpellCrit]: 0.78,
+                [Stat.StatSpellHaste]: 1.25,
+                [Stat.StatMP5]: 0.08,
+            }),
+            // Default consumes settings.
+            consumes: Consumes.create({
+                drums: Drums.DrumsOfBattle,
+                defaultPotion: Potions.SuperManaPotion,
+            }),
+            // Default rotation settings.
+            rotation: ElementalShamanRotation.create({
+                type: RotationType.Adaptive,
+            }),
+            // Default talents.
+            talents: Presets.StandardTalents,
+            // Default spec-specific settings.
+            specOptions: ElementalShamanOptions.create({
+                waterShield: true,
+                bloodlust: true,
+                totemOfWrath: true,
+                manaSpringTotem: true,
+                wrathOfAirTotem: true,
+            }),
+        },
+        // Custom function for determining the EP value of meta gem effects.
+        // Default meta effect EP value is 0, so just handle the ones relevant to your spec.
+        metaGemEffectEP: (gem, player) => {
+            if (gem.id == Gems.CHAOTIC_SKYFIRE_DIAMOND) {
+                const finalStats = new Stats(player.getCurrentStats().finalStats);
+                return (((finalStats.getStat(Stat.StatSpellPower) * 0.795) + 603) * 2 * (finalStats.getStat(Stat.StatSpellCrit) / 2208) * 0.045) / 0.795;
+            }
+            return 0;
+        },
+    },
+    sim: {
+        defaults: {
+            // TBC Release Phase, i.e. Black Temple is phase 3.
+            phase: 2,
+            // Default encounter settings.
+            encounter: Encounter.create({
+                duration: 300,
+            }),
+            // Default raid/party buffs settings.
+            buffs: Buffs.create({
+                bloodlust: 0,
+                arcaneBrilliance: true,
+                divineSpirit: TristateEffect.TristateEffectImproved,
+                blessingOfKings: true,
+                blessingOfWisdom: 2,
+                giftOfTheWild: TristateEffect.TristateEffectImproved,
+            }),
+        },
+    },
+    target: {
+        defaults: {
+            armor: 0,
+            debuffs: Debuffs.create({
+                judgementOfWisdom: true,
+                misery: true,
+            }),
+        },
+    },
     // IconInputs to include in the 'Self Buffs' section on the settings tab.
     selfBuffInputs: {
         tooltip: Tooltips.SELF_BUFFS_SECTION,
@@ -123,57 +195,6 @@ const theme = new DefaultTheme(document.body, {
     showTargetArmor: false,
     // Whether to include 'Num Targets' in the 'Encounter' section of the settings tab.
     showNumTargets: true,
-    // Default values for most sim settings, for when a user visits for the first time.
-    defaults: {
-        // TBC Release Phase, i.e. Black Temple is phase 3.
-        phase: 2,
-        // Default equipped gear.
-        gear: Presets.PRERAID_GEAR,
-        // Default EP weights for sorting gear in the gear picker.
-        epWeights: Stats.fromMap({
-            [Stat.StatIntellect]: 0.33,
-            [Stat.StatSpellPower]: 1,
-            [Stat.StatNatureSpellPower]: 1,
-            [Stat.StatSpellCrit]: 0.78,
-            [Stat.StatSpellHaste]: 1.25,
-            [Stat.StatMP5]: 0.08,
-        }),
-        // Default encounter settings.
-        encounter: Encounter.create({
-            duration: 300,
-            numTargets: 1,
-        }),
-        // Default raid/party buffs settings.
-        buffs: Buffs.create({
-            bloodlust: 0,
-            arcaneBrilliance: true,
-            divineSpirit: TristateEffect.TristateEffectImproved,
-            blessingOfKings: true,
-            blessingOfWisdom: 2,
-            giftOfTheWild: TristateEffect.TristateEffectImproved,
-            judgementOfWisdom: true,
-            misery: true,
-        }),
-        // Default consumes settings.
-        consumes: Consumes.create({
-            drums: Drums.DrumsOfBattle,
-            defaultPotion: Potions.SuperManaPotion,
-        }),
-        // Default rotation settings.
-        rotation: ElementalShamanRotation.create({
-            type: RotationType.Adaptive,
-        }),
-        // Default talents.
-        talents: Presets.StandardTalents,
-        // Default spec-specific settings.
-        specOptions: ElementalShamanOptions.create({
-            waterShield: true,
-            bloodlust: true,
-            totemOfWrath: true,
-            manaSpringTotem: true,
-            wrathOfAirTotem: true,
-        }),
-    },
     presets: {
         // Preset talents that the user can quickly select.
         talents: [
@@ -197,15 +218,6 @@ const theme = new DefaultTheme(document.body, {
         ],
         // Preset encounter settings that the user can quickly select.
         encounters: [],
-    },
-    // Custom function for determining the EP value of meta gem effects.
-    // Default meta effect EP value is 0, so just handle the ones relevant to your spec.
-    metaGemEffectEP: (gem, sim) => {
-        if (gem.id == Gems.CHAOTIC_SKYFIRE_DIAMOND) {
-            const finalStats = new Stats(sim.getCurrentStats().finalStats);
-            return (((finalStats.getStat(Stat.StatSpellPower) * 0.795) + 603) * 2 * (finalStats.getStat(Stat.StatSpellCrit) / 2208) * 0.045) / 0.795;
-        }
-        return 0;
     },
 });
 theme.init();

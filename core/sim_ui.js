@@ -1,5 +1,9 @@
+import { makeIndividualSimRequest } from '/tbc/core/proto_utils/request_helpers.js';
 import { specToLocalStorageKey } from '/tbc/core/proto_utils/utils.js';
+import { Player } from './player.js';
 import { Sim } from './sim.js';
+import { Target } from './target.js';
+import { TypedEvent } from './typed_event.js';
 const CURRENT_SETTINGS_STORAGE_KEY = '__currentSettings__';
 const SAVED_GEAR_STORAGE_KEY = '__savedGear__';
 const SAVED_ENCOUNTER_STORAGE_KEY = '__savedEncounter__';
@@ -9,9 +13,18 @@ const SAVED_TALENTS_STORAGE_KEY = '__savedTalents__';
 // Core UI module.
 export class SimUI {
     constructor(parentElem, config) {
+        // Emits when anything from sim, player, or target changes.
+        this.changeEmitter = new TypedEvent();
         this.parentElem = parentElem;
-        this.sim = new Sim(config);
+        this.sim = new Sim(config.sim);
+        this.player = new Player(config.player, this.sim);
+        this.target = new Target(config.target, this.sim);
         this.simUiConfig = config;
+        [
+            this.sim.changeEmitter,
+            this.player.changeEmitter,
+            this.target.changeEmitter,
+        ].forEach(emitter => emitter.on(() => this.changeEmitter.emit()));
         this.exclusivityMap = {
             'Battle Elixir': [],
             'Drums': [],
@@ -38,16 +51,36 @@ export class SimUI {
             });
         });
     }
+    // Returns JSON representing all the current values.
+    toJson() {
+        return {
+            'sim': this.sim.toJson(),
+            'player': this.player.toJson(),
+            'target': this.target.toJson(),
+        };
+    }
+    // Set all the current values, assumes obj is the same type returned by toJson().
+    fromJson(obj) {
+        if (obj['sim']) {
+            this.sim.fromJson(obj['sim']);
+        }
+        if (obj['player']) {
+            this.player.fromJson(obj['player']);
+        }
+        if (obj['target']) {
+            this.target.fromJson(obj['target']);
+        }
+    }
     async init() {
-        await this.sim.init();
+        await this.sim.init(this.player.spec);
         let loadedSettings = false;
         let hash = window.location.hash;
         if (hash.length > 1) {
             // Remove leading '#'
             hash = hash.substring(1);
             try {
-                const simJsonStr = atob(hash);
-                this.sim.fromJson(JSON.parse(simJsonStr));
+                const jsonStr = atob(hash);
+                this.fromJson(JSON.parse(jsonStr));
                 loadedSettings = true;
             }
             catch (e) {
@@ -58,7 +91,7 @@ export class SimUI {
         const savedSettings = window.localStorage.getItem(this.getStorageKey(CURRENT_SETTINGS_STORAGE_KEY));
         if (!loadedSettings && savedSettings != null) {
             try {
-                this.sim.fromJson(JSON.parse(savedSettings));
+                this.fromJson(JSON.parse(savedSettings));
                 loadedSettings = true;
             }
             catch (e) {
@@ -66,11 +99,11 @@ export class SimUI {
             }
         }
         if (!loadedSettings) {
-            this.sim.setGear(this.sim.lookupEquipmentSpec(this.simUiConfig.defaults.gear));
+            this.player.setGear(this.sim.lookupEquipmentSpec(this.player.defaultGear));
         }
-        this.sim.changeEmitter.on(() => {
-            const simJsonStr = JSON.stringify(this.sim.toJson());
-            window.localStorage.setItem(this.getStorageKey(CURRENT_SETTINGS_STORAGE_KEY), simJsonStr);
+        this.changeEmitter.on(() => {
+            const jsonStr = JSON.stringify(this.toJson());
+            window.localStorage.setItem(this.getStorageKey(CURRENT_SETTINGS_STORAGE_KEY), jsonStr);
         });
         Array.from(document.getElementsByClassName('share-link')).forEach(element => {
             tippy(element, {
@@ -79,9 +112,9 @@ export class SimUI {
             });
             element.addEventListener('click', event => {
                 const linkUrl = new URL(window.location.href);
-                const simJsonStr = JSON.stringify(this.sim.toJson());
-                const simEncoded = btoa(simJsonStr);
-                linkUrl.hash = simEncoded;
+                const jsonStr = JSON.stringify(this.toJson());
+                const encoded = btoa(jsonStr);
+                linkUrl.hash = encoded;
                 navigator.clipboard.writeText(linkUrl.toString());
                 alert('Current settings copied to clipboard!');
             });
@@ -120,6 +153,14 @@ export class SimUI {
     getStorageKey(keyPart) {
         // Local storage is shared by all sites under the same domain, so we need to use
         // different keys for each spec site.
-        return specToLocalStorageKey[this.simUiConfig.spec] + keyPart;
+        return specToLocalStorageKey[this.player.spec] + keyPart;
+    }
+    makeCurrentIndividualSimRequest(iterations, debug) {
+        const encounter = this.sim.getEncounter();
+        const numTargets = Math.max(1, this.sim.getNumTargets());
+        for (let i = 0; i < numTargets; i++) {
+            encounter.targets.push(this.target.toProto());
+        }
+        return makeIndividualSimRequest(this.sim.getBuffs(), this.player.getConsumes(), this.player.getCustomStats(), encounter, this.player.getGear(), this.player.getRace(), this.player.getRotation(), this.player.getTalents(), this.player.getSpecOptions(), iterations, debug);
     }
 }

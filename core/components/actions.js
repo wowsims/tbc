@@ -1,7 +1,7 @@
 import { StatWeightsRequest } from '/tbc/core/proto/api.js';
 import { Component } from './component.js';
 export class Actions extends Component {
-    constructor(parent, sim, epStats, epReferenceStat, results, detailedResults) {
+    constructor(parent, simUI, epStats, epReferenceStat, results, detailedResults) {
         super(parent, 'actions-root');
         const simButton = document.createElement('button');
         simButton.classList.add('actions-button');
@@ -21,23 +21,23 @@ export class Actions extends Component {
         const iterationsInput = iterationsDiv.getElementsByClassName('iterations-input')[0];
         simButton.addEventListener('click', async () => {
             const iterations = parseInt(iterationsInput.value);
-            const simRequest = sim.makeCurrentIndividualSimRequest(iterations, false);
+            const simRequest = simUI.makeCurrentIndividualSimRequest(iterations, false);
             results.setPending();
             detailedResults.setPending();
-            const result = await sim.individualSim(simRequest);
+            const result = await simUI.sim.individualSim(simRequest);
             results.setSimResult(simRequest, result);
             detailedResults.setSimResult(simRequest, result);
         });
         statWeightsButton.addEventListener('click', async () => {
             const iterations = parseInt(iterationsInput.value);
-            const simRequest = sim.makeCurrentIndividualSimRequest(iterations, false);
+            const simRequest = simUI.makeCurrentIndividualSimRequest(iterations, false);
             const statWeightsRequest = StatWeightsRequest.create({
                 options: simRequest,
                 statsToWeigh: epStats,
                 epReferenceStat: epReferenceStat,
             });
             results.setPending();
-            const result = await sim.statWeights(statWeightsRequest);
+            const result = await simUI.sim.statWeights(statWeightsRequest);
             results.setStatWeights(statWeightsRequest, result, epStats);
         });
     }

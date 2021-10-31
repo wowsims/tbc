@@ -1,8 +1,8 @@
 import { TalentsPicker } from './talents_picker.js';
 // Talents are the same for all Shaman specs, so its ok to just use ElementalShaman here
 export class ShamanTalentsPicker extends TalentsPicker {
-    constructor(parent, sim) {
-        super(parent, sim, [
+    constructor(parent, player) {
+        super(parent, player, [
             {
                 name: 'Elemental',
                 backgroundUrl: 'https://wow.zamimg.com/images/wow/talents/backgrounds/classic/261.jpg',

@@ -165,6 +165,27 @@ export interface Raid {
     parties: Party[];
 }
 /**
+ * @generated from protobuf message proto.SimOptions
+ */
+export interface SimOptions {
+    /**
+     * @generated from protobuf field: int32 iterations = 1;
+     */
+    iterations: number;
+    /**
+     * @generated from protobuf field: int64 random_seed = 2;
+     */
+    randomSeed: bigint;
+    /**
+     * @generated from protobuf field: bool debug = 3;
+     */
+    debug: boolean;
+    /**
+     * @generated from protobuf field: bool exit_on_oom = 4;
+     */
+    exitOnOom: boolean;
+}
+/**
  * RPC IndividualSim
  *
  * @generated from protobuf message proto.IndividualSimRequest
@@ -183,21 +204,9 @@ export interface IndividualSimRequest {
      */
     encounter?: Encounter;
     /**
-     * @generated from protobuf field: int32 iterations = 4;
+     * @generated from protobuf field: proto.SimOptions sim_options = 4;
      */
-    iterations: number;
-    /**
-     * @generated from protobuf field: int64 random_seed = 5;
-     */
-    randomSeed: bigint;
-    /**
-     * @generated from protobuf field: bool debug = 6;
-     */
-    debug: boolean;
-    /**
-     * @generated from protobuf field: bool exit_on_oom = 7;
-     */
-    exitOnOom: boolean;
+    simOptions?: SimOptions;
 }
 /**
  * @generated from protobuf message proto.IndividualSimResult
@@ -570,6 +579,16 @@ declare class Raid$Type extends MessageType<Raid> {
  * @generated MessageType for protobuf message proto.Raid
  */
 export declare const Raid: Raid$Type;
+declare class SimOptions$Type extends MessageType<SimOptions> {
+    constructor();
+    create(value?: PartialMessage<SimOptions>): SimOptions;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: SimOptions): SimOptions;
+    internalBinaryWrite(message: SimOptions, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message proto.SimOptions
+ */
+export declare const SimOptions: SimOptions$Type;
 declare class IndividualSimRequest$Type extends MessageType<IndividualSimRequest> {
     constructor();
     create(value?: PartialMessage<IndividualSimRequest>): IndividualSimRequest;

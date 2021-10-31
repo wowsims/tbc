@@ -1,22 +1,21 @@
-import { Sim } from '/tbc/core/sim.js';
 import { TypedEvent } from '/tbc/core/typed_event.js';
 import { Component } from './component.js';
 /**
  * Data for creating a new input UI element.
  */
-export interface InputConfig<T> {
+export interface InputConfig<ModObject, T> {
     label?: string;
     labelTooltip?: string;
     defaultValue?: T;
-    changedEvent: (sim: Sim<any>) => TypedEvent<any>;
-    getValue: (sim: Sim<any>) => T;
-    setValue: (sim: Sim<any>, newValue: T) => void;
-    enableWhen?: (sim: Sim<any>) => boolean;
+    changedEvent: (obj: ModObject) => TypedEvent<any>;
+    getValue: (obj: ModObject) => T;
+    setValue: (obj: ModObject, newValue: T) => void;
+    enableWhen?: (obj: ModObject) => boolean;
 }
-export declare abstract class Input<T> extends Component {
+export declare abstract class Input<ModObject, T> extends Component {
     private readonly inputConfig;
-    readonly sim: Sim<any>;
-    constructor(parent: HTMLElement, cssClass: string, sim: Sim<any>, config: InputConfig<T>);
+    readonly modObject: ModObject;
+    constructor(parent: HTMLElement, cssClass: string, modObject: ModObject, config: InputConfig<ModObject, T>);
     private update;
     init(): void;
     abstract getInputElem(): HTMLElement;

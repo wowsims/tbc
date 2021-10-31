@@ -9,8 +9,8 @@ export const IconWrathOfAirTotem = makeBooleanShamanBuffInput({ spellId: 3738 },
 export const ElementalShamanRotationConfig = {
     inputs: [
         {
-            type: 'enum',
-            cssClass: 'rotation-enum-picker',
+            type: 'enum', cssClass: 'rotation-enum-picker',
+            getModObject: (simUI) => simUI.player,
             config: {
                 label: 'Type',
                 values: [
@@ -35,29 +35,30 @@ export const ElementalShamanRotationConfig = {
                         tooltip: 'Only casts Lightning Bolt.',
                     },
                 ],
-                changedEvent: (sim) => sim.rotationChangeEmitter,
-                getValue: (sim) => sim.getRotation().type,
-                setValue: (sim, newValue) => {
-                    const newRotation = sim.getRotation();
+                changedEvent: (player) => player.rotationChangeEmitter,
+                getValue: (player) => player.getRotation().type,
+                setValue: (player, newValue) => {
+                    const newRotation = player.getRotation();
                     newRotation.type = newValue;
-                    sim.setRotation(newRotation);
+                    player.setRotation(newRotation);
                 },
             },
         },
         {
             type: 'number',
             cssClass: 'num-lbs-per-cl-picker',
+            getModObject: (simUI) => simUI.player,
             config: {
                 label: 'LBs per CL',
                 labelTooltip: 'The number of Lightning Bolts to cast between each Chain Lightning. Only used if Rotation is set to \'Fixed LB+CL\'.',
-                changedEvent: (sim) => sim.rotationChangeEmitter,
-                getValue: (sim) => sim.getRotation().lbsPerCl,
-                setValue: (sim, newValue) => {
-                    const newRotation = sim.getRotation();
+                changedEvent: (player) => player.rotationChangeEmitter,
+                getValue: (player) => player.getRotation().lbsPerCl,
+                setValue: (player, newValue) => {
+                    const newRotation = player.getRotation();
                     newRotation.lbsPerCl = newValue;
-                    sim.setRotation(newRotation);
+                    player.setRotation(newRotation);
                 },
-                enableWhen: (sim) => sim.getRotation().type == RotationType.FixedLBCL,
+                enableWhen: (player) => player.getRotation().type == RotationType.FixedLBCL,
             },
         },
     ],
@@ -66,12 +67,12 @@ function makeBooleanShamanBuffInput(id, optionsFieldName) {
     return {
         id: id,
         states: 2,
-        changedEvent: (sim) => sim.specOptionsChangeEmitter,
-        getValue: (sim) => sim.getSpecOptions()[optionsFieldName],
-        setBooleanValue: (sim, newValue) => {
-            const newOptions = sim.getSpecOptions();
+        changedEvent: (player) => player.specOptionsChangeEmitter,
+        getValue: (player) => player.getSpecOptions()[optionsFieldName],
+        setBooleanValue: (player, newValue) => {
+            const newOptions = player.getSpecOptions();
             newOptions[optionsFieldName] = newValue;
-            sim.setSpecOptions(newOptions);
+            player.setSpecOptions(newOptions);
         },
     };
 }

@@ -2,15 +2,15 @@ import { EquippedItem } from '/tbc/core/proto_utils/equipped_item.js';
 import { Enchant } from '/tbc/core/proto/common.js';
 import { Item } from '/tbc/core/proto/common.js';
 import { ItemSlot } from '/tbc/core/proto/common.js';
-import { Sim } from '/tbc/core/sim.js';
+import { Player } from '/tbc/core/player.js';
 import { Component } from './component.js';
 export declare class GearPicker extends Component {
     readonly itemPickers: Array<ItemPicker>;
-    constructor(parent: HTMLElement, sim: Sim<any>);
+    constructor(parent: HTMLElement, player: Player<any>);
 }
 declare class ItemPicker extends Component {
     readonly slot: ItemSlot;
-    private readonly sim;
+    private readonly player;
     private readonly iconElem;
     private readonly nameElem;
     private readonly enchantElem;
@@ -18,15 +18,15 @@ declare class ItemPicker extends Component {
     private _items;
     private _enchants;
     private _equippedItem;
-    constructor(parent: HTMLElement, sim: Sim<any>, slot: ItemSlot, selectorModal: SelectorModal);
+    constructor(parent: HTMLElement, player: Player<any>, slot: ItemSlot, selectorModal: SelectorModal);
     set item(newItem: EquippedItem | null);
 }
 declare class SelectorModal extends Component {
-    private readonly sim;
+    private readonly player;
     private readonly tabsElem;
     private readonly contentElem;
     private readonly closeButton;
-    constructor(parent: HTMLElement, sim: Sim<any>);
+    constructor(parent: HTMLElement, player: Player<any>);
     setData(slot: ItemSlot, equippedItem: EquippedItem | null, eligibleItems: Array<Item>, eligibleEnchants: Array<Enchant>): void;
     private addGemTabs;
     /**

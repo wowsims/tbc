@@ -4,18 +4,20 @@ import { TypedEvent } from '/tbc/core/typed_event.js';
 import { isRightClick } from '/tbc/core/utils.js';
 import { Component } from './component.js';
 // Icon-based UI for picking buffs / consumes / etc
+// ModObject is the object being modified (Sim, Player, or Target).
 export class IconPicker extends Component {
-    constructor(parent, sim, inputs, simUI) {
+    constructor(parent, modObj, inputs, simUI) {
         super(parent, 'icon-picker-root');
-        this._inputs = inputs.map(input => new IconInputComponent(this.rootElem, sim, input, simUI));
+        this._inputs = inputs.map(input => new IconInputComponent(this.rootElem, modObj, input, simUI));
     }
 }
+// ModObject is the object being modified (Sim, Player, or Target).
 class IconInputComponent extends Component {
-    constructor(parent, sim, input, simUI) {
+    constructor(parent, modObj, input, simUI) {
         super(parent, 'icon-input', document.createElement('a'));
         this._clickedEmitter = new TypedEvent();
         this._input = input;
-        this._sim = sim;
+        this._modObject = modObj;
         this._rootAnchor = this.rootElem;
         this._rootAnchor.target = '_blank';
         this._rootAnchor.dataset.states = String(this._input.states);
@@ -43,7 +45,7 @@ class IconInputComponent extends Component {
             }
         }
         this.updateIcon();
-        this._input.changedEvent(sim).on(() => this.updateIcon());
+        this._input.changedEvent(this._modObject).on(() => this.updateIcon());
         this._rootAnchor.addEventListener('click', event => {
             event.preventDefault();
         });
@@ -76,14 +78,14 @@ class IconInputComponent extends Component {
     }
     // Instead of dealing with bool | number, just convert everything to numbers
     getValue() {
-        return Number(this._input.getValue(this._sim));
+        return Number(this._input.getValue(this._modObject));
     }
     setValue(newValue) {
         if (this._input.setBooleanValue) {
-            this._input.setBooleanValue(this._sim, newValue > 0);
+            this._input.setBooleanValue(this._modObject, newValue > 0);
         }
         else if (this._input.setNumberValue) {
-            this._input.setNumberValue(this._sim, newValue);
+            this._input.setNumberValue(this._modObject, newValue);
         }
     }
     updateIcon() {

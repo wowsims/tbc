@@ -11,7 +11,7 @@ const spellPowerTypeStats = [
     Stat.StatShadowSpellPower,
 ];
 export class CharacterStats extends Component {
-    constructor(parent, stats, sim) {
+    constructor(parent, stats, player) {
         super(parent, 'character-stats-root');
         this.stats = stats;
         const table = document.createElement('table');
@@ -32,8 +32,8 @@ export class CharacterStats extends Component {
             this.valueElems.push(value);
         });
         this.updateStats(new Stats());
-        sim.characterStatsEmitter.on(() => {
-            this.updateStats(new Stats(sim.getCurrentStats().finalStats));
+        player.characterStatsEmitter.on(() => {
+            this.updateStats(new Stats(player.getCurrentStats().finalStats));
         });
     }
     updateStats(newStats) {

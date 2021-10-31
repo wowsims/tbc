@@ -11,7 +11,7 @@ import { setGemSocketCssClass } from '/tbc/core/css_utils.js';
 import { setItemQualityCssClass } from '/tbc/core/css_utils.js';
 import { Component } from './component.js';
 export class GearPicker extends Component {
-    constructor(parent, sim) {
+    constructor(parent, player) {
         super(parent, 'gear-picker-root');
         const leftSide = document.createElement('div');
         leftSide.classList.add('gear-picker-left');
@@ -19,7 +19,7 @@ export class GearPicker extends Component {
         const rightSide = document.createElement('div');
         rightSide.classList.add('gear-picker-right');
         this.rootElem.appendChild(rightSide);
-        const selectorModal = new SelectorModal(document.body, sim);
+        const selectorModal = new SelectorModal(document.body, player);
         const leftItemPickers = [
             ItemSlot.ItemSlotHead,
             ItemSlot.ItemSlotNeck,
@@ -29,7 +29,7 @@ export class GearPicker extends Component {
             ItemSlot.ItemSlotWrist,
             ItemSlot.ItemSlotMainHand,
             ItemSlot.ItemSlotOffHand,
-        ].map(slot => new ItemPicker(leftSide, sim, slot, selectorModal));
+        ].map(slot => new ItemPicker(leftSide, player, slot, selectorModal));
         const rightItemPickers = [
             ItemSlot.ItemSlotHands,
             ItemSlot.ItemSlotWaist,
@@ -40,19 +40,19 @@ export class GearPicker extends Component {
             ItemSlot.ItemSlotTrinket1,
             ItemSlot.ItemSlotTrinket2,
             ItemSlot.ItemSlotRanged,
-        ].map(slot => new ItemPicker(rightSide, sim, slot, selectorModal));
+        ].map(slot => new ItemPicker(rightSide, player, slot, selectorModal));
         this.itemPickers = leftItemPickers.concat(rightItemPickers).sort((a, b) => a.slot - b.slot);
     }
 }
 class ItemPicker extends Component {
-    constructor(parent, sim, slot, selectorModal) {
+    constructor(parent, player, slot, selectorModal) {
         super(parent, 'item-picker-root');
         // All items and enchants that are eligible for this slot
         this._items = [];
         this._enchants = [];
         this._equippedItem = null;
         this.slot = slot;
-        this.sim = sim;
+        this.player = player;
         this.rootElem.innerHTML = `
       <a class="item-picker-icon" target="_blank" data-toggle="modal" data-target="#selectorModal">
         <div class="item-picker-sockets-container">
@@ -68,15 +68,15 @@ class ItemPicker extends Component {
         this.enchantElem = this.rootElem.getElementsByClassName('item-picker-enchant')[0];
         this.socketsContainerElem = this.rootElem.getElementsByClassName('item-picker-sockets-container')[0];
         this.item = null;
-        sim.gearListEmitter.on(() => {
-            this._items = this.sim.getItems(this.slot);
-            this._enchants = this.sim.getEnchants(this.slot);
+        player.gearListEmitter.on(() => {
+            this._items = this.player.sim.getItems(this.slot);
+            this._enchants = this.player.sim.getEnchants(this.slot);
             this.iconElem.addEventListener('click', event => {
                 selectorModal.setData(this.slot, this._equippedItem, this._items, this._enchants);
             });
         });
-        sim.gearChangeEmitter.on(() => {
-            this.item = sim.getEquippedItem(slot);
+        player.gearChangeEmitter.on(() => {
+            this.item = player.getEquippedItem(slot);
         });
     }
     set item(newItem) {
@@ -93,7 +93,7 @@ class ItemPicker extends Component {
         if (newItem != null) {
             this.nameElem.textContent = newItem.item.name;
             setItemQualityCssClass(this.nameElem, newItem.item.quality);
-            this.sim.setWowheadData(newItem, this.iconElem);
+            this.player.setWowheadData(newItem, this.iconElem);
             setWowheadHref(this.iconElem, { itemId: newItem.item.id });
             getIconUrl({ itemId: newItem.item.id }).then(url => {
                 this.iconElem.style.backgroundImage = `url('${url}')`;
@@ -121,9 +121,9 @@ class ItemPicker extends Component {
     }
 }
 class SelectorModal extends Component {
-    constructor(parent, sim) {
+    constructor(parent, player) {
         super(parent, 'selector-model-root');
-        this.sim = sim;
+        this.player = player;
         this.rootElem.innerHTML = `
     <div class="modal fade selector-modal" id="selectorModal" tabindex="-1" role="dialog" aria-labelledby="selectorModalTitle" aria-hidden="true">
       <div class="modal-dialog" role="document">
@@ -152,62 +152,62 @@ class SelectorModal extends Component {
       <span aria-hidden="true">&times;</span>
     </button>
     `;
-        this.addTab('Items', slot, equippedItem, eligibleItems, item => this.sim.computeItemEP(item), equippedItem => equippedItem?.item, item => {
+        this.addTab('Items', slot, equippedItem, eligibleItems, item => this.player.computeItemEP(item), equippedItem => equippedItem?.item, item => {
             return {
                 id: item.id,
                 name: item.name,
                 quality: item.quality,
                 phase: item.phase,
                 onEquip: item => {
-                    const equippedItem = this.sim.getEquippedItem(slot);
+                    const equippedItem = this.player.getEquippedItem(slot);
                     if (equippedItem) {
-                        this.sim.equipItem(slot, equippedItem.withItem(item));
+                        this.player.equipItem(slot, equippedItem.withItem(item));
                     }
                     else {
-                        this.sim.equipItem(slot, new EquippedItem(item));
+                        this.player.equipItem(slot, new EquippedItem(item));
                     }
                 },
             };
         }, () => {
-            this.sim.equipItem(slot, null);
+            this.player.equipItem(slot, null);
         });
-        this.addTab('Enchants', slot, equippedItem, eligibleEnchants, enchant => this.sim.computeEnchantEP(enchant), equippedItem => equippedItem?.enchant, enchant => {
+        this.addTab('Enchants', slot, equippedItem, eligibleEnchants, enchant => this.player.computeEnchantEP(enchant), equippedItem => equippedItem?.enchant, enchant => {
             return {
                 id: enchant.id,
                 name: enchant.name,
                 quality: enchant.quality,
                 phase: 1,
                 onEquip: enchant => {
-                    const equippedItem = this.sim.getEquippedItem(slot);
+                    const equippedItem = this.player.getEquippedItem(slot);
                     if (equippedItem)
-                        this.sim.equipItem(slot, equippedItem.withEnchant(enchant));
+                        this.player.equipItem(slot, equippedItem.withEnchant(enchant));
                 },
             };
         }, () => {
-            const equippedItem = this.sim.getEquippedItem(slot);
+            const equippedItem = this.player.getEquippedItem(slot);
             if (equippedItem)
-                this.sim.equipItem(slot, equippedItem.withEnchant(null));
+                this.player.equipItem(slot, equippedItem.withEnchant(null));
         });
         this.addGemTabs(slot, equippedItem);
     }
     addGemTabs(slot, equippedItem) {
         equippedItem?.item.gemSockets.forEach((socketColor, socketIdx) => {
-            this.addTab('Gem ' + (socketIdx + 1), slot, equippedItem, this.sim.getGems(socketColor), gem => this.sim.computeGemEP(gem), equippedItem => equippedItem?.gems[socketIdx], gem => {
+            this.addTab('Gem ' + (socketIdx + 1), slot, equippedItem, this.player.sim.getGems(socketColor), gem => this.player.computeGemEP(gem), equippedItem => equippedItem?.gems[socketIdx], gem => {
                 return {
                     id: gem.id,
                     name: gem.name,
                     quality: gem.quality,
                     phase: gem.phase,
                     onEquip: gem => {
-                        const equippedItem = this.sim.getEquippedItem(slot);
+                        const equippedItem = this.player.getEquippedItem(slot);
                         if (equippedItem)
-                            this.sim.equipItem(slot, equippedItem.withGem(gem, socketIdx));
+                            this.player.equipItem(slot, equippedItem.withGem(gem, socketIdx));
                     },
                 };
             }, () => {
-                const equippedItem = this.sim.getEquippedItem(slot);
+                const equippedItem = this.player.getEquippedItem(slot);
                 if (equippedItem)
-                    this.sim.equipItem(slot, equippedItem.withGem(null, socketIdx));
+                    this.player.equipItem(slot, equippedItem.withGem(null, socketIdx));
             });
         });
     }
@@ -285,7 +285,7 @@ class SelectorModal extends Component {
                 // If the item changes, the gem slots might change, so remove and recreate the gem tabs
                 if (Item.is(item)) {
                     this.removeTabs('Gem');
-                    this.addGemTabs(slot, this.sim.getEquippedItem(slot));
+                    this.addGemTabs(slot, this.player.getEquippedItem(slot));
                 }
             };
             nameElem.addEventListener('click', onclick);
@@ -298,7 +298,7 @@ class SelectorModal extends Component {
             onRemove();
         });
         const updateSelected = () => {
-            const newEquippedItem = this.sim.getEquippedItem(slot);
+            const newEquippedItem = this.player.getEquippedItem(slot);
             const newItem = equippedToItemFn(newEquippedItem);
             if (!newItem)
                 return;
@@ -330,10 +330,10 @@ class SelectorModal extends Component {
             });
         };
         updateSelected();
-        this.sim.gearChangeEmitter.on(updateSelected);
+        this.player.gearChangeEmitter.on(updateSelected);
         const applyFilters = () => {
             const searchQuery = searchInput.value.toLowerCase();
-            const phase = this.sim.getPhase();
+            const phase = this.player.sim.getPhase();
             listItemElems.forEach(elem => {
                 if (elem.dataset.name.toLowerCase().includes(searchQuery) && Number(elem.dataset.phase) <= phase) {
                     elem.style.display = 'flex';
@@ -346,14 +346,14 @@ class SelectorModal extends Component {
         const searchInput = tabContent.getElementsByClassName('selector-modal-search')[0];
         searchInput.addEventListener('input', applyFilters);
         const phaseSelect = tabContent.getElementsByClassName('selector-modal-phase-select')[0];
-        phaseSelect.value = String(this.sim.getPhase());
-        tabContent.dataset.phase = String(this.sim.getPhase());
+        phaseSelect.value = String(this.player.sim.getPhase());
+        tabContent.dataset.phase = String(this.player.sim.getPhase());
         phaseSelect.addEventListener('input', event => {
-            this.sim.setPhase(Number(phaseSelect.value));
+            this.player.sim.setPhase(Number(phaseSelect.value));
         });
-        this.sim.phaseChangeEmitter.on(() => {
-            tabContent.dataset.phase = String(this.sim.getPhase());
-            phaseSelect.value = String(this.sim.getPhase());
+        this.player.sim.phaseChangeEmitter.on(() => {
+            tabContent.dataset.phase = String(this.player.sim.getPhase());
+            phaseSelect.value = String(this.player.sim.getPhase());
             applyFilters();
         });
         applyFilters();

@@ -1,7 +1,7 @@
 import { Input } from './input.js';
 export class EnumPicker extends Input {
-    constructor(parent, sim, config) {
-        super(parent, 'enum-picker-root', sim, config);
+    constructor(parent, modObject, config) {
+        super(parent, 'enum-picker-root', modObject, config);
         this.selectElem = document.createElement('select');
         this.selectElem.classList.add('enum-picker-selector');
         this.rootElem.appendChild(this.selectElem);

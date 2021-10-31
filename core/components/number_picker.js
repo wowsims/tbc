@@ -1,8 +1,8 @@
 import { Input } from './input.js';
 // UI element for picking an arbitrary number field.
 export class NumberPicker extends Input {
-    constructor(parent, sim, config) {
-        super(parent, 'number-picker-root', sim, config);
+    constructor(parent, modObject, config) {
+        super(parent, 'number-picker-root', modObject, config);
         this.inputElem = document.createElement('input');
         this.inputElem.type = "number";
         this.inputElem.classList.add('number-picker-input');

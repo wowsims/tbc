@@ -30,31 +30,31 @@ export class DefaultTheme extends SimUI {
         else if (config.releaseStatus == 'Beta') {
             titleElem.textContent += ' Beta';
         }
-        const results = new Results(this.parentElem.getElementsByClassName('default-results')[0], this.sim);
+        const results = new Results(this.parentElem.getElementsByClassName('default-results')[0], this);
         const detailedResults = new DetailedResults(this.parentElem.getElementsByClassName('detailed-results')[0]);
-        const actions = new Actions(this.parentElem.getElementsByClassName('default-actions')[0], this.sim, config.epStats, config.epReferenceStat, results, detailedResults);
-        const logRunner = new LogRunner(this.parentElem.getElementsByClassName('log-runner')[0], this.sim, results, detailedResults);
-        const characterStats = new CharacterStats(this.parentElem.getElementsByClassName('default-stats')[0], config.displayStats, this.sim);
-        const gearPicker = new GearPicker(this.parentElem.getElementsByClassName('gear-picker')[0], this.sim);
-        const customStatsPicker = new CustomStatsPicker(this.parentElem.getElementsByClassName('custom-stats-picker')[0], this.sim, config.epStats);
-        const talentsPicker = newTalentsPicker(config.spec, this.parentElem.getElementsByClassName('talents-picker')[0], this.sim);
+        const actions = new Actions(this.parentElem.getElementsByClassName('default-actions')[0], this, config.player.epStats, config.player.epReferenceStat, results, detailedResults);
+        const logRunner = new LogRunner(this.parentElem.getElementsByClassName('log-runner')[0], this, results, detailedResults);
+        const characterStats = new CharacterStats(this.parentElem.getElementsByClassName('default-stats')[0], config.player.displayStats, this.player);
+        const gearPicker = new GearPicker(this.parentElem.getElementsByClassName('gear-picker')[0], this.player);
+        const customStatsPicker = new CustomStatsPicker(this.parentElem.getElementsByClassName('custom-stats-picker')[0], this.player, config.player.epStats);
+        const talentsPicker = newTalentsPicker(this.player.spec, this.parentElem.getElementsByClassName('talents-picker')[0], this.player);
         if (this._config.freezeTalents) {
             talentsPicker.freeze();
         }
         const settingsTab = document.getElementsByClassName('settings-inputs')[0];
-        const configureIconSection = (sectionElem, sectionConfig) => {
+        const configureIconSection = (sectionElem, sectionConfig, modObject) => {
             if (sectionConfig.tooltip) {
                 tippy(sectionElem, {
                     'content': sectionConfig.tooltip,
                     'allowHTML': true,
                 });
             }
-            const iconPicker = new IconPicker(sectionElem, this.sim, sectionConfig.icons, this);
+            const iconPicker = new IconPicker(sectionElem, modObject, sectionConfig.icons, this);
         };
-        configureIconSection(this.parentElem.getElementsByClassName('self-buffs-section')[0], config.selfBuffInputs);
-        configureIconSection(this.parentElem.getElementsByClassName('buffs-section')[0], config.buffInputs);
-        configureIconSection(this.parentElem.getElementsByClassName('debuffs-section')[0], config.debuffInputs);
-        configureIconSection(this.parentElem.getElementsByClassName('consumes-section')[0], config.consumeInputs);
+        configureIconSection(this.parentElem.getElementsByClassName('self-buffs-section')[0], config.selfBuffInputs, this.player);
+        configureIconSection(this.parentElem.getElementsByClassName('buffs-section')[0], config.buffInputs, this.sim);
+        configureIconSection(this.parentElem.getElementsByClassName('debuffs-section')[0], config.debuffInputs, this.target);
+        configureIconSection(this.parentElem.getElementsByClassName('consumes-section')[0], config.consumeInputs, this.player);
         const configureInputSection = (sectionElem, sectionConfig) => {
             if (sectionConfig.tooltip) {
                 tippy(sectionElem, {
@@ -64,10 +64,10 @@ export class DefaultTheme extends SimUI {
             }
             sectionConfig.inputs.forEach(inputConfig => {
                 if (inputConfig.type == 'number') {
-                    const picker = new NumberPicker(sectionElem, this.sim, inputConfig.config);
+                    const picker = new NumberPicker(sectionElem, inputConfig.getModObject(this), inputConfig.config);
                 }
                 else if (inputConfig.type == 'enum') {
-                    const picker = new EnumPicker(sectionElem, this.sim, inputConfig.config);
+                    const picker = new EnumPicker(sectionElem, inputConfig.getModObject(this), inputConfig.config);
                 }
             });
         };
@@ -87,8 +87,8 @@ export class DefaultTheme extends SimUI {
             makeInputSection(sectionName, sectionConfig);
         }
         ;
-        const races = specToEligibleRaces[this.sim.spec];
-        const racePicker = new EnumPicker(this.parentElem.getElementsByClassName('race-section')[0], this.sim, {
+        const races = specToEligibleRaces[this.player.spec];
+        const racePicker = new EnumPicker(this.parentElem.getElementsByClassName('race-section')[0], this.player, {
             values: races.map(race => {
                 return {
                     name: raceNames[race],
@@ -111,14 +111,12 @@ export class DefaultTheme extends SimUI {
             },
         });
         if (config.showTargetArmor) {
-            new NumberPicker(encounterSectionElem, this.sim, {
+            new NumberPicker(encounterSectionElem, this.target, {
                 label: 'Target Armor',
-                changedEvent: (sim) => sim.encounterChangeEmitter,
-                getValue: (sim) => sim.getEncounter().targetArmor,
-                setValue: (sim, newValue) => {
-                    const encounter = sim.getEncounter();
-                    encounter.targetArmor = newValue;
-                    sim.setEncounter(encounter);
+                changedEvent: (target) => target.armorChangeEmitter,
+                getValue: (target) => target.getArmor(),
+                setValue: (target, newValue) => {
+                    target.setArmor(newValue);
                 },
             });
         }
@@ -127,12 +125,10 @@ export class DefaultTheme extends SimUI {
         if (config.showNumTargets) {
             new NumberPicker(encounterSectionElem, this.sim, {
                 label: '# of Targets',
-                changedEvent: (sim) => sim.encounterChangeEmitter,
-                getValue: (sim) => sim.getEncounter().numTargets,
+                changedEvent: (sim) => sim.numTargetsChangeEmitter,
+                getValue: (sim) => sim.getNumTargets(),
                 setValue: (sim, newValue) => {
-                    const encounter = sim.getEncounter();
-                    encounter.numTargets = newValue;
-                    sim.setEncounter(encounter);
+                    sim.setNumTargets(newValue);
                 },
             });
         }
@@ -150,20 +146,20 @@ export class DefaultTheme extends SimUI {
         });
     }
     async init() {
-        const savedGearManager = new SavedDataManager(this.parentElem.getElementsByClassName('saved-gear-manager')[0], this.sim, {
+        const savedGearManager = new SavedDataManager(this.parentElem.getElementsByClassName('saved-gear-manager')[0], this.player, {
             label: 'Gear',
             storageKey: this.getSavedGearStorageKey(),
-            getData: (sim) => {
+            getData: (player) => {
                 return {
-                    gear: sim.getGear(),
-                    customStats: sim.getCustomStats(),
+                    gear: player.getGear(),
+                    customStats: player.getCustomStats(),
                 };
             },
-            setData: (sim, newGearAndStats) => {
-                sim.setGear(newGearAndStats.gear);
-                sim.setCustomStats(newGearAndStats.customStats);
+            setData: (player, newGearAndStats) => {
+                player.setGear(newGearAndStats.gear);
+                player.setCustomStats(newGearAndStats.customStats);
             },
-            changeEmitters: [this.sim.gearChangeEmitter, this.sim.customStatsChangeEmitter],
+            changeEmitters: [this.player.gearChangeEmitter, this.player.customStatsChangeEmitter],
             equals: (a, b) => a.gear.equals(b.gear) && a.customStats.equals(b.customStats),
             toJson: (a) => {
                 return {
@@ -188,32 +184,32 @@ export class DefaultTheme extends SimUI {
             toJson: (a) => Encounter.toJson(a),
             fromJson: (obj) => Encounter.fromJson(obj),
         });
-        const savedRotationManager = new SavedDataManager(this.parentElem.getElementsByClassName('saved-rotation-manager')[0], this.sim, {
+        const savedRotationManager = new SavedDataManager(this.parentElem.getElementsByClassName('saved-rotation-manager')[0], this.player, {
             label: 'Rotation',
             storageKey: this.getSavedRotationStorageKey(),
-            getData: (sim) => sim.getRotation(),
-            setData: (sim, newRotation) => sim.setRotation(newRotation),
-            changeEmitters: [this.sim.rotationChangeEmitter],
-            equals: (a, b) => this.sim.specTypeFunctions.rotationEquals(a, b),
-            toJson: (a) => this.sim.specTypeFunctions.rotationToJson(a),
-            fromJson: (obj) => this.sim.specTypeFunctions.rotationFromJson(obj),
+            getData: (player) => player.getRotation(),
+            setData: (player, newRotation) => player.setRotation(newRotation),
+            changeEmitters: [this.player.rotationChangeEmitter],
+            equals: (a, b) => this.player.specTypeFunctions.rotationEquals(a, b),
+            toJson: (a) => this.player.specTypeFunctions.rotationToJson(a),
+            fromJson: (obj) => this.player.specTypeFunctions.rotationFromJson(obj),
         });
-        const savedSettingsManager = new SavedDataManager(this.parentElem.getElementsByClassName('saved-settings-manager')[0], this.sim, {
+        const savedSettingsManager = new SavedDataManager(this.parentElem.getElementsByClassName('saved-settings-manager')[0], this, {
             label: 'Settings',
             storageKey: this.getSavedSettingsStorageKey(),
-            getData: (sim) => {
+            getData: (simUI) => {
                 return {
-                    buffs: sim.getBuffs(),
-                    consumes: sim.getConsumes(),
-                    race: sim.getRace(),
+                    buffs: simUI.sim.getBuffs(),
+                    consumes: simUI.player.getConsumes(),
+                    race: simUI.player.getRace(),
                 };
             },
-            setData: (sim, newSettings) => {
-                sim.setBuffs(newSettings.buffs);
-                sim.setConsumes(newSettings.consumes);
-                sim.setRace(newSettings.race);
+            setData: (simUI, newSettings) => {
+                simUI.sim.setBuffs(newSettings.buffs);
+                simUI.player.setConsumes(newSettings.consumes);
+                simUI.player.setRace(newSettings.race);
             },
-            changeEmitters: [this.sim.buffsChangeEmitter, this.sim.consumesChangeEmitter, this.sim.raceChangeEmitter],
+            changeEmitters: [this.sim.buffsChangeEmitter, this.player.consumesChangeEmitter, this.player.raceChangeEmitter],
             equals: (a, b) => Buffs.equals(a.buffs, b.buffs) && Consumes.equals(a.consumes, b.consumes) && a.race == b.race,
             toJson: (a) => {
                 return {
@@ -230,12 +226,12 @@ export class DefaultTheme extends SimUI {
                 };
             },
         });
-        const savedTalentsManager = new SavedDataManager(this.parentElem.getElementsByClassName('saved-talents-manager')[0], this.sim, {
+        const savedTalentsManager = new SavedDataManager(this.parentElem.getElementsByClassName('saved-talents-manager')[0], this.player, {
             label: 'Talents',
             storageKey: this.getSavedTalentsStorageKey(),
-            getData: (sim) => sim.getTalentsString(),
-            setData: (sim, newTalentsString) => sim.setTalentsString(newTalentsString),
-            changeEmitters: [this.sim.talentsStringChangeEmitter],
+            getData: (player) => player.getTalentsString(),
+            setData: (player, newTalentsString) => player.setTalentsString(newTalentsString),
+            changeEmitters: [this.player.talentsStringChangeEmitter],
             equals: (a, b) => a == b,
             toJson: (a) => a,
             fromJson: (obj) => obj,

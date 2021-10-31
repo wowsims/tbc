@@ -24,9 +24,9 @@ export const WrathOfAirTotem = makeTristateBuffInput({ spellId: 3738 }, { spellI
 export const DrumsOfBattleBuff = makeEnumValueBuffInput({ spellId: 35476 }, 'drums', Drums.DrumsOfBattle, ['Drums']);
 export const DrumsOfRestorationBuff = makeEnumValueBuffInput({ spellId: 35478 }, 'drums', Drums.DrumsOfRestoration, ['Drums']);
 // Debuffs
-export const ImprovedSealOfTheCrusader = makeBooleanBuffInput({ spellId: 20337 }, 'improvedSealOfTheCrusader');
-export const JudgementOfWisdom = makeBooleanBuffInput({ spellId: 27164 }, 'judgementOfWisdom');
-export const Misery = makeBooleanBuffInput({ spellId: 33195 }, 'misery');
+export const ImprovedSealOfTheCrusader = makeBooleanDebuffInput({ spellId: 20337 }, 'improvedSealOfTheCrusader');
+export const JudgementOfWisdom = makeBooleanDebuffInput({ spellId: 27164 }, 'judgementOfWisdom');
+export const Misery = makeBooleanDebuffInput({ spellId: 33195 }, 'misery');
 // Consumes
 export const AdeptsElixir = makeBooleanConsumeInput({ itemId: 28103 }, 'adeptsElixir', ['Battle Elixir']);
 export const BlackenedBasilisk = makeBooleanConsumeInput({ itemId: 27657 }, 'blackenedBasilisk', ['Food']);
@@ -102,17 +102,31 @@ function makeEnumValueBuffInput(id, buffsFieldName, enumValue, exclusivityTags) 
         },
     };
 }
+function makeBooleanDebuffInput(id, debuffsFieldName, exclusivityTags) {
+    return {
+        id: id,
+        states: 2,
+        exclusivityTags: exclusivityTags,
+        changedEvent: (target) => target.debuffsChangeEmitter,
+        getValue: (target) => target.getDebuffs()[debuffsFieldName],
+        setBooleanValue: (target, newValue) => {
+            const newDebuffs = target.getDebuffs();
+            newDebuffs[debuffsFieldName] = newValue;
+            target.setDebuffs(newDebuffs);
+        },
+    };
+}
 function makeBooleanConsumeInput(id, consumesFieldName, exclusivityTags) {
     return {
         id: id,
         states: 2,
         exclusivityTags: exclusivityTags,
-        changedEvent: (sim) => sim.consumesChangeEmitter,
-        getValue: (sim) => sim.getConsumes()[consumesFieldName],
-        setBooleanValue: (sim, newValue) => {
-            const newBuffs = sim.getConsumes();
+        changedEvent: (player) => player.consumesChangeEmitter,
+        getValue: (player) => player.getConsumes()[consumesFieldName],
+        setBooleanValue: (player, newValue) => {
+            const newBuffs = player.getConsumes();
             newBuffs[consumesFieldName] = newValue;
-            sim.setConsumes(newBuffs);
+            player.setConsumes(newBuffs);
         },
     };
 }
@@ -121,12 +135,12 @@ function makeEnumValueConsumeInput(id, consumesFieldName, enumValue, exclusivity
         id: id,
         states: 2,
         exclusivityTags: exclusivityTags,
-        changedEvent: (sim) => sim.consumesChangeEmitter,
-        getValue: (sim) => sim.getConsumes()[consumesFieldName] == enumValue,
-        setBooleanValue: (sim, newValue) => {
-            const newConsumes = sim.getConsumes();
+        changedEvent: (player) => player.consumesChangeEmitter,
+        getValue: (player) => player.getConsumes()[consumesFieldName] == enumValue,
+        setBooleanValue: (player, newValue) => {
+            const newConsumes = player.getConsumes();
             newConsumes[consumesFieldName] = newValue ? enumValue : 0;
-            sim.setConsumes(newConsumes);
+            player.setConsumes(newConsumes);
         },
     };
 }

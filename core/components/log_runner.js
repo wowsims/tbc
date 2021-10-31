@@ -1,6 +1,6 @@
 import { Component } from './component.js';
 export class LogRunner extends Component {
-    constructor(parent, sim, results, detailedResults) {
+    constructor(parent, simUI, results, detailedResults) {
         super(parent, 'log-runner-root');
         const controlBar = document.createElement('div');
         controlBar.classList.add('log-runner-control-bar');
@@ -13,10 +13,10 @@ export class LogRunner extends Component {
         logsDiv.classList.add('log-runner-logs');
         this.rootElem.appendChild(logsDiv);
         simButton.addEventListener('click', async () => {
-            const simRequest = sim.makeCurrentIndividualSimRequest(1, true);
+            const simRequest = simUI.makeCurrentIndividualSimRequest(1, true);
             results.setPending();
             detailedResults.setPending();
-            const result = await sim.individualSim(simRequest);
+            const result = await simUI.sim.individualSim(simRequest);
             results.setSimResult(simRequest, result);
             detailedResults.setSimResult(simRequest, result);
             const lines = result.logs.split('\n');

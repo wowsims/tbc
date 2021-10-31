@@ -1,10 +1,10 @@
 import { Component } from './component.js';
-// Shared logic for UI elements that are mapped to Sim values.
+// Shared logic for UI elements that are mapped to a value for some modifiable object.
 export class Input extends Component {
-    constructor(parent, cssClass, sim, config) {
+    constructor(parent, cssClass, modObject, config) {
         super(parent, 'input-root');
         this.inputConfig = config;
-        this.sim = sim;
+        this.modObject = modObject;
         this.rootElem.classList.add(cssClass);
         if (config.label) {
             const label = document.createElement('span');
@@ -18,13 +18,13 @@ export class Input extends Component {
                 });
             }
         }
-        config.changedEvent(this.sim).on(() => {
-            this.setInputValue(config.getValue(this.sim));
+        config.changedEvent(this.modObject).on(() => {
+            this.setInputValue(config.getValue(this.modObject));
             this.update();
         });
     }
     update() {
-        const enable = !this.inputConfig.enableWhen || this.inputConfig.enableWhen(this.sim);
+        const enable = !this.inputConfig.enableWhen || this.inputConfig.enableWhen(this.modObject);
         if (enable) {
             this.rootElem.classList.remove('disabled');
             this.getInputElem().removeAttribute('disabled');
@@ -40,12 +40,12 @@ export class Input extends Component {
             this.setInputValue(this.inputConfig.defaultValue);
         }
         else {
-            this.setInputValue(this.inputConfig.getValue(this.sim));
+            this.setInputValue(this.inputConfig.getValue(this.modObject));
         }
         this.update();
     }
     // Child classes should call this method when the value in the input element changes.
     inputChanged() {
-        this.inputConfig.setValue(this.sim, this.getInputValue());
+        this.inputConfig.setValue(this.modObject, this.getInputValue());
     }
 }

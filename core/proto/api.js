@@ -529,20 +529,85 @@ class Raid$Type extends MessageType {
  */
 export const Raid = new Raid$Type();
 // @generated message type with reflection information, may provide speed optimized methods
+class SimOptions$Type extends MessageType {
+    constructor() {
+        super("proto.SimOptions", [
+            { no: 1, name: "iterations", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 2, name: "random_seed", kind: "scalar", T: 3 /*ScalarType.INT64*/, L: 0 /*LongType.BIGINT*/ },
+            { no: 3, name: "debug", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 4, name: "exit_on_oom", kind: "scalar", T: 8 /*ScalarType.BOOL*/ }
+        ]);
+    }
+    create(value) {
+        const message = { iterations: 0, randomSeed: 0n, debug: false, exitOnOom: false };
+        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader, length, options, target) {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* int32 iterations */ 1:
+                    message.iterations = reader.int32();
+                    break;
+                case /* int64 random_seed */ 2:
+                    message.randomSeed = reader.int64().toBigInt();
+                    break;
+                case /* bool debug */ 3:
+                    message.debug = reader.bool();
+                    break;
+                case /* bool exit_on_oom */ 4:
+                    message.exitOnOom = reader.bool();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message, writer, options) {
+        /* int32 iterations = 1; */
+        if (message.iterations !== 0)
+            writer.tag(1, WireType.Varint).int32(message.iterations);
+        /* int64 random_seed = 2; */
+        if (message.randomSeed !== 0n)
+            writer.tag(2, WireType.Varint).int64(message.randomSeed);
+        /* bool debug = 3; */
+        if (message.debug !== false)
+            writer.tag(3, WireType.Varint).bool(message.debug);
+        /* bool exit_on_oom = 4; */
+        if (message.exitOnOom !== false)
+            writer.tag(4, WireType.Varint).bool(message.exitOnOom);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message proto.SimOptions
+ */
+export const SimOptions = new SimOptions$Type();
+// @generated message type with reflection information, may provide speed optimized methods
 class IndividualSimRequest$Type extends MessageType {
     constructor() {
         super("proto.IndividualSimRequest", [
             { no: 1, name: "player", kind: "message", T: () => Player },
             { no: 2, name: "buffs", kind: "message", T: () => Buffs },
             { no: 3, name: "encounter", kind: "message", T: () => Encounter },
-            { no: 4, name: "iterations", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
-            { no: 5, name: "random_seed", kind: "scalar", T: 3 /*ScalarType.INT64*/, L: 0 /*LongType.BIGINT*/ },
-            { no: 6, name: "debug", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
-            { no: 7, name: "exit_on_oom", kind: "scalar", T: 8 /*ScalarType.BOOL*/ }
+            { no: 4, name: "sim_options", kind: "message", T: () => SimOptions }
         ]);
     }
     create(value) {
-        const message = { iterations: 0, randomSeed: 0n, debug: false, exitOnOom: false };
+        const message = {};
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -562,17 +627,8 @@ class IndividualSimRequest$Type extends MessageType {
                 case /* proto.Encounter encounter */ 3:
                     message.encounter = Encounter.internalBinaryRead(reader, reader.uint32(), options, message.encounter);
                     break;
-                case /* int32 iterations */ 4:
-                    message.iterations = reader.int32();
-                    break;
-                case /* int64 random_seed */ 5:
-                    message.randomSeed = reader.int64().toBigInt();
-                    break;
-                case /* bool debug */ 6:
-                    message.debug = reader.bool();
-                    break;
-                case /* bool exit_on_oom */ 7:
-                    message.exitOnOom = reader.bool();
+                case /* proto.SimOptions sim_options */ 4:
+                    message.simOptions = SimOptions.internalBinaryRead(reader, reader.uint32(), options, message.simOptions);
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -595,18 +651,9 @@ class IndividualSimRequest$Type extends MessageType {
         /* proto.Encounter encounter = 3; */
         if (message.encounter)
             Encounter.internalBinaryWrite(message.encounter, writer.tag(3, WireType.LengthDelimited).fork(), options).join();
-        /* int32 iterations = 4; */
-        if (message.iterations !== 0)
-            writer.tag(4, WireType.Varint).int32(message.iterations);
-        /* int64 random_seed = 5; */
-        if (message.randomSeed !== 0n)
-            writer.tag(5, WireType.Varint).int64(message.randomSeed);
-        /* bool debug = 6; */
-        if (message.debug !== false)
-            writer.tag(6, WireType.Varint).bool(message.debug);
-        /* bool exit_on_oom = 7; */
-        if (message.exitOnOom !== false)
-            writer.tag(7, WireType.Varint).bool(message.exitOnOom);
+        /* proto.SimOptions sim_options = 4; */
+        if (message.simOptions)
+            SimOptions.internalBinaryWrite(message.simOptions, writer.tag(4, WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

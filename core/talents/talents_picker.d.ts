@@ -1,12 +1,12 @@
 import { Component } from '/tbc/core/components/component.js';
 import { Spec } from '/tbc/core/proto/common.js';
 import { SpecTalents } from '/tbc/core/proto_utils/utils.js';
-import { Sim } from '/tbc/core/sim.js';
+import { Player } from '/tbc/core/player.js';
 export declare abstract class TalentsPicker<SpecType extends Spec> extends Component {
-    private readonly sim;
+    private readonly player;
     frozen: boolean;
     readonly trees: Array<TalentTreePicker<SpecType>>;
-    constructor(parent: HTMLElement, sim: Sim<SpecType>, treeConfigs: Array<TalentTreeConfig<SpecType>>);
+    constructor(parent: HTMLElement, player: Player<SpecType>, treeConfigs: Array<TalentTreeConfig<SpecType>>);
     get numPoints(): number;
     isFull(): boolean;
     update(): void;
@@ -21,7 +21,7 @@ declare class TalentTreePicker<SpecType extends Spec> extends Component {
     readonly talents: Array<TalentPicker<SpecType>>;
     readonly picker: TalentsPicker<SpecType>;
     numPoints: number;
-    constructor(parent: HTMLElement, sim: Sim<SpecType>, config: TalentTreeConfig<SpecType>, picker: TalentsPicker<SpecType>);
+    constructor(parent: HTMLElement, player: Player<SpecType>, config: TalentTreeConfig<SpecType>, picker: TalentsPicker<SpecType>);
     update(): void;
     getTalent(location: TalentLocation): TalentPicker<SpecType>;
     getTalentsString(): string;
@@ -31,7 +31,7 @@ declare class TalentPicker<SpecType extends Spec> extends Component {
     readonly config: TalentConfig<SpecType>;
     private readonly tree;
     private readonly pointsDisplay;
-    constructor(parent: HTMLElement, sim: Sim<SpecType>, config: TalentConfig<SpecType>, tree: TalentTreePicker<SpecType>);
+    constructor(parent: HTMLElement, player: Player<SpecType>, config: TalentConfig<SpecType>, tree: TalentTreePicker<SpecType>);
     getRow(): number;
     getCol(): number;
     getPoints(): number;

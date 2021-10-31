@@ -2,11 +2,11 @@ import { statNames } from '/tbc/core/proto_utils/names.js';
 import { stDevToConf90 } from '/tbc/core/utils.js';
 import { Component } from './component.js';
 export class Results extends Component {
-    constructor(parent, sim) {
+    constructor(parent, simUI) {
         super(parent, 'results-root');
         this.currentData = null;
         this.referenceData = null;
-        this.sim = sim;
+        this.simUI = simUI;
         this.rootElem.innerHTML = `
       <div class="results-pending">
         <div class="loader"></div>
@@ -50,7 +50,7 @@ export class Results extends Component {
                 const tmpData = this.currentData;
                 this.currentData = this.referenceData;
                 this.referenceData = tmpData;
-                this.sim.fromJson(this.currentData.settings);
+                this.simUI.fromJson(this.currentData.settings);
                 this.setSimResult(this.currentData.request, this.currentData.result);
                 this.updateReference();
             }
@@ -82,7 +82,7 @@ export class Results extends Component {
         this.currentData = {
             request: request,
             result: result,
-            settings: this.sim.toJson(),
+            settings: this.simUI.toJson(),
         };
         this.hideAll();
         this.simElem.style.display = 'initial';
@@ -93,7 +93,7 @@ export class Results extends Component {
         this.updateReference();
     }
     setStatWeights(request, result, epStats) {
-        const iterations = request.options.iterations;
+        const iterations = request.options.simOptions.iterations;
         this.hideAll();
         this.epElem.style.display = 'initial';
         this.epElem.innerHTML = `

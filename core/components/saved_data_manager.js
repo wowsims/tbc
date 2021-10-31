@@ -1,8 +1,8 @@
 import { Component } from '/tbc/core/components/component.js';
 export class SavedDataManager extends Component {
-    constructor(parent, sim, config) {
+    constructor(parent, modObject, config) {
         super(parent, 'saved-data-manager-root');
-        this.sim = sim;
+        this.modObject = modObject;
         this.config = config;
         this.userData = [];
         this.presets = [];
@@ -30,7 +30,7 @@ export class SavedDataManager extends Component {
                 alert(`${config.label} with name ${newName} already exists.`);
                 return;
             }
-            this.addSavedData(newName, config.getData(this.sim), false);
+            this.addSavedData(newName, config.getData(this.modObject), false);
             this.saveUserData();
         });
     }
@@ -61,7 +61,7 @@ export class SavedDataManager extends Component {
     <span class="saved-data-set-delete fa fa-times"></span>
     `;
         dataElem.addEventListener('click', event => {
-            this.config.setData(this.sim, data);
+            this.config.setData(this.modObject, data);
             this.saveInput.value = dataName;
         });
         if (isPreset) {
@@ -88,7 +88,7 @@ export class SavedDataManager extends Component {
             });
         }
         const checkActive = () => {
-            if (this.config.equals(data, this.config.getData(this.sim))) {
+            if (this.config.equals(data, this.config.getData(this.modObject))) {
                 dataElem.classList.add('active');
             }
             else {

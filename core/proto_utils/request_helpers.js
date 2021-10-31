@@ -1,5 +1,6 @@
 import { Player } from '/tbc/core/proto/api.js';
 import { PlayerOptions } from '/tbc/core/proto/api.js';
+import { SimOptions } from '/tbc/core/proto/api.js';
 import { ComputeStatsRequest } from '/tbc/core/proto/api.js';
 import { IndividualSimRequest } from '/tbc/core/proto/api.js';
 import { withSpecProto } from './utils.js';
@@ -28,7 +29,9 @@ export function makeIndividualSimRequest(buffs, consumes, customStats, encounter
         }),
         buffs: buffs,
         encounter: encounter,
-        iterations: iterations,
-        debug: debug,
+        simOptions: SimOptions.create({
+            iterations: iterations,
+            debug: debug,
+        }),
     });
 }
