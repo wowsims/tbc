@@ -1,6 +1,8 @@
 package core
 
 import (
+	"time"
+
 	"github.com/wowsims/tbc/sim/core/proto"
 	"github.com/wowsims/tbc/sim/core/stats"
 )
@@ -119,4 +121,8 @@ func (target *Target) Finalize() {
 
 func (target *Target) Reset(sim *Simulation) {
 	target.auraTracker.reset(sim)
+}
+
+func (target *Target) Advance(sim *Simulation, elapsedTime time.Duration) {
+	target.auraTracker.advance(sim, elapsedTime)
 }

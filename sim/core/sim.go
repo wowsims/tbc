@@ -223,7 +223,7 @@ func (sim *Simulation) Advance(elapsedTime time.Duration) {
 	}
 
 	for _, target := range sim.targets {
-		target.auraTracker.advance(sim, elapsedTime)
+		target.advance(sim, elapsedTime)
 	}
 }
 
