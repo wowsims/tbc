@@ -16,7 +16,6 @@ func (priest *Priest) GetCharacter() *core.Character {
 }
 
 func (priest *Priest) AddRaidBuffs(buffs *proto.Buffs) {
-	buffs.Misery = true
 	buffs.DivineSpirit = proto.TristateEffect_TristateEffectRegular
 }
 func (priest *Priest) AddPartyBuffs(buffs *proto.Buffs) {

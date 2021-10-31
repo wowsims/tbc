@@ -100,8 +100,10 @@ func TestIndividualSim(t *testing.T) {
 		},
 		Buffs: basicBuffs,
 		Encounter: &proto.Encounter{
-			Duration:   120,
-			NumTargets: 1,
+			Duration: 120,
+			Targets: []*proto.Target{
+				&proto.Target{},
+			},
 		},
 		Iterations: 5000,
 		RandomSeed: 1,
@@ -145,8 +147,10 @@ func TestCalcStatWeight(t *testing.T) {
 		},
 		Buffs: basicBuffs,
 		Encounter: &proto.Encounter{
-			Duration:   120,
-			NumTargets: 1,
+			Duration: 120,
+			Targets: []*proto.Target{
+				&proto.Target{},
+			},
 		},
 		Iterations: 5000,
 		RandomSeed: 1,

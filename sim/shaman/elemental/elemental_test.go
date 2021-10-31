@@ -62,6 +62,7 @@ func TestCalcStatWeight(t *testing.T) {
 		Class:       proto.Class_ClassShaman,
 		Consumes:    FullConsumes,
 		Buffs:       FullBuffs,
+		Options:     FullDebuffOptions,
 		PlayerOptions: &PlayerOptionsAdaptive,
 		CustomStats: stats.Stats{},
 	}
@@ -84,7 +85,9 @@ func TestSimulatePreRaidNoBuffs(t *testing.T) {
 	  T:     t,
 
 		// no consumes
-		Buffs: BasicBuffs,
+		Buffs:   BasicBuffs,
+		Options: NoDebuffOptions,
+
 		Race:  proto.Race_RaceTroll10,
 		Class: proto.Class_ClassShaman,
 
@@ -103,6 +106,7 @@ func TestSimulatePreRaid(t *testing.T) {
 
 		Consumes: FullConsumes,
 		Buffs:    FullBuffs,
+		Options:  FullDebuffOptions,
 		Race:     proto.Race_RaceOrc,
 		Class:    proto.Class_ClassShaman,
 
@@ -121,6 +125,7 @@ func TestSimulateP1(t *testing.T) {
 
 		Consumes: FullConsumes,
 		Buffs:    FullBuffs,
+		Options:  FullDebuffOptions,
 		Race:     proto.Race_RaceOrc,
 		Class:    proto.Class_ClassShaman,
 
@@ -139,6 +144,7 @@ func TestSimulateP1(t *testing.T) {
 //    Class:         proto.Class_ClassShaman,
 // 		Consumes:      FullConsumes,
 // 		Buffs:         FullBuffs,
+//    Options:       FullDebuffOptions,
 // 		Options:       makeOptions(core.BasicOptions, LongEncounter),
 // 		PlayerOptions: &PlayerOptionsAdaptive,
 // 	}
@@ -158,6 +164,7 @@ func TestLBOnlyAgent(t *testing.T) {
 
 		Consumes: FullConsumes,
 		Buffs:    FullBuffs,
+		Options:  FullDebuffOptions,
 		Race:     proto.Race_RaceOrc,
 		Class:    proto.Class_ClassShaman,
 
@@ -190,6 +197,7 @@ func TestClearcastAgent(t *testing.T) {
 
 		Consumes: FullConsumes,
 		Buffs:    FullBuffs,
+		Options:  FullDebuffOptions,
 		Race:     proto.Race_RaceOrc,
     Class:    proto.Class_ClassShaman,
 
@@ -208,6 +216,7 @@ func TestAverageDPS(t *testing.T) {
     Class:         proto.Class_ClassShaman,
 		Consumes:      FullConsumes,
 		Buffs:         FullBuffs,
+		Options:       FullDebuffOptions,
 		PlayerOptions: &PlayerOptionsAdaptive,
 		CustomStats:   stats.Stats{},
 	}
@@ -222,6 +231,7 @@ func BenchmarkSimulate(b *testing.B) {
     Class:    proto.Class_ClassShaman,
 		Consumes: FullConsumes,
 		Buffs:    FullBuffs,
+		Options:  FullDebuffOptions,
 
 		PlayerOptions: &PlayerOptionsAdaptive,
 		CustomStats:   stats.Stats{},

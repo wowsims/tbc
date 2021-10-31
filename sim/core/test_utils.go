@@ -12,30 +12,29 @@ import (
 // Use same seed to get same result on every run.
 const RSeed = int64(1)
 
-var BaseOptions = Options{
-	Iterations: 1,
-	RSeed:      RSeed,
-	Debug:      false,
-}
+const ShortDuration = 60
+const LongDuration = 300
 
-func MakeOptions(baseOptions Options, encounter Encounter) Options {
-	baseOptions.Encounter = encounter
-	return baseOptions
+func MakeSingleTargetOptions(debuffs proto.Debuffs) Options {
+	debuffsCopy := debuffs
+	return Options{
+		Encounter: NewEncounter(proto.Encounter{
+			Targets: []*proto.Target{
+				&proto.Target{
+					Debuffs: &debuffsCopy,
+				},
+			},
+		}),
+	}
 }
-
-var ShortEncounterOptions = MakeOptions(BaseOptions, Encounter{
-	Duration:   60,
-	NumTargets: 1,
-})
-var LongEncounterOptions = MakeOptions(BaseOptions, Encounter{
-	Duration:   300,
-	NumTargets: 1,
-})
 
 func CharacterStatsTest(label string, t *testing.T, params IndividualParams, expectedStats stats.Stats) {
-	sim := NewIndividualSim(params)
+	agent := NewAgent(params)
+	raid := NewRaid(params.Buffs)
+	raid.AddPlayer(agent)
+	raid.Finalize()
 
-	finalStats := sim.Raid.Parties[0].Players[0].GetCharacter().GetStats()
+	finalStats := agent.GetCharacter().GetStats()
 
 	const tolerance = 0.5
 	if !finalStats.EqualsWithTolerance(expectedStats, tolerance) {
@@ -44,8 +43,10 @@ func CharacterStatsTest(label string, t *testing.T, params IndividualParams, exp
 }
 
 func StatWeightsTest(label string, t *testing.T, params IndividualParams, statsToTest []stats.Stat, referenceStat stats.Stat, expectedStatWeights stats.Stats) {
-	params.Options = LongEncounterOptions
+	params.Options.Encounter.Duration = LongDuration
 	params.Options.Iterations = 5000
+	params.Options.RSeed = RSeed
+	params.Options.Debug = false
 
 	results := CalcStatWeight(params, statsToTest, referenceStat)
 
@@ -73,8 +74,10 @@ func IndividualSimTest(label string, t *testing.T, params IndividualParams, expe
 }
 
 func IndividualSimAverageTest(label string, t *testing.T, params IndividualParams, expectedDps float64) {
-	params.Options = LongEncounterOptions
+	params.Options.Encounter.Duration = LongDuration
 	params.Options.Iterations = 10000
+	params.Options.RSeed = RSeed
+	params.Options.Debug = false
 
 	sim := NewIndividualSim(params)
 	result := sim.Run()
@@ -113,18 +116,24 @@ func IndividualSimAllEncountersTest(testOpts AllEncountersTestOptions) {
 		Class:    testOpts.Class,
 		Consumes: testOpts.Consumes,
 		Buffs:    testOpts.Buffs,
-		Options:  ShortEncounterOptions,
+		Options:  testOpts.Options,
 
 		PlayerOptions: testOpts.PlayerOptions,
 		CustomStats:   stats.Stats{},
 	}
+
+	params.Options.Iterations = 1
+	params.Options.RSeed = RSeed
+	params.Options.Debug = false
+
+	params.Options.Encounter.Duration = ShortDuration
 	IndividualSimTest(
 		testOpts.Label+"-short",
 		testOpts.T,
 		params,
 		testOpts.ExpectedDpsShort)
 
-	params.Options = LongEncounterOptions
+	params.Options.Encounter.Duration = LongDuration
 	IndividualSimTest(
 		testOpts.Label+"-long",
 		testOpts.T,
@@ -133,8 +142,10 @@ func IndividualSimAllEncountersTest(testOpts AllEncountersTestOptions) {
 }
 
 func IndividualBenchmark(b *testing.B, params IndividualParams) {
-	params.Options = LongEncounterOptions
+	params.Options.Encounter.Duration = LongDuration
 	params.Options.Iterations = 1000
+	params.Options.RSeed = RSeed
+	params.Options.Debug = false
 
 	for i := 0; i < b.N; i++ {
 		sim := NewIndividualSim(params)

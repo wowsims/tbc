@@ -154,6 +154,7 @@ func (character *Character) Finalize() {
 	// All stats added up to this point are part of the 'initial' stats.
 	character.initialStats = character.stats
 
+	character.auraTracker.finalize()
 	character.majorCooldownManager.finalize(character)
 }
 

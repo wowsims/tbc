@@ -1,6 +1,7 @@
 package elemental
 
 import (
+	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/items"
 	"github.com/wowsims/tbc/sim/core/proto"
 )
@@ -91,7 +92,6 @@ var FullBuffs = proto.Buffs{
 	GiftOfTheWild:     proto.TristateEffect_TristateEffectImproved,
 	BlessingOfKings:   true,
 	BlessingOfWisdom:  proto.TristateEffect_TristateEffectImproved,
-	JudgementOfWisdom: true,
 	MoonkinAura:       proto.TristateEffect_TristateEffectRegular,
 	ShadowPriestDps:   500,
 }
@@ -106,6 +106,12 @@ var FullConsumes = proto.Consumes{
 	DarkRune:             true,
 	Drums:                proto.Drums_DrumsOfBattle,
 }
+
+var NoDebuffOptions = core.MakeSingleTargetOptions(proto.Debuffs{})
+
+var FullDebuffOptions = core.MakeSingleTargetOptions(proto.Debuffs{
+	JudgementOfWisdom: true,
+})
 
 var PreRaidGear = items.EquipmentSpecFromStrings([]string{
 	"Tidefury Helm",

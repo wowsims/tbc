@@ -7,21 +7,6 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-// Applies buffs that affect the sim as a whole.
-func applyBuffsToSim(sim *Simulation, buffs proto.Buffs) {
-	if buffs.Misery {
-		sim.AddPermanentAura(func(sim *Simulation) Aura {
-			return MiseryAura()
-		})
-	}
-
-	if buffs.JudgementOfWisdom {
-		sim.AddPermanentAura(func(sim *Simulation) Aura {
-			return AuraJudgementOfWisdom()
-		})
-	}
-}
-
 // Applies buffs that affect individual players.
 func applyBuffEffects(agent Agent, buffs proto.Buffs) {
 	character := agent.GetCharacter()
@@ -104,13 +89,6 @@ func applyBuffEffects(agent Agent, buffs proto.Buffs) {
 		}
 	}
 
-	if buffs.ImprovedSealOfTheCrusader {
-		character.AddStats(stats.Stats{
-			stats.SpellCrit: 3 * SpellCritRatingPerCritChance,
-		})
-		// FUTURE: melee crit bonus, research actual value
-	}
-
 	if buffs.TotemOfWrath > 0 {
 		character.AddStats(stats.Stats{
 			stats.SpellCrit: 3 * SpellCritRatingPerCritChance * float64(buffs.TotemOfWrath),
@@ -184,36 +162,4 @@ func registerBloodlustCD(agent Agent, buffs proto.Buffs) {
 			}
 		},
 	})
-}
-
-func MiseryAura() Aura {
-	return Aura{
-		ID:      MagicIDMisery,
-		Expires: NeverExpires,
-		OnSpellHit: func(sim *Simulation, cast DirectCastAction, result *DirectCastDamageResult) {
-			result.Damage *= 1.05
-		},
-	}
-}
-
-func AuraJudgementOfWisdom() Aura {
-	const mana = 74 / 2 // 50% proc
-	return Aura{
-		ID:      MagicIDJoW,
-		Expires: NeverExpires,
-		OnSpellHit: func(sim *Simulation, cast DirectCastAction, result *DirectCastDamageResult) {
-			if cast.GetActionID().ItemID == ItemIDTheLightningCapacitor {
-				return // TLC cant proc JoW
-			}
-
-			character := cast.GetCharacter()
-			// Only apply to agents that have mana.
-			if character.MaxMana() > 0 {
-				character.AddStat(stats.Mana, mana)
-				if sim.Log != nil {
-					sim.Log("(%d) +Judgement Of Wisdom: 37 mana (74 @ 50%% proc)\n", character.ID)
-				}
-			}
-		},
-	}
 }

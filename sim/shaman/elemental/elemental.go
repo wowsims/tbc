@@ -283,6 +283,16 @@ func NewAdaptiveRotation(simParams core.IndividualParams) *AdaptiveRotation {
 		Consumes: simParams.PlayerOptions.Consumes,
 	}
 
+	// If no encounter is set, it means we aren't going to run a sim at all.
+	// So just return something valid.
+	// TODO: Probably need some organized way of doing presims so we dont have
+	// to check these types of things.
+	if len(clearcastParams.Options.Encounter.Targets) == 0 {
+		agent.baseRotation = NewLBOnlyRotation()
+		agent.surplusRotation = NewCLOnClearcastRotation()
+		return agent
+	}
+
 	clearcastSim := core.NewIndividualSim(clearcastParams)
 	clearcastResult := clearcastSim.Run()
 
