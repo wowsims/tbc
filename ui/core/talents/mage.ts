@@ -1,13 +1,13 @@
 import { Spec } from '/tbc/core/proto/common.js';
 import { MageTalents as MageTalents } from '/tbc/core/proto/mage.js';
 import { MageSpecs } from '/tbc/core/proto_utils/utils.js';
-import { Sim } from '/tbc/core/sim.js';
+import { Player } from '/tbc/core/player.js';
 
 import { TalentsPicker } from './talents_picker.js';
 
 export class MageTalentsPicker extends TalentsPicker<Spec.SpecMage> {
-  constructor(parent: HTMLElement, sim: Sim<Spec.SpecMage>) {
-    super(parent, sim, [
+  constructor(parent: HTMLElement, player: Player<Spec.SpecMage>) {
+    super(parent, player, [
       {
         name: 'Arcane',
         backgroundUrl: 'https://wow.zamimg.com/images/wow/talents/backgrounds/tbc/81.jpg',

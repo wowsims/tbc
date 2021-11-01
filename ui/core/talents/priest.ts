@@ -1,14 +1,14 @@
 import { Spec } from '/tbc/core/proto/common.js';
 import { PriestTalents as PriestTalents } from '/tbc/core/proto/priest.js';
 import { PriestSpecs } from '/tbc/core/proto_utils/utils.js';
-import { Sim } from '/tbc/core/sim.js';
+import { Player } from '/tbc/core/player.js';
 
 import { TalentsPicker } from './talents_picker.js';
 
 // Talents are the same for all Priest specs, so its ok to just use ShadowPriest here
 export class PriestTalentsPicker extends TalentsPicker<Spec.SpecShadowPriest> {
-  constructor(parent: HTMLElement, sim: Sim<Spec.SpecShadowPriest>) {
-    super(parent, sim, [
+  constructor(parent: HTMLElement, player: Player<Spec.SpecShadowPriest>) {
+    super(parent, player, [
       {
         name: 'Discipline',
         backgroundUrl: 'https://wow.zamimg.com/images/wow/talents/backgrounds/tbc/201.jpg',

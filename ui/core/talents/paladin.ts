@@ -1,14 +1,14 @@
 import { Spec } from '/tbc/core/proto/common.js';
 import { PaladinTalents as PaladinTalents } from '/tbc/core/proto/paladin.js';
 import { PaladinSpecs } from '/tbc/core/proto_utils/utils.js';
-import { Sim } from '/tbc/core/sim.js';
+import { Player } from '/tbc/core/player.js';
 
 import { TalentsPicker } from './talents_picker.js';
 
 // Talents are the same for all Paladin specs, so its ok to just use RetributionPaladin here
 export class PaladinTalentsPicker extends TalentsPicker<Spec.SpecRetributionPaladin> {
-  constructor(parent: HTMLElement, sim: Sim<Spec.SpecRetributionPaladin>) {
-    super(parent, sim, [
+  constructor(parent: HTMLElement, player: Player<Spec.SpecRetributionPaladin>) {
+    super(parent, player, [
       {
         name: 'Holy',
         backgroundUrl: 'https://wow.zamimg.com/images/wow/talents/backgrounds/classic/382.jpg',

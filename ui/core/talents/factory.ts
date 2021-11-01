@@ -14,22 +14,22 @@ import { TalentsPicker } from './talents_picker.js';
 export function newTalentsPicker<SpecType extends Spec>(spec: Spec, parent: HTMLElement, player: Player<SpecType>): TalentsPicker<SpecType> {
   switch (spec) {
     case Spec.SpecBalanceDruid:
-      return new DruidTalentsPicker(parent, sim as Sim<Spec.SpecBalanceDruid>) as TalentsPicker<SpecType>;
+      return new DruidTalentsPicker(parent, player as Player<Spec.SpecBalanceDruid>) as TalentsPicker<SpecType>;
       break;
     case Spec.SpecElementalShaman:
       return new ShamanTalentsPicker(parent, player as Player<Spec.SpecElementalShaman>) as TalentsPicker<SpecType>;
       break;
     case Spec.SpecMage:
-      return new MageTalentsPicker(parent, sim as Sim<Spec.SpecMage>) as TalentsPicker<SpecType>;
+      return new MageTalentsPicker(parent, player as Player<Spec.SpecMage>) as TalentsPicker<SpecType>;
       break;
     case Spec.SpecRetributionPaladin:
-      return new PaladinTalentsPicker(parent, sim as Sim<Spec.SpecRetributionPaladin>) as TalentsPicker<SpecType>;
+      return new PaladinTalentsPicker(parent, player as Player<Spec.SpecRetributionPaladin>) as TalentsPicker<SpecType>;
       break;
     case Spec.SpecShadowPriest:
-      return new PriestTalentsPicker(parent, sim as Sim<Spec.SpecShadowPriest>) as TalentsPicker<SpecType>;
+      return new PriestTalentsPicker(parent, player as Player<Spec.SpecShadowPriest>) as TalentsPicker<SpecType>;
       break;
     case Spec.SpecWarlock:
-      return new WarlockTalentsPicker(parent, sim as Sim<Spec.SpecWarlock>) as TalentsPicker<SpecType>;
+      return new WarlockTalentsPicker(parent, player as Player<Spec.SpecWarlock>) as TalentsPicker<SpecType>;
       break;
     default:
       const playerClass = specToClass[spec];

@@ -1,13 +1,13 @@
 import { Spec } from '/tbc/core/proto/common.js';
 import { WarlockTalents as WarlockTalents } from '/tbc/core/proto/warlock.js';
 import { WarlockSpecs } from '/tbc/core/proto_utils/utils.js';
-import { Sim } from '/tbc/core/sim.js';
+import { Player } from '/tbc/core/player.js';
 
 import { TalentsPicker } from './talents_picker.js';
 
 export class WarlockTalentsPicker extends TalentsPicker<Spec.SpecWarlock> {
-  constructor(parent: HTMLElement, sim: Sim<Spec.SpecWarlock>) {
-    super(parent, sim, [
+  constructor(parent: HTMLElement, player: Player<Spec.SpecWarlock>) {
+    super(parent, player, [
       {
         name: 'Affliction',
         backgroundUrl: 'https://wow.zamimg.com/images/wow/talents/backgrounds/tbc/302.jpg',
