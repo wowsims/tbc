@@ -10,6 +10,7 @@ import "paladin.proto";
 import "priest.proto";
 import "shaman.proto";
 import "warlock.proto";
+import "warrior.proto";
 
 message PlayerOptions {
     Race race = 1;
@@ -33,8 +34,6 @@ message PlayerOptions {
 message Hunter {
 }
 message Rogue {
-}
-message Warrior {
 }
 
 message Player {

@@ -10,6 +10,7 @@ enum Spec {
     SpecRetributionPaladin = 3;
     SpecShadowPriest = 4;
     SpecWarlock = 5;
+    SpecWarrior = 6;
 }
 
 enum Race {

@@ -9,6 +9,7 @@ import { PaladinTalentsPicker } from './paladin.js';
 import { PriestTalentsPicker } from './priest.js';
 import { ShamanTalentsPicker } from './shaman.js';
 import { WarlockTalentsPicker } from './warlock.js';
+import { WarriorTalentsPicker } from './warrior.js';
 import { TalentsPicker } from './talents_picker.js';
 
 export function newTalentsPicker<SpecType extends Spec>(spec: Spec, parent: HTMLElement, player: Player<SpecType>): TalentsPicker<SpecType> {
@@ -30,6 +31,9 @@ export function newTalentsPicker<SpecType extends Spec>(spec: Spec, parent: HTML
       break;
     case Spec.SpecWarlock:
       return new WarlockTalentsPicker(parent, player as Player<Spec.SpecWarlock>) as TalentsPicker<SpecType>;
+      break;
+    case Spec.SpecWarrior:
+      return new WarriorTalentsPicker(parent, player as Player<Spec.SpecWarrior>) as TalentsPicker<SpecType>;
       break;
     default:
       const playerClass = specToClass[spec];

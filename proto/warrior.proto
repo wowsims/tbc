@@ -35,7 +35,7 @@ message WarriorTalents {
 	int32 improved_slam = 26;
 	bool sweeping_strikes = 27;
 	int32 weapon_mastery = 28;
-	int32 berserker_rage = 29;
+	int32 improved_berserker_rage = 29;
 	int32 flurry = 30;
 	int32 precision = 31;
 	bool bloodthirst = 32;
@@ -55,7 +55,7 @@ message WarriorTalents {
 	bool devastate = 44;
 }
 
-message DpsWarrior {
+message Warrior {
     message Rotation {
     }
     Rotation rotation = 1;

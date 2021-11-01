@@ -21,6 +21,7 @@ import { Mage, Mage_Rotation as MageRotation, MageTalents, Mage_Options as MageO
 import { RetributionPaladin, RetributionPaladin_Rotation as RetributionPaladinRotation, PaladinTalents, RetributionPaladin_Options as RetributionPaladinOptions } from '/tbc/core/proto/paladin.js';
 import { ShadowPriest, ShadowPriest_Rotation as ShadowPriestRotation, PriestTalents, ShadowPriest_Options as ShadowPriestOptions } from '/tbc/core/proto/priest.js';
 import { Warlock, Warlock_Rotation as WarlockRotation, WarlockTalents, Warlock_Options as WarlockOptions } from '/tbc/core/proto/warlock.js';
+import { Warrior, Warrior_Rotation as WarriorRotation, WarriorTalents, Warrior_Options as WarriorOptions } from '/tbc/core/proto/warrior.js';
 
 export type DruidSpecs = Spec.SpecBalanceDruid;
 export type MageSpecs = Spec.SpecMage;
@@ -28,6 +29,7 @@ export type PaladinSpecs = Spec.SpecRetributionPaladin;
 export type PriestSpecs = Spec.SpecShadowPriest;
 export type ShamanSpecs = Spec.SpecElementalShaman;
 export type WarlockSpecs = Spec.SpecWarlock;
+export type WarriorSpecs = Spec.SpecWarrior;
 
 export type RotationUnion =
 		BalanceDruidRotation |
@@ -35,7 +37,8 @@ export type RotationUnion =
 		MageRotation |
 		RetributionPaladinRotation |
 		ShadowPriestRotation |
-		WarlockRotation;
+		WarlockRotation |
+		WarriorRotation;
 export type SpecRotation<T extends Spec> =
 		T extends Spec.SpecBalanceDruid ? BalanceDruidRotation :
 		T extends Spec.SpecElementalShaman ? ElementalShamanRotation :
@@ -43,6 +46,7 @@ export type SpecRotation<T extends Spec> =
 		T extends Spec.SpecRetributionPaladin ? RetributionPaladinRotation :
 		T extends Spec.SpecShadowPriest ? ShadowPriestRotation :
 		T extends Spec.SpecWarlock ? WarlockRotation :
+		T extends Spec.SpecWarrior ? WarriorRotation :
 		ElementalShamanRotation; // Should never reach this case
 
 export type TalentsUnion =
@@ -51,7 +55,8 @@ export type TalentsUnion =
 		PaladinTalents |
 		PriestTalents |
 		ShamanTalents |
-		WarlockTalents;
+		WarlockTalents |
+		WarriorTalents;
 export type SpecTalents<T extends Spec> =
 		T extends Spec.SpecBalanceDruid ? DruidTalents :
 		T extends Spec.SpecElementalShaman ? ShamanTalents :
@@ -59,6 +64,7 @@ export type SpecTalents<T extends Spec> =
 		T extends Spec.SpecRetributionPaladin ? PaladinTalents :
 		T extends Spec.SpecShadowPriest ? PriestTalents :
 		T extends Spec.SpecWarlock ? WarlockTalents :
+		T extends Spec.SpecWarrior ? WarriorTalents :
 		ShamanTalents; // Should never reach this case
 
 export type SpecOptionsUnion =
@@ -67,7 +73,8 @@ export type SpecOptionsUnion =
 		MageOptions |
 		RetributionPaladinOptions |
 		ShadowPriestOptions |
-		WarlockOptions;
+		WarlockOptions |
+		WarriorOptions;
 export type SpecOptions<T extends Spec> =
 		T extends Spec.SpecBalanceDruid ? BalanceDruidOptions :
 		T extends Spec.SpecElementalShaman ? ElementalShamanOptions :
@@ -75,6 +82,7 @@ export type SpecOptions<T extends Spec> =
 		T extends Spec.SpecRetributionPaladin ? RetributionPaladinOptions :
 		T extends Spec.SpecShadowPriest ? ShadowPriestOptions :
 		T extends Spec.SpecWarlock ? WarlockOptions :
+		T extends Spec.SpecWarrior ? WarriorOptions :
 		ElementalShamanOptions; // Should never reach this case
 
 export type SpecProtoUnion =
@@ -83,7 +91,8 @@ export type SpecProtoUnion =
 		Mage |
 		RetributionPaladin |
 		ShadowPriest |
-		Warlock;
+		Warlock |
+		Warrior;
 export type SpecProto<T extends Spec> =
 		T extends Spec.SpecBalanceDruid ? BalanceDruid :
 		T extends Spec.SpecElementalShaman ? ElementalShaman :
@@ -91,6 +100,7 @@ export type SpecProto<T extends Spec> =
 		T extends Spec.SpecRetributionPaladin ? RetributionPaladin :
 		T extends Spec.SpecShadowPriest ? ShadowPriest :
 		T extends Spec.SpecWarlock ? Warlock :
+		T extends Spec.SpecWarrior ? Warrior :
 		ElementalShaman; // Should never reach this case
 
 export type SpecTypeFunctions<SpecType extends Spec> = {
@@ -228,6 +238,25 @@ export const specTypeFunctions: Partial<Record<Spec, SpecTypeFunctions<any>>> = 
     optionsToJson: (a) => WarlockOptions.toJson(a as WarlockOptions),
     optionsFromJson: (obj) => WarlockOptions.fromJson(obj),
   },
+  [Spec.SpecWarrior]: {
+    rotationCreate: () => WarriorRotation.create(),
+    rotationEquals: (a, b) => WarriorRotation.equals(a as WarriorRotation, b as WarriorRotation),
+    rotationCopy: (a) => WarriorRotation.clone(a as WarriorRotation),
+    rotationToJson: (a) => WarriorRotation.toJson(a as WarriorRotation),
+    rotationFromJson: (obj) => WarriorRotation.fromJson(obj),
+
+    talentsCreate: () => WarriorTalents.create(),
+    talentsEquals: (a, b) => WarriorTalents.equals(a as WarriorTalents, b as WarriorTalents),
+    talentsCopy: (a) => WarriorTalents.clone(a as WarriorTalents),
+    talentsToJson: (a) => WarriorTalents.toJson(a as WarriorTalents),
+    talentsFromJson: (obj) => WarriorTalents.fromJson(obj),
+
+    optionsCreate: () => WarriorOptions.create(),
+    optionsEquals: (a, b) => WarriorOptions.equals(a as WarriorOptions, b as WarriorOptions),
+    optionsCopy: (a) => WarriorOptions.clone(a as WarriorOptions),
+    optionsToJson: (a) => WarriorOptions.toJson(a as WarriorOptions),
+    optionsFromJson: (obj) => WarriorOptions.fromJson(obj),
+  },
 };
 
 export const specToClass: Record<Spec, Class> = {
@@ -237,6 +266,7 @@ export const specToClass: Record<Spec, Class> = {
   [Spec.SpecRetributionPaladin]: Class.ClassPaladin,
   [Spec.SpecShadowPriest]: Class.ClassPriest,
   [Spec.SpecWarlock]: Class.ClassWarlock,
+  [Spec.SpecWarrior]: Class.ClassWarrior,
 };
 
 const druidRaces = [
@@ -283,6 +313,19 @@ const warlockRaces = [
     Race.RaceOrc,
     Race.RaceUndead,
 ];
+const warriorRaces = [
+    Race.RaceBloodElf,
+    Race.RaceDraenei,
+    Race.RaceDwarf,
+    Race.RaceGnome,
+    Race.RaceHuman,
+    Race.RaceNightElf,
+    Race.RaceOrc,
+    Race.RaceTauren,
+    Race.RaceTroll10,
+    Race.RaceTroll30,
+    Race.RaceUndead,
+];
 
 export const specToEligibleRaces: Record<Spec, Array<Race>> = {
   [Spec.SpecBalanceDruid]: druidRaces,
@@ -291,6 +334,7 @@ export const specToEligibleRaces: Record<Spec, Array<Race>> = {
   [Spec.SpecRetributionPaladin]: paladinRaces,
   [Spec.SpecShadowPriest]: priestRaces,
   [Spec.SpecWarlock]: warlockRaces,
+  [Spec.SpecWarrior]: warriorRaces,
 };
 
 // Prefixes used for storing browser data for each site. Even if a Spec is
@@ -302,6 +346,7 @@ export const specToLocalStorageKey: Record<Spec, string> = {
   [Spec.SpecRetributionPaladin]: '__retribution_paladin',
   [Spec.SpecShadowPriest]: '__shadow_priest',
   [Spec.SpecWarlock]: '__warlock',
+  [Spec.SpecWarrior]: '__warrior',
 };
 
 // Returns a copy of playerOptions, with the class field set.
@@ -369,6 +414,16 @@ export function withSpecProto<SpecType extends Spec>(
         rotation: rotation,
         talents: talents as WarlockTalents,
         options: specOptions as WarlockOptions,
+      }),
+    };
+  } else if (WarriorRotation.is(rotation)) {
+		copy.class = Class.ClassWarrior;
+    copy.spec = {
+      oneofKind: 'warrior',
+      warrior: Warrior.create({
+        rotation: rotation,
+        talents: talents as WarriorTalents,
+        options: specOptions as WarriorOptions,
       }),
     };
   } else {
