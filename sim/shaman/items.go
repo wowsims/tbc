@@ -19,6 +19,7 @@ func init() {
 	core.AddItemSet(ItemSetSkyshatterRegalia)
 }
 
+var Tidefury2PcAuraID = core.NewAuraID()
 var ItemSetTidefury = core.ItemSet{
 	Name:  "Tidefury Raiment",
 	Items: map[int32]struct{}{28231: {}, 27510: {}, 28349: {}, 27909: {}, 27802: {}},
@@ -27,7 +28,7 @@ var ItemSetTidefury = core.ItemSet{
 			character := agent.GetCharacter()
 			character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 				return core.Aura{
-					ID: core.MagicIDTidefury,
+					ID: Tidefury2PcAuraID,
 					Name: "Tidefury 2pc",
 				}
 			})
@@ -45,6 +46,8 @@ var ItemSetTidefury = core.ItemSet{
 	},
 }
 
+var Cyclone4PcAuraID = core.NewAuraID()
+var Cyclone4PcManaRegainAuraID = core.NewAuraID()
 var ItemSetCycloneRegalia = core.ItemSet{
 	Name:  "Cyclone Regalia",
 	Items: map[int32]struct{}{29033: {}, 29035: {}, 29034: {}, 29036: {}, 29037: {}},
@@ -56,19 +59,19 @@ var ItemSetCycloneRegalia = core.ItemSet{
 			character := agent.GetCharacter()
 			character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 				return core.Aura{
-					ID:      core.MagicIDCyclone4pc,
+					ID:      Cyclone4PcAuraID,
 					Name:    "Cyclone 4pc Bonus",
 					OnSpellHit: func(sim *core.Simulation, cast core.DirectCastAction, result *core.DirectCastDamageResult) {
 						if result.Crit && sim.RandomFloat("cycl4p") < 0.11 {
 							character.AddAura(sim, core.Aura{
-								ID: core.MagicIDCycloneMana,
+								ID: Cyclone4PcManaRegainAuraID,
 								Name: "Cyclone Mana Cost Reduction",
 								OnCast: func(sim *core.Simulation, cast core.DirectCastAction, input *core.DirectCastInput) {
 									// TODO: how to make sure this goes in before clearcasting?
 									input.ManaCost -= 270
 								},
 								OnCastComplete: func(sim *core.Simulation, cast core.DirectCastAction) {
-									character.RemoveAura(sim, core.MagicIDCycloneMana)
+									character.RemoveAura(sim, Cyclone4PcManaRegainAuraID)
 								},
 							})
 						}
@@ -79,6 +82,7 @@ var ItemSetCycloneRegalia = core.ItemSet{
 	},
 }
 
+var Cataclysm4PcAuraID = core.NewAuraID()
 var ItemSetCataclysmRegalia = core.ItemSet{
 	Name:    "Cataclysm Regalia",
 	Items:   map[int32]struct{}{30169: {}, 30170: {}, 30171: {}, 30172: {}, 30173: {}},
@@ -87,7 +91,7 @@ var ItemSetCataclysmRegalia = core.ItemSet{
 			character := agent.GetCharacter()
 			character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 				return core.Aura{
-					ID:      core.MagicIDCataclysm4pc,
+					ID:      Cataclysm4PcAuraID,
 					Name:    "Cataclysm 4pc Bonus",
 					OnSpellHit: func(sim *core.Simulation, cast core.DirectCastAction, result *core.DirectCastDamageResult) {
 						if result.Crit && sim.RandomFloat("cata4p") < 0.25 {
@@ -100,6 +104,7 @@ var ItemSetCataclysmRegalia = core.ItemSet{
 	},
 }
 
+var Skyshatter4PcAuraID = core.NewAuraID()
 var ItemSetSkyshatterRegalia = core.ItemSet{
 	Name:  "Skyshatter Regalia",
 	Items: map[int32]struct{}{34437: {}, 31017: {}, 34542: {}, 31008: {}, 31014: {}, 31020: {}, 31023: {}, 34566: {}},
@@ -113,7 +118,7 @@ var ItemSetSkyshatterRegalia = core.ItemSet{
 			character := agent.GetCharacter()
 			character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 				return core.Aura{
-					ID:      core.MagicIDSkyshatter4pc,
+					ID:      Skyshatter4PcAuraID,
 					Name:    "Skyshatter 4pc Bonus",
 					OnSpellHit: func(sim *core.Simulation, cast core.DirectCastAction, result *core.DirectCastDamageResult) {
 						if cast.GetActionID().SpellID == SpellIDLB12 {
@@ -126,21 +131,22 @@ var ItemSetSkyshatterRegalia = core.ItemSet{
 	},
 }
 
+var NaturalAlignmentCrystalCooldownID = core.NewCooldownID()
 func ApplyNaturalAlignmentCrystal(agent core.Agent) {
 	const sp = 250
 	const dur = time.Second * 20
 
 	agent.GetCharacter().AddMajorCooldown(core.MajorCooldown{
-		CooldownID: core.MagicIDNACTrink,
+		CooldownID: NaturalAlignmentCrystalCooldownID,
 		Cooldown: time.Minute * 5,
-		SharedCooldownID: core.MagicIDAtkTrinket,
+		SharedCooldownID: core.OffensiveTrinketSharedCooldownID,
 		SharedCooldown: dur,
 		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
 			return func(sim *core.Simulation, character *core.Character) bool {
 				character.AddStat(stats.SpellPower, sp)
 
 				character.AddAura(sim, core.Aura{
-					ID:      core.MagicIDNAC,
+					ID:      core.OffensiveTrinketActiveAuraID,
 					Name:    "Natural Alignment Crystal",
 					Expires: sim.CurrentTime + dur,
 					OnCast: func(sim *core.Simulation, cast core.DirectCastAction, input *core.DirectCastInput) {
@@ -159,6 +165,7 @@ func ApplyNaturalAlignmentCrystal(agent core.Agent) {
 
 // ActivateFathomBrooch adds an aura that has a chance on cast of nature spell
 //  to restore 335 mana. 40s ICD
+var FathomBroochOfTheTidewalkerAuraID = core.NewAuraID()
 func ApplyFathomBroochOfTheTidewalker(agent core.Agent) {
 	character := agent.GetCharacter()
 	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
@@ -166,7 +173,7 @@ func ApplyFathomBroochOfTheTidewalker(agent core.Agent) {
 		const icdDur = time.Second * 40
 
 		return core.Aura{
-			ID:      core.MagicIDRegainMana,
+			ID:      FathomBroochOfTheTidewalkerAuraID,
 			Name:    "Fathom-Brooch of the Tidewalker",
 			OnCastComplete: func(sim *core.Simulation, cast core.DirectCastAction) {
 				if icd.IsOnCD(sim) {
@@ -184,6 +191,8 @@ func ApplyFathomBroochOfTheTidewalker(agent core.Agent) {
 	})
 }
 
+var SkycallTotemAuraID = core.NewAuraID()
+var EnergizedAuraID = core.NewAuraID()
 func ApplySkycallTotem(agent core.Agent) {
 	character := agent.GetCharacter()
 	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
@@ -191,12 +200,12 @@ func ApplySkycallTotem(agent core.Agent) {
 		const dur = time.Second * 10
 
 		return core.Aura{
-			ID:      core.MagicIDSkycall,
+			ID:      SkycallTotemAuraID,
 			Name:    "Skycall Totem",
 			Expires: core.NeverExpires,
 			OnCastComplete: func(sim *core.Simulation, cast core.DirectCastAction) {
 				if cast.GetActionID().SpellID == SpellIDLB12 && sim.RandomFloat("skycall") < 0.15 {
-					character.AddAuraWithTemporaryStats(sim, core.MagicIDEnergized, "Energized", stats.SpellHaste, hasteBonus, dur)
+					character.AddAuraWithTemporaryStats(sim, EnergizedAuraID, "Energized", stats.SpellHaste, hasteBonus, dur)
 				}
 			},
 		}

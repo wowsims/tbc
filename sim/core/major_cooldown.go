@@ -25,14 +25,14 @@ type CooldownActivationFactory func(*Simulation) CooldownActivation
 
 type MajorCooldown struct {
 	// Primary cooldown ID for checking whether this cooldown is ready.
-	CooldownID int32
+	CooldownID CooldownID
 
 	// Amount of time before activation can be used again, after a successful
 	// activation.
 	Cooldown time.Duration
 
 	// Secondary cooldown ID, used for shared cooldowns.
-	SharedCooldownID int32
+	SharedCooldownID CooldownID
 
 	// Duration of secondary cooldown.
 	SharedCooldown time.Duration
@@ -151,7 +151,7 @@ func (mcdm *majorCooldownManager) UpdateMajorCooldowns(sim *Simulation) {
 
 // Add a major cooldown to the given agent, which provides a temporary boost to a single stat.
 // This is use for effects like Icon of the Silver Crescent and Bloodlust Brooch.
-func RegisterTemporaryStatsOnUseCD(agent Agent, auraID int32, auraName string, stat stats.Stat, amount float64, duration time.Duration, mcd MajorCooldown) {
+func RegisterTemporaryStatsOnUseCD(agent Agent, auraID AuraID, auraName string, stat stats.Stat, amount float64, duration time.Duration, mcd MajorCooldown) {
 	// If shared cooldown ID is set but shared cooldown isn't, default to duration.
 	// Most items on a shared cooldown put each other on that cooldown for the
 	// duration of their active effect.
@@ -174,7 +174,7 @@ func RegisterTemporaryStatsOnUseCD(agent Agent, auraID int32, auraName string, s
 }
 
 // Helper function to make an ApplyEffect for a temporary stats on-use cooldown.
-func MakeTemporaryStatsOnUseCDRegistration(auraID int32, auraName string, stat stats.Stat, amount float64, duration time.Duration, mcd MajorCooldown) ApplyEffect {
+func MakeTemporaryStatsOnUseCDRegistration(auraID AuraID, auraName string, stat stats.Stat, amount float64, duration time.Duration, mcd MajorCooldown) ApplyEffect {
 	return func(agent Agent) {
 		RegisterTemporaryStatsOnUseCD(agent, auraID, auraName, stat, amount, duration, mcd)
 	}

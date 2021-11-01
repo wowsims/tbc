@@ -139,6 +139,11 @@ func (character *Character) CurrentMana() float64 {
 	return character.GetStat(stats.Mana)
 }
 
+// Returns whether the indicates stat is currently modified by a temporary bonus.
+func (character *Character) HasTemporaryBonusForStat(stat stats.Stat) bool {
+	return character.GetInitialStat(stat) != character.GetStat(stat)
+}
+
 func (character *Character) HasteBonus() float64 {
 	return 1 + (character.stats[stats.SpellHaste] / (HasteRatingPerHastePercent * 100))
 }

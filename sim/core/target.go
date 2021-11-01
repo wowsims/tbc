@@ -69,27 +69,21 @@ func applyDebuffEffects(target *Target, debuffs proto.Debuffs) {
 
 	if debuffs.JudgementOfWisdom {
 		target.AddPermanentAura(func(sim *Simulation) Aura {
-			return auraJudgementOfWisdom()
+			return judgementOfWisdomAura()
 		})
 	}
 
 	if debuffs.ImprovedSealOfTheCrusader {
 		target.AddPermanentAura(func(sim *Simulation) Aura {
-			return Aura{
-				ID: MagicIDImprovedSealOfTheCrusader,
-				Name: "Improved Seal of the Crusader",
-				OnBeforeSpellHit: func(sim *Simulation, hitInput *DirectCastDamageInput) {
-					hitInput.BonusCrit += 3
-					// FUTURE: melee crit bonus, research actual value
-				},
-			}
+			return improvedSealOfTheCrusaderAura()
 		})
 	}
 }
 
+var MiseryAuraID = NewAuraID()
 func miseryAura() Aura {
 	return Aura{
-		ID: MagicIDMisery,
+		ID: MiseryAuraID,
 		Name: "Misery",
 		OnSpellHit: func(sim *Simulation, cast DirectCastAction, result *DirectCastDamageResult) {
 			result.Damage *= 1.05
@@ -97,10 +91,11 @@ func miseryAura() Aura {
 	}
 }
 
-func auraJudgementOfWisdom() Aura {
+var JudgementOfWisdomAuraID = NewAuraID()
+func judgementOfWisdomAura() Aura {
 	const mana = 74 / 2 // 50% proc
 	return Aura{
-		ID: MagicIDJoW,
+		ID: JudgementOfWisdomAuraID,
 		Name: "Judgement of Wisdom",
 		OnSpellHit: func(sim *Simulation, cast DirectCastAction, result *DirectCastDamageResult) {
 			if cast.GetActionID().ItemID == ItemIDTheLightningCapacitor {
@@ -115,6 +110,18 @@ func auraJudgementOfWisdom() Aura {
 					sim.Log("(%d) +Judgement Of Wisdom: 37 mana (74 @ 50%% proc)\n", character.ID)
 				}
 			}
+		},
+	}
+}
+
+var ImprovedSealOfTheCrusaderAuraID = NewAuraID()
+func improvedSealOfTheCrusaderAura() Aura {
+	return Aura{
+		ID: ImprovedSealOfTheCrusaderAuraID,
+		Name: "Improved Seal of the Crusader",
+		OnBeforeSpellHit: func(sim *Simulation, hitInput *DirectCastDamageInput) {
+			hitInput.BonusCrit += 3
+			// FUTURE: melee crit bonus, research actual value
 		},
 	}
 }

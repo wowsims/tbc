@@ -125,7 +125,7 @@ func (shaman *Shaman) Act(sim *core.Simulation) time.Duration {
 	if actionSuccessful {
 		shaman.rotation.OnActionAccepted(shaman, sim, newAction)
 		return sim.CurrentTime + core.MaxDuration(
-				shaman.GetRemainingCD(core.MagicIDGCD, sim.CurrentTime),
+				shaman.GetRemainingCD(core.GCDCooldownID, sim.CurrentTime),
 				newAction.GetDuration())
 	} else {
 		// Only way for a shaman spell to fail is due to mana cost.
@@ -138,18 +138,20 @@ func (shaman *Shaman) Act(sim *core.Simulation) time.Duration {
 	}
 }
 
+var ElementalMasteryAuraID = core.NewAuraID()
+var ElementalMasteryCooldownID = core.NewCooldownID()
 func (shaman *Shaman) registerElementalMasteryCD() {
 	if !shaman.Talents.ElementalMastery {
 		return
 	}
 
 	shaman.AddMajorCooldown(core.MajorCooldown{
-		CooldownID: core.MagicIDEleMastery,
+		CooldownID: ElementalMasteryCooldownID,
 		Cooldown: time.Minute*3,
 		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
 			return func(sim *core.Simulation, character *core.Character) bool {
 				character.AddAura(sim, core.Aura{
-					ID:      core.MagicIDEleMastery,
+					ID:      ElementalMasteryAuraID,
 					Name:    "Elemental Mastery",
 					Expires: core.NeverExpires,
 					OnCast: func(sim *core.Simulation, cast core.DirectCastAction, input *core.DirectCastInput) {
@@ -158,8 +160,8 @@ func (shaman *Shaman) registerElementalMasteryCD() {
 					},
 					OnCastComplete: func(sim *core.Simulation, cast core.DirectCastAction) {
 						// Remove the buff and put skill on CD
-						character.SetCD(core.MagicIDEleMastery, sim.CurrentTime+time.Minute*3)
-						character.RemoveAura(sim, core.MagicIDEleMastery)
+						character.SetCD(ElementalMasteryCooldownID, sim.CurrentTime+time.Minute*3)
+						character.RemoveAura(sim, ElementalMasteryAuraID)
 						character.UpdateMajorCooldowns(sim)
 					},
 				})

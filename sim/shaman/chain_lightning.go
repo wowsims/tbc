@@ -7,6 +7,7 @@ import (
 )
 
 const SpellIDCL6 int32 = 25442
+var ChainLightningCooldownID = core.NewCooldownID()
 
 type ChainLightning struct {
 	ElectricSpell
@@ -15,7 +16,7 @@ type ChainLightning struct {
 func (cl ChainLightning) GetActionID() core.ActionID {
 	return core.ActionID{
 		SpellID: SpellIDCL6,
-		CooldownID: core.MagicIDChainLightning6,
+		CooldownID: ChainLightningCooldownID,
 	}
 }
 
@@ -42,7 +43,7 @@ func (cl ChainLightning) GetHitInputs(sim *core.Simulation, cast core.DirectCast
 		bounceHit := hitInputs[i - 1] // Makes a copy
 		bounceHit.Target = sim.GetTarget(i)
 
-		if cl.Shaman.HasAura(core.MagicIDTidefury) {
+		if cl.Shaman.HasAura(Tidefury2PcAuraID) {
 			bounceHit.DamageMultiplier *= 0.83
 		} else {
 			bounceHit.DamageMultiplier *= 0.7

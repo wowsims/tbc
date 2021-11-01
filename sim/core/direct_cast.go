@@ -162,7 +162,7 @@ func (action DirectCastAction) Act(sim *Simulation) bool {
 	if !action.castInput.IgnoreCooldowns {
 		// Prevent any actions on the GCD until the cast AND the GCD are done.
 		gcdCD := MaxDuration(GCDMin, action.castInput.CastTime)
-		character.SetCD(MagicIDGCD, sim.CurrentTime+gcdCD)
+		character.SetCD(GCDCooldownID, sim.CurrentTime+gcdCD)
 
 		// TODO: Hardcasts seem to also reset swing timers, so we should set those CDs as well.
 	}
@@ -282,8 +282,8 @@ func NewDirectCastAction(sim *Simulation, impl DirectCastImpl) DirectCastAction 
 
 	// By panicking if spell is on CD, we force each sim to properly check for their own CDs.
 	if !castInput.IgnoreCooldowns {
-		if character.IsOnCD(MagicIDGCD, sim.CurrentTime) {
-			panic(fmt.Sprintf("Trying to cast %s but GCD on cooldown for %s", action.GetName(), character.GetRemainingCD(MagicIDGCD, sim.CurrentTime)))
+		if character.IsOnCD(GCDCooldownID, sim.CurrentTime) {
+			panic(fmt.Sprintf("Trying to cast %s but GCD on cooldown for %s", action.GetName(), character.GetRemainingCD(GCDCooldownID, sim.CurrentTime)))
 		}
 		if character.IsOnCD(cooldownID, sim.CurrentTime) {
 			panic(fmt.Sprintf("Trying to cast %s but is still on cooldown for %s", action.GetName(), character.GetRemainingCD(cooldownID, sim.CurrentTime)))

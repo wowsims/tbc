@@ -9,8 +9,38 @@ import (
 
 const NeverExpires = time.Duration(math.MaxInt64)
 
+type AuraID int32
+
+var numAuraIDs = 0
+func NewAuraID() AuraID {
+	newAuraID := AuraID(numAuraIDs)
+	numAuraIDs++
+	return newAuraID
+}
+
+// Offsensive trinkets put each other on CD, so they can all share 1 aura ID
+var OffensiveTrinketActiveAuraID = NewAuraID()
+// Defensive trinkets put each other on CD, so they can all share 1 aura ID
+var DefensiveTrinketActiveAuraID = NewAuraID()
+
+type CooldownID int32
+
+var numCooldownIDs = 0
+func NewCooldownID() CooldownID {
+	newCooldownID := CooldownID(numCooldownIDs)
+	numCooldownIDs++
+	return newCooldownID
+}
+
+var GCDCooldownID = NewCooldownID()
+var MainHandSwingCooldownID = NewCooldownID()
+var OffHandSwingCooldownID = NewCooldownID()
+var RangedSwingCooldownID = NewCooldownID()
+var OffensiveTrinketSharedCooldownID = NewCooldownID()
+var DefensiveTrinketSharedCooldownID = NewCooldownID()
+
 type Aura struct {
-	ID          int32
+	ID          AuraID
 	Name        string        // Label used for logging.
 	Expires     time.Duration // time at which aura will be removed
 	activeIndex int32         // Position of this aura's index in the sim.activeAuraIDs array
@@ -57,19 +87,19 @@ type auraTracker struct {
 	finalized bool
 
   // Maps MagicIDs to sim duration at which CD is done. Using array for perf.
-	cooldowns [MagicIDLen]time.Duration
+	cooldowns []time.Duration
 
 	// Maps MagicIDs to aura for that ID. Using array for perf.
-	auras [MagicIDLen]Aura
+	auras []Aura
 
 	// IDs of Auras that are active, in no particular order
-	activeAuraIDs []int32
+	activeAuraIDs []AuraID
 }
 
 func newAuraTracker() auraTracker {
 	return auraTracker{
 		permanentAuras: []PermanentAura{},
-		activeAuraIDs: make([]int32, 0, 5),
+		activeAuraIDs: make([]AuraID, 0, 5),
 	}
 }
 
@@ -91,8 +121,8 @@ func (at *auraTracker) finalize() {
 }
 
 func (at *auraTracker) reset(sim *Simulation) {
-	at.auras = [MagicIDLen]Aura{}
-	at.cooldowns = [MagicIDLen]time.Duration{}
+	at.auras = make([]Aura, numAuraIDs)
+	at.cooldowns = make([]time.Duration, numCooldownIDs)
 	at.activeAuraIDs = at.activeAuraIDs[:0]
 
 	for _, permAura := range at.permanentAuras {
@@ -134,7 +164,7 @@ func (at *auraTracker) AddAura(sim *Simulation, newAura Aura) {
 }
 
 // Remove an aura by its ID
-func (at *auraTracker) RemoveAura(sim *Simulation, id int32) {
+func (at *auraTracker) RemoveAura(sim *Simulation, id AuraID) {
 	if at.auras[id].OnExpire != nil {
 		at.auras[id].OnExpire(sim)
 	}
@@ -158,16 +188,16 @@ func (at *auraTracker) RemoveAura(sim *Simulation, id int32) {
 }
 
 // Returns whether an aura with the given ID is currently active.
-func (at *auraTracker) HasAura(id int32) bool {
+func (at *auraTracker) HasAura(id AuraID) bool {
 	return at.auras[id].ID != 0
 }
 
-func (at *auraTracker) IsOnCD(magicID int32, currentTime time.Duration) bool {
-	return at.cooldowns[magicID] > currentTime
+func (at *auraTracker) IsOnCD(id CooldownID, currentTime time.Duration) bool {
+	return at.cooldowns[id] > currentTime
 }
 
-func (at *auraTracker) GetRemainingCD(magicID int32, currentTime time.Duration) time.Duration {
-	remainingCD := at.cooldowns[magicID] - currentTime
+func (at *auraTracker) GetRemainingCD(id CooldownID, currentTime time.Duration) time.Duration {
+	remainingCD := at.cooldowns[id] - currentTime
 	if remainingCD > 0 {
 		return remainingCD
 	} else {
@@ -175,8 +205,8 @@ func (at *auraTracker) GetRemainingCD(magicID int32, currentTime time.Duration) 
 	}
 }
 
-func (at *auraTracker) SetCD(magicID int32, newCD time.Duration) {
-	at.cooldowns[magicID] = newCD
+func (at *auraTracker) SetCD(id CooldownID, newCD time.Duration) {
+	at.cooldowns[id] = newCD
 }
 
 // Invokes the OnCast event for all tracked Auras.
@@ -235,96 +265,8 @@ func NewICD() InternalCD {
 	return InternalCD(0)
 }
 
-// List of all magic effects and spells and items and stuff that can go on CD or have an aura.
-const (
-	MagicIDUnknown int32 = iota
-
-	// Basic CDs
-	MagicIDGCD
-	MagicIDMainHandSwing
-	MagicIDOffHandSwing
-	MagicIDRangedSwing
-
-	// Spells, used for tracking CDs
-	MagicIDChainLightning6
-	// MagicIDFlameShock
-
-	// Auras
-	MagicIDLOTalent
-	MagicIDJoW
-	MagicIDEleMastery
-	MagicIDBlessingSilverCrescent
-	MagicIDDarkIronPipeweed
-	MagicIDQuagsEye
-	MagicIDFungalFrenzy
-	MagicIDBloodlust
-	MagicIDSkycall
-	MagicIDEnergized
-	MagicIDNAC
-	MagicIDChaoticSkyfire
-	MagicIDInsightfulEarthstorm
-	MagicIDMysticSkyfire
-	MagicIDMysticFocus
-	MagicIDSpellPower
-	MagicIDRubySerpent
-	MagicIDCallOfTheNexus
-	MagicIDDCC
-	MagicIDDCCBonus
-	MagicIDDrums // drums effect
-	MagicIDTwinStars
-	MagicIDTidefury
-	MagicIDSpellstrike
-	MagicIDSpellstrikeInfusion
-	MagicIDManaEtched
-	MagicIDManaEtchedInsight
-	MagicIDMisery
-	MagicIDEyeOfTheNight
-	MagicIDChainTO
-	MagicIDCyclone4pc
-	MagicIDCycloneMana // proc from 4pc
-	MagicIDOrcBloodFury    // orc racials
-	MagicIDTrollBerserking // troll racial
-	MagicIDTLC             // aura on equip of TLC, stores charges
-	MagicIDDestructionPotion
-	MagicIDHexShunkHead
-	MagicIDShiftingNaaru
-	MagicIDSkullGuldan
-	MagicIDNexusHorn
-	MagicIDSextant          // Trinket Aura
-	MagicIDUnstableCurrents // Sextant Proc Aura
-	MagicIDEyeOfMag         // trinket aura
-	MagicIDRecurringPower   // eye of mag proc aura
-	MagicIDCataclysm4pc     // cyclone 4pc aura
-	MagicIDSkyshatter4pc    // skyshatter 4pc aura
-	MagicIDElderScribe      // elder scribe robe item aura
-	MagicIDElderScribeProc  // elder scribe robe temp buff
-	MagicIDRegainMana // effect from fathom brooch
-	MagicIDCurseOfElements
-	MagicIDImprovedSealOfTheCrusader
-
-	// Items  (Usually individual trinket CDs)
-	MagicIDISCTrink
-	MagicIDNACTrink
-	MagicIDPotion
-	MagicIDRune
-	MagicIDAtkTrinket
-	MagicIDHealTrinket
-	MagicIDScryerTrink
-	MagicIDRubySerpentTrink
-	MagicIDXiriTrink
-	MagicIDHexTrink
-	MagicIDShiftingNaaruTrink
-	MagicIDSkullGuldanTrink
-	MagicIDEssMartyrTrink
-	MagicIDEssSappTrink
-	MagicIDDITrink // Dark Iron pipe trinket CD
-
-	// Always at end so we know how many magic IDs there are.
-	MagicIDLen
-)
-
 // Helper for the common case of adding an Aura that gives a temporary stat boost.
-func (character *Character) AddAuraWithTemporaryStats(sim *Simulation, auraID int32, auraName string, stat stats.Stat, amount float64, duration time.Duration) {
+func (character *Character) AddAuraWithTemporaryStats(sim *Simulation, auraID AuraID, auraName string, stat stats.Stat, amount float64, duration time.Duration) {
 	if sim.Log != nil {
 		sim.Log(" +%0.0f %s from %s\n", amount, stat.StatName(), auraName)
 	}

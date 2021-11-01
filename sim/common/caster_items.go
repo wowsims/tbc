@@ -13,6 +13,8 @@ func init() {
 	core.AddItemEffect(28602, ApplyRobeOfTheElderScribes)
 }
 
+var RobeOfTheElderScribeAuraID = core.NewAuraID()
+var PowerOfArcanagosAuraID = core.NewAuraID()
 func ApplyRobeOfTheElderScribes(agent core.Agent) {
 	character := agent.GetCharacter()
 	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
@@ -24,12 +26,12 @@ func ApplyRobeOfTheElderScribes(agent core.Agent) {
 		const proc = 0.2
 
 		return core.Aura{
-			ID:      core.MagicIDElderScribe,
+			ID:      RobeOfTheElderScribeAuraID,
 			Name:    "Robes of the Elder Scibe",
 			OnSpellHit: func(sim *core.Simulation, cast core.DirectCastAction, result *core.DirectCastDamageResult) {
 				if !icd.IsOnCD(sim) && sim.RandomFloat("unmarked") < proc {
 					icd = core.InternalCD(sim.CurrentTime + icdDur)
-					character.AddAuraWithTemporaryStats(sim, core.MagicIDElderScribeProc, "Power of Arcanagos", stats.SpellPower, spellBonus, dur)
+					character.AddAuraWithTemporaryStats(sim, PowerOfArcanagosAuraID, "Power of Arcanagos", stats.SpellPower, spellBonus, dur)
 				}
 			},
 		}

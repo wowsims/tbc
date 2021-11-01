@@ -126,6 +126,8 @@ func applyBuffEffects(agent Agent, buffs proto.Buffs) {
 	}
 }
 
+var BloodlustAuraID = NewAuraID()
+var BloodlustCooldownID = NewCooldownID()
 func registerBloodlustCD(agent Agent, buffs proto.Buffs) {
 	numBloodlusts := buffs.Bloodlust
 	if numBloodlusts == 0 {
@@ -135,7 +137,7 @@ func registerBloodlustCD(agent Agent, buffs proto.Buffs) {
 	const dur = time.Second * 40
 
 	agent.GetCharacter().AddMajorCooldown(MajorCooldown{
-		CooldownID: MagicIDBloodlust,
+		CooldownID: BloodlustCooldownID,
 		Cooldown: dur, // assumes that multiple BLs are different shaman.
 		Priority: CooldownPriorityBloodlust,
 		ActivationFactory: func(sim *Simulation) CooldownActivation {
@@ -144,9 +146,9 @@ func registerBloodlustCD(agent Agent, buffs proto.Buffs) {
 
 			return func(sim *Simulation, character *Character) bool {
 				if bloodlustsUsed < numBloodlusts {
-					character.SetCD(MagicIDBloodlust, sim.CurrentTime+dur)
+					character.SetCD(BloodlustCooldownID, sim.CurrentTime+dur)
 					character.Party.AddAura(sim, Aura{
-						ID:      MagicIDBloodlust,
+						ID:      BloodlustAuraID,
 						Name:    "Bloodlust",
 						Expires: sim.CurrentTime + dur,
 						OnCast: func(sim *Simulation, cast DirectCastAction, input *DirectCastInput) {
@@ -157,7 +159,7 @@ func registerBloodlustCD(agent Agent, buffs proto.Buffs) {
 					bloodlustsUsed++
 					return true
 				} else {
-					character.SetCD(MagicIDBloodlust, sim.CurrentTime+time.Minute*10)
+					character.SetCD(BloodlustCooldownID, sim.CurrentTime+time.Minute*10)
 					return true
 				}
 			}

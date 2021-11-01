@@ -15,6 +15,8 @@ func init() {
 	core.AddItemEffect(35503, ApplyEmberSkyfireDiamond)
 }
 
+var MysticalSkyfireDiamondAuraID = core.NewAuraID()
+var MysticFocusAuraID = core.NewAuraID()
 func ApplyMysticalSkyfireDiamond(agent core.Agent) {
 	character := agent.GetCharacter()
 	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
@@ -24,18 +26,19 @@ func ApplyMysticalSkyfireDiamond(agent core.Agent) {
 		icd := core.NewICD()
 
 		return core.Aura{
-			ID:      core.MagicIDMysticSkyfire,
+			ID:      MysticalSkyfireDiamondAuraID,
 			Name:    "Mystical Skyfire Diamond",
 			OnCastComplete: func(sim *core.Simulation, cast core.DirectCastAction) {
 				if !icd.IsOnCD(sim) && sim.RandomFloat("unmarked") < 0.15 {
 					icd = core.InternalCD(sim.CurrentTime + icdDur)
-					character.AddAuraWithTemporaryStats(sim, core.MagicIDMysticFocus, "Mystic Focus", stats.SpellHaste, hasteBonus, dur)
+					character.AddAuraWithTemporaryStats(sim, MysticFocusAuraID, "Mystic Focus", stats.SpellHaste, hasteBonus, dur)
 				}
 			},
 		}
 	})
 }
 
+var InsightfulEarthstormDiamondAuraID = core.NewAuraID()
 func ApplyInsightfulEarthstormDiamond(agent core.Agent) {
 	character := agent.GetCharacter()
 	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
@@ -43,7 +46,7 @@ func ApplyInsightfulEarthstormDiamond(agent core.Agent) {
 		const dur = time.Second * 15
 
 		return core.Aura{
-			ID:      core.MagicIDInsightfulEarthstorm,
+			ID:      InsightfulEarthstormDiamondAuraID,
 			Name:    "Insightful Earthstorm Diamond",
 			OnCastComplete: func(sim *core.Simulation, cast core.DirectCastAction) {
 				if !icd.IsOnCD(sim) && sim.RandomFloat("unmarked") < 0.04 {
@@ -58,11 +61,12 @@ func ApplyInsightfulEarthstormDiamond(agent core.Agent) {
 	})
 }
 
+var ChaoticSkyfireDiamondAuraID = core.NewAuraID()
 func ApplyChaoticSkyfireDiamond(agent core.Agent) {
 	character := agent.GetCharacter()
 	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		return core.Aura{
-			ID:      core.MagicIDChaoticSkyfire,
+			ID:      ChaoticSkyfireDiamondAuraID,
 			Name:    "Chaotic Skyfire Diamond",
 			OnCast: func(sim *core.Simulation, cast core.DirectCastAction, input *core.DirectCastInput) {
 				// For a normal spell with crit multiplier of 1.5, this will be 1.
