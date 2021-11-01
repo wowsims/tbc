@@ -44,121 +44,62 @@ import { sum } from './utils.js';
 import { wait } from './utils.js';
 import { WorkerPool } from './worker_pool.js';
 
-export interface SimConfig<SpecType extends Spec> {
-  spec: Spec;
-  epStats: Array<Stat>;
-  epReferenceStat: Stat;
+export interface SimConfig {
   defaults: {
 		phase: number,
-		gear: EquipmentSpec,
-		epWeights: Stats,
     encounter: Encounter,
     buffs: Buffs,
-    consumes: Consumes,
-    rotation: SpecRotation<SpecType>,
-    talents: string,
-    specOptions: SpecOptions<SpecType>,
   },
-	metaGemEffectEP?: ((gem: Gem, sim: Sim<SpecType>) => number),
 }
 
 // Core Sim module which deals only with api types, no UI-related stuff.
-export class Sim<SpecType extends Spec> extends WorkerPool {
-  readonly spec: Spec;
-
+export class Sim extends WorkerPool {
   readonly phaseChangeEmitter = new TypedEvent<void>();
   readonly buffsChangeEmitter = new TypedEvent<void>();
-  readonly consumesChangeEmitter = new TypedEvent<void>();
-  readonly customStatsChangeEmitter = new TypedEvent<void>();
   readonly encounterChangeEmitter = new TypedEvent<void>();
-  readonly gearChangeEmitter = new TypedEvent<void>();
-  readonly raceChangeEmitter = new TypedEvent<void>();
-  readonly rotationChangeEmitter = new TypedEvent<void>();
-  readonly talentsChangeEmitter = new TypedEvent<void>();
-  // Talents dont have all fields so we need this
-  readonly talentsStringChangeEmitter = new TypedEvent<void>();
-  readonly specOptionsChangeEmitter = new TypedEvent<void>();
+  readonly numTargetsChangeEmitter = new TypedEvent<void>();
 
   // Emits when any of the above emitters emit.
   readonly changeEmitter = new TypedEvent<void>();
-
-  readonly gearListEmitter = new TypedEvent<void>();
-  readonly characterStatsEmitter = new TypedEvent<void>();
-	private _currentStats: ComputeStatsResult;
 
   // Database
   private _items: Record<number, Item> = {};
   private _enchants: Record<number, Enchant> = {};
   private _gems: Record<number, Gem> = {};
 
+  readonly gearListEmitter = new TypedEvent<void>();
+
   // Current values
   private _phase: number;
   private _buffs: Buffs;
-  private _consumes: Consumes;
-  private _customStats: Stats;
-  private _gear: Gear;
   private _encounter: Encounter;
-  private _race: Race;
-  private _rotation: SpecRotation<SpecType>;
-  private _talents: SpecTalents<SpecType>;
-  private _talentsString: string;
-  private _specOptions: SpecOptions<SpecType>;
-	private _epWeights: Stats;
-
-  readonly specTypeFunctions: SpecTypeFunctions<SpecType>;
-	private readonly _metaGemEffectEP: (gem: Gem, sim: Sim<SpecType>) => number;
+  private _numTargets: number;
 
   private _init = false;
-	private readonly _defaultGear: EquipmentSpec;
 
-  constructor(config: SimConfig<SpecType>) {
+  constructor(config: SimConfig) {
 		super(3);
-
-    this.spec = config.spec;
-    this._race = specToEligibleRaces[this.spec][0];
-
-    this.specTypeFunctions = specTypeFunctions[this.spec] as SpecTypeFunctions<SpecType>;
-		this._metaGemEffectEP = config.metaGemEffectEP || (() => 0);
 
 		this._phase = config.defaults.phase;
     this._buffs = config.defaults.buffs;
-    this._consumes = config.defaults.consumes;
-    this._customStats = new Stats();
     this._encounter = config.defaults.encounter;
-    this._gear = new Gear({});
-    this._rotation = config.defaults.rotation;
-    this._talents = this.specTypeFunctions.talentsCreate();
-    this._talentsString = config.defaults.talents;
-		this._epWeights = config.defaults.epWeights;
-    this._specOptions = config.defaults.specOptions;
-		this._defaultGear = config.defaults.gear;
+    this._numTargets = 1;
 
     [
       this.buffsChangeEmitter,
-      this.consumesChangeEmitter,
-      this.customStatsChangeEmitter,
       this.encounterChangeEmitter,
-      this.gearChangeEmitter,
-      this.raceChangeEmitter,
-      this.rotationChangeEmitter,
-      this.talentsChangeEmitter,
-      this.talentsStringChangeEmitter,
-      this.specOptionsChangeEmitter,
+      this.numTargetsChangeEmitter,
+      this.phaseChangeEmitter,
     ].forEach(emitter => emitter.on(() => this.changeEmitter.emit()));
-
-		this._currentStats = ComputeStatsResult.create();
-		this.changeEmitter.on(() => {
-			this.updateCharacterStats();
-		});
   }
 
-  async init(): Promise<void> {
+  async init(spec: Spec): Promise<void> {
     if (this._init)
       return;
     this._init = true;
 
     const result = await this.getGearList(GearListRequest.create({
-      spec: this.spec,
+      spec: spec,
     }));
 
     result.items.forEach(item => this._items[item.id] = item);
@@ -167,37 +108,6 @@ export class Sim<SpecType extends Spec> extends WorkerPool {
 
     this.gearListEmitter.emit();
   }
-
-  async statWeights(request: StatWeightsRequest): Promise<StatWeightsResult> {
-		const result = await super.statWeights(request);
-		this._epWeights = new Stats(result.epValues);
-		return result;
-	}
-
-	// This should be invoked internally whenever stats might have changed.
-	private async updateCharacterStats() {
-		// Sometimes a ui change triggers other changes, so waiting a bit makes sure
-		// we get all of them.
-		await wait(10);
-
-		const computeStatsResult = await this.computeStats(makeComputeStatsRequest(
-      this._buffs,
-      this._consumes,
-      this._customStats,
-      this._encounter,
-      this._gear,
-      this._race,
-      this._rotation,
-      this._talents,
-      this._specOptions));
-
-		this._currentStats = computeStatsResult;
-		this.characterStatsEmitter.emit();
-	}
-
-	getCurrentStats(): ComputeStatsResult {
-		return ComputeStatsResult.clone(this._currentStats);
-	}
 
 	getItems(slot: ItemSlot | undefined): Array<Item> {
 		let items = Object.values(this._items);
@@ -236,16 +146,6 @@ export class Sim<SpecType extends Spec> extends WorkerPool {
       this.phaseChangeEmitter.emit();
     }
   }
-  
-  getRace(): Race {
-    return this._race;
-  }
-  setRace(newRace: Race) {
-    if (newRace != this._race) {
-      this._race = newRace;
-      this.raceChangeEmitter.emit();
-    }
-  }
 
   getBuffs(): Buffs {
     // Make a defensive copy
@@ -261,20 +161,6 @@ export class Sim<SpecType extends Spec> extends WorkerPool {
     this.buffsChangeEmitter.emit();
   }
 
-  getConsumes(): Consumes {
-    // Make a defensive copy
-    return Consumes.clone(this._consumes);
-  }
-
-  setConsumes(newConsumes: Consumes) {
-    if (Consumes.equals(this._consumes, newConsumes))
-      return;
-
-    // Make a defensive copy
-    this._consumes = Consumes.clone(newConsumes);
-    this.consumesChangeEmitter.emit();
-  }
-
   getEncounter(): Encounter {
     // Make a defensive copy
     return Encounter.clone(this._encounter);
@@ -288,91 +174,16 @@ export class Sim<SpecType extends Spec> extends WorkerPool {
     this._encounter = Encounter.clone(newEncounter);
     this.encounterChangeEmitter.emit();
   }
-
-  equipItem(slot: ItemSlot, newItem: EquippedItem | null) {
-    const newGear = this._gear.withEquippedItem(slot, newItem);
-    if (newGear.equals(this._gear))
-      return;
-
-    this._gear = newGear;
-    this.gearChangeEmitter.emit();
+  
+  getNumTargets(): number {
+    return this._numTargets;
   }
+  setNumTargets(newNumTargets: number) {
+    if (newNumTargets == this._numTargets)
+			return;
 
-  getEquippedItem(slot: ItemSlot): EquippedItem | null {
-    return this._gear.getEquippedItem(slot);
-  }
-
-  getGear(): Gear {
-    return this._gear;
-  }
-
-  setGear(newGear: Gear) {
-    if (newGear.equals(this._gear))
-      return;
-
-    this._gear = newGear;
-    this.gearChangeEmitter.emit();
-  }
-
-  getCustomStats(): Stats {
-    return this._customStats;
-  }
-
-  setCustomStats(newCustomStats: Stats) {
-    if (newCustomStats.equals(this._customStats))
-      return;
-
-    this._customStats = newCustomStats;
-    this.customStatsChangeEmitter.emit();
-  }
-
-  getRotation(): SpecRotation<SpecType> {
-    return this.specTypeFunctions.rotationCopy(this._rotation);
-  }
-
-  setRotation(newRotation: SpecRotation<SpecType>) {
-    if (this.specTypeFunctions.rotationEquals(newRotation, this._rotation))
-      return;
-
-    this._rotation = this.specTypeFunctions.rotationCopy(newRotation);
-    this.rotationChangeEmitter.emit();
-  }
-
-  // Commented because this should NOT be used; all external uses should be able to use getTalentsString()
-  //getTalents(): SpecTalents<SpecType> {
-  //  return this.specTypeFunctions.talentsCopy(this._talents);
-  //}
-
-  setTalents(newTalents: SpecTalents<SpecType>) {
-    if (this.specTypeFunctions.talentsEquals(newTalents, this._talents))
-      return;
-
-    this._talents = this.specTypeFunctions.talentsCopy(newTalents);
-    this.talentsChangeEmitter.emit();
-  }
-
-  getTalentsString(): string {
-    return this._talentsString;
-  }
-
-  setTalentsString(newTalentsString: string) {
-    if (newTalentsString == this._talentsString)
-      return;
-
-    this._talentsString = newTalentsString;
-    this.talentsStringChangeEmitter.emit();
-  }
-
-  getSpecOptions(): SpecOptions<SpecType> {
-    return this.specTypeFunctions.optionsCopy(this._specOptions);
-  }
-
-  setSpecOptions(newSpecOptions: SpecOptions<SpecType>) {
-    if (this.specTypeFunctions.optionsEquals(newSpecOptions, this._specOptions))
-      return;
-
-    this._specOptions = this.specTypeFunctions.optionsCopy(newSpecOptions);
-    this.specOptionsChangeEmitter.emit();
+		this._numTargets = newNumTargets;
+		this.numTargetsChangeEmitter.emit();
   }
 
   lookupItemSpec(itemSpec: ItemSpec): EquippedItem | null {
@@ -408,92 +219,12 @@ export class Sim<SpecType extends Spec> extends WorkerPool {
     return new Gear(gearMap);
   }
 
-	computeGemEP(gem: Gem): number {
-		const epFromStats = new Stats(gem.stats).computeEP(this._epWeights);
-		const epFromEffect = this._metaGemEffectEP(gem, this);
-		return epFromStats + epFromEffect;
-	}
-
-	computeEnchantEP(enchant: Enchant): number {
-		return new Stats(enchant.stats).computeEP(this._epWeights);
-	}
-
-	computeItemEP(item: Item): number {
-		if (item == null)
-			return 0;
-
-		let ep = new Stats(item.stats).computeEP(this._epWeights);
-
-		const slot = getEligibleItemSlots(item)[0];
-		const enchants = this.getEnchants(slot);
-		if (enchants.length > 0) {
-			ep += Math.max(...enchants.map(enchant => this.computeEnchantEP(enchant)));
-		}
-
-		// Compare whether its better to match sockets + get socket bonus, or just use best gems.
-		const bestGemEPNotMatchingSockets = sum(item.gemSockets.map(socketColor => {
-			const gems = this.getGems(socketColor).filter(gem => !gem.unique && gem.phase <= this.getPhase());
-			if (gems.length > 0) {
-				return Math.max(...gems.map(gem => this.computeGemEP(gem)));
-			} else {
-				return 0;
-			}
-		}));
-
-		const bestGemEPMatchingSockets = sum(item.gemSockets.map(socketColor => {
-			const gems = this.getGems(socketColor).filter(gem => !gem.unique && gem.phase <= this.getPhase() && gemMatchesSocket(gem, socketColor));
-			if (gems.length > 0) {
-				return Math.max(...gems.map(gem => this.computeGemEP(gem)));
-			} else {
-				return 0;
-			}
-		})) + new Stats(item.socketBonus).computeEP(this._epWeights);
-
-		ep += Math.max(bestGemEPMatchingSockets, bestGemEPNotMatchingSockets);
-
-		return ep;
-	}
-
-  makeCurrentIndividualSimRequest(iterations: number, debug: boolean): IndividualSimRequest {
-    return makeIndividualSimRequest(
-      this._buffs,
-      this._consumes,
-      this._customStats,
-      this._encounter,
-      this._gear,
-      this._race,
-      this._rotation,
-      this._talents,
-      this._specOptions,
-      iterations,
-      debug);
-  }
-
-  setWowheadData(equippedItem: EquippedItem, elem: HTMLElement) {
-    let parts = [];
-    if (equippedItem.gems.length > 0) {
-      parts.push('gems=' + equippedItem.gems.map(gem => gem ? gem.id : 0).join(':'));
-    }
-    if (equippedItem.enchant != null) {
-      parts.push('ench=' + equippedItem.enchant.effectId);
-    }
-    parts.push('pcs=' + this._gear.asArray().filter(ei => ei != null).map(ei => ei!.item.id).join(':'));
-
-    elem.setAttribute('data-wowhead', parts.join('&'));
-  }
-
   // Returns JSON representing all the current values.
   toJson(): Object {
     return {
       'buffs': Buffs.toJson(this._buffs),
-      'consumes': Consumes.toJson(this._consumes),
-      'customStats': this._customStats.toJson(),
       'encounter': Encounter.toJson(this._encounter),
-      'gear': EquipmentSpec.toJson(this._gear.asSpec()),
-      'race': this._race,
-      'rotation': this.specTypeFunctions.rotationToJson(this._rotation),
-      'talents': this._talentsString,
-      'specOptions': this.specTypeFunctions.optionsToJson(this._specOptions),
+      'numTargets': this._numTargets,
     };
   }
 
@@ -506,51 +237,14 @@ export class Sim<SpecType extends Spec> extends WorkerPool {
 		}
 
 		try {
-			this.setConsumes(Consumes.fromJson(obj['consumes']));
-		} catch (e) {
-			console.warn('Failed to parse consumes: ' + e);
-		}
-
-		try {
-			this.setCustomStats(Stats.fromJson(obj['customStats']));
-		} catch (e) {
-			console.warn('Failed to parse custom stats: ' + e);
-		}
-
-		try {
 			this.setEncounter(Encounter.fromJson(obj['encounter']));
 		} catch (e) {
 			console.warn('Failed to parse encounter: ' + e);
 		}
 
-		try {
-			this.setGear(this.lookupEquipmentSpec(EquipmentSpec.fromJson(obj['gear'])));
-		} catch (e) {
-			console.warn('Failed to parse gear: ' + e);
-		}
-
-		try {
-			this.setRace(obj['race']);
-		} catch (e) {
-			console.warn('Failed to parse race: ' + e);
-		}
-
-		try {
-			this.setRotation(this.specTypeFunctions.rotationFromJson(obj['rotation']));
-		} catch (e) {
-			console.warn('Failed to parse rotation: ' + e);
-		}
-
-		try {
-			this.setTalentsString(obj['talents']);
-		} catch (e) {
-			console.warn('Failed to parse talents: ' + e);
-		}
-
-		try {
-			this.setSpecOptions(this.specTypeFunctions.optionsFromJson(obj['specOptions']));
-		} catch (e) {
-			console.warn('Failed to parse spec options: ' + e);
+		const parsedNumTargets = parseInt(obj['numTargets']);
+		if (!isNaN(parsedNumTargets) && parsedNumTargets != 0) {
+			this._numTargets = parsedNumTargets;
 		}
   }
 }

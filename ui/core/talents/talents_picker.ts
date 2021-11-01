@@ -3,7 +3,7 @@ import { Spec } from '/tbc/core/proto/common.js';
 import { SpecTalents } from '/tbc/core/proto_utils/utils.js';
 import { getIconUrl } from '/tbc/core/resources.js';
 import { setWowheadHref } from '/tbc/core/resources.js';
-import { Sim } from '/tbc/core/sim.js';
+import { Player } from '/tbc/core/player.js';
 import { isRightClick } from '/tbc/core/utils.js';
 import { sum } from '/tbc/core/utils.js';
 
@@ -12,20 +12,20 @@ const NUM_ROWS = 9;
 const TALENTS_STORAGE_KEY = 'Talents';
 
 export abstract class TalentsPicker<SpecType extends Spec> extends Component {
-  private readonly sim: Sim<SpecType>;
+  private readonly player: Player<SpecType>;
 	frozen: boolean;
   readonly trees: Array<TalentTreePicker<SpecType>>;
 
-  constructor(parent: HTMLElement, sim: Sim<SpecType>, treeConfigs: Array<TalentTreeConfig<SpecType>>) {
+  constructor(parent: HTMLElement, player: Player<SpecType>, treeConfigs: Array<TalentTreeConfig<SpecType>>) {
     super(parent, 'talents-picker-root');
-    this.sim = sim;
+    this.player = player;
 		this.frozen = false;
-    this.trees = treeConfigs.map(treeConfig => new TalentTreePicker(this.rootElem, sim, treeConfig, this));
+    this.trees = treeConfigs.map(treeConfig => new TalentTreePicker(this.rootElem, player, treeConfig, this));
     this.trees.forEach(tree => tree.talents.forEach(talent => talent.setPoints(0, false)));
 
-    this.setTalentsString(this.sim.getTalentsString());
-    this.sim.talentsStringChangeEmitter.on(() => {
-      this.setTalentsString(this.sim.getTalentsString());
+    this.setTalentsString(this.player.getTalentsString());
+    this.player.talentsStringChangeEmitter.on(() => {
+      this.setTalentsString(this.player.getTalentsString());
     });
 
     this.update();
@@ -48,12 +48,12 @@ export abstract class TalentsPicker<SpecType extends Spec> extends Component {
 
     this.trees.forEach(tree => tree.update());
 
-    this.sim.setTalentsString(this.getTalentsString());
-    this.sim.setTalents(this.getTalents());
+    this.player.setTalentsString(this.getTalentsString());
+    this.player.setTalents(this.getTalents());
   }
 
   getTalents(): SpecTalents<SpecType> {
-    const talents = this.sim.specTypeFunctions.talentsCreate();
+    const talents = this.player.specTypeFunctions.talentsCreate();
 
     this.trees.forEach(tree => tree.talents.forEach(talent => {
       if (talent.config.fieldName) {
@@ -95,7 +95,7 @@ class TalentTreePicker<SpecType extends Spec> extends Component {
   // The current number of points in this tree
   numPoints: number;
 
-  constructor(parent: HTMLElement, sim: Sim<SpecType>, config: TalentTreeConfig<SpecType>, picker: TalentsPicker<SpecType>) {
+  constructor(parent: HTMLElement, player: Player<SpecType>, config: TalentTreeConfig<SpecType>, picker: TalentsPicker<SpecType>) {
     super(parent, 'talent-tree-picker-root');
     this.config = config;
     this.numPoints = 0;
@@ -115,7 +115,7 @@ class TalentTreePicker<SpecType extends Spec> extends Component {
     const main = this.rootElem.getElementsByClassName('talent-tree-main')[0] as HTMLElement;
     main.style.backgroundImage = `url('${config.backgroundUrl}')`;
 
-    this.talents = config.talents.map(talent => new TalentPicker(main, sim, talent, this));
+    this.talents = config.talents.map(talent => new TalentPicker(main, player, talent, this));
     this.talents.forEach(talent => {
       if (talent.config.prereqLocation) {
         this.getTalent(talent.config.prereqLocation).config.prereqOfLocation = talent.config.location;
@@ -157,7 +157,7 @@ class TalentPicker<SpecType extends Spec> extends Component {
   private readonly tree: TalentTreePicker<SpecType>;
   private readonly pointsDisplay: HTMLElement;
 
-  constructor(parent: HTMLElement, sim: Sim<SpecType>, config: TalentConfig<SpecType>, tree: TalentTreePicker<SpecType>) {
+  constructor(parent: HTMLElement, player: Player<SpecType>, config: TalentConfig<SpecType>, tree: TalentTreePicker<SpecType>) {
     super(parent, 'talent-picker-root', document.createElement('a'));
     this.config = config;
     this.tree = tree;

@@ -148,7 +148,7 @@ type Equipment [proto.ItemSlot_ItemSlotRanged + 1]Item
 // Structs used for looking up items/gems/enchants
 type EquipmentSpec [proto.ItemSlot_ItemSlotRanged + 1]ItemSpec
 
-func ProtoToEquipmentSpec(es *proto.EquipmentSpec) EquipmentSpec {
+func ProtoToEquipmentSpec(es proto.EquipmentSpec) EquipmentSpec {
 	coreEquip := EquipmentSpec{}
 
 	for i, item := range es.Items {
@@ -231,14 +231,24 @@ func NewEquipmentSet(equipSpec EquipmentSpec) Equipment {
 	return equipment
 }
 
-func EquipmentSpecFromStrings(itemNames []string) EquipmentSpec {
-	eq := EquipmentSpec{}
+func ProtoToEquipment(es proto.EquipmentSpec) Equipment {
+	return NewEquipmentSet(ProtoToEquipmentSpec(es))
+}
+
+func EquipmentSpecFromStrings(itemNames []string) *proto.EquipmentSpec {
+	eq := &proto.EquipmentSpec{
+		Items: make([]*proto.ItemSpec, len(itemNames)),
+	}
+
 	for i, itemName := range itemNames {
 		item := ByName[itemName]
 		if item.ID == 0 {
 			log.Fatalf("Item not found: %s", itemName)
 		}
-		eq[i].ID = item.ID
+		itemSpec := &proto.ItemSpec{
+			Id: item.ID,
+		}
+		eq.Items[i] = itemSpec
 	}
 	return eq
 }

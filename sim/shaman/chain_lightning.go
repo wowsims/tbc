@@ -25,6 +25,7 @@ func (cl ChainLightning) GetCooldown() time.Duration {
 
 func (cl ChainLightning) GetHitInputs(sim *core.Simulation, cast core.DirectCastAction) []core.DirectCastDamageInput{
 	hitInput := core.DirectCastDamageInput{
+		Target: sim.GetPrimaryTarget(),
 		MinBaseDamage: 734,
 		MaxBaseDamage: 838,
 		SpellCoefficient: 0.651,
@@ -33,12 +34,13 @@ func (cl ChainLightning) GetHitInputs(sim *core.Simulation, cast core.DirectCast
 
 	cl.ApplyHitInputModifiers(&hitInput)
 
-	numHits := core.MinInt32(3, sim.Options.Encounter.NumTargets)
+	numHits := core.MinInt32(3, sim.GetNumTargets())
 	hitInputs := make([]core.DirectCastDamageInput, 0, numHits)
 	hitInputs = append(hitInputs, hitInput)
 
 	for i := int32(1); i < numHits; i++ {
 		bounceHit := hitInputs[i - 1] // Makes a copy
+		bounceHit.Target = sim.GetTarget(i)
 
 		if cl.Shaman.HasAura(core.MagicIDTidefury) {
 			bounceHit.DamageMultiplier *= 0.83

@@ -51,15 +51,19 @@ message Raid {
     repeated Party parties = 1; 
 }
 
+message SimOptions {
+    int32 iterations = 1;
+    int64 random_seed = 2;
+    bool debug = 3; // enables debug logging.
+    bool exit_on_oom = 4;
+}
+
 // RPC IndividualSim
 message IndividualSimRequest {
     Player player = 1;
     Buffs buffs = 2;
     Encounter encounter = 3;
-    int32 iterations = 4;
-    int64 random_seed = 5;
-    bool debug = 6; // enables debug logging.
-    bool exit_on_oom = 7;
+		SimOptions sim_options = 4;
 }
 
 message IndividualSimResult {

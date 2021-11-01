@@ -52,8 +52,8 @@ func (spell ElectricSpell) GetTag() int32 {
 	}
 }
 
-func (spell ElectricSpell) GetAgent() core.Agent {
-	return spell.Shaman
+func (spell ElectricSpell) GetCharacter() *core.Character {
+	return spell.Shaman.GetCharacter()
 }
 
 func (spell ElectricSpell) GetBaseManaCost() float64 {

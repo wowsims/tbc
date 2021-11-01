@@ -11,7 +11,7 @@ type Party struct {
 	Players []Agent
 
 	// Party-wide buffs for this party + raid-wide buffs
-	Buffs proto.Buffs
+	buffs proto.Buffs
 }
 
 func (party *Party) Size() int {
@@ -38,14 +38,6 @@ func (party *Party) AddAura(sim *Simulation, aura Aura) {
 	}
 }
 
-func (party *Party) AddInitialStats(s stats.Stats) {
-	for _, agent := range party.Players {
-		agent.GetCharacter().AddInitialStats(s)
-	}
-}
-
-// AddStats adds a temporary increase to each players stats.
-//  This will be reset at the end of the simulation. (using player InitialStats)
 func (p *Party) AddStats(s stats.Stats) {
 	for _, agent := range p.Players {
 		agent.GetCharacter().AddStats(s)
@@ -56,7 +48,7 @@ type Raid struct {
 	Parties []*Party
 
 	// Raid-wide buffs
-	Buffs proto.Buffs
+	buffs proto.Buffs
 }
 
 // Makes a new raid. baseBuffs are extra additional buffs applied to all players in the raid.
@@ -69,7 +61,7 @@ func NewRaid(baseBuffs proto.Buffs) *Raid {
 			&Party{ Players: []Agent{}, },
 			&Party{ Players: []Agent{}, },
 		},
-		Buffs: baseBuffs,
+		buffs: baseBuffs,
 	}
 }
 
@@ -102,39 +94,43 @@ func (raid *Raid) AddPlayer(player Agent) *Party {
 }
 
 // Adds buffs from every player to the raid and party buffs.
-func (raid *Raid) AddPlayerBuffs() {
+func (raid *Raid) addPlayerBuffs() {
 	// Add raid-wide buffs first.
 	for _, party := range raid.Parties {
 		for _, player := range party.Players {
-			player.AddRaidBuffs(&raid.Buffs)
-			player.GetCharacter().AddRaidBuffs(&raid.Buffs)
+			player.AddRaidBuffs(&raid.buffs)
+			player.GetCharacter().AddRaidBuffs(&raid.buffs)
 		}
 	}
 
 	// Add party-wide buffs for each party.
 	for _, party := range raid.Parties {
-		party.Buffs = raid.Buffs
+		party.buffs = raid.buffs
 		for _, player := range party.Players {
-			player.AddPartyBuffs(&party.Buffs)
-			player.GetCharacter().AddPartyBuffs(&party.Buffs)
+			player.AddPartyBuffs(&party.buffs)
+			player.GetCharacter().AddPartyBuffs(&party.buffs)
 		}
 	}
 }
 
 // Applies buffs to the sim and all the players.
-func (raid *Raid) ApplyBuffs(sim *Simulation) {
-	ApplyBuffsToSim(sim, raid.Buffs)
-
+func (raid *Raid) applyAllEffects() {
 	for _, party := range raid.Parties {
 		for _, player := range party.Players {
-			ApplyBuffsToPlayer(player, party.Buffs)
+			player.GetCharacter().applyAllEffects(player, party.buffs)
 		}
 	}
 }
 
-func (raid Raid) AddInitialStats(s stats.Stats) {
+// Finalize the raid.
+func (raid *Raid) Finalize() {
+	raid.addPlayerBuffs()
+	raid.applyAllEffects()
+
 	for _, party := range raid.Parties {
-		party.AddInitialStats(s)
+		for _, player := range party.Players {
+			player.GetCharacter().Finalize()
+		}
 	}
 }
 

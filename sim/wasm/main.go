@@ -7,9 +7,14 @@ import (
 	"syscall/js"
 
 	"github.com/wowsims/tbc/sim"
+	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/proto"
 	googleProto "google.golang.org/protobuf/proto"
 )
+
+func init() {
+	sim.RegisterAll()
+}
 
 func main() {
 	c := make(chan struct{}, 0)
@@ -32,7 +37,7 @@ func computeStats(this js.Value, args []js.Value) interface{} {
 		log.Printf("Failed to parse request: %s", err)
 		return nil
 	}
-	result := sim.ComputeStats(csr)
+	result := core.ComputeStats(csr)
 
 	outbytes, err := googleProto.Marshal(result)
 	if err != nil {
@@ -56,7 +61,7 @@ func gearList(this js.Value, args []js.Value) interface{} {
 		log.Printf("Failed to parse request: %s", err)
 		return nil
 	}
-	result := sim.GetGearList(glr)
+	result := core.GetGearList(glr)
 
 	outbytes, err := googleProto.Marshal(result)
 	if err != nil {
@@ -80,7 +85,7 @@ func individualSim(this js.Value, args []js.Value) interface{} {
 		log.Printf("Failed to parse request: %s", err)
 		return nil
 	}
-	result := sim.RunSimulation(isr)
+	result := core.RunSimulation(isr)
 
 	outbytes, err := googleProto.Marshal(result)
 	if err != nil {
@@ -104,7 +109,7 @@ func statWeights(this js.Value, args []js.Value) interface{} {
 		log.Printf("Failed to parse request: %s", err)
 		return nil
 	}
-	result := sim.StatWeights(swr)
+	result := core.StatWeights(swr)
 
 	outbytes, err := googleProto.Marshal(result)
 	if err != nil {

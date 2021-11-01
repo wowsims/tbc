@@ -7,129 +7,235 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-// Keep these (and their functions) in order by item ID.
 func init() {
-	core.AddActiveItem(23046, core.ActiveItem{Activate: core.CreateSpellDmgActivate(core.MagicIDSpellPower, 130, time.Second*20), ActivateCD: time.Second * 120, CoolID: core.MagicIDEssSappTrink, SharedID: core.MagicIDAtkTrinket})
-	core.AddActiveItem(23207, core.ActiveItem{Activate: ActivateMarkOfTheChampion, ActivateCD: core.NeverExpires})
-	core.AddActiveItem(24126, core.ActiveItem{Activate: core.CreateSpellDmgActivate(core.MagicIDRubySerpent, 150, time.Second*20), ActivateCD: time.Second * 300, CoolID: core.MagicIDRubySerpentTrink, SharedID: core.MagicIDAtkTrinket})
-	core.AddActiveItem(27683, core.ActiveItem{Activate: ActivateQuagsEye, ActivateCD: core.NeverExpires, SharedID: core.MagicIDAtkTrinket})
-	core.AddActiveItem(28418, core.ActiveItem{Activate: ActivateNexusHorn, ActivateCD: core.NeverExpires, SharedID: core.MagicIDAtkTrinket})
-	core.AddActiveItem(28789, core.ActiveItem{Activate: ActivateEyeOfMag, ActivateCD: core.NeverExpires, SharedID: core.MagicIDAtkTrinket})
-	core.AddActiveItem(29132, core.ActiveItem{Activate: core.CreateSpellDmgActivate(core.MagicIDSpellPower, 150, time.Second*15), ActivateCD: time.Second * 90, CoolID: core.MagicIDScryerTrink, SharedID: core.MagicIDAtkTrinket})
-	core.AddActiveItem(29179, core.ActiveItem{Activate: core.CreateSpellDmgActivate(core.MagicIDSpellPower, 150, time.Second*15), ActivateCD: time.Second * 90, CoolID: core.MagicIDXiriTrink, SharedID: core.MagicIDAtkTrinket})
-	core.AddActiveItem(29370, core.ActiveItem{Activate: core.CreateSpellDmgActivate(core.MagicIDBlessingSilverCrescent, 155, time.Second*20), ActivateCD: time.Second * 120, CoolID: core.MagicIDISCTrink, SharedID: core.MagicIDAtkTrinket})
-	core.AddActiveItem(29376, core.ActiveItem{Activate: core.CreateSpellDmgActivate(core.MagicIDSpellPower, 99, time.Second*20), ActivateCD: time.Second * 120, CoolID: core.MagicIDEssMartyrTrink, SharedID: core.MagicIDHealTrinket})
-	core.AddActiveItem(30626, core.ActiveItem{Activate: ActivateSextant, ActivateCD: core.NeverExpires, SharedID: core.MagicIDAtkTrinket})
-	core.AddActiveItem(31856, core.ActiveItem{Activate: ActivateDCC, ActivateCD: core.NeverExpires, SharedID: core.MagicIDAtkTrinket})
-	core.AddActiveItem(32483, core.ActiveItem{Activate: core.CreateHasteActivate(core.MagicIDSkullGuldan, 175, time.Second*20), ActivateCD: time.Second * 120, CoolID: core.MagicIDSkullGuldanTrink, SharedID: core.MagicIDAtkTrinket})
-	core.AddActiveItem(33829, core.ActiveItem{Activate: core.CreateSpellDmgActivate(core.MagicIDHexShunkHead, 211, time.Second*20), ActivateCD: time.Second * 120, CoolID: core.MagicIDHexTrink, SharedID: core.MagicIDAtkTrinket})
-	core.AddActiveItem(34429, core.ActiveItem{Activate: core.CreateSpellDmgActivate(core.MagicIDShiftingNaaru, 320, time.Second*15), ActivateCD: time.Second * 90, CoolID: core.MagicIDShiftingNaaruTrink, SharedID: core.MagicIDAtkTrinket})
-	core.AddActiveItem(35749, core.ActiveItem{Activate: ActivateAlchStone, ActivateCD: core.NeverExpires, SharedID: core.MagicIDAtkTrinket})
-	core.AddActiveItem(38290, core.ActiveItem{Activate: core.CreateSpellDmgActivate(core.MagicIDDarkIronPipeweed, 155, time.Second*20), ActivateCD: time.Second * 120, CoolID: core.MagicIDDITrink, SharedID: core.MagicIDAtkTrinket})
-}
+	// Proc effects. Keep these in order by item ID.
+	core.AddItemEffect(23207, ApplyMarkOfTheChampion)
+	core.AddItemEffect(27683, ApplyQuagmirransEye)
+	core.AddItemEffect(28418, ApplyShiffarsNexusHorn)
+	core.AddItemEffect(28789, ApplyEyeOfMagtheridon)
+	core.AddItemEffect(30626, ApplySextantOfUnstableCurrents)
+	core.AddItemEffect(31856, ApplyDarkmoonCardCrusade)
 
-func ActivateMarkOfTheChampion(sim *core.Simulation, agent core.Agent) core.Aura {
-	agent.GetCharacter().Stats[stats.SpellPower] += 85
-	return core.Aura{}
-}
-
-func ActivateQuagsEye(sim *core.Simulation, agent core.Agent) core.Aura {
-	const hasteBonus = 320.0
-	const dur = time.Second * 45
-	icd := core.NewICD()
-	return core.Aura{
-		ID:      core.MagicIDQuagsEye,
-		Expires: core.NeverExpires,
-		OnCastComplete: func(sim *core.Simulation, cast core.DirectCastAction) {
-			if !icd.IsOnCD(sim) && sim.Rando.Float64("quags") < 0.1 {
-				icd = core.InternalCD(sim.CurrentTime + dur)
-				core.AddAuraWithTemporaryStats(sim, agent, core.MagicIDFungalFrenzy, stats.SpellHaste, hasteBonus, time.Second*6)
-			}
+	// Activatable effects. Keep these in order by item ID.
+	core.AddItemEffect(23046, core.MakeTemporaryStatsOnUseCDRegistration(
+		core.MagicIDSpellPower,
+		stats.SpellPower,
+		130,
+		time.Second*20,
+		core.MajorCooldown{
+			CooldownID: core.MagicIDEssSappTrink,
+			Cooldown: time.Minute * 2,
+			SharedCooldownID: core.MagicIDAtkTrinket,
 		},
-	}
-}
-
-func ActivateNexusHorn(sim *core.Simulation, agent core.Agent) core.Aura {
-	icd := core.NewICD()
-	const spellBonus = 225.0
-	const dur = time.Second * 45
-	return core.Aura{
-		ID:      core.MagicIDNexusHorn,
-		Expires: core.NeverExpires,
-		OnSpellHit: func(sim *core.Simulation, cast core.DirectCastAction, result *core.DirectCastDamageResult) {
-			if cast.GetActionID().ItemID == core.ItemIDTheLightningCapacitor {
-				return // TLC can't proc Sextant
-			}
-			if !icd.IsOnCD(sim) && result.Crit && sim.Rando.Float64("unmarked") < 0.2 {
-				icd = core.InternalCD(sim.CurrentTime + dur)
-				core.AddAuraWithTemporaryStats(sim, agent, core.MagicIDCallOfTheNexus, stats.SpellPower, spellBonus, time.Second*10)
-			}
+	))
+	core.AddItemEffect(24126, core.MakeTemporaryStatsOnUseCDRegistration(
+		core.MagicIDSpellPower,
+		stats.SpellPower,
+		150,
+		time.Second*20,
+		core.MajorCooldown{
+			CooldownID: core.MagicIDRubySerpentTrink,
+			Cooldown: time.Minute * 5,
+			SharedCooldownID: core.MagicIDAtkTrinket,
 		},
-	}
-}
-
-func ActivateEyeOfMag(sim *core.Simulation, agent core.Agent) core.Aura {
-	const spellBonus = 170.0
-	const dur = time.Second * 10
-	return core.Aura{
-		ID:      core.MagicIDEyeOfMag,
-		Expires: core.NeverExpires,
-		OnSpellMiss: func(sim *core.Simulation, cast core.DirectCastAction) {
-			core.AddAuraWithTemporaryStats(sim, agent, core.MagicIDRecurringPower, stats.SpellPower, spellBonus, dur)
+	))
+	core.AddItemEffect(29132, core.MakeTemporaryStatsOnUseCDRegistration(
+		core.MagicIDSpellPower,
+		stats.SpellPower,
+		150,
+		time.Second*15,
+		core.MajorCooldown{
+			CooldownID: core.MagicIDScryerTrink,
+			Cooldown: time.Second * 90,
+			SharedCooldownID: core.MagicIDAtkTrinket,
 		},
-	}
-}
-
-func ActivateSextant(sim *core.Simulation, agent core.Agent) core.Aura {
-	icd := core.NewICD()
-	const spellBonus = 190.0
-	const dur = time.Second * 15
-	const icdDur = time.Second * 45
-	return core.Aura{
-		ID:      core.MagicIDSextant,
-		Expires: core.NeverExpires,
-		OnSpellHit: func(sim *core.Simulation, cast core.DirectCastAction, result *core.DirectCastDamageResult) {
-			if cast.GetActionID().ItemID == core.ItemIDTheLightningCapacitor {
-				return // TLC can't proc Sextant
-			}
-			if result.Crit && !icd.IsOnCD(sim) && sim.Rando.Float64("unmarked") < 0.2 {
-				icd = core.InternalCD(sim.CurrentTime + icdDur)
-				core.AddAuraWithTemporaryStats(sim, agent, core.MagicIDUnstableCurrents, stats.SpellPower, spellBonus, dur)
-			}
+	))
+	core.AddItemEffect(29179, core.MakeTemporaryStatsOnUseCDRegistration(
+		core.MagicIDSpellPower,
+		stats.SpellPower,
+		150,
+		time.Second*15,
+		core.MajorCooldown{
+			CooldownID: core.MagicIDXiriTrink,
+			Cooldown: time.Second * 90,
+			SharedCooldownID: core.MagicIDAtkTrinket,
 		},
-	}
-}
-
-func ActivateDCC(sim *core.Simulation, agent core.Agent) core.Aura {
-	const spellBonus = 8.0
-	stacks := 0
-	return core.Aura{
-		ID:      core.MagicIDDCC,
-		Expires: core.NeverExpires,
-		OnCastComplete: func(sim *core.Simulation, cast core.DirectCastAction) {
-			if stacks < 10 {
-				stacks++
-				agent.GetCharacter().Stats[stats.SpellPower] += spellBonus
-			}
-			// Removal aura will refresh with new total spellpower based on stacks.
-			//  This will remove the old stack removal buff.
-			agent.GetCharacter().AddAura(sim, core.Aura{
-				ID:      core.MagicIDDCCBonus,
-				Expires: sim.CurrentTime + time.Second*10,
-				OnExpire: func(sim *core.Simulation) {
-					agent.GetCharacter().Stats[stats.SpellPower] -= spellBonus * float64(stacks)
-					stacks = 0
-				},
-			})
+	))
+	core.AddItemEffect(29370, core.MakeTemporaryStatsOnUseCDRegistration(
+		core.MagicIDBlessingSilverCrescent,
+		stats.SpellPower,
+		155,
+		time.Second*20,
+		core.MajorCooldown{
+			CooldownID: core.MagicIDISCTrink,
+			Cooldown: time.Minute * 2,
+			SharedCooldownID: core.MagicIDAtkTrinket,
 		},
-	}
+	))
+	core.AddItemEffect(29376, core.MakeTemporaryStatsOnUseCDRegistration(
+		core.MagicIDEssMartyrTrink,
+		stats.SpellPower,
+		99,
+		time.Second*20,
+		core.MajorCooldown{
+			CooldownID: core.MagicIDEssMartyrTrink,
+			Cooldown: time.Minute * 2,
+			SharedCooldownID: core.MagicIDHealTrinket,
+		},
+	))
+	core.AddItemEffect(32483, core.MakeTemporaryStatsOnUseCDRegistration(
+		core.MagicIDSkullGuldan,
+		stats.SpellHaste,
+		175,
+		time.Second*20,
+		core.MajorCooldown{
+			CooldownID: core.MagicIDSkullGuldanTrink,
+			Cooldown: time.Minute * 2,
+			SharedCooldownID: core.MagicIDAtkTrinket,
+		},
+	))
+	core.AddItemEffect(33829, core.MakeTemporaryStatsOnUseCDRegistration(
+		core.MagicIDHexShunkHead,
+		stats.SpellPower,
+		211,
+		time.Second*20,
+		core.MajorCooldown{
+			CooldownID: core.MagicIDHexTrink,
+			Cooldown: time.Minute * 2,
+			SharedCooldownID: core.MagicIDAtkTrinket,
+		},
+	))
+	core.AddItemEffect(34429, core.MakeTemporaryStatsOnUseCDRegistration(
+		core.MagicIDShiftingNaaru,
+		stats.SpellPower,
+		320,
+		time.Second*15,
+		core.MajorCooldown{
+			CooldownID: core.MagicIDShiftingNaaruTrink,
+			Cooldown: time.Second * 90,
+			SharedCooldownID: core.MagicIDAtkTrinket,
+		},
+	))
+	core.AddItemEffect(38290, core.MakeTemporaryStatsOnUseCDRegistration(
+		core.MagicIDDarkIronPipeweed,
+		stats.SpellPower,
+		155,
+		time.Second*20,
+		core.MajorCooldown{
+			CooldownID: core.MagicIDDITrink,
+			Cooldown: time.Minute * 2,
+			SharedCooldownID: core.MagicIDAtkTrinket,
+		},
+	))
 }
 
-// ActivateAlchStone adds the alch stone aura that has no effect on casts.
-//  The usage for this aura is in the potion usage function.
-func ActivateAlchStone(sim *core.Simulation, agent core.Agent) core.Aura {
-	return core.Aura{
-		ID:      core.MagicIDAlchStone,
-		Expires: core.NeverExpires,
-	}
+func ApplyMarkOfTheChampion(agent core.Agent) {
+	agent.GetCharacter().AddStat(stats.SpellPower, 85)
+}
+
+func ApplyQuagmirransEye(agent core.Agent) {
+	character := agent.GetCharacter()
+	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
+		const hasteBonus = 320.0
+		const dur = time.Second * 45
+		icd := core.NewICD()
+
+		return core.Aura{
+			ID:      core.MagicIDQuagsEye,
+			OnCastComplete: func(sim *core.Simulation, cast core.DirectCastAction) {
+				if !icd.IsOnCD(sim) && sim.Rando.Float64("quags") < 0.1 {
+					icd = core.InternalCD(sim.CurrentTime + dur)
+					character.AddAuraWithTemporaryStats(sim, core.MagicIDFungalFrenzy, stats.SpellHaste, hasteBonus, time.Second*6)
+				}
+			},
+		}
+	})
+}
+
+func ApplyShiffarsNexusHorn(agent core.Agent) {
+	character := agent.GetCharacter()
+	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
+		icd := core.NewICD()
+		const spellBonus = 225.0
+		const dur = time.Second * 45
+
+		return core.Aura{
+			ID:      core.MagicIDNexusHorn,
+			OnSpellHit: func(sim *core.Simulation, cast core.DirectCastAction, result *core.DirectCastDamageResult) {
+				if cast.GetActionID().ItemID == core.ItemIDTheLightningCapacitor {
+					return // TLC can't proc Sextant
+				}
+				if !icd.IsOnCD(sim) && result.Crit && sim.Rando.Float64("unmarked") < 0.2 {
+					icd = core.InternalCD(sim.CurrentTime + dur)
+					character.AddAuraWithTemporaryStats(sim, core.MagicIDCallOfTheNexus, stats.SpellPower, spellBonus, time.Second*10)
+				}
+			},
+		}
+	})
+}
+
+func ApplyEyeOfMagtheridon(agent core.Agent) {
+	character := agent.GetCharacter()
+	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
+		const spellBonus = 170.0
+		const dur = time.Second * 10
+
+		return core.Aura{
+			ID:      core.MagicIDEyeOfMag,
+			OnSpellMiss: func(sim *core.Simulation, cast core.DirectCastAction) {
+				character.AddAuraWithTemporaryStats(sim, core.MagicIDRecurringPower, stats.SpellPower, spellBonus, dur)
+			},
+		}
+	})
+}
+
+func ApplySextantOfUnstableCurrents(agent core.Agent) {
+	character := agent.GetCharacter()
+	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
+		icd := core.NewICD()
+		const spellBonus = 190.0
+		const dur = time.Second * 15
+		const icdDur = time.Second * 45
+
+		return core.Aura{
+			ID:      core.MagicIDSextant,
+			OnSpellHit: func(sim *core.Simulation, cast core.DirectCastAction, result *core.DirectCastDamageResult) {
+				if cast.GetActionID().ItemID == core.ItemIDTheLightningCapacitor {
+					return // TLC can't proc Sextant
+				}
+				if result.Crit && !icd.IsOnCD(sim) && sim.Rando.Float64("unmarked") < 0.2 {
+					icd = core.InternalCD(sim.CurrentTime + icdDur)
+					character.AddAuraWithTemporaryStats(sim, core.MagicIDUnstableCurrents, stats.SpellPower, spellBonus, dur)
+				}
+			},
+		}
+	})
+}
+
+func ApplyDarkmoonCardCrusade(agent core.Agent) {
+	character := agent.GetCharacter()
+	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
+		const spellBonus = 8.0
+		stacks := 0
+
+		return core.Aura{
+			ID:      core.MagicIDDCC,
+			OnCastComplete: func(sim *core.Simulation, cast core.DirectCastAction) {
+				if stacks < 10 {
+					stacks++
+					character.AddStat(stats.SpellPower, spellBonus)
+				}
+				// Removal aura will refresh with new total spellpower based on stacks.
+				//  This will remove the old stack removal buff.
+				character.AddAura(sim, core.Aura{
+					ID:      core.MagicIDDCCBonus,
+					Expires: sim.CurrentTime + time.Second*10,
+					OnExpire: func(sim *core.Simulation) {
+						character.AddStat(stats.SpellPower, -spellBonus * float64(stacks))
+						stacks = 0
+					},
+				})
+			},
+		}
+	})
 }

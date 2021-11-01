@@ -1,7 +1,6 @@
 import { Race } from '/tbc/core/proto/common.js';
 import { specToEligibleRaces } from '/tbc/core/proto_utils/utils.js';
 import { raceNames } from '/tbc/core/proto_utils/names.js';
-import { Sim } from '/tbc/core/sim.js';
 import { TypedEvent } from '/tbc/core/typed_event.js';
 
 import { Input, InputConfig } from './input.js';
@@ -12,15 +11,15 @@ export interface EnumValueConfig {
 	tooltip?: string,
 }
 
-export interface EnumPickerConfig extends InputConfig<number> {
+export interface EnumPickerConfig<ModObject> extends InputConfig<ModObject, number> {
 	values: Array<EnumValueConfig>;
 }
 
-export class EnumPicker extends Input<number> {
+export class EnumPicker<ModObject> extends Input<ModObject, number> {
 	private readonly selectElem: HTMLSelectElement;
 
-  constructor(parent: HTMLElement, sim: Sim<any>, config: EnumPickerConfig) {
-    super(parent, 'enum-picker-root', sim, config);
+  constructor(parent: HTMLElement, modObject: ModObject, config: EnumPickerConfig<ModObject>) {
+    super(parent, 'enum-picker-root', modObject, config);
 
     this.selectElem = document.createElement('select');
     this.selectElem.classList.add('enum-picker-selector');

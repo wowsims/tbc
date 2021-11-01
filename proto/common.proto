@@ -205,27 +205,22 @@ message Buffs {
 		bool draenei_racial_caster = 9;
     int32 shadow_priest_dps = 10;
 
-    // Target Debuff
-    bool judgement_of_wisdom = 11;
-    bool improved_seal_of_the_crusader = 12;
-    bool misery = 13;
-
 		// Drums
-		Drums drums = 14;
+		Drums drums = 11;
 
     // Item Buffs
-    int32 atiesh_mage = 15;
-    int32 atiesh_warlock = 16;
-    bool braided_eternium_chain = 17;
-    bool eye_of_the_night = 18;
-    bool chain_of_the_twilight_owl = 19;
-    bool jade_pendant_of_blasting = 20;
+    int32 atiesh_mage = 12;
+    int32 atiesh_warlock = 13;
+    bool braided_eternium_chain = 14;
+    bool eye_of_the_night = 15;
+    bool chain_of_the_twilight_owl = 16;
+    bool jade_pendant_of_blasting = 17;
 
     // Totems
-    TristateEffect mana_spring_totem = 21;
-    bool mana_tide_totem = 22;
-    int32 totem_of_wrath = 23;
-    TristateEffect wrath_of_air_totem = 24;
+    TristateEffect mana_spring_totem = 18;
+    bool mana_tide_totem = 19;
+    int32 totem_of_wrath = 20;
+    TristateEffect wrath_of_air_totem = 21;
 }
 
 message Consumes {
@@ -257,10 +252,20 @@ message Consumes {
 		Drums drums = 19;
 }
 
+message Debuffs {
+    bool judgement_of_wisdom = 1;
+    bool improved_seal_of_the_crusader = 2;
+    bool misery = 3;
+}
+
+message Target {
+		int32 armor = 1;
+		Debuffs debuffs = 2;
+}
+
 message Encounter {
     double duration = 1;
-    int32 num_targets = 2;
-    int32 target_armor = 3;
+		repeated Target targets = 2;
 }
 
 message ItemSpec {

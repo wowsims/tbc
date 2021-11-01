@@ -25,6 +25,7 @@ func (lb LightningBolt) GetCooldown() time.Duration {
 
 func (lb LightningBolt) GetHitInputs(sim *core.Simulation, cast core.DirectCastAction) []core.DirectCastDamageInput{
 	hitInput := core.DirectCastDamageInput{
+		Target: sim.GetPrimaryTarget(),
 		MinBaseDamage: 571,
 		MaxBaseDamage: 652,
 		SpellCoefficient: 0.794,

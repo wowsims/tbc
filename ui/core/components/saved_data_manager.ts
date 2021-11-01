@@ -1,18 +1,17 @@
 import { Spec } from '/tbc/core/proto/common.js';
-import { Sim } from '/tbc/core/sim.js';
 import { TypedEvent } from '/tbc/core/typed_event.js';
 
 import { Component } from '/tbc/core/components/component.js';
 
 declare var tippy: any;
 
-export type SavedDataManagerConfig<SpecType extends Spec, T> = {
+export type SavedDataManagerConfig<ModObject, T> = {
   label: string;
   storageKey: string;
   changeEmitters: Array<TypedEvent<any>>,
   equals: (a: T, b: T) => boolean;
-  getData: (sim: Sim<SpecType>) => T;
-  setData: (sim: Sim<SpecType>, data: T) => void;
+  getData: (modObject: ModObject) => T;
+  setData: (modObject: ModObject, data: T) => void;
   toJson: (a: T) => any;
   fromJson: (obj: any) => T;
 };
@@ -23,9 +22,9 @@ type SavedData<T> = {
   elem: HTMLElement;
 };
 
-export class SavedDataManager<SpecType extends Spec, T> extends Component {
-  private readonly sim: Sim<SpecType>;
-  private readonly config: SavedDataManagerConfig<SpecType, T>;
+export class SavedDataManager<ModObject, T> extends Component {
+  private readonly modObject: ModObject;
+  private readonly config: SavedDataManagerConfig<ModObject, T>;
 
   private readonly userData: Array<SavedData<T>>;
   private readonly presets: Array<SavedData<T>>;
@@ -34,9 +33,9 @@ export class SavedDataManager<SpecType extends Spec, T> extends Component {
   private readonly saveInput: HTMLInputElement;
 	private frozen: boolean;
 
-  constructor(parent: HTMLElement, sim: Sim<Spec>, config: SavedDataManagerConfig<SpecType, T>) {
+  constructor(parent: HTMLElement, modObject: ModObject, config: SavedDataManagerConfig<ModObject, T>) {
     super(parent, 'saved-data-manager-root');
-    this.sim = sim;
+    this.modObject = modObject;
     this.config = config;
 
     this.userData = [];
@@ -71,7 +70,7 @@ export class SavedDataManager<SpecType extends Spec, T> extends Component {
         return;
       }
 
-      this.addSavedData(newName, config.getData(this.sim), false);
+      this.addSavedData(newName, config.getData(this.modObject), false);
       this.saveUserData();
     });
   }
@@ -105,7 +104,7 @@ export class SavedDataManager<SpecType extends Spec, T> extends Component {
     `;
 
     dataElem.addEventListener('click', event => {
-      this.config.setData(this.sim, data);
+      this.config.setData(this.modObject, data);
       this.saveInput.value = dataName;
     });
 
@@ -135,7 +134,7 @@ export class SavedDataManager<SpecType extends Spec, T> extends Component {
     }
 
     const checkActive = () => {
-      if (this.config.equals(data, this.config.getData(this.sim))) {
+      if (this.config.equals(data, this.config.getData(this.modObject))) {
         dataElem.classList.add('active');
       } else {
         dataElem.classList.remove('active');

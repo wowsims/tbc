@@ -30,6 +30,9 @@ type DirectCastInput struct {
 
 // Input needed to calculate the damage of a spell.
 type DirectCastDamageInput struct {
+	// Target of the spell.
+	Target *Target
+
 	MinBaseDamage float64
 	MaxBaseDamage float64
 
@@ -45,6 +48,8 @@ type DirectCastDamageInput struct {
 }
 
 type DirectCastDamageResult struct {
+	Target *Target
+
 	Hit  bool // True = hit, False = resisted
 	Crit bool // Whether this cast was a critical strike.
 
@@ -86,7 +91,7 @@ type DirectCastImpl interface {
 	GetActionID() ActionID
 	GetName() string
 	GetTag() int32
-	GetAgent() Agent
+	GetCharacter() *Character
 
 	// This is needed because a lot of effects that 'reduce mana cost by X%' are
 	// calculated from the base mana cost.
@@ -123,15 +128,15 @@ func (action DirectCastAction) GetDuration() time.Duration {
 }
 
 func (action DirectCastAction) Act(sim *Simulation) bool {
-	character := action.GetAgent().GetCharacter()
+	character := action.GetCharacter()
 
 	if !action.castInput.IgnoreManaCost && action.castInput.ManaCost > 0 {
-		if character.Stats[stats.Mana] < action.castInput.ManaCost {
+		if character.CurrentMana() < action.castInput.ManaCost {
 			if sim.Log != nil {
 				sim.Log("(%d) Failed casting %s, not enough mana. (Current Mana = %0.0f, Mana Cost = %0.0f)\n",
-						character.ID, action.GetName(), character.Stats[stats.Mana], action.castInput.ManaCost)
+						character.ID, action.GetName(), character.CurrentMana(), action.castInput.ManaCost)
 			}
-			sim.MetricsAggregator.MarkOOM(action.GetAgent(), sim.CurrentTime)
+			sim.MetricsAggregator.MarkOOM(character, sim.CurrentTime)
 
 			return false
 		}
@@ -139,7 +144,7 @@ func (action DirectCastAction) Act(sim *Simulation) bool {
 
 	if sim.Log != nil {
 		sim.Log("(%d) Casting %s (Current Mana = %0.0f, Mana Cost = %0.0f, Cast Time = %s)\n",
-				character.ID, action.GetName(), character.Stats[stats.Mana], action.castInput.ManaCost, action.castInput.CastTime)
+				character.ID, action.GetName(), character.CurrentMana(), action.castInput.ManaCost, action.castInput.CastTime)
 	}
 
 	// For instant-cast spells we can skip creating an aura.
@@ -166,58 +171,33 @@ func (action DirectCastAction) Act(sim *Simulation) bool {
 }
 
 func (action DirectCastAction) internalOnCastComplete(sim *Simulation) {
-	character := action.GetAgent().GetCharacter()
+	character := action.GetCharacter()
 
 	if !action.castInput.IgnoreManaCost && action.castInput.ManaCost > 0 {
-		character.Stats[stats.Mana] -= action.castInput.ManaCost
+		character.AddStat(stats.Mana, -action.castInput.ManaCost)
 	}
 
 	action.OnCastComplete(sim, action)
-	for _, id := range character.ActiveAuraIDs {
-		if character.Auras[id].OnCastComplete != nil {
-			character.Auras[id].OnCastComplete(sim, action)
-		}
-	}
-	for _, id := range sim.ActiveAuraIDs {
-		if sim.Auras[id].OnCastComplete != nil {
-			sim.Auras[id].OnCastComplete(sim, action)
-		}
-	}
+	character.OnCastComplete(sim, action)
 
 	hitInputs := action.GetHitInputs(sim, action)
 
 	results := make([]DirectCastDamageResult, 0, len(hitInputs))
 	for _, hitInput := range hitInputs {
+		hitInput.Target.OnBeforeSpellHit(sim, &hitInput)
 		result := action.calculateDirectCastDamage(sim, hitInput)
 		results = append(results, result)
 
 		if result.Hit {
 			// Apply any on spell hit effects.
 			action.OnSpellHit(sim, action, &result)
-			for _, id := range character.ActiveAuraIDs {
-				if character.Auras[id].OnSpellHit != nil {
-					character.Auras[id].OnSpellHit(sim, action, &result)
-				}
-			}
-			for _, id := range sim.ActiveAuraIDs {
-				if sim.Auras[id].OnSpellHit != nil {
-					sim.Auras[id].OnSpellHit(sim, action, &result)
-				}
-			}
+			character.OnSpellHit(sim, action, &result)
+			hitInput.Target.OnSpellHit(sim, action, &result)
 		} else {
 			action.OnSpellMiss(sim, action)
-			for _, id := range character.ActiveAuraIDs {
-				if character.Auras[id].OnSpellMiss != nil {
-					character.Auras[id].OnSpellMiss(sim, action)
-				}
-			}
-			for _, id := range sim.ActiveAuraIDs {
-				if sim.Auras[id].OnSpellMiss != nil {
-					sim.Auras[id].OnSpellMiss(sim, action)
-				}
-			}
+			character.OnSpellMiss(sim, action)
+			hitInput.Target.OnSpellMiss(sim, action)
 		}
-
 		if sim.Log != nil {
 			sim.Log("(%d) %s result: %s\n", character.ID, action.GetName(), result)
 		}
@@ -235,11 +215,13 @@ func (action DirectCastAction) internalOnCastComplete(sim *Simulation) {
 }
 
 func (action DirectCastAction) calculateDirectCastDamage(sim *Simulation, damageInput DirectCastDamageInput) DirectCastDamageResult {
-	result := DirectCastDamageResult{}
+	result := DirectCastDamageResult{
+		Target: damageInput.Target,
+	}
 
-	character := action.GetAgent().GetCharacter()
+	character := action.GetCharacter()
 
-	hit := 0.83 + character.Stats[stats.SpellHit]/(SpellHitRatingPerHitChance*100) + damageInput.BonusHit
+	hit := 0.83 + character.GetStat(stats.SpellHit)/(SpellHitRatingPerHitChance*100) + damageInput.BonusHit
 	hit = MinFloat(hit, 0.99) // can't get away from the 1% miss
 
 	if sim.Rando.Float64("action hit") >= hit { // Miss
@@ -248,13 +230,13 @@ func (action DirectCastAction) calculateDirectCastDamage(sim *Simulation, damage
 	result.Hit = true
 
 	baseDamage := damageInput.MinBaseDamage + sim.Rando.Float64("action dmg")*(damageInput.MaxBaseDamage - damageInput.MinBaseDamage)
-	totalSpellPower := character.Stats[stats.SpellPower] + character.Stats[action.GetSpellSchool()] + damageInput.BonusSpellPower
+	totalSpellPower := character.GetStat(stats.SpellPower) + character.GetStat(action.GetSpellSchool()) + damageInput.BonusSpellPower
 	damageFromSpellPower := (totalSpellPower * damageInput.SpellCoefficient)
 	damage := baseDamage + damageFromSpellPower
 
 	damage *= damageInput.DamageMultiplier
 
-	crit := (character.Stats[stats.SpellCrit] / (SpellCritRatingPerCritChance * 100)) + damageInput.BonusCrit
+	crit := (character.GetStat(stats.SpellCrit) / (SpellCritRatingPerCritChance * 100)) + damageInput.BonusCrit
 	if action.castInput.GuaranteedCrit || sim.Rando.Float64("action crit") < crit {
 		result.Crit = true
 		damage *= action.castInput.CritMultiplier
@@ -288,19 +270,15 @@ func NewDirectCastAction(sim *Simulation, impl DirectCastImpl) DirectCastAction 
 	action := DirectCastAction{
 		DirectCastImpl: impl,
 	}
+	character := action.GetCharacter()
 
-	character := action.GetAgent().GetCharacter()
 	cooldownID := action.GetActionID().CooldownID
 
 	castInput := impl.GetCastInput(sim, action)
-	castInput.CastTime = time.Duration(float64(castInput.CastTime) / impl.GetAgent().GetCharacter().HasteBonus())
+	castInput.CastTime = time.Duration(float64(castInput.CastTime) / character.HasteBonus())
 
 	// Apply on-cast effects.
-	for _, id := range character.ActiveAuraIDs {
-		if character.Auras[id].OnCast != nil {
-			character.Auras[id].OnCast(sim, action, &castInput)
-		}
-	}
+	character.OnCast(sim, action, &castInput)
 
 	// By panicking if spell is on CD, we force each sim to properly check for their own CDs.
 	if !castInput.IgnoreCooldowns {

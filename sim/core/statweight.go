@@ -6,7 +6,9 @@ import (
 	"math/rand"
 	"sync"
 
+	"github.com/wowsims/tbc/sim/core/proto"
 	"github.com/wowsims/tbc/sim/core/stats"
+	googleProto "google.golang.org/protobuf/proto"
 )
 
 type StatWeightsResult struct {
@@ -16,9 +18,13 @@ type StatWeightsResult struct {
 	EpValuesStdev stats.Stats
 }
 
-func CalcStatWeight(params IndividualParams, statsToWeigh []stats.Stat, referenceStat stats.Stat) StatWeightsResult {
-	baseSim := NewIndividualSim(params)
-	baseStats := baseSim.Raid.Parties[0].Players[0].GetCharacter().Stats
+func CalcStatWeight(isr proto.IndividualSimRequest, statsToWeigh []stats.Stat, referenceStat stats.Stat) StatWeightsResult {
+	if isr.Player.CustomStats == nil {
+		isr.Player.CustomStats = make([]float64, stats.Len)
+	}
+
+	baseSim := NewIndividualSim(isr)
+	baseStats := baseSim.Raid.Parties[0].Players[0].GetCharacter().GetStats()
 	baselineResult := baseSim.Run()
 
 	var waitGroup sync.WaitGroup
@@ -28,10 +34,12 @@ func CalcStatWeight(params IndividualParams, statsToWeigh []stats.Stat, referenc
 	doStat := func(stat stats.Stat, value float64) {
 		defer waitGroup.Done()
 
-		newParams := params
-		newParams.CustomStats[stat] += value
-		newSim := NewIndividualSim(newParams)
+		simRequest := googleProto.Clone(&isr).(*proto.IndividualSimRequest)
+		simRequest.Player.CustomStats[stat] += value
+
+		newSim := NewIndividualSim(*simRequest)
 		simResult := newSim.Run()
+
 		result.Weights[stat] = (simResult.Agents[0].DpsAvg - baselineResult.Agents[0].DpsAvg) / value
 		dpsHists[stat] = simResult.Agents[0].DpsHist
 	}
@@ -64,19 +72,19 @@ func CalcStatWeight(params IndividualParams, statsToWeigh []stats.Stat, referenc
 		stat := stats.Stat(statIdx)
 
 		result.EpValues[stat] = result.Weights[stat] / result.Weights[referenceStat]
-		result.WeightsStdev[stat] = computeStDevFromHists(params.Options.Iterations, mod, dpsHists[stat], baselineResult.Agents[0].DpsHist, nil, statMods[referenceStat])
-		result.EpValuesStdev[stat] = computeStDevFromHists(params.Options.Iterations, mod, dpsHists[stat], baselineResult.Agents[0].DpsHist, dpsHists[referenceStat], statMods[referenceStat])
+		result.WeightsStdev[stat] = computeStDevFromHists(isr.SimOptions.Iterations, mod, dpsHists[stat], baselineResult.Agents[0].DpsHist, nil, statMods[referenceStat])
+		result.EpValuesStdev[stat] = computeStDevFromHists(isr.SimOptions.Iterations, mod, dpsHists[stat], baselineResult.Agents[0].DpsHist, dpsHists[referenceStat], statMods[referenceStat])
 		log.Printf("%s Weight: %0.2f +/- %0.2f", stat.StatName(), result.Weights[stat], result.WeightsStdev[stat])
 	}
 
 	return result
 }
 
-func computeStDevFromHists(iters int, modValue float64, moddedStatDpsHist map[int32]int32, baselineDpsHist map[int32]int32, referenceDpsHist map[int32]int32, referenceModValue float64) float64 {
+func computeStDevFromHists(iters int32, modValue float64, moddedStatDpsHist map[int32]int32, baselineDpsHist map[int32]int32, referenceDpsHist map[int32]int32, referenceModValue float64) float64 {
 	sum := 0.0
 	sumSquared := 0.0
 	n := iters * 10
-	for i := 0; i < n; {
+	for i := int32(0); i < n; {
 		denominator := 1.0
 		if referenceDpsHist != nil {
 			denominator = float64(sampleFromDpsHist(referenceDpsHist, iters)-sampleFromDpsHist(baselineDpsHist, iters)) / referenceModValue
@@ -95,7 +103,7 @@ func computeStDevFromHists(iters int, modValue float64, moddedStatDpsHist map[in
 }
 
 // Picks a random value from a histogram, taking into account the bucket sizes.
-func sampleFromDpsHist(hist map[int32]int32, histNumSamples int) int32 {
+func sampleFromDpsHist(hist map[int32]int32, histNumSamples int32) int32 {
 	r := rand.Float64()
 	sampleIdx := int32(math.Floor(float64(histNumSamples) * r))
 

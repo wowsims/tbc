@@ -10,7 +10,7 @@ import (
 )
 
 type WaitAction struct {
-	agent Agent
+	character *Character
 
 	duration time.Duration
 }
@@ -29,8 +29,8 @@ func (action WaitAction) GetTag() int32 {
 	return 0
 }
 
-func (action WaitAction) GetAgent() Agent {
-	return action.agent
+func (action WaitAction) GetCharacter() *Character {
+	return action.character
 }
 
 func (action WaitAction) GetDuration() time.Duration {
@@ -49,9 +49,9 @@ func (action WaitAction) Act(sim *Simulation) bool {
 	return true
 }
 
-func NewWaitAction(sim *Simulation, agent Agent, duration time.Duration) WaitAction {
+func NewWaitAction(sim *Simulation, character *Character, duration time.Duration) WaitAction {
 	return WaitAction{
-		agent: agent,
+		character: character,
 		duration: duration,
 	}
 }
