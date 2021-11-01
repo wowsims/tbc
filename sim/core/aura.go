@@ -11,7 +11,10 @@ const NeverExpires = time.Duration(math.MaxInt64)
 
 type AuraID int32
 
-var numAuraIDs = 0
+// Reserve the default value so no aura uses it.
+const UnknownAuraID = AuraID(0)
+var numAuraIDs = 1
+
 func NewAuraID() AuraID {
 	newAuraID := AuraID(numAuraIDs)
 	numAuraIDs++
@@ -25,7 +28,10 @@ var DefensiveTrinketActiveAuraID = NewAuraID()
 
 type CooldownID int32
 
-var numCooldownIDs = 0
+// Reserve the default value so no cooldown uses it.
+const UnknownCooldownID = AuraID(0)
+var numCooldownIDs = 1
+
 func NewCooldownID() CooldownID {
 	newCooldownID := CooldownID(numCooldownIDs)
 	numCooldownIDs++
