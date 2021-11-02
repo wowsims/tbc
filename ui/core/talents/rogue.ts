@@ -466,6 +466,207 @@ export class RogueTalentsPicker extends TalentsPicker<Spec.SpecRogue> {
             spellIds: [13958, 13970],
             maxPoints: 5,
           },
+          {
+            fieldName: 'opportunity',
+            location: {
+              rowIdx: 0,
+              colIdx: 2,
+            },
+            spellIds: [14057, 14072],
+            maxPoints: 5,
+          },
+          {
+            //fieldName: 'sleightOfHand',
+            location: {
+              rowIdx: 1,
+              colIdx: 0,
+            },
+            spellIds: [30892],
+            maxPoints: 2,
+          },
+          {
+            //fieldName: 'dirtyTricks',
+            location: {
+              rowIdx: 1,
+              colIdx: 1,
+            },
+            spellIds: [14076, 14094],
+            maxPoints: 2,
+          },
+          {
+            //fieldName: 'camoflauge',
+            location: {
+              rowIdx: 1,
+              colIdx: 2,
+            },
+            spellIds: [13975, 14062],
+            maxPoints: 5,
+          },
+          {
+            fieldName: 'initiative',
+            location: {
+              rowIdx: 2,
+              colIdx: 0,
+            },
+            spellIds: [13976, 13979],
+            maxPoints: 3,
+          },
+          {
+            fieldName: 'ghostlyStrike',
+            location: {
+              rowIdx: 2,
+              colIdx: 1,
+            },
+            spellIds: [14278],
+            maxPoints: 1,
+          },
+          {
+            fieldName: 'improvedAmbush',
+            location: {
+              rowIdx: 2,
+              colIdx: 2,
+            },
+            spellIds: [14079],
+            maxPoints: 3,
+          },
+          {
+            //fieldName: 'setup',
+            location: {
+              rowIdx: 3,
+              colIdx: 0,
+            },
+            spellIds: [13983, 14070],
+            maxPoints: 3,
+          },
+          {
+            //fieldName: 'elusiveness',
+            location: {
+              rowIdx: 3,
+              colIdx: 1,
+            },
+            spellIds: [13981, 14066],
+            maxPoints: 2,
+          },
+          {
+            fieldName: 'serratedBlades',
+            location: {
+              rowIdx: 3,
+              colIdx: 2,
+            },
+            spellIds: [14171],
+            maxPoints: 3,
+          },
+          {
+            //fieldName: 'heightenedSenses',
+            location: {
+              rowIdx: 4,
+              colIdx: 0,
+            },
+            spellIds: [30894],
+            maxPoints: 2,
+          },
+          {
+            fieldName: 'preparation',
+            location: {
+              rowIdx: 4,
+              colIdx: 1,
+            },
+            spellIds: [14185],
+            maxPoints: 1,
+          },
+          {
+            fieldName: 'dirtyDeeds',
+            location: {
+              rowIdx: 4,
+              colIdx: 2,
+            },
+            spellIds: [14082],
+            maxPoints: 2,
+          },
+          {
+            fieldName: 'hemorrhage',
+            location: {
+              rowIdx: 4,
+              colIdx: 3,
+            },
+            prereqLocation: {
+              rowIdx: 3,
+              colIdx: 2,
+            },
+            spellIds: [16511],
+            maxPoints: 1,
+          },
+          {
+            fieldName: 'masterOfSubtlety',
+            location: {
+              rowIdx: 5,
+              colIdx: 0,
+            },
+            spellIds: [31221],
+            maxPoints: 3,
+          },
+          {
+            fieldName: 'deadliness',
+            location: {
+              rowIdx: 5,
+              colIdx: 2,
+            },
+            spellIds: [30902],
+            maxPoints: 5,
+          },
+          {
+            //fieldName: 'envelopingShadows',
+            location: {
+              rowIdx: 6,
+              colIdx: 0,
+            },
+            spellIds: [31211],
+            maxPoints: 3,
+          },
+          {
+            fieldName: 'premeditation',
+            location: {
+              rowIdx: 6,
+              colIdx: 1,
+            },
+            prereqLocation: {
+              rowIdx: 4,
+              colIdx: 1,
+            },
+            spellIds: [14183],
+            maxPoints: 1,
+          },
+          {
+            //fieldName: 'cheatDeath',
+            location: {
+              rowIdx: 6,
+              colIdx: 2,
+            },
+            spellIds: [31228],
+            maxPoints: 3,
+          },
+          {
+            fieldName: 'sinisterCalling',
+            location: {
+              rowIdx: 7,
+              colIdx: 1,
+            },
+            prereqLocation: {
+              rowIdx: 6,
+              colIdx: 1,
+            },
+            spellIds: [31216],
+            maxPoints: 1,
+          },
+          {
+            fieldName: 'shadowstep',
+            location: {
+              rowIdx: 8,
+              colIdx: 1,
+            },
+            spellIds: [36554],
+            maxPoints: 1,
+          },
         ],
       },
     ]);
