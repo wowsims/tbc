@@ -7,6 +7,7 @@ import { DruidTalentsPicker } from './druid.js';
 import { MageTalentsPicker } from './mage.js';
 import { PaladinTalentsPicker } from './paladin.js';
 import { PriestTalentsPicker } from './priest.js';
+import { RogueTalentsPicker } from './rogue.js';
 import { ShamanTalentsPicker } from './shaman.js';
 import { WarlockTalentsPicker } from './warlock.js';
 import { WarriorTalentsPicker } from './warrior.js';
@@ -25,6 +26,9 @@ export function newTalentsPicker<SpecType extends Spec>(spec: Spec, parent: HTML
       break;
     case Spec.SpecRetributionPaladin:
       return new PaladinTalentsPicker(parent, player as Player<Spec.SpecRetributionPaladin>) as TalentsPicker<SpecType>;
+      break;
+    case Spec.SpecRogue:
+      return new RogueTalentsPicker(parent, player as Player<Spec.SpecRogue>) as TalentsPicker<SpecType>;
       break;
     case Spec.SpecShadowPriest:
       return new PriestTalentsPicker(parent, player as Player<Spec.SpecShadowPriest>) as TalentsPicker<SpecType>;

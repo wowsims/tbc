@@ -18,6 +18,7 @@ import { WeaponType } from '/tbc/core/proto/common.js';
 import { BalanceDruid, BalanceDruid_Rotation as BalanceDruidRotation, DruidTalents, BalanceDruid_Options as BalanceDruidOptions} from '/tbc/core/proto/druid.js';
 import { ElementalShaman, ElementalShaman_Rotation as ElementalShamanRotation, ShamanTalents, ElementalShaman_Options as ElementalShamanOptions } from '/tbc/core/proto/shaman.js';
 import { Mage, Mage_Rotation as MageRotation, MageTalents, Mage_Options as MageOptions } from '/tbc/core/proto/mage.js';
+import { Rogue, Rogue_Rotation as RogueRotation, RogueTalents, Rogue_Options as RogueOptions } from '/tbc/core/proto/rogue.js';
 import { RetributionPaladin, RetributionPaladin_Rotation as RetributionPaladinRotation, PaladinTalents, RetributionPaladin_Options as RetributionPaladinOptions } from '/tbc/core/proto/paladin.js';
 import { ShadowPriest, ShadowPriest_Rotation as ShadowPriestRotation, PriestTalents, ShadowPriest_Options as ShadowPriestOptions } from '/tbc/core/proto/priest.js';
 import { Warlock, Warlock_Rotation as WarlockRotation, WarlockTalents, Warlock_Options as WarlockOptions } from '/tbc/core/proto/warlock.js';
@@ -25,6 +26,7 @@ import { Warrior, Warrior_Rotation as WarriorRotation, WarriorTalents, Warrior_O
 
 export type DruidSpecs = Spec.SpecBalanceDruid;
 export type MageSpecs = Spec.SpecMage;
+export type RogueSpecs = Spec.SpecRogue;
 export type PaladinSpecs = Spec.SpecRetributionPaladin;
 export type PriestSpecs = Spec.SpecShadowPriest;
 export type ShamanSpecs = Spec.SpecElementalShaman;
@@ -35,6 +37,7 @@ export type RotationUnion =
 		BalanceDruidRotation |
 		ElementalShamanRotation |
 		MageRotation |
+		RogueRotation |
 		RetributionPaladinRotation |
 		ShadowPriestRotation |
 		WarlockRotation |
@@ -43,6 +46,7 @@ export type SpecRotation<T extends Spec> =
 		T extends Spec.SpecBalanceDruid ? BalanceDruidRotation :
 		T extends Spec.SpecElementalShaman ? ElementalShamanRotation :
 		T extends Spec.SpecMage ? MageRotation :
+		T extends Spec.SpecRogue ? RogueRotation :
 		T extends Spec.SpecRetributionPaladin ? RetributionPaladinRotation :
 		T extends Spec.SpecShadowPriest ? ShadowPriestRotation :
 		T extends Spec.SpecWarlock ? WarlockRotation :
@@ -52,6 +56,7 @@ export type SpecRotation<T extends Spec> =
 export type TalentsUnion =
 		DruidTalents |
 		MageTalents |
+		RogueTalents |
 		PaladinTalents |
 		PriestTalents |
 		ShamanTalents |
@@ -61,6 +66,7 @@ export type SpecTalents<T extends Spec> =
 		T extends Spec.SpecBalanceDruid ? DruidTalents :
 		T extends Spec.SpecElementalShaman ? ShamanTalents :
 		T extends Spec.SpecMage ? MageTalents :
+		T extends Spec.SpecRogue ? RogueTalents :
 		T extends Spec.SpecRetributionPaladin ? PaladinTalents :
 		T extends Spec.SpecShadowPriest ? PriestTalents :
 		T extends Spec.SpecWarlock ? WarlockTalents :
@@ -71,6 +77,7 @@ export type SpecOptionsUnion =
 		BalanceDruidOptions |
 		ElementalShamanOptions |
 		MageOptions |
+		RogueOptions |
 		RetributionPaladinOptions |
 		ShadowPriestOptions |
 		WarlockOptions |
@@ -79,6 +86,7 @@ export type SpecOptions<T extends Spec> =
 		T extends Spec.SpecBalanceDruid ? BalanceDruidOptions :
 		T extends Spec.SpecElementalShaman ? ElementalShamanOptions :
 		T extends Spec.SpecMage ? MageOptions :
+		T extends Spec.SpecRogue ? RogueOptions :
 		T extends Spec.SpecRetributionPaladin ? RetributionPaladinOptions :
 		T extends Spec.SpecShadowPriest ? ShadowPriestOptions :
 		T extends Spec.SpecWarlock ? WarlockOptions :
@@ -89,6 +97,7 @@ export type SpecProtoUnion =
 		BalanceDruid |
 		ElementalShaman |
 		Mage |
+		Rogue |
 		RetributionPaladin |
 		ShadowPriest |
 		Warlock |
@@ -97,6 +106,7 @@ export type SpecProto<T extends Spec> =
 		T extends Spec.SpecBalanceDruid ? BalanceDruid :
 		T extends Spec.SpecElementalShaman ? ElementalShaman :
 		T extends Spec.SpecMage ? Mage :
+		T extends Spec.SpecRogue ? Rogue :
 		T extends Spec.SpecRetributionPaladin ? RetributionPaladin :
 		T extends Spec.SpecShadowPriest ? ShadowPriest :
 		T extends Spec.SpecWarlock ? Warlock :
@@ -200,6 +210,25 @@ export const specTypeFunctions: Partial<Record<Spec, SpecTypeFunctions<any>>> = 
     optionsToJson: (a) => RetributionPaladinOptions.toJson(a as RetributionPaladinOptions),
     optionsFromJson: (obj) => RetributionPaladinOptions.fromJson(obj),
   },
+  [Spec.SpecRogue]: {
+    rotationCreate: () => RogueRotation.create(),
+    rotationEquals: (a, b) => RogueRotation.equals(a as RogueRotation, b as RogueRotation),
+    rotationCopy: (a) => RogueRotation.clone(a as RogueRotation),
+    rotationToJson: (a) => RogueRotation.toJson(a as RogueRotation),
+    rotationFromJson: (obj) => RogueRotation.fromJson(obj),
+
+    talentsCreate: () => RogueTalents.create(),
+    talentsEquals: (a, b) => RogueTalents.equals(a as RogueTalents, b as RogueTalents),
+    talentsCopy: (a) => RogueTalents.clone(a as RogueTalents),
+    talentsToJson: (a) => RogueTalents.toJson(a as RogueTalents),
+    talentsFromJson: (obj) => RogueTalents.fromJson(obj),
+
+    optionsCreate: () => RogueOptions.create(),
+    optionsEquals: (a, b) => RogueOptions.equals(a as RogueOptions, b as RogueOptions),
+    optionsCopy: (a) => RogueOptions.clone(a as RogueOptions),
+    optionsToJson: (a) => RogueOptions.toJson(a as RogueOptions),
+    optionsFromJson: (obj) => RogueOptions.fromJson(obj),
+  },
   [Spec.SpecShadowPriest]: {
     rotationCreate: () => ShadowPriestRotation.create(),
     rotationEquals: (a, b) => ShadowPriestRotation.equals(a as ShadowPriestRotation, b as ShadowPriestRotation),
@@ -263,6 +292,7 @@ export const specToClass: Record<Spec, Class> = {
   [Spec.SpecBalanceDruid]: Class.ClassDruid,
   [Spec.SpecElementalShaman]: Class.ClassShaman,
   [Spec.SpecMage]: Class.ClassMage,
+  [Spec.SpecRogue]: Class.ClassRogue,
   [Spec.SpecRetributionPaladin]: Class.ClassPaladin,
   [Spec.SpecShadowPriest]: Class.ClassPriest,
   [Spec.SpecWarlock]: Class.ClassWarlock,
@@ -292,6 +322,17 @@ const priestRaces = [
     Race.RaceBloodElf,
     Race.RaceDraenei,
     Race.RaceDwarf,
+    Race.RaceHuman,
+    Race.RaceNightElf,
+    Race.RaceOrc,
+    Race.RaceTroll10,
+    Race.RaceTroll30,
+    Race.RaceUndead,
+];
+const rogueRaces = [
+    Race.RaceBloodElf,
+    Race.RaceDwarf,
+    Race.RaceGnome,
     Race.RaceHuman,
     Race.RaceNightElf,
     Race.RaceOrc,
@@ -332,6 +373,7 @@ export const specToEligibleRaces: Record<Spec, Array<Race>> = {
   [Spec.SpecElementalShaman]: shamanRaces,
   [Spec.SpecMage]: mageRaces,
   [Spec.SpecRetributionPaladin]: paladinRaces,
+  [Spec.SpecRogue]: rogueRaces,
   [Spec.SpecShadowPriest]: priestRaces,
   [Spec.SpecWarlock]: warlockRaces,
   [Spec.SpecWarrior]: warriorRaces,
@@ -344,6 +386,7 @@ export const specToLocalStorageKey: Record<Spec, string> = {
   [Spec.SpecElementalShaman]: '__elemental_shaman',
   [Spec.SpecMage]: '__mage',
   [Spec.SpecRetributionPaladin]: '__retribution_paladin',
+  [Spec.SpecRogue]: '__rogue',
   [Spec.SpecShadowPriest]: '__shadow_priest',
   [Spec.SpecWarlock]: '__warlock',
   [Spec.SpecWarrior]: '__warrior',
@@ -394,6 +437,16 @@ export function withSpecProto<SpecType extends Spec>(
         rotation: rotation,
         talents: talents as PaladinTalents,
         options: specOptions as RetributionPaladinOptions,
+      }),
+    };
+  } else if (RogueRotation.is(rotation)) {
+		copy.class = Class.ClassRogue;
+    copy.spec = {
+      oneofKind: 'rogue',
+      rogue: Rogue.create({
+        rotation: rotation,
+        talents: talents as RogueTalents,
+        options: specOptions as RogueOptions,
       }),
     };
   } else if (ShadowPriestRotation.is(rotation)) {
