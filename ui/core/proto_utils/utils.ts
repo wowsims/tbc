@@ -17,6 +17,7 @@ import { WeaponType } from '/tbc/core/proto/common.js';
 
 import { BalanceDruid, BalanceDruid_Rotation as BalanceDruidRotation, DruidTalents, BalanceDruid_Options as BalanceDruidOptions} from '/tbc/core/proto/druid.js';
 import { ElementalShaman, ElementalShaman_Rotation as ElementalShamanRotation, ShamanTalents, ElementalShaman_Options as ElementalShamanOptions } from '/tbc/core/proto/shaman.js';
+import { Hunter, Hunter_Rotation as HunterRotation, HunterTalents, Hunter_Options as HunterOptions } from '/tbc/core/proto/hunter.js';
 import { Mage, Mage_Rotation as MageRotation, MageTalents, Mage_Options as MageOptions } from '/tbc/core/proto/mage.js';
 import { Rogue, Rogue_Rotation as RogueRotation, RogueTalents, Rogue_Options as RogueOptions } from '/tbc/core/proto/rogue.js';
 import { RetributionPaladin, RetributionPaladin_Rotation as RetributionPaladinRotation, PaladinTalents, RetributionPaladin_Options as RetributionPaladinOptions } from '/tbc/core/proto/paladin.js';
@@ -25,6 +26,7 @@ import { Warlock, Warlock_Rotation as WarlockRotation, WarlockTalents, Warlock_O
 import { Warrior, Warrior_Rotation as WarriorRotation, WarriorTalents, Warrior_Options as WarriorOptions } from '/tbc/core/proto/warrior.js';
 
 export type DruidSpecs = Spec.SpecBalanceDruid;
+export type HunterSpecs = Spec.SpecHunter;
 export type MageSpecs = Spec.SpecMage;
 export type RogueSpecs = Spec.SpecRogue;
 export type PaladinSpecs = Spec.SpecRetributionPaladin;
@@ -36,6 +38,7 @@ export type WarriorSpecs = Spec.SpecWarrior;
 export type RotationUnion =
 		BalanceDruidRotation |
 		ElementalShamanRotation |
+		HunterRotation |
 		MageRotation |
 		RogueRotation |
 		RetributionPaladinRotation |
@@ -45,6 +48,7 @@ export type RotationUnion =
 export type SpecRotation<T extends Spec> =
 		T extends Spec.SpecBalanceDruid ? BalanceDruidRotation :
 		T extends Spec.SpecElementalShaman ? ElementalShamanRotation :
+		T extends Spec.SpecHunter ? HunterRotation :
 		T extends Spec.SpecMage ? MageRotation :
 		T extends Spec.SpecRogue ? RogueRotation :
 		T extends Spec.SpecRetributionPaladin ? RetributionPaladinRotation :
@@ -55,6 +59,7 @@ export type SpecRotation<T extends Spec> =
 
 export type TalentsUnion =
 		DruidTalents |
+		HunterTalents |
 		MageTalents |
 		RogueTalents |
 		PaladinTalents |
@@ -65,6 +70,7 @@ export type TalentsUnion =
 export type SpecTalents<T extends Spec> =
 		T extends Spec.SpecBalanceDruid ? DruidTalents :
 		T extends Spec.SpecElementalShaman ? ShamanTalents :
+		T extends Spec.SpecHunter ? HunterTalents :
 		T extends Spec.SpecMage ? MageTalents :
 		T extends Spec.SpecRogue ? RogueTalents :
 		T extends Spec.SpecRetributionPaladin ? PaladinTalents :
@@ -76,6 +82,7 @@ export type SpecTalents<T extends Spec> =
 export type SpecOptionsUnion =
 		BalanceDruidOptions |
 		ElementalShamanOptions |
+		HunterOptions |
 		MageOptions |
 		RogueOptions |
 		RetributionPaladinOptions |
@@ -85,6 +92,7 @@ export type SpecOptionsUnion =
 export type SpecOptions<T extends Spec> =
 		T extends Spec.SpecBalanceDruid ? BalanceDruidOptions :
 		T extends Spec.SpecElementalShaman ? ElementalShamanOptions :
+		T extends Spec.SpecHunter ? HunterOptions :
 		T extends Spec.SpecMage ? MageOptions :
 		T extends Spec.SpecRogue ? RogueOptions :
 		T extends Spec.SpecRetributionPaladin ? RetributionPaladinOptions :
@@ -96,6 +104,7 @@ export type SpecOptions<T extends Spec> =
 export type SpecProtoUnion =
 		BalanceDruid |
 		ElementalShaman |
+		Hunter |
 		Mage |
 		Rogue |
 		RetributionPaladin |
@@ -105,6 +114,7 @@ export type SpecProtoUnion =
 export type SpecProto<T extends Spec> =
 		T extends Spec.SpecBalanceDruid ? BalanceDruid :
 		T extends Spec.SpecElementalShaman ? ElementalShaman :
+		T extends Spec.SpecHunter ? Hunter :
 		T extends Spec.SpecMage ? Mage :
 		T extends Spec.SpecRogue ? Rogue :
 		T extends Spec.SpecRetributionPaladin ? RetributionPaladin :
@@ -171,6 +181,25 @@ export const specTypeFunctions: Partial<Record<Spec, SpecTypeFunctions<any>>> = 
     optionsCopy: (a) => ElementalShamanOptions.clone(a as ElementalShamanOptions),
     optionsToJson: (a) => ElementalShamanOptions.toJson(a as ElementalShamanOptions),
     optionsFromJson: (obj) => ElementalShamanOptions.fromJson(obj),
+  },
+  [Spec.SpecHunter]: {
+    rotationCreate: () => HunterRotation.create(),
+    rotationEquals: (a, b) => HunterRotation.equals(a as HunterRotation, b as HunterRotation),
+    rotationCopy: (a) => HunterRotation.clone(a as HunterRotation),
+    rotationToJson: (a) => HunterRotation.toJson(a as HunterRotation),
+    rotationFromJson: (obj) => HunterRotation.fromJson(obj),
+
+    talentsCreate: () => HunterTalents.create(),
+    talentsEquals: (a, b) => HunterTalents.equals(a as HunterTalents, b as HunterTalents),
+    talentsCopy: (a) => HunterTalents.clone(a as HunterTalents),
+    talentsToJson: (a) => HunterTalents.toJson(a as HunterTalents),
+    talentsFromJson: (obj) => HunterTalents.fromJson(obj),
+
+    optionsCreate: () => HunterOptions.create(),
+    optionsEquals: (a, b) => HunterOptions.equals(a as HunterOptions, b as HunterOptions),
+    optionsCopy: (a) => HunterOptions.clone(a as HunterOptions),
+    optionsToJson: (a) => HunterOptions.toJson(a as HunterOptions),
+    optionsFromJson: (obj) => HunterOptions.fromJson(obj),
   },
   [Spec.SpecMage]: {
     rotationCreate: () => MageRotation.create(),
@@ -291,6 +320,7 @@ export const specTypeFunctions: Partial<Record<Spec, SpecTypeFunctions<any>>> = 
 export const specToClass: Record<Spec, Class> = {
   [Spec.SpecBalanceDruid]: Class.ClassDruid,
   [Spec.SpecElementalShaman]: Class.ClassShaman,
+  [Spec.SpecHunter]: Class.ClassHunter,
   [Spec.SpecMage]: Class.ClassMage,
   [Spec.SpecRogue]: Class.ClassRogue,
   [Spec.SpecRetributionPaladin]: Class.ClassPaladin,
@@ -302,6 +332,16 @@ export const specToClass: Record<Spec, Class> = {
 const druidRaces = [
     Race.RaceNightElf,
     Race.RaceTauren,
+];
+const hunterRaces = [
+    Race.RaceBloodElf,
+    Race.RaceDraenei,
+    Race.RaceDwarf,
+    Race.RaceNightElf,
+    Race.RaceOrc,
+    Race.RaceTauren,
+    Race.RaceTroll10,
+    Race.RaceTroll30,
 ];
 const mageRaces = [
     Race.RaceBloodElf,
@@ -371,6 +411,7 @@ const warriorRaces = [
 export const specToEligibleRaces: Record<Spec, Array<Race>> = {
   [Spec.SpecBalanceDruid]: druidRaces,
   [Spec.SpecElementalShaman]: shamanRaces,
+  [Spec.SpecHunter]: hunterRaces,
   [Spec.SpecMage]: mageRaces,
   [Spec.SpecRetributionPaladin]: paladinRaces,
   [Spec.SpecRogue]: rogueRaces,
@@ -384,6 +425,7 @@ export const specToEligibleRaces: Record<Spec, Array<Race>> = {
 export const specToLocalStorageKey: Record<Spec, string> = {
   [Spec.SpecBalanceDruid]: '__balance_druid',
   [Spec.SpecElementalShaman]: '__elemental_shaman',
+  [Spec.SpecHunter]: '__hunter',
   [Spec.SpecMage]: '__mage',
   [Spec.SpecRetributionPaladin]: '__retribution_paladin',
   [Spec.SpecRogue]: '__rogue',
@@ -417,6 +459,16 @@ export function withSpecProto<SpecType extends Spec>(
         rotation: rotation,
         talents: talents as ShamanTalents,
         options: specOptions as ElementalShamanOptions,
+      }),
+    };
+  } else if (HunterRotation.is(rotation)) {
+		copy.class = Class.ClassHunter;
+    copy.spec = {
+      oneofKind: 'hunter',
+      hunter: Hunter.create({
+        rotation: rotation,
+        talents: talents as HunterTalents,
+        options: specOptions as HunterOptions,
       }),
     };
   } else if (MageRotation.is(rotation)) {

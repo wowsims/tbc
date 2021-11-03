@@ -5,6 +5,7 @@ option go_package = "./proto";
 
 import "common.proto";
 import "druid.proto";
+import "hunter.proto";
 import "mage.proto";
 import "paladin.proto";
 import "priest.proto";
@@ -30,9 +31,6 @@ message PlayerOptions {
     }
 
     Consumes consumes = 12; // What consumes this player is going to be using.
-}
-
-message Hunter {
 }
 
 message Player {
