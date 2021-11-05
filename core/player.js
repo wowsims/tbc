@@ -26,7 +26,6 @@ export class Player {
         this.specOptionsChangeEmitter = new TypedEvent();
         // Emits when any of the above emitters emit.
         this.changeEmitter = new TypedEvent();
-        this.gearListEmitter = new TypedEvent();
         this.characterStatsEmitter = new TypedEvent();
         this.sim = sim;
         this.spec = config.spec;

@@ -68,7 +68,7 @@ class ItemPicker extends Component {
         this.enchantElem = this.rootElem.getElementsByClassName('item-picker-enchant')[0];
         this.socketsContainerElem = this.rootElem.getElementsByClassName('item-picker-sockets-container')[0];
         this.item = null;
-        player.gearListEmitter.on(() => {
+        player.sim.gearListEmitter.on(() => {
             this._items = this.player.sim.getItems(this.slot);
             this._enchants = this.player.sim.getEnchants(this.slot);
             this.iconElem.addEventListener('click', event => {

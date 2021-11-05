@@ -45,7 +45,6 @@ export declare class Player<SpecType extends Spec> {
     readonly talentsStringChangeEmitter: TypedEvent<void>;
     readonly specOptionsChangeEmitter: TypedEvent<void>;
     readonly changeEmitter: TypedEvent<void>;
-    readonly gearListEmitter: TypedEvent<void>;
     readonly characterStatsEmitter: TypedEvent<void>;
     private _currentStats;
     private _consumes;
