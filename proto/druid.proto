@@ -4,7 +4,50 @@ package proto;
 option go_package = "./proto";
 
 message DruidTalents {
+		// Balance
     int32 starlight_wrath = 1;
+    int32 focused_starlight = 2;
+    int32 improved_moonfire = 3;
+    int32 brambles = 4;
+    bool insect_swarm = 5;
+    int32 vengeance = 6;
+    int32 lunar_guidance = 7;
+    bool natures_grace = 8;
+    int32 moonglow = 9;
+    int32 moonfury = 10;
+    int32 balance_of_power = 11;
+    int32 dreamstate = 12;
+    bool moonkin_form = 13;
+    int32 improved_faerie_fire = 14;
+    int32 wrath_of_cenarius = 15;
+    bool force_of_nature = 16;
+
+		// Feral Combat
+    int32 ferocity = 17;
+    int32 feral_aggresion = 18;
+    int32 sharpened_claws = 19;
+    int32 shredding_attacks = 20;
+    int32 predatory_strikes = 21;
+    int32 primal_fury = 22;
+    int32 savage_fury = 23;
+    bool faerie_fire = 24;
+    int32 heart_of_the_wild = 25;
+    int32 survival_of_the_fittest = 26;
+    int32 leader_of_the_pack = 27;
+    int32 improved_leader_of_the_pack = 28;
+    int32 predatory_instincts = 29;
+    bool mangle = 30;
+
+		// Restoration
+    int32 improved_mark_of_the_wild = 31;
+    int32 furor = 32;
+    int32 naturalist = 33;
+    int32 natural_shapeshifter = 34;
+    int32 intensity = 35;
+    bool omen_of_clarity = 36;
+    bool natures_swiftness = 37;
+    int32 living_spirit = 38;
+    int32 natural_perfection = 39;
 }
 
 message BalanceDruid {

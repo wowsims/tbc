@@ -1,0 +1,68 @@
+syntax = "proto3";
+package proto;
+
+option go_package = "./proto";
+
+message WarriorTalents {
+	// Arms
+	int32 improved_heroic_strike = 1;
+	int32 improved_rend = 2;
+	int32 improved_charge = 3;
+	int32 improved_thunder_clap = 4;
+	int32 improved_overpower = 5;
+	bool anger_management = 6;
+	int32 deep_wounds = 7;
+	int32 two_handed_weapon_specialization = 8;
+	int32 impale = 9;
+	int32 poleaxe_specialization = 10;
+	bool death_wish = 11;
+	int32 mace_specialization = 12;
+	int32 sword_specialization = 13;
+	int32 improved_disciplines = 14;
+	int32 blood_frenzy = 15;
+	bool mortal_strike = 16;
+	int32 improved_mortal_strike = 17;
+	bool endless_rage = 18;
+
+	// Fury
+	int32 booming_voice = 19;
+	int32 cruelty = 20;
+	int32 unbridled_wrath = 21;
+	int32 improved_cleave = 22;
+	int32 commanding_presence = 23;
+	int32 dual_wield_specialization = 24;
+	int32 improved_execute = 25;
+	int32 improved_slam = 26;
+	bool sweeping_strikes = 27;
+	int32 weapon_mastery = 28;
+	int32 improved_berserker_rage = 29;
+	int32 flurry = 30;
+	int32 precision = 31;
+	bool bloodthirst = 32;
+	int32 improved_whirlwind = 33;
+	int32 improved_berserker_stance = 34;
+	bool rampage = 35;
+
+	// Protection
+	int32 improved_bloodrage = 36;
+	int32 tactical_mastery = 37;
+	int32 defiance = 38;
+	int32 improved_sunder_armor = 39;
+	int32 one_handed_weapon_specialization = 40;
+	bool shield_slam = 41;
+	int32 focused_rage = 42;
+	int32 vitality = 43;
+	bool devastate = 44;
+}
+
+message Warrior {
+    message Rotation {
+    }
+    Rotation rotation = 1;
+
+    WarriorTalents talents = 2;
+    
+    message Options {
+    }
+    Options options = 3;
+}

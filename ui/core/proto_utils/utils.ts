@@ -17,20 +17,111 @@ import { WeaponType } from '/tbc/core/proto/common.js';
 
 import { BalanceDruid, BalanceDruid_Rotation as BalanceDruidRotation, DruidTalents, BalanceDruid_Options as BalanceDruidOptions} from '/tbc/core/proto/druid.js';
 import { ElementalShaman, ElementalShaman_Rotation as ElementalShamanRotation, ShamanTalents, ElementalShaman_Options as ElementalShamanOptions } from '/tbc/core/proto/shaman.js';
+import { Hunter, Hunter_Rotation as HunterRotation, HunterTalents, Hunter_Options as HunterOptions } from '/tbc/core/proto/hunter.js';
+import { Mage, Mage_Rotation as MageRotation, MageTalents, Mage_Options as MageOptions } from '/tbc/core/proto/mage.js';
+import { Rogue, Rogue_Rotation as RogueRotation, RogueTalents, Rogue_Options as RogueOptions } from '/tbc/core/proto/rogue.js';
+import { RetributionPaladin, RetributionPaladin_Rotation as RetributionPaladinRotation, PaladinTalents, RetributionPaladin_Options as RetributionPaladinOptions } from '/tbc/core/proto/paladin.js';
+import { ShadowPriest, ShadowPriest_Rotation as ShadowPriestRotation, PriestTalents, ShadowPriest_Options as ShadowPriestOptions } from '/tbc/core/proto/priest.js';
+import { Warlock, Warlock_Rotation as WarlockRotation, WarlockTalents, Warlock_Options as WarlockOptions } from '/tbc/core/proto/warlock.js';
+import { Warrior, Warrior_Rotation as WarriorRotation, WarriorTalents, Warrior_Options as WarriorOptions } from '/tbc/core/proto/warrior.js';
 
+export type DruidSpecs = Spec.SpecBalanceDruid;
+export type HunterSpecs = Spec.SpecHunter;
+export type MageSpecs = Spec.SpecMage;
+export type RogueSpecs = Spec.SpecRogue;
+export type PaladinSpecs = Spec.SpecRetributionPaladin;
+export type PriestSpecs = Spec.SpecShadowPriest;
 export type ShamanSpecs = Spec.SpecElementalShaman;
+export type WarlockSpecs = Spec.SpecWarlock;
+export type WarriorSpecs = Spec.SpecWarrior;
 
-export type RotationUnion = BalanceDruidRotation | ElementalShamanRotation;
-export type SpecRotation<T extends Spec> = T extends Spec.SpecBalanceDruid ? BalanceDruidRotation : ElementalShamanRotation;
+export type RotationUnion =
+		BalanceDruidRotation |
+		ElementalShamanRotation |
+		HunterRotation |
+		MageRotation |
+		RogueRotation |
+		RetributionPaladinRotation |
+		ShadowPriestRotation |
+		WarlockRotation |
+		WarriorRotation;
+export type SpecRotation<T extends Spec> =
+		T extends Spec.SpecBalanceDruid ? BalanceDruidRotation :
+		T extends Spec.SpecElementalShaman ? ElementalShamanRotation :
+		T extends Spec.SpecHunter ? HunterRotation :
+		T extends Spec.SpecMage ? MageRotation :
+		T extends Spec.SpecRogue ? RogueRotation :
+		T extends Spec.SpecRetributionPaladin ? RetributionPaladinRotation :
+		T extends Spec.SpecShadowPriest ? ShadowPriestRotation :
+		T extends Spec.SpecWarlock ? WarlockRotation :
+		T extends Spec.SpecWarrior ? WarriorRotation :
+		ElementalShamanRotation; // Should never reach this case
 
-export type TalentsUnion = DruidTalents | ShamanTalents;
-export type SpecTalents<T extends Spec> = T extends Spec.SpecBalanceDruid ? DruidTalents: ShamanTalents;
+export type TalentsUnion =
+		DruidTalents |
+		HunterTalents |
+		MageTalents |
+		RogueTalents |
+		PaladinTalents |
+		PriestTalents |
+		ShamanTalents |
+		WarlockTalents |
+		WarriorTalents;
+export type SpecTalents<T extends Spec> =
+		T extends Spec.SpecBalanceDruid ? DruidTalents :
+		T extends Spec.SpecElementalShaman ? ShamanTalents :
+		T extends Spec.SpecHunter ? HunterTalents :
+		T extends Spec.SpecMage ? MageTalents :
+		T extends Spec.SpecRogue ? RogueTalents :
+		T extends Spec.SpecRetributionPaladin ? PaladinTalents :
+		T extends Spec.SpecShadowPriest ? PriestTalents :
+		T extends Spec.SpecWarlock ? WarlockTalents :
+		T extends Spec.SpecWarrior ? WarriorTalents :
+		ShamanTalents; // Should never reach this case
 
-export type SpecOptionsUnion = BalanceDruidOptions | ElementalShamanOptions;
-export type SpecOptions<T extends Spec> = T extends Spec.SpecBalanceDruid ? BalanceDruidOptions : ElementalShamanOptions;
+export type SpecOptionsUnion =
+		BalanceDruidOptions |
+		ElementalShamanOptions |
+		HunterOptions |
+		MageOptions |
+		RogueOptions |
+		RetributionPaladinOptions |
+		ShadowPriestOptions |
+		WarlockOptions |
+		WarriorOptions;
+export type SpecOptions<T extends Spec> =
+		T extends Spec.SpecBalanceDruid ? BalanceDruidOptions :
+		T extends Spec.SpecElementalShaman ? ElementalShamanOptions :
+		T extends Spec.SpecHunter ? HunterOptions :
+		T extends Spec.SpecMage ? MageOptions :
+		T extends Spec.SpecRogue ? RogueOptions :
+		T extends Spec.SpecRetributionPaladin ? RetributionPaladinOptions :
+		T extends Spec.SpecShadowPriest ? ShadowPriestOptions :
+		T extends Spec.SpecWarlock ? WarlockOptions :
+		T extends Spec.SpecWarrior ? WarriorOptions :
+		ElementalShamanOptions; // Should never reach this case
 
-export type SpecProtoUnion = BalanceDruid | ElementalShaman;
-export type SpecProto<T extends Spec> = T extends Spec.SpecBalanceDruid ? BalanceDruid : ElementalShaman;
+export type SpecProtoUnion =
+		BalanceDruid |
+		ElementalShaman |
+		Hunter |
+		Mage |
+		Rogue |
+		RetributionPaladin |
+		ShadowPriest |
+		Warlock |
+		Warrior;
+export type SpecProto<T extends Spec> =
+		T extends Spec.SpecBalanceDruid ? BalanceDruid :
+		T extends Spec.SpecElementalShaman ? ElementalShaman :
+		T extends Spec.SpecHunter ? Hunter :
+		T extends Spec.SpecMage ? Mage :
+		T extends Spec.SpecRogue ? Rogue :
+		T extends Spec.SpecRetributionPaladin ? RetributionPaladin :
+		T extends Spec.SpecShadowPriest ? ShadowPriest :
+		T extends Spec.SpecWarlock ? Warlock :
+		T extends Spec.SpecWarrior ? Warrior :
+		ElementalShaman; // Should never reach this case
 
 export type SpecTypeFunctions<SpecType extends Spec> = {
   rotationCreate: () => SpecRotation<SpecType>;
@@ -91,16 +182,203 @@ export const specTypeFunctions: Partial<Record<Spec, SpecTypeFunctions<any>>> = 
     optionsToJson: (a) => ElementalShamanOptions.toJson(a as ElementalShamanOptions),
     optionsFromJson: (obj) => ElementalShamanOptions.fromJson(obj),
   },
+  [Spec.SpecHunter]: {
+    rotationCreate: () => HunterRotation.create(),
+    rotationEquals: (a, b) => HunterRotation.equals(a as HunterRotation, b as HunterRotation),
+    rotationCopy: (a) => HunterRotation.clone(a as HunterRotation),
+    rotationToJson: (a) => HunterRotation.toJson(a as HunterRotation),
+    rotationFromJson: (obj) => HunterRotation.fromJson(obj),
+
+    talentsCreate: () => HunterTalents.create(),
+    talentsEquals: (a, b) => HunterTalents.equals(a as HunterTalents, b as HunterTalents),
+    talentsCopy: (a) => HunterTalents.clone(a as HunterTalents),
+    talentsToJson: (a) => HunterTalents.toJson(a as HunterTalents),
+    talentsFromJson: (obj) => HunterTalents.fromJson(obj),
+
+    optionsCreate: () => HunterOptions.create(),
+    optionsEquals: (a, b) => HunterOptions.equals(a as HunterOptions, b as HunterOptions),
+    optionsCopy: (a) => HunterOptions.clone(a as HunterOptions),
+    optionsToJson: (a) => HunterOptions.toJson(a as HunterOptions),
+    optionsFromJson: (obj) => HunterOptions.fromJson(obj),
+  },
+  [Spec.SpecMage]: {
+    rotationCreate: () => MageRotation.create(),
+    rotationEquals: (a, b) => MageRotation.equals(a as MageRotation, b as MageRotation),
+    rotationCopy: (a) => MageRotation.clone(a as MageRotation),
+    rotationToJson: (a) => MageRotation.toJson(a as MageRotation),
+    rotationFromJson: (obj) => MageRotation.fromJson(obj),
+
+    talentsCreate: () => MageTalents.create(),
+    talentsEquals: (a, b) => MageTalents.equals(a as MageTalents, b as MageTalents),
+    talentsCopy: (a) => MageTalents.clone(a as MageTalents),
+    talentsToJson: (a) => MageTalents.toJson(a as MageTalents),
+    talentsFromJson: (obj) => MageTalents.fromJson(obj),
+
+    optionsCreate: () => MageOptions.create(),
+    optionsEquals: (a, b) => MageOptions.equals(a as MageOptions, b as MageOptions),
+    optionsCopy: (a) => MageOptions.clone(a as MageOptions),
+    optionsToJson: (a) => MageOptions.toJson(a as MageOptions),
+    optionsFromJson: (obj) => MageOptions.fromJson(obj),
+  },
+  [Spec.SpecRetributionPaladin]: {
+    rotationCreate: () => RetributionPaladinRotation.create(),
+    rotationEquals: (a, b) => RetributionPaladinRotation.equals(a as RetributionPaladinRotation, b as RetributionPaladinRotation),
+    rotationCopy: (a) => RetributionPaladinRotation.clone(a as RetributionPaladinRotation),
+    rotationToJson: (a) => RetributionPaladinRotation.toJson(a as RetributionPaladinRotation),
+    rotationFromJson: (obj) => RetributionPaladinRotation.fromJson(obj),
+
+    talentsCreate: () => PaladinTalents.create(),
+    talentsEquals: (a, b) => PaladinTalents.equals(a as PaladinTalents, b as PaladinTalents),
+    talentsCopy: (a) => PaladinTalents.clone(a as PaladinTalents),
+    talentsToJson: (a) => PaladinTalents.toJson(a as PaladinTalents),
+    talentsFromJson: (obj) => PaladinTalents.fromJson(obj),
+
+    optionsCreate: () => RetributionPaladinOptions.create(),
+    optionsEquals: (a, b) => RetributionPaladinOptions.equals(a as RetributionPaladinOptions, b as RetributionPaladinOptions),
+    optionsCopy: (a) => RetributionPaladinOptions.clone(a as RetributionPaladinOptions),
+    optionsToJson: (a) => RetributionPaladinOptions.toJson(a as RetributionPaladinOptions),
+    optionsFromJson: (obj) => RetributionPaladinOptions.fromJson(obj),
+  },
+  [Spec.SpecRogue]: {
+    rotationCreate: () => RogueRotation.create(),
+    rotationEquals: (a, b) => RogueRotation.equals(a as RogueRotation, b as RogueRotation),
+    rotationCopy: (a) => RogueRotation.clone(a as RogueRotation),
+    rotationToJson: (a) => RogueRotation.toJson(a as RogueRotation),
+    rotationFromJson: (obj) => RogueRotation.fromJson(obj),
+
+    talentsCreate: () => RogueTalents.create(),
+    talentsEquals: (a, b) => RogueTalents.equals(a as RogueTalents, b as RogueTalents),
+    talentsCopy: (a) => RogueTalents.clone(a as RogueTalents),
+    talentsToJson: (a) => RogueTalents.toJson(a as RogueTalents),
+    talentsFromJson: (obj) => RogueTalents.fromJson(obj),
+
+    optionsCreate: () => RogueOptions.create(),
+    optionsEquals: (a, b) => RogueOptions.equals(a as RogueOptions, b as RogueOptions),
+    optionsCopy: (a) => RogueOptions.clone(a as RogueOptions),
+    optionsToJson: (a) => RogueOptions.toJson(a as RogueOptions),
+    optionsFromJson: (obj) => RogueOptions.fromJson(obj),
+  },
+  [Spec.SpecShadowPriest]: {
+    rotationCreate: () => ShadowPriestRotation.create(),
+    rotationEquals: (a, b) => ShadowPriestRotation.equals(a as ShadowPriestRotation, b as ShadowPriestRotation),
+    rotationCopy: (a) => ShadowPriestRotation.clone(a as ShadowPriestRotation),
+    rotationToJson: (a) => ShadowPriestRotation.toJson(a as ShadowPriestRotation),
+    rotationFromJson: (obj) => ShadowPriestRotation.fromJson(obj),
+
+    talentsCreate: () => PriestTalents.create(),
+    talentsEquals: (a, b) => PriestTalents.equals(a as PriestTalents, b as PriestTalents),
+    talentsCopy: (a) => PriestTalents.clone(a as PriestTalents),
+    talentsToJson: (a) => PriestTalents.toJson(a as PriestTalents),
+    talentsFromJson: (obj) => PriestTalents.fromJson(obj),
+
+    optionsCreate: () => ShadowPriestOptions.create(),
+    optionsEquals: (a, b) => ShadowPriestOptions.equals(a as ShadowPriestOptions, b as ShadowPriestOptions),
+    optionsCopy: (a) => ShadowPriestOptions.clone(a as ShadowPriestOptions),
+    optionsToJson: (a) => ShadowPriestOptions.toJson(a as ShadowPriestOptions),
+    optionsFromJson: (obj) => ShadowPriestOptions.fromJson(obj),
+  },
+  [Spec.SpecWarlock]: {
+    rotationCreate: () => WarlockRotation.create(),
+    rotationEquals: (a, b) => WarlockRotation.equals(a as WarlockRotation, b as WarlockRotation),
+    rotationCopy: (a) => WarlockRotation.clone(a as WarlockRotation),
+    rotationToJson: (a) => WarlockRotation.toJson(a as WarlockRotation),
+    rotationFromJson: (obj) => WarlockRotation.fromJson(obj),
+
+    talentsCreate: () => WarlockTalents.create(),
+    talentsEquals: (a, b) => WarlockTalents.equals(a as WarlockTalents, b as WarlockTalents),
+    talentsCopy: (a) => WarlockTalents.clone(a as WarlockTalents),
+    talentsToJson: (a) => WarlockTalents.toJson(a as WarlockTalents),
+    talentsFromJson: (obj) => WarlockTalents.fromJson(obj),
+
+    optionsCreate: () => WarlockOptions.create(),
+    optionsEquals: (a, b) => WarlockOptions.equals(a as WarlockOptions, b as WarlockOptions),
+    optionsCopy: (a) => WarlockOptions.clone(a as WarlockOptions),
+    optionsToJson: (a) => WarlockOptions.toJson(a as WarlockOptions),
+    optionsFromJson: (obj) => WarlockOptions.fromJson(obj),
+  },
+  [Spec.SpecWarrior]: {
+    rotationCreate: () => WarriorRotation.create(),
+    rotationEquals: (a, b) => WarriorRotation.equals(a as WarriorRotation, b as WarriorRotation),
+    rotationCopy: (a) => WarriorRotation.clone(a as WarriorRotation),
+    rotationToJson: (a) => WarriorRotation.toJson(a as WarriorRotation),
+    rotationFromJson: (obj) => WarriorRotation.fromJson(obj),
+
+    talentsCreate: () => WarriorTalents.create(),
+    talentsEquals: (a, b) => WarriorTalents.equals(a as WarriorTalents, b as WarriorTalents),
+    talentsCopy: (a) => WarriorTalents.clone(a as WarriorTalents),
+    talentsToJson: (a) => WarriorTalents.toJson(a as WarriorTalents),
+    talentsFromJson: (obj) => WarriorTalents.fromJson(obj),
+
+    optionsCreate: () => WarriorOptions.create(),
+    optionsEquals: (a, b) => WarriorOptions.equals(a as WarriorOptions, b as WarriorOptions),
+    optionsCopy: (a) => WarriorOptions.clone(a as WarriorOptions),
+    optionsToJson: (a) => WarriorOptions.toJson(a as WarriorOptions),
+    optionsFromJson: (obj) => WarriorOptions.fromJson(obj),
+  },
 };
 
 export const specToClass: Record<Spec, Class> = {
   [Spec.SpecBalanceDruid]: Class.ClassDruid,
   [Spec.SpecElementalShaman]: Class.ClassShaman,
+  [Spec.SpecHunter]: Class.ClassHunter,
+  [Spec.SpecMage]: Class.ClassMage,
+  [Spec.SpecRogue]: Class.ClassRogue,
+  [Spec.SpecRetributionPaladin]: Class.ClassPaladin,
+  [Spec.SpecShadowPriest]: Class.ClassPriest,
+  [Spec.SpecWarlock]: Class.ClassWarlock,
+  [Spec.SpecWarrior]: Class.ClassWarrior,
 };
 
 const druidRaces = [
     Race.RaceNightElf,
     Race.RaceTauren,
+];
+const hunterRaces = [
+    Race.RaceBloodElf,
+    Race.RaceDraenei,
+    Race.RaceDwarf,
+    Race.RaceNightElf,
+    Race.RaceOrc,
+    Race.RaceTauren,
+    Race.RaceTroll10,
+    Race.RaceTroll30,
+];
+const mageRaces = [
+    Race.RaceBloodElf,
+    Race.RaceDraenei,
+    Race.RaceGnome,
+    Race.RaceHuman,
+    Race.RaceTroll10,
+    Race.RaceTroll30,
+    Race.RaceUndead,
+];
+const paladinRaces = [
+    Race.RaceBloodElf,
+    Race.RaceDraenei,
+    Race.RaceDwarf,
+    Race.RaceHuman,
+];
+const priestRaces = [
+    Race.RaceBloodElf,
+    Race.RaceDraenei,
+    Race.RaceDwarf,
+    Race.RaceHuman,
+    Race.RaceNightElf,
+    Race.RaceOrc,
+    Race.RaceTroll10,
+    Race.RaceTroll30,
+    Race.RaceUndead,
+];
+const rogueRaces = [
+    Race.RaceBloodElf,
+    Race.RaceDwarf,
+    Race.RaceGnome,
+    Race.RaceHuman,
+    Race.RaceNightElf,
+    Race.RaceOrc,
+    Race.RaceTroll10,
+    Race.RaceTroll30,
+    Race.RaceUndead,
 ];
 const shamanRaces = [
     Race.RaceDraenei,
@@ -109,10 +387,37 @@ const shamanRaces = [
     Race.RaceTroll10,
     Race.RaceTroll30,
 ];
+const warlockRaces = [
+    Race.RaceBloodElf,
+    Race.RaceGnome,
+    Race.RaceHuman,
+    Race.RaceOrc,
+    Race.RaceUndead,
+];
+const warriorRaces = [
+    Race.RaceBloodElf,
+    Race.RaceDraenei,
+    Race.RaceDwarf,
+    Race.RaceGnome,
+    Race.RaceHuman,
+    Race.RaceNightElf,
+    Race.RaceOrc,
+    Race.RaceTauren,
+    Race.RaceTroll10,
+    Race.RaceTroll30,
+    Race.RaceUndead,
+];
 
 export const specToEligibleRaces: Record<Spec, Array<Race>> = {
   [Spec.SpecBalanceDruid]: druidRaces,
   [Spec.SpecElementalShaman]: shamanRaces,
+  [Spec.SpecHunter]: hunterRaces,
+  [Spec.SpecMage]: mageRaces,
+  [Spec.SpecRetributionPaladin]: paladinRaces,
+  [Spec.SpecRogue]: rogueRaces,
+  [Spec.SpecShadowPriest]: priestRaces,
+  [Spec.SpecWarlock]: warlockRaces,
+  [Spec.SpecWarrior]: warriorRaces,
 };
 
 // Prefixes used for storing browser data for each site. Even if a Spec is
@@ -120,6 +425,13 @@ export const specToEligibleRaces: Record<Spec, Array<Race>> = {
 export const specToLocalStorageKey: Record<Spec, string> = {
   [Spec.SpecBalanceDruid]: '__balance_druid',
   [Spec.SpecElementalShaman]: '__elemental_shaman',
+  [Spec.SpecHunter]: '__hunter',
+  [Spec.SpecMage]: '__mage',
+  [Spec.SpecRetributionPaladin]: '__retribution_paladin',
+  [Spec.SpecRogue]: '__rogue',
+  [Spec.SpecShadowPriest]: '__shadow_priest',
+  [Spec.SpecWarlock]: '__warlock',
+  [Spec.SpecWarrior]: '__warrior',
 };
 
 // Returns a copy of playerOptions, with the class field set.
@@ -147,6 +459,76 @@ export function withSpecProto<SpecType extends Spec>(
         rotation: rotation,
         talents: talents as ShamanTalents,
         options: specOptions as ElementalShamanOptions,
+      }),
+    };
+  } else if (HunterRotation.is(rotation)) {
+		copy.class = Class.ClassHunter;
+    copy.spec = {
+      oneofKind: 'hunter',
+      hunter: Hunter.create({
+        rotation: rotation,
+        talents: talents as HunterTalents,
+        options: specOptions as HunterOptions,
+      }),
+    };
+  } else if (MageRotation.is(rotation)) {
+		copy.class = Class.ClassMage;
+    copy.spec = {
+      oneofKind: 'mage',
+      mage: Mage.create({
+        rotation: rotation,
+        talents: talents as MageTalents,
+        options: specOptions as MageOptions,
+      }),
+    };
+  } else if (RetributionPaladinRotation.is(rotation)) {
+		copy.class = Class.ClassPaladin;
+    copy.spec = {
+      oneofKind: 'retributionPaladin',
+      retributionPaladin: RetributionPaladin.create({
+        rotation: rotation,
+        talents: talents as PaladinTalents,
+        options: specOptions as RetributionPaladinOptions,
+      }),
+    };
+  } else if (RogueRotation.is(rotation)) {
+		copy.class = Class.ClassRogue;
+    copy.spec = {
+      oneofKind: 'rogue',
+      rogue: Rogue.create({
+        rotation: rotation,
+        talents: talents as RogueTalents,
+        options: specOptions as RogueOptions,
+      }),
+    };
+  } else if (ShadowPriestRotation.is(rotation)) {
+		copy.class = Class.ClassPriest;
+    copy.spec = {
+      oneofKind: 'shadowPriest',
+      shadowPriest: ShadowPriest.create({
+        rotation: rotation,
+        talents: talents as PriestTalents,
+        options: specOptions as ShadowPriestOptions,
+      }),
+    };
+  } else if (WarlockRotation.is(rotation)) {
+		copy.class = Class.ClassWarlock;
+    copy.spec = {
+      oneofKind: 'warlock',
+      warlock: Warlock.create({
+        rotation: rotation,
+        talents: talents as WarlockTalents,
+        options: specOptions as WarlockOptions,
+      }),
+    };
+  } else if (WarriorRotation.is(rotation)) {
+		copy.class = Class.ClassWarrior;
+    copy.spec = {
+      oneofKind: 'warrior',
+      warrior: Warrior.create({
+        rotation: rotation,
+        talents: talents as WarriorTalents,
+        options: specOptions as WarriorOptions,
       }),
     };
   } else {
