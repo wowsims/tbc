@@ -31,7 +31,7 @@ export class HunterTalentsPicker extends TalentsPicker<Spec.SpecHunter> {
             maxPoints: 5,
           },
           {
-            fieldName: 'focusFire',
+            fieldName: 'focusedFire',
             location: {
               rowIdx: 1,
               colIdx: 0,
@@ -130,7 +130,7 @@ export class HunterTalentsPicker extends TalentsPicker<Spec.SpecHunter> {
             maxPoints: 1,
           },
           {
-            fieldName: 'Bestial Discipline',
+            fieldName: 'bestialDiscipline',
             location: {
               rowIdx: 4,
               colIdx: 3,
@@ -170,7 +170,7 @@ export class HunterTalentsPicker extends TalentsPicker<Spec.SpecHunter> {
             maxPoints: 3,
           },
           {
-            fieldName: 'Bestial Wrath',
+            fieldName: 'bestialWrath',
             location: {
               rowIdx: 6,
               colIdx: 1,

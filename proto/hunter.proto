@@ -45,7 +45,7 @@ message HunterTalents {
 	int32 survivalist = 34;
 	int32 trap_mastery = 35;
 	int32 surefooted = 36;
-	int32 survival_insticts = 37;
+	int32 survival_instincts = 37;
 	int32 killer_instinct = 38;
 	int32 resourcefulness = 39;
 	int32 lightning_reflexes = 40;
