@@ -74,7 +74,6 @@ export class Player<SpecType extends Spec> {
   // Emits when any of the above emitters emit.
   readonly changeEmitter = new TypedEvent<void>();
 
-  readonly gearListEmitter = new TypedEvent<void>();
   readonly characterStatsEmitter = new TypedEvent<void>();
 	private _currentStats: ComputeStatsResult;
 

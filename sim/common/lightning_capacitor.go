@@ -11,6 +11,7 @@ func init() {
 	core.AddItemEffect(core.ItemIDTheLightningCapacitor, ApplyTheLightningCapacitor)
 }
 
+var TheLightningCapacitorAuraID = core.NewAuraID()
 func ApplyTheLightningCapacitor(agent core.Agent) {
 	character := agent.GetCharacter()
 	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
@@ -20,7 +21,8 @@ func ApplyTheLightningCapacitor(agent core.Agent) {
 		icd := core.NewICD()
 
 		return core.Aura{
-			ID:      core.MagicIDTLC,
+			ID:      TheLightningCapacitorAuraID,
+			Name:    "The Lightning Capacitor",
 			OnSpellHit: func(sim *core.Simulation, cast core.DirectCastAction, result *core.DirectCastDamageResult) {
 				if icd.IsOnCD(sim) {
 					return

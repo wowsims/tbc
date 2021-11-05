@@ -5,6 +5,7 @@ import (
 
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/proto"
+	"github.com/wowsims/tbc/sim/core/stats"
 	. "github.com/wowsims/tbc/sim/shaman"
 	googleProto "google.golang.org/protobuf/proto"
 )
@@ -50,13 +51,13 @@ func NewElementalShaman(character core.Character, options proto.PlayerOptions, i
 type LBOnlyRotation struct {
 }
 
-func (agent *LBOnlyRotation) ChooseAction(shaman *Shaman, sim *core.Simulation) core.AgentAction {
-	return NewLightningBolt(sim, shaman, false)
+func (agent *LBOnlyRotation) ChooseAction(shamanAgent *Shaman, sim *core.Simulation) core.AgentAction {
+	return NewLightningBolt(sim, shamanAgent, false)
 }
 
-func (agent *LBOnlyRotation) OnActionAccepted(shaman *Shaman, sim *core.Simulation, action core.AgentAction) {
+func (agent *LBOnlyRotation) OnActionAccepted(shamanAgent *Shaman, sim *core.Simulation, action core.AgentAction) {
 }
-func (agent *LBOnlyRotation) Reset(shaman *Shaman, sim *core.Simulation) {}
+func (agent *LBOnlyRotation) Reset(shamanAgent *Shaman, sim *core.Simulation) {}
 
 func NewLBOnlyRotation() *LBOnlyRotation {
 	return &LBOnlyRotation{}
@@ -68,17 +69,17 @@ func NewLBOnlyRotation() *LBOnlyRotation {
 type CLOnCDRotation struct {
 }
 
-func (agent *CLOnCDRotation) ChooseAction(shaman *Shaman, sim *core.Simulation) core.AgentAction {
-	if shaman.IsOnCD(core.MagicIDChainLightning6, sim.CurrentTime) {
-		return NewLightningBolt(sim, shaman, false)
+func (agent *CLOnCDRotation) ChooseAction(shamanAgent *Shaman, sim *core.Simulation) core.AgentAction {
+	if shamanAgent.IsOnCD(ChainLightningCooldownID, sim.CurrentTime) {
+		return NewLightningBolt(sim, shamanAgent, false)
 	} else {
-		return NewChainLightning(sim, shaman, false)
+		return NewChainLightning(sim, shamanAgent, false)
 	}
 }
 
-func (agent *CLOnCDRotation) OnActionAccepted(shaman *Shaman, sim *core.Simulation, action core.AgentAction) {
+func (agent *CLOnCDRotation) OnActionAccepted(shamanAgent *Shaman, sim *core.Simulation, action core.AgentAction) {
 }
-func (agent *CLOnCDRotation) Reset(shaman *Shaman, sim *core.Simulation) {}
+func (agent *CLOnCDRotation) Reset(shamanAgent *Shaman, sim *core.Simulation) {}
 
 func NewCLOnCDRotation() *CLOnCDRotation {
 	return &CLOnCDRotation{}
@@ -94,33 +95,31 @@ type FixedRotation struct {
 
 // Returns if any temporary haste buff is currently active.
 // TODO: Figure out a way to make this automatic
-func (agent *FixedRotation) temporaryHasteActive(shaman *Shaman) bool {
-	return shaman.HasAura(core.MagicIDBloodlust) ||
-		shaman.HasAura(core.MagicIDDrums) ||
-		shaman.HasAura(core.MagicIDTrollBerserking) ||
-		shaman.HasAura(core.MagicIDSkullGuldan) ||
-		shaman.HasAura(core.MagicIDFungalFrenzy)
+func (agent *FixedRotation) temporaryHasteActive(shamanAgent *Shaman) bool {
+	return shamanAgent.HasAura(core.BloodlustAuraID) ||
+		shamanAgent.HasAura(core.TrollBerserkingAuraID) ||
+		shamanAgent.HasTemporaryBonusForStat(stats.SpellHaste)
 }
 
-func (agent *FixedRotation) ChooseAction(shaman *Shaman, sim *core.Simulation) core.AgentAction {
+func (agent *FixedRotation) ChooseAction(shamanAgent *Shaman, sim *core.Simulation) core.AgentAction {
 	if agent.numLBsSinceLastCL < agent.numLBsPerCL {
-		return NewLightningBolt(sim, shaman, false)
+		return NewLightningBolt(sim, shamanAgent, false)
 	}
 
-	if !shaman.IsOnCD(core.MagicIDChainLightning6, sim.CurrentTime) {
-		return NewChainLightning(sim, shaman, false)
+	if !shamanAgent.IsOnCD(ChainLightningCooldownID, sim.CurrentTime) {
+		return NewChainLightning(sim, shamanAgent, false)
 	}
 
 	// If we have a temporary haste effect (like bloodlust or quags eye) then
 	// we should add LB casts instead of waiting
-	if agent.temporaryHasteActive(shaman) {
-		return NewLightningBolt(sim, shaman, false)
+	if agent.temporaryHasteActive(shamanAgent) {
+		return NewLightningBolt(sim, shamanAgent, false)
 	}
 
-	return core.NewWaitAction(sim, shaman.GetCharacter(), shaman.GetRemainingCD(core.MagicIDChainLightning6, sim.CurrentTime))
+	return core.NewWaitAction(sim, shamanAgent.GetCharacter(), shamanAgent.GetRemainingCD(ChainLightningCooldownID, sim.CurrentTime))
 }
 
-func (agent *FixedRotation) OnActionAccepted(shaman *Shaman, sim *core.Simulation, action core.AgentAction) {
+func (agent *FixedRotation) OnActionAccepted(shamanAgent *Shaman, sim *core.Simulation, action core.AgentAction) {
 	cast, isCastAction := action.(*core.DirectCastAction)
 	if !isCastAction {
 		return
@@ -133,7 +132,7 @@ func (agent *FixedRotation) OnActionAccepted(shaman *Shaman, sim *core.Simulatio
 	}
 }
 
-func (agent *FixedRotation) Reset(shaman *Shaman, sim *core.Simulation) {
+func (agent *FixedRotation) Reset(shamanAgent *Shaman, sim *core.Simulation) {
 	agent.numLBsSinceLastCL = agent.numLBsPerCL // This lets us cast CL first
 }
 
@@ -151,19 +150,19 @@ type CLOnClearcastRotation struct {
 	prevPrevCastProccedCC bool
 }
 
-func (agent *CLOnClearcastRotation) ChooseAction(shaman *Shaman, sim *core.Simulation) core.AgentAction {
-	if shaman.IsOnCD(core.MagicIDChainLightning6, sim.CurrentTime) || !agent.prevPrevCastProccedCC {
-		return NewLightningBolt(sim, shaman, false)
+func (agent *CLOnClearcastRotation) ChooseAction(shamanAgent *Shaman, sim *core.Simulation) core.AgentAction {
+	if shamanAgent.IsOnCD(ChainLightningCooldownID, sim.CurrentTime) || !agent.prevPrevCastProccedCC {
+		return NewLightningBolt(sim, shamanAgent, false)
 	}
 
-	return NewChainLightning(sim, shaman, false)
+	return NewChainLightning(sim, shamanAgent, false)
 }
 
-func (agent *CLOnClearcastRotation) OnActionAccepted(shaman *Shaman, sim *core.Simulation, action core.AgentAction) {
-	agent.prevPrevCastProccedCC = shaman.ElementalFocusStacks == 2
+func (agent *CLOnClearcastRotation) OnActionAccepted(shamanAgent *Shaman, sim *core.Simulation, action core.AgentAction) {
+	agent.prevPrevCastProccedCC = shamanAgent.ElementalFocusStacks == 2
 }
 
-func (agent *CLOnClearcastRotation) Reset(shaman *Shaman, sim *core.Simulation) {
+func (agent *CLOnClearcastRotation) Reset(shamanAgent *Shaman, sim *core.Simulation) {
 	agent.prevPrevCastProccedCC = true // Lets us cast CL first
 }
 
@@ -210,14 +209,14 @@ func (agent *AdaptiveRotation) purgeExpiredSnapshots(sim *core.Simulation) {
 	agent.firstSnapshotIndex = curIndex
 }
 
-func (agent *AdaptiveRotation) takeSnapshot(sim *core.Simulation, shaman *Shaman) {
+func (agent *AdaptiveRotation) takeSnapshot(sim *core.Simulation, shamanAgent *Shaman) {
 	if agent.numSnapshots >= manaSnapshotsBufferSize {
 		panic("Rotation snapshot buffer full")
 	}
 
 	snapshot := ManaSnapshot{
 		time:      sim.CurrentTime,
-		manaSpent: sim.GetIndividualMetrics(shaman.ID).ManaSpent,
+		manaSpent: sim.GetIndividualMetrics(shamanAgent.ID).ManaSpent,
 	}
 
 	nextIndex := (agent.firstSnapshotIndex + agent.numSnapshots) % manaSnapshotsBufferSize
@@ -225,11 +224,11 @@ func (agent *AdaptiveRotation) takeSnapshot(sim *core.Simulation, shaman *Shaman
 	agent.numSnapshots++
 }
 
-func (agent *AdaptiveRotation) ChooseAction(shaman *Shaman, sim *core.Simulation) core.AgentAction {
+func (agent *AdaptiveRotation) ChooseAction(shamanAgent *Shaman, sim *core.Simulation) core.AgentAction {
 	agent.purgeExpiredSnapshots(sim)
 	oldestSnapshot := agent.getOldestSnapshot()
 
-	manaSpent := sim.GetIndividualMetrics(shaman.ID).ManaSpent - oldestSnapshot.manaSpent
+	manaSpent := sim.GetIndividualMetrics(shamanAgent.ID).ManaSpent - oldestSnapshot.manaSpent
 	timeDelta := sim.CurrentTime - oldestSnapshot.time
 	if timeDelta == 0 {
 		timeDelta = 1
@@ -240,28 +239,28 @@ func (agent *AdaptiveRotation) ChooseAction(shaman *Shaman, sim *core.Simulation
 
 	if sim.Log != nil {
 		manaSpendingRate := manaSpent / timeDelta.Seconds()
-		sim.Log("[AI] CL Ready: Mana/s: %0.1f, Est Mana Cost: %0.1f, CurrentMana: %0.1f\n", manaSpendingRate, projectedManaCost, shaman.CurrentMana())
+		sim.Log("[AI] CL Ready: Mana/s: %0.1f, Est Mana Cost: %0.1f, CurrentMana: %0.1f\n", manaSpendingRate, projectedManaCost, shamanAgent.CurrentMana())
 	}
 
 	// If we have enough mana to burn, use the surplus agent.
-	if projectedManaCost < shaman.CurrentMana() {
-		return agent.surplusRotation.ChooseAction(shaman, sim)
+	if projectedManaCost < shamanAgent.CurrentMana() {
+		return agent.surplusRotation.ChooseAction(shamanAgent, sim)
 	} else {
-		return agent.baseRotation.ChooseAction(shaman, sim)
+		return agent.baseRotation.ChooseAction(shamanAgent, sim)
 	}
 }
-func (agent *AdaptiveRotation) OnActionAccepted(shaman *Shaman, sim *core.Simulation, action core.AgentAction) {
-	agent.takeSnapshot(sim, shaman)
-	agent.baseRotation.OnActionAccepted(shaman, sim, action)
-	agent.surplusRotation.OnActionAccepted(shaman, sim, action)
+func (agent *AdaptiveRotation) OnActionAccepted(shamanAgent *Shaman, sim *core.Simulation, action core.AgentAction) {
+	agent.takeSnapshot(sim, shamanAgent)
+	agent.baseRotation.OnActionAccepted(shamanAgent, sim, action)
+	agent.surplusRotation.OnActionAccepted(shamanAgent, sim, action)
 }
 
-func (agent *AdaptiveRotation) Reset(shaman *Shaman, sim *core.Simulation) {
+func (agent *AdaptiveRotation) Reset(shamanAgent *Shaman, sim *core.Simulation) {
 	agent.manaSnapshots = [manaSnapshotsBufferSize]ManaSnapshot{}
 	agent.firstSnapshotIndex = 0
 	agent.numSnapshots = 0
-	agent.baseRotation.Reset(shaman, sim)
-	agent.surplusRotation.Reset(shaman, sim)
+	agent.baseRotation.Reset(shamanAgent, sim)
+	agent.surplusRotation.Reset(shamanAgent, sim)
 }
 
 func NewAdaptiveRotation(isr proto.IndividualSimRequest) *AdaptiveRotation {
