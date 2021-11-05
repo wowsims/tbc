@@ -13,7 +13,14 @@ import { Encounter } from "./common";
 import { Buffs } from "./common";
 import { EquipmentSpec } from "./common";
 import { Consumes } from "./common";
+import { Warrior } from "./warrior";
+import { Warlock } from "./warlock";
 import { ElementalShaman } from "./shaman";
+import { Rogue } from "./rogue";
+import { ShadowPriest } from "./priest";
+import { RetributionPaladin } from "./paladin";
+import { Mage } from "./mage";
+import { Hunter } from "./hunter";
 import { BalanceDruid } from "./druid";
 import { Class } from "./common";
 import { Race } from "./common";
@@ -51,17 +58,17 @@ export interface PlayerOptions {
          */
         mage: Mage;
     } | {
-        oneofKind: "paladin";
+        oneofKind: "retributionPaladin";
         /**
-         * @generated from protobuf field: proto.Paladin paladin = 6;
+         * @generated from protobuf field: proto.RetributionPaladin retribution_paladin = 6;
          */
-        paladin: Paladin;
+        retributionPaladin: RetributionPaladin;
     } | {
-        oneofKind: "priest";
+        oneofKind: "shadowPriest";
         /**
-         * @generated from protobuf field: proto.Priest priest = 7;
+         * @generated from protobuf field: proto.ShadowPriest shadow_priest = 7;
          */
-        priest: Priest;
+        shadowPriest: ShadowPriest;
     } | {
         oneofKind: "rogue";
         /**
@@ -93,41 +100,6 @@ export interface PlayerOptions {
      * @generated from protobuf field: proto.Consumes consumes = 12;
      */
     consumes?: Consumes;
-}
-/**
- * @generated from protobuf message proto.Hunter
- */
-export interface Hunter {
-}
-/**
- * @generated from protobuf message proto.Mage
- */
-export interface Mage {
-}
-/**
- * @generated from protobuf message proto.Paladin
- */
-export interface Paladin {
-}
-/**
- * @generated from protobuf message proto.Priest
- */
-export interface Priest {
-}
-/**
- * @generated from protobuf message proto.Rogue
- */
-export interface Rogue {
-}
-/**
- * @generated from protobuf message proto.Warlock
- */
-export interface Warlock {
-}
-/**
- * @generated from protobuf message proto.Warrior
- */
-export interface Warrior {
 }
 /**
  * @generated from protobuf message proto.Player
@@ -479,76 +451,6 @@ declare class PlayerOptions$Type extends MessageType<PlayerOptions> {
  * @generated MessageType for protobuf message proto.PlayerOptions
  */
 export declare const PlayerOptions: PlayerOptions$Type;
-declare class Hunter$Type extends MessageType<Hunter> {
-    constructor();
-    create(value?: PartialMessage<Hunter>): Hunter;
-    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: Hunter): Hunter;
-    internalBinaryWrite(message: Hunter, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
-}
-/**
- * @generated MessageType for protobuf message proto.Hunter
- */
-export declare const Hunter: Hunter$Type;
-declare class Mage$Type extends MessageType<Mage> {
-    constructor();
-    create(value?: PartialMessage<Mage>): Mage;
-    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: Mage): Mage;
-    internalBinaryWrite(message: Mage, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
-}
-/**
- * @generated MessageType for protobuf message proto.Mage
- */
-export declare const Mage: Mage$Type;
-declare class Paladin$Type extends MessageType<Paladin> {
-    constructor();
-    create(value?: PartialMessage<Paladin>): Paladin;
-    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: Paladin): Paladin;
-    internalBinaryWrite(message: Paladin, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
-}
-/**
- * @generated MessageType for protobuf message proto.Paladin
- */
-export declare const Paladin: Paladin$Type;
-declare class Priest$Type extends MessageType<Priest> {
-    constructor();
-    create(value?: PartialMessage<Priest>): Priest;
-    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: Priest): Priest;
-    internalBinaryWrite(message: Priest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
-}
-/**
- * @generated MessageType for protobuf message proto.Priest
- */
-export declare const Priest: Priest$Type;
-declare class Rogue$Type extends MessageType<Rogue> {
-    constructor();
-    create(value?: PartialMessage<Rogue>): Rogue;
-    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: Rogue): Rogue;
-    internalBinaryWrite(message: Rogue, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
-}
-/**
- * @generated MessageType for protobuf message proto.Rogue
- */
-export declare const Rogue: Rogue$Type;
-declare class Warlock$Type extends MessageType<Warlock> {
-    constructor();
-    create(value?: PartialMessage<Warlock>): Warlock;
-    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: Warlock): Warlock;
-    internalBinaryWrite(message: Warlock, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
-}
-/**
- * @generated MessageType for protobuf message proto.Warlock
- */
-export declare const Warlock: Warlock$Type;
-declare class Warrior$Type extends MessageType<Warrior> {
-    constructor();
-    create(value?: PartialMessage<Warrior>): Warrior;
-    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: Warrior): Warrior;
-    internalBinaryWrite(message: Warrior, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
-}
-/**
- * @generated MessageType for protobuf message proto.Warrior
- */
-export declare const Warrior: Warrior$Type;
 declare class Player$Type extends MessageType<Player> {
     constructor();
     create(value?: PartialMessage<Player>): Player;

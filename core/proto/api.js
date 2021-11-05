@@ -12,7 +12,14 @@ import { Encounter } from './common.js';
 import { Buffs } from './common.js';
 import { EquipmentSpec } from './common.js';
 import { Consumes } from './common.js';
+import { Warrior } from './warrior.js';
+import { Warlock } from './warlock.js';
 import { ElementalShaman } from './shaman.js';
+import { Rogue } from './rogue.js';
+import { ShadowPriest } from './priest.js';
+import { RetributionPaladin } from './paladin.js';
+import { Mage } from './mage.js';
+import { Hunter } from './hunter.js';
 import { BalanceDruid } from './druid.js';
 import { Class } from './common.js';
 import { Race } from './common.js';
@@ -41,8 +48,8 @@ class PlayerOptions$Type extends MessageType {
             { no: 3, name: "balance_druid", kind: "message", oneof: "spec", T: () => BalanceDruid },
             { no: 4, name: "hunter", kind: "message", oneof: "spec", T: () => Hunter },
             { no: 5, name: "mage", kind: "message", oneof: "spec", T: () => Mage },
-            { no: 6, name: "paladin", kind: "message", oneof: "spec", T: () => Paladin },
-            { no: 7, name: "priest", kind: "message", oneof: "spec", T: () => Priest },
+            { no: 6, name: "retribution_paladin", kind: "message", oneof: "spec", T: () => RetributionPaladin },
+            { no: 7, name: "shadow_priest", kind: "message", oneof: "spec", T: () => ShadowPriest },
             { no: 8, name: "rogue", kind: "message", oneof: "spec", T: () => Rogue },
             { no: 9, name: "elemental_shaman", kind: "message", oneof: "spec", T: () => ElementalShaman },
             { no: 10, name: "warlock", kind: "message", oneof: "spec", T: () => Warlock },
@@ -86,16 +93,16 @@ class PlayerOptions$Type extends MessageType {
                         mage: Mage.internalBinaryRead(reader, reader.uint32(), options, message.spec.mage)
                     };
                     break;
-                case /* proto.Paladin paladin */ 6:
+                case /* proto.RetributionPaladin retribution_paladin */ 6:
                     message.spec = {
-                        oneofKind: "paladin",
-                        paladin: Paladin.internalBinaryRead(reader, reader.uint32(), options, message.spec.paladin)
+                        oneofKind: "retributionPaladin",
+                        retributionPaladin: RetributionPaladin.internalBinaryRead(reader, reader.uint32(), options, message.spec.retributionPaladin)
                     };
                     break;
-                case /* proto.Priest priest */ 7:
+                case /* proto.ShadowPriest shadow_priest */ 7:
                     message.spec = {
-                        oneofKind: "priest",
-                        priest: Priest.internalBinaryRead(reader, reader.uint32(), options, message.spec.priest)
+                        oneofKind: "shadowPriest",
+                        shadowPriest: ShadowPriest.internalBinaryRead(reader, reader.uint32(), options, message.spec.shadowPriest)
                     };
                     break;
                 case /* proto.Rogue rogue */ 8:
@@ -152,12 +159,12 @@ class PlayerOptions$Type extends MessageType {
         /* proto.Mage mage = 5; */
         if (message.spec.oneofKind === "mage")
             Mage.internalBinaryWrite(message.spec.mage, writer.tag(5, WireType.LengthDelimited).fork(), options).join();
-        /* proto.Paladin paladin = 6; */
-        if (message.spec.oneofKind === "paladin")
-            Paladin.internalBinaryWrite(message.spec.paladin, writer.tag(6, WireType.LengthDelimited).fork(), options).join();
-        /* proto.Priest priest = 7; */
-        if (message.spec.oneofKind === "priest")
-            Priest.internalBinaryWrite(message.spec.priest, writer.tag(7, WireType.LengthDelimited).fork(), options).join();
+        /* proto.RetributionPaladin retribution_paladin = 6; */
+        if (message.spec.oneofKind === "retributionPaladin")
+            RetributionPaladin.internalBinaryWrite(message.spec.retributionPaladin, writer.tag(6, WireType.LengthDelimited).fork(), options).join();
+        /* proto.ShadowPriest shadow_priest = 7; */
+        if (message.spec.oneofKind === "shadowPriest")
+            ShadowPriest.internalBinaryWrite(message.spec.shadowPriest, writer.tag(7, WireType.LengthDelimited).fork(), options).join();
         /* proto.Rogue rogue = 8; */
         if (message.spec.oneofKind === "rogue")
             Rogue.internalBinaryWrite(message.spec.rogue, writer.tag(8, WireType.LengthDelimited).fork(), options).join();
@@ -183,188 +190,6 @@ class PlayerOptions$Type extends MessageType {
  * @generated MessageType for protobuf message proto.PlayerOptions
  */
 export const PlayerOptions = new PlayerOptions$Type();
-// @generated message type with reflection information, may provide speed optimized methods
-class Hunter$Type extends MessageType {
-    constructor() {
-        super("proto.Hunter", []);
-    }
-    create(value) {
-        const message = {};
-        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
-        if (value !== undefined)
-            reflectionMergePartial(this, message, value);
-        return message;
-    }
-    internalBinaryRead(reader, length, options, target) {
-        return target ?? this.create();
-    }
-    internalBinaryWrite(message, writer, options) {
-        let u = options.writeUnknownFields;
-        if (u !== false)
-            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
-        return writer;
-    }
-}
-/**
- * @generated MessageType for protobuf message proto.Hunter
- */
-export const Hunter = new Hunter$Type();
-// @generated message type with reflection information, may provide speed optimized methods
-class Mage$Type extends MessageType {
-    constructor() {
-        super("proto.Mage", []);
-    }
-    create(value) {
-        const message = {};
-        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
-        if (value !== undefined)
-            reflectionMergePartial(this, message, value);
-        return message;
-    }
-    internalBinaryRead(reader, length, options, target) {
-        return target ?? this.create();
-    }
-    internalBinaryWrite(message, writer, options) {
-        let u = options.writeUnknownFields;
-        if (u !== false)
-            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
-        return writer;
-    }
-}
-/**
- * @generated MessageType for protobuf message proto.Mage
- */
-export const Mage = new Mage$Type();
-// @generated message type with reflection information, may provide speed optimized methods
-class Paladin$Type extends MessageType {
-    constructor() {
-        super("proto.Paladin", []);
-    }
-    create(value) {
-        const message = {};
-        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
-        if (value !== undefined)
-            reflectionMergePartial(this, message, value);
-        return message;
-    }
-    internalBinaryRead(reader, length, options, target) {
-        return target ?? this.create();
-    }
-    internalBinaryWrite(message, writer, options) {
-        let u = options.writeUnknownFields;
-        if (u !== false)
-            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
-        return writer;
-    }
-}
-/**
- * @generated MessageType for protobuf message proto.Paladin
- */
-export const Paladin = new Paladin$Type();
-// @generated message type with reflection information, may provide speed optimized methods
-class Priest$Type extends MessageType {
-    constructor() {
-        super("proto.Priest", []);
-    }
-    create(value) {
-        const message = {};
-        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
-        if (value !== undefined)
-            reflectionMergePartial(this, message, value);
-        return message;
-    }
-    internalBinaryRead(reader, length, options, target) {
-        return target ?? this.create();
-    }
-    internalBinaryWrite(message, writer, options) {
-        let u = options.writeUnknownFields;
-        if (u !== false)
-            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
-        return writer;
-    }
-}
-/**
- * @generated MessageType for protobuf message proto.Priest
- */
-export const Priest = new Priest$Type();
-// @generated message type with reflection information, may provide speed optimized methods
-class Rogue$Type extends MessageType {
-    constructor() {
-        super("proto.Rogue", []);
-    }
-    create(value) {
-        const message = {};
-        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
-        if (value !== undefined)
-            reflectionMergePartial(this, message, value);
-        return message;
-    }
-    internalBinaryRead(reader, length, options, target) {
-        return target ?? this.create();
-    }
-    internalBinaryWrite(message, writer, options) {
-        let u = options.writeUnknownFields;
-        if (u !== false)
-            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
-        return writer;
-    }
-}
-/**
- * @generated MessageType for protobuf message proto.Rogue
- */
-export const Rogue = new Rogue$Type();
-// @generated message type with reflection information, may provide speed optimized methods
-class Warlock$Type extends MessageType {
-    constructor() {
-        super("proto.Warlock", []);
-    }
-    create(value) {
-        const message = {};
-        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
-        if (value !== undefined)
-            reflectionMergePartial(this, message, value);
-        return message;
-    }
-    internalBinaryRead(reader, length, options, target) {
-        return target ?? this.create();
-    }
-    internalBinaryWrite(message, writer, options) {
-        let u = options.writeUnknownFields;
-        if (u !== false)
-            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
-        return writer;
-    }
-}
-/**
- * @generated MessageType for protobuf message proto.Warlock
- */
-export const Warlock = new Warlock$Type();
-// @generated message type with reflection information, may provide speed optimized methods
-class Warrior$Type extends MessageType {
-    constructor() {
-        super("proto.Warrior", []);
-    }
-    create(value) {
-        const message = {};
-        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
-        if (value !== undefined)
-            reflectionMergePartial(this, message, value);
-        return message;
-    }
-    internalBinaryRead(reader, length, options, target) {
-        return target ?? this.create();
-    }
-    internalBinaryWrite(message, writer, options) {
-        let u = options.writeUnknownFields;
-        if (u !== false)
-            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
-        return writer;
-    }
-}
-/**
- * @generated MessageType for protobuf message proto.Warrior
- */
-export const Warrior = new Warrior$Type();
 // @generated message type with reflection information, may provide speed optimized methods
 class Player$Type extends MessageType {
     constructor() {

@@ -13,6 +13,13 @@ import { Spec } from '/tbc/core/proto/common.js';
 import { WeaponType } from '/tbc/core/proto/common.js';
 import { BalanceDruid, BalanceDruid_Rotation as BalanceDruidRotation, DruidTalents, BalanceDruid_Options as BalanceDruidOptions } from '/tbc/core/proto/druid.js';
 import { ElementalShaman, ElementalShaman_Rotation as ElementalShamanRotation, ShamanTalents, ElementalShaman_Options as ElementalShamanOptions } from '/tbc/core/proto/shaman.js';
+import { Hunter, Hunter_Rotation as HunterRotation, HunterTalents, Hunter_Options as HunterOptions } from '/tbc/core/proto/hunter.js';
+import { Mage, Mage_Rotation as MageRotation, MageTalents, Mage_Options as MageOptions } from '/tbc/core/proto/mage.js';
+import { Rogue, Rogue_Rotation as RogueRotation, RogueTalents, Rogue_Options as RogueOptions } from '/tbc/core/proto/rogue.js';
+import { RetributionPaladin, RetributionPaladin_Rotation as RetributionPaladinRotation, PaladinTalents, RetributionPaladin_Options as RetributionPaladinOptions } from '/tbc/core/proto/paladin.js';
+import { ShadowPriest, ShadowPriest_Rotation as ShadowPriestRotation, PriestTalents, ShadowPriest_Options as ShadowPriestOptions } from '/tbc/core/proto/priest.js';
+import { Warlock, Warlock_Rotation as WarlockRotation, WarlockTalents, Warlock_Options as WarlockOptions } from '/tbc/core/proto/warlock.js';
+import { Warrior, Warrior_Rotation as WarriorRotation, WarriorTalents, Warrior_Options as WarriorOptions } from '/tbc/core/proto/warrior.js';
 export const specTypeFunctions = {
     [Spec.SpecBalanceDruid]: {
         rotationCreate: () => BalanceDruidRotation.create(),
@@ -48,14 +55,187 @@ export const specTypeFunctions = {
         optionsToJson: (a) => ElementalShamanOptions.toJson(a),
         optionsFromJson: (obj) => ElementalShamanOptions.fromJson(obj),
     },
+    [Spec.SpecHunter]: {
+        rotationCreate: () => HunterRotation.create(),
+        rotationEquals: (a, b) => HunterRotation.equals(a, b),
+        rotationCopy: (a) => HunterRotation.clone(a),
+        rotationToJson: (a) => HunterRotation.toJson(a),
+        rotationFromJson: (obj) => HunterRotation.fromJson(obj),
+        talentsCreate: () => HunterTalents.create(),
+        talentsEquals: (a, b) => HunterTalents.equals(a, b),
+        talentsCopy: (a) => HunterTalents.clone(a),
+        talentsToJson: (a) => HunterTalents.toJson(a),
+        talentsFromJson: (obj) => HunterTalents.fromJson(obj),
+        optionsCreate: () => HunterOptions.create(),
+        optionsEquals: (a, b) => HunterOptions.equals(a, b),
+        optionsCopy: (a) => HunterOptions.clone(a),
+        optionsToJson: (a) => HunterOptions.toJson(a),
+        optionsFromJson: (obj) => HunterOptions.fromJson(obj),
+    },
+    [Spec.SpecMage]: {
+        rotationCreate: () => MageRotation.create(),
+        rotationEquals: (a, b) => MageRotation.equals(a, b),
+        rotationCopy: (a) => MageRotation.clone(a),
+        rotationToJson: (a) => MageRotation.toJson(a),
+        rotationFromJson: (obj) => MageRotation.fromJson(obj),
+        talentsCreate: () => MageTalents.create(),
+        talentsEquals: (a, b) => MageTalents.equals(a, b),
+        talentsCopy: (a) => MageTalents.clone(a),
+        talentsToJson: (a) => MageTalents.toJson(a),
+        talentsFromJson: (obj) => MageTalents.fromJson(obj),
+        optionsCreate: () => MageOptions.create(),
+        optionsEquals: (a, b) => MageOptions.equals(a, b),
+        optionsCopy: (a) => MageOptions.clone(a),
+        optionsToJson: (a) => MageOptions.toJson(a),
+        optionsFromJson: (obj) => MageOptions.fromJson(obj),
+    },
+    [Spec.SpecRetributionPaladin]: {
+        rotationCreate: () => RetributionPaladinRotation.create(),
+        rotationEquals: (a, b) => RetributionPaladinRotation.equals(a, b),
+        rotationCopy: (a) => RetributionPaladinRotation.clone(a),
+        rotationToJson: (a) => RetributionPaladinRotation.toJson(a),
+        rotationFromJson: (obj) => RetributionPaladinRotation.fromJson(obj),
+        talentsCreate: () => PaladinTalents.create(),
+        talentsEquals: (a, b) => PaladinTalents.equals(a, b),
+        talentsCopy: (a) => PaladinTalents.clone(a),
+        talentsToJson: (a) => PaladinTalents.toJson(a),
+        talentsFromJson: (obj) => PaladinTalents.fromJson(obj),
+        optionsCreate: () => RetributionPaladinOptions.create(),
+        optionsEquals: (a, b) => RetributionPaladinOptions.equals(a, b),
+        optionsCopy: (a) => RetributionPaladinOptions.clone(a),
+        optionsToJson: (a) => RetributionPaladinOptions.toJson(a),
+        optionsFromJson: (obj) => RetributionPaladinOptions.fromJson(obj),
+    },
+    [Spec.SpecRogue]: {
+        rotationCreate: () => RogueRotation.create(),
+        rotationEquals: (a, b) => RogueRotation.equals(a, b),
+        rotationCopy: (a) => RogueRotation.clone(a),
+        rotationToJson: (a) => RogueRotation.toJson(a),
+        rotationFromJson: (obj) => RogueRotation.fromJson(obj),
+        talentsCreate: () => RogueTalents.create(),
+        talentsEquals: (a, b) => RogueTalents.equals(a, b),
+        talentsCopy: (a) => RogueTalents.clone(a),
+        talentsToJson: (a) => RogueTalents.toJson(a),
+        talentsFromJson: (obj) => RogueTalents.fromJson(obj),
+        optionsCreate: () => RogueOptions.create(),
+        optionsEquals: (a, b) => RogueOptions.equals(a, b),
+        optionsCopy: (a) => RogueOptions.clone(a),
+        optionsToJson: (a) => RogueOptions.toJson(a),
+        optionsFromJson: (obj) => RogueOptions.fromJson(obj),
+    },
+    [Spec.SpecShadowPriest]: {
+        rotationCreate: () => ShadowPriestRotation.create(),
+        rotationEquals: (a, b) => ShadowPriestRotation.equals(a, b),
+        rotationCopy: (a) => ShadowPriestRotation.clone(a),
+        rotationToJson: (a) => ShadowPriestRotation.toJson(a),
+        rotationFromJson: (obj) => ShadowPriestRotation.fromJson(obj),
+        talentsCreate: () => PriestTalents.create(),
+        talentsEquals: (a, b) => PriestTalents.equals(a, b),
+        talentsCopy: (a) => PriestTalents.clone(a),
+        talentsToJson: (a) => PriestTalents.toJson(a),
+        talentsFromJson: (obj) => PriestTalents.fromJson(obj),
+        optionsCreate: () => ShadowPriestOptions.create(),
+        optionsEquals: (a, b) => ShadowPriestOptions.equals(a, b),
+        optionsCopy: (a) => ShadowPriestOptions.clone(a),
+        optionsToJson: (a) => ShadowPriestOptions.toJson(a),
+        optionsFromJson: (obj) => ShadowPriestOptions.fromJson(obj),
+    },
+    [Spec.SpecWarlock]: {
+        rotationCreate: () => WarlockRotation.create(),
+        rotationEquals: (a, b) => WarlockRotation.equals(a, b),
+        rotationCopy: (a) => WarlockRotation.clone(a),
+        rotationToJson: (a) => WarlockRotation.toJson(a),
+        rotationFromJson: (obj) => WarlockRotation.fromJson(obj),
+        talentsCreate: () => WarlockTalents.create(),
+        talentsEquals: (a, b) => WarlockTalents.equals(a, b),
+        talentsCopy: (a) => WarlockTalents.clone(a),
+        talentsToJson: (a) => WarlockTalents.toJson(a),
+        talentsFromJson: (obj) => WarlockTalents.fromJson(obj),
+        optionsCreate: () => WarlockOptions.create(),
+        optionsEquals: (a, b) => WarlockOptions.equals(a, b),
+        optionsCopy: (a) => WarlockOptions.clone(a),
+        optionsToJson: (a) => WarlockOptions.toJson(a),
+        optionsFromJson: (obj) => WarlockOptions.fromJson(obj),
+    },
+    [Spec.SpecWarrior]: {
+        rotationCreate: () => WarriorRotation.create(),
+        rotationEquals: (a, b) => WarriorRotation.equals(a, b),
+        rotationCopy: (a) => WarriorRotation.clone(a),
+        rotationToJson: (a) => WarriorRotation.toJson(a),
+        rotationFromJson: (obj) => WarriorRotation.fromJson(obj),
+        talentsCreate: () => WarriorTalents.create(),
+        talentsEquals: (a, b) => WarriorTalents.equals(a, b),
+        talentsCopy: (a) => WarriorTalents.clone(a),
+        talentsToJson: (a) => WarriorTalents.toJson(a),
+        talentsFromJson: (obj) => WarriorTalents.fromJson(obj),
+        optionsCreate: () => WarriorOptions.create(),
+        optionsEquals: (a, b) => WarriorOptions.equals(a, b),
+        optionsCopy: (a) => WarriorOptions.clone(a),
+        optionsToJson: (a) => WarriorOptions.toJson(a),
+        optionsFromJson: (obj) => WarriorOptions.fromJson(obj),
+    },
 };
 export const specToClass = {
     [Spec.SpecBalanceDruid]: Class.ClassDruid,
     [Spec.SpecElementalShaman]: Class.ClassShaman,
+    [Spec.SpecHunter]: Class.ClassHunter,
+    [Spec.SpecMage]: Class.ClassMage,
+    [Spec.SpecRogue]: Class.ClassRogue,
+    [Spec.SpecRetributionPaladin]: Class.ClassPaladin,
+    [Spec.SpecShadowPriest]: Class.ClassPriest,
+    [Spec.SpecWarlock]: Class.ClassWarlock,
+    [Spec.SpecWarrior]: Class.ClassWarrior,
 };
 const druidRaces = [
     Race.RaceNightElf,
     Race.RaceTauren,
+];
+const hunterRaces = [
+    Race.RaceBloodElf,
+    Race.RaceDraenei,
+    Race.RaceDwarf,
+    Race.RaceNightElf,
+    Race.RaceOrc,
+    Race.RaceTauren,
+    Race.RaceTroll10,
+    Race.RaceTroll30,
+];
+const mageRaces = [
+    Race.RaceBloodElf,
+    Race.RaceDraenei,
+    Race.RaceGnome,
+    Race.RaceHuman,
+    Race.RaceTroll10,
+    Race.RaceTroll30,
+    Race.RaceUndead,
+];
+const paladinRaces = [
+    Race.RaceBloodElf,
+    Race.RaceDraenei,
+    Race.RaceDwarf,
+    Race.RaceHuman,
+];
+const priestRaces = [
+    Race.RaceBloodElf,
+    Race.RaceDraenei,
+    Race.RaceDwarf,
+    Race.RaceHuman,
+    Race.RaceNightElf,
+    Race.RaceOrc,
+    Race.RaceTroll10,
+    Race.RaceTroll30,
+    Race.RaceUndead,
+];
+const rogueRaces = [
+    Race.RaceBloodElf,
+    Race.RaceDwarf,
+    Race.RaceGnome,
+    Race.RaceHuman,
+    Race.RaceNightElf,
+    Race.RaceOrc,
+    Race.RaceTroll10,
+    Race.RaceTroll30,
+    Race.RaceUndead,
 ];
 const shamanRaces = [
     Race.RaceDraenei,
@@ -64,15 +244,49 @@ const shamanRaces = [
     Race.RaceTroll10,
     Race.RaceTroll30,
 ];
+const warlockRaces = [
+    Race.RaceBloodElf,
+    Race.RaceGnome,
+    Race.RaceHuman,
+    Race.RaceOrc,
+    Race.RaceUndead,
+];
+const warriorRaces = [
+    Race.RaceBloodElf,
+    Race.RaceDraenei,
+    Race.RaceDwarf,
+    Race.RaceGnome,
+    Race.RaceHuman,
+    Race.RaceNightElf,
+    Race.RaceOrc,
+    Race.RaceTauren,
+    Race.RaceTroll10,
+    Race.RaceTroll30,
+    Race.RaceUndead,
+];
 export const specToEligibleRaces = {
     [Spec.SpecBalanceDruid]: druidRaces,
     [Spec.SpecElementalShaman]: shamanRaces,
+    [Spec.SpecHunter]: hunterRaces,
+    [Spec.SpecMage]: mageRaces,
+    [Spec.SpecRetributionPaladin]: paladinRaces,
+    [Spec.SpecRogue]: rogueRaces,
+    [Spec.SpecShadowPriest]: priestRaces,
+    [Spec.SpecWarlock]: warlockRaces,
+    [Spec.SpecWarrior]: warriorRaces,
 };
 // Prefixes used for storing browser data for each site. Even if a Spec is
 // renamed, DO NOT change these values or people will lose their saved data.
 export const specToLocalStorageKey = {
     [Spec.SpecBalanceDruid]: '__balance_druid',
     [Spec.SpecElementalShaman]: '__elemental_shaman',
+    [Spec.SpecHunter]: '__hunter',
+    [Spec.SpecMage]: '__mage',
+    [Spec.SpecRetributionPaladin]: '__retribution_paladin',
+    [Spec.SpecRogue]: '__rogue',
+    [Spec.SpecShadowPriest]: '__shadow_priest',
+    [Spec.SpecWarlock]: '__warlock',
+    [Spec.SpecWarrior]: '__warrior',
 };
 // Returns a copy of playerOptions, with the class field set.
 export function withSpecProto(playerOptions, rotation, talents, specOptions) {
@@ -93,6 +307,83 @@ export function withSpecProto(playerOptions, rotation, talents, specOptions) {
         copy.spec = {
             oneofKind: 'elementalShaman',
             elementalShaman: ElementalShaman.create({
+                rotation: rotation,
+                talents: talents,
+                options: specOptions,
+            }),
+        };
+    }
+    else if (HunterRotation.is(rotation)) {
+        copy.class = Class.ClassHunter;
+        copy.spec = {
+            oneofKind: 'hunter',
+            hunter: Hunter.create({
+                rotation: rotation,
+                talents: talents,
+                options: specOptions,
+            }),
+        };
+    }
+    else if (MageRotation.is(rotation)) {
+        copy.class = Class.ClassMage;
+        copy.spec = {
+            oneofKind: 'mage',
+            mage: Mage.create({
+                rotation: rotation,
+                talents: talents,
+                options: specOptions,
+            }),
+        };
+    }
+    else if (RetributionPaladinRotation.is(rotation)) {
+        copy.class = Class.ClassPaladin;
+        copy.spec = {
+            oneofKind: 'retributionPaladin',
+            retributionPaladin: RetributionPaladin.create({
+                rotation: rotation,
+                talents: talents,
+                options: specOptions,
+            }),
+        };
+    }
+    else if (RogueRotation.is(rotation)) {
+        copy.class = Class.ClassRogue;
+        copy.spec = {
+            oneofKind: 'rogue',
+            rogue: Rogue.create({
+                rotation: rotation,
+                talents: talents,
+                options: specOptions,
+            }),
+        };
+    }
+    else if (ShadowPriestRotation.is(rotation)) {
+        copy.class = Class.ClassPriest;
+        copy.spec = {
+            oneofKind: 'shadowPriest',
+            shadowPriest: ShadowPriest.create({
+                rotation: rotation,
+                talents: talents,
+                options: specOptions,
+            }),
+        };
+    }
+    else if (WarlockRotation.is(rotation)) {
+        copy.class = Class.ClassWarlock;
+        copy.spec = {
+            oneofKind: 'warlock',
+            warlock: Warlock.create({
+                rotation: rotation,
+                talents: talents,
+                options: specOptions,
+            }),
+        };
+    }
+    else if (WarriorRotation.is(rotation)) {
+        copy.class = Class.ClassWarrior;
+        copy.spec = {
+            oneofKind: 'warrior',
+            warrior: Warrior.create({
                 rotation: rotation,
                 talents: talents,
                 options: specOptions,

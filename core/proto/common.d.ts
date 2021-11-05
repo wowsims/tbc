@@ -391,7 +391,35 @@ export declare enum Spec {
     /**
      * @generated from protobuf enum value: SpecElementalShaman = 1;
      */
-    SpecElementalShaman = 1
+    SpecElementalShaman = 1,
+    /**
+     * @generated from protobuf enum value: SpecHunter = 8;
+     */
+    SpecHunter = 8,
+    /**
+     * @generated from protobuf enum value: SpecMage = 2;
+     */
+    SpecMage = 2,
+    /**
+     * @generated from protobuf enum value: SpecRetributionPaladin = 3;
+     */
+    SpecRetributionPaladin = 3,
+    /**
+     * @generated from protobuf enum value: SpecRogue = 7;
+     */
+    SpecRogue = 7,
+    /**
+     * @generated from protobuf enum value: SpecShadowPriest = 4;
+     */
+    SpecShadowPriest = 4,
+    /**
+     * @generated from protobuf enum value: SpecWarlock = 5;
+     */
+    SpecWarlock = 5,
+    /**
+     * @generated from protobuf enum value: SpecWarrior = 6;
+     */
+    SpecWarrior = 6
 }
 /**
  * @generated from protobuf enum proto.Race
