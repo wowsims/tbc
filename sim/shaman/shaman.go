@@ -8,10 +8,9 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-func NewShaman(character core.Character, talents proto.ShamanTalents, selfBuffs SelfBuffs, rotation Rotation) *Shaman {
-	shaman := &Shaman{
+func NewShaman(character core.Character, talents proto.ShamanTalents, selfBuffs SelfBuffs) Shaman {
+	shaman := Shaman{
 		Character: character,
-		rotation:  rotation,
 		Talents:   talents,
 		SelfBuffs: selfBuffs,
 
@@ -57,24 +56,9 @@ type SelfBuffs struct {
 	ManaSpring   bool
 }
 
-// Picks which attacks / abilities the Shaman does.
-type Rotation interface {
-	// Returns the action this rotation would like to take next.
-	ChooseAction(*Shaman, *core.Simulation) core.AgentAction
-
-	// This will be invoked right before the chosen action is actually executed, so the rotation can update its state.
-	// Note that the action may be different from the action chosen by this rotation.
-	OnActionAccepted(*Shaman, *core.Simulation, core.AgentAction)
-
-	// Returns this rotation to its initial state. Called before each Sim iteration.
-	Reset(*Shaman, *core.Simulation)
-}
-
 // Shaman represents a shaman character.
 type Shaman struct {
 	core.Character
-
-	rotation Rotation
 
 	Talents   proto.ShamanTalents
 	SelfBuffs SelfBuffs
@@ -84,6 +68,14 @@ type Shaman struct {
 	// cache
 	convectionBonus float64
 	concussionBonus float64
+}
+
+// Implemented by each Shaman spec.
+type ShamanAgent interface {
+	core.Agent
+
+	// The Shaman controlled by this Agent.
+	GetShaman() *Shaman
 }
 
 func (shaman *Shaman) GetCharacter() *core.Character {
@@ -111,30 +103,6 @@ func (shaman *Shaman) AddPartyBuffs(buffs *proto.Buffs) {
 			woaValue = proto.TristateEffect_TristateEffectImproved
 		}
 		buffs.WrathOfAirTotem = core.MaxTristate(buffs.WrathOfAirTotem, woaValue)
-	}
-}
-
-func (shaman *Shaman) Reset(newsim *core.Simulation) {
-	shaman.rotation.Reset(shaman, newsim)
-}
-
-func (shaman *Shaman) Act(sim *core.Simulation) time.Duration {
-	newAction := shaman.rotation.ChooseAction(shaman, sim)
-
-	actionSuccessful := newAction.Act(sim)
-	if actionSuccessful {
-		shaman.rotation.OnActionAccepted(shaman, sim, newAction)
-		return sim.CurrentTime + core.MaxDuration(
-				shaman.GetRemainingCD(core.GCDCooldownID, sim.CurrentTime),
-				newAction.GetDuration())
-	} else {
-		// Only way for a shaman spell to fail is due to mana cost.
-		// Wait until we have enough mana to cast.
-		// TODO: This logic should be in ele shaman code, because enhance react differently to going oom.
-		regenTime := shaman.TimeUntilManaRegen(newAction.GetManaCost())
-		newAction = core.NewWaitAction(sim, shaman.GetCharacter(), regenTime)
-		shaman.rotation.OnActionAccepted(shaman, sim, newAction)
-		return sim.CurrentTime + regenTime
 	}
 }
 

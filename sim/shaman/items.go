@@ -34,10 +34,11 @@ var ItemSetTidefury = core.ItemSet{
 			})
 		},
 		4: func(agent core.Agent) {
-			shaman, ok := agent.(*Shaman)
+			shamanAgent, ok := agent.(ShamanAgent)
 			if !ok {
 				log.Fatalf("Non-shaman attempted to activate shaman cyclone set bonus.")
 			}
+			shaman := shamanAgent.GetShaman()
 
 			if shaman.SelfBuffs.WaterShield {
 				shaman.AddStat(stats.MP5, 3)
