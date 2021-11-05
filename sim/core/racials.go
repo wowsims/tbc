@@ -7,6 +7,12 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
+var OrcBloodFuryAuraID = NewAuraID()
+var OrcBloodFuryCooldownID = NewCooldownID()
+
+var TrollBerserkingAuraID = NewAuraID()
+var TrollBerserkingCooldownID = NewCooldownID()
+
 func applyRaceEffects(agent Agent) {
 	character := agent.GetCharacter()
 
@@ -42,13 +48,12 @@ func applyRaceEffects(agent Agent) {
 		const spBonus = 143
 
 		character.AddMajorCooldown(MajorCooldown{
-			CooldownID: MagicIDOrcBloodFury,
+			CooldownID: OrcBloodFuryCooldownID,
 			Cooldown: cd,
-			Priority: CooldownPriorityDefault,
 			ActivationFactory: func(sim *Simulation) CooldownActivation {
 				return func(sim *Simulation, character *Character) bool {
-					character.SetCD(MagicIDOrcBloodFury, cd+sim.CurrentTime)
-					character.AddAuraWithTemporaryStats(sim, MagicIDOrcBloodFury, stats.SpellPower, spBonus, dur)
+					character.SetCD(OrcBloodFuryCooldownID, cd+sim.CurrentTime)
+					character.AddAuraWithTemporaryStats(sim, OrcBloodFuryAuraID, "Orc Blood Fury", stats.SpellPower, spBonus, dur)
 					return true
 				}
 			},
@@ -66,14 +71,14 @@ func applyRaceEffects(agent Agent) {
 		const cd = time.Minute * 3
 
 		character.AddMajorCooldown(MajorCooldown{
-			CooldownID: MagicIDTrollBerserking,
+			CooldownID: TrollBerserkingCooldownID,
 			Cooldown: cd,
-			Priority: CooldownPriorityDefault,
 			ActivationFactory: func(sim *Simulation) CooldownActivation {
 				return func(sim *Simulation, character *Character) bool {
-					character.SetCD(MagicIDTrollBerserking, cd+sim.CurrentTime)
+					character.SetCD(TrollBerserkingCooldownID, cd+sim.CurrentTime)
 					character.AddAura(sim, Aura{
-						ID:      MagicIDTrollBerserking,
+						ID:      TrollBerserkingAuraID,
+						Name:    "Troll Berserking",
 						Expires: sim.CurrentTime + dur,
 						OnCast: func(sim *Simulation, cast DirectCastAction, inputs *DirectCastInput) {
 							// Multiplying and then dividing lets us use integer multiplication/division which is faster.
@@ -86,5 +91,4 @@ func applyRaceEffects(agent Agent) {
 		})
 	case proto.Race_RaceUndead:
 	}
-
 }

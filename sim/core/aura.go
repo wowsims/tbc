@@ -9,8 +9,45 @@ import (
 
 const NeverExpires = time.Duration(math.MaxInt64)
 
+type AuraID int32
+
+// Reserve the default value so no aura uses it.
+const UnknownAuraID = AuraID(0)
+var numAuraIDs = 1
+
+func NewAuraID() AuraID {
+	newAuraID := AuraID(numAuraIDs)
+	numAuraIDs++
+	return newAuraID
+}
+
+// Offsensive trinkets put each other on CD, so they can all share 1 aura ID
+var OffensiveTrinketActiveAuraID = NewAuraID()
+// Defensive trinkets put each other on CD, so they can all share 1 aura ID
+var DefensiveTrinketActiveAuraID = NewAuraID()
+
+type CooldownID int32
+
+// Reserve the default value so no cooldown uses it.
+const UnknownCooldownID = AuraID(0)
+var numCooldownIDs = 1
+
+func NewCooldownID() CooldownID {
+	newCooldownID := CooldownID(numCooldownIDs)
+	numCooldownIDs++
+	return newCooldownID
+}
+
+var GCDCooldownID = NewCooldownID()
+var MainHandSwingCooldownID = NewCooldownID()
+var OffHandSwingCooldownID = NewCooldownID()
+var RangedSwingCooldownID = NewCooldownID()
+var OffensiveTrinketSharedCooldownID = NewCooldownID()
+var DefensiveTrinketSharedCooldownID = NewCooldownID()
+
 type Aura struct {
-	ID          int32
+	ID          AuraID
+	Name        string        // Label used for logging.
 	Expires     time.Duration // time at which aura will be removed
 	activeIndex int32         // Position of this aura's index in the sim.activeAuraIDs array
 
@@ -56,19 +93,19 @@ type auraTracker struct {
 	finalized bool
 
   // Maps MagicIDs to sim duration at which CD is done. Using array for perf.
-	cooldowns [MagicIDLen]time.Duration
+	cooldowns []time.Duration
 
 	// Maps MagicIDs to aura for that ID. Using array for perf.
-	auras [MagicIDLen]Aura
+	auras []Aura
 
 	// IDs of Auras that are active, in no particular order
-	activeAuraIDs []int32
+	activeAuraIDs []AuraID
 }
 
 func newAuraTracker() auraTracker {
 	return auraTracker{
 		permanentAuras: []PermanentAura{},
-		activeAuraIDs: make([]int32, 0, 5),
+		activeAuraIDs: make([]AuraID, 0, 5),
 	}
 }
 
@@ -90,8 +127,8 @@ func (at *auraTracker) finalize() {
 }
 
 func (at *auraTracker) reset(sim *Simulation) {
-	at.auras = [MagicIDLen]Aura{}
-	at.cooldowns = [MagicIDLen]time.Duration{}
+	at.auras = make([]Aura, numAuraIDs)
+	at.cooldowns = make([]time.Duration, numCooldownIDs)
 	at.activeAuraIDs = at.activeAuraIDs[:0]
 
 	for _, permAura := range at.permanentAuras {
@@ -128,15 +165,20 @@ func (at *auraTracker) AddAura(sim *Simulation, newAura Aura) {
 	at.activeAuraIDs = append(at.activeAuraIDs, newAura.ID)
 
 	if sim.Log != nil {
-		sim.Log("(%d) +%s\n", at.playerID, AuraName(newAura.ID))
+		sim.Log("(%d) +%s\n", at.playerID, newAura.Name)
 	}
 }
 
 // Remove an aura by its ID
-func (at *auraTracker) RemoveAura(sim *Simulation, id int32) {
+func (at *auraTracker) RemoveAura(sim *Simulation, id AuraID) {
 	if at.auras[id].OnExpire != nil {
 		at.auras[id].OnExpire(sim)
 	}
+
+	if sim.Log != nil {
+		sim.Log("(%d) -%s\n", at.playerID, at.auras[id].Name)
+	}
+
 	removeActiveIndex := at.auras[id].activeIndex
 	at.auras[id] = Aura{}
 
@@ -149,23 +191,19 @@ func (at *auraTracker) RemoveAura(sim *Simulation, id int32) {
 
 	// Now we can remove the last element, in constant time
 	at.activeAuraIDs = at.activeAuraIDs[:len(at.activeAuraIDs)-1]
-
-	if sim.Log != nil {
-		sim.Log("(%d) -%s\n", at.playerID, AuraName(id))
-	}
 }
 
 // Returns whether an aura with the given ID is currently active.
-func (at *auraTracker) HasAura(id int32) bool {
+func (at *auraTracker) HasAura(id AuraID) bool {
 	return at.auras[id].ID != 0
 }
 
-func (at *auraTracker) IsOnCD(magicID int32, currentTime time.Duration) bool {
-	return at.cooldowns[magicID] > currentTime
+func (at *auraTracker) IsOnCD(id CooldownID, currentTime time.Duration) bool {
+	return at.cooldowns[id] > currentTime
 }
 
-func (at *auraTracker) GetRemainingCD(magicID int32, currentTime time.Duration) time.Duration {
-	remainingCD := at.cooldowns[magicID] - currentTime
+func (at *auraTracker) GetRemainingCD(id CooldownID, currentTime time.Duration) time.Duration {
+	remainingCD := at.cooldowns[id] - currentTime
 	if remainingCD > 0 {
 		return remainingCD
 	} else {
@@ -173,8 +211,8 @@ func (at *auraTracker) GetRemainingCD(magicID int32, currentTime time.Duration) 
 	}
 }
 
-func (at *auraTracker) SetCD(magicID int32, newCD time.Duration) {
-	at.cooldowns[magicID] = newCD
+func (at *auraTracker) SetCD(id CooldownID, newCD time.Duration) {
+	at.cooldowns[id] = newCD
 }
 
 // Invokes the OnCast event for all tracked Auras.
@@ -222,145 +260,6 @@ func (at *auraTracker) OnSpellHit(sim *Simulation, cast DirectCastAction, result
 	}
 }
 
-func AuraName(a int32) string {
-	switch a {
-	case MagicIDUnknown:
-		return "Unknown"
-	case MagicIDLOTalent:
-		return "Lightning Overload Talent"
-	case MagicIDJoW:
-		return "Judgement Of Wisdom Aura"
-	case MagicIDEleMastery:
-		return "Elemental Mastery"
-	case MagicIDBlessingSilverCrescent:
-		return "Blessing of the Silver Crescent"
-	case MagicIDDarkIronPipeweed:
-		return "Dark Iron Pipeweed"
-	case MagicIDQuagsEye:
-		return "Quags Eye"
-	case MagicIDFungalFrenzy:
-		return "Fungal Frenzy"
-	case MagicIDBloodlust:
-		return "Bloodlust"
-	case MagicIDSkycall:
-		return "Skycall"
-	case MagicIDEnergized:
-		return "Energized"
-	case MagicIDNAC:
-		return "Nature Alignment Crystal"
-	case MagicIDChaoticSkyfire:
-		return "Chaotic Skyfire"
-	case MagicIDInsightfulEarthstorm:
-		return "Insightful Earthstorm"
-	case MagicIDMysticSkyfire:
-		return "Mystic Skyfire"
-	case MagicIDMysticFocus:
-		return "Mystic Focus"
-	case MagicIDISCTrink:
-		return "Icon Trinket"
-	case MagicIDNACTrink:
-		return "NAC Trinket"
-	case MagicIDDITrink:
-		return "Dark Iron Trinket"
-	case MagicIDPotion:
-		return "Potion"
-	case MagicIDRune:
-		return "Rune"
-	case MagicIDAtkTrinket:
-		return "Shared Attack Trinkets CD"
-	case MagicIDHealTrinket:
-		return "Shared Heal Trinkets CD"
-	case MagicIDSpellPower:
-		return "SpellPower"
-	case MagicIDRubySerpent:
-		return "RubySerpent"
-	case MagicIDCallOfTheNexus:
-		return "CallOfTheNexus"
-	case MagicIDDCC:
-		return "Darkmoon Card Crusade"
-	case MagicIDDCCBonus:
-		return "Aura of the Crusade"
-	case MagicIDScryerTrink:
-		return "Scryer Trinket"
-	case MagicIDRubySerpentTrink:
-		return "Ruby Serpent Trinket"
-	case MagicIDXiriTrink:
-		return "Xiri Trinket"
-	case MagicIDDrums:
-		return "Drums"
-	case MagicIDTwinStars:
-		return "Twin Stars Set"
-	case MagicIDTidefury:
-		return "Tidefury Set"
-	case MagicIDSpellstrike:
-		return "Spellstrike Set"
-	case MagicIDSpellstrikeInfusion:
-		return "Spellstrike Infusion"
-	case MagicIDManaEtched:
-		return "Mana-Etched Set"
-	case MagicIDManaEtchedInsight:
-		return "Mana-EtchedInsight"
-	case MagicIDOrcBloodFury:
-		return "Orc Blood Fury"
-	case MagicIDTrollBerserking:
-		return "Troll Berserking"
-	case MagicIDEyeOfTheNight:
-		return "EyeOfTheNight"
-	case MagicIDChainTO:
-		return "Chain of the Twilight Owl"
-	case MagicIDCyclone4pc:
-		return "Cyclone 4pc Bonus"
-	case MagicIDCycloneMana:
-		return "Cyclone Mana Cost Reduction"
-	case MagicIDTLC:
-		return "The Lightning Capacitor Aura"
-	case MagicIDDestructionPotion:
-		return "Destruction Potion"
-	case MagicIDHexShunkHead:
-		return "Hex Shunken Head"
-	case MagicIDShiftingNaaru:
-		return "Shifting Naaru Sliver"
-	case MagicIDSkullGuldan:
-		return "Skull of Guldan"
-	case MagicIDNexusHorn:
-		return "Nexus-Horn"
-	case MagicIDSextant:
-		return "Sextant of Unstable Currents"
-	case MagicIDUnstableCurrents:
-		return "Unstable Currents"
-	case MagicIDEyeOfMag:
-		return "Eye Of Mag"
-	case MagicIDRecurringPower:
-		return "Recurring Power"
-	case MagicIDCataclysm4pc:
-		return "Cataclysm 4pc Set Bonus"
-	case MagicIDSkyshatter4pc:
-		return "Skyshatter 4pc Set Bonus"
-	case MagicIDEssMartyrTrink:
-		return "Essence of the Martyr Trinket"
-	case MagicIDEssSappTrink:
-		return "Restrained Essence of Sapphiron Trinket"
-	case MagicIDMisery:
-		return "Misery"
-	case MagicIDElderScribe:
-		return "Robes of the Elder Scribe"
-	case MagicIDElderScribeProc:
-		return "Power of Arcanagos"
-	case MagicIDHexTrink:
-		return "Hex Trinket CD"
-	case MagicIDShiftingNaaruTrink:
-		return "ShiftingNaaru Trinket CD"
-	case MagicIDSkullGuldanTrink:
-		return "SkullGuldan Trinket CD"
-	case MagicIDRegainMana:
-		return "Fathom-Brooch Regain Mana"
-	case MagicIDImprovedSealOfTheCrusader:
-		return "Improved Seal of the Crusader"
-	}
-
-	return "<<Add Aura name to switch!!>>"
-}
-
 // Stored value is the time at which the ICD will be off CD
 type InternalCD time.Duration
 
@@ -372,107 +271,20 @@ func NewICD() InternalCD {
 	return InternalCD(0)
 }
 
-// List of all magic effects and spells and items and stuff that can go on CD or have an aura.
-const (
-	MagicIDUnknown int32 = iota
-
-	// Basic CDs
-	MagicIDGCD
-	MagicIDMainHandSwing
-	MagicIDOffHandSwing
-	MagicIDRangedSwing
-
-	// Spells, used for tracking CDs
-	MagicIDChainLightning6
-	// MagicIDFlameShock
-
-	// Auras
-	MagicIDLOTalent
-	MagicIDJoW
-	MagicIDEleMastery
-	MagicIDBlessingSilverCrescent
-	MagicIDDarkIronPipeweed
-	MagicIDQuagsEye
-	MagicIDFungalFrenzy
-	MagicIDBloodlust
-	MagicIDSkycall
-	MagicIDEnergized
-	MagicIDNAC
-	MagicIDChaoticSkyfire
-	MagicIDInsightfulEarthstorm
-	MagicIDMysticSkyfire
-	MagicIDMysticFocus
-	MagicIDSpellPower
-	MagicIDRubySerpent
-	MagicIDCallOfTheNexus
-	MagicIDDCC
-	MagicIDDCCBonus
-	MagicIDDrums // drums effect
-	MagicIDTwinStars
-	MagicIDTidefury
-	MagicIDSpellstrike
-	MagicIDSpellstrikeInfusion
-	MagicIDManaEtched
-	MagicIDManaEtchedInsight
-	MagicIDMisery
-	MagicIDEyeOfTheNight
-	MagicIDChainTO
-	MagicIDCyclone4pc
-	MagicIDCycloneMana // proc from 4pc
-	MagicIDOrcBloodFury    // orc racials
-	MagicIDTrollBerserking // troll racial
-	MagicIDTLC             // aura on equip of TLC, stores charges
-	MagicIDDestructionPotion
-	MagicIDHexShunkHead
-	MagicIDShiftingNaaru
-	MagicIDSkullGuldan
-	MagicIDNexusHorn
-	MagicIDSextant          // Trinket Aura
-	MagicIDUnstableCurrents // Sextant Proc Aura
-	MagicIDEyeOfMag         // trinket aura
-	MagicIDRecurringPower   // eye of mag proc aura
-	MagicIDCataclysm4pc     // cyclone 4pc aura
-	MagicIDSkyshatter4pc    // skyshatter 4pc aura
-	MagicIDElderScribe      // elder scribe robe item aura
-	MagicIDElderScribeProc  // elder scribe robe temp buff
-	MagicIDRegainMana // effect from fathom brooch
-	MagicIDCurseOfElements
-	MagicIDImprovedSealOfTheCrusader
-
-	// Items  (Usually individual trinket CDs)
-	MagicIDISCTrink
-	MagicIDNACTrink
-	MagicIDPotion
-	MagicIDRune
-	MagicIDAtkTrinket
-	MagicIDHealTrinket
-	MagicIDScryerTrink
-	MagicIDRubySerpentTrink
-	MagicIDXiriTrink
-	MagicIDHexTrink
-	MagicIDShiftingNaaruTrink
-	MagicIDSkullGuldanTrink
-	MagicIDEssMartyrTrink
-	MagicIDEssSappTrink
-	MagicIDDITrink // Dark Iron pipe trinket CD
-
-	// Always at end so we know how many magic IDs there are.
-	MagicIDLen
-)
-
 // Helper for the common case of adding an Aura that gives a temporary stat boost.
-func (character *Character) AddAuraWithTemporaryStats(sim *Simulation, auraID int32, stat stats.Stat, amount float64, duration time.Duration) {
+func (character *Character) AddAuraWithTemporaryStats(sim *Simulation, auraID AuraID, auraName string, stat stats.Stat, amount float64, duration time.Duration) {
 	if sim.Log != nil {
-		sim.Log(" +%0.0f %s from %s\n", amount, stat.StatName(), AuraName(auraID))
+		sim.Log(" +%0.0f %s from %s\n", amount, stat.StatName(), auraName)
 	}
 	character.AddStat(stat, amount)
 
 	character.AddAura(sim, Aura{
 		ID:      auraID,
+		Name:    auraName,
 		Expires: sim.CurrentTime + duration,
 		OnExpire: func(sim *Simulation) {
 			if sim.Log != nil {
-				sim.Log(" -%0.0f %s from %s\n", amount, stat.StatName(), AuraName(auraID))
+				sim.Log(" -%0.0f %s from %s\n", amount, stat.StatName(), auraName)
 			}
 			character.AddStat(stat, -amount)
 		},

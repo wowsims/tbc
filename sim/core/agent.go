@@ -31,7 +31,7 @@ type Agent interface {
 type ActionID struct {
 	SpellID    int32
 	ItemID     int32
-	CooldownID int32 // used only for tracking CDs internally
+	CooldownID CooldownID // used only for tracking CDs internally
 	OtherID    proto.OtherAction
 	// Can add future id types here.
 }
