@@ -23,6 +23,7 @@ const (
 // Shared logic for Lightning Bolt and Chain Lightning
 type ElectricSpell struct {
 	Shaman *Shaman
+	Target *core.Target
 	IsLightningOverload bool
 
 	name         string

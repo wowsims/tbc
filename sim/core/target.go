@@ -18,8 +18,8 @@ func NewEncounter(options proto.Encounter) Encounter {
 		Targets: []*Target{},
 	}
 
-	for _, targetOptions := range options.Targets {
-		target := NewTarget(*targetOptions)
+	for targetIndex, targetOptions := range options.Targets {
+		target := NewTarget(*targetOptions, int32(targetIndex))
 		encounter.Targets = append(encounter.Targets, target)
 	}
 
@@ -35,6 +35,10 @@ func (encounter *Encounter) Finalize() {
 // Target is an enemy that can be the target of attacks/spells.
 // Currently targets are basically just lvl 73 target dummies.
 type Target struct {
+	// Index of this target among all the targets. Primary target has index 0,
+	// 2nd target has index 1, etc.
+	Index int32
+
 	armor int32
 
 	// Provides aura tracking behavior. Targets need auras to handle debuffs.
@@ -45,10 +49,11 @@ type Target struct {
 	finalized bool
 }
 
-func NewTarget(options proto.Target) *Target {
+func NewTarget(options proto.Target, targetIndex int32) *Target {
 	target := &Target{
+		Index: targetIndex,
 		armor: options.Armor,
-		auraTracker: newAuraTracker(),
+		auraTracker: newAuraTracker(true),
 	}
 	// TODO: Do something with this
 	target.auraTracker.playerID = -1
@@ -80,10 +85,10 @@ func applyDebuffEffects(target *Target, debuffs proto.Debuffs) {
 	}
 }
 
-var MiseryAuraID = NewAuraID()
+var MiseryDebuffID = NewDebuffID()
 func miseryAura() Aura {
 	return Aura{
-		ID: MiseryAuraID,
+		ID: MiseryDebuffID,
 		Name: "Misery",
 		OnSpellHit: func(sim *Simulation, cast DirectCastAction, result *DirectCastDamageResult) {
 			result.Damage *= 1.05
@@ -91,11 +96,11 @@ func miseryAura() Aura {
 	}
 }
 
-var JudgementOfWisdomAuraID = NewAuraID()
+var JudgementOfWisdomDebuffID = NewDebuffID()
 func judgementOfWisdomAura() Aura {
 	const mana = 74 / 2 // 50% proc
 	return Aura{
-		ID: JudgementOfWisdomAuraID,
+		ID: JudgementOfWisdomDebuffID,
 		Name: "Judgement of Wisdom",
 		OnSpellHit: func(sim *Simulation, cast DirectCastAction, result *DirectCastDamageResult) {
 			if cast.GetActionID().ItemID == ItemIDTheLightningCapacitor {
@@ -114,10 +119,10 @@ func judgementOfWisdomAura() Aura {
 	}
 }
 
-var ImprovedSealOfTheCrusaderAuraID = NewAuraID()
+var ImprovedSealOfTheCrusaderDebuffID = NewDebuffID()
 func improvedSealOfTheCrusaderAura() Aura {
 	return Aura{
-		ID: ImprovedSealOfTheCrusaderAuraID,
+		ID: ImprovedSealOfTheCrusaderDebuffID,
 		Name: "Improved Seal of the Crusader",
 		OnBeforeSpellHit: func(sim *Simulation, hitInput *DirectCastDamageInput) {
 			hitInput.BonusCrit += 3
@@ -140,5 +145,5 @@ func (target *Target) Reset(sim *Simulation) {
 }
 
 func (target *Target) Advance(sim *Simulation, elapsedTime time.Duration) {
-	target.auraTracker.advance(sim, elapsedTime)
+	target.auraTracker.advance(sim)
 }

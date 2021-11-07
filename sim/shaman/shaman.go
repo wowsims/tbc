@@ -106,6 +106,15 @@ func (shaman *Shaman) AddPartyBuffs(buffs *proto.Buffs) {
 	}
 }
 
+func (shaman *Shaman) Reset(sim *core.Simulation) {
+	shaman.Character.Reset(sim)
+}
+
+func (shaman *Shaman) Advance(sim *core.Simulation, elapsedTime time.Duration) {
+	shaman.Character.RegenManaMP5Only(sim, elapsedTime)
+	shaman.Character.Advance(sim, elapsedTime)
+}
+
 var ElementalMasteryAuraID = core.NewAuraID()
 var ElementalMasteryCooldownID = core.NewCooldownID()
 func (shaman *Shaman) registerElementalMasteryCD() {
