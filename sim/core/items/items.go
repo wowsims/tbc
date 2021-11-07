@@ -58,6 +58,10 @@ type Item struct {
 	HandType         proto.HandType
 	RangedWeaponType proto.RangedWeaponType
 
+	// Used by the UI to filter which items are shown.
+	Categories     []proto.ItemCategory
+	ClassAllowlist []proto.Class
+
 	Name       string
 	SourceZone string
 	SourceDrop string
@@ -77,12 +81,14 @@ type Item struct {
 func (item Item) ToProto() *proto.Item {
 	return &proto.Item{
 		Id:               item.ID,
+		Name:             item.Name,
+		Categories:       item.Categories[:],
+		ClassAllowlist:   item.ClassAllowlist[:],
 		Type:             proto.ItemType(item.Type),
 		ArmorType:        proto.ArmorType(item.ArmorType),
 		WeaponType:       proto.WeaponType(item.WeaponType),
 		HandType:         proto.HandType(item.HandType),
 		RangedWeaponType: proto.RangedWeaponType(item.RangedWeaponType),
-		Name:             item.Name,
 		Stats:            item.Stats[:],
 		Phase:            int32(item.Phase),
 		Quality:          item.Quality,

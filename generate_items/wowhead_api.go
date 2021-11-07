@@ -119,6 +119,50 @@ func (item WowheadItemResponse) GetStats() Stats {
 	}
 }
 
+var warriorRegex = regexp.MustCompile("<a href=\\\"/class=1\\\" class=\\\"c1\\\">Warrior</a>")
+var paladinRegex = regexp.MustCompile("<a href=\\\"/class=2\\\" class=\\\"c2\\\">Paladin</a>")
+var hunterRegex = regexp.MustCompile("<a href=\\\"/class=3\\\" class=\\\"c3\\\">Hunter</a>")
+var rogueRegex = regexp.MustCompile("<a href=\\\"/class=4\\\" class=\\\"c4\\\">Rogue</a>")
+var priestRegex = regexp.MustCompile("<a href=\\\"/class=5\\\" class=\\\"c5\\\">Priest</a>")
+var shamanRegex = regexp.MustCompile("<a href=\\\"/class=7\\\" class=\\\"c7\\\">Shaman</a>")
+var mageRegex = regexp.MustCompile("<a href=\\\"/class=8\\\" class=\\\"c8\\\">Mage</a>")
+var warlockRegex = regexp.MustCompile("<a href=\\\"/class=9\\\" class=\\\"c9\\\">Warlock</a>")
+var druidRegex = regexp.MustCompile("<a href=\\\"/class=11\\\" class=\\\"c11\\\">Druid</a>")
+
+func (item WowheadItemResponse) GetClassAllowlist() []proto.Class {
+	var allowlist []proto.Class
+
+	if druidRegex.MatchString(item.Tooltip) {
+		allowlist = append(allowlist, proto.Class_ClassDruid)
+	}
+	if hunterRegex.MatchString(item.Tooltip) {
+		allowlist = append(allowlist, proto.Class_ClassHunter)
+	}
+	if mageRegex.MatchString(item.Tooltip) {
+		allowlist = append(allowlist, proto.Class_ClassMage)
+	}
+	if paladinRegex.MatchString(item.Tooltip) {
+		allowlist = append(allowlist, proto.Class_ClassPaladin)
+	}
+	if priestRegex.MatchString(item.Tooltip) {
+		allowlist = append(allowlist, proto.Class_ClassPriest)
+	}
+	if rogueRegex.MatchString(item.Tooltip) {
+		allowlist = append(allowlist, proto.Class_ClassRogue)
+	}
+	if shamanRegex.MatchString(item.Tooltip) {
+		allowlist = append(allowlist, proto.Class_ClassShaman)
+	}
+	if warlockRegex.MatchString(item.Tooltip) {
+		allowlist = append(allowlist, proto.Class_ClassWarlock)
+	}
+	if warriorRegex.MatchString(item.Tooltip) {
+		allowlist = append(allowlist, proto.Class_ClassWarrior)
+	}
+
+	return allowlist
+}
+
 var phaseRegex = regexp.MustCompile("Phase ([0-9])")
 func (item WowheadItemResponse) GetPhase() int {
 	return item.GetIntValue(phaseRegex)

@@ -2,8 +2,6 @@ package main
 
 import (
 	"flag"
-
-	"github.com/wowsims/tbc/sim/core/proto"
 )
 
 func main() {
@@ -21,9 +19,5 @@ func main() {
 		itemResponses[idx] = itemResponse
 	}
 
-	for specVal, _ := range proto.Spec_name {
-		spec := proto.Spec(specVal)
-		writeItemFile(*outDir, ItemDeclarations, itemResponses, &spec)
-	}
-	writeItemFile(*outDir, ItemDeclarations, itemResponses, nil)
+	writeItemFile(*outDir, ItemDeclarations, itemResponses)
 }
