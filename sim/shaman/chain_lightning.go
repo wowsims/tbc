@@ -26,7 +26,7 @@ func (cl ChainLightning) GetCooldown() time.Duration {
 
 func (cl ChainLightning) GetHitInputs(sim *core.Simulation, cast core.DirectCastAction) []core.DirectCastDamageInput{
 	hitInput := core.DirectCastDamageInput{
-		Target: sim.GetPrimaryTarget(),
+		Target: cl.Target,
 		MinBaseDamage: 734,
 		MaxBaseDamage: 838,
 		SpellCoefficient: 0.651,
@@ -41,7 +41,10 @@ func (cl ChainLightning) GetHitInputs(sim *core.Simulation, cast core.DirectCast
 
 	for i := int32(1); i < numHits; i++ {
 		bounceHit := hitInputs[i - 1] // Makes a copy
-		bounceHit.Target = sim.GetTarget(i)
+
+		// Pick targets by index, incrementally.
+		newTargetIndex := (bounceHit.Target.Index + 1) % sim.GetNumTargets()
+		bounceHit.Target = sim.GetTarget(newTargetIndex)
 
 		if cl.Shaman.HasAura(Tidefury2PcAuraID) {
 			bounceHit.DamageMultiplier *= 0.83
@@ -62,17 +65,18 @@ func (cl ChainLightning) OnSpellHit(sim *core.Simulation, cast core.DirectCastAc
 	if !cl.IsLightningOverload {
 		lightningOverloadChance := float64(cl.Shaman.Talents.LightningOverload) * 0.04 / 3
 		if sim.RandomFloat("LO") < lightningOverloadChance {
-			overloadAction := NewChainLightning(sim, cl.Shaman, true)
+			overloadAction := NewChainLightning(sim, cl.Shaman, cl.Target, true)
 			overloadAction.Act(sim)
 		}
 	}
 }
 
-func NewChainLightning(sim *core.Simulation, shaman *Shaman, IsLightningOverload bool) core.DirectCastAction {
+func NewChainLightning(sim *core.Simulation, shaman *Shaman, target *core.Target, IsLightningOverload bool) core.DirectCastAction {
 	return core.NewDirectCastAction(
 		sim,
 		ChainLightning{ElectricSpell{
 			Shaman: shaman,
+			Target: target,
 			IsLightningOverload: IsLightningOverload,
 			name: "Chain Lightning",
 			baseManaCost: 760.0,

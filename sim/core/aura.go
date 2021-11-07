@@ -26,6 +26,16 @@ var OffensiveTrinketActiveAuraID = NewAuraID()
 // Defensive trinkets put each other on CD, so they can all share 1 aura ID
 var DefensiveTrinketActiveAuraID = NewAuraID()
 
+// Reserve the default value so no aura uses it.
+const UnknownDebuffID = AuraID(0)
+var numDebuffIDs = 1
+
+func NewDebuffID() AuraID {
+	newDebuffID := AuraID(numDebuffIDs)
+	numDebuffIDs++
+	return newDebuffID
+}
+
 type CooldownID int32
 
 // Reserve the default value so no cooldown uses it.
@@ -50,6 +60,12 @@ type Aura struct {
 	Name        string        // Label used for logging.
 	Expires     time.Duration // time at which aura will be removed
 	activeIndex int32         // Position of this aura's index in the sim.activeAuraIDs array
+
+	onCastIndex           int32 // Position of this aura's index in the sim.onCastIDs array
+	onCastCompleteIndex   int32 // Position of this aura's index in the sim.onCastCompleteIDs array
+	onBeforeSpellHitIndex int32 // Position of this aura's index in the sim.onBeforeSpellHitIDs array
+	onSpellHitIndex       int32 // Position of this aura's index in the sim.onSpellHitIDs array
+	onSpellMissIndex      int32 // Position of this aura's index in the sim.onSpellMissIDs array
 
 	// The number of stacks, or charges, of this aura. If this aura doesn't care
 	// about charges, is just 0.
@@ -89,6 +105,9 @@ type auraTracker struct {
 	// Used for logging.
 	playerID int
 
+	// Set to true if this aura tracker is tracking target debuffs, instead of player buffs.
+	useDebuffIDs bool
+
 	// Whether finalize() has been called for this object.
 	finalized bool
 
@@ -100,12 +119,33 @@ type auraTracker struct {
 
 	// IDs of Auras that are active, in no particular order
 	activeAuraIDs []AuraID
+
+	// IDs of Auras that have a non-nil OnCast function set.
+	onCastIDs []AuraID
+
+	// IDs of Auras that have a non-nil OnCastComplete function set.
+	onCastCompleteIDs []AuraID
+
+	// IDs of Auras that have a non-nil OnBeforeSpellHit function set.
+	onBeforeSpellHitIDs []AuraID
+
+	// IDs of Auras that have a non-nil OnSpellHit function set.
+	onSpellHitIDs []AuraID
+
+	// IDs of Auras that have a non-nil OnSpellMiss function set.
+	onSpellMissIDs []AuraID
 }
 
-func newAuraTracker() auraTracker {
+func newAuraTracker(useDebuffIDs bool) auraTracker {
 	return auraTracker{
 		permanentAuras: []PermanentAura{},
-		activeAuraIDs: make([]AuraID, 0, 5),
+		activeAuraIDs: make([]AuraID, 0, 16),
+		onCastIDs: make([]AuraID, 0, 16),
+		onCastCompleteIDs: make([]AuraID, 0, 16),
+		onBeforeSpellHitIDs: make([]AuraID, 0, 16),
+		onSpellHitIDs: make([]AuraID, 0, 16),
+		onSpellMissIDs: make([]AuraID, 0, 16),
+		useDebuffIDs: useDebuffIDs,
 	}
 }
 
@@ -127,9 +167,19 @@ func (at *auraTracker) finalize() {
 }
 
 func (at *auraTracker) reset(sim *Simulation) {
-	at.auras = make([]Aura, numAuraIDs)
+	if at.useDebuffIDs {
+		at.auras = make([]Aura, numDebuffIDs)
+	} else {
+		at.auras = make([]Aura, numAuraIDs)
+	}
+
 	at.cooldowns = make([]time.Duration, numCooldownIDs)
 	at.activeAuraIDs = at.activeAuraIDs[:0]
+	at.onCastIDs = at.onCastIDs[:0]
+	at.onCastCompleteIDs = at.onCastCompleteIDs[:0]
+	at.onBeforeSpellHitIDs = at.onBeforeSpellHitIDs[:0]
+	at.onSpellHitIDs = at.onSpellHitIDs[:0]
+	at.onSpellMissIDs = at.onSpellMissIDs[:0]
 
 	for _, permAura := range at.permanentAuras {
 		aura := permAura(sim)
@@ -138,11 +188,11 @@ func (at *auraTracker) reset(sim *Simulation) {
 	}
 }
 
-func (at *auraTracker) advance(sim *Simulation, newTime time.Duration) {
+func (at *auraTracker) advance(sim *Simulation) {
 	// Go in reverse order so we can safely delete while looping
 	for i := len(at.activeAuraIDs) - 1; i >= 0; i-- {
 		id := at.activeAuraIDs[i]
-		if at.auras[id].Expires != 0 && at.auras[id].Expires <= newTime {
+		if at.auras[id].Expires != 0 && at.auras[id].Expires <= sim.CurrentTime {
 			at.RemoveAura(sim, id)
 		}
 	}
@@ -164,6 +214,31 @@ func (at *auraTracker) AddAura(sim *Simulation, newAura Aura) {
 	at.auras[newAura.ID].activeIndex = int32(len(at.activeAuraIDs))
 	at.activeAuraIDs = append(at.activeAuraIDs, newAura.ID)
 
+	if newAura.OnCast != nil {
+		at.auras[newAura.ID].onCastIndex = int32(len(at.onCastIDs))
+		at.onCastIDs = append(at.onCastIDs, newAura.ID)
+	}
+
+	if newAura.OnCastComplete != nil {
+		at.auras[newAura.ID].onCastCompleteIndex = int32(len(at.onCastCompleteIDs))
+		at.onCastCompleteIDs = append(at.onCastCompleteIDs, newAura.ID)
+	}
+
+	if newAura.OnBeforeSpellHit != nil {
+		at.auras[newAura.ID].onBeforeSpellHitIndex = int32(len(at.onBeforeSpellHitIDs))
+		at.onBeforeSpellHitIDs = append(at.onBeforeSpellHitIDs, newAura.ID)
+	}
+
+	if newAura.OnSpellHit != nil {
+		at.auras[newAura.ID].onSpellHitIndex = int32(len(at.onSpellHitIDs))
+		at.onSpellHitIDs = append(at.onSpellHitIDs, newAura.ID)
+	}
+
+	if newAura.OnSpellMiss != nil {
+		at.auras[newAura.ID].onSpellMissIndex = int32(len(at.onSpellMissIDs))
+		at.onSpellMissIDs = append(at.onSpellMissIDs, newAura.ID)
+	}
+
 	if sim.Log != nil {
 		sim.Log("(%d) +%s\n", at.playerID, newAura.Name)
 	}
@@ -180,17 +255,58 @@ func (at *auraTracker) RemoveAura(sim *Simulation, id AuraID) {
 	}
 
 	removeActiveIndex := at.auras[id].activeIndex
-	at.auras[id] = Aura{}
-
-	// Overwrite the element being removed with the last element
-	otherAuraID := at.activeAuraIDs[len(at.activeAuraIDs)-1]
-	if id != otherAuraID {
-		at.activeAuraIDs[removeActiveIndex] = otherAuraID
-		at.auras[otherAuraID].activeIndex = removeActiveIndex
+	at.activeAuraIDs = removeBySwappingToBack(at.activeAuraIDs, removeActiveIndex)
+	if removeActiveIndex < int32(len(at.activeAuraIDs)) {
+		at.auras[at.activeAuraIDs[removeActiveIndex]].activeIndex = removeActiveIndex
 	}
 
-	// Now we can remove the last element, in constant time
-	at.activeAuraIDs = at.activeAuraIDs[:len(at.activeAuraIDs)-1]
+	if at.auras[id].OnCast != nil {
+		removeOnCastIndex := at.auras[id].onCastIndex
+		at.onCastIDs = removeBySwappingToBack(at.onCastIDs, removeOnCastIndex)
+		if removeOnCastIndex < int32(len(at.onCastIDs)) {
+			at.auras[at.onCastIDs[removeOnCastIndex]].onCastIndex = removeOnCastIndex
+		}
+	}
+
+	if at.auras[id].OnCastComplete != nil {
+		removeOnCastCompleteIndex := at.auras[id].onCastCompleteIndex
+		at.onCastCompleteIDs = removeBySwappingToBack(at.onCastCompleteIDs, removeOnCastCompleteIndex)
+		if removeOnCastCompleteIndex < int32(len(at.onCastCompleteIDs)) {
+			at.auras[at.onCastCompleteIDs[removeOnCastCompleteIndex]].onCastCompleteIndex = removeOnCastCompleteIndex
+		}
+	}
+
+	if at.auras[id].OnBeforeSpellHit != nil {
+		removeOnBeforeSpellHitIndex := at.auras[id].onBeforeSpellHitIndex
+		at.onBeforeSpellHitIDs = removeBySwappingToBack(at.onBeforeSpellHitIDs, removeOnBeforeSpellHitIndex)
+		if removeOnBeforeSpellHitIndex < int32(len(at.onBeforeSpellHitIDs)) {
+			at.auras[at.onBeforeSpellHitIDs[removeOnBeforeSpellHitIndex]].onBeforeSpellHitIndex = removeOnBeforeSpellHitIndex
+		}
+	}
+
+	if at.auras[id].OnSpellHit != nil {
+		removeOnSpellHitIndex := at.auras[id].onSpellHitIndex
+		at.onSpellHitIDs = removeBySwappingToBack(at.onSpellHitIDs, removeOnSpellHitIndex)
+		if removeOnSpellHitIndex < int32(len(at.onSpellHitIDs)) {
+			at.auras[at.onSpellHitIDs[removeOnSpellHitIndex]].onSpellHitIndex = removeOnSpellHitIndex
+		}
+	}
+
+	if at.auras[id].OnSpellMiss != nil {
+		removeOnSpellMissIndex := at.auras[id].onSpellMissIndex
+		at.onSpellMissIDs = removeBySwappingToBack(at.onSpellMissIDs, removeOnSpellMissIndex)
+		if removeOnSpellMissIndex < int32(len(at.onSpellMissIDs)) {
+			at.auras[at.onSpellMissIDs[removeOnSpellMissIndex]].onSpellMissIndex = removeOnSpellMissIndex
+		}
+	}
+
+	at.auras[id] = Aura{}
+}
+
+// Constant-time removal from slice by swapping with the last element before removing.
+func removeBySwappingToBack(arr []AuraID, removeIdx int32) []AuraID {
+	arr[removeIdx] = arr[len(arr)-1]
+	return arr[:len(arr)-1]
 }
 
 // Returns whether an aura with the given ID is currently active.
@@ -217,46 +333,36 @@ func (at *auraTracker) SetCD(id CooldownID, newCD time.Duration) {
 
 // Invokes the OnCast event for all tracked Auras.
 func (at *auraTracker) OnCast(sim *Simulation, cast DirectCastAction, castInput *DirectCastInput) {
-	for _, id := range at.activeAuraIDs {
-		if at.auras[id].OnCast != nil {
-			at.auras[id].OnCast(sim, cast, castInput)
-		}
+	for _, id := range at.onCastIDs {
+		at.auras[id].OnCast(sim, cast, castInput)
 	}
 }
 
 // Invokes the OnCastComplete event for all tracked Auras.
 func (at *auraTracker) OnCastComplete(sim *Simulation, cast DirectCastAction) {
-	for _, id := range at.activeAuraIDs {
-		if at.auras[id].OnCastComplete != nil {
-			at.auras[id].OnCastComplete(sim, cast)
-		}
+	for _, id := range at.onCastCompleteIDs {
+		at.auras[id].OnCastComplete(sim, cast)
 	}
 }
 
 // Invokes the OnBeforeSpellHit event for all tracked Auras.
 func (at *auraTracker) OnBeforeSpellHit(sim *Simulation, hitInput *DirectCastDamageInput) {
-	for _, id := range at.activeAuraIDs {
-		if at.auras[id].OnBeforeSpellHit != nil {
-			at.auras[id].OnBeforeSpellHit(sim, hitInput)
-		}
+	for _, id := range at.onBeforeSpellHitIDs {
+		at.auras[id].OnBeforeSpellHit(sim, hitInput)
 	}
 }
 
 // Invokes the OnSpellMiss event for all tracked Auras.
 func (at *auraTracker) OnSpellMiss(sim *Simulation, cast DirectCastAction) {
-	for _, id := range at.activeAuraIDs {
-		if at.auras[id].OnSpellMiss != nil {
-			at.auras[id].OnSpellMiss(sim, cast)
-		}
+	for _, id := range at.onSpellMissIDs {
+		at.auras[id].OnSpellMiss(sim, cast)
 	}
 }
 
 // Invokes the OnSpellHit event for all tracked Auras.
 func (at *auraTracker) OnSpellHit(sim *Simulation, cast DirectCastAction, result *DirectCastDamageResult) {
-	for _, id := range at.activeAuraIDs {
-		if at.auras[id].OnSpellHit != nil {
-			at.auras[id].OnSpellHit(sim, cast, result)
-		}
+	for _, id := range at.onSpellHitIDs {
+		at.auras[id].OnSpellHit(sim, cast, result)
 	}
 }
 

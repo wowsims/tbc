@@ -57,7 +57,7 @@ func NewCharacter(player proto.Player) Character {
 		Class:    player.Options.Class,
 		Equip:    items.ProtoToEquipment(*player.Equipment),
 
-		auraTracker: newAuraTracker(),
+		auraTracker: newAuraTracker(false),
 	}
 
 	if player.Options.Consumes != nil {
@@ -148,70 +148,6 @@ func (character *Character) HasteBonus() float64 {
 	return 1 + (character.stats[stats.SpellHaste] / (HasteRatingPerHastePercent * 100))
 }
 
-func (character *Character) Finalize() {
-	if character.finalized {
-		return
-	}
-	character.finalized = true
-
-	// Make sure we dont accidentally set initial stats instead of stats.
-	if !character.initialStats.Equals(stats.Stats{}) {
-		panic("Initial stats may not be set before finalized!")
-	}
-	character.StatDependencyManager.Finalize()
-	character.stats = character.ApplyStatDependencies(character.stats)
-
-	// All stats added up to this point are part of the 'initial' stats.
-	character.initialStats = character.stats
-
-	character.auraTracker.finalize()
-	character.majorCooldownManager.finalize(character)
-}
-
-func (character *Character) Reset(sim *Simulation) {
-	character.stats = character.initialStats
-
-	character.auraTracker.reset(sim)
-
-	character.majorCooldownManager.reset(sim)
-}
-
-// Returns rate of mana regen, as mana / second
-func (character *Character) manaRegenPerSecond() float64 {
-	return character.stats[stats.MP5] / 5.0
-}
-
-// Returns the amount of time this Character would need to wait in order to reach
-// the desired amount of mana, via mana regen.
-//
-// Assumes that desiredMana > currentMana. Calculation assumes the Character
-// will not take any actions during this period that would reset the 5-second rule.
-func (character *Character) TimeUntilManaRegen(desiredMana float64) time.Duration {
-	// +1 at the end is to deal with floating point math rounding errors.
-	return DurationFromSeconds((desiredMana-character.CurrentMana())/character.manaRegenPerSecond()) + 1
-}
-
-// Advance moves time forward counting down auras, CDs, mana regen, etc
-func (character *Character) Advance(sim *Simulation, elapsedTime time.Duration, newTime time.Duration) {
-	// MP5 regen
-	regen := character.manaRegenPerSecond() * elapsedTime.Seconds()
-	character.stats[stats.Mana] += regen
-	if character.CurrentMana() > character.MaxMana() {
-		character.stats[stats.Mana] = character.MaxMana()
-	}
-	if sim.Log != nil && regen != 0 {
-		sim.Log("-> [%0.1f] Regenerated: %0.1f mana. Total: %0.1f\n", newTime.Seconds(), regen, character.CurrentMana())
-	}
-
-	// Advance CDs and Auras
-	character.auraTracker.advance(sim, newTime)
-
-	if character.HardcastAura.Expires != 0 && character.HardcastAura.Expires <= newTime {
-		character.HardcastAura.OnExpire(sim)
-		character.HardcastAura = Aura{}
-	}
-}
-
 func (character *Character) AddRaidBuffs(buffs *proto.Buffs) {
 }
 func (character *Character) AddPartyBuffs(buffs *proto.Buffs) {
@@ -251,6 +187,75 @@ func (character *Character) AddPartyBuffs(buffs *proto.Buffs) {
 	if character.Equip[items.ItemSlotNeck].ID == ItemIDJadePendantOfBlasting {
 		buffs.JadePendantOfBlasting = true
 	}
+}
+
+func (character *Character) Finalize() {
+	if character.finalized {
+		return
+	}
+	character.finalized = true
+
+	// Make sure we dont accidentally set initial stats instead of stats.
+	if !character.initialStats.Equals(stats.Stats{}) {
+		panic("Initial stats may not be set before finalized!")
+	}
+	character.StatDependencyManager.Finalize()
+	character.stats = character.ApplyStatDependencies(character.stats)
+
+	// All stats added up to this point are part of the 'initial' stats.
+	character.initialStats = character.stats
+
+	character.auraTracker.finalize()
+	character.majorCooldownManager.finalize(character)
+}
+
+func (character *Character) Reset(sim *Simulation) {
+	character.stats = character.initialStats
+
+	character.auraTracker.reset(sim)
+
+	character.majorCooldownManager.reset(sim)
+}
+
+// Advance moves time forward counting down auras, CDs, mana regen, etc
+func (character *Character) Advance(sim *Simulation, elapsedTime time.Duration) {
+	// Advance CDs and Auras
+	character.auraTracker.advance(sim)
+
+	if character.HardcastAura.Expires != 0 && character.HardcastAura.Expires <= sim.CurrentTime {
+		character.HardcastAura.OnExpire(sim)
+		character.HardcastAura = Aura{}
+	}
+}
+
+// Returns rate of mana regen, as mana / second
+func (character *Character) manaRegenPerSecond() float64 {
+	return character.stats[stats.MP5] / 5.0
+}
+
+// Regenerates mana based on MP5 stat and the elapsed time. This function
+// ignores Spirit-based regen; only use it to improve performance in cases where
+// there is a gaurantee to have no spirit regen.
+func (character *Character) RegenManaMP5Only(sim *Simulation, elapsedTime time.Duration) {
+	// MP5 regen
+	regen := character.manaRegenPerSecond() * elapsedTime.Seconds()
+	character.stats[stats.Mana] += regen
+	if character.CurrentMana() > character.MaxMana() {
+		character.stats[stats.Mana] = character.MaxMana()
+	}
+	if sim.Log != nil && regen != 0 {
+		sim.Log("-> [%0.1f] Regenerated: %0.1f mana. Total: %0.1f\n", sim.CurrentTime.Seconds(), regen, character.CurrentMana())
+	}
+}
+
+// Returns the amount of time this Character would need to wait in order to reach
+// the desired amount of mana, via mana regen.
+//
+// Assumes that desiredMana > currentMana. Calculation assumes the Character
+// will not take any actions during this period that would reset the 5-second rule.
+func (character *Character) TimeUntilManaRegen(desiredMana float64) time.Duration {
+	// +1 at the end is to deal with floating point math rounding errors.
+	return DurationFromSeconds((desiredMana-character.CurrentMana())/character.manaRegenPerSecond()) + 1
 }
 
 func (character *Character) HasTrinketEquipped(itemID int32) bool {

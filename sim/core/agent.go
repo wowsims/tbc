@@ -14,18 +14,22 @@ type Agent interface {
 	GetCharacter() *Character
 
 	// Updates the input Buffs to include raid-wide buffs provided by this Agent.
-	AddRaidBuffs(*proto.Buffs)
+	AddRaidBuffs(buffs *proto.Buffs)
 	// Updates the input Buffs to include party-wide buffs provided by this Agent.
-	AddPartyBuffs(*proto.Buffs)
+	AddPartyBuffs(buffs *proto.Buffs)
 
 	// Returns this Agent to its initial state. Called before each Sim iteration.
-	Reset(newsim *Simulation)
+	Reset(sim *Simulation)
 
 	// Allows the Agent to take whatever actions it wants to. This is called by
 	// the main event loop. The return value determines when the main event loop
 	// will call this again; it will call Act() at the time specified by the return
 	// value.
-	Act(*Simulation) time.Duration
+	Act(sim *Simulation) time.Duration
+
+	// Called after sim.CurrentTime is changed. Use this function to calculate
+	// mana/energy regen, cooldown changes, etc.
+	Advance(sim *Simulation, elapsedTime time.Duration)
 }
 
 type ActionID struct {
