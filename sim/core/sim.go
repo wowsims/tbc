@@ -96,7 +96,6 @@ func (sim *Simulation) reset() {
 	// Reset all players
 	for _, party := range sim.Raid.Parties {
 		for _, agent := range party.Players {
-			agent.GetCharacter().Reset(sim)
 			agent.Reset(sim)
 		}
 	}
@@ -186,13 +185,11 @@ func (sim *Simulation) RunOnce() {
 
 // Advance moves time forward counting down auras, CDs, mana regen, etc
 func (sim *Simulation) Advance(elapsedTime time.Duration) {
-	newTime := sim.CurrentTime + elapsedTime
-	sim.CurrentTime = newTime
+	sim.CurrentTime += elapsedTime
 
 	for _, party := range sim.Raid.Parties {
 		for _, agent := range party.Players {
-			// FUTURE: Do agents need to be notified or just advance the player state?
-			agent.GetCharacter().Advance(sim, elapsedTime, newTime)
+			agent.Advance(sim, elapsedTime)
 		}
 	}
 
