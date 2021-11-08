@@ -9,60 +9,53 @@ import (
 
 const SpellIDLB12 int32 = 25449
 
-type LightningBolt struct {
-	ElectricSpell
-}
-
-func (lb LightningBolt) GetActionID() core.ActionID {
-	return core.ActionID{
-		SpellID: SpellIDLB12,
-	}
-}
-
-func (lb LightningBolt) GetCooldown() time.Duration {
-	return 0
-}
-
-func (lb LightningBolt) GetHitInputs(sim *core.Simulation, cast core.DirectCastAction) []core.DirectCastDamageInput{
-	hitInput := core.DirectCastDamageInput{
-		Target: lb.Target,
-		MinBaseDamage: 571,
-		MaxBaseDamage: 652,
-		SpellCoefficient: 0.794,
-		DamageMultiplier: 1,
-	}
-
-	lb.ApplyHitInputModifiers(&hitInput)
-
-	return []core.DirectCastDamageInput{hitInput}
-}
-
-func (lb LightningBolt) OnSpellHit(sim *core.Simulation, cast core.DirectCastAction, result *core.DirectCastDamageResult) {
-	lb.OnElectricSpellHit(sim, cast, result)
-
-	if !lb.IsLightningOverload {
-		lightningOverloadChance := float64(lb.Shaman.Talents.LightningOverload) * 0.04
-		if sim.RandomFloat("LO") < lightningOverloadChance {
-			overloadAction := NewLightningBolt(sim, lb.Shaman, lb.Target, true)
-			overloadAction.Act(sim)
-		}
-	}
-}
-
-func NewLightningBolt(sim *core.Simulation, shaman *Shaman, target *core.Target, IsLightningOverload bool) core.DirectCastAction {
+func (shaman *Shaman) NewLightningBolt(sim *core.Simulation, target *core.Target, isLightningOverload bool) core.DirectCastAction {
 	baseManaCost := 300.0
 	if shaman.Equip[items.ItemSlotRanged].ID == TotemOfThePulsingEarth {
 		baseManaCost -= 27.0
 	}
 
+	cast := shaman.NewElectricCast(
+		"Lightning Bolt",
+		core.ActionID{
+			SpellID: SpellIDLB12,
+		},
+		baseManaCost,
+		time.Millisecond*2500,
+		isLightningOverload)
+
+	hitInput := core.DirectCastDamageInput{
+		Target: target,
+		MinBaseDamage: 571,
+		MaxBaseDamage: 652,
+		SpellCoefficient: 0.794,
+		DamageMultiplier: 1,
+	}
+	shaman.ApplyElectricSpellHitInputModifiers(&hitInput, isLightningOverload)
+
+	hitInputs := []core.DirectCastDamageInput{hitInput}
+
 	return core.NewDirectCastAction(
 		sim,
-		LightningBolt{ElectricSpell{
-			Shaman: shaman,
-			Target: target,
-			IsLightningOverload: IsLightningOverload,
-			name: "Lightning Bolt",
-			baseManaCost: baseManaCost,
-			baseCastTime: time.Millisecond*2500,
-		}})
+		cast,
+		hitInputs,
+		// OnCastComplete
+		func(sim *core.Simulation, cast *core.Cast) {
+			shaman.OnElectricSpellCastComplete(sim, cast, isLightningOverload)
+		},
+		// OnSpellHit
+		func(sim *core.Simulation, cast *core.Cast, result *core.DirectCastDamageResult) {
+			shaman.OnElectricSpellHit(sim, cast, result)
+
+			if !isLightningOverload {
+				lightningOverloadChance := float64(shaman.Talents.LightningOverload) * 0.04
+				if sim.RandomFloat("LB Lightning Overload") < lightningOverloadChance {
+					overloadAction := shaman.NewLightningBolt(sim, target, true)
+					overloadAction.Act(sim)
+				}
+			}
+		},
+		// OnSpellMiss
+		func(sim *core.Simulation, cast *core.Cast) {
+		})
 }

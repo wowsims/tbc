@@ -80,9 +80,9 @@ func applyRaceEffects(agent Agent) {
 						ID:      TrollBerserkingAuraID,
 						Name:    "Troll Berserking",
 						Expires: sim.CurrentTime + dur,
-						OnCast: func(sim *Simulation, cast DirectCastAction, inputs *DirectCastInput) {
+						OnCast: func(sim *Simulation, cast *Cast) {
 							// Multiplying and then dividing lets us use integer multiplication/division which is faster.
-							inputs.CastTime = (inputs.CastTime * 10) / hasteBonus
+							cast.CastTime = (cast.CastTime * 10) / hasteBonus
 						},
 					})
 					return true

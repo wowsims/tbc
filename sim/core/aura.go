@@ -55,6 +55,8 @@ var RangedSwingCooldownID = NewCooldownID()
 var OffensiveTrinketSharedCooldownID = NewCooldownID()
 var DefensiveTrinketSharedCooldownID = NewCooldownID()
 
+type OnExpire func(sim *Simulation)
+
 type Aura struct {
 	ID          AuraID
 	Name        string        // Label used for logging.
@@ -72,23 +74,23 @@ type Aura struct {
 	Stacks int32
 
 	// Invoked at creation time for a spell cast.
-	OnCast         func(sim *Simulation, cast DirectCastAction, castInput *DirectCastInput)
+	OnCast OnCast
 
 	// Invoked when a spell cast completes casting, before results are calculated.
-	OnCastComplete func(sim *Simulation, cast DirectCastAction)
+	OnCastComplete OnCastComplete
 
 	// Invoked before a spell lands, but after the target is selected.
-	OnBeforeSpellHit func(sim *Simulation, hitInput *DirectCastDamageInput)
-
-	// Invoked when a spell is fully resisted.
-	OnSpellMiss    func(sim *Simulation, cast DirectCastAction)
+	OnBeforeSpellHit OnBeforeSpellHit
 
 	// Invoked when a spell hits, after results are calculated. Results can be modified by changing
 	// properties of result.
-	OnSpellHit     func(sim *Simulation, cast DirectCastAction, result *DirectCastDamageResult)
+	OnSpellHit OnSpellHit
+
+	// Invoked when a spell is fully resisted.
+	OnSpellMiss OnSpellMiss
 
 	// Invoked when this Aura expires.
-	OnExpire       func(sim *Simulation)
+	OnExpire OnExpire
 }
 
 // This needs to be a function that returns an Aura rather than an Aura, so captured
@@ -332,35 +334,35 @@ func (at *auraTracker) SetCD(id CooldownID, newCD time.Duration) {
 }
 
 // Invokes the OnCast event for all tracked Auras.
-func (at *auraTracker) OnCast(sim *Simulation, cast DirectCastAction, castInput *DirectCastInput) {
+func (at *auraTracker) OnCast(sim *Simulation, cast *Cast) {
 	for _, id := range at.onCastIDs {
-		at.auras[id].OnCast(sim, cast, castInput)
+		at.auras[id].OnCast(sim, cast)
 	}
 }
 
 // Invokes the OnCastComplete event for all tracked Auras.
-func (at *auraTracker) OnCastComplete(sim *Simulation, cast DirectCastAction) {
+func (at *auraTracker) OnCastComplete(sim *Simulation, cast *Cast) {
 	for _, id := range at.onCastCompleteIDs {
 		at.auras[id].OnCastComplete(sim, cast)
 	}
 }
 
 // Invokes the OnBeforeSpellHit event for all tracked Auras.
-func (at *auraTracker) OnBeforeSpellHit(sim *Simulation, hitInput *DirectCastDamageInput) {
+func (at *auraTracker) OnBeforeSpellHit(sim *Simulation, cast *Cast, hitInput *DirectCastDamageInput) {
 	for _, id := range at.onBeforeSpellHitIDs {
-		at.auras[id].OnBeforeSpellHit(sim, hitInput)
+		at.auras[id].OnBeforeSpellHit(sim, cast, hitInput)
 	}
 }
 
 // Invokes the OnSpellMiss event for all tracked Auras.
-func (at *auraTracker) OnSpellMiss(sim *Simulation, cast DirectCastAction) {
+func (at *auraTracker) OnSpellMiss(sim *Simulation, cast *Cast) {
 	for _, id := range at.onSpellMissIDs {
 		at.auras[id].OnSpellMiss(sim, cast)
 	}
 }
 
 // Invokes the OnSpellHit event for all tracked Auras.
-func (at *auraTracker) OnSpellHit(sim *Simulation, cast DirectCastAction, result *DirectCastDamageResult) {
+func (at *auraTracker) OnSpellHit(sim *Simulation, cast *Cast, result *DirectCastDamageResult) {
 	for _, id := range at.onSpellHitIDs {
 		at.auras[id].OnSpellHit(sim, cast, result)
 	}

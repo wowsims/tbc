@@ -23,7 +23,7 @@ func ApplyTheLightningCapacitor(agent core.Agent) {
 		return core.Aura{
 			ID:      TheLightningCapacitorAuraID,
 			Name:    "The Lightning Capacitor",
-			OnSpellHit: func(sim *core.Simulation, cast core.DirectCastAction, result *core.DirectCastDamageResult) {
+			OnSpellHit: func(sim *core.Simulation, cast *core.Cast, result *core.DirectCastDamageResult) {
 				if icd.IsOnCD(sim) {
 					return
 				}
@@ -36,7 +36,7 @@ func ApplyTheLightningCapacitor(agent core.Agent) {
 				if charges >= 3 {
 					icd = core.InternalCD(sim.CurrentTime + icdDur)
 					charges = 0
-					castAction := NewLightningCapacitorCast(sim, character)
+					castAction := NewLightningCapacitorCast(sim, character, sim.GetPrimaryTarget())
 					castAction.Act(sim)
 				}
 			},
@@ -44,66 +44,39 @@ func ApplyTheLightningCapacitor(agent core.Agent) {
 	})
 }
 
-type LightningCapacitorCast struct {
-	character *core.Character
-}
-
-func (lcc LightningCapacitorCast) GetActionID() core.ActionID {
-	return core.ActionID{
-		ItemID: core.ItemIDTheLightningCapacitor,
-	}
-}
-
-func (lcc LightningCapacitorCast) GetName() string {
-	return "Lightning Capacitor"
-}
-
-func (lcc LightningCapacitorCast) GetTag() int32 {
-	return 0
-}
-
-func (lcc LightningCapacitorCast) GetCharacter() *core.Character {
-	return lcc.character
-}
-
-func (lcc LightningCapacitorCast) GetBaseManaCost() float64 {
-	return 0
-}
-
-func (lcc LightningCapacitorCast) GetSpellSchool() stats.Stat {
-	return stats.NatureSpellPower
-}
-
-func (lcc LightningCapacitorCast) GetCooldown() time.Duration {
-	return 0
-}
-
-func (lcc LightningCapacitorCast) GetCastInput(sim *core.Simulation, cast core.DirectCastAction) core.DirectCastInput {
-	return core.DirectCastInput{
+func NewLightningCapacitorCast(sim *core.Simulation, character *core.Character, target *core.Target) core.DirectCastAction {
+	cast := core.Cast{
+		Name: "Lightning Capacitor",
+		ActionID: core.ActionID{
+			ItemID: core.ItemIDTheLightningCapacitor,
+		},
+		Character: character,
+		SpellSchool: stats.NatureSpellPower,
 		IgnoreCooldowns: true,
 		IgnoreManaCost: true,
 		CritMultiplier: 1.5,
 	}
-}
 
-func (lcc LightningCapacitorCast) GetHitInputs(sim *core.Simulation, cast core.DirectCastAction) []core.DirectCastDamageInput{
-	hitInput := core.DirectCastDamageInput{
-		Target: sim.GetPrimaryTarget(),
-		MinBaseDamage: 694,
-		MaxBaseDamage: 807,
-		DamageMultiplier: 1,
+	hitInputs := []core.DirectCastDamageInput{
+		core.DirectCastDamageInput{
+			Target: target,
+			MinBaseDamage: 694,
+			MaxBaseDamage: 807,
+			DamageMultiplier: 1,
+		},
 	}
 
-	return []core.DirectCastDamageInput{hitInput}
-}
-
-func (lcc LightningCapacitorCast) OnCastComplete(sim *core.Simulation, cast core.DirectCastAction) {
-}
-func (lcc LightningCapacitorCast) OnSpellHit(sim *core.Simulation, cast core.DirectCastAction, result *core.DirectCastDamageResult) {
-}
-func (lcc LightningCapacitorCast) OnSpellMiss(sim *core.Simulation, cast core.DirectCastAction) {
-}
-
-func NewLightningCapacitorCast(sim *core.Simulation, character *core.Character) core.DirectCastAction {
-	return core.NewDirectCastAction(sim, LightningCapacitorCast{character: character})
+	return core.NewDirectCastAction(
+		sim,
+		cast,
+		hitInputs,
+		// OnCastComplete
+		func(sim *core.Simulation, cast *core.Cast) {
+		},
+		// OnSpellHit
+		func(sim *core.Simulation, cast *core.Cast, result *core.DirectCastDamageResult) {
+		},
+		// OnSpellMiss
+		func(sim *core.Simulation, cast *core.Cast) {
+		})
 }

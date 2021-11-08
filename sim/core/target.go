@@ -90,7 +90,7 @@ func miseryAura() Aura {
 	return Aura{
 		ID: MiseryDebuffID,
 		Name: "Misery",
-		OnSpellHit: func(sim *Simulation, cast DirectCastAction, result *DirectCastDamageResult) {
+		OnSpellHit: func(sim *Simulation, cast *Cast, result *DirectCastDamageResult) {
 			result.Damage *= 1.05
 		},
 	}
@@ -102,12 +102,12 @@ func judgementOfWisdomAura() Aura {
 	return Aura{
 		ID: JudgementOfWisdomDebuffID,
 		Name: "Judgement of Wisdom",
-		OnSpellHit: func(sim *Simulation, cast DirectCastAction, result *DirectCastDamageResult) {
-			if cast.GetActionID().ItemID == ItemIDTheLightningCapacitor {
+		OnSpellHit: func(sim *Simulation, cast *Cast, result *DirectCastDamageResult) {
+			if cast.ActionID.ItemID == ItemIDTheLightningCapacitor {
 				return // TLC cant proc JoW
 			}
 
-			character := cast.GetCharacter()
+			character := cast.Character
 			// Only apply to agents that have mana.
 			if character.MaxMana() > 0 {
 				character.AddStat(stats.Mana, mana)
@@ -124,7 +124,7 @@ func improvedSealOfTheCrusaderAura() Aura {
 	return Aura{
 		ID: ImprovedSealOfTheCrusaderDebuffID,
 		Name: "Improved Seal of the Crusader",
-		OnBeforeSpellHit: func(sim *Simulation, hitInput *DirectCastDamageInput) {
+		OnBeforeSpellHit: func(sim *Simulation, cast *Cast, hitInput *DirectCastDamageInput) {
 			hitInput.BonusCrit += 3
 			// FUTURE: melee crit bonus, research actual value
 		},

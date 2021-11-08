@@ -174,7 +174,7 @@ func ApplyQuagmirransEye(agent core.Agent) {
 		return core.Aura{
 			ID:      QuagmirransEyeAuraID,
 			Name:    "Quagmirran's Eye",
-			OnCastComplete: func(sim *core.Simulation, cast core.DirectCastAction) {
+			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
 				if !icd.IsOnCD(sim) && sim.RandomFloat("quags") < 0.1 {
 					icd = core.InternalCD(sim.CurrentTime + dur)
 					character.AddAuraWithTemporaryStats(sim, FungalFrenzyAuraID, "Fungal Frenzy", stats.SpellHaste, hasteBonus, time.Second*6)
@@ -196,8 +196,8 @@ func ApplyShiffarsNexusHorn(agent core.Agent) {
 		return core.Aura{
 			ID:      ShiffarsNexusHornAuraID,
 			Name:    "Shiffar's Nexus-Horn",
-			OnSpellHit: func(sim *core.Simulation, cast core.DirectCastAction, result *core.DirectCastDamageResult) {
-				if cast.GetActionID().ItemID == core.ItemIDTheLightningCapacitor {
+			OnSpellHit: func(sim *core.Simulation, cast *core.Cast, result *core.DirectCastDamageResult) {
+				if cast.ActionID.ItemID == core.ItemIDTheLightningCapacitor {
 					return // TLC can't proc Sextant
 				}
 				if !icd.IsOnCD(sim) && result.Crit && sim.RandomFloat("unmarked") < 0.2 {
@@ -220,7 +220,7 @@ func ApplyEyeOfMagtheridon(agent core.Agent) {
 		return core.Aura{
 			ID:      EyeOfMagtheridonAuraID,
 			Name:    "Eye of Magtheridon",
-			OnSpellMiss: func(sim *core.Simulation, cast core.DirectCastAction) {
+			OnSpellMiss: func(sim *core.Simulation, cast *core.Cast) {
 				character.AddAuraWithTemporaryStats(sim, RecurringPowerAuraID, "Recurring Power", stats.SpellPower, spellBonus, dur)
 			},
 		}
@@ -240,8 +240,8 @@ func ApplySextantOfUnstableCurrents(agent core.Agent) {
 		return core.Aura{
 			ID:      SextantOfUnstableCurrentsAuraID,
 			Name:    "Sextant of Unstable Currents",
-			OnSpellHit: func(sim *core.Simulation, cast core.DirectCastAction, result *core.DirectCastDamageResult) {
-				if cast.GetActionID().ItemID == core.ItemIDTheLightningCapacitor {
+			OnSpellHit: func(sim *core.Simulation, cast *core.Cast, result *core.DirectCastDamageResult) {
+				if cast.ActionID.ItemID == core.ItemIDTheLightningCapacitor {
 					return // TLC can't proc Sextant
 				}
 				if result.Crit && !icd.IsOnCD(sim) && sim.RandomFloat("unmarked") < 0.2 {
@@ -264,7 +264,7 @@ func ApplyDarkmoonCardCrusade(agent core.Agent) {
 		return core.Aura{
 			ID:      DarkmoonCardCrusadeAuraID,
 			Name:    "Darkmoon Card Crusade",
-			OnCastComplete: func(sim *core.Simulation, cast core.DirectCastAction) {
+			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
 				if stacks < 10 {
 					stacks++
 					character.AddStat(stats.SpellPower, spellBonus)

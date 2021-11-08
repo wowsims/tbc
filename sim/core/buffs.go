@@ -151,9 +151,9 @@ func registerBloodlustCD(agent Agent, buffs proto.Buffs) {
 						ID:      BloodlustAuraID,
 						Name:    "Bloodlust",
 						Expires: sim.CurrentTime + dur,
-						OnCast: func(sim *Simulation, cast DirectCastAction, input *DirectCastInput) {
+						OnCast: func(sim *Simulation, cast *Cast) {
 							// Multiply and divide lets us use integer math, which is better for perf.
-							input.CastTime = (input.CastTime * 10) / 13 // 30% faster
+							cast.CastTime = (cast.CastTime * 10) / 13 // 30% faster
 						},
 					})
 					bloodlustsUsed++

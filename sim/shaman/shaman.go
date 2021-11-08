@@ -131,11 +131,11 @@ func (shaman *Shaman) registerElementalMasteryCD() {
 					ID:      ElementalMasteryAuraID,
 					Name:    "Elemental Mastery",
 					Expires: core.NeverExpires,
-					OnCast: func(sim *core.Simulation, cast core.DirectCastAction, input *core.DirectCastInput) {
-						input.ManaCost = 0
-						input.GuaranteedCrit = true
+					OnCast: func(sim *core.Simulation, cast *core.Cast) {
+						cast.ManaCost = 0
+						cast.GuaranteedCrit = true
 					},
-					OnCastComplete: func(sim *core.Simulation, cast core.DirectCastAction) {
+					OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
 						// Remove the buff and put skill on CD
 						character.SetCD(ElementalMasteryCooldownID, sim.CurrentTime+time.Minute*3)
 						character.RemoveAura(sim, ElementalMasteryAuraID)

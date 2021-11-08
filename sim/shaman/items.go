@@ -62,16 +62,16 @@ var ItemSetCycloneRegalia = core.ItemSet{
 				return core.Aura{
 					ID:      Cyclone4PcAuraID,
 					Name:    "Cyclone 4pc Bonus",
-					OnSpellHit: func(sim *core.Simulation, cast core.DirectCastAction, result *core.DirectCastDamageResult) {
+					OnSpellHit: func(sim *core.Simulation, cast *core.Cast, result *core.DirectCastDamageResult) {
 						if result.Crit && sim.RandomFloat("cycl4p") < 0.11 {
 							character.AddAura(sim, core.Aura{
 								ID: Cyclone4PcManaRegainAuraID,
 								Name: "Cyclone Mana Cost Reduction",
-								OnCast: func(sim *core.Simulation, cast core.DirectCastAction, input *core.DirectCastInput) {
+								OnCast: func(sim *core.Simulation, cast *core.Cast) {
 									// TODO: how to make sure this goes in before clearcasting?
-									input.ManaCost -= 270
+									cast.ManaCost -= 270
 								},
-								OnCastComplete: func(sim *core.Simulation, cast core.DirectCastAction) {
+								OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
 									character.RemoveAura(sim, Cyclone4PcManaRegainAuraID)
 								},
 							})
@@ -94,7 +94,7 @@ var ItemSetCataclysmRegalia = core.ItemSet{
 				return core.Aura{
 					ID:      Cataclysm4PcAuraID,
 					Name:    "Cataclysm 4pc Bonus",
-					OnSpellHit: func(sim *core.Simulation, cast core.DirectCastAction, result *core.DirectCastDamageResult) {
+					OnSpellHit: func(sim *core.Simulation, cast *core.Cast, result *core.DirectCastDamageResult) {
 						if result.Crit && sim.RandomFloat("cata4p") < 0.25 {
 							character.AddStat(stats.Mana, 120)
 						}
@@ -121,8 +121,8 @@ var ItemSetSkyshatterRegalia = core.ItemSet{
 				return core.Aura{
 					ID:      Skyshatter4PcAuraID,
 					Name:    "Skyshatter 4pc Bonus",
-					OnSpellHit: func(sim *core.Simulation, cast core.DirectCastAction, result *core.DirectCastDamageResult) {
-						if cast.GetActionID().SpellID == SpellIDLB12 {
+					OnSpellHit: func(sim *core.Simulation, cast *core.Cast, result *core.DirectCastDamageResult) {
+						if cast.ActionID.SpellID == SpellIDLB12 {
 							result.Damage *= 1.05
 						}
 					},
@@ -150,8 +150,8 @@ func ApplyNaturalAlignmentCrystal(agent core.Agent) {
 					ID:      core.OffensiveTrinketActiveAuraID,
 					Name:    "Natural Alignment Crystal",
 					Expires: sim.CurrentTime + dur,
-					OnCast: func(sim *core.Simulation, cast core.DirectCastAction, input *core.DirectCastInput) {
-						input.ManaCost *= 1.2
+					OnCast: func(sim *core.Simulation, cast *core.Cast) {
+						cast.ManaCost *= 1.2
 					},
 					OnExpire: func(sim *core.Simulation) {
 						character.AddStat(stats.SpellPower, -sp)
@@ -176,11 +176,11 @@ func ApplyFathomBroochOfTheTidewalker(agent core.Agent) {
 		return core.Aura{
 			ID:      FathomBroochOfTheTidewalkerAuraID,
 			Name:    "Fathom-Brooch of the Tidewalker",
-			OnCastComplete: func(sim *core.Simulation, cast core.DirectCastAction) {
+			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
 				if icd.IsOnCD(sim) {
 					return
 				}
-				if cast.GetSpellSchool() != stats.NatureSpellPower {
+				if cast.SpellSchool != stats.NatureSpellPower {
 					return
 				}
 				if sim.RandomFloat("unmarked") < 0.15 {
@@ -204,8 +204,8 @@ func ApplySkycallTotem(agent core.Agent) {
 			ID:      SkycallTotemAuraID,
 			Name:    "Skycall Totem",
 			Expires: core.NeverExpires,
-			OnCastComplete: func(sim *core.Simulation, cast core.DirectCastAction) {
-				if cast.GetActionID().SpellID == SpellIDLB12 && sim.RandomFloat("skycall") < 0.15 {
+			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
+				if cast.ActionID.SpellID == SpellIDLB12 && sim.RandomFloat("skycall") < 0.15 {
 					character.AddAuraWithTemporaryStats(sim, EnergizedAuraID, "Energized", stats.SpellHaste, hasteBonus, dur)
 				}
 			},

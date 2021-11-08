@@ -112,11 +112,11 @@ func (aggregator *MetricsAggregator) AddCastAction(cast DirectCastAction, castRe
 
 	actionKey := NewActionKey(actionID, tag)
 
-	agentID := cast.GetCharacter().ID
+	agentID := cast.Character.ID
 
 	iterationMetrics := &aggregator.agentIterations[agentID]
-	if !cast.castInput.IgnoreManaCost {
-		iterationMetrics.ManaSpent += cast.castInput.ManaCost
+	if !cast.IgnoreManaCost {
+		iterationMetrics.ManaSpent += cast.ManaCost
 	}
 
 	aggregateMetrics := &aggregator.agentAggregates[agentID]

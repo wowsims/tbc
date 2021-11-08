@@ -8,26 +8,6 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-// Input needed to start casting a spell.
-type DirectCastInput struct {
-	// If set, CD for this action and GCD CD will be ignored, and this action
-	// will not set new values for those CDs either.
-	IgnoreCooldowns bool
-
-	// If set, this spell will have its mana cost ignored.
-	IgnoreManaCost bool
-
-	ManaCost float64
-
-	CastTime time.Duration
-
-	// How much to multiply damage by, if this cast crits.
-	CritMultiplier float64
-
-	// If true, will force the cast to crit (if it doesnt miss).
-	GuaranteedCrit bool
-}
-
 // Input needed to calculate the damage of a spell.
 type DirectCastDamageInput struct {
 	// Target of the spell.
@@ -85,133 +65,79 @@ func (result DirectCastDamageResult) String() string {
 	return sb.String()
 }
 
-// Interface for direct cast spells to implement.
-type DirectCastImpl interface {
-	// Pass-through AgentAction methods
-	GetActionID() ActionID
-	GetName() string
-	GetTag() int32
-	GetCharacter() *Character
+// Callback for before the damage calculation of a spell hit happens.
+type OnBeforeSpellHit func(sim *Simulation, cast *Cast, hitInput *DirectCastDamageInput)
 
-	// This is needed because a lot of effects that 'reduce mana cost by X%' are
-	// calculated from the base mana cost.
-	GetBaseManaCost() float64
+// Callback for after a spell hits the target and damage has been calculated.
+// The damage result can still be modified by changing the result fields.
+type OnSpellHit func(sim *Simulation, cast *Cast, result *DirectCastDamageResult)
 
-	// I.e. for nature spells, return stats.NatureSpellPower
-	GetSpellSchool() stats.Stat
-
-	GetCooldown() time.Duration
-
-	GetCastInput(sim *Simulation, cast DirectCastAction) DirectCastInput
-	GetHitInputs(sim *Simulation, cast DirectCastAction) []DirectCastDamageInput
-
-	// Lifecycle callbacks for additional custom effects.
-	OnCastComplete(sim *Simulation, cast DirectCastAction)
-	OnSpellHit(sim *Simulation, cast DirectCastAction, result *DirectCastDamageResult)
-	OnSpellMiss(sim *Simulation, cast DirectCastAction)
-}
+// Callback for after a spell is fully resisted on a target.
+type OnSpellMiss func(sim *Simulation, cast *Cast)
 
 type DirectCastAction struct {
-	DirectCastImpl
+	Cast
 
-	// The inputs to the cast. Auras are given a reference to these to modify them
-	// before the spell begins casting.
-	castInput DirectCastInput
+	HitInputs []DirectCastDamageInput
+
+	// Callbacks for providing additional custom behavior.
+	OnCastComplete OnCastComplete
+	OnSpellHit     OnSpellHit
+	OnSpellMiss    OnSpellMiss
+}
+
+func (action DirectCastAction) GetActionID() ActionID {
+	return action.Cast.ActionID
+}
+
+func (action DirectCastAction) GetName() string {
+	return action.Cast.Name
+}
+
+func (action DirectCastAction) GetTag() int32 {
+	return action.Cast.Tag
+}
+
+func (action DirectCastAction) GetCharacter() *Character {
+	return action.Cast.Character
 }
 
 func (action DirectCastAction) GetManaCost() float64 {
-	return action.castInput.ManaCost
+	return action.Cast.ManaCost
 }
 
 func (action DirectCastAction) GetDuration() time.Duration {
-	return action.castInput.CastTime
+	return action.Cast.CastTime
 }
 
 func (action DirectCastAction) Act(sim *Simulation) bool {
-	character := action.GetCharacter()
+	return action.Cast.startCasting(sim, func(sim *Simulation, cast *Cast) {
+		action.OnCastComplete(sim, cast)
 
-	if !action.castInput.IgnoreManaCost && action.castInput.ManaCost > 0 {
-		if character.CurrentMana() < action.castInput.ManaCost {
-			if sim.Log != nil {
-				sim.Log("(%d) Failed casting %s, not enough mana. (Current Mana = %0.0f, Mana Cost = %0.0f)\n",
-						character.ID, action.GetName(), character.CurrentMana(), action.castInput.ManaCost)
+		results := make([]DirectCastDamageResult, 0, len(action.HitInputs))
+		for _, hitInput := range action.HitInputs {
+			hitInput.Target.OnBeforeSpellHit(sim, cast, &hitInput)
+
+			result := action.calculateDirectCastDamage(sim, hitInput)
+			results = append(results, result)
+
+			if result.Hit {
+				// Apply any on spell hit effects.
+				action.OnSpellHit(sim, cast, &result)
+				cast.Character.OnSpellHit(sim, cast, &result)
+				hitInput.Target.OnSpellHit(sim, cast, &result)
+			} else {
+				action.OnSpellMiss(sim, cast)
+				cast.Character.OnSpellMiss(sim, cast)
+				hitInput.Target.OnSpellMiss(sim, cast)
 			}
-			sim.MetricsAggregator.MarkOOM(character, sim.CurrentTime)
-
-			return false
+			if sim.Log != nil {
+				sim.Log("(%d) %s result: %s\n", cast.Character.ID, action.Cast.Name, result)
+			}
 		}
-	}
 
-	if sim.Log != nil {
-		sim.Log("(%d) Casting %s (Current Mana = %0.0f, Mana Cost = %0.0f, Cast Time = %s)\n",
-				character.ID, action.GetName(), character.CurrentMana(), action.castInput.ManaCost, action.castInput.CastTime)
-	}
-
-	// For instant-cast spells we can skip creating an aura.
-	if action.castInput.CastTime == 0 {
-		action.internalOnCastComplete(sim)
-	} else {
-		character.HardcastAura = Aura{
-			Expires: sim.CurrentTime + action.castInput.CastTime,
-			OnExpire: func(sim *Simulation) {
-				action.internalOnCastComplete(sim)
-			},
-		}
-	}
-
-	if !action.castInput.IgnoreCooldowns {
-		// Prevent any actions on the GCD until the cast AND the GCD are done.
-		gcdCD := MaxDuration(GCDMin, action.castInput.CastTime)
-		character.SetCD(GCDCooldownID, sim.CurrentTime+gcdCD)
-
-		// TODO: Hardcasts seem to also reset swing timers, so we should set those CDs as well.
-	}
-
-	return true
-}
-
-func (action DirectCastAction) internalOnCastComplete(sim *Simulation) {
-	character := action.GetCharacter()
-
-	if !action.castInput.IgnoreManaCost && action.castInput.ManaCost > 0 {
-		character.AddStat(stats.Mana, -action.castInput.ManaCost)
-	}
-
-	action.OnCastComplete(sim, action)
-	character.OnCastComplete(sim, action)
-
-	hitInputs := action.GetHitInputs(sim, action)
-
-	results := make([]DirectCastDamageResult, 0, len(hitInputs))
-	for _, hitInput := range hitInputs {
-		hitInput.Target.OnBeforeSpellHit(sim, &hitInput)
-		result := action.calculateDirectCastDamage(sim, hitInput)
-		results = append(results, result)
-
-		if result.Hit {
-			// Apply any on spell hit effects.
-			action.OnSpellHit(sim, action, &result)
-			character.OnSpellHit(sim, action, &result)
-			hitInput.Target.OnSpellHit(sim, action, &result)
-		} else {
-			action.OnSpellMiss(sim, action)
-			character.OnSpellMiss(sim, action)
-			hitInput.Target.OnSpellMiss(sim, action)
-		}
-		if sim.Log != nil {
-			sim.Log("(%d) %s result: %s\n", character.ID, action.GetName(), result)
-		}
-	}
-
-
-	if !action.castInput.IgnoreCooldowns {
-		cooldown := action.GetCooldown()
-		if cooldown > 0 {
-			character.SetCD(action.GetActionID().CooldownID, sim.CurrentTime+cooldown)
-		}
-	}
-
-	sim.MetricsAggregator.AddCastAction(action, results)
+		sim.MetricsAggregator.AddCastAction(action, results)
+	})
 }
 
 func (action DirectCastAction) calculateDirectCastDamage(sim *Simulation, damageInput DirectCastDamageInput) DirectCastDamageResult {
@@ -219,27 +145,27 @@ func (action DirectCastAction) calculateDirectCastDamage(sim *Simulation, damage
 		Target: damageInput.Target,
 	}
 
-	character := action.GetCharacter()
+	character := action.Cast.Character
 
 	hit := 0.83 + character.GetStat(stats.SpellHit)/(SpellHitRatingPerHitChance*100) + damageInput.BonusHit
 	hit = MinFloat(hit, 0.99) // can't get away from the 1% miss
 
-	if sim.RandomFloat("action hit") >= hit { // Miss
+	if sim.RandomFloat("DirectCast Hit") >= hit { // Miss
 		return result
 	}
 	result.Hit = true
 
-	baseDamage := damageInput.MinBaseDamage + sim.RandomFloat("action dmg")*(damageInput.MaxBaseDamage - damageInput.MinBaseDamage)
-	totalSpellPower := character.GetStat(stats.SpellPower) + character.GetStat(action.GetSpellSchool()) + damageInput.BonusSpellPower
+	baseDamage := damageInput.MinBaseDamage + sim.RandomFloat("DirectCast Damage")*(damageInput.MaxBaseDamage - damageInput.MinBaseDamage)
+	totalSpellPower := character.GetStat(stats.SpellPower) + character.GetStat(action.Cast.SpellSchool) + damageInput.BonusSpellPower
 	damageFromSpellPower := (totalSpellPower * damageInput.SpellCoefficient)
 	damage := baseDamage + damageFromSpellPower
 
 	damage *= damageInput.DamageMultiplier
 
 	crit := (character.GetStat(stats.SpellCrit) / (SpellCritRatingPerCritChance * 100)) + damageInput.BonusCrit
-	if action.castInput.GuaranteedCrit || sim.RandomFloat("action crit") < crit {
+	if action.Cast.GuaranteedCrit || sim.RandomFloat("DirectCast Crit") < crit {
 		result.Crit = true
-		damage *= action.castInput.CritMultiplier
+		damage *= action.Cast.CritMultiplier
 	}
 
 	// Average Resistance (AR) = (Target's Resistance / (Caster's Level * 5)) * 0.75
@@ -247,7 +173,7 @@ func (action DirectCastAction) calculateDirectCastDamage(sim *Simulation, damage
 	// Using these stats:
 	//    13.6% chance of
 	//  FUTURE: handle boss resists for fights/classes that are actually impacted by that.
-	resVal := sim.RandomFloat("action resist")
+	resVal := sim.RandomFloat("DirectCast Resist")
 	if resVal < 0.18 { // 13% chance for 25% resist, 4% for 50%, 1% for 75%
 		if resVal < 0.01 {
 			result.PartialResist_3_4 = true
@@ -266,31 +192,16 @@ func (action DirectCastAction) calculateDirectCastDamage(sim *Simulation, damage
 	return result
 }
 
-func NewDirectCastAction(sim *Simulation, impl DirectCastImpl) DirectCastAction {
+func NewDirectCastAction(sim *Simulation, cast Cast, hitInputs []DirectCastDamageInput, onCastComplete OnCastComplete, onSpellHit OnSpellHit, onSpellMiss OnSpellMiss) DirectCastAction {
 	action := DirectCastAction{
-		DirectCastImpl: impl,
-	}
-	character := action.GetCharacter()
-
-	cooldownID := action.GetActionID().CooldownID
-
-	castInput := impl.GetCastInput(sim, action)
-	castInput.CastTime = time.Duration(float64(castInput.CastTime) / character.HasteBonus())
-
-	// Apply on-cast effects.
-	character.OnCast(sim, action, &castInput)
-
-	// By panicking if spell is on CD, we force each sim to properly check for their own CDs.
-	if !castInput.IgnoreCooldowns {
-		if character.IsOnCD(GCDCooldownID, sim.CurrentTime) {
-			panic(fmt.Sprintf("Trying to cast %s but GCD on cooldown for %s", action.GetName(), character.GetRemainingCD(GCDCooldownID, sim.CurrentTime)))
-		}
-		if character.IsOnCD(cooldownID, sim.CurrentTime) {
-			panic(fmt.Sprintf("Trying to cast %s but is still on cooldown for %s", action.GetName(), character.GetRemainingCD(cooldownID, sim.CurrentTime)))
-		}
+		Cast: cast,
+		HitInputs: hitInputs,
+		OnCastComplete: onCastComplete,
+		OnSpellHit: onSpellHit,
+		OnSpellMiss: onSpellMiss,
 	}
 
-	action.castInput = castInput
+	action.Cast.init(sim)
 
 	return action
 }
