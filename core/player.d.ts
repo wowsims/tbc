@@ -2,6 +2,7 @@ import { Consumes } from '/tbc/core/proto/common.js';
 import { Enchant } from '/tbc/core/proto/common.js';
 import { EquipmentSpec } from '/tbc/core/proto/common.js';
 import { Gem } from '/tbc/core/proto/common.js';
+import { GemColor } from '/tbc/core/proto/common.js';
 import { ItemSlot } from '/tbc/core/proto/common.js';
 import { Item } from '/tbc/core/proto/common.js';
 import { Race } from '/tbc/core/proto/common.js';
@@ -61,6 +62,9 @@ export declare class Player<SpecType extends Spec> {
     readonly defaultGear: EquipmentSpec;
     readonly sim: Sim;
     constructor(config: PlayerConfig<SpecType>, sim: Sim);
+    getItems(slot: ItemSlot | undefined): Array<Item>;
+    getEnchants(slot: ItemSlot | undefined): Array<Enchant>;
+    getGems(socketColor: GemColor | undefined): Array<Gem>;
     statWeights(request: StatWeightsRequest): Promise<StatWeightsResult>;
     private updateCharacterStats;
     getCurrentStats(): ComputeStatsResult;

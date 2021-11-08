@@ -3,8 +3,7 @@ import { GearListRequest, GearListResult } from './proto/api.js';
 import { IndividualSimRequest, IndividualSimResult } from './proto/api.js';
 import { StatWeightsRequest, StatWeightsResult } from './proto/api.js';
 import { repoName } from './resources.js';
-import { specDirectory } from './resources.js';
-const SIM_WORKER_URL = `/${repoName}/${specDirectory}/sim_worker.js`;
+const SIM_WORKER_URL = `/${repoName}/sim_worker.js`;
 export class WorkerPool {
     constructor(numWorkers) {
         this.workers = [];

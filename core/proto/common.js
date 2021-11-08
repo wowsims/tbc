@@ -264,6 +264,35 @@ export var Stat;
     Stat[Stat["StatArmor"] = 27] = "StatArmor";
 })(Stat || (Stat = {}));
 /**
+ * Does not correspond to anything in-game; just our own label to help filter
+ * items in the UI.
+ *
+ * @generated from protobuf enum proto.ItemCategory
+ */
+export var ItemCategory;
+(function (ItemCategory) {
+    /**
+     * @generated from protobuf enum value: ItemCategoryUnknown = 0;
+     */
+    ItemCategory[ItemCategory["ItemCategoryUnknown"] = 0] = "ItemCategoryUnknown";
+    /**
+     * @generated from protobuf enum value: ItemCategoryCaster = 1;
+     */
+    ItemCategory[ItemCategory["ItemCategoryCaster"] = 1] = "ItemCategoryCaster";
+    /**
+     * @generated from protobuf enum value: ItemCategoryMelee = 2;
+     */
+    ItemCategory[ItemCategory["ItemCategoryMelee"] = 2] = "ItemCategoryMelee";
+    /**
+     * @generated from protobuf enum value: ItemCategoryHybrid = 3;
+     */
+    ItemCategory[ItemCategory["ItemCategoryHybrid"] = 3] = "ItemCategoryHybrid";
+    /**
+     * @generated from protobuf enum value: ItemCategoryHealer = 4;
+     */
+    ItemCategory[ItemCategory["ItemCategoryHealer"] = 4] = "ItemCategoryHealer";
+})(ItemCategory || (ItemCategory = {}));
+/**
  * @generated from protobuf enum proto.ItemType
  */
 export var ItemType;
@@ -1324,6 +1353,8 @@ class Item$Type extends MessageType {
         super("proto.Item", [
             { no: 1, name: "id", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 2, name: "name", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 14, name: "categories", kind: "enum", repeat: 1 /*RepeatType.PACKED*/, T: () => ["proto.ItemCategory", ItemCategory] },
+            { no: 15, name: "class_allowlist", kind: "enum", repeat: 1 /*RepeatType.PACKED*/, T: () => ["proto.Class", Class] },
             { no: 3, name: "type", kind: "enum", T: () => ["proto.ItemType", ItemType] },
             { no: 4, name: "armor_type", kind: "enum", T: () => ["proto.ArmorType", ArmorType] },
             { no: 5, name: "weapon_type", kind: "enum", T: () => ["proto.WeaponType", WeaponType] },
@@ -1338,7 +1369,7 @@ class Item$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { id: 0, name: "", type: 0, armorType: 0, weaponType: 0, handType: 0, rangedWeaponType: 0, stats: [], gemSockets: [], socketBonus: [], phase: 0, quality: 0, unique: false };
+        const message = { id: 0, name: "", categories: [], classAllowlist: [], type: 0, armorType: 0, weaponType: 0, handType: 0, rangedWeaponType: 0, stats: [], gemSockets: [], socketBonus: [], phase: 0, quality: 0, unique: false };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -1354,6 +1385,20 @@ class Item$Type extends MessageType {
                     break;
                 case /* string name */ 2:
                     message.name = reader.string();
+                    break;
+                case /* repeated proto.ItemCategory categories */ 14:
+                    if (wireType === WireType.LengthDelimited)
+                        for (let e = reader.int32() + reader.pos; reader.pos < e;)
+                            message.categories.push(reader.int32());
+                    else
+                        message.categories.push(reader.int32());
+                    break;
+                case /* repeated proto.Class class_allowlist */ 15:
+                    if (wireType === WireType.LengthDelimited)
+                        for (let e = reader.int32() + reader.pos; reader.pos < e;)
+                            message.classAllowlist.push(reader.int32());
+                    else
+                        message.classAllowlist.push(reader.int32());
                     break;
                 case /* proto.ItemType type */ 3:
                     message.type = reader.int32();
@@ -1418,6 +1463,20 @@ class Item$Type extends MessageType {
         /* string name = 2; */
         if (message.name !== "")
             writer.tag(2, WireType.LengthDelimited).string(message.name);
+        /* repeated proto.ItemCategory categories = 14; */
+        if (message.categories.length) {
+            writer.tag(14, WireType.LengthDelimited).fork();
+            for (let i = 0; i < message.categories.length; i++)
+                writer.int32(message.categories[i]);
+            writer.join();
+        }
+        /* repeated proto.Class class_allowlist = 15; */
+        if (message.classAllowlist.length) {
+            writer.tag(15, WireType.LengthDelimited).fork();
+            for (let i = 0; i < message.classAllowlist.length; i++)
+                writer.int32(message.classAllowlist[i]);
+            writer.join();
+        }
         /* proto.ItemType type = 3; */
         if (message.type !== 0)
             writer.tag(3, WireType.Varint).int32(message.type);

@@ -3,6 +3,7 @@ import { Class } from '/tbc/core/proto/common.js';
 import { Enchant } from '/tbc/core/proto/common.js';
 import { Gem } from '/tbc/core/proto/common.js';
 import { GemColor } from '/tbc/core/proto/common.js';
+import { ItemCategory } from '/tbc/core/proto/common.js';
 import { ItemSlot } from '/tbc/core/proto/common.js';
 import { Item } from '/tbc/core/proto/common.js';
 import { Race } from '/tbc/core/proto/common.js';
@@ -53,8 +54,10 @@ export declare type SpecTypeFunctions<SpecType extends Spec> = {
 export declare const specTypeFunctions: Partial<Record<Spec, SpecTypeFunctions<any>>>;
 export declare const specToClass: Record<Spec, Class>;
 export declare const specToEligibleRaces: Record<Spec, Array<Race>>;
+export declare const specToEligibleItemCategories: Record<Spec, Array<ItemCategory>>;
 export declare const specToLocalStorageKey: Record<Spec, string>;
 export declare function withSpecProto<SpecType extends Spec>(playerOptions: PlayerOptions, rotation: SpecRotation<SpecType>, talents: SpecTalents<SpecType>, specOptions: SpecOptions<SpecType>): PlayerOptions;
+export declare function canEquipItem(item: Item, spec: Spec): boolean;
 export declare function getEligibleItemSlots(item: Item): Array<ItemSlot>;
 export declare function validWeaponCombo(mainHand: Item | null | undefined, offHand: Item | null | undefined): boolean;
 export declare function getEligibleEnchantSlots(enchant: Enchant): Array<ItemSlot>;

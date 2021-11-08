@@ -69,8 +69,8 @@ class ItemPicker extends Component {
         this.socketsContainerElem = this.rootElem.getElementsByClassName('item-picker-sockets-container')[0];
         this.item = null;
         player.sim.gearListEmitter.on(() => {
-            this._items = this.player.sim.getItems(this.slot);
-            this._enchants = this.player.sim.getEnchants(this.slot);
+            this._items = this.player.getItems(this.slot);
+            this._enchants = this.player.getEnchants(this.slot);
             this.iconElem.addEventListener('click', event => {
                 selectorModal.setData(this.slot, this._equippedItem, this._items, this._enchants);
             });
@@ -192,7 +192,7 @@ class SelectorModal extends Component {
     }
     addGemTabs(slot, equippedItem) {
         equippedItem?.item.gemSockets.forEach((socketColor, socketIdx) => {
-            this.addTab('Gem ' + (socketIdx + 1), slot, equippedItem, this.player.sim.getGems(socketColor), gem => this.player.computeGemEP(gem), equippedItem => equippedItem?.gems[socketIdx], gem => {
+            this.addTab('Gem ' + (socketIdx + 1), slot, equippedItem, this.player.getGems(socketColor), gem => this.player.computeGemEP(gem), equippedItem => equippedItem?.gems[socketIdx], gem => {
                 return {
                     id: gem.id,
                     name: gem.name,

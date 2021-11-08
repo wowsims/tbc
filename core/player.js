@@ -5,6 +5,7 @@ import { Gear } from '/tbc/core/proto_utils/gear.js';
 import { makeComputeStatsRequest } from '/tbc/core/proto_utils/request_helpers.js';
 import { Stats } from '/tbc/core/proto_utils/stats.js';
 import { specTypeFunctions } from '/tbc/core/proto_utils/utils.js';
+import { canEquipItem } from '/tbc/core/proto_utils/utils.js';
 import { specToEligibleRaces } from '/tbc/core/proto_utils/utils.js';
 import { getEligibleItemSlots } from '/tbc/core/proto_utils/utils.js';
 import { gemMatchesSocket } from '/tbc/core/proto_utils/utils.js';
@@ -58,6 +59,18 @@ export class Player {
         this.changeEmitter.on(() => {
             this.updateCharacterStats();
         });
+    }
+    // Returns all items that this player can wear in the given slot.
+    getItems(slot) {
+        return this.sim.getItems(slot).filter(item => canEquipItem(item, this.spec));
+    }
+    // Returns all enchants that this player can wear in the given slot.
+    getEnchants(slot) {
+        return this.sim.getEnchants(slot);
+    }
+    // Returns all gems that this player can wear of the given color.
+    getGems(socketColor) {
+        return this.sim.getGems(socketColor);
     }
     async statWeights(request) {
         const result = await this.sim.statWeights(request);
