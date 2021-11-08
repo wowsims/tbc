@@ -119,45 +119,26 @@ func (item WowheadItemResponse) GetStats() Stats {
 	}
 }
 
-var warriorRegex = regexp.MustCompile("<a href=\\\"/class=1\\\" class=\\\"c1\\\">Warrior</a>")
-var paladinRegex = regexp.MustCompile("<a href=\\\"/class=2\\\" class=\\\"c2\\\">Paladin</a>")
-var hunterRegex = regexp.MustCompile("<a href=\\\"/class=3\\\" class=\\\"c3\\\">Hunter</a>")
-var rogueRegex = regexp.MustCompile("<a href=\\\"/class=4\\\" class=\\\"c4\\\">Rogue</a>")
-var priestRegex = regexp.MustCompile("<a href=\\\"/class=5\\\" class=\\\"c5\\\">Priest</a>")
-var shamanRegex = regexp.MustCompile("<a href=\\\"/class=7\\\" class=\\\"c7\\\">Shaman</a>")
-var mageRegex = regexp.MustCompile("<a href=\\\"/class=8\\\" class=\\\"c8\\\">Mage</a>")
-var warlockRegex = regexp.MustCompile("<a href=\\\"/class=9\\\" class=\\\"c9\\\">Warlock</a>")
-var druidRegex = regexp.MustCompile("<a href=\\\"/class=11\\\" class=\\\"c11\\\">Druid</a>")
+// Detects class-locked items, e.g. tier sets and pvp gear.
+var classPatterns = map[proto.Class]*regexp.Regexp{
+	proto.Class_ClassWarrior: regexp.MustCompile("<a href=\\\"/class=1\\\" class=\\\"c1\\\">Warrior</a>"),
+	proto.Class_ClassPaladin: regexp.MustCompile("<a href=\\\"/class=2\\\" class=\\\"c2\\\">Paladin</a>"),
+	proto.Class_ClassHunter:  regexp.MustCompile("<a href=\\\"/class=3\\\" class=\\\"c3\\\">Hunter</a>"),
+	proto.Class_ClassRogue:   regexp.MustCompile("<a href=\\\"/class=4\\\" class=\\\"c4\\\">Rogue</a>"),
+	proto.Class_ClassPriest:  regexp.MustCompile("<a href=\\\"/class=5\\\" class=\\\"c5\\\">Priest</a>"),
+	proto.Class_ClassShaman:  regexp.MustCompile("<a href=\\\"/class=7\\\" class=\\\"c7\\\">Shaman</a>"),
+	proto.Class_ClassMage:    regexp.MustCompile("<a href=\\\"/class=8\\\" class=\\\"c8\\\">Mage</a>"),
+	proto.Class_ClassWarlock: regexp.MustCompile("<a href=\\\"/class=9\\\" class=\\\"c9\\\">Warlock</a>"),
+	proto.Class_ClassDruid:   regexp.MustCompile("<a href=\\\"/class=11\\\" class=\\\"c11\\\">Druid</a>"),
+}
 
 func (item WowheadItemResponse) GetClassAllowlist() []proto.Class {
 	var allowlist []proto.Class
 
-	if druidRegex.MatchString(item.Tooltip) {
-		allowlist = append(allowlist, proto.Class_ClassDruid)
-	}
-	if hunterRegex.MatchString(item.Tooltip) {
-		allowlist = append(allowlist, proto.Class_ClassHunter)
-	}
-	if mageRegex.MatchString(item.Tooltip) {
-		allowlist = append(allowlist, proto.Class_ClassMage)
-	}
-	if paladinRegex.MatchString(item.Tooltip) {
-		allowlist = append(allowlist, proto.Class_ClassPaladin)
-	}
-	if priestRegex.MatchString(item.Tooltip) {
-		allowlist = append(allowlist, proto.Class_ClassPriest)
-	}
-	if rogueRegex.MatchString(item.Tooltip) {
-		allowlist = append(allowlist, proto.Class_ClassRogue)
-	}
-	if shamanRegex.MatchString(item.Tooltip) {
-		allowlist = append(allowlist, proto.Class_ClassShaman)
-	}
-	if warlockRegex.MatchString(item.Tooltip) {
-		allowlist = append(allowlist, proto.Class_ClassWarlock)
-	}
-	if warriorRegex.MatchString(item.Tooltip) {
-		allowlist = append(allowlist, proto.Class_ClassWarrior)
+	for class, pattern := range classPatterns {
+		if pattern.MatchString(item.Tooltip) {
+			allowlist = append(allowlist, class)
+		}
 	}
 
 	return allowlist
