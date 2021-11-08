@@ -29,7 +29,7 @@ func ApplyMysticalSkyfireDiamond(agent core.Agent) {
 			ID:      MysticalSkyfireDiamondAuraID,
 			Name:    "Mystical Skyfire Diamond",
 			OnCastComplete: func(sim *core.Simulation, cast core.DirectCastAction) {
-				if !icd.IsOnCD(sim) && sim.RandomFloat("unmarked") < 0.15 {
+				if !icd.IsOnCD(sim) && sim.RandomFloat("Mystical Skyfire Diamond") < 0.15 {
 					icd = core.InternalCD(sim.CurrentTime + icdDur)
 					character.AddAuraWithTemporaryStats(sim, MysticFocusAuraID, "Mystic Focus", stats.SpellHaste, hasteBonus, dur)
 				}
@@ -49,7 +49,7 @@ func ApplyInsightfulEarthstormDiamond(agent core.Agent) {
 			ID:      InsightfulEarthstormDiamondAuraID,
 			Name:    "Insightful Earthstorm Diamond",
 			OnCastComplete: func(sim *core.Simulation, cast core.DirectCastAction) {
-				if !icd.IsOnCD(sim) && sim.RandomFloat("unmarked") < 0.04 {
+				if !icd.IsOnCD(sim) && sim.RandomFloat("Insightful Earthstorm Diamond") < 0.04 {
 					icd = core.InternalCD(sim.CurrentTime + dur)
 					if sim.Log != nil {
 						sim.Log(" *Insightful Earthstorm Mana Restore - 300\n")

@@ -235,67 +235,83 @@ func ProtoToEquipment(es proto.EquipmentSpec) Equipment {
 	return NewEquipmentSet(ProtoToEquipmentSpec(es))
 }
 
-func EquipmentSpecFromStrings(itemNames []string) *proto.EquipmentSpec {
+// Like ItemSpec, but uses names for reference instead of ID.
+type ItemStringSpec struct {
+	Name    string
+	Enchant string
+	Gems    []string
+}
+
+func EquipmentSpecFromStrings(itemStringSpecs []ItemStringSpec) *proto.EquipmentSpec {
 	eq := &proto.EquipmentSpec{
-		Items: make([]*proto.ItemSpec, len(itemNames)),
+		Items: make([]*proto.ItemSpec, len(itemStringSpecs)),
 	}
 
-	for i, itemName := range itemNames {
-		item := ByName[itemName]
+	for i, itemStringSpec := range itemStringSpecs {
+		item := ByName[itemStringSpec.Name]
 		if item.ID == 0 {
-			log.Fatalf("Item not found: %s", itemName)
+			log.Fatalf("Item not found: %s", itemStringSpec.Name)
 		}
 		itemSpec := &proto.ItemSpec{
 			Id: item.ID,
 		}
+
+		if itemStringSpec.Enchant != "" {
+			enchant := EnchantsByName[itemStringSpec.Enchant]
+			if enchant.ID == 0 {
+				log.Fatalf("Enchant not found: %s", itemStringSpec.Enchant)
+			}
+			itemSpec.Enchant = enchant.ID
+		}
+
+		for _, gemName := range itemStringSpec.Gems {
+			gem := GemsByName[gemName]
+			if gem.ID == 0 {
+				log.Fatalf("Gem not found: %s", gemName)
+			}
+			itemSpec.Gems = append(itemSpec.Gems, gem.ID)
+		}
+
 		eq.Items[i] = itemSpec
 	}
 	return eq
 }
 
-func (e Equipment) Clone() Equipment {
-	ne := Equipment{}
-	for i, v := range e {
-		vc := v
-		ne[i] = vc
+func (equipment Equipment) Clone() Equipment {
+	newEquipment := Equipment{}
+	for idx, item := range equipment {
+		newItem := item
+		newEquipment[idx] = newItem
 	}
-	return ne
+	return newEquipment
 }
 
-func (e Equipment) Stats() stats.Stats {
-	s := stats.Stats{}
-	for _, item := range e {
-		for k, v := range item.Stats {
-			if v == 0 {
-				continue
-			}
-			s[k] += v
+func (equipment Equipment) Stats() stats.Stats {
+	equipStats := stats.Stats{}
+	for _, item := range equipment {
+		equipStats = equipStats.Add(item.Stats)
+		equipStats = equipStats.Add(item.Enchant.Bonus)
+
+		for _, gem := range item.Gems {
+			equipStats = equipStats.Add(gem.Stats)
 		}
-		if len(item.GemSockets) > 0 {
-			isMatched := len(item.Gems) == len(item.GemSockets) && len(item.GemSockets) > 0
-			for gi, g := range item.Gems {
-				for k, v := range g.Stats {
-					s[k] += v
-				}
-				isMatched = isMatched && ColorIntersects(g.Color, item.GemSockets[gi])
-				if !isMatched {
-					break
-				}
-			}
-			if isMatched {
-				for k, v := range item.SocketBonus {
-					if v == 0 {
-						continue
-					}
-					s[k] += v
+
+		// Check socket bonus
+		if len(item.GemSockets) > 0 && len(item.GemSockets) == len(item.Gems) {
+			allMatch := true
+			for gemIndex, gem := range item.Gems {
+				if !ColorIntersects(gem.Color, item.GemSockets[gemIndex]) {
+					allMatch = false
+					break;
 				}
 			}
-		}
-		for k, v := range item.Enchant.Bonus {
-			s[k] += v
+
+			if allMatch {
+				equipStats = equipStats.Add(item.SocketBonus)
+			}
 		}
 	}
-	return s
+	return equipStats
 }
 
 type ItemSlot byte
