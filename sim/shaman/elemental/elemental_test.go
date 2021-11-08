@@ -27,22 +27,22 @@ func TestP1FullCharacterStats(t *testing.T) {
 	core.CharacterStatsTest("p1Full", t, isr, stats.Stats{
 		stats.Strength:   20.8,
 		stats.Agility:    20.8,
-		stats.Stamina:    347.5,
-		stats.Intellect:  511.4,
-		stats.Spirit:     191.3,
+		stats.Stamina:    395.9,
+		stats.Intellect:  531.2,
+		stats.Spirit:     198.0,
 
-		stats.SpellPower:       834,
-		stats.HealingPower:     690,
+		stats.SpellPower:       1109,
+		stats.HealingPower:     705,
 		stats.ArcaneSpellPower: 80,
 		stats.HolySpellPower:   80,
 		stats.NatureSpellPower: 123,
 
-		stats.MP5:       336.7,
-		stats.SpellHit:  73.8,
-		stats.SpellCrit: 637.8,
+		stats.MP5:       337.8,
+		stats.SpellHit:  87.8,
+		stats.SpellCrit: 696.4,
 
-		stats.Mana:  10349,
-		stats.Armor: 9211.5,
+		stats.Mana:  10646,
+		stats.Armor: 9211.6,
 	})
 }
 
@@ -67,10 +67,10 @@ func TestCalcStatWeight(t *testing.T) {
 	})
 
 	core.StatWeightsTest("p1Full", t, isr, StatsToTest, ReferenceStat, stats.Stats{
-		stats.Intellect:  0.14,
-		stats.SpellPower: 0.63,
-		stats.SpellHit:   1.26,
-		stats.SpellCrit:  0.46,
+		stats.Intellect:  0.19,
+		stats.SpellPower: 0.67,
+		stats.SpellHit:   0.10,
+		stats.SpellCrit:  0.59,
 	})
 }
 
@@ -95,8 +95,8 @@ func TestSimulatePreRaidNoBuffs(t *testing.T) {
 			Gear:          PreRaidGear,
 		},
 
-		ExpectedDpsShort: 973.7,
-		ExpectedDpsLong:  293.9,
+		ExpectedDpsShort: 828.0,
+		ExpectedDpsLong:  261.9,
 	})
 }
 
@@ -116,8 +116,8 @@ func TestSimulatePreRaid(t *testing.T) {
 			Gear:          PreRaidGear,
 		},
 
-		ExpectedDpsShort: 1435.9,
-		ExpectedDpsLong:  1078.5,
+		ExpectedDpsShort: 1297.5,
+		ExpectedDpsLong:  1009.1,
 	})
 }
 
@@ -137,8 +137,8 @@ func TestSimulateP1(t *testing.T) {
 			Gear:          P1Gear,
 		},
 
-		ExpectedDpsShort: 1385.0,
-		ExpectedDpsLong:  1317.3,
+		ExpectedDpsShort: 1928.0,
+		ExpectedDpsLong:  1470.0,
 	})
 }
 
@@ -178,8 +178,8 @@ func TestLBOnlyAgent(t *testing.T) {
 			Gear:          P1Gear,
 		},
 
-		ExpectedDpsShort: 1413.8,
-		ExpectedDpsLong:  1205.8,
+		ExpectedDpsShort: 1761.8,
+		ExpectedDpsLong:  1483.9,
 	})
 }
 
@@ -213,8 +213,8 @@ func TestClearcastAgent(t *testing.T) {
 			Gear:          P1Gear,
 		},
 
-		ExpectedDpsShort: 1607.6,
-		ExpectedDpsLong:  1315.1,
+		ExpectedDpsShort: 1715.9,
+		ExpectedDpsLong:  1526.6,
 	})
 }
 
@@ -229,7 +229,7 @@ func TestAverageDPS(t *testing.T) {
 		PlayerOptions: PlayerOptionsAdaptive,
 	})
 
-	core.IndividualSimAverageTest("P1Average", t, isr, 1248.1)
+	core.IndividualSimAverageTest("P1Average", t, isr, 1508.6)
 }
 
 func BenchmarkSimulate(b *testing.B) {
