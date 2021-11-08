@@ -8,13 +8,13 @@ import (
 // TODO: Create Generator for Gems and Enchants
 
 var Gems = []Gem{
-	{ID: 34220, Name: "Chaotic Skyfire Diamond", Quality: proto.ItemQuality_ItemQualityRare, Phase: 1, Color: proto.GemColor_GemColorMeta, Stats: stats.Stats{stats.SpellCrit: 12}}, // Activate: ActivateCSD
+	{ID: 34220, Name: "Chaotic Skyfire Diamond", Quality: proto.ItemQuality_ItemQualityRare, Phase: 1, Color: proto.GemColor_GemColorMeta, Stats: stats.Stats{stats.SpellCrit: 12}},
 	{ID: 25897, Name: "Bracing Earthstorm Diamond", Quality: proto.ItemQuality_ItemQualityRare, Phase: 1, Color: proto.GemColor_GemColorMeta, Stats: stats.Stats{stats.SpellPower: 14}},
 	{ID: 32641, Name: "Imbued Unstable Diamond", Quality: proto.ItemQuality_ItemQualityRare, Phase: 1, Color: proto.GemColor_GemColorMeta, Stats: stats.Stats{stats.SpellPower: 14}},
-	{ID: 35503, Name: "Ember Skyfire Diamond", Quality: proto.ItemQuality_ItemQualityRare, Phase: 1, Color: proto.GemColor_GemColorMeta, Stats: stats.Stats{stats.SpellPower: 14}}, // Activate: ActivateESD
+	{ID: 35503, Name: "Ember Skyfire Diamond", Quality: proto.ItemQuality_ItemQualityRare, Phase: 1, Color: proto.GemColor_GemColorMeta, Stats: stats.Stats{stats.SpellPower: 14}},
 	{ID: 28557, Name: "Swift Starfire Diamond", Quality: proto.ItemQuality_ItemQualityRare, Phase: 1, Color: proto.GemColor_GemColorMeta, Stats: stats.Stats{stats.SpellPower: 12}},
-	{ID: 25893, Name: "Mystical Skyfire Diamond", Quality: proto.ItemQuality_ItemQualityRare, Phase: 1, Color: proto.GemColor_GemColorMeta, Stats: stats.Stats{}},                         // Activate: ActivateMSD
-	{ID: 25901, Name: "Insightful Earthstorm Diamond", Quality: proto.ItemQuality_ItemQualityRare, Phase: 1, Color: proto.GemColor_GemColorMeta, Stats: stats.Stats{stats.Intellect: 12}}, // Activate: ActivateIED
+	{ID: 25893, Name: "Mystical Skyfire Diamond", Quality: proto.ItemQuality_ItemQualityRare, Phase: 1, Color: proto.GemColor_GemColorMeta, Stats: stats.Stats{}},
+	{ID: 25901, Name: "Insightful Earthstorm Diamond", Quality: proto.ItemQuality_ItemQualityRare, Phase: 1, Color: proto.GemColor_GemColorMeta, Stats: stats.Stats{stats.Intellect: 12}},
 	{ID: 23096, Name: "Runed Blood Garnet", Quality: proto.ItemQuality_ItemQualityUncommon, Phase: 1, Color: proto.GemColor_GemColorRed, Stats: stats.Stats{stats.SpellPower: 7}},
 	{ID: 24030, Name: "Runed Living Ruby", Quality: proto.ItemQuality_ItemQualityRare, Phase: 1, Color: proto.GemColor_GemColorRed, Stats: stats.Stats{stats.SpellPower: 9}},
 	{ID: 32196, Name: "Runed Crimson Spinel", Quality: proto.ItemQuality_ItemQualityEpic, Phase: 3, Color: proto.GemColor_GemColorRed, Stats: stats.Stats{stats.SpellPower: 12}},
