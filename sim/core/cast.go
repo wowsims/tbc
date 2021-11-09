@@ -135,6 +135,6 @@ func (cast *Cast) internalOnComplete(sim *Simulation, onCastComplete OnCastCompl
 		}
 	}
 
-	onCastComplete(sim, cast)
 	cast.Character.OnCastComplete(sim, cast)
+	onCastComplete(sim, cast)
 }

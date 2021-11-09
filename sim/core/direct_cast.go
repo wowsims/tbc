@@ -115,8 +115,9 @@ func (action DirectCastAction) Act(sim *Simulation) bool {
 		action.OnCastComplete(sim, cast)
 
 		results := make([]DirectCastDamageResult, 0, len(action.HitInputs))
-		for _, hitInput := range action.HitInputs {
-			hitInput.Target.OnBeforeSpellHit(sim, cast, &hitInput)
+		for hitIdx := range action.HitInputs {
+			hitInput := &action.HitInputs[hitIdx]
+			hitInput.Target.OnBeforeSpellHit(sim, cast, hitInput)
 
 			result := action.calculateDirectCastDamage(sim, hitInput)
 			results = append(results, result)
@@ -140,7 +141,7 @@ func (action DirectCastAction) Act(sim *Simulation) bool {
 	})
 }
 
-func (action DirectCastAction) calculateDirectCastDamage(sim *Simulation, damageInput DirectCastDamageInput) DirectCastDamageResult {
+func (action DirectCastAction) calculateDirectCastDamage(sim *Simulation, damageInput *DirectCastDamageInput) DirectCastDamageResult {
 	result := DirectCastDamageResult{
 		Target: damageInput.Target,
 	}
