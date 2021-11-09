@@ -24,6 +24,7 @@ func (shaman *Shaman) NewElectricCast(name string, actionID core.ActionID, baseM
 	cast := core.Cast{
 		Name: name,
 		ActionID: actionID,
+		Character: shaman.GetCharacter(),
 		BaseManaCost: baseManaCost,
 		ManaCost: baseManaCost,
 		CastTime: baseCastTime,
