@@ -35,7 +35,7 @@ type Simulation struct {
 }
 
 func NewIndividualSim(isr proto.IndividualSimRequest) *Simulation {
-	raid := NewRaid(*isr.Buffs)
+	raid := NewRaid(*isr.RaidBuffs, *isr.PartyBuffs, *isr.ApproximationBuffs)
 	raid.AddPlayer(NewAgent(*isr.Player, isr))
 	raid.Finalize()
 

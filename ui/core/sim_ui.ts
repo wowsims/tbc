@@ -218,7 +218,9 @@ export abstract class SimUI<SpecType extends Spec> {
 		}
 
     return makeIndividualSimRequest(
-      this.sim.getBuffs(),
+      this.sim.getRaidBuffs(),
+      this.sim.getPartyBuffs(),
+      this.sim.getApproximationBuffs(),
       this.player.getConsumes(),
       this.player.getCustomStats(),
       encounter,

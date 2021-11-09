@@ -33,8 +33,13 @@ func GetGearList(request *proto.GearListRequest) *proto.GearListResult {
  * Returns character stats taking into account gear / buffs / consumes / etc
  */
 func ComputeStats(request *proto.ComputeStatsRequest) *proto.ComputeStatsResult {
-	agent := NewAgent(*request.Player, proto.IndividualSimRequest{Player: request.Player, Buffs: request.Buffs})
-	raid := NewRaid(*request.Buffs)
+	agent := NewAgent(*request.Player, proto.IndividualSimRequest{
+		Player: request.Player,
+		RaidBuffs: request.RaidBuffs,
+		PartyBuffs: request.PartyBuffs,
+	})
+
+	raid := NewRaid(*request.RaidBuffs, *request.PartyBuffs, proto.ApproximationBuffs{})
 	raid.AddPlayer(agent)
 	raid.Finalize()
 

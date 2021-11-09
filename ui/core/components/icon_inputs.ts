@@ -1,4 +1,6 @@
-import { Buffs } from '/tbc/core/proto/common.js';
+import { RaidBuffs } from '/tbc/core/proto/common.js';
+import { PartyBuffs } from '/tbc/core/proto/common.js';
+import { ApproximationBuffs } from '/tbc/core/proto/common.js';
 import { Consumes } from '/tbc/core/proto/common.js';
 import { Debuffs } from '/tbc/core/proto/common.js';
 import { Drums } from '/tbc/core/proto/common.js';
@@ -12,29 +14,34 @@ import { ExclusivityTag } from '/tbc/core/sim_ui.js';
 import { IconInput } from './icon_picker.js';
 
 // Keep each section in alphabetical order.
-// Buffs
-export const ArcaneBrilliance = makeBooleanBuffInput({spellId:27127}, 'arcaneBrilliance');
-export const AtieshMage = makeMultistateBuffInput({spellId:28142}, 5, 'atieshMage');
-export const AtieshWarlock = makeMultistateBuffInput({spellId:28143}, 5, 'atieshWarlock');
-export const BlessingOfKings = makeBooleanBuffInput({spellId:25898}, 'blessingOfKings');
-export const BlessingOfWisdom = makeTristateBuffInput({spellId:27143}, {spellId:20245}, 'blessingOfWisdom');
-export const Bloodlust = makeMultistateBuffInput({spellId:2825}, 11, 'bloodlust');
-export const BraidedEterniumChain = makeBooleanBuffInput({spellId:31025}, 'braidedEterniumChain');
-export const ChainOfTheTwilightOwl = makeBooleanBuffInput({spellId:31035}, 'chainOfTheTwilightOwl');
-export const DraeneiRacialCaster = makeBooleanBuffInput({spellId:28878}, 'draeneiRacialCaster');
-export const DraeneiRacialMelee = makeBooleanBuffInput({spellId:6562}, 'draeneiRacialMelee');
-export const DivineSpirit = makeTristateBuffInput({spellId:25312}, {spellId:33182}, 'divineSpirit');
-export const EyeOfTheNight = makeBooleanBuffInput({spellId:31033}, 'eyeOfTheNight');
-export const GiftOfTheWild = makeTristateBuffInput({spellId:26991}, {spellId:17055}, 'giftOfTheWild');
-export const JadePendantOfBlasting = makeBooleanBuffInput({spellId:25607}, 'jadePendantOfBlasting');
-export const ManaSpringTotem = makeTristateBuffInput({spellId:25570}, {spellId:16208}, 'manaSpringTotem');
-export const ManaTideTotem = makeBooleanBuffInput({spellId:16190}, 'manaTideTotem');
-export const MoonkinAura = makeTristateBuffInput({spellId:24907}, {itemId:32387}, 'moonkinAura');
-export const TotemOfWrath = makeMultistateBuffInput({spellId:30706}, 5, 'totemOfWrath');
-export const WrathOfAirTotem = makeTristateBuffInput({spellId:3738}, {spellId:37212}, 'wrathOfAirTotem');
 
-export const DrumsOfBattleBuff = makeEnumValueBuffInput({spellId:35476}, 'drums', Drums.DrumsOfBattle, ['Drums']);
-export const DrumsOfRestorationBuff = makeEnumValueBuffInput({spellId:35478}, 'drums', Drums.DrumsOfRestoration, ['Drums']);
+// Raid Buffs
+export const ArcaneBrilliance = makeBooleanRaidBuffInput({spellId:27127}, 'arcaneBrilliance');
+export const BlessingOfKings = makeBooleanRaidBuffInput({spellId:25898}, 'blessingOfKings');
+export const BlessingOfWisdom = makeTristateRaidBuffInput({spellId:27143}, {spellId:20245}, 'blessingOfWisdom');
+export const DivineSpirit = makeTristateRaidBuffInput({spellId:25312}, {spellId:33182}, 'divineSpirit');
+export const GiftOfTheWild = makeTristateRaidBuffInput({spellId:26991}, {spellId:17055}, 'giftOfTheWild');
+
+// Party Buffs
+export const AtieshMage = makeMultistatePartyBuffInput({spellId:28142}, 5, 'atieshMage');
+export const AtieshWarlock = makeMultistatePartyBuffInput({spellId:28143}, 5, 'atieshWarlock');
+export const Bloodlust = makeMultistatePartyBuffInput({spellId:2825}, 11, 'bloodlust');
+export const BraidedEterniumChain = makeBooleanPartyBuffInput({spellId:31025}, 'braidedEterniumChain');
+export const ChainOfTheTwilightOwl = makeBooleanPartyBuffInput({spellId:31035}, 'chainOfTheTwilightOwl');
+export const DraeneiRacialCaster = makeBooleanPartyBuffInput({spellId:28878}, 'draeneiRacialCaster');
+export const DraeneiRacialMelee = makeBooleanPartyBuffInput({spellId:6562}, 'draeneiRacialMelee');
+export const EyeOfTheNight = makeBooleanPartyBuffInput({spellId:31033}, 'eyeOfTheNight');
+export const JadePendantOfBlasting = makeBooleanPartyBuffInput({spellId:25607}, 'jadePendantOfBlasting');
+export const ManaSpringTotem = makeTristatePartyBuffInput({spellId:25570}, {spellId:16208}, 'manaSpringTotem');
+export const MoonkinAura = makeTristatePartyBuffInput({spellId:24907}, {itemId:32387}, 'moonkinAura');
+export const TotemOfWrath = makeMultistatePartyBuffInput({spellId:30706}, 5, 'totemOfWrath');
+export const WrathOfAirTotem = makeTristatePartyBuffInput({spellId:3738}, {spellId:37212}, 'wrathOfAirTotem');
+
+export const DrumsOfBattleBuff = makeEnumValuePartyBuffInput({spellId:35476}, 'drums', Drums.DrumsOfBattle, ['Drums']);
+export const DrumsOfRestorationBuff = makeEnumValuePartyBuffInput({spellId:35478}, 'drums', Drums.DrumsOfRestoration, ['Drums']);
+
+// Approximation Buffs
+export const ManaTideTotem = makeBooleanApproximationBuffInput({spellId:16190}, 'manaTideTotem');
 
 // Debuffs
 export const ImprovedSealOfTheCrusader = makeBooleanDebuffInput({spellId:20337}, 'improvedSealOfTheCrusader');
@@ -64,61 +71,106 @@ export const DefaultSuperManaPotion = makeEnumValueConsumeInput({itemId:22832}, 
 export const DrumsOfBattleConsume = makeEnumValueConsumeInput({spellId:35476}, 'drums', Drums.DrumsOfBattle, ['Drums']);
 export const DrumsOfRestorationConsume = makeEnumValueConsumeInput({spellId:35478}, 'drums', Drums.DrumsOfRestoration, ['Drums']);
 
-function makeBooleanBuffInput(id: ItemOrSpellId, buffsFieldName: keyof Buffs, exclusivityTags?: Array<ExclusivityTag>): IconInput<Sim> {
+function makeBooleanRaidBuffInput(id: ItemOrSpellId, raidBuffsFieldName: keyof RaidBuffs, exclusivityTags?: Array<ExclusivityTag>): IconInput<Sim> {
   return {
     id: id,
     states: 2,
     exclusivityTags: exclusivityTags,
-    changedEvent: (sim: Sim) => sim.buffsChangeEmitter,
-    getValue: (sim: Sim) => sim.getBuffs()[buffsFieldName],
+    changedEvent: (sim: Sim) => sim.raidBuffsChangeEmitter,
+    getValue: (sim: Sim) => sim.getRaidBuffs()[raidBuffsFieldName],
     setBooleanValue: (sim: Sim, newValue: boolean) => {
-      const newBuffs = sim.getBuffs();
-      (newBuffs[buffsFieldName] as boolean) = newValue;
-      sim.setBuffs(newBuffs);
+      const newRaidBuffs = sim.getRaidBuffs();
+      (newRaidBuffs[raidBuffsFieldName] as boolean) = newValue;
+      sim.setRaidBuffs(newRaidBuffs);
     },
   }
 }
 
-function makeTristateBuffInput(id: ItemOrSpellId, impId: ItemOrSpellId, buffsFieldName: keyof Buffs): IconInput<Sim> {
+function makeTristateRaidBuffInput(id: ItemOrSpellId, impId: ItemOrSpellId, raidBuffsFieldName: keyof RaidBuffs): IconInput<Sim> {
   return {
     id: id,
     states: 3,
     improvedId: impId,
-    changedEvent: (sim: Sim) => sim.buffsChangeEmitter,
-    getValue: (sim: Sim) => sim.getBuffs()[buffsFieldName],
+    changedEvent: (sim: Sim) => sim.raidBuffsChangeEmitter,
+    getValue: (sim: Sim) => sim.getRaidBuffs()[raidBuffsFieldName],
     setNumberValue: (sim: Sim, newValue: number) => {
-      const newBuffs = sim.getBuffs();
-      (newBuffs[buffsFieldName] as number) = newValue;
-      sim.setBuffs(newBuffs);
+      const newRaidBuffs = sim.getRaidBuffs();
+      (newRaidBuffs[raidBuffsFieldName] as number) = newValue;
+      sim.setRaidBuffs(newRaidBuffs);
     },
   }
 }
 
-function makeMultistateBuffInput(id: ItemOrSpellId, numStates: number, buffsFieldName: keyof Buffs): IconInput<Sim> {
-  return {
-    id: id,
-    states: numStates,
-    changedEvent: (sim: Sim) => sim.buffsChangeEmitter,
-    getValue: (sim: Sim) => sim.getBuffs()[buffsFieldName],
-    setNumberValue: (sim: Sim, newValue: number) => {
-      const newBuffs = sim.getBuffs();
-      (newBuffs[buffsFieldName] as number) = newValue;
-      sim.setBuffs(newBuffs);
-    },
-  }
-}
-
-function makeEnumValueBuffInput(id: ItemOrSpellId, buffsFieldName: keyof Buffs, enumValue: number, exclusivityTags?: Array<ExclusivityTag>): IconInput<Sim> {
+function makeBooleanPartyBuffInput(id: ItemOrSpellId, partyBuffsFieldName: keyof PartyBuffs, exclusivityTags?: Array<ExclusivityTag>): IconInput<Sim> {
   return {
     id: id,
     states: 2,
     exclusivityTags: exclusivityTags,
-    changedEvent: (sim: Sim) => sim.buffsChangeEmitter,
-    getValue: (sim: Sim) => sim.getBuffs()[buffsFieldName] == enumValue,
+    changedEvent: (sim: Sim) => sim.partyBuffsChangeEmitter,
+    getValue: (sim: Sim) => sim.getPartyBuffs()[partyBuffsFieldName],
     setBooleanValue: (sim: Sim, newValue: boolean) => {
-			const newBuffs = sim.getBuffs();
-			(newBuffs[buffsFieldName] as number) = newValue ? enumValue : 0;
-			sim.setBuffs(newBuffs);
+      const newPartyBuffs = sim.getPartyBuffs();
+      (newPartyBuffs[partyBuffsFieldName] as boolean) = newValue;
+      sim.setPartyBuffs(newPartyBuffs);
+    },
+  }
+}
+
+function makeTristatePartyBuffInput(id: ItemOrSpellId, impId: ItemOrSpellId, partyBuffsFieldName: keyof PartyBuffs): IconInput<Sim> {
+  return {
+    id: id,
+    states: 3,
+    improvedId: impId,
+    changedEvent: (sim: Sim) => sim.partyBuffsChangeEmitter,
+    getValue: (sim: Sim) => sim.getPartyBuffs()[partyBuffsFieldName],
+    setNumberValue: (sim: Sim, newValue: number) => {
+      const newPartyBuffs = sim.getPartyBuffs();
+      (newPartyBuffs[partyBuffsFieldName] as number) = newValue;
+      sim.setPartyBuffs(newPartyBuffs);
+    },
+  }
+}
+
+function makeMultistatePartyBuffInput(id: ItemOrSpellId, numStates: number, partyBuffsFieldName: keyof PartyBuffs): IconInput<Sim> {
+  return {
+    id: id,
+    states: numStates,
+    changedEvent: (sim: Sim) => sim.partyBuffsChangeEmitter,
+    getValue: (sim: Sim) => sim.getPartyBuffs()[partyBuffsFieldName],
+    setNumberValue: (sim: Sim, newValue: number) => {
+      const newPartyBuffs = sim.getPartyBuffs();
+      (newPartyBuffs[partyBuffsFieldName] as number) = newValue;
+      sim.setPartyBuffs(newPartyBuffs);
+    },
+  }
+}
+
+function makeEnumValuePartyBuffInput(id: ItemOrSpellId, partyBuffsFieldName: keyof PartyBuffs, enumValue: number, exclusivityTags?: Array<ExclusivityTag>): IconInput<Sim> {
+  return {
+    id: id,
+    states: 2,
+    exclusivityTags: exclusivityTags,
+    changedEvent: (sim: Sim) => sim.partyBuffsChangeEmitter,
+    getValue: (sim: Sim) => sim.getPartyBuffs()[partyBuffsFieldName] == enumValue,
+    setBooleanValue: (sim: Sim, newValue: boolean) => {
+			const newPartyBuffs = sim.getPartyBuffs();
+			(newPartyBuffs[partyBuffsFieldName] as number) = newValue ? enumValue : 0;
+			sim.setPartyBuffs(newPartyBuffs);
+    },
+  }
+}
+
+function makeBooleanApproximationBuffInput(id: ItemOrSpellId, approximationBuffsFieldName: keyof ApproximationBuffs, exclusivityTags?: Array<ExclusivityTag>): IconInput<Sim> {
+  return {
+    id: id,
+    states: 2,
+    exclusivityTags: exclusivityTags,
+    changedEvent: (sim: Sim) => sim.approximationBuffsChangeEmitter,
+    getValue: (sim: Sim) => sim.getApproximationBuffs()[approximationBuffsFieldName],
+    setBooleanValue: (sim: Sim, newValue: boolean) => {
+      const newApproximationBuffs = sim.getApproximationBuffs();
+      (newApproximationBuffs[approximationBuffsFieldName] as boolean) = newValue;
+      sim.setApproximationBuffs(newApproximationBuffs);
     },
   }
 }

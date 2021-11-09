@@ -16,7 +16,9 @@ import { NumberPickerConfig } from '/tbc/core/components/number_picker.js';
 import { MobTypePickerConfig } from '/tbc/core/components/other_inputs.js';
 import { Results } from '/tbc/core/components/results.js';
 import { SavedDataManager } from '/tbc/core/components/saved_data_manager.js';
-import { Buffs } from '/tbc/core/proto/common.js';
+import { RaidBuffs } from '/tbc/core/proto/common.js';
+import { PartyBuffs } from '/tbc/core/proto/common.js';
+import { ApproximationBuffs } from '/tbc/core/proto/common.js';
 import { Class } from '/tbc/core/proto/common.js';
 import { Consumes } from '/tbc/core/proto/common.js';
 import { Encounter } from '/tbc/core/proto/common.js';
@@ -94,7 +96,9 @@ export interface GearAndStats {
 }
 
 export interface Settings {
-  buffs: Buffs,
+  raidBuffs: RaidBuffs,
+  partyBuffs: PartyBuffs,
+  approximationBuffs: ApproximationBuffs,
   consumes: Consumes,
   race: Race,
 }
@@ -299,28 +303,47 @@ export class DefaultTheme<SpecType extends Spec> extends SimUI<SpecType> {
 			storageKey: this.getSavedSettingsStorageKey(),
       getData: (simUI: SimUI<any>) => {
         return {
-          buffs: simUI.sim.getBuffs(),
+          raidBuffs: simUI.sim.getRaidBuffs(),
+          partyBuffs: simUI.sim.getPartyBuffs(),
+          approximationBuffs: simUI.sim.getApproximationBuffs(),
           consumes: simUI.player.getConsumes(),
           race: simUI.player.getRace(),
         };
       },
       setData: (simUI: SimUI<any>, newSettings: Settings) => {
-        simUI.sim.setBuffs(newSettings.buffs);
+        simUI.sim.setRaidBuffs(newSettings.raidBuffs);
+        simUI.sim.setPartyBuffs(newSettings.partyBuffs);
+        simUI.sim.setApproximationBuffs(newSettings.approximationBuffs);
         simUI.player.setConsumes(newSettings.consumes);
         simUI.player.setRace(newSettings.race);
       },
-      changeEmitters: [this.sim.buffsChangeEmitter, this.player.consumesChangeEmitter, this.player.raceChangeEmitter],
-      equals: (a: Settings, b: Settings) => Buffs.equals(a.buffs, b.buffs) && Consumes.equals(a.consumes, b.consumes) && a.race == b.race,
+      changeEmitters: [
+				this.sim.raidBuffsChangeEmitter,
+				this.sim.partyBuffsChangeEmitter,
+				this.sim.approximationBuffsChangeEmitter,
+				this.player.consumesChangeEmitter,
+				this.player.raceChangeEmitter,
+			],
+      equals: (a: Settings, b: Settings) =>
+					RaidBuffs.equals(a.raidBuffs, b.raidBuffs)
+					&& PartyBuffs.equals(a.partyBuffs, b.partyBuffs)
+					&& ApproximationBuffs.equals(a.approximationBuffs, b.approximationBuffs)
+					&& Consumes.equals(a.consumes, b.consumes)
+					&& a.race == b.race,
       toJson: (a: Settings) => {
         return {
-          buffs: Buffs.toJson(a.buffs),
+          raidBuffs: RaidBuffs.toJson(a.raidBuffs),
+          partyBuffs: PartyBuffs.toJson(a.partyBuffs),
+          approximationBuffs: ApproximationBuffs.toJson(a.approximationBuffs),
           consumes: Consumes.toJson(a.consumes),
           race: a.race,
         };
       },
       fromJson: (obj: any) => {
         return {
-          buffs: Buffs.fromJson(obj['buffs']),
+          raidBuffs: RaidBuffs.fromJson(obj['raidBuffs']),
+          partyBuffs: PartyBuffs.fromJson(obj['partyBuffs']),
+          approximationBuffs: ApproximationBuffs.fromJson(obj['approximationBuffs']),
           consumes: Consumes.fromJson(obj['consumes']),
           race: Number(obj['race']),
         };

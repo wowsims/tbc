@@ -105,12 +105,12 @@ export class Target {
   fromJson(obj: any) {
 		const parsedArmor = parseInt(obj['armor']);
 		if (!isNaN(parsedArmor) && parsedArmor != 0) {
-			this.armor = parsedArmor;
+			this.setArmor(parsedArmor);
 		}
 
 		const parsedMobType = parseInt(obj['mobType']);
 		if (!isNaN(parsedMobType) && parsedMobType != 0) {
-			this.mobType = parsedMobType;
+			this.setMobType(parsedMobType);
 		}
 
 		try {

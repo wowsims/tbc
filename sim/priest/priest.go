@@ -15,10 +15,10 @@ func (priest *Priest) GetCharacter() *core.Character {
 	return &priest.Character
 }
 
-func (priest *Priest) AddRaidBuffs(buffs *proto.Buffs) {
-	buffs.DivineSpirit = proto.TristateEffect_TristateEffectRegular
+func (priest *Priest) AddRaidBuffs(raidBuffs *proto.RaidBuffs) {
+	raidBuffs.DivineSpirit = proto.TristateEffect_TristateEffectRegular
 }
-func (priest *Priest) AddPartyBuffs(buffs *proto.Buffs) {
+func (priest *Priest) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {
 }
 
 func (priest *Priest) Reset(sim *core.Simulation) {}

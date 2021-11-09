@@ -19,7 +19,10 @@ func TestP1FullCharacterStats(t *testing.T) {
 		Race:     proto.Race_RaceTroll10,
 		Class:    proto.Class_ClassShaman,
 		Consumes: FullConsumes,
-		Buffs:    FullBuffs,
+
+		RaidBuffs:          FullRaidBuffs,
+		PartyBuffs:         FullPartyBuffs,
+		ApproximationBuffs: FullApproximationBuffs,
 
 		PlayerOptions: PlayerOptionsAdaptive,
 	})
@@ -37,7 +40,7 @@ func TestP1FullCharacterStats(t *testing.T) {
 		stats.HolySpellPower:   80,
 		stats.NatureSpellPower: 123,
 
-		stats.MP5:       337.8,
+		stats.MP5:       212.9,
 		stats.SpellHit:  87.8,
 		stats.SpellCrit: 696.4,
 
@@ -61,7 +64,11 @@ func TestCalcStatWeight(t *testing.T) {
 		Race:        proto.Race_RaceTroll10,
 		Class:       proto.Class_ClassShaman,
 		Consumes:    FullConsumes,
-		Buffs:       FullBuffs,
+
+		RaidBuffs:          FullRaidBuffs,
+		PartyBuffs:         FullPartyBuffs,
+		ApproximationBuffs: FullApproximationBuffs,
+
 		Target:      FullDebuffTarget,
 		PlayerOptions: PlayerOptionsAdaptive,
 	})
@@ -85,7 +92,10 @@ func TestSimulatePreRaidNoBuffs(t *testing.T) {
 
 		Inputs: core.IndividualSimInputs{
 			// no consumes
-			Buffs:   BasicBuffs,
+			RaidBuffs:          BasicRaidBuffs,
+			PartyBuffs:         BasicPartyBuffs,
+			ApproximationBuffs: BasicApproximationBuffs,
+
 			Target:  NoDebuffTarget,
 
 			Race:  proto.Race_RaceTroll10,
@@ -106,8 +116,11 @@ func TestSimulatePreRaid(t *testing.T) {
 	  T:     t,
 
 		Inputs: core.IndividualSimInputs{
+			RaidBuffs:          FullRaidBuffs,
+			PartyBuffs:         FullPartyBuffs,
+			ApproximationBuffs: FullApproximationBuffs,
+
 			Consumes: FullConsumes,
-			Buffs:    FullBuffs,
 			Target:   FullDebuffTarget,
 			Race:     proto.Race_RaceOrc,
 			Class:    proto.Class_ClassShaman,
@@ -127,8 +140,11 @@ func TestSimulateP1(t *testing.T) {
 	  T:     t,
 
 		Inputs: core.IndividualSimInputs{
+			RaidBuffs:          FullRaidBuffs,
+			PartyBuffs:         FullPartyBuffs,
+			ApproximationBuffs: FullApproximationBuffs,
+
 			Consumes: FullConsumes,
-			Buffs:    FullBuffs,
 			Target:   FullDebuffTarget,
 			Race:     proto.Race_RaceOrc,
 			Class:    proto.Class_ClassShaman,
@@ -168,8 +184,11 @@ func TestLBOnlyAgent(t *testing.T) {
 	  T:     t,
 
 		Inputs: core.IndividualSimInputs{
+			RaidBuffs:          FullRaidBuffs,
+			PartyBuffs:         FullPartyBuffs,
+			ApproximationBuffs: FullApproximationBuffs,
+
 			Consumes: FullConsumes,
-			Buffs:    FullBuffs,
 			Target:   FullDebuffTarget,
 			Race:     proto.Race_RaceOrc,
 			Class:    proto.Class_ClassShaman,
@@ -203,8 +222,11 @@ func TestClearcastAgent(t *testing.T) {
 	  T:     t,
 
 		Inputs: core.IndividualSimInputs{
+			RaidBuffs:          FullRaidBuffs,
+			PartyBuffs:         FullPartyBuffs,
+			ApproximationBuffs: FullApproximationBuffs,
+
 			Consumes: FullConsumes,
-			Buffs:    FullBuffs,
 			Target:   FullDebuffTarget,
 			Race:     proto.Race_RaceOrc,
 			Class:    proto.Class_ClassShaman,
@@ -224,7 +246,11 @@ func TestAverageDPS(t *testing.T) {
 		Race:          proto.Race_RaceOrc,
     Class:         proto.Class_ClassShaman,
 		Consumes:      FullConsumes,
-		Buffs:         FullBuffs,
+
+		RaidBuffs:          FullRaidBuffs,
+		PartyBuffs:         FullPartyBuffs,
+		ApproximationBuffs: FullApproximationBuffs,
+
 		Target:        FullDebuffTarget,
 		PlayerOptions: PlayerOptionsAdaptive,
 	})
@@ -238,7 +264,11 @@ func BenchmarkSimulate(b *testing.B) {
 		Race:     proto.Race_RaceOrc,
     Class:    proto.Class_ClassShaman,
 		Consumes: FullConsumes,
-		Buffs:    FullBuffs,
+
+		RaidBuffs:          FullRaidBuffs,
+		PartyBuffs:         FullPartyBuffs,
+		ApproximationBuffs: FullApproximationBuffs,
+
 		Target:   FullDebuffTarget,
 
 		PlayerOptions: PlayerOptionsAdaptive,

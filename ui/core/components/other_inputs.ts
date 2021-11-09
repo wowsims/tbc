@@ -52,12 +52,12 @@ export const ShadowPriestDPS = {
 	getModObject: (simUI: SimUI<any>) => simUI.sim,
   config: {
     label: 'Shadow Priest DPS',
-    changedEvent: (sim: Sim) => sim.buffsChangeEmitter,
-    getValue: (sim: Sim) => sim.getBuffs().shadowPriestDps,
+    changedEvent: (sim: Sim) => sim.approximationBuffsChangeEmitter,
+    getValue: (sim: Sim) => sim.getApproximationBuffs().shadowPriestDps,
     setValue: (sim: Sim, newValue: number) => {
-      const buffs = sim.getBuffs();
-      buffs.shadowPriestDps = newValue;
-      sim.setBuffs(buffs);
+      const approximationBuffs = sim.getApproximationBuffs();
+      approximationBuffs.shadowPriestDps = newValue;
+      sim.setApproximationBuffs(approximationBuffs);
     },
   },
 };

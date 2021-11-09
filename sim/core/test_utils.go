@@ -15,12 +15,14 @@ const ShortDuration = 60
 const LongDuration = 300
 
 type IndividualSimInputs struct {
-	SimOptions  *proto.SimOptions
-	Gear     *proto.EquipmentSpec
-	Buffs    *proto.Buffs
-	Consumes *proto.Consumes
-	Race     proto.Race
-	Class    proto.Class
+	SimOptions         *proto.SimOptions
+	Gear               *proto.EquipmentSpec
+	RaidBuffs          *proto.RaidBuffs
+	PartyBuffs         *proto.PartyBuffs
+	ApproximationBuffs *proto.ApproximationBuffs
+	Consumes           *proto.Consumes
+	Race               proto.Race
+	Class              proto.Class
 
 	Duration int
 
@@ -37,7 +39,11 @@ func NewIndividualSimRequest(inputs IndividualSimInputs) *proto.IndividualSimReq
 			Equipment: inputs.Gear,
 			Options: inputs.PlayerOptions,
 		},
-		Buffs: inputs.Buffs,
+
+		RaidBuffs: inputs.RaidBuffs,
+		PartyBuffs: inputs.PartyBuffs,
+		ApproximationBuffs: inputs.ApproximationBuffs,
+
 		Encounter: &proto.Encounter{},
 		SimOptions: inputs.SimOptions,
 	}
@@ -69,7 +75,8 @@ func NewIndividualSimRequest(inputs IndividualSimInputs) *proto.IndividualSimReq
 func CharacterStatsTest(label string, t *testing.T, isr *proto.IndividualSimRequest, expectedStats stats.Stats) {
 	csr := &proto.ComputeStatsRequest{
 		Player: isr.Player,
-		Buffs: isr.Buffs,
+		RaidBuffs: isr.RaidBuffs,
+		PartyBuffs: isr.PartyBuffs,
 	}
 
 	result := ComputeStats(csr)

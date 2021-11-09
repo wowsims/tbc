@@ -203,37 +203,44 @@ enum Potions {
 	SuperManaPotion = 2;
 }
 
-message Buffs {
-    // Raid buffs
+// Buffs that affect the entire raid.
+message RaidBuffs {
     bool arcane_brilliance = 1;
     bool blessing_of_kings = 2;
     TristateEffect blessing_of_wisdom = 3;
     TristateEffect divine_spirit = 4;
     TristateEffect gift_of_the_wild = 5;
+}
 
-    // Party Buffs
-    int32 bloodlust = 6;
-    TristateEffect moonkin_aura = 7;
-		bool draenei_racial_melee = 8;
-		bool draenei_racial_caster = 9;
-    int32 shadow_priest_dps = 10;
+// Buffs that affect a single party.
+message PartyBuffs {
+    int32 bloodlust = 1;
+    TristateEffect moonkin_aura = 2;
+		bool draenei_racial_melee = 3;
+		bool draenei_racial_caster = 4;
 
 		// Drums
-		Drums drums = 11;
+		Drums drums = 5;
 
     // Item Buffs
-    int32 atiesh_mage = 12;
-    int32 atiesh_warlock = 13;
-    bool braided_eternium_chain = 14;
-    bool eye_of_the_night = 15;
-    bool chain_of_the_twilight_owl = 16;
-    bool jade_pendant_of_blasting = 17;
+    int32 atiesh_mage = 6;
+    int32 atiesh_warlock = 7;
+    bool braided_eternium_chain = 8;
+    bool eye_of_the_night = 9;
+    bool chain_of_the_twilight_owl = 10;
+    bool jade_pendant_of_blasting = 11;
 
     // Totems
-    TristateEffect mana_spring_totem = 18;
-    bool mana_tide_totem = 19;
-    int32 totem_of_wrath = 20;
-    TristateEffect wrath_of_air_totem = 21;
+    TristateEffect mana_spring_totem = 12;
+    int32 totem_of_wrath = 13;
+    TristateEffect wrath_of_air_totem = 14;
+}
+
+// Buffs that are approximations of actions taken by other Characters. These
+// buffs are only used by individual sims, never the raid sim.
+message ApproximationBuffs {
+    int32 shadow_priest_dps = 1;
+    bool mana_tide_totem = 2;
 }
 
 message Consumes {

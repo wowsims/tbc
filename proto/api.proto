@@ -57,9 +57,13 @@ message SimOptions {
 // RPC IndividualSim
 message IndividualSimRequest {
     Player player = 1;
-    Buffs buffs = 2;
-    Encounter encounter = 3;
-		SimOptions sim_options = 4;
+
+    RaidBuffs raid_buffs = 2;
+    PartyBuffs party_buffs = 3;
+    ApproximationBuffs approximation_buffs = 4;
+
+    Encounter encounter = 5;
+		SimOptions sim_options = 6;
 }
 
 message IndividualSimResult {
@@ -137,7 +141,8 @@ message GearListResult {
 // RPC ComputeStats
 message ComputeStatsRequest {
     Player player = 1;
-    Buffs buffs = 2;
+    RaidBuffs raid_buffs = 2;
+    PartyBuffs party_buffs = 3;
 }
 message ComputeStatsResult {
     repeated double gear_only = 1;

@@ -5,8 +5,12 @@ import (
 	"github.com/wowsims/tbc/sim/core/proto"
 )
 
-var BasicBuffs = &proto.Buffs{
+var BasicRaidBuffs = &proto.RaidBuffs{
+}
+var BasicPartyBuffs = &proto.PartyBuffs{
 	Bloodlust: 1,
+}
+var BasicApproximationBuffs = &proto.ApproximationBuffs{
 }
 
 var StandardTalents = &proto.ShamanTalents{
@@ -86,13 +90,17 @@ var PlayerOptionsCLOnClearcast = &proto.PlayerOptions{
 	},
 }
 
-var FullBuffs = &proto.Buffs{
-	ArcaneBrilliance:  true,
-	GiftOfTheWild:     proto.TristateEffect_TristateEffectImproved,
-	BlessingOfKings:   true,
-	BlessingOfWisdom:  proto.TristateEffect_TristateEffectImproved,
-	MoonkinAura:       proto.TristateEffect_TristateEffectRegular,
-	ShadowPriestDps:   500,
+var FullRaidBuffs = &proto.RaidBuffs{
+	ArcaneBrilliance: true,
+	GiftOfTheWild:    proto.TristateEffect_TristateEffectImproved,
+	BlessingOfKings:  true,
+	BlessingOfWisdom: proto.TristateEffect_TristateEffectImproved,
+}
+var FullPartyBuffs = &proto.PartyBuffs{
+	MoonkinAura: proto.TristateEffect_TristateEffectRegular,
+}
+var FullApproximationBuffs = &proto.ApproximationBuffs{
+	ShadowPriestDps: 500,
 }
 
 var FullConsumes = &proto.Consumes{
