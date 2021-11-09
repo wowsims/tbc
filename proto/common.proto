@@ -271,8 +271,21 @@ message Debuffs {
     bool misery = 3;
 }
 
+enum MobType {
+    MobTypeUnknown = 0;
+    MobTypeBeast = 1;
+    MobTypeDemon = 2;
+    MobTypeDragonkin = 3;
+    MobTypeElemental = 4;
+    MobTypeGiant = 5;
+    MobTypeHumanoid = 6;
+    MobTypeMechanical = 7;
+    MobTypeUndead = 8;
+}
+
 message Target {
 		int32 armor = 1;
+		MobType mob_type = 3;
 		Debuffs debuffs = 2;
 }
 

@@ -5,6 +5,7 @@ import { Debuffs } from '/tbc/core/proto/common.js';
 import { Drums } from '/tbc/core/proto/common.js';
 import { Encounter } from '/tbc/core/proto/common.js';
 import { ItemSlot } from '/tbc/core/proto/common.js';
+import { MobType } from '/tbc/core/proto/common.js';
 import { Potions } from '/tbc/core/proto/common.js';
 import { Spec } from '/tbc/core/proto/common.js';
 import { Stat } from '/tbc/core/proto/common.js';
@@ -120,6 +121,7 @@ const theme = new DefaultTheme<Spec.SpecElementalShaman>(document.body, {
 	target: {
 		defaults: {
 			armor: 0,
+			mobType: MobType.MobTypeDemon,
 			debuffs: Debuffs.create({
 				judgementOfWisdom: true,
 				misery: true,

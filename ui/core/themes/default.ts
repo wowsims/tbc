@@ -13,6 +13,7 @@ import { IconPicker } from '/tbc/core/components/icon_picker.js';
 import { LogRunner } from '/tbc/core/components/log_runner.js';
 import { NumberPicker } from '/tbc/core/components/number_picker.js';
 import { NumberPickerConfig } from '/tbc/core/components/number_picker.js';
+import { MobTypePickerConfig } from '/tbc/core/components/other_inputs.js';
 import { Results } from '/tbc/core/components/results.js';
 import { SavedDataManager } from '/tbc/core/components/saved_data_manager.js';
 import { Buffs } from '/tbc/core/proto/common.js';
@@ -212,8 +213,9 @@ export class DefaultTheme<SpecType extends Spec> extends SimUI<SpecType> {
 					target.setArmor(newValue);
         },
       });
-    } else {
     }
+
+		new EnumPicker(encounterSectionElem, this.target, MobTypePickerConfig);
 
     if (config.showNumTargets) {
       new NumberPicker(encounterSectionElem, this.sim, {
