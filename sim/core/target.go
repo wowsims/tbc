@@ -41,6 +41,8 @@ type Target struct {
 
 	armor int32
 
+	MobType proto.MobType
+
 	// Provides aura tracking behavior. Targets need auras to handle debuffs.
 	auraTracker
 
@@ -53,6 +55,7 @@ func NewTarget(options proto.Target, targetIndex int32) *Target {
 	target := &Target{
 		Index: targetIndex,
 		armor: options.Armor,
+		MobType: options.MobType,
 		auraTracker: newAuraTracker(true),
 	}
 	// TODO: Do something with this

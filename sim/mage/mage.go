@@ -15,10 +15,10 @@ func (mage *Mage) GetCharacter() *core.Character {
 	return &mage.Character
 }
 
-func (mage *Mage) AddRaidBuffs(buffs *proto.Buffs) {
-	buffs.ArcaneBrilliance = true
+func (mage *Mage) AddRaidBuffs(raidBuffs *proto.RaidBuffs) {
+	raidBuffs.ArcaneBrilliance = true
 }
-func (mage *Mage) AddPartyBuffs(buffs *proto.Buffs) {
+func (mage *Mage) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {
 }
 
 func (mage *Mage) Reset(newsim *core.Simulation) {

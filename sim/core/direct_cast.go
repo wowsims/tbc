@@ -184,9 +184,9 @@ func (action DirectCastAction) internalOnCastComplete(sim *Simulation) {
 
 	results := make([]DirectCastDamageResult, 0, len(hitInputs))
 	for _, hitInput := range hitInputs {
+		character.OnBeforeSpellHit(sim, &hitInput)
 		hitInput.Target.OnBeforeSpellHit(sim, &hitInput)
 		result := action.calculateDirectCastDamage(sim, hitInput)
-		results = append(results, result)
 
 		if result.Hit {
 			// Apply any on spell hit effects.
@@ -201,6 +201,8 @@ func (action DirectCastAction) internalOnCastComplete(sim *Simulation) {
 		if sim.Log != nil {
 			sim.Log("(%d) %s result: %s\n", character.ID, action.GetName(), result)
 		}
+
+		results = append(results, result)
 	}
 
 

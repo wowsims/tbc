@@ -1,4 +1,3 @@
-import { Buffs } from '/tbc/core/proto/common.js';
 import { Class } from '/tbc/core/proto/common.js';
 import { Consumes } from '/tbc/core/proto/common.js';
 import { Enchant } from '/tbc/core/proto/common.js';
@@ -163,7 +162,9 @@ export class Player<SpecType extends Spec> {
 		await wait(10);
 
 		const computeStatsResult = await this.sim.computeStats(makeComputeStatsRequest(
-      this.sim.getBuffs(),
+      this.sim.getRaidBuffs(),
+      this.sim.getPartyBuffs(),
+      this.sim.getIndividualBuffs(),
       this._consumes,
       this._customStats,
       this.sim.getEncounter(),
