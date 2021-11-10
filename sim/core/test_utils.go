@@ -19,7 +19,7 @@ type IndividualSimInputs struct {
 	Gear               *proto.EquipmentSpec
 	RaidBuffs          *proto.RaidBuffs
 	PartyBuffs         *proto.PartyBuffs
-	ApproximationBuffs *proto.ApproximationBuffs
+	IndividualBuffs *proto.IndividualBuffs
 	Consumes           *proto.Consumes
 	Race               proto.Race
 	Class              proto.Class
@@ -42,7 +42,7 @@ func NewIndividualSimRequest(inputs IndividualSimInputs) *proto.IndividualSimReq
 
 		RaidBuffs: inputs.RaidBuffs,
 		PartyBuffs: inputs.PartyBuffs,
-		ApproximationBuffs: inputs.ApproximationBuffs,
+		IndividualBuffs: inputs.IndividualBuffs,
 
 		Encounter: &proto.Encounter{},
 		SimOptions: inputs.SimOptions,
@@ -77,6 +77,7 @@ func CharacterStatsTest(label string, t *testing.T, isr *proto.IndividualSimRequ
 		Player: isr.Player,
 		RaidBuffs: isr.RaidBuffs,
 		PartyBuffs: isr.PartyBuffs,
+		IndividualBuffs: isr.IndividualBuffs,
 	}
 
 	result := ComputeStats(csr)

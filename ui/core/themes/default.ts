@@ -18,7 +18,7 @@ import { Results } from '/tbc/core/components/results.js';
 import { SavedDataManager } from '/tbc/core/components/saved_data_manager.js';
 import { RaidBuffs } from '/tbc/core/proto/common.js';
 import { PartyBuffs } from '/tbc/core/proto/common.js';
-import { ApproximationBuffs } from '/tbc/core/proto/common.js';
+import { IndividualBuffs } from '/tbc/core/proto/common.js';
 import { Class } from '/tbc/core/proto/common.js';
 import { Consumes } from '/tbc/core/proto/common.js';
 import { Encounter } from '/tbc/core/proto/common.js';
@@ -98,7 +98,7 @@ export interface GearAndStats {
 export interface Settings {
   raidBuffs: RaidBuffs,
   partyBuffs: PartyBuffs,
-  approximationBuffs: ApproximationBuffs,
+  individualBuffs: IndividualBuffs,
   consumes: Consumes,
   race: Race,
 }
@@ -305,7 +305,7 @@ export class DefaultTheme<SpecType extends Spec> extends SimUI<SpecType> {
         return {
           raidBuffs: simUI.sim.getRaidBuffs(),
           partyBuffs: simUI.sim.getPartyBuffs(),
-          approximationBuffs: simUI.sim.getApproximationBuffs(),
+          individualBuffs: simUI.sim.getIndividualBuffs(),
           consumes: simUI.player.getConsumes(),
           race: simUI.player.getRace(),
         };
@@ -313,28 +313,28 @@ export class DefaultTheme<SpecType extends Spec> extends SimUI<SpecType> {
       setData: (simUI: SimUI<any>, newSettings: Settings) => {
         simUI.sim.setRaidBuffs(newSettings.raidBuffs);
         simUI.sim.setPartyBuffs(newSettings.partyBuffs);
-        simUI.sim.setApproximationBuffs(newSettings.approximationBuffs);
+        simUI.sim.setIndividualBuffs(newSettings.individualBuffs);
         simUI.player.setConsumes(newSettings.consumes);
         simUI.player.setRace(newSettings.race);
       },
       changeEmitters: [
 				this.sim.raidBuffsChangeEmitter,
 				this.sim.partyBuffsChangeEmitter,
-				this.sim.approximationBuffsChangeEmitter,
+				this.sim.individualBuffsChangeEmitter,
 				this.player.consumesChangeEmitter,
 				this.player.raceChangeEmitter,
 			],
       equals: (a: Settings, b: Settings) =>
 					RaidBuffs.equals(a.raidBuffs, b.raidBuffs)
 					&& PartyBuffs.equals(a.partyBuffs, b.partyBuffs)
-					&& ApproximationBuffs.equals(a.approximationBuffs, b.approximationBuffs)
+					&& IndividualBuffs.equals(a.individualBuffs, b.individualBuffs)
 					&& Consumes.equals(a.consumes, b.consumes)
 					&& a.race == b.race,
       toJson: (a: Settings) => {
         return {
           raidBuffs: RaidBuffs.toJson(a.raidBuffs),
           partyBuffs: PartyBuffs.toJson(a.partyBuffs),
-          approximationBuffs: ApproximationBuffs.toJson(a.approximationBuffs),
+          individualBuffs: IndividualBuffs.toJson(a.individualBuffs),
           consumes: Consumes.toJson(a.consumes),
           race: a.race,
         };
@@ -343,7 +343,7 @@ export class DefaultTheme<SpecType extends Spec> extends SimUI<SpecType> {
         return {
           raidBuffs: RaidBuffs.fromJson(obj['raidBuffs']),
           partyBuffs: PartyBuffs.fromJson(obj['partyBuffs']),
-          approximationBuffs: ApproximationBuffs.fromJson(obj['approximationBuffs']),
+          individualBuffs: IndividualBuffs.fromJson(obj['individualBuffs']),
           consumes: Consumes.fromJson(obj['consumes']),
           race: Number(obj['race']),
         };

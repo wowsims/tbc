@@ -1,6 +1,6 @@
 import { RaidBuffs } from '/tbc/core/proto/common.js';
 import { PartyBuffs } from '/tbc/core/proto/common.js';
-import { ApproximationBuffs } from '/tbc/core/proto/common.js';
+import { IndividualBuffs } from '/tbc/core/proto/common.js';
 import { Class } from '/tbc/core/proto/common.js';
 import { Consumes } from '/tbc/core/proto/common.js';
 import { Debuffs } from '/tbc/core/proto/common.js';
@@ -113,13 +113,13 @@ const theme = new DefaultTheme<Spec.SpecElementalShaman>(document.body, {
 			raidBuffs: RaidBuffs.create({
 				arcaneBrilliance: true,
 				divineSpirit: TristateEffect.TristateEffectImproved,
-				blessingOfKings: true,
-				blessingOfWisdom: 2,
 				giftOfTheWild: TristateEffect.TristateEffectImproved,
 			}),
 			partyBuffs: PartyBuffs.create({
 			}),
-			approximationBuffs: ApproximationBuffs.create({
+			individualBuffs: IndividualBuffs.create({
+				blessingOfKings: true,
+				blessingOfWisdom: 2,
 			}),
 		},
 	},

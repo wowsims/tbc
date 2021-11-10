@@ -1,6 +1,6 @@
 import { RaidBuffs } from '/tbc/core/proto/common.js';
 import { PartyBuffs } from '/tbc/core/proto/common.js';
-import { ApproximationBuffs } from '/tbc/core/proto/common.js';
+import { IndividualBuffs } from '/tbc/core/proto/common.js';
 import { Consumes } from '/tbc/core/proto/common.js';
 import { Debuffs } from '/tbc/core/proto/common.js';
 import { Drums } from '/tbc/core/proto/common.js';
@@ -17,8 +17,6 @@ import { IconInput } from './icon_picker.js';
 
 // Raid Buffs
 export const ArcaneBrilliance = makeBooleanRaidBuffInput({spellId:27127}, 'arcaneBrilliance');
-export const BlessingOfKings = makeBooleanRaidBuffInput({spellId:25898}, 'blessingOfKings');
-export const BlessingOfWisdom = makeTristateRaidBuffInput({spellId:27143}, {spellId:20245}, 'blessingOfWisdom');
 export const DivineSpirit = makeTristateRaidBuffInput({spellId:25312}, {spellId:33182}, 'divineSpirit');
 export const GiftOfTheWild = makeTristateRaidBuffInput({spellId:26991}, {spellId:17055}, 'giftOfTheWild');
 
@@ -40,8 +38,10 @@ export const WrathOfAirTotem = makeTristatePartyBuffInput({spellId:3738}, {spell
 export const DrumsOfBattleBuff = makeEnumValuePartyBuffInput({spellId:35476}, 'drums', Drums.DrumsOfBattle, ['Drums']);
 export const DrumsOfRestorationBuff = makeEnumValuePartyBuffInput({spellId:35478}, 'drums', Drums.DrumsOfRestoration, ['Drums']);
 
-// Approximation Buffs
-export const ManaTideTotem = makeBooleanApproximationBuffInput({spellId:16190}, 'manaTideTotem');
+// Individual Buffs
+export const BlessingOfKings = makeBooleanIndividualBuffInput({spellId:25898}, 'blessingOfKings');
+export const BlessingOfWisdom = makeTristateIndividualBuffInput({spellId:27143}, {spellId:20245}, 'blessingOfWisdom');
+export const ManaTideTotem = makeBooleanIndividualBuffInput({spellId:16190}, 'manaTideTotem');
 
 // Debuffs
 export const ImprovedSealOfTheCrusader = makeBooleanDebuffInput({spellId:20337}, 'improvedSealOfTheCrusader');
@@ -160,17 +160,32 @@ function makeEnumValuePartyBuffInput(id: ItemOrSpellId, partyBuffsFieldName: key
   }
 }
 
-function makeBooleanApproximationBuffInput(id: ItemOrSpellId, approximationBuffsFieldName: keyof ApproximationBuffs, exclusivityTags?: Array<ExclusivityTag>): IconInput<Sim> {
+function makeBooleanIndividualBuffInput(id: ItemOrSpellId, individualBuffsFieldName: keyof IndividualBuffs, exclusivityTags?: Array<ExclusivityTag>): IconInput<Sim> {
   return {
     id: id,
     states: 2,
     exclusivityTags: exclusivityTags,
-    changedEvent: (sim: Sim) => sim.approximationBuffsChangeEmitter,
-    getValue: (sim: Sim) => sim.getApproximationBuffs()[approximationBuffsFieldName],
+    changedEvent: (sim: Sim) => sim.individualBuffsChangeEmitter,
+    getValue: (sim: Sim) => sim.getIndividualBuffs()[individualBuffsFieldName],
     setBooleanValue: (sim: Sim, newValue: boolean) => {
-      const newApproximationBuffs = sim.getApproximationBuffs();
-      (newApproximationBuffs[approximationBuffsFieldName] as boolean) = newValue;
-      sim.setApproximationBuffs(newApproximationBuffs);
+      const newIndividualBuffs = sim.getIndividualBuffs();
+      (newIndividualBuffs[individualBuffsFieldName] as boolean) = newValue;
+      sim.setIndividualBuffs(newIndividualBuffs);
+    },
+  }
+}
+
+function makeTristateIndividualBuffInput(id: ItemOrSpellId, impId: ItemOrSpellId, individualBuffsFieldName: keyof IndividualBuffs): IconInput<Sim> {
+  return {
+    id: id,
+    states: 3,
+    improvedId: impId,
+    changedEvent: (sim: Sim) => sim.individualBuffsChangeEmitter,
+    getValue: (sim: Sim) => sim.getIndividualBuffs()[individualBuffsFieldName],
+    setNumberValue: (sim: Sim, newValue: number) => {
+      const newIndividualBuffs = sim.getIndividualBuffs();
+      (newIndividualBuffs[individualBuffsFieldName] as number) = newValue;
+      sim.setIndividualBuffs(newIndividualBuffs);
     },
   }
 }

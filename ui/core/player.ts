@@ -164,6 +164,7 @@ export class Player<SpecType extends Spec> {
 		const computeStatsResult = await this.sim.computeStats(makeComputeStatsRequest(
       this.sim.getRaidBuffs(),
       this.sim.getPartyBuffs(),
+      this.sim.getIndividualBuffs(),
       this._consumes,
       this._customStats,
       this.sim.getEncounter(),

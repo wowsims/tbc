@@ -10,7 +10,7 @@ var BasicRaidBuffs = &proto.RaidBuffs{
 var BasicPartyBuffs = &proto.PartyBuffs{
 	Bloodlust: 1,
 }
-var BasicApproximationBuffs = &proto.ApproximationBuffs{
+var BasicIndividualBuffs = &proto.IndividualBuffs{
 }
 
 var StandardTalents = &proto.ShamanTalents{
@@ -93,13 +93,13 @@ var PlayerOptionsCLOnClearcast = &proto.PlayerOptions{
 var FullRaidBuffs = &proto.RaidBuffs{
 	ArcaneBrilliance: true,
 	GiftOfTheWild:    proto.TristateEffect_TristateEffectImproved,
-	BlessingOfKings:  true,
-	BlessingOfWisdom: proto.TristateEffect_TristateEffectImproved,
 }
 var FullPartyBuffs = &proto.PartyBuffs{
 	MoonkinAura: proto.TristateEffect_TristateEffectRegular,
 }
-var FullApproximationBuffs = &proto.ApproximationBuffs{
+var FullIndividualBuffs = &proto.IndividualBuffs{
+	BlessingOfKings:  true,
+	BlessingOfWisdom: proto.TristateEffect_TristateEffectImproved,
 	ShadowPriestDps: 500,
 }
 

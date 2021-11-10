@@ -37,9 +37,10 @@ func ComputeStats(request *proto.ComputeStatsRequest) *proto.ComputeStatsResult 
 		Player: request.Player,
 		RaidBuffs: request.RaidBuffs,
 		PartyBuffs: request.PartyBuffs,
+		IndividualBuffs: request.IndividualBuffs,
 	})
 
-	raid := NewRaid(*request.RaidBuffs, *request.PartyBuffs, proto.ApproximationBuffs{})
+	raid := NewRaid(*request.RaidBuffs, *request.PartyBuffs, *request.IndividualBuffs)
 	raid.AddPlayer(agent)
 	raid.Finalize()
 

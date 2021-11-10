@@ -60,7 +60,7 @@ message IndividualSimRequest {
 
     RaidBuffs raid_buffs = 2;
     PartyBuffs party_buffs = 3;
-    ApproximationBuffs approximation_buffs = 4;
+    IndividualBuffs Individual_buffs = 4;
 
     Encounter encounter = 5;
 		SimOptions sim_options = 6;
@@ -143,6 +143,7 @@ message ComputeStatsRequest {
     Player player = 1;
     RaidBuffs raid_buffs = 2;
     PartyBuffs party_buffs = 3;
+    IndividualBuffs individual_buffs = 4;
 }
 message ComputeStatsResult {
     repeated double gear_only = 1;

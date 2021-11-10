@@ -16,8 +16,6 @@ func (paladin *Paladin) GetCharacter() *core.Character {
 }
 
 func (paladin *Paladin) AddRaidBuffs(raidBuffs *proto.RaidBuffs) {
-	raidBuffs.BlessingOfWisdom = proto.TristateEffect_TristateEffectImproved
-	raidBuffs.BlessingOfKings = true
 }
 func (paladin *Paladin) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {
 }

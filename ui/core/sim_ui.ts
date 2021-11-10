@@ -1,7 +1,6 @@
 import { IndividualSimRequest, IndividualSimResult } from '/tbc/core/proto/api.js';
 import { Class } from '/tbc/core/proto/common.js';
 import { Spec } from '/tbc/core/proto/common.js';
-import { makeComputeStatsRequest } from '/tbc/core/proto_utils/request_helpers.js';
 import { makeIndividualSimRequest } from '/tbc/core/proto_utils/request_helpers.js';
 import { specToLocalStorageKey } from '/tbc/core/proto_utils/utils.js';
 
@@ -220,7 +219,7 @@ export abstract class SimUI<SpecType extends Spec> {
     return makeIndividualSimRequest(
       this.sim.getRaidBuffs(),
       this.sim.getPartyBuffs(),
-      this.sim.getApproximationBuffs(),
+      this.sim.getIndividualBuffs(),
       this.player.getConsumes(),
       this.player.getCustomStats(),
       encounter,

@@ -22,7 +22,7 @@ func TestP1FullCharacterStats(t *testing.T) {
 
 		RaidBuffs:          FullRaidBuffs,
 		PartyBuffs:         FullPartyBuffs,
-		ApproximationBuffs: FullApproximationBuffs,
+		IndividualBuffs:    FullIndividualBuffs,
 
 		PlayerOptions: PlayerOptionsAdaptive,
 	})
@@ -40,7 +40,7 @@ func TestP1FullCharacterStats(t *testing.T) {
 		stats.HolySpellPower:   80,
 		stats.NatureSpellPower: 123,
 
-		stats.MP5:       212.9,
+		stats.MP5:       337.9,
 		stats.SpellHit:  87.8,
 		stats.SpellCrit: 696.4,
 
@@ -67,7 +67,7 @@ func TestCalcStatWeight(t *testing.T) {
 
 		RaidBuffs:          FullRaidBuffs,
 		PartyBuffs:         FullPartyBuffs,
-		ApproximationBuffs: FullApproximationBuffs,
+		IndividualBuffs: FullIndividualBuffs,
 
 		Target:      FullDebuffTarget,
 		PlayerOptions: PlayerOptionsAdaptive,
@@ -94,7 +94,7 @@ func TestSimulatePreRaidNoBuffs(t *testing.T) {
 			// no consumes
 			RaidBuffs:          BasicRaidBuffs,
 			PartyBuffs:         BasicPartyBuffs,
-			ApproximationBuffs: BasicApproximationBuffs,
+			IndividualBuffs: BasicIndividualBuffs,
 
 			Target:  NoDebuffTarget,
 
@@ -118,7 +118,7 @@ func TestSimulatePreRaid(t *testing.T) {
 		Inputs: core.IndividualSimInputs{
 			RaidBuffs:          FullRaidBuffs,
 			PartyBuffs:         FullPartyBuffs,
-			ApproximationBuffs: FullApproximationBuffs,
+			IndividualBuffs: FullIndividualBuffs,
 
 			Consumes: FullConsumes,
 			Target:   FullDebuffTarget,
@@ -142,7 +142,7 @@ func TestSimulateP1(t *testing.T) {
 		Inputs: core.IndividualSimInputs{
 			RaidBuffs:          FullRaidBuffs,
 			PartyBuffs:         FullPartyBuffs,
-			ApproximationBuffs: FullApproximationBuffs,
+			IndividualBuffs: FullIndividualBuffs,
 
 			Consumes: FullConsumes,
 			Target:   FullDebuffTarget,
@@ -186,7 +186,7 @@ func TestLBOnlyAgent(t *testing.T) {
 		Inputs: core.IndividualSimInputs{
 			RaidBuffs:          FullRaidBuffs,
 			PartyBuffs:         FullPartyBuffs,
-			ApproximationBuffs: FullApproximationBuffs,
+			IndividualBuffs: FullIndividualBuffs,
 
 			Consumes: FullConsumes,
 			Target:   FullDebuffTarget,
@@ -224,7 +224,7 @@ func TestClearcastAgent(t *testing.T) {
 		Inputs: core.IndividualSimInputs{
 			RaidBuffs:          FullRaidBuffs,
 			PartyBuffs:         FullPartyBuffs,
-			ApproximationBuffs: FullApproximationBuffs,
+			IndividualBuffs: FullIndividualBuffs,
 
 			Consumes: FullConsumes,
 			Target:   FullDebuffTarget,
@@ -249,7 +249,7 @@ func TestAverageDPS(t *testing.T) {
 
 		RaidBuffs:          FullRaidBuffs,
 		PartyBuffs:         FullPartyBuffs,
-		ApproximationBuffs: FullApproximationBuffs,
+		IndividualBuffs: FullIndividualBuffs,
 
 		Target:        FullDebuffTarget,
 		PlayerOptions: PlayerOptionsAdaptive,
@@ -267,7 +267,7 @@ func BenchmarkSimulate(b *testing.B) {
 
 		RaidBuffs:          FullRaidBuffs,
 		PartyBuffs:         FullPartyBuffs,
-		ApproximationBuffs: FullApproximationBuffs,
+		IndividualBuffs: FullIndividualBuffs,
 
 		Target:   FullDebuffTarget,
 

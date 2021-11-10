@@ -1,6 +1,6 @@
 import { RaidBuffs } from '/tbc/core/proto/common.js';
 import { PartyBuffs } from '/tbc/core/proto/common.js';
-import { ApproximationBuffs } from '/tbc/core/proto/common.js';
+import { IndividualBuffs } from '/tbc/core/proto/common.js';
 import { Consumes } from '/tbc/core/proto/common.js';
 import { Class } from '/tbc/core/proto/common.js';
 import { Encounter } from '/tbc/core/proto/common.js';
@@ -24,6 +24,7 @@ import { withSpecProto } from './utils.js';
 export function makeComputeStatsRequest<SpecType extends Spec>(
     raidBuffs: RaidBuffs,
     partyBuffs: PartyBuffs,
+    individualBuffs: IndividualBuffs,
     consumes: Consumes,
     customStats: Stats,
     encounter: Encounter,
@@ -43,13 +44,14 @@ export function makeComputeStatsRequest<SpecType extends Spec>(
     }),
     raidBuffs: raidBuffs,
     partyBuffs: partyBuffs,
+    individualBuffs: individualBuffs,
   });
 }
 
 export function makeIndividualSimRequest<SpecType extends Spec>(
     raidBuffs: RaidBuffs,
     partyBuffs: PartyBuffs,
-    approximationBuffs: ApproximationBuffs,
+    individualBuffs: IndividualBuffs,
     consumes: Consumes,
     customStats: Stats,
     encounter: Encounter,
@@ -71,7 +73,7 @@ export function makeIndividualSimRequest<SpecType extends Spec>(
     }),
     raidBuffs: raidBuffs,
     partyBuffs: partyBuffs,
-    approximationBuffs: approximationBuffs,
+    individualBuffs: individualBuffs,
     encounter: encounter,
 		simOptions: SimOptions.create({
 			iterations: iterations,

@@ -49,11 +49,11 @@ type Raid struct {
 
 	// Raid-wide buffs
 	buffs proto.RaidBuffs
-	approximationBuffs proto.ApproximationBuffs
+	individualBuffs proto.IndividualBuffs
 }
 
 // Makes a new raid. baseBuffs are extra additional buffs applied to all players in the raid.
-func NewRaid(baseRaidBuffs proto.RaidBuffs, basePartyBuffs proto.PartyBuffs, approximationBuffs proto.ApproximationBuffs) *Raid {
+func NewRaid(baseRaidBuffs proto.RaidBuffs, basePartyBuffs proto.PartyBuffs, individualBuffs proto.IndividualBuffs) *Raid {
 	return &Raid{
 		Parties: []*Party{
 			&Party{ Players: []Agent{}, buffs: basePartyBuffs, },
@@ -63,7 +63,7 @@ func NewRaid(baseRaidBuffs proto.RaidBuffs, basePartyBuffs proto.PartyBuffs, app
 			&Party{ Players: []Agent{}, buffs: basePartyBuffs, },
 		},
 		buffs: baseRaidBuffs,
-		approximationBuffs: approximationBuffs,
+		individualBuffs: individualBuffs,
 	}
 }
 
@@ -119,7 +119,7 @@ func (raid *Raid) applyAllEffects() {
 	for _, party := range raid.Parties {
 		for _, player := range party.Players {
 			player.GetCharacter().applyAllEffects(player)
-			applyBuffEffects(player, raid.buffs, party.buffs, raid.approximationBuffs)
+			applyBuffEffects(player, raid.buffs, party.buffs, raid.individualBuffs)
 		}
 	}
 }

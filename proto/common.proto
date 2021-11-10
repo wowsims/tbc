@@ -206,8 +206,6 @@ enum Potions {
 // Buffs that affect the entire raid.
 message RaidBuffs {
     bool arcane_brilliance = 1;
-    bool blessing_of_kings = 2;
-    TristateEffect blessing_of_wisdom = 3;
     TristateEffect divine_spirit = 4;
     TristateEffect gift_of_the_wild = 5;
 }
@@ -236,11 +234,15 @@ message PartyBuffs {
     TristateEffect wrath_of_air_totem = 14;
 }
 
-// Buffs that are approximations of actions taken by other Characters. These
-// buffs are only used by individual sims, never the raid sim.
-message ApproximationBuffs {
-    int32 shadow_priest_dps = 1;
-    bool mana_tide_totem = 2;
+// Buffs are only used by individual sims, never the raid sim.
+// These are usually individuals of actions taken by other Characters.
+message IndividualBuffs {
+    bool blessing_of_kings = 1;
+    TristateEffect blessing_of_wisdom = 2;
+    TristateEffect blessing_of_might = 3;
+
+    int32 shadow_priest_dps = 4;
+    bool mana_tide_totem = 5;
 }
 
 message Consumes {

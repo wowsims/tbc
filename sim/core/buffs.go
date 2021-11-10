@@ -8,7 +8,7 @@ import (
 )
 
 // Applies buffs that affect individual players.
-func applyBuffEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs proto.PartyBuffs, approximationBuffs proto.ApproximationBuffs) {
+func applyBuffEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs proto.PartyBuffs, individualBuffs proto.IndividualBuffs) {
 	character := agent.GetCharacter()
 
 	if raidBuffs.ArcaneBrilliance {
@@ -58,18 +58,18 @@ func applyBuffEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs proto.P
 	}
 
 	// shadow priest buff bot just statically applies mp5
-	if approximationBuffs.ShadowPriestDps > 0 {
+	if individualBuffs.ShadowPriestDps > 0 {
 		character.AddStats(stats.Stats{
-			stats.MP5: float64(approximationBuffs.ShadowPriestDps) * 0.25,
+			stats.MP5: float64(individualBuffs.ShadowPriestDps) * 0.25,
 		})
 	}
 
 	// TODO: Double-check these numbers
 	character.AddStats(stats.Stats{
-		stats.MP5: GetTristateValueFloat(raidBuffs.BlessingOfWisdom, 42.0, 50.0),
+		stats.MP5: GetTristateValueFloat(individualBuffs.BlessingOfWisdom, 42.0, 50.0),
 	})
 
-	if raidBuffs.BlessingOfKings {
+	if individualBuffs.BlessingOfKings {
 		bokStats := [5]stats.Stat{
 			stats.Agility,
 			stats.Strength,
