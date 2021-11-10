@@ -106,7 +106,7 @@ func NewMetricsAggregator(numAgents int, encounterDuration float64) *MetricsAggr
 }
 
 // Adds the results of an action to the aggregated metrics.
-func (aggregator *MetricsAggregator) AddCastAction(cast DirectCastAction, castResults []DirectCastDamageResult) {
+func (aggregator *MetricsAggregator) AddCastAction(cast *DirectCastAction, castResults []DirectCastDamageResult) {
 	actionID := cast.GetActionID()
 	tag := cast.GetTag()
 

@@ -86,35 +86,35 @@ type DirectCastAction struct {
 	OnSpellMiss    OnSpellMiss
 }
 
-func (action DirectCastAction) GetActionID() ActionID {
+func (action *DirectCastAction) GetActionID() ActionID {
 	return action.Cast.ActionID
 }
 
-func (action DirectCastAction) GetName() string {
+func (action *DirectCastAction) GetName() string {
 	return action.Cast.Name
 }
 
-func (action DirectCastAction) GetTag() int32 {
+func (action *DirectCastAction) GetTag() int32 {
 	return action.Cast.Tag
 }
 
-func (action DirectCastAction) GetCharacter() *Character {
+func (action *DirectCastAction) GetCharacter() *Character {
 	return action.Cast.Character
 }
 
-func (action DirectCastAction) GetManaCost() float64 {
+func (action *DirectCastAction) GetManaCost() float64 {
 	return action.Cast.ManaCost
 }
 
-func (action DirectCastAction) GetDuration() time.Duration {
+func (action *DirectCastAction) GetDuration() time.Duration {
 	return action.Cast.CastTime
 }
 
-func (action DirectCastAction) Init(sim *Simulation) {
+func (action *DirectCastAction) Init(sim *Simulation) {
 	action.Cast.init(sim)
 }
 
-func (action DirectCastAction) Act(sim *Simulation) bool {
+func (action *DirectCastAction) Act(sim *Simulation) bool {
 	return action.Cast.startCasting(sim, func(sim *Simulation, cast *Cast) {
 		action.OnCastComplete(sim, cast)
 
@@ -145,7 +145,7 @@ func (action DirectCastAction) Act(sim *Simulation) bool {
 	})
 }
 
-func (action DirectCastAction) calculateDirectCastDamage(sim *Simulation, damageInput *DirectCastDamageInput) DirectCastDamageResult {
+func (action *DirectCastAction) calculateDirectCastDamage(sim *Simulation, damageInput *DirectCastDamageInput) DirectCastDamageResult {
 	result := DirectCastDamageResult{
 		Target: damageInput.Target,
 	}
