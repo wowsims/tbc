@@ -17,10 +17,10 @@ func (warlock *Warlock) GetCharacter() *core.Character {
 	return &warlock.Character
 }
 
-func (warlock *Warlock) AddRaidBuffs(buffs *proto.Buffs) {
+func (warlock *Warlock) AddRaidBuffs(raidBuffs *proto.RaidBuffs) {
 	//sim.AddAura(sim, CurseOfElementsAura(warlock.malediction))
 }
-func (warlock *Warlock) AddPartyBuffs(buffs *proto.Buffs) {
+func (warlock *Warlock) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {
 }
 
 func (warlock *Warlock) Reset(sim *core.Simulation) {}

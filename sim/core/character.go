@@ -92,12 +92,11 @@ func NewCharacter(player proto.Player) Character {
 	return character
 }
 
-func (character *Character) applyAllEffects(agent Agent, buffs proto.Buffs) {
+func (character *Character) applyAllEffects(agent Agent) {
 	applyRaceEffects(agent)
 	character.applyItemEffects(agent)
 	character.applyItemSetBonusEffects(agent)
 	applyConsumeEffects(agent)
-	applyBuffEffects(agent, buffs)
 }
 
 // Apply effects from all equipped items.
@@ -148,44 +147,44 @@ func (character *Character) HasteBonus() float64 {
 	return 1 + (character.stats[stats.SpellHaste] / (HasteRatingPerHastePercent * 100))
 }
 
-func (character *Character) AddRaidBuffs(buffs *proto.Buffs) {
+func (character *Character) AddRaidBuffs(raidBuffs *proto.RaidBuffs) {
 }
-func (character *Character) AddPartyBuffs(buffs *proto.Buffs) {
+func (character *Character) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {
 	if character.Race == proto.Race_RaceDraenei {
 		class := character.Class
 		if class == proto.Class_ClassHunter ||
 				class == proto.Class_ClassPaladin ||
 				class == proto.Class_ClassWarrior {
-			buffs.DraeneiRacialMelee = true
+			partyBuffs.DraeneiRacialMelee = true
 		} else if class == proto.Class_ClassMage ||
 				class == proto.Class_ClassPriest ||
 				class == proto.Class_ClassShaman {
-			buffs.DraeneiRacialCaster = true
+			partyBuffs.DraeneiRacialCaster = true
 		}
 	}
 
 	if character.consumes.Drums > 0 {
-		buffs.Drums = character.consumes.Drums
+		partyBuffs.Drums = character.consumes.Drums
 	}
 
 	if character.Equip[items.ItemSlotMainHand].ID == ItemIDAtieshMage {
-		buffs.AtieshMage += 1
+		partyBuffs.AtieshMage += 1
 	}
 	if character.Equip[items.ItemSlotMainHand].ID == ItemIDAtieshWarlock {
-		buffs.AtieshWarlock += 1
+		partyBuffs.AtieshWarlock += 1
 	}
 
 	if character.Equip[items.ItemSlotNeck].ID == ItemIDBraidedEterniumChain {
-		buffs.BraidedEterniumChain = true
+		partyBuffs.BraidedEterniumChain = true
 	}
 	if character.Equip[items.ItemSlotNeck].ID == ItemIDChainOfTheTwilightOwl {
-		buffs.ChainOfTheTwilightOwl = true
+		partyBuffs.ChainOfTheTwilightOwl = true
 	}
 	if character.Equip[items.ItemSlotNeck].ID == ItemIDEyeOfTheNight {
-		buffs.EyeOfTheNight = true
+		partyBuffs.EyeOfTheNight = true
 	}
 	if character.Equip[items.ItemSlotNeck].ID == ItemIDJadePendantOfBlasting {
-		buffs.JadePendantOfBlasting = true
+		partyBuffs.JadePendantOfBlasting = true
 	}
 }
 

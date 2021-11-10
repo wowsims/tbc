@@ -10,6 +10,8 @@ import (
 var OrcBloodFuryAuraID = NewAuraID()
 var OrcBloodFuryCooldownID = NewCooldownID()
 
+var TrollBeastSlayingAuraID = NewAuraID()
+
 var TrollBerserkingAuraID = NewAuraID()
 var TrollBerserkingCooldownID = NewCooldownID()
 
@@ -63,6 +65,21 @@ func applyRaceEffects(agent Agent) {
 		// TODO: Health +5%
 	case proto.Race_RaceTroll10, proto.Race_RaceTroll30:
 		// TODO: +1% ranged crit when using a bow
+
+		// Beast Slaying (+5% damage to beasts)
+		character.AddPermanentAura(func(sim *Simulation) Aura {
+			return Aura{
+				ID:      TrollBeastSlayingAuraID,
+				Name:    "Beast Slaying (Troll Racial)",
+				OnSpellHit: func(sim *Simulation, cast *Cast, result *DirectCastDamageResult) {
+					if result.Target.MobType == proto.MobType_MobTypeBeast {
+						result.Damage *= 1.05
+					}
+				},
+			}
+		})
+
+		// Berserking
 		hasteBonus := time.Duration(11) // 10% haste
 		if character.Race == proto.Race_RaceTroll30 {
 			hasteBonus = time.Duration(13) // 30% haste

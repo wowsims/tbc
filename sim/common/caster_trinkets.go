@@ -4,12 +4,13 @@ import (
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
+	"github.com/wowsims/tbc/sim/core/proto"
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 func init() {
 	// Proc effects. Keep these in order by item ID.
-	core.AddItemEffect(23207, ApplyMarkOfTheChampion)
+	core.AddItemEffect(23207, ApplyMarkOfTheChampionCaster)
 	core.AddItemEffect(27683, ApplyQuagmirransEye)
 	core.AddItemEffect(28418, ApplyShiffarsNexusHorn)
 	core.AddItemEffect(28789, ApplyEyeOfMagtheridon)
@@ -158,8 +159,19 @@ func init() {
 	))
 }
 
-func ApplyMarkOfTheChampion(agent core.Agent) {
-	agent.GetCharacter().AddStat(stats.SpellPower, 85)
+var MarkOfTheChampionCasterAuraID = core.NewAuraID()
+func ApplyMarkOfTheChampionCaster(agent core.Agent) {
+	agent.GetCharacter().AddPermanentAura(func(sim *core.Simulation) core.Aura {
+		return core.Aura{
+			ID:      MarkOfTheChampionCasterAuraID,
+			Name:    "Mark of the Champion (Caster)",
+			OnBeforeSpellHit: func(sim *core.Simulation, cast *core.Cast, hitInput *core.DirectCastDamageInput) {
+				if hitInput.Target.MobType == proto.MobType_MobTypeDemon || hitInput.Target.MobType == proto.MobType_MobTypeUndead {
+					hitInput.BonusSpellPower += 85
+				}
+			},
+		}
+	})
 }
 
 var QuagmirransEyeAuraID = core.NewAuraID()

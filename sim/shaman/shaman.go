@@ -86,19 +86,19 @@ func (shaman *Shaman) GetCharacter() *core.Character {
 	return &shaman.Character
 }
 
-func (shaman *Shaman) AddRaidBuffs(buffs *proto.Buffs) {
+func (shaman *Shaman) AddRaidBuffs(raidBuffs *proto.RaidBuffs) {
 }
-func (shaman *Shaman) AddPartyBuffs(buffs *proto.Buffs) {
+func (shaman *Shaman) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {
 	if shaman.SelfBuffs.Bloodlust {
-		buffs.Bloodlust += 1
+		partyBuffs.Bloodlust += 1
 	}
 
 	if shaman.SelfBuffs.TotemOfWrath {
-		buffs.TotemOfWrath += 1
+		partyBuffs.TotemOfWrath += 1
 	}
 
 	if shaman.SelfBuffs.ManaSpring {
-		buffs.ManaSpringTotem = core.MaxTristate(buffs.ManaSpringTotem, proto.TristateEffect_TristateEffectRegular)
+		partyBuffs.ManaSpringTotem = core.MaxTristate(partyBuffs.ManaSpringTotem, proto.TristateEffect_TristateEffectRegular)
 	}
 
 	if shaman.SelfBuffs.WrathOfAir {
@@ -106,7 +106,7 @@ func (shaman *Shaman) AddPartyBuffs(buffs *proto.Buffs) {
 		if ItemSetCycloneRegalia.CharacterHasSetBonus(shaman.GetCharacter(), 2) {
 			woaValue = proto.TristateEffect_TristateEffectImproved
 		}
-		buffs.WrathOfAirTotem = core.MaxTristate(buffs.WrathOfAirTotem, woaValue)
+		partyBuffs.WrathOfAirTotem = core.MaxTristate(partyBuffs.WrathOfAirTotem, woaValue)
 	}
 }
 

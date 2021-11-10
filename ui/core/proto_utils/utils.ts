@@ -2,11 +2,13 @@ import { intersection } from '/tbc/core/utils.js';
 
 import { Player } from '/tbc/core/proto/api.js';
 import { PlayerOptions } from '/tbc/core/proto/api.js';
+import { ArmorType } from '/tbc/core/proto/common.js';
 import { Class } from '/tbc/core/proto/common.js';
 import { Enchant } from '/tbc/core/proto/common.js';
 import { Gem } from '/tbc/core/proto/common.js';
 import { GemColor } from '/tbc/core/proto/common.js';
 import { HandType } from '/tbc/core/proto/common.js';
+import { ItemCategory } from '/tbc/core/proto/common.js';
 import { ItemSlot } from '/tbc/core/proto/common.js';
 import { ItemType } from '/tbc/core/proto/common.js';
 import { Item } from '/tbc/core/proto/common.js';
@@ -420,6 +422,26 @@ export const specToEligibleRaces: Record<Spec, Array<Race>> = {
   [Spec.SpecWarrior]: warriorRaces,
 };
 
+export const specToEligibleItemCategories: Record<Spec, Array<ItemCategory>> = {
+  [Spec.SpecBalanceDruid]: [ItemCategory.ItemCategoryCaster],
+  [Spec.SpecElementalShaman]: [ItemCategory.ItemCategoryCaster],
+  [Spec.SpecHunter]: [ItemCategory.ItemCategoryMelee],
+  [Spec.SpecMage]: [ItemCategory.ItemCategoryCaster],
+  [Spec.SpecRetributionPaladin]: [ItemCategory.ItemCategoryMelee, ItemCategory.ItemCategoryHybrid],
+  [Spec.SpecRogue]: [ItemCategory.ItemCategoryMelee],
+  [Spec.SpecShadowPriest]: [ItemCategory.ItemCategoryCaster],
+  [Spec.SpecWarlock]: [ItemCategory.ItemCategoryCaster],
+  [Spec.SpecWarrior]: [ItemCategory.ItemCategoryMelee],
+};
+
+// Specs that can dual wield. This could be based on class, except that
+// Enhancement Shaman learn dual wield from a talent.
+const dualWieldSpecs: Array<Spec> = [
+	Spec.SpecHunter,
+	Spec.SpecRogue,
+	Spec.SpecWarrior,
+];
+
 // Prefixes used for storing browser data for each site. Even if a Spec is
 // renamed, DO NOT change these values or people will lose their saved data.
 export const specToLocalStorageKey: Record<Spec, string> = {
@@ -535,6 +557,165 @@ export function withSpecProto<SpecType extends Spec>(
     throw new Error('Unrecognized talents with options: ' + PlayerOptions.toJsonString(playerOptions));
   }
   return copy;
+}
+
+const classToMaxArmorType: Record<Class, ArmorType> = {
+	[Class.ClassUnknown]: ArmorType.ArmorTypeUnknown,
+	[Class.ClassDruid]: ArmorType.ArmorTypeLeather,
+	[Class.ClassHunter]: ArmorType.ArmorTypeMail,
+	[Class.ClassMage]: ArmorType.ArmorTypeCloth,
+	[Class.ClassPaladin]: ArmorType.ArmorTypePlate,
+	[Class.ClassPriest]: ArmorType.ArmorTypeCloth,
+	[Class.ClassRogue]: ArmorType.ArmorTypeLeather,
+	[Class.ClassShaman]: ArmorType.ArmorTypeMail,
+	[Class.ClassWarlock]: ArmorType.ArmorTypeCloth,
+	[Class.ClassWarrior]: ArmorType.ArmorTypePlate,
+};
+
+const classToEligibleRangedWeaponTypes: Record<Class, Array<RangedWeaponType>> = {
+	[Class.ClassUnknown]: [],
+	[Class.ClassDruid]: [RangedWeaponType.RangedWeaponTypeIdol],
+	[Class.ClassHunter]: [
+		RangedWeaponType.RangedWeaponTypeBow,
+		RangedWeaponType.RangedWeaponTypeCrossbow,
+		RangedWeaponType.RangedWeaponTypeGun,
+		RangedWeaponType.RangedWeaponTypeThrown,
+	],
+	[Class.ClassMage]: [RangedWeaponType.RangedWeaponTypeWand],
+	[Class.ClassPaladin]: [RangedWeaponType.RangedWeaponTypeLibram],
+	[Class.ClassPriest]: [RangedWeaponType.RangedWeaponTypeWand],
+	[Class.ClassRogue]: [
+		RangedWeaponType.RangedWeaponTypeBow,
+		RangedWeaponType.RangedWeaponTypeCrossbow,
+		RangedWeaponType.RangedWeaponTypeGun,
+		RangedWeaponType.RangedWeaponTypeThrown,
+	],
+	[Class.ClassShaman]: [RangedWeaponType.RangedWeaponTypeTotem],
+	[Class.ClassWarlock]: [RangedWeaponType.RangedWeaponTypeWand],
+	[Class.ClassWarrior]: [
+		RangedWeaponType.RangedWeaponTypeBow,
+		RangedWeaponType.RangedWeaponTypeCrossbow,
+		RangedWeaponType.RangedWeaponTypeGun,
+		RangedWeaponType.RangedWeaponTypeThrown,
+	],
+};
+
+interface EligibleWeaponType {
+	weaponType: WeaponType,
+	canUseTwoHand?: boolean,
+}
+
+const classToEligibleWeaponTypes: Record<Class, Array<EligibleWeaponType>> = {
+	[Class.ClassUnknown]: [],
+	[Class.ClassDruid]: [
+		{ weaponType: WeaponType.WeaponTypeDagger },
+		{ weaponType: WeaponType.WeaponTypeFist },
+		{ weaponType: WeaponType.WeaponTypeMace, canUseTwoHand: true },
+		{ weaponType: WeaponType.WeaponTypeOffHand },
+		{ weaponType: WeaponType.WeaponTypeStaff, canUseTwoHand: true },
+	],
+	[Class.ClassHunter]: [
+		{ weaponType: WeaponType.WeaponTypeAxe, canUseTwoHand: true },
+		{ weaponType: WeaponType.WeaponTypeDagger },
+		{ weaponType: WeaponType.WeaponTypeFist },
+		{ weaponType: WeaponType.WeaponTypeOffHand },
+		{ weaponType: WeaponType.WeaponTypePolearm, canUseTwoHand: true },
+		{ weaponType: WeaponType.WeaponTypeSword, canUseTwoHand: true },
+		{ weaponType: WeaponType.WeaponTypeStaff, canUseTwoHand: true },
+	],
+	[Class.ClassMage]: [
+		{ weaponType: WeaponType.WeaponTypeDagger },
+		{ weaponType: WeaponType.WeaponTypeOffHand },
+		{ weaponType: WeaponType.WeaponTypeStaff, canUseTwoHand: true },
+		{ weaponType: WeaponType.WeaponTypeSword },
+	],
+	[Class.ClassPaladin]: [
+		{ weaponType: WeaponType.WeaponTypeAxe, canUseTwoHand: true },
+		{ weaponType: WeaponType.WeaponTypeMace, canUseTwoHand: true },
+		{ weaponType: WeaponType.WeaponTypeOffHand },
+		{ weaponType: WeaponType.WeaponTypePolearm, canUseTwoHand: true },
+		{ weaponType: WeaponType.WeaponTypeShield },
+		{ weaponType: WeaponType.WeaponTypeSword, canUseTwoHand: true },
+	],
+	[Class.ClassPriest]: [
+		{ weaponType: WeaponType.WeaponTypeDagger },
+		{ weaponType: WeaponType.WeaponTypeMace },
+		{ weaponType: WeaponType.WeaponTypeOffHand },
+		{ weaponType: WeaponType.WeaponTypeStaff, canUseTwoHand: true },
+		{ weaponType: WeaponType.WeaponTypeSword },
+	],
+	[Class.ClassRogue]: [
+		{ weaponType: WeaponType.WeaponTypeDagger },
+		{ weaponType: WeaponType.WeaponTypeFist },
+		{ weaponType: WeaponType.WeaponTypeMace },
+		{ weaponType: WeaponType.WeaponTypeOffHand },
+		{ weaponType: WeaponType.WeaponTypeSword },
+	],
+	[Class.ClassShaman]: [
+		{ weaponType: WeaponType.WeaponTypeAxe, canUseTwoHand: true },
+		{ weaponType: WeaponType.WeaponTypeDagger },
+		{ weaponType: WeaponType.WeaponTypeFist },
+		{ weaponType: WeaponType.WeaponTypeMace, canUseTwoHand: true },
+		{ weaponType: WeaponType.WeaponTypeOffHand },
+		{ weaponType: WeaponType.WeaponTypeShield },
+		{ weaponType: WeaponType.WeaponTypeStaff, canUseTwoHand: true },
+	],
+	[Class.ClassWarlock]: [
+		{ weaponType: WeaponType.WeaponTypeDagger },
+		{ weaponType: WeaponType.WeaponTypeOffHand },
+		{ weaponType: WeaponType.WeaponTypeStaff, canUseTwoHand: true },
+		{ weaponType: WeaponType.WeaponTypeSword },
+	],
+	[Class.ClassWarrior]: [
+		{ weaponType: WeaponType.WeaponTypeAxe, canUseTwoHand: true },
+		{ weaponType: WeaponType.WeaponTypeDagger },
+		{ weaponType: WeaponType.WeaponTypeFist },
+		{ weaponType: WeaponType.WeaponTypeMace, canUseTwoHand: true },
+		{ weaponType: WeaponType.WeaponTypeOffHand },
+		{ weaponType: WeaponType.WeaponTypePolearm, canUseTwoHand: true },
+		{ weaponType: WeaponType.WeaponTypeShield },
+		{ weaponType: WeaponType.WeaponTypeStaff, canUseTwoHand: true },
+		{ weaponType: WeaponType.WeaponTypeSword, canUseTwoHand: true },
+	],
+};
+
+// Returns true if this item may be equipped in at least 1 slot for the given Spec.
+export function canEquipItem(item: Item, spec: Spec): boolean {
+	const playerClass = specToClass[spec];
+
+	if (item.classAllowlist.length > 0 && !item.classAllowlist.includes(playerClass)) {
+		return false;
+	}
+
+	if ([ItemType.ItemTypeFinger, ItemType.ItemTypeTrinket].includes(item.type)) {
+		return true;
+	}
+
+	if (item.type == ItemType.ItemTypeWeapon) {
+		const eligibleWeaponType = classToEligibleWeaponTypes[playerClass].find(wt => wt.weaponType == item.weaponType);
+		if (!eligibleWeaponType) {
+			return false;
+		}
+
+		if (item.handType == HandType.HandTypeOffHand
+				&& ![WeaponType.WeaponTypeShield, WeaponType.WeaponTypeOffHand].includes(item.weaponType)
+				&& !dualWieldSpecs.includes(spec)) {
+			return false;
+		}
+
+		if (item.handType == HandType.HandTypeTwoHand && !eligibleWeaponType.canUseTwoHand) {
+			return false;
+		}
+
+		return true;
+	}
+
+	if (item.type == ItemType.ItemTypeRanged) {
+		return classToEligibleRangedWeaponTypes[playerClass].includes(item.rangedWeaponType);
+	}
+
+	// At this point, we know the item is an armor piece (feet, chest, legs, etc).
+	return classToMaxArmorType[playerClass] >= item.armorType;
 }
 
 const itemTypeToSlotsMap: Partial<Record<ItemType, Array<ItemSlot>>> = {

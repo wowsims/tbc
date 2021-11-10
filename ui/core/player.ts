@@ -1,4 +1,3 @@
-import { Buffs } from '/tbc/core/proto/common.js';
 import { Class } from '/tbc/core/proto/common.js';
 import { Consumes } from '/tbc/core/proto/common.js';
 import { Enchant } from '/tbc/core/proto/common.js';
@@ -26,6 +25,7 @@ import { SpecTalents } from '/tbc/core/proto_utils/utils.js';
 import { SpecTypeFunctions } from '/tbc/core/proto_utils/utils.js';
 import { specTypeFunctions } from '/tbc/core/proto_utils/utils.js';
 import { SpecOptions } from '/tbc/core/proto_utils/utils.js';
+import { canEquipItem } from '/tbc/core/proto_utils/utils.js';
 import { specToClass } from '/tbc/core/proto_utils/utils.js';
 import { specToEligibleRaces } from '/tbc/core/proto_utils/utils.js';
 import { getEligibleItemSlots } from '/tbc/core/proto_utils/utils.js';
@@ -134,6 +134,21 @@ export class Player<SpecType extends Spec> {
 		});
   }
 
+	// Returns all items that this player can wear in the given slot.
+	getItems(slot: ItemSlot | undefined): Array<Item> {
+		return this.sim.getItems(slot).filter(item => canEquipItem(item, this.spec));
+	}
+
+	// Returns all enchants that this player can wear in the given slot.
+	getEnchants(slot: ItemSlot | undefined): Array<Enchant> {
+		return this.sim.getEnchants(slot);
+	}
+
+	// Returns all gems that this player can wear of the given color.
+  getGems(socketColor: GemColor | undefined): Array<Gem> {
+		return this.sim.getGems(socketColor);
+  }
+
   async statWeights(request: StatWeightsRequest): Promise<StatWeightsResult> {
 		const result = await this.sim.statWeights(request);
 		this._epWeights = new Stats(result.epValues);
@@ -147,7 +162,9 @@ export class Player<SpecType extends Spec> {
 		await wait(10);
 
 		const computeStatsResult = await this.sim.computeStats(makeComputeStatsRequest(
-      this.sim.getBuffs(),
+      this.sim.getRaidBuffs(),
+      this.sim.getPartyBuffs(),
+      this.sim.getIndividualBuffs(),
       this._consumes,
       this._customStats,
       this.sim.getEncounter(),

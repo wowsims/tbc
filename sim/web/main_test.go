@@ -45,16 +45,6 @@ var basicConsumes = &proto.Consumes{
 	DarkRune:             true,
 }
 
-var basicBuffs = &proto.Buffs{
-	ArcaneBrilliance: true,
-	BlessingOfKings:  true,
-	Bloodlust:        1,
-	MoonkinAura:      proto.TristateEffect_TristateEffectRegular,
-	ManaSpringTotem:  proto.TristateEffect_TristateEffectRegular,
-	TotemOfWrath:     1,
-	WrathOfAirTotem:  proto.TristateEffect_TristateEffectRegular,
-}
-
 var p1Equip = &proto.EquipmentSpec{
 	Items: []*proto.ItemSpec{
 		{Id: 29035, Gems: []int32{34220, 24059}, Enchant: 29191},
@@ -98,7 +88,9 @@ func TestIndividualSim(t *testing.T) {
 			},
 			Equipment: p1Equip,
 		},
-		Buffs: basicBuffs,
+		RaidBuffs: &proto.RaidBuffs{},
+		PartyBuffs: &proto.PartyBuffs{},
+		IndividualBuffs: &proto.IndividualBuffs{},
 		Encounter: &proto.Encounter{
 			Duration: 120,
 			Targets: []*proto.Target{
@@ -147,7 +139,9 @@ func TestCalcStatWeight(t *testing.T) {
 			},
 			Equipment: p1Equip,
 		},
-		Buffs: basicBuffs,
+		RaidBuffs: &proto.RaidBuffs{},
+		PartyBuffs: &proto.PartyBuffs{},
+		IndividualBuffs: &proto.IndividualBuffs{},
 		Encounter: &proto.Encounter{
 			Duration: 120,
 			Targets: []*proto.Target{

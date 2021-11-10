@@ -11,7 +11,7 @@ type Party struct {
 	Players []Agent
 
 	// Party-wide buffs for this party + raid-wide buffs
-	buffs proto.Buffs
+	buffs proto.PartyBuffs
 }
 
 func (party *Party) Size() int {
@@ -48,20 +48,22 @@ type Raid struct {
 	Parties []*Party
 
 	// Raid-wide buffs
-	buffs proto.Buffs
+	buffs proto.RaidBuffs
+	individualBuffs proto.IndividualBuffs
 }
 
 // Makes a new raid. baseBuffs are extra additional buffs applied to all players in the raid.
-func NewRaid(baseBuffs proto.Buffs) *Raid {
+func NewRaid(baseRaidBuffs proto.RaidBuffs, basePartyBuffs proto.PartyBuffs, individualBuffs proto.IndividualBuffs) *Raid {
 	return &Raid{
 		Parties: []*Party{
-			&Party{ Players: []Agent{}, },
-			&Party{ Players: []Agent{}, },
-			&Party{ Players: []Agent{}, },
-			&Party{ Players: []Agent{}, },
-			&Party{ Players: []Agent{}, },
+			&Party{ Players: []Agent{}, buffs: basePartyBuffs, },
+			&Party{ Players: []Agent{}, buffs: basePartyBuffs, },
+			&Party{ Players: []Agent{}, buffs: basePartyBuffs, },
+			&Party{ Players: []Agent{}, buffs: basePartyBuffs, },
+			&Party{ Players: []Agent{}, buffs: basePartyBuffs, },
 		},
-		buffs: baseBuffs,
+		buffs: baseRaidBuffs,
+		individualBuffs: individualBuffs,
 	}
 }
 
@@ -105,7 +107,6 @@ func (raid *Raid) addPlayerBuffs() {
 
 	// Add party-wide buffs for each party.
 	for _, party := range raid.Parties {
-		party.buffs = raid.buffs
 		for _, player := range party.Players {
 			player.AddPartyBuffs(&party.buffs)
 			player.GetCharacter().AddPartyBuffs(&party.buffs)
@@ -117,7 +118,8 @@ func (raid *Raid) addPlayerBuffs() {
 func (raid *Raid) applyAllEffects() {
 	for _, party := range raid.Parties {
 		for _, player := range party.Players {
-			player.GetCharacter().applyAllEffects(player, party.buffs)
+			player.GetCharacter().applyAllEffects(player)
+			applyBuffEffects(player, raid.buffs, party.buffs, raid.individualBuffs)
 		}
 	}
 }

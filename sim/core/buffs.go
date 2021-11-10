@@ -8,17 +8,17 @@ import (
 )
 
 // Applies buffs that affect individual players.
-func applyBuffEffects(agent Agent, buffs proto.Buffs) {
+func applyBuffEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs proto.PartyBuffs, individualBuffs proto.IndividualBuffs) {
 	character := agent.GetCharacter()
 
-	if buffs.ArcaneBrilliance {
+	if raidBuffs.ArcaneBrilliance {
 		character.AddStats(stats.Stats{
 			stats.Intellect: 40,
 		})
 	}
 
 	// TODO: Double-check these numbers.
-	gotwAmount := GetTristateValueFloat(buffs.GiftOfTheWild, 14.0, 14.0 * 1.35)
+	gotwAmount := GetTristateValueFloat(raidBuffs.GiftOfTheWild, 14.0, 14.0 * 1.35)
 	// TODO: Pretty sure some of these dont stack with fort/ai/divine spirit
 	character.AddStats(stats.Stats{
 		stats.Stamina:   gotwAmount,
@@ -29,25 +29,25 @@ func applyBuffEffects(agent Agent, buffs proto.Buffs) {
 	})
 
 	character.AddStats(stats.Stats{
-		stats.SpellCrit: GetTristateValueFloat(buffs.MoonkinAura, 5*SpellCritRatingPerCritChance, 5*SpellCritRatingPerCritChance+20),
+		stats.SpellCrit: GetTristateValueFloat(partyBuffs.MoonkinAura, 5*SpellCritRatingPerCritChance, 5*SpellCritRatingPerCritChance+20),
 	})
 
-	if (buffs.DraeneiRacialMelee) {
+	if (partyBuffs.DraeneiRacialMelee) {
 		character.AddStats(stats.Stats{
 			stats.MeleeHit: 1 * MeleeHitRatingPerHitChance,
 		})
 	}
 
-	if (buffs.DraeneiRacialCaster) {
+	if (partyBuffs.DraeneiRacialCaster) {
 		character.AddStats(stats.Stats{
 			stats.SpellHit: 1 * SpellHitRatingPerHitChance,
 		})
 	}
 
 	character.AddStats(stats.Stats{
-		stats.Spirit: GetTristateValueFloat(buffs.DivineSpirit, 50.0, 50.0),
+		stats.Spirit: GetTristateValueFloat(raidBuffs.DivineSpirit, 50.0, 50.0),
 	})
-	if buffs.DivineSpirit == proto.TristateEffect_TristateEffectImproved {
+	if raidBuffs.DivineSpirit == proto.TristateEffect_TristateEffectImproved {
 		character.AddStatDependency(stats.StatDependency{
 			SourceStat: stats.Spirit,
 			ModifiedStat: stats.SpellPower,
@@ -58,18 +58,18 @@ func applyBuffEffects(agent Agent, buffs proto.Buffs) {
 	}
 
 	// shadow priest buff bot just statically applies mp5
-	if buffs.ShadowPriestDps > 0 {
+	if individualBuffs.ShadowPriestDps > 0 {
 		character.AddStats(stats.Stats{
-			stats.MP5: float64(buffs.ShadowPriestDps) * 0.25,
+			stats.MP5: float64(individualBuffs.ShadowPriestDps) * 0.25,
 		})
 	}
 
 	// TODO: Double-check these numbers
 	character.AddStats(stats.Stats{
-		stats.MP5: GetTristateValueFloat(buffs.BlessingOfWisdom, 42.0, 50.0),
+		stats.MP5: GetTristateValueFloat(individualBuffs.BlessingOfWisdom, 42.0, 50.0),
 	})
 
-	if buffs.BlessingOfKings {
+	if individualBuffs.BlessingOfKings {
 		bokStats := [5]stats.Stat{
 			stats.Agility,
 			stats.Strength,
@@ -89,47 +89,46 @@ func applyBuffEffects(agent Agent, buffs proto.Buffs) {
 		}
 	}
 
-	if buffs.TotemOfWrath > 0 {
+	if partyBuffs.TotemOfWrath > 0 {
 		character.AddStats(stats.Stats{
-			stats.SpellCrit: 3 * SpellCritRatingPerCritChance * float64(buffs.TotemOfWrath),
-			stats.SpellHit:  3 * SpellHitRatingPerHitChance * float64(buffs.TotemOfWrath),
+			stats.SpellCrit: 3 * SpellCritRatingPerCritChance * float64(partyBuffs.TotemOfWrath),
+			stats.SpellHit:  3 * SpellHitRatingPerHitChance * float64(partyBuffs.TotemOfWrath),
 		})
 	}
 	character.AddStats(stats.Stats{
-		stats.SpellPower: GetTristateValueFloat(buffs.WrathOfAirTotem, 101.0, 121.0),
+		stats.SpellPower: GetTristateValueFloat(partyBuffs.WrathOfAirTotem, 101.0, 121.0),
 	})
 	character.AddStats(stats.Stats{
-		stats.MP5: GetTristateValueFloat(buffs.ManaSpringTotem, 50, 62.5),
+		stats.MP5: GetTristateValueFloat(partyBuffs.ManaSpringTotem, 50, 62.5),
 	})
 
-	registerBloodlustCD(agent, buffs)
+	registerBloodlustCD(agent, partyBuffs.Bloodlust)
 
 	character.AddStats(stats.Stats{
-		stats.SpellCrit: 28 * float64(buffs.AtieshMage),
+		stats.SpellCrit: 28 * float64(partyBuffs.AtieshMage),
 	})
 	character.AddStats(stats.Stats{
-		stats.SpellPower:   33 * float64(buffs.AtieshWarlock),
-		stats.HealingPower: 33 * float64(buffs.AtieshWarlock),
+		stats.SpellPower:   33 * float64(partyBuffs.AtieshWarlock),
+		stats.HealingPower: 33 * float64(partyBuffs.AtieshWarlock),
 	})
 
-	if buffs.BraidedEterniumChain {
+	if partyBuffs.BraidedEterniumChain {
 		character.AddStats(stats.Stats{stats.MeleeCrit: 28})
 	}
-	if buffs.EyeOfTheNight {
+	if partyBuffs.EyeOfTheNight {
 		character.AddStats(stats.Stats{stats.SpellPower: 34})
 	}
-	if buffs.JadePendantOfBlasting {
+	if partyBuffs.JadePendantOfBlasting {
 		character.AddStats(stats.Stats{stats.SpellPower: 15})
 	}
-	if buffs.ChainOfTheTwilightOwl {
+	if partyBuffs.ChainOfTheTwilightOwl {
 		character.AddStats(stats.Stats{stats.SpellCrit: 2 * SpellCritRatingPerCritChance})
 	}
 }
 
 var BloodlustAuraID = NewAuraID()
 var BloodlustCooldownID = NewCooldownID()
-func registerBloodlustCD(agent Agent, buffs proto.Buffs) {
-	numBloodlusts := buffs.Bloodlust
+func registerBloodlustCD(agent Agent, numBloodlusts int32) {
 	if numBloodlusts == 0 {
 		return
 	}

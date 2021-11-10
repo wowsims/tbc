@@ -14,9 +14,9 @@ type Agent interface {
 	GetCharacter() *Character
 
 	// Updates the input Buffs to include raid-wide buffs provided by this Agent.
-	AddRaidBuffs(buffs *proto.Buffs)
+	AddRaidBuffs(raidBuffs *proto.RaidBuffs)
 	// Updates the input Buffs to include party-wide buffs provided by this Agent.
-	AddPartyBuffs(buffs *proto.Buffs)
+	AddPartyBuffs(partyBuffs *proto.PartyBuffs)
 
 	// Returns this Agent to its initial state. Called before each Sim iteration.
 	Reset(sim *Simulation)

@@ -74,6 +74,16 @@ enum Stat {
     StatArmor = 27;
 }
 
+// Does not correspond to anything in-game; just our own label to help filter
+// items in the UI.
+enum ItemCategory {
+	ItemCategoryUnknown = 0;
+	ItemCategoryCaster = 1;
+	ItemCategoryMelee = 2;
+	ItemCategoryHybrid = 3;
+	ItemCategoryHealer = 4;
+}
+
 enum ItemType {
     ItemTypeUnknown = 0;
     ItemTypeHead = 1;
@@ -193,37 +203,46 @@ enum Potions {
 	SuperManaPotion = 2;
 }
 
-message Buffs {
-    // Raid buffs
+// Buffs that affect the entire raid.
+message RaidBuffs {
     bool arcane_brilliance = 1;
-    bool blessing_of_kings = 2;
-    TristateEffect blessing_of_wisdom = 3;
     TristateEffect divine_spirit = 4;
     TristateEffect gift_of_the_wild = 5;
+}
 
-    // Party Buffs
-    int32 bloodlust = 6;
-    TristateEffect moonkin_aura = 7;
-		bool draenei_racial_melee = 8;
-		bool draenei_racial_caster = 9;
-    int32 shadow_priest_dps = 10;
+// Buffs that affect a single party.
+message PartyBuffs {
+    int32 bloodlust = 1;
+    TristateEffect moonkin_aura = 2;
+		bool draenei_racial_melee = 3;
+		bool draenei_racial_caster = 4;
 
 		// Drums
-		Drums drums = 11;
+		Drums drums = 5;
 
     // Item Buffs
-    int32 atiesh_mage = 12;
-    int32 atiesh_warlock = 13;
-    bool braided_eternium_chain = 14;
-    bool eye_of_the_night = 15;
-    bool chain_of_the_twilight_owl = 16;
-    bool jade_pendant_of_blasting = 17;
+    int32 atiesh_mage = 6;
+    int32 atiesh_warlock = 7;
+    bool braided_eternium_chain = 8;
+    bool eye_of_the_night = 9;
+    bool chain_of_the_twilight_owl = 10;
+    bool jade_pendant_of_blasting = 11;
 
     // Totems
-    TristateEffect mana_spring_totem = 18;
-    bool mana_tide_totem = 19;
-    int32 totem_of_wrath = 20;
-    TristateEffect wrath_of_air_totem = 21;
+    TristateEffect mana_spring_totem = 12;
+    int32 totem_of_wrath = 13;
+    TristateEffect wrath_of_air_totem = 14;
+}
+
+// Buffs are only used by individual sims, never the raid sim.
+// These are usually individuals of actions taken by other Characters.
+message IndividualBuffs {
+    bool blessing_of_kings = 1;
+    TristateEffect blessing_of_wisdom = 2;
+    TristateEffect blessing_of_might = 3;
+
+    int32 shadow_priest_dps = 4;
+    bool mana_tide_totem = 5;
 }
 
 message Consumes {
@@ -261,8 +280,21 @@ message Debuffs {
     bool misery = 3;
 }
 
+enum MobType {
+    MobTypeUnknown = 0;
+    MobTypeBeast = 1;
+    MobTypeDemon = 2;
+    MobTypeDragonkin = 3;
+    MobTypeElemental = 4;
+    MobTypeGiant = 5;
+    MobTypeHumanoid = 6;
+    MobTypeMechanical = 7;
+    MobTypeUndead = 8;
+}
+
 message Target {
 		int32 armor = 1;
+		MobType mob_type = 3;
 		Debuffs debuffs = 2;
 }
 
@@ -284,6 +316,10 @@ message EquipmentSpec {
 message Item {
     int32 id = 1;
     string name = 2;
+
+    repeated ItemCategory categories = 14;
+		// Classes that are allowed to use the item. Empty indicates no special class restrictions.
+		repeated Class class_allowlist = 15;
 
     ItemType type = 3;
     ArmorType armor_type = 4;

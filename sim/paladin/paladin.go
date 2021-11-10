@@ -15,11 +15,9 @@ func (paladin *Paladin) GetCharacter() *core.Character {
 	return &paladin.Character
 }
 
-func (paladin *Paladin) AddRaidBuffs(buffs *proto.Buffs) {
-	buffs.BlessingOfWisdom = proto.TristateEffect_TristateEffectImproved
-	buffs.BlessingOfKings = true
+func (paladin *Paladin) AddRaidBuffs(raidBuffs *proto.RaidBuffs) {
 }
-func (paladin *Paladin) AddPartyBuffs(buffs *proto.Buffs) {
+func (paladin *Paladin) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {
 }
 
 func (paladin *Paladin) Reset(sim *core.Simulation) {
