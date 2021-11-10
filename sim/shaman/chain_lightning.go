@@ -9,8 +9,8 @@ import (
 const SpellIDCL6 int32 = 25442
 var ChainLightningCooldownID = core.NewCooldownID()
 
-func (shaman *Shaman) NewChainLightning(sim *core.Simulation, target *core.Target, isLightningOverload bool) core.DirectCastAction {
-	cast := shaman.NewElectricCast(
+func (shaman *Shaman) NewChainLightning(sim *core.Simulation, target *core.Target, isLightningOverload bool) *core.DirectCastAction {
+	spell := shaman.NewElectricSpell(
 		"Chain Lightning",
 		core.ActionID{
 			SpellID: SpellIDCL6,
@@ -19,7 +19,7 @@ func (shaman *Shaman) NewChainLightning(sim *core.Simulation, target *core.Targe
 		760.0,
 		time.Millisecond*2000,
 		isLightningOverload)
-	cast.Cooldown = time.Second*6
+	spell.Cast.Cooldown = time.Second*6
 
 	hitInput := core.DirectCastDamageInput{
 		Target: target,
@@ -48,28 +48,20 @@ func (shaman *Shaman) NewChainLightning(sim *core.Simulation, target *core.Targe
 
 		hitInputs = append(hitInputs, bounceHit)
 	}
+	spell.HitInputs = hitInputs
 
-	return core.NewDirectCastAction(
-		sim,
-		cast,
-		hitInputs,
-		// OnCastComplete
-		func(sim *core.Simulation, cast *core.Cast) {
-			shaman.OnElectricSpellCastComplete(sim, cast, isLightningOverload)
-		},
-		// OnSpellHit
-		func(sim *core.Simulation, cast *core.Cast, result *core.DirectCastDamageResult) {
-			shaman.OnElectricSpellHit(sim, cast, result)
+	spell.OnSpellHit = func(sim *core.Simulation, cast *core.Cast, result *core.DirectCastDamageResult) {
+		shaman.OnElectricSpellHit(sim, cast, result)
 
-			if !isLightningOverload {
-				lightningOverloadChance := float64(shaman.Talents.LightningOverload) * 0.04 / 3
-				if sim.RandomFloat("CL Lightning Overload") < lightningOverloadChance {
-					overloadAction := shaman.NewChainLightning(sim, hitInput.Target, true)
-					overloadAction.Act(sim)
-				}
+		if !isLightningOverload {
+			lightningOverloadChance := float64(shaman.Talents.LightningOverload) * 0.04 / 3
+			if sim.RandomFloat("CL Lightning Overload") < lightningOverloadChance {
+				overloadAction := shaman.NewChainLightning(sim, hitInput.Target, true)
+				overloadAction.Act(sim)
 			}
-		},
-		// OnSpellMiss
-		func(sim *core.Simulation, cast *core.Cast) {
-		})
+		}
+	}
+
+	spell.Init(sim)
+	return spell
 }

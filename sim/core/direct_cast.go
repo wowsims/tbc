@@ -110,6 +110,10 @@ func (action DirectCastAction) GetDuration() time.Duration {
 	return action.Cast.CastTime
 }
 
+func (action DirectCastAction) Init(sim *Simulation) {
+	action.Cast.init(sim)
+}
+
 func (action DirectCastAction) Act(sim *Simulation) bool {
 	return action.Cast.startCasting(sim, func(sim *Simulation, cast *Cast) {
 		action.OnCastComplete(sim, cast)
@@ -156,7 +160,7 @@ func (action DirectCastAction) calculateDirectCastDamage(sim *Simulation, damage
 	}
 	result.Hit = true
 
-	baseDamage := damageInput.MinBaseDamage + sim.RandomFloat("DirectCast Damage")*(damageInput.MaxBaseDamage - damageInput.MinBaseDamage)
+	baseDamage := damageInput.MinBaseDamage + sim.RandomFloat("DirectCast Base Damage")*(damageInput.MaxBaseDamage - damageInput.MinBaseDamage)
 	totalSpellPower := character.GetStat(stats.SpellPower) + character.GetStat(action.Cast.SpellSchool) + damageInput.BonusSpellPower
 	damageFromSpellPower := (totalSpellPower * damageInput.SpellCoefficient)
 	damage := baseDamage + damageFromSpellPower
@@ -191,18 +195,4 @@ func (action DirectCastAction) calculateDirectCastDamage(sim *Simulation, damage
 	result.Damage = damage
 
 	return result
-}
-
-func NewDirectCastAction(sim *Simulation, cast Cast, hitInputs []DirectCastDamageInput, onCastComplete OnCastComplete, onSpellHit OnSpellHit, onSpellMiss OnSpellMiss) DirectCastAction {
-	action := DirectCastAction{
-		Cast: cast,
-		HitInputs: hitInputs,
-		OnCastComplete: onCastComplete,
-		OnSpellHit: onSpellHit,
-		OnSpellMiss: onSpellMiss,
-	}
-
-	action.Cast.init(sim)
-
-	return action
 }

@@ -68,6 +68,10 @@ type Shaman struct {
 	// cache
 	convectionBonus float64
 	concussionBonus float64
+
+	// "object pool" for shaman spells.
+	electricSpell   core.DirectCastAction
+	electricSpellLO core.DirectCastAction
 }
 
 // Implemented by each Shaman spec.
