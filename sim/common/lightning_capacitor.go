@@ -64,6 +64,7 @@ func newLightningCapacitorCastTemplate(sim *core.Simulation, character *core.Cha
 			IgnoreCooldowns: true,
 			IgnoreManaCost: true,
 			CritMultiplier: 1.5,
+			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {},
 		},
 		HitInputs: []core.DirectCastDamageInput{
 			core.DirectCastDamageInput{
@@ -75,7 +76,6 @@ func newLightningCapacitorCastTemplate(sim *core.Simulation, character *core.Cha
 		HitResults: []core.DirectCastDamageResult{
 			core.DirectCastDamageResult{},
 		},
-		OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {},
 		OnSpellHit: func(sim *core.Simulation, cast *core.Cast, result *core.DirectCastDamageResult) {},
 		OnSpellMiss: func(sim *core.Simulation, cast *core.Cast) {},
 	}

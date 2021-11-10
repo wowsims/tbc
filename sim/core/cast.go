@@ -62,6 +62,9 @@ type Cast struct {
 
 	// If true, will force the cast to crit (if it doesnt miss).
 	GuaranteedCrit bool
+
+	// Callbacks for providing additional custom behavior.
+	OnCastComplete OnCastComplete
 }
 
 // Should be called exactly once after creation.
@@ -138,5 +141,6 @@ func (cast *Cast) internalOnComplete(sim *Simulation, onCastComplete OnCastCompl
 	}
 
 	cast.Character.OnCastComplete(sim, cast)
+	cast.OnCastComplete(sim, cast)
 	onCastComplete(sim, cast)
 }

@@ -121,9 +121,9 @@ var ItemSetSkyshatterRegalia = core.ItemSet{
 				return core.Aura{
 					ID:      Skyshatter4PcAuraID,
 					Name:    "Skyshatter 4pc Bonus",
-					OnSpellHit: func(sim *core.Simulation, cast *core.Cast, result *core.DirectCastDamageResult) {
+					OnBeforeSpellHit: func(sim *core.Simulation, cast *core.Cast, hitInput *core.DirectCastDamageInput) {
 						if cast.ActionID.SpellID == SpellIDLB12 {
-							result.Damage *= 1.05
+							hitInput.DamageMultiplier *= 1.05
 						}
 					},
 				}

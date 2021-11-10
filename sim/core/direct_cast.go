@@ -22,12 +22,13 @@ type DirectCastDamageInput struct {
 	// Increase in damage per point of spell power.
 	SpellCoefficient float64
 
+	// Bonus stats to be added to the damage calculation.
+	BonusSpellPower      float64
+	BonusSpellHitRating  float64
+	BonusSpellCritRating float64
+
 	// Additional multiplier that is always applied.
 	DamageMultiplier float64
-
-	BonusSpellPower float64
-	BonusHit        float64 // Direct % bonus... 0.1 == 10%
-	BonusCrit       float64 // Direct % bonus... 0.1 == 10%
 }
 
 type DirectCastDamageResult struct {
@@ -89,7 +90,6 @@ type DirectCastAction struct {
 	HitResults []DirectCastDamageResult
 
 	// Callbacks for providing additional custom behavior.
-	OnCastComplete OnCastComplete
 	OnSpellHit     OnSpellHit
 	OnSpellMiss    OnSpellMiss
 }
@@ -124,19 +124,24 @@ func (action *DirectCastAction) Init(sim *Simulation) {
 
 func (action *DirectCastAction) Act(sim *Simulation) bool {
 	return action.Cast.startCasting(sim, func(sim *Simulation, cast *Cast) {
-		action.OnCastComplete(sim, cast)
+		for hitIdx := range action.HitInputs {
+			hitInput := &action.HitInputs[hitIdx]
+
+			cast.Character.OnBeforeSpellHit(sim, cast, hitInput)
+			hitInput.Target.OnBeforeSpellHit(sim, cast, hitInput)
+
+			action.HitResults[hitIdx] = action.calculateDirectCastDamage(sim, hitInput)
+		}
+
+		// TODO: Allow hit results to be added to metrics individually, so we can merge
+		// this and the surrounding loops together.
+		sim.MetricsAggregator.AddCastAction(action, action.HitResults)
 
 		for hitIdx := range action.HitInputs {
 			hitInput := &action.HitInputs[hitIdx]
 			hitResult := &action.HitResults[hitIdx]
 
-			cast.Character.OnBeforeSpellHit(sim, cast, hitInput)
-			hitInput.Target.OnBeforeSpellHit(sim, cast, hitInput)
-
-			*hitResult = action.calculateDirectCastDamage(sim, hitInput)
-
 			if hitResult.Hit {
-				// Apply any on spell hit effects.
 				action.OnSpellHit(sim, cast, hitResult)
 				cast.Character.OnSpellHit(sim, cast, hitResult)
 				hitInput.Target.OnSpellHit(sim, cast, hitResult)
@@ -149,8 +154,6 @@ func (action *DirectCastAction) Act(sim *Simulation) bool {
 				sim.Log("(%d) %s result: %s\n", cast.Character.ID, action.Cast.Name, hitResult)
 			}
 		}
-
-		sim.MetricsAggregator.AddCastAction(action, action.HitResults)
 	})
 }
 
@@ -161,7 +164,7 @@ func (action *DirectCastAction) calculateDirectCastDamage(sim *Simulation, damag
 
 	character := action.Cast.Character
 
-	hit := 0.83 + character.GetStat(stats.SpellHit)/(SpellHitRatingPerHitChance*100) + damageInput.BonusHit
+	hit := 0.83 + (character.GetStat(stats.SpellHit) + damageInput.BonusSpellHitRating)/(SpellHitRatingPerHitChance*100)
 	hit = MinFloat(hit, 0.99) // can't get away from the 1% miss
 
 	if sim.RandomFloat("DirectCast Hit") >= hit { // Miss
@@ -176,7 +179,7 @@ func (action *DirectCastAction) calculateDirectCastDamage(sim *Simulation, damag
 
 	damage *= damageInput.DamageMultiplier
 
-	crit := (character.GetStat(stats.SpellCrit) / (SpellCritRatingPerCritChance * 100)) + damageInput.BonusCrit
+	crit := (character.GetStat(stats.SpellCrit) + damageInput.BonusSpellCritRating) / (SpellCritRatingPerCritChance * 100)
 	if action.Cast.GuaranteedCrit || sim.RandomFloat("DirectCast Crit") < crit {
 		result.Crit = true
 		damage *= action.Cast.CritMultiplier

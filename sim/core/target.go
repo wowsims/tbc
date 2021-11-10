@@ -93,8 +93,8 @@ func miseryAura() Aura {
 	return Aura{
 		ID: MiseryDebuffID,
 		Name: "Misery",
-		OnSpellHit: func(sim *Simulation, cast *Cast, result *DirectCastDamageResult) {
-			result.Damage *= 1.05
+		OnBeforeSpellHit: func(sim *Simulation, cast *Cast, hitInput *DirectCastDamageInput) {
+			hitInput.DamageMultiplier *= 1.05
 		},
 	}
 }
@@ -128,7 +128,7 @@ func improvedSealOfTheCrusaderAura() Aura {
 		ID: ImprovedSealOfTheCrusaderDebuffID,
 		Name: "Improved Seal of the Crusader",
 		OnBeforeSpellHit: func(sim *Simulation, cast *Cast, hitInput *DirectCastDamageInput) {
-			hitInput.BonusCrit += 3
+			hitInput.BonusSpellCritRating += 3 * SpellCritRatingPerCritChance
 			// FUTURE: melee crit bonus, research actual value
 		},
 	}

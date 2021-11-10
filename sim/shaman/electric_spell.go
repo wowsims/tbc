@@ -55,13 +55,13 @@ func (shaman *Shaman) newElectricSpellTemplate(name string, actionID core.Action
 	}
 
 	if !isLightningOverload && shaman.Talents.ElementalFocus {
-		template.OnCastComplete = func(sim *core.Simulation, cast *core.Cast) {
+		template.Cast.OnCastComplete = func(sim *core.Simulation, cast *core.Cast) {
 			if shaman.ElementalFocusStacks > 0 {
 				shaman.ElementalFocusStacks--
 			}
 		}
 	} else {
-		template.OnCastComplete = func(sim *core.Simulation, cast *core.Cast) {}
+		template.Cast.OnCastComplete = func(sim *core.Simulation, cast *core.Cast) {}
 	}
 
 	template.OnSpellMiss = func(sim *core.Simulation, cast *core.Cast) {}
@@ -76,10 +76,10 @@ func (shaman *Shaman) applyElectricSpellHitInputModifiers(hitInput *core.DirectC
 		hitInput.DamageMultiplier *= 0.5
 	}
 
-	hitInput.BonusHit += float64(shaman.Talents.ElementalPrecision) * 0.02
-	hitInput.BonusHit += float64(shaman.Talents.NaturesGuidance) * 0.01
-	hitInput.BonusCrit += float64(shaman.Talents.TidalMastery) * 0.01
-	hitInput.BonusCrit += float64(shaman.Talents.CallOfThunder) * 0.01
+	hitInput.BonusSpellHitRating += float64(shaman.Talents.ElementalPrecision) * 2 * core.SpellHitRatingPerHitChance
+	hitInput.BonusSpellHitRating += float64(shaman.Talents.NaturesGuidance) * 1 * core.SpellHitRatingPerHitChance
+	hitInput.BonusSpellCritRating += float64(shaman.Talents.TidalMastery) * 1 * core.SpellCritRatingPerCritChance
+	hitInput.BonusSpellCritRating += float64(shaman.Talents.CallOfThunder) * 1 * core.SpellCritRatingPerCritChance
 
 	if shaman.Equip[items.ItemSlotRanged].ID == TotemOfStorms {
 		hitInput.BonusSpellPower += 33
