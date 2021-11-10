@@ -1,4 +1,6 @@
-import { Buffs } from '/tbc/core/proto/common.js';
+import { RaidBuffs } from '/tbc/core/proto/common.js';
+import { PartyBuffs } from '/tbc/core/proto/common.js';
+import { IndividualBuffs } from '/tbc/core/proto/common.js';
 import { Encounter } from '/tbc/core/proto/common.js';
 import { Item } from '/tbc/core/proto/common.js';
 import { GearListRequest } from '/tbc/core/proto/api.js';
@@ -15,7 +17,9 @@ export class Sim extends WorkerPool {
     constructor(config) {
         super(3);
         this.phaseChangeEmitter = new TypedEvent();
-        this.buffsChangeEmitter = new TypedEvent();
+        this.raidBuffsChangeEmitter = new TypedEvent();
+        this.partyBuffsChangeEmitter = new TypedEvent();
+        this.individualBuffsChangeEmitter = new TypedEvent();
         this.encounterChangeEmitter = new TypedEvent();
         this.numTargetsChangeEmitter = new TypedEvent();
         // Emits when any of the above emitters emit.
@@ -27,11 +31,15 @@ export class Sim extends WorkerPool {
         this.gearListEmitter = new TypedEvent();
         this._init = false;
         this._phase = config.defaults.phase;
-        this._buffs = config.defaults.buffs;
+        this._raidBuffs = config.defaults.raidBuffs;
+        this._partyBuffs = config.defaults.partyBuffs;
+        this._individualBuffs = config.defaults.individualBuffs;
         this._encounter = config.defaults.encounter;
         this._numTargets = 1;
         [
-            this.buffsChangeEmitter,
+            this.raidBuffsChangeEmitter,
+            this.partyBuffsChangeEmitter,
+            this.individualBuffsChangeEmitter,
             this.encounterChangeEmitter,
             this.numTargetsChangeEmitter,
             this.phaseChangeEmitter,
@@ -82,16 +90,38 @@ export class Sim extends WorkerPool {
             this.phaseChangeEmitter.emit();
         }
     }
-    getBuffs() {
+    getRaidBuffs() {
         // Make a defensive copy
-        return Buffs.clone(this._buffs);
+        return RaidBuffs.clone(this._raidBuffs);
     }
-    setBuffs(newBuffs) {
-        if (Buffs.equals(this._buffs, newBuffs))
+    setRaidBuffs(newRaidBuffs) {
+        if (RaidBuffs.equals(this._raidBuffs, newRaidBuffs))
             return;
         // Make a defensive copy
-        this._buffs = Buffs.clone(newBuffs);
-        this.buffsChangeEmitter.emit();
+        this._raidBuffs = RaidBuffs.clone(newRaidBuffs);
+        this.raidBuffsChangeEmitter.emit();
+    }
+    getPartyBuffs() {
+        // Make a defensive copy
+        return PartyBuffs.clone(this._partyBuffs);
+    }
+    setPartyBuffs(newPartyBuffs) {
+        if (PartyBuffs.equals(this._partyBuffs, newPartyBuffs))
+            return;
+        // Make a defensive copy
+        this._partyBuffs = PartyBuffs.clone(newPartyBuffs);
+        this.partyBuffsChangeEmitter.emit();
+    }
+    getIndividualBuffs() {
+        // Make a defensive copy
+        return IndividualBuffs.clone(this._individualBuffs);
+    }
+    setIndividualBuffs(newIndividualBuffs) {
+        if (IndividualBuffs.equals(this._individualBuffs, newIndividualBuffs))
+            return;
+        // Make a defensive copy
+        this._individualBuffs = IndividualBuffs.clone(newIndividualBuffs);
+        this.individualBuffsChangeEmitter.emit();
     }
     getEncounter() {
         // Make a defensive copy
@@ -140,7 +170,9 @@ export class Sim extends WorkerPool {
     // Returns JSON representing all the current values.
     toJson() {
         return {
-            'buffs': Buffs.toJson(this._buffs),
+            'raidBuffs': RaidBuffs.toJson(this._raidBuffs),
+            'partyBuffs': PartyBuffs.toJson(this._partyBuffs),
+            'individualBuffs': IndividualBuffs.toJson(this._individualBuffs),
             'encounter': Encounter.toJson(this._encounter),
             'numTargets': this._numTargets,
         };
@@ -148,10 +180,22 @@ export class Sim extends WorkerPool {
     // Set all the current values, assumes obj is the same type returned by toJson().
     fromJson(obj) {
         try {
-            this.setBuffs(Buffs.fromJson(obj['buffs']));
+            this.setRaidBuffs(RaidBuffs.fromJson(obj['raidBuffs']));
         }
         catch (e) {
-            console.warn('Failed to parse buffs: ' + e);
+            console.warn('Failed to parse raid buffs: ' + e);
+        }
+        try {
+            this.setPartyBuffs(PartyBuffs.fromJson(obj['partyBuffs']));
+        }
+        catch (e) {
+            console.warn('Failed to parse party buffs: ' + e);
+        }
+        try {
+            this.setIndividualBuffs(IndividualBuffs.fromJson(obj['individualBuffs']));
+        }
+        catch (e) {
+            console.warn('Failed to parse individual buffs: ' + e);
         }
         try {
             this.setEncounter(Encounter.fromJson(obj['encounter']));
@@ -161,7 +205,7 @@ export class Sim extends WorkerPool {
         }
         const parsedNumTargets = parseInt(obj['numTargets']);
         if (!isNaN(parsedNumTargets) && parsedNumTargets != 0) {
-            this._numTargets = parsedNumTargets;
+            this.setNumTargets(parsedNumTargets);
         }
     }
 }

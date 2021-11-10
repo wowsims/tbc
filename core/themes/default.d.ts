@@ -4,7 +4,9 @@ import { Target } from '/tbc/core/target.js';
 import { EnumPickerConfig } from '/tbc/core/components/enum_picker.js';
 import { IconInput } from '/tbc/core/components/icon_picker.js';
 import { NumberPickerConfig } from '/tbc/core/components/number_picker.js';
-import { Buffs } from '/tbc/core/proto/common.js';
+import { RaidBuffs } from '/tbc/core/proto/common.js';
+import { PartyBuffs } from '/tbc/core/proto/common.js';
+import { IndividualBuffs } from '/tbc/core/proto/common.js';
 import { Consumes } from '/tbc/core/proto/common.js';
 import { Encounter } from '/tbc/core/proto/common.js';
 import { EquipmentSpec } from '/tbc/core/proto/common.js';
@@ -65,7 +67,9 @@ export interface GearAndStats {
     customStats: Stats;
 }
 export interface Settings {
-    buffs: Buffs;
+    raidBuffs: RaidBuffs;
+    partyBuffs: PartyBuffs;
+    individualBuffs: IndividualBuffs;
     consumes: Consumes;
     race: Race;
 }

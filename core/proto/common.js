@@ -702,35 +702,59 @@ export var Potions;
      */
     Potions[Potions["SuperManaPotion"] = 2] = "SuperManaPotion";
 })(Potions || (Potions = {}));
+/**
+ * @generated from protobuf enum proto.MobType
+ */
+export var MobType;
+(function (MobType) {
+    /**
+     * @generated from protobuf enum value: MobTypeUnknown = 0;
+     */
+    MobType[MobType["MobTypeUnknown"] = 0] = "MobTypeUnknown";
+    /**
+     * @generated from protobuf enum value: MobTypeBeast = 1;
+     */
+    MobType[MobType["MobTypeBeast"] = 1] = "MobTypeBeast";
+    /**
+     * @generated from protobuf enum value: MobTypeDemon = 2;
+     */
+    MobType[MobType["MobTypeDemon"] = 2] = "MobTypeDemon";
+    /**
+     * @generated from protobuf enum value: MobTypeDragonkin = 3;
+     */
+    MobType[MobType["MobTypeDragonkin"] = 3] = "MobTypeDragonkin";
+    /**
+     * @generated from protobuf enum value: MobTypeElemental = 4;
+     */
+    MobType[MobType["MobTypeElemental"] = 4] = "MobTypeElemental";
+    /**
+     * @generated from protobuf enum value: MobTypeGiant = 5;
+     */
+    MobType[MobType["MobTypeGiant"] = 5] = "MobTypeGiant";
+    /**
+     * @generated from protobuf enum value: MobTypeHumanoid = 6;
+     */
+    MobType[MobType["MobTypeHumanoid"] = 6] = "MobTypeHumanoid";
+    /**
+     * @generated from protobuf enum value: MobTypeMechanical = 7;
+     */
+    MobType[MobType["MobTypeMechanical"] = 7] = "MobTypeMechanical";
+    /**
+     * @generated from protobuf enum value: MobTypeUndead = 8;
+     */
+    MobType[MobType["MobTypeUndead"] = 8] = "MobTypeUndead";
+})(MobType || (MobType = {}));
 // @generated message type with reflection information, may provide speed optimized methods
-class Buffs$Type extends MessageType {
+class RaidBuffs$Type extends MessageType {
     constructor() {
-        super("proto.Buffs", [
+        super("proto.RaidBuffs", [
             { no: 1, name: "arcane_brilliance", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
-            { no: 2, name: "blessing_of_kings", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
-            { no: 3, name: "blessing_of_wisdom", kind: "enum", T: () => ["proto.TristateEffect", TristateEffect] },
             { no: 4, name: "divine_spirit", kind: "enum", T: () => ["proto.TristateEffect", TristateEffect] },
-            { no: 5, name: "gift_of_the_wild", kind: "enum", T: () => ["proto.TristateEffect", TristateEffect] },
-            { no: 6, name: "bloodlust", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
-            { no: 7, name: "moonkin_aura", kind: "enum", T: () => ["proto.TristateEffect", TristateEffect] },
-            { no: 8, name: "draenei_racial_melee", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
-            { no: 9, name: "draenei_racial_caster", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
-            { no: 10, name: "shadow_priest_dps", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
-            { no: 11, name: "drums", kind: "enum", T: () => ["proto.Drums", Drums] },
-            { no: 12, name: "atiesh_mage", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
-            { no: 13, name: "atiesh_warlock", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
-            { no: 14, name: "braided_eternium_chain", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
-            { no: 15, name: "eye_of_the_night", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
-            { no: 16, name: "chain_of_the_twilight_owl", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
-            { no: 17, name: "jade_pendant_of_blasting", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
-            { no: 18, name: "mana_spring_totem", kind: "enum", T: () => ["proto.TristateEffect", TristateEffect] },
-            { no: 19, name: "mana_tide_totem", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
-            { no: 20, name: "totem_of_wrath", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
-            { no: 21, name: "wrath_of_air_totem", kind: "enum", T: () => ["proto.TristateEffect", TristateEffect] }
+            { no: 5, name: "gift_of_the_wild", kind: "enum", T: () => ["proto.TristateEffect", TristateEffect] }
         ]);
     }
     create(value) {
-        const message = { arcaneBrilliance: false, blessingOfKings: false, blessingOfWisdom: 0, divineSpirit: 0, giftOfTheWild: 0, bloodlust: 0, moonkinAura: 0, draeneiRacialMelee: false, draeneiRacialCaster: false, shadowPriestDps: 0, drums: 0, atieshMage: 0, atieshWarlock: 0, braidedEterniumChain: false, eyeOfTheNight: false, chainOfTheTwilightOwl: false, jadePendantOfBlasting: false, manaSpringTotem: 0, manaTideTotem: false, totemOfWrath: 0, wrathOfAirTotem: 0 };
+        const message = { arcaneBrilliance: false, divineSpirit: 0, giftOfTheWild: 0 };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -744,65 +768,11 @@ class Buffs$Type extends MessageType {
                 case /* bool arcane_brilliance */ 1:
                     message.arcaneBrilliance = reader.bool();
                     break;
-                case /* bool blessing_of_kings */ 2:
-                    message.blessingOfKings = reader.bool();
-                    break;
-                case /* proto.TristateEffect blessing_of_wisdom */ 3:
-                    message.blessingOfWisdom = reader.int32();
-                    break;
                 case /* proto.TristateEffect divine_spirit */ 4:
                     message.divineSpirit = reader.int32();
                     break;
                 case /* proto.TristateEffect gift_of_the_wild */ 5:
                     message.giftOfTheWild = reader.int32();
-                    break;
-                case /* int32 bloodlust */ 6:
-                    message.bloodlust = reader.int32();
-                    break;
-                case /* proto.TristateEffect moonkin_aura */ 7:
-                    message.moonkinAura = reader.int32();
-                    break;
-                case /* bool draenei_racial_melee */ 8:
-                    message.draeneiRacialMelee = reader.bool();
-                    break;
-                case /* bool draenei_racial_caster */ 9:
-                    message.draeneiRacialCaster = reader.bool();
-                    break;
-                case /* int32 shadow_priest_dps */ 10:
-                    message.shadowPriestDps = reader.int32();
-                    break;
-                case /* proto.Drums drums */ 11:
-                    message.drums = reader.int32();
-                    break;
-                case /* int32 atiesh_mage */ 12:
-                    message.atieshMage = reader.int32();
-                    break;
-                case /* int32 atiesh_warlock */ 13:
-                    message.atieshWarlock = reader.int32();
-                    break;
-                case /* bool braided_eternium_chain */ 14:
-                    message.braidedEterniumChain = reader.bool();
-                    break;
-                case /* bool eye_of_the_night */ 15:
-                    message.eyeOfTheNight = reader.bool();
-                    break;
-                case /* bool chain_of_the_twilight_owl */ 16:
-                    message.chainOfTheTwilightOwl = reader.bool();
-                    break;
-                case /* bool jade_pendant_of_blasting */ 17:
-                    message.jadePendantOfBlasting = reader.bool();
-                    break;
-                case /* proto.TristateEffect mana_spring_totem */ 18:
-                    message.manaSpringTotem = reader.int32();
-                    break;
-                case /* bool mana_tide_totem */ 19:
-                    message.manaTideTotem = reader.bool();
-                    break;
-                case /* int32 totem_of_wrath */ 20:
-                    message.totemOfWrath = reader.int32();
-                    break;
-                case /* proto.TristateEffect wrath_of_air_totem */ 21:
-                    message.wrathOfAirTotem = reader.int32();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -819,66 +789,12 @@ class Buffs$Type extends MessageType {
         /* bool arcane_brilliance = 1; */
         if (message.arcaneBrilliance !== false)
             writer.tag(1, WireType.Varint).bool(message.arcaneBrilliance);
-        /* bool blessing_of_kings = 2; */
-        if (message.blessingOfKings !== false)
-            writer.tag(2, WireType.Varint).bool(message.blessingOfKings);
-        /* proto.TristateEffect blessing_of_wisdom = 3; */
-        if (message.blessingOfWisdom !== 0)
-            writer.tag(3, WireType.Varint).int32(message.blessingOfWisdom);
         /* proto.TristateEffect divine_spirit = 4; */
         if (message.divineSpirit !== 0)
             writer.tag(4, WireType.Varint).int32(message.divineSpirit);
         /* proto.TristateEffect gift_of_the_wild = 5; */
         if (message.giftOfTheWild !== 0)
             writer.tag(5, WireType.Varint).int32(message.giftOfTheWild);
-        /* int32 bloodlust = 6; */
-        if (message.bloodlust !== 0)
-            writer.tag(6, WireType.Varint).int32(message.bloodlust);
-        /* proto.TristateEffect moonkin_aura = 7; */
-        if (message.moonkinAura !== 0)
-            writer.tag(7, WireType.Varint).int32(message.moonkinAura);
-        /* bool draenei_racial_melee = 8; */
-        if (message.draeneiRacialMelee !== false)
-            writer.tag(8, WireType.Varint).bool(message.draeneiRacialMelee);
-        /* bool draenei_racial_caster = 9; */
-        if (message.draeneiRacialCaster !== false)
-            writer.tag(9, WireType.Varint).bool(message.draeneiRacialCaster);
-        /* int32 shadow_priest_dps = 10; */
-        if (message.shadowPriestDps !== 0)
-            writer.tag(10, WireType.Varint).int32(message.shadowPriestDps);
-        /* proto.Drums drums = 11; */
-        if (message.drums !== 0)
-            writer.tag(11, WireType.Varint).int32(message.drums);
-        /* int32 atiesh_mage = 12; */
-        if (message.atieshMage !== 0)
-            writer.tag(12, WireType.Varint).int32(message.atieshMage);
-        /* int32 atiesh_warlock = 13; */
-        if (message.atieshWarlock !== 0)
-            writer.tag(13, WireType.Varint).int32(message.atieshWarlock);
-        /* bool braided_eternium_chain = 14; */
-        if (message.braidedEterniumChain !== false)
-            writer.tag(14, WireType.Varint).bool(message.braidedEterniumChain);
-        /* bool eye_of_the_night = 15; */
-        if (message.eyeOfTheNight !== false)
-            writer.tag(15, WireType.Varint).bool(message.eyeOfTheNight);
-        /* bool chain_of_the_twilight_owl = 16; */
-        if (message.chainOfTheTwilightOwl !== false)
-            writer.tag(16, WireType.Varint).bool(message.chainOfTheTwilightOwl);
-        /* bool jade_pendant_of_blasting = 17; */
-        if (message.jadePendantOfBlasting !== false)
-            writer.tag(17, WireType.Varint).bool(message.jadePendantOfBlasting);
-        /* proto.TristateEffect mana_spring_totem = 18; */
-        if (message.manaSpringTotem !== 0)
-            writer.tag(18, WireType.Varint).int32(message.manaSpringTotem);
-        /* bool mana_tide_totem = 19; */
-        if (message.manaTideTotem !== false)
-            writer.tag(19, WireType.Varint).bool(message.manaTideTotem);
-        /* int32 totem_of_wrath = 20; */
-        if (message.totemOfWrath !== 0)
-            writer.tag(20, WireType.Varint).int32(message.totemOfWrath);
-        /* proto.TristateEffect wrath_of_air_totem = 21; */
-        if (message.wrathOfAirTotem !== 0)
-            writer.tag(21, WireType.Varint).int32(message.wrathOfAirTotem);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -886,9 +802,222 @@ class Buffs$Type extends MessageType {
     }
 }
 /**
- * @generated MessageType for protobuf message proto.Buffs
+ * @generated MessageType for protobuf message proto.RaidBuffs
  */
-export const Buffs = new Buffs$Type();
+export const RaidBuffs = new RaidBuffs$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class PartyBuffs$Type extends MessageType {
+    constructor() {
+        super("proto.PartyBuffs", [
+            { no: 1, name: "bloodlust", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 2, name: "moonkin_aura", kind: "enum", T: () => ["proto.TristateEffect", TristateEffect] },
+            { no: 3, name: "draenei_racial_melee", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 4, name: "draenei_racial_caster", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 5, name: "drums", kind: "enum", T: () => ["proto.Drums", Drums] },
+            { no: 6, name: "atiesh_mage", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 7, name: "atiesh_warlock", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 8, name: "braided_eternium_chain", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 9, name: "eye_of_the_night", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 10, name: "chain_of_the_twilight_owl", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 11, name: "jade_pendant_of_blasting", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 12, name: "mana_spring_totem", kind: "enum", T: () => ["proto.TristateEffect", TristateEffect] },
+            { no: 13, name: "totem_of_wrath", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 14, name: "wrath_of_air_totem", kind: "enum", T: () => ["proto.TristateEffect", TristateEffect] }
+        ]);
+    }
+    create(value) {
+        const message = { bloodlust: 0, moonkinAura: 0, draeneiRacialMelee: false, draeneiRacialCaster: false, drums: 0, atieshMage: 0, atieshWarlock: 0, braidedEterniumChain: false, eyeOfTheNight: false, chainOfTheTwilightOwl: false, jadePendantOfBlasting: false, manaSpringTotem: 0, totemOfWrath: 0, wrathOfAirTotem: 0 };
+        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader, length, options, target) {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* int32 bloodlust */ 1:
+                    message.bloodlust = reader.int32();
+                    break;
+                case /* proto.TristateEffect moonkin_aura */ 2:
+                    message.moonkinAura = reader.int32();
+                    break;
+                case /* bool draenei_racial_melee */ 3:
+                    message.draeneiRacialMelee = reader.bool();
+                    break;
+                case /* bool draenei_racial_caster */ 4:
+                    message.draeneiRacialCaster = reader.bool();
+                    break;
+                case /* proto.Drums drums */ 5:
+                    message.drums = reader.int32();
+                    break;
+                case /* int32 atiesh_mage */ 6:
+                    message.atieshMage = reader.int32();
+                    break;
+                case /* int32 atiesh_warlock */ 7:
+                    message.atieshWarlock = reader.int32();
+                    break;
+                case /* bool braided_eternium_chain */ 8:
+                    message.braidedEterniumChain = reader.bool();
+                    break;
+                case /* bool eye_of_the_night */ 9:
+                    message.eyeOfTheNight = reader.bool();
+                    break;
+                case /* bool chain_of_the_twilight_owl */ 10:
+                    message.chainOfTheTwilightOwl = reader.bool();
+                    break;
+                case /* bool jade_pendant_of_blasting */ 11:
+                    message.jadePendantOfBlasting = reader.bool();
+                    break;
+                case /* proto.TristateEffect mana_spring_totem */ 12:
+                    message.manaSpringTotem = reader.int32();
+                    break;
+                case /* int32 totem_of_wrath */ 13:
+                    message.totemOfWrath = reader.int32();
+                    break;
+                case /* proto.TristateEffect wrath_of_air_totem */ 14:
+                    message.wrathOfAirTotem = reader.int32();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message, writer, options) {
+        /* int32 bloodlust = 1; */
+        if (message.bloodlust !== 0)
+            writer.tag(1, WireType.Varint).int32(message.bloodlust);
+        /* proto.TristateEffect moonkin_aura = 2; */
+        if (message.moonkinAura !== 0)
+            writer.tag(2, WireType.Varint).int32(message.moonkinAura);
+        /* bool draenei_racial_melee = 3; */
+        if (message.draeneiRacialMelee !== false)
+            writer.tag(3, WireType.Varint).bool(message.draeneiRacialMelee);
+        /* bool draenei_racial_caster = 4; */
+        if (message.draeneiRacialCaster !== false)
+            writer.tag(4, WireType.Varint).bool(message.draeneiRacialCaster);
+        /* proto.Drums drums = 5; */
+        if (message.drums !== 0)
+            writer.tag(5, WireType.Varint).int32(message.drums);
+        /* int32 atiesh_mage = 6; */
+        if (message.atieshMage !== 0)
+            writer.tag(6, WireType.Varint).int32(message.atieshMage);
+        /* int32 atiesh_warlock = 7; */
+        if (message.atieshWarlock !== 0)
+            writer.tag(7, WireType.Varint).int32(message.atieshWarlock);
+        /* bool braided_eternium_chain = 8; */
+        if (message.braidedEterniumChain !== false)
+            writer.tag(8, WireType.Varint).bool(message.braidedEterniumChain);
+        /* bool eye_of_the_night = 9; */
+        if (message.eyeOfTheNight !== false)
+            writer.tag(9, WireType.Varint).bool(message.eyeOfTheNight);
+        /* bool chain_of_the_twilight_owl = 10; */
+        if (message.chainOfTheTwilightOwl !== false)
+            writer.tag(10, WireType.Varint).bool(message.chainOfTheTwilightOwl);
+        /* bool jade_pendant_of_blasting = 11; */
+        if (message.jadePendantOfBlasting !== false)
+            writer.tag(11, WireType.Varint).bool(message.jadePendantOfBlasting);
+        /* proto.TristateEffect mana_spring_totem = 12; */
+        if (message.manaSpringTotem !== 0)
+            writer.tag(12, WireType.Varint).int32(message.manaSpringTotem);
+        /* int32 totem_of_wrath = 13; */
+        if (message.totemOfWrath !== 0)
+            writer.tag(13, WireType.Varint).int32(message.totemOfWrath);
+        /* proto.TristateEffect wrath_of_air_totem = 14; */
+        if (message.wrathOfAirTotem !== 0)
+            writer.tag(14, WireType.Varint).int32(message.wrathOfAirTotem);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message proto.PartyBuffs
+ */
+export const PartyBuffs = new PartyBuffs$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class IndividualBuffs$Type extends MessageType {
+    constructor() {
+        super("proto.IndividualBuffs", [
+            { no: 1, name: "blessing_of_kings", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 2, name: "blessing_of_wisdom", kind: "enum", T: () => ["proto.TristateEffect", TristateEffect] },
+            { no: 3, name: "blessing_of_might", kind: "enum", T: () => ["proto.TristateEffect", TristateEffect] },
+            { no: 4, name: "shadow_priest_dps", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 5, name: "mana_tide_totem", kind: "scalar", T: 8 /*ScalarType.BOOL*/ }
+        ]);
+    }
+    create(value) {
+        const message = { blessingOfKings: false, blessingOfWisdom: 0, blessingOfMight: 0, shadowPriestDps: 0, manaTideTotem: false };
+        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader, length, options, target) {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* bool blessing_of_kings */ 1:
+                    message.blessingOfKings = reader.bool();
+                    break;
+                case /* proto.TristateEffect blessing_of_wisdom */ 2:
+                    message.blessingOfWisdom = reader.int32();
+                    break;
+                case /* proto.TristateEffect blessing_of_might */ 3:
+                    message.blessingOfMight = reader.int32();
+                    break;
+                case /* int32 shadow_priest_dps */ 4:
+                    message.shadowPriestDps = reader.int32();
+                    break;
+                case /* bool mana_tide_totem */ 5:
+                    message.manaTideTotem = reader.bool();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message, writer, options) {
+        /* bool blessing_of_kings = 1; */
+        if (message.blessingOfKings !== false)
+            writer.tag(1, WireType.Varint).bool(message.blessingOfKings);
+        /* proto.TristateEffect blessing_of_wisdom = 2; */
+        if (message.blessingOfWisdom !== 0)
+            writer.tag(2, WireType.Varint).int32(message.blessingOfWisdom);
+        /* proto.TristateEffect blessing_of_might = 3; */
+        if (message.blessingOfMight !== 0)
+            writer.tag(3, WireType.Varint).int32(message.blessingOfMight);
+        /* int32 shadow_priest_dps = 4; */
+        if (message.shadowPriestDps !== 0)
+            writer.tag(4, WireType.Varint).int32(message.shadowPriestDps);
+        /* bool mana_tide_totem = 5; */
+        if (message.manaTideTotem !== false)
+            writer.tag(5, WireType.Varint).bool(message.manaTideTotem);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message proto.IndividualBuffs
+ */
+export const IndividualBuffs = new IndividualBuffs$Type();
 // @generated message type with reflection information, may provide speed optimized methods
 class Consumes$Type extends MessageType {
     constructor() {
@@ -1128,11 +1257,12 @@ class Target$Type extends MessageType {
     constructor() {
         super("proto.Target", [
             { no: 1, name: "armor", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 3, name: "mob_type", kind: "enum", T: () => ["proto.MobType", MobType] },
             { no: 2, name: "debuffs", kind: "message", T: () => Debuffs }
         ]);
     }
     create(value) {
-        const message = { armor: 0 };
+        const message = { armor: 0, mobType: 0 };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -1145,6 +1275,9 @@ class Target$Type extends MessageType {
             switch (fieldNo) {
                 case /* int32 armor */ 1:
                     message.armor = reader.int32();
+                    break;
+                case /* proto.MobType mob_type */ 3:
+                    message.mobType = reader.int32();
                     break;
                 case /* proto.Debuffs debuffs */ 2:
                     message.debuffs = Debuffs.internalBinaryRead(reader, reader.uint32(), options, message.debuffs);
@@ -1164,6 +1297,9 @@ class Target$Type extends MessageType {
         /* int32 armor = 1; */
         if (message.armor !== 0)
             writer.tag(1, WireType.Varint).int32(message.armor);
+        /* proto.MobType mob_type = 3; */
+        if (message.mobType !== 0)
+            writer.tag(3, WireType.Varint).int32(message.mobType);
         /* proto.Debuffs debuffs = 2; */
         if (message.debuffs)
             Debuffs.internalBinaryWrite(message.debuffs, writer.tag(2, WireType.LengthDelimited).fork(), options).join();

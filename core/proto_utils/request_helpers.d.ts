@@ -1,4 +1,6 @@
-import { Buffs } from '/tbc/core/proto/common.js';
+import { RaidBuffs } from '/tbc/core/proto/common.js';
+import { PartyBuffs } from '/tbc/core/proto/common.js';
+import { IndividualBuffs } from '/tbc/core/proto/common.js';
 import { Consumes } from '/tbc/core/proto/common.js';
 import { Encounter } from '/tbc/core/proto/common.js';
 import { Race } from '/tbc/core/proto/common.js';
@@ -10,5 +12,5 @@ import { Stats } from './stats.js';
 import { SpecRotation } from './utils.js';
 import { SpecTalents } from './utils.js';
 import { SpecOptions } from './utils.js';
-export declare function makeComputeStatsRequest<SpecType extends Spec>(buffs: Buffs, consumes: Consumes, customStats: Stats, encounter: Encounter, gear: Gear, race: Race, rotation: SpecRotation<SpecType>, talents: SpecTalents<SpecType>, classOptions: SpecOptions<SpecType>): ComputeStatsRequest;
-export declare function makeIndividualSimRequest<SpecType extends Spec>(buffs: Buffs, consumes: Consumes, customStats: Stats, encounter: Encounter, gear: Gear, race: Race, rotation: SpecRotation<SpecType>, talents: SpecTalents<SpecType>, classOptions: SpecOptions<SpecType>, iterations: number, debug: boolean): IndividualSimRequest;
+export declare function makeComputeStatsRequest<SpecType extends Spec>(raidBuffs: RaidBuffs, partyBuffs: PartyBuffs, individualBuffs: IndividualBuffs, consumes: Consumes, customStats: Stats, encounter: Encounter, gear: Gear, race: Race, rotation: SpecRotation<SpecType>, talents: SpecTalents<SpecType>, classOptions: SpecOptions<SpecType>): ComputeStatsRequest;
+export declare function makeIndividualSimRequest<SpecType extends Spec>(raidBuffs: RaidBuffs, partyBuffs: PartyBuffs, individualBuffs: IndividualBuffs, consumes: Consumes, customStats: Stats, encounter: Encounter, gear: Gear, race: Race, rotation: SpecRotation<SpecType>, talents: SpecTalents<SpecType>, classOptions: SpecOptions<SpecType>, iterations: number, debug: boolean): IndividualSimRequest;

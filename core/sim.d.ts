@@ -1,4 +1,6 @@
-import { Buffs } from '/tbc/core/proto/common.js';
+import { RaidBuffs } from '/tbc/core/proto/common.js';
+import { PartyBuffs } from '/tbc/core/proto/common.js';
+import { IndividualBuffs } from '/tbc/core/proto/common.js';
 import { Enchant } from '/tbc/core/proto/common.js';
 import { Encounter } from '/tbc/core/proto/common.js';
 import { EquipmentSpec } from '/tbc/core/proto/common.js';
@@ -16,12 +18,16 @@ export interface SimConfig {
     defaults: {
         phase: number;
         encounter: Encounter;
-        buffs: Buffs;
+        raidBuffs: RaidBuffs;
+        partyBuffs: PartyBuffs;
+        individualBuffs: IndividualBuffs;
     };
 }
 export declare class Sim extends WorkerPool {
     readonly phaseChangeEmitter: TypedEvent<void>;
-    readonly buffsChangeEmitter: TypedEvent<void>;
+    readonly raidBuffsChangeEmitter: TypedEvent<void>;
+    readonly partyBuffsChangeEmitter: TypedEvent<void>;
+    readonly individualBuffsChangeEmitter: TypedEvent<void>;
     readonly encounterChangeEmitter: TypedEvent<void>;
     readonly numTargetsChangeEmitter: TypedEvent<void>;
     readonly changeEmitter: TypedEvent<void>;
@@ -30,7 +36,9 @@ export declare class Sim extends WorkerPool {
     private _gems;
     readonly gearListEmitter: TypedEvent<void>;
     private _phase;
-    private _buffs;
+    private _raidBuffs;
+    private _partyBuffs;
+    private _individualBuffs;
     private _encounter;
     private _numTargets;
     private _init;
@@ -42,8 +50,12 @@ export declare class Sim extends WorkerPool {
     getMatchingGems(socketColor: GemColor): Array<Gem>;
     getPhase(): number;
     setPhase(newPhase: number): void;
-    getBuffs(): Buffs;
-    setBuffs(newBuffs: Buffs): void;
+    getRaidBuffs(): RaidBuffs;
+    setRaidBuffs(newRaidBuffs: RaidBuffs): void;
+    getPartyBuffs(): PartyBuffs;
+    setPartyBuffs(newPartyBuffs: PartyBuffs): void;
+    getIndividualBuffs(): IndividualBuffs;
+    setIndividualBuffs(newIndividualBuffs: IndividualBuffs): void;
     getEncounter(): Encounter;
     setEncounter(newEncounter: Encounter): void;
     getNumTargets(): number;

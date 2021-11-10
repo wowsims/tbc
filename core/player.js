@@ -82,7 +82,7 @@ export class Player {
         // Sometimes a ui change triggers other changes, so waiting a bit makes sure
         // we get all of them.
         await wait(10);
-        const computeStatsResult = await this.sim.computeStats(makeComputeStatsRequest(this.sim.getBuffs(), this._consumes, this._customStats, this.sim.getEncounter(), this._gear, this._race, this._rotation, this._talents, this._specOptions));
+        const computeStatsResult = await this.sim.computeStats(makeComputeStatsRequest(this.sim.getRaidBuffs(), this.sim.getPartyBuffs(), this.sim.getIndividualBuffs(), this._consumes, this._customStats, this.sim.getEncounter(), this._gear, this._race, this._rotation, this._talents, this._specOptions));
         this._currentStats = computeStatsResult;
         this.characterStatsEmitter.emit();
     }

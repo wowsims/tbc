@@ -10,7 +10,9 @@ import { Enchant } from "./common";
 import { Item } from "./common";
 import { Spec } from "./common";
 import { Encounter } from "./common";
-import { Buffs } from "./common";
+import { IndividualBuffs } from "./common";
+import { PartyBuffs } from "./common";
+import { RaidBuffs } from "./common";
 import { EquipmentSpec } from "./common";
 import { Consumes } from "./common";
 import { Warrior } from "./warrior";
@@ -168,15 +170,23 @@ export interface IndividualSimRequest {
      */
     player?: Player;
     /**
-     * @generated from protobuf field: proto.Buffs buffs = 2;
+     * @generated from protobuf field: proto.RaidBuffs raid_buffs = 2;
      */
-    buffs?: Buffs;
+    raidBuffs?: RaidBuffs;
     /**
-     * @generated from protobuf field: proto.Encounter encounter = 3;
+     * @generated from protobuf field: proto.PartyBuffs party_buffs = 3;
+     */
+    partyBuffs?: PartyBuffs;
+    /**
+     * @generated from protobuf field: proto.IndividualBuffs Individual_buffs = 4 [json_name = "IndividualBuffs"];
+     */
+    individualBuffs?: IndividualBuffs;
+    /**
+     * @generated from protobuf field: proto.Encounter encounter = 5;
      */
     encounter?: Encounter;
     /**
-     * @generated from protobuf field: proto.SimOptions sim_options = 4;
+     * @generated from protobuf field: proto.SimOptions sim_options = 6;
      */
     simOptions?: SimOptions;
 }
@@ -365,9 +375,17 @@ export interface ComputeStatsRequest {
      */
     player?: Player;
     /**
-     * @generated from protobuf field: proto.Buffs buffs = 2;
+     * @generated from protobuf field: proto.RaidBuffs raid_buffs = 2;
      */
-    buffs?: Buffs;
+    raidBuffs?: RaidBuffs;
+    /**
+     * @generated from protobuf field: proto.PartyBuffs party_buffs = 3;
+     */
+    partyBuffs?: PartyBuffs;
+    /**
+     * @generated from protobuf field: proto.IndividualBuffs individual_buffs = 4;
+     */
+    individualBuffs?: IndividualBuffs;
 }
 /**
  * @generated from protobuf message proto.ComputeStatsResult

@@ -4,7 +4,7 @@ import { SimOptions } from '/tbc/core/proto/api.js';
 import { ComputeStatsRequest } from '/tbc/core/proto/api.js';
 import { IndividualSimRequest } from '/tbc/core/proto/api.js';
 import { withSpecProto } from './utils.js';
-export function makeComputeStatsRequest(buffs, consumes, customStats, encounter, gear, race, rotation, talents, classOptions) {
+export function makeComputeStatsRequest(raidBuffs, partyBuffs, individualBuffs, consumes, customStats, encounter, gear, race, rotation, talents, classOptions) {
     return ComputeStatsRequest.create({
         player: Player.create({
             customStats: customStats.asArray(),
@@ -14,10 +14,12 @@ export function makeComputeStatsRequest(buffs, consumes, customStats, encounter,
                 race: race,
             }), rotation, talents, classOptions),
         }),
-        buffs: buffs,
+        raidBuffs: raidBuffs,
+        partyBuffs: partyBuffs,
+        individualBuffs: individualBuffs,
     });
 }
-export function makeIndividualSimRequest(buffs, consumes, customStats, encounter, gear, race, rotation, talents, classOptions, iterations, debug) {
+export function makeIndividualSimRequest(raidBuffs, partyBuffs, individualBuffs, consumes, customStats, encounter, gear, race, rotation, talents, classOptions, iterations, debug) {
     return IndividualSimRequest.create({
         player: Player.create({
             customStats: customStats.asArray(),
@@ -27,7 +29,9 @@ export function makeIndividualSimRequest(buffs, consumes, customStats, encounter
                 race: race,
             }), rotation, talents, classOptions),
         }),
-        buffs: buffs,
+        raidBuffs: raidBuffs,
+        partyBuffs: partyBuffs,
+        individualBuffs: individualBuffs,
         encounter: encounter,
         simOptions: SimOptions.create({
             iterations: iterations,

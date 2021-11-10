@@ -9,7 +9,9 @@ import { Enchant } from './common.js';
 import { Item } from './common.js';
 import { Spec } from './common.js';
 import { Encounter } from './common.js';
-import { Buffs } from './common.js';
+import { IndividualBuffs } from './common.js';
+import { PartyBuffs } from './common.js';
+import { RaidBuffs } from './common.js';
 import { EquipmentSpec } from './common.js';
 import { Consumes } from './common.js';
 import { Warrior } from './warrior.js';
@@ -426,9 +428,11 @@ class IndividualSimRequest$Type extends MessageType {
     constructor() {
         super("proto.IndividualSimRequest", [
             { no: 1, name: "player", kind: "message", T: () => Player },
-            { no: 2, name: "buffs", kind: "message", T: () => Buffs },
-            { no: 3, name: "encounter", kind: "message", T: () => Encounter },
-            { no: 4, name: "sim_options", kind: "message", T: () => SimOptions }
+            { no: 2, name: "raid_buffs", kind: "message", T: () => RaidBuffs },
+            { no: 3, name: "party_buffs", kind: "message", T: () => PartyBuffs },
+            { no: 4, name: "Individual_buffs", kind: "message", jsonName: "IndividualBuffs", T: () => IndividualBuffs },
+            { no: 5, name: "encounter", kind: "message", T: () => Encounter },
+            { no: 6, name: "sim_options", kind: "message", T: () => SimOptions }
         ]);
     }
     create(value) {
@@ -446,13 +450,19 @@ class IndividualSimRequest$Type extends MessageType {
                 case /* proto.Player player */ 1:
                     message.player = Player.internalBinaryRead(reader, reader.uint32(), options, message.player);
                     break;
-                case /* proto.Buffs buffs */ 2:
-                    message.buffs = Buffs.internalBinaryRead(reader, reader.uint32(), options, message.buffs);
+                case /* proto.RaidBuffs raid_buffs */ 2:
+                    message.raidBuffs = RaidBuffs.internalBinaryRead(reader, reader.uint32(), options, message.raidBuffs);
                     break;
-                case /* proto.Encounter encounter */ 3:
+                case /* proto.PartyBuffs party_buffs */ 3:
+                    message.partyBuffs = PartyBuffs.internalBinaryRead(reader, reader.uint32(), options, message.partyBuffs);
+                    break;
+                case /* proto.IndividualBuffs Individual_buffs = 4 [json_name = "IndividualBuffs"];*/ 4:
+                    message.individualBuffs = IndividualBuffs.internalBinaryRead(reader, reader.uint32(), options, message.individualBuffs);
+                    break;
+                case /* proto.Encounter encounter */ 5:
                     message.encounter = Encounter.internalBinaryRead(reader, reader.uint32(), options, message.encounter);
                     break;
-                case /* proto.SimOptions sim_options */ 4:
+                case /* proto.SimOptions sim_options */ 6:
                     message.simOptions = SimOptions.internalBinaryRead(reader, reader.uint32(), options, message.simOptions);
                     break;
                 default:
@@ -470,15 +480,21 @@ class IndividualSimRequest$Type extends MessageType {
         /* proto.Player player = 1; */
         if (message.player)
             Player.internalBinaryWrite(message.player, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
-        /* proto.Buffs buffs = 2; */
-        if (message.buffs)
-            Buffs.internalBinaryWrite(message.buffs, writer.tag(2, WireType.LengthDelimited).fork(), options).join();
-        /* proto.Encounter encounter = 3; */
+        /* proto.RaidBuffs raid_buffs = 2; */
+        if (message.raidBuffs)
+            RaidBuffs.internalBinaryWrite(message.raidBuffs, writer.tag(2, WireType.LengthDelimited).fork(), options).join();
+        /* proto.PartyBuffs party_buffs = 3; */
+        if (message.partyBuffs)
+            PartyBuffs.internalBinaryWrite(message.partyBuffs, writer.tag(3, WireType.LengthDelimited).fork(), options).join();
+        /* proto.IndividualBuffs Individual_buffs = 4 [json_name = "IndividualBuffs"]; */
+        if (message.individualBuffs)
+            IndividualBuffs.internalBinaryWrite(message.individualBuffs, writer.tag(4, WireType.LengthDelimited).fork(), options).join();
+        /* proto.Encounter encounter = 5; */
         if (message.encounter)
-            Encounter.internalBinaryWrite(message.encounter, writer.tag(3, WireType.LengthDelimited).fork(), options).join();
-        /* proto.SimOptions sim_options = 4; */
+            Encounter.internalBinaryWrite(message.encounter, writer.tag(5, WireType.LengthDelimited).fork(), options).join();
+        /* proto.SimOptions sim_options = 6; */
         if (message.simOptions)
-            SimOptions.internalBinaryWrite(message.simOptions, writer.tag(4, WireType.LengthDelimited).fork(), options).join();
+            SimOptions.internalBinaryWrite(message.simOptions, writer.tag(6, WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -922,7 +938,9 @@ class ComputeStatsRequest$Type extends MessageType {
     constructor() {
         super("proto.ComputeStatsRequest", [
             { no: 1, name: "player", kind: "message", T: () => Player },
-            { no: 2, name: "buffs", kind: "message", T: () => Buffs }
+            { no: 2, name: "raid_buffs", kind: "message", T: () => RaidBuffs },
+            { no: 3, name: "party_buffs", kind: "message", T: () => PartyBuffs },
+            { no: 4, name: "individual_buffs", kind: "message", T: () => IndividualBuffs }
         ]);
     }
     create(value) {
@@ -940,8 +958,14 @@ class ComputeStatsRequest$Type extends MessageType {
                 case /* proto.Player player */ 1:
                     message.player = Player.internalBinaryRead(reader, reader.uint32(), options, message.player);
                     break;
-                case /* proto.Buffs buffs */ 2:
-                    message.buffs = Buffs.internalBinaryRead(reader, reader.uint32(), options, message.buffs);
+                case /* proto.RaidBuffs raid_buffs */ 2:
+                    message.raidBuffs = RaidBuffs.internalBinaryRead(reader, reader.uint32(), options, message.raidBuffs);
+                    break;
+                case /* proto.PartyBuffs party_buffs */ 3:
+                    message.partyBuffs = PartyBuffs.internalBinaryRead(reader, reader.uint32(), options, message.partyBuffs);
+                    break;
+                case /* proto.IndividualBuffs individual_buffs */ 4:
+                    message.individualBuffs = IndividualBuffs.internalBinaryRead(reader, reader.uint32(), options, message.individualBuffs);
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -958,9 +982,15 @@ class ComputeStatsRequest$Type extends MessageType {
         /* proto.Player player = 1; */
         if (message.player)
             Player.internalBinaryWrite(message.player, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
-        /* proto.Buffs buffs = 2; */
-        if (message.buffs)
-            Buffs.internalBinaryWrite(message.buffs, writer.tag(2, WireType.LengthDelimited).fork(), options).join();
+        /* proto.RaidBuffs raid_buffs = 2; */
+        if (message.raidBuffs)
+            RaidBuffs.internalBinaryWrite(message.raidBuffs, writer.tag(2, WireType.LengthDelimited).fork(), options).join();
+        /* proto.PartyBuffs party_buffs = 3; */
+        if (message.partyBuffs)
+            PartyBuffs.internalBinaryWrite(message.partyBuffs, writer.tag(3, WireType.LengthDelimited).fork(), options).join();
+        /* proto.IndividualBuffs individual_buffs = 4; */
+        if (message.individualBuffs)
+            IndividualBuffs.internalBinaryWrite(message.individualBuffs, writer.tag(4, WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

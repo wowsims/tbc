@@ -5,23 +5,15 @@ import type { IBinaryReader } from "@protobuf-ts/runtime";
 import type { PartialMessage } from "@protobuf-ts/runtime";
 import { MessageType } from "@protobuf-ts/runtime";
 /**
- * @generated from protobuf message proto.Buffs
+ * Buffs that affect the entire raid.
+ *
+ * @generated from protobuf message proto.RaidBuffs
  */
-export interface Buffs {
+export interface RaidBuffs {
     /**
-     * Raid buffs
-     *
      * @generated from protobuf field: bool arcane_brilliance = 1;
      */
     arcaneBrilliance: boolean;
-    /**
-     * @generated from protobuf field: bool blessing_of_kings = 2;
-     */
-    blessingOfKings: boolean;
-    /**
-     * @generated from protobuf field: proto.TristateEffect blessing_of_wisdom = 3;
-     */
-    blessingOfWisdom: TristateEffect;
     /**
      * @generated from protobuf field: proto.TristateEffect divine_spirit = 4;
      */
@@ -30,78 +22,103 @@ export interface Buffs {
      * @generated from protobuf field: proto.TristateEffect gift_of_the_wild = 5;
      */
     giftOfTheWild: TristateEffect;
+}
+/**
+ * Buffs that affect a single party.
+ *
+ * @generated from protobuf message proto.PartyBuffs
+ */
+export interface PartyBuffs {
     /**
-     * Party Buffs
-     *
-     * @generated from protobuf field: int32 bloodlust = 6;
+     * @generated from protobuf field: int32 bloodlust = 1;
      */
     bloodlust: number;
     /**
-     * @generated from protobuf field: proto.TristateEffect moonkin_aura = 7;
+     * @generated from protobuf field: proto.TristateEffect moonkin_aura = 2;
      */
     moonkinAura: TristateEffect;
     /**
-     * @generated from protobuf field: bool draenei_racial_melee = 8;
+     * @generated from protobuf field: bool draenei_racial_melee = 3;
      */
     draeneiRacialMelee: boolean;
     /**
-     * @generated from protobuf field: bool draenei_racial_caster = 9;
+     * @generated from protobuf field: bool draenei_racial_caster = 4;
      */
     draeneiRacialCaster: boolean;
     /**
-     * @generated from protobuf field: int32 shadow_priest_dps = 10;
-     */
-    shadowPriestDps: number;
-    /**
      * Drums
      *
-     * @generated from protobuf field: proto.Drums drums = 11;
+     * @generated from protobuf field: proto.Drums drums = 5;
      */
     drums: Drums;
     /**
      * Item Buffs
      *
-     * @generated from protobuf field: int32 atiesh_mage = 12;
+     * @generated from protobuf field: int32 atiesh_mage = 6;
      */
     atieshMage: number;
     /**
-     * @generated from protobuf field: int32 atiesh_warlock = 13;
+     * @generated from protobuf field: int32 atiesh_warlock = 7;
      */
     atieshWarlock: number;
     /**
-     * @generated from protobuf field: bool braided_eternium_chain = 14;
+     * @generated from protobuf field: bool braided_eternium_chain = 8;
      */
     braidedEterniumChain: boolean;
     /**
-     * @generated from protobuf field: bool eye_of_the_night = 15;
+     * @generated from protobuf field: bool eye_of_the_night = 9;
      */
     eyeOfTheNight: boolean;
     /**
-     * @generated from protobuf field: bool chain_of_the_twilight_owl = 16;
+     * @generated from protobuf field: bool chain_of_the_twilight_owl = 10;
      */
     chainOfTheTwilightOwl: boolean;
     /**
-     * @generated from protobuf field: bool jade_pendant_of_blasting = 17;
+     * @generated from protobuf field: bool jade_pendant_of_blasting = 11;
      */
     jadePendantOfBlasting: boolean;
     /**
      * Totems
      *
-     * @generated from protobuf field: proto.TristateEffect mana_spring_totem = 18;
+     * @generated from protobuf field: proto.TristateEffect mana_spring_totem = 12;
      */
     manaSpringTotem: TristateEffect;
     /**
-     * @generated from protobuf field: bool mana_tide_totem = 19;
-     */
-    manaTideTotem: boolean;
-    /**
-     * @generated from protobuf field: int32 totem_of_wrath = 20;
+     * @generated from protobuf field: int32 totem_of_wrath = 13;
      */
     totemOfWrath: number;
     /**
-     * @generated from protobuf field: proto.TristateEffect wrath_of_air_totem = 21;
+     * @generated from protobuf field: proto.TristateEffect wrath_of_air_totem = 14;
      */
     wrathOfAirTotem: TristateEffect;
+}
+/**
+ * Buffs are only used by individual sims, never the raid sim.
+ * These are usually individuals of actions taken by other Characters.
+ *
+ * @generated from protobuf message proto.IndividualBuffs
+ */
+export interface IndividualBuffs {
+    /**
+     * @generated from protobuf field: bool blessing_of_kings = 1;
+     */
+    blessingOfKings: boolean;
+    /**
+     * @generated from protobuf field: proto.TristateEffect blessing_of_wisdom = 2;
+     */
+    blessingOfWisdom: TristateEffect;
+    /**
+     * @generated from protobuf field: proto.TristateEffect blessing_of_might = 3;
+     */
+    blessingOfMight: TristateEffect;
+    /**
+     * @generated from protobuf field: int32 shadow_priest_dps = 4;
+     */
+    shadowPriestDps: number;
+    /**
+     * @generated from protobuf field: bool mana_tide_totem = 5;
+     */
+    manaTideTotem: boolean;
 }
 /**
  * @generated from protobuf message proto.Consumes
@@ -209,6 +226,10 @@ export interface Target {
      * @generated from protobuf field: int32 armor = 1;
      */
     armor: number;
+    /**
+     * @generated from protobuf field: proto.MobType mob_type = 3;
+     */
+    mobType: MobType;
     /**
      * @generated from protobuf field: proto.Debuffs debuffs = 2;
      */
@@ -1073,16 +1094,77 @@ export declare enum Potions {
      */
     SuperManaPotion = 2
 }
-declare class Buffs$Type extends MessageType<Buffs> {
+/**
+ * @generated from protobuf enum proto.MobType
+ */
+export declare enum MobType {
+    /**
+     * @generated from protobuf enum value: MobTypeUnknown = 0;
+     */
+    MobTypeUnknown = 0,
+    /**
+     * @generated from protobuf enum value: MobTypeBeast = 1;
+     */
+    MobTypeBeast = 1,
+    /**
+     * @generated from protobuf enum value: MobTypeDemon = 2;
+     */
+    MobTypeDemon = 2,
+    /**
+     * @generated from protobuf enum value: MobTypeDragonkin = 3;
+     */
+    MobTypeDragonkin = 3,
+    /**
+     * @generated from protobuf enum value: MobTypeElemental = 4;
+     */
+    MobTypeElemental = 4,
+    /**
+     * @generated from protobuf enum value: MobTypeGiant = 5;
+     */
+    MobTypeGiant = 5,
+    /**
+     * @generated from protobuf enum value: MobTypeHumanoid = 6;
+     */
+    MobTypeHumanoid = 6,
+    /**
+     * @generated from protobuf enum value: MobTypeMechanical = 7;
+     */
+    MobTypeMechanical = 7,
+    /**
+     * @generated from protobuf enum value: MobTypeUndead = 8;
+     */
+    MobTypeUndead = 8
+}
+declare class RaidBuffs$Type extends MessageType<RaidBuffs> {
     constructor();
-    create(value?: PartialMessage<Buffs>): Buffs;
-    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: Buffs): Buffs;
-    internalBinaryWrite(message: Buffs, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+    create(value?: PartialMessage<RaidBuffs>): RaidBuffs;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: RaidBuffs): RaidBuffs;
+    internalBinaryWrite(message: RaidBuffs, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
- * @generated MessageType for protobuf message proto.Buffs
+ * @generated MessageType for protobuf message proto.RaidBuffs
  */
-export declare const Buffs: Buffs$Type;
+export declare const RaidBuffs: RaidBuffs$Type;
+declare class PartyBuffs$Type extends MessageType<PartyBuffs> {
+    constructor();
+    create(value?: PartialMessage<PartyBuffs>): PartyBuffs;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: PartyBuffs): PartyBuffs;
+    internalBinaryWrite(message: PartyBuffs, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message proto.PartyBuffs
+ */
+export declare const PartyBuffs: PartyBuffs$Type;
+declare class IndividualBuffs$Type extends MessageType<IndividualBuffs> {
+    constructor();
+    create(value?: PartialMessage<IndividualBuffs>): IndividualBuffs;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: IndividualBuffs): IndividualBuffs;
+    internalBinaryWrite(message: IndividualBuffs, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message proto.IndividualBuffs
+ */
+export declare const IndividualBuffs: IndividualBuffs$Type;
 declare class Consumes$Type extends MessageType<Consumes> {
     constructor();
     create(value?: PartialMessage<Consumes>): Consumes;

@@ -1,8 +1,11 @@
-import { Buffs } from '/tbc/core/proto/common.js';
+import { RaidBuffs } from '/tbc/core/proto/common.js';
+import { PartyBuffs } from '/tbc/core/proto/common.js';
+import { IndividualBuffs } from '/tbc/core/proto/common.js';
 import { Consumes } from '/tbc/core/proto/common.js';
 import { Debuffs } from '/tbc/core/proto/common.js';
 import { Drums } from '/tbc/core/proto/common.js';
 import { Encounter } from '/tbc/core/proto/common.js';
+import { MobType } from '/tbc/core/proto/common.js';
 import { Potions } from '/tbc/core/proto/common.js';
 import { Spec } from '/tbc/core/proto/common.js';
 import { Stat } from '/tbc/core/proto/common.js';
@@ -98,19 +101,22 @@ const theme = new DefaultTheme(document.body, {
                 duration: 300,
             }),
             // Default raid/party buffs settings.
-            buffs: Buffs.create({
-                bloodlust: 0,
+            raidBuffs: RaidBuffs.create({
                 arcaneBrilliance: true,
                 divineSpirit: TristateEffect.TristateEffectImproved,
+                giftOfTheWild: TristateEffect.TristateEffectImproved,
+            }),
+            partyBuffs: PartyBuffs.create({}),
+            individualBuffs: IndividualBuffs.create({
                 blessingOfKings: true,
                 blessingOfWisdom: 2,
-                giftOfTheWild: TristateEffect.TristateEffectImproved,
             }),
         },
     },
     target: {
         defaults: {
             armor: 0,
+            mobType: MobType.MobTypeDemon,
             debuffs: Debuffs.create({
                 judgementOfWisdom: true,
                 misery: true,

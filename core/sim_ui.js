@@ -161,6 +161,6 @@ export class SimUI {
         for (let i = 0; i < numTargets; i++) {
             encounter.targets.push(this.target.toProto());
         }
-        return makeIndividualSimRequest(this.sim.getBuffs(), this.player.getConsumes(), this.player.getCustomStats(), encounter, this.player.getGear(), this.player.getRace(), this.player.getRotation(), this.player.getTalents(), this.player.getSpecOptions(), iterations, debug);
+        return makeIndividualSimRequest(this.sim.getRaidBuffs(), this.sim.getPartyBuffs(), this.sim.getIndividualBuffs(), this.player.getConsumes(), this.player.getCustomStats(), encounter, this.player.getGear(), this.player.getRace(), this.player.getRotation(), this.player.getTalents(), this.player.getSpecOptions(), iterations, debug);
     }
 }
