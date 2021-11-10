@@ -119,6 +119,7 @@ func (sim *Simulation) Run() SimResult {
 			player.GetCharacter().ID = pid
 			player.GetCharacter().auraTracker.playerID = pid
 			pid++
+			player.Init(sim)
 		}
 	}
 	logsBuffer := &strings.Builder{}

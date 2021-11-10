@@ -20,57 +20,56 @@ const (
 	CastTagLightningOverload int32 = 1 // This could be value or bitflag if we ended up needing multiple flags at the same time.
 )
 
-func (shaman *Shaman) NewElectricSpell(name string, actionID core.ActionID, baseManaCost float64, baseCastTime time.Duration, isLightningOverload bool) *core.DirectCastAction {
-	spell := &shaman.electricSpell
-	if isLightningOverload {
-		spell = &shaman.electricSpellLO
+func (shaman *Shaman) newElectricSpellTemplate(name string, actionID core.ActionID, baseManaCost float64, baseCastTime time.Duration, isLightningOverload bool) core.DirectCastAction {
+	template := core.DirectCastAction{
+		Cast: core.Cast{
+			Name: name,
+			ActionID: actionID,
+			Character: shaman.GetCharacter(),
+			BaseManaCost: baseManaCost,
+			ManaCost: baseManaCost,
+			CastTime: baseCastTime,
+			SpellSchool: stats.NatureSpellPower,
+			CritMultiplier: 1.5,
+		},
 	}
 
-	// Clear data from previous use of object
-	*spell = core.DirectCastAction{}
-
-	spell.Cast.Name = name
-	spell.Cast.ActionID = actionID
-	spell.Cast.Character = shaman.GetCharacter()
-	spell.Cast.BaseManaCost = baseManaCost
-	spell.Cast.ManaCost = baseManaCost
-	spell.Cast.CastTime = baseCastTime
-	spell.Cast.SpellSchool = stats.NatureSpellPower
-	spell.Cast.CritMultiplier = 1.5
 
 	if isLightningOverload {
-		spell.Cast.Name += " (LO)"
-		spell.Cast.Tag = CastTagLightningOverload
-		spell.Cast.CastTime = 0
-		spell.Cast.ManaCost = 0
-		spell.Cast.IgnoreCooldowns = true
-		spell.Cast.IgnoreManaCost = true
+		template.Cast.Name += " (LO)"
+		template.Cast.Tag = CastTagLightningOverload
+		template.Cast.CastTime = 0
+		template.Cast.ManaCost = 0
+		template.Cast.IgnoreCooldowns = true
+		template.Cast.IgnoreManaCost = true
 	} else if shaman.Talents.LightningMastery > 0 {
 		// Convection applies against the base cost of the spell.
-		spell.Cast.ManaCost -= spell.BaseManaCost * shaman.convectionBonus
+		template.Cast.ManaCost -= template.BaseManaCost * float64(shaman.Talents.Convection) * 0.02
 
-		spell.Cast.CastTime -= time.Millisecond * 100 * time.Duration(shaman.Talents.LightningMastery)
-	}
-
-	if shaman.ElementalFocusStacks > 0 {
-		// TODO: This should subtract 40% of base cost
-		spell.Cast.ManaCost *= .6 // reduced by 40%
+		template.Cast.CastTime -= time.Millisecond * 100 * time.Duration(shaman.Talents.LightningMastery)
 	}
 
 	if shaman.Talents.ElementalFury {
-		spell.Cast.CritMultiplier = 2
+		template.Cast.CritMultiplier = 2
 	}
 
-	spell.OnCastComplete = func(sim *core.Simulation, cast *core.Cast) {
-		shaman.OnElectricSpellCastComplete(sim, cast, isLightningOverload)
+	if !isLightningOverload && shaman.Talents.ElementalFocus {
+		template.OnCastComplete = func(sim *core.Simulation, cast *core.Cast) {
+			if shaman.ElementalFocusStacks > 0 {
+				shaman.ElementalFocusStacks--
+			}
+		}
+	} else {
+		template.OnCastComplete = func(sim *core.Simulation, cast *core.Cast) {}
 	}
-	spell.OnSpellMiss = func(sim *core.Simulation, cast *core.Cast) {}
 
-	return spell
+	template.OnSpellMiss = func(sim *core.Simulation, cast *core.Cast) {}
+
+	return template
 }
 
-func (shaman *Shaman) ApplyElectricSpellHitInputModifiers(hitInput *core.DirectCastDamageInput, isLightningOverload bool) {
-	hitInput.DamageMultiplier *= shaman.concussionBonus
+func (shaman *Shaman) applyElectricSpellHitInputModifiers(hitInput *core.DirectCastDamageInput, isLightningOverload bool) {
+	hitInput.DamageMultiplier *= 1 + 0.01*float64(shaman.Talents.Concussion)
 	if isLightningOverload {
 		hitInput.DamageMultiplier *= 0.5
 	}
@@ -89,13 +88,9 @@ func (shaman *Shaman) ApplyElectricSpellHitInputModifiers(hitInput *core.DirectC
 	}
 }
 
-func (shaman *Shaman) OnElectricSpellCastComplete(sim *core.Simulation, cast *core.Cast, isLightningOverload bool) {
-	if !isLightningOverload && shaman.ElementalFocusStacks > 0 {
-		shaman.ElementalFocusStacks--
-	}
-}
-func (shaman *Shaman) OnElectricSpellHit(sim *core.Simulation, cast *core.Cast, result *core.DirectCastDamageResult) {
-	if shaman.Talents.ElementalFocus && result.Crit {
-		shaman.ElementalFocusStacks = 2
+func (shaman *Shaman) applyElectricSpellInitModifiers(spell *core.DirectCastAction) {
+	if shaman.ElementalFocusStacks > 0 {
+		// TODO: This should subtract 40% of base cost
+		spell.Cast.ManaCost *= .6 // reduced by 40%
 	}
 }

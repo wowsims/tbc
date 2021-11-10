@@ -9,8 +9,8 @@ import (
 const SpellIDCL6 int32 = 25442
 var ChainLightningCooldownID = core.NewCooldownID()
 
-func (shaman *Shaman) NewChainLightning(sim *core.Simulation, target *core.Target, isLightningOverload bool) *core.DirectCastAction {
-	spell := shaman.NewElectricSpell(
+func (shaman *Shaman) newChainLightningTemplate(sim *core.Simulation, isLightningOverload bool) core.DirectCastAction {
+	spellTemplate := shaman.newElectricSpellTemplate(
 		"Chain Lightning",
 		core.ActionID{
 			SpellID: SpellIDCL6,
@@ -19,26 +19,21 @@ func (shaman *Shaman) NewChainLightning(sim *core.Simulation, target *core.Targe
 		760.0,
 		time.Millisecond*2000,
 		isLightningOverload)
-	spell.Cast.Cooldown = time.Second*6
+	spellTemplate.Cast.Cooldown = time.Second*6
 
 	hitInput := core.DirectCastDamageInput{
-		Target: target,
 		MinBaseDamage: 734,
 		MaxBaseDamage: 838,
 		SpellCoefficient: 0.651,
 		DamageMultiplier: 1,
 	}
-	shaman.ApplyElectricSpellHitInputModifiers(&hitInput, isLightningOverload)
+	shaman.applyElectricSpellHitInputModifiers(&hitInput, isLightningOverload)
 
 	numHits := core.MinInt32(3, sim.GetNumTargets())
 	hitInputs := make([]core.DirectCastDamageInput, 0, numHits)
 	hitInputs = append(hitInputs, hitInput)
 	for i := int32(1); i < numHits; i++ {
 		bounceHit := hitInputs[i - 1] // Makes a copy
-
-		// Pick targets by index, incrementally.
-		newTargetIndex := (bounceHit.Target.Index + 1) % sim.GetNumTargets()
-		bounceHit.Target = sim.GetTarget(newTargetIndex)
 
 		if shaman.HasAura(Tidefury2PcAuraID) {
 			bounceHit.DamageMultiplier *= 0.83
@@ -48,20 +43,54 @@ func (shaman *Shaman) NewChainLightning(sim *core.Simulation, target *core.Targe
 
 		hitInputs = append(hitInputs, bounceHit)
 	}
-	spell.HitInputs = hitInputs
+	spellTemplate.HitInputs = hitInputs
 
-	spell.OnSpellHit = func(sim *core.Simulation, cast *core.Cast, result *core.DirectCastDamageResult) {
-		shaman.OnElectricSpellHit(sim, cast, result)
+	if !isLightningOverload && shaman.Talents.LightningOverload > 0 {
+		lightningOverloadChance := float64(shaman.Talents.LightningOverload) * 0.04 / 3
+		spellTemplate.OnSpellHit = func(sim *core.Simulation, cast *core.Cast, result *core.DirectCastDamageResult) {
+			if shaman.Talents.ElementalFocus && result.Crit {
+				shaman.ElementalFocusStacks = 2
+			}
 
-		if !isLightningOverload {
-			lightningOverloadChance := float64(shaman.Talents.LightningOverload) * 0.04 / 3
 			if sim.RandomFloat("CL Lightning Overload") < lightningOverloadChance {
-				overloadAction := shaman.NewChainLightning(sim, hitInput.Target, true)
+				overloadAction := shaman.NewChainLightning(sim, result.Target, true)
 				overloadAction.Act(sim)
+			}
+		}
+	} else {
+		spellTemplate.OnSpellHit = func(sim *core.Simulation, cast *core.Cast, result *core.DirectCastDamageResult) {
+			if shaman.Talents.ElementalFocus && result.Crit {
+				shaman.ElementalFocusStacks = 2
 			}
 		}
 	}
 
+	return spellTemplate
+}
+
+func (shaman *Shaman) NewChainLightning(sim *core.Simulation, target *core.Target, isLightningOverload bool) *core.DirectCastAction {
+	var spell *core.DirectCastAction
+
+	if isLightningOverload {
+		spell = &shaman.electricSpellLO
+		*spell = shaman.chainLightningLOTemplate
+	} else {
+		spell = &shaman.electricSpell
+		*spell = shaman.chainLightningTemplate
+	}
+
+	spell.HitInputs[0].Target = target
+	curTargetIndex := target.Index
+	numHits := core.MinInt32(3, sim.GetNumTargets())
+	for i := int32(1); i < numHits; i++ {
+		// Pick targets by index, incrementally.
+		newTargetIndex := (curTargetIndex + 1) % sim.GetNumTargets()
+		spell.HitInputs[i].Target = sim.GetTarget(newTargetIndex)
+		curTargetIndex = newTargetIndex
+	}
+
+	shaman.applyElectricSpellInitModifiers(spell)
 	spell.Init(sim)
+
 	return spell
 }

@@ -17,6 +17,7 @@ func ApplyTheLightningCapacitor(agent core.Agent) {
 
 	character := agent.GetCharacter()
 	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
+		lightningCapacitorCastTemplate := newLightningCapacitorCastTemplate(sim, character)
 		charges := 0
 
 		const icdDur = time.Millisecond * 2500
@@ -38,7 +39,11 @@ func ApplyTheLightningCapacitor(agent core.Agent) {
 				if charges >= 3 {
 					icd = core.InternalCD(sim.CurrentTime + icdDur)
 					charges = 0
-					castAction := NewLightningCapacitorCast(sim, character, sim.GetPrimaryTarget(), &spellObj)
+
+					castAction := &spellObj
+					*castAction = lightningCapacitorCastTemplate
+					castAction.HitInputs[0].Target = result.Target
+					castAction.Init(sim)
 					castAction.Act(sim)
 				}
 			},
@@ -46,9 +51,8 @@ func ApplyTheLightningCapacitor(agent core.Agent) {
 	})
 }
 
-func NewLightningCapacitorCast(sim *core.Simulation, character *core.Character, target *core.Target, spellObj *core.DirectCastAction) *core.DirectCastAction {
-	spell := spellObj
-	*spell = core.DirectCastAction{
+func newLightningCapacitorCastTemplate(sim *core.Simulation, character *core.Character) core.DirectCastAction {
+	return core.DirectCastAction{
 		Cast: core.Cast{
 			Name: "Lightning Capacitor",
 			ActionID: core.ActionID{
@@ -62,7 +66,6 @@ func NewLightningCapacitorCast(sim *core.Simulation, character *core.Character, 
 		},
 		HitInputs: []core.DirectCastDamageInput{
 			core.DirectCastDamageInput{
-				Target: target,
 				MinBaseDamage: 694,
 				MaxBaseDamage: 807,
 				DamageMultiplier: 1,
@@ -72,7 +75,4 @@ func NewLightningCapacitorCast(sim *core.Simulation, character *core.Character, 
 		OnSpellHit: func(sim *core.Simulation, cast *core.Cast, result *core.DirectCastDamageResult) {},
 		OnSpellMiss: func(sim *core.Simulation, cast *core.Cast) {},
 	}
-
-	spell.Init(sim)
-	return spell
 }

@@ -13,9 +13,6 @@ func NewShaman(character core.Character, talents proto.ShamanTalents, selfBuffs 
 		Character: character,
 		Talents:   talents,
 		SelfBuffs: selfBuffs,
-
-		convectionBonus: 0.02 * float64(talents.Convection),
-		concussionBonus: 1 + 0.01*float64(talents.Concussion),
 	}
 
 	// Add Shaman stat dependencies
@@ -65,13 +62,15 @@ type Shaman struct {
 
 	ElementalFocusStacks byte
 
-	// cache
-	convectionBonus float64
-	concussionBonus float64
-
-	// "object pool" for shaman spells.
+	// "object pool" for shaman spells that are currently being cast.
 	electricSpell   core.DirectCastAction
 	electricSpellLO core.DirectCastAction
+
+	// Template cast objects for quickly resetting cast fields
+	lightningBoltTemplate    core.DirectCastAction
+	lightningBoltLOTemplate  core.DirectCastAction
+	chainLightningTemplate   core.DirectCastAction
+	chainLightningLOTemplate core.DirectCastAction
 }
 
 // Implemented by each Shaman spec.
@@ -108,6 +107,13 @@ func (shaman *Shaman) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {
 		}
 		partyBuffs.WrathOfAirTotem = core.MaxTristate(partyBuffs.WrathOfAirTotem, woaValue)
 	}
+}
+
+func (shaman *Shaman) Init(sim *core.Simulation) {
+	shaman.lightningBoltTemplate = shaman.newLightningBoltTemplate(sim, false)
+	shaman.lightningBoltLOTemplate = shaman.newLightningBoltTemplate(sim, true)
+	shaman.chainLightningTemplate = shaman.newChainLightningTemplate(sim, false)
+	shaman.chainLightningLOTemplate = shaman.newChainLightningTemplate(sim, true)
 }
 
 func (shaman *Shaman) Reset(sim *core.Simulation) {

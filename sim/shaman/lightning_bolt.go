@@ -9,13 +9,13 @@ import (
 
 const SpellIDLB12 int32 = 25449
 
-func (shaman *Shaman) NewLightningBolt(sim *core.Simulation, target *core.Target, isLightningOverload bool) *core.DirectCastAction {
+func (shaman *Shaman) newLightningBoltTemplate(sim *core.Simulation, isLightningOverload bool) core.DirectCastAction {
 	baseManaCost := 300.0
 	if shaman.Equip[items.ItemSlotRanged].ID == TotemOfThePulsingEarth {
 		baseManaCost -= 27.0
 	}
 
-	spell := shaman.NewElectricSpell(
+	spellTemplate := shaman.newElectricSpellTemplate(
 		"Lightning Bolt",
 		core.ActionID{
 			SpellID: SpellIDLB12,
@@ -25,28 +25,52 @@ func (shaman *Shaman) NewLightningBolt(sim *core.Simulation, target *core.Target
 		isLightningOverload)
 
 	hitInput := core.DirectCastDamageInput{
-		Target: target,
 		MinBaseDamage: 571,
 		MaxBaseDamage: 652,
 		SpellCoefficient: 0.794,
 		DamageMultiplier: 1,
 	}
-	shaman.ApplyElectricSpellHitInputModifiers(&hitInput, isLightningOverload)
+	shaman.applyElectricSpellHitInputModifiers(&hitInput, isLightningOverload)
 
-	spell.HitInputs = []core.DirectCastDamageInput{hitInput}
+	spellTemplate.HitInputs = []core.DirectCastDamageInput{hitInput}
 
-	spell.OnSpellHit = func(sim *core.Simulation, cast *core.Cast, result *core.DirectCastDamageResult) {
-		shaman.OnElectricSpellHit(sim, cast, result)
+	if !isLightningOverload && shaman.Talents.LightningOverload > 0 {
+		lightningOverloadChance := float64(shaman.Talents.LightningOverload) * 0.04
+		spellTemplate.OnSpellHit = func(sim *core.Simulation, cast *core.Cast, result *core.DirectCastDamageResult) {
+			if shaman.Talents.ElementalFocus && result.Crit {
+				shaman.ElementalFocusStacks = 2
+			}
 
-		if !isLightningOverload {
-			lightningOverloadChance := float64(shaman.Talents.LightningOverload) * 0.04
 			if sim.RandomFloat("LB Lightning Overload") < lightningOverloadChance {
-				overloadAction := shaman.NewLightningBolt(sim, target, true)
+				overloadAction := shaman.NewLightningBolt(sim, result.Target, true)
 				overloadAction.Act(sim)
+			}
+		}
+	} else {
+		spellTemplate.OnSpellHit = func(sim *core.Simulation, cast *core.Cast, result *core.DirectCastDamageResult) {
+			if shaman.Talents.ElementalFocus && result.Crit {
+				shaman.ElementalFocusStacks = 2
 			}
 		}
 	}
 
+	return spellTemplate
+}
+
+func (shaman *Shaman) NewLightningBolt(sim *core.Simulation, target *core.Target, isLightningOverload bool) *core.DirectCastAction {
+	var spell *core.DirectCastAction
+
+	if isLightningOverload {
+		spell = &shaman.electricSpellLO
+		*spell = shaman.lightningBoltLOTemplate
+	} else {
+		spell = &shaman.electricSpell
+		*spell = shaman.lightningBoltTemplate
+	}
+	spell.HitInputs[0].Target = target
+
+	shaman.applyElectricSpellInitModifiers(spell)
 	spell.Init(sim)
+
 	return spell
 }
