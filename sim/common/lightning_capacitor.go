@@ -51,6 +51,7 @@ func ApplyTheLightningCapacitor(agent core.Agent) {
 	})
 }
 
+// Returns a cast object for a Lightning Capacitor cast with as many fields precomputed as possible.
 func newLightningCapacitorCastTemplate(sim *core.Simulation, character *core.Character) core.DirectCastAction {
 	return core.DirectCastAction{
 		Cast: core.Cast{
@@ -70,6 +71,9 @@ func newLightningCapacitorCastTemplate(sim *core.Simulation, character *core.Cha
 				MaxBaseDamage: 807,
 				DamageMultiplier: 1,
 			},
+		},
+		HitResults: []core.DirectCastDamageResult{
+			core.DirectCastDamageResult{},
 		},
 		OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {},
 		OnSpellHit: func(sim *core.Simulation, cast *core.Cast, result *core.DirectCastDamageResult) {},

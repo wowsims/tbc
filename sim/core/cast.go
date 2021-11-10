@@ -7,6 +7,10 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
+// A cast corresponds to any action which causes the in-game castbar to be
+// shown, and activates the GCD. Note that a cast can also be instant, i.e.
+// the effects are applied immediately even though the GCD is still activated.
+
 // Callback for when a cast begins, i.e. when the in-game castbar starts filling up.
 type OnCast func(sim *Simulation, cast *Cast)
 
@@ -36,9 +40,6 @@ type Cast struct {
 	// will not set new values for those CDs either.
 	IgnoreCooldowns bool
 
-	// E.g. for nature spells, set to stats.NatureSpellPower.
-	SpellSchool stats.Stat
-
 	// If set, this spell will have its mana cost ignored.
 	IgnoreManaCost bool
 
@@ -52,6 +53,9 @@ type Cast struct {
 	ManaCost float64
 
 	CastTime time.Duration
+
+	// E.g. for nature spells, set to stats.NatureSpellPower.
+	SpellSchool stats.Stat
 
 	// How much to multiply damage by, if this cast crits.
 	CritMultiplier float64
@@ -129,10 +133,8 @@ func (cast *Cast) internalOnComplete(sim *Simulation, onCastComplete OnCastCompl
 		cast.Character.AddStat(stats.Mana, -cast.ManaCost)
 	}
 
-	if !cast.IgnoreCooldowns {
-		if cast.Cooldown > 0 {
-			cast.Character.SetCD(cast.ActionID.CooldownID, sim.CurrentTime+cast.Cooldown)
-		}
+	if !cast.IgnoreCooldowns && cast.Cooldown > 0 {
+		cast.Character.SetCD(cast.ActionID.CooldownID, sim.CurrentTime+cast.Cooldown)
 	}
 
 	cast.Character.OnCastComplete(sim, cast)

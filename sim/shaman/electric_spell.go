@@ -20,6 +20,7 @@ const (
 	CastTagLightningOverload int32 = 1 // This could be value or bitflag if we ended up needing multiple flags at the same time.
 )
 
+// Shared precomputation logic for LB and CL.
 func (shaman *Shaman) newElectricSpellTemplate(name string, actionID core.ActionID, baseManaCost float64, baseCastTime time.Duration, isLightningOverload bool) core.DirectCastAction {
 	template := core.DirectCastAction{
 		Cast: core.Cast{
@@ -68,6 +69,7 @@ func (shaman *Shaman) newElectricSpellTemplate(name string, actionID core.Action
 	return template
 }
 
+// Helper for precomputing hit inputs.
 func (shaman *Shaman) applyElectricSpellHitInputModifiers(hitInput *core.DirectCastDamageInput, isLightningOverload bool) {
 	hitInput.DamageMultiplier *= 1 + 0.01*float64(shaman.Talents.Concussion)
 	if isLightningOverload {
@@ -88,6 +90,7 @@ func (shaman *Shaman) applyElectricSpellHitInputModifiers(hitInput *core.DirectC
 	}
 }
 
+// Shared LB/CL logic that is dynamic, i.e. can't be precomputed.
 func (shaman *Shaman) applyElectricSpellInitModifiers(spell *core.DirectCastAction) {
 	if shaman.ElementalFocusStacks > 0 {
 		// TODO: This should subtract 40% of base cost

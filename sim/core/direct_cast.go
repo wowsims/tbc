@@ -8,7 +8,10 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-// Input needed to calculate the damage of a spell.
+// A direct spell is one that does a single instance of damage once casting is
+// complete, i.e. shadowbolt or fire blast.
+
+// Input needed to calculate the damage of a direct spell.
 type DirectCastDamageInput struct {
 	// Target of the spell.
 	Target *Target
@@ -78,7 +81,12 @@ type OnSpellMiss func(sim *Simulation, cast *Cast)
 type DirectCastAction struct {
 	Cast
 
+	// Inputs for each hit.
 	HitInputs []DirectCastDamageInput
+
+	// Results from each hit. For performance reasons, this should be pre-allocated
+	// by the caller.
+	HitResults []DirectCastDamageResult
 
 	// Callbacks for providing additional custom behavior.
 	OnCastComplete OnCastComplete
@@ -118,32 +126,31 @@ func (action *DirectCastAction) Act(sim *Simulation) bool {
 	return action.Cast.startCasting(sim, func(sim *Simulation, cast *Cast) {
 		action.OnCastComplete(sim, cast)
 
-		results := make([]DirectCastDamageResult, 0, len(action.HitInputs))
 		for hitIdx := range action.HitInputs {
 			hitInput := &action.HitInputs[hitIdx]
+			hitResult := &action.HitResults[hitIdx]
+
 			cast.Character.OnBeforeSpellHit(sim, cast, hitInput)
 			hitInput.Target.OnBeforeSpellHit(sim, cast, hitInput)
 
-			result := action.calculateDirectCastDamage(sim, hitInput)
+			*hitResult = action.calculateDirectCastDamage(sim, hitInput)
 
-			if result.Hit {
+			if hitResult.Hit {
 				// Apply any on spell hit effects.
-				action.OnSpellHit(sim, cast, &result)
-				cast.Character.OnSpellHit(sim, cast, &result)
-				hitInput.Target.OnSpellHit(sim, cast, &result)
+				action.OnSpellHit(sim, cast, hitResult)
+				cast.Character.OnSpellHit(sim, cast, hitResult)
+				hitInput.Target.OnSpellHit(sim, cast, hitResult)
 			} else {
 				action.OnSpellMiss(sim, cast)
 				cast.Character.OnSpellMiss(sim, cast)
 				hitInput.Target.OnSpellMiss(sim, cast)
 			}
 			if sim.Log != nil {
-				sim.Log("(%d) %s result: %s\n", cast.Character.ID, action.Cast.Name, result)
+				sim.Log("(%d) %s result: %s\n", cast.Character.ID, action.Cast.Name, hitResult)
 			}
-
-			results = append(results, result)
 		}
 
-		sim.MetricsAggregator.AddCastAction(action, results)
+		sim.MetricsAggregator.AddCastAction(action, action.HitResults)
 	})
 }
 

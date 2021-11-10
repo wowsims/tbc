@@ -9,6 +9,7 @@ import (
 const SpellIDCL6 int32 = 25442
 var ChainLightningCooldownID = core.NewCooldownID()
 
+// Returns a cast object for Chain Lightning with as many fields precomputed as possible.
 func (shaman *Shaman) newChainLightningTemplate(sim *core.Simulation, isLightningOverload bool) core.DirectCastAction {
 	spellTemplate := shaman.newElectricSpellTemplate(
 		"Chain Lightning",
@@ -45,6 +46,8 @@ func (shaman *Shaman) newChainLightningTemplate(sim *core.Simulation, isLightnin
 	}
 	spellTemplate.HitInputs = hitInputs
 
+	spellTemplate.HitResults = make([]core.DirectCastDamageResult, numHits)
+
 	if !isLightningOverload && shaman.Talents.LightningOverload > 0 {
 		lightningOverloadChance := float64(shaman.Talents.LightningOverload) * 0.04 / 3
 		spellTemplate.OnSpellHit = func(sim *core.Simulation, cast *core.Cast, result *core.DirectCastDamageResult) {
@@ -79,6 +82,9 @@ func (shaman *Shaman) NewChainLightning(sim *core.Simulation, target *core.Targe
 		*spell = shaman.chainLightningTemplate
 	}
 
+	// Set dynamic fields, i.e. the stuff we couldn't precompute.
+
+	// Set the targets.
 	spell.HitInputs[0].Target = target
 	curTargetIndex := target.Index
 	numHits := core.MinInt32(3, sim.GetNumTargets())
@@ -90,6 +96,7 @@ func (shaman *Shaman) NewChainLightning(sim *core.Simulation, target *core.Targe
 	}
 
 	shaman.applyElectricSpellInitModifiers(spell)
+
 	spell.Init(sim)
 
 	return spell
