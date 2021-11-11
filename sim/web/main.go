@@ -29,8 +29,7 @@ func init() {
 }
 
 func main() {
-	var useFS = flag.Bool("usefs", true, "Use local file system and wasm. Set to true for dev")
-	// TODO: usefs for now is set to true until we can solve how to embed the dist.
+	var useFS = flag.Bool("usefs", false, "Use local file system and wasm. Set to true during development.")
 	var host = flag.String("host", ":3333", "URL to host the interface on.")
 	var launch = flag.Bool("launch", true, "auto launch browser")
 
