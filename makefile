@@ -67,7 +67,8 @@ $(OUT_DIR)/net_worker.js: ui/worker/net_worker.js
 	cp ui/worker/net_worker.js $(OUT_DIR)
 
 binary_dist/dist.go: sim/web/dist.go.tmpl
-	mkdir -p binary_dist
+	mkdir -p binary_dist/tbc
+	touch binary_dist/tbc/embedded
 	cp sim/web/dist.go.tmpl binary_dist/dist.go
 
 binary_dist: $(OUT_DIR) binary_dist/dist.go
