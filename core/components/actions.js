@@ -15,7 +15,7 @@ export class Actions extends Component {
         iterationsDiv.classList.add('iterations-div');
         iterationsDiv.innerHTML = `
       <span class="iterations-label">Iterations:</span>
-      <input class="iterations-input" type="number" min="1" value="1000" step="1000">
+      <input class="iterations-input" type="number" min="1" value="3000" step="1000">
     `;
         this.rootElem.appendChild(iterationsDiv);
         const iterationsInput = iterationsDiv.getElementsByClassName('iterations-input')[0];
