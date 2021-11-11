@@ -37,16 +37,23 @@ export abstract class Input<ModObject, T> extends Component {
 		this.rootElem.classList.add(cssClass);
 
     if (config.label) {
+      const labelDiv = document.createElement('div');
+      labelDiv.classList.add('input-label-div');
+      this.rootElem.appendChild(labelDiv);
+
       const label = document.createElement('span');
       label.classList.add('input-label');
       label.textContent = config.label;
-      this.rootElem.appendChild(label);
+      labelDiv.appendChild(label);
 
 			if (config.labelTooltip) {
-				tippy(label, {
+				const tooltip = document.createElement('span');
+				tooltip.classList.add('input-tooltip', 'fa', 'fa-info-circle');
+				tippy(tooltip, {
 					'content': config.labelTooltip,
 					'allowHTML': true,
 				});
+				labelDiv.appendChild(tooltip);
 			}
     }
 

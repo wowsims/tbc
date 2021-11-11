@@ -1,7 +1,12 @@
-.input-label {
+.input-label-div {
+	display: inline-block;
   margin: 5px;
 }
 
-.input-root.disabled .input-label {
+.input-label, .input-tooltip {
+  margin: 3px;
+}
+
+.input-root.disabled .input-label, .input-root.disabled .input-tooltip {
 	filter: opacity(0.5);
 }
