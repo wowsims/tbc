@@ -74,12 +74,17 @@ func (shaman *Shaman) newChainLightningTemplate(sim *core.Simulation, isLightnin
 func (shaman *Shaman) NewChainLightning(sim *core.Simulation, target *core.Target, isLightningOverload bool) *core.DirectCastAction {
 	var spell *core.DirectCastAction
 
+	// Initialize cast from precomputed template.
 	if isLightningOverload {
 		spell = &shaman.electricSpellLO
 		*spell = shaman.chainLightningLOTemplate
+		spell.HitInputs = shaman.clHitInputs
+		copy(spell.HitInputs, shaman.chainLightningLOTemplate.HitInputs)
 	} else {
 		spell = &shaman.electricSpell
 		*spell = shaman.chainLightningTemplate
+		spell.HitInputs = shaman.clHitInputs
+		copy(spell.HitInputs, shaman.chainLightningTemplate.HitInputs)
 	}
 
 	// Set dynamic fields, i.e. the stuff we couldn't precompute.
