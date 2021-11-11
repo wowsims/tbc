@@ -67,7 +67,6 @@ $(OUT_DIR)/net_worker.js: ui/worker/net_worker.js
 	cp ui/worker/net_worker.js $(OUT_DIR)
 
 # Builds the web server with the compiled client.
-#  Deletes the lib.wasm to reduce size of binary.
 wowsimtbc: sim/web/main.go $(OUT_DIR)
 	mkdir -p binary_dist
 	cp -r $(OUT_DIR) binary_dist/
@@ -76,13 +75,9 @@ wowsimtbc: sim/web/main.go $(OUT_DIR)
 	go build -o wowsimtbc ./sim/web/main.go
 
 release: wowsimtbc
-	GOOS=windows GOARCH=amd64 go build -o wowsim.exe ./sim/web/main.go
-	GOOS=darwin GOARCH=amd64 go build -o wowsim-amd64-darwin ./sim/web/main.go
-	GOOS=linux go build -o wowsim-amd64-linux ./sim/web/main.go
-
-# Starts up a webserver hosting the $(OUT_DIR)/ and API endpoints.
-elerunweb: sim/core/proto/api.pb.go
-	go run --tags=elemental_shaman ./sim/web/main.go
+	GOOS=windows GOARCH=amd64 go build -o wowsimtbc.exe ./sim/web/main.go
+	GOOS=darwin GOARCH=amd64 go build -o wowsimtbc-amd64-darwin ./sim/web/main.go
+	GOOS=linux go build -o wowsimtbc-amd64-linux ./sim/web/main.go
 
 sim/core/proto/api.pb.go: proto/*.proto
 	protoc -I=./proto --go_out=./sim/core ./proto/*.proto
