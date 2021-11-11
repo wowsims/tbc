@@ -18,6 +18,10 @@ type Agent interface {
 	// Updates the input Buffs to include party-wide buffs provided by this Agent.
 	AddPartyBuffs(partyBuffs *proto.PartyBuffs)
 
+	// Called once before the first iteration, after all Agents and Targets are finalized.
+	// Use this to do any precomputations that require access to Sim or Target fields.
+	Init(sim *Simulation)
+
 	// Returns this Agent to its initial state. Called before each Sim iteration.
 	Reset(sim *Simulation)
 

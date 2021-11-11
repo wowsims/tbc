@@ -34,7 +34,7 @@ var ItemSetManaEtched = core.ItemSet{
 				return core.Aura{
 					ID:      ManaEtchedAuraID,
 					Name:    "Mana-Etched Set",
-					OnCastComplete: func(sim *core.Simulation, cast core.DirectCastAction) {
+					OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
 						if sim.RandomFloat("unmarked") < 0.02 {
 							character.AddAuraWithTemporaryStats(sim, ManaEtchedInsightAuraID, "Mana-Etched Insight", stats.SpellPower, spellBonus, duration)
 						}
@@ -70,7 +70,7 @@ var ItemSetSpellstrike = core.ItemSet{
 				return core.Aura{
 					ID:      SpellstrikeAuraID,
 					Name:    "Spellstrike Set",
-					OnCastComplete: func(sim *core.Simulation, cast core.DirectCastAction) {
+					OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
 						if sim.RandomFloat("spellstrike") < 0.05 {
 							character.AddAuraWithTemporaryStats(sim, SpellstrikeInfusionAuraID, "Spellstrike Infusion", stats.SpellPower, spellBonus, duration)
 						}

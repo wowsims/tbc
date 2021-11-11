@@ -28,7 +28,7 @@ func ApplyMysticalSkyfireDiamond(agent core.Agent) {
 		return core.Aura{
 			ID:      MysticalSkyfireDiamondAuraID,
 			Name:    "Mystical Skyfire Diamond",
-			OnCastComplete: func(sim *core.Simulation, cast core.DirectCastAction) {
+			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
 				if !icd.IsOnCD(sim) && sim.RandomFloat("Mystical Skyfire Diamond") < 0.15 {
 					icd = core.InternalCD(sim.CurrentTime + icdDur)
 					character.AddAuraWithTemporaryStats(sim, MysticFocusAuraID, "Mystic Focus", stats.SpellHaste, hasteBonus, dur)
@@ -48,7 +48,7 @@ func ApplyInsightfulEarthstormDiamond(agent core.Agent) {
 		return core.Aura{
 			ID:      InsightfulEarthstormDiamondAuraID,
 			Name:    "Insightful Earthstorm Diamond",
-			OnCastComplete: func(sim *core.Simulation, cast core.DirectCastAction) {
+			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
 				if !icd.IsOnCD(sim) && sim.RandomFloat("Insightful Earthstorm Diamond") < 0.04 {
 					icd = core.InternalCD(sim.CurrentTime + dur)
 					if sim.Log != nil {
@@ -68,12 +68,12 @@ func ApplyChaoticSkyfireDiamond(agent core.Agent) {
 		return core.Aura{
 			ID:      ChaoticSkyfireDiamondAuraID,
 			Name:    "Chaotic Skyfire Diamond",
-			OnCast: func(sim *core.Simulation, cast core.DirectCastAction, input *core.DirectCastInput) {
+			OnCast: func(sim *core.Simulation, cast *core.Cast) {
 				// For a normal spell with crit multiplier of 1.5, this will be 1.
 				// For a spell with a multiplier of 2 (i.e. 100% increased critical damage) this will be 2.
-				improvedCritRatio := (input.CritMultiplier - 1) / 0.5
+				improvedCritRatio := (cast.CritMultiplier - 1) / 0.5
 
-				input.CritMultiplier += 0.045 * improvedCritRatio
+				cast.CritMultiplier += 0.045 * improvedCritRatio
 			},
 		}
 	})
