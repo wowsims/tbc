@@ -69,11 +69,11 @@ type Shaman struct {
 	// Temporary hitInput slices to be used in object pool casts to avoid modifying
 	// templates directly (because slices are copied by reference).
 	singleHitInputs []core.DirectCastDamageInput
-	clHitInputs []core.DirectCastDamageInput
+	clHitInputs     []core.DirectCastDamageInput
 
 	// Precomputed template cast objects for quickly resetting cast fields.
-	lightningBoltTemplate    core.DirectCastAction
-	lightningBoltLOTemplate  core.DirectCastAction
+	lightningBoltTemplate   core.DirectCastAction
+	lightningBoltLOTemplate core.DirectCastAction
 
 	chainLightningTemplate   core.DirectCastAction
 	chainLightningLOTemplate core.DirectCastAction
@@ -173,15 +173,6 @@ func (shaman *Shaman) registerElementalMasteryCD() {
 }
 
 func init() {
-	// To calculate base stats, get a naked level 70 of the race you want, ideally without any talents to mess up base stats.
-	//  basic stats are as-shown (str/agi/stm/int/spirit)
-
-	// Base Spell Crit is calculated by
-	//   1. Take as-shown value (troll shaman have 3.5%)
-	//   2. Calculate the bonus from int (for troll shaman that would be 104/78.1=1.331% crit)
-	//   3. Subtract as-shown from int bouns (3.5-1.331=2.169)
-	//   4. 2.169*22.08 (rating per crit percent) = 47.89 crit rating.
-
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceDraenei, Class: proto.Class_ClassShaman}] = stats.Stats{
 		stats.Strength:  103,
 		stats.Agility:   61,

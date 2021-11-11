@@ -66,12 +66,17 @@ $(OUT_DIR)/sim_worker.js: ui/worker/sim_worker.js
 $(OUT_DIR)/net_worker.js: ui/worker/net_worker.js
 	cp ui/worker/net_worker.js $(OUT_DIR)
 
-# Builds the web server with the compiled client.
-wowsimtbc: sim/web/main.go $(OUT_DIR)
+binary_dist/dist.go: sim/web/dist.go.tmpl
+	mkdir -p binary_dist
+	cp sim/web/dist.go.tmpl binary_dist/dist.go
+
+binary_dist: $(OUT_DIR) binary_dist/dist.go
 	mkdir -p binary_dist
 	cp -r $(OUT_DIR) binary_dist/
 	rm binary_dist/tbc/lib.wasm
-	cp sim/web/dist.go.tmpl binary_dist/dist.go
+
+# Builds the web server with the compiled client.
+wowsimtbc: sim/web/main.go binary_dist
 	go build -o wowsimtbc ./sim/web/main.go
 
 release: wowsimtbc
@@ -88,5 +93,5 @@ items: sim/core/items/all_items.go
 sim/core/items/all_items.go: generate_items/*.go $(call rwildcard,sim/core/proto,*.go)
 	go run generate_items/*.go -outDir=sim/core/items
 
-test: $(OUT_DIR)/lib.wasm
+test: $(OUT_DIR)/lib.wasm binary_dist
 	go test ./...
