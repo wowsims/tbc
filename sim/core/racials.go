@@ -71,9 +71,9 @@ func applyRaceEffects(agent Agent) {
 			return Aura{
 				ID:      TrollBeastSlayingAuraID,
 				Name:    "Beast Slaying (Troll Racial)",
-				OnSpellHit: func(sim *Simulation, cast DirectCastAction, result *DirectCastDamageResult) {
-					if result.Target.MobType == proto.MobType_MobTypeBeast {
-						result.Damage *= 1.05
+				OnBeforeSpellHit: func(sim *Simulation, cast *Cast, hitInput *DirectCastDamageInput) {
+					if hitInput.Target.MobType == proto.MobType_MobTypeBeast {
+						hitInput.DamageMultiplier *= 1.05
 					}
 				},
 			}
@@ -97,9 +97,9 @@ func applyRaceEffects(agent Agent) {
 						ID:      TrollBerserkingAuraID,
 						Name:    "Troll Berserking",
 						Expires: sim.CurrentTime + dur,
-						OnCast: func(sim *Simulation, cast DirectCastAction, inputs *DirectCastInput) {
+						OnCast: func(sim *Simulation, cast *Cast) {
 							// Multiplying and then dividing lets us use integer multiplication/division which is faster.
-							inputs.CastTime = (inputs.CastTime * 10) / hasteBonus
+							cast.CastTime = (cast.CastTime * 10) / hasteBonus
 						},
 					})
 					return true

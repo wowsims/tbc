@@ -20,114 +20,80 @@ const (
 	CastTagLightningOverload int32 = 1 // This could be value or bitflag if we ended up needing multiple flags at the same time.
 )
 
-// Shared logic for Lightning Bolt and Chain Lightning
-type ElectricSpell struct {
-	Shaman *Shaman
-	Target *core.Target
-	IsLightningOverload bool
-
-	name         string
-	baseManaCost float64
-	baseCastTime time.Duration
-}
-
-func (spell ElectricSpell) GetActionID() core.ActionID {
-	return core.ActionID{
-		SpellID: SpellIDLB12,
-	}
-}
-
-func (spell ElectricSpell) GetName() string {
-	if spell.IsLightningOverload {
-		return spell.name + " (LO)"
-	} else {
-		return spell.name
-	}
-}
-
-func (spell ElectricSpell) GetTag() int32 {
-	if spell.IsLightningOverload {
-		return CastTagLightningOverload
-	} else {
-		return 0
-	}
-}
-
-func (spell ElectricSpell) GetCharacter() *core.Character {
-	return spell.Shaman.GetCharacter()
-}
-
-func (spell ElectricSpell) GetBaseManaCost() float64 {
-	return spell.baseManaCost
-}
-
-func (spell ElectricSpell) GetSpellSchool() stats.Stat {
-	return stats.NatureSpellPower
-}
-
-func (spell ElectricSpell) ApplyCastInputModifiers(input *core.DirectCastInput) {
-}
-
-func (spell ElectricSpell) GetCastInput(sim *core.Simulation, cast core.DirectCastAction) core.DirectCastInput {
-	input := core.DirectCastInput{
-		ManaCost: spell.baseManaCost,
-		CastTime: spell.baseCastTime,
-		CritMultiplier: 1.5,
+// Shared precomputation logic for LB and CL.
+func (shaman *Shaman) newElectricSpellTemplate(name string, actionID core.ActionID, baseManaCost float64, baseCastTime time.Duration, isLightningOverload bool) core.DirectCastAction {
+	template := core.DirectCastAction{
+		Cast: core.Cast{
+			Name: name,
+			ActionID: actionID,
+			Character: shaman.GetCharacter(),
+			BaseManaCost: baseManaCost,
+			ManaCost: baseManaCost,
+			CastTime: baseCastTime,
+			SpellSchool: stats.NatureSpellPower,
+			CritMultiplier: 1.5,
+		},
 	}
 
-	if spell.IsLightningOverload {
-		input.CastTime = 0
-		input.ManaCost = 0
-		input.IgnoreCooldowns = true
-		input.IgnoreManaCost = true
-	} else if spell.Shaman.Talents.LightningMastery > 0 {
+
+	if isLightningOverload {
+		template.Cast.Name += " (LO)"
+		template.Cast.Tag = CastTagLightningOverload
+		template.Cast.CastTime = 0
+		template.Cast.ManaCost = 0
+		template.Cast.IgnoreCooldowns = true
+		template.Cast.IgnoreManaCost = true
+	} else if shaman.Talents.LightningMastery > 0 {
 		// Convection applies against the base cost of the spell.
-		input.ManaCost -= spell.GetBaseManaCost() * spell.Shaman.convectionBonus
+		template.Cast.ManaCost -= template.BaseManaCost * float64(shaman.Talents.Convection) * 0.02
 
-		input.CastTime -= time.Millisecond * 100 * time.Duration(spell.Shaman.Talents.LightningMastery)
+		template.Cast.CastTime -= time.Millisecond * 100 * time.Duration(shaman.Talents.LightningMastery)
 	}
 
-	if spell.Shaman.ElementalFocusStacks > 0 {
-		// TODO: This should subtract 40% of base cost
-		input.ManaCost *= .6 // reduced by 40%
+	if shaman.Talents.ElementalFury {
+		template.Cast.CritMultiplier = 2
 	}
 
-	if spell.Shaman.Talents.ElementalFury {
-		input.CritMultiplier = 2
+	if !isLightningOverload && shaman.Talents.ElementalFocus {
+		template.Cast.OnCastComplete = func(sim *core.Simulation, cast *core.Cast) {
+			if shaman.ElementalFocusStacks > 0 {
+				shaman.ElementalFocusStacks--
+			}
+		}
+	} else {
+		template.Cast.OnCastComplete = func(sim *core.Simulation, cast *core.Cast) {}
 	}
 
-	return input
+	template.OnSpellMiss = func(sim *core.Simulation, cast *core.Cast) {}
+
+	return template
 }
 
-func (spell ElectricSpell) ApplyHitInputModifiers(hitInput *core.DirectCastDamageInput) {
-	hitInput.DamageMultiplier *= spell.Shaman.concussionBonus
-	if spell.IsLightningOverload {
+// Helper for precomputing hit inputs.
+func (shaman *Shaman) applyElectricSpellHitInputModifiers(hitInput *core.DirectCastDamageInput, isLightningOverload bool) {
+	hitInput.DamageMultiplier *= 1 + 0.01*float64(shaman.Talents.Concussion)
+	if isLightningOverload {
 		hitInput.DamageMultiplier *= 0.5
 	}
 
-	hitInput.BonusHit += float64(spell.Shaman.Talents.ElementalPrecision) * 0.02
-	hitInput.BonusHit += float64(spell.Shaman.Talents.NaturesGuidance) * 0.01
-	hitInput.BonusCrit += float64(spell.Shaman.Talents.TidalMastery) * 0.01
-	hitInput.BonusCrit += float64(spell.Shaman.Talents.CallOfThunder) * 0.01
+	hitInput.BonusSpellHitRating += float64(shaman.Talents.ElementalPrecision) * 2 * core.SpellHitRatingPerHitChance
+	hitInput.BonusSpellHitRating += float64(shaman.Talents.NaturesGuidance) * 1 * core.SpellHitRatingPerHitChance
+	hitInput.BonusSpellCritRating += float64(shaman.Talents.TidalMastery) * 1 * core.SpellCritRatingPerCritChance
+	hitInput.BonusSpellCritRating += float64(shaman.Talents.CallOfThunder) * 1 * core.SpellCritRatingPerCritChance
 
-	if spell.Shaman.Equip[items.ItemSlotRanged].ID == TotemOfStorms {
+	if shaman.Equip[items.ItemSlotRanged].ID == TotemOfStorms {
 		hitInput.BonusSpellPower += 33
-	} else if spell.Shaman.Equip[items.ItemSlotRanged].ID == TotemOfTheVoid {
+	} else if shaman.Equip[items.ItemSlotRanged].ID == TotemOfTheVoid {
 		hitInput.BonusSpellPower += 55
-	} else if spell.Shaman.Equip[items.ItemSlotRanged].ID == TotemOfAncestralGuidance {
+	} else if shaman.Equip[items.ItemSlotRanged].ID == TotemOfAncestralGuidance {
 		hitInput.BonusSpellPower += 85
 	}
 }
 
-func (spell ElectricSpell) OnCastComplete(sim *core.Simulation, cast core.DirectCastAction) {
-	if !spell.IsLightningOverload && spell.Shaman.ElementalFocusStacks > 0 {
-		spell.Shaman.ElementalFocusStacks--
+// Shared LB/CL logic that is dynamic, i.e. can't be precomputed.
+func (shaman *Shaman) applyElectricSpellInitModifiers(spell *core.DirectCastAction) {
+	if shaman.ElementalFocusStacks > 0 {
+		// TODO: This should subtract 40% of base cost
+		spell.Cast.ManaCost *= .6 // reduced by 40%
 	}
-}
-func (spell ElectricSpell) OnElectricSpellHit(sim *core.Simulation, cast core.DirectCastAction, result *core.DirectCastDamageResult) {
-	if spell.Shaman.Talents.ElementalFocus && result.Crit {
-		spell.Shaman.ElementalFocusStacks = 2
-	}
-}
-func (spell ElectricSpell) OnSpellMiss(sim *core.Simulation, cast core.DirectCastAction) {
 }

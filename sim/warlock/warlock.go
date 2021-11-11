@@ -35,8 +35,8 @@ func CurseOfElementsAura(malediction int) core.Aura {
 	return core.Aura{
 		ID:      CurseOfElementsAuraID,
 		Expires: core.NeverExpires,
-		OnSpellHit: func(sim *core.Simulation, cast core.DirectCastAction, result *core.DirectCastDamageResult) {
-			result.Damage *= multiplier
+		OnBeforeSpellHit: func(sim *core.Simulation, cast *core.Cast, hitInput *core.DirectCastDamageInput) {
+			hitInput.DamageMultiplier *= multiplier
 		},
 	}
 }

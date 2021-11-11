@@ -106,17 +106,17 @@ func NewMetricsAggregator(numAgents int, encounterDuration float64) *MetricsAggr
 }
 
 // Adds the results of an action to the aggregated metrics.
-func (aggregator *MetricsAggregator) AddCastAction(cast DirectCastAction, castResults []DirectCastDamageResult) {
+func (aggregator *MetricsAggregator) AddCastAction(cast *DirectCastAction, castResults []DirectCastDamageResult) {
 	actionID := cast.GetActionID()
 	tag := cast.GetTag()
 
 	actionKey := NewActionKey(actionID, tag)
 
-	agentID := cast.GetCharacter().ID
+	agentID := cast.Character.ID
 
 	iterationMetrics := &aggregator.agentIterations[agentID]
-	if !cast.castInput.IgnoreManaCost {
-		iterationMetrics.ManaSpent += cast.castInput.ManaCost
+	if !cast.IgnoreManaCost {
+		iterationMetrics.ManaSpent += cast.ManaCost
 	}
 
 	aggregateMetrics := &aggregator.agentAggregates[agentID]

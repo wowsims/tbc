@@ -102,7 +102,7 @@ type LBOnlyRotation struct {
 }
 
 func (rotation *LBOnlyRotation) ChooseAction(eleShaman *ElementalShaman, sim *core.Simulation) core.AgentAction {
-	return NewLightningBolt(sim, eleShaman.GetShaman(), sim.GetPrimaryTarget(), false)
+	return eleShaman.NewLightningBolt(sim, sim.GetPrimaryTarget(), false)
 }
 
 func (rotation *LBOnlyRotation) OnActionAccepted(eleShaman *ElementalShaman, sim *core.Simulation, action core.AgentAction) {
@@ -121,9 +121,9 @@ type CLOnCDRotation struct {
 
 func (rotation *CLOnCDRotation) ChooseAction(eleShaman *ElementalShaman, sim *core.Simulation) core.AgentAction {
 	if eleShaman.IsOnCD(ChainLightningCooldownID, sim.CurrentTime) {
-		return NewLightningBolt(sim, eleShaman.GetShaman(), sim.GetPrimaryTarget(), false)
+		return eleShaman.NewLightningBolt(sim, sim.GetPrimaryTarget(), false)
 	} else {
-		return NewChainLightning(sim, eleShaman.GetShaman(), sim.GetPrimaryTarget(), false)
+		return eleShaman.NewChainLightning(sim, sim.GetPrimaryTarget(), false)
 	}
 }
 
@@ -153,17 +153,17 @@ func (rotation *FixedRotation) temporaryHasteActive(eleShaman *ElementalShaman) 
 
 func (rotation *FixedRotation) ChooseAction(eleShaman *ElementalShaman, sim *core.Simulation) core.AgentAction {
 	if rotation.numLBsSinceLastCL < rotation.numLBsPerCL {
-		return NewLightningBolt(sim, eleShaman.GetShaman(), sim.GetPrimaryTarget(), false)
+		return eleShaman.NewLightningBolt(sim, sim.GetPrimaryTarget(), false)
 	}
 
 	if !eleShaman.IsOnCD(ChainLightningCooldownID, sim.CurrentTime) {
-		return NewChainLightning(sim, eleShaman.GetShaman(), sim.GetPrimaryTarget(), false)
+		return eleShaman.NewChainLightning(sim, sim.GetPrimaryTarget(), false)
 	}
 
 	// If we have a temporary haste effect (like bloodlust or quags eye) then
 	// we should add LB casts instead of waiting
 	if rotation.temporaryHasteActive(eleShaman) {
-		return NewLightningBolt(sim, eleShaman.GetShaman(), sim.GetPrimaryTarget(), false)
+		return eleShaman.NewLightningBolt(sim, sim.GetPrimaryTarget(), false)
 	}
 
 	return core.NewWaitAction(sim, eleShaman.GetCharacter(), eleShaman.GetRemainingCD(ChainLightningCooldownID, sim.CurrentTime))
@@ -202,10 +202,10 @@ type CLOnClearcastRotation struct {
 
 func (rotation *CLOnClearcastRotation) ChooseAction(eleShaman *ElementalShaman, sim *core.Simulation) core.AgentAction {
 	if eleShaman.IsOnCD(ChainLightningCooldownID, sim.CurrentTime) || !rotation.prevPrevCastProccedCC {
-		return NewLightningBolt(sim, eleShaman.GetShaman(), sim.GetPrimaryTarget(), false)
+		return eleShaman.NewLightningBolt(sim, sim.GetPrimaryTarget(), false)
 	}
 
-	return NewChainLightning(sim, eleShaman.GetShaman(), sim.GetPrimaryTarget(), false)
+	return eleShaman.NewChainLightning(sim, sim.GetPrimaryTarget(), false)
 }
 
 func (rotation *CLOnClearcastRotation) OnActionAccepted(eleShaman *ElementalShaman, sim *core.Simulation, action core.AgentAction) {

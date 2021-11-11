@@ -13,9 +13,6 @@ func NewShaman(character core.Character, talents proto.ShamanTalents, selfBuffs 
 		Character: character,
 		Talents:   talents,
 		SelfBuffs: selfBuffs,
-
-		convectionBonus: 0.02 * float64(talents.Convection),
-		concussionBonus: 1 + 0.01*float64(talents.Concussion),
 	}
 
 	// Add Shaman stat dependencies
@@ -65,9 +62,21 @@ type Shaman struct {
 
 	ElementalFocusStacks byte
 
-	// cache
-	convectionBonus float64
-	concussionBonus float64
+	// "object pool" for shaman spells that are currently being cast.
+	electricSpell   core.DirectCastAction
+	electricSpellLO core.DirectCastAction
+
+	// Temporary hitInput slices to be used in object pool casts to avoid modifying
+	// templates directly (because slices are copied by reference).
+	singleHitInputs []core.DirectCastDamageInput
+	clHitInputs []core.DirectCastDamageInput
+
+	// Precomputed template cast objects for quickly resetting cast fields.
+	lightningBoltTemplate    core.DirectCastAction
+	lightningBoltLOTemplate  core.DirectCastAction
+
+	chainLightningTemplate   core.DirectCastAction
+	chainLightningLOTemplate core.DirectCastAction
 }
 
 // Implemented by each Shaman spec.
@@ -106,6 +115,20 @@ func (shaman *Shaman) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {
 	}
 }
 
+func (shaman *Shaman) Init(sim *core.Simulation) {
+	// Precompute all the spell templates.
+	shaman.lightningBoltTemplate = shaman.newLightningBoltTemplate(sim, false)
+	shaman.lightningBoltLOTemplate = shaman.newLightningBoltTemplate(sim, true)
+	shaman.chainLightningTemplate = shaman.newChainLightningTemplate(sim, false)
+	shaman.chainLightningLOTemplate = shaman.newChainLightningTemplate(sim, true)
+
+	// Need to allocate separate hit input slices so we can avoid modifying the template versions.
+	shaman.singleHitInputs = []core.DirectCastDamageInput{
+		core.DirectCastDamageInput{},
+	}
+	shaman.clHitInputs = make([]core.DirectCastDamageInput, len(shaman.chainLightningTemplate.HitInputs))
+}
+
 func (shaman *Shaman) Reset(sim *core.Simulation) {
 	shaman.Character.Reset(sim)
 }
@@ -131,11 +154,11 @@ func (shaman *Shaman) registerElementalMasteryCD() {
 					ID:      ElementalMasteryAuraID,
 					Name:    "Elemental Mastery",
 					Expires: core.NeverExpires,
-					OnCast: func(sim *core.Simulation, cast core.DirectCastAction, input *core.DirectCastInput) {
-						input.ManaCost = 0
-						input.GuaranteedCrit = true
+					OnCast: func(sim *core.Simulation, cast *core.Cast) {
+						cast.ManaCost = 0
+						cast.GuaranteedCrit = true
 					},
-					OnCastComplete: func(sim *core.Simulation, cast core.DirectCastAction) {
+					OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
 						// Remove the buff and put skill on CD
 						character.SetCD(ElementalMasteryCooldownID, sim.CurrentTime+time.Minute*3)
 						character.RemoveAura(sim, ElementalMasteryAuraID)
