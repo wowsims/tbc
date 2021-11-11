@@ -5,7 +5,7 @@ import (
 )
 
 type ItemDeclaration struct {
-	ID    int
+	ID         int
 	Categories []proto.ItemCategory // Which categories this item belongs to.
 }
 
@@ -165,6 +165,7 @@ var ItemDeclarations = []ItemDeclaration{
 	{ /** Incanter's Gloves */ ID: 27508, Categories: []proto.ItemCategory{proto.ItemCategory_ItemCategoryCaster}},
 	{ /** Incanter's Robe */ ID: 28229, Categories: []proto.ItemCategory{proto.ItemCategory_ItemCategoryCaster}},
 	{ /** Incanter's Trousers */ ID: 27838, Categories: []proto.ItemCategory{proto.ItemCategory_ItemCategoryCaster}},
+	{ /** Jade Pendant of Blasting */ ID: 20966, Categories: []proto.ItemCategory{proto.ItemCategory_ItemCategoryCaster}},
 	{ /** Jewel of Infinite Possibilities */ ID: 28734, Categories: []proto.ItemCategory{proto.ItemCategory_ItemCategoryCaster}},
 	{ /** Karaborian Talisman */ ID: 28781, Categories: []proto.ItemCategory{proto.ItemCategory_ItemCategoryCaster}},
 	{ /** Khadgar's Kilt of Abjuration */ ID: 28185, Categories: []proto.ItemCategory{proto.ItemCategory_ItemCategoryCaster}},
