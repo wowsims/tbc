@@ -20,20 +20,20 @@ func NewShaman(character core.Character, talents proto.ShamanTalents, selfBuffs 
 
 	// Add Shaman stat dependencies
 	shaman.AddStatDependency(stats.StatDependency{
-		SourceStat: stats.Intellect,
+		SourceStat:   stats.Intellect,
 		ModifiedStat: stats.SpellCrit,
 		Modifier: func(intellect float64, spellCrit float64) float64 {
-			return spellCrit + (intellect / 78.1) * core.SpellCritRatingPerCritChance
+			return spellCrit + (intellect/78.1)*core.SpellCritRatingPerCritChance
 		},
 	})
 
 	if shaman.Talents.UnrelentingStorm > 0 {
 		coeff := 0.02 * float64(shaman.Talents.UnrelentingStorm)
 		shaman.AddStatDependency(stats.StatDependency{
-			SourceStat: stats.Intellect,
+			SourceStat:   stats.Intellect,
 			ModifiedStat: stats.MP5,
 			Modifier: func(intellect float64, mp5 float64) float64 {
-				return mp5 + intellect * coeff
+				return mp5 + intellect*coeff
 			},
 		})
 	}
@@ -117,6 +117,7 @@ func (shaman *Shaman) Advance(sim *core.Simulation, elapsedTime time.Duration) {
 
 var ElementalMasteryAuraID = core.NewAuraID()
 var ElementalMasteryCooldownID = core.NewCooldownID()
+
 func (shaman *Shaman) registerElementalMasteryCD() {
 	if !shaman.Talents.ElementalMastery {
 		return
@@ -124,7 +125,7 @@ func (shaman *Shaman) registerElementalMasteryCD() {
 
 	shaman.AddMajorCooldown(core.MajorCooldown{
 		CooldownID: ElementalMasteryCooldownID,
-		Cooldown: time.Minute*3,
+		Cooldown:   time.Minute * 3,
 		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
 			return func(sim *core.Simulation, character *core.Character) bool {
 				character.AddAura(sim, core.Aura{
@@ -149,34 +150,43 @@ func (shaman *Shaman) registerElementalMasteryCD() {
 }
 
 func init() {
-	core.BaseStats[core.BaseStatsKey{ Race: proto.Race_RaceDraenei, Class: proto.Class_ClassShaman }] = stats.Stats{
+	// To calculate base stats, get a naked level 70 of the race you want, ideally without any talents to mess up base stats.
+	//  basic stats are as-shown (str/agi/stm/int/spirit)
+
+	// Base Spell Crit is calculated by
+	//   1. Take as-shown value (troll shaman have 3.5%)
+	//   2. Calculate the bonus from int (for troll shaman that would be 104/78.1=1.331% crit)
+	//   3. Subtract as-shown from int bouns (3.5-1.331=2.169)
+	//   4. 2.169*22.08 (rating per crit percent) = 47.89 crit rating.
+
+	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceDraenei, Class: proto.Class_ClassShaman}] = stats.Stats{
 		stats.Strength:  103,
 		stats.Agility:   61,
 		stats.Stamina:   113,
 		stats.Intellect: 109,
 		stats.Spirit:    122,
 		stats.Mana:      2678,
-		stats.SpellCrit: 48.576,
+		stats.SpellCrit: 47.89,
 	}
-	core.BaseStats[core.BaseStatsKey{ Race: proto.Race_RaceOrc, Class: proto.Class_ClassShaman }] = stats.Stats{
+	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceOrc, Class: proto.Class_ClassShaman}] = stats.Stats{
 		stats.Intellect: 104,
 		stats.Mana:      2678,
 		stats.Spirit:    135,
-		stats.SpellCrit: 48.576,
+		stats.SpellCrit: 47.89,
 	}
-	core.BaseStats[core.BaseStatsKey{ Race: proto.Race_RaceTauren, Class: proto.Class_ClassShaman }] = stats.Stats{
+	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceTauren, Class: proto.Class_ClassShaman}] = stats.Stats{
 		stats.Intellect: 104,
 		stats.Mana:      2678,
 		stats.Spirit:    135,
-		stats.SpellCrit: 48.576,
+		stats.SpellCrit: 47.89,
 	}
 
 	trollStats := stats.Stats{
 		stats.Intellect: 104,
 		stats.Mana:      2678,
 		stats.Spirit:    135,
-		stats.SpellCrit: 48.576,
+		stats.SpellCrit: 47.89,
 	}
-	core.BaseStats[core.BaseStatsKey{ Race: proto.Race_RaceTroll10, Class: proto.Class_ClassShaman }] = trollStats
-	core.BaseStats[core.BaseStatsKey{ Race: proto.Race_RaceTroll30, Class: proto.Class_ClassShaman }] = trollStats
+	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceTroll10, Class: proto.Class_ClassShaman}] = trollStats
+	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceTroll30, Class: proto.Class_ClassShaman}] = trollStats
 }
