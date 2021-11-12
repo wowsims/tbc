@@ -18,7 +18,7 @@ func ApplyTheLightningCapacitor(agent core.Agent) {
 
 	character := agent.GetCharacter()
 	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
-		templateGen := core.NewDirectCastTemplateGenerator(newLightningCapacitorCastTemplate(sim, character))
+		templateGen := core.NewDirectCastGenerator(newLightningCapacitorCastTemplate(sim, character))
 		charges := 0
 
 		const icdDur = time.Millisecond * 2500
@@ -68,15 +68,13 @@ func newLightningCapacitorCastTemplate(sim *core.Simulation, character *core.Cha
 			OnCastComplete:  func(sim *core.Simulation, cast *core.Cast) {},
 		},
 		HitInputs: []core.DirectCastDamageInput{
-			core.DirectCastDamageInput{
+			{
 				MinBaseDamage:    694,
 				MaxBaseDamage:    807,
 				DamageMultiplier: 1,
 			},
 		},
-		HitResults: []core.DirectCastDamageResult{
-			core.DirectCastDamageResult{},
-		},
+		HitResults:  []core.DirectCastDamageResult{{}},
 		OnSpellHit:  func(sim *core.Simulation, cast *core.Cast, result *core.DirectCastDamageResult) {},
 		OnSpellMiss: func(sim *core.Simulation, cast *core.Cast) {},
 	}

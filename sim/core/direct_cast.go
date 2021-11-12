@@ -209,10 +209,10 @@ func (action *DirectCastAction) calculateDirectCastDamage(sim *Simulation, damag
 	return result
 }
 
-type DirectCastTemplateGenerator func() DirectCastAction
+type DirectCastGenerator func() DirectCastAction
 
-// NewDirectCastTemplateGenerator will take in a cast template and create a generator so you dont have to manually manage hit inputs.
-func NewDirectCastTemplateGenerator(template DirectCastAction) DirectCastTemplateGenerator {
+// NewDirectCastGenerator will take in a cast template and create a generator so you dont have to manually manage hit inputs.
+func NewDirectCastGenerator(template DirectCastAction) DirectCastGenerator {
 	hitInput := make([]DirectCastDamageInput, len(template.HitInputs))
 	return func() DirectCastAction {
 		newAction := template

@@ -66,12 +66,12 @@ type Shaman struct {
 	electricSpell   core.DirectCastAction
 	electricSpellLO core.DirectCastAction
 
-	// Precomputed template cast objects for quickly resetting cast fields.
-	lightningBoltTemplate   core.DirectCastTemplateGenerator
-	lightningBoltLOTemplate core.DirectCastTemplateGenerator
+	// Precomputed template cast generator for quickly resetting cast fields.
+	lightningBoltTemplate   core.DirectCastGenerator
+	lightningBoltLOTemplate core.DirectCastGenerator
 
-	chainLightningTemplate   core.DirectCastTemplateGenerator
-	chainLightningLOTemplate core.DirectCastTemplateGenerator
+	chainLightningTemplate   core.DirectCastGenerator
+	chainLightningLOTemplate core.DirectCastGenerator
 }
 
 // Implemented by each Shaman spec.
@@ -112,10 +112,10 @@ func (shaman *Shaman) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {
 
 func (shaman *Shaman) Init(sim *core.Simulation) {
 	// Precompute all the spell templates.
-	shaman.lightningBoltTemplate = core.NewDirectCastTemplateGenerator(shaman.newLightningBoltTemplate(sim, false))
-	shaman.lightningBoltLOTemplate = core.NewDirectCastTemplateGenerator(shaman.newLightningBoltTemplate(sim, true))
-	shaman.chainLightningTemplate = core.NewDirectCastTemplateGenerator(shaman.newChainLightningTemplate(sim, false))
-	shaman.chainLightningLOTemplate = core.NewDirectCastTemplateGenerator(shaman.newChainLightningTemplate(sim, true))
+	shaman.lightningBoltTemplate = shaman.newLightningBoltTemplate(sim, false)
+	shaman.lightningBoltLOTemplate = shaman.newLightningBoltTemplate(sim, true)
+	shaman.chainLightningTemplate = shaman.newChainLightningTemplate(sim, false)
+	shaman.chainLightningLOTemplate = shaman.newChainLightningTemplate(sim, true)
 }
 
 func (shaman *Shaman) Reset(sim *core.Simulation) {

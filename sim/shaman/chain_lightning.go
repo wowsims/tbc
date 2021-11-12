@@ -11,7 +11,7 @@ const SpellIDCL6 int32 = 25442
 var ChainLightningCooldownID = core.NewCooldownID()
 
 // Returns a cast object for Chain Lightning with as many fields precomputed as possible.
-func (shaman *Shaman) newChainLightningTemplate(sim *core.Simulation, isLightningOverload bool) core.DirectCastAction {
+func (shaman *Shaman) newChainLightningTemplate(sim *core.Simulation, isLightningOverload bool) core.DirectCastGenerator {
 	spellTemplate := shaman.newElectricSpellTemplate(
 		"Chain Lightning",
 		core.ActionID{
@@ -69,7 +69,7 @@ func (shaman *Shaman) newChainLightningTemplate(sim *core.Simulation, isLightnin
 		}
 	}
 
-	return spellTemplate
+	return core.NewDirectCastGenerator(spellTemplate)
 }
 
 func (shaman *Shaman) NewChainLightning(sim *core.Simulation, target *core.Target, isLightningOverload bool) *core.DirectCastAction {
