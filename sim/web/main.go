@@ -16,6 +16,7 @@ import (
 	"syscall"
 	"time"
 
+	dist "github.com/wowsims/tbc/binary_dist"
 	"github.com/wowsims/tbc/sim"
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/proto"
@@ -28,8 +29,7 @@ func init() {
 }
 
 func main() {
-	var useFS = flag.Bool("usefs", true, "Use local file system and wasm. Set to true for dev")
-	// TODO: usefs for now is set to true until we can solve how to embed the dist.
+	var useFS = flag.Bool("usefs", false, "Use local file system and wasm. Set to true during development.")
 	var host = flag.String("host", ":3333", "URL to host the interface on.")
 	var launch = flag.Bool("launch", true, "auto launch browser")
 
@@ -45,7 +45,7 @@ func runServer(useFS bool, host string, launchBrowser bool, inputReader *bufio.R
 		fs = http.FileServer(http.Dir("./dist"))
 	} else {
 		log.Printf("Embedded file server running.")
-		// fs = http.FileServer(http.FS(dist.FS))
+		fs = http.FileServer(http.FS(dist.FS))
 	}
 
 	http.HandleFunc("/statWeights", handleAPI)
@@ -58,11 +58,14 @@ func runServer(useFS bool, host string, launchBrowser bool, inputReader *bufio.R
 		if strings.HasSuffix(req.URL.Path, ".wasm") {
 			resp.Header().Set("content-type", "application/wasm")
 		}
+		if strings.HasSuffix(req.URL.Path, "sim_worker.js") {
+			req.URL.Path = strings.Replace(req.URL.Path, "sim_worker.js", "net_worker.js", 1)
+		}
 		fs.ServeHTTP(resp, req)
 	})
 
 	if launchBrowser {
-		url := fmt.Sprintf("http://localhost%s/elemental_shaman/", host)
+		url := fmt.Sprintf("http://localhost%s/tbc/elemental_shaman/", host)
 		log.Printf("Launching interface on %s", url)
 		go func() {
 			var cmd *exec.Cmd
@@ -89,6 +92,11 @@ func runServer(useFS bool, host string, launchBrowser bool, inputReader *bufio.R
 	c := make(chan os.Signal, 10)
 	signal.Notify(c, syscall.SIGINT)
 
+	go func() {
+		<-c
+		log.Printf("Shutting down")
+		os.Exit(0)
+	}()
 	fmt.Printf("Enter Command... '?' for list\n")
 	for {
 		fmt.Printf("> ")
@@ -138,10 +146,18 @@ type apiHandler struct {
 
 // Handlers to decode and handle each proto function
 var handlers = map[string]apiHandler{
-	"/individualSim": {msg: func() googleProto.Message { return &proto.IndividualSimRequest{} }, handle: func(msg googleProto.Message) googleProto.Message { return core.RunSimulation(msg.(*proto.IndividualSimRequest)) }},
-	"/statWeights":   {msg: func() googleProto.Message { return &proto.StatWeightsRequest{} }, handle: func(msg googleProto.Message) googleProto.Message { return core.StatWeights(msg.(*proto.StatWeightsRequest)) }},
-	"/computeStats":  {msg: func() googleProto.Message { return &proto.ComputeStatsRequest{} }, handle: func(msg googleProto.Message) googleProto.Message { return core.ComputeStats(msg.(*proto.ComputeStatsRequest)) }},
-	"/gearList":      {msg: func() googleProto.Message { return &proto.GearListRequest{} }, handle: func(msg googleProto.Message) googleProto.Message { return core.GetGearList(msg.(*proto.GearListRequest)) }},
+	"/individualSim": {msg: func() googleProto.Message { return &proto.IndividualSimRequest{} }, handle: func(msg googleProto.Message) googleProto.Message {
+		return core.RunSimulation(msg.(*proto.IndividualSimRequest))
+	}},
+	"/statWeights": {msg: func() googleProto.Message { return &proto.StatWeightsRequest{} }, handle: func(msg googleProto.Message) googleProto.Message {
+		return core.StatWeights(msg.(*proto.StatWeightsRequest))
+	}},
+	"/computeStats": {msg: func() googleProto.Message { return &proto.ComputeStatsRequest{} }, handle: func(msg googleProto.Message) googleProto.Message {
+		return core.ComputeStats(msg.(*proto.ComputeStatsRequest))
+	}},
+	"/gearList": {msg: func() googleProto.Message { return &proto.GearListRequest{} }, handle: func(msg googleProto.Message) googleProto.Message {
+		return core.GetGearList(msg.(*proto.GearListRequest))
+	}},
 }
 
 // handleAPI is generic handler for any api function using protos.

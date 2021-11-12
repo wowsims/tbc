@@ -53,9 +53,9 @@ type Character struct {
 
 func NewCharacter(player proto.Player) Character {
 	character := Character{
-		Race:     player.Options.Race,
-		Class:    player.Options.Class,
-		Equip:    items.ProtoToEquipment(*player.Equipment),
+		Race:  player.Options.Race,
+		Class: player.Options.Class,
+		Equip: items.ProtoToEquipment(*player.Equipment),
 
 		auraTracker: newAuraTracker(false),
 	}
@@ -64,7 +64,7 @@ func NewCharacter(player proto.Player) Character {
 		character.consumes = *player.Options.Consumes
 	}
 
-	character.AddStats(BaseStats[BaseStatsKey{ Race: character.Race, Class: character.Class }])
+	character.AddStats(BaseStats[BaseStatsKey{Race: character.Race, Class: character.Class}])
 	character.AddStats(character.Equip.Stats())
 
 	if player.CustomStats != nil {
@@ -75,17 +75,17 @@ func NewCharacter(player proto.Player) Character {
 
 	// Universal stat dependencies
 	character.AddStatDependency(stats.StatDependency{
-		SourceStat: stats.Agility,
+		SourceStat:   stats.Agility,
 		ModifiedStat: stats.Armor,
 		Modifier: func(agility float64, armor float64) float64 {
-			return armor + agility * 2
+			return armor + agility*2
 		},
 	})
 	character.AddStatDependency(stats.StatDependency{
-		SourceStat: stats.Intellect,
+		SourceStat:   stats.Intellect,
 		ModifiedStat: stats.Mana,
 		Modifier: func(intellect float64, mana float64) float64 {
-			return mana + intellect * 15
+			return mana + intellect*15
 		},
 	})
 
@@ -153,12 +153,12 @@ func (character *Character) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {
 	if character.Race == proto.Race_RaceDraenei {
 		class := character.Class
 		if class == proto.Class_ClassHunter ||
-				class == proto.Class_ClassPaladin ||
-				class == proto.Class_ClassWarrior {
+			class == proto.Class_ClassPaladin ||
+			class == proto.Class_ClassWarrior {
 			partyBuffs.DraeneiRacialMelee = true
 		} else if class == proto.Class_ClassMage ||
-				class == proto.Class_ClassPriest ||
-				class == proto.Class_ClassShaman {
+			class == proto.Class_ClassPriest ||
+			class == proto.Class_ClassShaman {
 			partyBuffs.DraeneiRacialCaster = true
 		}
 	}
@@ -259,7 +259,7 @@ func (character *Character) TimeUntilManaRegen(desiredMana float64) time.Duratio
 
 func (character *Character) HasTrinketEquipped(itemID int32) bool {
 	return character.Equip[items.ItemSlotTrinket1].ID == itemID ||
-			character.Equip[items.ItemSlotTrinket2].ID == itemID
+		character.Equip[items.ItemSlotTrinket2].ID == itemID
 }
 
 func (character *Character) HasMetaGemEquipped(gemID int32) bool {
@@ -277,3 +277,16 @@ type BaseStatsKey struct {
 }
 
 var BaseStats = map[BaseStatsKey]stats.Stats{}
+
+// To calculate base stats, get a naked level 70 of the race/class you want, ideally without any talents to mess up base stats.
+//  Basic stats are as-shown (str/agi/stm/int/spirit)
+
+// Base Spell Crit is calculated by
+//   1. Take as-shown value (troll shaman have 3.5%)
+//   2. Calculate the bonus from int (for troll shaman that would be 104/78.1=1.331% crit)
+//   3. Subtract as-shown from int bouns (3.5-1.331=2.169)
+//   4. 2.169*22.08 (rating per crit percent) = 47.89 crit rating.
+
+//  Base Mana = as-shown - int*15
+
+// I assume a similar processes can be applied for other stats.
