@@ -104,14 +104,14 @@ For a new sim, make the following changes:
 That's it! Now when you run `make` there will be generated .go and .ts code in `sim/core/proto` and `ui/core/proto` respectively. If you aren't familiar with protos, take a quick look at them to see what's happening.
 
 ## Add items to the Items Generator
-`generate_items/item_declarations.go` contains a list of all items known to the sim, as well as which sims that care about each item. Add the items needed by your sim and make sure your spec is listed under all of them. Run `make items` when you're done.
+`generate_items/item_declarations.go` contains a list of all items known to the sim, as well as a category label for each item. Add the items needed by your sim and run `make items` when you're done.
 
 ## Implement the Sim
 This step is where most of the magic happens. A few highlights to start understanding the sim code:
   - `sim/wasm/main.go` This file is the actual main function, for the [.wasm binary](https://webassembly.org/ "https://webassembly.org/") used by the UI. You shouldn't ever need to touch this, but just know its here.
-  - `sim/api.go` and `sim/api_impl.go` This is where the action starts. These files implement the request/response messages defined in `proto/api.proto`.
+  - `sim/core/api.go` This is where the action starts. This file implements the request/response messages defined in `proto/api.proto`.
   - `sim/core/sim.go` Orchestrates everything. Main event loop is in `Simulation.RunOnce`.
-  - `sim/core/agent.go` Agent is the interface you'll be implementing. This file also contains AgentAction, which you'll implement for each spell/ability.
+  - `sim/core/agent.go` An Agent can be thought of as the 'Player', i.e. the person controlling the game. This is the interface you'll be implementing.
   - `sim/core/character.go` A Character holds all the stats/cooldowns/gear/etc common to any WoW character. Each Agent has a Character that it controls.
 
 Read through the core code and some examples from other classes/specs to get a feel for what's needed. Hopefully `sim/core` already includes what you need, but most classes have at least 1 unique mechanic so you may need to touch `core` as well.
@@ -127,11 +127,7 @@ If you've made it this far, you're almost there! The UI is very generalized and 
 No .html is needed, it will be generated based on `ui/index_template.html` and the `$SPEC` name.
 
 Steps for building a new UI:
-  - Modify `ui/core/proto_utils/utils.ts` to include boilerplate for your `$SPEC` name.
-  - If it doesn't already exist, create a Talents picker at `ui/core/talents/YOUR_CLASS.ts` for your class. This part can be annoying but it isn't difficult.
-    - When filling out the `spellIds` field, note that talent levels will sometimes (but not always) have incremental spell IDs. When `spellIds.length < maxPoints` the code will assume the remaining IDs are incremental from the last one, so only fill as many as necessary.
-    - Note that the `fieldName` field must match a field name on the talents proto message you defined in `proto/YOUR_CLASS.proto`. This maps the talents onto the proto for making sim requests.
-    - When the new talents are done, update `ui/core/talents/factory.ts` to map the spec enum onto the talents picker.
+  - Modify `ui/core/proto_utils/utils.ts` to include boilerplate for your `$SPEC` name if it isn't already there.
   - Configure the UI by writing `ui/$SPEC/index.ts` and `ui/$SPEC/index.scss`. Start by copying from another spec's code, and change the configuration as needed.
   - Finally, add a rule to the `makefile` for the new sim site. Just copy from the other site rules already there and change the `$SPEC` names.
 
