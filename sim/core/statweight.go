@@ -1,7 +1,6 @@
 package core
 
 import (
-	"log"
 	"math"
 	"math/rand"
 	"sync"
@@ -74,7 +73,6 @@ func CalcStatWeight(isr proto.IndividualSimRequest, statsToWeigh []stats.Stat, r
 		result.EpValues[stat] = result.Weights[stat] / result.Weights[referenceStat]
 		result.WeightsStdev[stat] = computeStDevFromHists(isr.SimOptions.Iterations, mod, dpsHists[stat], baselineResult.Agents[0].DpsHist, nil, statMods[referenceStat])
 		result.EpValuesStdev[stat] = computeStDevFromHists(isr.SimOptions.Iterations, mod, dpsHists[stat], baselineResult.Agents[0].DpsHist, dpsHists[referenceStat], statMods[referenceStat])
-		log.Printf("%s Weight: %0.2f +/- %0.2f", stat.StatName(), result.Weights[stat], result.WeightsStdev[stat])
 	}
 
 	return result

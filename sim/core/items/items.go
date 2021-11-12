@@ -29,24 +29,8 @@ func init() {
 			fmt.Printf("Found dup item: %s\n", v.Name)
 			panic("no dupes allowed")
 		}
-		if it, ok := ByName[v.Name]; ok {
-			fmt.Printf("Found dup item: %s\n", v.Name)
-			statsMatch := it.Type == v.Type
-			for i, v := range v.Stats {
-				if len(it.Stats) <= i {
-					break
-				}
-				if it.Stats[i] != v {
-					statsMatch = false
-				}
-			}
-			if !statsMatch {
-				// log.Printf("Mismatched slot/stats: \n\tMoreItem: \n%#v\n\t FirstSet: \n%#v", it, v)
-			}
-		} else {
-			ByName[v.Name] = v
-			ByID[v.ID] = v
-		}
+		ByName[v.Name] = v
+		ByID[v.ID] = v
 	}
 }
 
@@ -308,7 +292,7 @@ func (equipment Equipment) Stats() stats.Stats {
 			for gemIndex, gem := range item.Gems {
 				if !ColorIntersects(gem.Color, item.GemSockets[gemIndex]) {
 					allMatch = false
-					break;
+					break
 				}
 			}
 

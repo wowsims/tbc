@@ -17,20 +17,20 @@ func NewShaman(character core.Character, talents proto.ShamanTalents, selfBuffs 
 
 	// Add Shaman stat dependencies
 	shaman.AddStatDependency(stats.StatDependency{
-		SourceStat: stats.Intellect,
+		SourceStat:   stats.Intellect,
 		ModifiedStat: stats.SpellCrit,
 		Modifier: func(intellect float64, spellCrit float64) float64 {
-			return spellCrit + (intellect / 78.1) * core.SpellCritRatingPerCritChance
+			return spellCrit + (intellect/78.1)*core.SpellCritRatingPerCritChance
 		},
 	})
 
 	if shaman.Talents.UnrelentingStorm > 0 {
 		coeff := 0.02 * float64(shaman.Talents.UnrelentingStorm)
 		shaman.AddStatDependency(stats.StatDependency{
-			SourceStat: stats.Intellect,
+			SourceStat:   stats.Intellect,
 			ModifiedStat: stats.MP5,
 			Modifier: func(intellect float64, mp5 float64) float64 {
-				return mp5 + intellect * coeff
+				return mp5 + intellect*coeff
 			},
 		})
 	}
@@ -69,11 +69,11 @@ type Shaman struct {
 	// Temporary hitInput slices to be used in object pool casts to avoid modifying
 	// templates directly (because slices are copied by reference).
 	singleHitInputs []core.DirectCastDamageInput
-	clHitInputs []core.DirectCastDamageInput
+	clHitInputs     []core.DirectCastDamageInput
 
 	// Precomputed template cast objects for quickly resetting cast fields.
-	lightningBoltTemplate    core.DirectCastAction
-	lightningBoltLOTemplate  core.DirectCastAction
+	lightningBoltTemplate   core.DirectCastAction
+	lightningBoltLOTemplate core.DirectCastAction
 
 	chainLightningTemplate   core.DirectCastAction
 	chainLightningLOTemplate core.DirectCastAction
@@ -140,6 +140,7 @@ func (shaman *Shaman) Advance(sim *core.Simulation, elapsedTime time.Duration) {
 
 var ElementalMasteryAuraID = core.NewAuraID()
 var ElementalMasteryCooldownID = core.NewCooldownID()
+
 func (shaman *Shaman) registerElementalMasteryCD() {
 	if !shaman.Talents.ElementalMastery {
 		return
@@ -147,7 +148,7 @@ func (shaman *Shaman) registerElementalMasteryCD() {
 
 	shaman.AddMajorCooldown(core.MajorCooldown{
 		CooldownID: ElementalMasteryCooldownID,
-		Cooldown: time.Minute*3,
+		Cooldown:   time.Minute * 3,
 		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
 			return func(sim *core.Simulation, character *core.Character) bool {
 				character.AddAura(sim, core.Aura{
@@ -172,34 +173,34 @@ func (shaman *Shaman) registerElementalMasteryCD() {
 }
 
 func init() {
-	core.BaseStats[core.BaseStatsKey{ Race: proto.Race_RaceDraenei, Class: proto.Class_ClassShaman }] = stats.Stats{
+	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceDraenei, Class: proto.Class_ClassShaman}] = stats.Stats{
 		stats.Strength:  103,
 		stats.Agility:   61,
 		stats.Stamina:   113,
 		stats.Intellect: 109,
 		stats.Spirit:    122,
 		stats.Mana:      2678,
-		stats.SpellCrit: 48.576,
+		stats.SpellCrit: 47.89,
 	}
-	core.BaseStats[core.BaseStatsKey{ Race: proto.Race_RaceOrc, Class: proto.Class_ClassShaman }] = stats.Stats{
+	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceOrc, Class: proto.Class_ClassShaman}] = stats.Stats{
 		stats.Intellect: 104,
 		stats.Mana:      2678,
 		stats.Spirit:    135,
-		stats.SpellCrit: 48.576,
+		stats.SpellCrit: 47.89,
 	}
-	core.BaseStats[core.BaseStatsKey{ Race: proto.Race_RaceTauren, Class: proto.Class_ClassShaman }] = stats.Stats{
+	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceTauren, Class: proto.Class_ClassShaman}] = stats.Stats{
 		stats.Intellect: 104,
 		stats.Mana:      2678,
 		stats.Spirit:    135,
-		stats.SpellCrit: 48.576,
+		stats.SpellCrit: 47.89,
 	}
 
 	trollStats := stats.Stats{
 		stats.Intellect: 104,
 		stats.Mana:      2678,
 		stats.Spirit:    135,
-		stats.SpellCrit: 48.576,
+		stats.SpellCrit: 47.89,
 	}
-	core.BaseStats[core.BaseStatsKey{ Race: proto.Race_RaceTroll10, Class: proto.Class_ClassShaman }] = trollStats
-	core.BaseStats[core.BaseStatsKey{ Race: proto.Race_RaceTroll30, Class: proto.Class_ClassShaman }] = trollStats
+	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceTroll10, Class: proto.Class_ClassShaman}] = trollStats
+	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceTroll30, Class: proto.Class_ClassShaman}] = trollStats
 }
