@@ -66,17 +66,12 @@ type Shaman struct {
 	electricSpell   core.DirectCastAction
 	electricSpellLO core.DirectCastAction
 
-	// Temporary hitInput slices to be used in object pool casts to avoid modifying
-	// templates directly (because slices are copied by reference).
-	singleHitInputs []core.DirectCastDamageInput
-	clHitInputs     []core.DirectCastDamageInput
+	// Precomputed templated cast generator for quickly resetting cast fields.
+	lightningBoltCastGenerator   core.DirectCastGenerator
+	lightningBoltLOCastGenerator core.DirectCastGenerator
 
-	// Precomputed template cast objects for quickly resetting cast fields.
-	lightningBoltTemplate   core.DirectCastAction
-	lightningBoltLOTemplate core.DirectCastAction
-
-	chainLightningTemplate   core.DirectCastAction
-	chainLightningLOTemplate core.DirectCastAction
+	chainLightningCastGenerator   core.DirectCastGenerator
+	chainLightningLOCastGenerator core.DirectCastGenerator
 }
 
 // Implemented by each Shaman spec.
@@ -117,16 +112,10 @@ func (shaman *Shaman) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {
 
 func (shaman *Shaman) Init(sim *core.Simulation) {
 	// Precompute all the spell templates.
-	shaman.lightningBoltTemplate = shaman.newLightningBoltTemplate(sim, false)
-	shaman.lightningBoltLOTemplate = shaman.newLightningBoltTemplate(sim, true)
-	shaman.chainLightningTemplate = shaman.newChainLightningTemplate(sim, false)
-	shaman.chainLightningLOTemplate = shaman.newChainLightningTemplate(sim, true)
-
-	// Need to allocate separate hit input slices so we can avoid modifying the template versions.
-	shaman.singleHitInputs = []core.DirectCastDamageInput{
-		core.DirectCastDamageInput{},
-	}
-	shaman.clHitInputs = make([]core.DirectCastDamageInput, len(shaman.chainLightningTemplate.HitInputs))
+	shaman.lightningBoltCastGenerator = shaman.newLightningBoltGenerator(sim, false)
+	shaman.lightningBoltLOCastGenerator = shaman.newLightningBoltGenerator(sim, true)
+	shaman.chainLightningCastGenerator = shaman.newChainLightningGenerator(sim, false)
+	shaman.chainLightningLOCastGenerator = shaman.newChainLightningGenerator(sim, true)
 }
 
 func (shaman *Shaman) Reset(sim *core.Simulation) {
