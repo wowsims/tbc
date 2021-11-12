@@ -10,8 +10,8 @@ const SpellIDCL6 int32 = 25442
 
 var ChainLightningCooldownID = core.NewCooldownID()
 
-// Returns a cast object for Chain Lightning with as many fields precomputed as possible.
-func (shaman *Shaman) newChainLightningTemplate(sim *core.Simulation, isLightningOverload bool) core.DirectCastGenerator {
+// newChainLightningGenerator returns a cast generator for Chain Lightning with as many fields precomputed as possible.
+func (shaman *Shaman) newChainLightningGenerator(sim *core.Simulation, isLightningOverload bool) core.DirectCastGenerator {
 	spellTemplate := shaman.newElectricSpellTemplate(
 		"Chain Lightning",
 		core.ActionID{
@@ -78,10 +78,10 @@ func (shaman *Shaman) NewChainLightning(sim *core.Simulation, target *core.Targe
 	// Initialize cast from precomputed template.
 	if isLightningOverload {
 		spell = &shaman.electricSpellLO
-		*spell = shaman.chainLightningLOTemplate()
+		*spell = shaman.chainLightningLOCastGenerator()
 	} else {
 		spell = &shaman.electricSpell
-		*spell = shaman.chainLightningTemplate()
+		*spell = shaman.chainLightningCastGenerator()
 	}
 
 	// Set dynamic fields, i.e. the stuff we couldn't precompute.
