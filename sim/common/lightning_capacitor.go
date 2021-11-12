@@ -12,20 +12,21 @@ func init() {
 }
 
 var TheLightningCapacitorAuraID = core.NewAuraID()
+
 func ApplyTheLightningCapacitor(agent core.Agent) {
 	spellObj := core.DirectCastAction{}
 
 	character := agent.GetCharacter()
 	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
-		lightningCapacitorCastTemplate := newLightningCapacitorCastTemplate(sim, character)
+		templateGen := core.NewDirectCastTemplateGenerator(newLightningCapacitorCastTemplate(sim, character))
 		charges := 0
 
 		const icdDur = time.Millisecond * 2500
 		icd := core.NewICD()
 
 		return core.Aura{
-			ID:      TheLightningCapacitorAuraID,
-			Name:    "The Lightning Capacitor",
+			ID:   TheLightningCapacitorAuraID,
+			Name: "The Lightning Capacitor",
 			OnSpellHit: func(sim *core.Simulation, cast *core.Cast, result *core.DirectCastDamageResult) {
 				if icd.IsOnCD(sim) {
 					return
@@ -41,7 +42,7 @@ func ApplyTheLightningCapacitor(agent core.Agent) {
 					charges = 0
 
 					castAction := &spellObj
-					*castAction = lightningCapacitorCastTemplate
+					*castAction = templateGen()
 					castAction.HitInputs[0].Target = result.Target
 					castAction.Init(sim)
 					castAction.Act(sim)
@@ -59,24 +60,24 @@ func newLightningCapacitorCastTemplate(sim *core.Simulation, character *core.Cha
 			ActionID: core.ActionID{
 				ItemID: core.ItemIDTheLightningCapacitor,
 			},
-			Character: character,
-			SpellSchool: stats.NatureSpellPower,
+			Character:       character,
+			SpellSchool:     stats.NatureSpellPower,
 			IgnoreCooldowns: true,
-			IgnoreManaCost: true,
-			CritMultiplier: 1.5,
-			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {},
+			IgnoreManaCost:  true,
+			CritMultiplier:  1.5,
+			OnCastComplete:  func(sim *core.Simulation, cast *core.Cast) {},
 		},
 		HitInputs: []core.DirectCastDamageInput{
 			core.DirectCastDamageInput{
-				MinBaseDamage: 694,
-				MaxBaseDamage: 807,
+				MinBaseDamage:    694,
+				MaxBaseDamage:    807,
 				DamageMultiplier: 1,
 			},
 		},
 		HitResults: []core.DirectCastDamageResult{
 			core.DirectCastDamageResult{},
 		},
-		OnSpellHit: func(sim *core.Simulation, cast *core.Cast, result *core.DirectCastDamageResult) {},
+		OnSpellHit:  func(sim *core.Simulation, cast *core.Cast, result *core.DirectCastDamageResult) {},
 		OnSpellMiss: func(sim *core.Simulation, cast *core.Cast) {},
 	}
 }

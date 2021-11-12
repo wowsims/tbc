@@ -26,8 +26,8 @@ func (shaman *Shaman) newLightningBoltTemplate(sim *core.Simulation, isLightning
 		isLightningOverload)
 
 	hitInput := core.DirectCastDamageInput{
-		MinBaseDamage: 571,
-		MaxBaseDamage: 652,
+		MinBaseDamage:    571,
+		MaxBaseDamage:    652,
 		SpellCoefficient: 0.794,
 		DamageMultiplier: 1,
 	}
@@ -65,14 +65,10 @@ func (shaman *Shaman) NewLightningBolt(sim *core.Simulation, target *core.Target
 	// Initialize cast from precomputed template.
 	if isLightningOverload {
 		spell = &shaman.electricSpellLO
-		*spell = shaman.lightningBoltLOTemplate
-		spell.HitInputs = shaman.singleHitInputs
-		spell.HitInputs[0] = shaman.lightningBoltLOTemplate.HitInputs[0]
+		*spell = shaman.lightningBoltLOTemplate()
 	} else {
 		spell = &shaman.electricSpell
-		*spell = shaman.lightningBoltTemplate
-		spell.HitInputs = shaman.singleHitInputs
-		spell.HitInputs[0] = shaman.lightningBoltTemplate.HitInputs[0]
+		*spell = shaman.lightningBoltTemplate()
 	}
 
 	// Set dynamic fields, i.e. the stuff we couldn't precompute.

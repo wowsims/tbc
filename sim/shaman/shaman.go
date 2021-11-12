@@ -17,20 +17,20 @@ func NewShaman(character core.Character, talents proto.ShamanTalents, selfBuffs 
 
 	// Add Shaman stat dependencies
 	shaman.AddStatDependency(stats.StatDependency{
-		SourceStat: stats.Intellect,
+		SourceStat:   stats.Intellect,
 		ModifiedStat: stats.SpellCrit,
 		Modifier: func(intellect float64, spellCrit float64) float64 {
-			return spellCrit + (intellect / 78.1) * core.SpellCritRatingPerCritChance
+			return spellCrit + (intellect/78.1)*core.SpellCritRatingPerCritChance
 		},
 	})
 
 	if shaman.Talents.UnrelentingStorm > 0 {
 		coeff := 0.02 * float64(shaman.Talents.UnrelentingStorm)
 		shaman.AddStatDependency(stats.StatDependency{
-			SourceStat: stats.Intellect,
+			SourceStat:   stats.Intellect,
 			ModifiedStat: stats.MP5,
 			Modifier: func(intellect float64, mp5 float64) float64 {
-				return mp5 + intellect * coeff
+				return mp5 + intellect*coeff
 			},
 		})
 	}
@@ -66,17 +66,12 @@ type Shaman struct {
 	electricSpell   core.DirectCastAction
 	electricSpellLO core.DirectCastAction
 
-	// Temporary hitInput slices to be used in object pool casts to avoid modifying
-	// templates directly (because slices are copied by reference).
-	singleHitInputs []core.DirectCastDamageInput
-	clHitInputs []core.DirectCastDamageInput
-
 	// Precomputed template cast objects for quickly resetting cast fields.
-	lightningBoltTemplate    core.DirectCastAction
-	lightningBoltLOTemplate  core.DirectCastAction
+	lightningBoltTemplate   core.DirectCastTemplateGenerator
+	lightningBoltLOTemplate core.DirectCastTemplateGenerator
 
-	chainLightningTemplate   core.DirectCastAction
-	chainLightningLOTemplate core.DirectCastAction
+	chainLightningTemplate   core.DirectCastTemplateGenerator
+	chainLightningLOTemplate core.DirectCastTemplateGenerator
 }
 
 // Implemented by each Shaman spec.
@@ -117,16 +112,10 @@ func (shaman *Shaman) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {
 
 func (shaman *Shaman) Init(sim *core.Simulation) {
 	// Precompute all the spell templates.
-	shaman.lightningBoltTemplate = shaman.newLightningBoltTemplate(sim, false)
-	shaman.lightningBoltLOTemplate = shaman.newLightningBoltTemplate(sim, true)
-	shaman.chainLightningTemplate = shaman.newChainLightningTemplate(sim, false)
-	shaman.chainLightningLOTemplate = shaman.newChainLightningTemplate(sim, true)
-
-	// Need to allocate separate hit input slices so we can avoid modifying the template versions.
-	shaman.singleHitInputs = []core.DirectCastDamageInput{
-		core.DirectCastDamageInput{},
-	}
-	shaman.clHitInputs = make([]core.DirectCastDamageInput, len(shaman.chainLightningTemplate.HitInputs))
+	shaman.lightningBoltTemplate = core.NewDirectCastTemplateGenerator(shaman.newLightningBoltTemplate(sim, false))
+	shaman.lightningBoltLOTemplate = core.NewDirectCastTemplateGenerator(shaman.newLightningBoltTemplate(sim, true))
+	shaman.chainLightningTemplate = core.NewDirectCastTemplateGenerator(shaman.newChainLightningTemplate(sim, false))
+	shaman.chainLightningLOTemplate = core.NewDirectCastTemplateGenerator(shaman.newChainLightningTemplate(sim, true))
 }
 
 func (shaman *Shaman) Reset(sim *core.Simulation) {
@@ -140,6 +129,7 @@ func (shaman *Shaman) Advance(sim *core.Simulation, elapsedTime time.Duration) {
 
 var ElementalMasteryAuraID = core.NewAuraID()
 var ElementalMasteryCooldownID = core.NewCooldownID()
+
 func (shaman *Shaman) registerElementalMasteryCD() {
 	if !shaman.Talents.ElementalMastery {
 		return
@@ -147,7 +137,7 @@ func (shaman *Shaman) registerElementalMasteryCD() {
 
 	shaman.AddMajorCooldown(core.MajorCooldown{
 		CooldownID: ElementalMasteryCooldownID,
-		Cooldown: time.Minute*3,
+		Cooldown:   time.Minute * 3,
 		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
 			return func(sim *core.Simulation, character *core.Character) bool {
 				character.AddAura(sim, core.Aura{
@@ -172,7 +162,7 @@ func (shaman *Shaman) registerElementalMasteryCD() {
 }
 
 func init() {
-	core.BaseStats[core.BaseStatsKey{ Race: proto.Race_RaceDraenei, Class: proto.Class_ClassShaman }] = stats.Stats{
+	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceDraenei, Class: proto.Class_ClassShaman}] = stats.Stats{
 		stats.Strength:  103,
 		stats.Agility:   61,
 		stats.Stamina:   113,
@@ -181,13 +171,13 @@ func init() {
 		stats.Mana:      2678,
 		stats.SpellCrit: 48.576,
 	}
-	core.BaseStats[core.BaseStatsKey{ Race: proto.Race_RaceOrc, Class: proto.Class_ClassShaman }] = stats.Stats{
+	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceOrc, Class: proto.Class_ClassShaman}] = stats.Stats{
 		stats.Intellect: 104,
 		stats.Mana:      2678,
 		stats.Spirit:    135,
 		stats.SpellCrit: 48.576,
 	}
-	core.BaseStats[core.BaseStatsKey{ Race: proto.Race_RaceTauren, Class: proto.Class_ClassShaman }] = stats.Stats{
+	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceTauren, Class: proto.Class_ClassShaman}] = stats.Stats{
 		stats.Intellect: 104,
 		stats.Mana:      2678,
 		stats.Spirit:    135,
@@ -200,6 +190,6 @@ func init() {
 		stats.Spirit:    135,
 		stats.SpellCrit: 48.576,
 	}
-	core.BaseStats[core.BaseStatsKey{ Race: proto.Race_RaceTroll10, Class: proto.Class_ClassShaman }] = trollStats
-	core.BaseStats[core.BaseStatsKey{ Race: proto.Race_RaceTroll30, Class: proto.Class_ClassShaman }] = trollStats
+	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceTroll10, Class: proto.Class_ClassShaman}] = trollStats
+	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceTroll30, Class: proto.Class_ClassShaman}] = trollStats
 }

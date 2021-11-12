@@ -7,6 +7,7 @@ import (
 )
 
 const SpellIDCL6 int32 = 25442
+
 var ChainLightningCooldownID = core.NewCooldownID()
 
 // Returns a cast object for Chain Lightning with as many fields precomputed as possible.
@@ -14,17 +15,17 @@ func (shaman *Shaman) newChainLightningTemplate(sim *core.Simulation, isLightnin
 	spellTemplate := shaman.newElectricSpellTemplate(
 		"Chain Lightning",
 		core.ActionID{
-			SpellID: SpellIDCL6,
+			SpellID:    SpellIDCL6,
 			CooldownID: ChainLightningCooldownID,
 		},
 		760.0,
 		time.Millisecond*2000,
 		isLightningOverload)
-	spellTemplate.Cast.Cooldown = time.Second*6
+	spellTemplate.Cast.Cooldown = time.Second * 6
 
 	hitInput := core.DirectCastDamageInput{
-		MinBaseDamage: 734,
-		MaxBaseDamage: 838,
+		MinBaseDamage:    734,
+		MaxBaseDamage:    838,
 		SpellCoefficient: 0.651,
 		DamageMultiplier: 1,
 	}
@@ -34,7 +35,7 @@ func (shaman *Shaman) newChainLightningTemplate(sim *core.Simulation, isLightnin
 	hitInputs := make([]core.DirectCastDamageInput, 0, numHits)
 	hitInputs = append(hitInputs, hitInput)
 	for i := int32(1); i < numHits; i++ {
-		bounceHit := hitInputs[i - 1] // Makes a copy
+		bounceHit := hitInputs[i-1] // Makes a copy
 
 		if shaman.HasAura(Tidefury2PcAuraID) {
 			bounceHit.DamageMultiplier *= 0.83
@@ -77,14 +78,10 @@ func (shaman *Shaman) NewChainLightning(sim *core.Simulation, target *core.Targe
 	// Initialize cast from precomputed template.
 	if isLightningOverload {
 		spell = &shaman.electricSpellLO
-		*spell = shaman.chainLightningLOTemplate
-		spell.HitInputs = shaman.clHitInputs
-		copy(spell.HitInputs, shaman.chainLightningLOTemplate.HitInputs)
+		*spell = shaman.chainLightningLOTemplate()
 	} else {
 		spell = &shaman.electricSpell
-		*spell = shaman.chainLightningTemplate
-		spell.HitInputs = shaman.clHitInputs
-		copy(spell.HitInputs, shaman.chainLightningTemplate.HitInputs)
+		*spell = shaman.chainLightningTemplate()
 	}
 
 	// Set dynamic fields, i.e. the stuff we couldn't precompute.

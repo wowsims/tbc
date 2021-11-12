@@ -90,8 +90,8 @@ type DirectCastAction struct {
 	HitResults []DirectCastDamageResult
 
 	// Callbacks for providing additional custom behavior.
-	OnSpellHit     OnSpellHit
-	OnSpellMiss    OnSpellMiss
+	OnSpellHit  OnSpellHit
+	OnSpellMiss OnSpellMiss
 }
 
 func (action *DirectCastAction) GetActionID() ActionID {
@@ -164,7 +164,7 @@ func (action *DirectCastAction) calculateDirectCastDamage(sim *Simulation, damag
 
 	character := action.Cast.Character
 
-	hit := 0.83 + (character.GetStat(stats.SpellHit) + damageInput.BonusSpellHitRating)/(SpellHitRatingPerHitChance*100)
+	hit := 0.83 + (character.GetStat(stats.SpellHit)+damageInput.BonusSpellHitRating)/(SpellHitRatingPerHitChance*100)
 	hit = MinFloat(hit, 0.99) // can't get away from the 1% miss
 
 	if sim.RandomFloat("DirectCast Hit") >= hit { // Miss
@@ -172,7 +172,7 @@ func (action *DirectCastAction) calculateDirectCastDamage(sim *Simulation, damag
 	}
 	result.Hit = true
 
-	baseDamage := damageInput.MinBaseDamage + sim.RandomFloat("DirectCast Base Damage")*(damageInput.MaxBaseDamage - damageInput.MinBaseDamage)
+	baseDamage := damageInput.MinBaseDamage + sim.RandomFloat("DirectCast Base Damage")*(damageInput.MaxBaseDamage-damageInput.MinBaseDamage)
 	totalSpellPower := character.GetStat(stats.SpellPower) + character.GetStat(action.Cast.SpellSchool) + damageInput.BonusSpellPower
 	damageFromSpellPower := (totalSpellPower * damageInput.SpellCoefficient)
 	damage := baseDamage + damageFromSpellPower
@@ -207,4 +207,17 @@ func (action *DirectCastAction) calculateDirectCastDamage(sim *Simulation, damag
 	result.Damage = damage
 
 	return result
+}
+
+type DirectCastTemplateGenerator func() DirectCastAction
+
+// NewDirectCastTemplateGenerator will take in a cast template and create a generator so you dont have to manually manage hit inputs.
+func NewDirectCastTemplateGenerator(template DirectCastAction) DirectCastTemplateGenerator {
+	hitInput := make([]DirectCastDamageInput, len(template.HitInputs))
+	return func() DirectCastAction {
+		newAction := template
+		newAction.HitInputs = hitInput
+		copy(newAction.HitInputs, template.HitInputs)
+		return newAction
+	}
 }
