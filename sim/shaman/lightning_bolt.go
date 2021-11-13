@@ -57,10 +57,10 @@ func (shaman *Shaman) NewLightningBolt(sim *core.Simulation, target *core.Target
 	// Initialize cast from precomputed template.
 	if isLightningOverload {
 		lb = &shaman.lightningBoltSpellLO
-		*lb = shaman.lightningBoltLOCastGenerator()
+		shaman.lightningBoltLOCastGenerator.Generate(lb)
 	} else {
 		lb = &shaman.lightningBoltSpell
-		*lb = shaman.lightningBoltCastGenerator()
+		shaman.lightningBoltCastGenerator.Generate(lb)
 	}
 
 	// Set dynamic fields, i.e. the stuff we couldn't precompute.

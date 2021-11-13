@@ -91,12 +91,18 @@ func (spell *SingleTargetDirectDamageSpell) Act(sim *Simulation) bool {
 	})
 }
 
-type SingleTargetDirectDamageSpellGenerator func() SingleTargetDirectDamageSpell
+type SingleTargetDirectDamageSpellGenerator struct {
+	template SingleTargetDirectDamageSpell
+}
+
+func (generator *SingleTargetDirectDamageSpellGenerator) Generate(newAction *SingleTargetDirectDamageSpell) {
+	*newAction = generator.template
+}
 
 // Takes in a cast template and returns a generator, so you don't need to keep track of which things to allocate yourself.
 func NewSingleTargetDirectDamageSpellGenerator(template SingleTargetDirectDamageSpell) SingleTargetDirectDamageSpellGenerator {
-	return func() SingleTargetDirectDamageSpell {
-		return template
+	return SingleTargetDirectDamageSpellGenerator{
+		template: template,
 	}
 }
 
@@ -125,15 +131,21 @@ func (spell *MultiTargetDirectDamageSpell) Act(sim *Simulation) bool {
 	})
 }
 
-type MultiTargetDirectDamageSpellGenerator func() MultiTargetDirectDamageSpell
+type MultiTargetDirectDamageSpellGenerator struct {
+	template MultiTargetDirectDamageSpell
+	effects  []DirectDamageSpellEffect
+}
+
+func (generator *MultiTargetDirectDamageSpellGenerator) Generate(newAction *MultiTargetDirectDamageSpell) {
+	*newAction = generator.template
+	newAction.Effects = generator.effects
+	copy(newAction.Effects, generator.template.Effects)
+}
 
 // Takes in a cast template and returns a generator, so you don't need to keep track of which things to allocate yourself.
 func NewMultiTargetDirectDamageSpellGenerator(template MultiTargetDirectDamageSpell) MultiTargetDirectDamageSpellGenerator {
-	effects := make([]DirectDamageSpellEffect, len(template.Effects))
-	return func() MultiTargetDirectDamageSpell {
-		newAction := template
-		newAction.Effects = effects
-		copy(newAction.Effects, template.Effects)
-		return newAction
+	return MultiTargetDirectDamageSpellGenerator{
+		template: template,
+		effects: make([]DirectDamageSpellEffect, len(template.Effects)),
 	}
 }

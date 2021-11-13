@@ -42,7 +42,7 @@ func ApplyTheLightningCapacitor(agent core.Agent) {
 					charges = 0
 
 					castAction := &spellObj
-					*castAction = castGenerator()
+					castGenerator.Generate(castAction)
 					castAction.Effect.Target = spellEffect.Target
 					castAction.Init(sim)
 					castAction.Act(sim)

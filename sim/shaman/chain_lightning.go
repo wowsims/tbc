@@ -72,10 +72,10 @@ func (shaman *Shaman) NewChainLightning(sim *core.Simulation, target *core.Targe
 	// Initialize cast from precomputed template.
 	if isLightningOverload {
 		cl = &shaman.chainLightningSpellLO
-		*cl = shaman.chainLightningLOCastGenerator()
+		shaman.chainLightningLOCastGenerator.Generate(cl)
 	} else {
 		cl = &shaman.chainLightningSpell
-		*cl = shaman.chainLightningCastGenerator()
+		shaman.chainLightningCastGenerator.Generate(cl)
 	}
 
 	// Set dynamic fields, i.e. the stuff we couldn't precompute.
