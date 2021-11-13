@@ -214,11 +214,11 @@ message RaidBuffs {
 message PartyBuffs {
     int32 bloodlust = 1;
     TristateEffect moonkin_aura = 2;
-		bool draenei_racial_melee = 3;
-		bool draenei_racial_caster = 4;
+    bool draenei_racial_melee = 3;
+    bool draenei_racial_caster = 4;
 
-		// Drums
-		Drums drums = 5;
+    // Drums
+    Drums drums = 5;
 
     // Item Buffs
     int32 atiesh_mage = 6;
@@ -243,6 +243,9 @@ message IndividualBuffs {
 
     int32 shadow_priest_dps = 4;
     bool mana_tide_totem = 5;
+
+    // How many innervates will you get?
+    int32 innervate = 6;
 }
 
 message Consumes {
@@ -278,6 +281,7 @@ message Debuffs {
     bool judgement_of_wisdom = 1;
     bool improved_seal_of_the_crusader = 2;
     bool misery = 3;
+    TristateEffect curse_of_elements = 4;
 }
 
 enum MobType {
@@ -359,5 +363,9 @@ message Gem {
 
     int32 phase = 5;
     ItemQuality quality = 6;
-		bool unique = 7;
+	bool unique = 7;
+}
+
+message RaidTarget {
+    int32 target_index = 1;
 }

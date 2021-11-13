@@ -3,6 +3,8 @@ package proto;
 
 option go_package = "./proto";
 
+import "common.proto";
+
 message DruidTalents {
 		// Balance
     int32 starlight_wrath = 1;
@@ -51,13 +53,26 @@ message DruidTalents {
 }
 
 message BalanceDruid {
-    message Rotation {
+  message Rotation {
+    enum PrimarySpell {
+        Unknown = 0;
+        Starfire = 1;
+        Starfire6 = 2;
+        Wrath = 3;
     }
-    Rotation rotation = 1;
 
-    DruidTalents talents = 2;
+    PrimarySpell primary_spell = 1;
+    bool faerie_fire = 2;
+    bool insect_swarm = 3;
+    bool moonfire = 4;
+    bool melee_while_oom = 5;
+  }
+  Rotation rotation = 1;
+  DruidTalents talents = 2;
     
-    message Options {
-    }
-    Options options = 3;
+  message Options {
+    bool omen_of_clarity = 1;
+    RaidTarget innervate_target = 2; 
+  }
+  Options options = 3;
 }
