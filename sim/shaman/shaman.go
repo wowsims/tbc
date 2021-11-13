@@ -70,11 +70,11 @@ type Shaman struct {
 	chainLightningSpellLO core.MultiTargetDirectDamageSpell
 
 	// Precomputed templated cast generator for quickly resetting cast fields.
-	lightningBoltCastGenerator   core.SingleTargetDirectDamageSpellGenerator
-	lightningBoltLOCastGenerator core.SingleTargetDirectDamageSpellGenerator
+	lightningBoltCastTemplate   core.SingleTargetDirectDamageSpellTemplate
+	lightningBoltLOCastTemplate core.SingleTargetDirectDamageSpellTemplate
 
-	chainLightningCastGenerator   core.MultiTargetDirectDamageSpellGenerator
-	chainLightningLOCastGenerator core.MultiTargetDirectDamageSpellGenerator
+	chainLightningCastTemplate   core.MultiTargetDirectDamageSpellTemplate
+	chainLightningLOCastTemplate core.MultiTargetDirectDamageSpellTemplate
 }
 
 // Implemented by each Shaman spec.
@@ -115,10 +115,10 @@ func (shaman *Shaman) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {
 
 func (shaman *Shaman) Init(sim *core.Simulation) {
 	// Precompute all the spell templates.
-	shaman.lightningBoltCastGenerator = shaman.newLightningBoltGenerator(sim, false)
-	shaman.lightningBoltLOCastGenerator = shaman.newLightningBoltGenerator(sim, true)
-	shaman.chainLightningCastGenerator = shaman.newChainLightningGenerator(sim, false)
-	shaman.chainLightningLOCastGenerator = shaman.newChainLightningGenerator(sim, true)
+	shaman.lightningBoltCastTemplate = shaman.newLightningBoltTemplate(sim, false)
+	shaman.lightningBoltLOCastTemplate = shaman.newLightningBoltTemplate(sim, true)
+	shaman.chainLightningCastTemplate = shaman.newChainLightningTemplate(sim, false)
+	shaman.chainLightningLOCastTemplate = shaman.newChainLightningTemplate(sim, true)
 }
 
 func (shaman *Shaman) Reset(sim *core.Simulation) {

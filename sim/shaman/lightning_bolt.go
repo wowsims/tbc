@@ -9,8 +9,8 @@ import (
 
 const SpellIDLB12 int32 = 25449
 
-// newLightningBoltGenerator returns a cast generator for Lightning Bolt with as many fields precomputed as possible.
-func (shaman *Shaman) newLightningBoltGenerator(sim *core.Simulation, isLightningOverload bool) core.SingleTargetDirectDamageSpellGenerator {
+// newLightningBoltTemplate returns a cast generator for Lightning Bolt with as many fields precomputed as possible.
+func (shaman *Shaman) newLightningBoltTemplate(sim *core.Simulation, isLightningOverload bool) core.SingleTargetDirectDamageSpellTemplate {
 	baseManaCost := 300.0
 	if shaman.Equip[items.ItemSlotRanged].ID == TotemOfThePulsingEarth {
 		baseManaCost -= 27.0
@@ -48,7 +48,7 @@ func (shaman *Shaman) newLightningBoltGenerator(sim *core.Simulation, isLightnin
 		}
 	}
 
-	return core.NewSingleTargetDirectDamageSpellGenerator(spellTemplate)
+	return core.NewSingleTargetDirectDamageSpellTemplate(spellTemplate)
 }
 
 func (shaman *Shaman) NewLightningBolt(sim *core.Simulation, target *core.Target, isLightningOverload bool) *core.SingleTargetDirectDamageSpell {
@@ -57,10 +57,10 @@ func (shaman *Shaman) NewLightningBolt(sim *core.Simulation, target *core.Target
 	// Initialize cast from precomputed template.
 	if isLightningOverload {
 		lb = &shaman.lightningBoltSpellLO
-		shaman.lightningBoltLOCastGenerator.Generate(lb)
+		shaman.lightningBoltLOCastTemplate.Apply(lb)
 	} else {
 		lb = &shaman.lightningBoltSpell
-		shaman.lightningBoltCastGenerator.Generate(lb)
+		shaman.lightningBoltCastTemplate.Apply(lb)
 	}
 
 	// Set dynamic fields, i.e. the stuff we couldn't precompute.
