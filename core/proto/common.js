@@ -951,11 +951,12 @@ class IndividualBuffs$Type extends MessageType {
             { no: 2, name: "blessing_of_wisdom", kind: "enum", T: () => ["proto.TristateEffect", TristateEffect] },
             { no: 3, name: "blessing_of_might", kind: "enum", T: () => ["proto.TristateEffect", TristateEffect] },
             { no: 4, name: "shadow_priest_dps", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
-            { no: 5, name: "mana_tide_totem", kind: "scalar", T: 8 /*ScalarType.BOOL*/ }
+            { no: 5, name: "mana_tide_totem", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 6, name: "innervate", kind: "scalar", T: 5 /*ScalarType.INT32*/ }
         ]);
     }
     create(value) {
-        const message = { blessingOfKings: false, blessingOfWisdom: 0, blessingOfMight: 0, shadowPriestDps: 0, manaTideTotem: false };
+        const message = { blessingOfKings: false, blessingOfWisdom: 0, blessingOfMight: 0, shadowPriestDps: 0, manaTideTotem: false, innervate: 0 };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -980,6 +981,9 @@ class IndividualBuffs$Type extends MessageType {
                     break;
                 case /* bool mana_tide_totem */ 5:
                     message.manaTideTotem = reader.bool();
+                    break;
+                case /* int32 innervate */ 6:
+                    message.innervate = reader.int32();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -1008,6 +1012,9 @@ class IndividualBuffs$Type extends MessageType {
         /* bool mana_tide_totem = 5; */
         if (message.manaTideTotem !== false)
             writer.tag(5, WireType.Varint).bool(message.manaTideTotem);
+        /* int32 innervate = 6; */
+        if (message.innervate !== 0)
+            writer.tag(6, WireType.Varint).int32(message.innervate);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -1197,11 +1204,12 @@ class Debuffs$Type extends MessageType {
         super("proto.Debuffs", [
             { no: 1, name: "judgement_of_wisdom", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 2, name: "improved_seal_of_the_crusader", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
-            { no: 3, name: "misery", kind: "scalar", T: 8 /*ScalarType.BOOL*/ }
+            { no: 3, name: "misery", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 4, name: "curse_of_elements", kind: "enum", T: () => ["proto.TristateEffect", TristateEffect] }
         ]);
     }
     create(value) {
-        const message = { judgementOfWisdom: false, improvedSealOfTheCrusader: false, misery: false };
+        const message = { judgementOfWisdom: false, improvedSealOfTheCrusader: false, misery: false, curseOfElements: 0 };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -1220,6 +1228,9 @@ class Debuffs$Type extends MessageType {
                     break;
                 case /* bool misery */ 3:
                     message.misery = reader.bool();
+                    break;
+                case /* proto.TristateEffect curse_of_elements */ 4:
+                    message.curseOfElements = reader.int32();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -1242,6 +1253,9 @@ class Debuffs$Type extends MessageType {
         /* bool misery = 3; */
         if (message.misery !== false)
             writer.tag(3, WireType.Varint).bool(message.misery);
+        /* proto.TristateEffect curse_of_elements = 4; */
+        if (message.curseOfElements !== 0)
+            writer.tag(4, WireType.Varint).int32(message.curseOfElements);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -1869,3 +1883,50 @@ class Gem$Type extends MessageType {
  * @generated MessageType for protobuf message proto.Gem
  */
 export const Gem = new Gem$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class RaidTarget$Type extends MessageType {
+    constructor() {
+        super("proto.RaidTarget", [
+            { no: 1, name: "target_index", kind: "scalar", T: 5 /*ScalarType.INT32*/ }
+        ]);
+    }
+    create(value) {
+        const message = { targetIndex: 0 };
+        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader, length, options, target) {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* int32 target_index */ 1:
+                    message.targetIndex = reader.int32();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message, writer, options) {
+        /* int32 target_index = 1; */
+        if (message.targetIndex !== 0)
+            writer.tag(1, WireType.Varint).int32(message.targetIndex);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message proto.RaidTarget
+ */
+export const RaidTarget = new RaidTarget$Type();

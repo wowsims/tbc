@@ -3,6 +3,29 @@ import { UnknownFieldHandler } from '/tbc/protobuf-ts/index.js';
 import { reflectionMergePartial } from '/tbc/protobuf-ts/index.js';
 import { MESSAGE_TYPE } from '/tbc/protobuf-ts/index.js';
 import { MessageType } from '/tbc/protobuf-ts/index.js';
+import { RaidTarget } from './common.js';
+/**
+ * @generated from protobuf enum proto.BalanceDruid.Rotation.PrimarySpell
+ */
+export var BalanceDruid_Rotation_PrimarySpell;
+(function (BalanceDruid_Rotation_PrimarySpell) {
+    /**
+     * @generated from protobuf enum value: Unknown = 0;
+     */
+    BalanceDruid_Rotation_PrimarySpell[BalanceDruid_Rotation_PrimarySpell["Unknown"] = 0] = "Unknown";
+    /**
+     * @generated from protobuf enum value: Starfire = 1;
+     */
+    BalanceDruid_Rotation_PrimarySpell[BalanceDruid_Rotation_PrimarySpell["Starfire"] = 1] = "Starfire";
+    /**
+     * @generated from protobuf enum value: Starfire6 = 2;
+     */
+    BalanceDruid_Rotation_PrimarySpell[BalanceDruid_Rotation_PrimarySpell["Starfire6"] = 2] = "Starfire6";
+    /**
+     * @generated from protobuf enum value: Wrath = 3;
+     */
+    BalanceDruid_Rotation_PrimarySpell[BalanceDruid_Rotation_PrimarySpell["Wrath"] = 3] = "Wrath";
+})(BalanceDruid_Rotation_PrimarySpell || (BalanceDruid_Rotation_PrimarySpell = {}));
 // @generated message type with reflection information, may provide speed optimized methods
 class DruidTalents$Type extends MessageType {
     constructor() {
@@ -380,19 +403,68 @@ export const BalanceDruid = new BalanceDruid$Type();
 // @generated message type with reflection information, may provide speed optimized methods
 class BalanceDruid_Rotation$Type extends MessageType {
     constructor() {
-        super("proto.BalanceDruid.Rotation", []);
+        super("proto.BalanceDruid.Rotation", [
+            { no: 1, name: "primary_spell", kind: "enum", T: () => ["proto.BalanceDruid.Rotation.PrimarySpell", BalanceDruid_Rotation_PrimarySpell] },
+            { no: 2, name: "faerie_fire", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 3, name: "insect_swarm", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 4, name: "moonfire", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 5, name: "melee_while_oom", kind: "scalar", T: 8 /*ScalarType.BOOL*/ }
+        ]);
     }
     create(value) {
-        const message = {};
+        const message = { primarySpell: 0, faerieFire: false, insectSwarm: false, moonfire: false, meleeWhileOom: false };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
         return message;
     }
     internalBinaryRead(reader, length, options, target) {
-        return target ?? this.create();
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* proto.BalanceDruid.Rotation.PrimarySpell primary_spell */ 1:
+                    message.primarySpell = reader.int32();
+                    break;
+                case /* bool faerie_fire */ 2:
+                    message.faerieFire = reader.bool();
+                    break;
+                case /* bool insect_swarm */ 3:
+                    message.insectSwarm = reader.bool();
+                    break;
+                case /* bool moonfire */ 4:
+                    message.moonfire = reader.bool();
+                    break;
+                case /* bool melee_while_oom */ 5:
+                    message.meleeWhileOom = reader.bool();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
     }
     internalBinaryWrite(message, writer, options) {
+        /* proto.BalanceDruid.Rotation.PrimarySpell primary_spell = 1; */
+        if (message.primarySpell !== 0)
+            writer.tag(1, WireType.Varint).int32(message.primarySpell);
+        /* bool faerie_fire = 2; */
+        if (message.faerieFire !== false)
+            writer.tag(2, WireType.Varint).bool(message.faerieFire);
+        /* bool insect_swarm = 3; */
+        if (message.insectSwarm !== false)
+            writer.tag(3, WireType.Varint).bool(message.insectSwarm);
+        /* bool moonfire = 4; */
+        if (message.moonfire !== false)
+            writer.tag(4, WireType.Varint).bool(message.moonfire);
+        /* bool melee_while_oom = 5; */
+        if (message.meleeWhileOom !== false)
+            writer.tag(5, WireType.Varint).bool(message.meleeWhileOom);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -406,19 +478,47 @@ export const BalanceDruid_Rotation = new BalanceDruid_Rotation$Type();
 // @generated message type with reflection information, may provide speed optimized methods
 class BalanceDruid_Options$Type extends MessageType {
     constructor() {
-        super("proto.BalanceDruid.Options", []);
+        super("proto.BalanceDruid.Options", [
+            { no: 1, name: "omen_of_clarity", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 2, name: "innervate_target", kind: "message", T: () => RaidTarget }
+        ]);
     }
     create(value) {
-        const message = {};
+        const message = { omenOfClarity: false };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
         return message;
     }
     internalBinaryRead(reader, length, options, target) {
-        return target ?? this.create();
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* bool omen_of_clarity */ 1:
+                    message.omenOfClarity = reader.bool();
+                    break;
+                case /* proto.RaidTarget innervate_target */ 2:
+                    message.innervateTarget = RaidTarget.internalBinaryRead(reader, reader.uint32(), options, message.innervateTarget);
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
     }
     internalBinaryWrite(message, writer, options) {
+        /* bool omen_of_clarity = 1; */
+        if (message.omenOfClarity !== false)
+            writer.tag(1, WireType.Varint).bool(message.omenOfClarity);
+        /* proto.RaidTarget innervate_target = 2; */
+        if (message.innervateTarget)
+            RaidTarget.internalBinaryWrite(message.innervateTarget, writer.tag(2, WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

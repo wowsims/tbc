@@ -119,6 +119,12 @@ export interface IndividualBuffs {
      * @generated from protobuf field: bool mana_tide_totem = 5;
      */
     manaTideTotem: boolean;
+    /**
+     * How many innervates will you get?
+     *
+     * @generated from protobuf field: int32 innervate = 6;
+     */
+    innervate: number;
 }
 /**
  * @generated from protobuf message proto.Consumes
@@ -217,6 +223,10 @@ export interface Debuffs {
      * @generated from protobuf field: bool misery = 3;
      */
     misery: boolean;
+    /**
+     * @generated from protobuf field: proto.TristateEffect curse_of_elements = 4;
+     */
+    curseOfElements: TristateEffect;
 }
 /**
  * @generated from protobuf message proto.Target
@@ -410,6 +420,15 @@ export interface Gem {
      * @generated from protobuf field: bool unique = 7;
      */
     unique: boolean;
+}
+/**
+ * @generated from protobuf message proto.RaidTarget
+ */
+export interface RaidTarget {
+    /**
+     * @generated from protobuf field: int32 target_index = 1;
+     */
+    targetIndex: number;
 }
 /**
  * @generated from protobuf enum proto.Spec
@@ -1255,4 +1274,14 @@ declare class Gem$Type extends MessageType<Gem> {
  * @generated MessageType for protobuf message proto.Gem
  */
 export declare const Gem: Gem$Type;
+declare class RaidTarget$Type extends MessageType<RaidTarget> {
+    constructor();
+    create(value?: PartialMessage<RaidTarget>): RaidTarget;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: RaidTarget): RaidTarget;
+    internalBinaryWrite(message: RaidTarget, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message proto.RaidTarget
+ */
+export declare const RaidTarget: RaidTarget$Type;
 export {};

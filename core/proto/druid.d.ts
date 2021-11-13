@@ -4,6 +4,7 @@ import type { BinaryReadOptions } from "@protobuf-ts/runtime";
 import type { IBinaryReader } from "@protobuf-ts/runtime";
 import type { PartialMessage } from "@protobuf-ts/runtime";
 import { MessageType } from "@protobuf-ts/runtime";
+import { RaidTarget } from "./common";
 /**
  * @generated from protobuf message proto.DruidTalents
  */
@@ -192,11 +193,60 @@ export interface BalanceDruid {
  * @generated from protobuf message proto.BalanceDruid.Rotation
  */
 export interface BalanceDruid_Rotation {
+    /**
+     * @generated from protobuf field: proto.BalanceDruid.Rotation.PrimarySpell primary_spell = 1;
+     */
+    primarySpell: BalanceDruid_Rotation_PrimarySpell;
+    /**
+     * @generated from protobuf field: bool faerie_fire = 2;
+     */
+    faerieFire: boolean;
+    /**
+     * @generated from protobuf field: bool insect_swarm = 3;
+     */
+    insectSwarm: boolean;
+    /**
+     * @generated from protobuf field: bool moonfire = 4;
+     */
+    moonfire: boolean;
+    /**
+     * @generated from protobuf field: bool melee_while_oom = 5;
+     */
+    meleeWhileOom: boolean;
+}
+/**
+ * @generated from protobuf enum proto.BalanceDruid.Rotation.PrimarySpell
+ */
+export declare enum BalanceDruid_Rotation_PrimarySpell {
+    /**
+     * @generated from protobuf enum value: Unknown = 0;
+     */
+    Unknown = 0,
+    /**
+     * @generated from protobuf enum value: Starfire = 1;
+     */
+    Starfire = 1,
+    /**
+     * @generated from protobuf enum value: Starfire6 = 2;
+     */
+    Starfire6 = 2,
+    /**
+     * @generated from protobuf enum value: Wrath = 3;
+     */
+    Wrath = 3
 }
 /**
  * @generated from protobuf message proto.BalanceDruid.Options
  */
 export interface BalanceDruid_Options {
+    /**
+     * @generated from protobuf field: bool omen_of_clarity = 1;
+     */
+    omenOfClarity: boolean;
+    /**
+     * @generated from protobuf field: proto.RaidTarget innervate_target = 2;
+     */
+    innervateTarget?: RaidTarget;
 }
 declare class DruidTalents$Type extends MessageType<DruidTalents> {
     constructor();
