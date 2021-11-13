@@ -10,72 +10,64 @@ import (
 const SpellIDLB12 int32 = 25449
 
 // newLightningBoltGenerator returns a cast generator for Lightning Bolt with as many fields precomputed as possible.
-func (shaman *Shaman) newLightningBoltGenerator(sim *core.Simulation, isLightningOverload bool) core.DirectCastGenerator {
+func (shaman *Shaman) newLightningBoltGenerator(sim *core.Simulation, isLightningOverload bool) core.SingleTargetDirectDamageSpellGenerator {
 	baseManaCost := 300.0
 	if shaman.Equip[items.ItemSlotRanged].ID == TotemOfThePulsingEarth {
 		baseManaCost -= 27.0
 	}
 
-	spellTemplate := shaman.newElectricSpellTemplate(
-		"Lightning Bolt",
-		core.ActionID{
-			SpellID: SpellIDLB12,
-		},
-		baseManaCost,
-		time.Millisecond*2500,
-		isLightningOverload)
-
-	hitInput := core.DirectCastDamageInput{
-		MinBaseDamage:    571,
-		MaxBaseDamage:    652,
-		SpellCoefficient: 0.794,
-		DamageMultiplier: 1,
+	spellTemplate := core.SingleTargetDirectDamageSpell{
+		SpellCast: shaman.newElectricSpellCast(
+			"Lightning Bolt",
+			core.ActionID{
+				SpellID: SpellIDLB12,
+			},
+			baseManaCost,
+			time.Millisecond*2500,
+			isLightningOverload),
+		Effect: shaman.newElectricSpellEffect(571, 652, 0.794, isLightningOverload),
 	}
-	shaman.applyElectricSpellHitInputModifiers(&hitInput, isLightningOverload)
-
-	spellTemplate.HitInputs = []core.DirectCastDamageInput{hitInput}
-	spellTemplate.HitResults = []core.DirectCastDamageResult{{}}
 
 	if !isLightningOverload && shaman.Talents.LightningOverload > 0 {
 		lightningOverloadChance := float64(shaman.Talents.LightningOverload) * 0.04
-		spellTemplate.OnSpellHit = func(sim *core.Simulation, cast *core.Cast, result *core.DirectCastDamageResult) {
-			if shaman.Talents.ElementalFocus && result.Crit {
+		spellTemplate.Effect.OnSpellHit = func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+			if shaman.Talents.ElementalFocus && spellEffect.Crit {
 				shaman.ElementalFocusStacks = 2
 			}
 
 			if sim.RandomFloat("LB Lightning Overload") < lightningOverloadChance {
-				overloadAction := shaman.NewLightningBolt(sim, result.Target, true)
+				overloadAction := shaman.NewLightningBolt(sim, spellEffect.Target, true)
 				overloadAction.Act(sim)
 			}
 		}
 	} else {
-		spellTemplate.OnSpellHit = func(sim *core.Simulation, cast *core.Cast, result *core.DirectCastDamageResult) {
-			if shaman.Talents.ElementalFocus && result.Crit {
+		spellTemplate.Effect.OnSpellHit = func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+			if shaman.Talents.ElementalFocus && spellEffect.Crit {
 				shaman.ElementalFocusStacks = 2
 			}
 		}
 	}
 
-	return core.NewDirectCastGenerator(spellTemplate)
+	return core.NewSingleTargetDirectDamageSpellGenerator(spellTemplate)
 }
 
-func (shaman *Shaman) NewLightningBolt(sim *core.Simulation, target *core.Target, isLightningOverload bool) *core.DirectCastAction {
-	var spell *core.DirectCastAction
+func (shaman *Shaman) NewLightningBolt(sim *core.Simulation, target *core.Target, isLightningOverload bool) *core.SingleTargetDirectDamageSpell {
+	var lb *core.SingleTargetDirectDamageSpell
 
 	// Initialize cast from precomputed template.
 	if isLightningOverload {
-		spell = &shaman.electricSpellLO
-		*spell = shaman.lightningBoltLOCastGenerator()
+		lb = &shaman.lightningBoltSpellLO
+		*lb = shaman.lightningBoltLOCastGenerator()
 	} else {
-		spell = &shaman.electricSpell
-		*spell = shaman.lightningBoltCastGenerator()
+		lb = &shaman.lightningBoltSpell
+		*lb = shaman.lightningBoltCastGenerator()
 	}
 
 	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	spell.HitInputs[0].Target = target
-	shaman.applyElectricSpellInitModifiers(spell)
+	lb.Effect.Target = target
+	shaman.applyElectricSpellCastInitModifiers(&lb.SpellCast)
 
-	spell.Init(sim)
+	lb.Init(sim)
 
-	return spell
+	return lb
 }

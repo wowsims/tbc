@@ -67,6 +67,32 @@ type Cast struct {
 	OnCastComplete OnCastComplete
 }
 
+// AgentAction functions for actions that embed a Cast.
+
+func (cast *Cast) GetActionID() ActionID {
+	return cast.ActionID
+}
+
+func (cast *Cast) GetName() string {
+	return cast.Name
+}
+
+func (cast *Cast) GetTag() int32 {
+	return cast.Tag
+}
+
+func (cast *Cast) GetCharacter() *Character {
+	return cast.Character
+}
+
+func (cast *Cast) GetManaCost() float64 {
+	return cast.ManaCost
+}
+
+func (cast *Cast) GetDuration() time.Duration {
+	return cast.CastTime
+}
+
 // Should be called exactly once after creation.
 func (cast *Cast) init(sim *Simulation) {
 	cast.CastTime = time.Duration(float64(cast.CastTime) / cast.Character.HasteBonus())

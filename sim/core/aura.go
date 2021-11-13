@@ -348,23 +348,23 @@ func (at *auraTracker) OnCastComplete(sim *Simulation, cast *Cast) {
 }
 
 // Invokes the OnBeforeSpellHit event for all tracked Auras.
-func (at *auraTracker) OnBeforeSpellHit(sim *Simulation, cast *Cast, hitInput *DirectCastDamageInput) {
+func (at *auraTracker) OnBeforeSpellHit(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect) {
 	for _, id := range at.onBeforeSpellHitIDs {
-		at.auras[id].OnBeforeSpellHit(sim, cast, hitInput)
+		at.auras[id].OnBeforeSpellHit(sim, spellCast, spellEffect)
 	}
 }
 
 // Invokes the OnSpellMiss event for all tracked Auras.
-func (at *auraTracker) OnSpellMiss(sim *Simulation, cast *Cast) {
+func (at *auraTracker) OnSpellMiss(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect) {
 	for _, id := range at.onSpellMissIDs {
-		at.auras[id].OnSpellMiss(sim, cast)
+		at.auras[id].OnSpellMiss(sim, spellCast, spellEffect)
 	}
 }
 
 // Invokes the OnSpellHit event for all tracked Auras.
-func (at *auraTracker) OnSpellHit(sim *Simulation, cast *Cast, result *DirectCastDamageResult) {
+func (at *auraTracker) OnSpellHit(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect) {
 	for _, id := range at.onSpellHitIDs {
-		at.auras[id].OnSpellHit(sim, cast, result)
+		at.auras[id].OnSpellHit(sim, spellCast, spellEffect)
 	}
 }
 

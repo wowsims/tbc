@@ -63,15 +63,18 @@ type Shaman struct {
 	ElementalFocusStacks byte
 
 	// "object pool" for shaman spells that are currently being cast.
-	electricSpell   core.DirectCastAction
-	electricSpellLO core.DirectCastAction
+	lightningBoltSpell   core.SingleTargetDirectDamageSpell
+	lightningBoltSpellLO core.SingleTargetDirectDamageSpell
+
+	chainLightningSpell   core.MultiTargetDirectDamageSpell
+	chainLightningSpellLO core.MultiTargetDirectDamageSpell
 
 	// Precomputed templated cast generator for quickly resetting cast fields.
-	lightningBoltCastGenerator   core.DirectCastGenerator
-	lightningBoltLOCastGenerator core.DirectCastGenerator
+	lightningBoltCastGenerator   core.SingleTargetDirectDamageSpellGenerator
+	lightningBoltLOCastGenerator core.SingleTargetDirectDamageSpellGenerator
 
-	chainLightningCastGenerator   core.DirectCastGenerator
-	chainLightningLOCastGenerator core.DirectCastGenerator
+	chainLightningCastGenerator   core.MultiTargetDirectDamageSpellGenerator
+	chainLightningLOCastGenerator core.MultiTargetDirectDamageSpellGenerator
 }
 
 // Implemented by each Shaman spec.

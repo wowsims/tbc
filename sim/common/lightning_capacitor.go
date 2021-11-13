@@ -14,7 +14,7 @@ func init() {
 var TheLightningCapacitorAuraID = core.NewAuraID()
 
 func ApplyTheLightningCapacitor(agent core.Agent) {
-	spellObj := core.DirectCastAction{}
+	spellObj := core.SingleTargetDirectDamageSpell{}
 
 	character := agent.GetCharacter()
 	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
@@ -27,12 +27,12 @@ func ApplyTheLightningCapacitor(agent core.Agent) {
 		return core.Aura{
 			ID:   TheLightningCapacitorAuraID,
 			Name: "The Lightning Capacitor",
-			OnSpellHit: func(sim *core.Simulation, cast *core.Cast, result *core.DirectCastDamageResult) {
+			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 				if icd.IsOnCD(sim) {
 					return
 				}
 
-				if !result.Crit {
+				if !spellEffect.Crit {
 					return
 				}
 
@@ -43,7 +43,7 @@ func ApplyTheLightningCapacitor(agent core.Agent) {
 
 					castAction := &spellObj
 					*castAction = castGenerator()
-					castAction.HitInputs[0].Target = result.Target
+					castAction.Effect.Target = spellEffect.Target
 					castAction.Init(sim)
 					castAction.Act(sim)
 				}
@@ -53,29 +53,33 @@ func ApplyTheLightningCapacitor(agent core.Agent) {
 }
 
 // Returns a cast object for a Lightning Capacitor cast with as many fields precomputed as possible.
-func newLightningCapacitorCastGenerator(sim *core.Simulation, character *core.Character) core.DirectCastGenerator {
-	return core.NewDirectCastGenerator(core.DirectCastAction{
-		Cast: core.Cast{
-			Name: "Lightning Capacitor",
-			ActionID: core.ActionID{
-				ItemID: core.ItemIDTheLightningCapacitor,
+func newLightningCapacitorCastGenerator(sim *core.Simulation, character *core.Character) core.SingleTargetDirectDamageSpellGenerator {
+	return core.NewSingleTargetDirectDamageSpellGenerator(core.SingleTargetDirectDamageSpell{
+		SpellCast: core.SpellCast{
+			Cast: core.Cast{
+				Name: "Lightning Capacitor",
+				ActionID: core.ActionID{
+					ItemID: core.ItemIDTheLightningCapacitor,
+				},
+				Character:       character,
+				IgnoreCooldowns: true,
+				IgnoreManaCost:  true,
+				SpellSchool:     stats.NatureSpellPower,
+				CritMultiplier:   1.5,
+				OnCastComplete:  func(sim *core.Simulation, cast *core.Cast) {},
 			},
-			Character:       character,
-			SpellSchool:     stats.NatureSpellPower,
-			IgnoreCooldowns: true,
-			IgnoreManaCost:  true,
-			CritMultiplier:  1.5,
-			OnCastComplete:  func(sim *core.Simulation, cast *core.Cast) {},
 		},
-		HitInputs: []core.DirectCastDamageInput{
-			{
+		Effect: core.DirectDamageSpellEffect{
+			SpellEffect: core.SpellEffect{
+				DamageMultiplier: 1,
+
+				OnSpellHit:  func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {},
+				OnSpellMiss: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {},
+			},
+			DirectDamageSpellInput: core.DirectDamageSpellInput{
 				MinBaseDamage:    694,
 				MaxBaseDamage:    807,
-				DamageMultiplier: 1,
 			},
 		},
-		HitResults:  []core.DirectCastDamageResult{{}},
-		OnSpellHit:  func(sim *core.Simulation, cast *core.Cast, result *core.DirectCastDamageResult) {},
-		OnSpellMiss: func(sim *core.Simulation, cast *core.Cast) {},
 	})
 }

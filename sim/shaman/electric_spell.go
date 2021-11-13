@@ -21,8 +21,8 @@ const (
 )
 
 // Shared precomputation logic for LB and CL.
-func (shaman *Shaman) newElectricSpellTemplate(name string, actionID core.ActionID, baseManaCost float64, baseCastTime time.Duration, isLightningOverload bool) core.DirectCastAction {
-	template := core.DirectCastAction{
+func (shaman *Shaman) newElectricSpellCast(name string, actionID core.ActionID, baseManaCost float64, baseCastTime time.Duration, isLightningOverload bool) core.SpellCast {
+	spellCast := core.SpellCast{
 		Cast: core.Cast{
 			Name: name,
 			ActionID: actionID,
@@ -31,69 +31,82 @@ func (shaman *Shaman) newElectricSpellTemplate(name string, actionID core.Action
 			ManaCost: baseManaCost,
 			CastTime: baseCastTime,
 			SpellSchool: stats.NatureSpellPower,
-			CritMultiplier: 1.5,
+			CritMultiplier:   1.5,
 		},
+	}
+
+	if shaman.Talents.ElementalFury {
+		spellCast.CritMultiplier = 2
 	}
 
 
 	if isLightningOverload {
-		template.Cast.Name += " (LO)"
-		template.Cast.Tag = CastTagLightningOverload
-		template.Cast.CastTime = 0
-		template.Cast.ManaCost = 0
-		template.Cast.IgnoreCooldowns = true
-		template.Cast.IgnoreManaCost = true
+		spellCast.Name += " (LO)"
+		spellCast.Tag = CastTagLightningOverload
+		spellCast.CastTime = 0
+		spellCast.ManaCost = 0
+		spellCast.IgnoreCooldowns = true
+		spellCast.IgnoreManaCost = true
 	} else if shaman.Talents.LightningMastery > 0 {
 		// Convection applies against the base cost of the spell.
-		template.Cast.ManaCost -= template.BaseManaCost * float64(shaman.Talents.Convection) * 0.02
+		spellCast.ManaCost -= spellCast.BaseManaCost * float64(shaman.Talents.Convection) * 0.02
 
-		template.Cast.CastTime -= time.Millisecond * 100 * time.Duration(shaman.Talents.LightningMastery)
-	}
-
-	if shaman.Talents.ElementalFury {
-		template.Cast.CritMultiplier = 2
+		spellCast.CastTime -= time.Millisecond * 100 * time.Duration(shaman.Talents.LightningMastery)
 	}
 
 	if !isLightningOverload && shaman.Talents.ElementalFocus {
-		template.Cast.OnCastComplete = func(sim *core.Simulation, cast *core.Cast) {
+		spellCast.OnCastComplete = func(sim *core.Simulation, cast *core.Cast) {
 			if shaman.ElementalFocusStacks > 0 {
 				shaman.ElementalFocusStacks--
 			}
 		}
 	} else {
-		template.Cast.OnCastComplete = func(sim *core.Simulation, cast *core.Cast) {}
+		spellCast.OnCastComplete = func(sim *core.Simulation, cast *core.Cast) {}
 	}
 
-	template.OnSpellMiss = func(sim *core.Simulation, cast *core.Cast) {}
-
-	return template
+	return spellCast
 }
 
-// Helper for precomputing hit inputs.
-func (shaman *Shaman) applyElectricSpellHitInputModifiers(hitInput *core.DirectCastDamageInput, isLightningOverload bool) {
-	hitInput.DamageMultiplier *= 1 + 0.01*float64(shaman.Talents.Concussion)
-	if isLightningOverload {
-		hitInput.DamageMultiplier *= 0.5
+// Helper for precomputing spell effects.
+func (shaman *Shaman) newElectricSpellEffect(minBaseDamage float64, maxBaseDamage float64, spellCoefficient float64, isLightningOverload bool) core.DirectDamageSpellEffect {
+	effect := core.DirectDamageSpellEffect{
+		SpellEffect: core.SpellEffect{
+			DamageMultiplier: 1,
+
+			OnSpellMiss: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {},
+		},
+		DirectDamageSpellInput: core.DirectDamageSpellInput{
+			MinBaseDamage: minBaseDamage,
+			MaxBaseDamage: maxBaseDamage,
+			SpellCoefficient: spellCoefficient,
+		},
 	}
 
-	hitInput.BonusSpellHitRating += float64(shaman.Talents.ElementalPrecision) * 2 * core.SpellHitRatingPerHitChance
-	hitInput.BonusSpellHitRating += float64(shaman.Talents.NaturesGuidance) * 1 * core.SpellHitRatingPerHitChance
-	hitInput.BonusSpellCritRating += float64(shaman.Talents.TidalMastery) * 1 * core.SpellCritRatingPerCritChance
-	hitInput.BonusSpellCritRating += float64(shaman.Talents.CallOfThunder) * 1 * core.SpellCritRatingPerCritChance
+	effect.SpellEffect.DamageMultiplier *= 1 + 0.01*float64(shaman.Talents.Concussion)
+	if isLightningOverload {
+		effect.SpellEffect.DamageMultiplier *= 0.5
+	}
+
+	effect.SpellEffect.BonusSpellHitRating += float64(shaman.Talents.ElementalPrecision) * 2 * core.SpellHitRatingPerHitChance
+	effect.SpellEffect.BonusSpellHitRating += float64(shaman.Talents.NaturesGuidance) * 1 * core.SpellHitRatingPerHitChance
+	effect.SpellEffect.BonusSpellCritRating += float64(shaman.Talents.TidalMastery) * 1 * core.SpellCritRatingPerCritChance
+	effect.SpellEffect.BonusSpellCritRating += float64(shaman.Talents.CallOfThunder) * 1 * core.SpellCritRatingPerCritChance
 
 	if shaman.Equip[items.ItemSlotRanged].ID == TotemOfStorms {
-		hitInput.BonusSpellPower += 33
+		effect.SpellEffect.BonusSpellPower += 33
 	} else if shaman.Equip[items.ItemSlotRanged].ID == TotemOfTheVoid {
-		hitInput.BonusSpellPower += 55
+		effect.SpellEffect.BonusSpellPower += 55
 	} else if shaman.Equip[items.ItemSlotRanged].ID == TotemOfAncestralGuidance {
-		hitInput.BonusSpellPower += 85
+		effect.SpellEffect.BonusSpellPower += 85
 	}
+
+	return effect
 }
 
 // Shared LB/CL logic that is dynamic, i.e. can't be precomputed.
-func (shaman *Shaman) applyElectricSpellInitModifiers(spell *core.DirectCastAction) {
+func (shaman *Shaman) applyElectricSpellCastInitModifiers(spellCast *core.SpellCast) {
 	if shaman.ElementalFocusStacks > 0 {
 		// TODO: This should subtract 40% of base cost
-		spell.Cast.ManaCost *= .6 // reduced by 40%
+		spellCast.Cast.ManaCost *= .6 // reduced by 40%
 	}
 }

@@ -71,9 +71,9 @@ func applyRaceEffects(agent Agent) {
 			return Aura{
 				ID:      TrollBeastSlayingAuraID,
 				Name:    "Beast Slaying (Troll Racial)",
-				OnBeforeSpellHit: func(sim *Simulation, cast *Cast, hitInput *DirectCastDamageInput) {
-					if hitInput.Target.MobType == proto.MobType_MobTypeBeast {
-						hitInput.DamageMultiplier *= 1.05
+				OnBeforeSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect) {
+					if spellEffect.Target.MobType == proto.MobType_MobTypeBeast {
+						spellEffect.DamageMultiplier *= 1.05
 					}
 				},
 			}

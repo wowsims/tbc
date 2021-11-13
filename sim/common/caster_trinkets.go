@@ -165,9 +165,9 @@ func ApplyMarkOfTheChampionCaster(agent core.Agent) {
 		return core.Aura{
 			ID:      MarkOfTheChampionCasterAuraID,
 			Name:    "Mark of the Champion (Caster)",
-			OnBeforeSpellHit: func(sim *core.Simulation, cast *core.Cast, hitInput *core.DirectCastDamageInput) {
-				if hitInput.Target.MobType == proto.MobType_MobTypeDemon || hitInput.Target.MobType == proto.MobType_MobTypeUndead {
-					hitInput.BonusSpellPower += 85
+			OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+				if spellEffect.Target.MobType == proto.MobType_MobTypeDemon || spellEffect.Target.MobType == proto.MobType_MobTypeUndead {
+					spellEffect.BonusSpellPower += 85
 				}
 			},
 		}
@@ -208,11 +208,11 @@ func ApplyShiffarsNexusHorn(agent core.Agent) {
 		return core.Aura{
 			ID:      ShiffarsNexusHornAuraID,
 			Name:    "Shiffar's Nexus-Horn",
-			OnSpellHit: func(sim *core.Simulation, cast *core.Cast, result *core.DirectCastDamageResult) {
-				if cast.ActionID.ItemID == core.ItemIDTheLightningCapacitor {
+			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+				if spellCast.ActionID.ItemID == core.ItemIDTheLightningCapacitor {
 					return // TLC can't proc Sextant
 				}
-				if !icd.IsOnCD(sim) && result.Crit && sim.RandomFloat("unmarked") < 0.2 {
+				if !icd.IsOnCD(sim) && spellEffect.Crit && sim.RandomFloat("unmarked") < 0.2 {
 					icd = core.InternalCD(sim.CurrentTime + dur)
 					character.AddAuraWithTemporaryStats(sim, CallOfTheNexusAuraID, "Call of the Nexus", stats.SpellPower, spellBonus, time.Second*10)
 				}
@@ -232,7 +232,7 @@ func ApplyEyeOfMagtheridon(agent core.Agent) {
 		return core.Aura{
 			ID:      EyeOfMagtheridonAuraID,
 			Name:    "Eye of Magtheridon",
-			OnSpellMiss: func(sim *core.Simulation, cast *core.Cast) {
+			OnSpellMiss: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 				character.AddAuraWithTemporaryStats(sim, RecurringPowerAuraID, "Recurring Power", stats.SpellPower, spellBonus, dur)
 			},
 		}
@@ -252,11 +252,11 @@ func ApplySextantOfUnstableCurrents(agent core.Agent) {
 		return core.Aura{
 			ID:      SextantOfUnstableCurrentsAuraID,
 			Name:    "Sextant of Unstable Currents",
-			OnSpellHit: func(sim *core.Simulation, cast *core.Cast, result *core.DirectCastDamageResult) {
-				if cast.ActionID.ItemID == core.ItemIDTheLightningCapacitor {
+			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+				if spellCast.ActionID.ItemID == core.ItemIDTheLightningCapacitor {
 					return // TLC can't proc Sextant
 				}
-				if result.Crit && !icd.IsOnCD(sim) && sim.RandomFloat("unmarked") < 0.2 {
+				if spellEffect.Crit && !icd.IsOnCD(sim) && sim.RandomFloat("unmarked") < 0.2 {
 					icd = core.InternalCD(sim.CurrentTime + icdDur)
 					character.AddAuraWithTemporaryStats(sim, UnstableCurrentsAuraID, "Unstable Currents", stats.SpellPower, spellBonus, dur)
 				}
