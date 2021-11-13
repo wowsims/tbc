@@ -62,8 +62,8 @@ var ItemSetCycloneRegalia = core.ItemSet{
 				return core.Aura{
 					ID:      Cyclone4PcAuraID,
 					Name:    "Cyclone 4pc Bonus",
-					OnSpellHit: func(sim *core.Simulation, cast *core.Cast, result *core.DirectCastDamageResult) {
-						if result.Crit && sim.RandomFloat("cycl4p") < 0.11 {
+					OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+						if spellEffect.Crit && sim.RandomFloat("cycl4p") < 0.11 {
 							character.AddAura(sim, core.Aura{
 								ID: Cyclone4PcManaRegainAuraID,
 								Name: "Cyclone Mana Cost Reduction",
@@ -94,8 +94,8 @@ var ItemSetCataclysmRegalia = core.ItemSet{
 				return core.Aura{
 					ID:      Cataclysm4PcAuraID,
 					Name:    "Cataclysm 4pc Bonus",
-					OnSpellHit: func(sim *core.Simulation, cast *core.Cast, result *core.DirectCastDamageResult) {
-						if result.Crit && sim.RandomFloat("cata4p") < 0.25 {
+					OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+						if spellEffect.Crit && sim.RandomFloat("cata4p") < 0.25 {
 							character.AddStat(stats.Mana, 120)
 						}
 					},
@@ -121,9 +121,9 @@ var ItemSetSkyshatterRegalia = core.ItemSet{
 				return core.Aura{
 					ID:      Skyshatter4PcAuraID,
 					Name:    "Skyshatter 4pc Bonus",
-					OnBeforeSpellHit: func(sim *core.Simulation, cast *core.Cast, hitInput *core.DirectCastDamageInput) {
-						if cast.ActionID.SpellID == SpellIDLB12 {
-							hitInput.DamageMultiplier *= 1.05
+					OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+						if spellCast.ActionID.SpellID == SpellIDLB12 {
+							spellEffect.DamageMultiplier *= 1.05
 						}
 					},
 				}

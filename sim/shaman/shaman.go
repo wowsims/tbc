@@ -63,15 +63,18 @@ type Shaman struct {
 	ElementalFocusStacks byte
 
 	// "object pool" for shaman spells that are currently being cast.
-	electricSpell   core.DirectCastAction
-	electricSpellLO core.DirectCastAction
+	lightningBoltSpell   core.SingleTargetDirectDamageSpell
+	lightningBoltSpellLO core.SingleTargetDirectDamageSpell
+
+	chainLightningSpell   core.MultiTargetDirectDamageSpell
+	chainLightningSpellLO core.MultiTargetDirectDamageSpell
 
 	// Precomputed templated cast generator for quickly resetting cast fields.
-	lightningBoltCastGenerator   core.DirectCastGenerator
-	lightningBoltLOCastGenerator core.DirectCastGenerator
+	lightningBoltCastTemplate   core.SingleTargetDirectDamageSpellTemplate
+	lightningBoltLOCastTemplate core.SingleTargetDirectDamageSpellTemplate
 
-	chainLightningCastGenerator   core.DirectCastGenerator
-	chainLightningLOCastGenerator core.DirectCastGenerator
+	chainLightningCastTemplate   core.MultiTargetDirectDamageSpellTemplate
+	chainLightningLOCastTemplate core.MultiTargetDirectDamageSpellTemplate
 }
 
 // Implemented by each Shaman spec.
@@ -112,10 +115,10 @@ func (shaman *Shaman) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {
 
 func (shaman *Shaman) Init(sim *core.Simulation) {
 	// Precompute all the spell templates.
-	shaman.lightningBoltCastGenerator = shaman.newLightningBoltGenerator(sim, false)
-	shaman.lightningBoltLOCastGenerator = shaman.newLightningBoltGenerator(sim, true)
-	shaman.chainLightningCastGenerator = shaman.newChainLightningGenerator(sim, false)
-	shaman.chainLightningLOCastGenerator = shaman.newChainLightningGenerator(sim, true)
+	shaman.lightningBoltCastTemplate = shaman.newLightningBoltTemplate(sim, false)
+	shaman.lightningBoltLOCastTemplate = shaman.newLightningBoltTemplate(sim, true)
+	shaman.chainLightningCastTemplate = shaman.newChainLightningTemplate(sim, false)
+	shaman.chainLightningLOCastTemplate = shaman.newChainLightningTemplate(sim, true)
 }
 
 func (shaman *Shaman) Reset(sim *core.Simulation) {

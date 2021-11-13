@@ -170,14 +170,9 @@ func (rotation *FixedRotation) ChooseAction(eleShaman *ElementalShaman, sim *cor
 }
 
 func (rotation *FixedRotation) OnActionAccepted(eleShaman *ElementalShaman, sim *core.Simulation, action core.AgentAction) {
-	cast, isCastAction := action.(*core.DirectCastAction)
-	if !isCastAction {
-		return
-	}
-
-	if cast.GetActionID().SpellID == SpellIDLB12 {
+	if action.GetActionID().SpellID == SpellIDLB12 {
 		rotation.numLBsSinceLastCL++
-	} else if cast.GetActionID().SpellID == SpellIDCL6 {
+	} else if action.GetActionID().SpellID == SpellIDCL6 {
 		rotation.numLBsSinceLastCL = 0
 	}
 }

@@ -83,7 +83,6 @@ type ActionMetric struct {
 	Hits   int32
 	Crits  int32
 	Misses int32
-	// Resists []int32   // Count of Resists
 
 	Damage float64
 }
@@ -106,17 +105,17 @@ func NewMetricsAggregator(numAgents int, encounterDuration float64) *MetricsAggr
 }
 
 // Adds the results of an action to the aggregated metrics.
-func (aggregator *MetricsAggregator) AddCastAction(cast *DirectCastAction, castResults []DirectCastDamageResult) {
-	actionID := cast.GetActionID()
-	tag := cast.GetTag()
+func (aggregator *MetricsAggregator) AddSpellEffects(spellCast *SpellCast) {
+	actionID := spellCast.ActionID
+	tag := spellCast.Tag
 
 	actionKey := NewActionKey(actionID, tag)
 
-	agentID := cast.Character.ID
+	agentID := spellCast.Character.ID
 
 	iterationMetrics := &aggregator.agentIterations[agentID]
-	if !cast.IgnoreManaCost {
-		iterationMetrics.ManaSpent += cast.ManaCost
+	if !spellCast.IgnoreManaCost {
+		iterationMetrics.ManaSpent += spellCast.ManaCost
 	}
 
 	aggregateMetrics := &aggregator.agentAggregates[agentID]
@@ -128,20 +127,11 @@ func (aggregator *MetricsAggregator) AddCastAction(cast *DirectCastAction, castR
 	}
 
 	actionMetrics.Casts++
-	for _, result := range castResults {
-		if result.Hit {
-			actionMetrics.Hits++
-		} else {
-			actionMetrics.Misses++
-		}
-
-		if result.Crit {
-			actionMetrics.Crits++
-		}
-
-		actionMetrics.Damage += result.Damage
-		iterationMetrics.TotalDamage += result.Damage
-	}
+	actionMetrics.Hits += spellCast.Hits
+	actionMetrics.Misses += spellCast.Misses
+	actionMetrics.Crits += spellCast.Crits
+	actionMetrics.Damage += spellCast.TotalDamage
+	iterationMetrics.TotalDamage += spellCast.TotalDamage
 
 	aggregateMetrics.Actions[actionKey] = actionMetrics
 }
