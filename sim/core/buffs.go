@@ -18,7 +18,7 @@ func applyBuffEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs proto.P
 	}
 
 	// TODO: Double-check these numbers.
-	gotwAmount := GetTristateValueFloat(raidBuffs.GiftOfTheWild, 14.0, 14.0 * 1.35)
+	gotwAmount := GetTristateValueFloat(raidBuffs.GiftOfTheWild, 14.0, 14.0*1.35)
 	// TODO: Pretty sure some of these dont stack with fort/ai/divine spirit
 	character.AddStats(stats.Stats{
 		stats.Stamina:   gotwAmount,
@@ -32,13 +32,13 @@ func applyBuffEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs proto.P
 		stats.SpellCrit: GetTristateValueFloat(partyBuffs.MoonkinAura, 5*SpellCritRatingPerCritChance, 5*SpellCritRatingPerCritChance+20),
 	})
 
-	if (partyBuffs.DraeneiRacialMelee) {
+	if partyBuffs.DraeneiRacialMelee {
 		character.AddStats(stats.Stats{
 			stats.MeleeHit: 1 * MeleeHitRatingPerHitChance,
 		})
 	}
 
-	if (partyBuffs.DraeneiRacialCaster) {
+	if partyBuffs.DraeneiRacialCaster {
 		character.AddStats(stats.Stats{
 			stats.SpellHit: 1 * SpellHitRatingPerHitChance,
 		})
@@ -49,10 +49,10 @@ func applyBuffEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs proto.P
 	})
 	if raidBuffs.DivineSpirit == proto.TristateEffect_TristateEffectImproved {
 		character.AddStatDependency(stats.StatDependency{
-			SourceStat: stats.Spirit,
+			SourceStat:   stats.Spirit,
 			ModifiedStat: stats.SpellPower,
 			Modifier: func(spirit float64, spellPower float64) float64 {
-				return spellPower + spirit * 0.1
+				return spellPower + spirit*0.1
 			},
 		})
 	}
@@ -80,7 +80,7 @@ func applyBuffEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs proto.P
 
 		for _, stat := range bokStats {
 			character.AddStatDependency(stats.StatDependency{
-				SourceStat: stat,
+				SourceStat:   stat,
 				ModifiedStat: stat,
 				Modifier: func(curValue float64, _ float64) float64 {
 					return curValue * 1.1
@@ -128,6 +128,7 @@ func applyBuffEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs proto.P
 
 var BloodlustAuraID = NewAuraID()
 var BloodlustCooldownID = NewCooldownID()
+
 func registerBloodlustCD(agent Agent, numBloodlusts int32) {
 	if numBloodlusts == 0 {
 		return
@@ -137,8 +138,8 @@ func registerBloodlustCD(agent Agent, numBloodlusts int32) {
 
 	agent.GetCharacter().AddMajorCooldown(MajorCooldown{
 		CooldownID: BloodlustCooldownID,
-		Cooldown: dur, // assumes that multiple BLs are different shaman.
-		Priority: CooldownPriorityBloodlust,
+		Cooldown:   dur, // assumes that multiple BLs are different shaman.
+		Priority:   CooldownPriorityBloodlust,
 		ActivationFactory: func(sim *Simulation) CooldownActivation {
 			// Capture this inside ActivationFactory so it resets on Sim reset.
 			bloodlustsUsed := int32(0)
