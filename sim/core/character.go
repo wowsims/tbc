@@ -46,6 +46,9 @@ type Character struct {
 	// Current stats, including temporary effects.
 	stats stats.Stats
 
+	// psuedoStats are modifiers that aren't directly a stat
+	psuedoStats stats.PsuedoStats
+
 	// Used for applying the effects of hardcast / channeled spells at a later time.
 	// By definition there can be only 1 hardcast spell being cast at any moment.
 	HardcastAura Aura
@@ -143,8 +146,9 @@ func (character *Character) HasTemporaryBonusForStat(stat stats.Stat) bool {
 	return character.GetInitialStat(stat) != character.GetStat(stat)
 }
 
-func (character *Character) HasteBonus() float64 {
-	return 1 + (character.stats[stats.SpellHaste] / (HasteRatingPerHastePercent * 100))
+// TODO: rename this better
+func (character *Character) CastSpeed() float64 {
+	return character.psuedoStats.CastSpeedMultiplier + (character.stats[stats.SpellHaste] / (HasteRatingPerHastePercent * 100))
 }
 
 func (character *Character) AddRaidBuffs(raidBuffs *proto.RaidBuffs) {

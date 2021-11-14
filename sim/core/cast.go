@@ -95,7 +95,7 @@ func (cast *Cast) GetDuration() time.Duration {
 
 // Should be called exactly once after creation.
 func (cast *Cast) init(sim *Simulation) {
-	cast.CastTime = time.Duration(float64(cast.CastTime) / cast.Character.HasteBonus())
+	cast.CastTime = time.Duration(float64(cast.CastTime) / cast.Character.CastSpeed())
 
 	// Apply on-cast effects.
 	cast.Character.OnCast(sim, cast)
@@ -147,11 +147,8 @@ func (cast *Cast) startCasting(sim *Simulation, onCastComplete OnCastComplete) b
 
 	if !cast.IgnoreCooldowns {
 		// Prevent any actions on the GCD until the cast AND the GCD are done.
-
-		// TODO: Handle instant casts, account for
-		// gcd := 1.5 / cast.Character.spellHasteBonus
-
-		gcdCD := MaxDuration(GCDMin, cast.CastTime)
+		gcd := float64(GCDDefault) / cast.Character.CastSpeed()
+		gcdCD := MaxDuration(GCDMin, time.Duration(gcd))
 		cast.Character.SetCD(GCDCooldownID, sim.CurrentTime+gcdCD)
 
 		// TODO: Hardcasts seem to also reset swing timers, so we should set those CDs as well.

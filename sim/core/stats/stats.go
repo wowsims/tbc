@@ -292,6 +292,11 @@ func (sdm *StatDependencyManager) ApplyStatDependencies(stats Stats) Stats {
 	return newStats
 }
 
+type PsuedoStats struct {
+	CastSpeedMultiplier     float64
+	AttackSpeedMultiplier   float64 // not used yet
+	SpiritRegenWhileCasting float64
+}
 
 // TODO: more stat calculations
 

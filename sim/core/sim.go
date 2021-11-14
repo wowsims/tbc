@@ -2,6 +2,7 @@ package core
 
 import (
 	"fmt"
+	"log"
 	"math/rand"
 	"sort"
 	"strings"
@@ -150,10 +151,12 @@ func (sim *Simulation) RunOnce() {
 	// setup initial actions.
 	for _, party := range sim.Raid.Parties {
 		for _, agent := range party.Players {
+			ag := agent
 			pa := PendingAction{}
 			pa.OnAction = func(sim *Simulation) {
-				agent.GetCharacter().TryUseCooldowns(sim)
-				pa.NextActionAt = agent.Act(sim)
+				ag.GetCharacter().TryUseCooldowns(sim)
+				pa.NextActionAt = ag.Act(sim)
+				log.Printf("Next action at: %v", pa.NextActionAt)
 			}
 			sim.AddPendingAction(pa)
 		}
@@ -166,8 +169,8 @@ func (sim *Simulation) RunOnce() {
 
 	for sim.CurrentTime < sim.Duration {
 		pa := sim.pendingActions[0]
-
 		if pa.NextActionAt > sim.CurrentTime {
+			log.Printf("Advancing... %#v, time: %v", pa.NextActionAt, sim.CurrentTime)
 			sim.Advance(pa.NextActionAt - sim.CurrentTime)
 		}
 
@@ -179,7 +182,7 @@ func (sim *Simulation) RunOnce() {
 		} else {
 			// Insert into the list the correct execution time.
 			for i, v := range sim.pendingActions {
-				if v.NextActionAt >= pa.NextActionAt {
+				if v.NextActionAt > pa.NextActionAt {
 					copy(sim.pendingActions, sim.pendingActions[:i])
 					sim.pendingActions[i] = pa
 				}
