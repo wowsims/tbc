@@ -35,7 +35,7 @@ message DruidTalents {
     bool faerie_fire = 24;
     int32 heart_of_the_wild = 25;
     int32 survival_of_the_fittest = 26;
-    int32 leader_of_the_pack = 27;
+    bool leader_of_the_pack = 27;
     int32 improved_leader_of_the_pack = 28;
     int32 predatory_instincts = 29;
     bool mangle = 30;
