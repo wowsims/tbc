@@ -860,3 +860,5 @@ export function gemMatchesSocket(gem: Gem, socketColor: GemColor) {
 export function gemEligibleForSocket(gem: Gem, socketColor: GemColor) {
   return (gem.color == GemColor.GemColorMeta) == (socketColor == GemColor.GemColorMeta);
 }
+
+export const NO_TARGET = -1;

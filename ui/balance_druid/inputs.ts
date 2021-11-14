@@ -1,7 +1,9 @@
 import { IconInput } from '/tbc/core/components/icon_picker.js';
 import { BalanceDruid_Rotation_PrimarySpell as PrimarySpell } from '/tbc/core/proto/druid.js';
 import { BalanceDruid_Options as DruidOptions } from '/tbc/core/proto/druid.js';
+import { RaidTarget } from '/tbc/core/proto/common.js';
 import { Spec } from '/tbc/core/proto/common.js';
+import { NO_TARGET } from '/tbc/core/proto_utils/utils.js';
 import { ItemOrSpellId } from '/tbc/core/resources.js';
 import { Player } from '/tbc/core/player.js';
 import { Sim } from '/tbc/core/sim.js';
@@ -10,6 +12,20 @@ import { Target } from '/tbc/core/target.js';
 
 // Configuration for spec-specific UI elements on the settings tab.
 // These don't need to be in a separate file but it keeps things cleaner.
+
+export const SelfInnervate = {
+	id: { spellId: 29166 },
+	states: 2,
+	changedEvent: (player: Player<Spec.SpecBalanceDruid>) => player.specOptionsChangeEmitter,
+	getValue: (player: Player<Spec.SpecBalanceDruid>) => player.getSpecOptions().innervateTarget?.targetIndex != NO_TARGET,
+	setBooleanValue: (player: Player<Spec.SpecBalanceDruid>, newValue: boolean) => {
+		const newOptions = player.getSpecOptions();
+		newOptions.innervateTarget = RaidTarget.create({
+			targetIndex: newValue ? 0 : NO_TARGET,
+		});
+		player.setSpecOptions(newOptions);
+	},
+};
 
 export const BalanceDruidRotationConfig = {
 	inputs: [

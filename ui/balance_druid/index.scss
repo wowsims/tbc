@@ -16,7 +16,7 @@ body {
 
 // Set grid width for icon sections based on how many buffs we configured.
 .self-buffs-section>div {
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, 1fr);
 }
 .consumes-section>div {
   grid-template-columns: repeat(4, 1fr);
@@ -25,5 +25,5 @@ body {
   grid-template-columns: repeat(6, 1fr);
 }
 .debuffs-section>div {
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
 }

@@ -140,6 +140,9 @@ const theme = new DefaultTheme<Spec.SpecBalanceDruid>(document.body, {
 	selfBuffInputs: {
 		tooltip: Tooltips.SELF_BUFFS_SECTION,
 		icons: [
+			DruidInputs.SelfInnervate,
+			IconInputs.DrumsOfBattleConsume,
+			IconInputs.DrumsOfRestorationConsume,
 		],
 	},
 	// IconInputs to include in the 'Other Buffs' section on the settings tab.
