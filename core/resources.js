@@ -1,3 +1,4 @@
+import { getWowheadItemId } from '/tbc/core/proto_utils/equipped_item.js';
 import { GemColor } from './proto/common.js';
 import { ItemSlot } from './proto/common.js';
 // Github pages serves our site under the /tbc directory (because the repo name is tbc)
@@ -61,6 +62,9 @@ export async function getIconUrl(id) {
     const tooltipData = await getTooltipData(id);
     return "https://wow.zamimg.com/images/wow/icons/large/" + tooltipData['icon'] + ".jpg";
 }
+export async function getItemIconUrl(item) {
+    return getIconUrl({ itemId: getWowheadItemId(item) });
+}
 function getOtherActionName(id) {
     throw new Error('No other actions!');
 }
@@ -78,6 +82,9 @@ export function setWowheadHref(elem, id) {
     else {
         elem.href = 'https://tbc.wowhead.com/spell=' + id.spellId;
     }
+}
+export function setWowheadItemHref(elem, item) {
+    return setWowheadHref(elem, { itemId: getWowheadItemId(item) });
 }
 const emptyGemSocketIcons = {
     [GemColor.GemColorBlue]: 'https://wow.zamimg.com/images/icons/socket-blue.gif',

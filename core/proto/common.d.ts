@@ -293,6 +293,14 @@ export interface Item {
      */
     id: number;
     /**
+     * This is unused by most items. For most items we set id to the
+     * wowhead/in-game ID directly. For random enchant items though we need to
+     * use unique hardcoded IDs so this field holds the wowhead ID instead.
+     *
+     * @generated from protobuf field: int32 wowhead_id = 16;
+     */
+    wowheadId: number;
+    /**
      * @generated from protobuf field: string name = 2;
      */
     name: string;

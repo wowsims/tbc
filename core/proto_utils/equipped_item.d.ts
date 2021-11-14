@@ -2,6 +2,7 @@ import { Enchant } from '/tbc/core/proto/common.js';
 import { Gem } from '/tbc/core/proto/common.js';
 import { Item } from '/tbc/core/proto/common.js';
 import { ItemSpec } from '/tbc/core/proto/common.js';
+export declare function getWowheadItemId(item: Item): number;
 /**
  * Represents an equipped item along with enchants/gems attached to it.
  *

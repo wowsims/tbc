@@ -118,9 +118,9 @@ export interface DruidTalents {
      */
     survivalOfTheFittest: number;
     /**
-     * @generated from protobuf field: int32 leader_of_the_pack = 27;
+     * @generated from protobuf field: bool leader_of_the_pack = 27;
      */
-    leaderOfThePack: number;
+    leaderOfThePack: boolean;
     /**
      * @generated from protobuf field: int32 improved_leader_of_the_pack = 28;
      */

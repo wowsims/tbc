@@ -5,6 +5,9 @@ import { ItemSpec } from '/tbc/core/proto/common.js';
 import { enchantAppliesToItem } from './utils.js';
 import { gemEligibleForSocket } from './utils.js';
 import { gemMatchesSocket } from './utils.js';
+export function getWowheadItemId(item) {
+    return item.wowheadId || item.id;
+}
 /**
  * Represents an equipped item along with enchants/gems attached to it.
  *

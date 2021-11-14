@@ -1502,6 +1502,7 @@ class Item$Type extends MessageType {
     constructor() {
         super("proto.Item", [
             { no: 1, name: "id", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 16, name: "wowhead_id", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 2, name: "name", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
             { no: 14, name: "categories", kind: "enum", repeat: 1 /*RepeatType.PACKED*/, T: () => ["proto.ItemCategory", ItemCategory] },
             { no: 15, name: "class_allowlist", kind: "enum", repeat: 1 /*RepeatType.PACKED*/, T: () => ["proto.Class", Class] },
@@ -1519,7 +1520,7 @@ class Item$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { id: 0, name: "", categories: [], classAllowlist: [], type: 0, armorType: 0, weaponType: 0, handType: 0, rangedWeaponType: 0, stats: [], gemSockets: [], socketBonus: [], phase: 0, quality: 0, unique: false };
+        const message = { id: 0, wowheadId: 0, name: "", categories: [], classAllowlist: [], type: 0, armorType: 0, weaponType: 0, handType: 0, rangedWeaponType: 0, stats: [], gemSockets: [], socketBonus: [], phase: 0, quality: 0, unique: false };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -1532,6 +1533,9 @@ class Item$Type extends MessageType {
             switch (fieldNo) {
                 case /* int32 id */ 1:
                     message.id = reader.int32();
+                    break;
+                case /* int32 wowhead_id */ 16:
+                    message.wowheadId = reader.int32();
                     break;
                 case /* string name */ 2:
                     message.name = reader.string();
@@ -1610,6 +1614,9 @@ class Item$Type extends MessageType {
         /* int32 id = 1; */
         if (message.id !== 0)
             writer.tag(1, WireType.Varint).int32(message.id);
+        /* int32 wowhead_id = 16; */
+        if (message.wowheadId !== 0)
+            writer.tag(16, WireType.Varint).int32(message.wowheadId);
         /* string name = 2; */
         if (message.name !== "")
             writer.tag(2, WireType.LengthDelimited).string(message.name);
