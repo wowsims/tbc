@@ -277,6 +277,7 @@ export class DefaultTheme extends SimUI {
             savedGearManager.addSavedData({
                 name: presetGear.name,
                 tooltip: presetGear.tooltip,
+                isPreset: true,
                 data: {
                     gear: this.sim.lookupEquipmentSpec(presetGear.gear),
                     customStats: new Stats(),
@@ -286,11 +287,13 @@ export class DefaultTheme extends SimUI {
         });
         savedEncounterManager.loadUserData();
         this._config.presets.encounters.forEach(config => {
+            config.isPreset = true;
             savedEncounterManager.addSavedData(config);
         });
         savedSettingsManager.loadUserData();
         savedTalentsManager.loadUserData();
         this._config.presets.talents.forEach(config => {
+            config.isPreset = true;
             savedTalentsManager.addSavedData(config);
         });
     }
