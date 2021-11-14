@@ -68,7 +68,7 @@ export class DruidTalentsPicker extends TalentsPicker<Spec.SpecBalanceDruid> {
               rowIdx: 1,
               colIdx: 2,
             },
-            spellIds: [15821],
+            spellIds: [16821],
             maxPoints: 2,
           },
           {

@@ -4,9 +4,10 @@ rwildcard=$(foreach d,$(wildcard $(1:=/*)),$(call rwildcard,$d,$2) $(filter $(su
 OUT_DIR=dist/tbc
 
 # Make everything. Keep this first so it's the default rule.
-$(OUT_DIR): elemental_shaman
+$(OUT_DIR): balance_druid elemental_shaman
 
 # Add new sim rules here! Don't forget to add it as a dependency to the default rule above.
+balance_druid: $(OUT_DIR)/balance_druid/index.js $(OUT_DIR)/balance_druid/index.css $(OUT_DIR)/balance_druid/index.html ui_shared
 elemental_shaman: $(OUT_DIR)/elemental_shaman/index.js $(OUT_DIR)/elemental_shaman/index.css $(OUT_DIR)/elemental_shaman/index.html ui_shared
 
 ui_shared: $(OUT_DIR)/lib.wasm $(OUT_DIR)/sim_worker.js $(OUT_DIR)/net_worker.js detailed_results

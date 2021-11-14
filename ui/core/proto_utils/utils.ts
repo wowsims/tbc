@@ -37,6 +37,18 @@ export type ShamanSpecs = Spec.SpecElementalShaman;
 export type WarlockSpecs = Spec.SpecWarlock;
 export type WarriorSpecs = Spec.SpecWarrior;
 
+export const specNames: Record<Spec, string> = {
+  [Spec.SpecBalanceDruid]: 'Balance Druid',
+  [Spec.SpecElementalShaman]: 'Elemental Shaman',
+  [Spec.SpecHunter]: 'Hunter',
+  [Spec.SpecMage]: 'Mage',
+  [Spec.SpecRogue]: 'Rogue',
+  [Spec.SpecRetributionPaladin]: 'Retribution Paladin',
+  [Spec.SpecShadowPriest]: 'Shadow Priest',
+  [Spec.SpecWarlock]: 'Warlock',
+  [Spec.SpecWarrior]: 'Warrior',
+};
+
 export type RotationUnion =
 		BalanceDruidRotation |
 		ElementalShamanRotation |
@@ -317,6 +329,27 @@ export const specTypeFunctions: Partial<Record<Spec, SpecTypeFunctions<any>>> = 
     optionsToJson: (a) => WarriorOptions.toJson(a as WarriorOptions),
     optionsFromJson: (obj) => WarriorOptions.fromJson(obj),
   },
+};
+
+export enum Faction {
+	Unknown,
+	Alliance,
+	Horde,
+}
+
+export const raceToFaction: Record<Race, Faction> = {
+	[Race.RaceUnknown]: Faction.Unknown,
+	[Race.RaceBloodElf]: Faction.Horde,
+	[Race.RaceDraenei]: Faction.Alliance,
+	[Race.RaceDwarf]: Faction.Alliance,
+	[Race.RaceGnome]: Faction.Alliance,
+	[Race.RaceHuman]: Faction.Alliance,
+	[Race.RaceNightElf]: Faction.Alliance,
+	[Race.RaceOrc]: Faction.Horde,
+	[Race.RaceTauren]: Faction.Horde,
+	[Race.RaceTroll10]: Faction.Horde,
+	[Race.RaceTroll30]: Faction.Horde,
+	[Race.RaceUndead]: Faction.Horde,
 };
 
 export const specToClass: Record<Spec, Class> = {
