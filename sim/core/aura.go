@@ -13,6 +13,7 @@ type AuraID int32
 
 // Reserve the default value so no aura uses it.
 const UnknownAuraID = AuraID(0)
+
 var numAuraIDs = 1
 
 func NewAuraID() AuraID {
@@ -23,11 +24,13 @@ func NewAuraID() AuraID {
 
 // Offsensive trinkets put each other on CD, so they can all share 1 aura ID
 var OffensiveTrinketActiveAuraID = NewAuraID()
+
 // Defensive trinkets put each other on CD, so they can all share 1 aura ID
 var DefensiveTrinketActiveAuraID = NewAuraID()
 
 // Reserve the default value so no aura uses it.
 const UnknownDebuffID = AuraID(0)
+
 var numDebuffIDs = 1
 
 func NewDebuffID() AuraID {
@@ -40,6 +43,7 @@ type CooldownID int32
 
 // Reserve the default value so no cooldown uses it.
 const UnknownCooldownID = AuraID(0)
+
 var numCooldownIDs = 1
 
 func NewCooldownID() CooldownID {
@@ -113,7 +117,7 @@ type auraTracker struct {
 	// Whether finalize() has been called for this object.
 	finalized bool
 
-  // Maps MagicIDs to sim duration at which CD is done. Using array for perf.
+	// Maps MagicIDs to sim duration at which CD is done. Using array for perf.
 	cooldowns []time.Duration
 
 	// Maps MagicIDs to aura for that ID. Using array for perf.
@@ -140,14 +144,14 @@ type auraTracker struct {
 
 func newAuraTracker(useDebuffIDs bool) auraTracker {
 	return auraTracker{
-		permanentAuras: []PermanentAura{},
-		activeAuraIDs: make([]AuraID, 0, 16),
-		onCastIDs: make([]AuraID, 0, 16),
-		onCastCompleteIDs: make([]AuraID, 0, 16),
+		permanentAuras:      []PermanentAura{},
+		activeAuraIDs:       make([]AuraID, 0, 16),
+		onCastIDs:           make([]AuraID, 0, 16),
+		onCastCompleteIDs:   make([]AuraID, 0, 16),
 		onBeforeSpellHitIDs: make([]AuraID, 0, 16),
-		onSpellHitIDs: make([]AuraID, 0, 16),
-		onSpellMissIDs: make([]AuraID, 0, 16),
-		useDebuffIDs: useDebuffIDs,
+		onSpellHitIDs:       make([]AuraID, 0, 16),
+		onSpellMissIDs:      make([]AuraID, 0, 16),
+		useDebuffIDs:        useDebuffIDs,
 	}
 }
 

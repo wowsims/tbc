@@ -120,7 +120,7 @@ func (cast *Cast) startCasting(sim *Simulation, onCastComplete OnCastComplete) b
 		if cast.Character.CurrentMana() < cast.ManaCost {
 			if sim.Log != nil {
 				sim.Log("(%d) Failed casting %s, not enough mana. (Current Mana = %0.0f, Mana Cost = %0.0f)\n",
-						cast.Character.ID, cast.Name, cast.Character.CurrentMana(), cast.ManaCost)
+					cast.Character.ID, cast.Name, cast.Character.CurrentMana(), cast.ManaCost)
 			}
 			sim.MetricsAggregator.MarkOOM(cast.Character, sim.CurrentTime)
 
@@ -130,7 +130,7 @@ func (cast *Cast) startCasting(sim *Simulation, onCastComplete OnCastComplete) b
 
 	if sim.Log != nil {
 		sim.Log("(%d) Casting %s (Current Mana = %0.0f, Mana Cost = %0.0f, Cast Time = %s)\n",
-				cast.Character.ID, cast.Name, cast.Character.CurrentMana(), cast.ManaCost, cast.CastTime)
+			cast.Character.ID, cast.Name, cast.Character.CurrentMana(), cast.ManaCost, cast.CastTime)
 	}
 
 	// For instant-cast spells we can skip creating an aura.
@@ -147,6 +147,10 @@ func (cast *Cast) startCasting(sim *Simulation, onCastComplete OnCastComplete) b
 
 	if !cast.IgnoreCooldowns {
 		// Prevent any actions on the GCD until the cast AND the GCD are done.
+
+		// TODO: Handle instant casts, account for
+		// gcd := 1.5 / cast.Character.spellHasteBonus
+
 		gcdCD := MaxDuration(GCDMin, cast.CastTime)
 		cast.Character.SetCD(GCDCooldownID, sim.CurrentTime+gcdCD)
 

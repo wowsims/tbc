@@ -69,7 +69,7 @@ message BalanceDruid {
   }
   Rotation rotation = 1;
   DruidTalents talents = 2;
-    
+
   message Options {
     bool omen_of_clarity = 1;
     RaidTarget innervate_target = 2; 

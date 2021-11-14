@@ -28,7 +28,9 @@ type Simulation struct {
 
 	rand *rand.Rand
 
-	CurrentTime time.Duration // duration that has elapsed in the sim since starting
+	// Current Simulation State
+	pendingActions []PendingAction
+	CurrentTime    time.Duration // duration that has elapsed in the sim since starting
 
 	Log  func(string, ...interface{})
 	logs []string
@@ -61,7 +63,7 @@ func newSim(raid *Raid, encounter Encounter, simOptions proto.SimOptions) *Simul
 		targets:  encounter.Targets,
 		Options:  simOptions,
 		Duration: DurationFromSeconds(encounter.Duration),
-		Log: nil,
+		Log:      nil,
 
 		rand: rand.New(rand.NewSource(rseed)),
 
@@ -105,8 +107,8 @@ func (sim *Simulation) reset() {
 	}
 }
 
-type pendingAgent struct {
-	Agent Agent
+type PendingAction struct {
+	OnAction     func(*Simulation)
 	NextActionAt time.Duration
 }
 
@@ -144,44 +146,55 @@ func (sim *Simulation) Run() SimResult {
 func (sim *Simulation) RunOnce() {
 	sim.reset()
 
-	pendingAgents := make([]pendingAgent, 0, 25)
+	sim.pendingActions = make([]PendingAction, 0, 25)
 	// setup initial actions.
 	for _, party := range sim.Raid.Parties {
 		for _, agent := range party.Players {
-			pendingAgents = append(pendingAgents, pendingAgent{
-				NextActionAt: 0,
-				Agent:        agent,
-			})
+			pa := PendingAction{}
+			pa.OnAction = func(sim *Simulation) {
+				agent.GetCharacter().TryUseCooldowns(sim)
+				pa.NextActionAt = agent.Act(sim)
+			}
+			sim.AddPendingAction(pa)
 		}
 	}
+
 	// order pending by execution time.
-	sort.Slice(pendingAgents, func(i, j int) bool {
-		return pendingAgents[i].NextActionAt < pendingAgents[j].NextActionAt
+	sort.Slice(sim.pendingActions, func(i, j int) bool {
+		return sim.pendingActions[i].NextActionAt < sim.pendingActions[j].NextActionAt
 	})
 
 	for sim.CurrentTime < sim.Duration {
-		pa := pendingAgents[0]
+		pa := sim.pendingActions[0]
 
 		if pa.NextActionAt > sim.CurrentTime {
 			sim.Advance(pa.NextActionAt - sim.CurrentTime)
 		}
 
-		pa.Agent.GetCharacter().TryUseCooldowns(sim)
-		pa.NextActionAt = pa.Agent.Act(sim)
+		pa.OnAction(sim)
 
-		if len(pendingAgents) == 1 {
+		if len(sim.pendingActions) == 1 {
 			// We know in a single user sim, just always make the next pending action ours.
-			pendingAgents[0] = pa
+			sim.pendingActions[0] = pa
 		} else {
 			// Insert into the list the correct execution time.
-			for i, v := range pendingAgents {
+			for i, v := range sim.pendingActions {
 				if v.NextActionAt >= pa.NextActionAt {
-					copy(pendingAgents, pendingAgents[:i])
-					pendingAgents[i] = pa
+					copy(sim.pendingActions, sim.pendingActions[:i])
+					sim.pendingActions[i] = pa
 				}
 			}
 		}
 	}
+}
+
+func (sim *Simulation) AddPendingAction(pa PendingAction) {
+	sim.pendingActions = append(sim.pendingActions, pa)
+}
+
+// TODO: remove pending actions
+func (sim *Simulation) RemovePendingAction(id int32) {
+
 }
 
 // Advance moves time forward counting down auras, CDs, mana regen, etc
