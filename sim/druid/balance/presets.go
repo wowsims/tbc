@@ -11,7 +11,23 @@ var BasicPartyBuffs = &proto.PartyBuffs{
 }
 var BasicIndividualBuffs = &proto.IndividualBuffs{}
 
-var StandardTalents = &proto.DruidTalents{}
+var StandardTalents = &proto.DruidTalents{
+	StarlightWrath:   5,
+	FocusedStarlight: 2,
+	ImprovedMoonfire: 2,
+	InsectSwarm:      true,
+	Vengeance:        5,
+	LunarGuidance:    3,
+	NaturesGrace:     true,
+	Moonglow:         3,
+	Moonfury:         5,
+	BalanceOfPower:   2,
+	Dreamstate:       3,
+	MoonkinForm:      true,
+	WrathOfCenarius:  5,
+	ForceOfNature:    true,
+	Intensity:        3,
+}
 
 var FullRaidBuffs = &proto.RaidBuffs{
 	ArcaneBrilliance: true,
@@ -44,6 +60,8 @@ var NoDebuffTarget = &proto.Target{
 var FullDebuffTarget = &proto.Target{
 	Debuffs: &proto.Debuffs{
 		JudgementOfWisdom: true,
+		Misery:            true,
+		CurseOfElements:   proto.TristateEffect_TristateEffectImproved,
 	},
 }
 
@@ -52,10 +70,25 @@ var PlayerOptionsStarfire = &proto.PlayerOptions{
 		BalanceDruid: &proto.BalanceDruid{
 			Talents: StandardTalents,
 			Options: &proto.BalanceDruid_Options{
-				// InnervateTarget: proto.,
+				InnervateTarget: &proto.RaidTarget{TargetIndex: 0}, // self innervate
 			},
 			Rotation: &proto.BalanceDruid_Rotation{
 				PrimarySpell: proto.BalanceDruid_Rotation_Starfire,
+				Moonfire:     true,
+			},
+		},
+	},
+}
+
+var PlayerOptionsWrath = &proto.PlayerOptions{
+	Spec: &proto.PlayerOptions_BalanceDruid{
+		BalanceDruid: &proto.BalanceDruid{
+			Talents: StandardTalents,
+			Options: &proto.BalanceDruid_Options{
+				InnervateTarget: &proto.RaidTarget{TargetIndex: 0}, // self innervate
+			},
+			Rotation: &proto.BalanceDruid_Rotation{
+				PrimarySpell: proto.BalanceDruid_Rotation_Wrath,
 				Moonfire:     true,
 			},
 		},

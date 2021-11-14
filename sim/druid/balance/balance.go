@@ -1,10 +1,12 @@
 package balance
 
 import (
+	"log"
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/proto"
+	"github.com/wowsims/tbc/sim/core/stats"
 	"github.com/wowsims/tbc/sim/druid"
 )
 
@@ -13,6 +15,9 @@ func RegisterBalanceDruid() {
 		return NewBalanceDruid(character, options, isr)
 	})
 }
+
+var InnervateCD = core.NewCooldownID()
+var InnervateAuraID = core.NewAuraID()
 
 func NewBalanceDruid(character core.Character, options proto.PlayerOptions, isr proto.IndividualSimRequest) *BalanceDruid {
 	balanceOptions := options.GetBalanceDruid()
@@ -47,6 +52,25 @@ func (moonkin *BalanceDruid) Act(sim *core.Simulation) time.Duration {
 	// TODO: handle all the buffs you keep up
 	// target := sim.GetPrimaryTarget()
 
+	// TODO: implement innervate in main druid code.
+	if moonkin.SelfBuffs.Innervate && moonkin.GetRemainingCD(InnervateCD, sim.CurrentTime) == 0 {
+		if moonkin.GetStat(stats.Mana)/moonkin.GetInitialStat(stats.Mana) < 0.75 {
+			oldRegen := moonkin.PsuedoStats.SpiritRegenRateCasting
+			moonkin.PsuedoStats.SpiritRegenRateCasting = 1.0
+			moonkin.PsuedoStats.ManaRegenMultiplier *= 3.0
+			moonkin.AddAura(sim, core.Aura{
+				ID:      InnervateAuraID,
+				Name:    "Innervate",
+				Expires: sim.CurrentTime + time.Second*20,
+				OnExpire: func(sim *core.Simulation) {
+					moonkin.PsuedoStats.SpiritRegenRateCasting = oldRegen
+					moonkin.PsuedoStats.ManaRegenMultiplier /= 3.0
+				},
+			})
+			moonkin.SetCD(InnervateCD, time.Minute*6)
+		}
+	}
+
 	// if moonkin.rotationOptions.FaerieFire && !target.HasAura(druid.FaerieFireAuraID) {
 	// 	// TODO: add faerie fire aura
 	// 	return sim.CurrentTime + moonkin.GetRemainingCD(core.GCDCooldownID, sim.CurrentTime)
@@ -56,20 +80,37 @@ func (moonkin *BalanceDruid) Act(sim *core.Simulation) time.Duration {
 	// } else
 	if moonkin.rotationOptions.Moonfire && !moonkin.MoonfireSpell.DotInput.IsTicking(sim) {
 		moonfire := moonkin.NewMoonfire(sim, sim.GetPrimaryTarget())
-		moonfire.Act(sim)
+		success := moonfire.Act(sim)
+		if !success {
+			regenTime := moonkin.TimeUntilManaRegen(moonfire.GetManaCost())
+			return sim.CurrentTime + regenTime
+		}
+
 		return sim.CurrentTime + moonkin.GetRemainingCD(core.GCDCooldownID, sim.CurrentTime)
 	}
 
-	if moonkin.rotationOptions.PrimarySpell == proto.BalanceDruid_Rotation_Starfire {
-		starfire := moonkin.NewStarfire(sim, sim.GetPrimaryTarget(), 8)
-		starfire.Act(sim)
-		return sim.CurrentTime + starfire.CastTime
-	} else if moonkin.rotationOptions.PrimarySpell == proto.BalanceDruid_Rotation_Starfire6 {
-		starfire := moonkin.NewStarfire(sim, sim.GetPrimaryTarget(), 6)
-		starfire.Act(sim)
-		return sim.CurrentTime + starfire.CastTime
+	var spell *core.SingleTargetDirectDamageSpell
+	switch moonkin.rotationOptions.PrimarySpell {
+	case proto.BalanceDruid_Rotation_Starfire:
+		spell = moonkin.NewStarfire(sim, sim.GetPrimaryTarget(), 8)
+	case proto.BalanceDruid_Rotation_Starfire6:
+		spell = moonkin.NewStarfire(sim, sim.GetPrimaryTarget(), 6)
+	case proto.BalanceDruid_Rotation_Wrath:
+		spell = moonkin.NewWrath(sim, sim.GetPrimaryTarget())
 	}
 
-	// default to normal druid stuff...
-	return moonkin.Druid.Act(sim)
+	actionSuccessful := spell.Act(sim)
+
+	if !actionSuccessful {
+		regenTime := moonkin.TimeUntilManaRegen(spell.GetManaCost())
+		if sim.Log != nil {
+			sim.Log("Not enough mana, regenerating for %s.\n", regenTime)
+		}
+		if regenTime > time.Second*5 {
+			log.Fatalf("spending more than 5 sec regen")
+		}
+		return sim.CurrentTime + regenTime
+	}
+
+	return sim.CurrentTime + spell.CastTime
 }

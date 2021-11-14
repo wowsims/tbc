@@ -5,7 +5,7 @@ import (
 )
 
 type ItemSet struct {
-	Name    string
+	Name string
 
 	// IDs of items that are part of this set. map[key]struct{} is roughly a set in go.
 	Items map[int32]struct{}
@@ -74,8 +74,8 @@ func (character *Character) getActiveSetBonuses() []ActiveSetBonus {
 			setItemCount[set.Name]++
 			if setBonusFunc, ok := set.Bonuses[setItemCount[set.Name]]; ok {
 				activeBonuses = append(activeBonuses, ActiveSetBonus{
-					Name: set.Name,
-					NumPieces: setItemCount[set.Name],
+					Name:        set.Name,
+					NumPieces:   setItemCount[set.Name],
 					BonusEffect: setBonusFunc,
 				})
 			}

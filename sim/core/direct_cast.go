@@ -165,6 +165,7 @@ func (dotEffect *DamageOverTimeSpellEffect) apply(sim *Simulation, spellCast *Sp
 	dotEffect.SpellEffect.beforeCalculations(sim, spellCast)
 
 	if dotEffect.Hit {
+		// Only apply direct damage if it has damage. Otherwise this is a dot without direct damage.
 		if dotEffect.DirectInput.MaxBaseDamage != 0 {
 			dotEffect.SpellEffect.calculateDirectDamage(sim, spellCast, &dotEffect.DirectInput)
 		}
@@ -246,6 +247,8 @@ func (spellEffect *SpellEffect) applyDot(sim *Simulation, spellCast *SpellCast, 
 			// Complete metrics and adding results etc
 			spellEffect.applyResultsToCast(spellCast)
 			sim.MetricsAggregator.AddSpellCast(spellCast)
+
+			// Kills the pending action from the main run loop.
 			pa.NextActionAt = NeverExpires
 		}
 	}

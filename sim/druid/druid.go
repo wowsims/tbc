@@ -13,6 +13,8 @@ type Druid struct {
 	SelfBuffs
 	Talents proto.DruidTalents
 
+	naturesGrace bool // when true next spellcast is 0.5s faster
+
 	// cached cast stuff
 	starfireSpell         core.SingleTargetDirectDamageSpell
 	starfire8CastTemplate core.SingleTargetDirectDamageSpellTemplate
@@ -20,6 +22,9 @@ type Druid struct {
 
 	MoonfireSpell        core.DamageOverTimeSpell
 	moonfireCastTemplate core.DamageOverTimeSpellTemplate
+
+	wrathSpell        core.SingleTargetDirectDamageSpell
+	wrathCastTemplate core.SingleTargetDirectDamageSpellTemplate
 }
 
 type SelfBuffs struct {
@@ -56,10 +61,12 @@ func (druid *Druid) Init(sim *core.Simulation) {
 	druid.starfire8CastTemplate = druid.newStarfireTemplate(sim, 8)
 	druid.starfire6CastTemplate = druid.newStarfireTemplate(sim, 6)
 	druid.moonfireCastTemplate = druid.newMoonfireTemplate(sim)
+	druid.wrathCastTemplate = druid.newWrathTemplate(sim)
 }
 
 func (druid *Druid) Reset(newsim *core.Simulation) {
-	druid.Character.Reset(newsim) // TODO: can we make this
+	druid.moonfireCastTemplate.Apply(&druid.MoonfireSpell)
+	druid.Character.Reset(newsim)
 }
 
 func (druid *Druid) Advance(sim *core.Simulation, elapsedTime time.Duration) {
@@ -71,7 +78,61 @@ func (druid *Druid) Act(sim *core.Simulation) time.Duration {
 	return core.NeverExpires // makes the bot wait forever and do nothing.
 }
 
+func (druid *Druid) applyOnHitTalents(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+	if druid.Talents.NaturesGrace && spellEffect.Crit {
+		druid.naturesGrace = true
+	}
+
+	if druid.Talents.WrathOfCenarius > 0 {
+		if spellCast.ActionID.SpellID == SpellIDSF8 || spellCast.ActionID.SpellID == SpellIDSF6 {
+			spellEffect.BonusSpellPower += (druid.GetStat(stats.SpellPower) + druid.GetStat(stats.ArcaneSpellPower)) * 0.04 * float64(druid.Talents.WrathOfCenarius)
+		}
+
+		if spellCast.ActionID.SpellID == SpellIDWrath {
+			spellEffect.BonusSpellPower += (druid.GetStat(stats.SpellPower) + druid.GetStat(stats.NatureSpellPower)) * 0.02 * float64(druid.Talents.WrathOfCenarius)
+		}
+	}
+}
+
+func (druid *Druid) applyNaturesGrace(spellCast *core.SpellCast) {
+	if druid.naturesGrace {
+		spellCast.CastTime -= time.Millisecond * 500
+		// This applies on cast complete, removing the effect.
+		//  if it crits, during 'onspellhit' then it will be reapplied (see func above)
+		spellCast.OnCastComplete = func(sim *core.Simulation, cast *core.Cast) {
+			druid.naturesGrace = false
+		}
+	}
+}
+
 func NewDruid(char core.Character, selfBuffs SelfBuffs, talents proto.DruidTalents) Druid {
+
+	if talents.LunarGuidance > 0 {
+		bonus := 0.083 * float64(talents.LunarGuidance)
+		char.AddStatDependency(stats.StatDependency{
+			SourceStat:   stats.Intellect,
+			ModifiedStat: stats.SpellPower,
+			Modifier: func(intellect float64, spellPower float64) float64 {
+				return spellPower + intellect*bonus
+			},
+		})
+	}
+
+	if talents.Dreamstate > 0 {
+		bonus := 0.0333 * float64(talents.Dreamstate)
+		char.AddStatDependency(stats.StatDependency{
+			SourceStat:   stats.Intellect,
+			ModifiedStat: stats.MP5,
+			Modifier: func(intellect float64, mp5 float64) float64 {
+				return mp5 + intellect*bonus
+			},
+		})
+	}
+
+	if talents.Intensity > 0 {
+		char.PsuedoStats.SpiritRegenRateCasting = float64(talents.Intensity) * 0.1
+	}
+
 	return Druid{
 		Character: char,
 		SelfBuffs: selfBuffs,

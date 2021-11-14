@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
+	"github.com/wowsims/tbc/sim/core/items"
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
@@ -11,15 +12,18 @@ import (
 const SpellIDSF8 int32 = 26986
 const SpellIDSF6 int32 = 9876
 
+// Idol IDs
+const IvoryMoongoddess int32 = 27518
+
 func (druid *Druid) newStarfireTemplate(sim *core.Simulation, rank int) core.SingleTargetDirectDamageSpellTemplate {
 	baseCast := core.Cast{
 		Name:           "Starfire",
 		CritMultiplier: 1.5,
 		SpellSchool:    stats.ArcaneSpellPower,
 		Character:      &druid.Character,
-
-		BaseManaCost: 370,
-		CastTime:     time.Millisecond * 3500,
+		BaseManaCost:   370,
+		ManaCost:       370,
+		CastTime:       time.Millisecond * 3500,
 		ActionID: core.ActionID{
 			SpellID: SpellIDSF8,
 		},
@@ -37,6 +41,8 @@ func (druid *Druid) newStarfireTemplate(sim *core.Simulation, rank int) core.Sin
 	}
 
 	if rank == 6 {
+		baseCast.BaseManaCost = 315
+		baseCast.ManaCost = 315
 		baseCast.ActionID = core.ActionID{
 			SpellID: SpellIDSF6,
 		}
@@ -45,18 +51,32 @@ func (druid *Druid) newStarfireTemplate(sim *core.Simulation, rank int) core.Sin
 		effect.SpellCoefficient = 0.99
 	}
 
-	// TODO: Talents
-	// effect.SpellEffect.DamageMultiplier *= 1 + 0.01*float64(shaman.Talents.Concussion)
-	// effect.SpellEffect.BonusSpellHitRating += float64(shaman.Talents.ElementalPrecision) * 2 * core.SpellHitRatingPerHitChance
-	// effect.SpellEffect.BonusSpellHitRating += float64(shaman.Talents.NaturesGuidance) * 1 * core.SpellHitRatingPerHitChance
-	// effect.SpellEffect.BonusSpellCritRating += float64(shaman.Talents.TidalMastery) * 1 * core.SpellCritRatingPerCritChance
-	// effect.SpellEffect.BonusSpellCritRating += float64(shaman.Talents.CallOfThunder) * 1 * core.SpellCritRatingPerCritChance
+	// TODO: Applies to both starfire and moonfire
+	baseCast.CastTime -= time.Millisecond * 100 * time.Duration(druid.Talents.StarlightWrath)
+	effect.SpellEffect.BonusSpellCritRating += float64(druid.Talents.FocusedStarlight) * 2 * core.SpellCritRatingPerCritChance // 2% crit per point
+
+	// TODO: applies to starfire, wrath and moonfire
+
+	// Convert to percent, multiply by percent increase, convert back to multiplier by adding 1
+	baseCast.CritMultiplier = (baseCast.CritMultiplier-1)*(1+float64(druid.Talents.Vengeance)*0.2) + 1
+	baseCast.ManaCost -= baseCast.BaseManaCost * float64(druid.Talents.Moonglow) * 0.03
+	effect.SpellEffect.DamageMultiplier *= 1 + 0.02*float64(druid.Talents.Moonfury)
+	effect.SpellEffect.BonusSpellHitRating += float64(druid.Talents.BalanceOfPower) * 2 * core.SpellHitRatingPerHitChance
+
+	if druid.Equip[items.ItemSlotRanged].ID == IvoryMoongoddess {
+		effect.SpellEffect.BonusSpellPower += 55
+	}
+	effect.OnSpellHit = druid.applyOnHitTalents
+	spCast := &core.SpellCast{
+		Cast: baseCast,
+	}
+
+	// Applies nature's grace cast time reduction if available.
+	druid.applyNaturesGrace(spCast)
 
 	return core.NewSingleTargetDirectDamageSpellTemplate(core.SingleTargetDirectDamageSpell{
-		SpellCast: core.SpellCast{
-			Cast: baseCast,
-		},
-		Effect: effect,
+		SpellCast: *spCast,
+		Effect:    effect,
 	})
 }
 

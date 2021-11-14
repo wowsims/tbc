@@ -86,6 +86,12 @@ func applyDebuffEffects(target *Target, debuffs proto.Debuffs) {
 			return improvedSealOfTheCrusaderAura()
 		})
 	}
+
+	if debuffs.CurseOfElements != proto.TristateEffect_TristateEffectMissing {
+		target.AddPermanentAura(func(sim *Simulation) Aura {
+			return curseOfElementsAura(debuffs.CurseOfElements)
+		})
+	}
 }
 
 var MiseryDebuffID = NewDebuffID()
@@ -133,6 +139,22 @@ func improvedSealOfTheCrusaderAura() Aura {
 		OnBeforeSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect) {
 			spellEffect.BonusSpellCritRating += 3 * SpellCritRatingPerCritChance
 			// FUTURE: melee crit bonus, research actual value
+		},
+	}
+}
+
+var CurseOfElementsDebuffID = NewDebuffID()
+
+func curseOfElementsAura(coe proto.TristateEffect) Aura {
+	mult := 1.1
+	if coe == proto.TristateEffect_TristateEffectImproved {
+		mult = 1.13
+	}
+	return Aura{
+		ID:   CurseOfElementsDebuffID,
+		Name: "Curse of the Elements",
+		OnBeforeSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect) {
+			spellEffect.DamageMultiplier *= mult
 		},
 	}
 }
