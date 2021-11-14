@@ -19,9 +19,11 @@ func NewBalanceDruid(character core.Character, options proto.PlayerOptions, isr 
 
 	selfBuffs := druid.SelfBuffs{
 		Omen: balanceOptions.Options.OmenOfClarity,
+	}
+	if balanceOptions.Options.InnervateTarget != nil {
 		// if targetting myself for individual sim
 		// TODO: what is my player idx for raid?
-		Innervate: balanceOptions.Options.InnervateTarget.TargetIndex == 0,
+		selfBuffs.Innervate = balanceOptions.Options.InnervateTarget.TargetIndex == 0
 	}
 
 	druid := druid.NewDruid(character, selfBuffs, *balanceOptions.Talents)
