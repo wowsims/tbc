@@ -20,6 +20,7 @@ import { EquippedItem } from '/tbc/core/proto_utils/equipped_item.js';
 import { Gear } from '/tbc/core/proto_utils/gear.js';
 import { makeComputeStatsRequest } from '/tbc/core/proto_utils/request_helpers.js';
 import { Stats } from '/tbc/core/proto_utils/stats.js';
+import { Faction } from '/tbc/core/proto_utils/utils.js';
 import { SpecRotation } from '/tbc/core/proto_utils/utils.js';
 import { SpecTalents } from '/tbc/core/proto_utils/utils.js';
 import { SpecTypeFunctions } from '/tbc/core/proto_utils/utils.js';
@@ -32,6 +33,7 @@ import { getEligibleItemSlots } from '/tbc/core/proto_utils/utils.js';
 import { getEligibleEnchantSlots } from '/tbc/core/proto_utils/utils.js';
 import { gemEligibleForSocket } from '/tbc/core/proto_utils/utils.js';
 import { gemMatchesSocket } from '/tbc/core/proto_utils/utils.js';
+import { raceToFaction } from '/tbc/core/proto_utils/utils.js';
 
 import { Listener } from './typed_event.js';
 import { TypedEvent } from './typed_event.js';
@@ -191,6 +193,10 @@ export class Player<SpecType extends Spec> {
       this.raceChangeEmitter.emit();
     }
   }
+
+	getFaction(): Faction {
+		return raceToFaction[this.getRace()];
+	}
 
   getConsumes(): Consumes {
     // Make a defensive copy

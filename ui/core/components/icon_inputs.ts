@@ -47,6 +47,7 @@ export const ManaTideTotem = makeBooleanIndividualBuffInput({spellId:16190}, 'ma
 export const ImprovedSealOfTheCrusader = makeBooleanDebuffInput({spellId:20337}, 'improvedSealOfTheCrusader');
 export const JudgementOfWisdom = makeBooleanDebuffInput({spellId:27164}, 'judgementOfWisdom');
 export const Misery = makeBooleanDebuffInput({spellId:33195}, 'misery');
+export const CurseOfElements = makeTristateDebuffInput({spellId:27228}, {spellId:32484}, 'curseOfElements');
 
 // Consumes
 export const AdeptsElixir = makeBooleanConsumeInput({itemId:28103}, 'adeptsElixir', ['Battle Elixir']);
@@ -200,6 +201,21 @@ function makeBooleanDebuffInput(id: ItemOrSpellId, debuffsFieldName: keyof Debuf
     setBooleanValue: (target: Target, newValue: boolean) => {
       const newDebuffs = target.getDebuffs();
       (newDebuffs[debuffsFieldName] as boolean) = newValue;
+      target.setDebuffs(newDebuffs);
+    },
+  }
+}
+
+function makeTristateDebuffInput(id: ItemOrSpellId, impId: ItemOrSpellId, debuffsFieldName: keyof Debuffs): IconInput<Target> {
+  return {
+    id: id,
+    states: 3,
+    improvedId: impId,
+    changedEvent: (target: Target) => target.debuffsChangeEmitter,
+    getValue: (target: Target) => target.getDebuffs()[debuffsFieldName],
+    setNumberValue: (target: Target, newValue: number) => {
+      const newDebuffs = target.getDebuffs();
+      (newDebuffs[debuffsFieldName] as number) = newValue;
       target.setDebuffs(newDebuffs);
     },
   }

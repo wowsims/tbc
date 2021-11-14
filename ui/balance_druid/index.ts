@@ -16,29 +16,30 @@ import { Stats } from '/tbc/core/proto_utils/stats.js';
 import { Sim } from '/tbc/core/sim.js';
 import { DefaultTheme } from '/tbc/core/themes/default.js';
 
-import { ElementalShaman, ElementalShaman_Rotation as ElementalShamanRotation, ShamanTalents as ShamanTalents, ElementalShaman_Options as ElementalShamanOptions } from '/tbc/core/proto/shaman.js';
-import { ElementalShaman_Rotation_RotationType as RotationType } from '/tbc/core/proto/shaman.js';
+import { BalanceDruid, BalanceDruid_Rotation as BalanceDruidRotation, DruidTalents as DruidTalents, BalanceDruid_Options as BalanceDruidOptions } from '/tbc/core/proto/druid.js';
+import { BalanceDruid_Rotation_PrimarySpell as PrimarySpell } from '/tbc/core/proto/druid.js';
 
 import * as IconInputs from '/tbc/core/components/icon_inputs.js';
 import * as OtherInputs from '/tbc/core/components/other_inputs.js';
 import * as Gems from '/tbc/core/constants/gems.js';
 import * as Tooltips from '/tbc/core/constants/tooltips.js';
 
-import * as ShamanInputs from './inputs.js';
+import * as DruidInputs from './inputs.js';
 import * as Presets from './presets.js';
 
-const theme = new DefaultTheme<Spec.SpecElementalShaman>(document.body, {
+const theme = new DefaultTheme<Spec.SpecBalanceDruid>(document.body, {
 	// Can be 'Alpha', 'Beta', or 'Live'. Just adds a postfix to the generated title.
-	releaseStatus: 'Beta',
+	releaseStatus: 'Alpha',
 	// List any known bugs / issues here and they'll be shown on the site.
 	knownIssues: [
 	],
 	player: {
-		spec: Spec.SpecElementalShaman,
+		spec: Spec.SpecBalanceDruid,
 		// All stats for which EP should be calculated.
 		epStats: [
 			Stat.StatIntellect,
 			Stat.StatSpellPower,
+			Stat.StatArcaneSpellPower,
 			Stat.StatNatureSpellPower,
 			Stat.StatSpellHit,
 			Stat.StatSpellCrit,
@@ -52,6 +53,7 @@ const theme = new DefaultTheme<Spec.SpecElementalShaman>(document.body, {
 			Stat.StatStamina,
 			Stat.StatIntellect,
 			Stat.StatSpellPower,
+			Stat.StatArcaneSpellPower,
 			Stat.StatNatureSpellPower,
 			Stat.StatSpellHit,
 			Stat.StatSpellCrit,
@@ -60,34 +62,30 @@ const theme = new DefaultTheme<Spec.SpecElementalShaman>(document.body, {
 		],
 		defaults: {
 			// Default equipped gear.
-			gear: Presets.PRERAID_GEAR.gear,
+			gear: Presets.P1_ALLIANCE_BIS.gear,
 			// Default EP weights for sorting gear in the gear picker.
 			epWeights: Stats.fromMap({
 				[Stat.StatIntellect]: 0.33,
 				[Stat.StatSpellPower]: 1,
-				[Stat.StatNatureSpellPower]: 1,
+				[Stat.StatArcaneSpellPower]: 1,
+				[Stat.StatNatureSpellPower]: 0,
 				[Stat.StatSpellCrit]: 0.78,
 				[Stat.StatSpellHaste]: 1.25,
 				[Stat.StatMP5]: 0.08,
 			}),
 			// Default consumes settings.
 			consumes: Consumes.create({
-				drums: Drums.DrumsOfBattle,
 				defaultPotion: Potions.SuperManaPotion,
 			}),
 			// Default rotation settings.
-			rotation: ElementalShamanRotation.create({
-				type: RotationType.Adaptive,
+			rotation: BalanceDruidRotation.create({
+				primarySpell: PrimarySpell.Starfire,
+				faerieFire: true,
 			}),
 			// Default talents.
 			talents: Presets.StandardTalents.data,
 			// Default spec-specific settings.
-			specOptions: ElementalShamanOptions.create({
-				waterShield: true,
-				bloodlust: true,
-				totemOfWrath: true,
-				manaSpringTotem: true,
-				wrathOfAirTotem: true,
+			specOptions: BalanceDruidOptions.create({
 			}),
 		},
 		// Custom function for determining the EP value of meta gem effects.
@@ -95,6 +93,7 @@ const theme = new DefaultTheme<Spec.SpecElementalShaman>(document.body, {
 		metaGemEffectEP: (gem, player) => {
 			if (gem.id == Gems.CHAOTIC_SKYFIRE_DIAMOND) {
 				const finalStats = new Stats(player.getCurrentStats().finalStats);
+				// TODO: Fix this
 				return (((finalStats.getStat(Stat.StatSpellPower) * 0.795) + 603) * 2 * (finalStats.getStat(Stat.StatSpellCrit) / 2208) * 0.045) / 0.795;
 			}
 
@@ -113,9 +112,12 @@ const theme = new DefaultTheme<Spec.SpecElementalShaman>(document.body, {
 			raidBuffs: RaidBuffs.create({
 				arcaneBrilliance: true,
 				divineSpirit: TristateEffect.TristateEffectImproved,
-				giftOfTheWild: TristateEffect.TristateEffectImproved,
 			}),
 			partyBuffs: PartyBuffs.create({
+				bloodlust: 1,
+				manaSpringTotem: TristateEffect.TristateEffectRegular,
+				totemOfWrath: 1,
+				wrathOfAirTotem: TristateEffect.TristateEffectRegular,
 			}),
 			individualBuffs: IndividualBuffs.create({
 				blessingOfKings: true,
@@ -130,6 +132,7 @@ const theme = new DefaultTheme<Spec.SpecElementalShaman>(document.body, {
 			debuffs: Debuffs.create({
 				judgementOfWisdom: true,
 				misery: true,
+				curseOfElements: TristateEffect.TristateEffectRegular,
 			}),
 		},
 	},
@@ -137,11 +140,7 @@ const theme = new DefaultTheme<Spec.SpecElementalShaman>(document.body, {
 	selfBuffInputs: {
 		tooltip: Tooltips.SELF_BUFFS_SECTION,
 		icons: [
-			ShamanInputs.IconWaterShield,
-			ShamanInputs.IconBloodlust,
-			ShamanInputs.IconWrathOfAirTotem,
-			ShamanInputs.IconTotemOfWrath,
-			ShamanInputs.IconManaSpringTotem,
+			DruidInputs.SelfInnervate,
 			IconInputs.DrumsOfBattleConsume,
 			IconInputs.DrumsOfRestorationConsume,
 		],
@@ -154,8 +153,6 @@ const theme = new DefaultTheme<Spec.SpecElementalShaman>(document.body, {
 			IconInputs.DivineSpirit,
 			IconInputs.BlessingOfKings,
 			IconInputs.BlessingOfWisdom,
-			IconInputs.GiftOfTheWild,
-			IconInputs.MoonkinAura,
 			IconInputs.DrumsOfBattleBuff,
 			IconInputs.DrumsOfRestorationBuff,
 			IconInputs.Bloodlust,
@@ -174,6 +171,7 @@ const theme = new DefaultTheme<Spec.SpecElementalShaman>(document.body, {
 		icons: [
 			IconInputs.JudgementOfWisdom,
 			IconInputs.ImprovedSealOfTheCrusader,
+			IconInputs.CurseOfElements,
 			IconInputs.Misery,
 		],
 	},
@@ -195,7 +193,7 @@ const theme = new DefaultTheme<Spec.SpecElementalShaman>(document.body, {
 		],
 	},
 	// Inputs to include in the 'Rotation' section on the settings tab.
-	rotationInputs: ShamanInputs.ElementalShamanRotationConfig,
+	rotationInputs: DruidInputs.BalanceDruidRotationConfig,
 	// Inputs to include in the 'Other' section on the settings tab.
 	otherInputs: {
 		inputs: [
@@ -218,8 +216,10 @@ const theme = new DefaultTheme<Spec.SpecElementalShaman>(document.body, {
 		],
 		// Preset gear configurations that the user can quickly select.
     gear: [
-			Presets.P1_BIS,
-			Presets.P2_BIS,
+      Presets.P1_ALLIANCE_BIS,
+      Presets.P2_ALLIANCE_BIS,
+      Presets.P1_HORDE_BIS,
+      Presets.P2_HORDE_BIS,
     ],
 		// Preset encounter settings that the user can quickly select.
 		encounters: [

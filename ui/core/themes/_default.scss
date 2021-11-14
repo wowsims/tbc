@@ -1,4 +1,5 @@
 @import "../components/actions";
+@import "../components/boolean_picker";
 @import "../components/character_stats";
 @import "../components/custom_stats_picker";
 @import "../components/detailed_results";
@@ -236,7 +237,7 @@ td, th {
   align-items: flex-end;
 }
 
-.encounter-section .number-picker-root {
+.encounter-section .input-root, {
   display: flex;
   justify-content: space-between;
   align-items: center;
