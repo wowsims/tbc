@@ -70,11 +70,15 @@ func (spellEffect *SpellEffect) beforeCalculations(sim *Simulation, spellCast *S
 
 func (spellEffect *SpellEffect) afterCalculations(sim *Simulation, spellCast *SpellCast) {
 	if spellEffect.Hit {
-		spellEffect.OnSpellHit(sim, spellCast, spellEffect)
+		if spellEffect.OnSpellHit != nil {
+			spellEffect.OnSpellHit(sim, spellCast, spellEffect)
+		}
 		spellCast.Character.OnSpellHit(sim, spellCast, spellEffect)
 		spellEffect.Target.OnSpellHit(sim, spellCast, spellEffect)
 	} else {
-		spellEffect.OnSpellMiss(sim, spellCast, spellEffect)
+		if spellEffect.OnSpellMiss != nil {
+			spellEffect.OnSpellMiss(sim, spellCast, spellEffect)
+		}
 		spellCast.Character.OnSpellMiss(sim, spellCast, spellEffect)
 		spellEffect.Target.OnSpellMiss(sim, spellCast, spellEffect)
 	}

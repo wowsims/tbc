@@ -225,7 +225,7 @@ func (spellEffect *SpellEffect) applyDot(sim *Simulation, spellCast *SpellCast, 
 		damage = calculateResists(sim, damage, spellEffect)
 
 		if sim.Log != nil {
-			sim.Log(" %s Ticked for %0.1f", ddInput.Name, damage)
+			sim.Log(" %s Ticked for %0.1f\n", ddInput.Name, damage)
 		}
 
 		spellEffect.Damage += damage
@@ -239,6 +239,10 @@ func (spellEffect *SpellEffect) applyDot(sim *Simulation, spellCast *SpellCast, 
 			// add more pending
 			pa.NextActionAt = sim.CurrentTime + ddInput.TickLength
 		} else {
+			// TODO: This needs to be called at end of sim even if it isn't done ticking.
+			//  maybe need an effect/aggregator that can be started and appended to or something.
+			//  instead of calling add all at end.
+
 			// Complete metrics and adding results etc
 			spellEffect.applyResultsToCast(spellCast)
 			sim.MetricsAggregator.AddSpellCast(spellCast)

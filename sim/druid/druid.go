@@ -52,17 +52,23 @@ func (druid *Druid) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {
 	}
 }
 
-func (druid *Druid) Reset(newsim *core.Simulation) {
-}
-
-func (druid *Druid) Act(sim *core.Simulation) time.Duration {
-	return core.NeverExpires // makes the bot wait forever and do nothing.
-}
-
 func (druid *Druid) Init(sim *core.Simulation) {
 	druid.starfire8CastTemplate = druid.newStarfireTemplate(sim, 8)
 	druid.starfire6CastTemplate = druid.newStarfireTemplate(sim, 6)
 	druid.moonfireCastTemplate = druid.newMoonfireTemplate(sim)
+}
+
+func (druid *Druid) Reset(newsim *core.Simulation) {
+	druid.Character.Reset(newsim) // TODO: can we make this
+}
+
+func (druid *Druid) Advance(sim *core.Simulation, elapsedTime time.Duration) {
+	druid.Character.RegenManaMP5Only(sim, elapsedTime)
+	druid.Character.Advance(sim, elapsedTime)
+}
+
+func (druid *Druid) Act(sim *core.Simulation) time.Duration {
+	return core.NeverExpires // makes the bot wait forever and do nothing.
 }
 
 func NewDruid(char core.Character, selfBuffs SelfBuffs, talents proto.DruidTalents) Druid {

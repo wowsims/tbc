@@ -168,6 +168,8 @@ func (cast *Cast) internalOnComplete(sim *Simulation, onCastComplete OnCastCompl
 	}
 
 	cast.Character.OnCastComplete(sim, cast)
-	cast.OnCastComplete(sim, cast)
+	if cast.OnCastComplete != nil {
+		cast.OnCastComplete(sim, cast)
+	}
 	onCastComplete(sim, cast)
 }

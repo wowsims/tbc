@@ -174,21 +174,19 @@ func (sim *Simulation) RunOnce() {
 
 		pa.OnAction(sim)
 
-		if pa.NextActionAt == NeverExpires {
-			sim.pendingActions = sim.pendingActions[1:] // cut off front
+		if len(sim.pendingActions) == 1 {
+			// We know in a single user sim, just always make the next pending action ours.
+			sim.pendingActions[0] = pa
 		} else {
-			if len(sim.pendingActions) == 1 {
-				// We know in a single user sim, just always make the next pending action ours.
-				sim.pendingActions[0] = pa
-			} else {
-				// Insert into the list the correct execution time.
-				for i, v := range sim.pendingActions {
-					if v.NextActionAt > pa.NextActionAt {
-						copy(sim.pendingActions, sim.pendingActions[:i])
-						sim.pendingActions[i] = pa
-					}
-				}
+			// This path is only used when there is more than one
+			//  action sitting on the list.
+			// This path is not currently used by individual shaman sim.
+			if pa.NextActionAt == NeverExpires {
+				sim.pendingActions = sim.pendingActions[1:] // cut off front
 			}
+			sort.Slice(sim.pendingActions, func(i, j int) bool {
+				return sim.pendingActions[i].NextActionAt < sim.pendingActions[j].NextActionAt
+			})
 		}
 	}
 }

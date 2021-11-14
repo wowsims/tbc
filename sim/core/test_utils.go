@@ -15,20 +15,20 @@ const ShortDuration = 60
 const LongDuration = 300
 
 type IndividualSimInputs struct {
-	SimOptions         *proto.SimOptions
-	Gear               *proto.EquipmentSpec
-	RaidBuffs          *proto.RaidBuffs
-	PartyBuffs         *proto.PartyBuffs
+	SimOptions      *proto.SimOptions
+	Gear            *proto.EquipmentSpec
+	RaidBuffs       *proto.RaidBuffs
+	PartyBuffs      *proto.PartyBuffs
 	IndividualBuffs *proto.IndividualBuffs
-	Consumes           *proto.Consumes
-	Race               proto.Race
-	Class              proto.Class
+	Consumes        *proto.Consumes
+	Race            proto.Race
+	Class           proto.Class
 
 	Duration int
 
 	// Convenience field if only 1 target is desired
-	Target   *proto.Target
-	Targets  []*proto.Target
+	Target  *proto.Target
+	Targets []*proto.Target
 
 	PlayerOptions *proto.PlayerOptions
 }
@@ -37,14 +37,14 @@ func NewIndividualSimRequest(inputs IndividualSimInputs) *proto.IndividualSimReq
 	isr := &proto.IndividualSimRequest{
 		Player: &proto.Player{
 			Equipment: inputs.Gear,
-			Options: inputs.PlayerOptions,
+			Options:   inputs.PlayerOptions,
 		},
 
-		RaidBuffs: inputs.RaidBuffs,
-		PartyBuffs: inputs.PartyBuffs,
+		RaidBuffs:       inputs.RaidBuffs,
+		PartyBuffs:      inputs.PartyBuffs,
 		IndividualBuffs: inputs.IndividualBuffs,
 
-		Encounter: &proto.Encounter{},
+		Encounter:  &proto.Encounter{},
 		SimOptions: inputs.SimOptions,
 	}
 
@@ -74,9 +74,9 @@ func NewIndividualSimRequest(inputs IndividualSimInputs) *proto.IndividualSimReq
 
 func CharacterStatsTest(label string, t *testing.T, isr *proto.IndividualSimRequest, expectedStats stats.Stats) {
 	csr := &proto.ComputeStatsRequest{
-		Player: isr.Player,
-		RaidBuffs: isr.RaidBuffs,
-		PartyBuffs: isr.PartyBuffs,
+		Player:          isr.Player,
+		RaidBuffs:       isr.RaidBuffs,
+		PartyBuffs:      isr.PartyBuffs,
 		IndividualBuffs: isr.IndividualBuffs,
 	}
 
@@ -94,8 +94,8 @@ func StatWeightsTest(label string, t *testing.T, isr *proto.IndividualSimRequest
 	isr.SimOptions.Iterations = 5000
 
 	swr := &proto.StatWeightsRequest{
-		Options: isr,
-		StatsToWeigh: statsToTest,
+		Options:         isr,
+		StatsToWeigh:    statsToTest,
 		EpReferenceStat: referenceStat,
 	}
 
@@ -154,6 +154,7 @@ type AllEncountersTestOptions struct {
 
 func IndividualSimAllEncountersTest(testOpts AllEncountersTestOptions) {
 	isr := NewIndividualSimRequest(testOpts.Inputs)
+	// isr.SimOptions.Debug = true
 
 	isr.Encounter.Duration = ShortDuration
 	IndividualSimTest(
