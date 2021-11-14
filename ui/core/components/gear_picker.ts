@@ -1,3 +1,4 @@
+import { getWowheadItemId } from '/tbc/core/proto_utils/equipped_item.js';
 import { EquippedItem } from '/tbc/core/proto_utils/equipped_item.js';
 import { Enchant } from '/tbc/core/proto/common.js';
 import { Item } from '/tbc/core/proto/common.js';
@@ -8,7 +9,9 @@ import { slotNames } from '/tbc/core/proto_utils/names.js';
 import { getEmptyGemSocketIconUrl } from '/tbc/core/resources.js';
 import { getEmptySlotIconUrl } from '/tbc/core/resources.js';
 import { getIconUrl } from '/tbc/core/resources.js';
+import { getItemIconUrl } from '/tbc/core/resources.js';
 import { setWowheadHref } from '/tbc/core/resources.js';
+import { setWowheadItemHref } from '/tbc/core/resources.js';
 import { setGemSocketCssClass } from '/tbc/core/css_utils.js';
 import { setItemQualityCssClass } from '/tbc/core/css_utils.js';
 import { Player } from '/tbc/core/player.js';
@@ -130,8 +133,8 @@ class ItemPicker extends Component {
       setItemQualityCssClass(this.nameElem, newItem.item.quality);
 
       this.player.setWowheadData(newItem, this.iconElem);
-      setWowheadHref(this.iconElem, {itemId: newItem.item.id});
-      getIconUrl({itemId: newItem.item.id}).then(url => {
+      setWowheadItemHref(this.iconElem, newItem.item);
+      getItemIconUrl(newItem.item).then(url => {
         this.iconElem.style.backgroundImage = `url('${url}')`;
       });
 
@@ -209,6 +212,7 @@ class SelectorModal extends Component {
         item => {
           return {
             id: item.id,
+            wowheadId: getWowheadItemId(item),
             name: item.name,
             quality: item.quality,
 						phase: item.phase,
@@ -236,6 +240,7 @@ class SelectorModal extends Component {
         enchant => {
           return {
             id: enchant.id,
+						wowheadId: enchant.id,
             name: enchant.name,
             quality: enchant.quality,
 						phase: 1,
@@ -267,6 +272,7 @@ class SelectorModal extends Component {
           gem => {
             return {
               id: gem.id,
+							wowheadId: gem.id,
               name: gem.name,
               quality: gem.quality,
 							phase: gem.phase,
@@ -300,6 +306,7 @@ class SelectorModal extends Component {
         equippedToItemFn: (equippedItem: EquippedItem | null) => (T | null | undefined),
         getItemData: (item: T) => {
           id: number,
+          wowheadId: number,
           name: string,
           quality: ItemQuality,
 					phase: number,
@@ -369,11 +376,11 @@ class SelectorModal extends Component {
 					<span class="selector-modal-list-item-ep-delta"></span>
 				</div>
       `;
-      setWowheadHref(listItemElem.children[0] as HTMLAnchorElement, {itemId: itemData.id});
-      setWowheadHref(listItemElem.children[1] as HTMLAnchorElement, {itemId: itemData.id});
+      setWowheadHref(listItemElem.children[0] as HTMLAnchorElement, { itemId: itemData.wowheadId });
+      setWowheadHref(listItemElem.children[1] as HTMLAnchorElement, { itemId: itemData.wowheadId });
 
       const iconElem = listItemElem.getElementsByClassName('selector-modal-list-item-icon')[0] as HTMLImageElement;
-      getIconUrl({itemId: itemData.id}).then(url => {
+      getIconUrl({itemId: itemData.wowheadId}).then(url => {
         iconElem.style.backgroundImage = `url('${url}')`;
       });
 

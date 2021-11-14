@@ -8,6 +8,10 @@ import { enchantAppliesToItem } from './utils.js';
 import { gemEligibleForSocket } from './utils.js';
 import { gemMatchesSocket } from './utils.js';
 
+export function getWowheadItemId(item: Item): number {
+	return item.wowheadId || item.id;
+}
+
 /**
  * Represents an equipped item along with enchants/gems attached to it.
  *

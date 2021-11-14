@@ -1,3 +1,4 @@
+import { getWowheadItemId } from '/tbc/core/proto_utils/equipped_item.js';
 import { GemColor } from './proto/common.js';
 import { Item } from './proto/common.js';
 import { ItemQuality } from './proto/common.js';
@@ -85,6 +86,10 @@ export async function getIconUrl(id: ActionId): Promise<string> {
 	return "https://wow.zamimg.com/images/wow/icons/large/" + tooltipData['icon'] + ".jpg";
 }
 
+export async function getItemIconUrl(item: Item): Promise<string> {
+	return getIconUrl({ itemId: getWowheadItemId(item) });
+}
+
 function getOtherActionName(id: number): string {
 	throw new Error('No other actions!');
 }
@@ -103,6 +108,10 @@ export function setWowheadHref(elem: HTMLAnchorElement, id: ItemOrSpellId) {
   } else {
     elem.href = 'https://tbc.wowhead.com/spell=' + id.spellId;
   }
+}
+
+export function setWowheadItemHref(elem: HTMLAnchorElement, item: Item) {
+	return setWowheadHref(elem, { itemId: getWowheadItemId(item) });
 }
 
 const emptyGemSocketIcons: Partial<Record<GemColor, string>> = {
