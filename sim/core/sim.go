@@ -2,7 +2,6 @@ package core
 
 import (
 	"fmt"
-	"log"
 	"math/rand"
 	"sort"
 	"strings"
@@ -30,7 +29,7 @@ type Simulation struct {
 	rand *rand.Rand
 
 	// Current Simulation State
-	pendingActions []PendingAction
+	pendingActions []*PendingAction
 	CurrentTime    time.Duration // duration that has elapsed in the sim since starting
 
 	Log  func(string, ...interface{})
@@ -147,16 +146,15 @@ func (sim *Simulation) Run() SimResult {
 func (sim *Simulation) RunOnce() {
 	sim.reset()
 
-	sim.pendingActions = make([]PendingAction, 0, 25)
+	sim.pendingActions = make([]*PendingAction, 0, 25)
 	// setup initial actions.
 	for _, party := range sim.Raid.Parties {
 		for _, agent := range party.Players {
 			ag := agent
-			pa := PendingAction{}
+			pa := &PendingAction{}
 			pa.OnAction = func(sim *Simulation) {
 				ag.GetCharacter().TryUseCooldowns(sim)
 				pa.NextActionAt = ag.Act(sim)
-				log.Printf("Next action at: %v", pa.NextActionAt)
 			}
 			sim.AddPendingAction(pa)
 		}
@@ -169,8 +167,8 @@ func (sim *Simulation) RunOnce() {
 
 	for sim.CurrentTime < sim.Duration {
 		pa := sim.pendingActions[0]
+
 		if pa.NextActionAt > sim.CurrentTime {
-			log.Printf("Advancing... %#v, time: %v", pa.NextActionAt, sim.CurrentTime)
 			sim.Advance(pa.NextActionAt - sim.CurrentTime)
 		}
 
@@ -191,7 +189,7 @@ func (sim *Simulation) RunOnce() {
 	}
 }
 
-func (sim *Simulation) AddPendingAction(pa PendingAction) {
+func (sim *Simulation) AddPendingAction(pa *PendingAction) {
 	sim.pendingActions = append(sim.pendingActions, pa)
 }
 

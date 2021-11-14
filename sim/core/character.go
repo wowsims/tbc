@@ -47,7 +47,8 @@ type Character struct {
 	stats stats.Stats
 
 	// psuedoStats are modifiers that aren't directly a stat
-	psuedoStats stats.PsuedoStats
+	initialPsuedoStats stats.PsuedoStats
+	PsuedoStats        stats.PsuedoStats
 
 	// Used for applying the effects of hardcast / channeled spells at a later time.
 	// By definition there can be only 1 hardcast spell being cast at any moment.
@@ -55,11 +56,14 @@ type Character struct {
 }
 
 func NewCharacter(player proto.Player) Character {
+	initialPsuedo := stats.PsuedoStats{
+		CastSpeedMultiplier: 1,
+	}
 	character := Character{
-		Race:  player.Options.Race,
-		Class: player.Options.Class,
-		Equip: items.ProtoToEquipment(*player.Equipment),
-
+		Race:        player.Options.Race,
+		Class:       player.Options.Class,
+		Equip:       items.ProtoToEquipment(*player.Equipment),
+		PsuedoStats: initialPsuedo,
 		auraTracker: newAuraTracker(false),
 	}
 
@@ -148,7 +152,7 @@ func (character *Character) HasTemporaryBonusForStat(stat stats.Stat) bool {
 
 // TODO: rename this better
 func (character *Character) CastSpeed() float64 {
-	return character.psuedoStats.CastSpeedMultiplier + (character.stats[stats.SpellHaste] / (HasteRatingPerHastePercent * 100))
+	return character.PsuedoStats.CastSpeedMultiplier * (1 + (character.stats[stats.SpellHaste] / (HasteRatingPerHastePercent * 100)))
 }
 
 func (character *Character) AddRaidBuffs(raidBuffs *proto.RaidBuffs) {
@@ -207,6 +211,7 @@ func (character *Character) Finalize() {
 
 	// All stats added up to this point are part of the 'initial' stats.
 	character.initialStats = character.stats
+	character.initialPsuedoStats = character.PsuedoStats
 
 	character.auraTracker.finalize()
 	character.majorCooldownManager.finalize(character)
@@ -214,6 +219,7 @@ func (character *Character) Finalize() {
 
 func (character *Character) Reset(sim *Simulation) {
 	character.stats = character.initialStats
+	character.PsuedoStats = character.initialPsuedoStats
 
 	character.auraTracker.reset(sim)
 

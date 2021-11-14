@@ -202,7 +202,7 @@ func (ddi *DotDamageInput) Ticking(sim *Simulation) bool {
 }
 
 func (ddi *DotDamageInput) AddPending(sim *Simulation) {
-	sim.AddPendingAction(PendingAction{
+	sim.AddPendingAction(&PendingAction{
 		NextActionAt: sim.CurrentTime + ddi.TickLength,
 		OnAction: func(sim *Simulation) {
 			ddi.OnDamageTick(sim)

@@ -147,8 +147,8 @@ func (cast *Cast) startCasting(sim *Simulation, onCastComplete OnCastComplete) b
 
 	if !cast.IgnoreCooldowns {
 		// Prevent any actions on the GCD until the cast AND the GCD are done.
-		gcd := float64(GCDDefault) / cast.Character.CastSpeed()
-		gcdCD := MaxDuration(GCDMin, time.Duration(gcd))
+		gcd := MaxDuration(GCDMin, time.Duration(float64(GCDDefault)/cast.Character.CastSpeed()))
+		gcdCD := MaxDuration(gcd, cast.CastTime)
 		cast.Character.SetCD(GCDCooldownID, sim.CurrentTime+gcdCD)
 
 		// TODO: Hardcasts seem to also reset swing timers, so we should set those CDs as well.
