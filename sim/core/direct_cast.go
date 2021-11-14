@@ -54,6 +54,8 @@ func (ddEffect *DirectDamageSpellEffect) apply(sim *Simulation, spellCast *Spell
 		ddEffect.SpellEffect.calculateDirectDamage(sim, spellCast, &ddEffect.DirectDamageSpellInput)
 	}
 
+	// Apply results to the cast before invoking callbacks, to prevent callbacks from changing results.
+	ddEffect.SpellEffect.applyResultsToCast(spellCast)
 	ddEffect.SpellEffect.afterCalculations(sim, spellCast)
 }
 
@@ -72,7 +74,7 @@ func (spell *SingleTargetDirectDamageSpell) Init(sim *Simulation) {
 func (spell *SingleTargetDirectDamageSpell) Act(sim *Simulation) bool {
 	return spell.startCasting(sim, func(sim *Simulation, cast *Cast) {
 		spell.Effect.apply(sim, &spell.SpellCast)
-		sim.MetricsAggregator.AddSpellEffects(&spell.SpellCast)
+		sim.MetricsAggregator.AddSpellCast(&spell.SpellCast)
 	})
 }
 
@@ -112,7 +114,7 @@ func (spell *MultiTargetDirectDamageSpell) Act(sim *Simulation) bool {
 			effect.apply(sim, &spell.SpellCast)
 		}
 
-		sim.MetricsAggregator.AddSpellEffects(&spell.SpellCast)
+		sim.MetricsAggregator.AddSpellCast(&spell.SpellCast)
 	})
 }
 
@@ -140,7 +142,7 @@ type DamageOverTimeSpell struct {
 	SpellCast
 
 	// Individual direct damage effect of this spell.
-	Effect DamageOverTimeSpellEffect
+	DamageOverTimeSpellEffect
 }
 
 func (spell *DamageOverTimeSpell) Init(sim *Simulation) {
@@ -149,8 +151,7 @@ func (spell *DamageOverTimeSpell) Init(sim *Simulation) {
 
 func (spell *DamageOverTimeSpell) Act(sim *Simulation) bool {
 	return spell.startCasting(sim, func(sim *Simulation, cast *Cast) {
-		spell.Effect.apply(sim, &spell.SpellCast)
-		sim.MetricsAggregator.AddSpellEffects(&spell.SpellCast)
+		spell.apply(sim, &spell.SpellCast)
 	})
 }
 
@@ -167,12 +168,14 @@ func (dotEffect *DamageOverTimeSpellEffect) apply(sim *Simulation, spellCast *Sp
 		if dotEffect.DirectInput.MaxBaseDamage != 0 {
 			dotEffect.SpellEffect.calculateDirectDamage(sim, spellCast, &dotEffect.DirectInput)
 		}
-
 		dotEffect.SpellEffect.applyDot(sim, spellCast, &dotEffect.DotInput)
+	} else {
+		// Handle a missed cast here.
+		dotEffect.SpellEffect.applyResultsToCast(spellCast)
+		sim.MetricsAggregator.AddSpellCast(spellCast)
 	}
 
 	dotEffect.SpellEffect.afterCalculations(sim, spellCast)
-
 }
 
 type OnDamageTick func(*Simulation)
@@ -184,47 +187,66 @@ type OnDamageTick func(*Simulation)
 //   But how would the Agent keep a reference to this so it can watch dot state? Maybe dot object can modify this
 //    struct to have a 'currently ticking' field.
 type DotDamageInput struct {
-	Name       string
-	BaseDamage float64
-	Duration   time.Duration // total time to tick for
-	TickLength time.Duration // how often to fire OnDamageTick
+	Name             string
+	BaseDamage       float64
+	NumberTicks      int           // total time to tick for
+	TickLength       time.Duration // how often to fire OnDamageTick
+	SpellCoefficient float64
 
 	OnDamageTick OnDamageTick // TODO: Do we need an OnExpire?
 
-	SpellCoefficient float64
-	Spellpower       float64 // TODO: combine school + sp. This is a snapshot at cast time.
-
-	TickUntil time.Duration // when to stop ticking
+	DamagePerTick float64 // TODO: combine school + sp. This is a snapshot at cast time.
+	FinalTickTime time.Duration
+	TickIndex     int
 }
 
-func (ddi *DotDamageInput) Ticking(sim *Simulation) bool {
-	return sim.CurrentTime < ddi.TickUntil
+func (ddi DotDamageInput) TimeRemaining(sim *Simulation) time.Duration {
+	return MaxDuration(0, ddi.FinalTickTime-sim.CurrentTime)
 }
 
-func (ddi *DotDamageInput) AddPending(sim *Simulation) {
-	sim.AddPendingAction(&PendingAction{
-		NextActionAt: sim.CurrentTime + ddi.TickLength,
-		OnAction: func(sim *Simulation) {
-			ddi.OnDamageTick(sim)
-
-			damage := ddi.BaseDamage + ddi.Spellpower*ddi.SpellCoefficient
-			if sim.Log != nil {
-				sim.Log(" %s Ticked for %0.1f", ddi.Name, damage)
-			}
-
-			// TODO: see, we need spelleffect here, so maybe all this should go in a separate tracked dot.
-			damage = calculateResists(sim, damage, nil)
-
-			// TODO: add damage metrics somehow
-			// do we want to track the dot separately?
-			// sim.MetricsAggregator.AddSpellEffects(&spell.SpellCast)
-		},
-	})
+func (ddi DotDamageInput) IsTicking(sim *Simulation) bool {
+	return ddi.TimeRemaining(sim) != 0
 }
 
 func (spellEffect *SpellEffect) applyDot(sim *Simulation, spellCast *SpellCast, ddInput *DotDamageInput) {
 	// TODO: Apply dot here!
-	ddInput.AddPending(sim)
+	totalSpellPower := spellCast.Character.GetStat(stats.SpellPower) + spellCast.Character.GetStat(spellCast.SpellSchool) + spellEffect.BonusSpellPower
+
+	// snapshot total damage per tick
+	ddInput.DamagePerTick = ddInput.BaseDamage/float64(ddInput.NumberTicks) + totalSpellPower*ddInput.SpellCoefficient
+	ddInput.FinalTickTime = sim.CurrentTime + time.Duration(ddInput.NumberTicks)*ddInput.TickLength
+
+	pa := &PendingAction{
+		NextActionAt: sim.CurrentTime + ddInput.TickLength,
+	}
+
+	pa.OnAction = func(sim *Simulation) {
+		damage := ddInput.DamagePerTick
+		damage = calculateResists(sim, damage, spellEffect)
+
+		if sim.Log != nil {
+			sim.Log(" %s Ticked for %0.1f", ddInput.Name, damage)
+		}
+
+		spellEffect.Damage += damage
+
+		if ddInput.OnDamageTick != nil {
+			ddInput.OnDamageTick(sim)
+		}
+
+		ddInput.TickIndex++
+		if ddInput.TickIndex < ddInput.NumberTicks {
+			// add more pending
+			pa.NextActionAt = sim.CurrentTime + ddInput.TickLength
+		} else {
+			// Complete metrics and adding results etc
+			spellEffect.applyResultsToCast(spellCast)
+			sim.MetricsAggregator.AddSpellCast(spellCast)
+			pa.NextActionAt = NeverExpires
+		}
+	}
+
+	sim.AddPendingAction(pa)
 }
 
 type DamageOverTimeSpellTemplate struct {

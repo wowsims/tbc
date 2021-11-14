@@ -43,23 +43,27 @@ func (moonkin *BalanceDruid) Reset(sim *core.Simulation) {
 
 func (moonkin *BalanceDruid) Act(sim *core.Simulation) time.Duration {
 	// TODO: handle all the buffs you keep up
-	target := sim.GetPrimaryTarget()
+	// target := sim.GetPrimaryTarget()
 
-	if !target.HasAura(druid.FaerieFireAuraID) {
-		return sim.CurrentTime + moonkin.GetRemainingCD(core.GCDCooldownID, sim.CurrentTime)
-	} else if moonkin.rotationOptions.Moonfire {
-
-		// TODO: how do we want to track the dot?
-		//  could make moonkin.Druid.moonfireSpell public and actually track that object.
-		//  we could have an OnExpire on dot effects that let us know when it falls off.
-		//  we probably need to know how much time remains on the dot...
-
+	// if moonkin.rotationOptions.FaerieFire && !target.HasAura(druid.FaerieFireAuraID) {
+	// 	// TODO: add faerie fire aura
+	// 	return sim.CurrentTime + moonkin.GetRemainingCD(core.GCDCooldownID, sim.CurrentTime)
+	// } else if moonkin.rotationOptions.InsectSwarm && !moonkin.InsectSwarmSpell.DotInput.IsTicking(sim) {
+	// 	// TODO: add insect swarm aura
+	// 	return sim.CurrentTime + moonkin.GetRemainingCD(core.GCDCooldownID, sim.CurrentTime)
+	// } else
+	if moonkin.rotationOptions.Moonfire && !moonkin.MoonfireSpell.DotInput.IsTicking(sim) {
 		moonfire := moonkin.NewMoonfire(sim, sim.GetPrimaryTarget())
-		return sim.CurrentTime + moonfire.CastTime // ?? or should it be just a GCD since moonfire is instant.
+		moonfire.Act(sim)
+		return sim.CurrentTime + moonkin.GetRemainingCD(core.GCDCooldownID, sim.CurrentTime)
 	}
 
 	if moonkin.rotationOptions.PrimarySpell == proto.BalanceDruid_Rotation_Starfire {
 		starfire := moonkin.NewStarfire(sim, sim.GetPrimaryTarget(), 8)
+		starfire.Act(sim)
+		return sim.CurrentTime + starfire.CastTime
+	} else if moonkin.rotationOptions.PrimarySpell == proto.BalanceDruid_Rotation_Starfire6 {
+		starfire := moonkin.NewStarfire(sim, sim.GetPrimaryTarget(), 6)
 		starfire.Act(sim)
 		return sim.CurrentTime + starfire.CastTime
 	}

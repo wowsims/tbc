@@ -100,7 +100,7 @@ func applyRaceEffects(agent Agent) {
 						Name:    "Troll Berserking",
 						Expires: sim.CurrentTime + dur,
 						OnExpire: func(sim *Simulation) {
-							character.PsuedoStats.CastSpeedMultiplier /= 1.3
+							character.PsuedoStats.CastSpeedMultiplier /= hasteBonus
 						},
 					})
 					return true

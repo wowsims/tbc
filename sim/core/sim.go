@@ -174,15 +174,19 @@ func (sim *Simulation) RunOnce() {
 
 		pa.OnAction(sim)
 
-		if len(sim.pendingActions) == 1 {
-			// We know in a single user sim, just always make the next pending action ours.
-			sim.pendingActions[0] = pa
+		if pa.NextActionAt == NeverExpires {
+			sim.pendingActions = sim.pendingActions[1:] // cut off front
 		} else {
-			// Insert into the list the correct execution time.
-			for i, v := range sim.pendingActions {
-				if v.NextActionAt > pa.NextActionAt {
-					copy(sim.pendingActions, sim.pendingActions[:i])
-					sim.pendingActions[i] = pa
+			if len(sim.pendingActions) == 1 {
+				// We know in a single user sim, just always make the next pending action ours.
+				sim.pendingActions[0] = pa
+			} else {
+				// Insert into the list the correct execution time.
+				for i, v := range sim.pendingActions {
+					if v.NextActionAt > pa.NextActionAt {
+						copy(sim.pendingActions, sim.pendingActions[:i])
+						sim.pendingActions[i] = pa
+					}
 				}
 			}
 		}

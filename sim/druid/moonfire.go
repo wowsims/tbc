@@ -32,12 +32,11 @@ func (druid *Druid) newMoonfireTemplate(sim *core.Simulation) core.DamageOverTim
 			MaxBaseDamage:    357,
 			SpellCoefficient: 0.15,
 		},
-		// TODO: actually create dot effects
 		DotInput: core.DotDamageInput{
 			Name:             "Moonfire DoT",
-			Duration:         time.Second * 12,
+			NumberTicks:      4,
 			TickLength:       time.Second * 3,
-			BaseDamage:       600 / 4, // base 600 / 4 ticks
+			BaseDamage:       600,
 			SpellCoefficient: 0.13,
 
 			// TODO: does druid care about dot ticks?
@@ -56,17 +55,17 @@ func (druid *Druid) newMoonfireTemplate(sim *core.Simulation) core.DamageOverTim
 		SpellCast: core.SpellCast{
 			Cast: baseCast,
 		},
-		Effect: effect,
+		DamageOverTimeSpellEffect: effect,
 	})
 }
 
 func (druid *Druid) NewMoonfire(sim *core.Simulation, target *core.Target) *core.DamageOverTimeSpell {
 	// Initialize cast from precomputed template.
-	sf := &druid.moonfireSpell
-	druid.moonfireTemplate.Apply(sf)
+	sf := &druid.MoonfireSpell
+	druid.moonfireCastTemplate.Apply(sf)
 
 	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	sf.Effect.Target = target
+	sf.Target = target
 	sf.Init(sim)
 
 	return sf

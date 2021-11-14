@@ -13,10 +13,11 @@ type ActionKey struct {
 	ActionID int32
 	Tag      int32
 }
+
 func NewActionKey(actionID ActionID, tag int32) ActionKey {
 	return ActionKey{
 		ActionID: int32(actionID.OtherID) + actionID.SpellID - actionID.ItemID,
-		Tag: tag,
+		Tag:      tag,
 	}
 }
 
@@ -24,8 +25,8 @@ type MetricsAggregator struct {
 	// Duration of each iteration, in seconds
 	encounterDuration float64
 
-	startTime time.Time
-	numIterations  int
+	startTime     time.Time
+	numIterations int
 
 	// Metrics for each Agent, for the current iteration
 	agentIterations []AgentIterationMetrics
@@ -90,7 +91,7 @@ type ActionMetric struct {
 func NewMetricsAggregator(numAgents int, encounterDuration float64) *MetricsAggregator {
 	aggregator := &MetricsAggregator{
 		encounterDuration: encounterDuration,
-		startTime: time.Now(),
+		startTime:         time.Now(),
 	}
 
 	for i := 0; i < numAgents; i++ {
@@ -105,7 +106,7 @@ func NewMetricsAggregator(numAgents int, encounterDuration float64) *MetricsAggr
 }
 
 // Adds the results of an action to the aggregated metrics.
-func (aggregator *MetricsAggregator) AddSpellEffects(spellCast *SpellCast) {
+func (aggregator *MetricsAggregator) AddSpellCast(spellCast *SpellCast) {
 	actionID := spellCast.ActionID
 	tag := spellCast.Tag
 

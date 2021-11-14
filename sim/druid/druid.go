@@ -5,6 +5,7 @@ import (
 
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/proto"
+	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 type Druid struct {
@@ -17,8 +18,8 @@ type Druid struct {
 	starfire8CastTemplate core.SingleTargetDirectDamageSpellTemplate
 	starfire6CastTemplate core.SingleTargetDirectDamageSpellTemplate
 
-	moonfireSpell    core.DamageOverTimeSpell
-	moonfireTemplate core.DamageOverTimeSpellTemplate
+	MoonfireSpell        core.DamageOverTimeSpell
+	moonfireCastTemplate core.DamageOverTimeSpellTemplate
 }
 
 type SelfBuffs struct {
@@ -61,6 +62,7 @@ func (druid *Druid) Act(sim *core.Simulation) time.Duration {
 func (druid *Druid) Init(sim *core.Simulation) {
 	druid.starfire8CastTemplate = druid.newStarfireTemplate(sim, 8)
 	druid.starfire6CastTemplate = druid.newStarfireTemplate(sim, 6)
+	druid.moonfireCastTemplate = druid.newMoonfireTemplate(sim)
 }
 
 func NewDruid(char core.Character, selfBuffs SelfBuffs, talents proto.DruidTalents) Druid {
@@ -71,6 +73,23 @@ func NewDruid(char core.Character, selfBuffs SelfBuffs, talents proto.DruidTalen
 	}
 }
 
-var InsectSwarmAuraID = core.NewAuraID()
-var MoonfireAuraID = core.NewAuraID()
 var FaerieFireAuraID = core.NewAuraID()
+
+func init() {
+	// TODO: get the actual real base stats here.
+	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceTauren, Class: proto.Class_ClassDruid}] = stats.Stats{
+		stats.Strength:  103,
+		stats.Agility:   61,
+		stats.Stamina:   113,
+		stats.Intellect: 109,
+		stats.Spirit:    122,
+		stats.Mana:      2678,
+		stats.SpellCrit: 47.89,
+	}
+	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceNightElf, Class: proto.Class_ClassDruid}] = stats.Stats{
+		stats.Intellect: 104,
+		stats.Mana:      2678,
+		stats.Spirit:    135,
+		stats.SpellCrit: 47.89,
+	}
+}
