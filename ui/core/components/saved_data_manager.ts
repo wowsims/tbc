@@ -16,18 +16,29 @@ export type SavedDataManagerConfig<ModObject, T> = {
   fromJson: (obj: any) => T;
 };
 
-type SavedData<T> = {
+export type SavedDataConfig<ModObject, T> = {
+  name: string;
+  data: T;
+  tooltip?: string;
+	isPreset?: boolean;
+
+	// If set, will automatically hide the saved data when this evaluates to false.
+	enableWhen?: (obj: ModObject) => boolean;
+};
+
+type SavedData<ModObject, T> = {
   name: string;
   data: T;
   elem: HTMLElement;
+	enableWhen?: (obj: ModObject) => boolean;
 };
 
 export class SavedDataManager<ModObject, T> extends Component {
   private readonly modObject: ModObject;
   private readonly config: SavedDataManagerConfig<ModObject, T>;
 
-  private readonly userData: Array<SavedData<T>>;
-  private readonly presets: Array<SavedData<T>>;
+  private readonly userData: Array<SavedData<ModObject, T>>;
+  private readonly presets: Array<SavedData<ModObject, T>>;
 
   private readonly savedDataDiv: HTMLElement;
   private readonly saveInput: HTMLInputElement;
@@ -70,19 +81,22 @@ export class SavedDataManager<ModObject, T> extends Component {
         return;
       }
 
-      this.addSavedData(newName, config.getData(this.modObject), false);
+      this.addSavedData({
+				name: newName,
+				data: config.getData(this.modObject),
+			});
       this.saveUserData();
     });
   }
 
-  addSavedData(newName: string, data: T, isPreset: boolean, tooltipInfo?: string) {
-    const newData = this.makeSavedData(newName, data, isPreset, tooltipInfo);
+  addSavedData(config: SavedDataConfig<ModObject, T>) {
+    const newData = this.makeSavedData(config);
 
-    const dataArr = isPreset ? this.presets : this.userData;
+    const dataArr = config.isPreset ? this.presets : this.userData;
 
-    const oldIdx = dataArr.findIndex(data => data.name == newName);
+    const oldIdx = dataArr.findIndex(data => data.name == config.name);
     if (oldIdx == -1) {
-      if (isPreset || this.presets.length == 0) {
+      if (config.isPreset || this.presets.length == 0) {
         this.savedDataDiv.appendChild(newData.elem);
       } else {
         this.savedDataDiv.insertBefore(newData.elem, this.presets[0].elem);
@@ -94,60 +108,67 @@ export class SavedDataManager<ModObject, T> extends Component {
     }
   }
 
-  private makeSavedData(dataName: string, data: T, isPreset: boolean, tooltipInfo?: string): SavedData<T> {
+  private makeSavedData(config: SavedDataConfig<ModObject, T>): SavedData<ModObject, T> {
     const dataElem = document.createElement('div');
     dataElem.classList.add('saved-data-set-chip');
     dataElem.innerHTML = `
-    <span class="saved-data-set-name">${dataName}</span>
+    <span class="saved-data-set-name">${config.name}</span>
     <span class="saved-data-set-tooltip fa fa-info-circle"></span>
     <span class="saved-data-set-delete fa fa-times"></span>
     `;
 
     dataElem.addEventListener('click', event => {
-      this.config.setData(this.modObject, data);
-      this.saveInput.value = dataName;
+      this.config.setData(this.modObject, config.data);
+      this.saveInput.value = config.name;
     });
 
-    if (isPreset) {
+    if (config.isPreset) {
       dataElem.classList.add('saved-data-preset');
     } else {
       const deleteButton = dataElem.getElementsByClassName('saved-data-set-delete')[0] as HTMLElement;
       deleteButton.addEventListener('click', event => {
         event.stopPropagation();
-        const shouldDelete = confirm(`Delete saved ${this.config.label} '${dataName}'?`);
+        const shouldDelete = confirm(`Delete saved ${this.config.label} '${config.name}'?`);
         if (!shouldDelete)
           return;
 
-        const idx = this.userData.findIndex(data => data.name == dataName);
+        const idx = this.userData.findIndex(data => data.name == config.name);
         this.userData[idx].elem.remove();
         this.userData.splice(idx, 1);
         this.saveUserData();
       });
     }
 
-    if (tooltipInfo) {
+    if (config.tooltip) {
       dataElem.classList.add('saved-data-has-tooltip');
       tippy(dataElem.getElementsByClassName('saved-data-set-tooltip')[0], {
-        'content': tooltipInfo,
+        'content': config.tooltip,
         'allowHTML': true,
       });
     }
 
     const checkActive = () => {
-      if (this.config.equals(data, this.config.getData(this.modObject))) {
+      if (this.config.equals(config.data, this.config.getData(this.modObject))) {
         dataElem.classList.add('active');
       } else {
         dataElem.classList.remove('active');
       }
+
+			if (config.enableWhen && !config.enableWhen(this.modObject)) {
+        dataElem.classList.add('disabled');
+			} else {
+        dataElem.classList.remove('disabled');
+			}
     };
 
     checkActive();
     this.config.changeEmitters.forEach(emitter => emitter.on(checkActive));
 
     return {
-      name: dataName,
-      data: data,
+      name: config.name,
+      data: config.data,
       elem: dataElem,
+			enableWhen: config.enableWhen,
     };
   }
 
@@ -169,7 +190,10 @@ export class SavedDataManager<ModObject, T> extends Component {
 
     const jsonData = JSON.parse(dataStr);
     for (let name in jsonData) {
-      this.addSavedData(name, this.config.fromJson(jsonData[name]), false);
+      this.addSavedData({
+				name: name,
+				data: this.config.fromJson(jsonData[name]),
+			});
     }
   }
 

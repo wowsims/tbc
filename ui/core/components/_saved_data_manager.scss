@@ -15,6 +15,9 @@
   background-color: black;
   color: white;
 }
+.saved-data-set-chip.disabled {
+	display: none;
+}
 
 .saved-data-set-delete {
   color: red;

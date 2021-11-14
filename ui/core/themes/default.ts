@@ -2,6 +2,8 @@ import { Player } from '/tbc/core/player.js';
 import { Sim } from '/tbc/core/sim.js';
 import { Target } from '/tbc/core/target.js';
 import { Actions } from '/tbc/core/components/actions.js';
+import { BooleanPicker } from '/tbc/core/components/boolean_picker.js';
+import { BooleanPickerConfig } from '/tbc/core/components/boolean_picker.js';
 import { CharacterStats } from '/tbc/core/components/character_stats.js';
 import { CustomStatsPicker } from '/tbc/core/components/custom_stats_picker.js';
 import { DetailedResults } from '/tbc/core/components/detailed_results.js';
@@ -15,6 +17,7 @@ import { NumberPicker } from '/tbc/core/components/number_picker.js';
 import { NumberPickerConfig } from '/tbc/core/components/number_picker.js';
 import { MobTypePickerConfig } from '/tbc/core/components/other_inputs.js';
 import { Results } from '/tbc/core/components/results.js';
+import { SavedDataConfig } from '/tbc/core/components/saved_data_manager.js';
 import { SavedDataManager } from '/tbc/core/components/saved_data_manager.js';
 import { RaidBuffs } from '/tbc/core/proto/common.js';
 import { PartyBuffs } from '/tbc/core/proto/common.js';
@@ -30,8 +33,10 @@ import { Gear } from '/tbc/core/proto_utils/gear.js';
 import { raceNames } from '/tbc/core/proto_utils/names.js';
 import { Stats } from '/tbc/core/proto_utils/stats.js';
 import { SpecRotation } from '/tbc/core/proto_utils/utils.js';
+import { specNames } from '/tbc/core/proto_utils/utils.js';
 import { specToEligibleRaces } from '/tbc/core/proto_utils/utils.js';
 import { newTalentsPicker } from '/tbc/core/talents/factory.js';
+import { equalsOrBothNull } from '/tbc/core/utils.js';
 
 import { SimUI, SimUIConfig } from '/tbc/core/sim_ui.js';
 
@@ -47,6 +52,12 @@ export interface IconSection<ModObject> {
 export interface InputSection {
 	tooltip?: string,
 	inputs: Array<{
+		type: 'boolean',
+		cssClass: string,
+		getModObject: (simUI: SimUI<any>) => any,
+		config: BooleanPickerConfig<any>,
+	} |
+	{
 		type: 'number',
 		cssClass: string,
 		getModObject: (simUI: SimUI<any>) => any,
@@ -70,29 +81,24 @@ export interface DefaultThemeConfig<SpecType extends Spec> extends SimUIConfig<S
   additionalSections?: Record<string, InputSection>;
   showTargetArmor: boolean;
   showNumTargets: boolean;
-	freezeTalents: boolean;
+	freezeTalents?: boolean;
   presets: {
-    gear: Array<{
-      name: string,
-      tooltip?: string,
-      equipment: EquipmentSpec,
-    }>;
-    encounters: Array<{
-      name: string,
-      tooltip?: string,
-      encounter: Encounter,
-    }>;
-    talents: Array<{
-      name: string,
-      tooltip?: string,
-      talents: string,
-    }>;
+    gear: Array<PresetGear>,
+    encounters: Array<SavedDataConfig<Sim, Encounter>>,
+    talents: Array<SavedDataConfig<Player<any>, string>>,
   },
 }
 
 export interface GearAndStats {
   gear: Gear,
-  customStats: Stats,
+  customStats?: Stats,
+}
+
+export interface PresetGear {
+  name: string;
+  gear: EquipmentSpec;
+  tooltip?: string;
+	enableWhen?: (obj: Player<any>) => boolean;
 }
 
 export interface Settings {
@@ -112,6 +118,7 @@ export class DefaultTheme<SpecType extends Spec> extends SimUI<SpecType> {
     this.parentElem.innerHTML = layoutHTML;
 
 		const titleElem = this.parentElem.getElementsByClassName('default-title')[0];
+		titleElem.textContent = 'TBC ' + specNames[this.player.spec] + ' Sim';
 		if (config.releaseStatus == 'Alpha') {
 			titleElem.textContent += ' Alpha';
 		} else if (config.releaseStatus == 'Beta') {
@@ -143,6 +150,10 @@ export class DefaultTheme<SpecType extends Spec> extends SimUI<SpecType> {
 				});
 			}
 
+			if (sectionConfig.icons.length == 0) {
+				sectionElem.style.display = 'none';
+			}
+
       const iconPicker = new IconPicker(sectionElem, modObject, sectionConfig.icons, this);
 		};
     configureIconSection(this.parentElem.getElementsByClassName('self-buffs-section')[0] as HTMLElement, config.selfBuffInputs, this.player);
@@ -161,6 +172,8 @@ export class DefaultTheme<SpecType extends Spec> extends SimUI<SpecType> {
       sectionConfig.inputs.forEach(inputConfig => {
         if (inputConfig.type == 'number') {
           const picker = new NumberPicker(sectionElem, inputConfig.getModObject(this), inputConfig.config);
+        } else if (inputConfig.type == 'boolean') {
+          const picker = new BooleanPicker(sectionElem, inputConfig.getModObject(this), inputConfig.config);
         } else if (inputConfig.type == 'enum') {
           const picker = new EnumPicker(sectionElem, inputConfig.getModObject(this), inputConfig.config);
         }
@@ -258,14 +271,16 @@ export class DefaultTheme<SpecType extends Spec> extends SimUI<SpecType> {
       },
       setData: (player: Player<any>, newGearAndStats: GearAndStats) => {
         player.setGear(newGearAndStats.gear);
-        player.setCustomStats(newGearAndStats.customStats);
+				if (newGearAndStats.customStats) {
+					player.setCustomStats(newGearAndStats.customStats);
+				}
       },
-      changeEmitters: [this.player.gearChangeEmitter, this.player.customStatsChangeEmitter],
-      equals: (a: GearAndStats, b: GearAndStats) => a.gear.equals(b.gear) && a.customStats.equals(b.customStats),
+      changeEmitters: [this.player.changeEmitter],
+      equals: (a: GearAndStats, b: GearAndStats) => a.gear.equals(b.gear) && equalsOrBothNull(a.customStats, b.customStats, (a, b) => a.equals(b)),
       toJson: (a: GearAndStats) => {
         return {
           gear: EquipmentSpec.toJson(a.gear.asSpec()),
-          customStats: a.customStats.toJson(),
+          customStats: a.customStats?.toJson(),
         };
       },
       fromJson: (obj: any) => {
@@ -367,21 +382,28 @@ export class DefaultTheme<SpecType extends Spec> extends SimUI<SpecType> {
     await super.init();
 
     savedGearManager.loadUserData();
-    this._config.presets.gear.forEach(gearConfig => {
-      const gear = this.sim.lookupEquipmentSpec(gearConfig.equipment);
-      savedGearManager.addSavedData(gearConfig.name, { gear: gear, customStats: new Stats(), }, true, gearConfig.tooltip);
+    this._config.presets.gear.forEach(presetGear => {
+      savedGearManager.addSavedData({
+				name: presetGear.name,
+				tooltip: presetGear.tooltip,
+				data: {
+					gear: this.sim.lookupEquipmentSpec(presetGear.gear),
+					customStats: new Stats(),
+				},
+				enableWhen: presetGear.enableWhen,
+			});
     });
 
     savedEncounterManager.loadUserData();
-    this._config.presets.encounters.forEach(encounterConfig => {
-      savedEncounterManager.addSavedData(encounterConfig.name, encounterConfig.encounter, true, encounterConfig.tooltip);
+    this._config.presets.encounters.forEach(config => {
+      savedEncounterManager.addSavedData(config);
     });
 
     savedSettingsManager.loadUserData();
 
     savedTalentsManager.loadUserData();
-    this._config.presets.talents.forEach(talentsConfig => {
-      savedTalentsManager.addSavedData(talentsConfig.name, talentsConfig.talents, true, talentsConfig.tooltip);
+    this._config.presets.talents.forEach(config => {
+      savedTalentsManager.addSavedData(config);
     });
   }
 }
@@ -389,15 +411,10 @@ export class DefaultTheme<SpecType extends Spec> extends SimUI<SpecType> {
 const layoutHTML = `
 <div class="default-root">
   <section class="default-sidebar">
-    <div class="default-title">
-      TBC Elemental Shaman Sim
-    </div>
-    <div class="default-actions">
-    </div>
-    <div class="default-results">
-    </div>
-    <div class="default-stats">
-    </div>
+    <div class="default-title"></div>
+    <div class="default-actions"></div>
+    <div class="default-results"></div>
+    <div class="default-stats"></div>
   </section>
   <section class="default-main">
     <ul class="nav nav-tabs">

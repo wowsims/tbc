@@ -1,0 +1,13 @@
+{
+  "extends": "../tsconfig-base",
+  "compilerOptions": {
+    "declaration": false,
+    "outDir": "../../dist/tbc/balance_druid",
+  },
+  "include": [
+    "**/*.ts",
+  ],
+  "references": [
+    { "path": "../core" },
+  ],
+}
