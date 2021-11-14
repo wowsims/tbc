@@ -13,6 +13,7 @@ import { StatWeightsRequest, StatWeightsResult } from '/tbc/core/proto/api.js';
 import { EquippedItem } from '/tbc/core/proto_utils/equipped_item.js';
 import { Gear } from '/tbc/core/proto_utils/gear.js';
 import { Stats } from '/tbc/core/proto_utils/stats.js';
+import { Faction } from '/tbc/core/proto_utils/utils.js';
 import { SpecRotation } from '/tbc/core/proto_utils/utils.js';
 import { SpecTalents } from '/tbc/core/proto_utils/utils.js';
 import { SpecTypeFunctions } from '/tbc/core/proto_utils/utils.js';
@@ -70,6 +71,7 @@ export declare class Player<SpecType extends Spec> {
     getCurrentStats(): ComputeStatsResult;
     getRace(): Race;
     setRace(newRace: Race): void;
+    getFaction(): Faction;
     getConsumes(): Consumes;
     setConsumes(newConsumes: Consumes): void;
     equipItem(slot: ItemSlot, newItem: EquippedItem | null): void;

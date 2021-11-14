@@ -1,9 +1,11 @@
 import { Player } from '/tbc/core/player.js';
 import { Sim } from '/tbc/core/sim.js';
 import { Target } from '/tbc/core/target.js';
+import { BooleanPickerConfig } from '/tbc/core/components/boolean_picker.js';
 import { EnumPickerConfig } from '/tbc/core/components/enum_picker.js';
 import { IconInput } from '/tbc/core/components/icon_picker.js';
 import { NumberPickerConfig } from '/tbc/core/components/number_picker.js';
+import { SavedDataConfig } from '/tbc/core/components/saved_data_manager.js';
 import { RaidBuffs } from '/tbc/core/proto/common.js';
 import { PartyBuffs } from '/tbc/core/proto/common.js';
 import { IndividualBuffs } from '/tbc/core/proto/common.js';
@@ -22,6 +24,11 @@ export interface IconSection<ModObject> {
 export interface InputSection {
     tooltip?: string;
     inputs: Array<{
+        type: 'boolean';
+        cssClass: string;
+        getModObject: (simUI: SimUI<any>) => any;
+        config: BooleanPickerConfig<any>;
+    } | {
         type: 'number';
         cssClass: string;
         getModObject: (simUI: SimUI<any>) => any;
@@ -43,28 +50,22 @@ export interface DefaultThemeConfig<SpecType extends Spec> extends SimUIConfig<S
     additionalSections?: Record<string, InputSection>;
     showTargetArmor: boolean;
     showNumTargets: boolean;
-    freezeTalents: boolean;
+    freezeTalents?: boolean;
     presets: {
-        gear: Array<{
-            name: string;
-            tooltip?: string;
-            equipment: EquipmentSpec;
-        }>;
-        encounters: Array<{
-            name: string;
-            tooltip?: string;
-            encounter: Encounter;
-        }>;
-        talents: Array<{
-            name: string;
-            tooltip?: string;
-            talents: string;
-        }>;
+        gear: Array<PresetGear>;
+        encounters: Array<SavedDataConfig<Sim, Encounter>>;
+        talents: Array<SavedDataConfig<Player<any>, string>>;
     };
 }
 export interface GearAndStats {
     gear: Gear;
-    customStats: Stats;
+    customStats?: Stats;
+}
+export interface PresetGear {
+    name: string;
+    gear: EquipmentSpec;
+    tooltip?: string;
+    enableWhen?: (obj: Player<any>) => boolean;
 }
 export interface Settings {
     raidBuffs: RaidBuffs;

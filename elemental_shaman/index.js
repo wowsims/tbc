@@ -52,7 +52,7 @@ const theme = new DefaultTheme(document.body, {
         ],
         defaults: {
             // Default equipped gear.
-            gear: Presets.PRERAID_GEAR,
+            gear: Presets.PRERAID_GEAR.gear,
             // Default EP weights for sorting gear in the gear picker.
             epWeights: Stats.fromMap({
                 [Stat.StatIntellect]: 0.33,
@@ -72,7 +72,7 @@ const theme = new DefaultTheme(document.body, {
                 type: RotationType.Adaptive,
             }),
             // Default talents.
-            talents: Presets.StandardTalents,
+            talents: Presets.StandardTalents.data,
             // Default spec-specific settings.
             specOptions: ElementalShamanOptions.create({
                 waterShield: true,
@@ -204,23 +204,12 @@ const theme = new DefaultTheme(document.body, {
     presets: {
         // Preset talents that the user can quickly select.
         talents: [
-            {
-                name: 'Standard',
-                talents: Presets.StandardTalents,
-            },
+            Presets.StandardTalents,
         ],
         // Preset gear configurations that the user can quickly select.
         gear: [
-            {
-                name: 'P1 BIS',
-                tooltip: Tooltips.BASIC_BIS_DISCLAIMER,
-                equipment: Presets.P1_BIS,
-            },
-            {
-                name: 'P2 BIS',
-                tooltip: Tooltips.BASIC_BIS_DISCLAIMER,
-                equipment: Presets.P2_BIS,
-            },
+            Presets.P1_BIS,
+            Presets.P2_BIS,
         ],
         // Preset encounter settings that the user can quickly select.
         encounters: [],

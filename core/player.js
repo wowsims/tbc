@@ -9,6 +9,7 @@ import { canEquipItem } from '/tbc/core/proto_utils/utils.js';
 import { specToEligibleRaces } from '/tbc/core/proto_utils/utils.js';
 import { getEligibleItemSlots } from '/tbc/core/proto_utils/utils.js';
 import { gemMatchesSocket } from '/tbc/core/proto_utils/utils.js';
+import { raceToFaction } from '/tbc/core/proto_utils/utils.js';
 import { TypedEvent } from './typed_event.js';
 import { sum } from './utils.js';
 import { wait } from './utils.js';
@@ -97,6 +98,9 @@ export class Player {
             this._race = newRace;
             this.raceChangeEmitter.emit();
         }
+    }
+    getFaction() {
+        return raceToFaction[this.getRace()];
     }
     getConsumes() {
         // Make a defensive copy

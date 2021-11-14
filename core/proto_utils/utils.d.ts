@@ -26,6 +26,7 @@ export declare type PriestSpecs = Spec.SpecShadowPriest;
 export declare type ShamanSpecs = Spec.SpecElementalShaman;
 export declare type WarlockSpecs = Spec.SpecWarlock;
 export declare type WarriorSpecs = Spec.SpecWarrior;
+export declare const specNames: Record<Spec, string>;
 export declare type RotationUnion = BalanceDruidRotation | ElementalShamanRotation | HunterRotation | MageRotation | RogueRotation | RetributionPaladinRotation | ShadowPriestRotation | WarlockRotation | WarriorRotation;
 export declare type SpecRotation<T extends Spec> = T extends Spec.SpecBalanceDruid ? BalanceDruidRotation : T extends Spec.SpecElementalShaman ? ElementalShamanRotation : T extends Spec.SpecHunter ? HunterRotation : T extends Spec.SpecMage ? MageRotation : T extends Spec.SpecRogue ? RogueRotation : T extends Spec.SpecRetributionPaladin ? RetributionPaladinRotation : T extends Spec.SpecShadowPriest ? ShadowPriestRotation : T extends Spec.SpecWarlock ? WarlockRotation : T extends Spec.SpecWarrior ? WarriorRotation : ElementalShamanRotation;
 export declare type TalentsUnion = DruidTalents | HunterTalents | MageTalents | RogueTalents | PaladinTalents | PriestTalents | ShamanTalents | WarlockTalents | WarriorTalents;
@@ -52,6 +53,12 @@ export declare type SpecTypeFunctions<SpecType extends Spec> = {
     optionsFromJson: (obj: any) => SpecOptions<SpecType>;
 };
 export declare const specTypeFunctions: Partial<Record<Spec, SpecTypeFunctions<any>>>;
+export declare enum Faction {
+    Unknown = 0,
+    Alliance = 1,
+    Horde = 2
+}
+export declare const raceToFaction: Record<Race, Faction>;
 export declare const specToClass: Record<Spec, Class>;
 export declare const specToEligibleRaces: Record<Spec, Array<Race>>;
 export declare const specToEligibleItemCategories: Record<Spec, Array<ItemCategory>>;

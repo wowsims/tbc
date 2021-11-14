@@ -22,6 +22,17 @@ import { RetributionPaladin, RetributionPaladin_Rotation as RetributionPaladinRo
 import { ShadowPriest, ShadowPriest_Rotation as ShadowPriestRotation, PriestTalents, ShadowPriest_Options as ShadowPriestOptions } from '/tbc/core/proto/priest.js';
 import { Warlock, Warlock_Rotation as WarlockRotation, WarlockTalents, Warlock_Options as WarlockOptions } from '/tbc/core/proto/warlock.js';
 import { Warrior, Warrior_Rotation as WarriorRotation, WarriorTalents, Warrior_Options as WarriorOptions } from '/tbc/core/proto/warrior.js';
+export const specNames = {
+    [Spec.SpecBalanceDruid]: 'Balance Druid',
+    [Spec.SpecElementalShaman]: 'Elemental Shaman',
+    [Spec.SpecHunter]: 'Hunter',
+    [Spec.SpecMage]: 'Mage',
+    [Spec.SpecRogue]: 'Rogue',
+    [Spec.SpecRetributionPaladin]: 'Retribution Paladin',
+    [Spec.SpecShadowPriest]: 'Shadow Priest',
+    [Spec.SpecWarlock]: 'Warlock',
+    [Spec.SpecWarrior]: 'Warrior',
+};
 export const specTypeFunctions = {
     [Spec.SpecBalanceDruid]: {
         rotationCreate: () => BalanceDruidRotation.create(),
@@ -176,6 +187,26 @@ export const specTypeFunctions = {
         optionsToJson: (a) => WarriorOptions.toJson(a),
         optionsFromJson: (obj) => WarriorOptions.fromJson(obj),
     },
+};
+export var Faction;
+(function (Faction) {
+    Faction[Faction["Unknown"] = 0] = "Unknown";
+    Faction[Faction["Alliance"] = 1] = "Alliance";
+    Faction[Faction["Horde"] = 2] = "Horde";
+})(Faction || (Faction = {}));
+export const raceToFaction = {
+    [Race.RaceUnknown]: Faction.Unknown,
+    [Race.RaceBloodElf]: Faction.Horde,
+    [Race.RaceDraenei]: Faction.Alliance,
+    [Race.RaceDwarf]: Faction.Alliance,
+    [Race.RaceGnome]: Faction.Alliance,
+    [Race.RaceHuman]: Faction.Alliance,
+    [Race.RaceNightElf]: Faction.Alliance,
+    [Race.RaceOrc]: Faction.Horde,
+    [Race.RaceTauren]: Faction.Horde,
+    [Race.RaceTroll10]: Faction.Horde,
+    [Race.RaceTroll30]: Faction.Horde,
+    [Race.RaceUndead]: Faction.Horde,
 };
 export const specToClass = {
     [Spec.SpecBalanceDruid]: Class.ClassDruid,

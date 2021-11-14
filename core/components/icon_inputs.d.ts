@@ -26,6 +26,7 @@ export declare const ManaTideTotem: IconInput<Sim>;
 export declare const ImprovedSealOfTheCrusader: IconInput<Target>;
 export declare const JudgementOfWisdom: IconInput<Target>;
 export declare const Misery: IconInput<Target>;
+export declare const CurseOfElements: IconInput<Target>;
 export declare const AdeptsElixir: IconInput<Player<any>>;
 export declare const BlackenedBasilisk: IconInput<Player<any>>;
 export declare const BrilliantWizardOil: IconInput<Player<any>>;

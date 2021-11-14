@@ -10,6 +10,13 @@ export declare type SavedDataManagerConfig<ModObject, T> = {
     toJson: (a: T) => any;
     fromJson: (obj: any) => T;
 };
+export declare type SavedDataConfig<ModObject, T> = {
+    name: string;
+    data: T;
+    tooltip?: string;
+    isPreset?: boolean;
+    enableWhen?: (obj: ModObject) => boolean;
+};
 export declare class SavedDataManager<ModObject, T> extends Component {
     private readonly modObject;
     private readonly config;
@@ -19,7 +26,7 @@ export declare class SavedDataManager<ModObject, T> extends Component {
     private readonly saveInput;
     private frozen;
     constructor(parent: HTMLElement, modObject: ModObject, config: SavedDataManagerConfig<ModObject, T>);
-    addSavedData(newName: string, data: T, isPreset: boolean, tooltipInfo?: string): void;
+    addSavedData(config: SavedDataConfig<ModObject, T>): void;
     private makeSavedData;
     private saveUserData;
     loadUserData(): void;

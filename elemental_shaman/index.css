@@ -93,6 +93,24 @@
   width: 30%;
 }
 
+.input-label-div {
+  display: inline-block;
+  margin: 5px;
+}
+
+.input-label, .input-tooltip {
+  margin: 3px;
+}
+
+.input-root.disabled .input-label, .input-root.disabled .input-tooltip {
+  filter: opacity(0.5);
+}
+
+.boolean-picker-input {
+  margin: 5px;
+  width: 70px;
+}
+
 .character-stats-root {
   width: 100%;
   height: 100%;
@@ -784,6 +802,10 @@
   color: white;
 }
 
+.saved-data-set-chip.disabled {
+  display: none;
+}
+
 .saved-data-set-delete {
   color: red;
 }
@@ -1277,7 +1299,7 @@ td, th {
   align-items: flex-end;
 }
 
-.encounter-section .number-picker-root {
+.encounter-section .input-root {
   display: flex;
   justify-content: space-between;
   align-items: center;
