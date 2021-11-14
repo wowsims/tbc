@@ -1,6 +1,21 @@
 import { BalanceDruid_Rotation_PrimarySpell as PrimarySpell } from '/tbc/core/proto/druid.js';
+import { RaidTarget } from '/tbc/core/proto/common.js';
+import { NO_TARGET } from '/tbc/core/proto_utils/utils.js';
 // Configuration for spec-specific UI elements on the settings tab.
 // These don't need to be in a separate file but it keeps things cleaner.
+export const SelfInnervate = {
+    id: { spellId: 29166 },
+    states: 2,
+    changedEvent: (player) => player.specOptionsChangeEmitter,
+    getValue: (player) => player.getSpecOptions().innervateTarget?.targetIndex != NO_TARGET,
+    setBooleanValue: (player, newValue) => {
+        const newOptions = player.getSpecOptions();
+        newOptions.innervateTarget = RaidTarget.create({
+            targetIndex: newValue ? 0 : NO_TARGET,
+        });
+        player.setSpecOptions(newOptions);
+    },
+};
 export const BalanceDruidRotationConfig = {
     inputs: [
         {

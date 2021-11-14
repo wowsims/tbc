@@ -128,7 +128,11 @@ const theme = new DefaultTheme(document.body, {
     // IconInputs to include in the 'Self Buffs' section on the settings tab.
     selfBuffInputs: {
         tooltip: Tooltips.SELF_BUFFS_SECTION,
-        icons: [],
+        icons: [
+            DruidInputs.SelfInnervate,
+            IconInputs.DrumsOfBattleConsume,
+            IconInputs.DrumsOfRestorationConsume,
+        ],
     },
     // IconInputs to include in the 'Other Buffs' section on the settings tab.
     buffInputs: {

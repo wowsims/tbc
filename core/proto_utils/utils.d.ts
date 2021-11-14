@@ -71,3 +71,4 @@ export declare function getEligibleEnchantSlots(enchant: Enchant): Array<ItemSlo
 export declare function enchantAppliesToItem(enchant: Enchant, item: Item): boolean;
 export declare function gemMatchesSocket(gem: Gem, socketColor: GemColor): boolean;
 export declare function gemEligibleForSocket(gem: Gem, socketColor: GemColor): boolean;
+export declare const NO_TARGET = -1;
