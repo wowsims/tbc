@@ -135,14 +135,14 @@ func (cast *Cast) startCasting(sim *Simulation, onCastComplete OnCastComplete) b
 
 	// For instant-cast spells we can skip creating an aura.
 	if cast.CastTime == 0 {
-		cast.Character.PsuedoStats.LastCast = sim.CurrentTime
+		cast.Character.PsuedoStats.FiveSecondRuleRefreshTime = sim.CurrentTime + time.Second*5
 		cast.internalOnComplete(sim, onCastComplete)
 	} else {
 		cast.Character.HardcastAura = Aura{
 			Expires: sim.CurrentTime + cast.CastTime,
 			OnExpire: func(sim *Simulation) {
 				cast.internalOnComplete(sim, onCastComplete)
-				cast.Character.PsuedoStats.LastCast = sim.CurrentTime
+				cast.Character.PsuedoStats.FiveSecondRuleRefreshTime = sim.CurrentTime + time.Second*5
 			},
 		}
 	}
