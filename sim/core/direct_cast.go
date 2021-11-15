@@ -83,6 +83,9 @@ type SingleTargetDirectDamageSpellTemplate struct {
 }
 
 func (template *SingleTargetDirectDamageSpellTemplate) Apply(newAction *SingleTargetDirectDamageSpell) {
+	if newAction.objectInUse {
+		panic("Single target spell already in use")
+	}
 	*newAction = template.template
 }
 
@@ -115,6 +118,7 @@ func (spell *MultiTargetDirectDamageSpell) Act(sim *Simulation) bool {
 		}
 
 		sim.MetricsAggregator.AddSpellCast(&spell.SpellCast)
+		spell.objectInUse = false
 	})
 }
 
@@ -124,6 +128,9 @@ type MultiTargetDirectDamageSpellTemplate struct {
 }
 
 func (template *MultiTargetDirectDamageSpellTemplate) Apply(newAction *MultiTargetDirectDamageSpell) {
+	if newAction.objectInUse {
+		panic("Multi target spell already in use")
+	}
 	*newAction = template.template
 	newAction.Effects = template.effects
 	copy(newAction.Effects, template.template.Effects)
@@ -174,6 +181,7 @@ func (dotEffect *DamageOverTimeSpellEffect) apply(sim *Simulation, spellCast *Sp
 		// Handle a missed cast here.
 		dotEffect.SpellEffect.applyResultsToCast(spellCast)
 		sim.MetricsAggregator.AddSpellCast(spellCast)
+		spellCast.objectInUse = false
 	}
 
 	dotEffect.SpellEffect.afterCalculations(sim, spellCast)
@@ -242,6 +250,7 @@ func (spellEffect *SpellEffect) applyDot(sim *Simulation, spellCast *SpellCast, 
 			// Complete metrics and adding results etc
 			spellEffect.applyResultsToCast(spellCast)
 			sim.MetricsAggregator.AddSpellCast(spellCast)
+			spellCast.objectInUse = false
 
 			// Kills the pending action from the main run loop.
 			pa.NextActionAt = NeverExpires
@@ -256,6 +265,9 @@ type DamageOverTimeSpellTemplate struct {
 }
 
 func (template *DamageOverTimeSpellTemplate) Apply(newAction *DamageOverTimeSpell) {
+	if newAction.objectInUse {
+		panic("Damage over time spell already in use")
+	}
 	*newAction = template.template
 }
 

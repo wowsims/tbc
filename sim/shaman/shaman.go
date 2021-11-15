@@ -66,15 +66,15 @@ type Shaman struct {
 	lightningBoltSpell   core.SingleTargetDirectDamageSpell
 	lightningBoltSpellLO core.SingleTargetDirectDamageSpell
 
-	chainLightningSpell   core.MultiTargetDirectDamageSpell
-	chainLightningSpellLO core.MultiTargetDirectDamageSpell
+	chainLightningSpell    core.MultiTargetDirectDamageSpell
+	chainLightningSpellLOs []core.MultiTargetDirectDamageSpell
 
 	// Precomputed templated cast generator for quickly resetting cast fields.
 	lightningBoltCastTemplate   core.SingleTargetDirectDamageSpellTemplate
 	lightningBoltLOCastTemplate core.SingleTargetDirectDamageSpellTemplate
 
-	chainLightningCastTemplate   core.MultiTargetDirectDamageSpellTemplate
-	chainLightningLOCastTemplate core.MultiTargetDirectDamageSpellTemplate
+	chainLightningCastTemplate    core.MultiTargetDirectDamageSpellTemplate
+	chainLightningLOCastTemplates []core.MultiTargetDirectDamageSpellTemplate
 }
 
 // Implemented by each Shaman spec.
@@ -117,8 +117,15 @@ func (shaman *Shaman) Init(sim *core.Simulation) {
 	// Precompute all the spell templates.
 	shaman.lightningBoltCastTemplate = shaman.newLightningBoltTemplate(sim, false)
 	shaman.lightningBoltLOCastTemplate = shaman.newLightningBoltTemplate(sim, true)
+
 	shaman.chainLightningCastTemplate = shaman.newChainLightningTemplate(sim, false)
-	shaman.chainLightningLOCastTemplate = shaman.newChainLightningTemplate(sim, true)
+
+	numHits := core.MinInt32(3, sim.GetNumTargets())
+	shaman.chainLightningSpellLOs = make([]core.MultiTargetDirectDamageSpell, numHits)
+	shaman.chainLightningLOCastTemplates = []core.MultiTargetDirectDamageSpellTemplate{}
+	for i := int32(0); i < numHits; i++ {
+		shaman.chainLightningLOCastTemplates = append(shaman.chainLightningLOCastTemplates, shaman.newChainLightningTemplate(sim, true))
+	}
 }
 
 func (shaman *Shaman) Reset(sim *core.Simulation) {

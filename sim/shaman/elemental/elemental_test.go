@@ -129,8 +129,8 @@ func TestSimulatePreRaid(t *testing.T) {
 			Gear:          PreRaidGear,
 		},
 
-		ExpectedDpsShort: 1297.5,
-		ExpectedDpsLong:  1009.1,
+		ExpectedDpsShort: 1429.1,
+		ExpectedDpsLong:  1169.2,
 	})
 }
 
@@ -153,30 +153,58 @@ func TestSimulateP1(t *testing.T) {
 			Gear:          P1Gear,
 		},
 
-		ExpectedDpsShort: 1928.0,
-		ExpectedDpsLong:  1470.0,
+		ExpectedDpsShort: 1883.1,
+		ExpectedDpsLong:  1625.6,
 	})
 }
 
-// func TestMultiTarget(t *testing.T) {
-// 	params := core.IndividualParams{
-// 		Equip:         P1Gear,
-// 		Race:          proto.Race_RaceOrc,
-//    Class:         proto.Class_ClassShaman,
-// 		Consumes:      FullConsumes,
-// 		Buffs:         FullBuffs,
-//    Options:       FullDebuffOptions,
-// 		Options:       makeOptions(core.BasicOptions, LongEncounter),
-// 		PlayerOptions: &PlayerOptionsAdaptive,
-// 	}
-// 	params.Options.Encounter.NumTargets = 3
+//func TestMultiTarget(t *testing.T) {
+//	params := core.IndividualParams{
+//		Equip:         P1Gear,
+//		Race:          proto.Race_RaceOrc,
+//   Class:         proto.Class_ClassShaman,
+//		Consumes:      FullConsumes,
+//		Buffs:         FullBuffs,
+//   Options:       FullDebuffOptions,
+//		Options:       makeOptions(core.BasicOptions, LongEncounter),
+//		PlayerOptions: &PlayerOptionsAdaptive,
+//	}
+//	params.Options.Encounter.NumTargets = 3
+//
+//	doSimulateTest(
+//		"multiTarget",
+//		t,
+//		params,
+//		1533.5)
+//}
 
-// 	doSimulateTest(
-// 		"multiTarget",
-// 		t,
-// 		params,
-// 		1533.5)
-// }
+func TestMultiTarget(t *testing.T) {
+	core.IndividualSimAllEncountersTest(core.AllEncountersTestOptions{
+		Label: "multiTarget",
+		T:     t,
+
+		Inputs: core.IndividualSimInputs{
+			RaidBuffs:       FullRaidBuffs,
+			PartyBuffs:      FullPartyBuffs,
+			IndividualBuffs: FullIndividualBuffs,
+
+			Consumes: FullConsumes,
+			Targets: []*proto.Target{
+				FullDebuffTarget,
+				NoDebuffTarget,
+				NoDebuffTarget,
+			},
+			Race:     proto.Race_RaceOrc,
+			Class:    proto.Class_ClassShaman,
+
+			PlayerOptions: PlayerOptionsAdaptive,
+			Gear:          P1Gear,
+		},
+
+		ExpectedDpsShort: 1880.7,
+		ExpectedDpsLong:  1601.9,
+	})
+}
 
 func TestLBOnlyAgent(t *testing.T) {
 	core.IndividualSimAllEncountersTest(core.AllEncountersTestOptions{
@@ -197,8 +225,8 @@ func TestLBOnlyAgent(t *testing.T) {
 			Gear:          P1Gear,
 		},
 
-		ExpectedDpsShort: 1761.8,
-		ExpectedDpsLong:  1483.9,
+		ExpectedDpsShort: 1880.7,
+		ExpectedDpsLong:  1601.9,
 	})
 }
 
@@ -235,8 +263,8 @@ func TestClearcastAgent(t *testing.T) {
 			Gear:          P1Gear,
 		},
 
-		ExpectedDpsShort: 1715.9,
-		ExpectedDpsLong:  1526.6,
+		ExpectedDpsShort: 2023.1,
+		ExpectedDpsLong:  1677.5,
 	})
 }
 
@@ -255,7 +283,7 @@ func TestAverageDPS(t *testing.T) {
 		PlayerOptions: PlayerOptionsAdaptive,
 	})
 
-	core.IndividualSimAverageTest("P1Average", t, isr, 1508.04)
+	core.IndividualSimAverageTest("P1Average", t, isr, 1622.65)
 }
 
 func BenchmarkSimulate(b *testing.B) {

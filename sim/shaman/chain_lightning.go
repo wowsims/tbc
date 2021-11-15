@@ -1,6 +1,7 @@
 package shaman
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
@@ -66,16 +67,28 @@ func (shaman *Shaman) newChainLightningTemplate(sim *core.Simulation, isLightnin
 	return core.NewMultiTargetDirectDamageSpellTemplate(spellTemplate)
 }
 
+func (shaman *Shaman) getFirstAvailableCLLOObjectIndex() int {
+	for i, _ := range shaman.chainLightningSpellLOs {
+		if !shaman.chainLightningSpellLOs[i].IsInUse() {
+			return i
+		}
+	}
+	panic("All chain lightning LO objects in use!")
+}
+
 func (shaman *Shaman) NewChainLightning(sim *core.Simulation, target *core.Target, isLightningOverload bool) *core.MultiTargetDirectDamageSpell {
 	var cl *core.MultiTargetDirectDamageSpell
 
 	// Initialize cast from precomputed template.
 	if isLightningOverload {
-		cl = &shaman.chainLightningSpellLO
-		shaman.chainLightningLOCastTemplate.Apply(cl)
+		objIndex := shaman.getFirstAvailableCLLOObjectIndex()
+		cl = &shaman.chainLightningSpellLOs[objIndex]
+		shaman.chainLightningLOCastTemplates[objIndex].Apply(cl)
+		fmt.Printf("Lo: %d\n", objIndex)
 	} else {
 		cl = &shaman.chainLightningSpell
 		shaman.chainLightningCastTemplate.Apply(cl)
+		fmt.Printf("not Lo\n")
 	}
 
 	// Set dynamic fields, i.e. the stuff we couldn't precompute.

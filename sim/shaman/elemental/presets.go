@@ -121,7 +121,9 @@ var NoDebuffTarget = &proto.Target{
 
 var FullDebuffTarget = &proto.Target{
 	Debuffs: &proto.Debuffs{
+		ImprovedSealOfTheCrusader: true,
 		JudgementOfWisdom: true,
+		Misery: true,
 	},
 }
 
