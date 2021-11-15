@@ -98,7 +98,7 @@ var PlayerOptionsWrath = &proto.PlayerOptions{
 var PreRaidGear = items.EquipmentSpecFromStrings([]items.ItemStringSpec{})
 
 var P1Gear = items.EquipmentSpecFromStrings([]items.ItemStringSpec{
-	items.ItemStringSpec{
+	{
 		Name:    "Antlers of Malorne",
 		Enchant: "Glyph of Power",
 		Gems: []string{
@@ -106,10 +106,10 @@ var P1Gear = items.EquipmentSpecFromStrings([]items.ItemStringSpec{
 			"Chaotic Skyfire Diamond",
 		},
 	},
-	items.ItemStringSpec{
+	{
 		Name: "Adornment of Stolen Souls",
 	},
-	items.ItemStringSpec{
+	{
 		Name:    "Pauldrons of Malorne",
 		Enchant: "Greater Inscription of Discipline",
 		Gems: []string{
@@ -117,10 +117,10 @@ var P1Gear = items.EquipmentSpecFromStrings([]items.ItemStringSpec{
 			"Potent Noble Topaz",
 		},
 	},
-	items.ItemStringSpec{
+	{
 		Name: "Ruby Drape of the Mysticant",
 	},
-	items.ItemStringSpec{
+	{
 		Name:    "Spellfire Robe",
 		Enchant: "Chest - Exceptional Stats",
 		Gems: []string{
@@ -128,14 +128,14 @@ var P1Gear = items.EquipmentSpecFromStrings([]items.ItemStringSpec{
 			"Glowing Nightseye",
 		},
 	},
-	items.ItemStringSpec{
+	{
 		Name:    "Bracers of Havok",
 		Enchant: "Bracer - Spellpower",
 		Gems: []string{
 			"Potent Noble Topaz",
 		},
 	},
-	items.ItemStringSpec{
+	{
 		Name:    "Spellfire Gloves",
 		Enchant: "Gloves - Major Spellpower",
 		Gems: []string{
@@ -143,14 +143,14 @@ var P1Gear = items.EquipmentSpecFromStrings([]items.ItemStringSpec{
 			"Runed Living Ruby",
 		},
 	},
-	items.ItemStringSpec{
+	{
 		Name: "Spellfire Belt",
 		Gems: []string{
 			"Runed Living Ruby",
 			"Runed Living Ruby",
 		},
 	},
-	items.ItemStringSpec{
+	{
 		Name:    "Spellstrike Pants",
 		Enchant: "Runic Spellthread",
 		Gems: []string{
@@ -159,31 +159,115 @@ var P1Gear = items.EquipmentSpecFromStrings([]items.ItemStringSpec{
 			"Runed Living Ruby",
 		},
 	},
-	items.ItemStringSpec{
+	{
 		Name: "Boots of Foretelling",
 	},
-	items.ItemStringSpec{
+	{
 		Name:    "Violet Signet of the Archmage",
 		Enchant: "Ring - Spellpower",
 	},
-	items.ItemStringSpec{
+	{
 		Name:    "Ring of Recurrence",
 		Enchant: "Ring - Spellpower",
 	},
-	items.ItemStringSpec{
+	{
 		Name: "Quagmirran's Eye",
 	},
-	items.ItemStringSpec{
+	{
 		Name: "Icon of the Silver Crescent",
 	},
-	items.ItemStringSpec{
+	{
 		Name: "Ivory Idol of the Moongoddess",
 	},
-	items.ItemStringSpec{
+	{
 		Name:    "Nathrezim Mindblade",
 		Enchant: "Weapon - Major Spellpower",
 	},
-	items.ItemStringSpec{
+	{
 		Name: "Talisman of Kalecgos",
+	},
+})
+
+var P2Gear = items.EquipmentSpecFromStrings([]items.ItemStringSpec{
+	{
+		Name:    "Nordrassil Headpiece",
+		Enchant: "Glyph of Power",
+		Gems: []string{
+			"Potent Noble Topaz",
+			"Chaotic Skyfire Diamond",
+		},
+	},
+	{
+		Name: "The Sun King's Talisman",
+	},
+	{
+		Name:    "Nordrassil Wrath-Mantle",
+		Enchant: "Greater Inscription of Discipline",
+		Gems: []string{
+			"Glowing Nightseye",
+			"Potent Noble Topaz",
+		},
+	},
+	{
+		Name: "Brute Cloak of the Ogre-Magi",
+	},
+	{
+		Name:    "Nordrassil Chestpiece",
+		Enchant: "Chest - Exceptional Stats",
+		Gems: []string{
+			"Runed Living Ruby",
+			"Runed Living Ruby",
+			"Runed Living Ruby",
+		},
+	},
+	{
+		Name:    "Mindstorm Wristbands",
+		Enchant: "Bracer - Spellpower",
+	},
+	{
+		Name:    "Spellfire Gloves",
+		Enchant: "Gloves - Major Spellpower",
+		Gems: []string{
+			"Runed Living Ruby",
+			"Runed Living Ruby",
+		},
+	},
+	{
+		Name: "Belt of Blasting",
+		Gems: []string{
+			"Glowing Nightseye",
+			"Potent Noble Topaz",
+		},
+	},
+	{
+		Name:    "Nordrassil Wrath-Kilt",
+		Enchant: "Runic Spellthread",
+		Gems: []string{
+			"Runed Living Ruby",
+		},
+	},
+	{
+		Name: "Boots of Blasting",
+	},
+	{
+		Name:    "Band of Eternity",
+		Enchant: "Ring - Spellpower",
+	},
+	{
+		Name:    "Ring of Recurrence",
+		Enchant: "Ring - Spellpower",
+	},
+	{
+		Name: "Quagmirran's Eye",
+	},
+	{
+		Name: "Icon of the Silver Crescent",
+	},
+	{
+		Name: "Idol of the Raven Goddess",
+	},
+	{
+		Name:    "The Nexus Key",
+		Enchant: "Weapon - Major Spellpower",
 	},
 })

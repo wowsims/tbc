@@ -12,6 +12,30 @@ func init() {
 	RegisterBalanceDruid()
 }
 
+func TestNordBonus(t *testing.T) {
+	core.IndividualSimAllEncountersTest(core.AllEncountersTestOptions{
+		Label: "phase2-nordbonus",
+		T:     t,
+
+		Inputs: core.IndividualSimInputs{
+			RaidBuffs:       FullRaidBuffs,
+			PartyBuffs:      FullPartyBuffs,
+			IndividualBuffs: FullIndividualBuffs,
+
+			Consumes: FullConsumes,
+			Target:   FullDebuffTarget,
+			Race:     proto.Race_RaceTauren,
+			Class:    proto.Class_ClassDruid,
+
+			PlayerOptions: PlayerOptionsStarfire,
+			Gear:          P2Gear,
+		},
+
+		ExpectedDpsShort: 1909.6,
+		ExpectedDpsLong:  1766.9,
+	})
+}
+
 func TestSimulateP1Starfire(t *testing.T) {
 	core.IndividualSimAllEncountersTest(core.AllEncountersTestOptions{
 		Label: "phase1-starfire",
@@ -31,8 +55,8 @@ func TestSimulateP1Starfire(t *testing.T) {
 			Gear:          P1Gear,
 		},
 
-		ExpectedDpsShort: 1184.8,
-		ExpectedDpsLong:  1155.4,
+		ExpectedDpsShort: 1476.3,
+		ExpectedDpsLong:  1423.0,
 	})
 }
 
@@ -55,7 +79,7 @@ func TestSimulateP1Wrath(t *testing.T) {
 			Gear:          P1Gear,
 		},
 
-		ExpectedDpsShort: 1160.6,
-		ExpectedDpsLong:  1002.8,
+		ExpectedDpsShort: 1224.1,
+		ExpectedDpsLong:  1055.4,
 	})
 }

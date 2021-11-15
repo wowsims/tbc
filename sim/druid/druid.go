@@ -31,7 +31,6 @@ type Druid struct {
 	insectSwarmCastTemplate core.DamageOverTimeSpellTemplate
 
 	malorne4p bool
-	nord4p    bool
 	thunder2p bool
 	thunder4p bool
 }
@@ -133,24 +132,6 @@ func (druid *Druid) applyOnHitTalents(sim *core.Simulation, spellCast *core.Spel
 	if druid.Talents.NaturesGrace && spellEffect.Crit {
 		druid.NaturesGrace = true
 	}
-
-	if druid.Talents.WrathOfCenarius > 0 {
-		if spellCast.ActionID.SpellID == SpellIDSF8 || spellCast.ActionID.SpellID == SpellIDSF6 {
-			spellEffect.BonusSpellPower += (druid.GetStat(stats.SpellPower) + druid.GetStat(stats.ArcaneSpellPower)) * 0.04 * float64(druid.Talents.WrathOfCenarius)
-		}
-
-		if spellCast.ActionID.SpellID == SpellIDWrath {
-			spellEffect.BonusSpellPower += (druid.GetStat(stats.SpellPower) + druid.GetStat(stats.NatureSpellPower)) * 0.02 * float64(druid.Talents.WrathOfCenarius)
-		}
-	}
-
-	if druid.nord4p && (spellCast.ActionID.SpellID == SpellIDSF8 || spellCast.ActionID.SpellID == SpellIDSF6) {
-		// Check if moonfire is ticking on the target.
-		// TODO: in a raid simulator we need to be able to see which dots are ticking from other druids.
-		if druid.MoonfireSpell.DotInput.IsTicking(sim) && druid.MoonfireSpell.Target.Index == spellEffect.Target.Index {
-			spellEffect.DamageMultiplier *= 1.1
-		}
-	}
 }
 
 func (druid *Druid) applyNaturesGrace(spellCast *core.SpellCast) {
@@ -164,7 +145,28 @@ func (druid *Druid) applyNaturesGrace(spellCast *core.SpellCast) {
 	}
 }
 
+var WrathOfCenariusAuraID = core.NewAuraID()
+
 func NewDruid(char core.Character, selfBuffs SelfBuffs, talents proto.DruidTalents) Druid {
+
+	if talents.WrathOfCenarius > 0 {
+		sfBonus := 0.04 * float64(talents.WrathOfCenarius)
+		wrathBonus := 0.02 * float64(talents.WrathOfCenarius)
+		char.AddPermanentAura(func(sim *core.Simulation) core.Aura {
+			return core.Aura{
+				ID:   WrathOfCenariusAuraID,
+				Name: "Wrath of Cenarius Talent",
+				OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+					if spellCast.ActionID.SpellID == SpellIDSF8 || spellCast.ActionID.SpellID == SpellIDSF6 {
+						spellEffect.BonusSpellPower += (spellCast.Character.GetStat(stats.SpellPower) + spellCast.Character.GetStat(stats.ArcaneSpellPower)) * sfBonus
+					}
+					if spellCast.ActionID.SpellID == SpellIDWrath {
+						spellEffect.BonusSpellPower += (spellCast.Character.GetStat(stats.SpellPower) + spellCast.Character.GetStat(stats.NatureSpellPower)) * wrathBonus
+					}
+				},
+			}
+		})
+	}
 
 	char.AddStatDependency(stats.StatDependency{
 		SourceStat:   stats.Intellect,
@@ -205,7 +207,6 @@ func NewDruid(char core.Character, selfBuffs SelfBuffs, talents proto.DruidTalen
 		SelfBuffs: selfBuffs,
 		Talents:   talents,
 		malorne4p: ItemSetMalorne.CharacterHasSetBonus(&char, 4),
-		nord4p:    ItemSetNordrassil.CharacterHasSetBonus(&char, 4),
 		thunder2p: ItemSetThunderheart.CharacterHasSetBonus(&char, 2),
 		thunder4p: ItemSetThunderheart.CharacterHasSetBonus(&char, 4),
 	}

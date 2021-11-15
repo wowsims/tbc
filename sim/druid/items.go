@@ -7,6 +7,7 @@ import (
 
 func init() {
 	core.AddItemSet(ItemSetMalorne)
+	core.AddItemSet(ItemSetThunderheart)
 }
 
 var Malorne2PcAuraID = core.NewAuraID()
@@ -31,16 +32,6 @@ var ItemSetMalorne = core.ItemSet{
 		},
 		4: func(agent core.Agent) {
 			// Currently this is handled in druid.go (reducing CD of innervate)
-		},
-	},
-}
-
-var ItemSetNordrassil = core.ItemSet{
-	Name:  "Nordrassil Regalia",
-	Items: map[int32]struct{}{30231: {}, 30232: {}, 30233: {}, 30234: {}, 30235: {}},
-	Bonuses: map[int32]core.ApplyEffect{
-		4: func(agent core.Agent) {
-			// handled in druid.go on spell hit
 		},
 	},
 }
