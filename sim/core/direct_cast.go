@@ -181,12 +181,9 @@ func (dotEffect *DamageOverTimeSpellEffect) apply(sim *Simulation, spellCast *Sp
 
 type OnDamageTick func(*Simulation)
 
-// TODO: Does the actual dot that rolls on the pending actions need to be this struct?
-//   we currently are missing a time to end the dot (only have the duration there)
-//   Perhaps DotDamageInput is passed into a real 'Dot' type that is the actual rolling thing.
-//   It could then have a reference to the metrics object.
-//   But how would the Agent keep a reference to this so it can watch dot state? Maybe dot object can modify this
-//    struct to have a 'currently ticking' field.
+// DotDamageInput is the data needed to kick of the dot ticking in pendingActions.
+//  For now the only way for a caster to track their dot is to keep a reference to the cast object
+//  that started this and check the DotDamageInput.IsTicking()
 type DotDamageInput struct {
 	Name             string
 	BaseDamage       float64
@@ -210,9 +207,7 @@ func (ddi DotDamageInput) IsTicking(sim *Simulation) bool {
 }
 
 func (spellEffect *SpellEffect) applyDot(sim *Simulation, spellCast *SpellCast, ddInput *DotDamageInput) {
-	// TODO: Apply dot here!
 	totalSpellPower := spellCast.Character.GetStat(stats.SpellPower) + spellCast.Character.GetStat(spellCast.SpellSchool) + spellEffect.BonusSpellPower
-
 	// snapshot total damage per tick
 	ddInput.DamagePerTick = ddInput.BaseDamage/float64(ddInput.NumberTicks) + totalSpellPower*ddInput.SpellCoefficient
 	ddInput.FinalTickTime = sim.CurrentTime + time.Duration(ddInput.NumberTicks)*ddInput.TickLength
