@@ -132,7 +132,7 @@ func (cast *Cast) startCasting(sim *Simulation, onCastComplete OnCastComplete) b
 					cast.Character.ID, cast.Name, cast.Character.CurrentMana(), cast.ManaCost)
 			}
 			sim.MetricsAggregator.MarkOOM(cast.Character, sim.CurrentTime)
-
+			cast.objectInUse = false // cast failed and we aren't using it
 			return false
 		}
 	}

@@ -75,6 +75,7 @@ func (spell *SingleTargetDirectDamageSpell) Act(sim *Simulation) bool {
 	return spell.startCasting(sim, func(sim *Simulation, cast *Cast) {
 		spell.Effect.apply(sim, &spell.SpellCast)
 		sim.MetricsAggregator.AddSpellCast(&spell.SpellCast)
+		spell.objectInUse = false
 	})
 }
 

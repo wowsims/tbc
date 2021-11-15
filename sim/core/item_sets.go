@@ -64,7 +64,7 @@ type ActiveSetBonus struct {
 }
 
 // Returns a list describing all active set bonuses.
-func (character *Character) getActiveSetBonuses() []ActiveSetBonus {
+func (character *Character) GetActiveSetBonuses() []ActiveSetBonus {
 	activeBonuses := []ActiveSetBonus{}
 	setItemCount := map[string]int32{}
 
@@ -87,7 +87,7 @@ func (character *Character) getActiveSetBonuses() []ActiveSetBonus {
 
 // Apply effects from item set bonuses.
 func (character *Character) applyItemSetBonusEffects(agent Agent) {
-	activeSetBonuses := character.getActiveSetBonuses()
+	activeSetBonuses := character.GetActiveSetBonuses()
 
 	for _, activeSetBonus := range activeSetBonuses {
 		activeSetBonus.BonusEffect(agent)
@@ -96,7 +96,7 @@ func (character *Character) applyItemSetBonusEffects(agent Agent) {
 
 // Returns the names of all active set bonuses.
 func (character *Character) GetActiveSetBonusNames() []string {
-	activeSetBonuses := character.getActiveSetBonuses()
+	activeSetBonuses := character.GetActiveSetBonuses()
 	names := []string{}
 
 	for _, activeSetBonus := range activeSetBonuses {

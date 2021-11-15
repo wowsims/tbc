@@ -1,7 +1,6 @@
 package shaman
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
@@ -48,13 +47,20 @@ func (shaman *Shaman) newChainLightningTemplate(sim *core.Simulation, isLightnin
 		}
 	}
 
+	setBonuses := shaman.GetActiveSetBonuses()
+	hasTidefury := false
+	for _, bonus := range setBonuses {
+		if bonus.Name == "Tidefury Raiment" && bonus.NumPieces >= 2 {
+			hasTidefury = true
+			break
+		}
+	}
 	numHits := core.MinInt32(3, sim.GetNumTargets())
 	effects := make([]core.DirectDamageSpellEffect, 0, numHits)
 	effects = append(effects, effect)
 	for i := int32(1); i < numHits; i++ {
 		bounceEffect := effects[i-1] // Makes a copy
-
-		if shaman.HasAura(Tidefury2PcAuraID) {
+		if hasTidefury {
 			bounceEffect.DamageMultiplier *= 0.83
 		} else {
 			bounceEffect.DamageMultiplier *= 0.7
@@ -84,11 +90,9 @@ func (shaman *Shaman) NewChainLightning(sim *core.Simulation, target *core.Targe
 		objIndex := shaman.getFirstAvailableCLLOObjectIndex()
 		cl = &shaman.chainLightningSpellLOs[objIndex]
 		shaman.chainLightningLOCastTemplates[objIndex].Apply(cl)
-		fmt.Printf("Lo: %d\n", objIndex)
 	} else {
 		cl = &shaman.chainLightningSpell
 		shaman.chainLightningCastTemplate.Apply(cl)
-		fmt.Printf("not Lo\n")
 	}
 
 	// Set dynamic fields, i.e. the stuff we couldn't precompute.

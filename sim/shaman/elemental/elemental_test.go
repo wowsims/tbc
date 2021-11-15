@@ -157,27 +157,6 @@ func TestSimulateP1(t *testing.T) {
 		ExpectedDpsLong:  1625.6,
 	})
 }
-
-//func TestMultiTarget(t *testing.T) {
-//	params := core.IndividualParams{
-//		Equip:         P1Gear,
-//		Race:          proto.Race_RaceOrc,
-//   Class:         proto.Class_ClassShaman,
-//		Consumes:      FullConsumes,
-//		Buffs:         FullBuffs,
-//   Options:       FullDebuffOptions,
-//		Options:       makeOptions(core.BasicOptions, LongEncounter),
-//		PlayerOptions: &PlayerOptionsAdaptive,
-//	}
-//	params.Options.Encounter.NumTargets = 3
-//
-//	doSimulateTest(
-//		"multiTarget",
-//		t,
-//		params,
-//		1533.5)
-//}
-
 func TestMultiTarget(t *testing.T) {
 	core.IndividualSimAllEncountersTest(core.AllEncountersTestOptions{
 		Label: "multiTarget",
@@ -193,16 +172,44 @@ func TestMultiTarget(t *testing.T) {
 				FullDebuffTarget,
 				NoDebuffTarget,
 				NoDebuffTarget,
+				NoDebuffTarget,
 			},
-			Race:     proto.Race_RaceOrc,
-			Class:    proto.Class_ClassShaman,
+			Race:  proto.Race_RaceOrc,
+			Class: proto.Class_ClassShaman,
 
 			PlayerOptions: PlayerOptionsAdaptive,
 			Gear:          P1Gear,
 		},
 
-		ExpectedDpsShort: 1880.7,
-		ExpectedDpsLong:  1601.9,
+		ExpectedDpsShort: 2459.5,
+		ExpectedDpsLong:  1943.5,
+	})
+
+	core.IndividualSimAllEncountersTest(core.AllEncountersTestOptions{
+		Label: "multiTarget-tidefury",
+		T:     t,
+
+		Inputs: core.IndividualSimInputs{
+			RaidBuffs:       FullRaidBuffs,
+			PartyBuffs:      FullPartyBuffs,
+			IndividualBuffs: FullIndividualBuffs,
+
+			Consumes: FullConsumes,
+			Targets: []*proto.Target{
+				FullDebuffTarget,
+				NoDebuffTarget,
+				NoDebuffTarget,
+				NoDebuffTarget,
+			},
+			Race:  proto.Race_RaceOrc,
+			Class: proto.Class_ClassShaman,
+
+			PlayerOptions: PlayerOptionsAdaptive,
+			Gear:          P1Tidefury,
+		},
+
+		ExpectedDpsShort: 2504.6,
+		ExpectedDpsLong:  1930.4,
 	})
 }
 

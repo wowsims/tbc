@@ -5,13 +5,11 @@ import (
 	"github.com/wowsims/tbc/sim/core/proto"
 )
 
-var BasicRaidBuffs = &proto.RaidBuffs{
-}
+var BasicRaidBuffs = &proto.RaidBuffs{}
 var BasicPartyBuffs = &proto.PartyBuffs{
 	Bloodlust: 1,
 }
-var BasicIndividualBuffs = &proto.IndividualBuffs{
-}
+var BasicIndividualBuffs = &proto.IndividualBuffs{}
 
 var StandardTalents = &proto.ShamanTalents{
 	ElementalFocus:     true,
@@ -100,7 +98,7 @@ var FullPartyBuffs = &proto.PartyBuffs{
 var FullIndividualBuffs = &proto.IndividualBuffs{
 	BlessingOfKings:  true,
 	BlessingOfWisdom: proto.TristateEffect_TristateEffectImproved,
-	ShadowPriestDps: 500,
+	ShadowPriestDps:  500,
 }
 
 var FullConsumes = &proto.Consumes{
@@ -115,21 +113,20 @@ var FullConsumes = &proto.Consumes{
 }
 
 var NoDebuffTarget = &proto.Target{
-	Debuffs: &proto.Debuffs{
-	},
+	Debuffs: &proto.Debuffs{},
 }
 
 var FullDebuffTarget = &proto.Target{
 	Debuffs: &proto.Debuffs{
 		ImprovedSealOfTheCrusader: true,
-		JudgementOfWisdom: true,
-		Misery: true,
+		JudgementOfWisdom:         true,
+		Misery:                    true,
 	},
 }
 
 var PreRaidGear = items.EquipmentSpecFromStrings([]items.ItemStringSpec{
 	items.ItemStringSpec{
-		Name: "Tidefury Helm",
+		Name:    "Tidefury Helm",
 		Enchant: "Glyph of Power",
 		Gems: []string{
 			"Runed Living Ruby",
@@ -137,7 +134,7 @@ var PreRaidGear = items.EquipmentSpecFromStrings([]items.ItemStringSpec{
 		},
 	},
 	items.ItemStringSpec{
-		Name: "Brooch of Heightened Potential",
+		Name:    "Brooch of Heightened Potential",
 		Enchant: "Zandalar Signet of Mojo",
 	},
 	items.ItemStringSpec{
@@ -159,7 +156,7 @@ var PreRaidGear = items.EquipmentSpecFromStrings([]items.ItemStringSpec{
 		Name: "Moonrage Girdle",
 	},
 	items.ItemStringSpec{
-		Name: "Tidefury Kilt",
+		Name:    "Tidefury Kilt",
 		Enchant: "Mystic Spellthread",
 	},
 	items.ItemStringSpec{
@@ -190,7 +187,7 @@ var PreRaidGear = items.EquipmentSpecFromStrings([]items.ItemStringSpec{
 
 var P1Gear = items.EquipmentSpecFromStrings([]items.ItemStringSpec{
 	items.ItemStringSpec{
-		Name: "Cyclone Faceguard",
+		Name:    "Cyclone Faceguard",
 		Enchant: "Glyph of Power",
 		Gems: []string{
 			"Chaotic Skyfire Diamond",
@@ -201,7 +198,7 @@ var P1Gear = items.EquipmentSpecFromStrings([]items.ItemStringSpec{
 		Name: "Adornment of Stolen Souls",
 	},
 	items.ItemStringSpec{
-		Name: "Cyclone Shoulderguards",
+		Name:    "Cyclone Shoulderguards",
 		Enchant: "Greater Inscription of Discipline",
 		Gems: []string{
 			"Potent Noble Topaz",
@@ -212,7 +209,7 @@ var P1Gear = items.EquipmentSpecFromStrings([]items.ItemStringSpec{
 		Name: "Ruby Drape of the Mysticant",
 	},
 	items.ItemStringSpec{
-		Name: "Netherstrike Breastplate",
+		Name:    "Netherstrike Breastplate",
 		Enchant: "Chest - Exceptional Stats",
 		Gems: []string{
 			"Runed Living Ruby",
@@ -221,14 +218,14 @@ var P1Gear = items.EquipmentSpecFromStrings([]items.ItemStringSpec{
 		},
 	},
 	items.ItemStringSpec{
-		Name: "Netherstrike Bracers",
+		Name:    "Netherstrike Bracers",
 		Enchant: "Bracer - Spellpower",
 		Gems: []string{
 			"Potent Noble Topaz",
 		},
 	},
 	items.ItemStringSpec{
-		Name: "Soul-Eater's Handwraps",
+		Name:    "Soul-Eater's Handwraps",
 		Enchant: "Gloves - Major Spellpower",
 		Gems: []string{
 			"Potent Noble Topaz",
@@ -243,7 +240,7 @@ var P1Gear = items.EquipmentSpecFromStrings([]items.ItemStringSpec{
 		},
 	},
 	items.ItemStringSpec{
-		Name: "Stormsong Kilt",
+		Name:    "Stormsong Kilt",
 		Enchant: "Runic Spellthread",
 		Gems: []string{
 			"Potent Noble Topaz",
@@ -255,11 +252,11 @@ var P1Gear = items.EquipmentSpecFromStrings([]items.ItemStringSpec{
 		Name: "Windshear Boots",
 	},
 	items.ItemStringSpec{
-		Name: "Ring of Unrelenting Storms",
+		Name:    "Ring of Unrelenting Storms",
 		Enchant: "Ring - Spellpower",
 	},
 	items.ItemStringSpec{
-		Name: "Ring of Recurrence",
+		Name:    "Ring of Recurrence",
 		Enchant: "Ring - Spellpower",
 	},
 	items.ItemStringSpec{
@@ -272,11 +269,104 @@ var P1Gear = items.EquipmentSpecFromStrings([]items.ItemStringSpec{
 		Name: "Totem of the Void",
 	},
 	items.ItemStringSpec{
-		Name: "Nathrezim Mindblade",
+		Name:    "Nathrezim Mindblade",
 		Enchant: "Weapon - Major Spellpower",
 	},
 	items.ItemStringSpec{
-		Name: "Mazthoril Honor Shield",
+		Name:    "Mazthoril Honor Shield",
+		Enchant: "Shield - Intellect",
+	},
+})
+
+var P1Tidefury = items.EquipmentSpecFromStrings([]items.ItemStringSpec{
+	items.ItemStringSpec{
+		Name:    "Cyclone Faceguard",
+		Enchant: "Glyph of Power",
+		Gems: []string{
+			"Chaotic Skyfire Diamond",
+			"Potent Noble Topaz",
+		},
+	},
+	items.ItemStringSpec{
+		Name: "Adornment of Stolen Souls",
+	},
+	items.ItemStringSpec{
+		Name:    "Cyclone Shoulderguards",
+		Enchant: "Greater Inscription of Discipline",
+		Gems: []string{
+			"Potent Noble Topaz",
+			"Potent Noble Topaz",
+		},
+	},
+	items.ItemStringSpec{
+		Name: "Ruby Drape of the Mysticant",
+	},
+	items.ItemStringSpec{
+		Name:    "Netherstrike Breastplate",
+		Enchant: "Chest - Exceptional Stats",
+		Gems: []string{
+			"Runed Living Ruby",
+			"Runed Living Ruby",
+			"Runed Living Ruby",
+		},
+	},
+	items.ItemStringSpec{
+		Name:    "Netherstrike Bracers",
+		Enchant: "Bracer - Spellpower",
+		Gems: []string{
+			"Potent Noble Topaz",
+		},
+	},
+	items.ItemStringSpec{
+		Name:    "Tidefury Gauntlets",
+		Enchant: "Gloves - Major Spellpower",
+		// Gems: []string{
+		// 	"Potent Noble Topaz",
+		// 	"Glowing Nightseye",
+		// },
+	},
+	items.ItemStringSpec{
+		Name: "Netherstrike Belt",
+		Gems: []string{
+			"Glowing Nightseye",
+			"Potent Noble Topaz",
+		},
+	},
+	items.ItemStringSpec{
+		Name:    "Tidefury Kilt",
+		Enchant: "Runic Spellthread",
+		// Gems: []string{
+		// 	"Potent Noble Topaz",
+		// 	"Runed Living Ruby",
+		// 	"Glowing Nightseye",
+		// },
+	},
+	items.ItemStringSpec{
+		Name: "Windshear Boots",
+	},
+	items.ItemStringSpec{
+		Name:    "Ring of Unrelenting Storms",
+		Enchant: "Ring - Spellpower",
+	},
+	items.ItemStringSpec{
+		Name:    "Ring of Recurrence",
+		Enchant: "Ring - Spellpower",
+	},
+	items.ItemStringSpec{
+		Name: "The Lightning Capacitor",
+	},
+	items.ItemStringSpec{
+		Name: "Icon of the Silver Crescent",
+	},
+	items.ItemStringSpec{
+		Name: "Totem of the Void",
+	},
+	items.ItemStringSpec{
+		Name:    "Nathrezim Mindblade",
+		Enchant: "Weapon - Major Spellpower",
+	},
+	items.ItemStringSpec{
+		Name:    "Mazthoril Honor Shield",
 		Enchant: "Shield - Intellect",
 	},
 })

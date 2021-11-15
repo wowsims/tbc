@@ -130,6 +130,15 @@ func (shaman *Shaman) Init(sim *core.Simulation) {
 
 func (shaman *Shaman) Reset(sim *core.Simulation) {
 	shaman.Character.Reset(sim)
+
+	// Reset all spells so any pending casts are cleaned up
+	shaman.lightningBoltSpell = core.SingleTargetDirectDamageSpell{}
+	shaman.lightningBoltSpellLO = core.SingleTargetDirectDamageSpell{}
+	shaman.chainLightningSpell = core.MultiTargetDirectDamageSpell{}
+
+	numHits := core.MinInt32(3, sim.GetNumTargets())
+	shaman.chainLightningSpellLOs = make([]core.MultiTargetDirectDamageSpell, numHits)
+
 }
 
 func (shaman *Shaman) Advance(sim *core.Simulation, elapsedTime time.Duration) {
