@@ -193,7 +193,7 @@ type DotDamageInput struct {
 
 	OnDamageTick OnDamageTick // TODO: Do we need an OnExpire?
 
-	DamagePerTick float64 // TODO: combine school + sp. This is a snapshot at cast time.
+	DamagePerTick float64
 	FinalTickTime time.Duration
 	TickIndex     int
 }

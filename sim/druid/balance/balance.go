@@ -48,9 +48,7 @@ func (moonkin *BalanceDruid) Act(sim *core.Simulation) time.Duration {
 	// Activate shared druid behaviors
 	moonkin.TryInnervate(sim)
 
-	// TODO: handle all the buffs you keep up
 	target := sim.GetPrimaryTarget()
-
 	if moonkin.rotationOptions.FaerieFire && !target.HasAura(druid.FaerieFireDebuffID) {
 		target.AddAura(sim, core.Aura{
 			ID:      druid.FaerieFireDebuffID,
