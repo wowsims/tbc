@@ -128,6 +128,7 @@ export const P1_BIS = {
 			}),
 			ItemSpec.create({
 				id: 28797, // Brute Cloak of the Ogre-Magi
+				enchant: Enchants.SUBTLETY,
 			}),
 			ItemSpec.create({
 				id: 29519, // Netherstrike Breastplate
@@ -171,6 +172,7 @@ export const P1_BIS = {
 			}),
 			ItemSpec.create({
 				id: 28517, // Boots of Foretelling
+				enchant: Enchants.BOARS_SPEED,
 				gems: [
 					Gems.RUNED_LIVING_RUBY,
 					Gems.RUNED_LIVING_RUBY,
@@ -230,6 +232,7 @@ export const P2_BIS = {
 			}),
 			ItemSpec.create({
 				id: 28797, // Brute Cloak of the Ogre-Magi
+				enchant: Enchants.SUBTLETY,
 			}),
 			ItemSpec.create({
 				id: 30169, // Cataclysm Chestpiece
@@ -268,6 +271,7 @@ export const P2_BIS = {
 			}),
 			ItemSpec.create({
 				id: 30067, // Velvet Boots of the Guardian
+				enchant: Enchants.BOARS_SPEED,
 			}),
 			ItemSpec.create({
 				id: 30667, // Ring of Unrelenting Storms

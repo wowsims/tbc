@@ -28,8 +28,8 @@ func TestP1FullCharacterStats(t *testing.T) {
 	})
 
 	core.CharacterStatsTest("p1Full", t, isr, stats.Stats{
-		stats.Strength:  20.8,
-		stats.Agility:   20.8,
+		stats.Strength:  27.4,
+		stats.Agility:   27.4,
 		stats.Stamina:   395.9,
 		stats.Intellect: 531.2,
 		stats.Spirit:    198.0,
@@ -45,7 +45,7 @@ func TestP1FullCharacterStats(t *testing.T) {
 		stats.SpellCrit: 695.705,
 
 		stats.Mana:  10646,
-		stats.Armor: 9211.6,
+		stats.Armor: 9224.8,
 	})
 }
 

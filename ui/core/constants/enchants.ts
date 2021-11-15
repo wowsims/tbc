@@ -7,6 +7,9 @@ export const GLYPH_OF_POWER = 29191;
 export const GREATER_INSCRIPTION_OF_DISCIPLINE = 28886;
 export const GREATER_INSCRIPTION_OF_THE_ORB = 28909;
 
+// Back
+export const SUBTLETY = 33150;
+
 // Chest
 export const CHEST_EXCEPTIONAL_STATS = 24003;
 
@@ -19,8 +22,13 @@ export const GLOVES_SPELLPOWER = 28272;
 // Legs
 export const RUNIC_SPELLTHREAD = 24274;
 
+// Feet
+export const BOARS_SPEED = 35297;
+
 // Weapon
 export const WEAPON_SPELLPOWER = 22555;
+export const SUNFIRE = 22560;
+export const SOULFROST = 22561;
 
 // Shield
 export const SHIELD_INTELLECT = 22539;
