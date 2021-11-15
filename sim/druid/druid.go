@@ -14,7 +14,7 @@ type Druid struct {
 	Talents proto.DruidTalents
 
 	innervateCD  time.Duration
-	naturesGrace bool // when true next spellcast is 0.5s faster
+	NaturesGrace bool // when true next spellcast is 0.5s faster
 
 	// cached cast stuff
 	starfireSpell         core.SingleTargetDirectDamageSpell
@@ -41,8 +41,8 @@ func (druid *Druid) GetCharacter() *core.Character {
 }
 
 func (druid *Druid) AddRaidBuffs(raidBuffs *proto.RaidBuffs) {
-	raidBuffs.GiftOfTheWild = proto.TristateEffect_TristateEffectRegular
-	if druid.Talents.ImprovedMarkOfTheWild > 0 { // ya ya whatever
+	raidBuffs.GiftOfTheWild = core.MaxTristate(raidBuffs.GiftOfTheWild, proto.TristateEffect_TristateEffectRegular)
+	if druid.Talents.ImprovedMarkOfTheWild == 5 { // probably could work on actually calculating the fraction effect later if we care.
 		raidBuffs.GiftOfTheWild = proto.TristateEffect_TristateEffectImproved
 	}
 }
@@ -51,7 +51,7 @@ const ravenGoddessItemID = 32387
 
 func (druid *Druid) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {
 	if druid.Talents.MoonkinForm { // assume if you have moonkin talent you are using it.
-		partyBuffs.MoonkinAura = proto.TristateEffect_TristateEffectRegular
+		partyBuffs.MoonkinAura = core.MaxTristate(partyBuffs.MoonkinAura, proto.TristateEffect_TristateEffectRegular)
 		for _, e := range druid.Equip {
 			if e.ID == ravenGoddessItemID {
 				partyBuffs.MoonkinAura = proto.TristateEffect_TristateEffectImproved
@@ -80,6 +80,9 @@ func (druid *Druid) Advance(sim *core.Simulation, elapsedTime time.Duration) {
 }
 
 var InnervateCD = core.NewCooldownID()
+
+// TODO: This probably needs to allow for multiple innervates later
+//  would need to solve the same issue we had as dots (maybe ID per user)
 var InnervateAuraID = core.NewAuraID()
 
 func (druid *Druid) TryInnervate(sim *core.Simulation) {
@@ -89,14 +92,14 @@ func (druid *Druid) TryInnervate(sim *core.Simulation) {
 		if druid.GetStat(stats.Mana)/druid.MaxMana() < 0.75 {
 			oldRegen := druid.PsuedoStats.SpiritRegenRateCasting
 			druid.PsuedoStats.SpiritRegenRateCasting = 1.0
-			druid.PsuedoStats.ManaRegenMultiplier *= 3.0
+			druid.PsuedoStats.ManaRegenMultiplier *= 5.0
 			druid.AddAura(sim, core.Aura{
 				ID:      InnervateAuraID,
 				Name:    "Innervate",
 				Expires: sim.CurrentTime + time.Second*20,
 				OnExpire: func(sim *core.Simulation) {
 					druid.PsuedoStats.SpiritRegenRateCasting = oldRegen
-					druid.PsuedoStats.ManaRegenMultiplier /= 3.0
+					druid.PsuedoStats.ManaRegenMultiplier /= 5.0
 				},
 			})
 			cd := time.Minute * 6
@@ -105,6 +108,9 @@ func (druid *Druid) TryInnervate(sim *core.Simulation) {
 			}
 			druid.SetCD(InnervateCD, cd)
 		}
+
+		// TODO: figure out if this triggers GCD (probably does) and trigger it manually?
+		//  perhaps convert innervate into a real spell cast.
 	}
 }
 func (druid *Druid) Act(sim *core.Simulation) time.Duration {
@@ -113,7 +119,7 @@ func (druid *Druid) Act(sim *core.Simulation) time.Duration {
 
 func (druid *Druid) applyOnHitTalents(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 	if druid.Talents.NaturesGrace && spellEffect.Crit {
-		druid.naturesGrace = true
+		druid.NaturesGrace = true
 	}
 
 	if druid.Talents.WrathOfCenarius > 0 {
@@ -128,12 +134,12 @@ func (druid *Druid) applyOnHitTalents(sim *core.Simulation, spellCast *core.Spel
 }
 
 func (druid *Druid) applyNaturesGrace(spellCast *core.SpellCast) {
-	if druid.naturesGrace {
+	if druid.NaturesGrace {
 		spellCast.CastTime -= time.Millisecond * 500
 		// This applies on cast complete, removing the effect.
 		//  if it crits, during 'onspellhit' then it will be reapplied (see func above)
 		spellCast.OnCastComplete = func(sim *core.Simulation, cast *core.Cast) {
-			druid.naturesGrace = false
+			druid.NaturesGrace = false
 		}
 	}
 }

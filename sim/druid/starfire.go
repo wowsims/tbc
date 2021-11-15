@@ -71,9 +71,6 @@ func (druid *Druid) newStarfireTemplate(sim *core.Simulation, rank int) core.Sin
 		Cast: baseCast,
 	}
 
-	// Applies nature's grace cast time reduction if available.
-	druid.applyNaturesGrace(spCast)
-
 	return core.NewSingleTargetDirectDamageSpellTemplate(core.SingleTargetDirectDamageSpell{
 		SpellCast: *spCast,
 		Effect:    effect,
@@ -89,6 +86,9 @@ func (druid *Druid) NewStarfire(sim *core.Simulation, target *core.Target, rank 
 	} else if rank == 6 {
 		druid.starfire6CastTemplate.Apply(sf)
 	}
+
+	// Applies nature's grace cast time reduction if available.
+	druid.applyNaturesGrace(&sf.SpellCast)
 
 	// Set dynamic fields, i.e. the stuff we couldn't precompute.
 	sf.Effect.Target = target

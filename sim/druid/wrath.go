@@ -52,9 +52,6 @@ func (druid *Druid) newWrathTemplate(sim *core.Simulation) core.SingleTargetDire
 		Cast: baseCast,
 	}
 
-	// Applies nature's grace cast time reduction if available.
-	druid.applyNaturesGrace(spCast)
-
 	return core.NewSingleTargetDirectDamageSpellTemplate(core.SingleTargetDirectDamageSpell{
 		SpellCast: *spCast,
 		Effect:    effect,
@@ -66,6 +63,9 @@ func (druid *Druid) NewWrath(sim *core.Simulation, target *core.Target) *core.Si
 	sf := &druid.wrathSpell
 
 	druid.wrathCastTemplate.Apply(sf)
+
+	// Modifies the cast time.
+	druid.applyNaturesGrace(&sf.SpellCast)
 
 	// Set dynamic fields, i.e. the stuff we couldn't precompute.
 	sf.Effect.Target = target

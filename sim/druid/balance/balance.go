@@ -1,7 +1,6 @@
 package balance
 
 import (
-	"log"
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
@@ -30,14 +29,14 @@ func NewBalanceDruid(character core.Character, options proto.PlayerOptions, isr 
 	druid := druid.NewDruid(character, selfBuffs, *balanceOptions.Talents)
 	return &BalanceDruid{
 		Druid:           druid,
-		rotationOptions: balanceOptions.Rotation,
+		rotationOptions: *balanceOptions.Rotation,
 	}
 }
 
 type BalanceDruid struct {
 	druid.Druid
 
-	rotationOptions *proto.BalanceDruid_Rotation
+	rotationOptions proto.BalanceDruid_Rotation
 }
 
 func (moonkin *BalanceDruid) Reset(sim *core.Simulation) {
@@ -93,11 +92,10 @@ func (moonkin *BalanceDruid) Act(sim *core.Simulation) time.Duration {
 		if sim.Log != nil {
 			sim.Log("Not enough mana, regenerating for %s.\n", regenTime)
 		}
-		if regenTime > time.Second*5 {
-			log.Fatalf("spending more than 5 sec regen")
-		}
 		return sim.CurrentTime + regenTime
 	}
 
-	return sim.CurrentTime + spell.CastTime
+	return sim.CurrentTime + core.MaxDuration(
+		moonkin.GetRemainingCD(core.GCDCooldownID, sim.CurrentTime),
+		spell.CastTime)
 }
