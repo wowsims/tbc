@@ -39,7 +39,8 @@ export const P1_ALLIANCE_BIS = {
                 ],
             }),
             ItemSpec.create({
-                id: 28766, // Ruby Drape of the Mysticant
+                id: 28766,
+                enchant: Enchants.SUBTLETY,
             }),
             ItemSpec.create({
                 id: 21848,
@@ -82,6 +83,7 @@ export const P1_ALLIANCE_BIS = {
             }),
             ItemSpec.create({
                 id: 28517,
+                enchant: Enchants.BOARS_SPEED,
                 gems: [
                     Gems.RUNED_LIVING_RUBY,
                     Gems.RUNED_LIVING_RUBY,
@@ -103,7 +105,7 @@ export const P1_ALLIANCE_BIS = {
             }),
             ItemSpec.create({
                 id: 28770,
-                enchant: Enchants.WEAPON_SPELLPOWER,
+                enchant: Enchants.SUNFIRE,
             }),
             ItemSpec.create({
                 id: 29271, // Talisman of Kalecgos
@@ -140,7 +142,8 @@ export const P1_HORDE_BIS = {
                 ],
             }),
             ItemSpec.create({
-                id: 28766, // Ruby Drape of the Mysticant
+                id: 28766,
+                enchant: Enchants.SUBTLETY,
             }),
             ItemSpec.create({
                 id: 21848,
@@ -183,6 +186,7 @@ export const P1_HORDE_BIS = {
             }),
             ItemSpec.create({
                 id: 28517,
+                enchant: Enchants.BOARS_SPEED,
                 gems: [
                     Gems.RUNED_LIVING_RUBY,
                     Gems.RUNED_LIVING_RUBY,
@@ -204,7 +208,7 @@ export const P1_HORDE_BIS = {
             }),
             ItemSpec.create({
                 id: 28770,
-                enchant: Enchants.WEAPON_SPELLPOWER,
+                enchant: Enchants.SUNFIRE,
             }),
             ItemSpec.create({
                 id: 29271, // Talisman of Kalecgos
@@ -241,7 +245,8 @@ export const P2_ALLIANCE_BIS = {
                 ],
             }),
             ItemSpec.create({
-                id: 28797, // Brute Cloak of the Ogre-Magi
+                id: 28797,
+                enchant: Enchants.SUBTLETY,
             }),
             ItemSpec.create({
                 id: 30231,
@@ -279,7 +284,8 @@ export const P2_ALLIANCE_BIS = {
                 ],
             }),
             ItemSpec.create({
-                id: 30037, // Boots of Blasting
+                id: 30037,
+                enchant: Enchants.BOARS_SPEED,
             }),
             ItemSpec.create({
                 id: 28753,
@@ -297,7 +303,7 @@ export const P2_ALLIANCE_BIS = {
             }),
             ItemSpec.create({
                 id: 29988,
-                enchant: Enchants.WEAPON_SPELLPOWER,
+                enchant: Enchants.SUNFIRE,
             }),
             ItemSpec.create({
                 id: 32387, // Idol of the Raven Goddess
@@ -331,7 +337,8 @@ export const P2_HORDE_BIS = {
                 ],
             }),
             ItemSpec.create({
-                id: 28797, // Brute Cloak of the Ogre-Magi
+                id: 28797,
+                enchant: Enchants.SUBTLETY,
             }),
             ItemSpec.create({
                 id: 30107,
@@ -369,7 +376,8 @@ export const P2_HORDE_BIS = {
                 ],
             }),
             ItemSpec.create({
-                id: 30037, // Boots of Blasting
+                id: 30037,
+                enchant: Enchants.BOARS_SPEED,
             }),
             ItemSpec.create({
                 id: 28753,
@@ -387,7 +395,7 @@ export const P2_HORDE_BIS = {
             }),
             ItemSpec.create({
                 id: 29988,
-                enchant: Enchants.WEAPON_SPELLPOWER,
+                enchant: Enchants.SUNFIRE,
             }),
             ItemSpec.create({
                 id: 32387, // Idol of the Raven Goddess

@@ -120,7 +120,8 @@ export const P1_BIS = {
                 ],
             }),
             ItemSpec.create({
-                id: 28797, // Brute Cloak of the Ogre-Magi
+                id: 28797,
+                enchant: Enchants.SUBTLETY,
             }),
             ItemSpec.create({
                 id: 29519,
@@ -164,6 +165,7 @@ export const P1_BIS = {
             }),
             ItemSpec.create({
                 id: 28517,
+                enchant: Enchants.BOARS_SPEED,
                 gems: [
                     Gems.RUNED_LIVING_RUBY,
                     Gems.RUNED_LIVING_RUBY,
@@ -221,7 +223,8 @@ export const P2_BIS = {
                 ],
             }),
             ItemSpec.create({
-                id: 28797, // Brute Cloak of the Ogre-Magi
+                id: 28797,
+                enchant: Enchants.SUBTLETY,
             }),
             ItemSpec.create({
                 id: 30169,
@@ -259,7 +262,8 @@ export const P2_BIS = {
                 ],
             }),
             ItemSpec.create({
-                id: 30067, // Velvet Boots of the Guardian
+                id: 30067,
+                enchant: Enchants.BOARS_SPEED,
             }),
             ItemSpec.create({
                 id: 30667,
