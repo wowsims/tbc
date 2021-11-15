@@ -47,14 +47,7 @@ func (shaman *Shaman) newChainLightningTemplate(sim *core.Simulation, isLightnin
 		}
 	}
 
-	setBonuses := shaman.GetActiveSetBonuses()
-	hasTidefury := false
-	for _, bonus := range setBonuses {
-		if bonus.Name == "Tidefury Raiment" && bonus.NumPieces >= 2 {
-			hasTidefury = true
-			break
-		}
-	}
+	hasTidefury := ItemSetTidefury.CharacterHasSetBonus(&shaman.Character, 2)
 	numHits := core.MinInt32(3, sim.GetNumTargets())
 	effects := make([]core.DirectDamageSpellEffect, 0, numHits)
 	effects = append(effects, effect)
