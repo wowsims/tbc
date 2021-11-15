@@ -6,7 +6,6 @@ import (
 
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/proto"
-	"github.com/wowsims/tbc/sim/core/stats"
 	"github.com/wowsims/tbc/sim/druid"
 )
 
@@ -15,9 +14,6 @@ func RegisterBalanceDruid() {
 		return NewBalanceDruid(character, options, isr)
 	})
 }
-
-var InnervateCD = core.NewCooldownID()
-var InnervateAuraID = core.NewAuraID()
 
 func NewBalanceDruid(character core.Character, options proto.PlayerOptions, isr proto.IndividualSimRequest) *BalanceDruid {
 	balanceOptions := options.GetBalanceDruid()
@@ -49,54 +45,47 @@ func (moonkin *BalanceDruid) Reset(sim *core.Simulation) {
 }
 
 func (moonkin *BalanceDruid) Act(sim *core.Simulation) time.Duration {
+	// Activate shared druid behaviors
+	moonkin.TryInnervate(sim)
+
 	// TODO: handle all the buffs you keep up
-	// target := sim.GetPrimaryTarget()
+	target := sim.GetPrimaryTarget()
 
-	// TODO: implement innervate in main druid code.
-	if moonkin.SelfBuffs.Innervate && moonkin.GetRemainingCD(InnervateCD, sim.CurrentTime) == 0 {
-		if moonkin.GetStat(stats.Mana)/moonkin.GetInitialStat(stats.Mana) < 0.75 {
-			oldRegen := moonkin.PsuedoStats.SpiritRegenRateCasting
-			moonkin.PsuedoStats.SpiritRegenRateCasting = 1.0
-			moonkin.PsuedoStats.ManaRegenMultiplier *= 3.0
-			moonkin.AddAura(sim, core.Aura{
-				ID:      InnervateAuraID,
-				Name:    "Innervate",
-				Expires: sim.CurrentTime + time.Second*20,
-				OnExpire: func(sim *core.Simulation) {
-					moonkin.PsuedoStats.SpiritRegenRateCasting = oldRegen
-					moonkin.PsuedoStats.ManaRegenMultiplier /= 3.0
-				},
-			})
-			moonkin.SetCD(InnervateCD, time.Minute*6)
+	if moonkin.rotationOptions.FaerieFire && !target.HasAura(druid.FaerieFireDebuffID) {
+		target.AddAura(sim, core.Aura{
+			ID:      druid.FaerieFireDebuffID,
+			Name:    "Faerie Fire",
+			Expires: sim.CurrentTime + time.Second*40,
+			// TODO: implement increased melee hit
+		})
+		// TODO: turn faerie fire into a real cast so we get automatic GCD
+		return sim.CurrentTime + time.Millisecond*1500
+	} else if moonkin.rotationOptions.InsectSwarm && !moonkin.InsectSwarmSpell.DotInput.IsTicking(sim) {
+		swarm := moonkin.NewInsectSwarm(sim, target)
+		success := swarm.Act(sim)
+		if !success {
+			regenTime := moonkin.TimeUntilManaRegen(swarm.GetManaCost())
+			return sim.CurrentTime + regenTime
 		}
-	}
-
-	// if moonkin.rotationOptions.FaerieFire && !target.HasAura(druid.FaerieFireAuraID) {
-	// 	// TODO: add faerie fire aura
-	// 	return sim.CurrentTime + moonkin.GetRemainingCD(core.GCDCooldownID, sim.CurrentTime)
-	// } else if moonkin.rotationOptions.InsectSwarm && !moonkin.InsectSwarmSpell.DotInput.IsTicking(sim) {
-	// 	// TODO: add insect swarm aura
-	// 	return sim.CurrentTime + moonkin.GetRemainingCD(core.GCDCooldownID, sim.CurrentTime)
-	// } else
-	if moonkin.rotationOptions.Moonfire && !moonkin.MoonfireSpell.DotInput.IsTicking(sim) {
-		moonfire := moonkin.NewMoonfire(sim, sim.GetPrimaryTarget())
+		return sim.CurrentTime + moonkin.GetRemainingCD(core.GCDCooldownID, sim.CurrentTime)
+	} else if moonkin.rotationOptions.Moonfire && !moonkin.MoonfireSpell.DotInput.IsTicking(sim) {
+		moonfire := moonkin.NewMoonfire(sim, target)
 		success := moonfire.Act(sim)
 		if !success {
 			regenTime := moonkin.TimeUntilManaRegen(moonfire.GetManaCost())
 			return sim.CurrentTime + regenTime
 		}
-
 		return sim.CurrentTime + moonkin.GetRemainingCD(core.GCDCooldownID, sim.CurrentTime)
 	}
 
 	var spell *core.SingleTargetDirectDamageSpell
 	switch moonkin.rotationOptions.PrimarySpell {
 	case proto.BalanceDruid_Rotation_Starfire:
-		spell = moonkin.NewStarfire(sim, sim.GetPrimaryTarget(), 8)
+		spell = moonkin.NewStarfire(sim, target, 8)
 	case proto.BalanceDruid_Rotation_Starfire6:
-		spell = moonkin.NewStarfire(sim, sim.GetPrimaryTarget(), 6)
+		spell = moonkin.NewStarfire(sim, target, 6)
 	case proto.BalanceDruid_Rotation_Wrath:
-		spell = moonkin.NewWrath(sim, sim.GetPrimaryTarget())
+		spell = moonkin.NewWrath(sim, target)
 	}
 
 	actionSuccessful := spell.Act(sim)

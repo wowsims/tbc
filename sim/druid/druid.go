@@ -13,6 +13,7 @@ type Druid struct {
 	SelfBuffs
 	Talents proto.DruidTalents
 
+	innervateCD  time.Duration
 	naturesGrace bool // when true next spellcast is 0.5s faster
 
 	// cached cast stuff
@@ -25,6 +26,9 @@ type Druid struct {
 
 	wrathSpell        core.SingleTargetDirectDamageSpell
 	wrathCastTemplate core.SingleTargetDirectDamageSpellTemplate
+
+	InsectSwarmSpell        core.DamageOverTimeSpell
+	insectSwarmCastTemplate core.DamageOverTimeSpellTemplate
 }
 
 type SelfBuffs struct {
@@ -62,6 +66,7 @@ func (druid *Druid) Init(sim *core.Simulation) {
 	druid.starfire6CastTemplate = druid.newStarfireTemplate(sim, 6)
 	druid.moonfireCastTemplate = druid.newMoonfireTemplate(sim)
 	druid.wrathCastTemplate = druid.newWrathTemplate(sim)
+	druid.insectSwarmCastTemplate = druid.newInsectSwarmTemplate(sim)
 }
 
 func (druid *Druid) Reset(newsim *core.Simulation) {
@@ -74,8 +79,36 @@ func (druid *Druid) Advance(sim *core.Simulation, elapsedTime time.Duration) {
 	druid.Character.Advance(sim, elapsedTime)
 }
 
+var InnervateCD = core.NewCooldownID()
+var InnervateAuraID = core.NewAuraID()
+
+func (druid *Druid) TryInnervate(sim *core.Simulation) {
+	// Currently just activates innervate on self when own mana is <75%
+	// TODO: get a real recommendation when to use this.
+	if druid.SelfBuffs.Innervate && druid.GetRemainingCD(InnervateCD, sim.CurrentTime) == 0 {
+		if druid.GetStat(stats.Mana)/druid.GetInitialStat(stats.Mana) < 0.75 {
+			oldRegen := druid.PsuedoStats.SpiritRegenRateCasting
+			druid.PsuedoStats.SpiritRegenRateCasting = 1.0
+			druid.PsuedoStats.ManaRegenMultiplier *= 3.0
+			druid.AddAura(sim, core.Aura{
+				ID:      InnervateAuraID,
+				Name:    "Innervate",
+				Expires: sim.CurrentTime + time.Second*20,
+				OnExpire: func(sim *core.Simulation) {
+					druid.PsuedoStats.SpiritRegenRateCasting = oldRegen
+					druid.PsuedoStats.ManaRegenMultiplier /= 3.0
+				},
+			})
+			cd := time.Minute * 6
+			if druid.HasAura(Malorne4PcAuraID) {
+				cd -= time.Second * 48
+			}
+			druid.SetCD(InnervateCD, cd)
+		}
+	}
+}
 func (druid *Druid) Act(sim *core.Simulation) time.Duration {
-	return core.NeverExpires // makes the bot wait forever and do nothing.
+	return core.NeverExpires // does nothing
 }
 
 func (druid *Druid) applyOnHitTalents(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
@@ -140,7 +173,7 @@ func NewDruid(char core.Character, selfBuffs SelfBuffs, talents proto.DruidTalen
 	}
 }
 
-var FaerieFireAuraID = core.NewAuraID()
+var FaerieFireDebuffID = core.NewDebuffID()
 
 func init() {
 	// TODO: get the actual real base stats here.

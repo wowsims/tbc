@@ -10,9 +10,11 @@ func init() {
 }
 
 var Malorne2PcAuraID = core.NewAuraID()
+var Malorne4PcAuraID = core.NewAuraID()
+
 var ItemSetMalorne = core.ItemSet{
 	Name:  "Malorne Rainment",
-	Items: map[int32]struct{}{29033: {}, 29035: {}, 29034: {}, 29036: {}, 29037: {}},
+	Items: map[int32]struct{}{29093: {}, 29094: {}, 29091: {}, 29092: {}, 29095: {}},
 	Bonuses: map[int32]core.ApplyEffect{
 		2: func(agent core.Agent) {
 			character := agent.GetCharacter()
@@ -25,6 +27,16 @@ var ItemSetMalorne = core.ItemSet{
 							spellCast.Character.AddStat(stats.Mana, 120)
 						}
 					},
+				}
+			})
+		},
+		4: func(agent core.Agent) {
+			character := agent.GetCharacter()
+			character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
+				return core.Aura{
+					ID:   Malorne4PcAuraID,
+					Name: "Malorne 4pc Bonus",
+					// Currently this is handled in druid.go (reducing CD of innervate)
 				}
 			})
 		},

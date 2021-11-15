@@ -73,8 +73,8 @@ func TestSimulateP1Starfire(t *testing.T) {
 			Gear:          P1Gear,
 		},
 
-		ExpectedDpsShort: 915.2,
-		ExpectedDpsLong:  1054.1,
+		ExpectedDpsShort: 1214.2,
+		ExpectedDpsLong:  1038.3,
 	})
 }
 
@@ -97,7 +97,7 @@ func TestSimulateP1Wrath(t *testing.T) {
 			Gear:          P1Gear,
 		},
 
-		ExpectedDpsShort: 1141.7,
-		ExpectedDpsLong:  859.1,
+		ExpectedDpsShort: 1184.9,
+		ExpectedDpsLong:  902.8,
 	})
 }
