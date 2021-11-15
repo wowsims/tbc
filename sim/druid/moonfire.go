@@ -45,7 +45,7 @@ func (druid *Druid) newMoonfireTemplate(sim *core.Simulation) core.DamageOverTim
 		},
 	}
 
-	if druid.thunder2p { // Thunderheart 2p adds 1 extra tick to moonfire
+	if ItemSetThunderheart.CharacterHasSetBonus(&druid.Character, 2) { // Thunderheart 2p adds 1 extra tick to moonfire
 		effect.DotInput.NumberTicks += 1
 	}
 

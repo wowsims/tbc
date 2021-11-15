@@ -30,9 +30,7 @@ type Druid struct {
 	InsectSwarmSpell        core.DamageOverTimeSpell
 	insectSwarmCastTemplate core.DamageOverTimeSpellTemplate
 
-	malorne4p bool
-	thunder2p bool
-	thunder4p bool
+	malorne4p bool // cached since we need to check on every innervate
 }
 
 type SelfBuffs struct {
@@ -207,8 +205,6 @@ func NewDruid(char core.Character, selfBuffs SelfBuffs, talents proto.DruidTalen
 		SelfBuffs: selfBuffs,
 		Talents:   talents,
 		malorne4p: ItemSetMalorne.CharacterHasSetBonus(&char, 4),
-		thunder2p: ItemSetThunderheart.CharacterHasSetBonus(&char, 2),
-		thunder4p: ItemSetThunderheart.CharacterHasSetBonus(&char, 4),
 	}
 }
 
