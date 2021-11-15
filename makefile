@@ -102,3 +102,8 @@ test: $(OUT_DIR)/lib.wasm binary_dist/dist.go
 
 fmt:
 	gofmt -w ./sim
+
+# one time setup to install pre-commit hook for gofmt
+setup:
+	cp pre-commit .git/hooks
+	chmod +x .git/hooks/pre-commit
