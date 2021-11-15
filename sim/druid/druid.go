@@ -107,10 +107,9 @@ func (druid *Druid) TryInnervate(sim *core.Simulation) {
 				cd -= time.Second * 48
 			}
 			druid.SetCD(InnervateCD, cd)
+			// triggers GCD
+			druid.SetCD(core.GCDCooldownID, core.CalculatedGCD(&druid.Character))
 		}
-
-		// TODO: figure out if this triggers GCD (probably does) and trigger it manually?
-		//  perhaps convert innervate into a real spell cast.
 	}
 }
 func (druid *Druid) Act(sim *core.Simulation) time.Duration {

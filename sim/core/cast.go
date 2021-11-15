@@ -149,7 +149,7 @@ func (cast *Cast) startCasting(sim *Simulation, onCastComplete OnCastComplete) b
 
 	if !cast.IgnoreCooldowns {
 		// Prevent any actions on the GCD until the cast AND the GCD are done.
-		gcd := MaxDuration(GCDMin, time.Duration(float64(GCDDefault)/cast.Character.CastSpeed()))
+		gcd := MaxDuration(GCDMin, CalculatedGCD(cast.Character))
 		gcdCD := MaxDuration(gcd, cast.CastTime)
 		cast.Character.SetCD(GCDCooldownID, sim.CurrentTime+gcdCD)
 
@@ -157,6 +157,10 @@ func (cast *Cast) startCasting(sim *Simulation, onCastComplete OnCastComplete) b
 	}
 
 	return true
+}
+
+func CalculatedGCD(char *Character) time.Duration {
+	return MaxDuration(GCDMin, time.Duration(float64(GCDDefault)/char.CastSpeed()))
 }
 
 // Cast has finished, activate the effects of the cast.

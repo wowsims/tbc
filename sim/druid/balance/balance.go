@@ -55,7 +55,7 @@ func (moonkin *BalanceDruid) Act(sim *core.Simulation) time.Duration {
 			Expires: sim.CurrentTime + time.Second*40,
 			// TODO: implement increased melee hit
 		})
-		// TODO: turn faerie fire into a real cast so we get automatic GCD
+		moonkin.SetCD(core.GCDCooldownID, core.CalculatedGCD(&moonkin.Character))
 		return sim.CurrentTime + time.Millisecond*1500
 	} else if moonkin.rotationOptions.InsectSwarm && !moonkin.InsectSwarmSpell.DotInput.IsTicking(sim) {
 		swarm := moonkin.NewInsectSwarm(sim, target)
