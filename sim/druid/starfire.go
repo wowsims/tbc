@@ -66,6 +66,11 @@ func (druid *Druid) newStarfireTemplate(sim *core.Simulation, rank int) core.Sin
 	if druid.Equip[items.ItemSlotRanged].ID == IvoryMoongoddess {
 		effect.SpellEffect.BonusSpellPower += 55
 	}
+
+	if druid.thunder4p { // Thunderheart 4p adds 5% crit to starfire
+		effect.SpellEffect.BonusSpellCritRating += 5 * core.SpellCritRatingPerCritChance
+	}
+
 	effect.OnSpellHit = druid.applyOnHitTalents
 	spCast := &core.SpellCast{
 		Cast: baseCast,

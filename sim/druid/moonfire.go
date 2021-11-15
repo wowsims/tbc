@@ -45,6 +45,10 @@ func (druid *Druid) newMoonfireTemplate(sim *core.Simulation) core.DamageOverTim
 		},
 	}
 
+	if druid.thunder2p { // Thunderheart 2p adds 1 extra tick to moonfire
+		effect.DotInput.NumberTicks += 1
+	}
+
 	// Moonfire only talents
 	effect.SpellEffect.DamageMultiplier *= 1 + 0.05*float64(druid.Talents.ImprovedMoonfire)
 	effect.SpellEffect.BonusSpellCritRating += float64(druid.Talents.ImprovedMoonfire) * 5 * core.SpellCritRatingPerCritChance

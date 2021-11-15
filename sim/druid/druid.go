@@ -29,6 +29,11 @@ type Druid struct {
 
 	InsectSwarmSpell        core.DamageOverTimeSpell
 	insectSwarmCastTemplate core.DamageOverTimeSpellTemplate
+
+	malorne4p bool
+	nord4p    bool
+	thunder2p bool
+	thunder4p bool
 }
 
 type SelfBuffs struct {
@@ -104,7 +109,7 @@ func (druid *Druid) TryInnervate(sim *core.Simulation) {
 				},
 			})
 			cd := time.Minute * 6
-			if druid.HasAura(Malorne4PcAuraID) {
+			if druid.malorne4p {
 				cd -= time.Second * 48
 			}
 			druid.SetCD(InnervateCD, cd)
@@ -129,6 +134,14 @@ func (druid *Druid) applyOnHitTalents(sim *core.Simulation, spellCast *core.Spel
 
 		if spellCast.ActionID.SpellID == SpellIDWrath {
 			spellEffect.BonusSpellPower += (druid.GetStat(stats.SpellPower) + druid.GetStat(stats.NatureSpellPower)) * 0.02 * float64(druid.Talents.WrathOfCenarius)
+		}
+	}
+
+	if druid.nord4p && (spellCast.ActionID.SpellID == SpellIDSF8 || spellCast.ActionID.SpellID == SpellIDSF6) {
+		// Check if moonfire is ticking on the target.
+		// TODO: in a raid simulator we need to be able to see which dots are ticking from other druids.
+		if druid.MoonfireSpell.DotInput.IsTicking(sim) && druid.MoonfireSpell.Target.Index == spellEffect.Target.Index {
+			spellEffect.DamageMultiplier *= 1.1
 		}
 	}
 }
@@ -184,6 +197,10 @@ func NewDruid(char core.Character, selfBuffs SelfBuffs, talents proto.DruidTalen
 		Character: char,
 		SelfBuffs: selfBuffs,
 		Talents:   talents,
+		malorne4p: ItemSetMalorne.CharacterHasSetBonus(&char, 4),
+		nord4p:    ItemSetNordrassil.CharacterHasSetBonus(&char, 4),
+		thunder2p: ItemSetThunderheart.CharacterHasSetBonus(&char, 2),
+		thunder4p: ItemSetThunderheart.CharacterHasSetBonus(&char, 4),
 	}
 }
 
