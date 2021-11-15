@@ -65,6 +65,10 @@ type Cast struct {
 
 	// Callbacks for providing additional custom behavior.
 	OnCastComplete OnCastComplete
+
+	// Internal field only, used to prevent cast pool objects from being used by
+	// multiple casts simultaneously.
+	objectInUse bool
 }
 
 // AgentAction functions for actions that embed a Cast.
@@ -93,8 +97,13 @@ func (cast *Cast) GetDuration() time.Duration {
 	return cast.CastTime
 }
 
+func (cast *Cast) IsInUse() bool {
+	return cast.objectInUse
+}
+
 // Should be called exactly once after creation.
 func (cast *Cast) init(sim *Simulation) {
+	cast.objectInUse = true
 	cast.CastTime = time.Duration(float64(cast.CastTime) / cast.Character.CastSpeed())
 
 	// Apply on-cast effects.
@@ -123,7 +132,7 @@ func (cast *Cast) startCasting(sim *Simulation, onCastComplete OnCastComplete) b
 					cast.Character.ID, cast.Name, cast.Character.CurrentMana(), cast.ManaCost)
 			}
 			sim.MetricsAggregator.MarkOOM(cast.Character, sim.CurrentTime)
-
+			cast.objectInUse = false // cast failed and we aren't using it
 			return false
 		}
 	}
