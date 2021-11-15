@@ -25,13 +25,7 @@ var ItemSetTidefury = core.ItemSet{
 	Items: map[int32]struct{}{28231: {}, 27510: {}, 28349: {}, 27909: {}, 27802: {}},
 	Bonuses: map[int32]core.ApplyEffect{
 		2: func(agent core.Agent) {
-			character := agent.GetCharacter()
-			character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
-				return core.Aura{
-					ID: Tidefury2PcAuraID,
-					Name: "Tidefury 2pc",
-				}
-			})
+			// Handled in chain_lightning.go
 		},
 		4: func(agent core.Agent) {
 			shamanAgent, ok := agent.(ShamanAgent)
@@ -60,12 +54,12 @@ var ItemSetCycloneRegalia = core.ItemSet{
 			character := agent.GetCharacter()
 			character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 				return core.Aura{
-					ID:      Cyclone4PcAuraID,
-					Name:    "Cyclone 4pc Bonus",
+					ID:   Cyclone4PcAuraID,
+					Name: "Cyclone 4pc Bonus",
 					OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 						if spellEffect.Crit && sim.RandomFloat("cycl4p") < 0.11 {
 							character.AddAura(sim, core.Aura{
-								ID: Cyclone4PcManaRegainAuraID,
+								ID:   Cyclone4PcManaRegainAuraID,
 								Name: "Cyclone Mana Cost Reduction",
 								OnCast: func(sim *core.Simulation, cast *core.Cast) {
 									// TODO: how to make sure this goes in before clearcasting?
@@ -85,15 +79,15 @@ var ItemSetCycloneRegalia = core.ItemSet{
 
 var Cataclysm4PcAuraID = core.NewAuraID()
 var ItemSetCataclysmRegalia = core.ItemSet{
-	Name:    "Cataclysm Regalia",
-	Items:   map[int32]struct{}{30169: {}, 30170: {}, 30171: {}, 30172: {}, 30173: {}},
+	Name:  "Cataclysm Regalia",
+	Items: map[int32]struct{}{30169: {}, 30170: {}, 30171: {}, 30172: {}, 30173: {}},
 	Bonuses: map[int32]core.ApplyEffect{
 		4: func(agent core.Agent) {
 			character := agent.GetCharacter()
 			character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 				return core.Aura{
-					ID:      Cataclysm4PcAuraID,
-					Name:    "Cataclysm 4pc Bonus",
+					ID:   Cataclysm4PcAuraID,
+					Name: "Cataclysm 4pc Bonus",
 					OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 						if spellEffect.Crit && sim.RandomFloat("cata4p") < 0.25 {
 							character.AddStat(stats.Mana, 120)
@@ -119,8 +113,8 @@ var ItemSetSkyshatterRegalia = core.ItemSet{
 			character := agent.GetCharacter()
 			character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 				return core.Aura{
-					ID:      Skyshatter4PcAuraID,
-					Name:    "Skyshatter 4pc Bonus",
+					ID:   Skyshatter4PcAuraID,
+					Name: "Skyshatter 4pc Bonus",
 					OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 						if spellCast.ActionID.SpellID == SpellIDLB12 {
 							spellEffect.DamageMultiplier *= 1.05
@@ -133,15 +127,16 @@ var ItemSetSkyshatterRegalia = core.ItemSet{
 }
 
 var NaturalAlignmentCrystalCooldownID = core.NewCooldownID()
+
 func ApplyNaturalAlignmentCrystal(agent core.Agent) {
 	const sp = 250
 	const dur = time.Second * 20
 
 	agent.GetCharacter().AddMajorCooldown(core.MajorCooldown{
-		CooldownID: NaturalAlignmentCrystalCooldownID,
-		Cooldown: time.Minute * 5,
+		CooldownID:       NaturalAlignmentCrystalCooldownID,
+		Cooldown:         time.Minute * 5,
 		SharedCooldownID: core.OffensiveTrinketSharedCooldownID,
-		SharedCooldown: dur,
+		SharedCooldown:   dur,
 		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
 			return func(sim *core.Simulation, character *core.Character) bool {
 				character.AddStat(stats.SpellPower, sp)
@@ -167,6 +162,7 @@ func ApplyNaturalAlignmentCrystal(agent core.Agent) {
 // ActivateFathomBrooch adds an aura that has a chance on cast of nature spell
 //  to restore 335 mana. 40s ICD
 var FathomBroochOfTheTidewalkerAuraID = core.NewAuraID()
+
 func ApplyFathomBroochOfTheTidewalker(agent core.Agent) {
 	character := agent.GetCharacter()
 	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
@@ -174,8 +170,8 @@ func ApplyFathomBroochOfTheTidewalker(agent core.Agent) {
 		const icdDur = time.Second * 40
 
 		return core.Aura{
-			ID:      FathomBroochOfTheTidewalkerAuraID,
-			Name:    "Fathom-Brooch of the Tidewalker",
+			ID:   FathomBroochOfTheTidewalkerAuraID,
+			Name: "Fathom-Brooch of the Tidewalker",
 			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
 				if icd.IsOnCD(sim) {
 					return
@@ -194,6 +190,7 @@ func ApplyFathomBroochOfTheTidewalker(agent core.Agent) {
 
 var SkycallTotemAuraID = core.NewAuraID()
 var EnergizedAuraID = core.NewAuraID()
+
 func ApplySkycallTotem(agent core.Agent) {
 	character := agent.GetCharacter()
 	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {

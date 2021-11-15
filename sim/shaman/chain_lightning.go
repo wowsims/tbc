@@ -47,13 +47,13 @@ func (shaman *Shaman) newChainLightningTemplate(sim *core.Simulation, isLightnin
 		}
 	}
 
+	hasTidefury := ItemSetTidefury.CharacterHasSetBonus(&shaman.Character, 2)
 	numHits := core.MinInt32(3, sim.GetNumTargets())
 	effects := make([]core.DirectDamageSpellEffect, 0, numHits)
 	effects = append(effects, effect)
 	for i := int32(1); i < numHits; i++ {
 		bounceEffect := effects[i-1] // Makes a copy
-
-		if shaman.HasAura(Tidefury2PcAuraID) {
+		if hasTidefury {
 			bounceEffect.DamageMultiplier *= 0.83
 		} else {
 			bounceEffect.DamageMultiplier *= 0.7
@@ -66,13 +66,23 @@ func (shaman *Shaman) newChainLightningTemplate(sim *core.Simulation, isLightnin
 	return core.NewMultiTargetDirectDamageSpellTemplate(spellTemplate)
 }
 
+func (shaman *Shaman) getFirstAvailableCLLOObjectIndex() int {
+	for i, _ := range shaman.chainLightningSpellLOs {
+		if !shaman.chainLightningSpellLOs[i].IsInUse() {
+			return i
+		}
+	}
+	panic("All chain lightning LO objects in use!")
+}
+
 func (shaman *Shaman) NewChainLightning(sim *core.Simulation, target *core.Target, isLightningOverload bool) *core.MultiTargetDirectDamageSpell {
 	var cl *core.MultiTargetDirectDamageSpell
 
 	// Initialize cast from precomputed template.
 	if isLightningOverload {
-		cl = &shaman.chainLightningSpellLO
-		shaman.chainLightningLOCastTemplate.Apply(cl)
+		objIndex := shaman.getFirstAvailableCLLOObjectIndex()
+		cl = &shaman.chainLightningSpellLOs[objIndex]
+		shaman.chainLightningLOCastTemplates[objIndex].Apply(cl)
 	} else {
 		cl = &shaman.chainLightningSpell
 		shaman.chainLightningCastTemplate.Apply(cl)

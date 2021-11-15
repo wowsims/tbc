@@ -143,6 +143,10 @@ type auraTracker struct {
 }
 
 func newAuraTracker(useDebuffIDs bool) auraTracker {
+	numAura := numAuraIDs
+	if useDebuffIDs {
+		numAura = numDebuffIDs
+	}
 	return auraTracker{
 		permanentAuras:      []PermanentAura{},
 		activeAuraIDs:       make([]AuraID, 0, 16),
@@ -151,6 +155,8 @@ func newAuraTracker(useDebuffIDs bool) auraTracker {
 		onBeforeSpellHitIDs: make([]AuraID, 0, 16),
 		onSpellHitIDs:       make([]AuraID, 0, 16),
 		onSpellMissIDs:      make([]AuraID, 0, 16),
+		auras:               make([]Aura, numAura),
+		cooldowns:           make([]time.Duration, numCooldownIDs),
 		useDebuffIDs:        useDebuffIDs,
 	}
 }

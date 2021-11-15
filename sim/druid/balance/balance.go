@@ -45,7 +45,9 @@ func (moonkin *BalanceDruid) Reset(sim *core.Simulation) {
 
 func (moonkin *BalanceDruid) Act(sim *core.Simulation) time.Duration {
 	// Activate shared druid behaviors
-	moonkin.TryInnervate(sim)
+	if moonkin.TryInnervate(sim) {
+		return sim.CurrentTime + moonkin.GetRemainingCD(core.GCDCooldownID, sim.CurrentTime)
+	}
 
 	target := sim.GetPrimaryTarget()
 	if moonkin.rotationOptions.FaerieFire && !target.HasAura(druid.FaerieFireDebuffID) {
