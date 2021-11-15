@@ -43,7 +43,7 @@ func NewElementalShaman(character core.Character, options proto.PlayerOptions, i
 	}
 
 	return &ElementalShaman{
-		Shaman: NewShaman(character, *eleShamOptions.Talents, selfBuffs),
+		Shaman:   NewShaman(character, *eleShamOptions.Talents, selfBuffs),
 		rotation: rotation,
 	}
 }
@@ -70,8 +70,8 @@ func (eleShaman *ElementalShaman) Act(sim *core.Simulation) time.Duration {
 	if actionSuccessful {
 		eleShaman.rotation.OnActionAccepted(eleShaman, sim, newAction)
 		return sim.CurrentTime + core.MaxDuration(
-				eleShaman.GetRemainingCD(core.GCDCooldownID, sim.CurrentTime),
-				newAction.GetDuration())
+			eleShaman.GetRemainingCD(core.GCDCooldownID, sim.CurrentTime),
+			newAction.GetDuration())
 	} else {
 		// Only way for a shaman spell to fail is due to mana cost.
 		// Wait until we have enough mana to cast.
@@ -144,11 +144,9 @@ type FixedRotation struct {
 }
 
 // Returns if any temporary haste buff is currently active.
-// TODO: Figure out a way to make this automatic
 func (rotation *FixedRotation) temporaryHasteActive(eleShaman *ElementalShaman) bool {
-	return eleShaman.HasAura(core.BloodlustAuraID) ||
-		eleShaman.HasAura(core.TrollBerserkingAuraID) ||
-		eleShaman.HasTemporaryBonusForStat(stats.SpellHaste)
+	return eleShaman.HasTemporaryBonusForStat(stats.SpellHaste) ||
+		eleShaman.PsuedoStats.CastSpeedMultiplier != 1
 }
 
 func (rotation *FixedRotation) ChooseAction(eleShaman *ElementalShaman, sim *core.Simulation) core.AgentAction {

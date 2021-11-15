@@ -27,9 +27,9 @@ type SpellCast struct {
 	Hits               int32
 	Misses             int32
 	Crits              int32
-	PartialResists_1_4 int32 // 1/4 of the spell was resisted
-	PartialResists_2_4 int32 // 2/4 of the spell was resisted
-	PartialResists_3_4 int32 // 3/4 of the spell was resisted
+	PartialResists_1_4 int32   // 1/4 of the spell was resisted
+	PartialResists_2_4 int32   // 2/4 of the spell was resisted
+	PartialResists_3_4 int32   // 3/4 of the spell was resisted
 	TotalDamage        float64 // Damage done by this cast.
 }
 
@@ -69,15 +69,16 @@ func (spellEffect *SpellEffect) beforeCalculations(sim *Simulation, spellCast *S
 }
 
 func (spellEffect *SpellEffect) afterCalculations(sim *Simulation, spellCast *SpellCast) {
-	// Apply results to the cast before invoking callbacks, to prevent callbacks from changing results.
-	spellEffect.applyResultsToCast(spellCast)
-
 	if spellEffect.Hit {
-		spellEffect.OnSpellHit(sim, spellCast, spellEffect)
+		if spellEffect.OnSpellHit != nil {
+			spellEffect.OnSpellHit(sim, spellCast, spellEffect)
+		}
 		spellCast.Character.OnSpellHit(sim, spellCast, spellEffect)
 		spellEffect.Target.OnSpellHit(sim, spellCast, spellEffect)
 	} else {
-		spellEffect.OnSpellMiss(sim, spellCast, spellEffect)
+		if spellEffect.OnSpellMiss != nil {
+			spellEffect.OnSpellMiss(sim, spellCast, spellEffect)
+		}
 		spellCast.Character.OnSpellMiss(sim, spellCast, spellEffect)
 		spellEffect.Target.OnSpellMiss(sim, spellCast, spellEffect)
 	}

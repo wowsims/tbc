@@ -23,7 +23,7 @@ func (party *Party) IsFull() bool {
 }
 
 func (party *Party) AddPlayer(player Agent) {
-	if (party.IsFull()) {
+	if party.IsFull() {
 		// Just print a warning, dont need to panic
 		fmt.Printf("Party is full\n")
 	}
@@ -48,7 +48,7 @@ type Raid struct {
 	Parties []*Party
 
 	// Raid-wide buffs
-	buffs proto.RaidBuffs
+	buffs           proto.RaidBuffs
 	individualBuffs proto.IndividualBuffs
 }
 
@@ -56,13 +56,13 @@ type Raid struct {
 func NewRaid(baseRaidBuffs proto.RaidBuffs, basePartyBuffs proto.PartyBuffs, individualBuffs proto.IndividualBuffs) *Raid {
 	return &Raid{
 		Parties: []*Party{
-			&Party{ Players: []Agent{}, buffs: basePartyBuffs, },
-			&Party{ Players: []Agent{}, buffs: basePartyBuffs, },
-			&Party{ Players: []Agent{}, buffs: basePartyBuffs, },
-			&Party{ Players: []Agent{}, buffs: basePartyBuffs, },
-			&Party{ Players: []Agent{}, buffs: basePartyBuffs, },
+			&Party{Players: []Agent{}, buffs: basePartyBuffs},
+			&Party{Players: []Agent{}, buffs: basePartyBuffs},
+			&Party{Players: []Agent{}, buffs: basePartyBuffs},
+			&Party{Players: []Agent{}, buffs: basePartyBuffs},
+			&Party{Players: []Agent{}, buffs: basePartyBuffs},
 		},
-		buffs: baseRaidBuffs,
+		buffs:           baseRaidBuffs,
 		individualBuffs: individualBuffs,
 	}
 }

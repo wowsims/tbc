@@ -3,6 +3,7 @@ package stats
 import (
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/wowsims/tbc/sim/core/proto"
 )
@@ -292,6 +293,13 @@ func (sdm *StatDependencyManager) ApplyStatDependencies(stats Stats) Stats {
 	return newStats
 }
 
+type PsuedoStats struct {
+	CastSpeedMultiplier       float64
+	AttackSpeedMultiplier     float64       // not used yet
+	SpiritRegenRateCasting    float64       // percentage of spirit regen allowed during casting
+	ManaRegenMultiplier       float64       // Currently main use is for innervate
+	FiveSecondRuleRefreshTime time.Duration // last time a spell was cast
+}
 
 // TODO: more stat calculations
 

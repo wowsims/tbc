@@ -72,13 +72,14 @@ binary_dist/dist.go: sim/web/dist.go.tmpl
 	touch binary_dist/tbc/embedded
 	cp sim/web/dist.go.tmpl binary_dist/dist.go
 
-binary_dist: $(OUT_DIR) binary_dist/dist.go
+binary_dist: $(OUT_DIR)
+	rm -rf binary_dist
 	mkdir -p binary_dist
 	cp -r $(OUT_DIR) binary_dist/
 	rm binary_dist/tbc/lib.wasm
 
 # Builds the web server with the compiled client.
-wowsimtbc: sim/web/main.go binary_dist
+wowsimtbc: sim/web/main.go  binary_dist binary_dist/dist.go
 	go build -o wowsimtbc ./sim/web/main.go
 
 release: wowsimtbc

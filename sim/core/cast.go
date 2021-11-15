@@ -95,7 +95,7 @@ func (cast *Cast) GetDuration() time.Duration {
 
 // Should be called exactly once after creation.
 func (cast *Cast) init(sim *Simulation) {
-	cast.CastTime = time.Duration(float64(cast.CastTime) / cast.Character.HasteBonus())
+	cast.CastTime = time.Duration(float64(cast.CastTime) / cast.Character.CastSpeed())
 
 	// Apply on-cast effects.
 	cast.Character.OnCast(sim, cast)
@@ -120,7 +120,7 @@ func (cast *Cast) startCasting(sim *Simulation, onCastComplete OnCastComplete) b
 		if cast.Character.CurrentMana() < cast.ManaCost {
 			if sim.Log != nil {
 				sim.Log("(%d) Failed casting %s, not enough mana. (Current Mana = %0.0f, Mana Cost = %0.0f)\n",
-						cast.Character.ID, cast.Name, cast.Character.CurrentMana(), cast.ManaCost)
+					cast.Character.ID, cast.Name, cast.Character.CurrentMana(), cast.ManaCost)
 			}
 			sim.MetricsAggregator.MarkOOM(cast.Character, sim.CurrentTime)
 
@@ -130,30 +130,37 @@ func (cast *Cast) startCasting(sim *Simulation, onCastComplete OnCastComplete) b
 
 	if sim.Log != nil {
 		sim.Log("(%d) Casting %s (Current Mana = %0.0f, Mana Cost = %0.0f, Cast Time = %s)\n",
-				cast.Character.ID, cast.Name, cast.Character.CurrentMana(), cast.ManaCost, cast.CastTime)
+			cast.Character.ID, cast.Name, cast.Character.CurrentMana(), cast.ManaCost, cast.CastTime)
 	}
 
 	// For instant-cast spells we can skip creating an aura.
 	if cast.CastTime == 0 {
+		cast.Character.PsuedoStats.FiveSecondRuleRefreshTime = sim.CurrentTime + time.Second*5
 		cast.internalOnComplete(sim, onCastComplete)
 	} else {
 		cast.Character.HardcastAura = Aura{
 			Expires: sim.CurrentTime + cast.CastTime,
 			OnExpire: func(sim *Simulation) {
 				cast.internalOnComplete(sim, onCastComplete)
+				cast.Character.PsuedoStats.FiveSecondRuleRefreshTime = sim.CurrentTime + time.Second*5
 			},
 		}
 	}
 
 	if !cast.IgnoreCooldowns {
 		// Prevent any actions on the GCD until the cast AND the GCD are done.
-		gcdCD := MaxDuration(GCDMin, cast.CastTime)
+		gcd := MaxDuration(GCDMin, CalculatedGCD(cast.Character))
+		gcdCD := MaxDuration(gcd, cast.CastTime)
 		cast.Character.SetCD(GCDCooldownID, sim.CurrentTime+gcdCD)
 
 		// TODO: Hardcasts seem to also reset swing timers, so we should set those CDs as well.
 	}
 
 	return true
+}
+
+func CalculatedGCD(char *Character) time.Duration {
+	return MaxDuration(GCDMin, time.Duration(float64(GCDDefault)/char.CastSpeed()))
 }
 
 // Cast has finished, activate the effects of the cast.
@@ -167,6 +174,8 @@ func (cast *Cast) internalOnComplete(sim *Simulation, onCastComplete OnCastCompl
 	}
 
 	cast.Character.OnCastComplete(sim, cast)
-	cast.OnCastComplete(sim, cast)
+	if cast.OnCastComplete != nil {
+		cast.OnCastComplete(sim, cast)
+	}
 	onCastComplete(sim, cast)
 }

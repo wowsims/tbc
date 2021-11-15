@@ -147,13 +147,17 @@ func registerBloodlustCD(agent Agent, numBloodlusts int32) {
 			return func(sim *Simulation, character *Character) bool {
 				if bloodlustsUsed < numBloodlusts {
 					character.SetCD(BloodlustCooldownID, sim.CurrentTime+dur)
+					for _, agent := range character.Party.Players {
+						agent.GetCharacter().PsuedoStats.CastSpeedMultiplier *= 1.3
+					}
 					character.Party.AddAura(sim, Aura{
 						ID:      BloodlustAuraID,
 						Name:    "Bloodlust",
 						Expires: sim.CurrentTime + dur,
-						OnCast: func(sim *Simulation, cast *Cast) {
-							// Multiply and divide lets us use integer math, which is better for perf.
-							cast.CastTime = (cast.CastTime * 10) / 13 // 30% faster
+						OnExpire: func(sim *Simulation) {
+							for _, agent := range character.Party.Players {
+								agent.GetCharacter().PsuedoStats.CastSpeedMultiplier /= 1.3
+							}
 						},
 					})
 					bloodlustsUsed++

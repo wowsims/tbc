@@ -26,7 +26,7 @@ func applyRaceEffects(agent Agent) {
 		// TODO: If gun equipped, +1% ranged crit
 	case proto.Race_RaceGnome:
 		character.AddStatDependency(stats.StatDependency{
-			SourceStat: stats.Intellect,
+			SourceStat:   stats.Intellect,
 			ModifiedStat: stats.Intellect,
 			Modifier: func(intellect float64, _ float64) float64 {
 				return intellect * 1.05
@@ -34,7 +34,7 @@ func applyRaceEffects(agent Agent) {
 		})
 	case proto.Race_RaceHuman:
 		character.AddStatDependency(stats.StatDependency{
-			SourceStat: stats.Spirit,
+			SourceStat:   stats.Spirit,
 			ModifiedStat: stats.Spirit,
 			Modifier: func(spirit float64, _ float64) float64 {
 				return spirit * 1.1
@@ -51,7 +51,7 @@ func applyRaceEffects(agent Agent) {
 
 		character.AddMajorCooldown(MajorCooldown{
 			CooldownID: OrcBloodFuryCooldownID,
-			Cooldown: cd,
+			Cooldown:   cd,
 			ActivationFactory: func(sim *Simulation) CooldownActivation {
 				return func(sim *Simulation, character *Character) bool {
 					character.SetCD(OrcBloodFuryCooldownID, cd+sim.CurrentTime)
@@ -69,8 +69,8 @@ func applyRaceEffects(agent Agent) {
 		// Beast Slaying (+5% damage to beasts)
 		character.AddPermanentAura(func(sim *Simulation) Aura {
 			return Aura{
-				ID:      TrollBeastSlayingAuraID,
-				Name:    "Beast Slaying (Troll Racial)",
+				ID:   TrollBeastSlayingAuraID,
+				Name: "Beast Slaying (Troll Racial)",
 				OnBeforeSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect) {
 					if spellEffect.Target.MobType == proto.MobType_MobTypeBeast {
 						spellEffect.DamageMultiplier *= 1.05
@@ -80,26 +80,27 @@ func applyRaceEffects(agent Agent) {
 		})
 
 		// Berserking
-		hasteBonus := time.Duration(11) // 10% haste
+		hasteBonus := 1.1
 		if character.Race == proto.Race_RaceTroll30 {
-			hasteBonus = time.Duration(13) // 30% haste
+			hasteBonus = 1.3
 		}
 		const dur = time.Second * 10
 		const cd = time.Minute * 3
 
 		character.AddMajorCooldown(MajorCooldown{
 			CooldownID: TrollBerserkingCooldownID,
-			Cooldown: cd,
+			Cooldown:   cd,
 			ActivationFactory: func(sim *Simulation) CooldownActivation {
 				return func(sim *Simulation, character *Character) bool {
 					character.SetCD(TrollBerserkingCooldownID, cd+sim.CurrentTime)
+					// Increase cast speed multiplier
+					character.PsuedoStats.CastSpeedMultiplier *= hasteBonus
 					character.AddAura(sim, Aura{
 						ID:      TrollBerserkingAuraID,
 						Name:    "Troll Berserking",
 						Expires: sim.CurrentTime + dur,
-						OnCast: func(sim *Simulation, cast *Cast) {
-							// Multiplying and then dividing lets us use integer multiplication/division which is faster.
-							cast.CastTime = (cast.CastTime * 10) / hasteBonus
+						OnExpire: func(sim *Simulation) {
+							character.PsuedoStats.CastSpeedMultiplier /= hasteBonus
 						},
 					})
 					return true
