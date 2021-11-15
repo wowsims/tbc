@@ -95,6 +95,10 @@ items: sim/core/items/all_items.go
 
 sim/core/items/all_items.go: generate_items/*.go $(call rwildcard,sim/core/proto,*.go)
 	go run generate_items/*.go -outDir=sim/core/items
+	gofmt -w ./sim/core/items
 
 test: $(OUT_DIR)/lib.wasm binary_dist/dist.go
 	go test ./...
+
+fmt:
+	gofmt -w ./sim
