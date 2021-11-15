@@ -232,3 +232,8 @@ func init() {
 		stats.SpellCrit: 47.89,
 	}
 }
+
+// Agent is a generic way to access underlying druid on any of the agents (for example balance druid.)
+type Agent interface {
+	GetDruid() *Druid
+}

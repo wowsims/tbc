@@ -7,6 +7,7 @@ import (
 
 func init() {
 	core.AddItemSet(ItemSetMalorne)
+	core.AddItemSet(ItemSetNordrassil)
 	core.AddItemSet(ItemSetThunderheart)
 }
 
@@ -32,6 +33,39 @@ var ItemSetMalorne = core.ItemSet{
 		},
 		4: func(agent core.Agent) {
 			// Currently this is handled in druid.go (reducing CD of innervate)
+		},
+	},
+}
+
+var Nordrassil4pAuraID = core.NewAuraID()
+
+var ItemSetNordrassil = core.ItemSet{
+	Name:  "Nordrassil Regalia",
+	Items: map[int32]struct{}{30231: {}, 30232: {}, 30233: {}, 30234: {}, 30235: {}},
+	Bonuses: map[int32]core.ApplyEffect{
+		4: func(agent core.Agent) {
+			character := agent.GetCharacter()
+			character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
+				return core.Aura{
+					ID:   Nordrassil4pAuraID,
+					Name: "Nordrassil 4p Bonus",
+					OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+						agent, ok := agent.(Agent)
+						if !ok {
+							panic("why is a non-druid using nordassil regalia")
+						}
+						druid := agent.GetDruid()
+						if spellCast.ActionID.SpellID == SpellIDSF8 || spellCast.ActionID.SpellID == SpellIDSF6 {
+							// Check if moonfire/insectswarm is ticking on the target.
+							// TODO: in a raid simulator we need to be able to see which dots are ticking from other druids.
+							if (druid.MoonfireSpell.DotInput.IsTicking(sim) && druid.MoonfireSpell.Target.Index == spellEffect.Target.Index) ||
+								(druid.InsectSwarmSpell.DotInput.IsTicking(sim) && druid.InsectSwarmSpell.Target.Index == spellEffect.Target.Index) {
+								spellEffect.DamageMultiplier *= 1.1
+							}
+						}
+					},
+				}
+			})
 		},
 	},
 }
