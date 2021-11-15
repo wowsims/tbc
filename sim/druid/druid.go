@@ -70,7 +70,12 @@ func (druid *Druid) Init(sim *core.Simulation) {
 }
 
 func (druid *Druid) Reset(newsim *core.Simulation) {
-	druid.moonfireCastTemplate.Apply(&druid.MoonfireSpell)
+	// Cleanup and pending dots and casts
+	druid.MoonfireSpell = core.DamageOverTimeSpell{}
+	druid.InsectSwarmSpell = core.DamageOverTimeSpell{}
+	druid.starfireSpell = core.SingleTargetDirectDamageSpell{}
+	druid.wrathSpell = core.SingleTargetDirectDamageSpell{}
+
 	druid.Character.Reset(newsim)
 }
 
@@ -86,7 +91,7 @@ var InnervateCD = core.NewCooldownID()
 //  would need to solve the same issue we had as dots (maybe ID per user)
 var InnervateAuraID = core.NewAuraID()
 
-func (druid *Druid) TryInnervate(sim *core.Simulation) {
+func (druid *Druid) TryInnervate(sim *core.Simulation) bool {
 	// Currently just activates innervate on self when own mana is <75%
 	// TODO: get a real recommendation when to use this.
 	if druid.SelfBuffs.Innervate && druid.GetRemainingCD(InnervateCD, sim.CurrentTime) == 0 {
@@ -110,8 +115,10 @@ func (druid *Druid) TryInnervate(sim *core.Simulation) {
 			druid.SetCD(InnervateCD, cd)
 			// triggers GCD
 			druid.SetCD(core.GCDCooldownID, core.CalculatedGCD(&druid.Character))
+			return true
 		}
 	}
+	return false
 }
 func (druid *Druid) Act(sim *core.Simulation) time.Duration {
 	return core.NeverExpires // does nothing

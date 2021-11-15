@@ -181,7 +181,7 @@ func TestMultiTarget(t *testing.T) {
 			Gear:          P1Gear,
 		},
 
-		ExpectedDpsShort: 2459.5,
+		ExpectedDpsShort: 2497.0,
 		ExpectedDpsLong:  1943.5,
 	})
 

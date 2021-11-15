@@ -138,7 +138,6 @@ func (shaman *Shaman) Reset(sim *core.Simulation) {
 
 	numHits := core.MinInt32(3, sim.GetNumTargets())
 	shaman.chainLightningSpellLOs = make([]core.MultiTargetDirectDamageSpell, numHits)
-
 }
 
 func (shaman *Shaman) Advance(sim *core.Simulation, elapsedTime time.Duration) {

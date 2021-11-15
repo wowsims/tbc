@@ -212,7 +212,11 @@ func (ddi DotDamageInput) TimeRemaining(sim *Simulation) time.Duration {
 }
 
 func (ddi DotDamageInput) IsTicking(sim *Simulation) bool {
-	return ddi.TimeRemaining(sim) != 0
+	// It is possible that both cast and tick are to happen at the same time.
+	//  In this case the dot "time remaining" will be 0 but there will be ticks left.
+	//  If a DOT misses then it will have NumberTicks set but never have been started.
+	//  So the case of 'has a final tick time but its now, but it has ticks remaining' looks like this.
+	return (ddi.FinalTickTime != 0 && ddi.TickIndex < ddi.NumberTicks)
 }
 
 func (spellEffect *SpellEffect) applyDot(sim *Simulation, spellCast *SpellCast, ddInput *DotDamageInput) {
