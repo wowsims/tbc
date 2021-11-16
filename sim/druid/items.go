@@ -10,6 +10,7 @@ import (
 func init() {
 	core.AddItemEffect(30664, ApplyLivingRootoftheWildheart)
 	core.AddItemEffect(33510, ApplyIdoloftheUnseenMoon)
+	core.AddItemEffect(32486, ApplyAshtongueTalisman)
 
 	core.AddItemSet(ItemSetMalorne)
 	core.AddItemSet(ItemSetNordrassil)
@@ -129,6 +130,29 @@ func ApplyIdoloftheUnseenMoon(agent core.Agent) {
 			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
 				if sim.RandomFloat("unseen oon") < 0.5 {
 					druid.AddAuraWithTemporaryStats(sim, LunarGraceAuraID, "Lunar Blessing", stats.SpellPower, spellBonus, dur)
+				}
+			},
+		}
+	})
+}
+
+var AshtongueTalismanItemAuraID = core.NewAuraID()
+var AshtongueTalismanAuraID = core.NewAuraID()
+
+func ApplyAshtongueTalisman(agent core.Agent) {
+	const spellBonus = 150
+	const dur = time.Second * 8
+
+	char := agent.GetCharacter()
+	char.AddPermanentAura(func(sim *core.Simulation) core.Aura {
+		return core.Aura{
+			ID:   AshtongueTalismanItemAuraID,
+			Name: "Ashtongue Talisman of Equilibrium",
+			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
+				if cast.ActionID.SpellID == SpellIDSF8 || cast.ActionID.SpellID == SpellIDSF6 {
+					if sim.RandomFloat("ashtongue talisman") < 0.25 {
+						char.AddAuraWithTemporaryStats(sim, AshtongueTalismanAuraID, "Ashtongue Spellpower", stats.SpellPower, spellBonus, dur)
+					}
 				}
 			},
 		}

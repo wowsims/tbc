@@ -26,6 +26,7 @@ var ItemDeclarations = []ItemDeclaration{
 	{ /** Antlers of Malorne */ ID: 29093, Categories: []proto.ItemCategory{CasterCategory}},
 	{ /** Antonidas's Aegis of Rapt Concentration */ ID: 30909, Categories: []proto.ItemCategory{CasterCategory}},
 	{ /** Arcanium Signet Bands */ ID: 27746, Categories: []proto.ItemCategory{CasterCategory}},
+	{ /** Ashtongue Talisman of Equilibrium */ ID: 32486, Categories: []proto.ItemCategory{CasterCategory}},
 	{ /** Ashyen's Gift */ ID: 29172, Categories: []proto.ItemCategory{CasterCategory}},
 	{ /** Auchenai Anchorite's Robe */ ID: 29341, Categories: []proto.ItemCategory{CasterCategory}},
 	{ /** Auchenai Staff */ ID: 29130, Categories: []proto.ItemCategory{CasterCategory}},
