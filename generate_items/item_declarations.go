@@ -268,6 +268,7 @@ var ItemDeclarations = []ItemDeclaration{
 	{ /** Pendant of Sunfire */ ID: 34359, Categories: []proto.ItemCategory{CasterCategory}},
 	{ /** Pendant of the Lost Ages */ ID: 30008, Categories: []proto.ItemCategory{CasterCategory}},
 	{ /** Quagmirran's Eye */ ID: 27683, Categories: []proto.ItemCategory{CasterCategory}},
+	{ /** Reign of Misery */ ID: 34176, Categories: []proto.ItemCategory{CasterCategory}},
 	{ /** Ring of Ancient Knowledge */ ID: 32527, Categories: []proto.ItemCategory{CasterCategory}},
 	{ /** Ring of Captured Storms */ ID: 32247, Categories: []proto.ItemCategory{CasterCategory}},
 	{ /** Ring of Conflict Survival */ ID: 31922, Categories: []proto.ItemCategory{CasterCategory}},
