@@ -38,6 +38,11 @@ func (druid *Druid) newWrathTemplate(sim *core.Simulation) core.SingleTargetDire
 		},
 	}
 
+	if druid.Equip[items.ItemSlotRanged].ID == IdolAvenger {
+		// This seems to be unaffected by wrath of cenarius so it needs to come first.
+		effect.DirectDamageSpellInput.FlatDamageBonus += 25 * effect.SpellCoefficient
+	}
+
 	// TODO: Applies to both starfire and moonfire
 	baseCast.CastTime -= time.Millisecond * 100 * time.Duration(druid.Talents.StarlightWrath)
 	effect.SpellEffect.BonusSpellCritRating += float64(druid.Talents.FocusedStarlight) * 2 * core.SpellCritRatingPerCritChance // 2% crit per point
@@ -48,10 +53,6 @@ func (druid *Druid) newWrathTemplate(sim *core.Simulation) core.SingleTargetDire
 	baseCast.CritMultiplier = (baseCast.CritMultiplier-1)*(1+float64(druid.Talents.Vengeance)*0.2) + 1
 	baseCast.ManaCost -= baseCast.BaseManaCost * float64(druid.Talents.Moonglow) * 0.03
 	effect.SpellEffect.DamageMultiplier *= 1 + 0.02*float64(druid.Talents.Moonfury)
-
-	if druid.Equip[items.ItemSlotRanged].ID == IdolAvenger {
-		effect.SpellEffect.BonusSpellPower += 25
-	}
 
 	effect.OnSpellHit = druid.applyOnHitTalents
 	spCast := &core.SpellCast{

@@ -55,8 +55,8 @@ func TestSimulateP1Starfire(t *testing.T) {
 			Gear:          P1Gear,
 		},
 
-		ExpectedDpsShort: 1453.1,
-		ExpectedDpsLong:  1460.4,
+		ExpectedDpsShort: 1447.9,
+		ExpectedDpsLong:  1455.1,
 	})
 }
 

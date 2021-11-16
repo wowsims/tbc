@@ -51,6 +51,11 @@ func (druid *Druid) newStarfireTemplate(sim *core.Simulation, rank int) core.Sin
 		effect.SpellCoefficient = 0.99
 	}
 
+	if druid.Equip[items.ItemSlotRanged].ID == IvoryMoongoddess {
+		// This seems to be unaffected by wrath of cenarius so it needs to come first.
+		effect.DirectDamageSpellInput.FlatDamageBonus += 55 * effect.SpellCoefficient
+	}
+
 	effect.SpellCoefficient += 0.04 * float64(druid.Talents.WrathOfCenarius)
 
 	// TODO: Applies to both starfire and moonfire
@@ -63,10 +68,6 @@ func (druid *Druid) newStarfireTemplate(sim *core.Simulation, rank int) core.Sin
 	baseCast.CritMultiplier = (baseCast.CritMultiplier-1)*(1+float64(druid.Talents.Vengeance)*0.2) + 1
 	baseCast.ManaCost -= baseCast.BaseManaCost * float64(druid.Talents.Moonglow) * 0.03
 	effect.SpellEffect.DamageMultiplier *= 1 + 0.02*float64(druid.Talents.Moonfury)
-
-	if druid.Equip[items.ItemSlotRanged].ID == IvoryMoongoddess {
-		effect.SpellEffect.BonusSpellPower += 55
-	}
 
 	if ItemSetThunderheart.CharacterHasSetBonus(&druid.Character, 4) { // Thunderheart 4p adds 5% crit to starfire
 		effect.SpellEffect.BonusSpellCritRating += 5 * core.SpellCritRatingPerCritChance

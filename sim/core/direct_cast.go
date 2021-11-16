@@ -19,6 +19,9 @@ type DirectDamageSpellInput struct {
 
 	// Increase in damage per point of spell power.
 	SpellCoefficient float64
+
+	// Adds a fixed amount of damage to the spell, before multipliers.
+	FlatDamageBonus float64
 }
 
 func (spellEffect *SpellEffect) calculateDirectDamage(sim *Simulation, spellCast *SpellCast, ddInput *DirectDamageSpellInput) {
@@ -27,7 +30,7 @@ func (spellEffect *SpellEffect) calculateDirectDamage(sim *Simulation, spellCast
 	totalSpellPower := spellCast.Character.GetStat(stats.SpellPower) + spellCast.Character.GetStat(spellCast.SpellSchool) + spellEffect.BonusSpellPower
 	damageFromSpellPower := (totalSpellPower * ddInput.SpellCoefficient)
 
-	damage := baseDamage + damageFromSpellPower
+	damage := baseDamage + damageFromSpellPower + ddInput.FlatDamageBonus
 
 	damage *= spellEffect.DamageMultiplier
 
