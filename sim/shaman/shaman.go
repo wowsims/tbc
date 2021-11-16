@@ -173,54 +173,21 @@ func (shaman *Shaman) TryDropTotems(sim *core.Simulation) time.Duration {
 		}
 		if sim.CurrentTime > v {
 			// Need to recast totem
+			// Manually set time on each totem because some totems have different time to expire.
+			//  This could also be managed by using a cooldown or aura.
+			//  An aura would allow us to implement totems as actual casts (we could apply and expire on party members)
 			switch i {
 			case AirTotem:
-				cast = &core.NoEffectSpell{
-					SpellCast: core.SpellCast{
-						Cast: core.Cast{
-							Name:            "Wrath of Air",
-							ActionID:        core.ActionID{SpellID: 3738}, // just using totem of wrath
-							Character:       shaman.GetCharacter(),
-							BaseManaCost:    240,
-							ManaCost:        240,
-							CastTime:        time.Second * 1,
-							IgnoreCooldowns: true, // lets us override the GCD
-						},
-					},
-				}
+				cast = shaman.NewAirTotem()
 				shaman.SelfBuffs.NextTotemDrops[i] = sim.CurrentTime + time.Second*120
 			case EarthTotem:
 				// dont cast an earth totem right now
 				shaman.SelfBuffs.NextTotemDrops[i] = core.NeverExpires
 			case FireTotem:
-				cast = &core.NoEffectSpell{
-					SpellCast: core.SpellCast{
-						Cast: core.Cast{
-							Name:            "Totem of Wrath",
-							ActionID:        core.ActionID{SpellID: 30706}, // just using totem of wrath
-							Character:       shaman.GetCharacter(),
-							BaseManaCost:    240,
-							ManaCost:        240,
-							CastTime:        time.Second * 1,
-							IgnoreCooldowns: true, // lets us override the GCD
-						},
-					},
-				}
+				cast = shaman.NewFireTotem()
 				shaman.SelfBuffs.NextTotemDrops[i] = sim.CurrentTime + time.Second*120
 			case WaterTotem:
-				cast = &core.NoEffectSpell{
-					SpellCast: core.SpellCast{
-						Cast: core.Cast{
-							Name:            "Mana Stream",
-							ActionID:        core.ActionID{SpellID: 25570}, // just using totem of wrath
-							Character:       shaman.GetCharacter(),
-							BaseManaCost:    90,
-							ManaCost:        90,
-							CastTime:        time.Second * 1,
-							IgnoreCooldowns: true, // lets us override the GCD
-						},
-					},
-				}
+				cast = shaman.NewWaterTotem()
 				shaman.SelfBuffs.NextTotemDrops[i] = sim.CurrentTime + time.Second*120
 			}
 		}
