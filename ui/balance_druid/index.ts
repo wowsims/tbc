@@ -204,7 +204,7 @@ const theme = new DefaultTheme<Spec.SpecBalanceDruid>(document.body, {
 	},
 	// If true, the talents on the talents tab will not be individually modifiable by the user.
 	// Note that the use can still pick between preset talents, if there is more than 1.
-	freezeTalents: true,
+	freezeTalents: false,
 	// Whether to include 'Target Armor' in the 'Encounter' section of the settings tab.
   showTargetArmor: false,
 	// Whether to include 'Num Targets' in the 'Encounter' section of the settings tab.
