@@ -52,6 +52,7 @@ message SimOptions {
     int64 random_seed = 2;
     bool debug = 3; // enables debug logging.
     bool exit_on_oom = 4;
+    int32 action_delay_milliseconds = 5; // Adds delay between actions. Can simulate latency or downtime in a fight.
 }
 
 // RPC IndividualSim
@@ -63,7 +64,7 @@ message IndividualSimRequest {
     IndividualBuffs Individual_buffs = 4;
 
     Encounter encounter = 5;
-		SimOptions sim_options = 6;
+	SimOptions sim_options = 6;
 }
 
 message IndividualSimResult {

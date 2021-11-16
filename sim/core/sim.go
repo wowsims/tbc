@@ -154,7 +154,7 @@ func (sim *Simulation) RunOnce() {
 			pa := &PendingAction{}
 			pa.OnAction = func(sim *Simulation) {
 				ag.GetCharacter().TryUseCooldowns(sim)
-				pa.NextActionAt = ag.Act(sim)
+				pa.NextActionAt = ag.Act(sim) + time.Duration(sim.Options.ActionDelayMilliseconds)*time.Millisecond
 			}
 			sim.AddPendingAction(pa)
 		}
