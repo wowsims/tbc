@@ -141,8 +141,23 @@ func (shaman *Shaman) Init(sim *core.Simulation) {
 func (shaman *Shaman) Reset(sim *core.Simulation) {
 	shaman.Character.Reset(sim)
 
+	// Check to see if we are casting a totem to set its expire time.
 	for i := range shaman.SelfBuffs.NextTotemDrops {
-		shaman.SelfBuffs.NextTotemDrops[i] = time.Second * 120 // 2 min until drop totems
+		shaman.SelfBuffs.NextTotemDrops[i] = core.NeverExpires
+		switch i {
+		case AirTotem:
+			if shaman.SelfBuffs.WrathOfAir {
+				shaman.SelfBuffs.NextTotemDrops[i] = time.Second * 120 // 2 min until drop totems
+			}
+		case FireTotem:
+			if shaman.SelfBuffs.TotemOfWrath {
+				shaman.SelfBuffs.NextTotemDrops[i] = time.Second * 120 // 2 min until drop totems
+			}
+		case WaterTotem:
+			if shaman.SelfBuffs.ManaSpring {
+				shaman.SelfBuffs.NextTotemDrops[i] = time.Second * 120 // 2 min until drop totems
+			}
+		}
 	}
 
 	// Reset all spells so any pending casts are cleaned up
@@ -181,8 +196,7 @@ func (shaman *Shaman) TryDropTotems(sim *core.Simulation) time.Duration {
 				cast = shaman.NewAirTotem()
 				shaman.SelfBuffs.NextTotemDrops[i] = sim.CurrentTime + time.Second*120
 			case EarthTotem:
-				// dont cast an earth totem right now
-				shaman.SelfBuffs.NextTotemDrops[i] = core.NeverExpires
+				// no air totem right now
 			case FireTotem:
 				cast = shaman.NewFireTotem()
 				shaman.SelfBuffs.NextTotemDrops[i] = sim.CurrentTime + time.Second*120
