@@ -226,7 +226,7 @@ func (ddi DotDamageInput) IsTicking(sim *Simulation) bool {
 func (spellEffect *SpellEffect) applyDot(sim *Simulation, spellCast *SpellCast, ddInput *DotDamageInput) {
 	totalSpellPower := spellCast.Character.GetStat(stats.SpellPower) + spellCast.Character.GetStat(spellCast.SpellSchool) + spellEffect.BonusSpellPower
 	// snapshot total damage per tick
-	ddInput.damagePerTick = ddInput.TickBaseDamage + totalSpellPower*ddInput.TickSpellCoefficient
+	ddInput.damagePerTick = (ddInput.TickBaseDamage + totalSpellPower*ddInput.TickSpellCoefficient) * spellEffect.DamageMultiplier
 	ddInput.finalTickTime = sim.CurrentTime + time.Duration(ddInput.NumberOfTicks)*ddInput.TickLength
 
 	pa := &PendingAction{
@@ -241,11 +241,11 @@ func (spellEffect *SpellEffect) applyDot(sim *Simulation, spellCast *SpellCast, 
 			sim.Log(" %s Ticked for %0.1f\n", ddInput.Name, damage)
 		}
 
-		spellEffect.Damage += damage
-
 		if ddInput.OnDamageTick != nil {
 			ddInput.OnDamageTick(sim)
 		}
+
+		spellEffect.Damage += damage
 
 		ddInput.tickIndex++
 		if ddInput.tickIndex < ddInput.NumberOfTicks {
