@@ -58,6 +58,7 @@ export abstract class SimUI<SpecType extends Spec> {
       'Battle Elixir': [],
       'Drums': [],
       'Food': [],
+      'Alchohol': [],
       'Guardian Elixir': [],
       'Potion': [],
       'Rune': [],
@@ -237,6 +238,7 @@ export type ExclusivityTag =
     'Battle Elixir'
     | 'Drums'
     | 'Food'
+    | 'Alchohol'
     | 'Guardian Elixir'
     | 'Potion'
     | 'Rune'

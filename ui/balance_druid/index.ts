@@ -193,6 +193,7 @@ const theme = new DefaultTheme<Spec.SpecBalanceDruid>(document.body, {
 			IconInputs.SuperiorWizardOil,
 			IconInputs.BlackenedBasilisk,
 			IconInputs.SkullfishSoup,
+			IconInputs.KreegsStoutBeatdown,
 		],
 	},
 	// Inputs to include in the 'Rotation' section on the settings tab.
