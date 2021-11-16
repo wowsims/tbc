@@ -11,7 +11,7 @@ import * as Tooltips from '/tbc/core/constants/tooltips.js';
 // https://tbc.wowhead.com/talent-calc and copy the numbers in the url.
 export const StandardTalents = {
     name: 'Standard',
-    data: '510022212503135231351--52003301',
+    data: '510022312503135231351--520033',
 };
 export const P1_ALLIANCE_BIS = {
     name: 'P1 Alliance BIS',
