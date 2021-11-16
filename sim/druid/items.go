@@ -1,6 +1,8 @@
 package druid
 
 import (
+	"time"
+
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/stats"
 )
@@ -81,4 +83,51 @@ var ItemSetThunderheart = core.ItemSet{
 			// handled in starfire.go in template construction
 		},
 	},
+}
+
+var LivingRootoftheWildheartAuraID = core.NewAuraID()
+var LunarBlessingAuraID = core.NewAuraID()
+
+func ApplyLivingRootoftheWildheart(agent core.Agent) {
+	const spellBonus = 209
+	const dur = time.Second * 15
+
+	druidAgent := agent.(Agent)
+	druid := druidAgent.GetDruid()
+	druid.AddPermanentAura(func(sim *core.Simulation) core.Aura {
+		return core.Aura{
+			ID:   LivingRootoftheWildheartAuraID,
+			Name: "Living Root of the Wildheart",
+			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
+				// technically only works while in moonkin form... but i think we can assume thats always true.
+				if druid.Talents.MoonkinForm {
+					if sim.RandomFloat("living root") < 0.03 {
+						druid.AddAuraWithTemporaryStats(sim, LunarBlessingAuraID, "Lunar Blessing", stats.SpellPower, spellBonus, dur)
+					}
+				}
+			},
+		}
+	})
+}
+
+var IdoloftheUnseenMoonAuraID = core.NewAuraID()
+var LunarGraceAuraID = core.NewAuraID()
+
+func ApplyIdoloftheUnseenMoon(agent core.Agent) {
+	const spellBonus = 140
+	const dur = time.Second * 10
+
+	druidAgent := agent.(Agent)
+	druid := druidAgent.GetDruid()
+	druid.AddPermanentAura(func(sim *core.Simulation) core.Aura {
+		return core.Aura{
+			ID:   IdoloftheUnseenMoonAuraID,
+			Name: "Idol of the Unseen Moon",
+			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
+				if sim.RandomFloat("unseen oon") < 0.5 {
+					druid.AddAuraWithTemporaryStats(sim, LunarGraceAuraID, "Lunar Blessing", stats.SpellPower, spellBonus, dur)
+				}
+			},
+		}
+	})
 }
