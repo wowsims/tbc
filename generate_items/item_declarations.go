@@ -7,6 +7,9 @@ import (
 type ItemDeclaration struct {
 	ID         int
 	Categories []proto.ItemCategory // Which categories this item belongs to.
+
+	// Override fields, in case wowhead is wrong.
+	Phase int
 }
 
 const CasterCategory = proto.ItemCategory_ItemCategoryCaster
@@ -179,8 +182,8 @@ var ItemDeclarations = []ItemDeclaration{
 	{ /** Hydra-fang Necklace */ ID: 27758, Categories: []proto.ItemCategory{CasterCategory}},
 	{ /** Icon of the Silver Crescent */ ID: 29370, Categories: []proto.ItemCategory{CasterCategory}},
 	{ /** Idol of the Avenger */ ID: 31025, Categories: []proto.ItemCategory{CasterCategory}},
-	{ /** Idol of the Raven Goddess */ ID: 32387, Categories: []proto.ItemCategory{CasterCategory}},
-	{ /** Idol of the Unseen Moon */ ID: 33510, Categories: []proto.ItemCategory{CasterCategory}},
+	{ /** Idol of the Raven Goddess */ ID: 32387, Categories: []proto.ItemCategory{CasterCategory}, Phase: 2},
+	{ /** Idol of the Unseen Moon */ ID: 33510, Categories: []proto.ItemCategory{CasterCategory}, Phase: 4},
 	{ /** Illidari Runeshield */ ID: 34011, Categories: []proto.ItemCategory{CasterCategory}},
 	{ /** Illidari Shoulderpads */ ID: 30079, Categories: []proto.ItemCategory{CasterCategory}},
 	{ /** Incanter's Cowl */ ID: 28278, Categories: []proto.ItemCategory{CasterCategory}},

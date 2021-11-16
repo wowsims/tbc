@@ -95,7 +95,11 @@ func itemToGoString(itemDeclaration ItemDeclaration, itemResponse WowheadItemRes
 		}
 	}
 
-	itemStr += fmt.Sprintf("Phase:%d, ", itemResponse.GetPhase())
+	phase := itemDeclaration.Phase
+	if phase == 0 {
+		phase = itemResponse.GetPhase()
+	}
+	itemStr += fmt.Sprintf("Phase:%d, ", phase)
 	itemStr += fmt.Sprintf("Quality:proto.ItemQuality_%s, ", proto.ItemQuality(itemResponse.Quality).String())
 
 	if itemResponse.GetUnique() {

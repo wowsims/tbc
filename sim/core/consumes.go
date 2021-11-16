@@ -78,6 +78,10 @@ func consumesStats(c proto.Consumes) stats.Stats {
 		s[stats.SpellCrit] += 20
 		s[stats.Spirit] += 20
 	}
+	if c.KreegsStoutBeatdown {
+		s[stats.Intellect] -= 5
+		s[stats.Spirit] += 25
+	}
 
 	return s
 }
