@@ -29,6 +29,7 @@ export class SimUI {
             'Battle Elixir': [],
             'Drums': [],
             'Food': [],
+            'Alchohol': [],
             'Guardian Elixir': [],
             'Potion': [],
             'Rune': [],

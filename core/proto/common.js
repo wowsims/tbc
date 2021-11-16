@@ -1043,6 +1043,7 @@ class Consumes$Type extends MessageType {
             { no: 12, name: "superior_wizard_oil", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 13, name: "blackened_basilisk", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 14, name: "skullfish_soup", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 20, name: "kreegsStoutBeatdown", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 15, name: "default_potion", kind: "enum", T: () => ["proto.Potions", Potions] },
             { no: 16, name: "starting_potion", kind: "enum", T: () => ["proto.Potions", Potions] },
             { no: 17, name: "num_starting_potions", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
@@ -1051,7 +1052,7 @@ class Consumes$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { flaskOfBlindingLight: false, flaskOfMightyRestoration: false, flaskOfPureDeath: false, flaskOfSupremePower: false, adeptsElixir: false, elixirOfMajorFirePower: false, elixirOfMajorFrostPower: false, elixirOfMajorShadowPower: false, elixirOfDraenicWisdom: false, elixirOfMajorMageblood: false, brilliantWizardOil: false, superiorWizardOil: false, blackenedBasilisk: false, skullfishSoup: false, defaultPotion: 0, startingPotion: 0, numStartingPotions: 0, darkRune: false, drums: 0 };
+        const message = { flaskOfBlindingLight: false, flaskOfMightyRestoration: false, flaskOfPureDeath: false, flaskOfSupremePower: false, adeptsElixir: false, elixirOfMajorFirePower: false, elixirOfMajorFrostPower: false, elixirOfMajorShadowPower: false, elixirOfDraenicWisdom: false, elixirOfMajorMageblood: false, brilliantWizardOil: false, superiorWizardOil: false, blackenedBasilisk: false, skullfishSoup: false, kreegsStoutBeatdown: false, defaultPotion: 0, startingPotion: 0, numStartingPotions: 0, darkRune: false, drums: 0 };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -1103,6 +1104,9 @@ class Consumes$Type extends MessageType {
                     break;
                 case /* bool skullfish_soup */ 14:
                     message.skullfishSoup = reader.bool();
+                    break;
+                case /* bool kreegsStoutBeatdown */ 20:
+                    message.kreegsStoutBeatdown = reader.bool();
                     break;
                 case /* proto.Potions default_potion */ 15:
                     message.defaultPotion = reader.int32();
@@ -1173,6 +1177,9 @@ class Consumes$Type extends MessageType {
         /* bool skullfish_soup = 14; */
         if (message.skullfishSoup !== false)
             writer.tag(14, WireType.Varint).bool(message.skullfishSoup);
+        /* bool kreegsStoutBeatdown = 20; */
+        if (message.kreegsStoutBeatdown !== false)
+            writer.tag(20, WireType.Varint).bool(message.kreegsStoutBeatdown);
         /* proto.Potions default_potion = 15; */
         if (message.defaultPotion !== 0)
             writer.tag(15, WireType.Varint).int32(message.defaultPotion);

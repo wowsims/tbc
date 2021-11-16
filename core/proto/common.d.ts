@@ -187,6 +187,10 @@ export interface Consumes {
      */
     skullfishSoup: boolean;
     /**
+     * @generated from protobuf field: bool kreegsStoutBeatdown = 20;
+     */
+    kreegsStoutBeatdown: boolean;
+    /**
      * @generated from protobuf field: proto.Potions default_potion = 15;
      */
     defaultPotion: Potions;

@@ -40,6 +40,7 @@ export declare const FlaskOfBlindingLight: IconInput<Player<any>>;
 export declare const FlaskOfMightyRestoration: IconInput<Player<any>>;
 export declare const FlaskOfPureDeath: IconInput<Player<any>>;
 export declare const FlaskOfSupremePower: IconInput<Player<any>>;
+export declare const KreegsStoutBeatdown: IconInput<Player<any>>;
 export declare const SkullfishSoup: IconInput<Player<any>>;
 export declare const SuperiorWizardOil: IconInput<Player<any>>;
 export declare const DefaultDestructionPotion: IconInput<Player<any>>;

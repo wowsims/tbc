@@ -33,7 +33,7 @@ export declare abstract class SimUI<SpecType extends Spec> {
     private getStorageKey;
     makeCurrentIndividualSimRequest(iterations: number, debug: boolean): IndividualSimRequest;
 }
-export declare type ExclusivityTag = 'Battle Elixir' | 'Drums' | 'Food' | 'Guardian Elixir' | 'Potion' | 'Rune' | 'Weapon Imbue';
+export declare type ExclusivityTag = 'Battle Elixir' | 'Drums' | 'Food' | 'Alchohol' | 'Guardian Elixir' | 'Potion' | 'Rune' | 'Weapon Imbue';
 export interface ExclusiveEffect {
     tags: Array<ExclusivityTag>;
     changedEvent: TypedEvent<any>;
