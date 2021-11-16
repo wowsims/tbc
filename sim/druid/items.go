@@ -8,6 +8,9 @@ import (
 )
 
 func init() {
+	core.AddItemEffect(30664, ApplyLivingRootoftheWildheart)
+	core.AddItemEffect(33510, ApplyIdoloftheUnseenMoon)
+
 	core.AddItemSet(ItemSetMalorne)
 	core.AddItemSet(ItemSetNordrassil)
 	core.AddItemSet(ItemSetThunderheart)
