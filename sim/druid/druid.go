@@ -194,19 +194,26 @@ var FaerieFireDebuffID = core.NewDebuffID()
 func init() {
 	// TODO: get the actual real base stats here.
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceTauren, Class: proto.Class_ClassDruid}] = stats.Stats{
-		stats.Strength:  103,
-		stats.Agility:   61,
-		stats.Stamina:   113,
-		stats.Intellect: 109,
-		stats.Spirit:    122,
-		stats.Mana:      2678,
-		stats.SpellCrit: 47.89,
+		stats.Strength:  81,
+		stats.Agility:   65,
+		stats.Stamina:   85,
+		stats.Intellect: 115,
+		stats.Spirit:    135,
+		stats.Mana:      2090,  // 3815 mana shown on naked character
+		stats.SpellCrit: 40.66, // 3.29% chance to crit shown on naked character screen
+		stats.Armor:     130,
+		// 4498 health shown on naked character (would include tauren bonus)
 	}
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceNightElf, Class: proto.Class_ClassDruid}] = stats.Stats{
-		stats.Intellect: 104,
-		stats.Mana:      2678,
-		stats.Spirit:    135,
-		stats.SpellCrit: 47.89,
+		stats.Strength:  73,
+		stats.Agility:   75,
+		stats.Stamina:   82,
+		stats.Intellect: 120,
+		stats.Spirit:    133,
+		stats.Mana:      2090,  // 3890 mana shown on naked character
+		stats.SpellCrit: 40.60, // 3.35% chance to crit shown on naked character screen
+		stats.Armor:     150,
+		// 4254 health shown on naked character
 	}
 }
 
