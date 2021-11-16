@@ -62,6 +62,18 @@ func (ddEffect *DirectDamageSpellEffect) apply(sim *Simulation, spellCast *Spell
 	ddEffect.SpellEffect.afterCalculations(sim, spellCast)
 }
 
+// NoEffectSpell is a way to cast something that doesn't actually hit a target (or maybe could be a self buff)
+// This will still use up cast time and mana cost. Example: Shaman Totem Casting
+type NoEffectSpell struct {
+	SpellCast
+}
+
+func (spell *NoEffectSpell) Act(sim *Simulation) bool {
+	return spell.startCasting(sim, func(sim *Simulation, cast *Cast) {
+		sim.MetricsAggregator.AddSpellCast(&spell.SpellCast)
+	})
+}
+
 type SingleTargetDirectDamageSpell struct {
 	// Embedded spell cast.
 	SpellCast

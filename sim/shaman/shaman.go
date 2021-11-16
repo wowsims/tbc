@@ -51,7 +51,17 @@ type SelfBuffs struct {
 	TotemOfWrath bool
 	WrathOfAir   bool
 	ManaSpring   bool
+
+	NextTotemDrops [4]time.Duration // track when to drop totems
 }
+
+// Indexes into NextTotemDrops for self buffs
+const (
+	AirTotem int = iota
+	EarthTotem
+	FireTotem
+	WaterTotem
+)
 
 // Shaman represents a shaman character.
 type Shaman struct {
@@ -61,7 +71,6 @@ type Shaman struct {
 	SelfBuffs SelfBuffs
 
 	ElementalFocusStacks byte
-	NextTotemDrop        time.Duration // track when to drop totems again
 
 	// "object pool" for shaman spells that are currently being cast.
 	lightningBoltSpell   core.SingleTargetDirectDamageSpell
@@ -132,7 +141,9 @@ func (shaman *Shaman) Init(sim *core.Simulation) {
 func (shaman *Shaman) Reset(sim *core.Simulation) {
 	shaman.Character.Reset(sim)
 
-	shaman.NextTotemDrop = time.Second * 120 // 2 min until drop totems
+	for i := range shaman.SelfBuffs.NextTotemDrops {
+		shaman.SelfBuffs.NextTotemDrops[i] = time.Second * 120 // 2 min until drop totems
+	}
 
 	// Reset all spells so any pending casts are cleaned up
 	shaman.lightningBoltSpell = core.SingleTargetDirectDamageSpell{}
@@ -152,39 +163,75 @@ func (shaman *Shaman) Advance(sim *core.Simulation, elapsedTime time.Duration) {
 // TryDropTotems will check to see if totems need to be re-cast.
 //  If they do time.Duration will be returned will be >0.
 func (shaman *Shaman) TryDropTotems(sim *core.Simulation) time.Duration {
-	if sim.CurrentTime < shaman.NextTotemDrop {
-		return 0
+
+	var cast *core.NoEffectSpell
+
+	// currently hardcoded to include 25% mana cost reduction from resto talents
+	for i, v := range shaman.SelfBuffs.NextTotemDrops {
+		if cast != nil {
+			break
+		}
+		if sim.CurrentTime > v {
+			// Need to recast totem
+			switch i {
+			case AirTotem:
+				cast = &core.NoEffectSpell{
+					SpellCast: core.SpellCast{
+						Cast: core.Cast{
+							Name:            "Wrath of Air",
+							ActionID:        core.ActionID{SpellID: 3738}, // just using totem of wrath
+							Character:       shaman.GetCharacter(),
+							BaseManaCost:    240,
+							ManaCost:        240,
+							CastTime:        time.Second * 1,
+							IgnoreCooldowns: true, // lets us override the GCD
+						},
+					},
+				}
+				shaman.SelfBuffs.NextTotemDrops[i] = sim.CurrentTime + time.Second*120
+			case EarthTotem:
+				// dont cast an earth totem right now
+				shaman.SelfBuffs.NextTotemDrops[i] = core.NeverExpires
+			case FireTotem:
+				cast = &core.NoEffectSpell{
+					SpellCast: core.SpellCast{
+						Cast: core.Cast{
+							Name:            "Totem of Wrath",
+							ActionID:        core.ActionID{SpellID: 30706}, // just using totem of wrath
+							Character:       shaman.GetCharacter(),
+							BaseManaCost:    240,
+							ManaCost:        240,
+							CastTime:        time.Second * 1,
+							IgnoreCooldowns: true, // lets us override the GCD
+						},
+					},
+				}
+				shaman.SelfBuffs.NextTotemDrops[i] = sim.CurrentTime + time.Second*120
+			case WaterTotem:
+				cast = &core.NoEffectSpell{
+					SpellCast: core.SpellCast{
+						Cast: core.Cast{
+							Name:            "Mana Stream",
+							ActionID:        core.ActionID{SpellID: 25570}, // just using totem of wrath
+							Character:       shaman.GetCharacter(),
+							BaseManaCost:    90,
+							ManaCost:        90,
+							CastTime:        time.Second * 1,
+							IgnoreCooldowns: true, // lets us override the GCD
+						},
+					},
+				}
+				shaman.SelfBuffs.NextTotemDrops[i] = sim.CurrentTime + time.Second*120
+			}
+		}
 	}
 
-	// 110 = totem of wrath
-	// 90 = mana stream
-	// 240 = wrath of air
-	// currently hardcoded to include 25% cost reduction from resto talents
-	var manaCost float64 = 110 + 90 + 240
-
-	cast := &core.SingleTargetDirectDamageSpell{
-		SpellCast: core.SpellCast{
-			Cast: core.Cast{
-				Name:         "Shaman Totems",
-				ActionID:     core.ActionID{SpellID: 36936}, // just using totem of wrath
-				Character:    shaman.GetCharacter(),
-				BaseManaCost: manaCost,
-				ManaCost:     manaCost,
-				CastTime:     time.Second * 3,
-				SpellSchool:  stats.NatureSpellPower,
-			},
-		},
-		Effect: core.DirectDamageSpellEffect{
-			SpellEffect: core.SpellEffect{
-				Target:               sim.GetPrimaryTarget(),
-				BonusSpellCritRating: -100000, // dont let this spell hit/crit to accidentally proc shaman abilities
-				BonusSpellHitRating:  -100000,
-			},
-		},
+	if cast == nil {
+		return 0 // no totem to cast
 	}
+
 	cast.Act(sim)
 
-	shaman.NextTotemDrop = sim.CurrentTime + time.Second*120
 	return cast.CastTime
 }
 

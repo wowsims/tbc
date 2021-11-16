@@ -74,10 +74,10 @@ func TestCalcStatWeight(t *testing.T) {
 	})
 
 	core.StatWeightsTest("p1Full", t, isr, StatsToTest, ReferenceStat, stats.Stats{
-		stats.Intellect:  0.19,
-		stats.SpellPower: 0.67,
-		stats.SpellHit:   0.10,
-		stats.SpellCrit:  0.59,
+		stats.Intellect:  0.163,
+		stats.SpellPower: 0.704,
+		stats.SpellHit:   -0.053,
+		stats.SpellCrit:  0.556,
 	})
 }
 
@@ -106,7 +106,7 @@ func TestSimulatePreRaidNoBuffs(t *testing.T) {
 		},
 
 		ExpectedDpsShort: 828.0,
-		ExpectedDpsLong:  261.2,
+		ExpectedDpsLong:  274.4,
 	})
 }
 
@@ -130,7 +130,7 @@ func TestSimulatePreRaid(t *testing.T) {
 		},
 
 		ExpectedDpsShort: 1429.1,
-		ExpectedDpsLong:  1150.3,
+		ExpectedDpsLong:  1112.4,
 	})
 }
 
@@ -154,7 +154,7 @@ func TestSimulateP1(t *testing.T) {
 		},
 
 		ExpectedDpsShort: 1883.1,
-		ExpectedDpsLong:  1579.0,
+		ExpectedDpsLong:  1634.3,
 	})
 }
 func TestMultiTarget(t *testing.T) {
@@ -182,7 +182,7 @@ func TestMultiTarget(t *testing.T) {
 		},
 
 		ExpectedDpsShort: 2497.0,
-		ExpectedDpsLong:  1867.8,
+		ExpectedDpsLong:  1880.9,
 	})
 
 	core.IndividualSimAllEncountersTest(core.AllEncountersTestOptions{
@@ -209,7 +209,7 @@ func TestMultiTarget(t *testing.T) {
 		},
 
 		ExpectedDpsShort: 2504.6,
-		ExpectedDpsLong:  1887.2,
+		ExpectedDpsLong:  1918.8,
 	})
 }
 
@@ -233,7 +233,7 @@ func TestLBOnlyAgent(t *testing.T) {
 		},
 
 		ExpectedDpsShort: 1880.7,
-		ExpectedDpsLong:  1505.4,
+		ExpectedDpsLong:  1566.8,
 	})
 }
 
@@ -271,7 +271,7 @@ func TestClearcastAgent(t *testing.T) {
 		},
 
 		ExpectedDpsShort: 2023.1,
-		ExpectedDpsLong:  1588.1,
+		ExpectedDpsLong:  1675.5,
 	})
 }
 
