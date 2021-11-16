@@ -130,7 +130,7 @@ func TestSimulatePreRaid(t *testing.T) {
 		},
 
 		ExpectedDpsShort: 1429.1,
-		ExpectedDpsLong:  1169.2,
+		ExpectedDpsLong:  1150.3,
 	})
 }
 
@@ -154,7 +154,7 @@ func TestSimulateP1(t *testing.T) {
 		},
 
 		ExpectedDpsShort: 1883.1,
-		ExpectedDpsLong:  1625.6,
+		ExpectedDpsLong:  1579.0,
 	})
 }
 func TestMultiTarget(t *testing.T) {
@@ -182,7 +182,7 @@ func TestMultiTarget(t *testing.T) {
 		},
 
 		ExpectedDpsShort: 2497.0,
-		ExpectedDpsLong:  1943.5,
+		ExpectedDpsLong:  1867.8,
 	})
 
 	core.IndividualSimAllEncountersTest(core.AllEncountersTestOptions{
@@ -209,7 +209,7 @@ func TestMultiTarget(t *testing.T) {
 		},
 
 		ExpectedDpsShort: 2504.6,
-		ExpectedDpsLong:  1930.4,
+		ExpectedDpsLong:  1887.2,
 	})
 }
 
@@ -233,7 +233,7 @@ func TestLBOnlyAgent(t *testing.T) {
 		},
 
 		ExpectedDpsShort: 1880.7,
-		ExpectedDpsLong:  1601.9,
+		ExpectedDpsLong:  1505.4,
 	})
 }
 
@@ -271,7 +271,7 @@ func TestClearcastAgent(t *testing.T) {
 		},
 
 		ExpectedDpsShort: 2023.1,
-		ExpectedDpsLong:  1677.5,
+		ExpectedDpsLong:  1588.1,
 	})
 }
 
@@ -290,7 +290,7 @@ func TestAverageDPS(t *testing.T) {
 		PlayerOptions: PlayerOptionsAdaptive,
 	})
 
-	core.IndividualSimAverageTest("P1Average", t, isr, 1622.65)
+	core.IndividualSimAverageTest("P1Average", t, isr, 1587.6)
 }
 
 func BenchmarkSimulate(b *testing.B) {
