@@ -404,6 +404,7 @@ var ItemDeclarations = []ItemDeclaration{
 	{ /** Vindicator's Mail Bracers */ ID: 33897, Categories: []proto.ItemCategory{CasterCategory}},
 	{ /** Vindicator's Mail Girdle */ ID: 33898, Categories: []proto.ItemCategory{CasterCategory}},
 	{ /** Vindicator's Mail Sabatons */ ID: 33899, Categories: []proto.ItemCategory{CasterCategory}},
+	{ /** Vindicator's Pendant of Subjugation */ ID: 35319, Categories: []proto.ItemCategory{CasterCategory}},
 	{ /** Vindicator's Wyrmhide Belt */ ID: 33915, Categories: []proto.ItemCategory{CasterCategory}},
 	{ /** Vindicator's Wyrmhide Boots */ ID: 33916, Categories: []proto.ItemCategory{CasterCategory}},
 	{ /** Vindicator's Wyrmhide Bracers */ ID: 33917, Categories: []proto.ItemCategory{CasterCategory}},
