@@ -39,6 +39,11 @@ type BalanceDruid struct {
 	rotationOptions proto.BalanceDruid_Rotation
 }
 
+// GetDruid is to implement druid.Agent (supports nordrassil set bonus)
+func (moonkin *BalanceDruid) GetDruid() *druid.Druid {
+	return &moonkin.Druid
+}
+
 func (moonkin *BalanceDruid) Reset(sim *core.Simulation) {
 	moonkin.Druid.Reset(sim)
 }

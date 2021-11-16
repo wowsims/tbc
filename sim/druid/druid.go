@@ -29,6 +29,8 @@ type Druid struct {
 
 	InsectSwarmSpell        core.DamageOverTimeSpell
 	insectSwarmCastTemplate core.DamageOverTimeSpellTemplate
+
+	malorne4p bool // cached since we need to check on every innervate
 }
 
 type SelfBuffs struct {
@@ -109,7 +111,7 @@ func (druid *Druid) TryInnervate(sim *core.Simulation) bool {
 				},
 			})
 			cd := time.Minute * 6
-			if druid.HasAura(Malorne4PcAuraID) {
+			if druid.malorne4p {
 				cd -= time.Second * 48
 			}
 			druid.SetCD(InnervateCD, cd)
@@ -128,16 +130,6 @@ func (druid *Druid) applyOnHitTalents(sim *core.Simulation, spellCast *core.Spel
 	if druid.Talents.NaturesGrace && spellEffect.Crit {
 		druid.NaturesGrace = true
 	}
-
-	if druid.Talents.WrathOfCenarius > 0 {
-		if spellCast.ActionID.SpellID == SpellIDSF8 || spellCast.ActionID.SpellID == SpellIDSF6 {
-			spellEffect.BonusSpellPower += (druid.GetStat(stats.SpellPower) + druid.GetStat(stats.ArcaneSpellPower)) * 0.04 * float64(druid.Talents.WrathOfCenarius)
-		}
-
-		if spellCast.ActionID.SpellID == SpellIDWrath {
-			spellEffect.BonusSpellPower += (druid.GetStat(stats.SpellPower) + druid.GetStat(stats.NatureSpellPower)) * 0.02 * float64(druid.Talents.WrathOfCenarius)
-		}
-	}
 }
 
 func (druid *Druid) applyNaturesGrace(spellCast *core.SpellCast) {
@@ -151,7 +143,28 @@ func (druid *Druid) applyNaturesGrace(spellCast *core.SpellCast) {
 	}
 }
 
+var WrathOfCenariusAuraID = core.NewAuraID()
+
 func NewDruid(char core.Character, selfBuffs SelfBuffs, talents proto.DruidTalents) Druid {
+
+	if talents.WrathOfCenarius > 0 {
+		sfBonus := 0.04 * float64(talents.WrathOfCenarius)
+		wrathBonus := 0.02 * float64(talents.WrathOfCenarius)
+		char.AddPermanentAura(func(sim *core.Simulation) core.Aura {
+			return core.Aura{
+				ID:   WrathOfCenariusAuraID,
+				Name: "Wrath of Cenarius Talent",
+				OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+					if spellCast.ActionID.SpellID == SpellIDSF8 || spellCast.ActionID.SpellID == SpellIDSF6 {
+						spellEffect.BonusSpellPower += (spellCast.Character.GetStat(stats.SpellPower) + spellCast.Character.GetStat(stats.ArcaneSpellPower)) * sfBonus
+					}
+					if spellCast.ActionID.SpellID == SpellIDWrath {
+						spellEffect.BonusSpellPower += (spellCast.Character.GetStat(stats.SpellPower) + spellCast.Character.GetStat(stats.NatureSpellPower)) * wrathBonus
+					}
+				},
+			}
+		})
+	}
 
 	char.AddStatDependency(stats.StatDependency{
 		SourceStat:   stats.Intellect,
@@ -191,6 +204,7 @@ func NewDruid(char core.Character, selfBuffs SelfBuffs, talents proto.DruidTalen
 		Character: char,
 		SelfBuffs: selfBuffs,
 		Talents:   talents,
+		malorne4p: ItemSetMalorne.CharacterHasSetBonus(&char, 4),
 	}
 }
 
@@ -213,4 +227,9 @@ func init() {
 		stats.Spirit:    135,
 		stats.SpellCrit: 47.89,
 	}
+}
+
+// Agent is a generic way to access underlying druid on any of the agents (for example balance druid.)
+type Agent interface {
+	GetDruid() *Druid
 }

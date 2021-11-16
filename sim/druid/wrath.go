@@ -4,11 +4,14 @@ import (
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
+	"github.com/wowsims/tbc/sim/core/items"
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 // Starfire spell IDs
 const SpellIDWrath int32 = 26985
+
+const IdolAvenger int32 = 31025
 
 func (druid *Druid) newWrathTemplate(sim *core.Simulation) core.SingleTargetDirectDamageSpellTemplate {
 	baseCast := core.Cast{
@@ -46,6 +49,10 @@ func (druid *Druid) newWrathTemplate(sim *core.Simulation) core.SingleTargetDire
 	baseCast.ManaCost -= baseCast.BaseManaCost * float64(druid.Talents.Moonglow) * 0.03
 	effect.SpellEffect.DamageMultiplier *= 1 + 0.02*float64(druid.Talents.Moonfury)
 	effect.SpellEffect.BonusSpellHitRating += float64(druid.Talents.BalanceOfPower) * 2 * core.SpellHitRatingPerHitChance
+
+	if druid.Equip[items.ItemSlotRanged].ID == IdolAvenger {
+		effect.SpellEffect.BonusSpellPower += 25
+	}
 
 	effect.OnSpellHit = druid.applyOnHitTalents
 	spCast := &core.SpellCast{

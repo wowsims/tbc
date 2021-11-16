@@ -7,7 +7,7 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-const SpellIDIS int32 = 26988
+const SpellIDIS int32 = 27013
 
 func (druid *Druid) newInsectSwarmTemplate(sim *core.Simulation) core.DamageOverTimeSpellTemplate {
 	baseCast := core.Cast{

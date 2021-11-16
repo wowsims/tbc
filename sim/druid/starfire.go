@@ -66,6 +66,11 @@ func (druid *Druid) newStarfireTemplate(sim *core.Simulation, rank int) core.Sin
 	if druid.Equip[items.ItemSlotRanged].ID == IvoryMoongoddess {
 		effect.SpellEffect.BonusSpellPower += 55
 	}
+
+	if ItemSetThunderheart.CharacterHasSetBonus(&druid.Character, 4) { // Thunderheart 4p adds 5% crit to starfire
+		effect.SpellEffect.BonusSpellCritRating += 5 * core.SpellCritRatingPerCritChance
+	}
+
 	effect.OnSpellHit = druid.applyOnHitTalents
 	spCast := &core.SpellCast{
 		Cast: baseCast,
@@ -86,6 +91,9 @@ func (druid *Druid) NewStarfire(sim *core.Simulation, target *core.Target, rank 
 	} else if rank == 6 {
 		druid.starfire6CastTemplate.Apply(sf)
 	}
+
+	// Dynamically apply.
+	sf.Effect.BonusSpellPower += (druid.GetStat(stats.SpellPower) + druid.GetStat(stats.ArcaneSpellPower)) * 0.04 * float64(druid.Talents.WrathOfCenarius)
 
 	// Applies nature's grace cast time reduction if available.
 	druid.applyNaturesGrace(&sf.SpellCast)
