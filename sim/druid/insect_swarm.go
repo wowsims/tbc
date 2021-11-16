@@ -28,11 +28,11 @@ func (druid *Druid) newInsectSwarmTemplate(sim *core.Simulation) core.DamageOver
 			DamageMultiplier: 1,
 		},
 		DotInput: core.DotDamageInput{
-			Name:             "Insect Swarm DoT",
-			NumberTicks:      6,
-			TickLength:       time.Second * 2,
-			BaseDamage:       792,
-			SpellCoefficient: 0.127,
+			Name:                 "Insect Swarm DoT",
+			NumberOfTicks:        6,
+			TickLength:           time.Second * 2,
+			TickBaseDamage:       792 / 6,
+			TickSpellCoefficient: 0.127,
 		},
 	}
 	return core.NewDamageOverTimeSpellTemplate(core.DamageOverTimeSpell{

@@ -143,28 +143,9 @@ func (druid *Druid) applyNaturesGrace(spellCast *core.SpellCast) {
 	}
 }
 
-var WrathOfCenariusAuraID = core.NewAuraID()
-
 func NewDruid(char core.Character, selfBuffs SelfBuffs, talents proto.DruidTalents) Druid {
 
-	if talents.WrathOfCenarius > 0 {
-		sfBonus := 0.04 * float64(talents.WrathOfCenarius)
-		wrathBonus := 0.02 * float64(talents.WrathOfCenarius)
-		char.AddPermanentAura(func(sim *core.Simulation) core.Aura {
-			return core.Aura{
-				ID:   WrathOfCenariusAuraID,
-				Name: "Wrath of Cenarius Talent",
-				OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-					if spellCast.ActionID.SpellID == SpellIDSF8 || spellCast.ActionID.SpellID == SpellIDSF6 {
-						spellEffect.BonusSpellPower += (spellCast.Character.GetStat(stats.SpellPower) + spellCast.Character.GetStat(stats.ArcaneSpellPower)) * sfBonus
-					}
-					if spellCast.ActionID.SpellID == SpellIDWrath {
-						spellEffect.BonusSpellPower += (spellCast.Character.GetStat(stats.SpellPower) + spellCast.Character.GetStat(stats.NatureSpellPower)) * wrathBonus
-					}
-				},
-			}
-		})
-	}
+	char.AddStat(stats.SpellHit, float64(talents.BalanceOfPower) * 2 * core.SpellHitRatingPerHitChance)
 
 	char.AddStatDependency(stats.StatDependency{
 		SourceStat:   stats.Intellect,
@@ -175,7 +156,7 @@ func NewDruid(char core.Character, selfBuffs SelfBuffs, talents proto.DruidTalen
 	})
 
 	if talents.LunarGuidance > 0 {
-		bonus := 0.083 * float64(talents.LunarGuidance)
+		bonus := (0.25 / 3) * float64(talents.LunarGuidance)
 		char.AddStatDependency(stats.StatDependency{
 			SourceStat:   stats.Intellect,
 			ModifiedStat: stats.SpellPower,
@@ -186,7 +167,7 @@ func NewDruid(char core.Character, selfBuffs SelfBuffs, talents proto.DruidTalen
 	}
 
 	if talents.Dreamstate > 0 {
-		bonus := 0.0333 * float64(talents.Dreamstate)
+		bonus := (10 / 3) * float64(talents.Dreamstate)
 		char.AddStatDependency(stats.StatDependency{
 			SourceStat:   stats.Intellect,
 			ModifiedStat: stats.MP5,

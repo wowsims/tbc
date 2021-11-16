@@ -51,6 +51,8 @@ func (druid *Druid) newStarfireTemplate(sim *core.Simulation, rank int) core.Sin
 		effect.SpellCoefficient = 0.99
 	}
 
+	effect.SpellCoefficient += 0.04 * float64(druid.Talents.WrathOfCenarius)
+
 	// TODO: Applies to both starfire and moonfire
 	baseCast.CastTime -= time.Millisecond * 100 * time.Duration(druid.Talents.StarlightWrath)
 	effect.SpellEffect.BonusSpellCritRating += float64(druid.Talents.FocusedStarlight) * 2 * core.SpellCritRatingPerCritChance // 2% crit per point
@@ -61,7 +63,6 @@ func (druid *Druid) newStarfireTemplate(sim *core.Simulation, rank int) core.Sin
 	baseCast.CritMultiplier = (baseCast.CritMultiplier-1)*(1+float64(druid.Talents.Vengeance)*0.2) + 1
 	baseCast.ManaCost -= baseCast.BaseManaCost * float64(druid.Talents.Moonglow) * 0.03
 	effect.SpellEffect.DamageMultiplier *= 1 + 0.02*float64(druid.Talents.Moonfury)
-	effect.SpellEffect.BonusSpellHitRating += float64(druid.Talents.BalanceOfPower) * 2 * core.SpellHitRatingPerHitChance
 
 	if druid.Equip[items.ItemSlotRanged].ID == IvoryMoongoddess {
 		effect.SpellEffect.BonusSpellPower += 55

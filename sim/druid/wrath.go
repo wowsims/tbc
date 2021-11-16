@@ -34,7 +34,7 @@ func (druid *Druid) newWrathTemplate(sim *core.Simulation) core.SingleTargetDire
 		DirectDamageSpellInput: core.DirectDamageSpellInput{
 			MinBaseDamage:    383,
 			MaxBaseDamage:    432,
-			SpellCoefficient: 0.571,
+			SpellCoefficient: 0.571 + 0.02 * float64(druid.Talents.WrathOfCenarius),
 		},
 	}
 
@@ -48,7 +48,6 @@ func (druid *Druid) newWrathTemplate(sim *core.Simulation) core.SingleTargetDire
 	baseCast.CritMultiplier = (baseCast.CritMultiplier-1)*(1+float64(druid.Talents.Vengeance)*0.2) + 1
 	baseCast.ManaCost -= baseCast.BaseManaCost * float64(druid.Talents.Moonglow) * 0.03
 	effect.SpellEffect.DamageMultiplier *= 1 + 0.02*float64(druid.Talents.Moonfury)
-	effect.SpellEffect.BonusSpellHitRating += float64(druid.Talents.BalanceOfPower) * 2 * core.SpellHitRatingPerHitChance
 
 	if druid.Equip[items.ItemSlotRanged].ID == IdolAvenger {
 		effect.SpellEffect.BonusSpellPower += 25

@@ -194,43 +194,44 @@ type OnDamageTick func(*Simulation)
 //  For now the only way for a caster to track their dot is to keep a reference to the cast object
 //  that started this and check the DotDamageInput.IsTicking()
 type DotDamageInput struct {
-	Name             string
-	BaseDamage       float64
-	NumberTicks      int           // total time to tick for
-	TickLength       time.Duration // how often to fire OnDamageTick
-	SpellCoefficient float64
+	Name                 string
+	NumberOfTicks        int           // number of ticks over the whole duration
+	TickLength           time.Duration // time between each tick
+	TickBaseDamage       float64
+	TickSpellCoefficient float64
 
 	OnDamageTick OnDamageTick // TODO: Do we need an OnExpire?
 
-	DamagePerTick float64
-	FinalTickTime time.Duration
-	TickIndex     int
+	// Internal fields
+	damagePerTick float64
+	finalTickTime time.Duration
+	tickIndex     int
 }
 
 func (ddi DotDamageInput) TimeRemaining(sim *Simulation) time.Duration {
-	return MaxDuration(0, ddi.FinalTickTime-sim.CurrentTime)
+	return MaxDuration(0, ddi.finalTickTime-sim.CurrentTime)
 }
 
 func (ddi DotDamageInput) IsTicking(sim *Simulation) bool {
 	// It is possible that both cast and tick are to happen at the same time.
 	//  In this case the dot "time remaining" will be 0 but there will be ticks left.
-	//  If a DOT misses then it will have NumberTicks set but never have been started.
+	//  If a DOT misses then it will have NumberOfTicks set but never have been started.
 	//  So the case of 'has a final tick time but its now, but it has ticks remaining' looks like this.
-	return (ddi.FinalTickTime != 0 && ddi.TickIndex < ddi.NumberTicks)
+	return (ddi.finalTickTime != 0 && ddi.tickIndex < ddi.NumberOfTicks)
 }
 
 func (spellEffect *SpellEffect) applyDot(sim *Simulation, spellCast *SpellCast, ddInput *DotDamageInput) {
 	totalSpellPower := spellCast.Character.GetStat(stats.SpellPower) + spellCast.Character.GetStat(spellCast.SpellSchool) + spellEffect.BonusSpellPower
 	// snapshot total damage per tick
-	ddInput.DamagePerTick = ddInput.BaseDamage/float64(ddInput.NumberTicks) + totalSpellPower*ddInput.SpellCoefficient
-	ddInput.FinalTickTime = sim.CurrentTime + time.Duration(ddInput.NumberTicks)*ddInput.TickLength
+	ddInput.damagePerTick = ddInput.TickBaseDamage + totalSpellPower*ddInput.TickSpellCoefficient
+	ddInput.finalTickTime = sim.CurrentTime + time.Duration(ddInput.NumberOfTicks)*ddInput.TickLength
 
 	pa := &PendingAction{
 		NextActionAt: sim.CurrentTime + ddInput.TickLength,
 	}
 
 	pa.OnAction = func(sim *Simulation) {
-		damage := ddInput.DamagePerTick
+		damage := ddInput.damagePerTick
 		damage = calculateResists(sim, damage, spellEffect)
 
 		if sim.Log != nil {
@@ -243,8 +244,8 @@ func (spellEffect *SpellEffect) applyDot(sim *Simulation, spellCast *SpellCast, 
 			ddInput.OnDamageTick(sim)
 		}
 
-		ddInput.TickIndex++
-		if ddInput.TickIndex < ddInput.NumberTicks {
+		ddInput.tickIndex++
+		if ddInput.tickIndex < ddInput.NumberOfTicks {
 			// add more pending
 			pa.NextActionAt = sim.CurrentTime + ddInput.TickLength
 		} else {

@@ -31,8 +31,8 @@ func TestNordBonus(t *testing.T) {
 			Gear:          P2Gear,
 		},
 
-		ExpectedDpsShort: 1909.6,
-		ExpectedDpsLong:  1766.9,
+		ExpectedDpsShort: 1860.2,
+		ExpectedDpsLong:  1685.3,
 	})
 }
 
@@ -55,8 +55,8 @@ func TestSimulateP1Starfire(t *testing.T) {
 			Gear:          P1Gear,
 		},
 
-		ExpectedDpsShort: 1476.3,
-		ExpectedDpsLong:  1423.0,
+		ExpectedDpsShort: 1453.1,
+		ExpectedDpsLong:  1460.4,
 	})
 }
 
@@ -79,7 +79,7 @@ func TestSimulateP1Wrath(t *testing.T) {
 			Gear:          P1Gear,
 		},
 
-		ExpectedDpsShort: 1224.1,
-		ExpectedDpsLong:  1055.4,
+		ExpectedDpsShort: 1185.2,
+		ExpectedDpsLong:  1241.4,
 	})
 }

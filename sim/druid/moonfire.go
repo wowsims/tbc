@@ -34,11 +34,11 @@ func (druid *Druid) newMoonfireTemplate(sim *core.Simulation) core.DamageOverTim
 			SpellCoefficient: 0.15,
 		},
 		DotInput: core.DotDamageInput{
-			Name:             "Moonfire DoT",
-			NumberTicks:      4,
-			TickLength:       time.Second * 3,
-			BaseDamage:       600,
-			SpellCoefficient: 0.13,
+			Name:                 "Moonfire DoT",
+			NumberOfTicks:        4,
+			TickLength:           time.Second * 3,
+			TickBaseDamage:       600 / 4,
+			TickSpellCoefficient: 0.13,
 
 			// TODO: does druid care about dot ticks?
 			// OnDamageTick: func(sim *core.Simulation) {},
@@ -46,7 +46,7 @@ func (druid *Druid) newMoonfireTemplate(sim *core.Simulation) core.DamageOverTim
 	}
 
 	if ItemSetThunderheart.CharacterHasSetBonus(&druid.Character, 2) { // Thunderheart 2p adds 1 extra tick to moonfire
-		effect.DotInput.NumberTicks += 1
+		effect.DotInput.NumberOfTicks += 1
 	}
 
 	// Moonfire only talents
@@ -54,7 +54,6 @@ func (druid *Druid) newMoonfireTemplate(sim *core.Simulation) core.DamageOverTim
 	effect.SpellEffect.BonusSpellCritRating += float64(druid.Talents.ImprovedMoonfire) * 5 * core.SpellCritRatingPerCritChance
 
 	// TODO: Shared talents
-	effect.SpellEffect.BonusSpellCritRating += float64(druid.Talents.FocusedStarlight) * 2 * core.SpellCritRatingPerCritChance // 2% crit per point
 	baseCast.ManaCost -= baseCast.BaseManaCost * float64(druid.Talents.Moonglow) * 0.03
 	effect.SpellEffect.DamageMultiplier *= 1 + 0.02*float64(druid.Talents.Moonfury)
 	// Convert to percent, multiply by percent increase, convert back to multiplier by adding 1
