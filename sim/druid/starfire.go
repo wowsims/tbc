@@ -94,9 +94,6 @@ func (druid *Druid) NewStarfire(sim *core.Simulation, target *core.Target, rank 
 		druid.starfire6CastTemplate.Apply(sf)
 	}
 
-	// Dynamically apply.
-	sf.Effect.BonusSpellPower += (druid.GetStat(stats.SpellPower) + druid.GetStat(stats.ArcaneSpellPower)) * 0.04 * float64(druid.Talents.WrathOfCenarius)
-
 	// Applies nature's grace cast time reduction if available.
 	druid.applyNaturesGrace(&sf.SpellCast)
 
