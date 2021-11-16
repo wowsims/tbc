@@ -167,7 +167,7 @@ func NewDruid(char core.Character, selfBuffs SelfBuffs, talents proto.DruidTalen
 	}
 
 	if talents.Dreamstate > 0 {
-		bonus := (10 / 3) * float64(talents.Dreamstate)
+		bonus := (0.1 / 3) * float64(talents.Dreamstate)
 		char.AddStatDependency(stats.StatDependency{
 			SourceStat:   stats.Intellect,
 			ModifiedStat: stats.MP5,

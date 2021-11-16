@@ -31,8 +31,8 @@ func TestNordBonus(t *testing.T) {
 			Gear:          P2Gear,
 		},
 
-		ExpectedDpsShort: 1860.2,
-		ExpectedDpsLong:  1685.3,
+		ExpectedDpsShort: 1895.9,
+		ExpectedDpsLong:  1754.4,
 	})
 }
 
@@ -55,8 +55,8 @@ func TestSimulateP1Starfire(t *testing.T) {
 			Gear:          P1Gear,
 		},
 
-		ExpectedDpsShort: 1447.9,
-		ExpectedDpsLong:  1455.1,
+		ExpectedDpsShort: 1506.0,
+		ExpectedDpsLong:  1453.6,
 	})
 }
 
@@ -79,7 +79,25 @@ func TestSimulateP1Wrath(t *testing.T) {
 			Gear:          P1Gear,
 		},
 
-		ExpectedDpsShort: 1185.2,
-		ExpectedDpsLong:  1241.4,
+		ExpectedDpsShort: 1272.2,
+		ExpectedDpsLong:  1095.2,
 	})
+}
+
+func TestAverageDPS(t *testing.T) {
+	isr := core.NewIndividualSimRequest(core.IndividualSimInputs{
+		Gear:     P1Gear,
+		Race:     proto.Race_RaceNightElf,
+		Class:    proto.Class_ClassDruid,
+		Consumes: FullConsumes,
+
+		RaidBuffs:       FullRaidBuffs,
+		PartyBuffs:      FullPartyBuffs,
+		IndividualBuffs: FullIndividualBuffs,
+
+		Target:        FullDebuffTarget,
+		PlayerOptions: PlayerOptionsStarfire,
+	})
+
+	core.IndividualSimAverageTest("P1Average", t, isr, 1433.0)
 }
