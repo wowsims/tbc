@@ -94,10 +94,10 @@ var InnervateCD = core.NewCooldownID()
 var InnervateAuraID = core.NewAuraID()
 
 func (druid *Druid) TryInnervate(sim *core.Simulation) bool {
-	// Currently just activates innervate on self when own mana is <75%
+	// Currently just activates innervate on self when own mana is <33%
 	// TODO: get a real recommendation when to use this.
 	if druid.SelfBuffs.Innervate && druid.GetRemainingCD(InnervateCD, sim.CurrentTime) == 0 {
-		if druid.GetStat(stats.Mana)/druid.MaxMana() < 0.75 {
+		if druid.GetStat(stats.Mana)/druid.MaxMana() < 0.33 {
 			oldRegen := druid.PsuedoStats.SpiritRegenRateCasting
 			druid.PsuedoStats.SpiritRegenRateCasting = 1.0
 			druid.PsuedoStats.ManaRegenMultiplier *= 5.0
@@ -145,7 +145,7 @@ func (druid *Druid) applyNaturesGrace(spellCast *core.SpellCast) {
 
 func NewDruid(char core.Character, selfBuffs SelfBuffs, talents proto.DruidTalents) Druid {
 
-	char.AddStat(stats.SpellHit, float64(talents.BalanceOfPower) * 2 * core.SpellHitRatingPerHitChance)
+	char.AddStat(stats.SpellHit, float64(talents.BalanceOfPower)*2*core.SpellHitRatingPerHitChance)
 
 	char.AddStatDependency(stats.StatDependency{
 		SourceStat:   stats.Intellect,
