@@ -34,7 +34,7 @@ var Gems = []Gem{
 	{ID: 23101, Name: "Potent Flame Spessarite", Quality: proto.ItemQuality_ItemQualityUncommon, Phase: 1, Color: proto.GemColor_GemColorOrange, Stats: stats.Stats{stats.SpellCrit: 3, stats.SpellPower: 4}},
 	{ID: 24059, Name: "Potent Noble Topaz", Quality: proto.ItemQuality_ItemQualityRare, Phase: 1, Color: proto.GemColor_GemColorOrange, Stats: stats.Stats{stats.SpellCrit: 4, stats.SpellPower: 5}},
 	{ID: 32218, Name: "Potent Pyrestone", Quality: proto.ItemQuality_ItemQualityEpic, Phase: 3, Color: proto.GemColor_GemColorOrange, Stats: stats.Stats{stats.SpellCrit: 5, stats.SpellPower: 6}},
-	{ID: 35760, Name: "Reckless Pyrestone", Quality: proto.ItemQuality_ItemQualityEpic, Phase: 3, Color: proto.GemColor_GemColorOrange, Stats: stats.Stats{stats.SpellHaste: 5, stats.SpellPower: 6}},
+	{ID: 35760, Name: "Reckless Pyrestone", Quality: proto.ItemQuality_ItemQualityEpic, Phase: 5, Color: proto.GemColor_GemColorOrange, Stats: stats.Stats{stats.SpellHaste: 5, stats.SpellPower: 6}},
 	{ID: 30588, Name: "Potent Fire Opal", Quality: proto.ItemQuality_ItemQualityEpic, Phase: 1, Color: proto.GemColor_GemColorOrange, Stats: stats.Stats{stats.SpellPower: 6, stats.SpellCrit: 4}, Unique: true},
 	{ID: 28123, Name: "Potent Ornate Topaz", Quality: proto.ItemQuality_ItemQualityEpic, Phase: 1, Color: proto.GemColor_GemColorOrange, Stats: stats.Stats{stats.SpellPower: 6, stats.SpellCrit: 5}, Unique: true},
 	{ID: 31866, Name: "Veiled Flame Spessarite", Quality: proto.ItemQuality_ItemQualityUncommon, Phase: 1, Color: proto.GemColor_GemColorOrange, Stats: stats.Stats{stats.SpellHit: 3, stats.SpellPower: 4}},

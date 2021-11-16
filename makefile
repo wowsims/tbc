@@ -57,7 +57,7 @@ $(OUT_DIR)/%/index.html: ui/index_template.html
 wasm: $(OUT_DIR)/lib.wasm
 
 # Builds the generic .wasm, with all items included.
-$(OUT_DIR)/lib.wasm: sim/wasm/* sim/core/proto/api.pb.go $(filter-out $(wildcard sim/core/items/*), $(call rwildcard,sim,*.go))
+$(OUT_DIR)/lib.wasm: sim/wasm/* sim/core/proto/api.pb.go $(call rwildcard,sim,*.go)
 	GOOS=js GOARCH=wasm go build -o ./$(OUT_DIR)/lib.wasm ./sim/wasm/
 
 # Generic sim_worker that uses the generic lib.wasm
