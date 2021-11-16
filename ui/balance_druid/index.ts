@@ -38,6 +38,7 @@ const theme = new DefaultTheme<Spec.SpecBalanceDruid>(document.body, {
 		// All stats for which EP should be calculated.
 		epStats: [
 			Stat.StatIntellect,
+			Stat.StatSpirit,
 			Stat.StatSpellPower,
 			Stat.StatArcaneSpellPower,
 			Stat.StatNatureSpellPower,
@@ -52,6 +53,7 @@ const theme = new DefaultTheme<Spec.SpecBalanceDruid>(document.body, {
 		displayStats: [
 			Stat.StatStamina,
 			Stat.StatIntellect,
+			Stat.StatSpirit,
 			Stat.StatSpellPower,
 			Stat.StatArcaneSpellPower,
 			Stat.StatNatureSpellPower,
