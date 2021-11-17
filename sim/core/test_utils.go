@@ -172,6 +172,9 @@ func IndividualBenchmark(b *testing.B, isr *proto.IndividualSimRequest) {
 	isr.Encounter.Duration = LongDuration
 	isr.SimOptions.Iterations = 1000
 
+	// Set to false because IsTest adds a lot of computation.
+	isr.SimOptions.IsTest = false
+
 	for i := 0; i < b.N; i++ {
 		sim := NewIndividualSim(*isr)
 		sim.Run()
