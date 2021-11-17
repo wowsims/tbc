@@ -51,7 +51,7 @@ export const P1_ALLIANCE_BIS = {
 				id: 21848, // Spellfire Robe
 				enchant: Enchants.CHEST_EXCEPTIONAL_STATS,
 				gems: [
-					Gems.RUNED_LIVING_RUBY,
+					Gems.VEILED_NOBLE_TOPAZ,
 					Gems.GLOWING_NIGHTSEYE,
 				],
 			}),
@@ -73,8 +73,8 @@ export const P1_ALLIANCE_BIS = {
 			ItemSpec.create({
 				id: 21846, // Spellfire Belt
 				gems: [
-					Gems.RUNED_LIVING_RUBY,
-					Gems.RUNED_LIVING_RUBY,
+					Gems.VEILED_NOBLE_TOPAZ,
+					Gems.VEILED_NOBLE_TOPAZ,
 				],
 			}),
 			ItemSpec.create({
@@ -90,7 +90,7 @@ export const P1_ALLIANCE_BIS = {
 				id: 28517, // Boots of Foretelling
 				enchant: Enchants.BOARS_SPEED,
 				gems: [
-					Gems.RUNED_LIVING_RUBY,
+					Gems.VEILED_NOBLE_TOPAZ,
 					Gems.RUNED_LIVING_RUBY,
 				],
 			}),
@@ -256,7 +256,7 @@ export const P2_ALLIANCE_BIS = {
 				enchant: Enchants.SUBTLETY,
 			}),
 			ItemSpec.create({
-				id: 30231, // Nordrassil Chestpiece
+				id: 30107, // Vestments of the Sea-Witch
 				enchant: Enchants.CHEST_EXCEPTIONAL_STATS,
 				gems: [
 					Gems.RUNED_LIVING_RUBY,
@@ -269,11 +269,9 @@ export const P2_ALLIANCE_BIS = {
 				enchant: Enchants.WRIST_SPELLPOWER,
 			}),
 			ItemSpec.create({
-				id: 21847, // Spellfire Gloves
+				id: 30232, // Nordrassil Gauntlets
 				enchant: Enchants.GLOVES_SPELLPOWER,
 				gems: [
-					Gems.POTENT_NOBLE_TOPAZ,
-					Gems.POTENT_NOBLE_TOPAZ,
 				],
 			}),
 			ItemSpec.create({
@@ -284,14 +282,16 @@ export const P2_ALLIANCE_BIS = {
 				],
 			}),
 			ItemSpec.create({
-				id: 30234, // Nordrassil Wrath-Kilt
+				id: 24262, // Spellstrike Pants
 				enchant: Enchants.RUNIC_SPELLTHREAD,
 				gems: [
+					Gems.RUNED_LIVING_RUBY,
+					Gems.RUNED_LIVING_RUBY,
 					Gems.RUNED_LIVING_RUBY,
 				],
 			}),
 			ItemSpec.create({
-				id: 30037, // Boots of Blasting
+				id: 30067, // Velvet Boots of the Guardian
 				enchant: Enchants.BOARS_SPEED,
 			}),
 			ItemSpec.create({
@@ -329,7 +329,7 @@ export const P2_HORDE_BIS = {
 				id: 30233, // Nordrassil Headpiece
 				enchant: Enchants.GLYPH_OF_POWER,
 				gems: [
-					Gems.POTENT_NOBLE_TOPAZ,
+					Gems.VEILED_NOBLE_TOPAZ,
 					Gems.CHAOTIC_SKYFIRE_DIAMOND,
 				],
 			}),
@@ -341,7 +341,7 @@ export const P2_HORDE_BIS = {
 				enchant: Enchants.GREATER_INSCRIPTION_OF_DISCIPLINE,
 				gems: [
 					Gems.GLOWING_NIGHTSEYE,
-					Gems.POTENT_NOBLE_TOPAZ,
+					Gems.VEILED_NOBLE_TOPAZ,
 				],
 			}),
 			ItemSpec.create({
@@ -365,26 +365,26 @@ export const P2_HORDE_BIS = {
 				id: 30232, // Nordrassil Gauntlets
 				enchant: Enchants.GLOVES_SPELLPOWER,
 				gems: [
-					Gems.POTENT_NOBLE_TOPAZ,
-					Gems.POTENT_NOBLE_TOPAZ,
 				],
 			}),
 			ItemSpec.create({
 				id: 30038, // Belt of Blasting
 				gems: [
 					Gems.GLOWING_NIGHTSEYE,
-					Gems.POTENT_NOBLE_TOPAZ,
+					Gems.VEILED_NOBLE_TOPAZ,
 				],
 			}),
 			ItemSpec.create({
-				id: 30234, // Nordrassil Wrath-Kilt
+				id: 24262, // Spellstrike Pants
 				enchant: Enchants.RUNIC_SPELLTHREAD,
 				gems: [
+					Gems.RUNED_LIVING_RUBY,
+					Gems.RUNED_LIVING_RUBY,
 					Gems.RUNED_LIVING_RUBY,
 				],
 			}),
 			ItemSpec.create({
-				id: 30037, // Boots of Blasting
+				id: 30067, // Velvet Boots of the Guardian
 				enchant: Enchants.BOARS_SPEED,
 			}),
 			ItemSpec.create({
