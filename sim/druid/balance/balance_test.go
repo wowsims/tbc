@@ -31,7 +31,7 @@ func TestNordBonus(t *testing.T) {
 			Gear:          P2Gear,
 		},
 
-		ExpectedDpsShort: 1621.1,
+		ExpectedDpsShort: 1613.3,
 		ExpectedDpsLong:  1536.4,
 	})
 }
@@ -55,7 +55,7 @@ func TestSimulateP1Starfire(t *testing.T) {
 			Gear:          P1Gear,
 		},
 
-		ExpectedDpsShort: 1510.2,
+		ExpectedDpsShort: 1457.4,
 		ExpectedDpsLong:  1367.9,
 	})
 }
@@ -79,8 +79,8 @@ func TestSimulateP1Wrath(t *testing.T) {
 			Gear:          P1Gear,
 		},
 
-		ExpectedDpsShort: 1320.4,
-		ExpectedDpsLong:  1162.7,
+		ExpectedDpsShort: 1312.5,
+		ExpectedDpsLong:  1160.1,
 	})
 }
 
@@ -99,5 +99,5 @@ func TestAverageDPS(t *testing.T) {
 		PlayerOptions: PlayerOptionsStarfire,
 	})
 
-	core.IndividualSimAverageTest("P1Average", t, isr, 1324.8)
+	core.IndividualSimAverageTest("P1Average", t, isr, 1319.3)
 }

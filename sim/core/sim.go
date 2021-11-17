@@ -188,8 +188,11 @@ func (sim *Simulation) RunOnce() {
 		return sim.pendingActions[i].NextActionAt < sim.pendingActions[j].NextActionAt
 	})
 
-	for sim.CurrentTime < sim.Duration {
+	for true {
 		pa := sim.pendingActions[0]
+		if pa.NextActionAt > sim.Duration {
+			break
+		}
 
 		if pa.NextActionAt > sim.CurrentTime {
 			sim.Advance(pa.NextActionAt - sim.CurrentTime)
