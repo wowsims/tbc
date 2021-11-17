@@ -50,8 +50,9 @@ message Raid {
 message SimOptions {
     int32 iterations = 1;
     int64 random_seed = 2;
-    bool debug = 3; // enables debug logging.
+    bool debug = 3; // Enables debug logging.
     bool exit_on_oom = 4;
+		bool is_test = 5; // Only used internally.
 }
 
 // RPC IndividualSim

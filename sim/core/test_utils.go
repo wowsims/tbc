@@ -8,9 +8,6 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-// Use same seed to get same result on every run.
-const RSeed = int64(1)
-
 const ShortDuration = 60
 const LongDuration = 300
 
@@ -66,7 +63,7 @@ func NewIndividualSimRequest(inputs IndividualSimInputs) *proto.IndividualSimReq
 		isr.SimOptions = &proto.SimOptions{}
 	}
 	isr.SimOptions.Iterations = 1
-	isr.SimOptions.RandomSeed = RSeed
+	isr.SimOptions.IsTest = true
 	isr.SimOptions.Debug = false
 
 	return isr
@@ -174,6 +171,9 @@ func IndividualSimAllEncountersTest(testOpts AllEncountersTestOptions) {
 func IndividualBenchmark(b *testing.B, isr *proto.IndividualSimRequest) {
 	isr.Encounter.Duration = LongDuration
 	isr.SimOptions.Iterations = 1000
+
+	// Set to false because IsTest adds a lot of computation.
+	isr.SimOptions.IsTest = false
 
 	for i := 0; i < b.N; i++ {
 		sim := NewIndividualSim(*isr)

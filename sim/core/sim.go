@@ -28,6 +28,10 @@ type Simulation struct {
 
 	rand *rand.Rand
 
+	// Used for testing only, see RandomFloat().
+	isTest    bool
+	testRands map[uint32]*rand.Rand
+
 	// Current Simulation State
 	pendingActions []*PendingAction
 	CurrentTime    time.Duration // duration that has elapsed in the sim since starting
@@ -67,17 +71,35 @@ func newSim(raid *Raid, encounter Encounter, simOptions proto.SimOptions) *Simul
 
 		rand: rand.New(rand.NewSource(rseed)),
 
+		isTest:    simOptions.IsTest,
+		testRands: make(map[uint32]*rand.Rand),
+
 		MetricsAggregator: NewMetricsAggregator(raid.Size(), encounter.Duration),
 	}
 }
 
-// Returns a random float. Label is for debugging, to check whether the order
-// of RandomFloat() calls has changed. Uncomment the log statements to use it.
+// Returns a random float.
+//
+// In tests, although we can set the initial seed, test results are still very
+// sensitive to the exact order of RandomFloat() calls. To mitigate this, when
+// testing we use a separate rand object for each RandomFloat callsite,
+// distinguished by the label string.
 func (sim *Simulation) RandomFloat(label string) float64 {
+	if !sim.isTest {
+		return sim.rand.Float64()
+	}
+
 	// if sim.Log != nil {
 	// 	sim.Log("FLOAT64 FROM: %s\n", label)
 	// }
-	return sim.rand.Float64()
+
+	labelHash := hash(label)
+	labelRand, isPresent := sim.testRands[labelHash]
+	if !isPresent {
+		labelRand = rand.New(rand.NewSource(int64(labelHash)))
+		sim.testRands[labelHash] = labelRand
+	}
+	return labelRand.Float64()
 }
 
 // Get the metrics for an invidual Agent, for the current iteration.

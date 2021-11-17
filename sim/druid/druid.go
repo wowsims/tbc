@@ -96,6 +96,7 @@ var InnervateAuraID = core.NewAuraID()
 func (druid *Druid) TryInnervate(sim *core.Simulation) bool {
 	// Currently just activates innervate on self when own mana is <33%
 	// TODO: get a real recommendation when to use this.
+	// TODO re-implement as a cast, and add the mana cost.
 	if druid.SelfBuffs.Innervate && druid.GetRemainingCD(InnervateCD, sim.CurrentTime) == 0 {
 		if druid.GetStat(stats.Mana)/druid.MaxMana() < 0.33 {
 			druid.PseudoStats.ForceFullSpiritRegen = true

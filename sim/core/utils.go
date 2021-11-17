@@ -1,6 +1,7 @@
 package core
 
 import (
+	"hash/fnv"
 	"time"
 
 	"github.com/wowsims/tbc/sim/core/proto"
@@ -82,4 +83,10 @@ func GetTristateValueFloat(effect proto.TristateEffect, regularValue float64, im
 	} else {
 		return 0
 	}
+}
+
+func hash(s string) uint32 {
+	h := fnv.New32a()
+	h.Write([]byte(s))
+	return h.Sum32()
 }

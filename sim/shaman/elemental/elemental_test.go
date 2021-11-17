@@ -74,10 +74,10 @@ func TestCalcStatWeight(t *testing.T) {
 	})
 
 	core.StatWeightsTest("p1Full", t, isr, StatsToTest, ReferenceStat, stats.Stats{
-		stats.Intellect:  0.163,
-		stats.SpellPower: 0.704,
-		stats.SpellHit:   -0.053,
-		stats.SpellCrit:  0.556,
+		stats.Intellect:  0.183,
+		stats.SpellPower: 0.703,
+		stats.SpellHit:   0.100,
+		stats.SpellCrit:  0.579,
 	})
 }
 
@@ -105,8 +105,8 @@ func TestSimulatePreRaidNoBuffs(t *testing.T) {
 			Gear:          PreRaidGear,
 		},
 
-		ExpectedDpsShort: 828.0,
-		ExpectedDpsLong:  261.2,
+		ExpectedDpsShort: 1057.8,
+		ExpectedDpsLong:  364.7,
 	})
 }
 
@@ -129,8 +129,8 @@ func TestSimulatePreRaid(t *testing.T) {
 			Gear:          PreRaidGear,
 		},
 
-		ExpectedDpsShort: 1429.1,
-		ExpectedDpsLong:  1112.4,
+		ExpectedDpsShort: 1590.5,
+		ExpectedDpsLong:  1178.9,
 	})
 }
 
@@ -153,8 +153,8 @@ func TestSimulateP1(t *testing.T) {
 			Gear:          P1Gear,
 		},
 
-		ExpectedDpsShort: 1883.1,
-		ExpectedDpsLong:  1634.3,
+		ExpectedDpsShort: 2195.6,
+		ExpectedDpsLong:  1610.0,
 	})
 }
 func TestMultiTarget(t *testing.T) {
@@ -181,8 +181,8 @@ func TestMultiTarget(t *testing.T) {
 			Gear:          P1Gear,
 		},
 
-		ExpectedDpsShort: 2497.0,
-		ExpectedDpsLong:  1880.9,
+		ExpectedDpsShort: 2732.5,
+		ExpectedDpsLong:  1895.7,
 	})
 
 	core.IndividualSimAllEncountersTest(core.AllEncountersTestOptions{
@@ -208,8 +208,8 @@ func TestMultiTarget(t *testing.T) {
 			Gear:          P1Tidefury,
 		},
 
-		ExpectedDpsShort: 2504.6,
-		ExpectedDpsLong:  1918.8,
+		ExpectedDpsShort: 2743.7,
+		ExpectedDpsLong:  1954.4,
 	})
 }
 
@@ -232,8 +232,8 @@ func TestLBOnlyAgent(t *testing.T) {
 			Gear:          P1Gear,
 		},
 
-		ExpectedDpsShort: 1880.7,
-		ExpectedDpsLong:  1566.8,
+		ExpectedDpsShort: 2072.0,
+		ExpectedDpsLong:  1542.9,
 	})
 }
 
@@ -270,8 +270,8 @@ func TestClearcastAgent(t *testing.T) {
 			Gear:          P1Gear,
 		},
 
-		ExpectedDpsShort: 2023.1,
-		ExpectedDpsLong:  1675.5,
+		ExpectedDpsShort: 2165.1,
+		ExpectedDpsLong:  1614.6,
 	})
 }
 
