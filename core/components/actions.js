@@ -37,7 +37,7 @@ export class Actions extends Component {
                 epReferenceStat: epReferenceStat,
             });
             results.setPending();
-            const result = await simUI.sim.statWeights(statWeightsRequest);
+            const result = await simUI.player.statWeights(statWeightsRequest);
             results.setStatWeights(statWeightsRequest, result, epStats);
         });
     }
