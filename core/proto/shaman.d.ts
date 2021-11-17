@@ -67,6 +67,10 @@ export interface ShamanTalents {
      */
     lightningOverload: number;
     /**
+     * @generated from protobuf field: bool totemOfWrath = 33;
+     */
+    totemOfWrath: boolean;
+    /**
      * Enhancement
      *
      * @generated from protobuf field: int32 ancestral_knowledge = 15;

@@ -187,7 +187,7 @@ export class ShamanTalentsPicker extends TalentsPicker {
                         maxPoints: 5,
                     },
                     {
-                        //fieldName: 'totemOfWrath',
+                        fieldName: 'totemOfWrath',
                         location: {
                             rowIdx: 8,
                             colIdx: 1,
