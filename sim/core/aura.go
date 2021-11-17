@@ -210,7 +210,22 @@ func (at *auraTracker) advance(sim *Simulation) {
 	}
 }
 
-// addAura will add a new aura to the simulation. If there is a matching aura ID
+// ReplaceAura is like AddAura but an existing aura will not be removed/readded.
+// This means that 'OnExpire' will not fire off on the old aura.
+func (at *auraTracker) ReplaceAura(sim *Simulation, newAura Aura) {
+	if newAura.Expires <= sim.CurrentTime {
+		return // no need to waste time adding aura that doesn't last.
+	}
+
+	if at.HasAura(newAura.ID) {
+		at.auras[newAura.ID] = newAura
+		return
+	}
+
+	at.AddAura(sim, newAura)
+}
+
+// AddAura will add a new aura to the simulation. If there is a matching aura ID
 // it will be replaced with the newer aura.
 // Auras with duration of 0 will be logged as activating but never added to simulation Auras.
 func (at *auraTracker) AddAura(sim *Simulation, newAura Aura) {

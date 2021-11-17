@@ -26,8 +26,8 @@ func init() {
 		130,
 		time.Second*20,
 		core.MajorCooldown{
-			CooldownID: RestrainedEssenceOfSapphironCooldownID,
-			Cooldown: time.Minute * 2,
+			CooldownID:       RestrainedEssenceOfSapphironCooldownID,
+			Cooldown:         time.Minute * 2,
 			SharedCooldownID: core.OffensiveTrinketSharedCooldownID,
 		},
 	))
@@ -40,8 +40,8 @@ func init() {
 		150,
 		time.Second*20,
 		core.MajorCooldown{
-			CooldownID: LivingRubySerpentCooldownID,
-			Cooldown: time.Minute * 5,
+			CooldownID:       LivingRubySerpentCooldownID,
+			Cooldown:         time.Minute * 5,
 			SharedCooldownID: core.OffensiveTrinketSharedCooldownID,
 		},
 	))
@@ -54,8 +54,8 @@ func init() {
 		150,
 		time.Second*15,
 		core.MajorCooldown{
-			CooldownID: ScryersBloodgemCooldownID,
-			Cooldown: time.Second * 90,
+			CooldownID:       ScryersBloodgemCooldownID,
+			Cooldown:         time.Second * 90,
 			SharedCooldownID: core.OffensiveTrinketSharedCooldownID,
 		},
 	))
@@ -68,8 +68,8 @@ func init() {
 		150,
 		time.Second*15,
 		core.MajorCooldown{
-			CooldownID: XirisGiftCooldownID,
-			Cooldown: time.Second * 90,
+			CooldownID:       XirisGiftCooldownID,
+			Cooldown:         time.Second * 90,
 			SharedCooldownID: core.OffensiveTrinketSharedCooldownID,
 		},
 	))
@@ -82,8 +82,8 @@ func init() {
 		155,
 		time.Second*20,
 		core.MajorCooldown{
-			CooldownID: IconOfTheSilverCrescentCooldownID,
-			Cooldown: time.Minute * 2,
+			CooldownID:       IconOfTheSilverCrescentCooldownID,
+			Cooldown:         time.Minute * 2,
 			SharedCooldownID: core.OffensiveTrinketSharedCooldownID,
 		},
 	))
@@ -96,8 +96,8 @@ func init() {
 		99,
 		time.Second*20,
 		core.MajorCooldown{
-			CooldownID: EssenceOfTheMartyrCooldownID,
-			Cooldown: time.Minute * 2,
+			CooldownID:       EssenceOfTheMartyrCooldownID,
+			Cooldown:         time.Minute * 2,
 			SharedCooldownID: core.DefensiveTrinketSharedCooldownID,
 		},
 	))
@@ -110,8 +110,8 @@ func init() {
 		175,
 		time.Second*20,
 		core.MajorCooldown{
-			CooldownID: SkullOfGuldanCooldownID,
-			Cooldown: time.Minute * 2,
+			CooldownID:       SkullOfGuldanCooldownID,
+			Cooldown:         time.Minute * 2,
 			SharedCooldownID: core.OffensiveTrinketSharedCooldownID,
 		},
 	))
@@ -124,8 +124,8 @@ func init() {
 		211,
 		time.Second*20,
 		core.MajorCooldown{
-			CooldownID: HexShrunkenHeadCooldownID,
-			Cooldown: time.Minute * 2,
+			CooldownID:       HexShrunkenHeadCooldownID,
+			Cooldown:         time.Minute * 2,
 			SharedCooldownID: core.OffensiveTrinketSharedCooldownID,
 		},
 	))
@@ -138,8 +138,8 @@ func init() {
 		320,
 		time.Second*15,
 		core.MajorCooldown{
-			CooldownID: ShiftingNaaruSliverCooldownID,
-			Cooldown: time.Second * 90,
+			CooldownID:       ShiftingNaaruSliverCooldownID,
+			Cooldown:         time.Second * 90,
 			SharedCooldownID: core.OffensiveTrinketSharedCooldownID,
 		},
 	))
@@ -152,19 +152,20 @@ func init() {
 		155,
 		time.Second*20,
 		core.MajorCooldown{
-			CooldownID: DarkIronSmokingPipeCooldownID,
-			Cooldown: time.Minute * 2,
+			CooldownID:       DarkIronSmokingPipeCooldownID,
+			Cooldown:         time.Minute * 2,
 			SharedCooldownID: core.OffensiveTrinketSharedCooldownID,
 		},
 	))
 }
 
 var MarkOfTheChampionCasterAuraID = core.NewAuraID()
+
 func ApplyMarkOfTheChampionCaster(agent core.Agent) {
 	agent.GetCharacter().AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		return core.Aura{
-			ID:      MarkOfTheChampionCasterAuraID,
-			Name:    "Mark of the Champion (Caster)",
+			ID:   MarkOfTheChampionCasterAuraID,
+			Name: "Mark of the Champion (Caster)",
 			OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 				if spellEffect.Target.MobType == proto.MobType_MobTypeDemon || spellEffect.Target.MobType == proto.MobType_MobTypeUndead {
 					spellEffect.BonusSpellPower += 85
@@ -176,6 +177,7 @@ func ApplyMarkOfTheChampionCaster(agent core.Agent) {
 
 var QuagmirransEyeAuraID = core.NewAuraID()
 var FungalFrenzyAuraID = core.NewAuraID()
+
 func ApplyQuagmirransEye(agent core.Agent) {
 	character := agent.GetCharacter()
 	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
@@ -184,8 +186,8 @@ func ApplyQuagmirransEye(agent core.Agent) {
 		icd := core.NewICD()
 
 		return core.Aura{
-			ID:      QuagmirransEyeAuraID,
-			Name:    "Quagmirran's Eye",
+			ID:   QuagmirransEyeAuraID,
+			Name: "Quagmirran's Eye",
 			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
 				if !icd.IsOnCD(sim) && sim.RandomFloat("quags") < 0.1 {
 					icd = core.InternalCD(sim.CurrentTime + dur)
@@ -198,6 +200,7 @@ func ApplyQuagmirransEye(agent core.Agent) {
 
 var ShiffarsNexusHornAuraID = core.NewAuraID()
 var CallOfTheNexusAuraID = core.NewAuraID()
+
 func ApplyShiffarsNexusHorn(agent core.Agent) {
 	character := agent.GetCharacter()
 	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
@@ -206,8 +209,8 @@ func ApplyShiffarsNexusHorn(agent core.Agent) {
 		const dur = time.Second * 45
 
 		return core.Aura{
-			ID:      ShiffarsNexusHornAuraID,
-			Name:    "Shiffar's Nexus-Horn",
+			ID:   ShiffarsNexusHornAuraID,
+			Name: "Shiffar's Nexus-Horn",
 			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 				if spellCast.ActionID.ItemID == core.ItemIDTheLightningCapacitor {
 					return // TLC can't proc Sextant
@@ -223,6 +226,7 @@ func ApplyShiffarsNexusHorn(agent core.Agent) {
 
 var EyeOfMagtheridonAuraID = core.NewAuraID()
 var RecurringPowerAuraID = core.NewAuraID()
+
 func ApplyEyeOfMagtheridon(agent core.Agent) {
 	character := agent.GetCharacter()
 	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
@@ -230,8 +234,8 @@ func ApplyEyeOfMagtheridon(agent core.Agent) {
 		const dur = time.Second * 10
 
 		return core.Aura{
-			ID:      EyeOfMagtheridonAuraID,
-			Name:    "Eye of Magtheridon",
+			ID:   EyeOfMagtheridonAuraID,
+			Name: "Eye of Magtheridon",
 			OnSpellMiss: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 				character.AddAuraWithTemporaryStats(sim, RecurringPowerAuraID, "Recurring Power", stats.SpellPower, spellBonus, dur)
 			},
@@ -241,6 +245,7 @@ func ApplyEyeOfMagtheridon(agent core.Agent) {
 
 var SextantOfUnstableCurrentsAuraID = core.NewAuraID()
 var UnstableCurrentsAuraID = core.NewAuraID()
+
 func ApplySextantOfUnstableCurrents(agent core.Agent) {
 	character := agent.GetCharacter()
 	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
@@ -250,8 +255,8 @@ func ApplySextantOfUnstableCurrents(agent core.Agent) {
 		const icdDur = time.Second * 45
 
 		return core.Aura{
-			ID:      SextantOfUnstableCurrentsAuraID,
-			Name:    "Sextant of Unstable Currents",
+			ID:   SextantOfUnstableCurrentsAuraID,
+			Name: "Sextant of Unstable Currents",
 			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 				if spellCast.ActionID.ItemID == core.ItemIDTheLightningCapacitor {
 					return // TLC can't proc Sextant
@@ -267,6 +272,7 @@ func ApplySextantOfUnstableCurrents(agent core.Agent) {
 
 var DarkmoonCardCrusadeAuraID = core.NewAuraID()
 var AuraOfTheCrusadeAuraID = core.NewAuraID()
+
 func ApplyDarkmoonCardCrusade(agent core.Agent) {
 	character := agent.GetCharacter()
 	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
@@ -274,24 +280,26 @@ func ApplyDarkmoonCardCrusade(agent core.Agent) {
 		stacks := 0
 
 		return core.Aura{
-			ID:      DarkmoonCardCrusadeAuraID,
-			Name:    "Darkmoon Card Crusade",
+			ID:   DarkmoonCardCrusadeAuraID,
+			Name: "Darkmoon Card Crusade",
 			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
 				if stacks < 10 {
 					stacks++
 					character.AddStat(stats.SpellPower, spellBonus)
 				}
+
 				// Removal aura will refresh with new total spellpower based on stacks.
 				//  This will remove the old stack removal buff.
-				character.AddAura(sim, core.Aura{
+				character.ReplaceAura(sim, core.Aura{
 					ID:      AuraOfTheCrusadeAuraID,
 					Name:    "Aura of the Crusade",
 					Expires: sim.CurrentTime + time.Second*10,
 					OnExpire: func(sim *core.Simulation) {
-						character.AddStat(stats.SpellPower, -spellBonus * float64(stacks))
+						character.AddStat(stats.SpellPower, -spellBonus*float64(stacks))
 						stacks = 0
 					},
 				})
+
 			},
 		}
 	})
