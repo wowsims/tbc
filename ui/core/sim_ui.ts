@@ -117,13 +117,20 @@ export abstract class SimUI<SpecType extends Spec> {
       // Remove leading '#'
       hash = hash.substring(1);
       try {
-        const binary = atob(hash);
-        const bytes = new Uint8Array(binary.length);
-        for (let i = 0; i < bytes.length; i++) {
-            bytes[i] = binary.charCodeAt(i);
+        let jsonData;
+        if (new URLSearchParams(window.location.search).has('uncompressed')) {
+          const jsonStr = atob(hash);
+          jsonData = JSON.parse(jsonStr);
+        } else {
+          const binary = atob(hash);
+          const bytes = new Uint8Array(binary.length);
+          for (let i = 0; i < bytes.length; i++) {
+              bytes[i] = binary.charCodeAt(i);
+          }
+          const jsonStr = pako.inflate(bytes, { to: 'string' });  
+          jsonData = JSON.parse(jsonStr);
         }
-        const jsonStr = pako.inflate(bytes, { to: 'string' });
-        this.fromJson(JSON.parse(jsonStr));
+        this.fromJson(jsonData);
         loadedSettings = true;
       } catch (e) {
         console.warn('Failed to parse settings from window hash: ' + e);
