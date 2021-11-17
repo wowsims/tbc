@@ -24,6 +24,7 @@ var StandardTalents = &proto.ShamanTalents{
 	CallOfThunder:      5,
 	Concussion:         5,
 	Convection:         5,
+	TotemOfWrath:       true,
 }
 
 var eleShamOptionsNoBuffs = &proto.ElementalShaman_Options{

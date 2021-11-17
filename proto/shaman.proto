@@ -19,6 +19,7 @@ message ShamanTalents {
     int32 lightning_mastery = 12;
     bool elemental_mastery = 13;
     int32 lightning_overload = 14;
+		bool totemOfWrath = 33;
 
     // Enhancement
     int32 ancestral_knowledge = 15;

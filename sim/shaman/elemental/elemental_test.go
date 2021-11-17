@@ -44,6 +44,8 @@ func TestP1FullCharacterStats(t *testing.T) {
 		stats.SpellHit:  87.8,
 		stats.SpellCrit: 695.705,
 
+		stats.AttackPower: 54.8,
+
 		stats.Mana:  10646,
 		stats.Armor: 9224.8,
 	})

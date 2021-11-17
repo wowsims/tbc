@@ -10,14 +10,16 @@ import (
 // TODO: add logic inside these to select each totem based on options on the shaman?
 
 func (shaman *Shaman) NewAirTotem() *core.NoEffectSpell {
+	manaCost := 360 * (1 - float64(shaman.Talents.TotemicFocus) * 0.05)
+
 	return &core.NoEffectSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
 				Name:            "Wrath of Air",
-				ActionID:        core.ActionID{SpellID: 3738}, // just using totem of wrath
+				ActionID:        core.ActionID{SpellID: 3738},
 				Character:       shaman.GetCharacter(),
-				BaseManaCost:    240,
-				ManaCost:        240,
+				BaseManaCost:    manaCost,
+				ManaCost:        manaCost,
 				CastTime:        time.Second * 1,
 				IgnoreCooldowns: true, // lets us override the GCD
 			},
@@ -26,14 +28,16 @@ func (shaman *Shaman) NewAirTotem() *core.NoEffectSpell {
 }
 
 func (shaman *Shaman) NewWaterTotem() *core.NoEffectSpell {
+	manaCost := 120 * (1 - float64(shaman.Talents.TotemicFocus) * 0.05)
+
 	return &core.NoEffectSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
 				Name:            "Mana Stream",
-				ActionID:        core.ActionID{SpellID: 25570}, // just using totem of wrath
+				ActionID:        core.ActionID{SpellID: 25570},
 				Character:       shaman.GetCharacter(),
-				BaseManaCost:    90,
-				ManaCost:        90,
+				BaseManaCost:    manaCost,
+				ManaCost:        manaCost,
 				CastTime:        time.Second * 1,
 				IgnoreCooldowns: true, // lets us override the GCD
 			},
@@ -42,14 +46,16 @@ func (shaman *Shaman) NewWaterTotem() *core.NoEffectSpell {
 }
 
 func (shaman *Shaman) NewFireTotem() *core.NoEffectSpell {
+	manaCost := 360 * (1 - float64(shaman.Talents.TotemicFocus) * 0.05)
+
 	return &core.NoEffectSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
 				Name:            "Totem of Wrath",
-				ActionID:        core.ActionID{SpellID: 30706}, // just using totem of wrath
+				ActionID:        core.ActionID{SpellID: 30706},
 				Character:       shaman.GetCharacter(),
-				BaseManaCost:    240,
-				ManaCost:        240,
+				BaseManaCost:    manaCost,
+				ManaCost:        manaCost,
 				CastTime:        time.Second * 1,
 				IgnoreCooldowns: true, // lets us override the GCD
 			},

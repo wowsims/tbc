@@ -24,6 +24,14 @@ func NewShaman(character core.Character, talents proto.ShamanTalents, selfBuffs 
 		},
 	})
 
+	shaman.AddStatDependency(stats.StatDependency{
+		SourceStat:   stats.Strength,
+		ModifiedStat: stats.AttackPower,
+		Modifier: func(strength float64, attackPower float64) float64 {
+			return attackPower + strength*2
+		},
+	})
+
 	if shaman.Talents.UnrelentingStorm > 0 {
 		coeff := 0.02 * float64(shaman.Talents.UnrelentingStorm)
 		shaman.AddStatDependency(stats.StatDependency{
@@ -31,6 +39,39 @@ func NewShaman(character core.Character, talents proto.ShamanTalents, selfBuffs 
 			ModifiedStat: stats.MP5,
 			Modifier: func(intellect float64, mp5 float64) float64 {
 				return mp5 + intellect*coeff
+			},
+		})
+	}
+
+	if shaman.Talents.AncestralKnowledge > 0 {
+		coeff := 0.01 * float64(shaman.Talents.AncestralKnowledge)
+		shaman.AddStatDependency(stats.StatDependency{
+			SourceStat:   stats.Mana,
+			ModifiedStat: stats.Mana,
+			Modifier: func(mana float64, _ float64) float64 {
+				return mana * coeff
+			},
+		})
+	}
+
+	if shaman.Talents.MentalQuickness > 0 {
+		coeff := 0.1 * float64(shaman.Talents.MentalQuickness)
+		shaman.AddStatDependency(stats.StatDependency{
+			SourceStat:   stats.AttackPower,
+			ModifiedStat: stats.SpellPower,
+			Modifier: func(attackPower float64, spellPower float64) float64 {
+				return spellPower + attackPower*coeff
+			},
+		})
+	}
+
+	if shaman.Talents.NaturesBlessing > 0 {
+		coeff := 0.1 * float64(shaman.Talents.NaturesBlessing)
+		shaman.AddStatDependency(stats.StatDependency{
+			SourceStat:   stats.Intellect,
+			ModifiedStat: stats.SpellPower,
+			Modifier: func(intellect float64, spellPower float64) float64 {
+				return spellPower + intellect*coeff
 			},
 		})
 	}
@@ -106,12 +147,15 @@ func (shaman *Shaman) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {
 		partyBuffs.Bloodlust += 1
 	}
 
-	if shaman.SelfBuffs.TotemOfWrath {
+	if shaman.Talents.TotemOfWrath && shaman.SelfBuffs.TotemOfWrath {
 		partyBuffs.TotemOfWrath += 1
 	}
 
 	if shaman.SelfBuffs.ManaSpring {
 		partyBuffs.ManaSpringTotem = core.MaxTristate(partyBuffs.ManaSpringTotem, proto.TristateEffect_TristateEffectRegular)
+		if shaman.Talents.RestorativeTotems == 5 {
+			partyBuffs.ManaSpringTotem = proto.TristateEffect_TristateEffectImproved
+		}
 	}
 
 	if shaman.SelfBuffs.WrathOfAir {

@@ -5,7 +5,6 @@ import (
 
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/proto"
-	"github.com/wowsims/tbc/sim/core/stats"
 	. "github.com/wowsims/tbc/sim/shaman"
 	googleProto "google.golang.org/protobuf/proto"
 )
@@ -147,12 +146,6 @@ type FixedRotation struct {
 	numLBsSinceLastCL int32
 }
 
-// Returns if any temporary haste buff is currently active.
-func (rotation *FixedRotation) temporaryHasteActive(eleShaman *ElementalShaman) bool {
-	return eleShaman.HasTemporaryBonusForStat(stats.SpellHaste) ||
-		eleShaman.PseudoStats.CastSpeedMultiplier != 1
-}
-
 func (rotation *FixedRotation) ChooseAction(eleShaman *ElementalShaman, sim *core.Simulation) core.AgentAction {
 	if rotation.numLBsSinceLastCL < rotation.numLBsPerCL {
 		return eleShaman.NewLightningBolt(sim, sim.GetPrimaryTarget(), false)
@@ -164,7 +157,7 @@ func (rotation *FixedRotation) ChooseAction(eleShaman *ElementalShaman, sim *cor
 
 	// If we have a temporary haste effect (like bloodlust or quags eye) then
 	// we should add LB casts instead of waiting
-	if rotation.temporaryHasteActive(eleShaman) {
+	if eleShaman.HasTemporarySpellCastSpeedIncrease() {
 		return eleShaman.NewLightningBolt(sim, sim.GetPrimaryTarget(), false)
 	}
 
