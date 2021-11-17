@@ -6,9 +6,10 @@ import { Player, PlayerConfig } from './player.js';
 import { Sim, SimConfig } from './sim.js';
 import { Target, TargetConfig } from './target.js';
 import { TypedEvent } from './typed_event.js';
-import { gzip, ungzip } from 'pako';
+// import { gzip, ungzip } from 'pako';
 
 declare var tippy: any;
+declare var pako: any;
 
 const CURRENT_SETTINGS_STORAGE_KEY = '__currentSettings__';
 const SAVED_GEAR_STORAGE_KEY = '__savedGear__';
@@ -118,7 +119,7 @@ export abstract class SimUI<SpecType extends Spec> {
       hash = hash.substring(1);
       try {
         const jsonStr = atob(hash);
-        const unzipped = ungzip(jsonStr, { to: 'string' });
+        const unzipped = pako.ungzip(jsonStr, { to: 'string' });
         this.fromJson(JSON.parse(unzipped));
         loadedSettings = true;
       } catch (e) {
@@ -156,7 +157,7 @@ export abstract class SimUI<SpecType extends Spec> {
 			element.addEventListener('click', event => {
 				const linkUrl = new URL(window.location.href);
 				const jsonStr = JSON.stringify(this.toJson());
-        const zipped = gzip(jsonStr, {to: 'string'});
+        const zipped = pako.gzip(jsonStr, {to: 'string'});
 				const encoded = btoa(zipped);
 				linkUrl.hash = encoded;
 
