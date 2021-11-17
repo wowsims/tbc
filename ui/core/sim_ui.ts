@@ -165,11 +165,12 @@ export abstract class SimUI<SpecType extends Spec> {
 			});
 
 			element.addEventListener('click', event => {
-				const linkUrl = new URL(window.location.href);
 				const jsonStr = JSON.stringify(this.toJson());
         const val = pako.deflate(jsonStr, { to: 'string' });
         const encoded = btoa(String.fromCharCode(...val));
-				linkUrl.hash = encoded;
+				
+        const linkUrl = new URL(window.location.href);
+        linkUrl.hash = encoded;
 				navigator.clipboard.writeText(linkUrl.toString());
 				alert('Current settings copied to clipboard!');
 			});
