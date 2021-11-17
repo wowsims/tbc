@@ -83,7 +83,7 @@ func (druid *Druid) Reset(newsim *core.Simulation) {
 
 func (druid *Druid) Advance(sim *core.Simulation, elapsedTime time.Duration) {
 	// druid should never be outside the 5s window, use combat regen.
-	druid.Character.CombatManaRegen(sim, elapsedTime)
+	druid.Character.RegenManaCasting(sim, elapsedTime)
 	druid.Character.Advance(sim, elapsedTime)
 }
 

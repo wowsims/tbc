@@ -276,8 +276,8 @@ func (character *Character) addMana(amount float64) {
 	character.stats[stats.Mana] = MinFloat(character.stats[stats.Mana] + amount, character.MaxMana())
 }
 
-// Regenerates mana based on MP5 stat, spirit regen allowed in combat and the elapsed time.
-func (character *Character) CombatManaRegen(sim *Simulation, elapsedTime time.Duration) {
+// Regenerates mana based on MP5 stat, spirit regen allowed while casting and the elapsed time.
+func (character *Character) RegenManaCasting(sim *Simulation, elapsedTime time.Duration) {
 	manaRegen := character.manaRegenPerSecondWhileCasting() * elapsedTime.Seconds()
 	character.addMana(manaRegen)
 	if sim.Log != nil {
@@ -286,7 +286,7 @@ func (character *Character) CombatManaRegen(sim *Simulation, elapsedTime time.Du
 }
 
 // Regenerates mana using mp5 and spirit. Will calculate time since last cast and then enable spirit regen if needed.
-func (character *Character) FullManaRegen(sim *Simulation, elapsedTime time.Duration) {
+func (character *Character) RegenMana(sim *Simulation, elapsedTime time.Duration) {
 	var regen float64
 	if sim.CurrentTime-elapsedTime > character.PseudoStats.FiveSecondRuleRefreshTime {
 		// Five second rule activated before the advance window started, so use full
