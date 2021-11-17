@@ -140,6 +140,9 @@ var AshtongueTalismanItemAuraID = core.NewAuraID()
 var AshtongueTalismanAuraID = core.NewAuraID()
 
 func ApplyAshtongueTalisman(agent core.Agent) {
+	// Not in the game yet so cant test; this logic assumes that:
+	// - does not affect the starfire which procs it
+	// - can proc off of any completed cast, not just hits
 	const spellBonus = 150
 	const dur = time.Second * 8
 
