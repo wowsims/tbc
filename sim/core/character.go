@@ -47,9 +47,9 @@ type Character struct {
 	// Current stats, including temporary effects.
 	stats stats.Stats
 
-	// psuedoStats are modifiers that aren't directly a stat
-	initialPsuedoStats stats.PsuedoStats
-	PsuedoStats        stats.PsuedoStats
+	// pseudoStats are modifiers that aren't directly a stat
+	initialPseudoStats stats.PseudoStats
+	PseudoStats        stats.PseudoStats
 
 	// Used for applying the effects of hardcast / channeled spells at a later time.
 	// By definition there can be only 1 hardcast spell being cast at any moment.
@@ -57,15 +57,14 @@ type Character struct {
 }
 
 func NewCharacter(player proto.Player) Character {
-	initialPsuedo := stats.PsuedoStats{
-		CastSpeedMultiplier: 1,
-		ManaRegenMultiplier: 1,
-	}
 	character := Character{
 		Race:        player.Options.Race,
 		Class:       player.Options.Class,
 		Equip:       items.ProtoToEquipment(*player.Equipment),
-		PsuedoStats: initialPsuedo,
+		PseudoStats: stats.PseudoStats{
+			CastSpeedMultiplier:   1,
+			SpiritRegenMultiplier: 1,
+		},
 		auraTracker: newAuraTracker(false),
 	}
 
@@ -154,7 +153,7 @@ func (character *Character) HasTemporaryBonusForStat(stat stats.Stat) bool {
 
 // TODO: rename this better
 func (character *Character) CastSpeed() float64 {
-	return character.PsuedoStats.CastSpeedMultiplier * (1 + (character.stats[stats.SpellHaste] / (HasteRatingPerHastePercent * 100)))
+	return character.PseudoStats.CastSpeedMultiplier * (1 + (character.stats[stats.SpellHaste] / (HasteRatingPerHastePercent * 100)))
 }
 
 func (character *Character) AddRaidBuffs(raidBuffs *proto.RaidBuffs) {
@@ -213,7 +212,7 @@ func (character *Character) Finalize() {
 
 	// All stats added up to this point are part of the 'initial' stats.
 	character.initialStats = character.stats
-	character.initialPsuedoStats = character.PsuedoStats
+	character.initialPseudoStats = character.PseudoStats
 
 	character.auraTracker.finalize()
 	character.majorCooldownManager.finalize(character)
@@ -221,7 +220,7 @@ func (character *Character) Finalize() {
 
 func (character *Character) Reset(sim *Simulation) {
 	character.stats = character.initialStats
-	character.PsuedoStats = character.initialPsuedoStats
+	character.PseudoStats = character.initialPseudoStats
 
 	character.auraTracker.reset(sim)
 
@@ -239,61 +238,72 @@ func (character *Character) Advance(sim *Simulation, elapsedTime time.Duration) 
 	}
 }
 
-// Returns rate of mana regen, as mana / second when in/out 5sec rule.
-//   when within 5 sec rule you only get mp5 + any bonus spirit regen in combat.
-func (character *Character) manaRegenPerSecond(withinFiveSecond bool) float64 {
-	regen := character.stats[stats.MP5] / 5.0
-	if withinFiveSecond {
-		if character.PsuedoStats.SpiritRegenRateCasting > 0 {
-			//  TODO: We could also add some stat caches on calculated things like regen and spell hit etc and not need this check
-			regen += (character.PsuedoStats.SpiritRegenRateCasting * character.spiritManaRegen())
-		}
-	} else {
-		regen += character.spiritManaRegen()
-	}
-
-	return regen * character.PsuedoStats.ManaRegenMultiplier
+// Returns the rate of mana regen per second from mp5.
+func (character *Character) mp5ManaRegenPerSecond() float64 {
+	return character.stats[stats.MP5] / 5.0
 }
 
-// spiritManaRegen returns the total mana regen per second from spirit.
-func (character *Character) spiritManaRegen() float64 {
+// Returns the rate of mana regen per second from spirit.
+func (character *Character) spiritManaRegenPerSecond() float64 {
 	return 0.001 + character.stats[stats.Spirit]*math.Sqrt(character.stats[stats.Intellect])*0.009327
+}
+
+// Returns the rate of mana regen per second, assuming this character is
+// considered to be casting.
+func (character *Character) manaRegenPerSecondWhileCasting() float64 {
+	regenRate := character.mp5ManaRegenPerSecond()
+
+	spiritRegenRate := character.spiritManaRegenPerSecond() * character.PseudoStats.SpiritRegenMultiplier
+	if !character.PseudoStats.ForceFullSpiritRegen {
+		spiritRegenRate *= character.PseudoStats.SpiritRegenRateCasting
+	}
+	regenRate += spiritRegenRate
+
+	return regenRate
+}
+
+// Returns the rate of mana regen per second, assuming this character is
+// considered to be not casting.
+func (character *Character) manaRegenPerSecondWhileNotCasting() float64 {
+	regenRate := character.mp5ManaRegenPerSecond()
+
+	regenRate += character.spiritManaRegenPerSecond() * character.PseudoStats.SpiritRegenMultiplier
+
+	return regenRate
+}
+
+func (character *Character) addMana(amount float64) {
+	character.stats[stats.Mana] = MinFloat(character.stats[stats.Mana] + amount, character.MaxMana())
 }
 
 // Regenerates mana based on MP5 stat, spirit regen allowed in combat and the elapsed time.
 func (character *Character) CombatManaRegen(sim *Simulation, elapsedTime time.Duration) {
-	regen := character.manaRegenPerSecond(true) * elapsedTime.Seconds()
-	character.addMana(regen)
-	if sim.Log != nil && regen != 0 {
-		sim.Log(" Advanced [%0.1fs] Regenerated: %0.1f mana. Total: %0.1f\n", elapsedTime.Seconds(), regen, character.CurrentMana())
+	manaRegen := character.manaRegenPerSecondWhileCasting() * elapsedTime.Seconds()
+	character.addMana(manaRegen)
+	if sim.Log != nil {
+		sim.Log(" Advanced [%0.1fs] Regenerated: %0.1f mana. Total: %0.1f\n", elapsedTime.Seconds(), manaRegen, character.CurrentMana())
 	}
 }
-
-func (character *Character) addMana(amount float64) {
-	character.stats[stats.Mana] += amount
-	if character.CurrentMana() > character.MaxMana() {
-		character.stats[stats.Mana] = character.MaxMana()
-	}
-}
-
-const fiveseconds = time.Second * 5
 
 // Regenerates mana using mp5 and spirit. Will calculate time since last cast and then enable spirit regen if needed.
-func (character *Character) FullRegen(sim *Simulation, elapsedTime time.Duration) {
+func (character *Character) FullManaRegen(sim *Simulation, elapsedTime time.Duration) {
 	var regen float64
-	if sim.CurrentTime-fiveseconds > character.PsuedoStats.FiveSecondRuleRefreshTime { // this means we fully in spirit regen.
-		regen = character.manaRegenPerSecond(true) * elapsedTime.Seconds()
-	} else if sim.CurrentTime > character.PsuedoStats.FiveSecondRuleRefreshTime { // half mp5 and half spirit
-		spiritRegenTime := sim.CurrentTime - character.PsuedoStats.FiveSecondRuleRefreshTime // how many seconds of spirit regen
-		mp5RegenTime := elapsedTime - spiritRegenTime
-		// add mp5 mana here
-		regen = character.manaRegenPerSecond(true)*mp5RegenTime.Seconds() + character.manaRegenPerSecond(false)*spiritRegenTime.Seconds()
+	if sim.CurrentTime-elapsedTime > character.PseudoStats.FiveSecondRuleRefreshTime {
+		// Five second rule activated before the advance window started, so use full
+		// spirit regen for the full duration.
+		regen = character.manaRegenPerSecondWhileNotCasting() * elapsedTime.Seconds()
+	} else if sim.CurrentTime > character.PseudoStats.FiveSecondRuleRefreshTime {
+		// Five second rule activated sometime in the middle of the advance window,
+		// so regen is a combination of casting and not-casting regen.
+		notCastingRegenTime := sim.CurrentTime - character.PseudoStats.FiveSecondRuleRefreshTime // how many seconds of full spirit regen
+		castingRegenTime := elapsedTime - notCastingRegenTime
+		regen = (character.manaRegenPerSecondWhileNotCasting()*notCastingRegenTime.Seconds()) + (character.manaRegenPerSecondWhileCasting()*castingRegenTime.Seconds())
 	} else {
-		regen = character.manaRegenPerSecond(true) * elapsedTime.Seconds()
+		regen = character.manaRegenPerSecondWhileCasting() * elapsedTime.Seconds()
 	}
 	character.addMana(regen)
 
-	if sim.Log != nil && regen != 0 {
+	if sim.Log != nil {
 		sim.Log(" Advanced [%0.1fs] Regenerated: %0.1f mana. Total: %0.1f\n", elapsedTime.Seconds(), regen, character.CurrentMana())
 	}
 }
@@ -305,19 +315,19 @@ func (character *Character) FullRegen(sim *Simulation, elapsedTime time.Duration
 // will not take any actions during this period that would reset the 5-second rule.
 func (character *Character) TimeUntilManaRegen(desiredMana float64) time.Duration {
 	// +1 at the end is to deal with floating point math rounding errors.
-	regenNeeded := desiredMana - character.CurrentMana()
-	mp5Regen := character.manaRegenPerSecond(true) // for now just use the inside 5s regen
-	regenTime := DurationFromSeconds(regenNeeded/mp5Regen) + 1
-	// TODO: this needs to have access to the sim to see current time vs character.PsuedoStats.FiveSecondRule.
+	manaNeeded := desiredMana - character.CurrentMana()
+	regenTime := DurationFromSeconds(manaNeeded / character.manaRegenPerSecondWhileCasting()) + 1
+
+	// TODO: this needs to have access to the sim to see current time vs character.PseudoStats.FiveSecondRule.
 	//  it is possible that we have been waiting.
 	//  In practice this function is always used right after a previous cast so no big deal for now.
 	if regenTime > time.Second*5 {
 		regenTime = time.Second * 5
+		manaNeeded -= character.manaRegenPerSecondWhileCasting()*5
 		// now we move into spirit based regen.
-		newRegen := regenNeeded - character.manaRegenPerSecond(true)*5
-		totalRegen := character.stats[stats.MP5]/5.0 + character.spiritManaRegen()
-		regenTime += DurationFromSeconds(newRegen / totalRegen)
+		regenTime += DurationFromSeconds(manaNeeded / character.manaRegenPerSecondWhileNotCasting())
 	}
+
 	return regenTime
 }
 
