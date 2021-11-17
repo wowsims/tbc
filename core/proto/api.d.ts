@@ -158,6 +158,10 @@ export interface SimOptions {
      * @generated from protobuf field: bool exit_on_oom = 4;
      */
     exitOnOom: boolean;
+    /**
+     * @generated from protobuf field: bool is_test = 5;
+     */
+    isTest: boolean;
 }
 /**
  * RPC IndividualSim
