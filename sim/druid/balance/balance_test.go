@@ -32,7 +32,7 @@ func TestNordBonus(t *testing.T) {
 		},
 
 		ExpectedDpsShort: 1708.5,
-		ExpectedDpsLong:  1553.8,
+		ExpectedDpsLong:  1537.1,
 	})
 }
 
@@ -56,7 +56,7 @@ func TestSimulateP1Starfire(t *testing.T) {
 		},
 
 		ExpectedDpsShort: 1367.0,
-		ExpectedDpsLong:  1343.1,
+		ExpectedDpsLong:  1271.6,
 	})
 }
 
@@ -80,7 +80,7 @@ func TestSimulateP1Wrath(t *testing.T) {
 		},
 
 		ExpectedDpsShort: 1313.6,
-		ExpectedDpsLong:  1289.3,
+		ExpectedDpsLong:  1177.2,
 	})
 }
 

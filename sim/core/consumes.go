@@ -235,7 +235,7 @@ func makePotionActivation(potionType proto.Potions, character *Character) Cooldo
 		alchStoneEquipped := character.HasTrinketEquipped(alchStoneItemID)
 		return func(sim *Simulation, character *Character) bool {
 			// Only pop if we have less than the max mana provided by the potion minus 1mp5 tick.
-			totalRegen := character.manaRegenPerSecond(true) * 5
+			totalRegen := character.manaRegenPerSecondWhileCasting() * 5
 			if character.MaxMana()-(character.CurrentMana()+totalRegen) < 3000 {
 				return false
 			}
@@ -274,7 +274,7 @@ func registerDarkRuneCD(agent Agent, consumes proto.Consumes) {
 		ActivationFactory: func(sim *Simulation) CooldownActivation {
 			return func(sim *Simulation, character *Character) bool {
 				// Only pop if we have less than the max mana provided by the potion minus 1mp5 tick.
-				totalRegen := character.manaRegenPerSecond(true) * 5
+				totalRegen := character.manaRegenPerSecondWhileCasting() * 5
 				if character.MaxMana()-(character.CurrentMana()+totalRegen) < 1500 {
 					return false
 				}

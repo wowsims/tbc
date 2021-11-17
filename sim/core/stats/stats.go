@@ -293,12 +293,16 @@ func (sdm *StatDependencyManager) ApplyStatDependencies(stats Stats) Stats {
 	return newStats
 }
 
-type PsuedoStats struct {
+type PseudoStats struct {
 	CastSpeedMultiplier       float64
 	AttackSpeedMultiplier     float64       // not used yet
-	SpiritRegenRateCasting    float64       // percentage of spirit regen allowed during casting
-	ManaRegenMultiplier       float64       // Currently main use is for innervate
+
 	FiveSecondRuleRefreshTime time.Duration // last time a spell was cast
+	SpiritRegenRateCasting    float64       // percentage of spirit regen allowed during casting
+
+	// Both of these are currently only used for innervate.
+	ForceFullSpiritRegen  bool    // If set, automatically uses full spirit regen regardless of FSR refresh time.
+	SpiritRegenMultiplier float64 // Multiplier on spirit portion of mana regen.
 }
 
 // TODO: more stat calculations

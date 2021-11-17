@@ -171,7 +171,7 @@ func (shaman *Shaman) Reset(sim *core.Simulation) {
 
 func (shaman *Shaman) Advance(sim *core.Simulation, elapsedTime time.Duration) {
 	// Shaman should never be outside the 5s window, use combat regen
-	shaman.Character.CombatManaRegen(sim, elapsedTime)
+	shaman.Character.RegenManaCasting(sim, elapsedTime)
 	shaman.Character.Advance(sim, elapsedTime)
 }
 

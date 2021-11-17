@@ -150,7 +150,7 @@ type FixedRotation struct {
 // Returns if any temporary haste buff is currently active.
 func (rotation *FixedRotation) temporaryHasteActive(eleShaman *ElementalShaman) bool {
 	return eleShaman.HasTemporaryBonusForStat(stats.SpellHaste) ||
-		eleShaman.PsuedoStats.CastSpeedMultiplier != 1
+		eleShaman.PseudoStats.CastSpeedMultiplier != 1
 }
 
 func (rotation *FixedRotation) ChooseAction(eleShaman *ElementalShaman, sim *core.Simulation) core.AgentAction {

@@ -83,7 +83,7 @@ func (druid *Druid) Reset(newsim *core.Simulation) {
 
 func (druid *Druid) Advance(sim *core.Simulation, elapsedTime time.Duration) {
 	// druid should never be outside the 5s window, use combat regen.
-	druid.Character.CombatManaRegen(sim, elapsedTime)
+	druid.Character.RegenManaCasting(sim, elapsedTime)
 	druid.Character.Advance(sim, elapsedTime)
 }
 
@@ -98,16 +98,16 @@ func (druid *Druid) TryInnervate(sim *core.Simulation) bool {
 	// TODO: get a real recommendation when to use this.
 	if druid.SelfBuffs.Innervate && druid.GetRemainingCD(InnervateCD, sim.CurrentTime) == 0 {
 		if druid.GetStat(stats.Mana)/druid.MaxMana() < 0.33 {
-			oldRegen := druid.PsuedoStats.SpiritRegenRateCasting
-			druid.PsuedoStats.SpiritRegenRateCasting = 1.0
-			druid.PsuedoStats.ManaRegenMultiplier *= 5.0
+			druid.PseudoStats.ForceFullSpiritRegen = true
+			druid.PseudoStats.SpiritRegenMultiplier *= 5.0
+
 			druid.AddAura(sim, core.Aura{
 				ID:      InnervateAuraID,
 				Name:    "Innervate",
 				Expires: sim.CurrentTime + time.Second*20,
 				OnExpire: func(sim *core.Simulation) {
-					druid.PsuedoStats.SpiritRegenRateCasting = oldRegen
-					druid.PsuedoStats.ManaRegenMultiplier /= 5.0
+					druid.PseudoStats.ForceFullSpiritRegen = false
+					druid.PseudoStats.SpiritRegenMultiplier /= 5.0
 				},
 			})
 			cd := time.Minute * 6
@@ -178,7 +178,7 @@ func NewDruid(char core.Character, selfBuffs SelfBuffs, talents proto.DruidTalen
 	}
 
 	if talents.Intensity > 0 {
-		char.PsuedoStats.SpiritRegenRateCasting = float64(talents.Intensity) * 0.1
+		char.PseudoStats.SpiritRegenRateCasting = float64(talents.Intensity) * 0.1
 	}
 
 	return Druid{
