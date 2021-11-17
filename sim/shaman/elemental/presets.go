@@ -12,19 +12,21 @@ var BasicPartyBuffs = &proto.PartyBuffs{
 var BasicIndividualBuffs = &proto.IndividualBuffs{}
 
 var StandardTalents = &proto.ShamanTalents{
+	Convection:         5,
+	Concussion:         5,
 	ElementalFocus:     true,
-	LightningMastery:   5,
-	LightningOverload:  5,
-	ElementalPrecision: 3,
-	NaturesGuidance:    3,
-	TidalMastery:       5,
-	ElementalMastery:   true,
+	CallOfThunder:      5,
 	ElementalFury:      true,
 	UnrelentingStorm:   3,
-	CallOfThunder:      5,
-	Concussion:         5,
-	Convection:         5,
+	ElementalPrecision: 3,
+	LightningMastery:   5,
+	ElementalMastery:   true,
+	LightningOverload:  5,
 	TotemOfWrath:       true,
+
+	TotemicFocus:       5,
+	NaturesGuidance:    3,
+	TidalMastery:       5,
 }
 
 var eleShamOptionsNoBuffs = &proto.ElementalShaman_Options{

@@ -8,7 +8,7 @@ const GCDMin = time.Second * 1
 const GCDDefault = time.Millisecond * 1500
 
 const HasteRatingPerHastePercent = 15.76
-const MeleeCritRatingPerCritChance = 22.1
+const MeleeCritRatingPerCritChance = 22.08
 const MeleeHitRatingPerHitChance = 15.8
 const SpellCritRatingPerCritChance = 22.08
 const SpellHitRatingPerHitChance = 12.6
