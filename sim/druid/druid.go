@@ -96,7 +96,7 @@ var InnervateAuraID = core.NewAuraID()
 func (druid *Druid) TryInnervate(sim *core.Simulation) bool {
 	// Currently just activates innervate on self when own mana is <33%
 	// TODO: get a real recommendation when to use this.
-	// TODO re-implement as a cast, and add the mana cost.
+	// TODO re-implement as a cast, and add the mana cost (costs 94 mana).
 	if druid.SelfBuffs.Innervate && druid.GetRemainingCD(InnervateCD, sim.CurrentTime) == 0 {
 		if druid.GetStat(stats.Mana)/druid.MaxMana() < 0.33 {
 			druid.PseudoStats.ForceFullSpiritRegen = true
@@ -193,7 +193,6 @@ func NewDruid(char core.Character, selfBuffs SelfBuffs, talents proto.DruidTalen
 var FaerieFireDebuffID = core.NewDebuffID()
 
 func init() {
-	// TODO: get the actual real base stats here.
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceTauren, Class: proto.Class_ClassDruid}] = stats.Stats{
 		stats.Strength:  81,
 		stats.Agility:   65,

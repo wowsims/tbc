@@ -264,18 +264,21 @@ func (spellEffect *SpellEffect) applyDot(sim *Simulation, spellCast *SpellCast, 
 			// add more pending
 			pa.NextActionAt = sim.CurrentTime + ddInput.TickLength
 		} else {
-			// TODO: This needs to be called at end of sim even if it isn't done ticking.
-			//  maybe need an effect/aggregator that can be started and appended to or something.
-			//  instead of calling add all at end.
-
-			// Complete metrics and adding results etc
-			spellEffect.applyResultsToCast(spellCast)
-			sim.MetricsAggregator.AddSpellCast(spellCast)
-			spellCast.objectInUse = false
-
-			// Kills the pending action from the main run loop.
-			pa.NextActionAt = NeverExpires
+			pa.CleanUp(sim)
 		}
+	}
+	pa.CleanUp = func(sim *Simulation) {
+		if pa.NextActionAt == NeverExpires {
+			panic("Already cleaned up dot")
+		}
+
+		// Complete metrics and adding results etc
+		spellEffect.applyResultsToCast(spellCast)
+		sim.MetricsAggregator.AddSpellCast(spellCast)
+		spellCast.objectInUse = false
+
+		// Kills the pending action from the main run loop.
+		pa.NextActionAt = NeverExpires
 	}
 
 	sim.AddPendingAction(pa)

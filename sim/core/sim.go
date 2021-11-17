@@ -131,6 +131,7 @@ func (sim *Simulation) reset() {
 
 type PendingAction struct {
 	OnAction     func(*Simulation)
+	CleanUp      func(*Simulation)
 	NextActionAt time.Duration
 }
 
@@ -209,6 +210,12 @@ func (sim *Simulation) RunOnce() {
 			sort.Slice(sim.pendingActions, func(i, j int) bool {
 				return sim.pendingActions[i].NextActionAt < sim.pendingActions[j].NextActionAt
 			})
+		}
+	}
+
+	for _, pa := range sim.pendingActions {
+		if pa.CleanUp != nil {
+			pa.CleanUp(sim)
 		}
 	}
 }
