@@ -43,7 +43,7 @@ var Gems = []Gem{
 	{ID: 30564, Name: "Veiled Pyrestone", Quality: proto.ItemQuality_ItemQualityEpic, Phase: 3, Color: proto.GemColor_GemColorOrange, Stats: stats.Stats{stats.SpellHit: 5, stats.SpellPower: 6}},
 	{ID: 30560, Name: "Rune Covered Chrysoprase", Quality: proto.ItemQuality_ItemQualityEpic, Phase: 1, Color: proto.GemColor_GemColorGreen, Stats: stats.Stats{stats.MP5: 2, stats.SpellCrit: 5}, Unique: true},
 	{ID: 24065, Name: "Dazzling Talasite", Quality: proto.ItemQuality_ItemQualityRare, Phase: 1, Color: proto.GemColor_GemColorGreen, Stats: stats.Stats{stats.MP5: 2, stats.Intellect: 4}},
-	{ID: 35759, Name: "Forceful Seaspray Emerald", Quality: proto.ItemQuality_ItemQualityEpic, Phase: 3, Color: proto.GemColor_GemColorGreen, Stats: stats.Stats{stats.SpellHaste: 5, stats.Stamina: 7}},
+	{ID: 35759, Name: "Forceful Seaspray Emerald", Quality: proto.ItemQuality_ItemQualityEpic, Phase: 5, Color: proto.GemColor_GemColorGreen, Stats: stats.Stats{stats.SpellHaste: 5, stats.Stamina: 7}},
 	{ID: 24056, Name: "Glowing Nightseye", Quality: proto.ItemQuality_ItemQualityRare, Phase: 1, Color: proto.GemColor_GemColorPurple, Stats: stats.Stats{stats.SpellPower: 5, stats.Stamina: 6}},
 	{ID: 30555, Name: "Glowing Tanzanite", Quality: proto.ItemQuality_ItemQualityEpic, Phase: 1, Color: proto.GemColor_GemColorPurple, Stats: stats.Stats{stats.SpellPower: 6, stats.Stamina: 6}, Unique: true},
 	{ID: 32215, Name: "Glowing Shadowsong Amethyst", Quality: proto.ItemQuality_ItemQualityEpic, Phase: 3, Color: proto.GemColor_GemColorPurple, Stats: stats.Stats{stats.SpellPower: 6, stats.Stamina: 7}},
