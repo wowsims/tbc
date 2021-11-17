@@ -118,9 +118,13 @@ export abstract class SimUI<SpecType extends Spec> {
       // Remove leading '#'
       hash = hash.substring(1);
       try {
-        const jsonStr = atob(hash);
-        const unzipped = pako.ungzip(jsonStr, { to: 'string' });
-        this.fromJson(JSON.parse(unzipped));
+        const binary = atob(hash);
+        const bytes = new Uint8Array(binary.length);
+        for (let i = 0; i < bytes.length; i++) {
+            bytes[i] = binary.charCodeAt(i);
+        }
+        const jsonStr = pako.inflate(bytes, { to: 'string' });
+        this.fromJson(JSON.parse(jsonStr));
         loadedSettings = true;
       } catch (e) {
         console.warn('Failed to parse settings from window hash: ' + e);
@@ -157,10 +161,9 @@ export abstract class SimUI<SpecType extends Spec> {
 			element.addEventListener('click', event => {
 				const linkUrl = new URL(window.location.href);
 				const jsonStr = JSON.stringify(this.toJson());
-        const zipped = pako.gzip(jsonStr, {to: 'string'});
-				const encoded = btoa(zipped);
+        const val = pako.deflate(jsonStr, { to: 'string' });
+        const encoded = btoa(String.fromCharCode(...val));
 				linkUrl.hash = encoded;
-
 				navigator.clipboard.writeText(linkUrl.toString());
 				alert('Current settings copied to clipboard!');
 			});
