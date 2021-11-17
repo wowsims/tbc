@@ -1,15 +1,14 @@
 import { IndividualSimRequest, IndividualSimResult } from '/tbc/core/proto/api.js';
-import { Class } from '/tbc/core/proto/common.js';
 import { Spec } from '/tbc/core/proto/common.js';
 import { makeIndividualSimRequest } from '/tbc/core/proto_utils/request_helpers.js';
 import { specToLocalStorageKey } from '/tbc/core/proto_utils/utils.js';
-
 import { Player, PlayerConfig } from './player.js';
 import { Sim, SimConfig } from './sim.js';
 import { Target, TargetConfig } from './target.js';
 import { TypedEvent } from './typed_event.js';
 
 declare var tippy: any;
+declare var pako: any;
 
 const CURRENT_SETTINGS_STORAGE_KEY = '__currentSettings__';
 const SAVED_GEAR_STORAGE_KEY = '__savedGear__';
@@ -118,8 +117,20 @@ export abstract class SimUI<SpecType extends Spec> {
       // Remove leading '#'
       hash = hash.substring(1);
       try {
-        const jsonStr = atob(hash);
-        this.fromJson(JSON.parse(jsonStr));
+        let jsonData;
+        if (new URLSearchParams(window.location.search).has('uncompressed')) {
+          const jsonStr = atob(hash);
+          jsonData = JSON.parse(jsonStr);
+        } else {
+          const binary = atob(hash);
+          const bytes = new Uint8Array(binary.length);
+          for (let i = 0; i < bytes.length; i++) {
+              bytes[i] = binary.charCodeAt(i);
+          }
+          const jsonStr = pako.inflate(bytes, { to: 'string' });  
+          jsonData = JSON.parse(jsonStr);
+        }
+        this.fromJson(jsonData);
         loadedSettings = true;
       } catch (e) {
         console.warn('Failed to parse settings from window hash: ' + e);
@@ -154,11 +165,12 @@ export abstract class SimUI<SpecType extends Spec> {
 			});
 
 			element.addEventListener('click', event => {
-				const linkUrl = new URL(window.location.href);
 				const jsonStr = JSON.stringify(this.toJson());
-				const encoded = btoa(jsonStr);
-				linkUrl.hash = encoded;
-
+        const val = pako.deflate(jsonStr, { to: 'string' });
+        const encoded = btoa(String.fromCharCode(...val));
+				
+        const linkUrl = new URL(window.location.href);
+        linkUrl.hash = encoded;
 				navigator.clipboard.writeText(linkUrl.toString());
 				alert('Current settings copied to clipboard!');
 			});
