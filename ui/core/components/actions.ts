@@ -52,7 +52,7 @@ export class Actions extends Component {
       });
 
       results.setPending();
-      const result = await simUI.sim.statWeights(statWeightsRequest);
+      const result = await simUI.player.statWeights(statWeightsRequest);
       results.setStatWeights(statWeightsRequest, result, epStats);
     });
   }
