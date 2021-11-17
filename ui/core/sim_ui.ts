@@ -6,7 +6,6 @@ import { Player, PlayerConfig } from './player.js';
 import { Sim, SimConfig } from './sim.js';
 import { Target, TargetConfig } from './target.js';
 import { TypedEvent } from './typed_event.js';
-// import { gzip, ungzip } from 'pako';
 
 declare var tippy: any;
 declare var pako: any;
