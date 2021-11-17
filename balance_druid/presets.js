@@ -46,7 +46,7 @@ export const P1_ALLIANCE_BIS = {
                 id: 21848,
                 enchant: Enchants.CHEST_EXCEPTIONAL_STATS,
                 gems: [
-                    Gems.RUNED_LIVING_RUBY,
+                    Gems.VEILED_NOBLE_TOPAZ,
                     Gems.GLOWING_NIGHTSEYE,
                 ],
             }),
@@ -68,8 +68,8 @@ export const P1_ALLIANCE_BIS = {
             ItemSpec.create({
                 id: 21846,
                 gems: [
-                    Gems.RUNED_LIVING_RUBY,
-                    Gems.RUNED_LIVING_RUBY,
+                    Gems.VEILED_NOBLE_TOPAZ,
+                    Gems.VEILED_NOBLE_TOPAZ,
                 ],
             }),
             ItemSpec.create({
@@ -85,7 +85,7 @@ export const P1_ALLIANCE_BIS = {
                 id: 28517,
                 enchant: Enchants.BOARS_SPEED,
                 gems: [
-                    Gems.RUNED_LIVING_RUBY,
+                    Gems.VEILED_NOBLE_TOPAZ,
                     Gems.RUNED_LIVING_RUBY,
                 ],
             }),
@@ -249,7 +249,7 @@ export const P2_ALLIANCE_BIS = {
                 enchant: Enchants.SUBTLETY,
             }),
             ItemSpec.create({
-                id: 30231,
+                id: 30107,
                 enchant: Enchants.CHEST_EXCEPTIONAL_STATS,
                 gems: [
                     Gems.RUNED_LIVING_RUBY,
@@ -262,12 +262,9 @@ export const P2_ALLIANCE_BIS = {
                 enchant: Enchants.WRIST_SPELLPOWER,
             }),
             ItemSpec.create({
-                id: 21847,
+                id: 30232,
                 enchant: Enchants.GLOVES_SPELLPOWER,
-                gems: [
-                    Gems.POTENT_NOBLE_TOPAZ,
-                    Gems.POTENT_NOBLE_TOPAZ,
-                ],
+                gems: [],
             }),
             ItemSpec.create({
                 id: 30038,
@@ -277,14 +274,16 @@ export const P2_ALLIANCE_BIS = {
                 ],
             }),
             ItemSpec.create({
-                id: 30234,
+                id: 24262,
                 enchant: Enchants.RUNIC_SPELLTHREAD,
                 gems: [
+                    Gems.RUNED_LIVING_RUBY,
+                    Gems.RUNED_LIVING_RUBY,
                     Gems.RUNED_LIVING_RUBY,
                 ],
             }),
             ItemSpec.create({
-                id: 30037,
+                id: 30067,
                 enchant: Enchants.BOARS_SPEED,
             }),
             ItemSpec.create({
@@ -321,7 +320,7 @@ export const P2_HORDE_BIS = {
                 id: 30233,
                 enchant: Enchants.GLYPH_OF_POWER,
                 gems: [
-                    Gems.POTENT_NOBLE_TOPAZ,
+                    Gems.VEILED_NOBLE_TOPAZ,
                     Gems.CHAOTIC_SKYFIRE_DIAMOND,
                 ],
             }),
@@ -333,7 +332,7 @@ export const P2_HORDE_BIS = {
                 enchant: Enchants.GREATER_INSCRIPTION_OF_DISCIPLINE,
                 gems: [
                     Gems.GLOWING_NIGHTSEYE,
-                    Gems.POTENT_NOBLE_TOPAZ,
+                    Gems.VEILED_NOBLE_TOPAZ,
                 ],
             }),
             ItemSpec.create({
@@ -356,27 +355,26 @@ export const P2_HORDE_BIS = {
             ItemSpec.create({
                 id: 30232,
                 enchant: Enchants.GLOVES_SPELLPOWER,
-                gems: [
-                    Gems.POTENT_NOBLE_TOPAZ,
-                    Gems.POTENT_NOBLE_TOPAZ,
-                ],
+                gems: [],
             }),
             ItemSpec.create({
                 id: 30038,
                 gems: [
                     Gems.GLOWING_NIGHTSEYE,
-                    Gems.POTENT_NOBLE_TOPAZ,
+                    Gems.VEILED_NOBLE_TOPAZ,
                 ],
             }),
             ItemSpec.create({
-                id: 30234,
+                id: 24262,
                 enchant: Enchants.RUNIC_SPELLTHREAD,
                 gems: [
+                    Gems.RUNED_LIVING_RUBY,
+                    Gems.RUNED_LIVING_RUBY,
                     Gems.RUNED_LIVING_RUBY,
                 ],
             }),
             ItemSpec.create({
-                id: 30037,
+                id: 30067,
                 enchant: Enchants.BOARS_SPEED,
             }),
             ItemSpec.create({
