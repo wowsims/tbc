@@ -284,6 +284,9 @@ func ApplyDarkmoonCardCrusade(agent core.Agent) {
 			Name: "Darkmoon Card Crusade",
 			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
 				if stacks < 10 {
+					if sim.Log != nil {
+						sim.Log("(%d) Darkmoon Card Crusade: Stacks %d\n", cast.Character.ID, stacks)
+					}
 					stacks++
 					character.AddStat(stats.SpellPower, spellBonus)
 				}
@@ -299,7 +302,6 @@ func ApplyDarkmoonCardCrusade(agent core.Agent) {
 						stacks = 0
 					},
 				})
-
 			},
 		}
 	})
