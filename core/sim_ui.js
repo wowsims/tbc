@@ -80,8 +80,21 @@ export class SimUI {
             // Remove leading '#'
             hash = hash.substring(1);
             try {
-                const jsonStr = atob(hash);
-                this.fromJson(JSON.parse(jsonStr));
+                let jsonData;
+                if (new URLSearchParams(window.location.search).has('uncompressed')) {
+                    const jsonStr = atob(hash);
+                    jsonData = JSON.parse(jsonStr);
+                }
+                else {
+                    const binary = atob(hash);
+                    const bytes = new Uint8Array(binary.length);
+                    for (let i = 0; i < bytes.length; i++) {
+                        bytes[i] = binary.charCodeAt(i);
+                    }
+                    const jsonStr = pako.inflate(bytes, { to: 'string' });
+                    jsonData = JSON.parse(jsonStr);
+                }
+                this.fromJson(jsonData);
                 loadedSettings = true;
             }
             catch (e) {
@@ -112,9 +125,10 @@ export class SimUI {
                 'allowHTML': true,
             });
             element.addEventListener('click', event => {
-                const linkUrl = new URL(window.location.href);
                 const jsonStr = JSON.stringify(this.toJson());
-                const encoded = btoa(jsonStr);
+                const val = pako.deflate(jsonStr, { to: 'string' });
+                const encoded = btoa(String.fromCharCode(...val));
+                const linkUrl = new URL(window.location.href);
                 linkUrl.hash = encoded;
                 navigator.clipboard.writeText(linkUrl.toString());
                 alert('Current settings copied to clipboard!');
