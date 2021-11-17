@@ -35,7 +35,7 @@ export const P1_ALLIANCE_BIS = {
                 enchant: Enchants.GREATER_INSCRIPTION_OF_DISCIPLINE,
                 gems: [
                     Gems.GLOWING_NIGHTSEYE,
-                    Gems.POTENT_NOBLE_TOPAZ,
+                    Gems.VEILED_NOBLE_TOPAZ,
                 ],
             }),
             ItemSpec.create({
@@ -46,7 +46,7 @@ export const P1_ALLIANCE_BIS = {
                 id: 21848,
                 enchant: Enchants.CHEST_EXCEPTIONAL_STATS,
                 gems: [
-                    Gems.POTENT_NOBLE_TOPAZ,
+                    Gems.RUNED_LIVING_RUBY,
                     Gems.GLOWING_NIGHTSEYE,
                 ],
             }),
@@ -54,21 +54,21 @@ export const P1_ALLIANCE_BIS = {
                 id: 24250,
                 enchant: Enchants.WRIST_SPELLPOWER,
                 gems: [
-                    Gems.POTENT_NOBLE_TOPAZ,
+                    Gems.VEILED_NOBLE_TOPAZ,
                 ],
             }),
             ItemSpec.create({
                 id: 21847,
                 enchant: Enchants.GLOVES_SPELLPOWER,
                 gems: [
-                    Gems.POTENT_NOBLE_TOPAZ,
-                    Gems.POTENT_NOBLE_TOPAZ,
+                    Gems.VEILED_NOBLE_TOPAZ,
+                    Gems.VEILED_NOBLE_TOPAZ,
                 ],
             }),
             ItemSpec.create({
                 id: 21846,
                 gems: [
-                    Gems.POTENT_NOBLE_TOPAZ,
+                    Gems.RUNED_LIVING_RUBY,
                     Gems.RUNED_LIVING_RUBY,
                 ],
             }),
@@ -76,9 +76,9 @@ export const P1_ALLIANCE_BIS = {
                 id: 24262,
                 enchant: Enchants.RUNIC_SPELLTHREAD,
                 gems: [
-                    Gems.RUNED_LIVING_RUBY,
-                    Gems.RUNED_LIVING_RUBY,
-                    Gems.RUNED_LIVING_RUBY,
+                    Gems.VEILED_NOBLE_TOPAZ,
+                    Gems.VEILED_NOBLE_TOPAZ,
+                    Gems.VEILED_NOBLE_TOPAZ,
                 ],
             }),
             ItemSpec.create({
@@ -157,39 +157,39 @@ export const P1_HORDE_BIS = {
                 id: 24250,
                 enchant: Enchants.WRIST_SPELLPOWER,
                 gems: [
-                    Gems.POTENT_NOBLE_TOPAZ,
+                    Gems.VEILED_NOBLE_TOPAZ,
                 ],
             }),
             ItemSpec.create({
                 id: 21847,
                 enchant: Enchants.GLOVES_SPELLPOWER,
                 gems: [
-                    Gems.POTENT_NOBLE_TOPAZ,
-                    Gems.POTENT_NOBLE_TOPAZ,
+                    Gems.VEILED_NOBLE_TOPAZ,
+                    Gems.VEILED_NOBLE_TOPAZ,
                 ],
             }),
             ItemSpec.create({
                 id: 21846,
                 gems: [
-                    Gems.POTENT_NOBLE_TOPAZ,
-                    Gems.RUNED_LIVING_RUBY,
+                    Gems.VEILED_NOBLE_TOPAZ,
+                    Gems.VEILED_NOBLE_TOPAZ,
                 ],
             }),
             ItemSpec.create({
                 id: 24262,
                 enchant: Enchants.RUNIC_SPELLTHREAD,
                 gems: [
-                    Gems.RUNED_LIVING_RUBY,
-                    Gems.RUNED_LIVING_RUBY,
-                    Gems.RUNED_LIVING_RUBY,
+                    Gems.VEILED_NOBLE_TOPAZ,
+                    Gems.VEILED_NOBLE_TOPAZ,
+                    Gems.VEILED_NOBLE_TOPAZ,
                 ],
             }),
             ItemSpec.create({
                 id: 28517,
                 enchant: Enchants.BOARS_SPEED,
                 gems: [
-                    Gems.RUNED_LIVING_RUBY,
-                    Gems.RUNED_LIVING_RUBY,
+                    Gems.VEILED_NOBLE_TOPAZ,
+                    Gems.POTENT_NOBLE_TOPAZ,
                 ],
             }),
             ItemSpec.create({
