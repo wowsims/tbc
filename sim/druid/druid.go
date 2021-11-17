@@ -115,7 +115,7 @@ func (druid *Druid) TryInnervate(sim *core.Simulation) bool {
 			if druid.malorne4p {
 				cd -= time.Second * 48
 			}
-			druid.SetCD(InnervateCD, cd)
+			druid.SetCD(InnervateCD, sim.CurrentTime+cd)
 			// triggers GCD
 			druid.SetCD(core.GCDCooldownID, core.CalculatedGCD(&druid.Character))
 			return true
