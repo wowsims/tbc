@@ -136,7 +136,8 @@ export class DefaultTheme<SpecType extends Spec> extends SimUI<SpecType> {
     const customStatsPicker = new CustomStatsPicker(this.parentElem.getElementsByClassName('custom-stats-picker')[0] as HTMLElement, this.player, config.player.epStats);
 
     const talentsPicker = newTalentsPicker(this.player.spec, this.parentElem.getElementsByClassName('talents-picker')[0] as HTMLElement, this.player);
-		if (this._config.freezeTalents) {
+		// Add a url parameter to help people trapped in the wrong talents   ;)
+		if (this._config.freezeTalents && !(new URLSearchParams(window.location.search).has('unlockTalents'))) {
 			talentsPicker.freeze();
 		}
 
