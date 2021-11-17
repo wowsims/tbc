@@ -151,6 +151,12 @@ func (character *Character) HasTemporaryBonusForStat(stat stats.Stat) bool {
 	return character.GetInitialStat(stat) != character.GetStat(stat)
 }
 
+// Returns if spell casting has any temporary increases active.
+func (character *Character) HasTemporarySpellCastSpeedIncrease() bool {
+	return character.HasTemporaryBonusForStat(stats.SpellHaste) ||
+		character.PseudoStats.CastSpeedMultiplier != 1
+}
+
 // TODO: rename this better
 func (character *Character) CastSpeed() float64 {
 	return character.PseudoStats.CastSpeedMultiplier * (1 + (character.stats[stats.SpellHaste] / (HasteRatingPerHastePercent * 100)))

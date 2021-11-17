@@ -201,7 +201,6 @@ func init() {
 		stats.Spirit:    135,
 		stats.Mana:      2090,  // 3815 mana shown on naked character
 		stats.SpellCrit: 40.66, // 3.29% chance to crit shown on naked character screen
-		stats.Armor:     130,
 		// 4498 health shown on naked character (would include tauren bonus)
 	}
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceNightElf, Class: proto.Class_ClassDruid}] = stats.Stats{
@@ -212,7 +211,6 @@ func init() {
 		stats.Spirit:    133,
 		stats.Mana:      2090,  // 3890 mana shown on naked character
 		stats.SpellCrit: 40.60, // 3.35% chance to crit shown on naked character screen
-		stats.Armor:     150,
 		// 4254 health shown on naked character
 	}
 }
