@@ -1,13 +1,12 @@
 import { IndividualSimRequest, IndividualSimResult } from '/tbc/core/proto/api.js';
-import { Class } from '/tbc/core/proto/common.js';
 import { Spec } from '/tbc/core/proto/common.js';
 import { makeIndividualSimRequest } from '/tbc/core/proto_utils/request_helpers.js';
 import { specToLocalStorageKey } from '/tbc/core/proto_utils/utils.js';
-
 import { Player, PlayerConfig } from './player.js';
 import { Sim, SimConfig } from './sim.js';
 import { Target, TargetConfig } from './target.js';
 import { TypedEvent } from './typed_event.js';
+import { gzip, ungzip } from 'pako';
 
 declare var tippy: any;
 
@@ -119,7 +118,8 @@ export abstract class SimUI<SpecType extends Spec> {
       hash = hash.substring(1);
       try {
         const jsonStr = atob(hash);
-        this.fromJson(JSON.parse(jsonStr));
+        const unzipped = ungzip(jsonStr, { to: 'string' });
+        this.fromJson(JSON.parse(unzipped));
         loadedSettings = true;
       } catch (e) {
         console.warn('Failed to parse settings from window hash: ' + e);
@@ -156,7 +156,8 @@ export abstract class SimUI<SpecType extends Spec> {
 			element.addEventListener('click', event => {
 				const linkUrl = new URL(window.location.href);
 				const jsonStr = JSON.stringify(this.toJson());
-				const encoded = btoa(jsonStr);
+        const zipped = gzip(jsonStr, {to: 'string'});
+				const encoded = btoa(zipped);
 				linkUrl.hash = encoded;
 
 				navigator.clipboard.writeText(linkUrl.toString());
