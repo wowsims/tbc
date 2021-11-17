@@ -105,7 +105,7 @@ func TestSimulatePreRaidNoBuffs(t *testing.T) {
 			Gear:          PreRaidGear,
 		},
 
-		ExpectedDpsShort: 1057.8,
+		ExpectedDpsShort: 1019.4,
 		ExpectedDpsLong:  364.7,
 	})
 }
@@ -129,7 +129,7 @@ func TestSimulatePreRaid(t *testing.T) {
 			Gear:          PreRaidGear,
 		},
 
-		ExpectedDpsShort: 1590.5,
+		ExpectedDpsShort: 1566.1,
 		ExpectedDpsLong:  1178.9,
 	})
 }
@@ -153,8 +153,8 @@ func TestSimulateP1(t *testing.T) {
 			Gear:          P1Gear,
 		},
 
-		ExpectedDpsShort: 2195.6,
-		ExpectedDpsLong:  1610.0,
+		ExpectedDpsShort: 2166.0,
+		ExpectedDpsLong:  1596.2,
 	})
 }
 func TestMultiTarget(t *testing.T) {
@@ -181,8 +181,8 @@ func TestMultiTarget(t *testing.T) {
 			Gear:          P1Gear,
 		},
 
-		ExpectedDpsShort: 2732.5,
-		ExpectedDpsLong:  1895.7,
+		ExpectedDpsShort: 2684.5,
+		ExpectedDpsLong:  1889.7,
 	})
 
 	core.IndividualSimAllEncountersTest(core.AllEncountersTestOptions{
@@ -208,8 +208,8 @@ func TestMultiTarget(t *testing.T) {
 			Gear:          P1Tidefury,
 		},
 
-		ExpectedDpsShort: 2743.7,
-		ExpectedDpsLong:  1954.4,
+		ExpectedDpsShort: 2714.5,
+		ExpectedDpsLong:  1934.5,
 	})
 }
 
@@ -232,8 +232,8 @@ func TestLBOnlyAgent(t *testing.T) {
 			Gear:          P1Gear,
 		},
 
-		ExpectedDpsShort: 2072.0,
-		ExpectedDpsLong:  1542.9,
+		ExpectedDpsShort: 2041.9,
+		ExpectedDpsLong:  1536.8,
 	})
 }
 
@@ -270,8 +270,8 @@ func TestClearcastAgent(t *testing.T) {
 			Gear:          P1Gear,
 		},
 
-		ExpectedDpsShort: 2165.1,
-		ExpectedDpsLong:  1614.6,
+		ExpectedDpsShort: 2135.3,
+		ExpectedDpsLong:  1596.3,
 	})
 }
 
@@ -290,7 +290,7 @@ func TestAverageDPS(t *testing.T) {
 		PlayerOptions: PlayerOptionsAdaptive,
 	})
 
-	core.IndividualSimAverageTest("P1Average", t, isr, 1587.6)
+	core.IndividualSimAverageTest("P1Average", t, isr, 1578.6)
 }
 
 func BenchmarkSimulate(b *testing.B) {
