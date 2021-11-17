@@ -8,6 +8,7 @@ import (
 
 // Totems that shaman will cast.
 // TODO: add logic inside these to select each totem based on options on the shaman?
+// TODO: Include mental quickness mana cost reduction when we figure out what it is.
 
 func (shaman *Shaman) NewAirTotem() *core.NoEffectSpell {
 	manaCost := 360 * (1 - float64(shaman.Talents.TotemicFocus) * 0.05)
