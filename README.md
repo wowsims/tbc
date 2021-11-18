@@ -14,17 +14,18 @@ This project has dependencies on Go >=1.16, protobuf-compiler and the correspond
 curl -O https://dl.google.com/go/go1.16.10.linux-amd64.tar.gz
 sudo rm -rf /usr/local/go 
 sudo tar -C /usr/local -xzf go1.16.10.linux-amd64.tar.gz
-export PATH=$PATH:/usr/local/go/bin
+echo `export PATH=$PATH:/usr/local/go/bin` >> $HOME/.bashrc
+echo 'export GOPATH=$HOME/go' >> $HOME/.bashrc
+echo 'export PATH=$PATH:$GOPATH/bin' >> $HOME/.bashrc
+source $HOME/.bashrc
 
 # Install protobuf compiler and Go plugins
-sudo apt-get install protobuf-compiler
+sudo apt update && sudo apt upgrade
+sudo apt install protobuf-compiler
 go get -u -v github.com/golang/protobuf/proto
 go get -u -v github.com/golang/protobuf/protoc-gen-go
 
 # You should be able to run 'make test' now. If you see an error like, 'protoc-gen-go: program not found or is not executable', run the following commands:
-echo 'export GOPATH=$HOME/go' >> $HOME/.bashrc
-echo 'export PATH=$PATH:$GOPATH/bin' >> $HOME/.bashrc
-source $HOME/.bashrc
 
 # Install node
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash
