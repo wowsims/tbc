@@ -6,12 +6,15 @@ Live sims:
 [Elemental Shaman](https://wowsims.github.io/tbc/elemental_shaman/ "https://wowsims.github.io/tbc/elemental_shaman/")
 
 # Installation
-This project has dependencies on Go, protobuf-compiler and the corresponding Go plugins, and node >= 14.0.
+This project has dependencies on Go >=1.16, protobuf-compiler and the corresponding Go plugins, and node >= 14.0.
 
 ## Ubuntu
 ```sh
-# Install Go
-sudo apt-get install golang-go
+# Standard Go installation script
+curl -O https://golang.org/dl/go1.17.3.linux-amd64.tar.gz
+sudo rm -rf /usr/local/go 
+sudo tar -C /usr/local -xzf go1.17.3.linux-amd64.tar.gz
+export PATH=$PATH:/usr/local/go/bin
 
 # Install protobuf compiler and Go plugins
 sudo apt-get install protobuf-compiler
