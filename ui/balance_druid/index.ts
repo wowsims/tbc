@@ -83,7 +83,7 @@ const theme = new DefaultTheme<Spec.SpecBalanceDruid>(document.body, {
 			}),
 			// Default rotation settings.
 			rotation: BalanceDruidRotation.create({
-				primarySpell: PrimarySpell.Starfire,
+				primarySpell: PrimarySpell.Adaptive,
 				faerieFire: true,
 			}),
 			// Default talents.

@@ -34,7 +34,11 @@ export const BalanceDruidRotationConfig = {
 			getModObject: (simUI: SimUI<any>) => simUI.player,
 			config: {
 				label: 'Primary Spell',
+				labelTooltip: 'If set to \'Adaptive\', will dynamically adjust rotation based on available mana.',
 				values: [
+					{
+						name: 'Adaptive', value: PrimarySpell.Adaptive,
+					},
 					{
 						name: 'Starfire', value: PrimarySpell.Starfire,
 					},
@@ -68,6 +72,7 @@ export const BalanceDruidRotationConfig = {
 					newRotation.moonfire = newValue;
 					player.setRotation(newRotation);
 				},
+				enableWhen: (player: Player<Spec.SpecBalanceDruid>) => player.getRotation().primarySpell != PrimarySpell.Adaptive,
 			},
 		},
 		{

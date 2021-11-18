@@ -59,20 +59,19 @@ message BalanceDruid {
         Starfire = 1;
         Starfire6 = 2;
         Wrath = 3;
+        Adaptive = 4;
     }
 
     PrimarySpell primary_spell = 1;
     bool faerie_fire = 2;
     bool insect_swarm = 3;
     bool moonfire = 4;
-    bool melee_while_oom = 5;
   }
   Rotation rotation = 1;
   DruidTalents talents = 2;
 
   message Options {
-    bool omen_of_clarity = 1;
-    RaidTarget innervate_target = 2; 
+    RaidTarget innervate_target = 1; 
   }
   Options options = 3;
 }
