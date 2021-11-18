@@ -6,6 +6,7 @@ import { Debuffs } from '/tbc/core/proto/common.js';
 import { Encounter } from '/tbc/core/proto/common.js';
 import { MobType } from '/tbc/core/proto/common.js';
 import { Potions } from '/tbc/core/proto/common.js';
+import { RaidTarget } from '/tbc/core/proto/common.js';
 import { Spec } from '/tbc/core/proto/common.js';
 import { Stat } from '/tbc/core/proto/common.js';
 import { TristateEffect } from '/tbc/core/proto/common.js';
@@ -58,13 +59,14 @@ const theme = new DefaultTheme(document.body, {
             gear: Presets.P1_ALLIANCE_BIS.gear,
             // Default EP weights for sorting gear in the gear picker.
             epWeights: Stats.fromMap({
-                [Stat.StatIntellect]: 0.33,
+                [Stat.StatIntellect]: 0.65,
+                [Stat.StatSpirit]: 0.1,
                 [Stat.StatSpellPower]: 1,
                 [Stat.StatArcaneSpellPower]: 1,
                 [Stat.StatNatureSpellPower]: 0,
-                [Stat.StatSpellCrit]: 0.78,
-                [Stat.StatSpellHaste]: 1.25,
-                [Stat.StatMP5]: 0.08,
+                [Stat.StatSpellCrit]: 0.9,
+                [Stat.StatSpellHaste]: 1.34,
+                [Stat.StatMP5]: 0.02,
             }),
             // Default consumes settings.
             consumes: Consumes.create({
@@ -78,7 +80,11 @@ const theme = new DefaultTheme(document.body, {
             // Default talents.
             talents: Presets.StandardTalents.data,
             // Default spec-specific settings.
-            specOptions: BalanceDruidOptions.create({}),
+            specOptions: BalanceDruidOptions.create({
+                innervateTarget: RaidTarget.create({
+                    targetIndex: 0, // In an individual sim the 0-indexed player is ourself.
+                }),
+            }),
         },
         // Custom function for determining the EP value of meta gem effects.
         // Default meta effect EP value is 0, so just handle the ones relevant to your spec.
