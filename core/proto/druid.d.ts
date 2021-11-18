@@ -209,10 +209,6 @@ export interface BalanceDruid_Rotation {
      * @generated from protobuf field: bool moonfire = 4;
      */
     moonfire: boolean;
-    /**
-     * @generated from protobuf field: bool melee_while_oom = 5;
-     */
-    meleeWhileOom: boolean;
 }
 /**
  * @generated from protobuf enum proto.BalanceDruid.Rotation.PrimarySpell
@@ -233,18 +229,18 @@ export declare enum BalanceDruid_Rotation_PrimarySpell {
     /**
      * @generated from protobuf enum value: Wrath = 3;
      */
-    Wrath = 3
+    Wrath = 3,
+    /**
+     * @generated from protobuf enum value: Adaptive = 4;
+     */
+    Adaptive = 4
 }
 /**
  * @generated from protobuf message proto.BalanceDruid.Options
  */
 export interface BalanceDruid_Options {
     /**
-     * @generated from protobuf field: bool omen_of_clarity = 1;
-     */
-    omenOfClarity: boolean;
-    /**
-     * @generated from protobuf field: proto.RaidTarget innervate_target = 2;
+     * @generated from protobuf field: proto.RaidTarget innervate_target = 1;
      */
     innervateTarget?: RaidTarget;
 }

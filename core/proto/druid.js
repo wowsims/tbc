@@ -25,6 +25,10 @@ export var BalanceDruid_Rotation_PrimarySpell;
      * @generated from protobuf enum value: Wrath = 3;
      */
     BalanceDruid_Rotation_PrimarySpell[BalanceDruid_Rotation_PrimarySpell["Wrath"] = 3] = "Wrath";
+    /**
+     * @generated from protobuf enum value: Adaptive = 4;
+     */
+    BalanceDruid_Rotation_PrimarySpell[BalanceDruid_Rotation_PrimarySpell["Adaptive"] = 4] = "Adaptive";
 })(BalanceDruid_Rotation_PrimarySpell || (BalanceDruid_Rotation_PrimarySpell = {}));
 // @generated message type with reflection information, may provide speed optimized methods
 class DruidTalents$Type extends MessageType {
@@ -407,12 +411,11 @@ class BalanceDruid_Rotation$Type extends MessageType {
             { no: 1, name: "primary_spell", kind: "enum", T: () => ["proto.BalanceDruid.Rotation.PrimarySpell", BalanceDruid_Rotation_PrimarySpell] },
             { no: 2, name: "faerie_fire", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 3, name: "insect_swarm", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
-            { no: 4, name: "moonfire", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
-            { no: 5, name: "melee_while_oom", kind: "scalar", T: 8 /*ScalarType.BOOL*/ }
+            { no: 4, name: "moonfire", kind: "scalar", T: 8 /*ScalarType.BOOL*/ }
         ]);
     }
     create(value) {
-        const message = { primarySpell: 0, faerieFire: false, insectSwarm: false, moonfire: false, meleeWhileOom: false };
+        const message = { primarySpell: 0, faerieFire: false, insectSwarm: false, moonfire: false };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -434,9 +437,6 @@ class BalanceDruid_Rotation$Type extends MessageType {
                     break;
                 case /* bool moonfire */ 4:
                     message.moonfire = reader.bool();
-                    break;
-                case /* bool melee_while_oom */ 5:
-                    message.meleeWhileOom = reader.bool();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -462,9 +462,6 @@ class BalanceDruid_Rotation$Type extends MessageType {
         /* bool moonfire = 4; */
         if (message.moonfire !== false)
             writer.tag(4, WireType.Varint).bool(message.moonfire);
-        /* bool melee_while_oom = 5; */
-        if (message.meleeWhileOom !== false)
-            writer.tag(5, WireType.Varint).bool(message.meleeWhileOom);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -479,12 +476,11 @@ export const BalanceDruid_Rotation = new BalanceDruid_Rotation$Type();
 class BalanceDruid_Options$Type extends MessageType {
     constructor() {
         super("proto.BalanceDruid.Options", [
-            { no: 1, name: "omen_of_clarity", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
-            { no: 2, name: "innervate_target", kind: "message", T: () => RaidTarget }
+            { no: 1, name: "innervate_target", kind: "message", T: () => RaidTarget }
         ]);
     }
     create(value) {
-        const message = { omenOfClarity: false };
+        const message = {};
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -495,10 +491,7 @@ class BalanceDruid_Options$Type extends MessageType {
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
-                case /* bool omen_of_clarity */ 1:
-                    message.omenOfClarity = reader.bool();
-                    break;
-                case /* proto.RaidTarget innervate_target */ 2:
+                case /* proto.RaidTarget innervate_target */ 1:
                     message.innervateTarget = RaidTarget.internalBinaryRead(reader, reader.uint32(), options, message.innervateTarget);
                     break;
                 default:
@@ -513,12 +506,9 @@ class BalanceDruid_Options$Type extends MessageType {
         return message;
     }
     internalBinaryWrite(message, writer, options) {
-        /* bool omen_of_clarity = 1; */
-        if (message.omenOfClarity !== false)
-            writer.tag(1, WireType.Varint).bool(message.omenOfClarity);
-        /* proto.RaidTarget innervate_target = 2; */
+        /* proto.RaidTarget innervate_target = 1; */
         if (message.innervateTarget)
-            RaidTarget.internalBinaryWrite(message.innervateTarget, writer.tag(2, WireType.LengthDelimited).fork(), options).join();
+            RaidTarget.internalBinaryWrite(message.innervateTarget, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
