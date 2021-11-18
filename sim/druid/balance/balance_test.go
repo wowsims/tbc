@@ -84,6 +84,30 @@ func TestSimulateP1Wrath(t *testing.T) {
 	})
 }
 
+func TestAdaptive(t *testing.T) {
+	core.IndividualSimAllEncountersTest(core.AllEncountersTestOptions{
+		Label: "phase2-adaptive",
+		T:     t,
+
+		Inputs: core.IndividualSimInputs{
+			RaidBuffs:       BasicRaidBuffs,
+			PartyBuffs:      BasicPartyBuffs,
+			IndividualBuffs: BasicIndividualBuffs,
+
+			Consumes: BasicConsumes,
+			Target:   FullDebuffTarget,
+			Race:     proto.Race_RaceTauren,
+			Class:    proto.Class_ClassDruid,
+
+			PlayerOptions: PlayerOptionsAdaptive,
+			Gear:          P2Gear,
+		},
+
+		ExpectedDpsShort: 1578.8,
+		ExpectedDpsLong:  1129.5,
+	})
+}
+
 func TestAverageDPS(t *testing.T) {
 	isr := core.NewIndividualSimRequest(core.IndividualSimInputs{
 		Gear:     P1Gear,

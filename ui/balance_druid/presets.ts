@@ -256,7 +256,7 @@ export const P2_ALLIANCE_BIS = {
 				enchant: Enchants.SUBTLETY,
 			}),
 			ItemSpec.create({
-				id: 30107, // Vestments of the Sea-Witch
+				id: 30231, // Nordrassil Chestpiece
 				enchant: Enchants.CHEST_EXCEPTIONAL_STATS,
 				gems: [
 					Gems.RUNED_LIVING_RUBY,
@@ -349,7 +349,7 @@ export const P2_HORDE_BIS = {
 				enchant: Enchants.SUBTLETY,
 			}),
 			ItemSpec.create({
-				id: 30107, // Vestments of the Sea-Witch
+				id: 30231, // Nordrassil Chestpiece
 				enchant: Enchants.CHEST_EXCEPTIONAL_STATS,
 				gems: [
 					Gems.RUNED_LIVING_RUBY,

@@ -3,6 +3,7 @@ package elemental
 import (
 	"time"
 
+	"github.com/wowsims/tbc/sim/common"
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/proto"
 	. "github.com/wowsims/tbc/sim/shaman"
@@ -214,73 +215,14 @@ func NewCLOnClearcastRotation() *CLOnClearcastRotation {
 //                             ADAPTIVE
 // ################################################################
 type AdaptiveRotation struct {
-	// Circular array buffer for recent mana snapshots, within a time window
-	manaSnapshots      [manaSnapshotsBufferSize]ManaSnapshot
-	numSnapshots       int32
-	firstSnapshotIndex int32
+	manaTracker common.ManaSpendingRateTracker
 
 	baseRotation    Rotation // The rotation used most of the time
 	surplusRotation Rotation // The rotation used when we have extra mana
 }
 
-const manaSpendingWindowNumSeconds = 60
-const manaSpendingWindow = time.Second * manaSpendingWindowNumSeconds
-
-// 2 * (# of seconds) should be plenty of slots
-const manaSnapshotsBufferSize = manaSpendingWindowNumSeconds * 2
-
-type ManaSnapshot struct {
-	time      time.Duration // time this snapshot was taken
-	manaSpent float64       // total amount of mana spent up to this time
-}
-
-func (rotation *AdaptiveRotation) getOldestSnapshot() ManaSnapshot {
-	return rotation.manaSnapshots[rotation.firstSnapshotIndex]
-}
-
-func (rotation *AdaptiveRotation) purgeExpiredSnapshots(sim *core.Simulation) {
-	expirationCutoff := sim.CurrentTime - manaSpendingWindow
-
-	curIndex := rotation.firstSnapshotIndex
-	for rotation.numSnapshots > 0 && rotation.manaSnapshots[curIndex].time < expirationCutoff {
-		curIndex = (curIndex + 1) % manaSnapshotsBufferSize
-		rotation.numSnapshots--
-	}
-	rotation.firstSnapshotIndex = curIndex
-}
-
-func (rotation *AdaptiveRotation) takeSnapshot(sim *core.Simulation, eleShaman *ElementalShaman) {
-	if rotation.numSnapshots >= manaSnapshotsBufferSize {
-		panic("Rotation snapshot buffer full")
-	}
-
-	snapshot := ManaSnapshot{
-		time:      sim.CurrentTime,
-		manaSpent: sim.GetIndividualMetrics(eleShaman.ID).ManaSpent,
-	}
-
-	nextIndex := (rotation.firstSnapshotIndex + rotation.numSnapshots) % manaSnapshotsBufferSize
-	rotation.manaSnapshots[nextIndex] = snapshot
-	rotation.numSnapshots++
-}
-
 func (rotation *AdaptiveRotation) ChooseAction(eleShaman *ElementalShaman, sim *core.Simulation) core.AgentAction {
-	rotation.purgeExpiredSnapshots(sim)
-	oldestSnapshot := rotation.getOldestSnapshot()
-
-	manaSpent := sim.GetIndividualMetrics(eleShaman.ID).ManaSpent - oldestSnapshot.manaSpent
-	timeDelta := sim.CurrentTime - oldestSnapshot.time
-	if timeDelta == 0 {
-		timeDelta = 1
-	}
-
-	timeRemaining := sim.Duration - sim.CurrentTime
-	projectedManaCost := manaSpent * (timeRemaining.Seconds() / timeDelta.Seconds())
-
-	if sim.Log != nil {
-		manaSpendingRate := manaSpent / timeDelta.Seconds()
-		sim.Log("[AI] CL Ready: Mana/s: %0.1f, Est Mana Cost: %0.1f, CurrentMana: %0.1f\n", manaSpendingRate, projectedManaCost, eleShaman.CurrentMana())
-	}
+	projectedManaCost := rotation.manaTracker.ProjectedManaCost(sim, eleShaman.GetCharacter())
 
 	// If we have enough mana to burn, use the surplus rotation.
 	if projectedManaCost < eleShaman.CurrentMana() {
@@ -290,21 +232,21 @@ func (rotation *AdaptiveRotation) ChooseAction(eleShaman *ElementalShaman, sim *
 	}
 }
 func (rotation *AdaptiveRotation) OnActionAccepted(eleShaman *ElementalShaman, sim *core.Simulation, action core.AgentAction) {
-	rotation.takeSnapshot(sim, eleShaman)
+	rotation.manaTracker.Update(sim, eleShaman.GetCharacter())
 	rotation.baseRotation.OnActionAccepted(eleShaman, sim, action)
 	rotation.surplusRotation.OnActionAccepted(eleShaman, sim, action)
 }
 
 func (rotation *AdaptiveRotation) Reset(eleShaman *ElementalShaman, sim *core.Simulation) {
-	rotation.manaSnapshots = [manaSnapshotsBufferSize]ManaSnapshot{}
-	rotation.firstSnapshotIndex = 0
-	rotation.numSnapshots = 0
+	rotation.manaTracker.Reset()
 	rotation.baseRotation.Reset(eleShaman, sim)
 	rotation.surplusRotation.Reset(eleShaman, sim)
 }
 
 func NewAdaptiveRotation(isr proto.IndividualSimRequest) *AdaptiveRotation {
-	rotation := &AdaptiveRotation{}
+	rotation := &AdaptiveRotation{
+		manaTracker: common.NewManaSpendingRateTracker(),
+	}
 
 	// If no encounter is set, it means we aren't going to run a sim at all.
 	// So just return something valid.
