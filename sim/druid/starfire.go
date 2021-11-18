@@ -41,6 +41,7 @@ func (druid *Druid) newStarfireTemplate(sim *core.Simulation, rank int) core.Sin
 	}
 
 	if rank == 6 {
+		baseCast.Name = "Starfire (Rank 6)"
 		baseCast.BaseManaCost = 315
 		baseCast.ManaCost = 315
 		baseCast.ActionID = core.ActionID{
