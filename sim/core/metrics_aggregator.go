@@ -137,10 +137,13 @@ func (aggregator *MetricsAggregator) AddSpellCast(spellCast *SpellCast) {
 	aggregateMetrics.Actions[actionKey] = actionMetrics
 }
 
-func (aggregator *MetricsAggregator) MarkOOM(character *Character, oomAtTime time.Duration) {
+func (aggregator *MetricsAggregator) MarkOOM(sim *Simulation, character *Character, oomAtTime time.Duration) {
 	agentID := character.ID
 
 	if aggregator.agentIterations[agentID].OOMAt == 0 {
+		if sim.Log != nil {
+			sim.Log("(%d) Went OOM!\n", character.ID)
+		}
 		aggregator.agentIterations[agentID].DamageAtOOM = aggregator.agentIterations[agentID].TotalDamage
 		aggregator.agentIterations[agentID].OOMAt = oomAtTime
 	}

@@ -131,7 +131,7 @@ func (cast *Cast) startCasting(sim *Simulation, onCastComplete OnCastComplete) b
 				sim.Log("(%d) Failed casting %s, not enough mana. (Current Mana = %0.0f, Mana Cost = %0.0f)\n",
 					cast.Character.ID, cast.Name, cast.Character.CurrentMana(), cast.ManaCost)
 			}
-			sim.MetricsAggregator.MarkOOM(cast.Character, sim.CurrentTime)
+			sim.MetricsAggregator.MarkOOM(sim, cast.Character, sim.CurrentTime)
 			cast.objectInUse = false // cast failed and we aren't using it
 			return false
 		}
