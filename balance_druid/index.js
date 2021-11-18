@@ -59,14 +59,14 @@ const theme = new DefaultTheme(document.body, {
             gear: Presets.P1_ALLIANCE_BIS.gear,
             // Default EP weights for sorting gear in the gear picker.
             epWeights: Stats.fromMap({
-                [Stat.StatIntellect]: 0.65,
+                [Stat.StatIntellect]: 0.54,
                 [Stat.StatSpirit]: 0.1,
                 [Stat.StatSpellPower]: 1,
                 [Stat.StatArcaneSpellPower]: 1,
                 [Stat.StatNatureSpellPower]: 0,
-                [Stat.StatSpellCrit]: 0.9,
-                [Stat.StatSpellHaste]: 1.34,
-                [Stat.StatMP5]: 0.02,
+                [Stat.StatSpellCrit]: 0.84,
+                [Stat.StatSpellHaste]: 1.29,
+                [Stat.StatMP5]: 0.00,
             }),
             // Default consumes settings.
             consumes: Consumes.create({
