@@ -11,9 +11,9 @@ This project has dependencies on Go >=1.16, protobuf-compiler and the correspond
 ## Ubuntu
 ```sh
 # Standard Go installation script
-curl -O https://golang.org/dl/go1.17.3.linux-amd64.tar.gz
+curl -O https://golang.org/dl/go1.16.10.linux-amd64.tar.gz
 sudo rm -rf /usr/local/go 
-sudo tar -C /usr/local -xzf go1.17.3.linux-amd64.tar.gz
+sudo tar -C /usr/local -xzf go1.16.10.linux-amd64.tar.gz
 export PATH=$PATH:/usr/local/go/bin
 
 # Install protobuf compiler and Go plugins
