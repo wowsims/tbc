@@ -27,3 +27,23 @@ body {
 .debuffs-section>div {
   grid-template-columns: repeat(2, 1fr);
 }
+
+// Balance has a lot of EP stats, so make the text smaller so it fits vertically.
+.character-stats-table-row {
+  font-size: 14px;
+}
+.results-ep-table tr td:nth-child(1) {
+  font-size: 12px;
+}
+.results-ep-table tr td:nth-child(2), .results-ep-table tr td:nth-child(4) {
+  font-size: 12px;
+}
+.results-ep-table tr td:nth-child(2):after {
+  font-size: 11px;
+}
+.results-ep-table tr td:nth-child(4):after {
+  font-size: 11px;
+}
+.results-ep-table tr td:nth-child(3), .results-ep-table tr td:nth-child(5) {
+  font-size: 10px;
+}
