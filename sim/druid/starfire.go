@@ -17,7 +17,7 @@ const IvoryMoongoddess int32 = 27518
 
 func (druid *Druid) newStarfireTemplate(sim *core.Simulation, rank int) core.SingleTargetDirectDamageSpellTemplate {
 	baseCast := core.Cast{
-		Name:           "Starfire",
+		Name:           "Starfire (Rank 8)",
 		CritMultiplier: 1.5,
 		SpellSchool:    stats.ArcaneSpellPower,
 		Character:      &druid.Character,
