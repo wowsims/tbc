@@ -40,7 +40,7 @@ func (druid *Druid) newWrathTemplate(sim *core.Simulation) core.SimpleSpellTempl
 
 	if druid.Equip[items.ItemSlotRanged].ID == IdolAvenger {
 		// This seems to be unaffected by wrath of cenarius so it needs to come first.
-		effect.DirectDamageSpellInput.FlatDamageBonus += 25 * effect.SpellCoefficient
+		effect.DirectInput.FlatDamageBonus += 25 * effect.DirectInput.SpellCoefficient
 	}
 
 	// TODO: Applies to both starfire and moonfire
@@ -60,8 +60,8 @@ func (druid *Druid) newWrathTemplate(sim *core.Simulation) core.SimpleSpellTempl
 	}
 
 	return core.NewSimpleSpellTemplate(core.SimpleSpell{
-		SpellCast: *spCast,
-		Effect:    effect,
+		SpellCast:      *spCast,
+		SpellHitEffect: effect,
 	})
 }
 
@@ -75,7 +75,7 @@ func (druid *Druid) NewWrath(sim *core.Simulation, target *core.Target) *core.Si
 	druid.applyNaturesGrace(&sf.SpellCast)
 
 	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	sf.Effect.Target = target
+	sf.Target = target
 	sf.Init(sim)
 
 	return sf

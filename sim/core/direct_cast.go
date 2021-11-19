@@ -114,14 +114,13 @@ func (hitEffect *SpellHitEffect) apply(sim *Simulation, spellCast *SpellCast) {
 		}
 	}
 
-	hitEffect.SpellEffect.afterCalculations(sim, spellCast)
-
 	// Only applyNow
 	if applyNow {
 		hitEffect.SpellEffect.applyResultsToCast(spellCast)
 		sim.MetricsAggregator.AddSpellCast(spellCast)
 		spellCast.objectInUse = false
 	}
+	hitEffect.SpellEffect.afterCalculations(sim, spellCast)
 }
 
 type OnDamageTick func(*Simulation)
