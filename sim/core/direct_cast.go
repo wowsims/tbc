@@ -81,7 +81,7 @@ type SimpleSpell struct {
 }
 
 func (spell *SimpleSpell) Init(sim *Simulation) {
-	spell.SpellCast.init(sim)
+	spell.init(sim)
 }
 
 func (spell *SimpleSpell) Act(sim *Simulation) bool {
@@ -97,30 +97,30 @@ type SpellHitEffect struct {
 }
 
 func (hitEffect *SpellHitEffect) apply(sim *Simulation, spellCast *SpellCast) {
-	hitEffect.SpellEffect.beforeCalculations(sim, spellCast)
+	hitEffect.beforeCalculations(sim, spellCast)
 
 	applyNow := !hitEffect.Hit // a miss will immediately apply
 
 	if hitEffect.Hit {
 		// Only apply direct damage if it has damage. Otherwise this is a dot without direct damage.
 		if hitEffect.DirectInput.MaxBaseDamage != 0 {
-			hitEffect.SpellEffect.calculateDirectDamage(sim, spellCast, &hitEffect.DirectInput)
+			hitEffect.calculateDirectDamage(sim, spellCast, &hitEffect.DirectInput)
 		}
 
 		if hitEffect.DotInput.NumberOfTicks != 0 {
-			hitEffect.SpellEffect.applyDot(sim, spellCast, &hitEffect.DotInput)
+			hitEffect.applyDot(sim, spellCast, &hitEffect.DotInput)
 		} else {
 			applyNow = true // no dot means we can apply results now.
 		}
 	}
 
-	// Only applyNow
+	// Only applyNow if there is no dot ticking
 	if applyNow {
-		hitEffect.SpellEffect.applyResultsToCast(spellCast)
+		hitEffect.applyResultsToCast(spellCast)
 		sim.MetricsAggregator.AddSpellCast(spellCast)
 		spellCast.objectInUse = false
 	}
-	hitEffect.SpellEffect.afterCalculations(sim, spellCast)
+	hitEffect.afterCalculations(sim, spellCast)
 }
 
 type OnDamageTick func(*Simulation)
