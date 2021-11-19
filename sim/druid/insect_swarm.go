@@ -9,7 +9,7 @@ import (
 
 const SpellIDIS int32 = 27013
 
-func (druid *Druid) newInsectSwarmTemplate(sim *core.Simulation) core.DamageOverTimeSpellTemplate {
+func (druid *Druid) newInsectSwarmTemplate(sim *core.Simulation) core.SingleHitSpellTemplate {
 	baseCast := core.Cast{
 		Name:           "Insect Swarm",
 		CritMultiplier: 1.5,
@@ -23,29 +23,28 @@ func (druid *Druid) newInsectSwarmTemplate(sim *core.Simulation) core.DamageOver
 		},
 	}
 
-	effect := core.DamageOverTimeSpellEffect{
+	effect := core.SpellHitEffect{
 		SpellEffect: core.SpellEffect{
 			DamageMultiplier: 1,
 		},
 		DotInput: core.DotDamageInput{
-			Name:                 "Insect Swarm DoT",
 			NumberOfTicks:        6,
 			TickLength:           time.Second * 2,
 			TickBaseDamage:       792 / 6,
 			TickSpellCoefficient: 0.127,
 		},
 	}
-	return core.NewDamageOverTimeSpellTemplate(core.DamageOverTimeSpell{
+	return core.NewSingleHitSpellTemplate(core.SingleHitSpell{
 		SpellCast: core.SpellCast{
 			Cast: baseCast,
 		},
-		DamageOverTimeSpellEffect: effect,
+		SpellHitEffect: effect,
 	})
 }
 
 // TODO: This might behave weird if we have a moonfire still ticking when we cast one.
-//   We could do a check and if the spell is still ticking allocate a new DamageOverTimeSpell?
-func (druid *Druid) NewInsectSwarm(sim *core.Simulation, target *core.Target) *core.DamageOverTimeSpell {
+//   We could do a check and if the spell is still ticking allocate a new SingleHitSpell?
+func (druid *Druid) NewInsectSwarm(sim *core.Simulation, target *core.Target) *core.SingleHitSpell {
 	// Initialize cast from precomputed template.
 	sf := &druid.InsectSwarmSpell
 	druid.insectSwarmCastTemplate.Apply(sf)

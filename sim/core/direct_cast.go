@@ -160,47 +160,55 @@ func NewMultiTargetDirectDamageSpellTemplate(spellTemplate MultiTargetDirectDama
 	}
 }
 
-type DamageOverTimeSpell struct {
+type SingleHitSpell struct {
 	// Embedded spell cast.
 	SpellCast
 
 	// Individual direct damage effect of this spell.
-	DamageOverTimeSpellEffect
+	SpellHitEffect
 }
 
-func (spell *DamageOverTimeSpell) Init(sim *Simulation) {
+func (spell *SingleHitSpell) Init(sim *Simulation) {
 	spell.SpellCast.init(sim)
 }
 
-func (spell *DamageOverTimeSpell) Act(sim *Simulation) bool {
+func (spell *SingleHitSpell) Act(sim *Simulation) bool {
 	return spell.startCasting(sim, func(sim *Simulation, cast *Cast) {
 		spell.apply(sim, &spell.SpellCast)
 	})
 }
 
-type DamageOverTimeSpellEffect struct {
+type SpellHitEffect struct {
 	SpellEffect
 	DotInput    DotDamageInput
 	DirectInput DirectDamageSpellInput
 }
 
-func (dotEffect *DamageOverTimeSpellEffect) apply(sim *Simulation, spellCast *SpellCast) {
-	dotEffect.SpellEffect.beforeCalculations(sim, spellCast)
+func (hitEffect *SpellHitEffect) apply(sim *Simulation, spellCast *SpellCast) {
+	hitEffect.SpellEffect.beforeCalculations(sim, spellCast)
 
-	if dotEffect.Hit {
+	if hitEffect.Hit {
 		// Only apply direct damage if it has damage. Otherwise this is a dot without direct damage.
-		if dotEffect.DirectInput.MaxBaseDamage != 0 {
-			dotEffect.SpellEffect.calculateDirectDamage(sim, spellCast, &dotEffect.DirectInput)
+		if hitEffect.DirectInput.MaxBaseDamage != 0 {
+			hitEffect.SpellEffect.calculateDirectDamage(sim, spellCast, &hitEffect.DirectInput)
 		}
-		dotEffect.SpellEffect.applyDot(sim, spellCast, &dotEffect.DotInput)
+
+		if hitEffect.DotInput.NumberOfTicks != 0 {
+			hitEffect.SpellEffect.applyDot(sim, spellCast, &hitEffect.DotInput)
+		} else {
+			// If there is no dot effect, apply the cleanup logic immediately.
+			hitEffect.SpellEffect.applyResultsToCast(spellCast)
+			sim.MetricsAggregator.AddSpellCast(spellCast)
+			spellCast.objectInUse = false
+		}
 	} else {
 		// Handle a missed cast here.
-		dotEffect.SpellEffect.applyResultsToCast(spellCast)
+		hitEffect.SpellEffect.applyResultsToCast(spellCast)
 		sim.MetricsAggregator.AddSpellCast(spellCast)
 		spellCast.objectInUse = false
 	}
 
-	dotEffect.SpellEffect.afterCalculations(sim, spellCast)
+	hitEffect.SpellEffect.afterCalculations(sim, spellCast)
 }
 
 type OnDamageTick func(*Simulation)
@@ -209,7 +217,6 @@ type OnDamageTick func(*Simulation)
 //  For now the only way for a caster to track their dot is to keep a reference to the cast object
 //  that started this and check the DotDamageInput.IsTicking()
 type DotDamageInput struct {
-	Name                 string
 	NumberOfTicks        int           // number of ticks over the whole duration
 	TickLength           time.Duration // time between each tick
 	TickBaseDamage       float64
@@ -250,7 +257,7 @@ func (spellEffect *SpellEffect) applyDot(sim *Simulation, spellCast *SpellCast, 
 		damage = calculateResists(sim, damage, spellEffect)
 
 		if sim.Log != nil {
-			sim.Log(" %s Ticked for %0.1f\n", ddInput.Name, damage)
+			sim.Log(" %s Ticked for %0.1f\n", spellCast.Name, damage)
 		}
 
 		if ddInput.OnDamageTick != nil {
@@ -284,11 +291,11 @@ func (spellEffect *SpellEffect) applyDot(sim *Simulation, spellCast *SpellCast, 
 	sim.AddPendingAction(pa)
 }
 
-type DamageOverTimeSpellTemplate struct {
-	template DamageOverTimeSpell
+type SingleHitSpellTemplate struct {
+	template SingleHitSpell
 }
 
-func (template *DamageOverTimeSpellTemplate) Apply(newAction *DamageOverTimeSpell) {
+func (template *SingleHitSpellTemplate) Apply(newAction *SingleHitSpell) {
 	if newAction.objectInUse {
 		panic("Damage over time spell already in use")
 	}
@@ -296,8 +303,8 @@ func (template *DamageOverTimeSpellTemplate) Apply(newAction *DamageOverTimeSpel
 }
 
 // Takes in a cast template and returns a template, so you don't need to keep track of which things to allocate yourself.
-func NewDamageOverTimeSpellTemplate(spellTemplate DamageOverTimeSpell) DamageOverTimeSpellTemplate {
-	return DamageOverTimeSpellTemplate{
+func NewSingleHitSpellTemplate(spellTemplate SingleHitSpell) SingleHitSpellTemplate {
+	return SingleHitSpellTemplate{
 		template: spellTemplate,
 	}
 }

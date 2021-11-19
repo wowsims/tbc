@@ -10,7 +10,7 @@ import (
 // Starfire spell IDs
 const SpellIDMF int32 = 26988
 
-func (druid *Druid) newMoonfireTemplate(sim *core.Simulation) core.DamageOverTimeSpellTemplate {
+func (druid *Druid) newMoonfireTemplate(sim *core.Simulation) core.SingleHitSpellTemplate {
 	baseCast := core.Cast{
 		Name:           "Moonfire",
 		CritMultiplier: 1.5,
@@ -24,7 +24,7 @@ func (druid *Druid) newMoonfireTemplate(sim *core.Simulation) core.DamageOverTim
 		},
 	}
 
-	effect := core.DamageOverTimeSpellEffect{
+	effect := core.SpellHitEffect{
 		SpellEffect: core.SpellEffect{
 			DamageMultiplier: 1,
 		},
@@ -34,7 +34,6 @@ func (druid *Druid) newMoonfireTemplate(sim *core.Simulation) core.DamageOverTim
 			SpellCoefficient: 0.15,
 		},
 		DotInput: core.DotDamageInput{
-			Name:                 "Moonfire DoT",
 			NumberOfTicks:        4,
 			TickLength:           time.Second * 3,
 			TickBaseDamage:       600 / 4,
@@ -62,17 +61,17 @@ func (druid *Druid) newMoonfireTemplate(sim *core.Simulation) core.DamageOverTim
 	// moonfire can proc the on hit but doesn't consume charges (i think)
 	effect.OnSpellHit = druid.applyOnHitTalents
 
-	return core.NewDamageOverTimeSpellTemplate(core.DamageOverTimeSpell{
+	return core.NewSingleHitSpellTemplate(core.SingleHitSpell{
 		SpellCast: core.SpellCast{
 			Cast: baseCast,
 		},
-		DamageOverTimeSpellEffect: effect,
+		SpellHitEffect: effect,
 	})
 }
 
 // TODO: This might behave weird if we have a moonfire still ticking when we cast one.
-//   We could do a check and if the spell is still ticking allocate a new DamageOverTimeSpell?
-func (druid *Druid) NewMoonfire(sim *core.Simulation, target *core.Target) *core.DamageOverTimeSpell {
+//   We could do a check and if the spell is still ticking allocate a new SingleHitSpell?
+func (druid *Druid) NewMoonfire(sim *core.Simulation, target *core.Target) *core.SingleHitSpell {
 	// Initialize cast from precomputed template.
 	sf := &druid.MoonfireSpell
 	druid.moonfireCastTemplate.Apply(sf)
