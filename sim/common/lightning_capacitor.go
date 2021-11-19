@@ -45,7 +45,7 @@ func ApplyTheLightningCapacitor(agent core.Agent) {
 					castTemplate.Apply(castAction)
 					castAction.Target = spellEffect.Target
 					castAction.Init(sim)
-					castAction.Act(sim)
+					castAction.Cast(sim)
 				}
 			},
 		}
@@ -66,15 +66,11 @@ func newLightningCapacitorCastTemplate(sim *core.Simulation, character *core.Cha
 				IgnoreManaCost:  true,
 				SpellSchool:     stats.NatureSpellPower,
 				CritMultiplier:  1.5,
-				OnCastComplete:  func(sim *core.Simulation, cast *core.Cast) {},
 			},
 		},
 		SpellHitEffect: core.SpellHitEffect{
 			SpellEffect: core.SpellEffect{
 				DamageMultiplier: 1,
-
-				OnSpellHit:  func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {},
-				OnSpellMiss: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {},
 			},
 			DirectInput: core.DirectDamageSpellInput{
 				MinBaseDamage: 694,

@@ -36,13 +36,16 @@ func (spell *MultiTargetDirectDamageSpell) Init(sim *Simulation) {
 	spell.SpellCast.init(sim)
 }
 
-func (spell *MultiTargetDirectDamageSpell) Act(sim *Simulation) bool {
+// TODO: If there are multiple Effects.DotEffect then each one will apply to the metrics (creating too high of a resulting DPS)
+//  To handle this we would need to add a "OnDotComplete" callback to aggregate all the dots together into a single metrics.
+//  Note: This might only apply to consecrate.
+func (spell *MultiTargetDirectDamageSpell) Cast(sim *Simulation) bool {
 	return spell.startCasting(sim, func(sim *Simulation, cast *Cast) {
 		for effectIdx := range spell.Effects {
 			effect := &spell.Effects[effectIdx]
-			effect.apply(sim, &spell.SpellCast)
+			effect.apply(sim, &spell.SpellCast, false)
 		}
-
+		// Manually apply all effects at once at the end of all the apply
 		sim.MetricsAggregator.AddSpellCast(&spell.SpellCast)
 		spell.objectInUse = false
 	})
@@ -50,7 +53,7 @@ func (spell *MultiTargetDirectDamageSpell) Act(sim *Simulation) bool {
 
 type MultiTargetDirectDamageSpellTemplate struct {
 	template MultiTargetDirectDamageSpell
-	effects  []SpellHitEffect
+	effects  []SpellHitEffect // cached effects to use on the actual cast so we don't mutate the template
 }
 
 func (template *MultiTargetDirectDamageSpellTemplate) Apply(newAction *MultiTargetDirectDamageSpell) {
@@ -80,13 +83,15 @@ type SimpleSpell struct {
 	SpellHitEffect
 }
 
+// Init will call any 'OnCast' effects associated with the caster and then apply spell haste to the cast.
+//  Init will panic if the spell or the GCD is still on CD.
 func (spell *SimpleSpell) Init(sim *Simulation) {
 	spell.init(sim)
 }
 
-func (spell *SimpleSpell) Act(sim *Simulation) bool {
+func (spell *SimpleSpell) Cast(sim *Simulation) bool {
 	return spell.startCasting(sim, func(sim *Simulation, cast *Cast) {
-		spell.apply(sim, &spell.SpellCast)
+		spell.apply(sim, &spell.SpellCast, true)
 	})
 }
 
@@ -96,7 +101,10 @@ type SpellHitEffect struct {
 	DirectInput DirectDamageSpellInput
 }
 
-func (hitEffect *SpellHitEffect) apply(sim *Simulation, spellCast *SpellCast) {
+// applies the hit/miss/dmg effects to the spellCast
+//  If applyMetrics is false it will not apply to the sim.MetricsAggregator.. This is to support collecting multiple SpellHitEffects (like in Multi)
+//  If there is a dot effect the damage will be applied to the SpellCast on each tick and on expire added to sim.MetricsAggregator.
+func (hitEffect *SpellHitEffect) apply(sim *Simulation, spellCast *SpellCast, applyMetrics bool) {
 	hitEffect.beforeCalculations(sim, spellCast)
 
 	applyNow := !hitEffect.Hit // a miss will immediately apply
@@ -117,7 +125,9 @@ func (hitEffect *SpellHitEffect) apply(sim *Simulation, spellCast *SpellCast) {
 	// Only applyNow if there is no dot ticking
 	if applyNow {
 		hitEffect.applyResultsToCast(spellCast)
-		sim.MetricsAggregator.AddSpellCast(spellCast)
+		if applyMetrics {
+			sim.MetricsAggregator.AddSpellCast(spellCast)
+		}
 		spellCast.objectInUse = false
 	}
 	hitEffect.afterCalculations(sim, spellCast)

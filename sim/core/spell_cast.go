@@ -76,7 +76,6 @@ func (spellEffect *SpellEffect) beforeCalculations(sim *Simulation, spellCast *S
 }
 
 func (spellEffect *SpellEffect) afterCalculations(sim *Simulation, spellCast *SpellCast) {
-
 	// A spell can only hit/miss if it has a target
 	if spellEffect.Target == nil {
 		return
@@ -99,7 +98,6 @@ func (spellEffect *SpellEffect) afterCalculations(sim *Simulation, spellCast *Sp
 	if sim.Log != nil {
 		sim.Log("(%d) %s result: %s\n", spellCast.Character.ID, spellCast.Name, spellEffect)
 	}
-
 }
 
 // Calculates whether this spell 'hit' and updates the effect field with the result.

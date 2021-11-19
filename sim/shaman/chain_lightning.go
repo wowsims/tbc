@@ -36,7 +36,7 @@ func (shaman *Shaman) newChainLightningTemplate(sim *core.Simulation, isLightnin
 
 			if sim.RandomFloat("CL Lightning Overload") < lightningOverloadChance {
 				overloadAction := shaman.NewChainLightning(sim, spellEffect.Target, true)
-				overloadAction.Act(sim)
+				overloadAction.Cast(sim)
 			}
 		}
 	} else {
@@ -52,7 +52,7 @@ func (shaman *Shaman) newChainLightningTemplate(sim *core.Simulation, isLightnin
 	effects := make([]core.SpellHitEffect, 0, numHits)
 	effects = append(effects, effect)
 	for i := int32(1); i < numHits; i++ {
-		bounceEffect := effects[i-1] // Makes a copy
+		bounceEffect := effects[i-1] // Makes a copy of the previous bounce
 		if hasTidefury {
 			bounceEffect.DamageMultiplier *= 0.83
 		} else {

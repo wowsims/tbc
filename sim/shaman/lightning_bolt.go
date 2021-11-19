@@ -37,7 +37,7 @@ func (shaman *Shaman) newLightningBoltTemplate(sim *core.Simulation, isLightning
 
 			if sim.RandomFloat("LB Lightning Overload") < lightningOverloadChance {
 				overloadAction := shaman.NewLightningBolt(sim, spellEffect.Target, true)
-				overloadAction.Act(sim)
+				overloadAction.Cast(sim)
 			}
 		}
 	} else {
@@ -64,7 +64,7 @@ func (shaman *Shaman) NewLightningBolt(sim *core.Simulation, target *core.Target
 	}
 
 	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	lb.SpellHitEffect.Target = target
+	lb.Target = target
 	shaman.applyElectricSpellCastInitModifiers(&lb.SpellCast)
 
 	lb.Init(sim)

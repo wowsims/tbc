@@ -94,7 +94,7 @@ func (moonkin *BalanceDruid) actRotation(sim *core.Simulation, rotation proto.Ba
 		return sim.CurrentTime + time.Millisecond*1500
 	} else if rotation.InsectSwarm && !moonkin.InsectSwarmSpell.DotInput.IsTicking(sim) {
 		swarm := moonkin.NewInsectSwarm(sim, target)
-		success := swarm.Act(sim)
+		success := swarm.Cast(sim)
 		if !success {
 			regenTime := moonkin.TimeUntilManaRegen(swarm.GetManaCost())
 			return sim.CurrentTime + regenTime
@@ -102,7 +102,7 @@ func (moonkin *BalanceDruid) actRotation(sim *core.Simulation, rotation proto.Ba
 		return sim.CurrentTime + moonkin.GetRemainingCD(core.GCDCooldownID, sim.CurrentTime)
 	} else if rotation.Moonfire && !moonkin.MoonfireSpell.DotInput.IsTicking(sim) {
 		moonfire := moonkin.NewMoonfire(sim, target)
-		success := moonfire.Act(sim)
+		success := moonfire.Cast(sim)
 		if !success {
 			regenTime := moonkin.TimeUntilManaRegen(moonfire.GetManaCost())
 			return sim.CurrentTime + regenTime
@@ -120,7 +120,7 @@ func (moonkin *BalanceDruid) actRotation(sim *core.Simulation, rotation proto.Ba
 		spell = moonkin.NewWrath(sim, target)
 	}
 
-	actionSuccessful := spell.Act(sim)
+	actionSuccessful := spell.Cast(sim)
 
 	if !actionSuccessful {
 		regenTime := moonkin.TimeUntilManaRegen(spell.GetManaCost())
