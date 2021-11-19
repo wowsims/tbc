@@ -24,21 +24,20 @@ const (
 func (shaman *Shaman) newElectricSpellCast(name string, actionID core.ActionID, baseManaCost float64, baseCastTime time.Duration, isLightningOverload bool) core.SpellCast {
 	spellCast := core.SpellCast{
 		Cast: core.Cast{
-			Name: name,
-			ActionID: actionID,
-			Character: shaman.GetCharacter(),
-			BaseManaCost: baseManaCost,
-			ManaCost: baseManaCost,
-			CastTime: baseCastTime,
-			SpellSchool: stats.NatureSpellPower,
-			CritMultiplier:   1.5,
+			Name:           name,
+			ActionID:       actionID,
+			Character:      shaman.GetCharacter(),
+			BaseManaCost:   baseManaCost,
+			ManaCost:       baseManaCost,
+			CastTime:       baseCastTime,
+			SpellSchool:    stats.NatureSpellPower,
+			CritMultiplier: 1.5,
 		},
 	}
 
 	if shaman.Talents.ElementalFury {
 		spellCast.CritMultiplier = 2
 	}
-
 
 	if isLightningOverload {
 		spellCast.Name += " (LO)"
@@ -76,8 +75,8 @@ func (shaman *Shaman) newElectricSpellEffect(minBaseDamage float64, maxBaseDamag
 			OnSpellMiss: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {},
 		},
 		DirectDamageSpellInput: core.DirectDamageSpellInput{
-			MinBaseDamage: minBaseDamage,
-			MaxBaseDamage: maxBaseDamage,
+			MinBaseDamage:    minBaseDamage,
+			MaxBaseDamage:    maxBaseDamage,
 			SpellCoefficient: spellCoefficient,
 		},
 	}
@@ -88,7 +87,6 @@ func (shaman *Shaman) newElectricSpellEffect(minBaseDamage float64, maxBaseDamag
 	}
 
 	effect.SpellEffect.BonusSpellHitRating += float64(shaman.Talents.ElementalPrecision) * 2 * core.SpellHitRatingPerHitChance
-	effect.SpellEffect.BonusSpellHitRating += float64(shaman.Talents.NaturesGuidance) * 1 * core.SpellHitRatingPerHitChance
 	effect.SpellEffect.BonusSpellCritRating += float64(shaman.Talents.TidalMastery) * 1 * core.SpellCritRatingPerCritChance
 	effect.SpellEffect.BonusSpellCritRating += float64(shaman.Talents.CallOfThunder) * 1 * core.SpellCritRatingPerCritChance
 

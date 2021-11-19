@@ -41,7 +41,7 @@ func TestP1FullCharacterStats(t *testing.T) {
 		stats.NatureSpellPower: 123,
 
 		stats.MP5:       337.9,
-		stats.SpellHit:  87.8,
+		stats.SpellHit:  125.600,
 		stats.SpellCrit: 695.705,
 
 		stats.AttackPower: 401.4,
@@ -157,7 +157,7 @@ func TestSimulateP1(t *testing.T) {
 		},
 
 		ExpectedDpsShort: 2166.0,
-		ExpectedDpsLong:  1596.2,
+		ExpectedDpsLong:  1582.3,
 	})
 }
 func TestMultiTarget(t *testing.T) {
@@ -211,8 +211,8 @@ func TestMultiTarget(t *testing.T) {
 			Gear:          P1Tidefury,
 		},
 
-		ExpectedDpsShort: 2714.5,
-		ExpectedDpsLong:  1934.5,
+		ExpectedDpsShort: 2731.0,
+		ExpectedDpsLong:  1958.3,
 	})
 }
 
@@ -274,7 +274,7 @@ func TestClearcastAgent(t *testing.T) {
 		},
 
 		ExpectedDpsShort: 2135.3,
-		ExpectedDpsLong:  1596.3,
+		ExpectedDpsLong:  1578.9,
 	})
 }
 
@@ -293,7 +293,7 @@ func TestAverageDPS(t *testing.T) {
 		PlayerOptions: PlayerOptionsAdaptive,
 	})
 
-	core.IndividualSimAverageTest("P1Average", t, isr, 1578.6)
+	core.IndividualSimAverageTest("P1Average", t, isr, 1580.9)
 }
 
 func BenchmarkSimulate(b *testing.B) {
