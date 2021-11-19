@@ -21,14 +21,14 @@ type Druid struct {
 	starfire8CastTemplate core.SingleTargetDirectDamageSpellTemplate
 	starfire6CastTemplate core.SingleTargetDirectDamageSpellTemplate
 
-	MoonfireSpell        core.DamageOverTimeSpell
-	moonfireCastTemplate core.DamageOverTimeSpellTemplate
+	MoonfireSpell        core.SingleHitSpell
+	moonfireCastTemplate core.SingleHitSpellTemplate
 
 	wrathSpell        core.SingleTargetDirectDamageSpell
 	wrathCastTemplate core.SingleTargetDirectDamageSpellTemplate
 
-	InsectSwarmSpell        core.DamageOverTimeSpell
-	insectSwarmCastTemplate core.DamageOverTimeSpellTemplate
+	InsectSwarmSpell        core.SingleHitSpell
+	insectSwarmCastTemplate core.SingleHitSpellTemplate
 
 	malorne4p bool // cached since we need to check on every innervate
 }
@@ -73,8 +73,8 @@ func (druid *Druid) Init(sim *core.Simulation) {
 
 func (druid *Druid) Reset(newsim *core.Simulation) {
 	// Cleanup and pending dots and casts
-	druid.MoonfireSpell = core.DamageOverTimeSpell{}
-	druid.InsectSwarmSpell = core.DamageOverTimeSpell{}
+	druid.MoonfireSpell = core.SingleHitSpell{}
+	druid.InsectSwarmSpell = core.SingleHitSpell{}
 	druid.starfireSpell = core.SingleTargetDirectDamageSpell{}
 	druid.wrathSpell = core.SingleTargetDirectDamageSpell{}
 
