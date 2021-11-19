@@ -17,18 +17,18 @@ type Druid struct {
 	NaturesGrace bool // when true next spellcast is 0.5s faster
 
 	// cached cast stuff
-	starfireSpell         core.SingleTargetDirectDamageSpell
-	starfire8CastTemplate core.SingleTargetDirectDamageSpellTemplate
-	starfire6CastTemplate core.SingleTargetDirectDamageSpellTemplate
+	starfireSpell         core.SimpleSpell
+	starfire8CastTemplate core.SimpleSpellTemplate
+	starfire6CastTemplate core.SimpleSpellTemplate
 
-	MoonfireSpell        core.SingleHitSpell
-	moonfireCastTemplate core.SingleHitSpellTemplate
+	MoonfireSpell        core.SimpleSpell
+	moonfireCastTemplate core.SimpleSpellTemplate
 
-	wrathSpell        core.SingleTargetDirectDamageSpell
-	wrathCastTemplate core.SingleTargetDirectDamageSpellTemplate
+	wrathSpell        core.SimpleSpell
+	wrathCastTemplate core.SimpleSpellTemplate
 
-	InsectSwarmSpell        core.SingleHitSpell
-	insectSwarmCastTemplate core.SingleHitSpellTemplate
+	InsectSwarmSpell        core.SimpleSpell
+	insectSwarmCastTemplate core.SimpleSpellTemplate
 
 	malorne4p bool // cached since we need to check on every innervate
 }
@@ -73,10 +73,10 @@ func (druid *Druid) Init(sim *core.Simulation) {
 
 func (druid *Druid) Reset(newsim *core.Simulation) {
 	// Cleanup and pending dots and casts
-	druid.MoonfireSpell = core.SingleHitSpell{}
-	druid.InsectSwarmSpell = core.SingleHitSpell{}
-	druid.starfireSpell = core.SingleTargetDirectDamageSpell{}
-	druid.wrathSpell = core.SingleTargetDirectDamageSpell{}
+	druid.MoonfireSpell = core.SimpleSpell{}
+	druid.InsectSwarmSpell = core.SimpleSpell{}
+	druid.starfireSpell = core.SimpleSpell{}
+	druid.wrathSpell = core.SimpleSpell{}
 
 	druid.Character.Reset(newsim)
 }

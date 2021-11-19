@@ -49,7 +49,7 @@ func (shaman *Shaman) newChainLightningTemplate(sim *core.Simulation, isLightnin
 
 	hasTidefury := ItemSetTidefury.CharacterHasSetBonus(&shaman.Character, 2)
 	numHits := core.MinInt32(3, sim.GetNumTargets())
-	effects := make([]core.DirectDamageSpellEffect, 0, numHits)
+	effects := make([]core.SpellHitEffect, 0, numHits)
 	effects = append(effects, effect)
 	for i := int32(1); i < numHits; i++ {
 		bounceEffect := effects[i-1] // Makes a copy

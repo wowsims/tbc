@@ -45,7 +45,7 @@ type BalanceDruid struct {
 	// primaryRotation.
 	useSurplusRotation bool
 	surplusRotation    proto.BalanceDruid_Rotation
-	manaTracker      common.ManaSpendingRateTracker
+	manaTracker        common.ManaSpendingRateTracker
 }
 
 // GetDruid is to implement druid.Agent (supports nordrassil set bonus)
@@ -110,7 +110,7 @@ func (moonkin *BalanceDruid) actRotation(sim *core.Simulation, rotation proto.Ba
 		return sim.CurrentTime + moonkin.GetRemainingCD(core.GCDCooldownID, sim.CurrentTime)
 	}
 
-	var spell *core.SingleTargetDirectDamageSpell
+	var spell *core.SimpleSpell
 	switch rotation.PrimarySpell {
 	case proto.BalanceDruid_Rotation_Starfire:
 		spell = moonkin.NewStarfire(sim, target, 8)
@@ -172,14 +172,14 @@ func (moonkin *BalanceDruid) PickRotations(baseRotation proto.BalanceDruid_Rotat
 			}
 
 			moonkin.useSurplusRotation = true
-			moonkin.surplusRotation = rotations[i - 1]
+			moonkin.surplusRotation = rotations[i-1]
 			moonkin.manaTracker = common.NewManaSpendingRateTracker()
 			return
 		}
 	}
 
 	// If we are here than all of the rotations went oom. No adaptive logic needed, just use the lowest one.
-	moonkin.primaryRotation = rotations[len(rotations) - 1]
+	moonkin.primaryRotation = rotations[len(rotations)-1]
 }
 
 // Returns the order of DPS rotations to try, from highest to lowest dps. The

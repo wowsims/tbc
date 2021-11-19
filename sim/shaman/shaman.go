@@ -57,7 +57,7 @@ func NewShaman(character core.Character, talents proto.ShamanTalents, selfBuffs 
 			SourceStat:   stats.Mana,
 			ModifiedStat: stats.Mana,
 			Modifier: func(mana float64, _ float64) float64 {
-				return mana + mana * coeff
+				return mana + mana*coeff
 			},
 		})
 	}
@@ -123,15 +123,15 @@ type Shaman struct {
 	ElementalFocusStacks byte
 
 	// "object pool" for shaman spells that are currently being cast.
-	lightningBoltSpell   core.SingleTargetDirectDamageSpell
-	lightningBoltSpellLO core.SingleTargetDirectDamageSpell
+	lightningBoltSpell   core.SimpleSpell
+	lightningBoltSpellLO core.SimpleSpell
 
 	chainLightningSpell    core.MultiTargetDirectDamageSpell
 	chainLightningSpellLOs []core.MultiTargetDirectDamageSpell
 
 	// Precomputed templated cast generator for quickly resetting cast fields.
-	lightningBoltCastTemplate   core.SingleTargetDirectDamageSpellTemplate
-	lightningBoltLOCastTemplate core.SingleTargetDirectDamageSpellTemplate
+	lightningBoltCastTemplate   core.SimpleSpellTemplate
+	lightningBoltLOCastTemplate core.SimpleSpellTemplate
 
 	chainLightningCastTemplate    core.MultiTargetDirectDamageSpellTemplate
 	chainLightningLOCastTemplates []core.MultiTargetDirectDamageSpellTemplate
@@ -214,8 +214,8 @@ func (shaman *Shaman) Reset(sim *core.Simulation) {
 	}
 
 	// Reset all spells so any pending casts are cleaned up
-	shaman.lightningBoltSpell = core.SingleTargetDirectDamageSpell{}
-	shaman.lightningBoltSpellLO = core.SingleTargetDirectDamageSpell{}
+	shaman.lightningBoltSpell = core.SimpleSpell{}
+	shaman.lightningBoltSpellLO = core.SimpleSpell{}
 	shaman.chainLightningSpell = core.MultiTargetDirectDamageSpell{}
 
 	numHits := core.MinInt32(3, sim.GetNumTargets())
@@ -232,7 +232,7 @@ func (shaman *Shaman) Advance(sim *core.Simulation, elapsedTime time.Duration) {
 //  If they do time.Duration will be returned will be >0.
 func (shaman *Shaman) TryDropTotems(sim *core.Simulation) time.Duration {
 
-	var cast *core.NoEffectSpell
+	var cast *core.SimpleSpell
 
 	// currently hardcoded to include 25% mana cost reduction from resto talents
 	for i, v := range shaman.SelfBuffs.NextTotemDrops {
@@ -264,8 +264,11 @@ func (shaman *Shaman) TryDropTotems(sim *core.Simulation) time.Duration {
 		return 0 // no totem to cast
 	}
 
-	cast.Act(sim)
+	if cast.Act(sim) {
+		return cast.CastTime
+	}
 
+	// TODO: calculate regen time instead of just a GCD
 	return cast.CastTime
 }
 

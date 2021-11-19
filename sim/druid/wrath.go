@@ -13,7 +13,7 @@ const SpellIDWrath int32 = 26985
 
 const IdolAvenger int32 = 31025
 
-func (druid *Druid) newWrathTemplate(sim *core.Simulation) core.SingleTargetDirectDamageSpellTemplate {
+func (druid *Druid) newWrathTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
 	baseCast := core.Cast{
 		Name:           "Wrath",
 		CritMultiplier: 1.5,
@@ -27,14 +27,14 @@ func (druid *Druid) newWrathTemplate(sim *core.Simulation) core.SingleTargetDire
 		},
 	}
 
-	effect := core.DirectDamageSpellEffect{
+	effect := core.SpellHitEffect{
 		SpellEffect: core.SpellEffect{
 			DamageMultiplier: 1,
 		},
-		DirectDamageSpellInput: core.DirectDamageSpellInput{
+		DirectInput: core.DirectDamageSpellInput{
 			MinBaseDamage:    383,
 			MaxBaseDamage:    432,
-			SpellCoefficient: 0.571 + 0.02 * float64(druid.Talents.WrathOfCenarius),
+			SpellCoefficient: 0.571 + 0.02*float64(druid.Talents.WrathOfCenarius),
 		},
 	}
 
@@ -59,13 +59,13 @@ func (druid *Druid) newWrathTemplate(sim *core.Simulation) core.SingleTargetDire
 		Cast: baseCast,
 	}
 
-	return core.NewSingleTargetDirectDamageSpellTemplate(core.SingleTargetDirectDamageSpell{
+	return core.NewSimpleSpellTemplate(core.SimpleSpell{
 		SpellCast: *spCast,
 		Effect:    effect,
 	})
 }
 
-func (druid *Druid) NewWrath(sim *core.Simulation, target *core.Target) *core.SingleTargetDirectDamageSpell {
+func (druid *Druid) NewWrath(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
 	// Initialize cast from precomputed template.
 	sf := &druid.wrathSpell
 

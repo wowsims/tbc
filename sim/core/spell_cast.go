@@ -3,6 +3,7 @@ package core
 import (
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/wowsims/tbc/sim/core/stats"
 )
@@ -62,6 +63,12 @@ type SpellEffect struct {
 }
 
 func (spellEffect *SpellEffect) beforeCalculations(sim *Simulation, spellCast *SpellCast) {
+
+	// A spell without a target won't hit
+	if spellEffect.Target == nil {
+		return
+	}
+
 	spellCast.Character.OnBeforeSpellHit(sim, spellCast, spellEffect)
 	spellEffect.Target.OnBeforeSpellHit(sim, spellCast, spellEffect)
 
@@ -69,6 +76,12 @@ func (spellEffect *SpellEffect) beforeCalculations(sim *Simulation, spellCast *S
 }
 
 func (spellEffect *SpellEffect) afterCalculations(sim *Simulation, spellCast *SpellCast) {
+
+	// A spell can only hit/miss if it has a target
+	if spellEffect.Target == nil {
+		return
+	}
+
 	if spellEffect.Hit {
 		if spellEffect.OnSpellHit != nil {
 			spellEffect.OnSpellHit(sim, spellCast, spellEffect)
@@ -86,6 +99,7 @@ func (spellEffect *SpellEffect) afterCalculations(sim *Simulation, spellCast *Sp
 	if sim.Log != nil {
 		sim.Log("(%d) %s result: %s\n", spellCast.Character.ID, spellCast.Name, spellEffect)
 	}
+
 }
 
 // Calculates whether this spell 'hit' and updates the effect field with the result.
@@ -117,6 +131,76 @@ func (spellEffect *SpellEffect) applyResultsToCast(spellCast *SpellCast) {
 	spellCast.TotalDamage += spellEffect.Damage
 }
 
+func (spellEffect *SpellEffect) calculateDirectDamage(sim *Simulation, spellCast *SpellCast, ddInput *DirectDamageSpellInput) {
+	baseDamage := ddInput.MinBaseDamage + sim.RandomFloat("DirectSpell Base Damage")*(ddInput.MaxBaseDamage-ddInput.MinBaseDamage)
+
+	totalSpellPower := spellCast.Character.GetStat(stats.SpellPower) + spellCast.Character.GetStat(spellCast.SpellSchool) + spellEffect.BonusSpellPower
+	damageFromSpellPower := (totalSpellPower * ddInput.SpellCoefficient)
+
+	damage := baseDamage + damageFromSpellPower + ddInput.FlatDamageBonus
+
+	damage *= spellEffect.DamageMultiplier
+
+	crit := (spellCast.Character.GetStat(stats.SpellCrit) + spellEffect.BonusSpellCritRating) / (SpellCritRatingPerCritChance * 100)
+	if spellCast.GuaranteedCrit || sim.RandomFloat("DirectSpell Crit") < crit {
+		spellEffect.Crit = true
+		damage *= spellCast.CritMultiplier
+	}
+
+	damage = calculateResists(sim, damage, spellEffect)
+
+	spellEffect.Damage = damage
+}
+
+func (spellEffect *SpellEffect) applyDot(sim *Simulation, spellCast *SpellCast, ddInput *DotDamageInput) {
+	totalSpellPower := spellCast.Character.GetStat(stats.SpellPower) + spellCast.Character.GetStat(spellCast.SpellSchool) + spellEffect.BonusSpellPower
+	// snapshot total damage per tick
+	ddInput.damagePerTick = (ddInput.TickBaseDamage + totalSpellPower*ddInput.TickSpellCoefficient) * spellEffect.DamageMultiplier
+	ddInput.finalTickTime = sim.CurrentTime + time.Duration(ddInput.NumberOfTicks)*ddInput.TickLength
+
+	pa := &PendingAction{
+		NextActionAt: sim.CurrentTime + ddInput.TickLength,
+	}
+
+	pa.OnAction = func(sim *Simulation) {
+		damage := ddInput.damagePerTick
+		damage = calculateResists(sim, damage, spellEffect)
+
+		if sim.Log != nil {
+			sim.Log(" %s Ticked for %0.1f\n", spellCast.Name, damage)
+		}
+
+		if ddInput.OnDamageTick != nil {
+			ddInput.OnDamageTick(sim)
+		}
+
+		spellEffect.Damage += damage
+
+		ddInput.tickIndex++
+		if ddInput.tickIndex < ddInput.NumberOfTicks {
+			// add more pending
+			pa.NextActionAt = sim.CurrentTime + ddInput.TickLength
+		} else {
+			pa.CleanUp(sim)
+		}
+	}
+	pa.CleanUp = func(sim *Simulation) {
+		if pa.NextActionAt == NeverExpires {
+			panic("Already cleaned up dot")
+		}
+
+		// Complete metrics and adding results etc
+		spellEffect.applyResultsToCast(spellCast)
+		sim.MetricsAggregator.AddSpellCast(spellCast)
+		spellCast.objectInUse = false
+
+		// Kills the pending action from the main run loop.
+		pa.NextActionAt = NeverExpires
+	}
+
+	sim.AddPendingAction(pa)
+}
+
 func (spellEffect *SpellEffect) String() string {
 	if !spellEffect.Hit {
 		return "Miss"
@@ -140,4 +224,28 @@ func (spellEffect *SpellEffect) String() string {
 
 	fmt.Fprintf(&sb, " for %0.2f damage", spellEffect.Damage)
 	return sb.String()
+}
+
+func calculateResists(sim *Simulation, damage float64, spellEffect *SpellEffect) float64 {
+	// Average Resistance (AR) = (Target's Resistance / (Caster's Level * 5)) * 0.75
+	// P(x) = 50% - 250%*|x - AR| <- where X is %resisted
+	// Using these stats:
+	//    13.6% chance of
+	//  FUTURE: handle boss resists for fights/classes that are actually impacted by that.
+
+	resVal := sim.RandomFloat("DirectSpell Resist")
+	if resVal < 0.18 { // 13% chance for 25% resist, 4% for 50%, 1% for 75%
+		if resVal < 0.01 {
+			spellEffect.PartialResist_3_4 = true
+			return damage * 0.25
+		} else if resVal < 0.05 {
+			spellEffect.PartialResist_2_4 = true
+			return damage * 0.5
+		} else {
+			spellEffect.PartialResist_1_4 = true
+			return damage * 0.75
+		}
+	}
+
+	return damage
 }
