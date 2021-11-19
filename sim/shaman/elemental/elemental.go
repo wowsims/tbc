@@ -259,6 +259,7 @@ func NewAdaptiveRotation(isr proto.IndividualSimRequest) *AdaptiveRotation {
 	}
 
 	clearcastRequest := googleProto.Clone(&isr).(*proto.IndividualSimRequest)
+	clearcastRequest.SimOptions.RandomSeed = 1
 	clearcastRequest.SimOptions.Debug = false
 	clearcastRequest.SimOptions.Iterations = 100
 	clearcastRequest.Player.Options.Spec.(*proto.PlayerOptions_ElementalShaman).ElementalShaman.Rotation.Type = proto.ElementalShaman_Rotation_CLOnClearcast
@@ -266,7 +267,7 @@ func NewAdaptiveRotation(isr proto.IndividualSimRequest) *AdaptiveRotation {
 	clearcastSim := core.NewIndividualSim(*clearcastRequest)
 	clearcastResult := clearcastSim.Run()
 
-	if clearcastResult.Agents[0].NumOom >= 5 {
+	if clearcastResult.Agents[0].NumOom >= 15 {
 		rotation.baseRotation = NewLBOnlyRotation()
 		rotation.surplusRotation = NewCLOnClearcastRotation()
 	} else {
