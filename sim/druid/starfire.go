@@ -99,7 +99,7 @@ func (druid *Druid) NewStarfire(sim *core.Simulation, target *core.Target, rank 
 	druid.applyNaturesGrace(&sf.SpellCast)
 
 	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	sf.SpellHitEffect.Target = target
+	sf.Target = target
 	sf.Init(sim)
 
 	return sf

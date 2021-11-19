@@ -43,7 +43,7 @@ func ApplyTheLightningCapacitor(agent core.Agent) {
 
 					castAction := &spellObj
 					castTemplate.Apply(castAction)
-					castAction.Effect.Target = spellEffect.Target
+					castAction.Target = spellEffect.Target
 					castAction.Init(sim)
 					castAction.Act(sim)
 				}
@@ -69,7 +69,7 @@ func newLightningCapacitorCastTemplate(sim *core.Simulation, character *core.Cha
 				OnCastComplete:  func(sim *core.Simulation, cast *core.Cast) {},
 			},
 		},
-		Effect: core.SpellHitEffect{
+		SpellHitEffect: core.SpellHitEffect{
 			SpellEffect: core.SpellEffect{
 				DamageMultiplier: 1,
 
