@@ -40,7 +40,7 @@ var ItemDeclarations = []ItemDeclaration{
 	{ /** Band of Al'ar */ ID: 29922, Categories: []proto.ItemCategory{CasterCategory}},
 	{ /** Band of Crimson Fury */ ID: 28793, Categories: []proto.ItemCategory{CasterCategory}},
 	{ /** Band of Dominion */ ID: 31290, Categories: []proto.ItemCategory{CasterCategory}},
-	{ /** Band of Eternity */ ID: 29302, Categories: []proto.ItemCategory{CasterCategory}},
+	{ /** Band of Eternity */ ID: 29302, Categories: []proto.ItemCategory{CasterCategory}, Phase: 2},
 	{ /** Band of Frigid Elements */ ID: 32779, Categories: []proto.ItemCategory{CasterCategory}},
 	{ /** Band of the Eternal Sage */ ID: 29305, Categories: []proto.ItemCategory{CasterCategory}},
 	{ /** Band of the Guardian */ ID: 29320, Categories: []proto.ItemCategory{CasterCategory}},
