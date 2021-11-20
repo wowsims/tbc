@@ -256,7 +256,7 @@ func makePotionActivation(potionType proto.Potions, character *Character) Cooldo
 
 			character.AddStat(stats.Mana, manaGain)
 			if sim.Log != nil {
-				sim.Log("Used Mana Potion\n")
+				sim.Log("Used Super Mana Potion\n")
 			}
 
 			character.SetCD(PotionCooldownID, time.Minute*2+sim.CurrentTime)
