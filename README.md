@@ -3,7 +3,8 @@ Welcome to the WoW TBC Classic simulator! If you have questions or are thinking 
 The primary goal of this project is to provide a framework that makes it easy to build a DPS sim for any class/spec, with a polished UI and accurate results. Each community will have ownership / responsibility over their portion of the sim, to ensure accuracy and that their community is represented. When enough classes/specs are implemented, we also hope to build a "raid sim".
 
 Live sims:
-[Elemental Shaman](https://wowsims.github.io/tbc/elemental_shaman/ "https://wowsims.github.io/tbc/elemental_shaman/")
+ - [Balance Druid](https://wowsims.github.io/tbc/balance_druid/ "https://wowsims.github.io/tbc/balance_druid/")
+ - [Elemental Shaman](https://wowsims.github.io/tbc/elemental_shaman/ "https://wowsims.github.io/tbc/elemental_shaman/")
 
 # Installation
 This project has dependencies on Go >=1.16, protobuf-compiler and the corresponding Go plugins, and node >= 14.0.
@@ -24,8 +25,6 @@ sudo apt update && sudo apt upgrade
 sudo apt install protobuf-compiler
 go get -u -v github.com/golang/protobuf/proto
 go get -u -v github.com/golang/protobuf/protoc-gen-go
-
-# You should be able to run 'make test' now. If you see an error like, 'protoc-gen-go: program not found or is not executable', run the following commands:
 
 # Install node
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash
