@@ -179,6 +179,7 @@ var ItemDeclarations = []ItemDeclaration{
 	{ /** Handguards of Defiled Worlds */ ID: 34344, Categories: []proto.ItemCategory{CasterCategory}},
 	{ /** Handwraps of Flowing Thought */ ID: 28507, Categories: []proto.ItemCategory{CasterCategory}},
 	{ /** Haramad's Leggings of the Third Coin */ ID: 29343, Categories: []proto.ItemCategory{CasterCategory}},
+	{ /** Harbringer Bands */ ID: 28477, Categories: []proto.ItemCategory{CasterCategory}},
 	{ /** Harmony's Touch */ ID: 29784, Categories: []proto.ItemCategory{CasterCategory}},
 	{ /** Hatefury Mantle */ ID: 30884, Categories: []proto.ItemCategory{CasterCategory}},
 	{ /** Hauberk of the Furious Elements */ ID: 33965, Categories: []proto.ItemCategory{CasterCategory}},
