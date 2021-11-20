@@ -95,7 +95,7 @@ func registerDrumsCD(agent Agent, consumes proto.Consumes) {
 	drumsType := proto.Drums_DrumsUnknown
 
 	// Whether this agent is the one casting the drums.
-	//drumsSelfCast := false
+	drumsSelfCast := false
 
 	if consumes.Drums != proto.Drums_DrumsUnknown {
 		drumsType = consumes.Drums
@@ -119,6 +119,9 @@ func registerDrumsCD(agent Agent, consumes proto.Consumes) {
 					agent.GetCharacter().SetCD(DrumsCooldownID, time.Minute*2+sim.CurrentTime) // tinnitus
 					agent.GetCharacter().AddAuraWithTemporaryStats(sim, DrumsAuraID, "Drums of Battle", stats.SpellHaste, hasteBonus, time.Second*30)
 				}
+				if drumsSelfCast {
+					sim.MetricsAggregator.AddInstantCast(agent.GetCharacter(), ActionID{SpellID: 35476})
+				}
 				return true
 			}
 		}
@@ -130,6 +133,9 @@ func registerDrumsCD(agent Agent, consumes proto.Consumes) {
 				for _, agent := range character.Party.Players {
 					agent.GetCharacter().SetCD(DrumsCooldownID, time.Minute*2+sim.CurrentTime) // tinnitus
 					agent.GetCharacter().AddAuraWithTemporaryStats(sim, DrumsAuraID, "Drums of Restoration", stats.MP5, mp5Bonus, time.Second*15)
+				}
+				if drumsSelfCast {
+					sim.MetricsAggregator.AddInstantCast(agent.GetCharacter(), ActionID{SpellID: 35478})
 				}
 				return true
 			}
@@ -229,6 +235,7 @@ func makePotionActivation(potionType proto.Potions, character *Character) Cooldo
 			})
 
 			character.SetCD(PotionCooldownID, time.Minute*2+sim.CurrentTime)
+			sim.MetricsAggregator.AddInstantCast(character, ActionID{ItemID: 22839})
 			return true
 		}
 	} else if potionType == proto.Potions_SuperManaPotion {
@@ -253,6 +260,7 @@ func makePotionActivation(potionType proto.Potions, character *Character) Cooldo
 			}
 
 			character.SetCD(PotionCooldownID, time.Minute*2+sim.CurrentTime)
+			sim.MetricsAggregator.AddInstantCast(character, ActionID{ItemID: 22832})
 			return true
 		}
 	} else {
@@ -285,6 +293,7 @@ func registerDarkRuneCD(agent Agent, consumes proto.Consumes) {
 				if sim.Log != nil {
 					sim.Log("Used Dark Rune\n")
 				}
+				sim.MetricsAggregator.AddInstantCast(character, ActionID{SpellID: 27869})
 
 				return true
 			}

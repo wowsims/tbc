@@ -78,21 +78,21 @@ func (moonkin *BalanceDruid) Act(sim *core.Simulation) time.Duration {
 
 func (moonkin *BalanceDruid) actRotation(sim *core.Simulation, rotation proto.BalanceDruid_Rotation) time.Duration {
 	// Activate shared druid behaviors
-	if moonkin.TryInnervate(sim) {
-		return sim.CurrentTime + moonkin.GetRemainingCD(core.GCDCooldownID, sim.CurrentTime)
+	innervateWait := moonkin.TryInnervate(sim)
+	if innervateWait != 0 {
+		return innervateWait
 	}
 
 	target := sim.GetPrimaryTarget()
-	if rotation.FaerieFire && !target.HasAura(druid.FaerieFireDebuffID) {
-		target.AddAura(sim, core.Aura{
-			ID:      druid.FaerieFireDebuffID,
-			Name:    "Faerie Fire",
-			Expires: sim.CurrentTime + time.Second*40,
-			// TODO: implement increased melee hit
-		})
-		moonkin.SetCD(core.GCDCooldownID, core.CalculatedGCD(&moonkin.Character))
-		return sim.CurrentTime + time.Millisecond*1500
-	} else if rotation.InsectSwarm && !moonkin.InsectSwarmSpell.DotInput.IsTicking(sim) {
+
+	if rotation.FaerieFire {
+		ffWait := moonkin.TryFaerieFire(sim, target)
+		if ffWait != 0 {
+			return ffWait
+		}
+	}
+
+	if rotation.InsectSwarm && !moonkin.InsectSwarmSpell.DotInput.IsTicking(sim) {
 		swarm := moonkin.NewInsectSwarm(sim, target)
 		success := swarm.Cast(sim)
 		if !success {

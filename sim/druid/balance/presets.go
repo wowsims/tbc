@@ -93,6 +93,7 @@ var PlayerOptionsStarfire = &proto.PlayerOptions{
 			Rotation: &proto.BalanceDruid_Rotation{
 				PrimarySpell: proto.BalanceDruid_Rotation_Starfire,
 				Moonfire:     true,
+				FaerieFire:   true,
 			},
 		},
 	},

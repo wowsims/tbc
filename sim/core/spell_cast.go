@@ -64,11 +64,6 @@ type SpellEffect struct {
 
 func (spellEffect *SpellEffect) beforeCalculations(sim *Simulation, spellCast *SpellCast) {
 
-	// A spell without a target won't hit
-	if spellEffect.Target == nil {
-		return
-	}
-
 	spellCast.Character.OnBeforeSpellHit(sim, spellCast, spellEffect)
 	spellEffect.Target.OnBeforeSpellHit(sim, spellCast, spellEffect)
 
@@ -76,11 +71,6 @@ func (spellEffect *SpellEffect) beforeCalculations(sim *Simulation, spellCast *S
 }
 
 func (spellEffect *SpellEffect) afterCalculations(sim *Simulation, spellCast *SpellCast) {
-	// A spell can only hit/miss if it has a target
-	if spellEffect.Target == nil {
-		return
-	}
-
 	if spellEffect.Hit {
 		if spellEffect.OnSpellHit != nil {
 			spellEffect.OnSpellHit(sim, spellCast, spellEffect)

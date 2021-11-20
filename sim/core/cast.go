@@ -36,6 +36,9 @@ type Cast struct {
 	// Note that the GCD CD will be activated even if this is not set.
 	Cooldown time.Duration
 
+	// If set, this will be used as the GCD instead of the default value (1.5s).
+	GCDCooldown time.Duration
+
 	// If set, CD for this action and GCD CD will be ignored, and this action
 	// will not set new values for those CDs either.
 	IgnoreCooldowns bool
@@ -141,7 +144,6 @@ func (cast *Cast) startCasting(sim *Simulation, onCastComplete OnCastComplete) b
 		sim.Log("(%d) Casting %s (Current Mana = %0.0f, Mana Cost = %0.0f, Cast Time = %s)\n",
 			cast.Character.ID, cast.Name, cast.Character.CurrentMana(), cast.ManaCost, cast.CastTime)
 	}
-	cast.Character.PseudoStats.FiveSecondRuleRefreshTime = sim.CurrentTime + time.Second*5
 
 	// For instant-cast spells we can skip creating an aura.
 	if cast.CastTime == 0 {
@@ -157,7 +159,7 @@ func (cast *Cast) startCasting(sim *Simulation, onCastComplete OnCastComplete) b
 
 	if !cast.IgnoreCooldowns {
 		// Prevent any actions on the GCD until the cast AND the GCD are done.
-		gcd := MaxDuration(GCDMin, CalculatedGCD(cast.Character))
+		gcd := MaxDuration(GCDMin, cast.calculatedGCD(cast.Character))
 		gcdCD := MaxDuration(gcd, cast.CastTime)
 		cast.Character.SetCD(GCDCooldownID, sim.CurrentTime+gcdCD)
 
@@ -167,14 +169,19 @@ func (cast *Cast) startCasting(sim *Simulation, onCastComplete OnCastComplete) b
 	return true
 }
 
-func CalculatedGCD(char *Character) time.Duration {
-	return MaxDuration(GCDMin, time.Duration(float64(GCDDefault)/char.CastSpeed()))
+func (cast *Cast) calculatedGCD(char *Character) time.Duration {
+	baseGCD := GCDDefault
+	if cast.GCDCooldown != 0 {
+		baseGCD = cast.GCDCooldown
+	}
+	return MaxDuration(GCDMin, time.Duration(float64(baseGCD)/char.CastSpeed()))
 }
 
 // Cast has finished, activate the effects of the cast.
 func (cast *Cast) internalOnComplete(sim *Simulation, onCastComplete OnCastComplete) {
 	if !cast.IgnoreManaCost && cast.ManaCost > 0 {
 		cast.Character.AddStat(stats.Mana, -cast.ManaCost)
+		cast.Character.PseudoStats.FiveSecondRuleRefreshTime = sim.CurrentTime + time.Second*5
 	}
 
 	if !cast.IgnoreCooldowns && cast.Cooldown > 0 {
@@ -186,4 +193,26 @@ func (cast *Cast) internalOnComplete(sim *Simulation, onCastComplete OnCastCompl
 		cast.OnCastComplete(sim, cast)
 	}
 	onCastComplete(sim, cast)
+}
+
+// A simple cast is just a cast with a callback, no calculations or damage.
+type SimpleCast struct {
+	// Embedded Cast
+	Cast
+
+	OnCastComplete OnCastComplete
+}
+
+func (simpleCast *SimpleCast) Init(sim *Simulation) {
+	simpleCast.Cast.init(sim)
+}
+
+// TODO: Need to rename this. Cant call it Cast() because of conflict with field of the same name.
+func (simpleCast *SimpleCast) StartCast(sim *Simulation) bool {
+	return simpleCast.Cast.startCasting(sim, func(sim *Simulation, cast *Cast) {
+		sim.MetricsAggregator.AddCast(cast)
+		if simpleCast.OnCastComplete != nil {
+			simpleCast.OnCastComplete(sim, cast)
+		}
+	})
 }

@@ -105,6 +105,41 @@ func NewMetricsAggregator(numAgents int, encounterDuration float64) *MetricsAggr
 	return aggregator
 }
 
+func (aggregator *MetricsAggregator) addCastInternal(character *Character, actionID ActionID, tag int32, manaCost float64) {
+	actionKey := NewActionKey(actionID, tag)
+
+	agentID := character.ID
+
+	iterationMetrics := &aggregator.agentIterations[agentID]
+	iterationMetrics.ManaSpent += manaCost
+
+	aggregateMetrics := &aggregator.agentAggregates[agentID]
+	actionMetrics, ok := aggregateMetrics.Actions[actionKey]
+
+	if !ok {
+		actionMetrics.ActionID = actionID
+		actionMetrics.Tag = tag
+	}
+
+	actionMetrics.Casts++
+
+	aggregateMetrics.Actions[actionKey] = actionMetrics
+}
+
+func (aggregator *MetricsAggregator) AddInstantCast(character *Character, actionID ActionID) {
+	aggregator.addCastInternal(character, actionID, 0, 0)
+}
+
+// Adds the results of a cast to the aggregated metrics.
+func (aggregator *MetricsAggregator) AddCast(cast *Cast) {
+	manaCost := cast.ManaCost
+	if cast.IgnoreManaCost {
+		manaCost = 0
+	}
+
+	aggregator.addCastInternal(cast.Character, cast.ActionID, cast.Tag, manaCost)
+}
+
 // Adds the results of an action to the aggregated metrics.
 func (aggregator *MetricsAggregator) AddSpellCast(spellCast *SpellCast) {
 	actionID := spellCast.ActionID
