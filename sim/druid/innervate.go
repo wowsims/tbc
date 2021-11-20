@@ -20,9 +20,9 @@ func (druid *Druid) TryInnervate(sim *core.Simulation) time.Duration {
 		return 0
 	}
 
-	// Currently just activates innervate on self when own mana is <33%
+	// Currently just activates innervate on self when own mana is <10%
 	// TODO: get a real recommendation when to use this.
-	if druid.GetStat(stats.Mana)/druid.MaxMana() > 0.33 {
+	if druid.GetStat(stats.Mana)/druid.MaxMana() > 0.10 {
 		return 0
 	}
 
