@@ -36,6 +36,9 @@ type Cast struct {
 	// Note that the GCD CD will be activated even if this is not set.
 	Cooldown time.Duration
 
+	// If set, this will be used as the GCD instead of the default value (1.5s).
+	GCDCooldown time.Duration
+
 	// If set, CD for this action and GCD CD will be ignored, and this action
 	// will not set new values for those CDs either.
 	IgnoreCooldowns bool
@@ -156,7 +159,7 @@ func (cast *Cast) startCasting(sim *Simulation, onCastComplete OnCastComplete) b
 
 	if !cast.IgnoreCooldowns {
 		// Prevent any actions on the GCD until the cast AND the GCD are done.
-		gcd := MaxDuration(GCDMin, CalculatedGCD(cast.Character))
+		gcd := MaxDuration(GCDMin, cast.calculatedGCD(cast.Character))
 		gcdCD := MaxDuration(gcd, cast.CastTime)
 		cast.Character.SetCD(GCDCooldownID, sim.CurrentTime+gcdCD)
 
@@ -166,8 +169,12 @@ func (cast *Cast) startCasting(sim *Simulation, onCastComplete OnCastComplete) b
 	return true
 }
 
-func CalculatedGCD(char *Character) time.Duration {
-	return MaxDuration(GCDMin, time.Duration(float64(GCDDefault)/char.CastSpeed()))
+func (cast *Cast) calculatedGCD(char *Character) time.Duration {
+	baseGCD := GCDDefault
+	if cast.GCDCooldown != 0 {
+		baseGCD = cast.GCDCooldown
+	}
+	return MaxDuration(GCDMin, time.Duration(float64(baseGCD)/char.CastSpeed()))
 }
 
 // Cast has finished, activate the effects of the cast.

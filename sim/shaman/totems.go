@@ -20,8 +20,7 @@ func (shaman *Shaman) NewAirTotem(sim *core.Simulation) *core.SimpleCast {
 			Character:       shaman.GetCharacter(),
 			BaseManaCost:    manaCost,
 			ManaCost:        manaCost,
-			CastTime:        time.Second * 1,
-			IgnoreCooldowns: true, // lets us override the GCD
+			GCDCooldown:     time.Second * 1,
 		},
 		OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
 			shaman.SelfBuffs.NextTotemDrops[AirTotem] = sim.CurrentTime + time.Second*120
@@ -41,8 +40,7 @@ func (shaman *Shaman) NewWaterTotem(sim *core.Simulation) *core.SimpleCast {
 			Character:       shaman.GetCharacter(),
 			BaseManaCost:    manaCost,
 			ManaCost:        manaCost,
-			CastTime:        time.Second * 1,
-			IgnoreCooldowns: true, // lets us override the GCD
+			GCDCooldown:     time.Second * 1,
 		},
 		OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
 			shaman.SelfBuffs.NextTotemDrops[WaterTotem] = sim.CurrentTime + time.Second*120
@@ -62,8 +60,7 @@ func (shaman *Shaman) NewFireTotem(sim *core.Simulation) *core.SimpleCast {
 			Character:       shaman.GetCharacter(),
 			BaseManaCost:    manaCost,
 			ManaCost:        manaCost,
-			CastTime:        time.Second * 1,
-			IgnoreCooldowns: true, // lets us override the GCD
+			GCDCooldown:     time.Second * 1,
 		},
 		OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
 			shaman.SelfBuffs.NextTotemDrops[FireTotem] = sim.CurrentTime + time.Second*120
@@ -71,4 +68,41 @@ func (shaman *Shaman) NewFireTotem(sim *core.Simulation) *core.SimpleCast {
 	}
 	cast.Init(sim)
 	return cast
+}
+
+// TryDropTotems will check to see if totems need to be re-cast.
+//  If they do time.Duration will be returned will be >0.
+func (shaman *Shaman) TryDropTotems(sim *core.Simulation) time.Duration {
+
+	var cast *core.SimpleCast
+
+	// currently hardcoded to include 25% mana cost reduction from resto talents
+	for totemTypeIdx, totemExpiration := range shaman.SelfBuffs.NextTotemDrops {
+		if cast != nil {
+			break
+		}
+		if sim.CurrentTime > totemExpiration {
+			switch totemTypeIdx {
+			case AirTotem:
+				cast = shaman.NewAirTotem(sim)
+			case EarthTotem:
+				// no earth totem right now
+			case FireTotem:
+				cast = shaman.NewFireTotem(sim)
+			case WaterTotem:
+				cast = shaman.NewWaterTotem(sim)
+			}
+		}
+	}
+
+	if cast == nil {
+		return 0 // no totem to cast
+	}
+
+	success := cast.StartCast(sim)
+	if !success {
+		regenTime := shaman.TimeUntilManaRegen(cast.GetManaCost())
+		return sim.CurrentTime + regenTime
+	}
+	return sim.CurrentTime + shaman.GetRemainingCD(core.GCDCooldownID, sim.CurrentTime)
 }

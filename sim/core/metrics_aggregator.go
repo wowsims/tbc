@@ -105,19 +105,13 @@ func NewMetricsAggregator(numAgents int, encounterDuration float64) *MetricsAggr
 	return aggregator
 }
 
-// Adds the results of a cast to the aggregated metrics.
-func (aggregator *MetricsAggregator) AddCast(cast *Cast) {
-	actionID := cast.ActionID
-	tag := cast.Tag
-
+func (aggregator *MetricsAggregator) addCastInternal(character *Character, actionID ActionID, tag int32, manaCost float64) {
 	actionKey := NewActionKey(actionID, tag)
 
-	agentID := cast.Character.ID
+	agentID := character.ID
 
 	iterationMetrics := &aggregator.agentIterations[agentID]
-	if !cast.IgnoreManaCost {
-		iterationMetrics.ManaSpent += cast.ManaCost
-	}
+	iterationMetrics.ManaSpent += manaCost
 
 	aggregateMetrics := &aggregator.agentAggregates[agentID]
 	actionMetrics, ok := aggregateMetrics.Actions[actionKey]
@@ -130,6 +124,20 @@ func (aggregator *MetricsAggregator) AddCast(cast *Cast) {
 	actionMetrics.Casts++
 
 	aggregateMetrics.Actions[actionKey] = actionMetrics
+}
+
+func (aggregator *MetricsAggregator) AddInstantCast(character *Character, actionID ActionID) {
+	aggregator.addCastInternal(character, actionID, 0, 0)
+}
+
+// Adds the results of a cast to the aggregated metrics.
+func (aggregator *MetricsAggregator) AddCast(cast *Cast) {
+	manaCost := cast.ManaCost
+	if cast.IgnoreManaCost {
+		manaCost = 0
+	}
+
+	aggregator.addCastInternal(cast.Character, cast.ActionID, cast.Tag, manaCost)
 }
 
 // Adds the results of an action to the aggregated metrics.

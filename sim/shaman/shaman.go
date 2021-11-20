@@ -232,43 +232,6 @@ func (shaman *Shaman) Advance(sim *core.Simulation, elapsedTime time.Duration) {
 	shaman.Character.Advance(sim, elapsedTime)
 }
 
-// TryDropTotems will check to see if totems need to be re-cast.
-//  If they do time.Duration will be returned will be >0.
-func (shaman *Shaman) TryDropTotems(sim *core.Simulation) time.Duration {
-
-	var cast *core.SimpleCast
-
-	// currently hardcoded to include 25% mana cost reduction from resto talents
-	for totemTypeIdx, totemExpiration := range shaman.SelfBuffs.NextTotemDrops {
-		if cast != nil {
-			break
-		}
-		if sim.CurrentTime > totemExpiration {
-			switch totemTypeIdx {
-			case AirTotem:
-				cast = shaman.NewAirTotem(sim)
-			case EarthTotem:
-				// no earth totem right now
-			case FireTotem:
-				cast = shaman.NewFireTotem(sim)
-			case WaterTotem:
-				cast = shaman.NewWaterTotem(sim)
-			}
-		}
-	}
-
-	if cast == nil {
-		return 0 // no totem to cast
-	}
-
-	if cast.StartCast(sim) {
-		return cast.CastTime
-	}
-
-	// TODO: calculate regen time instead of just a GCD
-	return cast.CastTime
-}
-
 var ElementalMasteryAuraID = core.NewAuraID()
 var ElementalMasteryCooldownID = core.NewCooldownID()
 
@@ -282,6 +245,8 @@ func (shaman *Shaman) registerElementalMasteryCD() {
 		Cooldown:   time.Minute * 3,
 		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
 			return func(sim *core.Simulation, character *core.Character) bool {
+				sim.MetricsAggregator.AddInstantCast(shaman.GetCharacter(), core.ActionID{SpellID: 16166})
+
 				character.AddAura(sim, core.Aura{
 					ID:      ElementalMasteryAuraID,
 					Name:    "Elemental Mastery",
@@ -322,6 +287,8 @@ func (shaman *Shaman) registerNaturesSwiftnessCD() {
 				if character.HasTemporarySpellCastSpeedIncrease() {
 					return false
 				}
+
+				sim.MetricsAggregator.AddInstantCast(shaman.GetCharacter(), core.ActionID{SpellID: 16188})
 
 				character.AddAura(sim, core.Aura{
 					ID:      NaturesSwiftnessAuraID,

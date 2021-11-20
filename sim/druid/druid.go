@@ -87,42 +87,6 @@ func (druid *Druid) Advance(sim *core.Simulation, elapsedTime time.Duration) {
 	druid.Character.Advance(sim, elapsedTime)
 }
 
-var InnervateCD = core.NewCooldownID()
-
-// TODO: This probably needs to allow for multiple innervates later
-//  would need to solve the same issue we had as dots (maybe ID per user)
-var InnervateAuraID = core.NewAuraID()
-
-func (druid *Druid) TryInnervate(sim *core.Simulation) bool {
-	// Currently just activates innervate on self when own mana is <33%
-	// TODO: get a real recommendation when to use this.
-	// TODO re-implement as a cast, and add the mana cost (costs 94 mana).
-	if druid.SelfBuffs.Innervate && druid.GetRemainingCD(InnervateCD, sim.CurrentTime) == 0 {
-		if druid.GetStat(stats.Mana)/druid.MaxMana() < 0.33 {
-			druid.PseudoStats.ForceFullSpiritRegen = true
-			druid.PseudoStats.SpiritRegenMultiplier *= 5.0
-
-			druid.AddAura(sim, core.Aura{
-				ID:      InnervateAuraID,
-				Name:    "Innervate",
-				Expires: sim.CurrentTime + time.Second*20,
-				OnExpire: func(sim *core.Simulation) {
-					druid.PseudoStats.ForceFullSpiritRegen = false
-					druid.PseudoStats.SpiritRegenMultiplier /= 5.0
-				},
-			})
-			cd := time.Minute * 6
-			if druid.malorne4p {
-				cd -= time.Second * 48
-			}
-			druid.SetCD(InnervateCD, sim.CurrentTime+cd)
-			// triggers GCD
-			druid.SetCD(core.GCDCooldownID, core.CalculatedGCD(&druid.Character))
-			return true
-		}
-	}
-	return false
-}
 func (druid *Druid) Act(sim *core.Simulation) time.Duration {
 	return core.NeverExpires // does nothing
 }
@@ -189,8 +153,6 @@ func NewDruid(char core.Character, selfBuffs SelfBuffs, talents proto.DruidTalen
 		malorne4p: ItemSetMalorne.CharacterHasSetBonus(&char, 4),
 	}
 }
-
-var FaerieFireDebuffID = core.NewDebuffID()
 
 func init() {
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceTauren, Class: proto.Class_ClassDruid}] = stats.Stats{

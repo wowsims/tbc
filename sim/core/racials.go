@@ -56,6 +56,7 @@ func applyRaceEffects(agent Agent) {
 				return func(sim *Simulation, character *Character) bool {
 					character.SetCD(OrcBloodFuryCooldownID, cd+sim.CurrentTime)
 					character.AddAuraWithTemporaryStats(sim, OrcBloodFuryAuraID, "Orc Blood Fury", stats.SpellPower, spBonus, dur)
+					sim.MetricsAggregator.AddInstantCast(character, ActionID{SpellID: 33697})
 					return true
 				}
 			},
@@ -103,6 +104,7 @@ func applyRaceEffects(agent Agent) {
 							character.PseudoStats.CastSpeedMultiplier /= hasteBonus
 						},
 					})
+					sim.MetricsAggregator.AddInstantCast(character, ActionID{SpellID: 20554})
 					return true
 				}
 			},
