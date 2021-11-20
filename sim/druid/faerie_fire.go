@@ -29,9 +29,6 @@ func (druid *Druid) TryFaerieFire(sim *core.Simulation, target *core.Target) tim
 				Target: target,
 
 				OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-					druid.PseudoStats.ForceFullSpiritRegen = true
-					druid.PseudoStats.SpiritRegenMultiplier *= 5.0
-
 					target.AddAura(sim, core.Aura{
 						ID:      FaerieFireDebuffID,
 						Name:    "Faerie Fire",
