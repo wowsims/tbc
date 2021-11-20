@@ -64,6 +64,9 @@ func itemToGoString(itemDeclaration ItemDeclaration, itemResponse WowheadItemRes
 	itemStr += "}, "
 
 	classAllowlist := itemResponse.GetClassAllowlist()
+	if len(itemDeclaration.ClassAllowlist) > 0 {
+		classAllowlist = itemDeclaration.ClassAllowlist
+	}
 	if len(classAllowlist) > 0 {
 		itemStr += "ClassAllowlist: []proto.Class{"
 		for _, class := range classAllowlist {

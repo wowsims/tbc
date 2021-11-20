@@ -9,7 +9,8 @@ type ItemDeclaration struct {
 	Categories []proto.ItemCategory // Which categories this item belongs to.
 
 	// Override fields, in case wowhead is wrong.
-	Phase int
+	ClassAllowlist []proto.Class
+	Phase          int
 }
 
 const CasterCategory = proto.ItemCategory_ItemCategoryCaster
@@ -110,6 +111,7 @@ var ItemDeclarations = []ItemDeclaration{
 	{ /** Dark Conjuror's Collar */ ID: 34340, Categories: []proto.ItemCategory{CasterCategory}},
 	{ /** Dark Iron Smoking Pipe */ ID: 38290, Categories: []proto.ItemCategory{CasterCategory}},
 	{ /** Darkmoon Card: Crusade */ ID: 31856, Categories: []proto.ItemCategory{CasterCategory}},
+	{ /** Destruction Holo-gogs */ ID: 32494, ClassAllowlist: []proto.Class{proto.Class_ClassMage, proto.Class_ClassPriest, proto.Class_ClassWarlock}, Categories: []proto.ItemCategory{CasterCategory}},
 	{ /** Draenei Honor Guard Shield */ ID: 31287, Categories: []proto.ItemCategory{CasterCategory}},
 	{ /** Dragonheart Flameshield */ ID: 28611, Categories: []proto.ItemCategory{CasterCategory}},
 	{ /** Dreamcrystal Band */ ID: 32664, Categories: []proto.ItemCategory{CasterCategory}},
@@ -137,7 +139,7 @@ var ItemDeclarations = []ItemDeclaration{
 	{ /** Frozen Shadoweave Boots */ ID: 21870, Categories: []proto.ItemCategory{CasterCategory}},
 	{ /** Frozen Shadoweave Robe */ ID: 21871, Categories: []proto.ItemCategory{CasterCategory}},
 	{ /** Frozen Shadoweave Shoulders */ ID: 21869, Categories: []proto.ItemCategory{CasterCategory}},
-	{ /** Gadgetstorm Goggles */ ID: 32476, Categories: []proto.ItemCategory{CasterCategory}},
+	{ /** Gadgetstorm Goggles */ ID: 32476, ClassAllowlist: []proto.Class{proto.Class_ClassShaman}, Categories: []proto.ItemCategory{CasterCategory}},
 	{ /** Garments of Crashing Shores */ ID: 34396, Categories: []proto.ItemCategory{CasterCategory}},
 	{ /** Gauntlets of the Ancient Shadowmoon */ ID: 34350, Categories: []proto.ItemCategory{CasterCategory}},
 	{ /** Gauntlets of the Sun King */ ID: 29987, Categories: []proto.ItemCategory{CasterCategory}},
@@ -223,6 +225,7 @@ var ItemDeclarations = []ItemDeclaration{
 	{ /** Mag'hari Ritualist's Horns */ ID: 28169, Categories: []proto.ItemCategory{CasterCategory}},
 	{ /** Mage-Collar of the Firestorm */ ID: 27488, Categories: []proto.ItemCategory{CasterCategory}},
 	{ /** Magma Plume Boots */ ID: 27845, Categories: []proto.ItemCategory{CasterCategory}},
+	{ /** Magnified Moon Specs */ ID: 32480, ClassAllowlist: []proto.Class{proto.Class_ClassDruid}, Categories: []proto.ItemCategory{CasterCategory}},
 	{ /** Malefic Girdle */ ID: 28654, Categories: []proto.ItemCategory{CasterCategory}},
 	{ /** Mana Infused Wristguards */ ID: 29955, Categories: []proto.ItemCategory{CasterCategory}},
 	{ /** Mana-Etched Crown */ ID: 28193, Categories: []proto.ItemCategory{CasterCategory}},
