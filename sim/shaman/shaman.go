@@ -15,6 +15,10 @@ func NewShaman(character core.Character, talents proto.ShamanTalents, selfBuffs 
 		SelfBuffs: selfBuffs,
 	}
 
+	if shaman.Talents.NaturesGuidance > 0 {
+		shaman.AddStat(stats.SpellHit, float64(shaman.Talents.NaturesGuidance)*1*core.SpellHitRatingPerHitChance)
+	}
+
 	// Add Shaman stat dependencies
 	shaman.AddStatDependency(stats.StatDependency{
 		SourceStat:   stats.Intellect,
