@@ -236,44 +236,37 @@ func (shaman *Shaman) Advance(sim *core.Simulation, elapsedTime time.Duration) {
 //  If they do time.Duration will be returned will be >0.
 func (shaman *Shaman) TryDropTotems(sim *core.Simulation) time.Duration {
 
-	var spell *core.SimpleSpell
+	var cast *core.SimpleCast
 
 	// currently hardcoded to include 25% mana cost reduction from resto talents
-	for i, v := range shaman.SelfBuffs.NextTotemDrops {
-		if spell != nil {
+	for totemTypeIdx, totemExpiration := range shaman.SelfBuffs.NextTotemDrops {
+		if cast != nil {
 			break
 		}
-		if sim.CurrentTime > v {
-			// Need to recast totem
-			// Manually set time on each totem because some totems have different time to expire.
-			//  This could also be managed by using a cooldown or aura.
-			//  An aura would allow us to implement totems as actual casts (we could apply and expire on party members)
-			switch i {
+		if sim.CurrentTime > totemExpiration {
+			switch totemTypeIdx {
 			case AirTotem:
-				spell = shaman.NewAirTotem()
-				shaman.SelfBuffs.NextTotemDrops[i] = sim.CurrentTime + time.Second*120
+				cast = shaman.NewAirTotem(sim)
 			case EarthTotem:
-				// no air totem right now
+				// no earth totem right now
 			case FireTotem:
-				spell = shaman.NewFireTotem()
-				shaman.SelfBuffs.NextTotemDrops[i] = sim.CurrentTime + time.Second*120
+				cast = shaman.NewFireTotem(sim)
 			case WaterTotem:
-				spell = shaman.NewWaterTotem()
-				shaman.SelfBuffs.NextTotemDrops[i] = sim.CurrentTime + time.Second*120
+				cast = shaman.NewWaterTotem(sim)
 			}
 		}
 	}
 
-	if spell == nil {
+	if cast == nil {
 		return 0 // no totem to cast
 	}
 
-	if spell.Cast(sim) {
-		return spell.CastTime
+	if cast.StartCast(sim) {
+		return cast.CastTime
 	}
 
 	// TODO: calculate regen time instead of just a GCD
-	return spell.CastTime
+	return cast.CastTime
 }
 
 var ElementalMasteryAuraID = core.NewAuraID()
