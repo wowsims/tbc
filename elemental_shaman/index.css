@@ -308,6 +308,7 @@
 
 .item-picker-labels-container {
   padding: 3px;
+  text-shadow: 2px 2px 3px black;
 }
 
 .item-picker-name {
@@ -378,6 +379,7 @@
   display: flex;
   align-items: center;
   padding: 2px;
+  text-shadow: 2px 2px 3px black;
 }
 
 .selector-modal-list-item.active .selector-modal-list-item-icon {
