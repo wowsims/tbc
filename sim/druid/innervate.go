@@ -4,7 +4,6 @@ import (
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
-	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 var InnervateCooldownID = core.NewCooldownID()
@@ -20,9 +19,13 @@ func (druid *Druid) TryInnervate(sim *core.Simulation) time.Duration {
 		return 0
 	}
 
-	// Currently just activates innervate on self when own mana is <10%
-	// TODO: get a real recommendation when to use this.
-	if druid.GetStat(stats.Mana)/druid.MaxMana() > 0.10 {
+	// Innervate needs to be activated as late as possible to maximize DPS. The issue is that
+	// innervate gives so much mana that it can cause Super Mana Potion or Dark Rune usages
+	// to be delayed, if they come off CD soon after innervate. This delay is minimized by
+	// activating innervate from the smallest amount of mana possible.
+	//
+	// 500 mana is enough to cast our most expensive spell (moonfire).
+	if druid.CurrentMana() > 500 {
 		return 0
 	}
 
