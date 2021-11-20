@@ -288,8 +288,6 @@ func (shaman *Shaman) registerNaturesSwiftnessCD() {
 					return false
 				}
 
-				sim.MetricsAggregator.AddInstantCast(shaman.GetCharacter(), core.ActionID{SpellID: 16188})
-
 				character.AddAura(sim, core.Aura{
 					ID:      NaturesSwiftnessAuraID,
 					Name:    "Nature's Swiftness",
@@ -310,6 +308,7 @@ func (shaman *Shaman) registerNaturesSwiftnessCD() {
 						character.SetCD(NaturesSwiftnessCooldownID, sim.CurrentTime+time.Minute*3)
 						character.RemoveAura(sim, NaturesSwiftnessAuraID)
 						character.UpdateMajorCooldowns(sim)
+						sim.MetricsAggregator.AddInstantCast(character, core.ActionID{SpellID: 16188})
 					},
 				})
 				return true
