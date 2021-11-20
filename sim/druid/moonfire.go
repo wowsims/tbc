@@ -10,7 +10,7 @@ import (
 // Starfire spell IDs
 const SpellIDMF int32 = 26988
 
-func (druid *Druid) newMoonfireTemplate(sim *core.Simulation) core.SingleHitSpellTemplate {
+func (druid *Druid) newMoonfireTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
 	baseCast := core.Cast{
 		Name:           "Moonfire",
 		CritMultiplier: 1.5,
@@ -61,7 +61,7 @@ func (druid *Druid) newMoonfireTemplate(sim *core.Simulation) core.SingleHitSpel
 	// moonfire can proc the on hit but doesn't consume charges (i think)
 	effect.OnSpellHit = druid.applyOnHitTalents
 
-	return core.NewSingleHitSpellTemplate(core.SingleHitSpell{
+	return core.NewSimpleSpellTemplate(core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: baseCast,
 		},
@@ -71,7 +71,7 @@ func (druid *Druid) newMoonfireTemplate(sim *core.Simulation) core.SingleHitSpel
 
 // TODO: This might behave weird if we have a moonfire still ticking when we cast one.
 //   We could do a check and if the spell is still ticking allocate a new SingleHitSpell?
-func (druid *Druid) NewMoonfire(sim *core.Simulation, target *core.Target) *core.SingleHitSpell {
+func (druid *Druid) NewMoonfire(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
 	// Initialize cast from precomputed template.
 	sf := &druid.MoonfireSpell
 	druid.moonfireCastTemplate.Apply(sf)

@@ -127,15 +127,15 @@ type Shaman struct {
 	ElementalFocusStacks byte
 
 	// "object pool" for shaman spells that are currently being cast.
-	lightningBoltSpell   core.SingleTargetDirectDamageSpell
-	lightningBoltSpellLO core.SingleTargetDirectDamageSpell
+	lightningBoltSpell   core.SimpleSpell
+	lightningBoltSpellLO core.SimpleSpell
 
 	chainLightningSpell    core.MultiTargetDirectDamageSpell
 	chainLightningSpellLOs []core.MultiTargetDirectDamageSpell
 
 	// Precomputed templated cast generator for quickly resetting cast fields.
-	lightningBoltCastTemplate   core.SingleTargetDirectDamageSpellTemplate
-	lightningBoltLOCastTemplate core.SingleTargetDirectDamageSpellTemplate
+	lightningBoltCastTemplate   core.SimpleSpellTemplate
+	lightningBoltLOCastTemplate core.SimpleSpellTemplate
 
 	chainLightningCastTemplate    core.MultiTargetDirectDamageSpellTemplate
 	chainLightningLOCastTemplates []core.MultiTargetDirectDamageSpellTemplate
@@ -218,8 +218,8 @@ func (shaman *Shaman) Reset(sim *core.Simulation) {
 	}
 
 	// Reset all spells so any pending casts are cleaned up
-	shaman.lightningBoltSpell = core.SingleTargetDirectDamageSpell{}
-	shaman.lightningBoltSpellLO = core.SingleTargetDirectDamageSpell{}
+	shaman.lightningBoltSpell = core.SimpleSpell{}
+	shaman.lightningBoltSpellLO = core.SimpleSpell{}
 	shaman.chainLightningSpell = core.MultiTargetDirectDamageSpell{}
 
 	numHits := core.MinInt32(3, sim.GetNumTargets())
@@ -236,11 +236,11 @@ func (shaman *Shaman) Advance(sim *core.Simulation, elapsedTime time.Duration) {
 //  If they do time.Duration will be returned will be >0.
 func (shaman *Shaman) TryDropTotems(sim *core.Simulation) time.Duration {
 
-	var cast *core.NoEffectSpell
+	var spell *core.SimpleSpell
 
 	// currently hardcoded to include 25% mana cost reduction from resto talents
 	for i, v := range shaman.SelfBuffs.NextTotemDrops {
-		if cast != nil {
+		if spell != nil {
 			break
 		}
 		if sim.CurrentTime > v {
@@ -250,27 +250,30 @@ func (shaman *Shaman) TryDropTotems(sim *core.Simulation) time.Duration {
 			//  An aura would allow us to implement totems as actual casts (we could apply and expire on party members)
 			switch i {
 			case AirTotem:
-				cast = shaman.NewAirTotem()
+				spell = shaman.NewAirTotem()
 				shaman.SelfBuffs.NextTotemDrops[i] = sim.CurrentTime + time.Second*120
 			case EarthTotem:
 				// no air totem right now
 			case FireTotem:
-				cast = shaman.NewFireTotem()
+				spell = shaman.NewFireTotem()
 				shaman.SelfBuffs.NextTotemDrops[i] = sim.CurrentTime + time.Second*120
 			case WaterTotem:
-				cast = shaman.NewWaterTotem()
+				spell = shaman.NewWaterTotem()
 				shaman.SelfBuffs.NextTotemDrops[i] = sim.CurrentTime + time.Second*120
 			}
 		}
 	}
 
-	if cast == nil {
+	if spell == nil {
 		return 0 // no totem to cast
 	}
 
-	cast.Act(sim)
+	if spell.Cast(sim) {
+		return spell.CastTime
+	}
 
-	return cast.CastTime
+	// TODO: calculate regen time instead of just a GCD
+	return spell.CastTime
 }
 
 var ElementalMasteryAuraID = core.NewAuraID()

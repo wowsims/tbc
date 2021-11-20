@@ -15,7 +15,7 @@ const SpellIDSF6 int32 = 9876
 // Idol IDs
 const IvoryMoongoddess int32 = 27518
 
-func (druid *Druid) newStarfireTemplate(sim *core.Simulation, rank int) core.SingleTargetDirectDamageSpellTemplate {
+func (druid *Druid) newStarfireTemplate(sim *core.Simulation, rank int) core.SimpleSpellTemplate {
 	baseCast := core.Cast{
 		Name:           "Starfire (Rank 8)",
 		CritMultiplier: 1.5,
@@ -29,11 +29,11 @@ func (druid *Druid) newStarfireTemplate(sim *core.Simulation, rank int) core.Sin
 		},
 	}
 
-	effect := core.DirectDamageSpellEffect{
+	effect := core.SpellHitEffect{
 		SpellEffect: core.SpellEffect{
 			DamageMultiplier: 1,
 		},
-		DirectDamageSpellInput: core.DirectDamageSpellInput{
+		DirectInput: core.DirectDamageSpellInput{
 			MinBaseDamage:    550,
 			MaxBaseDamage:    647,
 			SpellCoefficient: 1.0,
@@ -47,17 +47,17 @@ func (druid *Druid) newStarfireTemplate(sim *core.Simulation, rank int) core.Sin
 		baseCast.ActionID = core.ActionID{
 			SpellID: SpellIDSF6,
 		}
-		effect.DirectDamageSpellInput.MinBaseDamage = 463
-		effect.DirectDamageSpellInput.MaxBaseDamage = 543
-		effect.SpellCoefficient = 0.99
+		effect.DirectInput.MinBaseDamage = 463
+		effect.DirectInput.MaxBaseDamage = 543
+		effect.DirectInput.SpellCoefficient = 0.99
 	}
 
 	if druid.Equip[items.ItemSlotRanged].ID == IvoryMoongoddess {
 		// This seems to be unaffected by wrath of cenarius so it needs to come first.
-		effect.DirectDamageSpellInput.FlatDamageBonus += 55 * effect.SpellCoefficient
+		effect.DirectInput.FlatDamageBonus += 55 * effect.DirectInput.SpellCoefficient
 	}
 
-	effect.SpellCoefficient += 0.04 * float64(druid.Talents.WrathOfCenarius)
+	effect.DirectInput.SpellCoefficient += 0.04 * float64(druid.Talents.WrathOfCenarius)
 
 	// TODO: Applies to both starfire and moonfire
 	baseCast.CastTime -= time.Millisecond * 100 * time.Duration(druid.Talents.StarlightWrath)
@@ -79,13 +79,13 @@ func (druid *Druid) newStarfireTemplate(sim *core.Simulation, rank int) core.Sin
 		Cast: baseCast,
 	}
 
-	return core.NewSingleTargetDirectDamageSpellTemplate(core.SingleTargetDirectDamageSpell{
-		SpellCast: *spCast,
-		Effect:    effect,
+	return core.NewSimpleSpellTemplate(core.SimpleSpell{
+		SpellCast:      *spCast,
+		SpellHitEffect: effect,
 	})
 }
 
-func (druid *Druid) NewStarfire(sim *core.Simulation, target *core.Target, rank int) *core.SingleTargetDirectDamageSpell {
+func (druid *Druid) NewStarfire(sim *core.Simulation, target *core.Target, rank int) *core.SimpleSpell {
 	// Initialize cast from precomputed template.
 	sf := &druid.starfireSpell
 
@@ -99,7 +99,7 @@ func (druid *Druid) NewStarfire(sim *core.Simulation, target *core.Target, rank 
 	druid.applyNaturesGrace(&sf.SpellCast)
 
 	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	sf.Effect.Target = target
+	sf.Target = target
 	sf.Init(sim)
 
 	return sf

@@ -2,8 +2,6 @@ package core
 
 import (
 	"time"
-
-	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 // A direct spell is one that does a single instance of damage once casting is
@@ -24,94 +22,6 @@ type DirectDamageSpellInput struct {
 	FlatDamageBonus float64
 }
 
-func (spellEffect *SpellEffect) calculateDirectDamage(sim *Simulation, spellCast *SpellCast, ddInput *DirectDamageSpellInput) {
-	baseDamage := ddInput.MinBaseDamage + sim.RandomFloat("DirectSpell Base Damage")*(ddInput.MaxBaseDamage-ddInput.MinBaseDamage)
-
-	totalSpellPower := spellCast.Character.GetStat(stats.SpellPower) + spellCast.Character.GetStat(spellCast.SpellSchool) + spellEffect.BonusSpellPower
-	damageFromSpellPower := (totalSpellPower * ddInput.SpellCoefficient)
-
-	damage := baseDamage + damageFromSpellPower + ddInput.FlatDamageBonus
-
-	damage *= spellEffect.DamageMultiplier
-
-	crit := (spellCast.Character.GetStat(stats.SpellCrit) + spellEffect.BonusSpellCritRating) / (SpellCritRatingPerCritChance * 100)
-	if spellCast.GuaranteedCrit || sim.RandomFloat("DirectSpell Crit") < crit {
-		spellEffect.Crit = true
-		damage *= spellCast.CritMultiplier
-	}
-
-	damage = calculateResists(sim, damage, spellEffect)
-
-	spellEffect.Damage = damage
-}
-
-type DirectDamageSpellEffect struct {
-	SpellEffect
-	DirectDamageSpellInput
-}
-
-func (ddEffect *DirectDamageSpellEffect) apply(sim *Simulation, spellCast *SpellCast) {
-	ddEffect.SpellEffect.beforeCalculations(sim, spellCast)
-
-	if ddEffect.Hit {
-		ddEffect.SpellEffect.calculateDirectDamage(sim, spellCast, &ddEffect.DirectDamageSpellInput)
-	}
-
-	// Apply results to the cast before invoking callbacks, to prevent callbacks from changing results.
-	ddEffect.SpellEffect.applyResultsToCast(spellCast)
-	ddEffect.SpellEffect.afterCalculations(sim, spellCast)
-}
-
-// NoEffectSpell is a way to cast something that doesn't actually hit a target (or maybe could be a self buff)
-// This will still use up cast time and mana cost. Example: Shaman Totem Casting
-type NoEffectSpell struct {
-	SpellCast
-}
-
-func (spell *NoEffectSpell) Act(sim *Simulation) bool {
-	return spell.startCasting(sim, func(sim *Simulation, cast *Cast) {
-		sim.MetricsAggregator.AddSpellCast(&spell.SpellCast)
-	})
-}
-
-type SingleTargetDirectDamageSpell struct {
-	// Embedded spell cast.
-	SpellCast
-
-	// Individual direct damage effect of this spell.
-	Effect DirectDamageSpellEffect
-}
-
-func (spell *SingleTargetDirectDamageSpell) Init(sim *Simulation) {
-	spell.SpellCast.init(sim)
-}
-
-func (spell *SingleTargetDirectDamageSpell) Act(sim *Simulation) bool {
-	return spell.startCasting(sim, func(sim *Simulation, cast *Cast) {
-		spell.Effect.apply(sim, &spell.SpellCast)
-		sim.MetricsAggregator.AddSpellCast(&spell.SpellCast)
-		spell.objectInUse = false
-	})
-}
-
-type SingleTargetDirectDamageSpellTemplate struct {
-	template SingleTargetDirectDamageSpell
-}
-
-func (template *SingleTargetDirectDamageSpellTemplate) Apply(newAction *SingleTargetDirectDamageSpell) {
-	if newAction.objectInUse {
-		panic("Single target spell already in use")
-	}
-	*newAction = template.template
-}
-
-// Takes in a cast template and returns a template, so you don't need to keep track of which things to allocate yourself.
-func NewSingleTargetDirectDamageSpellTemplate(spellTemplate SingleTargetDirectDamageSpell) SingleTargetDirectDamageSpellTemplate {
-	return SingleTargetDirectDamageSpellTemplate{
-		template: spellTemplate,
-	}
-}
-
 type MultiTargetDirectDamageSpell struct {
 	// Embedded spell cast.
 	SpellCast
@@ -119,20 +29,23 @@ type MultiTargetDirectDamageSpell struct {
 	// Individual direct damage effects of this spell.
 	// For most spells this will only have 1 element, but for multi-damage spells
 	// like Arcane Explosion of Chain Lightning this will have multiple elements.
-	Effects []DirectDamageSpellEffect
+	Effects []SpellHitEffect
 }
 
 func (spell *MultiTargetDirectDamageSpell) Init(sim *Simulation) {
 	spell.SpellCast.init(sim)
 }
 
-func (spell *MultiTargetDirectDamageSpell) Act(sim *Simulation) bool {
+// TODO: If there are multiple Effects.DotEffect then each one will apply to the metrics (creating too high of a resulting DPS)
+//  To handle this we would need to add a "OnDotComplete" callback to aggregate all the dots together into a single metrics.
+//  Note: This might only apply to consecrate.
+func (spell *MultiTargetDirectDamageSpell) Cast(sim *Simulation) bool {
 	return spell.startCasting(sim, func(sim *Simulation, cast *Cast) {
 		for effectIdx := range spell.Effects {
 			effect := &spell.Effects[effectIdx]
-			effect.apply(sim, &spell.SpellCast)
+			effect.apply(sim, &spell.SpellCast, false)
 		}
-
+		// Manually apply all effects at once at the end of all the apply
 		sim.MetricsAggregator.AddSpellCast(&spell.SpellCast)
 		spell.objectInUse = false
 	})
@@ -140,7 +53,7 @@ func (spell *MultiTargetDirectDamageSpell) Act(sim *Simulation) bool {
 
 type MultiTargetDirectDamageSpellTemplate struct {
 	template MultiTargetDirectDamageSpell
-	effects  []DirectDamageSpellEffect
+	effects  []SpellHitEffect // cached effects to use on the actual cast so we don't mutate the template
 }
 
 func (template *MultiTargetDirectDamageSpellTemplate) Apply(newAction *MultiTargetDirectDamageSpell) {
@@ -156,11 +69,13 @@ func (template *MultiTargetDirectDamageSpellTemplate) Apply(newAction *MultiTarg
 func NewMultiTargetDirectDamageSpellTemplate(spellTemplate MultiTargetDirectDamageSpell) MultiTargetDirectDamageSpellTemplate {
 	return MultiTargetDirectDamageSpellTemplate{
 		template: spellTemplate,
-		effects:  make([]DirectDamageSpellEffect, len(spellTemplate.Effects)),
+		effects:  make([]SpellHitEffect, len(spellTemplate.Effects)),
 	}
 }
 
-type SingleHitSpell struct {
+// SimpleSpell has a single cast and could have a dot or direct effect (or no effect)
+//  A SimpleSpell without a target or effect will simply be cast and nothing else happens.
+type SimpleSpell struct {
 	// Embedded spell cast.
 	SpellCast
 
@@ -168,13 +83,15 @@ type SingleHitSpell struct {
 	SpellHitEffect
 }
 
-func (spell *SingleHitSpell) Init(sim *Simulation) {
-	spell.SpellCast.init(sim)
+// Init will call any 'OnCast' effects associated with the caster and then apply spell haste to the cast.
+//  Init will panic if the spell or the GCD is still on CD.
+func (spell *SimpleSpell) Init(sim *Simulation) {
+	spell.init(sim)
 }
 
-func (spell *SingleHitSpell) Act(sim *Simulation) bool {
+func (spell *SimpleSpell) Cast(sim *Simulation) bool {
 	return spell.startCasting(sim, func(sim *Simulation, cast *Cast) {
-		spell.apply(sim, &spell.SpellCast)
+		spell.apply(sim, &spell.SpellCast, true)
 	})
 }
 
@@ -184,31 +101,36 @@ type SpellHitEffect struct {
 	DirectInput DirectDamageSpellInput
 }
 
-func (hitEffect *SpellHitEffect) apply(sim *Simulation, spellCast *SpellCast) {
-	hitEffect.SpellEffect.beforeCalculations(sim, spellCast)
+// applies the hit/miss/dmg effects to the spellCast
+//  If applyMetrics is false it will not apply to the sim.MetricsAggregator.. This is to support collecting multiple SpellHitEffects (like in Multi)
+//  If there is a dot effect the damage will be applied to the SpellCast on each tick and on expire added to sim.MetricsAggregator.
+func (hitEffect *SpellHitEffect) apply(sim *Simulation, spellCast *SpellCast, applyMetrics bool) {
+	hitEffect.beforeCalculations(sim, spellCast)
+
+	applyNow := !hitEffect.Hit // a miss will immediately apply
 
 	if hitEffect.Hit {
 		// Only apply direct damage if it has damage. Otherwise this is a dot without direct damage.
 		if hitEffect.DirectInput.MaxBaseDamage != 0 {
-			hitEffect.SpellEffect.calculateDirectDamage(sim, spellCast, &hitEffect.DirectInput)
+			hitEffect.calculateDirectDamage(sim, spellCast, &hitEffect.DirectInput)
 		}
 
 		if hitEffect.DotInput.NumberOfTicks != 0 {
-			hitEffect.SpellEffect.applyDot(sim, spellCast, &hitEffect.DotInput)
+			hitEffect.applyDot(sim, spellCast, &hitEffect.DotInput)
 		} else {
-			// If there is no dot effect, apply the cleanup logic immediately.
-			hitEffect.SpellEffect.applyResultsToCast(spellCast)
-			sim.MetricsAggregator.AddSpellCast(spellCast)
-			spellCast.objectInUse = false
+			applyNow = true // no dot means we can apply results now.
 		}
-	} else {
-		// Handle a missed cast here.
-		hitEffect.SpellEffect.applyResultsToCast(spellCast)
-		sim.MetricsAggregator.AddSpellCast(spellCast)
-		spellCast.objectInUse = false
 	}
 
-	hitEffect.SpellEffect.afterCalculations(sim, spellCast)
+	// Only applyNow if there is no dot ticking
+	if applyNow {
+		hitEffect.applyResultsToCast(spellCast)
+		if applyMetrics {
+			sim.MetricsAggregator.AddSpellCast(spellCast)
+		}
+		spellCast.objectInUse = false
+	}
+	hitEffect.afterCalculations(sim, spellCast)
 }
 
 type OnDamageTick func(*Simulation)
@@ -242,60 +164,11 @@ func (ddi DotDamageInput) IsTicking(sim *Simulation) bool {
 	return (ddi.finalTickTime != 0 && ddi.tickIndex < ddi.NumberOfTicks)
 }
 
-func (spellEffect *SpellEffect) applyDot(sim *Simulation, spellCast *SpellCast, ddInput *DotDamageInput) {
-	totalSpellPower := spellCast.Character.GetStat(stats.SpellPower) + spellCast.Character.GetStat(spellCast.SpellSchool) + spellEffect.BonusSpellPower
-	// snapshot total damage per tick
-	ddInput.damagePerTick = (ddInput.TickBaseDamage + totalSpellPower*ddInput.TickSpellCoefficient) * spellEffect.DamageMultiplier
-	ddInput.finalTickTime = sim.CurrentTime + time.Duration(ddInput.NumberOfTicks)*ddInput.TickLength
-
-	pa := &PendingAction{
-		NextActionAt: sim.CurrentTime + ddInput.TickLength,
-	}
-
-	pa.OnAction = func(sim *Simulation) {
-		damage := ddInput.damagePerTick
-		damage = calculateResists(sim, damage, spellEffect)
-
-		if sim.Log != nil {
-			sim.Log(" %s Ticked for %0.1f\n", spellCast.Name, damage)
-		}
-
-		if ddInput.OnDamageTick != nil {
-			ddInput.OnDamageTick(sim)
-		}
-
-		spellEffect.Damage += damage
-
-		ddInput.tickIndex++
-		if ddInput.tickIndex < ddInput.NumberOfTicks {
-			// add more pending
-			pa.NextActionAt = sim.CurrentTime + ddInput.TickLength
-		} else {
-			pa.CleanUp(sim)
-		}
-	}
-	pa.CleanUp = func(sim *Simulation) {
-		if pa.NextActionAt == NeverExpires {
-			panic("Already cleaned up dot")
-		}
-
-		// Complete metrics and adding results etc
-		spellEffect.applyResultsToCast(spellCast)
-		sim.MetricsAggregator.AddSpellCast(spellCast)
-		spellCast.objectInUse = false
-
-		// Kills the pending action from the main run loop.
-		pa.NextActionAt = NeverExpires
-	}
-
-	sim.AddPendingAction(pa)
+type SimpleSpellTemplate struct {
+	template SimpleSpell
 }
 
-type SingleHitSpellTemplate struct {
-	template SingleHitSpell
-}
-
-func (template *SingleHitSpellTemplate) Apply(newAction *SingleHitSpell) {
+func (template *SimpleSpellTemplate) Apply(newAction *SimpleSpell) {
 	if newAction.objectInUse {
 		panic("Damage over time spell already in use")
 	}
@@ -303,32 +176,8 @@ func (template *SingleHitSpellTemplate) Apply(newAction *SingleHitSpell) {
 }
 
 // Takes in a cast template and returns a template, so you don't need to keep track of which things to allocate yourself.
-func NewSingleHitSpellTemplate(spellTemplate SingleHitSpell) SingleHitSpellTemplate {
-	return SingleHitSpellTemplate{
+func NewSimpleSpellTemplate(spellTemplate SimpleSpell) SimpleSpellTemplate {
+	return SimpleSpellTemplate{
 		template: spellTemplate,
 	}
-}
-
-func calculateResists(sim *Simulation, damage float64, spellEffect *SpellEffect) float64 {
-	// Average Resistance (AR) = (Target's Resistance / (Caster's Level * 5)) * 0.75
-	// P(x) = 50% - 250%*|x - AR| <- where X is %resisted
-	// Using these stats:
-	//    13.6% chance of
-	//  FUTURE: handle boss resists for fights/classes that are actually impacted by that.
-
-	resVal := sim.RandomFloat("DirectSpell Resist")
-	if resVal < 0.18 { // 13% chance for 25% resist, 4% for 50%, 1% for 75%
-		if resVal < 0.01 {
-			spellEffect.PartialResist_3_4 = true
-			return damage * 0.25
-		} else if resVal < 0.05 {
-			spellEffect.PartialResist_2_4 = true
-			return damage * 0.5
-		} else {
-			spellEffect.PartialResist_1_4 = true
-			return damage * 0.75
-		}
-	}
-
-	return damage
 }

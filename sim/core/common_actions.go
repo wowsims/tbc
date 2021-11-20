@@ -41,7 +41,7 @@ func (action WaitAction) GetManaCost() float64 {
 	return 0
 }
 
-func (action WaitAction) Act(sim *Simulation) bool {
+func (action WaitAction) Cast(sim *Simulation) bool {
 	if sim.Log != nil {
 		sim.Log("Doing nothing for %0.1f seconds.\n", action.GetDuration())
 	}
@@ -52,6 +52,6 @@ func (action WaitAction) Act(sim *Simulation) bool {
 func NewWaitAction(sim *Simulation, character *Character, duration time.Duration) WaitAction {
 	return WaitAction{
 		character: character,
-		duration: duration,
+		duration:  duration,
 	}
 }

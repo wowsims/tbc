@@ -14,7 +14,7 @@ func init() {
 var TheLightningCapacitorAuraID = core.NewAuraID()
 
 func ApplyTheLightningCapacitor(agent core.Agent) {
-	spellObj := core.SingleTargetDirectDamageSpell{}
+	spellObj := core.SimpleSpell{}
 
 	character := agent.GetCharacter()
 	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
@@ -43,9 +43,9 @@ func ApplyTheLightningCapacitor(agent core.Agent) {
 
 					castAction := &spellObj
 					castTemplate.Apply(castAction)
-					castAction.Effect.Target = spellEffect.Target
+					castAction.Target = spellEffect.Target
 					castAction.Init(sim)
-					castAction.Act(sim)
+					castAction.Cast(sim)
 				}
 			},
 		}
@@ -53,8 +53,8 @@ func ApplyTheLightningCapacitor(agent core.Agent) {
 }
 
 // Returns a cast object for a Lightning Capacitor cast with as many fields precomputed as possible.
-func newLightningCapacitorCastTemplate(sim *core.Simulation, character *core.Character) core.SingleTargetDirectDamageSpellTemplate {
-	return core.NewSingleTargetDirectDamageSpellTemplate(core.SingleTargetDirectDamageSpell{
+func newLightningCapacitorCastTemplate(sim *core.Simulation, character *core.Character) core.SimpleSpellTemplate {
+	return core.NewSimpleSpellTemplate(core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
 				Name: "Lightning Capacitor",
@@ -65,20 +65,16 @@ func newLightningCapacitorCastTemplate(sim *core.Simulation, character *core.Cha
 				IgnoreCooldowns: true,
 				IgnoreManaCost:  true,
 				SpellSchool:     stats.NatureSpellPower,
-				CritMultiplier:   1.5,
-				OnCastComplete:  func(sim *core.Simulation, cast *core.Cast) {},
+				CritMultiplier:  1.5,
 			},
 		},
-		Effect: core.DirectDamageSpellEffect{
+		SpellHitEffect: core.SpellHitEffect{
 			SpellEffect: core.SpellEffect{
 				DamageMultiplier: 1,
-
-				OnSpellHit:  func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {},
-				OnSpellMiss: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {},
 			},
-			DirectDamageSpellInput: core.DirectDamageSpellInput{
-				MinBaseDamage:    694,
-				MaxBaseDamage:    807,
+			DirectInput: core.DirectDamageSpellInput{
+				MinBaseDamage: 694,
+				MaxBaseDamage: 807,
 			},
 		},
 	})

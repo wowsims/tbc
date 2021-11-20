@@ -44,31 +44,6 @@ type ActionID struct {
 	// Can add future id types here.
 }
 
-// A single action that an Agent can take.
-type AgentAction interface {
-	GetActionID() ActionID
-
-	// For logging / debugging.
-	GetName() string
-
-	GetTag() int32
-
-	// The Character performing this action.
-	GetCharacter() *Character
-
-	// How long this action takes to cast/channel/etc.
-	// In other words, how long until another action should be chosen.
-	GetDuration() time.Duration
-
-	// TODO: Maybe change this to 'ResourceCost'
-	// Amount of mana required to perform the action.
-	GetManaCost() float64
-
-	// Do the action. Returns whether the action was successful. An unsuccessful
-	// action indicates that the prerequisites, like resource cost, were not met.
-	Act(sim *Simulation) bool
-}
-
 type AgentFactory func(Character, proto.PlayerOptions, proto.IndividualSimRequest) Agent
 
 var agentFactories map[string]AgentFactory = make(map[string]AgentFactory)

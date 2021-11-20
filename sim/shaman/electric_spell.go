@@ -49,7 +49,6 @@ func (shaman *Shaman) newElectricSpellCast(name string, actionID core.ActionID, 
 	} else if shaman.Talents.LightningMastery > 0 {
 		// Convection applies against the base cost of the spell.
 		spellCast.ManaCost -= spellCast.BaseManaCost * float64(shaman.Talents.Convection) * 0.02
-
 		spellCast.CastTime -= time.Millisecond * 100 * time.Duration(shaman.Talents.LightningMastery)
 	}
 
@@ -67,14 +66,12 @@ func (shaman *Shaman) newElectricSpellCast(name string, actionID core.ActionID, 
 }
 
 // Helper for precomputing spell effects.
-func (shaman *Shaman) newElectricSpellEffect(minBaseDamage float64, maxBaseDamage float64, spellCoefficient float64, isLightningOverload bool) core.DirectDamageSpellEffect {
-	effect := core.DirectDamageSpellEffect{
+func (shaman *Shaman) newElectricSpellEffect(minBaseDamage float64, maxBaseDamage float64, spellCoefficient float64, isLightningOverload bool) core.SpellHitEffect {
+	effect := core.SpellHitEffect{
 		SpellEffect: core.SpellEffect{
 			DamageMultiplier: 1,
-
-			OnSpellMiss: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {},
 		},
-		DirectDamageSpellInput: core.DirectDamageSpellInput{
+		DirectInput: core.DirectDamageSpellInput{
 			MinBaseDamage:    minBaseDamage,
 			MaxBaseDamage:    maxBaseDamage,
 			SpellCoefficient: spellCoefficient,
