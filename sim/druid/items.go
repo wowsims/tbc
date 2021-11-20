@@ -127,7 +127,12 @@ func ApplyIdoloftheUnseenMoon(agent core.Agent) {
 		return core.Aura{
 			ID:   IdoloftheUnseenMoonAuraID,
 			Name: "Idol of the Unseen Moon",
-			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
+			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+				if sim.RandomFloat("Idol of the Unseen Moon") < 0.5 {
+					druid.AddAuraWithTemporaryStats(sim, LunarGraceAuraID, "Lunar Blessing", stats.SpellPower, spellBonus, dur)
+				}
+			},
+			OnSpellMiss: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 				if sim.RandomFloat("Idol of the Unseen Moon") < 0.5 {
 					druid.AddAuraWithTemporaryStats(sim, LunarGraceAuraID, "Lunar Blessing", stats.SpellPower, spellBonus, dur)
 				}
