@@ -25,8 +25,6 @@ sudo apt install protobuf-compiler
 go get -u -v github.com/golang/protobuf/proto
 go get -u -v github.com/golang/protobuf/protoc-gen-go
 
-# You should be able to run 'make test' now. If you see an error like, 'protoc-gen-go: program not found or is not executable', run the following commands:
-
 # Install node
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash
 nvm install 14.17.6
