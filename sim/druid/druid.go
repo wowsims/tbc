@@ -15,6 +15,7 @@ type Druid struct {
 
 	innervateCD  time.Duration
 	NaturesGrace bool // when true next spellcast is 0.5s faster
+	Rebirth bool
 
 	// cached cast stuff
 	starfireSpell         core.SimpleSpell
@@ -223,6 +224,7 @@ func NewDruid(char core.Character, selfBuffs SelfBuffs, talents proto.DruidTalen
 		SelfBuffs: selfBuffs,
 		Talents:   talents,
 		malorne4p: ItemSetMalorne.CharacterHasSetBonus(&char, 4),
+		Rebirth: false,
 	}
 
 	druid.registerNaturesSwiftnessCD()
