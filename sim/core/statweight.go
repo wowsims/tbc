@@ -73,6 +73,20 @@ func CalcStatWeight(isr proto.IndividualSimRequest, statsToWeigh []stats.Stat, r
 		result.EpValues[stat] = result.Weights[stat] / result.Weights[referenceStat]
 		result.WeightsStdev[stat] = computeStDevFromHists(isr.SimOptions.Iterations, mod, dpsHists[stat], baselineResult.Agents[0].DpsHist, nil, statMods[referenceStat])
 		result.EpValuesStdev[stat] = computeStDevFromHists(isr.SimOptions.Iterations, mod, dpsHists[stat], baselineResult.Agents[0].DpsHist, dpsHists[referenceStat], statMods[referenceStat])
+
+		if referenceStat == stats.SpellPower {
+			// Lets do a little cheating to make people ask less questions.
+			switch stat {
+			case stats.ArcaneSpellPower, stats.FireSpellPower, stats.FrostSpellPower, stats.HolySpellPower, stats.NatureSpellPower, stats.ShadowSpellPower:
+				if result.EpValues[stat] > 1.0 {
+					diff := result.EpValues[stat] - 1.0
+					result.EpValues[stat] = 1.0
+					result.WeightsStdev[stat] += diff
+					result.EpValuesStdev[stat] += diff
+					result.Weights[stat] = result.Weights[referenceStat]
+				}
+			}
+		}
 	}
 
 	return result
