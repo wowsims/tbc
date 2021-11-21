@@ -132,6 +132,27 @@ export class Results extends Component {
 
   setStatWeights(request: StatWeightsRequest, result: StatWeightsResult, epStats: Array<Stat>) {
 		const iterations = request.options!.simOptions!.iterations;
+	if (request.epReferenceStat == Stat.StatSpellPower) {
+
+		result.epValues.forEach( (value, index) => {
+			if (
+			index == Stat.StatArcaneSpellPower ||
+			index == Stat.StatFireSpellPower ||
+			index == Stat.StatFrostSpellPower ||
+			index == Stat.StatHolySpellPower ||
+			index == Stat.StatNatureSpellPower ||
+			index == Stat.StatShadowSpellPower) {
+				if (value > result.epValues[request.epReferenceStat]) {
+					const diff = value - result.epValues[request.epReferenceStat];
+					result.epValues[index] = result.epValues[request.epReferenceStat];
+					result.epValuesStdev[index] -= diff;
+					const wdiff = result.weights[index] - result.weights[request.epReferenceStat];
+					result.weights[index] = result.weights[request.epReferenceStat];
+					result.weightsStdev[index] -= wdiff;
+				}
+			}
+		});		
+	}
 
     this.hideAll();
     this.epElem.style.display = 'initial';
