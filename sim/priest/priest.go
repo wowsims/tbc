@@ -14,6 +14,7 @@ type Priest struct {
 	Talents proto.PriestTalents
 
 	// cached cast stuff
+	// TODO: aoe multi-target situations will need multiple spells ticking for each target.
 	MindFlaySpell        core.SimpleSpell
 	mindflayCastTemplate core.SimpleSpellTemplate
 

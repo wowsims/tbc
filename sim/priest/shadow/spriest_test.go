@@ -30,7 +30,7 @@ func TestSimulateP1Basic(t *testing.T) {
 			Gear:          P1Gear,
 		},
 
-		ExpectedDpsShort: 1077.6,
-		ExpectedDpsLong:  1342.1,
+		ExpectedDpsShort: 1128.9,
+		ExpectedDpsLong:  48.7,
 	})
 }

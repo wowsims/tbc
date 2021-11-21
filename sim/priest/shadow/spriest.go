@@ -6,6 +6,7 @@ import (
 	"github.com/wowsims/tbc/sim/common"
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/proto"
+	"github.com/wowsims/tbc/sim/core/stats"
 	"github.com/wowsims/tbc/sim/priest"
 )
 
@@ -15,7 +16,7 @@ func RegisterShadowPriest() {
 	})
 }
 
-var ShadowWeavingAuraID = core.NewDebuffID()
+var ShadowWeavingDebuffID = core.NewDebuffID()
 var ShadowWeaverAuraID = core.NewAuraID()
 
 func NewShadowPriest(character core.Character, options proto.PlayerOptions, isr proto.IndividualSimRequest) *ShadowPriest {
@@ -23,20 +24,28 @@ func NewShadowPriest(character core.Character, options proto.PlayerOptions, isr 
 
 	selfBuffs := priest.SelfBuffs{}
 
-	priest := priest.NewPriest(character, selfBuffs, *shadowOptions.Talents)
+	basePriest := priest.NewPriest(character, selfBuffs, *shadowOptions.Talents)
 	spriest := &ShadowPriest{
-		Priest:          priest,
+		Priest:          basePriest,
 		primaryRotation: *shadowOptions.Rotation,
 	}
 
-	if priest.Talents.ShadowWeaving > 0 {
+	if basePriest.Talents.ShadowWeaving > 0 {
 		const dur = time.Second * 15
+		const misDur = time.Second * 24
 
 		spriest.Character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 			return core.Aura{
 				ID:   ShadowWeaverAuraID,
 				Name: "Shadow Weaving",
 				OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+					if basePriest.VTSpell.DotInput.IsTicking(sim) {
+						s := stats.Stats{stats.Mana: spellEffect.Damage * 0.05}
+						if sim.Log != nil {
+							sim.Log("VT Regenerated %0f mana.", s[stats.Mana])
+						}
+						character.Party.AddStats(s)
+					}
 					if spriest.swStacks < 5 {
 						spriest.swStacks++
 						if sim.Log != nil {
@@ -45,7 +54,7 @@ func NewShadowPriest(character core.Character, options proto.PlayerOptions, isr 
 					}
 					// Just keep replacing it with new expire time.
 					spellEffect.Target.ReplaceAura(sim, core.Aura{
-						ID:      ShadowWeavingAuraID,
+						ID:      ShadowWeavingDebuffID,
 						Name:    "Shadow Weaving",
 						Expires: sim.CurrentTime + dur,
 						OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
@@ -56,6 +65,16 @@ func NewShadowPriest(character core.Character, options proto.PlayerOptions, isr 
 						},
 					})
 
+					if spellCast.ActionID.SpellID == priest.SpellIDSWP || spellCast.ActionID.SpellID == priest.SpellIDVT || spellCast.ActionID.SpellID == priest.SpellIDMF {
+						spellEffect.Target.ReplaceAura(sim, core.Aura{
+							ID:      core.MiseryDebuffID,
+							Expires: sim.CurrentTime + misDur,
+							Name:    "Misery",
+							OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+								spellEffect.DamageMultiplier *= 1.05
+							},
+						})
+					}
 				},
 			}
 		})
