@@ -83,9 +83,9 @@ wowsimtbc: sim/web/main.go  binary_dist binary_dist/dist.go
 	go build -o wowsimtbc ./sim/web/main.go
 
 release: wowsimtbc
-	GOOS=windows GOARCH=amd64 go build -o wowsimtbc.exe ./sim/web/main.go
+	GOOS=windows GOARCH=amd64 go build -o wowsimtbc-windows.exe ./sim/web/main.go
 	GOOS=darwin GOARCH=amd64 go build -o wowsimtbc-amd64-darwin ./sim/web/main.go
-	GOOS=linux go build -o wowsimtbc-amd64-linux ./sim/web/main.go
+	GOOS=linux GOARCH=amd64 go build -o wowsimtbc-amd64-linux ./sim/web/main.go
 
 sim/core/proto/api.pb.go: proto/*.proto
 	protoc -I=./proto --go_out=./sim/core ./proto/*.proto
