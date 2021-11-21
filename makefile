@@ -17,6 +17,9 @@ clean:
 	rm -f ui/core/proto/*.ts
 	rm -f sim/core/proto/*.pb.go
 	rm -f wowsimtbc
+	rm -f wowsimtbc-windows.exe
+	rm -f wowsimtbc-amd64-darwin
+	rm -f wowsimtbc-amd64-linux
 	rm -rf dist
 	rm -rf binary_dist
 
@@ -80,8 +83,15 @@ binary_dist: $(OUT_DIR)
 	rm binary_dist/tbc/lib.wasm
 
 # Builds the web server with the compiled client.
-wowsimtbc: sim/web/main.go  binary_dist binary_dist/dist.go
-	go build -o wowsimtbc ./sim/web/main.go
+wowsimtbc: sim/web/main.go  binary_dist binary_dist/dist.go devserver
+
+devserver:
+	@echo "Starting server compile now..."
+	@if go build -o wowsimtbc ./sim/web/main.go; then \
+		echo "\033[1;32mBuild Completed Succeessfully\033[1;32m"; \
+	else \
+		echo "\033[1;31mBUILD FAILED\033[1;31m"; \
+	fi
 
 release: wowsimtbc
 	GOOS=windows GOARCH=amd64 go build -o wowsimtbc-windows.exe ./sim/web/main.go
