@@ -88,7 +88,7 @@ func (moonkin *BalanceDruid) actRotation(sim *core.Simulation, rotation proto.Ba
 	if moonkin.useBattleRes {
 	    rebirthTime := moonkin.TryRebirth(sim)
 	    if rebirthTime > 0  {
-	      return sim.CurrentTime + rebirthTime
+	      return rebirthTime
 	    }
 	}
 	innervateWait := moonkin.TryInnervate(sim)
