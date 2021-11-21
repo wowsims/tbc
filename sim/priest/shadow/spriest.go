@@ -42,14 +42,14 @@ func NewShadowPriest(character core.Character, options proto.PlayerOptions, isr 
 					if spellEffect.Damage > 0 && spriest.VTSpell.DotInput.IsTicking(sim) {
 						s := stats.Stats{stats.Mana: spellEffect.Damage * 0.05}
 						if sim.Log != nil {
-							sim.Log("VT Regenerated %0f mana.\n", s[stats.Mana])
+							sim.Log("VT Regenerated %0.1f mana.\n", s[stats.Mana])
 						}
 						spriest.Party.AddStats(s)
 					}
 					if spriest.swStacks < 5 {
 						spriest.swStacks++
 						if sim.Log != nil {
-							sim.Log("(%d) Shadow Weaving: stacks on target %d\n", spriest.ID, spriest.swStacks)
+							sim.Log("(%d) Shadow Weaving: stacks on target %0.0f\n", spriest.ID, spriest.swStacks)
 						}
 					}
 					// Just keep replacing it with new expire time.

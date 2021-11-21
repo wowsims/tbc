@@ -79,7 +79,7 @@ var PreRaidGear = items.EquipmentSpecFromStrings([]items.ItemStringSpec{})
 // TODO: fill out a p1 gear for spriest.
 var P1Gear = items.EquipmentSpecFromStrings([]items.ItemStringSpec{
 	{
-		Name:    "Spellstrike Hood", // TODO: helm
+		Name:    "Spellstrike Hood",
 		Enchant: "Glyph of Power",
 		Gems: []string{
 			"Runed Living Ruby",
@@ -91,7 +91,7 @@ var P1Gear = items.EquipmentSpecFromStrings([]items.ItemStringSpec{
 		Name: "Ritssyn's Lost Pendant",
 	},
 	{
-		Name:    "Frozen Shadoweave Shoulders", // TODO: shoulders
+		Name:    "Frozen Shadoweave Shoulders",
 		Enchant: "Greater Inscription of Discipline",
 		Gems: []string{
 			"Runed Living Ruby",
@@ -102,7 +102,7 @@ var P1Gear = items.EquipmentSpecFromStrings([]items.ItemStringSpec{
 		Name: "Ruby Drape of the Mysticant",
 	},
 	{
-		Name:    "Frozen Shadoweave Robe", // TODO: chest
+		Name:    "Frozen Shadoweave Robe",
 		Enchant: "Chest - Exceptional Stats",
 		Gems: []string{
 			"Runed Living Ruby",
@@ -114,7 +114,7 @@ var P1Gear = items.EquipmentSpecFromStrings([]items.ItemStringSpec{
 		Enchant: "Bracer - Spellpower",
 	},
 	{
-		Name:    "Soul-Eater's Handwraps", // TODO: gloves
+		Name:    "Soul-Eater's Handwraps",
 		Enchant: "Gloves - Major Spellpower",
 		Gems: []string{
 			"Runed Living Ruby",
@@ -122,14 +122,14 @@ var P1Gear = items.EquipmentSpecFromStrings([]items.ItemStringSpec{
 		},
 	},
 	{
-		Name: "Girdle of Ruination", // TODO: waist
+		Name: "Girdle of Ruination",
 		Gems: []string{
 			"Runed Living Ruby",
 			"Runed Living Ruby",
 		},
 	},
 	{
-		Name:    "Spellstrike Pants", // TODO: legs
+		Name:    "Spellstrike Pants",
 		Enchant: "Runic Spellthread",
 		Gems: []string{
 			"Runed Living Ruby",
