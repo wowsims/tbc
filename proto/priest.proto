@@ -45,7 +45,9 @@ message ShadowPriest {
     message Rotation {
       enum RotationType {
           Unknown = 0;
-          Standard = 1;
+          Basic = 1;
+		  ClipAlways = 2;
+		  IntelligentClipping = 3;
       }
       RotationType type = 1;
     }

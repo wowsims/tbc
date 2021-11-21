@@ -295,6 +295,7 @@ var ItemDeclarations = []ItemDeclaration{
 	{ /** Ring of Recurrence */ ID: 28753, Categories: []proto.ItemCategory{CasterCategory}},
 	{ /** Ring of Unrelenting Storms */ ID: 30667, Categories: []proto.ItemCategory{CasterCategory}},
 	{ /** Ring of the Fallen God */ ID: 21709, Categories: []proto.ItemCategory{CasterCategory}},
+	{ /** Ritssyn's Lost Pendant */ ID: 30666, Categories: []proto.ItemCategory{CasterCategory}},
 	{ /** Robe of Hateful Echoes */ ID: 30056, Categories: []proto.ItemCategory{CasterCategory}},
 	{ /** Robe of Oblivion */ ID: 28232, Categories: []proto.ItemCategory{CasterCategory}},
 	{ /** Robe of the Crimson Order */ ID: 31297, Categories: []proto.ItemCategory{CasterCategory}},
