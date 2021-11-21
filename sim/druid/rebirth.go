@@ -18,7 +18,7 @@ func (druid *Druid) NewRebirth(sim *core.Simulation) *core.SimpleCast {
 			ManaCost:        manaCost,
 			CastTime:        time.Second * 2,
 		},
-		OnCastComplete: func(sim *core.Simulation, cast *core.Cast) { druid.Rebirth = true },
+		OnCastComplete: func(sim *core.Simulation, cast *core.Cast) { druid.RebirthUsed = true },
 	}
 
 	rb.Init(sim)
@@ -28,14 +28,14 @@ func (druid *Druid) NewRebirth(sim *core.Simulation) *core.SimpleCast {
 
 func (druid *Druid) TryRebirth(sim *core.Simulation) time.Duration {
 
-	var cast *core.SimpleCast
-
-	if !druid.Rebirth {
-		cast = druid.NewRebirth(sim);
+	if druid.RebirthUsed {
+		return 0 
 	}
 
-	if cast == nil {
-		return 0 
+	var cast *core.SimpleCast
+
+	if !druid.RebirthUsed {
+		cast = druid.NewRebirth(sim);
 	}
 
 	success := cast.StartCast(sim)
