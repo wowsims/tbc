@@ -16,6 +16,7 @@ detailed_results: $(OUT_DIR)/detailed_results/index.js $(OUT_DIR)/detailed_resul
 clean:
 	rm -f ui/core/proto/*.ts
 	rm -f sim/core/proto/*.pb.go
+	rm -f wowsimtbc
 	rm -rf dist
 	rm -rf binary_dist
 
