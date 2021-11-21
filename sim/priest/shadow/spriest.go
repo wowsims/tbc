@@ -15,6 +15,9 @@ func RegisterShadowPriest() {
 	})
 }
 
+var ShadowWeavingAuraID = core.NewDebuffID()
+var ShadowWeaverAuraID = core.NewAuraID()
+
 func NewShadowPriest(character core.Character, options proto.PlayerOptions, isr proto.IndividualSimRequest) *ShadowPriest {
 	shadowOptions := options.GetShadowPriest()
 
@@ -22,7 +25,40 @@ func NewShadowPriest(character core.Character, options proto.PlayerOptions, isr 
 
 	priest := priest.NewPriest(character, selfBuffs, *shadowOptions.Talents)
 	spriest := &ShadowPriest{
-		Priest: priest,
+		Priest:          priest,
+		primaryRotation: *shadowOptions.Rotation,
+	}
+
+	if priest.Talents.ShadowWeaving > 0 {
+		const dur = time.Second * 15
+
+		spriest.Character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
+			return core.Aura{
+				ID:   ShadowWeaverAuraID,
+				Name: "Shadow Weaving",
+				OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+					if spriest.swStacks < 5 {
+						spriest.swStacks++
+						if sim.Log != nil {
+							sim.Log("(%d) Shadow Weaving: stacks on target %d\n", spriest.ID, spriest.swStacks)
+						}
+					}
+					// Just keep replacing it with new expire time.
+					spellEffect.Target.ReplaceAura(sim, core.Aura{
+						ID:      ShadowWeavingAuraID,
+						Name:    "Shadow Weaving",
+						Expires: sim.CurrentTime + dur,
+						OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+							spellEffect.DamageMultiplier *= 1 + 0.02*spriest.swStacks
+						},
+						OnExpire: func(sim *core.Simulation) {
+							spriest.swStacks = 0
+						},
+					})
+
+				},
+			}
+		})
 	}
 	// spriest.PickRotations(*shadowOptions.Rotation, isr)
 
@@ -31,6 +67,8 @@ func NewShadowPriest(character core.Character, options proto.PlayerOptions, isr 
 
 type ShadowPriest struct {
 	priest.Priest
+
+	swStacks float64
 
 	primaryRotation proto.ShadowPriest_Rotation
 	// These are only used when primary spell is set to 'Adaptive'. When the mana
@@ -50,6 +88,7 @@ func (spriest *ShadowPriest) Reset(sim *core.Simulation) {
 		spriest.manaTracker.Reset()
 	}
 	spriest.Priest.Reset(sim)
+	spriest.swStacks = 0
 }
 
 func (spriest *ShadowPriest) Act(sim *core.Simulation) time.Duration {
@@ -70,25 +109,52 @@ func (spriest *ShadowPriest) Act(sim *core.Simulation) time.Duration {
 
 func (spriest *ShadowPriest) actRotation(sim *core.Simulation, rotation proto.ShadowPriest_Rotation) time.Duration {
 	// Activate shared druid behaviors
-
-	// target := sim.GetPrimaryTarget()
-
-	// if rotation.FaerieFire {
-	// 	ffWait := moonkin.TryFaerieFire(sim, target)
-	// 	if ffWait != 0 {
-	// 		return ffWait
-	// 	}
-	// }
-
+	target := sim.GetPrimaryTarget()
 	var spell *core.SimpleSpell
-	// switch rotation.PrimarySpell {
-	// case proto.BalanceDruid_Rotation_Starfire:
-	// 	spell = moonkin.NewStarfire(sim, target, 8)
-	// case proto.BalanceDruid_Rotation_Starfire6:
-	// 	spell = moonkin.NewStarfire(sim, target, 6)
-	// case proto.BalanceDruid_Rotation_Wrath:
-	// 	spell = moonkin.NewWrath(sim, target)
-	// }
+	var wait time.Duration
+
+	if spriest.Talents.VampiricTouch && !spriest.VTSpell.DotInput.IsTicking(sim) {
+		spell = spriest.NewVT(sim, target)
+	} else if !spriest.SWPSpell.DotInput.IsTicking(sim) {
+		spell = spriest.NewSWP(sim, target)
+	} else if rotation.UseDevPlague && spriest.Race == proto.Race_RaceUndead {
+		// TODO: add dev plague
+		panic("not implemented")
+	} else if spriest.Talents.MindFlay {
+		mbcd := spriest.Character.GetRemainingCD(priest.MBCooldownID, sim.CurrentTime)
+		swdcd := spriest.Character.GetRemainingCD(priest.SWDCooldownID, sim.CurrentTime)
+
+		if mbcd == 0 {
+			spell = spriest.NewMindBlast(sim, target)
+		} else if rotation.UseSwd && swdcd == 0 {
+			spell = spriest.NewSWD(sim, target)
+		} else {
+			spell = spriest.NewMindFlay(sim, target)
+			mfLength := spriest.MindFlaySpell.DotInput.TickLength * time.Duration(spriest.MindFlaySpell.DotInput.NumberOfTicks)
+			wait = mfLength
+
+			switch rotation.Type {
+			case proto.ShadowPriest_Rotation_Basic:
+				// basic rotation will simply wait the whole length
+			case proto.ShadowPriest_Rotation_ClipAlways:
+				// Prio MindBlast
+				minWait := core.MinDuration(mbcd, swdcd)
+				if minWait < mfLength && minWait > 1 {
+					spell.DotInput.NumberOfTicks = int((mfLength - minWait).Seconds()) // cut fractional seconds off
+					wait = minWait
+				} else if minWait < 1 {
+					return sim.CurrentTime + minWait // just wait until its off CD.. dont cast a spell for no reason
+				}
+			default:
+				panic("not implemented")
+			}
+		}
+	} else {
+		// what do you even do... i guess just sit around
+		mbcd := spriest.Character.GetRemainingCD(priest.MBCooldownID, sim.CurrentTime)
+		swdcd := spriest.Character.GetRemainingCD(priest.SWDCooldownID, sim.CurrentTime)
+		wait = core.MinDuration(mbcd, swdcd)
+	}
 
 	actionSuccessful := spell.Cast(sim)
 
@@ -98,6 +164,9 @@ func (spriest *ShadowPriest) actRotation(sim *core.Simulation, rotation proto.Sh
 			sim.Log("Not enough mana, regenerating for %s.\n", regenTime)
 		}
 		return sim.CurrentTime + regenTime
+	}
+	if wait != 0 {
+		return sim.CurrentTime + wait
 	}
 
 	return sim.CurrentTime + core.MaxDuration(

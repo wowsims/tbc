@@ -218,6 +218,16 @@ func (at *auraTracker) ReplaceAura(sim *Simulation, newAura Aura) {
 	}
 
 	if at.HasAura(newAura.ID) {
+		old := at.auras[newAura.ID]
+
+		// private cached state has to be copied over
+		newAura.activeIndex = old.activeIndex
+		newAura.onCastIndex = old.onCastIndex
+		newAura.onCastCompleteIndex = old.onCastCompleteIndex
+		newAura.onBeforeSpellHitIndex = old.onBeforeSpellHitIndex
+		newAura.onSpellHitIndex = old.onSpellHitIndex
+		newAura.onSpellMissIndex = old.onSpellMissIndex
+
 		at.auras[newAura.ID] = newAura
 		return
 	}

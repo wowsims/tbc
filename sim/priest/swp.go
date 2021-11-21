@@ -34,12 +34,12 @@ func (priest *Priest) newSWPTemplate(sim *core.Simulation) core.SimpleSpellTempl
 			TickBaseDamage:       1236 / 6,
 			TickSpellCoefficient: 0.183,
 
-			// TODO: does priest care about dot ticks?
+			// TODO:  Shadow Weaving apply on tick?
 			// OnDamageTick: func(sim *core.Simulation) {},
 		},
 	}
 
-	effect.DamageMultiplier *= 1 + float64(priest.Talents.Darkness)*0.02
+	priest.applyTalentsToShadowSpell(&baseCast, &effect)
 
 	return core.NewSimpleSpellTemplate(core.SimpleSpell{
 		SpellCast: core.SpellCast{
@@ -51,7 +51,7 @@ func (priest *Priest) newSWPTemplate(sim *core.Simulation) core.SimpleSpellTempl
 
 func (priest *Priest) NewSWP(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
 	// Initialize cast from precomputed template.
-	mf := &priest.swpSpell
+	mf := &priest.SWPSpell
 
 	priest.swpCastTemplate.Apply(mf)
 

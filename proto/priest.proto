@@ -49,7 +49,10 @@ message ShadowPriest {
 		  ClipAlways = 2;
 		  IntelligentClipping = 3;
       }
+	  
       RotationType type = 1;
+	  bool use_swd = 2;
+	  bool use_dev_plague = 3; // only undead
     }
     Rotation rotation = 1;
 

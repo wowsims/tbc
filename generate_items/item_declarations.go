@@ -273,6 +273,7 @@ var ItemDeclarations = []ItemDeclaration{
 	{ /** Nordrassil Chestpiece */ ID: 30231, Categories: []proto.ItemCategory{CasterCategory}},
 	{ /** Nordrassil Wrath-Kilt */ ID: 30234, Categories: []proto.ItemCategory{CasterCategory}},
 	{ /** Nordrassil Wrath-Mantle */ ID: 30235, Categories: []proto.ItemCategory{CasterCategory}},
+	{ /** Orb of the Soul-Eater */ ID: 29272, Categories: []proto.ItemCategory{CasterCategory}},
 	{ /** Ogre Slayer's Cover */ ID: 25777, Categories: []proto.ItemCategory{CasterCategory}},
 	{ /** Omor's Unyielding Will */ ID: 27464, Categories: []proto.ItemCategory{CasterCategory}},
 	{ /** Pantaloons of Flaming Wrath */ ID: 30709, Categories: []proto.ItemCategory{CasterCategory}},

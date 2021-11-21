@@ -1,11 +1,15 @@
 package priest
 
 import (
+	"time"
+
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 const SpellIDSWD int32 = 25368
+
+var SWDCooldownID = core.NewCooldownID()
 
 func (priest *Priest) newSWDTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
 	baseCast := core.Cast{
@@ -16,8 +20,10 @@ func (priest *Priest) newSWDTemplate(sim *core.Simulation) core.SimpleSpellTempl
 		BaseManaCost:   309,
 		ManaCost:       309,
 		CastTime:       0,
+		Cooldown:       time.Second * 12,
 		ActionID: core.ActionID{
-			SpellID: SpellIDSWD,
+			SpellID:    SpellIDSWD,
+			CooldownID: SWDCooldownID,
 		},
 	}
 
@@ -34,7 +40,7 @@ func (priest *Priest) newSWDTemplate(sim *core.Simulation) core.SimpleSpellTempl
 
 	// TODO: Manage health with SW:D or assume healers got you?
 
-	effect.DamageMultiplier *= 1 + float64(priest.Talents.Darkness)*0.02
+	priest.applyTalentsToShadowSpell(&baseCast, &effect)
 
 	return core.NewSimpleSpellTemplate(core.SimpleSpell{
 		SpellCast: core.SpellCast{
@@ -46,9 +52,9 @@ func (priest *Priest) newSWDTemplate(sim *core.Simulation) core.SimpleSpellTempl
 
 func (priest *Priest) NewSWD(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
 	// Initialize cast from precomputed template.
-	mf := &priest.vtSpell
+	mf := &priest.swdSpell
 
-	priest.swpCastTemplate.Apply(mf)
+	priest.swdCastTemplate.Apply(mf)
 
 	// Set dynamic fields, i.e. the stuff we couldn't precompute.
 	mf.Target = target

@@ -26,11 +26,11 @@ func TestSimulateP1Basic(t *testing.T) {
 			Race:     proto.Race_RaceUndead,
 			Class:    proto.Class_ClassPriest,
 
-			PlayerOptions: PlayerOptionsAdaptive,
+			PlayerOptions: PlayerOptionsBasic,
 			Gear:          P1Gear,
 		},
 
-		ExpectedDpsShort: 1423.7,
+		ExpectedDpsShort: 1077.6,
 		ExpectedDpsLong:  1342.1,
 	})
 }

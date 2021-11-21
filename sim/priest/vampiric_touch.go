@@ -34,12 +34,12 @@ func (priest *Priest) newVTTemplate(sim *core.Simulation) core.SimpleSpellTempla
 			TickBaseDamage:       650 / 5,
 			TickSpellCoefficient: 0.2,
 
-			// TODO: does priest care about dot ticks?
+			// TODO:  Shadow Weaving apply on tick?
 			// OnDamageTick: func(sim *core.Simulation) {},
 		},
 	}
 
-	effect.DamageMultiplier *= 1 + float64(priest.Talents.Darkness)*0.02
+	priest.applyTalentsToShadowSpell(&baseCast, &effect)
 
 	return core.NewSimpleSpellTemplate(core.SimpleSpell{
 		SpellCast: core.SpellCast{
@@ -51,7 +51,7 @@ func (priest *Priest) newVTTemplate(sim *core.Simulation) core.SimpleSpellTempla
 
 func (priest *Priest) NewVT(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
 	// Initialize cast from precomputed template.
-	mf := &priest.vtSpell
+	mf := &priest.VTSpell
 
 	priest.vtCastTemplate.Apply(mf)
 

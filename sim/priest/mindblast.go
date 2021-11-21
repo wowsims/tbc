@@ -9,6 +9,8 @@ import (
 
 const SpellIDMB int32 = 25375
 
+var MBCooldownID = core.NewCooldownID()
+
 func (priest *Priest) newMindBlastTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
 	baseCast := core.Cast{
 		Name:           "Mind Blast",
@@ -18,8 +20,10 @@ func (priest *Priest) newMindBlastTemplate(sim *core.Simulation) core.SimpleSpel
 		BaseManaCost:   450,
 		ManaCost:       450,
 		CastTime:       time.Millisecond * 1500,
+		Cooldown:       time.Second * 8,
 		ActionID: core.ActionID{
-			SpellID: SpellIDMB,
+			SpellID:    SpellIDMB,
+			CooldownID: MBCooldownID,
 		},
 	}
 
@@ -34,7 +38,9 @@ func (priest *Priest) newMindBlastTemplate(sim *core.Simulation) core.SimpleSpel
 		},
 	}
 
-	effect.DamageMultiplier *= 1 + float64(priest.Talents.Darkness)*0.02
+	priest.applyTalentsToShadowSpell(&baseCast, &effect)
+
+	baseCast.Cooldown -= time.Millisecond * 500 * time.Duration(priest.Talents.ImprovedMindBlast)
 
 	return core.NewSimpleSpellTemplate(core.SimpleSpell{
 		SpellCast: core.SpellCast{

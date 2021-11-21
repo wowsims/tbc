@@ -11,7 +11,20 @@ var BasicPartyBuffs = &proto.PartyBuffs{
 }
 var BasicIndividualBuffs = &proto.IndividualBuffs{}
 
-var StandardTalents = &proto.PriestTalents{}
+var StandardTalents = &proto.PriestTalents{
+	ImprovedShadowWordPain: 2,
+	ImprovedMindBlast:      5,
+	ShadowFocus:            5,
+	MindFlay:               true,
+	ShadowWeaving:          5,
+	VampiricEmbrace:        true,
+	FocusedMind:            3,
+	Darkness:               5,
+	Shadowform:             true,
+	Misery:                 5,
+	VampiricTouch:          true,
+	// TODO: Inner Focus
+}
 
 var FullRaidBuffs = &proto.RaidBuffs{
 	ArcaneBrilliance: true,
@@ -50,12 +63,15 @@ var FullDebuffTarget = &proto.Target{
 	},
 }
 
-var PlayerOptionsAdaptive = &proto.PlayerOptions{
+var PlayerOptionsBasic = &proto.PlayerOptions{
 	Spec: &proto.PlayerOptions_ShadowPriest{
 		ShadowPriest: &proto.ShadowPriest{
-			Talents:  StandardTalents,
-			Options:  &proto.ShadowPriest_Options{},
-			Rotation: &proto.ShadowPriest_Rotation{},
+			Talents: StandardTalents,
+			Options: &proto.ShadowPriest_Options{},
+			Rotation: &proto.ShadowPriest_Rotation{
+				Type:   proto.ShadowPriest_Rotation_Basic,
+				UseSwd: true,
+			},
 		},
 	},
 }
@@ -100,7 +116,7 @@ var P1Gear = items.EquipmentSpecFromStrings([]items.ItemStringSpec{
 		Enchant: "Bracer - Spellpower",
 	},
 	{
-		Name:    "", // TODO: gloves
+		Name:    "Soul-Eater's Handwraps", // TODO: gloves
 		Enchant: "Gloves - Major Spellpower",
 		Gems: []string{
 			"Runed Living Ruby",
@@ -108,14 +124,14 @@ var P1Gear = items.EquipmentSpecFromStrings([]items.ItemStringSpec{
 		},
 	},
 	{
-		Name: "", // TODO: waist
+		Name: "Girdle of Ruination", // TODO: waist
 		Gems: []string{
 			"Runed Living Ruby",
 			"Runed Living Ruby",
 		},
 	},
 	{
-		Name:    "", // TODO: legs
+		Name:    "Spellstrike Pants", // TODO: legs
 		Enchant: "Runic Spellthread",
 		Gems: []string{
 			"Runed Living Ruby",
@@ -124,15 +140,17 @@ var P1Gear = items.EquipmentSpecFromStrings([]items.ItemStringSpec{
 		},
 	},
 	{
-		Name: "Boots of Foretelling",
+		Name: "Frozen Shadoweave Boots",
+		Gems: []string{
+			"Runed Living Ruby",
+			"Runed Living Ruby",
+		},
 	},
 	{
-		Name:    "Violet Signet of the Archmage",
-		Enchant: "Ring - Spellpower",
+		Name: "Band of the Inevitable",
 	},
 	{
-		Name:    "Ring of Recurrence",
-		Enchant: "Ring - Spellpower",
+		Name: "Ring of the Fallen God",
 	},
 	{
 		Name: "Quagmirran's Eye",
@@ -145,6 +163,6 @@ var P1Gear = items.EquipmentSpecFromStrings([]items.ItemStringSpec{
 		Enchant: "Weapon - Major Spellpower",
 	},
 	{
-		Name: "Talisman of Kalecgos",
+		Name: "Orb of the Soul-Eater",
 	},
 })

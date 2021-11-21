@@ -14,16 +14,19 @@ type Priest struct {
 	Talents proto.PriestTalents
 
 	// cached cast stuff
-	mindflaySpell        core.SimpleSpell
+	MindFlaySpell        core.SimpleSpell
 	mindflayCastTemplate core.SimpleSpellTemplate
 
 	mindblastSpell        core.SimpleSpell
 	mindblastCastTemplate core.SimpleSpellTemplate
 
-	swpSpell        core.SimpleSpell
+	swdSpell        core.SimpleSpell
+	swdCastTemplate core.SimpleSpellTemplate
+
+	SWPSpell        core.SimpleSpell
 	swpCastTemplate core.SimpleSpellTemplate
 
-	vtSpell        core.SimpleSpell
+	VTSpell        core.SimpleSpell
 	vtCastTemplate core.SimpleSpellTemplate
 }
 
@@ -43,12 +46,21 @@ func (priest *Priest) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {
 }
 
 func (priest *Priest) Init(sim *core.Simulation) {
-	// druid.starfire8CastTemplate = druid.newStarfireTemplate(sim, 8)
+	priest.mindflayCastTemplate = priest.newMindflayTemplate(sim)
+	priest.mindblastCastTemplate = priest.newMindBlastTemplate(sim)
+	priest.swpCastTemplate = priest.newSWPTemplate(sim)
+	priest.vtCastTemplate = priest.newVTTemplate(sim)
+	priest.swdCastTemplate = priest.newSWDTemplate(sim)
 }
 
 func (priest *Priest) Reset(newsim *core.Simulation) {
 	// Cleanup and pending dots and casts
-	// druid.starfireSpell = core.SimpleSpell{}
+	priest.mindblastSpell = core.SimpleSpell{}
+	priest.swdSpell = core.SimpleSpell{}
+	priest.MindFlaySpell = core.SimpleSpell{}
+	priest.SWPSpell = core.SimpleSpell{}
+	priest.VTSpell = core.SimpleSpell{}
+
 	priest.Character.Reset(newsim)
 }
 
@@ -60,6 +72,19 @@ func (priest *Priest) Advance(sim *core.Simulation, elapsedTime time.Duration) {
 
 func (priest *Priest) Act(sim *core.Simulation) time.Duration {
 	return core.NeverExpires // does nothing
+}
+
+func (priest *Priest) applyTalentsToShadowSpell(cast *core.Cast, effect *core.SpellHitEffect) {
+	if cast.ActionID.SpellID == SpellIDMF || cast.ActionID.SpellID == SpellIDMB {
+		cast.ManaCost -= cast.BaseManaCost * float64(priest.Talents.FocusedMind) * 0.05
+	}
+	effect.DamageMultiplier *= 1 + float64(priest.Talents.Darkness)*0.02
+	if priest.Talents.Shadowform {
+		effect.DamageMultiplier *= 1.15
+	}
+
+	// shadow focus gives 2% hit per level
+	effect.BonusSpellHitRating += float64(priest.Talents.ShadowFocus) * 2 * core.SpellHitRatingPerHitChance
 }
 
 func NewPriest(char core.Character, selfBuffs SelfBuffs, talents proto.PriestTalents) Priest {
@@ -74,6 +99,10 @@ func NewPriest(char core.Character, selfBuffs SelfBuffs, talents proto.PriestTal
 		},
 	})
 
+	if talents.Meditation > 0 {
+		char.PseudoStats.SpiritRegenRateCasting = float64(talents.Meditation) * 0.1
+	}
+
 	// if talents.LunarGuidance > 0 {
 	// 	bonus := (0.25 / 3) * float64(talents.LunarGuidance)
 	// 	char.AddStatDependency(stats.StatDependency{
@@ -84,6 +113,7 @@ func NewPriest(char core.Character, selfBuffs SelfBuffs, talents proto.PriestTal
 	// 		},
 	// 	})
 	// }
+
 	priest := Priest{
 		Character: char,
 		SelfBuffs: selfBuffs,

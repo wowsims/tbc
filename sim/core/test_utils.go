@@ -151,14 +151,14 @@ type AllEncountersTestOptions struct {
 
 func IndividualSimAllEncountersTest(testOpts AllEncountersTestOptions) {
 	isr := NewIndividualSimRequest(testOpts.Inputs)
-	// isr.SimOptions.Debug = true
+	isr.SimOptions.Debug = true
 
 	isr.Encounter.Duration = ShortDuration
-	IndividualSimTest(
-		testOpts.Label+"-short",
-		testOpts.T,
-		isr,
-		testOpts.ExpectedDpsShort)
+	// IndividualSimTest(
+	// 	testOpts.Label+"-short",
+	// 	testOpts.T,
+	// 	isr,
+	// 	testOpts.ExpectedDpsShort)
 
 	isr.Encounter.Duration = LongDuration
 	IndividualSimTest(

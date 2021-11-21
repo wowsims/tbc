@@ -33,12 +33,12 @@ func (priest *Priest) newMindflayTemplate(sim *core.Simulation) core.SimpleSpell
 			TickBaseDamage:       528 / 3,
 			TickSpellCoefficient: 0.19,
 
-			// TODO: does priest care about dot ticks?
+			// TODO:  Shadow Weaving apply on tick?
 			// OnDamageTick: func(sim *core.Simulation) {},
 		},
 	}
 
-	effect.DamageMultiplier *= 1 + float64(priest.Talents.Darkness)*0.02
+	priest.applyTalentsToShadowSpell(&baseCast, &effect)
 
 	return core.NewSimpleSpellTemplate(core.SimpleSpell{
 		SpellCast: core.SpellCast{
@@ -48,15 +48,18 @@ func (priest *Priest) newMindflayTemplate(sim *core.Simulation) core.SimpleSpell
 	})
 }
 
-func (priest *Priest) NewMindflay(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
+func (priest *Priest) NewMindFlay(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
 	// Initialize cast from precomputed template.
-	mf := &priest.mindflaySpell
+	mf := &priest.MindFlaySpell
 
 	priest.mindflayCastTemplate.Apply(mf)
 
 	// Set dynamic fields, i.e. the stuff we couldn't precompute.
 	mf.Target = target
 	mf.Init(sim)
+
+	// Channels accelerate tick speed by haste.
+	mf.DotInput.TickLength = time.Duration(float64(mf.DotInput.TickLength) / priest.CastSpeed())
 
 	return mf
 }
