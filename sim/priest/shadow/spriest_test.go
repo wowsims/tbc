@@ -30,7 +30,25 @@ func TestSimulateP1Basic(t *testing.T) {
 			Gear:          P1Gear,
 		},
 
-		ExpectedDpsShort: 1103.8,
-		ExpectedDpsLong:  908.5,
+		ExpectedDpsShort: 1192.0,
+		ExpectedDpsLong:  1296.0,
 	})
+}
+
+func TestAverageDPS(t *testing.T) {
+	isr := core.NewIndividualSimRequest(core.IndividualSimInputs{
+		RaidBuffs:       FullRaidBuffs,
+		PartyBuffs:      FullPartyBuffs,
+		IndividualBuffs: FullIndividualBuffs,
+
+		Consumes: FullConsumes,
+		Target:   FullDebuffTarget,
+		Race:     proto.Race_RaceUndead,
+		Class:    proto.Class_ClassPriest,
+
+		PlayerOptions: PlayerOptionsBasic,
+		Gear:          P1Gear,
+	})
+
+	core.IndividualSimAverageTest("P1Average", t, isr, 1274.75)
 }

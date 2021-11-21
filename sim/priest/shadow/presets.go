@@ -23,7 +23,7 @@ var StandardTalents = &proto.PriestTalents{
 	Shadowform:             true,
 	Misery:                 5,
 	VampiricTouch:          true,
-	// TODO: Inner Focus
+	InnerFocus:             true,
 }
 
 var FullRaidBuffs = &proto.RaidBuffs{
@@ -31,7 +31,10 @@ var FullRaidBuffs = &proto.RaidBuffs{
 	GiftOfTheWild:    proto.TristateEffect_TristateEffectImproved,
 }
 var FullPartyBuffs = &proto.PartyBuffs{
-	MoonkinAura: proto.TristateEffect_TristateEffectRegular,
+	MoonkinAura:     proto.TristateEffect_TristateEffectRegular,
+	TotemOfWrath:    1,
+	WrathOfAirTotem: proto.TristateEffect_TristateEffectImproved,
+	ManaSpringTotem: proto.TristateEffect_TristateEffectRegular,
 }
 var FullIndividualBuffs = &proto.IndividualBuffs{
 	BlessingOfKings:  true,
@@ -110,7 +113,7 @@ var P1Gear = items.EquipmentSpecFromStrings([]items.ItemStringSpec{
 		},
 	},
 	{
-		Name:    "Bracers of Havok",
+		Name:    "Ravager's Cuffs of Shadow Wrath",
 		Enchant: "Bracer - Spellpower",
 	},
 	{
@@ -122,11 +125,7 @@ var P1Gear = items.EquipmentSpecFromStrings([]items.ItemStringSpec{
 		},
 	},
 	{
-		Name: "Girdle of Ruination",
-		Gems: []string{
-			"Runed Living Ruby",
-			"Runed Living Ruby",
-		},
+		Name: "Lurker's Cord of Shadow Wrath",
 	},
 	{
 		Name:    "Spellstrike Pants",
@@ -155,6 +154,9 @@ var P1Gear = items.EquipmentSpecFromStrings([]items.ItemStringSpec{
 	},
 	{
 		Name: "Icon of the Silver Crescent",
+	},
+	{
+		Name: "Flawless Wand of Shadow Wrath",
 	},
 	{
 		Name:    "Nathrezim Mindblade",

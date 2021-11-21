@@ -79,13 +79,16 @@ func (priest *Priest) applyTalentsToShadowSpell(cast *core.Cast, effect *core.Sp
 	if cast.ActionID.SpellID == SpellIDMF || cast.ActionID.SpellID == SpellIDMB {
 		cast.ManaCost -= cast.BaseManaCost * float64(priest.Talents.FocusedMind) * 0.05
 	}
-	effect.DamageMultiplier *= 1 + float64(priest.Talents.Darkness)*0.02
-	if priest.Talents.Shadowform {
-		effect.DamageMultiplier *= 1.15
-	}
+	if cast.SpellSchool == stats.ShadowSpellPower {
+		effect.DamageMultiplier *= 1 + float64(priest.Talents.Darkness)*0.02
 
-	// shadow focus gives 2% hit per level
-	effect.BonusSpellHitRating += float64(priest.Talents.ShadowFocus) * 2 * core.SpellHitRatingPerHitChance
+		if priest.Talents.Shadowform {
+			effect.DamageMultiplier *= 1.15
+		}
+
+		// shadow focus gives 2% hit per level
+		effect.BonusSpellHitRating += float64(priest.Talents.ShadowFocus) * 2 * core.SpellHitRatingPerHitChance
+	}
 }
 
 func NewPriest(char core.Character, selfBuffs SelfBuffs, talents proto.PriestTalents) Priest {
@@ -124,6 +127,7 @@ func NewPriest(char core.Character, selfBuffs SelfBuffs, talents proto.PriestTal
 	return priest
 }
 
+// newVTOnTick is the OnDamage function for all priest DoTs to apply VT
 func newVTOnTick(party *core.Party) core.OnDamageTick {
 	return func(sim *core.Simulation, damage float64) {
 		s := stats.Stats{stats.Mana: damage * 0.05}
@@ -132,6 +136,31 @@ func newVTOnTick(party *core.Party) core.OnDamageTick {
 		}
 		party.AddStats(s)
 	}
+}
+
+var InnerFocusAuraID = core.NewAuraID()
+var InnerFocusCooldownID = core.NewCooldownID()
+
+func ApplyInnerFocus(sim *core.Simulation, priest *Priest) bool {
+	sim.MetricsAggregator.AddInstantCast(&priest.Character, core.ActionID{SpellID: 14751})
+
+	priest.Character.AddAura(sim, core.Aura{
+		ID:      InnerFocusAuraID,
+		Name:    "Inner Focus",
+		Expires: core.NeverExpires,
+		OnCast: func(sim *core.Simulation, cast *core.Cast) {
+			cast.ManaCost = 0
+		},
+		OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+			spellEffect.BonusSpellCritRating += 25 * core.SpellCritRatingPerCritChance
+		},
+		OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
+			// Remove the buff and put skill on CD
+			priest.SetCD(InnerFocusCooldownID, sim.CurrentTime+time.Minute*3)
+			priest.RemoveAura(sim, InnerFocusAuraID)
+		},
+	})
+	return true
 }
 
 // TODO: Get Priest base stats

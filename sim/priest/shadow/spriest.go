@@ -34,10 +34,12 @@ func NewShadowPriest(character core.Character, options proto.PlayerOptions, isr 
 		const dur = time.Second * 15
 		const misDur = time.Second * 24
 
+		// This is a combined aura for all spriest major on hit effects.
+		//  Shadow Weaving, Vampiric Touch, and Misery
 		spriest.Character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 			return core.Aura{
 				ID:   ShadowWeaverAuraID,
-				Name: "Shadow Weaving",
+				Name: "Shadow Weaver",
 				OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 					if spellEffect.Damage > 0 && spriest.VTSpell.DotInput.IsTicking(sim) {
 						s := stats.Stats{stats.Mana: spellEffect.Damage * 0.05}
@@ -46,6 +48,7 @@ func NewShadowPriest(character core.Character, options proto.PlayerOptions, isr 
 						}
 						spriest.Party.AddStats(s)
 					}
+
 					if spriest.swStacks < 5 {
 						spriest.swStacks++
 						if sim.Log != nil {
@@ -144,6 +147,10 @@ func (spriest *ShadowPriest) actRotation(sim *core.Simulation, rotation proto.Sh
 		swdcd := spriest.Character.GetRemainingCD(priest.SWDCooldownID, sim.CurrentTime)
 
 		if mbcd == 0 {
+			if spriest.Talents.InnerFocus && spriest.GetRemainingCD(priest.InnerFocusCooldownID, sim.CurrentTime) == 0 {
+				priest.ApplyInnerFocus(sim, &spriest.Priest)
+			}
+
 			spell = spriest.NewMindBlast(sim, target)
 		} else if rotation.UseSwd && swdcd == 0 {
 			spell = spriest.NewSWD(sim, target)

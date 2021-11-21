@@ -39,6 +39,7 @@ func (priest *Priest) newSWPTemplate(sim *core.Simulation) core.SimpleSpellTempl
 		},
 	}
 
+	effect.DotInput.NumberOfTicks += int(priest.Talents.ImprovedShadowWordPain) // extra tick per point
 	priest.applyTalentsToShadowSpell(&baseCast, &effect)
 
 	return core.NewSimpleSpellTemplate(core.SimpleSpell{
