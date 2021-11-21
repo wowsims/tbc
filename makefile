@@ -88,9 +88,9 @@ wowsimtbc: sim/web/main.go  binary_dist binary_dist/dist.go devserver
 devserver:
 	@echo "Starting server compile now..."
 	@if go build -o wowsimtbc ./sim/web/main.go; then \
-		echo "\033[1;32mBuild Completed Succeessfully\033[1;32m"; \
+		echo "\033[1;32mBuild Completed Succeessfully\033[0m"; \
 	else \
-		echo "\033[1;31mBUILD FAILED\033[1;31m"; \
+		echo "\033[1;31mBUILD FAILED\033[0m"; \
 	fi
 
 release: wowsimtbc
