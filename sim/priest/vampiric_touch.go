@@ -35,7 +35,7 @@ func (priest *Priest) newVTTemplate(sim *core.Simulation) core.SimpleSpellTempla
 			TickSpellCoefficient: 0.2,
 
 			// TODO:  Shadow Weaving apply on tick?
-			// OnDamageTick: func(sim *core.Simulation) {},
+			OnDamageTick: newVTOnTick(priest.Party),
 		},
 	}
 

@@ -34,7 +34,7 @@ func (priest *Priest) newMindflayTemplate(sim *core.Simulation) core.SimpleSpell
 			TickSpellCoefficient: 0.19,
 
 			// TODO:  Shadow Weaving apply on tick?
-			// OnDamageTick: func(sim *core.Simulation) {},
+			OnDamageTick: newVTOnTick(priest.Party),
 		},
 	}
 

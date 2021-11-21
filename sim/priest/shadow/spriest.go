@@ -39,12 +39,12 @@ func NewShadowPriest(character core.Character, options proto.PlayerOptions, isr 
 				ID:   ShadowWeaverAuraID,
 				Name: "Shadow Weaving",
 				OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-					if basePriest.VTSpell.DotInput.IsTicking(sim) {
+					if spellEffect.Damage > 0 && spriest.VTSpell.DotInput.IsTicking(sim) {
 						s := stats.Stats{stats.Mana: spellEffect.Damage * 0.05}
 						if sim.Log != nil {
-							sim.Log("VT Regenerated %0f mana.", s[stats.Mana])
+							sim.Log("VT Regenerated %0f mana.\n", s[stats.Mana])
 						}
-						character.Party.AddStats(s)
+						spriest.Party.AddStats(s)
 					}
 					if spriest.swStacks < 5 {
 						spriest.swStacks++

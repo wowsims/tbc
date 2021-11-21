@@ -159,7 +159,7 @@ func (spellEffect *SpellEffect) applyDot(sim *Simulation, spellCast *SpellCast, 
 		}
 
 		if ddInput.OnDamageTick != nil {
-			ddInput.OnDamageTick(sim)
+			ddInput.OnDamageTick(sim, damage)
 		}
 
 		spellEffect.Damage += damage

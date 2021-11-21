@@ -42,14 +42,12 @@ var BasicConsumes = &proto.Consumes{
 	DefaultPotion: proto.Potions_SuperManaPotion,
 }
 var FullConsumes = &proto.Consumes{
-	FlaskOfBlindingLight: true,
-	BrilliantWizardOil:   true,
-	BlackenedBasilisk:    true,
-	DefaultPotion:        proto.Potions_SuperManaPotion,
-	StartingPotion:       proto.Potions_DestructionPotion,
-	NumStartingPotions:   1,
-	DarkRune:             true,
-	Drums:                proto.Drums_DrumsOfBattle,
+	FlaskOfPureDeath:   true,
+	BrilliantWizardOil: true,
+	BlackenedBasilisk:  true,
+	DefaultPotion:      proto.Potions_SuperManaPotion,
+	NumStartingPotions: 1,
+	DarkRune:           true,
 }
 
 var NoDebuffTarget = &proto.Target{

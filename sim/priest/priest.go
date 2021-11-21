@@ -124,6 +124,16 @@ func NewPriest(char core.Character, selfBuffs SelfBuffs, talents proto.PriestTal
 	return priest
 }
 
+func newVTOnTick(party *core.Party) core.OnDamageTick {
+	return func(sim *core.Simulation, damage float64) {
+		s := stats.Stats{stats.Mana: damage * 0.05}
+		if sim.Log != nil {
+			sim.Log("VT Regenerated %0f mana.\n", s[stats.Mana])
+		}
+		party.AddStats(s)
+	}
+}
+
 // TODO: Get Priest base stats
 func init() {
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceHuman, Class: proto.Class_ClassPriest}] = stats.Stats{
