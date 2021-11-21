@@ -70,8 +70,8 @@ var PlayerOptionsBasic = &proto.PlayerOptions{
 			Talents: StandardTalents,
 			Options: &proto.ShadowPriest_Options{},
 			Rotation: &proto.ShadowPriest_Rotation{
-				Type:   proto.ShadowPriest_Rotation_Basic,
-				UseSwd: true,
+				RotationType: proto.ShadowPriest_Rotation_Basic,
+				UseSwd:       true,
 			},
 		},
 	},

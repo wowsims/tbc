@@ -1,6 +1,7 @@
 package core
 
 import (
+	"fmt"
 	"log"
 	"testing"
 
@@ -112,12 +113,12 @@ func IndividualSimTest(label string, t *testing.T, isr *proto.IndividualSimReque
 	sim := NewIndividualSim(*isr)
 	result := sim.Run()
 
-	if isr.SimOptions.Debug {
-		log.Printf("LOGS:\n%s\n", result.Logs)
-	}
-
 	tolerance := 0.5
 	if result.Agents[0].DpsAvg < expectedDps-tolerance || result.Agents[0].DpsAvg > expectedDps+tolerance {
+		// Automatically print output if we had debugging enabled.
+		if isr.SimOptions.Debug {
+			log.Printf("LOGS:\n%s\n", result.Logs)
+		}
 		t.Fatalf("%s failed: expected %0f dps from sim but was %0f", label, expectedDps, result.Agents[0].DpsAvg)
 	}
 }
@@ -150,6 +151,10 @@ type AllEncountersTestOptions struct {
 }
 
 func IndividualSimAllEncountersTest(testOpts AllEncountersTestOptions) {
+	for _, item := range testOpts.Inputs.Gear.Items {
+		fmt.Printf("id: %d,\n", item.Id)
+	}
+
 	isr := NewIndividualSimRequest(testOpts.Inputs)
 	isr.SimOptions.Debug = true
 

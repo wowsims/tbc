@@ -159,7 +159,7 @@ func (spriest *ShadowPriest) actRotation(sim *core.Simulation, rotation proto.Sh
 			mfLength := spriest.MindFlaySpell.DotInput.TickLength * time.Duration(spriest.MindFlaySpell.DotInput.NumberOfTicks)
 			wait = mfLength
 
-			switch rotation.Type {
+			switch rotation.RotationType {
 			case proto.ShadowPriest_Rotation_Basic:
 				// basic rotation will simply wait the whole length
 			case proto.ShadowPriest_Rotation_ClipAlways:
