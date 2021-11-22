@@ -46,7 +46,7 @@ func (spell *MultiTargetDirectDamageSpell) Cast(sim *Simulation) bool {
 			effect.apply(sim, &spell.SpellCast, false)
 		}
 		// Manually apply all effects at once at the end of all the apply
-		sim.MetricsAggregator.AddSpellCast(&spell.SpellCast)
+		cast.Character.Metrics.AddSpellCast(&spell.SpellCast)
 		spell.objectInUse = false
 	})
 }
@@ -126,7 +126,7 @@ func (hitEffect *SpellHitEffect) apply(sim *Simulation, spellCast *SpellCast, ap
 	if applyNow {
 		hitEffect.applyResultsToCast(spellCast)
 		if applyMetrics {
-			sim.MetricsAggregator.AddSpellCast(spellCast)
+			spellCast.Character.Metrics.AddSpellCast(spellCast)
 		}
 		spellCast.objectInUse = false
 	}

@@ -24,7 +24,7 @@ func CalcStatWeight(isr proto.IndividualSimRequest, statsToWeigh []stats.Stat, r
 
 	baseSim := NewIndividualSim(isr)
 	baseStats := baseSim.Raid.Parties[0].Players[0].GetCharacter().GetStats()
-	baselineResult := baseSim.Run()
+	baselineResult := baseSim.RunIndividual()
 
 	var waitGroup sync.WaitGroup
 	result := StatWeightsResult{}
@@ -36,11 +36,10 @@ func CalcStatWeight(isr proto.IndividualSimRequest, statsToWeigh []stats.Stat, r
 		simRequest := googleProto.Clone(&isr).(*proto.IndividualSimRequest)
 		simRequest.Player.CustomStats[stat] += value
 
-		newSim := NewIndividualSim(*simRequest)
-		simResult := newSim.Run()
+		simResult := RunIndividualSim(simRequest)
 
-		result.Weights[stat] = (simResult.Agents[0].DpsAvg - baselineResult.Agents[0].DpsAvg) / value
-		dpsHists[stat] = simResult.Agents[0].DpsHist
+		result.Weights[stat] = (simResult.PlayerMetrics.DpsAvg - baselineResult.PlayerMetrics.DpsAvg) / value
+		dpsHists[stat] = simResult.PlayerMetrics.DpsHist
 	}
 
 	// Spell hit mod shouldn't go over hit cap.
@@ -71,8 +70,8 @@ func CalcStatWeight(isr proto.IndividualSimRequest, statsToWeigh []stats.Stat, r
 		stat := stats.Stat(statIdx)
 
 		result.EpValues[stat] = result.Weights[stat] / result.Weights[referenceStat]
-		result.WeightsStdev[stat] = computeStDevFromHists(isr.SimOptions.Iterations, mod, dpsHists[stat], baselineResult.Agents[0].DpsHist, nil, statMods[referenceStat])
-		result.EpValuesStdev[stat] = computeStDevFromHists(isr.SimOptions.Iterations, mod, dpsHists[stat], baselineResult.Agents[0].DpsHist, dpsHists[referenceStat], statMods[referenceStat])
+		result.WeightsStdev[stat] = computeStDevFromHists(isr.SimOptions.Iterations, mod, dpsHists[stat], baselineResult.PlayerMetrics.DpsHist, nil, statMods[referenceStat])
+		result.EpValuesStdev[stat] = computeStDevFromHists(isr.SimOptions.Iterations, mod, dpsHists[stat], baselineResult.PlayerMetrics.DpsHist, dpsHists[referenceStat], statMods[referenceStat])
 	}
 
 	return result

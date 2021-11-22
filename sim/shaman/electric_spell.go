@@ -41,7 +41,7 @@ func (shaman *Shaman) newElectricSpellCast(name string, actionID core.ActionID, 
 
 	if isLightningOverload {
 		spellCast.Name += " (LO)"
-		spellCast.Tag = CastTagLightningOverload
+		spellCast.ActionID.Tag = CastTagLightningOverload
 		spellCast.CastTime = 0
 		spellCast.ManaCost = 0
 		spellCast.IgnoreCooldowns = true

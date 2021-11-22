@@ -108,7 +108,7 @@ func TestSimulatePreRaidNoBuffs(t *testing.T) {
 			Gear:          PreRaidGear,
 		},
 
-		ExpectedDpsShort: 1019.4,
+		ExpectedDpsShort: 997.0,
 		ExpectedDpsLong:  364.7,
 	})
 }
@@ -132,8 +132,8 @@ func TestSimulatePreRaid(t *testing.T) {
 			Gear:          PreRaidGear,
 		},
 
-		ExpectedDpsShort: 1566.1,
-		ExpectedDpsLong:  1178.9,
+		ExpectedDpsShort: 1557.8,
+		ExpectedDpsLong:  1177.4,
 	})
 }
 

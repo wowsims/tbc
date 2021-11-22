@@ -196,8 +196,6 @@ func (shaman *Shaman) Init(sim *core.Simulation) {
 }
 
 func (shaman *Shaman) Reset(sim *core.Simulation) {
-	shaman.Character.Reset(sim)
-
 	// Check to see if we are casting a totem to set its expire time.
 	for i := range shaman.SelfBuffs.NextTotemDrops {
 		shaman.SelfBuffs.NextTotemDrops[i] = core.NeverExpires
@@ -229,7 +227,6 @@ func (shaman *Shaman) Reset(sim *core.Simulation) {
 func (shaman *Shaman) Advance(sim *core.Simulation, elapsedTime time.Duration) {
 	// Shaman should never be outside the 5s window, use combat regen
 	shaman.Character.RegenManaCasting(sim, elapsedTime)
-	shaman.Character.Advance(sim, elapsedTime)
 }
 
 var ElementalMasteryAuraID = core.NewAuraID()
@@ -245,10 +242,11 @@ func (shaman *Shaman) registerElementalMasteryCD() {
 		Cooldown:   time.Minute * 3,
 		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
 			return func(sim *core.Simulation, character *core.Character) bool {
-				sim.MetricsAggregator.AddInstantCast(shaman.GetCharacter(), core.ActionID{SpellID: 16166})
+				character.Metrics.AddInstantCast(core.ActionID{SpellID: 16166})
 
 				character.AddAura(sim, core.Aura{
 					ID:      ElementalMasteryAuraID,
+					SpellID: 16166,
 					Name:    "Elemental Mastery",
 					Expires: core.NeverExpires,
 					OnCast: func(sim *core.Simulation, cast *core.Cast) {
@@ -308,7 +306,7 @@ func (shaman *Shaman) registerNaturesSwiftnessCD() {
 						character.SetCD(NaturesSwiftnessCooldownID, sim.CurrentTime+time.Minute*3)
 						character.RemoveAura(sim, NaturesSwiftnessAuraID)
 						character.UpdateMajorCooldowns(sim)
-						sim.MetricsAggregator.AddInstantCast(character, core.ActionID{SpellID: 16188})
+						character.Metrics.AddInstantCast(core.ActionID{SpellID: 16188})
 					},
 				})
 				return true

@@ -55,8 +55,8 @@ func applyRaceEffects(agent Agent) {
 			ActivationFactory: func(sim *Simulation) CooldownActivation {
 				return func(sim *Simulation, character *Character) bool {
 					character.SetCD(OrcBloodFuryCooldownID, cd+sim.CurrentTime)
-					character.AddAuraWithTemporaryStats(sim, OrcBloodFuryAuraID, "Orc Blood Fury", stats.SpellPower, spBonus, dur)
-					sim.MetricsAggregator.AddInstantCast(character, ActionID{SpellID: 33697})
+					character.AddAuraWithTemporaryStats(sim, OrcBloodFuryAuraID, 33697, "Orc Blood Fury", stats.SpellPower, spBonus, dur)
+					character.Metrics.AddInstantCast(ActionID{SpellID: 33697})
 					return true
 				}
 			},
@@ -104,7 +104,8 @@ func applyRaceEffects(agent Agent) {
 							character.PseudoStats.CastSpeedMultiplier /= hasteBonus
 						},
 					})
-					sim.MetricsAggregator.AddInstantCast(character, ActionID{SpellID: 20554})
+					character.Metrics.AddInstantCast(ActionID{SpellID: 20554})
+					character.AddAuraUptime(TrollBerserkingAuraID, 20554, MinDuration(dur, sim.Duration - sim.CurrentTime))
 					return true
 				}
 			},

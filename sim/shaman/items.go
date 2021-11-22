@@ -179,7 +179,7 @@ func ApplyFathomBroochOfTheTidewalker(agent core.Agent) {
 				if cast.SpellSchool != stats.NatureSpellPower {
 					return
 				}
-				if sim.RandomFloat("unmarked") < 0.15 {
+				if sim.RandomFloat("Fathom-Brooch of the Tidewalker") < 0.15 {
 					icd = core.InternalCD(sim.CurrentTime + icdDur)
 					character.AddStat(stats.Mana, 335)
 				}
@@ -202,8 +202,8 @@ func ApplySkycallTotem(agent core.Agent) {
 			Name:    "Skycall Totem",
 			Expires: core.NeverExpires,
 			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
-				if cast.ActionID.SpellID == SpellIDLB12 && sim.RandomFloat("skycall") < 0.15 {
-					character.AddAuraWithTemporaryStats(sim, EnergizedAuraID, "Energized", stats.SpellHaste, hasteBonus, dur)
+				if cast.ActionID.SpellID == SpellIDLB12 && sim.RandomFloat("Skycall Totem") < 0.15 {
+					character.AddAuraWithTemporaryStats(sim, EnergizedAuraID, 0, "Energized", stats.SpellHaste, hasteBonus, dur)
 				}
 			},
 		}
