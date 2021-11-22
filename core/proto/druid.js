@@ -476,11 +476,12 @@ export const BalanceDruid_Rotation = new BalanceDruid_Rotation$Type();
 class BalanceDruid_Options$Type extends MessageType {
     constructor() {
         super("proto.BalanceDruid.Options", [
-            { no: 1, name: "innervate_target", kind: "message", T: () => RaidTarget }
+            { no: 1, name: "innervate_target", kind: "message", T: () => RaidTarget },
+            { no: 2, name: "battle_res", kind: "scalar", T: 8 /*ScalarType.BOOL*/ }
         ]);
     }
     create(value) {
-        const message = {};
+        const message = { battleRes: false };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -493,6 +494,9 @@ class BalanceDruid_Options$Type extends MessageType {
             switch (fieldNo) {
                 case /* proto.RaidTarget innervate_target */ 1:
                     message.innervateTarget = RaidTarget.internalBinaryRead(reader, reader.uint32(), options, message.innervateTarget);
+                    break;
+                case /* bool battle_res */ 2:
+                    message.battleRes = reader.bool();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -509,6 +513,9 @@ class BalanceDruid_Options$Type extends MessageType {
         /* proto.RaidTarget innervate_target = 1; */
         if (message.innervateTarget)
             RaidTarget.internalBinaryWrite(message.innervateTarget, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+        /* bool battle_res = 2; */
+        if (message.battleRes !== false)
+            writer.tag(2, WireType.Varint).bool(message.battleRes);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

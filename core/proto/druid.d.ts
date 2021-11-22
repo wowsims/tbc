@@ -243,6 +243,10 @@ export interface BalanceDruid_Options {
      * @generated from protobuf field: proto.RaidTarget innervate_target = 1;
      */
     innervateTarget?: RaidTarget;
+    /**
+     * @generated from protobuf field: bool battle_res = 2;
+     */
+    battleRes: boolean;
 }
 declare class DruidTalents$Type extends MessageType<DruidTalents> {
     constructor();

@@ -97,5 +97,21 @@ export const BalanceDruidRotationConfig = {
                 enableWhen: (player) => player.getTalents().insectSwarm,
             },
         },
+        {
+            type: 'boolean',
+            cssClass: 'battle-res-picker',
+            getModObject: (simUI) => simUI.player,
+            config: {
+                label: 'Use Battle Res',
+                labelTooltip: 'Cast Battle Res on an ally sometime during the encounter.',
+                changedEvent: (player) => player.specOptionsChangeEmitter,
+                getValue: (player) => player.getSpecOptions().battleRes,
+                setValue: (player, newValue) => {
+                    const newOptions = player.getSpecOptions();
+                    newOptions.battleRes = newValue;
+                    player.setSpecOptions(newOptions);
+                },
+            },
+        },
     ],
 };
