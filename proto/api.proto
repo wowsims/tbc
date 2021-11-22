@@ -55,6 +55,102 @@ message SimOptions {
 		bool is_test = 5; // Only used internally.
 }
 
+// ID for actions that aren't spells or items.
+enum OtherAction {
+    OtherActionNone = 0;
+    OtherActionWait = 1;
+}
+
+message ActionID {
+    // Identifies this action.
+    oneof raw_id {
+        int32 spell_id = 1;
+        int32 item_id = 2;
+        OtherAction other_id = 3;
+    }
+
+		// Distinguishes between different versions of the same action.
+		// Currently the only use for this is Shaman Lightning Overload.
+		int32 tag = 4;
+}
+
+// The aggregated results from all uses of a particular action.
+message ActionMetrics {
+		ActionID id = 1;
+
+		// # of times this action was used by the agent.
+    int32 casts = 2;
+
+		// # of times this action hit a target. For cleave spells this can be larger than casts.
+    int32 hits = 3;
+
+		// # of times this action was a critical strike.
+    int32 crits = 4;
+
+		// # of times this action was a Miss or Resist.
+    int32 misses = 5;
+
+		// Total damage done to all targets by this action.
+    double damage = 6;
+}
+
+message AuraMetrics {
+		// The in-game spell ID for the aura.
+		int32 id = 1;
+
+		// Total time, in seconds, that this aura was active.
+		double uptime_seconds = 2;
+}
+
+// All the results for a single Player.
+message PlayerMetrics {
+    double dps_avg   = 1;
+    double dps_stdev = 2;
+    double dps_max   = 3;
+    map<int32, int32> dps_hist = 4;
+
+    int32 num_oom = 5;
+    double oom_at_avg = 6;
+    double dps_at_oom_avg = 7;
+
+    repeated ActionMetrics actions = 8;
+
+		repeated AuraMetrics auras = 9;
+}
+
+// Results for a whole raid.
+message PartyMetrics {
+		repeated PlayerMetrics players = 1;
+}
+
+// Results for a whole raid.
+message RaidMetrics {
+		repeated PartyMetrics parties = 1;
+}
+
+message TargetMetrics {
+		repeated AuraMetrics auras = 1;
+}
+
+message EncounterMetrics {
+		repeated TargetMetrics targets = 1;
+}
+
+// RPC RaidSim
+message RaidSimRequest {
+    Raid raid = 1;
+    Encounter encounter = 2;
+		SimOptions sim_options = 3;
+}
+
+// Result from running the raid sim.
+message RaidSimResult {
+		RaidMetrics raid_metrics = 1;
+		EncounterMetrics encounter_metrics = 2;
+
+		string logs = 3;
+}
+
 // RPC IndividualSim
 message IndividualSimRequest {
     Player player = 1;
@@ -68,65 +164,10 @@ message IndividualSimRequest {
 }
 
 message IndividualSimResult {
-    int64 execution_duration_ms = 1;
-    string logs = 2;
+		PlayerMetrics player_metrics = 1;
+		EncounterMetrics encounter_metrics = 2;
 
-    double dps_avg   = 3;
-    double dps_stdev = 4;
-    double dps_max   = 5;
-    map<int32, int32> dps_hist = 6;
-
-    int32 num_oom = 7;
-    double oom_at_avg = 8;
-    double dps_at_oom_avg = 9;
-
-    repeated ActionMetric action_metrics = 10;
-
-    string error = 11; 
-}
-
-// ID for actions that aren't spells or items.
-enum OtherAction {
-    OtherActionNone = 0;
-    OtherActionWait = 1;
-}
-
-// The aggregated results from all uses of a particular action.
-message ActionMetric {
-    // Identifies this action.
-    oneof action_id {
-        int32 spell_id = 1;
-        int32 item_id = 2;
-        OtherAction other_id = 3;
-    }
-
-		// Distinguishes between different versions of the same action.
-		// Currently the only use for this is Shaman Lightning Overload.
-		int32 tag = 4;
-
-		// # of times this action was used by the agent.
-    int32 casts = 5;
-
-		// # of times this action hit a target. For cleave spells this can be larger than casts.
-    int32 hits = 6;
-
-		// # of times this action was a critical strike.
-    int32 crits = 7;
-
-		// # of times this action was a Miss or Resist.
-    int32 misses = 8;
-
-		// Total damage done to all targets by this action.
-    double damage = 9;
-}
-
-// RPC RaidSim
-message RaidSimRequest {
-    Raid raid = 1;
-    Encounter encounter = 2;
-    int64 random_seed = 3;
-    double gcd_min = 4; // sets the minimum GCD
-    bool debug = 5; // enables debug printing.
+    string logs = 3;
 }
 
 // RPC GearList

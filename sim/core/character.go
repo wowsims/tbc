@@ -54,6 +54,9 @@ type Character struct {
 	// Used for applying the effects of hardcast / channeled spells at a later time.
 	// By definition there can be only 1 hardcast spell being cast at any moment.
 	Hardcast Hardcast
+
+	// Statistics describing the results of the sim.
+	Metrics CharacterMetrics
 }
 
 func NewCharacter(player proto.Player) Character {
@@ -66,6 +69,7 @@ func NewCharacter(player proto.Player) Character {
 			SpiritRegenMultiplier: 1,
 		},
 		auraTracker: newAuraTracker(false),
+		Metrics:     NewCharacterMetrics(),
 	}
 
 	if player.Options.Consumes != nil {
@@ -224,7 +228,7 @@ func (character *Character) Finalize() {
 	character.majorCooldownManager.finalize(character)
 }
 
-func (character *Character) Reset(sim *Simulation) {
+func (character *Character) reset(sim *Simulation) {
 	character.stats = character.initialStats
 	character.PseudoStats = character.initialPseudoStats
 
@@ -234,7 +238,7 @@ func (character *Character) Reset(sim *Simulation) {
 }
 
 // Advance moves time forward counting down auras, CDs, mana regen, etc
-func (character *Character) Advance(sim *Simulation, elapsedTime time.Duration) {
+func (character *Character) advance(sim *Simulation, elapsedTime time.Duration) {
 	// Advance CDs and Auras
 	character.auraTracker.advance(sim)
 
@@ -349,6 +353,12 @@ func (character *Character) HasMetaGemEquipped(gemID int32) bool {
 		}
 	}
 	return false
+}
+
+func (character *Character) GetMetricsProto(numIterations int32) *proto.PlayerMetrics {
+	metrics := character.Metrics.ToProto(numIterations)
+	metrics.Auras = character.auraTracker.GetMetricsProto()
+	return metrics
 }
 
 type BaseStatsKey struct {

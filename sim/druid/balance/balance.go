@@ -42,7 +42,7 @@ type BalanceDruid struct {
 	druid.Druid
 
 	primaryRotation proto.BalanceDruid_Rotation
-	useBattleRes bool
+	useBattleRes    bool
 
 	// These are only used when primary spell is set to 'Adaptive'. When the mana
 	// tracker tells us we have extra mana to spare, use surplusRotation instead of
@@ -86,10 +86,10 @@ func (moonkin *BalanceDruid) actRotation(sim *core.Simulation, rotation proto.Ba
 	// Potentially allow options for "Time of cast" in future or default cast like 1 min into fight
 	// Currently just casts at the beginning of encounter (with all CDs popped)
 	if moonkin.useBattleRes {
-	    rebirthTime := moonkin.TryRebirth(sim)
-	    if rebirthTime > 0  {
-	      return rebirthTime
-	    }
+		rebirthTime := moonkin.TryRebirth(sim)
+		if rebirthTime > 0 {
+			return rebirthTime
+		}
 	}
 	innervateWait := moonkin.TryInnervate(sim)
 	if innervateWait != 0 {
@@ -167,16 +167,15 @@ func (moonkin *BalanceDruid) PickRotations(baseRotation proto.BalanceDruid_Rotat
 
 	rotations := moonkin.GetDpsRotationHierarchy(baseRotation)
 	for i, rotation := range rotations {
-		rotationRequest := googleProto.Clone(&isr).(*proto.IndividualSimRequest)
-		rotationRequest.SimOptions.RandomSeed = 1
-		rotationRequest.SimOptions.Debug = false
-		rotationRequest.SimOptions.Iterations = 100
-		*rotationRequest.Player.Options.Spec.(*proto.PlayerOptions_BalanceDruid).BalanceDruid.Rotation = rotation
+		presimRequest := googleProto.Clone(&isr).(*proto.IndividualSimRequest)
+		presimRequest.SimOptions.RandomSeed = 1
+		presimRequest.SimOptions.Debug = false
+		presimRequest.SimOptions.Iterations = 100
+		*presimRequest.Player.Options.Spec.(*proto.PlayerOptions_BalanceDruid).BalanceDruid.Rotation = rotation
 
-		rotationSim := core.NewIndividualSim(*rotationRequest)
-		rotationResult := rotationSim.Run()
+		presimResult := core.RunIndividualSim(presimRequest)
 
-		if rotationResult.Agents[0].NumOom < 15 {
+		if presimResult.PlayerMetrics.NumOom < 15 {
 			moonkin.primaryRotation = rotation
 
 			// If the highest dps rotation is fine, we dont need any adaptive logic.

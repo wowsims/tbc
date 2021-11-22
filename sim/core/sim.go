@@ -19,12 +19,10 @@ func debugFunc(sim *Simulation) func(string, ...interface{}) {
 type InitialAura func(*Simulation) Aura
 
 type Simulation struct {
-	Raid     *Raid
-	targets  []*Target
-	Options  proto.SimOptions
-	Duration time.Duration
-
-	MetricsAggregator *MetricsAggregator
+	Raid      *Raid
+	encounter Encounter
+	Options   proto.SimOptions
+	Duration  time.Duration
 
 	rand *rand.Rand
 
@@ -63,18 +61,16 @@ func newSim(raid *Raid, encounter Encounter, simOptions proto.SimOptions) *Simul
 	}
 
 	return &Simulation{
-		Raid:     raid,
-		targets:  encounter.Targets,
-		Options:  simOptions,
-		Duration: DurationFromSeconds(encounter.Duration),
-		Log:      nil,
+		Raid:      raid,
+		encounter: encounter,
+		Options:   simOptions,
+		Duration:  DurationFromSeconds(encounter.Duration),
+		Log:       nil,
 
 		rand: rand.New(rand.NewSource(rseed)),
 
 		isTest:    simOptions.IsTest,
 		testRands: make(map[uint32]*rand.Rand),
-
-		MetricsAggregator: NewMetricsAggregator(raid.Size(), encounter.Duration),
 	}
 }
 
@@ -102,16 +98,9 @@ func (sim *Simulation) RandomFloat(label string) float64 {
 	return labelRand.Float64()
 }
 
-// Get the metrics for an invidual Agent, for the current iteration.
-func (sim *Simulation) GetIndividualMetrics(agentID int) AgentIterationMetrics {
-	return sim.MetricsAggregator.agentIterations[agentID]
-}
-
 // Reset will set sim back and erase all current state.
 // This is automatically called before every 'Run'.
 func (sim *Simulation) reset() {
-	sim.CurrentTime = 0.0
-
 	if sim.Log != nil {
 		sim.Log("SIM RESET\n")
 		sim.Log("----------------------\n")
@@ -120,13 +109,16 @@ func (sim *Simulation) reset() {
 	// Reset all players
 	for _, party := range sim.Raid.Parties {
 		for _, agent := range party.Players {
+			agent.GetCharacter().reset(sim)
 			agent.Reset(sim)
 		}
 	}
 
-	for _, target := range sim.targets {
+	for _, target := range sim.encounter.Targets {
 		target.Reset(sim)
 	}
+
+	sim.CurrentTime = 0.0
 }
 
 type PendingAction struct {
@@ -137,7 +129,7 @@ type PendingAction struct {
 
 // Run runs the simulation for the configured number of iterations, and
 // collects all the metrics together.
-func (sim *Simulation) Run() SimResult {
+func (sim *Simulation) Run() *proto.RaidSimResult {
 	pid := 0
 	for _, raidParty := range sim.Raid.Parties {
 		for _, player := range raidParty.Players {
@@ -155,14 +147,33 @@ func (sim *Simulation) Run() SimResult {
 		}
 	}
 
+	simDurationSeconds := sim.Duration.Seconds()
 	for i := int32(0); i < sim.Options.Iterations; i++ {
 		sim.RunOnce()
-		sim.MetricsAggregator.doneIteration()
+
+		sim.Raid.doneIteration(simDurationSeconds)
 	}
 
-	result := sim.MetricsAggregator.getResult()
-	result.Logs = logsBuffer.String()
+	// Reset after the last iteration, because some metrics get updated in reset().
+	sim.reset()
+
+	result := &proto.RaidSimResult{
+		RaidMetrics:      sim.Raid.GetMetrics(sim.Options.Iterations),
+		EncounterMetrics: sim.encounter.GetMetricsProto(),
+
+		Logs: logsBuffer.String(),
+	}
 	return result
+}
+
+// Runs a full sim for an individual player.
+func (sim *Simulation) RunIndividual() *proto.IndividualSimResult {
+	raidResult := sim.Run()
+	return &proto.IndividualSimResult{
+		PlayerMetrics:    raidResult.RaidMetrics.Parties[0].Players[0],
+		EncounterMetrics: raidResult.EncounterMetrics,
+		Logs:             raidResult.Logs,
+	}
 }
 
 // RunOnce is the main event loop. It will run the simulation for number of seconds.
@@ -195,7 +206,7 @@ func (sim *Simulation) RunOnce() {
 		}
 
 		if pa.NextActionAt > sim.CurrentTime {
-			sim.Advance(pa.NextActionAt - sim.CurrentTime)
+			sim.advance(pa.NextActionAt - sim.CurrentTime)
 		}
 
 		pa.OnAction(sim)
@@ -251,26 +262,27 @@ func (sim *Simulation) RemovePendingAction(id int32) {
 }
 
 // Advance moves time forward counting down auras, CDs, mana regen, etc
-func (sim *Simulation) Advance(elapsedTime time.Duration) {
+func (sim *Simulation) advance(elapsedTime time.Duration) {
 	sim.CurrentTime += elapsedTime
 
 	for _, party := range sim.Raid.Parties {
 		for _, agent := range party.Players {
 			agent.Advance(sim, elapsedTime)
+			agent.GetCharacter().advance(sim, elapsedTime)
 		}
 	}
 
-	for _, target := range sim.targets {
+	for _, target := range sim.encounter.Targets {
 		target.Advance(sim, elapsedTime)
 	}
 }
 
 func (sim *Simulation) GetNumTargets() int32 {
-	return int32(len(sim.targets))
+	return int32(len(sim.encounter.Targets))
 }
 
 func (sim *Simulation) GetTarget(index int32) *Target {
-	return sim.targets[index]
+	return sim.encounter.Targets[index]
 }
 
 func (sim *Simulation) GetPrimaryTarget() *Target {

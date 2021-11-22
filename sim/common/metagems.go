@@ -17,6 +17,7 @@ func init() {
 
 var MysticalSkyfireDiamondAuraID = core.NewAuraID()
 var MysticFocusAuraID = core.NewAuraID()
+
 func ApplyMysticalSkyfireDiamond(agent core.Agent) {
 	character := agent.GetCharacter()
 	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
@@ -26,12 +27,12 @@ func ApplyMysticalSkyfireDiamond(agent core.Agent) {
 		icd := core.NewICD()
 
 		return core.Aura{
-			ID:      MysticalSkyfireDiamondAuraID,
-			Name:    "Mystical Skyfire Diamond",
+			ID:   MysticalSkyfireDiamondAuraID,
+			Name: "Mystical Skyfire Diamond",
 			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
 				if !icd.IsOnCD(sim) && sim.RandomFloat("Mystical Skyfire Diamond") < 0.15 {
 					icd = core.InternalCD(sim.CurrentTime + icdDur)
-					character.AddAuraWithTemporaryStats(sim, MysticFocusAuraID, "Mystic Focus", stats.SpellHaste, hasteBonus, dur)
+					character.AddAuraWithTemporaryStats(sim, MysticFocusAuraID, 18803, "Mystic Focus", stats.SpellHaste, hasteBonus, dur)
 				}
 			},
 		}
@@ -39,6 +40,7 @@ func ApplyMysticalSkyfireDiamond(agent core.Agent) {
 }
 
 var InsightfulEarthstormDiamondAuraID = core.NewAuraID()
+
 func ApplyInsightfulEarthstormDiamond(agent core.Agent) {
 	character := agent.GetCharacter()
 	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
@@ -46,8 +48,8 @@ func ApplyInsightfulEarthstormDiamond(agent core.Agent) {
 		const dur = time.Second * 15
 
 		return core.Aura{
-			ID:      InsightfulEarthstormDiamondAuraID,
-			Name:    "Insightful Earthstorm Diamond",
+			ID:   InsightfulEarthstormDiamondAuraID,
+			Name: "Insightful Earthstorm Diamond",
 			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
 				if !icd.IsOnCD(sim) && sim.RandomFloat("Insightful Earthstorm Diamond") < 0.04 {
 					icd = core.InternalCD(sim.CurrentTime + dur)
@@ -62,12 +64,13 @@ func ApplyInsightfulEarthstormDiamond(agent core.Agent) {
 }
 
 var ChaoticSkyfireDiamondAuraID = core.NewAuraID()
+
 func ApplyChaoticSkyfireDiamond(agent core.Agent) {
 	character := agent.GetCharacter()
 	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		return core.Aura{
-			ID:      ChaoticSkyfireDiamondAuraID,
-			Name:    "Chaotic Skyfire Diamond",
+			ID:   ChaoticSkyfireDiamondAuraID,
+			Name: "Chaotic Skyfire Diamond",
 			OnCast: func(sim *core.Simulation, cast *core.Cast) {
 				// For a normal spell with crit multiplier of 1.5, this will be 1.
 				// For a spell with a multiplier of 2 (i.e. 100% increased critical damage) this will be 2.
@@ -81,7 +84,7 @@ func ApplyChaoticSkyfireDiamond(agent core.Agent) {
 
 func ApplyEmberSkyfireDiamond(agent core.Agent) {
 	agent.GetCharacter().AddStatDependency(stats.StatDependency{
-		SourceStat: stats.Intellect,
+		SourceStat:   stats.Intellect,
 		ModifiedStat: stats.Intellect,
 		Modifier: func(intellect float64, _ float64) float64 {
 			return intellect * 1.02

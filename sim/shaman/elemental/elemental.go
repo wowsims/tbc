@@ -258,15 +258,14 @@ func NewAdaptiveRotation(isr proto.IndividualSimRequest) *AdaptiveRotation {
 		return rotation
 	}
 
-	clearcastRequest := googleProto.Clone(&isr).(*proto.IndividualSimRequest)
-	clearcastRequest.SimOptions.Debug = false
-	clearcastRequest.SimOptions.Iterations = 100
-	clearcastRequest.Player.Options.Spec.(*proto.PlayerOptions_ElementalShaman).ElementalShaman.Rotation.Type = proto.ElementalShaman_Rotation_CLOnClearcast
+	presimRequest := googleProto.Clone(&isr).(*proto.IndividualSimRequest)
+	presimRequest.SimOptions.Debug = false
+	presimRequest.SimOptions.Iterations = 100
+	presimRequest.Player.Options.Spec.(*proto.PlayerOptions_ElementalShaman).ElementalShaman.Rotation.Type = proto.ElementalShaman_Rotation_CLOnClearcast
 
-	clearcastSim := core.NewIndividualSim(*clearcastRequest)
-	clearcastResult := clearcastSim.Run()
+	presimResult := core.RunIndividualSim(presimRequest)
 
-	if clearcastResult.Agents[0].NumOom >= 5 {
+	if presimResult.PlayerMetrics.NumOom >= 5 {
 		rotation.baseRotation = NewLBOnlyRotation()
 		rotation.surplusRotation = NewCLOnClearcastRotation()
 	} else {
@@ -283,8 +282,6 @@ type AgentAction interface {
 
 	// For logging / debugging.
 	GetName() string
-
-	GetTag() int32
 
 	// The Character performing this action.
 	GetCharacter() *core.Character

@@ -32,6 +32,20 @@ func (encounter *Encounter) Finalize() {
 	}
 }
 
+func (encounter *Encounter) GetMetricsProto() *proto.EncounterMetrics {
+	metrics := &proto.EncounterMetrics{
+		Targets: make([]*proto.TargetMetrics, len(encounter.Targets)),
+	}
+
+	i := 0
+	for _, target := range encounter.Targets {
+		metrics.Targets[i] = target.GetMetricsProto()
+		i++
+	}
+
+	return metrics
+}
+
 // Target is an enemy that can be the target of attacks/spells.
 // Currently targets are basically just lvl 73 target dummies.
 type Target struct {
@@ -174,4 +188,10 @@ func (target *Target) Reset(sim *Simulation) {
 
 func (target *Target) Advance(sim *Simulation, elapsedTime time.Duration) {
 	target.auraTracker.advance(sim)
+}
+
+func (target *Target) GetMetricsProto() *proto.TargetMetrics {
+	return &proto.TargetMetrics{
+		Auras: target.auraTracker.GetMetricsProto(),
+	}
 }
