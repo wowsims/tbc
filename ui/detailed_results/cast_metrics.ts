@@ -91,7 +91,7 @@ export class CastMetrics extends ResultComponent {
 		const iterations = request.simOptions!.iterations;
 		const duration = request.encounter?.duration || 1;
 
-		parseActionMetrics(result.actionMetrics).then(actionMetrics => {
+		parseActionMetrics(result.playerMetrics!.actions).then(actionMetrics => {
 			actionMetrics.forEach(actionMetric => {
 				const rowElem = document.createElement('tr');
 				this.bodyElem.appendChild(rowElem);
@@ -105,8 +105,8 @@ export class CastMetrics extends ResultComponent {
 
 				const iconElem = nameCellElem.getElementsByClassName('cast-metrics-action-icon')[0] as HTMLAnchorElement;
 				iconElem.style.backgroundImage = `url('${actionMetric.iconUrl}')`;
-				if (!('otherId' in actionMetric.actionId)) {
-					setWowheadHref(iconElem, actionMetric.actionId);
+				if (!('otherId' in actionMetric.actionId.id)) {
+					setWowheadHref(iconElem, actionMetric.actionId.id);
 				}
 
 				const addCell = (value: string | number): HTMLElement => {

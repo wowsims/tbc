@@ -10,8 +10,8 @@ export class DpsResult extends ResultComponent {
 
 	onSimResult(request: IndividualSimRequest, result: IndividualSimResult) {
     this.rootElem.innerHTML = `
-      <span class="results-sim-dps-avg">${result.dpsAvg.toFixed(2)}</span>
-      <span class="results-sim-dps-stdev">${result.dpsStdev.toFixed(2)}</span>
+      <span class="results-sim-dps-avg">${result.playerMetrics!.dpsAvg.toFixed(2)}</span>
+      <span class="results-sim-dps-stdev">${result.playerMetrics!.dpsStdev.toFixed(2)}</span>
     `;
 	}
 }

@@ -22,7 +22,7 @@ export class SourceChart extends ResultComponent {
 
 		const colors: Array<string> = ['red', 'blue', 'lawngreen'];
 
-		parseActionMetrics(result.actionMetrics).then(actionMetrics => {
+		parseActionMetrics(result.playerMetrics!.actions).then(actionMetrics => {
 			const names = actionMetrics.map(am => am.name);
 			const totalDmg = sum(actionMetrics.map(actionMetric => actionMetric.totalDmg));
 			const vals = actionMetrics.map(actionMetric => actionMetric.totalDmg / totalDmg);
