@@ -4,6 +4,7 @@ import (
 	"math"
 	"time"
 
+	"github.com/wowsims/tbc/sim/core/proto"
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
@@ -63,15 +64,18 @@ type OnExpire func(sim *Simulation)
 
 type Aura struct {
 	ID          AuraID
+	SpellID     int32         // In-game spell ID. If set, metrics will be tracked for this aura using this ID.
 	Name        string        // Label used for logging.
-	Expires     time.Duration // time at which aura will be removed
-	activeIndex int32         // Position of this aura's index in the sim.activeAuraIDs array
+	Expires     time.Duration // Time at which aura will be removed.
+	activeIndex int32         // Position of this aura's index in the sim.activeAuraIDs array.
 
-	onCastIndex           int32 // Position of this aura's index in the sim.onCastIDs array
-	onCastCompleteIndex   int32 // Position of this aura's index in the sim.onCastCompleteIDs array
-	onBeforeSpellHitIndex int32 // Position of this aura's index in the sim.onBeforeSpellHitIDs array
-	onSpellHitIndex       int32 // Position of this aura's index in the sim.onSpellHitIDs array
-	onSpellMissIndex      int32 // Position of this aura's index in the sim.onSpellMissIDs array
+	startTime time.Duration // Time at which the aura was applied.
+
+	onCastIndex           int32 // Position of this aura's index in the sim.onCastIDs array.
+	onCastCompleteIndex   int32 // Position of this aura's index in the sim.onCastCompleteIDs array.
+	onBeforeSpellHitIndex int32 // Position of this aura's index in the sim.onBeforeSpellHitIDs array.
+	onSpellHitIndex       int32 // Position of this aura's index in the sim.onSpellHitIDs array.
+	onSpellMissIndex      int32 // Position of this aura's index in the sim.onSpellMissIDs array.
 
 	// The number of stacks, or charges, of this aura. If this aura doesn't care
 	// about charges, is just 0.
@@ -123,7 +127,7 @@ type auraTracker struct {
 	// Maps MagicIDs to aura for that ID. Using array for perf.
 	auras []Aura
 
-	// IDs of Auras that are active, in no particular order
+	// IDs of Auras that are active, in no particular order.
 	activeAuraIDs []AuraID
 
 	// IDs of Auras that have a non-nil OnCast function set.
@@ -140,6 +144,24 @@ type auraTracker struct {
 
 	// IDs of Auras that have a non-nil OnSpellMiss function set.
 	onSpellMissIDs []AuraID
+
+	// Metrics for each aura.
+	metrics []AuraMetrics
+}
+
+type AuraMetrics struct {
+	ID int32
+
+	// Total time this aura has been active.
+	Uptime time.Duration
+}
+
+func (auraMetrics *AuraMetrics) ToProto() *proto.AuraMetrics {
+	return &proto.AuraMetrics{
+		Id: auraMetrics.ID,
+
+		UptimeSeconds: auraMetrics.Uptime.Seconds(),
+	}
 }
 
 func newAuraTracker(useDebuffIDs bool) auraTracker {
@@ -158,6 +180,7 @@ func newAuraTracker(useDebuffIDs bool) auraTracker {
 		auras:               make([]Aura, numAura),
 		cooldowns:           make([]time.Duration, numCooldownIDs),
 		useDebuffIDs:        useDebuffIDs,
+		metrics:             make([]AuraMetrics, numAura),
 	}
 }
 
@@ -179,6 +202,13 @@ func (at *auraTracker) finalize() {
 }
 
 func (at *auraTracker) reset(sim *Simulation) {
+	// Add metrics for any auras that are still active.
+	for _, aura := range at.auras {
+		if aura.SpellID != 0 {
+			at.AddAuraUptime(aura.ID, aura.SpellID, sim.Duration - aura.startTime)
+		}
+	}
+
 	if at.useDebuffIDs {
 		at.auras = make([]Aura, numDebuffIDs)
 	} else {
@@ -213,11 +243,8 @@ func (at *auraTracker) advance(sim *Simulation) {
 // ReplaceAura is like AddAura but an existing aura will not be removed/readded.
 // This means that 'OnExpire' will not fire off on the old aura.
 func (at *auraTracker) ReplaceAura(sim *Simulation, newAura Aura) {
-	if newAura.Expires <= sim.CurrentTime {
-		return // no need to waste time adding aura that doesn't last.
-	}
-
 	if at.HasAura(newAura.ID) {
+		newAura.startTime = at.auras[newAura.ID].startTime
 		at.auras[newAura.ID] = newAura
 		return
 	}
@@ -225,17 +252,14 @@ func (at *auraTracker) ReplaceAura(sim *Simulation, newAura Aura) {
 	at.AddAura(sim, newAura)
 }
 
-// AddAura will add a new aura to the simulation. If there is a matching aura ID
-// it will be replaced with the newer aura.
-// Auras with duration of 0 will be logged as activating but never added to simulation Auras.
+// Adds a new aura to the simulation. If an aura with the same ID already
+// exists it will be replaced with the new one.
 func (at *auraTracker) AddAura(sim *Simulation, newAura Aura) {
-	if newAura.Expires <= sim.CurrentTime {
-		return // no need to waste time adding aura that doesn't last.
-	}
-
 	if at.HasAura(newAura.ID) {
 		at.RemoveAura(sim, newAura.ID)
 	}
+
+	newAura.startTime = sim.CurrentTime
 
 	at.auras[newAura.ID] = newAura
 	at.auras[newAura.ID].activeIndex = int32(len(at.activeAuraIDs))
@@ -275,6 +299,10 @@ func (at *auraTracker) AddAura(sim *Simulation, newAura Aura) {
 func (at *auraTracker) RemoveAura(sim *Simulation, id AuraID) {
 	if at.auras[id].OnExpire != nil {
 		at.auras[id].OnExpire(sim)
+	}
+
+	if at.auras[id].SpellID != 0 {
+		at.AddAuraUptime(id, at.auras[id].SpellID, sim.CurrentTime - at.auras[id].startTime)
 	}
 
 	if sim.Log != nil {
@@ -393,6 +421,25 @@ func (at *auraTracker) OnSpellHit(sim *Simulation, spellCast *SpellCast, spellEf
 	}
 }
 
+func (at *auraTracker) AddAuraUptime(auraID AuraID, spellID int32, uptime time.Duration) {
+	metrics := &at.metrics[auraID]
+
+	metrics.ID = spellID
+	metrics.Uptime += uptime
+}
+
+func (at *auraTracker) GetMetricsProto() []*proto.AuraMetrics {
+	metrics := make([]*proto.AuraMetrics, 0, len(at.metrics))
+
+	for _, auraMetric := range at.metrics {
+		if auraMetric.ID != 0 {
+			metrics = append(metrics, auraMetric.ToProto())
+		}
+	}
+
+	return metrics
+}
+
 // Stored value is the time at which the ICD will be off CD
 type InternalCD time.Duration
 
@@ -405,7 +452,7 @@ func NewICD() InternalCD {
 }
 
 // Helper for the common case of adding an Aura that gives a temporary stat boost.
-func (character *Character) AddAuraWithTemporaryStats(sim *Simulation, auraID AuraID, auraName string, stat stats.Stat, amount float64, duration time.Duration) {
+func (character *Character) AddAuraWithTemporaryStats(sim *Simulation, auraID AuraID, spellID int32, auraName string, stat stats.Stat, amount float64, duration time.Duration) {
 	if sim.Log != nil {
 		sim.Log(" +%0.0f %s from %s\n", amount, stat.StatName(), auraName)
 	}
@@ -413,6 +460,7 @@ func (character *Character) AddAuraWithTemporaryStats(sim *Simulation, auraID Au
 
 	character.AddAura(sim, Aura{
 		ID:      auraID,
+		SpellID: spellID,
 		Name:    auraName,
 		Expires: sim.CurrentTime + duration,
 		OnExpire: func(sim *Simulation) {

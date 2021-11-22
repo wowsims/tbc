@@ -38,10 +38,24 @@ func (party *Party) AddAura(sim *Simulation, aura Aura) {
 	}
 }
 
-func (p *Party) AddStats(s stats.Stats) {
-	for _, agent := range p.Players {
-		agent.GetCharacter().AddStats(s)
+func (party *Party) AddStats(newStats stats.Stats) {
+	for _, agent := range party.Players {
+		agent.GetCharacter().AddStats(newStats)
 	}
+}
+
+func (party *Party) doneIteration(encounterDurationSeconds float64) {
+	for _, agent := range party.Players {
+		agent.GetCharacter().Metrics.doneIteration(encounterDurationSeconds)
+	}
+}
+
+func (party *Party) GetMetrics(numIterations int32) *proto.PartyMetrics {
+	metrics := &proto.PartyMetrics{}
+	for _, agent := range party.Players {
+		metrics.Players = append(metrics.Players, agent.GetCharacter().GetMetricsProto(numIterations))
+	}
+	return metrics
 }
 
 type Raid struct {
@@ -140,4 +154,18 @@ func (raid Raid) AddStats(s stats.Stats) {
 	for _, party := range raid.Parties {
 		party.AddStats(s)
 	}
+}
+
+func (raid *Raid) doneIteration(encounterDurationSeconds float64) {
+	for _, party := range raid.Parties {
+		party.doneIteration(encounterDurationSeconds)
+	}
+}
+
+func (raid *Raid) GetMetrics(numIterations int32) *proto.RaidMetrics {
+	metrics := &proto.RaidMetrics{}
+	for _, party := range raid.Parties {
+		metrics.Parties = append(metrics.Parties, party.GetMetrics(numIterations))
+	}
+	return metrics
 }

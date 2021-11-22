@@ -31,9 +31,9 @@ func ApplyRobeOfTheElderScribes(agent core.Agent) {
 			ID:   RobeOfTheElderScribeAuraID,
 			Name: "Robes of the Elder Scibe",
 			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-				if !icd.IsOnCD(sim) && sim.RandomFloat("unmarked") < proc {
+				if !icd.IsOnCD(sim) && sim.RandomFloat("Robe of the Elder Scribe") < proc {
 					icd = core.InternalCD(sim.CurrentTime + icdDur)
-					character.AddAuraWithTemporaryStats(sim, PowerOfArcanagosAuraID, "Power of Arcanagos", stats.SpellPower, spellBonus, dur)
+					character.AddAuraWithTemporaryStats(sim, PowerOfArcanagosAuraID, 0, "Power of Arcanagos", stats.SpellPower, spellBonus, dur)
 				}
 			},
 		}
@@ -57,9 +57,9 @@ func ApplyEternalSage(agent core.Agent) {
 			ID:   EternalSageItemAuraID,
 			Name: "Band of the Enternal Sage Passive",
 			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-				if !icd.IsOnCD(sim) && sim.RandomFloat("band of eternal sage") < proc {
+				if !icd.IsOnCD(sim) && sim.RandomFloat("Band of the Eternal Sage") < proc {
 					icd = core.InternalCD(sim.CurrentTime + icdDur)
-					character.AddAuraWithTemporaryStats(sim, BandoftheEternalSageAuraID, "Band of the Eternal Sage", stats.SpellPower, spellBonus, dur)
+					character.AddAuraWithTemporaryStats(sim, BandoftheEternalSageAuraID, 0, "Band of the Eternal Sage", stats.SpellPower, spellBonus, dur)
 				}
 			},
 		}

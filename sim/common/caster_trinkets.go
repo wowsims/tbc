@@ -21,6 +21,7 @@ func init() {
 	var RestrainedEssenceOfSapphironCooldownID = core.NewCooldownID()
 	core.AddItemEffect(23046, core.MakeTemporaryStatsOnUseCDRegistration(
 		core.OffensiveTrinketActiveAuraID,
+		0,
 		"Restrained Essence of Sapphiron",
 		stats.SpellPower,
 		130,
@@ -35,6 +36,7 @@ func init() {
 	var LivingRubySerpentCooldownID = core.NewCooldownID()
 	core.AddItemEffect(24126, core.MakeTemporaryStatsOnUseCDRegistration(
 		core.OffensiveTrinketActiveAuraID,
+		0,
 		"Figurine - Living Ruby Serpent",
 		stats.SpellPower,
 		150,
@@ -49,6 +51,7 @@ func init() {
 	var ScryersBloodgemCooldownID = core.NewCooldownID()
 	core.AddItemEffect(29132, core.MakeTemporaryStatsOnUseCDRegistration(
 		core.OffensiveTrinketActiveAuraID,
+		0,
 		"Scryer's Bloodgem",
 		stats.SpellPower,
 		150,
@@ -63,6 +66,7 @@ func init() {
 	var XirisGiftCooldownID = core.NewCooldownID()
 	core.AddItemEffect(29179, core.MakeTemporaryStatsOnUseCDRegistration(
 		core.OffensiveTrinketActiveAuraID,
+		0,
 		"Xi'ri's Gift",
 		stats.SpellPower,
 		150,
@@ -77,6 +81,7 @@ func init() {
 	var IconOfTheSilverCrescentCooldownID = core.NewCooldownID()
 	core.AddItemEffect(29370, core.MakeTemporaryStatsOnUseCDRegistration(
 		core.OffensiveTrinketActiveAuraID,
+		0,
 		"Blessing of the Silver Crescent",
 		stats.SpellPower,
 		155,
@@ -91,6 +96,7 @@ func init() {
 	var EssenceOfTheMartyrCooldownID = core.NewCooldownID()
 	core.AddItemEffect(29376, core.MakeTemporaryStatsOnUseCDRegistration(
 		core.DefensiveTrinketActiveAuraID,
+		0,
 		"Essence of the Martyr",
 		stats.SpellPower,
 		99,
@@ -105,6 +111,7 @@ func init() {
 	var SkullOfGuldanCooldownID = core.NewCooldownID()
 	core.AddItemEffect(32483, core.MakeTemporaryStatsOnUseCDRegistration(
 		core.OffensiveTrinketActiveAuraID,
+		0,
 		"The Skull of Gul'dan",
 		stats.SpellHaste,
 		175,
@@ -119,6 +126,7 @@ func init() {
 	var HexShrunkenHeadCooldownID = core.NewCooldownID()
 	core.AddItemEffect(33829, core.MakeTemporaryStatsOnUseCDRegistration(
 		core.OffensiveTrinketActiveAuraID,
+		0,
 		"Hex Shrunken Head",
 		stats.SpellPower,
 		211,
@@ -133,6 +141,7 @@ func init() {
 	var ShiftingNaaruSliverCooldownID = core.NewCooldownID()
 	core.AddItemEffect(34429, core.MakeTemporaryStatsOnUseCDRegistration(
 		core.OffensiveTrinketActiveAuraID,
+		0,
 		"Shifting Naaru Sliver",
 		stats.SpellPower,
 		320,
@@ -147,6 +156,7 @@ func init() {
 	var DarkIronSmokingPipeCooldownID = core.NewCooldownID()
 	core.AddItemEffect(38290, core.MakeTemporaryStatsOnUseCDRegistration(
 		core.OffensiveTrinketActiveAuraID,
+		0,
 		"Dark Iron Smoking Pipe",
 		stats.SpellPower,
 		155,
@@ -189,9 +199,9 @@ func ApplyQuagmirransEye(agent core.Agent) {
 			ID:   QuagmirransEyeAuraID,
 			Name: "Quagmirran's Eye",
 			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
-				if !icd.IsOnCD(sim) && sim.RandomFloat("quags") < 0.1 {
+				if !icd.IsOnCD(sim) && sim.RandomFloat("Quagmirran's Eye") < 0.1 {
 					icd = core.InternalCD(sim.CurrentTime + dur)
-					character.AddAuraWithTemporaryStats(sim, FungalFrenzyAuraID, "Fungal Frenzy", stats.SpellHaste, hasteBonus, time.Second*6)
+					character.AddAuraWithTemporaryStats(sim, FungalFrenzyAuraID, 0, "Fungal Frenzy", stats.SpellHaste, hasteBonus, time.Second*6)
 				}
 			},
 		}
@@ -215,9 +225,9 @@ func ApplyShiffarsNexusHorn(agent core.Agent) {
 				if spellCast.ActionID.ItemID == core.ItemIDTheLightningCapacitor {
 					return // TLC can't proc Sextant
 				}
-				if !icd.IsOnCD(sim) && spellEffect.Crit && sim.RandomFloat("unmarked") < 0.2 {
+				if !icd.IsOnCD(sim) && spellEffect.Crit && sim.RandomFloat("Shiffar's Nexus-Horn") < 0.2 {
 					icd = core.InternalCD(sim.CurrentTime + dur)
-					character.AddAuraWithTemporaryStats(sim, CallOfTheNexusAuraID, "Call of the Nexus", stats.SpellPower, spellBonus, time.Second*10)
+					character.AddAuraWithTemporaryStats(sim, CallOfTheNexusAuraID, 0, "Call of the Nexus", stats.SpellPower, spellBonus, time.Second*10)
 				}
 			},
 		}
@@ -237,7 +247,7 @@ func ApplyEyeOfMagtheridon(agent core.Agent) {
 			ID:   EyeOfMagtheridonAuraID,
 			Name: "Eye of Magtheridon",
 			OnSpellMiss: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-				character.AddAuraWithTemporaryStats(sim, RecurringPowerAuraID, "Recurring Power", stats.SpellPower, spellBonus, dur)
+				character.AddAuraWithTemporaryStats(sim, RecurringPowerAuraID, 0, "Recurring Power", stats.SpellPower, spellBonus, dur)
 			},
 		}
 	})
@@ -261,9 +271,9 @@ func ApplySextantOfUnstableCurrents(agent core.Agent) {
 				if spellCast.ActionID.ItemID == core.ItemIDTheLightningCapacitor {
 					return // TLC can't proc Sextant
 				}
-				if spellEffect.Crit && !icd.IsOnCD(sim) && sim.RandomFloat("unmarked") < 0.2 {
+				if spellEffect.Crit && !icd.IsOnCD(sim) && sim.RandomFloat("Sextant of Unstable Currents") < 0.2 {
 					icd = core.InternalCD(sim.CurrentTime + icdDur)
-					character.AddAuraWithTemporaryStats(sim, UnstableCurrentsAuraID, "Unstable Currents", stats.SpellPower, spellBonus, dur)
+					character.AddAuraWithTemporaryStats(sim, UnstableCurrentsAuraID, 0, "Unstable Currents", stats.SpellPower, spellBonus, dur)
 				}
 			},
 		}

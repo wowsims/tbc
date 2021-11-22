@@ -60,7 +60,7 @@ func (tracker *ManaSpendingRateTracker) Update(sim *core.Simulation, character *
 
 	snapshot := manaSnapshot{
 		time:      sim.CurrentTime,
-		manaSpent: sim.GetIndividualMetrics(character.ID).ManaSpent,
+		manaSpent: character.Metrics.ManaSpent,
 	}
 
 	nextIndex := (tracker.firstSnapshotIndex + tracker.numSnapshots) % manaSnapshotsBufferSize
@@ -72,7 +72,7 @@ func (tracker *ManaSpendingRateTracker) ManaSpentPerSecond(sim *core.Simulation,
 	tracker.purgeExpiredSnapshots(sim)
 	oldestSnapshot := tracker.getOldestSnapshot()
 
-	manaSpent := sim.GetIndividualMetrics(character.ID).ManaSpent - oldestSnapshot.manaSpent
+	manaSpent := character.Metrics.ManaSpent - oldestSnapshot.manaSpent
 	timeDelta := sim.CurrentTime - oldestSnapshot.time
 	if timeDelta == 0 {
 		timeDelta = 1
