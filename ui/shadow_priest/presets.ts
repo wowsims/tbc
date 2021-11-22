@@ -18,6 +18,15 @@ export const StandardTalents = {
 	data: '500230013--503250510240103051451',
 };
 
+// ItemSpec.create({
+// 	id: 28780, // Soul-Eater's Handwraps
+// 	enchant: Enchants.GLOVES_SPELLPOWER,
+// 	gems: [
+// 		Gems.RUNED_LIVING_RUBY,
+// 		Gems.RUNED_LIVING_RUBY,
+// 	],
+// }),
+
 export const P1_BIS = {
 	name: 'P1 BIS',
 	tooltip: Tooltips.BASIC_BIS_DISCLAIMER,
@@ -27,7 +36,7 @@ export const P1_BIS = {
 				id: 24266, // Spellstrike Hood
 				enchant: Enchants.GLYPH_OF_POWER,
 				gems: [
-					Gems.RUNED_LIVING_RUBY,
+					Gems.RUNED_ORNATE_RUBY,
 					Gems.RUNED_LIVING_RUBY,
 					Gems.RUNED_LIVING_RUBY,
 				],
@@ -44,7 +53,7 @@ export const P1_BIS = {
 				],
 			}),
 			ItemSpec.create({
-				id: 28766, // Ruby Drape of the Mysticant
+				id: 28570, // Shadow-Cloak of Dalaran
 				enchant: Enchants.SUBTLETY,
 			}),
 			ItemSpec.create({
@@ -56,11 +65,14 @@ export const P1_BIS = {
 				],
 			}),
 			ItemSpec.create({
-				id: -14, // Ravager's Cuffs of Shadow Wrath
+				id: 24250, // Bracers of Havok
 				enchant: Enchants.WRIST_SPELLPOWER,
+				gems: [
+					Gems.RUNED_LIVING_RUBY,
+				],
 			}),
 			ItemSpec.create({
-				id: 28780, // Soul-Eater's Handwraps
+				id: 28507, // Handwraps of Flowing Thought
 				enchant: Enchants.GLOVES_SPELLPOWER,
 				gems: [
 					Gems.RUNED_LIVING_RUBY,
@@ -68,7 +80,11 @@ export const P1_BIS = {
 				],
 			}),
 			ItemSpec.create({
-				id: -9, // Lurker's Cord of Shadow Wrath
+				id: 28799, // Belt of Divine Inspiration
+				gems: [
+					Gems.RUNED_LIVING_RUBY,
+					Gems.RUNED_LIVING_RUBY,
+				],
 			}),
 			ItemSpec.create({
 				id: 24262, // Spellstrike Pants
@@ -88,25 +104,25 @@ export const P1_BIS = {
 				],
 			}),
 			ItemSpec.create({
-				id: 23031, // Band of the Inevitable
+				id: 29352, // Cobalt Band of Tyrigosa
 				enchant: Enchants.RING_SPELLPOWER,
 			}),
 			ItemSpec.create({
-				id: 21709, // Ring of the Fallen God
+				id: 28793, // Band of Crimson Fury
 				enchant: Enchants.RING_SPELLPOWER,
 			}),
 			ItemSpec.create({
-				id: 27683, // Quagmirran's Eye
+				id: 28789, // Eye of Magtheridon
 			}),
 			ItemSpec.create({
 				id: 29370, // Icon of the Silver Crescent
 			}),
 			ItemSpec.create({
-				id: -16, // Flawless Wand of Shadow Wrath
+				id: 29350, // The Black Stalk
 			}),
 			ItemSpec.create({
 				id: 28770, // Nathrezim Mindblade
-				enchant: Enchants.SUNFIRE,
+				enchant: Enchants.SOULFROST,
 			}),
 			ItemSpec.create({
 				id: 29272, // Orb of the Soul-Eater
@@ -115,94 +131,99 @@ export const P1_BIS = {
 	}),
 };
 
-// export const P2_BIS = {
-// 	name: 'P2 BIS',
-// 	tooltip: Tooltips.BASIC_BIS_DISCLAIMER,
-// 	gear: EquipmentSpec.create({
-// 		items: [
-// 			ItemSpec.create({
-// 				id: 30233, // Nordrassil Headpiece
-// 				enchant: Enchants.GLYPH_OF_POWER,
-// 				gems: [
-// 					Gems.VEILED_NOBLE_TOPAZ,
-// 					Gems.CHAOTIC_SKYFIRE_DIAMOND,
-// 				],
-// 			}),
-// 			ItemSpec.create({
-// 				id: 30015, // The Sun King's Talisman
-// 			}),
-// 			ItemSpec.create({
-// 				id: 30235, // Nordrassil Wrath-Mantle
-// 				enchant: Enchants.GREATER_INSCRIPTION_OF_DISCIPLINE,
-// 				gems: [
-// 					Gems.GLOWING_NIGHTSEYE,
-// 					Gems.VEILED_NOBLE_TOPAZ,
-// 				],
-// 			}),
-// 			ItemSpec.create({
-// 				id: 28797, // Brute Cloak of the Ogre-Magi
-// 				enchant: Enchants.SUBTLETY,
-// 			}),
-// 			ItemSpec.create({
-// 				id: 30231, // Nordrassil Chestpiece
-// 				enchant: Enchants.CHEST_EXCEPTIONAL_STATS,
-// 				gems: [
-// 					Gems.RUNED_LIVING_RUBY,
-// 					Gems.RUNED_LIVING_RUBY,
-// 					Gems.RUNED_LIVING_RUBY,
-// 				],
-// 			}),
-// 			ItemSpec.create({
-// 				id: 29918, // Mindstorm Wristbands
-// 				enchant: Enchants.WRIST_SPELLPOWER,
-// 			}),
-// 			ItemSpec.create({
-// 				id: 30232, // Nordrassil Gauntlets
-// 				enchant: Enchants.GLOVES_SPELLPOWER,
-// 				gems: [
-// 				],
-// 			}),
-// 			ItemSpec.create({
-// 				id: 30038, // Belt of Blasting
-// 				gems: [
-// 					Gems.GLOWING_NIGHTSEYE,
-// 					Gems.VEILED_NOBLE_TOPAZ,
-// 				],
-// 			}),
-// 			ItemSpec.create({
-// 				id: 24262, // Spellstrike Pants
-// 				enchant: Enchants.RUNIC_SPELLTHREAD,
-// 				gems: [
-// 					Gems.RUNED_LIVING_RUBY,
-// 					Gems.RUNED_LIVING_RUBY,
-// 					Gems.RUNED_LIVING_RUBY,
-// 				],
-// 			}),
-// 			ItemSpec.create({
-// 				id: 30067, // Velvet Boots of the Guardian
-// 				enchant: Enchants.BOARS_SPEED,
-// 			}),
-// 			ItemSpec.create({
-// 				id: 28753, // Ring of Recurrence
-// 				enchant: Enchants.RING_SPELLPOWER,
-// 			}),
-// 			ItemSpec.create({
-// 				id: 29302, // Band of Eternity
-// 				enchant: Enchants.RING_SPELLPOWER,
-// 			}),
-// 			ItemSpec.create({
-// 				id: 29370, // Icon of the Silver Crescent
-// 			}),
-// 			ItemSpec.create({
-// 				id: 27683, // Quagmirran's Eye
-// 			}),
-// 			ItemSpec.create({
-// 				id: 29988, // The Nexus Key
-// 				enchant: Enchants.SUNFIRE,
-// 			}),
-// 			ItemSpec.create({
-// 				id: 32387, // Idol of the Raven Goddess
-// 			}),
-// 		],
-// 	}),
-// };
+export const P2_BIS = {
+	name: 'P2 BIS',
+	tooltip: Tooltips.BASIC_BIS_DISCLAIMER,
+	gear: EquipmentSpec.create({
+		items: [
+			ItemSpec.create({
+				id: 32494, // Destruction Holo-gogs
+				enchant: Enchants.GLYPH_OF_POWER,
+				gems: [
+					Gems.MYSTICAL_SKYFIRE_DIAMOND,
+					Gems.GLOWING_NIGHTSEYE,
+				],
+			}),
+			ItemSpec.create({
+				id: 30666// ritssyns-lost-pendant
+			}),
+			ItemSpec.create({
+				id: 30163, // wings-of-the-avatar
+				enchant: Enchants.GREATER_INSCRIPTION_OF_DISCIPLINE,
+				gems: [
+					Gems.RUNED_LIVING_RUBY,
+					Gems.RUNED_LIVING_RUBY,
+				],
+			}),
+			ItemSpec.create({
+				id: -18, // illidari-cloak
+				enchant: Enchants.SUBTLETY,
+			}),
+			ItemSpec.create({
+				id: 30107, // vestments-of-the-sea-witch
+				enchant: Enchants.CHEST_EXCEPTIONAL_STATS,
+				gems: [
+					Gems.RUNED_LIVING_RUBY,
+					Gems.RUNED_LIVING_RUBY,
+					Gems.RUNED_LIVING_RUBY,
+				],
+			}),
+			ItemSpec.create({
+				id: -14, // ravagers-cuffs shadow wrath
+				enchant: Enchants.WRIST_SPELLPOWER,
+			}),
+			ItemSpec.create({
+				id: 28780, // nethersteel-lined-handwraps
+				enchant: Enchants.GLOVES_SPELLPOWER,
+				gems: [
+					Gems.RUNED_LIVING_RUBY,
+					Gems.RUNED_LIVING_RUBY,
+				],
+			}),
+			ItemSpec.create({
+				id: 30038, // Belt of Blasting
+				gems: [
+					Gems.RUNED_LIVING_RUBY,
+					Gems.RUNED_LIVING_RUBY,
+				],
+			}),
+			ItemSpec.create({
+				id: 29972, // trousers-of-the-astromancer
+				enchant: Enchants.RUNIC_SPELLTHREAD,
+				gems: [
+					Gems.RUNED_LIVING_RUBY,
+					Gems.RUNED_LIVING_RUBY,
+					Gems.RUNED_LIVING_RUBY,
+				],
+			}),
+			ItemSpec.create({
+				id: -5, // gliders-foot-wraps
+				enchant: Enchants.BOARS_SPEED,
+			}),
+			ItemSpec.create({
+				id: 30109, // ring-of-endless-coils
+				enchant: Enchants.RING_SPELLPOWER,
+			}),
+			ItemSpec.create({
+				id: 29922, // band-of-alar
+				enchant: Enchants.RING_SPELLPOWER,
+			}),
+			ItemSpec.create({
+				id: 29370, // Icon of the Silver Crescent
+			}),
+			ItemSpec.create({
+				id: 38290, // dark-iron-smoking-pipe
+			}),
+			ItemSpec.create({
+				id: 29982, // wand of forgotten star
+			}),
+			ItemSpec.create({
+				id: 32963, // merciless-gladiators-spellblade
+				enchant: Enchants.SOULFROST,
+			}),
+			ItemSpec.create({
+				id: 29272, // orb-of-the-soul-eater
+			}),
+		],
+	}),
+};

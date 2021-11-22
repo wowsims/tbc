@@ -8,7 +8,7 @@ import (
 )
 
 // Starfire spell IDs
-const SpellIDVT int32 = 25368
+const SpellIDVT int32 = 34917
 
 func (priest *Priest) newVTTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
 	baseCast := core.Cast{

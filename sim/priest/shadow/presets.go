@@ -70,8 +70,7 @@ var PlayerOptionsBasic = &proto.PlayerOptions{
 			Talents: StandardTalents,
 			Options: &proto.ShadowPriest_Options{},
 			Rotation: &proto.ShadowPriest_Rotation{
-				RotationType: proto.ShadowPriest_Rotation_Basic,
-				UseSwd:       true,
+				RotationType: proto.ShadowPriest_Rotation_ClipAlways,
 			},
 		},
 	},
@@ -102,7 +101,7 @@ var P1Gear = items.EquipmentSpecFromStrings([]items.ItemStringSpec{
 		},
 	},
 	{
-		Name: "Ruby Drape of the Mysticant",
+		Name: "Shadow-Cloak of Dalaran",
 	},
 	{
 		Name:    "Frozen Shadoweave Robe",
@@ -113,11 +112,11 @@ var P1Gear = items.EquipmentSpecFromStrings([]items.ItemStringSpec{
 		},
 	},
 	{
-		Name:    "Ravager's Cuffs of Shadow Wrath",
+		Name:    "Bracers of Havok",
 		Enchant: "Bracer - Spellpower",
 	},
 	{
-		Name:    "Soul-Eater's Handwraps",
+		Name:    "Handwraps of Flowing Thought",
 		Enchant: "Gloves - Major Spellpower",
 		Gems: []string{
 			"Runed Living Ruby",
@@ -125,7 +124,7 @@ var P1Gear = items.EquipmentSpecFromStrings([]items.ItemStringSpec{
 		},
 	},
 	{
-		Name: "Lurker's Cord of Shadow Wrath",
+		Name: "Belt of Divine Inspiration",
 	},
 	{
 		Name:    "Spellstrike Pants",
@@ -144,19 +143,19 @@ var P1Gear = items.EquipmentSpecFromStrings([]items.ItemStringSpec{
 		},
 	},
 	{
-		Name: "Band of the Inevitable",
+		Name: "Cobalt Band of Tyrigosa",
 	},
 	{
-		Name: "Ring of the Fallen God",
+		Name: "Band of Crimson Fury",
 	},
 	{
-		Name: "Quagmirran's Eye",
+		Name: "Eye of Magtheridon",
 	},
 	{
 		Name: "Icon of the Silver Crescent",
 	},
 	{
-		Name: "Flawless Wand of Shadow Wrath",
+		Name: "The Black Stalk",
 	},
 	{
 		Name:    "Nathrezim Mindblade",

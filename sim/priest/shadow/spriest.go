@@ -1,6 +1,8 @@
 package shadow
 
 import (
+	"fmt"
+	"log"
 	"time"
 
 	"github.com/wowsims/tbc/sim/common"
@@ -21,6 +23,11 @@ var ShadowWeaverAuraID = core.NewAuraID()
 
 func NewShadowPriest(character core.Character, options proto.PlayerOptions, isr proto.IndividualSimRequest) *ShadowPriest {
 	shadowOptions := options.GetShadowPriest()
+
+	// Only undead can do Dev Plague
+	if shadowOptions.Rotation.UseDevPlague == true && options.Race != proto.Race_RaceUndead {
+		shadowOptions.Rotation.UseDevPlague = false
+	}
 
 	selfBuffs := priest.SelfBuffs{}
 
@@ -131,6 +138,7 @@ func (spriest *ShadowPriest) Act(sim *core.Simulation) time.Duration {
 
 func (spriest *ShadowPriest) actRotation(sim *core.Simulation, rotation proto.ShadowPriest_Rotation) time.Duration {
 	// Activate shared druid behaviors
+	log.Printf("(%0.1f) Act Start...", sim.CurrentTime.Seconds())
 	target := sim.GetPrimaryTarget()
 	var spell *core.SimpleSpell
 	var wait time.Duration
@@ -139,9 +147,8 @@ func (spriest *ShadowPriest) actRotation(sim *core.Simulation, rotation proto.Sh
 		spell = spriest.NewVT(sim, target)
 	} else if !spriest.SWPSpell.DotInput.IsTicking(sim) {
 		spell = spriest.NewSWP(sim, target)
-	} else if rotation.UseDevPlague && spriest.Race == proto.Race_RaceUndead {
-		// TODO: add dev plague
-		panic("not implemented")
+	} else if rotation.UseDevPlague && spriest.GetRemainingCD(priest.DPCooldownID, sim.CurrentTime) == 0 {
+		spell = spriest.NewDevouringPlague(sim, target)
 	} else if spriest.Talents.MindFlay {
 		mbcd := spriest.Character.GetRemainingCD(priest.MBCooldownID, sim.CurrentTime)
 		swdcd := spriest.Character.GetRemainingCD(priest.SWDCooldownID, sim.CurrentTime)
@@ -152,7 +159,7 @@ func (spriest *ShadowPriest) actRotation(sim *core.Simulation, rotation proto.Sh
 			}
 
 			spell = spriest.NewMindBlast(sim, target)
-		} else if rotation.UseSwd && swdcd == 0 {
+		} else if swdcd == 0 {
 			spell = spriest.NewSWD(sim, target)
 		} else {
 			spell = spriest.NewMindFlay(sim, target)
@@ -164,12 +171,20 @@ func (spriest *ShadowPriest) actRotation(sim *core.Simulation, rotation proto.Sh
 				// basic rotation will simply wait the whole length
 			case proto.ShadowPriest_Rotation_ClipAlways:
 				// Prio MindBlast
-				minWait := core.MinDuration(mbcd, swdcd)
-				if minWait < mfLength && minWait > 1 {
-					spell.DotInput.NumberOfTicks = int((mfLength - minWait).Seconds()) // cut fractional seconds off
-					wait = minWait
-				} else if minWait < 1 {
-					return sim.CurrentTime + minWait // just wait until its off CD.. dont cast a spell for no reason
+				minWait := core.MinDuration(mbcd, swdcd) + 1
+				if minWait < mfLength && minWait > spriest.MindFlaySpell.DotInput.TickLength {
+					numTicks := int(float64(core.GCDDefault)/float64(spriest.MindFlaySpell.DotInput.TickLength)) + 1
+					if numTicks < 4 {
+						spriest.MindFlaySpell.DotInput.NumberOfTicks = numTicks
+					}
+					wait = spriest.MindFlaySpell.DotInput.TickLength * time.Duration(spriest.MindFlaySpell.DotInput.NumberOfTicks)
+					fmt.Printf("\t\tGoing to cast MF for: %01.f ticks..\n", wait.Seconds())
+				} else if minWait < spriest.MindFlaySpell.DotInput.TickLength {
+					// just wait until its off CD.. dont cast a spell for no reason
+					log.Printf("(%0.1f) Skipping...", sim.CurrentTime.Seconds())
+					return sim.CurrentTime + core.MaxDuration(
+						spriest.GetRemainingCD(core.GCDCooldownID, sim.CurrentTime),
+						minWait)
 				}
 			default:
 				panic("not implemented")
@@ -182,6 +197,7 @@ func (spriest *ShadowPriest) actRotation(sim *core.Simulation, rotation proto.Sh
 		wait = core.MinDuration(mbcd, swdcd)
 	}
 
+	log.Printf("(%0.1f) Casting %s", sim.CurrentTime.Seconds(), spell.Name)
 	actionSuccessful := spell.Cast(sim)
 
 	if !actionSuccessful {

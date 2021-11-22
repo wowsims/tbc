@@ -42,22 +42,6 @@ export const ShadowPriestRotationConfig = {
 		},
 		{
 			type: 'boolean' as const,
-			cssClass: 'swd-picker',
-			getModObject: (simUI: SimUI<any>) => simUI.player,
-			config: {
-				label: 'Use Shadow Word: Death',
-				labelTooltip: 'Use SWD as the next cast after the dot expires.',
-				changedEvent: (player: Player<Spec.SpecShadowPriest>) => player.rotationChangeEmitter,
-				getValue: (player: Player<Spec.SpecShadowPriest>) => player.getRotation().useSwd,
-				setValue: (player: Player<Spec.SpecShadowPriest>, newValue: boolean) => {
-					const newRotation = player.getRotation();
-					newRotation.useSwd = newValue;
-					player.setRotation(newRotation);
-				},
-			},
-		},
-		{
-			type: 'boolean' as const,
 			cssClass: 'devplague-picker',
 			getModObject: (simUI: SimUI<any>) => simUI.player,
 			config: {

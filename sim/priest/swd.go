@@ -7,7 +7,7 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-const SpellIDSWD int32 = 25368
+const SpellIDSWD int32 = 32996
 
 var SWDCooldownID = core.NewCooldownID()
 

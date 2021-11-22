@@ -29,6 +29,14 @@ type Priest struct {
 
 	VTSpell        core.SimpleSpell
 	vtCastTemplate core.SimpleSpellTemplate
+
+	ShadowfiendSpell    core.SimpleSpell
+	shadowfiendTemplate core.SimpleSpellTemplate
+
+	DevouringPlagueSpell    core.SimpleSpell
+	devouringPlagueTemplate core.SimpleSpellTemplate
+
+	// TODO: starshards
 }
 
 type SelfBuffs struct {
@@ -52,6 +60,8 @@ func (priest *Priest) Init(sim *core.Simulation) {
 	priest.swpCastTemplate = priest.newSWPTemplate(sim)
 	priest.vtCastTemplate = priest.newVTTemplate(sim)
 	priest.swdCastTemplate = priest.newSWDTemplate(sim)
+	priest.shadowfiendTemplate = priest.newShadowfiendTemplate(sim)
+	priest.devouringPlagueTemplate = priest.newDevouringPlagueTemplate(sim)
 }
 
 func (priest *Priest) Reset(newsim *core.Simulation) {
@@ -61,6 +71,8 @@ func (priest *Priest) Reset(newsim *core.Simulation) {
 	priest.MindFlaySpell = core.SimpleSpell{}
 	priest.SWPSpell = core.SimpleSpell{}
 	priest.VTSpell = core.SimpleSpell{}
+	priest.ShadowfiendSpell = core.SimpleSpell{}
+	priest.DevouringPlagueSpell = core.SimpleSpell{}
 
 	priest.Character.Reset(newsim)
 }
