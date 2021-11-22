@@ -215,7 +215,7 @@ func (sim *Simulation) RunOnce() {
 					if i == 0 {
 						continue
 					}
-					if v.NextActionAt > pa.NextActionAt {
+					if v.NextActionAt >= pa.NextActionAt {
 						handled = true
 						if i == 1 {
 							sim.pendingActions[0] = pa
