@@ -149,12 +149,9 @@ func (cast *Cast) startCasting(sim *Simulation, onCastComplete OnCastComplete) b
 	if cast.CastTime == 0 {
 		cast.internalOnComplete(sim, onCastComplete)
 	} else {
-		cast.Character.HardcastAura = Aura{
-			Expires: sim.CurrentTime + cast.CastTime,
-			OnExpire: func(sim *Simulation) {
-				cast.internalOnComplete(sim, onCastComplete)
-			},
-		}
+		cast.Character.Hardcast.Expires = sim.CurrentTime + cast.CastTime
+		cast.Character.Hardcast.Cast = cast
+		cast.Character.Hardcast.OnComplete = onCastComplete
 	}
 
 	if !cast.IgnoreCooldowns {
@@ -215,4 +212,14 @@ func (simpleCast *SimpleCast) StartCast(sim *Simulation) bool {
 			simpleCast.OnCastComplete(sim, cast)
 		}
 	})
+}
+
+type Hardcast struct {
+	Cast       *Cast
+	Expires    time.Duration
+	OnComplete OnCastComplete
+}
+
+func (hc Hardcast) OnExpire(sim *Simulation) {
+	hc.Cast.internalOnComplete(sim, hc.OnComplete)
 }

@@ -209,10 +209,28 @@ func (sim *Simulation) RunOnce() {
 			// This path is not currently used by individual shaman sim.
 			if pa.NextActionAt == NeverExpires {
 				sim.pendingActions = sim.pendingActions[1:] // cut off front
+			} else {
+				handled := false
+				for i, v := range sim.pendingActions {
+					if i == 0 {
+						continue
+					}
+					if v.NextActionAt > pa.NextActionAt {
+						handled = true
+						if i == 1 {
+							sim.pendingActions[0] = pa
+							break // just leave it there
+						}
+						copy(sim.pendingActions, sim.pendingActions[1:i])
+						sim.pendingActions[i-1] = pa
+						break
+					}
+				}
+				if !handled {
+					copy(sim.pendingActions, sim.pendingActions[1:])
+					sim.pendingActions[len(sim.pendingActions)-1] = pa
+				}
 			}
-			sort.Slice(sim.pendingActions, func(i, j int) bool {
-				return sim.pendingActions[i].NextActionAt < sim.pendingActions[j].NextActionAt
-			})
 		}
 	}
 
