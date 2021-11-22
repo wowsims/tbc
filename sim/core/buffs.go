@@ -152,6 +152,7 @@ func registerBloodlustCD(agent Agent, numBloodlusts int32) {
 					}
 					character.Party.AddAura(sim, Aura{
 						ID:      BloodlustAuraID,
+						SpellID: 2825,
 						Name:    "Bloodlust",
 						Expires: sim.CurrentTime + dur,
 						OnExpire: func(sim *Simulation) {

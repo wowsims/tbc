@@ -226,6 +226,7 @@ func makePotionActivation(potionType proto.Potions, character *Character) Cooldo
 
 			character.AddAura(sim, Aura{
 				ID:      PotionAuraID,
+				SpellID: 28508,
 				Name:    "Destruction Potion",
 				Expires: sim.CurrentTime + dur,
 				OnExpire: func(sim *Simulation) {

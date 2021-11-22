@@ -53,6 +53,7 @@ func (druid *Druid) TryInnervate(sim *core.Simulation) time.Duration {
 
 			druid.AddAura(sim, core.Aura{
 				ID:      InnervateAuraID,
+				SpellID: 29166,
 				Name:    "Innervate",
 				Expires: sim.CurrentTime + time.Second*20,
 				OnExpire: func(sim *core.Simulation) {

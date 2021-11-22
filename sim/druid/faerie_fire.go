@@ -31,6 +31,7 @@ func (druid *Druid) TryFaerieFire(sim *core.Simulation, target *core.Target) tim
 				OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 					target.AddAura(sim, core.Aura{
 						ID:      FaerieFireDebuffID,
+						SpellID: 26993,
 						Name:    "Faerie Fire",
 						Expires: sim.CurrentTime + time.Second*40,
 						// TODO: implement increased melee hit

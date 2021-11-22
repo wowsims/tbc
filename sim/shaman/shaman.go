@@ -246,6 +246,7 @@ func (shaman *Shaman) registerElementalMasteryCD() {
 
 				character.AddAura(sim, core.Aura{
 					ID:      ElementalMasteryAuraID,
+					SpellID: 16166,
 					Name:    "Elemental Mastery",
 					Expires: core.NeverExpires,
 					OnCast: func(sim *core.Simulation, cast *core.Cast) {

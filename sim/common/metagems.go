@@ -31,7 +31,7 @@ func ApplyMysticalSkyfireDiamond(agent core.Agent) {
 			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
 				if !icd.IsOnCD(sim) && sim.RandomFloat("Mystical Skyfire Diamond") < 0.15 {
 					icd = core.InternalCD(sim.CurrentTime + icdDur)
-					character.AddAuraWithTemporaryStats(sim, MysticFocusAuraID, 0, "Mystic Focus", stats.SpellHaste, hasteBonus, dur)
+					character.AddAuraWithTemporaryStats(sim, MysticFocusAuraID, 18803, "Mystic Focus", stats.SpellHaste, hasteBonus, dur)
 				}
 			},
 		}
