@@ -1,12 +1,11 @@
-import { ActionMetric as ActionMetricProto } from '/tbc/core/proto/api.js';
+import { ActionMetrics as ActionMetricsProto } from '/tbc/core/proto/api.js';
 import { ActionId } from '/tbc/core/resources.js';
 import { getIconUrl } from '/tbc/core/resources.js';
 import { getName } from '/tbc/core/resources.js';
 
-export type ActionMetric = {
+export type ActionMetrics = {
 	actionId: ActionId,
 	name: string,
-	tagIndex: number,
 	iconUrl: string,
 	casts: number,
 	hits: number,
@@ -15,31 +14,39 @@ export type ActionMetric = {
 	totalDmg: number,
 };
 
-export function getActionId(actionMetric: ActionMetricProto): ActionId {
-	if (actionMetric.actionId.oneofKind == 'spellId') {
+export function getActionId(actionMetric: ActionMetricsProto): ActionId {
+	if (actionMetric.id!.rawId.oneofKind == 'spellId') {
 		return {
-			spellId: actionMetric.actionId.spellId,
+			id: {
+				spellId: actionMetric.id!.rawId.spellId,
+			},
+			tag: actionMetric.id!.tag,
 		};
-	} else if (actionMetric.actionId.oneofKind == 'itemId') {
+	} else if (actionMetric.id!.rawId.oneofKind == 'itemId') {
 		return {
-			itemId: actionMetric.actionId.itemId,
+			id: {
+				itemId: actionMetric.id!.rawId.itemId,
+			},
+			tag: actionMetric.id!.tag,
 		};
-	} else if (actionMetric.actionId.oneofKind == 'otherId') {
+	} else if (actionMetric.id!.rawId.oneofKind == 'otherId') {
 		return {
-			otherId: actionMetric.actionId.otherId,
+			id: {
+				otherId: actionMetric.id!.rawId.otherId,
+			},
+			tag: actionMetric.id!.tag,
 		};
 	} else {
 		throw new Error('Invalid action metric with no ID');
 	}
 }
 
-export function parseActionMetrics(actionMetricProtos: Array<ActionMetricProto>): Promise<Array<ActionMetric>> {
+export function parseActionMetrics(actionMetricProtos: Array<ActionMetricsProto>): Promise<Array<ActionMetrics>> {
 	const actionMetrics = actionMetricProtos.map(actionMetric => {
 		return {
 			actionId: getActionId(actionMetric),
 			name: '',
 			iconUrl: '',
-			tagIndex: actionMetric.tag,
 			casts: actionMetric.casts,
 			hits: actionMetric.hits,
 			crits: actionMetric.crits,
@@ -49,15 +56,15 @@ export function parseActionMetrics(actionMetricProtos: Array<ActionMetricProto>)
 	});
 
 	return Promise.all(actionMetrics.map(actionMetric => 
-		getName(actionMetric.actionId)
+		getName(actionMetric.actionId.id)
 		.then(name => {
-			if (actionMetric.tagIndex == 0) {
+			if (actionMetric.actionId.tag == 0) {
 				actionMetric.name = name;
 			} else {
 				actionMetric.name = name + ' (LO)';
 			}
 		})
-		.then(() => getIconUrl(actionMetric.actionId))
+		.then(() => getIconUrl(actionMetric.actionId.id))
 		.then(iconUrl => actionMetric.iconUrl = iconUrl)
 	))
 	.then(() => actionMetrics);

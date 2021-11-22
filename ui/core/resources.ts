@@ -45,7 +45,11 @@ export type OtherId = {
   otherId: number;
 };
 export type ItemOrSpellId = ItemId | SpellId;
-export type ActionId = ItemId | SpellId | OtherId;
+export type RawActionId = ItemId | SpellId | OtherId;
+export type ActionId = {
+	id: RawActionId,
+	tag?: number,
+};
 
 // Some items/spells have weird icons, so use this to show a different icon instead.
 const idOverrides: Record<string, ItemOrSpellId> = {};
@@ -77,7 +81,7 @@ export async function getTooltipData(id: ItemOrSpellId): Promise<any> {
 function getOtherActionIconUrl(id: number): string {
 	throw new Error('No other actions!');
 }
-export async function getIconUrl(id: ActionId): Promise<string> {
+export async function getIconUrl(id: RawActionId): Promise<string> {
 	if ('otherId' in id) {
 		return getOtherActionIconUrl(id.otherId);
 	}
@@ -93,7 +97,7 @@ export async function getItemIconUrl(item: Item): Promise<string> {
 function getOtherActionName(id: number): string {
 	throw new Error('No other actions!');
 }
-export async function getName(id: ItemOrSpellId | ActionId): Promise<string> {
+export async function getName(id: ItemOrSpellId | RawActionId): Promise<string> {
 	if ('otherId' in id) {
 		return getOtherActionName(id.otherId);
 	}
