@@ -34,6 +34,8 @@ type Simulation struct {
 	pendingActions []*PendingAction
 	CurrentTime    time.Duration // duration that has elapsed in the sim since starting
 
+	ProgressReport func(*proto.ProgressMetrics)
+
 	Log  func(string, ...interface{})
 	logs []string
 }
@@ -148,10 +150,15 @@ func (sim *Simulation) Run() *proto.RaidSimResult {
 	}
 
 	simDurationSeconds := sim.Duration.Seconds()
+	st := time.Now()
 	for i := int32(0); i < sim.Options.Iterations; i++ {
 		sim.RunOnce()
 
 		sim.Raid.doneIteration(simDurationSeconds)
+		if sim.ProgressReport != nil && time.Since(st) > time.Millisecond*250 {
+			sim.ProgressReport(&proto.ProgressMetrics{TotalIterations: sim.Options.Iterations, CompletedIterations: i, Dps: sim.Raid.Parties[0].Players[0].GetCharacter().Metrics.dpsSum / float64(i)})
+			st = time.Now()
+		}
 	}
 
 	// Reset after the last iteration, because some metrics get updated in reset().

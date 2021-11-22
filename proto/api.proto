@@ -205,3 +205,9 @@ message StatWeightsResult {
     repeated double ep_values = 3;
     repeated double ep_values_stdev = 4;
 }
+
+message ProgressMetrics {
+    int32 completed_iterations = 1;
+    int32 total_iterations = 2;
+    double dps = 3;
+}
