@@ -71,7 +71,8 @@ message BalanceDruid {
   DruidTalents talents = 2;
 
   message Options {
-    RaidTarget innervate_target = 1; 
+    RaidTarget innervate_target = 1;
+    bool battle_res = 2;
   }
   Options options = 3;
 }
