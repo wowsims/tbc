@@ -30,8 +30,8 @@ func TestSimulateP1Basic(t *testing.T) {
 			Gear:          P1Gear,
 		},
 
-		ExpectedDpsShort: 1192.0,
-		ExpectedDpsLong:  1296.0,
+		ExpectedDpsShort: 1198.6,
+		ExpectedDpsLong:  1257.7,
 	})
 }
 
@@ -50,5 +50,5 @@ func TestAverageDPS(t *testing.T) {
 		Gear:          P1Gear,
 	})
 
-	core.IndividualSimAverageTest("P1Average", t, isr, 1274.75)
+	core.IndividualSimAverageTest("P1Average", t, isr, 1245.6)
 }

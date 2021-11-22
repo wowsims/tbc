@@ -1,8 +1,6 @@
 package shadow
 
 import (
-	"fmt"
-	"log"
 	"time"
 
 	"github.com/wowsims/tbc/sim/common"
@@ -138,7 +136,6 @@ func (spriest *ShadowPriest) Act(sim *core.Simulation) time.Duration {
 
 func (spriest *ShadowPriest) actRotation(sim *core.Simulation, rotation proto.ShadowPriest_Rotation) time.Duration {
 	// Activate shared druid behaviors
-	log.Printf("(%0.1f) Act Start...", sim.CurrentTime.Seconds())
 	target := sim.GetPrimaryTarget()
 	var spell *core.SimpleSpell
 	var wait time.Duration
@@ -170,7 +167,8 @@ func (spriest *ShadowPriest) actRotation(sim *core.Simulation, rotation proto.Sh
 			case proto.ShadowPriest_Rotation_Basic:
 				// basic rotation will simply wait the whole length
 			case proto.ShadowPriest_Rotation_ClipAlways:
-				// Prio MindBlast
+				// Prio MindBlast/SWD
+				// TODO: also account for dots falling off.
 				minWait := core.MinDuration(mbcd, swdcd) + 1
 				if minWait < mfLength && minWait > spriest.MindFlaySpell.DotInput.TickLength {
 					numTicks := int(float64(core.GCDDefault)/float64(spriest.MindFlaySpell.DotInput.TickLength)) + 1
@@ -178,10 +176,9 @@ func (spriest *ShadowPriest) actRotation(sim *core.Simulation, rotation proto.Sh
 						spriest.MindFlaySpell.DotInput.NumberOfTicks = numTicks
 					}
 					wait = spriest.MindFlaySpell.DotInput.TickLength * time.Duration(spriest.MindFlaySpell.DotInput.NumberOfTicks)
-					fmt.Printf("\t\tGoing to cast MF for: %01.f ticks..\n", wait.Seconds())
 				} else if minWait < spriest.MindFlaySpell.DotInput.TickLength {
 					// just wait until its off CD.. dont cast a spell for no reason
-					log.Printf("(%0.1f) Skipping...", sim.CurrentTime.Seconds())
+					spell.Cancel() // turn off 'in use'
 					return sim.CurrentTime + core.MaxDuration(
 						spriest.GetRemainingCD(core.GCDCooldownID, sim.CurrentTime),
 						minWait)
@@ -197,7 +194,6 @@ func (spriest *ShadowPriest) actRotation(sim *core.Simulation, rotation proto.Sh
 		wait = core.MinDuration(mbcd, swdcd)
 	}
 
-	log.Printf("(%0.1f) Casting %s", sim.CurrentTime.Seconds(), spell.Name)
 	actionSuccessful := spell.Cast(sim)
 
 	if !actionSuccessful {

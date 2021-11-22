@@ -70,7 +70,8 @@ var PlayerOptionsBasic = &proto.PlayerOptions{
 			Talents: StandardTalents,
 			Options: &proto.ShadowPriest_Options{},
 			Rotation: &proto.ShadowPriest_Rotation{
-				RotationType: proto.ShadowPriest_Rotation_ClipAlways,
+				RotationType: proto.ShadowPriest_Rotation_Basic,
+				// UseDevPlague: true,
 			},
 		},
 	},
@@ -78,7 +79,6 @@ var PlayerOptionsBasic = &proto.PlayerOptions{
 
 var PreRaidGear = items.EquipmentSpecFromStrings([]items.ItemStringSpec{})
 
-// TODO: fill out a p1 gear for spriest.
 var P1Gear = items.EquipmentSpecFromStrings([]items.ItemStringSpec{
 	{
 		Name:    "Spellstrike Hood",

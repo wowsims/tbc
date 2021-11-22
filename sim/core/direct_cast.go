@@ -89,6 +89,11 @@ func (spell *SimpleSpell) Init(sim *Simulation) {
 	spell.init(sim)
 }
 
+// Cancel will disable 'in use' so the spell can be reused. Useful if deciding not to cast.
+func (spell *SimpleSpell) Cancel() {
+	spell.objectInUse = false
+}
+
 func (spell *SimpleSpell) Cast(sim *Simulation) bool {
 	return spell.startCasting(sim, func(sim *Simulation, cast *Cast) {
 		spell.apply(sim, &spell.SpellCast, true)
