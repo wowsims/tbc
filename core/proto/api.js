@@ -8,10 +8,10 @@ import { Gem } from './common.js';
 import { Enchant } from './common.js';
 import { Item } from './common.js';
 import { Spec } from './common.js';
-import { Encounter } from './common.js';
 import { IndividualBuffs } from './common.js';
 import { PartyBuffs } from './common.js';
 import { RaidBuffs } from './common.js';
+import { Encounter } from './common.js';
 import { EquipmentSpec } from './common.js';
 import { Consumes } from './common.js';
 import { Warrior } from './warrior.js';
@@ -431,6 +431,648 @@ class SimOptions$Type extends MessageType {
  */
 export const SimOptions = new SimOptions$Type();
 // @generated message type with reflection information, may provide speed optimized methods
+class ActionID$Type extends MessageType {
+    constructor() {
+        super("proto.ActionID", [
+            { no: 1, name: "spell_id", kind: "scalar", oneof: "rawId", T: 5 /*ScalarType.INT32*/ },
+            { no: 2, name: "item_id", kind: "scalar", oneof: "rawId", T: 5 /*ScalarType.INT32*/ },
+            { no: 3, name: "other_id", kind: "enum", oneof: "rawId", T: () => ["proto.OtherAction", OtherAction] },
+            { no: 4, name: "tag", kind: "scalar", T: 5 /*ScalarType.INT32*/ }
+        ]);
+    }
+    create(value) {
+        const message = { rawId: { oneofKind: undefined }, tag: 0 };
+        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader, length, options, target) {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* int32 spell_id */ 1:
+                    message.rawId = {
+                        oneofKind: "spellId",
+                        spellId: reader.int32()
+                    };
+                    break;
+                case /* int32 item_id */ 2:
+                    message.rawId = {
+                        oneofKind: "itemId",
+                        itemId: reader.int32()
+                    };
+                    break;
+                case /* proto.OtherAction other_id */ 3:
+                    message.rawId = {
+                        oneofKind: "otherId",
+                        otherId: reader.int32()
+                    };
+                    break;
+                case /* int32 tag */ 4:
+                    message.tag = reader.int32();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message, writer, options) {
+        /* int32 spell_id = 1; */
+        if (message.rawId.oneofKind === "spellId")
+            writer.tag(1, WireType.Varint).int32(message.rawId.spellId);
+        /* int32 item_id = 2; */
+        if (message.rawId.oneofKind === "itemId")
+            writer.tag(2, WireType.Varint).int32(message.rawId.itemId);
+        /* proto.OtherAction other_id = 3; */
+        if (message.rawId.oneofKind === "otherId")
+            writer.tag(3, WireType.Varint).int32(message.rawId.otherId);
+        /* int32 tag = 4; */
+        if (message.tag !== 0)
+            writer.tag(4, WireType.Varint).int32(message.tag);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message proto.ActionID
+ */
+export const ActionID = new ActionID$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class ActionMetrics$Type extends MessageType {
+    constructor() {
+        super("proto.ActionMetrics", [
+            { no: 1, name: "id", kind: "message", T: () => ActionID },
+            { no: 2, name: "casts", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 3, name: "hits", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 4, name: "crits", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 5, name: "misses", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 6, name: "damage", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ }
+        ]);
+    }
+    create(value) {
+        const message = { casts: 0, hits: 0, crits: 0, misses: 0, damage: 0 };
+        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader, length, options, target) {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* proto.ActionID id */ 1:
+                    message.id = ActionID.internalBinaryRead(reader, reader.uint32(), options, message.id);
+                    break;
+                case /* int32 casts */ 2:
+                    message.casts = reader.int32();
+                    break;
+                case /* int32 hits */ 3:
+                    message.hits = reader.int32();
+                    break;
+                case /* int32 crits */ 4:
+                    message.crits = reader.int32();
+                    break;
+                case /* int32 misses */ 5:
+                    message.misses = reader.int32();
+                    break;
+                case /* double damage */ 6:
+                    message.damage = reader.double();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message, writer, options) {
+        /* proto.ActionID id = 1; */
+        if (message.id)
+            ActionID.internalBinaryWrite(message.id, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+        /* int32 casts = 2; */
+        if (message.casts !== 0)
+            writer.tag(2, WireType.Varint).int32(message.casts);
+        /* int32 hits = 3; */
+        if (message.hits !== 0)
+            writer.tag(3, WireType.Varint).int32(message.hits);
+        /* int32 crits = 4; */
+        if (message.crits !== 0)
+            writer.tag(4, WireType.Varint).int32(message.crits);
+        /* int32 misses = 5; */
+        if (message.misses !== 0)
+            writer.tag(5, WireType.Varint).int32(message.misses);
+        /* double damage = 6; */
+        if (message.damage !== 0)
+            writer.tag(6, WireType.Bit64).double(message.damage);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message proto.ActionMetrics
+ */
+export const ActionMetrics = new ActionMetrics$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class AuraMetrics$Type extends MessageType {
+    constructor() {
+        super("proto.AuraMetrics", [
+            { no: 1, name: "id", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 2, name: "uptime_seconds", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ }
+        ]);
+    }
+    create(value) {
+        const message = { id: 0, uptimeSeconds: 0 };
+        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader, length, options, target) {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* int32 id */ 1:
+                    message.id = reader.int32();
+                    break;
+                case /* double uptime_seconds */ 2:
+                    message.uptimeSeconds = reader.double();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message, writer, options) {
+        /* int32 id = 1; */
+        if (message.id !== 0)
+            writer.tag(1, WireType.Varint).int32(message.id);
+        /* double uptime_seconds = 2; */
+        if (message.uptimeSeconds !== 0)
+            writer.tag(2, WireType.Bit64).double(message.uptimeSeconds);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message proto.AuraMetrics
+ */
+export const AuraMetrics = new AuraMetrics$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class PlayerMetrics$Type extends MessageType {
+    constructor() {
+        super("proto.PlayerMetrics", [
+            { no: 1, name: "dps_avg", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
+            { no: 2, name: "dps_stdev", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
+            { no: 3, name: "dps_max", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
+            { no: 4, name: "dps_hist", kind: "map", K: 5 /*ScalarType.INT32*/, V: { kind: "scalar", T: 5 /*ScalarType.INT32*/ } },
+            { no: 5, name: "num_oom", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 6, name: "oom_at_avg", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
+            { no: 7, name: "dps_at_oom_avg", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
+            { no: 8, name: "actions", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => ActionMetrics },
+            { no: 9, name: "auras", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => AuraMetrics }
+        ]);
+    }
+    create(value) {
+        const message = { dpsAvg: 0, dpsStdev: 0, dpsMax: 0, dpsHist: {}, numOom: 0, oomAtAvg: 0, dpsAtOomAvg: 0, actions: [], auras: [] };
+        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader, length, options, target) {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* double dps_avg */ 1:
+                    message.dpsAvg = reader.double();
+                    break;
+                case /* double dps_stdev */ 2:
+                    message.dpsStdev = reader.double();
+                    break;
+                case /* double dps_max */ 3:
+                    message.dpsMax = reader.double();
+                    break;
+                case /* map<int32, int32> dps_hist */ 4:
+                    this.binaryReadMap4(message.dpsHist, reader, options);
+                    break;
+                case /* int32 num_oom */ 5:
+                    message.numOom = reader.int32();
+                    break;
+                case /* double oom_at_avg */ 6:
+                    message.oomAtAvg = reader.double();
+                    break;
+                case /* double dps_at_oom_avg */ 7:
+                    message.dpsAtOomAvg = reader.double();
+                    break;
+                case /* repeated proto.ActionMetrics actions */ 8:
+                    message.actions.push(ActionMetrics.internalBinaryRead(reader, reader.uint32(), options));
+                    break;
+                case /* repeated proto.AuraMetrics auras */ 9:
+                    message.auras.push(AuraMetrics.internalBinaryRead(reader, reader.uint32(), options));
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    binaryReadMap4(map, reader, options) {
+        let len = reader.uint32(), end = reader.pos + len, key, val;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case 1:
+                    key = reader.int32();
+                    break;
+                case 2:
+                    val = reader.int32();
+                    break;
+                default: throw new globalThis.Error("unknown map entry field for field proto.PlayerMetrics.dps_hist");
+            }
+        }
+        map[key ?? 0] = val ?? 0;
+    }
+    internalBinaryWrite(message, writer, options) {
+        /* double dps_avg = 1; */
+        if (message.dpsAvg !== 0)
+            writer.tag(1, WireType.Bit64).double(message.dpsAvg);
+        /* double dps_stdev = 2; */
+        if (message.dpsStdev !== 0)
+            writer.tag(2, WireType.Bit64).double(message.dpsStdev);
+        /* double dps_max = 3; */
+        if (message.dpsMax !== 0)
+            writer.tag(3, WireType.Bit64).double(message.dpsMax);
+        /* map<int32, int32> dps_hist = 4; */
+        for (let k of Object.keys(message.dpsHist))
+            writer.tag(4, WireType.LengthDelimited).fork().tag(1, WireType.Varint).int32(parseInt(k)).tag(2, WireType.Varint).int32(message.dpsHist[k]).join();
+        /* int32 num_oom = 5; */
+        if (message.numOom !== 0)
+            writer.tag(5, WireType.Varint).int32(message.numOom);
+        /* double oom_at_avg = 6; */
+        if (message.oomAtAvg !== 0)
+            writer.tag(6, WireType.Bit64).double(message.oomAtAvg);
+        /* double dps_at_oom_avg = 7; */
+        if (message.dpsAtOomAvg !== 0)
+            writer.tag(7, WireType.Bit64).double(message.dpsAtOomAvg);
+        /* repeated proto.ActionMetrics actions = 8; */
+        for (let i = 0; i < message.actions.length; i++)
+            ActionMetrics.internalBinaryWrite(message.actions[i], writer.tag(8, WireType.LengthDelimited).fork(), options).join();
+        /* repeated proto.AuraMetrics auras = 9; */
+        for (let i = 0; i < message.auras.length; i++)
+            AuraMetrics.internalBinaryWrite(message.auras[i], writer.tag(9, WireType.LengthDelimited).fork(), options).join();
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message proto.PlayerMetrics
+ */
+export const PlayerMetrics = new PlayerMetrics$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class PartyMetrics$Type extends MessageType {
+    constructor() {
+        super("proto.PartyMetrics", [
+            { no: 1, name: "players", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => PlayerMetrics }
+        ]);
+    }
+    create(value) {
+        const message = { players: [] };
+        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader, length, options, target) {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* repeated proto.PlayerMetrics players */ 1:
+                    message.players.push(PlayerMetrics.internalBinaryRead(reader, reader.uint32(), options));
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message, writer, options) {
+        /* repeated proto.PlayerMetrics players = 1; */
+        for (let i = 0; i < message.players.length; i++)
+            PlayerMetrics.internalBinaryWrite(message.players[i], writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message proto.PartyMetrics
+ */
+export const PartyMetrics = new PartyMetrics$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class RaidMetrics$Type extends MessageType {
+    constructor() {
+        super("proto.RaidMetrics", [
+            { no: 1, name: "parties", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => PartyMetrics }
+        ]);
+    }
+    create(value) {
+        const message = { parties: [] };
+        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader, length, options, target) {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* repeated proto.PartyMetrics parties */ 1:
+                    message.parties.push(PartyMetrics.internalBinaryRead(reader, reader.uint32(), options));
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message, writer, options) {
+        /* repeated proto.PartyMetrics parties = 1; */
+        for (let i = 0; i < message.parties.length; i++)
+            PartyMetrics.internalBinaryWrite(message.parties[i], writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message proto.RaidMetrics
+ */
+export const RaidMetrics = new RaidMetrics$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class TargetMetrics$Type extends MessageType {
+    constructor() {
+        super("proto.TargetMetrics", [
+            { no: 1, name: "auras", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => AuraMetrics }
+        ]);
+    }
+    create(value) {
+        const message = { auras: [] };
+        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader, length, options, target) {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* repeated proto.AuraMetrics auras */ 1:
+                    message.auras.push(AuraMetrics.internalBinaryRead(reader, reader.uint32(), options));
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message, writer, options) {
+        /* repeated proto.AuraMetrics auras = 1; */
+        for (let i = 0; i < message.auras.length; i++)
+            AuraMetrics.internalBinaryWrite(message.auras[i], writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message proto.TargetMetrics
+ */
+export const TargetMetrics = new TargetMetrics$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class EncounterMetrics$Type extends MessageType {
+    constructor() {
+        super("proto.EncounterMetrics", [
+            { no: 1, name: "targets", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => TargetMetrics }
+        ]);
+    }
+    create(value) {
+        const message = { targets: [] };
+        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader, length, options, target) {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* repeated proto.TargetMetrics targets */ 1:
+                    message.targets.push(TargetMetrics.internalBinaryRead(reader, reader.uint32(), options));
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message, writer, options) {
+        /* repeated proto.TargetMetrics targets = 1; */
+        for (let i = 0; i < message.targets.length; i++)
+            TargetMetrics.internalBinaryWrite(message.targets[i], writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message proto.EncounterMetrics
+ */
+export const EncounterMetrics = new EncounterMetrics$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class RaidSimRequest$Type extends MessageType {
+    constructor() {
+        super("proto.RaidSimRequest", [
+            { no: 1, name: "raid", kind: "message", T: () => Raid },
+            { no: 2, name: "encounter", kind: "message", T: () => Encounter },
+            { no: 3, name: "sim_options", kind: "message", T: () => SimOptions }
+        ]);
+    }
+    create(value) {
+        const message = {};
+        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader, length, options, target) {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* proto.Raid raid */ 1:
+                    message.raid = Raid.internalBinaryRead(reader, reader.uint32(), options, message.raid);
+                    break;
+                case /* proto.Encounter encounter */ 2:
+                    message.encounter = Encounter.internalBinaryRead(reader, reader.uint32(), options, message.encounter);
+                    break;
+                case /* proto.SimOptions sim_options */ 3:
+                    message.simOptions = SimOptions.internalBinaryRead(reader, reader.uint32(), options, message.simOptions);
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message, writer, options) {
+        /* proto.Raid raid = 1; */
+        if (message.raid)
+            Raid.internalBinaryWrite(message.raid, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+        /* proto.Encounter encounter = 2; */
+        if (message.encounter)
+            Encounter.internalBinaryWrite(message.encounter, writer.tag(2, WireType.LengthDelimited).fork(), options).join();
+        /* proto.SimOptions sim_options = 3; */
+        if (message.simOptions)
+            SimOptions.internalBinaryWrite(message.simOptions, writer.tag(3, WireType.LengthDelimited).fork(), options).join();
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message proto.RaidSimRequest
+ */
+export const RaidSimRequest = new RaidSimRequest$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class RaidSimResult$Type extends MessageType {
+    constructor() {
+        super("proto.RaidSimResult", [
+            { no: 1, name: "raid_metrics", kind: "message", T: () => RaidMetrics },
+            { no: 2, name: "encounter_metrics", kind: "message", T: () => EncounterMetrics },
+            { no: 3, name: "logs", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
+        ]);
+    }
+    create(value) {
+        const message = { logs: "" };
+        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader, length, options, target) {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* proto.RaidMetrics raid_metrics */ 1:
+                    message.raidMetrics = RaidMetrics.internalBinaryRead(reader, reader.uint32(), options, message.raidMetrics);
+                    break;
+                case /* proto.EncounterMetrics encounter_metrics */ 2:
+                    message.encounterMetrics = EncounterMetrics.internalBinaryRead(reader, reader.uint32(), options, message.encounterMetrics);
+                    break;
+                case /* string logs */ 3:
+                    message.logs = reader.string();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message, writer, options) {
+        /* proto.RaidMetrics raid_metrics = 1; */
+        if (message.raidMetrics)
+            RaidMetrics.internalBinaryWrite(message.raidMetrics, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+        /* proto.EncounterMetrics encounter_metrics = 2; */
+        if (message.encounterMetrics)
+            EncounterMetrics.internalBinaryWrite(message.encounterMetrics, writer.tag(2, WireType.LengthDelimited).fork(), options).join();
+        /* string logs = 3; */
+        if (message.logs !== "")
+            writer.tag(3, WireType.LengthDelimited).string(message.logs);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message proto.RaidSimResult
+ */
+export const RaidSimResult = new RaidSimResult$Type();
+// @generated message type with reflection information, may provide speed optimized methods
 class IndividualSimRequest$Type extends MessageType {
     constructor() {
         super("proto.IndividualSimRequest", [
@@ -516,21 +1158,13 @@ export const IndividualSimRequest = new IndividualSimRequest$Type();
 class IndividualSimResult$Type extends MessageType {
     constructor() {
         super("proto.IndividualSimResult", [
-            { no: 1, name: "execution_duration_ms", kind: "scalar", T: 3 /*ScalarType.INT64*/, L: 0 /*LongType.BIGINT*/ },
-            { no: 2, name: "logs", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
-            { no: 3, name: "dps_avg", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
-            { no: 4, name: "dps_stdev", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
-            { no: 5, name: "dps_max", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
-            { no: 6, name: "dps_hist", kind: "map", K: 5 /*ScalarType.INT32*/, V: { kind: "scalar", T: 5 /*ScalarType.INT32*/ } },
-            { no: 7, name: "num_oom", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
-            { no: 8, name: "oom_at_avg", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
-            { no: 9, name: "dps_at_oom_avg", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
-            { no: 10, name: "action_metrics", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => ActionMetric },
-            { no: 11, name: "error", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
+            { no: 1, name: "player_metrics", kind: "message", T: () => PlayerMetrics },
+            { no: 2, name: "encounter_metrics", kind: "message", T: () => EncounterMetrics },
+            { no: 3, name: "logs", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
         ]);
     }
     create(value) {
-        const message = { executionDurationMs: 0n, logs: "", dpsAvg: 0, dpsStdev: 0, dpsMax: 0, dpsHist: {}, numOom: 0, oomAtAvg: 0, dpsAtOomAvg: 0, actionMetrics: [], error: "" };
+        const message = { logs: "" };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -541,38 +1175,14 @@ class IndividualSimResult$Type extends MessageType {
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
-                case /* int64 execution_duration_ms */ 1:
-                    message.executionDurationMs = reader.int64().toBigInt();
+                case /* proto.PlayerMetrics player_metrics */ 1:
+                    message.playerMetrics = PlayerMetrics.internalBinaryRead(reader, reader.uint32(), options, message.playerMetrics);
                     break;
-                case /* string logs */ 2:
+                case /* proto.EncounterMetrics encounter_metrics */ 2:
+                    message.encounterMetrics = EncounterMetrics.internalBinaryRead(reader, reader.uint32(), options, message.encounterMetrics);
+                    break;
+                case /* string logs */ 3:
                     message.logs = reader.string();
-                    break;
-                case /* double dps_avg */ 3:
-                    message.dpsAvg = reader.double();
-                    break;
-                case /* double dps_stdev */ 4:
-                    message.dpsStdev = reader.double();
-                    break;
-                case /* double dps_max */ 5:
-                    message.dpsMax = reader.double();
-                    break;
-                case /* map<int32, int32> dps_hist */ 6:
-                    this.binaryReadMap6(message.dpsHist, reader, options);
-                    break;
-                case /* int32 num_oom */ 7:
-                    message.numOom = reader.int32();
-                    break;
-                case /* double oom_at_avg */ 8:
-                    message.oomAtAvg = reader.double();
-                    break;
-                case /* double dps_at_oom_avg */ 9:
-                    message.dpsAtOomAvg = reader.double();
-                    break;
-                case /* repeated proto.ActionMetric action_metrics */ 10:
-                    message.actionMetrics.push(ActionMetric.internalBinaryRead(reader, reader.uint32(), options));
-                    break;
-                case /* string error */ 11:
-                    message.error = reader.string();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -585,56 +1195,16 @@ class IndividualSimResult$Type extends MessageType {
         }
         return message;
     }
-    binaryReadMap6(map, reader, options) {
-        let len = reader.uint32(), end = reader.pos + len, key, val;
-        while (reader.pos < end) {
-            let [fieldNo, wireType] = reader.tag();
-            switch (fieldNo) {
-                case 1:
-                    key = reader.int32();
-                    break;
-                case 2:
-                    val = reader.int32();
-                    break;
-                default: throw new globalThis.Error("unknown map entry field for field proto.IndividualSimResult.dps_hist");
-            }
-        }
-        map[key ?? 0] = val ?? 0;
-    }
     internalBinaryWrite(message, writer, options) {
-        /* int64 execution_duration_ms = 1; */
-        if (message.executionDurationMs !== 0n)
-            writer.tag(1, WireType.Varint).int64(message.executionDurationMs);
-        /* string logs = 2; */
+        /* proto.PlayerMetrics player_metrics = 1; */
+        if (message.playerMetrics)
+            PlayerMetrics.internalBinaryWrite(message.playerMetrics, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+        /* proto.EncounterMetrics encounter_metrics = 2; */
+        if (message.encounterMetrics)
+            EncounterMetrics.internalBinaryWrite(message.encounterMetrics, writer.tag(2, WireType.LengthDelimited).fork(), options).join();
+        /* string logs = 3; */
         if (message.logs !== "")
-            writer.tag(2, WireType.LengthDelimited).string(message.logs);
-        /* double dps_avg = 3; */
-        if (message.dpsAvg !== 0)
-            writer.tag(3, WireType.Bit64).double(message.dpsAvg);
-        /* double dps_stdev = 4; */
-        if (message.dpsStdev !== 0)
-            writer.tag(4, WireType.Bit64).double(message.dpsStdev);
-        /* double dps_max = 5; */
-        if (message.dpsMax !== 0)
-            writer.tag(5, WireType.Bit64).double(message.dpsMax);
-        /* map<int32, int32> dps_hist = 6; */
-        for (let k of Object.keys(message.dpsHist))
-            writer.tag(6, WireType.LengthDelimited).fork().tag(1, WireType.Varint).int32(parseInt(k)).tag(2, WireType.Varint).int32(message.dpsHist[k]).join();
-        /* int32 num_oom = 7; */
-        if (message.numOom !== 0)
-            writer.tag(7, WireType.Varint).int32(message.numOom);
-        /* double oom_at_avg = 8; */
-        if (message.oomAtAvg !== 0)
-            writer.tag(8, WireType.Bit64).double(message.oomAtAvg);
-        /* double dps_at_oom_avg = 9; */
-        if (message.dpsAtOomAvg !== 0)
-            writer.tag(9, WireType.Bit64).double(message.dpsAtOomAvg);
-        /* repeated proto.ActionMetric action_metrics = 10; */
-        for (let i = 0; i < message.actionMetrics.length; i++)
-            ActionMetric.internalBinaryWrite(message.actionMetrics[i], writer.tag(10, WireType.LengthDelimited).fork(), options).join();
-        /* string error = 11; */
-        if (message.error !== "")
-            writer.tag(11, WireType.LengthDelimited).string(message.error);
+            writer.tag(3, WireType.LengthDelimited).string(message.logs);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -645,193 +1215,6 @@ class IndividualSimResult$Type extends MessageType {
  * @generated MessageType for protobuf message proto.IndividualSimResult
  */
 export const IndividualSimResult = new IndividualSimResult$Type();
-// @generated message type with reflection information, may provide speed optimized methods
-class ActionMetric$Type extends MessageType {
-    constructor() {
-        super("proto.ActionMetric", [
-            { no: 1, name: "spell_id", kind: "scalar", oneof: "actionId", T: 5 /*ScalarType.INT32*/ },
-            { no: 2, name: "item_id", kind: "scalar", oneof: "actionId", T: 5 /*ScalarType.INT32*/ },
-            { no: 3, name: "other_id", kind: "enum", oneof: "actionId", T: () => ["proto.OtherAction", OtherAction] },
-            { no: 4, name: "tag", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
-            { no: 5, name: "casts", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
-            { no: 6, name: "hits", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
-            { no: 7, name: "crits", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
-            { no: 8, name: "misses", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
-            { no: 9, name: "damage", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ }
-        ]);
-    }
-    create(value) {
-        const message = { actionId: { oneofKind: undefined }, tag: 0, casts: 0, hits: 0, crits: 0, misses: 0, damage: 0 };
-        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
-        if (value !== undefined)
-            reflectionMergePartial(this, message, value);
-        return message;
-    }
-    internalBinaryRead(reader, length, options, target) {
-        let message = target ?? this.create(), end = reader.pos + length;
-        while (reader.pos < end) {
-            let [fieldNo, wireType] = reader.tag();
-            switch (fieldNo) {
-                case /* int32 spell_id */ 1:
-                    message.actionId = {
-                        oneofKind: "spellId",
-                        spellId: reader.int32()
-                    };
-                    break;
-                case /* int32 item_id */ 2:
-                    message.actionId = {
-                        oneofKind: "itemId",
-                        itemId: reader.int32()
-                    };
-                    break;
-                case /* proto.OtherAction other_id */ 3:
-                    message.actionId = {
-                        oneofKind: "otherId",
-                        otherId: reader.int32()
-                    };
-                    break;
-                case /* int32 tag */ 4:
-                    message.tag = reader.int32();
-                    break;
-                case /* int32 casts */ 5:
-                    message.casts = reader.int32();
-                    break;
-                case /* int32 hits */ 6:
-                    message.hits = reader.int32();
-                    break;
-                case /* int32 crits */ 7:
-                    message.crits = reader.int32();
-                    break;
-                case /* int32 misses */ 8:
-                    message.misses = reader.int32();
-                    break;
-                case /* double damage */ 9:
-                    message.damage = reader.double();
-                    break;
-                default:
-                    let u = options.readUnknownField;
-                    if (u === "throw")
-                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
-                    let d = reader.skip(wireType);
-                    if (u !== false)
-                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
-            }
-        }
-        return message;
-    }
-    internalBinaryWrite(message, writer, options) {
-        /* int32 spell_id = 1; */
-        if (message.actionId.oneofKind === "spellId")
-            writer.tag(1, WireType.Varint).int32(message.actionId.spellId);
-        /* int32 item_id = 2; */
-        if (message.actionId.oneofKind === "itemId")
-            writer.tag(2, WireType.Varint).int32(message.actionId.itemId);
-        /* proto.OtherAction other_id = 3; */
-        if (message.actionId.oneofKind === "otherId")
-            writer.tag(3, WireType.Varint).int32(message.actionId.otherId);
-        /* int32 tag = 4; */
-        if (message.tag !== 0)
-            writer.tag(4, WireType.Varint).int32(message.tag);
-        /* int32 casts = 5; */
-        if (message.casts !== 0)
-            writer.tag(5, WireType.Varint).int32(message.casts);
-        /* int32 hits = 6; */
-        if (message.hits !== 0)
-            writer.tag(6, WireType.Varint).int32(message.hits);
-        /* int32 crits = 7; */
-        if (message.crits !== 0)
-            writer.tag(7, WireType.Varint).int32(message.crits);
-        /* int32 misses = 8; */
-        if (message.misses !== 0)
-            writer.tag(8, WireType.Varint).int32(message.misses);
-        /* double damage = 9; */
-        if (message.damage !== 0)
-            writer.tag(9, WireType.Bit64).double(message.damage);
-        let u = options.writeUnknownFields;
-        if (u !== false)
-            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
-        return writer;
-    }
-}
-/**
- * @generated MessageType for protobuf message proto.ActionMetric
- */
-export const ActionMetric = new ActionMetric$Type();
-// @generated message type with reflection information, may provide speed optimized methods
-class RaidSimRequest$Type extends MessageType {
-    constructor() {
-        super("proto.RaidSimRequest", [
-            { no: 1, name: "raid", kind: "message", T: () => Raid },
-            { no: 2, name: "encounter", kind: "message", T: () => Encounter },
-            { no: 3, name: "random_seed", kind: "scalar", T: 3 /*ScalarType.INT64*/, L: 0 /*LongType.BIGINT*/ },
-            { no: 4, name: "gcd_min", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
-            { no: 5, name: "debug", kind: "scalar", T: 8 /*ScalarType.BOOL*/ }
-        ]);
-    }
-    create(value) {
-        const message = { randomSeed: 0n, gcdMin: 0, debug: false };
-        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
-        if (value !== undefined)
-            reflectionMergePartial(this, message, value);
-        return message;
-    }
-    internalBinaryRead(reader, length, options, target) {
-        let message = target ?? this.create(), end = reader.pos + length;
-        while (reader.pos < end) {
-            let [fieldNo, wireType] = reader.tag();
-            switch (fieldNo) {
-                case /* proto.Raid raid */ 1:
-                    message.raid = Raid.internalBinaryRead(reader, reader.uint32(), options, message.raid);
-                    break;
-                case /* proto.Encounter encounter */ 2:
-                    message.encounter = Encounter.internalBinaryRead(reader, reader.uint32(), options, message.encounter);
-                    break;
-                case /* int64 random_seed */ 3:
-                    message.randomSeed = reader.int64().toBigInt();
-                    break;
-                case /* double gcd_min */ 4:
-                    message.gcdMin = reader.double();
-                    break;
-                case /* bool debug */ 5:
-                    message.debug = reader.bool();
-                    break;
-                default:
-                    let u = options.readUnknownField;
-                    if (u === "throw")
-                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
-                    let d = reader.skip(wireType);
-                    if (u !== false)
-                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
-            }
-        }
-        return message;
-    }
-    internalBinaryWrite(message, writer, options) {
-        /* proto.Raid raid = 1; */
-        if (message.raid)
-            Raid.internalBinaryWrite(message.raid, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
-        /* proto.Encounter encounter = 2; */
-        if (message.encounter)
-            Encounter.internalBinaryWrite(message.encounter, writer.tag(2, WireType.LengthDelimited).fork(), options).join();
-        /* int64 random_seed = 3; */
-        if (message.randomSeed !== 0n)
-            writer.tag(3, WireType.Varint).int64(message.randomSeed);
-        /* double gcd_min = 4; */
-        if (message.gcdMin !== 0)
-            writer.tag(4, WireType.Bit64).double(message.gcdMin);
-        /* bool debug = 5; */
-        if (message.debug !== false)
-            writer.tag(5, WireType.Varint).bool(message.debug);
-        let u = options.writeUnknownFields;
-        if (u !== false)
-            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
-        return writer;
-    }
-}
-/**
- * @generated MessageType for protobuf message proto.RaidSimRequest
- */
-export const RaidSimRequest = new RaidSimRequest$Type();
 // @generated message type with reflection information, may provide speed optimized methods
 class GearListRequest$Type extends MessageType {
     constructor() {

@@ -10,13 +10,13 @@ export class DpsHistogram extends ResultComponent {
         const chartCanvas = document.createElement("canvas");
         chartCanvas.height = chartBounds.height;
         chartCanvas.width = chartBounds.width;
-        const min = result.dpsAvg - result.dpsStdev;
-        const max = result.dpsAvg + result.dpsStdev;
+        const min = result.playerMetrics.dpsAvg - result.playerMetrics.dpsStdev;
+        const max = result.playerMetrics.dpsAvg + result.playerMetrics.dpsStdev;
         const vals = [];
         const colors = [];
-        const labels = Object.keys(result.dpsHist);
+        const labels = Object.keys(result.playerMetrics.dpsHist);
         labels.forEach((k, i) => {
-            vals.push(result.dpsHist[Number(k)]);
+            vals.push(result.playerMetrics.dpsHist[Number(k)]);
             const val = parseInt(k);
             if (val > min && val < max) {
                 colors.push('#1E87F0');

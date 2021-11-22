@@ -88,8 +88,8 @@ export class Results extends Component {
         this.hideAll();
         this.simElem.style.display = 'initial';
         this.simDpsElem.innerHTML = `
-      <span class="results-sim-dps-avg">${result.dpsAvg.toFixed(2)}</span>
-      <span class="results-sim-dps-stdev">${result.dpsStdev.toFixed(2)}</span>
+      <span class="results-sim-dps-avg">${result.playerMetrics.dpsAvg.toFixed(2)}</span>
+      <span class="results-sim-dps-stdev">${result.playerMetrics.dpsStdev.toFixed(2)}</span>
     `;
         this.updateReference();
     }
@@ -155,7 +155,7 @@ export class Results extends Component {
             return;
         }
         this.simReferenceElem.classList.add('has-reference');
-        const delta = this.currentData.result.dpsAvg - this.referenceData.result.dpsAvg;
+        const delta = this.currentData.result.playerMetrics.dpsAvg - this.referenceData.result.playerMetrics.dpsAvg;
         const deltaStr = delta.toFixed(2);
         if (delta >= 0) {
             this.simReferenceDiffElem.textContent = '+' + deltaStr;

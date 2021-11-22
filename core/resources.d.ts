@@ -14,11 +14,15 @@ export declare type OtherId = {
     otherId: number;
 };
 export declare type ItemOrSpellId = ItemId | SpellId;
-export declare type ActionId = ItemId | SpellId | OtherId;
+export declare type RawActionId = ItemId | SpellId | OtherId;
+export declare type ActionId = {
+    id: RawActionId;
+    tag?: number;
+};
 export declare function getTooltipData(id: ItemOrSpellId): Promise<any>;
-export declare function getIconUrl(id: ActionId): Promise<string>;
+export declare function getIconUrl(id: RawActionId): Promise<string>;
 export declare function getItemIconUrl(item: Item): Promise<string>;
-export declare function getName(id: ItemOrSpellId | ActionId): Promise<string>;
+export declare function getName(id: ItemOrSpellId | RawActionId): Promise<string>;
 export declare function setWowheadHref(elem: HTMLAnchorElement, id: ItemOrSpellId): void;
 export declare function setWowheadItemHref(elem: HTMLAnchorElement, item: Item): void;
 export declare function getEmptyGemSocketIconUrl(color: GemColor): string;
