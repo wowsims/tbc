@@ -18,6 +18,21 @@ body {
 	margin: 10px;
 }
 
+.other-metrics {
+	display: table;
+    width: 100%;
+    table-layout: fixed; 
+}
+
+.dr-col {
+	display: table-cell;
+    text-align: center;
+}
+
+tr.empty {
+	height: 46.188px;
+}
+
 .topline-results {
 	display: flex;
 	justify-content: space-around;
