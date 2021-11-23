@@ -77,7 +77,7 @@ var PlayerOptionsBasic = &proto.PlayerOptions{
 	},
 }
 
-var PreRaidGear = items.EquipmentSpecFromStrings([]items.ItemStringSpec{})
+// var PreRaidGear = items.EquipmentSpecFromStrings([]items.ItemStringSpec{})
 
 var P1Gear = items.EquipmentSpecFromStrings([]items.ItemStringSpec{
 	{

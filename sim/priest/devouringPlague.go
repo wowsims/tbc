@@ -7,7 +7,7 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-const SpellIDDevouringPlague int32 = 25368
+const SpellIDDevouringPlague int32 = 25467
 
 var DPCooldownID = core.NewCooldownID()
 
@@ -36,9 +36,6 @@ func (priest *Priest) newDevouringPlagueTemplate(sim *core.Simulation) core.Simp
 			TickLength:           time.Second * 3,
 			TickBaseDamage:       1216 / 8,
 			TickSpellCoefficient: 0.1,
-
-			// TODO:  Shadow Weaving apply on tick?
-			OnDamageTick: newVTOnTick(priest.Party),
 		},
 	}
 

@@ -27,18 +27,24 @@ func (priest *Priest) newShadowfiendTemplate(sim *core.Simulation) core.SimpleSp
 		},
 	}
 
+	// Dmg over 15 sec = shadow_dmg*.6 + 1191
+	// just simulate 10 1.5s long ticks
 	effect := core.SpellHitEffect{
 		SpellEffect: core.SpellEffect{
 			DamageMultiplier: 1,
 		},
 		DotInput: core.DotDamageInput{
-			NumberOfTicks:        6,
-			TickLength:           time.Second * 15,
-			TickBaseDamage:       1236 / 6,
-			TickSpellCoefficient: 0.183,
-
-			// TODO:  Shadow Weaving apply on tick?
-			OnDamageTick: newVTOnTick(priest.Party),
+			NumberOfTicks:        10,
+			TickLength:           time.Millisecond * 1500,
+			TickBaseDamage:       1191 / 10,
+			TickSpellCoefficient: 0.06,
+			OnDamageTick: func(sim *core.Simulation, damage float64) {
+				s := stats.Stats{stats.Mana: damage * 2.5}
+				if sim.Log != nil {
+					sim.Log("Shadowfiend Regenerated %0f mana.\n", s[stats.Mana])
+				}
+				priest.AddStats(s)
+			},
 		},
 	}
 

@@ -47,7 +47,7 @@ export const ShadowPriestRotationConfig = {
 			config: {
 				label: 'Use Devouring Plague',
 				labelTooltip: 'Use Devouring Plague whenever off CD.',
-				changedEvent: (player: Player<Spec.SpecShadowPriest>) => player.rotationChangeEmitter,
+				changedEvent: (player: Player<Spec.SpecShadowPriest>) => player.raceChangeEmitter,
 				getValue: (player: Player<Spec.SpecShadowPriest>) => player.getRotation().useDevPlague,
 				setValue: (player: Player<Spec.SpecShadowPriest>, newValue: boolean) => {
 					const newRotation = player.getRotation();

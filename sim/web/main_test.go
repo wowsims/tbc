@@ -69,7 +69,7 @@ var p1Equip = &proto.EquipmentSpec{
 
 func init() {
 	go func() {
-		runServer(true, ":3333", false, "", bufio.NewReader(bytes.NewBuffer([]byte{})))
+		runServer(true, ":3333", false, "", false, bufio.NewReader(bytes.NewBuffer([]byte{})))
 	}()
 
 	time.Sleep(time.Second) // hack so we have time for server to startup. Probably could repeatedly curl the endpoint until it responds.

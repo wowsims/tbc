@@ -18,6 +18,9 @@ type OnSpellHit func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEf
 // Callback for after a spell is fully resisted on a target.
 type OnSpellMiss func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect)
 
+// OnPeriodicDamage is called when dots tick. Able to return a replacement damage.
+type OnPeriodicDamage func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect, tickDamage float64) float64
+
 // A Spell is a type of cast that can hit/miss using spell stats, and has a spell school.
 type SpellCast struct {
 	// Embedded Cast
@@ -135,7 +138,9 @@ func (spellEffect *SpellEffect) calculateDirectDamage(sim *Simulation, spellCast
 		damage *= spellCast.CritMultiplier
 	}
 
-	damage = calculateResists(sim, damage, spellEffect)
+	if !spellCast.Binary {
+		damage = calculateResists(sim, damage, spellEffect)
+	}
 
 	spellEffect.Damage = damage
 }
@@ -143,7 +148,7 @@ func (spellEffect *SpellEffect) calculateDirectDamage(sim *Simulation, spellCast
 func (spellEffect *SpellEffect) applyDot(sim *Simulation, spellCast *SpellCast, ddInput *DotDamageInput) {
 	totalSpellPower := spellCast.Character.GetStat(stats.SpellPower) + spellCast.Character.GetStat(spellCast.SpellSchool) + spellEffect.BonusSpellPower
 	// snapshot total damage per tick
-	ddInput.damagePerTick = (ddInput.TickBaseDamage + totalSpellPower*ddInput.TickSpellCoefficient) * spellEffect.DamageMultiplier
+	ddInput.damagePerTick = (ddInput.TickBaseDamage + totalSpellPower*ddInput.TickSpellCoefficient)
 	ddInput.finalTickTime = sim.CurrentTime + time.Duration(ddInput.NumberOfTicks)*ddInput.TickLength
 
 	pa := &PendingAction{
@@ -151,11 +156,15 @@ func (spellEffect *SpellEffect) applyDot(sim *Simulation, spellCast *SpellCast, 
 	}
 
 	pa.OnAction = func(sim *Simulation) {
-		damage := ddInput.damagePerTick
-		damage = calculateResists(sim, damage, spellEffect)
+		damage := spellCast.Character.OnPeriodicDamage(sim, spellCast, spellEffect, ddInput.damagePerTick)
+		damage = spellEffect.Target.OnPeriodicDamage(sim, spellCast, spellEffect, damage)
+
+		if !spellCast.Binary {
+			damage = calculateResists(sim, damage, spellEffect)
+		}
 
 		if sim.Log != nil {
-			sim.Log(" %s Ticked for %0.1f\n", spellCast.Name, damage)
+			sim.Log(" %s (base: %01.f) Ticked for %0.1f\n", spellCast.Name, ddInput.damagePerTick, damage)
 		}
 
 		if ddInput.OnDamageTick != nil {

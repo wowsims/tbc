@@ -9,6 +9,9 @@ import (
 
 const SpellIDMF int32 = 25387
 
+const TagMF2 = 2
+const TagMF3 = 3
+
 func (priest *Priest) newMindflayTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
 	baseCast := core.Cast{
 		Name:           "Mind Flay",
@@ -18,6 +21,7 @@ func (priest *Priest) newMindflayTemplate(sim *core.Simulation) core.SimpleSpell
 		BaseManaCost:   230,
 		ManaCost:       230,
 		CastTime:       0,
+		Binary:         true,
 		ActionID: core.ActionID{
 			SpellID: SpellIDMF,
 		},
@@ -32,9 +36,6 @@ func (priest *Priest) newMindflayTemplate(sim *core.Simulation) core.SimpleSpell
 			TickLength:           time.Second,
 			TickBaseDamage:       528 / 3,
 			TickSpellCoefficient: 0.19,
-
-			// TODO:  Shadow Weaving apply on tick?
-			OnDamageTick: newVTOnTick(priest.Party),
 		},
 	}
 

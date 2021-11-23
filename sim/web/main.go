@@ -29,17 +29,18 @@ func init() {
 }
 
 func main() {
-	var useFS = flag.Bool("usefs", false, "Use local file system and wasm. Set to true during development.")
+	var useFS = flag.Bool("usefs", false, "Use local file system for client files. Set to true during development.")
+	var wasm = flag.Bool("wasm", false, "Use wasm for sim instead of web server apis. Can only be used with usefs=true")
 	var host = flag.String("host", ":3333", "URL to host the interface on.")
 	var launch = flag.Bool("launch", true, "auto launch browser")
 	var simName = flag.String("sim", "", "which sim to launch (elemental_shaman, balance_druid, etc)")
 
 	flag.Parse()
 
-	runServer(*useFS, *host, *launch, *simName, bufio.NewReader(os.Stdin))
+	runServer(*useFS, *host, *launch, *simName, *wasm, bufio.NewReader(os.Stdin))
 }
 
-func runServer(useFS bool, host string, launchBrowser bool, simName string, inputReader *bufio.Reader) {
+func runServer(useFS bool, host string, launchBrowser bool, simName string, wasm bool, inputReader *bufio.Reader) {
 	var fs http.Handler
 	if useFS {
 		log.Printf("Using local file system for development.")
@@ -67,8 +68,10 @@ func runServer(useFS bool, host string, launchBrowser bool, simName string, inpu
 		if strings.HasSuffix(req.URL.Path, ".wasm") {
 			resp.Header().Set("content-type", "application/wasm")
 		}
-		if strings.HasSuffix(req.URL.Path, "sim_worker.js") {
-			req.URL.Path = strings.Replace(req.URL.Path, "sim_worker.js", "net_worker.js", 1)
+		if !useFS || (useFS && !wasm) {
+			if strings.HasSuffix(req.URL.Path, "sim_worker.js") {
+				req.URL.Path = strings.Replace(req.URL.Path, "sim_worker.js", "net_worker.js", 1)
+			}
 		}
 		fs.ServeHTTP(resp, req)
 	})

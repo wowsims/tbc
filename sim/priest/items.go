@@ -1,0 +1,66 @@
+package priest
+
+import (
+	"time"
+
+	"github.com/wowsims/tbc/sim/core"
+	"github.com/wowsims/tbc/sim/core/stats"
+)
+
+func init() {
+	// core.AddItemEffect(30664, ApplyLivingRootoftheWildheart)
+
+	core.AddItemSet(ItemSetAvatar)
+}
+
+var Avatar2PcAuraID = core.NewAuraID()
+var Avatar4PcAuraID = core.NewAuraID()
+var SadistAuraID = core.NewAuraID()
+
+var ItemSetAvatar = core.ItemSet{
+	Name:  "Avatar Regalia",
+	Items: map[int32]struct{}{30160: {}, 30161: {}, 30162: {}, 30159: {}, 30163: {}},
+	Bonuses: map[int32]core.ApplyEffect{
+		2: func(agent core.Agent) {
+			character := agent.GetCharacter()
+			character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
+				return core.Aura{
+					ID:   Avatar2PcAuraID,
+					Name: "Avatar 2pc Bonus",
+					OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
+						if sim.RandomFloat("avatar 2p") < 0.06 {
+							// This is a cheat...
+							// easier than adding another aura the subtracts 150 mana from next cast.
+							character.AddStat(stats.Mana, 150)
+						}
+					},
+				}
+			})
+		},
+		4: func(agent core.Agent) {
+			character := agent.GetCharacter()
+			character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
+				return core.Aura{
+					ID:   Avatar4PcAuraID,
+					Name: "Avatar 4pc Bonus",
+					OnPeriodicDamage: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect, tickDamage float64) float64 {
+						if spellCast.ActionID.SpellID == SpellIDSWP {
+							if sim.RandomFloat("avatar 4p") < 0.4 {
+								character.AddAura(sim, core.Aura{
+									ID:      SadistAuraID,
+									Name:    "Sadist",
+									Expires: sim.CurrentTime + time.Second*15,
+									OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+										spellEffect.BonusSpellPower += 100
+										character.RemoveAura(sim, SadistAuraID)
+									},
+								})
+							}
+						}
+						return tickDamage
+					},
+				}
+			})
+		},
+	},
+}

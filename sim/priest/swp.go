@@ -33,9 +33,6 @@ func (priest *Priest) newSWPTemplate(sim *core.Simulation) core.SimpleSpellTempl
 			TickLength:           time.Second * 3,
 			TickBaseDamage:       1236 / 6,
 			TickSpellCoefficient: 0.183,
-
-			// TODO:  Shadow Weaving apply on tick?
-			OnDamageTick: newVTOnTick(priest.Party),
 		},
 	}
 

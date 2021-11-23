@@ -88,6 +88,10 @@ func (priest *Priest) Act(sim *core.Simulation) time.Duration {
 }
 
 func (priest *Priest) applyTalentsToShadowSpell(cast *core.Cast, effect *core.SpellHitEffect) {
+	if cast.ActionID.SpellID == SpellIDSWD || cast.ActionID.SpellID == SpellIDMB {
+		effect.BonusSpellCritRating += float64(priest.Talents.ShadowPower) * 3 * core.SpellCritRatingPerCritChance
+	}
+
 	if cast.ActionID.SpellID == SpellIDMF || cast.ActionID.SpellID == SpellIDMB {
 		cast.ManaCost -= cast.BaseManaCost * float64(priest.Talents.FocusedMind) * 0.05
 	}
@@ -139,17 +143,6 @@ func NewPriest(char core.Character, selfBuffs SelfBuffs, talents proto.PriestTal
 	return priest
 }
 
-// newVTOnTick is the OnDamage function for all priest DoTs to apply VT
-func newVTOnTick(party *core.Party) core.OnDamageTick {
-	return func(sim *core.Simulation, damage float64) {
-		s := stats.Stats{stats.Mana: damage * 0.05}
-		if sim.Log != nil {
-			sim.Log("VT Regenerated %0f mana.\n", s[stats.Mana])
-		}
-		party.AddStats(s)
-	}
-}
-
 var InnerFocusAuraID = core.NewAuraID()
 var InnerFocusCooldownID = core.NewCooldownID()
 
@@ -175,79 +168,74 @@ func ApplyInnerFocus(sim *core.Simulation, priest *Priest) bool {
 	return true
 }
 
-// TODO: Get Priest base stats
 func init() {
+
+	// TODO: str/agi/stm are just the base priest stats, not modified for each race yet. Not sure it matters...
+
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceHuman, Class: proto.Class_ClassPriest}] = stats.Stats{
-		stats.Strength:  81,
-		stats.Agility:   65,
-		stats.Stamina:   85,
-		stats.Intellect: 115,
+		stats.Strength:  146,
+		stats.Agility:   184,
+		stats.Stamina:   154,
+		stats.Intellect: 180,
 		stats.Spirit:    135,
-		stats.Mana:      2090,  // 3815 mana shown on naked character
-		stats.SpellCrit: 40.66, // 3.29% chance to crit shown on naked character screen
-		// 4498 health shown on naked character (would include tauren bonus)
+		stats.Mana:      2090,
+		stats.SpellCrit: core.SpellCritRatingPerCritChance * 1.24,
 	}
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceDwarf, Class: proto.Class_ClassPriest}] = stats.Stats{
-		stats.Strength:  81,
-		stats.Agility:   65,
-		stats.Stamina:   85,
-		stats.Intellect: 115,
-		stats.Spirit:    135,
-		stats.Mana:      2090,  // 3815 mana shown on naked character
-		stats.SpellCrit: 40.66, // 3.29% chance to crit shown on naked character screen
-		// 4498 health shown on naked character (would include tauren bonus)
+		stats.Strength:  146,
+		stats.Agility:   184,
+		stats.Stamina:   154,
+		stats.Intellect: 179,
+		stats.Spirit:    134,
+		stats.Mana:      2090,
+		stats.SpellCrit: core.SpellCritRatingPerCritChance * 1.24,
 	}
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceNightElf, Class: proto.Class_ClassPriest}] = stats.Stats{
-		stats.Strength:  81,
-		stats.Agility:   65,
-		stats.Stamina:   85,
-		stats.Intellect: 115,
+		stats.Strength:  146,
+		stats.Agility:   184,
+		stats.Stamina:   154,
+		stats.Intellect: 180,
 		stats.Spirit:    135,
-		stats.Mana:      2090,  // 3815 mana shown on naked character
-		stats.SpellCrit: 40.66, // 3.29% chance to crit shown on naked character screen
-		// 4498 health shown on naked character (would include tauren bonus)
+		stats.Mana:      2090,
+		stats.SpellCrit: core.SpellCritRatingPerCritChance * 1.24,
 	}
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceDraenei, Class: proto.Class_ClassPriest}] = stats.Stats{
-		stats.Strength:  81,
-		stats.Agility:   65,
-		stats.Stamina:   85,
-		stats.Intellect: 115,
-		stats.Spirit:    135,
-		stats.Mana:      2090,  // 3815 mana shown on naked character
-		stats.SpellCrit: 40.66, // 3.29% chance to crit shown on naked character screen
-		// 4498 health shown on naked character (would include tauren bonus)
+		stats.Strength:  146,
+		stats.Agility:   184,
+		stats.Stamina:   154,
+		stats.Intellect: 180,
+		stats.Spirit:    137,
+		stats.Mana:      2090,
+		stats.SpellCrit: core.SpellCritRatingPerCritChance * 1.24,
 	}
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceUndead, Class: proto.Class_ClassPriest}] = stats.Stats{
-		stats.Strength:  81,
-		stats.Agility:   65,
-		stats.Stamina:   85,
-		stats.Intellect: 115,
+		stats.Strength:  146,
+		stats.Agility:   184,
+		stats.Stamina:   154,
+		stats.Intellect: 178,
 		stats.Spirit:    135,
-		stats.Mana:      2090,  // 3815 mana shown on naked character
-		stats.SpellCrit: 40.66, // 3.29% chance to crit shown on naked character screen
-		// 4498 health shown on naked character (would include tauren bonus)
+		stats.Mana:      2090,
+		stats.SpellCrit: core.SpellCritRatingPerCritChance * 1.24,
 	}
 	troll := stats.Stats{
-		stats.Strength:  81,
-		stats.Agility:   65,
-		stats.Stamina:   85,
-		stats.Intellect: 115,
-		stats.Spirit:    135,
-		stats.Mana:      2090,  // 3815 mana shown on naked character
-		stats.SpellCrit: 40.66, // 3.29% chance to crit shown on naked character screen
-		// 4498 health shown on naked character (would include tauren bonus)
+		stats.Strength:  146,
+		stats.Agility:   184,
+		stats.Stamina:   154,
+		stats.Intellect: 176,
+		stats.Spirit:    136,
+		stats.Mana:      2090,
+		stats.SpellCrit: core.SpellCritRatingPerCritChance * 1.24,
 	}
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceTroll10, Class: proto.Class_ClassPriest}] = troll
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceTroll30, Class: proto.Class_ClassPriest}] = troll
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceBloodElf, Class: proto.Class_ClassPriest}] = stats.Stats{
-		stats.Strength:  81,
-		stats.Agility:   65,
-		stats.Stamina:   85,
-		stats.Intellect: 115,
-		stats.Spirit:    135,
-		stats.Mana:      2090,  // 3815 mana shown on naked character
-		stats.SpellCrit: 40.66, // 3.29% chance to crit shown on naked character screen
-		// 4498 health shown on naked character (would include tauren bonus)
+		stats.Strength:  146,
+		stats.Agility:   184,
+		stats.Stamina:   154,
+		stats.Intellect: 183,
+		stats.Spirit:    138,
+		stats.Mana:      2090,
+		stats.SpellCrit: core.SpellCritRatingPerCritChance * 1.24,
 	}
 }
 
@@ -255,3 +243,59 @@ func init() {
 type Agent interface {
 	GetPriest() *Priest
 }
+
+// class Priest(talents: Map<String, Talent>, spec: Spec) : Class(talents, spec) {
+//     override val baseStats: Stats = Stats(
+//         agility = 184,
+//         intellect = 180,
+//         strength = 146,
+//         stamina = 154,
+//         spirit = 135
+//     )
+// class Dwarf : Race() {
+//     override var baseStats: Stats = Stats(
+//         strength = 5,
+//         agility = -4,
+//         stamina = 1,
+//         intellect = -1,
+//         spirit = -1
+//     )
+// class Draenei : Race() {
+//     override var baseStats: Stats = Stats(
+//         strength = 1,
+//         agility = -3,
+//         spirit = 2
+//     )
+// class NightElf : Race() {
+//     override var baseStats: Stats = Stats(
+//         strength = -4,
+//         agility = 4,
+//         stamina = 0,
+//         intellect = 0,
+//         spirit = 0
+//     )
+// class Troll : Race() {
+//     override var baseStats: Stats = Stats(
+//         strength = 1,
+//         agility = 2,
+//         intellect = -4,
+//         spirit = 1
+//     )
+// class Undead : Race() {
+//     override var baseStats: Stats = Stats(
+//         strength = -1,
+//         agility = -2,
+//         stamina = 0,
+//         intellect = -2,
+//         spirit = 5
+//     )
+// class BloodElf : Race() {
+//     override var baseStats: Stats = Stats(
+//         strength = -3,
+//         agility = 2,
+//         stamina = 0,
+//         intellect = 3,
+//         spirit = -2
+//     )
+// // https://worldofwarcraft.fandom.com/et/wiki/Spell_critical_strike
+//     override val baseSpellCritChance: Double = 1.24

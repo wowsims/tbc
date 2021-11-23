@@ -1,7 +1,6 @@
 package core
 
 import (
-	"fmt"
 	"log"
 	"testing"
 
@@ -151,10 +150,6 @@ type AllEncountersTestOptions struct {
 }
 
 func IndividualSimAllEncountersTest(testOpts AllEncountersTestOptions) {
-	for _, item := range testOpts.Inputs.Gear.Items {
-		fmt.Printf("id: %d,\n", item.Id)
-	}
-
 	isr := NewIndividualSimRequest(testOpts.Inputs)
 	isr.SimOptions.Debug = true
 

@@ -266,7 +266,7 @@ func EquipmentSpecFromStrings(itemStringSpecs []ItemStringSpec) *proto.Equipment
 	for i, itemStringSpec := range itemStringSpecs {
 		item := ByName[itemStringSpec.Name]
 		if item.ID == 0 {
-			log.Fatalf("Item not found: %s", itemStringSpec.Name)
+			log.Fatalf("Item not found: %#v", itemStringSpec)
 		}
 		itemSpec := &proto.ItemSpec{
 			Id: item.ID,

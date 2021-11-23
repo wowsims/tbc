@@ -17,6 +17,13 @@ const CasterCategory = proto.ItemCategory_ItemCategoryCaster
 
 // Keep these sorted alphabetically by item Name.
 var ItemDeclarations = []ItemDeclaration{
+	/** Avatar Regalia placed together here because their names don't start the same.**/
+	{ /** Handguards of the Avatar */ ID: 30160, Categories: []proto.ItemCategory{CasterCategory}},
+	{ /** Hood of the Avatar */ ID: 30161, Categories: []proto.ItemCategory{CasterCategory}},
+	{ /** Leggings of the Avatar */ ID: 30162, Categories: []proto.ItemCategory{CasterCategory}},
+	{ /** Shroud of the Avatar */ ID: 30159, Categories: []proto.ItemCategory{CasterCategory}},
+	{ /** Wings of the Avatar */ ID: 30163, Categories: []proto.ItemCategory{CasterCategory}},
+
 	{ /** A'dal's Gift */ ID: 31461, Categories: []proto.ItemCategory{CasterCategory}},
 	{ /** Adornment of Stolen Souls */ ID: 28762, Categories: []proto.ItemCategory{CasterCategory}},
 	{ /** Amani Punisher */ ID: 33283, Categories: []proto.ItemCategory{CasterCategory}},
@@ -455,7 +462,6 @@ var ItemDeclarations = []ItemDeclaration{
 	{ /** Windscale Hood */ ID: 29504, Categories: []proto.ItemCategory{CasterCategory}},
 	{ /** Windshear Boots */ ID: 28810, Categories: []proto.ItemCategory{CasterCategory}},
 	{ /** Wand of the Forgotten Star */ ID: 29982, Categories: []proto.ItemCategory{CasterCategory}},
-	{ /** Wings of the Avatar */ ID: 30163, Categories: []proto.ItemCategory{CasterCategory}},
 	{ /** World's End Bracers */ ID: 27522, Categories: []proto.ItemCategory{CasterCategory}},
 	{ /** Worldfire Chestguard */ ID: 28391, Categories: []proto.ItemCategory{CasterCategory}},
 	{ /** Wub's Cursed Hexblade */ ID: 33354, Categories: []proto.ItemCategory{CasterCategory}},

@@ -51,10 +51,18 @@ export function parseActionMetrics(actionMetricProtos: Array<ActionMetricProto>)
 	return Promise.all(actionMetrics.map(actionMetric => 
 		getName(actionMetric.actionId)
 		.then(name => {
+			// TODO: We should map these in each class specifically since they are not currently shared.
+			//   The other option is switch on spell (only certain spells need tags)
 			if (actionMetric.tagIndex == 0) {
 				actionMetric.name = name;
-			} else {
+			} else if (actionMetric.tagIndex == 1) {
 				actionMetric.name = name + ' (LO)';
+			} else if (actionMetric.tagIndex == 2) {
+				actionMetric.name = name + ' (2 Tick)';
+			} else if (actionMetric.tagIndex == 3) {
+				actionMetric.name = name + ' (3 Tick)';
+			} else {
+				actionMetric.name = name + ' (??)';
 			}
 		})
 		.then(() => getIconUrl(actionMetric.actionId))
