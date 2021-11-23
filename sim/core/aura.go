@@ -69,14 +69,6 @@ type Aura struct {
 	Expires     time.Duration // Time at which aura will be removed.
 	activeIndex int32         // Position of this aura's index in the sim.activeAuraIDs array.
 
-<<<<<<< HEAD
-	onCastIndex           int32 // Position of this aura's index in the sim.onCastIDs array
-	onCastCompleteIndex   int32 // Position of this aura's index in the sim.onCastCompleteIDs array
-	onBeforeSpellHitIndex int32 // Position of this aura's index in the sim.onBeforeSpellHitIDs array
-	onSpellHitIndex       int32 // Position of this aura's index in the sim.onSpellHitIDs array
-	onSpellMissIndex      int32 // Position of this aura's index in the sim.onSpellMissIDs array
-	onPeriodicDamageIndex int32 // Position of this aura's index in the sim.onSpellMissIDs array
-=======
 	startTime time.Duration // Time at which the aura was applied.
 
 	onCastIndex           int32 // Position of this aura's index in the sim.onCastIDs array.
@@ -84,7 +76,7 @@ type Aura struct {
 	onBeforeSpellHitIndex int32 // Position of this aura's index in the sim.onBeforeSpellHitIDs array.
 	onSpellHitIndex       int32 // Position of this aura's index in the sim.onSpellHitIDs array.
 	onSpellMissIndex      int32 // Position of this aura's index in the sim.onSpellMissIDs array.
->>>>>>> ad2bbf7eae5b63a35939e048d1540d8ffe7004f8
+	onPeriodicDamageIndex int32 // Position of this aura's index in the sim.onPeriodicDamageIDs array.
 
 	// The number of stacks, or charges, of this aura. If this aura doesn't care
 	// about charges, is just 0.
@@ -156,10 +148,9 @@ type auraTracker struct {
 	// IDs of Auras that have a non-nil OnSpellMiss function set.
 	onSpellMissIDs []AuraID
 
-<<<<<<< HEAD
 	// IDs of Auras that have a non-nil OnPeriodicDamage function set.
 	onPeriodicDamageIDs []AuraID
-=======
+
 	// Metrics for each aura.
 	metrics []AuraMetrics
 }
@@ -177,7 +168,6 @@ func (auraMetrics *AuraMetrics) ToProto() *proto.AuraMetrics {
 
 		UptimeSeconds: auraMetrics.Uptime.Seconds(),
 	}
->>>>>>> ad2bbf7eae5b63a35939e048d1540d8ffe7004f8
 }
 
 func newAuraTracker(useDebuffIDs bool) auraTracker {
@@ -262,7 +252,6 @@ func (at *auraTracker) advance(sim *Simulation) {
 // This means that 'OnExpire' will not fire off on the old aura.
 func (at *auraTracker) ReplaceAura(sim *Simulation, newAura Aura) {
 	if at.HasAura(newAura.ID) {
-<<<<<<< HEAD
 		old := at.auras[newAura.ID]
 
 		// private cached state has to be copied over
@@ -273,10 +262,8 @@ func (at *auraTracker) ReplaceAura(sim *Simulation, newAura Aura) {
 		newAura.onSpellHitIndex = old.onSpellHitIndex
 		newAura.onSpellMissIndex = old.onSpellMissIndex
 		newAura.onPeriodicDamageIndex = old.onPeriodicDamageIndex
+		newAura.startTime = old.startTime
 
-=======
-		newAura.startTime = at.auras[newAura.ID].startTime
->>>>>>> ad2bbf7eae5b63a35939e048d1540d8ffe7004f8
 		at.auras[newAura.ID] = newAura
 		return
 	}
@@ -466,7 +453,6 @@ func (at *auraTracker) OnSpellHit(sim *Simulation, spellCast *SpellCast, spellEf
 	}
 }
 
-<<<<<<< HEAD
 // Invokes the OnPeriodicDamage
 //   As a debuff when target is being hit by dot.
 //   As a buff when caster's dots are ticking.
@@ -476,7 +462,8 @@ func (at *auraTracker) OnPeriodicDamage(sim *Simulation, spellCast *SpellCast, s
 	}
 
 	return tickDamage
-=======
+}
+
 func (at *auraTracker) AddAuraUptime(auraID AuraID, spellID int32, uptime time.Duration) {
 	metrics := &at.metrics[auraID]
 
@@ -494,7 +481,6 @@ func (at *auraTracker) GetMetricsProto() []*proto.AuraMetrics {
 	}
 
 	return metrics
->>>>>>> ad2bbf7eae5b63a35939e048d1540d8ffe7004f8
 }
 
 // Stored value is the time at which the ICD will be off CD

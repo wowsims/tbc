@@ -162,7 +162,7 @@ func (spriest *ShadowPriest) Act(sim *core.Simulation) time.Duration {
 			spell = spriest.NewSWD(sim, target)
 		} else {
 			spell = spriest.NewMindFlay(sim, target)
-			spell.Tag = 3 // default to 3 tick mf
+			spell.ActionID.Tag = 3 // default to 3 tick mf
 			mfLength := spriest.MindFlaySpell.DotInput.TickLength * time.Duration(spriest.MindFlaySpell.DotInput.NumberOfTicks)
 			wait = mfLength
 
@@ -184,7 +184,7 @@ func (spriest *ShadowPriest) Act(sim *core.Simulation) time.Duration {
 					numTicks := int(float64(core.GCDDefault)/float64(spriest.MindFlaySpell.DotInput.TickLength)) + 1
 					if numTicks < 4 {
 						spriest.MindFlaySpell.DotInput.NumberOfTicks = numTicks
-						spell.Tag = int32(numTicks)
+						spell.ActionID.Tag = int32(numTicks)
 					}
 					wait = spriest.MindFlaySpell.DotInput.TickLength * time.Duration(spriest.MindFlaySpell.DotInput.NumberOfTicks)
 				} else if minWait < spriest.MindFlaySpell.DotInput.TickLength {

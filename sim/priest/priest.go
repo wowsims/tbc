@@ -73,14 +73,11 @@ func (priest *Priest) Reset(newsim *core.Simulation) {
 	priest.VTSpell = core.SimpleSpell{}
 	priest.ShadowfiendSpell = core.SimpleSpell{}
 	priest.DevouringPlagueSpell = core.SimpleSpell{}
-
-	priest.Character.Reset(newsim)
 }
 
 func (priest *Priest) Advance(sim *core.Simulation, elapsedTime time.Duration) {
 	// druid should never be outside the 5s window, use combat regen.
 	priest.Character.RegenManaCasting(sim, elapsedTime)
-	priest.Character.Advance(sim, elapsedTime)
 }
 
 func (priest *Priest) Act(sim *core.Simulation) time.Duration {
@@ -147,8 +144,7 @@ var InnerFocusAuraID = core.NewAuraID()
 var InnerFocusCooldownID = core.NewCooldownID()
 
 func ApplyInnerFocus(sim *core.Simulation, priest *Priest) bool {
-	sim.MetricsAggregator.AddInstantCast(&priest.Character, core.ActionID{SpellID: 14751})
-
+	priest.Metrics.AddInstantCast(core.ActionID{SpellID: 14751})
 	priest.Character.AddAura(sim, core.Aura{
 		ID:      InnerFocusAuraID,
 		Name:    "Inner Focus",

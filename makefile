@@ -63,7 +63,14 @@ wasm: $(OUT_DIR)/lib.wasm
 
 # Builds the generic .wasm, with all items included.
 $(OUT_DIR)/lib.wasm: sim/wasm/* sim/core/proto/api.pb.go $(filter-out sim/core/items/all_items.go, $(call rwildcard,sim,*.go))
-	GOOS=js GOARCH=wasm go build -o ./$(OUT_DIR)/lib.wasm ./sim/wasm/
+	@echo "Starting webassembly compile now..."
+	@if GOOS=js GOARCH=wasm go build -o ./$(OUT_DIR)/lib.wasm ./sim/wasm/; then \
+		echo "\033[1;32mWASM compile successful.\033[0m"; \
+	else \
+		echo "\033[1;31mWASM COMPILE FAILED\033[0m"; \
+		exit 1; \
+	fi
+	
 
 # Generic sim_worker that uses the generic lib.wasm
 $(OUT_DIR)/sim_worker.js: ui/worker/sim_worker.js
@@ -92,6 +99,7 @@ devserver:
 		echo "\033[1;32mBuild Completed Succeessfully\033[0m"; \
 	else \
 		echo "\033[1;31mBUILD FAILED\033[0m"; \
+		exit 1; \
 	fi
 
 release: wowsimtbc
