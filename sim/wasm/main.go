@@ -85,7 +85,7 @@ func individualSim(this js.Value, args []js.Value) interface{} {
 		log.Printf("Failed to parse request: %s", err)
 		return nil
 	}
-	result := core.RunSimulation(isr)
+	result := core.RunIndividualSim(isr)
 
 	outbytes, err := googleProto.Marshal(result)
 	if err != nil {

@@ -3,82 +3,45 @@ package core
 import (
 	"math"
 	"time"
+
+	"github.com/wowsims/tbc/sim/core/proto"
 )
 
-// Returns a unique number based on an ActionID.
+// A unique number based on an ActionID.
 // This works by making item IDs negative to avoid collisions, and assumes
-// there are no collisions with OtherID.
+// there are no collisions with OtherID. Tag adds decimals.
 // Actual key values dont matter, just need something unique and fast to compute.
-type ActionKey struct {
-	ActionID int32
-	Tag      int32
+type ActionKey float64
+
+func NewActionKey(actionID ActionID) ActionKey {
+	return ActionKey(float64((int32(actionID.OtherID) + actionID.SpellID - actionID.ItemID)) + (float64(actionID.Tag) / 256))
 }
 
-func NewActionKey(actionID ActionID, tag int32) ActionKey {
-	return ActionKey{
-		ActionID: int32(actionID.OtherID) + actionID.SpellID - actionID.ItemID,
-		Tag:      tag,
-	}
+type CharacterMetrics struct {
+	CharacterIterationMetrics
+
+	// Aggregate values. These are updated after each iteration.
+	dpsSum        float64
+	dpsSumSquared float64
+	dpsMax        float64
+	dpsHist       map[int32]int32 // rounded DPS to count
+	numOom        int32
+	oomAtSum      float64
+	dpsAtOomSum   float64
+	actions       map[ActionKey]ActionMetrics
 }
 
-type MetricsAggregator struct {
-	// Duration of each iteration, in seconds
-	encounterDuration float64
-
-	startTime     time.Time
-	numIterations int
-
-	// Metrics for each Agent, for the current iteration
-	agentIterations []AgentIterationMetrics
-
-	// Aggregate values for each agent over all iterations
-	agentAggregates []AgentAggregateMetrics
-}
-
-type AgentIterationMetrics struct {
+// Metrics for the current iteration, for 1 agent. Keep this as a separate
+// struct so its easy to clear.
+type CharacterIterationMetrics struct {
 	TotalDamage float64
 	ManaSpent   float64
 	DamageAtOOM float64
 	OOMAt       time.Duration
 }
 
-type AgentAggregateMetrics struct {
-	DpsSum        float64
-	DpsSumSquared float64
-	DpsMax        float64
-	DpsHist       map[int32]int32 // rounded DPS to count
-
-	NumOom      int
-	OomAtSum    float64
-	DpsAtOomSum float64
-
-	Actions map[ActionKey]ActionMetric
-}
-
-type SimResult struct {
-	ExecutionDurationMs int64
-	Logs                string
-
-	Agents []AgentResult
-}
-
-type AgentResult struct {
-	DpsAvg   float64
-	DpsStDev float64
-	DpsMax   float64
-	DpsHist  map[int32]int32 // rounded DPS to count
-
-	NumOom      int
-	OomAtAvg    float64
-	DpsAtOomAvg float64
-
-	Actions []ActionMetric
-}
-
-type ActionMetric struct {
+type ActionMetrics struct {
 	ActionID ActionID
-
-	Tag int32
 
 	Casts  int32
 	Hits   int32
@@ -88,78 +51,66 @@ type ActionMetric struct {
 	Damage float64
 }
 
-func NewMetricsAggregator(numAgents int, encounterDuration float64) *MetricsAggregator {
-	aggregator := &MetricsAggregator{
-		encounterDuration: encounterDuration,
-		startTime:         time.Now(),
+func (actionMetrics *ActionMetrics) ToProto() *proto.ActionMetrics {
+	return &proto.ActionMetrics{
+		Id: actionMetrics.ActionID.ToProto(),
+
+		Casts:  actionMetrics.Casts,
+		Hits:   actionMetrics.Hits,
+		Crits:  actionMetrics.Crits,
+		Misses: actionMetrics.Misses,
+		Damage: actionMetrics.Damage,
 	}
-
-	for i := 0; i < numAgents; i++ {
-		aggregator.agentIterations = append(aggregator.agentIterations, AgentIterationMetrics{})
-		aggregator.agentAggregates = append(aggregator.agentAggregates, AgentAggregateMetrics{})
-
-		aggregator.agentAggregates[i].Actions = make(map[ActionKey]ActionMetric)
-		aggregator.agentAggregates[i].DpsHist = make(map[int32]int32)
-	}
-
-	return aggregator
 }
 
-func (aggregator *MetricsAggregator) addCastInternal(character *Character, actionID ActionID, tag int32, manaCost float64) {
-	actionKey := NewActionKey(actionID, tag)
+func NewCharacterMetrics() CharacterMetrics {
+	return CharacterMetrics{
+		dpsHist: make(map[int32]int32),
+		actions: make(map[ActionKey]ActionMetrics),
+	}
+}
 
-	agentID := character.ID
+func (characterMetrics *CharacterMetrics) addCastInternal(actionID ActionID, manaCost float64) {
+	characterMetrics.ManaSpent += manaCost
 
-	iterationMetrics := &aggregator.agentIterations[agentID]
-	iterationMetrics.ManaSpent += manaCost
-
-	aggregateMetrics := &aggregator.agentAggregates[agentID]
-	actionMetrics, ok := aggregateMetrics.Actions[actionKey]
+	actionKey := NewActionKey(actionID)
+	actionMetrics, ok := characterMetrics.actions[actionKey]
 
 	if !ok {
 		actionMetrics.ActionID = actionID
-		actionMetrics.Tag = tag
 	}
 
 	actionMetrics.Casts++
 
-	aggregateMetrics.Actions[actionKey] = actionMetrics
+	characterMetrics.actions[actionKey] = actionMetrics
 }
 
-func (aggregator *MetricsAggregator) AddInstantCast(character *Character, actionID ActionID) {
-	aggregator.addCastInternal(character, actionID, 0, 0)
+func (characterMetrics *CharacterMetrics) AddInstantCast(actionID ActionID) {
+	characterMetrics.addCastInternal(actionID, 0)
 }
 
 // Adds the results of a cast to the aggregated metrics.
-func (aggregator *MetricsAggregator) AddCast(cast *Cast) {
+func (characterMetrics *CharacterMetrics) AddCast(cast *Cast) {
 	manaCost := cast.ManaCost
 	if cast.IgnoreManaCost {
 		manaCost = 0
 	}
 
-	aggregator.addCastInternal(cast.Character, cast.ActionID, cast.Tag, manaCost)
+	characterMetrics.addCastInternal(cast.ActionID, manaCost)
 }
 
 // Adds the results of an action to the aggregated metrics.
-func (aggregator *MetricsAggregator) AddSpellCast(spellCast *SpellCast) {
-	actionID := spellCast.ActionID
-	tag := spellCast.Tag
-
-	actionKey := NewActionKey(actionID, tag)
-
-	agentID := spellCast.Character.ID
-
-	iterationMetrics := &aggregator.agentIterations[agentID]
+func (characterMetrics *CharacterMetrics) AddSpellCast(spellCast *SpellCast) {
 	if !spellCast.IgnoreManaCost {
-		iterationMetrics.ManaSpent += spellCast.ManaCost
+		characterMetrics.ManaSpent += spellCast.ManaCost
 	}
 
-	aggregateMetrics := &aggregator.agentAggregates[agentID]
-	actionMetrics, ok := aggregateMetrics.Actions[actionKey]
+	actionID := spellCast.ActionID
+	actionKey := NewActionKey(actionID)
+	actionMetrics, ok := characterMetrics.actions[actionKey]
 
 	if !ok {
 		actionMetrics.ActionID = actionID
-		actionMetrics.Tag = tag
 	}
 
 	actionMetrics.Casts++
@@ -167,79 +118,63 @@ func (aggregator *MetricsAggregator) AddSpellCast(spellCast *SpellCast) {
 	actionMetrics.Misses += spellCast.Misses
 	actionMetrics.Crits += spellCast.Crits
 	actionMetrics.Damage += spellCast.TotalDamage
-	iterationMetrics.TotalDamage += spellCast.TotalDamage
+	characterMetrics.TotalDamage += spellCast.TotalDamage
 
-	aggregateMetrics.Actions[actionKey] = actionMetrics
+	characterMetrics.actions[actionKey] = actionMetrics
 }
 
-func (aggregator *MetricsAggregator) MarkOOM(sim *Simulation, character *Character, oomAtTime time.Duration) {
-	agentID := character.ID
-
-	if aggregator.agentIterations[agentID].OOMAt == 0 {
+func (characterMetrics *CharacterMetrics) MarkOOM(sim *Simulation, character *Character) {
+	if characterMetrics.OOMAt == 0 {
 		if sim.Log != nil {
 			sim.Log("(%d) Went OOM!\n", character.ID)
 		}
-		aggregator.agentIterations[agentID].DamageAtOOM = aggregator.agentIterations[agentID].TotalDamage
-		aggregator.agentIterations[agentID].OOMAt = oomAtTime
+		characterMetrics.DamageAtOOM = characterMetrics.TotalDamage
+		characterMetrics.OOMAt = sim.CurrentTime
 	}
 }
 
 // This should be called when a Sim iteration is complete.
-func (aggregator *MetricsAggregator) doneIteration() {
-	aggregator.numIterations++
+func (characterMetrics *CharacterMetrics) doneIteration(encounterDurationSeconds float64) {
+	dps := characterMetrics.TotalDamage / encounterDurationSeconds
+	// log.Printf("total: %0.1f, dur: %0.1f, dps: %0.1f", metrics.TotalDamage, encounterDurationSeconds, dps)
 
-	// Loop for each agent
-	for i, iterationMetrics := range aggregator.agentIterations {
-		aggregateMetrics := &aggregator.agentAggregates[i]
+	characterMetrics.dpsSum += dps
+	characterMetrics.dpsSumSquared += dps * dps
+	characterMetrics.dpsMax = MaxFloat(characterMetrics.dpsMax, dps)
 
-		dps := iterationMetrics.TotalDamage / aggregator.encounterDuration
-		// log.Printf("total: %0.1f, dur: %0.1f, dps: %0.1f", metrics.TotalDamage, aggregator.encounterDuration, dps)
+	dpsRounded := int32(math.Round(dps/10) * 10)
+	characterMetrics.dpsHist[dpsRounded]++
 
-		aggregateMetrics.DpsSum += dps
-		aggregateMetrics.DpsSumSquared += dps * dps
-		aggregateMetrics.DpsMax = MaxFloat(aggregateMetrics.DpsMax, dps)
-
-		dpsRounded := int32(math.Round(dps/10) * 10)
-		aggregateMetrics.DpsHist[dpsRounded]++
-
-		if iterationMetrics.OOMAt > 0 {
-			aggregateMetrics.NumOom++
-			aggregateMetrics.OomAtSum += float64(iterationMetrics.OOMAt)
-			aggregateMetrics.DpsAtOomSum += float64(iterationMetrics.DamageAtOOM) / float64(iterationMetrics.OOMAt.Seconds())
-		}
-
-		// Clear the iteration metrics
-		aggregator.agentIterations[i] = AgentIterationMetrics{}
+	if characterMetrics.OOMAt > 0 {
+		characterMetrics.numOom++
+		characterMetrics.oomAtSum += float64(characterMetrics.OOMAt)
+		characterMetrics.dpsAtOomSum += float64(characterMetrics.DamageAtOOM) / float64(characterMetrics.OOMAt.Seconds())
 	}
+
+	// Clear the iteration metrics
+	characterMetrics.CharacterIterationMetrics = CharacterIterationMetrics{}
 }
 
-func (aggregator *MetricsAggregator) getResult() SimResult {
-	result := SimResult{}
-	result.ExecutionDurationMs = time.Since(aggregator.startTime).Milliseconds()
+func (characterMetrics *CharacterMetrics) ToProto(numIterations int32) *proto.PlayerMetrics {
+	dpsAvg := characterMetrics.dpsSum / float64(numIterations)
 
-	numIterations := float64(aggregator.numIterations)
-	numAgents := len(aggregator.agentAggregates)
+	protoMetrics := &proto.PlayerMetrics{
+		DpsAvg:   dpsAvg,
+		DpsStdev: math.Sqrt((characterMetrics.dpsSumSquared / float64(numIterations)) - (dpsAvg * dpsAvg)),
+		DpsMax:   characterMetrics.dpsMax,
+		DpsHist:  characterMetrics.dpsHist,
 
-	result.Agents = make([]AgentResult, numAgents)
-	for i := 0; i < numAgents; i++ {
-		agentAggregate := &aggregator.agentAggregates[i]
-		agentResult := &result.Agents[i]
-
-		agentResult.DpsAvg = agentAggregate.DpsSum / numIterations
-		agentResult.DpsStDev = math.Sqrt((agentAggregate.DpsSumSquared / numIterations) - (agentResult.DpsAvg * agentResult.DpsAvg))
-		agentResult.DpsMax = agentAggregate.DpsMax
-		agentResult.DpsHist = agentAggregate.DpsHist
-
-		agentResult.NumOom = agentAggregate.NumOom
-		if agentResult.NumOom > 0 {
-			agentResult.OomAtAvg = agentAggregate.OomAtSum / float64(agentAggregate.NumOom)
-			agentResult.DpsAtOomAvg = agentAggregate.DpsAtOomSum / float64(agentAggregate.NumOom)
-		}
-
-		for _, action := range agentAggregate.Actions {
-			agentResult.Actions = append(agentResult.Actions, action)
-		}
+		NumOom: characterMetrics.numOom,
 	}
 
-	return result
+	if characterMetrics.numOom > 0 {
+		protoMetrics.OomAtAvg = characterMetrics.oomAtSum / float64(characterMetrics.numOom)
+		protoMetrics.DpsAtOomAvg = characterMetrics.dpsAtOomSum / float64(characterMetrics.numOom)
+	}
+
+	for _, action := range characterMetrics.actions {
+		protoMetrics.Actions = append(protoMetrics.Actions, action.ToProto())
+	}
+
+	return protoMetrics
 }

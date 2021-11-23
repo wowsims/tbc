@@ -22,7 +22,8 @@ type Agent interface {
 	// Use this to do any precomputations that require access to Sim or Target fields.
 	Init(sim *Simulation)
 
-	// Returns this Agent to its initial state. Called before each Sim iteration.
+	// Returns this Agent to its initial state. Called before each Sim iteration
+	// and once after the final iteration.
 	Reset(sim *Simulation)
 
 	// Allows the Agent to take whatever actions it wants to. This is called by
@@ -37,11 +38,30 @@ type Agent interface {
 }
 
 type ActionID struct {
-	SpellID    int32
-	ItemID     int32
+	// Only one of these should be set.
+	SpellID int32
+	ItemID  int32
+	OtherID proto.OtherAction
+
+	Tag int32
+
 	CooldownID CooldownID // used only for tracking CDs internally
-	OtherID    proto.OtherAction
-	// Can add future id types here.
+}
+
+func (actionID ActionID) ToProto() *proto.ActionID {
+	protoID := &proto.ActionID{
+		Tag: actionID.Tag,
+	}
+
+	if actionID.SpellID != 0 {
+		protoID.RawId = &proto.ActionID_SpellId{SpellId: actionID.SpellID}
+	} else if actionID.ItemID != 0 {
+		protoID.RawId = &proto.ActionID_ItemId{ItemId: actionID.ItemID}
+	} else if actionID.OtherID != 0 {
+		protoID.RawId = &proto.ActionID_OtherId{OtherId: actionID.OtherID}
+	}
+
+	return protoID
 }
 
 type AgentFactory func(Character, proto.PlayerOptions, proto.IndividualSimRequest) Agent

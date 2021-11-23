@@ -188,7 +188,7 @@ func (spellEffect *SpellEffect) applyDot(sim *Simulation, spellCast *SpellCast, 
 
 		// Complete metrics and adding results etc
 		spellEffect.applyResultsToCast(spellCast)
-		sim.MetricsAggregator.AddSpellCast(spellCast)
+		spellCast.Character.Metrics.AddSpellCast(spellCast)
 		spellCast.objectInUse = false
 
 		// Kills the pending action from the main run loop.

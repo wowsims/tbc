@@ -26,9 +26,6 @@ type Cast struct {
 	// The name of the cast action, e.g. 'Shadowbolt'.
 	Name string
 
-	// Subcategory for this action, for metrics.
-	Tag int32
-
 	// The character performing this action.
 	Character *Character
 
@@ -86,10 +83,6 @@ func (cast *Cast) GetName() string {
 	return cast.Name
 }
 
-func (cast *Cast) GetTag() int32 {
-	return cast.Tag
-}
-
 func (cast *Cast) GetCharacter() *Character {
 	return cast.Character
 }
@@ -136,7 +129,7 @@ func (cast *Cast) startCasting(sim *Simulation, onCastComplete OnCastComplete) b
 				sim.Log("(%d) Failed casting %s, not enough mana. (Current Mana = %0.0f, Mana Cost = %0.0f)\n",
 					cast.Character.ID, cast.Name, cast.Character.CurrentMana(), cast.ManaCost)
 			}
-			sim.MetricsAggregator.MarkOOM(sim, cast.Character, sim.CurrentTime)
+			cast.Character.Metrics.MarkOOM(sim, cast.Character)
 			cast.objectInUse = false // cast failed and we aren't using it
 			return false
 		}
@@ -151,12 +144,9 @@ func (cast *Cast) startCasting(sim *Simulation, onCastComplete OnCastComplete) b
 	if cast.CastTime == 0 {
 		cast.internalOnComplete(sim, onCastComplete)
 	} else {
-		cast.Character.HardcastAura = Aura{
-			Expires: sim.CurrentTime + cast.CastTime,
-			OnExpire: func(sim *Simulation) {
-				cast.internalOnComplete(sim, onCastComplete)
-			},
-		}
+		cast.Character.Hardcast.Expires = sim.CurrentTime + cast.CastTime
+		cast.Character.Hardcast.Cast = cast
+		cast.Character.Hardcast.OnComplete = onCastComplete
 	}
 
 	if !cast.IgnoreCooldowns {
@@ -212,9 +202,19 @@ func (simpleCast *SimpleCast) Init(sim *Simulation) {
 // TODO: Need to rename this. Cant call it Cast() because of conflict with field of the same name.
 func (simpleCast *SimpleCast) StartCast(sim *Simulation) bool {
 	return simpleCast.Cast.startCasting(sim, func(sim *Simulation, cast *Cast) {
-		sim.MetricsAggregator.AddCast(cast)
+		cast.Character.Metrics.AddCast(cast)
 		if simpleCast.OnCastComplete != nil {
 			simpleCast.OnCastComplete(sim, cast)
 		}
 	})
+}
+
+type Hardcast struct {
+	Cast       *Cast
+	Expires    time.Duration
+	OnComplete OnCastComplete
+}
+
+func (hc Hardcast) OnExpire(sim *Simulation) {
+	hc.Cast.internalOnComplete(sim, hc.OnComplete)
 }

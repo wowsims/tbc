@@ -123,8 +123,8 @@ export class Results extends Component {
     this.hideAll();
     this.simElem.style.display = 'initial';
     this.simDpsElem.innerHTML = `
-      <span class="results-sim-dps-avg">${result.dpsAvg.toFixed(2)}</span>
-      <span class="results-sim-dps-stdev">${result.dpsStdev.toFixed(2)}</span>
+      <span class="results-sim-dps-avg">${result.playerMetrics!.dpsAvg.toFixed(2)}</span>
+      <span class="results-sim-dps-stdev">${result.playerMetrics!.dpsStdev.toFixed(2)}</span>
     `;
 
 		this.updateReference();
@@ -132,6 +132,27 @@ export class Results extends Component {
 
   setStatWeights(request: StatWeightsRequest, result: StatWeightsResult, epStats: Array<Stat>) {
 		const iterations = request.options!.simOptions!.iterations;
+	if (request.epReferenceStat == Stat.StatSpellPower) {
+
+		result.epValues.forEach( (value, index) => {
+			if (
+			index == Stat.StatArcaneSpellPower ||
+			index == Stat.StatFireSpellPower ||
+			index == Stat.StatFrostSpellPower ||
+			index == Stat.StatHolySpellPower ||
+			index == Stat.StatNatureSpellPower ||
+			index == Stat.StatShadowSpellPower) {
+				if (value > result.epValues[request.epReferenceStat]) {
+					const diff = value - result.epValues[request.epReferenceStat];
+					result.epValues[index] = result.epValues[request.epReferenceStat];
+					result.epValuesStdev[index] -= diff;
+					const wdiff = result.weights[index] - result.weights[request.epReferenceStat];
+					result.weights[index] = result.weights[request.epReferenceStat];
+					result.weightsStdev[index] -= wdiff;
+				}
+			}
+		});		
+	}
 
     this.hideAll();
     this.epElem.style.display = 'initial';
@@ -178,7 +199,7 @@ export class Results extends Component {
 		}
 		this.simReferenceElem.classList.add('has-reference');
 
-		const delta = this.currentData.result.dpsAvg - this.referenceData.result.dpsAvg;
+		const delta = this.currentData.result.playerMetrics!.dpsAvg - this.referenceData.result.playerMetrics!.dpsAvg;
 		const deltaStr = delta.toFixed(2);
 		if (delta >= 0) {
 			this.simReferenceDiffElem.textContent = '+' + deltaStr;

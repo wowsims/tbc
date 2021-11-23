@@ -15,6 +15,7 @@ type Druid struct {
 
 	innervateCD  time.Duration
 	NaturesGrace bool // when true next spellcast is 0.5s faster
+	RebirthUsed  bool
 
 	// cached cast stuff
 	starfireSpell         core.SimpleSpell
@@ -77,14 +78,12 @@ func (druid *Druid) Reset(newsim *core.Simulation) {
 	druid.InsectSwarmSpell = core.SimpleSpell{}
 	druid.starfireSpell = core.SimpleSpell{}
 	druid.wrathSpell = core.SimpleSpell{}
-
-	druid.Character.Reset(newsim)
+	druid.RebirthUsed = false
 }
 
 func (druid *Druid) Advance(sim *core.Simulation, elapsedTime time.Duration) {
 	// druid should never be outside the 5s window, use combat regen.
 	druid.Character.RegenManaCasting(sim, elapsedTime)
-	druid.Character.Advance(sim, elapsedTime)
 }
 
 func (druid *Druid) Act(sim *core.Simulation) time.Duration {
@@ -219,10 +218,11 @@ func NewDruid(char core.Character, selfBuffs SelfBuffs, talents proto.DruidTalen
 	}
 
 	druid := Druid{
-		Character: char,
-		SelfBuffs: selfBuffs,
-		Talents:   talents,
-		malorne4p: ItemSetMalorne.CharacterHasSetBonus(&char, 4),
+		Character:   char,
+		SelfBuffs:   selfBuffs,
+		Talents:     talents,
+		malorne4p:   ItemSetMalorne.CharacterHasSetBonus(&char, 4),
+		RebirthUsed: false,
 	}
 
 	druid.registerNaturesSwiftnessCD()
@@ -269,7 +269,7 @@ func (druid *Druid) registerNaturesSwiftnessCD() {
 						character.SetCD(NaturesSwiftnessCooldownID, sim.CurrentTime+time.Minute*3)
 						character.RemoveAura(sim, NaturesSwiftnessAuraID)
 						character.UpdateMajorCooldowns(sim)
-						sim.MetricsAggregator.AddInstantCast(character, core.ActionID{SpellID: 17116})
+						character.Metrics.AddInstantCast(core.ActionID{SpellID: 17116})
 					},
 				})
 				return true

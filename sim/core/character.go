@@ -53,19 +53,23 @@ type Character struct {
 
 	// Used for applying the effects of hardcast / channeled spells at a later time.
 	// By definition there can be only 1 hardcast spell being cast at any moment.
-	HardcastAura Aura
+	Hardcast Hardcast
+
+	// Statistics describing the results of the sim.
+	Metrics CharacterMetrics
 }
 
 func NewCharacter(player proto.Player) Character {
 	character := Character{
-		Race:        player.Options.Race,
-		Class:       player.Options.Class,
-		Equip:       items.ProtoToEquipment(*player.Equipment),
+		Race:  player.Options.Race,
+		Class: player.Options.Class,
+		Equip: items.ProtoToEquipment(*player.Equipment),
 		PseudoStats: stats.PseudoStats{
 			CastSpeedMultiplier:   1,
 			SpiritRegenMultiplier: 1,
 		},
 		auraTracker: newAuraTracker(false),
+		Metrics:     NewCharacterMetrics(),
 	}
 
 	if player.Options.Consumes != nil {
@@ -224,7 +228,7 @@ func (character *Character) Finalize() {
 	character.majorCooldownManager.finalize(character)
 }
 
-func (character *Character) Reset(sim *Simulation) {
+func (character *Character) reset(sim *Simulation) {
 	character.stats = character.initialStats
 	character.PseudoStats = character.initialPseudoStats
 
@@ -234,13 +238,13 @@ func (character *Character) Reset(sim *Simulation) {
 }
 
 // Advance moves time forward counting down auras, CDs, mana regen, etc
-func (character *Character) Advance(sim *Simulation, elapsedTime time.Duration) {
+func (character *Character) advance(sim *Simulation, elapsedTime time.Duration) {
 	// Advance CDs and Auras
 	character.auraTracker.advance(sim)
 
-	if character.HardcastAura.Expires != 0 && character.HardcastAura.Expires <= sim.CurrentTime {
-		character.HardcastAura.OnExpire(sim)
-		character.HardcastAura = Aura{}
+	if character.Hardcast.Expires != 0 && character.Hardcast.Expires <= sim.CurrentTime {
+		character.Hardcast.OnExpire(sim)
+		character.Hardcast.Expires = 0
 	}
 }
 
@@ -279,7 +283,7 @@ func (character *Character) manaRegenPerSecondWhileNotCasting() float64 {
 }
 
 func (character *Character) addMana(amount float64) {
-	character.stats[stats.Mana] = MinFloat(character.stats[stats.Mana] + amount, character.MaxMana())
+	character.stats[stats.Mana] = MinFloat(character.stats[stats.Mana]+amount, character.MaxMana())
 }
 
 // Regenerates mana based on MP5 stat, spirit regen allowed while casting and the elapsed time.
@@ -303,7 +307,7 @@ func (character *Character) RegenMana(sim *Simulation, elapsedTime time.Duration
 		// so regen is a combination of casting and not-casting regen.
 		notCastingRegenTime := sim.CurrentTime - character.PseudoStats.FiveSecondRuleRefreshTime // how many seconds of full spirit regen
 		castingRegenTime := elapsedTime - notCastingRegenTime
-		regen = (character.manaRegenPerSecondWhileNotCasting()*notCastingRegenTime.Seconds()) + (character.manaRegenPerSecondWhileCasting()*castingRegenTime.Seconds())
+		regen = (character.manaRegenPerSecondWhileNotCasting() * notCastingRegenTime.Seconds()) + (character.manaRegenPerSecondWhileCasting() * castingRegenTime.Seconds())
 	} else {
 		regen = character.manaRegenPerSecondWhileCasting() * elapsedTime.Seconds()
 	}
@@ -322,14 +326,14 @@ func (character *Character) RegenMana(sim *Simulation, elapsedTime time.Duration
 func (character *Character) TimeUntilManaRegen(desiredMana float64) time.Duration {
 	// +1 at the end is to deal with floating point math rounding errors.
 	manaNeeded := desiredMana - character.CurrentMana()
-	regenTime := DurationFromSeconds(manaNeeded / character.manaRegenPerSecondWhileCasting()) + 1
+	regenTime := DurationFromSeconds(manaNeeded/character.manaRegenPerSecondWhileCasting()) + 1
 
 	// TODO: this needs to have access to the sim to see current time vs character.PseudoStats.FiveSecondRule.
 	//  it is possible that we have been waiting.
 	//  In practice this function is always used right after a previous cast so no big deal for now.
 	if regenTime > time.Second*5 {
 		regenTime = time.Second * 5
-		manaNeeded -= character.manaRegenPerSecondWhileCasting()*5
+		manaNeeded -= character.manaRegenPerSecondWhileCasting() * 5
 		// now we move into spirit based regen.
 		regenTime += DurationFromSeconds(manaNeeded / character.manaRegenPerSecondWhileNotCasting())
 	}
@@ -349,6 +353,12 @@ func (character *Character) HasMetaGemEquipped(gemID int32) bool {
 		}
 	}
 	return false
+}
+
+func (character *Character) GetMetricsProto(numIterations int32) *proto.PlayerMetrics {
+	metrics := character.Metrics.ToProto(numIterations)
+	metrics.Auras = character.auraTracker.GetMetricsProto()
+	return metrics
 }
 
 type BaseStatsKey struct {

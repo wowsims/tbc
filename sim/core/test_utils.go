@@ -109,16 +109,15 @@ func StatWeightsTest(label string, t *testing.T, isr *proto.IndividualSimRequest
 //   This is where we can add more sophisticated checks if we would like.
 //   Any changes to the damage output of an item set
 func IndividualSimTest(label string, t *testing.T, isr *proto.IndividualSimRequest, expectedDps float64) {
-	sim := NewIndividualSim(*isr)
-	result := sim.Run()
+	result := RunIndividualSim(isr)
 
 	tolerance := 0.5
-	if result.Agents[0].DpsAvg < expectedDps-tolerance || result.Agents[0].DpsAvg > expectedDps+tolerance {
+	if result.PlayerMetrics.DpsAvg < expectedDps-tolerance || result.PlayerMetrics.DpsAvg > expectedDps+tolerance {
 		// Automatically print output if we had debugging enabled.
 		if isr.SimOptions.Debug {
 			log.Printf("LOGS:\n%s\n", result.Logs)
 		}
-		t.Fatalf("%s failed: expected %0f dps from sim but was %0f", label, expectedDps, result.Agents[0].DpsAvg)
+		t.Fatalf("%s failed: expected %0f dps from sim but was %0f", label, expectedDps, result.PlayerMetrics.DpsAvg)
 	}
 }
 
@@ -126,16 +125,15 @@ func IndividualSimAverageTest(label string, t *testing.T, isr *proto.IndividualS
 	isr.Encounter.Duration = LongDuration
 	isr.SimOptions.Iterations = 10000
 
-	sim := NewIndividualSim(*isr)
-	result := sim.Run()
+	result := RunIndividualSim(isr)
 
 	if isr.SimOptions.Debug {
 		log.Printf("LOGS:\n%s\n", result.Logs)
 	}
 
 	tolerance := 0.5
-	if result.Agents[0].DpsAvg < expectedDps-tolerance || result.Agents[0].DpsAvg > expectedDps+tolerance {
-		t.Fatalf("%s failed: expected %0f dps from sim but was %0f", label, expectedDps, result.Agents[0].DpsAvg)
+	if result.PlayerMetrics.DpsAvg < expectedDps-tolerance || result.PlayerMetrics.DpsAvg > expectedDps+tolerance {
+		t.Fatalf("%s failed: expected %0f dps from sim but was %0f", label, expectedDps, result.PlayerMetrics.DpsAvg)
 	}
 }
 
