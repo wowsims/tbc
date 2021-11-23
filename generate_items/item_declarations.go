@@ -17,13 +17,6 @@ const CasterCategory = proto.ItemCategory_ItemCategoryCaster
 
 // Keep these sorted alphabetically by item Name.
 var ItemDeclarations = []ItemDeclaration{
-	/** Avatar Regalia placed together here because their names don't start the same.**/
-	{ /** Handguards of the Avatar */ ID: 30160, Categories: []proto.ItemCategory{CasterCategory}},
-	{ /** Hood of the Avatar */ ID: 30161, Categories: []proto.ItemCategory{CasterCategory}},
-	{ /** Leggings of the Avatar */ ID: 30162, Categories: []proto.ItemCategory{CasterCategory}},
-	{ /** Shroud of the Avatar */ ID: 30159, Categories: []proto.ItemCategory{CasterCategory}},
-	{ /** Wings of the Avatar */ ID: 30163, Categories: []proto.ItemCategory{CasterCategory}},
-
 	{ /** A'dal's Gift */ ID: 31461, Categories: []proto.ItemCategory{CasterCategory}},
 	{ /** Adornment of Stolen Souls */ ID: 28762, Categories: []proto.ItemCategory{CasterCategory}},
 	{ /** Amani Punisher */ ID: 33283, Categories: []proto.ItemCategory{CasterCategory}},
@@ -184,6 +177,7 @@ var ItemDeclarations = []ItemDeclaration{
 	{ /** Grips of Nature's Wrath */ ID: 33534, Categories: []proto.ItemCategory{CasterCategory}},
 	{ /** Hammer of Judgement */ ID: 34009, Categories: []proto.ItemCategory{CasterCategory}},
 	{ /** Handguards of Defiled Worlds */ ID: 34344, Categories: []proto.ItemCategory{CasterCategory}},
+	{ /** Handguards of the Avatar */ ID: 30160, Categories: []proto.ItemCategory{CasterCategory}},
 	{ /** Handwraps of Flowing Thought */ ID: 28507, Categories: []proto.ItemCategory{CasterCategory}},
 	{ /** Haramad's Leggings of the Third Coin */ ID: 29343, Categories: []proto.ItemCategory{CasterCategory}},
 	{ /** Harbringer Bands */ ID: 28477, Categories: []proto.ItemCategory{CasterCategory}},
@@ -194,6 +188,7 @@ var ItemDeclarations = []ItemDeclaration{
 	{ /** Helm of Arcane Purity */ ID: 34405, Categories: []proto.ItemCategory{CasterCategory}},
 	{ /** Hex Shrunken Head */ ID: 33829, Categories: []proto.ItemCategory{CasterCategory}},
 	{ /** Hood of Oblivion */ ID: 28415, Categories: []proto.ItemCategory{CasterCategory}},
+	{ /** Hood of the Avatar */ ID: 30161, Categories: []proto.ItemCategory{CasterCategory}},
 	{ /** Hortus' Seal of Brilliance */ ID: 27534, Categories: []proto.ItemCategory{CasterCategory}},
 	{ /** Hurricane Boots */ ID: 30043, Categories: []proto.ItemCategory{CasterCategory}},
 	{ /** Hydra-fang Necklace */ ID: 27758, Categories: []proto.ItemCategory{CasterCategory}},
@@ -223,6 +218,7 @@ var ItemDeclarations = []ItemDeclaration{
 	{ /** Leggings of Devastation */ ID: 32367, Categories: []proto.ItemCategory{CasterCategory}},
 	{ /** Leggings of Elemental Fury */ ID: 23665, Categories: []proto.ItemCategory{CasterCategory}},
 	{ /** Leggings of Polarity */ ID: 23070, Categories: []proto.ItemCategory{CasterCategory}},
+	{ /** Leggings of the Avatar */ ID: 30162, Categories: []proto.ItemCategory{CasterCategory}},
 	{ /** Leggings of the Seventh Circle */ ID: 30734, Categories: []proto.ItemCategory{CasterCategory}},
 	{ /** Leggings of the Third Coin */ ID: 29314, Categories: []proto.ItemCategory{CasterCategory}},
 	{ /** Lightning Crown */ ID: 31330, Categories: []proto.ItemCategory{CasterCategory}},
@@ -341,6 +337,7 @@ var ItemDeclarations = []ItemDeclaration{
 	{ /** Shifting Naaru Sliver */ ID: 34429, Categories: []proto.ItemCategory{CasterCategory}},
 	{ /** Shimmering Azure Boots */ ID: 29808, Categories: []proto.ItemCategory{CasterCategory}},
 	{ /** Shoulderpads of Knowledge's Pursuit */ ID: 34393, Categories: []proto.ItemCategory{CasterCategory}},
+	{ /** Shroud of the Avatar */ ID: 30159, Categories: []proto.ItemCategory{CasterCategory}},
 	{ /** Shroud of the Highborne */ ID: 32524, Categories: []proto.ItemCategory{CasterCategory}},
 	{ /** Sigil-Laced Boots */ ID: 28406, Categories: []proto.ItemCategory{CasterCategory}},
 	{ /** Silvermoon Crest Shield */ ID: 27910, Categories: []proto.ItemCategory{CasterCategory}},
@@ -461,6 +458,7 @@ var ItemDeclarations = []ItemDeclaration{
 	{ /** Windhawk Hauberk */ ID: 29522, Categories: []proto.ItemCategory{CasterCategory}},
 	{ /** Windscale Hood */ ID: 29504, Categories: []proto.ItemCategory{CasterCategory}},
 	{ /** Windshear Boots */ ID: 28810, Categories: []proto.ItemCategory{CasterCategory}},
+	{ /** Wings of the Avatar */ ID: 30163, Categories: []proto.ItemCategory{CasterCategory}},
 	{ /** Wand of the Forgotten Star */ ID: 29982, Categories: []proto.ItemCategory{CasterCategory}},
 	{ /** World's End Bracers */ ID: 27522, Categories: []proto.ItemCategory{CasterCategory}},
 	{ /** Worldfire Chestguard */ ID: 28391, Categories: []proto.ItemCategory{CasterCategory}},
