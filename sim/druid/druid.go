@@ -15,7 +15,7 @@ type Druid struct {
 
 	innervateCD  time.Duration
 	NaturesGrace bool // when true next spellcast is 0.5s faster
-	RebirthUsed bool
+	RebirthUsed  bool
 
 	// cached cast stuff
 	starfireSpell         core.SimpleSpell
@@ -218,10 +218,10 @@ func NewDruid(char core.Character, selfBuffs SelfBuffs, talents proto.DruidTalen
 	}
 
 	druid := Druid{
-		Character: char,
-		SelfBuffs: selfBuffs,
-		Talents:   talents,
-		malorne4p: ItemSetMalorne.CharacterHasSetBonus(&char, 4),
+		Character:   char,
+		SelfBuffs:   selfBuffs,
+		Talents:     talents,
+		malorne4p:   ItemSetMalorne.CharacterHasSetBonus(&char, 4),
 		RebirthUsed: false,
 	}
 
@@ -285,7 +285,7 @@ func init() {
 		stats.Stamina:   85,
 		stats.Intellect: 115,
 		stats.Spirit:    135,
-		stats.Mana:      2090,  // 3815 mana shown on naked character
+		stats.Mana:      2370,
 		stats.SpellCrit: 40.66, // 3.29% chance to crit shown on naked character screen
 		// 4498 health shown on naked character (would include tauren bonus)
 	}
@@ -295,7 +295,7 @@ func init() {
 		stats.Stamina:   82,
 		stats.Intellect: 120,
 		stats.Spirit:    133,
-		stats.Mana:      2090,  // 3890 mana shown on naked character
+		stats.Mana:      2370,
 		stats.SpellCrit: 40.60, // 3.35% chance to crit shown on naked character screen
 		// 4254 health shown on naked character
 	}

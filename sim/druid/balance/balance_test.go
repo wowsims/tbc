@@ -123,5 +123,5 @@ func TestAverageDPS(t *testing.T) {
 		PlayerOptions: PlayerOptionsStarfire,
 	})
 
-	core.IndividualSimAverageTest("P1Average", t, isr, 1258.8)
+	core.IndividualSimAverageTest("P1Average", t, isr, 1258.1)
 }

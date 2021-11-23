@@ -61,15 +61,15 @@ type Character struct {
 
 func NewCharacter(player proto.Player) Character {
 	character := Character{
-		Race:        player.Options.Race,
-		Class:       player.Options.Class,
-		Equip:       items.ProtoToEquipment(*player.Equipment),
+		Race:  player.Options.Race,
+		Class: player.Options.Class,
+		Equip: items.ProtoToEquipment(*player.Equipment),
 		PseudoStats: stats.PseudoStats{
 			CastSpeedMultiplier:   1,
 			SpiritRegenMultiplier: 1,
 		},
 		auraTracker: newAuraTracker(false),
-		Metrics: NewCharacterMetrics(),
+		Metrics:     NewCharacterMetrics(),
 	}
 
 	if player.Options.Consumes != nil {
@@ -97,7 +97,9 @@ func NewCharacter(player proto.Player) Character {
 		SourceStat:   stats.Intellect,
 		ModifiedStat: stats.Mana,
 		Modifier: func(intellect float64, mana float64) float64 {
-			return mana + intellect*15
+			// Assumes all characters have >= 20 intellect.
+			// See https://wowwiki-archive.fandom.com/wiki/Base_mana.
+			return mana + (20 + 15*(intellect-20))
 		},
 	})
 
@@ -137,11 +139,17 @@ func (character *Character) AddStat(stat stats.Stat, amount float64) {
 func (character *Character) GetInitialStat(stat stats.Stat) float64 {
 	return character.initialStats[stat]
 }
+func (character *Character) GetBaseStats() stats.Stats {
+	return BaseStats[BaseStatsKey{Race: character.Race, Class: character.Class}]
+}
 func (character *Character) GetStats() stats.Stats {
 	return character.stats
 }
 func (character *Character) GetStat(stat stats.Stat) float64 {
 	return character.stats[stat]
+}
+func (character *Character) BaseMana() float64 {
+	return character.GetBaseStats()[stats.Mana]
 }
 func (character *Character) MaxMana() float64 {
 	return character.GetInitialStat(stats.Mana)
@@ -283,7 +291,7 @@ func (character *Character) manaRegenPerSecondWhileNotCasting() float64 {
 }
 
 func (character *Character) addMana(amount float64) {
-	character.stats[stats.Mana] = MinFloat(character.stats[stats.Mana] + amount, character.MaxMana())
+	character.stats[stats.Mana] = MinFloat(character.stats[stats.Mana]+amount, character.MaxMana())
 }
 
 // Regenerates mana based on MP5 stat, spirit regen allowed while casting and the elapsed time.
@@ -307,7 +315,7 @@ func (character *Character) RegenMana(sim *Simulation, elapsedTime time.Duration
 		// so regen is a combination of casting and not-casting regen.
 		notCastingRegenTime := sim.CurrentTime - character.PseudoStats.FiveSecondRuleRefreshTime // how many seconds of full spirit regen
 		castingRegenTime := elapsedTime - notCastingRegenTime
-		regen = (character.manaRegenPerSecondWhileNotCasting()*notCastingRegenTime.Seconds()) + (character.manaRegenPerSecondWhileCasting()*castingRegenTime.Seconds())
+		regen = (character.manaRegenPerSecondWhileNotCasting() * notCastingRegenTime.Seconds()) + (character.manaRegenPerSecondWhileCasting() * castingRegenTime.Seconds())
 	} else {
 		regen = character.manaRegenPerSecondWhileCasting() * elapsedTime.Seconds()
 	}
@@ -326,14 +334,14 @@ func (character *Character) RegenMana(sim *Simulation, elapsedTime time.Duration
 func (character *Character) TimeUntilManaRegen(desiredMana float64) time.Duration {
 	// +1 at the end is to deal with floating point math rounding errors.
 	manaNeeded := desiredMana - character.CurrentMana()
-	regenTime := DurationFromSeconds(manaNeeded / character.manaRegenPerSecondWhileCasting()) + 1
+	regenTime := DurationFromSeconds(manaNeeded/character.manaRegenPerSecondWhileCasting()) + 1
 
 	// TODO: this needs to have access to the sim to see current time vs character.PseudoStats.FiveSecondRule.
 	//  it is possible that we have been waiting.
 	//  In practice this function is always used right after a previous cast so no big deal for now.
 	if regenTime > time.Second*5 {
 		regenTime = time.Second * 5
-		manaNeeded -= character.manaRegenPerSecondWhileCasting()*5
+		manaNeeded -= character.manaRegenPerSecondWhileCasting() * 5
 		// now we move into spirit based regen.
 		regenTime += DurationFromSeconds(manaNeeded / character.manaRegenPerSecondWhileNotCasting())
 	}
@@ -377,6 +385,6 @@ var BaseStats = map[BaseStatsKey]stats.Stats{}
 //   3. Subtract as-shown from int bouns (3.5-1.331=2.169)
 //   4. 2.169*22.08 (rating per crit percent) = 47.89 crit rating.
 
-//  Base Mana = as-shown - int*15
+// Base mana can be looked up here: https://wowwiki-archive.fandom.com/wiki/Base_mana
 
 // I assume a similar processes can be applied for other stats.
