@@ -34,9 +34,9 @@ func GetGearList(request *proto.GearListRequest) *proto.GearListResult {
  */
 func ComputeStats(request *proto.ComputeStatsRequest) *proto.ComputeStatsResult {
 	agent := NewAgent(*request.Player, proto.IndividualSimRequest{
-		Player: request.Player,
-		RaidBuffs: request.RaidBuffs,
-		PartyBuffs: request.PartyBuffs,
+		Player:          request.Player,
+		RaidBuffs:       request.RaidBuffs,
+		PartyBuffs:      request.PartyBuffs,
 		IndividualBuffs: request.IndividualBuffs,
 	})
 

@@ -8,8 +8,8 @@ import (
 )
 
 const (
-	CooldownPriorityDefault = 0.0
-	CooldownPriorityDrums = 2.0
+	CooldownPriorityDefault   = 0.0
+	CooldownPriorityDrums     = 2.0
 	CooldownPriorityBloodlust = 1.0
 )
 
@@ -18,7 +18,7 @@ const (
 type CooldownActivation func(*Simulation, *Character) bool
 
 // Function for making a CooldownActivation.
-// 
+//
 // We need a function that returns a CooldownActivation rather than a
 // CooldownActivation, so captured local variables can be reset on Sim reset.
 type CooldownActivationFactory func(*Simulation) CooldownActivation
@@ -61,8 +61,8 @@ func (mcd MajorCooldown) IsOnCD(sim *Simulation, character *Character) bool {
 
 func (mcd MajorCooldown) GetRemainingCD(sim *Simulation, character *Character) time.Duration {
 	return MaxDuration(
-			character.GetRemainingCD(mcd.CooldownID, sim.CurrentTime),
-			character.GetRemainingCD(mcd.SharedCooldownID, sim.CurrentTime))
+		character.GetRemainingCD(mcd.CooldownID, sim.CurrentTime),
+		character.GetRemainingCD(mcd.SharedCooldownID, sim.CurrentTime))
 }
 
 type majorCooldownManager struct {
@@ -133,7 +133,7 @@ func (mcdm *majorCooldownManager) TryUseCooldowns(sim *Simulation) {
 	}
 
 	if anyCooldownsUsed {
-		// Re-sort by availability. 
+		// Re-sort by availability.
 		// TODO: Probably a much faster way to do this, especially since we know which cooldowns need to be re-ordered.
 		sort.Slice(mcdm.majorCooldowns, func(i, j int) bool {
 			return mcdm.majorCooldowns[i].GetRemainingCD(sim, mcdm.character) < mcdm.majorCooldowns[j].GetRemainingCD(sim, mcdm.character)

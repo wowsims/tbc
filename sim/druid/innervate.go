@@ -43,7 +43,7 @@ func (druid *Druid) TryInnervate(sim *core.Simulation) time.Duration {
 			Cooldown:     cd,
 
 			ActionID: core.ActionID{
-				SpellID: 29166,
+				SpellID:    29166,
 				CooldownID: InnervateCooldownID,
 			},
 		},

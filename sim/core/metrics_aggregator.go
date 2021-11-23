@@ -17,7 +17,6 @@ func NewActionKey(actionID ActionID) ActionKey {
 	return ActionKey(float64((int32(actionID.OtherID) + actionID.SpellID - actionID.ItemID)) + (float64(actionID.Tag) / 256))
 }
 
-
 type CharacterMetrics struct {
 	CharacterIterationMetrics
 
@@ -160,10 +159,10 @@ func (characterMetrics *CharacterMetrics) ToProto(numIterations int32) *proto.Pl
 	dpsAvg := characterMetrics.dpsSum / float64(numIterations)
 
 	protoMetrics := &proto.PlayerMetrics{
-		DpsAvg: dpsAvg,
+		DpsAvg:   dpsAvg,
 		DpsStdev: math.Sqrt((characterMetrics.dpsSumSquared / float64(numIterations)) - (dpsAvg * dpsAvg)),
-		DpsMax: characterMetrics.dpsMax,
-		DpsHist: characterMetrics.dpsHist,
+		DpsMax:   characterMetrics.dpsMax,
+		DpsHist:  characterMetrics.dpsHist,
 
 		NumOom: characterMetrics.numOom,
 	}

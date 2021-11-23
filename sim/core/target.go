@@ -192,6 +192,6 @@ func (target *Target) Advance(sim *Simulation, elapsedTime time.Duration) {
 
 func (target *Target) GetMetricsProto() *proto.TargetMetrics {
 	return &proto.TargetMetrics{
-		Auras:  target.auraTracker.GetMetricsProto(),
+		Auras: target.auraTracker.GetMetricsProto(),
 	}
 }

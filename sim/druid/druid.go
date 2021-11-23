@@ -15,7 +15,7 @@ type Druid struct {
 
 	innervateCD  time.Duration
 	NaturesGrace bool // when true next spellcast is 0.5s faster
-	RebirthUsed bool
+	RebirthUsed  bool
 
 	// cached cast stuff
 	starfireSpell         core.SimpleSpell
@@ -218,10 +218,10 @@ func NewDruid(char core.Character, selfBuffs SelfBuffs, talents proto.DruidTalen
 	}
 
 	druid := Druid{
-		Character: char,
-		SelfBuffs: selfBuffs,
-		Talents:   talents,
-		malorne4p: ItemSetMalorne.CharacterHasSetBonus(&char, 4),
+		Character:   char,
+		SelfBuffs:   selfBuffs,
+		Talents:     talents,
+		malorne4p:   ItemSetMalorne.CharacterHasSetBonus(&char, 4),
 		RebirthUsed: false,
 	}
 

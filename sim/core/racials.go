@@ -105,7 +105,7 @@ func applyRaceEffects(agent Agent) {
 						},
 					})
 					character.Metrics.AddInstantCast(ActionID{SpellID: 20554})
-					character.AddAuraUptime(TrollBerserkingAuraID, 20554, MinDuration(dur, sim.Duration - sim.CurrentTime))
+					character.AddAuraUptime(TrollBerserkingAuraID, 20554, MinDuration(dur, sim.Duration-sim.CurrentTime))
 					return true
 				}
 			},

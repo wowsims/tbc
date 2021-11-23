@@ -205,7 +205,7 @@ func (at *auraTracker) reset(sim *Simulation) {
 	// Add metrics for any auras that are still active.
 	for _, aura := range at.auras {
 		if aura.SpellID != 0 {
-			at.AddAuraUptime(aura.ID, aura.SpellID, sim.Duration - aura.startTime)
+			at.AddAuraUptime(aura.ID, aura.SpellID, sim.Duration-aura.startTime)
 		}
 	}
 
@@ -302,7 +302,7 @@ func (at *auraTracker) RemoveAura(sim *Simulation, id AuraID) {
 	}
 
 	if at.auras[id].SpellID != 0 {
-		at.AddAuraUptime(id, at.auras[id].SpellID, sim.CurrentTime - at.auras[id].startTime)
+		at.AddAuraUptime(id, at.auras[id].SpellID, sim.CurrentTime-at.auras[id].startTime)
 	}
 
 	if sim.Log != nil {

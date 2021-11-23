@@ -88,8 +88,8 @@ func TestIndividualSim(t *testing.T) {
 			},
 			Equipment: p1Equip,
 		},
-		RaidBuffs: &proto.RaidBuffs{},
-		PartyBuffs: &proto.PartyBuffs{},
+		RaidBuffs:       &proto.RaidBuffs{},
+		PartyBuffs:      &proto.PartyBuffs{},
 		IndividualBuffs: &proto.IndividualBuffs{},
 		Encounter: &proto.Encounter{
 			Duration: 120,
@@ -139,8 +139,8 @@ func TestCalcStatWeight(t *testing.T) {
 			},
 			Equipment: p1Equip,
 		},
-		RaidBuffs: &proto.RaidBuffs{},
-		PartyBuffs: &proto.PartyBuffs{},
+		RaidBuffs:       &proto.RaidBuffs{},
+		PartyBuffs:      &proto.PartyBuffs{},
 		IndividualBuffs: &proto.IndividualBuffs{},
 		Encounter: &proto.Encounter{
 			Duration: 120,
