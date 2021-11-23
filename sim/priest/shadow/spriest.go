@@ -26,7 +26,9 @@ func NewShadowPriest(character core.Character, options proto.PlayerOptions, isr 
 		shadowOptions.Rotation.UseDevPlague = false
 	}
 
-	selfBuffs := priest.SelfBuffs{}
+	selfBuffs := priest.SelfBuffs{
+		UseShadowfiend: shadowOptions.Options.UseShadowfiend,
+	}
 
 	basePriest := priest.NewPriest(character, selfBuffs, *shadowOptions.Talents)
 	spriest := &ShadowPriest{
@@ -142,8 +144,12 @@ func (spriest *ShadowPriest) Act(sim *core.Simulation) time.Duration {
 	var wait time.Duration
 
 	timeForDots := sim.Duration-sim.CurrentTime > time.Second*12
-
-	if spriest.Talents.VampiricTouch && timeForDots && !spriest.VTSpell.DotInput.IsTicking(sim) {
+	if spriest.UseShadowfiend &&
+		spriest.CurrentMana()/spriest.MaxMana() < 0.5 &&
+		spriest.GetRemainingCD(priest.ShadowfiendCD, sim.CurrentTime) == 0 &&
+		!spriest.ShadowfiendSpell.DotInput.IsTicking(sim) {
+		spell = spriest.NewShadowfiend(sim, target)
+	} else if spriest.Talents.VampiricTouch && timeForDots && !spriest.VTSpell.DotInput.IsTicking(sim) {
 		spell = spriest.NewVT(sim, target)
 	} else if timeForDots && !spriest.SWPSpell.DotInput.IsTicking(sim) {
 		spell = spriest.NewSWP(sim, target)
@@ -169,15 +175,32 @@ func (spriest *ShadowPriest) Act(sim *core.Simulation) time.Duration {
 			case proto.ShadowPriest_Rotation_Basic:
 				// basic rotation will simply wait the whole length
 			case proto.ShadowPriest_Rotation_IntelligentClipping:
-				// TODO: calculate dps gains/losses on each spell vs more MF ticks.
-
-				// For now just use the ClipAlways logic
-				fallthrough
+				minWait := core.MinDuration(mbcd, swdcd) + 1
+				if minWait < mfLength && minWait > (spriest.MindFlaySpell.DotInput.TickLength/2) {
+					numTicks := int(minWait/spriest.MindFlaySpell.DotInput.TickLength) + 1
+					if minWait == spriest.MindFlaySpell.DotInput.TickLength {
+						numTicks = 1
+					}
+					if numTicks < 4 {
+						spriest.MindFlaySpell.DotInput.NumberOfTicks = numTicks
+						spell.ActionID.Tag = int32(numTicks)
+					}
+					wait = spriest.MindFlaySpell.DotInput.TickLength * time.Duration(spriest.MindFlaySpell.DotInput.NumberOfTicks)
+					minGCD := spriest.GetRemainingCD(core.GCDCooldownID, sim.CurrentTime)
+					if wait < minGCD {
+						wait = minGCD
+					}
+				} else if minWait < spriest.MindFlaySpell.DotInput.TickLength {
+					// just wait until its off CD.. dont cast a spell for no reason
+					spell.Cancel() // turn off 'in use'
+					return sim.CurrentTime + core.MaxDuration(
+						spriest.GetRemainingCD(core.GCDCooldownID, sim.CurrentTime),
+						minWait)
+				}
 			case proto.ShadowPriest_Rotation_ClipAlways:
 				// Prio MindBlast/SWD
 
 				// TODO: also account for dots falling off.
-
 				minWait := core.MinDuration(mbcd, swdcd) + 1
 				if minWait < mfLength && minWait > spriest.MindFlaySpell.DotInput.TickLength {
 					numTicks := int(float64(core.GCDDefault)/float64(spriest.MindFlaySpell.DotInput.TickLength)) + 1

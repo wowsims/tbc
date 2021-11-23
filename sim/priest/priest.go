@@ -40,6 +40,7 @@ type Priest struct {
 }
 
 type SelfBuffs struct {
+	UseShadowfiend bool
 }
 
 func (priest *Priest) GetCharacter() *core.Character {
@@ -47,7 +48,8 @@ func (priest *Priest) GetCharacter() *core.Character {
 }
 
 func (priest *Priest) AddRaidBuffs(raidBuffs *proto.RaidBuffs) {
-	raidBuffs.DivineSpirit = proto.TristateEffect_TristateEffectRegular
+	// TODO: handle this for raid sim
+	// raidBuffs.DivineSpirit = proto.TristateEffect_TristateEffectRegular
 }
 
 func (priest *Priest) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {

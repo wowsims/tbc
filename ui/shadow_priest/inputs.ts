@@ -42,6 +42,22 @@ export const ShadowPriestRotationConfig = {
 		},
 		{
 			type: 'boolean' as const,
+			cssClass: 'shadowfiend-picker',
+			getModObject: (simUI: SimUI<any>) => simUI.player,
+			config: {
+				label: 'Use Shadowfiend',
+				labelTooltip: 'Use Shadowfiend when low mana and off CD.',
+				changedEvent: (player: Player<Spec.SpecShadowPriest>) => player.raceChangeEmitter,
+				getValue: (player: Player<Spec.SpecShadowPriest>) => player.getSpecOptions().useShadowfiend,
+				setValue: (player: Player<Spec.SpecShadowPriest>, newValue: boolean) => {
+					const newOptions = player.getSpecOptions();
+					newOptions.useShadowfiend = newValue;
+					player.setSpecOptions(newOptions);
+				},
+			},
+		},
+		{
+			type: 'boolean' as const,
 			cssClass: 'devplague-picker',
 			getModObject: (simUI: SimUI<any>) => simUI.player,
 			config: {

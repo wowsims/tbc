@@ -172,14 +172,16 @@ func curseOfElementsAura(coe proto.TristateEffect) Aura {
 		Name: "Curse of the Elements",
 		OnBeforeSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect) {
 			if spellCast.SpellSchool == stats.NatureSpellPower ||
-				spellCast.SpellSchool == stats.HolySpellPower {
+				spellCast.SpellSchool == stats.HolySpellPower ||
+				spellCast.SpellSchool == stats.AttackPower {
 				return // does not apply to these schools
 			}
 			spellEffect.DamageMultiplier *= mult
 		},
 		OnPeriodicDamage: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect, tickDamage float64) float64 {
 			if spellCast.SpellSchool == stats.NatureSpellPower ||
-				spellCast.SpellSchool == stats.HolySpellPower {
+				spellCast.SpellSchool == stats.HolySpellPower ||
+				spellCast.SpellSchool == stats.AttackPower {
 				return tickDamage // does not apply to these schools
 			}
 			return tickDamage * mult

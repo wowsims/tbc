@@ -58,6 +58,7 @@ message ShadowPriest {
     PriestTalents talents = 2;
     
     message Options {
+		bool use_shadowfiend = 1;
     }
     Options options = 3;
 }
