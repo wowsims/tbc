@@ -162,7 +162,6 @@ func (spriest *ShadowPriest) Act(sim *core.Simulation) time.Duration {
 			spell = spriest.NewSWD(sim, target)
 		} else {
 			spell = spriest.NewMindFlay(sim, target)
-			spell.ActionID.Tag = 3 // default to 3 tick mf
 			mfLength := spriest.MindFlaySpell.DotInput.TickLength * time.Duration(spriest.MindFlaySpell.DotInput.NumberOfTicks)
 			wait = mfLength
 

@@ -152,6 +152,7 @@ func (spellEffect *SpellEffect) applyDot(sim *Simulation, spellCast *SpellCast, 
 	ddInput.finalTickTime = sim.CurrentTime + time.Duration(ddInput.NumberOfTicks)*ddInput.TickLength
 
 	pa := &PendingAction{
+		Name:         spellCast.Name,
 		NextActionAt: sim.CurrentTime + ddInput.TickLength,
 	}
 

@@ -24,6 +24,7 @@ func (priest *Priest) newMindflayTemplate(sim *core.Simulation) core.SimpleSpell
 		Binary:         true,
 		ActionID: core.ActionID{
 			SpellID: SpellIDMF,
+			Tag:     3, // default to 3 tick mf
 		},
 	}
 
@@ -61,6 +62,5 @@ func (priest *Priest) NewMindFlay(sim *core.Simulation, target *core.Target) *co
 
 	// Channels accelerate tick speed by haste.
 	mf.DotInput.TickLength = time.Duration(float64(mf.DotInput.TickLength) / priest.CastSpeed())
-
 	return mf
 }
