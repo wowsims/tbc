@@ -79,7 +79,7 @@ func (shaman *Shaman) newElectricSpellEffect(minBaseDamage float64, maxBaseDamag
 		},
 	}
 
-	effect.SpellEffect.StaticDamageMultiplier *= 1 + 0.01*float64(shaman.Talents.Concussion)
+	effect.SpellEffect.DamageMultiplier *= 1 + 0.01*float64(shaman.Talents.Concussion)
 	if isLightningOverload {
 		effect.SpellEffect.DamageMultiplier *= 0.5
 	}

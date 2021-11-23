@@ -74,8 +74,11 @@ func applyRaceEffects(agent Agent) {
 				Name: "Beast Slaying (Troll Racial)",
 				OnBeforeSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect) {
 					if spellEffect.Target.MobType == proto.MobType_MobTypeBeast {
-						spellEffect.StaticDamageMultiplier *= 1.05
+						spellEffect.DamageMultiplier *= 1.05
 					}
+				},
+				OnPeriodicDamage: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect, tickDamage *float64) {
+					*tickDamage *= 1.05
 				},
 			}
 		})
