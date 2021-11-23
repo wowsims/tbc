@@ -26,7 +26,8 @@ func (priest *Priest) newVTTemplate(sim *core.Simulation) core.SimpleSpellTempla
 
 	effect := core.SpellHitEffect{
 		SpellEffect: core.SpellEffect{
-			DamageMultiplier: 1,
+			DamageMultiplier:       1,
+			StaticDamageMultiplier: 1,
 		},
 		DotInput: core.DotDamageInput{
 			NumberOfTicks:        5,

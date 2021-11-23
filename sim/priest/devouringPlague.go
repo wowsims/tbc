@@ -29,7 +29,8 @@ func (priest *Priest) newDevouringPlagueTemplate(sim *core.Simulation) core.Simp
 
 	effect := core.SpellHitEffect{
 		SpellEffect: core.SpellEffect{
-			DamageMultiplier: 1,
+			DamageMultiplier:       1,
+			StaticDamageMultiplier: 1,
 		},
 		DotInput: core.DotDamageInput{
 			NumberOfTicks:        8,

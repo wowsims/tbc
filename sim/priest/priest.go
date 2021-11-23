@@ -95,10 +95,10 @@ func (priest *Priest) applyTalentsToShadowSpell(cast *core.Cast, effect *core.Sp
 		cast.ManaCost -= cast.BaseManaCost * float64(priest.Talents.FocusedMind) * 0.05
 	}
 	if cast.SpellSchool == stats.ShadowSpellPower {
-		effect.DamageMultiplier *= 1 + float64(priest.Talents.Darkness)*0.02
+		effect.StaticDamageMultiplier *= 1 + float64(priest.Talents.Darkness)*0.02
 
 		if priest.Talents.Shadowform {
-			effect.DamageMultiplier *= 1.15
+			effect.StaticDamageMultiplier *= 1.15
 		}
 
 		// shadow focus gives 2% hit per level

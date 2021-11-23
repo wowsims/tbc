@@ -46,8 +46,8 @@ func NewShadowPriest(character core.Character, options proto.PlayerOptions, isr 
 			OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 				spellEffect.DamageMultiplier *= 1 + 0.02*spriest.swStacks
 			},
-			OnPeriodicDamage: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect, tickDamage float64) float64 {
-				return tickDamage * (1 + 0.02*spriest.swStacks)
+			OnPeriodicDamage: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect, tickDamage *float64) {
+				*tickDamage *= (1 + 0.02*spriest.swStacks)
 			},
 			OnExpire: func(sim *core.Simulation) {
 				spriest.swStacks = 0
@@ -71,23 +71,14 @@ func NewShadowPriest(character core.Character, options proto.PlayerOptions, isr 
 			return core.Aura{
 				ID:   ShadowWeaverAuraID,
 				Name: "Shadow Weaver",
-				OnPeriodicDamage: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect, tickDamage float64) float64 {
-					// Handle talents here for now.
-					// 'always on' type effects could maybe go in as a DotEffect.DamageMultiplier that is added on each tick (separate)
-					if spellCast.SpellSchool == stats.ShadowSpellPower {
-						tickDamage *= 1 + float64(spriest.Talents.Darkness)*0.02
-						if spriest.Talents.Shadowform {
-							tickDamage *= 1.15
-						}
-					}
-					if tickDamage > 0 && spriest.VTSpell.DotInput.IsTicking(sim) {
-						s := stats.Stats{stats.Mana: tickDamage * 0.05}
+				OnPeriodicDamage: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect, tickDamage *float64) {
+					if *tickDamage > 0 && spriest.VTSpell.DotInput.IsTicking(sim) {
+						s := stats.Stats{stats.Mana: *tickDamage * 0.05}
 						if sim.Log != nil {
 							sim.Log("VT Regenerated %0f mana.\n", s[stats.Mana])
 						}
 						spriest.Party.AddStats(s)
 					}
-					return tickDamage
 				},
 				OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 					addShadowWeaving(sim, spellEffect)
@@ -107,8 +98,8 @@ func NewShadowPriest(character core.Character, options proto.PlayerOptions, isr 
 							OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 								spellEffect.DamageMultiplier *= 1.05
 							},
-							OnPeriodicDamage: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect, tickDamage float64) float64 {
-								return tickDamage * 1.05
+							OnPeriodicDamage: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect, tickDamage *float64) {
+								*tickDamage *= 1.05
 							},
 						})
 					}

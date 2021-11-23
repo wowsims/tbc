@@ -43,21 +43,24 @@ var ItemSetAvatar = core.ItemSet{
 				return core.Aura{
 					ID:   Avatar4PcAuraID,
 					Name: "Avatar 4pc Bonus",
-					OnPeriodicDamage: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect, tickDamage float64) float64 {
-						if spellCast.ActionID.SpellID == SpellIDSWP {
-							if sim.RandomFloat("avatar 4p") < 0.4 {
-								character.AddAura(sim, core.Aura{
-									ID:      SadistAuraID,
-									Name:    "Sadist",
-									Expires: sim.CurrentTime + time.Second*15,
-									OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-										spellEffect.BonusSpellPower += 100
-										character.RemoveAura(sim, SadistAuraID)
-									},
-								})
-							}
+					OnPeriodicDamage: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect, tickDamage *float64) {
+						if spellCast.ActionID.SpellID != SpellIDSWP {
+							return
 						}
-						return tickDamage
+
+						if sim.RandomFloat("avatar 4p") > 0.4 {
+							return
+						}
+
+						character.AddAura(sim, core.Aura{
+							ID:      SadistAuraID,
+							Name:    "Sadist",
+							Expires: sim.CurrentTime + time.Second*15,
+							OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+								spellEffect.BonusSpellPower += 100
+								character.RemoveAura(sim, SadistAuraID)
+							},
+						})
 					},
 				}
 			})

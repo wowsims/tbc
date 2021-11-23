@@ -29,7 +29,8 @@ func (priest *Priest) newSWDTemplate(sim *core.Simulation) core.SimpleSpellTempl
 
 	effect := core.SpellHitEffect{
 		SpellEffect: core.SpellEffect{
-			DamageMultiplier: 1,
+			DamageMultiplier:       1,
+			StaticDamageMultiplier: 1,
 		},
 		DirectInput: core.DirectDamageSpellInput{
 			MinBaseDamage:    672,

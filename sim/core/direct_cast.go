@@ -138,8 +138,6 @@ func (hitEffect *SpellHitEffect) apply(sim *Simulation, spellCast *SpellCast, ap
 	hitEffect.afterCalculations(sim, spellCast)
 }
 
-type OnDamageTick func(sim *Simulation, damage float64)
-
 // DotDamageInput is the data needed to kick of the dot ticking in pendingActions.
 //  For now the only way for a caster to track their dot is to keep a reference to the cast object
 //  that started this and check the DotDamageInput.IsTicking()
@@ -149,7 +147,7 @@ type DotDamageInput struct {
 	TickBaseDamage       float64
 	TickSpellCoefficient float64
 
-	OnDamageTick OnDamageTick // TODO: Do we need an OnExpire?
+	OnPeriodicDamage OnPeriodicDamage // Specific on-tick logic for this dot.
 
 	// Internal fields
 	damagePerTick float64

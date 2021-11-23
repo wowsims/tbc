@@ -456,12 +456,10 @@ func (at *auraTracker) OnSpellHit(sim *Simulation, spellCast *SpellCast, spellEf
 // Invokes the OnPeriodicDamage
 //   As a debuff when target is being hit by dot.
 //   As a buff when caster's dots are ticking.
-func (at *auraTracker) OnPeriodicDamage(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect, tickDamage float64) float64 {
+func (at *auraTracker) OnPeriodicDamage(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect, tickDamage *float64) {
 	for _, id := range at.onPeriodicDamageIDs {
-		tickDamage = at.auras[id].OnPeriodicDamage(sim, spellCast, spellEffect, tickDamage)
+		at.auras[id].OnPeriodicDamage(sim, spellCast, spellEffect, tickDamage)
 	}
-
-	return tickDamage
 }
 
 func (at *auraTracker) AddAuraUptime(auraID AuraID, spellID int32, uptime time.Duration) {
