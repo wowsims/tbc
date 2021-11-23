@@ -57,6 +57,15 @@ func runServer(useFS bool, host string, launchBrowser bool, simName string, wasm
 
 	http.HandleFunc("/", func(resp http.ResponseWriter, req *http.Request) {
 		resp.Header().Add("Cache-Control", "no-cache")
+		if strings.HasSuffix(req.URL.Path, "/tbc/") {
+			resp.Write([]byte(`
+				<html><body><a href="/tbc/elemental_shaman">Elemental Shaman Sim</a"><br>
+				<a href="/tbc/balance_druid">Balance Druid Sim</a"><br>
+				<a href="/tbc/shadow_priest">Shadow Priest Sim</a"></body></html>
+		    `))
+			return
+		}
+
 		if strings.HasSuffix(req.URL.Path, ".wasm") {
 			resp.Header().Set("content-type", "application/wasm")
 		}
