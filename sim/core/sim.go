@@ -258,7 +258,7 @@ func (sim *Simulation) RunOnce() {
 func (sim *Simulation) AddPendingAction(pa *PendingAction) {
 	handled := false
 	for i, v := range sim.pendingActions {
-		if v.NextActionAt > pa.NextActionAt {
+		if v.NextActionAt >= pa.NextActionAt {
 			handled = true
 			sim.pendingActions = append(sim.pendingActions, &PendingAction{})
 			copy(sim.pendingActions[i+1:], sim.pendingActions[i:])
