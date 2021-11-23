@@ -18,15 +18,6 @@ export const StandardTalents = {
 	data: '500230013--503250510240103051451',
 };
 
-// ItemSpec.create({
-// 	id: 28780, // Soul-Eater's Handwraps
-// 	enchant: Enchants.GLOVES_SPELLPOWER,
-// 	gems: [
-// 		Gems.RUNED_LIVING_RUBY,
-// 		Gems.RUNED_LIVING_RUBY,
-// 	],
-// }),
-
 export const P1_BIS = {
 	name: 'P1 BIS',
 	tooltip: Tooltips.BASIC_BIS_DISCLAIMER,

@@ -7,7 +7,8 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-// Starfire spell IDs
+// https://web.archive.org/web/20071201221602/http://www.shadowpriest.com/viewtopic.php?t=7616
+
 const SpellIDShadowfiend int32 = 34433
 
 var ShadowfiendCD = core.NewCooldownID()
@@ -72,5 +73,3 @@ func (priest *Priest) NewShadowfiend(sim *core.Simulation, target *core.Target) 
 
 	return mf
 }
-
-// https://web.archive.org/web/20071201221602/http://www.shadowpriest.com/viewtopic.php?t=7616

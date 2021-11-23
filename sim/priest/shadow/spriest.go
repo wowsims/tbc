@@ -30,7 +30,7 @@ func NewShadowPriest(character core.Character, options proto.PlayerOptions, isr 
 		UseShadowfiend: shadowOptions.Options.UseShadowfiend,
 	}
 
-	basePriest := priest.NewPriest(character, selfBuffs, *shadowOptions.Talents)
+	basePriest := priest.New(character, selfBuffs, *shadowOptions.Talents)
 	spriest := &ShadowPriest{
 		Priest:   basePriest,
 		rotation: *shadowOptions.Rotation,
@@ -40,6 +40,8 @@ func NewShadowPriest(character core.Character, options proto.PlayerOptions, isr 
 		const dur = time.Second * 15
 		const misDur = time.Second * 24
 
+		// TODO: use Aura.Stacks and add a function to increment stacks.
+		//  This is required to make this work correctly for a raid sim.
 		swAura := core.Aura{
 			ID:   ShadowWeavingDebuffID,
 			Name: "Shadow Weaving",
@@ -137,8 +139,7 @@ func (spriest *ShadowPriest) Act(sim *core.Simulation) time.Duration {
 	timeForDots := sim.Duration-sim.CurrentTime > time.Second*12
 	if spriest.UseShadowfiend &&
 		spriest.CurrentMana()/spriest.MaxMana() < 0.5 &&
-		spriest.GetRemainingCD(priest.ShadowfiendCD, sim.CurrentTime) == 0 &&
-		!spriest.ShadowfiendSpell.DotInput.IsTicking(sim) {
+		spriest.GetRemainingCD(priest.ShadowfiendCD, sim.CurrentTime) == 0 {
 		spell = spriest.NewShadowfiend(sim, target)
 	} else if spriest.Talents.VampiricTouch && timeForDots && !spriest.VTSpell.DotInput.IsTicking(sim) {
 		spell = spriest.NewVT(sim, target)

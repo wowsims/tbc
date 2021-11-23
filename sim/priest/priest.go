@@ -48,8 +48,18 @@ func (priest *Priest) GetCharacter() *core.Character {
 }
 
 func (priest *Priest) AddRaidBuffs(raidBuffs *proto.RaidBuffs) {
-	// TODO: handle this for raid sim
-	// raidBuffs.DivineSpirit = proto.TristateEffect_TristateEffectRegular
+	if !priest.Talents.DivineSpirit {
+		return
+	}
+
+	ds := proto.TristateEffect_TristateEffectRegular
+
+	if priest.Talents.ImprovedDivineSpirit == 2 {
+		// TODO: handle a larger variety of IDS values.
+		ds = proto.TristateEffect_TristateEffectImproved
+	}
+
+	raidBuffs.DivineSpirit = core.MaxTristate(raidBuffs.DivineSpirit, ds)
 }
 
 func (priest *Priest) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {
@@ -78,19 +88,14 @@ func (priest *Priest) Reset(newsim *core.Simulation) {
 }
 
 func (priest *Priest) Advance(sim *core.Simulation, elapsedTime time.Duration) {
-	// druid should never be outside the 5s window, use combat regen.
+	// spriest should never be outside the 5s window, use combat regen.
 	priest.Character.RegenManaCasting(sim, elapsedTime)
-}
-
-func (priest *Priest) Act(sim *core.Simulation) time.Duration {
-	return core.NeverExpires // does nothing
 }
 
 func (priest *Priest) applyTalentsToShadowSpell(cast *core.Cast, effect *core.SpellHitEffect) {
 	if cast.ActionID.SpellID == SpellIDSWD || cast.ActionID.SpellID == SpellIDMB {
 		effect.BonusSpellCritRating += float64(priest.Talents.ShadowPower) * 3 * core.SpellCritRatingPerCritChance
 	}
-
 	if cast.ActionID.SpellID == SpellIDMF || cast.ActionID.SpellID == SpellIDMB {
 		cast.ManaCost -= cast.BaseManaCost * float64(priest.Talents.FocusedMind) * 0.05
 	}
@@ -106,32 +111,19 @@ func (priest *Priest) applyTalentsToShadowSpell(cast *core.Cast, effect *core.Sp
 	}
 }
 
-func NewPriest(char core.Character, selfBuffs SelfBuffs, talents proto.PriestTalents) Priest {
-
-	// char.AddStat(stats.SpellHit, float64(talents.BalanceOfPower)*2*core.SpellHitRatingPerHitChance)
+func New(char core.Character, selfBuffs SelfBuffs, talents proto.PriestTalents) Priest {
 
 	char.AddStatDependency(stats.StatDependency{
 		SourceStat:   stats.Intellect,
 		ModifiedStat: stats.SpellCrit,
 		Modifier: func(intellect float64, spellCrit float64) float64 {
-			return spellCrit + (intellect/79.4)*core.SpellCritRatingPerCritChance
+			return spellCrit + (intellect/80)*core.SpellCritRatingPerCritChance
 		},
 	})
 
 	if talents.Meditation > 0 {
 		char.PseudoStats.SpiritRegenRateCasting = float64(talents.Meditation) * 0.1
 	}
-
-	// if talents.LunarGuidance > 0 {
-	// 	bonus := (0.25 / 3) * float64(talents.LunarGuidance)
-	// 	char.AddStatDependency(stats.StatDependency{
-	// 		SourceStat:   stats.Intellect,
-	// 		ModifiedStat: stats.SpellPower,
-	// 		Modifier: func(intellect float64, spellPower float64) float64 {
-	// 			return spellPower + intellect*bonus
-	// 		},
-	// 	})
-	// }
 
 	priest := Priest{
 		Character: char,
