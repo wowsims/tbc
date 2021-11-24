@@ -39,8 +39,6 @@ func (priest *Priest) newSWDTemplate(sim *core.Simulation) core.SimpleSpellTempl
 		},
 	}
 
-	// TODO: Manage health with SW:D or assume healers got you?
-
 	priest.applyTalentsToShadowSpell(&baseCast, &effect)
 
 	return core.NewSimpleSpellTemplate(core.SimpleSpell{
