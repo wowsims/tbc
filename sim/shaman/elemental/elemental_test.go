@@ -77,16 +77,12 @@ func TestCalcStatWeight(t *testing.T) {
 	})
 
 	core.StatWeightsTest("p1Full", t, isr, StatsToTest, ReferenceStat, stats.Stats{
-		stats.Intellect:  0.183,
-		stats.SpellPower: 0.703,
-		stats.SpellHit:   0.100,
-		stats.SpellCrit:  0.579,
+		stats.Intellect:  0.182,
+		stats.SpellPower: 0.699,
+		stats.SpellHit:   0.156,
+		stats.SpellCrit:  0.580,
 	})
 }
-
-// TODO:
-//  1. How to handle buffs that modify stats based on stats? Kings, Unrelenting Storms, etc.
-//		Possible: Add a function on player like 'AddStats' and a 'onstatbuff' aura effect?
 
 func TestSimulatePreRaidNoBuffs(t *testing.T) {
 	core.IndividualSimAllEncountersTest(core.AllEncountersTestOptions{
@@ -108,8 +104,8 @@ func TestSimulatePreRaidNoBuffs(t *testing.T) {
 			Gear:          PreRaidGear,
 		},
 
-		ExpectedDpsShort: 997.0,
-		ExpectedDpsLong:  364.7,
+		ExpectedDpsShort: 994.9,
+		ExpectedDpsLong:  380.6,
 	})
 }
 
@@ -133,7 +129,7 @@ func TestSimulatePreRaid(t *testing.T) {
 		},
 
 		ExpectedDpsShort: 1557.8,
-		ExpectedDpsLong:  1177.4,
+		ExpectedDpsLong:  1175.1,
 	})
 }
 
@@ -157,7 +153,7 @@ func TestSimulateP1(t *testing.T) {
 		},
 
 		ExpectedDpsShort: 2166.0,
-		ExpectedDpsLong:  1582.3,
+		ExpectedDpsLong:  1578.4,
 	})
 }
 func TestMultiTarget(t *testing.T) {
@@ -212,7 +208,7 @@ func TestMultiTarget(t *testing.T) {
 		},
 
 		ExpectedDpsShort: 2731.0,
-		ExpectedDpsLong:  1958.3,
+		ExpectedDpsLong:  1965.8,
 	})
 }
 
@@ -293,7 +289,7 @@ func TestAverageDPS(t *testing.T) {
 		PlayerOptions: PlayerOptionsAdaptive,
 	})
 
-	core.IndividualSimAverageTest("P1Average", t, isr, 1580.9)
+	core.IndividualSimAverageTest("P1Average", t, isr, 1581.5)
 }
 
 func BenchmarkSimulate(b *testing.B) {

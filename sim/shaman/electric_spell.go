@@ -20,6 +20,14 @@ const (
 	CastTagLightningOverload int32 = 1 // This could be value or bitflag if we ended up needing multiple flags at the same time.
 )
 
+// Mana cost numbers based on in-game testing:
+//
+// With 5/5 convection:
+// Normal: 270, w/ EF: 150
+//
+// With 5/5 convection and TotPE equipped:
+// Normal: 246, w/ EF: 136
+
 // Shared precomputation logic for LB and CL.
 func (shaman *Shaman) newElectricSpellCast(name string, actionID core.ActionID, baseManaCost float64, baseCastTime time.Duration, isLightningOverload bool) core.SpellCast {
 	spellCast := core.SpellCast{
@@ -102,7 +110,7 @@ func (shaman *Shaman) newElectricSpellEffect(minBaseDamage float64, maxBaseDamag
 // Shared LB/CL logic that is dynamic, i.e. can't be precomputed.
 func (shaman *Shaman) applyElectricSpellCastInitModifiers(spellCast *core.SpellCast) {
 	if shaman.ElementalFocusStacks > 0 {
-		// TODO: This should subtract 40% of base cost
-		spellCast.Cast.ManaCost *= .6 // reduced by 40%
+		// Reduces mana cost by 40%
+		spellCast.Cast.ManaCost -= spellCast.Cast.BaseManaCost * 0.4
 	}
 }

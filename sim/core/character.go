@@ -97,7 +97,9 @@ func NewCharacter(player proto.Player) Character {
 		SourceStat:   stats.Intellect,
 		ModifiedStat: stats.Mana,
 		Modifier: func(intellect float64, mana float64) float64 {
-			return mana + intellect*15
+			// Assumes all characters have >= 20 intellect.
+			// See https://wowwiki-archive.fandom.com/wiki/Base_mana.
+			return mana + (20 + 15*(intellect-20))
 		},
 	})
 
@@ -137,11 +139,17 @@ func (character *Character) AddStat(stat stats.Stat, amount float64) {
 func (character *Character) GetInitialStat(stat stats.Stat) float64 {
 	return character.initialStats[stat]
 }
+func (character *Character) GetBaseStats() stats.Stats {
+	return BaseStats[BaseStatsKey{Race: character.Race, Class: character.Class}]
+}
 func (character *Character) GetStats() stats.Stats {
 	return character.stats
 }
 func (character *Character) GetStat(stat stats.Stat) float64 {
 	return character.stats[stat]
+}
+func (character *Character) BaseMana() float64 {
+	return character.GetBaseStats()[stats.Mana]
 }
 func (character *Character) MaxMana() float64 {
 	return character.GetInitialStat(stats.Mana)
@@ -377,6 +385,6 @@ var BaseStats = map[BaseStatsKey]stats.Stats{}
 //   3. Subtract as-shown from int bouns (3.5-1.331=2.169)
 //   4. 2.169*22.08 (rating per crit percent) = 47.89 crit rating.
 
-//  Base Mana = as-shown - int*15
+// Base mana can be looked up here: https://wowwiki-archive.fandom.com/wiki/Base_mana
 
 // I assume a similar processes can be applied for other stats.
