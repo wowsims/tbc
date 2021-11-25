@@ -31,7 +31,7 @@ export class PriestTalentsPicker extends TalentsPicker {
                             rowIdx: 1,
                             colIdx: 0,
                         },
-                        spellIds: [14253, 14784],
+                        spellIds: [14523, 14784],
                         maxPoints: 5,
                     },
                     {
