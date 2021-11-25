@@ -157,9 +157,13 @@ export interface ShadowPriest {
  */
 export interface ShadowPriest_Rotation {
     /**
-     * @generated from protobuf field: proto.ShadowPriest.Rotation.RotationType type = 1;
+     * @generated from protobuf field: proto.ShadowPriest.Rotation.RotationType rotation_type = 1;
      */
-    type: ShadowPriest_Rotation_RotationType;
+    rotationType: ShadowPriest_Rotation_RotationType;
+    /**
+     * @generated from protobuf field: bool use_dev_plague = 3;
+     */
+    useDevPlague: boolean;
 }
 /**
  * @generated from protobuf enum proto.ShadowPriest.Rotation.RotationType
@@ -170,14 +174,26 @@ export declare enum ShadowPriest_Rotation_RotationType {
      */
     Unknown = 0,
     /**
-     * @generated from protobuf enum value: Standard = 1;
+     * @generated from protobuf enum value: Basic = 1;
      */
-    Standard = 1
+    Basic = 1,
+    /**
+     * @generated from protobuf enum value: ClipAlways = 2;
+     */
+    ClipAlways = 2,
+    /**
+     * @generated from protobuf enum value: IntelligentClipping = 3;
+     */
+    IntelligentClipping = 3
 }
 /**
  * @generated from protobuf message proto.ShadowPriest.Options
  */
 export interface ShadowPriest_Options {
+    /**
+     * @generated from protobuf field: bool use_shadowfiend = 1;
+     */
+    useShadowfiend: boolean;
 }
 declare class PriestTalents$Type extends MessageType<PriestTalents> {
     constructor();

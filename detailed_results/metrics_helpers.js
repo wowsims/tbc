@@ -47,8 +47,17 @@ export function parseActionMetrics(actionMetricProtos) {
         if (actionMetric.actionId.tag == 0) {
             actionMetric.name = name;
         }
-        else {
+        else if (actionMetric.actionId.tag == 1) {
             actionMetric.name = name + ' (LO)';
+        }
+        else if (actionMetric.actionId.tag == 2) {
+            actionMetric.name = name + ' (2 Tick)';
+        }
+        else if (actionMetric.actionId.tag == 3) {
+            actionMetric.name = name + ' (3 Tick)';
+        }
+        else {
+            actionMetric.name = name + ' (??)';
         }
     })
         .then(() => getIconUrl(actionMetric.actionId.id))

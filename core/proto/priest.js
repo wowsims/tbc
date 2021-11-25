@@ -13,9 +13,17 @@ export var ShadowPriest_Rotation_RotationType;
      */
     ShadowPriest_Rotation_RotationType[ShadowPriest_Rotation_RotationType["Unknown"] = 0] = "Unknown";
     /**
-     * @generated from protobuf enum value: Standard = 1;
+     * @generated from protobuf enum value: Basic = 1;
      */
-    ShadowPriest_Rotation_RotationType[ShadowPriest_Rotation_RotationType["Standard"] = 1] = "Standard";
+    ShadowPriest_Rotation_RotationType[ShadowPriest_Rotation_RotationType["Basic"] = 1] = "Basic";
+    /**
+     * @generated from protobuf enum value: ClipAlways = 2;
+     */
+    ShadowPriest_Rotation_RotationType[ShadowPriest_Rotation_RotationType["ClipAlways"] = 2] = "ClipAlways";
+    /**
+     * @generated from protobuf enum value: IntelligentClipping = 3;
+     */
+    ShadowPriest_Rotation_RotationType[ShadowPriest_Rotation_RotationType["IntelligentClipping"] = 3] = "IntelligentClipping";
 })(ShadowPriest_Rotation_RotationType || (ShadowPriest_Rotation_RotationType = {}));
 // @generated message type with reflection information, may provide speed optimized methods
 class PriestTalents$Type extends MessageType {
@@ -332,11 +340,12 @@ export const ShadowPriest = new ShadowPriest$Type();
 class ShadowPriest_Rotation$Type extends MessageType {
     constructor() {
         super("proto.ShadowPriest.Rotation", [
-            { no: 1, name: "type", kind: "enum", T: () => ["proto.ShadowPriest.Rotation.RotationType", ShadowPriest_Rotation_RotationType] }
+            { no: 1, name: "rotation_type", kind: "enum", T: () => ["proto.ShadowPriest.Rotation.RotationType", ShadowPriest_Rotation_RotationType] },
+            { no: 3, name: "use_dev_plague", kind: "scalar", T: 8 /*ScalarType.BOOL*/ }
         ]);
     }
     create(value) {
-        const message = { type: 0 };
+        const message = { rotationType: 0, useDevPlague: false };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -347,8 +356,11 @@ class ShadowPriest_Rotation$Type extends MessageType {
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
-                case /* proto.ShadowPriest.Rotation.RotationType type */ 1:
-                    message.type = reader.int32();
+                case /* proto.ShadowPriest.Rotation.RotationType rotation_type */ 1:
+                    message.rotationType = reader.int32();
+                    break;
+                case /* bool use_dev_plague */ 3:
+                    message.useDevPlague = reader.bool();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -362,9 +374,12 @@ class ShadowPriest_Rotation$Type extends MessageType {
         return message;
     }
     internalBinaryWrite(message, writer, options) {
-        /* proto.ShadowPriest.Rotation.RotationType type = 1; */
-        if (message.type !== 0)
-            writer.tag(1, WireType.Varint).int32(message.type);
+        /* proto.ShadowPriest.Rotation.RotationType rotation_type = 1; */
+        if (message.rotationType !== 0)
+            writer.tag(1, WireType.Varint).int32(message.rotationType);
+        /* bool use_dev_plague = 3; */
+        if (message.useDevPlague !== false)
+            writer.tag(3, WireType.Varint).bool(message.useDevPlague);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -378,19 +393,40 @@ export const ShadowPriest_Rotation = new ShadowPriest_Rotation$Type();
 // @generated message type with reflection information, may provide speed optimized methods
 class ShadowPriest_Options$Type extends MessageType {
     constructor() {
-        super("proto.ShadowPriest.Options", []);
+        super("proto.ShadowPriest.Options", [
+            { no: 1, name: "use_shadowfiend", kind: "scalar", T: 8 /*ScalarType.BOOL*/ }
+        ]);
     }
     create(value) {
-        const message = {};
+        const message = { useShadowfiend: false };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
         return message;
     }
     internalBinaryRead(reader, length, options, target) {
-        return target ?? this.create();
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* bool use_shadowfiend */ 1:
+                    message.useShadowfiend = reader.bool();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
     }
     internalBinaryWrite(message, writer, options) {
+        /* bool use_shadowfiend = 1; */
+        if (message.useShadowfiend !== false)
+            writer.tag(1, WireType.Varint).bool(message.useShadowfiend);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
