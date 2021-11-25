@@ -53,7 +53,7 @@ type Character struct {
 
 	// Used for applying the effects of hardcast / channeled spells at a later time.
 	// By definition there can be only 1 hardcast spell being cast at any moment.
-	HardcastAura Aura
+	Hardcast Hardcast
 
 	// Statistics describing the results of the sim.
 	Metrics CharacterMetrics
@@ -250,9 +250,9 @@ func (character *Character) advance(sim *Simulation, elapsedTime time.Duration) 
 	// Advance CDs and Auras
 	character.auraTracker.advance(sim)
 
-	if character.HardcastAura.Expires != 0 && character.HardcastAura.Expires <= sim.CurrentTime {
-		character.HardcastAura.OnExpire(sim)
-		character.HardcastAura = Aura{}
+	if character.Hardcast.Expires != 0 && character.Hardcast.Expires <= sim.CurrentTime {
+		character.Hardcast.OnExpire(sim)
+		character.Hardcast.Expires = 0
 	}
 }
 

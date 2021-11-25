@@ -77,6 +77,9 @@ func applyRaceEffects(agent Agent) {
 						spellEffect.DamageMultiplier *= 1.05
 					}
 				},
+				OnPeriodicDamage: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect, tickDamage *float64) {
+					*tickDamage *= 1.05
+				},
 			}
 		})
 
@@ -105,7 +108,7 @@ func applyRaceEffects(agent Agent) {
 						},
 					})
 					character.Metrics.AddInstantCast(ActionID{SpellID: 20554})
-					character.AddAuraUptime(TrollBerserkingAuraID, 20554, MinDuration(dur, sim.Duration - sim.CurrentTime))
+					character.AddAuraUptime(TrollBerserkingAuraID, 20554, MinDuration(dur, sim.Duration-sim.CurrentTime))
 					return true
 				}
 			},

@@ -26,7 +26,7 @@ func NewBalanceDruid(character core.Character, options proto.PlayerOptions, isr 
 		selfBuffs.Innervate = balanceOptions.Options.InnervateTarget.TargetIndex == 0
 	}
 
-	druid := druid.NewDruid(character, selfBuffs, *balanceOptions.Talents)
+	druid := druid.New(character, selfBuffs, *balanceOptions.Talents)
 	moonkin := &BalanceDruid{
 		Druid: druid,
 	}
@@ -42,7 +42,7 @@ type BalanceDruid struct {
 	druid.Druid
 
 	primaryRotation proto.BalanceDruid_Rotation
-	useBattleRes bool
+	useBattleRes    bool
 
 	// These are only used when primary spell is set to 'Adaptive'. When the mana
 	// tracker tells us we have extra mana to spare, use surplusRotation instead of
@@ -86,10 +86,10 @@ func (moonkin *BalanceDruid) actRotation(sim *core.Simulation, rotation proto.Ba
 	// Potentially allow options for "Time of cast" in future or default cast like 1 min into fight
 	// Currently just casts at the beginning of encounter (with all CDs popped)
 	if moonkin.useBattleRes {
-	    rebirthTime := moonkin.TryRebirth(sim)
-	    if rebirthTime > 0  {
-	      return rebirthTime
-	    }
+		rebirthTime := moonkin.TryRebirth(sim)
+		if rebirthTime > 0 {
+			return rebirthTime
+		}
 	}
 	innervateWait := moonkin.TryInnervate(sim)
 	if innervateWait != 0 {

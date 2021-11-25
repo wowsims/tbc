@@ -43,6 +43,9 @@ func init() {
 		{Name: "Ravager's Cuffs of Frozen Wrath", WowheadID: 30684, ID: -13, Categories: []proto.ItemCategory{proto.ItemCategory_ItemCategoryCaster}, Type: proto.ItemType_ItemTypeWrist, ArmorType: proto.ArmorType_ArmorTypeCloth, Phase: 1, Quality: proto.ItemQuality_ItemQualityEpic, Stats: stats.Stats{stats.Armor: 85, stats.FrostSpellPower: 58}},
 		{Name: "Ravager's Cuffs of Shadow Wrath", WowheadID: 30684, ID: -14, Categories: []proto.ItemCategory{proto.ItemCategory_ItemCategoryCaster}, Type: proto.ItemType_ItemTypeWrist, ArmorType: proto.ArmorType_ArmorTypeCloth, Phase: 1, Quality: proto.ItemQuality_ItemQualityEpic, Stats: stats.Stats{stats.Armor: 85, stats.ShadowSpellPower: 58}},
 		{Name: "Ravager's Wrist-Wraps of Nature's Wrath", WowheadID: 30685, ID: -15, Categories: []proto.ItemCategory{proto.ItemCategory_ItemCategoryCaster}, Type: proto.ItemType_ItemTypeWrist, ArmorType: proto.ArmorType_ArmorTypeLeather, Phase: 1, Quality: proto.ItemQuality_ItemQualityEpic, Stats: stats.Stats{stats.Armor: 159, stats.NatureSpellPower: 58}},
+		{Name: "Flawless Wand of Shadow Wrath", WowheadID: 25295, ID: -16, Categories: []proto.ItemCategory{proto.ItemCategory_ItemCategoryCaster}, Type: proto.ItemType_ItemTypeRanged, RangedWeaponType: proto.RangedWeaponType_RangedWeaponTypeWand, Phase: 1, Quality: proto.ItemQuality_ItemQualityUncommon, Stats: stats.Stats{stats.ShadowSpellPower: 25}},
+		{Name: "Amber Cape of Shadow Wrath", WowheadID: 25043, ID: -17, Categories: []proto.ItemCategory{proto.ItemCategory_ItemCategoryCaster}, Type: proto.ItemType_ItemTypeBack, Phase: 1, Quality: proto.ItemQuality_ItemQualityUncommon, Stats: stats.Stats{stats.ShadowSpellPower: 45}},
+		{Name: "Illidari Cape of Shadow Wrath", WowheadID: 31201, ID: -18, Categories: []proto.ItemCategory{proto.ItemCategory_ItemCategoryCaster}, Type: proto.ItemType_ItemTypeBack, Phase: 1, Quality: proto.ItemQuality_ItemQualityRare, Stats: stats.Stats{stats.ShadowSpellPower: 47}},
 	}...)
 
 	for _, v := range Items {
@@ -263,7 +266,7 @@ func EquipmentSpecFromStrings(itemStringSpecs []ItemStringSpec) *proto.Equipment
 	for i, itemStringSpec := range itemStringSpecs {
 		item := ByName[itemStringSpec.Name]
 		if item.ID == 0 {
-			log.Fatalf("Item not found: %s", itemStringSpec.Name)
+			log.Fatalf("Item not found: %#v", itemStringSpec)
 		}
 		itemSpec := &proto.ItemSpec{
 			Id: item.ID,

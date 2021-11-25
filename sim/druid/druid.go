@@ -107,7 +107,7 @@ func (druid *Druid) applyNaturesGrace(spellCast *core.SpellCast) {
 	}
 }
 
-func NewDruid(char core.Character, selfBuffs SelfBuffs, talents proto.DruidTalents) Druid {
+func New(char core.Character, selfBuffs SelfBuffs, talents proto.DruidTalents) Druid {
 
 	char.AddStat(stats.SpellHit, float64(talents.BalanceOfPower)*2*core.SpellHitRatingPerHitChance)
 

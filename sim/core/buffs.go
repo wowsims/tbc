@@ -43,7 +43,6 @@ func applyBuffEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs proto.P
 			stats.SpellHit: 1 * SpellHitRatingPerHitChance,
 		})
 	}
-
 	character.AddStats(stats.Stats{
 		stats.Spirit: GetTristateValueFloat(raidBuffs.DivineSpirit, 50.0, 50.0),
 	})

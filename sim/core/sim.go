@@ -122,6 +122,7 @@ func (sim *Simulation) reset() {
 }
 
 type PendingAction struct {
+	Name         string
 	OnAction     func(*Simulation)
 	CleanUp      func(*Simulation)
 	NextActionAt time.Duration
@@ -185,7 +186,9 @@ func (sim *Simulation) RunOnce() {
 	for _, party := range sim.Raid.Parties {
 		for _, agent := range party.Players {
 			ag := agent
-			pa := &PendingAction{}
+			pa := &PendingAction{
+				Name: "Agent",
+			}
 			pa.OnAction = func(sim *Simulation) {
 				ag.GetCharacter().TryUseCooldowns(sim)
 				pa.NextActionAt = ag.Act(sim)
@@ -220,10 +223,28 @@ func (sim *Simulation) RunOnce() {
 			// This path is not currently used by individual shaman sim.
 			if pa.NextActionAt == NeverExpires {
 				sim.pendingActions = sim.pendingActions[1:] // cut off front
+			} else {
+				handled := false
+				for i, v := range sim.pendingActions {
+					if i == 0 {
+						continue
+					}
+					if v.NextActionAt >= pa.NextActionAt {
+						handled = true
+						if i == 1 {
+							sim.pendingActions[0] = pa
+							break // just leave it there
+						}
+						copy(sim.pendingActions, sim.pendingActions[1:i])
+						sim.pendingActions[i-1] = pa
+						break
+					}
+				}
+				if !handled {
+					copy(sim.pendingActions, sim.pendingActions[1:])
+					sim.pendingActions[len(sim.pendingActions)-1] = pa
+				}
 			}
-			sort.Slice(sim.pendingActions, func(i, j int) bool {
-				return sim.pendingActions[i].NextActionAt < sim.pendingActions[j].NextActionAt
-			})
 		}
 	}
 
@@ -235,7 +256,19 @@ func (sim *Simulation) RunOnce() {
 }
 
 func (sim *Simulation) AddPendingAction(pa *PendingAction) {
-	sim.pendingActions = append(sim.pendingActions, pa)
+	handled := false
+	for i, v := range sim.pendingActions {
+		if v.NextActionAt >= pa.NextActionAt {
+			handled = true
+			sim.pendingActions = append(sim.pendingActions, &PendingAction{})
+			copy(sim.pendingActions[i+1:], sim.pendingActions[i:])
+			sim.pendingActions[i] = pa
+			break
+		}
+	}
+	if !handled {
+		sim.pendingActions = append(sim.pendingActions, pa)
+	}
 }
 
 // TODO: remove pending actions
