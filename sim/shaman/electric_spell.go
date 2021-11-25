@@ -69,7 +69,8 @@ func (shaman *Shaman) newElectricSpellCast(name string, actionID core.ActionID, 
 func (shaman *Shaman) newElectricSpellEffect(minBaseDamage float64, maxBaseDamage float64, spellCoefficient float64, isLightningOverload bool) core.SpellHitEffect {
 	effect := core.SpellHitEffect{
 		SpellEffect: core.SpellEffect{
-			DamageMultiplier: 1,
+			DamageMultiplier:       1,
+			StaticDamageMultiplier: 1,
 		},
 		DirectInput: core.DirectDamageSpellInput{
 			MinBaseDamage:    minBaseDamage,

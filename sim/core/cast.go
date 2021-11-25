@@ -66,6 +66,8 @@ type Cast struct {
 	// Callbacks for providing additional custom behavior.
 	OnCastComplete OnCastComplete
 
+	Binary bool // if spell is binary it ignores partial resists
+
 	// Internal field only, used to prevent cast pool objects from being used by
 	// multiple casts simultaneously.
 	objectInUse bool

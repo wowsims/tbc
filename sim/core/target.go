@@ -117,6 +117,9 @@ func miseryAura() Aura {
 		OnBeforeSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect) {
 			spellEffect.DamageMultiplier *= 1.05
 		},
+		OnPeriodicDamage: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect, tickDamage *float64) {
+			*tickDamage *= 1.05
+		},
 	}
 }
 
@@ -168,7 +171,20 @@ func curseOfElementsAura(coe proto.TristateEffect) Aura {
 		ID:   CurseOfElementsDebuffID,
 		Name: "Curse of the Elements",
 		OnBeforeSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect) {
+			if spellCast.SpellSchool == stats.NatureSpellPower ||
+				spellCast.SpellSchool == stats.HolySpellPower ||
+				spellCast.SpellSchool == stats.AttackPower {
+				return // does not apply to these schools
+			}
 			spellEffect.DamageMultiplier *= mult
+		},
+		OnPeriodicDamage: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect, tickDamage *float64) {
+			if spellCast.SpellSchool == stats.NatureSpellPower ||
+				spellCast.SpellSchool == stats.HolySpellPower ||
+				spellCast.SpellSchool == stats.AttackPower {
+				return // does not apply to these schools
+			}
+			*tickDamage *= mult
 		},
 	}
 }

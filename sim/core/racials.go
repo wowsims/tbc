@@ -77,6 +77,9 @@ func applyRaceEffects(agent Agent) {
 						spellEffect.DamageMultiplier *= 1.05
 					}
 				},
+				OnPeriodicDamage: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect, tickDamage *float64) {
+					*tickDamage *= 1.05
+				},
 			}
 		})
 
