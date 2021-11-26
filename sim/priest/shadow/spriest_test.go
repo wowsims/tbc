@@ -50,5 +50,5 @@ func TestAverageDPS(t *testing.T) {
 		Gear:          P1Gear,
 	})
 
-	core.IndividualSimAverageTest("P1Average", t, isr, 1204.0)
+	core.IndividualSimAverageTest("P1Average", t, isr, 1200.2)
 }

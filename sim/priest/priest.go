@@ -121,6 +121,14 @@ func New(char core.Character, selfBuffs SelfBuffs, talents proto.PriestTalents) 
 		},
 	})
 
+	char.AddStatDependency(stats.StatDependency{
+		SourceStat:   stats.Strength,
+		ModifiedStat: stats.AttackPower,
+		Modifier: func(strength float64, attackPower float64) float64 {
+			return attackPower + strength*2
+		},
+	})
+
 	if talents.Meditation > 0 {
 		char.PseudoStats.SpiritRegenRateCasting = float64(talents.Meditation) * 0.1
 	}
@@ -163,68 +171,68 @@ func init() {
 	// TODO: str/agi/stm are just the base priest stats, not modified for each race yet. Not sure it matters...
 
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceHuman, Class: proto.Class_ClassPriest}] = stats.Stats{
-		stats.Strength:  146,
-		stats.Agility:   184,
-		stats.Stamina:   154,
-		stats.Intellect: 180,
-		stats.Spirit:    135,
-		stats.Mana:      2090,
+		stats.Strength:  39,
+		stats.Agility:   45,
+		stats.Stamina:   58,
+		stats.Intellect: 145,
+		stats.Spirit:    166,
+		stats.Mana:      2620,
 		stats.SpellCrit: core.SpellCritRatingPerCritChance * 1.24,
 	}
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceDwarf, Class: proto.Class_ClassPriest}] = stats.Stats{
-		stats.Strength:  146,
-		stats.Agility:   184,
-		stats.Stamina:   154,
-		stats.Intellect: 179,
-		stats.Spirit:    134,
-		stats.Mana:      2090,
+		stats.Strength:  41,
+		stats.Agility:   41,
+		stats.Stamina:   61,
+		stats.Intellect: 144,
+		stats.Spirit:    150,
+		stats.Mana:      2620,
 		stats.SpellCrit: core.SpellCritRatingPerCritChance * 1.24,
 	}
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceNightElf, Class: proto.Class_ClassPriest}] = stats.Stats{
-		stats.Strength:  146,
-		stats.Agility:   184,
-		stats.Stamina:   154,
-		stats.Intellect: 180,
-		stats.Spirit:    135,
-		stats.Mana:      2090,
+		stats.Strength:  36,
+		stats.Agility:   50,
+		stats.Stamina:   57,
+		stats.Intellect: 145,
+		stats.Spirit:    151,
+		stats.Mana:      2620,
 		stats.SpellCrit: core.SpellCritRatingPerCritChance * 1.24,
 	}
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceDraenei, Class: proto.Class_ClassPriest}] = stats.Stats{
-		stats.Strength:  146,
-		stats.Agility:   184,
-		stats.Stamina:   154,
-		stats.Intellect: 180,
-		stats.Spirit:    137,
-		stats.Mana:      2090,
+		stats.Strength:  40,
+		stats.Agility:   42,
+		stats.Stamina:   57,
+		stats.Intellect: 146,
+		stats.Spirit:    153,
+		stats.Mana:      2620,
 		stats.SpellCrit: core.SpellCritRatingPerCritChance * 1.24,
 	}
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceUndead, Class: proto.Class_ClassPriest}] = stats.Stats{
-		stats.Strength:  146,
-		stats.Agility:   184,
-		stats.Stamina:   154,
-		stats.Intellect: 178,
-		stats.Spirit:    135,
-		stats.Mana:      2090,
+		stats.Strength:  38,
+		stats.Agility:   43,
+		stats.Stamina:   59,
+		stats.Intellect: 143,
+		stats.Spirit:    156,
+		stats.Mana:      2620,
 		stats.SpellCrit: core.SpellCritRatingPerCritChance * 1.24,
 	}
-	troll := stats.Stats{
-		stats.Strength:  146,
-		stats.Agility:   184,
-		stats.Stamina:   154,
-		stats.Intellect: 176,
-		stats.Spirit:    136,
-		stats.Mana:      2090,
+	trollStats := stats.Stats{
+		stats.Strength:  40,
+		stats.Agility:   47,
+		stats.Stamina:   59,
+		stats.Intellect: 141,
+		stats.Spirit:    152,
+		stats.Mana:      2620,
 		stats.SpellCrit: core.SpellCritRatingPerCritChance * 1.24,
 	}
-	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceTroll10, Class: proto.Class_ClassPriest}] = troll
-	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceTroll30, Class: proto.Class_ClassPriest}] = troll
+	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceTroll10, Class: proto.Class_ClassPriest}] = trollStats
+	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceTroll30, Class: proto.Class_ClassPriest}] = trollStats
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceBloodElf, Class: proto.Class_ClassPriest}] = stats.Stats{
-		stats.Strength:  146,
-		stats.Agility:   184,
-		stats.Stamina:   154,
-		stats.Intellect: 183,
-		stats.Spirit:    138,
-		stats.Mana:      2090,
+		stats.Strength:  36,
+		stats.Agility:   47,
+		stats.Stamina:   57,
+		stats.Intellect: 149,
+		stats.Spirit:    150,
+		stats.Mana:      2620,
 		stats.SpellCrit: core.SpellCritRatingPerCritChance * 1.24,
 	}
 }
