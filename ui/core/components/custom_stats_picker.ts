@@ -28,5 +28,20 @@ export class CustomStatsPicker extends Component {
         player.setCustomStats(customStats);
       },
     }));
+
+		player.customStatsChangeEmitter.on(() => {
+			this.statPickers.forEach(statPicker => {
+				if (statPicker.getInputValue() > 0) {
+					statPicker.rootElem.classList.remove('negative');
+					statPicker.rootElem.classList.add('positive');
+				} else if (statPicker.getInputValue() < 0) {
+					statPicker.rootElem.classList.remove('positive');
+					statPicker.rootElem.classList.add('negative');
+				} else {
+					statPicker.rootElem.classList.remove('negative');
+					statPicker.rootElem.classList.remove('positive');
+				}
+			});
+		});
   }
 }
