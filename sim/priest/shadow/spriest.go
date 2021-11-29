@@ -136,6 +136,14 @@ func (spriest *ShadowPriest) Act(sim *core.Simulation) time.Duration {
 	var spell *core.SimpleSpell
 	var wait time.Duration
 
+	// need to add something here to track spell cool downs and remaining dot durations
+	// calculate dps of each possible spell as (DMG)/(remaining_cd + gcd)
+	// find maximum dps spell to cast next
+	// if max dps spell's wait time > gcd, then find the second highest dps spell to cast
+	// if max dps spell's wait time > 0.9 seconds (TBD), then check to see if adding a mf filler is more dps
+	// option 1: (Spell_dmg)/(wait_time + gcd) ; option 2: (Spell_dmg + mf_dmg)/(gcd + gcd)
+	// if option 2 is chosen, then enter into the mf routine to optimize sequence
+
 	timeForDots := sim.Duration-sim.CurrentTime > time.Second*12
 	if spriest.UseShadowfiend &&
 		spriest.CurrentMana()/spriest.MaxMana() < 0.5 &&
@@ -167,6 +175,7 @@ func (spriest *ShadowPriest) Act(sim *core.Simulation) time.Duration {
 			case proto.ShadowPriest_Rotation_Basic:
 				// basic rotation will simply wait the whole length
 			case proto.ShadowPriest_Rotation_IntelligentClipping:
+
 				minWait := core.MinDuration(mbcd, swdcd) + 1
 				if minWait < mfLength && minWait > (spriest.MindFlaySpell.DotInput.TickLength/2) {
 					numTicks := int(minWait/spriest.MindFlaySpell.DotInput.TickLength) + 1
@@ -178,10 +187,6 @@ func (spriest *ShadowPriest) Act(sim *core.Simulation) time.Duration {
 						spell.ActionID.Tag = int32(numTicks)
 					}
 					wait = spriest.MindFlaySpell.DotInput.TickLength * time.Duration(spriest.MindFlaySpell.DotInput.NumberOfTicks)
-					minGCD := spriest.GetRemainingCD(core.GCDCooldownID, sim.CurrentTime)
-					if wait < minGCD {
-						wait = minGCD
-					}
 				} else if minWait < spriest.MindFlaySpell.DotInput.TickLength {
 					// just wait until its off CD.. dont cast a spell for no reason
 					spell.Cancel() // turn off 'in use'
@@ -229,7 +234,7 @@ func (spriest *ShadowPriest) Act(sim *core.Simulation) time.Duration {
 		return sim.CurrentTime + regenTime
 	}
 	if wait != 0 {
-		return sim.CurrentTime + wait
+		return sim.CurrentTime + core.MaxDuration(spriest.GetRemainingCD(core.GCDCooldownID, sim.CurrentTime), wait)
 	}
 
 	return sim.CurrentTime + core.MaxDuration(
