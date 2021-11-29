@@ -22,6 +22,7 @@ func (priest *Priest) newShadowfiendTemplate(sim *core.Simulation) core.SimpleSp
 		BaseManaCost:   575,
 		ManaCost:       575,
 		CastTime:       0,
+		Cooldown:       time.Minute * 5,
 		ActionID: core.ActionID{
 			SpellID:    SpellIDShadowfiend,
 			CooldownID: ShadowfiendCD,
