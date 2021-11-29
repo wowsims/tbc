@@ -7,7 +7,11 @@ export class CustomStatsPicker extends Component {
         this.stats = stats;
         const label = document.createElement('span');
         label.classList.add('custom-stats-label');
-        label.textContent = 'Custom Stats';
+        label.textContent = 'Bonus Stats';
+        tippy(label, {
+            'content': 'Extra stats to add on top of gear, buffs, etc.',
+            'allowHTML': true,
+        });
         this.rootElem.appendChild(label);
         this.statPickers = this.stats.map(stat => new NumberPicker(this.rootElem, player, {
             label: statNames[stat],
