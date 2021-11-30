@@ -178,3 +178,31 @@ func (characterMetrics *CharacterMetrics) ToProto(numIterations int32) *proto.Pl
 
 	return protoMetrics
 }
+
+type AuraMetrics struct {
+	ID int32
+
+	// Metrics for the current iteration.
+	Uptime time.Duration
+
+	// Aggregate values. These are updated after each iteration.
+	uptimeSum        time.Duration
+	uptimeSumSquared time.Duration
+}
+
+// This should be called when a Sim iteration is complete.
+func (auraMetrics *AuraMetrics) doneIteration() {
+	auraMetrics.uptimeSum += auraMetrics.Uptime
+	auraMetrics.uptimeSumSquared += auraMetrics.Uptime * auraMetrics.Uptime
+}
+
+func (auraMetrics *AuraMetrics) ToProto(numIterations int32) *proto.AuraMetrics {
+	uptimeAvg := auraMetrics.uptimeSum.Seconds() / float64(numIterations)
+
+	return &proto.AuraMetrics{
+		Id: auraMetrics.ID,
+
+		UptimeSecondsAvg:   uptimeAvg,
+		UptimeSecondsStdev: math.Sqrt((auraMetrics.uptimeSumSquared.Seconds() / float64(numIterations)) - (uptimeAvg * uptimeAvg)),
+	}
+}

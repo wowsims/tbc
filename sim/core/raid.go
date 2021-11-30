@@ -2,6 +2,7 @@ package core
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/wowsims/tbc/sim/core/proto"
 	"github.com/wowsims/tbc/sim/core/stats"
@@ -44,9 +45,9 @@ func (party *Party) AddStats(newStats stats.Stats) {
 	}
 }
 
-func (party *Party) doneIteration(encounterDurationSeconds float64) {
+func (party *Party) doneIteration(simDuration time.Duration) {
 	for _, agent := range party.Players {
-		agent.GetCharacter().Metrics.doneIteration(encounterDurationSeconds)
+		agent.GetCharacter().doneIteration(simDuration)
 	}
 }
 
@@ -156,9 +157,9 @@ func (raid Raid) AddStats(s stats.Stats) {
 	}
 }
 
-func (raid *Raid) doneIteration(encounterDurationSeconds float64) {
+func (raid *Raid) doneIteration(simDuration time.Duration) {
 	for _, party := range raid.Parties {
-		party.doneIteration(encounterDurationSeconds)
+		party.doneIteration(simDuration)
 	}
 }
 
