@@ -92,31 +92,17 @@ export class Target {
 		});
 	}
 
-  // Returns JSON representing all the current values.
+	fromProto(proto: TargetProto) {
+		this.setArmor(proto.armor);
+		this.setMobType(proto.mobType);
+		this.setDebuffs(proto.debuffs || Debuffs.create());
+	}
+
   toJson(): Object {
-    return {
-      'armor': this.armor,
-      'mobType': this.mobType,
-      'debuffs': Debuffs.toJson(this.debuffs),
-    };
+		return TargetProto.toJson(this.toProto()) as Object;
   }
 
-  // Set all the current values, assumes obj is the same type returned by toJson().
   fromJson(obj: any) {
-		const parsedArmor = parseInt(obj['armor']);
-		if (!isNaN(parsedArmor) && parsedArmor != 0) {
-			this.setArmor(parsedArmor);
-		}
-
-		const parsedMobType = parseInt(obj['mobType']);
-		if (!isNaN(parsedMobType) && parsedMobType != 0) {
-			this.setMobType(parsedMobType);
-		}
-
-		try {
-			this.setDebuffs(Debuffs.fromJson(obj['debuffs']));
-		} catch (e) {
-			console.warn('Failed to parse debuffs: ' + e);
-		}
+		this.fromProto(TargetProto.fromJson(obj));
   }
 }

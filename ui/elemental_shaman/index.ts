@@ -105,10 +105,6 @@ const theme = new DefaultTheme<Spec.SpecElementalShaman>(document.body, {
 		defaults: {
 			// TBC Release Phase, i.e. Black Temple is phase 3.
 			phase: 2,
-			// Default encounter settings.
-			encounter: Encounter.create({
-				duration: 300,
-			}),
 			// Default raid/party buffs settings.
 			raidBuffs: RaidBuffs.create({
 				arcaneBrilliance: true,
@@ -120,16 +116,6 @@ const theme = new DefaultTheme<Spec.SpecElementalShaman>(document.body, {
 			individualBuffs: IndividualBuffs.create({
 				blessingOfKings: true,
 				blessingOfWisdom: 2,
-			}),
-		},
-	},
-	target: {
-		defaults: {
-			armor: 0,
-			mobType: MobType.MobTypeDemon,
-			debuffs: Debuffs.create({
-				judgementOfWisdom: true,
-				misery: true,
 			}),
 		},
 	},
@@ -204,13 +190,27 @@ const theme = new DefaultTheme<Spec.SpecElementalShaman>(document.body, {
 			OtherInputs.NumStartingPotions,
 		],
 	},
+	encounter: {
+		primaryTarget: {
+			defaults: {
+				armor: 0,
+				mobType: MobType.MobTypeDemon,
+				debuffs: Debuffs.create({
+					judgementOfWisdom: true,
+					misery: true,
+				}),
+			},
+		},
+	},
+	encounterPicker: {
+		// Whether to include 'Target Armor' in the 'Encounter' section of the settings tab.
+		showTargetArmor: false,
+		// Whether to include 'Num Targets' in the 'Encounter' section of the settings tab.
+		showNumTargets: true,
+	},
 	// If true, the talents on the talents tab will not be individually modifiable by the user.
 	// Note that the use can still pick between preset talents, if there is more than 1.
 	freezeTalents: false,
-	// Whether to include 'Target Armor' in the 'Encounter' section of the settings tab.
-  showTargetArmor: false,
-	// Whether to include 'Num Targets' in the 'Encounter' section of the settings tab.
-  showNumTargets: true,
   presets: {
 		// Preset talents that the user can quickly select.
     talents: [

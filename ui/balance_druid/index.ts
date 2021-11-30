@@ -30,7 +30,7 @@ import * as Presets from './presets.js';
 
 const theme = new DefaultTheme<Spec.SpecBalanceDruid>(document.body, {
 	// Can be 'Alpha', 'Beta', or 'Live'. Just adds a postfix to the generated title.
-	releaseStatus: 'Alpha',
+	releaseStatus: 'Beta',
 	// List any known bugs / issues here and they'll be shown on the site.
 	knownIssues: [
 	],
@@ -111,10 +111,6 @@ const theme = new DefaultTheme<Spec.SpecBalanceDruid>(document.body, {
 		defaults: {
 			// TBC Release Phase, i.e. Black Temple is phase 3.
 			phase: 2,
-			// Default encounter settings.
-			encounter: Encounter.create({
-				duration: 300,
-			}),
 			// Default raid/party buffs settings.
 			raidBuffs: RaidBuffs.create({
 				arcaneBrilliance: true,
@@ -129,17 +125,6 @@ const theme = new DefaultTheme<Spec.SpecBalanceDruid>(document.body, {
 			individualBuffs: IndividualBuffs.create({
 				blessingOfKings: true,
 				blessingOfWisdom: 2,
-			}),
-		},
-	},
-	target: {
-		defaults: {
-			armor: 0,
-			mobType: MobType.MobTypeDemon,
-			debuffs: Debuffs.create({
-				judgementOfWisdom: true,
-				misery: true,
-				curseOfElements: TristateEffect.TristateEffectRegular,
 			}),
 		},
 	},
@@ -211,13 +196,28 @@ const theme = new DefaultTheme<Spec.SpecBalanceDruid>(document.body, {
 			OtherInputs.NumStartingPotions,
 		],
 	},
+	encounter: {
+		primaryTarget: {
+			defaults: {
+				armor: 0,
+				mobType: MobType.MobTypeDemon,
+				debuffs: Debuffs.create({
+					judgementOfWisdom: true,
+					misery: true,
+					curseOfElements: TristateEffect.TristateEffectRegular,
+				}),
+			},
+		},
+	},
+	encounterPicker: {
+		// Whether to include 'Target Armor' in the 'Encounter' section of the settings tab.
+		showTargetArmor: false,
+		// Whether to include 'Num Targets' in the 'Encounter' section of the settings tab.
+		showNumTargets: true,
+	},
 	// If true, the talents on the talents tab will not be individually modifiable by the user.
 	// Note that the use can still pick between preset talents, if there is more than 1.
 	freezeTalents: false,
-	// Whether to include 'Target Armor' in the 'Encounter' section of the settings tab.
-  showTargetArmor: false,
-	// Whether to include 'Num Targets' in the 'Encounter' section of the settings tab.
-  showNumTargets: true,
   presets: {
 		// Preset talents that the user can quickly select.
     talents: [

@@ -4,6 +4,7 @@ import { makeIndividualSimRequest } from '/tbc/core/proto_utils/request_helpers.
 import { specToLocalStorageKey } from '/tbc/core/proto_utils/utils.js';
 import { Player, PlayerConfig } from './player.js';
 import { Sim, SimConfig } from './sim.js';
+import { Encounter, EncounterConfig } from './encounter.js';
 import { Target, TargetConfig } from './target.js';
 import { TypedEvent } from './typed_event.js';
 
@@ -24,7 +25,7 @@ export interface SimUIConfig<SpecType extends Spec> {
 	knownIssues?: Array<string>;
 	sim: SimConfig;
 	player: PlayerConfig<SpecType>;
-	target: TargetConfig;
+	encounter: EncounterConfig;
 }
 
 // Core UI module.
@@ -32,7 +33,7 @@ export abstract class SimUI<SpecType extends Spec> {
   readonly parentElem: HTMLElement;
   readonly sim: Sim;
   readonly player: Player<SpecType>;
-  readonly target: Target;
+  readonly encounter: Encounter;
 	readonly simUiConfig: SimUIConfig<SpecType>;
 
   // Emits when anything from sim, player, or target changes.
@@ -44,13 +45,13 @@ export abstract class SimUI<SpecType extends Spec> {
     this.parentElem = parentElem;
     this.sim = new Sim(config.sim);
 		this.player = new Player<SpecType>(config.player, this.sim);
-    this.target = new Target(config.target, this.sim);
+    this.encounter = new Encounter(config.encounter, this.sim);
 		this.simUiConfig = config;
 
     [
       this.sim.changeEmitter,
       this.player.changeEmitter,
-      this.target.changeEmitter,
+      this.encounter.changeEmitter,
     ].forEach(emitter => emitter.on(() => this.changeEmitter.emit()));
 
     this.exclusivityMap = {
@@ -88,7 +89,7 @@ export abstract class SimUI<SpecType extends Spec> {
     return {
       'sim': this.sim.toJson(),
       'player': this.player.toJson(),
-      'target': this.target.toJson(),
+      'encounter': this.encounter.toJson(),
     };
 	}
 
@@ -102,8 +103,8 @@ export abstract class SimUI<SpecType extends Spec> {
 			this.player.fromJson(obj['player']);
 		}
 
-		if (obj['target']) {
-			this.target.fromJson(obj['target']);
+		if (obj['encounter']) {
+			this.encounter.fromJson(obj['encounter']);
 		}
   }
 
@@ -223,19 +224,13 @@ export abstract class SimUI<SpecType extends Spec> {
 	}
 
   makeCurrentIndividualSimRequest(iterations: number, debug: boolean): IndividualSimRequest {
-		const encounter = this.sim.getEncounter();
-		const numTargets = Math.max(1, this.sim.getNumTargets());
-		for (let i = 0; i < numTargets; i++) {
-			encounter.targets.push(this.target.toProto());
-		}
-
     return makeIndividualSimRequest(
       this.sim.getRaidBuffs(),
       this.sim.getPartyBuffs(),
       this.sim.getIndividualBuffs(),
       this.player.getConsumes(),
       this.player.getCustomStats(),
-      encounter,
+      this.encounter.toProto(),
       this.player.getGear(),
       this.player.getRace(),
       this.player.getRotation(),

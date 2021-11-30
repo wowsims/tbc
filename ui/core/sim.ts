@@ -47,7 +47,6 @@ import { WorkerPool } from './worker_pool.js';
 export interface SimConfig {
   defaults: {
 		phase: number,
-    encounter: Encounter,
     raidBuffs: RaidBuffs,
     partyBuffs: PartyBuffs,
     individualBuffs: IndividualBuffs,
@@ -60,8 +59,6 @@ export class Sim extends WorkerPool {
   readonly raidBuffsChangeEmitter = new TypedEvent<void>();
   readonly partyBuffsChangeEmitter = new TypedEvent<void>();
   readonly individualBuffsChangeEmitter = new TypedEvent<void>();
-  readonly encounterChangeEmitter = new TypedEvent<void>();
-  readonly numTargetsChangeEmitter = new TypedEvent<void>();
 
   // Emits when any of the above emitters emit.
   readonly changeEmitter = new TypedEvent<void>();
@@ -78,8 +75,6 @@ export class Sim extends WorkerPool {
   private _raidBuffs: RaidBuffs;
   private _partyBuffs: PartyBuffs;
   private _individualBuffs: IndividualBuffs;
-  private _encounter: Encounter;
-  private _numTargets: number;
 
   private _init = false;
 
@@ -90,15 +85,11 @@ export class Sim extends WorkerPool {
     this._raidBuffs = config.defaults.raidBuffs;
     this._partyBuffs = config.defaults.partyBuffs;
     this._individualBuffs = config.defaults.individualBuffs;
-    this._encounter = config.defaults.encounter;
-    this._numTargets = 1;
 
     [
       this.raidBuffsChangeEmitter,
       this.partyBuffsChangeEmitter,
       this.individualBuffsChangeEmitter,
-      this.encounterChangeEmitter,
-      this.numTargetsChangeEmitter,
       this.phaseChangeEmitter,
     ].forEach(emitter => emitter.on(() => this.changeEmitter.emit()));
   }
@@ -199,31 +190,6 @@ export class Sim extends WorkerPool {
     this.individualBuffsChangeEmitter.emit();
   }
 
-  getEncounter(): Encounter {
-    // Make a defensive copy
-    return Encounter.clone(this._encounter);
-  }
-
-  setEncounter(newEncounter: Encounter) {
-    if (Encounter.equals(this._encounter, newEncounter))
-      return;
-
-    // Make a defensive copy
-    this._encounter = Encounter.clone(newEncounter);
-    this.encounterChangeEmitter.emit();
-  }
-  
-  getNumTargets(): number {
-    return this._numTargets;
-  }
-  setNumTargets(newNumTargets: number) {
-    if (newNumTargets == this._numTargets)
-			return;
-
-		this._numTargets = newNumTargets;
-		this.numTargetsChangeEmitter.emit();
-  }
-
   lookupItemSpec(itemSpec: ItemSpec): EquippedItem | null {
     const item = this._items[itemSpec.id];
     if (!item)
@@ -263,8 +229,6 @@ export class Sim extends WorkerPool {
       'raidBuffs': RaidBuffs.toJson(this._raidBuffs),
       'partyBuffs': PartyBuffs.toJson(this._partyBuffs),
       'individualBuffs': IndividualBuffs.toJson(this._individualBuffs),
-      'encounter': Encounter.toJson(this._encounter),
-      'numTargets': this._numTargets,
     };
   }
 
@@ -286,17 +250,6 @@ export class Sim extends WorkerPool {
 			this.setIndividualBuffs(IndividualBuffs.fromJson(obj['individualBuffs']));
 		} catch (e) {
 			console.warn('Failed to parse individual buffs: ' + e);
-		}
-
-		try {
-			this.setEncounter(Encounter.fromJson(obj['encounter']));
-		} catch (e) {
-			console.warn('Failed to parse encounter: ' + e);
-		}
-
-		const parsedNumTargets = parseInt(obj['numTargets']);
-		if (!isNaN(parsedNumTargets) && parsedNumTargets != 0) {
-			this.setNumTargets(parsedNumTargets);
 		}
   }
 }

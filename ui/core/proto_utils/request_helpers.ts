@@ -27,7 +27,6 @@ export function makeComputeStatsRequest<SpecType extends Spec>(
     individualBuffs: IndividualBuffs,
     consumes: Consumes,
     customStats: Stats,
-    encounter: Encounter,
     gear: Gear,
     race: Race,
     rotation: SpecRotation<SpecType>,

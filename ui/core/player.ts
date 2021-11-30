@@ -169,7 +169,6 @@ export class Player<SpecType extends Spec> {
       this.sim.getIndividualBuffs(),
       this._consumes,
       this._customStats,
-      this.sim.getEncounter(),
       this._gear,
       this._race,
       this._rotation,
