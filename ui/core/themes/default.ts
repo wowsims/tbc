@@ -70,6 +70,10 @@ export interface InputSection {
 }
 
 export interface DefaultThemeConfig<SpecType extends Spec> extends SimUIConfig<SpecType> {
+  epStats: Array<Stat>;
+  epReferenceStat: Stat;
+  displayStats: Array<Stat>;
+
 	selfBuffInputs: IconSection<Player<any>>;
 	buffInputs: IconSection<Sim>;
 	debuffInputs: IconSection<Target>;
@@ -79,6 +83,7 @@ export interface DefaultThemeConfig<SpecType extends Spec> extends SimUIConfig<S
   additionalSections?: Record<string, InputSection>;
 	encounterPicker: EncounterPickerConfig,
 	freezeTalents?: boolean;
+
   presets: {
     gear: Array<PresetGear>,
     encounters: Array<SavedDataConfig<Encounter, EncounterProto>>,
@@ -124,13 +129,13 @@ export class DefaultTheme<SpecType extends Spec> extends SimUI<SpecType> {
 
     const results = new Results(this.parentElem.getElementsByClassName('default-results')[0] as HTMLElement, this);
     const detailedResults = new DetailedResults(this.parentElem.getElementsByClassName('detailed-results')[0] as HTMLElement);
-    const actions = new Actions(this.parentElem.getElementsByClassName('default-actions')[0] as HTMLElement, this, config.player.epStats, config.player.epReferenceStat, results, detailedResults);
+    const actions = new Actions(this.parentElem.getElementsByClassName('default-actions')[0] as HTMLElement, this, config.epStats, config.epReferenceStat, results, detailedResults);
     const logRunner = new LogRunner(this.parentElem.getElementsByClassName('log-runner')[0] as HTMLElement, this, results, detailedResults);
 
-    const characterStats = new CharacterStats(this.parentElem.getElementsByClassName('default-stats')[0] as HTMLElement, config.player.displayStats, this.player);
+    const characterStats = new CharacterStats(this.parentElem.getElementsByClassName('default-stats')[0] as HTMLElement, config.displayStats, this.player);
 
     const gearPicker = new GearPicker(this.parentElem.getElementsByClassName('gear-picker')[0] as HTMLElement, this.player);
-    const customStatsPicker = new CustomStatsPicker(this.parentElem.getElementsByClassName('custom-stats-picker')[0] as HTMLElement, this.player, config.player.epStats);
+    const customStatsPicker = new CustomStatsPicker(this.parentElem.getElementsByClassName('custom-stats-picker')[0] as HTMLElement, this.player, config.epStats);
 
     const talentsPicker = newTalentsPicker(this.player.spec, this.parentElem.getElementsByClassName('talents-picker')[0] as HTMLElement, this.player);
 		// Add a url parameter to help people trapped in the wrong talents   ;)

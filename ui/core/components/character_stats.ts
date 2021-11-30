@@ -44,7 +44,7 @@ export class CharacterStats extends Component {
     });
 
 		this.updateStats(new Stats());
-		player.characterStatsEmitter.on(() => {
+		player.currentStatsEmitter.on(() => {
 			this.updateStats(new Stats(player.getCurrentStats().finalStats));
 		});
   }

@@ -1,37 +1,26 @@
 import { Encounter as EncounterProto } from '/tbc/core/proto/common.js';
-import { Target, TargetConfig } from '/tbc/core/target.js';
+import { Target } from '/tbc/core/target.js';
 
-import { Listener } from './typed_event.js';
 import { Sim } from './sim.js';
 import { TypedEvent } from './typed_event.js';
-import { sum } from './utils.js';
-import { wait } from './utils.js';
-
-export interface EncounterConfig {
-	primaryTarget: TargetConfig,
-}
 
 // Manages all the settings for an Encounter.
 export class Encounter {
+	private readonly sim: Sim;
+
+  private duration: number = 300;
+  private numTargets: number = 1;
+	readonly primaryTarget: Target;
+
   readonly durationChangeEmitter = new TypedEvent<void>();
   readonly numTargetsChangeEmitter = new TypedEvent<void>();
 
   // Emits when any of the above emitters emit.
   readonly changeEmitter = new TypedEvent<void>();
 
-  private duration: number;
-  private numTargets: number;
-
-	readonly primaryTarget: Target;
-
-	private readonly sim: Sim;
-
-  constructor(config: EncounterConfig, sim: Sim) {
+  constructor(sim: Sim) {
 		this.sim = sim;
-
-		this.duration = 300;
-		this.numTargets = 1;
-		this.primaryTarget = new Target(config.primaryTarget, sim);
+		this.primaryTarget = new Target(sim);
 
     [
       this.durationChangeEmitter,

@@ -13,27 +13,33 @@ import { Item } from '/tbc/core/proto/common.js';
 import { Race } from '/tbc/core/proto/common.js';
 import { Spec } from '/tbc/core/proto/common.js';
 import { Stat } from '/tbc/core/proto/common.js';
+import { Player as PlayerProto } from '/tbc/core/proto/api.js';
+import { PlayerOptions as PlayerOptionsProto } from '/tbc/core/proto/api.js';
 import { ComputeStatsRequest, ComputeStatsResult } from '/tbc/core/proto/api.js';
 import { StatWeightsRequest, StatWeightsResult } from '/tbc/core/proto/api.js';
 
 import { EquippedItem } from '/tbc/core/proto_utils/equipped_item.js';
 import { Gear } from '/tbc/core/proto_utils/gear.js';
-import { makeComputeStatsRequest } from '/tbc/core/proto_utils/request_helpers.js';
 import { Stats } from '/tbc/core/proto_utils/stats.js';
-import { Faction } from '/tbc/core/proto_utils/utils.js';
-import { SpecRotation } from '/tbc/core/proto_utils/utils.js';
-import { SpecTalents } from '/tbc/core/proto_utils/utils.js';
-import { SpecTypeFunctions } from '/tbc/core/proto_utils/utils.js';
-import { specTypeFunctions } from '/tbc/core/proto_utils/utils.js';
-import { SpecOptions } from '/tbc/core/proto_utils/utils.js';
-import { canEquipItem } from '/tbc/core/proto_utils/utils.js';
-import { specToClass } from '/tbc/core/proto_utils/utils.js';
-import { specToEligibleRaces } from '/tbc/core/proto_utils/utils.js';
-import { getEligibleItemSlots } from '/tbc/core/proto_utils/utils.js';
-import { getEligibleEnchantSlots } from '/tbc/core/proto_utils/utils.js';
-import { gemEligibleForSocket } from '/tbc/core/proto_utils/utils.js';
-import { gemMatchesSocket } from '/tbc/core/proto_utils/utils.js';
-import { raceToFaction } from '/tbc/core/proto_utils/utils.js';
+
+import {
+	Faction,
+	SpecRotation,
+	SpecTalents,
+	SpecTypeFunctions,
+	SpecOptions,
+	canEquipItem,
+	getEligibleEnchantSlots,
+	gemEligibleForSocket,
+	getEligibleItemSlots,
+	getMetaGemEffectEP,
+	gemMatchesSocket,
+	raceToFaction,
+	specToClass,
+	specToEligibleRaces,
+	specTypeFunctions,
+	withSpecProto,
+} from '/tbc/core/proto_utils/utils.js';
 
 import { Listener } from './typed_event.js';
 import { TypedEvent } from './typed_event.js';
@@ -42,79 +48,49 @@ import { sum } from './utils.js';
 import { wait } from './utils.js';
 import { WorkerPool } from './worker_pool.js';
 
-export interface PlayerConfig<SpecType extends Spec> {
-  spec: Spec;
-  epStats: Array<Stat>;
-  epReferenceStat: Stat;
-  displayStats: Array<Stat>;
-  defaults: {
-		gear: EquipmentSpec,
-		epWeights: Stats,
-    consumes: Consumes,
-    rotation: SpecRotation<SpecType>,
-    talents: string,
-    specOptions: SpecOptions<SpecType>,
-  },
-	metaGemEffectEP?: ((gem: Gem, player: Player<SpecType>) => number),
-}
-
 // Manages all the gear / consumes / other settings for a single Player.
 export class Player<SpecType extends Spec> {
-  readonly spec: Spec;
+	readonly sim: Sim;
 
-  readonly phaseChangeEmitter = new TypedEvent<void>();
+  readonly spec: Spec;
+  private consumes: Consumes = Consumes.create();
+  private customStats: Stats = new Stats();
+  private gear: Gear = new Gear({});
+  private race: Race;
+  private rotation: SpecRotation<SpecType>;
+  private talents: SpecTalents<SpecType>;
+  private talentsString: string = '';
+  private specOptions: SpecOptions<SpecType>;
+
+  readonly specTypeFunctions: SpecTypeFunctions<SpecType>;
+
+	private epWeights: Stats = new Stats();
+	private currentStats: ComputeStatsResult;
+
   readonly consumesChangeEmitter = new TypedEvent<void>();
   readonly customStatsChangeEmitter = new TypedEvent<void>();
   readonly gearChangeEmitter = new TypedEvent<void>();
   readonly raceChangeEmitter = new TypedEvent<void>();
   readonly rotationChangeEmitter = new TypedEvent<void>();
   readonly talentsChangeEmitter = new TypedEvent<void>();
-  // Talents dont have all fields so we need this
+  // Talents dont have all fields so we need this.
   readonly talentsStringChangeEmitter = new TypedEvent<void>();
   readonly specOptionsChangeEmitter = new TypedEvent<void>();
+
+  readonly currentStatsEmitter = new TypedEvent<void>();
 
   // Emits when any of the above emitters emit.
   readonly changeEmitter = new TypedEvent<void>();
 
-  readonly characterStatsEmitter = new TypedEvent<void>();
-	private _currentStats: ComputeStatsResult;
-
-  // Current values
-  private _consumes: Consumes;
-  private _customStats: Stats;
-  private _gear: Gear;
-  private _race: Race;
-  private _rotation: SpecRotation<SpecType>;
-  private _talents: SpecTalents<SpecType>;
-  private _talentsString: string;
-  private _specOptions: SpecOptions<SpecType>;
-	private _epWeights: Stats;
-
-  readonly specTypeFunctions: SpecTypeFunctions<SpecType>;
-	private readonly _metaGemEffectEP: (gem: Gem, player: Player<SpecType>) => number;
-
-	readonly defaultGear: EquipmentSpec;
-
-	readonly sim: Sim;
-
-  constructor(config: PlayerConfig<SpecType>, sim: Sim) {
+  constructor(spec: Spec, sim: Sim) {
 		this.sim = sim;
 
-    this.spec = config.spec;
-    this._race = specToEligibleRaces[this.spec][0];
-
+    this.spec = spec;
+    this.race = specToEligibleRaces[this.spec][0];
     this.specTypeFunctions = specTypeFunctions[this.spec] as SpecTypeFunctions<SpecType>;
-		this._metaGemEffectEP = config.metaGemEffectEP || (() => 0);
-
-    this._consumes = config.defaults.consumes;
-    this._customStats = new Stats();
-    this._gear = new Gear({});
-    this._rotation = config.defaults.rotation;
-    this._talents = this.specTypeFunctions.talentsCreate();
-    this._talentsString = config.defaults.talents;
-		this._epWeights = config.defaults.epWeights;
-    this._specOptions = config.defaults.specOptions;
-		this.defaultGear = config.defaults.gear;
+		this.rotation = this.specTypeFunctions.rotationCreate();
+    this.talents = this.specTypeFunctions.talentsCreate();
+		this.specOptions = this.specTypeFunctions.optionsCreate();
 
     [
       this.consumesChangeEmitter,
@@ -127,7 +103,7 @@ export class Player<SpecType extends Spec> {
       this.specOptionsChangeEmitter,
     ].forEach(emitter => emitter.on(() => this.changeEmitter.emit()));
 
-		this._currentStats = ComputeStatsResult.create();
+		this.currentStats = ComputeStatsResult.create();
 		this.sim.changeEmitter.on(() => {
 			this.updateCharacterStats();
 		});
@@ -151,9 +127,17 @@ export class Player<SpecType extends Spec> {
 		return this.sim.getGems(socketColor);
   }
 
+	getEpWeights(): Stats {
+		return this.epWeights;
+	}
+
+	setEpWeights(newEpWeights: Stats) {
+		this.epWeights = newEpWeights;
+	}
+
   async statWeights(request: StatWeightsRequest): Promise<StatWeightsResult> {
 		const result = await this.sim.statWeights(request);
-		this._epWeights = new Stats(result.epValues);
+		this.epWeights = new Stats(result.epValues);
 		return result;
 	}
 
@@ -163,32 +147,28 @@ export class Player<SpecType extends Spec> {
 		// we get all of them.
 		await wait(10);
 
-		const computeStatsResult = await this.sim.computeStats(makeComputeStatsRequest(
-      this.sim.getRaidBuffs(),
-      this.sim.getPartyBuffs(),
-      this.sim.getIndividualBuffs(),
-      this._consumes,
-      this._customStats,
-      this._gear,
-      this._race,
-      this._rotation,
-      this._talents,
-      this._specOptions));
 
-		this._currentStats = computeStatsResult;
-		this.characterStatsEmitter.emit();
+		const computeStatsResult = await this.sim.computeStats(ComputeStatsRequest.create({
+			player: this.toProto(),
+			raidBuffs: this.sim.getRaidBuffs(),
+			partyBuffs: this.sim.getPartyBuffs(),
+			individualBuffs: this.sim.getIndividualBuffs(),
+		}));
+
+		this.currentStats = computeStatsResult;
+		this.currentStatsEmitter.emit();
 	}
 
 	getCurrentStats(): ComputeStatsResult {
-		return ComputeStatsResult.clone(this._currentStats);
+		return ComputeStatsResult.clone(this.currentStats);
 	}
   
   getRace(): Race {
-    return this._race;
+    return this.race;
   }
   setRace(newRace: Race) {
-    if (newRace != this._race) {
-      this._race = newRace;
+    if (newRace != this.race) {
+      this.race = newRace;
       this.raceChangeEmitter.emit();
     }
   }
@@ -199,118 +179,118 @@ export class Player<SpecType extends Spec> {
 
   getConsumes(): Consumes {
     // Make a defensive copy
-    return Consumes.clone(this._consumes);
+    return Consumes.clone(this.consumes);
   }
 
   setConsumes(newConsumes: Consumes) {
-    if (Consumes.equals(this._consumes, newConsumes))
+    if (Consumes.equals(this.consumes, newConsumes))
       return;
 
     // Make a defensive copy
-    this._consumes = Consumes.clone(newConsumes);
+    this.consumes = Consumes.clone(newConsumes);
     this.consumesChangeEmitter.emit();
   }
 
   equipItem(slot: ItemSlot, newItem: EquippedItem | null) {
-    const newGear = this._gear.withEquippedItem(slot, newItem);
-    if (newGear.equals(this._gear))
+    const newGear = this.gear.withEquippedItem(slot, newItem);
+    if (newGear.equals(this.gear))
       return;
 
-    this._gear = newGear;
+    this.gear = newGear;
     this.gearChangeEmitter.emit();
   }
 
   getEquippedItem(slot: ItemSlot): EquippedItem | null {
-    return this._gear.getEquippedItem(slot);
+    return this.gear.getEquippedItem(slot);
   }
 
   getGear(): Gear {
-    return this._gear;
+    return this.gear;
   }
 
   setGear(newGear: Gear) {
-    if (newGear.equals(this._gear))
+    if (newGear.equals(this.gear))
       return;
 
-    this._gear = newGear;
+    this.gear = newGear;
     this.gearChangeEmitter.emit();
   }
 
   getCustomStats(): Stats {
-    return this._customStats;
+    return this.customStats;
   }
 
   setCustomStats(newCustomStats: Stats) {
-    if (newCustomStats.equals(this._customStats))
+    if (newCustomStats.equals(this.customStats))
       return;
 
-    this._customStats = newCustomStats;
+    this.customStats = newCustomStats;
     this.customStatsChangeEmitter.emit();
   }
 
   getRotation(): SpecRotation<SpecType> {
-    return this.specTypeFunctions.rotationCopy(this._rotation);
+    return this.specTypeFunctions.rotationCopy(this.rotation);
   }
 
   setRotation(newRotation: SpecRotation<SpecType>) {
-    if (this.specTypeFunctions.rotationEquals(newRotation, this._rotation))
+    if (this.specTypeFunctions.rotationEquals(newRotation, this.rotation))
       return;
 
-    this._rotation = this.specTypeFunctions.rotationCopy(newRotation);
+    this.rotation = this.specTypeFunctions.rotationCopy(newRotation);
     this.rotationChangeEmitter.emit();
   }
 
   getTalents(): SpecTalents<SpecType> {
-    return this.specTypeFunctions.talentsCopy(this._talents);
+    return this.specTypeFunctions.talentsCopy(this.talents);
   }
 
   setTalents(newTalents: SpecTalents<SpecType>) {
-    if (this.specTypeFunctions.talentsEquals(newTalents, this._talents))
+    if (this.specTypeFunctions.talentsEquals(newTalents, this.talents))
       return;
 
-    this._talents = this.specTypeFunctions.talentsCopy(newTalents);
+    this.talents = this.specTypeFunctions.talentsCopy(newTalents);
     this.talentsChangeEmitter.emit();
   }
 
   getTalentsString(): string {
-    return this._talentsString;
+    return this.talentsString;
   }
 
   setTalentsString(newTalentsString: string) {
-    if (newTalentsString == this._talentsString)
+    if (newTalentsString == this.talentsString)
       return;
 
-    this._talentsString = newTalentsString;
+    this.talentsString = newTalentsString;
     this.talentsStringChangeEmitter.emit();
   }
 
   getSpecOptions(): SpecOptions<SpecType> {
-    return this.specTypeFunctions.optionsCopy(this._specOptions);
+    return this.specTypeFunctions.optionsCopy(this.specOptions);
   }
 
   setSpecOptions(newSpecOptions: SpecOptions<SpecType>) {
-    if (this.specTypeFunctions.optionsEquals(newSpecOptions, this._specOptions))
+    if (this.specTypeFunctions.optionsEquals(newSpecOptions, this.specOptions))
       return;
 
-    this._specOptions = this.specTypeFunctions.optionsCopy(newSpecOptions);
+    this.specOptions = this.specTypeFunctions.optionsCopy(newSpecOptions);
     this.specOptionsChangeEmitter.emit();
   }
 
 	computeGemEP(gem: Gem): number {
-		const epFromStats = new Stats(gem.stats).computeEP(this._epWeights);
-		const epFromEffect = this._metaGemEffectEP(gem, this);
+		const epFromStats = new Stats(gem.stats).computeEP(this.epWeights);
+		const epFromEffect = getMetaGemEffectEP(this.spec, gem, new Stats(this.currentStats.finalStats));
 		return epFromStats + epFromEffect;
 	}
 
 	computeEnchantEP(enchant: Enchant): number {
-		return new Stats(enchant.stats).computeEP(this._epWeights);
+		return new Stats(enchant.stats).computeEP(this.epWeights);
 	}
 
 	computeItemEP(item: Item): number {
 		if (item == null)
 			return 0;
 
-		let ep = new Stats(item.stats).computeEP(this._epWeights);
+		let ep = new Stats(item.stats).computeEP(this.epWeights);
 
 		const slot = getEligibleItemSlots(item)[0];
 		const enchants = this.sim.getEnchants(slot);
@@ -335,7 +315,7 @@ export class Player<SpecType extends Spec> {
 			} else {
 				return 0;
 			}
-		})) + new Stats(item.socketBonus).computeEP(this._epWeights);
+		})) + new Stats(item.socketBonus).computeEP(this.epWeights);
 
 		ep += Math.max(bestGemEPMatchingSockets, bestGemEPNotMatchingSockets);
 
@@ -350,21 +330,35 @@ export class Player<SpecType extends Spec> {
     if (equippedItem.enchant != null) {
       parts.push('ench=' + equippedItem.enchant.effectId);
     }
-    parts.push('pcs=' + this._gear.asArray().filter(ei => ei != null).map(ei => ei!.item.id).join(':'));
+    parts.push('pcs=' + this.gear.asArray().filter(ei => ei != null).map(ei => ei!.item.id).join(':'));
 
     elem.setAttribute('data-wowhead', parts.join('&'));
   }
 
+	toProto(): PlayerProto {
+    return PlayerProto.create({
+      customStats: this.getCustomStats().asArray(),
+      equipment: this.getGear().asSpec(),
+      options: withSpecProto(PlayerOptionsProto.create({
+        race: this.getRace(),
+        class: specToClass[this.spec],
+        consumes: this.getConsumes(),
+      }), this.getRotation(), this.getTalents(), this.getSpecOptions()),
+    });
+	}
+
+	// TODO: Remove to/from json functions and use proto versions instead. This will require
+	// some way to store all talents in the proto.
   // Returns JSON representing all the current values.
   toJson(): Object {
     return {
-      'consumes': Consumes.toJson(this._consumes),
-      'customStats': this._customStats.toJson(),
-      'gear': EquipmentSpec.toJson(this._gear.asSpec()),
-      'race': this._race,
-      'rotation': this.specTypeFunctions.rotationToJson(this._rotation),
-      'talents': this._talentsString,
-      'specOptions': this.specTypeFunctions.optionsToJson(this._specOptions),
+      'consumes': Consumes.toJson(this.consumes),
+      'customStats': this.customStats.toJson(),
+      'gear': EquipmentSpec.toJson(this.gear.asSpec()),
+      'race': this.race,
+      'rotation': this.specTypeFunctions.rotationToJson(this.rotation),
+      'talents': this.talentsString,
+      'specOptions': this.specTypeFunctions.optionsToJson(this.specOptions),
     };
   }
 
