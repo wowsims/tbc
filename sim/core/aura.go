@@ -155,21 +155,6 @@ type auraTracker struct {
 	metrics []AuraMetrics
 }
 
-type AuraMetrics struct {
-	ID int32
-
-	// Total time this aura has been active.
-	Uptime time.Duration
-}
-
-func (auraMetrics *AuraMetrics) ToProto() *proto.AuraMetrics {
-	return &proto.AuraMetrics{
-		Id: auraMetrics.ID,
-
-		UptimeSeconds: auraMetrics.Uptime.Seconds(),
-	}
-}
-
 func newAuraTracker(useDebuffIDs bool) auraTracker {
 	numAura := numAuraIDs
 	if useDebuffIDs {
@@ -209,13 +194,6 @@ func (at *auraTracker) finalize() {
 }
 
 func (at *auraTracker) reset(sim *Simulation) {
-	// Add metrics for any auras that are still active.
-	for _, aura := range at.auras {
-		if aura.SpellID != 0 {
-			at.AddAuraUptime(aura.ID, aura.SpellID, sim.Duration-aura.startTime)
-		}
-	}
-
 	if at.useDebuffIDs {
 		at.auras = make([]Aura, numDebuffIDs)
 	} else {
@@ -245,6 +223,20 @@ func (at *auraTracker) advance(sim *Simulation) {
 		if at.auras[id].Expires != 0 && at.auras[id].Expires <= sim.CurrentTime {
 			at.RemoveAura(sim, id)
 		}
+	}
+}
+
+func (at *auraTracker) doneIteration(simDuration time.Duration) {
+	// Add metrics for any auras that are still active.
+	for _, aura := range at.auras {
+		if aura.SpellID != 0 {
+			at.AddAuraUptime(aura.ID, aura.SpellID, simDuration-aura.startTime)
+		}
+	}
+
+	for i, _ := range at.metrics {
+		auraMetric := &at.metrics[i]
+		auraMetric.doneIteration()
 	}
 }
 
@@ -469,12 +461,12 @@ func (at *auraTracker) AddAuraUptime(auraID AuraID, spellID int32, uptime time.D
 	metrics.Uptime += uptime
 }
 
-func (at *auraTracker) GetMetricsProto() []*proto.AuraMetrics {
+func (at *auraTracker) GetMetricsProto(numIterations int32) []*proto.AuraMetrics {
 	metrics := make([]*proto.AuraMetrics, 0, len(at.metrics))
 
 	for _, auraMetric := range at.metrics {
 		if auraMetric.ID != 0 {
-			metrics = append(metrics, auraMetric.ToProto())
+			metrics = append(metrics, auraMetric.ToProto(numIterations))
 		}
 	}
 

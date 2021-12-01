@@ -32,14 +32,21 @@ func (encounter *Encounter) Finalize() {
 	}
 }
 
-func (encounter *Encounter) GetMetricsProto() *proto.EncounterMetrics {
+func (encounter *Encounter) doneIteration(simDuration time.Duration) {
+	for i, _ := range encounter.Targets {
+		target := encounter.Targets[i]
+		target.doneIteration(simDuration)
+	}
+}
+
+func (encounter *Encounter) GetMetricsProto(numIterations int32) *proto.EncounterMetrics {
 	metrics := &proto.EncounterMetrics{
 		Targets: make([]*proto.TargetMetrics, len(encounter.Targets)),
 	}
 
 	i := 0
 	for _, target := range encounter.Targets {
-		metrics.Targets[i] = target.GetMetricsProto()
+		metrics.Targets[i] = target.GetMetricsProto(numIterations)
 		i++
 	}
 
@@ -206,8 +213,12 @@ func (target *Target) Advance(sim *Simulation, elapsedTime time.Duration) {
 	target.auraTracker.advance(sim)
 }
 
-func (target *Target) GetMetricsProto() *proto.TargetMetrics {
+func (target *Target) doneIteration(simDuration time.Duration) {
+	target.auraTracker.doneIteration(simDuration)
+}
+
+func (target *Target) GetMetricsProto(numIterations int32) *proto.TargetMetrics {
 	return &proto.TargetMetrics{
-		Auras: target.auraTracker.GetMetricsProto(),
+		Auras: target.auraTracker.GetMetricsProto(numIterations),
 	}
 }

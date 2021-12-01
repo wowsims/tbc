@@ -98,8 +98,8 @@ message AuraMetrics {
 		// The in-game spell ID for the aura.
 		int32 id = 1;
 
-		// Total time, in seconds, that this aura was active.
-		double uptime_seconds = 2;
+		double uptime_seconds_avg = 2;
+		double uptime_seconds_stdev = 3;
 }
 
 // All the results for a single Player.
