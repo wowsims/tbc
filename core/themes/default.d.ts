@@ -1,7 +1,9 @@
+import { Encounter } from '/tbc/core/encounter.js';
 import { Player } from '/tbc/core/player.js';
 import { Sim } from '/tbc/core/sim.js';
 import { Target } from '/tbc/core/target.js';
 import { BooleanPickerConfig } from '/tbc/core/components/boolean_picker.js';
+import { EncounterPickerConfig } from '/tbc/core/components/encounter_picker.js';
 import { EnumPickerConfig } from '/tbc/core/components/enum_picker.js';
 import { IconInput } from '/tbc/core/components/icon_picker.js';
 import { NumberPickerConfig } from '/tbc/core/components/number_picker.js';
@@ -10,10 +12,11 @@ import { RaidBuffs } from '/tbc/core/proto/common.js';
 import { PartyBuffs } from '/tbc/core/proto/common.js';
 import { IndividualBuffs } from '/tbc/core/proto/common.js';
 import { Consumes } from '/tbc/core/proto/common.js';
-import { Encounter } from '/tbc/core/proto/common.js';
+import { Encounter as EncounterProto } from '/tbc/core/proto/common.js';
 import { EquipmentSpec } from '/tbc/core/proto/common.js';
 import { Race } from '/tbc/core/proto/common.js';
 import { Spec } from '/tbc/core/proto/common.js';
+import { Stat } from '/tbc/core/proto/common.js';
 import { Gear } from '/tbc/core/proto_utils/gear.js';
 import { Stats } from '/tbc/core/proto_utils/stats.js';
 import { SimUI, SimUIConfig } from '/tbc/core/sim_ui.js';
@@ -41,6 +44,9 @@ export interface InputSection {
     }>;
 }
 export interface DefaultThemeConfig<SpecType extends Spec> extends SimUIConfig<SpecType> {
+    epStats: Array<Stat>;
+    epReferenceStat: Stat;
+    displayStats: Array<Stat>;
     selfBuffInputs: IconSection<Player<any>>;
     buffInputs: IconSection<Sim>;
     debuffInputs: IconSection<Target>;
@@ -48,12 +54,11 @@ export interface DefaultThemeConfig<SpecType extends Spec> extends SimUIConfig<S
     rotationInputs: InputSection;
     otherInputs?: InputSection;
     additionalSections?: Record<string, InputSection>;
-    showTargetArmor: boolean;
-    showNumTargets: boolean;
+    encounterPicker: EncounterPickerConfig;
     freezeTalents?: boolean;
     presets: {
         gear: Array<PresetGear>;
-        encounters: Array<SavedDataConfig<Sim, Encounter>>;
+        encounters: Array<SavedDataConfig<Encounter, EncounterProto>>;
         talents: Array<SavedDataConfig<Player<any>, string>>;
     };
 }

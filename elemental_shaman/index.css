@@ -194,6 +194,47 @@
   margin: 5px;
 }
 
+.input-label-div {
+  display: inline-block;
+  margin: 5px;
+}
+
+.input-label, .input-tooltip {
+  margin: 3px;
+}
+
+.input-root.disabled .input-label, .input-root.disabled .input-tooltip {
+  filter: opacity(0.5);
+}
+
+.number-picker-input {
+  margin: 5px;
+  width: 70px;
+}
+
+.encounter-picker-root .input-root {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.input-label-div {
+  display: inline-block;
+  margin: 5px;
+}
+
+.input-label, .input-tooltip {
+  margin: 3px;
+}
+
+.input-root.disabled .input-label, .input-root.disabled .input-tooltip {
+  filter: opacity(0.5);
+}
+
+.enum-picker-selector {
+  margin: 5px;
+}
+
 :root {
   --main-bg-color: DarkSlateGrey;
   --main-text-color: White;
@@ -1311,12 +1352,6 @@ td, th {
   display: flex;
   justify-content: space-around;
   align-items: flex-end;
-}
-
-.encounter-section .input-root {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
 }
 
 .race-section {

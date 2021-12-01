@@ -67,6 +67,74 @@
   border: 1px solid yellow;
 }
 
+:root {
+  --main-bg-color: DarkSlateGrey;
+  --main-text-color: White;
+  --main-secondary-color: Black;
+  --sidebar-bg-color: DarkKhaki;
+  --sidebar-text-color: White;
+  --sidebar-highlight-color: Blue;
+}
+
+.loader {
+  border: 16px solid #f3f3f3;
+  /* Light grey */
+  border-top: 16px solid #3498db;
+  /* Blue */
+  border-radius: 50%;
+  width: 120px;
+  height: 120px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+.socket-color-blue {
+  border: 1px solid blue;
+}
+
+.item-quality-junk {
+  color: #fff !important;
+}
+
+.item-quality-common {
+  color: white !important;
+}
+
+.item-quality-uncommon {
+  color: #1eff00 !important;
+}
+
+.item-quality-rare {
+  color: #0070dd !important;
+}
+
+.item-quality-epic {
+  color: #a335ee !important;
+}
+
+.item-quality-legendary {
+  color: #ff8000 !important;
+}
+
+.socket-color-meta {
+  border: 1px solid white;
+}
+
+.socket-color-red {
+  border: 1px solid red;
+}
+
+.socket-color-yellow {
+  border: 1px solid yellow;
+}
+
 .actions-root {
   display: flex;
   flex-direction: column;
@@ -1404,56 +1472,16 @@ td, th {
 }
 
 :root {
-  --main-bg-color: #777;
+  --main-bg-color: Black;
   --main-text-color: White;
   --main-secondary-color: Black;
   --sidebar-bg-color: #222;
   --sidebar-text-color: White;
-  --sidebar-highlight-color: #AAA;
+  --sidebar-highlight-color: Red;
 }
 
 body {
   margin: 0;
-}
-
-.self-buffs-section > div {
-  grid-template-columns: repeat(3, 1fr);
-}
-
-.consumes-section > div {
-  grid-template-columns: repeat(5, 1fr);
-}
-
-.buffs-section > div {
-  grid-template-columns: repeat(6, 1fr);
-}
-
-.debuffs-section > div {
-  grid-template-columns: repeat(3, 1fr);
-}
-
-.character-stats-table-row {
-  font-size: 14px;
-}
-
-.results-ep-table tr td:nth-child(1) {
-  font-size: 12px;
-}
-
-.results-ep-table tr td:nth-child(2), .results-ep-table tr td:nth-child(4) {
-  font-size: 12px;
-}
-
-.results-ep-table tr td:nth-child(2):after {
-  font-size: 11px;
-}
-
-.results-ep-table tr td:nth-child(4):after {
-  font-size: 11px;
-}
-
-.results-ep-table tr td:nth-child(3), .results-ep-table tr td:nth-child(5) {
-  font-size: 10px;
 }
 
 /*# sourceMappingURL=index.css.map */

@@ -12,7 +12,9 @@ import { Item } from '/tbc/core/proto/common.js';
 import { Race } from '/tbc/core/proto/common.js';
 import { RangedWeaponType } from '/tbc/core/proto/common.js';
 import { Spec } from '/tbc/core/proto/common.js';
+import { Stat } from '/tbc/core/proto/common.js';
 import { WeaponType } from '/tbc/core/proto/common.js';
+import * as Gems from '/tbc/core/constants/gems.js';
 import { BalanceDruid, BalanceDruid_Rotation as BalanceDruidRotation, DruidTalents, BalanceDruid_Options as BalanceDruidOptions } from '/tbc/core/proto/druid.js';
 import { ElementalShaman, ElementalShaman_Rotation as ElementalShamanRotation, ShamanTalents, ElementalShaman_Options as ElementalShamanOptions } from '/tbc/core/proto/shaman.js';
 import { Hunter, Hunter_Rotation as HunterRotation, HunterTalents, Hunter_Options as HunterOptions } from '/tbc/core/proto/hunter.js';
@@ -558,6 +560,31 @@ const classToEligibleWeaponTypes = {
         { weaponType: WeaponType.WeaponTypeSword, canUseTwoHand: true },
     ],
 };
+// Custom functions for determining the EP value of meta gem effects.
+// Default meta effect EP value is 0, so just handle the ones relevant to your spec.
+const metaGemEffectEPs = {
+    [Spec.SpecBalanceDruid]: (gem, playerStats) => {
+        if (gem.id == Gems.CHAOTIC_SKYFIRE_DIAMOND) {
+            // TODO: Fix this
+            return (((playerStats.getStat(Stat.StatSpellPower) * 0.795) + 603) * 2 * (playerStats.getStat(Stat.StatSpellCrit) / 2208) * 0.045) / 0.795;
+        }
+        return 0;
+    },
+    [Spec.SpecElementalShaman]: (gem, playerStats) => {
+        if (gem.id == Gems.CHAOTIC_SKYFIRE_DIAMOND) {
+            return (((playerStats.getStat(Stat.StatSpellPower) * 0.795) + 603) * 2 * (playerStats.getStat(Stat.StatSpellCrit) / 2208) * 0.045) / 0.795;
+        }
+        return 0;
+    },
+};
+export function getMetaGemEffectEP(spec, gem, playerStats) {
+    if (metaGemEffectEPs[spec]) {
+        return metaGemEffectEPs[spec](gem, playerStats);
+    }
+    else {
+        return 0;
+    }
+}
 // Returns true if this item may be equipped in at least 1 slot for the given Spec.
 export function canEquipItem(item, spec) {
     const playerClass = specToClass[spec];

@@ -3,8 +3,6 @@ import { PartyBuffs } from '/tbc/core/proto/common.js';
 import { IndividualBuffs } from '/tbc/core/proto/common.js';
 import { Consumes } from '/tbc/core/proto/common.js';
 import { Debuffs } from '/tbc/core/proto/common.js';
-import { Encounter } from '/tbc/core/proto/common.js';
-import { MobType } from '/tbc/core/proto/common.js';
 import { Potions } from '/tbc/core/proto/common.js';
 import { Spec } from '/tbc/core/proto/common.js';
 import { Stat } from '/tbc/core/proto/common.js';
@@ -18,111 +16,82 @@ import * as Tooltips from '/tbc/core/constants/tooltips.js';
 import * as ShadowPriestInputs from './inputs.js';
 import * as Presets from './presets.js';
 const theme = new DefaultTheme(document.body, {
+    spec: Spec.SpecShadowPriest,
     // Can be 'Alpha', 'Beta', or 'Live'. Just adds a postfix to the generated title.
     releaseStatus: 'Alpha',
     // List any known bugs / issues here and they'll be shown on the site.
     knownIssues: [],
-    player: {
-        spec: Spec.SpecShadowPriest,
-        // All stats for which EP should be calculated.
-        epStats: [
-            Stat.StatIntellect,
-            Stat.StatSpirit,
-            Stat.StatSpellPower,
-            Stat.StatShadowSpellPower,
-            Stat.StatSpellHit,
-            Stat.StatSpellCrit,
-            Stat.StatSpellHaste,
-            Stat.StatMP5,
-        ],
-        // Reference stat against which to calculate EP. I think all classes use either spell power or attack power.
-        epReferenceStat: Stat.StatSpellPower,
-        // Which stats to display in the Character Stats section, at the bottom of the left-hand sidebar.
-        displayStats: [
-            Stat.StatStamina,
-            Stat.StatIntellect,
-            Stat.StatSpirit,
-            Stat.StatSpellPower,
-            Stat.StatShadowSpellPower,
-            Stat.StatSpellHit,
-            Stat.StatSpellCrit,
-            Stat.StatSpellHaste,
-            Stat.StatMP5,
-        ],
-        defaults: {
-            // Default equipped gear.
-            gear: Presets.P1_BIS.gear,
-            // Default EP weights for sorting gear in the gear picker.
-            epWeights: Stats.fromMap({
-                [Stat.StatIntellect]: 0.05,
-                [Stat.StatSpirit]: 0.11,
-                [Stat.StatSpellPower]: 1,
-                [Stat.StatShadowSpellPower]: 1,
-                [Stat.StatSpellCrit]: 0.163,
-                [Stat.StatSpellHaste]: 1.0,
-                [Stat.StatMP5]: 0.00,
-            }),
-            // Default consumes settings.
-            consumes: Consumes.create({
-                defaultPotion: Potions.SuperManaPotion,
-            }),
-            // Default rotation settings.
-            rotation: Rotation.create({
-                rotationType: ShadowPriest_Rotation_RotationType.Basic,
-            }),
-            // Default talents.
-            talents: Presets.StandardTalents.data,
-            // Default spec-specific settings.
-            specOptions: Options.create({}),
-        },
-        // Custom function for determining the EP value of meta gem effects.
-        // Default meta effect EP value is 0, so just handle the ones relevant to your spec.
-        metaGemEffectEP: (gem, player) => {
-            // TODO: What meta gem should spriest use?
-            // if (gem.id == Gems.CHAOTIC_SKYFIRE_DIAMOND) {
-            // 	const finalStats = new Stats(player.getCurrentStats().finalStats);
-            // 	// TODO: Fix this
-            // 	return (((finalStats.getStat(Stat.StatSpellPower) * 0.795) + 603) * 2 * (finalStats.getStat(Stat.StatSpellCrit) / 2208) * 0.045) / 0.795;
-            // }
-            return 0;
-        },
-    },
-    sim: {
-        defaults: {
-            // TBC Release Phase, i.e. Black Temple is phase 3.
-            phase: 2,
-            // Default encounter settings.
-            encounter: Encounter.create({
-                duration: 300,
-            }),
-            // Default raid/party buffs settings.
-            raidBuffs: RaidBuffs.create({
-                arcaneBrilliance: true,
-                divineSpirit: TristateEffect.TristateEffectImproved,
-                giftOfTheWild: TristateEffect.TristateEffectImproved,
-            }),
-            partyBuffs: PartyBuffs.create({
-                bloodlust: 1,
-                manaSpringTotem: TristateEffect.TristateEffectRegular,
-                totemOfWrath: 1,
-                wrathOfAirTotem: TristateEffect.TristateEffectRegular,
-            }),
-            individualBuffs: IndividualBuffs.create({
-                blessingOfKings: true,
-                blessingOfWisdom: 2,
-            }),
-        },
-    },
-    target: {
-        defaults: {
-            armor: 0,
-            mobType: MobType.MobTypeDemon,
-            debuffs: Debuffs.create({
-                judgementOfWisdom: true,
-                misery: true,
-                curseOfElements: TristateEffect.TristateEffectRegular,
-            }),
-        },
+    // All stats for which EP should be calculated.
+    epStats: [
+        Stat.StatIntellect,
+        Stat.StatSpirit,
+        Stat.StatSpellPower,
+        Stat.StatShadowSpellPower,
+        Stat.StatSpellHit,
+        Stat.StatSpellCrit,
+        Stat.StatSpellHaste,
+        Stat.StatMP5,
+    ],
+    // Reference stat against which to calculate EP. I think all classes use either spell power or attack power.
+    epReferenceStat: Stat.StatSpellPower,
+    // Which stats to display in the Character Stats section, at the bottom of the left-hand sidebar.
+    displayStats: [
+        Stat.StatStamina,
+        Stat.StatIntellect,
+        Stat.StatSpirit,
+        Stat.StatSpellPower,
+        Stat.StatShadowSpellPower,
+        Stat.StatSpellHit,
+        Stat.StatSpellCrit,
+        Stat.StatSpellHaste,
+        Stat.StatMP5,
+    ],
+    defaults: {
+        // Default equipped gear.
+        gear: Presets.P1_BIS.gear,
+        // Default EP weights for sorting gear in the gear picker.
+        epWeights: Stats.fromMap({
+            [Stat.StatIntellect]: 0.05,
+            [Stat.StatSpirit]: 0.11,
+            [Stat.StatSpellPower]: 1,
+            [Stat.StatShadowSpellPower]: 1,
+            [Stat.StatSpellCrit]: 0.163,
+            [Stat.StatSpellHaste]: 1.0,
+            [Stat.StatMP5]: 0.00,
+        }),
+        // Default consumes settings.
+        consumes: Consumes.create({
+            defaultPotion: Potions.SuperManaPotion,
+        }),
+        // Default rotation settings.
+        rotation: Rotation.create({
+            rotationType: ShadowPriest_Rotation_RotationType.Basic,
+        }),
+        // Default talents.
+        talents: Presets.StandardTalents.data,
+        // Default spec-specific settings.
+        specOptions: Options.create({}),
+        // Default raid/party buffs settings.
+        raidBuffs: RaidBuffs.create({
+            arcaneBrilliance: true,
+            divineSpirit: TristateEffect.TristateEffectImproved,
+            giftOfTheWild: TristateEffect.TristateEffectImproved,
+        }),
+        partyBuffs: PartyBuffs.create({
+            bloodlust: 1,
+            manaSpringTotem: TristateEffect.TristateEffectRegular,
+            totemOfWrath: 1,
+            wrathOfAirTotem: TristateEffect.TristateEffectRegular,
+        }),
+        individualBuffs: IndividualBuffs.create({
+            blessingOfKings: true,
+            blessingOfWisdom: 2,
+        }),
+        debuffs: Debuffs.create({
+            judgementOfWisdom: true,
+            misery: true,
+            curseOfElements: TristateEffect.TristateEffectRegular,
+        }),
     },
     // IconInputs to include in the 'Self Buffs' section on the settings tab.
     selfBuffInputs: {
@@ -190,13 +159,15 @@ const theme = new DefaultTheme(document.body, {
             OtherInputs.NumStartingPotions,
         ],
     },
+    encounterPicker: {
+        // Whether to include 'Target Armor' in the 'Encounter' section of the settings tab.
+        showTargetArmor: false,
+        // Whether to include 'Num Targets' in the 'Encounter' section of the settings tab.
+        showNumTargets: true,
+    },
     // If true, the talents on the talents tab will not be individually modifiable by the user.
     // Note that the use can still pick between preset talents, if there is more than 1.
     freezeTalents: false,
-    // Whether to include 'Target Armor' in the 'Encounter' section of the settings tab.
-    showTargetArmor: false,
-    // Whether to include 'Num Targets' in the 'Encounter' section of the settings tab.
-    showNumTargets: true,
     presets: {
         // Preset talents that the user can quickly select.
         talents: [

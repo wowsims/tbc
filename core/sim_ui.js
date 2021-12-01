@@ -1,8 +1,9 @@
-import { makeIndividualSimRequest } from '/tbc/core/proto_utils/request_helpers.js';
+import { IndividualSimRequest } from '/tbc/core/proto/api.js';
+import { SimOptions } from '/tbc/core/proto/api.js';
 import { specToLocalStorageKey } from '/tbc/core/proto_utils/utils.js';
 import { Player } from './player.js';
 import { Sim } from './sim.js';
-import { Target } from './target.js';
+import { Encounter } from './encounter.js';
 import { TypedEvent } from './typed_event.js';
 const CURRENT_SETTINGS_STORAGE_KEY = '__currentSettings__';
 const SAVED_GEAR_STORAGE_KEY = '__savedGear__';
@@ -16,14 +17,14 @@ export class SimUI {
         // Emits when anything from sim, player, or target changes.
         this.changeEmitter = new TypedEvent();
         this.parentElem = parentElem;
-        this.sim = new Sim(config.sim);
-        this.player = new Player(config.player, this.sim);
-        this.target = new Target(config.target, this.sim);
+        this.sim = new Sim();
+        this.player = new Player(config.spec, this.sim);
+        this.encounter = new Encounter(this.sim);
         this.simUiConfig = config;
         [
             this.sim.changeEmitter,
             this.player.changeEmitter,
-            this.target.changeEmitter,
+            this.encounter.changeEmitter,
         ].forEach(emitter => emitter.on(() => this.changeEmitter.emit()));
         this.exclusivityMap = {
             'Battle Elixir': [],
@@ -57,7 +58,7 @@ export class SimUI {
         return {
             'sim': this.sim.toJson(),
             'player': this.player.toJson(),
-            'target': this.target.toJson(),
+            'encounter': this.encounter.toJson(),
         };
     }
     // Set all the current values, assumes obj is the same type returned by toJson().
@@ -68,8 +69,8 @@ export class SimUI {
         if (obj['player']) {
             this.player.fromJson(obj['player']);
         }
-        if (obj['target']) {
-            this.target.fromJson(obj['target']);
+        if (obj['encounter']) {
+            this.encounter.fromJson(obj['encounter']);
         }
     }
     async init() {
@@ -113,7 +114,7 @@ export class SimUI {
             }
         }
         if (!loadedSettings) {
-            this.player.setGear(this.sim.lookupEquipmentSpec(this.player.defaultGear));
+            this.applyDefaults();
         }
         this.changeEmitter.on(() => {
             const jsonStr = JSON.stringify(this.toJson());
@@ -134,6 +135,15 @@ export class SimUI {
                 alert('Current settings copied to clipboard!');
             });
         });
+    }
+    applyDefaults() {
+        this.player.setGear(this.sim.lookupEquipmentSpec(this.simUiConfig.defaults.gear));
+        this.player.setConsumes(this.simUiConfig.defaults.consumes);
+        this.player.setRotation(this.simUiConfig.defaults.rotation);
+        this.player.setTalentsString(this.simUiConfig.defaults.talents);
+        this.player.setSpecOptions(this.simUiConfig.defaults.specOptions);
+        this.player.setEpWeights(this.simUiConfig.defaults.epWeights);
+        this.encounter.primaryTarget.setDebuffs(this.simUiConfig.defaults.debuffs);
     }
     registerExclusiveEffect(effect) {
         effect.tags.forEach(tag => {
@@ -171,11 +181,16 @@ export class SimUI {
         return specToLocalStorageKey[this.player.spec] + keyPart;
     }
     makeCurrentIndividualSimRequest(iterations, debug) {
-        const encounter = this.sim.getEncounter();
-        const numTargets = Math.max(1, this.sim.getNumTargets());
-        for (let i = 0; i < numTargets; i++) {
-            encounter.targets.push(this.target.toProto());
-        }
-        return makeIndividualSimRequest(this.sim.getRaidBuffs(), this.sim.getPartyBuffs(), this.sim.getIndividualBuffs(), this.player.getConsumes(), this.player.getCustomStats(), encounter, this.player.getGear(), this.player.getRace(), this.player.getRotation(), this.player.getTalents(), this.player.getSpecOptions(), iterations, debug);
+        return IndividualSimRequest.create({
+            player: this.player.toProto(),
+            raidBuffs: this.sim.getRaidBuffs(),
+            partyBuffs: this.sim.getPartyBuffs(),
+            individualBuffs: this.sim.getIndividualBuffs(),
+            encounter: this.encounter.toProto(),
+            simOptions: SimOptions.create({
+                iterations: iterations,
+                debug: debug,
+            }),
+        });
     }
 }

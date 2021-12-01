@@ -1,4 +1,3 @@
-import { MobType } from '/tbc/core/proto/common.js';
 import { Potions } from '/tbc/core/proto/common.js';
 export const StartingPotion = {
     type: 'enum',
@@ -51,24 +50,5 @@ export const ShadowPriestDPS = {
             individualBuffs.shadowPriestDps = newValue;
             sim.setIndividualBuffs(individualBuffs);
         },
-    },
-};
-export const MobTypePickerConfig = {
-    label: 'Mob Type',
-    values: [
-        { name: 'None', value: MobType.MobTypeUnknown },
-        { name: 'Beast', value: MobType.MobTypeBeast },
-        { name: 'Demon', value: MobType.MobTypeDemon },
-        { name: 'Dragonkin', value: MobType.MobTypeDragonkin },
-        { name: 'Elemental', value: MobType.MobTypeElemental },
-        { name: 'Giant', value: MobType.MobTypeGiant },
-        { name: 'Humanoid', value: MobType.MobTypeHumanoid },
-        { name: 'Mechanical', value: MobType.MobTypeMechanical },
-        { name: 'Undead', value: MobType.MobTypeUndead },
-    ],
-    changedEvent: (target) => target.mobTypeChangeEmitter,
-    getValue: (target) => target.getMobType(),
-    setValue: (target, newValue) => {
-        target.setMobType(newValue);
     },
 };

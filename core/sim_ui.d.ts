@@ -1,22 +1,41 @@
 import { IndividualSimRequest } from '/tbc/core/proto/api.js';
+import { Consumes } from '/tbc/core/proto/common.js';
+import { Debuffs } from '/tbc/core/proto/common.js';
+import { EquipmentSpec } from '/tbc/core/proto/common.js';
+import { IndividualBuffs } from '/tbc/core/proto/common.js';
+import { PartyBuffs } from '/tbc/core/proto/common.js';
+import { RaidBuffs } from '/tbc/core/proto/common.js';
 import { Spec } from '/tbc/core/proto/common.js';
-import { Player, PlayerConfig } from './player.js';
-import { Sim, SimConfig } from './sim.js';
-import { Target, TargetConfig } from './target.js';
+import { Stats } from '/tbc/core/proto_utils/stats.js';
+import { SpecOptions } from '/tbc/core/proto_utils/utils.js';
+import { SpecRotation } from '/tbc/core/proto_utils/utils.js';
+import { Player } from './player.js';
+import { Sim } from './sim.js';
+import { Encounter } from './encounter.js';
 import { TypedEvent } from './typed_event.js';
 export declare type ReleaseStatus = 'Alpha' | 'Beta' | 'Live';
 export interface SimUIConfig<SpecType extends Spec> {
+    spec: Spec;
     releaseStatus: ReleaseStatus;
     knownIssues?: Array<string>;
-    sim: SimConfig;
-    player: PlayerConfig<SpecType>;
-    target: TargetConfig;
+    defaults: {
+        gear: EquipmentSpec;
+        epWeights: Stats;
+        consumes: Consumes;
+        rotation: SpecRotation<SpecType>;
+        talents: string;
+        specOptions: SpecOptions<SpecType>;
+        raidBuffs: RaidBuffs;
+        partyBuffs: PartyBuffs;
+        individualBuffs: IndividualBuffs;
+        debuffs: Debuffs;
+    };
 }
 export declare abstract class SimUI<SpecType extends Spec> {
     readonly parentElem: HTMLElement;
     readonly sim: Sim;
     readonly player: Player<SpecType>;
-    readonly target: Target;
+    readonly encounter: Encounter;
     readonly simUiConfig: SimUIConfig<SpecType>;
     readonly changeEmitter: TypedEvent<void>;
     private readonly exclusivityMap;
@@ -24,6 +43,7 @@ export declare abstract class SimUI<SpecType extends Spec> {
     toJson(): Object;
     fromJson(obj: any): void;
     init(): Promise<void>;
+    applyDefaults(): void;
     registerExclusiveEffect(effect: ExclusiveEffect): void;
     getSavedGearStorageKey(): string;
     getSavedEncounterStorageKey(): string;

@@ -1,8 +1,6 @@
-import { EnumPickerConfig } from '/tbc/core/components/enum_picker.js';
 import { Potions } from '/tbc/core/proto/common.js';
 import { Player } from '/tbc/core/player.js';
 import { Sim } from '/tbc/core/sim.js';
-import { Target } from '/tbc/core/target.js';
 import { SimUI } from '/tbc/core/sim_ui.js';
 export declare const StartingPotion: {
     type: "enum";
@@ -44,4 +42,3 @@ export declare const ShadowPriestDPS: {
         setValue: (sim: Sim, newValue: number) => void;
     };
 };
-export declare const MobTypePickerConfig: EnumPickerConfig<Target>;
