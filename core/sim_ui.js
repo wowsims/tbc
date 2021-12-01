@@ -116,6 +116,7 @@ export class SimUI {
         if (!loadedSettings) {
             this.applyDefaults();
         }
+        this.player.setEpWeights(this.simUiConfig.defaults.epWeights);
         this.changeEmitter.on(() => {
             const jsonStr = JSON.stringify(this.toJson());
             window.localStorage.setItem(this.getStorageKey(CURRENT_SETTINGS_STORAGE_KEY), jsonStr);
@@ -142,7 +143,6 @@ export class SimUI {
         this.player.setRotation(this.simUiConfig.defaults.rotation);
         this.player.setTalentsString(this.simUiConfig.defaults.talents);
         this.player.setSpecOptions(this.simUiConfig.defaults.specOptions);
-        this.player.setEpWeights(this.simUiConfig.defaults.epWeights);
         this.encounter.primaryTarget.setDebuffs(this.simUiConfig.defaults.debuffs);
     }
     registerExclusiveEffect(effect) {
