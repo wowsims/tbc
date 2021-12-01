@@ -1,5 +1,4 @@
 import { EnumPickerConfig } from '/tbc/core/components/enum_picker.js';
-import { MobType } from '/tbc/core/proto/common.js';
 import { Potions } from '/tbc/core/proto/common.js';
 import { Player } from '/tbc/core/player.js';
 import { Sim } from '/tbc/core/sim.js';
@@ -60,24 +59,4 @@ export const ShadowPriestDPS = {
       sim.setIndividualBuffs(individualBuffs);
     },
   },
-};
-
-export const MobTypePickerConfig: EnumPickerConfig<Target> = {
-	label: 'Mob Type',
-	values: [
-		{ name: 'None', value: MobType.MobTypeUnknown },
-		{ name: 'Beast', value: MobType.MobTypeBeast },
-		{ name: 'Demon', value: MobType.MobTypeDemon },
-		{ name: 'Dragonkin', value: MobType.MobTypeDragonkin },
-		{ name: 'Elemental', value: MobType.MobTypeElemental },
-		{ name: 'Giant', value: MobType.MobTypeGiant },
-		{ name: 'Humanoid', value: MobType.MobTypeHumanoid },
-		{ name: 'Mechanical', value: MobType.MobTypeMechanical },
-		{ name: 'Undead', value: MobType.MobTypeUndead },
-	],
-	changedEvent: (target: Target) => target.mobTypeChangeEmitter,
-	getValue: (target: Target) => target.getMobType(),
-	setValue: (target: Target, newValue: number) => {
-		target.setMobType(newValue);
-	},
 };

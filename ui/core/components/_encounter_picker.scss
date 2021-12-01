@@ -1,0 +1,8 @@
+@import "./enum_picker";
+@import "./number_picker";
+
+.encounter-picker-root .input-root, {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}

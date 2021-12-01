@@ -1,21 +1,19 @@
+import { Encounter } from '/tbc/core/encounter.js';
 import { Player } from '/tbc/core/player.js';
 import { Sim } from '/tbc/core/sim.js';
 import { Target } from '/tbc/core/target.js';
 import { Actions } from '/tbc/core/components/actions.js';
-import { BooleanPicker } from '/tbc/core/components/boolean_picker.js';
-import { BooleanPickerConfig } from '/tbc/core/components/boolean_picker.js';
+import { BooleanPicker, BooleanPickerConfig } from '/tbc/core/components/boolean_picker.js';
 import { CharacterStats } from '/tbc/core/components/character_stats.js';
 import { CustomStatsPicker } from '/tbc/core/components/custom_stats_picker.js';
 import { DetailedResults } from '/tbc/core/components/detailed_results.js';
-import { EnumPicker } from '/tbc/core/components/enum_picker.js';
-import { EnumPickerConfig } from '/tbc/core/components/enum_picker.js';
+import { EncounterPicker, EncounterPickerConfig } from '/tbc/core/components/encounter_picker.js';
+import { EnumPicker, EnumPickerConfig } from '/tbc/core/components/enum_picker.js';
 import { GearPicker } from '/tbc/core/components/gear_picker.js';
 import { IconInput } from '/tbc/core/components/icon_picker.js';
 import { IconPicker } from '/tbc/core/components/icon_picker.js';
 import { LogRunner } from '/tbc/core/components/log_runner.js';
-import { NumberPicker } from '/tbc/core/components/number_picker.js';
-import { NumberPickerConfig } from '/tbc/core/components/number_picker.js';
-import { MobTypePickerConfig } from '/tbc/core/components/other_inputs.js';
+import { NumberPicker, NumberPickerConfig } from '/tbc/core/components/number_picker.js';
 import { Results } from '/tbc/core/components/results.js';
 import { SavedDataConfig } from '/tbc/core/components/saved_data_manager.js';
 import { SavedDataManager } from '/tbc/core/components/saved_data_manager.js';
@@ -24,7 +22,7 @@ import { PartyBuffs } from '/tbc/core/proto/common.js';
 import { IndividualBuffs } from '/tbc/core/proto/common.js';
 import { Class } from '/tbc/core/proto/common.js';
 import { Consumes } from '/tbc/core/proto/common.js';
-import { Encounter } from '/tbc/core/proto/common.js';
+import { Encounter as EncounterProto } from '/tbc/core/proto/common.js';
 import { EquipmentSpec } from '/tbc/core/proto/common.js';
 import { Race } from '/tbc/core/proto/common.js';
 import { Spec } from '/tbc/core/proto/common.js';
@@ -72,6 +70,10 @@ export interface InputSection {
 }
 
 export interface DefaultThemeConfig<SpecType extends Spec> extends SimUIConfig<SpecType> {
+  epStats: Array<Stat>;
+  epReferenceStat: Stat;
+  displayStats: Array<Stat>;
+
 	selfBuffInputs: IconSection<Player<any>>;
 	buffInputs: IconSection<Sim>;
 	debuffInputs: IconSection<Target>;
@@ -79,12 +81,12 @@ export interface DefaultThemeConfig<SpecType extends Spec> extends SimUIConfig<S
 	rotationInputs: InputSection;
 	otherInputs?: InputSection;
   additionalSections?: Record<string, InputSection>;
-  showTargetArmor: boolean;
-  showNumTargets: boolean;
+	encounterPicker: EncounterPickerConfig,
 	freezeTalents?: boolean;
+
   presets: {
     gear: Array<PresetGear>,
-    encounters: Array<SavedDataConfig<Sim, Encounter>>,
+    encounters: Array<SavedDataConfig<Encounter, EncounterProto>>,
     talents: Array<SavedDataConfig<Player<any>, string>>,
   },
 }
@@ -127,13 +129,13 @@ export class DefaultTheme<SpecType extends Spec> extends SimUI<SpecType> {
 
     const results = new Results(this.parentElem.getElementsByClassName('default-results')[0] as HTMLElement, this);
     const detailedResults = new DetailedResults(this.parentElem.getElementsByClassName('detailed-results')[0] as HTMLElement);
-    const actions = new Actions(this.parentElem.getElementsByClassName('default-actions')[0] as HTMLElement, this, config.player.epStats, config.player.epReferenceStat, results, detailedResults);
+    const actions = new Actions(this.parentElem.getElementsByClassName('default-actions')[0] as HTMLElement, this, config.epStats, config.epReferenceStat, results, detailedResults);
     const logRunner = new LogRunner(this.parentElem.getElementsByClassName('log-runner')[0] as HTMLElement, this, results, detailedResults);
 
-    const characterStats = new CharacterStats(this.parentElem.getElementsByClassName('default-stats')[0] as HTMLElement, config.player.displayStats, this.player);
+    const characterStats = new CharacterStats(this.parentElem.getElementsByClassName('default-stats')[0] as HTMLElement, config.displayStats, this.player);
 
     const gearPicker = new GearPicker(this.parentElem.getElementsByClassName('gear-picker')[0] as HTMLElement, this.player);
-    const customStatsPicker = new CustomStatsPicker(this.parentElem.getElementsByClassName('custom-stats-picker')[0] as HTMLElement, this.player, config.player.epStats);
+    const customStatsPicker = new CustomStatsPicker(this.parentElem.getElementsByClassName('custom-stats-picker')[0] as HTMLElement, this.player, config.epStats);
 
     const talentsPicker = newTalentsPicker(this.player.spec, this.parentElem.getElementsByClassName('talents-picker')[0] as HTMLElement, this.player);
 		// Add a url parameter to help people trapped in the wrong talents   ;)
@@ -159,7 +161,7 @@ export class DefaultTheme<SpecType extends Spec> extends SimUI<SpecType> {
 		};
     configureIconSection(this.parentElem.getElementsByClassName('self-buffs-section')[0] as HTMLElement, config.selfBuffInputs, this.player);
     configureIconSection(this.parentElem.getElementsByClassName('buffs-section')[0] as HTMLElement, config.buffInputs, this.sim);
-    configureIconSection(this.parentElem.getElementsByClassName('debuffs-section')[0] as HTMLElement, config.debuffInputs, this.target);
+    configureIconSection(this.parentElem.getElementsByClassName('debuffs-section')[0] as HTMLElement, config.debuffInputs, this.encounter.primaryTarget);
     configureIconSection(this.parentElem.getElementsByClassName('consumes-section')[0] as HTMLElement, config.consumeInputs, this.player);
 
 		const configureInputSection = (sectionElem: HTMLElement, sectionConfig: InputSection) => {
@@ -211,40 +213,7 @@ export class DefaultTheme<SpecType extends Spec> extends SimUI<SpecType> {
     });
 
     const encounterSectionElem = settingsTab.getElementsByClassName('encounter-section')[0] as HTMLElement;
-    new NumberPicker(encounterSectionElem, this.sim, {
-      label: 'Duration',
-      changedEvent: (sim: Sim) => sim.encounterChangeEmitter,
-      getValue: (sim: Sim) => sim.getEncounter().duration,
-      setValue: (sim: Sim, newValue: number) => {
-        const encounter = sim.getEncounter();
-        encounter.duration = newValue;
-        sim.setEncounter(encounter);
-      },
-    });
-
-    if (config.showTargetArmor) {
-      new NumberPicker(encounterSectionElem, this.target, {
-        label: 'Target Armor',
-        changedEvent: (target: Target) => target.armorChangeEmitter,
-        getValue: (target: Target) => target.getArmor(),
-        setValue: (target: Target, newValue: number) => {
-					target.setArmor(newValue);
-        },
-      });
-    }
-
-		new EnumPicker(encounterSectionElem, this.target, MobTypePickerConfig);
-
-    if (config.showNumTargets) {
-      new NumberPicker(encounterSectionElem, this.sim, {
-        label: '# of Targets',
-        changedEvent: (sim: Sim) => sim.numTargetsChangeEmitter,
-        getValue: (sim: Sim) => sim.getNumTargets(),
-        setValue: (sim: Sim, newValue: number) => {
-					sim.setNumTargets(newValue);
-        },
-      });
-    }
+		new EncounterPicker(encounterSectionElem, this.encounter, config.encounterPicker);
 
     // Init Muuri layout only when settings tab is clicked, because it needs the elements
     // to be shown so it can calculate sizes.
@@ -292,15 +261,15 @@ export class DefaultTheme<SpecType extends Spec> extends SimUI<SpecType> {
       },
     });
 
-    const savedEncounterManager = new SavedDataManager<Sim, Encounter>(this.parentElem.getElementsByClassName('saved-encounter-manager')[0] as HTMLElement, this.sim, {
+    const savedEncounterManager = new SavedDataManager<Encounter, EncounterProto>(this.parentElem.getElementsByClassName('saved-encounter-manager')[0] as HTMLElement, this.encounter, {
       label: 'Encounter',
 			storageKey: this.getSavedEncounterStorageKey(),
-      getData: (sim: Sim) => sim.getEncounter(),
-      setData: (sim: Sim, newEncounter: Encounter) => sim.setEncounter(newEncounter),
-      changeEmitters: [this.sim.encounterChangeEmitter],
-      equals: (a: Encounter, b: Encounter) => Encounter.equals(a, b),
-      toJson: (a: Encounter) => Encounter.toJson(a),
-      fromJson: (obj: any) => Encounter.fromJson(obj),
+      getData: (encounter: Encounter) => encounter.toProto(),
+      setData: (encounter: Encounter, newEncounter: EncounterProto) => encounter.fromProto(newEncounter),
+      changeEmitters: [this.encounter.changeEmitter],
+      equals: (a: EncounterProto, b: EncounterProto) => EncounterProto.equals(a, b),
+      toJson: (a: EncounterProto) => EncounterProto.toJson(a),
+      fromJson: (obj: any) => EncounterProto.fromJson(obj),
     });
 
     const savedRotationManager = new SavedDataManager<Player<any>, SpecRotation<SpecType>>(this.parentElem.getElementsByClassName('saved-rotation-manager')[0] as HTMLElement, this.player, {

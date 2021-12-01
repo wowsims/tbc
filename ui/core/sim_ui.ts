@@ -1,10 +1,21 @@
 import { IndividualSimRequest, IndividualSimResult } from '/tbc/core/proto/api.js';
+import { SimOptions } from '/tbc/core/proto/api.js';
+import { Consumes } from '/tbc/core/proto/common.js';
+import { Debuffs } from '/tbc/core/proto/common.js';
+import { EquipmentSpec } from '/tbc/core/proto/common.js';
+import { IndividualBuffs } from '/tbc/core/proto/common.js';
+import { PartyBuffs } from '/tbc/core/proto/common.js';
+import { RaidBuffs } from '/tbc/core/proto/common.js';
 import { Spec } from '/tbc/core/proto/common.js';
-import { makeIndividualSimRequest } from '/tbc/core/proto_utils/request_helpers.js';
+import { Stats } from '/tbc/core/proto_utils/stats.js';
+import { SpecOptions } from '/tbc/core/proto_utils/utils.js';
+import { SpecRotation } from '/tbc/core/proto_utils/utils.js';
 import { specToLocalStorageKey } from '/tbc/core/proto_utils/utils.js';
-import { Player, PlayerConfig } from './player.js';
-import { Sim, SimConfig } from './sim.js';
-import { Target, TargetConfig } from './target.js';
+
+import { Player } from './player.js';
+import { Sim } from './sim.js';
+import { Encounter } from './encounter.js';
+import { Target } from './target.js';
 import { TypedEvent } from './typed_event.js';
 
 declare var tippy: any;
@@ -20,11 +31,24 @@ const SAVED_TALENTS_STORAGE_KEY = '__savedTalents__';
 export type ReleaseStatus = 'Alpha' | 'Beta' | 'Live';
 
 export interface SimUIConfig<SpecType extends Spec> {
+	spec: Spec,
   releaseStatus: ReleaseStatus;
 	knownIssues?: Array<string>;
-	sim: SimConfig;
-	player: PlayerConfig<SpecType>;
-	target: TargetConfig;
+
+  defaults: {
+		gear: EquipmentSpec,
+		epWeights: Stats,
+    consumes: Consumes,
+    rotation: SpecRotation<SpecType>,
+    talents: string,
+    specOptions: SpecOptions<SpecType>,
+
+    raidBuffs: RaidBuffs,
+    partyBuffs: PartyBuffs,
+    individualBuffs: IndividualBuffs,
+
+    debuffs: Debuffs,
+  },
 }
 
 // Core UI module.
@@ -32,7 +56,7 @@ export abstract class SimUI<SpecType extends Spec> {
   readonly parentElem: HTMLElement;
   readonly sim: Sim;
   readonly player: Player<SpecType>;
-  readonly target: Target;
+  readonly encounter: Encounter;
 	readonly simUiConfig: SimUIConfig<SpecType>;
 
   // Emits when anything from sim, player, or target changes.
@@ -42,15 +66,15 @@ export abstract class SimUI<SpecType extends Spec> {
 
   constructor(parentElem: HTMLElement, config: SimUIConfig<SpecType>) {
     this.parentElem = parentElem;
-    this.sim = new Sim(config.sim);
-		this.player = new Player<SpecType>(config.player, this.sim);
-    this.target = new Target(config.target, this.sim);
+    this.sim = new Sim();
+		this.player = new Player<SpecType>(config.spec, this.sim);
+    this.encounter = new Encounter(this.sim);
 		this.simUiConfig = config;
 
     [
       this.sim.changeEmitter,
       this.player.changeEmitter,
-      this.target.changeEmitter,
+      this.encounter.changeEmitter,
     ].forEach(emitter => emitter.on(() => this.changeEmitter.emit()));
 
     this.exclusivityMap = {
@@ -88,7 +112,7 @@ export abstract class SimUI<SpecType extends Spec> {
     return {
       'sim': this.sim.toJson(),
       'player': this.player.toJson(),
-      'target': this.target.toJson(),
+      'encounter': this.encounter.toJson(),
     };
 	}
 
@@ -102,8 +126,8 @@ export abstract class SimUI<SpecType extends Spec> {
 			this.player.fromJson(obj['player']);
 		}
 
-		if (obj['target']) {
-			this.target.fromJson(obj['target']);
+		if (obj['encounter']) {
+			this.encounter.fromJson(obj['encounter']);
 		}
   }
 
@@ -149,7 +173,7 @@ export abstract class SimUI<SpecType extends Spec> {
     }
 
 		if (!loadedSettings) {
-			this.player.setGear(this.sim.lookupEquipmentSpec(this.player.defaultGear));
+			this.applyDefaults();
 		}
 
     this.changeEmitter.on(() => {
@@ -176,6 +200,16 @@ export abstract class SimUI<SpecType extends Spec> {
 			});
 		});
   }
+
+	applyDefaults() {
+		this.player.setGear(this.sim.lookupEquipmentSpec(this.simUiConfig.defaults.gear));
+		this.player.setConsumes(this.simUiConfig.defaults.consumes);
+		this.player.setRotation(this.simUiConfig.defaults.rotation);
+		this.player.setTalentsString(this.simUiConfig.defaults.talents);
+		this.player.setSpecOptions(this.simUiConfig.defaults.specOptions);
+		this.player.setEpWeights(this.simUiConfig.defaults.epWeights);
+		this.encounter.primaryTarget.setDebuffs(this.simUiConfig.defaults.debuffs);
+	}
 
   registerExclusiveEffect(effect: ExclusiveEffect) {
     effect.tags.forEach(tag => {
@@ -223,26 +257,17 @@ export abstract class SimUI<SpecType extends Spec> {
 	}
 
   makeCurrentIndividualSimRequest(iterations: number, debug: boolean): IndividualSimRequest {
-		const encounter = this.sim.getEncounter();
-		const numTargets = Math.max(1, this.sim.getNumTargets());
-		for (let i = 0; i < numTargets; i++) {
-			encounter.targets.push(this.target.toProto());
-		}
-
-    return makeIndividualSimRequest(
-      this.sim.getRaidBuffs(),
-      this.sim.getPartyBuffs(),
-      this.sim.getIndividualBuffs(),
-      this.player.getConsumes(),
-      this.player.getCustomStats(),
-      encounter,
-      this.player.getGear(),
-      this.player.getRace(),
-      this.player.getRotation(),
-      this.player.getTalents(),
-      this.player.getSpecOptions(),
-      iterations,
-      debug);
+		return IndividualSimRequest.create({
+			player: this.player.toProto(),
+			raidBuffs: this.sim.getRaidBuffs(),
+			partyBuffs: this.sim.getPartyBuffs(),
+			individualBuffs: this.sim.getIndividualBuffs(),
+			encounter: this.encounter.toProto(),
+			simOptions: SimOptions.create({
+				iterations: iterations,
+				debug: debug,
+			}),
+		});
   }
 }
 
