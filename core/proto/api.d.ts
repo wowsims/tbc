@@ -251,11 +251,13 @@ export interface AuraMetrics {
      */
     id: number;
     /**
-     * Total time, in seconds, that this aura was active.
-     *
-     * @generated from protobuf field: double uptime_seconds = 2;
+     * @generated from protobuf field: double uptime_seconds_avg = 2;
      */
-    uptimeSeconds: number;
+    uptimeSecondsAvg: number;
+    /**
+     * @generated from protobuf field: double uptime_seconds_stdev = 3;
+     */
+    uptimeSecondsStdev: number;
 }
 /**
  * All the results for a single Player.

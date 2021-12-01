@@ -594,11 +594,12 @@ class AuraMetrics$Type extends MessageType {
     constructor() {
         super("proto.AuraMetrics", [
             { no: 1, name: "id", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
-            { no: 2, name: "uptime_seconds", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ }
+            { no: 2, name: "uptime_seconds_avg", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
+            { no: 3, name: "uptime_seconds_stdev", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ }
         ]);
     }
     create(value) {
-        const message = { id: 0, uptimeSeconds: 0 };
+        const message = { id: 0, uptimeSecondsAvg: 0, uptimeSecondsStdev: 0 };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -612,8 +613,11 @@ class AuraMetrics$Type extends MessageType {
                 case /* int32 id */ 1:
                     message.id = reader.int32();
                     break;
-                case /* double uptime_seconds */ 2:
-                    message.uptimeSeconds = reader.double();
+                case /* double uptime_seconds_avg */ 2:
+                    message.uptimeSecondsAvg = reader.double();
+                    break;
+                case /* double uptime_seconds_stdev */ 3:
+                    message.uptimeSecondsStdev = reader.double();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -630,9 +634,12 @@ class AuraMetrics$Type extends MessageType {
         /* int32 id = 1; */
         if (message.id !== 0)
             writer.tag(1, WireType.Varint).int32(message.id);
-        /* double uptime_seconds = 2; */
-        if (message.uptimeSeconds !== 0)
-            writer.tag(2, WireType.Bit64).double(message.uptimeSeconds);
+        /* double uptime_seconds_avg = 2; */
+        if (message.uptimeSecondsAvg !== 0)
+            writer.tag(2, WireType.Bit64).double(message.uptimeSecondsAvg);
+        /* double uptime_seconds_stdev = 3; */
+        if (message.uptimeSecondsStdev !== 0)
+            writer.tag(3, WireType.Bit64).double(message.uptimeSecondsStdev);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
