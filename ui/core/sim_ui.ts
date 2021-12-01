@@ -175,6 +175,7 @@ export abstract class SimUI<SpecType extends Spec> {
 		if (!loadedSettings) {
 			this.applyDefaults();
 		}
+		this.player.setEpWeights(this.simUiConfig.defaults.epWeights);
 
     this.changeEmitter.on(() => {
       const jsonStr = JSON.stringify(this.toJson());
@@ -207,7 +208,6 @@ export abstract class SimUI<SpecType extends Spec> {
 		this.player.setRotation(this.simUiConfig.defaults.rotation);
 		this.player.setTalentsString(this.simUiConfig.defaults.talents);
 		this.player.setSpecOptions(this.simUiConfig.defaults.specOptions);
-		this.player.setEpWeights(this.simUiConfig.defaults.epWeights);
 		this.encounter.primaryTarget.setDebuffs(this.simUiConfig.defaults.debuffs);
 	}
 
