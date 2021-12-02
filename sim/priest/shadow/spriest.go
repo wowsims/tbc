@@ -10,7 +10,7 @@ import (
 )
 
 func RegisterShadowPriest() {
-	core.RegisterAgentFactory(proto.PlayerOptions_ShadowPriest{}, func(character core.Character, options proto.PlayerOptions, isr proto.IndividualSimRequest) core.Agent {
+	core.RegisterAgentFactory(proto.Player_ShadowPriest{}, func(character core.Character, options proto.Player, isr proto.IndividualSimRequest) core.Agent {
 		return NewShadowPriest(character, options, isr)
 	})
 }
@@ -18,7 +18,7 @@ func RegisterShadowPriest() {
 var ShadowWeavingDebuffID = core.NewDebuffID()
 var ShadowWeaverAuraID = core.NewAuraID()
 
-func NewShadowPriest(character core.Character, options proto.PlayerOptions, isr proto.IndividualSimRequest) *ShadowPriest {
+func NewShadowPriest(character core.Character, options proto.Player, isr proto.IndividualSimRequest) *ShadowPriest {
 	shadowOptions := options.GetShadowPriest()
 
 	// Only undead can do Dev Plague

@@ -24,9 +24,9 @@ var StandardTalents = &proto.ShamanTalents{
 	LightningOverload:  5,
 	TotemOfWrath:       true,
 
-	TotemicFocus:       5,
-	NaturesGuidance:    3,
-	TidalMastery:       5,
+	TotemicFocus:    5,
+	NaturesGuidance: 3,
+	TidalMastery:    5,
 }
 
 var eleShamOptionsNoBuffs = &proto.ElementalShaman_Options{
@@ -36,14 +36,12 @@ var eleShamOptionsNoBuffs = &proto.ElementalShaman_Options{
 	// TotemOfWrath:    true,
 	// WrathOfAirTotem: true,
 }
-var PlayerOptionsAdaptiveNoBuffs = &proto.PlayerOptions{
-	Spec: &proto.PlayerOptions_ElementalShaman{
-		ElementalShaman: &proto.ElementalShaman{
-			Talents: StandardTalents,
-			Options: eleShamOptionsNoBuffs,
-			Rotation: &proto.ElementalShaman_Rotation{
-				Type: proto.ElementalShaman_Rotation_Adaptive,
-			},
+var PlayerOptionsAdaptiveNoBuffs = &proto.Player_ElementalShaman{
+	ElementalShaman: &proto.ElementalShaman{
+		Talents: StandardTalents,
+		Options: eleShamOptionsNoBuffs,
+		Rotation: &proto.ElementalShaman_Rotation{
+			Type: proto.ElementalShaman_Rotation_Adaptive,
 		},
 	},
 }
@@ -55,38 +53,32 @@ var eleShamOptions = &proto.ElementalShaman_Options{
 	TotemOfWrath:    true,
 	WrathOfAirTotem: true,
 }
-var PlayerOptionsAdaptive = &proto.PlayerOptions{
-	Spec: &proto.PlayerOptions_ElementalShaman{
-		ElementalShaman: &proto.ElementalShaman{
-			Talents: StandardTalents,
-			Options: eleShamOptions,
-			Rotation: &proto.ElementalShaman_Rotation{
-				Type: proto.ElementalShaman_Rotation_Adaptive,
-			},
+var PlayerOptionsAdaptive = &proto.Player_ElementalShaman{
+	ElementalShaman: &proto.ElementalShaman{
+		Talents: StandardTalents,
+		Options: eleShamOptions,
+		Rotation: &proto.ElementalShaman_Rotation{
+			Type: proto.ElementalShaman_Rotation_Adaptive,
 		},
 	},
 }
 
-var PlayerOptionsLBOnly = &proto.PlayerOptions{
-	Spec: &proto.PlayerOptions_ElementalShaman{
-		ElementalShaman: &proto.ElementalShaman{
-			Talents: StandardTalents,
-			Options: eleShamOptions,
-			Rotation: &proto.ElementalShaman_Rotation{
-				Type: proto.ElementalShaman_Rotation_LBOnly,
-			},
+var PlayerOptionsLBOnly = &proto.Player_ElementalShaman{
+	ElementalShaman: &proto.ElementalShaman{
+		Talents: StandardTalents,
+		Options: eleShamOptions,
+		Rotation: &proto.ElementalShaman_Rotation{
+			Type: proto.ElementalShaman_Rotation_LBOnly,
 		},
 	},
 }
 
-var PlayerOptionsCLOnClearcast = &proto.PlayerOptions{
-	Spec: &proto.PlayerOptions_ElementalShaman{
-		ElementalShaman: &proto.ElementalShaman{
-			Talents: StandardTalents,
-			Options: eleShamOptions,
-			Rotation: &proto.ElementalShaman_Rotation{
-				Type: proto.ElementalShaman_Rotation_CLOnClearcast,
-			},
+var PlayerOptionsCLOnClearcast = &proto.Player_ElementalShaman{
+	ElementalShaman: &proto.ElementalShaman{
+		Talents: StandardTalents,
+		Options: eleShamOptions,
+		Rotation: &proto.ElementalShaman_Rotation{
+			Type: proto.ElementalShaman_Rotation_CLOnClearcast,
 		},
 	},
 }

@@ -11,12 +11,12 @@ import (
 )
 
 func RegisterElementalShaman() {
-	core.RegisterAgentFactory(proto.PlayerOptions_ElementalShaman{}, func(character core.Character, options proto.PlayerOptions, isr proto.IndividualSimRequest) core.Agent {
+	core.RegisterAgentFactory(proto.Player_ElementalShaman{}, func(character core.Character, options proto.Player, isr proto.IndividualSimRequest) core.Agent {
 		return NewElementalShaman(character, options, isr)
 	})
 }
 
-func NewElementalShaman(character core.Character, options proto.PlayerOptions, isr proto.IndividualSimRequest) *ElementalShaman {
+func NewElementalShaman(character core.Character, options proto.Player, isr proto.IndividualSimRequest) *ElementalShaman {
 	eleShamOptions := options.GetElementalShaman()
 
 	selfBuffs := SelfBuffs{
@@ -261,7 +261,7 @@ func NewAdaptiveRotation(isr proto.IndividualSimRequest) *AdaptiveRotation {
 	presimRequest := googleProto.Clone(&isr).(*proto.IndividualSimRequest)
 	presimRequest.SimOptions.Debug = false
 	presimRequest.SimOptions.Iterations = 100
-	presimRequest.Player.Options.Spec.(*proto.PlayerOptions_ElementalShaman).ElementalShaman.Rotation.Type = proto.ElementalShaman_Rotation_CLOnClearcast
+	presimRequest.Player.Spec.(*proto.Player_ElementalShaman).ElementalShaman.Rotation.Type = proto.ElementalShaman_Rotation_CLOnClearcast
 
 	presimResult := core.RunIndividualSim(presimRequest)
 

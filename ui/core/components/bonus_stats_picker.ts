@@ -8,16 +8,16 @@ import { NumberPicker } from './number_picker.js';
 
 declare var tippy: any;
 
-export class CustomStatsPicker extends Component {
+export class BonusStatsPicker extends Component {
   readonly stats: Array<Stat>;
   readonly statPickers: Array<NumberPicker<Player<any>>>;
 
   constructor(parent: HTMLElement, player: Player<any>, stats: Array<Stat>) {
-    super(parent, 'custom-stats-root');
+    super(parent, 'bonus-stats-root');
     this.stats = stats;
 
     const label = document.createElement('span');
-    label.classList.add('custom-stats-label');
+    label.classList.add('bonus-stats-label');
     label.textContent = 'Bonus Stats';
 		tippy(label, {
 			'content': 'Extra stats to add on top of gear, buffs, etc.',
@@ -27,15 +27,15 @@ export class CustomStatsPicker extends Component {
 
     this.statPickers = this.stats.map(stat => new NumberPicker(this.rootElem, player, {
       label: statNames[stat],
-      changedEvent: (player: Player<any>) => player.customStatsChangeEmitter,
-      getValue: (player: Player<any>) => player.getCustomStats().getStat(stat),
+      changedEvent: (player: Player<any>) => player.bonusStatsChangeEmitter,
+      getValue: (player: Player<any>) => player.getBonusStats().getStat(stat),
       setValue: (player: Player<any>, newValue: number) => {
-        const customStats = player.getCustomStats().withStat(stat, newValue);
-        player.setCustomStats(customStats);
+        const bonusStats = player.getBonusStats().withStat(stat, newValue);
+        player.setBonusStats(bonusStats);
       },
     }));
 
-		player.customStatsChangeEmitter.on(() => {
+		player.bonusStatsChangeEmitter.on(() => {
 			this.statPickers.forEach(statPicker => {
 				if (statPicker.getInputValue() > 0) {
 					statPicker.rootElem.classList.remove('negative');

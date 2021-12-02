@@ -18,8 +18,8 @@ type StatWeightsResult struct {
 }
 
 func CalcStatWeight(isr proto.IndividualSimRequest, statsToWeigh []stats.Stat, referenceStat stats.Stat) StatWeightsResult {
-	if isr.Player.CustomStats == nil {
-		isr.Player.CustomStats = make([]float64, stats.Len)
+	if isr.Player.BonusStats == nil {
+		isr.Player.BonusStats = make([]float64, stats.Len)
 	}
 
 	baseSim := NewIndividualSim(isr)
@@ -34,7 +34,7 @@ func CalcStatWeight(isr proto.IndividualSimRequest, statsToWeigh []stats.Stat, r
 		defer waitGroup.Done()
 
 		simRequest := googleProto.Clone(&isr).(*proto.IndividualSimRequest)
-		simRequest.Player.CustomStats[stat] += value
+		simRequest.Player.BonusStats[stat] += value
 
 		simResult := RunIndividualSim(simRequest)
 

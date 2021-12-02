@@ -54,7 +54,7 @@ export class Player<SpecType extends Spec> {
 
   readonly spec: Spec;
   private consumes: Consumes = Consumes.create();
-  private customStats: Stats = new Stats();
+  private bonusStats: Stats = new Stats();
   private gear: Gear = new Gear({});
   private race: Race;
   private rotation: SpecRotation<SpecType>;
@@ -68,7 +68,7 @@ export class Player<SpecType extends Spec> {
 	private currentStats: ComputeStatsResult;
 
   readonly consumesChangeEmitter = new TypedEvent<void>();
-  readonly customStatsChangeEmitter = new TypedEvent<void>();
+  readonly bonusStatsChangeEmitter = new TypedEvent<void>();
   readonly gearChangeEmitter = new TypedEvent<void>();
   readonly raceChangeEmitter = new TypedEvent<void>();
   readonly rotationChangeEmitter = new TypedEvent<void>();
@@ -94,7 +94,7 @@ export class Player<SpecType extends Spec> {
 
     [
       this.consumesChangeEmitter,
-      this.customStatsChangeEmitter,
+      this.bonusStatsChangeEmitter,
       this.gearChangeEmitter,
       this.raceChangeEmitter,
       this.rotationChangeEmitter,
@@ -216,16 +216,16 @@ export class Player<SpecType extends Spec> {
     this.gearChangeEmitter.emit();
   }
 
-  getCustomStats(): Stats {
-    return this.customStats;
+  getBonusStats(): Stats {
+    return this.bonusStats;
   }
 
-  setCustomStats(newCustomStats: Stats) {
-    if (newCustomStats.equals(this.customStats))
+  setBonusStats(newBonusStats: Stats) {
+    if (newBonusStats.equals(this.bonusStats))
       return;
 
-    this.customStats = newCustomStats;
-    this.customStatsChangeEmitter.emit();
+    this.bonusStats = newBonusStats;
+    this.bonusStatsChangeEmitter.emit();
   }
 
   getRotation(): SpecRotation<SpecType> {
@@ -336,15 +336,17 @@ export class Player<SpecType extends Spec> {
   }
 
 	toProto(): PlayerProto {
-    return PlayerProto.create({
-      customStats: this.getCustomStats().asArray(),
-      equipment: this.getGear().asSpec(),
-      options: withSpecProto(PlayerOptionsProto.create({
-        race: this.getRace(),
-        class: specToClass[this.spec],
-        consumes: this.getConsumes(),
-      }), this.getRotation(), this.getTalents(), this.getSpecOptions()),
-    });
+    return withSpecProto(
+				PlayerProto.create({
+					race: this.getRace(),
+					class: specToClass[this.spec],
+					equipment: this.getGear().asSpec(),
+					consumes: this.getConsumes(),
+					bonusStats: this.getBonusStats().asArray(),
+				}),
+				this.getRotation(),
+				this.getTalents(),
+				this.getSpecOptions());
 	}
 
 	// TODO: Remove to/from json functions and use proto versions instead. This will require
@@ -353,7 +355,7 @@ export class Player<SpecType extends Spec> {
   toJson(): Object {
     return {
       'consumes': Consumes.toJson(this.consumes),
-      'customStats': this.customStats.toJson(),
+      'bonusStats': this.bonusStats.toJson(),
       'gear': EquipmentSpec.toJson(this.gear.asSpec()),
       'race': this.race,
       'rotation': this.specTypeFunctions.rotationToJson(this.rotation),
@@ -371,9 +373,9 @@ export class Player<SpecType extends Spec> {
 		}
 
 		try {
-			this.setCustomStats(Stats.fromJson(obj['customStats']));
+			this.setBonusStats(Stats.fromJson(obj['bonusStats']));
 		} catch (e) {
-			console.warn('Failed to parse custom stats: ' + e);
+			console.warn('Failed to parse bonus stats: ' + e);
 		}
 
 		try {

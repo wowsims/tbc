@@ -13,7 +13,7 @@ import (
 	googleProto "google.golang.org/protobuf/proto"
 )
 
-var basicSpec = &proto.PlayerOptions_ElementalShaman{
+var basicSpec = &proto.Player_ElementalShaman{
 	ElementalShaman: &proto.ElementalShaman{
 		Rotation: &proto.ElementalShaman_Rotation{
 			Type: proto.ElementalShaman_Rotation_Adaptive,
@@ -80,13 +80,11 @@ func init() {
 func TestIndividualSim(t *testing.T) {
 	req := &proto.IndividualSimRequest{
 		Player: &proto.Player{
-			Options: &proto.PlayerOptions{
-				Race:     proto.Race_RaceTroll10,
-				Class:    proto.Class_ClassShaman,
-				Spec:     basicSpec,
-				Consumes: basicConsumes,
-			},
+			Race:      proto.Race_RaceTroll10,
+			Class:     proto.Class_ClassShaman,
 			Equipment: p1Equip,
+			Consumes:  basicConsumes,
+			Spec:      basicSpec,
 		},
 		RaidBuffs:       &proto.RaidBuffs{},
 		PartyBuffs:      &proto.PartyBuffs{},
@@ -132,12 +130,10 @@ func TestIndividualSim(t *testing.T) {
 func TestCalcStatWeight(t *testing.T) {
 	req := &proto.IndividualSimRequest{
 		Player: &proto.Player{
-			Options: &proto.PlayerOptions{
-				Race:     proto.Race_RaceTroll10,
-				Spec:     basicSpec,
-				Consumes: basicConsumes,
-			},
+			Race:      proto.Race_RaceTroll10,
 			Equipment: p1Equip,
+			Consumes:  basicConsumes,
+			Spec:      basicSpec,
 		},
 		RaidBuffs:       &proto.RaidBuffs{},
 		PartyBuffs:      &proto.PartyBuffs{},

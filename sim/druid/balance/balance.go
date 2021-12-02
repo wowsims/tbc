@@ -11,12 +11,12 @@ import (
 )
 
 func RegisterBalanceDruid() {
-	core.RegisterAgentFactory(proto.PlayerOptions_BalanceDruid{}, func(character core.Character, options proto.PlayerOptions, isr proto.IndividualSimRequest) core.Agent {
+	core.RegisterAgentFactory(proto.Player_BalanceDruid{}, func(character core.Character, options proto.Player, isr proto.IndividualSimRequest) core.Agent {
 		return NewBalanceDruid(character, options, isr)
 	})
 }
 
-func NewBalanceDruid(character core.Character, options proto.PlayerOptions, isr proto.IndividualSimRequest) *BalanceDruid {
+func NewBalanceDruid(character core.Character, options proto.Player, isr proto.IndividualSimRequest) *BalanceDruid {
 	balanceOptions := options.GetBalanceDruid()
 
 	selfBuffs := druid.SelfBuffs{}
@@ -171,7 +171,7 @@ func (moonkin *BalanceDruid) PickRotations(baseRotation proto.BalanceDruid_Rotat
 		presimRequest.SimOptions.RandomSeed = 1
 		presimRequest.SimOptions.Debug = false
 		presimRequest.SimOptions.Iterations = 100
-		*presimRequest.Player.Options.Spec.(*proto.PlayerOptions_BalanceDruid).BalanceDruid.Rotation = rotation
+		*presimRequest.Player.Spec.(*proto.Player_BalanceDruid).BalanceDruid.Rotation = rotation
 
 		presimResult := core.RunIndividualSim(presimRequest)
 

@@ -64,7 +64,7 @@ func (actionID ActionID) ToProto() *proto.ActionID {
 	return protoID
 }
 
-type AgentFactory func(Character, proto.PlayerOptions, proto.IndividualSimRequest) Agent
+type AgentFactory func(Character, proto.Player, proto.IndividualSimRequest) Agent
 
 var agentFactories map[string]AgentFactory = make(map[string]AgentFactory)
 
@@ -80,11 +80,7 @@ func RegisterAgentFactory(emptyOptions interface{}, factory AgentFactory) {
 
 // Constructs a new Agent. isr is only used for presims.
 func NewAgent(player proto.Player, isr proto.IndividualSimRequest) Agent {
-	if player.Options == nil {
-		panic("No player options provided!")
-	}
-
-	typeName := reflect.TypeOf(player.Options.GetSpec()).Elem().Name()
+	typeName := reflect.TypeOf(player.GetSpec()).Elem().Name()
 
 	factory, ok := agentFactories[typeName]
 	if !ok {
@@ -92,5 +88,5 @@ func NewAgent(player proto.Player, isr proto.IndividualSimRequest) Agent {
 	}
 
 	character := NewCharacter(player)
-	return factory(character, *player.Options, isr)
+	return factory(character, player, isr)
 }
