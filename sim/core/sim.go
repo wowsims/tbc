@@ -148,19 +148,13 @@ func (sim *Simulation) Run() *proto.RaidSimResult {
 		}
 	}
 
-	simDurationSeconds := sim.Duration.Seconds()
 	for i := int32(0); i < sim.Options.Iterations; i++ {
 		sim.RunOnce()
-
-		sim.Raid.doneIteration(simDurationSeconds)
 	}
-
-	// Reset after the last iteration, because some metrics get updated in reset().
-	sim.reset()
 
 	result := &proto.RaidSimResult{
 		RaidMetrics:      sim.Raid.GetMetrics(sim.Options.Iterations),
-		EncounterMetrics: sim.encounter.GetMetricsProto(),
+		EncounterMetrics: sim.encounter.GetMetricsProto(sim.Options.Iterations),
 
 		Logs: logsBuffer.String(),
 	}
@@ -253,6 +247,9 @@ func (sim *Simulation) RunOnce() {
 			pa.CleanUp(sim)
 		}
 	}
+
+	sim.Raid.doneIteration(sim.Duration)
+	sim.encounter.doneIteration(sim.Duration)
 }
 
 func (sim *Simulation) AddPendingAction(pa *PendingAction) {

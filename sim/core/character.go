@@ -363,9 +363,14 @@ func (character *Character) HasMetaGemEquipped(gemID int32) bool {
 	return false
 }
 
+func (character *Character) doneIteration(simDuration time.Duration) {
+	character.Metrics.doneIteration(simDuration.Seconds())
+	character.auraTracker.doneIteration(simDuration)
+}
+
 func (character *Character) GetMetricsProto(numIterations int32) *proto.PlayerMetrics {
 	metrics := character.Metrics.ToProto(numIterations)
-	metrics.Auras = character.auraTracker.GetMetricsProto()
+	metrics.Auras = character.auraTracker.GetMetricsProto(numIterations)
 	return metrics
 }
 

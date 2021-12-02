@@ -3,6 +3,7 @@
 @import "../components/character_stats";
 @import "../components/custom_stats_picker";
 @import "../components/detailed_results";
+@import "../components/encounter_picker";
 @import "../components/enum_picker";
 @import "../components/gear_picker";
 @import "../components/icon_picker";
@@ -235,12 +236,6 @@ td, th {
   display: flex;
   justify-content: space-around;
   align-items: flex-end;
-}
-
-.encounter-section .input-root, {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
 }
 
 .race-section {
