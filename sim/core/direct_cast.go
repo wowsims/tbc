@@ -155,6 +155,11 @@ type DotDamageInput struct {
 	tickIndex     int
 }
 
+// DamagePerTick returns the cached damage per tick on the spell.
+func (ddi DotDamageInput) DamagePerTick() float64 {
+	return ddi.damagePerTick
+}
+
 func (ddi DotDamageInput) TimeRemaining(sim *Simulation) time.Duration {
 	return MaxDuration(0, ddi.finalTickTime-sim.CurrentTime)
 }
