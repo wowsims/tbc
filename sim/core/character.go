@@ -110,7 +110,6 @@ func (character *Character) applyAllEffects(agent Agent) {
 	applyRaceEffects(agent)
 	character.applyItemEffects(agent)
 	character.applyItemSetBonusEffects(agent)
-	applyConsumeEffects(agent)
 }
 
 // Apply effects from all equipped items.

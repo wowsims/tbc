@@ -7,16 +7,15 @@ import (
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/proto"
 	"github.com/wowsims/tbc/sim/druid"
-	googleProto "google.golang.org/protobuf/proto"
 )
 
 func RegisterBalanceDruid() {
-	core.RegisterAgentFactory(proto.Player_BalanceDruid{}, func(character core.Character, options proto.Player, isr proto.IndividualSimRequest) core.Agent {
-		return NewBalanceDruid(character, options, isr)
+	core.RegisterAgentFactory(proto.Player_BalanceDruid{}, func(character core.Character, options proto.Player) core.Agent {
+		return NewBalanceDruid(character, options)
 	})
 }
 
-func NewBalanceDruid(character core.Character, options proto.Player, isr proto.IndividualSimRequest) *BalanceDruid {
+func NewBalanceDruid(character core.Character, options proto.Player) *BalanceDruid {
 	balanceOptions := options.GetBalanceDruid()
 
 	selfBuffs := druid.SelfBuffs{}
@@ -28,12 +27,11 @@ func NewBalanceDruid(character core.Character, options proto.Player, isr proto.I
 
 	druid := druid.New(character, selfBuffs, *balanceOptions.Talents)
 	moonkin := &BalanceDruid{
-		Druid: druid,
+		Druid:           druid,
+		primaryRotation: *balanceOptions.Rotation,
 	}
 
 	moonkin.useBattleRes = balanceOptions.Options.BattleRes
-
-	moonkin.PickRotations(*balanceOptions.Rotation, isr)
 
 	return moonkin
 }
@@ -55,6 +53,48 @@ type BalanceDruid struct {
 // GetDruid is to implement druid.Agent (supports nordrassil set bonus)
 func (moonkin *BalanceDruid) GetDruid() *druid.Druid {
 	return &moonkin.Druid
+}
+
+func (moonkin *BalanceDruid) GetPresimOptions() *core.PresimOptions {
+	// If not adaptive, just use the primary rotation directly.
+	if moonkin.primaryRotation.PrimarySpell != proto.BalanceDruid_Rotation_Adaptive {
+		return nil
+	}
+
+	rotations := moonkin.GetDpsRotationHierarchy(moonkin.primaryRotation)
+	rotationIdx := 0
+
+	return &core.PresimOptions{
+		SetPresimPlayerOptions: func(player *proto.Player) {
+			*player.Spec.(*proto.Player_BalanceDruid).BalanceDruid.Rotation = rotations[rotationIdx]
+		},
+
+		OnPresimResult: func(presimResult proto.PlayerMetrics, iterations int32) bool {
+			if float64(presimResult.NumOom) < float64(iterations)*0.15 {
+				moonkin.primaryRotation = rotations[rotationIdx]
+
+				// If the highest dps rotation is fine, we dont need any adaptive logic.
+				if rotationIdx == 0 {
+					return true
+				}
+
+				moonkin.useSurplusRotation = true
+				moonkin.surplusRotation = rotations[rotationIdx-1]
+				moonkin.manaTracker = common.NewManaSpendingRateTracker()
+
+				return true
+			}
+
+			rotationIdx++
+			if rotationIdx == len(rotations) {
+				// If we are here than all of the rotations went oom. No adaptive logic needed, just use the lowest one.
+				moonkin.primaryRotation = rotations[len(rotations)-1]
+				return true
+			}
+
+			return false
+		},
+	}
 }
 
 func (moonkin *BalanceDruid) Reset(sim *core.Simulation) {
@@ -146,52 +186,6 @@ func (moonkin *BalanceDruid) actRotation(sim *core.Simulation, rotation proto.Ba
 	return sim.CurrentTime + core.MaxDuration(
 		moonkin.GetRemainingCD(core.GCDCooldownID, sim.CurrentTime),
 		spell.CastTime)
-}
-
-// Sets the rotation fields on moonkin. If adaptive, uses multiple presims.
-func (moonkin *BalanceDruid) PickRotations(baseRotation proto.BalanceDruid_Rotation, isr proto.IndividualSimRequest) {
-	// If not adaptive, just use the base rotation directly.
-	if baseRotation.PrimarySpell != proto.BalanceDruid_Rotation_Adaptive {
-		moonkin.primaryRotation = baseRotation
-		return
-	}
-
-	// If no encounter is set, it means we aren't going to run a sim at all.
-	// So just return something valid.
-	// TODO: Probably need some organized way of doing presims so we dont have
-	// to check these types of things.
-	if isr.Encounter == nil || len(isr.Encounter.Targets) == 0 {
-		moonkin.primaryRotation = baseRotation
-		return
-	}
-
-	rotations := moonkin.GetDpsRotationHierarchy(baseRotation)
-	for i, rotation := range rotations {
-		presimRequest := googleProto.Clone(&isr).(*proto.IndividualSimRequest)
-		presimRequest.SimOptions.RandomSeed = 1
-		presimRequest.SimOptions.Debug = false
-		presimRequest.SimOptions.Iterations = 100
-		*presimRequest.Player.Spec.(*proto.Player_BalanceDruid).BalanceDruid.Rotation = rotation
-
-		presimResult := core.RunIndividualSim(presimRequest)
-
-		if presimResult.PlayerMetrics.NumOom < 15 {
-			moonkin.primaryRotation = rotation
-
-			// If the highest dps rotation is fine, we dont need any adaptive logic.
-			if i == 0 {
-				return
-			}
-
-			moonkin.useSurplusRotation = true
-			moonkin.surplusRotation = rotations[i-1]
-			moonkin.manaTracker = common.NewManaSpendingRateTracker()
-			return
-		}
-	}
-
-	// If we are here than all of the rotations went oom. No adaptive logic needed, just use the lowest one.
-	moonkin.primaryRotation = rotations[len(rotations)-1]
 }
 
 // Returns the order of DPS rotations to try, from highest to lowest dps. The

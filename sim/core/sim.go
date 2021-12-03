@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/wowsims/tbc/sim/core/proto"
+	googleProto "google.golang.org/protobuf/proto"
 )
 
 func debugFunc(sim *Simulation) func(string, ...interface{}) {
@@ -38,19 +39,17 @@ type Simulation struct {
 	logs []string
 }
 
-func NewIndividualSim(isr proto.IndividualSimRequest) *Simulation {
-	raid := NewRaid(*isr.RaidBuffs, *isr.PartyBuffs, *isr.IndividualBuffs)
-	raid.AddPlayer(NewAgent(*isr.Player, isr))
-	raid.Finalize()
-
-	encounter := NewEncounter(*isr.Encounter)
-	encounter.Finalize()
-
-	return newSim(raid, encounter, *isr.SimOptions)
+func RunSim(rsr proto.RaidSimRequest) *proto.RaidSimResult {
+	sim := newSim(rsr)
+	sim.runPresims(rsr)
+	return sim.run()
 }
 
-// New sim contructs a simulator with the given raid and target settings.
-func newSim(raid *Raid, encounter Encounter, simOptions proto.SimOptions) *Simulation {
+func newSim(rsr proto.RaidSimRequest) *Simulation {
+	raid := NewRaid(*rsr.Raid)
+	encounter := NewEncounter(*rsr.Encounter)
+	simOptions := *rsr.SimOptions
+
 	if len(encounter.Targets) == 0 {
 		panic("Must have at least 1 target!")
 	}
@@ -98,6 +97,67 @@ func (sim *Simulation) RandomFloat(label string) float64 {
 	return labelRand.Float64()
 }
 
+func (sim *Simulation) runPresims(request proto.RaidSimRequest) {
+	const numPresimIterations = 100
+
+	// Run presims if requested.
+	raidPresimOptions := make([]*PresimOptions, sim.Raid.Size())
+	remainingAgents := 0
+	for _, party := range sim.Raid.Parties {
+		for _, player := range party.Players {
+			presimOptions := player.GetPresimOptions()
+			if presimOptions != nil {
+				raidPresimOptions[player.GetCharacter().ID] = presimOptions
+				remainingAgents++
+			}
+		}
+	}
+
+	// Base presim request.
+	// Define this outside the loop so that, as Agents iteratively update their
+	// settings, we keep the most recent settings even after that Agent is
+	// done with presims.
+	presimRequest := googleProto.Clone(&request).(*proto.RaidSimRequest)
+	presimRequest.SimOptions.RandomSeed = 1
+	presimRequest.SimOptions.Debug = false
+	presimRequest.SimOptions.Iterations = numPresimIterations
+
+	for remainingAgents > 0 {
+		// ** Run a presim round. **
+
+		// Let each Agent modify their own settings.
+		for partyIdx, party := range sim.Raid.Parties {
+			partyConfig := presimRequest.Raid.Parties[partyIdx]
+			for playerIdx, player := range party.Players {
+				playerConfig := partyConfig.Players[playerIdx]
+				presimOptions := raidPresimOptions[player.GetCharacter().ID]
+				if presimOptions != nil {
+					presimOptions.SetPresimPlayerOptions(playerConfig)
+				}
+			}
+		}
+
+		// Run the presim.
+		presimResult := RunSim(*presimRequest)
+
+		// Provide each Agent with their own results.
+		for partyIdx, party := range sim.Raid.Parties {
+			partyMetrics := presimResult.RaidMetrics.Parties[partyIdx]
+			for playerIdx, player := range party.Players {
+				playerMetrics := partyMetrics.Players[playerIdx]
+				presimOptions := raidPresimOptions[player.GetCharacter().ID]
+				if presimOptions != nil {
+					done := presimOptions.OnPresimResult(*playerMetrics, numPresimIterations)
+					if done {
+						raidPresimOptions[player.GetCharacter().ID] = nil
+						remainingAgents--
+					}
+				}
+			}
+		}
+	}
+}
+
 // Reset will set sim back and erase all current state.
 // This is automatically called before every 'Run'.
 func (sim *Simulation) reset() {
@@ -130,18 +190,14 @@ type PendingAction struct {
 
 // Run runs the simulation for the configured number of iterations, and
 // collects all the metrics together.
-func (sim *Simulation) Run() *proto.RaidSimResult {
-	pid := 0
-	for _, raidParty := range sim.Raid.Parties {
-		for _, player := range raidParty.Players {
-			player.GetCharacter().ID = pid
-			player.GetCharacter().auraTracker.playerID = pid
-			pid++
+func (sim *Simulation) run() *proto.RaidSimResult {
+	for _, party := range sim.Raid.Parties {
+		for _, player := range party.Players {
 			player.Init(sim)
 		}
 	}
-	logsBuffer := &strings.Builder{}
 
+	logsBuffer := &strings.Builder{}
 	if sim.Options.Debug {
 		sim.Log = func(s string, vals ...interface{}) {
 			logsBuffer.WriteString(fmt.Sprintf("[%0.1f] "+s, append([]interface{}{sim.CurrentTime.Seconds()}, vals...)...))
@@ -149,7 +205,7 @@ func (sim *Simulation) Run() *proto.RaidSimResult {
 	}
 
 	for i := int32(0); i < sim.Options.Iterations; i++ {
-		sim.RunOnce()
+		sim.runOnce()
 	}
 
 	result := &proto.RaidSimResult{
@@ -161,18 +217,8 @@ func (sim *Simulation) Run() *proto.RaidSimResult {
 	return result
 }
 
-// Runs a full sim for an individual player.
-func (sim *Simulation) RunIndividual() *proto.IndividualSimResult {
-	raidResult := sim.Run()
-	return &proto.IndividualSimResult{
-		PlayerMetrics:    raidResult.RaidMetrics.Parties[0].Players[0],
-		EncounterMetrics: raidResult.EncounterMetrics,
-		Logs:             raidResult.Logs,
-	}
-}
-
 // RunOnce is the main event loop. It will run the simulation for number of seconds.
-func (sim *Simulation) RunOnce() {
+func (sim *Simulation) runOnce() {
 	sim.reset()
 
 	sim.pendingActions = make([]*PendingAction, 0, 25)

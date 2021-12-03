@@ -23,12 +23,14 @@ func NewEncounter(options proto.Encounter) Encounter {
 		encounter.Targets = append(encounter.Targets, target)
 	}
 
+	encounter.finalize()
+
 	return encounter
 }
 
-func (encounter *Encounter) Finalize() {
+func (encounter *Encounter) finalize() {
 	for _, target := range encounter.Targets {
-		target.Finalize()
+		target.finalize()
 	}
 }
 
@@ -67,7 +69,7 @@ type Target struct {
 	// Provides aura tracking behavior. Targets need auras to handle debuffs.
 	auraTracker
 
-	// Whether Finalize() has been called yet for this Character.
+	// Whether finalize() has been called yet for this Character.
 	// All fields above this may not be altered once finalized is set.
 	finalized bool
 }
@@ -196,7 +198,7 @@ func curseOfElementsAura(coe proto.TristateEffect) Aura {
 	}
 }
 
-func (target *Target) Finalize() {
+func (target *Target) finalize() {
 	if target.finalized {
 		return
 	}

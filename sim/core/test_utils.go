@@ -27,14 +27,15 @@ type IndividualSimInputs struct {
 
 func NewIndividualSimRequest(inputs IndividualSimInputs) *proto.IndividualSimRequest {
 	isr := &proto.IndividualSimRequest{
-		Player:          inputs.Player,
-		RaidBuffs:       inputs.RaidBuffs,
-		PartyBuffs:      inputs.PartyBuffs,
-		IndividualBuffs: inputs.IndividualBuffs,
+		Player:     inputs.Player,
+		RaidBuffs:  inputs.RaidBuffs,
+		PartyBuffs: inputs.PartyBuffs,
 
 		Encounter:  &proto.Encounter{},
 		SimOptions: inputs.SimOptions,
 	}
+
+	isr.Player.Buffs = inputs.IndividualBuffs
 
 	isr.Encounter.Duration = float64(inputs.Duration)
 	if inputs.Target != nil {
@@ -55,10 +56,9 @@ func NewIndividualSimRequest(inputs IndividualSimInputs) *proto.IndividualSimReq
 
 func CharacterStatsTest(label string, t *testing.T, isr *proto.IndividualSimRequest, expectedStats stats.Stats) {
 	csr := &proto.ComputeStatsRequest{
-		Player:          isr.Player,
-		RaidBuffs:       isr.RaidBuffs,
-		PartyBuffs:      isr.PartyBuffs,
-		IndividualBuffs: isr.IndividualBuffs,
+		Player:     isr.Player,
+		RaidBuffs:  isr.RaidBuffs,
+		PartyBuffs: isr.PartyBuffs,
 	}
 
 	result := ComputeStats(csr)
@@ -158,7 +158,6 @@ func IndividualBenchmark(b *testing.B, isr *proto.IndividualSimRequest) {
 	isr.SimOptions.IsTest = false
 
 	for i := 0; i < b.N; i++ {
-		sim := NewIndividualSim(*isr)
-		sim.Run()
+		RunIndividualSim(isr)
 	}
 }

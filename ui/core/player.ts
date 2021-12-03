@@ -152,7 +152,6 @@ export class Player<SpecType extends Spec> {
 			player: this.toProto(),
 			raidBuffs: this.sim.getRaidBuffs(),
 			partyBuffs: this.sim.getPartyBuffs(),
-			individualBuffs: this.sim.getIndividualBuffs(),
 		}));
 
 		this.currentStats = computeStatsResult;
@@ -343,6 +342,7 @@ export class Player<SpecType extends Spec> {
 					equipment: this.getGear().asSpec(),
 					consumes: this.getConsumes(),
 					bonusStats: this.getBonusStats().asArray(),
+					buffs: this.sim.getIndividualBuffs(),
 				}),
 				this.getRotation(),
 				this.getTalents(),

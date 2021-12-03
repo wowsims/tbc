@@ -18,6 +18,9 @@ type Agent interface {
 	// Updates the input Buffs to include party-wide buffs provided by this Agent.
 	AddPartyBuffs(partyBuffs *proto.PartyBuffs)
 
+	// See PresimOptions for details. If a presim is not needed, should return nil instead.
+	GetPresimOptions() *PresimOptions
+
 	// Called once before the first iteration, after all Agents and Targets are finalized.
 	// Use this to do any precomputations that require access to Sim or Target fields.
 	Init(sim *Simulation)
@@ -64,7 +67,7 @@ func (actionID ActionID) ToProto() *proto.ActionID {
 	return protoID
 }
 
-type AgentFactory func(Character, proto.Player, proto.IndividualSimRequest) Agent
+type AgentFactory func(Character, proto.Player) Agent
 
 var agentFactories map[string]AgentFactory = make(map[string]AgentFactory)
 
@@ -78,8 +81,8 @@ func RegisterAgentFactory(emptyOptions interface{}, factory AgentFactory) {
 	agentFactories[typeName] = factory
 }
 
-// Constructs a new Agent. isr is only used for presims.
-func NewAgent(player proto.Player, isr proto.IndividualSimRequest) Agent {
+// Constructs a new Agent.
+func NewAgent(player proto.Player) Agent {
 	typeName := reflect.TypeOf(player.GetSpec()).Elem().Name()
 
 	factory, ok := agentFactories[typeName]
@@ -88,5 +91,22 @@ func NewAgent(player proto.Player, isr proto.IndividualSimRequest) Agent {
 	}
 
 	character := NewCharacter(player)
-	return factory(character, player, isr)
+	return factory(character, player)
+}
+
+// A presim is a full simulation run with multiple iterations, as a preparation
+// step for testing out settings before starting the recorded iterations.
+//
+// If you don't know what this is, you probably don't need it.
+type PresimOptions struct {
+	// Called once before each presim round.
+	//
+	// Modify the player parameter to use whatever player options are desired
+	// for the presim.
+	SetPresimPlayerOptions func(player *proto.Player)
+
+	// Called once after each presim round to provide the results.
+	//
+	// Should return true if this Agent is done running presims, and false otherwise.
+	OnPresimResult func(presimResult proto.PlayerMetrics, iterations int32) bool
 }

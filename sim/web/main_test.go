@@ -86,9 +86,6 @@ func TestIndividualSim(t *testing.T) {
 			Consumes:  basicConsumes,
 			Spec:      basicSpec,
 		},
-		RaidBuffs:       &proto.RaidBuffs{},
-		PartyBuffs:      &proto.PartyBuffs{},
-		IndividualBuffs: &proto.IndividualBuffs{},
 		Encounter: &proto.Encounter{
 			Duration: 120,
 			Targets: []*proto.Target{
@@ -135,9 +132,6 @@ func TestCalcStatWeight(t *testing.T) {
 			Consumes:  basicConsumes,
 			Spec:      basicSpec,
 		},
-		RaidBuffs:       &proto.RaidBuffs{},
-		PartyBuffs:      &proto.PartyBuffs{},
-		IndividualBuffs: &proto.IndividualBuffs{},
 		Encounter: &proto.Encounter{
 			Duration: 120,
 			Targets: []*proto.Target{

@@ -22,9 +22,14 @@ func CalcStatWeight(isr proto.IndividualSimRequest, statsToWeigh []stats.Stat, r
 		isr.Player.BonusStats = make([]float64, stats.Len)
 	}
 
-	baseSim := NewIndividualSim(isr)
-	baseStats := baseSim.Raid.Parties[0].Players[0].GetCharacter().GetStats()
-	baselineResult := baseSim.RunIndividual()
+	baseStatsResult := ComputeStats(&proto.ComputeStatsRequest{
+		Player:     isr.Player,
+		RaidBuffs:  isr.RaidBuffs,
+		PartyBuffs: isr.PartyBuffs,
+	})
+	baseStats := baseStatsResult.FinalStats
+
+	baselineResult := RunIndividualSim(&isr)
 
 	var waitGroup sync.WaitGroup
 	result := StatWeightsResult{}
