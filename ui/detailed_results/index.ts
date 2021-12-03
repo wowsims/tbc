@@ -30,18 +30,46 @@ const layoutHTML = `
 <div class="dr-root">
 	<div class="dr-row topline-results">
 	</div>
-	<div class="dr-row cast-metrics">
+	<div class="dr-row">
+		<div class="table-container">
+			<div class="title-row">
+				<span class="table-title">Damaging Cast Metrics</span>
+			</div>
+			<div class="cast-metrics scroll-table">
+			</div>
+		</div>
 	</div>
 	<div class="dr-row source-stats">
 		<div class="source-chart">
 		</div>
 	</div>
 	<div class="dr-row other-metrics">
-		<div class="dr-col other-cast-metrics">
+		<div class="dr-col-3 start">
+			<div class="table-container">
+				<div class="title-row">
+					<span class="table-title">Other Cast Metrics</span>
+				</div>
+				<div class="other-cast-metrics scroll-table">
+				</div>
+			</div>
 		</div>
-		<div class="dr-col buff-aura-metrics">
+		<div class="dr-col-3">
+			<div class="table-container">
+				<div class="title-row">
+					<span class="table-title">Buff Aura Metrics</span>
+				</div>
+				<div class="buff-aura-metrics scroll-table">
+				</div>
+			</div>
 		</div>
-		<div class="dr-col debuff-aura-metrics">
+		<div class="dr-col-3 end">
+			<div class="table-container">
+				<div class="title-row">
+					<span class="table-title">Debuff Aura Metrics</span>
+				</div>
+				<div class="debuff-aura-metrics scroll-table">
+				</div>
+			</div>
 		</div>
 	</div>
 	<div class="dr-row dps-histogram">
@@ -69,24 +97,3 @@ const buffAuraMetrics = new BuffAuraMetrics({ parent: document.body.getElementsB
 const debuffAuraMetrics = new DebuffAuraMetrics({ parent: document.body.getElementsByClassName('debuff-aura-metrics')[0] as HTMLElement, resultsEmitter: resultsEmitter, colorSettings: colorSettings });
 const sourceChart = new SourceChart({ parent: document.body.getElementsByClassName('source-chart')[0] as HTMLElement, resultsEmitter: resultsEmitter, colorSettings: colorSettings });
 const dpsHistogram = new DpsHistogram({ parent: document.body.getElementsByClassName('dps-histogram')[0] as HTMLElement, resultsEmitter: resultsEmitter, colorSettings: colorSettings });
-
-// Need to implement this function to run after all the above
-// function balanceTables() {
-// 	var otherMetricsTables = document.querySelectorAll('.other-metrics table');
-// 	var max = 0;
-// 	for (var i = 0; i < otherMetricsTables.length; i++) {
-// 		var rows = otherMetricsTables[i].querySelectorAll('tbody tr').length;
-// 		if (rows > max) max = rows;
-// 	}
-// 	for (var i = 0; i < otherMetricsTables.length; i++) {
-// 		var rows = otherMetricsTables[i].querySelectorAll('tbody tr').length;
-// 		for (var j = rows; j < max; j++) {
-// 			var body = otherMetricsTables[i].querySelector('tbody');
-// 			var emptyRow = document.createElement('tr');
-// 			emptyRow.classList.add('empty');
-// 			body.appendChild(emptyRow);
-// 		}
-// 	}
-// 	console.log("executed");
-// }
-// balanceTables();
