@@ -14,9 +14,6 @@ import "shaman.proto";
 import "warlock.proto";
 import "warrior.proto";
 
-message PlayerOptions {
-}
-
 message Player {
     Race race = 1;
     Class class = 2;
