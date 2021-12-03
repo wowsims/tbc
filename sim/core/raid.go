@@ -10,9 +10,18 @@ import (
 
 type Party struct {
 	Players []Agent
+}
 
-	// Party-wide buffs for this party + raid-wide buffs
-	buffs proto.PartyBuffs
+func NewParty(partyConfig proto.Party) *Party {
+	party := &Party{}
+
+	for _, playerConfig := range partyConfig.Players {
+		if playerConfig != nil {
+			party.AddPlayer(NewAgent(*playerConfig))
+		}
+	}
+
+	return party
 }
 
 func (party *Party) Size() int {
@@ -61,25 +70,30 @@ func (party *Party) GetMetrics(numIterations int32) *proto.PartyMetrics {
 
 type Raid struct {
 	Parties []*Party
-
-	// Raid-wide buffs
-	buffs           proto.RaidBuffs
-	individualBuffs proto.IndividualBuffs
 }
 
-// Makes a new raid. baseBuffs are extra additional buffs applied to all players in the raid.
-func NewRaid(baseRaidBuffs proto.RaidBuffs, basePartyBuffs proto.PartyBuffs, individualBuffs proto.IndividualBuffs) *Raid {
-	return &Raid{
-		Parties: []*Party{
-			&Party{Players: []Agent{}, buffs: basePartyBuffs},
-			&Party{Players: []Agent{}, buffs: basePartyBuffs},
-			&Party{Players: []Agent{}, buffs: basePartyBuffs},
-			&Party{Players: []Agent{}, buffs: basePartyBuffs},
-			&Party{Players: []Agent{}, buffs: basePartyBuffs},
-		},
-		buffs:           baseRaidBuffs,
-		individualBuffs: individualBuffs,
+// Makes a new raid.
+func NewRaid(raidConfig proto.Raid) *Raid {
+	raid := &Raid{}
+
+	for _, partyConfig := range raidConfig.Parties {
+		if partyConfig != nil {
+			raid.Parties = append(raid.Parties, NewParty(*partyConfig))
+		}
 	}
+
+	pid := 0
+	for _, party := range raid.Parties {
+		for _, player := range party.Players {
+			player.GetCharacter().ID = pid
+			player.GetCharacter().auraTracker.playerID = pid
+			pid++
+		}
+	}
+
+	raid.finalize(raidConfig)
+
+	return raid
 }
 
 func (raid *Raid) Size() int {
@@ -110,39 +124,45 @@ func (raid *Raid) AddPlayer(player Agent) *Party {
 	return party
 }
 
-// Adds buffs from every player to the raid and party buffs.
-func (raid *Raid) addPlayerBuffs() {
-	// Add raid-wide buffs first.
-	for _, party := range raid.Parties {
-		for _, player := range party.Players {
-			player.AddRaidBuffs(&raid.buffs)
-			player.GetCharacter().AddRaidBuffs(&raid.buffs)
-		}
-	}
-
-	// Add party-wide buffs for each party.
-	for _, party := range raid.Parties {
-		for _, player := range party.Players {
-			player.AddPartyBuffs(&party.buffs)
-			player.GetCharacter().AddPartyBuffs(&party.buffs)
-		}
-	}
-}
-
-// Applies buffs to the sim and all the players.
-func (raid *Raid) applyAllEffects() {
-	for _, party := range raid.Parties {
-		for _, player := range party.Players {
-			player.GetCharacter().applyAllEffects(player)
-			applyBuffEffects(player, raid.buffs, party.buffs, raid.individualBuffs)
-		}
-	}
-}
-
 // Finalize the raid.
-func (raid *Raid) Finalize() {
-	raid.addPlayerBuffs()
-	raid.applyAllEffects()
+func (raid *Raid) finalize(raidConfig proto.Raid) {
+	// Compute the full raid buffs from the raid.
+	raidBuffs := proto.RaidBuffs{}
+	if raidConfig.Buffs != nil {
+		raidBuffs = *raidConfig.Buffs
+	}
+	for _, party := range raid.Parties {
+		for _, player := range party.Players {
+			player.AddRaidBuffs(&raidBuffs)
+			player.GetCharacter().AddRaidBuffs(&raidBuffs)
+		}
+	}
+
+	for partyIdx, party := range raid.Parties {
+		// Compute the full party buffs for this party.
+		partyConfig := *raidConfig.Parties[partyIdx]
+		partyBuffs := proto.PartyBuffs{}
+		if partyConfig.Buffs != nil {
+			partyBuffs = *partyConfig.Buffs
+		}
+		for _, player := range party.Players {
+			player.AddPartyBuffs(&partyBuffs)
+			player.GetCharacter().AddPartyBuffs(&partyBuffs)
+		}
+
+		// Apply all buffs to the players in this party.
+		for playerIdx, player := range party.Players {
+			playerConfig := *partyConfig.Players[playerIdx]
+			individualBuffs := proto.IndividualBuffs{}
+			if playerConfig.Buffs != nil {
+				individualBuffs = *playerConfig.Buffs
+			}
+
+			player.GetCharacter().applyAllEffects(player)
+			applyBuffEffects(player, raidBuffs, partyBuffs, individualBuffs)
+			applyConsumeEffects(player, partyBuffs)
+		}
+	}
 
 	for _, party := range raid.Parties {
 		for _, player := range party.Players {

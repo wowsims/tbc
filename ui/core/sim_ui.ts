@@ -261,7 +261,6 @@ export abstract class SimUI<SpecType extends Spec> {
 			player: this.player.toProto(),
 			raidBuffs: this.sim.getRaidBuffs(),
 			partyBuffs: this.sim.getPartyBuffs(),
-			individualBuffs: this.sim.getIndividualBuffs(),
 			encounter: this.encounter.toProto(),
 			simOptions: SimOptions.create({
 				iterations: iterations,

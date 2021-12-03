@@ -1,24 +1,24 @@
-.custom-stats-root {
+.bonus-stats-root {
   margin: 10px;
 }
 
-.custom-stats-label {
+.bonus-stats-label {
   font-size: 18px;
   font-weight: 700;
 }
 
-.custom-stats-root .number-picker-root {
+.bonus-stats-root .number-picker-root {
   display: flex;
   align-items: center;
 }
 
-.custom-stats-root .number-picker-root.positive .input-label {
+.bonus-stats-root .number-picker-root.positive .input-label {
 	color: lawngreen;
 	font-weight: bold;
 	text-shadow: 2px 2px 3px black;
 }
 
-.custom-stats-root .number-picker-root.negative .input-label {
+.bonus-stats-root .number-picker-root.negative .input-label {
 	color: red;
 	font-weight: bold;
 	text-shadow: 2px 2px 3px black;

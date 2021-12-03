@@ -118,10 +118,6 @@ func (mcdm *majorCooldownManager) AddMajorCooldown(mcd MajorCooldown) {
 		panic("Major cooldowns may not be added once finalized!")
 	}
 
-	if mcdm.initialMajorCooldowns == nil {
-		mcdm.initialMajorCooldowns = []MajorCooldown{}
-	}
-
 	mcdm.initialMajorCooldowns = append(mcdm.initialMajorCooldowns, mcd)
 }
 

@@ -43,7 +43,7 @@ var FullIndividualBuffs = &proto.IndividualBuffs{
 }
 
 var BasicConsumes = &proto.Consumes{
-	DefaultPotion:        proto.Potions_SuperManaPotion,
+	DefaultPotion: proto.Potions_SuperManaPotion,
 }
 var FullConsumes = &proto.Consumes{
 	FlaskOfBlindingLight: true,
@@ -68,48 +68,42 @@ var FullDebuffTarget = &proto.Target{
 	},
 }
 
-var PlayerOptionsAdaptive = &proto.PlayerOptions{
-	Spec: &proto.PlayerOptions_BalanceDruid{
-		BalanceDruid: &proto.BalanceDruid{
-			Talents: StandardTalents,
-			Options: &proto.BalanceDruid_Options{
-				InnervateTarget: &proto.RaidTarget{TargetIndex: 0}, // self innervate
-			},
-			Rotation: &proto.BalanceDruid_Rotation{
-				PrimarySpell: proto.BalanceDruid_Rotation_Adaptive,
-				FaerieFire: true,
-			},
+var PlayerOptionsAdaptive = &proto.Player_BalanceDruid{
+	BalanceDruid: &proto.BalanceDruid{
+		Talents: StandardTalents,
+		Options: &proto.BalanceDruid_Options{
+			InnervateTarget: &proto.RaidTarget{TargetIndex: 0}, // self innervate
+		},
+		Rotation: &proto.BalanceDruid_Rotation{
+			PrimarySpell: proto.BalanceDruid_Rotation_Adaptive,
+			FaerieFire:   true,
 		},
 	},
 }
 
-var PlayerOptionsStarfire = &proto.PlayerOptions{
-	Spec: &proto.PlayerOptions_BalanceDruid{
-		BalanceDruid: &proto.BalanceDruid{
-			Talents: StandardTalents,
-			Options: &proto.BalanceDruid_Options{
-				InnervateTarget: &proto.RaidTarget{TargetIndex: 0}, // self innervate
-			},
-			Rotation: &proto.BalanceDruid_Rotation{
-				PrimarySpell: proto.BalanceDruid_Rotation_Starfire,
-				Moonfire:     true,
-				FaerieFire:   true,
-			},
+var PlayerOptionsStarfire = &proto.Player_BalanceDruid{
+	BalanceDruid: &proto.BalanceDruid{
+		Talents: StandardTalents,
+		Options: &proto.BalanceDruid_Options{
+			InnervateTarget: &proto.RaidTarget{TargetIndex: 0}, // self innervate
+		},
+		Rotation: &proto.BalanceDruid_Rotation{
+			PrimarySpell: proto.BalanceDruid_Rotation_Starfire,
+			Moonfire:     true,
+			FaerieFire:   true,
 		},
 	},
 }
 
-var PlayerOptionsWrath = &proto.PlayerOptions{
-	Spec: &proto.PlayerOptions_BalanceDruid{
-		BalanceDruid: &proto.BalanceDruid{
-			Talents: StandardTalents,
-			Options: &proto.BalanceDruid_Options{
-				InnervateTarget: &proto.RaidTarget{TargetIndex: 0}, // self innervate
-			},
-			Rotation: &proto.BalanceDruid_Rotation{
-				PrimarySpell: proto.BalanceDruid_Rotation_Wrath,
-				Moonfire:     true,
-			},
+var PlayerOptionsWrath = &proto.Player_BalanceDruid{
+	BalanceDruid: &proto.BalanceDruid{
+		Talents: StandardTalents,
+		Options: &proto.BalanceDruid_Options{
+			InnervateTarget: &proto.RaidTarget{TargetIndex: 0}, // self innervate
+		},
+		Rotation: &proto.BalanceDruid_Rotation{
+			PrimarySpell: proto.BalanceDruid_Rotation_Wrath,
+			Moonfire:     true,
 		},
 	},
 }

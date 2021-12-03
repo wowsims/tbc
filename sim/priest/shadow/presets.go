@@ -64,15 +64,13 @@ var FullDebuffTarget = &proto.Target{
 	},
 }
 
-var PlayerOptionsBasic = &proto.PlayerOptions{
-	Spec: &proto.PlayerOptions_ShadowPriest{
-		ShadowPriest: &proto.ShadowPriest{
-			Talents: StandardTalents,
-			Options: &proto.ShadowPriest_Options{},
-			Rotation: &proto.ShadowPriest_Rotation{
-				RotationType: proto.ShadowPriest_Rotation_Basic,
-				// UseDevPlague: true,
-			},
+var PlayerOptionsBasic = &proto.Player_ShadowPriest{
+	ShadowPriest: &proto.ShadowPriest{
+		Talents: StandardTalents,
+		Options: &proto.ShadowPriest_Options{},
+		Rotation: &proto.ShadowPriest_Rotation{
+			RotationType: proto.ShadowPriest_Rotation_Basic,
+			// UseDevPlague: true,
 		},
 	},
 }

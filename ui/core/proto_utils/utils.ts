@@ -1,7 +1,6 @@
 import { intersection } from '/tbc/core/utils.js';
 
 import { Player } from '/tbc/core/proto/api.js';
-import { PlayerOptions } from '/tbc/core/proto/api.js';
 import { ArmorType } from '/tbc/core/proto/common.js';
 import { Class } from '/tbc/core/proto/common.js';
 import { Enchant } from '/tbc/core/proto/common.js';
@@ -496,11 +495,11 @@ export const specToLocalStorageKey: Record<Spec, string> = {
 
 // Returns a copy of playerOptions, with the class field set.
 export function withSpecProto<SpecType extends Spec>(
-    playerOptions: PlayerOptions,
+    player: Player,
     rotation: SpecRotation<SpecType>,
     talents: SpecTalents<SpecType>,
-    specOptions: SpecOptions<SpecType>): PlayerOptions {
-  const copy = PlayerOptions.clone(playerOptions);
+    specOptions: SpecOptions<SpecType>): Player {
+  const copy = Player.clone(player);
   if (BalanceDruidRotation.is(rotation)) {
 		copy.class = Class.ClassDruid;
     copy.spec = {
@@ -592,7 +591,7 @@ export function withSpecProto<SpecType extends Spec>(
       }),
     };
   } else {
-    throw new Error('Unrecognized talents with options: ' + PlayerOptions.toJsonString(playerOptions));
+    throw new Error('Unrecognized talents with options: ' + Player.toJsonString(player));
   }
   return copy;
 }
