@@ -31,6 +31,7 @@ var Gems = []Gem{
 	{ID: 24050, Name: "Gleaming Dawnstone", Quality: proto.ItemQuality_ItemQualityRare, Phase: 1, Color: proto.GemColor_GemColorYellow, Stats: stats.Stats{stats.SpellCrit: 8}},
 	{ID: 32207, Name: "Gleaming Lionseye", Quality: proto.ItemQuality_ItemQualityEpic, Phase: 3, Color: proto.GemColor_GemColorYellow, Stats: stats.Stats{stats.SpellCrit: 10}},
 	{ID: 28120, Name: "Gleaming Ornate Dawnstone", Quality: proto.ItemQuality_ItemQualityUncommon, Phase: 1, Color: proto.GemColor_GemColorYellow, Stats: stats.Stats{stats.SpellCrit: 10}, Unique: true},
+	{ID: 31861, Name: "Great Dawnstone", Quality: proto.ItemQuality_ItemQualityRare, Phase: 1, Color: proto.GemColor_GemColorYellow, Stats: stats.Stats{stats.SpellHit: 8}},
 	{ID: 35761, Name: "Quick Lionseye", Quality: proto.ItemQuality_ItemQualityEpic, Phase: 5, Color: proto.GemColor_GemColorYellow, Stats: stats.Stats{stats.SpellHaste: 10}},
 	{ID: 30551, Name: "Infused Fire Opal", Quality: proto.ItemQuality_ItemQualityEpic, Phase: 1, Color: proto.GemColor_GemColorOrange, Stats: stats.Stats{stats.Intellect: 4, stats.SpellPower: 6}, Unique: true},
 	{ID: 23101, Name: "Potent Flame Spessarite", Quality: proto.ItemQuality_ItemQualityUncommon, Phase: 1, Color: proto.GemColor_GemColorOrange, Stats: stats.Stats{stats.SpellCrit: 3, stats.SpellPower: 4}},

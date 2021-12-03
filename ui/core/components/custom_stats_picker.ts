@@ -6,6 +6,8 @@ import { Player } from '/tbc/core/player.js';
 import { Component } from './component.js';
 import { NumberPicker } from './number_picker.js';
 
+declare var tippy: any;
+
 export class CustomStatsPicker extends Component {
   readonly stats: Array<Stat>;
   readonly statPickers: Array<NumberPicker<Player<any>>>;
@@ -16,7 +18,11 @@ export class CustomStatsPicker extends Component {
 
     const label = document.createElement('span');
     label.classList.add('custom-stats-label');
-    label.textContent = 'Custom Stats';
+    label.textContent = 'Bonus Stats';
+		tippy(label, {
+			'content': 'Extra stats to add on top of gear, buffs, etc.',
+			'allowHTML': true,
+		});
     this.rootElem.appendChild(label);
 
     this.statPickers = this.stats.map(stat => new NumberPicker(this.rootElem, player, {
@@ -28,5 +34,20 @@ export class CustomStatsPicker extends Component {
         player.setCustomStats(customStats);
       },
     }));
+
+		player.customStatsChangeEmitter.on(() => {
+			this.statPickers.forEach(statPicker => {
+				if (statPicker.getInputValue() > 0) {
+					statPicker.rootElem.classList.remove('negative');
+					statPicker.rootElem.classList.add('positive');
+				} else if (statPicker.getInputValue() < 0) {
+					statPicker.rootElem.classList.remove('positive');
+					statPicker.rootElem.classList.add('negative');
+				} else {
+					statPicker.rootElem.classList.remove('negative');
+					statPicker.rootElem.classList.remove('positive');
+				}
+			});
+		});
   }
 }

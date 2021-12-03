@@ -4,11 +4,14 @@ rwildcard=$(foreach d,$(wildcard $(1:=/*)),$(call rwildcard,$d,$2) $(filter $(su
 OUT_DIR=dist/tbc
 
 # Make everything. Keep this first so it's the default rule.
-$(OUT_DIR): balance_druid elemental_shaman
+$(OUT_DIR): balance_druid elemental_shaman shadow_priest raid
 
 # Add new sim rules here! Don't forget to add it as a dependency to the default rule above.
 balance_druid: $(OUT_DIR)/balance_druid/index.js $(OUT_DIR)/balance_druid/index.css $(OUT_DIR)/balance_druid/index.html ui_shared
 elemental_shaman: $(OUT_DIR)/elemental_shaman/index.js $(OUT_DIR)/elemental_shaman/index.css $(OUT_DIR)/elemental_shaman/index.html ui_shared
+shadow_priest: $(OUT_DIR)/shadow_priest/index.js $(OUT_DIR)/shadow_priest/index.css $(OUT_DIR)/shadow_priest/index.html ui_shared
+
+raid: $(OUT_DIR)/raid/index.js $(OUT_DIR)/raid/index.css $(OUT_DIR)/raid/index.html
 
 ui_shared: $(OUT_DIR)/lib.wasm $(OUT_DIR)/sim_worker.js $(OUT_DIR)/net_worker.js detailed_results
 detailed_results: $(OUT_DIR)/detailed_results/index.js $(OUT_DIR)/detailed_results/index.css $(OUT_DIR)/detailed_results/index.html
@@ -62,7 +65,14 @@ wasm: $(OUT_DIR)/lib.wasm
 
 # Builds the generic .wasm, with all items included.
 $(OUT_DIR)/lib.wasm: sim/wasm/* sim/core/proto/api.pb.go $(filter-out sim/core/items/all_items.go, $(call rwildcard,sim,*.go))
-	GOOS=js GOARCH=wasm go build -o ./$(OUT_DIR)/lib.wasm ./sim/wasm/
+	@echo "Starting webassembly compile now..."
+	@if GOOS=js GOARCH=wasm go build -o ./$(OUT_DIR)/lib.wasm ./sim/wasm/; then \
+		echo "\033[1;32mWASM compile successful.\033[0m"; \
+	else \
+		echo "\033[1;31mWASM COMPILE FAILED\033[0m"; \
+		exit 1; \
+	fi
+	
 
 # Generic sim_worker that uses the generic lib.wasm
 $(OUT_DIR)/sim_worker.js: ui/worker/sim_worker.js
@@ -91,6 +101,7 @@ devserver:
 		echo "\033[1;32mBuild Completed Succeessfully\033[0m"; \
 	else \
 		echo "\033[1;31mBUILD FAILED\033[0m"; \
+		exit 1; \
 	fi
 
 release: wowsimtbc

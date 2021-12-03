@@ -18,6 +18,9 @@ type OnSpellHit func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEf
 // Callback for after a spell is fully resisted on a target.
 type OnSpellMiss func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect)
 
+// OnPeriodicDamage is called when dots tick. Able to mutate tickDamage as needed
+type OnPeriodicDamage func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect, tickDamage *float64)
+
 // A Spell is a type of cast that can hit/miss using spell stats, and has a spell school.
 type SpellCast struct {
 	// Embedded Cast
@@ -45,6 +48,11 @@ type SpellEffect struct {
 
 	// Additional multiplier that is always applied.
 	DamageMultiplier float64
+
+	// applies fixed % increases to damage at cast time.
+	//  Only use multipliers that don't change for the lifetime of the sim.
+	//  This should probably only be mutated in a template and not changed in auras.
+	StaticDamageMultiplier float64
 
 	// Callbacks for providing additional custom behavior.
 	OnSpellHit  OnSpellHit
@@ -127,7 +135,7 @@ func (spellEffect *SpellEffect) calculateDirectDamage(sim *Simulation, spellCast
 
 	damage := baseDamage + damageFromSpellPower + ddInput.FlatDamageBonus
 
-	damage *= spellEffect.DamageMultiplier
+	damage *= spellEffect.DamageMultiplier * spellEffect.StaticDamageMultiplier
 
 	crit := (spellCast.Character.GetStat(stats.SpellCrit) + spellEffect.BonusSpellCritRating) / (SpellCritRatingPerCritChance * 100)
 	if spellCast.GuaranteedCrit || sim.RandomFloat("DirectSpell Crit") < crit {
@@ -135,31 +143,40 @@ func (spellEffect *SpellEffect) calculateDirectDamage(sim *Simulation, spellCast
 		damage *= spellCast.CritMultiplier
 	}
 
-	damage = calculateResists(sim, damage, spellEffect)
+	if !spellCast.Binary {
+		damage = calculateResists(sim, damage, spellEffect)
+	}
 
 	spellEffect.Damage = damage
 }
 
 func (spellEffect *SpellEffect) applyDot(sim *Simulation, spellCast *SpellCast, ddInput *DotDamageInput) {
 	totalSpellPower := spellCast.Character.GetStat(stats.SpellPower) + spellCast.Character.GetStat(spellCast.SpellSchool) + spellEffect.BonusSpellPower
-	// snapshot total damage per tick
-	ddInput.damagePerTick = (ddInput.TickBaseDamage + totalSpellPower*ddInput.TickSpellCoefficient) * spellEffect.DamageMultiplier
+
+	// snapshot total damage per tick, including any static damage multipliers
+	ddInput.damagePerTick = (ddInput.TickBaseDamage + totalSpellPower*ddInput.TickSpellCoefficient) * spellEffect.StaticDamageMultiplier
 	ddInput.finalTickTime = sim.CurrentTime + time.Duration(ddInput.NumberOfTicks)*ddInput.TickLength
 
 	pa := &PendingAction{
+		Name:         spellCast.Name,
 		NextActionAt: sim.CurrentTime + ddInput.TickLength,
 	}
 
 	pa.OnAction = func(sim *Simulation) {
 		damage := ddInput.damagePerTick
-		damage = calculateResists(sim, damage, spellEffect)
+		spellCast.Character.OnPeriodicDamage(sim, spellCast, spellEffect, &damage)
+		spellEffect.Target.OnPeriodicDamage(sim, spellCast, spellEffect, &damage)
 
-		if sim.Log != nil {
-			sim.Log(" %s Ticked for %0.1f\n", spellCast.Name, damage)
+		if !spellCast.Binary {
+			damage = calculateResists(sim, damage, spellEffect)
 		}
 
-		if ddInput.OnDamageTick != nil {
-			ddInput.OnDamageTick(sim)
+		if ddInput.OnPeriodicDamage != nil {
+			ddInput.OnPeriodicDamage(sim, spellCast, spellEffect, &damage)
+		}
+
+		if sim.Log != nil {
+			sim.Log(" %s (base: %01.f) Ticked for %0.1f\n", spellCast.Name, ddInput.damagePerTick, damage)
 		}
 
 		spellEffect.Damage += damage

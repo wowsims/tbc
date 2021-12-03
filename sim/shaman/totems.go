@@ -11,16 +11,17 @@ import (
 // TODO: Include mental quickness mana cost reduction when we figure out what it is.
 
 func (shaman *Shaman) NewAirTotem(sim *core.Simulation) *core.SimpleCast {
-	manaCost := 360 * (1 - float64(shaman.Talents.TotemicFocus)*0.05)
+	baseManaCost := 320.0
+	manaCost := baseManaCost * (1 - float64(shaman.Talents.TotemicFocus)*0.05)
 
 	cast := &core.SimpleCast{
 		Cast: core.Cast{
-			Name:            "Wrath of Air",
-			ActionID:        core.ActionID{SpellID: 3738},
-			Character:       shaman.GetCharacter(),
-			BaseManaCost:    manaCost,
-			ManaCost:        manaCost,
-			GCDCooldown:     time.Second * 1,
+			Name:         "Wrath of Air",
+			ActionID:     core.ActionID{SpellID: 3738},
+			Character:    shaman.GetCharacter(),
+			BaseManaCost: baseManaCost,
+			ManaCost:     manaCost,
+			GCDCooldown:  time.Second * 1,
 		},
 		OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
 			shaman.SelfBuffs.NextTotemDrops[AirTotem] = sim.CurrentTime + time.Second*120
@@ -31,16 +32,17 @@ func (shaman *Shaman) NewAirTotem(sim *core.Simulation) *core.SimpleCast {
 }
 
 func (shaman *Shaman) NewWaterTotem(sim *core.Simulation) *core.SimpleCast {
-	manaCost := 120 * (1 - float64(shaman.Talents.TotemicFocus)*0.05)
+	baseManaCost := 120.0
+	manaCost := baseManaCost * (1 - float64(shaman.Talents.TotemicFocus)*0.05)
 
 	cast := &core.SimpleCast{
 		Cast: core.Cast{
-			Name:            "Mana Stream",
-			ActionID:        core.ActionID{SpellID: 25570},
-			Character:       shaman.GetCharacter(),
-			BaseManaCost:    manaCost,
-			ManaCost:        manaCost,
-			GCDCooldown:     time.Second * 1,
+			Name:         "Mana Stream",
+			ActionID:     core.ActionID{SpellID: 25570},
+			Character:    shaman.GetCharacter(),
+			BaseManaCost: baseManaCost,
+			ManaCost:     manaCost,
+			GCDCooldown:  time.Second * 1,
 		},
 		OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
 			shaman.SelfBuffs.NextTotemDrops[WaterTotem] = sim.CurrentTime + time.Second*120
@@ -51,16 +53,17 @@ func (shaman *Shaman) NewWaterTotem(sim *core.Simulation) *core.SimpleCast {
 }
 
 func (shaman *Shaman) NewFireTotem(sim *core.Simulation) *core.SimpleCast {
-	manaCost := 360 * (1 - float64(shaman.Talents.TotemicFocus)*0.05)
+	baseManaCost := shaman.BaseMana() * 0.05
+	manaCost := baseManaCost * (1 - float64(shaman.Talents.TotemicFocus)*0.05)
 
 	cast := &core.SimpleCast{
 		Cast: core.Cast{
-			Name:            "Totem of Wrath",
-			ActionID:        core.ActionID{SpellID: 30706},
-			Character:       shaman.GetCharacter(),
-			BaseManaCost:    manaCost,
-			ManaCost:        manaCost,
-			GCDCooldown:     time.Second * 1,
+			Name:         "Totem of Wrath",
+			ActionID:     core.ActionID{SpellID: 30706},
+			Character:    shaman.GetCharacter(),
+			BaseManaCost: baseManaCost,
+			ManaCost:     manaCost,
+			GCDCooldown:  time.Second * 1,
 		},
 		OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
 			shaman.SelfBuffs.NextTotemDrops[FireTotem] = sim.CurrentTime + time.Second*120

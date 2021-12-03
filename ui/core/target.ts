@@ -8,16 +8,14 @@ import { TypedEvent } from './typed_event.js';
 import { sum } from './utils.js';
 import { wait } from './utils.js';
 
-export interface TargetConfig {
-  defaults: {
-		armor: number,
-		mobType: MobType,
-		debuffs: Debuffs,
-  },
-}
-
 // Manages all the settings for a single Target.
 export class Target {
+	private readonly sim: Sim;
+
+	private armor: number = 0;
+	private mobType: MobType = MobType.MobTypeDemon;
+  private debuffs: Debuffs = Debuffs.create();
+
   readonly armorChangeEmitter = new TypedEvent<void>();
   readonly mobTypeChangeEmitter = new TypedEvent<void>();
   readonly debuffsChangeEmitter = new TypedEvent<void>();
@@ -25,19 +23,8 @@ export class Target {
   // Emits when any of the above emitters emit.
   readonly changeEmitter = new TypedEvent<void>();
 
-  // Current values
-	private armor: number;
-	private mobType: MobType;
-  private debuffs: Debuffs;
-
-	private readonly sim: Sim;
-
-  constructor(config: TargetConfig, sim: Sim) {
+  constructor(sim: Sim) {
 		this.sim = sim;
-
-    this.armor = config.defaults.armor;
-    this.mobType = config.defaults.mobType;
-    this.debuffs = config.defaults.debuffs;
 
     [
       this.armorChangeEmitter,
@@ -92,31 +79,17 @@ export class Target {
 		});
 	}
 
-  // Returns JSON representing all the current values.
+	fromProto(proto: TargetProto) {
+		this.setArmor(proto.armor);
+		this.setMobType(proto.mobType);
+		this.setDebuffs(proto.debuffs || Debuffs.create());
+	}
+
   toJson(): Object {
-    return {
-      'armor': this.armor,
-      'mobType': this.mobType,
-      'debuffs': Debuffs.toJson(this.debuffs),
-    };
+		return TargetProto.toJson(this.toProto()) as Object;
   }
 
-  // Set all the current values, assumes obj is the same type returned by toJson().
   fromJson(obj: any) {
-		const parsedArmor = parseInt(obj['armor']);
-		if (!isNaN(parsedArmor) && parsedArmor != 0) {
-			this.setArmor(parsedArmor);
-		}
-
-		const parsedMobType = parseInt(obj['mobType']);
-		if (!isNaN(parsedMobType) && parsedMobType != 0) {
-			this.setMobType(parsedMobType);
-		}
-
-		try {
-			this.setDebuffs(Debuffs.fromJson(obj['debuffs']));
-		} catch (e) {
-			console.warn('Failed to parse debuffs: ' + e);
-		}
+		this.fromProto(TargetProto.fromJson(obj));
   }
 }

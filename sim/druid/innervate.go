@@ -34,12 +34,14 @@ func (druid *Druid) TryInnervate(sim *core.Simulation) time.Duration {
 		cd -= time.Second * 48
 	}
 
+	baseManaCost := druid.BaseMana() * 0.04
+
 	cast := &core.SimpleCast{
 		Cast: core.Cast{
 			Name:         "Innervate",
 			Character:    druid.GetCharacter(),
-			BaseManaCost: 94,
-			ManaCost:     94,
+			BaseManaCost: baseManaCost,
+			ManaCost:     baseManaCost,
 			Cooldown:     cd,
 
 			ActionID: core.ActionID{

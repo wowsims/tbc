@@ -1,0 +1,16 @@
+@import "../core/shared";
+@import "../core/themes/default";
+
+// Set color variables which control the site theme.
+:root {
+	--main-bg-color: Black;
+	--main-text-color: White;
+	--main-secondary-color: Black;
+	--sidebar-bg-color: #222;
+	--sidebar-text-color: White;
+	--sidebar-highlight-color: Red;
+}
+
+body {
+  margin: 0;
+}
