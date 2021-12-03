@@ -11,6 +11,7 @@ import { Stat } from './proto/common.js';
 import { ComputeStatsRequest, ComputeStatsResult } from './proto/api.js';
 import { GearListRequest, GearListResult } from './proto/api.js';
 import { IndividualSimRequest, IndividualSimResult } from './proto/api.js';
+import { RaidSimRequest, RaidSimResult } from './proto/api.js';
 import { StatWeightsRequest, StatWeightsResult } from './proto/api.js';
 
 import { repoName } from './resources.js';
@@ -57,6 +58,14 @@ export class WorkerPool {
 		const resultData = await this.makeApiCall('individualSim', IndividualSimRequest.toBinary(request));
 		const result = IndividualSimResult.fromBinary(resultData);
     console.log('Individual sim result: ' + IndividualSimResult.toJsonString(result));
+		return result;
+  }
+
+  async raidSim(request: RaidSimRequest): Promise<RaidSimResult> {
+    console.log('Raid sim request: ' + RaidSimRequest.toJsonString(request));
+		const resultData = await this.makeApiCall('raidSim', RaidSimRequest.toBinary(request));
+		const result = RaidSimResult.fromBinary(resultData);
+    console.log('Raid sim result: ' + RaidSimResult.toJsonString(result));
 		return result;
   }
 }

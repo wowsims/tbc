@@ -8,12 +8,12 @@ import (
 )
 
 // Registers all consume-related effects to the Agent.
-func applyConsumeEffects(agent Agent) {
+func applyConsumeEffects(agent Agent, partyBuffs proto.PartyBuffs) {
 	consumes := agent.GetCharacter().consumes
 
 	agent.GetCharacter().AddStats(consumesStats(consumes))
 
-	registerDrumsCD(agent, consumes)
+	registerDrumsCD(agent, partyBuffs, consumes)
 	registerPotionCD(agent, consumes)
 	registerDarkRuneCD(agent, consumes)
 }
@@ -90,8 +90,8 @@ func consumesStats(c proto.Consumes) stats.Stats {
 var DrumsAuraID = NewAuraID()
 var DrumsCooldownID = NewCooldownID()
 
-func registerDrumsCD(agent Agent, consumes proto.Consumes) {
-	character := agent.GetCharacter()
+func registerDrumsCD(agent Agent, partyBuffs proto.PartyBuffs, consumes proto.Consumes) {
+	//character := agent.GetCharacter()
 	drumsType := proto.Drums_DrumsUnknown
 
 	// Whether this agent is the one casting the drums.
@@ -100,8 +100,8 @@ func registerDrumsCD(agent Agent, consumes proto.Consumes) {
 	if consumes.Drums != proto.Drums_DrumsUnknown {
 		drumsType = consumes.Drums
 		//drumsSelfCast = true
-	} else if character.Party.buffs.Drums != proto.Drums_DrumsUnknown {
-		drumsType = character.Party.buffs.Drums
+	} else if partyBuffs.Drums != proto.Drums_DrumsUnknown {
+		drumsType = partyBuffs.Drums
 	}
 
 	// TODO: If drumsSelfCast == true, then do a cast time

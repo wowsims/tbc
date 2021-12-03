@@ -61,8 +61,8 @@ type Character struct {
 
 func NewCharacter(player proto.Player) Character {
 	character := Character{
-		Race:  player.Options.Race,
-		Class: player.Options.Class,
+		Race:  player.Race,
+		Class: player.Class,
 		Equip: items.ProtoToEquipment(*player.Equipment),
 		PseudoStats: stats.PseudoStats{
 			CastSpeedMultiplier:   1,
@@ -72,17 +72,17 @@ func NewCharacter(player proto.Player) Character {
 		Metrics:     NewCharacterMetrics(),
 	}
 
-	if player.Options.Consumes != nil {
-		character.consumes = *player.Options.Consumes
+	if player.Consumes != nil {
+		character.consumes = *player.Consumes
 	}
 
 	character.AddStats(BaseStats[BaseStatsKey{Race: character.Race, Class: character.Class}])
 	character.AddStats(character.Equip.Stats())
 
-	if player.CustomStats != nil {
-		customStats := stats.Stats{}
-		copy(customStats[:], player.CustomStats[:])
-		character.AddStats(customStats)
+	if player.BonusStats != nil {
+		bonusStats := stats.Stats{}
+		copy(bonusStats[:], player.BonusStats[:])
+		character.AddStats(bonusStats)
 	}
 
 	// Universal stat dependencies
@@ -110,7 +110,6 @@ func (character *Character) applyAllEffects(agent Agent) {
 	applyRaceEffects(agent)
 	character.applyItemEffects(agent)
 	character.applyItemSetBonusEffects(agent)
-	applyConsumeEffects(agent)
 }
 
 // Apply effects from all equipped items.

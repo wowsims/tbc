@@ -14,37 +14,39 @@ import "shaman.proto";
 import "warlock.proto";
 import "warrior.proto";
 
-message PlayerOptions {
+message Player {
     Race race = 1;
     Class class = 2;
 
+    EquipmentSpec equipment = 3;
+    Consumes consumes = 4;
+    repeated double bonus_stats = 5;
+
+		IndividualBuffs buffs = 15;
+
     oneof spec {
-        BalanceDruid balance_druid = 3;
-        Hunter hunter = 4;
-        Mage mage = 5;
-        RetributionPaladin retribution_paladin = 6;
-        ShadowPriest shadow_priest = 7;
-        Rogue rogue = 8;
-        ElementalShaman elemental_shaman = 9;
-        Warlock warlock = 10;
-        Warrior warrior = 11;
+        BalanceDruid balance_druid = 6;
+        Hunter hunter = 7;
+        Mage mage = 8;
+        RetributionPaladin retribution_paladin = 9;
+        ShadowPriest shadow_priest = 10;
+        Rogue rogue = 11;
+        ElementalShaman elemental_shaman = 12;
+        Warlock warlock = 13;
+        Warrior warrior = 14;
     }
-
-    Consumes consumes = 12; // What consumes this player is going to be using.
-}
-
-message Player {
-    PlayerOptions options = 1;
-    EquipmentSpec equipment = 2;
-    repeated double custom_stats = 3;
 }
 
 message Party {
     repeated Player players = 1;
+
+		PartyBuffs buffs = 2;
 }
 
 message Raid {
     repeated Party parties = 1; 
+
+		RaidBuffs buffs = 2;
 }
 
 message SimOptions {
@@ -157,7 +159,6 @@ message IndividualSimRequest {
 
     RaidBuffs raid_buffs = 2;
     PartyBuffs party_buffs = 3;
-    IndividualBuffs Individual_buffs = 4;
 
     Encounter encounter = 5;
 		SimOptions sim_options = 6;
@@ -185,7 +186,6 @@ message ComputeStatsRequest {
     Player player = 1;
     RaidBuffs raid_buffs = 2;
     PartyBuffs party_buffs = 3;
-    IndividualBuffs individual_buffs = 4;
 }
 message ComputeStatsResult {
     repeated double gear_only = 1;

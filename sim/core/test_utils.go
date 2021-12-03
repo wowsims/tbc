@@ -12,45 +12,30 @@ const ShortDuration = 60
 const LongDuration = 300
 
 type IndividualSimInputs struct {
-	SimOptions      *proto.SimOptions
-	Gear            *proto.EquipmentSpec
+	Player          *proto.Player
 	RaidBuffs       *proto.RaidBuffs
 	PartyBuffs      *proto.PartyBuffs
 	IndividualBuffs *proto.IndividualBuffs
-	Consumes        *proto.Consumes
-	Race            proto.Race
-	Class           proto.Class
+	SimOptions      *proto.SimOptions
 
 	Duration int
 
 	// Convenience field if only 1 target is desired
 	Target  *proto.Target
 	Targets []*proto.Target
-
-	PlayerOptions *proto.PlayerOptions
 }
 
 func NewIndividualSimRequest(inputs IndividualSimInputs) *proto.IndividualSimRequest {
 	isr := &proto.IndividualSimRequest{
-		Player: &proto.Player{
-			Equipment: inputs.Gear,
-			Options:   inputs.PlayerOptions,
-		},
-
-		RaidBuffs:       inputs.RaidBuffs,
-		PartyBuffs:      inputs.PartyBuffs,
-		IndividualBuffs: inputs.IndividualBuffs,
+		Player:     inputs.Player,
+		RaidBuffs:  inputs.RaidBuffs,
+		PartyBuffs: inputs.PartyBuffs,
 
 		Encounter:  &proto.Encounter{},
 		SimOptions: inputs.SimOptions,
 	}
 
-	if isr.Player.Options == nil {
-		isr.Player.Options = &proto.PlayerOptions{}
-	}
-	isr.Player.Options.Race = inputs.Race
-	isr.Player.Options.Class = inputs.Class
-	isr.Player.Options.Consumes = inputs.Consumes
+	isr.Player.Buffs = inputs.IndividualBuffs
 
 	isr.Encounter.Duration = float64(inputs.Duration)
 	if inputs.Target != nil {
@@ -71,10 +56,9 @@ func NewIndividualSimRequest(inputs IndividualSimInputs) *proto.IndividualSimReq
 
 func CharacterStatsTest(label string, t *testing.T, isr *proto.IndividualSimRequest, expectedStats stats.Stats) {
 	csr := &proto.ComputeStatsRequest{
-		Player:          isr.Player,
-		RaidBuffs:       isr.RaidBuffs,
-		PartyBuffs:      isr.PartyBuffs,
-		IndividualBuffs: isr.IndividualBuffs,
+		Player:     isr.Player,
+		RaidBuffs:  isr.RaidBuffs,
+		PartyBuffs: isr.PartyBuffs,
 	}
 
 	result := ComputeStats(csr)
@@ -174,7 +158,6 @@ func IndividualBenchmark(b *testing.B, isr *proto.IndividualSimRequest) {
 	isr.SimOptions.IsTest = false
 
 	for i := 0; i < b.N; i++ {
-		sim := NewIndividualSim(*isr)
-		sim.Run()
+		RunIndividualSim(isr)
 	}
 }

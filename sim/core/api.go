@@ -32,17 +32,20 @@ func GetGearList(request *proto.GearListRequest) *proto.GearListResult {
 /**
  * Returns character stats taking into account gear / buffs / consumes / etc
  */
-func ComputeStats(request *proto.ComputeStatsRequest) *proto.ComputeStatsResult {
-	agent := NewAgent(*request.Player, proto.IndividualSimRequest{
-		Player:          request.Player,
-		RaidBuffs:       request.RaidBuffs,
-		PartyBuffs:      request.PartyBuffs,
-		IndividualBuffs: request.IndividualBuffs,
+func ComputeStats(csr *proto.ComputeStatsRequest) *proto.ComputeStatsResult {
+	raid := NewRaid(proto.Raid{
+		Parties: []*proto.Party{
+			&proto.Party{
+				Players: []*proto.Player{
+					csr.Player,
+				},
+				Buffs: csr.PartyBuffs,
+			},
+		},
+		Buffs: csr.RaidBuffs,
 	})
 
-	raid := NewRaid(*request.RaidBuffs, *request.PartyBuffs, *request.IndividualBuffs)
-	raid.AddPlayer(agent)
-	raid.Finalize()
+	agent := raid.Parties[0].Players[0]
 
 	gearStats := agent.GetCharacter().Equip.Stats()
 	finalStats := agent.GetCharacter().GetStats()
@@ -72,9 +75,35 @@ func StatWeights(request *proto.StatWeightsRequest) *proto.StatWeightsResult {
 }
 
 /**
- * Runs multiple iterations of the sim with a single set of options / gear.
+ * Runs multiple iterations of the sim with just 1 player.
  */
 func RunIndividualSim(request *proto.IndividualSimRequest) *proto.IndividualSimResult {
-	sim := NewIndividualSim(*request)
-	return sim.RunIndividual()
+	raidResult := RunRaidSim(&proto.RaidSimRequest{
+		Raid: &proto.Raid{
+			Parties: []*proto.Party{
+				&proto.Party{
+					Players: []*proto.Player{
+						request.Player,
+					},
+					Buffs: request.PartyBuffs,
+				},
+			},
+			Buffs: request.RaidBuffs,
+		},
+		Encounter:  request.Encounter,
+		SimOptions: request.SimOptions,
+	})
+
+	return &proto.IndividualSimResult{
+		PlayerMetrics:    raidResult.RaidMetrics.Parties[0].Players[0],
+		EncounterMetrics: raidResult.EncounterMetrics,
+		Logs:             raidResult.Logs,
+	}
+}
+
+/**
+ * Runs multiple iterations of the sim with a full raid.
+ */
+func RunRaidSim(request *proto.RaidSimRequest) *proto.RaidSimResult {
+	return RunSim(*request)
 }
