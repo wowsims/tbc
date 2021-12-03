@@ -372,6 +372,11 @@ export class Player<SpecType extends Spec> {
 			console.warn('Failed to parse consumes: ' + e);
 		}
 
+		// For legacy format. Do not remove this until 2022/01/02 (1 month).
+		if (obj['customStats']) {
+			obj['bonusStats'] = obj['customStats'];
+		}
+
 		try {
 			this.setBonusStats(Stats.fromJson(obj['bonusStats']));
 		} catch (e) {
