@@ -19,7 +19,8 @@ export type AuraMetrics = {
 	actionId: ActionId,
 	name: string,
 	iconUrl: string,
-	uptimeSeconds: number,
+	uptimeSecondsAvg: number,
+	uptimeSecondsStdev: number,
 };
 
 export function getActionId(actionMetric: ActionMetricsProto): ActionId {
@@ -95,7 +96,8 @@ export function parseAuraMetrics(auraMetricProtos: Array<AuraMetricsProto>): Pro
 			},
 			name: '',
 			iconUrl: '',
-			uptimeSeconds: auraMetric.uptimeSeconds,
+			uptimeSecondsAvg: auraMetric.uptimeSecondsAvg,
+			uptimeSecondsStdev: auraMetric.uptimeSecondsStdev,
 		};
 	});
 

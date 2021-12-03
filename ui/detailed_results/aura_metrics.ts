@@ -71,7 +71,7 @@ export class BuffAuraMetrics extends ResultComponent {
 					return cellElem;
 				};
 
-				addCell((auraMetric.uptimeSeconds / iterations / duration * 100).toFixed(2) + '%'); // Uptime
+				addCell((auraMetric.uptimeSecondsAvg / iterations / duration * 100).toFixed(2) + '%'); // Uptime
 			});
 
 			$(this.tableElem).trigger('update');
@@ -142,7 +142,7 @@ export class DebuffAuraMetrics extends ResultComponent {
 					return cellElem;
 				};
 
-				addCell((auraMetric.uptimeSeconds / iterations / duration * 100).toFixed(2) + '%'); // Uptime
+				addCell((auraMetric.uptimeSecondsAvg / iterations / duration * 100).toFixed(2) + '%'); // Uptime
 			});
 
 			$(this.tableElem).trigger('update');
