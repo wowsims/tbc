@@ -64,7 +64,7 @@ export interface DefaultThemeConfig<SpecType extends Spec> extends SimUIConfig<S
 }
 export interface GearAndStats {
     gear: Gear;
-    customStats?: Stats;
+    bonusStats?: Stats;
 }
 export interface PresetGear {
     name: string;

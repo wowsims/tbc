@@ -1,7 +1,6 @@
 import { Consumes } from '/tbc/core/proto/common.js';
 import { EquipmentSpec } from '/tbc/core/proto/common.js';
 import { Player as PlayerProto } from '/tbc/core/proto/api.js';
-import { PlayerOptions as PlayerOptionsProto } from '/tbc/core/proto/api.js';
 import { ComputeStatsRequest, ComputeStatsResult } from '/tbc/core/proto/api.js';
 import { Gear } from '/tbc/core/proto_utils/gear.js';
 import { Stats } from '/tbc/core/proto_utils/stats.js';
@@ -13,12 +12,12 @@ import { wait } from './utils.js';
 export class Player {
     constructor(spec, sim) {
         this.consumes = Consumes.create();
-        this.customStats = new Stats();
+        this.bonusStats = new Stats();
         this.gear = new Gear({});
         this.talentsString = '';
         this.epWeights = new Stats();
         this.consumesChangeEmitter = new TypedEvent();
-        this.customStatsChangeEmitter = new TypedEvent();
+        this.bonusStatsChangeEmitter = new TypedEvent();
         this.gearChangeEmitter = new TypedEvent();
         this.raceChangeEmitter = new TypedEvent();
         this.rotationChangeEmitter = new TypedEvent();
@@ -38,7 +37,7 @@ export class Player {
         this.specOptions = this.specTypeFunctions.optionsCreate();
         [
             this.consumesChangeEmitter,
-            this.customStatsChangeEmitter,
+            this.bonusStatsChangeEmitter,
             this.gearChangeEmitter,
             this.raceChangeEmitter,
             this.rotationChangeEmitter,
@@ -86,7 +85,6 @@ export class Player {
             player: this.toProto(),
             raidBuffs: this.sim.getRaidBuffs(),
             partyBuffs: this.sim.getPartyBuffs(),
-            individualBuffs: this.sim.getIndividualBuffs(),
         }));
         this.currentStats = computeStatsResult;
         this.currentStatsEmitter.emit();
@@ -136,14 +134,14 @@ export class Player {
         this.gear = newGear;
         this.gearChangeEmitter.emit();
     }
-    getCustomStats() {
-        return this.customStats;
+    getBonusStats() {
+        return this.bonusStats;
     }
-    setCustomStats(newCustomStats) {
-        if (newCustomStats.equals(this.customStats))
+    setBonusStats(newBonusStats) {
+        if (newBonusStats.equals(this.bonusStats))
             return;
-        this.customStats = newCustomStats;
-        this.customStatsChangeEmitter.emit();
+        this.bonusStats = newBonusStats;
+        this.bonusStatsChangeEmitter.emit();
     }
     getRotation() {
         return this.specTypeFunctions.rotationCopy(this.rotation);
@@ -232,15 +230,14 @@ export class Player {
         elem.setAttribute('data-wowhead', parts.join('&'));
     }
     toProto() {
-        return PlayerProto.create({
-            customStats: this.getCustomStats().asArray(),
+        return withSpecProto(PlayerProto.create({
+            race: this.getRace(),
+            class: specToClass[this.spec],
             equipment: this.getGear().asSpec(),
-            options: withSpecProto(PlayerOptionsProto.create({
-                race: this.getRace(),
-                class: specToClass[this.spec],
-                consumes: this.getConsumes(),
-            }), this.getRotation(), this.getTalents(), this.getSpecOptions()),
-        });
+            consumes: this.getConsumes(),
+            bonusStats: this.getBonusStats().asArray(),
+            buffs: this.sim.getIndividualBuffs(),
+        }), this.getRotation(), this.getTalents(), this.getSpecOptions());
     }
     // TODO: Remove to/from json functions and use proto versions instead. This will require
     // some way to store all talents in the proto.
@@ -248,7 +245,7 @@ export class Player {
     toJson() {
         return {
             'consumes': Consumes.toJson(this.consumes),
-            'customStats': this.customStats.toJson(),
+            'bonusStats': this.bonusStats.toJson(),
             'gear': EquipmentSpec.toJson(this.gear.asSpec()),
             'race': this.race,
             'rotation': this.specTypeFunctions.rotationToJson(this.rotation),
@@ -264,11 +261,15 @@ export class Player {
         catch (e) {
             console.warn('Failed to parse consumes: ' + e);
         }
+        // For legacy format. Do not remove this until 2022/01/02 (1 month).
+        if (obj['customStats']) {
+            obj['bonusStats'] = obj['customStats'];
+        }
         try {
-            this.setCustomStats(Stats.fromJson(obj['customStats']));
+            this.setBonusStats(Stats.fromJson(obj['bonusStats']));
         }
         catch (e) {
-            console.warn('Failed to parse custom stats: ' + e);
+            console.warn('Failed to parse bonus stats: ' + e);
         }
         try {
             this.setGear(this.sim.lookupEquipmentSpec(EquipmentSpec.fromJson(obj['gear'])));

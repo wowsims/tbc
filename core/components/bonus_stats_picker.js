@@ -1,12 +1,12 @@
 import { statNames } from '/tbc/core/proto_utils/names.js';
 import { Component } from './component.js';
 import { NumberPicker } from './number_picker.js';
-export class CustomStatsPicker extends Component {
+export class BonusStatsPicker extends Component {
     constructor(parent, player, stats) {
-        super(parent, 'custom-stats-root');
+        super(parent, 'bonus-stats-root');
         this.stats = stats;
         const label = document.createElement('span');
-        label.classList.add('custom-stats-label');
+        label.classList.add('bonus-stats-label');
         label.textContent = 'Bonus Stats';
         tippy(label, {
             'content': 'Extra stats to add on top of gear, buffs, etc.',
@@ -15,14 +15,14 @@ export class CustomStatsPicker extends Component {
         this.rootElem.appendChild(label);
         this.statPickers = this.stats.map(stat => new NumberPicker(this.rootElem, player, {
             label: statNames[stat],
-            changedEvent: (player) => player.customStatsChangeEmitter,
-            getValue: (player) => player.getCustomStats().getStat(stat),
+            changedEvent: (player) => player.bonusStatsChangeEmitter,
+            getValue: (player) => player.getBonusStats().getStat(stat),
             setValue: (player, newValue) => {
-                const customStats = player.getCustomStats().withStat(stat, newValue);
-                player.setCustomStats(customStats);
+                const bonusStats = player.getBonusStats().withStat(stat, newValue);
+                player.setBonusStats(bonusStats);
             },
         }));
-        player.customStatsChangeEmitter.on(() => {
+        player.bonusStatsChangeEmitter.on(() => {
             this.statPickers.forEach(statPicker => {
                 if (statPicker.getInputValue() > 0) {
                     statPicker.rootElem.classList.remove('negative');

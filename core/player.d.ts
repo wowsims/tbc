@@ -19,7 +19,7 @@ export declare class Player<SpecType extends Spec> {
     readonly sim: Sim;
     readonly spec: Spec;
     private consumes;
-    private customStats;
+    private bonusStats;
     private gear;
     private race;
     private rotation;
@@ -30,7 +30,7 @@ export declare class Player<SpecType extends Spec> {
     private epWeights;
     private currentStats;
     readonly consumesChangeEmitter: TypedEvent<void>;
-    readonly customStatsChangeEmitter: TypedEvent<void>;
+    readonly bonusStatsChangeEmitter: TypedEvent<void>;
     readonly gearChangeEmitter: TypedEvent<void>;
     readonly raceChangeEmitter: TypedEvent<void>;
     readonly rotationChangeEmitter: TypedEvent<void>;
@@ -57,8 +57,8 @@ export declare class Player<SpecType extends Spec> {
     getEquippedItem(slot: ItemSlot): EquippedItem | null;
     getGear(): Gear;
     setGear(newGear: Gear): void;
-    getCustomStats(): Stats;
-    setCustomStats(newCustomStats: Stats): void;
+    getBonusStats(): Stats;
+    setBonusStats(newBonusStats: Stats): void;
     getRotation(): SpecRotation<SpecType>;
     setRotation(newRotation: SpecRotation<SpecType>): void;
     getTalents(): SpecTalents<SpecType>;

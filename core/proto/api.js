@@ -1,5 +1,5 @@
-import { WireType } from '/tbc/protobuf-ts/index.js';
 import { UnknownFieldHandler } from '/tbc/protobuf-ts/index.js';
+import { WireType } from '/tbc/protobuf-ts/index.js';
 import { reflectionMergePartial } from '/tbc/protobuf-ts/index.js';
 import { MESSAGE_TYPE } from '/tbc/protobuf-ts/index.js';
 import { MessageType } from '/tbc/protobuf-ts/index.js';
@@ -8,12 +8,9 @@ import { Gem } from './common.js';
 import { Enchant } from './common.js';
 import { Item } from './common.js';
 import { Spec } from './common.js';
-import { IndividualBuffs } from './common.js';
-import { PartyBuffs } from './common.js';
-import { RaidBuffs } from './common.js';
 import { Encounter } from './common.js';
-import { EquipmentSpec } from './common.js';
-import { Consumes } from './common.js';
+import { RaidBuffs } from './common.js';
+import { PartyBuffs } from './common.js';
 import { Warrior } from './warrior.js';
 import { Warlock } from './warlock.js';
 import { ElementalShaman } from './shaman.js';
@@ -23,6 +20,9 @@ import { RetributionPaladin } from './paladin.js';
 import { Mage } from './mage.js';
 import { Hunter } from './hunter.js';
 import { BalanceDruid } from './druid.js';
+import { IndividualBuffs } from './common.js';
+import { Consumes } from './common.js';
+import { EquipmentSpec } from './common.js';
 import { Class } from './common.js';
 import { Race } from './common.js';
 /**
@@ -42,25 +42,28 @@ export var OtherAction;
     OtherAction[OtherAction["OtherActionWait"] = 1] = "OtherActionWait";
 })(OtherAction || (OtherAction = {}));
 // @generated message type with reflection information, may provide speed optimized methods
-class PlayerOptions$Type extends MessageType {
+class Player$Type extends MessageType {
     constructor() {
-        super("proto.PlayerOptions", [
+        super("proto.Player", [
             { no: 1, name: "race", kind: "enum", T: () => ["proto.Race", Race] },
             { no: 2, name: "class", kind: "enum", T: () => ["proto.Class", Class] },
-            { no: 3, name: "balance_druid", kind: "message", oneof: "spec", T: () => BalanceDruid },
-            { no: 4, name: "hunter", kind: "message", oneof: "spec", T: () => Hunter },
-            { no: 5, name: "mage", kind: "message", oneof: "spec", T: () => Mage },
-            { no: 6, name: "retribution_paladin", kind: "message", oneof: "spec", T: () => RetributionPaladin },
-            { no: 7, name: "shadow_priest", kind: "message", oneof: "spec", T: () => ShadowPriest },
-            { no: 8, name: "rogue", kind: "message", oneof: "spec", T: () => Rogue },
-            { no: 9, name: "elemental_shaman", kind: "message", oneof: "spec", T: () => ElementalShaman },
-            { no: 10, name: "warlock", kind: "message", oneof: "spec", T: () => Warlock },
-            { no: 11, name: "warrior", kind: "message", oneof: "spec", T: () => Warrior },
-            { no: 12, name: "consumes", kind: "message", T: () => Consumes }
+            { no: 3, name: "equipment", kind: "message", T: () => EquipmentSpec },
+            { no: 4, name: "consumes", kind: "message", T: () => Consumes },
+            { no: 5, name: "bonus_stats", kind: "scalar", repeat: 1 /*RepeatType.PACKED*/, T: 1 /*ScalarType.DOUBLE*/ },
+            { no: 15, name: "buffs", kind: "message", T: () => IndividualBuffs },
+            { no: 6, name: "balance_druid", kind: "message", oneof: "spec", T: () => BalanceDruid },
+            { no: 7, name: "hunter", kind: "message", oneof: "spec", T: () => Hunter },
+            { no: 8, name: "mage", kind: "message", oneof: "spec", T: () => Mage },
+            { no: 9, name: "retribution_paladin", kind: "message", oneof: "spec", T: () => RetributionPaladin },
+            { no: 10, name: "shadow_priest", kind: "message", oneof: "spec", T: () => ShadowPriest },
+            { no: 11, name: "rogue", kind: "message", oneof: "spec", T: () => Rogue },
+            { no: 12, name: "elemental_shaman", kind: "message", oneof: "spec", T: () => ElementalShaman },
+            { no: 13, name: "warlock", kind: "message", oneof: "spec", T: () => Warlock },
+            { no: 14, name: "warrior", kind: "message", oneof: "spec", T: () => Warrior }
         ]);
     }
     create(value) {
-        const message = { race: 0, class: 0, spec: { oneofKind: undefined } };
+        const message = { race: 0, class: 0, bonusStats: [], spec: { oneofKind: undefined } };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -77,62 +80,75 @@ class PlayerOptions$Type extends MessageType {
                 case /* proto.Class class */ 2:
                     message.class = reader.int32();
                     break;
-                case /* proto.BalanceDruid balance_druid */ 3:
+                case /* proto.EquipmentSpec equipment */ 3:
+                    message.equipment = EquipmentSpec.internalBinaryRead(reader, reader.uint32(), options, message.equipment);
+                    break;
+                case /* proto.Consumes consumes */ 4:
+                    message.consumes = Consumes.internalBinaryRead(reader, reader.uint32(), options, message.consumes);
+                    break;
+                case /* repeated double bonus_stats */ 5:
+                    if (wireType === WireType.LengthDelimited)
+                        for (let e = reader.int32() + reader.pos; reader.pos < e;)
+                            message.bonusStats.push(reader.double());
+                    else
+                        message.bonusStats.push(reader.double());
+                    break;
+                case /* proto.IndividualBuffs buffs */ 15:
+                    message.buffs = IndividualBuffs.internalBinaryRead(reader, reader.uint32(), options, message.buffs);
+                    break;
+                case /* proto.BalanceDruid balance_druid */ 6:
                     message.spec = {
                         oneofKind: "balanceDruid",
                         balanceDruid: BalanceDruid.internalBinaryRead(reader, reader.uint32(), options, message.spec.balanceDruid)
                     };
                     break;
-                case /* proto.Hunter hunter */ 4:
+                case /* proto.Hunter hunter */ 7:
                     message.spec = {
                         oneofKind: "hunter",
                         hunter: Hunter.internalBinaryRead(reader, reader.uint32(), options, message.spec.hunter)
                     };
                     break;
-                case /* proto.Mage mage */ 5:
+                case /* proto.Mage mage */ 8:
                     message.spec = {
                         oneofKind: "mage",
                         mage: Mage.internalBinaryRead(reader, reader.uint32(), options, message.spec.mage)
                     };
                     break;
-                case /* proto.RetributionPaladin retribution_paladin */ 6:
+                case /* proto.RetributionPaladin retribution_paladin */ 9:
                     message.spec = {
                         oneofKind: "retributionPaladin",
                         retributionPaladin: RetributionPaladin.internalBinaryRead(reader, reader.uint32(), options, message.spec.retributionPaladin)
                     };
                     break;
-                case /* proto.ShadowPriest shadow_priest */ 7:
+                case /* proto.ShadowPriest shadow_priest */ 10:
                     message.spec = {
                         oneofKind: "shadowPriest",
                         shadowPriest: ShadowPriest.internalBinaryRead(reader, reader.uint32(), options, message.spec.shadowPriest)
                     };
                     break;
-                case /* proto.Rogue rogue */ 8:
+                case /* proto.Rogue rogue */ 11:
                     message.spec = {
                         oneofKind: "rogue",
                         rogue: Rogue.internalBinaryRead(reader, reader.uint32(), options, message.spec.rogue)
                     };
                     break;
-                case /* proto.ElementalShaman elemental_shaman */ 9:
+                case /* proto.ElementalShaman elemental_shaman */ 12:
                     message.spec = {
                         oneofKind: "elementalShaman",
                         elementalShaman: ElementalShaman.internalBinaryRead(reader, reader.uint32(), options, message.spec.elementalShaman)
                     };
                     break;
-                case /* proto.Warlock warlock */ 10:
+                case /* proto.Warlock warlock */ 13:
                     message.spec = {
                         oneofKind: "warlock",
                         warlock: Warlock.internalBinaryRead(reader, reader.uint32(), options, message.spec.warlock)
                     };
                     break;
-                case /* proto.Warrior warrior */ 11:
+                case /* proto.Warrior warrior */ 14:
                     message.spec = {
                         oneofKind: "warrior",
                         warrior: Warrior.internalBinaryRead(reader, reader.uint32(), options, message.spec.warrior)
                     };
-                    break;
-                case /* proto.Consumes consumes */ 12:
-                    message.consumes = Consumes.internalBinaryRead(reader, reader.uint32(), options, message.consumes);
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -152,105 +168,49 @@ class PlayerOptions$Type extends MessageType {
         /* proto.Class class = 2; */
         if (message.class !== 0)
             writer.tag(2, WireType.Varint).int32(message.class);
-        /* proto.BalanceDruid balance_druid = 3; */
-        if (message.spec.oneofKind === "balanceDruid")
-            BalanceDruid.internalBinaryWrite(message.spec.balanceDruid, writer.tag(3, WireType.LengthDelimited).fork(), options).join();
-        /* proto.Hunter hunter = 4; */
-        if (message.spec.oneofKind === "hunter")
-            Hunter.internalBinaryWrite(message.spec.hunter, writer.tag(4, WireType.LengthDelimited).fork(), options).join();
-        /* proto.Mage mage = 5; */
-        if (message.spec.oneofKind === "mage")
-            Mage.internalBinaryWrite(message.spec.mage, writer.tag(5, WireType.LengthDelimited).fork(), options).join();
-        /* proto.RetributionPaladin retribution_paladin = 6; */
-        if (message.spec.oneofKind === "retributionPaladin")
-            RetributionPaladin.internalBinaryWrite(message.spec.retributionPaladin, writer.tag(6, WireType.LengthDelimited).fork(), options).join();
-        /* proto.ShadowPriest shadow_priest = 7; */
-        if (message.spec.oneofKind === "shadowPriest")
-            ShadowPriest.internalBinaryWrite(message.spec.shadowPriest, writer.tag(7, WireType.LengthDelimited).fork(), options).join();
-        /* proto.Rogue rogue = 8; */
-        if (message.spec.oneofKind === "rogue")
-            Rogue.internalBinaryWrite(message.spec.rogue, writer.tag(8, WireType.LengthDelimited).fork(), options).join();
-        /* proto.ElementalShaman elemental_shaman = 9; */
-        if (message.spec.oneofKind === "elementalShaman")
-            ElementalShaman.internalBinaryWrite(message.spec.elementalShaman, writer.tag(9, WireType.LengthDelimited).fork(), options).join();
-        /* proto.Warlock warlock = 10; */
-        if (message.spec.oneofKind === "warlock")
-            Warlock.internalBinaryWrite(message.spec.warlock, writer.tag(10, WireType.LengthDelimited).fork(), options).join();
-        /* proto.Warrior warrior = 11; */
-        if (message.spec.oneofKind === "warrior")
-            Warrior.internalBinaryWrite(message.spec.warrior, writer.tag(11, WireType.LengthDelimited).fork(), options).join();
-        /* proto.Consumes consumes = 12; */
-        if (message.consumes)
-            Consumes.internalBinaryWrite(message.consumes, writer.tag(12, WireType.LengthDelimited).fork(), options).join();
-        let u = options.writeUnknownFields;
-        if (u !== false)
-            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
-        return writer;
-    }
-}
-/**
- * @generated MessageType for protobuf message proto.PlayerOptions
- */
-export const PlayerOptions = new PlayerOptions$Type();
-// @generated message type with reflection information, may provide speed optimized methods
-class Player$Type extends MessageType {
-    constructor() {
-        super("proto.Player", [
-            { no: 1, name: "options", kind: "message", T: () => PlayerOptions },
-            { no: 2, name: "equipment", kind: "message", T: () => EquipmentSpec },
-            { no: 3, name: "custom_stats", kind: "scalar", repeat: 1 /*RepeatType.PACKED*/, T: 1 /*ScalarType.DOUBLE*/ }
-        ]);
-    }
-    create(value) {
-        const message = { customStats: [] };
-        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
-        if (value !== undefined)
-            reflectionMergePartial(this, message, value);
-        return message;
-    }
-    internalBinaryRead(reader, length, options, target) {
-        let message = target ?? this.create(), end = reader.pos + length;
-        while (reader.pos < end) {
-            let [fieldNo, wireType] = reader.tag();
-            switch (fieldNo) {
-                case /* proto.PlayerOptions options */ 1:
-                    message.options = PlayerOptions.internalBinaryRead(reader, reader.uint32(), options, message.options);
-                    break;
-                case /* proto.EquipmentSpec equipment */ 2:
-                    message.equipment = EquipmentSpec.internalBinaryRead(reader, reader.uint32(), options, message.equipment);
-                    break;
-                case /* repeated double custom_stats */ 3:
-                    if (wireType === WireType.LengthDelimited)
-                        for (let e = reader.int32() + reader.pos; reader.pos < e;)
-                            message.customStats.push(reader.double());
-                    else
-                        message.customStats.push(reader.double());
-                    break;
-                default:
-                    let u = options.readUnknownField;
-                    if (u === "throw")
-                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
-                    let d = reader.skip(wireType);
-                    if (u !== false)
-                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
-            }
-        }
-        return message;
-    }
-    internalBinaryWrite(message, writer, options) {
-        /* proto.PlayerOptions options = 1; */
-        if (message.options)
-            PlayerOptions.internalBinaryWrite(message.options, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
-        /* proto.EquipmentSpec equipment = 2; */
+        /* proto.EquipmentSpec equipment = 3; */
         if (message.equipment)
-            EquipmentSpec.internalBinaryWrite(message.equipment, writer.tag(2, WireType.LengthDelimited).fork(), options).join();
-        /* repeated double custom_stats = 3; */
-        if (message.customStats.length) {
-            writer.tag(3, WireType.LengthDelimited).fork();
-            for (let i = 0; i < message.customStats.length; i++)
-                writer.double(message.customStats[i]);
+            EquipmentSpec.internalBinaryWrite(message.equipment, writer.tag(3, WireType.LengthDelimited).fork(), options).join();
+        /* proto.Consumes consumes = 4; */
+        if (message.consumes)
+            Consumes.internalBinaryWrite(message.consumes, writer.tag(4, WireType.LengthDelimited).fork(), options).join();
+        /* repeated double bonus_stats = 5; */
+        if (message.bonusStats.length) {
+            writer.tag(5, WireType.LengthDelimited).fork();
+            for (let i = 0; i < message.bonusStats.length; i++)
+                writer.double(message.bonusStats[i]);
             writer.join();
         }
+        /* proto.IndividualBuffs buffs = 15; */
+        if (message.buffs)
+            IndividualBuffs.internalBinaryWrite(message.buffs, writer.tag(15, WireType.LengthDelimited).fork(), options).join();
+        /* proto.BalanceDruid balance_druid = 6; */
+        if (message.spec.oneofKind === "balanceDruid")
+            BalanceDruid.internalBinaryWrite(message.spec.balanceDruid, writer.tag(6, WireType.LengthDelimited).fork(), options).join();
+        /* proto.Hunter hunter = 7; */
+        if (message.spec.oneofKind === "hunter")
+            Hunter.internalBinaryWrite(message.spec.hunter, writer.tag(7, WireType.LengthDelimited).fork(), options).join();
+        /* proto.Mage mage = 8; */
+        if (message.spec.oneofKind === "mage")
+            Mage.internalBinaryWrite(message.spec.mage, writer.tag(8, WireType.LengthDelimited).fork(), options).join();
+        /* proto.RetributionPaladin retribution_paladin = 9; */
+        if (message.spec.oneofKind === "retributionPaladin")
+            RetributionPaladin.internalBinaryWrite(message.spec.retributionPaladin, writer.tag(9, WireType.LengthDelimited).fork(), options).join();
+        /* proto.ShadowPriest shadow_priest = 10; */
+        if (message.spec.oneofKind === "shadowPriest")
+            ShadowPriest.internalBinaryWrite(message.spec.shadowPriest, writer.tag(10, WireType.LengthDelimited).fork(), options).join();
+        /* proto.Rogue rogue = 11; */
+        if (message.spec.oneofKind === "rogue")
+            Rogue.internalBinaryWrite(message.spec.rogue, writer.tag(11, WireType.LengthDelimited).fork(), options).join();
+        /* proto.ElementalShaman elemental_shaman = 12; */
+        if (message.spec.oneofKind === "elementalShaman")
+            ElementalShaman.internalBinaryWrite(message.spec.elementalShaman, writer.tag(12, WireType.LengthDelimited).fork(), options).join();
+        /* proto.Warlock warlock = 13; */
+        if (message.spec.oneofKind === "warlock")
+            Warlock.internalBinaryWrite(message.spec.warlock, writer.tag(13, WireType.LengthDelimited).fork(), options).join();
+        /* proto.Warrior warrior = 14; */
+        if (message.spec.oneofKind === "warrior")
+            Warrior.internalBinaryWrite(message.spec.warrior, writer.tag(14, WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -265,7 +225,8 @@ export const Player = new Player$Type();
 class Party$Type extends MessageType {
     constructor() {
         super("proto.Party", [
-            { no: 1, name: "players", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => Player }
+            { no: 1, name: "players", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => Player },
+            { no: 2, name: "buffs", kind: "message", T: () => PartyBuffs }
         ]);
     }
     create(value) {
@@ -283,6 +244,9 @@ class Party$Type extends MessageType {
                 case /* repeated proto.Player players */ 1:
                     message.players.push(Player.internalBinaryRead(reader, reader.uint32(), options));
                     break;
+                case /* proto.PartyBuffs buffs */ 2:
+                    message.buffs = PartyBuffs.internalBinaryRead(reader, reader.uint32(), options, message.buffs);
+                    break;
                 default:
                     let u = options.readUnknownField;
                     if (u === "throw")
@@ -298,6 +262,9 @@ class Party$Type extends MessageType {
         /* repeated proto.Player players = 1; */
         for (let i = 0; i < message.players.length; i++)
             Player.internalBinaryWrite(message.players[i], writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+        /* proto.PartyBuffs buffs = 2; */
+        if (message.buffs)
+            PartyBuffs.internalBinaryWrite(message.buffs, writer.tag(2, WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -312,7 +279,8 @@ export const Party = new Party$Type();
 class Raid$Type extends MessageType {
     constructor() {
         super("proto.Raid", [
-            { no: 1, name: "parties", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => Party }
+            { no: 1, name: "parties", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => Party },
+            { no: 2, name: "buffs", kind: "message", T: () => RaidBuffs }
         ]);
     }
     create(value) {
@@ -330,6 +298,9 @@ class Raid$Type extends MessageType {
                 case /* repeated proto.Party parties */ 1:
                     message.parties.push(Party.internalBinaryRead(reader, reader.uint32(), options));
                     break;
+                case /* proto.RaidBuffs buffs */ 2:
+                    message.buffs = RaidBuffs.internalBinaryRead(reader, reader.uint32(), options, message.buffs);
+                    break;
                 default:
                     let u = options.readUnknownField;
                     if (u === "throw")
@@ -345,6 +316,9 @@ class Raid$Type extends MessageType {
         /* repeated proto.Party parties = 1; */
         for (let i = 0; i < message.parties.length; i++)
             Party.internalBinaryWrite(message.parties[i], writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+        /* proto.RaidBuffs buffs = 2; */
+        if (message.buffs)
+            RaidBuffs.internalBinaryWrite(message.buffs, writer.tag(2, WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -1086,7 +1060,6 @@ class IndividualSimRequest$Type extends MessageType {
             { no: 1, name: "player", kind: "message", T: () => Player },
             { no: 2, name: "raid_buffs", kind: "message", T: () => RaidBuffs },
             { no: 3, name: "party_buffs", kind: "message", T: () => PartyBuffs },
-            { no: 4, name: "Individual_buffs", kind: "message", jsonName: "IndividualBuffs", T: () => IndividualBuffs },
             { no: 5, name: "encounter", kind: "message", T: () => Encounter },
             { no: 6, name: "sim_options", kind: "message", T: () => SimOptions }
         ]);
@@ -1111,9 +1084,6 @@ class IndividualSimRequest$Type extends MessageType {
                     break;
                 case /* proto.PartyBuffs party_buffs */ 3:
                     message.partyBuffs = PartyBuffs.internalBinaryRead(reader, reader.uint32(), options, message.partyBuffs);
-                    break;
-                case /* proto.IndividualBuffs Individual_buffs = 4 [json_name = "IndividualBuffs"];*/ 4:
-                    message.individualBuffs = IndividualBuffs.internalBinaryRead(reader, reader.uint32(), options, message.individualBuffs);
                     break;
                 case /* proto.Encounter encounter */ 5:
                     message.encounter = Encounter.internalBinaryRead(reader, reader.uint32(), options, message.encounter);
@@ -1142,9 +1112,6 @@ class IndividualSimRequest$Type extends MessageType {
         /* proto.PartyBuffs party_buffs = 3; */
         if (message.partyBuffs)
             PartyBuffs.internalBinaryWrite(message.partyBuffs, writer.tag(3, WireType.LengthDelimited).fork(), options).join();
-        /* proto.IndividualBuffs Individual_buffs = 4 [json_name = "IndividualBuffs"]; */
-        if (message.individualBuffs)
-            IndividualBuffs.internalBinaryWrite(message.individualBuffs, writer.tag(4, WireType.LengthDelimited).fork(), options).join();
         /* proto.Encounter encounter = 5; */
         if (message.encounter)
             Encounter.internalBinaryWrite(message.encounter, writer.tag(5, WireType.LengthDelimited).fork(), options).join();
@@ -1336,8 +1303,7 @@ class ComputeStatsRequest$Type extends MessageType {
         super("proto.ComputeStatsRequest", [
             { no: 1, name: "player", kind: "message", T: () => Player },
             { no: 2, name: "raid_buffs", kind: "message", T: () => RaidBuffs },
-            { no: 3, name: "party_buffs", kind: "message", T: () => PartyBuffs },
-            { no: 4, name: "individual_buffs", kind: "message", T: () => IndividualBuffs }
+            { no: 3, name: "party_buffs", kind: "message", T: () => PartyBuffs }
         ]);
     }
     create(value) {
@@ -1361,9 +1327,6 @@ class ComputeStatsRequest$Type extends MessageType {
                 case /* proto.PartyBuffs party_buffs */ 3:
                     message.partyBuffs = PartyBuffs.internalBinaryRead(reader, reader.uint32(), options, message.partyBuffs);
                     break;
-                case /* proto.IndividualBuffs individual_buffs */ 4:
-                    message.individualBuffs = IndividualBuffs.internalBinaryRead(reader, reader.uint32(), options, message.individualBuffs);
-                    break;
                 default:
                     let u = options.readUnknownField;
                     if (u === "throw")
@@ -1385,9 +1348,6 @@ class ComputeStatsRequest$Type extends MessageType {
         /* proto.PartyBuffs party_buffs = 3; */
         if (message.partyBuffs)
             PartyBuffs.internalBinaryWrite(message.partyBuffs, writer.tag(3, WireType.LengthDelimited).fork(), options).join();
-        /* proto.IndividualBuffs individual_buffs = 4; */
-        if (message.individualBuffs)
-            IndividualBuffs.internalBinaryWrite(message.individualBuffs, writer.tag(4, WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

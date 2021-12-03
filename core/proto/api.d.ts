@@ -9,12 +9,9 @@ import { Gem } from "./common";
 import { Enchant } from "./common";
 import { Item } from "./common";
 import { Spec } from "./common";
-import { IndividualBuffs } from "./common";
-import { PartyBuffs } from "./common";
-import { RaidBuffs } from "./common";
 import { Encounter } from "./common";
-import { EquipmentSpec } from "./common";
-import { Consumes } from "./common";
+import { RaidBuffs } from "./common";
+import { PartyBuffs } from "./common";
 import { Warrior } from "./warrior";
 import { Warlock } from "./warlock";
 import { ElementalShaman } from "./shaman";
@@ -24,12 +21,15 @@ import { RetributionPaladin } from "./paladin";
 import { Mage } from "./mage";
 import { Hunter } from "./hunter";
 import { BalanceDruid } from "./druid";
+import { IndividualBuffs } from "./common";
+import { Consumes } from "./common";
+import { EquipmentSpec } from "./common";
 import { Class } from "./common";
 import { Race } from "./common";
 /**
- * @generated from protobuf message proto.PlayerOptions
+ * @generated from protobuf message proto.Player
  */
-export interface PlayerOptions {
+export interface Player {
     /**
      * @generated from protobuf field: proto.Race race = 1;
      */
@@ -39,86 +39,81 @@ export interface PlayerOptions {
      */
     class: Class;
     /**
+     * @generated from protobuf field: proto.EquipmentSpec equipment = 3;
+     */
+    equipment?: EquipmentSpec;
+    /**
+     * @generated from protobuf field: proto.Consumes consumes = 4;
+     */
+    consumes?: Consumes;
+    /**
+     * @generated from protobuf field: repeated double bonus_stats = 5;
+     */
+    bonusStats: number[];
+    /**
+     * @generated from protobuf field: proto.IndividualBuffs buffs = 15;
+     */
+    buffs?: IndividualBuffs;
+    /**
      * @generated from protobuf oneof: spec
      */
     spec: {
         oneofKind: "balanceDruid";
         /**
-         * @generated from protobuf field: proto.BalanceDruid balance_druid = 3;
+         * @generated from protobuf field: proto.BalanceDruid balance_druid = 6;
          */
         balanceDruid: BalanceDruid;
     } | {
         oneofKind: "hunter";
         /**
-         * @generated from protobuf field: proto.Hunter hunter = 4;
+         * @generated from protobuf field: proto.Hunter hunter = 7;
          */
         hunter: Hunter;
     } | {
         oneofKind: "mage";
         /**
-         * @generated from protobuf field: proto.Mage mage = 5;
+         * @generated from protobuf field: proto.Mage mage = 8;
          */
         mage: Mage;
     } | {
         oneofKind: "retributionPaladin";
         /**
-         * @generated from protobuf field: proto.RetributionPaladin retribution_paladin = 6;
+         * @generated from protobuf field: proto.RetributionPaladin retribution_paladin = 9;
          */
         retributionPaladin: RetributionPaladin;
     } | {
         oneofKind: "shadowPriest";
         /**
-         * @generated from protobuf field: proto.ShadowPriest shadow_priest = 7;
+         * @generated from protobuf field: proto.ShadowPriest shadow_priest = 10;
          */
         shadowPriest: ShadowPriest;
     } | {
         oneofKind: "rogue";
         /**
-         * @generated from protobuf field: proto.Rogue rogue = 8;
+         * @generated from protobuf field: proto.Rogue rogue = 11;
          */
         rogue: Rogue;
     } | {
         oneofKind: "elementalShaman";
         /**
-         * @generated from protobuf field: proto.ElementalShaman elemental_shaman = 9;
+         * @generated from protobuf field: proto.ElementalShaman elemental_shaman = 12;
          */
         elementalShaman: ElementalShaman;
     } | {
         oneofKind: "warlock";
         /**
-         * @generated from protobuf field: proto.Warlock warlock = 10;
+         * @generated from protobuf field: proto.Warlock warlock = 13;
          */
         warlock: Warlock;
     } | {
         oneofKind: "warrior";
         /**
-         * @generated from protobuf field: proto.Warrior warrior = 11;
+         * @generated from protobuf field: proto.Warrior warrior = 14;
          */
         warrior: Warrior;
     } | {
         oneofKind: undefined;
     };
-    /**
-     * @generated from protobuf field: proto.Consumes consumes = 12;
-     */
-    consumes?: Consumes;
-}
-/**
- * @generated from protobuf message proto.Player
- */
-export interface Player {
-    /**
-     * @generated from protobuf field: proto.PlayerOptions options = 1;
-     */
-    options?: PlayerOptions;
-    /**
-     * @generated from protobuf field: proto.EquipmentSpec equipment = 2;
-     */
-    equipment?: EquipmentSpec;
-    /**
-     * @generated from protobuf field: repeated double custom_stats = 3;
-     */
-    customStats: number[];
 }
 /**
  * @generated from protobuf message proto.Party
@@ -128,6 +123,10 @@ export interface Party {
      * @generated from protobuf field: repeated proto.Player players = 1;
      */
     players: Player[];
+    /**
+     * @generated from protobuf field: proto.PartyBuffs buffs = 2;
+     */
+    buffs?: PartyBuffs;
 }
 /**
  * @generated from protobuf message proto.Raid
@@ -137,6 +136,10 @@ export interface Raid {
      * @generated from protobuf field: repeated proto.Party parties = 1;
      */
     parties: Party[];
+    /**
+     * @generated from protobuf field: proto.RaidBuffs buffs = 2;
+     */
+    buffs?: RaidBuffs;
 }
 /**
  * @generated from protobuf message proto.SimOptions
@@ -401,10 +404,6 @@ export interface IndividualSimRequest {
      */
     partyBuffs?: PartyBuffs;
     /**
-     * @generated from protobuf field: proto.IndividualBuffs Individual_buffs = 4 [json_name = "IndividualBuffs"];
-     */
-    individualBuffs?: IndividualBuffs;
-    /**
      * @generated from protobuf field: proto.Encounter encounter = 5;
      */
     encounter?: Encounter;
@@ -476,10 +475,6 @@ export interface ComputeStatsRequest {
      * @generated from protobuf field: proto.PartyBuffs party_buffs = 3;
      */
     partyBuffs?: PartyBuffs;
-    /**
-     * @generated from protobuf field: proto.IndividualBuffs individual_buffs = 4;
-     */
-    individualBuffs?: IndividualBuffs;
 }
 /**
  * @generated from protobuf message proto.ComputeStatsResult
@@ -553,16 +548,6 @@ export declare enum OtherAction {
      */
     OtherActionWait = 1
 }
-declare class PlayerOptions$Type extends MessageType<PlayerOptions> {
-    constructor();
-    create(value?: PartialMessage<PlayerOptions>): PlayerOptions;
-    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: PlayerOptions): PlayerOptions;
-    internalBinaryWrite(message: PlayerOptions, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
-}
-/**
- * @generated MessageType for protobuf message proto.PlayerOptions
- */
-export declare const PlayerOptions: PlayerOptions$Type;
 declare class Player$Type extends MessageType<Player> {
     constructor();
     create(value?: PartialMessage<Player>): Player;

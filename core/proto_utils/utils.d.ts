@@ -1,4 +1,4 @@
-import { PlayerOptions } from '/tbc/core/proto/api.js';
+import { Player } from '/tbc/core/proto/api.js';
 import { Class } from '/tbc/core/proto/common.js';
 import { Enchant } from '/tbc/core/proto/common.js';
 import { Gem } from '/tbc/core/proto/common.js';
@@ -64,7 +64,7 @@ export declare const specToClass: Record<Spec, Class>;
 export declare const specToEligibleRaces: Record<Spec, Array<Race>>;
 export declare const specToEligibleItemCategories: Record<Spec, Array<ItemCategory>>;
 export declare const specToLocalStorageKey: Record<Spec, string>;
-export declare function withSpecProto<SpecType extends Spec>(playerOptions: PlayerOptions, rotation: SpecRotation<SpecType>, talents: SpecTalents<SpecType>, specOptions: SpecOptions<SpecType>): PlayerOptions;
+export declare function withSpecProto<SpecType extends Spec>(player: Player, rotation: SpecRotation<SpecType>, talents: SpecTalents<SpecType>, specOptions: SpecOptions<SpecType>): Player;
 export declare function getMetaGemEffectEP(spec: Spec, gem: Gem, playerStats: Stats): number;
 export declare function canEquipItem(item: Item, spec: Spec): boolean;
 export declare function getEligibleItemSlots(item: Item): Array<ItemSlot>;
