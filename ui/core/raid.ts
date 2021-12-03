@@ -16,7 +16,7 @@ export class Raid {
 	// Should always hold exactly MAX_NUM_PARTIES elements.
 	private parties: Array<Party>;
 
-	private readonly sim: Sim;
+	readonly sim: Sim;
 
   constructor(sim: Sim) {
 		this.sim = sim;

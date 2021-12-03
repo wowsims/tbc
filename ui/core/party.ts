@@ -15,9 +15,9 @@ export class Party {
   readonly changeEmitter = new TypedEvent<void>();
 
 	// Should always hold exactly MAX_PARTY_SIZE elements.
-	private players: Array<Player<any>?>;
+	private players: Array<Player<any> | null>;
 
-	private readonly sim: Sim;
+	readonly sim: Sim;
 
   constructor(sim: Sim) {
 		this.sim = sim;
@@ -32,20 +32,24 @@ export class Party {
 		return this.size() == 0;
 	}
 
-	getPlayers(): Array<Player<any>?> {
+	getPlayers(): Array<Player<any> | null> {
 		// Make defensive copy.
 		return this.players.slice();
 	}
 
-	setPlayer(newPlayer: Player<any>?, partyIndex: number) {
-		if (partyIndex < 0 || partyIndex >= MAX_PARTY_SIZE) {
-			throw new Error('Invalid party index: ' + partyIndex);
+	getPlayer(playerIndex: number): Player<any> | null {
+		return this.players[playerIndex];
+	}
+
+	setPlayer(playerIndex: number, newPlayer: Player<any> | null) {
+		if (playerIndex < 0 || playerIndex >= MAX_PARTY_SIZE) {
+			throw new Error('Invalid player index: ' + playerIndex);
 		}
 
 		if (newPlayer != null) {
 			newPlayer.changeEmitter.on(() => this.changeEmitter.emit());
 		}
-		this.players[partyIndex] = newPlayer;
+		this.players[playerIndex] = newPlayer;
 		this.changeEmitter.emit();
 	}
 
@@ -68,10 +72,14 @@ export class Party {
 		this.players = [];
 		this.changeEmitter.emit();
 
-		(obj as Array<any>).forEach(playerObj => {
-			const newPlayer = new Player(playerObj['spec'] as Spec, this.sim);
-			newPlayer.fromJson(playerObj['player']);
-			this.addPlayer(newPlayer);
+		(obj as Array<any>).forEach((playerObj, i) => {
+			if (playerObj == null) {
+				this.setPlayer(i, null);
+			} else {
+				const newPlayer = new Player(playerObj['spec'] as Spec, this.sim);
+				newPlayer.fromJson(playerObj['player']);
+				this.setPlayer(i, newPlayer);
+			}
 		});
   }
 }

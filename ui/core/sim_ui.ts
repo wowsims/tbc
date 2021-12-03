@@ -132,7 +132,7 @@ export abstract class SimUI<SpecType extends Spec> {
   }
 
   async init(): Promise<void> {
-    await this.sim.init(this.player.spec);
+    await this.sim.init();
 
     let loadedSettings = false;
 

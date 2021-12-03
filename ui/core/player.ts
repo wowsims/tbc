@@ -52,6 +52,7 @@ export class Player<SpecType extends Spec> {
 	readonly sim: Sim;
 
   readonly spec: Spec;
+	private name: string = '';
   private consumes: Consumes = Consumes.create();
   private bonusStats: Stats = new Stats();
   private gear: Gear = new Gear({});
@@ -66,6 +67,7 @@ export class Player<SpecType extends Spec> {
 	private epWeights: Stats = new Stats();
 	private currentStats: ComputeStatsResult;
 
+  readonly nameChangeEmitter = new TypedEvent<void>();
   readonly consumesChangeEmitter = new TypedEvent<void>();
   readonly bonusStatsChangeEmitter = new TypedEvent<void>();
   readonly gearChangeEmitter = new TypedEvent<void>();
@@ -92,6 +94,7 @@ export class Player<SpecType extends Spec> {
 		this.specOptions = this.specTypeFunctions.optionsCreate();
 
     [
+      this.nameChangeEmitter,
       this.consumesChangeEmitter,
       this.bonusStatsChangeEmitter,
       this.gearChangeEmitter,
@@ -160,6 +163,16 @@ export class Player<SpecType extends Spec> {
 	getCurrentStats(): ComputeStatsResult {
 		return ComputeStatsResult.clone(this.currentStats);
 	}
+  
+  getName(): string {
+    return this.name;
+  }
+  setName(newName: string) {
+    if (newName != this.name) {
+      this.name = newName;
+      this.nameChangeEmitter.emit();
+    }
+  }
   
   getRace(): Race {
     return this.race;
@@ -353,6 +366,7 @@ export class Player<SpecType extends Spec> {
   // Returns JSON representing all the current values.
   toJson(): Object {
     return {
+      'name': this.name,
       'consumes': Consumes.toJson(this.consumes),
       'bonusStats': this.bonusStats.toJson(),
       'gear': EquipmentSpec.toJson(this.gear.asSpec()),
@@ -365,6 +379,14 @@ export class Player<SpecType extends Spec> {
 
   // Set all the current values, assumes obj is the same type returned by toJson().
   fromJson(obj: any) {
+		try {
+			if (obj['name']) {
+				this.setName(obj['name']);
+			}
+		} catch (e) {
+			console.warn('Failed to parse name: ' + e);
+		}
+
 		try {
 			this.setConsumes(Consumes.fromJson(obj['consumes']));
 		} catch (e) {

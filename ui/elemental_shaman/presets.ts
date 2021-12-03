@@ -1,7 +1,13 @@
+import { Consumes } from '/tbc/core/proto/common.js';
+import { Drums } from '/tbc/core/proto/common.js';
 import { EquipmentSpec } from '/tbc/core/proto/common.js';
 import { ItemSpec } from '/tbc/core/proto/common.js';
+import { Potions } from '/tbc/core/proto/common.js';
 import { Faction } from '/tbc/core/proto_utils/utils.js';
 import { Player } from '/tbc/core/player.js';
+
+import { ElementalShaman, ElementalShaman_Rotation as ElementalShamanRotation, ElementalShaman_Options as ElementalShamanOptions } from '/tbc/core/proto/shaman.js';
+import { ElementalShaman_Rotation_RotationType as RotationType } from '/tbc/core/proto/shaman.js';
 
 import * as Enchants from '/tbc/core/constants/enchants.js';
 import * as Gems from '/tbc/core/constants/gems.js';
@@ -17,6 +23,23 @@ export const StandardTalents = {
 	name: 'Standard',
 	data: '55030105100213351051--05105301005',
 };
+
+export const DefaultRotation = ElementalShamanRotation.create({
+	type: RotationType.Adaptive,
+});
+
+export const DefaultOptions = ElementalShamanOptions.create({
+	waterShield: true,
+	bloodlust: true,
+	totemOfWrath: true,
+	manaSpringTotem: true,
+	wrathOfAirTotem: true,
+});
+
+export const DefaultConsumes = Consumes.create({
+	drums: Drums.DrumsOfBattle,
+	defaultPotion: Potions.SuperManaPotion,
+});
 
 export const PRERAID_GEAR = {
 	name: 'PreRaid Gear',
