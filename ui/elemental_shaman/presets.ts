@@ -39,6 +39,9 @@ export const DefaultOptions = ElementalShamanOptions.create({
 export const DefaultConsumes = Consumes.create({
 	drums: Drums.DrumsOfBattle,
 	defaultPotion: Potions.SuperManaPotion,
+	flaskOfBlindingLight: true,
+	brilliantWizardOil: true,
+	blackenedBasilisk: true,
 });
 
 export const PRERAID_GEAR = {

@@ -3,12 +3,39 @@ import { Spec } from '/tbc/core/proto/common.js';
 import { Faction } from '/tbc/core/proto_utils/utils.js';
 import { specIconsLarge } from '/tbc/core/proto_utils/utils.js';
 
+import * as BalanceDruidPresets from '/tbc/balance_druid/presets.js';
 import * as ElementalShamanPresets from '/tbc/elemental_shaman/presets.js';
+import * as ShadowPriestPresets from '/tbc/shadow_priest/presets.js';
 
 import { RaidSimUI } from './raid_sim_ui.js';
 
 const ui = new RaidSimUI(document.body, {
 	specs: [
+		{
+			spec: Spec.SpecBalanceDruid,
+			rotation: BalanceDruidPresets.DefaultRotation,
+			talents: BalanceDruidPresets.StandardTalents.data,
+			specOptions: BalanceDruidPresets.DefaultOptions,
+			consumes: BalanceDruidPresets.DefaultConsumes,
+			defaultFactionRaces: {
+				[Faction.Unknown]: Race.RaceUnknown,
+				[Faction.Alliance]: Race.RaceNightElf,
+				[Faction.Horde]: Race.RaceTauren,
+			},
+			defaultGear: {
+				[Faction.Unknown]: {},
+				[Faction.Alliance]: {
+					1: BalanceDruidPresets.P1_ALLIANCE_BIS.gear,
+					2: BalanceDruidPresets.P2_ALLIANCE_BIS.gear,
+				},
+				[Faction.Horde]: {
+					1: BalanceDruidPresets.P1_HORDE_BIS.gear,
+					2: BalanceDruidPresets.P2_HORDE_BIS.gear,
+				},
+			},
+			tooltip: 'Balance Druid',
+			iconUrl: specIconsLarge[Spec.SpecBalanceDruid],
+		},
 		{
 			spec: Spec.SpecElementalShaman,
 			rotation: ElementalShamanPresets.DefaultRotation,
@@ -31,7 +58,33 @@ const ui = new RaidSimUI(document.body, {
 					2: ElementalShamanPresets.P2_BIS.gear,
 				},
 			},
+			tooltip: 'Elemental Shaman',
 			iconUrl: specIconsLarge[Spec.SpecElementalShaman],
+		},
+		{
+			spec: Spec.SpecShadowPriest,
+			rotation: ShadowPriestPresets.DefaultRotation,
+			talents: ShadowPriestPresets.StandardTalents.data,
+			specOptions: ShadowPriestPresets.DefaultOptions,
+			consumes: ShadowPriestPresets.DefaultConsumes,
+			defaultFactionRaces: {
+				[Faction.Unknown]: Race.RaceUnknown,
+				[Faction.Alliance]: Race.RaceDwarf,
+				[Faction.Horde]: Race.RaceUndead,
+			},
+			defaultGear: {
+				[Faction.Unknown]: {},
+				[Faction.Alliance]: {
+					1: ShadowPriestPresets.P1_BIS.gear,
+					2: ShadowPriestPresets.P2_BIS.gear,
+				},
+				[Faction.Horde]: {
+					1: ShadowPriestPresets.P1_BIS.gear,
+					2: ShadowPriestPresets.P2_BIS.gear,
+				},
+			},
+			tooltip: 'Shadow Priest',
+			iconUrl: specIconsLarge[Spec.SpecShadowPriest],
 		},
 	],
 });

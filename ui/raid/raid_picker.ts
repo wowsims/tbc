@@ -159,5 +159,6 @@ export interface PresetSpecSettings<SpecType extends Spec> {
 	defaultFactionRaces: Record<Faction, Race>,
 	defaultGear: Record<Faction, Record<number, EquipmentSpec>>,
 
+	tooltip: string,
 	iconUrl: string,
 }

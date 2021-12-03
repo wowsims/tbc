@@ -79,14 +79,9 @@ const theme = new DefaultTheme<Spec.SpecBalanceDruid>(document.body, {
 			[Stat.StatMP5]: 0.00,
 		}),
 		// Default consumes settings.
-		consumes: Consumes.create({
-			defaultPotion: Potions.SuperManaPotion,
-		}),
+		consumes: Presets.DefaultConsumes,
 		// Default rotation settings.
-		rotation: BalanceDruidRotation.create({
-			primarySpell: PrimarySpell.Adaptive,
-			faerieFire: true,
-		}),
+		rotation: Presets.DefaultRotation,
 		// Default talents.
 		talents: Presets.StandardTalents.data,
 		// Default spec-specific settings.
