@@ -10,7 +10,7 @@ import * as ShadowPriestPresets from '/tbc/shadow_priest/presets.js';
 import { RaidSimUI } from './raid_sim_ui.js';
 
 const ui = new RaidSimUI(document.body, {
-	specs: [
+	presets: [
 		{
 			spec: Spec.SpecBalanceDruid,
 			rotation: BalanceDruidPresets.DefaultRotation,

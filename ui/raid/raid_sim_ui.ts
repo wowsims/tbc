@@ -14,7 +14,7 @@ declare var tippy: any;
 
 export interface RaidSimConfig {
 	knownIssues?: Array<string>,
-	specs: Array<PresetSpecSettings<any>>,
+	presets: Array<PresetSpecSettings<any>>,
 }
 
 export class RaidSimUI {
@@ -37,7 +37,7 @@ export class RaidSimUI {
 		const titleElem = this.parentElem.getElementsByClassName('default-title')[0];
 		titleElem.textContent = 'TBC Raid Sim';
 
-		const raidPicker = new RaidPicker(this.parentElem.getElementsByClassName('raid-picker')[0] as HTMLElement, this.raid, this.config.specs);
+		const raidPicker = new RaidPicker(this.parentElem.getElementsByClassName('raid-picker')[0] as HTMLElement, this.raid, this.config.presets);
 
     //const results = new Results(this.parentElem.getElementsByClassName('default-results')[0] as HTMLElement, this);
     //const detailedResults = new DetailedResults(this.parentElem.getElementsByClassName('detailed-results')[0] as HTMLElement);

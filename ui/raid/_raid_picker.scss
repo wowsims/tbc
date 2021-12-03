@@ -1,0 +1,62 @@
+.raid-picker-root {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+}
+
+.parties-container {
+	display: flex;
+	flex-wrap: wrap;
+}
+
+.party-picker-root {
+	margin: 15px;
+}
+
+.party-header, .player-picker-root {
+	margin: 3px;
+}
+
+.party-header {
+}
+
+.player-picker-root {
+	height: 30px;
+	width: 200px;
+	border-width: 1px;
+	border-style: solid;
+}
+
+.player-picker-root.empty {
+	border-color: gray;
+}
+
+.new-player-picker {
+	background: var(--sidebar-bg-color);
+	padding: 5px;
+}
+
+.new-player-picker-controls {
+	text-align: center;
+	margin-bottom: 15px;
+}
+
+.faction-selector .input-root {
+	white-space: nowrap;
+}
+
+.class-presets-container {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-around;
+	align-items: center;
+
+	margin: 5px;
+	padding: 5px;
+	border-radius: 10px;
+}
+
+.preset-picker-icon {
+	height: 30px;
+	cursor: pointer;
+}

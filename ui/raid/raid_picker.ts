@@ -5,6 +5,7 @@ import { Raid } from '/tbc/core/raid.js';
 import { MAX_PARTY_SIZE } from '/tbc/core/party.js';
 import { Party } from '/tbc/core/party.js';
 import { Player } from '/tbc/core/player.js';
+import { Class } from '/tbc/core/proto/common.js';
 import { Consumes } from '/tbc/core/proto/common.js';
 import { EquipmentSpec } from '/tbc/core/proto/common.js';
 import { Race } from '/tbc/core/proto/common.js';
@@ -12,14 +13,19 @@ import { Spec } from '/tbc/core/proto/common.js';
 import { Faction } from '/tbc/core/proto_utils/utils.js';
 import { SpecOptions } from '/tbc/core/proto_utils/utils.js';
 import { SpecRotation } from '/tbc/core/proto_utils/utils.js';
+import { classColors } from '/tbc/core/proto_utils/utils.js';
+import { specToClass } from '/tbc/core/proto_utils/utils.js';
 import { TypedEvent } from '/tbc/core/typed_event.js';
+import { getEnumValues } from '/tbc/core/utils.js';
+import { hexToRgba } from '/tbc/core/utils.js';
 
+declare var tippy: any;
 
 export class RaidPicker extends Component {
 	private readonly raid: Raid;
   private readonly partyPickers: Array<PartyPicker>;
 
-  constructor(parent: HTMLElement, raid: Raid, specs: Array<PresetSpecSettings<any>>) {
+  constructor(parent: HTMLElement, raid: Raid, presets: Array<PresetSpecSettings<any>>) {
     super(parent, 'raid-picker-root');
 		this.raid = raid;
 
@@ -38,7 +44,7 @@ export class RaidPicker extends Component {
     newPlayerPickerRoot.classList.add('new-player-picker');
     this.rootElem.appendChild(newPlayerPickerRoot);
 
-		const newPlayerPicker = new NewPlayerPicker(newPlayerPickerRoot, this.raid, specs);
+		const newPlayerPicker = new NewPlayerPicker(newPlayerPickerRoot, this.raid, presets);
 	}
 }
 
@@ -98,6 +104,8 @@ export class PlayerPicker extends Component {
 
 			this.update();
 		});
+
+		this.update();
 	}
 
 	setPlayer(newPlayer: Player<any> | null) {
@@ -109,8 +117,10 @@ export class PlayerPicker extends Component {
 
 	private update() {
 		if (this.player == null) {
+			this.rootElem.classList.add('empty');
 			this.nameElem.textContent = '';
 		} else {
+			this.rootElem.classList.remove('empty');
 			this.nameElem.textContent = this.player.getName();
 		}
 	}
@@ -120,15 +130,17 @@ export class NewPlayerPicker extends Component {
 	private readonly raid: Raid;
 	private currentFaction: Faction;
 
-  constructor(parent: HTMLElement, raid: Raid, specs: Array<PresetSpecSettings<any>>) {
+  constructor(parent: HTMLElement, raid: Raid, presets: Array<PresetSpecSettings<any>>) {
     super(parent, 'new-player-picker-root');
 		this.raid = raid;
 		this.currentFaction = Faction.Alliance;
 
 		this.rootElem.innerHTML = `
-			<div class="faction-selector"></div>
-			<div class="phase-selector"></div>
-			<div class="class-pickers"></div>
+			<div class="new-player-picker-controls">
+				<div class="faction-selector"></div>
+				<div class="phase-selector"></div>
+			</div>
+			<div class="presets-container"></div>
 		`;
 
 		const factionSelector = new EnumPicker<NewPlayerPicker>(this.rootElem.getElementsByClassName('faction-selector')[0] as HTMLElement, this, {
@@ -146,6 +158,43 @@ export class NewPlayerPicker extends Component {
 		});
 
 		const phaseSelector = makePhaseSelector(this.rootElem.getElementsByClassName('phase-selector')[0] as HTMLElement, this.raid.sim);
+
+		const presetsContainer = this.rootElem.getElementsByClassName('presets-container')[0] as HTMLElement;
+		getEnumValues(Class).forEach(wowClass => {
+			const matchingPresets = presets.filter(preset => specToClass[preset.spec] == wowClass);
+			if (matchingPresets.length == 0 || wowClass == Class.ClassUnknown) {
+				return;
+			}
+
+			const classPresetsContainer = document.createElement('div');
+			classPresetsContainer.classList.add('class-presets-container');
+			presetsContainer.appendChild(classPresetsContainer);
+			classPresetsContainer.style.backgroundColor = hexToRgba(classColors[wowClass as Class], 0.5);
+
+			matchingPresets.forEach(matchingPreset => {
+				const presetIndex = presets.findIndex(matchingPreset);
+
+				const presetElem = document.createElement('div');
+				presetElem.classList.add('preset-picker');
+				classPresetsContainer.appendChild(presetElem);
+
+        const presetIconElem = document.createElement('img');
+        presetIconElem.classList.add('preset-picker-icon');
+				presetElem.appendChild(presetIconElem);
+				presetIconElem.src = matchingPreset.iconUrl;
+				tippy(presetIconElem, {
+					'content': matchingPreset.tooltip,
+					'allowHTML': true,
+				});
+
+				presetElem.setAttribute('draggable', true);
+				presetElem.addEventListener("dragstart", event => {
+					event.dataTransfer.setData('text/plain', presetIndex);
+					event.dataTransfer.setDragImage(matchingPreset.iconUrl, 30, 30);
+					event.dataTransfer.dropEffect = 'copy';
+				});
+			});
+		});
 	}
 }
 
