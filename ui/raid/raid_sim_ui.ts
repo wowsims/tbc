@@ -60,7 +60,13 @@ const layoutHTML = `
 			</li>
     </ul>
     <div class="tab-content">
-      <div id="raid-tab" class="tab-pane fade in active">
+      <div id="raid-tab" class="raid-tab tab-pane fade in active">
+				<div class="raid-picker">
+				</div>
+				<div class="saved-raids-div">
+					<div class="saved-raids-manager">
+					</div>
+				</div>
       </div>
       <div id="detailed-results-tab" class="tab-pane fade">
 				<div class="detailed-results">
