@@ -18,9 +18,6 @@ type Agent interface {
 	// Updates the input Buffs to include party-wide buffs provided by this Agent.
 	AddPartyBuffs(partyBuffs *proto.PartyBuffs)
 
-	// See PresimOptions for details. If a presim is not needed, should return nil instead.
-	GetPresimOptions() *PresimOptions
-
 	// Called once before the first iteration, after all Agents and Targets are finalized.
 	// Use this to do any precomputations that require access to Sim or Target fields.
 	Init(sim *Simulation)
@@ -92,21 +89,4 @@ func NewAgent(player proto.Player) Agent {
 
 	character := NewCharacter(player)
 	return factory(character, player)
-}
-
-// A presim is a full simulation run with multiple iterations, as a preparation
-// step for testing out settings before starting the recorded iterations.
-//
-// If you don't know what this is, you probably don't need it.
-type PresimOptions struct {
-	// Called once before each presim round.
-	//
-	// Modify the player parameter to use whatever player options are desired
-	// for the presim.
-	SetPresimPlayerOptions func(player *proto.Player)
-
-	// Called once after each presim round to provide the results.
-	//
-	// Should return true if this Agent is done running presims, and false otherwise.
-	OnPresimResult func(presimResult proto.PlayerMetrics, iterations int32) bool
 }

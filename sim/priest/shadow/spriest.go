@@ -125,10 +125,6 @@ func (spriest *ShadowPriest) GetPriest() *priest.Priest {
 	return &spriest.Priest
 }
 
-func (spriest *ShadowPriest) GetPresimOptions() *core.PresimOptions {
-	return nil
-}
-
 func (spriest *ShadowPriest) Reset(sim *core.Simulation) {
 	spriest.Priest.Reset(sim)
 	spriest.swStacks = 0
