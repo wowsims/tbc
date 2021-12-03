@@ -68,7 +68,7 @@ export class CastMetrics extends ResultComponent {
         const iterations = request.simOptions.iterations;
         const duration = request.encounter?.duration || 1;
         parseActionMetrics(result.playerMetrics.actions).then(actionMetrics => {
-            actionMetrics.forEach(actionMetric => {
+            actionMetrics.filter(e => e.hits + e.misses != 0).forEach(actionMetric => {
                 const rowElem = document.createElement('tr');
                 this.bodyElem.appendChild(rowElem);
                 const nameCellElem = document.createElement('td');
@@ -95,6 +95,64 @@ export class CastMetrics extends ResultComponent {
                 addCell((actionMetric.totalDmg / actionMetric.hits).toFixed(1)); // Avg Hit
                 addCell(((actionMetric.crits / actionMetric.hits) * 100).toFixed(2) + ' %'); // Crit %
                 addCell(((actionMetric.misses / (actionMetric.hits + actionMetric.misses)) * 100).toFixed(2) + ' %'); // Miss %
+            });
+            $(this.tableElem).trigger('update');
+        });
+    }
+}
+// For the no-damage casts
+export class OtherCastMetrics extends ResultComponent {
+    constructor(config) {
+        config.rootCssClass = 'other-cast-metrics-root';
+        super(config);
+        this.rootElem.innerHTML = `
+		<table class="cast-metrics-table tablesorter">
+			<thead class="cast-metrics-table-header">
+				<tr class="cast-metrics-table-header-row">
+					<th class="cast-metrics-table-header-cell"><span>Name</span></th>
+					<th class="cast-metrics-table-header-cell"><span>Casts</span></th>
+				</tr>
+			</thead>
+			<tbody class="cast-metrics-table-body">
+			</tbody>
+		</table>
+		`;
+        this.tableElem = this.rootElem.getElementsByClassName('cast-metrics-table')[0];
+        this.bodyElem = this.rootElem.getElementsByClassName('cast-metrics-table-body')[0];
+        const headerElems = Array.from(this.tableElem.querySelectorAll('th'));
+        // Casts
+        tippy(headerElems[1], {
+            'content': 'Casts',
+            'allowHTML': true,
+        });
+        $(this.tableElem).tablesorter({ sortList: [[1, 1]] });
+    }
+    onSimResult(request, result) {
+        this.bodyElem.textContent = '';
+        const iterations = request.simOptions.iterations;
+        const duration = request.encounter?.duration || 1;
+        parseActionMetrics(result.playerMetrics.actions).then(actionMetrics => {
+            actionMetrics.filter(e => e.hits + e.misses == 0).forEach(actionMetric => {
+                const rowElem = document.createElement('tr');
+                this.bodyElem.appendChild(rowElem);
+                const nameCellElem = document.createElement('td');
+                rowElem.appendChild(nameCellElem);
+                nameCellElem.innerHTML = `
+				<a class="cast-metrics-action-icon"></a>
+				<span class="cast-metrics-action-name">${actionMetric.name}</span>
+				`;
+                const iconElem = nameCellElem.getElementsByClassName('cast-metrics-action-icon')[0];
+                iconElem.style.backgroundImage = `url('${actionMetric.iconUrl}')`;
+                if (!('otherId' in actionMetric.actionId.id)) {
+                    setWowheadHref(iconElem, actionMetric.actionId.id);
+                }
+                const addCell = (value) => {
+                    const cellElem = document.createElement('td');
+                    cellElem.textContent = String(value);
+                    rowElem.appendChild(cellElem);
+                    return cellElem;
+                };
+                addCell((actionMetric.casts / iterations).toFixed(1)); // Casts
             });
             $(this.tableElem).trigger('update');
         });

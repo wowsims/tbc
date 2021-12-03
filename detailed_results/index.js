@@ -1,5 +1,8 @@
 import { TypedEvent } from '/tbc/core/typed_event.js';
 import { CastMetrics } from './cast_metrics.js';
+import { OtherCastMetrics } from './cast_metrics.js';
+import { BuffAuraMetrics } from './aura_metrics.js';
+import { DebuffAuraMetrics } from './aura_metrics.js';
 import { DpsHistogram } from './dps_histogram.js';
 import { DpsResult } from './dps_result.js';
 import { PercentOom } from './percent_oom.js';
@@ -19,10 +22,46 @@ const layoutHTML = `
 <div class="dr-root">
 	<div class="dr-row topline-results">
 	</div>
-	<div class="dr-row cast-metrics">
+	<div class="dr-row">
+		<div class="table-container">
+			<div class="title-row">
+				<span class="table-title">Damaging Cast Metrics</span>
+			</div>
+			<div class="cast-metrics scroll-table">
+			</div>
+		</div>
 	</div>
 	<div class="dr-row source-stats">
 		<div class="source-chart">
+		</div>
+	</div>
+	<div class="dr-row other-metrics">
+		<div class="dr-col-3 start">
+			<div class="table-container">
+				<div class="title-row">
+					<span class="table-title">Other Cast Metrics</span>
+				</div>
+				<div class="other-cast-metrics scroll-table">
+				</div>
+			</div>
+		</div>
+		<div class="dr-col-3">
+			<div class="table-container">
+				<div class="title-row">
+					<span class="table-title">Buff Aura Metrics</span>
+				</div>
+				<div class="buff-aura-metrics scroll-table">
+				</div>
+			</div>
+		</div>
+		<div class="dr-col-3 end">
+			<div class="table-container">
+				<div class="title-row">
+					<span class="table-title">Debuff Aura Metrics</span>
+				</div>
+				<div class="debuff-aura-metrics scroll-table">
+				</div>
+			</div>
 		</div>
 	</div>
 	<div class="dr-row dps-histogram">
@@ -40,5 +79,8 @@ const toplineResultsDiv = document.body.getElementsByClassName('topline-results'
 const dpsResult = new DpsResult({ parent: toplineResultsDiv, resultsEmitter: resultsEmitter, colorSettings: colorSettings });
 const percentOom = new PercentOom({ parent: toplineResultsDiv, resultsEmitter: resultsEmitter, colorSettings: colorSettings });
 const castMetrics = new CastMetrics({ parent: document.body.getElementsByClassName('cast-metrics')[0], resultsEmitter: resultsEmitter, colorSettings: colorSettings });
+const otherCastMetrics = new OtherCastMetrics({ parent: document.body.getElementsByClassName('other-cast-metrics')[0], resultsEmitter: resultsEmitter, colorSettings: colorSettings });
+const buffAuraMetrics = new BuffAuraMetrics({ parent: document.body.getElementsByClassName('buff-aura-metrics')[0], resultsEmitter: resultsEmitter, colorSettings: colorSettings });
+const debuffAuraMetrics = new DebuffAuraMetrics({ parent: document.body.getElementsByClassName('debuff-aura-metrics')[0], resultsEmitter: resultsEmitter, colorSettings: colorSettings });
 const sourceChart = new SourceChart({ parent: document.body.getElementsByClassName('source-chart')[0], resultsEmitter: resultsEmitter, colorSettings: colorSettings });
 const dpsHistogram = new DpsHistogram({ parent: document.body.getElementsByClassName('dps-histogram')[0], resultsEmitter: resultsEmitter, colorSettings: colorSettings });

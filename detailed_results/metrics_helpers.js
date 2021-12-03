@@ -64,3 +64,26 @@ export function parseActionMetrics(actionMetricProtos) {
         .then(iconUrl => actionMetric.iconUrl = iconUrl)))
         .then(() => actionMetrics);
 }
+export function parseAuraMetrics(auraMetricProtos) {
+    const auraMetrics = auraMetricProtos.map(auraMetric => {
+        return {
+            actionId: {
+                id: {
+                    spellId: auraMetric.id,
+                },
+                tag: 0,
+            },
+            name: '',
+            iconUrl: '',
+            uptimeSecondsAvg: auraMetric.uptimeSecondsAvg,
+            uptimeSecondsStdev: auraMetric.uptimeSecondsStdev,
+        };
+    });
+    return Promise.all(auraMetrics.map(auraMetric => getName(auraMetric.actionId.id)
+        .then(name => {
+        auraMetric.name = name;
+    })
+        .then(() => getIconUrl(auraMetric.actionId.id))
+        .then(iconUrl => auraMetric.iconUrl = iconUrl)))
+        .then(() => auraMetrics);
+}
