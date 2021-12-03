@@ -5,7 +5,7 @@ import { Target } from '/tbc/core/target.js';
 import { Actions } from '/tbc/core/components/actions.js';
 import { BooleanPicker, BooleanPickerConfig } from '/tbc/core/components/boolean_picker.js';
 import { CharacterStats } from '/tbc/core/components/character_stats.js';
-import { CustomStatsPicker } from '/tbc/core/components/custom_stats_picker.js';
+import { BonusStatsPicker } from '/tbc/core/components/bonus_stats_picker.js';
 import { DetailedResults } from '/tbc/core/components/detailed_results.js';
 import { EncounterPicker, EncounterPickerConfig } from '/tbc/core/components/encounter_picker.js';
 import { EnumPicker, EnumPickerConfig } from '/tbc/core/components/enum_picker.js';
@@ -93,7 +93,7 @@ export interface DefaultThemeConfig<SpecType extends Spec> extends SimUIConfig<S
 
 export interface GearAndStats {
   gear: Gear,
-  customStats?: Stats,
+  bonusStats?: Stats,
 }
 
 export interface PresetGear {
@@ -135,7 +135,7 @@ export class DefaultTheme<SpecType extends Spec> extends SimUI<SpecType> {
     const characterStats = new CharacterStats(this.parentElem.getElementsByClassName('default-stats')[0] as HTMLElement, config.displayStats, this.player);
 
     const gearPicker = new GearPicker(this.parentElem.getElementsByClassName('gear-picker')[0] as HTMLElement, this.player);
-    const customStatsPicker = new CustomStatsPicker(this.parentElem.getElementsByClassName('custom-stats-picker')[0] as HTMLElement, this.player, config.epStats);
+    const bonusStatsPicker = new BonusStatsPicker(this.parentElem.getElementsByClassName('bonus-stats-picker')[0] as HTMLElement, this.player, config.epStats);
 
     const talentsPicker = newTalentsPicker(this.player.spec, this.parentElem.getElementsByClassName('talents-picker')[0] as HTMLElement, this.player);
 		// Add a url parameter to help people trapped in the wrong talents   ;)
@@ -236,27 +236,27 @@ export class DefaultTheme<SpecType extends Spec> extends SimUI<SpecType> {
       getData: (player: Player<any>) => {
         return {
           gear: player.getGear(),
-          customStats: player.getCustomStats(),
+          bonusStats: player.getBonusStats(),
         };
       },
       setData: (player: Player<any>, newGearAndStats: GearAndStats) => {
         player.setGear(newGearAndStats.gear);
-				if (newGearAndStats.customStats) {
-					player.setCustomStats(newGearAndStats.customStats);
+				if (newGearAndStats.bonusStats) {
+					player.setBonusStats(newGearAndStats.bonusStats);
 				}
       },
       changeEmitters: [this.player.changeEmitter],
-      equals: (a: GearAndStats, b: GearAndStats) => a.gear.equals(b.gear) && equalsOrBothNull(a.customStats, b.customStats, (a, b) => a.equals(b)),
+      equals: (a: GearAndStats, b: GearAndStats) => a.gear.equals(b.gear) && equalsOrBothNull(a.bonusStats, b.bonusStats, (a, b) => a.equals(b)),
       toJson: (a: GearAndStats) => {
         return {
           gear: EquipmentSpec.toJson(a.gear.asSpec()),
-          customStats: a.customStats?.toJson(),
+          bonusStats: a.bonusStats?.toJson(),
         };
       },
       fromJson: (obj: any) => {
         return {
           gear: this.sim.lookupEquipmentSpec(EquipmentSpec.fromJson(obj['gear'])),
-          customStats: Stats.fromJson(obj['customStats']),
+          bonusStats: Stats.fromJson(obj['bonusStats']),
         };
       },
     });
@@ -359,7 +359,7 @@ export class DefaultTheme<SpecType extends Spec> extends SimUI<SpecType> {
 				isPreset: true,
 				data: {
 					gear: this.sim.lookupEquipmentSpec(presetGear.gear),
-					customStats: new Stats(),
+					bonusStats: new Stats(),
 				},
 				enableWhen: presetGear.enableWhen,
 			});
@@ -409,7 +409,7 @@ const layoutHTML = `
             </div>
           </div>
           <div class="right-gear-panel">
-            <div class="custom-stats-picker">
+            <div class="bonus-stats-picker">
             </div>
             <div class="saved-gear-manager">
             </div>

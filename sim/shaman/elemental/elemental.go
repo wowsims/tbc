@@ -7,16 +7,15 @@ import (
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/proto"
 	. "github.com/wowsims/tbc/sim/shaman"
-	googleProto "google.golang.org/protobuf/proto"
 )
 
 func RegisterElementalShaman() {
-	core.RegisterAgentFactory(proto.PlayerOptions_ElementalShaman{}, func(character core.Character, options proto.PlayerOptions, isr proto.IndividualSimRequest) core.Agent {
-		return NewElementalShaman(character, options, isr)
+	core.RegisterAgentFactory(proto.Player_ElementalShaman{}, func(character core.Character, options proto.Player) core.Agent {
+		return NewElementalShaman(character, options)
 	})
 }
 
-func NewElementalShaman(character core.Character, options proto.PlayerOptions, isr proto.IndividualSimRequest) *ElementalShaman {
+func NewElementalShaman(character core.Character, options proto.Player) *ElementalShaman {
 	eleShamOptions := options.GetElementalShaman()
 
 	selfBuffs := SelfBuffs{
@@ -31,7 +30,7 @@ func NewElementalShaman(character core.Character, options proto.PlayerOptions, i
 
 	switch eleShamOptions.Rotation.Type {
 	case proto.ElementalShaman_Rotation_Adaptive:
-		rotation = NewAdaptiveRotation(isr)
+		rotation = NewAdaptiveRotation()
 	case proto.ElementalShaman_Rotation_CLOnClearcast:
 		rotation = NewCLOnClearcastRotation()
 	case proto.ElementalShaman_Rotation_CLOnCD:
@@ -56,6 +55,10 @@ type ElementalShaman struct {
 
 func (eleShaman *ElementalShaman) GetShaman() *Shaman {
 	return &eleShaman.Shaman
+}
+
+func (eleShaman *ElementalShaman) GetPresimOptions() *core.PresimOptions {
+	return eleShaman.rotation.GetPresimOptions()
 }
 
 func (eleShaman *ElementalShaman) Reset(sim *core.Simulation) {
@@ -88,6 +91,8 @@ func (eleShaman *ElementalShaman) Act(sim *core.Simulation) time.Duration {
 
 // Picks which attacks / abilities the Shaman does.
 type Rotation interface {
+	GetPresimOptions() *core.PresimOptions
+
 	// Returns the action this rotation would like to take next.
 	ChooseAction(*ElementalShaman, *core.Simulation) AgentAction
 
@@ -112,6 +117,7 @@ func (rotation *LBOnlyRotation) ChooseAction(eleShaman *ElementalShaman, sim *co
 func (rotation *LBOnlyRotation) OnActionAccepted(eleShaman *ElementalShaman, sim *core.Simulation, action AgentAction) {
 }
 func (rotation *LBOnlyRotation) Reset(eleShaman *ElementalShaman, sim *core.Simulation) {}
+func (rotation *LBOnlyRotation) GetPresimOptions() *core.PresimOptions                  { return nil }
 
 func NewLBOnlyRotation() *LBOnlyRotation {
 	return &LBOnlyRotation{}
@@ -134,6 +140,7 @@ func (rotation *CLOnCDRotation) ChooseAction(eleShaman *ElementalShaman, sim *co
 func (rotation *CLOnCDRotation) OnActionAccepted(eleShaman *ElementalShaman, sim *core.Simulation, action AgentAction) {
 }
 func (rotation *CLOnCDRotation) Reset(eleShaman *ElementalShaman, sim *core.Simulation) {}
+func (rotation *CLOnCDRotation) GetPresimOptions() *core.PresimOptions                  { return nil }
 
 func NewCLOnCDRotation() *CLOnCDRotation {
 	return &CLOnCDRotation{}
@@ -177,6 +184,8 @@ func (rotation *FixedRotation) Reset(eleShaman *ElementalShaman, sim *core.Simul
 	rotation.numLBsSinceLastCL = rotation.numLBsPerCL // This lets us cast CL first
 }
 
+func (rotation *FixedRotation) GetPresimOptions() *core.PresimOptions { return nil }
+
 func NewFixedRotation(numLBsPerCL int32) *FixedRotation {
 	return &FixedRotation{
 		numLBsPerCL: numLBsPerCL,
@@ -206,6 +215,8 @@ func (rotation *CLOnClearcastRotation) OnActionAccepted(eleShaman *ElementalSham
 func (rotation *CLOnClearcastRotation) Reset(eleShaman *ElementalShaman, sim *core.Simulation) {
 	rotation.prevPrevCastProccedCC = true // Lets us cast CL first
 }
+
+func (rotation *CLOnClearcastRotation) GetPresimOptions() *core.PresimOptions { return nil }
 
 func NewCLOnClearcastRotation() *CLOnClearcastRotation {
 	return &CLOnClearcastRotation{}
@@ -243,37 +254,29 @@ func (rotation *AdaptiveRotation) Reset(eleShaman *ElementalShaman, sim *core.Si
 	rotation.surplusRotation.Reset(eleShaman, sim)
 }
 
-func NewAdaptiveRotation(isr proto.IndividualSimRequest) *AdaptiveRotation {
-	rotation := &AdaptiveRotation{
+func (rotation *AdaptiveRotation) GetPresimOptions() *core.PresimOptions {
+	return &core.PresimOptions{
+		SetPresimPlayerOptions: func(player *proto.Player) {
+			player.Spec.(*proto.Player_ElementalShaman).ElementalShaman.Rotation.Type = proto.ElementalShaman_Rotation_CLOnClearcast
+		},
+
+		OnPresimResult: func(presimResult proto.PlayerMetrics, iterations int32) bool {
+			if float64(presimResult.NumOom) >= float64(iterations)*0.05 {
+				rotation.baseRotation = NewLBOnlyRotation()
+				rotation.surplusRotation = NewCLOnClearcastRotation()
+			} else {
+				rotation.baseRotation = NewCLOnClearcastRotation()
+				rotation.surplusRotation = NewCLOnCDRotation()
+			}
+			return true
+		},
+	}
+}
+
+func NewAdaptiveRotation() *AdaptiveRotation {
+	return &AdaptiveRotation{
 		manaTracker: common.NewManaSpendingRateTracker(),
 	}
-
-	// If no encounter is set, it means we aren't going to run a sim at all.
-	// So just return something valid.
-	// TODO: Probably need some organized way of doing presims so we dont have
-	// to check these types of things.
-	if isr.Encounter == nil || len(isr.Encounter.Targets) == 0 {
-		rotation.baseRotation = NewLBOnlyRotation()
-		rotation.surplusRotation = NewCLOnClearcastRotation()
-		return rotation
-	}
-
-	presimRequest := googleProto.Clone(&isr).(*proto.IndividualSimRequest)
-	presimRequest.SimOptions.Debug = false
-	presimRequest.SimOptions.Iterations = 100
-	presimRequest.Player.Options.Spec.(*proto.PlayerOptions_ElementalShaman).ElementalShaman.Rotation.Type = proto.ElementalShaman_Rotation_CLOnClearcast
-
-	presimResult := core.RunIndividualSim(presimRequest)
-
-	if presimResult.PlayerMetrics.NumOom >= 5 {
-		rotation.baseRotation = NewLBOnlyRotation()
-		rotation.surplusRotation = NewCLOnClearcastRotation()
-	} else {
-		rotation.baseRotation = NewCLOnClearcastRotation()
-		rotation.surplusRotation = NewCLOnCDRotation()
-	}
-
-	return rotation
 }
 
 // A single action that an Agent can take.

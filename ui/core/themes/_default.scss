@@ -1,7 +1,7 @@
 @import "../components/actions";
 @import "../components/boolean_picker";
 @import "../components/character_stats";
-@import "../components/custom_stats_picker";
+@import "../components/bonus_stats_picker";
 @import "../components/detailed_results";
 @import "../components/encounter_picker";
 @import "../components/enum_picker";
@@ -177,13 +177,13 @@ td, th {
   position: relative;
 }
 
-.custom-stats-root {
+.bonus-stats-root {
   justify-content: end;
   text-align: right;
 	color: var(--main-text-color);
 }
 
-.custom-stats-root .number-picker-root {
+.bonus-stats-root .number-picker-root {
   justify-content: end;
 }
 

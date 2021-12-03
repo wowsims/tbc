@@ -18,17 +18,19 @@ func TestNordBonus(t *testing.T) {
 		T:     t,
 
 		Inputs: core.IndividualSimInputs{
+			Player: &proto.Player{
+				Race:      proto.Race_RaceTauren,
+				Class:     proto.Class_ClassDruid,
+				Equipment: P2Gear,
+				Consumes:  FullConsumes,
+				Spec:      PlayerOptionsStarfire,
+			},
+
 			RaidBuffs:       FullRaidBuffs,
 			PartyBuffs:      FullPartyBuffs,
 			IndividualBuffs: FullIndividualBuffs,
 
-			Consumes: FullConsumes,
-			Target:   FullDebuffTarget,
-			Race:     proto.Race_RaceTauren,
-			Class:    proto.Class_ClassDruid,
-
-			PlayerOptions: PlayerOptionsStarfire,
-			Gear:          P2Gear,
+			Target: FullDebuffTarget,
 		},
 
 		ExpectedDpsShort: 1538.2,
@@ -42,17 +44,19 @@ func TestSimulateP1Starfire(t *testing.T) {
 		T:     t,
 
 		Inputs: core.IndividualSimInputs{
+			Player: &proto.Player{
+				Race:      proto.Race_RaceTauren,
+				Class:     proto.Class_ClassDruid,
+				Equipment: P1Gear,
+				Consumes:  FullConsumes,
+				Spec:      PlayerOptionsStarfire,
+			},
+
 			RaidBuffs:       FullRaidBuffs,
 			PartyBuffs:      FullPartyBuffs,
 			IndividualBuffs: FullIndividualBuffs,
 
-			Consumes: FullConsumes,
-			Target:   FullDebuffTarget,
-			Race:     proto.Race_RaceTauren,
-			Class:    proto.Class_ClassDruid,
-
-			PlayerOptions: PlayerOptionsStarfire,
-			Gear:          P1Gear,
+			Target: FullDebuffTarget,
 		},
 
 		ExpectedDpsShort: 1413.4,
@@ -66,17 +70,19 @@ func TestSimulateP1Wrath(t *testing.T) {
 		T:     t,
 
 		Inputs: core.IndividualSimInputs{
+			Player: &proto.Player{
+				Race:      proto.Race_RaceTauren,
+				Class:     proto.Class_ClassDruid,
+				Equipment: P1Gear,
+				Consumes:  FullConsumes,
+				Spec:      PlayerOptionsWrath,
+			},
+
 			RaidBuffs:       FullRaidBuffs,
 			PartyBuffs:      FullPartyBuffs,
 			IndividualBuffs: FullIndividualBuffs,
 
-			Consumes: FullConsumes,
-			Target:   FullDebuffTarget,
-			Race:     proto.Race_RaceTauren,
-			Class:    proto.Class_ClassDruid,
-
-			PlayerOptions: PlayerOptionsWrath,
-			Gear:          P1Gear,
+			Target: FullDebuffTarget,
 		},
 
 		ExpectedDpsShort: 1141.3,
@@ -90,17 +96,19 @@ func TestAdaptive(t *testing.T) {
 		T:     t,
 
 		Inputs: core.IndividualSimInputs{
+			Player: &proto.Player{
+				Race:      proto.Race_RaceTauren,
+				Class:     proto.Class_ClassDruid,
+				Equipment: P2Gear,
+				Consumes:  BasicConsumes,
+				Spec:      PlayerOptionsAdaptive,
+			},
+
 			RaidBuffs:       BasicRaidBuffs,
 			PartyBuffs:      BasicPartyBuffs,
 			IndividualBuffs: BasicIndividualBuffs,
 
-			Consumes: BasicConsumes,
-			Target:   FullDebuffTarget,
-			Race:     proto.Race_RaceTauren,
-			Class:    proto.Class_ClassDruid,
-
-			PlayerOptions: PlayerOptionsAdaptive,
-			Gear:          P2Gear,
+			Target: FullDebuffTarget,
 		},
 
 		ExpectedDpsShort: 1569.7,
@@ -110,17 +118,19 @@ func TestAdaptive(t *testing.T) {
 
 func TestAverageDPS(t *testing.T) {
 	isr := core.NewIndividualSimRequest(core.IndividualSimInputs{
-		Gear:     P1Gear,
-		Race:     proto.Race_RaceNightElf,
-		Class:    proto.Class_ClassDruid,
-		Consumes: FullConsumes,
+		Player: &proto.Player{
+			Race:      proto.Race_RaceNightElf,
+			Class:     proto.Class_ClassDruid,
+			Equipment: P1Gear,
+			Consumes:  FullConsumes,
+			Spec:      PlayerOptionsStarfire,
+		},
 
 		RaidBuffs:       FullRaidBuffs,
 		PartyBuffs:      FullPartyBuffs,
 		IndividualBuffs: FullIndividualBuffs,
 
-		Target:        FullDebuffTarget,
-		PlayerOptions: PlayerOptionsStarfire,
+		Target: FullDebuffTarget,
 	})
 
 	core.IndividualSimAverageTest("P1Average", t, isr, 1258.1)
