@@ -207,7 +207,7 @@ func (spriest *ShadowPriest) Act(sim *core.Simulation) time.Duration {
 
 // CalculateMindflay will calculate how many ticks should be cast and mutate the cast.
 func (spriest *ShadowPriest) CalculateMindflay(sim *core.Simulation, spell *core.SimpleSpell, allCDs []time.Duration) time.Duration {
-	var nextCD time.Duration
+	nextCD := core.NeverExpires
 	for _, v := range allCDs {
 		if v < nextCD {
 			nextCD = v
