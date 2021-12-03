@@ -1,4 +1,5 @@
 import { ActionMetrics as ActionMetricsProto } from '/tbc/core/proto/api.js';
+import { AuraMetrics as AuraMetricsProto } from '/tbc/core/proto/api.js';
 import { ActionId } from '/tbc/core/resources.js';
 import { getIconUrl } from '/tbc/core/resources.js';
 import { getName } from '/tbc/core/resources.js';
@@ -12,6 +13,14 @@ export type ActionMetrics = {
 	crits: number,
 	misses: number,
 	totalDmg: number,
+};
+
+export type AuraMetrics = {
+	actionId: ActionId,
+	name: string,
+	iconUrl: string,
+	uptimeSecondsAvg: number,
+	uptimeSecondsStdev: number,
 };
 
 export function getActionId(actionMetric: ActionMetricsProto): ActionId {
@@ -75,3 +84,31 @@ export function parseActionMetrics(actionMetricProtos: Array<ActionMetricsProto>
 	))
 	.then(() => actionMetrics);
 }
+
+export function parseAuraMetrics(auraMetricProtos: Array<AuraMetricsProto>): Promise<Array<AuraMetrics>> {
+	const auraMetrics = auraMetricProtos.map(auraMetric => {
+		return {
+			actionId: {
+				id: {
+					spellId: auraMetric.id,
+				},
+				tag: 0,
+			},
+			name: '',
+			iconUrl: '',
+			uptimeSecondsAvg: auraMetric.uptimeSecondsAvg,
+			uptimeSecondsStdev: auraMetric.uptimeSecondsStdev,
+		};
+	});
+
+	return Promise.all(auraMetrics.map(auraMetric => 
+		getName(auraMetric.actionId.id)
+		.then(name => {
+			auraMetric.name = name;
+		})
+		.then(() => getIconUrl(auraMetric.actionId.id))
+		.then(iconUrl => auraMetric.iconUrl = iconUrl)
+	))
+	.then(() => auraMetrics);
+}
+
