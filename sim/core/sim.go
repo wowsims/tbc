@@ -169,7 +169,11 @@ func (sim *Simulation) runOnce() {
 			}
 			pa.OnAction = func(sim *Simulation) {
 				ag.GetCharacter().TryUseCooldowns(sim)
-				pa.NextActionAt = ag.Act(sim)
+				dur := ag.Act(sim)
+				if dur == 0 {
+					panic("Agent returned a 0 time wait")
+				}
+				pa.NextActionAt = dur
 			}
 			sim.AddPendingAction(pa)
 		}

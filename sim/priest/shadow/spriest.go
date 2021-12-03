@@ -139,22 +139,22 @@ const (
 )
 
 func (spriest *ShadowPriest) Act(sim *core.Simulation) time.Duration {
-	// log.Printf("[%0.1f] Priest Acting...", sim.CurrentTime.Seconds())
+	// fmt.Printf("[%0.1f] (%dns) Priest Acting...\n", sim.CurrentTime.Seconds(), sim.CurrentTime)
 	// Activate shared behaviors
 	target := sim.GetPrimaryTarget()
 	var spell *core.SimpleSpell
 	var wait time.Duration
 
-	timeForDots := sim.Duration-sim.CurrentTime > time.Second*12
+	// timeForDots := sim.Duration-sim.CurrentTime > time.Second*12
 	if spriest.UseShadowfiend &&
 		spriest.CurrentMana()/spriest.MaxMana() < 0.5 &&
 		spriest.GetRemainingCD(priest.ShadowfiendCD, sim.CurrentTime) == 0 {
 		spell = spriest.NewShadowfiend(sim, target)
-	} else if spriest.Talents.VampiricTouch && timeForDots && !spriest.VTSpell.DotInput.IsTicking(sim) {
+	} else if spriest.Talents.VampiricTouch && !spriest.VTSpell.DotInput.IsTicking(sim) {
 		spell = spriest.NewVT(sim, target)
-	} else if timeForDots && !spriest.SWPSpell.DotInput.IsTicking(sim) {
+	} else if !spriest.SWPSpell.DotInput.IsTicking(sim) {
 		spell = spriest.NewSWP(sim, target)
-	} else if spriest.rotation.UseDevPlague && timeForDots && spriest.GetRemainingCD(priest.DPCooldownID, sim.CurrentTime) == 0 {
+	} else if spriest.rotation.UseDevPlague && spriest.GetRemainingCD(priest.DPCooldownID, sim.CurrentTime) == 0 {
 		spell = spriest.NewDevouringPlague(sim, target)
 	} else if spriest.Talents.MindFlay {
 		allCDs := []time.Duration{
@@ -164,12 +164,12 @@ func (spriest *ShadowPriest) Act(sim *core.Simulation) time.Duration {
 			swpidx: spriest.SWPSpell.DotInput.TimeRemaining(sim),
 		}
 
-		if allCDs[0] == 0 {
+		if allCDs[mbidx] == 0 {
 			if spriest.Talents.InnerFocus && spriest.GetRemainingCD(priest.InnerFocusCooldownID, sim.CurrentTime) == 0 {
 				priest.ApplyInnerFocus(sim, &spriest.Priest)
 			}
 			spell = spriest.NewMindBlast(sim, target)
-		} else if allCDs[1] == 0 {
+		} else if allCDs[swdidx] == 0 {
 			spell = spriest.NewSWD(sim, target)
 		} else {
 			spell = spriest.NewMindFlay(sim, target)
@@ -177,7 +177,15 @@ func (spriest *ShadowPriest) Act(sim *core.Simulation) time.Duration {
 			if sim.Log != nil {
 				sim.Log("<spriest> Selected %d mindflay ticks.\n", spell.DotInput.NumberOfTicks)
 			}
-			// log.Printf("MF TICKS: %d, wait: %0.1f", spell.DotInput.NumberOfTicks, wait)
+			if spell.DotInput.NumberOfTicks == 0 {
+				// fmt.Printf("\tcancelling cast... waiting %0.1fs\n", wait.Seconds())
+				spell.Cancel()
+				// if wait <= 1 {
+				// 	fmt.Printf("wtf")
+				// }
+				return sim.CurrentTime + core.MaxDuration(spriest.GetRemainingCD(core.GCDCooldownID, sim.CurrentTime), wait)
+			}
+			// fmt.Printf("MF TICKS: %d, wait: %d\n", spell.DotInput.NumberOfTicks, wait)
 		}
 	} else {
 		// what do you even do... i guess just sit around
@@ -188,7 +196,7 @@ func (spriest *ShadowPriest) Act(sim *core.Simulation) time.Duration {
 
 	actionSuccessful := spell.Cast(sim)
 
-	// log.Printf("Casting: %s", spell.Name)
+	// fmt.Printf("\tCasting: %s\n", spell.Name)
 	if !actionSuccessful {
 		regenTime := spriest.TimeUntilManaRegen(spell.GetManaCost())
 		if sim.Log != nil {
@@ -209,11 +217,15 @@ func (spriest *ShadowPriest) Act(sim *core.Simulation) time.Duration {
 func (spriest *ShadowPriest) CalculateMindflay(sim *core.Simulation, spell *core.SimpleSpell, allCDs []time.Duration) time.Duration {
 	nextCD := core.NeverExpires
 	for _, v := range allCDs {
+		// fmt.Printf("\tCD[%d] %0.1fs (%dns)\n", i, v.Seconds(), v)
 		if v < nextCD {
 			nextCD = v
 		}
 	}
-
+	if sim.Log != nil {
+		sim.Log("Next CD available at: %0.1f\n", nextCD.Seconds())
+	}
+	// fmt.Printf("\tNext CD available in: %0.1fs\n", nextCD.Seconds())
 	gcd := time.Duration(float64(core.GCDDefault) / spriest.CastSpeed())
 
 	var numTicks int
@@ -222,6 +234,15 @@ func (spriest *ShadowPriest) CalculateMindflay(sim *core.Simulation, spell *core
 	} else {
 		numTicks = int(float64(nextCD) / float64(spell.DotInput.TickLength))
 	}
+
+	if numTicks == 0 {
+		spell.DotInput.NumberOfTicks = 0
+		// if nextCD == 0 {
+		// 	fmt.Printf("zero time until next action?")
+		// }
+		return nextCD + 1 // add a nanosecond to be sure any ticking dot finishes.
+	}
+
 	mfTime := time.Duration(numTicks) * spell.DotInput.TickLength
 
 	cdDiffs := []time.Duration{
@@ -243,6 +264,9 @@ func (spriest *ShadowPriest) CalculateMindflay(sim *core.Simulation, spell *core
 	bestIdx := 0
 	bestDmg := 0.0
 	for i, v := range spellDamages {
+		if sim.Log != nil {
+			sim.Log("\tSpellDamages[%d]: %01.f\n", i, v)
+		}
 		if v > bestDmg {
 			bestIdx = i
 			bestDmg = v
@@ -257,11 +281,6 @@ func (spriest *ShadowPriest) CalculateMindflay(sim *core.Simulation, spell *core
 		0,
 		0,
 		0,
-	}
-	if numTicks == 0 {
-		// TODO: what do we do ?
-		// log.Printf("")
-		return spell.DotInput.TickLength * time.Duration(spell.DotInput.NumberOfTicks)
 	}
 
 	dpsDuration := float64(chosenWait + gcd)
@@ -321,14 +340,31 @@ func (spriest *ShadowPriest) CalculateMindflay(sim *core.Simulation, spell *core
 		spell.DotInput.NumberOfTicks = numTicks
 	} else if numTicks%3 < 2 && numTicks < 5 && numTicks != 3 {
 		spell.DotInput.NumberOfTicks = 2
+		if sim.Log != nil {
+			sim.Log("Final rotation should be: MF2 MF2\n")
+		}
 	} else if numTicks%3 == 0 {
 		//  cast MF3 MF3...MF3
+		if sim.Log != nil {
+			sim.Log("Final rotation should be: MF3 MF3 ... MF3\n")
+		}
 		spell.DotInput.NumberOfTicks = 3
 	} else if numTicks%3 == 2 {
 		//  cast MF3 MF3...MF2
-		spell.DotInput.NumberOfTicks = 3
+		if sim.Log != nil {
+			sim.Log("Final rotation should be: MF3 MF3 ... MF2\n")
+		}
+		if numTicks == 2 {
+			spell.DotInput.NumberOfTicks = 2
+		} else {
+			spell.DotInput.NumberOfTicks = 3
+		}
+
 	} else if numTicks%3 < 2 && numTicks > 5 { // % need to optomize between 3 and 2 ticks and not allowing 1 tick
 		//  cast MF3 MF3...MF2 MF2
+		if sim.Log != nil {
+			sim.Log("Final rotation should be: MF3 MF3 ... MF2 MF2\n")
+		}
 		spell.DotInput.NumberOfTicks = 3
 	}
 	spell.ActionID.Tag = int32(spell.DotInput.NumberOfTicks)
