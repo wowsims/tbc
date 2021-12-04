@@ -229,18 +229,22 @@ func (spriest *ShadowPriest) CalculateMindflay(sim *core.Simulation, spell *core
 	gcd := time.Duration(float64(core.GCDDefault) / spriest.CastSpeed())
 
 	var numTicks int
+	// Add a millisecond as fudge factor to these checks
 	if nextCD <= gcd {
-		numTicks = int(float64(nextCD) / float64(gcd))
+		numTicks = int(float64(nextCD+time.Millisecond) / float64(gcd))
 	} else {
-		numTicks = int(float64(nextCD) / float64(spell.DotInput.TickLength))
+		numTicks = int(float64(nextCD+time.Millisecond) / float64(spell.DotInput.TickLength))
 	}
 
 	if numTicks == 0 {
 		spell.DotInput.NumberOfTicks = 0
-		// if nextCD == 0 {
-		// 	fmt.Printf("zero time until next action?")
+		if nextCD == 0 {
+			nextCD = 1 // add a nanosecond to be sure any ticking dot finishes and we don't get sim stuck.
+		}
+		// else if nextCD > time.Second+time.Millisecond {
+		// fmt.Printf("Long Wait")
 		// }
-		return nextCD + 1 // add a nanosecond to be sure any ticking dot finishes.
+		return nextCD
 	}
 
 	mfTime := time.Duration(numTicks) * spell.DotInput.TickLength
