@@ -21,13 +21,22 @@ import { hexToRgba } from '/tbc/core/utils.js';
 
 declare var tippy: any;
 
+const NEW_PLAYER: number = -1;
+
 export class RaidPicker extends Component {
-	private readonly raid: Raid;
-  private readonly partyPickers: Array<PartyPicker>;
+	readonly raid: Raid;
+	readonly presets: Array<PresetSpecSettings<any>>;
+  readonly partyPickers: Array<PartyPicker>;
+	readonly newPlayerPicker: NewPlayerPicker;
+
+	// Hold data about the player being dragged while the drag is happening.
+	currentDragPlayer: Player<any> | null = null;
+	currentDragPlayerFromIndex: number = NEW_PLAYER;
 
   constructor(parent: HTMLElement, raid: Raid, presets: Array<PresetSpecSettings<any>>) {
     super(parent, 'raid-picker-root');
 		this.raid = raid;
+		this.presets = presets;
 
     const raidViewer = document.createElement('div');
     raidViewer.classList.add('current-raid-viewer');
@@ -38,25 +47,70 @@ export class RaidPicker extends Component {
 		`;
 
     const partiesContainer = this.rootElem.getElementsByClassName('parties-container')[0] as HTMLDivElement;
-		this.partyPickers = this.raid.getParties().map((party, i) => new PartyPicker(partiesContainer, party, i));
+		this.partyPickers = this.raid.getParties().map((party, i) => new PartyPicker(partiesContainer, party, i, this));
 
     const newPlayerPickerRoot = document.createElement('div');
     newPlayerPickerRoot.classList.add('new-player-picker');
     this.rootElem.appendChild(newPlayerPickerRoot);
 
-		const newPlayerPicker = new NewPlayerPicker(newPlayerPickerRoot, this.raid, presets);
+		this.newPlayerPicker = new NewPlayerPicker(newPlayerPickerRoot, this);
+
+		this.rootElem.ondragend = event => {
+			if (this.currentDragPlayerFromIndex != NEW_PLAYER) {
+				const playerPicker = this.getPlayerPicker(this.currentDragPlayerFromIndex);
+				playerPicker.setPlayer(null);
+			}
+
+			this.clearDragPlayer();
+		};
+	}
+
+	getCurrentFaction(): Faction {
+		return this.newPlayerPicker.currentFaction;
+	}
+
+	getCurrentPhase(): number {
+		return this.raid.sim.getPhase();
+	}
+
+	getPlayerPicker(raidIndex: number): PlayerPicker {
+		return this.partyPickers[Math.floor(raidIndex / MAX_PARTY_SIZE)].playerPickers[raidIndex % MAX_PARTY_SIZE];
+	}
+
+	setDragPlayer(player: Player<any>, fromIndex: number) {
+		this.clearDragPlayer();
+
+		this.currentDragPlayer = player;
+		this.currentDragPlayerFromIndex = fromIndex;
+
+		if (fromIndex != NEW_PLAYER) {
+			const playerPicker = this.getPlayerPicker(fromIndex);
+			playerPicker.rootElem.classList.add('dragFrom');
+		}
+	}
+
+	clearDragPlayer() {
+		if (this.currentDragPlayerFromIndex != NEW_PLAYER) {
+			const playerPicker = this.getPlayerPicker(this.currentDragPlayerFromIndex);
+			playerPicker.rootElem.classList.remove('dragFrom');
+		}
+
+		this.currentDragPlayer = null;
+		this.currentDragPlayerFromIndex = NEW_PLAYER;
 	}
 }
 
 export class PartyPicker extends Component {
-	private readonly party: Party;
-	private readonly index: number;
-  private readonly playerPickers: Array<PlayerPicker>;
+	readonly party: Party;
+	readonly index: number;
+	readonly raidPicker: RaidPicker;
+  readonly playerPickers: Array<PlayerPicker>;
 
-  constructor(parent: HTMLElement, party: Party, index: number) {
+  constructor(parent: HTMLElement, party: Party, index: number, raidPicker: RaidPicker) {
     super(parent, 'party-picker-root');
 		this.party = party;
 		this.index = index;
+		this.raidPicker = raidPicker;
 
 		this.rootElem.innerHTML = `
 			<div class="party-header">
@@ -67,35 +121,49 @@ export class PartyPicker extends Component {
 		`;
 
     const playersContainer = this.rootElem.getElementsByClassName('players-container')[0] as HTMLDivElement;
-		this.playerPickers = [...Array(MAX_PARTY_SIZE).keys()].map(i => new PlayerPicker(playersContainer, this.party, i));
+		this.playerPickers = [...Array(MAX_PARTY_SIZE).keys()].map(i => new PlayerPicker(playersContainer, this, i));
 	}
 }
 
 export class PlayerPicker extends Component {
-	private readonly party: Party;
-	private readonly playerIndex: number;
-	private player: Player<any> | null;
+	// Index of this player within its party (0-4).
+	readonly index: number;
 
+	// Index of this player within the whole raid (0-24).
+	readonly raidIndex: number;
+
+	player: Player<any> | null;
+
+	readonly partyPicker: PartyPicker;
+	readonly raidPicker: RaidPicker;
+
+	private readonly labelElem: HTMLElement;
+	private readonly iconElem: HTMLImageElement;
 	private readonly nameElem: HTMLSpanElement;
 
-  constructor(parent: HTMLElement, party: Party, playerIndex: number) {
+  constructor(parent: HTMLElement, partyPicker: PartyPicker, index: number) {
     super(parent, 'player-picker-root');
-		this.party = party;
-		this.playerIndex = playerIndex;
+		this.index = index;
+		this.raidIndex = partyPicker.index * MAX_PARTY_SIZE + index;
 		this.player = null;
+		this.partyPicker = partyPicker;
+		this.raidPicker = partyPicker.raidPicker;
 
 		this.rootElem.innerHTML = `
 			<div class="player-label">
+				<img class="player-icon"></img>
 				<span class="player-name"></span>
 			</div>
 			<div class="player-options">
 			</div>
 		`;
 
+		this.labelElem = this.rootElem.getElementsByClassName('player-label')[0] as HTMLElement;
+		this.iconElem = this.rootElem.getElementsByClassName('player-icon')[0] as HTMLImageElement;
 		this.nameElem = this.rootElem.getElementsByClassName('player-name')[0] as HTMLSpanElement;
 
-		this.party.changeEmitter.on(() => {
-			const newPlayer = this.party.getPlayer(this.playerIndex);
+		this.partyPicker.party.changeEmitter.on(() => {
+			const newPlayer = this.partyPicker.party.getPlayer(this.index);
 
 			if (((newPlayer == null) != (this.player == null)) || newPlayer != this.player) {
 				this.setPlayer(newPlayer);
@@ -105,12 +173,71 @@ export class PlayerPicker extends Component {
 			this.update();
 		});
 
+		this.labelElem.ondragstart = event => {
+			if (this.player == null) {
+				event.preventDefault();
+				return;
+			}
+
+			const iconSrc = this.iconElem.src;
+			console.log('icon: ' + iconSrc);
+			const dragImage = new Image();
+			dragImage.src = iconSrc;
+			event.dataTransfer!.setDragImage(dragImage, 30, 30);
+			event.dataTransfer!.setData("text/plain", iconSrc);
+
+			event.dataTransfer!.dropEffect = 'move';
+
+			this.raidPicker.setDragPlayer(this.player, this.raidIndex);
+		};
+
+		let dragEnterCounter = 0;
+		this.rootElem.ondragenter = event => {
+			event.preventDefault();
+			dragEnterCounter++;
+			this.rootElem.classList.add('dragto');
+		};
+		this.rootElem.ondragleave = event => {
+			event.preventDefault();
+			dragEnterCounter--;
+			if (dragEnterCounter <= 0) {
+				this.rootElem.classList.remove('dragto');
+			}
+		};
+		this.rootElem.ondragover = event => {
+			event.preventDefault();
+		};
+		this.rootElem.ondrop = event => {
+			event.preventDefault();
+			dragEnterCounter = 0;
+			this.rootElem.classList.remove('dragto');
+
+			if (this.raidPicker.currentDragPlayer == null) {
+				return;
+			}
+
+			if (this.raidPicker.currentDragPlayerFromIndex == this.raidIndex) {
+				this.raidPicker.clearDragPlayer();
+				return;
+			}
+
+			this.setPlayer(this.raidPicker.currentDragPlayer);
+			this.iconElem.src = event.dataTransfer!.getData('text/plain');
+
+			if (this.raidPicker.currentDragPlayerFromIndex != NEW_PLAYER) {
+				const fromPlayerPicker = this.raidPicker.getPlayerPicker(this.raidPicker.currentDragPlayerFromIndex);
+				fromPlayerPicker.setPlayer(null);
+			}
+
+			this.raidPicker.clearDragPlayer();
+		};
+
 		this.update();
 	}
 
 	setPlayer(newPlayer: Player<any> | null) {
 		this.player = newPlayer;
-		this.party.setPlayer(this.playerIndex, this.player);
+		this.partyPicker.party.setPlayer(this.index, this.player);
 
 		this.update();
 	}
@@ -118,21 +245,25 @@ export class PlayerPicker extends Component {
 	private update() {
 		if (this.player == null) {
 			this.rootElem.classList.add('empty');
+			this.rootElem.style.backgroundColor = 'black';
+			this.labelElem.setAttribute('draggable', 'false');
 			this.nameElem.textContent = '';
 		} else {
 			this.rootElem.classList.remove('empty');
+			this.rootElem.style.backgroundColor = classColors[specToClass[this.player.spec]];
+			this.labelElem.setAttribute('draggable', 'true');
 			this.nameElem.textContent = this.player.getName();
 		}
 	}
 }
 
 export class NewPlayerPicker extends Component {
-	private readonly raid: Raid;
-	private currentFaction: Faction;
+	readonly raidPicker: RaidPicker;
+	currentFaction: Faction;
 
-  constructor(parent: HTMLElement, raid: Raid, presets: Array<PresetSpecSettings<any>>) {
+  constructor(parent: HTMLElement, raidPicker: RaidPicker) {
     super(parent, 'new-player-picker-root');
-		this.raid = raid;
+		this.raidPicker = raidPicker;
 		this.currentFaction = Faction.Alliance;
 
 		this.rootElem.innerHTML = `
@@ -157,11 +288,11 @@ export class NewPlayerPicker extends Component {
 			},
 		});
 
-		const phaseSelector = makePhaseSelector(this.rootElem.getElementsByClassName('phase-selector')[0] as HTMLElement, this.raid.sim);
+		const phaseSelector = makePhaseSelector(this.rootElem.getElementsByClassName('phase-selector')[0] as HTMLElement, this.raidPicker.raid.sim);
 
 		const presetsContainer = this.rootElem.getElementsByClassName('presets-container')[0] as HTMLElement;
 		getEnumValues(Class).forEach(wowClass => {
-			const matchingPresets = presets.filter(preset => specToClass[preset.spec] == wowClass);
+			const matchingPresets = this.raidPicker.presets.filter(preset => specToClass[preset.spec] == wowClass);
 			if (matchingPresets.length == 0 || wowClass == Class.ClassUnknown) {
 				return;
 			}
@@ -172,8 +303,6 @@ export class NewPlayerPicker extends Component {
 			classPresetsContainer.style.backgroundColor = hexToRgba(classColors[wowClass as Class], 0.5);
 
 			matchingPresets.forEach(matchingPreset => {
-				const presetIndex = presets.findIndex(matchingPreset);
-
 				const presetElem = document.createElement('div');
 				presetElem.classList.add('preset-picker');
 				classPresetsContainer.appendChild(presetElem);
@@ -187,12 +316,28 @@ export class NewPlayerPicker extends Component {
 					'allowHTML': true,
 				});
 
-				presetElem.setAttribute('draggable', true);
-				presetElem.addEventListener("dragstart", event => {
-					event.dataTransfer.setData('text/plain', presetIndex);
-					event.dataTransfer.setDragImage(matchingPreset.iconUrl, 30, 30);
-					event.dataTransfer.dropEffect = 'copy';
-				});
+				presetElem.setAttribute('draggable', 'true');
+				presetElem.ondragstart = event => {
+					const dragImage = new Image();
+					dragImage.src = matchingPreset.iconUrl;
+					event.dataTransfer!.setDragImage(dragImage, 30, 30);
+					event.dataTransfer!.setData("text/plain", matchingPreset.iconUrl);
+
+					event.dataTransfer!.dropEffect = 'copy';
+
+					const newPlayer = new Player(matchingPreset.spec, this.raidPicker.raid.sim);
+					newPlayer.setRace(matchingPreset.defaultFactionRaces[this.raidPicker.getCurrentFaction()]);
+					newPlayer.setRotation(matchingPreset.rotation);
+					newPlayer.setTalentsString(matchingPreset.talents);
+					newPlayer.setSpecOptions(matchingPreset.specOptions);
+					newPlayer.setGear(
+							this.raidPicker.raid.sim.lookupEquipmentSpec(
+									matchingPreset.defaultGear[this.raidPicker.getCurrentFaction()][this.raidPicker.getCurrentPhase()]));
+					newPlayer.setConsumes(matchingPreset.consumes);
+					newPlayer.setName(matchingPreset.defaultName);
+
+					this.raidPicker.setDragPlayer(newPlayer, NEW_PLAYER);
+				};
 			});
 		});
 	}
@@ -205,6 +350,7 @@ export interface PresetSpecSettings<SpecType extends Spec> {
 	specOptions: SpecOptions<SpecType>,
 	consumes: Consumes,
 
+	defaultName: string,
 	defaultFactionRaces: Record<Faction, Race>,
 	defaultGear: Record<Faction, Record<number, EquipmentSpec>>,
 

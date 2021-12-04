@@ -2,6 +2,7 @@ import { Race } from '/tbc/core/proto/common.js';
 import { Spec } from '/tbc/core/proto/common.js';
 import { Faction } from '/tbc/core/proto_utils/utils.js';
 import { specIconsLarge } from '/tbc/core/proto_utils/utils.js';
+import { specNames } from '/tbc/core/proto_utils/utils.js';
 
 import * as BalanceDruidPresets from '/tbc/balance_druid/presets.js';
 import * as ElementalShamanPresets from '/tbc/elemental_shaman/presets.js';
@@ -17,6 +18,7 @@ const ui = new RaidSimUI(document.body, {
 			talents: BalanceDruidPresets.StandardTalents.data,
 			specOptions: BalanceDruidPresets.DefaultOptions,
 			consumes: BalanceDruidPresets.DefaultConsumes,
+			defaultName: specNames[Spec.SpecBalanceDruid],
 			defaultFactionRaces: {
 				[Faction.Unknown]: Race.RaceUnknown,
 				[Faction.Alliance]: Race.RaceNightElf,
@@ -33,7 +35,7 @@ const ui = new RaidSimUI(document.body, {
 					2: BalanceDruidPresets.P2_HORDE_BIS.gear,
 				},
 			},
-			tooltip: 'Balance Druid',
+			tooltip: specNames[Spec.SpecBalanceDruid],
 			iconUrl: specIconsLarge[Spec.SpecBalanceDruid],
 		},
 		{
@@ -42,6 +44,7 @@ const ui = new RaidSimUI(document.body, {
 			talents: ElementalShamanPresets.StandardTalents.data,
 			specOptions: ElementalShamanPresets.DefaultOptions,
 			consumes: ElementalShamanPresets.DefaultConsumes,
+			defaultName: specNames[Spec.SpecElementalShaman],
 			defaultFactionRaces: {
 				[Faction.Unknown]: Race.RaceUnknown,
 				[Faction.Alliance]: Race.RaceDraenei,
@@ -58,7 +61,7 @@ const ui = new RaidSimUI(document.body, {
 					2: ElementalShamanPresets.P2_BIS.gear,
 				},
 			},
-			tooltip: 'Elemental Shaman',
+			tooltip: specNames[Spec.SpecElementalShaman],
 			iconUrl: specIconsLarge[Spec.SpecElementalShaman],
 		},
 		{
@@ -67,6 +70,7 @@ const ui = new RaidSimUI(document.body, {
 			talents: ShadowPriestPresets.StandardTalents.data,
 			specOptions: ShadowPriestPresets.DefaultOptions,
 			consumes: ShadowPriestPresets.DefaultConsumes,
+			defaultName: specNames[Spec.SpecShadowPriest],
 			defaultFactionRaces: {
 				[Faction.Unknown]: Race.RaceUnknown,
 				[Faction.Alliance]: Race.RaceDwarf,
@@ -83,7 +87,7 @@ const ui = new RaidSimUI(document.body, {
 					2: ShadowPriestPresets.P2_BIS.gear,
 				},
 			},
-			tooltip: 'Shadow Priest',
+			tooltip: specNames[Spec.SpecShadowPriest],
 			iconUrl: specIconsLarge[Spec.SpecShadowPriest],
 		},
 	],

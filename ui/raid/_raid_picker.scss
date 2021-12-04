@@ -25,10 +25,50 @@
 	width: 200px;
 	border-width: 1px;
 	border-style: solid;
+	text-color: var(--main-text-color);
 }
 
 .player-picker-root.empty {
 	border-color: gray;
+}
+
+.player-picker-root.dragfrom {
+	box-shadow:
+		0 0 5px blue,
+		0 0 5px blue,
+		0 0 5px blue,
+		0 0 5px blue;
+}
+
+.player-picker-root.dragto:not(.dragfrom) {
+	box-shadow:
+		0 0 5px var(--sidebar-highlight-color),
+		0 0 5px var(--sidebar-highlight-color),
+		0 0 5px var(--sidebar-highlight-color),
+		0 0 5px var(--sidebar-highlight-color);
+}
+
+.player-label {
+	height: 100%;
+	display: flex;
+	align-items: center;
+}
+
+.player-icon {
+	margin: 2px;
+	height: 90%;
+}
+
+.player-picker-root.empty .player-icon {
+	opacity: 0;
+}
+
+.player-name {
+	margin: 2px;
+	text-shadow:
+		0 0 3px var(--main-secondary-color),
+		0 0 3px var(--main-secondary-color),
+		0 0 3px var(--main-secondary-color);
 }
 
 .new-player-picker {
