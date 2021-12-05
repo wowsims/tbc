@@ -50,3 +50,11 @@ export function hexToRgba(hex: string, alpha: number): string {
 	}
 	throw new Error('Invalid hex color: ' + hex);
 }
+
+export function camelToSnakeCase(str: string): string {
+	let result = str.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
+	if (result.startsWith('_')) {
+		result = result.substring(1);
+	}
+	return result;
+}

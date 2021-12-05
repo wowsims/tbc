@@ -434,4 +434,10 @@ export class Player<SpecType extends Spec> {
 			console.warn('Failed to parse spec options: ' + e);
 		}
   }
+
+	clone(): Player<SpecType> {
+		const newPlayer = new Player<SpecType>(this.spec, this.sim);
+		newPlayer.fromJson(this.toJson());
+		return newPlayer;
+	}
 }

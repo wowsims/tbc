@@ -11,6 +11,9 @@ export const MAX_PARTY_SIZE = 5;
 
 // Manages all the settings for a single Party.
 export class Party {
+	// Emits when a party member is added/removed/moved.
+  readonly compChangeEmitter = new TypedEvent<void>();
+
   // Emits when anything in the party changes.
   readonly changeEmitter = new TypedEvent<void>();
 
@@ -19,9 +22,14 @@ export class Party {
 
 	readonly sim: Sim;
 
+	private readonly playerChangeListener: () => void;
+
   constructor(sim: Sim) {
 		this.sim = sim;
 		this.players = [...Array(MAX_PARTY_SIZE).keys()].map(i => null);
+		this.playerChangeListener = () => this.changeEmitter.emit();
+
+		this.compChangeEmitter.on(() => this.changeEmitter.emit());
   }
 
 	size(): number {
@@ -46,11 +54,19 @@ export class Party {
 			throw new Error('Invalid player index: ' + playerIndex);
 		}
 
-		if (newPlayer != null) {
-			newPlayer.changeEmitter.on(() => this.changeEmitter.emit());
+		if (newPlayer == this.players[playerIndex]) {
+			return;
 		}
+
+		if (this.players[playerIndex] != null) {
+			this.players[playerIndex]!.changeEmitter.off(this.playerChangeListener);
+		}
+		if (newPlayer != null) {
+			newPlayer.changeEmitter.on(this.playerChangeListener);
+		}
+
 		this.players[playerIndex] = newPlayer;
-		this.changeEmitter.emit();
+		this.compChangeEmitter.emit();
 	}
 
   // Returns JSON representing all the current values.

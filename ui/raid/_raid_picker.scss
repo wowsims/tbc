@@ -1,3 +1,5 @@
+@import "../core/shared";
+
 .raid-picker-root {
 	display: flex;
 	flex-direction: row;
@@ -25,7 +27,7 @@
 	width: 200px;
 	border-width: 1px;
 	border-style: solid;
-	text-color: var(--main-text-color);
+	color: var(--main-text-color);
 }
 
 .player-picker-root.empty {
@@ -50,8 +52,9 @@
 
 .player-label {
 	height: 100%;
-	display: flex;
+	display: inline-flex;
 	align-items: center;
+	cursor: pointer;
 }
 
 .player-icon {
@@ -69,6 +72,49 @@
 		0 0 3px var(--main-secondary-color),
 		0 0 3px var(--main-secondary-color),
 		0 0 3px var(--main-secondary-color);
+}
+
+.player-picker-root.empty .player-name {
+	display: none;
+}
+
+.player-options {
+	height: 100%;
+	vertical-align: top;
+	display: inline-flex;
+	align-items: center;
+}
+
+.player-picker-root.empty .player-options {
+	opacity: 0;
+}
+
+.player-options span {
+	margin: 2px;
+	cursor: pointer;
+	text-shadow:
+		0 0 3px var(--main-secondary-color),
+		0 0 3px var(--main-secondary-color),
+		0 0 3px var(--main-secondary-color);
+}
+
+.player-options span:hover {
+	text-shadow:
+		0 0 3px var(--sidebar-highlight-color),
+		0 0 3px var(--sidebar-highlight-color),
+		0 0 3px var(--sidebar-highlight-color);
+}
+
+.player-swap {
+	color: yellow;
+}
+
+.player-copy {
+	color: blue;
+}
+
+.player-edit {
+	color: green;
 }
 
 .new-player-picker {
@@ -99,4 +145,25 @@
 .preset-picker-icon {
 	height: 30px;
 	cursor: pointer;
+}
+
+.player-editor-modal .modal-dialog {
+	width: initial;
+	@include vertical-horizontal-center;
+}
+
+.player-editor-modal .modal-content {
+	height: 95vh;
+	width: 95vw;
+	margin: auto;
+}
+
+.player-editor-modal .player-editor-iframe {
+	height: 100%;
+	width: 100%;
+}
+
+.player-editor-modal .modal-body {
+	height: 100%;
+	padding: 5px;
 }

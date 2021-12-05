@@ -24,7 +24,6 @@ export class DetailedResults extends Component {
 		url.searchParams.append('mainBgColor', computedStyles.getPropertyValue('--main-bg-color').trim());
 		url.searchParams.append('mainTextColor', computedStyles.getPropertyValue('--main-text-color').trim());
 
-		const cssFilePath = '/elemental_shaman/index.css';
 		this.rootElem.innerHTML = `
 		<div class="detailed-results-controls-div">
 			<button class="detailed-results-new-tab-button">View in separate tab</button>

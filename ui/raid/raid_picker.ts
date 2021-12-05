@@ -15,7 +15,9 @@ import { SpecOptions } from '/tbc/core/proto_utils/utils.js';
 import { SpecRotation } from '/tbc/core/proto_utils/utils.js';
 import { classColors } from '/tbc/core/proto_utils/utils.js';
 import { specToClass } from '/tbc/core/proto_utils/utils.js';
+import { repoName } from '/tbc/core/resources.js';
 import { TypedEvent } from '/tbc/core/typed_event.js';
+import { camelToSnakeCase } from '/tbc/core/utils.js';
 import { getEnumValues } from '/tbc/core/utils.js';
 import { hexToRgba } from '/tbc/core/utils.js';
 
@@ -23,15 +25,24 @@ declare var tippy: any;
 
 const NEW_PLAYER: number = -1;
 
+enum DragType {
+	New,
+	Move,
+	Swap,
+	Copy,
+}
+
 export class RaidPicker extends Component {
 	readonly raid: Raid;
 	readonly presets: Array<PresetSpecSettings<any>>;
   readonly partyPickers: Array<PartyPicker>;
 	readonly newPlayerPicker: NewPlayerPicker;
+	readonly playerEditorModal: PlayerEditorModal;
 
 	// Hold data about the player being dragged while the drag is happening.
 	currentDragPlayer: Player<any> | null = null;
 	currentDragPlayerFromIndex: number = NEW_PLAYER;
+	currentDragType: DragType = DragType.New;
 
   constructor(parent: HTMLElement, raid: Raid, presets: Array<PresetSpecSettings<any>>) {
     super(parent, 'raid-picker-root');
@@ -63,6 +74,8 @@ export class RaidPicker extends Component {
 
 			this.clearDragPlayer();
 		};
+
+    this.playerEditorModal = new PlayerEditorModal(document.body);
 	}
 
 	getCurrentFaction(): Faction {
@@ -77,11 +90,12 @@ export class RaidPicker extends Component {
 		return this.partyPickers[Math.floor(raidIndex / MAX_PARTY_SIZE)].playerPickers[raidIndex % MAX_PARTY_SIZE];
 	}
 
-	setDragPlayer(player: Player<any>, fromIndex: number) {
+	setDragPlayer(player: Player<any>, fromIndex: number, type: DragType) {
 		this.clearDragPlayer();
 
 		this.currentDragPlayer = player;
 		this.currentDragPlayerFromIndex = fromIndex;
+		this.currentDragType = type;
 
 		if (fromIndex != NEW_PLAYER) {
 			const playerPicker = this.getPlayerPicker(fromIndex);
@@ -97,6 +111,7 @@ export class RaidPicker extends Component {
 
 		this.currentDragPlayer = null;
 		this.currentDragPlayerFromIndex = NEW_PLAYER;
+		this.currentDragType = DragType.New;
 	}
 }
 
@@ -152,15 +167,32 @@ export class PlayerPicker extends Component {
 		this.rootElem.innerHTML = `
 			<div class="player-label">
 				<img class="player-icon"></img>
-				<span class="player-name"></span>
+				<span class="player-name" contenteditable></span>
 			</div>
 			<div class="player-options">
+				<span class="player-swap fa fa-retweet" draggable="true"></span>
+				<span class="player-copy fa fa-copy" draggable="true"></span>
+				<span class="player-edit fa fa-edit" data-toggle="modal" data-target="#playerEditorModal"></span>
 			</div>
 		`;
 
 		this.labelElem = this.rootElem.getElementsByClassName('player-label')[0] as HTMLElement;
 		this.iconElem = this.rootElem.getElementsByClassName('player-icon')[0] as HTMLImageElement;
 		this.nameElem = this.rootElem.getElementsByClassName('player-name')[0] as HTMLSpanElement;
+
+    this.nameElem.addEventListener('input', event => {
+			let newName = this.nameElem.textContent || 'Unnamed';
+			newName = newName.replace(/([\n\r\t])/g, "");
+			newName = newName.substring(0, 25);
+
+			if (this.player == null) {
+				newName = '';
+			} else {
+				this.player.setName(newName);
+			}
+
+			this.nameElem.textContent = newName;
+		});
 
 		this.partyPicker.party.changeEmitter.on(() => {
 			const newPlayer = this.partyPicker.party.getPlayer(this.index);
@@ -173,14 +205,13 @@ export class PlayerPicker extends Component {
 			this.update();
 		});
 
-		this.labelElem.ondragstart = event => {
+		const dragStart = (event: DragEvent, type: DragType) => {
 			if (this.player == null) {
 				event.preventDefault();
 				return;
 			}
 
 			const iconSrc = this.iconElem.src;
-			console.log('icon: ' + iconSrc);
 			const dragImage = new Image();
 			dragImage.src = iconSrc;
 			event.dataTransfer!.setDragImage(dragImage, 30, 30);
@@ -188,7 +219,29 @@ export class PlayerPicker extends Component {
 
 			event.dataTransfer!.dropEffect = 'move';
 
-			this.raidPicker.setDragPlayer(this.player, this.raidIndex);
+			this.raidPicker.setDragPlayer(this.player, this.raidIndex, type);
+		};
+
+		this.labelElem.ondragstart = event => {
+			dragStart(event, DragType.Move);
+		};
+
+		const swapElem = this.rootElem.getElementsByClassName('player-swap')[0] as HTMLSpanElement;
+		tippy(swapElem, {
+			'content': 'Swap',
+			'allowHTML': true,
+		});
+		swapElem.ondragstart = event => {
+			dragStart(event, DragType.Swap);
+		};
+
+		const copyElem = this.rootElem.getElementsByClassName('player-copy')[0] as HTMLSpanElement;
+		tippy(copyElem, {
+			'content': 'Copy',
+			'allowHTML': true,
+		});
+		copyElem.ondragstart = event => {
+			dragStart(event, DragType.Copy);
 		};
 
 		let dragEnterCounter = 0;
@@ -220,17 +273,40 @@ export class PlayerPicker extends Component {
 				this.raidPicker.clearDragPlayer();
 				return;
 			}
-
-			this.setPlayer(this.raidPicker.currentDragPlayer);
-			this.iconElem.src = event.dataTransfer!.getData('text/plain');
+			
+			const dragType = this.raidPicker.currentDragType;
 
 			if (this.raidPicker.currentDragPlayerFromIndex != NEW_PLAYER) {
 				const fromPlayerPicker = this.raidPicker.getPlayerPicker(this.raidPicker.currentDragPlayerFromIndex);
-				fromPlayerPicker.setPlayer(null);
+
+				if (dragType == DragType.Swap) {
+					fromPlayerPicker.setPlayer(this.player);
+					fromPlayerPicker.iconElem.src = this.iconElem.src;
+				} else if (dragType == DragType.Move) {
+					fromPlayerPicker.setPlayer(null);
+				}
 			}
+
+			if (dragType == DragType.Copy) {
+				this.setPlayer(this.raidPicker.currentDragPlayer.clone());
+			} else {
+				this.setPlayer(this.raidPicker.currentDragPlayer);
+			}
+			this.iconElem.src = event.dataTransfer!.getData('text/plain');
 
 			this.raidPicker.clearDragPlayer();
 		};
+
+		const editElem = this.rootElem.getElementsByClassName('player-edit')[0] as HTMLSpanElement;
+		tippy(editElem, {
+			'content': 'Edit',
+			'allowHTML': true,
+		});
+    editElem.addEventListener('click', event => {
+			if (this.player != null) {
+				this.raidPicker.playerEditorModal.setPlayer(this.player);
+			}
+		});
 
 		this.update();
 	}
@@ -257,7 +333,43 @@ export class PlayerPicker extends Component {
 	}
 }
 
-export class NewPlayerPicker extends Component {
+class PlayerEditorModal extends Component {
+	private readonly urlTemplate: string;
+	private readonly iframeElem: HTMLIFrameElement;
+
+  constructor(parent: HTMLElement) {
+    super(parent, 'player-editor-model-root');
+
+		const url = new URL(`${window.location.protocol}//${window.location.host}/${repoName}/SPEC/index.html`);
+		url.searchParams.append('raidSim', '');
+		this.urlTemplate = url.href;
+
+    this.rootElem.innerHTML = `
+    <div class="modal fade player-editor-modal" id="playerEditorModal" tabindex="-1" role="dialog" aria-labelledby="playerEditorModalTitle" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-body">
+						<iframe class="player-editor-iframe"></iframe>
+          </div>
+        </div>
+      </div>
+    </div>
+    `;
+
+		this.iframeElem = this.rootElem.getElementsByClassName('player-editor-iframe')[0] as HTMLIFrameElement;
+	}
+
+	setPlayer(player: Player<any>) {
+		let specString = Spec[player.spec]; // Returns 'SpecBalanceDruid' for BalanceDruid.
+		specString = specString.substring('Spec'.length); // 'BalanceDruid'
+		specString = camelToSnakeCase(specString); // 'balance_druid'
+		const url = this.urlTemplate.replace('SPEC', specString);
+
+		this.iframeElem.src = url;
+	}
+}
+
+class NewPlayerPicker extends Component {
 	readonly raidPicker: RaidPicker;
 	currentFaction: Faction;
 
@@ -288,7 +400,19 @@ export class NewPlayerPicker extends Component {
 			},
 		});
 
-		const phaseSelector = makePhaseSelector(this.rootElem.getElementsByClassName('phase-selector')[0] as HTMLElement, this.raidPicker.raid.sim);
+		const phaseSelector = new EnumPicker<NewPlayerPicker>(this.rootElem.getElementsByClassName('phase-selector')[0] as HTMLElement, this, {
+			label: 'Phase',
+			labelTooltip: 'Newly-created players will start with approximate BIS gear from this phase.',
+			values: [
+				{ name: '1', value: 1 },
+				{ name: '2', value: 2 },
+			],
+			changedEvent: (picker: NewPlayerPicker) => this.raidPicker.raid.sim.phaseChangeEmitter,
+			getValue: (picker: NewPlayerPicker) => this.raidPicker.raid.sim.getPhase(),
+			setValue: (picker: NewPlayerPicker, newValue: number) => {
+				this.raidPicker.raid.sim.setPhase(newValue);
+			},
+		});
 
 		const presetsContainer = this.rootElem.getElementsByClassName('presets-container')[0] as HTMLElement;
 		getEnumValues(Class).forEach(wowClass => {
@@ -336,7 +460,7 @@ export class NewPlayerPicker extends Component {
 					newPlayer.setConsumes(matchingPreset.consumes);
 					newPlayer.setName(matchingPreset.defaultName);
 
-					this.raidPicker.setDragPlayer(newPlayer, NEW_PLAYER);
+					this.raidPicker.setDragPlayer(newPlayer, NEW_PLAYER, DragType.New);
 				};
 			});
 		});
