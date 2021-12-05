@@ -1,0 +1,169 @@
+@import "../core/shared";
+
+.raid-picker-root {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+}
+
+.parties-container {
+	display: flex;
+	flex-wrap: wrap;
+}
+
+.party-picker-root {
+	margin: 15px;
+}
+
+.party-header, .player-picker-root {
+	margin: 3px;
+}
+
+.party-header {
+}
+
+.player-picker-root {
+	height: 30px;
+	width: 200px;
+	border-width: 1px;
+	border-style: solid;
+	color: var(--main-text-color);
+}
+
+.player-picker-root.empty {
+	border-color: gray;
+}
+
+.player-picker-root.dragfrom {
+	box-shadow:
+		0 0 5px blue,
+		0 0 5px blue,
+		0 0 5px blue,
+		0 0 5px blue;
+}
+
+.player-picker-root.dragto:not(.dragfrom) {
+	box-shadow:
+		0 0 5px var(--sidebar-highlight-color),
+		0 0 5px var(--sidebar-highlight-color),
+		0 0 5px var(--sidebar-highlight-color),
+		0 0 5px var(--sidebar-highlight-color);
+}
+
+.player-label {
+	height: 100%;
+	display: inline-flex;
+	align-items: center;
+	cursor: pointer;
+}
+
+.player-icon {
+	margin: 2px;
+	height: 90%;
+}
+
+.player-picker-root.empty .player-icon {
+	opacity: 0;
+}
+
+.player-name {
+	margin: 2px;
+	text-shadow:
+		0 0 3px var(--main-secondary-color),
+		0 0 3px var(--main-secondary-color),
+		0 0 3px var(--main-secondary-color);
+}
+
+.player-picker-root.empty .player-name {
+	display: none;
+}
+
+.player-options {
+	height: 100%;
+	vertical-align: top;
+	display: inline-flex;
+	align-items: center;
+}
+
+.player-picker-root.empty .player-options {
+	opacity: 0;
+}
+
+.player-options span {
+	margin: 2px;
+	cursor: pointer;
+	text-shadow:
+		0 0 3px var(--main-secondary-color),
+		0 0 3px var(--main-secondary-color),
+		0 0 3px var(--main-secondary-color);
+}
+
+.player-options span:hover {
+	text-shadow:
+		0 0 3px var(--sidebar-highlight-color),
+		0 0 3px var(--sidebar-highlight-color),
+		0 0 3px var(--sidebar-highlight-color);
+}
+
+.player-swap {
+	color: yellow;
+}
+
+.player-copy {
+	color: blue;
+}
+
+.player-edit {
+	color: green;
+}
+
+.new-player-picker {
+	background: var(--sidebar-bg-color);
+	padding: 5px;
+}
+
+.new-player-picker-controls {
+	text-align: center;
+	margin-bottom: 15px;
+}
+
+.faction-selector .input-root {
+	white-space: nowrap;
+}
+
+.class-presets-container {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-around;
+	align-items: center;
+
+	margin: 5px;
+	padding: 5px;
+	border-radius: 10px;
+}
+
+.preset-picker-icon {
+	height: 30px;
+	cursor: pointer;
+}
+
+.player-editor-modal .modal-dialog {
+	width: initial;
+	@include vertical-horizontal-center;
+}
+
+.player-editor-modal .modal-content {
+	height: 95vh;
+	width: 95vw;
+	margin: auto;
+}
+
+.player-editor-modal .player-editor-iframe {
+	height: 100%;
+	width: 100%;
+}
+
+.player-editor-modal .modal-body {
+	height: 100%;
+	padding: 5px;
+}

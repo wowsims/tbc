@@ -17,7 +17,7 @@ import { Stats } from '/tbc/core/proto_utils/stats.js';
 import { Sim } from '/tbc/core/sim.js';
 import { DefaultTheme } from '/tbc/core/themes/default.js';
 
-import { ShadowPriest, ShadowPriest_Rotation as Rotation, PriestTalents as Talents, ShadowPriest_Options as Options, ShadowPriest_Rotation, ShadowPriest_Rotation_RotationType } from '/tbc/core/proto/priest.js';
+import { ShadowPriest, ShadowPriest_Rotation as Rotation, ShadowPriest_Options as Options, ShadowPriest_Rotation, ShadowPriest_Rotation_RotationType } from '/tbc/core/proto/priest.js';
 
 import * as IconInputs from '/tbc/core/components/icon_inputs.js';
 import * as OtherInputs from '/tbc/core/components/other_inputs.js';
@@ -75,18 +75,13 @@ const theme = new DefaultTheme<Spec.SpecShadowPriest>(document.body, {
 			[Stat.StatMP5]: 0.00,
 		}),
 		// Default consumes settings.
-		consumes: Consumes.create({
-			defaultPotion: Potions.SuperManaPotion,
-		}),
+		consumes: Presets.DefaultConsumes,
 		// Default rotation settings.
-		rotation: Rotation.create({
-			rotationType: ShadowPriest_Rotation_RotationType.Basic,
-		}),
+		rotation: Presets.DefaultRotation,
 		// Default talents.
 		talents: Presets.StandardTalents.data,
 		// Default spec-specific settings.
-		specOptions: Options.create({
-		}),
+		specOptions: Presets.DefaultOptions,
 		// Default raid/party buffs settings.
 		raidBuffs: RaidBuffs.create({
 			arcaneBrilliance: true,

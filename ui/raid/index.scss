@@ -1,6 +1,8 @@
 @import "../core/shared";
 @import "../core/themes/default";
 
+@import "./raid_picker";
+
 // Set color variables which control the site theme.
 :root {
 	--main-bg-color: Black;

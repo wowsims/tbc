@@ -11,61 +11,75 @@ export const MAX_PARTY_SIZE = 5;
 
 // Manages all the settings for a single Party.
 export class Party {
+	// Emits when a party member is added/removed/moved.
+  readonly compChangeEmitter = new TypedEvent<void>();
+
   // Emits when anything in the party changes.
   readonly changeEmitter = new TypedEvent<void>();
 
-	// Should never hold more than MAX_PARTY_SIZE elements.
-	private players: Array<Player<any>>;
+	// Should always hold exactly MAX_PARTY_SIZE elements.
+	private players: Array<Player<any> | null>;
 
-	private readonly sim: Sim;
+	readonly sim: Sim;
+
+	private readonly playerChangeListener: () => void;
 
   constructor(sim: Sim) {
 		this.sim = sim;
-		this.players = [];
+		this.players = [...Array(MAX_PARTY_SIZE).keys()].map(i => null);
+		this.playerChangeListener = () => this.changeEmitter.emit();
+
+		this.compChangeEmitter.on(() => this.changeEmitter.emit());
   }
 
 	size(): number {
-		return this.players.length;
+		return this.players.filter(player => player != null).length;
 	}
 
 	empty(): boolean {
 		return this.size() == 0;
 	}
 
-	getPlayers(): Array<Player<any>> {
+	getPlayers(): Array<Player<any> | null> {
 		// Make defensive copy.
 		return this.players.slice();
 	}
 
-	addPlayer(player: Player<any>) {
-		if (this.size() >= MAX_PARTY_SIZE) {
-			throw new Error('Cannot add player to full party');
-		}
-
-		this.players.push(player);
-		player.changeEmitter.on(() => this.changeEmitter.emit());
-		this.changeEmitter.emit();
+	getPlayer(playerIndex: number): Player<any> | null {
+		return this.players[playerIndex];
 	}
 
-	removePlayer(playerToRemove: Player<any>) {
-		const removeIndex = this.players.findIndex(partyPlayer => partyPlayer == playerToRemove);
-		if (removeIndex == -1) {
+	setPlayer(playerIndex: number, newPlayer: Player<any> | null) {
+		if (playerIndex < 0 || playerIndex >= MAX_PARTY_SIZE) {
+			throw new Error('Invalid player index: ' + playerIndex);
+		}
+
+		if (newPlayer == this.players[playerIndex]) {
 			return;
 		}
 
-		// TODO: Might need to remove the player changeEmitter callback here.
+		if (this.players[playerIndex] != null) {
+			this.players[playerIndex]!.changeEmitter.off(this.playerChangeListener);
+		}
+		if (newPlayer != null) {
+			newPlayer.changeEmitter.on(this.playerChangeListener);
+		}
 
-		this.players = this.players.splice(removeIndex, 1);
-		this.changeEmitter.emit();
+		this.players[playerIndex] = newPlayer;
+		this.compChangeEmitter.emit();
 	}
 
   // Returns JSON representing all the current values.
   toJson(): Object {
 		return this.players.map(player => {
-			return {
-				'spec': player.spec,
-				'player': player.toJson(),
-			};
+			if (player == null) {
+				return null;
+			} else {
+				return {
+					'spec': player.spec,
+					'player': player.toJson(),
+				};
+			}
 		});
   }
 
@@ -74,10 +88,14 @@ export class Party {
 		this.players = [];
 		this.changeEmitter.emit();
 
-		(obj as Array<any>).forEach(playerObj => {
-			const newPlayer = new Player(playerObj['spec'] as Spec, this.sim);
-			newPlayer.fromJson(playerObj['player']);
-			this.addPlayer(newPlayer);
+		(obj as Array<any>).forEach((playerObj, i) => {
+			if (playerObj == null) {
+				this.setPlayer(i, null);
+			} else {
+				const newPlayer = new Player(playerObj['spec'] as Spec, this.sim);
+				newPlayer.fromJson(playerObj['player']);
+				this.setPlayer(i, newPlayer);
+			}
 		});
   }
 }

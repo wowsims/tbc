@@ -16,8 +16,7 @@ import { Stats } from '/tbc/core/proto_utils/stats.js';
 import { Sim } from '/tbc/core/sim.js';
 import { DefaultTheme } from '/tbc/core/themes/default.js';
 
-import { ElementalShaman, ElementalShaman_Rotation as ElementalShamanRotation, ShamanTalents as ShamanTalents, ElementalShaman_Options as ElementalShamanOptions } from '/tbc/core/proto/shaman.js';
-import { ElementalShaman_Rotation_RotationType as RotationType } from '/tbc/core/proto/shaman.js';
+import { ElementalShaman, ElementalShaman_Rotation as ElementalShamanRotation, ElementalShaman_Options as ElementalShamanOptions } from '/tbc/core/proto/shaman.js';
 
 import * as IconInputs from '/tbc/core/components/icon_inputs.js';
 import * as OtherInputs from '/tbc/core/components/other_inputs.js';
@@ -72,24 +71,13 @@ const theme = new DefaultTheme<Spec.SpecElementalShaman>(document.body, {
 			[Stat.StatMP5]: 0.08,
 		}),
 		// Default consumes settings.
-		consumes: Consumes.create({
-			drums: Drums.DrumsOfBattle,
-			defaultPotion: Potions.SuperManaPotion,
-		}),
+		consumes: Presets.DefaultConsumes,
 		// Default rotation settings.
-		rotation: ElementalShamanRotation.create({
-			type: RotationType.Adaptive,
-		}),
+		rotation: Presets.DefaultRotation,
 		// Default talents.
 		talents: Presets.StandardTalents.data,
 		// Default spec-specific settings.
-		specOptions: ElementalShamanOptions.create({
-			waterShield: true,
-			bloodlust: true,
-			totemOfWrath: true,
-			manaSpringTotem: true,
-			wrathOfAirTotem: true,
-		}),
+		specOptions: Presets.DefaultOptions,
 		// Default raid/party buffs settings.
 		raidBuffs: RaidBuffs.create({
 			arcaneBrilliance: true,

@@ -18,6 +18,7 @@ import { Player } from '/tbc/core/player.js';
 import { getEnumValues } from '/tbc/core/utils.js';
 
 import { Component } from './component.js';
+import { makePhaseSelector } from './other_inputs.js';
 
 export class GearPicker extends Component {
   // ItemSlot is used as the index
@@ -337,16 +338,11 @@ class SelectorModal extends Component {
     <div class="selector-modal-tab-content-header">
       <button class="selector-modal-remove-button">Remove</button>
       <input class="selector-modal-search" type="text" placeholder="Search...">
-      <select class="selector-modal-phase-select">
-				<option value="1">Phase 1</option>
-				<option value="2">Phase 2</option>
-				<option value="3">Phase 3</option>
-				<option value="4">Phase 4</option>
-				<option value="5">Phase 5</option>
-			</select>
+			<div class="selector-modal-phase-selector"></div>
     </div>
     <ul class="selector-modal-list"></ul>
     `;
+		const phaseSelector = makePhaseSelector(tabContent.getElementsByClassName('selector-modal-phase-selector')[0] as HTMLElement, this.player.sim);
 
     if (label == 'Items') {
       tabElem.classList.add('active', 'in');
@@ -463,15 +459,9 @@ class SelectorModal extends Component {
     const searchInput = tabContent.getElementsByClassName('selector-modal-search')[0] as HTMLInputElement;
     searchInput.addEventListener('input', applyFilters);
 
-    const phaseSelect = tabContent.getElementsByClassName('selector-modal-phase-select')[0] as HTMLSelectElement;
-		phaseSelect.value = String(this.player.sim.getPhase());
 		tabContent.dataset.phase = String(this.player.sim.getPhase());
-		phaseSelect.addEventListener('input', event => {
-			this.player.sim.setPhase(Number(phaseSelect.value));
-		});
 		this.player.sim.phaseChangeEmitter.on(() => {
 			tabContent.dataset.phase = String(this.player.sim.getPhase());
-			phaseSelect.value = String(this.player.sim.getPhase());
 			applyFilters();
 		});
 

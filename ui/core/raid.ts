@@ -16,19 +16,12 @@ export class Raid {
 	// Should always hold exactly MAX_NUM_PARTIES elements.
 	private parties: Array<Party>;
 
-	private readonly sim: Sim;
+	readonly sim: Sim;
 
   constructor(sim: Sim) {
 		this.sim = sim;
 
-		// TODO: Use MAX_NUM_PARTIES
-		this.parties = [
-			new Party(sim),
-			new Party(sim),
-			new Party(sim),
-			new Party(sim),
-			new Party(sim),
-		];
+		this.parties = [...Array(MAX_NUM_PARTIES).keys()].map(i => new Party(sim));
 
 		this.parties.forEach(party => {
 			party.changeEmitter.on(() => this.changeEmitter.emit());

@@ -1,7 +1,7 @@
 {
   "extends": "../tsconfig-base",
   "compilerOptions": {
-    "declaration": false,
+    "composite": true,
     "outDir": "../../dist/tbc/elemental_shaman",
   },
   "include": [

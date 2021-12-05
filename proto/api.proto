@@ -173,7 +173,6 @@ message IndividualSimResult {
 
 // RPC GearList
 message GearListRequest {
-    Spec spec = 1; // Each spec has a custom gear list
 }
 message GearListResult {
     repeated Item items = 1;

@@ -1,7 +1,11 @@
+import { Consumes } from '/tbc/core/proto/common.js';
 import { EquipmentSpec } from '/tbc/core/proto/common.js';
 import { ItemSpec } from '/tbc/core/proto/common.js';
+import { Potions } from '/tbc/core/proto/common.js';
 import { Faction } from '/tbc/core/proto_utils/utils.js';
 import { Player } from '/tbc/core/player.js';
+
+import { ShadowPriest, ShadowPriest_Rotation as Rotation, ShadowPriest_Options as Options, ShadowPriest_Rotation, ShadowPriest_Rotation_RotationType } from '/tbc/core/proto/priest.js';
 
 import * as Enchants from '/tbc/core/constants/enchants.js';
 import * as Gems from '/tbc/core/constants/gems.js';
@@ -17,6 +21,20 @@ export const StandardTalents = {
 	name: 'Standard',
 	data: '500230013--503250510240103051451',
 };
+
+export const DefaultRotation = Rotation.create({
+	rotationType: ShadowPriest_Rotation_RotationType.Basic,
+});
+
+export const DefaultOptions = Options.create({
+});
+
+export const DefaultConsumes = Consumes.create({
+	defaultPotion: Potions.SuperManaPotion,
+	flaskOfPureDeath: true,
+	superiorWizardOil: true,
+	blackenedBasilisk: true,
+});
 
 export const P1_BIS = {
 	name: 'P1 BIS',
