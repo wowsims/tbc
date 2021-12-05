@@ -5,3 +5,5 @@ export declare function stDevToConf90(stDev: number, N: number): number;
 export declare function wait(ms: number): Promise<void>;
 export declare function getEnumValues<E>(enumType: any): Array<E>;
 export declare function isRightClick(event: MouseEvent): boolean;
+export declare function hexToRgba(hex: string, alpha: number): string;
+export declare function camelToSnakeCase(str: string): string;

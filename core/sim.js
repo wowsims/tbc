@@ -40,13 +40,11 @@ export class Sim extends WorkerPool {
             this.phaseChangeEmitter,
         ].forEach(emitter => emitter.on(() => this.changeEmitter.emit()));
     }
-    async init(spec) {
+    async init() {
         if (this._init)
             return;
         this._init = true;
-        const result = await this.getGearList(GearListRequest.create({
-            spec: spec,
-        }));
+        const result = await this.getGearList(GearListRequest.create());
         result.items.forEach(item => this.items[item.id] = item);
         result.enchants.forEach(enchant => this.enchants[enchant.id] = enchant);
         result.gems.forEach(gem => this.gems[gem.id] = gem);

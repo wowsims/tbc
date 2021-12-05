@@ -29,3 +29,22 @@ export function getEnumValues(enumType) {
 export function isRightClick(event) {
     return event.button == 2;
 }
+// Converts from '#ffffff' --> 'rgba(255, 255, 255, alpha)'
+export function hexToRgba(hex, alpha) {
+    if (/^#([A-Fa-f0-9]{3}){1,2}$/.test(hex)) {
+        let parts = hex.substring(1).split('');
+        if (parts.length == 3) {
+            parts = [parts[0], parts[0], parts[1], parts[1], parts[2], parts[2]];
+        }
+        const c = '0x' + parts.join('');
+        return 'rgba(' + [(c >> 16) & 255, (c >> 8) & 255, c & 255].join(',') + ',' + alpha + ')';
+    }
+    throw new Error('Invalid hex color: ' + hex);
+}
+export function camelToSnakeCase(str) {
+    let result = str.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
+    if (result.startsWith('_')) {
+        result = result.substring(1);
+    }
+    return result;
+}

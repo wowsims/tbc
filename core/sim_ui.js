@@ -74,7 +74,7 @@ export class SimUI {
         }
     }
     async init() {
-        await this.sim.init(this.player.spec);
+        await this.sim.init();
         let loadedSettings = false;
         let hash = window.location.hash;
         if (hash.length > 1) {

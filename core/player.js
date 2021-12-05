@@ -11,11 +11,13 @@ import { wait } from './utils.js';
 // Manages all the gear / consumes / other settings for a single Player.
 export class Player {
     constructor(spec, sim) {
+        this.name = '';
         this.consumes = Consumes.create();
         this.bonusStats = new Stats();
         this.gear = new Gear({});
         this.talentsString = '';
         this.epWeights = new Stats();
+        this.nameChangeEmitter = new TypedEvent();
         this.consumesChangeEmitter = new TypedEvent();
         this.bonusStatsChangeEmitter = new TypedEvent();
         this.gearChangeEmitter = new TypedEvent();
@@ -36,6 +38,7 @@ export class Player {
         this.talents = this.specTypeFunctions.talentsCreate();
         this.specOptions = this.specTypeFunctions.optionsCreate();
         [
+            this.nameChangeEmitter,
             this.consumesChangeEmitter,
             this.bonusStatsChangeEmitter,
             this.gearChangeEmitter,
@@ -91,6 +94,15 @@ export class Player {
     }
     getCurrentStats() {
         return ComputeStatsResult.clone(this.currentStats);
+    }
+    getName() {
+        return this.name;
+    }
+    setName(newName) {
+        if (newName != this.name) {
+            this.name = newName;
+            this.nameChangeEmitter.emit();
+        }
     }
     getRace() {
         return this.race;
@@ -244,6 +256,7 @@ export class Player {
     // Returns JSON representing all the current values.
     toJson() {
         return {
+            'name': this.name,
             'consumes': Consumes.toJson(this.consumes),
             'bonusStats': this.bonusStats.toJson(),
             'gear': EquipmentSpec.toJson(this.gear.asSpec()),
@@ -255,6 +268,14 @@ export class Player {
     }
     // Set all the current values, assumes obj is the same type returned by toJson().
     fromJson(obj) {
+        try {
+            if (obj['name']) {
+                this.setName(obj['name']);
+            }
+        }
+        catch (e) {
+            console.warn('Failed to parse name: ' + e);
+        }
         try {
             this.setConsumes(Consumes.fromJson(obj['consumes']));
         }
@@ -301,5 +322,10 @@ export class Player {
         catch (e) {
             console.warn('Failed to parse spec options: ' + e);
         }
+    }
+    clone() {
+        const newPlayer = new Player(this.spec, this.sim);
+        newPlayer.fromJson(this.toJson());
+        return newPlayer;
     }
 }

@@ -1,7 +1,9 @@
+import { EnumPicker } from '/tbc/core/components/enum_picker.js';
 import { Potions } from '/tbc/core/proto/common.js';
 import { Player } from '/tbc/core/player.js';
 import { Sim } from '/tbc/core/sim.js';
 import { SimUI } from '/tbc/core/sim_ui.js';
+export declare function makePhaseSelector(parent: HTMLElement, sim: Sim): EnumPicker<Sim>;
 export declare const StartingPotion: {
     type: "enum";
     cssClass: string;

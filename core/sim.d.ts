@@ -8,7 +8,6 @@ import { GemColor } from '/tbc/core/proto/common.js';
 import { ItemSlot } from '/tbc/core/proto/common.js';
 import { ItemSpec } from '/tbc/core/proto/common.js';
 import { Item } from '/tbc/core/proto/common.js';
-import { Spec } from '/tbc/core/proto/common.js';
 import { EquippedItem } from '/tbc/core/proto_utils/equipped_item.js';
 import { Gear } from '/tbc/core/proto_utils/gear.js';
 import { TypedEvent } from './typed_event.js';
@@ -29,7 +28,7 @@ export declare class Sim extends WorkerPool {
     readonly gearListEmitter: TypedEvent<void>;
     private _init;
     constructor();
-    init(spec: Spec): Promise<void>;
+    init(): Promise<void>;
     getItems(slot: ItemSlot | undefined): Array<Item>;
     getEnchants(slot: ItemSlot | undefined): Array<Enchant>;
     getGems(socketColor: GemColor | undefined): Array<Gem>;

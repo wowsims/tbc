@@ -8,7 +8,6 @@ import { Stat } from "./common";
 import { Gem } from "./common";
 import { Enchant } from "./common";
 import { Item } from "./common";
-import { Spec } from "./common";
 import { Encounter } from "./common";
 import { RaidBuffs } from "./common";
 import { PartyBuffs } from "./common";
@@ -435,10 +434,6 @@ export interface IndividualSimResult {
  * @generated from protobuf message proto.GearListRequest
  */
 export interface GearListRequest {
-    /**
-     * @generated from protobuf field: proto.Spec spec = 1;
-     */
-    spec: Spec;
 }
 /**
  * @generated from protobuf message proto.GearListResult

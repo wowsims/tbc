@@ -1,0 +1,58 @@
+import { BalanceDruid_Rotation_PrimarySpell as PrimarySpell } from '/tbc/core/proto/druid.js';
+import { Spec } from '/tbc/core/proto/common.js';
+import { Player } from '/tbc/core/player.js';
+import { SimUI } from '/tbc/core/sim_ui.js';
+export declare const SelfInnervate: {
+    id: {
+        spellId: number;
+    };
+    states: number;
+    changedEvent: (player: Player<Spec.SpecBalanceDruid>) => import("/tbc/core/typed_event").TypedEvent<void>;
+    getValue: (player: Player<Spec.SpecBalanceDruid>) => boolean;
+    setBooleanValue: (player: Player<Spec.SpecBalanceDruid>, newValue: boolean) => void;
+};
+export declare const BalanceDruidRotationConfig: {
+    inputs: ({
+        type: "enum";
+        cssClass: string;
+        getModObject: (simUI: SimUI<any>) => Player<any>;
+        config: {
+            label: string;
+            labelTooltip: string;
+            values: {
+                name: string;
+                value: PrimarySpell;
+            }[];
+            changedEvent: (player: Player<Spec.SpecBalanceDruid>) => import("/tbc/core/typed_event").TypedEvent<void>;
+            getValue: (player: Player<Spec.SpecBalanceDruid>) => PrimarySpell;
+            setValue: (player: Player<Spec.SpecBalanceDruid>, newValue: number) => void;
+            enableWhen?: undefined;
+        };
+    } | {
+        type: "boolean";
+        cssClass: string;
+        getModObject: (simUI: SimUI<any>) => Player<any>;
+        config: {
+            label: string;
+            labelTooltip: string;
+            changedEvent: (player: Player<Spec.SpecBalanceDruid>) => import("/tbc/core/typed_event").TypedEvent<void>;
+            getValue: (player: Player<Spec.SpecBalanceDruid>) => boolean;
+            setValue: (player: Player<Spec.SpecBalanceDruid>, newValue: boolean) => void;
+            enableWhen: (player: Player<Spec.SpecBalanceDruid>) => boolean;
+            values?: undefined;
+        };
+    } | {
+        type: "boolean";
+        cssClass: string;
+        getModObject: (simUI: SimUI<any>) => Player<any>;
+        config: {
+            label: string;
+            labelTooltip: string;
+            changedEvent: (player: Player<Spec.SpecBalanceDruid>) => import("/tbc/core/typed_event").TypedEvent<void>;
+            getValue: (player: Player<Spec.SpecBalanceDruid>) => boolean;
+            setValue: (player: Player<Spec.SpecBalanceDruid>, newValue: boolean) => void;
+            values?: undefined;
+            enableWhen?: undefined;
+        };
+    })[];
+};

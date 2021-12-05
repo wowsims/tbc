@@ -18,6 +18,7 @@ import { Sim } from './sim.js';
 export declare class Player<SpecType extends Spec> {
     readonly sim: Sim;
     readonly spec: Spec;
+    private name;
     private consumes;
     private bonusStats;
     private gear;
@@ -29,6 +30,7 @@ export declare class Player<SpecType extends Spec> {
     readonly specTypeFunctions: SpecTypeFunctions<SpecType>;
     private epWeights;
     private currentStats;
+    readonly nameChangeEmitter: TypedEvent<void>;
     readonly consumesChangeEmitter: TypedEvent<void>;
     readonly bonusStatsChangeEmitter: TypedEvent<void>;
     readonly gearChangeEmitter: TypedEvent<void>;
@@ -48,6 +50,8 @@ export declare class Player<SpecType extends Spec> {
     statWeights(request: StatWeightsRequest): Promise<StatWeightsResult>;
     private updateCharacterStats;
     getCurrentStats(): ComputeStatsResult;
+    getName(): string;
+    setName(newName: string): void;
     getRace(): Race;
     setRace(newRace: Race): void;
     getFaction(): Faction;
@@ -74,4 +78,5 @@ export declare class Player<SpecType extends Spec> {
     toProto(): PlayerProto;
     toJson(): Object;
     fromJson(obj: any): void;
+    clone(): Player<SpecType>;
 }

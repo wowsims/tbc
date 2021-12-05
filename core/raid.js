@@ -8,14 +8,7 @@ export class Raid {
         // Emits when anything in the raid changes.
         this.changeEmitter = new TypedEvent();
         this.sim = sim;
-        // TODO: Use MAX_NUM_PARTIES
-        this.parties = [
-            new Party(sim),
-            new Party(sim),
-            new Party(sim),
-            new Party(sim),
-            new Party(sim),
-        ];
+        this.parties = [...Array(MAX_NUM_PARTIES).keys()].map(i => new Party(sim));
         this.parties.forEach(party => {
             party.changeEmitter.on(() => this.changeEmitter.emit());
         });

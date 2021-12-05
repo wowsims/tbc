@@ -474,7 +474,7 @@
   border-radius: 4px;
 }
 
-.selector-modal-phase-select {
+.selector-modal-phase-selector {
   float: right;
 }
 
@@ -791,7 +791,7 @@
   position: absolute;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%) !important;
   width: 100%;
   text-align: center;
 }
@@ -1469,6 +1469,225 @@ td, th {
 
 .saved-talents-manager .saved-data-container, .saved-talents-manager .saved-data-create-container {
   display: inline-block;
+}
+
+:root {
+  --main-bg-color: DarkSlateGrey;
+  --main-text-color: White;
+  --main-secondary-color: Black;
+  --sidebar-bg-color: DarkKhaki;
+  --sidebar-text-color: White;
+  --sidebar-highlight-color: Blue;
+}
+
+.loader {
+  border: 16px solid #f3f3f3;
+  /* Light grey */
+  border-top: 16px solid #3498db;
+  /* Blue */
+  border-radius: 50%;
+  width: 120px;
+  height: 120px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+.socket-color-blue {
+  border: 1px solid blue;
+}
+
+.item-quality-junk {
+  color: #fff !important;
+}
+
+.item-quality-common {
+  color: white !important;
+}
+
+.item-quality-uncommon {
+  color: #1eff00 !important;
+}
+
+.item-quality-rare {
+  color: #0070dd !important;
+}
+
+.item-quality-epic {
+  color: #a335ee !important;
+}
+
+.item-quality-legendary {
+  color: #ff8000 !important;
+}
+
+.socket-color-meta {
+  border: 1px solid white;
+}
+
+.socket-color-red {
+  border: 1px solid red;
+}
+
+.socket-color-yellow {
+  border: 1px solid yellow;
+}
+
+.raid-picker-root {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.parties-container {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.party-picker-root {
+  margin: 15px;
+}
+
+.party-header, .player-picker-root {
+  margin: 3px;
+}
+
+.player-picker-root {
+  height: 30px;
+  width: 200px;
+  border-width: 1px;
+  border-style: solid;
+  color: var(--main-text-color);
+}
+
+.player-picker-root.empty {
+  border-color: gray;
+}
+
+.player-picker-root.dragfrom {
+  box-shadow: 0 0 5px blue, 0 0 5px blue, 0 0 5px blue, 0 0 5px blue;
+}
+
+.player-picker-root.dragto:not(.dragfrom) {
+  box-shadow: 0 0 5px var(--sidebar-highlight-color), 0 0 5px var(--sidebar-highlight-color), 0 0 5px var(--sidebar-highlight-color), 0 0 5px var(--sidebar-highlight-color);
+}
+
+.player-label {
+  height: 100%;
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.player-icon {
+  margin: 2px;
+  height: 90%;
+}
+
+.player-picker-root.empty .player-icon {
+  opacity: 0;
+}
+
+.player-name {
+  margin: 2px;
+  text-shadow: 0 0 3px var(--main-secondary-color), 0 0 3px var(--main-secondary-color), 0 0 3px var(--main-secondary-color);
+}
+
+.player-picker-root.empty .player-name {
+  display: none;
+}
+
+.player-options {
+  height: 100%;
+  vertical-align: top;
+  display: inline-flex;
+  align-items: center;
+}
+
+.player-picker-root.empty .player-options {
+  opacity: 0;
+}
+
+.player-options span {
+  margin: 2px;
+  cursor: pointer;
+  text-shadow: 0 0 3px var(--main-secondary-color), 0 0 3px var(--main-secondary-color), 0 0 3px var(--main-secondary-color);
+}
+
+.player-options span:hover {
+  text-shadow: 0 0 3px var(--sidebar-highlight-color), 0 0 3px var(--sidebar-highlight-color), 0 0 3px var(--sidebar-highlight-color);
+}
+
+.player-swap {
+  color: yellow;
+}
+
+.player-copy {
+  color: blue;
+}
+
+.player-edit {
+  color: green;
+}
+
+.new-player-picker {
+  background: var(--sidebar-bg-color);
+  padding: 5px;
+}
+
+.new-player-picker-controls {
+  text-align: center;
+  margin-bottom: 15px;
+}
+
+.faction-selector .input-root {
+  white-space: nowrap;
+}
+
+.class-presets-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  align-items: center;
+  margin: 5px;
+  padding: 5px;
+  border-radius: 10px;
+}
+
+.preset-picker-icon {
+  height: 30px;
+  cursor: pointer;
+}
+
+.player-editor-modal .modal-dialog {
+  width: initial;
+  margin: 0;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) !important;
+}
+
+.player-editor-modal .modal-content {
+  height: 95vh;
+  width: 95vw;
+  margin: auto;
+}
+
+.player-editor-modal .player-editor-iframe {
+  height: 100%;
+  width: 100%;
+}
+
+.player-editor-modal .modal-body {
+  height: 100%;
+  padding: 5px;
 }
 
 :root {

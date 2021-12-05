@@ -5,7 +5,7 @@ export declare const MAX_NUM_PARTIES = 5;
 export declare class Raid {
     readonly changeEmitter: TypedEvent<void>;
     private parties;
-    private readonly sim;
+    readonly sim: Sim;
     constructor(sim: Sim);
     size(): number;
     empty(): boolean;

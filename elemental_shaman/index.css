@@ -406,7 +406,7 @@
   border-radius: 4px;
 }
 
-.selector-modal-phase-select {
+.selector-modal-phase-selector {
   float: right;
 }
 
@@ -723,7 +723,7 @@
   position: absolute;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%) !important;
   width: 100%;
   text-align: center;
 }

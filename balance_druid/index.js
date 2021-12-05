@@ -1,17 +1,14 @@
 import { RaidBuffs } from '/tbc/core/proto/common.js';
 import { PartyBuffs } from '/tbc/core/proto/common.js';
 import { IndividualBuffs } from '/tbc/core/proto/common.js';
-import { Consumes } from '/tbc/core/proto/common.js';
 import { Debuffs } from '/tbc/core/proto/common.js';
-import { Potions } from '/tbc/core/proto/common.js';
 import { RaidTarget } from '/tbc/core/proto/common.js';
 import { Spec } from '/tbc/core/proto/common.js';
 import { Stat } from '/tbc/core/proto/common.js';
 import { TristateEffect } from '/tbc/core/proto/common.js';
 import { Stats } from '/tbc/core/proto_utils/stats.js';
 import { DefaultTheme } from '/tbc/core/themes/default.js';
-import { BalanceDruid_Rotation as BalanceDruidRotation, BalanceDruid_Options as BalanceDruidOptions } from '/tbc/core/proto/druid.js';
-import { BalanceDruid_Rotation_PrimarySpell as PrimarySpell } from '/tbc/core/proto/druid.js';
+import { BalanceDruid_Options as BalanceDruidOptions } from '/tbc/core/proto/druid.js';
 import * as IconInputs from '/tbc/core/components/icon_inputs.js';
 import * as OtherInputs from '/tbc/core/components/other_inputs.js';
 import * as Tooltips from '/tbc/core/constants/tooltips.js';
@@ -65,14 +62,9 @@ const theme = new DefaultTheme(document.body, {
             [Stat.StatMP5]: 0.00,
         }),
         // Default consumes settings.
-        consumes: Consumes.create({
-            defaultPotion: Potions.SuperManaPotion,
-        }),
+        consumes: Presets.DefaultConsumes,
         // Default rotation settings.
-        rotation: BalanceDruidRotation.create({
-            primarySpell: PrimarySpell.Adaptive,
-            faerieFire: true,
-        }),
+        rotation: Presets.DefaultRotation,
         // Default talents.
         talents: Presets.StandardTalents.data,
         // Default spec-specific settings.

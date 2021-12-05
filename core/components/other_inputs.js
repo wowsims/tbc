@@ -1,4 +1,21 @@
+import { EnumPicker } from '/tbc/core/components/enum_picker.js';
 import { Potions } from '/tbc/core/proto/common.js';
+export function makePhaseSelector(parent, sim) {
+    return new EnumPicker(parent, sim, {
+        values: [
+            { name: 'Phase 1', value: 1 },
+            { name: 'Phase 2', value: 2 },
+            { name: 'Phase 3', value: 3 },
+            { name: 'Phase 4', value: 4 },
+            { name: 'Phase 5', value: 5 },
+        ],
+        changedEvent: (sim) => sim.phaseChangeEmitter,
+        getValue: (sim) => sim.getPhase(),
+        setValue: (sim, newValue) => {
+            sim.setPhase(newValue);
+        },
+    });
+}
 export const StartingPotion = {
     type: 'enum',
     cssClass: 'starting-potion-picker',
