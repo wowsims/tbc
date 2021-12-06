@@ -67,7 +67,9 @@ var FullDebuffTarget = &proto.Target{
 var PlayerOptionsBasic = &proto.Player_ShadowPriest{
 	ShadowPriest: &proto.ShadowPriest{
 		Talents: StandardTalents,
-		Options: &proto.ShadowPriest_Options{},
+		Options: &proto.ShadowPriest_Options{
+			UseShadowfiend: true,
+		},
 		Rotation: &proto.ShadowPriest_Rotation{
 			RotationType: proto.ShadowPriest_Rotation_Basic,
 			// UseDevPlague: true,

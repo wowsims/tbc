@@ -27,7 +27,8 @@ type Priest struct {
 	SWPSpell        core.SimpleSpell
 	swpCastTemplate core.SimpleSpellTemplate
 
-	VTSpell        core.SimpleSpell
+	VTSpell        *core.SimpleSpell
+	VTSpellCasting *core.SimpleSpell
 	vtCastTemplate core.SimpleSpellTemplate
 
 	ShadowfiendSpell    core.SimpleSpell
@@ -82,7 +83,8 @@ func (priest *Priest) Reset(newsim *core.Simulation) {
 	priest.swdSpell = core.SimpleSpell{}
 	priest.MindFlaySpell = core.SimpleSpell{}
 	priest.SWPSpell = core.SimpleSpell{}
-	priest.VTSpell = core.SimpleSpell{}
+	priest.VTSpell = &core.SimpleSpell{}
+	priest.VTSpellCasting = &core.SimpleSpell{}
 	priest.ShadowfiendSpell = core.SimpleSpell{}
 	priest.DevouringPlagueSpell = core.SimpleSpell{}
 }

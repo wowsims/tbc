@@ -49,7 +49,7 @@ func (priest *Priest) newVTTemplate(sim *core.Simulation) core.SimpleSpellTempla
 
 func (priest *Priest) NewVT(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
 	// Initialize cast from precomputed template.
-	mf := &priest.VTSpell
+	mf := priest.VTSpellCasting
 
 	priest.vtCastTemplate.Apply(mf)
 

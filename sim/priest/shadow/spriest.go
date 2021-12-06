@@ -139,18 +139,37 @@ const (
 )
 
 func (spriest *ShadowPriest) Act(sim *core.Simulation) time.Duration {
-	// fmt.Printf("[%0.1f] (%dns) Priest Acting...\n", sim.CurrentTime.Seconds(), sim.CurrentTime)
+	// fmt.Printf("[%0.1f] Priest Acting...\n", sim.CurrentTime.Seconds())
+
+	// This if block is to handle being able to cast a VT while having another one ticking.
+	//  This will swap the casting spell if it is ticking, so the newly cast spell is now the ticking spell.
+	//  spriest.NewVT() will always use the priest.VTSpellCasting as the target.
+	if spriest.VTSpellCasting.DotInput.IsTicking(sim) {
+		if spriest.VTSpell.DotInput.TimeRemaining(sim) > 0 {
+			// If we still have VT ticking that isn't allowed... crash immediately so we can fix the logic.
+			panic("never should have two copies ticking")
+		}
+		oldVT := spriest.VTSpell
+		spriest.VTSpell = spriest.VTSpellCasting
+		spriest.VTSpellCasting = oldVT // will probably have one more tick
+	}
+
 	// Activate shared behaviors
 	target := sim.GetPrimaryTarget()
 	var spell *core.SimpleSpell
 	var wait time.Duration
 
+	// calculate how much time a VT cast would take so we can possibly start casting right before the dot is up.
+	vtCastTime := time.Duration(float64(time.Millisecond*1500) / spriest.CastSpeed())
+
 	// timeForDots := sim.Duration-sim.CurrentTime > time.Second*12
+	// TODO: stop casting dots near the end?
+
 	if spriest.UseShadowfiend &&
 		spriest.CurrentMana()/spriest.MaxMana() < 0.5 &&
 		spriest.GetRemainingCD(priest.ShadowfiendCD, sim.CurrentTime) == 0 {
 		spell = spriest.NewShadowfiend(sim, target)
-	} else if spriest.Talents.VampiricTouch && !spriest.VTSpell.DotInput.IsTicking(sim) {
+	} else if spriest.Talents.VampiricTouch && spriest.VTSpell.DotInput.TimeRemaining(sim) < vtCastTime {
 		spell = spriest.NewVT(sim, target)
 	} else if !spriest.SWPSpell.DotInput.IsTicking(sim) {
 		spell = spriest.NewSWP(sim, target)
@@ -160,7 +179,7 @@ func (spriest *ShadowPriest) Act(sim *core.Simulation) time.Duration {
 		allCDs := []time.Duration{
 			mbidx:  spriest.Character.GetRemainingCD(priest.MBCooldownID, sim.CurrentTime),
 			swdidx: spriest.Character.GetRemainingCD(priest.SWDCooldownID, sim.CurrentTime),
-			vtidx:  spriest.VTSpell.DotInput.TimeRemaining(sim),
+			vtidx:  spriest.VTSpell.DotInput.TimeRemaining(sim) - vtCastTime,
 			swpidx: spriest.SWPSpell.DotInput.TimeRemaining(sim),
 		}
 
@@ -173,6 +192,7 @@ func (spriest *ShadowPriest) Act(sim *core.Simulation) time.Duration {
 			spell = spriest.NewSWD(sim, target)
 		} else {
 			spell = spriest.NewMindFlay(sim, target)
+			// CalculateMindflay to modify how many mindflay ticks to perform.
 			wait = spriest.CalculateMindflay(sim, spell, allCDs)
 			if sim.Log != nil {
 				sim.Log("<spriest> Selected %d mindflay ticks.\n", spell.DotInput.NumberOfTicks)
@@ -180,9 +200,6 @@ func (spriest *ShadowPriest) Act(sim *core.Simulation) time.Duration {
 			if spell.DotInput.NumberOfTicks == 0 {
 				// fmt.Printf("\tcancelling cast... waiting %0.1fs\n", wait.Seconds())
 				spell.Cancel()
-				// if wait <= 1 {
-				// 	fmt.Printf("wtf")
-				// }
 				return sim.CurrentTime + core.MaxDuration(spriest.GetRemainingCD(core.GCDCooldownID, sim.CurrentTime), wait)
 			}
 			// fmt.Printf("MF TICKS: %d, wait: %d\n", spell.DotInput.NumberOfTicks, wait)
@@ -196,7 +213,7 @@ func (spriest *ShadowPriest) Act(sim *core.Simulation) time.Duration {
 
 	actionSuccessful := spell.Cast(sim)
 
-	// fmt.Printf("\tCasting: %s\n", spell.Name)
+	// fmt.Printf("\tCasting: %s, %0.2f\n", spell.Name, spell.CastTime.Seconds())
 	if !actionSuccessful {
 		regenTime := spriest.TimeUntilManaRegen(spell.GetManaCost())
 		if sim.Log != nil {
@@ -216,10 +233,11 @@ func (spriest *ShadowPriest) Act(sim *core.Simulation) time.Duration {
 // CalculateMindflay will calculate how many ticks should be cast and mutate the cast.
 func (spriest *ShadowPriest) CalculateMindflay(sim *core.Simulation, spell *core.SimpleSpell, allCDs []time.Duration) time.Duration {
 	nextCD := core.NeverExpires
+	// nextIdx := -1
 	for _, v := range allCDs {
-		// fmt.Printf("\tCD[%d] %0.1fs (%dns)\n", i, v.Seconds(), v)
 		if v < nextCD {
 			nextCD = v
+			// nextIdx = i
 		}
 	}
 	if sim.Log != nil {
@@ -230,20 +248,22 @@ func (spriest *ShadowPriest) CalculateMindflay(sim *core.Simulation, spell *core
 
 	var numTicks int
 	// Add a millisecond as fudge factor to these checks
+	//  sometimes we wait 1ns extra from waiting for a dot tick to finish.
+	//  these can cause some CDs to be slightly shorter than they should be.
 	if nextCD <= gcd {
-		numTicks = int(float64(nextCD+time.Millisecond) / float64(gcd))
+		numTicks = int((nextCD + time.Millisecond) / gcd)
 	} else {
-		numTicks = int(float64(nextCD+time.Millisecond) / float64(spell.DotInput.TickLength))
+		numTicks = int((nextCD + time.Millisecond) / spell.DotInput.TickLength)
 	}
 
 	if numTicks == 0 {
 		spell.DotInput.NumberOfTicks = 0
-		if nextCD == 0 {
+		if nextCD <= 0 {
 			nextCD = 1 // add a nanosecond to be sure any ticking dot finishes and we don't get sim stuck.
+		} else {
+			// TODO: We might still want to do a single MF1 tick...
+			//  calculate the dps gain from casting vs waiting.
 		}
-		// else if nextCD > time.Second+time.Millisecond {
-		// fmt.Printf("Long Wait")
-		// }
 		return nextCD
 	}
 
@@ -322,19 +342,22 @@ func (spriest *ShadowPriest) CalculateMindflay(sim *core.Simulation, spell *core
 	highestPossibleIdx := 0
 	highestPossibleDmg := 0.0
 	for i, v := range dpsPossible {
+		if sim.Log != nil {
+			sim.Log("\tdpsPossible[%d]: %01.f\n", i, v)
+		}
 		if v > highestPossibleDmg {
 			highestPossibleIdx = i
 			highestPossibleDmg = v
 		}
 	}
 
-	if highestPossibleIdx == 2 {
+	if highestPossibleIdx == 1 {
 		numTicks = numTicks + 1
-	} else if highestPossibleIdx == 3 {
+	} else if highestPossibleIdx == 2 {
 		numTicks = numTicks + 2
-	} else if highestPossibleIdx == 4 {
+	} else if highestPossibleIdx == 3 {
 		numTicks = numTicks + 3
-	} else if highestPossibleIdx == 1 {
+	} else if highestPossibleIdx == 0 {
 		// ind_sp = ind_sp3  // What does this mean??
 	}
 

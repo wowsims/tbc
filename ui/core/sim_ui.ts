@@ -196,7 +196,11 @@ export abstract class SimUI<SpecType extends Spec> {
 				
         const linkUrl = new URL(window.location.href);
         linkUrl.hash = encoded;
-				navigator.clipboard.writeText(linkUrl.toString());
+        if (navigator.clipboard == undefined) {
+          console.log("LINK:", linkUrl.toString());
+        } else {
+          navigator.clipboard.writeText(linkUrl.toString());
+        }
 				alert('Current settings copied to clipboard!');
 			});
 		});

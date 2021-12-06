@@ -1,6 +1,7 @@
 package core
 
 import (
+	"fmt"
 	"time"
 )
 
@@ -178,7 +179,7 @@ type SimpleSpellTemplate struct {
 
 func (template *SimpleSpellTemplate) Apply(newAction *SimpleSpell) {
 	if newAction.objectInUse {
-		panic("Damage over time spell already in use")
+		panic(fmt.Sprintf("Damage over time spell (%s) already in use", newAction.Name))
 	}
 	*newAction = template.template
 }
