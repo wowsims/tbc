@@ -12,7 +12,9 @@ import { SpecOptions } from '/tbc/core/proto_utils/utils.js';
 import { SpecRotation } from '/tbc/core/proto_utils/utils.js';
 import { specToLocalStorageKey } from '/tbc/core/proto_utils/utils.js';
 
+import { Party } from './party.js';
 import { Player } from './player.js';
+import { Raid } from './raid.js';
 import { Sim } from './sim.js';
 import { Encounter } from './encounter.js';
 import { Target } from './target.js';
@@ -55,6 +57,8 @@ export interface SimUIConfig<SpecType extends Spec> {
 export abstract class SimUI<SpecType extends Spec> {
   readonly parentElem: HTMLElement;
   readonly sim: Sim;
+  readonly raid: Raid;
+  readonly party: Party;
   readonly player: Player<SpecType>;
   readonly encounter: Encounter;
 	readonly simUiConfig: SimUIConfig<SpecType>;
@@ -67,13 +71,19 @@ export abstract class SimUI<SpecType extends Spec> {
   constructor(parentElem: HTMLElement, config: SimUIConfig<SpecType>) {
     this.parentElem = parentElem;
     this.sim = new Sim();
+
+		this.raid = new Raid(this.sim);
+		this.party = this.raid.getParty(0);
 		this.player = new Player<SpecType>(config.spec, this.sim);
+		this.raid.setPlayer(0, this.player);
+
     this.encounter = new Encounter(this.sim);
+
 		this.simUiConfig = config;
 
     [
       this.sim.changeEmitter,
-      this.player.changeEmitter,
+      this.raid.changeEmitter,
       this.encounter.changeEmitter,
     ].forEach(emitter => emitter.on(() => this.changeEmitter.emit()));
 
@@ -110,20 +120,33 @@ export abstract class SimUI<SpecType extends Spec> {
   // Returns JSON representing all the current values.
   toJson(): Object {
     return {
-      'sim': this.sim.toJson(),
-      'player': this.player.toJson(),
+      'raid': this.raid.toJson(),
       'encounter': this.encounter.toJson(),
     };
 	}
 
   // Set all the current values, assumes obj is the same type returned by toJson().
   fromJson(obj: any) {
+		// For legacy format. Do not remove this until 2022/01/05 (1 month).
 		if (obj['sim']) {
-			this.sim.fromJson(obj['sim']);
+			if (!obj['raid']) {
+				obj['raid'] = {
+					'parties': [
+						{
+							'players': [
+								obj['player'],
+							],
+							'buffs': obj['sim']['partyBuffs'],
+						},
+					],
+					'buffs': obj['sim']['raidBuffs'],
+				};
+				obj['raid']['parties'][0]['players'][0]['buffs'] = obj['sim']['individualBuffs'];
+			}
 		}
 
-		if (obj['player']) {
-			this.player.fromJson(obj['player']);
+		if (obj['raid']) {
+			this.raid.fromJson(obj['raid']);
 		}
 
 		if (obj['encounter']) {
@@ -259,8 +282,8 @@ export abstract class SimUI<SpecType extends Spec> {
   makeCurrentIndividualSimRequest(iterations: number, debug: boolean): IndividualSimRequest {
 		return IndividualSimRequest.create({
 			player: this.player.toProto(),
-			raidBuffs: this.sim.getRaidBuffs(),
-			partyBuffs: this.sim.getPartyBuffs(),
+			raidBuffs: this.raid.getBuffs(),
+			partyBuffs: this.party.getBuffs(),
 			encounter: this.encounter.toProto(),
 			simOptions: SimOptions.create({
 				iterations: iterations,

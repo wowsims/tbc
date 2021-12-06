@@ -1,6 +1,3 @@
-import { RaidBuffs } from '/tbc/core/proto/common.js';
-import { PartyBuffs } from '/tbc/core/proto/common.js';
-import { IndividualBuffs } from '/tbc/core/proto/common.js';
 import { Class } from '/tbc/core/proto/common.js';
 import { Consumes } from '/tbc/core/proto/common.js';
 import { Enchant } from '/tbc/core/proto/common.js';
@@ -18,8 +15,6 @@ import { Spec } from '/tbc/core/proto/common.js';
 import { Stat } from '/tbc/core/proto/common.js';
 import { Player } from '/tbc/core/proto/api.js';
 import { GearListRequest, GearListResult } from '/tbc/core/proto/api.js';
-import { IndividualSimRequest, IndividualSimResult } from '/tbc/core/proto/api.js';
-import { StatWeightsRequest, StatWeightsResult } from '/tbc/core/proto/api.js';
 
 import { EquippedItem } from '/tbc/core/proto_utils/equipped_item.js';
 import { Gear } from '/tbc/core/proto_utils/gear.js';
@@ -47,9 +42,6 @@ import * as OtherConstants from '/tbc/core/constants/other.js';
 // Core Sim module which deals only with api types, no UI-related stuff.
 export class Sim extends WorkerPool {
   private phase: number = OtherConstants.CURRENT_PHASE;
-  private raidBuffs: RaidBuffs = RaidBuffs.create();
-  private partyBuffs: PartyBuffs = PartyBuffs.create();
-  private individualBuffs: IndividualBuffs = IndividualBuffs.create();
 
   // Database
   private items: Record<number, Item> = {};
@@ -57,9 +49,6 @@ export class Sim extends WorkerPool {
   private gems: Record<number, Gem> = {};
 
   readonly phaseChangeEmitter = new TypedEvent<void>();
-  readonly raidBuffsChangeEmitter = new TypedEvent<void>();
-  readonly partyBuffsChangeEmitter = new TypedEvent<void>();
-  readonly individualBuffsChangeEmitter = new TypedEvent<void>();
 
   // Emits when any of the above emitters emit.
   readonly changeEmitter = new TypedEvent<void>();
@@ -73,9 +62,6 @@ export class Sim extends WorkerPool {
 		super(3);
 
     [
-      this.raidBuffsChangeEmitter,
-      this.partyBuffsChangeEmitter,
-      this.individualBuffsChangeEmitter,
       this.phaseChangeEmitter,
     ].forEach(emitter => emitter.on(() => this.changeEmitter.emit()));
   }
@@ -132,48 +118,6 @@ export class Sim extends WorkerPool {
     }
   }
 
-  getRaidBuffs(): RaidBuffs {
-    // Make a defensive copy
-    return RaidBuffs.clone(this.raidBuffs);
-  }
-
-  setRaidBuffs(newRaidBuffs: RaidBuffs) {
-    if (RaidBuffs.equals(this.raidBuffs, newRaidBuffs))
-      return;
-
-    // Make a defensive copy
-    this.raidBuffs = RaidBuffs.clone(newRaidBuffs);
-    this.raidBuffsChangeEmitter.emit();
-  }
-
-  getPartyBuffs(): PartyBuffs {
-    // Make a defensive copy
-    return PartyBuffs.clone(this.partyBuffs);
-  }
-
-  setPartyBuffs(newPartyBuffs: PartyBuffs) {
-    if (PartyBuffs.equals(this.partyBuffs, newPartyBuffs))
-      return;
-
-    // Make a defensive copy
-    this.partyBuffs = PartyBuffs.clone(newPartyBuffs);
-    this.partyBuffsChangeEmitter.emit();
-  }
-
-  getIndividualBuffs(): IndividualBuffs {
-    // Make a defensive copy
-    return IndividualBuffs.clone(this.individualBuffs);
-  }
-
-  setIndividualBuffs(newIndividualBuffs: IndividualBuffs) {
-    if (IndividualBuffs.equals(this.individualBuffs, newIndividualBuffs))
-      return;
-
-    // Make a defensive copy
-    this.individualBuffs = IndividualBuffs.clone(newIndividualBuffs);
-    this.individualBuffsChangeEmitter.emit();
-  }
-
   lookupItemSpec(itemSpec: ItemSpec): EquippedItem | null {
     const item = this.items[itemSpec.id];
     if (!item)
@@ -205,35 +149,5 @@ export class Sim extends WorkerPool {
     });
 
     return new Gear(gearMap);
-  }
-
-  // Returns JSON representing all the current values.
-  toJson(): Object {
-    return {
-      'raidBuffs': RaidBuffs.toJson(this.raidBuffs),
-      'partyBuffs': PartyBuffs.toJson(this.partyBuffs),
-      'individualBuffs': IndividualBuffs.toJson(this.individualBuffs),
-    };
-  }
-
-  // Set all the current values, assumes obj is the same type returned by toJson().
-  fromJson(obj: any) {
-		try {
-			this.setRaidBuffs(RaidBuffs.fromJson(obj['raidBuffs']));
-		} catch (e) {
-			console.warn('Failed to parse raid buffs: ' + e);
-		}
-
-		try {
-			this.setPartyBuffs(PartyBuffs.fromJson(obj['partyBuffs']));
-		} catch (e) {
-			console.warn('Failed to parse party buffs: ' + e);
-		}
-
-		try {
-			this.setIndividualBuffs(IndividualBuffs.fromJson(obj['individualBuffs']));
-		} catch (e) {
-			console.warn('Failed to parse individual buffs: ' + e);
-		}
   }
 }

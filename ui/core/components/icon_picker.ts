@@ -11,17 +11,6 @@ import { Component } from './component.js';
 // Icon-based UI for picking buffs / consumes / etc
 // ModObject is the object being modified (Sim, Player, or Target).
 export class IconPicker<ModObject> extends Component {
-  private readonly _inputs: Array<IconInputComponent<ModObject>>;
-
-  constructor(parent: HTMLElement, modObj: ModObject, inputs: Array<IconInput<ModObject>>, simUI: SimUI<any>) {
-    super(parent, 'icon-picker-root');
-
-    this._inputs = inputs.map(input => new IconInputComponent(this.rootElem, modObj, input, simUI));
-  }
-}
-
-// ModObject is the object being modified (Sim, Player, or Target).
-class IconInputComponent<ModObject> extends Component {
   private readonly _input: IconInput<ModObject>;
   private readonly _modObject: ModObject;
 

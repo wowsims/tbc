@@ -106,62 +106,56 @@ const theme = new DefaultTheme<Spec.SpecShadowPriest>(document.body, {
 	},
 
 	// IconInputs to include in the 'Self Buffs' section on the settings tab.
-	selfBuffInputs: {
-		tooltip: Tooltips.SELF_BUFFS_SECTION,
-		icons: [
-			IconInputs.DrumsOfBattleConsume,
-			IconInputs.DrumsOfRestorationConsume,
-		],
-	},
+	selfBuffInputs: [
+		IconInputs.DrumsOfBattleConsume,
+		IconInputs.DrumsOfRestorationConsume,
+	],
 	// IconInputs to include in the 'Other Buffs' section on the settings tab.
-	buffInputs: {
-		tooltip: Tooltips.OTHER_BUFFS_SECTION,
-		icons: [
-			IconInputs.ArcaneBrilliance,
-			IconInputs.DivineSpirit,
-			IconInputs.GiftOfTheWild,
-			IconInputs.BlessingOfKings,
-			IconInputs.BlessingOfWisdom,
-			IconInputs.DrumsOfBattleBuff,
-			IconInputs.DrumsOfRestorationBuff,
-			IconInputs.Bloodlust,
-			IconInputs.WrathOfAirTotem,
-			IconInputs.TotemOfWrath,
-			IconInputs.ManaSpringTotem,
-			IconInputs.DraeneiRacialCaster,
-			IconInputs.EyeOfTheNight,
-			IconInputs.ChainOfTheTwilightOwl,
-			IconInputs.JadePendantOfBlasting,
-			IconInputs.AtieshWarlock,
-			IconInputs.AtieshMage,
-		],
-	},
+	raidBuffInputs: [
+		IconInputs.ArcaneBrilliance,
+		IconInputs.DivineSpirit,
+		IconInputs.GiftOfTheWild,
+	],
+	partyBuffInputs: [
+		IconInputs.DrumsOfBattleBuff,
+		IconInputs.DrumsOfRestorationBuff,
+		IconInputs.Bloodlust,
+		IconInputs.WrathOfAirTotem,
+		IconInputs.TotemOfWrath,
+		IconInputs.ManaSpringTotem,
+		IconInputs.DraeneiRacialCaster,
+		IconInputs.EyeOfTheNight,
+		IconInputs.ChainOfTheTwilightOwl,
+		IconInputs.JadePendantOfBlasting,
+		IconInputs.AtieshWarlock,
+		IconInputs.AtieshMage,
+	],
+	playerBuffInputs: [
+		IconInputs.BlessingOfKings,
+		IconInputs.BlessingOfWisdom,
+	],
 	// IconInputs to include in the 'Debuffs' section on the settings tab.
-	debuffInputs: {
-		icons: [
-			IconInputs.JudgementOfWisdom,
-			IconInputs.ImprovedSealOfTheCrusader,
-			IconInputs.CurseOfElements,
-		],
-	},
+	debuffInputs: [
+		IconInputs.JudgementOfWisdom,
+		IconInputs.ImprovedSealOfTheCrusader,
+		IconInputs.CurseOfElements,
+	],
 	// IconInputs to include in the 'Consumes' section on the settings tab.
-	consumeInputs: {
-		icons: [
-			IconInputs.DefaultSuperManaPotion,
-			IconInputs.DefaultDestructionPotion,
-			IconInputs.DarkRune,
-			IconInputs.FlaskOfPureDeath,
-			IconInputs.FlaskOfSupremePower,
-			IconInputs.AdeptsElixir,
-			IconInputs.ElixirOfMajorMageblood,
-			IconInputs.ElixirOfDraenicWisdom,
-			IconInputs.BrilliantWizardOil,
-			IconInputs.SuperiorWizardOil,
-			IconInputs.BlackenedBasilisk,
-			IconInputs.SkullfishSoup,
-			IconInputs.KreegsStoutBeatdown,
-		],
-	},
+	consumeInputs: [
+		IconInputs.DefaultSuperManaPotion,
+		IconInputs.DefaultDestructionPotion,
+		IconInputs.DarkRune,
+		IconInputs.FlaskOfPureDeath,
+		IconInputs.FlaskOfSupremePower,
+		IconInputs.AdeptsElixir,
+		IconInputs.ElixirOfMajorMageblood,
+		IconInputs.ElixirOfDraenicWisdom,
+		IconInputs.BrilliantWizardOil,
+		IconInputs.SuperiorWizardOil,
+		IconInputs.BlackenedBasilisk,
+		IconInputs.SkullfishSoup,
+		IconInputs.KreegsStoutBeatdown,
+	],
 	// Inputs to include in the 'Rotation' section on the settings tab.
 	rotationInputs: ShadowPriestInputs.ShadowPriestRotationConfig,
 	// Inputs to include in the 'Other' section on the settings tab.

@@ -1,5 +1,7 @@
 import { Encounter } from '/tbc/core/encounter.js';
+import { Party } from '/tbc/core/party.js';
 import { Player } from '/tbc/core/player.js';
+import { Raid } from '/tbc/core/raid.js';
 import { Sim } from '/tbc/core/sim.js';
 import { Target } from '/tbc/core/target.js';
 import { Actions } from '/tbc/core/components/actions.js';
@@ -38,14 +40,10 @@ import { equalsOrBothNull } from '/tbc/core/utils.js';
 
 import { SimUI, SimUIConfig } from '/tbc/core/sim_ui.js';
 
+import * as Tooltips from '/tbc/core/constants/tooltips.js';
+
 declare var Muuri: any;
 declare var tippy: any;
-
-
-export interface IconSection<ModObject> {
-	tooltip?: string,
-	icons: Array<IconInput<ModObject>>,
-}
 
 export interface InputSection {
 	tooltip?: string,
@@ -74,10 +72,12 @@ export interface DefaultThemeConfig<SpecType extends Spec> extends SimUIConfig<S
   epReferenceStat: Stat;
   displayStats: Array<Stat>;
 
-	selfBuffInputs: IconSection<Player<any>>;
-	buffInputs: IconSection<Sim>;
-	debuffInputs: IconSection<Target>;
-	consumeInputs: IconSection<Player<any>>;
+	selfBuffInputs: Array<IconInput<Player<any>>>,
+	raidBuffInputs: Array<IconInput<Raid>>,
+	partyBuffInputs: Array<IconInput<Party>>,
+	playerBuffInputs: Array<IconInput<Player<any>>>,
+	debuffInputs: Array<IconInput<Target>>;
+	consumeInputs: Array<IconInput<Player<any>>>;
 	rotationInputs: InputSection;
 	otherInputs?: InputSection;
   additionalSections?: Record<string, InputSection>;
@@ -145,24 +145,44 @@ export class DefaultTheme<SpecType extends Spec> extends SimUI<SpecType> {
 
     const settingsTab = document.getElementsByClassName('settings-inputs')[0] as HTMLElement;
 
-		const configureIconSection = <ModObject extends unknown>(sectionElem: HTMLElement, sectionConfig: IconSection<ModObject>, modObject: ModObject) => {
-			if (sectionConfig.tooltip) {
+		const configureIconSection = (sectionElem: HTMLElement, iconPickers: Array<IconPicker<any>>, tooltip?: string) => {
+			if (tooltip) {
 				tippy(sectionElem, {
-					'content': sectionConfig.tooltip,
+					'content': tooltip,
 					'allowHTML': true,
 				});
 			}
 
-			if (sectionConfig.icons.length == 0) {
+			if (iconPickers.length == 0) {
 				sectionElem.style.display = 'none';
 			}
-
-      const iconPicker = new IconPicker(sectionElem, modObject, sectionConfig.icons, this);
 		};
-    configureIconSection(this.parentElem.getElementsByClassName('self-buffs-section')[0] as HTMLElement, config.selfBuffInputs, this.player);
-    configureIconSection(this.parentElem.getElementsByClassName('buffs-section')[0] as HTMLElement, config.buffInputs, this.sim);
-    configureIconSection(this.parentElem.getElementsByClassName('debuffs-section')[0] as HTMLElement, config.debuffInputs, this.encounter.primaryTarget);
-    configureIconSection(this.parentElem.getElementsByClassName('consumes-section')[0] as HTMLElement, config.consumeInputs, this.player);
+
+		const selfBuffsSection = this.parentElem.getElementsByClassName('self-buffs-section')[0] as HTMLElement;
+    configureIconSection(
+				selfBuffsSection,
+				config.selfBuffInputs.map(iconInput => new IconPicker(selfBuffsSection, this.player, iconInput, this)),
+				Tooltips.SELF_BUFFS_SECTION);
+
+		const buffsSection = this.parentElem.getElementsByClassName('buffs-section')[0] as HTMLElement;
+    configureIconSection(
+				buffsSection,
+				[
+					config.raidBuffInputs.map(iconInput => new IconPicker(buffsSection, this.raid, iconInput, this)),
+					config.playerBuffInputs.map(iconInput => new IconPicker(buffsSection, this.player, iconInput, this)),
+					config.partyBuffInputs.map(iconInput => new IconPicker(buffsSection, this.party, iconInput, this)),
+				].flat(),
+				Tooltips.OTHER_BUFFS_SECTION);
+
+		const debuffsSection = this.parentElem.getElementsByClassName('debuffs-section')[0] as HTMLElement;
+    configureIconSection(
+				debuffsSection,
+				config.debuffInputs.map(iconInput => new IconPicker(debuffsSection, this.encounter.primaryTarget, iconInput, this)));
+
+		const consumesSection = this.parentElem.getElementsByClassName('consumes-section')[0] as HTMLElement;
+    configureIconSection(
+				consumesSection,
+				config.consumeInputs.map(iconInput => new IconPicker(consumesSection, this.player, iconInput, this)));
 
 		const configureInputSection = (sectionElem: HTMLElement, sectionConfig: InputSection) => {
 			if (sectionConfig.tooltip) {
@@ -288,24 +308,24 @@ export class DefaultTheme<SpecType extends Spec> extends SimUI<SpecType> {
 			storageKey: this.getSavedSettingsStorageKey(),
       getData: (simUI: SimUI<any>) => {
         return {
-          raidBuffs: simUI.sim.getRaidBuffs(),
-          partyBuffs: simUI.sim.getPartyBuffs(),
-          individualBuffs: simUI.sim.getIndividualBuffs(),
+          raidBuffs: simUI.raid.getBuffs(),
+          partyBuffs: simUI.party.getBuffs(),
+          individualBuffs: simUI.player.getBuffs(),
           consumes: simUI.player.getConsumes(),
           race: simUI.player.getRace(),
         };
       },
       setData: (simUI: SimUI<any>, newSettings: Settings) => {
-        simUI.sim.setRaidBuffs(newSettings.raidBuffs);
-        simUI.sim.setPartyBuffs(newSettings.partyBuffs);
-        simUI.sim.setIndividualBuffs(newSettings.individualBuffs);
+        simUI.raid.setBuffs(newSettings.raidBuffs);
+        simUI.party.setBuffs(newSettings.partyBuffs);
+        simUI.player.setBuffs(newSettings.individualBuffs);
         simUI.player.setConsumes(newSettings.consumes);
         simUI.player.setRace(newSettings.race);
       },
       changeEmitters: [
-				this.sim.raidBuffsChangeEmitter,
-				this.sim.partyBuffsChangeEmitter,
-				this.sim.individualBuffsChangeEmitter,
+				this.raid.buffsChangeEmitter,
+				this.party.buffsChangeEmitter,
+				this.player.buffsChangeEmitter,
 				this.player.consumesChangeEmitter,
 				this.player.raceChangeEmitter,
 			],
