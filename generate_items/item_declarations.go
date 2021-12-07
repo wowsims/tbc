@@ -66,6 +66,7 @@ var ItemDeclarations = []ItemDeclaration{
 	{ /** Boots of Oceanic Fury */ ID: 32242, Categories: []proto.ItemCategory{CasterCategory}},
 	{ /** Boots of the Infernal Coven */ ID: 28670, Categories: []proto.ItemCategory{CasterCategory}},
 	{ /** Boots of the Nexus Warden */ ID: 30519, Categories: []proto.ItemCategory{CasterCategory}},
+	{ /** Boots of the Shifting Nightmare */ ID: 30050, Categories: []proto.ItemCategory{CasterCategory}},
 	{ /** Botanist's Gloves of Growth */ ID: 32328, Categories: []proto.ItemCategory{CasterCategory}},
 	{ /** Bracers of Absolution */ ID: 34434, Categories: []proto.ItemCategory{CasterCategory}},
 	{ /** Bracers of Havok */ ID: 24250, Categories: []proto.ItemCategory{CasterCategory}},
