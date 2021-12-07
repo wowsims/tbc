@@ -219,6 +219,8 @@ type AuraMetrics struct {
 func (auraMetrics *AuraMetrics) doneIteration() {
 	auraMetrics.uptimeSum += auraMetrics.Uptime
 	auraMetrics.uptimeSumSquared += auraMetrics.Uptime * auraMetrics.Uptime
+
+	auraMetrics.Uptime = 0
 }
 
 func (auraMetrics *AuraMetrics) ToProto(numIterations int32) *proto.AuraMetrics {

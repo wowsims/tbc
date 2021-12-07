@@ -63,6 +63,9 @@ export class BuffAuraMetrics extends ResultComponent {
 
 				const iconElem = nameCellElem.getElementsByClassName('aura-metrics-action-icon')[0] as HTMLAnchorElement;
 				iconElem.style.backgroundImage = `url('${auraMetric.iconUrl}')`;
+				if (!('otherId' in auraMetric.actionId.id)) {
+					setWowheadHref(iconElem, auraMetric.actionId.id);
+				}
 
 				const addCell = (value: string | number): HTMLElement => {
 					const cellElem = document.createElement('td');
@@ -71,7 +74,7 @@ export class BuffAuraMetrics extends ResultComponent {
 					return cellElem;
 				};
 
-				addCell((auraMetric.uptimeSecondsAvg / iterations / duration * 100).toFixed(2) + '%'); // Uptime
+				addCell((auraMetric.uptimeSecondsAvg / duration * 100).toFixed(2) + '%'); // Uptime
 			});
 
 			$(this.tableElem).trigger('update');
@@ -134,6 +137,9 @@ export class DebuffAuraMetrics extends ResultComponent {
 
 				const iconElem = nameCellElem.getElementsByClassName('aura-metrics-action-icon')[0] as HTMLAnchorElement;
 				iconElem.style.backgroundImage = `url('${auraMetric.iconUrl}')`;
+				if (!('otherId' in auraMetric.actionId.id)) {
+					setWowheadHref(iconElem, auraMetric.actionId.id);
+				}
 
 				const addCell = (value: string | number): HTMLElement => {
 					const cellElem = document.createElement('td');
@@ -142,7 +148,7 @@ export class DebuffAuraMetrics extends ResultComponent {
 					return cellElem;
 				};
 
-				addCell((auraMetric.uptimeSecondsAvg / iterations / duration * 100).toFixed(2) + '%'); // Uptime
+				addCell((auraMetric.uptimeSecondsAvg / duration * 100).toFixed(2) + '%'); // Uptime
 			});
 
 			$(this.tableElem).trigger('update');
