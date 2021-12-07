@@ -63,23 +63,35 @@ var StatsToTest = []proto.Stat{
 var ReferenceStat = proto.Stat_StatSpellPower
 
 func TestCalcStatWeight(t *testing.T) {
-	isr := core.NewIndividualSimRequest(core.IndividualSimInputs{
+	//rsr := &proto.RaidSimRequest{
+	//	Raid: SinglePlayerRaidProto(
+	//			FullPartyBuffs,
+	//			FullRaidBuffs),
+	//	Encounter:  request.Encounter,
+	//}
+
+	swr := &proto.StatWeightsRequest{
 		Player: &proto.Player{
 			Race:      proto.Race_RaceTroll10,
 			Class:     proto.Class_ClassShaman,
 			Equipment: P1Gear,
 			Consumes:  FullConsumes,
 			Spec:      PlayerOptionsAdaptive,
+			Buffs:     FullIndividualBuffs,
 		},
+		RaidBuffs:  FullRaidBuffs,
+		PartyBuffs: FullPartyBuffs,
+		Encounter: &proto.Encounter{
+			Targets: []*proto.Target{
+				FullDebuffTarget,
+			},
+		},
+		StatsToWeigh:    StatsToTest,
+		EpReferenceStat: ReferenceStat,
+		SimOptions:      core.DefaultSimTestOptions,
+	}
 
-		RaidBuffs:       FullRaidBuffs,
-		PartyBuffs:      FullPartyBuffs,
-		IndividualBuffs: FullIndividualBuffs,
-
-		Target: FullDebuffTarget,
-	})
-
-	core.StatWeightsTest("p1Full", t, isr, StatsToTest, ReferenceStat, stats.Stats{
+	core.StatWeightsTest("p1Full", t, swr, stats.Stats{
 		stats.Intellect:  0.182,
 		stats.SpellPower: 0.699,
 		stats.SpellHit:   0.156,

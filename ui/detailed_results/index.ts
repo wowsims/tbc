@@ -1,4 +1,4 @@
-import { IndividualSimData } from '/tbc/core/components/detailed_results.js';
+import { RaidSimData } from '/tbc/core/components/detailed_results.js';
 import { TypedEvent } from '/tbc/core/typed_event.js';
 
 import { CastMetrics } from './cast_metrics.js';
@@ -77,10 +77,10 @@ const layoutHTML = `
 </div>
 `;
 
-const resultsEmitter = new TypedEvent<IndividualSimData | null>();
+const resultsEmitter = new TypedEvent<RaidSimData | null>();
 window.addEventListener('message', event => {
 	// Null indicates pending results
-	const data: IndividualSimData | null = event.data;
+	const data: RaidSimData | null = event.data;
 
 	resultsEmitter.emit(event.data);
 });

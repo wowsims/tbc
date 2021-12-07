@@ -1,6 +1,8 @@
+import { Raid as RaidProto } from '/tbc/core/proto/api.js';
+import { RaidBuffs } from '/tbc/core/proto/common.js';
 import { Spec } from '/tbc/core/proto/common.js';
 
-import { Party } from './party.js';
+import { Party, MAX_PARTY_SIZE } from './party.js';
 import { Player } from './player.js';
 import { TypedEvent } from './typed_event.js';
 import { Sim } from './sim.js';
@@ -10,6 +12,13 @@ export const MAX_NUM_PARTIES = 5;
 
 // Manages all the settings for a single Raid.
 export class Raid {
+  private buffs: RaidBuffs = RaidBuffs.create();
+
+	// Emits when a raid member is added/removed/moved.
+  readonly compChangeEmitter = new TypedEvent<void>();
+
+  readonly buffsChangeEmitter = new TypedEvent<void>();
+
   // Emits when anything in the raid changes.
   readonly changeEmitter = new TypedEvent<void>();
 
@@ -21,18 +30,24 @@ export class Raid {
   constructor(sim: Sim) {
 		this.sim = sim;
 
-		this.parties = [...Array(MAX_NUM_PARTIES).keys()].map(i => new Party(sim));
-
-		this.parties.forEach(party => {
-			party.changeEmitter.on(() => this.changeEmitter.emit());
+		this.parties = [...Array(MAX_NUM_PARTIES).keys()].map(i => {
+			const newParty = new Party(this, sim);
+			newParty.compChangeEmitter.on(() => this.compChangeEmitter.emit());
+			newParty.changeEmitter.on(() => this.changeEmitter.emit());
+			return newParty;
 		});
+
+    [
+      this.compChangeEmitter,
+      this.buffsChangeEmitter,
+    ].forEach(emitter => emitter.on(() => this.changeEmitter.emit()));
   }
 
 	size(): number {
 		return sum(this.parties.map(party => party.size()));
 	}
 
-	empty(): boolean {
+	isEmpty(): boolean {
 		return this.size() == 0;
 	}
 
@@ -41,28 +56,71 @@ export class Raid {
 		return this.parties.slice();
 	}
 
-	//getPlayers(): Array<Player<any>> {
-	//	// TODO: Flatten
-	//	return this.parties.map(party => party.getPlayers());
-	//}
+	getParty(index: number): Party {
+		return this.parties[index];
+	}
+
+	getPlayers(): Array<Player<any> | null> {
+		return this.parties.map(party => party.getPlayers()).flat();
+	}
+
+	getPlayer(index: number): Player<any> | null {
+		const party = this.parties[Math.floor(index / MAX_PARTY_SIZE)];
+		return party.getPlayer(index % MAX_PARTY_SIZE);
+	}
+
+	setPlayer(index: number, newPlayer: Player<any> | null) {
+		const party = this.parties[Math.floor(index / MAX_PARTY_SIZE)];
+		party.setPlayer(index % MAX_PARTY_SIZE, newPlayer);
+	}
+
+  getBuffs(): RaidBuffs {
+    // Make a defensive copy
+    return RaidBuffs.clone(this.buffs);
+  }
+
+  setBuffs(newBuffs: RaidBuffs) {
+    if (RaidBuffs.equals(this.buffs, newBuffs))
+      return;
+
+    // Make a defensive copy
+    this.buffs = RaidBuffs.clone(newBuffs);
+    this.buffsChangeEmitter.emit();
+  }
+
+	toProto(): RaidProto {
+		return RaidProto.create({
+			parties: this.parties.filter(party => !party.isEmpty()).map(party => party.toProto()),
+			buffs: this.buffs,
+		});
+	}
 
   // Returns JSON representing all the current values.
   toJson(): Object {
-		return this.parties.map(party => party.toJson());
+		return {
+			'parties': this.parties.map(party => party.toJson()),
+      'buffs': RaidBuffs.toJson(this.buffs),
+		};
   }
 
   // Set all the current values, assumes obj is the same type returned by toJson().
   fromJson(obj: any) {
-		this.parties = (obj as Array<any>).map(partyObj => {
-			const newParty = new Party(this.sim);
-			newParty.fromJson(partyObj);
-			return newParty;
-		});
+		try {
+			this.setBuffs(RaidBuffs.fromJson(obj['buffs']));
+		} catch (e) {
+			console.warn('Failed to parse raid buffs: ' + e);
+		}
 
-		this.parties.forEach(party => {
-			party.changeEmitter.on(() => this.changeEmitter.emit());
-		});
+		if (obj['parties']) {
+			for (let i = 0; i < MAX_NUM_PARTIES; i++) {
+				const partyObj = obj['parties'][i];
+				if (!partyObj) {
+					this.parties[i].clear();
+					continue;
+				}
 
-		this.changeEmitter.emit();
+				this.parties[i].fromJson(partyObj);
+			}
+		}
   }
 }

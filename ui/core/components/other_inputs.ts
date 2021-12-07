@@ -65,15 +65,15 @@ export const NumStartingPotions = {
 export const ShadowPriestDPS = {
   type: 'number' as const,
   cssClass: 'shadow-priest-dps-picker',
-	getModObject: (simUI: SimUI<any>) => simUI.sim,
+	getModObject: (simUI: SimUI<any>) => simUI.player,
   config: {
     label: 'Shadow Priest DPS',
-    changedEvent: (sim: Sim) => sim.individualBuffsChangeEmitter,
-    getValue: (sim: Sim) => sim.getIndividualBuffs().shadowPriestDps,
-    setValue: (sim: Sim, newValue: number) => {
-      const individualBuffs = sim.getIndividualBuffs();
-      individualBuffs.shadowPriestDps = newValue;
-      sim.setIndividualBuffs(individualBuffs);
+    changedEvent: (player: Player<any>) => player.buffsChangeEmitter,
+    getValue: (player: Player<any>) => player.getBuffs().shadowPriestDps,
+    setValue: (player: Player<any>, newValue: number) => {
+      const buffs = player.getBuffs();
+      buffs.shadowPriestDps = newValue;
+      player.setBuffs(buffs);
     },
   },
 };

@@ -1,4 +1,4 @@
-import { IndividualSimRequest, IndividualSimResult } from '/tbc/core/proto/api.js';
+import { RaidSimRequest, RaidSimResult } from '/tbc/core/proto/api.js';
 import { setWowheadHref } from '/tbc/core/resources.js';
 import { sum } from '/tbc/core/utils.js';
 
@@ -43,13 +43,13 @@ export class BuffAuraMetrics extends ResultComponent {
 		$(this.tableElem).tablesorter({ sortList: [[1, 1]] });
 	}
 
-	onSimResult(request: IndividualSimRequest, result: IndividualSimResult) {
+	onSimResult(request: RaidSimRequest, result: RaidSimResult) {
 		this.bodyElem.textContent = '';
 
 		const iterations = request.simOptions!.iterations;
 		const duration = request.encounter?.duration || 1;
 
-		parseAuraMetrics(result.playerMetrics!.auras).then(auraMetrics => {
+		parseAuraMetrics(result.raidMetrics!.parties[0].players[0].auras).then(auraMetrics => {
 			auraMetrics.forEach(auraMetric => {
 				const rowElem = document.createElement('tr');
 				this.bodyElem.appendChild(rowElem);
@@ -114,7 +114,7 @@ export class DebuffAuraMetrics extends ResultComponent {
 		$(this.tableElem).tablesorter({ sortList: [[1, 1]] });
 	}
 
-	onSimResult(request: IndividualSimRequest, result: IndividualSimResult) {
+	onSimResult(request: RaidSimRequest, result: RaidSimResult) {
 		this.bodyElem.textContent = '';
 
 		const iterations = request.simOptions!.iterations;

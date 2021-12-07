@@ -17,24 +17,63 @@ func NewActionKey(actionID ActionID) ActionKey {
 	return ActionKey(float64((int32(actionID.OtherID) + actionID.SpellID - actionID.ItemID)) + (float64(actionID.Tag) / 256))
 }
 
+type DpsMetrics struct {
+	// Values for the current iteration. These are cleared after each iteration.
+	TotalDamage float64
+
+	// Aggregate values. These are updated after each iteration.
+	sum        float64
+	sumSquared float64
+	max        float64
+	hist       map[int32]int32 // rounded DPS to count
+}
+
+// This should be called when a Sim iteration is complete.
+func (dpsMetrics *DpsMetrics) doneIteration(encounterDurationSeconds float64) {
+	dps := dpsMetrics.TotalDamage / encounterDurationSeconds
+
+	dpsMetrics.sum += dps
+	dpsMetrics.sumSquared += dps * dps
+	dpsMetrics.max = MaxFloat(dpsMetrics.max, dps)
+
+	dpsRounded := int32(math.Round(dps/10) * 10)
+	dpsMetrics.hist[dpsRounded]++
+
+	// Clear the iteration metrics
+	dpsMetrics.TotalDamage = 0
+}
+
+func (dpsMetrics *DpsMetrics) ToProto(numIterations int32) *proto.DpsMetrics {
+	dpsAvg := dpsMetrics.sum / float64(numIterations)
+
+	return &proto.DpsMetrics{
+		Avg:   dpsAvg,
+		Stdev: math.Sqrt((dpsMetrics.sumSquared / float64(numIterations)) - (dpsAvg * dpsAvg)),
+		Max:   dpsMetrics.max,
+		Hist:  dpsMetrics.hist,
+	}
+}
+
+func NewDpsMetrics() DpsMetrics {
+	return DpsMetrics{
+		hist: make(map[int32]int32),
+	}
+}
+
 type CharacterMetrics struct {
+	DpsMetrics
 	CharacterIterationMetrics
 
 	// Aggregate values. These are updated after each iteration.
-	dpsSum        float64
-	dpsSumSquared float64
-	dpsMax        float64
-	dpsHist       map[int32]int32 // rounded DPS to count
-	numOom        int32
-	oomAtSum      float64
-	dpsAtOomSum   float64
-	actions       map[ActionKey]ActionMetrics
+	numOom      int32
+	oomAtSum    float64
+	dpsAtOomSum float64
+	actions     map[ActionKey]ActionMetrics
 }
 
 // Metrics for the current iteration, for 1 agent. Keep this as a separate
 // struct so its easy to clear.
 type CharacterIterationMetrics struct {
-	TotalDamage float64
 	ManaSpent   float64
 	DamageAtOOM float64
 	OOMAt       time.Duration
@@ -65,8 +104,8 @@ func (actionMetrics *ActionMetrics) ToProto() *proto.ActionMetrics {
 
 func NewCharacterMetrics() CharacterMetrics {
 	return CharacterMetrics{
-		dpsHist: make(map[int32]int32),
-		actions: make(map[ActionKey]ActionMetrics),
+		DpsMetrics: NewDpsMetrics(),
+		actions:    make(map[ActionKey]ActionMetrics),
 	}
 }
 
@@ -135,15 +174,7 @@ func (characterMetrics *CharacterMetrics) MarkOOM(sim *Simulation, character *Ch
 
 // This should be called when a Sim iteration is complete.
 func (characterMetrics *CharacterMetrics) doneIteration(encounterDurationSeconds float64) {
-	dps := characterMetrics.TotalDamage / encounterDurationSeconds
-	// log.Printf("total: %0.1f, dur: %0.1f, dps: %0.1f", metrics.TotalDamage, encounterDurationSeconds, dps)
-
-	characterMetrics.dpsSum += dps
-	characterMetrics.dpsSumSquared += dps * dps
-	characterMetrics.dpsMax = MaxFloat(characterMetrics.dpsMax, dps)
-
-	dpsRounded := int32(math.Round(dps/10) * 10)
-	characterMetrics.dpsHist[dpsRounded]++
+	characterMetrics.DpsMetrics.doneIteration(encounterDurationSeconds)
 
 	if characterMetrics.OOMAt > 0 {
 		characterMetrics.numOom++
@@ -156,14 +187,8 @@ func (characterMetrics *CharacterMetrics) doneIteration(encounterDurationSeconds
 }
 
 func (characterMetrics *CharacterMetrics) ToProto(numIterations int32) *proto.PlayerMetrics {
-	dpsAvg := characterMetrics.dpsSum / float64(numIterations)
-
 	protoMetrics := &proto.PlayerMetrics{
-		DpsAvg:   dpsAvg,
-		DpsStdev: math.Sqrt((characterMetrics.dpsSumSquared / float64(numIterations)) - (dpsAvg * dpsAvg)),
-		DpsMax:   characterMetrics.dpsMax,
-		DpsHist:  characterMetrics.dpsHist,
-
+		Dps:    characterMetrics.DpsMetrics.ToProto(numIterations),
 		NumOom: characterMetrics.numOom,
 	}
 

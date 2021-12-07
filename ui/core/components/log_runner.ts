@@ -1,4 +1,4 @@
-import { IndividualSimRequest } from '/tbc/core/proto/api.js';
+import { RaidSimRequest } from '/tbc/core/proto/api.js';
 import { Stat } from '/tbc/core/proto/common.js';
 import { StatWeightsRequest } from '/tbc/core/proto/api.js';
 import { SimUI } from '/tbc/core/sim_ui.js';
@@ -25,11 +25,11 @@ export class LogRunner extends Component {
 		this.rootElem.appendChild(logsDiv);
 
     simButton.addEventListener('click', async () => {
-      const simRequest = simUI.makeCurrentIndividualSimRequest(1, true);
+      const simRequest = simUI.makeRaidSimRequest(1, true);
 
       results.setPending();
       detailedResults.setPending();
-      const result = await simUI.sim.individualSim(simRequest);
+      const result = await simUI.sim.raidSim(simRequest);
       results.setSimResult(simRequest, result);
       detailedResults.setSimResult(simRequest, result);
 

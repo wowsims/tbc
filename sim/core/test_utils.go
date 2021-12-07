@@ -6,10 +6,17 @@ import (
 
 	"github.com/wowsims/tbc/sim/core/proto"
 	"github.com/wowsims/tbc/sim/core/stats"
+	googleProto "google.golang.org/protobuf/proto"
 )
 
 const ShortDuration = 60
 const LongDuration = 300
+
+var DefaultSimTestOptions = &proto.SimOptions{
+	Iterations: 1,
+	IsTest:     true,
+	Debug:      false,
+}
 
 type IndividualSimInputs struct {
 	Player          *proto.Player
@@ -70,15 +77,12 @@ func CharacterStatsTest(label string, t *testing.T, isr *proto.IndividualSimRequ
 	}
 }
 
-func StatWeightsTest(label string, t *testing.T, isr *proto.IndividualSimRequest, statsToTest []proto.Stat, referenceStat proto.Stat, expectedStatWeights stats.Stats) {
-	isr.Encounter.Duration = LongDuration
-	isr.SimOptions.Iterations = 5000
+func StatWeightsTest(label string, t *testing.T, _swr *proto.StatWeightsRequest, expectedStatWeights stats.Stats) {
+	// Make a copy so we can safely change fields.
+	swr := googleProto.Clone(_swr).(*proto.StatWeightsRequest)
 
-	swr := &proto.StatWeightsRequest{
-		Options:         isr,
-		StatsToWeigh:    statsToTest,
-		EpReferenceStat: referenceStat,
-	}
+	swr.Encounter.Duration = LongDuration
+	swr.SimOptions.Iterations = 5000
 
 	result := StatWeights(swr)
 	resultWeights := stats.FromFloatArray(result.Weights)
@@ -96,12 +100,12 @@ func IndividualSimTest(label string, t *testing.T, isr *proto.IndividualSimReque
 	result := RunIndividualSim(isr)
 
 	tolerance := 0.5
-	if result.PlayerMetrics.DpsAvg < expectedDps-tolerance || result.PlayerMetrics.DpsAvg > expectedDps+tolerance {
+	if result.PlayerMetrics.Dps.Avg < expectedDps-tolerance || result.PlayerMetrics.Dps.Avg > expectedDps+tolerance {
 		// Automatically print output if we had debugging enabled.
 		if isr.SimOptions.Debug {
 			log.Printf("LOGS:\n%s\n", result.Logs)
 		}
-		t.Fatalf("%s failed: expected %0f dps from sim but was %0f", label, expectedDps, result.PlayerMetrics.DpsAvg)
+		t.Fatalf("%s failed: expected %0f dps from sim but was %0f", label, expectedDps, result.PlayerMetrics.Dps.Avg)
 	}
 }
 
@@ -116,8 +120,8 @@ func IndividualSimAverageTest(label string, t *testing.T, isr *proto.IndividualS
 	}
 
 	tolerance := 0.5
-	if result.PlayerMetrics.DpsAvg < expectedDps-tolerance || result.PlayerMetrics.DpsAvg > expectedDps+tolerance {
-		t.Fatalf("%s failed: expected %0f dps from sim but was %0f", label, expectedDps, result.PlayerMetrics.DpsAvg)
+	if result.PlayerMetrics.Dps.Avg < expectedDps-tolerance || result.PlayerMetrics.Dps.Avg > expectedDps+tolerance {
+		t.Fatalf("%s failed: expected %0f dps from sim but was %0f", label, expectedDps, result.PlayerMetrics.Dps.Avg)
 	}
 }
 
