@@ -225,7 +225,7 @@ export abstract class SimUI<SpecType extends Spec> {
         const linkUrl = new URL(window.location.href);
         linkUrl.hash = encoded;
         if (navigator.clipboard == undefined) {
-          console.log("LINK:", linkUrl.toString());
+          alert(linkUrl.toString());
         } else {
           navigator.clipboard.writeText(linkUrl.toString());
         }

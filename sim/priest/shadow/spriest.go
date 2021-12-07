@@ -200,8 +200,8 @@ func (spriest *ShadowPriest) Act(sim *core.Simulation) time.Duration {
 			spell = spriest.NewSWD(sim, target)
 		} else {
 			spell = spriest.NewMindFlay(sim, target)
-			// CalculateMindflay to modify how many mindflay ticks to perform.
-			wait = spriest.CalculateMindflay(sim, spell, allCDs)
+			// CalculateMindflayRotation to modify how many mindflay ticks to perform.
+			wait = spriest.CalculateMindflayRotation(sim, spell, allCDs)
 			if sim.Log != nil {
 				sim.Log("<spriest> Selected %d mindflay ticks.\n", spell.DotInput.NumberOfTicks)
 			}
@@ -239,7 +239,7 @@ func (spriest *ShadowPriest) Act(sim *core.Simulation) time.Duration {
 }
 
 // CalculateMindflay will calculate how many ticks should be cast and mutate the cast.
-func (spriest *ShadowPriest) CalculateMindflay(sim *core.Simulation, spell *core.SimpleSpell, allCDs []time.Duration) time.Duration {
+func (spriest *ShadowPriest) CalculateMindflayRotation(sim *core.Simulation, spell *core.SimpleSpell, allCDs []time.Duration) time.Duration {
 	nextCD := core.NeverExpires
 	nextIdx := -1
 	for i, v := range allCDs {
