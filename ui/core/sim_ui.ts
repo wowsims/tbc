@@ -228,8 +228,8 @@ export abstract class SimUI<SpecType extends Spec> {
           alert(linkUrl.toString());
         } else {
           navigator.clipboard.writeText(linkUrl.toString());
+          alert('Current settings copied to clipboard!');
         }
-				alert('Current settings copied to clipboard!');
 			});
 		});
   }
