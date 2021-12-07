@@ -617,7 +617,6 @@ addEventListener('message', async (e) => {
 	[
 		['computeStats', computeStats],
 		['gearList', gearList],
-		['individualSim', individualSim],
 		['raidSim', raidSim],
 		['statWeights', statWeights],
 	].forEach(funcData => {

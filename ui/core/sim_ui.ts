@@ -1,4 +1,3 @@
-import { IndividualSimRequest, IndividualSimResult } from '/tbc/core/proto/api.js';
 import { RaidSimRequest, RaidSimResult } from '/tbc/core/proto/api.js';
 import { StatWeightsRequest } from '/tbc/core/proto/api.js';
 import { SimOptions } from '/tbc/core/proto/api.js';
@@ -287,19 +286,6 @@ export abstract class SimUI<SpecType extends Spec> {
   makeRaidSimRequest(iterations: number, debug: boolean): RaidSimRequest {
 		return RaidSimRequest.create({
 			raid: this.raid.toProto(),
-			encounter: this.encounter.toProto(),
-			simOptions: SimOptions.create({
-				iterations: iterations,
-				debug: debug,
-			}),
-		});
-  }
-
-  makeCurrentIndividualSimRequest(iterations: number, debug: boolean): IndividualSimRequest {
-		return IndividualSimRequest.create({
-			player: this.player.toProto(),
-			raidBuffs: this.raid.getBuffs(),
-			partyBuffs: this.party.getBuffs(),
 			encounter: this.encounter.toProto(),
 			simOptions: SimOptions.create({
 				iterations: iterations,

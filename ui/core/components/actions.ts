@@ -1,4 +1,3 @@
-import { IndividualSimRequest } from '/tbc/core/proto/api.js';
 import { RaidSimRequest } from '/tbc/core/proto/api.js';
 import { SimOptions } from '/tbc/core/proto/api.js';
 import { Stat } from '/tbc/core/proto/common.js';
