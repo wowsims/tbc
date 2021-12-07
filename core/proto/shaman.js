@@ -33,6 +33,86 @@ export var ElementalShaman_Rotation_RotationType;
      */
     ElementalShaman_Rotation_RotationType[ElementalShaman_Rotation_RotationType["LBOnly"] = 5] = "LBOnly";
 })(ElementalShaman_Rotation_RotationType || (ElementalShaman_Rotation_RotationType = {}));
+/**
+ * @generated from protobuf enum proto.EarthTotem
+ */
+export var EarthTotem;
+(function (EarthTotem) {
+    /**
+     * @generated from protobuf enum value: NoEarthTotem = 0;
+     */
+    EarthTotem[EarthTotem["NoEarthTotem"] = 0] = "NoEarthTotem";
+    /**
+     * @generated from protobuf enum value: StrengthOfEarthTotem = 1;
+     */
+    EarthTotem[EarthTotem["StrengthOfEarthTotem"] = 1] = "StrengthOfEarthTotem";
+    /**
+     * @generated from protobuf enum value: TremorTotem = 2;
+     */
+    EarthTotem[EarthTotem["TremorTotem"] = 2] = "TremorTotem";
+})(EarthTotem || (EarthTotem = {}));
+/**
+ * @generated from protobuf enum proto.AirTotem
+ */
+export var AirTotem;
+(function (AirTotem) {
+    /**
+     * @generated from protobuf enum value: NoAirTotem = 0;
+     */
+    AirTotem[AirTotem["NoAirTotem"] = 0] = "NoAirTotem";
+    /**
+     * @generated from protobuf enum value: GraceOfAirTotem = 1;
+     */
+    AirTotem[AirTotem["GraceOfAirTotem"] = 1] = "GraceOfAirTotem";
+    /**
+     * @generated from protobuf enum value: TranquilAirTotem = 2;
+     */
+    AirTotem[AirTotem["TranquilAirTotem"] = 2] = "TranquilAirTotem";
+    /**
+     * @generated from protobuf enum value: WindfuryTotem = 3;
+     */
+    AirTotem[AirTotem["WindfuryTotem"] = 3] = "WindfuryTotem";
+    /**
+     * @generated from protobuf enum value: WrathOfAirTotem = 4;
+     */
+    AirTotem[AirTotem["WrathOfAirTotem"] = 4] = "WrathOfAirTotem";
+})(AirTotem || (AirTotem = {}));
+/**
+ * @generated from protobuf enum proto.FireTotem
+ */
+export var FireTotem;
+(function (FireTotem) {
+    /**
+     * @generated from protobuf enum value: NoFireTotem = 0;
+     */
+    FireTotem[FireTotem["NoFireTotem"] = 0] = "NoFireTotem";
+    /**
+     * @generated from protobuf enum value: MagmaTotem = 1;
+     */
+    FireTotem[FireTotem["MagmaTotem"] = 1] = "MagmaTotem";
+    /**
+     * @generated from protobuf enum value: SearingTotem = 2;
+     */
+    FireTotem[FireTotem["SearingTotem"] = 2] = "SearingTotem";
+    /**
+     * @generated from protobuf enum value: TotemOfWrath = 3;
+     */
+    FireTotem[FireTotem["TotemOfWrath"] = 3] = "TotemOfWrath";
+})(FireTotem || (FireTotem = {}));
+/**
+ * @generated from protobuf enum proto.WaterTotem
+ */
+export var WaterTotem;
+(function (WaterTotem) {
+    /**
+     * @generated from protobuf enum value: NoWaterTotem = 0;
+     */
+    WaterTotem[WaterTotem["NoWaterTotem"] = 0] = "NoWaterTotem";
+    /**
+     * @generated from protobuf enum value: ManaSpringTotem = 1;
+     */
+    WaterTotem[WaterTotem["ManaSpringTotem"] = 1] = "ManaSpringTotem";
+})(WaterTotem || (WaterTotem = {}));
 // @generated message type with reflection information, may provide speed optimized methods
 class ShamanTalents$Type extends MessageType {
     constructor() {
@@ -304,6 +384,116 @@ class ShamanTalents$Type extends MessageType {
  * @generated MessageType for protobuf message proto.ShamanTalents
  */
 export const ShamanTalents = new ShamanTalents$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class ShamanTotems$Type extends MessageType {
+    constructor() {
+        super("proto.ShamanTotems", [
+            { no: 1, name: "earth", kind: "enum", T: () => ["proto.EarthTotem", EarthTotem] },
+            { no: 2, name: "air", kind: "enum", T: () => ["proto.AirTotem", AirTotem] },
+            { no: 3, name: "fire", kind: "enum", T: () => ["proto.FireTotem", FireTotem] },
+            { no: 4, name: "water", kind: "enum", T: () => ["proto.WaterTotem", WaterTotem] },
+            { no: 5, name: "twist_windfury", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 6, name: "twist_fire_nova", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 7, name: "use_mana_tide", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 8, name: "use_fire_elemental", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 9, name: "recall_fire_elemental_on_oom", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 10, name: "recall_totems", kind: "scalar", T: 8 /*ScalarType.BOOL*/ }
+        ]);
+    }
+    create(value) {
+        const message = { earth: 0, air: 0, fire: 0, water: 0, twistWindfury: false, twistFireNova: false, useManaTide: false, useFireElemental: false, recallFireElementalOnOom: false, recallTotems: false };
+        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader, length, options, target) {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* proto.EarthTotem earth */ 1:
+                    message.earth = reader.int32();
+                    break;
+                case /* proto.AirTotem air */ 2:
+                    message.air = reader.int32();
+                    break;
+                case /* proto.FireTotem fire */ 3:
+                    message.fire = reader.int32();
+                    break;
+                case /* proto.WaterTotem water */ 4:
+                    message.water = reader.int32();
+                    break;
+                case /* bool twist_windfury */ 5:
+                    message.twistWindfury = reader.bool();
+                    break;
+                case /* bool twist_fire_nova */ 6:
+                    message.twistFireNova = reader.bool();
+                    break;
+                case /* bool use_mana_tide */ 7:
+                    message.useManaTide = reader.bool();
+                    break;
+                case /* bool use_fire_elemental */ 8:
+                    message.useFireElemental = reader.bool();
+                    break;
+                case /* bool recall_fire_elemental_on_oom */ 9:
+                    message.recallFireElementalOnOom = reader.bool();
+                    break;
+                case /* bool recall_totems */ 10:
+                    message.recallTotems = reader.bool();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message, writer, options) {
+        /* proto.EarthTotem earth = 1; */
+        if (message.earth !== 0)
+            writer.tag(1, WireType.Varint).int32(message.earth);
+        /* proto.AirTotem air = 2; */
+        if (message.air !== 0)
+            writer.tag(2, WireType.Varint).int32(message.air);
+        /* proto.FireTotem fire = 3; */
+        if (message.fire !== 0)
+            writer.tag(3, WireType.Varint).int32(message.fire);
+        /* proto.WaterTotem water = 4; */
+        if (message.water !== 0)
+            writer.tag(4, WireType.Varint).int32(message.water);
+        /* bool twist_windfury = 5; */
+        if (message.twistWindfury !== false)
+            writer.tag(5, WireType.Varint).bool(message.twistWindfury);
+        /* bool twist_fire_nova = 6; */
+        if (message.twistFireNova !== false)
+            writer.tag(6, WireType.Varint).bool(message.twistFireNova);
+        /* bool use_mana_tide = 7; */
+        if (message.useManaTide !== false)
+            writer.tag(7, WireType.Varint).bool(message.useManaTide);
+        /* bool use_fire_elemental = 8; */
+        if (message.useFireElemental !== false)
+            writer.tag(8, WireType.Varint).bool(message.useFireElemental);
+        /* bool recall_fire_elemental_on_oom = 9; */
+        if (message.recallFireElementalOnOom !== false)
+            writer.tag(9, WireType.Varint).bool(message.recallFireElementalOnOom);
+        /* bool recall_totems = 10; */
+        if (message.recallTotems !== false)
+            writer.tag(10, WireType.Varint).bool(message.recallTotems);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message proto.ShamanTotems
+ */
+export const ShamanTotems = new ShamanTotems$Type();
 // @generated message type with reflection information, may provide speed optimized methods
 class ElementalShaman$Type extends MessageType {
     constructor() {

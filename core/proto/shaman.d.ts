@@ -148,6 +148,67 @@ export interface ShamanTalents {
     naturesBlessing: number;
 }
 /**
+ * @generated from protobuf message proto.ShamanTotems
+ */
+export interface ShamanTotems {
+    /**
+     * @generated from protobuf field: proto.EarthTotem earth = 1;
+     */
+    earth: EarthTotem;
+    /**
+     * @generated from protobuf field: proto.AirTotem air = 2;
+     */
+    air: AirTotem;
+    /**
+     * @generated from protobuf field: proto.FireTotem fire = 3;
+     */
+    fire: FireTotem;
+    /**
+     * @generated from protobuf field: proto.WaterTotem water = 4;
+     */
+    water: WaterTotem;
+    /**
+     * If set, will twist windfury with whichever air totem is selected.
+     *
+     * @generated from protobuf field: bool twist_windfury = 5;
+     */
+    twistWindfury: boolean;
+    /**
+     * If set, will twist fire nova with whichever fire totem is selected.
+     *
+     * @generated from protobuf field: bool twist_fire_nova = 6;
+     */
+    twistFireNova: boolean;
+    /**
+     * If set, will use mana tide when appripriate.
+     *
+     * @generated from protobuf field: bool use_mana_tide = 7;
+     */
+    useManaTide: boolean;
+    /**
+     * If set, will use fire elemental totem at the start and revert to regular
+     * fire totems when it expires. If fire nova is also selected, fire nova
+     * will be used once before dropping fire ele.
+     *
+     * @generated from protobuf field: bool use_fire_elemental = 8;
+     */
+    useFireElemental: boolean;
+    /**
+     * If set, will revert to regular fire totems when fire elemental goes OOM,
+     * instead of waiting the full 2 minutes.
+     *
+     * @generated from protobuf field: bool recall_fire_elemental_on_oom = 9;
+     */
+    recallFireElementalOnOom: boolean;
+    /**
+     * If set, any time a 2-minute totem is about to expire, will recall and
+     * replace all totems.
+     *
+     * @generated from protobuf field: bool recall_totems = 10;
+     */
+    recallTotems: boolean;
+}
+/**
  * @generated from protobuf message proto.ElementalShaman
  */
 export interface ElementalShaman {
@@ -233,6 +294,82 @@ export interface ElementalShaman_Options {
      */
     wrathOfAirTotem: boolean;
 }
+/**
+ * @generated from protobuf enum proto.EarthTotem
+ */
+export declare enum EarthTotem {
+    /**
+     * @generated from protobuf enum value: NoEarthTotem = 0;
+     */
+    NoEarthTotem = 0,
+    /**
+     * @generated from protobuf enum value: StrengthOfEarthTotem = 1;
+     */
+    StrengthOfEarthTotem = 1,
+    /**
+     * @generated from protobuf enum value: TremorTotem = 2;
+     */
+    TremorTotem = 2
+}
+/**
+ * @generated from protobuf enum proto.AirTotem
+ */
+export declare enum AirTotem {
+    /**
+     * @generated from protobuf enum value: NoAirTotem = 0;
+     */
+    NoAirTotem = 0,
+    /**
+     * @generated from protobuf enum value: GraceOfAirTotem = 1;
+     */
+    GraceOfAirTotem = 1,
+    /**
+     * @generated from protobuf enum value: TranquilAirTotem = 2;
+     */
+    TranquilAirTotem = 2,
+    /**
+     * @generated from protobuf enum value: WindfuryTotem = 3;
+     */
+    WindfuryTotem = 3,
+    /**
+     * @generated from protobuf enum value: WrathOfAirTotem = 4;
+     */
+    WrathOfAirTotem = 4
+}
+/**
+ * @generated from protobuf enum proto.FireTotem
+ */
+export declare enum FireTotem {
+    /**
+     * @generated from protobuf enum value: NoFireTotem = 0;
+     */
+    NoFireTotem = 0,
+    /**
+     * @generated from protobuf enum value: MagmaTotem = 1;
+     */
+    MagmaTotem = 1,
+    /**
+     * @generated from protobuf enum value: SearingTotem = 2;
+     */
+    SearingTotem = 2,
+    /**
+     * @generated from protobuf enum value: TotemOfWrath = 3;
+     */
+    TotemOfWrath = 3
+}
+/**
+ * @generated from protobuf enum proto.WaterTotem
+ */
+export declare enum WaterTotem {
+    /**
+     * @generated from protobuf enum value: NoWaterTotem = 0;
+     */
+    NoWaterTotem = 0,
+    /**
+     * @generated from protobuf enum value: ManaSpringTotem = 1;
+     */
+    ManaSpringTotem = 1
+}
 declare class ShamanTalents$Type extends MessageType<ShamanTalents> {
     constructor();
     create(value?: PartialMessage<ShamanTalents>): ShamanTalents;
@@ -243,6 +380,16 @@ declare class ShamanTalents$Type extends MessageType<ShamanTalents> {
  * @generated MessageType for protobuf message proto.ShamanTalents
  */
 export declare const ShamanTalents: ShamanTalents$Type;
+declare class ShamanTotems$Type extends MessageType<ShamanTotems> {
+    constructor();
+    create(value?: PartialMessage<ShamanTotems>): ShamanTotems;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: ShamanTotems): ShamanTotems;
+    internalBinaryWrite(message: ShamanTotems, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message proto.ShamanTotems
+ */
+export declare const ShamanTotems: ShamanTotems$Type;
 declare class ElementalShaman$Type extends MessageType<ElementalShaman> {
     constructor();
     create(value?: PartialMessage<ElementalShaman>): ElementalShaman;
