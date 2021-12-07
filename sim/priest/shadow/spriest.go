@@ -1,6 +1,7 @@
 package shadow
 
 import (
+	"math"
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
@@ -176,6 +177,7 @@ func (spriest *ShadowPriest) Act(sim *core.Simulation) time.Duration {
 	} else if spriest.rotation.UseDevPlague && spriest.GetRemainingCD(priest.DPCooldownID, sim.CurrentTime) == 0 {
 		spell = spriest.NewDevouringPlague(sim, target)
 	} else if spriest.Talents.MindFlay {
+
 		allCDs := []time.Duration{
 			mbidx:  spriest.Character.GetRemainingCD(priest.MBCooldownID, sim.CurrentTime),
 			swdidx: spriest.Character.GetRemainingCD(priest.SWDCooldownID, sim.CurrentTime),
@@ -233,11 +235,11 @@ func (spriest *ShadowPriest) Act(sim *core.Simulation) time.Duration {
 // CalculateMindflay will calculate how many ticks should be cast and mutate the cast.
 func (spriest *ShadowPriest) CalculateMindflay(sim *core.Simulation, spell *core.SimpleSpell, allCDs []time.Duration) time.Duration {
 	nextCD := core.NeverExpires
-	// nextIdx := -1
-	for _, v := range allCDs {
+	nextIdx := -1
+	for i, v := range allCDs {
 		if v < nextCD {
 			nextCD = v
-			// nextIdx = i
+			nextIdx = i
 		}
 	}
 	if sim.Log != nil {
@@ -247,6 +249,7 @@ func (spriest *ShadowPriest) CalculateMindflay(sim *core.Simulation, spell *core
 	gcd := time.Duration(float64(core.GCDDefault) / spriest.CastSpeed())
 
 	var numTicks int
+	var Major_dmg float64
 	// Add a millisecond as fudge factor to these checks
 	//  sometimes we wait 1ns extra from waiting for a dot tick to finish.
 	//  these can cause some CDs to be slightly shorter than they should be.
@@ -258,16 +261,112 @@ func (spriest *ShadowPriest) CalculateMindflay(sim *core.Simulation, spell *core
 
 	if numTicks == 0 {
 		spell.DotInput.NumberOfTicks = 0
+		crit := spriest.GetStat(stats.SpellCrit) / (core.SpellCritRatingPerCritChance * 100)
 		if nextCD <= 0 {
 			nextCD = 1 // add a nanosecond to be sure any ticking dot finishes and we don't get sim stuck.
 		} else {
 			// TODO: We might still want to do a single MF1 tick...
 			//  calculate the dps gain from casting vs waiting.
+			if nextIdx == 0 {
+				Major_dmg = (731.5 + spriest.GetStat(stats.SpellPower)*0.429) / (gcd + nextCD).Seconds() * (1 + (0.5 * (crit + 0.15)))
+			} else if nextIdx == 1 {
+				Major_dmg = (618 + spriest.GetStat(stats.SpellPower)*0.429) / (gcd + nextCD).Seconds() * (1 + (0.5 * (crit + 0.15)))
+			} else if nextIdx == 2 {
+				Major_dmg = (spriest.VTSpell.DotInput.DamagePerTick() * float64(spriest.VTSpell.DotInput.NumberOfTicks)) / (gcd + nextCD).Seconds()
+			} else if nextIdx == 3 {
+				Major_dmg = (spriest.SWPSpell.DotInput.DamagePerTick() * float64(spriest.SWPSpell.DotInput.NumberOfTicks)) / (gcd + nextCD).Seconds()
+			}
+
+			mfDamage := (528 + 0.57*(spriest.GetStat(stats.SpellPower))) * 0.3333
+
+			dpsPossibleshort := []float64{
+				(Major_dmg * float64(nextCD+gcd)) / float64(gcd+nextCD), // dps with no tick and just wait
+				0,
+				0,
+				0,
+			}
+			dpsPossibleshort[1] = (Major_dmg*(nextCD+gcd).Seconds() + mfDamage) / (gcd + gcd).Seconds()                           // new damage for 1 extra tick
+			dpsPossibleshort[2] = (Major_dmg*(nextCD+gcd).Seconds() + 2*mfDamage) / (2*spell.DotInput.TickLength + gcd).Seconds() // new damage for 2 extra tick
+			dpsPossibleshort[3] = (Major_dmg*(nextCD+gcd).Seconds() + 3*mfDamage) / (3*spell.DotInput.TickLength + gcd).Seconds() // new damage for 3 extra tick
+
+			// Find the highest possible dps and its index
+			highestPossibleIdx := 0
+			highestPossibleDmg := 0.0
+			if highestPossibleIdx == 0 {
+				for i, v := range dpsPossibleshort {
+					if sim.Log != nil {
+						//sim.Log("\tdpsPossibleshort[%d]: %01.f\n", i, v)
+					}
+					if v >= highestPossibleDmg {
+						highestPossibleIdx = i
+						highestPossibleDmg = v
+					}
+				}
+			}
+
+			if highestPossibleIdx == 1 {
+				numTicks = numTicks + 1
+			} else if highestPossibleIdx == 2 {
+				numTicks = numTicks + 2
+			} else if highestPossibleIdx == 3 {
+				numTicks = numTicks + 3
+			} else if highestPossibleIdx == 0 {
+				// ind_sp = ind_sp3  // What does this mean??
+			}
+
+			var numtickss float64 = float64(numTicks)
+			res := math.Mod(numtickss, 3)
+
+			if sim.Log != nil {
+				sim.Log("Decided to Add %d Ticks\n", numTicks)
+			}
+
+			//  Now that the number of optimal ticks has been determined to optimize dps
+			//  Now optimize mf2s and mf3s
+			if numTicks == 1 {
+				spell.DotInput.NumberOfTicks = numTicks
+			} else if res < 2 && numTicks < 5 && numTicks != 3 && numTicks != 0 {
+				spell.DotInput.NumberOfTicks = 2
+				if sim.Log != nil {
+					sim.Log("Final rotation should be: MF2 MF2\n")
+				}
+			} else if res == 0 && numTicks != 0 {
+				//  cast MF3 MF3...MF3
+				if sim.Log != nil {
+					sim.Log("Final rotation should be: MF3 MF3 ... MF3\n")
+				}
+				spell.DotInput.NumberOfTicks = 3
+			} else if res == 2 {
+				//  cast MF3 MF3...MF2
+				if sim.Log != nil {
+					sim.Log("Final rotation should be: MF3 MF3 ... MF2\n")
+				}
+				if numTicks == 2 {
+					spell.DotInput.NumberOfTicks = 2
+				} else {
+					spell.DotInput.NumberOfTicks = 3
+				}
+
+			} else if res < 2 && numTicks > 5 { // % need to optomize between 3 and 2 ticks and not allowing 1 tick
+				//  cast MF3 MF3...MF2 MF2
+				if sim.Log != nil {
+					sim.Log("Final rotation should be: MF3 MF3 ... MF2 MF2\n")
+				}
+				spell.DotInput.NumberOfTicks = 3
+			} else if numTicks == 0 {
+				return nextCD
+			}
+			spell.ActionID.Tag = int32(spell.DotInput.NumberOfTicks)
+
+			return spell.DotInput.TickLength * time.Duration(spell.DotInput.NumberOfTicks)
 		}
 		return nextCD
 	}
 
 	mfTime := time.Duration(numTicks) * spell.DotInput.TickLength
+	if mfTime < gcd {
+		mfTime = gcd
+	}
 
 	cdDiffs := []time.Duration{
 		allCDs[0] - mfTime,
@@ -276,11 +375,24 @@ func (spriest *ShadowPriest) CalculateMindflay(sim *core.Simulation, spell *core
 		allCDs[3] - mfTime,
 	}
 
+	if cdDiffs[0] < 0 {
+		cdDiffs[0] = 0
+	}
+	if cdDiffs[1] < 0 {
+		cdDiffs[1] = 0
+	}
+	if cdDiffs[2] < 0 {
+		cdDiffs[2] = 0
+	}
+	if cdDiffs[3] < 0 {
+		cdDiffs[3] = 0
+	}
+
 	crit := spriest.GetStat(stats.SpellCrit) / (core.SpellCritRatingPerCritChance * 100)
 
 	spellDamages := []float64{
-		mbidx:  (731.5 + spriest.GetStat(stats.SpellPower)*0.429/(gcd+cdDiffs[mbidx]).Seconds()) * (1 + (0.5 * (crit + 0.1))),
-		swdidx: (618 + spriest.GetStat(stats.SpellPower)*0.429/(gcd+cdDiffs[swdidx]).Seconds()) * (1 + (0.5 * (crit + 0.1))),
+		mbidx:  (731.5 + spriest.GetStat(stats.SpellPower)*0.429) / (gcd + cdDiffs[mbidx]).Seconds() * (1 + (0.5 * (crit + 0.15))),
+		swdidx: (618 + spriest.GetStat(stats.SpellPower)*0.429) / (gcd + cdDiffs[swdidx]).Seconds() * (1 + (0.5 * (crit + 0.15))),
 		vtidx:  (spriest.VTSpell.DotInput.DamagePerTick() * float64(spriest.VTSpell.DotInput.NumberOfTicks)) / (gcd + cdDiffs[vtidx]).Seconds(),
 		swpidx: (spriest.SWPSpell.DotInput.DamagePerTick() * float64(spriest.SWPSpell.DotInput.NumberOfTicks)) / (gcd + cdDiffs[swpidx]).Seconds(),
 	}
@@ -289,65 +401,94 @@ func (spriest *ShadowPriest) CalculateMindflay(sim *core.Simulation, spell *core
 	bestDmg := 0.0
 	for i, v := range spellDamages {
 		if sim.Log != nil {
-			sim.Log("\tSpellDamages[%d]: %01.f\n", i, v)
+			//sim.Log("\tSpellDamages[%d]: %01.f\n", i, v)
+			//sim.Log("\tcdDiffs[%d]: %0.1f\n", i, cdDiffs[i].Seconds())
 		}
 		if v > bestDmg {
 			bestIdx = i
 			bestDmg = v
 		}
 	}
+
 	chosenWait := cdDiffs[bestIdx]
 	mfDamage := (528 + 0.57*(spriest.GetStat(stats.SpellPower))) * 0.3333
-	finalMFStart := numTicks % 3 // (how many ticks are left over after mf3s are casted repeatedly
 
+	if nextIdx != bestIdx && chosenWait.Seconds() < 1.49 {
+		numTicks = int((allCDs[bestIdx] + time.Millisecond) / spell.DotInput.TickLength)
+	}
+
+	if chosenWait > cdDiffs[nextIdx] && cdDiffs[nextIdx].Seconds() < 0.1 {
+		chosenWait = cdDiffs[nextIdx]
+	}
+
+	finalMFStart := numTicks // Base ticks before adding additional
+
+	highestPossibleIdx := 0
+	if (finalMFStart == 2) && (chosenWait < 1000000000 && chosenWait > 999999985) {
+		highestPossibleIdx = 1 // if the wait time is equal to an extra mf tick, and there are already 2 ticks, then just add 1
+	}
+	//sim.Log("CW %d \n", chosenWait)
 	dpsPossible := []float64{
-		(bestDmg * float64(chosenWait+gcd)) / float64(gcd+chosenWait), // dps with no tick and just wait
+		bestDmg, // dps with no tick and just wait
 		0,
 		0,
 		0,
 	}
 
-	dpsDuration := float64(chosenWait + gcd)
-	switch finalMFStart {
-	case 0:
-		// this means that the extra ticks will be relative to starting a new mf cast entirely
-		dpsPossible[1] = (bestDmg*dpsDuration + mfDamage) / float64(gcd+gcd)                           // new damage for 1 extra tick
-		dpsPossible[2] = (bestDmg*dpsDuration + 2*mfDamage) / float64(2*spell.DotInput.TickLength+gcd) // new damage for 2 extra tick
-		dpsPossible[3] = (bestDmg*dpsDuration + 3*mfDamage) / float64(3*spell.DotInput.TickLength+gcd) // new damage for 3 extra tick
-	case 1:
-		total_check_time := time.Duration(finalMFStart)*spell.DotInput.TickLength + spell.DotInput.TickLength
-		if total_check_time < gcd {
-			dpsPossible[1] = (bestDmg*dpsDuration + (mfDamage * float64(finalMFStart+1))) / float64(gcd+gcd)
-		} else {
-			dpsPossible[1] = (bestDmg*dpsDuration + (mfDamage * float64(finalMFStart+1))) / float64(total_check_time+gcd)
+	dpsDuration := float64((chosenWait + gcd).Seconds())
+	if highestPossibleIdx == 0 {
+		switch finalMFStart {
+		case 0:
+			// this means that the extra ticks will be relative to starting a new mf cast entirely
+			dpsPossible[1] = (bestDmg*dpsDuration + mfDamage) / float64(gcd+gcd)                           // new damage for 1 extra tick
+			dpsPossible[2] = (bestDmg*dpsDuration + 2*mfDamage) / float64(2*spell.DotInput.TickLength+gcd) // new damage for 2 extra tick
+			dpsPossible[3] = (bestDmg*dpsDuration + 3*mfDamage) / float64(3*spell.DotInput.TickLength+gcd) // new damage for 3 extra tick
+		case 1:
+			total_check_time := 2 * spell.DotInput.TickLength
+
+			if total_check_time < gcd {
+				newDuration := float64((gcd + gcd).Seconds())
+				dpsPossible[1] = (bestDmg*dpsDuration + (mfDamage * float64(finalMFStart+1))) / newDuration
+			} else {
+				newDuration := float64(((total_check_time - gcd) + gcd).Seconds())
+				dpsPossible[1] = (bestDmg*dpsDuration + (mfDamage * float64(finalMFStart+1))) / newDuration
+			}
+			// % check add 2
+			total_check_time2 := 2 * spell.DotInput.TickLength
+			if total_check_time2 < gcd {
+				dpsPossible[2] = (bestDmg*dpsDuration + (mfDamage * float64(finalMFStart+2))) / float64(gcd+gcd)
+			} else {
+				dpsPossible[2] = (bestDmg*dpsDuration + (mfDamage * float64(finalMFStart+2))) / float64(total_check_time2+gcd)
+			}
+		case 2:
+			// % check add 1
+			total_check_time := spell.DotInput.TickLength
+			newDuration := float64((total_check_time + gcd).Seconds())
+			dpsPossible[1] = (bestDmg*dpsDuration + mfDamage) / newDuration
+
+		default:
+			dpsPossible[1] = (bestDmg*dpsDuration + mfDamage) / float64(gcd+gcd)
+			if spell.DotInput.TickLength*2 > gcd {
+				dpsPossible[2] = (bestDmg*dpsDuration + 2*mfDamage) / float64(2*spell.DotInput.TickLength+gcd)
+			} else {
+				dpsPossible[2] = (bestDmg*dpsDuration + 2*mfDamage) / float64(gcd+gcd)
+			}
+			dpsPossible[3] = (bestDmg*dpsDuration + 3*mfDamage) / float64(3*spell.DotInput.TickLength+gcd)
 		}
-		// % check add 2
-		total_check_time2 := time.Duration(finalMFStart)*spell.DotInput.TickLength + 2*spell.DotInput.TickLength
-		if total_check_time2 < gcd {
-			dpsPossible[2] = (bestDmg*dpsDuration + (mfDamage * float64(finalMFStart+2))) / float64(gcd+gcd)
-		} else {
-			dpsPossible[2] = (bestDmg*dpsDuration + (mfDamage * float64(finalMFStart+2))) / float64(total_check_time2+gcd)
-		}
-	default:
-		dpsPossible[1] = (bestDmg*dpsDuration + mfDamage) / float64(gcd+gcd)
-		if spell.DotInput.TickLength*2 > gcd {
-			dpsPossible[2] = (bestDmg*dpsDuration + 2*mfDamage) / float64(2*spell.DotInput.TickLength+gcd)
-		} else {
-			dpsPossible[2] = (bestDmg*dpsDuration + 2*mfDamage) / float64(gcd+gcd)
-		}
-		dpsPossible[3] = (bestDmg*dpsDuration + 3*mfDamage) / float64(3*spell.DotInput.TickLength+gcd)
 	}
 
 	// Find the highest possible dps and its index
-	highestPossibleIdx := 0
+	// highestPossibleIdx := 0
 	highestPossibleDmg := 0.0
-	for i, v := range dpsPossible {
-		if sim.Log != nil {
-			sim.Log("\tdpsPossible[%d]: %01.f\n", i, v)
-		}
-		if v > highestPossibleDmg {
-			highestPossibleIdx = i
-			highestPossibleDmg = v
+	if highestPossibleIdx == 0 {
+		for i, v := range dpsPossible {
+			if sim.Log != nil {
+				//sim.Log("\tdpsPossible[%d]: %01.f\n", i, v)
+			}
+			if v >= highestPossibleDmg {
+				highestPossibleIdx = i
+				highestPossibleDmg = v
+			}
 		}
 	}
 
@@ -361,25 +502,28 @@ func (spriest *ShadowPriest) CalculateMindflay(sim *core.Simulation, spell *core
 		// ind_sp = ind_sp3  // What does this mean??
 	}
 
+	var numbticks float64 = float64(numTicks)
+	res2 := math.Mod(numbticks, 3)
+
 	//  Now that the number of optimal ticks has been determined to optimize dps
 	//  Now optimize mf2s and mf3s
 	if numTicks == 1 {
 		spell.DotInput.NumberOfTicks = numTicks
-	} else if numTicks%3 < 2 && numTicks < 5 && numTicks != 3 {
+	} else if res2 < 2 && numTicks < 5 && numTicks != 3 && numTicks != 0 {
 		spell.DotInput.NumberOfTicks = 2
 		if sim.Log != nil {
-			sim.Log("Final rotation should be: MF2 MF2\n")
+			//sim.Log("Final rotation should be: MF2 MF2\n")
 		}
-	} else if numTicks%3 == 0 {
+	} else if res2 == 0 && numTicks != 0 {
 		//  cast MF3 MF3...MF3
 		if sim.Log != nil {
-			sim.Log("Final rotation should be: MF3 MF3 ... MF3\n")
+			//sim.Log("Final rotation should be: MF3 MF3 ... MF3\n")
 		}
 		spell.DotInput.NumberOfTicks = 3
-	} else if numTicks%3 == 2 {
+	} else if res2 == 2 {
 		//  cast MF3 MF3...MF2
 		if sim.Log != nil {
-			sim.Log("Final rotation should be: MF3 MF3 ... MF2\n")
+			//sim.Log("Final rotation should be: MF3 MF3 ... MF2\n")
 		}
 		if numTicks == 2 {
 			spell.DotInput.NumberOfTicks = 2
@@ -387,12 +531,14 @@ func (spriest *ShadowPriest) CalculateMindflay(sim *core.Simulation, spell *core
 			spell.DotInput.NumberOfTicks = 3
 		}
 
-	} else if numTicks%3 < 2 && numTicks > 5 { // % need to optomize between 3 and 2 ticks and not allowing 1 tick
+	} else if res2 < 2 && numTicks > 5 { // % need to optomize between 3 and 2 ticks and not allowing 1 tick
 		//  cast MF3 MF3...MF2 MF2
 		if sim.Log != nil {
-			sim.Log("Final rotation should be: MF3 MF3 ... MF2 MF2\n")
+			//sim.Log("Final rotation should be: MF3 MF3 ... MF2 MF2\n")
 		}
 		spell.DotInput.NumberOfTicks = 3
+	} else if numTicks == 0 {
+		return nextCD
 	}
 	spell.ActionID.Tag = int32(spell.DotInput.NumberOfTicks)
 

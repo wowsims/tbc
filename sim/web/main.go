@@ -83,7 +83,7 @@ func runServer(useFS bool, host string, launchBrowser bool, simName string, wasm
 		go func() {
 			var cmd *exec.Cmd
 			if runtime.GOOS == "windows" {
-				cmd = exec.Command("explorer", url)
+				cmd = exec.Command("start", "msedge", url)
 			} else if runtime.GOOS == "darwin" {
 				cmd = exec.Command("open", url)
 			} else if runtime.GOOS == "linux" {

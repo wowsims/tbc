@@ -43,6 +43,10 @@ func (priest *Priest) newMindBlastTemplate(sim *core.Simulation) core.SimpleSpel
 
 	baseCast.Cooldown -= time.Millisecond * 500 * time.Duration(priest.Talents.ImprovedMindBlast)
 
+	if ItemSetAbsolution.CharacterHasSetBonus(&priest.Character, 4) { // Absolution 4p adds 10% damage
+		effect.StaticDamageMultiplier += 0.1
+	}
+
 	return core.NewSimpleSpellTemplate(core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: baseCast,
