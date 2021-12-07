@@ -186,9 +186,6 @@ const theme = new DefaultTheme<Spec.SpecShadowPriest>(document.body, {
       Presets.P1_BIS,
       Presets.P2_BIS,
     ],
-		// Preset encounter settings that the user can quickly select.
-		encounters: [
-		],
   },
 });
 theme.init();

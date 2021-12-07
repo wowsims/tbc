@@ -1,4 +1,4 @@
-import { IndividualSimRequest, IndividualSimResult } from '/tbc/core/proto/api.js';
+import { RaidSimRequest, RaidSimResult } from '/tbc/core/proto/api.js';
 import { sum } from '/tbc/core/utils.js';
 
 import { parseActionMetrics } from './metrics_helpers.js';
@@ -12,7 +12,7 @@ export class SourceChart extends ResultComponent {
     super(config);
 	}
 
-	onSimResult(request: IndividualSimRequest, result: IndividualSimResult) {
+	onSimResult(request: RaidSimRequest, result: RaidSimResult) {
 		const chartBounds = this.rootElem.getBoundingClientRect();
 
 		this.rootElem.textContent = '';
@@ -22,7 +22,7 @@ export class SourceChart extends ResultComponent {
 
 		const colors: Array<string> = ['red', 'blue', 'lawngreen'];
 
-		parseActionMetrics(result.playerMetrics!.actions).then(actionMetrics => {
+		parseActionMetrics(result.raidMetrics!.parties[0].players[0].actions).then(actionMetrics => {
 			const names = actionMetrics.map(am => am.name);
 			const totalDmg = sum(actionMetrics.map(actionMetric => actionMetric.totalDmg));
 			const vals = actionMetrics.map(actionMetric => actionMetric.totalDmg / totalDmg);

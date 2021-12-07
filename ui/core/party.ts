@@ -1,3 +1,4 @@
+import { Party as PartyProto } from '/tbc/core/proto/api.js';
 import { PartyBuffs } from '/tbc/core/proto/common.js';
 import { Spec } from '/tbc/core/proto/common.js';
 
@@ -103,6 +104,13 @@ export class Party {
     this.buffs = PartyBuffs.clone(newBuffs);
     this.buffsChangeEmitter.emit();
   }
+
+	toProto(): PartyProto {
+		return PartyProto.create({
+			players: this.players.filter(player => player != null).map(player => player!.toProto()),
+			buffs: this.buffs,
+		});
+	}
 
   // Returns JSON representing all the current values.
   toJson(): Object {

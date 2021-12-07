@@ -86,7 +86,6 @@ export interface DefaultThemeConfig<SpecType extends Spec> extends SimUIConfig<S
 
   presets: {
     gear: Array<PresetGear>,
-    encounters: Array<SavedDataConfig<Encounter, EncounterProto>>,
     talents: Array<SavedDataConfig<Player<any>, string>>,
   },
 }
@@ -386,11 +385,6 @@ export class DefaultTheme<SpecType extends Spec> extends SimUI<SpecType> {
     });
 
     savedEncounterManager.loadUserData();
-    this._config.presets.encounters.forEach(config => {
-			config.isPreset = true;
-      savedEncounterManager.addSavedData(config);
-    });
-
     savedSettingsManager.loadUserData();
 
     savedTalentsManager.loadUserData();

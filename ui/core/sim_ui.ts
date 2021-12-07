@@ -1,4 +1,6 @@
 import { IndividualSimRequest, IndividualSimResult } from '/tbc/core/proto/api.js';
+import { RaidSimRequest, RaidSimResult } from '/tbc/core/proto/api.js';
+import { StatWeightsRequest } from '/tbc/core/proto/api.js';
 import { SimOptions } from '/tbc/core/proto/api.js';
 import { Consumes } from '/tbc/core/proto/common.js';
 import { Debuffs } from '/tbc/core/proto/common.js';
@@ -278,6 +280,17 @@ export abstract class SimUI<SpecType extends Spec> {
 		// different keys for each spec site.
 		return specToLocalStorageKey[this.player.spec] + keyPart;
 	}
+
+  makeRaidSimRequest(iterations: number, debug: boolean): RaidSimRequest {
+		return RaidSimRequest.create({
+			raid: this.raid.toProto(),
+			encounter: this.encounter.toProto(),
+			simOptions: SimOptions.create({
+				iterations: iterations,
+				debug: debug,
+			}),
+		});
+  }
 
   makeCurrentIndividualSimRequest(iterations: number, debug: boolean): IndividualSimRequest {
 		return IndividualSimRequest.create({

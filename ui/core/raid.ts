@@ -1,3 +1,4 @@
+import { Raid as RaidProto } from '/tbc/core/proto/api.js';
 import { RaidBuffs } from '/tbc/core/proto/common.js';
 import { Spec } from '/tbc/core/proto/common.js';
 
@@ -86,6 +87,13 @@ export class Raid {
     this.buffs = RaidBuffs.clone(newBuffs);
     this.buffsChangeEmitter.emit();
   }
+
+	toProto(): RaidProto {
+		return RaidProto.create({
+			parties: this.parties.filter(party => !party.isEmpty()).map(party => party.toProto()),
+			buffs: this.buffs,
+		});
+	}
 
   // Returns JSON representing all the current values.
   toJson(): Object {

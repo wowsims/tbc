@@ -64,7 +64,7 @@ func ComputeStats(csr *proto.ComputeStatsRequest) *proto.ComputeStatsResult {
 func StatWeights(request *proto.StatWeightsRequest) *proto.StatWeightsResult {
 	statsToWeigh := stats.ProtoArrayToStatsList(request.StatsToWeigh)
 
-	result := CalcStatWeight(*request.Options, statsToWeigh, stats.Stat(request.EpReferenceStat))
+	result := CalcStatWeight(*request, statsToWeigh, stats.Stat(request.EpReferenceStat))
 
 	return &proto.StatWeightsResult{
 		Weights:       result.Weights[:],
@@ -79,17 +79,7 @@ func StatWeights(request *proto.StatWeightsRequest) *proto.StatWeightsResult {
  */
 func RunIndividualSim(request *proto.IndividualSimRequest) *proto.IndividualSimResult {
 	raidResult := RunRaidSim(&proto.RaidSimRequest{
-		Raid: &proto.Raid{
-			Parties: []*proto.Party{
-				&proto.Party{
-					Players: []*proto.Player{
-						request.Player,
-					},
-					Buffs: request.PartyBuffs,
-				},
-			},
-			Buffs: request.RaidBuffs,
-		},
+		Raid:       SinglePlayerRaidProto(request.Player, request.PartyBuffs, request.RaidBuffs),
 		Encounter:  request.Encounter,
 		SimOptions: request.SimOptions,
 	})

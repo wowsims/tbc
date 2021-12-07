@@ -197,9 +197,6 @@ const theme = new DefaultTheme<Spec.SpecBalanceDruid>(document.body, {
       Presets.P1_HORDE_BIS,
       Presets.P2_HORDE_BIS,
     ],
-		// Preset encounter settings that the user can quickly select.
-		encounters: [
-		],
   },
 });
 theme.init();

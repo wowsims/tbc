@@ -1,4 +1,4 @@
-import { IndividualSimRequest, IndividualSimResult } from '/tbc/core/proto/api.js';
+import { RaidSimRequest, RaidSimResult } from '/tbc/core/proto/api.js';
 import { setWowheadHref } from '/tbc/core/resources.js';
 import { sum } from '/tbc/core/utils.js';
 
@@ -85,13 +85,13 @@ export class CastMetrics extends ResultComponent {
 		$(this.tableElem).tablesorter({ sortList: [[1, 1]] });
 	}
 
-	onSimResult(request: IndividualSimRequest, result: IndividualSimResult) {
+	onSimResult(request: RaidSimRequest, result: RaidSimResult) {
 		this.bodyElem.textContent = '';
 
 		const iterations = request.simOptions!.iterations;
 		const duration = request.encounter?.duration || 1;
 
-		parseActionMetrics(result.playerMetrics!.actions).then(actionMetrics => {
+		parseActionMetrics(result.raidMetrics!.parties[0].players[0].actions).then(actionMetrics => {
 			actionMetrics.filter(e => e.hits + e.misses != 0).forEach(actionMetric => {
 
 				const rowElem = document.createElement('tr');
@@ -167,13 +167,13 @@ export class OtherCastMetrics extends ResultComponent {
 		$(this.tableElem).tablesorter({ sortList: [[1, 1]] });
 	}
 
-	onSimResult(request: IndividualSimRequest, result: IndividualSimResult) {
+	onSimResult(request: RaidSimRequest, result: RaidSimResult) {
 		this.bodyElem.textContent = '';
 
 		const iterations = request.simOptions!.iterations;
 		const duration = request.encounter?.duration || 1;
 
-		parseActionMetrics(result.playerMetrics!.actions).then(actionMetrics => {
+		parseActionMetrics(result.raidMetrics!.parties[0].players[0].actions).then(actionMetrics => {
 			actionMetrics.filter(e => e.hits + e.misses == 0).forEach(actionMetric => {
 
 				const rowElem = document.createElement('tr');
