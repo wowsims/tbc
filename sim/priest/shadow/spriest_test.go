@@ -32,8 +32,8 @@ func TestSimulateP1Basic(t *testing.T) {
 			Target: FullDebuffTarget,
 		},
 
-		ExpectedDpsShort: 1184.4,
-		ExpectedDpsLong:  1235.9,
+		ExpectedDpsShort: 1220.5,
+		ExpectedDpsLong:  1266.2,
 	})
 }
 
@@ -54,5 +54,5 @@ func TestAverageDPS(t *testing.T) {
 		Target: FullDebuffTarget,
 	})
 
-	core.IndividualSimAverageTest("P1Average", t, isr, 1189.5)
+	core.IndividualSimAverageTest("P1Average", t, isr, 1271.8)
 }
