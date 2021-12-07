@@ -1,7 +1,7 @@
 import { setWowheadHref } from '/tbc/core/resources.js';
 import { parseActionMetrics } from './metrics_helpers.js';
 import { ResultComponent } from './result_component.js';
-export class CastMetrics extends ResultComponent {
+export class SpellMetrics extends ResultComponent {
     constructor(config) {
         config.rootCssClass = 'cast-metrics-root';
         super(config);
@@ -101,7 +101,7 @@ export class CastMetrics extends ResultComponent {
     }
 }
 // For the no-damage casts
-export class OtherCastMetrics extends ResultComponent {
+export class CastMetrics extends ResultComponent {
     constructor(config) {
         config.rootCssClass = 'other-cast-metrics-root';
         super(config);
@@ -111,6 +111,7 @@ export class OtherCastMetrics extends ResultComponent {
 				<tr class="cast-metrics-table-header-row">
 					<th class="cast-metrics-table-header-cell"><span>Name</span></th>
 					<th class="cast-metrics-table-header-cell"><span>Casts</span></th>
+					<th class="cast-metrics-table-header-cell"><span>CPM</span></th>
 				</tr>
 			</thead>
 			<tbody class="cast-metrics-table-body">
@@ -125,6 +126,11 @@ export class OtherCastMetrics extends ResultComponent {
             'content': 'Casts',
             'allowHTML': true,
         });
+        // CPM
+        tippy(headerElems[2], {
+            'content': 'Casts / (Encounter Duration / 60 Seconds)',
+            'allowHTML': true,
+        });
         $(this.tableElem).tablesorter({ sortList: [[1, 1]] });
     }
     onSimResult(request, result) {
@@ -132,7 +138,7 @@ export class OtherCastMetrics extends ResultComponent {
         const iterations = request.simOptions.iterations;
         const duration = request.encounter?.duration || 1;
         parseActionMetrics(result.raidMetrics.parties[0].players[0].actions).then(actionMetrics => {
-            actionMetrics.filter(e => e.hits + e.misses == 0).forEach(actionMetric => {
+            actionMetrics.forEach(actionMetric => {
                 const rowElem = document.createElement('tr');
                 this.bodyElem.appendChild(rowElem);
                 const nameCellElem = document.createElement('td');
@@ -153,6 +159,7 @@ export class OtherCastMetrics extends ResultComponent {
                     return cellElem;
                 };
                 addCell((actionMetric.casts / iterations).toFixed(1)); // Casts
+                addCell((actionMetric.casts / iterations / (duration / 60)).toFixed(1)); // Casts
             });
             $(this.tableElem).trigger('update');
         });

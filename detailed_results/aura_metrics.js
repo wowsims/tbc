@@ -1,3 +1,4 @@
+import { setWowheadHref } from '/tbc/core/resources.js';
 import { parseAuraMetrics } from './metrics_helpers.js';
 import { ResultComponent } from './result_component.js';
 export class BuffAuraMetrics extends ResultComponent {
@@ -42,13 +43,16 @@ export class BuffAuraMetrics extends ResultComponent {
 				`;
                 const iconElem = nameCellElem.getElementsByClassName('aura-metrics-action-icon')[0];
                 iconElem.style.backgroundImage = `url('${auraMetric.iconUrl}')`;
+                if (!('otherId' in auraMetric.actionId.id)) {
+                    setWowheadHref(iconElem, auraMetric.actionId.id);
+                }
                 const addCell = (value) => {
                     const cellElem = document.createElement('td');
                     cellElem.textContent = String(value);
                     rowElem.appendChild(cellElem);
                     return cellElem;
                 };
-                addCell((auraMetric.uptimeSecondsAvg / iterations / duration * 100).toFixed(2) + '%'); // Uptime
+                addCell((auraMetric.uptimeSecondsAvg / duration * 100).toFixed(2) + '%'); // Uptime
             });
             $(this.tableElem).trigger('update');
         });
@@ -96,13 +100,16 @@ export class DebuffAuraMetrics extends ResultComponent {
 				`;
                 const iconElem = nameCellElem.getElementsByClassName('aura-metrics-action-icon')[0];
                 iconElem.style.backgroundImage = `url('${auraMetric.iconUrl}')`;
+                if (!('otherId' in auraMetric.actionId.id)) {
+                    setWowheadHref(iconElem, auraMetric.actionId.id);
+                }
                 const addCell = (value) => {
                     const cellElem = document.createElement('td');
                     cellElem.textContent = String(value);
                     rowElem.appendChild(cellElem);
                     return cellElem;
                 };
-                addCell((auraMetric.uptimeSecondsAvg / iterations / duration * 100).toFixed(2) + '%'); // Uptime
+                addCell((auraMetric.uptimeSecondsAvg / duration * 100).toFixed(2) + '%'); // Uptime
             });
             $(this.tableElem).trigger('update');
         });
