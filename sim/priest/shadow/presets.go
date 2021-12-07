@@ -73,6 +73,7 @@ var PlayerOptionsBasic = &proto.Player_ShadowPriest{
 		Rotation: &proto.ShadowPriest_Rotation{
 			RotationType: proto.ShadowPriest_Rotation_Basic,
 			// UseDevPlague: true,
+			PrecastVt: true,
 		},
 	},
 }

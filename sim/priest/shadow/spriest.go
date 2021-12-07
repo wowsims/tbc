@@ -141,6 +141,12 @@ const (
 
 func (spriest *ShadowPriest) Act(sim *core.Simulation) time.Duration {
 	// fmt.Printf("[%0.1f] Priest Acting...\n", sim.CurrentTime.Seconds())
+	if spriest.rotation.PrecastVt && sim.CurrentTime == 0 {
+		spell := spriest.NewVT(sim, sim.GetPrimaryTarget())
+		spell.CastTime = 0
+		spell.IgnoreCooldowns = true
+		spell.Cast(sim)
+	}
 
 	// This if block is to handle being able to cast a VT while having another one ticking.
 	//  This will swap the casting spell if it is ticking, so the newly cast spell is now the ticking spell.

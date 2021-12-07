@@ -47,12 +47,28 @@ export const ShadowPriestRotationConfig = {
 			config: {
 				label: 'Use Shadowfiend',
 				labelTooltip: 'Use Shadowfiend when low mana and off CD.',
-				changedEvent: (player: Player<Spec.SpecShadowPriest>) => player.raceChangeEmitter,
+				changedEvent: (player: Player<Spec.SpecShadowPriest>) => player.rotationChangeEmitter,
 				getValue: (player: Player<Spec.SpecShadowPriest>) => player.getSpecOptions().useShadowfiend,
 				setValue: (player: Player<Spec.SpecShadowPriest>, newValue: boolean) => {
 					const newOptions = player.getSpecOptions();
 					newOptions.useShadowfiend = newValue;
 					player.setSpecOptions(newOptions);
+				},
+			},
+		},
+		{
+			type: 'boolean' as const,
+			cssClass: 'devplague-picker',
+			getModObject: (simUI: SimUI<any>) => simUI.player,
+			config: {
+				label: 'Precast Vampiric Touch',
+				labelTooltip: 'Start fight with VT landing at time 0',
+				changedEvent: (player: Player<Spec.SpecShadowPriest>) => player.rotationChangeEmitter,
+				getValue: (player: Player<Spec.SpecShadowPriest>) => player.getRotation().precastVt,
+				setValue: (player: Player<Spec.SpecShadowPriest>, newValue: boolean) => {
+					const newRotation = player.getRotation();
+					newRotation.precastVt = newValue;
+					player.setRotation(newRotation);
 				},
 			},
 		},
