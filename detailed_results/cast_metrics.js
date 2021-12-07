@@ -159,7 +159,7 @@ export class CastMetrics extends ResultComponent {
                     return cellElem;
                 };
                 addCell((actionMetric.casts / iterations).toFixed(1)); // Casts
-                addCell((actionMetric.casts / iterations / (duration / 60)).toFixed(1)); // Casts
+                addCell((actionMetric.casts / iterations / (duration / 60)).toFixed(1)); // CPM
             });
             $(this.tableElem).trigger('update');
         });
