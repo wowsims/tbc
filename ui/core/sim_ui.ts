@@ -136,14 +136,17 @@ export abstract class SimUI<SpecType extends Spec> {
 					'parties': [
 						{
 							'players': [
-								obj['player'],
+								{
+									'spec': this.player.spec,
+									'player': obj['player'],
+								},
 							],
 							'buffs': obj['sim']['partyBuffs'],
 						},
 					],
 					'buffs': obj['sim']['raidBuffs'],
 				};
-				obj['raid']['parties'][0]['players'][0]['buffs'] = obj['sim']['individualBuffs'];
+				obj['raid']['parties'][0]['players'][0]['player']['buffs'] = obj['sim']['individualBuffs'];
 			}
 		}
 
