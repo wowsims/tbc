@@ -5,7 +5,7 @@ export class PercentOom extends ResultComponent {
         super(config);
     }
     onSimResult(request, result) {
-        const percentOom = result.playerMetrics.numOom / request.simOptions.iterations;
+        const percentOom = result.raidMetrics.parties[0].players[0].numOom / request.simOptions.iterations;
         this.rootElem.innerHTML = `
       <span class="percent-oom-value">${Math.round(percentOom * 100)}%</span>
       <span class="percent-oom-label">of simulations went OOM</span>

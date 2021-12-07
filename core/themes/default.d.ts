@@ -1,6 +1,6 @@
-import { Encounter } from '/tbc/core/encounter.js';
+import { Party } from '/tbc/core/party.js';
 import { Player } from '/tbc/core/player.js';
-import { Sim } from '/tbc/core/sim.js';
+import { Raid } from '/tbc/core/raid.js';
 import { Target } from '/tbc/core/target.js';
 import { BooleanPickerConfig } from '/tbc/core/components/boolean_picker.js';
 import { EncounterPickerConfig } from '/tbc/core/components/encounter_picker.js';
@@ -12,7 +12,6 @@ import { RaidBuffs } from '/tbc/core/proto/common.js';
 import { PartyBuffs } from '/tbc/core/proto/common.js';
 import { IndividualBuffs } from '/tbc/core/proto/common.js';
 import { Consumes } from '/tbc/core/proto/common.js';
-import { Encounter as EncounterProto } from '/tbc/core/proto/common.js';
 import { EquipmentSpec } from '/tbc/core/proto/common.js';
 import { Race } from '/tbc/core/proto/common.js';
 import { Spec } from '/tbc/core/proto/common.js';
@@ -20,10 +19,6 @@ import { Stat } from '/tbc/core/proto/common.js';
 import { Gear } from '/tbc/core/proto_utils/gear.js';
 import { Stats } from '/tbc/core/proto_utils/stats.js';
 import { SimUI, SimUIConfig } from '/tbc/core/sim_ui.js';
-export interface IconSection<ModObject> {
-    tooltip?: string;
-    icons: Array<IconInput<ModObject>>;
-}
 export interface InputSection {
     tooltip?: string;
     inputs: Array<{
@@ -47,10 +42,12 @@ export interface DefaultThemeConfig<SpecType extends Spec> extends SimUIConfig<S
     epStats: Array<Stat>;
     epReferenceStat: Stat;
     displayStats: Array<Stat>;
-    selfBuffInputs: IconSection<Player<any>>;
-    buffInputs: IconSection<Sim>;
-    debuffInputs: IconSection<Target>;
-    consumeInputs: IconSection<Player<any>>;
+    selfBuffInputs: Array<IconInput<Player<any>>>;
+    raidBuffInputs: Array<IconInput<Raid>>;
+    partyBuffInputs: Array<IconInput<Party>>;
+    playerBuffInputs: Array<IconInput<Player<any>>>;
+    debuffInputs: Array<IconInput<Target>>;
+    consumeInputs: Array<IconInput<Player<any>>>;
     rotationInputs: InputSection;
     otherInputs?: InputSection;
     additionalSections?: Record<string, InputSection>;
@@ -58,7 +55,6 @@ export interface DefaultThemeConfig<SpecType extends Spec> extends SimUIConfig<S
     freezeTalents?: boolean;
     presets: {
         gear: Array<PresetGear>;
-        encounters: Array<SavedDataConfig<Encounter, EncounterProto>>;
         talents: Array<SavedDataConfig<Player<any>, string>>;
     };
 }

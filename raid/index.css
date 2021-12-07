@@ -1401,6 +1401,7 @@ td, th {
   padding-top: 15px;
   margin: 10px;
   margin-top: 20px;
+  display: grid;
 }
 
 .settings-section > label {

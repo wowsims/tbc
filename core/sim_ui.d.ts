@@ -1,4 +1,5 @@
 import { IndividualSimRequest } from '/tbc/core/proto/api.js';
+import { RaidSimRequest } from '/tbc/core/proto/api.js';
 import { Consumes } from '/tbc/core/proto/common.js';
 import { Debuffs } from '/tbc/core/proto/common.js';
 import { EquipmentSpec } from '/tbc/core/proto/common.js';
@@ -9,7 +10,9 @@ import { Spec } from '/tbc/core/proto/common.js';
 import { Stats } from '/tbc/core/proto_utils/stats.js';
 import { SpecOptions } from '/tbc/core/proto_utils/utils.js';
 import { SpecRotation } from '/tbc/core/proto_utils/utils.js';
+import { Party } from './party.js';
 import { Player } from './player.js';
+import { Raid } from './raid.js';
 import { Sim } from './sim.js';
 import { Encounter } from './encounter.js';
 import { TypedEvent } from './typed_event.js';
@@ -34,6 +37,8 @@ export interface SimUIConfig<SpecType extends Spec> {
 export declare abstract class SimUI<SpecType extends Spec> {
     readonly parentElem: HTMLElement;
     readonly sim: Sim;
+    readonly raid: Raid;
+    readonly party: Party;
     readonly player: Player<SpecType>;
     readonly encounter: Encounter;
     readonly simUiConfig: SimUIConfig<SpecType>;
@@ -51,6 +56,7 @@ export declare abstract class SimUI<SpecType extends Spec> {
     getSavedSettingsStorageKey(): string;
     getSavedTalentsStorageKey(): string;
     private getStorageKey;
+    makeRaidSimRequest(iterations: number, debug: boolean): RaidSimRequest;
     makeCurrentIndividualSimRequest(iterations: number, debug: boolean): IndividualSimRequest;
 }
 export declare type ExclusivityTag = 'Battle Elixir' | 'Drums' | 'Food' | 'Alchohol' | 'Guardian Elixir' | 'Potion' | 'Rune' | 'Weapon Imbue';

@@ -1,6 +1,3 @@
-import { RaidBuffs } from '/tbc/core/proto/common.js';
-import { PartyBuffs } from '/tbc/core/proto/common.js';
-import { IndividualBuffs } from '/tbc/core/proto/common.js';
 import { Enchant } from '/tbc/core/proto/common.js';
 import { EquipmentSpec } from '/tbc/core/proto/common.js';
 import { Gem } from '/tbc/core/proto/common.js';
@@ -14,16 +11,10 @@ import { TypedEvent } from './typed_event.js';
 import { WorkerPool } from './worker_pool.js';
 export declare class Sim extends WorkerPool {
     private phase;
-    private raidBuffs;
-    private partyBuffs;
-    private individualBuffs;
     private items;
     private enchants;
     private gems;
     readonly phaseChangeEmitter: TypedEvent<void>;
-    readonly raidBuffsChangeEmitter: TypedEvent<void>;
-    readonly partyBuffsChangeEmitter: TypedEvent<void>;
-    readonly individualBuffsChangeEmitter: TypedEvent<void>;
     readonly changeEmitter: TypedEvent<void>;
     readonly gearListEmitter: TypedEvent<void>;
     private _init;
@@ -35,14 +26,6 @@ export declare class Sim extends WorkerPool {
     getMatchingGems(socketColor: GemColor): Array<Gem>;
     getPhase(): number;
     setPhase(newPhase: number): void;
-    getRaidBuffs(): RaidBuffs;
-    setRaidBuffs(newRaidBuffs: RaidBuffs): void;
-    getPartyBuffs(): PartyBuffs;
-    setPartyBuffs(newPartyBuffs: PartyBuffs): void;
-    getIndividualBuffs(): IndividualBuffs;
-    setIndividualBuffs(newIndividualBuffs: IndividualBuffs): void;
     lookupItemSpec(itemSpec: ItemSpec): EquippedItem | null;
     lookupEquipmentSpec(equipSpec: EquipmentSpec): Gear;
-    toJson(): Object;
-    fromJson(obj: any): void;
 }

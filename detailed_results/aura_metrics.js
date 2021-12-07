@@ -30,7 +30,7 @@ export class BuffAuraMetrics extends ResultComponent {
         this.bodyElem.textContent = '';
         const iterations = request.simOptions.iterations;
         const duration = request.encounter?.duration || 1;
-        parseAuraMetrics(result.playerMetrics.auras).then(auraMetrics => {
+        parseAuraMetrics(result.raidMetrics.parties[0].players[0].auras).then(auraMetrics => {
             auraMetrics.forEach(auraMetric => {
                 const rowElem = document.createElement('tr');
                 this.bodyElem.appendChild(rowElem);

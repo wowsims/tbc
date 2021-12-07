@@ -1,21 +1,30 @@
+import { Party as PartyProto } from '/tbc/core/proto/api.js';
+import { PartyBuffs } from '/tbc/core/proto/common.js';
+import { Raid } from './raid.js';
 import { Player } from './player.js';
 import { TypedEvent } from './typed_event.js';
 import { Sim } from './sim.js';
-export interface PartyConfig {
-}
 export declare const MAX_PARTY_SIZE = 5;
 export declare class Party {
+    readonly sim: Sim;
+    readonly raid: Raid;
+    private buffs;
     readonly compChangeEmitter: TypedEvent<void>;
+    readonly buffsChangeEmitter: TypedEvent<void>;
     readonly changeEmitter: TypedEvent<void>;
     private players;
-    readonly sim: Sim;
     private readonly playerChangeListener;
-    constructor(sim: Sim);
+    constructor(raid: Raid, sim: Sim);
     size(): number;
-    empty(): boolean;
+    isEmpty(): boolean;
+    clear(): void;
+    getIndex(): number;
     getPlayers(): Array<Player<any> | null>;
     getPlayer(playerIndex: number): Player<any> | null;
     setPlayer(playerIndex: number, newPlayer: Player<any> | null): void;
+    getBuffs(): PartyBuffs;
+    setBuffs(newBuffs: PartyBuffs): void;
+    toProto(): PartyProto;
     toJson(): Object;
     fromJson(obj: any): void;
 }

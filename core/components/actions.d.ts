@@ -5,4 +5,5 @@ import { DetailedResults } from './detailed_results.js';
 import { Results } from './results.js';
 export declare class Actions extends Component {
     constructor(parent: HTMLElement, simUI: SimUI<any>, epStats: Array<Stat>, epReferenceStat: Stat, results: Results, detailedResults: DetailedResults);
+    private makeStatWeightsRequest;
 }

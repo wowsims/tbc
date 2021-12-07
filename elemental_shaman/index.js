@@ -9,7 +9,6 @@ import { Stats } from '/tbc/core/proto_utils/stats.js';
 import { DefaultTheme } from '/tbc/core/themes/default.js';
 import * as IconInputs from '/tbc/core/components/icon_inputs.js';
 import * as OtherInputs from '/tbc/core/components/other_inputs.js';
-import * as Tooltips from '/tbc/core/constants/tooltips.js';
 import * as ShamanInputs from './inputs.js';
 import * as Presets from './presets.js';
 const theme = new DefaultTheme(document.body, {
@@ -78,66 +77,60 @@ const theme = new DefaultTheme(document.body, {
         }),
     },
     // IconInputs to include in the 'Self Buffs' section on the settings tab.
-    selfBuffInputs: {
-        tooltip: Tooltips.SELF_BUFFS_SECTION,
-        icons: [
-            ShamanInputs.IconWaterShield,
-            ShamanInputs.IconBloodlust,
-            ShamanInputs.IconWrathOfAirTotem,
-            ShamanInputs.IconTotemOfWrath,
-            ShamanInputs.IconManaSpringTotem,
-            IconInputs.DrumsOfBattleConsume,
-            IconInputs.DrumsOfRestorationConsume,
-        ],
-    },
+    selfBuffInputs: [
+        ShamanInputs.IconWaterShield,
+        ShamanInputs.IconBloodlust,
+        ShamanInputs.IconWrathOfAirTotem,
+        ShamanInputs.IconTotemOfWrath,
+        ShamanInputs.IconManaSpringTotem,
+        IconInputs.DrumsOfBattleConsume,
+        IconInputs.DrumsOfRestorationConsume,
+    ],
     // IconInputs to include in the 'Other Buffs' section on the settings tab.
-    buffInputs: {
-        tooltip: Tooltips.OTHER_BUFFS_SECTION,
-        icons: [
-            IconInputs.ArcaneBrilliance,
-            IconInputs.DivineSpirit,
-            IconInputs.BlessingOfKings,
-            IconInputs.BlessingOfWisdom,
-            IconInputs.GiftOfTheWild,
-            IconInputs.MoonkinAura,
-            IconInputs.DrumsOfBattleBuff,
-            IconInputs.DrumsOfRestorationBuff,
-            IconInputs.Bloodlust,
-            IconInputs.WrathOfAirTotem,
-            IconInputs.TotemOfWrath,
-            IconInputs.ManaSpringTotem,
-            IconInputs.EyeOfTheNight,
-            IconInputs.ChainOfTheTwilightOwl,
-            IconInputs.JadePendantOfBlasting,
-            IconInputs.AtieshWarlock,
-            IconInputs.AtieshMage,
-        ],
-    },
+    raidBuffInputs: [
+        IconInputs.ArcaneBrilliance,
+        IconInputs.DivineSpirit,
+        IconInputs.GiftOfTheWild,
+    ],
+    partyBuffInputs: [
+        IconInputs.MoonkinAura,
+        IconInputs.DrumsOfBattleBuff,
+        IconInputs.DrumsOfRestorationBuff,
+        IconInputs.Bloodlust,
+        IconInputs.WrathOfAirTotem,
+        IconInputs.TotemOfWrath,
+        IconInputs.ManaSpringTotem,
+        IconInputs.EyeOfTheNight,
+        IconInputs.ChainOfTheTwilightOwl,
+        IconInputs.JadePendantOfBlasting,
+        IconInputs.AtieshWarlock,
+        IconInputs.AtieshMage,
+    ],
+    playerBuffInputs: [
+        IconInputs.BlessingOfKings,
+        IconInputs.BlessingOfWisdom,
+    ],
     // IconInputs to include in the 'Debuffs' section on the settings tab.
-    debuffInputs: {
-        icons: [
-            IconInputs.JudgementOfWisdom,
-            IconInputs.ImprovedSealOfTheCrusader,
-            IconInputs.Misery,
-        ],
-    },
+    debuffInputs: [
+        IconInputs.JudgementOfWisdom,
+        IconInputs.ImprovedSealOfTheCrusader,
+        IconInputs.Misery,
+    ],
     // IconInputs to include in the 'Consumes' section on the settings tab.
-    consumeInputs: {
-        icons: [
-            IconInputs.DefaultSuperManaPotion,
-            IconInputs.DefaultDestructionPotion,
-            IconInputs.DarkRune,
-            IconInputs.FlaskOfBlindingLight,
-            IconInputs.FlaskOfSupremePower,
-            IconInputs.AdeptsElixir,
-            IconInputs.ElixirOfMajorMageblood,
-            IconInputs.ElixirOfDraenicWisdom,
-            IconInputs.BrilliantWizardOil,
-            IconInputs.SuperiorWizardOil,
-            IconInputs.BlackenedBasilisk,
-            IconInputs.SkullfishSoup,
-        ],
-    },
+    consumeInputs: [
+        IconInputs.DefaultSuperManaPotion,
+        IconInputs.DefaultDestructionPotion,
+        IconInputs.DarkRune,
+        IconInputs.FlaskOfBlindingLight,
+        IconInputs.FlaskOfSupremePower,
+        IconInputs.AdeptsElixir,
+        IconInputs.ElixirOfMajorMageblood,
+        IconInputs.ElixirOfDraenicWisdom,
+        IconInputs.BrilliantWizardOil,
+        IconInputs.SuperiorWizardOil,
+        IconInputs.BlackenedBasilisk,
+        IconInputs.SkullfishSoup,
+    ],
     // Inputs to include in the 'Rotation' section on the settings tab.
     rotationInputs: ShamanInputs.ElementalShamanRotationConfig,
     // Inputs to include in the 'Other' section on the settings tab.
@@ -167,8 +160,6 @@ const theme = new DefaultTheme(document.body, {
             Presets.P1_BIS,
             Presets.P2_BIS,
         ],
-        // Preset encounter settings that the user can quickly select.
-        encounters: [],
     },
 });
 theme.init();

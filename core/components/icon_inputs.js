@@ -51,114 +51,114 @@ export const DefaultDestructionPotion = makeEnumValueConsumeInput({ itemId: 2283
 export const DefaultSuperManaPotion = makeEnumValueConsumeInput({ itemId: 22832 }, 'defaultPotion', Potions.SuperManaPotion, ['Potion']);
 export const DrumsOfBattleConsume = makeEnumValueConsumeInput({ spellId: 35476 }, 'drums', Drums.DrumsOfBattle, ['Drums']);
 export const DrumsOfRestorationConsume = makeEnumValueConsumeInput({ spellId: 35478 }, 'drums', Drums.DrumsOfRestoration, ['Drums']);
-function makeBooleanRaidBuffInput(id, raidBuffsFieldName, exclusivityTags) {
+function makeBooleanRaidBuffInput(id, buffsFieldName, exclusivityTags) {
     return {
         id: id,
         states: 2,
         exclusivityTags: exclusivityTags,
-        changedEvent: (sim) => sim.raidBuffsChangeEmitter,
-        getValue: (sim) => sim.getRaidBuffs()[raidBuffsFieldName],
-        setBooleanValue: (sim, newValue) => {
-            const newRaidBuffs = sim.getRaidBuffs();
-            newRaidBuffs[raidBuffsFieldName] = newValue;
-            sim.setRaidBuffs(newRaidBuffs);
+        changedEvent: (raid) => raid.buffsChangeEmitter,
+        getValue: (raid) => raid.getBuffs()[buffsFieldName],
+        setBooleanValue: (raid, newValue) => {
+            const newBuffs = raid.getBuffs();
+            newBuffs[buffsFieldName] = newValue;
+            raid.setBuffs(newBuffs);
         },
     };
 }
-function makeTristateRaidBuffInput(id, impId, raidBuffsFieldName) {
+function makeTristateRaidBuffInput(id, impId, buffsFieldName) {
     return {
         id: id,
         states: 3,
         improvedId: impId,
-        changedEvent: (sim) => sim.raidBuffsChangeEmitter,
-        getValue: (sim) => sim.getRaidBuffs()[raidBuffsFieldName],
-        setNumberValue: (sim, newValue) => {
-            const newRaidBuffs = sim.getRaidBuffs();
-            newRaidBuffs[raidBuffsFieldName] = newValue;
-            sim.setRaidBuffs(newRaidBuffs);
+        changedEvent: (raid) => raid.buffsChangeEmitter,
+        getValue: (raid) => raid.getBuffs()[buffsFieldName],
+        setNumberValue: (raid, newValue) => {
+            const newBuffs = raid.getBuffs();
+            newBuffs[buffsFieldName] = newValue;
+            raid.setBuffs(newBuffs);
         },
     };
 }
-function makeBooleanPartyBuffInput(id, partyBuffsFieldName, exclusivityTags) {
+function makeBooleanPartyBuffInput(id, buffsFieldName, exclusivityTags) {
     return {
         id: id,
         states: 2,
         exclusivityTags: exclusivityTags,
-        changedEvent: (sim) => sim.partyBuffsChangeEmitter,
-        getValue: (sim) => sim.getPartyBuffs()[partyBuffsFieldName],
-        setBooleanValue: (sim, newValue) => {
-            const newPartyBuffs = sim.getPartyBuffs();
-            newPartyBuffs[partyBuffsFieldName] = newValue;
-            sim.setPartyBuffs(newPartyBuffs);
+        changedEvent: (party) => party.buffsChangeEmitter,
+        getValue: (party) => party.getBuffs()[buffsFieldName],
+        setBooleanValue: (party, newValue) => {
+            const newBuffs = party.getBuffs();
+            newBuffs[buffsFieldName] = newValue;
+            party.setBuffs(newBuffs);
         },
     };
 }
-function makeTristatePartyBuffInput(id, impId, partyBuffsFieldName) {
+function makeTristatePartyBuffInput(id, impId, buffsFieldName) {
     return {
         id: id,
         states: 3,
         improvedId: impId,
-        changedEvent: (sim) => sim.partyBuffsChangeEmitter,
-        getValue: (sim) => sim.getPartyBuffs()[partyBuffsFieldName],
-        setNumberValue: (sim, newValue) => {
-            const newPartyBuffs = sim.getPartyBuffs();
-            newPartyBuffs[partyBuffsFieldName] = newValue;
-            sim.setPartyBuffs(newPartyBuffs);
+        changedEvent: (party) => party.buffsChangeEmitter,
+        getValue: (party) => party.getBuffs()[buffsFieldName],
+        setNumberValue: (party, newValue) => {
+            const newBuffs = party.getBuffs();
+            newBuffs[buffsFieldName] = newValue;
+            party.setBuffs(newBuffs);
         },
     };
 }
-function makeMultistatePartyBuffInput(id, numStates, partyBuffsFieldName) {
+function makeMultistatePartyBuffInput(id, numStates, buffsFieldName) {
     return {
         id: id,
         states: numStates,
-        changedEvent: (sim) => sim.partyBuffsChangeEmitter,
-        getValue: (sim) => sim.getPartyBuffs()[partyBuffsFieldName],
-        setNumberValue: (sim, newValue) => {
-            const newPartyBuffs = sim.getPartyBuffs();
-            newPartyBuffs[partyBuffsFieldName] = newValue;
-            sim.setPartyBuffs(newPartyBuffs);
+        changedEvent: (party) => party.buffsChangeEmitter,
+        getValue: (party) => party.getBuffs()[buffsFieldName],
+        setNumberValue: (party, newValue) => {
+            const newBuffs = party.getBuffs();
+            newBuffs[buffsFieldName] = newValue;
+            party.setBuffs(newBuffs);
         },
     };
 }
-function makeEnumValuePartyBuffInput(id, partyBuffsFieldName, enumValue, exclusivityTags) {
+function makeEnumValuePartyBuffInput(id, buffsFieldName, enumValue, exclusivityTags) {
     return {
         id: id,
         states: 2,
         exclusivityTags: exclusivityTags,
-        changedEvent: (sim) => sim.partyBuffsChangeEmitter,
-        getValue: (sim) => sim.getPartyBuffs()[partyBuffsFieldName] == enumValue,
-        setBooleanValue: (sim, newValue) => {
-            const newPartyBuffs = sim.getPartyBuffs();
-            newPartyBuffs[partyBuffsFieldName] = newValue ? enumValue : 0;
-            sim.setPartyBuffs(newPartyBuffs);
+        changedEvent: (party) => party.buffsChangeEmitter,
+        getValue: (party) => party.getBuffs()[buffsFieldName] == enumValue,
+        setBooleanValue: (party, newValue) => {
+            const newBuffs = party.getBuffs();
+            newBuffs[buffsFieldName] = newValue ? enumValue : 0;
+            party.setBuffs(newBuffs);
         },
     };
 }
-function makeBooleanIndividualBuffInput(id, individualBuffsFieldName, exclusivityTags) {
+function makeBooleanIndividualBuffInput(id, buffsFieldName, exclusivityTags) {
     return {
         id: id,
         states: 2,
         exclusivityTags: exclusivityTags,
-        changedEvent: (sim) => sim.individualBuffsChangeEmitter,
-        getValue: (sim) => sim.getIndividualBuffs()[individualBuffsFieldName],
-        setBooleanValue: (sim, newValue) => {
-            const newIndividualBuffs = sim.getIndividualBuffs();
-            newIndividualBuffs[individualBuffsFieldName] = newValue;
-            sim.setIndividualBuffs(newIndividualBuffs);
+        changedEvent: (player) => player.buffsChangeEmitter,
+        getValue: (player) => player.getBuffs()[buffsFieldName],
+        setBooleanValue: (player, newValue) => {
+            const newBuffs = player.getBuffs();
+            newBuffs[buffsFieldName] = newValue;
+            player.setBuffs(newBuffs);
         },
     };
 }
-function makeTristateIndividualBuffInput(id, impId, individualBuffsFieldName) {
+function makeTristateIndividualBuffInput(id, impId, buffsFieldName) {
     return {
         id: id,
         states: 3,
         improvedId: impId,
-        changedEvent: (sim) => sim.individualBuffsChangeEmitter,
-        getValue: (sim) => sim.getIndividualBuffs()[individualBuffsFieldName],
-        setNumberValue: (sim, newValue) => {
-            const newIndividualBuffs = sim.getIndividualBuffs();
-            newIndividualBuffs[individualBuffsFieldName] = newValue;
-            sim.setIndividualBuffs(newIndividualBuffs);
+        changedEvent: (player) => player.buffsChangeEmitter,
+        getValue: (player) => player.getBuffs()[buffsFieldName],
+        setNumberValue: (player, newValue) => {
+            const newBuffs = player.getBuffs();
+            newBuffs[buffsFieldName] = newValue;
+            player.setBuffs(newBuffs);
         },
     };
 }

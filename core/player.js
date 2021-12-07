@@ -1,23 +1,27 @@
 import { Consumes } from '/tbc/core/proto/common.js';
 import { EquipmentSpec } from '/tbc/core/proto/common.js';
+import { IndividualBuffs } from '/tbc/core/proto/common.js';
 import { Player as PlayerProto } from '/tbc/core/proto/api.js';
 import { ComputeStatsRequest, ComputeStatsResult } from '/tbc/core/proto/api.js';
 import { Gear } from '/tbc/core/proto_utils/gear.js';
 import { Stats } from '/tbc/core/proto_utils/stats.js';
 import { canEquipItem, getEligibleItemSlots, getMetaGemEffectEP, gemMatchesSocket, raceToFaction, specToClass, specToEligibleRaces, specTypeFunctions, withSpecProto, } from '/tbc/core/proto_utils/utils.js';
 import { TypedEvent } from './typed_event.js';
+import { MAX_PARTY_SIZE } from './party.js';
 import { sum } from './utils.js';
 import { wait } from './utils.js';
 // Manages all the gear / consumes / other settings for a single Player.
 export class Player {
     constructor(spec, sim) {
         this.name = '';
+        this.buffs = IndividualBuffs.create();
         this.consumes = Consumes.create();
         this.bonusStats = new Stats();
         this.gear = new Gear({});
         this.talentsString = '';
         this.epWeights = new Stats();
         this.nameChangeEmitter = new TypedEvent();
+        this.buffsChangeEmitter = new TypedEvent();
         this.consumesChangeEmitter = new TypedEvent();
         this.bonusStatsChangeEmitter = new TypedEvent();
         this.gearChangeEmitter = new TypedEvent();
@@ -31,6 +35,8 @@ export class Player {
         // Emits when any of the above emitters emit.
         this.changeEmitter = new TypedEvent();
         this.sim = sim;
+        this.party = null;
+        this.raid = null;
         this.spec = spec;
         this.race = specToEligibleRaces[this.spec][0];
         this.specTypeFunctions = specTypeFunctions[this.spec];
@@ -39,6 +45,7 @@ export class Player {
         this.specOptions = this.specTypeFunctions.optionsCreate();
         [
             this.nameChangeEmitter,
+            this.buffsChangeEmitter,
             this.consumesChangeEmitter,
             this.bonusStatsChangeEmitter,
             this.gearChangeEmitter,
@@ -55,6 +62,43 @@ export class Player {
         this.changeEmitter.on(() => {
             this.updateCharacterStats();
         });
+    }
+    getParty() {
+        return this.party;
+    }
+    getRaid() {
+        return this.raid;
+    }
+    // Returns this player's index within its party [0-4].
+    getPartyIndex() {
+        if (this.party == null) {
+            throw new Error('Can\'t get party index for player without a party!');
+        }
+        return this.party.getPlayers().indexOf(this);
+    }
+    // Returns this player's index within its raid [0-24].
+    getRaidIndex() {
+        if (this.party == null) {
+            throw new Error('Can\'t get raid index for player without a party!');
+        }
+        return this.party.getIndex() * MAX_PARTY_SIZE + this.getPartyIndex();
+    }
+    setParty(newParty) {
+        if (this.party == newParty) {
+            return;
+        }
+        // Remove player from its old party if there is one.
+        if (this.party != null) {
+            this.party.setPlayer(this.getPartyIndex(), null);
+        }
+        if (newParty == null) {
+            this.party = null;
+            this.raid = null;
+        }
+        else {
+            this.party = newParty;
+            this.raid = newParty.raid;
+        }
     }
     // Returns all items that this player can wear in the given slot.
     getItems(slot) {
@@ -86,8 +130,8 @@ export class Player {
         await wait(10);
         const computeStatsResult = await this.sim.computeStats(ComputeStatsRequest.create({
             player: this.toProto(),
-            raidBuffs: this.sim.getRaidBuffs(),
-            partyBuffs: this.sim.getPartyBuffs(),
+            raidBuffs: this.raid.getBuffs(),
+            partyBuffs: this.party.getBuffs(),
         }));
         this.currentStats = computeStatsResult;
         this.currentStatsEmitter.emit();
@@ -115,6 +159,17 @@ export class Player {
     }
     getFaction() {
         return raceToFaction[this.getRace()];
+    }
+    getBuffs() {
+        // Make a defensive copy
+        return IndividualBuffs.clone(this.buffs);
+    }
+    setBuffs(newBuffs) {
+        if (IndividualBuffs.equals(this.buffs, newBuffs))
+            return;
+        // Make a defensive copy
+        this.buffs = IndividualBuffs.clone(newBuffs);
+        this.buffsChangeEmitter.emit();
     }
     getConsumes() {
         // Make a defensive copy
@@ -248,7 +303,7 @@ export class Player {
             equipment: this.getGear().asSpec(),
             consumes: this.getConsumes(),
             bonusStats: this.getBonusStats().asArray(),
-            buffs: this.sim.getIndividualBuffs(),
+            buffs: this.getBuffs(),
         }), this.getRotation(), this.getTalents(), this.getSpecOptions());
     }
     // TODO: Remove to/from json functions and use proto versions instead. This will require
@@ -257,6 +312,7 @@ export class Player {
     toJson() {
         return {
             'name': this.name,
+            'buffs': IndividualBuffs.toJson(this.buffs),
             'consumes': Consumes.toJson(this.consumes),
             'bonusStats': this.bonusStats.toJson(),
             'gear': EquipmentSpec.toJson(this.gear.asSpec()),
@@ -275,6 +331,12 @@ export class Player {
         }
         catch (e) {
             console.warn('Failed to parse name: ' + e);
+        }
+        try {
+            this.setBuffs(IndividualBuffs.fromJson(obj['buffs']));
+        }
+        catch (e) {
+            console.warn('Failed to parse player buffs: ' + e);
         }
         try {
             this.setConsumes(Consumes.fromJson(obj['consumes']));

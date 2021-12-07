@@ -1,6 +1,3 @@
-import { RaidBuffs } from '/tbc/core/proto/common.js';
-import { PartyBuffs } from '/tbc/core/proto/common.js';
-import { IndividualBuffs } from '/tbc/core/proto/common.js';
 import { Item } from '/tbc/core/proto/common.js';
 import { GearListRequest } from '/tbc/core/proto/api.js';
 import { EquippedItem } from '/tbc/core/proto_utils/equipped_item.js';
@@ -17,26 +14,17 @@ export class Sim extends WorkerPool {
     constructor() {
         super(3);
         this.phase = OtherConstants.CURRENT_PHASE;
-        this.raidBuffs = RaidBuffs.create();
-        this.partyBuffs = PartyBuffs.create();
-        this.individualBuffs = IndividualBuffs.create();
         // Database
         this.items = {};
         this.enchants = {};
         this.gems = {};
         this.phaseChangeEmitter = new TypedEvent();
-        this.raidBuffsChangeEmitter = new TypedEvent();
-        this.partyBuffsChangeEmitter = new TypedEvent();
-        this.individualBuffsChangeEmitter = new TypedEvent();
         // Emits when any of the above emitters emit.
         this.changeEmitter = new TypedEvent();
         // Fires when the gear list is finished loading.
         this.gearListEmitter = new TypedEvent();
         this._init = false;
         [
-            this.raidBuffsChangeEmitter,
-            this.partyBuffsChangeEmitter,
-            this.individualBuffsChangeEmitter,
             this.phaseChangeEmitter,
         ].forEach(emitter => emitter.on(() => this.changeEmitter.emit()));
     }
@@ -83,39 +71,6 @@ export class Sim extends WorkerPool {
             this.phaseChangeEmitter.emit();
         }
     }
-    getRaidBuffs() {
-        // Make a defensive copy
-        return RaidBuffs.clone(this.raidBuffs);
-    }
-    setRaidBuffs(newRaidBuffs) {
-        if (RaidBuffs.equals(this.raidBuffs, newRaidBuffs))
-            return;
-        // Make a defensive copy
-        this.raidBuffs = RaidBuffs.clone(newRaidBuffs);
-        this.raidBuffsChangeEmitter.emit();
-    }
-    getPartyBuffs() {
-        // Make a defensive copy
-        return PartyBuffs.clone(this.partyBuffs);
-    }
-    setPartyBuffs(newPartyBuffs) {
-        if (PartyBuffs.equals(this.partyBuffs, newPartyBuffs))
-            return;
-        // Make a defensive copy
-        this.partyBuffs = PartyBuffs.clone(newPartyBuffs);
-        this.partyBuffsChangeEmitter.emit();
-    }
-    getIndividualBuffs() {
-        // Make a defensive copy
-        return IndividualBuffs.clone(this.individualBuffs);
-    }
-    setIndividualBuffs(newIndividualBuffs) {
-        if (IndividualBuffs.equals(this.individualBuffs, newIndividualBuffs))
-            return;
-        // Make a defensive copy
-        this.individualBuffs = IndividualBuffs.clone(newIndividualBuffs);
-        this.individualBuffsChangeEmitter.emit();
-    }
     lookupItemSpec(itemSpec) {
         const item = this.items[itemSpec.id];
         if (!item)
@@ -139,34 +94,5 @@ export class Sim extends WorkerPool {
             gearMap[assignedSlot] = item;
         });
         return new Gear(gearMap);
-    }
-    // Returns JSON representing all the current values.
-    toJson() {
-        return {
-            'raidBuffs': RaidBuffs.toJson(this.raidBuffs),
-            'partyBuffs': PartyBuffs.toJson(this.partyBuffs),
-            'individualBuffs': IndividualBuffs.toJson(this.individualBuffs),
-        };
-    }
-    // Set all the current values, assumes obj is the same type returned by toJson().
-    fromJson(obj) {
-        try {
-            this.setRaidBuffs(RaidBuffs.fromJson(obj['raidBuffs']));
-        }
-        catch (e) {
-            console.warn('Failed to parse raid buffs: ' + e);
-        }
-        try {
-            this.setPartyBuffs(PartyBuffs.fromJson(obj['partyBuffs']));
-        }
-        catch (e) {
-            console.warn('Failed to parse party buffs: ' + e);
-        }
-        try {
-            this.setIndividualBuffs(IndividualBuffs.fromJson(obj['individualBuffs']));
-        }
-        catch (e) {
-            console.warn('Failed to parse individual buffs: ' + e);
-        }
     }
 }

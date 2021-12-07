@@ -624,22 +624,17 @@ class AuraMetrics$Type extends MessageType {
  */
 export const AuraMetrics = new AuraMetrics$Type();
 // @generated message type with reflection information, may provide speed optimized methods
-class PlayerMetrics$Type extends MessageType {
+class DpsMetrics$Type extends MessageType {
     constructor() {
-        super("proto.PlayerMetrics", [
-            { no: 1, name: "dps_avg", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
-            { no: 2, name: "dps_stdev", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
-            { no: 3, name: "dps_max", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
-            { no: 4, name: "dps_hist", kind: "map", K: 5 /*ScalarType.INT32*/, V: { kind: "scalar", T: 5 /*ScalarType.INT32*/ } },
-            { no: 5, name: "num_oom", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
-            { no: 6, name: "oom_at_avg", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
-            { no: 7, name: "dps_at_oom_avg", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
-            { no: 8, name: "actions", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => ActionMetrics },
-            { no: 9, name: "auras", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => AuraMetrics }
+        super("proto.DpsMetrics", [
+            { no: 1, name: "avg", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
+            { no: 2, name: "stdev", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
+            { no: 3, name: "max", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
+            { no: 4, name: "hist", kind: "map", K: 5 /*ScalarType.INT32*/, V: { kind: "scalar", T: 5 /*ScalarType.INT32*/ } }
         ]);
     }
     create(value) {
-        const message = { dpsAvg: 0, dpsStdev: 0, dpsMax: 0, dpsHist: {}, numOom: 0, oomAtAvg: 0, dpsAtOomAvg: 0, actions: [], auras: [] };
+        const message = { avg: 0, stdev: 0, max: 0, hist: {} };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -650,32 +645,17 @@ class PlayerMetrics$Type extends MessageType {
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
-                case /* double dps_avg */ 1:
-                    message.dpsAvg = reader.double();
+                case /* double avg */ 1:
+                    message.avg = reader.double();
                     break;
-                case /* double dps_stdev */ 2:
-                    message.dpsStdev = reader.double();
+                case /* double stdev */ 2:
+                    message.stdev = reader.double();
                     break;
-                case /* double dps_max */ 3:
-                    message.dpsMax = reader.double();
+                case /* double max */ 3:
+                    message.max = reader.double();
                     break;
-                case /* map<int32, int32> dps_hist */ 4:
-                    this.binaryReadMap4(message.dpsHist, reader, options);
-                    break;
-                case /* int32 num_oom */ 5:
-                    message.numOom = reader.int32();
-                    break;
-                case /* double oom_at_avg */ 6:
-                    message.oomAtAvg = reader.double();
-                    break;
-                case /* double dps_at_oom_avg */ 7:
-                    message.dpsAtOomAvg = reader.double();
-                    break;
-                case /* repeated proto.ActionMetrics actions */ 8:
-                    message.actions.push(ActionMetrics.internalBinaryRead(reader, reader.uint32(), options));
-                    break;
-                case /* repeated proto.AuraMetrics auras */ 9:
-                    message.auras.push(AuraMetrics.internalBinaryRead(reader, reader.uint32(), options));
+                case /* map<int32, int32> hist */ 4:
+                    this.binaryReadMap4(message.hist, reader, options);
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -699,39 +679,106 @@ class PlayerMetrics$Type extends MessageType {
                 case 2:
                     val = reader.int32();
                     break;
-                default: throw new globalThis.Error("unknown map entry field for field proto.PlayerMetrics.dps_hist");
+                default: throw new globalThis.Error("unknown map entry field for field proto.DpsMetrics.hist");
             }
         }
         map[key ?? 0] = val ?? 0;
     }
     internalBinaryWrite(message, writer, options) {
-        /* double dps_avg = 1; */
-        if (message.dpsAvg !== 0)
-            writer.tag(1, WireType.Bit64).double(message.dpsAvg);
-        /* double dps_stdev = 2; */
-        if (message.dpsStdev !== 0)
-            writer.tag(2, WireType.Bit64).double(message.dpsStdev);
-        /* double dps_max = 3; */
-        if (message.dpsMax !== 0)
-            writer.tag(3, WireType.Bit64).double(message.dpsMax);
-        /* map<int32, int32> dps_hist = 4; */
-        for (let k of Object.keys(message.dpsHist))
-            writer.tag(4, WireType.LengthDelimited).fork().tag(1, WireType.Varint).int32(parseInt(k)).tag(2, WireType.Varint).int32(message.dpsHist[k]).join();
-        /* int32 num_oom = 5; */
+        /* double avg = 1; */
+        if (message.avg !== 0)
+            writer.tag(1, WireType.Bit64).double(message.avg);
+        /* double stdev = 2; */
+        if (message.stdev !== 0)
+            writer.tag(2, WireType.Bit64).double(message.stdev);
+        /* double max = 3; */
+        if (message.max !== 0)
+            writer.tag(3, WireType.Bit64).double(message.max);
+        /* map<int32, int32> hist = 4; */
+        for (let k of Object.keys(message.hist))
+            writer.tag(4, WireType.LengthDelimited).fork().tag(1, WireType.Varint).int32(parseInt(k)).tag(2, WireType.Varint).int32(message.hist[k]).join();
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message proto.DpsMetrics
+ */
+export const DpsMetrics = new DpsMetrics$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class PlayerMetrics$Type extends MessageType {
+    constructor() {
+        super("proto.PlayerMetrics", [
+            { no: 1, name: "dps", kind: "message", T: () => DpsMetrics },
+            { no: 2, name: "num_oom", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 3, name: "oom_at_avg", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
+            { no: 4, name: "dps_at_oom_avg", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
+            { no: 5, name: "actions", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => ActionMetrics },
+            { no: 6, name: "auras", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => AuraMetrics }
+        ]);
+    }
+    create(value) {
+        const message = { numOom: 0, oomAtAvg: 0, dpsAtOomAvg: 0, actions: [], auras: [] };
+        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader, length, options, target) {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* proto.DpsMetrics dps */ 1:
+                    message.dps = DpsMetrics.internalBinaryRead(reader, reader.uint32(), options, message.dps);
+                    break;
+                case /* int32 num_oom */ 2:
+                    message.numOom = reader.int32();
+                    break;
+                case /* double oom_at_avg */ 3:
+                    message.oomAtAvg = reader.double();
+                    break;
+                case /* double dps_at_oom_avg */ 4:
+                    message.dpsAtOomAvg = reader.double();
+                    break;
+                case /* repeated proto.ActionMetrics actions */ 5:
+                    message.actions.push(ActionMetrics.internalBinaryRead(reader, reader.uint32(), options));
+                    break;
+                case /* repeated proto.AuraMetrics auras */ 6:
+                    message.auras.push(AuraMetrics.internalBinaryRead(reader, reader.uint32(), options));
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message, writer, options) {
+        /* proto.DpsMetrics dps = 1; */
+        if (message.dps)
+            DpsMetrics.internalBinaryWrite(message.dps, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+        /* int32 num_oom = 2; */
         if (message.numOom !== 0)
-            writer.tag(5, WireType.Varint).int32(message.numOom);
-        /* double oom_at_avg = 6; */
+            writer.tag(2, WireType.Varint).int32(message.numOom);
+        /* double oom_at_avg = 3; */
         if (message.oomAtAvg !== 0)
-            writer.tag(6, WireType.Bit64).double(message.oomAtAvg);
-        /* double dps_at_oom_avg = 7; */
+            writer.tag(3, WireType.Bit64).double(message.oomAtAvg);
+        /* double dps_at_oom_avg = 4; */
         if (message.dpsAtOomAvg !== 0)
-            writer.tag(7, WireType.Bit64).double(message.dpsAtOomAvg);
-        /* repeated proto.ActionMetrics actions = 8; */
+            writer.tag(4, WireType.Bit64).double(message.dpsAtOomAvg);
+        /* repeated proto.ActionMetrics actions = 5; */
         for (let i = 0; i < message.actions.length; i++)
-            ActionMetrics.internalBinaryWrite(message.actions[i], writer.tag(8, WireType.LengthDelimited).fork(), options).join();
-        /* repeated proto.AuraMetrics auras = 9; */
+            ActionMetrics.internalBinaryWrite(message.actions[i], writer.tag(5, WireType.LengthDelimited).fork(), options).join();
+        /* repeated proto.AuraMetrics auras = 6; */
         for (let i = 0; i < message.auras.length; i++)
-            AuraMetrics.internalBinaryWrite(message.auras[i], writer.tag(9, WireType.LengthDelimited).fork(), options).join();
+            AuraMetrics.internalBinaryWrite(message.auras[i], writer.tag(6, WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -746,7 +793,8 @@ export const PlayerMetrics = new PlayerMetrics$Type();
 class PartyMetrics$Type extends MessageType {
     constructor() {
         super("proto.PartyMetrics", [
-            { no: 1, name: "players", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => PlayerMetrics }
+            { no: 1, name: "dps", kind: "message", T: () => DpsMetrics },
+            { no: 2, name: "players", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => PlayerMetrics }
         ]);
     }
     create(value) {
@@ -761,7 +809,10 @@ class PartyMetrics$Type extends MessageType {
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
-                case /* repeated proto.PlayerMetrics players */ 1:
+                case /* proto.DpsMetrics dps */ 1:
+                    message.dps = DpsMetrics.internalBinaryRead(reader, reader.uint32(), options, message.dps);
+                    break;
+                case /* repeated proto.PlayerMetrics players */ 2:
                     message.players.push(PlayerMetrics.internalBinaryRead(reader, reader.uint32(), options));
                     break;
                 default:
@@ -776,9 +827,12 @@ class PartyMetrics$Type extends MessageType {
         return message;
     }
     internalBinaryWrite(message, writer, options) {
-        /* repeated proto.PlayerMetrics players = 1; */
+        /* proto.DpsMetrics dps = 1; */
+        if (message.dps)
+            DpsMetrics.internalBinaryWrite(message.dps, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+        /* repeated proto.PlayerMetrics players = 2; */
         for (let i = 0; i < message.players.length; i++)
-            PlayerMetrics.internalBinaryWrite(message.players[i], writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+            PlayerMetrics.internalBinaryWrite(message.players[i], writer.tag(2, WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -793,7 +847,8 @@ export const PartyMetrics = new PartyMetrics$Type();
 class RaidMetrics$Type extends MessageType {
     constructor() {
         super("proto.RaidMetrics", [
-            { no: 1, name: "parties", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => PartyMetrics }
+            { no: 1, name: "dps", kind: "message", T: () => DpsMetrics },
+            { no: 2, name: "parties", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => PartyMetrics }
         ]);
     }
     create(value) {
@@ -808,7 +863,10 @@ class RaidMetrics$Type extends MessageType {
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
-                case /* repeated proto.PartyMetrics parties */ 1:
+                case /* proto.DpsMetrics dps */ 1:
+                    message.dps = DpsMetrics.internalBinaryRead(reader, reader.uint32(), options, message.dps);
+                    break;
+                case /* repeated proto.PartyMetrics parties */ 2:
                     message.parties.push(PartyMetrics.internalBinaryRead(reader, reader.uint32(), options));
                     break;
                 default:
@@ -823,9 +881,12 @@ class RaidMetrics$Type extends MessageType {
         return message;
     }
     internalBinaryWrite(message, writer, options) {
-        /* repeated proto.PartyMetrics parties = 1; */
+        /* proto.DpsMetrics dps = 1; */
+        if (message.dps)
+            DpsMetrics.internalBinaryWrite(message.dps, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+        /* repeated proto.PartyMetrics parties = 2; */
         for (let i = 0; i < message.parties.length; i++)
-            PartyMetrics.internalBinaryWrite(message.parties[i], writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+            PartyMetrics.internalBinaryWrite(message.parties[i], writer.tag(2, WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -1417,9 +1478,13 @@ export const ComputeStatsResult = new ComputeStatsResult$Type();
 class StatWeightsRequest$Type extends MessageType {
     constructor() {
         super("proto.StatWeightsRequest", [
-            { no: 1, name: "options", kind: "message", T: () => IndividualSimRequest },
-            { no: 2, name: "stats_to_weigh", kind: "enum", repeat: 1 /*RepeatType.PACKED*/, T: () => ["proto.Stat", Stat] },
-            { no: 3, name: "ep_reference_stat", kind: "enum", T: () => ["proto.Stat", Stat] }
+            { no: 1, name: "player", kind: "message", T: () => Player },
+            { no: 2, name: "raid_buffs", kind: "message", T: () => RaidBuffs },
+            { no: 3, name: "party_buffs", kind: "message", T: () => PartyBuffs },
+            { no: 4, name: "encounter", kind: "message", T: () => Encounter },
+            { no: 5, name: "sim_options", kind: "message", T: () => SimOptions },
+            { no: 6, name: "stats_to_weigh", kind: "enum", repeat: 1 /*RepeatType.PACKED*/, T: () => ["proto.Stat", Stat] },
+            { no: 7, name: "ep_reference_stat", kind: "enum", T: () => ["proto.Stat", Stat] }
         ]);
     }
     create(value) {
@@ -1434,17 +1499,29 @@ class StatWeightsRequest$Type extends MessageType {
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
-                case /* proto.IndividualSimRequest options */ 1:
-                    message.options = IndividualSimRequest.internalBinaryRead(reader, reader.uint32(), options, message.options);
+                case /* proto.Player player */ 1:
+                    message.player = Player.internalBinaryRead(reader, reader.uint32(), options, message.player);
                     break;
-                case /* repeated proto.Stat stats_to_weigh */ 2:
+                case /* proto.RaidBuffs raid_buffs */ 2:
+                    message.raidBuffs = RaidBuffs.internalBinaryRead(reader, reader.uint32(), options, message.raidBuffs);
+                    break;
+                case /* proto.PartyBuffs party_buffs */ 3:
+                    message.partyBuffs = PartyBuffs.internalBinaryRead(reader, reader.uint32(), options, message.partyBuffs);
+                    break;
+                case /* proto.Encounter encounter */ 4:
+                    message.encounter = Encounter.internalBinaryRead(reader, reader.uint32(), options, message.encounter);
+                    break;
+                case /* proto.SimOptions sim_options */ 5:
+                    message.simOptions = SimOptions.internalBinaryRead(reader, reader.uint32(), options, message.simOptions);
+                    break;
+                case /* repeated proto.Stat stats_to_weigh */ 6:
                     if (wireType === WireType.LengthDelimited)
                         for (let e = reader.int32() + reader.pos; reader.pos < e;)
                             message.statsToWeigh.push(reader.int32());
                     else
                         message.statsToWeigh.push(reader.int32());
                     break;
-                case /* proto.Stat ep_reference_stat */ 3:
+                case /* proto.Stat ep_reference_stat */ 7:
                     message.epReferenceStat = reader.int32();
                     break;
                 default:
@@ -1459,19 +1536,31 @@ class StatWeightsRequest$Type extends MessageType {
         return message;
     }
     internalBinaryWrite(message, writer, options) {
-        /* proto.IndividualSimRequest options = 1; */
-        if (message.options)
-            IndividualSimRequest.internalBinaryWrite(message.options, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
-        /* repeated proto.Stat stats_to_weigh = 2; */
+        /* proto.Player player = 1; */
+        if (message.player)
+            Player.internalBinaryWrite(message.player, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+        /* proto.RaidBuffs raid_buffs = 2; */
+        if (message.raidBuffs)
+            RaidBuffs.internalBinaryWrite(message.raidBuffs, writer.tag(2, WireType.LengthDelimited).fork(), options).join();
+        /* proto.PartyBuffs party_buffs = 3; */
+        if (message.partyBuffs)
+            PartyBuffs.internalBinaryWrite(message.partyBuffs, writer.tag(3, WireType.LengthDelimited).fork(), options).join();
+        /* proto.Encounter encounter = 4; */
+        if (message.encounter)
+            Encounter.internalBinaryWrite(message.encounter, writer.tag(4, WireType.LengthDelimited).fork(), options).join();
+        /* proto.SimOptions sim_options = 5; */
+        if (message.simOptions)
+            SimOptions.internalBinaryWrite(message.simOptions, writer.tag(5, WireType.LengthDelimited).fork(), options).join();
+        /* repeated proto.Stat stats_to_weigh = 6; */
         if (message.statsToWeigh.length) {
-            writer.tag(2, WireType.LengthDelimited).fork();
+            writer.tag(6, WireType.LengthDelimited).fork();
             for (let i = 0; i < message.statsToWeigh.length; i++)
                 writer.int32(message.statsToWeigh[i]);
             writer.join();
         }
-        /* proto.Stat ep_reference_stat = 3; */
+        /* proto.Stat ep_reference_stat = 7; */
         if (message.epReferenceStat !== 0)
-            writer.tag(3, WireType.Varint).int32(message.epReferenceStat);
+            writer.tag(7, WireType.Varint).int32(message.epReferenceStat);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

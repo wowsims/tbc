@@ -1,4 +1,4 @@
-import { IndividualSimRequest, IndividualSimResult } from '/tbc/core/proto/api.js';
+import { RaidSimRequest, RaidSimResult } from '/tbc/core/proto/api.js';
 import { StatWeightsRequest, StatWeightsResult } from '/tbc/core/proto/api.js';
 import { Stat } from '/tbc/core/proto/common.js';
 import { SimUI } from '/tbc/core/sim_ui.js';
@@ -17,7 +17,7 @@ export declare class Results extends Component {
     constructor(parent: HTMLElement, simUI: SimUI<any>);
     hideAll(): void;
     setPending(): void;
-    setSimResult(request: IndividualSimRequest, result: IndividualSimResult): void;
+    setSimResult(request: RaidSimRequest, result: RaidSimResult): void;
     setStatWeights(request: StatWeightsRequest, result: StatWeightsResult, epStats: Array<Stat>): void;
     updateReference(): void;
 }

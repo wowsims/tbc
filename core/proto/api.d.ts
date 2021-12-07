@@ -262,47 +262,56 @@ export interface AuraMetrics {
     uptimeSecondsStdev: number;
 }
 /**
+ * @generated from protobuf message proto.DpsMetrics
+ */
+export interface DpsMetrics {
+    /**
+     * @generated from protobuf field: double avg = 1;
+     */
+    avg: number;
+    /**
+     * @generated from protobuf field: double stdev = 2;
+     */
+    stdev: number;
+    /**
+     * @generated from protobuf field: double max = 3;
+     */
+    max: number;
+    /**
+     * @generated from protobuf field: map<int32, int32> hist = 4;
+     */
+    hist: {
+        [key: number]: number;
+    };
+}
+/**
  * All the results for a single Player.
  *
  * @generated from protobuf message proto.PlayerMetrics
  */
 export interface PlayerMetrics {
     /**
-     * @generated from protobuf field: double dps_avg = 1;
+     * @generated from protobuf field: proto.DpsMetrics dps = 1;
      */
-    dpsAvg: number;
+    dps?: DpsMetrics;
     /**
-     * @generated from protobuf field: double dps_stdev = 2;
-     */
-    dpsStdev: number;
-    /**
-     * @generated from protobuf field: double dps_max = 3;
-     */
-    dpsMax: number;
-    /**
-     * @generated from protobuf field: map<int32, int32> dps_hist = 4;
-     */
-    dpsHist: {
-        [key: number]: number;
-    };
-    /**
-     * @generated from protobuf field: int32 num_oom = 5;
+     * @generated from protobuf field: int32 num_oom = 2;
      */
     numOom: number;
     /**
-     * @generated from protobuf field: double oom_at_avg = 6;
+     * @generated from protobuf field: double oom_at_avg = 3;
      */
     oomAtAvg: number;
     /**
-     * @generated from protobuf field: double dps_at_oom_avg = 7;
+     * @generated from protobuf field: double dps_at_oom_avg = 4;
      */
     dpsAtOomAvg: number;
     /**
-     * @generated from protobuf field: repeated proto.ActionMetrics actions = 8;
+     * @generated from protobuf field: repeated proto.ActionMetrics actions = 5;
      */
     actions: ActionMetrics[];
     /**
-     * @generated from protobuf field: repeated proto.AuraMetrics auras = 9;
+     * @generated from protobuf field: repeated proto.AuraMetrics auras = 6;
      */
     auras: AuraMetrics[];
 }
@@ -313,7 +322,11 @@ export interface PlayerMetrics {
  */
 export interface PartyMetrics {
     /**
-     * @generated from protobuf field: repeated proto.PlayerMetrics players = 1;
+     * @generated from protobuf field: proto.DpsMetrics dps = 1;
+     */
+    dps?: DpsMetrics;
+    /**
+     * @generated from protobuf field: repeated proto.PlayerMetrics players = 2;
      */
     players: PlayerMetrics[];
 }
@@ -324,7 +337,11 @@ export interface PartyMetrics {
  */
 export interface RaidMetrics {
     /**
-     * @generated from protobuf field: repeated proto.PartyMetrics parties = 1;
+     * @generated from protobuf field: proto.DpsMetrics dps = 1;
+     */
+    dps?: DpsMetrics;
+    /**
+     * @generated from protobuf field: repeated proto.PartyMetrics parties = 2;
      */
     parties: PartyMetrics[];
 }
@@ -495,15 +512,31 @@ export interface ComputeStatsResult {
  */
 export interface StatWeightsRequest {
     /**
-     * @generated from protobuf field: proto.IndividualSimRequest options = 1;
+     * @generated from protobuf field: proto.Player player = 1;
      */
-    options?: IndividualSimRequest;
+    player?: Player;
     /**
-     * @generated from protobuf field: repeated proto.Stat stats_to_weigh = 2;
+     * @generated from protobuf field: proto.RaidBuffs raid_buffs = 2;
+     */
+    raidBuffs?: RaidBuffs;
+    /**
+     * @generated from protobuf field: proto.PartyBuffs party_buffs = 3;
+     */
+    partyBuffs?: PartyBuffs;
+    /**
+     * @generated from protobuf field: proto.Encounter encounter = 4;
+     */
+    encounter?: Encounter;
+    /**
+     * @generated from protobuf field: proto.SimOptions sim_options = 5;
+     */
+    simOptions?: SimOptions;
+    /**
+     * @generated from protobuf field: repeated proto.Stat stats_to_weigh = 6;
      */
     statsToWeigh: Stat[];
     /**
-     * @generated from protobuf field: proto.Stat ep_reference_stat = 3;
+     * @generated from protobuf field: proto.Stat ep_reference_stat = 7;
      */
     epReferenceStat: Stat;
 }
@@ -613,11 +646,21 @@ declare class AuraMetrics$Type extends MessageType<AuraMetrics> {
  * @generated MessageType for protobuf message proto.AuraMetrics
  */
 export declare const AuraMetrics: AuraMetrics$Type;
+declare class DpsMetrics$Type extends MessageType<DpsMetrics> {
+    constructor();
+    create(value?: PartialMessage<DpsMetrics>): DpsMetrics;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: DpsMetrics): DpsMetrics;
+    private binaryReadMap4;
+    internalBinaryWrite(message: DpsMetrics, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message proto.DpsMetrics
+ */
+export declare const DpsMetrics: DpsMetrics$Type;
 declare class PlayerMetrics$Type extends MessageType<PlayerMetrics> {
     constructor();
     create(value?: PartialMessage<PlayerMetrics>): PlayerMetrics;
     internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: PlayerMetrics): PlayerMetrics;
-    private binaryReadMap4;
     internalBinaryWrite(message: PlayerMetrics, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**

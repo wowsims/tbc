@@ -1,3 +1,4 @@
+import { SimOptions } from '/tbc/core/proto/api.js';
 import { StatWeightsRequest } from '/tbc/core/proto/api.js';
 import { Component } from './component.js';
 export class Actions extends Component {
@@ -21,24 +22,33 @@ export class Actions extends Component {
         const iterationsInput = iterationsDiv.getElementsByClassName('iterations-input')[0];
         simButton.addEventListener('click', async () => {
             const iterations = parseInt(iterationsInput.value);
-            const simRequest = simUI.makeCurrentIndividualSimRequest(iterations, false);
+            const simRequest = simUI.makeRaidSimRequest(iterations, false);
             results.setPending();
             detailedResults.setPending();
-            const result = await simUI.sim.individualSim(simRequest);
+            const result = await simUI.sim.raidSim(simRequest);
             results.setSimResult(simRequest, result);
             detailedResults.setSimResult(simRequest, result);
         });
         statWeightsButton.addEventListener('click', async () => {
             const iterations = parseInt(iterationsInput.value);
-            const simRequest = simUI.makeCurrentIndividualSimRequest(iterations, false);
-            const statWeightsRequest = StatWeightsRequest.create({
-                options: simRequest,
-                statsToWeigh: epStats,
-                epReferenceStat: epReferenceStat,
-            });
+            const statWeightsRequest = this.makeStatWeightsRequest(simUI, iterations, false, epStats, epReferenceStat);
             results.setPending();
             const result = await simUI.player.statWeights(statWeightsRequest);
             results.setStatWeights(statWeightsRequest, result, epStats);
+        });
+    }
+    makeStatWeightsRequest(simUI, iterations, debug, epStats, epReferenceStat) {
+        return StatWeightsRequest.create({
+            player: simUI.player.toProto(),
+            raidBuffs: simUI.raid.getBuffs(),
+            partyBuffs: simUI.party.getBuffs(),
+            encounter: simUI.encounter.toProto(),
+            simOptions: SimOptions.create({
+                iterations: iterations,
+                debug: debug,
+            }),
+            statsToWeigh: epStats,
+            epReferenceStat: epReferenceStat,
         });
     }
 }

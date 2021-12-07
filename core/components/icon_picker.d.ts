@@ -4,8 +4,16 @@ import { ExclusivityTag } from '/tbc/core/sim_ui.js';
 import { SimUI } from '/tbc/core/sim_ui.js';
 import { Component } from './component.js';
 export declare class IconPicker<ModObject> extends Component {
-    private readonly _inputs;
-    constructor(parent: HTMLElement, modObj: ModObject, inputs: Array<IconInput<ModObject>>, simUI: SimUI<any>);
+    private readonly _input;
+    private readonly _modObject;
+    private readonly _rootAnchor;
+    private readonly _improvedAnchor;
+    private readonly _counterElem;
+    private readonly _clickedEmitter;
+    constructor(parent: HTMLElement, modObj: ModObject, input: IconInput<ModObject>, simUI: SimUI<any>);
+    private getValue;
+    private setValue;
+    private updateIcon;
 }
 export declare type IconInput<ModObject> = {
     id: ItemOrSpellId;

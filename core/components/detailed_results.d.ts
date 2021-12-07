@@ -1,8 +1,8 @@
-import { IndividualSimRequest, IndividualSimResult } from '/tbc/core/proto/api.js';
+import { RaidSimRequest, RaidSimResult } from '/tbc/core/proto/api.js';
 import { Component } from './component.js';
-export declare type IndividualSimData = {
-    request: IndividualSimRequest;
-    result: IndividualSimResult;
+export declare type RaidSimData = {
+    request: RaidSimRequest;
+    result: RaidSimResult;
 };
 export declare class DetailedResults extends Component {
     private readonly iframeElem;
@@ -10,5 +10,5 @@ export declare class DetailedResults extends Component {
     private latestResult;
     constructor(parent: HTMLElement);
     setPending(): void;
-    setSimResult(request: IndividualSimRequest, result: IndividualSimResult): void;
+    setSimResult(request: RaidSimRequest, result: RaidSimResult): void;
 }

@@ -67,7 +67,7 @@ export class CastMetrics extends ResultComponent {
         this.bodyElem.textContent = '';
         const iterations = request.simOptions.iterations;
         const duration = request.encounter?.duration || 1;
-        parseActionMetrics(result.playerMetrics.actions).then(actionMetrics => {
+        parseActionMetrics(result.raidMetrics.parties[0].players[0].actions).then(actionMetrics => {
             actionMetrics.filter(e => e.hits + e.misses != 0).forEach(actionMetric => {
                 const rowElem = document.createElement('tr');
                 this.bodyElem.appendChild(rowElem);
@@ -131,7 +131,7 @@ export class OtherCastMetrics extends ResultComponent {
         this.bodyElem.textContent = '';
         const iterations = request.simOptions.iterations;
         const duration = request.encounter?.duration || 1;
-        parseActionMetrics(result.playerMetrics.actions).then(actionMetrics => {
+        parseActionMetrics(result.raidMetrics.parties[0].players[0].actions).then(actionMetrics => {
             actionMetrics.filter(e => e.hits + e.misses == 0).forEach(actionMetric => {
                 const rowElem = document.createElement('tr');
                 this.bodyElem.appendChild(rowElem);
