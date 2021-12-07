@@ -94,6 +94,8 @@ message ShamanTotems {
 		// instead of waiting the full 2 minutes.
 		bool recall_fire_elemental_on_oom = 9;
 
+		// If set, any time a 2-minute totem is about to expire, will recall and
+		// replace all totems.
 		bool recall_totems = 10;
 }
 
