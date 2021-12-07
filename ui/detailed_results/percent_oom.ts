@@ -1,4 +1,4 @@
-import { IndividualSimRequest, IndividualSimResult } from '/tbc/core/proto/api.js';
+import { RaidSimRequest, RaidSimResult } from '/tbc/core/proto/api.js';
 
 import { ResultComponent, ResultComponentConfig } from './result_component.js';
 
@@ -8,8 +8,8 @@ export class PercentOom extends ResultComponent {
     super(config);
   }
 
-	onSimResult(request: IndividualSimRequest, result: IndividualSimResult) {
-		const percentOom = result.playerMetrics!.numOom / request.simOptions!.iterations;
+	onSimResult(request: RaidSimRequest, result: RaidSimResult) {
+		const percentOom = result.raidMetrics!.parties[0].players[0].numOom / request.simOptions!.iterations;
 
     this.rootElem.innerHTML = `
       <span class="percent-oom-value">${Math.round(percentOom * 100)}%</span>

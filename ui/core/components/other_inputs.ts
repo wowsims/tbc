@@ -1,9 +1,26 @@
-import { EnumPickerConfig } from '/tbc/core/components/enum_picker.js';
+import { EnumPicker, EnumPickerConfig } from '/tbc/core/components/enum_picker.js';
 import { Potions } from '/tbc/core/proto/common.js';
 import { Player } from '/tbc/core/player.js';
 import { Sim } from '/tbc/core/sim.js';
 import { Target } from '/tbc/core/target.js';
 import { SimUI } from '/tbc/core/sim_ui.js';
+
+export function makePhaseSelector(parent: HTMLElement, sim: Sim): EnumPicker<Sim> {
+	return new EnumPicker<Sim>(parent, sim, {
+		values: [
+			{ name: 'Phase 1', value: 1 },
+			{ name: 'Phase 2', value: 2 },
+			{ name: 'Phase 3', value: 3 },
+			{ name: 'Phase 4', value: 4 },
+			{ name: 'Phase 5', value: 5 },
+		],
+		changedEvent: (sim: Sim) => sim.phaseChangeEmitter,
+		getValue: (sim: Sim) => sim.getPhase(),
+		setValue: (sim: Sim, newValue: number) => {
+			sim.setPhase(newValue);
+		},
+	});
+}
 
 export const StartingPotion = {
 	type: 'enum' as const,
@@ -48,15 +65,15 @@ export const NumStartingPotions = {
 export const ShadowPriestDPS = {
   type: 'number' as const,
   cssClass: 'shadow-priest-dps-picker',
-	getModObject: (simUI: SimUI<any>) => simUI.sim,
+	getModObject: (simUI: SimUI<any>) => simUI.player,
   config: {
     label: 'Shadow Priest DPS',
-    changedEvent: (sim: Sim) => sim.individualBuffsChangeEmitter,
-    getValue: (sim: Sim) => sim.getIndividualBuffs().shadowPriestDps,
-    setValue: (sim: Sim, newValue: number) => {
-      const individualBuffs = sim.getIndividualBuffs();
-      individualBuffs.shadowPriestDps = newValue;
-      sim.setIndividualBuffs(individualBuffs);
+    changedEvent: (player: Player<any>) => player.buffsChangeEmitter,
+    getValue: (player: Player<any>) => player.getBuffs().shadowPriestDps,
+    setValue: (player: Player<any>, newValue: number) => {
+      const buffs = player.getBuffs();
+      buffs.shadowPriestDps = newValue;
+      player.setBuffs(buffs);
     },
   },
 };

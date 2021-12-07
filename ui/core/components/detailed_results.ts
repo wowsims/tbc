@@ -1,17 +1,17 @@
-import { IndividualSimRequest, IndividualSimResult } from '/tbc/core/proto/api.js';
+import { RaidSimRequest, RaidSimResult } from '/tbc/core/proto/api.js';
 import { repoName } from '/tbc/core/resources.js';
 
 import { Component } from './component.js';
 
-export type IndividualSimData = {
-	request: IndividualSimRequest;
-	result: IndividualSimResult;
+export type RaidSimData = {
+	request: RaidSimRequest;
+	result: RaidSimResult;
 };
 
 export class DetailedResults extends Component {
 	private readonly iframeElem: HTMLIFrameElement;
 	private tabWindow: Window | null;
-	private latestResult: IndividualSimData | null;
+	private latestResult: RaidSimData | null;
 
   constructor(parent: HTMLElement) {
     super(parent, 'detailed-results-manager-root');
@@ -24,7 +24,6 @@ export class DetailedResults extends Component {
 		url.searchParams.append('mainBgColor', computedStyles.getPropertyValue('--main-bg-color').trim());
 		url.searchParams.append('mainTextColor', computedStyles.getPropertyValue('--main-text-color').trim());
 
-		const cssFilePath = '/elemental_shaman/index.css';
 		this.rootElem.innerHTML = `
 		<div class="detailed-results-controls-div">
 			<button class="detailed-results-new-tab-button">View in separate tab</button>
@@ -57,7 +56,7 @@ export class DetailedResults extends Component {
 		}
 	}
 
-  setSimResult(request: IndividualSimRequest, result: IndividualSimResult) {
+  setSimResult(request: RaidSimRequest, result: RaidSimResult) {
 		const data = {
 			request: request,
 			result: result,

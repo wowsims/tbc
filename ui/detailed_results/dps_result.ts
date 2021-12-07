@@ -1,4 +1,4 @@
-import { IndividualSimRequest, IndividualSimResult } from '/tbc/core/proto/api.js';
+import { RaidSimRequest, RaidSimResult } from '/tbc/core/proto/api.js';
 
 import { ResultComponent, ResultComponentConfig } from './result_component.js';
 
@@ -8,10 +8,10 @@ export class DpsResult extends ResultComponent {
     super(config);
   }
 
-	onSimResult(request: IndividualSimRequest, result: IndividualSimResult) {
+	onSimResult(request: RaidSimRequest, result: RaidSimResult) {
     this.rootElem.innerHTML = `
-      <span class="results-sim-dps-avg">${result.playerMetrics!.dpsAvg.toFixed(2)}</span>
-      <span class="results-sim-dps-stdev">${result.playerMetrics!.dpsStdev.toFixed(2)}</span>
+      <span class="results-sim-dps-avg">${result.raidMetrics!.dps!.avg.toFixed(2)}</span>
+      <span class="results-sim-dps-stdev">${result.raidMetrics!.dps!.stdev.toFixed(2)}</span>
     `;
 	}
 }

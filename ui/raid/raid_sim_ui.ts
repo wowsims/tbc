@@ -1,31 +1,43 @@
-import { Player } from '/tbc/core/player.js';
+import { Encounter } from '/tbc/core/encounter.js';
+import { Raid } from '/tbc/core/raid.js';
 import { Sim } from '/tbc/core/sim.js';
-import { Target } from '/tbc/core/target.js';
 import { Actions } from '/tbc/core/components/actions.js';
 import { DetailedResults } from '/tbc/core/components/detailed_results.js';
 import { LogRunner } from '/tbc/core/components/log_runner.js';
 import { Results } from '/tbc/core/components/results.js';
 import { SavedDataConfig } from '/tbc/core/components/saved_data_manager.js';
 import { SavedDataManager } from '/tbc/core/components/saved_data_manager.js';
-import { equalsOrBothNull } from '/tbc/core/utils.js';
+
+import { RaidPicker, PresetSpecSettings } from './raid_picker.js';
 
 declare var tippy: any;
 
-
 export interface RaidSimConfig {
+	knownIssues?: Array<string>,
+	presets: Array<PresetSpecSettings<any>>,
 }
 
 export class RaidSimUI {
+  readonly sim: Sim;
+  readonly raid: Raid;
+  readonly encounter: Encounter;
+
   private readonly config: RaidSimConfig;
   private readonly parentElem: HTMLElement;
 
   constructor(parentElem: HTMLElement, config: RaidSimConfig) {
+    this.sim = new Sim();
+		this.raid = new Raid(this.sim);
+    this.encounter = new Encounter(this.sim);
+
     this.config = config;
 		this.parentElem = parentElem;
     this.parentElem.innerHTML = layoutHTML;
 
 		const titleElem = this.parentElem.getElementsByClassName('default-title')[0];
 		titleElem.textContent = 'TBC Raid Sim';
+
+		const raidPicker = new RaidPicker(this.parentElem.getElementsByClassName('raid-picker')[0] as HTMLElement, this.raid, this.config.presets);
 
     //const results = new Results(this.parentElem.getElementsByClassName('default-results')[0] as HTMLElement, this);
     //const detailedResults = new DetailedResults(this.parentElem.getElementsByClassName('detailed-results')[0] as HTMLElement);
@@ -36,8 +48,8 @@ export class RaidSimUI {
   }
 
   async init(): Promise<void> {
-		return Promise.resolve();
-    //await super.init();
+    await this.sim.init();
+		return;
   }
 }
 
@@ -60,7 +72,13 @@ const layoutHTML = `
 			</li>
     </ul>
     <div class="tab-content">
-      <div id="raid-tab" class="tab-pane fade in active">
+      <div id="raid-tab" class="raid-tab tab-pane fade in active">
+				<div class="raid-picker">
+				</div>
+				<div class="saved-raids-div">
+					<div class="saved-raids-manager">
+					</div>
+				</div>
       </div>
       <div id="detailed-results-tab" class="tab-pane fade">
 				<div class="detailed-results">

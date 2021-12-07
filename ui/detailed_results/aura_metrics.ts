@@ -1,4 +1,4 @@
-import { IndividualSimRequest, IndividualSimResult } from '/tbc/core/proto/api.js';
+import { RaidSimRequest, RaidSimResult } from '/tbc/core/proto/api.js';
 import { setWowheadHref } from '/tbc/core/resources.js';
 import { sum } from '/tbc/core/utils.js';
 
@@ -43,13 +43,13 @@ export class BuffAuraMetrics extends ResultComponent {
 		$(this.tableElem).tablesorter({ sortList: [[1, 1]] });
 	}
 
-	onSimResult(request: IndividualSimRequest, result: IndividualSimResult) {
+	onSimResult(request: RaidSimRequest, result: RaidSimResult) {
 		this.bodyElem.textContent = '';
 
 		const iterations = request.simOptions!.iterations;
 		const duration = request.encounter?.duration || 1;
 
-		parseAuraMetrics(result.playerMetrics!.auras).then(auraMetrics => {
+		parseAuraMetrics(result.raidMetrics!.parties[0].players[0].auras).then(auraMetrics => {
 			auraMetrics.forEach(auraMetric => {
 				const rowElem = document.createElement('tr');
 				this.bodyElem.appendChild(rowElem);
@@ -63,6 +63,9 @@ export class BuffAuraMetrics extends ResultComponent {
 
 				const iconElem = nameCellElem.getElementsByClassName('aura-metrics-action-icon')[0] as HTMLAnchorElement;
 				iconElem.style.backgroundImage = `url('${auraMetric.iconUrl}')`;
+				if (!('otherId' in auraMetric.actionId.id)) {
+					setWowheadHref(iconElem, auraMetric.actionId.id);
+				}
 
 				const addCell = (value: string | number): HTMLElement => {
 					const cellElem = document.createElement('td');
@@ -71,7 +74,7 @@ export class BuffAuraMetrics extends ResultComponent {
 					return cellElem;
 				};
 
-				addCell((auraMetric.uptimeSecondsAvg / iterations / duration * 100).toFixed(2) + '%'); // Uptime
+				addCell((auraMetric.uptimeSecondsAvg / duration * 100).toFixed(2) + '%'); // Uptime
 			});
 
 			$(this.tableElem).trigger('update');
@@ -114,7 +117,7 @@ export class DebuffAuraMetrics extends ResultComponent {
 		$(this.tableElem).tablesorter({ sortList: [[1, 1]] });
 	}
 
-	onSimResult(request: IndividualSimRequest, result: IndividualSimResult) {
+	onSimResult(request: RaidSimRequest, result: RaidSimResult) {
 		this.bodyElem.textContent = '';
 
 		const iterations = request.simOptions!.iterations;
@@ -134,6 +137,9 @@ export class DebuffAuraMetrics extends ResultComponent {
 
 				const iconElem = nameCellElem.getElementsByClassName('aura-metrics-action-icon')[0] as HTMLAnchorElement;
 				iconElem.style.backgroundImage = `url('${auraMetric.iconUrl}')`;
+				if (!('otherId' in auraMetric.actionId.id)) {
+					setWowheadHref(iconElem, auraMetric.actionId.id);
+				}
 
 				const addCell = (value: string | number): HTMLElement => {
 					const cellElem = document.createElement('td');
@@ -142,7 +148,7 @@ export class DebuffAuraMetrics extends ResultComponent {
 					return cellElem;
 				};
 
-				addCell((auraMetric.uptimeSecondsAvg / iterations / duration * 100).toFixed(2) + '%'); // Uptime
+				addCell((auraMetric.uptimeSecondsAvg / duration * 100).toFixed(2) + '%'); // Uptime
 			});
 
 			$(this.tableElem).trigger('update');

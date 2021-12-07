@@ -1,4 +1,4 @@
-import { IndividualSimRequest, IndividualSimResult } from '/tbc/core/proto/api.js';
+import { RaidSimRequest, RaidSimResult } from '/tbc/core/proto/api.js';
 import { StatWeightsRequest, StatWeightsResult } from '/tbc/core/proto/api.js';
 import { Stat } from '/tbc/core/proto/common.js';
 import { statNames } from '/tbc/core/proto_utils/names.js';
@@ -10,8 +10,8 @@ import { Component } from './component.js';
 declare var tippy: any;
 
 type ReferenceData = {
-	request: IndividualSimRequest,
-	result: IndividualSimResult,
+	request: RaidSimRequest,
+	result: RaidSimResult,
 	settings: any,
 };
 
@@ -113,7 +113,7 @@ export class Results extends Component {
     this.pendingElem.style.display = 'initial';
   }
 
-  setSimResult(request: IndividualSimRequest, result: IndividualSimResult) {
+  setSimResult(request: RaidSimRequest, result: RaidSimResult) {
 		this.currentData = {
 			request: request,
 			result: result,
@@ -122,16 +122,17 @@ export class Results extends Component {
 
     this.hideAll();
     this.simElem.style.display = 'initial';
+		const dpsMetrics = result.raidMetrics!.dps!;
     this.simDpsElem.innerHTML = `
-      <span class="results-sim-dps-avg">${result.playerMetrics!.dpsAvg.toFixed(2)}</span>
-      <span class="results-sim-dps-stdev">${result.playerMetrics!.dpsStdev.toFixed(2)}</span>
+      <span class="results-sim-dps-avg">${dpsMetrics.avg.toFixed(2)}</span>
+      <span class="results-sim-dps-stdev">${dpsMetrics.stdev.toFixed(2)}</span>
     `;
 
 		this.updateReference();
   }
 
   setStatWeights(request: StatWeightsRequest, result: StatWeightsResult, epStats: Array<Stat>) {
-		const iterations = request.options!.simOptions!.iterations;
+		const iterations = request.simOptions!.iterations;
 	if (request.epReferenceStat == Stat.StatSpellPower) {
 
 		result.epValues.forEach( (value, index) => {
@@ -199,7 +200,9 @@ export class Results extends Component {
 		}
 		this.simReferenceElem.classList.add('has-reference');
 
-		const delta = this.currentData.result.playerMetrics!.dpsAvg - this.referenceData.result.playerMetrics!.dpsAvg;
+		const currentDpsMetrics = this.currentData.result.raidMetrics!.dps!;
+		const referenceDpsMetrics = this.referenceData.result.raidMetrics!.dps!;
+		const delta = currentDpsMetrics.avg - referenceDpsMetrics.avg;
 		const deltaStr = delta.toFixed(2);
 		if (delta >= 0) {
 			this.simReferenceDiffElem.textContent = '+' + deltaStr;

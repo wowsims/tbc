@@ -1,4 +1,4 @@
-import { IndividualSimRequest, IndividualSimResult } from '/tbc/core/proto/api.js';
+import { RaidSimRequest, RaidSimResult } from '/tbc/core/proto/api.js';
 
 import { ResultComponent, ResultComponentConfig } from './result_component.js';
 
@@ -10,7 +10,7 @@ export class DpsHistogram extends ResultComponent {
     super(config);
 	}
 
-	onSimResult(request: IndividualSimRequest, result: IndividualSimResult) {
+	onSimResult(request: RaidSimRequest, result: RaidSimResult) {
 		const chartBounds = this.rootElem.getBoundingClientRect();
 
 		this.rootElem.textContent = '';
@@ -19,14 +19,14 @@ export class DpsHistogram extends ResultComponent {
 		chartCanvas.width = chartBounds.width;
 
 
-		const min = result.playerMetrics!.dpsAvg - result.playerMetrics!.dpsStdev;
-		const max = result.playerMetrics!.dpsAvg + result.playerMetrics!.dpsStdev;
+		const min = result.raidMetrics!.dps!.avg - result.raidMetrics!.dps!.stdev;
+		const max = result.raidMetrics!.dps!.avg + result.raidMetrics!.dps!.stdev;
 		const vals: Array<number> = [];
 		const colors: Array<string> = [];
 
-		const labels = Object.keys(result.playerMetrics!.dpsHist);
+		const labels = Object.keys(result.raidMetrics!.dps!.hist);
 		labels.forEach((k, i) => {
-			vals.push(result.playerMetrics!.dpsHist[Number(k)]);
+			vals.push(result.raidMetrics!.dps!.hist[Number(k)]);
 			const val = parseInt(k);
 			if (val > min && val < max) {
 				colors.push('#1E87F0');

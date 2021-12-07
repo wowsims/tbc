@@ -104,30 +104,38 @@ message AuraMetrics {
 		double uptime_seconds_stdev = 3;
 }
 
+message DpsMetrics {
+    double avg   = 1;
+    double stdev = 2;
+    double max   = 3;
+    map<int32, int32> hist = 4;
+}
+
 // All the results for a single Player.
 message PlayerMetrics {
-    double dps_avg   = 1;
-    double dps_stdev = 2;
-    double dps_max   = 3;
-    map<int32, int32> dps_hist = 4;
+		DpsMetrics dps = 1;
 
-    int32 num_oom = 5;
-    double oom_at_avg = 6;
-    double dps_at_oom_avg = 7;
+    int32 num_oom = 2;
+    double oom_at_avg = 3;
+    double dps_at_oom_avg = 4;
 
-    repeated ActionMetrics actions = 8;
+    repeated ActionMetrics actions = 5;
 
-		repeated AuraMetrics auras = 9;
+		repeated AuraMetrics auras = 6;
 }
 
 // Results for a whole raid.
 message PartyMetrics {
-		repeated PlayerMetrics players = 1;
+		DpsMetrics dps = 1;
+
+		repeated PlayerMetrics players = 2;
 }
 
 // Results for a whole raid.
 message RaidMetrics {
-		repeated PartyMetrics parties = 1;
+		DpsMetrics dps = 1;
+
+		repeated PartyMetrics parties = 2;
 }
 
 message TargetMetrics {
@@ -173,7 +181,6 @@ message IndividualSimResult {
 
 // RPC GearList
 message GearListRequest {
-    Spec spec = 1; // Each spec has a custom gear list
 }
 message GearListResult {
     repeated Item items = 1;
@@ -195,9 +202,14 @@ message ComputeStatsResult {
 
 // RPC StatWeights
 message StatWeightsRequest {
-    IndividualSimRequest options = 1;
-    repeated Stat stats_to_weigh = 2;
-    Stat ep_reference_stat = 3;
+    Player player = 1;
+    RaidBuffs raid_buffs = 2;
+    PartyBuffs party_buffs = 3;
+    Encounter encounter = 4;
+		SimOptions sim_options = 5;
+
+    repeated Stat stats_to_weigh = 6;
+    Stat ep_reference_stat = 7;
 }
 message StatWeightsResult {
     repeated double weights = 1;

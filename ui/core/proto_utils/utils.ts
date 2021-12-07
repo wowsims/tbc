@@ -53,6 +53,31 @@ export const specNames: Record<Spec, string> = {
   [Spec.SpecWarrior]: 'Warrior',
 };
 
+export const classColors: Record<Class, string> = {
+	[Class.ClassUnknown]: '#fff',
+	[Class.ClassDruid]: '#ff7d0a',
+	[Class.ClassHunter]: '#abd473',
+	[Class.ClassMage]: '#69ccf0',
+	[Class.ClassPaladin]: '#f58cba',
+	[Class.ClassPriest]: '#fff',
+	[Class.ClassRogue]: '#fff569',
+	[Class.ClassShaman]: '#2459ff',
+	[Class.ClassWarlock]: '#9482c9',
+	[Class.ClassWarrior]: '#c79c6e',
+}
+
+export const specIconsLarge: Record<Spec, string> = {
+  [Spec.SpecBalanceDruid]: 'https://wow.zamimg.com/images/wow/icons/large/spell_nature_starfall.jpg',
+  [Spec.SpecElementalShaman]: 'https://wow.zamimg.com/images/wow/icons/large/spell_nature_lightning.jpg',
+  [Spec.SpecHunter]: 'https://wow.zamimg.com/images/wow/icons/large/ability_marksmanship.jpg',
+  [Spec.SpecMage]: 'https://wow.zamimg.com/images/wow/icons/large/spell_holy_magicalsentry.jpg',
+  [Spec.SpecRogue]: 'https://wow.zamimg.com/images/wow/icons/large/ability_rogue_eviscerate.jpg',
+  [Spec.SpecRetributionPaladin]: 'https://wow.zamimg.com/images/wow/icons/large/spell_holy_auraoflight.jpg',
+  [Spec.SpecShadowPriest]: 'https://wow.zamimg.com/images/wow/icons/large/spell_shadow_shadowwordpain.jpg',
+  [Spec.SpecWarlock]: 'https://wow.zamimg.com/images/wow/icons/large/spell_shadow_metamorphosis.jpg',
+  [Spec.SpecWarrior]: 'https://wow.zamimg.com/images/wow/icons/large/ability_warrior_innerrage.jpg',
+};
+
 export type RotationUnion =
 		BalanceDruidRotation |
 		ElementalShamanRotation |

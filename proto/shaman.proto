@@ -44,6 +44,61 @@ message ShamanTalents {
     int32 natures_blessing = 32;
 }
 
+enum EarthTotem {
+	NoEarthTotem = 0;
+	StrengthOfEarthTotem = 1;
+	TremorTotem = 2;
+}
+
+enum AirTotem {
+	NoAirTotem = 0;
+	GraceOfAirTotem = 1;
+	TranquilAirTotem = 2;
+	WindfuryTotem = 3;
+	WrathOfAirTotem = 4;
+}
+
+enum FireTotem {
+	NoFireTotem = 0;
+	MagmaTotem = 1;
+	SearingTotem = 2;
+	TotemOfWrath = 3;
+}
+
+enum WaterTotem {
+	NoWaterTotem = 0;
+	ManaSpringTotem = 1;
+}
+
+message ShamanTotems {
+		EarthTotem earth = 1;
+		AirTotem air = 2;
+		FireTotem fire = 3;
+		WaterTotem water = 4;
+
+		// If set, will twist windfury with whichever air totem is selected.
+		bool twist_windfury = 5; 
+
+		// If set, will twist fire nova with whichever fire totem is selected.
+		bool twist_fire_nova = 6;
+
+		// If set, will use mana tide when appripriate.
+		bool use_mana_tide = 7;
+
+		// If set, will use fire elemental totem at the start and revert to regular
+		// fire totems when it expires. If fire nova is also selected, fire nova
+		// will be used once before dropping fire ele.
+		bool use_fire_elemental = 8;
+
+		// If set, will revert to regular fire totems when fire elemental goes OOM,
+		// instead of waiting the full 2 minutes.
+		bool recall_fire_elemental_on_oom = 9;
+
+		// If set, any time a 2-minute totem is about to expire, will recall and
+		// replace all totems.
+		bool recall_totems = 10;
+}
+
 message ElementalShaman {
     message Rotation {
       enum RotationType {
