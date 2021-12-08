@@ -52,6 +52,7 @@ message ShadowPriest {
 	  
       RotationType rotation_type = 1;
 	  bool use_dev_plague = 3; // only undead
+	  bool precast_vt = 4; // casts VT ahead of the start of the fight so that it lands on 0
     }
     Rotation rotation = 1;
 

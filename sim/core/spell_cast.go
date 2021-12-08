@@ -163,6 +163,7 @@ func (spellEffect *SpellEffect) applyDot(sim *Simulation, spellCast *SpellCast, 
 	}
 
 	pa.OnAction = func(sim *Simulation) {
+		// fmt.Printf("DOT (%s) Ticking, Time Remaining: %0.2f\n", spellCast.Name, ddInput.TimeRemaining(sim).Seconds())
 		damage := ddInput.damagePerTick
 		spellCast.Character.OnPeriodicDamage(sim, spellCast, spellEffect, &damage)
 		spellEffect.Target.OnPeriodicDamage(sim, spellCast, spellEffect, &damage)

@@ -46,6 +46,9 @@ func init() {
 		{Name: "Flawless Wand of Shadow Wrath", WowheadID: 25295, ID: -16, Categories: []proto.ItemCategory{proto.ItemCategory_ItemCategoryCaster}, Type: proto.ItemType_ItemTypeRanged, RangedWeaponType: proto.RangedWeaponType_RangedWeaponTypeWand, Phase: 1, Quality: proto.ItemQuality_ItemQualityUncommon, Stats: stats.Stats{stats.ShadowSpellPower: 25}},
 		{Name: "Amber Cape of Shadow Wrath", WowheadID: 25043, ID: -17, Categories: []proto.ItemCategory{proto.ItemCategory_ItemCategoryCaster}, Type: proto.ItemType_ItemTypeBack, Phase: 1, Quality: proto.ItemQuality_ItemQualityUncommon, Stats: stats.Stats{stats.ShadowSpellPower: 45}},
 		{Name: "Illidari Cape of Shadow Wrath", WowheadID: 31201, ID: -18, Categories: []proto.ItemCategory{proto.ItemCategory_ItemCategoryCaster}, Type: proto.ItemType_ItemTypeBack, Phase: 1, Quality: proto.ItemQuality_ItemQualityRare, Stats: stats.Stats{stats.ShadowSpellPower: 47}},
+		{Name: "Elementalist Bracelets of Shadow Wrath", WowheadID: 24692, ID: -19, Categories: []proto.ItemCategory{proto.ItemCategory_ItemCategoryCaster}, Type: proto.ItemType_ItemTypeWrist, Phase: 1, Quality: proto.ItemQuality_ItemQualityUncommon, Stats: stats.Stats{stats.ShadowSpellPower: 45}},
+		{Name: "Amber Cape of Shadow Wrath", WowheadID: 25043, ID: -20, Categories: []proto.ItemCategory{proto.ItemCategory_ItemCategoryCaster}, Type: proto.ItemType_ItemTypeBack, Phase: 1, Quality: proto.ItemQuality_ItemQualityUncommon, Stats: stats.Stats{stats.ShadowSpellPower: 45}},
+		{Name: "Elementalist Gloves of Shadow Wrath", WowheadID: 24688, ID: -21, Categories: []proto.ItemCategory{proto.ItemCategory_ItemCategoryCaster}, Type: proto.ItemType_ItemTypeHands, Phase: 1, Quality: proto.ItemQuality_ItemQualityUncommon, Stats: stats.Stats{stats.ShadowSpellPower: 60}},
 	}...)
 
 	for _, v := range Items {

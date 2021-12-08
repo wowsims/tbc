@@ -169,7 +169,11 @@ func (sim *Simulation) runOnce() {
 			}
 			pa.OnAction = func(sim *Simulation) {
 				ag.GetCharacter().TryUseCooldowns(sim)
-				pa.NextActionAt = ag.Act(sim)
+				dur := ag.Act(sim)
+				if dur <= sim.CurrentTime {
+					panic(fmt.Sprintf("Agent returned invalid time delta: %dns", sim.CurrentTime-dur))
+				}
+				pa.NextActionAt = dur
 			}
 			sim.AddPendingAction(pa)
 		}

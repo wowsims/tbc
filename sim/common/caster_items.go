@@ -12,6 +12,7 @@ func init() {
 	// Proc effects. Keep these in order by item ID.
 	core.AddItemEffect(28602, ApplyRobeOfTheElderScribes)
 	core.AddItemEffect(29305, ApplyEternalSage)
+	core.AddItemEffect(34470, ApplyTimbals)
 }
 
 var RobeOfTheElderScribeAuraID = core.NewAuraID()
@@ -60,6 +61,59 @@ func ApplyEternalSage(agent core.Agent) {
 				if !icd.IsOnCD(sim) && sim.RandomFloat("Band of the Eternal Sage") < proc {
 					icd = core.InternalCD(sim.CurrentTime + icdDur)
 					character.AddAuraWithTemporaryStats(sim, BandoftheEternalSageAuraID, 35084, "Band of the Eternal Sage", stats.SpellPower, spellBonus, dur)
+				}
+			},
+		}
+	})
+}
+
+var AugmentPainAuraID = core.NewAuraID()
+
+func ApplyTimbals(agent core.Agent) {
+	timbalsTemplate := core.NewSimpleSpellTemplate(core.SimpleSpell{
+		SpellCast: core.SpellCast{
+			Cast: core.Cast{
+				Name:            "Timbal's Shadow Bolt",
+				CritMultiplier:  1.5,
+				SpellSchool:     stats.ShadowSpellPower,
+				IgnoreCooldowns: true,
+				ActionID: core.ActionID{
+					SpellID: 45055,
+				},
+			},
+		},
+		SpellHitEffect: core.SpellHitEffect{
+			SpellEffect: core.SpellEffect{
+				DamageMultiplier:       1,
+				StaticDamageMultiplier: 1,
+			},
+			DirectInput: core.DirectDamageSpellInput{
+				MinBaseDamage: 285,
+				MaxBaseDamage: 475,
+			},
+		},
+	})
+	character := agent.GetCharacter()
+	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
+		var shadowBolt = &core.SimpleSpell{}
+
+		// Each time one of your spells deals periodic damage,
+		// there is a chance 285 to 475 additional damage will be dealt. (Proc chance: 10%, 15s cooldown)
+		icd := core.NewICD()
+		const icdDur = time.Second * 15
+		const proc = 0.1
+
+		return core.Aura{
+			ID:   AugmentPainAuraID,
+			Name: "Timbal's - Augment Pain", // added Timbals to the front
+			OnPeriodicDamage: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect, tickDamage *float64) {
+				if !icd.IsOnCD(sim) && sim.RandomFloat("timbals") < proc {
+					icd = core.InternalCD(sim.CurrentTime + icdDur)
+					timbalsTemplate.Apply(shadowBolt)
+					// Apply the caster/target from the cast that procd this.
+					shadowBolt.Character = spellCast.Character
+					shadowBolt.Target = spellEffect.Target
+					shadowBolt.Cast(sim)
 				}
 			},
 		}
