@@ -477,6 +477,7 @@ var ItemDeclarations = []ItemDeclaration{
 	{ /** Windscale Hood */ ID: 29504, Categories: []proto.ItemCategory{CasterCategory}},
 	{ /** Windshear Boots */ ID: 28810, Categories: []proto.ItemCategory{CasterCategory}},
 	{ /** Wings of the Avatar */ ID: 30163, Categories: []proto.ItemCategory{CasterCategory}},
+	{ /** Wand of Prismatic Focus */ ID: 32343, Categories: []proto.ItemCategory{CasterCategory}},
 	{ /** Wand of the Demonsoul */ ID: 34347, Categories: []proto.ItemCategory{CasterCategory}},
 	{ /** Wand of the Forgotten Star */ ID: 29982, Categories: []proto.ItemCategory{CasterCategory}},
 	{ /** World's End Bracers */ ID: 27522, Categories: []proto.ItemCategory{CasterCategory}},
