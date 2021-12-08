@@ -141,6 +141,7 @@ const theme = new DefaultTheme(document.body, {
     // Inputs to include in the 'Other' section on the settings tab.
     otherInputs: {
         inputs: [
+            OtherInputs.ISBUptime,
             OtherInputs.StartingPotion,
             OtherInputs.NumStartingPotions,
         ],

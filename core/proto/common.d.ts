@@ -231,6 +231,10 @@ export interface Debuffs {
      * @generated from protobuf field: proto.TristateEffect curse_of_elements = 4;
      */
     curseOfElements: TristateEffect;
+    /**
+     * @generated from protobuf field: double isb_uptime = 5;
+     */
+    isbUptime: number;
 }
 /**
  * @generated from protobuf message proto.Target

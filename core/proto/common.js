@@ -1212,11 +1212,12 @@ class Debuffs$Type extends MessageType {
             { no: 1, name: "judgement_of_wisdom", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 2, name: "improved_seal_of_the_crusader", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 3, name: "misery", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
-            { no: 4, name: "curse_of_elements", kind: "enum", T: () => ["proto.TristateEffect", TristateEffect] }
+            { no: 4, name: "curse_of_elements", kind: "enum", T: () => ["proto.TristateEffect", TristateEffect] },
+            { no: 5, name: "isb_uptime", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ }
         ]);
     }
     create(value) {
-        const message = { judgementOfWisdom: false, improvedSealOfTheCrusader: false, misery: false, curseOfElements: 0 };
+        const message = { judgementOfWisdom: false, improvedSealOfTheCrusader: false, misery: false, curseOfElements: 0, isbUptime: 0 };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -1238,6 +1239,9 @@ class Debuffs$Type extends MessageType {
                     break;
                 case /* proto.TristateEffect curse_of_elements */ 4:
                     message.curseOfElements = reader.int32();
+                    break;
+                case /* double isb_uptime */ 5:
+                    message.isbUptime = reader.double();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -1263,6 +1267,9 @@ class Debuffs$Type extends MessageType {
         /* proto.TristateEffect curse_of_elements = 4; */
         if (message.curseOfElements !== 0)
             writer.tag(4, WireType.Varint).int32(message.curseOfElements);
+        /* double isb_uptime = 5; */
+        if (message.isbUptime !== 0)
+            writer.tag(5, WireType.Bit64).double(message.isbUptime);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
