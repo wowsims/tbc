@@ -164,6 +164,10 @@ export interface ShadowPriest_Rotation {
      * @generated from protobuf field: bool use_dev_plague = 3;
      */
     useDevPlague: boolean;
+    /**
+     * @generated from protobuf field: bool precast_vt = 4;
+     */
+    precastVt: boolean;
 }
 /**
  * @generated from protobuf enum proto.ShadowPriest.Rotation.RotationType

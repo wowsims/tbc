@@ -153,8 +153,13 @@ export class SimUI {
                 const encoded = btoa(String.fromCharCode(...val));
                 const linkUrl = new URL(window.location.href);
                 linkUrl.hash = encoded;
-                navigator.clipboard.writeText(linkUrl.toString());
-                alert('Current settings copied to clipboard!');
+                if (navigator.clipboard == undefined) {
+                    alert(linkUrl.toString());
+                }
+                else {
+                    navigator.clipboard.writeText(linkUrl.toString());
+                    alert('Current settings copied to clipboard!');
+                }
             });
         });
     }
