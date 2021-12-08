@@ -95,7 +95,7 @@ export const ShadowPriestRotationConfig = {
 			getModObject: (simUI: SimUI<any>) => simUI.player,
 			config: {
 				label: 'Channeling Latency (ms)',
-				labelTooltip: 'Latency after a channel that lasts longer then GCD. 0 to disable',
+				labelTooltip: 'Latency after a channel that lasts longer than GCD. 0 to disable, min value of 150 if set',
 				changedEvent: (player: Player<Spec.SpecShadowPriest>) => player.rotationChangeEmitter,
 				getValue: (player: Player<Spec.SpecShadowPriest>) => player.getRotation().latency,
 				setValue: (player: Player<Spec.SpecShadowPriest>, newValue: number) => {
