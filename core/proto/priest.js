@@ -342,11 +342,12 @@ class ShadowPriest_Rotation$Type extends MessageType {
         super("proto.ShadowPriest.Rotation", [
             { no: 1, name: "rotation_type", kind: "enum", T: () => ["proto.ShadowPriest.Rotation.RotationType", ShadowPriest_Rotation_RotationType] },
             { no: 3, name: "use_dev_plague", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
-            { no: 4, name: "precast_vt", kind: "scalar", T: 8 /*ScalarType.BOOL*/ }
+            { no: 4, name: "precast_vt", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 5, name: "latency", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ }
         ]);
     }
     create(value) {
-        const message = { rotationType: 0, useDevPlague: false, precastVt: false };
+        const message = { rotationType: 0, useDevPlague: false, precastVt: false, latency: 0 };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -365,6 +366,9 @@ class ShadowPriest_Rotation$Type extends MessageType {
                     break;
                 case /* bool precast_vt */ 4:
                     message.precastVt = reader.bool();
+                    break;
+                case /* double latency */ 5:
+                    message.latency = reader.double();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -387,6 +391,9 @@ class ShadowPriest_Rotation$Type extends MessageType {
         /* bool precast_vt = 4; */
         if (message.precastVt !== false)
             writer.tag(4, WireType.Varint).bool(message.precastVt);
+        /* double latency = 5; */
+        if (message.latency !== 0)
+            writer.tag(5, WireType.Bit64).double(message.latency);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

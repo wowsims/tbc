@@ -168,6 +168,10 @@ export interface ShadowPriest_Rotation {
      * @generated from protobuf field: bool precast_vt = 4;
      */
     precastVt: boolean;
+    /**
+     * @generated from protobuf field: double latency = 5;
+     */
+    latency: number;
 }
 /**
  * @generated from protobuf enum proto.ShadowPriest.Rotation.RotationType
