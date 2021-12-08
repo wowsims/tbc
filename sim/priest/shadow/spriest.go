@@ -207,6 +207,8 @@ func (spriest *ShadowPriest) Act(sim *core.Simulation) time.Duration {
 			if spell.DotInput.NumberOfTicks == 0 {
 				spell.Cancel()
 				return sim.CurrentTime + core.MaxDuration(spriest.GetRemainingCD(core.GCDCooldownID, sim.CurrentTime), wait)
+			} else if spell.DotInput.NumberOfTicks > 1 {
+				wait += spriest.options.latency
 			}
 		}
 	} else {
