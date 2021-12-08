@@ -5,7 +5,7 @@ import { Potions } from '/tbc/core/proto/common.js';
 import { Faction } from '/tbc/core/proto_utils/utils.js';
 import { Player } from '/tbc/core/player.js';
 
-import { ShadowPriest, ShadowPriest_Rotation as Rotation, ShadowPriest_Options as Options, ShadowPriest_Rotation, ShadowPriest_Rotation_RotationType } from '/tbc/core/proto/priest.js';
+import { ShadowPriest, ShadowPriest_Rotation as Rotation, ShadowPriest_Options as Options, ShadowPriest_Rotation_RotationType } from '/tbc/core/proto/priest.js';
 
 import * as Enchants from '/tbc/core/constants/enchants.js';
 import * as Gems from '/tbc/core/constants/gems.js';
@@ -23,10 +23,11 @@ export const StandardTalents = {
 };
 
 export const DefaultRotation = Rotation.create({
-	rotationType: ShadowPriest_Rotation_RotationType.Basic,
+	rotationType: ShadowPriest_Rotation_RotationType.Sweaty,
 });
 
 export const DefaultOptions = Options.create({
+	useShadowfiend: true,
 });
 
 export const DefaultConsumes = Consumes.create({
