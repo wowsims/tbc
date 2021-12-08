@@ -57,19 +57,20 @@ var ItemSetCycloneRegalia = core.ItemSet{
 					ID:   Cyclone4PcAuraID,
 					Name: "Cyclone 4pc Bonus",
 					OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-						if spellEffect.Crit && sim.RandomFloat("cycl4p") < 0.11 {
-							character.AddAura(sim, core.Aura{
-								ID:   Cyclone4PcManaRegainAuraID,
-								Name: "Cyclone Mana Cost Reduction",
-								OnCast: func(sim *core.Simulation, cast *core.Cast) {
-									// TODO: how to make sure this goes in before clearcasting?
-									cast.ManaCost -= 270
-								},
-								OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
-									character.RemoveAura(sim, Cyclone4PcManaRegainAuraID)
-								},
-							})
+						if !spellEffect.Crit || sim.RandomFloat("cycl4p") > 0.11 {
+							return // if not a crit or didn't proc, don't activate
 						}
+						character.AddAura(sim, core.Aura{
+							ID:   Cyclone4PcManaRegainAuraID,
+							Name: "Cyclone Mana Cost Reduction",
+							OnCast: func(sim *core.Simulation, cast *core.Cast) {
+								// TODO: how to make sure this goes in before clearcasting?
+								cast.ManaCost -= 270
+							},
+							OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
+								character.RemoveAura(sim, Cyclone4PcManaRegainAuraID)
+							},
+						})
 					},
 				}
 			})
@@ -89,9 +90,10 @@ var ItemSetCataclysmRegalia = core.ItemSet{
 					ID:   Cataclysm4PcAuraID,
 					Name: "Cataclysm 4pc Bonus",
 					OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-						if spellEffect.Crit && sim.RandomFloat("cata4p") < 0.25 {
-							character.AddStat(stats.Mana, 120)
+						if !spellEffect.Crit || sim.RandomFloat("cata4p") > 0.25 {
+							return
 						}
+						character.AddStat(stats.Mana, 120)
 					},
 				}
 			})
@@ -181,10 +183,11 @@ func ApplyFathomBroochOfTheTidewalker(agent core.Agent) {
 				if cast.SpellSchool != stats.NatureSpellPower {
 					return
 				}
-				if sim.RandomFloat("Fathom-Brooch of the Tidewalker") < 0.15 {
-					icd = core.InternalCD(sim.CurrentTime + icdDur)
-					character.AddStat(stats.Mana, 335)
+				if sim.RandomFloat("Fathom-Brooch of the Tidewalker") > 0.15 {
+					return
 				}
+				icd = core.InternalCD(sim.CurrentTime + icdDur)
+				character.AddStat(stats.Mana, 335)
 			},
 		}
 	})
@@ -204,9 +207,10 @@ func ApplySkycallTotem(agent core.Agent) {
 			Name:    "Skycall Totem",
 			Expires: core.NeverExpires,
 			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
-				if cast.ActionID.SpellID == SpellIDLB12 && sim.RandomFloat("Skycall Totem") < 0.15 {
-					character.AddAuraWithTemporaryStats(sim, EnergizedAuraID, 0, "Energized", stats.SpellHaste, hasteBonus, dur)
+				if cast.ActionID.SpellID != SpellIDLB12 || sim.RandomFloat("Skycall Totem") > 0.15 {
+					return
 				}
+				character.AddAuraWithTemporaryStats(sim, EnergizedAuraID, 0, "Energized", stats.SpellHaste, hasteBonus, dur)
 			},
 		}
 	})

@@ -34,10 +34,11 @@ func (shaman *Shaman) newChainLightningTemplate(sim *core.Simulation, isLightnin
 				shaman.ElementalFocusStacks = 2
 			}
 
-			if sim.RandomFloat("CL Lightning Overload") < lightningOverloadChance {
-				overloadAction := shaman.NewChainLightning(sim, spellEffect.Target, true)
-				overloadAction.Cast(sim)
+			if sim.RandomFloat("CL Lightning Overload") > lightningOverloadChance {
+				return
 			}
+			overloadAction := shaman.NewChainLightning(sim, spellEffect.Target, true)
+			overloadAction.Cast(sim)
 		}
 	} else {
 		effect.OnSpellHit = func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
