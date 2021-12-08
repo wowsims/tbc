@@ -140,7 +140,6 @@ const (
 )
 
 func (spriest *ShadowPriest) Act(sim *core.Simulation) time.Duration {
-	// fmt.Printf("[%0.1f] Priest Acting...\n", sim.CurrentTime.Seconds())
 	if spriest.rotation.PrecastVt && sim.CurrentTime == 0 {
 		spell := spriest.NewVT(sim, sim.GetPrimaryTarget())
 		spell.CastTime = 0
@@ -206,11 +205,9 @@ func (spriest *ShadowPriest) Act(sim *core.Simulation) time.Duration {
 				sim.Log("<spriest> Selected %d mindflay ticks.\n", spell.DotInput.NumberOfTicks)
 			}
 			if spell.DotInput.NumberOfTicks == 0 {
-				// fmt.Printf("\tcancelling cast... waiting %0.1fs\n", wait.Seconds())
 				spell.Cancel()
 				return sim.CurrentTime + core.MaxDuration(spriest.GetRemainingCD(core.GCDCooldownID, sim.CurrentTime), wait)
 			}
-			// fmt.Printf("MF TICKS: %d, wait: %d\n", spell.DotInput.NumberOfTicks, wait)
 		}
 	} else {
 		// what do you even do... i guess just sit around
@@ -225,7 +222,7 @@ func (spriest *ShadowPriest) Act(sim *core.Simulation) time.Duration {
 	if !actionSuccessful {
 		regenTime := spriest.TimeUntilManaRegen(spell.GetManaCost())
 		if sim.Log != nil {
-			sim.Log("Not enough mana, regenerating for %s.\n", regenTime)
+			sim.Log("<spriest> Not enough mana, regenerating for %s.\n", regenTime)
 		}
 		return sim.CurrentTime + regenTime
 	}
@@ -248,10 +245,6 @@ func (spriest *ShadowPriest) CalculateMindflayRotation(sim *core.Simulation, spe
 			nextIdx = i
 		}
 	}
-	if sim.Log != nil {
-		sim.Log("Next CD available at: %0.1f\n", nextCD.Seconds())
-	}
-	// fmt.Printf("\tNext CD available in: %0.1fs\n", nextCD.Seconds())
 	gcd := time.Duration(float64(core.GCDDefault) / spriest.CastSpeed())
 
 	var numTicks int
@@ -271,7 +264,6 @@ func (spriest *ShadowPriest) CalculateMindflayRotation(sim *core.Simulation, spe
 		if nextCD <= 0 {
 			nextCD = 1 // add a nanosecond to be sure any ticking dot finishes and we don't get sim stuck.
 		} else {
-			// TODO: We might still want to do a single MF1 tick...
 			//  calculate the dps gain from casting vs waiting.
 			if nextIdx == 0 {
 				Major_dmg = (731.5 + spriest.GetStat(stats.SpellPower)*0.429) / (gcd + nextCD).Seconds() * (1 + (0.5 * (crit + 0.15)))
@@ -300,9 +292,6 @@ func (spriest *ShadowPriest) CalculateMindflayRotation(sim *core.Simulation, spe
 			highestPossibleDmg := 0.0
 			if highestPossibleIdx == 0 {
 				for i, v := range dpsPossibleshort {
-					if sim.Log != nil {
-						//sim.Log("\tdpsPossibleshort[%d]: %01.f\n", i, v)
-					}
 					if v >= highestPossibleDmg {
 						highestPossibleIdx = i
 						highestPossibleDmg = v
@@ -323,41 +312,24 @@ func (spriest *ShadowPriest) CalculateMindflayRotation(sim *core.Simulation, spe
 			var numtickss float64 = float64(numTicks)
 			res := math.Mod(numtickss, 3)
 
-			if sim.Log != nil {
-				sim.Log("Decided to Add %d Ticks\n", numTicks)
-			}
-
 			//  Now that the number of optimal ticks has been determined to optimize dps
 			//  Now optimize mf2s and mf3s
 			if numTicks == 1 {
 				spell.DotInput.NumberOfTicks = numTicks
 			} else if res < 2 && numTicks < 5 && numTicks != 3 && numTicks != 0 {
 				spell.DotInput.NumberOfTicks = 2
-				if sim.Log != nil {
-					sim.Log("Final rotation should be: MF2 MF2\n")
-				}
 			} else if res == 0 && numTicks != 0 {
 				//  cast MF3 MF3...MF3
-				if sim.Log != nil {
-					sim.Log("Final rotation should be: MF3 MF3 ... MF3\n")
-				}
 				spell.DotInput.NumberOfTicks = 3
 			} else if res == 2 {
 				//  cast MF3 MF3...MF2
-				if sim.Log != nil {
-					sim.Log("Final rotation should be: MF3 MF3 ... MF2\n")
-				}
 				if numTicks == 2 {
 					spell.DotInput.NumberOfTicks = 2
 				} else {
 					spell.DotInput.NumberOfTicks = 3
 				}
-
 			} else if res < 2 && numTicks > 5 { // % need to optomize between 3 and 2 ticks and not allowing 1 tick
 				//  cast MF3 MF3...MF2 MF2
-				if sim.Log != nil {
-					sim.Log("Final rotation should be: MF3 MF3 ... MF2 MF2\n")
-				}
 				spell.DotInput.NumberOfTicks = 3
 			} else if numTicks == 0 {
 				return nextCD
