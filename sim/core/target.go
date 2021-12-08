@@ -115,6 +115,12 @@ func applyDebuffEffects(target *Target, debuffs proto.Debuffs) {
 			return curseOfElementsAura(debuffs.CurseOfElements)
 		})
 	}
+
+	if debuffs.IsbUptime > 0.0 {
+		target.AddPermanentAura(func(sim *Simulation) Aura {
+			return ImprovedShadowBoltAura(debuffs.IsbUptime)
+		})
+	}
 }
 
 var MiseryDebuffID = NewDebuffID()
@@ -191,6 +197,28 @@ func curseOfElementsAura(coe proto.TristateEffect) Aura {
 			if spellCast.SpellSchool == stats.NatureSpellPower ||
 				spellCast.SpellSchool == stats.HolySpellPower ||
 				spellCast.SpellSchool == stats.AttackPower {
+				return // does not apply to these schools
+			}
+			*tickDamage *= mult
+		},
+	}
+}
+
+var ImprovedShadowBoltID = NewDebuffID()
+
+func ImprovedShadowBoltAura(uptime float64) Aura {
+	mult := (1 + uptime*0.2)
+	return Aura{
+		ID:   ImprovedShadowBoltID,
+		Name: "Improved Shadow Bolt",
+		OnBeforeSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect) {
+			if spellCast.SpellSchool != stats.ShadowSpellPower {
+				return // does not apply to these schools
+			}
+			spellEffect.DamageMultiplier *= mult
+		},
+		OnPeriodicDamage: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect, tickDamage *float64) {
+			if spellCast.SpellSchool != stats.ShadowSpellPower {
 				return // does not apply to these schools
 			}
 			*tickDamage *= mult

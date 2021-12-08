@@ -199,10 +199,11 @@ func ApplyQuagmirransEye(agent core.Agent) {
 			ID:   QuagmirransEyeAuraID,
 			Name: "Quagmirran's Eye",
 			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
-				if !icd.IsOnCD(sim) && sim.RandomFloat("Quagmirran's Eye") < 0.1 {
-					icd = core.InternalCD(sim.CurrentTime + dur)
-					character.AddAuraWithTemporaryStats(sim, FungalFrenzyAuraID, 33370, "Fungal Frenzy", stats.SpellHaste, hasteBonus, time.Second*6)
+				if icd.IsOnCD(sim) || sim.RandomFloat("Quagmirran's Eye") > 0.1 {
+					return
 				}
+				icd = core.InternalCD(sim.CurrentTime + dur)
+				character.AddAuraWithTemporaryStats(sim, FungalFrenzyAuraID, 33370, "Fungal Frenzy", stats.SpellHaste, hasteBonus, time.Second*6)
 			},
 		}
 	})
@@ -225,10 +226,11 @@ func ApplyShiffarsNexusHorn(agent core.Agent) {
 				if spellCast.ActionID.ItemID == core.ItemIDTheLightningCapacitor {
 					return // TLC can't proc Sextant
 				}
-				if !icd.IsOnCD(sim) && spellEffect.Crit && sim.RandomFloat("Shiffar's Nexus-Horn") < 0.2 {
-					icd = core.InternalCD(sim.CurrentTime + dur)
-					character.AddAuraWithTemporaryStats(sim, CallOfTheNexusAuraID, 34321, "Call of the Nexus", stats.SpellPower, spellBonus, time.Second*10)
+				if icd.IsOnCD(sim) || spellEffect.Crit && sim.RandomFloat("Shiffar's Nexus-Horn") > 0.2 {
+					return
 				}
+				icd = core.InternalCD(sim.CurrentTime + dur)
+				character.AddAuraWithTemporaryStats(sim, CallOfTheNexusAuraID, 34321, "Call of the Nexus", stats.SpellPower, spellBonus, time.Second*10)
 			},
 		}
 	})
@@ -271,10 +273,11 @@ func ApplySextantOfUnstableCurrents(agent core.Agent) {
 				if spellCast.ActionID.ItemID == core.ItemIDTheLightningCapacitor {
 					return // TLC can't proc Sextant
 				}
-				if spellEffect.Crit && !icd.IsOnCD(sim) && sim.RandomFloat("Sextant of Unstable Currents") < 0.2 {
-					icd = core.InternalCD(sim.CurrentTime + icdDur)
-					character.AddAuraWithTemporaryStats(sim, UnstableCurrentsAuraID, 38348, "Unstable Currents", stats.SpellPower, spellBonus, dur)
+				if !spellEffect.Crit || icd.IsOnCD(sim) || sim.RandomFloat("Sextant of Unstable Currents") > 0.2 {
+					return // if not crit, or on cd, or didn't proc, dont activate
 				}
+				icd = core.InternalCD(sim.CurrentTime + icdDur)
+				character.AddAuraWithTemporaryStats(sim, UnstableCurrentsAuraID, 38348, "Unstable Currents", stats.SpellPower, spellBonus, dur)
 			},
 		}
 	})

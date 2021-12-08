@@ -77,3 +77,19 @@ export const ShadowPriestDPS = {
     },
   },
 };
+
+export const ISBUptime = {
+    type: 'number' as const,
+    cssClass: 'isb-uptime-picker',
+    getModObject: (simUI: SimUI<any>) => simUI.encounter.primaryTarget,
+    config: {
+      label: 'ISB Uptime %',
+      changedEvent: (target: Target) => target.debuffsChangeEmitter,
+      getValue: (target: Target) => Math.round(target.getDebuffs().isbUptime*100),
+      setValue: (target: Target, newValue: number) => {
+        const newDebuffs = target.getDebuffs();
+        newDebuffs.isbUptime = newValue/100;
+        target.setDebuffs(newDebuffs);
+      },
+    },
+  };
