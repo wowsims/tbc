@@ -200,15 +200,24 @@ func (spriest *ShadowPriest) Act(sim *core.Simulation) time.Duration {
 		} else {
 			spell = spriest.NewMindFlay(sim, target)
 			// CalculateMindflayRotation to modify how many mindflay ticks to perform.
-			wait = spriest.CalculateMindflayRotation(sim, spell, allCDs)
+			gcd := spell.CalculatedGCD(&spriest.Character)
+			wait = spriest.CalculateMindflayRotation(sim, spell, allCDs, gcd)
 			if sim.Log != nil {
 				sim.Log("<spriest> Selected %d mindflay ticks.\n", spell.DotInput.NumberOfTicks)
 			}
 			if spell.DotInput.NumberOfTicks == 0 {
 				spell.Cancel()
 				return sim.CurrentTime + core.MaxDuration(spriest.GetRemainingCD(core.GCDCooldownID, sim.CurrentTime), wait)
-			} else if spell.DotInput.NumberOfTicks > 1 {
-				wait += spriest.options.latency
+			}
+
+			// if our channel is longer than GCD it will have human latency to end it beause you can't queue the next spell.
+			if wait > gcd && spriest.rotation.Latency > 0 {
+				base := spriest.rotation.Latency * 0.66
+				variation := base + sim.RandomFloat("spriest latency")*base // should vary from 0.66 - 1.33 of given latency
+				if variation < 150 {
+					variation = 150 // no player can go under 150ms response time
+				}
+				wait += time.Duration(variation) * time.Millisecond
 			}
 		}
 	} else {
@@ -238,7 +247,7 @@ func (spriest *ShadowPriest) Act(sim *core.Simulation) time.Duration {
 }
 
 // CalculateMindflay will calculate how many ticks should be cast and mutate the cast.
-func (spriest *ShadowPriest) CalculateMindflayRotation(sim *core.Simulation, spell *core.SimpleSpell, allCDs []time.Duration) time.Duration {
+func (spriest *ShadowPriest) CalculateMindflayRotation(sim *core.Simulation, spell *core.SimpleSpell, allCDs []time.Duration, gcd time.Duration) time.Duration {
 	nextCD := core.NeverExpires
 	nextIdx := -1
 	for i, v := range allCDs {
@@ -247,7 +256,6 @@ func (spriest *ShadowPriest) CalculateMindflayRotation(sim *core.Simulation, spe
 			nextIdx = i
 		}
 	}
-	gcd := time.Duration(float64(core.GCDDefault) / spriest.CastSpeed())
 
 	var numTicks int
 	var Major_dmg float64
