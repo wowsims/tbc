@@ -214,8 +214,10 @@ func (spriest *ShadowPriest) Act(sim *core.Simulation) time.Duration {
 			if wait > gcd && spriest.rotation.Latency > 0 {
 				base := spriest.rotation.Latency * 0.66
 				variation := base + sim.RandomFloat("spriest latency")*base // should vary from 0.66 - 1.33 of given latency
-				if variation < 150 {
-					variation = 150 // no player can go under 150ms response time
+
+				const minimumLatencyMS = 100
+				if variation < minimumLatencyMS {
+					variation = minimumLatencyMS // no player can go under XXXms response time
 				}
 				wait += time.Duration(variation) * time.Millisecond
 			}
