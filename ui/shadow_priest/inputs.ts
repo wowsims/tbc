@@ -58,7 +58,7 @@ export const ShadowPriestRotationConfig = {
 		},
 		{
 			type: 'boolean' as const,
-			cssClass: 'devplague-picker',
+			cssClass: 'precastvt-picker',
 			getModObject: (simUI: SimUI<any>) => simUI.player,
 			config: {
 				label: 'Precast Vampiric Touch',
@@ -89,5 +89,21 @@ export const ShadowPriestRotationConfig = {
 				enableWhen: (player: Player<Spec.SpecShadowPriest>) => player.getRace() == Race.RaceUndead,
 			},
 		},
+		{
+			type: 'number' as const,
+			cssClass: 'latency-picker',
+			getModObject: (simUI: SimUI<any>) => simUI.player,
+			config: {
+				label: 'Channeling Latency (ms)',
+				labelTooltip: 'Latency after a channel that lasts longer then GCD. 0 to disable',
+				changedEvent: (player: Player<Spec.SpecShadowPriest>) => player.rotationChangeEmitter,
+				getValue: (player: Player<Spec.SpecShadowPriest>) => player.getRotation().latency,
+				setValue: (player: Player<Spec.SpecShadowPriest>, newValue: number) => {
+					const newRotation = player.getRotation();
+					newRotation.latency = newValue;
+					player.setRotation(newRotation);
+				},
+			},
+		},		
 	],
 };
