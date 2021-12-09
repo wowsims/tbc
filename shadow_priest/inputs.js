@@ -9,16 +9,16 @@ export const ShadowPriestRotationConfig = {
             getModObject: (simUI) => simUI.player,
             config: {
                 label: 'Rotation Type',
-                labelTooltip: 'Choose how to clip your mindflay',
+                labelTooltip: 'Choose how to clip your mindflay. Lazy will never clip. Sweaty will clip for other spells and use a 2xMF2 when there is time for 4 ticks. Perfect will evaluate the DPS gain of every action to determine MF actions.',
                 values: [
                     {
-                        name: 'Basic', value: RotationType.Basic,
+                        name: 'Lazy', value: RotationType.Lazy,
                     },
                     {
-                        name: 'Clip Always', value: RotationType.ClipAlways,
+                        name: 'Sweaty', value: RotationType.Sweaty,
                     },
                     {
-                        name: 'Intelligent', value: RotationType.IntelligentClipping,
+                        name: 'Perfect', value: RotationType.Perfect,
                     },
                 ],
                 changedEvent: (player) => player.rotationChangeEmitter,
