@@ -199,9 +199,31 @@ func (spriest *ShadowPriest) Act(sim *core.Simulation) time.Duration {
 			spell = spriest.NewSWD(sim, target)
 		} else {
 			spell = spriest.NewMindFlay(sim, target)
-			// CalculateMindflayRotation to modify how many mindflay ticks to perform.
+
 			gcd := spell.CalculatedGCD(&spriest.Character)
-			wait = spriest.CalculateMindflayRotation(sim, spell, allCDs, gcd)
+			switch spriest.rotation.RotationType {
+			case proto.ShadowPriest_Rotation_Perfect:
+				// PerfectMindflayRotation to modify how many mindflay ticks to perform.
+				wait = spriest.PerfectMindflayRotation(sim, spell, allCDs, gcd)
+			case proto.ShadowPriest_Rotation_Sweaty:
+				wait = spriest.SweatyMindflayRotation(sim, spell, allCDs, gcd)
+			case proto.ShadowPriest_Rotation_Lazy:
+				// just do MF3, never clipping
+				nextCD := core.NeverExpires
+				for _, v := range allCDs {
+					if v < nextCD {
+						nextCD = v
+					}
+				}
+				// But don't start a MF if we can't get a single tick off.
+				if nextCD < gcd {
+					spell.DotInput.NumberOfTicks = 0
+					wait = nextCD + 1
+				} else {
+					wait = time.Duration(spell.DotInput.NumberOfTicks) * spell.DotInput.TickLength
+				}
+
+			}
 			if sim.Log != nil {
 				sim.Log("<spriest> Selected %d mindflay ticks.\n", spell.DotInput.NumberOfTicks)
 			}
@@ -209,7 +231,6 @@ func (spriest *ShadowPriest) Act(sim *core.Simulation) time.Duration {
 				spell.Cancel()
 				return sim.CurrentTime + core.MaxDuration(spriest.GetRemainingCD(core.GCDCooldownID, sim.CurrentTime), wait)
 			}
-
 			// if our channel is longer than GCD it will have human latency to end it beause you can't queue the next spell.
 			if wait > gcd && spriest.rotation.Latency > 0 {
 				base := spriest.rotation.Latency * 0.66
@@ -248,8 +269,9 @@ func (spriest *ShadowPriest) Act(sim *core.Simulation) time.Duration {
 		spell.CastTime)
 }
 
-// CalculateMindflay will calculate how many ticks should be cast and mutate the cast.
-func (spriest *ShadowPriest) CalculateMindflayRotation(sim *core.Simulation, spell *core.SimpleSpell, allCDs []time.Duration, gcd time.Duration) time.Duration {
+// PerfectMindflayRotation will calculate how many ticks should be cast and mutate the cast.
+//  It will calculate the DPS difference between MF and other pending CDs and select clipping based on that.
+func (spriest *ShadowPriest) PerfectMindflayRotation(sim *core.Simulation, spell *core.SimpleSpell, allCDs []time.Duration, gcd time.Duration) time.Duration {
 	nextCD := core.NeverExpires
 	nextIdx := -1
 	for i, v := range allCDs {
@@ -534,5 +556,52 @@ func (spriest *ShadowPriest) CalculateMindflayRotation(sim *core.Simulation, spe
 
 	//  ONE BIG CAVEAT THAT STILL NEEDS WORK.. THIS NEEDS TO BE UPDATED TO INCLUDE HASTE PROCS THAT CAN OCCUR/DROP OFF MID MF SEQUENCE
 
+	return spell.DotInput.TickLength * time.Duration(spell.DotInput.NumberOfTicks)
+}
+
+// SweatyMindflayRotation is to be a 'sweaty but not perfect' rotation.
+//  it will prioritize casting MB / SWD by clipping.
+//  If there is 4s until the next CD it will use a 2xMF2 instead of 3+1
+//  This will mutate the input cast to the correct number of ticks.
+func (spriest *ShadowPriest) SweatyMindflayRotation(sim *core.Simulation, spell *core.SimpleSpell, allCDs []time.Duration, gcd time.Duration) time.Duration {
+	nextCD := core.NeverExpires
+	for _, v := range allCDs[:2] {
+		if v < nextCD {
+			nextCD = v
+		}
+	}
+
+	if sim.Log != nil {
+		sim.Log("<spriest> NextCD: %0.2f\n", nextCD.Seconds())
+	}
+	// This means a CD is coming up before we could cast a single MF
+	if nextCD < gcd {
+		spell.DotInput.NumberOfTicks = 0
+		if nextCD < 0 {
+			nextCD = 0
+		}
+		return nextCD + 1
+	}
+
+	mfTwoTime := 2 * spell.DotInput.TickLength
+	mfBaseTime := 3 * spell.DotInput.TickLength
+	mfFourTime := 4 * spell.DotInput.TickLength
+	mfFiveTime := 5 * spell.DotInput.TickLength
+
+	if nextCD >= mfFiveTime {
+		spell.DotInput.NumberOfTicks = 3
+	} else if nextCD >= mfFourTime && nextCD < mfFiveTime {
+		// time for between 4-5 ticks should use 2xMF2
+		spell.DotInput.NumberOfTicks = 2
+	} else if nextCD >= mfBaseTime {
+		spell.DotInput.NumberOfTicks = 3
+	} else if nextCD >= mfTwoTime {
+		spell.DotInput.NumberOfTicks = 2
+	} else {
+		// means we can squeeze in a single tick
+		spell.DotInput.NumberOfTicks = 1
+	}
+
+	spell.ActionID.Tag = int32(spell.DotInput.NumberOfTicks)
 	return spell.DotInput.TickLength * time.Duration(spell.DotInput.NumberOfTicks)
 }
