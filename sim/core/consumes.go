@@ -152,64 +152,77 @@ var PotionCooldownID = NewCooldownID()
 
 func registerPotionCD(agent Agent, consumes proto.Consumes) {
 	character := agent.GetCharacter()
-	defaultPotionActivation := makePotionActivation(consumes.DefaultPotion, character)
-	startingPotionActivation := makePotionActivation(consumes.StartingPotion, character)
-	numStartingPotions := consumes.NumStartingPotions
+	defaultPotion := consumes.DefaultPotion
+	startingPotion := consumes.StartingPotion
+	numStartingPotions := int(consumes.NumStartingPotions)
 
-	mcd := MajorCooldown{
+	defaultPotionActivation := makePotionActivation(defaultPotion, character)
+	startingPotionActivation := makePotionActivation(startingPotion, character)
+
+	if startingPotionActivation == nil {
+		numStartingPotions = 0
+	}
+
+	if defaultPotionActivation == nil && startingPotionActivation == nil {
+		return
+	}
+
+	agent.GetCharacter().AddMajorCooldown(MajorCooldown{
 		CooldownID: PotionCooldownID,
 		Cooldown:   time.Minute * 2,
 		Priority:   CooldownPriorityDefault,
-	}
-
-	if defaultPotionActivation != nil {
-		if startingPotionActivation != nil && numStartingPotions > 0 {
-			mcd.ActivationFactory = func(sim *Simulation) CooldownActivation {
-				// Capture this inside ActivationFactory so it resets on Sim reset.
-				numPotionsUsed := int32(0)
-
-				return func(sim *Simulation, character *Character) bool {
-					usedPotion := false
-					if numPotionsUsed < numStartingPotions {
-						usedPotion = startingPotionActivation(sim, character)
-					} else {
-						usedPotion = defaultPotionActivation(sim, character)
-					}
-					if usedPotion {
-						numPotionsUsed++
-					}
-					return usedPotion
-				}
-			}
-		} else {
-			mcd.ActivationFactory = func(sim *Simulation) CooldownActivation {
-				return defaultPotionActivation
-			}
-		}
-	} else if startingPotionActivation != nil && numStartingPotions > 0 {
-		mcd.ActivationFactory = func(sim *Simulation) CooldownActivation {
+		ActivationFactory: func(sim *Simulation) CooldownActivation {
 			// Capture this inside ActivationFactory so it resets on Sim reset.
-			numPotionsUsed := int32(0)
+			numPotionsUsed := 0
+
+			expectedManaPerUsage := float64((3000 + 1800) / 2)
+			remainingUsages := int(1 + (MaxDuration(0, sim.Duration))/(time.Minute*2))
+
+			remainingManaPotionUsages := 0
+			if startingPotion == proto.Potions_SuperManaPotion {
+				remainingManaPotionUsages += MinInt(numStartingPotions, remainingUsages)
+			}
+			if defaultPotion == proto.Potions_SuperManaPotion {
+				remainingManaPotionUsages += MaxInt(0, remainingUsages-numStartingPotions)
+			}
+
+			character.ExpectedBonusMana += expectedManaPerUsage * float64(remainingManaPotionUsages)
 
 			return func(sim *Simulation, character *Character) bool {
 				usedPotion := false
-				if numPotionsUsed < numStartingPotions {
+				if startingPotionActivation != nil && numPotionsUsed < numStartingPotions {
 					usedPotion = startingPotionActivation(sim, character)
-					if usedPotion {
-						numPotionsUsed++
-					}
-					return usedPotion
-				} else {
-					character.SetCD(PotionCooldownID, NeverExpires)
-					return true
+				} else if defaultPotionActivation != nil {
+					usedPotion = defaultPotionActivation(sim, character)
 				}
-			}
-		}
-	}
 
-	if mcd.ActivationFactory != nil {
-		agent.GetCharacter().AddMajorCooldown(mcd)
-	}
+				if usedPotion {
+					numPotionsUsed++
+
+					// Update expected bonus mana
+					newRemainingUsages := int(sim.GetRemainingDuration() / (time.Minute * 2))
+					newRemainingManaPotionUsages := 0
+					if startingPotion == proto.Potions_SuperManaPotion {
+						newRemainingManaPotionUsages += MinInt(numStartingPotions-numPotionsUsed, remainingUsages)
+					}
+					if defaultPotion == proto.Potions_SuperManaPotion {
+						newRemainingManaPotionUsages += MaxInt(0, newRemainingUsages-MaxInt(0, numStartingPotions-numPotionsUsed))
+					}
+
+					if sim.Log != nil {
+						sim.Log("ExpectedBonusMana before: %f\n", character.ExpectedBonusMana)
+					}
+					character.ExpectedBonusMana -= expectedManaPerUsage * float64(remainingManaPotionUsages-newRemainingManaPotionUsages)
+					remainingManaPotionUsages = newRemainingManaPotionUsages
+					if sim.Log != nil {
+						sim.Log("ExpectedBonusMana after: %f\n", character.ExpectedBonusMana)
+					}
+				}
+
+				return usedPotion
+			}
+		},
+	})
 }
 
 const alchStoneItemID = 35749
@@ -276,11 +289,16 @@ func registerDarkRuneCD(agent Agent, consumes proto.Consumes) {
 		return
 	}
 
-	agent.GetCharacter().AddMajorCooldown(MajorCooldown{
+	character := agent.GetCharacter()
+	character.AddMajorCooldown(MajorCooldown{
 		CooldownID: RuneCooldownID,
 		Cooldown:   time.Minute * 2,
 		Priority:   CooldownPriorityDefault,
 		ActivationFactory: func(sim *Simulation) CooldownActivation {
+			expectedManaPerUsage := float64((900 + 600) / 2)
+			remainingUsages := int(1 + (MaxDuration(0, sim.Duration))/(time.Minute*2))
+			character.ExpectedBonusMana += expectedManaPerUsage * float64(remainingUsages)
+
 			return func(sim *Simulation, character *Character) bool {
 				// Only pop if we have less than the max mana provided by the potion minus 1mp5 tick.
 				totalRegen := character.manaRegenPerSecondWhileCasting() * 5
@@ -291,6 +309,12 @@ func registerDarkRuneCD(agent Agent, consumes proto.Consumes) {
 				// Restores 900 to 1500 mana. (2 Min Cooldown)
 				character.AddStat(stats.Mana, 900+(sim.RandomFloat("dark rune")*600))
 				character.SetCD(RuneCooldownID, time.Minute*2+sim.CurrentTime)
+
+				// Update expected bonus mana
+				newRemainingUsages := int(sim.GetRemainingDuration() / (time.Minute * 2))
+				character.ExpectedBonusMana -= expectedManaPerUsage * float64(remainingUsages-newRemainingUsages)
+				remainingUsages = newRemainingUsages
+
 				if sim.Log != nil {
 					sim.Log("Used Dark Rune\n")
 				}

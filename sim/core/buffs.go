@@ -168,3 +168,67 @@ func registerBloodlustCD(agent Agent, numBloodlusts int32) {
 		},
 	})
 }
+
+func registerInnervateCD(agent Agent, numInnervates int) {
+	if numInnervates == 0 {
+		return
+	}
+
+	// Cooldowns for each innervate are separate, since they are cast by different players.
+	innervateCDs := make([]InternalCD, numInnervates)
+	const dur = time.Second * 20
+	const cd = time.Minute * 6
+
+	agent.GetCharacter().AddMajorCooldown(MajorCooldown{
+		CooldownID: InnervateCooldownID,
+		Cooldown:   dur, // Just put on CD for the duration because we can get other innervates after
+		ActivationFactory: func(sim *Simulation) CooldownActivation {
+			for i := 0; i < numInnervates; i++ {
+				innervateCDs[i] = NewICD()
+			}
+			nextInnervateIndex := 0
+
+			return func(sim *Simulation, character *Character) bool {
+				if innervateCDs[nextInnervateIndex].IsOnCD(sim) {
+					return false
+				}
+
+				// Only cast innervate when very low on mana, to make sure all other mana CDs are prioritized.
+				if character.CurrentMana() > 1000 {
+					return false
+				}
+
+				AddInnervateAura(sim, character, 0)
+				innervateCDs[nextInnervateIndex] = InternalCD(sim.CurrentTime + cd)
+				nextInnervateIndex = (nextInnervateIndex + 1) % len(innervateCDs)
+
+				if innervateCDs[nextInnervateIndex].IsOnCD(sim) {
+					character.SetCD(InnervateCooldownID, sim.CurrentTime+innervateCDs[nextInnervateIndex].GetRemainingCD(sim))
+				} else {
+					character.SetCD(InnervateCooldownID, sim.CurrentTime+dur)
+				}
+				return true
+			}
+		},
+	})
+}
+
+var InnervateCooldownID = NewCooldownID()
+var InnervateAuraID = NewAuraID()
+
+func AddInnervateAura(sim *Simulation, character *Character, expectedBonusManaReduction float64) {
+	character.PseudoStats.ForceFullSpiritRegen = true
+	character.PseudoStats.SpiritRegenMultiplier *= 5.0
+
+	character.AddAura(sim, Aura{
+		ID:      InnervateAuraID,
+		SpellID: 29166,
+		Name:    "Innervate",
+		Expires: sim.CurrentTime + time.Second*20,
+		OnExpire: func(sim *Simulation) {
+			character.PseudoStats.ForceFullSpiritRegen = false
+			character.PseudoStats.SpiritRegenMultiplier /= 5.0
+			character.ExpectedBonusMana -= expectedBonusManaReduction
+		},
+	})
+}

@@ -277,6 +277,10 @@ func (sim *Simulation) advance(elapsedTime time.Duration) {
 	}
 }
 
+func (sim *Simulation) GetRemainingDuration() time.Duration {
+	return sim.Duration - sim.CurrentTime
+}
+
 func (sim *Simulation) GetNumTargets() int32 {
 	return int32(len(sim.encounter.Targets))
 }

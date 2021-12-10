@@ -116,6 +116,32 @@ func TestAdaptive(t *testing.T) {
 	})
 }
 
+func TestAdaptiveFull(t *testing.T) {
+	core.IndividualSimAllEncountersTest(core.AllEncountersTestOptions{
+		Label: "phase2-adaptiveFull",
+		T:     t,
+
+		Inputs: core.IndividualSimInputs{
+			Player: &proto.Player{
+				Race:      proto.Race_RaceTauren,
+				Class:     proto.Class_ClassDruid,
+				Equipment: P2Gear,
+				Consumes:  FullConsumes,
+				Spec:      PlayerOptionsAdaptive,
+			},
+
+			RaidBuffs:       FullRaidBuffs,
+			PartyBuffs:      FullPartyBuffs,
+			IndividualBuffs: FullIndividualBuffs,
+
+			Target: FullDebuffTarget,
+		},
+
+		ExpectedDpsShort: 1538.2,
+		ExpectedDpsLong:  1467.9,
+	})
+}
+
 func TestAverageDPS(t *testing.T) {
 	isr := core.NewIndividualSimRequest(core.IndividualSimInputs{
 		Player: &proto.Player{
