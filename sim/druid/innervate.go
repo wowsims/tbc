@@ -31,7 +31,7 @@ func (druid *Druid) TryInnervate(sim *core.Simulation) time.Duration {
 	baseManaCost := druid.BaseMana() * 0.04
 
 	// Update expected bonus mana
-	newRemainingUsages := int((sim.Duration - sim.CurrentTime) / cd)
+	newRemainingUsages := int(sim.GetRemainingDuration() / cd)
 	expectedBonusManaReduction := druid.ExpectedManaPerInnervate * float64(druid.RemainingInnervateUsages-newRemainingUsages)
 	druid.RemainingInnervateUsages = newRemainingUsages
 

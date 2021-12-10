@@ -200,7 +200,7 @@ func registerPotionCD(agent Agent, consumes proto.Consumes) {
 					numPotionsUsed++
 
 					// Update expected bonus mana
-					newRemainingUsages := int((sim.Duration - sim.CurrentTime) / (time.Minute * 2))
+					newRemainingUsages := int(sim.GetRemainingDuration() / (time.Minute * 2))
 					newRemainingManaPotionUsages := 0
 					if startingPotion == proto.Potions_SuperManaPotion {
 						newRemainingManaPotionUsages += MinInt(numStartingPotions-numPotionsUsed, remainingUsages)
@@ -311,7 +311,7 @@ func registerDarkRuneCD(agent Agent, consumes proto.Consumes) {
 				character.SetCD(RuneCooldownID, time.Minute*2+sim.CurrentTime)
 
 				// Update expected bonus mana
-				newRemainingUsages := int((sim.Duration - sim.CurrentTime) / (time.Minute * 2))
+				newRemainingUsages := int(sim.GetRemainingDuration() / (time.Minute * 2))
 				character.ExpectedBonusMana -= expectedManaPerUsage * float64(remainingUsages-newRemainingUsages)
 				remainingUsages = newRemainingUsages
 
