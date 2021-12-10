@@ -6,16 +6,10 @@ import (
 	"github.com/wowsims/tbc/sim/core"
 )
 
-var InnervateCooldownID = core.NewCooldownID()
-
-// TODO: This probably needs to allow for multiple innervates later
-//  would need to solve the same issue we had as dots (maybe ID per user)
-var InnervateAuraID = core.NewAuraID()
-
 // Returns the time to wait before the next action, or 0 if innervate is on CD
 // or disabled.
 func (druid *Druid) TryInnervate(sim *core.Simulation) time.Duration {
-	if !druid.SelfBuffs.Innervate || druid.GetRemainingCD(InnervateCooldownID, sim.CurrentTime) != 0 {
+	if !druid.SelfBuffs.Innervate || druid.GetRemainingCD(core.InnervateCooldownID, sim.CurrentTime) != 0 {
 		return 0
 	}
 
@@ -36,6 +30,11 @@ func (druid *Druid) TryInnervate(sim *core.Simulation) time.Duration {
 
 	baseManaCost := druid.BaseMana() * 0.04
 
+	// Update expected bonus mana
+	newRemainingUsages := int((sim.Duration - sim.CurrentTime) / cd)
+	expectedBonusManaReduction := druid.ExpectedManaPerInnervate * float64(druid.RemainingInnervateUsages-newRemainingUsages)
+	druid.RemainingInnervateUsages = newRemainingUsages
+
 	cast := &core.SimpleCast{
 		Cast: core.Cast{
 			Name:         "Innervate",
@@ -46,23 +45,11 @@ func (druid *Druid) TryInnervate(sim *core.Simulation) time.Duration {
 
 			ActionID: core.ActionID{
 				SpellID:    29166,
-				CooldownID: InnervateCooldownID,
+				CooldownID: core.InnervateCooldownID,
 			},
 		},
 		OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
-			druid.PseudoStats.ForceFullSpiritRegen = true
-			druid.PseudoStats.SpiritRegenMultiplier *= 5.0
-
-			druid.AddAura(sim, core.Aura{
-				ID:      InnervateAuraID,
-				SpellID: 29166,
-				Name:    "Innervate",
-				Expires: sim.CurrentTime + time.Second*20,
-				OnExpire: func(sim *core.Simulation) {
-					druid.PseudoStats.ForceFullSpiritRegen = false
-					druid.PseudoStats.SpiritRegenMultiplier /= 5.0
-				},
-			})
+			core.AddInnervateAura(sim, druid.GetCharacter(), expectedBonusManaReduction)
 		},
 	}
 	cast.Init(sim)
