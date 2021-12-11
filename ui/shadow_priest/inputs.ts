@@ -90,6 +90,23 @@ export const ShadowPriestRotationConfig = {
 			},
 		},
 		{
+			type: 'boolean' as const,
+			cssClass: 'starshards-picker',
+			getModObject: (simUI: SimUI<any>) => simUI.player,
+			config: {
+				label: 'Use starshards',
+				labelTooltip: 'Use Starshards whenever off CD.',
+				changedEvent: (player: Player<Spec.SpecShadowPriest>) => player.raceChangeEmitter,
+				getValue: (player: Player<Spec.SpecShadowPriest>) => player.getRotation().useStarshards,
+				setValue: (player: Player<Spec.SpecShadowPriest>, newValue: boolean) => {
+					const newRotation = player.getRotation();
+					newRotation.useStarshards = newValue;
+					player.setRotation(newRotation);
+				},
+				enableWhen: (player: Player<Spec.SpecShadowPriest>) => player.getRace() == Race.RaceNightElf,
+			},
+		},
+		{
 			type: 'number' as const,
 			cssClass: 'latency-picker',
 			getModObject: (simUI: SimUI<any>) => simUI.player,

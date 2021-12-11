@@ -37,7 +37,8 @@ type Priest struct {
 	DevouringPlagueSpell    core.SimpleSpell
 	devouringPlagueTemplate core.SimpleSpellTemplate
 
-	// TODO: starshards
+	StarshardsSpell    core.SimpleSpell
+	starshardsTemplate core.SimpleSpellTemplate
 }
 
 type SelfBuffs struct {
@@ -75,6 +76,7 @@ func (priest *Priest) Init(sim *core.Simulation) {
 	priest.swdCastTemplate = priest.newSWDTemplate(sim)
 	priest.shadowfiendTemplate = priest.newShadowfiendTemplate(sim)
 	priest.devouringPlagueTemplate = priest.newDevouringPlagueTemplate(sim)
+	priest.starshardsTemplate = priest.newStarshardsTemplate(sim)
 }
 
 func (priest *Priest) Reset(newsim *core.Simulation) {
@@ -87,6 +89,7 @@ func (priest *Priest) Reset(newsim *core.Simulation) {
 	priest.VTSpellCasting = &core.SimpleSpell{}
 	priest.ShadowfiendSpell = core.SimpleSpell{}
 	priest.DevouringPlagueSpell = core.SimpleSpell{}
+	priest.StarshardsSpell = core.SimpleSpell{}
 }
 
 func (priest *Priest) Advance(sim *core.Simulation, elapsedTime time.Duration) {
