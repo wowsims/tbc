@@ -209,14 +209,8 @@ func registerPotionCD(agent Agent, consumes proto.Consumes) {
 						newRemainingManaPotionUsages += MaxInt(0, newRemainingUsages-MaxInt(0, numStartingPotions-numPotionsUsed))
 					}
 
-					if sim.Log != nil {
-						sim.Log("ExpectedBonusMana before: %f\n", character.ExpectedBonusMana)
-					}
 					character.ExpectedBonusMana -= expectedManaPerUsage * float64(remainingManaPotionUsages-newRemainingManaPotionUsages)
 					remainingManaPotionUsages = newRemainingManaPotionUsages
-					if sim.Log != nil {
-						sim.Log("ExpectedBonusMana after: %f\n", character.ExpectedBonusMana)
-					}
 				}
 
 				return usedPotion

@@ -121,7 +121,7 @@ func TestSimulatePreRaidNoBuffs(t *testing.T) {
 		},
 
 		ExpectedDpsShort: 994.9,
-		ExpectedDpsLong:  373.0,
+		ExpectedDpsLong:  364.5,
 	})
 }
 
@@ -147,7 +147,7 @@ func TestSimulatePreRaid(t *testing.T) {
 		},
 
 		ExpectedDpsShort: 1557.8,
-		ExpectedDpsLong:  1176.3,
+		ExpectedDpsLong:  1181.8,
 	})
 }
 
@@ -203,7 +203,7 @@ func TestMultiTarget(t *testing.T) {
 		},
 
 		ExpectedDpsShort: 2684.5,
-		ExpectedDpsLong:  2004.9,
+		ExpectedDpsLong:  2053.3,
 	})
 
 	core.IndividualSimAllEncountersTest(core.AllEncountersTestOptions{
@@ -232,7 +232,7 @@ func TestMultiTarget(t *testing.T) {
 		},
 
 		ExpectedDpsShort: 2731.0,
-		ExpectedDpsLong:  2034.3,
+		ExpectedDpsLong:  2093.3,
 	})
 }
 
@@ -319,7 +319,7 @@ func TestAverageDPS(t *testing.T) {
 		Target: FullDebuffTarget,
 	})
 
-	core.IndividualSimAverageTest("P1Average", t, isr, 1589.7)
+	core.IndividualSimAverageTest("P1Average", t, isr, 1593.9)
 }
 
 func BenchmarkSimulate(b *testing.B) {
