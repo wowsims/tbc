@@ -58,8 +58,8 @@ func TestSimulateP1Clipping(t *testing.T) {
 			Target: FullDebuffTarget,
 		},
 
-		ExpectedDpsShort: 1218.8,
-		ExpectedDpsLong:  1245.1,
+		ExpectedDpsShort: 1191.1,
+		ExpectedDpsLong:  1262.2,
 	})
 }
 
