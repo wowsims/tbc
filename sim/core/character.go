@@ -31,6 +31,9 @@ type Character struct {
 	// Base mana regen rate while casting, without any temporary effects.
 	initialManaRegenPerSecondWhileCasting float64
 
+	// Cast speed without any temporary effects.
+	initialCastSpeed float64
+
 	// Provides stat dependency management behavior.
 	stats.StatDependencyManager
 
@@ -62,6 +65,11 @@ type Character struct {
 	// beyond this Character's mana pool. This should include mana potions / runes /
 	// innervates / etc.
 	ExpectedBonusMana float64
+
+	// Number of JoW so far for the current iteration. Used to estimate bonus mana
+	// over the remainder of the iteration.
+	// This is a float because each count is scaled by current cast speed.
+	judgementOfWisdomProcs float64
 
 	// Statistics describing the results of the sim.
 	Metrics CharacterMetrics
@@ -176,7 +184,10 @@ func (character *Character) HasTemporarySpellCastSpeedIncrease() bool {
 		character.PseudoStats.CastSpeedMultiplier != 1
 }
 
-// TODO: rename this better
+func (character *Character) InitialCastSpeed() float64 {
+	return character.initialCastSpeed
+}
+
 func (character *Character) CastSpeed() float64 {
 	return character.PseudoStats.CastSpeedMultiplier * (1 + (character.stats[stats.SpellHaste] / (HasteRatingPerHastePercent * 100)))
 }
@@ -240,6 +251,7 @@ func (character *Character) Finalize() {
 	character.initialPseudoStats = character.PseudoStats
 
 	character.initialManaRegenPerSecondWhileCasting = character.manaRegenPerSecondWhileCasting()
+	character.initialCastSpeed = character.CastSpeed()
 
 	character.auraTracker.finalize()
 	character.majorCooldownManager.finalize(character)
@@ -249,6 +261,7 @@ func (character *Character) reset(sim *Simulation) {
 	character.stats = character.initialStats
 	character.PseudoStats = character.initialPseudoStats
 	character.ExpectedBonusMana = 0
+	character.judgementOfWisdomProcs = 0
 
 	character.auraTracker.reset(sim)
 
@@ -362,7 +375,13 @@ func (character *Character) TimeUntilManaRegen(desiredMana float64) time.Duratio
 // Returns the total amount of mana this character will be able to use over the
 // remaining sim duration. This value is an approximation.
 func (character *Character) ExpectedRemainingManaPool(sim *Simulation) float64 {
-	return character.initialManaRegenPerSecondWhileCasting*sim.GetRemainingDuration().Seconds() + character.CurrentMana() + character.ExpectedBonusMana
+	remainingManaPool := character.CurrentMana() + character.ExpectedBonusMana
+
+	remainingDuration := sim.GetRemainingDuration().Seconds()
+	remainingManaPool += character.initialManaRegenPerSecondWhileCasting * remainingDuration
+	remainingManaPool += (74 / 2) * (float64(character.judgementOfWisdomProcs) / sim.CurrentTime.Seconds()) * remainingDuration
+
+	return remainingManaPool
 }
 
 func (character *Character) HasTrinketEquipped(itemID int32) bool {

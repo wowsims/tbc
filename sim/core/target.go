@@ -154,6 +154,9 @@ func judgementOfWisdomAura() Aura {
 			// Only apply to agents that have mana.
 			if character.MaxMana() > 0 {
 				character.AddStat(stats.Mana, mana)
+				// Scale down proc counts so we don't get a bad estimate due to lust/drums/etc.
+				character.judgementOfWisdomProcs += 1 * (character.InitialCastSpeed() / character.CastSpeed())
+
 				if sim.Log != nil {
 					sim.Log("(%d) +Judgement Of Wisdom: 37 mana (74 @ 50%% proc)\n", character.ID)
 				}

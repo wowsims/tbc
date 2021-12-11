@@ -69,10 +69,13 @@ func (tracker *ManaSpendingRateTracker) Update(sim *core.Simulation, character *
 		panic("Mana tracker snapshot buffer is full")
 	}
 
+	// Scale down mana spent so we don't get bad estimates from lust/drums/etc.
+	manaSpentCoefficient := character.InitialCastSpeed() / tracker.previousCastSpeed
+
 	snapshot := manaSnapshot{
 		time:           sim.CurrentTime,
 		manaSpent:      character.Metrics.ManaSpent,
-		manaSpentDelta: (character.Metrics.ManaSpent - tracker.previousManaSpent) / tracker.previousCastSpeed,
+		manaSpentDelta: (character.Metrics.ManaSpent - tracker.previousManaSpent) * manaSpentCoefficient,
 	}
 
 	nextIndex := (tracker.firstSnapshotIndex + tracker.numSnapshots) % manaSnapshotsBufferSize
