@@ -23,8 +23,12 @@ func NewShadowPriest(character core.Character, options proto.Player) *ShadowPrie
 	shadowOptions := options.GetShadowPriest()
 
 	// Only undead can do Dev Plague
-	if shadowOptions.Rotation.UseDevPlague == true && options.Race != proto.Race_RaceUndead {
+	if shadowOptions.Rotation.UseDevPlague && options.Race != proto.Race_RaceUndead {
 		shadowOptions.Rotation.UseDevPlague = false
+	}
+	// Only nelf can do starshards
+	if shadowOptions.Rotation.UseStarshards && options.Race != proto.Race_RaceNightElf {
+		shadowOptions.Rotation.UseStarshards = false
 	}
 
 	selfBuffs := priest.SelfBuffs{
@@ -179,6 +183,8 @@ func (spriest *ShadowPriest) Act(sim *core.Simulation) time.Duration {
 		spell = spriest.NewVT(sim, target)
 	} else if !spriest.SWPSpell.DotInput.IsTicking(sim) {
 		spell = spriest.NewSWP(sim, target)
+	} else if spriest.rotation.UseStarshards && spriest.GetRemainingCD(priest.SSCooldownID, sim.CurrentTime) == 0 {
+		spell = spriest.NewStarshards(sim, target)
 	} else if spriest.rotation.UseDevPlague && spriest.GetRemainingCD(priest.DPCooldownID, sim.CurrentTime) == 0 {
 		spell = spriest.NewDevouringPlague(sim, target)
 	} else if spriest.Talents.MindFlay {

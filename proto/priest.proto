@@ -54,6 +54,7 @@ message ShadowPriest {
 	  bool use_dev_plague = 3; // only undead
 	  bool precast_vt = 4; // casts VT ahead of the start of the fight so that it lands on 0
 	  double latency = 5; // Latency between actions
+	  bool use_starshards = 6; // only nelf
     }
     Rotation rotation = 1;
 
