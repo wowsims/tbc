@@ -234,9 +234,10 @@ type AdaptiveRotation struct {
 
 func (rotation *AdaptiveRotation) ChooseAction(eleShaman *ElementalShaman, sim *core.Simulation) AgentAction {
 	projectedManaCost := rotation.manaTracker.ProjectedManaCost(sim, eleShaman.GetCharacter())
+	remainingManaPool := eleShaman.ExpectedRemainingManaPool(sim)
 
 	// If we have enough mana to burn, use the surplus rotation.
-	if projectedManaCost < eleShaman.CurrentMana() {
+	if projectedManaCost < remainingManaPool {
 		return rotation.surplusRotation.ChooseAction(eleShaman, sim)
 	} else {
 		return rotation.baseRotation.ChooseAction(eleShaman, sim)

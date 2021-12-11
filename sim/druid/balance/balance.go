@@ -108,9 +108,10 @@ func (moonkin *BalanceDruid) Act(sim *core.Simulation) time.Duration {
 	if moonkin.useSurplusRotation {
 		moonkin.manaTracker.Update(sim, moonkin.GetCharacter())
 		projectedManaCost := moonkin.manaTracker.ProjectedManaCost(sim, moonkin.GetCharacter())
+		remainingManaPool := moonkin.ExpectedRemainingManaPool(sim)
 
 		// If we have enough mana to burn, use the surplus rotation.
-		if projectedManaCost < moonkin.CurrentMana() {
+		if projectedManaCost < remainingManaPool {
 			return moonkin.actRotation(sim, moonkin.surplusRotation)
 		} else {
 			return moonkin.actRotation(sim, moonkin.primaryRotation)
