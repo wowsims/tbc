@@ -202,12 +202,12 @@ func (spriest *ShadowPriest) Act(sim *core.Simulation) time.Duration {
 
 			gcd := spell.CalculatedGCD(&spriest.Character)
 			switch spriest.rotation.RotationType {
-			case proto.ShadowPriest_Rotation_Perfect:
+			case proto.ShadowPriest_Rotation_Ideal:
 				// PerfectMindflayRotation to modify how many mindflay ticks to perform.
-				wait = spriest.PerfectMindflayRotation(sim, spell, allCDs, gcd)
-			case proto.ShadowPriest_Rotation_Sweaty:
-				wait = spriest.SweatyMindflayRotation(sim, spell, allCDs, gcd)
-			case proto.ShadowPriest_Rotation_Lazy:
+				wait = spriest.IdealMindflayRotation(sim, spell, allCDs, gcd)
+			case proto.ShadowPriest_Rotation_Clipping:
+				wait = spriest.ClippingMindflayRotation(sim, spell, allCDs, gcd)
+			case proto.ShadowPriest_Rotation_Basic:
 				// just do MF3, never clipping
 				nextCD := core.NeverExpires
 				for _, v := range allCDs {
@@ -269,9 +269,9 @@ func (spriest *ShadowPriest) Act(sim *core.Simulation) time.Duration {
 		spell.CastTime)
 }
 
-// PerfectMindflayRotation will calculate how many ticks should be cast and mutate the cast.
+// IdealMindflayRotation will calculate how many ticks should be cast and mutate the cast.
 //  It will calculate the DPS difference between MF and other pending CDs and select clipping based on that.
-func (spriest *ShadowPriest) PerfectMindflayRotation(sim *core.Simulation, spell *core.SimpleSpell, allCDs []time.Duration, gcd time.Duration) time.Duration {
+func (spriest *ShadowPriest) IdealMindflayRotation(sim *core.Simulation, spell *core.SimpleSpell, allCDs []time.Duration, gcd time.Duration) time.Duration {
 	nextCD := core.NeverExpires
 	nextIdx := -1
 	for i, v := range allCDs {
@@ -559,11 +559,11 @@ func (spriest *ShadowPriest) PerfectMindflayRotation(sim *core.Simulation, spell
 	return spell.DotInput.TickLength * time.Duration(spell.DotInput.NumberOfTicks)
 }
 
-// SweatyMindflayRotation is to be a 'sweaty but not perfect' rotation.
+// ClippingMindflayRotation is to be a 'sweaty but not perfect' rotation.
 //  it will prioritize casting MB / SWD by clipping.
 //  If there is 4s until the next CD it will use a 2xMF2 instead of 3+1
 //  This will mutate the input cast to the correct number of ticks.
-func (spriest *ShadowPriest) SweatyMindflayRotation(sim *core.Simulation, spell *core.SimpleSpell, allCDs []time.Duration, gcd time.Duration) time.Duration {
+func (spriest *ShadowPriest) ClippingMindflayRotation(sim *core.Simulation, spell *core.SimpleSpell, allCDs []time.Duration, gcd time.Duration) time.Duration {
 	nextCD := core.NeverExpires
 	for _, v := range allCDs[:2] {
 		if v < nextCD {
@@ -583,14 +583,13 @@ func (spriest *ShadowPriest) SweatyMindflayRotation(sim *core.Simulation, spell 
 		return nextCD + 1
 	}
 
-	mfTwoTime := 2 * spell.DotInput.TickLength
-	mfBaseTime := 3 * spell.DotInput.TickLength
-	mfFourTime := 4 * spell.DotInput.TickLength
-	mfFiveTime := 5 * spell.DotInput.TickLength
+	mfTwoTime := 2*spell.DotInput.TickLength + time.Duration(spriest.rotation.Latency)
+	mfBaseTime := 3*spell.DotInput.TickLength + time.Duration(spriest.rotation.Latency)
+	mfFiveTime := 5*spell.DotInput.TickLength + time.Duration(spriest.rotation.Latency)
 
 	if nextCD >= mfFiveTime {
 		spell.DotInput.NumberOfTicks = 3
-	} else if nextCD >= mfFourTime && nextCD < mfFiveTime {
+	} else if nextCD >= mfTwoTime*2 {
 		// time for between 4-5 ticks should use 2xMF2
 		spell.DotInput.NumberOfTicks = 2
 	} else if nextCD >= mfBaseTime {
