@@ -343,11 +343,12 @@ class ShadowPriest_Rotation$Type extends MessageType {
             { no: 1, name: "rotation_type", kind: "enum", T: () => ["proto.ShadowPriest.Rotation.RotationType", ShadowPriest_Rotation_RotationType] },
             { no: 3, name: "use_dev_plague", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 4, name: "precast_vt", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
-            { no: 5, name: "latency", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ }
+            { no: 5, name: "latency", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
+            { no: 6, name: "use_starshards", kind: "scalar", T: 8 /*ScalarType.BOOL*/ }
         ]);
     }
     create(value) {
-        const message = { rotationType: 0, useDevPlague: false, precastVt: false, latency: 0 };
+        const message = { rotationType: 0, useDevPlague: false, precastVt: false, latency: 0, useStarshards: false };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -369,6 +370,9 @@ class ShadowPriest_Rotation$Type extends MessageType {
                     break;
                 case /* double latency */ 5:
                     message.latency = reader.double();
+                    break;
+                case /* bool use_starshards */ 6:
+                    message.useStarshards = reader.bool();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -394,6 +398,9 @@ class ShadowPriest_Rotation$Type extends MessageType {
         /* double latency = 5; */
         if (message.latency !== 0)
             writer.tag(5, WireType.Bit64).double(message.latency);
+        /* bool use_starshards = 6; */
+        if (message.useStarshards !== false)
+            writer.tag(6, WireType.Varint).bool(message.useStarshards);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

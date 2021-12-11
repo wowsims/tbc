@@ -172,6 +172,10 @@ export interface ShadowPriest_Rotation {
      * @generated from protobuf field: double latency = 5;
      */
     latency: number;
+    /**
+     * @generated from protobuf field: bool use_starshards = 6;
+     */
+    useStarshards: boolean;
 }
 /**
  * @generated from protobuf enum proto.ShadowPriest.Rotation.RotationType
