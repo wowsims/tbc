@@ -64,37 +64,37 @@ var FullDebuffTarget = &proto.Target{
 	},
 }
 
-var PlayerOptionsLazy = &proto.Player_ShadowPriest{
+var PlayerOptionsBasic = &proto.Player_ShadowPriest{
 	ShadowPriest: &proto.ShadowPriest{
 		Talents: StandardTalents,
 		Options: &proto.ShadowPriest_Options{
 			UseShadowfiend: true,
 		},
 		Rotation: &proto.ShadowPriest_Rotation{
-			RotationType: proto.ShadowPriest_Rotation_Lazy,
+			RotationType: proto.ShadowPriest_Rotation_Basic,
 		},
 	},
 }
-var PlayerOptionsSweaty = &proto.Player_ShadowPriest{
+var PlayerOptionsClipping = &proto.Player_ShadowPriest{
 	ShadowPriest: &proto.ShadowPriest{
 		Talents: StandardTalents,
 		Options: &proto.ShadowPriest_Options{
 			UseShadowfiend: true,
 		},
 		Rotation: &proto.ShadowPriest_Rotation{
-			RotationType: proto.ShadowPriest_Rotation_Sweaty,
+			RotationType: proto.ShadowPriest_Rotation_Clipping,
 			PrecastVt:    true,
 		},
 	},
 }
-var PlayerOptionsPerfect = &proto.Player_ShadowPriest{
+var PlayerOptionsIdeal = &proto.Player_ShadowPriest{
 	ShadowPriest: &proto.ShadowPriest{
 		Talents: StandardTalents,
 		Options: &proto.ShadowPriest_Options{
 			UseShadowfiend: true,
 		},
 		Rotation: &proto.ShadowPriest_Rotation{
-			RotationType: proto.ShadowPriest_Rotation_Perfect,
+			RotationType: proto.ShadowPriest_Rotation_Ideal,
 			PrecastVt:    true,
 		},
 	},

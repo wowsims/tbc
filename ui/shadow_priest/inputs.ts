@@ -19,16 +19,16 @@ export const ShadowPriestRotationConfig = {
 			getModObject: (simUI: SimUI<any>) => simUI.player,
 			config: {
 				label: 'Rotation Type',
-				labelTooltip: 'Choose how to clip your mindflay. Lazy will never clip. Sweaty will clip for other spells and use a 2xMF2 when there is time for 4 ticks. Perfect will evaluate the DPS gain of every action to determine MF actions.',
+				labelTooltip: 'Choose how to clip your mindflay. Basic will never clip. Clipping will clip for other spells and use a 2xMF2 when there is time for 4 ticks. Ideal will evaluate the DPS gain of every action to determine MF actions.',
 				values: [
 					{
-						name: 'Lazy', value: RotationType.Lazy,
+						name: 'Basic', value: RotationType.Basic,
 					},
 					{
-						name: 'Sweaty', value: RotationType.Sweaty,
+						name: 'Clipping', value: RotationType.Clipping,
 					},
 					{
-						name: 'Perfect', value: RotationType.Perfect,
+						name: 'Ideal', value: RotationType.Ideal,
 					},
 				],
 				changedEvent: (player: Player<Spec.SpecShadowPriest>) => player.rotationChangeEmitter,
@@ -87,6 +87,23 @@ export const ShadowPriestRotationConfig = {
 					player.setRotation(newRotation);
 				},
 				enableWhen: (player: Player<Spec.SpecShadowPriest>) => player.getRace() == Race.RaceUndead,
+			},
+		},
+		{
+			type: 'boolean' as const,
+			cssClass: 'starshards-picker',
+			getModObject: (simUI: SimUI<any>) => simUI.player,
+			config: {
+				label: 'Use starshards',
+				labelTooltip: 'Use Starshards whenever off CD.',
+				changedEvent: (player: Player<Spec.SpecShadowPriest>) => player.raceChangeEmitter,
+				getValue: (player: Player<Spec.SpecShadowPriest>) => player.getRotation().useStarshards,
+				setValue: (player: Player<Spec.SpecShadowPriest>, newValue: boolean) => {
+					const newRotation = player.getRotation();
+					newRotation.useStarshards = newValue;
+					player.setRotation(newRotation);
+				},
+				enableWhen: (player: Player<Spec.SpecShadowPriest>) => player.getRace() == Race.RaceNightElf,
 			},
 		},
 		{

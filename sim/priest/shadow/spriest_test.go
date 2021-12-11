@@ -22,7 +22,7 @@ func TestSimulateP1Lazy(t *testing.T) {
 				Class:     proto.Class_ClassPriest,
 				Equipment: P1Gear,
 				Consumes:  FullConsumes,
-				Spec:      PlayerOptionsLazy,
+				Spec:      PlayerOptionsBasic,
 			},
 
 			RaidBuffs:       FullRaidBuffs,
@@ -37,9 +37,9 @@ func TestSimulateP1Lazy(t *testing.T) {
 	})
 }
 
-func TestSimulateP1Sweaty(t *testing.T) {
+func TestSimulateP1Clipping(t *testing.T) {
 	core.IndividualSimAllEncountersTest(core.AllEncountersTestOptions{
-		Label: "phase1-sweaty",
+		Label: "phase1-clipping",
 		T:     t,
 
 		Inputs: core.IndividualSimInputs{
@@ -48,7 +48,7 @@ func TestSimulateP1Sweaty(t *testing.T) {
 				Class:     proto.Class_ClassPriest,
 				Equipment: P1Gear,
 				Consumes:  FullConsumes,
-				Spec:      PlayerOptionsSweaty,
+				Spec:      PlayerOptionsClipping,
 			},
 
 			RaidBuffs:       FullRaidBuffs,
@@ -63,9 +63,9 @@ func TestSimulateP1Sweaty(t *testing.T) {
 	})
 }
 
-func TestSimulateP1Perfect(t *testing.T) {
+func TestSimulateP1Ideal(t *testing.T) {
 	core.IndividualSimAllEncountersTest(core.AllEncountersTestOptions{
-		Label: "phase1-sweaty",
+		Label: "phase1-ideal",
 		T:     t,
 
 		Inputs: core.IndividualSimInputs{
@@ -74,7 +74,7 @@ func TestSimulateP1Perfect(t *testing.T) {
 				Class:     proto.Class_ClassPriest,
 				Equipment: P1Gear,
 				Consumes:  FullConsumes,
-				Spec:      PlayerOptionsPerfect,
+				Spec:      PlayerOptionsIdeal,
 			},
 
 			RaidBuffs:       FullRaidBuffs,
@@ -96,7 +96,7 @@ func TestAverageDPS(t *testing.T) {
 			Class:     proto.Class_ClassPriest,
 			Equipment: P1Gear,
 			Consumes:  FullConsumes,
-			Spec:      PlayerOptionsPerfect,
+			Spec:      PlayerOptionsIdeal,
 		},
 
 		RaidBuffs:       FullRaidBuffs,

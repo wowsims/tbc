@@ -23,7 +23,7 @@ export const StandardTalents = {
 };
 
 export const DefaultRotation = Rotation.create({
-	rotationType: ShadowPriest_Rotation_RotationType.Sweaty,
+	rotationType: ShadowPriest_Rotation_RotationType.Basic,
 });
 
 export const DefaultOptions = Options.create({
