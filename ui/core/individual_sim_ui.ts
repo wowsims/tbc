@@ -33,7 +33,7 @@ const SAVED_TALENTS_STORAGE_KEY = '__savedTalents__';
 
 export type ReleaseStatus = 'Alpha' | 'Beta' | 'Live';
 
-export interface SimUIConfig<SpecType extends Spec> {
+export interface IndividualSimUIConfig<SpecType extends Spec> {
 	spec: Spec,
   releaseStatus: ReleaseStatus;
 	knownIssues?: Array<string>;
@@ -55,38 +55,22 @@ export interface SimUIConfig<SpecType extends Spec> {
 }
 
 // Core UI module.
-export abstract class SimUI<SpecType extends Spec> {
-  readonly parentElem: HTMLElement;
-  readonly sim: Sim;
-  readonly raid: Raid;
+export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
   readonly party: Party;
   readonly player: Player<SpecType>;
-  readonly encounter: Encounter;
 	readonly simUiConfig: SimUIConfig<SpecType>;
-
-  // Emits when anything from sim, player, or target changes.
-  readonly changeEmitter = new TypedEvent<void>();
 
   private readonly exclusivityMap: Record<ExclusivityTag, Array<ExclusiveEffect>>;
 
-  constructor(parentElem: HTMLElement, config: SimUIConfig<SpecType>) {
-    this.parentElem = parentElem;
-    this.sim = new Sim();
+  constructor(parentElem: HTMLElement, sim: Sim, config: SimUIConfig<SpecType>) {
+		super(parentElem, sim);
+		this.rootElem.classList.add('individual-sim-ui');
 
-		this.raid = new Raid(this.sim);
 		this.party = this.raid.getParty(0);
 		this.player = new Player<SpecType>(config.spec, this.sim);
 		this.raid.setPlayer(0, this.player);
 
-    this.encounter = new Encounter(this.sim);
-
 		this.simUiConfig = config;
-
-    [
-      this.sim.changeEmitter,
-      this.raid.changeEmitter,
-      this.encounter.changeEmitter,
-    ].forEach(emitter => emitter.on(() => this.changeEmitter.emit()));
 
     this.exclusivityMap = {
       'Battle Elixir': [],
@@ -98,68 +82,10 @@ export abstract class SimUI<SpecType extends Spec> {
       'Rune': [],
       'Weapon Imbue': [],
     };
-
-		Array.from(document.getElementsByClassName('known-issues')).forEach(element => {
-			if (this.simUiConfig.knownIssues?.length) {
-				(element as HTMLElement).style.display = 'initial';
-			} else {
-				return;
-			}
-
-			
-			tippy(element, {
-				'content': `
-				<ul class="known-issues-tooltip">
-					${this.simUiConfig.knownIssues.map(issue => '<li>' + issue + '</li>').join('')}
-				</ul>
-				`,
-				'allowHTML': true,
-			});
-		});
-  }
-
-  // Returns JSON representing all the current values.
-  toJson(): Object {
-    return {
-      'raid': this.raid.toJson(),
-      'encounter': this.encounter.toJson(),
-    };
-	}
-
-  // Set all the current values, assumes obj is the same type returned by toJson().
-  fromJson(obj: any) {
-		// For legacy format. Do not remove this until 2022/01/05 (1 month).
-		if (obj['sim']) {
-			if (!obj['raid']) {
-				obj['raid'] = {
-					'parties': [
-						{
-							'players': [
-								{
-									'spec': this.player.spec,
-									'player': obj['player'],
-								},
-							],
-							'buffs': obj['sim']['partyBuffs'],
-						},
-					],
-					'buffs': obj['sim']['raidBuffs'],
-				};
-				obj['raid']['parties'][0]['players'][0]['player']['buffs'] = obj['sim']['individualBuffs'];
-			}
-		}
-
-		if (obj['raid']) {
-			this.raid.fromJson(obj['raid']);
-		}
-
-		if (obj['encounter']) {
-			this.encounter.fromJson(obj['encounter']);
-		}
   }
 
   async init(): Promise<void> {
-    await this.sim.init();
+    await super.init();
 
     let loadedSettings = false;
 
@@ -203,12 +129,6 @@ export abstract class SimUI<SpecType extends Spec> {
 			this.applyDefaults();
 		}
 		this.player.setEpWeights(this.simUiConfig.defaults.epWeights);
-
-    this.changeEmitter.on(() => {
-      const jsonStr = JSON.stringify(this.toJson());
-      window.localStorage.setItem(this.getStorageKey(CURRENT_SETTINGS_STORAGE_KEY), jsonStr);
-    });
-
 		
 		Array.from(document.getElementsByClassName('share-link')).forEach(element => {
 			tippy(element, {
@@ -229,7 +149,7 @@ export abstract class SimUI<SpecType extends Spec> {
 		});
   }
 
-	applyDefaults() {
+	private applyDefaults() {
 		this.player.setGear(this.sim.lookupEquipmentSpec(this.simUiConfig.defaults.gear));
 		this.player.setConsumes(this.simUiConfig.defaults.consumes);
 		this.player.setRotation(this.simUiConfig.defaults.rotation);
@@ -282,17 +202,6 @@ export abstract class SimUI<SpecType extends Spec> {
 		// different keys for each spec site.
 		return specToLocalStorageKey[this.player.spec] + keyPart;
 	}
-
-  makeRaidSimRequest(iterations: number, debug: boolean): RaidSimRequest {
-		return RaidSimRequest.create({
-			raid: this.raid.toProto(),
-			encounter: this.encounter.toProto(),
-			simOptions: SimOptions.create({
-				iterations: iterations,
-				debug: debug,
-			}),
-		});
-  }
 }
 
 export type ExclusivityTag =

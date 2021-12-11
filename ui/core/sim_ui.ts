@@ -1,3 +1,4 @@
+import { specToLocalStorageKey } from '/tbc/core/components/component.js';
 import { SimOptions } from '/tbc/core/proto/api.js';
 import { specToLocalStorageKey } from '/tbc/core/proto_utils/utils.js';
 
@@ -11,27 +12,24 @@ declare var tippy: any;
 declare var pako: any;
 
 const CURRENT_SETTINGS_STORAGE_KEY = '__currentSettings__';
-const SAVED_GEAR_STORAGE_KEY = '__savedGear__';
-const SAVED_ENCOUNTER_STORAGE_KEY = '__savedEncounter__';
-const SAVED_ROTATION_STORAGE_KEY = '__savedRotation__';
-const SAVED_SETTINGS_STORAGE_KEY = '__savedSettings__';
-const SAVED_TALENTS_STORAGE_KEY = '__savedTalents__';
+
+export interface SimUIConfig {
+	knownIssues?: Array<string>;
+}
 
 // Core UI module.
-export abstract class SimUI {
-  readonly parentElem: HTMLElement;
+export abstract class SimUI extends Component {
   readonly sim: Sim;
   readonly raid: Raid;
   readonly encounter: Encounter;
 
-  // Emits when anything from sim, player, or target changes.
+  // Emits when anything from the sim, raid, or encounter changes.
   readonly changeEmitter = new TypedEvent<void>();
 
-  private readonly exclusivityMap: Record<ExclusivityTag, Array<ExclusiveEffect>>;
-
-  constructor(parentElem: HTMLElement) {
-    this.parentElem = parentElem;
-    this.sim = new Sim();
+  constructor(parentElem: HTMLElement, sim: Sim, config: SimUIConfig) {
+		super(parentElem, 'sim-ui');
+    this.sim = sim;
+    this.rootElem.innerHTML = simHTML;
 
 		this.raid = new Raid(this.sim);
     this.encounter = new Encounter(this.sim);
@@ -41,6 +39,24 @@ export abstract class SimUI {
       this.raid.changeEmitter,
       this.encounter.changeEmitter,
     ].forEach(emitter => emitter.on(() => this.changeEmitter.emit()));
+
+		Array.from(document.getElementsByClassName('known-issues')).forEach(element => {
+			if (config.knownIssues?.length) {
+				(element as HTMLElement).style.display = 'initial';
+			} else {
+				return;
+			}
+
+			
+			tippy(element, {
+				'content': `
+				<ul class="known-issues-tooltip">
+					${config.knownIssues.map(issue => '<li>' + issue + '</li>').join('')}
+				</ul>
+				`,
+				'allowHTML': true,
+			});
+		});
   }
 
   // Returns JSON representing all the current values.
@@ -92,33 +108,6 @@ export abstract class SimUI {
     });
   }
 
-	getSavedGearStorageKey(): string {
-		return this.getStorageKey(SAVED_GEAR_STORAGE_KEY);
-	}
-
-	getSavedEncounterStorageKey(): string {
-		return this.getStorageKey(SAVED_ENCOUNTER_STORAGE_KEY);
-	}
-
-	getSavedRotationStorageKey(): string {
-		return this.getStorageKey(SAVED_ROTATION_STORAGE_KEY);
-	}
-
-	getSavedSettingsStorageKey(): string {
-		return this.getStorageKey(SAVED_SETTINGS_STORAGE_KEY);
-	}
-
-	getSavedTalentsStorageKey(): string {
-		return this.getStorageKey(SAVED_TALENTS_STORAGE_KEY);
-	}
-
-	// Returns the actual key to use for local storage, based on the given key part and the site context.
-	private getStorageKey(keyPart: string): string {
-		// Local storage is shared by all sites under the same domain, so we need to use
-		// different keys for each spec site.
-		return specToLocalStorageKey[this.player.spec] + keyPart;
-	}
-
   makeRaidSimRequest(iterations: number, debug: boolean): RaidSimRequest {
 		return RaidSimRequest.create({
 			raid: this.raid.toProto(),
@@ -129,4 +118,42 @@ export abstract class SimUI {
 			}),
 		});
   }
+
+	abstract getStorageKey(postfix: string): string;
 }
+
+const simHTML = `
+<div class="default-root">
+  <section class="default-sidebar">
+    <div class="default-title"></div>
+    <div class="default-actions"></div>
+    <div class="default-results"></div>
+    <div class="default-stats"></div>
+  </section>
+  <section class="default-main">
+    <ul class="nav nav-tabs">
+      <li class="active"><a data-toggle="tab" href="#gear-tab">Gear</a></li>
+      <li class="default-top-bar">
+				<div class="known-issues">Known Issues</div>
+				<span class="share-link fa fa-link"></span>
+			</li>
+    </ul>
+    <div class="tab-content">
+      <div id="gear-tab" class="tab-pane fade in active">
+        <div class="gear-tab">
+          <div class="left-gear-panel">
+            <div class="gear-picker">
+            </div>
+          </div>
+          <div class="right-gear-panel">
+            <div class="bonus-stats-picker">
+            </div>
+            <div class="saved-gear-manager">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+`;
