@@ -11,6 +11,7 @@ declare var tippy: any;
 export interface InputConfig<ModObject, T> {
   label?: string,
 	labelTooltip?: string,
+	cssClass?: string,
 
   defaultValue?: T,
 
@@ -35,6 +36,9 @@ export abstract class Input<ModObject, T> extends Component {
 		this.inputConfig = config;
 		this.modObject = modObject;
 		this.rootElem.classList.add(cssClass);
+		if (config.cssClass) {
+			this.rootElem.classList.add(config.cssClass);
+		}
 
     if (config.label) {
       const labelDiv = document.createElement('div');

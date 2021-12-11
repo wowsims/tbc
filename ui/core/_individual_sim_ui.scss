@@ -1,0 +1,144 @@
+@import "./components/actions";
+@import "./components/bonus_stats_picker";
+@import "./components/boolean_picker";
+@import "./components/character_stats";
+@import "./components/detailed_results";
+@import "./components/encounter_picker";
+@import "./components/enum_picker";
+@import "./components/gear_picker";
+@import "./components/icon_picker";
+@import "./components/log_runner";
+@import "./components/number_picker";
+@import "./components/raid_sim_action";
+@import "./components/saved_data_manager";
+@import "./components/stat_weights_action";
+@import "./shared";
+@import "./talents/talents_picker";
+
+.share-link {
+	margin: 10px;
+	font-size: 20px;
+	cursor: pointer;
+}
+
+.left-gear-panel {
+  width: 70%;
+}
+
+.right-gear-panel {
+  width: 30%;
+  text-align: center;
+  border-left: 3px solid var(--main-text-color);
+  position: relative;
+}
+
+.bonus-stats-root {
+  justify-content: end;
+  text-align: right;
+	color: var(--main-text-color);
+}
+
+.bonus-stats-root .number-picker-root {
+  justify-content: end;
+}
+
+.saved-gear-manager {
+  @include vertical-bottom;
+  @include horizontal-right;
+  text-align: right;
+}
+
+.saved-data-set-chip {
+	color: var(--main-text-color);
+	border-color: var(--main-text-color);
+}
+.saved-data-set-chip.active {
+	color: var(--main-secondary-color);
+	border-color: var(--main-secondary-color);
+	background-color: var(--main-text-color);
+}
+
+.settings-inputs {
+  position: relative;
+}
+.settings-section-container {
+  position: absolute;
+}
+.settings-section {
+  border: 4px solid var(--main-text-color);
+  border-radius: 8px;
+  position: relative;
+  padding: 4px;
+  padding-top: 15px;
+  margin: 10px;
+  margin-top: 20px;
+	display: grid;
+}
+
+.settings-section>label {
+  position: absolute;
+  left: 12px;
+  top: -20px;
+  font-weight: 900;
+  display: inline-block;
+	color: var(--main-text-color);
+  background: var(--main-bg-color);
+  padding: 5px 10px 5px 10px;
+  font-size: 18px;
+}
+
+.settings-bottom-bar {
+  margin: 20px;
+  display: flex;
+  justify-content: space-around;
+  align-items: flex-end;
+}
+
+.race-section {
+  text-align: center;
+}
+
+.rotation-section > div, .other-settings-section > div {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.self-buffs-section>div {
+  display: grid;
+}
+
+.buffs-section>div {
+  display: grid;
+}
+
+.consumes-section>div {
+  display: grid;
+}
+
+.debuffs-section>div {
+  display: grid;
+}
+
+.saved-encounter-manager {
+  display: inline-block;
+  text-align: left;
+}
+
+.saved-rotation-manager {
+  display: inline-block;
+  text-align: center;
+}
+
+.saved-settings-manager {
+  display: inline-block;
+  text-align: right;
+}
+
+.saved-talents-manager {
+  text-align: center;
+}
+
+.saved-talents-manager .saved-data-container, .saved-talents-manager .saved-data-create-container {
+  display: inline-block;
+}

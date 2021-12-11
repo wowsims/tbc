@@ -1,14 +1,9 @@
-import { RaidSimRequest } from '/tbc/core/proto/api.js';
-import { Stat } from '/tbc/core/proto/common.js';
-import { StatWeightsRequest } from '/tbc/core/proto/api.js';
 import { SimUI } from '/tbc/core/sim_ui.js';
 
 import { Component } from './component.js';
-import { DetailedResults } from './detailed_results.js';
-import { Results } from './results.js';
 
 export class LogRunner extends Component {
-  constructor(parent: HTMLElement, simUI: SimUI<any>, results: Results, detailedResults: DetailedResults) {
+  constructor(parent: HTMLElement, simUI: SimUI) {
     super(parent, 'log-runner-root');
 
 		const controlBar = document.createElement('div');
@@ -25,14 +20,12 @@ export class LogRunner extends Component {
 		this.rootElem.appendChild(logsDiv);
 
     simButton.addEventListener('click', async () => {
-      const simRequest = simUI.makeRaidSimRequest(1, true);
+			simUI.setResultsPending();
+			const result = await simUI.sim.runRaidSim();
+    });
 
-      results.setPending();
-      detailedResults.setPending();
-      const result = await simUI.sim.raidSim(simRequest);
-      results.setSimResult(simRequest, result);
-      detailedResults.setSimResult(simRequest, result);
-
+		simUI.sim.raidSimEmitter.on(data => {
+			const result = data.result;
 			const lines = result.logs.split('\n');
 			logsDiv.textContent = '';
 			lines.forEach(line => {
@@ -40,6 +33,6 @@ export class LogRunner extends Component {
 				lineElem.textContent = line;
 				logsDiv.appendChild(lineElem);
 			});
-    });
+		});
   }
 }

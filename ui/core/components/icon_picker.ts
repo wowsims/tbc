@@ -3,8 +3,8 @@ import { ItemOrSpellId } from '/tbc/core/resources.js';
 import { setWowheadHref } from '/tbc/core/resources.js';
 import { TypedEvent } from '/tbc/core/typed_event.js';
 import { isRightClick } from '/tbc/core/utils.js';
-import { ExclusivityTag } from '/tbc/core/sim_ui.js';
-import { SimUI } from '/tbc/core/sim_ui.js';
+import { ExclusivityTag } from '/tbc/core/individual_sim_ui.js';
+import { IndividualSimUI } from '/tbc/core/individual_sim_ui.js';
 
 import { Component } from './component.js';
 
@@ -19,7 +19,7 @@ export class IconPicker<ModObject> extends Component {
   private readonly _counterElem: HTMLElement;
   private readonly _clickedEmitter = new TypedEvent<void>();
 
-  constructor(parent: HTMLElement, modObj: ModObject, input: IconInput<ModObject>, simUI: SimUI<any>) {
+  constructor(parent: HTMLElement, modObj: ModObject, input: IconInput<ModObject>, simUI: IndividualSimUI<any>) {
     super(parent, 'icon-input', document.createElement('a'));
     this._input = input;
     this._modObject = modObj;

@@ -1,0 +1,46 @@
+@import "../shared";
+
+.results-ep-table {
+  margin: auto;
+}
+
+.results-ep-table td {
+  padding: 3px;
+}
+
+.results-ep-table tr td:nth-child(1) {
+  text-align: right;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.results-ep-table tr td:nth-child(2), .results-ep-table tr td:nth-child(4) {
+  text-align: left;
+  font-size: 14px;
+  font-weight: 700;
+}
+.results-ep-table tr td:nth-child(2):after {
+  content: " DPS";
+  font-size: 13px;
+}
+.results-ep-table tr td:nth-child(4):after {
+  content: " EP";
+  font-size: 13px;
+}
+
+.results-ep-table tr td:nth-child(3), .results-ep-table tr td:nth-child(5) {
+  text-align: left;
+  font-size: 12px;
+  font-weight: 700;
+}
+.results-ep-table tr td:nth-child(3):before, .results-ep-table tr td:nth-child(5):before {
+  content: " \00b1";
+  padding: 1px;
+}
+
+.stats-type-ep .results-ep-table tr td:nth-child(2), .stats-type-ep .results-ep-table tr td:nth-child(3) {
+  display: none;
+}
+.stats-type-dps .results-ep-table tr td:nth-child(4), .stats-type-dps .results-ep-table tr td:nth-child(5) {
+  display: none;
+}

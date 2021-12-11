@@ -1,43 +1,37 @@
-import { specToLocalStorageKey } from '/tbc/core/components/component.js';
+import { Component } from '/tbc/core/components/component.js';
+import { NumberPicker } from '/tbc/core/components/number_picker.js';
 import { SimOptions } from '/tbc/core/proto/api.js';
 import { specToLocalStorageKey } from '/tbc/core/proto_utils/utils.js';
 
-import { Raid } from './raid.js';
 import { Sim } from './sim.js';
-import { Encounter } from './encounter.js';
 import { Target } from './target.js';
 import { TypedEvent } from './typed_event.js';
 
 declare var tippy: any;
 declare var pako: any;
 
-const CURRENT_SETTINGS_STORAGE_KEY = '__currentSettings__';
-
 export interface SimUIConfig {
+	title: string,
 	knownIssues?: Array<string>;
 }
 
-// Core UI module.
+// Shared UI for all individual sims and the raid sim.
 export abstract class SimUI extends Component {
   readonly sim: Sim;
-  readonly raid: Raid;
-  readonly encounter: Encounter;
 
   // Emits when anything from the sim, raid, or encounter changes.
   readonly changeEmitter = new TypedEvent<void>();
+
+	readonly resultsPendingElem: HTMLElement;
+	readonly resultsContentElem: HTMLElement;
 
   constructor(parentElem: HTMLElement, sim: Sim, config: SimUIConfig) {
 		super(parentElem, 'sim-ui');
     this.sim = sim;
     this.rootElem.innerHTML = simHTML;
 
-		this.raid = new Raid(this.sim);
-    this.encounter = new Encounter(this.sim);
-
     [
       this.sim.changeEmitter,
-      this.raid.changeEmitter,
-      this.encounter.changeEmitter,
     ].forEach(emitter => emitter.on(() => this.changeEmitter.emit()));
 
 		Array.from(document.getElementsByClassName('known-issues')).forEach(element => {
@@ -57,102 +51,101 @@ export abstract class SimUI extends Component {
 				'allowHTML': true,
 			});
 		});
-  }
 
-  // Returns JSON representing all the current values.
-  toJson(): Object {
-    return {
-      'raid': this.raid.toJson(),
-      'encounter': this.encounter.toJson(),
-    };
-	}
+		this.resultsPendingElem = this.rootElem.getElementsByClassName('results-pending')[0] as HTMLElement;
+		this.resultsContentElem = this.rootElem.getElementsByClassName('results-content')[0] as HTMLElement;
 
-  // Set all the current values, assumes obj is the same type returned by toJson().
-  fromJson(obj: any) {
-		// For legacy format. Do not remove this until 2022/01/05 (1 month).
-		if (obj['sim']) {
-			if (!obj['raid']) {
-				obj['raid'] = {
-					'parties': [
-						{
-							'players': [
-								{
-									'spec': this.player.spec,
-									'player': obj['player'],
-								},
-							],
-							'buffs': obj['sim']['partyBuffs'],
-						},
-					],
-					'buffs': obj['sim']['raidBuffs'],
-				};
-				obj['raid']['parties'][0]['players'][0]['player']['buffs'] = obj['sim']['individualBuffs'];
-			}
-		}
+		const titleElem = this.rootElem.getElementsByClassName('sim-title')[0];
+		titleElem.textContent = config.title;
 
-		if (obj['raid']) {
-			this.raid.fromJson(obj['raid']);
-		}
-
-		if (obj['encounter']) {
-			this.encounter.fromJson(obj['encounter']);
-		}
-  }
-
-  async init(): Promise<void> {
-    await this.sim.init();
-
-    this.changeEmitter.on(() => {
-      const jsonStr = JSON.stringify(this.toJson());
-      window.localStorage.setItem(this.getStorageKey(CURRENT_SETTINGS_STORAGE_KEY), jsonStr);
-    });
-  }
-
-  makeRaidSimRequest(iterations: number, debug: boolean): RaidSimRequest {
-		return RaidSimRequest.create({
-			raid: this.raid.toProto(),
-			encounter: this.encounter.toProto(),
-			simOptions: SimOptions.create({
-				iterations: iterations,
-				debug: debug,
-			}),
+		const simActionsContainer = this.rootElem.getElementsByClassName('sim-sidebar-actions')[0] as HTMLElement;
+		const iterationsPicker = new NumberPicker(simActionsContainer, this.sim, {
+			label: 'Iterations',
+			cssClass: 'iterations-picker',
+			changedEvent: (sim: Sim) => sim.iterationsChangeEmitter,
+			getValue: (sim: Sim) => sim.getIterations(),
+			setValue: (sim: Sim, newValue: number) => {
+				sim.setIterations(newValue);
+			},
 		});
   }
 
+	addAction(name: string, cssClass: string, actFn: () => void) {
+		const simActionsContainer = this.rootElem.getElementsByClassName('sim-sidebar-actions')[0] as HTMLElement;
+		const iterationsPicker = this.rootElem.getElementsByClassName('iterationsPicker')[0] as HTMLElement;
+
+    const button = document.createElement('button');
+    button.classList.add('sim-sidebar-actions-button', cssClass);
+    button.textContent = name;
+    button.addEventListener('click', actFn);
+    simActionsContainer.insertBefore(button, iterationsPicker);
+	}
+
+	addTab(title: string, cssClass: string, innerHTML: string) {
+		const simTabsContainer = this.rootElem.getElementsByClassName('sim-tabs')[0] as HTMLElement;
+		const simTabContentsContainer = this.rootElem.getElementsByClassName('tab-content')[0] as HTMLElement;
+		const topBar = simTabsContainer.getElementsByClassName('sim-top-bar')[0] as HTMLElement;
+
+		const contentId = title.replace(/\s+/g, '-') + '-tab';
+		const isFirstTab = simTabsContainer.children.length == 1;
+
+		const newTab = document.createElement('li');
+		newTab.innerHTML = `<a data-toggle="tab" href="#${contentId}">${title}</a>`;
+		simTabsContainer.insertBefore(newTab, topBar);
+
+		const newContent = document.createElement('div');
+		newContent.id = contentId;
+		newContent.classList.add(cssClass, 'tab-pane', 'fade', 'in');
+		newContent.innerHTML = innerHTML;
+		simTabContentsContainer.appendChild(newContent);
+
+		if (isFirstTab) {
+			newTab.classList.add('active');
+			newContent.classList.add('active');
+		}
+	}
+
+  setResultsPending() {
+		this.resultsContentElem.style.display = 'none';
+    this.resultsPendingElem.style.display = 'initial';
+  }
+
+	setResultsContent(innerHTML: string) {
+		this.resultsContentElem.innerHTML = innerHTML;
+		this.resultsContentElem.style.display = 'initial';
+    this.resultsPendingElem.style.display = 'none';
+	}
+
+	// Returns a key suitable for the browser's localStorage feature.
 	abstract getStorageKey(postfix: string): string;
+
+	getSettingsStorageKey(): string {
+		return this.getStorageKey('__currentSettings__');
+	}
 }
 
 const simHTML = `
-<div class="default-root">
-  <section class="default-sidebar">
-    <div class="default-title"></div>
-    <div class="default-actions"></div>
-    <div class="default-results"></div>
-    <div class="default-stats"></div>
+<div class="sim-root">
+  <section class="sim-sidebar">
+    <div class="sim-sidebar-title"></div>
+    <div class="sim-sidebar-actions"></div>
+    <div class="sim-sidebar-results">
+      <div class="results-pending">
+        <div class="loader"></div>
+      </div>
+      <div class="results-content">
+      </div>
+		</div>
+    <div class="sim-sidebar-footer"></div>
   </section>
-  <section class="default-main">
-    <ul class="nav nav-tabs">
-      <li class="active"><a data-toggle="tab" href="#gear-tab">Gear</a></li>
-      <li class="default-top-bar">
+  <section class="sim-main">
+    <ul class="sim-tabs nav nav-tabs">
+      <li class="sim-top-bar">
 				<div class="known-issues">Known Issues</div>
 				<span class="share-link fa fa-link"></span>
 			</li>
     </ul>
     <div class="tab-content">
-      <div id="gear-tab" class="tab-pane fade in active">
-        <div class="gear-tab">
-          <div class="left-gear-panel">
-            <div class="gear-picker">
-            </div>
-          </div>
-          <div class="right-gear-panel">
-            <div class="bonus-stats-picker">
-            </div>
-            <div class="saved-gear-manager">
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
   </section>
 </div>

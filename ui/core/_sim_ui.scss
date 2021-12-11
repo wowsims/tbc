@@ -1,0 +1,160 @@
+@import "./components/number_picker";
+@import "./shared";
+
+html {
+	overflow: hidden;
+}
+
+td, th {
+  padding: auto;
+}
+
+.sim-root {
+  height: 100%;
+  display: flex;
+}
+
+.sim-sidebar {
+  height: 100%;
+  width: 20%;
+  min-width: 200px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  background: var(--sidebar-bg-color);
+}
+
+.sim-sidebar>div {
+  margin: 10px 0;
+}
+
+.sim-sidebar-title {
+  text-align: center;
+  font-size: 20px;
+  font-weight: 900;
+  color: var(--sidebar-text-color);
+	text-shadow: 0 0 10px var(--sidebar-highlight-color);
+}
+
+.sim-sidebar-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.sim-sidebar-actions-button {
+  width: 150px;
+  height: 40px;
+  cursor: pointer;
+  margin: 5px;
+}
+
+.iterations-picker {
+  text-align: center;
+}
+
+.iterations-picker .input-label {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.sim-sidebar-results {
+  flex-grow: 1;
+}
+
+.sim-sidebar-results {
+  height: 100%;
+  position: relative;
+}
+
+.sim-sidebar-results > div {
+  @include vertical-horizontal-center;
+  width: 100%;
+	text-align: center;
+}
+
+.results-pending {
+}
+.results-pending .loader {
+  margin: auto;
+}
+
+.sim-sidebar-actions, .sim-sidebar-footer {
+	margin: 0 !important;
+}
+
+.actions-button {
+  background: transparent;
+  color: var(--sidebar-text-color);
+  border: 1px solid var(--sidebar-text-color);
+  border-radius: 5px;
+  font-weight: 1000;
+  transition: all .2s ease-in;
+}
+
+.actions-button:hover {
+  color: var(--sidebar-highlight-color);
+  background: var(--sidebar-text-color);
+  box-shadow: 0 0 10px var(--sidebar-highlight-color);
+}
+
+.iterations-label {
+	color: var(--sidebar-text-color);
+}
+
+.results-sim, .results-ep-table {
+	color: var(--sidebar-text-color);
+	text-shadow: 0 0 10px var(--sidebar-highlight-color);
+}
+
+.sim-main {
+  height: 100%;
+  width: 80%;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--main-bg-color);
+  color: var(--main-text-color);
+}
+
+.sim-main input, .sim-main select {
+	color: black;
+}
+
+.nav-tabs {
+  padding-left: 40px;
+  padding-top: 15px;
+	border-bottom-color: var(--main-text-color);
+}
+ .nav-tabs>li>a {
+	color: var(--main-text-color);
+}
+.nav-tabs>li>a:hover, .nav-tabs>li.active>a {
+	color: var(--main-secondary-color);
+	background-color: var(--main-text-color);
+}
+
+.sim-main > .tab-content {
+  flex-grow: 1;
+	height: 80%;
+}
+.sim-main > .tab-content > .tab-pane {
+	height: 100%;
+  padding: 25px;
+}
+
+.sim-top-bar {
+	float: right !important;
+	display: flex !important;
+	align-items: center !important;
+	height: 100% !important;
+}
+
+.known-issues {
+	display: none;
+	background-color: red;
+	border: 2px solid var(--main-text-color);
+	padding: 2px;
+	margin: 0 10px;
+	font-size: 14px;
+	font-weight: 900;
+}
