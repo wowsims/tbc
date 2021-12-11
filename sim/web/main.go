@@ -53,6 +53,7 @@ func runServer(useFS bool, host string, launchBrowser bool, simName string, wasm
 	http.HandleFunc("/statWeights", handleAPI)
 	http.HandleFunc("/computeStats", handleAPI)
 	http.HandleFunc("/individualSim", handleAPI)
+	http.HandleFunc("/raidSim", handleAPI)
 	http.HandleFunc("/gearList", handleAPI)
 
 	http.HandleFunc("/", func(resp http.ResponseWriter, req *http.Request) {
@@ -83,7 +84,7 @@ func runServer(useFS bool, host string, launchBrowser bool, simName string, wasm
 		go func() {
 			var cmd *exec.Cmd
 			if runtime.GOOS == "windows" {
-				cmd = exec.Command("explorer", url)
+				cmd = exec.Command("start", "msedge", url)
 			} else if runtime.GOOS == "darwin" {
 				cmd = exec.Command("open", url)
 			} else if runtime.GOOS == "linux" {
@@ -159,6 +160,9 @@ type apiHandler struct {
 
 // Handlers to decode and handle each proto function
 var handlers = map[string]apiHandler{
+	"/raidSim": {msg: func() googleProto.Message { return &proto.RaidSimRequest{} }, handle: func(msg googleProto.Message) googleProto.Message {
+		return core.RunRaidSim(msg.(*proto.RaidSimRequest))
+	}},
 	"/individualSim": {msg: func() googleProto.Message { return &proto.IndividualSimRequest{} }, handle: func(msg googleProto.Message) googleProto.Message {
 		return core.RunIndividualSim(msg.(*proto.IndividualSimRequest))
 	}},

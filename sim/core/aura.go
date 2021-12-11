@@ -398,12 +398,7 @@ func (at *auraTracker) IsOnCD(id CooldownID, currentTime time.Duration) bool {
 }
 
 func (at *auraTracker) GetRemainingCD(id CooldownID, currentTime time.Duration) time.Duration {
-	remainingCD := at.cooldowns[id] - currentTime
-	if remainingCD > 0 {
-		return remainingCD
-	} else {
-		return 0
-	}
+	return MaxDuration(0, at.cooldowns[id]-currentTime)
 }
 
 func (at *auraTracker) SetCD(id CooldownID, newCD time.Duration) {
@@ -478,6 +473,10 @@ type InternalCD time.Duration
 
 func (icd InternalCD) IsOnCD(sim *Simulation) bool {
 	return time.Duration(icd) > sim.CurrentTime
+}
+
+func (icd InternalCD) GetRemainingCD(sim *Simulation) time.Duration {
+	return MaxDuration(0, time.Duration(icd)-sim.CurrentTime)
 }
 
 func NewICD() InternalCD {

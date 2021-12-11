@@ -1,6 +1,7 @@
 package core
 
 import (
+	"fmt"
 	"time"
 )
 
@@ -155,6 +156,11 @@ type DotDamageInput struct {
 	tickIndex     int
 }
 
+// DamagePerTick returns the cached damage per tick on the spell.
+func (ddi DotDamageInput) DamagePerTick() float64 {
+	return ddi.damagePerTick
+}
+
 func (ddi DotDamageInput) TimeRemaining(sim *Simulation) time.Duration {
 	return MaxDuration(0, ddi.finalTickTime-sim.CurrentTime)
 }
@@ -173,7 +179,7 @@ type SimpleSpellTemplate struct {
 
 func (template *SimpleSpellTemplate) Apply(newAction *SimpleSpell) {
 	if newAction.objectInUse {
-		panic("Damage over time spell already in use")
+		panic(fmt.Sprintf("Damage over time spell (%s) already in use", newAction.Name))
 	}
 	*newAction = template.template
 }

@@ -19,16 +19,16 @@ export const ShadowPriestRotationConfig = {
 			getModObject: (simUI: SimUI<any>) => simUI.player,
 			config: {
 				label: 'Rotation Type',
-				labelTooltip: 'Choose how to clip your mindflay',
+				labelTooltip: 'Choose how to clip your mindflay. Lazy will never clip. Sweaty will clip for other spells and use a 2xMF2 when there is time for 4 ticks. Perfect will evaluate the DPS gain of every action to determine MF actions.',
 				values: [
 					{
-						name: 'Basic', value: RotationType.Basic,
+						name: 'Lazy', value: RotationType.Lazy,
 					},
 					{
-						name: 'Clip Always', value: RotationType.ClipAlways,
+						name: 'Sweaty', value: RotationType.Sweaty,
 					},
 					{
-						name: 'Intelligent', value: RotationType.IntelligentClipping,
+						name: 'Perfect', value: RotationType.Perfect,
 					},
 				],
 				changedEvent: (player: Player<Spec.SpecShadowPriest>) => player.rotationChangeEmitter,
@@ -47,12 +47,28 @@ export const ShadowPriestRotationConfig = {
 			config: {
 				label: 'Use Shadowfiend',
 				labelTooltip: 'Use Shadowfiend when low mana and off CD.',
-				changedEvent: (player: Player<Spec.SpecShadowPriest>) => player.raceChangeEmitter,
+				changedEvent: (player: Player<Spec.SpecShadowPriest>) => player.rotationChangeEmitter,
 				getValue: (player: Player<Spec.SpecShadowPriest>) => player.getSpecOptions().useShadowfiend,
 				setValue: (player: Player<Spec.SpecShadowPriest>, newValue: boolean) => {
 					const newOptions = player.getSpecOptions();
 					newOptions.useShadowfiend = newValue;
 					player.setSpecOptions(newOptions);
+				},
+			},
+		},
+		{
+			type: 'boolean' as const,
+			cssClass: 'precastvt-picker',
+			getModObject: (simUI: SimUI<any>) => simUI.player,
+			config: {
+				label: 'Precast Vampiric Touch',
+				labelTooltip: 'Start fight with VT landing at time 0',
+				changedEvent: (player: Player<Spec.SpecShadowPriest>) => player.rotationChangeEmitter,
+				getValue: (player: Player<Spec.SpecShadowPriest>) => player.getRotation().precastVt,
+				setValue: (player: Player<Spec.SpecShadowPriest>, newValue: boolean) => {
+					const newRotation = player.getRotation();
+					newRotation.precastVt = newValue;
+					player.setRotation(newRotation);
 				},
 			},
 		},
@@ -73,5 +89,21 @@ export const ShadowPriestRotationConfig = {
 				enableWhen: (player: Player<Spec.SpecShadowPriest>) => player.getRace() == Race.RaceUndead,
 			},
 		},
+		{
+			type: 'number' as const,
+			cssClass: 'latency-picker',
+			getModObject: (simUI: SimUI<any>) => simUI.player,
+			config: {
+				label: 'Channeling Latency (ms)',
+				labelTooltip: 'Latency after a channel that lasts longer than GCD. 0 to disable. Has a minimum value of 100ms if set.',
+				changedEvent: (player: Player<Spec.SpecShadowPriest>) => player.rotationChangeEmitter,
+				getValue: (player: Player<Spec.SpecShadowPriest>) => player.getRotation().latency,
+				setValue: (player: Player<Spec.SpecShadowPriest>, newValue: number) => {
+					const newRotation = player.getRotation();
+					newRotation.latency = newValue;
+					player.setRotation(newRotation);
+				},
+			},
+		},		
 	],
 };

@@ -28,11 +28,12 @@ var ItemSetAvatar = core.ItemSet{
 					ID:   Avatar2PcAuraID,
 					Name: "Avatar 2pc Bonus",
 					OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
-						if sim.RandomFloat("avatar 2p") < 0.06 {
-							// This is a cheat...
-							// easier than adding another aura the subtracts 150 mana from next cast.
-							character.AddStat(stats.Mana, 150)
+						if sim.RandomFloat("avatar 2p") > 0.06 {
+							return
 						}
+						// This is a cheat...
+						// easier than adding another aura the subtracts 150 mana from next cast.
+						character.AddStat(stats.Mana, 150)
 					},
 				}
 			})
@@ -48,7 +49,7 @@ var ItemSetAvatar = core.ItemSet{
 							return
 						}
 
-						if sim.RandomFloat("avatar 4p") > 0.4 {
+						if sim.RandomFloat("avatar 4p") > 0.4 { // 60% chance of not activating.
 							return
 						}
 
@@ -64,6 +65,22 @@ var ItemSetAvatar = core.ItemSet{
 					},
 				}
 			})
+		},
+	},
+}
+
+var Absolution2PcAuraID = core.NewAuraID()
+var Absolution4PcAuraID = core.NewAuraID()
+
+var ItemSetAbsolution = core.ItemSet{
+	Name:  "Avatar Regalia",
+	Items: map[int32]struct{}{31061: {}, 31064: {}, 31067: {}, 31070: {}, 31065: {}, 34434: {}, 34528: {}, 34563: {}},
+	Bonuses: map[int32]core.ApplyEffect{
+		2: func(agent core.Agent) {
+			// this is implemented in swp.go
+		},
+		4: func(agent core.Agent) {
+			// this is implemented in mindblast.go
 		},
 	},
 }

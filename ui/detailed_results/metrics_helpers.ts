@@ -69,15 +69,21 @@ export function parseActionMetrics(actionMetricProtos: Array<ActionMetricsProto>
 		.then(name => {
 			if (actionMetric.actionId.tag == 0) {
 				actionMetric.name = name;
-			} else if (actionMetric.actionId.tag == 1) {
-				actionMetric.name = name + ' (LO)';
-			} else if (actionMetric.actionId.tag == 2) {
-				actionMetric.name = name + ' (2 Tick)';
-			} else if (actionMetric.actionId.tag == 3) {
-				actionMetric.name = name + ' (3 Tick)';
+			} else if (name == "Mind Flay") { // for now we can just check the name and use special tagging rules.
+				if (actionMetric.actionId.tag == 1) {
+					actionMetric.name = name + ' (1 Tick)';
+				} else if (actionMetric.actionId.tag == 2) {
+					actionMetric.name = name + ' (2 Tick)';
+				} else if (actionMetric.actionId.tag == 3) {
+					actionMetric.name = name + ' (3 Tick)';
+				}
 			} else {
-				actionMetric.name = name + ' (??)';
-			}
+				if (actionMetric.actionId.tag == 1) {
+					actionMetric.name = name + ' (LO)';
+				} else {
+					actionMetric.name = name + ' (??)';
+				}
+			} 
 		})
 		.then(() => getIconUrl(actionMetric.actionId.id))
 		.then(iconUrl => actionMetric.iconUrl = iconUrl)

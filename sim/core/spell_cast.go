@@ -163,6 +163,7 @@ func (spellEffect *SpellEffect) applyDot(sim *Simulation, spellCast *SpellCast, 
 	}
 
 	pa.OnAction = func(sim *Simulation) {
+		// fmt.Printf("DOT (%s) Ticking, Time Remaining: %0.2f\n", spellCast.Name, ddInput.TimeRemaining(sim).Seconds())
 		damage := ddInput.damagePerTick
 		spellCast.Character.OnPeriodicDamage(sim, spellCast, spellEffect, &damage)
 		spellEffect.Target.OnPeriodicDamage(sim, spellCast, spellEffect, &damage)
@@ -237,19 +238,20 @@ func calculateResists(sim *Simulation, damage float64, spellEffect *SpellEffect)
 	// Using these stats:
 	//    13.6% chance of
 	//  FUTURE: handle boss resists for fights/classes that are actually impacted by that.
-
 	resVal := sim.RandomFloat("DirectSpell Resist")
-	if resVal < 0.18 { // 13% chance for 25% resist, 4% for 50%, 1% for 75%
-		if resVal < 0.01 {
-			spellEffect.PartialResist_3_4 = true
-			return damage * 0.25
-		} else if resVal < 0.05 {
-			spellEffect.PartialResist_2_4 = true
-			return damage * 0.5
-		} else {
-			spellEffect.PartialResist_1_4 = true
-			return damage * 0.75
-		}
+	if resVal > 0.18 { // 13% chance for 25% resist, 4% for 50%, 1% for 75%
+		return damage // means didn't resist
+	}
+
+	if resVal < 0.01 {
+		spellEffect.PartialResist_3_4 = true
+		damage *= 0.25
+	} else if resVal < 0.05 {
+		spellEffect.PartialResist_2_4 = true
+		damage *= 0.5
+	} else {
+		spellEffect.PartialResist_1_4 = true
+		damage *= 0.75
 	}
 
 	return damage

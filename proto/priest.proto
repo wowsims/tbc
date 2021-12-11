@@ -45,13 +45,15 @@ message ShadowPriest {
     message Rotation {
       enum RotationType {
           Unknown = 0;
-          Basic = 1;
-		  ClipAlways = 2;
-		  IntelligentClipping = 3;
+          Lazy = 1;
+		  Sweaty = 2;
+		  Perfect = 3;
       }
 	  
       RotationType rotation_type = 1;
 	  bool use_dev_plague = 3; // only undead
+	  bool precast_vt = 4; // casts VT ahead of the start of the fight so that it lands on 0
+	  double latency = 5; // Latency between actions
     }
     Rotation rotation = 1;
 

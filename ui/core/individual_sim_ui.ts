@@ -143,8 +143,12 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 				
         const linkUrl = new URL(window.location.href);
         linkUrl.hash = encoded;
-				navigator.clipboard.writeText(linkUrl.toString());
-				alert('Current settings copied to clipboard!');
+        if (navigator.clipboard == undefined) {
+          alert(linkUrl.toString());
+        } else {
+          navigator.clipboard.writeText(linkUrl.toString());
+          alert('Current settings copied to clipboard!');
+        }
 			});
 		});
   }
