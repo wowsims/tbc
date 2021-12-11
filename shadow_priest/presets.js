@@ -16,7 +16,7 @@ export const StandardTalents = {
     data: '500230013--503250510240103051451',
 };
 export const DefaultRotation = Rotation.create({
-    rotationType: ShadowPriest_Rotation_RotationType.Sweaty,
+    rotationType: ShadowPriest_Rotation_RotationType.Basic,
 });
 export const DefaultOptions = Options.create({
     useShadowfiend: true,

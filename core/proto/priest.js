@@ -13,17 +13,17 @@ export var ShadowPriest_Rotation_RotationType;
      */
     ShadowPriest_Rotation_RotationType[ShadowPriest_Rotation_RotationType["Unknown"] = 0] = "Unknown";
     /**
-     * @generated from protobuf enum value: Lazy = 1;
+     * @generated from protobuf enum value: Basic = 1;
      */
-    ShadowPriest_Rotation_RotationType[ShadowPriest_Rotation_RotationType["Lazy"] = 1] = "Lazy";
+    ShadowPriest_Rotation_RotationType[ShadowPriest_Rotation_RotationType["Basic"] = 1] = "Basic";
     /**
-     * @generated from protobuf enum value: Sweaty = 2;
+     * @generated from protobuf enum value: Clipping = 2;
      */
-    ShadowPriest_Rotation_RotationType[ShadowPriest_Rotation_RotationType["Sweaty"] = 2] = "Sweaty";
+    ShadowPriest_Rotation_RotationType[ShadowPriest_Rotation_RotationType["Clipping"] = 2] = "Clipping";
     /**
-     * @generated from protobuf enum value: Perfect = 3;
+     * @generated from protobuf enum value: Ideal = 3;
      */
-    ShadowPriest_Rotation_RotationType[ShadowPriest_Rotation_RotationType["Perfect"] = 3] = "Perfect";
+    ShadowPriest_Rotation_RotationType[ShadowPriest_Rotation_RotationType["Ideal"] = 3] = "Ideal";
 })(ShadowPriest_Rotation_RotationType || (ShadowPriest_Rotation_RotationType = {}));
 // @generated message type with reflection information, may provide speed optimized methods
 class PriestTalents$Type extends MessageType {

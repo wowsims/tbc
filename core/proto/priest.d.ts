@@ -182,17 +182,17 @@ export declare enum ShadowPriest_Rotation_RotationType {
      */
     Unknown = 0,
     /**
-     * @generated from protobuf enum value: Lazy = 1;
+     * @generated from protobuf enum value: Basic = 1;
      */
-    Lazy = 1,
+    Basic = 1,
     /**
-     * @generated from protobuf enum value: Sweaty = 2;
+     * @generated from protobuf enum value: Clipping = 2;
      */
-    Sweaty = 2,
+    Clipping = 2,
     /**
-     * @generated from protobuf enum value: Perfect = 3;
+     * @generated from protobuf enum value: Ideal = 3;
      */
-    Perfect = 3
+    Ideal = 3
 }
 /**
  * @generated from protobuf message proto.ShadowPriest.Options
