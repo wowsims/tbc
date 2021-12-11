@@ -36,7 +36,7 @@ func (priest *Priest) newStarshardsTemplate(sim *core.Simulation) core.SimpleSpe
 			NumberOfTicks:        5,
 			TickLength:           time.Second * 3,
 			TickBaseDamage:       785 / 5,
-			TickSpellCoefficient: 0.176,
+			TickSpellCoefficient: 0.167,
 		},
 	}
 
