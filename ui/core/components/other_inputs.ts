@@ -8,6 +8,9 @@ import { IndividualSimUI } from '/tbc/core/individual_sim_ui.js';
 
 export function makePhaseSelector(parent: HTMLElement, sim: Sim): EnumPicker<Sim> {
 	return new EnumPicker<Sim>(parent, sim, {
+		extraCssClasses: [
+			'phase-selector',
+		],
 		values: [
 			{ name: 'Phase 1', value: 1 },
 			{ name: 'Phase 2', value: 2 },
@@ -25,9 +28,11 @@ export function makePhaseSelector(parent: HTMLElement, sim: Sim): EnumPicker<Sim
 
 export const StartingPotion = {
 	type: 'enum' as const,
-	cssClass: 'starting-potion-picker',
 	getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
 	config: {
+		extraCssClasses: [
+			'starting-potion-picker',
+		],
 		label: 'Starting Potion',
 		labelTooltip: 'If set, this potion will be used instead of the default potion for the first few uses.',
 		values: [
@@ -47,9 +52,11 @@ export const StartingPotion = {
 
 export const NumStartingPotions = {
 	type: 'number' as const,
-	cssClass: 'num-starting-potions-picker',
 	getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
 	config: {
+		extraCssClasses: [
+			'num-starting-potions-picker',
+		],
 		label: '# to use',
 		labelTooltip: 'The number of starting potions to use before going back to the default potion.',
 		changedEvent: (player: Player<any>) => player.consumesChangeEmitter,
@@ -68,6 +75,10 @@ export const ShadowPriestDPS = {
   cssClass: 'shadow-priest-dps-picker',
 	getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
   config: {
+		extraCssClasses: [
+			'shadow-priest-dps-picker',
+			'within-raid-sim-hide',
+		],
     label: 'Shadow Priest DPS',
     changedEvent: (player: Player<any>) => player.buffsChangeEmitter,
     getValue: (player: Player<any>) => player.getBuffs().shadowPriestDps,
@@ -80,17 +91,20 @@ export const ShadowPriestDPS = {
 };
 
 export const ISBUptime = {
-    type: 'number' as const,
-    cssClass: 'isb-uptime-picker',
-    getModObject: (simUI: IndividualSimUI<any>) => simUI.sim.encounter.primaryTarget,
-    config: {
-      label: 'ISB Uptime %',
-      changedEvent: (target: Target) => target.debuffsChangeEmitter,
-      getValue: (target: Target) => Math.round(target.getDebuffs().isbUptime*100),
-      setValue: (target: Target, newValue: number) => {
-        const newDebuffs = target.getDebuffs();
-        newDebuffs.isbUptime = newValue/100;
-        target.setDebuffs(newDebuffs);
-      },
-    },
-  };
+	type: 'number' as const,
+	getModObject: (simUI: IndividualSimUI<any>) => simUI.sim.encounter.primaryTarget,
+	config: {
+		extraCssClasses: [
+			'isb-uptime-picker',
+			'within-raid-sim-hide',
+		],
+		label: 'ISB Uptime %',
+		changedEvent: (target: Target) => target.debuffsChangeEmitter,
+		getValue: (target: Target) => Math.round(target.getDebuffs().isbUptime*100),
+		setValue: (target: Target, newValue: number) => {
+			const newDebuffs = target.getDebuffs();
+			newDebuffs.isbUptime = newValue/100;
+			target.setDebuffs(newDebuffs);
+		},
+	},
+};

@@ -1,4 +1,4 @@
-import { IconInput } from '/tbc/core/components/icon_picker.js';
+import { IconPickerConfig } from '/tbc/core/components/icon_picker.js';
 import { ElementalShaman_Rotation_RotationType as RotationType } from '/tbc/core/proto/shaman.js';
 import { ElementalShaman_Options as ShamanOptions } from '/tbc/core/proto/shaman.js';
 import { Spec } from '/tbc/core/proto/common.js';
@@ -75,13 +75,13 @@ export const ElementalShamanRotationConfig = {
 	],
 };
 
-function makeBooleanShamanBuffInput(id: ItemOrSpellId, optionsFieldName: keyof ShamanOptions): IconInput<Player<any>> {
+function makeBooleanShamanBuffInput(id: ItemOrSpellId, optionsFieldName: keyof ShamanOptions): IconPickerConfig<Player<any>, boolean> {
   return {
     id: id,
     states: 2,
 		changedEvent: (player: Player<Spec.SpecElementalShaman>) => player.specOptionsChangeEmitter,
-		getValue: (player: Player<Spec.SpecElementalShaman>) => player.getSpecOptions()[optionsFieldName],
-		setBooleanValue: (player: Player<Spec.SpecElementalShaman>, newValue: boolean) => {
+		getValue: (player: Player<Spec.SpecElementalShaman>) => player.getSpecOptions()[optionsFieldName] as boolean,
+		setValue: (player: Player<Spec.SpecElementalShaman>, newValue: boolean) => {
 			const newOptions = player.getSpecOptions();
       (newOptions[optionsFieldName] as boolean) = newValue;
 			player.setSpecOptions(newOptions);

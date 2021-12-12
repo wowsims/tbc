@@ -74,6 +74,7 @@ export class Player<SpecType extends Spec> {
 	private currentStats: ComputeStatsResult;
 
   readonly nameChangeEmitter = new TypedEvent<void>();
+  readonly partyChangeEmitter = new TypedEvent<void>();
   readonly buffsChangeEmitter = new TypedEvent<void>();
   readonly consumesChangeEmitter = new TypedEvent<void>();
   readonly bonusStatsChangeEmitter = new TypedEvent<void>();
@@ -104,6 +105,7 @@ export class Player<SpecType extends Spec> {
 
     [
       this.nameChangeEmitter,
+      this.partyChangeEmitter,
       this.buffsChangeEmitter,
       this.consumesChangeEmitter,
       this.bonusStatsChangeEmitter,
@@ -167,6 +169,15 @@ export class Player<SpecType extends Spec> {
 			this.party = newParty;
 			this.raid = newParty.raid;
 		}
+		this.partyChangeEmitter.emit();
+	}
+
+	getOtherPartyMembers(): Array<Player<any>> {
+		if (this.party == null) {
+			return [];
+		}
+
+		return this.party.getPlayers().filter(player => player != null && player != this) as Array<Player<any>>;
 	}
 
 	// Returns all items that this player can wear in the given slot.

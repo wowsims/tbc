@@ -116,6 +116,12 @@ export class Sim {
   }
 
   async runRaidSim(): Promise<RaidSimResult> {
+		if (this.raid.isEmpty()) {
+			throw new Error('Raid is empty! Try adding some players first.');
+		} else if (this.encounter.getNumTargets() < 1) {
+			throw new Error('Encounter has no targets! Try adding some targets first.');
+		}
+
 		const request = this.makeRaidSimRequest(false);
 		const result = await this.workerPool.raidSim(request);
 		this.raidSimEmitter.emit({ request: request, result: result });
@@ -123,6 +129,12 @@ export class Sim {
 	}
 
   async runRaidSimWithLogs(): Promise<RaidSimResult> {
+		if (this.raid.isEmpty()) {
+			throw new Error('Raid is empty! Try adding some players first.');
+		} else if (this.encounter.getNumTargets() < 1) {
+			throw new Error('Encounter has no targets! Try adding some targets first.');
+		}
+
 		const request = this.makeRaidSimRequest(true);
 		const result = await this.workerPool.raidSim(request);
 		this.raidSimEmitter.emit({ request: request, result: result });
@@ -131,7 +143,7 @@ export class Sim {
 
 	async getCharacterStats(player: Player<any>): Promise<ComputeStatsResult> {
 		if (player.getParty() == null) {
-			console.warn('Trying to get character stats without a party!');
+			//console.warn('Trying to get character stats without a party!');
 			return ComputeStatsResult.create();
 		} else {
 			return await this.workerPool.computeStats(ComputeStatsRequest.create({
@@ -143,6 +155,12 @@ export class Sim {
 	}
 
   async statWeights(player: Player<any>, epStats: Array<Stat>, epReferenceStat: Stat): Promise<StatWeightsResult> {
+		if (this.raid.isEmpty()) {
+			throw new Error('Raid is empty! Try adding some players first.');
+		} else if (this.encounter.getNumTargets() < 1) {
+			throw new Error('Encounter has no targets! Try adding some targets first.');
+		}
+
 		if (player.getParty() == null) {
 			console.warn('Trying to get stat weights without a party!');
 			return StatWeightsResult.create();

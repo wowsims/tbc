@@ -12,8 +12,7 @@ import { EnumPicker, EnumPickerConfig } from '/tbc/core/components/enum_picker.j
 import { EquipmentSpec } from '/tbc/core/proto/common.js';
 import { Gear } from '/tbc/core/proto_utils/gear.js';
 import { GearPicker } from '/tbc/core/components/gear_picker.js';
-import { IconInput } from '/tbc/core/components/icon_picker.js';
-import { IconPicker } from '/tbc/core/components/icon_picker.js';
+import { IconPicker, IconPickerConfig } from '/tbc/core/components/icon_picker.js';
 import { IndividualBuffs } from '/tbc/core/proto/common.js';
 import { LogRunner } from '/tbc/core/components/log_runner.js';
 import { NumberPicker, NumberPickerConfig } from '/tbc/core/components/number_picker.js';
@@ -51,10 +50,30 @@ declare var tippy: any;
 declare var pako: any;
 
 const SAVED_GEAR_STORAGE_KEY = '__savedGear__';
-const SAVED_ENCOUNTER_STORAGE_KEY = '__savedEncounter__';
 const SAVED_ROTATION_STORAGE_KEY = '__savedRotation__';
 const SAVED_SETTINGS_STORAGE_KEY = '__savedSettings__';
 const SAVED_TALENTS_STORAGE_KEY = '__savedTalents__';
+
+export interface IndividualSimIconPickerConfig<ModObject, ValueType> extends IconPickerConfig<ModObject, ValueType> {
+  // If set, all effects with matching tags will be deactivated when this
+  // effect is enabled.
+  exclusivityTags?: Array<ExclusivityTag>;
+};
+
+class IndividualSimIconPicker<ModObject, ValueType> extends IconPicker<ModObject, ValueType> {
+  constructor(parent: HTMLElement, modObj: ModObject, input: IndividualSimIconPickerConfig<ModObject, ValueType>, simUI: IndividualSimUI<any>) {
+		super(parent, modObj, input);
+
+    if (input.exclusivityTags) {
+      simUI.registerExclusiveEffect({
+        tags: input.exclusivityTags,
+        changedEvent: this.changeEmitter,
+        isActive: () => Boolean(this.getInputValue()),
+        deactivate: () => this.setInputValue(0 as unknown as ValueType),
+      });
+    }
+	}
+}
 
 export type ReleaseStatus = 'Alpha' | 'Beta' | 'Live';
 
@@ -62,19 +81,16 @@ export interface InputSection {
 	tooltip?: string,
 	inputs: Array<{
 		type: 'boolean',
-		cssClass: string,
 		getModObject: (simUI: IndividualSimUI<any>) => any,
 		config: BooleanPickerConfig<any>,
 	} |
 	{
 		type: 'number',
-		cssClass: string,
 		getModObject: (simUI: IndividualSimUI<any>) => any,
 		config: NumberPickerConfig<any>,
 	} |
 	{
 		type: 'enum',
-		cssClass: string,
 		getModObject: (simUI: IndividualSimUI<any>) => any,
 		config: EnumPickerConfig<any>,
 	}>,
@@ -106,12 +122,12 @@ export interface IndividualSimUIConfig<SpecType extends Spec> {
     debuffs: Debuffs,
   },
 
-	selfBuffInputs: Array<IconInput<Player<any>>>,
-	raidBuffInputs: Array<IconInput<Raid>>,
-	partyBuffInputs: Array<IconInput<Party>>,
-	playerBuffInputs: Array<IconInput<Player<any>>>,
-	debuffInputs: Array<IconInput<Target>>;
-	consumeInputs: Array<IconInput<Player<any>>>;
+	selfBuffInputs: Array<IndividualSimIconPickerConfig<Player<any>, any>>,
+	raidBuffInputs: Array<IndividualSimIconPickerConfig<Raid, any>>,
+	partyBuffInputs: Array<IndividualSimIconPickerConfig<Party, any>>,
+	playerBuffInputs: Array<IndividualSimIconPickerConfig<Player<any>, any>>,
+	debuffInputs: Array<IndividualSimIconPickerConfig<Target, any>>;
+	consumeInputs: Array<IndividualSimIconPickerConfig<Player<any>, any>>;
 	rotationInputs: InputSection;
 	otherInputs?: InputSection;
   additionalSections?: Record<string, InputSection>;
@@ -194,8 +210,11 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 		this.addGearTab();
 		this.addSettingsTab();
 		this.addTalentsTab();
-		this.addDetailedResultsTab();
-		this.addLogTab();
+
+		if (!this.isWithinRaidSim) {
+			this.addDetailedResultsTab();
+			this.addLogTab();
+		}
   }
 
 	private loadSettings() {
@@ -350,7 +369,7 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 		this.addTab('Settings', 'settings-tab', `
 			<div class="settings-inputs">
 				<div class="settings-section-container">
-					<section class="settings-section encounter-section">
+					<section class="settings-section encounter-section within-raid-sim-hide">
 						<label>Encounter</label>
 					</section>
 					<section class="settings-section race-section">
@@ -365,7 +384,7 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 						<label>Self Buffs</label>
 					</section>
 				</div>
-				<div class="settings-section-container">
+				<div class="settings-section-container within-raid-sim-hide">
 					<section class="settings-section buffs-section">
 						<label>Other Buffs</label>
 					</section>
@@ -375,7 +394,7 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 						<label>Consumes</label>
 					</section>
 				</div>
-				<div class="settings-section-container">
+				<div class="settings-section-container within-raid-sim-hide">
 					<section class="settings-section debuffs-section">
 						<label>Debuffs</label>
 					</section>
@@ -387,18 +406,18 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 				</div>
 			</div>
 			<div class="settings-bottom-bar">
-				<div class="saved-encounter-manager">
+				<div class="saved-encounter-manager within-raid-sim-hide">
 				</div>
 				<div class="saved-rotation-manager">
 				</div>
-				<div class="saved-settings-manager">
+				<div class="saved-settings-manager within-raid-sim-hide">
 				</div>
 			</div>
 		`);
 
     const settingsTab = this.rootElem.getElementsByClassName('settings-inputs')[0] as HTMLElement;
 
-		const configureIconSection = (sectionElem: HTMLElement, iconPickers: Array<IconPicker<any>>, tooltip?: string) => {
+		const configureIconSection = (sectionElem: HTMLElement, iconPickers: Array<IconPicker<any, any>>, tooltip?: string) => {
 			if (tooltip) {
 				tippy(sectionElem, {
 					'content': tooltip,
@@ -414,28 +433,28 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 		const selfBuffsSection = this.rootElem.getElementsByClassName('self-buffs-section')[0] as HTMLElement;
     configureIconSection(
 				selfBuffsSection,
-				this.individualConfig.selfBuffInputs.map(iconInput => new IconPicker(selfBuffsSection, this.player, iconInput, this)),
+				this.individualConfig.selfBuffInputs.map(iconInput => new IndividualSimIconPicker(selfBuffsSection, this.player, iconInput, this)),
 				Tooltips.SELF_BUFFS_SECTION);
 
 		const buffsSection = this.rootElem.getElementsByClassName('buffs-section')[0] as HTMLElement;
     configureIconSection(
 				buffsSection,
 				[
-					this.individualConfig.raidBuffInputs.map(iconInput => new IconPicker(buffsSection, this.sim.raid, iconInput, this)),
-					this.individualConfig.playerBuffInputs.map(iconInput => new IconPicker(buffsSection, this.player, iconInput, this)),
-					this.individualConfig.partyBuffInputs.map(iconInput => new IconPicker(buffsSection, this.player.getParty()!, iconInput, this)),
+					this.individualConfig.raidBuffInputs.map(iconInput => new IndividualSimIconPicker(buffsSection, this.sim.raid, iconInput, this)),
+					this.individualConfig.playerBuffInputs.map(iconInput => new IndividualSimIconPicker(buffsSection, this.player, iconInput, this)),
+					this.individualConfig.partyBuffInputs.map(iconInput => new IndividualSimIconPicker(buffsSection, this.player.getParty()!, iconInput, this)),
 				].flat(),
 				Tooltips.OTHER_BUFFS_SECTION);
 
 		const debuffsSection = this.rootElem.getElementsByClassName('debuffs-section')[0] as HTMLElement;
     configureIconSection(
 				debuffsSection,
-				this.individualConfig.debuffInputs.map(iconInput => new IconPicker(debuffsSection, this.sim.encounter.primaryTarget, iconInput, this)));
+				this.individualConfig.debuffInputs.map(iconInput => new IndividualSimIconPicker(debuffsSection, this.sim.encounter.primaryTarget, iconInput, this)));
 
 		const consumesSection = this.rootElem.getElementsByClassName('consumes-section')[0] as HTMLElement;
     configureIconSection(
 				consumesSection,
-				this.individualConfig.consumeInputs.map(iconInput => new IconPicker(consumesSection, this.player, iconInput, this)));
+				this.individualConfig.consumeInputs.map(iconInput => new IndividualSimIconPicker(consumesSection, this.player, iconInput, this)));
 
 		const configureInputSection = (sectionElem: HTMLElement, sectionConfig: InputSection) => {
 			if (sectionConfig.tooltip) {
@@ -639,6 +658,9 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 		this.player.setRotation(this.individualConfig.defaults.rotation);
 		this.player.setTalentsString(this.individualConfig.defaults.talents);
 		this.player.setSpecOptions(this.individualConfig.defaults.specOptions);
+		this.player.setBuffs(this.individualConfig.defaults.individualBuffs);
+		this.player.getParty()!.setBuffs(this.individualConfig.defaults.partyBuffs);
+		this.player.getRaid()!.setBuffs(this.individualConfig.defaults.raidBuffs);
 		this.sim.encounter.primaryTarget.setDebuffs(this.individualConfig.defaults.debuffs);
 	}
 
@@ -662,10 +684,6 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 
 	getSavedGearStorageKey(): string {
 		return this.getStorageKey(SAVED_GEAR_STORAGE_KEY);
-	}
-
-	getSavedEncounterStorageKey(): string {
-		return this.getStorageKey(SAVED_ENCOUNTER_STORAGE_KEY);
 	}
 
 	getSavedRotationStorageKey(): string {

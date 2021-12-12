@@ -6,7 +6,12 @@ declare var tippy: any;
 export function addRaidSimAction(simUI: SimUI) {
 	simUI.addAction('DPS', 'dps-action', async () => {
 		simUI.setResultsPending();
-		const result = await simUI.sim.runRaidSim();
+		try {
+			const result = await simUI.sim.runRaidSim();
+		} catch (e) {
+			simUI.hideAllResults();
+			alert(e);
+		}
 	});
 
 	const resultsManager = new RaidSimResultsManager(simUI);

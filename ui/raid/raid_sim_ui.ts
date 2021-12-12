@@ -2,10 +2,13 @@ import { Encounter } from '/tbc/core/encounter.js';
 import { Raid } from '/tbc/core/raid.js';
 import { Sim } from '/tbc/core/sim.js';
 import { SimUI } from '/tbc/core/sim_ui.js';
+import { Encounter as EncounterProto } from '/tbc/core/proto/common.js';
 import { DetailedResults } from '/tbc/core/components/detailed_results.js';
+import { EncounterPicker, EncounterPickerConfig } from '/tbc/core/components/encounter_picker.js';
 import { LogRunner } from '/tbc/core/components/log_runner.js';
 import { SavedDataConfig } from '/tbc/core/components/saved_data_manager.js';
 import { SavedDataManager } from '/tbc/core/components/saved_data_manager.js';
+import { addRaidSimAction } from '/tbc/core/components/raid_sim_action.js';
 
 import { RaidPicker, PresetSpecSettings } from './raid_picker.js';
 
@@ -31,11 +34,13 @@ export class RaidSimUI extends SimUI{
 		this.addSidebarComponents();
 		this.addTopbarComponents();
 		this.addRaidTab();
+		this.addSettingsTab();
+		this.addDetailedResultsTab();
+		this.addLogTab();
   }
 
 	private addSidebarComponents() {
-		//addRaidSimAction(this);
-		//addStatWeightsAction(this, this.individualConfig.epStats, this.individualConfig.epReferenceStat);
+		addRaidSimAction(this);
 	}
 
 	private addTopbarComponents() {
@@ -73,6 +78,60 @@ export class RaidSimUI extends SimUI{
 		`);
 
 		const raidPicker = new RaidPicker(this.rootElem.getElementsByClassName('raid-picker')[0] as HTMLElement, this.sim.raid, this.config.presets);
+	}
+
+	private addSettingsTab() {
+		this.addTab('Settings', 'raid-settings-tab', `
+			<div class="raid-settings-sections">
+				<div class="settings-section-container">
+					<section class="settings-section encounter-section">
+						<label>Encounter</label>
+					</section>
+				</div>
+			</div>
+			<div class="settings-bottom-bar">
+				<div class="saved-encounter-manager within-raid-sim-hide">
+				</div>
+			</div>
+		`);
+
+    const encounterSectionElem = this.rootElem.getElementsByClassName('encounter-section')[0] as HTMLElement;
+		new EncounterPicker(encounterSectionElem, this.sim.encounter, {
+			showTargetArmor: true,
+			showNumTargets: true,
+		});
+    const savedEncounterManager = new SavedDataManager<Encounter, EncounterProto>(this.rootElem.getElementsByClassName('saved-encounter-manager')[0] as HTMLElement, this.sim.encounter, {
+      label: 'Encounter',
+			storageKey: this.getSavedEncounterStorageKey(),
+      getData: (encounter: Encounter) => encounter.toProto(),
+      setData: (encounter: Encounter, newEncounter: EncounterProto) => encounter.fromProto(newEncounter),
+      changeEmitters: [this.sim.encounter.changeEmitter],
+      equals: (a: EncounterProto, b: EncounterProto) => EncounterProto.equals(a, b),
+      toJson: (a: EncounterProto) => EncounterProto.toJson(a),
+      fromJson: (obj: any) => EncounterProto.fromJson(obj),
+    });
+
+		this.sim.waitForInit().then(() => {
+			savedEncounterManager.loadUserData();
+		});
+	}
+
+	private addDetailedResultsTab() {
+		this.addTab('Detailed Results', 'detailed-results-tab', `
+			<div class="detailed-results">
+			</div>
+		`);
+
+    const detailedResults = new DetailedResults(this.rootElem.getElementsByClassName('detailed-results')[0] as HTMLElement, this);
+	}
+
+	private addLogTab() {
+		this.addTab('Log', 'log-tab', `
+			<div class="log-runner">
+			</div>
+		`);
+
+    const logRunner = new LogRunner(this.rootElem.getElementsByClassName('log-runner')[0] as HTMLElement, this);
 	}
 
 	// Returns the actual key to use for local storage, based on the given key part and the site context.
