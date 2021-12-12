@@ -6,6 +6,9 @@ export class Input extends Component {
         this.inputConfig = config;
         this.modObject = modObject;
         this.rootElem.classList.add(cssClass);
+        if (config.cssClass) {
+            this.rootElem.classList.add(config.cssClass);
+        }
         if (config.label) {
             const labelDiv = document.createElement('div');
             labelDiv.classList.add('input-label-div');

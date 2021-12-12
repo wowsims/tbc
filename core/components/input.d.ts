@@ -6,6 +6,7 @@ import { Component } from './component.js';
 export interface InputConfig<ModObject, T> {
     label?: string;
     labelTooltip?: string;
+    cssClass?: string;
     defaultValue?: T;
     changedEvent: (obj: ModObject) => TypedEvent<any>;
     getValue: (obj: ModObject) => T;

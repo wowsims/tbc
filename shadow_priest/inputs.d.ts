@@ -1,12 +1,12 @@
 import { ShadowPriest_Rotation_RotationType as RotationType } from '/tbc/core/proto/priest.js';
 import { Spec } from '/tbc/core/proto/common.js';
 import { Player } from '/tbc/core/player.js';
-import { SimUI } from '/tbc/core/sim_ui.js';
+import { IndividualSimUI } from '/tbc/core/individual_sim_ui.js';
 export declare const ShadowPriestRotationConfig: {
     inputs: ({
         type: "enum";
         cssClass: string;
-        getModObject: (simUI: SimUI<any>) => Player<any>;
+        getModObject: (simUI: IndividualSimUI<any>) => Player<any>;
         config: {
             label: string;
             labelTooltip: string;
@@ -22,7 +22,7 @@ export declare const ShadowPriestRotationConfig: {
     } | {
         type: "boolean";
         cssClass: string;
-        getModObject: (simUI: SimUI<any>) => Player<any>;
+        getModObject: (simUI: IndividualSimUI<any>) => Player<any>;
         config: {
             label: string;
             labelTooltip: string;
@@ -35,7 +35,7 @@ export declare const ShadowPriestRotationConfig: {
     } | {
         type: "boolean";
         cssClass: string;
-        getModObject: (simUI: SimUI<any>) => Player<any>;
+        getModObject: (simUI: IndividualSimUI<any>) => Player<any>;
         config: {
             label: string;
             labelTooltip: string;
@@ -48,7 +48,7 @@ export declare const ShadowPriestRotationConfig: {
     } | {
         type: "number";
         cssClass: string;
-        getModObject: (simUI: SimUI<any>) => Player<any>;
+        getModObject: (simUI: IndividualSimUI<any>) => Player<any>;
         config: {
             label: string;
             labelTooltip: string;

@@ -1,7 +1,7 @@
 import { repoName } from '/tbc/core/resources.js';
 import { Component } from './component.js';
 export class DetailedResults extends Component {
-    constructor(parent) {
+    constructor(parent, simUI) {
         super(parent, 'detailed-results-manager-root');
         this.tabWindow = null;
         this.latestResult = null;
@@ -30,14 +30,18 @@ export class DetailedResults extends Component {
                 this.tabWindow.focus();
             }
         });
+        simUI.sim.raidSimEmitter.on(data => {
+            this.setSimResult(data.request, data.result);
+        });
     }
-    setPending() {
-        this.latestResult = null;
-        this.iframeElem.contentWindow.postMessage(null, '*');
-        if (this.tabWindow) {
-            this.tabWindow.postMessage(null, '*');
-        }
-    }
+    // TODO: Decide whether to continue using this or just remove it.
+    //setPending() {
+    //	this.latestResult = null;
+    //	this.iframeElem.contentWindow!.postMessage(null, '*');
+    //	if (this.tabWindow) {
+    //		this.tabWindow.postMessage(null, '*');
+    //	}
+    //}
     setSimResult(request, result) {
         const data = {
             request: request,

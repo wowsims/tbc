@@ -1,7 +1,7 @@
 import { ItemOrSpellId } from '/tbc/core/resources.js';
 import { TypedEvent } from '/tbc/core/typed_event.js';
-import { ExclusivityTag } from '/tbc/core/sim_ui.js';
-import { SimUI } from '/tbc/core/sim_ui.js';
+import { ExclusivityTag } from '/tbc/core/individual_sim_ui.js';
+import { IndividualSimUI } from '/tbc/core/individual_sim_ui.js';
 import { Component } from './component.js';
 export declare class IconPicker<ModObject> extends Component {
     private readonly _input;
@@ -10,7 +10,7 @@ export declare class IconPicker<ModObject> extends Component {
     private readonly _improvedAnchor;
     private readonly _counterElem;
     private readonly _clickedEmitter;
-    constructor(parent: HTMLElement, modObj: ModObject, input: IconInput<ModObject>, simUI: SimUI<any>);
+    constructor(parent: HTMLElement, modObj: ModObject, input: IconInput<ModObject>, simUI: IndividualSimUI<any>);
     private getValue;
     private setValue;
     private updateIcon;

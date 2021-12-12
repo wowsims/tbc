@@ -1,0 +1,126 @@
+import { BooleanPickerConfig } from '/tbc/core/components/boolean_picker.js';
+import { Consumes } from '/tbc/core/proto/common.js';
+import { Debuffs } from '/tbc/core/proto/common.js';
+import { EncounterPickerConfig } from '/tbc/core/components/encounter_picker.js';
+import { EnumPickerConfig } from '/tbc/core/components/enum_picker.js';
+import { EquipmentSpec } from '/tbc/core/proto/common.js';
+import { Gear } from '/tbc/core/proto_utils/gear.js';
+import { IconInput } from '/tbc/core/components/icon_picker.js';
+import { IndividualBuffs } from '/tbc/core/proto/common.js';
+import { NumberPickerConfig } from '/tbc/core/components/number_picker.js';
+import { Party } from './party.js';
+import { PartyBuffs } from '/tbc/core/proto/common.js';
+import { Player } from './player.js';
+import { Race } from '/tbc/core/proto/common.js';
+import { Raid } from './raid.js';
+import { RaidBuffs } from '/tbc/core/proto/common.js';
+import { SavedDataConfig } from '/tbc/core/components/saved_data_manager.js';
+import { SimUI } from './sim_ui.js';
+import { Spec } from '/tbc/core/proto/common.js';
+import { SpecOptions } from '/tbc/core/proto_utils/utils.js';
+import { SpecRotation } from '/tbc/core/proto_utils/utils.js';
+import { Stat } from '/tbc/core/proto/common.js';
+import { Stats } from '/tbc/core/proto_utils/stats.js';
+import { Target } from './target.js';
+import { TypedEvent } from './typed_event.js';
+export declare type ReleaseStatus = 'Alpha' | 'Beta' | 'Live';
+export interface InputSection {
+    tooltip?: string;
+    inputs: Array<{
+        type: 'boolean';
+        cssClass: string;
+        getModObject: (simUI: IndividualSimUI<any>) => any;
+        config: BooleanPickerConfig<any>;
+    } | {
+        type: 'number';
+        cssClass: string;
+        getModObject: (simUI: IndividualSimUI<any>) => any;
+        config: NumberPickerConfig<any>;
+    } | {
+        type: 'enum';
+        cssClass: string;
+        getModObject: (simUI: IndividualSimUI<any>) => any;
+        config: EnumPickerConfig<any>;
+    }>;
+}
+export interface IndividualSimUIConfig<SpecType extends Spec> {
+    cssClass: string;
+    releaseStatus: ReleaseStatus;
+    knownIssues?: Array<string>;
+    epStats: Array<Stat>;
+    epReferenceStat: Stat;
+    displayStats: Array<Stat>;
+    defaults: {
+        gear: EquipmentSpec;
+        epWeights: Stats;
+        consumes: Consumes;
+        rotation: SpecRotation<SpecType>;
+        talents: string;
+        specOptions: SpecOptions<SpecType>;
+        raidBuffs: RaidBuffs;
+        partyBuffs: PartyBuffs;
+        individualBuffs: IndividualBuffs;
+        debuffs: Debuffs;
+    };
+    selfBuffInputs: Array<IconInput<Player<any>>>;
+    raidBuffInputs: Array<IconInput<Raid>>;
+    partyBuffInputs: Array<IconInput<Party>>;
+    playerBuffInputs: Array<IconInput<Player<any>>>;
+    debuffInputs: Array<IconInput<Target>>;
+    consumeInputs: Array<IconInput<Player<any>>>;
+    rotationInputs: InputSection;
+    otherInputs?: InputSection;
+    additionalSections?: Record<string, InputSection>;
+    encounterPicker: EncounterPickerConfig;
+    freezeTalents?: boolean;
+    presets: {
+        gear: Array<PresetGear>;
+        talents: Array<SavedDataConfig<Player<any>, string>>;
+    };
+}
+export interface GearAndStats {
+    gear: Gear;
+    bonusStats?: Stats;
+}
+export interface PresetGear {
+    name: string;
+    gear: EquipmentSpec;
+    tooltip?: string;
+    enableWhen?: (obj: Player<any>) => boolean;
+}
+export interface Settings {
+    raidBuffs: RaidBuffs;
+    partyBuffs: PartyBuffs;
+    individualBuffs: IndividualBuffs;
+    consumes: Consumes;
+    race: Race;
+}
+export declare abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
+    readonly player: Player<SpecType>;
+    readonly individualConfig: IndividualSimUIConfig<SpecType>;
+    private readonly exclusivityMap;
+    constructor(parentElem: HTMLElement, player: Player<SpecType>, config: IndividualSimUIConfig<SpecType>);
+    private loadSettings;
+    private addSidebarComponents;
+    private addTopbarComponents;
+    private addGearTab;
+    private addSettingsTab;
+    private addTalentsTab;
+    private addDetailedResultsTab;
+    private addLogTab;
+    private applyDefaults;
+    registerExclusiveEffect(effect: ExclusiveEffect): void;
+    getSavedGearStorageKey(): string;
+    getSavedEncounterStorageKey(): string;
+    getSavedRotationStorageKey(): string;
+    getSavedSettingsStorageKey(): string;
+    getSavedTalentsStorageKey(): string;
+    getStorageKey(keyPart: string): string;
+}
+export declare type ExclusivityTag = 'Battle Elixir' | 'Drums' | 'Food' | 'Alchohol' | 'Guardian Elixir' | 'Potion' | 'Rune' | 'Weapon Imbue';
+export interface ExclusiveEffect {
+    tags: Array<ExclusivityTag>;
+    changedEvent: TypedEvent<any>;
+    isActive: () => boolean;
+    deactivate: () => void;
+}

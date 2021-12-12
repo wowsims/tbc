@@ -1,7 +1,7 @@
 import { BalanceDruid_Rotation_PrimarySpell as PrimarySpell } from '/tbc/core/proto/druid.js';
 import { Spec } from '/tbc/core/proto/common.js';
 import { Player } from '/tbc/core/player.js';
-import { SimUI } from '/tbc/core/sim_ui.js';
+import { IndividualSimUI } from '/tbc/core/individual_sim_ui.js';
 export declare const SelfInnervate: {
     id: {
         spellId: number;
@@ -15,7 +15,7 @@ export declare const BalanceDruidRotationConfig: {
     inputs: ({
         type: "enum";
         cssClass: string;
-        getModObject: (simUI: SimUI<any>) => Player<any>;
+        getModObject: (simUI: IndividualSimUI<any>) => Player<any>;
         config: {
             label: string;
             labelTooltip: string;
@@ -31,7 +31,7 @@ export declare const BalanceDruidRotationConfig: {
     } | {
         type: "boolean";
         cssClass: string;
-        getModObject: (simUI: SimUI<any>) => Player<any>;
+        getModObject: (simUI: IndividualSimUI<any>) => Player<any>;
         config: {
             label: string;
             labelTooltip: string;
@@ -44,7 +44,7 @@ export declare const BalanceDruidRotationConfig: {
     } | {
         type: "boolean";
         cssClass: string;
-        getModObject: (simUI: SimUI<any>) => Player<any>;
+        getModObject: (simUI: IndividualSimUI<any>) => Player<any>;
         config: {
             label: string;
             labelTooltip: string;

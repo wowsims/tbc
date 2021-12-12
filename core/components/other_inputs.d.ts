@@ -3,12 +3,12 @@ import { Potions } from '/tbc/core/proto/common.js';
 import { Player } from '/tbc/core/player.js';
 import { Sim } from '/tbc/core/sim.js';
 import { Target } from '/tbc/core/target.js';
-import { SimUI } from '/tbc/core/sim_ui.js';
+import { IndividualSimUI } from '/tbc/core/individual_sim_ui.js';
 export declare function makePhaseSelector(parent: HTMLElement, sim: Sim): EnumPicker<Sim>;
 export declare const StartingPotion: {
     type: "enum";
     cssClass: string;
-    getModObject: (simUI: SimUI<any>) => Player<any>;
+    getModObject: (simUI: IndividualSimUI<any>) => Player<any>;
     config: {
         label: string;
         labelTooltip: string;
@@ -24,7 +24,7 @@ export declare const StartingPotion: {
 export declare const NumStartingPotions: {
     type: "number";
     cssClass: string;
-    getModObject: (simUI: SimUI<any>) => Player<any>;
+    getModObject: (simUI: IndividualSimUI<any>) => Player<any>;
     config: {
         label: string;
         labelTooltip: string;
@@ -37,7 +37,7 @@ export declare const NumStartingPotions: {
 export declare const ShadowPriestDPS: {
     type: "number";
     cssClass: string;
-    getModObject: (simUI: SimUI<any>) => Player<any>;
+    getModObject: (simUI: IndividualSimUI<any>) => Player<any>;
     config: {
         label: string;
         changedEvent: (player: Player<any>) => import("../typed_event").TypedEvent<void>;
@@ -48,7 +48,7 @@ export declare const ShadowPriestDPS: {
 export declare const ISBUptime: {
     type: "number";
     cssClass: string;
-    getModObject: (simUI: SimUI<any>) => Target;
+    getModObject: (simUI: IndividualSimUI<any>) => Target;
     config: {
         label: string;
         changedEvent: (target: Target) => import("../typed_event").TypedEvent<void>;
