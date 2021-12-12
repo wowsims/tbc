@@ -7,7 +7,7 @@ import { NO_TARGET } from '/tbc/core/proto_utils/utils.js';
 import { ItemOrSpellId } from '/tbc/core/resources.js';
 import { Player } from '/tbc/core/player.js';
 import { Sim } from '/tbc/core/sim.js';
-import { SimUI } from '/tbc/core/sim_ui.js';
+import { IndividualSimUI } from '/tbc/core/individual_sim_ui.js';
 import { Target } from '/tbc/core/target.js';
 
 // Configuration for spec-specific UI elements on the settings tab.
@@ -31,7 +31,7 @@ export const BalanceDruidRotationConfig = {
 	inputs: [
 		{
 			type: 'enum' as const, cssClass: 'primary-spell-enum-picker',
-			getModObject: (simUI: SimUI<any>) => simUI.player,
+			getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
 			config: {
 				label: 'Primary Spell',
 				labelTooltip: 'If set to \'Adaptive\', will dynamically adjust rotation based on available mana.',
@@ -61,7 +61,7 @@ export const BalanceDruidRotationConfig = {
 		{
 			type: 'boolean' as const,
 			cssClass: 'moonfire-picker',
-			getModObject: (simUI: SimUI<any>) => simUI.player,
+			getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
 			config: {
 				label: 'Use Moonfire',
 				labelTooltip: 'Use Moonfire as the next cast after the dot expires.',
@@ -78,7 +78,7 @@ export const BalanceDruidRotationConfig = {
 		{
 			type: 'boolean' as const,
 			cssClass: 'faerie-fire-picker',
-			getModObject: (simUI: SimUI<any>) => simUI.player,
+			getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
 			config: {
 				label: 'Use Faerie Fire',
 				labelTooltip: 'Keep Faerie Fire active on the primary target.',
@@ -94,7 +94,7 @@ export const BalanceDruidRotationConfig = {
 		{
 			type: 'boolean' as const,
 			cssClass: 'insect-swarm-picker',
-			getModObject: (simUI: SimUI<any>) => simUI.player,
+			getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
 			config: {
 				label: 'Use Insect Swarm',
 				labelTooltip: 'Keep Insect Swarm active on the primary target.',
@@ -111,7 +111,7 @@ export const BalanceDruidRotationConfig = {
     {
       type: 'boolean' as const,
       cssClass: 'battle-res-picker',
-      getModObject: (simUI: SimUI<any>) => simUI.player,
+      getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
       config: {
         label: 'Use Battle Res',
         labelTooltip: 'Cast Battle Res on an ally sometime during the encounter.',

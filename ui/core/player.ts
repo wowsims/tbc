@@ -14,9 +14,9 @@ import { Item } from '/tbc/core/proto/common.js';
 import { Race } from '/tbc/core/proto/common.js';
 import { Spec } from '/tbc/core/proto/common.js';
 import { Stat } from '/tbc/core/proto/common.js';
+import { ComputeStatsResult } from '/tbc/core/proto/api.js';
 import { Player as PlayerProto } from '/tbc/core/proto/api.js';
-import { ComputeStatsRequest, ComputeStatsResult } from '/tbc/core/proto/api.js';
-import { StatWeightsRequest, StatWeightsResult } from '/tbc/core/proto/api.js';
+import { StatWeightsResult } from '/tbc/core/proto/api.js';
 
 import { EquippedItem } from '/tbc/core/proto_utils/equipped_item.js';
 import { Gear } from '/tbc/core/proto_utils/gear.js';
@@ -192,8 +192,8 @@ export class Player<SpecType extends Spec> {
 		this.epWeights = newEpWeights;
 	}
 
-  async statWeights(request: StatWeightsRequest): Promise<StatWeightsResult> {
-		const result = await this.sim.statWeights(request);
+  async computeStatWeights(epStats: Array<Stat>, epReferenceStat: Stat): Promise<StatWeightsResult> {
+		const result = await this.sim.statWeights(this, epStats, epReferenceStat);
 		this.epWeights = new Stats(result.epValues);
 		return result;
 	}
@@ -204,14 +204,7 @@ export class Player<SpecType extends Spec> {
 		// we get all of them.
 		await wait(10);
 
-
-		const computeStatsResult = await this.sim.computeStats(ComputeStatsRequest.create({
-			player: this.toProto(),
-			raidBuffs: this.raid!.getBuffs(),
-			partyBuffs: this.party!.getBuffs(),
-		}));
-
-		this.currentStats = computeStatsResult;
+		this.currentStats = await this.sim.getCharacterStats(this);
 		this.currentStatsEmitter.emit();
 	}
 

@@ -1,7 +1,6 @@
 import { Class } from '/tbc/core/proto/common.js';
 import { Consumes } from '/tbc/core/proto/common.js';
 import { Enchant } from '/tbc/core/proto/common.js';
-import { Encounter } from '/tbc/core/proto/common.js';
 import { EquipmentSpec } from '/tbc/core/proto/common.js';
 import { Gem } from '/tbc/core/proto/common.js';
 import { GemColor } from '/tbc/core/proto/common.js';
@@ -13,8 +12,11 @@ import { Item } from '/tbc/core/proto/common.js';
 import { Race } from '/tbc/core/proto/common.js';
 import { Spec } from '/tbc/core/proto/common.js';
 import { Stat } from '/tbc/core/proto/common.js';
-import { Player } from '/tbc/core/proto/api.js';
+import { ComputeStatsRequest, ComputeStatsResult } from '/tbc/core/proto/api.js';
 import { GearListRequest, GearListResult } from '/tbc/core/proto/api.js';
+import { RaidSimRequest, RaidSimResult } from '/tbc/core/proto/api.js';
+import { SimOptions } from '/tbc/core/proto/api.js';
+import { StatWeightsRequest, StatWeightsResult } from '/tbc/core/proto/api.js';
 
 import { EquippedItem } from '/tbc/core/proto_utils/equipped_item.js';
 import { Gear } from '/tbc/core/proto_utils/gear.js';
@@ -31,6 +33,9 @@ import { getEligibleEnchantSlots } from '/tbc/core/proto_utils/utils.js';
 import { gemEligibleForSocket } from '/tbc/core/proto_utils/utils.js';
 import { gemMatchesSocket } from '/tbc/core/proto_utils/utils.js';
 
+import { Encounter } from './encounter.js';
+import { Player } from './player.js';
+import { Raid } from './raid.js';
 import { Listener } from './typed_event.js';
 import { TypedEvent } from './typed_event.js';
 import { sum } from './utils.js';
@@ -39,46 +44,116 @@ import { WorkerPool } from './worker_pool.js';
 
 import * as OtherConstants from '/tbc/core/constants/other.js';
 
+export type RaidSimData = {
+	request: RaidSimRequest,
+	result: RaidSimResult,
+};
+
+export type StatWeightsData = {
+	request: StatWeightsRequest,
+	result: StatWeightsResult,
+};
+
 // Core Sim module which deals only with api types, no UI-related stuff.
-export class Sim extends WorkerPool {
+export class Sim {
+	private readonly workerPool: WorkerPool;
+
+	private iterations: number = 3000;
   private phase: number = OtherConstants.CURRENT_PHASE;
+
+  readonly raid: Raid;
+  readonly encounter: Encounter;
 
   // Database
   private items: Record<number, Item> = {};
   private enchants: Record<number, Enchant> = {};
   private gems: Record<number, Gem> = {};
 
+  readonly iterationsChangeEmitter = new TypedEvent<void>();
   readonly phaseChangeEmitter = new TypedEvent<void>();
 
   // Emits when any of the above emitters emit.
   readonly changeEmitter = new TypedEvent<void>();
 
-	// Fires when the gear list is finished loading.
-  readonly gearListEmitter = new TypedEvent<void>();
+	// Fires when a raid sim API call completes.
+  readonly raidSimEmitter = new TypedEvent<RaidSimData>();
 
-  private _init = false;
+	private readonly _initPromise: Promise<void>;
 
   constructor() {
-		super(3);
+		this.workerPool = new WorkerPool(3);
+
+    this._initPromise = this.workerPool.getGearList(GearListRequest.create()).then(result => {
+			result.items.forEach(item => this.items[item.id] = item);
+			result.enchants.forEach(enchant => this.enchants[enchant.id] = enchant);
+			result.gems.forEach(gem => this.gems[gem.id] = gem);
+		});
+
+		this.raid = new Raid(this);
+    this.encounter = new Encounter(this);
 
     [
+      this.iterationsChangeEmitter,
       this.phaseChangeEmitter,
+			this.raid.changeEmitter,
+			this.encounter.changeEmitter,
     ].forEach(emitter => emitter.on(() => this.changeEmitter.emit()));
   }
 
-  async init(): Promise<void> {
-    if (this._init)
-      return;
-    this._init = true;
-
-    const result = await this.getGearList(GearListRequest.create());
-
-    result.items.forEach(item => this.items[item.id] = item);
-    result.enchants.forEach(enchant => this.enchants[enchant.id] = enchant);
-    result.gems.forEach(gem => this.gems[gem.id] = gem);
-
-    this.gearListEmitter.emit();
+  waitForInit(): Promise<void> {
+		return this._initPromise;
   }
+
+  private makeRaidSimRequest(debug: boolean): RaidSimRequest {
+		return RaidSimRequest.create({
+			raid: this.raid.toProto(),
+			encounter: this.encounter.toProto(),
+			simOptions: SimOptions.create({
+				iterations: debug ? 1 : this.getIterations(),
+				debug: debug,
+			}),
+		});
+  }
+
+  async runRaidSim(): Promise<RaidSimResult> {
+		const request = this.makeRaidSimRequest(false);
+		const result = await this.workerPool.raidSim(request);
+		this.raidSimEmitter.emit({ request: request, result: result });
+		return result;
+	}
+
+  async runRaidSimWithLogs(): Promise<RaidSimResult> {
+		const request = this.makeRaidSimRequest(true);
+		const result = await this.workerPool.raidSim(request);
+		this.raidSimEmitter.emit({ request: request, result: result });
+		return result;
+	}
+
+	async getCharacterStats(player: Player<any>): Promise<ComputeStatsResult> {
+		return await this.workerPool.computeStats(ComputeStatsRequest.create({
+			player: player.toProto(),
+			raidBuffs: this.raid.getBuffs(),
+			partyBuffs: player.getParty()!.getBuffs(),
+		}));
+	}
+
+  async statWeights(player: Player<any>, epStats: Array<Stat>, epReferenceStat: Stat): Promise<StatWeightsResult> {
+		const request = StatWeightsRequest.create({
+			player: player.toProto(),
+			raidBuffs: this.raid.getBuffs(),
+			partyBuffs: player.getParty()!.getBuffs(),
+			encounter: this.encounter.toProto(),
+			simOptions: SimOptions.create({
+				iterations: this.getIterations(),
+				debug: false,
+			}),
+
+			statsToWeigh: epStats,
+			epReferenceStat: epReferenceStat,
+		});
+
+		return await this.workerPool.statWeights(request);
+	}
 
 	getItems(slot: ItemSlot | undefined): Array<Item> {
 		let items = Object.values(this.items);
@@ -117,6 +192,16 @@ export class Sim extends WorkerPool {
       this.phaseChangeEmitter.emit();
     }
   }
+  
+  getIterations(): number {
+    return this.iterations;
+  }
+  setIterations(newIterations: number) {
+    if (newIterations != this.iterations) {
+      this.iterations = newIterations;
+      this.iterationsChangeEmitter.emit();
+    }
+  }
 
   lookupItemSpec(itemSpec: ItemSpec): EquippedItem | null {
     const item = this.items[itemSpec.id];
@@ -149,5 +234,45 @@ export class Sim extends WorkerPool {
     });
 
     return new Gear(gearMap);
+  }
+
+  // Returns JSON representing all the current values.
+  toJson(): Object {
+    return {
+      'raid': this.raid.toJson(),
+      'encounter': this.encounter.toJson(),
+    };
+	}
+
+  // Set all the current values, assumes obj is the same type returned by toJson().
+  fromJson(obj: any, spec?: Spec) {
+		// For legacy format. Do not remove this until 2022/01/05 (1 month).
+		if (obj['sim']) {
+			if (!obj['raid']) {
+				obj['raid'] = {
+					'parties': [
+						{
+							'players': [
+								{
+									'spec': spec,
+									'player': obj['player'],
+								},
+							],
+							'buffs': obj['sim']['partyBuffs'],
+						},
+					],
+					'buffs': obj['sim']['raidBuffs'],
+				};
+				obj['raid']['parties'][0]['players'][0]['player']['buffs'] = obj['sim']['individualBuffs'];
+			}
+		}
+
+		if (obj['raid']) {
+			this.raid.fromJson(obj['raid']);
+		}
+
+		if (obj['encounter']) {
+			this.encounter.fromJson(obj['encounter']);
+		}
   }
 }

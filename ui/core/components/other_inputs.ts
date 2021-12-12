@@ -4,6 +4,7 @@ import { Player } from '/tbc/core/player.js';
 import { Sim } from '/tbc/core/sim.js';
 import { Target } from '/tbc/core/target.js';
 import { SimUI } from '/tbc/core/sim_ui.js';
+import { IndividualSimUI } from '/tbc/core/individual_sim_ui.js';
 
 export function makePhaseSelector(parent: HTMLElement, sim: Sim): EnumPicker<Sim> {
 	return new EnumPicker<Sim>(parent, sim, {
@@ -25,7 +26,7 @@ export function makePhaseSelector(parent: HTMLElement, sim: Sim): EnumPicker<Sim
 export const StartingPotion = {
 	type: 'enum' as const,
 	cssClass: 'starting-potion-picker',
-	getModObject: (simUI: SimUI<any>) => simUI.player,
+	getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
 	config: {
 		label: 'Starting Potion',
 		labelTooltip: 'If set, this potion will be used instead of the default potion for the first few uses.',
@@ -47,7 +48,7 @@ export const StartingPotion = {
 export const NumStartingPotions = {
 	type: 'number' as const,
 	cssClass: 'num-starting-potions-picker',
-	getModObject: (simUI: SimUI<any>) => simUI.player,
+	getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
 	config: {
 		label: '# to use',
 		labelTooltip: 'The number of starting potions to use before going back to the default potion.',
@@ -65,7 +66,7 @@ export const NumStartingPotions = {
 export const ShadowPriestDPS = {
   type: 'number' as const,
   cssClass: 'shadow-priest-dps-picker',
-	getModObject: (simUI: SimUI<any>) => simUI.player,
+	getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
   config: {
     label: 'Shadow Priest DPS',
     changedEvent: (player: Player<any>) => player.buffsChangeEmitter,
@@ -81,7 +82,7 @@ export const ShadowPriestDPS = {
 export const ISBUptime = {
     type: 'number' as const,
     cssClass: 'isb-uptime-picker',
-    getModObject: (simUI: SimUI<any>) => simUI.encounter.primaryTarget,
+    getModObject: (simUI: IndividualSimUI<any>) => simUI.sim.encounter.primaryTarget,
     config: {
       label: 'ISB Uptime %',
       changedEvent: (target: Target) => target.debuffsChangeEmitter,

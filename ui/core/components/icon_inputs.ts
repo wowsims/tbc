@@ -12,7 +12,7 @@ import { Raid } from '/tbc/core/raid.js';
 import { Sim } from '/tbc/core/sim.js';
 import { Target } from '/tbc/core/target.js';
 
-import { ExclusivityTag } from '/tbc/core/sim_ui.js';
+import { ExclusivityTag } from '/tbc/core/individual_sim_ui.js';
 import { IconInput } from './icon_picker.js';
 
 // Keep each section in alphabetical order.

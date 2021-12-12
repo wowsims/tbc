@@ -1,10 +1,8 @@
 import { Encounter } from '/tbc/core/encounter.js';
 import { Raid } from '/tbc/core/raid.js';
 import { Sim } from '/tbc/core/sim.js';
-import { Actions } from '/tbc/core/components/actions.js';
 import { DetailedResults } from '/tbc/core/components/detailed_results.js';
 import { LogRunner } from '/tbc/core/components/log_runner.js';
-import { Results } from '/tbc/core/components/results.js';
 import { SavedDataConfig } from '/tbc/core/components/saved_data_manager.js';
 import { SavedDataManager } from '/tbc/core/components/saved_data_manager.js';
 
@@ -19,16 +17,12 @@ export interface RaidSimConfig {
 
 export class RaidSimUI {
   readonly sim: Sim;
-  readonly raid: Raid;
-  readonly encounter: Encounter;
 
   private readonly config: RaidSimConfig;
   private readonly parentElem: HTMLElement;
 
   constructor(parentElem: HTMLElement, config: RaidSimConfig) {
     this.sim = new Sim();
-		this.raid = new Raid(this.sim);
-    this.encounter = new Encounter(this.sim);
 
     this.config = config;
 		this.parentElem = parentElem;
@@ -37,19 +31,7 @@ export class RaidSimUI {
 		const titleElem = this.parentElem.getElementsByClassName('default-title')[0];
 		titleElem.textContent = 'TBC Raid Sim';
 
-		const raidPicker = new RaidPicker(this.parentElem.getElementsByClassName('raid-picker')[0] as HTMLElement, this.raid, this.config.presets);
-
-    //const results = new Results(this.parentElem.getElementsByClassName('default-results')[0] as HTMLElement, this);
-    //const detailedResults = new DetailedResults(this.parentElem.getElementsByClassName('detailed-results')[0] as HTMLElement);
-    //const actions = new Actions(this.parentElem.getElementsByClassName('default-actions')[0] as HTMLElement, this, config.player.epStats, config.player.epReferenceStat, results, detailedResults);
-    //const logRunner = new LogRunner(this.parentElem.getElementsByClassName('log-runner')[0] as HTMLElement, this, results, detailedResults);
-
-    //const settingsTab = document.getElementsByClassName('settings-inputs')[0] as HTMLElement;
-  }
-
-  async init(): Promise<void> {
-    await this.sim.init();
-		return;
+		const raidPicker = new RaidPicker(this.parentElem.getElementsByClassName('raid-picker')[0] as HTMLElement, this.sim.raid, this.config.presets);
   }
 }
 

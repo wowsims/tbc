@@ -1,4 +1,5 @@
-@import "../core/themes/default";
+@import "../core/individual_sim_ui";
+@import "./sim";
 
 // Set color variables which control the site theme.
 :root {
@@ -8,22 +9,4 @@
 	--sidebar-bg-color: #222;
 	--sidebar-text-color: White;
 	--sidebar-highlight-color: Blue;
-}
-
-body {
-  margin: 0;
-}
-
-// Set grid width for icon sections based on how many buffs we configured.
-.self-buffs-section {
-  grid-template-columns: repeat(4, 1fr);
-}
-.consumes-section {
-  grid-template-columns: repeat(4, 1fr);
-}
-.buffs-section {
-  grid-template-columns: repeat(6, 1fr);
-}
-.debuffs-section {
-  grid-template-columns: repeat(3, 1fr);
 }

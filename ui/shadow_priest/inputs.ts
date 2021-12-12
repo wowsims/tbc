@@ -6,7 +6,7 @@ import { NO_TARGET } from '/tbc/core/proto_utils/utils.js';
 import { ItemOrSpellId } from '/tbc/core/resources.js';
 import { Player } from '/tbc/core/player.js';
 import { Sim } from '/tbc/core/sim.js';
-import { SimUI } from '/tbc/core/sim_ui.js';
+import { IndividualSimUI } from '/tbc/core/individual_sim_ui.js';
 import { Target } from '/tbc/core/target.js';
 
 // Configuration for spec-specific UI elements on the settings tab.
@@ -16,7 +16,7 @@ export const ShadowPriestRotationConfig = {
 	inputs: [
 		{
 			type: 'enum' as const, cssClass: 'rotation-enum-picker',
-			getModObject: (simUI: SimUI<any>) => simUI.player,
+			getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
 			config: {
 				label: 'Rotation Type',
 				labelTooltip: 'Choose how to clip your mindflay. Basic will never clip. Clipping will clip for other spells and use a 2xMF2 when there is time for 4 ticks. Ideal will evaluate the DPS gain of every action to determine MF actions.',
@@ -43,7 +43,7 @@ export const ShadowPriestRotationConfig = {
 		{
 			type: 'boolean' as const,
 			cssClass: 'shadowfiend-picker',
-			getModObject: (simUI: SimUI<any>) => simUI.player,
+			getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
 			config: {
 				label: 'Use Shadowfiend',
 				labelTooltip: 'Use Shadowfiend when low mana and off CD.',
@@ -59,7 +59,7 @@ export const ShadowPriestRotationConfig = {
 		{
 			type: 'boolean' as const,
 			cssClass: 'precastvt-picker',
-			getModObject: (simUI: SimUI<any>) => simUI.player,
+			getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
 			config: {
 				label: 'Precast Vampiric Touch',
 				labelTooltip: 'Start fight with VT landing at time 0',
@@ -75,7 +75,7 @@ export const ShadowPriestRotationConfig = {
 		{
 			type: 'boolean' as const,
 			cssClass: 'devplague-picker',
-			getModObject: (simUI: SimUI<any>) => simUI.player,
+			getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
 			config: {
 				label: 'Use Devouring Plague',
 				labelTooltip: 'Use Devouring Plague whenever off CD.',
@@ -92,7 +92,7 @@ export const ShadowPriestRotationConfig = {
 		{
 			type: 'boolean' as const,
 			cssClass: 'starshards-picker',
-			getModObject: (simUI: SimUI<any>) => simUI.player,
+			getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
 			config: {
 				label: 'Use starshards',
 				labelTooltip: 'Use Starshards whenever off CD.',
@@ -109,7 +109,7 @@ export const ShadowPriestRotationConfig = {
 		{
 			type: 'number' as const,
 			cssClass: 'latency-picker',
-			getModObject: (simUI: SimUI<any>) => simUI.player,
+			getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
 			config: {
 				label: 'Channeling Latency (ms)',
 				labelTooltip: 'Latency after a channel that lasts longer than GCD. 0 to disable. Has a minimum value of 100ms if set.',

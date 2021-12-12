@@ -1,5 +1,6 @@
 import { RaidSimRequest, RaidSimResult } from '/tbc/core/proto/api.js';
 import { repoName } from '/tbc/core/resources.js';
+import { SimUI } from '/tbc/core/sim_ui.js';
 
 import { Component } from './component.js';
 
@@ -13,7 +14,7 @@ export class DetailedResults extends Component {
 	private tabWindow: Window | null;
 	private latestResult: RaidSimData | null;
 
-  constructor(parent: HTMLElement) {
+  constructor(parent: HTMLElement, simUI: SimUI) {
     super(parent, 'detailed-results-manager-root');
 		this.tabWindow = null;
 		this.latestResult = null;
@@ -46,17 +47,22 @@ export class DetailedResults extends Component {
 				this.tabWindow.focus();
 			}
 		});
+
+		simUI.sim.raidSimEmitter.on(data => {
+			this.setSimResult(data.request, data.result);
+		});
 	}
 
-	setPending() {
-		this.latestResult = null;
-		this.iframeElem.contentWindow!.postMessage(null, '*');
-		if (this.tabWindow) {
-			this.tabWindow.postMessage(null, '*');
-		}
-	}
+	// TODO: Decide whether to continue using this or just remove it.
+	//setPending() {
+	//	this.latestResult = null;
+	//	this.iframeElem.contentWindow!.postMessage(null, '*');
+	//	if (this.tabWindow) {
+	//		this.tabWindow.postMessage(null, '*');
+	//	}
+	//}
 
-  setSimResult(request: RaidSimRequest, result: RaidSimResult) {
+  private setSimResult(request: RaidSimRequest, result: RaidSimResult) {
 		const data = {
 			request: request,
 			result: result,
