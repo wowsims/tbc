@@ -92,4 +92,3 @@ const ui = new RaidSimUI(document.body, {
 		},
 	],
 });
-ui.init();

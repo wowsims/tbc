@@ -54,8 +54,10 @@ export abstract class SimUI extends Component {
 
 		this.resultsPendingElem = this.rootElem.getElementsByClassName('results-pending')[0] as HTMLElement;
 		this.resultsContentElem = this.rootElem.getElementsByClassName('results-content')[0] as HTMLElement;
+		this.resultsContentElem.style.display = 'none';
+    this.resultsPendingElem.style.display = 'none';
 
-		const titleElem = this.rootElem.getElementsByClassName('sim-title')[0];
+		const titleElem = this.rootElem.getElementsByClassName('sim-sidebar-title')[0];
 		titleElem.textContent = config.title;
 
 		const simActionsContainer = this.rootElem.getElementsByClassName('sim-sidebar-actions')[0] as HTMLElement;
@@ -72,7 +74,7 @@ export abstract class SimUI extends Component {
 
 	addAction(name: string, cssClass: string, actFn: () => void) {
 		const simActionsContainer = this.rootElem.getElementsByClassName('sim-sidebar-actions')[0] as HTMLElement;
-		const iterationsPicker = this.rootElem.getElementsByClassName('iterationsPicker')[0] as HTMLElement;
+		const iterationsPicker = this.rootElem.getElementsByClassName('iterations-picker')[0] as HTMLElement;
 
     const button = document.createElement('button');
     button.classList.add('sim-sidebar-actions-button', cssClass);
@@ -91,18 +93,20 @@ export abstract class SimUI extends Component {
 
 		const newTab = document.createElement('li');
 		newTab.innerHTML = `<a data-toggle="tab" href="#${contentId}">${title}</a>`;
-		simTabsContainer.insertBefore(newTab, topBar);
+		newTab.classList.add(cssClass + '-tab');
 
 		const newContent = document.createElement('div');
 		newContent.id = contentId;
-		newContent.classList.add(cssClass, 'tab-pane', 'fade', 'in');
+		newContent.classList.add(cssClass, 'tab-pane', 'fade');
 		newContent.innerHTML = innerHTML;
-		simTabContentsContainer.appendChild(newContent);
 
 		if (isFirstTab) {
 			newTab.classList.add('active');
-			newContent.classList.add('active');
+			newContent.classList.add('active', 'in');
 		}
+
+		simTabsContainer.insertBefore(newTab, topBar);
+		simTabContentsContainer.appendChild(newContent);
 	}
 
   setResultsPending() {

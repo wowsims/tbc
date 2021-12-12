@@ -1,4 +1,3 @@
-@import "./components/actions";
 @import "./components/bonus_stats_picker";
 @import "./components/boolean_picker";
 @import "./components/character_stats";
@@ -12,13 +11,33 @@
 @import "./components/raid_sim_action";
 @import "./components/saved_data_manager";
 @import "./components/stat_weights_action";
-@import "./shared";
+@import "./sim_ui";
 @import "./talents/talents_picker";
+
+.character-stats-header {
+	padding: 5px;
+	font-size: 14px;
+}
+
+.character-stats-table {
+	padding: 10px;
+}
+
+.character-stats-table-row {
+	color: var(--sidebar-text-color);
+	border-bottom: 1px solid var(--sidebar-text-color);
+	font-size: 16px;
+	font-weight: 600;
+}
 
 .share-link {
 	margin: 10px;
 	font-size: 20px;
 	cursor: pointer;
+}
+
+.gear-tab-columns {
+	display: flex;
 }
 
 .left-gear-panel {
@@ -56,6 +75,10 @@
 	color: var(--main-secondary-color);
 	border-color: var(--main-secondary-color);
 	background-color: var(--main-text-color);
+}
+
+.settings-tab {
+	overflow-y: auto;
 }
 
 .settings-inputs {
@@ -133,6 +156,9 @@
 .saved-settings-manager {
   display: inline-block;
   text-align: right;
+}
+
+.talents-tab {
 }
 
 .saved-talents-manager {

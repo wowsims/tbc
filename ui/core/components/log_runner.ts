@@ -21,7 +21,7 @@ export class LogRunner extends Component {
 
     simButton.addEventListener('click', async () => {
 			simUI.setResultsPending();
-			const result = await simUI.sim.runRaidSim();
+			const result = await simUI.sim.runRaidSimWithLogs();
     });
 
 		simUI.sim.raidSimEmitter.on(data => {

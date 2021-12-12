@@ -5,7 +5,7 @@ import { Spec } from '/tbc/core/proto/common.js';
 import { ItemOrSpellId } from '/tbc/core/resources.js';
 import { Player } from '/tbc/core/player.js';
 import { Sim } from '/tbc/core/sim.js';
-import { SimUI } from '/tbc/core/sim_ui.js';
+import { IndividualSimUI } from '/tbc/core/individual_sim_ui.js';
 import { Target } from '/tbc/core/target.js';
 
 // Configuration for spec-specific UI elements on the settings tab.
@@ -21,7 +21,7 @@ export const ElementalShamanRotationConfig = {
 	inputs: [
 		{
 			type: 'enum' as const, cssClass: 'rotation-enum-picker',
-			getModObject: (simUI: SimUI<any>) => simUI.player,
+			getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
 			config: {
 				label: 'Type',
 				values: [
@@ -58,7 +58,7 @@ export const ElementalShamanRotationConfig = {
 		{
 			type: 'number' as const,
 			cssClass: 'num-lbs-per-cl-picker',
-			getModObject: (simUI: SimUI<any>) => simUI.player,
+			getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
 			config: {
 				label: 'LBs per CL',
 				labelTooltip: 'The number of Lightning Bolts to cast between each Chain Lightning. Only used if Rotation is set to \'Fixed LB+CL\'.',

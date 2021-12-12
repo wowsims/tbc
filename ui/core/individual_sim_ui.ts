@@ -81,7 +81,9 @@ export interface InputSection {
 }
 
 export interface IndividualSimUIConfig<SpecType extends Spec> {
-	spec: Spec,
+	// Additional css class to add to the root element.
+	cssClass: string,
+
   releaseStatus: ReleaseStatus;
 	knownIssues?: Array<string>;
 
@@ -149,24 +151,20 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 
   private readonly exclusivityMap: Record<ExclusivityTag, Array<ExclusiveEffect>>;
 
-  constructor(parentElem: HTMLElement, sim: Sim, player: Player<SpecType>, config: IndividualSimUIConfig<SpecType>) {
-		let title = 'TBC ' + specNames[config.spec] + ' Sim';
+  constructor(parentElem: HTMLElement, player: Player<SpecType>, config: IndividualSimUIConfig<SpecType>) {
+		let title = 'TBC ' + specNames[player.spec] + ' Sim';
 		if (config.releaseStatus == 'Alpha') {
 			title += ' Alpha';
 		} else if (config.releaseStatus == 'Beta') {
 			title += ' Beta';
 		}
 
-		super(parentElem, sim, {
+		super(parentElem, player.sim, {
 			title: title,
 			knownIssues: config.knownIssues,
 		});
-		this.rootElem.classList.add('individual-sim-ui');
-
-		//this.player = new Player<SpecType>(config.spec, this.sim);
-		//this.raid.setPlayer(0, this.player);
+		this.rootElem.classList.add('individual-sim-ui', config.cssClass);
 		this.player = player;
-
 		this.individualConfig = config;
 
     this.exclusivityMap = {
@@ -279,14 +277,16 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 
 	private addGearTab() {
 		this.addTab('Gear', 'gear-tab', `
-			<div class="left-gear-panel">
-				<div class="gear-picker">
+			<div class="gear-tab-columns">
+				<div class="left-gear-panel">
+					<div class="gear-picker">
+					</div>
 				</div>
-			</div>
-			<div class="right-gear-panel">
-				<div class="bonus-stats-picker">
-				</div>
-				<div class="saved-gear-manager">
+				<div class="right-gear-panel">
+					<div class="bonus-stats-picker">
+					</div>
+					<div class="saved-gear-manager">
+					</div>
 				</div>
 			</div>
 		`);
@@ -507,7 +507,7 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
     // Init Muuri layout only when settings tab is clicked, because it needs the elements
     // to be shown so it can calculate sizes.
     let muuriInit = false;
-    document.getElementById('settings-tab-toggle')!.addEventListener('click', event => {
+    (this.rootElem.getElementsByClassName('settings-tab-tab')[0] as HTMLElement)!.addEventListener('click', event => {
       if (muuriInit) {
         return;
       }
