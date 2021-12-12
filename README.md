@@ -36,7 +36,7 @@ npm install
 ```
 
 ## Windows
-If you want to develop on Windows, we recommend setting up Docker using [this guide](https://docs.docker.com/desktop/windows/wsl/ "https://docs.docker.com/desktop/windows/wsl/") and then following the Docker instructions below.
+If you want to develop on Windows, we recommend setting up a Ubuntu virtual machine (VM) or running Docker using [this guide](https://docs.docker.com/desktop/windows/wsl/ "https://docs.docker.com/desktop/windows/wsl/") and then following the Ubuntu or Docker instructions, respectively.
 
 ## Docker
 Alternatively, install Docker and your workflow will look something like this:
