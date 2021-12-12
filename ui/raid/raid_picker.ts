@@ -1,6 +1,8 @@
+import { CloseButton } from '/tbc/core/components/close_button.js';
 import { Component } from '/tbc/core/components/component.js';
 import { EnumPicker } from '/tbc/core/components/enum_picker.js';
 import { makePhaseSelector } from '/tbc/core/components/other_inputs.js';
+import { IndividualSimUI } from '/tbc/core/individual_sim_ui.js';
 import { Raid } from '/tbc/core/raid.js';
 import { MAX_PARTY_SIZE } from '/tbc/core/party.js';
 import { Party } from '/tbc/core/party.js';
@@ -21,7 +23,12 @@ import { camelToSnakeCase } from '/tbc/core/utils.js';
 import { getEnumValues } from '/tbc/core/utils.js';
 import { hexToRgba } from '/tbc/core/utils.js';
 
+import { BalanceDruidSimUI } from '/tbc/balance_druid/sim.js';
+import { ElementalShamanSimUI } from '/tbc/elemental_shaman/sim.js';
+import { ShadowPriestSimUI } from '/tbc/shadow_priest/sim.js';
+
 declare var tippy: any;
+declare var $: any;
 
 const NEW_PLAYER: number = -1;
 
@@ -37,7 +44,6 @@ export class RaidPicker extends Component {
 	readonly presets: Array<PresetSpecSettings<any>>;
   readonly partyPickers: Array<PartyPicker>;
 	readonly newPlayerPicker: NewPlayerPicker;
-	readonly playerEditorModal: PlayerEditorModal;
 
 	// Hold data about the player being dragged while the drag is happening.
 	currentDragPlayer: Player<any> | null = null;
@@ -74,8 +80,6 @@ export class RaidPicker extends Component {
 
 			this.clearDragPlayer();
 		};
-
-    this.playerEditorModal = new PlayerEditorModal(document.body);
 	}
 
 	getCurrentFaction(): Faction {
@@ -172,7 +176,7 @@ export class PlayerPicker extends Component {
 			<div class="player-options">
 				<span class="player-swap fa fa-retweet" draggable="true"></span>
 				<span class="player-copy fa fa-copy" draggable="true"></span>
-				<span class="player-edit fa fa-edit" data-toggle="modal" data-target="#playerEditorModal"></span>
+				<span class="player-edit fa fa-edit"></span>
 			</div>
 		`;
 
@@ -304,7 +308,7 @@ export class PlayerPicker extends Component {
 		});
     editElem.addEventListener('click', event => {
 			if (this.player != null) {
-				this.raidPicker.playerEditorModal.setPlayer(this.player);
+				new PlayerEditorModal(this.player);
 			}
 		});
 
@@ -334,38 +338,29 @@ export class PlayerPicker extends Component {
 }
 
 class PlayerEditorModal extends Component {
-	private readonly urlTemplate: string;
-	private readonly iframeElem: HTMLIFrameElement;
+  constructor(player: Player<any>) {
+    super(document.body, 'player-editor-modal');
 
-  constructor(parent: HTMLElement) {
-    super(parent, 'player-editor-model-root');
+		this.rootElem.id = 'playerEditorModal';
+		this.rootElem.innerHTML = `
+			<div class="player-editor within-raid-sim">
+			</div>
+		`;
 
-		const url = new URL(`${window.location.protocol}//${window.location.host}/${repoName}/SPEC/index.html`);
-		url.searchParams.append('raidSim', '');
-		this.urlTemplate = url.href;
+		new CloseButton(this.rootElem, () => {
+			$('#playerEditorModal').bPopup().close();
+			this.rootElem.remove();
+		});
 
-    this.rootElem.innerHTML = `
-    <div class="modal fade player-editor-modal" id="playerEditorModal" tabindex="-1" role="dialog" aria-labelledby="playerEditorModalTitle" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-          <div class="modal-body">
-						<iframe class="player-editor-iframe"></iframe>
-          </div>
-        </div>
-      </div>
-    </div>
-    `;
+		const editorRoot = this.rootElem.getElementsByClassName('player-editor')[0] as HTMLElement;
+		const individualSim = specSimFactories[player.spec]!(editorRoot, player);
 
-		this.iframeElem = this.rootElem.getElementsByClassName('player-editor-iframe')[0] as HTMLIFrameElement;
-	}
-
-	setPlayer(player: Player<any>) {
-		let specString = Spec[player.spec]; // Returns 'SpecBalanceDruid' for BalanceDruid.
-		specString = specString.substring('Spec'.length); // 'BalanceDruid'
-		specString = camelToSnakeCase(specString); // 'balance_druid'
-		const url = this.urlTemplate.replace('SPEC', specString);
-
-		this.iframeElem.src = url;
+		$('#playerEditorModal').bPopup({
+			closeClass: 'player-editor-close',
+			onClose: () => {
+				this.rootElem.remove();
+			},
+		});
 	}
 }
 
@@ -466,6 +461,12 @@ class NewPlayerPicker extends Component {
 		});
 	}
 }
+
+export const specSimFactories: Partial<Record<Spec, (parentElem: HTMLElement, player: Player<any>) => IndividualSimUI<any>>> = {
+	[Spec.SpecBalanceDruid]: (parentElem: HTMLElement, player: Player<any>) => new BalanceDruidSimUI(parentElem, player),
+	[Spec.SpecElementalShaman]: (parentElem: HTMLElement, player: Player<any>) => new ElementalShamanSimUI(parentElem, player),
+	[Spec.SpecShadowPriest]: (parentElem: HTMLElement, player: Player<any>) => new ShadowPriestSimUI(parentElem, player),
+};
 
 export interface PresetSpecSettings<SpecType extends Spec> {
 	spec: Spec,

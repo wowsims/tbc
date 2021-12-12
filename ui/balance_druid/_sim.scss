@@ -1,3 +1,13 @@
+// Set color variables which control the site theme.
+.balance-druid-sim-ui {
+	--main-bg-color: #995c00;
+	--main-text-color: White;
+	--main-secondary-color: Black;
+	--sidebar-bg-color: #222;
+	--sidebar-text-color: White;
+	--sidebar-highlight-color: #ff9900;
+}
+
 // Set grid width for icon sections based on how many buffs we configured.
 .balance-druid-sim-ui .self-buffs-section {
   grid-template-columns: repeat(3, 1fr);

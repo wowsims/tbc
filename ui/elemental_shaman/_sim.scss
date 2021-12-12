@@ -1,3 +1,13 @@
+// Set color variables which control the site theme.
+.elemental-shaman-sim-ui {
+	--main-bg-color: MidnightBlue;
+	--main-text-color: White;
+	--main-secondary-color: Black;
+	--sidebar-bg-color: #222;
+	--sidebar-text-color: White;
+	--sidebar-highlight-color: Blue;
+}
+
 // Set grid width for icon sections based on how many buffs we configured.
 .elemental-shaman-sim-ui .self-buffs-section {
   grid-template-columns: repeat(4, 1fr);

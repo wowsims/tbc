@@ -130,29 +130,39 @@ export class Sim {
 	}
 
 	async getCharacterStats(player: Player<any>): Promise<ComputeStatsResult> {
-		return await this.workerPool.computeStats(ComputeStatsRequest.create({
-			player: player.toProto(),
-			raidBuffs: this.raid.getBuffs(),
-			partyBuffs: player.getParty()!.getBuffs(),
-		}));
+		if (player.getParty() == null) {
+			console.warn('Trying to get character stats without a party!');
+			return ComputeStatsResult.create();
+		} else {
+			return await this.workerPool.computeStats(ComputeStatsRequest.create({
+				player: player.toProto(),
+				raidBuffs: this.raid.getBuffs(),
+				partyBuffs: player.getParty()!.getBuffs(),
+			}));
+		}
 	}
 
   async statWeights(player: Player<any>, epStats: Array<Stat>, epReferenceStat: Stat): Promise<StatWeightsResult> {
-		const request = StatWeightsRequest.create({
-			player: player.toProto(),
-			raidBuffs: this.raid.getBuffs(),
-			partyBuffs: player.getParty()!.getBuffs(),
-			encounter: this.encounter.toProto(),
-			simOptions: SimOptions.create({
-				iterations: this.getIterations(),
-				debug: false,
-			}),
+		if (player.getParty() == null) {
+			console.warn('Trying to get stat weights without a party!');
+			return StatWeightsResult.create();
+		} else {
+			const request = StatWeightsRequest.create({
+				player: player.toProto(),
+				raidBuffs: this.raid.getBuffs(),
+				partyBuffs: player.getParty()!.getBuffs(),
+				encounter: this.encounter.toProto(),
+				simOptions: SimOptions.create({
+					iterations: this.getIterations(),
+					debug: false,
+				}),
 
-			statsToWeigh: epStats,
-			epReferenceStat: epReferenceStat,
-		});
+				statsToWeigh: epStats,
+				epReferenceStat: epReferenceStat,
+			});
 
-		return await this.workerPool.statWeights(request);
+			return await this.workerPool.statWeights(request);
+		}
 	}
 
 	getItems(slot: ItemSlot | undefined): Array<Item> {

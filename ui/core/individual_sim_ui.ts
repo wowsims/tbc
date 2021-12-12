@@ -148,6 +148,7 @@ export interface Settings {
 export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
   readonly player: Player<SpecType>;
 	readonly individualConfig: IndividualSimUIConfig<SpecType>;
+	readonly isWithinRaidSim: boolean;
 
   private readonly exclusivityMap: Record<ExclusivityTag, Array<ExclusiveEffect>>;
 
@@ -166,6 +167,7 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 		this.rootElem.classList.add('individual-sim-ui', config.cssClass);
 		this.player = player;
 		this.individualConfig = config;
+		this.isWithinRaidSim = this.rootElem.closest('.within-raid-sim') != null;
 
     this.exclusivityMap = {
       'Battle Elixir': [],
@@ -178,11 +180,14 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
       'Weapon Imbue': [],
     };
 
-		// This needs to go before all the UI components so that gear loading is the
-		// first callback invoked from waitForInit().
-		this.sim.waitForInit().then(() => {
-			this.loadSettings();
-		});
+		if (!this.isWithinRaidSim) {
+			// This needs to go before all the UI components so that gear loading is the
+			// first callback invoked from waitForInit().
+			this.sim.waitForInit().then(() => {
+				this.loadSettings();
+			});
+		}
+		this.player.setEpWeights(this.individualConfig.defaults.epWeights);
 
 		this.addSidebarComponents();
 		this.addTopbarComponents();
@@ -235,7 +240,6 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 		if (!loadedSettings) {
 			this.applyDefaults();
 		}
-		this.player.setEpWeights(this.individualConfig.defaults.epWeights);
 
 		// This needs to go last so it doesn't re-store things as they are initialized.
 		this.changeEmitter.on(() => {

@@ -1,9 +1,12 @@
-@import "../core/shared";
+@import "../balance_druid/sim";
+@import "../core/individual_sim_ui";
+@import "../elemental_shaman/sim";
+@import "../shadow_priest/sim";
 
-@import "./raid_picker";
+@import "./raid_sim_ui";
 
 // Set color variables which control the site theme.
-:root {
+.raid-sim-ui {
 	--main-bg-color: Black;
 	--main-text-color: White;
 	--main-secondary-color: Black;

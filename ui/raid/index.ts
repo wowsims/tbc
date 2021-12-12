@@ -1,6 +1,7 @@
 import { Race } from '/tbc/core/proto/common.js';
 import { Spec } from '/tbc/core/proto/common.js';
 import { Faction } from '/tbc/core/proto_utils/utils.js';
+import { Player } from '/tbc/core/player.js';
 import { specIconsLarge } from '/tbc/core/proto_utils/utils.js';
 import { specNames } from '/tbc/core/proto_utils/utils.js';
 
