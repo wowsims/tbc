@@ -32,12 +32,15 @@ host: $(OUT_DIR)
 	# directory just like github pages.
 	npx http-server $(OUT_DIR)/..
 
-ui/core/proto/proto.ts: proto/*.proto
+ui/core/proto/proto.ts: proto/*.proto node_modules
 	mkdir -p $(OUT_DIR)/protobuf-ts
 	cp -r node_modules/@protobuf-ts/runtime/build/es2015/* $(OUT_DIR)/protobuf-ts
 	sed -i -E "s/from '(.*)';/from '\1\.js';/g" $(OUT_DIR)/protobuf-ts/*
 	sed -i -E "s/from \"(.*)\";/from '\1\.js';/g" $(OUT_DIR)/protobuf-ts/*
 	npx protoc --ts_opt generate_dependencies --ts_out ui/core/proto --proto_path proto proto/api.proto
+
+node_modules: package-lock.json
+	npm install
 
 $(OUT_DIR)/core/tsconfig.tsbuildinfo: $(call rwildcard,ui/core,*.ts) ui/core/proto/proto.ts
 	npx tsc -p ui/core
@@ -113,7 +116,7 @@ sim/core/proto/api.pb.go: proto/*.proto
 	protoc -I=./proto --go_out=./sim/core ./proto/*.proto
 
 .PHONY: items
-items: sim/core/items/all_items.go
+items: sim/core/items/all_items.go sim/core/proto/api.pb.go
 
 sim/core/items/all_items.go: generate_items/*.go $(call rwildcard,sim/core/proto,*.go)
 	go run generate_items/*.go -outDir=sim/core/items
@@ -125,7 +128,7 @@ test: $(OUT_DIR)/lib.wasm binary_dist/dist.go
 fmt:
 	gofmt -w ./sim
 
-# one time setup to install pre-commit hook for gofmt
+# one time setup to install pre-commit hook for gofmt and npm install needed packages
 setup:
 	cp pre-commit .git/hooks
 	chmod +x .git/hooks/pre-commit
