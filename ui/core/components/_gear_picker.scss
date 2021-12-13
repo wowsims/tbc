@@ -59,23 +59,12 @@
 }
 
 .selector-modal {
-}
-
-.selector-modal .modal-content {
+	display: none;
+	@include vertical-horizontal-center;
+	min-width: 50%;
+	padding: 8px;
 	background-color: #666;
-}
-
-.selector-modal-tabs .close {
-	color: red;
-	opacity: 0.5;
-	text-shadow: none;
-}
-.selector-modal-tabs .close:hover {
-	opacity: 1;
-}
-
-.selector-modal .modal-dialog {
-  @include screen-vertical-horizontal-center;
+	border-radius: 6px;
 }
 
 .selector-modal-tab-content-header {

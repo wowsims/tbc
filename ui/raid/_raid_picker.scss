@@ -1,5 +1,3 @@
-@import "../core/shared";
-
 .raid-picker-root {
 	display: flex;
 	flex-direction: row;
@@ -62,8 +60,8 @@
 	height: 90%;
 }
 
-.player-picker-root.empty .player-icon {
-	opacity: 0;
+.player-picker-root.empty * {
+	display: none;
 }
 
 .player-name {
@@ -74,19 +72,11 @@
 		0 0 3px var(--main-secondary-color);
 }
 
-.player-picker-root.empty .player-name {
-	display: none;
-}
-
 .player-options {
 	height: 100%;
 	vertical-align: top;
 	display: inline-flex;
 	align-items: center;
-}
-
-.player-picker-root.empty .player-options {
-	opacity: 0;
 }
 
 .player-options span {
@@ -115,6 +105,10 @@
 
 .player-edit {
 	color: green;
+}
+
+.buff-bot .player-edit {
+	display: none;
 }
 
 .new-player-picker {
@@ -147,6 +141,17 @@
 	cursor: pointer;
 }
 
+.preset-picker-buff-bot .preset-picker-icon {
+	border: 1px solid red;
+}
+
+.player-editor-modal {
+	display: none;
+	height: 95vh;
+	width: 95vw;
+	@include vertical-horizontal-center;
+}
+
 .player-editor-modal .modal-dialog {
 	width: initial;
 	@include vertical-horizontal-center;
@@ -158,12 +163,12 @@
 	margin: auto;
 }
 
-.player-editor-modal .player-editor-iframe {
-	height: 100%;
-	width: 100%;
-}
-
 .player-editor-modal .modal-body {
 	height: 100%;
 	padding: 5px;
+}
+
+.player-editor-modal .player-editor {
+	height: 100%;
+	width: 100%;
 }

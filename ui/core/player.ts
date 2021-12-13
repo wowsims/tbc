@@ -124,6 +124,10 @@ export class Player<SpecType extends Spec> {
 		});
   }
 
+	getClass(): Class {
+		return specToClass[this.spec];
+	}
+
 	getParty(): Party | null {
 		return this.party;
 	}
@@ -155,11 +159,7 @@ export class Player<SpecType extends Spec> {
 			return;
 		}
 
-		// Remove player from its old party if there is one.
-		if (this.party != null) {
-			this.party.setPlayer(this.getPartyIndex(), null);
-		}
-
+		const oldParty = this.party;
 		if (newParty == null) {
 			this.party = null;
 			this.raid = null;
@@ -167,6 +167,22 @@ export class Player<SpecType extends Spec> {
 			this.party = newParty;
 			this.raid = newParty.raid;
 		}
+
+		// Remove player from its old party if there is one.
+		if (oldParty != null) {
+			const oldPartyIndex = oldParty.getPlayers().indexOf(this);
+			if (oldPartyIndex != -1) {
+				oldParty.setPlayer(oldPartyIndex, null);
+			}
+		}
+	}
+
+	getOtherPartyMembers(): Array<Player<any>> {
+		if (this.party == null) {
+			return [];
+		}
+
+		return this.party.getPlayers().filter(player => player != null && player != this) as Array<Player<any>>;
 	}
 
 	// Returns all items that this player can wear in the given slot.
@@ -411,8 +427,11 @@ export class Player<SpecType extends Spec> {
 	toProto(): PlayerProto {
     return withSpecProto(
 				PlayerProto.create({
+					name: this.getName(),
+					raidIndex: this.getRaidIndex(),
 					race: this.getRace(),
-					class: specToClass[this.spec],
+					class: this.getClass(),
+					playerSpec: this.spec,
 					equipment: this.getGear().asSpec(),
 					consumes: this.getConsumes(),
 					bonusStats: this.getBonusStats().asArray(),

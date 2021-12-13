@@ -1,3 +1,4 @@
+import { Class } from '/tbc/core/proto/common.js';
 import { Raid as RaidProto } from '/tbc/core/proto/api.js';
 import { RaidBuffs } from '/tbc/core/proto/common.js';
 import { Spec } from '/tbc/core/proto/common.js';
@@ -24,6 +25,8 @@ export class Raid {
 
 	// Should always hold exactly MAX_NUM_PARTIES elements.
 	private parties: Array<Party>;
+
+	private modifyRaidProto: ((raidProto: RaidProto) => void) = () => {};
 
 	readonly sim: Sim;
 
@@ -74,6 +77,10 @@ export class Raid {
 		party.setPlayer(index % MAX_PARTY_SIZE, newPlayer);
 	}
 
+	getClassCount(playerClass: Class) {
+		return this.getPlayers().filter(player => player != null && player.getClass() == playerClass).length;
+	}
+
   getBuffs(): RaidBuffs {
     // Make a defensive copy
     return RaidBuffs.clone(this.buffs);
@@ -88,11 +95,22 @@ export class Raid {
     this.buffsChangeEmitter.emit();
   }
 
+	setModifyRaidProto(newModFn: (raidProto: RaidProto) => void) {
+		this.modifyRaidProto = newModFn;
+	}
+
 	toProto(): RaidProto {
-		return RaidProto.create({
-			parties: this.parties.filter(party => !party.isEmpty()).map(party => party.toProto()),
+		const raidProto = RaidProto.create({
+			parties: this.parties.map(party => party.toProto()),
 			buffs: this.buffs,
 		});
+
+		this.modifyRaidProto(raidProto);
+
+		// Remove empty parties and null players because the sim doesn't like them.
+		raidProto.parties = raidProto.parties.filter(party => party.players.length > 0);
+
+		return raidProto;
 	}
 
   // Returns JSON representing all the current values.

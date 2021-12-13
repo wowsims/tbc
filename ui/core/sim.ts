@@ -116,6 +116,12 @@ export class Sim {
   }
 
   async runRaidSim(): Promise<RaidSimResult> {
+		if (this.raid.isEmpty()) {
+			throw new Error('Raid is empty! Try adding some players first.');
+		} else if (this.encounter.getNumTargets() < 1) {
+			throw new Error('Encounter has no targets! Try adding some targets first.');
+		}
+
 		const request = this.makeRaidSimRequest(false);
 		const result = await this.workerPool.raidSim(request);
 		this.raidSimEmitter.emit({ request: request, result: result });
@@ -123,6 +129,12 @@ export class Sim {
 	}
 
   async runRaidSimWithLogs(): Promise<RaidSimResult> {
+		if (this.raid.isEmpty()) {
+			throw new Error('Raid is empty! Try adding some players first.');
+		} else if (this.encounter.getNumTargets() < 1) {
+			throw new Error('Encounter has no targets! Try adding some targets first.');
+		}
+
 		const request = this.makeRaidSimRequest(true);
 		const result = await this.workerPool.raidSim(request);
 		this.raidSimEmitter.emit({ request: request, result: result });
@@ -130,29 +142,45 @@ export class Sim {
 	}
 
 	async getCharacterStats(player: Player<any>): Promise<ComputeStatsResult> {
-		return await this.workerPool.computeStats(ComputeStatsRequest.create({
-			player: player.toProto(),
-			raidBuffs: this.raid.getBuffs(),
-			partyBuffs: player.getParty()!.getBuffs(),
-		}));
+		if (player.getParty() == null) {
+			//console.warn('Trying to get character stats without a party!');
+			return ComputeStatsResult.create();
+		} else {
+			return await this.workerPool.computeStats(ComputeStatsRequest.create({
+				player: player.toProto(),
+				raidBuffs: this.raid.getBuffs(),
+				partyBuffs: player.getParty()!.getBuffs(),
+			}));
+		}
 	}
 
   async statWeights(player: Player<any>, epStats: Array<Stat>, epReferenceStat: Stat): Promise<StatWeightsResult> {
-		const request = StatWeightsRequest.create({
-			player: player.toProto(),
-			raidBuffs: this.raid.getBuffs(),
-			partyBuffs: player.getParty()!.getBuffs(),
-			encounter: this.encounter.toProto(),
-			simOptions: SimOptions.create({
-				iterations: this.getIterations(),
-				debug: false,
-			}),
+		if (this.raid.isEmpty()) {
+			throw new Error('Raid is empty! Try adding some players first.');
+		} else if (this.encounter.getNumTargets() < 1) {
+			throw new Error('Encounter has no targets! Try adding some targets first.');
+		}
 
-			statsToWeigh: epStats,
-			epReferenceStat: epReferenceStat,
-		});
+		if (player.getParty() == null) {
+			console.warn('Trying to get stat weights without a party!');
+			return StatWeightsResult.create();
+		} else {
+			const request = StatWeightsRequest.create({
+				player: player.toProto(),
+				raidBuffs: this.raid.getBuffs(),
+				partyBuffs: player.getParty()!.getBuffs(),
+				encounter: this.encounter.toProto(),
+				simOptions: SimOptions.create({
+					iterations: this.getIterations(),
+					debug: false,
+				}),
 
-		return await this.workerPool.statWeights(request);
+				statsToWeigh: epStats,
+				epReferenceStat: epReferenceStat,
+			});
+
+			return await this.workerPool.statWeights(request);
+		}
 	}
 
 	getItems(slot: ItemSlot | undefined): Array<Item> {

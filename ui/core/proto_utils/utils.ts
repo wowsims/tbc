@@ -78,6 +78,15 @@ export const specIconsLarge: Record<Spec, string> = {
   [Spec.SpecWarrior]: 'https://wow.zamimg.com/images/wow/icons/large/ability_warrior_innerrage.jpg',
 };
 
+// Gets the URL for the individual sim corresponding to the given spec.
+//const specSiteUrlTemplate = new URL(`${window.location.protocol}//${window.location.host}/${repoName}/SPEC/index.html`);
+//export function getSpecSiteUrl(spec: Spec): string {
+//	let specString = Spec[spec]; // Returns 'SpecBalanceDruid' for BalanceDruid.
+//	specString = specString.substring('Spec'.length); // 'BalanceDruid'
+//	specString = camelToSnakeCase(specString); // 'balance_druid'
+//	return specSiteUrlTemplate.replace('SPEC', specString);
+//}
+
 export type RotationUnion =
 		BalanceDruidRotation |
 		ElementalShamanRotation |

@@ -1,4 +1,3 @@
-import { IconInput } from '/tbc/core/components/icon_picker.js';
 import { ShadowPriest_Rotation_RotationType as RotationType } from '/tbc/core/proto/priest.js';
 import { Race, RaidTarget } from '/tbc/core/proto/common.js';
 import { Spec } from '/tbc/core/proto/common.js';

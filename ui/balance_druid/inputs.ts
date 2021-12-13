@@ -1,4 +1,3 @@
-import { IconInput } from '/tbc/core/components/icon_picker.js';
 import { BalanceDruid_Rotation_PrimarySpell as PrimarySpell } from '/tbc/core/proto/druid.js';
 import { BalanceDruid_Options as DruidOptions } from '/tbc/core/proto/druid.js';
 import { RaidTarget } from '/tbc/core/proto/common.js';
@@ -16,9 +15,13 @@ import { Target } from '/tbc/core/target.js';
 export const SelfInnervate = {
 	id: { spellId: 29166 },
 	states: 2,
+	extraCssClasses: [
+		'self-innervate-picker',
+		'within-raid-sim-hide',
+	],
 	changedEvent: (player: Player<Spec.SpecBalanceDruid>) => player.specOptionsChangeEmitter,
 	getValue: (player: Player<Spec.SpecBalanceDruid>) => player.getSpecOptions().innervateTarget?.targetIndex != NO_TARGET,
-	setBooleanValue: (player: Player<Spec.SpecBalanceDruid>, newValue: boolean) => {
+	setValue: (player: Player<Spec.SpecBalanceDruid>, newValue: boolean) => {
 		const newOptions = player.getSpecOptions();
 		newOptions.innervateTarget = RaidTarget.create({
 			targetIndex: newValue ? 0 : NO_TARGET,
@@ -30,9 +33,12 @@ export const SelfInnervate = {
 export const BalanceDruidRotationConfig = {
 	inputs: [
 		{
-			type: 'enum' as const, cssClass: 'primary-spell-enum-picker',
+			type: 'enum' as const,
 			getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
 			config: {
+				extraCssClasses: [
+					'primary-spell-enum-picker',
+				],
 				label: 'Primary Spell',
 				labelTooltip: 'If set to \'Adaptive\', will dynamically adjust rotation based on available mana.',
 				values: [
@@ -60,9 +66,11 @@ export const BalanceDruidRotationConfig = {
 		},
 		{
 			type: 'boolean' as const,
-			cssClass: 'moonfire-picker',
 			getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
 			config: {
+				extraCssClasses: [
+					'moonfire-picker',
+				],
 				label: 'Use Moonfire',
 				labelTooltip: 'Use Moonfire as the next cast after the dot expires.',
 				changedEvent: (player: Player<Spec.SpecBalanceDruid>) => player.rotationChangeEmitter,
@@ -77,9 +85,11 @@ export const BalanceDruidRotationConfig = {
 		},
 		{
 			type: 'boolean' as const,
-			cssClass: 'faerie-fire-picker',
 			getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
 			config: {
+				extraCssClasses: [
+					'faerie-fire-picker',
+				],
 				label: 'Use Faerie Fire',
 				labelTooltip: 'Keep Faerie Fire active on the primary target.',
 				changedEvent: (player: Player<Spec.SpecBalanceDruid>) => player.rotationChangeEmitter,
@@ -93,9 +103,11 @@ export const BalanceDruidRotationConfig = {
 		},
 		{
 			type: 'boolean' as const,
-			cssClass: 'insect-swarm-picker',
 			getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
 			config: {
+				extraCssClasses: [
+					'insect-swarm-picker',
+				],
 				label: 'Use Insect Swarm',
 				labelTooltip: 'Keep Insect Swarm active on the primary target.',
 				changedEvent: (player: Player<Spec.SpecBalanceDruid>) => player.rotationChangeEmitter,
@@ -110,9 +122,11 @@ export const BalanceDruidRotationConfig = {
 		},
     {
       type: 'boolean' as const,
-      cssClass: 'battle-res-picker',
       getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
       config: {
+				extraCssClasses: [
+					'battle-res-picker',
+				],
         label: 'Use Battle Res',
         labelTooltip: 'Cast Battle Res on an ally sometime during the encounter.',
         changedEvent: (player: Player<Spec.SpecBalanceDruid>) => player.specOptionsChangeEmitter,

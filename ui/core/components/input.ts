@@ -11,7 +11,7 @@ declare var tippy: any;
 export interface InputConfig<ModObject, T> {
   label?: string,
 	labelTooltip?: string,
-	cssClass?: string,
+	extraCssClasses?: Array<string>,
 
   defaultValue?: T,
 
@@ -24,6 +24,9 @@ export interface InputConfig<ModObject, T> {
 
 	// If set, will automatically disable the input when this evaluates to false.
 	enableWhen?: (obj: ModObject) => boolean,
+
+	// Overrides the default root element (new div).
+	rootElem?: HTMLElement,
 }
 
 // Shared logic for UI elements that are mapped to a value for some modifiable object.
@@ -31,13 +34,15 @@ export abstract class Input<ModObject, T> extends Component {
 	private readonly inputConfig: InputConfig<ModObject, T>;
 	readonly modObject: ModObject;
 
+  readonly changeEmitter = new TypedEvent<void>();
+
   constructor(parent: HTMLElement, cssClass: string, modObject: ModObject, config: InputConfig<ModObject, T>) {
-    super(parent, 'input-root');
+    super(parent, 'input-root', config.rootElem);
 		this.inputConfig = config;
 		this.modObject = modObject;
 		this.rootElem.classList.add(cssClass);
-		if (config.cssClass) {
-			this.rootElem.classList.add(config.cssClass);
+		if (config.extraCssClasses) {
+			this.rootElem.classList.add(...config.extraCssClasses);
 		}
 
     if (config.label) {
@@ -97,5 +102,6 @@ export abstract class Input<ModObject, T> extends Component {
 	// Child classes should call this method when the value in the input element changes.
 	inputChanged() {
 		this.inputConfig.setValue(this.modObject, this.getInputValue());
+		this.changeEmitter.emit();
 	}
 }

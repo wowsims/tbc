@@ -12,7 +12,7 @@ import { wait } from './utils.js';
 export class Target {
 	private readonly sim: Sim;
 
-	private armor: number = 0;
+	private armor: number = 7700;
 	private mobType: MobType = MobType.MobTypeDemon;
   private debuffs: Debuffs = Debuffs.create();
 
