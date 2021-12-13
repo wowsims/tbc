@@ -30,14 +30,16 @@ export class SimUI extends Component {
         });
         this.resultsPendingElem = this.rootElem.getElementsByClassName('results-pending')[0];
         this.resultsContentElem = this.rootElem.getElementsByClassName('results-content')[0];
-        this.resultsContentElem.style.display = 'none';
-        this.resultsPendingElem.style.display = 'none';
+        this.hideAllResults();
         const titleElem = this.rootElem.getElementsByClassName('sim-sidebar-title')[0];
         titleElem.textContent = config.title;
         const simActionsContainer = this.rootElem.getElementsByClassName('sim-sidebar-actions')[0];
         const iterationsPicker = new NumberPicker(simActionsContainer, this.sim, {
             label: 'Iterations',
-            cssClass: 'iterations-picker',
+            extraCssClasses: [
+                'iterations-picker',
+                'within-raid-sim-hide',
+            ],
             changedEvent: (sim) => sim.iterationsChangeEmitter,
             getValue: (sim) => sim.getIterations(),
             setValue: (sim, newValue) => {
@@ -58,7 +60,7 @@ export class SimUI extends Component {
         const simTabsContainer = this.rootElem.getElementsByClassName('sim-tabs')[0];
         const simTabContentsContainer = this.rootElem.getElementsByClassName('tab-content')[0];
         const topBar = simTabsContainer.getElementsByClassName('sim-top-bar')[0];
-        const contentId = title.replace(/\s+/g, '-') + '-tab';
+        const contentId = cssClass.replace(/\s+/g, '-') + '-tab';
         const isFirstTab = simTabsContainer.children.length == 1;
         const newTab = document.createElement('li');
         newTab.innerHTML = `<a data-toggle="tab" href="#${contentId}">${title}</a>`;
@@ -74,6 +76,10 @@ export class SimUI extends Component {
         simTabsContainer.insertBefore(newTab, topBar);
         simTabContentsContainer.appendChild(newContent);
     }
+    hideAllResults() {
+        this.resultsContentElem.style.display = 'none';
+        this.resultsPendingElem.style.display = 'none';
+    }
     setResultsPending() {
         this.resultsContentElem.style.display = 'none';
         this.resultsPendingElem.style.display = 'initial';
@@ -86,13 +92,16 @@ export class SimUI extends Component {
     getSettingsStorageKey() {
         return this.getStorageKey('__currentSettings__');
     }
+    getSavedEncounterStorageKey() {
+        return this.getStorageKey('__savedEncounter__');
+    }
 }
 const simHTML = `
 <div class="sim-root">
   <section class="sim-sidebar">
     <div class="sim-sidebar-title"></div>
-    <div class="sim-sidebar-actions"></div>
-    <div class="sim-sidebar-results">
+    <div class="sim-sidebar-actions within-raid-sim-hide"></div>
+    <div class="sim-sidebar-results within-raid-sim-hide">
       <div class="results-pending">
         <div class="loader"></div>
       </div>
@@ -105,7 +114,7 @@ const simHTML = `
     <ul class="sim-tabs nav nav-tabs">
       <li class="sim-top-bar">
 				<div class="known-issues">Known Issues</div>
-				<span class="share-link fa fa-link"></span>
+				<span class="share-link fa fa-link within-raid-sim-hide"></span>
 			</li>
     </ul>
     <div class="tab-content">

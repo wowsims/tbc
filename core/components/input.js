@@ -1,13 +1,15 @@
+import { TypedEvent } from '/tbc/core/typed_event.js';
 import { Component } from './component.js';
 // Shared logic for UI elements that are mapped to a value for some modifiable object.
 export class Input extends Component {
     constructor(parent, cssClass, modObject, config) {
-        super(parent, 'input-root');
+        super(parent, 'input-root', config.rootElem);
+        this.changeEmitter = new TypedEvent();
         this.inputConfig = config;
         this.modObject = modObject;
         this.rootElem.classList.add(cssClass);
-        if (config.cssClass) {
-            this.rootElem.classList.add(config.cssClass);
+        if (config.extraCssClasses) {
+            this.rootElem.classList.add(...config.extraCssClasses);
         }
         if (config.label) {
             const labelDiv = document.createElement('div');
@@ -56,5 +58,6 @@ export class Input extends Component {
     // Child classes should call this method when the value in the input element changes.
     inputChanged() {
         this.inputConfig.setValue(this.modObject, this.getInputValue());
+        this.changeEmitter.emit();
     }
 }

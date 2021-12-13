@@ -6,16 +6,18 @@ import { Component } from './component.js';
 export interface InputConfig<ModObject, T> {
     label?: string;
     labelTooltip?: string;
-    cssClass?: string;
+    extraCssClasses?: Array<string>;
     defaultValue?: T;
     changedEvent: (obj: ModObject) => TypedEvent<any>;
     getValue: (obj: ModObject) => T;
     setValue: (obj: ModObject, newValue: T) => void;
     enableWhen?: (obj: ModObject) => boolean;
+    rootElem?: HTMLElement;
 }
 export declare abstract class Input<ModObject, T> extends Component {
     private readonly inputConfig;
     readonly modObject: ModObject;
+    readonly changeEmitter: TypedEvent<void>;
     constructor(parent: HTMLElement, cssClass: string, modObject: ModObject, config: InputConfig<ModObject, T>);
     private update;
     init(): void;

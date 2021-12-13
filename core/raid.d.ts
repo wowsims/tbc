@@ -1,3 +1,4 @@
+import { Class } from '/tbc/core/proto/common.js';
 import { Raid as RaidProto } from '/tbc/core/proto/api.js';
 import { RaidBuffs } from '/tbc/core/proto/common.js';
 import { Party } from './party.js';
@@ -11,6 +12,7 @@ export declare class Raid {
     readonly buffsChangeEmitter: TypedEvent<void>;
     readonly changeEmitter: TypedEvent<void>;
     private parties;
+    private modifyRaidProto;
     readonly sim: Sim;
     constructor(sim: Sim);
     size(): number;
@@ -20,8 +22,10 @@ export declare class Raid {
     getPlayers(): Array<Player<any> | null>;
     getPlayer(index: number): Player<any> | null;
     setPlayer(index: number, newPlayer: Player<any> | null): void;
+    getClassCount(playerClass: Class): number;
     getBuffs(): RaidBuffs;
     setBuffs(newBuffs: RaidBuffs): void;
+    setModifyRaidProto(newModFn: (raidProto: RaidProto) => void): void;
     toProto(): RaidProto;
     toJson(): Object;
     fromJson(obj: any): void;

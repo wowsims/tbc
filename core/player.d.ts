@@ -1,3 +1,4 @@
+import { Class } from '/tbc/core/proto/common.js';
 import { Consumes } from '/tbc/core/proto/common.js';
 import { Enchant } from '/tbc/core/proto/common.js';
 import { Gem } from '/tbc/core/proto/common.js';
@@ -50,11 +51,13 @@ export declare class Player<SpecType extends Spec> {
     readonly currentStatsEmitter: TypedEvent<void>;
     readonly changeEmitter: TypedEvent<void>;
     constructor(spec: Spec, sim: Sim);
+    getClass(): Class;
     getParty(): Party | null;
     getRaid(): Raid | null;
     getPartyIndex(): number;
     getRaidIndex(): number;
     setParty(newParty: Party | null): void;
+    getOtherPartyMembers(): Array<Player<any>>;
     getItems(slot: ItemSlot | undefined): Array<Item>;
     getEnchants(slot: ItemSlot | undefined): Array<Enchant>;
     getGems(socketColor: GemColor | undefined): Array<Gem>;

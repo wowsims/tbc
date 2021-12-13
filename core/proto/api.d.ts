@@ -23,12 +23,25 @@ import { BalanceDruid } from "./druid";
 import { IndividualBuffs } from "./common";
 import { Consumes } from "./common";
 import { EquipmentSpec } from "./common";
+import { Spec } from "./common";
 import { Class } from "./common";
 import { Race } from "./common";
 /**
  * @generated from protobuf message proto.Player
  */
 export interface Player {
+    /**
+     * Label used for logging.
+     *
+     * @generated from protobuf field: string name = 16;
+     */
+    name: string;
+    /**
+     * The index of this player within the raid [0-24].
+     *
+     * @generated from protobuf field: int32 raid_index = 17;
+     */
+    raidIndex: number;
     /**
      * @generated from protobuf field: proto.Race race = 1;
      */
@@ -37,6 +50,10 @@ export interface Player {
      * @generated from protobuf field: proto.Class class = 2;
      */
     class: Class;
+    /**
+     * @generated from protobuf field: proto.Spec player_spec = 18;
+     */
+    playerSpec: Spec;
     /**
      * @generated from protobuf field: proto.EquipmentSpec equipment = 3;
      */
@@ -126,6 +143,12 @@ export interface Party {
      * @generated from protobuf field: proto.PartyBuffs buffs = 2;
      */
     buffs?: PartyBuffs;
+    /**
+     * The index of this party within the raid [0-4].
+     *
+     * @generated from protobuf field: int32 index = 3;
+     */
+    index: number;
 }
 /**
  * @generated from protobuf message proto.Raid

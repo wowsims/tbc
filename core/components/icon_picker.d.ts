@@ -1,27 +1,18 @@
 import { ItemOrSpellId } from '/tbc/core/resources.js';
-import { TypedEvent } from '/tbc/core/typed_event.js';
-import { ExclusivityTag } from '/tbc/core/individual_sim_ui.js';
-import { IndividualSimUI } from '/tbc/core/individual_sim_ui.js';
-import { Component } from './component.js';
-export declare class IconPicker<ModObject> extends Component {
-    private readonly _input;
-    private readonly _modObject;
-    private readonly _rootAnchor;
-    private readonly _improvedAnchor;
-    private readonly _counterElem;
-    private readonly _clickedEmitter;
-    constructor(parent: HTMLElement, modObj: ModObject, input: IconInput<ModObject>, simUI: IndividualSimUI<any>);
-    private getValue;
-    private setValue;
-    private updateIcon;
-}
-export declare type IconInput<ModObject> = {
+import { Input, InputConfig } from './input.js';
+export interface IconPickerConfig<ModObject, ValueType> extends InputConfig<ModObject, ValueType> {
     id: ItemOrSpellId;
     states: number;
     improvedId?: ItemOrSpellId;
-    exclusivityTags?: Array<ExclusivityTag>;
-    changedEvent: (obj: ModObject) => TypedEvent<any>;
-    getValue: (obj: ModObject) => boolean | number;
-    setBooleanValue?: (obj: ModObject, newValue: boolean) => void;
-    setNumberValue?: (obj: ModObject, newValue: number) => void;
-};
+}
+export declare class IconPicker<ModObject, ValueType> extends Input<ModObject, ValueType> {
+    private readonly config;
+    private readonly rootAnchor;
+    private readonly improvedAnchor;
+    private readonly counterElem;
+    private currentValue;
+    constructor(parent: HTMLElement, modObj: ModObject, config: IconPickerConfig<ModObject, ValueType>);
+    getInputElem(): HTMLElement;
+    getInputValue(): ValueType;
+    setInputValue(newValue: ValueType): void;
+}

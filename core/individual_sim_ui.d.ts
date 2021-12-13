@@ -5,7 +5,7 @@ import { EncounterPickerConfig } from '/tbc/core/components/encounter_picker.js'
 import { EnumPickerConfig } from '/tbc/core/components/enum_picker.js';
 import { EquipmentSpec } from '/tbc/core/proto/common.js';
 import { Gear } from '/tbc/core/proto_utils/gear.js';
-import { IconInput } from '/tbc/core/components/icon_picker.js';
+import { IconPickerConfig } from '/tbc/core/components/icon_picker.js';
 import { IndividualBuffs } from '/tbc/core/proto/common.js';
 import { NumberPickerConfig } from '/tbc/core/components/number_picker.js';
 import { Party } from './party.js';
@@ -23,22 +23,22 @@ import { Stat } from '/tbc/core/proto/common.js';
 import { Stats } from '/tbc/core/proto_utils/stats.js';
 import { Target } from './target.js';
 import { TypedEvent } from './typed_event.js';
+export interface IndividualSimIconPickerConfig<ModObject, ValueType> extends IconPickerConfig<ModObject, ValueType> {
+    exclusivityTags?: Array<ExclusivityTag>;
+}
 export declare type ReleaseStatus = 'Alpha' | 'Beta' | 'Live';
 export interface InputSection {
     tooltip?: string;
     inputs: Array<{
         type: 'boolean';
-        cssClass: string;
         getModObject: (simUI: IndividualSimUI<any>) => any;
         config: BooleanPickerConfig<any>;
     } | {
         type: 'number';
-        cssClass: string;
         getModObject: (simUI: IndividualSimUI<any>) => any;
         config: NumberPickerConfig<any>;
     } | {
         type: 'enum';
-        cssClass: string;
         getModObject: (simUI: IndividualSimUI<any>) => any;
         config: EnumPickerConfig<any>;
     }>;
@@ -62,12 +62,12 @@ export interface IndividualSimUIConfig<SpecType extends Spec> {
         individualBuffs: IndividualBuffs;
         debuffs: Debuffs;
     };
-    selfBuffInputs: Array<IconInput<Player<any>>>;
-    raidBuffInputs: Array<IconInput<Raid>>;
-    partyBuffInputs: Array<IconInput<Party>>;
-    playerBuffInputs: Array<IconInput<Player<any>>>;
-    debuffInputs: Array<IconInput<Target>>;
-    consumeInputs: Array<IconInput<Player<any>>>;
+    selfBuffInputs: Array<IndividualSimIconPickerConfig<Player<any>, any>>;
+    raidBuffInputs: Array<IndividualSimIconPickerConfig<Raid, any>>;
+    partyBuffInputs: Array<IndividualSimIconPickerConfig<Party, any>>;
+    playerBuffInputs: Array<IndividualSimIconPickerConfig<Player<any>, any>>;
+    debuffInputs: Array<IndividualSimIconPickerConfig<Target, any>>;
+    consumeInputs: Array<IndividualSimIconPickerConfig<Player<any>, any>>;
     rotationInputs: InputSection;
     otherInputs?: InputSection;
     additionalSections?: Record<string, InputSection>;
@@ -98,6 +98,7 @@ export interface Settings {
 export declare abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
     readonly player: Player<SpecType>;
     readonly individualConfig: IndividualSimUIConfig<SpecType>;
+    readonly isWithinRaidSim: boolean;
     private readonly exclusivityMap;
     constructor(parentElem: HTMLElement, player: Player<SpecType>, config: IndividualSimUIConfig<SpecType>);
     private loadSettings;
@@ -111,7 +112,6 @@ export declare abstract class IndividualSimUI<SpecType extends Spec> extends Sim
     private applyDefaults;
     registerExclusiveEffect(effect: ExclusiveEffect): void;
     getSavedGearStorageKey(): string;
-    getSavedEncounterStorageKey(): string;
     getSavedRotationStorageKey(): string;
     getSavedSettingsStorageKey(): string;
     getSavedTalentsStorageKey(): string;

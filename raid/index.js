@@ -88,4 +88,47 @@ const ui = new RaidSimUI(document.body, {
             iconUrl: specIconsLarge[Spec.SpecShadowPriest],
         },
     ],
+    buffBots: [
+        {
+            // The value of this field must never change, to preserve local storage data.
+            buffBotId: 'Paladin',
+            spec: Spec.SpecRetributionPaladin,
+            name: 'Paladin',
+            tooltip: 'Buff bot that adds a set of blessings.',
+            iconUrl: specIconsLarge[Spec.SpecRetributionPaladin],
+            modifyRaidProto: (raidProto, partyProto) => {
+                // Do nothing, blessings are handled elswhere.
+            },
+            modifyEncounterProto: (encounterProto) => {
+            },
+        },
+        {
+            // The value of this field must never change, to preserve local storage data.
+            buffBotId: 'JoW Paladin',
+            spec: Spec.SpecRetributionPaladin,
+            name: 'JoW Paladin',
+            tooltip: 'Buff bot that adds a set of blessings and Judgement of Wisdom.',
+            iconUrl: 'https://wow.zamimg.com/images/wow/icons/large/spell_holy_righteousnessaura.jpg',
+            modifyRaidProto: (raidProto, partyProto) => {
+                // Do nothing, blessings are handled elswhere.
+            },
+            modifyEncounterProto: (encounterProto) => {
+                encounterProto.targets[0].debuffs.judgementOfWisdom = true;
+            },
+        },
+        {
+            // The value of this field must never change, to preserve local storage data.
+            buffBotId: 'JoC Paladin',
+            spec: Spec.SpecRetributionPaladin,
+            name: 'JoC Paladin',
+            tooltip: 'Buff bot that adds a set of blessings and Improved Judgement of the Crusader (+3% crit).',
+            iconUrl: 'https://wow.zamimg.com/images/wow/icons/large/spell_holy_holysmite.jpg',
+            modifyRaidProto: (raidProto, partyProto) => {
+                // Do nothing, blessings are handled elswhere.
+            },
+            modifyEncounterProto: (encounterProto) => {
+                encounterProto.targets[0].debuffs.improvedSealOfTheCrusader = true;
+            },
+        },
+    ],
 });

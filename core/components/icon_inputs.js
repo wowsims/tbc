@@ -49,8 +49,18 @@ export const SkullfishSoup = makeBooleanConsumeInput({ itemId: 33825 }, 'skullfi
 export const SuperiorWizardOil = makeBooleanConsumeInput({ itemId: 22522 }, 'superiorWizardOil', ['Weapon Imbue']);
 export const DefaultDestructionPotion = makeEnumValueConsumeInput({ itemId: 22839 }, 'defaultPotion', Potions.DestructionPotion, ['Potion']);
 export const DefaultSuperManaPotion = makeEnumValueConsumeInput({ itemId: 22832 }, 'defaultPotion', Potions.SuperManaPotion, ['Potion']);
-export const DrumsOfBattleConsume = makeEnumValueConsumeInput({ spellId: 35476 }, 'drums', Drums.DrumsOfBattle, ['Drums']);
-export const DrumsOfRestorationConsume = makeEnumValueConsumeInput({ spellId: 35478 }, 'drums', Drums.DrumsOfRestoration, ['Drums']);
+function removeOtherPartyMembersDrums(player, newValue) {
+    if (newValue) {
+        player.getOtherPartyMembers().forEach(otherPlayer => {
+            const otherConsumes = otherPlayer.getConsumes();
+            otherConsumes.drums = Drums.DrumsUnknown;
+            otherPlayer.setConsumes(otherConsumes);
+        });
+    }
+}
+;
+export const DrumsOfBattleConsume = makeEnumValueConsumeInput({ spellId: 35476 }, 'drums', Drums.DrumsOfBattle, ['Drums'], removeOtherPartyMembersDrums);
+export const DrumsOfRestorationConsume = makeEnumValueConsumeInput({ spellId: 35478 }, 'drums', Drums.DrumsOfRestoration, ['Drums'], removeOtherPartyMembersDrums);
 function makeBooleanRaidBuffInput(id, buffsFieldName, exclusivityTags) {
     return {
         id: id,
@@ -58,7 +68,7 @@ function makeBooleanRaidBuffInput(id, buffsFieldName, exclusivityTags) {
         exclusivityTags: exclusivityTags,
         changedEvent: (raid) => raid.buffsChangeEmitter,
         getValue: (raid) => raid.getBuffs()[buffsFieldName],
-        setBooleanValue: (raid, newValue) => {
+        setValue: (raid, newValue) => {
             const newBuffs = raid.getBuffs();
             newBuffs[buffsFieldName] = newValue;
             raid.setBuffs(newBuffs);
@@ -72,7 +82,7 @@ function makeTristateRaidBuffInput(id, impId, buffsFieldName) {
         improvedId: impId,
         changedEvent: (raid) => raid.buffsChangeEmitter,
         getValue: (raid) => raid.getBuffs()[buffsFieldName],
-        setNumberValue: (raid, newValue) => {
+        setValue: (raid, newValue) => {
             const newBuffs = raid.getBuffs();
             newBuffs[buffsFieldName] = newValue;
             raid.setBuffs(newBuffs);
@@ -86,7 +96,7 @@ function makeBooleanPartyBuffInput(id, buffsFieldName, exclusivityTags) {
         exclusivityTags: exclusivityTags,
         changedEvent: (party) => party.buffsChangeEmitter,
         getValue: (party) => party.getBuffs()[buffsFieldName],
-        setBooleanValue: (party, newValue) => {
+        setValue: (party, newValue) => {
             const newBuffs = party.getBuffs();
             newBuffs[buffsFieldName] = newValue;
             party.setBuffs(newBuffs);
@@ -100,7 +110,7 @@ function makeTristatePartyBuffInput(id, impId, buffsFieldName) {
         improvedId: impId,
         changedEvent: (party) => party.buffsChangeEmitter,
         getValue: (party) => party.getBuffs()[buffsFieldName],
-        setNumberValue: (party, newValue) => {
+        setValue: (party, newValue) => {
             const newBuffs = party.getBuffs();
             newBuffs[buffsFieldName] = newValue;
             party.setBuffs(newBuffs);
@@ -113,7 +123,7 @@ function makeMultistatePartyBuffInput(id, numStates, buffsFieldName) {
         states: numStates,
         changedEvent: (party) => party.buffsChangeEmitter,
         getValue: (party) => party.getBuffs()[buffsFieldName],
-        setNumberValue: (party, newValue) => {
+        setValue: (party, newValue) => {
             const newBuffs = party.getBuffs();
             newBuffs[buffsFieldName] = newValue;
             party.setBuffs(newBuffs);
@@ -127,7 +137,7 @@ function makeEnumValuePartyBuffInput(id, buffsFieldName, enumValue, exclusivityT
         exclusivityTags: exclusivityTags,
         changedEvent: (party) => party.buffsChangeEmitter,
         getValue: (party) => party.getBuffs()[buffsFieldName] == enumValue,
-        setBooleanValue: (party, newValue) => {
+        setValue: (party, newValue) => {
             const newBuffs = party.getBuffs();
             newBuffs[buffsFieldName] = newValue ? enumValue : 0;
             party.setBuffs(newBuffs);
@@ -141,7 +151,7 @@ function makeBooleanIndividualBuffInput(id, buffsFieldName, exclusivityTags) {
         exclusivityTags: exclusivityTags,
         changedEvent: (player) => player.buffsChangeEmitter,
         getValue: (player) => player.getBuffs()[buffsFieldName],
-        setBooleanValue: (player, newValue) => {
+        setValue: (player, newValue) => {
             const newBuffs = player.getBuffs();
             newBuffs[buffsFieldName] = newValue;
             player.setBuffs(newBuffs);
@@ -155,7 +165,7 @@ function makeTristateIndividualBuffInput(id, impId, buffsFieldName) {
         improvedId: impId,
         changedEvent: (player) => player.buffsChangeEmitter,
         getValue: (player) => player.getBuffs()[buffsFieldName],
-        setNumberValue: (player, newValue) => {
+        setValue: (player, newValue) => {
             const newBuffs = player.getBuffs();
             newBuffs[buffsFieldName] = newValue;
             player.setBuffs(newBuffs);
@@ -169,7 +179,7 @@ function makeBooleanDebuffInput(id, debuffsFieldName, exclusivityTags) {
         exclusivityTags: exclusivityTags,
         changedEvent: (target) => target.debuffsChangeEmitter,
         getValue: (target) => target.getDebuffs()[debuffsFieldName],
-        setBooleanValue: (target, newValue) => {
+        setValue: (target, newValue) => {
             const newDebuffs = target.getDebuffs();
             newDebuffs[debuffsFieldName] = newValue;
             target.setDebuffs(newDebuffs);
@@ -183,7 +193,7 @@ function makeTristateDebuffInput(id, impId, debuffsFieldName) {
         improvedId: impId,
         changedEvent: (target) => target.debuffsChangeEmitter,
         getValue: (target) => target.getDebuffs()[debuffsFieldName],
-        setNumberValue: (target, newValue) => {
+        setValue: (target, newValue) => {
             const newDebuffs = target.getDebuffs();
             newDebuffs[debuffsFieldName] = newValue;
             target.setDebuffs(newDebuffs);
@@ -197,24 +207,27 @@ function makeBooleanConsumeInput(id, consumesFieldName, exclusivityTags) {
         exclusivityTags: exclusivityTags,
         changedEvent: (player) => player.consumesChangeEmitter,
         getValue: (player) => player.getConsumes()[consumesFieldName],
-        setBooleanValue: (player, newValue) => {
+        setValue: (player, newValue) => {
             const newBuffs = player.getConsumes();
             newBuffs[consumesFieldName] = newValue;
             player.setConsumes(newBuffs);
         },
     };
 }
-function makeEnumValueConsumeInput(id, consumesFieldName, enumValue, exclusivityTags) {
+function makeEnumValueConsumeInput(id, consumesFieldName, enumValue, exclusivityTags, onSet) {
     return {
         id: id,
         states: 2,
         exclusivityTags: exclusivityTags,
         changedEvent: (player) => player.consumesChangeEmitter,
         getValue: (player) => player.getConsumes()[consumesFieldName] == enumValue,
-        setBooleanValue: (player, newValue) => {
+        setValue: (player, newValue) => {
             const newConsumes = player.getConsumes();
             newConsumes[consumesFieldName] = newValue ? enumValue : 0;
             player.setConsumes(newConsumes);
+            if (onSet) {
+                onSet(player, newValue);
+            }
         },
     };
 }

@@ -27,10 +27,23 @@ import { specToEligibleRaces } from '/tbc/core/proto_utils/utils.js';
 import { specToLocalStorageKey } from '/tbc/core/proto_utils/utils.js';
 import * as Tooltips from '/tbc/core/constants/tooltips.js';
 const SAVED_GEAR_STORAGE_KEY = '__savedGear__';
-const SAVED_ENCOUNTER_STORAGE_KEY = '__savedEncounter__';
 const SAVED_ROTATION_STORAGE_KEY = '__savedRotation__';
 const SAVED_SETTINGS_STORAGE_KEY = '__savedSettings__';
 const SAVED_TALENTS_STORAGE_KEY = '__savedTalents__';
+;
+class IndividualSimIconPicker extends IconPicker {
+    constructor(parent, modObj, input, simUI) {
+        super(parent, modObj, input);
+        if (input.exclusivityTags) {
+            simUI.registerExclusiveEffect({
+                tags: input.exclusivityTags,
+                changedEvent: this.changeEmitter,
+                isActive: () => Boolean(this.getInputValue()),
+                deactivate: () => this.setInputValue(0),
+            });
+        }
+    }
+}
 // Extended shared UI for all individual player sims.
 export class IndividualSimUI extends SimUI {
     constructor(parentElem, player, config) {
@@ -48,6 +61,7 @@ export class IndividualSimUI extends SimUI {
         this.rootElem.classList.add('individual-sim-ui', config.cssClass);
         this.player = player;
         this.individualConfig = config;
+        this.isWithinRaidSim = this.rootElem.closest('.within-raid-sim') != null;
         this.exclusivityMap = {
             'Battle Elixir': [],
             'Drums': [],
@@ -58,18 +72,23 @@ export class IndividualSimUI extends SimUI {
             'Rune': [],
             'Weapon Imbue': [],
         };
-        // This needs to go before all the UI components so that gear loading is the
-        // first callback invoked from waitForInit().
-        this.sim.waitForInit().then(() => {
-            this.loadSettings();
-        });
+        if (!this.isWithinRaidSim) {
+            // This needs to go before all the UI components so that gear loading is the
+            // first callback invoked from waitForInit().
+            this.sim.waitForInit().then(() => {
+                this.loadSettings();
+            });
+        }
+        this.player.setEpWeights(this.individualConfig.defaults.epWeights);
         this.addSidebarComponents();
         this.addTopbarComponents();
         this.addGearTab();
         this.addSettingsTab();
         this.addTalentsTab();
-        this.addDetailedResultsTab();
-        this.addLogTab();
+        if (!this.isWithinRaidSim) {
+            this.addDetailedResultsTab();
+            this.addLogTab();
+        }
     }
     loadSettings() {
         let loadedSettings = false;
@@ -113,7 +132,6 @@ export class IndividualSimUI extends SimUI {
         if (!loadedSettings) {
             this.applyDefaults();
         }
-        this.player.setEpWeights(this.individualConfig.defaults.epWeights);
         // This needs to go last so it doesn't re-store things as they are initialized.
         this.changeEmitter.on(() => {
             const jsonStr = JSON.stringify(this.sim.toJson());
@@ -214,7 +232,7 @@ export class IndividualSimUI extends SimUI {
         this.addTab('Settings', 'settings-tab', `
 			<div class="settings-inputs">
 				<div class="settings-section-container">
-					<section class="settings-section encounter-section">
+					<section class="settings-section encounter-section within-raid-sim-hide">
 						<label>Encounter</label>
 					</section>
 					<section class="settings-section race-section">
@@ -229,7 +247,7 @@ export class IndividualSimUI extends SimUI {
 						<label>Self Buffs</label>
 					</section>
 				</div>
-				<div class="settings-section-container">
+				<div class="settings-section-container within-raid-sim-hide">
 					<section class="settings-section buffs-section">
 						<label>Other Buffs</label>
 					</section>
@@ -239,7 +257,7 @@ export class IndividualSimUI extends SimUI {
 						<label>Consumes</label>
 					</section>
 				</div>
-				<div class="settings-section-container">
+				<div class="settings-section-container within-raid-sim-hide">
 					<section class="settings-section debuffs-section">
 						<label>Debuffs</label>
 					</section>
@@ -251,11 +269,11 @@ export class IndividualSimUI extends SimUI {
 				</div>
 			</div>
 			<div class="settings-bottom-bar">
-				<div class="saved-encounter-manager">
+				<div class="saved-encounter-manager within-raid-sim-hide">
 				</div>
 				<div class="saved-rotation-manager">
 				</div>
-				<div class="saved-settings-manager">
+				<div class="saved-settings-manager within-raid-sim-hide">
 				</div>
 			</div>
 		`);
@@ -272,17 +290,17 @@ export class IndividualSimUI extends SimUI {
             }
         };
         const selfBuffsSection = this.rootElem.getElementsByClassName('self-buffs-section')[0];
-        configureIconSection(selfBuffsSection, this.individualConfig.selfBuffInputs.map(iconInput => new IconPicker(selfBuffsSection, this.player, iconInput, this)), Tooltips.SELF_BUFFS_SECTION);
+        configureIconSection(selfBuffsSection, this.individualConfig.selfBuffInputs.map(iconInput => new IndividualSimIconPicker(selfBuffsSection, this.player, iconInput, this)), Tooltips.SELF_BUFFS_SECTION);
         const buffsSection = this.rootElem.getElementsByClassName('buffs-section')[0];
         configureIconSection(buffsSection, [
-            this.individualConfig.raidBuffInputs.map(iconInput => new IconPicker(buffsSection, this.sim.raid, iconInput, this)),
-            this.individualConfig.playerBuffInputs.map(iconInput => new IconPicker(buffsSection, this.player, iconInput, this)),
-            this.individualConfig.partyBuffInputs.map(iconInput => new IconPicker(buffsSection, this.player.getParty(), iconInput, this)),
+            this.individualConfig.raidBuffInputs.map(iconInput => new IndividualSimIconPicker(buffsSection, this.sim.raid, iconInput, this)),
+            this.individualConfig.playerBuffInputs.map(iconInput => new IndividualSimIconPicker(buffsSection, this.player, iconInput, this)),
+            this.individualConfig.partyBuffInputs.map(iconInput => new IndividualSimIconPicker(buffsSection, this.player.getParty(), iconInput, this)),
         ].flat(), Tooltips.OTHER_BUFFS_SECTION);
         const debuffsSection = this.rootElem.getElementsByClassName('debuffs-section')[0];
-        configureIconSection(debuffsSection, this.individualConfig.debuffInputs.map(iconInput => new IconPicker(debuffsSection, this.sim.encounter.primaryTarget, iconInput, this)));
+        configureIconSection(debuffsSection, this.individualConfig.debuffInputs.map(iconInput => new IndividualSimIconPicker(debuffsSection, this.sim.encounter.primaryTarget, iconInput, this)));
         const consumesSection = this.rootElem.getElementsByClassName('consumes-section')[0];
-        configureIconSection(consumesSection, this.individualConfig.consumeInputs.map(iconInput => new IconPicker(consumesSection, this.player, iconInput, this)));
+        configureIconSection(consumesSection, this.individualConfig.consumeInputs.map(iconInput => new IndividualSimIconPicker(consumesSection, this.player, iconInput, this)));
         const configureInputSection = (sectionElem, sectionConfig) => {
             if (sectionConfig.tooltip) {
                 tippy(sectionElem, {
@@ -471,6 +489,9 @@ export class IndividualSimUI extends SimUI {
         this.player.setRotation(this.individualConfig.defaults.rotation);
         this.player.setTalentsString(this.individualConfig.defaults.talents);
         this.player.setSpecOptions(this.individualConfig.defaults.specOptions);
+        this.player.setBuffs(this.individualConfig.defaults.individualBuffs);
+        this.player.getParty().setBuffs(this.individualConfig.defaults.partyBuffs);
+        this.player.getRaid().setBuffs(this.individualConfig.defaults.raidBuffs);
         this.sim.encounter.primaryTarget.setDebuffs(this.individualConfig.defaults.debuffs);
     }
     registerExclusiveEffect(effect) {
@@ -489,9 +510,6 @@ export class IndividualSimUI extends SimUI {
     }
     getSavedGearStorageKey() {
         return this.getStorageKey(SAVED_GEAR_STORAGE_KEY);
-    }
-    getSavedEncounterStorageKey() {
-        return this.getStorageKey(SAVED_ENCOUNTER_STORAGE_KEY);
     }
     getSavedRotationStorageKey() {
         return this.getStorageKey(SAVED_ROTATION_STORAGE_KEY);

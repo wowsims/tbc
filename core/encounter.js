@@ -10,6 +10,7 @@ export class Encounter {
         this.numTargetsChangeEmitter = new TypedEvent();
         // Emits when any of the above emitters emit.
         this.changeEmitter = new TypedEvent();
+        this.modifyEncounterProto = () => { };
         this.sim = sim;
         this.primaryTarget = new Target(sim);
         [
@@ -36,16 +37,21 @@ export class Encounter {
         this.numTargets = newNumTargets;
         this.numTargetsChangeEmitter.emit();
     }
+    setModifyEncounterProto(newModFn) {
+        this.modifyEncounterProto = newModFn;
+    }
     toProto() {
         const numTargets = Math.max(1, this.numTargets);
         const targetProtos = [];
         for (let i = 0; i < numTargets; i++) {
             targetProtos.push(this.primaryTarget.toProto());
         }
-        return EncounterProto.create({
+        const proto = EncounterProto.create({
             duration: this.duration,
             targets: targetProtos,
         });
+        this.modifyEncounterProto(proto);
+        return proto;
     }
     fromProto(proto) {
         this.setDuration(proto.duration);

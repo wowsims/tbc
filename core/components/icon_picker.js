@@ -1,106 +1,96 @@
 import { getIconUrl } from '/tbc/core/resources.js';
 import { setWowheadHref } from '/tbc/core/resources.js';
-import { TypedEvent } from '/tbc/core/typed_event.js';
 import { isRightClick } from '/tbc/core/utils.js';
-import { Component } from './component.js';
+import { Input } from './input.js';
+;
 // Icon-based UI for picking buffs / consumes / etc
 // ModObject is the object being modified (Sim, Player, or Target).
-export class IconPicker extends Component {
-    constructor(parent, modObj, input, simUI) {
-        super(parent, 'icon-input', document.createElement('a'));
-        this._clickedEmitter = new TypedEvent();
-        this._input = input;
-        this._modObject = modObj;
-        this._rootAnchor = this.rootElem;
-        this._rootAnchor.target = '_blank';
-        this._rootAnchor.dataset.states = String(this._input.states);
-        this._rootAnchor.innerHTML = `
+export class IconPicker extends Input {
+    constructor(parent, modObj, config) {
+        config.rootElem = document.createElement('a');
+        super(parent, 'icon-input', modObj, config);
+        this.config = config;
+        this.currentValue = 0;
+        this.rootAnchor = this.rootElem;
+        this.rootAnchor.target = '_blank';
+        this.rootAnchor.dataset.states = String(this.config.states);
+        this.rootAnchor.innerHTML = `
     <div class="icon-input-level-container">
       <a class="icon-input-improved"></a>
       <span class="icon-input-counter"></span>
     </div>
     `;
-        this._improvedAnchor = this._rootAnchor.getElementsByClassName('icon-input-improved')[0];
-        this._counterElem = this._rootAnchor.getElementsByClassName('icon-input-counter')[0];
-        setWowheadHref(this._rootAnchor, this._input.id);
-        getIconUrl(this._input.id).then(url => {
-            this._rootAnchor.style.backgroundImage = `url('${url}')`;
+        this.improvedAnchor = this.rootAnchor.getElementsByClassName('icon-input-improved')[0];
+        this.counterElem = this.rootAnchor.getElementsByClassName('icon-input-counter')[0];
+        setWowheadHref(this.rootAnchor, this.config.id);
+        getIconUrl(this.config.id).then(url => {
+            this.rootAnchor.style.backgroundImage = `url('${url}')`;
         });
-        if (this._input.states == 3) {
-            if (this._input.improvedId) {
-                setWowheadHref(this._improvedAnchor, this._input.improvedId);
-                getIconUrl(this._input.improvedId).then(url => {
-                    this._improvedAnchor.style.backgroundImage = `url('${url}')`;
+        if (this.config.states == 3) {
+            if (this.config.improvedId) {
+                setWowheadHref(this.improvedAnchor, this.config.improvedId);
+                getIconUrl(this.config.improvedId).then(url => {
+                    this.improvedAnchor.style.backgroundImage = `url('${url}')`;
                 });
             }
             else {
                 throw new Error('IconInput missing improved icon id');
             }
         }
-        this.updateIcon();
-        this._input.changedEvent(this._modObject).on(() => this.updateIcon());
-        this._rootAnchor.addEventListener('click', event => {
+        this.init();
+        this.rootAnchor.addEventListener('click', event => {
             event.preventDefault();
         });
-        this._rootAnchor.addEventListener('contextmenu', event => {
+        this.rootAnchor.addEventListener('contextmenu', event => {
             event.preventDefault();
         });
-        this._rootAnchor.addEventListener('mousedown', event => {
+        this.rootAnchor.addEventListener('mousedown', event => {
             const rightClick = isRightClick(event);
-            const value = this.getValue();
             if (rightClick) {
-                if (value > 0) {
-                    this.setValue(value - 1);
+                if (this.currentValue > 0) {
+                    this.currentValue--;
+                    this.inputChanged();
                 }
             }
             else {
-                if (this._input.states == 0 || (value + 1) < this._input.states) {
-                    this.setValue(value + 1);
+                if (this.config.states == 0 || (this.currentValue + 1) < this.config.states) {
+                    this.currentValue++;
+                    this.inputChanged();
                 }
             }
-            this._clickedEmitter.emit();
         });
-        if (this._input.exclusivityTags) {
-            simUI.registerExclusiveEffect({
-                tags: this._input.exclusivityTags,
-                changedEvent: this._clickedEmitter,
-                isActive: () => Boolean(this.getValue()),
-                deactivate: () => this.setValue(0),
-            });
-        }
     }
-    // Instead of dealing with bool | number, just convert everything to numbers
-    getValue() {
-        return Number(this._input.getValue(this._modObject));
+    getInputElem() {
+        return this.rootAnchor;
     }
-    setValue(newValue) {
-        if (this._input.setBooleanValue) {
-            this._input.setBooleanValue(this._modObject, newValue > 0);
-        }
-        else if (this._input.setNumberValue) {
-            this._input.setNumberValue(this._modObject, newValue);
-        }
-    }
-    updateIcon() {
-        const value = this.getValue();
-        if (value > 0) {
-            this._rootAnchor.classList.add('active');
-            this._counterElem.classList.add('active');
+    getInputValue() {
+        if (this.config.states == 2) {
+            return Boolean(this.currentValue);
         }
         else {
-            this._rootAnchor.classList.remove('active');
-            this._counterElem.classList.remove('active');
+            return this.currentValue;
         }
-        if (this._input.states == 3) {
-            if (value > 1) {
-                this._improvedAnchor.classList.add('active');
+    }
+    setInputValue(newValue) {
+        this.currentValue = Number(newValue);
+        if (this.currentValue > 0) {
+            this.rootAnchor.classList.add('active');
+            this.counterElem.classList.add('active');
+        }
+        else {
+            this.rootAnchor.classList.remove('active');
+            this.counterElem.classList.remove('active');
+        }
+        if (this.config.states == 3) {
+            if (this.currentValue > 1) {
+                this.improvedAnchor.classList.add('active');
             }
             else {
-                this._improvedAnchor.classList.remove('active');
+                this.improvedAnchor.classList.remove('active');
             }
         }
-        if (this._input.states > 3 || this._input.states == 0) {
-            this._counterElem.textContent = String(value);
+        if (this.config.states > 3 || this.config.states == 0) {
+            this.counterElem.textContent = String(this.currentValue);
         }
     }
 }

@@ -7,16 +7,17 @@ export declare const SelfInnervate: {
         spellId: number;
     };
     states: number;
+    extraCssClasses: string[];
     changedEvent: (player: Player<Spec.SpecBalanceDruid>) => import("/tbc/core/typed_event").TypedEvent<void>;
     getValue: (player: Player<Spec.SpecBalanceDruid>) => boolean;
-    setBooleanValue: (player: Player<Spec.SpecBalanceDruid>, newValue: boolean) => void;
+    setValue: (player: Player<Spec.SpecBalanceDruid>, newValue: boolean) => void;
 };
 export declare const BalanceDruidRotationConfig: {
     inputs: ({
         type: "enum";
-        cssClass: string;
         getModObject: (simUI: IndividualSimUI<any>) => Player<any>;
         config: {
+            extraCssClasses: string[];
             label: string;
             labelTooltip: string;
             values: {
@@ -30,9 +31,9 @@ export declare const BalanceDruidRotationConfig: {
         };
     } | {
         type: "boolean";
-        cssClass: string;
         getModObject: (simUI: IndividualSimUI<any>) => Player<any>;
         config: {
+            extraCssClasses: string[];
             label: string;
             labelTooltip: string;
             changedEvent: (player: Player<Spec.SpecBalanceDruid>) => import("/tbc/core/typed_event").TypedEvent<void>;
@@ -43,9 +44,9 @@ export declare const BalanceDruidRotationConfig: {
         };
     } | {
         type: "boolean";
-        cssClass: string;
         getModObject: (simUI: IndividualSimUI<any>) => Player<any>;
         config: {
+            extraCssClasses: string[];
             label: string;
             labelTooltip: string;
             changedEvent: (player: Player<Spec.SpecBalanceDruid>) => import("/tbc/core/typed_event").TypedEvent<void>;

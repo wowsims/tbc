@@ -10,11 +10,13 @@ export declare class Encounter {
     readonly durationChangeEmitter: TypedEvent<void>;
     readonly numTargetsChangeEmitter: TypedEvent<void>;
     readonly changeEmitter: TypedEvent<void>;
+    private modifyEncounterProto;
     constructor(sim: Sim);
     getDuration(): number;
     setDuration(newDuration: number): void;
     getNumTargets(): number;
     setNumTargets(newNumTargets: number): void;
+    setModifyEncounterProto(newModFn: (encounterProto: EncounterProto) => void): void;
     toProto(): EncounterProto;
     fromProto(proto: EncounterProto): void;
     toJson(): Object;

@@ -1,9 +1,9 @@
 import { Item } from '/tbc/core/proto/common.js';
-import { ComputeStatsRequest } from '/tbc/core/proto/api.js';
+import { ComputeStatsRequest, ComputeStatsResult } from '/tbc/core/proto/api.js';
 import { GearListRequest } from '/tbc/core/proto/api.js';
 import { RaidSimRequest } from '/tbc/core/proto/api.js';
 import { SimOptions } from '/tbc/core/proto/api.js';
-import { StatWeightsRequest } from '/tbc/core/proto/api.js';
+import { StatWeightsRequest, StatWeightsResult } from '/tbc/core/proto/api.js';
 import { EquippedItem } from '/tbc/core/proto_utils/equipped_item.js';
 import { Gear } from '/tbc/core/proto_utils/gear.js';
 import { getEligibleItemSlots } from '/tbc/core/proto_utils/utils.js';
@@ -59,38 +59,68 @@ export class Sim {
         });
     }
     async runRaidSim() {
+        if (this.raid.isEmpty()) {
+            throw new Error('Raid is empty! Try adding some players first.');
+        }
+        else if (this.encounter.getNumTargets() < 1) {
+            throw new Error('Encounter has no targets! Try adding some targets first.');
+        }
         const request = this.makeRaidSimRequest(false);
         const result = await this.workerPool.raidSim(request);
         this.raidSimEmitter.emit({ request: request, result: result });
         return result;
     }
     async runRaidSimWithLogs() {
+        if (this.raid.isEmpty()) {
+            throw new Error('Raid is empty! Try adding some players first.');
+        }
+        else if (this.encounter.getNumTargets() < 1) {
+            throw new Error('Encounter has no targets! Try adding some targets first.');
+        }
         const request = this.makeRaidSimRequest(true);
         const result = await this.workerPool.raidSim(request);
         this.raidSimEmitter.emit({ request: request, result: result });
         return result;
     }
     async getCharacterStats(player) {
-        return await this.workerPool.computeStats(ComputeStatsRequest.create({
-            player: player.toProto(),
-            raidBuffs: this.raid.getBuffs(),
-            partyBuffs: player.getParty().getBuffs(),
-        }));
+        if (player.getParty() == null) {
+            //console.warn('Trying to get character stats without a party!');
+            return ComputeStatsResult.create();
+        }
+        else {
+            return await this.workerPool.computeStats(ComputeStatsRequest.create({
+                player: player.toProto(),
+                raidBuffs: this.raid.getBuffs(),
+                partyBuffs: player.getParty().getBuffs(),
+            }));
+        }
     }
     async statWeights(player, epStats, epReferenceStat) {
-        const request = StatWeightsRequest.create({
-            player: player.toProto(),
-            raidBuffs: this.raid.getBuffs(),
-            partyBuffs: player.getParty().getBuffs(),
-            encounter: this.encounter.toProto(),
-            simOptions: SimOptions.create({
-                iterations: this.getIterations(),
-                debug: false,
-            }),
-            statsToWeigh: epStats,
-            epReferenceStat: epReferenceStat,
-        });
-        return await this.workerPool.statWeights(request);
+        if (this.raid.isEmpty()) {
+            throw new Error('Raid is empty! Try adding some players first.');
+        }
+        else if (this.encounter.getNumTargets() < 1) {
+            throw new Error('Encounter has no targets! Try adding some targets first.');
+        }
+        if (player.getParty() == null) {
+            console.warn('Trying to get stat weights without a party!');
+            return StatWeightsResult.create();
+        }
+        else {
+            const request = StatWeightsRequest.create({
+                player: player.toProto(),
+                raidBuffs: this.raid.getBuffs(),
+                partyBuffs: player.getParty().getBuffs(),
+                encounter: this.encounter.toProto(),
+                simOptions: SimOptions.create({
+                    iterations: this.getIterations(),
+                    debug: false,
+                }),
+                statsToWeigh: epStats,
+                epReferenceStat: epReferenceStat,
+            });
+            return await this.workerPool.statWeights(request);
+        }
     }
     getItems(slot) {
         let items = Object.values(this.items);

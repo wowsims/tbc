@@ -281,26 +281,17 @@
   color: lawngreen;
 }
 
-.selector-modal .modal-content {
-  background-color: #666;
-}
-
-.selector-modal-tabs .close {
-  color: red;
-  opacity: 0.5;
-  text-shadow: none;
-}
-
-.selector-modal-tabs .close:hover {
-  opacity: 1;
-}
-
-.selector-modal .modal-dialog {
-  margin: 0;
-  position: fixed;
-  top: 50%;
-  left: 50%;
+.selector-modal {
+  display: none;
+  margin: 0 !important;
+  position: absolute !important;
+  top: 50% !important;
+  left: 50% !important;
   transform: translate(-50%, -50%) !important;
+  min-width: 50%;
+  padding: 8px;
+  background-color: #666;
+  border-radius: 6px;
 }
 
 .selector-modal-tab-content-header {
@@ -385,6 +376,44 @@
 
 .selector-modal-list-item-ep-delta.negative {
   color: red;
+}
+
+.icon-enum-picker-root {
+  position: relative;
+  display: inline-block;
+}
+
+.icon-enum-picker-root a {
+  height: 40px;
+  width: 40px;
+  display: block;
+}
+
+.icon-enum-picker-button {
+  cursor: pointer;
+  background-size: cover;
+}
+
+.icon-enum-picker-dropdown {
+  display: none;
+  position: absolute;
+  background-color: gray;
+  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+  z-index: 1;
+}
+
+.icon-enum-picker-root:hover .icon-enum-picker-dropdown {
+  display: block;
+}
+
+.icon-enum-picker-option {
+  display: block;
+  cursor: pointer;
+  background-size: cover;
+}
+
+.icon-enum-picker-option:not(:hover) {
+  opacity: 0.7;
 }
 
 :root {
@@ -852,6 +881,35 @@
   display: none;
 }
 
+.close-button {
+  position: absolute;
+  right: -10px;
+  top: -10px;
+  height: 30px;
+  width: 30px;
+  background-color: black;
+  border: 2px solid white;
+  border-radius: 20px;
+  font-size: 20px;
+  font-weight: 900;
+  color: red;
+  opacity: 0.5;
+  text-shadow: none;
+  cursor: pointer;
+}
+
+.close-button:hover {
+  opacity: 1;
+}
+
+.close-button span {
+  margin: 0 !important;
+  position: absolute !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+}
+
 .input-label-div {
   display: inline-block;
   margin: 5px;
@@ -1022,10 +1080,10 @@ td, th {
 }
 
 .sim-sidebar-results > div {
-  margin: 0;
-  position: absolute;
-  top: 50%;
-  left: 50%;
+  margin: 0 !important;
+  position: absolute !important;
+  top: 50% !important;
+  left: 50% !important;
   transform: translate(-50%, -50%) !important;
   width: 100%;
   text-align: center;
@@ -1263,6 +1321,10 @@ td, th {
   border-color: dimgray;
 }
 
+.within-raid-sim .within-raid-sim-hide {
+  display: none;
+}
+
 .character-stats-header {
   padding: 5px;
   font-size: 14px;
@@ -1420,6 +1482,15 @@ td, th {
   display: inline-block;
 }
 
+.elemental-shaman-sim-ui {
+  --main-bg-color: MidnightBlue;
+  --main-text-color: White;
+  --main-secondary-color: Black;
+  --sidebar-bg-color: #222;
+  --sidebar-text-color: White;
+  --sidebar-highlight-color: Blue;
+}
+
 .elemental-shaman-sim-ui .self-buffs-section {
   grid-template-columns: repeat(4, 1fr);
 }
@@ -1434,15 +1505,6 @@ td, th {
 
 .elemental-shaman-sim-ui .debuffs-section {
   grid-template-columns: repeat(3, 1fr);
-}
-
-:root {
-  --main-bg-color: MidnightBlue;
-  --main-text-color: White;
-  --main-secondary-color: Black;
-  --sidebar-bg-color: #222;
-  --sidebar-text-color: White;
-  --sidebar-highlight-color: Blue;
 }
 
 /*# sourceMappingURL=index.css.map */

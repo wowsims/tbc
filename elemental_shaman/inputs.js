@@ -69,7 +69,7 @@ function makeBooleanShamanBuffInput(id, optionsFieldName) {
         states: 2,
         changedEvent: (player) => player.specOptionsChangeEmitter,
         getValue: (player) => player.getSpecOptions()[optionsFieldName],
-        setBooleanValue: (player, newValue) => {
+        setValue: (player, newValue) => {
             const newOptions = player.getSpecOptions();
             newOptions[optionsFieldName] = newValue;
             player.setSpecOptions(newOptions);

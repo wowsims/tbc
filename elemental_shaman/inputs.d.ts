@@ -1,13 +1,13 @@
-import { IconInput } from '/tbc/core/components/icon_picker.js';
+import { IconPickerConfig } from '/tbc/core/components/icon_picker.js';
 import { ElementalShaman_Rotation_RotationType as RotationType } from '/tbc/core/proto/shaman.js';
 import { Spec } from '/tbc/core/proto/common.js';
 import { Player } from '/tbc/core/player.js';
 import { IndividualSimUI } from '/tbc/core/individual_sim_ui.js';
-export declare const IconBloodlust: IconInput<Player<any>>;
-export declare const IconManaSpringTotem: IconInput<Player<any>>;
-export declare const IconTotemOfWrath: IconInput<Player<any>>;
-export declare const IconWaterShield: IconInput<Player<any>>;
-export declare const IconWrathOfAirTotem: IconInput<Player<any>>;
+export declare const IconBloodlust: IconPickerConfig<Player<any>, boolean>;
+export declare const IconManaSpringTotem: IconPickerConfig<Player<any>, boolean>;
+export declare const IconTotemOfWrath: IconPickerConfig<Player<any>, boolean>;
+export declare const IconWaterShield: IconPickerConfig<Player<any>, boolean>;
+export declare const IconWrathOfAirTotem: IconPickerConfig<Player<any>, boolean>;
 export declare const ElementalShamanRotationConfig: {
     inputs: ({
         type: "enum";

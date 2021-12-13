@@ -13,6 +13,7 @@ import { setWowheadItemHref } from '/tbc/core/resources.js';
 import { setGemSocketCssClass } from '/tbc/core/css_utils.js';
 import { setItemQualityCssClass } from '/tbc/core/css_utils.js';
 import { Component } from './component.js';
+import { CloseButton } from './close_button.js';
 import { makePhaseSelector } from './other_inputs.js';
 export class GearPicker extends Component {
     constructor(parent, player) {
@@ -23,7 +24,6 @@ export class GearPicker extends Component {
         const rightSide = document.createElement('div');
         rightSide.classList.add('gear-picker-right');
         this.rootElem.appendChild(rightSide);
-        const selectorModal = new SelectorModal(document.body, player);
         const leftItemPickers = [
             ItemSlot.ItemSlotHead,
             ItemSlot.ItemSlotNeck,
@@ -33,7 +33,7 @@ export class GearPicker extends Component {
             ItemSlot.ItemSlotWrist,
             ItemSlot.ItemSlotMainHand,
             ItemSlot.ItemSlotOffHand,
-        ].map(slot => new ItemPicker(leftSide, player, slot, selectorModal));
+        ].map(slot => new ItemPicker(leftSide, player, slot));
         const rightItemPickers = [
             ItemSlot.ItemSlotHands,
             ItemSlot.ItemSlotWaist,
@@ -44,12 +44,12 @@ export class GearPicker extends Component {
             ItemSlot.ItemSlotTrinket1,
             ItemSlot.ItemSlotTrinket2,
             ItemSlot.ItemSlotRanged,
-        ].map(slot => new ItemPicker(rightSide, player, slot, selectorModal));
+        ].map(slot => new ItemPicker(rightSide, player, slot));
         this.itemPickers = leftItemPickers.concat(rightItemPickers).sort((a, b) => a.slot - b.slot);
     }
 }
 class ItemPicker extends Component {
-    constructor(parent, player, slot, selectorModal) {
+    constructor(parent, player, slot) {
         super(parent, 'item-picker-root');
         // All items and enchants that are eligible for this slot
         this._items = [];
@@ -58,7 +58,7 @@ class ItemPicker extends Component {
         this.slot = slot;
         this.player = player;
         this.rootElem.innerHTML = `
-      <a class="item-picker-icon" target="_blank" data-toggle="modal" data-target="#selectorModal">
+      <a class="item-picker-icon">
         <div class="item-picker-sockets-container">
         </div>
       </a>
@@ -71,12 +71,13 @@ class ItemPicker extends Component {
         this.nameElem = this.rootElem.getElementsByClassName('item-picker-name')[0];
         this.enchantElem = this.rootElem.getElementsByClassName('item-picker-enchant')[0];
         this.socketsContainerElem = this.rootElem.getElementsByClassName('item-picker-sockets-container')[0];
-        this.item = null;
+        this.item = player.getEquippedItem(slot);
         player.sim.waitForInit().then(() => {
             this._items = this.player.getItems(this.slot);
             this._enchants = this.player.getEnchants(this.slot);
             this.iconElem.addEventListener('click', event => {
-                selectorModal.setData(this.slot, this._equippedItem, this._items, this._enchants);
+                event.preventDefault();
+                const selectorModal = new SelectorModal(this.rootElem.closest('.individual-sim-ui'), this.player, this.slot, this._equippedItem, this._items, this._enchants);
             });
         });
         player.gearChangeEmitter.on(() => {
@@ -125,37 +126,27 @@ class ItemPicker extends Component {
     }
 }
 class SelectorModal extends Component {
-    constructor(parent, player) {
-        super(parent, 'selector-model-root');
+    constructor(parent, player, slot, equippedItem, eligibleItems, eligibleEnchants) {
+        super(parent, 'selector-modal');
         this.player = player;
+        this.rootElem.id = 'selectorModal';
         this.rootElem.innerHTML = `
-    <div class="modal fade selector-modal" id="selectorModal" tabindex="-1" role="dialog" aria-labelledby="selectorModalTitle" aria-hidden="true">
-      <div class="modal-dialog" role="document">
-        <div class="modal-content">
-          <div class="modal-body">
-            <ul class="nav nav-tabs selector-modal-tabs">
-            </ul>
-            <div class="tab-content selector-modal-tab-content">
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary selector-modal-close-button" data-dismiss="modal">Close</button>
-          </div>
-        </div>
-      </div>
-    </div>
-    `;
+			<ul class="nav nav-tabs selector-modal-tabs">
+			</ul>
+			<div class="tab-content selector-modal-tab-content">
+			</div>
+		`;
+        new CloseButton(this.rootElem, () => {
+            $('#selectorModal').bPopup().close();
+            this.rootElem.remove();
+        });
         this.tabsElem = this.rootElem.getElementsByClassName('selector-modal-tabs')[0];
         this.contentElem = this.rootElem.getElementsByClassName('selector-modal-tab-content')[0];
-        this.closeButton = this.rootElem.getElementsByClassName('selector-modal-close-button')[0];
+        this.setData(slot, equippedItem, eligibleItems, eligibleEnchants);
     }
     setData(slot, equippedItem, eligibleItems, eligibleEnchants) {
         this.tabsElem.innerHTML = '';
         this.contentElem.innerHTML = '';
-        this.tabsElem.innerHTML = `
-    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-      <span aria-hidden="true">&times;</span>
-    </button>
-    `;
         this.addTab('Items', slot, equippedItem, eligibleItems, item => this.player.computeItemEP(item), equippedItem => equippedItem?.item, item => {
             return {
                 id: item.id,
@@ -195,6 +186,12 @@ class SelectorModal extends Component {
                 this.player.equipItem(slot, equippedItem.withEnchant(null));
         });
         this.addGemTabs(slot, equippedItem);
+        $('#selectorModal').bPopup({
+            closeClass: 'item-picker-close',
+            onClose: () => {
+                this.rootElem.remove();
+            },
+        });
     }
     addGemTabs(slot, equippedItem) {
         equippedItem?.item.gemSockets.forEach((socketColor, socketIdx) => {
@@ -234,7 +231,7 @@ class SelectorModal extends Component {
         };
         items.sort((itemA, itemB) => computeEP(itemB) - computeEP(itemA));
         const tabElem = document.createElement('li');
-        this.tabsElem.insertBefore(tabElem, this.tabsElem.lastChild);
+        this.tabsElem.appendChild(tabElem);
         const tabContentId = (label + '-tab').split(' ').join('');
         tabElem.innerHTML = `<a class="selector-modal-item-tab" data-toggle="tab" href="#${tabContentId}">${label}</a>`;
         const tabContent = document.createElement('div');

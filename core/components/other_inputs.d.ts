@@ -7,9 +7,9 @@ import { IndividualSimUI } from '/tbc/core/individual_sim_ui.js';
 export declare function makePhaseSelector(parent: HTMLElement, sim: Sim): EnumPicker<Sim>;
 export declare const StartingPotion: {
     type: "enum";
-    cssClass: string;
     getModObject: (simUI: IndividualSimUI<any>) => Player<any>;
     config: {
+        extraCssClasses: string[];
         label: string;
         labelTooltip: string;
         values: {
@@ -23,9 +23,9 @@ export declare const StartingPotion: {
 };
 export declare const NumStartingPotions: {
     type: "number";
-    cssClass: string;
     getModObject: (simUI: IndividualSimUI<any>) => Player<any>;
     config: {
+        extraCssClasses: string[];
         label: string;
         labelTooltip: string;
         changedEvent: (player: Player<any>) => import("../typed_event").TypedEvent<void>;
@@ -39,6 +39,7 @@ export declare const ShadowPriestDPS: {
     cssClass: string;
     getModObject: (simUI: IndividualSimUI<any>) => Player<any>;
     config: {
+        extraCssClasses: string[];
         label: string;
         changedEvent: (player: Player<any>) => import("../typed_event").TypedEvent<void>;
         getValue: (player: Player<any>) => number;
@@ -47,9 +48,9 @@ export declare const ShadowPriestDPS: {
 };
 export declare const ISBUptime: {
     type: "number";
-    cssClass: string;
     getModObject: (simUI: IndividualSimUI<any>) => Target;
     config: {
+        extraCssClasses: string[];
         label: string;
         changedEvent: (target: Target) => import("../typed_event").TypedEvent<void>;
         getValue: (target: Target) => number;

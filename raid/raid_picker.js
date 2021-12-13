@@ -1,3 +1,4 @@
+import { CloseButton } from '/tbc/core/components/close_button.js';
 import { Component } from '/tbc/core/components/component.js';
 import { EnumPicker } from '/tbc/core/components/enum_picker.js';
 import { MAX_PARTY_SIZE } from '/tbc/core/party.js';
@@ -7,11 +8,12 @@ import { Spec } from '/tbc/core/proto/common.js';
 import { Faction } from '/tbc/core/proto_utils/utils.js';
 import { classColors } from '/tbc/core/proto_utils/utils.js';
 import { specToClass } from '/tbc/core/proto_utils/utils.js';
-import { repoName } from '/tbc/core/resources.js';
 import { TypedEvent } from '/tbc/core/typed_event.js';
-import { camelToSnakeCase } from '/tbc/core/utils.js';
 import { getEnumValues } from '/tbc/core/utils.js';
 import { hexToRgba } from '/tbc/core/utils.js';
+import { BalanceDruidSimUI } from '/tbc/balance_druid/sim.js';
+import { ElementalShamanSimUI } from '/tbc/elemental_shaman/sim.js';
+import { ShadowPriestSimUI } from '/tbc/shadow_priest/sim.js';
 const NEW_PLAYER = -1;
 var DragType;
 (function (DragType) {
@@ -20,15 +22,18 @@ var DragType;
     DragType[DragType["Swap"] = 2] = "Swap";
     DragType[DragType["Copy"] = 3] = "Copy";
 })(DragType || (DragType = {}));
+;
 export class RaidPicker extends Component {
-    constructor(parent, raid, presets) {
+    constructor(parent, raid, presets, buffBots) {
         super(parent, 'raid-picker-root');
+        this.buffBotChangeEmitter = new TypedEvent();
         // Hold data about the player being dragged while the drag is happening.
         this.currentDragPlayer = null;
         this.currentDragPlayerFromIndex = NEW_PLAYER;
         this.currentDragType = DragType.New;
         this.raid = raid;
         this.presets = presets;
+        this.buffBots = buffBots;
         const raidViewer = document.createElement('div');
         raidViewer.classList.add('current-raid-viewer');
         this.rootElem.appendChild(raidViewer);
@@ -49,7 +54,6 @@ export class RaidPicker extends Component {
             }
             this.clearDragPlayer();
         };
-        this.playerEditorModal = new PlayerEditorModal(document.body);
     }
     getCurrentFaction() {
         return this.newPlayerPicker.currentFaction;
@@ -59,6 +63,20 @@ export class RaidPicker extends Component {
     }
     getPlayerPicker(raidIndex) {
         return this.partyPickers[Math.floor(raidIndex / MAX_PARTY_SIZE)].playerPickers[raidIndex % MAX_PARTY_SIZE];
+    }
+    getPlayerPickers() {
+        return [...new Array(25).keys()].map(i => this.getPlayerPicker(i));
+    }
+    getBuffBots() {
+        return this.getPlayerPickers()
+            .filter(picker => picker.player != null && 'buffBotId' in picker.player)
+            .map(picker => {
+            return {
+                buffBot: picker.player,
+                partyIndex: picker.partyPicker.index,
+                raidIndex: picker.raidIndex,
+            };
+        });
     }
     setDragPlayer(player, fromIndex, type) {
         this.clearDragPlayer();
@@ -113,7 +131,7 @@ export class PlayerPicker extends Component {
 			<div class="player-options">
 				<span class="player-swap fa fa-retweet" draggable="true"></span>
 				<span class="player-copy fa fa-copy" draggable="true"></span>
-				<span class="player-edit fa fa-edit" data-toggle="modal" data-target="#playerEditorModal"></span>
+				<span class="player-edit fa fa-edit"></span>
 			</div>
 		`;
         this.labelElem = this.rootElem.getElementsByClassName('player-label')[0];
@@ -126,18 +144,10 @@ export class PlayerPicker extends Component {
             if (this.player == null) {
                 newName = '';
             }
-            else {
+            else if (this.player instanceof Player) {
                 this.player.setName(newName);
             }
             this.nameElem.textContent = newName;
-        });
-        this.partyPicker.party.changeEmitter.on(() => {
-            const newPlayer = this.partyPicker.party.getPlayer(this.index);
-            if (((newPlayer == null) != (this.player == null)) || newPlayer != this.player) {
-                this.setPlayer(newPlayer);
-                return;
-            }
-            this.update();
         });
         const dragStart = (event, type) => {
             if (this.player == null) {
@@ -210,7 +220,12 @@ export class PlayerPicker extends Component {
                 }
             }
             if (dragType == DragType.Copy) {
-                this.setPlayer(this.raidPicker.currentDragPlayer.clone());
+                if ('buffBotId' in this.raidPicker.currentDragPlayer) {
+                    this.setPlayer(this.raidPicker.currentDragPlayer);
+                }
+                else {
+                    this.setPlayer(this.raidPicker.currentDragPlayer.clone());
+                }
             }
             else {
                 this.setPlayer(this.raidPicker.currentDragPlayer);
@@ -224,57 +239,73 @@ export class PlayerPicker extends Component {
             'allowHTML': true,
         });
         editElem.addEventListener('click', event => {
-            if (this.player != null) {
-                this.raidPicker.playerEditorModal.setPlayer(this.player);
+            if (this.player instanceof Player) {
+                new PlayerEditorModal(this.player);
             }
         });
         this.update();
     }
     setPlayer(newPlayer) {
+        const oldPlayerWasBuffBot = this.player != null && 'buffBotId' in this.player;
         this.player = newPlayer;
-        this.partyPicker.party.setPlayer(this.index, this.player);
+        if (newPlayer == null || newPlayer instanceof Player) {
+            this.partyPicker.party.setPlayer(this.index, newPlayer);
+            if (oldPlayerWasBuffBot) {
+                this.raidPicker.buffBotChangeEmitter.emit();
+            }
+        }
+        else {
+            this.raidPicker.buffBotChangeEmitter.emit();
+        }
         this.update();
     }
     update() {
         if (this.player == null) {
             this.rootElem.classList.add('empty');
+            this.rootElem.classList.remove('buff-bot');
             this.rootElem.style.backgroundColor = 'black';
             this.labelElem.setAttribute('draggable', 'false');
             this.nameElem.textContent = '';
+            this.nameElem.removeAttribute('contenteditable');
+        }
+        else if ('buffBotId' in this.player) {
+            this.rootElem.classList.remove('empty');
+            this.rootElem.classList.add('buff-bot');
+            this.rootElem.style.backgroundColor = classColors[specToClass[this.player.spec]];
+            this.labelElem.setAttribute('draggable', 'true');
+            this.nameElem.textContent = this.player.name;
+            this.nameElem.removeAttribute('contenteditable');
         }
         else {
             this.rootElem.classList.remove('empty');
+            this.rootElem.classList.remove('buff-bot');
             this.rootElem.style.backgroundColor = classColors[specToClass[this.player.spec]];
             this.labelElem.setAttribute('draggable', 'true');
             this.nameElem.textContent = this.player.getName();
+            this.nameElem.setAttribute('contenteditable', '');
         }
     }
 }
 class PlayerEditorModal extends Component {
-    constructor(parent) {
-        super(parent, 'player-editor-model-root');
-        const url = new URL(`${window.location.protocol}//${window.location.host}/${repoName}/SPEC/index.html`);
-        url.searchParams.append('raidSim', '');
-        this.urlTemplate = url.href;
+    constructor(player) {
+        super(document.body, 'player-editor-modal');
+        this.rootElem.id = 'playerEditorModal';
         this.rootElem.innerHTML = `
-    <div class="modal fade player-editor-modal" id="playerEditorModal" tabindex="-1" role="dialog" aria-labelledby="playerEditorModalTitle" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-          <div class="modal-body">
-						<iframe class="player-editor-iframe"></iframe>
-          </div>
-        </div>
-      </div>
-    </div>
-    `;
-        this.iframeElem = this.rootElem.getElementsByClassName('player-editor-iframe')[0];
-    }
-    setPlayer(player) {
-        let specString = Spec[player.spec]; // Returns 'SpecBalanceDruid' for BalanceDruid.
-        specString = specString.substring('Spec'.length); // 'BalanceDruid'
-        specString = camelToSnakeCase(specString); // 'balance_druid'
-        const url = this.urlTemplate.replace('SPEC', specString);
-        this.iframeElem.src = url;
+			<div class="player-editor within-raid-sim">
+			</div>
+		`;
+        new CloseButton(this.rootElem, () => {
+            $('#playerEditorModal').bPopup().close();
+            this.rootElem.remove();
+        });
+        const editorRoot = this.rootElem.getElementsByClassName('player-editor')[0];
+        const individualSim = specSimFactories[player.spec](editorRoot, player);
+        $('#playerEditorModal').bPopup({
+            closeClass: 'player-editor-close',
+            onClose: () => {
+                this.rootElem.remove();
+            },
+        });
     }
 }
 class NewPlayerPicker extends Component {
@@ -317,8 +348,12 @@ class NewPlayerPicker extends Component {
         });
         const presetsContainer = this.rootElem.getElementsByClassName('presets-container')[0];
         getEnumValues(Class).forEach(wowClass => {
+            if (wowClass == Class.ClassUnknown) {
+                return;
+            }
             const matchingPresets = this.raidPicker.presets.filter(preset => specToClass[preset.spec] == wowClass);
-            if (matchingPresets.length == 0 || wowClass == Class.ClassUnknown) {
+            const matchingBuffBots = this.raidPicker.buffBots.filter(buffBot => specToClass[buffBot.spec] == wowClass);
+            if ((matchingPresets.length + matchingBuffBots.length) == 0) {
                 return;
             }
             const classPresetsContainer = document.createElement('div');
@@ -355,6 +390,34 @@ class NewPlayerPicker extends Component {
                     this.raidPicker.setDragPlayer(newPlayer, NEW_PLAYER, DragType.New);
                 };
             });
+            matchingBuffBots.forEach(matchingBuffBot => {
+                const presetElem = document.createElement('div');
+                presetElem.classList.add('preset-picker');
+                presetElem.classList.add('preset-picker-buff-bot');
+                classPresetsContainer.appendChild(presetElem);
+                const presetIconElem = document.createElement('img');
+                presetIconElem.classList.add('preset-picker-icon');
+                presetElem.appendChild(presetIconElem);
+                presetIconElem.src = matchingBuffBot.iconUrl;
+                tippy(presetIconElem, {
+                    'content': matchingBuffBot.tooltip,
+                    'allowHTML': true,
+                });
+                presetElem.setAttribute('draggable', 'true');
+                presetElem.ondragstart = event => {
+                    const dragImage = new Image();
+                    dragImage.src = matchingBuffBot.iconUrl;
+                    event.dataTransfer.setDragImage(dragImage, 30, 30);
+                    event.dataTransfer.setData("text/plain", matchingBuffBot.iconUrl);
+                    event.dataTransfer.dropEffect = 'copy';
+                    this.raidPicker.setDragPlayer(matchingBuffBot, NEW_PLAYER, DragType.New);
+                };
+            });
         });
     }
 }
+export const specSimFactories = {
+    [Spec.SpecBalanceDruid]: (parentElem, player) => new BalanceDruidSimUI(parentElem, player),
+    [Spec.SpecElementalShaman]: (parentElem, player) => new ElementalShamanSimUI(parentElem, player),
+    [Spec.SpecShadowPriest]: (parentElem, player) => new ShadowPriestSimUI(parentElem, player),
+};
