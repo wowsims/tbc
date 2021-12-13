@@ -319,6 +319,12 @@ class NewPlayerPicker extends Component {
 				<div class="phase-selector"></div>
 			</div>
 			<div class="presets-container"></div>
+			<div class="buff-bots-container">
+				<div class="buff-bots-title">
+					<span class="buff-bots-title-text">Buff Bots</span>
+					<span class="buff-bots-tooltip fa fa-info-circle"></span>
+				</div>
+			</div>
 		`;
         const factionSelector = new EnumPicker(this.rootElem.getElementsByClassName('faction-selector')[0], this, {
             label: 'Faction',
@@ -352,8 +358,7 @@ class NewPlayerPicker extends Component {
                 return;
             }
             const matchingPresets = this.raidPicker.presets.filter(preset => specToClass[preset.spec] == wowClass);
-            const matchingBuffBots = this.raidPicker.buffBots.filter(buffBot => specToClass[buffBot.spec] == wowClass);
-            if ((matchingPresets.length + matchingBuffBots.length) == 0) {
+            if (matchingPresets.length == 0) {
                 return;
             }
             const classPresetsContainer = document.createElement('div');
@@ -390,6 +395,25 @@ class NewPlayerPicker extends Component {
                     this.raidPicker.setDragPlayer(newPlayer, NEW_PLAYER, DragType.New);
                 };
             });
+        });
+        const buffbotsTooltip = this.rootElem.getElementsByClassName('buff-bots-tooltip')[0];
+        tippy(buffbotsTooltip, {
+            'content': 'Buff bots do not do DPS or any actions at all, except to buff their raid/party members. They are used as placeholders for classes we haven\'t implemented yet, or never will (e.g. healers) so that a proper raid environment can still be simulated.',
+            'allowHTML': true,
+        });
+        const buffbotsContainer = this.rootElem.getElementsByClassName('buff-bots-container')[0];
+        getEnumValues(Class).forEach(wowClass => {
+            if (wowClass == Class.ClassUnknown) {
+                return;
+            }
+            const matchingBuffBots = this.raidPicker.buffBots.filter(buffBot => specToClass[buffBot.spec] == wowClass);
+            if (matchingBuffBots.length == 0) {
+                return;
+            }
+            const classPresetsContainer = document.createElement('div');
+            classPresetsContainer.classList.add('class-presets-container');
+            buffbotsContainer.appendChild(classPresetsContainer);
+            classPresetsContainer.style.backgroundColor = hexToRgba(classColors[wowClass], 0.5);
             matchingBuffBots.forEach(matchingBuffBot => {
                 const presetElem = document.createElement('div');
                 presetElem.classList.add('preset-picker');

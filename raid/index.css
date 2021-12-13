@@ -1750,8 +1750,16 @@ td, th {
   cursor: pointer;
 }
 
-.preset-picker-buff-bot .preset-picker-icon {
-  border: 1px solid red;
+.buff-bots-container {
+  border-top: 1px solid white;
+  margin-top: 10px;
+}
+
+.buff-bots-title {
+  font-size: 16px;
+  font-weight: 700;
+  margin: 5px;
+  text-align: center;
 }
 
 .player-editor-modal {
