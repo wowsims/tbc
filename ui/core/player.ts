@@ -126,6 +126,10 @@ export class Player<SpecType extends Spec> {
 		});
   }
 
+	getClass(): Class {
+		return specToClass[this.spec];
+	}
+
 	getParty(): Party | null {
 		return this.party;
 	}
@@ -423,7 +427,7 @@ export class Player<SpecType extends Spec> {
     return withSpecProto(
 				PlayerProto.create({
 					race: this.getRace(),
-					class: specToClass[this.spec],
+					class: this.getClass(),
 					equipment: this.getGear().asSpec(),
 					consumes: this.getConsumes(),
 					bonusStats: this.getBonusStats().asArray(),

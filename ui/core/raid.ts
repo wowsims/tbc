@@ -1,3 +1,4 @@
+import { Class } from '/tbc/core/proto/common.js';
 import { Raid as RaidProto } from '/tbc/core/proto/api.js';
 import { RaidBuffs } from '/tbc/core/proto/common.js';
 import { Spec } from '/tbc/core/proto/common.js';
@@ -72,6 +73,10 @@ export class Raid {
 	setPlayer(index: number, newPlayer: Player<any> | null) {
 		const party = this.parties[Math.floor(index / MAX_PARTY_SIZE)];
 		party.setPlayer(index % MAX_PARTY_SIZE, newPlayer);
+	}
+
+	getClassCount(playerClass: Class) {
+		return this.getPlayers().filter(player => player != null && player.getClass() == playerClass).length;
 	}
 
   getBuffs(): RaidBuffs {

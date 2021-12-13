@@ -2,7 +2,6 @@ import { getIconUrl } from '/tbc/core/resources.js';
 import { ItemOrSpellId } from '/tbc/core/resources.js';
 import { setWowheadHref } from '/tbc/core/resources.js';
 import { isRightClick } from '/tbc/core/utils.js';
-import { ExclusivityTag } from '/tbc/core/individual_sim_ui.js';
 
 import { Component } from './component.js';
 import { Input, InputConfig } from './input.js';

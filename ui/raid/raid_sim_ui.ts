@@ -3,6 +3,7 @@ import { Raid } from '/tbc/core/raid.js';
 import { Sim } from '/tbc/core/sim.js';
 import { SimUI } from '/tbc/core/sim_ui.js';
 import { Encounter as EncounterProto } from '/tbc/core/proto/common.js';
+import { Spec } from '/tbc/core/proto/common.js';
 import { DetailedResults } from '/tbc/core/components/detailed_results.js';
 import { EncounterPicker, EncounterPickerConfig } from '/tbc/core/components/encounter_picker.js';
 import { LogRunner } from '/tbc/core/components/log_runner.js';
@@ -10,6 +11,7 @@ import { SavedDataConfig } from '/tbc/core/components/saved_data_manager.js';
 import { SavedDataManager } from '/tbc/core/components/saved_data_manager.js';
 import { addRaidSimAction } from '/tbc/core/components/raid_sim_action.js';
 
+import { BlessingsPicker } from './blessings_picker.js';
 import { RaidPicker, PresetSpecSettings } from './raid_picker.js';
 
 declare var tippy: any;
@@ -21,6 +23,7 @@ export interface RaidSimConfig {
 
 export class RaidSimUI extends SimUI{
   private readonly config: RaidSimConfig;
+	private readonly implementedSpecs: Array<Spec>;
 
   constructor(parentElem: HTMLElement, config: RaidSimConfig) {
 		super(parentElem, new Sim(), {
@@ -30,6 +33,8 @@ export class RaidSimUI extends SimUI{
 		this.rootElem.classList.add('raid-sim-ui');
 
     this.config = config;
+		
+		this.implementedSpecs = [...new Set(config.presets.map(preset => preset.spec))];
 
 		this.addSidebarComponents();
 		this.addTopbarComponents();
@@ -83,19 +88,24 @@ export class RaidSimUI extends SimUI{
 	private addSettingsTab() {
 		this.addTab('Settings', 'raid-settings-tab', `
 			<div class="raid-settings-sections">
-				<div class="settings-section-container">
-					<section class="settings-section encounter-section">
+				<div class="raid-settings-section-container">
+					<section class="settings-section raid-encounter-section">
 						<label>Encounter</label>
+					</section>
+				</div>
+				<div class="blessings-section-container">
+					<section class="settings-section blessings-section">
+						<label>Blessings</label>
 					</section>
 				</div>
 			</div>
 			<div class="settings-bottom-bar">
-				<div class="saved-encounter-manager within-raid-sim-hide">
+				<div class="saved-encounter-manager">
 				</div>
 			</div>
 		`);
 
-    const encounterSectionElem = this.rootElem.getElementsByClassName('encounter-section')[0] as HTMLElement;
+    const encounterSectionElem = this.rootElem.getElementsByClassName('raid-encounter-section')[0] as HTMLElement;
 		new EncounterPicker(encounterSectionElem, this.sim.encounter, {
 			showTargetArmor: true,
 			showNumTargets: true,
@@ -110,6 +120,8 @@ export class RaidSimUI extends SimUI{
       toJson: (a: EncounterProto) => EncounterProto.toJson(a),
       fromJson: (obj: any) => EncounterProto.fromJson(obj),
     });
+
+		const blessingsPicker = new BlessingsPicker(this.rootElem.getElementsByClassName('blessings-section')[0] as HTMLElement, this, this.implementedSpecs);
 
 		this.sim.waitForInit().then(() => {
 			savedEncounterManager.loadUserData();

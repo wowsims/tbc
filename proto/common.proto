@@ -287,6 +287,24 @@ message Debuffs {
     double isb_uptime = 5;
 }
 
+enum Blessings {
+	BlessingUnknown = 0;
+	BlessingOfKings = 1;
+	BlessingOfMight = 2;
+	BlessingOfSalvation = 3;
+	BlessingOfWisdom = 4;
+}
+
+message BlessingsAssignment {
+	// Index corresponds to Spec that the blessing should be applied to.
+	repeated Blessings blessings = 1;
+}
+
+message BlessingsAssignments {
+	// Assignments for each paladin.
+	repeated BlessingsAssignment paladins = 1;
+}
+
 enum MobType {
     MobTypeUnknown = 0;
     MobTypeBeast = 1;

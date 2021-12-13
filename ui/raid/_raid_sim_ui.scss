@@ -1,3 +1,4 @@
+@import "./blessings_picker";
 @import "./raid_picker";
 
 .raid-settings-tab {
@@ -5,4 +6,12 @@
 }
 .raid-settings-sections {
   position: relative;
+}
+
+.raid-encounter-section {
+	display: inline-block;
+}
+
+.blessings-section {
+	display: inline-block;
 }

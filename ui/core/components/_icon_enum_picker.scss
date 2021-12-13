@@ -1,0 +1,37 @@
+.icon-enum-picker-root {
+	position: relative;
+	display: inline-block;
+}
+
+.icon-enum-picker-root a {
+	height: 40px;
+	width: 40px;
+	display: block;
+}
+
+.icon-enum-picker-button {
+	cursor: pointer;
+  background-size: cover;
+}
+
+.icon-enum-picker-dropdown {
+	display: none;
+	position: absolute;
+	background-color: gray;
+	box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+	z-index: 1;
+}
+
+.icon-enum-picker-root:hover .icon-enum-picker-dropdown {
+	display: block;
+}
+
+.icon-enum-picker-option {
+	display: block;
+	cursor: pointer;
+  background-size: cover;
+}
+
+.icon-enum-picker-option:not(:hover) {
+	opacity: 0.7;
+}

@@ -1,0 +1,26 @@
+
+.blessings-table-header-cell {
+	padding: 2px 10px;
+}
+
+.blessings-table-header-cell img {
+	height: 40px;
+	border: 1px solid white;
+}
+
+.blessings-table-body {
+}
+
+.blessings-table-label-cell {
+	font-size: 20px;
+	font-weight: 700;
+	color: #f58cba;
+}
+
+.blessings-table-row:not(.paladin-active) .blessings-table-label-cell {
+	filter: grayscale(1);
+}
+
+.blessings-table-cell {
+	padding: 2px 10px;
+}
