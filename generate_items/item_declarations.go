@@ -399,6 +399,7 @@ var ItemDeclarations = []ItemDeclaration{
 	{ /** Terokk's Wisdom */ ID: 32541, Categories: []proto.ItemCategory{CasterCategory}},
 	{ /** The Black Stalk */ ID: 29350, Categories: []proto.ItemCategory{CasterCategory}},
 	{ /** The Bringer of Death */ ID: 31308, Categories: []proto.ItemCategory{CasterCategory}},
+	{ /** The Horseman's Signet Ring */ ID: 34073, Categories: []proto.ItemCategory{CasterCategory}},
 	{ /** The Lightning Capacitor */ ID: 28785, Categories: []proto.ItemCategory{CasterCategory}},
 	{ /** The Maelstrom's Fury */ ID: 32237, Categories: []proto.ItemCategory{CasterCategory}},
 	{ /** The Nexus Key */ ID: 29988, Categories: []proto.ItemCategory{CasterCategory}},

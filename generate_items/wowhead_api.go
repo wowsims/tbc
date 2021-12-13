@@ -70,6 +70,7 @@ var holySpellPowerRegex = regexp.MustCompile("Increases damage done by Holy spel
 var natureSpellPowerRegex = regexp.MustCompile("Increases damage done by Nature spells and effects by up to ([0-9]+)\\.")
 var shadowSpellPowerRegex = regexp.MustCompile("Increases damage done by Shadow spells and effects by up to ([0-9]+)\\.")
 var spellHitRegex = regexp.MustCompile("Improves spell hit rating by <!--rtg18-->([0-9]+)\\.")
+var spellHitRegex2 = regexp.MustCompile("Increases your spell hit rating by ([0-9]+)\\.")
 var spellCritRegex = regexp.MustCompile("Improves spell critical strike rating by <!--rtg21-->([0-9]+)\\.")
 var spellHasteRegex = regexp.MustCompile("Improves spell haste rating by <!--rtg30-->([0-9]+)\\.")
 var spellPenetrationRegex = regexp.MustCompile("Improves your spell penetration by ([0-9]+)\\.")
@@ -105,7 +106,7 @@ func (item WowheadItemResponse) GetStats() Stats {
 		proto.Stat_StatHolySpellPower:   float64(item.GetIntValue(holySpellPowerRegex)),
 		proto.Stat_StatNatureSpellPower: float64(item.GetIntValue(natureSpellPowerRegex)),
 		proto.Stat_StatShadowSpellPower: float64(item.GetIntValue(shadowSpellPowerRegex)),
-		proto.Stat_StatSpellHit:         float64(item.GetIntValue(spellHitRegex)),
+		proto.Stat_StatSpellHit:         float64(item.GetIntValue(spellHitRegex)) + float64(item.GetIntValue(spellHitRegex2)),
 		proto.Stat_StatSpellCrit:        float64(item.GetIntValue(spellCritRegex)),
 		proto.Stat_StatSpellHaste:       float64(item.GetIntValue(spellHasteRegex)),
 		proto.Stat_StatSpellPenetration: float64(item.GetIntValue(spellPenetrationRegex)),
