@@ -7,6 +7,8 @@ import { Raid } from '/tbc/core/raid.js';
 import { MAX_PARTY_SIZE } from '/tbc/core/party.js';
 import { Party } from '/tbc/core/party.js';
 import { Player } from '/tbc/core/player.js';
+import { Raid as RaidProto } from '/tbc/core/proto/api.js';
+import { Party as PartyProto } from '/tbc/core/proto/api.js';
 import { Class } from '/tbc/core/proto/common.js';
 import { Consumes } from '/tbc/core/proto/common.js';
 import { EquipmentSpec } from '/tbc/core/proto/common.js';
@@ -39,21 +41,32 @@ enum DragType {
 	Copy,
 }
 
+// Represents a buff bot in a raid.
+export interface BuffBotData {
+	buffBot: BuffBotSettings,
+	partyIndex: number,
+	raidIndex: number,
+};
+
 export class RaidPicker extends Component {
 	readonly raid: Raid;
 	readonly presets: Array<PresetSpecSettings<any>>;
+	readonly buffBots: Array<BuffBotSettings>;
   readonly partyPickers: Array<PartyPicker>;
 	readonly newPlayerPicker: NewPlayerPicker;
 
+	readonly buffBotChangeEmitter: TypedEvent<void> = new TypedEvent<void>();
+
 	// Hold data about the player being dragged while the drag is happening.
-	currentDragPlayer: Player<any> | null = null;
+	currentDragPlayer: Player<any> | BuffBotSettings | null = null;
 	currentDragPlayerFromIndex: number = NEW_PLAYER;
 	currentDragType: DragType = DragType.New;
 
-  constructor(parent: HTMLElement, raid: Raid, presets: Array<PresetSpecSettings<any>>) {
+  constructor(parent: HTMLElement, raid: Raid, presets: Array<PresetSpecSettings<any>>, buffBots: Array<BuffBotSettings>) {
     super(parent, 'raid-picker-root');
 		this.raid = raid;
 		this.presets = presets;
+		this.buffBots = buffBots;
 
     const raidViewer = document.createElement('div');
     raidViewer.classList.add('current-raid-viewer');
@@ -94,7 +107,23 @@ export class RaidPicker extends Component {
 		return this.partyPickers[Math.floor(raidIndex / MAX_PARTY_SIZE)].playerPickers[raidIndex % MAX_PARTY_SIZE];
 	}
 
-	setDragPlayer(player: Player<any>, fromIndex: number, type: DragType) {
+	getPlayerPickers(): Array<PlayerPicker> {
+		return [...new Array(25).keys()].map(i => this.getPlayerPicker(i));
+	}
+
+	getBuffBots(): Array<BuffBotData> {
+		return this.getPlayerPickers()
+				.filter(picker => picker.player != null && 'buffBotId' in picker.player)
+				.map(picker => {
+					return {
+						buffBot: picker.player as BuffBotSettings,
+						partyIndex: picker.partyPicker.index,
+						raidIndex: picker.raidIndex,
+					};
+				});
+	}
+
+	setDragPlayer(player: Player<any> | BuffBotSettings, fromIndex: number, type: DragType) {
 		this.clearDragPlayer();
 
 		this.currentDragPlayer = player;
@@ -151,7 +180,7 @@ export class PlayerPicker extends Component {
 	// Index of this player within the whole raid (0-24).
 	readonly raidIndex: number;
 
-	player: Player<any> | null;
+	player: Player<any> | BuffBotSettings | null;
 
 	readonly partyPicker: PartyPicker;
 	readonly raidPicker: RaidPicker;
@@ -191,22 +220,11 @@ export class PlayerPicker extends Component {
 
 			if (this.player == null) {
 				newName = '';
-			} else {
+			} else if (this.player instanceof Player) {
 				this.player.setName(newName);
 			}
 
 			this.nameElem.textContent = newName;
-		});
-
-		this.partyPicker.party.changeEmitter.on(() => {
-			const newPlayer = this.partyPicker.party.getPlayer(this.index);
-
-			if (((newPlayer == null) != (this.player == null)) || newPlayer != this.player) {
-				this.setPlayer(newPlayer);
-				return;
-			}
-
-			this.update();
 		});
 
 		const dragStart = (event: DragEvent, type: DragType) => {
@@ -292,7 +310,11 @@ export class PlayerPicker extends Component {
 			}
 
 			if (dragType == DragType.Copy) {
-				this.setPlayer(this.raidPicker.currentDragPlayer.clone());
+				if ('buffBotId' in this.raidPicker.currentDragPlayer) {
+					this.setPlayer(this.raidPicker.currentDragPlayer);
+				} else {
+					this.setPlayer(this.raidPicker.currentDragPlayer.clone());
+				}
 			} else {
 				this.setPlayer(this.raidPicker.currentDragPlayer);
 			}
@@ -307,7 +329,7 @@ export class PlayerPicker extends Component {
 			'allowHTML': true,
 		});
     editElem.addEventListener('click', event => {
-			if (this.player != null) {
+			if (this.player instanceof Player) {
 				new PlayerEditorModal(this.player);
 			}
 		});
@@ -315,9 +337,18 @@ export class PlayerPicker extends Component {
 		this.update();
 	}
 
-	setPlayer(newPlayer: Player<any> | null) {
+	setPlayer(newPlayer: Player<any> | BuffBotSettings | null) {
+		const oldPlayerWasBuffBot = this.player != null && 'buffBotId' in this.player;
+
 		this.player = newPlayer;
-		this.partyPicker.party.setPlayer(this.index, this.player);
+		if (newPlayer == null || newPlayer instanceof Player) {
+			this.partyPicker.party.setPlayer(this.index, newPlayer);
+			if (oldPlayerWasBuffBot) {
+				this.raidPicker.buffBotChangeEmitter.emit();
+			}
+		} else {
+			this.raidPicker.buffBotChangeEmitter.emit();
+		}
 
 		this.update();
 	}
@@ -325,14 +356,25 @@ export class PlayerPicker extends Component {
 	private update() {
 		if (this.player == null) {
 			this.rootElem.classList.add('empty');
+			this.rootElem.classList.remove('buff-bot');
 			this.rootElem.style.backgroundColor = 'black';
 			this.labelElem.setAttribute('draggable', 'false');
 			this.nameElem.textContent = '';
+			this.nameElem.removeAttribute('contenteditable');
+		} else if ('buffBotId' in this.player) {
+			this.rootElem.classList.remove('empty');
+			this.rootElem.classList.add('buff-bot');
+			this.rootElem.style.backgroundColor = classColors[specToClass[this.player.spec]];
+			this.labelElem.setAttribute('draggable', 'true');
+			this.nameElem.textContent = this.player.name;
+			this.nameElem.removeAttribute('contenteditable');
 		} else {
 			this.rootElem.classList.remove('empty');
+			this.rootElem.classList.remove('buff-bot');
 			this.rootElem.style.backgroundColor = classColors[specToClass[this.player.spec]];
 			this.labelElem.setAttribute('draggable', 'true');
 			this.nameElem.textContent = this.player.getName();
+			this.nameElem.setAttribute('contenteditable', '');
 		}
 	}
 }
@@ -411,8 +453,13 @@ class NewPlayerPicker extends Component {
 
 		const presetsContainer = this.rootElem.getElementsByClassName('presets-container')[0] as HTMLElement;
 		getEnumValues(Class).forEach(wowClass => {
+			if (wowClass == Class.ClassUnknown) {
+				return;
+			}
+
 			const matchingPresets = this.raidPicker.presets.filter(preset => specToClass[preset.spec] == wowClass);
-			if (matchingPresets.length == 0 || wowClass == Class.ClassUnknown) {
+			const matchingBuffBots = this.raidPicker.buffBots.filter(buffBot => specToClass[buffBot.spec] == wowClass);
+			if ((matchingPresets.length + matchingBuffBots.length) == 0) {
 				return;
 			}
 
@@ -458,6 +505,34 @@ class NewPlayerPicker extends Component {
 					this.raidPicker.setDragPlayer(newPlayer, NEW_PLAYER, DragType.New);
 				};
 			});
+
+			matchingBuffBots.forEach(matchingBuffBot => {
+				const presetElem = document.createElement('div');
+				presetElem.classList.add('preset-picker');
+				presetElem.classList.add('preset-picker-buffbot');
+				classPresetsContainer.appendChild(presetElem);
+
+        const presetIconElem = document.createElement('img');
+        presetIconElem.classList.add('preset-picker-icon');
+				presetElem.appendChild(presetIconElem);
+				presetIconElem.src = matchingBuffBot.iconUrl;
+				tippy(presetIconElem, {
+					'content': matchingBuffBot.tooltip,
+					'allowHTML': true,
+				});
+
+				presetElem.setAttribute('draggable', 'true');
+				presetElem.ondragstart = event => {
+					const dragImage = new Image();
+					dragImage.src = matchingBuffBot.iconUrl;
+					event.dataTransfer!.setDragImage(dragImage, 30, 30);
+					event.dataTransfer!.setData("text/plain", matchingBuffBot.iconUrl);
+
+					event.dataTransfer!.dropEffect = 'copy';
+
+					this.raidPicker.setDragPlayer(matchingBuffBot, NEW_PLAYER, DragType.New);
+				};
+			});
 		});
 	}
 }
@@ -481,4 +556,17 @@ export interface PresetSpecSettings<SpecType extends Spec> {
 
 	tooltip: string,
 	iconUrl: string,
+}
+
+export interface BuffBotSettings {
+	// The value of this field must never change, to preserve local storage data.
+	buffBotId: string,
+
+	spec: Spec,
+	name: string,
+	tooltip: string,
+	iconUrl: string,
+
+	// Callback to apply buffs from this buff bot.
+	modifyRaidProto: (raidProto: RaidProto, partyProto: PartyProto) => void,
 }

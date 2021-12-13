@@ -74,7 +74,6 @@ export class Player<SpecType extends Spec> {
 	private currentStats: ComputeStatsResult;
 
   readonly nameChangeEmitter = new TypedEvent<void>();
-  readonly partyChangeEmitter = new TypedEvent<void>();
   readonly buffsChangeEmitter = new TypedEvent<void>();
   readonly consumesChangeEmitter = new TypedEvent<void>();
   readonly bonusStatsChangeEmitter = new TypedEvent<void>();
@@ -105,7 +104,6 @@ export class Player<SpecType extends Spec> {
 
     [
       this.nameChangeEmitter,
-      this.partyChangeEmitter,
       this.buffsChangeEmitter,
       this.consumesChangeEmitter,
       this.bonusStatsChangeEmitter,
@@ -161,11 +159,7 @@ export class Player<SpecType extends Spec> {
 			return;
 		}
 
-		// Remove player from its old party if there is one.
-		if (this.party != null) {
-			this.party.setPlayer(this.getPartyIndex(), null);
-		}
-
+		const oldParty = this.party;
 		if (newParty == null) {
 			this.party = null;
 			this.raid = null;
@@ -173,7 +167,14 @@ export class Player<SpecType extends Spec> {
 			this.party = newParty;
 			this.raid = newParty.raid;
 		}
-		this.partyChangeEmitter.emit();
+
+		// Remove player from its old party if there is one.
+		if (oldParty != null) {
+			const oldPartyIndex = oldParty.getPlayers().indexOf(this);
+			if (oldPartyIndex != -1) {
+				oldParty.setPlayer(oldPartyIndex, null);
+			}
+		}
 	}
 
 	getOtherPartyMembers(): Array<Player<any>> {
@@ -426,8 +427,11 @@ export class Player<SpecType extends Spec> {
 	toProto(): PlayerProto {
     return withSpecProto(
 				PlayerProto.create({
+					name: this.getName(),
+					raidIndex: this.getRaidIndex(),
 					race: this.getRace(),
 					class: this.getClass(),
+					playerSpec: this.spec,
 					equipment: this.getGear().asSpec(),
 					consumes: this.getConsumes(),
 					bonusStats: this.getBonusStats().asArray(),

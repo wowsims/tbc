@@ -158,10 +158,9 @@ export class BlessingsPicker extends Component {
 			return row;
 		});
 
-		this.setNumPaladins(2);
-		//this.setNumPaladins(raidSimUI.sim.raid.getClassCount(Class.ClassPaladin));
-		raidSimUI.sim.raid.compChangeEmitter.on(() => {
-			this.setNumPaladins(raidSimUI.sim.raid.getClassCount(Class.ClassPaladin));
+		this.setNumPaladins(raidSimUI.getClassCount(Class.ClassPaladin));
+		raidSimUI.compChangeEmitter.on(() => {
+			this.setNumPaladins(raidSimUI.getClassCount(Class.ClassPaladin));
 		});
 	}
 
@@ -172,5 +171,10 @@ export class BlessingsPicker extends Component {
 		for (let i = numPaladins; i < this.rows.length; i++) {
 			this.rows[i].classList.remove('paladin-active');
 		}
+	}
+
+	getAssignments(): BlessingsAssignments {
+		// Defensive copy.
+		return BlessingsAssignments.clone(this.assignments);
 	}
 }

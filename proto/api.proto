@@ -15,8 +15,15 @@ import "warlock.proto";
 import "warrior.proto";
 
 message Player {
+		// Label used for logging.
+		string name = 16;
+
+		// The index of this player within the raid [0-24].
+		int32 raid_index = 17;
+
     Race race = 1;
     Class class = 2;
+    Spec player_spec = 18;
 
     EquipmentSpec equipment = 3;
     Consumes consumes = 4;
@@ -41,6 +48,9 @@ message Party {
     repeated Player players = 1;
 
 		PartyBuffs buffs = 2;
+
+		// The index of this party within the raid [0-4].
+		int32 index = 3;
 }
 
 message Raid {

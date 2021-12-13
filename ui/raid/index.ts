@@ -1,3 +1,5 @@
+import { Raid as RaidProto } from '/tbc/core/proto/api.js';
+import { Party as PartyProto } from '/tbc/core/proto/api.js';
 import { Race } from '/tbc/core/proto/common.js';
 import { Spec } from '/tbc/core/proto/common.js';
 import { Faction } from '/tbc/core/proto_utils/utils.js';
@@ -90,6 +92,19 @@ const ui = new RaidSimUI(document.body, {
 			},
 			tooltip: specNames[Spec.SpecShadowPriest],
 			iconUrl: specIconsLarge[Spec.SpecShadowPriest],
+		},
+	],
+	buffBots: [
+		{
+			// The value of this field must never change, to preserve local storage data.
+			buffBotId: 'Paladin',
+			spec: Spec.SpecRetributionPaladin,
+			name: 'Paladin',
+			tooltip: 'Buff bot that adds a set of blessings.',
+			iconUrl: specIconsLarge[Spec.SpecRetributionPaladin],
+			modifyRaidProto: (raidProto: RaidProto, partyProto: PartyProto) => {
+				// Do nothing, blessings are handled elswhere.
+			},
 		},
 	],
 });

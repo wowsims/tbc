@@ -79,15 +79,18 @@ export class Party {
 			return;
 		}
 
-		if (this.players[playerIndex] != null) {
-			this.players[playerIndex]!.changeEmitter.off(this.playerChangeListener);
+		const oldPlayer = this.players[playerIndex];
+		this.players[playerIndex] = newPlayer;
+
+		if (oldPlayer != null) {
+			oldPlayer.changeEmitter.off(this.playerChangeListener);
+			oldPlayer.setParty(null);
 		}
 		if (newPlayer != null) {
 			newPlayer.changeEmitter.on(this.playerChangeListener);
 			newPlayer.setParty(this);
 		}
 
-		this.players[playerIndex] = newPlayer;
 		this.compChangeEmitter.emit();
 	}
 
@@ -109,6 +112,7 @@ export class Party {
 		return PartyProto.create({
 			players: this.players.filter(player => player != null).map(player => player!.toProto()),
 			buffs: this.buffs,
+			index: this.getIndex(),
 		});
 	}
 
