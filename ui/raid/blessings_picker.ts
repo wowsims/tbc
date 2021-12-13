@@ -165,6 +165,8 @@ export class BlessingsPicker extends Component {
 	}
 
 	private setNumPaladins(numPaladins: number) {
+		numPaladins = Math.min(numPaladins, MAX_PALADINS);
+
 		for (let i = 0; i < numPaladins; i++) {
 			this.rows[i].classList.add('paladin-active');
 		}

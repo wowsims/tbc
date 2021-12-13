@@ -50,6 +50,7 @@ export class RaidSimUI extends SimUI{
 
 		this.sim.raid.compChangeEmitter.on(() => this.compChangeEmitter.emit());
 		this.sim.raid.setModifyRaidProto(raidProto => this.modifyRaidProto(raidProto));
+		this.sim.encounter.setModifyEncounterProto(encounterProto => this.modifyEncounterProto(encounterProto));
 
 		this.addSidebarComponents();
 		this.addTopbarComponents();
@@ -192,6 +193,13 @@ export class RaidSimUI extends SimUI{
 					playerProtos.forEach(playerProto => playerProto.buffs!.blessingOfWisdom = TristateEffect.TristateEffectImproved);
 				}
 			});
+		});
+	}
+
+	private modifyEncounterProto(encounterProto: EncounterProto) {
+		// Invoke all the buff bot callbacks.
+		this.raidPicker!.getBuffBots().forEach(buffBotData => {
+			buffBotData.buffBot.modifyEncounterProto(encounterProto);
 		});
 	}
 

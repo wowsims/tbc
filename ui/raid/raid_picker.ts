@@ -7,6 +7,7 @@ import { Raid } from '/tbc/core/raid.js';
 import { MAX_PARTY_SIZE } from '/tbc/core/party.js';
 import { Party } from '/tbc/core/party.js';
 import { Player } from '/tbc/core/player.js';
+import { Encounter as EncounterProto } from '/tbc/core/proto/common.js';
 import { Raid as RaidProto } from '/tbc/core/proto/api.js';
 import { Party as PartyProto } from '/tbc/core/proto/api.js';
 import { Class } from '/tbc/core/proto/common.js';
@@ -509,7 +510,7 @@ class NewPlayerPicker extends Component {
 			matchingBuffBots.forEach(matchingBuffBot => {
 				const presetElem = document.createElement('div');
 				presetElem.classList.add('preset-picker');
-				presetElem.classList.add('preset-picker-buffbot');
+				presetElem.classList.add('preset-picker-buff-bot');
 				classPresetsContainer.appendChild(presetElem);
 
         const presetIconElem = document.createElement('img');
@@ -569,4 +570,5 @@ export interface BuffBotSettings {
 
 	// Callback to apply buffs from this buff bot.
 	modifyRaidProto: (raidProto: RaidProto, partyProto: PartyProto) => void,
+	modifyEncounterProto: (encounterProto: EncounterProto) => void,
 }
