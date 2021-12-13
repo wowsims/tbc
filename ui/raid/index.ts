@@ -3,6 +3,7 @@ import { Party as PartyProto } from '/tbc/core/proto/api.js';
 import { Encounter as EncounterProto } from '/tbc/core/proto/common.js';
 import { Race } from '/tbc/core/proto/common.js';
 import { Spec } from '/tbc/core/proto/common.js';
+import { TristateEffect } from '/tbc/core/proto/common.js';
 import { Faction } from '/tbc/core/proto_utils/utils.js';
 import { Player } from '/tbc/core/player.js';
 import { specIconsLarge } from '/tbc/core/proto_utils/utils.js';
@@ -98,10 +99,23 @@ const ui = new RaidSimUI(document.body, {
 	buffBots: [
 		{
 			// The value of this field must never change, to preserve local storage data.
+			buffBotId: 'Mage',
+			spec: Spec.SpecMage,
+			name: 'Mage',
+			tooltip: 'Adds Arcane Brilliance.',
+			iconUrl: 'https://wow.zamimg.com/images/wow/icons/large/spell_holy_arcaneintellect.jpg',
+			modifyRaidProto: (raidProto: RaidProto, partyProto: PartyProto) => {
+				raidProto.buffs!.arcaneBrilliance = true;
+			},
+			modifyEncounterProto: (encounterProto: EncounterProto) => {
+			},
+		},
+		{
+			// The value of this field must never change, to preserve local storage data.
 			buffBotId: 'Paladin',
 			spec: Spec.SpecRetributionPaladin,
 			name: 'Paladin',
-			tooltip: 'Buff bot that adds a set of blessings.',
+			tooltip: 'Adds a set of blessings.',
 			iconUrl: specIconsLarge[Spec.SpecRetributionPaladin],
 			modifyRaidProto: (raidProto: RaidProto, partyProto: PartyProto) => {
 				// Do nothing, blessings are handled elswhere.
@@ -114,7 +128,7 @@ const ui = new RaidSimUI(document.body, {
 			buffBotId: 'JoW Paladin',
 			spec: Spec.SpecRetributionPaladin,
 			name: 'JoW Paladin',
-			tooltip: 'Buff bot that adds a set of blessings and Judgement of Wisdom.',
+			tooltip: 'Adds a set of blessings and Judgement of Wisdom.',
 			iconUrl: 'https://wow.zamimg.com/images/wow/icons/large/spell_holy_righteousnessaura.jpg',
 			modifyRaidProto: (raidProto: RaidProto, partyProto: PartyProto) => {
 				// Do nothing, blessings are handled elswhere.
@@ -128,13 +142,56 @@ const ui = new RaidSimUI(document.body, {
 			buffBotId: 'JoC Paladin',
 			spec: Spec.SpecRetributionPaladin,
 			name: 'JoC Paladin',
-			tooltip: 'Buff bot that adds a set of blessings and Improved Judgement of the Crusader (+3% crit).',
+			tooltip: 'Adds a set of blessings and Improved Judgement of the Crusader (+3% crit).',
 			iconUrl: 'https://wow.zamimg.com/images/wow/icons/large/spell_holy_holysmite.jpg',
 			modifyRaidProto: (raidProto: RaidProto, partyProto: PartyProto) => {
 				// Do nothing, blessings are handled elswhere.
 			},
 			modifyEncounterProto: (encounterProto: EncounterProto) => {
 				encounterProto.targets[0].debuffs!.improvedSealOfTheCrusader = true;
+			},
+		},
+		{
+			// The value of this field must never change, to preserve local storage data.
+			buffBotId: 'Divine Spirit Priest',
+			spec: Spec.SpecShadowPriest,
+			name: 'Holy Priest',
+			tooltip: 'Adds Improved Divine Spirit',
+			iconUrl: 'https://wow.zamimg.com/images/wow/icons/large/spell_holy_divinespirit.jpg',
+			modifyRaidProto: (raidProto: RaidProto, partyProto: PartyProto) => {
+				raidProto.buffs!.divineSpirit = TristateEffect.TristateEffectImproved;
+			},
+			modifyEncounterProto: (encounterProto: EncounterProto) => {
+			},
+		},
+		{
+			// The value of this field must never change, to preserve local storage data.
+			buffBotId: 'CoE Warlock',
+			spec: Spec.SpecWarlock,
+			name: 'CoE Warlock',
+			tooltip: 'Adds Curse of Elements (regular). Also adds +20% uptime to ISB.',
+			iconUrl: 'https://wow.zamimg.com/images/wow/icons/large/spell_shadow_chilltouch.jpg',
+			modifyRaidProto: (raidProto: RaidProto, partyProto: PartyProto) => {
+			},
+			modifyEncounterProto: (encounterProto: EncounterProto) => {
+				const debuffs = encounterProto.targets[0].debuffs!;
+				debuffs.curseOfElements = Math.max(debuffs.curseOfElements, TristateEffect.TristateEffectRegular);
+				debuffs.isbUptime = Math.min(1.0, debuffs.isbUptime + 0.2);
+			},
+		},
+		{
+			// The value of this field must never change, to preserve local storage data.
+			buffBotId: 'Malediction Warlock',
+			spec: Spec.SpecWarlock,
+			name: 'Malediction Warlock',
+			tooltip: 'Adds Curse of Elements (improved). Also adds +20% uptime to ISB.',
+			iconUrl: 'https://wow.zamimg.com/images/wow/icons/large/spell_shadow_curseofachimonde.jpg',
+			modifyRaidProto: (raidProto: RaidProto, partyProto: PartyProto) => {
+			},
+			modifyEncounterProto: (encounterProto: EncounterProto) => {
+				const debuffs = encounterProto.targets[0].debuffs!;
+				debuffs.curseOfElements = TristateEffect.TristateEffectImproved;
+				debuffs.isbUptime = Math.min(1.0, debuffs.isbUptime + 0.2);
 			},
 		},
 	],
