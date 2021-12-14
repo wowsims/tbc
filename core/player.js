@@ -307,10 +307,8 @@ export class Player {
     toProto() {
         return withSpecProto(PlayerProto.create({
             name: this.getName(),
-            raidIndex: this.getRaidIndex(),
             race: this.getRace(),
             class: this.getClass(),
-            playerSpec: this.spec,
             equipment: this.getGear().asSpec(),
             consumes: this.getConsumes(),
             bonusStats: this.getBonusStats().asArray(),

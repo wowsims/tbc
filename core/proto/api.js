@@ -22,7 +22,6 @@ import { BalanceDruid } from './druid.js';
 import { IndividualBuffs } from './common.js';
 import { Consumes } from './common.js';
 import { EquipmentSpec } from './common.js';
-import { Spec } from './common.js';
 import { Class } from './common.js';
 import { Race } from './common.js';
 /**
@@ -46,10 +45,8 @@ class Player$Type extends MessageType {
     constructor() {
         super("proto.Player", [
             { no: 16, name: "name", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
-            { no: 17, name: "raid_index", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 1, name: "race", kind: "enum", T: () => ["proto.Race", Race] },
             { no: 2, name: "class", kind: "enum", T: () => ["proto.Class", Class] },
-            { no: 18, name: "player_spec", kind: "enum", T: () => ["proto.Spec", Spec] },
             { no: 3, name: "equipment", kind: "message", T: () => EquipmentSpec },
             { no: 4, name: "consumes", kind: "message", T: () => Consumes },
             { no: 5, name: "bonus_stats", kind: "scalar", repeat: 1 /*RepeatType.PACKED*/, T: 1 /*ScalarType.DOUBLE*/ },
@@ -66,7 +63,7 @@ class Player$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { name: "", raidIndex: 0, race: 0, class: 0, playerSpec: 0, bonusStats: [], spec: { oneofKind: undefined } };
+        const message = { name: "", race: 0, class: 0, bonusStats: [], spec: { oneofKind: undefined } };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -80,17 +77,11 @@ class Player$Type extends MessageType {
                 case /* string name */ 16:
                     message.name = reader.string();
                     break;
-                case /* int32 raid_index */ 17:
-                    message.raidIndex = reader.int32();
-                    break;
                 case /* proto.Race race */ 1:
                     message.race = reader.int32();
                     break;
                 case /* proto.Class class */ 2:
                     message.class = reader.int32();
-                    break;
-                case /* proto.Spec player_spec */ 18:
-                    message.playerSpec = reader.int32();
                     break;
                 case /* proto.EquipmentSpec equipment */ 3:
                     message.equipment = EquipmentSpec.internalBinaryRead(reader, reader.uint32(), options, message.equipment);
@@ -177,18 +168,12 @@ class Player$Type extends MessageType {
         /* string name = 16; */
         if (message.name !== "")
             writer.tag(16, WireType.LengthDelimited).string(message.name);
-        /* int32 raid_index = 17; */
-        if (message.raidIndex !== 0)
-            writer.tag(17, WireType.Varint).int32(message.raidIndex);
         /* proto.Race race = 1; */
         if (message.race !== 0)
             writer.tag(1, WireType.Varint).int32(message.race);
         /* proto.Class class = 2; */
         if (message.class !== 0)
             writer.tag(2, WireType.Varint).int32(message.class);
-        /* proto.Spec player_spec = 18; */
-        if (message.playerSpec !== 0)
-            writer.tag(18, WireType.Varint).int32(message.playerSpec);
         /* proto.EquipmentSpec equipment = 3; */
         if (message.equipment)
             EquipmentSpec.internalBinaryWrite(message.equipment, writer.tag(3, WireType.LengthDelimited).fork(), options).join();
@@ -247,12 +232,11 @@ class Party$Type extends MessageType {
     constructor() {
         super("proto.Party", [
             { no: 1, name: "players", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => Player },
-            { no: 2, name: "buffs", kind: "message", T: () => PartyBuffs },
-            { no: 3, name: "index", kind: "scalar", T: 5 /*ScalarType.INT32*/ }
+            { no: 2, name: "buffs", kind: "message", T: () => PartyBuffs }
         ]);
     }
     create(value) {
-        const message = { players: [], index: 0 };
+        const message = { players: [] };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -268,9 +252,6 @@ class Party$Type extends MessageType {
                     break;
                 case /* proto.PartyBuffs buffs */ 2:
                     message.buffs = PartyBuffs.internalBinaryRead(reader, reader.uint32(), options, message.buffs);
-                    break;
-                case /* int32 index */ 3:
-                    message.index = reader.int32();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -290,9 +271,6 @@ class Party$Type extends MessageType {
         /* proto.PartyBuffs buffs = 2; */
         if (message.buffs)
             PartyBuffs.internalBinaryWrite(message.buffs, writer.tag(2, WireType.LengthDelimited).fork(), options).join();
-        /* int32 index = 3; */
-        if (message.index !== 0)
-            writer.tag(3, WireType.Varint).int32(message.index);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

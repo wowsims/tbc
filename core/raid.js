@@ -73,8 +73,6 @@ export class Raid {
             buffs: this.buffs,
         });
         this.modifyRaidProto(raidProto);
-        // Remove empty parties and null players because the sim doesn't like them.
-        raidProto.parties = raidProto.parties.filter(party => party.players.length > 0);
         return raidProto;
     }
     // Returns JSON representing all the current values.

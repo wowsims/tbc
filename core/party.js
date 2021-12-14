@@ -1,4 +1,5 @@
 import { Party as PartyProto } from '/tbc/core/proto/api.js';
+import { Player as PlayerProto } from '/tbc/core/proto/api.js';
 import { PartyBuffs } from '/tbc/core/proto/common.js';
 import { Player } from './player.js';
 import { TypedEvent } from './typed_event.js';
@@ -76,9 +77,8 @@ export class Party {
     }
     toProto() {
         return PartyProto.create({
-            players: this.players.filter(player => player != null).map(player => player.toProto()),
+            players: this.players.map(player => player == null ? PlayerProto.create() : player.toProto()),
             buffs: this.buffs,
-            index: this.getIndex(),
         });
     }
     // Returns JSON representing all the current values.
