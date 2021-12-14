@@ -22,7 +22,7 @@
 
 .player-picker-root {
 	height: 30px;
-	width: 200px;
+	width: 370px;
 	border-width: 1px;
 	border-style: solid;
 	color: var(--main-text-color);
@@ -60,7 +60,7 @@
 	height: 90%;
 }
 
-.player-picker-root.empty * {
+.player-picker-root.empty .player-label, .player-picker-root.empty .player-options {
 	display: none;
 }
 
@@ -179,4 +179,31 @@
 .player-editor-modal .player-editor {
 	height: 100%;
 	width: 100%;
+}
+
+.player-results {
+	height: 100%;
+	vertical-align: top;
+	display: inline-flex;
+	align-items: center;
+	float: right;
+
+	font-size: 16px;
+	text-shadow:
+		0 0 3px var(--main-secondary-color),
+		0 0 3px var(--main-secondary-color),
+		0 0 3px var(--main-secondary-color);
+}
+
+.player-results-dps, .player-results-reference-delta {
+	width: 60px;
+	text-align: right;
+	margin: 5px;
+}
+
+.player-results-reference-delta.positive {
+	color: lawngreen;
+}
+.player-results-reference-delta.negative {
+	color: red;
 }

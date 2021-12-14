@@ -7,6 +7,8 @@ import (
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/proto"
 
+	balanceDruid "github.com/wowsims/tbc/sim/druid/balance"
+	shadowPriest "github.com/wowsims/tbc/sim/priest/shadow"
 	elementalShaman "github.com/wowsims/tbc/sim/shaman/elemental"
 )
 
@@ -25,9 +27,20 @@ var StandardTarget = &proto.Target{
 }
 
 var STEncounter = &proto.Encounter{
+	Duration: 300,
 	Targets: []*proto.Target{
 		StandardTarget,
 	},
+}
+
+var P1BalanceDruid = &proto.Player{
+	Name:      "P1 Boomkin",
+	Race:      proto.Race_RaceTauren,
+	Class:     proto.Class_ClassDruid,
+	Equipment: balanceDruid.P1Gear,
+	Consumes:  balanceDruid.FullConsumes,
+	Spec:      balanceDruid.PlayerOptionsAdaptive,
+	Buffs:     balanceDruid.FullIndividualBuffs,
 }
 
 var P1ElementalShaman = &proto.Player{
@@ -40,17 +53,29 @@ var P1ElementalShaman = &proto.Player{
 	Buffs:     elementalShaman.FullIndividualBuffs,
 }
 
+var P1ShadowPriest = &proto.Player{
+	Name:      "P1 Shadow Priest",
+	Race:      proto.Race_RaceUndead,
+	Class:     proto.Class_ClassPriest,
+	Equipment: shadowPriest.P1Gear,
+	Consumes:  shadowPriest.FullConsumes,
+	Spec:      shadowPriest.PlayerOptionsIdeal,
+	Buffs:     shadowPriest.FullIndividualBuffs,
+}
+
 var BasicRaid = &proto.Raid{
 	Parties: []*proto.Party{
 		&proto.Party{
 			Players: []*proto.Player{
+				P1BalanceDruid,
 				P1ElementalShaman,
+				P1ShadowPriest,
 			},
 		},
 	},
 }
 
-// Tests that we don't crash with empty parties / blank players.
+// Tests that we don't crash with various combinations of empty parties / blank players.
 func TestSparseRaid(t *testing.T) {
 	sparseRaid := &proto.Raid{
 		Parties: []*proto.Party{
@@ -77,7 +102,7 @@ func TestSparseRaid(t *testing.T) {
 		SimOptions: SimOptions,
 	}
 
-	RaidSimTest("Sparse", t, rsr, 1000)
+	RaidSimTest("Sparse", t, rsr, 1203.4)
 }
 
 func TestBasicRaid(t *testing.T) {
@@ -87,7 +112,7 @@ func TestBasicRaid(t *testing.T) {
 		SimOptions: SimOptions,
 	}
 
-	RaidSimTest("P1 ST", t, rsr, 1000)
+	RaidSimTest("P1 ST", t, rsr, 2960.1)
 }
 
 func RaidSimTest(label string, t *testing.T, rsr *proto.RaidSimRequest, expectedDps float64) {

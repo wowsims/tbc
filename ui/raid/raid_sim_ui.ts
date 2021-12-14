@@ -16,7 +16,7 @@ import { EncounterPicker, EncounterPickerConfig } from '/tbc/core/components/enc
 import { LogRunner } from '/tbc/core/components/log_runner.js';
 import { SavedDataConfig } from '/tbc/core/components/saved_data_manager.js';
 import { SavedDataManager } from '/tbc/core/components/saved_data_manager.js';
-import { addRaidSimAction } from '/tbc/core/components/raid_sim_action.js';
+import { addRaidSimAction, RaidSimResultsManager, ReferenceData } from '/tbc/core/components/raid_sim_action.js';
 
 import { BlessingsPicker } from './blessings_picker.js';
 import { RaidPicker, BuffBotSettings, PresetSpecSettings } from './raid_picker.js';
@@ -32,11 +32,14 @@ export interface RaidSimConfig {
 export class RaidSimUI extends SimUI{
   private readonly config: RaidSimConfig;
 	private readonly implementedSpecs: Array<Spec>;
+	private raidSimResultsManager: RaidSimResultsManager | null = null;
 	private raidPicker: RaidPicker | null = null;
 	private blessingsPicker: BlessingsPicker | null = null;
 
 	// Emits when the raid comp changes. Includes changes to buff bots.
   readonly compChangeEmitter = new TypedEvent<void>();
+
+  readonly referenceChangeEmitter = new TypedEvent<void>();
 
   constructor(parentElem: HTMLElement, config: RaidSimConfig) {
 		super(parentElem, new Sim(), {
@@ -62,7 +65,8 @@ export class RaidSimUI extends SimUI{
   }
 
 	private addSidebarComponents() {
-		addRaidSimAction(this);
+		this.raidSimResultsManager = addRaidSimAction(this);
+		this.raidSimResultsManager.referenceChangeEmitter.on(() => this.referenceChangeEmitter.emit());
 	}
 
 	private addTopbarComponents() {
@@ -99,7 +103,7 @@ export class RaidSimUI extends SimUI{
 			</div>
 		`);
 
-		this.raidPicker = new RaidPicker(this.rootElem.getElementsByClassName('raid-picker')[0] as HTMLElement, this.sim.raid, this.config.presets, this.config.buffBots);
+		this.raidPicker = new RaidPicker(this.rootElem.getElementsByClassName('raid-picker')[0] as HTMLElement, this, this.config.presets, this.config.buffBots);
 		this.raidPicker.buffBotChangeEmitter.on(() => this.compChangeEmitter.emit());
 	}
 
@@ -202,6 +206,22 @@ export class RaidSimUI extends SimUI{
 		this.raidPicker!.getBuffBots().forEach(buffBotData => {
 			buffBotData.buffBot.modifyEncounterProto(encounterProto);
 		});
+	}
+
+	getCurrentData(): ReferenceData | null {
+		if (this.raidSimResultsManager) {
+			return this.raidSimResultsManager.getCurrentData();
+		} else {
+			return null;
+		}
+	}
+
+	getReferenceData(): ReferenceData | null {
+		if (this.raidSimResultsManager) {
+			return this.raidSimResultsManager.getReferenceData();
+		} else {
+			return null;
+		}
 	}
 
 	getClassCount(playerClass: Class): number {
