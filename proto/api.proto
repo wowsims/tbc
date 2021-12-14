@@ -114,6 +114,11 @@ message DpsMetrics {
     map<int32, int32> hist = 4;
 }
 
+message ResourceMetrics {
+  double seconds = 1; // seconds into simulation the measurement was taken
+  double resource = 2; // amount of Resource at the time given.
+}
+
 // All the results for a single Player.
 message PlayerMetrics {
 		DpsMetrics dps = 1;
@@ -125,6 +130,8 @@ message PlayerMetrics {
     repeated ActionMetrics actions = 5;
 
 		repeated AuraMetrics auras = 6;
+
+    repeated ResourceMetrics resources = 7;
 }
 
 // Results for a whole raid.

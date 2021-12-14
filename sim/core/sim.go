@@ -179,12 +179,21 @@ func (sim *Simulation) runOnce() {
 				Name: "Agent",
 			}
 			pa.OnAction = func(sim *Simulation) {
-				ag.GetCharacter().TryUseCooldowns(sim)
+				c := ag.GetCharacter()
+				c.TryUseCooldowns(sim)
 				dur := ag.Act(sim)
 				if dur <= sim.CurrentTime {
 					panic(fmt.Sprintf("Agent returned invalid time delta: %dns", sim.CurrentTime-dur))
 				}
 				pa.NextActionAt = dur
+
+				if sim.Options.Iterations == 1 { // temp hack, if iterations == 1 then log resource levels
+					// Anytime agent performs an action, lets also log resource level
+					c.Metrics.resources = append(c.Metrics.resources, ResourceMetric{
+						seconds:  sim.CurrentTime.Seconds(),
+						resource: c.CurrentMana(),
+					})
+				}
 			}
 			sim.AddPendingAction(pa)
 		}
