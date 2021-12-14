@@ -167,6 +167,8 @@ func (spriest *ShadowPriest) Act(sim *core.Simulation) time.Duration {
 	// Activate shared behaviors
 	target := sim.GetPrimaryTarget()
 	var spell *core.SimpleSpell
+	var wait1 time.Duration
+	var wait2 time.Duration
 	var wait time.Duration
 
 	// calculate how much time a VT cast would take so we can possibly start casting right before the dot is up.
@@ -242,7 +244,7 @@ func (spriest *ShadowPriest) Act(sim *core.Simulation) time.Duration {
 				base := spriest.rotation.Latency * 0.66
 				variation := base + sim.RandomFloat("spriest latency")*base // should vary from 0.66 - 1.33 of given latency
 
-				const minimumLatencyMS = 100
+				const minimumLatencyMS = 10
 				if variation < minimumLatencyMS {
 					variation = minimumLatencyMS // no player can go under XXXms response time
 				}
@@ -253,7 +255,11 @@ func (spriest *ShadowPriest) Act(sim *core.Simulation) time.Duration {
 		// what do you even do... i guess just sit around
 		mbcd := spriest.Character.GetRemainingCD(priest.MBCooldownID, sim.CurrentTime)
 		swdcd := spriest.Character.GetRemainingCD(priest.SWDCooldownID, sim.CurrentTime)
-		wait = core.MinDuration(mbcd, swdcd)
+		vtidx := spriest.VTSpell.DotInput.TimeRemaining(sim) - vtCastTime
+		swpidx := spriest.SWPSpell.DotInput.TimeRemaining(sim)
+		wait1 = core.MinDuration(mbcd, swdcd)
+		wait2 = core.MinDuration(vtidx, swpidx)
+		wait = core.MinDuration(wait1, wait2)
 	}
 
 	actionSuccessful := spell.Cast(sim)
