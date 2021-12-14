@@ -120,6 +120,7 @@ export class ShadowPriestSimUI extends IndividualSimUI<Spec.SpecShadowPriest> {
 				IconInputs.GiftOfTheWild,
 			],
 			partyBuffInputs: [
+				IconInputs.MoonkinAura,
 				IconInputs.DrumsOfBattleBuff,
 				IconInputs.DrumsOfRestorationBuff,
 				IconInputs.Bloodlust,
@@ -165,6 +166,7 @@ export class ShadowPriestSimUI extends IndividualSimUI<Spec.SpecShadowPriest> {
 			otherInputs: {
 				inputs: [
 					OtherInputs.ISBUptime,
+					OtherInputs.ShadowPriestDPS,
 					OtherInputs.StartingPotion,
 					OtherInputs.NumStartingPotions,
 				],
