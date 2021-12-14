@@ -21,6 +21,7 @@ import { SpecRotation } from '/tbc/core/proto_utils/utils.js';
 import { classColors } from '/tbc/core/proto_utils/utils.js';
 import { specToClass } from '/tbc/core/proto_utils/utils.js';
 import { repoName } from '/tbc/core/resources.js';
+import { newTalentsPicker } from '/tbc/core/talents/factory.js';
 import { TypedEvent } from '/tbc/core/typed_event.js';
 import { camelToSnakeCase } from '/tbc/core/utils.js';
 import { getEnumValues } from '/tbc/core/utils.js';
@@ -500,7 +501,11 @@ class NewPlayerPicker extends Component {
 					const newPlayer = new Player(matchingPreset.spec, this.raidPicker.raid.sim);
 					newPlayer.setRace(matchingPreset.defaultFactionRaces[this.raidPicker.getCurrentFaction()]);
 					newPlayer.setRotation(matchingPreset.rotation);
+
 					newPlayer.setTalentsString(matchingPreset.talents);
+					// TalentPicker needed to convert from talents string into talents proto.
+					newTalentsPicker(newPlayer.spec, document.createElement('div'), newPlayer);
+
 					newPlayer.setSpecOptions(matchingPreset.specOptions);
 					newPlayer.setGear(
 							this.raidPicker.raid.sim.lookupEquipmentSpec(
