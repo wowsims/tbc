@@ -20,10 +20,12 @@ export class RaidSimUI extends SimUI {
             title: 'TBC RaidSim',
             knownIssues: config.knownIssues,
         });
+        this.raidSimResultsManager = null;
         this.raidPicker = null;
         this.blessingsPicker = null;
         // Emits when the raid comp changes. Includes changes to buff bots.
         this.compChangeEmitter = new TypedEvent();
+        this.referenceChangeEmitter = new TypedEvent();
         this.rootElem.classList.add('raid-sim-ui');
         this.config = config;
         this.implementedSpecs = [...new Set(config.presets.map(preset => preset.spec))];
@@ -38,7 +40,8 @@ export class RaidSimUI extends SimUI {
         this.addLogTab();
     }
     addSidebarComponents() {
-        addRaidSimAction(this);
+        this.raidSimResultsManager = addRaidSimAction(this);
+        this.raidSimResultsManager.referenceChangeEmitter.on(() => this.referenceChangeEmitter.emit());
     }
     addTopbarComponents() {
         //Array.from(document.getElementsByClassName('share-link')).forEach(element => {
@@ -71,7 +74,7 @@ export class RaidSimUI extends SimUI {
 				</div>
 			</div>
 		`);
-        this.raidPicker = new RaidPicker(this.rootElem.getElementsByClassName('raid-picker')[0], this.sim.raid, this.config.presets, this.config.buffBots);
+        this.raidPicker = new RaidPicker(this.rootElem.getElementsByClassName('raid-picker')[0], this, this.config.presets, this.config.buffBots);
         this.raidPicker.buffBotChangeEmitter.on(() => this.compChangeEmitter.emit());
     }
     addSettingsTab() {
@@ -164,6 +167,22 @@ export class RaidSimUI extends SimUI {
         this.raidPicker.getBuffBots().forEach(buffBotData => {
             buffBotData.buffBot.modifyEncounterProto(encounterProto);
         });
+    }
+    getCurrentData() {
+        if (this.raidSimResultsManager) {
+            return this.raidSimResultsManager.getCurrentData();
+        }
+        else {
+            return null;
+        }
+    }
+    getReferenceData() {
+        if (this.raidSimResultsManager) {
+            return this.raidSimResultsManager.getReferenceData();
+        }
+        else {
+            return null;
+        }
     }
     getClassCount(playerClass) {
         return this.sim.raid.getClassCount(playerClass)

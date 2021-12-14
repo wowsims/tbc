@@ -25,14 +25,15 @@ var DragType;
 })(DragType || (DragType = {}));
 ;
 export class RaidPicker extends Component {
-    constructor(parent, raid, presets, buffBots) {
+    constructor(parent, raidSimUI, presets, buffBots) {
         super(parent, 'raid-picker-root');
         this.buffBotChangeEmitter = new TypedEvent();
         // Hold data about the player being dragged while the drag is happening.
         this.currentDragPlayer = null;
         this.currentDragPlayerFromIndex = NEW_PLAYER;
         this.currentDragType = DragType.New;
-        this.raid = raid;
+        this.raidSimUI = raidSimUI;
+        this.raid = raidSimUI.sim.raid;
         this.presets = presets;
         this.buffBots = buffBots;
         const raidViewer = document.createElement('div');
@@ -134,10 +135,16 @@ export class PlayerPicker extends Component {
 				<span class="player-copy fa fa-copy" draggable="true"></span>
 				<span class="player-edit fa fa-edit"></span>
 			</div>
+			<div class="player-results">
+				<span class="player-results-dps"></span>
+				<span class="player-results-reference-delta"></span>
+			</div>
 		`;
         this.labelElem = this.rootElem.getElementsByClassName('player-label')[0];
         this.iconElem = this.rootElem.getElementsByClassName('player-icon')[0];
         this.nameElem = this.rootElem.getElementsByClassName('player-name')[0];
+        this.dpsResultElem = this.rootElem.getElementsByClassName('player-results-dps')[0];
+        this.referenceDeltaElem = this.rootElem.getElementsByClassName('player-results-reference-delta')[0];
         this.nameElem.addEventListener('input', event => {
             let newName = this.nameElem.textContent || 'Unnamed';
             newName = newName.replace(/([\n\r\t])/g, "");
@@ -244,9 +251,42 @@ export class PlayerPicker extends Component {
                 new PlayerEditorModal(this.player);
             }
         });
+        this.raidPicker.raidSimUI.referenceChangeEmitter.on(() => {
+            const currentData = this.raidPicker.raidSimUI.getCurrentData();
+            const referenceData = this.raidPicker.raidSimUI.getReferenceData();
+            const playerDps = currentData?.result.raidMetrics.parties[this.partyPicker.index].players[this.index]?.dps?.avg || 0;
+            const referenceDps = referenceData?.result.raidMetrics.parties[this.partyPicker.index].players[this.index]?.dps?.avg || 0;
+            if (playerDps == 0 && referenceDps == 0) {
+                this.dpsResultElem.textContent = '';
+                this.referenceDeltaElem.textContent = '';
+                return;
+            }
+            this.dpsResultElem.textContent = playerDps.toFixed(1);
+            if (!referenceData) {
+                this.referenceDeltaElem.textContent = '';
+                return;
+            }
+            const delta = playerDps - referenceDps;
+            const deltaStr = delta.toFixed(1);
+            if (delta >= 0) {
+                this.referenceDeltaElem.textContent = '+' + deltaStr;
+                this.referenceDeltaElem.classList.remove('negative');
+                this.referenceDeltaElem.classList.add('positive');
+            }
+            else {
+                this.referenceDeltaElem.textContent = '' + deltaStr;
+                this.referenceDeltaElem.classList.remove('positive');
+                this.referenceDeltaElem.classList.add('negative');
+            }
+        });
         this.update();
     }
     setPlayer(newPlayer) {
+        if (newPlayer == this.player) {
+            return;
+        }
+        this.dpsResultElem.textContent = '';
+        this.referenceDeltaElem.textContent = '';
         const oldPlayerWasBuffBot = this.player != null && 'buffBotId' in this.player;
         this.player = newPlayer;
         if (newPlayer == null || newPlayer instanceof Player) {
