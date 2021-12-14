@@ -259,6 +259,7 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 		if (!loadedSettings) {
 			this.applyDefaults();
 		}
+		this.player.setName('Player');
 
 		// This needs to go last so it doesn't re-store things as they are initialized.
 		this.changeEmitter.on(() => {

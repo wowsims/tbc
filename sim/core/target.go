@@ -1,6 +1,7 @@
 package core
 
 import (
+	"strconv"
 	"time"
 
 	"github.com/wowsims/tbc/sim/core/proto"
@@ -72,6 +73,9 @@ type Target struct {
 	// Whether finalize() has been called yet for this Character.
 	// All fields above this may not be altered once finalized is set.
 	finalized bool
+
+	// For logging.
+	Name string
 }
 
 func NewTarget(options proto.Target, targetIndex int32) *Target {
@@ -80,15 +84,18 @@ func NewTarget(options proto.Target, targetIndex int32) *Target {
 		armor:       options.Armor,
 		MobType:     options.MobType,
 		auraTracker: newAuraTracker(true),
+		Name:        "Target " + strconv.Itoa(int(targetIndex)+1),
 	}
-	// TODO: Do something with this
-	target.auraTracker.playerID = -1
 
 	if options.Debuffs != nil {
 		applyDebuffEffects(target, *options.Debuffs)
 	}
 
 	return target
+}
+
+func (target *Target) Log(sim *Simulation, message string, vals ...interface{}) {
+	sim.Log("%s: "+message, append([]interface{}{target.Name}, vals...)...)
 }
 
 func applyDebuffEffects(target *Target, debuffs proto.Debuffs) {
@@ -158,7 +165,7 @@ func judgementOfWisdomAura() Aura {
 				character.judgementOfWisdomProcs += 1 * (character.InitialCastSpeed() / character.CastSpeed())
 
 				if sim.Log != nil {
-					sim.Log("(%d) +Judgement Of Wisdom: 37 mana (74 @ 50%% proc)\n", character.ID)
+					character.Log(sim, "Gained 37 mana from Judgement Of Wisdom (74 @ 50%% proc).")
 				}
 			}
 		},

@@ -79,7 +79,7 @@ func RegisterAgentFactory(emptyOptions interface{}, factory AgentFactory) {
 }
 
 // Constructs a new Agent.
-func NewAgent(player proto.Player) Agent {
+func NewAgent(party *Party, partyIndex int, player proto.Player) Agent {
 	typeName := reflect.TypeOf(player.GetSpec()).Elem().Name()
 
 	factory, ok := agentFactories[typeName]
@@ -87,6 +87,6 @@ func NewAgent(player proto.Player) Agent {
 		panic("No agent factory for type: " + typeName)
 	}
 
-	character := NewCharacter(player)
+	character := NewCharacter(party, partyIndex, player)
 	return factory(character, player)
 }

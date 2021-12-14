@@ -94,7 +94,7 @@ func (spellEffect *SpellEffect) afterCalculations(sim *Simulation, spellCast *Sp
 	}
 
 	if sim.Log != nil {
-		sim.Log("(%d) %s result: %s\n", spellCast.Character.ID, spellCast.Name, spellEffect)
+		spellCast.Character.Log(sim, "%s result: %s", spellCast.Name, spellEffect)
 	}
 }
 
@@ -177,7 +177,7 @@ func (spellEffect *SpellEffect) applyDot(sim *Simulation, spellCast *SpellCast, 
 		}
 
 		if sim.Log != nil {
-			sim.Log(" %s (base: %01.f) Ticked for %0.1f\n", spellCast.Name, ddInput.damagePerTick, damage)
+			spellCast.Character.Log(sim, "%s ticked for %0.1f.", spellCast.Name, damage)
 		}
 
 		spellEffect.Damage += damage

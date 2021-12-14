@@ -1,7 +1,6 @@
 package core
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/wowsims/tbc/sim/core/proto"
@@ -9,19 +8,22 @@ import (
 )
 
 type Party struct {
+	Index int
+
 	Players []Agent
 
 	dpsMetrics DpsMetrics
 }
 
-func NewParty(partyConfig proto.Party) *Party {
+func NewParty(index int, partyConfig proto.Party) *Party {
 	party := &Party{
+		Index:      index,
 		dpsMetrics: NewDpsMetrics(),
 	}
 
-	for _, playerConfig := range partyConfig.Players {
-		if playerConfig != nil {
-			party.AddPlayer(NewAgent(*playerConfig))
+	for playerIndex, playerConfig := range partyConfig.Players {
+		if playerConfig != nil && playerConfig.Class != proto.Class_ClassUnknown {
+			party.Players = append(party.Players, NewAgent(party, playerIndex, *playerConfig))
 		}
 	}
 
@@ -34,16 +36,6 @@ func (party *Party) Size() int {
 
 func (party *Party) IsFull() bool {
 	return party.Size() >= 5
-}
-
-func (party *Party) AddPlayer(player Agent) {
-	if party.IsFull() {
-		// Just print a warning, dont need to panic
-		fmt.Printf("Party is full\n")
-	}
-
-	party.Players = append(party.Players, player)
-	player.GetCharacter().Party = party
 }
 
 func (party *Party) AddAura(sim *Simulation, aura Aura) {
@@ -70,9 +62,20 @@ func (party *Party) GetMetrics(numIterations int32) *proto.PartyMetrics {
 	metrics := &proto.PartyMetrics{
 		Dps: party.dpsMetrics.ToProto(numIterations),
 	}
-	for _, agent := range party.Players {
-		metrics.Players = append(metrics.Players, agent.GetCharacter().GetMetricsProto(numIterations))
+
+	playerIdx := 0
+	i := 0
+	for playerIdx < len(party.Players) {
+		player := party.Players[playerIdx]
+		if player.GetCharacter().PartyIndex == i {
+			metrics.Players = append(metrics.Players, player.GetCharacter().GetMetricsProto(numIterations))
+			playerIdx++
+		} else {
+			metrics.Players = append(metrics.Players, &proto.PlayerMetrics{})
+		}
+		i++
 	}
+
 	return metrics
 }
 
@@ -88,18 +91,9 @@ func NewRaid(raidConfig proto.Raid) *Raid {
 		dpsMetrics: NewDpsMetrics(),
 	}
 
-	for _, partyConfig := range raidConfig.Parties {
+	for partyIndex, partyConfig := range raidConfig.Parties {
 		if partyConfig != nil {
-			raid.Parties = append(raid.Parties, NewParty(*partyConfig))
-		}
-	}
-
-	pid := 0
-	for _, party := range raid.Parties {
-		for _, player := range party.Players {
-			player.GetCharacter().ID = pid
-			player.GetCharacter().auraTracker.playerID = pid
-			pid++
+			raid.Parties = append(raid.Parties, NewParty(partyIndex, *partyConfig))
 		}
 	}
 
@@ -118,22 +112,6 @@ func (raid *Raid) Size() int {
 
 func (raid *Raid) IsFull() bool {
 	return raid.Size() >= 25
-}
-
-// Adds the player to the first non-full party in the raid and returns the
-// party to which it was added.
-func (raid *Raid) AddPlayer(player Agent) *Party {
-	for _, party := range raid.Parties {
-		if !party.IsFull() {
-			party.AddPlayer(player)
-			return party
-		}
-	}
-
-	// All parties are full. For now, just put extra players in party 1.
-	party := raid.Parties[0]
-	party.AddPlayer(player)
-	return party
 }
 
 // Finalize the raid.

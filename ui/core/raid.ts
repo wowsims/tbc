@@ -107,9 +107,6 @@ export class Raid {
 
 		this.modifyRaidProto(raidProto);
 
-		// Remove empty parties and null players because the sim doesn't like them.
-		raidProto.parties = raidProto.parties.filter(party => party.players.length > 0);
-
 		return raidProto;
 	}
 

@@ -84,7 +84,7 @@ func (sim *Simulation) RandomFloat(label string) float64 {
 	}
 
 	// if sim.Log != nil {
-	// 	sim.Log("FLOAT64 FROM: %s\n", label)
+	// 	sim.Log("FLOAT64 FROM: %s", label)
 	// }
 
 	labelHash := hash(label)
@@ -100,8 +100,8 @@ func (sim *Simulation) RandomFloat(label string) float64 {
 // This is automatically called before every 'Run'.
 func (sim *Simulation) reset() {
 	if sim.Log != nil {
-		sim.Log("SIM RESET\n")
-		sim.Log("----------------------\n")
+		sim.Log("SIM RESET")
+		sim.Log("----------------------")
 	}
 
 	// Reset all players
@@ -132,13 +132,24 @@ func (sim *Simulation) run() *proto.RaidSimResult {
 	for _, party := range sim.Raid.Parties {
 		for _, player := range party.Players {
 			player.Init(sim)
+
+			character := player.GetCharacter()
+			character.auraTracker.logFn = func(message string, vals ...interface{}) {
+				character.Log(sim, message, vals)
+			}
+		}
+	}
+
+	for _, target := range sim.encounter.Targets {
+		target.auraTracker.logFn = func(message string, vals ...interface{}) {
+			target.Log(sim, message, vals)
 		}
 	}
 
 	logsBuffer := &strings.Builder{}
 	if sim.Options.Debug {
-		sim.Log = func(s string, vals ...interface{}) {
-			logsBuffer.WriteString(fmt.Sprintf("[%0.1f] "+s, append([]interface{}{sim.CurrentTime.Seconds()}, vals...)...))
+		sim.Log = func(message string, vals ...interface{}) {
+			logsBuffer.WriteString(fmt.Sprintf("[%0.1f] "+message+"\n", append([]interface{}{sim.CurrentTime.Seconds()}, vals...)...))
 		}
 	}
 

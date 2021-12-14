@@ -115,8 +115,8 @@ type auraTracker struct {
 	// These are automatically applied on each Sim reset.
 	permanentAuras []PermanentAura
 
-	// Used for logging.
-	playerID int
+	// Callback to format aura-related logs.
+	logFn func(string, ...interface{})
 
 	// Set to true if this aura tracker is tracking target debuffs, instead of player buffs.
 	useDebuffIDs bool
@@ -307,7 +307,7 @@ func (at *auraTracker) AddAura(sim *Simulation, newAura Aura) {
 	}
 
 	if sim.Log != nil {
-		sim.Log("(%d) +%s\n", at.playerID, newAura.Name)
+		at.logFn("Aura gained: %s", newAura.Name)
 	}
 }
 
@@ -322,7 +322,7 @@ func (at *auraTracker) RemoveAura(sim *Simulation, id AuraID) {
 	}
 
 	if sim.Log != nil {
-		sim.Log("(%d) -%s\n", at.playerID, at.auras[id].Name)
+		at.logFn("Aura faded: %s", at.auras[id].Name)
 	}
 
 	removeActiveIndex := at.auras[id].activeIndex
@@ -486,7 +486,7 @@ func NewICD() InternalCD {
 // Helper for the common case of adding an Aura that gives a temporary stat boost.
 func (character *Character) AddAuraWithTemporaryStats(sim *Simulation, auraID AuraID, spellID int32, auraName string, stat stats.Stat, amount float64, duration time.Duration) {
 	if sim.Log != nil {
-		sim.Log(" +%0.0f %s from %s\n", amount, stat.StatName(), auraName)
+		character.Log(sim, "Gained %0.0f %s from %s.", amount, stat.StatName(), auraName)
 	}
 	character.AddStat(stat, amount)
 
@@ -497,7 +497,7 @@ func (character *Character) AddAuraWithTemporaryStats(sim *Simulation, auraID Au
 		Expires: sim.CurrentTime + duration,
 		OnExpire: func(sim *Simulation) {
 			if sim.Log != nil {
-				sim.Log(" -%0.0f %s from %s\n", amount, stat.StatName(), auraName)
+				character.Log(sim, "Lost %0.0f %s from fading %s.", amount, stat.StatName(), auraName)
 			}
 			character.AddStat(stat, -amount)
 		},

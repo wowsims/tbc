@@ -1,0 +1,104 @@
+package sim
+
+import (
+	"log"
+	"testing"
+
+	"github.com/wowsims/tbc/sim/core"
+	"github.com/wowsims/tbc/sim/core/proto"
+
+	elementalShaman "github.com/wowsims/tbc/sim/shaman/elemental"
+)
+
+func init() {
+	RegisterAll()
+}
+
+var SimOptions = &proto.SimOptions{
+	Iterations: 1,
+	IsTest:     true,
+}
+
+var StandardTarget = &proto.Target{
+	Armor:   7700,
+	MobType: proto.MobType_MobTypeDemon,
+}
+
+var STEncounter = &proto.Encounter{
+	Targets: []*proto.Target{
+		StandardTarget,
+	},
+}
+
+var P1ElementalShaman = &proto.Player{
+	Name:      "P1 Ele Shaman",
+	Race:      proto.Race_RaceOrc,
+	Class:     proto.Class_ClassShaman,
+	Equipment: elementalShaman.P1Gear,
+	Consumes:  elementalShaman.FullConsumes,
+	Spec:      elementalShaman.PlayerOptionsAdaptive,
+	Buffs:     elementalShaman.FullIndividualBuffs,
+}
+
+var BasicRaid = &proto.Raid{
+	Parties: []*proto.Party{
+		&proto.Party{
+			Players: []*proto.Player{
+				P1ElementalShaman,
+			},
+		},
+	},
+}
+
+// Tests that we don't crash with empty parties / blank players.
+func TestSparseRaid(t *testing.T) {
+	sparseRaid := &proto.Raid{
+		Parties: []*proto.Party{
+			&proto.Party{},
+			&proto.Party{
+				Players: []*proto.Player{
+					&proto.Player{},
+					P1ElementalShaman,
+					&proto.Player{},
+				},
+			},
+			&proto.Party{
+				Players: []*proto.Player{
+					&proto.Player{},
+					&proto.Player{},
+				},
+			},
+		},
+	}
+
+	rsr := &proto.RaidSimRequest{
+		Raid:       sparseRaid,
+		Encounter:  STEncounter,
+		SimOptions: SimOptions,
+	}
+
+	RaidSimTest("Sparse", t, rsr, 1000)
+}
+
+func TestBasicRaid(t *testing.T) {
+	rsr := &proto.RaidSimRequest{
+		Raid:       BasicRaid,
+		Encounter:  STEncounter,
+		SimOptions: SimOptions,
+	}
+
+	RaidSimTest("P1 ST", t, rsr, 1000)
+}
+
+func RaidSimTest(label string, t *testing.T, rsr *proto.RaidSimRequest, expectedDps float64) {
+	result := core.RunRaidSim(rsr)
+
+	tolerance := 0.5
+	if result.RaidMetrics.Dps.Avg < expectedDps-tolerance || result.RaidMetrics.Dps.Avg > expectedDps+tolerance {
+		// Automatically print output if we had debugging enabled.
+		if rsr.SimOptions.Debug {
+			log.Printf("LOGS:\n%s\n", result.Logs)
+		}
+		t.Fatalf("%s failed: expected %0f dps from sim but was %0f", label, expectedDps, result.RaidMetrics.Dps.Avg)
+	}
+}

@@ -126,8 +126,8 @@ func (cast *Cast) startCasting(sim *Simulation, onCastComplete OnCastComplete) b
 	if !cast.IgnoreManaCost && cast.ManaCost > 0 {
 		if cast.Character.CurrentMana() < cast.ManaCost {
 			if sim.Log != nil {
-				sim.Log("(%d) Failed casting %s, not enough mana. (Current Mana = %0.0f, Mana Cost = %0.0f)\n",
-					cast.Character.ID, cast.Name, cast.Character.CurrentMana(), cast.ManaCost)
+				cast.Character.Log(sim, "Failed casting %s, not enough mana. (Current Mana = %0.0f, Mana Cost = %0.0f)",
+					cast.Name, cast.Character.CurrentMana(), cast.ManaCost)
 			}
 			cast.Character.Metrics.MarkOOM(sim, cast.Character)
 			cast.objectInUse = false // cast failed and we aren't using it
@@ -136,8 +136,8 @@ func (cast *Cast) startCasting(sim *Simulation, onCastComplete OnCastComplete) b
 	}
 
 	if sim.Log != nil {
-		sim.Log("(%d) Casting %s (Current Mana = %0.0f, Mana Cost = %0.0f, Cast Time = %s)\n",
-			cast.Character.ID, cast.Name, cast.Character.CurrentMana(), cast.ManaCost, cast.CastTime)
+		cast.Character.Log(sim, "Casting %s (Current Mana = %0.0f, Mana Cost = %0.0f, Cast Time = %s)",
+			cast.Name, cast.Character.CurrentMana(), cast.ManaCost, cast.CastTime)
 	}
 
 	// For instant-cast spells we can skip creating an aura.
