@@ -117,4 +117,3 @@ export function parseAuraMetrics(auraMetricProtos: Array<AuraMetricsProto>): Pro
 	))
 	.then(() => auraMetrics);
 }
-

@@ -31,6 +31,8 @@ import { BalanceDruidSimUI } from '/tbc/balance_druid/sim.js';
 import { ElementalShamanSimUI } from '/tbc/elemental_shaman/sim.js';
 import { ShadowPriestSimUI } from '/tbc/shadow_priest/sim.js';
 
+import { RaidSimUI } from './raid_sim_ui.js';
+
 declare var tippy: any;
 declare var $: any;
 
@@ -51,6 +53,7 @@ export interface BuffBotData {
 };
 
 export class RaidPicker extends Component {
+	readonly raidSimUI: RaidSimUI;
 	readonly raid: Raid;
 	readonly presets: Array<PresetSpecSettings<any>>;
 	readonly buffBots: Array<BuffBotSettings>;
@@ -64,9 +67,10 @@ export class RaidPicker extends Component {
 	currentDragPlayerFromIndex: number = NEW_PLAYER;
 	currentDragType: DragType = DragType.New;
 
-  constructor(parent: HTMLElement, raid: Raid, presets: Array<PresetSpecSettings<any>>, buffBots: Array<BuffBotSettings>) {
+  constructor(parent: HTMLElement, raidSimUI: RaidSimUI, presets: Array<PresetSpecSettings<any>>, buffBots: Array<BuffBotSettings>) {
     super(parent, 'raid-picker-root');
-		this.raid = raid;
+		this.raidSimUI = raidSimUI;
+		this.raid = raidSimUI.sim.raid;
 		this.presets = presets;
 		this.buffBots = buffBots;
 
@@ -190,6 +194,8 @@ export class PlayerPicker extends Component {
 	private readonly labelElem: HTMLElement;
 	private readonly iconElem: HTMLImageElement;
 	private readonly nameElem: HTMLSpanElement;
+	private readonly dpsResultElem: HTMLElement;
+	private readonly referenceDeltaElem: HTMLElement;
 
   constructor(parent: HTMLElement, partyPicker: PartyPicker, index: number) {
     super(parent, 'player-picker-root');
@@ -209,11 +215,17 @@ export class PlayerPicker extends Component {
 				<span class="player-copy fa fa-copy" draggable="true"></span>
 				<span class="player-edit fa fa-edit"></span>
 			</div>
+			<div class="player-results">
+				<span class="player-results-dps"></span>
+				<span class="player-results-reference-delta"></span>
+			</div>
 		`;
 
 		this.labelElem = this.rootElem.getElementsByClassName('player-label')[0] as HTMLElement;
 		this.iconElem = this.rootElem.getElementsByClassName('player-icon')[0] as HTMLImageElement;
 		this.nameElem = this.rootElem.getElementsByClassName('player-name')[0] as HTMLSpanElement;
+		this.dpsResultElem = this.rootElem.getElementsByClassName('player-results-dps')[0] as HTMLElement;
+		this.referenceDeltaElem = this.rootElem.getElementsByClassName('player-results-reference-delta')[0] as HTMLElement;
 
     this.nameElem.addEventListener('input', event => {
 			let newName = this.nameElem.textContent || 'Unnamed';
@@ -336,10 +348,50 @@ export class PlayerPicker extends Component {
 			}
 		});
 
+		this.raidPicker.raidSimUI.referenceChangeEmitter.on(() => {
+			const currentData = this.raidPicker.raidSimUI.getCurrentData();
+			const referenceData = this.raidPicker.raidSimUI.getReferenceData();
+
+			const playerDps = currentData?.result.raidMetrics!.parties[this.partyPicker.index].players[this.index]?.dps?.avg || 0;
+			const referenceDps = referenceData?.result.raidMetrics!.parties[this.partyPicker.index].players[this.index]?.dps?.avg || 0;
+
+			if (playerDps == 0 && referenceDps == 0) {
+				this.dpsResultElem.textContent = '';
+				this.referenceDeltaElem.textContent = '';
+				return;
+			}
+
+			this.dpsResultElem.textContent = playerDps.toFixed(1);
+
+			if (!referenceData) {
+				this.referenceDeltaElem.textContent = '';
+				return;
+			}
+
+			const delta = playerDps - referenceDps;
+			const deltaStr = delta.toFixed(1);
+			if (delta >= 0) {
+				this.referenceDeltaElem.textContent = '+' + deltaStr;
+				this.referenceDeltaElem.classList.remove('negative');
+				this.referenceDeltaElem.classList.add('positive');
+			} else {
+				this.referenceDeltaElem.textContent = '' + deltaStr;
+				this.referenceDeltaElem.classList.remove('positive');
+				this.referenceDeltaElem.classList.add('negative');
+			}
+		});
+
 		this.update();
 	}
 
 	setPlayer(newPlayer: Player<any> | BuffBotSettings | null) {
+		if (newPlayer == this.player) {
+			return;
+		}
+
+		this.dpsResultElem.textContent = '';
+		this.referenceDeltaElem.textContent = '';
+
 		const oldPlayerWasBuffBot = this.player != null && 'buffBotId' in this.player;
 
 		this.player = newPlayer;

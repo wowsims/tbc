@@ -1,9 +1,10 @@
 import { RaidSimRequest, RaidSimResult } from '/tbc/core/proto/api.js';
 import { SimUI } from '/tbc/core/sim_ui.js';
+import { TypedEvent } from '/tbc/core/typed_event.js';
 
 declare var tippy: any;
 
-export function addRaidSimAction(simUI: SimUI) {
+export function addRaidSimAction(simUI: SimUI): RaidSimResultsManager {
 	simUI.addAction('DPS', 'dps-action', async () => {
 		simUI.setResultsPending();
 		try {
@@ -18,15 +19,19 @@ export function addRaidSimAction(simUI: SimUI) {
 	simUI.sim.raidSimEmitter.on(data => {
 		resultsManager.setSimResult(data.request, data.result);
 	});
+	return resultsManager;
 }
 
-type ReferenceData = {
+export type ReferenceData = {
 	request: RaidSimRequest,
 	result: RaidSimResult,
 	settings: any,
 };
 
-class RaidSimResultsManager {
+export class RaidSimResultsManager {
+	readonly currentChangeEmitter: TypedEvent<void> = new TypedEvent<void>();
+	readonly referenceChangeEmitter: TypedEvent<void> = new TypedEvent<void>();
+
 	private readonly simUI: SimUI;
 
 	private currentData: ReferenceData | null = null;
@@ -106,6 +111,8 @@ class RaidSimResultsManager {
   }
 
 	private updateReference() {
+		this.referenceChangeEmitter.emit();
+
     const simReferenceElem = this.simUI.resultsContentElem.getElementsByClassName('results-sim-reference')[0] as HTMLDivElement;
     const simReferenceDiffElem = this.simUI.resultsContentElem.getElementsByClassName('results-sim-reference-diff')[0] as HTMLSpanElement;
 
@@ -128,5 +135,31 @@ class RaidSimResultsManager {
 			simReferenceDiffElem.classList.remove('positive');
 			simReferenceDiffElem.classList.add('negative');
 		}
+	}
+
+	getCurrentData(): ReferenceData | null {
+		if (this.currentData == null) {
+			return null;
+		}
+
+		// Defensive copy.
+		return {
+			request: RaidSimRequest.clone(this.currentData.request),
+			result: RaidSimResult.clone(this.currentData.result),
+			settings: JSON.parse(JSON.stringify(this.currentData.settings)),
+		};
+	}
+
+	getReferenceData(): ReferenceData | null {
+		if (this.referenceData == null) {
+			return null;
+		}
+
+		// Defensive copy.
+		return {
+			request: RaidSimRequest.clone(this.referenceData.request),
+			result: RaidSimResult.clone(this.referenceData.result),
+			settings: JSON.parse(JSON.stringify(this.referenceData.settings)),
+		};
 	}
 }
