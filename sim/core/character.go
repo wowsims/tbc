@@ -13,7 +13,9 @@ import (
 // class logic shares.
 // All players have stats, equipment, auras, etc
 type Character struct {
-	ID    int
+	// Label for logging.
+	Name string
+
 	Race  proto.Race
 	Class proto.Class
 
@@ -46,6 +48,12 @@ type Character struct {
 	// Up reference to this Character's Party.
 	Party *Party
 
+	// This character's index within its party [0-4].
+	PartyIndex int
+
+	// This character's index within the raid [0-24].
+	RaidIndex int
+
 	// Whether Finalize() has been called yet for this Character.
 	// All fields above this may not be altered once finalized is set.
 	finalized bool
@@ -75,8 +83,9 @@ type Character struct {
 	Metrics CharacterMetrics
 }
 
-func NewCharacter(player proto.Player) Character {
+func NewCharacter(party *Party, partyIndex int, player proto.Player) Character {
 	character := Character{
+		Name:  player.Name,
 		Race:  player.Race,
 		Class: player.Class,
 		Equip: items.ProtoToEquipment(*player.Equipment),
@@ -84,6 +93,9 @@ func NewCharacter(player proto.Player) Character {
 			CastSpeedMultiplier:   1,
 			SpiritRegenMultiplier: 1,
 		},
+		Party:       party,
+		PartyIndex:  partyIndex,
+		RaidIndex:   party.Index*5 + partyIndex,
 		auraTracker: newAuraTracker(false),
 		Metrics:     NewCharacterMetrics(),
 	}
@@ -120,6 +132,10 @@ func NewCharacter(player proto.Player) Character {
 	})
 
 	return character
+}
+
+func (character *Character) Log(sim *Simulation, message string, vals ...interface{}) {
+	sim.Log("%s (#%d): "+message, append([]interface{}{character.Name, character.RaidIndex + 1}, vals...)...)
 }
 
 func (character *Character) applyAllEffects(agent Agent) {
@@ -322,7 +338,7 @@ func (character *Character) RegenManaCasting(sim *Simulation, elapsedTime time.D
 	manaRegen := character.manaRegenPerSecondWhileCasting() * elapsedTime.Seconds()
 	character.addMana(manaRegen)
 	if sim.Log != nil {
-		sim.Log(" Advanced [%0.1fs] Regenerated: %0.1f mana. Total: %0.1f\n", elapsedTime.Seconds(), manaRegen, character.CurrentMana())
+		character.Log(sim, "Advanced [%0.1fs] Regenerated: %0.1f mana. Total: %0.1f", elapsedTime.Seconds(), manaRegen, character.CurrentMana())
 	}
 }
 
@@ -345,7 +361,7 @@ func (character *Character) RegenMana(sim *Simulation, elapsedTime time.Duration
 	character.addMana(regen)
 
 	if sim.Log != nil {
-		sim.Log(" Advanced [%0.1fs] Regenerated: %0.1f mana. Total: %0.1f\n", elapsedTime.Seconds(), regen, character.CurrentMana())
+		character.Log(sim, "Advanced [%0.1fs] Regenerated: %0.1f mana. Total: %0.1f", elapsedTime.Seconds(), regen, character.CurrentMana())
 	}
 }
 

@@ -43,7 +43,7 @@ func (action WaitAction) GetManaCost() float64 {
 
 func (action WaitAction) Cast(sim *Simulation) bool {
 	if sim.Log != nil {
-		sim.Log("Doing nothing for %0.1f seconds.\n", action.GetDuration())
+		action.character.Log(sim, "Doing nothing for %0.1f seconds.", action.GetDuration())
 	}
 	//sim.MetricsAggregator.AddAction(action)
 	return true

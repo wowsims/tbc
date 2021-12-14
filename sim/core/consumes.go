@@ -264,7 +264,7 @@ func makePotionActivation(potionType proto.Potions, character *Character) Cooldo
 
 			character.AddStat(stats.Mana, manaGain)
 			if sim.Log != nil {
-				sim.Log("Used Super Mana Potion\n")
+				character.Log(sim, "Used Super Mana Potion")
 			}
 
 			character.SetCD(PotionCooldownID, time.Minute*2+sim.CurrentTime)
@@ -310,7 +310,7 @@ func registerDarkRuneCD(agent Agent, consumes proto.Consumes) {
 				remainingUsages = newRemainingUsages
 
 				if sim.Log != nil {
-					sim.Log("Used Dark Rune\n")
+					character.Log(sim, "Used Dark Rune")
 				}
 				character.Metrics.AddInstantCast(ActionID{SpellID: 27869})
 

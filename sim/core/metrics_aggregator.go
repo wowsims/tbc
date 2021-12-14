@@ -165,7 +165,7 @@ func (characterMetrics *CharacterMetrics) AddSpellCast(spellCast *SpellCast) {
 func (characterMetrics *CharacterMetrics) MarkOOM(sim *Simulation, character *Character) {
 	if characterMetrics.OOMAt == 0 {
 		if sim.Log != nil {
-			sim.Log("(%d) Went OOM!\n", character.ID)
+			character.Log(sim, "Went OOM!")
 		}
 		characterMetrics.DamageAtOOM = characterMetrics.TotalDamage
 		characterMetrics.OOMAt = sim.CurrentTime

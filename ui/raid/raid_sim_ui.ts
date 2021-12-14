@@ -10,6 +10,7 @@ import { Encounter as EncounterProto } from '/tbc/core/proto/common.js';
 import { Spec } from '/tbc/core/proto/common.js';
 import { TristateEffect } from '/tbc/core/proto/common.js';
 import { specToClass } from '/tbc/core/proto_utils/utils.js';
+import { playerToSpec } from '/tbc/core/proto_utils/utils.js';
 import { DetailedResults } from '/tbc/core/components/detailed_results.js';
 import { EncounterPicker, EncounterPickerConfig } from '/tbc/core/components/encounter_picker.js';
 import { LogRunner } from '/tbc/core/components/log_runner.js';
@@ -165,7 +166,7 @@ export class RaidSimUI extends SimUI{
 	private modifyRaidProto(raidProto: RaidProto) {
 		// Invoke all the buff bot callbacks.
 		this.raidPicker!.getBuffBots().forEach(buffBotData => {
-			const partyProto = raidProto.parties.find(party => party.index == buffBotData.partyIndex);
+			const partyProto = raidProto.parties[buffBotData.partyIndex];
 			if (!partyProto) {
 				throw new Error('No party proto for party index: ' + buffBotData.partyIndex);
 			}
@@ -177,7 +178,7 @@ export class RaidSimUI extends SimUI{
 		const blessingsAssignments = this.blessingsPicker!.getAssignments();
 		this.implementedSpecs.forEach(spec => {
 			const playerProtos = raidProto.parties
-					.map(party => party.players.filter(player => player.playerSpec == spec))
+					.map(party => party.players.filter(player => player.class != Class.ClassUnknown && playerToSpec(player) == spec))
 					.flat();
 
 			blessingsAssignments.paladins.forEach((paladin, i) => {

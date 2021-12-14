@@ -109,7 +109,7 @@ func (tracker *ManaSpendingRateTracker) ProjectedManaCost(sim *core.Simulation, 
 
 	//if sim.Log != nil {
 	//	remainingManaPool := character.ExpectedRemainingManaPool(sim)
-	//	sim.Log("Mana spent: %0.02f, Projected: %0.02f, total: %0.02f (%0.02f + %0.02f)\n", character.Metrics.ManaSpent, projectedManaCost, remainingManaPool, character.CurrentMana(), character.ExpectedBonusMana)
+	//	character.Log(sim, "Mana spent: %0.02f, Projected: %0.02f, total: %0.02f (%0.02f + %0.02f)", character.Metrics.ManaSpent, projectedManaCost, remainingManaPool, character.CurrentMana(), character.ExpectedBonusMana)
 	//}
 
 	return projectedManaCost

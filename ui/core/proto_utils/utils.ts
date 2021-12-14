@@ -1,3 +1,4 @@
+import { getEnumValues } from '/tbc/core/utils.js';
 import { intersection } from '/tbc/core/utils.js';
 
 import { Player } from '/tbc/core/proto/api.js';
@@ -628,6 +629,22 @@ export function withSpecProto<SpecType extends Spec>(
     throw new Error('Unrecognized talents with options: ' + Player.toJsonString(player));
   }
   return copy;
+}
+
+export function playerToSpec(player: Player): Spec {
+	const specValues = getEnumValues(Spec);
+	for (let i = 0; i < specValues.length; i++) {
+		const spec = specValues[i] as Spec;
+		let specString = Spec[spec]; // Returns 'SpecBalanceDruid' for BalanceDruid.
+		specString = specString.substring('Spec'.length); // 'BalanceDruid'
+		specString = specString.charAt(0).toLowerCase() + specString.slice(1); // 'balanceDruid'
+
+		if (player.spec.oneofKind == specString) {
+			return spec;
+		}
+	}
+
+	throw new Error('Unable to parse spec from player proto: ' + player);
 }
 
 const classToMaxArmorType: Record<Class, ArmorType> = {

@@ -57,7 +57,7 @@ func ApplyInsightfulEarthstormDiamond(agent core.Agent) {
 				}
 				icd = core.InternalCD(sim.CurrentTime + dur)
 				if sim.Log != nil {
-					sim.Log(" *Insightful Earthstorm Mana Restore - 300\n")
+					character.Log(sim, "Insightful Earthstorm Mana Restore - 300")
 				}
 				character.AddStat(stats.Mana, 300)
 			},

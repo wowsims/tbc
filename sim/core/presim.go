@@ -33,7 +33,7 @@ func (sim *Simulation) runPresims(request proto.RaidSimRequest) {
 	const numPresimIterations = 100
 
 	// Run presims if requested.
-	raidPresimOptions := make([]*PresimOptions, sim.Raid.Size())
+	raidPresimOptions := make([]*PresimOptions, 25)
 	remainingAgents := 0
 	for _, party := range sim.Raid.Parties {
 		for _, player := range party.Players {
@@ -47,7 +47,7 @@ func (sim *Simulation) runPresims(request proto.RaidSimRequest) {
 				continue
 			}
 
-			raidPresimOptions[player.GetCharacter().ID] = presimOptions
+			raidPresimOptions[player.GetCharacter().RaidIndex] = presimOptions
 			remainingAgents++
 		}
 	}
@@ -67,10 +67,10 @@ func (sim *Simulation) runPresims(request proto.RaidSimRequest) {
 		// Let each Agent modify their own settings.
 		for partyIdx, party := range sim.Raid.Parties {
 			partyConfig := presimRequest.Raid.Parties[partyIdx]
-			for playerIdx, player := range party.Players {
-				playerConfig := partyConfig.Players[playerIdx]
+			for _, player := range party.Players {
+				playerConfig := partyConfig.Players[player.GetCharacter().PartyIndex]
 
-				presimOptions := raidPresimOptions[player.GetCharacter().ID]
+				presimOptions := raidPresimOptions[player.GetCharacter().RaidIndex]
 				if presimOptions == nil {
 					continue
 				}
@@ -85,13 +85,13 @@ func (sim *Simulation) runPresims(request proto.RaidSimRequest) {
 		// Provide each Agent with their own results.
 		for partyIdx, party := range sim.Raid.Parties {
 			partyMetrics := presimResult.RaidMetrics.Parties[partyIdx]
-			for playerIdx, player := range party.Players {
-				playerMetrics := partyMetrics.Players[playerIdx]
-				presimOptions := raidPresimOptions[player.GetCharacter().ID]
+			for _, player := range party.Players {
+				playerMetrics := partyMetrics.Players[player.GetCharacter().PartyIndex]
+				presimOptions := raidPresimOptions[player.GetCharacter().RaidIndex]
 				if presimOptions != nil {
 					done := presimOptions.OnPresimResult(*playerMetrics, numPresimIterations)
 					if done {
-						raidPresimOptions[player.GetCharacter().ID] = nil
+						raidPresimOptions[player.GetCharacter().RaidIndex] = nil
 						remainingAgents--
 					}
 				}

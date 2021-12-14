@@ -179,7 +179,7 @@ func (moonkin *BalanceDruid) actRotation(sim *core.Simulation, rotation proto.Ba
 	if !actionSuccessful {
 		regenTime := moonkin.TimeUntilManaRegen(spell.GetManaCost())
 		if sim.Log != nil {
-			sim.Log("Not enough mana, regenerating for %s.\n", regenTime)
+			moonkin.Log(sim, "Not enough mana, regenerating for %s.", regenTime)
 		}
 		return sim.CurrentTime + regenTime
 	}
