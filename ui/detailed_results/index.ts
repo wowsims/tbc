@@ -1,6 +1,7 @@
-import { RaidSimData } from '/tbc/core/components/detailed_results.js';
 import { TypedEvent } from '/tbc/core/typed_event.js';
+import { SimResult, SimResultFilter } from '/tbc/core/proto_utils/sim_result.js';
 
+import { SimResultData } from './result_component.js';
 import { CastMetrics } from './cast_metrics.js';
 import { SpellMetrics } from './cast_metrics.js';
 import { BuffAuraMetrics } from './aura_metrics.js'
@@ -77,12 +78,29 @@ const layoutHTML = `
 </div>
 `;
 
-const resultsEmitter = new TypedEvent<RaidSimData | null>();
-window.addEventListener('message', event => {
-	// Null indicates pending results
-	const data: RaidSimData | null = event.data;
+// Gets the current filter from the input elements.
+function getResultsFilter(simResult: SimResult): SimResultFilter {
+	return {
+		player: simResult.getFirstPlayer().raidIndex,
+		target: null,
+	};
+}
 
-	resultsEmitter.emit(event.data);
+const resultsEmitter = new TypedEvent<SimResultData | null>();
+window.addEventListener('message', async event => {
+	// Null indicates pending results
+	const data: Object | null = event.data;
+
+	let simResult: SimResult | null = null;
+	if (data) {
+		simResult = await SimResult.fromJson(data);
+		resultsEmitter.emit({
+			result: simResult,
+			filter: getResultsFilter(simResult),
+		});
+	} else {
+		resultsEmitter.emit(null);
+	}
 });
 
 document.body.innerHTML = layoutHTML;

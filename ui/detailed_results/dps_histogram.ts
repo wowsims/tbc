@@ -1,6 +1,6 @@
-import { RaidSimRequest, RaidSimResult } from '/tbc/core/proto/api.js';
+import { SimResult, SimResultFilter } from '/tbc/core/proto_utils/sim_result.js';
 
-import { ResultComponent, ResultComponentConfig } from './result_component.js';
+import { ResultComponent, ResultComponentConfig, SimResultData } from './result_component.js';
 
 declare var Chart: any;
 
@@ -10,7 +10,7 @@ export class DpsHistogram extends ResultComponent {
     super(config);
 	}
 
-	onSimResult(request: RaidSimRequest, result: RaidSimResult) {
+	onSimResult(resultData: SimResultData) {
 		const chartBounds = this.rootElem.getBoundingClientRect();
 
 		this.rootElem.textContent = '';
@@ -18,15 +18,16 @@ export class DpsHistogram extends ResultComponent {
 		chartCanvas.height = chartBounds.height;
 		chartCanvas.width = chartBounds.width;
 
+		const damageMetrics = resultData.result.getDamageMetrics(resultData.filter);
 
-		const min = result.raidMetrics!.dps!.avg - result.raidMetrics!.dps!.stdev;
-		const max = result.raidMetrics!.dps!.avg + result.raidMetrics!.dps!.stdev;
+		const min = damageMetrics.avg - damageMetrics.stdev;
+		const max = damageMetrics.avg + damageMetrics.stdev;
 		const vals: Array<number> = [];
 		const colors: Array<string> = [];
 
-		const labels = Object.keys(result.raidMetrics!.dps!.hist);
+		const labels = Object.keys(damageMetrics.hist);
 		labels.forEach((k, i) => {
-			vals.push(result.raidMetrics!.dps!.hist[Number(k)]);
+			vals.push(damageMetrics.hist[Number(k)]);
 			const val = parseInt(k);
 			if (val > min && val < max) {
 				colors.push('#1E87F0');

@@ -1,7 +1,7 @@
 import { ActionMetrics as ActionMetricsProto } from '/tbc/core/proto/api.js';
 import { AuraMetrics as AuraMetricsProto } from '/tbc/core/proto/api.js';
 import { DpsMetrics as DpsMetricsProto } from '/tbc/core/proto/api.js';
-import { Encounter as EncounterProto } from '/tbc/core/proto/api.js';
+import { Encounter as EncounterProto } from '/tbc/core/proto/common.js';
 import { EncounterMetrics as EncounterMetricsProto } from '/tbc/core/proto/api.js';
 import { Party as PartyProto } from '/tbc/core/proto/api.js';
 import { PartyMetrics as PartyMetricsProto } from '/tbc/core/proto/api.js';
@@ -9,8 +9,9 @@ import { Player as PlayerProto } from '/tbc/core/proto/api.js';
 import { PlayerMetrics as PlayerMetricsProto } from '/tbc/core/proto/api.js';
 import { Raid as RaidProto } from '/tbc/core/proto/api.js';
 import { RaidMetrics as RaidMetricsProto } from '/tbc/core/proto/api.js';
-import { Target as TargetProto } from '/tbc/core/proto/api.js';
+import { Target as TargetProto } from '/tbc/core/proto/common.js';
 import { TargetMetrics as TargetMetricsProto } from '/tbc/core/proto/api.js';
+import { RaidSimRequest, RaidSimResult } from '/tbc/core/proto/api.js';
 import { Class } from '/tbc/core/proto/common.js';
 import { Spec } from '/tbc/core/proto/common.js';
 import { ActionId } from '/tbc/core/resources.js';
@@ -18,18 +19,59 @@ import { getIconUrl } from '/tbc/core/resources.js';
 import { getName } from '/tbc/core/resources.js';
 import { playerToSpec } from '/tbc/core/proto_utils/utils.js';
 
+export interface SimResultFilter {
+	// Raid index of the player to display, or null for all players.
+	player: number | null;
+
+	// Target index of the target to display, or null for all targets.
+	target: number | null;
+}
+
 export class SimResult {
 	private readonly request: RaidSimRequest;
 	private readonly result: RaidSimResult;
 
 	readonly raidMetrics: RaidMetrics;
-	readonly encounterMetrics: RaidMetrics;
+	readonly encounterMetrics: EncounterMetrics;
 
 	private constructor(request: RaidSimRequest, result: RaidSimResult, raidMetrics: RaidMetrics, encounterMetrics: EncounterMetrics) {
 		this.request = request;
 		this.result = result;
 		this.raidMetrics = raidMetrics;
 		this.encounterMetrics = encounterMetrics;
+	}
+
+	getPlayers(): Array<PlayerMetrics> {
+		return this.raidMetrics.parties.map(party => party.players).flat();
+	}
+
+	// Returns the first player, regardless of which party / raid slot its in.
+	getFirstPlayer(): PlayerMetrics {
+		const players = this.getPlayers();
+		if (players.length == 0) {
+			throw new Error('Empty sim result with no players!');
+		}
+		return players[0];
+	}
+
+	getPlayerWithRaidIndex(raidIndex: number): PlayerMetrics {
+		const player = this.getPlayers().find(player => player.raidIndex == raidIndex);
+		if (!player) {
+			throw new Error('No player with raid index: ' + raidIndex);
+		}
+		return player;
+	}
+
+	getDamageMetrics(filter: SimResultFilter): DpsMetricsProto {
+		if (filter.player == null) {
+			return this.raidMetrics.dps;
+		}
+
+		return this.getPlayerWithRaidIndex(filter.player).dps;
+	}
+
+	getLogs(): Array<string> {
+		return this.result.logs.split('\n');
 	}
 
 	toJson(): any {
@@ -39,7 +81,7 @@ export class SimResult {
 		};
 	}
 
-	static async fromJson(obj: any): SimResult {
+	static async fromJson(obj: any): Promise<SimResult> {
 		const request = RaidSimRequest.fromJson(obj['request']);
 		const result = RaidSimResult.fromJson(obj['result']);
 		return SimResult.makeNew(request, result);
@@ -55,7 +97,7 @@ export class SimResult {
 		const raidMetrics = await raidPromise;
 		const encounterMetrics = await encounterPromise;
 
-		return new SimResult(request, result, raidMetrics, encounterPromise);
+		return new SimResult(request, result, raidMetrics, encounterMetrics);
 	}
 }
 
@@ -63,11 +105,13 @@ export class RaidMetrics {
 	private readonly raid: RaidProto;
 	private readonly metrics: RaidMetricsProto;
 
+	readonly dps: DpsMetricsProto;
 	readonly parties: Array<PartyMetrics>;
 
 	private constructor(raid: RaidProto, metrics: RaidMetricsProto, parties: Array<PartyMetrics>) {
 		this.raid = raid;
 		this.metrics = metrics;
+		this.dps = this.metrics.dps!;
 		this.parties = parties;
 	}
 
@@ -92,12 +136,14 @@ export class PartyMetrics {
 	private readonly metrics: PartyMetricsProto;
 
 	readonly partyIndex: number;
+	readonly dps: DpsMetricsProto;
 	readonly players: Array<PlayerMetrics>;
 
 	private constructor(party: PartyProto, metrics: PartyMetricsProto, partyIndex: number, players: Array<PlayerMetrics>) {
 		this.party = party;
 		this.metrics = metrics;
 		this.partyIndex = partyIndex;
+		this.dps = this.metrics.dps!;
 		this.players = players;
 	}
 
@@ -124,6 +170,7 @@ export class PlayerMetrics {
 	readonly raidIndex: number;
 	readonly name: string;
 	readonly spec: Spec;
+	readonly dps: DpsMetricsProto;
 	readonly actions: Array<ActionMetrics>;
 	readonly auras: Array<AuraMetrics>;
 
@@ -134,6 +181,7 @@ export class PlayerMetrics {
 		this.raidIndex = raidIndex;
 		this.name = player.name;
 		this.spec = playerToSpec(player);
+		this.dps = this.metrics.dps!;
 		this.actions = actions;
 		this.auras = auras;
 	}
@@ -152,12 +200,11 @@ export class EncounterMetrics {
 	private readonly encounter: EncounterProto;
 	private readonly metrics: EncounterMetricsProto;
 
-	readonly targets: Array<PlayerMetrics>;
+	readonly targets: Array<TargetMetrics>;
 
-	private constructor(encounter: EncounterProto, metrics: EncounterMetricsProto, targets: Array<PlayerMetrics>) {
+	private constructor(encounter: EncounterProto, metrics: EncounterMetricsProto, targets: Array<TargetMetrics>) {
 		this.encounter = encounter;
 		this.metrics = metrics;
-		this.encounterIndex = encounterIndex;
 		this.targets = targets;
 	}
 
@@ -172,7 +219,7 @@ export class EncounterMetrics {
 								metrics.targets[i],
 								i)));
 
-		return new EncounterMetrics(encounter, metrics, encounterIndex, targets);
+		return new EncounterMetrics(encounter, metrics, targets);
 	}
 }
 
@@ -198,87 +245,64 @@ export class TargetMetrics {
 }
 
 export class AuraMetrics {
+	readonly actionId: ActionId;
 	readonly name: string;
 	readonly iconUrl: string;
-	readonly actionId: ActionId;
 	private readonly iterations: number;
 	private readonly duration: number;
 	private readonly data: AuraMetricsProto;
 
-	private constructor(name: string, iconUrl: string, iterations: number, duration: number, data: AuraMetricsProto) {
+	private constructor(actionId: ActionId, name: string, iconUrl: string, iterations: number, duration: number, data: AuraMetricsProto) {
+		this.actionId = actionId;
 		this.name = name;
 		this.iconUrl = iconUrl;
 		this.iterations = iterations;
 		this.duration = duration;
 		this.data = data;
-
-		this.actionId = {
-			id: {
-				spellId: data.id,
-			},
-			tag: 0,
-		};
 	}
 
 	get uptimePercent() {
 		return this.data.uptimeSecondsAvg / this.duration * 100;
 	}
 
-	static async makeNew(iterations: number, duration: number, auraMetrics: AuraMetricsProto): AuraMetrics {
-		const namePromise = getName(auraMetrics.actionId.id);
-		const iconPromise = getIconUrl(auraMetrics.actionId.id);
+	static async makeNew(iterations: number, duration: number, auraMetrics: AuraMetricsProto): Promise<AuraMetrics> {
+		const actionId = {
+			id: {
+				spellId: auraMetrics.id,
+			},
+			tag: 0,
+		};
+
+		const namePromise = getName(actionId.id);
+		const iconPromise = getIconUrl(actionId.id);
 
 		const name = await namePromise;
 		const iconUrl = await iconPromise;
 
-		return new AuraMetrics(name, iconUrl, iterations, duration, auraMetrics);
+		return new AuraMetrics(actionId, name, iconUrl, iterations, duration, auraMetrics);
 	}
 };
 
 // Manages the metrics for a single player action (e.g. Lightning Bolt).
 export class ActionMetrics {
+	readonly actionId: ActionId;
 	readonly name: string;
 	readonly iconUrl: string;
-	readonly actionId: ActionId;
 	private readonly iterations: number;
 	private readonly duration: number;
 	private readonly data: ActionMetricsProto;
 
-	private constructor(name: string, iconUrl: string, iterations: number, duration: number, data: ActionMetricsProto) {
+	private constructor(actionId: ActionId, name: string, iconUrl: string, iterations: number, duration: number, data: ActionMetricsProto) {
+		this.actionId = actionId;
 		this.name = name;
 		this.iconUrl = iconUrl;
 		this.iterations = iterations;
 		this.duration = duration;
 		this.data = data;
-
-		if (actionMetric.id!.rawId.oneofKind == 'spellId') {
-			this.actionId = {
-				id: {
-					spellId: actionMetric.id!.rawId.spellId,
-				},
-				tag: actionMetric.id!.tag,
-			};
-		} else if (actionMetric.id!.rawId.oneofKind == 'itemId') {
-			this.actionId = {
-				id: {
-					itemId: actionMetric.id!.rawId.itemId,
-				},
-				tag: actionMetric.id!.tag,
-			};
-		} else if (actionMetric.id!.rawId.oneofKind == 'otherId') {
-			this.actionId = {
-				id: {
-					otherId: actionMetric.id!.rawId.otherId,
-				},
-				tag: actionMetric.id!.tag,
-			};
-		} else {
-			throw new Error('Invalid action metric with no ID');
-		}
 	}
 
 	get dps() {
-		return this.data.totalDmg / this.iterations / this.duration;
+		return this.data.damage / this.iterations / this.duration;
 	}
 
 	get casts() {
@@ -290,7 +314,7 @@ export class ActionMetrics {
 	}
 
 	get avgCast() {
-		return this.data.totalDmg / this.data.casts;
+		return this.data.damage / this.data.casts;
 	}
 
 	get hits() {
@@ -298,7 +322,7 @@ export class ActionMetrics {
 	}
 
 	get avgHit() {
-		return this.data.totalDmg / this.data.hits;
+		return this.data.damage / this.data.hits;
 	}
 
 	get critPercent() {
@@ -309,22 +333,48 @@ export class ActionMetrics {
 		return (this.data.misses / (this.data.hits + this.data.misses)) * 100;
 	}
 
-	static async makeNew(iterations: number, duration: number, actionMetrics: ActionMetricsProto): ActionMetrics {
-		const namePromise = getName(actionMetrics.actionId.id);
-		const iconPromise = getIconUrl(actionMetrics.actionId.id);
+	static async makeNew(iterations: number, duration: number, actionMetrics: ActionMetricsProto): Promise<ActionMetrics> {
+		let actionId: ActionId | null = null;
+		if (actionMetrics.id!.rawId.oneofKind == 'spellId') {
+			actionId = {
+				id: {
+					spellId: actionMetrics.id!.rawId.spellId,
+				},
+				tag: actionMetrics.id!.tag,
+			};
+		} else if (actionMetrics.id!.rawId.oneofKind == 'itemId') {
+			actionId = {
+				id: {
+					itemId: actionMetrics.id!.rawId.itemId,
+				},
+				tag: actionMetrics.id!.tag,
+			};
+		} else if (actionMetrics.id!.rawId.oneofKind == 'otherId') {
+			actionId = {
+				id: {
+					otherId: actionMetrics.id!.rawId.otherId,
+				},
+				tag: actionMetrics.id!.tag,
+			};
+		} else {
+			throw new Error('Invalid action metric with no ID');
+		}
+
+		const namePromise = getName(actionId.id);
+		const iconPromise = getIconUrl(actionId.id);
 
 		let name = await namePromise;
-		if (actionMetrics.actionId.tag != 0) {
+		if (actionId.tag != 0) {
 			if (name == "Mind Flay") { // for now we can just check the name and use special tagging rules.
-				if (actionMetrics.actionId.tag == 1) {
+				if (actionId.tag == 1) {
 					name += ' (1 Tick)';
-				} else if (actionMetrics.actionId.tag == 2) {
+				} else if (actionId.tag == 2) {
 					name += ' (2 Tick)';
-				} else if (actionMetrics.actionId.tag == 3) {
+				} else if (actionId.tag == 3) {
 					name += ' (3 Tick)';
 				}
 			} else {
-				if (actionMetrics.actionId.tag == 1) {
+				if (actionId.tag == 1) {
 					name += ' (LO)';
 				} else {
 					name += ' (??)';
@@ -334,6 +384,6 @@ export class ActionMetrics {
 
 		const iconUrl = await iconPromise;
 
-		return new ActionMetrics(name, iconUrl, iterations, duration, actionMetrics);
+		return new ActionMetrics(actionId, name, iconUrl, iterations, duration, actionMetrics);
 	}
 }

@@ -1,25 +1,21 @@
 import { RaidSimRequest, RaidSimResult } from '/tbc/core/proto/api.js';
+import { SimResult } from '/tbc/core/proto_utils/sim_result.js';
 import { repoName } from '/tbc/core/resources.js';
 import { SimUI } from '/tbc/core/sim_ui.js';
 
 import { Component } from './component.js';
 
-export type RaidSimData = {
-	request: RaidSimRequest;
-	result: RaidSimResult;
-};
-
 export class DetailedResults extends Component {
 	private readonly iframeElem: HTMLIFrameElement;
 	private tabWindow: Window | null;
-	private latestResult: RaidSimData | null;
+	private latestResult: SimResult | null;
 
   constructor(parent: HTMLElement, simUI: SimUI) {
     super(parent, 'detailed-results-manager-root');
 		this.tabWindow = null;
 		this.latestResult = null;
 
-		const computedStyles = window.getComputedStyle(document.body);
+		const computedStyles = window.getComputedStyle(this.rootElem);
 
 		const url = new URL(`${window.location.protocol}//${window.location.host}/${repoName}/detailed_results/index.html`);
 		url.searchParams.append('mainBgColor', computedStyles.getPropertyValue('--main-bg-color').trim());
@@ -40,7 +36,7 @@ export class DetailedResults extends Component {
 				this.tabWindow = window.open(url.href, 'Detailed Results');
 				this.tabWindow!.addEventListener('load', event => {
 					if (this.latestResult) {
-						this.setSimResult(this.latestResult.request, this.latestResult.result);
+						this.setSimResult(this.latestResult);
 					}
 				});
 			} else {
@@ -48,8 +44,8 @@ export class DetailedResults extends Component {
 			}
 		});
 
-		simUI.sim.raidSimEmitter.on(data => {
-			this.setSimResult(data.request, data.result);
+		simUI.sim.simResultEmitter.on(simResult => {
+			this.setSimResult(simResult);
 		});
 	}
 
@@ -62,16 +58,12 @@ export class DetailedResults extends Component {
 	//	}
 	//}
 
-  private setSimResult(request: RaidSimRequest, result: RaidSimResult) {
-		const data = {
-			request: request,
-			result: result,
-		};
-
-		this.latestResult = data;
-		this.iframeElem.contentWindow!.postMessage(data, '*');
+  private setSimResult(simResult: SimResult) {
+		this.latestResult = simResult;
+		const serialized = simResult.toJson();
+		this.iframeElem.contentWindow!.postMessage(serialized, '*');
 		if (this.tabWindow) {
-			this.tabWindow.postMessage(data, '*');
+			this.tabWindow.postMessage(serialized, '*');
 		}
   }
 }
