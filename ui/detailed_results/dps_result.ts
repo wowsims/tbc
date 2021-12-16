@@ -1,6 +1,6 @@
-import { RaidSimRequest, RaidSimResult } from '/tbc/core/proto/api.js';
+import { SimResult, SimResultFilter } from '/tbc/core/proto_utils/sim_result.js';
 
-import { ResultComponent, ResultComponentConfig } from './result_component.js';
+import { ResultComponent, ResultComponentConfig, SimResultData } from './result_component.js';
 
 export class DpsResult extends ResultComponent {
   constructor(config: ResultComponentConfig) {
@@ -8,10 +8,12 @@ export class DpsResult extends ResultComponent {
     super(config);
   }
 
-	onSimResult(request: RaidSimRequest, result: RaidSimResult) {
+	onSimResult(resultData: SimResultData) {
+		const damageMetrics = resultData.result.getDamageMetrics(resultData.filter);
+
     this.rootElem.innerHTML = `
-      <span class="results-sim-dps-avg">${result.raidMetrics!.dps!.avg.toFixed(2)}</span>
-      <span class="results-sim-dps-stdev">${result.raidMetrics!.dps!.stdev.toFixed(2)}</span>
+      <span class="results-sim-dps-avg">${damageMetrics.avg.toFixed(2)}</span>
+      <span class="results-sim-dps-stdev">${damageMetrics.stdev.toFixed(2)}</span>
     `;
 	}
 }

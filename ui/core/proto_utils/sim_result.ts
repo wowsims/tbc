@@ -17,16 +17,21 @@ import { Spec } from '/tbc/core/proto/common.js';
 import { ActionId } from '/tbc/core/resources.js';
 import { getIconUrl } from '/tbc/core/resources.js';
 import { getName } from '/tbc/core/resources.js';
+import { actionIdToString } from '/tbc/core/resources.js';
 import { playerToSpec } from '/tbc/core/proto_utils/utils.js';
+import { bucket } from '/tbc/core/utils.js';
+import { sum } from '/tbc/core/utils.js';
 
 export interface SimResultFilter {
 	// Raid index of the player to display, or null for all players.
-	player: number | null;
+	player?: number | null;
 
 	// Target index of the target to display, or null for all targets.
-	target: number | null;
+	target?: number | null;
 }
 
+// Holds all the data from a simulation call, and provides helper functions
+// for parsing it.
 export class SimResult {
 	private readonly request: RaidSimRequest;
 	private readonly result: RaidSimResult;
@@ -41,33 +46,59 @@ export class SimResult {
 		this.encounterMetrics = encounterMetrics;
 	}
 
-	getPlayers(): Array<PlayerMetrics> {
-		return this.raidMetrics.parties.map(party => party.players).flat();
+	getPlayers(filter?: SimResultFilter): Array<PlayerMetrics> {
+		if (filter?.player || filter?.player === 0) {
+			const player = this.getPlayerWithRaidIndex(filter.player);
+			return player ? [player] : [];
+		} else {
+			return this.raidMetrics.parties.map(party => party.players).flat();
+		}
 	}
 
 	// Returns the first player, regardless of which party / raid slot its in.
-	getFirstPlayer(): PlayerMetrics {
-		const players = this.getPlayers();
-		if (players.length == 0) {
-			throw new Error('Empty sim result with no players!');
-		}
-		return players[0];
+	getFirstPlayer(): PlayerMetrics | null {
+		return this.getPlayers()[0] || null;
 	}
 
-	getPlayerWithRaidIndex(raidIndex: number): PlayerMetrics {
-		const player = this.getPlayers().find(player => player.raidIndex == raidIndex);
-		if (!player) {
-			throw new Error('No player with raid index: ' + raidIndex);
+	getPlayerWithRaidIndex(raidIndex: number): PlayerMetrics | null {
+		return this.getPlayers().find(player => player.raidIndex == raidIndex) || null;
+	}
+
+	getTargets(filter?: SimResultFilter): Array<TargetMetrics> {
+		if (filter?.target || filter?.target === 0) {
+			const target = this.getTargetWithIndex(filter.target);
+			return target ? [target] : [];
+		} else {
+			return this.encounterMetrics.targets.slice();
 		}
-		return player;
+	}
+
+	getTargetWithIndex(index: number): TargetMetrics | null {
+		return this.getTargets().find(target => target.index == index) || null;
 	}
 
 	getDamageMetrics(filter: SimResultFilter): DpsMetricsProto {
-		if (filter.player == null) {
-			return this.raidMetrics.dps;
+		if (filter.player || filter.player === 0) {
+			return this.getPlayerWithRaidIndex(filter.player)?.dps || DpsMetricsProto.create();
 		}
 
-		return this.getPlayerWithRaidIndex(filter.player).dps;
+		return this.raidMetrics.dps;
+	}
+
+	getActionMetrics(filter: SimResultFilter): Array<ActionMetrics> {
+		return ActionMetrics.join(this.getPlayers(filter).map(player => player.actions).flat());
+	}
+
+	getSpellMetrics(filter: SimResultFilter): Array<ActionMetrics> {
+		return this.getActionMetrics(filter).filter(e => e.hits + e.misses != 0);
+	}
+
+	getBuffMetrics(filter: SimResultFilter): Array<AuraMetrics> {
+		return AuraMetrics.join(this.getPlayers(filter).map(player => player.auras).flat());
+	}
+
+	getDebuffMetrics(filter: SimResultFilter): Array<AuraMetrics> {
+		return AuraMetrics.join(this.getTargets(filter).map(target => target.auras).flat());
 	}
 
 	getLogs(): Array<string> {
@@ -173,8 +204,10 @@ export class PlayerMetrics {
 	readonly dps: DpsMetricsProto;
 	readonly actions: Array<ActionMetrics>;
 	readonly auras: Array<AuraMetrics>;
+	private readonly iterations: number;
+	private readonly duration: number;
 
-	private constructor(player: PlayerProto, metrics: PlayerMetricsProto, raidIndex: number, actions: Array<ActionMetrics>, auras: Array<AuraMetrics>) {
+	private constructor(player: PlayerProto, metrics: PlayerMetricsProto, raidIndex: number, actions: Array<ActionMetrics>, auras: Array<AuraMetrics>, iterations: number, duration: number) {
 		this.player = player;
 		this.metrics = metrics;
 
@@ -184,6 +217,12 @@ export class PlayerMetrics {
 		this.dps = this.metrics.dps!;
 		this.actions = actions;
 		this.auras = auras;
+		this.iterations = iterations;
+		this.duration = duration;
+	}
+
+	get oomPercent() {
+		return (this.metrics.numOom / this.iterations) * 100;
 	}
 
 	static async makeNew(iterations: number, duration: number, player: PlayerProto, metrics: PlayerMetricsProto, raidIndex: number): Promise<PlayerMetrics> {
@@ -192,7 +231,7 @@ export class PlayerMetrics {
 
 		const actions = await actionsPromise;
 		const auras = await aurasPromise;
-		return new PlayerMetrics(player, metrics, raidIndex, actions, auras);
+		return new PlayerMetrics(player, metrics, raidIndex, actions, auras, iterations, duration);
 	}
 }
 
@@ -281,6 +320,20 @@ export class AuraMetrics {
 
 		return new AuraMetrics(actionId, name, iconUrl, iterations, duration, auraMetrics);
 	}
+
+	// Merges aura metrics that have the same name/ID, adding their stats together.
+	static join(auras: Array<AuraMetrics>): Array<AuraMetrics> {
+		const joinedById = bucket(auras, aura => actionIdToString(aura.actionId));
+
+		return Object.values(joinedById).map(aurasToJoin => {
+			const firstAura = aurasToJoin[0];
+			return new AuraMetrics(
+					firstAura.actionId, firstAura.name, firstAura.iconUrl, firstAura.iterations, firstAura.duration,
+					AuraMetricsProto.create({
+						uptimeSecondsAvg: Math.max(...aurasToJoin.map(a => a.data.uptimeSecondsAvg)),
+					}));
+		});
+	}
 };
 
 // Manages the metrics for a single player action (e.g. Lightning Bolt).
@@ -299,6 +352,10 @@ export class ActionMetrics {
 		this.iterations = iterations;
 		this.duration = duration;
 		this.data = data;
+	}
+
+	get damage() {
+		return this.data.damage;
 	}
 
 	get dps() {
@@ -327,6 +384,10 @@ export class ActionMetrics {
 
 	get critPercent() {
 		return (this.data.crits / this.data.hits) * 100;
+	}
+
+	get misses() {
+		return this.data.misses / this.iterations;
 	}
 
 	get missPercent() {
@@ -385,5 +446,23 @@ export class ActionMetrics {
 		const iconUrl = await iconPromise;
 
 		return new ActionMetrics(actionId, name, iconUrl, iterations, duration, actionMetrics);
+	}
+
+	// Merges action metrics that have the same name/ID, adding their stats together.
+	static join(actions: Array<ActionMetrics>): Array<ActionMetrics> {
+		const joinedById = bucket(actions, action => actionIdToString(action.actionId));
+
+		return Object.values(joinedById).map(actionsToJoin => {
+			const firstAction = actionsToJoin[0];
+			return new ActionMetrics(
+					firstAction.actionId, firstAction.name, firstAction.iconUrl, firstAction.iterations, firstAction.duration,
+					ActionMetricsProto.create({
+						casts: sum(actionsToJoin.map(a => a.data.casts)),
+						hits: sum(actionsToJoin.map(a => a.data.hits)),
+						crits: sum(actionsToJoin.map(a => a.data.crits)),
+						misses: sum(actionsToJoin.map(a => a.data.misses)),
+						damage: sum(actionsToJoin.map(a => a.data.damage)),
+					}));
+		});
 	}
 }
