@@ -66,7 +66,7 @@ export class ShadowPriestSimUI extends IndividualSimUI<Spec.SpecShadowPriest> {
 
 			defaults: {
 				// Default equipped gear.
-				gear: Presets.P1_BIS.gear,
+				gear: Presets.P3_BIS.gear,
 				// Default EP weights for sorting gear in the gear picker.
 				epWeights: Stats.fromMap({
 					[Stat.StatIntellect]: 0.05,
@@ -191,6 +191,7 @@ export class ShadowPriestSimUI extends IndividualSimUI<Spec.SpecShadowPriest> {
 				gear: [
 					Presets.P1_BIS,
 					Presets.P2_BIS,
+					Presets.P3_BIS,
 				],
 			},
 		});

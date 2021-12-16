@@ -237,3 +237,98 @@ export const P2_BIS = {
 		],
 	}),
 };
+export const P3_BIS = {
+	name: 'P3 Initial BIS',
+	tooltip: Tooltips.BASIC_BIS_DISCLAIMER,
+	gear: EquipmentSpec.create({
+		items: [
+			ItemSpec.create({
+				id: 31064, // Hood of Absolution
+				enchant: Enchants.GLYPH_OF_POWER,
+				gems: [
+					Gems.MYSTICAL_SKYFIRE_DIAMOND,
+					Gems.GLOWING_SHADOWSONG_AMETHYST,
+				],
+			}),
+			ItemSpec.create({
+				id: 35319,// Vindicator's Pendant of Subjugation
+				gems: [
+					Gems.RUNED_CRIMSON_SPINEL,
+				],
+			}),
+			ItemSpec.create({
+				id: 31070, // Shoulderpads of Absolution
+				enchant: Enchants.GREATER_INSCRIPTION_OF_DISCIPLINE,
+				gems: [
+					Gems.RUNED_CRIMSON_SPINEL,
+					Gems.RUNED_CRIMSON_SPINEL,
+				],
+			}),
+			ItemSpec.create({
+				id: 32590, // Nethervoid Cloak
+				enchant: Enchants.SUBTLETY,
+			}),
+			ItemSpec.create({
+				id: 31065, // Shroud of Absolution
+				enchant: Enchants.CHEST_EXCEPTIONAL_STATS,
+				gems: [
+					Gems.RUNED_CRIMSON_SPINEL,
+					Gems.RUNED_CRIMSON_SPINEL,
+					Gems.RUNED_CRIMSON_SPINEL,
+				],
+			}),
+			ItemSpec.create({
+				id: 32586, // bracers-of-nimble-thought
+				enchant: Enchants.WRIST_SPELLPOWER,
+			}),
+			ItemSpec.create({
+				id: 31061, // handguards-of-absolution
+				enchant: Enchants.GLOVES_SPELLPOWER,
+				gems: [
+					Gems.RUNED_CRIMSON_SPINEL,
+				],
+			}),
+			ItemSpec.create({
+				id: 32256, // waistwrap-of-infinity
+			}),
+			ItemSpec.create({
+				id: 30916, // /leggings-of-channeled-elements
+				enchant: Enchants.RUNIC_SPELLTHREAD,
+				gems: [
+					Gems.RUNED_CRIMSON_SPINEL,
+					Gems.RUNED_CRIMSON_SPINEL,
+					Gems.RUNED_CRIMSON_SPINEL,
+				],
+			}),
+			ItemSpec.create({
+				id: 32239, // Slippers of the Seacaller
+				enchant: Enchants.BOARS_SPEED,
+				gems: [
+					Gems.RUNED_CRIMSON_SPINEL,
+					Gems.RUNED_CRIMSON_SPINEL,
+				],
+			}),
+			ItemSpec.create({
+				id: 32527, // ring-of-ancient-knowledge
+				enchant: Enchants.RING_SPELLPOWER,
+			}),
+			ItemSpec.create({
+				id: 32527, // ring-of-ancient-knowledge
+				enchant: Enchants.RING_SPELLPOWER,
+			}),
+			ItemSpec.create({
+				id: 32483, // the-skull-of-guldan
+			}),
+			ItemSpec.create({
+				id: 38290, // dark-iron-smoking-pipe
+			}),
+			ItemSpec.create({
+				id: 29982, // wand of forgotten star
+			}),
+			ItemSpec.create({
+				id: 32374, // Zhar'doom, Greatstaff of the Devourer
+				enchant: Enchants.SOULFROST,
+			}),
+		],
+	}),
+};
