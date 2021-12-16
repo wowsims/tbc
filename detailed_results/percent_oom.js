@@ -4,14 +4,21 @@ export class PercentOom extends ResultComponent {
         config.rootCssClass = 'percent-oom';
         super(config);
     }
-    onSimResult(request, result) {
-        const percentOom = result.raidMetrics.parties[0].players[0].numOom / request.simOptions.iterations;
-        this.rootElem.innerHTML = `
-      <span class="percent-oom-value">${Math.round(percentOom * 100)}%</span>
-      <span class="percent-oom-label">of simulations went OOM</span>
-    `;
-        const dangerLevel = percentOom < 0.05 ? 'safe' : (percentOom < 0.25 ? 'warning' : 'danger');
-        this.rootElem.classList.remove('safe', 'warning', 'danger');
-        this.rootElem.classList.add(dangerLevel);
+    onSimResult(resultData) {
+        const players = resultData.result.getPlayers(resultData.filter);
+        if (players.length == 1) {
+            const percentOom = players[0].oomPercent;
+            this.rootElem.innerHTML = `
+				<span class="percent-oom-value">${Math.round(percentOom)}%</span>
+				<span class="percent-oom-label">of simulations went OOM</span>
+			`;
+            const dangerLevel = percentOom < 5 ? 'safe' : (percentOom < 25 ? 'warning' : 'danger');
+            this.rootElem.classList.remove('safe', 'warning', 'danger');
+            this.rootElem.classList.add(dangerLevel);
+            this.rootElem.style.display = 'initial';
+        }
+        else {
+            this.rootElem.style.display = 'none';
+        }
     }
 }

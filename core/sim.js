@@ -6,6 +6,7 @@ import { SimOptions } from '/tbc/core/proto/api.js';
 import { StatWeightsRequest, StatWeightsResult } from '/tbc/core/proto/api.js';
 import { EquippedItem } from '/tbc/core/proto_utils/equipped_item.js';
 import { Gear } from '/tbc/core/proto_utils/gear.js';
+import { SimResult } from '/tbc/core/proto_utils/sim_result.js';
 import { getEligibleItemSlots } from '/tbc/core/proto_utils/utils.js';
 import { getEligibleEnchantSlots } from '/tbc/core/proto_utils/utils.js';
 import { gemEligibleForSocket } from '/tbc/core/proto_utils/utils.js';
@@ -29,7 +30,7 @@ export class Sim {
         // Emits when any of the above emitters emit.
         this.changeEmitter = new TypedEvent();
         // Fires when a raid sim API call completes.
-        this.raidSimEmitter = new TypedEvent();
+        this.simResultEmitter = new TypedEvent();
         this.workerPool = new WorkerPool(3);
         this._initPromise = this.workerPool.getGearList(GearListRequest.create()).then(result => {
             result.items.forEach(item => this.items[item.id] = item);
@@ -67,8 +68,9 @@ export class Sim {
         }
         const request = this.makeRaidSimRequest(false);
         const result = await this.workerPool.raidSim(request);
-        this.raidSimEmitter.emit({ request: request, result: result });
-        return result;
+        const simResult = await SimResult.makeNew(request, result);
+        this.simResultEmitter.emit(simResult);
+        return simResult;
     }
     async runRaidSimWithLogs() {
         if (this.raid.isEmpty()) {
@@ -79,8 +81,9 @@ export class Sim {
         }
         const request = this.makeRaidSimRequest(true);
         const result = await this.workerPool.raidSim(request);
-        this.raidSimEmitter.emit({ request: request, result: result });
-        return result;
+        const simResult = await SimResult.makeNew(request, result);
+        this.simResultEmitter.emit(simResult);
+        return simResult;
     }
     async getCharacterStats(player) {
         if (player.getParty() == null) {

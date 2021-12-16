@@ -29,6 +29,27 @@ const emptySlotIcons = {
 export function getEmptySlotIconUrl(slot) {
     return emptySlotIcons[slot];
 }
+export function sameActionId(id1, id2) {
+    return ((('itemId' in id1.id && 'itemId' in id2.id && id1.id.itemId == id2.id.itemId)
+        || ('spellId' in id1.id && 'spellId' in id2.id && id1.id.spellId == id2.id.spellId)
+        || ('otherId' in id1.id && 'otherId' in id2.id && id1.id.otherId == id2.id.otherId))
+        && id1.tag == id2.tag);
+}
+export function actionIdToString(id) {
+    let tagStr = id.tag ? ('-' + id.tag) : '';
+    if ('itemId' in id.id) {
+        return 'item-' + id.id.itemId + tagStr;
+    }
+    else if ('spellId' in id.id) {
+        return 'spell-' + id.id.spellId + tagStr;
+    }
+    else if ('otherId' in id.id) {
+        return 'other-' + id.id.otherId + tagStr;
+    }
+    else {
+        throw new Error('Invalid Action Id: ' + JSON.stringify(id));
+    }
+}
 // Some items/spells have weird icons, so use this to show a different icon instead.
 const idOverrides = {};
 idOverrides[JSON.stringify({ spellId: 37212 })] = { itemId: 29035 }; // Improved Wrath of Air Totem

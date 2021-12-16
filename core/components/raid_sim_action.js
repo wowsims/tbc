@@ -1,4 +1,3 @@
-import { RaidSimRequest, RaidSimResult } from '/tbc/core/proto/api.js';
 import { TypedEvent } from '/tbc/core/typed_event.js';
 export function addRaidSimAction(simUI) {
     simUI.addAction('DPS', 'dps-action', async () => {
@@ -12,8 +11,8 @@ export function addRaidSimAction(simUI) {
         }
     });
     const resultsManager = new RaidSimResultsManager(simUI);
-    simUI.sim.raidSimEmitter.on(data => {
-        resultsManager.setSimResult(data.request, data.result);
+    simUI.sim.simResultEmitter.on(simResult => {
+        resultsManager.setSimResult(simResult);
     });
     return resultsManager;
 }
@@ -25,13 +24,12 @@ export class RaidSimResultsManager {
         this.referenceData = null;
         this.simUI = simUI;
     }
-    setSimResult(request, result) {
+    setSimResult(simResult) {
         this.currentData = {
-            request: request,
-            result: result,
+            simResult: simResult,
             settings: this.simUI.sim.toJson(),
         };
-        const dpsMetrics = result.raidMetrics.dps;
+        const dpsMetrics = simResult.raidMetrics.dps;
         this.simUI.setResultsContent(`
       <div class="results-sim">
 				<div class="results-sim-dps">
@@ -67,7 +65,7 @@ export class RaidSimResultsManager {
                 this.currentData = this.referenceData;
                 this.referenceData = tmpData;
                 this.simUI.sim.fromJson(this.currentData.settings);
-                this.setSimResult(this.currentData.request, this.currentData.result);
+                this.setSimResult(this.currentData.simResult);
                 this.updateReference();
             }
         });
@@ -95,8 +93,8 @@ export class RaidSimResultsManager {
             return;
         }
         simReferenceElem.classList.add('has-reference');
-        const currentDpsMetrics = this.currentData.result.raidMetrics.dps;
-        const referenceDpsMetrics = this.referenceData.result.raidMetrics.dps;
+        const currentDpsMetrics = this.currentData.simResult.raidMetrics.dps;
+        const referenceDpsMetrics = this.referenceData.simResult.raidMetrics.dps;
         const delta = currentDpsMetrics.avg - referenceDpsMetrics.avg;
         const deltaStr = delta.toFixed(2);
         if (delta >= 0) {
@@ -116,8 +114,7 @@ export class RaidSimResultsManager {
         }
         // Defensive copy.
         return {
-            request: RaidSimRequest.clone(this.currentData.request),
-            result: RaidSimResult.clone(this.currentData.result),
+            simResult: this.currentData.simResult,
             settings: JSON.parse(JSON.stringify(this.currentData.settings)),
         };
     }
@@ -127,8 +124,7 @@ export class RaidSimResultsManager {
         }
         // Defensive copy.
         return {
-            request: RaidSimRequest.clone(this.referenceData.request),
-            result: RaidSimResult.clone(this.referenceData.result),
+            simResult: this.referenceData.simResult,
             settings: JSON.parse(JSON.stringify(this.referenceData.settings)),
         };
     }

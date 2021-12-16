@@ -4,10 +4,11 @@ export class DpsResult extends ResultComponent {
         config.rootCssClass = 'dps-result';
         super(config);
     }
-    onSimResult(request, result) {
+    onSimResult(resultData) {
+        const damageMetrics = resultData.result.getDamageMetrics(resultData.filter);
         this.rootElem.innerHTML = `
-      <span class="results-sim-dps-avg">${result.raidMetrics.dps.avg.toFixed(2)}</span>
-      <span class="results-sim-dps-stdev">${result.raidMetrics.dps.stdev.toFixed(2)}</span>
+      <span class="results-sim-dps-avg">${damageMetrics.avg.toFixed(2)}</span>
+      <span class="results-sim-dps-stdev">${damageMetrics.stdev.toFixed(2)}</span>
     `;
     }
 }

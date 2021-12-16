@@ -5,7 +5,7 @@ export class DetailedResults extends Component {
         super(parent, 'detailed-results-manager-root');
         this.tabWindow = null;
         this.latestResult = null;
-        const computedStyles = window.getComputedStyle(document.body);
+        const computedStyles = window.getComputedStyle(this.rootElem);
         const url = new URL(`${window.location.protocol}//${window.location.host}/${repoName}/detailed_results/index.html`);
         url.searchParams.append('mainBgColor', computedStyles.getPropertyValue('--main-bg-color').trim());
         url.searchParams.append('mainTextColor', computedStyles.getPropertyValue('--main-text-color').trim());
@@ -22,7 +22,7 @@ export class DetailedResults extends Component {
                 this.tabWindow = window.open(url.href, 'Detailed Results');
                 this.tabWindow.addEventListener('load', event => {
                     if (this.latestResult) {
-                        this.setSimResult(this.latestResult.request, this.latestResult.result);
+                        this.setSimResult(this.latestResult);
                     }
                 });
             }
@@ -30,8 +30,8 @@ export class DetailedResults extends Component {
                 this.tabWindow.focus();
             }
         });
-        simUI.sim.raidSimEmitter.on(data => {
-            this.setSimResult(data.request, data.result);
+        simUI.sim.simResultEmitter.on(simResult => {
+            this.setSimResult(simResult);
         });
     }
     // TODO: Decide whether to continue using this or just remove it.
@@ -42,15 +42,12 @@ export class DetailedResults extends Component {
     //		this.tabWindow.postMessage(null, '*');
     //	}
     //}
-    setSimResult(request, result) {
-        const data = {
-            request: request,
-            result: result,
-        };
-        this.latestResult = data;
-        this.iframeElem.contentWindow.postMessage(data, '*');
+    setSimResult(simResult) {
+        this.latestResult = simResult;
+        const serialized = simResult.toJson();
+        this.iframeElem.contentWindow.postMessage(serialized, '*');
         if (this.tabWindow) {
-            this.tabWindow.postMessage(data, '*');
+            this.tabWindow.postMessage(serialized, '*');
         }
     }
 }

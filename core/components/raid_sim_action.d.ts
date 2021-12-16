@@ -1,10 +1,9 @@
-import { RaidSimRequest, RaidSimResult } from '/tbc/core/proto/api.js';
+import { SimResult } from '/tbc/core/proto_utils/sim_result.js';
 import { SimUI } from '/tbc/core/sim_ui.js';
 import { TypedEvent } from '/tbc/core/typed_event.js';
 export declare function addRaidSimAction(simUI: SimUI): RaidSimResultsManager;
 export declare type ReferenceData = {
-    request: RaidSimRequest;
-    result: RaidSimResult;
+    simResult: SimResult;
     settings: any;
 };
 export declare class RaidSimResultsManager {
@@ -14,7 +13,7 @@ export declare class RaidSimResultsManager {
     private currentData;
     private referenceData;
     constructor(simUI: SimUI);
-    setSimResult(request: RaidSimRequest, result: RaidSimResult): void;
+    setSimResult(simResult: SimResult): void;
     private updateReference;
     getCurrentData(): ReferenceData | null;
     getReferenceData(): ReferenceData | null;

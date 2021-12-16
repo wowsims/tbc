@@ -13,6 +13,21 @@ export function sum(arr) {
 export function intersection(a, b) {
     return a.filter(value => b.includes(value));
 }
+// Splits an array into buckets, where elements are placed in the same bucket if the
+// toString function returns the same value.
+export function bucket(arr, toString) {
+    const buckets = {};
+    arr.forEach(val => {
+        const valString = toString(val);
+        if (buckets[valString]) {
+            buckets[valString].push(val);
+        }
+        else {
+            buckets[valString] = [val];
+        }
+    });
+    return buckets;
+}
 export function stDevToConf90(stDev, N) {
     return 1.645 * stDev / Math.sqrt(N);
 }

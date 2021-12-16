@@ -19,6 +19,8 @@ export declare type ActionId = {
     id: RawActionId;
     tag?: number;
 };
+export declare function sameActionId(id1: ActionId, id2: ActionId): boolean;
+export declare function actionIdToString(id: ActionId): string;
 export declare function getTooltipData(id: ItemOrSpellId): Promise<any>;
 export declare function getIconUrl(id: RawActionId): Promise<string>;
 export declare function getItemIconUrl(item: Item): Promise<string>;
