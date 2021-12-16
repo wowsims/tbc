@@ -18,6 +18,21 @@ export function intersection<T>(a: Array<T>, b: Array<T>): Array<T> {
   return a.filter(value => b.includes(value));
 }
 
+// Splits an array into buckets, where elements are placed in the same bucket if the
+// toString function returns the same value.
+export function bucket<T>(arr: Array<T>, toString: (val: T) => string): Record<string, Array<T>> {
+	const buckets: Record<string, Array<T>> = {};
+	arr.forEach(val => {
+		const valString = toString(val);
+		if (buckets[valString]) {
+			buckets[valString].push(val);
+		} else {
+			buckets[valString] = [val];
+		}
+	});
+	return buckets;
+}
+
 export function stDevToConf90(stDev: number, N: number) {
   return 1.645 * stDev / Math.sqrt(N);
 }

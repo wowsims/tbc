@@ -20,6 +20,7 @@ import { StatWeightsRequest, StatWeightsResult } from '/tbc/core/proto/api.js';
 
 import { EquippedItem } from '/tbc/core/proto_utils/equipped_item.js';
 import { Gear } from '/tbc/core/proto_utils/gear.js';
+import { SimResult } from '/tbc/core/proto_utils/sim_result.js';
 import { Stats } from '/tbc/core/proto_utils/stats.js';
 import { SpecRotation } from '/tbc/core/proto_utils/utils.js';
 import { SpecTalents } from '/tbc/core/proto_utils/utils.js';
@@ -76,7 +77,7 @@ export class Sim {
   readonly changeEmitter = new TypedEvent<void>();
 
 	// Fires when a raid sim API call completes.
-  readonly raidSimEmitter = new TypedEvent<RaidSimData>();
+  readonly simResultEmitter = new TypedEvent<SimResult>();
 
 	private readonly _initPromise: Promise<void>;
 
@@ -115,7 +116,7 @@ export class Sim {
 		});
   }
 
-  async runRaidSim(): Promise<RaidSimResult> {
+  async runRaidSim(): Promise<SimResult> {
 		if (this.raid.isEmpty()) {
 			throw new Error('Raid is empty! Try adding some players first.');
 		} else if (this.encounter.getNumTargets() < 1) {
@@ -124,11 +125,13 @@ export class Sim {
 
 		const request = this.makeRaidSimRequest(false);
 		const result = await this.workerPool.raidSim(request);
-		this.raidSimEmitter.emit({ request: request, result: result });
-		return result;
+
+		const simResult = await SimResult.makeNew(request, result);
+		this.simResultEmitter.emit(simResult);
+		return simResult;
 	}
 
-  async runRaidSimWithLogs(): Promise<RaidSimResult> {
+  async runRaidSimWithLogs(): Promise<SimResult> {
 		if (this.raid.isEmpty()) {
 			throw new Error('Raid is empty! Try adding some players first.');
 		} else if (this.encounter.getNumTargets() < 1) {
@@ -137,8 +140,10 @@ export class Sim {
 
 		const request = this.makeRaidSimRequest(true);
 		const result = await this.workerPool.raidSim(request);
-		this.raidSimEmitter.emit({ request: request, result: result });
-		return result;
+
+		const simResult = await SimResult.makeNew(request, result);
+		this.simResultEmitter.emit(simResult);
+		return simResult;
 	}
 
 	async getCharacterStats(player: Player<any>): Promise<ComputeStatsResult> {

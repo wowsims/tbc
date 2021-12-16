@@ -1,8 +1,7 @@
-import { RaidSimRequest, RaidSimResult } from '/tbc/core/proto/api.js';
+import { SimResult, SimResultFilter } from '/tbc/core/proto_utils/sim_result.js';
 import { sum } from '/tbc/core/utils.js';
 
-import { parseActionMetrics } from './metrics_helpers.js';
-import { ResultComponent, ResultComponentConfig } from './result_component.js';
+import { ResultComponent, ResultComponentConfig, SimResultData } from './result_component.js';
 
 declare var Chart: any;
 
@@ -12,7 +11,7 @@ export class SourceChart extends ResultComponent {
     super(config);
 	}
 
-	onSimResult(request: RaidSimRequest, result: RaidSimResult) {
+	onSimResult(resultData: SimResultData) {
 		const chartBounds = this.rootElem.getBoundingClientRect();
 
 		this.rootElem.textContent = '';
@@ -22,31 +21,30 @@ export class SourceChart extends ResultComponent {
 
 		const colors: Array<string> = ['red', 'blue', 'lawngreen'];
 
-		parseActionMetrics(result.raidMetrics!.parties[0].players[0].actions).then(actionMetrics => {
-			const names = actionMetrics.map(am => am.name);
-			const totalDmg = sum(actionMetrics.map(actionMetric => actionMetric.totalDmg));
-			const vals = actionMetrics.map(actionMetric => actionMetric.totalDmg / totalDmg);
+		const actionMetrics = resultData.result.getActionMetrics(resultData.filter);
+		const names = actionMetrics.map(am => am.name);
+		const totalDmg = sum(actionMetrics.map(actionMetric => actionMetric.damage));
+		const vals = actionMetrics.map(actionMetric => actionMetric.damage / totalDmg);
 
-			const ctx = chartCanvas.getContext('2d');
-			const chart = new Chart(ctx, {
-				type: 'pie',
-				data: {
-					labels: names,
-					datasets: [{
-						data: vals,
-						backgroundColor: colors,
-					}],
+		const ctx = chartCanvas.getContext('2d');
+		const chart = new Chart(ctx, {
+			type: 'pie',
+			data: {
+				labels: names,
+				datasets: [{
+					data: vals,
+					backgroundColor: colors,
+				}],
+			},
+			options: {
+				plugins: {
+					legend: {
+						display: true,
+						position: 'right',
+					}
 				},
-				options: {
-					plugins: {
-						legend: {
-							display: true,
-							position: 'right',
-						}
-					},
-				},
-			});
-			this.rootElem.appendChild(chartCanvas);
+			},
 		});
+		this.rootElem.appendChild(chartCanvas);
 	}
 }

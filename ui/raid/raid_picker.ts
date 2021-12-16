@@ -352,8 +352,8 @@ export class PlayerPicker extends Component {
 			const currentData = this.raidPicker.raidSimUI.getCurrentData();
 			const referenceData = this.raidPicker.raidSimUI.getReferenceData();
 
-			const playerDps = currentData?.result.raidMetrics!.parties[this.partyPicker.index].players[this.index]?.dps?.avg || 0;
-			const referenceDps = referenceData?.result.raidMetrics!.parties[this.partyPicker.index].players[this.index]?.dps?.avg || 0;
+			const playerDps = currentData?.simResult.getDamageMetrics({ player: this.raidIndex }).avg || 0;
+			const referenceDps = referenceData?.simResult.getDamageMetrics({ player: this.raidIndex }).avg || 0;
 
 			if (playerDps == 0 && referenceDps == 0) {
 				this.dpsResultElem.textContent = '';

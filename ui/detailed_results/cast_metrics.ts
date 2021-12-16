@@ -1,9 +1,8 @@
-import { RaidSimRequest, RaidSimResult } from '/tbc/core/proto/api.js';
+import { SimResult, SimResultFilter } from '/tbc/core/proto_utils/sim_result.js';
 import { setWowheadHref } from '/tbc/core/resources.js';
 import { sum } from '/tbc/core/utils.js';
 
-import { parseActionMetrics } from './metrics_helpers.js';
-import { ResultComponent, ResultComponentConfig } from './result_component.js';
+import { ResultComponent, ResultComponentConfig, SimResultData } from './result_component.js';
 
 declare var $: any;
 declare var tippy: any;
@@ -85,49 +84,44 @@ export class SpellMetrics extends ResultComponent {
 		$(this.tableElem).tablesorter({ sortList: [[1, 1]] });
 	}
 
-	onSimResult(request: RaidSimRequest, result: RaidSimResult) {
+	onSimResult(resultData: SimResultData) {
 		this.bodyElem.textContent = '';
 
-		const iterations = request.simOptions!.iterations;
-		const duration = request.encounter?.duration || 1;
+		const spellMetrics = resultData.result.getSpellMetrics(resultData.filter);
+		spellMetrics.forEach(spellMetric => {
+			const rowElem = document.createElement('tr');
+			this.bodyElem.appendChild(rowElem);
 
-		parseActionMetrics(result.raidMetrics!.parties[0].players[0].actions).then(actionMetrics => {
-			actionMetrics.filter(e => e.hits + e.misses != 0).forEach(actionMetric => {
+			const nameCellElem = document.createElement('td');
+			rowElem.appendChild(nameCellElem);
+			nameCellElem.innerHTML = `
+			<a class="cast-metrics-action-icon"></a>
+			<span class="cast-metrics-action-name">${spellMetric.name}</span>
+			`;
 
-				const rowElem = document.createElement('tr');
-				this.bodyElem.appendChild(rowElem);
+			const iconElem = nameCellElem.getElementsByClassName('cast-metrics-action-icon')[0] as HTMLAnchorElement;
+			iconElem.style.backgroundImage = `url('${spellMetric.iconUrl}')`;
+			if (!('otherId' in spellMetric.actionId.id)) {
+				setWowheadHref(iconElem, spellMetric.actionId.id);
+			}
 
-				const nameCellElem = document.createElement('td');
-				rowElem.appendChild(nameCellElem);
-				nameCellElem.innerHTML = `
-				<a class="cast-metrics-action-icon"></a>
-				<span class="cast-metrics-action-name">${actionMetric.name}</span>
-				`;
+			const addCell = (value: string | number): HTMLElement => {
+				const cellElem = document.createElement('td');
+				cellElem.textContent = String(value);
+				rowElem.appendChild(cellElem);
+				return cellElem;
+			};
 
-				const iconElem = nameCellElem.getElementsByClassName('cast-metrics-action-icon')[0] as HTMLAnchorElement;
-				iconElem.style.backgroundImage = `url('${actionMetric.iconUrl}')`;
-				if (!('otherId' in actionMetric.actionId.id)) {
-					setWowheadHref(iconElem, actionMetric.actionId.id);
-				}
-
-				const addCell = (value: string | number): HTMLElement => {
-					const cellElem = document.createElement('td');
-					cellElem.textContent = String(value);
-					rowElem.appendChild(cellElem);
-					return cellElem;
-				};
-
-				addCell((actionMetric.totalDmg / iterations / duration).toFixed(1)); // DPS
-				addCell((actionMetric.casts / iterations).toFixed(1)); // Casts
-				addCell((actionMetric.totalDmg / actionMetric.casts).toFixed(1)); // Avg Cast
-				addCell((actionMetric.hits / iterations).toFixed(1)); // Hits
-				addCell((actionMetric.totalDmg / actionMetric.hits).toFixed(1)); // Avg Hit
-				addCell(((actionMetric.crits / actionMetric.hits) * 100).toFixed(2) + ' %'); // Crit %
-				addCell(((actionMetric.misses / (actionMetric.hits + actionMetric.misses)) * 100).toFixed(2) + ' %'); // Miss %
-			});
-
-			$(this.tableElem).trigger('update');
+			addCell(spellMetric.dps.toFixed(1)); // DPS
+			addCell(spellMetric.casts.toFixed(1)); // Casts
+			addCell(spellMetric.avgCast.toFixed(1)); // Avg Cast
+			addCell(spellMetric.hits.toFixed(1)); // Hits
+			addCell(spellMetric.avgHit.toFixed(1)); // Avg Hit
+			addCell(spellMetric.critPercent.toFixed(2) + ' %'); // Crit %
+			addCell(spellMetric.missPercent.toFixed(2) + ' %'); // Miss %
 		});
+
+		$(this.tableElem).trigger('update');
 	}
 }
 
@@ -174,42 +168,38 @@ export class CastMetrics extends ResultComponent {
 		$(this.tableElem).tablesorter({ sortList: [[1, 1]] });
 	}
 
-	onSimResult(request: RaidSimRequest, result: RaidSimResult) {
+	onSimResult(resultData: SimResultData) {
 		this.bodyElem.textContent = '';
 
-		const iterations = request.simOptions!.iterations;
-		const duration = request.encounter?.duration || 1;
+		const actionMetrics = resultData.result.getActionMetrics(resultData.filter);
+		actionMetrics.forEach(actionMetric => {
+			const rowElem = document.createElement('tr');
+			this.bodyElem.appendChild(rowElem);
 
-		parseActionMetrics(result.raidMetrics!.parties[0].players[0].actions).then(actionMetrics => {
-			actionMetrics.forEach(actionMetric => {
-				const rowElem = document.createElement('tr');
-				this.bodyElem.appendChild(rowElem);
+			const nameCellElem = document.createElement('td');
+			rowElem.appendChild(nameCellElem);
+			nameCellElem.innerHTML = `
+			<a class="cast-metrics-action-icon"></a>
+			<span class="cast-metrics-action-name">${actionMetric.name}</span>
+			`;
 
-				const nameCellElem = document.createElement('td');
-				rowElem.appendChild(nameCellElem);
-				nameCellElem.innerHTML = `
-				<a class="cast-metrics-action-icon"></a>
-				<span class="cast-metrics-action-name">${actionMetric.name}</span>
-				`;
+			const iconElem = nameCellElem.getElementsByClassName('cast-metrics-action-icon')[0] as HTMLAnchorElement;
+			iconElem.style.backgroundImage = `url('${actionMetric.iconUrl}')`;
+			if (!('otherId' in actionMetric.actionId.id)) {
+				setWowheadHref(iconElem, actionMetric.actionId.id);
+			}
 
-				const iconElem = nameCellElem.getElementsByClassName('cast-metrics-action-icon')[0] as HTMLAnchorElement;
-				iconElem.style.backgroundImage = `url('${actionMetric.iconUrl}')`;
-				if (!('otherId' in actionMetric.actionId.id)) {
-					setWowheadHref(iconElem, actionMetric.actionId.id);
-				}
+			const addCell = (value: string | number): HTMLElement => {
+				const cellElem = document.createElement('td');
+				cellElem.textContent = String(value);
+				rowElem.appendChild(cellElem);
+				return cellElem;
+			};
 
-				const addCell = (value: string | number): HTMLElement => {
-					const cellElem = document.createElement('td');
-					cellElem.textContent = String(value);
-					rowElem.appendChild(cellElem);
-					return cellElem;
-				};
-
-				addCell((actionMetric.casts / iterations).toFixed(1)); // Casts
-				addCell((actionMetric.casts / iterations / (duration / 60)).toFixed(1)); // CPM
-			});
-
-			$(this.tableElem).trigger('update');
+			addCell(actionMetric.casts.toFixed(1)); // Casts
+			addCell(actionMetric.castsPerMinute.toFixed(1)); // CPM
 		});
+
+		$(this.tableElem).trigger('update');
 	}
 }

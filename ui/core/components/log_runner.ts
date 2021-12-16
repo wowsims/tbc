@@ -29,13 +29,12 @@ export class LogRunner extends Component {
 			}
     });
 
-		simUI.sim.raidSimEmitter.on(data => {
-			const result = data.result;
-			const lines = result.logs.split('\n');
+		simUI.sim.simResultEmitter.on(simResult => {
+			const logs = simResult.getLogs();
 			logsDiv.textContent = '';
-			lines.forEach(line => {
+			logs.forEach(log => {
 				const lineElem = document.createElement('span');
-				lineElem.textContent = line;
+				lineElem.textContent = log;
 				logsDiv.appendChild(lineElem);
 			});
 		});

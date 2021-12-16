@@ -1,10 +1,10 @@
-import { RaidSimData } from '/tbc/core/components/detailed_results.js';
 import { TypedEvent } from '/tbc/core/typed_event.js';
+import { SimResult, SimResultFilter } from '/tbc/core/proto_utils/sim_result.js';
 
+import { SimResultData } from './result_component.js';
 import { CastMetrics } from './cast_metrics.js';
 import { SpellMetrics } from './cast_metrics.js';
-import { BuffAuraMetrics } from './aura_metrics.js'
-import { DebuffAuraMetrics } from './aura_metrics.js'
+import { AuraMetrics } from './aura_metrics.js'
 import { DpsHistogram } from './dps_histogram.js';
 import { DpsResult } from './dps_result.js';
 import { PercentOom } from './percent_oom.js';
@@ -77,12 +77,29 @@ const layoutHTML = `
 </div>
 `;
 
-const resultsEmitter = new TypedEvent<RaidSimData | null>();
-window.addEventListener('message', event => {
-	// Null indicates pending results
-	const data: RaidSimData | null = event.data;
+// Gets the current filter from the input elements.
+function getResultsFilter(simResult: SimResult): SimResultFilter {
+	return {
+		player: simResult.getFirstPlayer()?.raidIndex || null,
+		target: null,
+	};
+}
 
-	resultsEmitter.emit(event.data);
+const resultsEmitter = new TypedEvent<SimResultData | null>();
+window.addEventListener('message', async event => {
+	// Null indicates pending results
+	const data: Object | null = event.data;
+
+	let simResult: SimResult | null = null;
+	if (data) {
+		simResult = await SimResult.fromJson(data);
+		resultsEmitter.emit({
+			result: simResult,
+			filter: getResultsFilter(simResult),
+		});
+	} else {
+		resultsEmitter.emit(null);
+	}
 });
 
 document.body.innerHTML = layoutHTML;
@@ -93,7 +110,15 @@ const percentOom = new PercentOom({ parent: toplineResultsDiv, resultsEmitter: r
 
 const castMetrics = new CastMetrics({ parent: document.body.getElementsByClassName('cast-metrics')[0] as HTMLElement, resultsEmitter: resultsEmitter, colorSettings: colorSettings });
 const spellMetrics = new SpellMetrics({ parent: document.body.getElementsByClassName('spell-metrics')[0] as HTMLElement, resultsEmitter: resultsEmitter, colorSettings: colorSettings });
-const buffAuraMetrics = new BuffAuraMetrics({ parent: document.body.getElementsByClassName('buff-aura-metrics')[0] as HTMLElement, resultsEmitter: resultsEmitter, colorSettings: colorSettings });
-const debuffAuraMetrics = new DebuffAuraMetrics({ parent: document.body.getElementsByClassName('debuff-aura-metrics')[0] as HTMLElement, resultsEmitter: resultsEmitter, colorSettings: colorSettings });
+const buffAuraMetrics = new AuraMetrics({
+	parent: document.body.getElementsByClassName('buff-aura-metrics')[0] as HTMLElement,
+	resultsEmitter: resultsEmitter,
+	colorSettings: colorSettings,
+}, false);
+const debuffAuraMetrics = new AuraMetrics({
+	parent: document.body.getElementsByClassName('debuff-aura-metrics')[0] as HTMLElement,
+	resultsEmitter: resultsEmitter,
+	colorSettings: colorSettings,
+}, true);
 const sourceChart = new SourceChart({ parent: document.body.getElementsByClassName('source-chart')[0] as HTMLElement, resultsEmitter: resultsEmitter, colorSettings: colorSettings });
 const dpsHistogram = new DpsHistogram({ parent: document.body.getElementsByClassName('dps-histogram')[0] as HTMLElement, resultsEmitter: resultsEmitter, colorSettings: colorSettings });
