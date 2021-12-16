@@ -9,6 +9,9 @@ export class DetailedResults extends Component {
         const url = new URL(`${window.location.protocol}//${window.location.host}/${repoName}/detailed_results/index.html`);
         url.searchParams.append('mainBgColor', computedStyles.getPropertyValue('--main-bg-color').trim());
         url.searchParams.append('mainTextColor', computedStyles.getPropertyValue('--main-text-color').trim());
+        if (simUI.isIndividualSim()) {
+            url.searchParams.append('isIndividualSim', '');
+        }
         this.rootElem.innerHTML = `
 		<div class="detailed-results-controls-div">
 			<button class="detailed-results-new-tab-button">View in separate tab</button>

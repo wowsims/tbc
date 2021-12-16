@@ -5,25 +5,25 @@ export class SpellMetrics extends ResultComponent {
         config.rootCssClass = 'cast-metrics-root';
         super(config);
         this.rootElem.innerHTML = `
-		<table class="cast-metrics-table tablesorter">
-			<thead class="cast-metrics-table-header">
-				<tr class="cast-metrics-table-header-row">
-					<th class="cast-metrics-table-header-cell"><span>Name</span></th>
-					<th class="cast-metrics-table-header-cell"><span>DPS</span></th>
-					<th class="cast-metrics-table-header-cell"><span>Casts</span></th>
-					<th class="cast-metrics-table-header-cell"><span>Avg Cast</span></th>
-					<th class="cast-metrics-table-header-cell"><span>Hits</span></th>
-					<th class="cast-metrics-table-header-cell"><span>Avg Hit</span></th>
-					<th class="cast-metrics-table-header-cell"><span>Crit %</span></th>
-					<th class="cast-metrics-table-header-cell"><span>Miss %</span></th>
+		<table class="metrics-table tablesorter">
+			<thead class="metrics-table-header">
+				<tr class="metrics-table-header-row">
+					<th class="metrics-table-header-cell"><span>Name</span></th>
+					<th class="metrics-table-header-cell"><span>DPS</span></th>
+					<th class="metrics-table-header-cell"><span>Casts</span></th>
+					<th class="metrics-table-header-cell"><span>Avg Cast</span></th>
+					<th class="metrics-table-header-cell"><span>Hits</span></th>
+					<th class="metrics-table-header-cell"><span>Avg Hit</span></th>
+					<th class="metrics-table-header-cell"><span>Crit %</span></th>
+					<th class="metrics-table-header-cell"><span>Miss %</span></th>
 				</tr>
 			</thead>
-			<tbody class="cast-metrics-table-body">
+			<tbody class="metrics-table-body">
 			</tbody>
 		</table>
 		`;
-        this.tableElem = this.rootElem.getElementsByClassName('cast-metrics-table')[0];
-        this.bodyElem = this.rootElem.getElementsByClassName('cast-metrics-table-body')[0];
+        this.tableElem = this.rootElem.getElementsByClassName('metrics-table')[0];
+        this.bodyElem = this.rootElem.getElementsByClassName('metrics-table-body')[0];
         const headerElems = Array.from(this.tableElem.querySelectorAll('th'));
         // DPS
         tippy(headerElems[1], {
@@ -71,10 +71,10 @@ export class SpellMetrics extends ResultComponent {
             const nameCellElem = document.createElement('td');
             rowElem.appendChild(nameCellElem);
             nameCellElem.innerHTML = `
-			<a class="cast-metrics-action-icon"></a>
-			<span class="cast-metrics-action-name">${spellMetric.name}</span>
+			<a class="metrics-action-icon"></a>
+			<span class="metrics-action-name">${spellMetric.name}</span>
 			`;
-            const iconElem = nameCellElem.getElementsByClassName('cast-metrics-action-icon')[0];
+            const iconElem = nameCellElem.getElementsByClassName('metrics-action-icon')[0];
             iconElem.style.backgroundImage = `url('${spellMetric.iconUrl}')`;
             if (!('otherId' in spellMetric.actionId.id)) {
                 setWowheadHref(iconElem, spellMetric.actionId.id);
@@ -102,20 +102,20 @@ export class CastMetrics extends ResultComponent {
         config.rootCssClass = 'other-cast-metrics-root';
         super(config);
         this.rootElem.innerHTML = `
-		<table class="cast-metrics-table tablesorter">
-			<thead class="cast-metrics-table-header">
-				<tr class="cast-metrics-table-header-row">
-					<th class="cast-metrics-table-header-cell"><span>Name</span></th>
-					<th class="cast-metrics-table-header-cell"><span>Casts</span></th>
-					<th class="cast-metrics-table-header-cell"><span>CPM</span></th>
+		<table class="metrics-table tablesorter">
+			<thead class="metrics-table-header">
+				<tr class="metrics-table-header-row">
+					<th class="metrics-table-header-cell"><span>Name</span></th>
+					<th class="metrics-table-header-cell"><span>Casts</span></th>
+					<th class="metrics-table-header-cell"><span>CPM</span></th>
 				</tr>
 			</thead>
-			<tbody class="cast-metrics-table-body">
+			<tbody class="metrics-table-body">
 			</tbody>
 		</table>
 		`;
-        this.tableElem = this.rootElem.getElementsByClassName('cast-metrics-table')[0];
-        this.bodyElem = this.rootElem.getElementsByClassName('cast-metrics-table-body')[0];
+        this.tableElem = this.rootElem.getElementsByClassName('metrics-table')[0];
+        this.bodyElem = this.rootElem.getElementsByClassName('metrics-table-body')[0];
         const headerElems = Array.from(this.tableElem.querySelectorAll('th'));
         // Casts
         tippy(headerElems[1], {
@@ -138,10 +138,10 @@ export class CastMetrics extends ResultComponent {
             const nameCellElem = document.createElement('td');
             rowElem.appendChild(nameCellElem);
             nameCellElem.innerHTML = `
-			<a class="cast-metrics-action-icon"></a>
-			<span class="cast-metrics-action-name">${actionMetric.name}</span>
+			<a class="metrics-action-icon"></a>
+			<span class="metrics-action-name">${actionMetric.name}</span>
 			`;
-            const iconElem = nameCellElem.getElementsByClassName('cast-metrics-action-icon')[0];
+            const iconElem = nameCellElem.getElementsByClassName('metrics-action-icon')[0];
             iconElem.style.backgroundImage = `url('${actionMetric.iconUrl}')`;
             if (!('otherId' in actionMetric.actionId.id)) {
                 setWowheadHref(iconElem, actionMetric.actionId.id);

@@ -19,4 +19,5 @@ export declare abstract class SimUI extends Component {
     abstract getStorageKey(postfix: string): string;
     getSettingsStorageKey(): string;
     getSavedEncounterStorageKey(): string;
+    isIndividualSim(): boolean;
 }
