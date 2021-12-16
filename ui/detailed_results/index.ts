@@ -2,6 +2,7 @@ import { TypedEvent } from '/tbc/core/typed_event.js';
 import { SimResult, SimResultFilter } from '/tbc/core/proto_utils/sim_result.js';
 
 import { SimResultData } from './result_component.js';
+import { ResultsFilter } from './results_filter.js';
 import { CastMetrics } from './cast_metrics.js';
 import { SpellMetrics } from './cast_metrics.js';
 import { AuraMetrics } from './aura_metrics.js'
@@ -20,6 +21,11 @@ if (urlParams.has('mainTextColor')) {
 	document.body.style.setProperty('--main-text-color', urlParams.get('mainTextColor')!);
 }
 
+const isIndividualSim = urlParams.has('isIndividualSim');
+if (isIndividualSim) {
+	document.body.classList.add('individual-sim');
+}
+
 const colorSettings = {
 	mainTextColor: document.body.style.getPropertyValue('--main-text-color'),
 };
@@ -28,81 +34,57 @@ Chart.defaults.color = colorSettings.mainTextColor;
 
 const layoutHTML = `
 <div class="dr-root">
-	<div class="dr-row topline-results">
-	</div>
-	<div class="dr-row">
-		<div class="table-container">
-			<div class="title-row">
-				<span class="table-title">Spells</span>
+	<ul class="dr-toolbar nav nav-tabs">
+		<li class="results-filter">
+		</li>
+		<li class="tabs-filler">
+		</li>
+		<li class="dr-tab-tab active"><a data-toggle="tab" href="#damageTab">Damage</a></li>
+		<li class="dr-tab-tab"><a data-toggle="tab" href="#buffsTab">Buffs</a></li>
+		<li class="dr-tab-tab"><a data-toggle="tab" href="#debuffsTab">Debuffs</a></li>
+		<li class="dr-tab-tab"><a data-toggle="tab" href="#castsTab">Casts</a></li>
+	</ul>
+	<div class="tab-content">
+		<div id="damageTab" class="tab-pane dr-tab-content damage-content fade active in">
+			<div class="dr-row topline-results">
 			</div>
-			<div class="spell-metrics scroll-table">
-			</div>
-		</div>
-	</div>
-	<div class="dr-row source-stats">
-		<div class="source-chart">
-		</div>
-	</div>
-	<div class="dr-row other-metrics">
-		<div class="dr-col-3 start">
-			<div class="table-container">
-				<div class="title-row">
-					<span class="table-title">Casts</span>
-				</div>
-				<div class="cast-metrics scroll-table">
+			<div class="dr-row">
+				<div class="spell-metrics">
 				</div>
 			</div>
+			<div class="dr-row dps-histogram">
+			</div>
 		</div>
-		<div class="dr-col-3">
-			<div class="table-container">
-				<div class="title-row">
-					<span class="table-title">Buffs</span>
-				</div>
-				<div class="buff-aura-metrics scroll-table">
+		<div id="buffsTab" class="tab-pane dr-tab-content buffs-content fade">
+			<div class="dr-row">
+				<div class="buff-aura-metrics">
 				</div>
 			</div>
 		</div>
-		<div class="dr-col-3 end">
-			<div class="table-container">
-				<div class="title-row">
-					<span class="table-title">Target Debuffs</span>
-				</div>
-				<div class="debuff-aura-metrics scroll-table">
+		<div id="debuffsTab" class="tab-pane dr-tab-content debuffs-content fade">
+			<div class="dr-row">
+				<div class="debuff-aura-metrics">
 				</div>
 			</div>
 		</div>
-	</div>
-	<div class="dr-row dps-histogram">
+		<div id="castsTab" class="tab-pane dr-tab-content casts-content fade">
+			<div class="dr-row">
+				<div class="cast-metrics">
+				</div>
+			</div>
+		</div>
 	</div>
 </div>
 `;
 
-// Gets the current filter from the input elements.
-function getResultsFilter(simResult: SimResult): SimResultFilter {
-	return {
-		player: simResult.getFirstPlayer()?.raidIndex || null,
-		target: null,
-	};
-}
-
-const resultsEmitter = new TypedEvent<SimResultData | null>();
-window.addEventListener('message', async event => {
-	// Null indicates pending results
-	const data: Object | null = event.data;
-
-	let simResult: SimResult | null = null;
-	if (data) {
-		simResult = await SimResult.fromJson(data);
-		resultsEmitter.emit({
-			result: simResult,
-			filter: getResultsFilter(simResult),
-		});
-	} else {
-		resultsEmitter.emit(null);
-	}
-});
-
 document.body.innerHTML = layoutHTML;
+const resultsEmitter = new TypedEvent<SimResultData | null>();
+
+const resultsFilter = new ResultsFilter({
+	parent: document.body.getElementsByClassName('results-filter')[0] as HTMLElement,
+	resultsEmitter: resultsEmitter,
+	colorSettings: colorSettings,
+});
 
 const toplineResultsDiv = document.body.getElementsByClassName('topline-results')[0] as HTMLElement;
 const dpsResult = new DpsResult({ parent: toplineResultsDiv, resultsEmitter: resultsEmitter, colorSettings: colorSettings });
@@ -120,5 +102,30 @@ const debuffAuraMetrics = new AuraMetrics({
 	resultsEmitter: resultsEmitter,
 	colorSettings: colorSettings,
 }, true);
-const sourceChart = new SourceChart({ parent: document.body.getElementsByClassName('source-chart')[0] as HTMLElement, resultsEmitter: resultsEmitter, colorSettings: colorSettings });
 const dpsHistogram = new DpsHistogram({ parent: document.body.getElementsByClassName('dps-histogram')[0] as HTMLElement, resultsEmitter: resultsEmitter, colorSettings: colorSettings });
+
+let currentSimResult: SimResult | null = null;
+function updateResults() {
+	if (currentSimResult == null) {
+		resultsEmitter.emit(null);
+	} else {
+		resultsEmitter.emit({
+			result: currentSimResult,
+			filter: resultsFilter.getFilter(),
+		});
+	}
+}
+
+window.addEventListener('message', async event => {
+	// Null indicates pending results
+	const data: Object | null = event.data;
+
+	if (data) {
+		currentSimResult = await SimResult.fromJson(data);
+	} else {
+		currentSimResult = null;
+	}
+	updateResults();
+});
+
+resultsFilter.changeEmitter.on(() => updateResults());
