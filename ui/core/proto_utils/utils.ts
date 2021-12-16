@@ -1,5 +1,7 @@
 import { getEnumValues } from '/tbc/core/utils.js';
 import { intersection } from '/tbc/core/utils.js';
+import { maxIndex } from '/tbc/core/utils.js';
+import { sum } from '/tbc/core/utils.js';
 
 import { Player } from '/tbc/core/proto/api.js';
 import { ArmorType } from '/tbc/core/proto/common.js';
@@ -127,6 +129,19 @@ export const talentTreeIcons: Record<Class, Array<string>> = {
 		'https://wow.zamimg.com/images/wow/icons/medium/inv_shield_06.jpg',
 	],
 };
+
+// Returns the index of the talent tree (0, 1, or 2) that has the most points.
+export function getTalentTree(talentsString: string): number {
+	const trees = talentsString.split('-');
+	const points = trees.map(tree => sum([...tree].map(char => parseInt(char))));
+	return maxIndex(points) || 0;
+}
+
+// Returns the index of the talent tree (0, 1, or 2) that has the most points.
+export function getTalentTreeIcon(spec: Spec, talentsString: string): string {
+	const talentTreeIdx = getTalentTree(talentsString);
+	return talentTreeIcons[specToClass[spec]][talentTreeIdx];
+}
 
 // Gets the URL for the individual sim corresponding to the given spec.
 //const specSiteUrlTemplate = new URL(`${window.location.protocol}//${window.location.host}/${repoName}/SPEC/index.html`);

@@ -18,7 +18,10 @@ import { ActionId } from '/tbc/core/resources.js';
 import { getIconUrl } from '/tbc/core/resources.js';
 import { getName } from '/tbc/core/resources.js';
 import { actionIdToString } from '/tbc/core/resources.js';
+import { classColors } from '/tbc/core/proto_utils/utils.js';
+import { getTalentTreeIcon } from '/tbc/core/proto_utils/utils.js';
 import { playerToSpec } from '/tbc/core/proto_utils/utils.js';
+import { specToClass } from '/tbc/core/proto_utils/utils.js';
 import { bucket } from '/tbc/core/utils.js';
 import { sum } from '/tbc/core/utils.js';
 
@@ -201,6 +204,8 @@ export class PlayerMetrics {
 	readonly raidIndex: number;
 	readonly name: string;
 	readonly spec: Spec;
+	readonly iconUrl: string;
+	readonly classColor: string;
 	readonly dps: DpsMetricsProto;
 	readonly actions: Array<ActionMetrics>;
 	readonly auras: Array<AuraMetrics>;
@@ -214,6 +219,8 @@ export class PlayerMetrics {
 		this.raidIndex = raidIndex;
 		this.name = player.name;
 		this.spec = playerToSpec(player);
+		this.iconUrl = getTalentTreeIcon(this.spec, player.talentsString);
+		this.classColor = classColors[specToClass[this.spec]];
 		this.dps = this.metrics.dps!;
 		this.actions = actions;
 		this.auras = auras;
