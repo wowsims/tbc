@@ -113,3 +113,33 @@
   cursor: pointer;
   display: inline-block;
 }
+
+.dropdown-root {
+	position: relative;
+	display: inline-block;
+}
+
+.dropdown-button {
+	cursor: pointer;
+}
+
+.dropdown-panel {
+	display: none;
+	position: absolute;
+	background-color: gray;
+	box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+	z-index: 1;
+}
+
+.dropdown-root:hover .dropdown-panel {
+	display: block !important;
+}
+
+.dropdown-option {
+	display: block;
+	cursor: pointer;
+}
+
+.dropdown-option:not(:hover) {
+	opacity: 0.7;
+}

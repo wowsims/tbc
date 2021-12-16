@@ -123,6 +123,8 @@ export class Sim {
 			throw new Error('Encounter has no targets! Try adding some targets first.');
 		}
 
+		await this.waitForInit();
+
 		const request = this.makeRaidSimRequest(false);
 		const result = await this.workerPool.raidSim(request);
 
@@ -138,6 +140,8 @@ export class Sim {
 			throw new Error('Encounter has no targets! Try adding some targets first.');
 		}
 
+		await this.waitForInit();
+
 		const request = this.makeRaidSimRequest(true);
 		const result = await this.workerPool.raidSim(request);
 
@@ -151,6 +155,8 @@ export class Sim {
 			//console.warn('Trying to get character stats without a party!');
 			return ComputeStatsResult.create();
 		} else {
+			await this.waitForInit();
+
 			return await this.workerPool.computeStats(ComputeStatsRequest.create({
 				player: player.toProto(),
 				raidBuffs: this.raid.getBuffs(),
@@ -165,6 +171,8 @@ export class Sim {
 		} else if (this.encounter.getNumTargets() < 1) {
 			throw new Error('Encounter has no targets! Try adding some targets first.');
 		}
+
+		await this.waitForInit();
 
 		if (player.getParty() == null) {
 			console.warn('Trying to get stat weights without a party!');

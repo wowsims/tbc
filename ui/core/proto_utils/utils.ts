@@ -79,6 +79,55 @@ export const specIconsLarge: Record<Spec, string> = {
   [Spec.SpecWarrior]: 'https://wow.zamimg.com/images/wow/icons/large/ability_warrior_innerrage.jpg',
 };
 
+export const talentTreeIcons: Record<Class, Array<string>> = {
+	[Class.ClassUnknown]: [],
+	[Class.ClassDruid]: [
+		'https://wow.zamimg.com/images/wow/icons/medium/spell_nature_starfall.jpg',
+		'https://wow.zamimg.com/images/wow/icons/medium/ability_racial_bearform.jpg',
+		'https://wow.zamimg.com/images/wow/icons/medium/spell_nature_healingtouch.jpg',
+	],
+	[Class.ClassHunter]: [
+		'https://wow.zamimg.com/images/wow/icons/medium/ability_hunter_beasttaming.jpg',
+		'https://wow.zamimg.com/images/wow/icons/medium/ability_marksmanship.jpg',
+		'https://wow.zamimg.com/images/wow/icons/medium/ability_hunter_swiftstrike.jpg',
+	],
+	[Class.ClassMage]: [
+		'https://wow.zamimg.com/images/wow/icons/medium/spell_holy_magicalsentry.jpg',
+		'https://wow.zamimg.com/images/wow/icons/medium/spell_fire_firebolt02.jpg',
+		'https://wow.zamimg.com/images/wow/icons/medium/spell_frost_frostbolt02.jpg',
+	],
+	[Class.ClassPaladin]: [
+		'https://wow.zamimg.com/images/wow/icons/medium/spell_holy_holybolt.jpg',
+		'https://wow.zamimg.com/images/wow/icons/medium/spell_holy_devotionaura.jpg',
+		'https://wow.zamimg.com/images/wow/icons/medium/spell_holy_auraoflight.jpg',
+	],
+	[Class.ClassPriest]: [
+		'https://wow.zamimg.com/images/wow/icons/medium/spell_holy_powerinfusion.jpg',
+		'https://wow.zamimg.com/images/wow/icons/medium/spell_holy_holybolt.jpg',
+		'https://wow.zamimg.com/images/wow/icons/medium/spell_shadow_shadowwordpain.jpg',
+	],
+	[Class.ClassRogue]: [
+		'https://wow.zamimg.com/images/wow/icons/medium/ability_rogue_eviscerate.jpg',
+		'https://wow.zamimg.com/images/wow/icons/medium/ability_backstab.jpg',
+		'https://wow.zamimg.com/images/wow/icons/medium/ability_stealth.jpg',
+	],
+	[Class.ClassShaman]: [
+		'https://wow.zamimg.com/images/wow/icons/medium/spell_nature_lightning.jpg',
+		'https://wow.zamimg.com/images/wow/icons/medium/ability_shaman_stormstrike.jpg',
+		'https://wow.zamimg.com/images/wow/icons/medium/spell_nature_magicimmunity.jpg',
+	],
+	[Class.ClassWarlock]: [
+		'https://wow.zamimg.com/images/wow/icons/medium/spell_shadow_deathcoil.jpg',
+		'https://wow.zamimg.com/images/wow/icons/medium/spell_shadow_metamorphosis.jpg',
+		'https://wow.zamimg.com/images/wow/icons/medium/spell_shadow_rainoffire.jpg',
+	],
+	[Class.ClassWarrior]: [
+		'https://wow.zamimg.com/images/wow/icons/medium/ability_warrior_savageblow.jpg',
+		'https://wow.zamimg.com/images/wow/icons/medium/ability_warrior_innerrage.jpg',
+		'https://wow.zamimg.com/images/wow/icons/medium/inv_shield_06.jpg',
+	],
+};
+
 // Gets the URL for the individual sim corresponding to the given spec.
 //const specSiteUrlTemplate = new URL(`${window.location.protocol}//${window.location.host}/${repoName}/SPEC/index.html`);
 //export function getSpecSiteUrl(spec: Spec): string {
