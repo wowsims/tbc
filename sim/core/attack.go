@@ -218,11 +218,19 @@ type WeaponDamageInput struct {
 }
 
 // Attack will perform the attack
+//  Returns false if unable to attack (due to resource lacking)
 // TODO: add AbilityResult data to action metrics.
-func (ama *ActiveMeleeAbility) Attack(sim *Simulation) {
+func (ama *ActiveMeleeAbility) Attack(sim *Simulation) bool {
+	if ama.MeleeAbility.Cost.Type != 0 {
+		if ama.Character.stats[ama.MeleeAbility.Cost.Type] < ama.MeleeAbility.Cost.Value {
+			return false
+		}
+		ama.Character.AddStat(ama.MeleeAbility.Cost.Type, -ama.MeleeAbility.Cost.Value)
+	}
+
 	// Goes on CD on use
 	if ama.ActionID.CooldownID != 0 {
-		ama.Character.SetCD(ama.ActionID.CooldownID, ama.Cooldown)
+		ama.Character.SetCD(ama.ActionID.CooldownID, sim.CurrentTime+ama.Cooldown)
 	}
 
 	// 1. Attack Roll
@@ -235,7 +243,7 @@ func (ama *ActiveMeleeAbility) Attack(sim *Simulation) {
 		}
 		// Not sure MH/OH Matters for an attack
 		ama.Character.OnMeleeAttack(sim, ama.Target, hit, ama, false)
-		return
+		return true
 	}
 
 	c := ama.Character
@@ -251,7 +259,7 @@ func (ama *ActiveMeleeAbility) Attack(sim *Simulation) {
 
 	// Only calculate attack if there is a weapon swing involved.
 	if ama.WeaponDamageInput.MainHand == 0 && ama.WeaponDamageInput.Offhand == 0 {
-		return
+		return true
 	}
 
 	skill := 350.0
@@ -299,6 +307,8 @@ func (ama *ActiveMeleeAbility) Attack(sim *Simulation) {
 		}
 		c.OnMeleeAttack(sim, ama.Target, ama.Result, ama, true)
 	}
+
+	return true
 }
 
 type AbilityEffect struct {

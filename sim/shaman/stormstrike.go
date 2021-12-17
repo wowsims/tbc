@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
+	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 const SpellIDSS int32 = 17364
@@ -18,9 +19,12 @@ func (shaman *Shaman) newStormstrikeTemplate(sim *core.Simulation) core.MeleeAbi
 				SpellID:    SpellIDSS,
 				CooldownID: StormstrikeCD,
 			},
-			Name:            "Stormstrike",
-			Cooldown:        time.Second * 10,
-			Cost:            core.ResourceCost{},
+			Name:     "Stormstrike",
+			Cooldown: time.Second * 10,
+			Cost: core.ResourceCost{
+				Type:  stats.Mana,
+				Value: 237,
+			},
 			CritMultiplier:  2.0,
 			ResetSwingTimer: true,
 			Character:       &shaman.Character,
