@@ -47,16 +47,19 @@ export declare type SpecTypeFunctions<SpecType extends Spec> = {
     rotationCopy: (a: SpecRotation<SpecType>) => SpecRotation<SpecType>;
     rotationToJson: (a: SpecRotation<SpecType>) => any;
     rotationFromJson: (obj: any) => SpecRotation<SpecType>;
+    rotationFromPlayer: (player: Player) => SpecRotation<SpecType>;
     talentsCreate: () => SpecTalents<SpecType>;
     talentsEquals: (a: SpecTalents<SpecType>, b: SpecTalents<SpecType>) => boolean;
     talentsCopy: (a: SpecTalents<SpecType>) => SpecTalents<SpecType>;
     talentsToJson: (a: SpecTalents<SpecType>) => any;
     talentsFromJson: (obj: any) => SpecTalents<SpecType>;
+    talentsFromPlayer: (player: Player) => SpecTalents<SpecType>;
     optionsCreate: () => SpecOptions<SpecType>;
     optionsEquals: (a: SpecOptions<SpecType>, b: SpecOptions<SpecType>) => boolean;
     optionsCopy: (a: SpecOptions<SpecType>) => SpecOptions<SpecType>;
     optionsToJson: (a: SpecOptions<SpecType>) => any;
     optionsFromJson: (obj: any) => SpecOptions<SpecType>;
+    optionsFromPlayer: (player: Player) => SpecOptions<SpecType>;
 };
 export declare const specTypeFunctions: Partial<Record<Spec, SpecTypeFunctions<any>>>;
 export declare enum Faction {

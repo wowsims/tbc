@@ -94,6 +94,7 @@ export declare class Player<SpecType extends Spec> {
     computeItemEP(item: Item): number;
     setWowheadData(equippedItem: EquippedItem, elem: HTMLElement): void;
     toProto(): PlayerProto;
+    fromProto(proto: PlayerProto): void;
     toJson(): Object;
     fromJson(obj: any): void;
     clone(): Player<SpecType>;

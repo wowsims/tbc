@@ -86,6 +86,7 @@ export class Player {
         }
         return this.party.getIndex() * MAX_PARTY_SIZE + this.getPartyIndex();
     }
+    // This should only ever be called from party.
     setParty(newParty) {
         if (this.party == newParty) {
             return;
@@ -98,13 +99,6 @@ export class Player {
         else {
             this.party = newParty;
             this.raid = newParty.raid;
-        }
-        // Remove player from its old party if there is one.
-        if (oldParty != null) {
-            const oldPartyIndex = oldParty.getPlayers().indexOf(this);
-            if (oldPartyIndex != -1) {
-                oldParty.setPlayer(oldPartyIndex, null);
-            }
         }
     }
     getOtherPartyMembers() {
@@ -316,6 +310,18 @@ export class Player {
             talentsString: this.getTalentsString(),
         }), this.getRotation(), this.getTalents(), this.getSpecOptions());
     }
+    fromProto(proto) {
+        this.setName(proto.name);
+        this.setRace(proto.race);
+        this.setGear(proto.equipment ? this.sim.lookupEquipmentSpec(proto.equipment) : new Gear({}));
+        this.setConsumes(proto.consumes || Consumes.create());
+        this.setBonusStats(new Stats(proto.bonusStats));
+        this.setBuffs(proto.buffs || IndividualBuffs.create());
+        this.setTalentsString(proto.talentsString);
+        this.setRotation(this.specTypeFunctions.rotationFromPlayer(proto));
+        this.setTalents(this.specTypeFunctions.talentsFromPlayer(proto));
+        this.setSpecOptions(this.specTypeFunctions.optionsFromPlayer(proto));
+    }
     // TODO: Remove to/from json functions and use proto versions instead. This will require
     // some way to store all talents in the proto.
     // Returns JSON representing all the current values.
@@ -397,7 +403,7 @@ export class Player {
     }
     clone() {
         const newPlayer = new Player(this.spec, this.sim);
-        newPlayer.fromJson(this.toJson());
+        newPlayer.fromProto(this.toProto());
         return newPlayer;
     }
 }
