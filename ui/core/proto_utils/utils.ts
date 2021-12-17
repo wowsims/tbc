@@ -335,18 +335,27 @@ export const specTypeFunctions: Partial<Record<Spec, SpecTypeFunctions<any>>> = 
     rotationCopy: (a) => EnhancementShamanRotation.clone(a as EnhancementShamanRotation),
     rotationToJson: (a) => EnhancementShamanRotation.toJson(a as EnhancementShamanRotation),
     rotationFromJson: (obj) => EnhancementShamanRotation.fromJson(obj),
+    rotationFromPlayer: (player) => player.spec.oneofKind == 'enhancementShaman'
+				? player.spec.enhancementShaman.rotation || EnhancementShamanRotation.create()
+				: EnhancementShamanRotation.create(),
 
     talentsCreate: () => ShamanTalents.create(),
     talentsEquals: (a, b) => ShamanTalents.equals(a as ShamanTalents, b as ShamanTalents),
     talentsCopy: (a) => ShamanTalents.clone(a as ShamanTalents),
     talentsToJson: (a) => ShamanTalents.toJson(a as ShamanTalents),
     talentsFromJson: (obj) => ShamanTalents.fromJson(obj),
+    talentsFromPlayer: (player) => player.spec.oneofKind == 'enhancementShaman'
+    ? player.spec.enhancementShaman.talents || ShamanTalents.create()
+    : ShamanTalents.create(),
 
     optionsCreate: () => EnhancementShamanOptions.create(),
     optionsEquals: (a, b) => EnhancementShamanOptions.equals(a as EnhancementShamanOptions, b as EnhancementShamanOptions),
     optionsCopy: (a) => EnhancementShamanOptions.clone(a as EnhancementShamanOptions),
     optionsToJson: (a) => EnhancementShamanOptions.toJson(a as EnhancementShamanOptions),
     optionsFromJson: (obj) => EnhancementShamanOptions.fromJson(obj),
+    optionsFromPlayer: (player) => player.spec.oneofKind == 'enhancementShaman'
+				? player.spec.enhancementShaman.options || EnhancementShamanOptions.create()
+				: EnhancementShamanOptions.create(),
   },
   [Spec.SpecHunter]: {
     rotationCreate: () => HunterRotation.create(),
