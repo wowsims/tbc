@@ -2,7 +2,11 @@
 	cursor: pointer;
 }
 
-.player-damage-amount {
+.amount-header-cell, .amount-cell {
+	text-align: center !important;
+}
+
+.amount-cell {
 	display: flex;
 	align-items: center;
 	justify-content: space-between;

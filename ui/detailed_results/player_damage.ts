@@ -25,7 +25,7 @@ export class PlayerDamageMetrics extends ResultComponent {
 			<thead class="metrics-table-header">
 				<tr class="metrics-table-header-row">
 					<th class="metrics-table-header-cell"><span>Player</span></th>
-					<th class="metrics-table-header-cell"><span>Amount</span></th>
+					<th class="metrics-table-header-cell amount-header-cell"><span>Amount</span></th>
 					<th class="metrics-table-header-cell"><span>DPS</span></th>
 				</tr>
 			</thead>
@@ -70,24 +70,23 @@ export class PlayerDamageMetrics extends ResultComponent {
 				this.resultsFilter.setPlayer(player.raidIndex);
 			});
 
-			let madeChart = false;
-			rowElem.addEventListener('mouseenter', event => {
-				if (madeChart) {
-					return;
-				}
-				madeChart = true;
-
+			let chart: HTMLElement | null = null;
+			const makeChart = () => {
 				const chartContainer = document.createElement('div');
-				chartContainer.classList.add('source-chart-container');
 				rowElem.appendChild(chartContainer);
 				const sourceChart = new SourceChart(chartContainer, player.actions);
-				tippy(rowElem, {
-					'content': chartContainer,
-					'placement': 'bottom',
+				return chartContainer;
+			};
 
-					// Need to explicit show because we're already moused over the element.
-					'showOnCreate': true,
-				});
+			tippy(rowElem, {
+				content: 'Loading...',
+				placement: 'bottom',
+				onShow(instance: any) {
+					if (!chart) {
+						chart = makeChart();
+						instance.setContent(chart);
+					}
+				},
 			});
 
 			const nameCellElem = document.createElement('td');
@@ -97,9 +96,8 @@ export class PlayerDamageMetrics extends ResultComponent {
 			<span class="metrics-action-name" style="color:${player.classColor}">${player.label}</span>
 			`;
 
-
 			const amountCellElem = document.createElement('td');
-			amountCellElem.classList.add('player-damage-amount');
+			amountCellElem.classList.add('amount-cell');
 			rowElem.appendChild(amountCellElem);
 			amountCellElem.innerHTML = `
 				<div class="player-damage-percent">

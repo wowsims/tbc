@@ -20,6 +20,13 @@ body {
 	display: none;
 }
 
+.individual-sim .single-player-only {
+	display: initial;
+}
+.individual-sim .all-players-only {
+	display: none;
+}
+
 .dr-root {
 	margin: 10px;
 }
@@ -82,7 +89,6 @@ body {
 .metrics-table-header-cell {
 	padding: 3px 1px;
 	cursor: pointer;
-	text-align: center;
 }
 
 .metrics-table-body tr {
@@ -97,11 +103,10 @@ body {
 	padding: 2px 1px;
 }
 
-.metrics-table-body td:first-child {
+.metrics-table-header-cell:first-child, .metrics-table-body td:first-child {
 	text-align: left;
 }
-
-.metrics-table-body td:not(:first-child) {
+.metrics-table-header-cell:not(:first-child), .metrics-table-body td:not(:first-child) {
 	text-align: right;
 }
 

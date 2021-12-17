@@ -33,7 +33,6 @@ export class SourceChart extends Component {
 		const totalDmg = sum(actionMetrics.map(actionMetric => actionMetric.damage));
 		const vals = actionMetrics.map(actionMetric => actionMetric.damage / totalDmg);
 		const bgColors = sliceColors.slice(0, actionMetrics.length);
-		console.log(bgColors);
 
 		const ctx = chartCanvas.getContext('2d');
 		const chart = new Chart(ctx, {
