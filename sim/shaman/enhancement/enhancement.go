@@ -73,5 +73,5 @@ func (enh *EnhancementShaman) Act(sim *core.Simulation) time.Duration {
 	if shockCD < nextCD {
 		nextCD = shockCD
 	}
-	return sim.CurrentTime + enh.AutoAttacks.TimeUntil(sim, nil, nil, shockCD)
+	return sim.CurrentTime + enh.AutoAttacks.TimeUntil(sim, nil, nil, nextCD)
 }
