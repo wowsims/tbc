@@ -258,6 +258,38 @@
   border: 1px solid yellow;
 }
 
+.dropdown-root {
+  position: relative;
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.dropdown-button {
+  cursor: pointer;
+}
+
+.dropdown-panel {
+  display: none;
+  position: absolute;
+  background-color: gray;
+  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+  z-index: 1;
+}
+
+.dropdown-root:hover .dropdown-panel {
+  display: block !important;
+}
+
+.dropdown-option {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+*:not(.dropdown-button) > .dropdown-option:not(:hover) {
+  opacity: 0.7;
+}
+
 .gear-picker-root {
   display: flex;
   margin: 15px;
@@ -427,11 +459,6 @@
   color: red;
 }
 
-.icon-enum-picker-root {
-  position: relative;
-  display: inline-block;
-}
-
 .icon-enum-picker-root a {
   height: 40px;
   width: 40px;
@@ -439,30 +466,11 @@
 }
 
 .icon-enum-picker-button {
-  cursor: pointer;
   background-size: cover;
-}
-
-.icon-enum-picker-dropdown {
-  display: none;
-  position: absolute;
-  background-color: gray;
-  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
-  z-index: 1;
-}
-
-.icon-enum-picker-root:hover .icon-enum-picker-dropdown {
-  display: block;
 }
 
 .icon-enum-picker-option {
-  display: block;
-  cursor: pointer;
   background-size: cover;
-}
-
-.icon-enum-picker-option:not(:hover) {
-  opacity: 0.7;
 }
 
 :root {
@@ -531,6 +539,38 @@
 
 .socket-color-yellow {
   border: 1px solid yellow;
+}
+
+.dropdown-root {
+  position: relative;
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.dropdown-button {
+  cursor: pointer;
+}
+
+.dropdown-panel {
+  display: none;
+  position: absolute;
+  background-color: gray;
+  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+  z-index: 1;
+}
+
+.dropdown-root:hover .dropdown-panel {
+  display: block !important;
+}
+
+.dropdown-option {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+*:not(.dropdown-button) > .dropdown-option:not(:hover) {
+  opacity: 0.7;
 }
 
 .icon-input {
@@ -695,6 +735,38 @@
 
 .socket-color-yellow {
   border: 1px solid yellow;
+}
+
+.dropdown-root {
+  position: relative;
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.dropdown-button {
+  cursor: pointer;
+}
+
+.dropdown-panel {
+  display: none;
+  position: absolute;
+  background-color: gray;
+  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+  z-index: 1;
+}
+
+.dropdown-root:hover .dropdown-panel {
+  display: block !important;
+}
+
+.dropdown-option {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+*:not(.dropdown-button) > .dropdown-option:not(:hover) {
+  opacity: 0.7;
 }
 
 .results-sim {
@@ -881,6 +953,38 @@
   border: 1px solid yellow;
 }
 
+.dropdown-root {
+  position: relative;
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.dropdown-button {
+  cursor: pointer;
+}
+
+.dropdown-panel {
+  display: none;
+  position: absolute;
+  background-color: gray;
+  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+  z-index: 1;
+}
+
+.dropdown-root:hover .dropdown-panel {
+  display: block !important;
+}
+
+.dropdown-option {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+*:not(.dropdown-button) > .dropdown-option:not(:hover) {
+  opacity: 0.7;
+}
+
 .results-ep-table {
   margin: auto;
 }
@@ -1043,6 +1147,38 @@
 
 .socket-color-yellow {
   border: 1px solid yellow;
+}
+
+.dropdown-root {
+  position: relative;
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.dropdown-button {
+  cursor: pointer;
+}
+
+.dropdown-panel {
+  display: none;
+  position: absolute;
+  background-color: gray;
+  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+  z-index: 1;
+}
+
+.dropdown-root:hover .dropdown-panel {
+  display: block !important;
+}
+
+.dropdown-option {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+*:not(.dropdown-button) > .dropdown-option:not(:hover) {
+  opacity: 0.7;
 }
 
 html {
@@ -1276,6 +1412,38 @@ td, th {
 
 .socket-color-yellow {
   border: 1px solid yellow;
+}
+
+.dropdown-root {
+  position: relative;
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.dropdown-button {
+  cursor: pointer;
+}
+
+.dropdown-panel {
+  display: none;
+  position: absolute;
+  background-color: gray;
+  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+  z-index: 1;
+}
+
+.dropdown-root:hover .dropdown-panel {
+  display: block !important;
+}
+
+.dropdown-option {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+*:not(.dropdown-button) > .dropdown-option:not(:hover) {
+  opacity: 0.7;
 }
 
 .talents-picker-root {
@@ -1705,16 +1873,16 @@ td, th {
   text-shadow: 0 0 3px var(--sidebar-highlight-color), 0 0 3px var(--sidebar-highlight-color), 0 0 3px var(--sidebar-highlight-color);
 }
 
-.player-swap {
-  color: yellow;
-}
-
-.player-copy {
+.player-edit {
   color: blue;
 }
 
-.player-edit {
-  color: green;
+.player-copy {
+  color: yellow;
+}
+
+.player-delete {
+  color: red;
 }
 
 .buff-bot .player-edit {

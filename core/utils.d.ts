@@ -1,5 +1,6 @@
 export declare function equalsOrBothNull<T>(a: T, b: T, comparator?: (_a: NonNullable<T>, _b: NonNullable<T>) => boolean): boolean;
 export declare function sum(arr: Array<number>): number;
+export declare function maxIndex(arr: Array<number>): number | null;
 export declare function intersection<T>(a: Array<T>, b: Array<T>): Array<T>;
 export declare function bucket<T>(arr: Array<T>, toString: (val: T) => string): Record<string, Array<T>>;
 export declare function stDevToConf90(stDev: number, N: number): number;

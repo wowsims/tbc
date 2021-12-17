@@ -59,11 +59,12 @@ class Player$Type extends MessageType {
             { no: 11, name: "rogue", kind: "message", oneof: "spec", T: () => Rogue },
             { no: 12, name: "elemental_shaman", kind: "message", oneof: "spec", T: () => ElementalShaman },
             { no: 13, name: "warlock", kind: "message", oneof: "spec", T: () => Warlock },
-            { no: 14, name: "warrior", kind: "message", oneof: "spec", T: () => Warrior }
+            { no: 14, name: "warrior", kind: "message", oneof: "spec", T: () => Warrior },
+            { no: 17, name: "talentsString", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
         ]);
     }
     create(value) {
-        const message = { name: "", race: 0, class: 0, bonusStats: [], spec: { oneofKind: undefined } };
+        const message = { name: "", race: 0, class: 0, bonusStats: [], spec: { oneofKind: undefined }, talentsString: "" };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -153,6 +154,9 @@ class Player$Type extends MessageType {
                         warrior: Warrior.internalBinaryRead(reader, reader.uint32(), options, message.spec.warrior)
                     };
                     break;
+                case /* string talentsString */ 17:
+                    message.talentsString = reader.string();
+                    break;
                 default:
                     let u = options.readUnknownField;
                     if (u === "throw")
@@ -217,6 +221,9 @@ class Player$Type extends MessageType {
         /* proto.Warrior warrior = 14; */
         if (message.spec.oneofKind === "warrior")
             Warrior.internalBinaryWrite(message.spec.warrior, writer.tag(14, WireType.LengthDelimited).fork(), options).join();
+        /* string talentsString = 17; */
+        if (message.talentsString !== "")
+            writer.tag(17, WireType.LengthDelimited).string(message.talentsString);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

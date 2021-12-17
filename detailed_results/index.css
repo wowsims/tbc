@@ -67,72 +67,36 @@
   border: 1px solid yellow;
 }
 
-:root {
-  --main-bg-color: DarkSlateGrey;
-  --main-text-color: White;
-  --main-secondary-color: Black;
-  --sidebar-bg-color: DarkKhaki;
-  --sidebar-text-color: White;
-  --sidebar-highlight-color: Blue;
+.dropdown-root {
+  position: relative;
+  display: inline-block;
+  white-space: nowrap;
 }
 
-.loader {
-  border: 16px solid #f3f3f3;
-  /* Light grey */
-  border-top: 16px solid #3498db;
-  /* Blue */
-  border-radius: 50%;
-  width: 120px;
-  height: 120px;
-  animation: spin 1s linear infinite;
+.dropdown-button {
+  cursor: pointer;
 }
 
-@keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
-}
-.socket-color-blue {
-  border: 1px solid blue;
+.dropdown-panel {
+  display: none;
+  position: absolute;
+  background-color: gray;
+  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+  z-index: 1;
 }
 
-.item-quality-junk {
-  color: #fff !important;
+.dropdown-root:hover .dropdown-panel {
+  display: block !important;
 }
 
-.item-quality-common {
-  color: white !important;
+.dropdown-option {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
 }
 
-.item-quality-uncommon {
-  color: #1eff00 !important;
-}
-
-.item-quality-rare {
-  color: #0070dd !important;
-}
-
-.item-quality-epic {
-  color: #a335ee !important;
-}
-
-.item-quality-legendary {
-  color: #ff8000 !important;
-}
-
-.socket-color-meta {
-  border: 1px solid white;
-}
-
-.socket-color-red {
-  border: 1px solid red;
-}
-
-.socket-color-yellow {
-  border: 1px solid yellow;
+*:not(.dropdown-button) > .dropdown-option:not(:hover) {
+  opacity: 0.7;
 }
 
 :root {
@@ -201,6 +165,138 @@
 
 .socket-color-yellow {
   border: 1px solid yellow;
+}
+
+.dropdown-root {
+  position: relative;
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.dropdown-button {
+  cursor: pointer;
+}
+
+.dropdown-panel {
+  display: none;
+  position: absolute;
+  background-color: gray;
+  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+  z-index: 1;
+}
+
+.dropdown-root:hover .dropdown-panel {
+  display: block !important;
+}
+
+.dropdown-option {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+*:not(.dropdown-button) > .dropdown-option:not(:hover) {
+  opacity: 0.7;
+}
+
+:root {
+  --main-bg-color: DarkSlateGrey;
+  --main-text-color: White;
+  --main-secondary-color: Black;
+  --sidebar-bg-color: DarkKhaki;
+  --sidebar-text-color: White;
+  --sidebar-highlight-color: Blue;
+}
+
+.loader {
+  border: 16px solid #f3f3f3;
+  /* Light grey */
+  border-top: 16px solid #3498db;
+  /* Blue */
+  border-radius: 50%;
+  width: 120px;
+  height: 120px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+.socket-color-blue {
+  border: 1px solid blue;
+}
+
+.item-quality-junk {
+  color: #fff !important;
+}
+
+.item-quality-common {
+  color: white !important;
+}
+
+.item-quality-uncommon {
+  color: #1eff00 !important;
+}
+
+.item-quality-rare {
+  color: #0070dd !important;
+}
+
+.item-quality-epic {
+  color: #a335ee !important;
+}
+
+.item-quality-legendary {
+  color: #ff8000 !important;
+}
+
+.socket-color-meta {
+  border: 1px solid white;
+}
+
+.socket-color-red {
+  border: 1px solid red;
+}
+
+.socket-color-yellow {
+  border: 1px solid yellow;
+}
+
+.dropdown-root {
+  position: relative;
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.dropdown-button {
+  cursor: pointer;
+}
+
+.dropdown-panel {
+  display: none;
+  position: absolute;
+  background-color: gray;
+  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+  z-index: 1;
+}
+
+.dropdown-root:hover .dropdown-panel {
+  display: block !important;
+}
+
+.dropdown-option {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+*:not(.dropdown-button) > .dropdown-option:not(:hover) {
+  opacity: 0.7;
 }
 
 .aura-metrics-table {
@@ -296,6 +392,27 @@
   display: flex;
   align-items: center;
   font-size: 20px;
+}
+
+.player-filter-root {
+  border: 1px solid white;
+  margin: 2px;
+  color: white;
+  text-shadow: 0 0 3px black, 0 0 3px black, 0 0 3px black;
+}
+
+.player-filter-option {
+  height: 30px;
+}
+
+.player-filter-icon {
+  margin: 2px;
+  height: 25px;
+}
+
+.player-filter-label {
+  font-size: 14px;
+  margin: 2px;
 }
 
 .source-chart-root {

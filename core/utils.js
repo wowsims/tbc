@@ -9,6 +9,10 @@ export function equalsOrBothNull(a, b, comparator) {
 export function sum(arr) {
     return arr.reduce((total, cur) => total + cur, 0);
 }
+// Returns the index of maximum value, or null if empty.
+export function maxIndex(arr) {
+    return arr.reduce((cur, v, i, arr) => v > arr[cur] ? i : cur, 0);
+}
 // Returns a new array containing only elements present in both a and b.
 export function intersection(a, b) {
     return a.filter(value => b.includes(value));

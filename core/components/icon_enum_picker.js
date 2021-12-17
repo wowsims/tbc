@@ -8,9 +8,10 @@ export class IconEnumPicker extends Input {
         super(parent, 'icon-enum-picker-root', modObj, config);
         this.config = config;
         this.currentValue = 0;
+        this.rootElem.classList.add('dropdown-root');
         this.rootElem.innerHTML = `
-			<a class="icon-enum-picker-button"></a>
-			<div class="icon-enum-picker-dropdown"></div>
+			<a class="dropdown-button icon-enum-picker-button"></a>
+			<div class="dropdown-panel icon-enum-picker-dropdown"></div>
     `;
         this.buttonElem = this.rootElem.getElementsByClassName('icon-enum-picker-button')[0];
         const dropdownElem = this.rootElem.getElementsByClassName('icon-enum-picker-dropdown')[0];
@@ -19,7 +20,7 @@ export class IconEnumPicker extends Input {
         });
         config.values.forEach(valueConfig => {
             const option = document.createElement('a');
-            option.classList.add('icon-enum-picker-option');
+            option.classList.add('dropdown-option', 'icon-enum-picker-option');
             dropdownElem.appendChild(option);
             this.setImage(option, valueConfig);
             option.addEventListener('click', event => {

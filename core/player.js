@@ -313,6 +313,7 @@ export class Player {
             consumes: this.getConsumes(),
             bonusStats: this.getBonusStats().asArray(),
             buffs: this.getBuffs(),
+            talentsString: this.getTalentsString(),
         }), this.getRotation(), this.getTalents(), this.getSpecOptions());
     }
     // TODO: Remove to/from json functions and use proto versions instead. This will require

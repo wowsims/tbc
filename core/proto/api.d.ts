@@ -119,6 +119,12 @@ export interface Player {
     } | {
         oneofKind: undefined;
     };
+    /**
+     * Only used by the UI. Sim uses talents within the spec protos.
+     *
+     * @generated from protobuf field: string talentsString = 17;
+     */
+    talentsString: string;
 }
 /**
  * @generated from protobuf message proto.Party

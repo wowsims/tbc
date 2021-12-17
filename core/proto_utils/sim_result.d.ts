@@ -62,6 +62,8 @@ export declare class PlayerMetrics {
     readonly raidIndex: number;
     readonly name: string;
     readonly spec: Spec;
+    readonly iconUrl: string;
+    readonly classColor: string;
     readonly dps: DpsMetricsProto;
     readonly actions: Array<ActionMetrics>;
     readonly auras: Array<AuraMetrics>;
