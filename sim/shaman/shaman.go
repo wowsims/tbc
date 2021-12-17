@@ -27,16 +27,6 @@ func NewShaman(character core.Character, talents proto.ShamanTalents, selfBuffs 
 		shaman.AddStat(stats.MeleeHit, core.MeleeCritRatingPerCritChance*2*float64(shaman.Talents.DualWieldSpecialization))
 	}
 
-	if shaman.Talents.MentalQuickness > 0 {
-		shaman.AddStatDependency(stats.StatDependency{
-			SourceStat:   stats.AttackPower,
-			ModifiedStat: stats.SpellPower,
-			Modifier: func(attackpower float64, spellpower float64) float64 {
-				return spellpower + attackpower*0.1*float64(shaman.Talents.MentalQuickness)
-			},
-		})
-	}
-
 	if shaman.Talents.UnleashedRage > 0 {
 		shaman.applyUnleashedRage(shaman.Talents.UnleashedRage)
 	}

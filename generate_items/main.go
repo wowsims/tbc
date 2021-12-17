@@ -9,8 +9,7 @@ func main() {
 	flag.Parse()
 
 	if *outDir == "" {
-		// Default to items package so I can debug this file. :D
-		*outDir = "sim/core/items"
+		panic("outDir flag is required!")
 	}
 
 	itemResponses := make([]WowheadItemResponse, len(ItemDeclarations))

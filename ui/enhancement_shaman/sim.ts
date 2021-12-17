@@ -32,7 +32,7 @@ export class EnhancementShamanSimUI extends IndividualSimUI<Spec.SpecEnhancement
 		super(parentElem, player, {
 			// Can be 'Alpha', 'Beta', or 'Live'. Just adds a postfix to the generated title.
 			releaseStatus: 'Beta',
-			cssClass: 'Enhancement-shaman-sim-ui',
+			cssClass: 'enhancement-shaman-sim-ui',
 			// List any known bugs / issues here and they'll be shown on the site.
 			knownIssues: [
 			],
