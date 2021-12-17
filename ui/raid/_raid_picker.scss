@@ -95,16 +95,16 @@
 		0 0 3px var(--sidebar-highlight-color);
 }
 
-.player-swap {
-	color: yellow;
-}
-
-.player-copy {
+.player-edit {
 	color: blue;
 }
 
-.player-edit {
-	color: green;
+.player-copy {
+	color: yellow;
+}
+
+.player-delete {
+	color: red;
 }
 
 .buff-bot .player-edit {

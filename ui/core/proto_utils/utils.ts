@@ -1,5 +1,7 @@
 import { getEnumValues } from '/tbc/core/utils.js';
 import { intersection } from '/tbc/core/utils.js';
+import { maxIndex } from '/tbc/core/utils.js';
+import { sum } from '/tbc/core/utils.js';
 
 import { Player } from '/tbc/core/proto/api.js';
 import { ArmorType } from '/tbc/core/proto/common.js';
@@ -78,6 +80,68 @@ export const specIconsLarge: Record<Spec, string> = {
   [Spec.SpecWarlock]: 'https://wow.zamimg.com/images/wow/icons/large/spell_shadow_metamorphosis.jpg',
   [Spec.SpecWarrior]: 'https://wow.zamimg.com/images/wow/icons/large/ability_warrior_innerrage.jpg',
 };
+
+export const talentTreeIcons: Record<Class, Array<string>> = {
+	[Class.ClassUnknown]: [],
+	[Class.ClassDruid]: [
+		'https://wow.zamimg.com/images/wow/icons/medium/spell_nature_starfall.jpg',
+		'https://wow.zamimg.com/images/wow/icons/medium/ability_racial_bearform.jpg',
+		'https://wow.zamimg.com/images/wow/icons/medium/spell_nature_healingtouch.jpg',
+	],
+	[Class.ClassHunter]: [
+		'https://wow.zamimg.com/images/wow/icons/medium/ability_hunter_beasttaming.jpg',
+		'https://wow.zamimg.com/images/wow/icons/medium/ability_marksmanship.jpg',
+		'https://wow.zamimg.com/images/wow/icons/medium/ability_hunter_swiftstrike.jpg',
+	],
+	[Class.ClassMage]: [
+		'https://wow.zamimg.com/images/wow/icons/medium/spell_holy_magicalsentry.jpg',
+		'https://wow.zamimg.com/images/wow/icons/medium/spell_fire_firebolt02.jpg',
+		'https://wow.zamimg.com/images/wow/icons/medium/spell_frost_frostbolt02.jpg',
+	],
+	[Class.ClassPaladin]: [
+		'https://wow.zamimg.com/images/wow/icons/medium/spell_holy_holybolt.jpg',
+		'https://wow.zamimg.com/images/wow/icons/medium/spell_holy_devotionaura.jpg',
+		'https://wow.zamimg.com/images/wow/icons/medium/spell_holy_auraoflight.jpg',
+	],
+	[Class.ClassPriest]: [
+		'https://wow.zamimg.com/images/wow/icons/medium/spell_holy_powerinfusion.jpg',
+		'https://wow.zamimg.com/images/wow/icons/medium/spell_holy_holybolt.jpg',
+		'https://wow.zamimg.com/images/wow/icons/medium/spell_shadow_shadowwordpain.jpg',
+	],
+	[Class.ClassRogue]: [
+		'https://wow.zamimg.com/images/wow/icons/medium/ability_rogue_eviscerate.jpg',
+		'https://wow.zamimg.com/images/wow/icons/medium/ability_backstab.jpg',
+		'https://wow.zamimg.com/images/wow/icons/medium/ability_stealth.jpg',
+	],
+	[Class.ClassShaman]: [
+		'https://wow.zamimg.com/images/wow/icons/medium/spell_nature_lightning.jpg',
+		'https://wow.zamimg.com/images/wow/icons/medium/ability_shaman_stormstrike.jpg',
+		'https://wow.zamimg.com/images/wow/icons/medium/spell_nature_magicimmunity.jpg',
+	],
+	[Class.ClassWarlock]: [
+		'https://wow.zamimg.com/images/wow/icons/medium/spell_shadow_deathcoil.jpg',
+		'https://wow.zamimg.com/images/wow/icons/medium/spell_shadow_metamorphosis.jpg',
+		'https://wow.zamimg.com/images/wow/icons/medium/spell_shadow_rainoffire.jpg',
+	],
+	[Class.ClassWarrior]: [
+		'https://wow.zamimg.com/images/wow/icons/medium/ability_warrior_savageblow.jpg',
+		'https://wow.zamimg.com/images/wow/icons/medium/ability_warrior_innerrage.jpg',
+		'https://wow.zamimg.com/images/wow/icons/medium/inv_shield_06.jpg',
+	],
+};
+
+// Returns the index of the talent tree (0, 1, or 2) that has the most points.
+export function getTalentTree(talentsString: string): number {
+	const trees = talentsString.split('-');
+	const points = trees.map(tree => sum([...tree].map(char => parseInt(char))));
+	return maxIndex(points) || 0;
+}
+
+// Returns the index of the talent tree (0, 1, or 2) that has the most points.
+export function getTalentTreeIcon(spec: Spec, talentsString: string): string {
+	const talentTreeIdx = getTalentTree(talentsString);
+	return talentTreeIcons[specToClass[spec]][talentTreeIdx];
+}
 
 // Gets the URL for the individual sim corresponding to the given spec.
 //const specSiteUrlTemplate = new URL(`${window.location.protocol}//${window.location.host}/${repoName}/SPEC/index.html`);

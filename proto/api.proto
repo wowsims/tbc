@@ -38,6 +38,9 @@ message Player {
         Warlock warlock = 13;
         Warrior warrior = 14;
     }
+
+		// Only used by the UI. Sim uses talents within the spec protos.
+		string talentsString = 17;
 }
 
 message Party {

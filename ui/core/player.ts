@@ -434,6 +434,7 @@ export class Player<SpecType extends Spec> {
 					consumes: this.getConsumes(),
 					bonusStats: this.getBonusStats().asArray(),
 					buffs: this.getBuffs(),
+					talentsString: this.getTalentsString(),
 				}),
 				this.getRotation(),
 				this.getTalents(),

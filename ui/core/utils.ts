@@ -13,6 +13,11 @@ export function sum(arr: Array<number>): number {
   return arr.reduce((total, cur) => total + cur, 0);
 }
 
+// Returns the index of maximum value, or null if empty.
+export function maxIndex(arr: Array<number>): number | null {
+	return arr.reduce((cur, v, i, arr) => v > arr[cur] ? i : cur, 0);
+}
+
 // Returns a new array containing only elements present in both a and b.
 export function intersection<T>(a: Array<T>, b: Array<T>): Array<T> {
   return a.filter(value => b.includes(value));

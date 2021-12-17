@@ -211,9 +211,9 @@ export class PlayerPicker extends Component {
 				<span class="player-name" contenteditable></span>
 			</div>
 			<div class="player-options">
-				<span class="player-swap fa fa-retweet" draggable="true"></span>
-				<span class="player-copy fa fa-copy" draggable="true"></span>
 				<span class="player-edit fa fa-edit"></span>
+				<span class="player-copy fa fa-copy" draggable="true"></span>
+				<span class="player-delete fa fa-times"></span>
 			</div>
 			<div class="player-results">
 				<span class="player-results-dps"></span>
@@ -259,15 +259,6 @@ export class PlayerPicker extends Component {
 		};
 
 		this.labelElem.ondragstart = event => {
-			dragStart(event, DragType.Move);
-		};
-
-		const swapElem = this.rootElem.getElementsByClassName('player-swap')[0] as HTMLSpanElement;
-		tippy(swapElem, {
-			'content': 'Swap',
-			'allowHTML': true,
-		});
-		swapElem.ondragstart = event => {
 			dragStart(event, DragType.Swap);
 		};
 
@@ -279,6 +270,15 @@ export class PlayerPicker extends Component {
 		copyElem.ondragstart = event => {
 			dragStart(event, DragType.Copy);
 		};
+
+		const deleteElem = this.rootElem.getElementsByClassName('player-delete')[0] as HTMLSpanElement;
+		tippy(deleteElem, {
+			'content': 'Delete',
+			'allowHTML': true,
+		});
+		deleteElem.addEventListener('click', event => {
+			this.setPlayer(null);
+		});
 
 		let dragEnterCounter = 0;
 		this.rootElem.ondragenter = event => {
@@ -559,11 +559,15 @@ class NewPlayerPicker extends Component {
 					newTalentsPicker(newPlayer.spec, document.createElement('div'), newPlayer);
 
 					newPlayer.setSpecOptions(matchingPreset.specOptions);
-					newPlayer.setGear(
-							this.raidPicker.raid.sim.lookupEquipmentSpec(
-									matchingPreset.defaultGear[this.raidPicker.getCurrentFaction()][this.raidPicker.getCurrentPhase()]));
 					newPlayer.setConsumes(matchingPreset.consumes);
 					newPlayer.setName(matchingPreset.defaultName);
+
+					// Need to wait because the gear might not be loaded yet.
+					this.raidPicker.raid.sim.waitForInit().then(() => {
+						newPlayer.setGear(
+								this.raidPicker.raid.sim.lookupEquipmentSpec(
+										matchingPreset.defaultGear[this.raidPicker.getCurrentFaction()][this.raidPicker.getCurrentPhase()]));
+					});
 
 					this.raidPicker.setDragPlayer(newPlayer, NEW_PLAYER, DragType.New);
 				};
