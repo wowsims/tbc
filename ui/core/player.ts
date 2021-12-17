@@ -154,6 +154,7 @@ export class Player<SpecType extends Spec> {
 		return this.party.getIndex() * MAX_PARTY_SIZE + this.getPartyIndex();
 	}
 
+	// This should only ever be called from party.
 	setParty(newParty: Party | null) {
 		if (this.party == newParty) {
 			return;
@@ -166,14 +167,6 @@ export class Player<SpecType extends Spec> {
 		} else {
 			this.party = newParty;
 			this.raid = newParty.raid;
-		}
-
-		// Remove player from its old party if there is one.
-		if (oldParty != null) {
-			const oldPartyIndex = oldParty.getPlayers().indexOf(this);
-			if (oldPartyIndex != -1) {
-				oldParty.setPlayer(oldPartyIndex, null);
-			}
 		}
 	}
 
@@ -441,6 +434,19 @@ export class Player<SpecType extends Spec> {
 				this.getSpecOptions());
 	}
 
+	fromProto(proto: PlayerProto) {
+		this.setName(proto.name);
+		this.setRace(proto.race);
+		this.setGear(proto.equipment ? this.sim.lookupEquipmentSpec(proto.equipment) : new Gear({}));
+		this.setConsumes(proto.consumes || Consumes.create());
+		this.setBonusStats(new Stats(proto.bonusStats));
+		this.setBuffs(proto.buffs || IndividualBuffs.create());
+		this.setTalentsString(proto.talentsString);
+		this.setRotation(this.specTypeFunctions.rotationFromPlayer(proto));
+		this.setTalents(this.specTypeFunctions.talentsFromPlayer(proto));
+		this.setSpecOptions(this.specTypeFunctions.optionsFromPlayer(proto));
+	}
+
 	// TODO: Remove to/from json functions and use proto versions instead. This will require
 	// some way to store all talents in the proto.
   // Returns JSON representing all the current values.
@@ -524,7 +530,7 @@ export class Player<SpecType extends Spec> {
 
 	clone(): Player<SpecType> {
 		const newPlayer = new Player<SpecType>(this.spec, this.sim);
-		newPlayer.fromJson(this.toJson());
+		newPlayer.fromProto(this.toProto());
 		return newPlayer;
 	}
 }

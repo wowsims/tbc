@@ -92,10 +92,11 @@ export class RaidPicker extends Component {
 		this.newPlayerPicker = new NewPlayerPicker(newPlayerPickerRoot, this);
 
 		this.rootElem.ondragend = event => {
-			if (this.currentDragPlayerFromIndex != NEW_PLAYER) {
-				const playerPicker = this.getPlayerPicker(this.currentDragPlayerFromIndex);
-				playerPicker.setPlayer(null);
-			}
+			// Uncomment to remove player when dropped 'off' the raid.
+			//if (this.currentDragPlayerFromIndex != NEW_PLAYER) {
+			//	const playerPicker = this.getPlayerPicker(this.currentDragPlayerFromIndex);
+			//	playerPicker.setPlayer(null);
+			//}
 
 			this.clearDragPlayer();
 		};
@@ -228,17 +229,53 @@ export class PlayerPicker extends Component {
 		this.referenceDeltaElem = this.rootElem.getElementsByClassName('player-results-reference-delta')[0] as HTMLElement;
 
     this.nameElem.addEventListener('input', event => {
-			let newName = this.nameElem.textContent || 'Unnamed';
-			newName = newName.replace(/([\n\r\t])/g, "");
-			newName = newName.substring(0, 25);
+			if (this.player instanceof Player) {
+				this.player.setName(this.nameElem.textContent || '');
+			}
+		});
 
-			if (this.player == null) {
-				newName = '';
-			} else if (this.player instanceof Player) {
-				this.player.setName(newName);
+		const maxLength = 25;
+		this.nameElem.addEventListener('keydown', event => {
+			// 9 is tab, 13 is enter
+			if (event.keyCode == 9 || event.keyCode == 13) {
+				event.preventDefault();
+				const realPlayerPickers = this.raidPicker.getPlayerPickers().filter(pp => pp.player instanceof Player);
+				const indexOfThis = realPlayerPickers.indexOf(this);
+				if (indexOfThis != -1 && realPlayerPickers.length > indexOfThis + 1) {
+					realPlayerPickers[indexOfThis + 1].nameElem.focus();
+				} else {
+					this.nameElem.blur();
+				}
 			}
 
-			this.nameElem.textContent = newName;
+			// escape
+			if (event.keyCode == 27) {
+				this.nameElem.blur();
+			}
+
+			// 8 is backspace, 46 is delete, 
+			if ((event.keyCode != 8 && event.keyCode != 46) && (this.nameElem.textContent?.length || 0) >= maxLength) {
+				event.preventDefault();
+			}
+		});
+
+		const emptyName = 'Unnamed';
+		this.nameElem.addEventListener('focusin', event => {
+			const selection = window.getSelection();
+			if (selection) {
+				const range = document.createRange();
+				range.selectNodeContents(this.nameElem);
+				selection.removeAllRanges();
+				selection.addRange(range);
+			}
+		});
+		this.nameElem.addEventListener('focusout', event => {
+			if (!this.nameElem.textContent) {
+				this.nameElem.textContent = emptyName;
+				if (this.player instanceof Player) {
+					this.player.setName(emptyName);
+				}
+			}
 		});
 
 		const dragStart = (event: DragEvent, type: DragType) => {
