@@ -1,30 +1,39 @@
-import { SimResult, SimResultFilter } from '/tbc/core/proto_utils/sim_result.js';
+import { Component } from '/tbc/core/components/component.js';
+import { SimResult, SimResultFilter, ActionMetrics } from '/tbc/core/proto_utils/sim_result.js';
 import { sum } from '/tbc/core/utils.js';
-
-import { ResultComponent, ResultComponentConfig, SimResultData } from './result_component.js';
 
 declare var Chart: any;
 
-export class SourceChart extends ResultComponent {
-  constructor(config: ResultComponentConfig) {
-		config.rootCssClass = 'source-chart-root';
-    super(config);
-	}
+const sliceColors: Array<string> = [
+	'#05878a',
+	'#074e67',
+	'#5a175d',
+	'#67074e',
+	'#dd9933',
+	'#c9c1e7',
+	'#bdd5ef',
+	'#c7e3d0',
+	'#e7e6ce',
+	'#f2d8cc',
+	'#e9ccce',
+];
 
-	onSimResult(resultData: SimResultData) {
-		const chartBounds = this.rootElem.getBoundingClientRect();
-
-		this.rootElem.textContent = '';
+export class SourceChart extends Component {
+  constructor(parentElem: HTMLElement, allActionMetrics: Array<ActionMetrics>) {
 		const chartCanvas = document.createElement("canvas");
-		chartCanvas.height = chartBounds.height;
-		chartCanvas.width = chartBounds.width;
+    super(parentElem, 'source-chart-root', chartCanvas);
 
-		const colors: Array<string> = ['red', 'blue', 'lawngreen'];
+		chartCanvas.style.height = '400px';
+		chartCanvas.style.width = '600px';
+		chartCanvas.height = 400;
+		chartCanvas.width = 600;
 
-		const actionMetrics = resultData.result.getActionMetrics(resultData.filter);
+		const actionMetrics = allActionMetrics.filter(actionMetric => actionMetric.damage > 0);
 		const names = actionMetrics.map(am => am.name);
 		const totalDmg = sum(actionMetrics.map(actionMetric => actionMetric.damage));
 		const vals = actionMetrics.map(actionMetric => actionMetric.damage / totalDmg);
+		const bgColors = sliceColors.slice(0, actionMetrics.length);
+		console.log(bgColors);
 
 		const ctx = chartCanvas.getContext('2d');
 		const chart = new Chart(ctx, {
@@ -33,7 +42,7 @@ export class SourceChart extends ResultComponent {
 				labels: names,
 				datasets: [{
 					data: vals,
-					backgroundColor: colors,
+					backgroundColor: bgColors,
 				}],
 			},
 			options: {
@@ -45,6 +54,5 @@ export class SourceChart extends ResultComponent {
 				},
 			},
 		});
-		this.rootElem.appendChild(chartCanvas);
 	}
 }
