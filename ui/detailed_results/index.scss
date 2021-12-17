@@ -4,11 +4,27 @@
 @import "dps_histogram";
 @import "dps_result";
 @import "percent_oom";
+@import "player_damage";
 @import "results_filter";
 @import "source_chart";
 
 body {
 	background-color: var(--main-bg-color);
+}
+
+.all-players .single-player-only {
+	display: none;
+}
+
+.single-player .all-players-only {
+	display: none;
+}
+
+.individual-sim .single-player-only {
+	display: initial;
+}
+.individual-sim .all-players-only {
+	display: none;
 }
 
 .dr-root {
@@ -87,9 +103,16 @@ body {
 	padding: 2px 1px;
 }
 
+.metrics-table-header-cell:first-child, .metrics-table-body td:first-child {
+	text-align: left;
+}
+.metrics-table-header-cell:not(:first-child), .metrics-table-body td:not(:first-child) {
+	text-align: right;
+}
+
 .metrics-action-icon {
   @include wowhead-background-icon;
-	height: 5vh;
-	width: 5vh;
+	height: 30px;
+	width: 30px;
 	vertical-align: middle;
 }
