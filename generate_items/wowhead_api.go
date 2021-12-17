@@ -263,6 +263,7 @@ func (item WowheadItemResponse) GetRangedWeaponType() proto.RangedWeaponType {
 	return proto.RangedWeaponType_RangedWeaponTypeUnknown
 }
 
+// Returns min/max of weapon damage
 func (item WowheadItemResponse) GetWeaponDamage() (float64, float64) {
 	if matches := weaponDamageRegex.FindStringSubmatch(item.Tooltip); len(matches) > 0 {
 		max, err := strconv.ParseFloat(matches[1], 64)
@@ -273,7 +274,7 @@ func (item WowheadItemResponse) GetWeaponDamage() (float64, float64) {
 		if err != nil {
 			log.Fatalf("Failed to parse weapon damage: %s", err)
 		}
-		return max, min
+		return min, max
 	}
 	return 0, 0
 }

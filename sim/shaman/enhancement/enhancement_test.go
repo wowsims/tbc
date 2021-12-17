@@ -33,7 +33,7 @@ func TestSimulatePreRaidNoBuffs(t *testing.T) {
 		},
 
 		// these numbers will change while we are still implementing and fixing up enh shaman and melee
-		ExpectedDpsShort: 759.9,
-		ExpectedDpsLong:  756.8,
+		ExpectedDpsShort: 739.6,
+		ExpectedDpsLong:  751.9,
 	})
 }
