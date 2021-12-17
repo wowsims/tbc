@@ -57,11 +57,12 @@ func (priest *Priest) NewMindFlay(sim *core.Simulation, target *core.Target) *co
 
 	priest.mindflayCastTemplate.Apply(mf)
 
+	// Channels accelerate tick speed by haste.
+	mf.DotInput.TickLength = time.Duration(float64(mf.DotInput.TickLength) / priest.CastSpeed())
+
 	// Set dynamic fields, i.e. the stuff we couldn't precompute.
 	mf.Target = target
 	mf.Init(sim)
 
-	// Channels accelerate tick speed by haste.
-	mf.DotInput.TickLength = time.Duration(float64(mf.DotInput.TickLength) / priest.CastSpeed())
 	return mf
 }

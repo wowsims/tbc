@@ -118,6 +118,7 @@ func registerDrumsCD(agent Agent, partyBuffs proto.PartyBuffs, consumes proto.Co
 				for _, agent := range character.Party.Players {
 					agent.GetCharacter().SetCD(DrumsCooldownID, time.Minute*2+sim.CurrentTime) // tinnitus
 					agent.GetCharacter().AddAuraWithTemporaryStats(sim, DrumsAuraID, 35476, "Drums of Battle", stats.SpellHaste, hasteBonus, time.Second*30)
+					// TODO: Add melee haste to drums
 				}
 				if drumsSelfCast {
 					character.Metrics.AddInstantCast(ActionID{SpellID: 35476})

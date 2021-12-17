@@ -179,6 +179,10 @@ func (sim *Simulation) runOnce() {
 				Name: "Agent",
 			}
 			pa.OnAction = func(sim *Simulation) {
+				// If char has AA enabled (a MH weapon is set), try to swing
+				if ag.GetCharacter().AutoAttacks.mh != nil {
+					ag.GetCharacter().AutoAttacks.Swing(sim, sim.GetPrimaryTarget())
+				}
 				ag.GetCharacter().TryUseCooldowns(sim)
 				dur := ag.Act(sim)
 				if dur <= sim.CurrentTime {

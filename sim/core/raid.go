@@ -50,6 +50,12 @@ func (party *Party) AddStats(newStats stats.Stats) {
 	}
 }
 
+func (party *Party) AddStat(stat stats.Stat, amount float64) {
+	for _, agent := range party.Players {
+		agent.GetCharacter().AddStat(stat, amount)
+	}
+}
+
 func (party *Party) doneIteration(simDuration time.Duration) {
 	for _, agent := range party.Players {
 		agent.GetCharacter().doneIteration(simDuration)

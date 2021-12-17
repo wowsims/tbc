@@ -81,6 +81,8 @@ var meleeCritRegex = regexp.MustCompile("Increases your critical strike rating b
 var meleeHasteRegex = regexp.MustCompile("Improves haste rating by <!--rtg36-->([0-9]+)\\.")
 var armorPenetrationRegex = regexp.MustCompile("Your attacks ignore ([0-9]+) of your opponent's armor\\.")
 var expertiseRegex = regexp.MustCompile("Increases your expertise rating by <!--rtg37-->([0-9]+)\\.")
+var weaponDamageRegex = regexp.MustCompile("<!--dmg-->([0-9]+) - ([0-9]+)")
+var weaponSpeedRegex = regexp.MustCompile("<!--spd-->(([0-9]+).([0-9]+))")
 
 func (item WowheadItemResponse) GetStats() Stats {
 	spellPower := item.GetIntValue(spellPowerRegex)
@@ -259,6 +261,32 @@ func (item WowheadItemResponse) GetRangedWeaponType() proto.RangedWeaponType {
 		}
 	}
 	return proto.RangedWeaponType_RangedWeaponTypeUnknown
+}
+
+func (item WowheadItemResponse) GetWeaponDamage() (float64, float64) {
+	if matches := weaponDamageRegex.FindStringSubmatch(item.Tooltip); len(matches) > 0 {
+		max, err := strconv.ParseFloat(matches[1], 64)
+		if err != nil {
+			log.Fatalf("Failed to parse weapon damage: %s", err)
+		}
+		min, err := strconv.ParseFloat(matches[2], 64)
+		if err != nil {
+			log.Fatalf("Failed to parse weapon damage: %s", err)
+		}
+		return max, min
+	}
+	return 0, 0
+}
+
+func (item WowheadItemResponse) GetWeaponSpeed() float64 {
+	if matches := weaponSpeedRegex.FindStringSubmatch(item.Tooltip); len(matches) > 0 {
+		speed, err := strconv.ParseFloat(matches[1], 64)
+		if err != nil {
+			log.Fatalf("Failed to parse weapon damage: %s", err)
+		}
+		return speed
+	}
+	return 0
 }
 
 var gemColorsRegex, _ = regexp.Compile("(Meta|Yellow|Blue|Red) Socket")

@@ -33,6 +33,8 @@ message ShamanTalents {
     int32 weapon_mastery = 23;
     int32 dual_wield_specialization = 24;
     int32 unleashed_rage = 25;
+    bool stormstrike = 34;
+    bool shamanistic_rage = 35;
 
     // Restoration
     int32 totemic_focus = 26;
@@ -127,4 +129,25 @@ message ElementalShaman {
         // int32 WaterShieldPPM
     }
     Options options = 3;
+}
+
+
+message EnhancementShaman {
+  message Rotation {
+    enum RotationType {
+        Unknown = 0;
+        Basic = 1;
+    }
+    RotationType type = 1;
+  }
+  Rotation rotation = 1;
+
+  ShamanTalents talents = 2;
+  
+  message Options {
+      bool water_shield = 1;
+      bool bloodlust = 2;
+      ShamanTotems totems = 3;
+  }
+  Options options = 3;
 }

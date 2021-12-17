@@ -29,7 +29,7 @@ func (druid *Druid) newMoonfireTemplate(sim *core.Simulation) core.SimpleSpellTe
 			DamageMultiplier:       1,
 			StaticDamageMultiplier: 1,
 		},
-		DirectInput: core.DirectDamageSpellInput{
+		DirectInput: core.DirectDamageInput{
 			MinBaseDamage:    305,
 			MaxBaseDamage:    357,
 			SpellCoefficient: 0.15,

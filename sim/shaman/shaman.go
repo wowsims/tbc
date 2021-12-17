@@ -8,8 +8,8 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-func NewShaman(character core.Character, talents proto.ShamanTalents, selfBuffs SelfBuffs) Shaman {
-	shaman := Shaman{
+func NewShaman(character core.Character, talents proto.ShamanTalents, selfBuffs SelfBuffs) *Shaman {
+	shaman := &Shaman{
 		Character: character,
 		Talents:   talents,
 		SelfBuffs: selfBuffs,
@@ -17,6 +17,34 @@ func NewShaman(character core.Character, talents proto.ShamanTalents, selfBuffs 
 
 	if shaman.Talents.NaturesGuidance > 0 {
 		shaman.AddStat(stats.SpellHit, float64(shaman.Talents.NaturesGuidance)*1*core.SpellHitRatingPerHitChance)
+	}
+
+	if shaman.Talents.ThunderingStrikes > 0 {
+		shaman.AddStat(stats.MeleeCrit, core.MeleeCritRatingPerCritChance*1*float64(shaman.Talents.ThunderingStrikes))
+	}
+
+	if shaman.Talents.DualWieldSpecialization > 0 {
+		shaman.AddStat(stats.MeleeHit, core.MeleeCritRatingPerCritChance*2*float64(shaman.Talents.DualWieldSpecialization))
+	}
+
+	if shaman.Talents.MentalQuickness > 0 {
+		shaman.AddStatDependency(stats.StatDependency{
+			SourceStat:   stats.AttackPower,
+			ModifiedStat: stats.SpellPower,
+			Modifier: func(attackpower float64, spellpower float64) float64 {
+				return spellpower + attackpower*0.1*float64(shaman.Talents.MentalQuickness)
+			},
+		})
+	}
+
+	if shaman.Talents.UnleashedRage > 0 {
+		shaman.applyUnleashedRage(shaman.Talents.UnleashedRage)
+	}
+	if shaman.Talents.ShamanisticFocus {
+		shaman.applyShamanisticFocus()
+	}
+	if shaman.Talents.Flurry > 0 {
+		shaman.applyFlurry(shaman.Talents.Flurry)
 	}
 
 	// Add Shaman stat dependencies
@@ -100,11 +128,14 @@ func NewShaman(character core.Character, talents proto.ShamanTalents, selfBuffs 
 
 // Which buffs this shaman is using.
 type SelfBuffs struct {
-	Bloodlust    bool
-	WaterShield  bool
-	TotemOfWrath bool
-	WrathOfAir   bool
-	ManaSpring   bool
+	Bloodlust       bool
+	WaterShield     bool
+	TotemOfWrath    bool
+	WrathOfAir      bool
+	ManaSpring      bool
+	StrengthOfEarth bool
+	GraceOfAir      bool
+	WindfuryTotem   bool
 
 	NextTotemDrops [4]time.Duration // track when to drop totems
 }
@@ -125,6 +156,8 @@ type Shaman struct {
 	SelfBuffs SelfBuffs
 
 	ElementalFocusStacks byte
+	FlurryStacks         byte
+	Focused              bool // If Shamanistic Focus is active
 
 	// "object pool" for shaman spells that are currently being cast.
 	lightningBoltSpell   core.SimpleSpell
@@ -139,6 +172,15 @@ type Shaman struct {
 
 	chainLightningCastTemplate    core.MultiTargetDirectDamageSpellTemplate
 	chainLightningLOCastTemplates []core.MultiTargetDirectDamageSpellTemplate
+
+	stormstrikeTemplate core.MeleeAbilittyTemplate
+	stormstrikeSpell    core.ActiveMeleeAbility
+
+	// Shocks
+	shockSpell         core.SimpleSpell
+	frostShockTemplate core.SimpleSpellTemplate
+
+	unleashedRages []core.Aura
 }
 
 // Implemented by each Shaman spec.
@@ -177,11 +219,29 @@ func (shaman *Shaman) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {
 			woaValue = proto.TristateEffect_TristateEffectImproved
 		}
 		partyBuffs.WrathOfAirTotem = core.MaxTristate(partyBuffs.WrathOfAirTotem, woaValue)
+	} else if shaman.SelfBuffs.GraceOfAir {
+		value := proto.TristateEffect_TristateEffectRegular
+		if shaman.Talents.EnhancingTotems == 2 {
+			value = proto.TristateEffect_TristateEffectImproved
+		}
+		partyBuffs.GraceOfAirTotem = core.MaxTristate(partyBuffs.WrathOfAirTotem, value)
+	} else if shaman.SelfBuffs.WindfuryTotem {
+		// none
+		panic("not implemented")
+	}
+
+	if shaman.SelfBuffs.StrengthOfEarth {
+		value := proto.TristateEffect_TristateEffectRegular
+		if shaman.Talents.EnhancingTotems == 2 {
+			value = proto.TristateEffect_TristateEffectImproved
+		}
+		partyBuffs.StrengthOfEarthTotem = core.MaxTristate(partyBuffs.WrathOfAirTotem, value)
 	}
 }
 
 func (shaman *Shaman) Init(sim *core.Simulation) {
 	// Precompute all the spell templates.
+	shaman.stormstrikeTemplate = shaman.newStormstrikeTemplate(sim)
 	shaman.lightningBoltCastTemplate = shaman.newLightningBoltTemplate(sim, false)
 	shaman.lightningBoltLOCastTemplate = shaman.newLightningBoltTemplate(sim, true)
 
@@ -193,6 +253,7 @@ func (shaman *Shaman) Init(sim *core.Simulation) {
 	for i := int32(0); i < numHits; i++ {
 		shaman.chainLightningLOCastTemplates = append(shaman.chainLightningLOCastTemplates, shaman.newChainLightningTemplate(sim, true))
 	}
+	shaman.frostShockTemplate = shaman.newFrostShockTemplate(sim)
 }
 
 func (shaman *Shaman) Reset(sim *core.Simulation) {
@@ -219,14 +280,17 @@ func (shaman *Shaman) Reset(sim *core.Simulation) {
 	shaman.lightningBoltSpell = core.SimpleSpell{}
 	shaman.lightningBoltSpellLO = core.SimpleSpell{}
 	shaman.chainLightningSpell = core.MultiTargetDirectDamageSpell{}
+	shaman.shockSpell = core.SimpleSpell{} // technically nothing to clean since its instant cast..
 
 	numHits := core.MinInt32(3, sim.GetNumTargets())
 	shaman.chainLightningSpellLOs = make([]core.MultiTargetDirectDamageSpell, numHits)
+
+	shaman.unleashedRages = shaman.unleashedRages[0:]
 }
 
 func (shaman *Shaman) Advance(sim *core.Simulation, elapsedTime time.Duration) {
-	// Shaman should never be outside the 5s window, use combat regen
-	shaman.Character.RegenManaCasting(sim, elapsedTime)
+	// Enh shaman could have a 5s window without casting, use longer regen function
+	shaman.Character.RegenMana(sim, elapsedTime)
 }
 
 var ElementalMasteryAuraID = core.NewAuraID()
@@ -312,6 +376,115 @@ func (shaman *Shaman) registerNaturesSwiftnessCD() {
 				return true
 			}
 		},
+	})
+}
+
+var UnleasedRageTalentAuraID = core.NewAuraID()
+var UnleasedRageProcAuraID = core.NewAuraID()
+
+func (shaman *Shaman) applyUnleashedRage(level int32) {
+	shaman.AddPermanentAura(func(sim *core.Simulation) core.Aura {
+		dur := time.Second * 10
+		bonus := 0.02 * float64(level)
+		return core.Aura{
+			ID:   UnleasedRageTalentAuraID,
+			Name: "Unleashed Rage Talent",
+			OnMeleeAttack: func(sim *core.Simulation, target *core.Target, result core.MeleeHitType, ability *core.ActiveMeleeAbility, isOH bool) {
+				if result != core.MeleeHitTypeCrit {
+					return
+				}
+				for i, player := range shaman.GetCharacter().Party.Players {
+					char := player.GetCharacter()
+					if char.HasAura(UnleasedRageProcAuraID) {
+						// Renew
+						shaman.unleashedRages[i].Expires = sim.CurrentTime + dur
+						char.ReplaceAura(sim, shaman.unleashedRages[i])
+						continue
+					}
+					ap := char.GetStat(stats.AttackPower) * bonus
+					char.AddStat(stats.AttackPower, ap)
+					shaman.unleashedRages = append(shaman.unleashedRages, core.Aura{
+						ID:      UnleasedRageProcAuraID,
+						Name:    "Unleased Rage",
+						Expires: sim.CurrentTime + dur,
+						OnExpire: func(sim *core.Simulation) {
+							char.AddStat(stats.AttackPower, -ap)
+						},
+					})
+					char.AddAura(sim, shaman.unleashedRages[i])
+				}
+			},
+		}
+	})
+}
+
+var ShamanisticFocusTalentAuraID = core.NewAuraID()
+
+func (shaman *Shaman) applyShamanisticFocus() {
+	shaman.AddPermanentAura(func(sim *core.Simulation) core.Aura {
+		return core.Aura{
+			ID:   ShamanisticFocusTalentAuraID,
+			Name: "Shamanistic Focus Talent",
+			OnMeleeAttack: func(sim *core.Simulation, target *core.Target, result core.MeleeHitType, ability *core.ActiveMeleeAbility, isOH bool) {
+				if result != core.MeleeHitTypeCrit {
+					return
+				}
+				shaman.Focused = true
+			},
+		}
+	})
+}
+
+func (shaman *Shaman) applyFocusedEffect(cast *core.SimpleSpell) {
+	cast.ManaCost -= cast.BaseManaCost * 0.6
+	cast.OnSpellHit = func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+		shaman.Focused = false
+	}
+}
+
+var FlurryTalentAuraID = core.NewAuraID()
+var FlurryProcAuraID = core.NewAuraID()
+
+func (shaman *Shaman) applyFlurry(level int32) {
+	shaman.AddPermanentAura(func(sim *core.Simulation) core.Aura {
+		icdDur := time.Millisecond * 500
+		var icd core.InternalCD
+
+		bonus := 1.3
+		inverseBonus := 1 / 1.3
+		return core.Aura{
+			ID:   FlurryTalentAuraID,
+			Name: "Flurry Talent",
+			OnMeleeAttack: func(sim *core.Simulation, target *core.Target, result core.MeleeHitType, ability *core.ActiveMeleeAbility, isOH bool) {
+				if result != core.MeleeHitTypeCrit {
+					if ability == nil {
+						// Remove a stack from auto attacks
+						if shaman.FlurryStacks > 0 && !icd.IsOnCD(sim) {
+							icd = core.InternalCD(sim.CurrentTime + icdDur)
+							shaman.FlurryStacks--
+							// Remove aura will reset attack speed
+							if shaman.FlurryStacks == 0 {
+								shaman.RemoveAura(sim, FlurryProcAuraID)
+							}
+						}
+					}
+					return
+				}
+				if shaman.FlurryStacks == 0 {
+					shaman.MultiplyMeleeSpeed(sim, bonus)
+					shaman.AddAura(sim, core.Aura{
+						ID:      FlurryProcAuraID,
+						Name:    "Flurry",
+						Expires: core.NeverExpires,
+						OnExpire: func(sim *core.Simulation) {
+							shaman.MultiplyMeleeSpeed(sim, inverseBonus)
+						},
+					})
+				}
+				icd = 0
+				shaman.FlurryStacks = 3
+			},
+		}
 	})
 }
 

@@ -32,7 +32,7 @@ func (druid *Druid) newWrathTemplate(sim *core.Simulation) core.SimpleSpellTempl
 			DamageMultiplier:       1,
 			StaticDamageMultiplier: 1,
 		},
-		DirectInput: core.DirectDamageSpellInput{
+		DirectInput: core.DirectDamageInput{
 			MinBaseDamage:    383,
 			MaxBaseDamage:    432,
 			SpellCoefficient: 0.571 + 0.02*float64(druid.Talents.WrathOfCenarius),

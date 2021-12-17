@@ -28,6 +28,7 @@ import { getEnumValues } from '/tbc/core/utils.js';
 import { hexToRgba } from '/tbc/core/utils.js';
 
 import { BalanceDruidSimUI } from '/tbc/balance_druid/sim.js';
+import { EnhancementShamanSimUI } from '/tbc/enhancement_shaman/sim.js';
 import { ElementalShamanSimUI } from '/tbc/elemental_shaman/sim.js';
 import { ShadowPriestSimUI } from '/tbc/shadow_priest/sim.js';
 
@@ -630,6 +631,7 @@ class NewPlayerPicker extends Component {
 export const specSimFactories: Partial<Record<Spec, (parentElem: HTMLElement, player: Player<any>) => IndividualSimUI<any>>> = {
 	[Spec.SpecBalanceDruid]: (parentElem: HTMLElement, player: Player<any>) => new BalanceDruidSimUI(parentElem, player),
 	[Spec.SpecElementalShaman]: (parentElem: HTMLElement, player: Player<any>) => new ElementalShamanSimUI(parentElem, player),
+	[Spec.SpecEnhancementShaman]: (parentElem: HTMLElement, player: Player<any>) => new EnhancementShamanSimUI(parentElem, player),
 	[Spec.SpecShadowPriest]: (parentElem: HTMLElement, player: Player<any>) => new ShadowPriestSimUI(parentElem, player),
 };
 

@@ -12,7 +12,7 @@ import (
 //
 // This struct holds additional inputs beyond what a SpellEffect already contains,
 // which are necessary for a direct spell damage calculation.
-type DirectDamageSpellInput struct {
+type DirectDamageInput struct {
 	MinBaseDamage float64
 	MaxBaseDamage float64
 
@@ -104,7 +104,7 @@ func (spell *SimpleSpell) Cast(sim *Simulation) bool {
 type SpellHitEffect struct {
 	SpellEffect
 	DotInput    DotDamageInput
-	DirectInput DirectDamageSpellInput
+	DirectInput DirectDamageInput
 }
 
 // applies the hit/miss/dmg effects to the spellCast

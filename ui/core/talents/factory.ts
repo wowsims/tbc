@@ -22,6 +22,9 @@ export function newTalentsPicker<SpecType extends Spec>(spec: Spec, parent: HTML
     case Spec.SpecElementalShaman:
       return new ShamanTalentsPicker(parent, player as Player<Spec.SpecElementalShaman>) as TalentsPicker<SpecType>;
       break;
+    case Spec.SpecEnhancementShaman:
+      return new ShamanTalentsPicker(parent, player as Player<Spec.SpecElementalShaman>) as TalentsPicker<SpecType>;
+      break;
     case Spec.SpecHunter:
       return new HunterTalentsPicker(parent, player as Player<Spec.SpecHunter>) as TalentsPicker<SpecType>;
       break;

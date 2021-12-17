@@ -65,6 +65,8 @@ type Target struct {
 
 	armor int32
 
+	Level int32 // level of target
+
 	MobType proto.MobType
 
 	// Provides aura tracking behavior. Targets need auras to handle debuffs.
@@ -85,6 +87,10 @@ func NewTarget(options proto.Target, targetIndex int32) *Target {
 		MobType:     options.MobType,
 		auraTracker: newAuraTracker(true),
 		Name:        "Target " + strconv.Itoa(int(targetIndex)+1),
+		Level:       73,
+	}
+	if options.Level > 0 {
+		target.Level = options.Level
 	}
 
 	if options.Debuffs != nil {

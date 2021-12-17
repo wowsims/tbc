@@ -1,6 +1,5 @@
 import { Spec } from '/tbc/core/proto/common.js';
 import { ShamanTalents as ShamanTalents } from '/tbc/core/proto/shaman.js';
-import { ShamanSpecs } from '/tbc/core/proto_utils/utils.js';
 import { Player } from '/tbc/core/player.js';
 
 import { TalentsPicker } from './talents_picker.js';
@@ -386,7 +385,7 @@ export class ShamanTalentsPicker extends TalentsPicker<Spec.SpecElementalShaman>
             maxPoints: 1,
           },
           {
-            //fieldName: 'stormstrike',
+            fieldName: 'stormstrike',
             location: {
               rowIdx: 6,
               colIdx: 2,
@@ -408,7 +407,7 @@ export class ShamanTalentsPicker extends TalentsPicker<Spec.SpecElementalShaman>
             maxPoints: 5,
           },
           {
-            //fieldName: 'shamanisticRage',
+            fieldName: 'shamanisticRage',
             location: {
               rowIdx: 8,
               colIdx: 1,

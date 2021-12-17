@@ -6,7 +6,7 @@ import (
 	"github.com/wowsims/tbc/sim/common"
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/proto"
-	. "github.com/wowsims/tbc/sim/shaman"
+	"github.com/wowsims/tbc/sim/shaman"
 )
 
 func RegisterElementalShaman() {
@@ -18,7 +18,7 @@ func RegisterElementalShaman() {
 func NewElementalShaman(character core.Character, options proto.Player) *ElementalShaman {
 	eleShamOptions := options.GetElementalShaman()
 
-	selfBuffs := SelfBuffs{
+	selfBuffs := shaman.SelfBuffs{
 		Bloodlust:    eleShamOptions.Options.Bloodlust,
 		ManaSpring:   eleShamOptions.Options.ManaSpringTotem,
 		TotemOfWrath: eleShamOptions.Options.TotemOfWrath,
@@ -42,19 +42,19 @@ func NewElementalShaman(character core.Character, options proto.Player) *Element
 	}
 
 	return &ElementalShaman{
-		Shaman:   NewShaman(character, *eleShamOptions.Talents, selfBuffs),
+		Shaman:   shaman.NewShaman(character, *eleShamOptions.Talents, selfBuffs),
 		rotation: rotation,
 	}
 }
 
 type ElementalShaman struct {
-	Shaman
+	*shaman.Shaman
 
 	rotation Rotation
 }
 
-func (eleShaman *ElementalShaman) GetShaman() *Shaman {
-	return &eleShaman.Shaman
+func (eleShaman *ElementalShaman) GetShaman() *shaman.Shaman {
+	return eleShaman.Shaman
 }
 
 func (eleShaman *ElementalShaman) GetPresimOptions() *core.PresimOptions {
@@ -130,7 +130,7 @@ type CLOnCDRotation struct {
 }
 
 func (rotation *CLOnCDRotation) ChooseAction(eleShaman *ElementalShaman, sim *core.Simulation) AgentAction {
-	if eleShaman.IsOnCD(ChainLightningCooldownID, sim.CurrentTime) {
+	if eleShaman.IsOnCD(shaman.ChainLightningCooldownID, sim.CurrentTime) {
 		return eleShaman.NewLightningBolt(sim, sim.GetPrimaryTarget(), false)
 	} else {
 		return eleShaman.NewChainLightning(sim, sim.GetPrimaryTarget(), false)
@@ -159,7 +159,7 @@ func (rotation *FixedRotation) ChooseAction(eleShaman *ElementalShaman, sim *cor
 		return eleShaman.NewLightningBolt(sim, sim.GetPrimaryTarget(), false)
 	}
 
-	if !eleShaman.IsOnCD(ChainLightningCooldownID, sim.CurrentTime) {
+	if !eleShaman.IsOnCD(shaman.ChainLightningCooldownID, sim.CurrentTime) {
 		return eleShaman.NewChainLightning(sim, sim.GetPrimaryTarget(), false)
 	}
 
@@ -169,13 +169,13 @@ func (rotation *FixedRotation) ChooseAction(eleShaman *ElementalShaman, sim *cor
 		return eleShaman.NewLightningBolt(sim, sim.GetPrimaryTarget(), false)
 	}
 
-	return core.NewWaitAction(sim, eleShaman.GetCharacter(), eleShaman.GetRemainingCD(ChainLightningCooldownID, sim.CurrentTime))
+	return core.NewWaitAction(sim, eleShaman.GetCharacter(), eleShaman.GetRemainingCD(shaman.ChainLightningCooldownID, sim.CurrentTime))
 }
 
 func (rotation *FixedRotation) OnActionAccepted(eleShaman *ElementalShaman, sim *core.Simulation, action AgentAction) {
-	if action.GetActionID().SpellID == SpellIDLB12 {
+	if action.GetActionID().SpellID == shaman.SpellIDLB12 {
 		rotation.numLBsSinceLastCL++
-	} else if action.GetActionID().SpellID == SpellIDCL6 {
+	} else if action.GetActionID().SpellID == shaman.SpellIDCL6 {
 		rotation.numLBsSinceLastCL = 0
 	}
 }
@@ -201,7 +201,7 @@ type CLOnClearcastRotation struct {
 }
 
 func (rotation *CLOnClearcastRotation) ChooseAction(eleShaman *ElementalShaman, sim *core.Simulation) AgentAction {
-	if eleShaman.IsOnCD(ChainLightningCooldownID, sim.CurrentTime) || !rotation.prevPrevCastProccedCC {
+	if eleShaman.IsOnCD(shaman.ChainLightningCooldownID, sim.CurrentTime) || !rotation.prevPrevCastProccedCC {
 		return eleShaman.NewLightningBolt(sim, sim.GetPrimaryTarget(), false)
 	}
 
