@@ -163,10 +163,6 @@ func judgementOfWisdomAura() Aura {
 				character.AddStat(stats.Mana, mana)
 				// Scale down proc counts so we don't get a bad estimate due to lust/drums/etc.
 				character.judgementOfWisdomProcs += 1 * (character.InitialCastSpeed() / character.CastSpeed())
-
-				if sim.Log != nil {
-					character.Log(sim, "Gained 37 mana from Judgement Of Wisdom (74 @ 50%% proc).")
-				}
 			}
 		},
 	}
