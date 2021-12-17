@@ -117,6 +117,7 @@
 .dropdown-root {
 	position: relative;
 	display: inline-block;
+	white-space: nowrap;
 }
 
 .dropdown-button {
@@ -136,10 +137,11 @@
 }
 
 .dropdown-option {
-	display: block;
+	display: flex;
+	align-items: center;
 	cursor: pointer;
 }
 
-.dropdown-option:not(:hover) {
+*:not(.dropdown-button) > .dropdown-option:not(:hover) {
 	opacity: 0.7;
 }
