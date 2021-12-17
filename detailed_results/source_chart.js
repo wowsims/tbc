@@ -1,21 +1,31 @@
+import { Component } from '/tbc/core/components/component.js';
 import { sum } from '/tbc/core/utils.js';
-import { ResultComponent } from './result_component.js';
-export class SourceChart extends ResultComponent {
-    constructor(config) {
-        config.rootCssClass = 'source-chart-root';
-        super(config);
-    }
-    onSimResult(resultData) {
-        const chartBounds = this.rootElem.getBoundingClientRect();
-        this.rootElem.textContent = '';
+const sliceColors = [
+    '#05878a',
+    '#074e67',
+    '#5a175d',
+    '#67074e',
+    '#dd9933',
+    '#c9c1e7',
+    '#bdd5ef',
+    '#c7e3d0',
+    '#e7e6ce',
+    '#f2d8cc',
+    '#e9ccce',
+];
+export class SourceChart extends Component {
+    constructor(parentElem, allActionMetrics) {
         const chartCanvas = document.createElement("canvas");
-        chartCanvas.height = chartBounds.height;
-        chartCanvas.width = chartBounds.width;
-        const colors = ['red', 'blue', 'lawngreen'];
-        const actionMetrics = resultData.result.getActionMetrics(resultData.filter);
+        super(parentElem, 'source-chart-root', chartCanvas);
+        chartCanvas.style.height = '400px';
+        chartCanvas.style.width = '600px';
+        chartCanvas.height = 400;
+        chartCanvas.width = 600;
+        const actionMetrics = allActionMetrics.filter(actionMetric => actionMetric.damage > 0);
         const names = actionMetrics.map(am => am.name);
         const totalDmg = sum(actionMetrics.map(actionMetric => actionMetric.damage));
         const vals = actionMetrics.map(actionMetric => actionMetric.damage / totalDmg);
+        const bgColors = sliceColors.slice(0, actionMetrics.length);
         const ctx = chartCanvas.getContext('2d');
         const chart = new Chart(ctx, {
             type: 'pie',
@@ -23,7 +33,7 @@ export class SourceChart extends ResultComponent {
                 labels: names,
                 datasets: [{
                         data: vals,
-                        backgroundColor: colors,
+                        backgroundColor: bgColors,
                     }],
             },
             options: {
@@ -35,6 +45,5 @@ export class SourceChart extends ResultComponent {
                 },
             },
         });
-        this.rootElem.appendChild(chartCanvas);
     }
 }

@@ -328,15 +328,23 @@
 
 .selector-modal-tab-content-header {
   margin: 5px;
+  display: flex;
+  align-items: center;
 }
 
 .selector-modal-search {
   border: 1px inset black;
   border-radius: 4px;
+  margin: 5px;
+}
+
+.selector-modal-filter-bar-filler {
+  flex-grow: 1;
 }
 
 .selector-modal-phase-selector {
-  float: right;
+  font-size: 18px;
+  font-weight: 700;
 }
 
 .selector-modal-list {
@@ -758,6 +766,7 @@
 
 .results-sim-set-reference {
   cursor: pointer;
+  font-size: 24px;
 }
 
 .results-sim-reference-diff.positive {

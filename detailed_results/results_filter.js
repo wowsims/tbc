@@ -25,12 +25,16 @@ export class ResultsFilter extends ResultComponent {
     onSimResult(resultData) {
         this.playerFilter.setOptions(resultData.result);
     }
+    setPlayer(newPlayer) {
+        this.currentFilter.player = (newPlayer === null) ? ALL_PLAYERS : newPlayer;
+        this.playerFilter.changeEmitter.emit();
+    }
 }
 ;
 const allPlayersOption = {
     iconUrl: '',
     text: 'All Players',
-    color: '',
+    color: 'black',
     value: ALL_PLAYERS,
 };
 // Dropdown menu for filtering by player.
@@ -63,7 +67,7 @@ class PlayerFilter extends Input {
         this.currentOptions = [allPlayersOption].concat(simResult.getPlayers().map(player => {
             return {
                 iconUrl: player.iconUrl,
-                text: `${player.name} (#${player.raidIndex + 1})`,
+                text: player.label,
                 color: player.classColor,
                 value: player.raidIndex,
             };

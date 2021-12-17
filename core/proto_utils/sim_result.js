@@ -136,8 +136,14 @@ export class PlayerMetrics {
         this.iterations = iterations;
         this.duration = duration;
     }
+    get label() {
+        return `${this.name} (#${this.raidIndex + 1})`;
+    }
     get oomPercent() {
         return (this.metrics.numOom / this.iterations) * 100;
+    }
+    get totalDamage() {
+        return this.dps.avg * this.duration;
     }
     static async makeNew(iterations, duration, player, metrics, raidIndex) {
         const actionsPromise = Promise.all(metrics.actions.map(actionMetrics => ActionMetrics.makeNew(iterations, duration, actionMetrics)));

@@ -2,7 +2,8 @@ import { TypedEvent } from '/tbc/core/typed_event.js';
 import { SimResult } from '/tbc/core/proto_utils/sim_result.js';
 import { ResultsFilter } from './results_filter.js';
 import { CastMetrics } from './cast_metrics.js';
-import { SpellMetrics } from './cast_metrics.js';
+import { SpellMetrics } from './spell_metrics.js';
+import { PlayerDamageMetrics } from './player_damage.js';
 import { AuraMetrics } from './aura_metrics.js';
 import { DpsHistogram } from './dps_histogram.js';
 import { DpsResult } from './dps_result.js';
@@ -38,7 +39,11 @@ const layoutHTML = `
 		<div id="damageTab" class="tab-pane dr-tab-content damage-content fade active in">
 			<div class="dr-row topline-results">
 			</div>
-			<div class="dr-row">
+			<div class="dr-row all-players-only">
+				<div class="player-damage-metrics">
+				</div>
+			</div>
+			<div class="dr-row single-player-only">
 				<div class="spell-metrics">
 				</div>
 			</div>
@@ -78,6 +83,7 @@ const dpsResult = new DpsResult({ parent: toplineResultsDiv, resultsEmitter: res
 const percentOom = new PercentOom({ parent: toplineResultsDiv, resultsEmitter: resultsEmitter, colorSettings: colorSettings });
 const castMetrics = new CastMetrics({ parent: document.body.getElementsByClassName('cast-metrics')[0], resultsEmitter: resultsEmitter, colorSettings: colorSettings });
 const spellMetrics = new SpellMetrics({ parent: document.body.getElementsByClassName('spell-metrics')[0], resultsEmitter: resultsEmitter, colorSettings: colorSettings });
+const playerDamageMetrics = new PlayerDamageMetrics({ parent: document.body.getElementsByClassName('player-damage-metrics')[0], resultsEmitter: resultsEmitter, colorSettings: colorSettings }, resultsFilter);
 const buffAuraMetrics = new AuraMetrics({
     parent: document.body.getElementsByClassName('buff-aura-metrics')[0],
     resultsEmitter: resultsEmitter,
@@ -113,3 +119,14 @@ window.addEventListener('message', async (event) => {
     updateResults();
 });
 resultsFilter.changeEmitter.on(() => updateResults());
+const rootDiv = document.body.getElementsByClassName('dr-root')[0];
+resultsEmitter.on(resultData => {
+    if (resultData?.filter.player || resultData?.filter.player === 0) {
+        rootDiv.classList.remove('all-players');
+        rootDiv.classList.add('single-player');
+    }
+    else {
+        rootDiv.classList.add('all-players');
+        rootDiv.classList.remove('single-player');
+    }
+});

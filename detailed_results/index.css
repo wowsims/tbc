@@ -388,6 +388,42 @@
   font-weight: 700;
 }
 
+.player-damage-row {
+  cursor: pointer;
+}
+
+.amount-header-cell, .amount-cell {
+  text-align: center !important;
+}
+
+.amount-cell {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 35px;
+  width: 600px;
+  margin: auto;
+}
+
+.player-damage-percent {
+  display: inline-block;
+  margin: 0 10px;
+}
+
+.player-damage-bar-container {
+  display: inline-block;
+  flex-grow: 1;
+}
+
+.player-damage-bar {
+  height: 25px;
+}
+
+.player-damage-total {
+  display: inline-block;
+  margin: 0 10px;
+}
+
 .results-filter-root {
   display: flex;
   align-items: center;
@@ -416,12 +452,29 @@
 }
 
 .source-chart-root {
-  height: 30vh;
-  width: 30vh;
+  display: block;
+  height: 400px;
+  width: 600px;
 }
 
 body {
   background-color: var(--main-bg-color);
+}
+
+.all-players .single-player-only {
+  display: none;
+}
+
+.single-player .all-players-only {
+  display: none;
+}
+
+.individual-sim .single-player-only {
+  display: initial;
+}
+
+.individual-sim .all-players-only {
+  display: none;
 }
 
 .dr-root {
@@ -502,14 +555,22 @@ body {
   padding: 2px 1px;
 }
 
+.metrics-table-header-cell:first-child, .metrics-table-body td:first-child {
+  text-align: left;
+}
+
+.metrics-table-header-cell:not(:first-child), .metrics-table-body td:not(:first-child) {
+  text-align: right;
+}
+
 .metrics-action-icon {
   background-repeat: no-repeat;
   background-size: cover;
   position: relative;
   cursor: pointer;
   display: inline-block;
-  height: 5vh;
-  width: 5vh;
+  height: 30px;
+  width: 30px;
   vertical-align: middle;
 }
 

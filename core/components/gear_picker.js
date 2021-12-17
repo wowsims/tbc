@@ -242,6 +242,7 @@ class SelectorModal extends Component {
     <div class="selector-modal-tab-content-header">
       <button class="selector-modal-remove-button">Remove</button>
       <input class="selector-modal-search" type="text" placeholder="Search...">
+			<div class="selector-modal-filter-bar-filler"></div>
 			<div class="selector-modal-phase-selector"></div>
     </div>
     <ul class="selector-modal-list"></ul>
