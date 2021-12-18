@@ -25,6 +25,7 @@ export declare class Party {
     getBuffs(): PartyBuffs;
     setBuffs(newBuffs: PartyBuffs): void;
     toProto(): PartyProto;
+    fromProto(proto: PartyProto): void;
     toJson(): Object;
     fromJson(obj: any): void;
 }

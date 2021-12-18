@@ -27,6 +27,7 @@ export declare class Raid {
     setBuffs(newBuffs: RaidBuffs): void;
     setModifyRaidProto(newModFn: (raidProto: RaidProto) => void): void;
     toProto(): RaidProto;
+    fromProto(proto: RaidProto): void;
     toJson(): Object;
     fromJson(obj: any): void;
 }

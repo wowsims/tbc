@@ -1,3 +1,5 @@
+import { Encounter as EncounterProto } from '/tbc/core/proto/common.js';
+import { Raid as RaidProto } from '/tbc/core/proto/api.js';
 import { TypedEvent } from '/tbc/core/typed_event.js';
 export function addRaidSimAction(simUI) {
     simUI.addAction('DPS', 'dps-action', async () => {
@@ -28,6 +30,8 @@ export class RaidSimResultsManager {
         this.currentData = {
             simResult: simResult,
             settings: this.simUI.sim.toJson(),
+            raidProto: RaidProto.clone(simResult.request.raid || RaidProto.create()),
+            encounterProto: EncounterProto.clone(simResult.request.encounter || EncounterProto.create()),
         };
         this.currentChangeEmitter.emit();
         const dpsMetrics = simResult.raidMetrics.dps;
@@ -65,7 +69,8 @@ export class RaidSimResultsManager {
                 const tmpData = this.currentData;
                 this.currentData = this.referenceData;
                 this.referenceData = tmpData;
-                this.simUI.sim.fromJson(this.currentData.settings);
+                this.simUI.sim.raid.fromProto(this.currentData.raidProto);
+                this.simUI.sim.encounter.fromProto(this.currentData.encounterProto);
                 this.setSimResult(this.currentData.simResult);
                 this.updateReference();
             }
@@ -117,6 +122,8 @@ export class RaidSimResultsManager {
         return {
             simResult: this.currentData.simResult,
             settings: JSON.parse(JSON.stringify(this.currentData.settings)),
+            raidProto: this.currentData.raidProto,
+            encounterProto: this.currentData.encounterProto,
         };
     }
     getReferenceData() {
@@ -127,6 +134,8 @@ export class RaidSimResultsManager {
         return {
             simResult: this.referenceData.simResult,
             settings: JSON.parse(JSON.stringify(this.referenceData.settings)),
+            raidProto: this.referenceData.raidProto,
+            encounterProto: this.referenceData.encounterProto,
         };
     }
 }

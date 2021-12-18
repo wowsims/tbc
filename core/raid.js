@@ -75,6 +75,17 @@ export class Raid {
         this.modifyRaidProto(raidProto);
         return raidProto;
     }
+    fromProto(proto) {
+        this.setBuffs(proto.buffs || RaidBuffs.create());
+        for (let i = 0; i < MAX_NUM_PARTIES; i++) {
+            if (proto.parties[i]) {
+                this.parties[i].fromProto(proto.parties[i]);
+            }
+            else {
+                this.parties[i].clear();
+            }
+        }
+    }
     // Returns JSON representing all the current values.
     toJson() {
         return {

@@ -5,7 +5,7 @@ import { ComputeStatsResult } from '/tbc/core/proto/api.js';
 import { Player as PlayerProto } from '/tbc/core/proto/api.js';
 import { Gear } from '/tbc/core/proto_utils/gear.js';
 import { Stats } from '/tbc/core/proto_utils/stats.js';
-import { canEquipItem, getEligibleItemSlots, getMetaGemEffectEP, gemMatchesSocket, raceToFaction, specToClass, specToEligibleRaces, specTypeFunctions, withSpecProto, } from '/tbc/core/proto_utils/utils.js';
+import { canEquipItem, classColors, getEligibleItemSlots, getTalentTreeIcon, getMetaGemEffectEP, gemMatchesSocket, raceToFaction, specToClass, specToEligibleRaces, specTypeFunctions, withSpecProto, } from '/tbc/core/proto_utils/utils.js';
 import { TypedEvent } from './typed_event.js';
 import { MAX_PARTY_SIZE } from './party.js';
 import { sum } from './utils.js';
@@ -65,6 +65,9 @@ export class Player {
     }
     getClass() {
         return specToClass[this.spec];
+    }
+    getClassColor() {
+        return classColors[this.getClass()];
     }
     getParty() {
         return this.party;
@@ -238,6 +241,9 @@ export class Player {
             return;
         this.talentsString = newTalentsString;
         this.talentsStringChangeEmitter.emit();
+    }
+    getTalentTreeIcon() {
+        return getTalentTreeIcon(this.spec, this.getTalentsString());
     }
     getSpecOptions() {
         return this.specTypeFunctions.optionsCopy(this.specOptions);

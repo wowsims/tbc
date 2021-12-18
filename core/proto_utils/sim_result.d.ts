@@ -19,8 +19,8 @@ export interface SimResultFilter {
     target?: number | null;
 }
 export declare class SimResult {
-    private readonly request;
-    private readonly result;
+    readonly request: RaidSimRequest;
+    readonly result: RaidSimResult;
     readonly raidMetrics: RaidMetrics;
     readonly encounterMetrics: EncounterMetrics;
     private constructor();

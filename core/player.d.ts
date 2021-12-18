@@ -52,6 +52,7 @@ export declare class Player<SpecType extends Spec> {
     readonly changeEmitter: TypedEvent<void>;
     constructor(spec: Spec, sim: Sim);
     getClass(): Class;
+    getClassColor(): string;
     getParty(): Party | null;
     getRaid(): Raid | null;
     getPartyIndex(): number;
@@ -87,6 +88,7 @@ export declare class Player<SpecType extends Spec> {
     setTalents(newTalents: SpecTalents<SpecType>): void;
     getTalentsString(): string;
     setTalentsString(newTalentsString: string): void;
+    getTalentTreeIcon(): string;
     getSpecOptions(): SpecOptions<SpecType>;
     setSpecOptions(newSpecOptions: SpecOptions<SpecType>): void;
     computeGemEP(gem: Gem): number;
