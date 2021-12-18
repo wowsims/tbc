@@ -34,7 +34,7 @@ func (druid *Druid) newStarfireTemplate(sim *core.Simulation, rank int) core.Sim
 			DamageMultiplier:       1,
 			StaticDamageMultiplier: 1,
 		},
-		DirectInput: core.DirectDamageSpellInput{
+		DirectInput: core.DirectDamageInput{
 			MinBaseDamage:    550,
 			MaxBaseDamage:    647,
 			SpellCoefficient: 1.0,

@@ -89,7 +89,7 @@ func ApplyTimbals(agent core.Agent) {
 				DamageMultiplier:       1,
 				StaticDamageMultiplier: 1,
 			},
-			DirectInput: core.DirectDamageSpellInput{
+			DirectInput: core.DirectDamageInput{
 				MinBaseDamage: 285,
 				MaxBaseDamage: 475,
 			},

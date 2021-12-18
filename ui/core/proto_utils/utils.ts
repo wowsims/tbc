@@ -25,7 +25,7 @@ import { Stats } from './stats.js';
 import * as Gems from '/tbc/core/constants/gems.js';
 
 import { BalanceDruid, BalanceDruid_Rotation as BalanceDruidRotation, DruidTalents, BalanceDruid_Options as BalanceDruidOptions} from '/tbc/core/proto/druid.js';
-import { ElementalShaman, ElementalShaman_Rotation as ElementalShamanRotation, ShamanTalents, ElementalShaman_Options as ElementalShamanOptions } from '/tbc/core/proto/shaman.js';
+import { ElementalShaman, EnhancementShaman_Rotation as EnhancementShamanRotation, ElementalShaman_Rotation as ElementalShamanRotation, ShamanTalents, ElementalShaman_Options as ElementalShamanOptions, EnhancementShaman_Options as EnhancementShamanOptions, EnhancementShaman } from '/tbc/core/proto/shaman.js';
 import { Hunter, Hunter_Rotation as HunterRotation, HunterTalents, Hunter_Options as HunterOptions } from '/tbc/core/proto/hunter.js';
 import { Mage, Mage_Rotation as MageRotation, MageTalents, Mage_Options as MageOptions } from '/tbc/core/proto/mage.js';
 import { Rogue, Rogue_Rotation as RogueRotation, RogueTalents, Rogue_Options as RogueOptions } from '/tbc/core/proto/rogue.js';
@@ -40,13 +40,14 @@ export type MageSpecs = Spec.SpecMage;
 export type RogueSpecs = Spec.SpecRogue;
 export type PaladinSpecs = Spec.SpecRetributionPaladin;
 export type PriestSpecs = Spec.SpecShadowPriest;
-export type ShamanSpecs = Spec.SpecElementalShaman;
+export type ShamanSpecs = [Spec.SpecElementalShaman, Spec.SpecEnhancementShaman];
 export type WarlockSpecs = Spec.SpecWarlock;
 export type WarriorSpecs = Spec.SpecWarrior;
 
 export const specNames: Record<Spec, string> = {
   [Spec.SpecBalanceDruid]: 'Balance Druid',
   [Spec.SpecElementalShaman]: 'Elemental Shaman',
+  [Spec.SpecEnhancementShaman]: 'Enhancement Shaman',
   [Spec.SpecHunter]: 'Hunter',
   [Spec.SpecMage]: 'Mage',
   [Spec.SpecRogue]: 'Rogue',
@@ -72,6 +73,7 @@ export const classColors: Record<Class, string> = {
 export const specIconsLarge: Record<Spec, string> = {
   [Spec.SpecBalanceDruid]: 'https://wow.zamimg.com/images/wow/icons/large/spell_nature_starfall.jpg',
   [Spec.SpecElementalShaman]: 'https://wow.zamimg.com/images/wow/icons/large/spell_nature_lightning.jpg',
+  [Spec.SpecEnhancementShaman]: 'https://wow.zamimg.com/images/wow/icons/large/ability_shaman_stormstrike.jpg', // TODO: Fix enh icon?
   [Spec.SpecHunter]: 'https://wow.zamimg.com/images/wow/icons/large/ability_marksmanship.jpg',
   [Spec.SpecMage]: 'https://wow.zamimg.com/images/wow/icons/large/spell_holy_magicalsentry.jpg',
   [Spec.SpecRogue]: 'https://wow.zamimg.com/images/wow/icons/large/ability_rogue_eviscerate.jpg',
@@ -155,6 +157,7 @@ export function getTalentTreeIcon(spec: Spec, talentsString: string): string {
 export type RotationUnion =
 		BalanceDruidRotation |
 		ElementalShamanRotation |
+    EnhancementShamanRotation |
 		HunterRotation |
 		MageRotation |
 		RogueRotation |
@@ -165,6 +168,7 @@ export type RotationUnion =
 export type SpecRotation<T extends Spec> =
 		T extends Spec.SpecBalanceDruid ? BalanceDruidRotation :
 		T extends Spec.SpecElementalShaman ? ElementalShamanRotation :
+    T extends Spec.SpecEnhancementShaman ? EnhancementShamanRotation :
 		T extends Spec.SpecHunter ? HunterRotation :
 		T extends Spec.SpecMage ? MageRotation :
 		T extends Spec.SpecRogue ? RogueRotation :
@@ -187,6 +191,7 @@ export type TalentsUnion =
 export type SpecTalents<T extends Spec> =
 		T extends Spec.SpecBalanceDruid ? DruidTalents :
 		T extends Spec.SpecElementalShaman ? ShamanTalents :
+    T extends Spec.SpecEnhancementShaman ? ShamanTalents :
 		T extends Spec.SpecHunter ? HunterTalents :
 		T extends Spec.SpecMage ? MageTalents :
 		T extends Spec.SpecRogue ? RogueTalents :
@@ -199,6 +204,7 @@ export type SpecTalents<T extends Spec> =
 export type SpecOptionsUnion =
 		BalanceDruidOptions |
 		ElementalShamanOptions |
+    EnhancementShamanOptions |
 		HunterOptions |
 		MageOptions |
 		RogueOptions |
@@ -209,6 +215,7 @@ export type SpecOptionsUnion =
 export type SpecOptions<T extends Spec> =
 		T extends Spec.SpecBalanceDruid ? BalanceDruidOptions :
 		T extends Spec.SpecElementalShaman ? ElementalShamanOptions :
+    T extends Spec.SpecEnhancementShaman ? EnhancementShamanOptions :
 		T extends Spec.SpecHunter ? HunterOptions :
 		T extends Spec.SpecMage ? MageOptions :
 		T extends Spec.SpecRogue ? RogueOptions :
@@ -221,6 +228,7 @@ export type SpecOptions<T extends Spec> =
 export type SpecProtoUnion =
 		BalanceDruid |
 		ElementalShaman |
+    EnhancementShaman |
 		Hunter |
 		Mage |
 		Rogue |
@@ -231,6 +239,7 @@ export type SpecProtoUnion =
 export type SpecProto<T extends Spec> =
 		T extends Spec.SpecBalanceDruid ? BalanceDruid :
 		T extends Spec.SpecElementalShaman ? ElementalShaman :
+    T extends Spec.SpecEnhancementShaman ? EnhancementShaman :
 		T extends Spec.SpecHunter ? Hunter :
 		T extends Spec.SpecMage ? Mage :
 		T extends Spec.SpecRogue ? Rogue :
@@ -319,6 +328,34 @@ export const specTypeFunctions: Partial<Record<Spec, SpecTypeFunctions<any>>> = 
     optionsFromPlayer: (player) => player.spec.oneofKind == 'elementalShaman'
 				? player.spec.elementalShaman.options || ElementalShamanOptions.create()
 				: ElementalShamanOptions.create(),
+  },
+  [Spec.SpecEnhancementShaman]: {
+    rotationCreate: () => EnhancementShamanRotation.create(),
+    rotationEquals: (a, b) => EnhancementShamanRotation.equals(a as EnhancementShamanRotation, b as EnhancementShamanRotation),
+    rotationCopy: (a) => EnhancementShamanRotation.clone(a as EnhancementShamanRotation),
+    rotationToJson: (a) => EnhancementShamanRotation.toJson(a as EnhancementShamanRotation),
+    rotationFromJson: (obj) => EnhancementShamanRotation.fromJson(obj),
+    rotationFromPlayer: (player) => player.spec.oneofKind == 'enhancementShaman'
+				? player.spec.enhancementShaman.rotation || EnhancementShamanRotation.create()
+				: EnhancementShamanRotation.create(),
+
+    talentsCreate: () => ShamanTalents.create(),
+    talentsEquals: (a, b) => ShamanTalents.equals(a as ShamanTalents, b as ShamanTalents),
+    talentsCopy: (a) => ShamanTalents.clone(a as ShamanTalents),
+    talentsToJson: (a) => ShamanTalents.toJson(a as ShamanTalents),
+    talentsFromJson: (obj) => ShamanTalents.fromJson(obj),
+    talentsFromPlayer: (player) => player.spec.oneofKind == 'enhancementShaman'
+    ? player.spec.enhancementShaman.talents || ShamanTalents.create()
+    : ShamanTalents.create(),
+
+    optionsCreate: () => EnhancementShamanOptions.create(),
+    optionsEquals: (a, b) => EnhancementShamanOptions.equals(a as EnhancementShamanOptions, b as EnhancementShamanOptions),
+    optionsCopy: (a) => EnhancementShamanOptions.clone(a as EnhancementShamanOptions),
+    optionsToJson: (a) => EnhancementShamanOptions.toJson(a as EnhancementShamanOptions),
+    optionsFromJson: (obj) => EnhancementShamanOptions.fromJson(obj),
+    optionsFromPlayer: (player) => player.spec.oneofKind == 'enhancementShaman'
+				? player.spec.enhancementShaman.options || EnhancementShamanOptions.create()
+				: EnhancementShamanOptions.create(),
   },
   [Spec.SpecHunter]: {
     rotationCreate: () => HunterRotation.create(),
@@ -542,6 +579,7 @@ export const raceToFaction: Record<Race, Faction> = {
 export const specToClass: Record<Spec, Class> = {
   [Spec.SpecBalanceDruid]: Class.ClassDruid,
   [Spec.SpecElementalShaman]: Class.ClassShaman,
+  [Spec.SpecEnhancementShaman]: Class.ClassShaman,
   [Spec.SpecHunter]: Class.ClassHunter,
   [Spec.SpecMage]: Class.ClassMage,
   [Spec.SpecRogue]: Class.ClassRogue,
@@ -633,6 +671,7 @@ const warriorRaces = [
 export const specToEligibleRaces: Record<Spec, Array<Race>> = {
   [Spec.SpecBalanceDruid]: druidRaces,
   [Spec.SpecElementalShaman]: shamanRaces,
+  [Spec.SpecEnhancementShaman]: shamanRaces,
   [Spec.SpecHunter]: hunterRaces,
   [Spec.SpecMage]: mageRaces,
   [Spec.SpecRetributionPaladin]: paladinRaces,
@@ -645,6 +684,7 @@ export const specToEligibleRaces: Record<Spec, Array<Race>> = {
 export const specToEligibleItemCategories: Record<Spec, Array<ItemCategory>> = {
   [Spec.SpecBalanceDruid]: [ItemCategory.ItemCategoryCaster],
   [Spec.SpecElementalShaman]: [ItemCategory.ItemCategoryCaster],
+  [Spec.SpecEnhancementShaman]: [ItemCategory.ItemCategoryMelee],
   [Spec.SpecHunter]: [ItemCategory.ItemCategoryMelee],
   [Spec.SpecMage]: [ItemCategory.ItemCategoryCaster],
   [Spec.SpecRetributionPaladin]: [ItemCategory.ItemCategoryMelee, ItemCategory.ItemCategoryHybrid],
@@ -667,6 +707,7 @@ const dualWieldSpecs: Array<Spec> = [
 export const specToLocalStorageKey: Record<Spec, string> = {
   [Spec.SpecBalanceDruid]: '__balance_druid',
   [Spec.SpecElementalShaman]: '__elemental_shaman',
+  [Spec.SpecEnhancementShaman]: '__enhacement_shaman',
   [Spec.SpecHunter]: '__hunter',
   [Spec.SpecMage]: '__mage',
   [Spec.SpecRetributionPaladin]: '__retribution_paladin',
@@ -698,6 +739,16 @@ export function withSpecProto<SpecType extends Spec>(
     copy.spec = {
       oneofKind: 'elementalShaman',
       elementalShaman: ElementalShaman.create({
+        rotation: rotation,
+        talents: talents as ShamanTalents,
+        options: specOptions as ElementalShamanOptions,
+      }),
+    };
+  } else if (EnhancementShamanRotation.is(rotation)) {
+		copy.class = Class.ClassShaman;
+    copy.spec = {
+      oneofKind: 'enhancementShaman',
+      enhancementShaman: EnhancementShaman.create({
         rotation: rotation,
         talents: talents as ShamanTalents,
         options: specOptions as ElementalShamanOptions,

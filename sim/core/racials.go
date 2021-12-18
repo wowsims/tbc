@@ -88,6 +88,7 @@ func applyRaceEffects(agent Agent) {
 		if character.Race == proto.Race_RaceTroll30 {
 			hasteBonus = 1.3
 		}
+		inverseBonus := 1 / hasteBonus
 		const dur = time.Second * 10
 		const cd = time.Minute * 3
 
@@ -99,12 +100,14 @@ func applyRaceEffects(agent Agent) {
 					character.SetCD(TrollBerserkingCooldownID, cd+sim.CurrentTime)
 					// Increase cast speed multiplier
 					character.PseudoStats.CastSpeedMultiplier *= hasteBonus
+					character.MultiplyMeleeSpeed(sim, hasteBonus)
 					character.AddAura(sim, Aura{
 						ID:      TrollBerserkingAuraID,
 						Name:    "Troll Berserking",
 						Expires: sim.CurrentTime + dur,
 						OnExpire: func(sim *Simulation) {
 							character.PseudoStats.CastSpeedMultiplier /= hasteBonus
+							character.MultiplyMeleeSpeed(sim, inverseBonus)
 						},
 					})
 					character.Metrics.AddInstantCast(ActionID{SpellID: 20554})

@@ -32,7 +32,7 @@ func (priest *Priest) newSWDTemplate(sim *core.Simulation) core.SimpleSpellTempl
 			DamageMultiplier:       1,
 			StaticDamageMultiplier: 1,
 		},
-		DirectInput: core.DirectDamageSpellInput{
+		DirectInput: core.DirectDamageInput{
 			MinBaseDamage:    572,
 			MaxBaseDamage:    664,
 			SpellCoefficient: 0.429,

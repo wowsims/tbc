@@ -102,7 +102,7 @@ func TestSparseRaid(t *testing.T) {
 		SimOptions: SimOptions,
 	}
 
-	RaidSimTest("Sparse", t, rsr, 1203.4)
+	RaidSimTest("Sparse", t, rsr, 1201.5)
 }
 
 func TestBasicRaid(t *testing.T) {

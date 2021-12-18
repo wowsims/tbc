@@ -6,6 +6,7 @@ option go_package = "./proto";
 enum Spec {
     SpecBalanceDruid = 0;
     SpecElementalShaman = 1;
+    SpecEnhancementShaman = 9;
     SpecHunter = 8;
     SpecMage = 2;
     SpecRetributionPaladin = 3;
@@ -232,6 +233,8 @@ message PartyBuffs {
     TristateEffect mana_spring_totem = 12;
     int32 totem_of_wrath = 13;
     TristateEffect wrath_of_air_totem = 14;
+    TristateEffect grace_of_air_totem = 15;
+    TristateEffect strength_of_earth_totem = 16;
 }
 
 // Buffs are only used by individual sims, never the raid sim.
@@ -319,6 +322,7 @@ enum MobType {
 
 message Target {
 		int32 armor = 1;
+        int32 level = 4;
 		MobType mob_type = 3;
 		Debuffs debuffs = 2;
 }

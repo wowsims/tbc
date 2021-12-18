@@ -80,21 +80,21 @@ func NewShadowPriest(character core.Character, options proto.Player) *ShadowPrie
 				Name: "Shadow Weaver",
 				OnPeriodicDamage: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect, tickDamage *float64) {
 					if *tickDamage > 0 && spriest.VTSpell.DotInput.IsTicking(sim) {
-						s := stats.Stats{stats.Mana: *tickDamage * 0.05}
+						amount := *tickDamage * 0.05
 						if sim.Log != nil {
-							spriest.Log(sim, "VT Regenerated %0f mana.", s[stats.Mana])
+							spriest.Log(sim, "VT Regenerated %0f mana.", amount)
 						}
-						spriest.Party.AddStats(s)
+						spriest.Party.AddStat(stats.Mana, amount)
 					}
 				},
 				OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 					addShadowWeaving(sim, spellEffect)
 					if spellEffect.Damage > 0 && spriest.VTSpell.DotInput.IsTicking(sim) {
-						s := stats.Stats{stats.Mana: spellEffect.Damage * 0.05}
+						amount := spellEffect.Damage * 0.05
 						if sim.Log != nil {
-							spriest.Log(sim, "VT Regenerated %0.1f mana.", s[stats.Mana])
+							spriest.Log(sim, "VT Regenerated %0.1f mana.", amount)
 						}
-						spriest.Party.AddStats(s)
+						spriest.Party.AddStat(stats.Mana, amount)
 					}
 
 					if spellCast.ActionID.SpellID == priest.SpellIDSWP || spellCast.ActionID.SpellID == priest.SpellIDVT || spellCast.ActionID.SpellID == priest.SpellIDMF {

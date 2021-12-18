@@ -61,6 +61,7 @@ func runServer(useFS bool, host string, launchBrowser bool, simName string, wasm
 		if strings.HasSuffix(req.URL.Path, "/tbc/") {
 			resp.Write([]byte(`
 				<html><body><a href="/tbc/elemental_shaman">Elemental Shaman Sim</a"><br>
+				<html><body><a href="/tbc/enhancement_shaman">Enhancement Shaman Sim</a"><br>
 				<a href="/tbc/balance_druid">Balance Druid Sim</a"><br>
 				<a href="/tbc/shadow_priest">Shadow Priest Sim</a"></body></html>
 		    `))

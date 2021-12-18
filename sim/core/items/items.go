@@ -63,13 +63,17 @@ func init() {
 }
 
 type Item struct {
-	ID               int32
-	WowheadID        int32
-	Type             proto.ItemType
-	ArmorType        proto.ArmorType
+	ID        int32
+	WowheadID int32
+	Type      proto.ItemType
+	ArmorType proto.ArmorType
+	// Weapon Stats
 	WeaponType       proto.WeaponType
 	HandType         proto.HandType
 	RangedWeaponType proto.RangedWeaponType
+	WeaponDamageMin  float64
+	WeaponDamageMax  float64
+	SwingSpeed       float64
 
 	// Used by the UI to filter which items are shown.
 	Categories     []proto.ItemCategory
@@ -243,6 +247,12 @@ func NewEquipmentSet(equipSpec EquipmentSpec) Equipment {
 				equipment[ItemSlotOffHand] = Item{} // clear offhand
 			} else if item.HandType == proto.HandType_HandTypeOffHand && equipment[ItemSlotMainHand].HandType != proto.HandType_HandTypeTwoHand {
 				equipment[ItemSlotOffHand] = item
+			} else if item.HandType == proto.HandType_HandTypeOneHand {
+				if equipment[ItemSlotMainHand].ID == 0 {
+					equipment[ItemSlotMainHand] = item
+				} else if equipment[ItemSlotOffHand].ID == 0 {
+					equipment[ItemSlotOffHand] = item
+				}
 			}
 		} else {
 			equipment[ItemTypeToSlot(item.Type)] = item

@@ -96,6 +96,12 @@ func applyBuffEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs proto.P
 		stats.SpellPower: GetTristateValueFloat(partyBuffs.WrathOfAirTotem, 101.0, 121.0),
 	})
 	character.AddStats(stats.Stats{
+		stats.Agility: GetTristateValueFloat(partyBuffs.GraceOfAirTotem, 77.0, 88.55),
+	})
+	character.AddStats(stats.Stats{
+		stats.Strength: GetTristateValueFloat(partyBuffs.StrengthOfEarthTotem, 86.0, 98.9),
+	})
+	character.AddStats(stats.Stats{
 		stats.MP5: GetTristateValueFloat(partyBuffs.ManaSpringTotem, 50, 62.5),
 	})
 
@@ -133,6 +139,8 @@ func registerBloodlustCD(agent Agent, numBloodlusts int32) {
 
 	const dur = time.Second * 40
 
+	bonus := 1.3
+	inverseBonus := 1 / 1.3
 	agent.GetCharacter().AddMajorCooldown(MajorCooldown{
 		CooldownID: BloodlustCooldownID,
 		Cooldown:   dur, // assumes that multiple BLs are different shaman.
@@ -146,6 +154,7 @@ func registerBloodlustCD(agent Agent, numBloodlusts int32) {
 					character.SetCD(BloodlustCooldownID, sim.CurrentTime+dur)
 					for _, agent := range character.Party.Players {
 						agent.GetCharacter().PseudoStats.CastSpeedMultiplier *= 1.3
+						agent.GetCharacter().MultiplyMeleeSpeed(sim, bonus)
 					}
 					character.Party.AddAura(sim, Aura{
 						ID:      BloodlustAuraID,
@@ -155,6 +164,7 @@ func registerBloodlustCD(agent Agent, numBloodlusts int32) {
 						OnExpire: func(sim *Simulation) {
 							for _, agent := range character.Party.Players {
 								agent.GetCharacter().PseudoStats.CastSpeedMultiplier /= 1.3
+								agent.GetCharacter().MultiplyMeleeSpeed(sim, inverseBonus)
 							}
 						},
 					})

@@ -14,6 +14,7 @@ const (
 	TotemOfStorms            = 23199
 	TotemOfThePulsingEarth   = 29389
 	TotemOfTheVoid           = 28248
+	TotemOfImpact            = 27947
 )
 
 const (
@@ -80,7 +81,7 @@ func (shaman *Shaman) newElectricSpellEffect(minBaseDamage float64, maxBaseDamag
 			DamageMultiplier:       1,
 			StaticDamageMultiplier: 1,
 		},
-		DirectInput: core.DirectDamageSpellInput{
+		DirectInput: core.DirectDamageInput{
 			MinBaseDamage:    minBaseDamage,
 			MaxBaseDamage:    maxBaseDamage,
 			SpellCoefficient: spellCoefficient,

@@ -7,11 +7,17 @@ import (
 const GCDMin = time.Second * 1
 const GCDDefault = time.Millisecond * 1500
 
-const HasteRatingPerHastePercent = 15.76
+const HasteRatingPerHastePercent = 15.77
+
 const MeleeCritRatingPerCritChance = 22.08
-const MeleeHitRatingPerHitChance = 15.8
+const MeleeHitRatingPerHitChance = 15.77
+const MeleeAttackRatingPerDamage = 14
+
+const ExpertisePerPercentReduction = 15.77
+const ArmorPenPerPercentArmor = 5.92
+
 const SpellCritRatingPerCritChance = 22.08
-const SpellHitRatingPerHitChance = 12.6
+const SpellHitRatingPerHitChance = 12.62
 
 // IDs for items used in core
 const (

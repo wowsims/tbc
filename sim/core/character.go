@@ -69,6 +69,10 @@ type Character struct {
 	// By definition there can be only 1 hardcast spell being cast at any moment.
 	Hardcast Hardcast
 
+	// AutoAttacks is the manager for auto attack swings.
+	// Must be enabled to use "EnableAutoAttacks()"
+	AutoAttacks AutoAttacks
+
 	// Total amount of remaining additional mana expected for the current sim iteration,
 	// beyond this Character's mana pool. This should include mana potions / runes /
 	// innervates / etc.
@@ -90,6 +94,7 @@ func NewCharacter(party *Party, partyIndex int, player proto.Player) Character {
 		Class: player.Class,
 		Equip: items.ProtoToEquipment(*player.Equipment),
 		PseudoStats: stats.PseudoStats{
+			AttackSpeedMultiplier: 1,
 			CastSpeedMultiplier:   1,
 			SpiritRegenMultiplier: 1,
 		},
@@ -165,8 +170,27 @@ func (character *Character) AddStats(stat stats.Stats) {
 	character.stats = character.stats.Add(stat)
 }
 func (character *Character) AddStat(stat stats.Stat, amount float64) {
+	if stat == stats.MeleeHaste {
+		panic("use AddMeleeHaste")
+	}
 	character.stats[stat] += amount
 }
+
+func (character *Character) AddMeleeHaste(sim *Simulation, amount float64) {
+	if amount > 0 {
+		character.AutoAttacks.ModifySwingTime(sim, 1+(amount/HasteRatingPerHastePercent*100))
+	} else {
+		character.AutoAttacks.ModifySwingTime(sim, 1/(1+(amount/HasteRatingPerHastePercent*100)))
+	}
+	character.stats[stats.MeleeHaste] += amount
+}
+
+// MultiplyMeleeSpeed will alter the attack speed multiplier and change swing speed of all autoattack swings in progress.
+func (character *Character) MultiplyMeleeSpeed(sim *Simulation, amount float64) {
+	character.PseudoStats.AttackSpeedMultiplier *= amount
+	character.AutoAttacks.ModifySwingTime(sim, amount)
+}
+
 func (character *Character) GetInitialStat(stat stats.Stat) float64 {
 	return character.initialStats[stat]
 }
@@ -206,6 +230,10 @@ func (character *Character) InitialCastSpeed() float64 {
 
 func (character *Character) CastSpeed() float64 {
 	return character.PseudoStats.CastSpeedMultiplier * (1 + (character.stats[stats.SpellHaste] / (HasteRatingPerHastePercent * 100)))
+}
+
+func (character *Character) SwingSpeed() float64 {
+	return character.PseudoStats.AttackSpeedMultiplier * (1 + (character.stats[stats.MeleeHaste] / (HasteRatingPerHastePercent * 100)))
 }
 
 func (character *Character) AddRaidBuffs(raidBuffs *proto.RaidBuffs) {
@@ -423,6 +451,10 @@ func (character *Character) GetMetricsProto(numIterations int32) *proto.PlayerMe
 	metrics := character.Metrics.ToProto(numIterations)
 	metrics.Auras = character.auraTracker.GetMetricsProto(numIterations)
 	return metrics
+}
+
+func (character *Character) EnableAutoAttacks() {
+	character.AutoAttacks = NewAutoAttacks(character)
 }
 
 type BaseStatsKey struct {

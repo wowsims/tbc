@@ -73,7 +73,7 @@ func newLightningCapacitorCastTemplate(sim *core.Simulation, character *core.Cha
 				DamageMultiplier:       1,
 				StaticDamageMultiplier: 1,
 			},
-			DirectInput: core.DirectDamageSpellInput{
+			DirectInput: core.DirectDamageInput{
 				MinBaseDamage: 694,
 				MaxBaseDamage: 807,
 			},

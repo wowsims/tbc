@@ -121,7 +121,7 @@ func TestSimulatePreRaidNoBuffs(t *testing.T) {
 		},
 
 		ExpectedDpsShort: 994.9,
-		ExpectedDpsLong:  364.5,
+		ExpectedDpsLong:  418.5,
 	})
 }
 

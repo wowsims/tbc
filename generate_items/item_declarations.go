@@ -14,9 +14,12 @@ type ItemDeclaration struct {
 }
 
 const CasterCategory = proto.ItemCategory_ItemCategoryCaster
+const MeleeCategory = proto.ItemCategory_ItemCategoryMelee
 
 // Keep these sorted alphabetically by item Name.
 var ItemDeclarations = []ItemDeclaration{
+	{ /** Gladiators Cleaver */ ID: 28308, Categories: []proto.ItemCategory{MeleeCategory}},
+
 	{ /** A'dal's Gift */ ID: 31461, Categories: []proto.ItemCategory{CasterCategory}},
 	{ /** Adornment of Stolen Souls */ ID: 28762, Categories: []proto.ItemCategory{CasterCategory}},
 	{ /** Amani Punisher */ ID: 33283, Categories: []proto.ItemCategory{CasterCategory}},
