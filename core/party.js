@@ -61,6 +61,10 @@ export class Party {
             oldPlayer.setParty(null);
         }
         if (newPlayer != null) {
+            const newPlayerOldParty = newPlayer.getParty();
+            if (newPlayerOldParty) {
+                newPlayerOldParty.setPlayer(newPlayer.getPartyIndex(), null);
+            }
             newPlayer.changeEmitter.on(this.playerChangeListener);
             newPlayer.setParty(this);
         }
