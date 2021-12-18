@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
+	"github.com/wowsims/tbc/sim/core/proto"
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
@@ -55,4 +56,8 @@ func (druid *Druid) NewInsectSwarm(sim *core.Simulation, target *core.Target) *c
 	sf.Init(sim)
 
 	return sf
+}
+
+func (druid *Druid) ShouldCastInsectSwarm(sim *core.Simulation, target *core.Target, rotation proto.BalanceDruid_Rotation) bool {
+	return rotation.InsectSwarm && !druid.InsectSwarmSpell.DotInput.IsTicking(sim)
 }

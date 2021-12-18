@@ -5,13 +5,17 @@ import (
 )
 
 func (priest *Priest) ApplyMisery(sim *core.Simulation, target *core.Target) {
-	if priest.Talents.Misery == 5 {
-		target.ReplaceAura(sim, core.MiseryAura(sim))
+	if priest.Talents.Misery >= target.NumStacks(core.MiseryDebuffID) {
+		target.ReplaceAura(sim, core.MiseryAura(sim, priest.Talents.Misery))
 	}
 }
 
 func (priest *Priest) ApplyShadowWeaving(sim *core.Simulation, target *core.Target) {
-	if sim.RandomFloat("Shadow Weaving") > 0.2*float64(priest.Talents.ShadowWeaving) {
+	if priest.Talents.ShadowWeaving == 0 {
+		return
+	}
+
+	if priest.Talents.ShadowWeaving < 5 && sim.RandomFloat("Shadow Weaving") > 0.2*float64(priest.Talents.ShadowWeaving) {
 		return
 	}
 

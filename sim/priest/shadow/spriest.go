@@ -223,11 +223,9 @@ func (spriest *ShadowPriest) Act(sim *core.Simulation) time.Duration {
 	// fmt.Printf("\tCasting: %s, %0.2f\n", spell.Name, spell.CastTime.Seconds())
 	if !actionSuccessful {
 		regenTime := spriest.TimeUntilManaRegen(spell.GetManaCost())
-		if sim.Log != nil {
-			spriest.Log(sim, "<spriest> Not enough mana, regenerating for %s.", regenTime)
-		}
-		spriest.Character.Metrics.MarkOOM(sim, &spriest.Character, regenTime)
-		return sim.CurrentTime + regenTime
+		waitAction := core.NewWaitAction(sim, spriest.GetCharacter(), regenTime, core.WaitReasonOOM)
+		waitAction.Cast(sim)
+		return sim.CurrentTime + waitAction.GetDuration()
 	}
 	if wait != 0 {
 		return sim.CurrentTime + core.MaxDuration(spriest.GetRemainingCD(core.GCDCooldownID, sim.CurrentTime), wait)

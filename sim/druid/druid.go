@@ -31,6 +31,9 @@ type Druid struct {
 	InsectSwarmSpell        core.SimpleSpell
 	insectSwarmCastTemplate core.SimpleSpellTemplate
 
+	FaerieFireSpell        core.SimpleSpell
+	faerieFireCastTemplate core.SimpleSpellTemplate
+
 	malorne4p bool // cached since we need to check on every innervate
 
 	// Used for accounting for bonus mana expected from future innervates.
@@ -74,6 +77,7 @@ func (druid *Druid) Init(sim *core.Simulation) {
 	druid.moonfireCastTemplate = druid.newMoonfireTemplate(sim)
 	druid.wrathCastTemplate = druid.newWrathTemplate(sim)
 	druid.insectSwarmCastTemplate = druid.newInsectSwarmTemplate(sim)
+	druid.faerieFireCastTemplate = druid.newFaerieFireTemplate(sim)
 
 	if druid.SelfBuffs.Innervate {
 		druid.ExpectedManaPerInnervate = druid.SpiritManaRegenPerSecond() * 5 * 20
@@ -84,6 +88,7 @@ func (druid *Druid) Reset(sim *core.Simulation) {
 	// Cleanup and pending dots and casts
 	druid.MoonfireSpell = core.SimpleSpell{}
 	druid.InsectSwarmSpell = core.SimpleSpell{}
+	druid.FaerieFireSpell = core.SimpleSpell{}
 	druid.starfireSpell = core.SimpleSpell{}
 	druid.wrathSpell = core.SimpleSpell{}
 	druid.RebirthUsed = false

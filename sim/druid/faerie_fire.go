@@ -4,17 +4,13 @@ import (
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
+	"github.com/wowsims/tbc/sim/core/proto"
 )
 
 var FaerieFireDebuffID = core.NewDebuffID()
 
-// Returns the time to wait before the next action, or 0 if faerie fire is already active.
-func (druid *Druid) TryFaerieFire(sim *core.Simulation, target *core.Target) time.Duration {
-	if target.HasAura(FaerieFireDebuffID) {
-		return 0
-	}
-
-	cast := &core.SimpleSpell{
+func (druid *Druid) newFaerieFireTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
+	return core.NewSimpleSpellTemplate(core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
 				Name:         "Faerie Fire",
@@ -26,10 +22,8 @@ func (druid *Druid) TryFaerieFire(sim *core.Simulation, target *core.Target) tim
 		},
 		SpellHitEffect: core.SpellHitEffect{
 			SpellEffect: core.SpellEffect{
-				Target: target,
-
 				OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-					target.AddAura(sim, core.Aura{
+					spellEffect.Target.AddAura(sim, core.Aura{
 						ID:      FaerieFireDebuffID,
 						SpellID: 26993,
 						Name:    "Faerie Fire",
@@ -39,14 +33,21 @@ func (druid *Druid) TryFaerieFire(sim *core.Simulation, target *core.Target) tim
 				},
 			},
 		},
-	}
-	cast.Init(sim)
+	})
+}
 
-	success := cast.Cast(sim)
-	if !success {
-		regenTime := druid.TimeUntilManaRegen(cast.GetManaCost())
-		druid.Character.Metrics.MarkOOM(sim, &druid.Character, regenTime)
-		return sim.CurrentTime + regenTime
-	}
-	return sim.CurrentTime + druid.GetRemainingCD(core.GCDCooldownID, sim.CurrentTime)
+func (druid *Druid) NewFaerieFire(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
+	// Initialize cast from precomputed template.
+	ff := &druid.FaerieFireSpell
+	druid.faerieFireCastTemplate.Apply(ff)
+
+	// Set dynamic fields, i.e. the stuff we couldn't precompute.
+	ff.Target = target
+	ff.Init(sim)
+
+	return ff
+}
+
+func (druid *Druid) ShouldCastFaerieFire(sim *core.Simulation, target *core.Target, rotation proto.BalanceDruid_Rotation) bool {
+	return rotation.FaerieFire && !target.HasAura(FaerieFireDebuffID)
 }

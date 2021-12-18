@@ -1,6 +1,7 @@
 package balance
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/wowsims/tbc/sim/common"
@@ -20,18 +21,15 @@ func NewBalanceDruid(character core.Character, options proto.Player) *BalanceDru
 
 	selfBuffs := druid.SelfBuffs{}
 	if balanceOptions.Options.InnervateTarget != nil {
-		// if targetting myself for individual sim
-		// TODO: what is my player idx for raid?
-		selfBuffs.Innervate = balanceOptions.Options.InnervateTarget.TargetIndex == 0
+		selfBuffs.Innervate = balanceOptions.Options.InnervateTarget.TargetIndex == int32(character.RaidIndex)
 	}
 
 	druid := druid.New(character, selfBuffs, *balanceOptions.Talents)
 	moonkin := &BalanceDruid{
 		Druid:           druid,
 		primaryRotation: *balanceOptions.Rotation,
+		useBattleRes:    balanceOptions.Options.BattleRes,
 	}
-
-	moonkin.useBattleRes = balanceOptions.Options.BattleRes
 
 	return moonkin
 }
@@ -69,10 +67,9 @@ func (moonkin *BalanceDruid) GetPresimOptions() *core.PresimOptions {
 			*player.Spec.(*proto.Player_BalanceDruid).BalanceDruid.Rotation = rotations[rotationIdx]
 		},
 
-		OnPresimResult: func(presimResult proto.PlayerMetrics, iterations int32) bool {
-			// if more than 5 seconds per iteration were spent OOM then we probably need a lighter rotation.
-			//  TODO: We could make this a percent of total time instead of seconds but we would need a way to know the length of the sim.
-			if float64(presimResult.SecondsOomAvg) >= 5 {
+		OnPresimResult: func(presimResult proto.PlayerMetrics, iterations int32, duration time.Duration) bool {
+			fmt.Printf("Avg: %0.02f, cutoff: %0.02f\n", presimResult.SecondsOomAvg, 0.03*duration.Seconds())
+			if float64(presimResult.SecondsOomAvg) >= 0.03*duration.Seconds() {
 				moonkin.primaryRotation = rotations[rotationIdx]
 
 				// If the highest dps rotation is fine, we dont need any adaptive logic.
@@ -141,18 +138,13 @@ func (moonkin *BalanceDruid) actRotation(sim *core.Simulation, rotation proto.Ba
 
 	target := sim.GetPrimaryTarget()
 
-	if rotation.FaerieFire {
-		ffWait := moonkin.TryFaerieFire(sim, target)
-		if ffWait != 0 {
-			return ffWait
-		}
-	}
-
 	var spell *core.SimpleSpell
 
-	if rotation.InsectSwarm && !moonkin.InsectSwarmSpell.DotInput.IsTicking(sim) {
+	if moonkin.ShouldCastFaerieFire(sim, target, rotation) {
+		spell = moonkin.NewFaerieFire(sim, target)
+	} else if moonkin.ShouldCastInsectSwarm(sim, target, rotation) {
 		spell = moonkin.NewInsectSwarm(sim, target)
-	} else if rotation.Moonfire && !moonkin.MoonfireSpell.DotInput.IsTicking(sim) {
+	} else if moonkin.ShouldCastMoonfire(sim, target, rotation) {
 		spell = moonkin.NewMoonfire(sim, target)
 	} else {
 		switch rotation.PrimarySpell {
@@ -169,11 +161,9 @@ func (moonkin *BalanceDruid) actRotation(sim *core.Simulation, rotation proto.Ba
 
 	if !actionSuccessful {
 		regenTime := moonkin.TimeUntilManaRegen(spell.GetManaCost())
-		moonkin.Character.Metrics.MarkOOM(sim, &moonkin.Character, regenTime)
-		if sim.Log != nil {
-			moonkin.Log(sim, "Not enough mana to cast %s, regenerating for %s.", spell.Name, regenTime)
-		}
-		return sim.CurrentTime + regenTime
+		waitAction := core.NewWaitAction(sim, moonkin.GetCharacter(), regenTime, core.WaitReasonOOM)
+		waitAction.Cast(sim)
+		return sim.CurrentTime + waitAction.GetDuration()
 	}
 
 	return sim.CurrentTime + core.MaxDuration(

@@ -1,6 +1,7 @@
 package core
 
 import (
+	"fmt"
 	"math"
 	"time"
 
@@ -159,8 +160,9 @@ func (characterMetrics *CharacterMetrics) AddSpellCast(spellCast *SpellCast) {
 	characterMetrics.actions[actionKey] = actionMetrics
 }
 
-func (characterMetrics *CharacterMetrics) MarkOOM(sim *Simulation, character *Character, seconds time.Duration) {
-	characterMetrics.CharacterIterationMetrics.OOMTime += seconds
+func (characterMetrics *CharacterMetrics) MarkOOM(sim *Simulation, character *Character, dur time.Duration) {
+	fmt.Printf("Marking OOM\n")
+	characterMetrics.CharacterIterationMetrics.OOMTime += dur
 }
 
 // This should be called when a Sim iteration is complete.

@@ -9,6 +9,15 @@ import (
 	"github.com/wowsims/tbc/sim/core/proto"
 )
 
+type WaitReason byte
+
+const (
+	WaitReasonNone     WaitReason = iota // unknown why we waited
+	WaitReasonOOM                        // no mana to cast
+	WaitReasonRotation                   // waiting on rotation
+	WaitReasonOptimal                    // waiting because its more optimal than casting.
+)
+
 type WaitAction struct {
 	character *Character
 
@@ -43,26 +52,30 @@ func (action WaitAction) GetManaCost() float64 {
 }
 
 func (action WaitAction) Cast(sim *Simulation) bool {
-	if sim.Log != nil {
-		action.character.Log(sim, "Doing nothing for %0.1f seconds.", action.GetDuration())
+	switch action.reason {
+	case WaitReasonNone:
+		if sim.Log != nil {
+			action.character.Log(sim, "Idling for %s seconds, for no particular reason.", action.GetDuration())
+		}
+	case WaitReasonOOM:
+		action.character.Metrics.MarkOOM(sim, action.character, action.GetDuration())
+		if sim.Log != nil {
+			action.character.Log(sim, "Not enough mana to cast, regenerating for %s.", action.GetDuration())
+		}
+	case WaitReasonRotation:
+		if sim.Log != nil {
+			action.character.Log(sim, "Waiting for %s due to rotation / CDs.", action.GetDuration())
+		}
+	case WaitReasonOptimal:
+		if sim.Log != nil {
+			action.character.Log(sim, "Waiting for %s because its more dps.", action.GetDuration())
+		}
 	}
-	//sim.MetricsAggregator.AddAction(action)
+
 	return true
 }
 
-type WaitReason byte
-
-const (
-	WaitReasonNone     WaitReason = iota // unknown why we waited
-	WaitReasonOOM                        // no mana to cast
-	WaitReasonRotation                   // waiting on rotation
-	WaitReasonOptimal                    // waiting because its more optimal than casting.
-)
-
 func NewWaitAction(sim *Simulation, character *Character, duration time.Duration, reason WaitReason) WaitAction {
-	if reason == WaitReasonOOM {
-		character.Metrics.MarkOOM(sim, character, duration)
-	}
 	return WaitAction{
 		character: character,
 		duration:  duration,

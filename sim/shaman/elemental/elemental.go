@@ -1,6 +1,7 @@
 package elemental
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/wowsims/tbc/sim/common"
@@ -84,8 +85,9 @@ func (eleShaman *ElementalShaman) Act(sim *core.Simulation) time.Duration {
 		// Wait until we have enough mana to cast.
 		regenTime := eleShaman.TimeUntilManaRegen(newAction.GetManaCost())
 		newAction = core.NewWaitAction(sim, eleShaman.GetCharacter(), regenTime, core.WaitReasonOOM)
+		newAction.Cast(sim)
 		eleShaman.rotation.OnActionAccepted(eleShaman, sim, newAction)
-		return sim.CurrentTime + regenTime
+		return sim.CurrentTime + newAction.GetDuration()
 	}
 }
 
@@ -261,10 +263,9 @@ func (rotation *AdaptiveRotation) GetPresimOptions() *core.PresimOptions {
 			player.Spec.(*proto.Player_ElementalShaman).ElementalShaman.Rotation.Type = proto.ElementalShaman_Rotation_CLOnClearcast
 		},
 
-		OnPresimResult: func(presimResult proto.PlayerMetrics, iterations int32) bool {
-			// if more than 5 seconds per iteration were spent OOM then we probably need a lighter rotation.
-			//  TODO: We could make this a percent of total time instead of seconds but we would need a way to know the length of the sim.
-			if float64(presimResult.SecondsOomAvg) >= 5 {
+		OnPresimResult: func(presimResult proto.PlayerMetrics, iterations int32, duration time.Duration) bool {
+			fmt.Printf("Avg: %0.02f, cutoff: %0.02f\n", presimResult.SecondsOomAvg, 0.03*duration.Seconds())
+			if float64(presimResult.SecondsOomAvg) >= 0.03*duration.Seconds() {
 				rotation.baseRotation = NewLBOnlyRotation()
 				rotation.surplusRotation = NewCLOnClearcastRotation()
 			} else {

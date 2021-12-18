@@ -275,6 +275,10 @@ export class EncounterMetrics {
 
 		return new EncounterMetrics(encounter, metrics, targets);
 	}
+
+	get durationSeconds() {
+		return this.encounter.duration;
+	}
 }
 
 export class TargetMetrics {
