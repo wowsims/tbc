@@ -232,8 +232,8 @@ export class PlayerMetrics {
 		return `${this.name} (#${this.raidIndex + 1})`;
 	}
 
-	get oomPercent() {
-		return (this.metrics.numOom / this.iterations) * 100;
+	get secondsOomAvg() {
+		return this.metrics.secondsOomAvg
 	}
 
 	get totalDamage() {

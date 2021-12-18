@@ -13,6 +13,7 @@ type WaitAction struct {
 	character *Character
 
 	duration time.Duration
+	reason   WaitReason
 }
 
 func (action WaitAction) GetActionID() ActionID {
@@ -49,9 +50,22 @@ func (action WaitAction) Cast(sim *Simulation) bool {
 	return true
 }
 
-func NewWaitAction(sim *Simulation, character *Character, duration time.Duration) WaitAction {
+type WaitReason byte
+
+const (
+	WaitReasonNone     WaitReason = iota // unknown why we waited
+	WaitReasonOOM                        // no mana to cast
+	WaitReasonRotation                   // waiting on rotation
+	WaitReasonOptimal                    // waiting because its more optimal than casting.
+)
+
+func NewWaitAction(sim *Simulation, character *Character, duration time.Duration, reason WaitReason) WaitAction {
+	if reason == WaitReasonOOM {
+		character.Metrics.MarkOOM(sim, character, duration)
+	}
 	return WaitAction{
 		character: character,
 		duration:  duration,
+		reason:    reason,
 	}
 }

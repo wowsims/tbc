@@ -45,6 +45,7 @@ func (druid *Druid) TryFaerieFire(sim *core.Simulation, target *core.Target) tim
 	success := cast.Cast(sim)
 	if !success {
 		regenTime := druid.TimeUntilManaRegen(cast.GetManaCost())
+		druid.Character.Metrics.MarkOOM(sim, &druid.Character, regenTime)
 		return sim.CurrentTime + regenTime
 	}
 	return sim.CurrentTime + druid.GetRemainingCD(core.GCDCooldownID, sim.CurrentTime)

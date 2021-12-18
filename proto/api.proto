@@ -60,7 +60,6 @@ message SimOptions {
     int32 iterations = 1;
     int64 random_seed = 2;
     bool debug = 3; // Enables debug logging.
-    bool exit_on_oom = 4;
 		bool is_test = 5; // Only used internally.
 }
 
@@ -122,12 +121,10 @@ message DpsMetrics {
 message PlayerMetrics {
 		DpsMetrics dps = 1;
 
-    int32 num_oom = 2;
-    double oom_at_avg = 3;
-    double dps_at_oom_avg = 4;
+    // average seconds spent oom per iteration
+    double seconds_oom_avg = 3; 
 
     repeated ActionMetrics actions = 5;
-
 		repeated AuraMetrics auras = 6;
 }
 
