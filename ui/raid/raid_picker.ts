@@ -248,6 +248,13 @@ export class PlayerPicker extends Component {
 		this.partyPicker = partyPicker;
 		this.raidPicker = partyPicker.raidPicker;
 
+		this.partyPicker.party.compChangeEmitter.on(() => {
+			const newPlayer = this.partyPicker.party.getPlayer(this.index);
+			if (newPlayer != this.player) {
+				this.setPlayer(newPlayer);
+			}
+		});
+
 		this.rootElem.innerHTML = `
 			<div class="player-label">
 				<img class="player-icon"></img>
@@ -510,11 +517,12 @@ export class PlayerPicker extends Component {
 		} else {
 			this.rootElem.classList.remove('empty');
 			this.rootElem.classList.remove('buff-bot');
-			this.rootElem.style.backgroundColor = classColors[specToClass[this.player.spec]];
+			this.rootElem.style.backgroundColor = this.player.getClassColor();
 			this.labelElem.setAttribute('draggable', 'true');
 			this.resultsElem.setAttribute('draggable', 'true');
 			this.nameElem.textContent = this.player.getName();
 			this.nameElem.setAttribute('contenteditable', '');
+			this.iconElem.src = this.player.getTalentTreeIcon();
 		}
 	}
 }

@@ -36,8 +36,8 @@ export interface SimResultFilter {
 // Holds all the data from a simulation call, and provides helper functions
 // for parsing it.
 export class SimResult {
-	private readonly request: RaidSimRequest;
-	private readonly result: RaidSimResult;
+	readonly request: RaidSimRequest;
+	readonly result: RaidSimResult;
 
 	readonly raidMetrics: RaidMetrics;
 	readonly encounterMetrics: EncounterMetrics;
