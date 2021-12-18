@@ -4,13 +4,14 @@ import { repoName } from '/tbc/core/resources.js';
 import { SimUI } from '/tbc/core/sim_ui.js';
 
 import { Component } from './component.js';
+import { RaidSimResultsManager } from './raid_sim_action.js';
 
 export class DetailedResults extends Component {
 	private readonly iframeElem: HTMLIFrameElement;
 	private tabWindow: Window | null;
 	private latestResult: SimResult | null;
 
-  constructor(parent: HTMLElement, simUI: SimUI) {
+  constructor(parent: HTMLElement, simUI: SimUI, simResultsManager: RaidSimResultsManager) {
     super(parent, 'detailed-results-manager-root');
 		this.tabWindow = null;
 		this.latestResult = null;
@@ -47,8 +48,11 @@ export class DetailedResults extends Component {
 			}
 		});
 
-		simUI.sim.simResultEmitter.on(simResult => {
-			this.setSimResult(simResult);
+		simResultsManager.currentChangeEmitter.on(() => {
+			const cur = simResultsManager.getCurrentData();
+			if (cur) {
+				this.setSimResult(cur.simResult);
+			}
 		});
 	}
 

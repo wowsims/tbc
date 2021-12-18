@@ -170,6 +170,10 @@ export class PartyPicker extends Component {
 		this.rootElem.innerHTML = `
 			<div class="party-header">
 				<span>Group ${index + 1}</span>
+				<div class="party-results">
+					<span class="party-results-dps"></span>
+					<span class="party-results-reference-delta"></span>
+				</div>
 			</div>
 			<div class="players-container">
 			</div>
@@ -177,6 +181,42 @@ export class PartyPicker extends Component {
 
     const playersContainer = this.rootElem.getElementsByClassName('players-container')[0] as HTMLDivElement;
 		this.playerPickers = [...Array(MAX_PARTY_SIZE).keys()].map(i => new PlayerPicker(playersContainer, this, i));
+
+		const dpsResultElem = this.rootElem.getElementsByClassName('party-results-dps')[0] as HTMLElement;
+		const referenceDeltaElem = this.rootElem.getElementsByClassName('party-results-reference-delta')[0] as HTMLElement;
+
+		this.raidPicker.raidSimUI.referenceChangeEmitter.on(() => {
+			const currentData = this.raidPicker.raidSimUI.getCurrentData();
+			const referenceData = this.raidPicker.raidSimUI.getReferenceData();
+
+			const partyDps = currentData?.simResult.raidMetrics.parties[this.index].dps.avg || 0;
+			const referenceDps = referenceData?.simResult.raidMetrics.parties[this.index].dps.avg || 0;
+
+			if (partyDps == 0 && referenceDps == 0) {
+				dpsResultElem.textContent = '';
+				referenceDeltaElem.textContent = '';
+				return;
+			}
+
+			dpsResultElem.textContent = partyDps.toFixed(1);
+
+			if (!referenceData) {
+				referenceDeltaElem.textContent = '';
+				return;
+			}
+
+			const delta = partyDps - referenceDps;
+			const deltaStr = delta.toFixed(1);
+			if (delta >= 0) {
+				referenceDeltaElem.textContent = '+' + deltaStr;
+				referenceDeltaElem.classList.remove('negative');
+				referenceDeltaElem.classList.add('positive');
+			} else {
+				referenceDeltaElem.textContent = '' + deltaStr;
+				referenceDeltaElem.classList.remove('positive');
+				referenceDeltaElem.classList.add('negative');
+			}
+		});
 	}
 }
 
@@ -195,6 +235,7 @@ export class PlayerPicker extends Component {
 	private readonly labelElem: HTMLElement;
 	private readonly iconElem: HTMLImageElement;
 	private readonly nameElem: HTMLSpanElement;
+	private readonly resultsElem: HTMLElement;
 	private readonly dpsResultElem: HTMLElement;
 	private readonly referenceDeltaElem: HTMLElement;
 
@@ -211,20 +252,21 @@ export class PlayerPicker extends Component {
 				<img class="player-icon"></img>
 				<span class="player-name" contenteditable></span>
 			</div>
+			<div class="player-results">
+				<span class="player-results-dps"></span>
+				<span class="player-results-reference-delta"></span>
+			</div>
 			<div class="player-options">
 				<span class="player-edit fa fa-edit"></span>
 				<span class="player-copy fa fa-copy" draggable="true"></span>
 				<span class="player-delete fa fa-times"></span>
-			</div>
-			<div class="player-results">
-				<span class="player-results-dps"></span>
-				<span class="player-results-reference-delta"></span>
 			</div>
 		`;
 
 		this.labelElem = this.rootElem.getElementsByClassName('player-label')[0] as HTMLElement;
 		this.iconElem = this.rootElem.getElementsByClassName('player-icon')[0] as HTMLImageElement;
 		this.nameElem = this.rootElem.getElementsByClassName('player-name')[0] as HTMLSpanElement;
+		this.resultsElem = this.rootElem.getElementsByClassName('player-results')[0] as HTMLElement;
 		this.dpsResultElem = this.rootElem.getElementsByClassName('player-results-dps')[0] as HTMLElement;
 		this.referenceDeltaElem = this.rootElem.getElementsByClassName('player-results-reference-delta')[0] as HTMLElement;
 
@@ -296,6 +338,9 @@ export class PlayerPicker extends Component {
 		};
 
 		this.labelElem.ondragstart = event => {
+			dragStart(event, DragType.Swap);
+		};
+		this.resultsElem.ondragstart = event => {
 			dragStart(event, DragType.Swap);
 		};
 
@@ -450,6 +495,7 @@ export class PlayerPicker extends Component {
 			this.rootElem.classList.remove('buff-bot');
 			this.rootElem.style.backgroundColor = 'black';
 			this.labelElem.setAttribute('draggable', 'false');
+			this.resultsElem.setAttribute('draggable', 'false');
 			this.nameElem.textContent = '';
 			this.nameElem.removeAttribute('contenteditable');
 		} else if ('buffBotId' in this.player) {
@@ -457,6 +503,7 @@ export class PlayerPicker extends Component {
 			this.rootElem.classList.add('buff-bot');
 			this.rootElem.style.backgroundColor = classColors[specToClass[this.player.spec]];
 			this.labelElem.setAttribute('draggable', 'true');
+			this.resultsElem.setAttribute('draggable', 'true');
 			this.nameElem.textContent = this.player.name;
 			this.nameElem.removeAttribute('contenteditable');
 		} else {
@@ -464,6 +511,7 @@ export class PlayerPicker extends Component {
 			this.rootElem.classList.remove('buff-bot');
 			this.rootElem.style.backgroundColor = classColors[specToClass[this.player.spec]];
 			this.labelElem.setAttribute('draggable', 'true');
+			this.resultsElem.setAttribute('draggable', 'true');
 			this.nameElem.textContent = this.player.getName();
 			this.nameElem.setAttribute('contenteditable', '');
 		}

@@ -18,6 +18,7 @@
 }
 
 .party-header {
+	height: 20px;
 }
 
 .player-picker-root {
@@ -77,10 +78,11 @@
 	vertical-align: top;
 	display: inline-flex;
 	align-items: center;
+	float: right;
 }
 
 .player-options span {
-	margin: 2px;
+	margin: 4px;
 	cursor: pointer;
 	text-shadow:
 		0 0 3px var(--main-secondary-color),
@@ -105,6 +107,30 @@
 
 .player-delete {
 	color: red;
+}
+
+.party-results, .player-results {
+	height: 100%;
+	vertical-align: top;
+	display: inline-flex;
+	align-items: center;
+	float: right;
+
+	font-size: 16px;
+	text-shadow:
+		0 0 3px var(--main-secondary-color),
+		0 0 3px var(--main-secondary-color),
+		0 0 3px var(--main-secondary-color);
+}
+
+.player-results[draggable="true"] {
+	cursor: pointer;
+}
+
+.party-results-dps, .party-results-reference-delta, .player-results-dps, .player-results-reference-delta {
+	width: 60px;
+	text-align: right;
+	margin: 5px;
 }
 
 .buff-bot .player-edit {
@@ -179,31 +205,4 @@
 .player-editor-modal .player-editor {
 	height: 100%;
 	width: 100%;
-}
-
-.player-results {
-	height: 100%;
-	vertical-align: top;
-	display: inline-flex;
-	align-items: center;
-	float: right;
-
-	font-size: 16px;
-	text-shadow:
-		0 0 3px var(--main-secondary-color),
-		0 0 3px var(--main-secondary-color),
-		0 0 3px var(--main-secondary-color);
-}
-
-.player-results-dps, .player-results-reference-delta {
-	width: 60px;
-	text-align: right;
-	margin: 5px;
-}
-
-.player-results-reference-delta.positive {
-	color: lawngreen;
-}
-.player-results-reference-delta.negative {
-	color: red;
 }
