@@ -162,11 +162,6 @@ export class Player<SpecType extends Spec> {
 
 	// This should only ever be called from party.
 	setParty(newParty: Party | null) {
-		if (this.party == newParty) {
-			return;
-		}
-
-		const oldParty = this.party;
 		if (newParty == null) {
 			this.party = null;
 			this.raid = null;

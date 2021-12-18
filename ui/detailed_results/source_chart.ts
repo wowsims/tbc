@@ -5,11 +5,11 @@ import { sum } from '/tbc/core/utils.js';
 declare var Chart: any;
 
 const sliceColors: Array<string> = [
-	'#05878a',
-	'#074e67',
-	'#5a175d',
-	'#67074e',
 	'#dd9933',
+	'#67074e',
+	'#5a175d',
+	'#074e67',
+	'#05878a',
 	'#c9c1e7',
 	'#bdd5ef',
 	'#c7e3d0',
@@ -28,7 +28,9 @@ export class SourceChart extends Component {
 		chartCanvas.height = 400;
 		chartCanvas.width = 600;
 
-		const actionMetrics = allActionMetrics.filter(actionMetric => actionMetric.damage > 0);
+		const actionMetrics = allActionMetrics
+				.filter(actionMetric => actionMetric.damage > 0)
+				.sort((a, b) => b.damage - a.damage);
 		const names = actionMetrics.map(am => am.name);
 		const totalDmg = sum(actionMetrics.map(actionMetric => actionMetric.damage));
 		const vals = actionMetrics.map(actionMetric => actionMetric.damage / totalDmg);

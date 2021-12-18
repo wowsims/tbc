@@ -50,18 +50,14 @@ func (priest *Priest) GetCharacter() *core.Character {
 }
 
 func (priest *Priest) AddRaidBuffs(raidBuffs *proto.RaidBuffs) {
-	if !priest.Talents.DivineSpirit {
-		return
+	if priest.Talents.DivineSpirit {
+		ds := proto.TristateEffect_TristateEffectRegular
+		if priest.Talents.ImprovedDivineSpirit == 2 {
+			// TODO: handle a larger variety of IDS values.
+			ds = proto.TristateEffect_TristateEffectImproved
+		}
+		raidBuffs.DivineSpirit = core.MaxTristate(raidBuffs.DivineSpirit, ds)
 	}
-
-	ds := proto.TristateEffect_TristateEffectRegular
-
-	if priest.Talents.ImprovedDivineSpirit == 2 {
-		// TODO: handle a larger variety of IDS values.
-		ds = proto.TristateEffect_TristateEffectImproved
-	}
-
-	raidBuffs.DivineSpirit = core.MaxTristate(raidBuffs.DivineSpirit, ds)
 }
 
 func (priest *Priest) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {
@@ -173,8 +169,6 @@ func ApplyInnerFocus(sim *core.Simulation, priest *Priest) bool {
 
 func init() {
 
-	// TODO: str/agi/stm are just the base priest stats, not modified for each race yet. Not sure it matters...
-
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceHuman, Class: proto.Class_ClassPriest}] = stats.Stats{
 		stats.Strength:  39,
 		stats.Agility:   45,
@@ -246,59 +240,3 @@ func init() {
 type Agent interface {
 	GetPriest() *Priest
 }
-
-// class Priest(talents: Map<String, Talent>, spec: Spec) : Class(talents, spec) {
-//     override val baseStats: Stats = Stats(
-//         agility = 184,
-//         intellect = 180,
-//         strength = 146,
-//         stamina = 154,
-//         spirit = 135
-//     )
-// class Dwarf : Race() {
-//     override var baseStats: Stats = Stats(
-//         strength = 5,
-//         agility = -4,
-//         stamina = 1,
-//         intellect = -1,
-//         spirit = -1
-//     )
-// class Draenei : Race() {
-//     override var baseStats: Stats = Stats(
-//         strength = 1,
-//         agility = -3,
-//         spirit = 2
-//     )
-// class NightElf : Race() {
-//     override var baseStats: Stats = Stats(
-//         strength = -4,
-//         agility = 4,
-//         stamina = 0,
-//         intellect = 0,
-//         spirit = 0
-//     )
-// class Troll : Race() {
-//     override var baseStats: Stats = Stats(
-//         strength = 1,
-//         agility = 2,
-//         intellect = -4,
-//         spirit = 1
-//     )
-// class Undead : Race() {
-//     override var baseStats: Stats = Stats(
-//         strength = -1,
-//         agility = -2,
-//         stamina = 0,
-//         intellect = -2,
-//         spirit = 5
-//     )
-// class BloodElf : Race() {
-//     override var baseStats: Stats = Stats(
-//         strength = -3,
-//         agility = 2,
-//         stamina = 0,
-//         intellect = 3,
-//         spirit = -2
-//     )
-// // https://worldofwarcraft.fandom.com/et/wiki/Spell_critical_strike
-//     override val baseSpellCritChance: Double = 1.24
