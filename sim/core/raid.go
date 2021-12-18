@@ -84,6 +84,24 @@ func (party *Party) GetMetrics(numIterations int32) *proto.PartyMetrics {
 
 	return metrics
 }
+func (party *Party) GetStats() *proto.PartyStats {
+	partyStats := &proto.PartyStats{}
+
+	playerIdx := 0
+	i := 0
+	for playerIdx < len(party.Players) {
+		player := party.Players[playerIdx]
+		if player.GetCharacter().PartyIndex == i {
+			partyStats.Players = append(partyStats.Players, player.GetCharacter().GetStatsProto())
+			playerIdx++
+		} else {
+			partyStats.Players = append(partyStats.Players, &proto.PlayerStats{})
+		}
+		i++
+	}
+
+	return partyStats
+}
 
 type Raid struct {
 	Parties []*Party
@@ -198,6 +216,14 @@ func (raid *Raid) GetMetrics(numIterations int32) *proto.RaidMetrics {
 		metrics.Parties = append(metrics.Parties, party.GetMetrics(numIterations))
 	}
 	return metrics
+}
+
+func (raid *Raid) GetStats() *proto.RaidStats {
+	raidStats := &proto.RaidStats{}
+	for _, party := range raid.Parties {
+		raidStats.Parties = append(raidStats.Parties, party.GetStats())
+	}
+	return raidStats
 }
 
 func SinglePlayerRaidProto(player *proto.Player, partyBuffs *proto.PartyBuffs, raidBuffs *proto.RaidBuffs) *proto.Raid {

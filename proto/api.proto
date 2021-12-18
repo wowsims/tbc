@@ -197,14 +197,22 @@ message GearListResult {
 
 // RPC ComputeStats
 message ComputeStatsRequest {
-    Player player = 1;
-    RaidBuffs raid_buffs = 2;
-    PartyBuffs party_buffs = 3;
+    Raid raid = 1;
+}
+message PlayerStats {
+    repeated double gear_only = 1;
+    repeated double final_stats = 2;
+    repeated string sets = 3;
+		IndividualBuffs buffs = 4;
+}
+message PartyStats {
+    repeated PlayerStats players = 1;
+}
+message RaidStats {
+    repeated PartyStats parties = 1;
 }
 message ComputeStatsResult {
-    repeated double gear_only = 1;
-    repeated double finalStats = 2;
-    repeated string sets = 3;
+		RaidStats raid_stats = 1;
 }
 
 // RPC StatWeights

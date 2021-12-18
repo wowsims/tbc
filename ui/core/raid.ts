@@ -1,5 +1,6 @@
 import { Class } from '/tbc/core/proto/common.js';
 import { Raid as RaidProto } from '/tbc/core/proto/api.js';
+import { RaidStats as RaidStatsProto } from '/tbc/core/proto/api.js';
 import { RaidBuffs } from '/tbc/core/proto/common.js';
 import { Spec } from '/tbc/core/proto/common.js';
 

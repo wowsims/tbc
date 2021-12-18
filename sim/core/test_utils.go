@@ -63,13 +63,11 @@ func NewIndividualSimRequest(inputs IndividualSimInputs) *proto.IndividualSimReq
 
 func CharacterStatsTest(label string, t *testing.T, isr *proto.IndividualSimRequest, expectedStats stats.Stats) {
 	csr := &proto.ComputeStatsRequest{
-		Player:     isr.Player,
-		RaidBuffs:  isr.RaidBuffs,
-		PartyBuffs: isr.PartyBuffs,
+		Raid: SinglePlayerRaidProto(isr.Player, isr.PartyBuffs, isr.RaidBuffs),
 	}
 
 	result := ComputeStats(csr)
-	finalStats := stats.FromFloatArray(result.FinalStats)
+	finalStats := stats.FromFloatArray(result.RaidStats.Parties[0].Players[0].FinalStats)
 
 	const tolerance = 0.5
 	if !finalStats.EqualsWithTolerance(expectedStats, tolerance) {

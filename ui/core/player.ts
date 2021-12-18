@@ -14,7 +14,7 @@ import { Item } from '/tbc/core/proto/common.js';
 import { Race } from '/tbc/core/proto/common.js';
 import { Spec } from '/tbc/core/proto/common.js';
 import { Stat } from '/tbc/core/proto/common.js';
-import { ComputeStatsResult } from '/tbc/core/proto/api.js';
+import { PlayerStats } from '/tbc/core/proto/api.js';
 import { Player as PlayerProto } from '/tbc/core/proto/api.js';
 import { StatWeightsResult } from '/tbc/core/proto/api.js';
 
@@ -73,7 +73,7 @@ export class Player<SpecType extends Spec> {
   readonly specTypeFunctions: SpecTypeFunctions<SpecType>;
 
 	private epWeights: Stats = new Stats();
-	private currentStats: ComputeStatsResult;
+	private currentStats: PlayerStats = PlayerStats.create();
 
   readonly nameChangeEmitter = new TypedEvent<void>();
   readonly buffsChangeEmitter = new TypedEvent<void>();
@@ -116,14 +116,6 @@ export class Player<SpecType extends Spec> {
       this.talentsStringChangeEmitter,
       this.specOptionsChangeEmitter,
     ].forEach(emitter => emitter.on(() => this.changeEmitter.emit()));
-
-		this.currentStats = ComputeStatsResult.create();
-		this.sim.changeEmitter.on(() => {
-			this.updateCharacterStats();
-		});
-		this.changeEmitter.on(() => {
-			this.updateCharacterStats();
-		});
   }
 
 	getClass(): Class {
@@ -208,18 +200,13 @@ export class Player<SpecType extends Spec> {
 		return result;
 	}
 
-	// This should be invoked internally whenever stats might have changed.
-	private async updateCharacterStats() {
-		// Sometimes a ui change triggers other changes, so waiting a bit makes sure
-		// we get all of them.
-		await wait(10);
-
-		this.currentStats = await this.sim.getCharacterStats(this);
-		this.currentStatsEmitter.emit();
+	getCurrentStats(): PlayerStats {
+		return PlayerStats.clone(this.currentStats);
 	}
 
-	getCurrentStats(): ComputeStatsResult {
-		return ComputeStatsResult.clone(this.currentStats);
+	setCurrentStats(newStats: PlayerStats) {
+		this.currentStats = newStats;
+		this.currentStatsEmitter.emit();
 	}
   
   getName(): string {
