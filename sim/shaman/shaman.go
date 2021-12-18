@@ -110,6 +110,7 @@ func NewShaman(character core.Character, talents proto.ShamanTalents, selfBuffs 
 		shaman.AddStat(stats.MP5, 50)
 	}
 
+	shaman.registerBloodlustCD()
 	shaman.registerElementalMasteryCD()
 	shaman.registerNaturesSwiftnessCD()
 
@@ -188,10 +189,6 @@ func (shaman *Shaman) GetCharacter() *core.Character {
 func (shaman *Shaman) AddRaidBuffs(raidBuffs *proto.RaidBuffs) {
 }
 func (shaman *Shaman) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {
-	if shaman.SelfBuffs.Bloodlust {
-		partyBuffs.Bloodlust += 1
-	}
-
 	if shaman.Talents.TotemOfWrath && shaman.SelfBuffs.TotemOfWrath {
 		partyBuffs.TotemOfWrath += 1
 	}
@@ -283,6 +280,35 @@ func (shaman *Shaman) Advance(sim *core.Simulation, elapsedTime time.Duration) {
 	shaman.Character.RegenMana(sim, elapsedTime)
 }
 
+var BloodlustCooldownID = core.NewCooldownID()
+
+func (shaman *Shaman) registerBloodlustCD() {
+	if !shaman.SelfBuffs.Bloodlust {
+		return
+	}
+
+	shaman.AddMajorCooldown(core.MajorCooldown{
+		CooldownID: BloodlustCooldownID,
+		Cooldown:   core.BloodlustCD,
+		Priority:   core.CooldownPriorityBloodlust,
+		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
+			return func(sim *core.Simulation, character *core.Character) bool {
+				if character.HasAura(core.BloodlustAuraID) {
+					return false
+				}
+
+				for _, partyMember := range character.Party.Players {
+					core.AddBloodlustAura(sim, partyMember.GetCharacter())
+				}
+				character.SetCD(BloodlustCooldownID, sim.CurrentTime+core.BloodlustCD)
+				character.Metrics.AddInstantCast(core.ActionID{SpellID: 2825})
+
+				return true
+			}
+		},
+	})
+}
+
 var ElementalMasteryAuraID = core.NewAuraID()
 var ElementalMasteryCooldownID = core.NewCooldownID()
 
@@ -296,6 +322,9 @@ func (shaman *Shaman) registerElementalMasteryCD() {
 		Cooldown:   time.Minute * 3,
 		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
 			return func(sim *core.Simulation, character *core.Character) bool {
+				if sim.Log != nil {
+					character.Log(sim, "Try activate EM")
+				}
 				character.Metrics.AddInstantCast(core.ActionID{SpellID: 16166})
 
 				character.AddAura(sim, core.Aura{

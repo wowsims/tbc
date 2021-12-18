@@ -129,6 +129,13 @@ type PendingAction struct {
 // Run runs the simulation for the configured number of iterations, and
 // collects all the metrics together.
 func (sim *Simulation) run() *proto.RaidSimResult {
+	logsBuffer := &strings.Builder{}
+	if sim.Options.Debug {
+		sim.Log = func(message string, vals ...interface{}) {
+			logsBuffer.WriteString(fmt.Sprintf("[%0.1f] "+message+"\n", append([]interface{}{sim.CurrentTime.Seconds()}, vals...)...))
+		}
+	}
+
 	for _, party := range sim.Raid.Parties {
 		for _, player := range party.Players {
 			player.Init(sim)
@@ -143,13 +150,6 @@ func (sim *Simulation) run() *proto.RaidSimResult {
 	for _, target := range sim.encounter.Targets {
 		target.auraTracker.logFn = func(message string, vals ...interface{}) {
 			target.Log(sim, message, vals)
-		}
-	}
-
-	logsBuffer := &strings.Builder{}
-	if sim.Options.Debug {
-		sim.Log = func(message string, vals ...interface{}) {
-			logsBuffer.WriteString(fmt.Sprintf("[%0.1f] "+message+"\n", append([]interface{}{sim.CurrentTime.Seconds()}, vals...)...))
 		}
 	}
 
