@@ -188,10 +188,8 @@ func AddBloodlustAura(sim *Simulation, character *Character) {
 		Name:    "Bloodlust",
 		Expires: sim.CurrentTime + BloodlustDuration,
 		OnExpire: func(sim *Simulation) {
-			for _, agent := range character.Party.Players {
-				agent.GetCharacter().PseudoStats.CastSpeedMultiplier *= inverseBonus
-				agent.GetCharacter().MultiplyMeleeSpeed(sim, inverseBonus)
-			}
+			character.PseudoStats.CastSpeedMultiplier *= inverseBonus
+			character.MultiplyMeleeSpeed(sim, inverseBonus)
 		},
 	})
 }
