@@ -173,9 +173,7 @@ func (moonkin *BalanceDruid) actRotation(sim *core.Simulation, rotation proto.Ba
 // Rotation tiers, from highest dps to lowest:
 //  - SF8 + MF
 //  - SF6 + MF
-//  - SF6
-//  - SF6 + IS
-// Order of the last two (SF6 / SF6+IS) is swapped if 4p T5 is worn.
+//  - SF6, or SF6 + IS if 4p T5 is worn.
 func (moonkin *BalanceDruid) GetDpsRotationHierarchy(baseRotation proto.BalanceDruid_Rotation) []proto.BalanceDruid_Rotation {
 	rotations := []proto.BalanceDruid_Rotation{}
 
@@ -191,14 +189,8 @@ func (moonkin *BalanceDruid) GetDpsRotationHierarchy(baseRotation proto.BalanceD
 		currentRotation.Moonfire = false
 		currentRotation.InsectSwarm = true
 		rotations = append(rotations, currentRotation)
-
-		currentRotation.InsectSwarm = false
-		rotations = append(rotations, currentRotation)
 	} else {
 		currentRotation.Moonfire = false
-		rotations = append(rotations, currentRotation)
-
-		currentRotation.InsectSwarm = true
 		rotations = append(rotations, currentRotation)
 	}
 
