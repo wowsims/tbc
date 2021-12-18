@@ -130,50 +130,67 @@ func applyBuffEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs proto.P
 }
 
 var BloodlustAuraID = NewAuraID()
-var BloodlustCooldownID = NewCooldownID()
+var sharedBloodlustCooldownID = NewCooldownID() // Different from shaman bloodlust CD.
+const BloodlustDuration = time.Second * 40
+const BloodlustCD = time.Minute * 10
 
 func registerBloodlustCD(agent Agent, numBloodlusts int32) {
 	if numBloodlusts == 0 {
 		return
 	}
 
-	const dur = time.Second * 40
+	bloodlustCDs := make([]InternalCD, numBloodlusts)
 
-	bonus := 1.3
-	inverseBonus := 1 / 1.3
 	agent.GetCharacter().AddMajorCooldown(MajorCooldown{
-		CooldownID: BloodlustCooldownID,
-		Cooldown:   dur, // assumes that multiple BLs are different shaman.
+		CooldownID: sharedBloodlustCooldownID,
+		Cooldown:   BloodlustDuration, // assumes that multiple BLs are different shaman.
 		Priority:   CooldownPriorityBloodlust,
 		ActivationFactory: func(sim *Simulation) CooldownActivation {
-			// Capture this inside ActivationFactory so it resets on Sim reset.
-			bloodlustsUsed := int32(0)
+			for i := 0; i < int(numBloodlusts); i++ {
+				bloodlustCDs[i] = NewICD()
+			}
+			nextBloodlustIndex := 0
 
 			return func(sim *Simulation, character *Character) bool {
-				if bloodlustsUsed < numBloodlusts {
-					character.SetCD(BloodlustCooldownID, sim.CurrentTime+dur)
-					for _, agent := range character.Party.Players {
-						agent.GetCharacter().PseudoStats.CastSpeedMultiplier *= 1.3
-						agent.GetCharacter().MultiplyMeleeSpeed(sim, bonus)
-					}
-					character.Party.AddAura(sim, Aura{
-						ID:      BloodlustAuraID,
-						SpellID: 2825,
-						Name:    "Bloodlust",
-						Expires: sim.CurrentTime + dur,
-						OnExpire: func(sim *Simulation) {
-							for _, agent := range character.Party.Players {
-								agent.GetCharacter().PseudoStats.CastSpeedMultiplier /= 1.3
-								agent.GetCharacter().MultiplyMeleeSpeed(sim, inverseBonus)
-							}
-						},
-					})
-					bloodlustsUsed++
-					return true
-				} else {
-					character.SetCD(BloodlustCooldownID, sim.CurrentTime+time.Minute*10)
-					return true
+				if bloodlustCDs[nextBloodlustIndex].IsOnCD(sim) {
+					return false
 				}
+
+				if character.HasAura(BloodlustAuraID) {
+					return false
+				}
+
+				AddBloodlustAura(sim, character)
+				bloodlustCDs[nextBloodlustIndex] = InternalCD(sim.CurrentTime + BloodlustCD)
+				nextBloodlustIndex = (nextBloodlustIndex + 1) % len(bloodlustCDs)
+
+				if bloodlustCDs[nextBloodlustIndex].IsOnCD(sim) {
+					character.SetCD(sharedBloodlustCooldownID, sim.CurrentTime+bloodlustCDs[nextBloodlustIndex].GetRemainingCD(sim))
+				} else {
+					character.SetCD(sharedBloodlustCooldownID, sim.CurrentTime+BloodlustDuration)
+				}
+				return true
+			}
+		},
+	})
+}
+
+func AddBloodlustAura(sim *Simulation, character *Character) {
+	const bonus = 1.3
+	const inverseBonus = 1 / 1.3
+
+	character.PseudoStats.CastSpeedMultiplier *= bonus
+	character.MultiplyMeleeSpeed(sim, bonus)
+
+	character.AddAura(sim, Aura{
+		ID:      BloodlustAuraID,
+		SpellID: 2825,
+		Name:    "Bloodlust",
+		Expires: sim.CurrentTime + BloodlustDuration,
+		OnExpire: func(sim *Simulation) {
+			for _, agent := range character.Party.Players {
+				agent.GetCharacter().PseudoStats.CastSpeedMultiplier *= inverseBonus
+				agent.GetCharacter().MultiplyMeleeSpeed(sim, inverseBonus)
 			}
 		},
 	})
@@ -200,6 +217,10 @@ func registerInnervateCD(agent Agent, numInnervates int) {
 
 			return func(sim *Simulation, character *Character) bool {
 				if innervateCDs[nextInnervateIndex].IsOnCD(sim) {
+					return false
+				}
+
+				if character.HasAura(InnervateAuraID) {
 					return false
 				}
 

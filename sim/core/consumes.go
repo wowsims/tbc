@@ -99,9 +99,22 @@ func registerDrumsCD(agent Agent, partyBuffs proto.PartyBuffs, consumes proto.Co
 
 	if consumes.Drums != proto.Drums_DrumsUnknown {
 		drumsType = consumes.Drums
-		//drumsSelfCast = true
+		drumsSelfCast = true
+
+		// Disable self-drums on other party members, so there is only 1 drummer.
+		for _, partyMember := range agent.GetCharacter().Party.Players {
+			if partyMember != agent {
+				partyMember.GetCharacter().consumes.Drums = proto.Drums_DrumsUnknown
+			}
+		}
 	} else if partyBuffs.Drums != proto.Drums_DrumsUnknown {
 		drumsType = partyBuffs.Drums
+	}
+
+	// If we aren't casting drums, and there is another real party member doing so, then we're done.
+	otherRealDrummer := agent.GetCharacter().Party.Size() > 1
+	if !drumsSelfCast && otherRealDrummer {
+		return
 	}
 
 	// TODO: If drumsSelfCast == true, then do a cast time
