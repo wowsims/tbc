@@ -83,7 +83,7 @@ func (eleShaman *ElementalShaman) Act(sim *core.Simulation) time.Duration {
 		// Only way for a shaman spell to fail is due to mana cost.
 		// Wait until we have enough mana to cast.
 		regenTime := eleShaman.TimeUntilManaRegen(newAction.GetManaCost())
-		newAction = core.NewWaitAction(sim, eleShaman.GetCharacter(), regenTime)
+		newAction = core.NewWaitAction(sim, eleShaman.GetCharacter(), regenTime, core.WaitReasonOOM)
 		eleShaman.rotation.OnActionAccepted(eleShaman, sim, newAction)
 		return sim.CurrentTime + regenTime
 	}
@@ -169,7 +169,7 @@ func (rotation *FixedRotation) ChooseAction(eleShaman *ElementalShaman, sim *cor
 		return eleShaman.NewLightningBolt(sim, sim.GetPrimaryTarget(), false)
 	}
 
-	return core.NewWaitAction(sim, eleShaman.GetCharacter(), eleShaman.GetRemainingCD(shaman.ChainLightningCooldownID, sim.CurrentTime))
+	return core.NewWaitAction(sim, eleShaman.GetCharacter(), eleShaman.GetRemainingCD(shaman.ChainLightningCooldownID, sim.CurrentTime), core.WaitReasonRotation)
 }
 
 func (rotation *FixedRotation) OnActionAccepted(eleShaman *ElementalShaman, sim *core.Simulation, action AgentAction) {
@@ -262,7 +262,9 @@ func (rotation *AdaptiveRotation) GetPresimOptions() *core.PresimOptions {
 		},
 
 		OnPresimResult: func(presimResult proto.PlayerMetrics, iterations int32) bool {
-			if float64(presimResult.NumOom) >= float64(iterations)*0.05 {
+			// if more than 5 seconds per iteration were spent OOM then we probably need a lighter rotation.
+			//  TODO: We could make this a percent of total time instead of seconds but we would need a way to know the length of the sim.
+			if float64(presimResult.SecondsOomAvg) >= 5 {
 				rotation.baseRotation = NewLBOnlyRotation()
 				rotation.surplusRotation = NewCLOnClearcastRotation()
 			} else {

@@ -65,18 +65,15 @@ type CharacterMetrics struct {
 	CharacterIterationMetrics
 
 	// Aggregate values. These are updated after each iteration.
-	numOom      int32
-	oomAtSum    float64
-	dpsAtOomSum float64
-	actions     map[ActionKey]ActionMetrics
+	oomTimeSum float64
+	actions    map[ActionKey]ActionMetrics
 }
 
 // Metrics for the current iteration, for 1 agent. Keep this as a separate
 // struct so its easy to clear.
 type CharacterIterationMetrics struct {
-	ManaSpent   float64
-	DamageAtOOM float64
-	OOMAt       time.Duration
+	ManaSpent float64
+	OOMTime   time.Duration // time spent not casting and waiting for regen.
 }
 
 type ActionMetrics struct {
@@ -162,25 +159,14 @@ func (characterMetrics *CharacterMetrics) AddSpellCast(spellCast *SpellCast) {
 	characterMetrics.actions[actionKey] = actionMetrics
 }
 
-func (characterMetrics *CharacterMetrics) MarkOOM(sim *Simulation, character *Character) {
-	if characterMetrics.OOMAt == 0 {
-		if sim.Log != nil {
-			character.Log(sim, "Went OOM!")
-		}
-		characterMetrics.DamageAtOOM = characterMetrics.TotalDamage
-		characterMetrics.OOMAt = sim.CurrentTime
-	}
+func (characterMetrics *CharacterMetrics) MarkOOM(sim *Simulation, character *Character, seconds time.Duration) {
+	characterMetrics.CharacterIterationMetrics.OOMTime += seconds
 }
 
 // This should be called when a Sim iteration is complete.
 func (characterMetrics *CharacterMetrics) doneIteration(encounterDurationSeconds float64) {
 	characterMetrics.DpsMetrics.doneIteration(encounterDurationSeconds)
-
-	if characterMetrics.OOMAt > 0 {
-		characterMetrics.numOom++
-		characterMetrics.oomAtSum += float64(characterMetrics.OOMAt)
-		characterMetrics.dpsAtOomSum += float64(characterMetrics.DamageAtOOM) / float64(characterMetrics.OOMAt.Seconds())
-	}
+	characterMetrics.oomTimeSum += float64(characterMetrics.OOMTime.Seconds())
 
 	// Clear the iteration metrics
 	characterMetrics.CharacterIterationMetrics = CharacterIterationMetrics{}
@@ -188,13 +174,8 @@ func (characterMetrics *CharacterMetrics) doneIteration(encounterDurationSeconds
 
 func (characterMetrics *CharacterMetrics) ToProto(numIterations int32) *proto.PlayerMetrics {
 	protoMetrics := &proto.PlayerMetrics{
-		Dps:    characterMetrics.DpsMetrics.ToProto(numIterations),
-		NumOom: characterMetrics.numOom,
-	}
-
-	if characterMetrics.numOom > 0 {
-		protoMetrics.OomAtAvg = characterMetrics.oomAtSum / float64(characterMetrics.numOom)
-		protoMetrics.DpsAtOomAvg = characterMetrics.dpsAtOomSum / float64(characterMetrics.numOom)
+		Dps:           characterMetrics.DpsMetrics.ToProto(numIterations),
+		SecondsOomAvg: characterMetrics.oomTimeSum / float64(numIterations),
 	}
 
 	for _, action := range characterMetrics.actions {

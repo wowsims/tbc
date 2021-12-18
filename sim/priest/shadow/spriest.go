@@ -271,6 +271,7 @@ func (spriest *ShadowPriest) Act(sim *core.Simulation) time.Duration {
 		if sim.Log != nil {
 			spriest.Log(sim, "<spriest> Not enough mana, regenerating for %s.", regenTime)
 		}
+		spriest.Character.Metrics.MarkOOM(sim, &spriest.Character, regenTime)
 		return sim.CurrentTime + regenTime
 	}
 	if wait != 0 {

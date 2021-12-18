@@ -70,7 +70,9 @@ func (moonkin *BalanceDruid) GetPresimOptions() *core.PresimOptions {
 		},
 
 		OnPresimResult: func(presimResult proto.PlayerMetrics, iterations int32) bool {
-			if float64(presimResult.NumOom) < float64(iterations)*0.15 {
+			// if more than 5 seconds per iteration were spent OOM then we probably need a lighter rotation.
+			//  TODO: We could make this a percent of total time instead of seconds but we would need a way to know the length of the sim.
+			if float64(presimResult.SecondsOomAvg) >= 5 {
 				moonkin.primaryRotation = rotations[rotationIdx]
 
 				// If the highest dps rotation is fine, we dont need any adaptive logic.
@@ -146,40 +148,30 @@ func (moonkin *BalanceDruid) actRotation(sim *core.Simulation, rotation proto.Ba
 		}
 	}
 
-	if rotation.InsectSwarm && !moonkin.InsectSwarmSpell.DotInput.IsTicking(sim) {
-		swarm := moonkin.NewInsectSwarm(sim, target)
-		success := swarm.Cast(sim)
-		if !success {
-			regenTime := moonkin.TimeUntilManaRegen(swarm.GetManaCost())
-			return sim.CurrentTime + regenTime
-		}
-		return sim.CurrentTime + moonkin.GetRemainingCD(core.GCDCooldownID, sim.CurrentTime)
-	} else if rotation.Moonfire && !moonkin.MoonfireSpell.DotInput.IsTicking(sim) {
-		moonfire := moonkin.NewMoonfire(sim, target)
-		success := moonfire.Cast(sim)
-		if !success {
-			regenTime := moonkin.TimeUntilManaRegen(moonfire.GetManaCost())
-			return sim.CurrentTime + regenTime
-		}
-		return sim.CurrentTime + moonkin.GetRemainingCD(core.GCDCooldownID, sim.CurrentTime)
-	}
-
 	var spell *core.SimpleSpell
-	switch rotation.PrimarySpell {
-	case proto.BalanceDruid_Rotation_Starfire:
-		spell = moonkin.NewStarfire(sim, target, 8)
-	case proto.BalanceDruid_Rotation_Starfire6:
-		spell = moonkin.NewStarfire(sim, target, 6)
-	case proto.BalanceDruid_Rotation_Wrath:
-		spell = moonkin.NewWrath(sim, target)
+
+	if rotation.InsectSwarm && !moonkin.InsectSwarmSpell.DotInput.IsTicking(sim) {
+		spell = moonkin.NewInsectSwarm(sim, target)
+	} else if rotation.Moonfire && !moonkin.MoonfireSpell.DotInput.IsTicking(sim) {
+		spell = moonkin.NewMoonfire(sim, target)
+	} else {
+		switch rotation.PrimarySpell {
+		case proto.BalanceDruid_Rotation_Starfire:
+			spell = moonkin.NewStarfire(sim, target, 8)
+		case proto.BalanceDruid_Rotation_Starfire6:
+			spell = moonkin.NewStarfire(sim, target, 6)
+		case proto.BalanceDruid_Rotation_Wrath:
+			spell = moonkin.NewWrath(sim, target)
+		}
 	}
 
 	actionSuccessful := spell.Cast(sim)
 
 	if !actionSuccessful {
 		regenTime := moonkin.TimeUntilManaRegen(spell.GetManaCost())
+		moonkin.Character.Metrics.MarkOOM(sim, &moonkin.Character, regenTime)
 		if sim.Log != nil {
-			moonkin.Log(sim, "Not enough mana, regenerating for %s.", regenTime)
+			moonkin.Log(sim, "Not enough mana to cast %s, regenerating for %s.", spell.Name, regenTime)
 		}
 		return sim.CurrentTime + regenTime
 	}

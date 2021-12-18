@@ -44,6 +44,7 @@ func (druid *Druid) TryRebirth(sim *core.Simulation) time.Duration {
 	success := cast.StartCast(sim)
 	if !success {
 		regenTime := druid.TimeUntilManaRegen(cast.GetManaCost())
+		druid.Character.Metrics.MarkOOM(sim, &druid.Character, regenTime)
 		return sim.CurrentTime + regenTime
 	}
 	return sim.CurrentTime + druid.GetRemainingCD(core.GCDCooldownID, sim.CurrentTime)
