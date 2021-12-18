@@ -78,15 +78,15 @@ func (tracker *ManaSpendingRateTracker) Update(sim *core.Simulation, character *
 
 	// Scale down mana spent/gained so we don't get bad estimates from lust/drums/etc.
 	manaDeltaCoefficient := character.InitialCastSpeed() / tracker.previousCastSpeed
+	manaSpent := character.Metrics.ManaSpent
 	manaGained := character.Metrics.ManaGained - character.Metrics.BonusManaGained
 
 	snapshot := manaSnapshot{
 		time:            sim.CurrentTime,
-		manaSpent:       character.Metrics.ManaSpent,
+		manaSpent:       manaSpent,
 		manaGained:      manaGained,
-		manaSpentDelta:  (character.Metrics.ManaSpent - tracker.previousManaSpent) * manaDeltaCoefficient,
-		manaGainedDelta: (manaGained - tracker.previousManaGained),
-		//manaGainedDelta: (manaGained - tracker.previousManaGained) * manaDeltaCoefficient,
+		manaSpentDelta:  (manaSpent - tracker.previousManaSpent) * manaDeltaCoefficient,
+		manaGainedDelta: (manaGained - tracker.previousManaGained) * manaDeltaCoefficient,
 	}
 
 	nextIndex := (tracker.firstSnapshotIndex + tracker.numSnapshots) % manaSnapshotsBufferSize

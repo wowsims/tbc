@@ -133,10 +133,6 @@ func (characterMetrics *CharacterMetrics) AddCast(cast *Cast) {
 
 // Adds the results of an action to the aggregated metrics.
 func (characterMetrics *CharacterMetrics) AddSpellCast(spellCast *SpellCast) {
-	if !spellCast.IgnoreManaCost {
-		characterMetrics.ManaSpent += spellCast.ManaCost
-	}
-
 	actionID := spellCast.ActionID
 	actionKey := NewActionKey(actionID)
 	actionMetrics, ok := characterMetrics.actions[actionKey]
