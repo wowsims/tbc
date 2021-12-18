@@ -12,6 +12,7 @@ import { RaidBuffs } from './common.js';
 import { PartyBuffs } from './common.js';
 import { Warrior } from './warrior.js';
 import { Warlock } from './warlock.js';
+import { EnhancementShaman } from './shaman.js';
 import { ElementalShaman } from './shaman.js';
 import { Rogue } from './rogue.js';
 import { ShadowPriest } from './priest.js';
@@ -58,6 +59,7 @@ class Player$Type extends MessageType {
             { no: 10, name: "shadow_priest", kind: "message", oneof: "spec", T: () => ShadowPriest },
             { no: 11, name: "rogue", kind: "message", oneof: "spec", T: () => Rogue },
             { no: 12, name: "elemental_shaman", kind: "message", oneof: "spec", T: () => ElementalShaman },
+            { no: 18, name: "enhancement_shaman", kind: "message", oneof: "spec", T: () => EnhancementShaman },
             { no: 13, name: "warlock", kind: "message", oneof: "spec", T: () => Warlock },
             { no: 14, name: "warrior", kind: "message", oneof: "spec", T: () => Warrior },
             { no: 17, name: "talentsString", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
@@ -142,6 +144,12 @@ class Player$Type extends MessageType {
                         elementalShaman: ElementalShaman.internalBinaryRead(reader, reader.uint32(), options, message.spec.elementalShaman)
                     };
                     break;
+                case /* proto.EnhancementShaman enhancement_shaman */ 18:
+                    message.spec = {
+                        oneofKind: "enhancementShaman",
+                        enhancementShaman: EnhancementShaman.internalBinaryRead(reader, reader.uint32(), options, message.spec.enhancementShaman)
+                    };
+                    break;
                 case /* proto.Warlock warlock */ 13:
                     message.spec = {
                         oneofKind: "warlock",
@@ -215,6 +223,9 @@ class Player$Type extends MessageType {
         /* proto.ElementalShaman elemental_shaman = 12; */
         if (message.spec.oneofKind === "elementalShaman")
             ElementalShaman.internalBinaryWrite(message.spec.elementalShaman, writer.tag(12, WireType.LengthDelimited).fork(), options).join();
+        /* proto.EnhancementShaman enhancement_shaman = 18; */
+        if (message.spec.oneofKind === "enhancementShaman")
+            EnhancementShaman.internalBinaryWrite(message.spec.enhancementShaman, writer.tag(18, WireType.LengthDelimited).fork(), options).join();
         /* proto.Warlock warlock = 13; */
         if (message.spec.oneofKind === "warlock")
             Warlock.internalBinaryWrite(message.spec.warlock, writer.tag(13, WireType.LengthDelimited).fork(), options).join();

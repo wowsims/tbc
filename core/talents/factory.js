@@ -17,6 +17,9 @@ export function newTalentsPicker(spec, parent, player) {
         case Spec.SpecElementalShaman:
             return new ShamanTalentsPicker(parent, player);
             break;
+        case Spec.SpecEnhancementShaman:
+            return new ShamanTalentsPicker(parent, player);
+            break;
         case Spec.SpecHunter:
             return new HunterTalentsPicker(parent, player);
             break;

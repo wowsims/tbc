@@ -34,6 +34,20 @@ export var ElementalShaman_Rotation_RotationType;
     ElementalShaman_Rotation_RotationType[ElementalShaman_Rotation_RotationType["LBOnly"] = 5] = "LBOnly";
 })(ElementalShaman_Rotation_RotationType || (ElementalShaman_Rotation_RotationType = {}));
 /**
+ * @generated from protobuf enum proto.EnhancementShaman.Rotation.RotationType
+ */
+export var EnhancementShaman_Rotation_RotationType;
+(function (EnhancementShaman_Rotation_RotationType) {
+    /**
+     * @generated from protobuf enum value: Unknown = 0;
+     */
+    EnhancementShaman_Rotation_RotationType[EnhancementShaman_Rotation_RotationType["Unknown"] = 0] = "Unknown";
+    /**
+     * @generated from protobuf enum value: Basic = 1;
+     */
+    EnhancementShaman_Rotation_RotationType[EnhancementShaman_Rotation_RotationType["Basic"] = 1] = "Basic";
+})(EnhancementShaman_Rotation_RotationType || (EnhancementShaman_Rotation_RotationType = {}));
+/**
  * @generated from protobuf enum proto.EarthTotem
  */
 export var EarthTotem;
@@ -143,6 +157,8 @@ class ShamanTalents$Type extends MessageType {
             { no: 23, name: "weapon_mastery", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 24, name: "dual_wield_specialization", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 25, name: "unleashed_rage", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 34, name: "stormstrike", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 35, name: "shamanistic_rage", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 26, name: "totemic_focus", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 27, name: "natures_guidance", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 28, name: "restorative_totems", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
@@ -153,7 +169,7 @@ class ShamanTalents$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { convection: 0, concussion: 0, callOfFlame: 0, elementalFocus: false, reverberation: 0, callOfThunder: 0, improvedFireTotems: 0, elementalDevastation: 0, elementalFury: false, unrelentingStorm: 0, elementalPrecision: 0, lightningMastery: 0, elementalMastery: false, lightningOverload: 0, totemOfWrath: false, ancestralKnowledge: 0, thunderingStrikes: 0, enhancingTotems: 0, shamanisticFocus: false, flurry: 0, improvedWeaponTotems: 0, elementalWeapons: 0, mentalQuickness: 0, weaponMastery: 0, dualWieldSpecialization: 0, unleashedRage: 0, totemicFocus: 0, naturesGuidance: 0, restorativeTotems: 0, tidalMastery: 0, naturesSwiftness: false, manaTideTotem: false, naturesBlessing: 0 };
+        const message = { convection: 0, concussion: 0, callOfFlame: 0, elementalFocus: false, reverberation: 0, callOfThunder: 0, improvedFireTotems: 0, elementalDevastation: 0, elementalFury: false, unrelentingStorm: 0, elementalPrecision: 0, lightningMastery: 0, elementalMastery: false, lightningOverload: 0, totemOfWrath: false, ancestralKnowledge: 0, thunderingStrikes: 0, enhancingTotems: 0, shamanisticFocus: false, flurry: 0, improvedWeaponTotems: 0, elementalWeapons: 0, mentalQuickness: 0, weaponMastery: 0, dualWieldSpecialization: 0, unleashedRage: 0, stormstrike: false, shamanisticRage: false, totemicFocus: 0, naturesGuidance: 0, restorativeTotems: 0, tidalMastery: 0, naturesSwiftness: false, manaTideTotem: false, naturesBlessing: 0 };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -241,6 +257,12 @@ class ShamanTalents$Type extends MessageType {
                     break;
                 case /* int32 unleashed_rage */ 25:
                     message.unleashedRage = reader.int32();
+                    break;
+                case /* bool stormstrike */ 34:
+                    message.stormstrike = reader.bool();
+                    break;
+                case /* bool shamanistic_rage */ 35:
+                    message.shamanisticRage = reader.bool();
                     break;
                 case /* int32 totemic_focus */ 26:
                     message.totemicFocus = reader.int32();
@@ -353,6 +375,12 @@ class ShamanTalents$Type extends MessageType {
         /* int32 unleashed_rage = 25; */
         if (message.unleashedRage !== 0)
             writer.tag(25, WireType.Varint).int32(message.unleashedRage);
+        /* bool stormstrike = 34; */
+        if (message.stormstrike !== false)
+            writer.tag(34, WireType.Varint).bool(message.stormstrike);
+        /* bool shamanistic_rage = 35; */
+        if (message.shamanisticRage !== false)
+            writer.tag(35, WireType.Varint).bool(message.shamanisticRage);
         /* int32 totemic_focus = 26; */
         if (message.totemicFocus !== 0)
             writer.tag(26, WireType.Varint).int32(message.totemicFocus);
@@ -684,3 +712,172 @@ class ElementalShaman_Options$Type extends MessageType {
  * @generated MessageType for protobuf message proto.ElementalShaman.Options
  */
 export const ElementalShaman_Options = new ElementalShaman_Options$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class EnhancementShaman$Type extends MessageType {
+    constructor() {
+        super("proto.EnhancementShaman", [
+            { no: 1, name: "rotation", kind: "message", T: () => EnhancementShaman_Rotation },
+            { no: 2, name: "talents", kind: "message", T: () => ShamanTalents },
+            { no: 3, name: "options", kind: "message", T: () => EnhancementShaman_Options }
+        ]);
+    }
+    create(value) {
+        const message = {};
+        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader, length, options, target) {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* proto.EnhancementShaman.Rotation rotation */ 1:
+                    message.rotation = EnhancementShaman_Rotation.internalBinaryRead(reader, reader.uint32(), options, message.rotation);
+                    break;
+                case /* proto.ShamanTalents talents */ 2:
+                    message.talents = ShamanTalents.internalBinaryRead(reader, reader.uint32(), options, message.talents);
+                    break;
+                case /* proto.EnhancementShaman.Options options */ 3:
+                    message.options = EnhancementShaman_Options.internalBinaryRead(reader, reader.uint32(), options, message.options);
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message, writer, options) {
+        /* proto.EnhancementShaman.Rotation rotation = 1; */
+        if (message.rotation)
+            EnhancementShaman_Rotation.internalBinaryWrite(message.rotation, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+        /* proto.ShamanTalents talents = 2; */
+        if (message.talents)
+            ShamanTalents.internalBinaryWrite(message.talents, writer.tag(2, WireType.LengthDelimited).fork(), options).join();
+        /* proto.EnhancementShaman.Options options = 3; */
+        if (message.options)
+            EnhancementShaman_Options.internalBinaryWrite(message.options, writer.tag(3, WireType.LengthDelimited).fork(), options).join();
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message proto.EnhancementShaman
+ */
+export const EnhancementShaman = new EnhancementShaman$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class EnhancementShaman_Rotation$Type extends MessageType {
+    constructor() {
+        super("proto.EnhancementShaman.Rotation", [
+            { no: 1, name: "type", kind: "enum", T: () => ["proto.EnhancementShaman.Rotation.RotationType", EnhancementShaman_Rotation_RotationType] }
+        ]);
+    }
+    create(value) {
+        const message = { type: 0 };
+        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader, length, options, target) {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* proto.EnhancementShaman.Rotation.RotationType type */ 1:
+                    message.type = reader.int32();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message, writer, options) {
+        /* proto.EnhancementShaman.Rotation.RotationType type = 1; */
+        if (message.type !== 0)
+            writer.tag(1, WireType.Varint).int32(message.type);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message proto.EnhancementShaman.Rotation
+ */
+export const EnhancementShaman_Rotation = new EnhancementShaman_Rotation$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class EnhancementShaman_Options$Type extends MessageType {
+    constructor() {
+        super("proto.EnhancementShaman.Options", [
+            { no: 1, name: "water_shield", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 2, name: "bloodlust", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 3, name: "totems", kind: "message", T: () => ShamanTotems }
+        ]);
+    }
+    create(value) {
+        const message = { waterShield: false, bloodlust: false };
+        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader, length, options, target) {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* bool water_shield */ 1:
+                    message.waterShield = reader.bool();
+                    break;
+                case /* bool bloodlust */ 2:
+                    message.bloodlust = reader.bool();
+                    break;
+                case /* proto.ShamanTotems totems */ 3:
+                    message.totems = ShamanTotems.internalBinaryRead(reader, reader.uint32(), options, message.totems);
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message, writer, options) {
+        /* bool water_shield = 1; */
+        if (message.waterShield !== false)
+            writer.tag(1, WireType.Varint).bool(message.waterShield);
+        /* bool bloodlust = 2; */
+        if (message.bloodlust !== false)
+            writer.tag(2, WireType.Varint).bool(message.bloodlust);
+        /* proto.ShamanTotems totems = 3; */
+        if (message.totems)
+            ShamanTotems.internalBinaryWrite(message.totems, writer.tag(3, WireType.LengthDelimited).fork(), options).join();
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message proto.EnhancementShaman.Options
+ */
+export const EnhancementShaman_Options = new EnhancementShaman_Options$Type();

@@ -91,6 +91,14 @@ export interface PartyBuffs {
      * @generated from protobuf field: proto.TristateEffect wrath_of_air_totem = 14;
      */
     wrathOfAirTotem: TristateEffect;
+    /**
+     * @generated from protobuf field: proto.TristateEffect grace_of_air_totem = 15;
+     */
+    graceOfAirTotem: TristateEffect;
+    /**
+     * @generated from protobuf field: proto.TristateEffect strength_of_earth_totem = 16;
+     */
+    strengthOfEarthTotem: TristateEffect;
 }
 /**
  * Buffs are only used by individual sims, never the raid sim.
@@ -266,6 +274,10 @@ export interface Target {
      * @generated from protobuf field: int32 armor = 1;
      */
     armor: number;
+    /**
+     * @generated from protobuf field: int32 level = 4;
+     */
+    level: number;
     /**
      * @generated from protobuf field: proto.MobType mob_type = 3;
      */
@@ -480,6 +492,10 @@ export declare enum Spec {
      * @generated from protobuf enum value: SpecElementalShaman = 1;
      */
     SpecElementalShaman = 1,
+    /**
+     * @generated from protobuf enum value: SpecEnhancementShaman = 9;
+     */
+    SpecEnhancementShaman = 9,
     /**
      * @generated from protobuf enum value: SpecHunter = 8;
      */

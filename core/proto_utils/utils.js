@@ -19,7 +19,7 @@ import { Stat } from '/tbc/core/proto/common.js';
 import { WeaponType } from '/tbc/core/proto/common.js';
 import * as Gems from '/tbc/core/constants/gems.js';
 import { BalanceDruid, BalanceDruid_Rotation as BalanceDruidRotation, DruidTalents, BalanceDruid_Options as BalanceDruidOptions } from '/tbc/core/proto/druid.js';
-import { ElementalShaman, ElementalShaman_Rotation as ElementalShamanRotation, ShamanTalents, ElementalShaman_Options as ElementalShamanOptions } from '/tbc/core/proto/shaman.js';
+import { ElementalShaman, EnhancementShaman_Rotation as EnhancementShamanRotation, ElementalShaman_Rotation as ElementalShamanRotation, ShamanTalents, ElementalShaman_Options as ElementalShamanOptions, EnhancementShaman_Options as EnhancementShamanOptions, EnhancementShaman } from '/tbc/core/proto/shaman.js';
 import { Hunter, Hunter_Rotation as HunterRotation, HunterTalents, Hunter_Options as HunterOptions } from '/tbc/core/proto/hunter.js';
 import { Mage, Mage_Rotation as MageRotation, MageTalents, Mage_Options as MageOptions } from '/tbc/core/proto/mage.js';
 import { Rogue, Rogue_Rotation as RogueRotation, RogueTalents, Rogue_Options as RogueOptions } from '/tbc/core/proto/rogue.js';
@@ -30,6 +30,7 @@ import { Warrior, Warrior_Rotation as WarriorRotation, WarriorTalents, Warrior_O
 export const specNames = {
     [Spec.SpecBalanceDruid]: 'Balance Druid',
     [Spec.SpecElementalShaman]: 'Elemental Shaman',
+    [Spec.SpecEnhancementShaman]: 'Enhancement Shaman',
     [Spec.SpecHunter]: 'Hunter',
     [Spec.SpecMage]: 'Mage',
     [Spec.SpecRogue]: 'Rogue',
@@ -53,6 +54,7 @@ export const classColors = {
 export const specIconsLarge = {
     [Spec.SpecBalanceDruid]: 'https://wow.zamimg.com/images/wow/icons/large/spell_nature_starfall.jpg',
     [Spec.SpecElementalShaman]: 'https://wow.zamimg.com/images/wow/icons/large/spell_nature_lightning.jpg',
+    [Spec.SpecEnhancementShaman]: 'https://wow.zamimg.com/images/wow/icons/large/ability_shaman_stormstrike.jpg',
     [Spec.SpecHunter]: 'https://wow.zamimg.com/images/wow/icons/large/ability_marksmanship.jpg',
     [Spec.SpecMage]: 'https://wow.zamimg.com/images/wow/icons/large/spell_holy_magicalsentry.jpg',
     [Spec.SpecRogue]: 'https://wow.zamimg.com/images/wow/icons/large/ability_rogue_eviscerate.jpg',
@@ -172,6 +174,32 @@ export const specTypeFunctions = {
         optionsFromPlayer: (player) => player.spec.oneofKind == 'elementalShaman'
             ? player.spec.elementalShaman.options || ElementalShamanOptions.create()
             : ElementalShamanOptions.create(),
+    },
+    [Spec.SpecEnhancementShaman]: {
+        rotationCreate: () => EnhancementShamanRotation.create(),
+        rotationEquals: (a, b) => EnhancementShamanRotation.equals(a, b),
+        rotationCopy: (a) => EnhancementShamanRotation.clone(a),
+        rotationToJson: (a) => EnhancementShamanRotation.toJson(a),
+        rotationFromJson: (obj) => EnhancementShamanRotation.fromJson(obj),
+        rotationFromPlayer: (player) => player.spec.oneofKind == 'enhancementShaman'
+            ? player.spec.enhancementShaman.rotation || EnhancementShamanRotation.create()
+            : EnhancementShamanRotation.create(),
+        talentsCreate: () => ShamanTalents.create(),
+        talentsEquals: (a, b) => ShamanTalents.equals(a, b),
+        talentsCopy: (a) => ShamanTalents.clone(a),
+        talentsToJson: (a) => ShamanTalents.toJson(a),
+        talentsFromJson: (obj) => ShamanTalents.fromJson(obj),
+        talentsFromPlayer: (player) => player.spec.oneofKind == 'enhancementShaman'
+            ? player.spec.enhancementShaman.talents || ShamanTalents.create()
+            : ShamanTalents.create(),
+        optionsCreate: () => EnhancementShamanOptions.create(),
+        optionsEquals: (a, b) => EnhancementShamanOptions.equals(a, b),
+        optionsCopy: (a) => EnhancementShamanOptions.clone(a),
+        optionsToJson: (a) => EnhancementShamanOptions.toJson(a),
+        optionsFromJson: (obj) => EnhancementShamanOptions.fromJson(obj),
+        optionsFromPlayer: (player) => player.spec.oneofKind == 'enhancementShaman'
+            ? player.spec.enhancementShaman.options || EnhancementShamanOptions.create()
+            : EnhancementShamanOptions.create(),
     },
     [Spec.SpecHunter]: {
         rotationCreate: () => HunterRotation.create(),
@@ -379,6 +407,7 @@ export const raceToFaction = {
 export const specToClass = {
     [Spec.SpecBalanceDruid]: Class.ClassDruid,
     [Spec.SpecElementalShaman]: Class.ClassShaman,
+    [Spec.SpecEnhancementShaman]: Class.ClassShaman,
     [Spec.SpecHunter]: Class.ClassHunter,
     [Spec.SpecMage]: Class.ClassMage,
     [Spec.SpecRogue]: Class.ClassRogue,
@@ -468,6 +497,7 @@ const warriorRaces = [
 export const specToEligibleRaces = {
     [Spec.SpecBalanceDruid]: druidRaces,
     [Spec.SpecElementalShaman]: shamanRaces,
+    [Spec.SpecEnhancementShaman]: shamanRaces,
     [Spec.SpecHunter]: hunterRaces,
     [Spec.SpecMage]: mageRaces,
     [Spec.SpecRetributionPaladin]: paladinRaces,
@@ -479,6 +509,7 @@ export const specToEligibleRaces = {
 export const specToEligibleItemCategories = {
     [Spec.SpecBalanceDruid]: [ItemCategory.ItemCategoryCaster],
     [Spec.SpecElementalShaman]: [ItemCategory.ItemCategoryCaster],
+    [Spec.SpecEnhancementShaman]: [ItemCategory.ItemCategoryMelee],
     [Spec.SpecHunter]: [ItemCategory.ItemCategoryMelee],
     [Spec.SpecMage]: [ItemCategory.ItemCategoryCaster],
     [Spec.SpecRetributionPaladin]: [ItemCategory.ItemCategoryMelee, ItemCategory.ItemCategoryHybrid],
@@ -499,6 +530,7 @@ const dualWieldSpecs = [
 export const specToLocalStorageKey = {
     [Spec.SpecBalanceDruid]: '__balance_druid',
     [Spec.SpecElementalShaman]: '__elemental_shaman',
+    [Spec.SpecEnhancementShaman]: '__enhacement_shaman',
     [Spec.SpecHunter]: '__hunter',
     [Spec.SpecMage]: '__mage',
     [Spec.SpecRetributionPaladin]: '__retribution_paladin',
@@ -526,6 +558,17 @@ export function withSpecProto(player, rotation, talents, specOptions) {
         copy.spec = {
             oneofKind: 'elementalShaman',
             elementalShaman: ElementalShaman.create({
+                rotation: rotation,
+                talents: talents,
+                options: specOptions,
+            }),
+        };
+    }
+    else if (EnhancementShamanRotation.is(rotation)) {
+        copy.class = Class.ClassShaman;
+        copy.spec = {
+            oneofKind: 'enhancementShaman',
+            enhancementShaman: EnhancementShaman.create({
                 rotation: rotation,
                 talents: talents,
                 options: specOptions,

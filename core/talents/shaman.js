@@ -380,7 +380,7 @@ export class ShamanTalentsPicker extends TalentsPicker {
                         maxPoints: 1,
                     },
                     {
-                        //fieldName: 'stormstrike',
+                        fieldName: 'stormstrike',
                         location: {
                             rowIdx: 6,
                             colIdx: 2,
@@ -402,7 +402,7 @@ export class ShamanTalentsPicker extends TalentsPicker {
                         maxPoints: 5,
                     },
                     {
-                        //fieldName: 'shamanisticRage',
+                        fieldName: 'shamanisticRage',
                         location: {
                             rowIdx: 8,
                             colIdx: 1,

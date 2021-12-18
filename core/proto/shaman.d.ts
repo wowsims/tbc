@@ -117,6 +117,14 @@ export interface ShamanTalents {
      */
     unleashedRage: number;
     /**
+     * @generated from protobuf field: bool stormstrike = 34;
+     */
+    stormstrike: boolean;
+    /**
+     * @generated from protobuf field: bool shamanistic_rage = 35;
+     */
+    shamanisticRage: boolean;
+    /**
      * Restoration
      *
      * @generated from protobuf field: int32 totemic_focus = 26;
@@ -295,6 +303,62 @@ export interface ElementalShaman_Options {
     wrathOfAirTotem: boolean;
 }
 /**
+ * @generated from protobuf message proto.EnhancementShaman
+ */
+export interface EnhancementShaman {
+    /**
+     * @generated from protobuf field: proto.EnhancementShaman.Rotation rotation = 1;
+     */
+    rotation?: EnhancementShaman_Rotation;
+    /**
+     * @generated from protobuf field: proto.ShamanTalents talents = 2;
+     */
+    talents?: ShamanTalents;
+    /**
+     * @generated from protobuf field: proto.EnhancementShaman.Options options = 3;
+     */
+    options?: EnhancementShaman_Options;
+}
+/**
+ * @generated from protobuf message proto.EnhancementShaman.Rotation
+ */
+export interface EnhancementShaman_Rotation {
+    /**
+     * @generated from protobuf field: proto.EnhancementShaman.Rotation.RotationType type = 1;
+     */
+    type: EnhancementShaman_Rotation_RotationType;
+}
+/**
+ * @generated from protobuf enum proto.EnhancementShaman.Rotation.RotationType
+ */
+export declare enum EnhancementShaman_Rotation_RotationType {
+    /**
+     * @generated from protobuf enum value: Unknown = 0;
+     */
+    Unknown = 0,
+    /**
+     * @generated from protobuf enum value: Basic = 1;
+     */
+    Basic = 1
+}
+/**
+ * @generated from protobuf message proto.EnhancementShaman.Options
+ */
+export interface EnhancementShaman_Options {
+    /**
+     * @generated from protobuf field: bool water_shield = 1;
+     */
+    waterShield: boolean;
+    /**
+     * @generated from protobuf field: bool bloodlust = 2;
+     */
+    bloodlust: boolean;
+    /**
+     * @generated from protobuf field: proto.ShamanTotems totems = 3;
+     */
+    totems?: ShamanTotems;
+}
+/**
  * @generated from protobuf enum proto.EarthTotem
  */
 export declare enum EarthTotem {
@@ -420,4 +484,34 @@ declare class ElementalShaman_Options$Type extends MessageType<ElementalShaman_O
  * @generated MessageType for protobuf message proto.ElementalShaman.Options
  */
 export declare const ElementalShaman_Options: ElementalShaman_Options$Type;
+declare class EnhancementShaman$Type extends MessageType<EnhancementShaman> {
+    constructor();
+    create(value?: PartialMessage<EnhancementShaman>): EnhancementShaman;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: EnhancementShaman): EnhancementShaman;
+    internalBinaryWrite(message: EnhancementShaman, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message proto.EnhancementShaman
+ */
+export declare const EnhancementShaman: EnhancementShaman$Type;
+declare class EnhancementShaman_Rotation$Type extends MessageType<EnhancementShaman_Rotation> {
+    constructor();
+    create(value?: PartialMessage<EnhancementShaman_Rotation>): EnhancementShaman_Rotation;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: EnhancementShaman_Rotation): EnhancementShaman_Rotation;
+    internalBinaryWrite(message: EnhancementShaman_Rotation, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message proto.EnhancementShaman.Rotation
+ */
+export declare const EnhancementShaman_Rotation: EnhancementShaman_Rotation$Type;
+declare class EnhancementShaman_Options$Type extends MessageType<EnhancementShaman_Options> {
+    constructor();
+    create(value?: PartialMessage<EnhancementShaman_Options>): EnhancementShaman_Options;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: EnhancementShaman_Options): EnhancementShaman_Options;
+    internalBinaryWrite(message: EnhancementShaman_Options, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message proto.EnhancementShaman.Options
+ */
+export declare const EnhancementShaman_Options: EnhancementShaman_Options$Type;
 export {};

@@ -17,6 +17,10 @@ export var Spec;
      */
     Spec[Spec["SpecElementalShaman"] = 1] = "SpecElementalShaman";
     /**
+     * @generated from protobuf enum value: SpecEnhancementShaman = 9;
+     */
+    Spec[Spec["SpecEnhancementShaman"] = 9] = "SpecEnhancementShaman";
+    /**
      * @generated from protobuf enum value: SpecHunter = 8;
      */
     Spec[Spec["SpecHunter"] = 8] = "SpecHunter";
@@ -848,11 +852,13 @@ class PartyBuffs$Type extends MessageType {
             { no: 11, name: "jade_pendant_of_blasting", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 12, name: "mana_spring_totem", kind: "enum", T: () => ["proto.TristateEffect", TristateEffect] },
             { no: 13, name: "totem_of_wrath", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
-            { no: 14, name: "wrath_of_air_totem", kind: "enum", T: () => ["proto.TristateEffect", TristateEffect] }
+            { no: 14, name: "wrath_of_air_totem", kind: "enum", T: () => ["proto.TristateEffect", TristateEffect] },
+            { no: 15, name: "grace_of_air_totem", kind: "enum", T: () => ["proto.TristateEffect", TristateEffect] },
+            { no: 16, name: "strength_of_earth_totem", kind: "enum", T: () => ["proto.TristateEffect", TristateEffect] }
         ]);
     }
     create(value) {
-        const message = { bloodlust: 0, moonkinAura: 0, draeneiRacialMelee: false, draeneiRacialCaster: false, drums: 0, atieshMage: 0, atieshWarlock: 0, braidedEterniumChain: false, eyeOfTheNight: false, chainOfTheTwilightOwl: false, jadePendantOfBlasting: false, manaSpringTotem: 0, totemOfWrath: 0, wrathOfAirTotem: 0 };
+        const message = { bloodlust: 0, moonkinAura: 0, draeneiRacialMelee: false, draeneiRacialCaster: false, drums: 0, atieshMage: 0, atieshWarlock: 0, braidedEterniumChain: false, eyeOfTheNight: false, chainOfTheTwilightOwl: false, jadePendantOfBlasting: false, manaSpringTotem: 0, totemOfWrath: 0, wrathOfAirTotem: 0, graceOfAirTotem: 0, strengthOfEarthTotem: 0 };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -904,6 +910,12 @@ class PartyBuffs$Type extends MessageType {
                     break;
                 case /* proto.TristateEffect wrath_of_air_totem */ 14:
                     message.wrathOfAirTotem = reader.int32();
+                    break;
+                case /* proto.TristateEffect grace_of_air_totem */ 15:
+                    message.graceOfAirTotem = reader.int32();
+                    break;
+                case /* proto.TristateEffect strength_of_earth_totem */ 16:
+                    message.strengthOfEarthTotem = reader.int32();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -959,6 +971,12 @@ class PartyBuffs$Type extends MessageType {
         /* proto.TristateEffect wrath_of_air_totem = 14; */
         if (message.wrathOfAirTotem !== 0)
             writer.tag(14, WireType.Varint).int32(message.wrathOfAirTotem);
+        /* proto.TristateEffect grace_of_air_totem = 15; */
+        if (message.graceOfAirTotem !== 0)
+            writer.tag(15, WireType.Varint).int32(message.graceOfAirTotem);
+        /* proto.TristateEffect strength_of_earth_totem = 16; */
+        if (message.strengthOfEarthTotem !== 0)
+            writer.tag(16, WireType.Varint).int32(message.strengthOfEarthTotem);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -1413,12 +1431,13 @@ class Target$Type extends MessageType {
     constructor() {
         super("proto.Target", [
             { no: 1, name: "armor", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 4, name: "level", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 3, name: "mob_type", kind: "enum", T: () => ["proto.MobType", MobType] },
             { no: 2, name: "debuffs", kind: "message", T: () => Debuffs }
         ]);
     }
     create(value) {
-        const message = { armor: 0, mobType: 0 };
+        const message = { armor: 0, level: 0, mobType: 0 };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -1431,6 +1450,9 @@ class Target$Type extends MessageType {
             switch (fieldNo) {
                 case /* int32 armor */ 1:
                     message.armor = reader.int32();
+                    break;
+                case /* int32 level */ 4:
+                    message.level = reader.int32();
                     break;
                 case /* proto.MobType mob_type */ 3:
                     message.mobType = reader.int32();
@@ -1453,6 +1475,9 @@ class Target$Type extends MessageType {
         /* int32 armor = 1; */
         if (message.armor !== 0)
             writer.tag(1, WireType.Varint).int32(message.armor);
+        /* int32 level = 4; */
+        if (message.level !== 0)
+            writer.tag(4, WireType.Varint).int32(message.level);
         /* proto.MobType mob_type = 3; */
         if (message.mobType !== 0)
             writer.tag(3, WireType.Varint).int32(message.mobType);

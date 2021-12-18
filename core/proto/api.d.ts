@@ -13,6 +13,7 @@ import { RaidBuffs } from "./common";
 import { PartyBuffs } from "./common";
 import { Warrior } from "./warrior";
 import { Warlock } from "./warlock";
+import { EnhancementShaman } from "./shaman";
 import { ElementalShaman } from "./shaman";
 import { Rogue } from "./rogue";
 import { ShadowPriest } from "./priest";
@@ -104,6 +105,12 @@ export interface Player {
          * @generated from protobuf field: proto.ElementalShaman elemental_shaman = 12;
          */
         elementalShaman: ElementalShaman;
+    } | {
+        oneofKind: "enhancementShaman";
+        /**
+         * @generated from protobuf field: proto.EnhancementShaman enhancement_shaman = 18;
+         */
+        enhancementShaman: EnhancementShaman;
     } | {
         oneofKind: "warlock";
         /**
