@@ -1,7 +1,7 @@
 import { Consumes } from '/tbc/core/proto/common.js';
 import { EquipmentSpec } from '/tbc/core/proto/common.js';
 import { IndividualBuffs } from '/tbc/core/proto/common.js';
-import { ComputeStatsResult } from '/tbc/core/proto/api.js';
+import { PlayerStats } from '/tbc/core/proto/api.js';
 import { Player as PlayerProto } from '/tbc/core/proto/api.js';
 import { Gear } from '/tbc/core/proto_utils/gear.js';
 import { Stats } from '/tbc/core/proto_utils/stats.js';
@@ -9,7 +9,6 @@ import { canEquipItem, classColors, getEligibleItemSlots, getTalentTreeIcon, get
 import { TypedEvent } from './typed_event.js';
 import { MAX_PARTY_SIZE } from './party.js';
 import { sum } from './utils.js';
-import { wait } from './utils.js';
 // Manages all the gear / consumes / other settings for a single Player.
 export class Player {
     constructor(spec, sim) {
@@ -20,6 +19,7 @@ export class Player {
         this.gear = new Gear({});
         this.talentsString = '';
         this.epWeights = new Stats();
+        this.currentStats = PlayerStats.create();
         this.nameChangeEmitter = new TypedEvent();
         this.buffsChangeEmitter = new TypedEvent();
         this.consumesChangeEmitter = new TypedEvent();
@@ -55,13 +55,6 @@ export class Player {
             this.talentsStringChangeEmitter,
             this.specOptionsChangeEmitter,
         ].forEach(emitter => emitter.on(() => this.changeEmitter.emit()));
-        this.currentStats = ComputeStatsResult.create();
-        this.sim.changeEmitter.on(() => {
-            this.updateCharacterStats();
-        });
-        this.changeEmitter.on(() => {
-            this.updateCharacterStats();
-        });
     }
     getClass() {
         return specToClass[this.spec];
@@ -129,16 +122,12 @@ export class Player {
         this.epWeights = new Stats(result.epValues);
         return result;
     }
-    // This should be invoked internally whenever stats might have changed.
-    async updateCharacterStats() {
-        // Sometimes a ui change triggers other changes, so waiting a bit makes sure
-        // we get all of them.
-        await wait(10);
-        this.currentStats = await this.sim.getCharacterStats(this);
-        this.currentStatsEmitter.emit();
-    }
     getCurrentStats() {
-        return ComputeStatsResult.clone(this.currentStats);
+        return PlayerStats.clone(this.currentStats);
+    }
+    setCurrentStats(newStats) {
+        this.currentStats = newStats;
+        this.currentStatsEmitter.emit();
     }
     getName() {
         return this.name;

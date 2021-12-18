@@ -1365,9 +1365,7 @@ export const GearListResult = new GearListResult$Type();
 class ComputeStatsRequest$Type extends MessageType {
     constructor() {
         super("proto.ComputeStatsRequest", [
-            { no: 1, name: "player", kind: "message", T: () => Player },
-            { no: 2, name: "raid_buffs", kind: "message", T: () => RaidBuffs },
-            { no: 3, name: "party_buffs", kind: "message", T: () => PartyBuffs }
+            { no: 1, name: "raid", kind: "message", T: () => Raid }
         ]);
     }
     create(value) {
@@ -1382,14 +1380,8 @@ class ComputeStatsRequest$Type extends MessageType {
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
-                case /* proto.Player player */ 1:
-                    message.player = Player.internalBinaryRead(reader, reader.uint32(), options, message.player);
-                    break;
-                case /* proto.RaidBuffs raid_buffs */ 2:
-                    message.raidBuffs = RaidBuffs.internalBinaryRead(reader, reader.uint32(), options, message.raidBuffs);
-                    break;
-                case /* proto.PartyBuffs party_buffs */ 3:
-                    message.partyBuffs = PartyBuffs.internalBinaryRead(reader, reader.uint32(), options, message.partyBuffs);
+                case /* proto.Raid raid */ 1:
+                    message.raid = Raid.internalBinaryRead(reader, reader.uint32(), options, message.raid);
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -1403,15 +1395,9 @@ class ComputeStatsRequest$Type extends MessageType {
         return message;
     }
     internalBinaryWrite(message, writer, options) {
-        /* proto.Player player = 1; */
-        if (message.player)
-            Player.internalBinaryWrite(message.player, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
-        /* proto.RaidBuffs raid_buffs = 2; */
-        if (message.raidBuffs)
-            RaidBuffs.internalBinaryWrite(message.raidBuffs, writer.tag(2, WireType.LengthDelimited).fork(), options).join();
-        /* proto.PartyBuffs party_buffs = 3; */
-        if (message.partyBuffs)
-            PartyBuffs.internalBinaryWrite(message.partyBuffs, writer.tag(3, WireType.LengthDelimited).fork(), options).join();
+        /* proto.Raid raid = 1; */
+        if (message.raid)
+            Raid.internalBinaryWrite(message.raid, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -1423,12 +1409,13 @@ class ComputeStatsRequest$Type extends MessageType {
  */
 export const ComputeStatsRequest = new ComputeStatsRequest$Type();
 // @generated message type with reflection information, may provide speed optimized methods
-class ComputeStatsResult$Type extends MessageType {
+class PlayerStats$Type extends MessageType {
     constructor() {
-        super("proto.ComputeStatsResult", [
+        super("proto.PlayerStats", [
             { no: 1, name: "gear_only", kind: "scalar", repeat: 1 /*RepeatType.PACKED*/, T: 1 /*ScalarType.DOUBLE*/ },
-            { no: 2, name: "finalStats", kind: "scalar", repeat: 1 /*RepeatType.PACKED*/, T: 1 /*ScalarType.DOUBLE*/ },
-            { no: 3, name: "sets", kind: "scalar", repeat: 2 /*RepeatType.UNPACKED*/, T: 9 /*ScalarType.STRING*/ }
+            { no: 2, name: "final_stats", kind: "scalar", repeat: 1 /*RepeatType.PACKED*/, T: 1 /*ScalarType.DOUBLE*/ },
+            { no: 3, name: "sets", kind: "scalar", repeat: 2 /*RepeatType.UNPACKED*/, T: 9 /*ScalarType.STRING*/ },
+            { no: 4, name: "buffs", kind: "message", T: () => IndividualBuffs }
         ]);
     }
     create(value) {
@@ -1450,7 +1437,7 @@ class ComputeStatsResult$Type extends MessageType {
                     else
                         message.gearOnly.push(reader.double());
                     break;
-                case /* repeated double finalStats */ 2:
+                case /* repeated double final_stats */ 2:
                     if (wireType === WireType.LengthDelimited)
                         for (let e = reader.int32() + reader.pos; reader.pos < e;)
                             message.finalStats.push(reader.double());
@@ -1459,6 +1446,9 @@ class ComputeStatsResult$Type extends MessageType {
                     break;
                 case /* repeated string sets */ 3:
                     message.sets.push(reader.string());
+                    break;
+                case /* proto.IndividualBuffs buffs */ 4:
+                    message.buffs = IndividualBuffs.internalBinaryRead(reader, reader.uint32(), options, message.buffs);
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -1479,7 +1469,7 @@ class ComputeStatsResult$Type extends MessageType {
                 writer.double(message.gearOnly[i]);
             writer.join();
         }
-        /* repeated double finalStats = 2; */
+        /* repeated double final_stats = 2; */
         if (message.finalStats.length) {
             writer.tag(2, WireType.LengthDelimited).fork();
             for (let i = 0; i < message.finalStats.length; i++)
@@ -1489,6 +1479,150 @@ class ComputeStatsResult$Type extends MessageType {
         /* repeated string sets = 3; */
         for (let i = 0; i < message.sets.length; i++)
             writer.tag(3, WireType.LengthDelimited).string(message.sets[i]);
+        /* proto.IndividualBuffs buffs = 4; */
+        if (message.buffs)
+            IndividualBuffs.internalBinaryWrite(message.buffs, writer.tag(4, WireType.LengthDelimited).fork(), options).join();
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message proto.PlayerStats
+ */
+export const PlayerStats = new PlayerStats$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class PartyStats$Type extends MessageType {
+    constructor() {
+        super("proto.PartyStats", [
+            { no: 1, name: "players", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => PlayerStats }
+        ]);
+    }
+    create(value) {
+        const message = { players: [] };
+        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader, length, options, target) {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* repeated proto.PlayerStats players */ 1:
+                    message.players.push(PlayerStats.internalBinaryRead(reader, reader.uint32(), options));
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message, writer, options) {
+        /* repeated proto.PlayerStats players = 1; */
+        for (let i = 0; i < message.players.length; i++)
+            PlayerStats.internalBinaryWrite(message.players[i], writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message proto.PartyStats
+ */
+export const PartyStats = new PartyStats$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class RaidStats$Type extends MessageType {
+    constructor() {
+        super("proto.RaidStats", [
+            { no: 1, name: "parties", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => PartyStats }
+        ]);
+    }
+    create(value) {
+        const message = { parties: [] };
+        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader, length, options, target) {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* repeated proto.PartyStats parties */ 1:
+                    message.parties.push(PartyStats.internalBinaryRead(reader, reader.uint32(), options));
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message, writer, options) {
+        /* repeated proto.PartyStats parties = 1; */
+        for (let i = 0; i < message.parties.length; i++)
+            PartyStats.internalBinaryWrite(message.parties[i], writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message proto.RaidStats
+ */
+export const RaidStats = new RaidStats$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class ComputeStatsResult$Type extends MessageType {
+    constructor() {
+        super("proto.ComputeStatsResult", [
+            { no: 1, name: "raid_stats", kind: "message", T: () => RaidStats }
+        ]);
+    }
+    create(value) {
+        const message = {};
+        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader, length, options, target) {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* proto.RaidStats raid_stats */ 1:
+                    message.raidStats = RaidStats.internalBinaryRead(reader, reader.uint32(), options, message.raidStats);
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message, writer, options) {
+        /* proto.RaidStats raid_stats = 1; */
+        if (message.raidStats)
+            RaidStats.internalBinaryWrite(message.raidStats, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

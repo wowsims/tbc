@@ -7,7 +7,6 @@ import { ItemSpec } from '/tbc/core/proto/common.js';
 import { Item } from '/tbc/core/proto/common.js';
 import { Spec } from '/tbc/core/proto/common.js';
 import { Stat } from '/tbc/core/proto/common.js';
-import { ComputeStatsResult } from '/tbc/core/proto/api.js';
 import { RaidSimRequest, RaidSimResult } from '/tbc/core/proto/api.js';
 import { StatWeightsRequest, StatWeightsResult } from '/tbc/core/proto/api.js';
 import { EquippedItem } from '/tbc/core/proto_utils/equipped_item.js';
@@ -44,7 +43,7 @@ export declare class Sim {
     private makeRaidSimRequest;
     runRaidSim(): Promise<SimResult>;
     runRaidSimWithLogs(): Promise<SimResult>;
-    getCharacterStats(player: Player<any>): Promise<ComputeStatsResult>;
+    private updateCharacterStats;
     statWeights(player: Player<any>, epStats: Array<Stat>, epReferenceStat: Stat): Promise<StatWeightsResult>;
     getItems(slot: ItemSlot | undefined): Array<Item>;
     getEnchants(slot: ItemSlot | undefined): Array<Enchant>;

@@ -1,5 +1,5 @@
 import { Item } from '/tbc/core/proto/common.js';
-import { ComputeStatsRequest, ComputeStatsResult } from '/tbc/core/proto/api.js';
+import { ComputeStatsRequest } from '/tbc/core/proto/api.js';
 import { GearListRequest } from '/tbc/core/proto/api.js';
 import { RaidSimRequest } from '/tbc/core/proto/api.js';
 import { SimOptions } from '/tbc/core/proto/api.js';
@@ -14,6 +14,7 @@ import { gemMatchesSocket } from '/tbc/core/proto_utils/utils.js';
 import { Encounter } from './encounter.js';
 import { Raid } from './raid.js';
 import { TypedEvent } from './typed_event.js';
+import { wait } from './utils.js';
 import { WorkerPool } from './worker_pool.js';
 import * as OtherConstants from '/tbc/core/constants/other.js';
 // Core Sim module which deals only with api types, no UI-related stuff.
@@ -45,6 +46,9 @@ export class Sim {
             this.raid.changeEmitter,
             this.encounter.changeEmitter,
         ].forEach(emitter => emitter.on(() => this.changeEmitter.emit()));
+        this.raid.changeEmitter.on(() => {
+            this.updateCharacterStats();
+        });
     }
     waitForInit() {
         return this._initPromise;
@@ -87,19 +91,20 @@ export class Sim {
         this.simResultEmitter.emit(simResult);
         return simResult;
     }
-    async getCharacterStats(player) {
-        if (player.getParty() == null) {
-            //console.warn('Trying to get character stats without a party!');
-            return ComputeStatsResult.create();
-        }
-        else {
-            await this.waitForInit();
-            return await this.workerPool.computeStats(ComputeStatsRequest.create({
-                player: player.toProto(),
-                raidBuffs: this.raid.getBuffs(),
-                partyBuffs: player.getParty().getBuffs(),
-            }));
-        }
+    // This should be invoked internally whenever stats might have changed.
+    async updateCharacterStats() {
+        await this.waitForInit();
+        // Sometimes a ui change triggers other changes, so waiting a bit makes sure
+        // we get all of them.
+        await wait(10);
+        // Capture the current players so we avoid issues if something changes while
+        // request is in-flight.
+        const players = this.raid.getPlayers();
+        const result = await this.workerPool.computeStats(ComputeStatsRequest.create({
+            raid: this.raid.toProto(),
+        }));
+        result.raidStats.parties
+            .forEach((partyStats, partyIndex) => partyStats.players.forEach((playerStats, playerIndex) => players[partyIndex * 5 + playerIndex]?.setCurrentStats(playerStats)));
     }
     async statWeights(player, epStats, epReferenceStat) {
         if (this.raid.isEmpty()) {

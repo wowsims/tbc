@@ -31,7 +31,7 @@ export class CharacterStats extends Component {
             row.appendChild(value);
             this.valueElems.push(value);
         });
-        this.updateStats(new Stats());
+        this.updateStats(new Stats(player.getCurrentStats().finalStats));
         player.currentStatsEmitter.on(() => {
             this.updateStats(new Stats(player.getCurrentStats().finalStats));
         });

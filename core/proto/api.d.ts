@@ -495,34 +495,57 @@ export interface GearListResult {
  */
 export interface ComputeStatsRequest {
     /**
-     * @generated from protobuf field: proto.Player player = 1;
+     * @generated from protobuf field: proto.Raid raid = 1;
      */
-    player?: Player;
-    /**
-     * @generated from protobuf field: proto.RaidBuffs raid_buffs = 2;
-     */
-    raidBuffs?: RaidBuffs;
-    /**
-     * @generated from protobuf field: proto.PartyBuffs party_buffs = 3;
-     */
-    partyBuffs?: PartyBuffs;
+    raid?: Raid;
 }
 /**
- * @generated from protobuf message proto.ComputeStatsResult
+ * @generated from protobuf message proto.PlayerStats
  */
-export interface ComputeStatsResult {
+export interface PlayerStats {
     /**
      * @generated from protobuf field: repeated double gear_only = 1;
      */
     gearOnly: number[];
     /**
-     * @generated from protobuf field: repeated double finalStats = 2;
+     * @generated from protobuf field: repeated double final_stats = 2;
      */
     finalStats: number[];
     /**
      * @generated from protobuf field: repeated string sets = 3;
      */
     sets: string[];
+    /**
+     * @generated from protobuf field: proto.IndividualBuffs buffs = 4;
+     */
+    buffs?: IndividualBuffs;
+}
+/**
+ * @generated from protobuf message proto.PartyStats
+ */
+export interface PartyStats {
+    /**
+     * @generated from protobuf field: repeated proto.PlayerStats players = 1;
+     */
+    players: PlayerStats[];
+}
+/**
+ * @generated from protobuf message proto.RaidStats
+ */
+export interface RaidStats {
+    /**
+     * @generated from protobuf field: repeated proto.PartyStats parties = 1;
+     */
+    parties: PartyStats[];
+}
+/**
+ * @generated from protobuf message proto.ComputeStatsResult
+ */
+export interface ComputeStatsResult {
+    /**
+     * @generated from protobuf field: proto.RaidStats raid_stats = 1;
+     */
+    raidStats?: RaidStats;
 }
 /**
  * RPC StatWeights
@@ -796,6 +819,36 @@ declare class ComputeStatsRequest$Type extends MessageType<ComputeStatsRequest> 
  * @generated MessageType for protobuf message proto.ComputeStatsRequest
  */
 export declare const ComputeStatsRequest: ComputeStatsRequest$Type;
+declare class PlayerStats$Type extends MessageType<PlayerStats> {
+    constructor();
+    create(value?: PartialMessage<PlayerStats>): PlayerStats;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: PlayerStats): PlayerStats;
+    internalBinaryWrite(message: PlayerStats, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message proto.PlayerStats
+ */
+export declare const PlayerStats: PlayerStats$Type;
+declare class PartyStats$Type extends MessageType<PartyStats> {
+    constructor();
+    create(value?: PartialMessage<PartyStats>): PartyStats;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: PartyStats): PartyStats;
+    internalBinaryWrite(message: PartyStats, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message proto.PartyStats
+ */
+export declare const PartyStats: PartyStats$Type;
+declare class RaidStats$Type extends MessageType<RaidStats> {
+    constructor();
+    create(value?: PartialMessage<RaidStats>): RaidStats;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: RaidStats): RaidStats;
+    internalBinaryWrite(message: RaidStats, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message proto.RaidStats
+ */
+export declare const RaidStats: RaidStats$Type;
 declare class ComputeStatsResult$Type extends MessageType<ComputeStatsResult> {
     constructor();
     create(value?: PartialMessage<ComputeStatsResult>): ComputeStatsResult;
