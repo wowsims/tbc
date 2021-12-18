@@ -105,10 +105,10 @@ type Aura struct {
 
 	OnPeriodicDamage OnPeriodicDamage
 
-	// Invoked before an auto attack swing happens
+	// Invoked before an auto attack swing happens.
 	OnBeforeSwingHit OnBeforeSwingHit
 
-	// Invoked after a melee hit has occured (could be auto or skill)
+	// Invoked after a melee hit has occured (could be auto or skill).
 	OnMeleeAttack OnMeleeAttack
 }
 
@@ -258,6 +258,8 @@ func (at *auraTracker) ReplaceAura(sim *Simulation, newAura Aura) {
 		newAura.onSpellHitIndex = old.onSpellHitIndex
 		newAura.onSpellMissIndex = old.onSpellMissIndex
 		newAura.onPeriodicDamageIndex = old.onPeriodicDamageIndex
+		newAura.onBeforeSwingHitIndex = old.onBeforeSwingHitIndex
+		newAura.OnMeleeAttackIndex = old.OnMeleeAttackIndex
 		newAura.startTime = old.startTime
 
 		at.auras[newAura.ID] = newAura
@@ -419,6 +421,14 @@ func removeBySwappingToBack(arr []AuraID, removeIdx int32) []AuraID {
 // Returns whether an aura with the given ID is currently active.
 func (at *auraTracker) HasAura(id AuraID) bool {
 	return at.auras[id].ID != 0
+}
+
+func (at *auraTracker) NumStacks(id AuraID) int32 {
+	if at.HasAura(id) {
+		return at.auras[id].Stacks
+	} else {
+		return 0
+	}
 }
 
 func (at *auraTracker) IsOnCD(id CooldownID, currentTime time.Duration) bool {

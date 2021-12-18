@@ -16,7 +16,6 @@ func RegisterShadowPriest() {
 	})
 }
 
-var ShadowWeavingDebuffID = core.NewDebuffID()
 var ShadowWeaverAuraID = core.NewAuraID()
 
 func NewShadowPriest(character core.Character, options proto.Player) *ShadowPriest {
@@ -42,37 +41,6 @@ func NewShadowPriest(character core.Character, options proto.Player) *ShadowPrie
 	}
 
 	if basePriest.Talents.ShadowWeaving > 0 {
-		// TODO: use Aura.Stacks and add a function to increment stacks.
-		//  This is required to make this work correctly for a raid sim.
-		swAura := core.Aura{
-			ID:   ShadowWeavingDebuffID,
-			Name: "Shadow Weaving",
-			OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-				if spellCast.SpellSchool == stats.ShadowSpellPower {
-					spellEffect.DamageMultiplier *= 1 + 0.02*spriest.swStacks
-				}
-			},
-			OnPeriodicDamage: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect, tickDamage *float64) {
-				if spellCast.SpellSchool == stats.ShadowSpellPower {
-					*tickDamage *= (1 + 0.02*spriest.swStacks)
-				}
-			},
-			OnExpire: func(sim *core.Simulation) {
-				spriest.swStacks = 0
-			},
-		}
-
-		addShadowWeaving := func(sim *core.Simulation, spellEffect *core.SpellEffect) {
-			if spriest.swStacks < 5 {
-				spriest.swStacks++
-				if sim.Log != nil {
-					spriest.Log(sim, "Shadow Weaving: stacks on target %0.0f\n", spriest.swStacks)
-				}
-			}
-			// Just keep replacing it with new expire time.
-			swAura.Expires = sim.CurrentTime + time.Second*15
-			spellEffect.Target.ReplaceAura(sim, swAura)
-		}
 		// This is a combined aura for all spriest major on hit effects.
 		//  Shadow Weaving, Vampiric Touch, and Misery
 		spriest.Character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
@@ -89,7 +57,7 @@ func NewShadowPriest(character core.Character, options proto.Player) *ShadowPrie
 					}
 				},
 				OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-					addShadowWeaving(sim, spellEffect)
+					spriest.ApplyShadowWeaving(sim, spellEffect.Target)
 					if spellEffect.Damage > 0 && spriest.VTSpell.DotInput.IsTicking(sim) {
 						amount := spellEffect.Damage * 0.05
 						if sim.Log != nil {
@@ -99,17 +67,7 @@ func NewShadowPriest(character core.Character, options proto.Player) *ShadowPrie
 					}
 
 					if spellCast.ActionID.SpellID == priest.SpellIDSWP || spellCast.ActionID.SpellID == priest.SpellIDVT || spellCast.ActionID.SpellID == priest.SpellIDMF {
-						spellEffect.Target.ReplaceAura(sim, core.Aura{
-							ID:      core.MiseryDebuffID,
-							Expires: sim.CurrentTime + time.Second*24,
-							Name:    "Misery",
-							OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-								spellEffect.DamageMultiplier *= 1.05
-							},
-							OnPeriodicDamage: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect, tickDamage *float64) {
-								*tickDamage *= 1.05
-							},
-						})
+						spriest.ApplyMisery(sim, spellEffect.Target)
 					}
 				},
 			}
@@ -122,8 +80,6 @@ func NewShadowPriest(character core.Character, options proto.Player) *ShadowPrie
 type ShadowPriest struct {
 	priest.Priest
 
-	swStacks float64
-
 	rotation proto.ShadowPriest_Rotation
 }
 
@@ -133,7 +89,6 @@ func (spriest *ShadowPriest) GetPriest() *priest.Priest {
 
 func (spriest *ShadowPriest) Reset(sim *core.Simulation) {
 	spriest.Priest.Reset(sim)
-	spriest.swStacks = 0
 }
 
 // TODO: probably do something different instead of making it global?
