@@ -63,13 +63,11 @@
 }
 
 .bonus-stats-root .number-picker-root.positive .input-label {
-  color: lawngreen;
   font-weight: bold;
   text-shadow: 2px 2px 3px black;
 }
 
 .bonus-stats-root .number-picker-root.negative .input-label {
-  color: red;
   font-weight: bold;
   text-shadow: 2px 2px 3px black;
 }
@@ -290,6 +288,14 @@
   opacity: 0.7;
 }
 
+.positive {
+  color: lawngreen;
+}
+
+.negative {
+  color: red;
+}
+
 .gear-picker-root {
   display: flex;
   margin: 15px;
@@ -459,14 +465,6 @@
   color: white;
 }
 
-.selector-modal-list-item-ep-delta.positive {
-  color: lawngreen;
-}
-
-.selector-modal-list-item-ep-delta.negative {
-  color: red;
-}
-
 .icon-enum-picker-root a {
   height: 40px;
   width: 40px;
@@ -579,6 +577,14 @@
 
 *:not(.dropdown-button) > .dropdown-option:not(:hover) {
   opacity: 0.7;
+}
+
+.positive {
+  color: lawngreen;
+}
+
+.negative {
+  color: red;
 }
 
 .icon-input {
@@ -777,6 +783,14 @@
   opacity: 0.7;
 }
 
+.positive {
+  color: lawngreen;
+}
+
+.negative {
+  color: red;
+}
+
 .results-sim {
   text-align: center;
 }
@@ -816,14 +830,6 @@
 .results-sim-set-reference {
   cursor: pointer;
   font-size: 24px;
-}
-
-.results-sim-reference-diff.positive {
-  color: lawngreen;
-}
-
-.results-sim-reference-diff.negative {
-  color: red;
 }
 
 .results-sim-reference-swap {
@@ -992,6 +998,14 @@
 
 *:not(.dropdown-button) > .dropdown-option:not(:hover) {
   opacity: 0.7;
+}
+
+.positive {
+  color: lawngreen;
+}
+
+.negative {
+  color: red;
 }
 
 .results-ep-table {
@@ -1188,6 +1202,14 @@
 
 *:not(.dropdown-button) > .dropdown-option:not(:hover) {
   opacity: 0.7;
+}
+
+.positive {
+  color: lawngreen;
+}
+
+.negative {
+  color: red;
 }
 
 html {
@@ -1453,6 +1475,14 @@ td, th {
 
 *:not(.dropdown-button) > .dropdown-option:not(:hover) {
   opacity: 0.7;
+}
+
+.positive {
+  color: lawngreen;
+}
+
+.negative {
+  color: red;
 }
 
 .talents-picker-root {
@@ -1801,6 +1831,14 @@ td, th {
   filter: grayscale(1);
 }
 
+.blessings-table-row:not(.paladin-active) .dropdown-option {
+  filter: grayscale(1);
+}
+
+.blessings-table-row:not(.paladin-active) .dropdown-button {
+  filter: grayscale(1);
+}
+
 .blessings-table-cell {
   padding: 2px 10px;
 }
@@ -1822,6 +1860,10 @@ td, th {
 
 .party-header, .player-picker-root {
   margin: 3px;
+}
+
+.party-header {
+  height: 20px;
 }
 
 .player-picker-root {
@@ -1870,10 +1912,11 @@ td, th {
   vertical-align: top;
   display: inline-flex;
   align-items: center;
+  float: right;
 }
 
 .player-options span {
-  margin: 2px;
+  margin: 4px;
   cursor: pointer;
   text-shadow: 0 0 3px var(--main-secondary-color), 0 0 3px var(--main-secondary-color), 0 0 3px var(--main-secondary-color);
 }
@@ -1892,6 +1935,26 @@ td, th {
 
 .player-delete {
   color: red;
+}
+
+.party-results, .player-results {
+  height: 100%;
+  vertical-align: top;
+  display: inline-flex;
+  align-items: center;
+  float: right;
+  font-size: 16px;
+  text-shadow: 0 0 3px var(--main-secondary-color), 0 0 3px var(--main-secondary-color), 0 0 3px var(--main-secondary-color);
+}
+
+.player-results[draggable=true] {
+  cursor: pointer;
+}
+
+.party-results-dps, .party-results-reference-delta, .player-results-dps, .player-results-reference-delta {
+  width: 60px;
+  text-align: right;
+  margin: 5px;
 }
 
 .buff-bot .player-edit {
@@ -1973,30 +2036,6 @@ td, th {
 .player-editor-modal .player-editor {
   height: 100%;
   width: 100%;
-}
-
-.player-results {
-  height: 100%;
-  vertical-align: top;
-  display: inline-flex;
-  align-items: center;
-  float: right;
-  font-size: 16px;
-  text-shadow: 0 0 3px var(--main-secondary-color), 0 0 3px var(--main-secondary-color), 0 0 3px var(--main-secondary-color);
-}
-
-.player-results-dps, .player-results-reference-delta {
-  width: 60px;
-  text-align: right;
-  margin: 5px;
-}
-
-.player-results-reference-delta.positive {
-  color: lawngreen;
-}
-
-.player-results-reference-delta.negative {
-  color: red;
 }
 
 .raid-settings-tab {

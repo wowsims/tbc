@@ -62,6 +62,7 @@ export class IndividualSimUI extends SimUI {
         this.player = player;
         this.individualConfig = config;
         this.isWithinRaidSim = this.rootElem.closest('.within-raid-sim') != null;
+        this.raidSimResultsManager = null;
         this.exclusivityMap = {
             'Battle Elixir': [],
             'Drums': [],
@@ -140,7 +141,7 @@ export class IndividualSimUI extends SimUI {
         });
     }
     addSidebarComponents() {
-        addRaidSimAction(this);
+        this.raidSimResultsManager = addRaidSimAction(this);
         addStatWeightsAction(this, this.individualConfig.epStats, this.individualConfig.epReferenceStat);
         const characterStats = new CharacterStats(this.rootElem.getElementsByClassName('sim-sidebar-footer')[0], this.individualConfig.displayStats, this.player);
     }
@@ -475,7 +476,7 @@ export class IndividualSimUI extends SimUI {
 			<div class="detailed-results">
 			</div>
 		`);
-        const detailedResults = new DetailedResults(this.rootElem.getElementsByClassName('detailed-results')[0], this);
+        const detailedResults = new DetailedResults(this.rootElem.getElementsByClassName('detailed-results')[0], this, this.raidSimResultsManager);
     }
     addLogTab() {
         this.addTab('Log', 'log-tab', `

@@ -1,7 +1,7 @@
 import { repoName } from '/tbc/core/resources.js';
 import { Component } from './component.js';
 export class DetailedResults extends Component {
-    constructor(parent, simUI) {
+    constructor(parent, simUI, simResultsManager) {
         super(parent, 'detailed-results-manager-root');
         this.tabWindow = null;
         this.latestResult = null;
@@ -33,8 +33,11 @@ export class DetailedResults extends Component {
                 this.tabWindow.focus();
             }
         });
-        simUI.sim.simResultEmitter.on(simResult => {
-            this.setSimResult(simResult);
+        simResultsManager.currentChangeEmitter.on(() => {
+            const cur = simResultsManager.getCurrentData();
+            if (cur) {
+                this.setSimResult(cur.simResult);
+            }
         });
     }
     // TODO: Decide whether to continue using this or just remove it.

@@ -100,6 +100,7 @@ export declare abstract class IndividualSimUI<SpecType extends Spec> extends Sim
     readonly individualConfig: IndividualSimUIConfig<SpecType>;
     readonly isWithinRaidSim: boolean;
     private readonly exclusivityMap;
+    private raidSimResultsManager;
     constructor(parentElem: HTMLElement, player: Player<SpecType>, config: IndividualSimUIConfig<SpecType>);
     private loadSettings;
     private addSidebarComponents;

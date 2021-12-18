@@ -14,13 +14,11 @@
 }
 
 .bonus-stats-root .number-picker-root.positive .input-label {
-  color: lawngreen;
   font-weight: bold;
   text-shadow: 2px 2px 3px black;
 }
 
 .bonus-stats-root .number-picker-root.negative .input-label {
-  color: red;
   font-weight: bold;
   text-shadow: 2px 2px 3px black;
 }
@@ -241,6 +239,14 @@
   opacity: 0.7;
 }
 
+.positive {
+  color: lawngreen;
+}
+
+.negative {
+  color: red;
+}
+
 .gear-picker-root {
   display: flex;
   margin: 15px;
@@ -410,14 +416,6 @@
   color: white;
 }
 
-.selector-modal-list-item-ep-delta.positive {
-  color: lawngreen;
-}
-
-.selector-modal-list-item-ep-delta.negative {
-  color: red;
-}
-
 .icon-enum-picker-root a {
   height: 40px;
   width: 40px;
@@ -530,6 +528,14 @@
 
 *:not(.dropdown-button) > .dropdown-option:not(:hover) {
   opacity: 0.7;
+}
+
+.positive {
+  color: lawngreen;
+}
+
+.negative {
+  color: red;
 }
 
 .icon-input {
@@ -728,6 +734,14 @@
   opacity: 0.7;
 }
 
+.positive {
+  color: lawngreen;
+}
+
+.negative {
+  color: red;
+}
+
 .results-sim {
   text-align: center;
 }
@@ -767,14 +781,6 @@
 .results-sim-set-reference {
   cursor: pointer;
   font-size: 24px;
-}
-
-.results-sim-reference-diff.positive {
-  color: lawngreen;
-}
-
-.results-sim-reference-diff.negative {
-  color: red;
 }
 
 .results-sim-reference-swap {
@@ -943,6 +949,14 @@
 
 *:not(.dropdown-button) > .dropdown-option:not(:hover) {
   opacity: 0.7;
+}
+
+.positive {
+  color: lawngreen;
+}
+
+.negative {
+  color: red;
 }
 
 .results-ep-table {
@@ -1139,6 +1153,14 @@
 
 *:not(.dropdown-button) > .dropdown-option:not(:hover) {
   opacity: 0.7;
+}
+
+.positive {
+  color: lawngreen;
+}
+
+.negative {
+  color: red;
 }
 
 html {
@@ -1404,6 +1426,14 @@ td, th {
 
 *:not(.dropdown-button) > .dropdown-option:not(:hover) {
   opacity: 0.7;
+}
+
+.positive {
+  color: lawngreen;
+}
+
+.negative {
+  color: red;
 }
 
 .talents-picker-root {

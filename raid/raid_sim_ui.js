@@ -121,7 +121,7 @@ export class RaidSimUI extends SimUI {
 			<div class="detailed-results">
 			</div>
 		`);
-        const detailedResults = new DetailedResults(this.rootElem.getElementsByClassName('detailed-results')[0], this);
+        const detailedResults = new DetailedResults(this.rootElem.getElementsByClassName('detailed-results')[0], this, this.raidSimResultsManager);
     }
     addLogTab() {
         this.addTab('Log', 'log-tab', `

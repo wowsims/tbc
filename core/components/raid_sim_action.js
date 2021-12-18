@@ -29,6 +29,7 @@ export class RaidSimResultsManager {
             simResult: simResult,
             settings: this.simUI.sim.toJson(),
         };
+        this.currentChangeEmitter.emit();
         const dpsMetrics = simResult.raidMetrics.dps;
         this.simUI.setResultsContent(`
       <div class="results-sim">
