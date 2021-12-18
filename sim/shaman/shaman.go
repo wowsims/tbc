@@ -290,6 +290,7 @@ func (shaman *Shaman) registerBloodlustCD() {
 	shaman.AddMajorCooldown(core.MajorCooldown{
 		CooldownID: BloodlustCooldownID,
 		Cooldown:   core.BloodlustCD,
+		Priority:   core.CooldownPriorityBloodlust,
 		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
 			return func(sim *core.Simulation, character *core.Character) bool {
 				if character.HasAura(core.BloodlustAuraID) {
