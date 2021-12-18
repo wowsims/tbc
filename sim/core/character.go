@@ -447,6 +447,18 @@ func (character *Character) doneIteration(simDuration time.Duration) {
 	character.auraTracker.doneIteration(simDuration)
 }
 
+func (character *Character) GetStatsProto() *proto.PlayerStats {
+	gearStats := character.Equip.Stats()
+	finalStats := character.GetStats()
+	setBonusNames := character.GetActiveSetBonusNames()
+
+	return &proto.PlayerStats{
+		GearOnly:   gearStats[:],
+		FinalStats: finalStats[:],
+		Sets:       setBonusNames,
+	}
+}
+
 func (character *Character) GetMetricsProto(numIterations int32) *proto.PlayerMetrics {
 	metrics := character.Metrics.ToProto(numIterations)
 	metrics.Auras = character.auraTracker.GetMetricsProto(numIterations)

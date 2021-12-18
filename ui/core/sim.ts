@@ -99,6 +99,10 @@ export class Sim {
 			this.raid.changeEmitter,
 			this.encounter.changeEmitter,
     ].forEach(emitter => emitter.on(() => this.changeEmitter.emit()));
+
+		this.raid.changeEmitter.on(() => {
+			this.updateCharacterStats();
+		});
   }
 
   waitForInit(): Promise<void> {
@@ -150,19 +154,26 @@ export class Sim {
 		return simResult;
 	}
 
-	async getCharacterStats(player: Player<any>): Promise<ComputeStatsResult> {
-		if (player.getParty() == null) {
-			//console.warn('Trying to get character stats without a party!');
-			return ComputeStatsResult.create();
-		} else {
-			await this.waitForInit();
+	// This should be invoked internally whenever stats might have changed.
+	private async updateCharacterStats() {
+		await this.waitForInit();
 
-			return await this.workerPool.computeStats(ComputeStatsRequest.create({
-				player: player.toProto(),
-				raidBuffs: this.raid.getBuffs(),
-				partyBuffs: player.getParty()!.getBuffs(),
-			}));
-		}
+		// Sometimes a ui change triggers other changes, so waiting a bit makes sure
+		// we get all of them.
+		await wait(10);
+
+		// Capture the current players so we avoid issues if something changes while
+		// request is in-flight.
+		const players = this.raid.getPlayers();
+
+		const result = await this.workerPool.computeStats(ComputeStatsRequest.create({
+			raid: this.raid.toProto(),
+		}));
+
+		result.raidStats!.parties
+				.forEach((partyStats, partyIndex) =>
+						partyStats.players.forEach((playerStats, playerIndex) =>
+								players[partyIndex*5 + playerIndex]?.setCurrentStats(playerStats)));
 	}
 
   async statWeights(player: Player<any>, epStats: Array<Stat>, epReferenceStat: Stat): Promise<StatWeightsResult> {

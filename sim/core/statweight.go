@@ -22,15 +22,14 @@ func CalcStatWeight(swr proto.StatWeightsRequest, statsToWeigh []stats.Stat, ref
 		swr.Player.BonusStats = make([]float64, stats.Len)
 	}
 
+	raidProto := SinglePlayerRaidProto(swr.Player, swr.PartyBuffs, swr.RaidBuffs)
 	baseStatsResult := ComputeStats(&proto.ComputeStatsRequest{
-		Player:     swr.Player,
-		RaidBuffs:  swr.RaidBuffs,
-		PartyBuffs: swr.PartyBuffs,
+		Raid: raidProto,
 	})
-	baseStats := baseStatsResult.FinalStats
+	baseStats := baseStatsResult.RaidStats.Parties[0].Players[0].FinalStats
 
 	baseSimRequest := &proto.RaidSimRequest{
-		Raid:       SinglePlayerRaidProto(swr.Player, swr.PartyBuffs, swr.RaidBuffs),
+		Raid:       raidProto,
 		Encounter:  swr.Encounter,
 		SimOptions: swr.SimOptions,
 	}

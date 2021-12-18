@@ -1,4 +1,5 @@
 import { Party as PartyProto } from '/tbc/core/proto/api.js';
+import { PartyStats as PartyStatsProto } from '/tbc/core/proto/api.js';
 import { Player as PlayerProto } from '/tbc/core/proto/api.js';
 import { PartyBuffs } from '/tbc/core/proto/common.js';
 import { Class } from '/tbc/core/proto/common.js';

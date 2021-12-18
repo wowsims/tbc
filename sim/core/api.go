@@ -33,28 +33,10 @@ func GetGearList(request *proto.GearListRequest) *proto.GearListResult {
  * Returns character stats taking into account gear / buffs / consumes / etc
  */
 func ComputeStats(csr *proto.ComputeStatsRequest) *proto.ComputeStatsResult {
-	raid := NewRaid(proto.Raid{
-		Parties: []*proto.Party{
-			&proto.Party{
-				Players: []*proto.Player{
-					csr.Player,
-				},
-				Buffs: csr.PartyBuffs,
-			},
-		},
-		Buffs: csr.RaidBuffs,
-	})
-
-	agent := raid.Parties[0].Players[0]
-
-	gearStats := agent.GetCharacter().Equip.Stats()
-	finalStats := agent.GetCharacter().GetStats()
-	setBonusNames := agent.GetCharacter().GetActiveSetBonusNames()
+	raid := NewRaid(*csr.Raid)
 
 	return &proto.ComputeStatsResult{
-		GearOnly:   gearStats[:],
-		FinalStats: finalStats[:],
-		Sets:       setBonusNames,
+		RaidStats: raid.GetStats(),
 	}
 }
 
