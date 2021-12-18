@@ -1,7 +1,6 @@
 package elemental
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/wowsims/tbc/sim/common"
@@ -235,11 +234,8 @@ type AdaptiveRotation struct {
 }
 
 func (rotation *AdaptiveRotation) ChooseAction(eleShaman *ElementalShaman, sim *core.Simulation) AgentAction {
-	projectedManaCost := rotation.manaTracker.ProjectedManaCost(sim, eleShaman.GetCharacter())
-	remainingManaPool := eleShaman.ExpectedRemainingManaPool(sim)
-
 	// If we have enough mana to burn, use the surplus rotation.
-	if projectedManaCost < remainingManaPool {
+	if rotation.manaTracker.ProjectedManaSurplus(sim, eleShaman.GetCharacter()) {
 		return rotation.surplusRotation.ChooseAction(eleShaman, sim)
 	} else {
 		return rotation.baseRotation.ChooseAction(eleShaman, sim)
@@ -264,7 +260,6 @@ func (rotation *AdaptiveRotation) GetPresimOptions() *core.PresimOptions {
 		},
 
 		OnPresimResult: func(presimResult proto.PlayerMetrics, iterations int32, duration time.Duration) bool {
-			fmt.Printf("Avg: %0.02f, cutoff: %0.02f\n", presimResult.SecondsOomAvg, 0.03*duration.Seconds())
 			if float64(presimResult.SecondsOomAvg) >= 0.03*duration.Seconds() {
 				rotation.baseRotation = NewLBOnlyRotation()
 				rotation.surplusRotation = NewCLOnClearcastRotation()

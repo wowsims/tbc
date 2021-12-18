@@ -1,7 +1,6 @@
 package balance
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/wowsims/tbc/sim/common"
@@ -68,8 +67,7 @@ func (moonkin *BalanceDruid) GetPresimOptions() *core.PresimOptions {
 		},
 
 		OnPresimResult: func(presimResult proto.PlayerMetrics, iterations int32, duration time.Duration) bool {
-			fmt.Printf("Avg: %0.02f, cutoff: %0.02f\n", presimResult.SecondsOomAvg, 0.03*duration.Seconds())
-			if float64(presimResult.SecondsOomAvg) >= 0.03*duration.Seconds() {
+			if float64(presimResult.SecondsOomAvg) <= 0.03*duration.Seconds() {
 				moonkin.primaryRotation = rotations[rotationIdx]
 
 				// If the highest dps rotation is fine, we dont need any adaptive logic.
@@ -106,11 +104,9 @@ func (moonkin *BalanceDruid) Reset(sim *core.Simulation) {
 func (moonkin *BalanceDruid) Act(sim *core.Simulation) time.Duration {
 	if moonkin.useSurplusRotation {
 		moonkin.manaTracker.Update(sim, moonkin.GetCharacter())
-		projectedManaCost := moonkin.manaTracker.ProjectedManaCost(sim, moonkin.GetCharacter())
-		remainingManaPool := moonkin.ExpectedRemainingManaPool(sim)
 
 		// If we have enough mana to burn, use the surplus rotation.
-		if projectedManaCost < remainingManaPool {
+		if moonkin.manaTracker.ProjectedManaSurplus(sim, moonkin.GetCharacter()) {
 			return moonkin.actRotation(sim, moonkin.surplusRotation)
 		} else {
 			return moonkin.actRotation(sim, moonkin.primaryRotation)

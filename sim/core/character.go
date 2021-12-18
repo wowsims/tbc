@@ -1,6 +1,7 @@
 package core
 
 import (
+	"fmt"
 	"math"
 	"time"
 
@@ -77,11 +78,6 @@ type Character struct {
 	// beyond this Character's mana pool. This should include mana potions / runes /
 	// innervates / etc.
 	ExpectedBonusMana float64
-
-	// Number of JoW so far for the current iteration. Used to estimate bonus mana
-	// over the remainder of the iteration.
-	// This is a float because each count is scaled by current cast speed.
-	judgementOfWisdomProcs float64
 
 	// Statistics describing the results of the sim.
 	Metrics CharacterMetrics
@@ -170,10 +166,40 @@ func (character *Character) AddStats(stat stats.Stats) {
 	character.stats = character.stats.Add(stat)
 }
 func (character *Character) AddStat(stat stats.Stat, amount float64) {
-	if stat == stats.MeleeHaste {
-		panic("use AddMeleeHaste")
+	if character.finalized {
+		if stat == stats.Mana {
+			panic("Use AddMana!")
+		}
+		if stat == stats.MeleeHaste {
+			panic("Use AddMeleeHaste!")
+		}
 	}
 	character.stats[stat] += amount
+}
+
+func (character *Character) SpendMana(sim *Simulation, amount float64, reason string) {
+	newMana := character.CurrentMana() - amount
+
+	if sim.Log != nil {
+		character.Log(sim, "Spent %0.1f mana from %s (%0.1f --> %0.1f).", amount, reason, character.CurrentMana(), newMana)
+	}
+
+	character.stats[stats.Mana] = newMana
+	character.Metrics.ManaSpent += amount
+}
+func (character *Character) AddMana(sim *Simulation, amount float64, reason string, isBonusMana bool) {
+	oldMana := character.CurrentMana()
+	newMana := MinFloat(oldMana+amount, character.MaxMana())
+
+	if sim.Log != nil {
+		character.Log(sim, "Gained %0.1f mana from %s (%0.1f --> %0.1f).", amount, reason, oldMana, newMana)
+	}
+
+	character.stats[stats.Mana] = newMana
+	character.Metrics.ManaGained += newMana - oldMana
+	if isBonusMana {
+		character.Metrics.BonusManaGained += newMana - oldMana
+	}
 }
 
 func (character *Character) AddMeleeHaste(sim *Simulation, amount float64) {
@@ -305,7 +331,6 @@ func (character *Character) reset(sim *Simulation) {
 	character.stats = character.initialStats
 	character.PseudoStats = character.initialPseudoStats
 	character.ExpectedBonusMana = 0
-	character.judgementOfWisdomProcs = 0
 
 	character.auraTracker.reset(sim)
 
@@ -357,17 +382,10 @@ func (character *Character) manaRegenPerSecondWhileNotCasting() float64 {
 	return regenRate
 }
 
-func (character *Character) addMana(amount float64) {
-	character.stats[stats.Mana] = MinFloat(character.stats[stats.Mana]+amount, character.MaxMana())
-}
-
 // Regenerates mana based on MP5 stat, spirit regen allowed while casting and the elapsed time.
 func (character *Character) RegenManaCasting(sim *Simulation, elapsedTime time.Duration) {
 	manaRegen := character.manaRegenPerSecondWhileCasting() * elapsedTime.Seconds()
-	character.addMana(manaRegen)
-	if sim.Log != nil {
-		character.Log(sim, "Advanced [%0.1fs] Regenerated: %0.1f mana. Total: %0.1f", elapsedTime.Seconds(), manaRegen, character.CurrentMana())
-	}
+	character.AddMana(sim, manaRegen, fmt.Sprintf("%0.1fs Regen", elapsedTime.Seconds()), false)
 }
 
 // Regenerates mana using mp5 and spirit. Will calculate time since last cast and then enable spirit regen if needed.
@@ -386,11 +404,7 @@ func (character *Character) RegenMana(sim *Simulation, elapsedTime time.Duration
 	} else {
 		regen = character.manaRegenPerSecondWhileCasting() * elapsedTime.Seconds()
 	}
-	character.addMana(regen)
-
-	if sim.Log != nil {
-		character.Log(sim, "Advanced [%0.1fs] Regenerated: %0.1f mana. Total: %0.1f", elapsedTime.Seconds(), regen, character.CurrentMana())
-	}
+	character.AddMana(sim, regen, fmt.Sprintf("%0.1fs Regen", elapsedTime.Seconds()), false)
 }
 
 // Returns the amount of time this Character would need to wait in order to reach
@@ -414,18 +428,6 @@ func (character *Character) TimeUntilManaRegen(desiredMana float64) time.Duratio
 	}
 
 	return regenTime
-}
-
-// Returns the total amount of mana this character will be able to use over the
-// remaining sim duration. This value is an approximation.
-func (character *Character) ExpectedRemainingManaPool(sim *Simulation) float64 {
-	remainingManaPool := character.CurrentMana() + character.ExpectedBonusMana
-
-	remainingDuration := sim.GetRemainingDuration().Seconds()
-	remainingManaPool += character.initialManaRegenPerSecondWhileCasting * remainingDuration
-	remainingManaPool += (74 / 2) * (float64(character.judgementOfWisdomProcs) / sim.CurrentTime.Seconds()) * remainingDuration
-
-	return remainingManaPool
 }
 
 func (character *Character) HasTrinketEquipped(itemID int32) bool {

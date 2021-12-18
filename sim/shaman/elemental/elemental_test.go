@@ -120,7 +120,7 @@ func TestSimulatePreRaidNoBuffs(t *testing.T) {
 			Target: NoDebuffTarget,
 		},
 
-		ExpectedDpsShort: 994.9,
+		ExpectedDpsShort: 990.2,
 		ExpectedDpsLong:  418.5,
 	})
 }

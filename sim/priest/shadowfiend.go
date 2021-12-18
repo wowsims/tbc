@@ -42,10 +42,8 @@ func (priest *Priest) newShadowfiendTemplate(sim *core.Simulation) core.SimpleSp
 			TickBaseDamage:       1191 / 10,
 			TickSpellCoefficient: 0.06,
 			OnPeriodicDamage: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect, tickDamage *float64) {
-				if sim.Log != nil {
-					sim.Log("Shadowfiend Regenerated %0f mana.\n", *tickDamage*2.5)
-				}
-				priest.AddStat(stats.Mana, *tickDamage*2.5)
+				// TODO: This should also do something with ExpectedBonusMana
+				priest.AddMana(sim, *tickDamage*2.5, "Shadowfiend", false)
 			},
 		},
 	}

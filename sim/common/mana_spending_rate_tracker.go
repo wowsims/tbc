@@ -20,17 +20,21 @@ type ManaSpendingRateTracker struct {
 	numSnapshots       int32
 	firstSnapshotIndex int32
 
-	manaSpentDuringWindow float64
+	manaSpentDuringWindow  float64
+	manaGainedDuringWindow float64
 
-	previousManaSpent float64
-	previousCastSpeed float64
+	previousManaSpent  float64
+	previousManaGained float64
+	previousCastSpeed  float64
 }
 
 type manaSnapshot struct {
-	time      time.Duration // time this snapshot was taken
-	manaSpent float64       // total amount of mana spent up to this time
+	time       time.Duration // time this snapshot was taken
+	manaSpent  float64       // total amount of mana spent up to this time
+	manaGained float64       // total amount of mana gained, minus bonus mana (pots/runes/innervates).
 
-	manaSpentDelta float64
+	manaSpentDelta  float64
+	manaGainedDelta float64
 }
 
 func NewManaSpendingRateTracker() ManaSpendingRateTracker {
@@ -43,7 +47,9 @@ func (tracker *ManaSpendingRateTracker) Reset() {
 	tracker.firstSnapshotIndex = 0
 	tracker.numSnapshots = 0
 	tracker.manaSpentDuringWindow = 0
+	tracker.manaGainedDuringWindow = 0
 	tracker.previousManaSpent = 0
+	tracker.previousManaGained = 0
 	tracker.previousCastSpeed = 1
 }
 
@@ -57,6 +63,7 @@ func (tracker *ManaSpendingRateTracker) purgeExpiredSnapshots(sim *core.Simulati
 	curIndex := tracker.firstSnapshotIndex
 	for tracker.numSnapshots > 0 && tracker.manaSnapshots[curIndex].time < expirationCutoff {
 		tracker.manaSpentDuringWindow -= tracker.manaSnapshots[curIndex].manaSpentDelta
+		tracker.manaGainedDuringWindow -= tracker.manaSnapshots[curIndex].manaGainedDelta
 		curIndex = (curIndex + 1) % manaSnapshotsBufferSize
 		tracker.numSnapshots--
 	}
@@ -69,19 +76,25 @@ func (tracker *ManaSpendingRateTracker) Update(sim *core.Simulation, character *
 		panic("Mana tracker snapshot buffer is full")
 	}
 
-	// Scale down mana spent so we don't get bad estimates from lust/drums/etc.
-	manaSpentCoefficient := character.InitialCastSpeed() / tracker.previousCastSpeed
+	// Scale down mana spent/gained so we don't get bad estimates from lust/drums/etc.
+	manaDeltaCoefficient := character.InitialCastSpeed() / tracker.previousCastSpeed
+	manaGained := character.Metrics.ManaGained - character.Metrics.BonusManaGained
 
 	snapshot := manaSnapshot{
-		time:           sim.CurrentTime,
-		manaSpent:      character.Metrics.ManaSpent,
-		manaSpentDelta: (character.Metrics.ManaSpent - tracker.previousManaSpent) * manaSpentCoefficient,
+		time:            sim.CurrentTime,
+		manaSpent:       character.Metrics.ManaSpent,
+		manaGained:      manaGained,
+		manaSpentDelta:  (character.Metrics.ManaSpent - tracker.previousManaSpent) * manaDeltaCoefficient,
+		manaGainedDelta: (manaGained - tracker.previousManaGained),
+		//manaGainedDelta: (manaGained - tracker.previousManaGained) * manaDeltaCoefficient,
 	}
 
 	nextIndex := (tracker.firstSnapshotIndex + tracker.numSnapshots) % manaSnapshotsBufferSize
 	tracker.previousCastSpeed = character.CastSpeed()
 	tracker.previousManaSpent = snapshot.manaSpent
+	tracker.previousManaGained = snapshot.manaGained
 	tracker.manaSpentDuringWindow += snapshot.manaSpentDelta
+	tracker.manaGainedDuringWindow += snapshot.manaGainedDelta
 	tracker.manaSnapshots[nextIndex] = snapshot
 	tracker.numSnapshots++
 }
@@ -90,7 +103,7 @@ func (tracker *ManaSpendingRateTracker) ManaSpentPerSecond(sim *core.Simulation,
 	tracker.purgeExpiredSnapshots(sim)
 	oldestSnapshot := tracker.getOldestSnapshot()
 
-	manaSpent := tracker.manaSpentDuringWindow
+	manaSpent := tracker.manaSpentDuringWindow - tracker.manaGainedDuringWindow
 	timeDelta := sim.CurrentTime - oldestSnapshot.time
 	if timeDelta == 0 {
 		return 0
@@ -104,8 +117,7 @@ func (tracker *ManaSpendingRateTracker) ManaSpentPerSecond(sim *core.Simulation,
 func (tracker *ManaSpendingRateTracker) ProjectedManaCost(sim *core.Simulation, character *core.Character) float64 {
 	manaSpentPerSecond := tracker.ManaSpentPerSecond(sim, character)
 
-	timeRemaining := sim.Duration - sim.CurrentTime
-	projectedManaCost := manaSpentPerSecond * timeRemaining.Seconds()
+	projectedManaCost := manaSpentPerSecond * sim.GetRemainingDuration().Seconds()
 
 	//if sim.Log != nil {
 	//	remainingManaPool := character.ExpectedRemainingManaPool(sim)
@@ -113,4 +125,8 @@ func (tracker *ManaSpendingRateTracker) ProjectedManaCost(sim *core.Simulation, 
 	//}
 
 	return projectedManaCost
+}
+
+func (tracker *ManaSpendingRateTracker) ProjectedManaSurplus(sim *core.Simulation, character *core.Character) bool {
+	return tracker.ProjectedManaCost(sim, character) < character.CurrentMana()+character.ExpectedBonusMana
 }

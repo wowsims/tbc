@@ -50,20 +50,18 @@ func NewShadowPriest(character core.Character, options proto.Player) *ShadowPrie
 				OnPeriodicDamage: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect, tickDamage *float64) {
 					if *tickDamage > 0 && spriest.VTSpell.DotInput.IsTicking(sim) {
 						amount := *tickDamage * 0.05
-						if sim.Log != nil {
-							spriest.Log(sim, "VT Regenerated %0f mana.", amount)
+						for _, partyMember := range spriest.Party.Players {
+							partyMember.GetCharacter().AddMana(sim, amount, "Vampiric Touch", false)
 						}
-						spriest.Party.AddStat(stats.Mana, amount)
 					}
 				},
 				OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 					spriest.ApplyShadowWeaving(sim, spellEffect.Target)
 					if spellEffect.Damage > 0 && spriest.VTSpell.DotInput.IsTicking(sim) {
 						amount := spellEffect.Damage * 0.05
-						if sim.Log != nil {
-							spriest.Log(sim, "VT Regenerated %0.1f mana.", amount)
+						for _, partyMember := range spriest.Party.Players {
+							partyMember.GetCharacter().AddMana(sim, amount, "Vampiric Touch", false)
 						}
-						spriest.Party.AddStat(stats.Mana, amount)
 					}
 
 					if spellCast.ActionID.SpellID == priest.SpellIDSWP || spellCast.ActionID.SpellID == priest.SpellIDVT || spellCast.ActionID.SpellID == priest.SpellIDMF {

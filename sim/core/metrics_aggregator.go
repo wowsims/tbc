@@ -1,7 +1,6 @@
 package core
 
 import (
-	"fmt"
 	"math"
 	"time"
 
@@ -73,8 +72,11 @@ type CharacterMetrics struct {
 // Metrics for the current iteration, for 1 agent. Keep this as a separate
 // struct so its easy to clear.
 type CharacterIterationMetrics struct {
-	ManaSpent float64
-	OOMTime   time.Duration // time spent not casting and waiting for regen.
+	ManaSpent       float64
+	ManaGained      float64
+	BonusManaGained float64 // Only includes amount from mana pots / runes / innervates.
+
+	OOMTime time.Duration // time spent not casting and waiting for regen.
 }
 
 type ActionMetrics struct {
@@ -107,9 +109,7 @@ func NewCharacterMetrics() CharacterMetrics {
 	}
 }
 
-func (characterMetrics *CharacterMetrics) addCastInternal(actionID ActionID, manaCost float64) {
-	characterMetrics.ManaSpent += manaCost
-
+func (characterMetrics *CharacterMetrics) addCastInternal(actionID ActionID) {
 	actionKey := NewActionKey(actionID)
 	actionMetrics, ok := characterMetrics.actions[actionKey]
 
@@ -123,17 +123,12 @@ func (characterMetrics *CharacterMetrics) addCastInternal(actionID ActionID, man
 }
 
 func (characterMetrics *CharacterMetrics) AddInstantCast(actionID ActionID) {
-	characterMetrics.addCastInternal(actionID, 0)
+	characterMetrics.addCastInternal(actionID)
 }
 
 // Adds the results of a cast to the aggregated metrics.
 func (characterMetrics *CharacterMetrics) AddCast(cast *Cast) {
-	manaCost := cast.ManaCost
-	if cast.IgnoreManaCost {
-		manaCost = 0
-	}
-
-	characterMetrics.addCastInternal(cast.ActionID, manaCost)
+	characterMetrics.addCastInternal(cast.ActionID)
 }
 
 // Adds the results of an action to the aggregated metrics.
@@ -161,7 +156,6 @@ func (characterMetrics *CharacterMetrics) AddSpellCast(spellCast *SpellCast) {
 }
 
 func (characterMetrics *CharacterMetrics) MarkOOM(sim *Simulation, character *Character, dur time.Duration) {
-	fmt.Printf("Marking OOM\n")
 	characterMetrics.CharacterIterationMetrics.OOMTime += dur
 }
 

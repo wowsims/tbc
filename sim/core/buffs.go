@@ -258,6 +258,7 @@ func AddInnervateAura(sim *Simulation, character *Character, expectedBonusManaRe
 			character.PseudoStats.ForceFullSpiritRegen = false
 			character.PseudoStats.SpiritRegenMultiplier /= 5.0
 			character.ExpectedBonusMana -= expectedBonusManaReduction
+			character.Metrics.BonusManaGained += expectedBonusManaReduction
 		},
 	})
 }

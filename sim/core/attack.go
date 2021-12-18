@@ -225,7 +225,11 @@ func (ama *ActiveMeleeAbility) Attack(sim *Simulation) bool {
 		if ama.Character.stats[ama.MeleeAbility.Cost.Type] < ama.MeleeAbility.Cost.Value {
 			return false
 		}
-		ama.Character.AddStat(ama.MeleeAbility.Cost.Type, -ama.MeleeAbility.Cost.Value)
+		if ama.MeleeAbility.Cost.Type == stats.Mana {
+			ama.Character.AddMana(sim, ama.MeleeAbility.Cost.Value, ama.MeleeAbility.Name, false)
+		} else {
+			ama.Character.AddStat(ama.MeleeAbility.Cost.Type, -ama.MeleeAbility.Cost.Value)
+		}
 	}
 
 	// Goes on CD on use

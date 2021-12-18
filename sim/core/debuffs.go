@@ -96,9 +96,7 @@ func JudgementOfWisdomAura() Aura {
 			character := spellCast.Character
 			// Only apply to agents that have mana.
 			if character.MaxMana() > 0 {
-				character.AddStat(stats.Mana, mana)
-				// Scale down proc counts so we don't get a bad estimate due to lust/drums/etc.
-				character.judgementOfWisdomProcs += 1 * (character.InitialCastSpeed() / character.CastSpeed())
+				character.AddMana(sim, mana, "Judgement of Wisdom", false)
 			}
 		},
 	}
