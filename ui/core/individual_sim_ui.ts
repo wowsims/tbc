@@ -34,7 +34,7 @@ import { StatWeightsRequest } from '/tbc/core/proto/api.js';
 import { Stats } from '/tbc/core/proto_utils/stats.js';
 import { Target } from './target.js';
 import { TypedEvent } from './typed_event.js';
-import { addRaidSimAction } from '/tbc/core/components/raid_sim_action.js';
+import { addRaidSimAction, RaidSimResultsManager } from '/tbc/core/components/raid_sim_action.js';
 import { addStatWeightsAction } from '/tbc/core/components/stat_weights_action.js';
 import { equalsOrBothNull } from '/tbc/core/utils.js';
 import { newTalentsPicker } from '/tbc/core/talents/factory.js';
@@ -168,6 +168,8 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 
   private readonly exclusivityMap: Record<ExclusivityTag, Array<ExclusiveEffect>>;
 
+	private raidSimResultsManager: RaidSimResultsManager | null;
+
   constructor(parentElem: HTMLElement, player: Player<SpecType>, config: IndividualSimUIConfig<SpecType>) {
 		let title = 'TBC ' + specNames[player.spec] + ' Sim';
 		if (config.releaseStatus == 'Alpha') {
@@ -184,6 +186,7 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 		this.player = player;
 		this.individualConfig = config;
 		this.isWithinRaidSim = this.rootElem.closest('.within-raid-sim') != null;
+		this.raidSimResultsManager = null;
 
     this.exclusivityMap = {
       'Battle Elixir': [],
@@ -269,7 +272,7 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 	}
 
 	private addSidebarComponents() {
-		addRaidSimAction(this);
+		this.raidSimResultsManager = addRaidSimAction(this);
 		addStatWeightsAction(this, this.individualConfig.epStats, this.individualConfig.epReferenceStat);
 
     const characterStats = new CharacterStats(this.rootElem.getElementsByClassName('sim-sidebar-footer')[0] as HTMLElement, this.individualConfig.displayStats, this.player);
@@ -641,7 +644,7 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 			</div>
 		`);
 
-    const detailedResults = new DetailedResults(this.rootElem.getElementsByClassName('detailed-results')[0] as HTMLElement, this);
+    const detailedResults = new DetailedResults(this.rootElem.getElementsByClassName('detailed-results')[0] as HTMLElement, this, this.raidSimResultsManager!);
 	}
 
 	private addLogTab() {
