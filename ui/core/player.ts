@@ -29,9 +29,11 @@ import {
 	SpecTypeFunctions,
 	SpecOptions,
 	canEquipItem,
+	classColors,
 	getEligibleEnchantSlots,
 	gemEligibleForSocket,
 	getEligibleItemSlots,
+	getTalentTreeIcon,
 	getMetaGemEffectEP,
 	gemMatchesSocket,
 	raceToFaction,
@@ -126,6 +128,10 @@ export class Player<SpecType extends Spec> {
 
 	getClass(): Class {
 		return specToClass[this.spec];
+	}
+
+	getClassColor(): string {
+		return classColors[this.getClass()];
 	}
 
 	getParty(): Party | null {
@@ -345,6 +351,10 @@ export class Player<SpecType extends Spec> {
     this.talentsString = newTalentsString;
     this.talentsStringChangeEmitter.emit();
   }
+
+	getTalentTreeIcon(): string {
+		return getTalentTreeIcon(this.spec, this.getTalentsString());
+	}
 
   getSpecOptions(): SpecOptions<SpecType> {
     return this.specTypeFunctions.optionsCopy(this.specOptions);

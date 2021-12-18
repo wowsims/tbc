@@ -322,9 +322,6 @@ func (shaman *Shaman) registerElementalMasteryCD() {
 		Cooldown:   time.Minute * 3,
 		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
 			return func(sim *core.Simulation, character *core.Character) bool {
-				if sim.Log != nil {
-					character.Log(sim, "Try activate EM")
-				}
 				character.Metrics.AddInstantCast(core.ActionID{SpellID: 16166})
 
 				character.AddAura(sim, core.Aura{

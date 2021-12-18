@@ -29,7 +29,7 @@ export interface RaidSimConfig {
 	buffBots: Array<BuffBotSettings>,
 }
 
-export class RaidSimUI extends SimUI{
+export class RaidSimUI extends SimUI {
   private readonly config: RaidSimConfig;
 	private readonly implementedSpecs: Array<Spec>;
 	private raidSimResultsManager: RaidSimResultsManager | null = null;

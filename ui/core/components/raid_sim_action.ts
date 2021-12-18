@@ -1,3 +1,5 @@
+import { Encounter as EncounterProto } from '/tbc/core/proto/common.js';
+import { Raid as RaidProto } from '/tbc/core/proto/api.js';
 import { RaidSimRequest, RaidSimResult } from '/tbc/core/proto/api.js';
 import { SimResult } from '/tbc/core/proto_utils/sim_result.js';
 import { SimUI } from '/tbc/core/sim_ui.js';
@@ -26,6 +28,8 @@ export function addRaidSimAction(simUI: SimUI): RaidSimResultsManager {
 export type ReferenceData = {
 	simResult: SimResult,
 	settings: any,
+	raidProto: RaidProto,
+	encounterProto: EncounterProto,
 };
 
 export class RaidSimResultsManager {
@@ -45,6 +49,8 @@ export class RaidSimResultsManager {
 		this.currentData = {
 			simResult: simResult,
 			settings: this.simUI.sim.toJson(),
+			raidProto: RaidProto.clone(simResult.request.raid || RaidProto.create()),
+			encounterProto: EncounterProto.clone(simResult.request.encounter || EncounterProto.create()),
 		};
 		this.currentChangeEmitter.emit();
 
@@ -87,7 +93,8 @@ export class RaidSimResultsManager {
 				this.currentData = this.referenceData;
 				this.referenceData = tmpData;
 
-				this.simUI.sim.fromJson(this.currentData.settings);
+				this.simUI.sim.raid.fromProto(this.currentData.raidProto);
+				this.simUI.sim.encounter.fromProto(this.currentData.encounterProto);
 				this.setSimResult(this.currentData.simResult);
 				this.updateReference();
 			}
@@ -146,6 +153,8 @@ export class RaidSimResultsManager {
 		return {
 			simResult: this.currentData.simResult,
 			settings: JSON.parse(JSON.stringify(this.currentData.settings)),
+			raidProto: this.currentData.raidProto,
+			encounterProto: this.currentData.encounterProto,
 		};
 	}
 
@@ -158,6 +167,8 @@ export class RaidSimResultsManager {
 		return {
 			simResult: this.referenceData.simResult,
 			settings: JSON.parse(JSON.stringify(this.referenceData.settings)),
+			raidProto: this.referenceData.raidProto,
+			encounterProto: this.referenceData.encounterProto,
 		};
 	}
 }

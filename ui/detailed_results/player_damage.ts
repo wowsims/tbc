@@ -59,6 +59,10 @@ export class PlayerDamageMetrics extends ResultComponent {
 
 		const raidDps = resultData.result.raidMetrics.dps.avg;
 		const players = resultData.result.getPlayers(resultData.filter);
+		if (players.length == 0) {
+			return;
+		}
+
 		const maxDpsIndex = maxIndex(players.map(player => player.dps.avg))!;
 		const maxDps = players[maxDpsIndex].dps.avg;
 

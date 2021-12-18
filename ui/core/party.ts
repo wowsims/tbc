@@ -1,7 +1,9 @@
 import { Party as PartyProto } from '/tbc/core/proto/api.js';
 import { Player as PlayerProto } from '/tbc/core/proto/api.js';
 import { PartyBuffs } from '/tbc/core/proto/common.js';
+import { Class } from '/tbc/core/proto/common.js';
 import { Spec } from '/tbc/core/proto/common.js';
+import { playerToSpec } from '/tbc/core/proto_utils/utils.js';
 
 import { Raid } from './raid.js';
 import { Player } from './player.js';
@@ -114,6 +116,23 @@ export class Party {
 			players: this.players.map(player => player == null ? PlayerProto.create() : player.toProto()),
 			buffs: this.buffs,
 		});
+	}
+
+	fromProto(proto: PartyProto) {
+		this.setBuffs(proto.buffs || PartyBuffs.create());
+
+		for (let i = 0; i < MAX_PARTY_SIZE; i++) {
+			if (!proto.players[i] || proto.players[i].class == Class.ClassUnknown) {
+				this.setPlayer(i, null);
+				continue;
+			}
+
+			const playerProto = proto.players[i];
+			const spec = playerToSpec(playerProto);
+			const newPlayer = new Player(spec, this.sim);
+			newPlayer.fromProto(playerProto);
+			this.setPlayer(i, newPlayer);
+		}
 	}
 
   // Returns JSON representing all the current values.
