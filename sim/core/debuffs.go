@@ -10,7 +10,7 @@ import (
 func applyDebuffEffects(target *Target, debuffs proto.Debuffs) {
 	if debuffs.Misery {
 		target.AddPermanentAura(func(sim *Simulation) Aura {
-			return MiseryAura(sim)
+			return MiseryAura(sim, 5)
 		})
 	}
 
@@ -41,16 +41,19 @@ func applyDebuffEffects(target *Target, debuffs proto.Debuffs) {
 
 var MiseryDebuffID = NewDebuffID()
 
-func MiseryAura(sim *Simulation) Aura {
+func MiseryAura(sim *Simulation, numPoints int32) Aura {
+	multiplier := 1.0 + 0.01*float64(numPoints)
+
 	return Aura{
 		ID:      MiseryDebuffID,
 		Name:    "Misery",
 		Expires: sim.CurrentTime + time.Second*24,
+		Stacks:  numPoints,
 		OnBeforeSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect) {
-			spellEffect.DamageMultiplier *= 1.05
+			spellEffect.DamageMultiplier *= multiplier
 		},
 		OnPeriodicDamage: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect, tickDamage *float64) {
-			*tickDamage *= 1.05
+			*tickDamage *= multiplier
 		},
 	}
 }
@@ -93,9 +96,7 @@ func JudgementOfWisdomAura() Aura {
 			character := spellCast.Character
 			// Only apply to agents that have mana.
 			if character.MaxMana() > 0 {
-				character.AddStat(stats.Mana, mana)
-				// Scale down proc counts so we don't get a bad estimate due to lust/drums/etc.
-				character.judgementOfWisdomProcs += 1 * (character.InitialCastSpeed() / character.CastSpeed())
+				character.AddMana(sim, mana, "Judgement of Wisdom", false)
 			}
 		},
 	}

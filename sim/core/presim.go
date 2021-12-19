@@ -1,6 +1,8 @@
 package core
 
 import (
+	"time"
+
 	"github.com/wowsims/tbc/sim/core/proto"
 	googleProto "google.golang.org/protobuf/proto"
 )
@@ -26,7 +28,7 @@ type PresimOptions struct {
 	// Called once after each presim round to provide the results.
 	//
 	// Should return true if this Agent is done running presims, and false otherwise.
-	OnPresimResult func(presimResult proto.PlayerMetrics, iterations int32) bool
+	OnPresimResult func(presimResult proto.PlayerMetrics, iterations int32, duration time.Duration) bool
 }
 
 func (sim *Simulation) runPresims(request proto.RaidSimRequest) {
@@ -60,6 +62,7 @@ func (sim *Simulation) runPresims(request proto.RaidSimRequest) {
 	presimRequest.SimOptions.RandomSeed = 1
 	presimRequest.SimOptions.Debug = false
 	presimRequest.SimOptions.Iterations = numPresimIterations
+	duration := DurationFromSeconds(presimRequest.Encounter.Duration)
 
 	for remainingAgents > 0 {
 		// ** Run a presim round. **
@@ -89,7 +92,7 @@ func (sim *Simulation) runPresims(request proto.RaidSimRequest) {
 				playerMetrics := partyMetrics.Players[player.GetCharacter().PartyIndex]
 				presimOptions := raidPresimOptions[player.GetCharacter().RaidIndex]
 				if presimOptions != nil {
-					done := presimOptions.OnPresimResult(*playerMetrics, numPresimIterations)
+					done := presimOptions.OnPresimResult(*playerMetrics, numPresimIterations, duration)
 					if done {
 						raidPresimOptions[player.GetCharacter().RaidIndex] = nil
 						remainingAgents--

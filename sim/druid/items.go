@@ -33,7 +33,7 @@ var ItemSetMalorne = core.ItemSet{
 						if sim.RandomFloat("malorne 2p") > 0.05 {
 							return
 						}
-						spellCast.Character.AddStat(stats.Mana, 120)
+						spellCast.Character.AddMana(sim, 120, "Malorne 2p Bonus", false)
 					},
 				}
 			})

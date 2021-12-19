@@ -105,6 +105,7 @@ func (shaman *Shaman) TryDropTotems(sim *core.Simulation) time.Duration {
 	success := cast.StartCast(sim)
 	if !success {
 		regenTime := shaman.TimeUntilManaRegen(cast.GetManaCost())
+		shaman.Character.Metrics.MarkOOM(sim, &shaman.Character, regenTime)
 		return sim.CurrentTime + regenTime
 	}
 	return sim.CurrentTime + shaman.GetRemainingCD(core.GCDCooldownID, sim.CurrentTime)

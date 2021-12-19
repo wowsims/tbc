@@ -65,18 +65,20 @@ type CharacterMetrics struct {
 	CharacterIterationMetrics
 
 	// Aggregate values. These are updated after each iteration.
-	numOom      int32
-	oomAtSum    float64
-	dpsAtOomSum float64
-	actions     map[ActionKey]ActionMetrics
+	oomTimeSum float64
+	actions    map[ActionKey]ActionMetrics
 }
 
 // Metrics for the current iteration, for 1 agent. Keep this as a separate
 // struct so its easy to clear.
 type CharacterIterationMetrics struct {
-	ManaSpent   float64
-	DamageAtOOM float64
-	OOMAt       time.Duration
+	WentOOM bool // Whether the agent has hit OOM at least once in this iteration.
+
+	ManaSpent       float64
+	ManaGained      float64
+	BonusManaGained float64 // Only includes amount from mana pots / runes / innervates.
+
+	OOMTime time.Duration // time spent not casting and waiting for regen.
 }
 
 type ActionMetrics struct {
@@ -109,9 +111,7 @@ func NewCharacterMetrics() CharacterMetrics {
 	}
 }
 
-func (characterMetrics *CharacterMetrics) addCastInternal(actionID ActionID, manaCost float64) {
-	characterMetrics.ManaSpent += manaCost
-
+func (characterMetrics *CharacterMetrics) addCastInternal(actionID ActionID) {
 	actionKey := NewActionKey(actionID)
 	actionMetrics, ok := characterMetrics.actions[actionKey]
 
@@ -125,25 +125,16 @@ func (characterMetrics *CharacterMetrics) addCastInternal(actionID ActionID, man
 }
 
 func (characterMetrics *CharacterMetrics) AddInstantCast(actionID ActionID) {
-	characterMetrics.addCastInternal(actionID, 0)
+	characterMetrics.addCastInternal(actionID)
 }
 
 // Adds the results of a cast to the aggregated metrics.
 func (characterMetrics *CharacterMetrics) AddCast(cast *Cast) {
-	manaCost := cast.ManaCost
-	if cast.IgnoreManaCost {
-		manaCost = 0
-	}
-
-	characterMetrics.addCastInternal(cast.ActionID, manaCost)
+	characterMetrics.addCastInternal(cast.ActionID)
 }
 
 // Adds the results of an action to the aggregated metrics.
 func (characterMetrics *CharacterMetrics) AddSpellCast(spellCast *SpellCast) {
-	if !spellCast.IgnoreManaCost {
-		characterMetrics.ManaSpent += spellCast.ManaCost
-	}
-
 	actionID := spellCast.ActionID
 	actionKey := NewActionKey(actionID)
 	actionMetrics, ok := characterMetrics.actions[actionKey]
@@ -162,25 +153,15 @@ func (characterMetrics *CharacterMetrics) AddSpellCast(spellCast *SpellCast) {
 	characterMetrics.actions[actionKey] = actionMetrics
 }
 
-func (characterMetrics *CharacterMetrics) MarkOOM(sim *Simulation, character *Character) {
-	if characterMetrics.OOMAt == 0 {
-		if sim.Log != nil {
-			character.Log(sim, "Went OOM!")
-		}
-		characterMetrics.DamageAtOOM = characterMetrics.TotalDamage
-		characterMetrics.OOMAt = sim.CurrentTime
-	}
+func (characterMetrics *CharacterMetrics) MarkOOM(sim *Simulation, character *Character, dur time.Duration) {
+	characterMetrics.CharacterIterationMetrics.OOMTime += dur
+	characterMetrics.CharacterIterationMetrics.WentOOM = true
 }
 
 // This should be called when a Sim iteration is complete.
 func (characterMetrics *CharacterMetrics) doneIteration(encounterDurationSeconds float64) {
 	characterMetrics.DpsMetrics.doneIteration(encounterDurationSeconds)
-
-	if characterMetrics.OOMAt > 0 {
-		characterMetrics.numOom++
-		characterMetrics.oomAtSum += float64(characterMetrics.OOMAt)
-		characterMetrics.dpsAtOomSum += float64(characterMetrics.DamageAtOOM) / float64(characterMetrics.OOMAt.Seconds())
-	}
+	characterMetrics.oomTimeSum += float64(characterMetrics.OOMTime.Seconds())
 
 	// Clear the iteration metrics
 	characterMetrics.CharacterIterationMetrics = CharacterIterationMetrics{}
@@ -188,13 +169,8 @@ func (characterMetrics *CharacterMetrics) doneIteration(encounterDurationSeconds
 
 func (characterMetrics *CharacterMetrics) ToProto(numIterations int32) *proto.PlayerMetrics {
 	protoMetrics := &proto.PlayerMetrics{
-		Dps:    characterMetrics.DpsMetrics.ToProto(numIterations),
-		NumOom: characterMetrics.numOom,
-	}
-
-	if characterMetrics.numOom > 0 {
-		protoMetrics.OomAtAvg = characterMetrics.oomAtSum / float64(characterMetrics.numOom)
-		protoMetrics.DpsAtOomAvg = characterMetrics.dpsAtOomSum / float64(characterMetrics.numOom)
+		Dps:           characterMetrics.DpsMetrics.ToProto(numIterations),
+		SecondsOomAvg: characterMetrics.oomTimeSum / float64(numIterations),
 	}
 
 	for _, action := range characterMetrics.actions {

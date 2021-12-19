@@ -102,7 +102,7 @@ func TestSparseRaid(t *testing.T) {
 		SimOptions: SimOptions,
 	}
 
-	RaidSimTest("Sparse", t, rsr, 1201.5)
+	RaidSimTest("Sparse", t, rsr, 1238.3)
 }
 
 func TestBasicRaid(t *testing.T) {
@@ -112,7 +112,7 @@ func TestBasicRaid(t *testing.T) {
 		SimOptions: SimOptions,
 	}
 
-	RaidSimTest("P1 ST", t, rsr, 3979.9)
+	RaidSimTest("P1 ST", t, rsr, 3955.1)
 }
 
 func RaidSimTest(label string, t *testing.T, rsr *proto.RaidSimRequest, expectedDps float64) {

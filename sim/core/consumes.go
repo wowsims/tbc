@@ -276,11 +276,7 @@ func makePotionActivation(potionType proto.Potions, character *Character) Cooldo
 				manaGain *= 1.4
 			}
 
-			character.AddStat(stats.Mana, manaGain)
-			if sim.Log != nil {
-				character.Log(sim, "Used Super Mana Potion")
-			}
-
+			character.AddMana(sim, manaGain, "Super Mana Potion", true)
 			character.SetCD(PotionCooldownID, time.Minute*2+sim.CurrentTime)
 			character.Metrics.AddInstantCast(ActionID{ItemID: 22832})
 			return true
@@ -315,7 +311,9 @@ func registerDarkRuneCD(agent Agent, consumes proto.Consumes) {
 				}
 
 				// Restores 900 to 1500 mana. (2 Min Cooldown)
-				character.AddStat(stats.Mana, 900+(sim.RandomFloat("dark rune")*600))
+				manaGain := 900 + (sim.RandomFloat("dark rune") * 600)
+
+				character.AddMana(sim, manaGain, "Dark Rune", true)
 				character.SetCD(RuneCooldownID, time.Minute*2+sim.CurrentTime)
 
 				// Update expected bonus mana
