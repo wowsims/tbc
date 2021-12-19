@@ -2,7 +2,6 @@ import { CloseButton } from '/tbc/core/components/close_button.js';
 import { Component } from '/tbc/core/components/component.js';
 import { EnumPicker } from '/tbc/core/components/enum_picker.js';
 import { makePhaseSelector } from '/tbc/core/components/other_inputs.js';
-import { IndividualSimUI } from '/tbc/core/individual_sim_ui.js';
 import { Raid } from '/tbc/core/raid.js';
 import { MAX_PARTY_SIZE } from '/tbc/core/party.js';
 import { Party } from '/tbc/core/party.js';
@@ -11,13 +10,9 @@ import { Encounter as EncounterProto } from '/tbc/core/proto/common.js';
 import { Raid as RaidProto } from '/tbc/core/proto/api.js';
 import { Party as PartyProto } from '/tbc/core/proto/api.js';
 import { Class } from '/tbc/core/proto/common.js';
-import { Consumes } from '/tbc/core/proto/common.js';
-import { EquipmentSpec } from '/tbc/core/proto/common.js';
 import { Race } from '/tbc/core/proto/common.js';
 import { Spec } from '/tbc/core/proto/common.js';
 import { Faction } from '/tbc/core/proto_utils/utils.js';
-import { SpecOptions } from '/tbc/core/proto_utils/utils.js';
-import { SpecRotation } from '/tbc/core/proto_utils/utils.js';
 import { classColors } from '/tbc/core/proto_utils/utils.js';
 import { specToClass } from '/tbc/core/proto_utils/utils.js';
 import { repoName } from '/tbc/core/resources.js';
@@ -27,12 +22,9 @@ import { camelToSnakeCase } from '/tbc/core/utils.js';
 import { getEnumValues } from '/tbc/core/utils.js';
 import { hexToRgba } from '/tbc/core/utils.js';
 
-import { BalanceDruidSimUI } from '/tbc/balance_druid/sim.js';
-import { EnhancementShamanSimUI } from '/tbc/enhancement_shaman/sim.js';
-import { ElementalShamanSimUI } from '/tbc/elemental_shaman/sim.js';
-import { ShadowPriestSimUI } from '/tbc/shadow_priest/sim.js';
-
+import { BuffBot } from './buff_bot.js';
 import { RaidSimUI } from './raid_sim_ui.js';
+import { buffBotPresets, playerPresets, specSimFactories } from './presets.js';
 
 declare var tippy: any;
 declare var $: any;
@@ -49,24 +41,18 @@ enum DragType {
 export class RaidPicker extends Component {
 	readonly raidSimUI: RaidSimUI;
 	readonly raid: Raid;
-	readonly presets: Array<PresetSpecSettings<any>>;
-	readonly buffBots: Array<BuffBotSettings>;
   readonly partyPickers: Array<PartyPicker>;
 	readonly newPlayerPicker: NewPlayerPicker;
 
-	readonly buffBotChangeEmitter: TypedEvent<void> = new TypedEvent<void>();
-
 	// Hold data about the player being dragged while the drag is happening.
-	currentDragPlayer: Player<any> | BuffBotSettings | null = null;
+	currentDragPlayer: Player<any> | BuffBot | null = null;
 	currentDragPlayerFromIndex: number = NEW_PLAYER;
 	currentDragType: DragType = DragType.New;
 
-  constructor(parent: HTMLElement, raidSimUI: RaidSimUI, presets: Array<PresetSpecSettings<any>>, buffBots: Array<BuffBotSettings>) {
+  constructor(parent: HTMLElement, raidSimUI: RaidSimUI) {
     super(parent, 'raid-picker-root');
 		this.raidSimUI = raidSimUI;
 		this.raid = raidSimUI.sim.raid;
-		this.presets = presets;
-		this.buffBots = buffBots;
 
     const raidViewer = document.createElement('div');
     raidViewer.classList.add('current-raid-viewer');
@@ -112,19 +98,13 @@ export class RaidPicker extends Component {
 		return [...new Array(25).keys()].map(i => this.getPlayerPicker(i));
 	}
 
-	getBuffBots(): Array<BuffBotData> {
+	getBuffBots(): Array<BuffBot> {
 		return this.getPlayerPickers()
-				.filter(picker => picker.player != null && 'buffBotId' in picker.player)
-				.map(picker => {
-					return {
-						buffBot: picker.player as BuffBotSettings,
-						partyIndex: picker.partyPicker.index,
-						raidIndex: picker.raidIndex,
-					};
-				});
+				.filter(picker => picker.player instanceof BuffBot)
+				.map(picker => picker.player as BuffBot);
 	}
 
-	setDragPlayer(player: Player<any> | BuffBotSettings, fromIndex: number, type: DragType) {
+	setDragPlayer(player: Player<any> | BuffBot, fromIndex: number, type: DragType) {
 		this.clearDragPlayer();
 
 		this.currentDragPlayer = player;
@@ -221,7 +201,7 @@ export class PlayerPicker extends Component {
 	// Index of this player within the whole raid (0-24).
 	readonly raidIndex: number;
 
-	player: Player<any> | BuffBotSettings | null;
+	player: Player<any> | BuffBot | null;
 
 	readonly partyPicker: PartyPicker;
 	readonly raidPicker: RaidPicker;
@@ -407,11 +387,7 @@ export class PlayerPicker extends Component {
 			}
 
 			if (dragType == DragType.Copy) {
-				if ('buffBotId' in this.raidPicker.currentDragPlayer) {
-					this.setPlayer(this.raidPicker.currentDragPlayer);
-				} else {
-					this.setPlayer(this.raidPicker.currentDragPlayer.clone());
-				}
+				this.setPlayer(this.raidPicker.currentDragPlayer.clone());
 			} else {
 				this.setPlayer(this.raidPicker.currentDragPlayer);
 			}
@@ -467,7 +443,7 @@ export class PlayerPicker extends Component {
 		this.update();
 	}
 
-	setPlayer(newPlayer: Player<any> | BuffBotSettings | null) {
+	setPlayer(newPlayer: Player<any> | BuffBot | null) {
 		if (newPlayer == this.player) {
 			return;
 		}
@@ -475,16 +451,13 @@ export class PlayerPicker extends Component {
 		this.dpsResultElem.textContent = '';
 		this.referenceDeltaElem.textContent = '';
 
-		const oldPlayerWasBuffBot = this.player != null && 'buffBotId' in this.player;
+		const oldPlayerWasBuffBot = this.player instanceof BuffBot;
 
 		this.player = newPlayer;
-		if (newPlayer == null || newPlayer instanceof Player) {
-			this.partyPicker.party.setPlayer(this.index, newPlayer);
-			if (oldPlayerWasBuffBot) {
-				this.raidPicker.buffBotChangeEmitter.emit();
-			}
+		if (newPlayer instanceof BuffBot) {
+			newPlayer.setRaidIndex(this.raidIndex);
 		} else {
-			this.raidPicker.buffBotChangeEmitter.emit();
+			this.partyPicker.party.setPlayer(this.index, newPlayer);
 		}
 
 		this.update();
@@ -499,7 +472,7 @@ export class PlayerPicker extends Component {
 			this.resultsElem.setAttribute('draggable', 'false');
 			this.nameElem.textContent = '';
 			this.nameElem.removeAttribute('contenteditable');
-		} else if ('buffBotId' in this.player) {
+		} else if (this.player instanceof BuffBot) {
 			this.rootElem.classList.remove('empty');
 			this.rootElem.classList.add('buff-bot');
 			this.rootElem.style.backgroundColor = classColors[specToClass[this.player.spec]];
@@ -604,7 +577,7 @@ class NewPlayerPicker extends Component {
 				return;
 			}
 
-			const matchingPresets = this.raidPicker.presets.filter(preset => specToClass[preset.spec] == wowClass);
+			const matchingPresets = playerPresets.filter(preset => specToClass[preset.spec] == wowClass);
 			if (matchingPresets.length == 0) {
 				return;
 			}
@@ -673,7 +646,7 @@ class NewPlayerPicker extends Component {
 				return;
 			}
 
-			const matchingBuffBots = this.raidPicker.buffBots.filter(buffBot => specToClass[buffBot.spec] == wowClass);
+			const matchingBuffBots = buffBotPresets.filter(buffBot => specToClass[buffBot.spec] == wowClass);
 			if (matchingBuffBots.length == 0) {
 				return;
 			}
@@ -707,31 +680,9 @@ class NewPlayerPicker extends Component {
 
 					event.dataTransfer!.dropEffect = 'copy';
 
-					this.raidPicker.setDragPlayer(matchingBuffBot, NEW_PLAYER, DragType.New);
+					this.raidPicker.setDragPlayer(new BuffBot(matchingBuffBot.buffBotId, this.raidPicker.raidSimUI.sim), NEW_PLAYER, DragType.New);
 				};
 			});
 		});
 	}
-}
-
-export const specSimFactories: Partial<Record<Spec, (parentElem: HTMLElement, player: Player<any>) => IndividualSimUI<any>>> = {
-	[Spec.SpecBalanceDruid]: (parentElem: HTMLElement, player: Player<any>) => new BalanceDruidSimUI(parentElem, player),
-	[Spec.SpecElementalShaman]: (parentElem: HTMLElement, player: Player<any>) => new ElementalShamanSimUI(parentElem, player),
-	[Spec.SpecEnhancementShaman]: (parentElem: HTMLElement, player: Player<any>) => new EnhancementShamanSimUI(parentElem, player),
-	[Spec.SpecShadowPriest]: (parentElem: HTMLElement, player: Player<any>) => new ShadowPriestSimUI(parentElem, player),
-};
-
-export interface PresetSpecSettings<SpecType extends Spec> {
-	spec: Spec,
-	rotation: SpecRotation<SpecType>,
-	talents: string,
-	specOptions: SpecOptions<SpecType>,
-	consumes: Consumes,
-
-	defaultName: string,
-	defaultFactionRaces: Record<Faction, Race>,
-	defaultGear: Record<Faction, Record<number, EquipmentSpec>>,
-
-	tooltip: string,
-	iconUrl: string,
 }

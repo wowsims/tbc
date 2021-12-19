@@ -1,15 +1,15 @@
 import { Encounter } from '/tbc/core/encounter.js';
+import { Player } from '/tbc/core/player.js';
 import { Raid } from '/tbc/core/raid.js';
 import { Sim } from '/tbc/core/sim.js';
 import { SimUI } from '/tbc/core/sim_ui.js';
 import { TypedEvent } from '/tbc/core/typed_event.js';
 import { Raid as RaidProto } from '/tbc/core/proto/api.js';
-import { Blessings } from '/tbc/core/proto/common.js';
+import { Blessings } from '/tbc/core/proto/ui.js';
 import { Class } from '/tbc/core/proto/common.js';
 import { Encounter as EncounterProto } from '/tbc/core/proto/common.js';
 import { Spec } from '/tbc/core/proto/common.js';
 import { TristateEffect } from '/tbc/core/proto/common.js';
-import { specToClass } from '/tbc/core/proto_utils/utils.js';
 import { playerToSpec } from '/tbc/core/proto_utils/utils.js';
 import { DetailedResults } from '/tbc/core/components/detailed_results.js';
 import { EncounterPicker, EncounterPickerConfig } from '/tbc/core/components/encounter_picker.js';
@@ -19,19 +19,18 @@ import { SavedDataManager } from '/tbc/core/components/saved_data_manager.js';
 import { addRaidSimAction, RaidSimResultsManager, ReferenceData } from '/tbc/core/components/raid_sim_action.js';
 
 import { BlessingsPicker } from './blessings_picker.js';
-import { RaidPicker, BuffBotData, BuffBotSettings, PresetSpecSettings } from './raid_picker.js';
+import { BuffBot } from './buff_bot.js';
+import { RaidPicker } from './raid_picker.js';
+import { implementedSpecs } from './presets.js';
 
 declare var tippy: any;
 
 export interface RaidSimConfig {
 	knownIssues?: Array<string>,
-	presets: Array<PresetSpecSettings<any>>,
-	buffBots: Array<BuffBotSettings>,
 }
 
 export class RaidSimUI extends SimUI {
   private readonly config: RaidSimConfig;
-	private readonly implementedSpecs: Array<Spec>;
 	private raidSimResultsManager: RaidSimResultsManager | null = null;
 	private raidPicker: RaidPicker | null = null;
 	private blessingsPicker: BlessingsPicker | null = null;
@@ -49,8 +48,6 @@ export class RaidSimUI extends SimUI {
 		this.rootElem.classList.add('raid-sim-ui');
 
     this.config = config;
-		
-		this.implementedSpecs = [...new Set(config.presets.map(preset => preset.spec))];
 
 		this.sim.raid.compChangeEmitter.on(() => this.compChangeEmitter.emit());
 		this.sim.raid.setModifyRaidProto(raidProto => this.modifyRaidProto(raidProto));
@@ -103,8 +100,7 @@ export class RaidSimUI extends SimUI {
 			</div>
 		`);
 
-		this.raidPicker = new RaidPicker(this.rootElem.getElementsByClassName('raid-picker')[0] as HTMLElement, this, this.config.presets, this.config.buffBots);
-		this.raidPicker.buffBotChangeEmitter.on(() => this.compChangeEmitter.emit());
+		this.raidPicker = new RaidPicker(this.rootElem.getElementsByClassName('raid-picker')[0] as HTMLElement, this);
 	}
 
 	private addSettingsTab() {
@@ -146,7 +142,7 @@ export class RaidSimUI extends SimUI {
 			savedEncounterManager.loadUserData();
 		});
 
-		this.blessingsPicker = new BlessingsPicker(this.rootElem.getElementsByClassName('blessings-section')[0] as HTMLElement, this, this.implementedSpecs);
+		this.blessingsPicker = new BlessingsPicker(this.rootElem.getElementsByClassName('blessings-section')[0] as HTMLElement, this);
 	}
 
 	private addDetailedResultsTab() {
@@ -169,18 +165,18 @@ export class RaidSimUI extends SimUI {
 
 	private modifyRaidProto(raidProto: RaidProto) {
 		// Invoke all the buff bot callbacks.
-		this.getBuffBots().forEach(buffBotData => {
-			const partyProto = raidProto.parties[buffBotData.partyIndex];
+		this.getBuffBots().forEach(buffBot => {
+			const partyProto = raidProto.parties[buffBot.getPartyIndex()];
 			if (!partyProto) {
-				throw new Error('No party proto for party index: ' + buffBotData.partyIndex);
+				throw new Error('No party proto for party index: ' + buffBot.getPartyIndex());
 			}
-			buffBotData.buffBot.modifyRaidProto(raidProto, partyProto);
+			buffBot.settings.modifyRaidProto(raidProto, partyProto);
 		});
 
 		// Apply blessings.
 		const numPaladins = this.getClassCount(Class.ClassPaladin);
 		const blessingsAssignments = this.blessingsPicker!.getAssignments();
-		this.implementedSpecs.forEach(spec => {
+		implementedSpecs.forEach(spec => {
 			const playerProtos = raidProto.parties
 					.map(party => party.players.filter(player => player.class != Class.ClassUnknown && playerToSpec(player) == spec))
 					.flat();
@@ -203,8 +199,8 @@ export class RaidSimUI extends SimUI {
 
 	private modifyEncounterProto(encounterProto: EncounterProto) {
 		// Invoke all the buff bot callbacks.
-		this.getBuffBots().forEach(buffBotData => {
-			buffBotData.buffBot.modifyEncounterProto(encounterProto);
+		this.getBuffBots().forEach(buffBot => {
+			buffBot.settings.modifyEncounterProto(encounterProto);
 		});
 	}
 
@@ -227,11 +223,23 @@ export class RaidSimUI extends SimUI {
 	getClassCount(playerClass: Class): number {
 		return this.sim.raid.getClassCount(playerClass)
 				+ this.getBuffBots()
-						.filter(buffBotData => specToClass[buffBotData.buffBot.spec] == playerClass).length;
+						.filter(buffBot => buffBot.getClass() == playerClass).length;
 	}
 
-	getBuffBots(): Array<BuffBotData> {
+	getBuffBots(): Array<BuffBot> {
 		return this.raidPicker!.getBuffBots();
+	}
+
+	getPlayersAndBuffBots(): Array<Player<any> | BuffBot | null> {
+		const players = this.sim.raid.getPlayers();
+		const buffBots = this.getBuffBots();
+
+		const playersAndBuffBots: Array<Player<any> | BuffBot | null> = players.slice();
+		buffBots.forEach(buffBot => {
+			playersAndBuffBots[buffBot.getRaidIndex()] = buffBot;
+		});
+
+		return playersAndBuffBots;
 	}
 
 	// Returns the actual key to use for local storage, based on the given key part and the site context.

@@ -118,6 +118,10 @@ export class Player<SpecType extends Spec> {
     ].forEach(emitter => emitter.on(() => this.changeEmitter.emit()));
   }
 
+	getSpecIcon(): string {
+		return getTalentTreeIcon(this.spec, this.getTalentsString());
+	}
+
 	getClass(): Class {
 		return specToClass[this.spec];
 	}
@@ -218,6 +222,14 @@ export class Player<SpecType extends Spec> {
       this.nameChangeEmitter.emit();
     }
   }
+
+	getLabel(): string {
+		if (this.party) {
+			return `${this.name} (#${this.getRaidIndex() + 1})`;
+		} else {
+			return this.name;
+		}
+	}
   
   getRace(): Race {
     return this.race;

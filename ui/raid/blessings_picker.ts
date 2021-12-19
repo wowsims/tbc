@@ -2,10 +2,10 @@ import { Component } from '/tbc/core/components/component.js';
 import { IconEnumPicker } from '/tbc/core/components/icon_enum_picker.js';
 import { TypedEvent } from '/tbc/core/typed_event.js';
 import { Class } from '/tbc/core/proto/common.js';
-import { Blessings } from '/tbc/core/proto/common.js';
-import { BlessingsAssignment } from '/tbc/core/proto/common.js';
-import { BlessingsAssignments } from '/tbc/core/proto/common.js';
 import { Spec } from '/tbc/core/proto/common.js';
+import { Blessings } from '/tbc/core/proto/ui.js';
+import { BlessingsAssignment } from '/tbc/core/proto/ui.js';
+import { BlessingsAssignments } from '/tbc/core/proto/ui.js';
 import {
 	classColors,
 	specIconsLarge,
@@ -14,6 +14,7 @@ import {
 import { getEnumValues } from '/tbc/core/utils.js';
 
 import { RaidSimUI } from './raid_sim_ui.js';
+import { implementedSpecs } from './presets.js';
 
 declare var tippy: any;
 
@@ -75,7 +76,7 @@ export class BlessingsPicker extends Component {
 
 	private assignments: BlessingsAssignments;
 
-  constructor(parentElem: HTMLElement, raidSimUI: RaidSimUI, specsToShow: Array<Spec>) {
+  constructor(parentElem: HTMLElement, raidSimUI: RaidSimUI) {
     super(parentElem, 'blessings-picker-root');
 		this.raidSimUI = raidSimUI;
 		this.assignments = BlessingsAssignments.clone(defaultBlessings);
@@ -96,7 +97,7 @@ export class BlessingsPicker extends Component {
 		const bodyElem = this.rootElem.getElementsByClassName('blessings-table-body')[0] as HTMLTableSectionElement;
 
 		specOrder.forEach(spec => {
-			if (!specsToShow.includes(spec)) {
+			if (!implementedSpecs.includes(spec)) {
 				return;
 			}
 
@@ -125,7 +126,7 @@ export class BlessingsPicker extends Component {
 			row.appendChild(cell);
 
 			specOrder.forEach(spec => {
-				if (!specsToShow.includes(spec)) {
+				if (!implementedSpecs.includes(spec)) {
 					return;
 				}
 

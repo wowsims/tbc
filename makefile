@@ -39,6 +39,7 @@ ui/core/proto/proto.ts: proto/*.proto node_modules
 	sed -i -E "s/from '(.*)';/from '\1\.js';/g" $(OUT_DIR)/protobuf-ts/*
 	sed -i -E "s/from \"(.*)\";/from '\1\.js';/g" $(OUT_DIR)/protobuf-ts/*
 	npx protoc --ts_opt generate_dependencies --ts_out ui/core/proto --proto_path proto proto/api.proto
+	npx protoc --ts_out ui/core/proto --proto_path proto proto/ui.proto
 
 node_modules: package-lock.json
 	npm install

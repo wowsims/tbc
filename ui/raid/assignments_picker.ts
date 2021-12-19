@@ -1,11 +1,14 @@
 import { Component } from '/tbc/core/components/component.js';
 import { Player } from '/tbc/core/player.js';
+import { Raid } from '/tbc/core/raid.js';
 import { TypedEvent } from '/tbc/core/typed_event.js';
 import { Class } from '/tbc/core/proto/common.js';
+import { RaidTarget } from '/tbc/core/proto/common.js';
 import { Spec } from '/tbc/core/proto/common.js';
-import { BuffBot } from '/tbc/core/proto/ui.js';
 import { getEnumValues } from '/tbc/core/utils.js';
+import { newRaidTarget, emptyRaidTarget } from '/tbc/core/proto_utils/utils.js';
 
+import { BuffBot } from './buff_bot.js';
 import { RaidSimUI } from './raid_sim_ui.js';
 
 declare var tippy: any;
@@ -14,34 +17,72 @@ export class AssignmentsPicker extends Component {
 	readonly raidSimUI: RaidSimUI;
 	readonly changeEmitter: TypedEvent<void> = new TypedEvent<void>();
 
+	private readonly innervatesPicker: InnervatesPicker;
+
   constructor(parentElem: HTMLElement, raidSimUI: RaidSimUI) {
     super(parentElem, 'assignments-picker-root');
 		this.raidSimUI = raidSimUI;
+		this.innervatesPicker = new InnervatesPicker(this.rootElem, raidSimUI);
 	}
 }
 
-// Dropdown menu for selecting a player.
-class PlayerPicker extends Input<FilterData, number> {
-	private readonly filterData: FilterData;
-	readonly changeEmitter: TypedEvent<void>;
+export class InnervatesPicker extends Component {
+	readonly raidSimUI: RaidSimUI;
+	readonly changeEmitter: TypedEvent<void> = new TypedEvent<void>();
 
-	private currentOptions: Array<PlayerFilterOption>;
+	private readonly playersContainer: HTMLElement;
+
+  constructor(parentElem: HTMLElement, raidSimUI: RaidSimUI) {
+    super(parentElem, 'innervates-picker-root');
+		this.raidSimUI = raidSimUI;
+
+		this.playersContainer = document.createElement('div');
+		this.playersContainer.classList.add('innervate-players-container');
+		this.rootElem.appendChild(this.playersContainer);
+	}
+
+	private update(playersAndBots: Array<Player<any> | BuffBot | null>) {
+		this.playersContainer.innerHTML = '';
+
+		const druids = playersAndBots.filter(playerOrBot => playerOrBot?.getClass() == Class.ClassDruid);
+	}
+}
+
+
+export interface RaidTargetPickerConfig<ModObject> extends InputConfig<ModObject, RaidTarget> {
+	raid: Raid,
+}
+
+interface RaidTargetOption {
+	iconUrl: string,
+	text: string,
+	color: string,
+	value: RaidTarget,
+};
+
+const unassignedOption: RaidTargetOption = {
+	iconUrl: '',
+	text: 'Unassigned',
+	color: 'black',
+	value: emptyRaidTarget(),
+};
+
+// Dropdown menu for selecting a player.
+class RaidTargetPicker<ModObject> extends Input<ModObject, RaidTarget> {
+	private readonly config: RaidTargetPickerConfig<ModObject>;
+	private readonly raidTarget: RaidTarget;
+
+	private currentOptions: Array<RaidTargetOption>;
 
 	private readonly buttonElem: HTMLElement;
 	private readonly dropdownElem: HTMLElement;
 
-  constructor(parent: HTMLElement, filterData: FilterData) {
-		const changeEmitter = new TypedEvent<void>();
-    super(parent, 'player-filter-root', filterData, {
-			extraCssClasses: [
-				'dropdown-root',
-			],
-			changedEvent: (filterData: FilterData) => changeEmitter,
-			getValue: (filterData: FilterData) => filterData.player,
-			setValue: (filterData: FilterData, newValue: number) => filterData.player = newValue,
-		});
-		this.filterData = filterData;
-		this.currentOptions = [allPlayersOption];
+  constructor(parent: HTMLElement, modObj: ModObject, config: RaidTargetPickerConfig<ModObject>) {
+    super(parent, 'raid-target-picker-root', modObj, config);
+    this.config = config;
+		this.raidTarget = emptyRaidTarget();
+
+		this.currentOptions = [unassignedOption];
 		this.changeEmitter = changeEmitter;
 
     this.rootElem.innerHTML = `
@@ -56,16 +97,20 @@ class PlayerPicker extends Input<FilterData, number> {
 			event.preventDefault();
 		});
 
+		config.raidSimUI.compChangeEmitter.on(() => {
+			this.setOptions(config.raid.getPlayers().filter(p => p != null));
+		});
+
 		this.init();
   }
 
-	setOptions(simResult: SimResult) {
-		this.currentOptions = [allPlayersOption].concat(simResult.getPlayers().map(player => {
+	private setOptions(players: Array<Player<any>>) {
+		this.currentOptions = [unassignedOption].concat(players.map(player => {
 			return {
-				iconUrl: player.iconUrl,
-				text: player.label,
-				color: player.classColor,
-				value: player.raidIndex,
+				iconUrl: player.getTalentTreeIcon(),
+				text: player.getLabel(),
+				color: player.getClassColor(),
+				value: newRaidTarget(player.getRaidIndex()),
 			};
 		}));
 
@@ -120,12 +165,12 @@ class PlayerPicker extends Input<FilterData, number> {
 		return this.buttonElem;
 	}
 
-	getInputValue(): number {
-		return this.filterData.player;
+	getInputValue(): RaidTarget {
+		return RaidTarget.clone(this.raidTarget);
 	}
 
-  setInputValue(newValue: number) {
-    this.filterData.player = newValue;
+  setInputValue(newValue: RaidTarget) {
+		this.raidTarget = RaidTarget.clone(newValue);
 
 		const optionData = this.currentOptions.find(optionData => optionData.value == newValue);
 		if (!optionData) {
