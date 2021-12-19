@@ -132,7 +132,6 @@ func (cast *Cast) startCasting(sim *Simulation, onCastComplete OnCastComplete) b
 				cast.Character.Log(sim, "Failed casting %s, not enough mana. (Current Mana = %0.0f, Mana Cost = %0.0f)",
 					cast.Name, cast.Character.CurrentMana(), cast.ManaCost)
 			}
-			cast.Character.Metrics.MarkOOM(sim, cast.Character)
 			cast.objectInUse = false // cast failed and we aren't using it
 			return false
 		}
@@ -174,7 +173,7 @@ func (cast *Cast) CalculatedGCD(char *Character) time.Duration {
 // Cast has finished, activate the effects of the cast.
 func (cast *Cast) internalOnComplete(sim *Simulation, onCastComplete OnCastComplete) {
 	if !cast.IgnoreManaCost && cast.ManaCost > 0 {
-		cast.Character.AddStat(stats.Mana, -cast.ManaCost)
+		cast.Character.SpendMana(sim, cast.ManaCost, cast.Name)
 		cast.Character.PseudoStats.FiveSecondRuleRefreshTime = sim.CurrentTime + time.Second*5
 	}
 

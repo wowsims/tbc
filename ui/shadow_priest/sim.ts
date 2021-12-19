@@ -23,6 +23,7 @@ import { ShadowPriest, ShadowPriest_Rotation as Rotation, ShadowPriest_Options a
 import * as IconInputs from '/tbc/core/components/icon_inputs.js';
 import * as OtherInputs from '/tbc/core/components/other_inputs.js';
 import * as Gems from '/tbc/core/constants/gems.js';
+import * as Mechanics from '/tbc/core/constants/mechanics.js';
 import * as Tooltips from '/tbc/core/constants/tooltips.js';
 
 import * as ShadowPriestInputs from './inputs.js';
@@ -63,10 +64,15 @@ export class ShadowPriestSimUI extends IndividualSimUI<Spec.SpecShadowPriest> {
 				Stat.StatSpellHaste,
 				Stat.StatMP5,
 			],
+			modifyDisplayStats: (player: Player<Spec.SpecShadowPriest>, stats: Stats) => {
+				return stats.withStat(Stat.StatSpellHit,
+						stats.getStat(Stat.StatSpellHit)
+						+ player.getTalents().shadowFocus * 2 * Mechanics.SPELL_HIT_RATING_PER_HIT_CHANCE);
+			},
 
 			defaults: {
 				// Default equipped gear.
-				gear: Presets.P1_BIS.gear,
+				gear: Presets.P1_PRESET.gear,
 				// Default EP weights for sorting gear in the gear picker.
 				epWeights: Stats.fromMap({
 					[Stat.StatIntellect]: 0.05,
@@ -189,8 +195,8 @@ export class ShadowPriestSimUI extends IndividualSimUI<Spec.SpecShadowPriest> {
 				],
 				// Preset gear configurations that the user can quickly select.
 				gear: [
-					Presets.P1_BIS,
-					Presets.P2_BIS,
+					Presets.P1_PRESET,
+					Presets.P2_PRESET,
 				],
 			},
 		});

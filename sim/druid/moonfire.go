@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
+	"github.com/wowsims/tbc/sim/core/proto"
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
@@ -83,4 +84,8 @@ func (druid *Druid) NewMoonfire(sim *core.Simulation, target *core.Target) *core
 	sf.Init(sim)
 
 	return sf
+}
+
+func (druid *Druid) ShouldCastMoonfire(sim *core.Simulation, target *core.Target, rotation proto.BalanceDruid_Rotation) bool {
+	return rotation.Moonfire && !druid.MoonfireSpell.DotInput.IsTicking(sim)
 }

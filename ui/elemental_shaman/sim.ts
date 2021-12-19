@@ -22,6 +22,7 @@ import { ElementalShaman, ElementalShaman_Rotation as ElementalShamanRotation, E
 import * as IconInputs from '/tbc/core/components/icon_inputs.js';
 import * as OtherInputs from '/tbc/core/components/other_inputs.js';
 import * as Gems from '/tbc/core/constants/gems.js';
+import * as Mechanics from '/tbc/core/constants/mechanics.js';
 import * as Tooltips from '/tbc/core/constants/tooltips.js';
 
 import * as ShamanInputs from './inputs.js';
@@ -60,6 +61,18 @@ export class ElementalShamanSimUI extends IndividualSimUI<Spec.SpecElementalSham
 				Stat.StatSpellHaste,
 				Stat.StatMP5,
 			],
+			modifyDisplayStats: (player: Player<Spec.SpecElementalShaman>, stats: Stats) => {
+				stats = stats.withStat(Stat.StatSpellHit,
+						stats.getStat(Stat.StatSpellHit)
+						+ player.getTalents().elementalPrecision * 2 * Mechanics.SPELL_HIT_RATING_PER_HIT_CHANCE);
+
+				stats = stats.withStat(Stat.StatSpellCrit,
+						stats.getStat(Stat.StatSpellCrit)
+						+ player.getTalents().lightningMastery * 1 * Mechanics.SPELL_CRIT_RATING_PER_CRIT_CHANCE
+						+ player.getTalents().tidalMastery * 1 * Mechanics.SPELL_CRIT_RATING_PER_CRIT_CHANCE);
+
+				return stats;
+			},
 
 			defaults: {
 				// Default equipped gear.
@@ -182,8 +195,8 @@ export class ElementalShamanSimUI extends IndividualSimUI<Spec.SpecElementalSham
 				],
 				// Preset gear configurations that the user can quickly select.
 				gear: [
-					Presets.P1_BIS,
-					Presets.P2_BIS,
+					Presets.P1_PRESET,
+					Presets.P2_PRESET,
 				],
 			},
 		});

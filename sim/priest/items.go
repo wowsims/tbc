@@ -4,7 +4,6 @@ import (
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
-	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 func init() {
@@ -33,7 +32,7 @@ var ItemSetAvatar = core.ItemSet{
 						}
 						// This is a cheat...
 						// easier than adding another aura the subtracts 150 mana from next cast.
-						character.AddStat(stats.Mana, 150)
+						character.AddMana(sim, 150, "Avatar 2p Bonus", false)
 					},
 				}
 			})

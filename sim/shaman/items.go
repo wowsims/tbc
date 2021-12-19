@@ -93,7 +93,7 @@ var ItemSetCataclysmRegalia = core.ItemSet{
 						if !spellEffect.Crit || sim.RandomFloat("cata4p") > 0.25 {
 							return
 						}
-						character.AddStat(stats.Mana, 120)
+						character.AddMana(sim, 120, "Cataclysm 4p Bonus", false)
 					},
 				}
 			})
@@ -187,7 +187,7 @@ func ApplyFathomBroochOfTheTidewalker(agent core.Agent) {
 					return
 				}
 				icd = core.InternalCD(sim.CurrentTime + icdDur)
-				character.AddStat(stats.Mana, 335)
+				character.AddMana(sim, 335, "Fathom-Brooch of the Tidewalker", false)
 			},
 		}
 	})

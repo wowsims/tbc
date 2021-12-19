@@ -106,6 +106,7 @@ export interface IndividualSimUIConfig<SpecType extends Spec> {
   epStats: Array<Stat>;
   epReferenceStat: Stat;
   displayStats: Array<Stat>;
+	modifyDisplayStats?: (player: Player<SpecType>, stats: Stats) => Stats,
 
   defaults: {
 		gear: EquipmentSpec,
@@ -275,7 +276,11 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 		this.raidSimResultsManager = addRaidSimAction(this);
 		addStatWeightsAction(this, this.individualConfig.epStats, this.individualConfig.epReferenceStat);
 
-    const characterStats = new CharacterStats(this.rootElem.getElementsByClassName('sim-sidebar-footer')[0] as HTMLElement, this.individualConfig.displayStats, this.player);
+    const characterStats = new CharacterStats(
+				this.rootElem.getElementsByClassName('sim-sidebar-footer')[0] as HTMLElement,
+				this.player,
+				this.individualConfig.displayStats,
+				this.individualConfig.modifyDisplayStats);
 	}
 
 	private addTopbarComponents() {

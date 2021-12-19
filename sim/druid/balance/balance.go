@@ -20,18 +20,15 @@ func NewBalanceDruid(character core.Character, options proto.Player) *BalanceDru
 
 	selfBuffs := druid.SelfBuffs{}
 	if balanceOptions.Options.InnervateTarget != nil {
-		// if targetting myself for individual sim
-		// TODO: what is my player idx for raid?
-		selfBuffs.Innervate = balanceOptions.Options.InnervateTarget.TargetIndex == 0
+		selfBuffs.Innervate = balanceOptions.Options.InnervateTarget.TargetIndex == int32(character.RaidIndex)
 	}
 
 	druid := druid.New(character, selfBuffs, *balanceOptions.Talents)
 	moonkin := &BalanceDruid{
 		Druid:           druid,
 		primaryRotation: *balanceOptions.Rotation,
+		useBattleRes:    balanceOptions.Options.BattleRes,
 	}
-
-	moonkin.useBattleRes = balanceOptions.Options.BattleRes
 
 	return moonkin
 }
@@ -69,8 +66,8 @@ func (moonkin *BalanceDruid) GetPresimOptions() *core.PresimOptions {
 			*player.Spec.(*proto.Player_BalanceDruid).BalanceDruid.Rotation = rotations[rotationIdx]
 		},
 
-		OnPresimResult: func(presimResult proto.PlayerMetrics, iterations int32) bool {
-			if float64(presimResult.NumOom) < float64(iterations)*0.15 {
+		OnPresimResult: func(presimResult proto.PlayerMetrics, iterations int32, duration time.Duration) bool {
+			if float64(presimResult.SecondsOomAvg) <= 0.03*duration.Seconds() {
 				moonkin.primaryRotation = rotations[rotationIdx]
 
 				// If the highest dps rotation is fine, we dont need any adaptive logic.
@@ -107,11 +104,9 @@ func (moonkin *BalanceDruid) Reset(sim *core.Simulation) {
 func (moonkin *BalanceDruid) Act(sim *core.Simulation) time.Duration {
 	if moonkin.useSurplusRotation {
 		moonkin.manaTracker.Update(sim, moonkin.GetCharacter())
-		projectedManaCost := moonkin.manaTracker.ProjectedManaCost(sim, moonkin.GetCharacter())
-		remainingManaPool := moonkin.ExpectedRemainingManaPool(sim)
 
 		// If we have enough mana to burn, use the surplus rotation.
-		if projectedManaCost < remainingManaPool {
+		if moonkin.manaTracker.ProjectedManaSurplus(sim, moonkin.GetCharacter()) {
 			return moonkin.actRotation(sim, moonkin.surplusRotation)
 		} else {
 			return moonkin.actRotation(sim, moonkin.primaryRotation)
@@ -139,49 +134,32 @@ func (moonkin *BalanceDruid) actRotation(sim *core.Simulation, rotation proto.Ba
 
 	target := sim.GetPrimaryTarget()
 
-	if rotation.FaerieFire {
-		ffWait := moonkin.TryFaerieFire(sim, target)
-		if ffWait != 0 {
-			return ffWait
-		}
-	}
-
-	if rotation.InsectSwarm && !moonkin.InsectSwarmSpell.DotInput.IsTicking(sim) {
-		swarm := moonkin.NewInsectSwarm(sim, target)
-		success := swarm.Cast(sim)
-		if !success {
-			regenTime := moonkin.TimeUntilManaRegen(swarm.GetManaCost())
-			return sim.CurrentTime + regenTime
-		}
-		return sim.CurrentTime + moonkin.GetRemainingCD(core.GCDCooldownID, sim.CurrentTime)
-	} else if rotation.Moonfire && !moonkin.MoonfireSpell.DotInput.IsTicking(sim) {
-		moonfire := moonkin.NewMoonfire(sim, target)
-		success := moonfire.Cast(sim)
-		if !success {
-			regenTime := moonkin.TimeUntilManaRegen(moonfire.GetManaCost())
-			return sim.CurrentTime + regenTime
-		}
-		return sim.CurrentTime + moonkin.GetRemainingCD(core.GCDCooldownID, sim.CurrentTime)
-	}
-
 	var spell *core.SimpleSpell
-	switch rotation.PrimarySpell {
-	case proto.BalanceDruid_Rotation_Starfire:
-		spell = moonkin.NewStarfire(sim, target, 8)
-	case proto.BalanceDruid_Rotation_Starfire6:
-		spell = moonkin.NewStarfire(sim, target, 6)
-	case proto.BalanceDruid_Rotation_Wrath:
-		spell = moonkin.NewWrath(sim, target)
+
+	if moonkin.ShouldCastFaerieFire(sim, target, rotation) {
+		spell = moonkin.NewFaerieFire(sim, target)
+	} else if moonkin.ShouldCastInsectSwarm(sim, target, rotation) {
+		spell = moonkin.NewInsectSwarm(sim, target)
+	} else if moonkin.ShouldCastMoonfire(sim, target, rotation) {
+		spell = moonkin.NewMoonfire(sim, target)
+	} else {
+		switch rotation.PrimarySpell {
+		case proto.BalanceDruid_Rotation_Starfire:
+			spell = moonkin.NewStarfire(sim, target, 8)
+		case proto.BalanceDruid_Rotation_Starfire6:
+			spell = moonkin.NewStarfire(sim, target, 6)
+		case proto.BalanceDruid_Rotation_Wrath:
+			spell = moonkin.NewWrath(sim, target)
+		}
 	}
 
 	actionSuccessful := spell.Cast(sim)
 
 	if !actionSuccessful {
 		regenTime := moonkin.TimeUntilManaRegen(spell.GetManaCost())
-		if sim.Log != nil {
-			moonkin.Log(sim, "Not enough mana, regenerating for %s.", regenTime)
-		}
-		return sim.CurrentTime + regenTime
+		waitAction := core.NewWaitAction(sim, moonkin.GetCharacter(), regenTime, core.WaitReasonOOM)
+		waitAction.Cast(sim)
+		return sim.CurrentTime + waitAction.GetDuration()
 	}
 
 	return sim.CurrentTime + core.MaxDuration(
@@ -195,9 +173,7 @@ func (moonkin *BalanceDruid) actRotation(sim *core.Simulation, rotation proto.Ba
 // Rotation tiers, from highest dps to lowest:
 //  - SF8 + MF
 //  - SF6 + MF
-//  - SF6
-//  - SF6 + IS
-// Order of the last two (SF6 / SF6+IS) is swapped if 4p T5 is worn.
+//  - SF6, or SF6 + IS if 4p T5 is worn.
 func (moonkin *BalanceDruid) GetDpsRotationHierarchy(baseRotation proto.BalanceDruid_Rotation) []proto.BalanceDruid_Rotation {
 	rotations := []proto.BalanceDruid_Rotation{}
 
@@ -213,14 +189,8 @@ func (moonkin *BalanceDruid) GetDpsRotationHierarchy(baseRotation proto.BalanceD
 		currentRotation.Moonfire = false
 		currentRotation.InsectSwarm = true
 		rotations = append(rotations, currentRotation)
-
-		currentRotation.InsectSwarm = false
-		rotations = append(rotations, currentRotation)
 	} else {
 		currentRotation.Moonfire = false
-		rotations = append(rotations, currentRotation)
-
-		currentRotation.InsectSwarm = true
 		rotations = append(rotations, currentRotation)
 	}
 

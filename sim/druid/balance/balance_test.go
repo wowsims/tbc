@@ -112,7 +112,7 @@ func TestAdaptive(t *testing.T) {
 		},
 
 		ExpectedDpsShort: 1569.7,
-		ExpectedDpsLong:  1083.0,
+		ExpectedDpsLong:  1153.9,
 	})
 }
 
