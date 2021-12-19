@@ -179,7 +179,7 @@ export const P2_PRESET = {
 				],
 			}),
 			ItemSpec.create({
-				id: 29918, // Mindstorm Wristbands
+				id: -19, // Elementalist Bracelets of Shadow Wrath
 				enchant: Enchants.WRIST_SPELLPOWER,
 			}),
 			ItemSpec.create({
