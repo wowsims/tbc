@@ -37,8 +37,8 @@ export const DefaultConsumes = Consumes.create({
 	blackenedBasilisk: true,
 });
 
-export const P1_BIS = {
-	name: 'P1 BIS',
+export const P1_PRESET = {
+	name: 'P1 Preset',
 	tooltip: Tooltips.BASIC_BIS_DISCLAIMER,
 	gear: EquipmentSpec.create({
 		items: [
@@ -141,8 +141,8 @@ export const P1_BIS = {
 	}),
 };
 
-export const P2_BIS = {
-	name: 'P2 BIS',
+export const P2_PRESET = {
+	name: 'P2 Preset',
 	tooltip: Tooltips.BASIC_BIS_DISCLAIMER,
 	gear: EquipmentSpec.create({
 		items: [
@@ -166,7 +166,7 @@ export const P2_BIS = {
 				],
 			}),
 			ItemSpec.create({
-				id: -18, // illidari-cloak
+				id: 29992, // Royal Cloak of the Sunstriders
 				enchant: Enchants.SUBTLETY,
 			}),
 			ItemSpec.create({
@@ -179,11 +179,11 @@ export const P2_BIS = {
 				],
 			}),
 			ItemSpec.create({
-				id: -14, // ravagers-cuffs shadow wrath
+				id: 29918, // Mindstorm Wristbands
 				enchant: Enchants.WRIST_SPELLPOWER,
 			}),
 			ItemSpec.create({
-				id: 28780, // nethersteel-lined-handwraps
+				id: 28780, // Soul-Eater's Handwraps
 				enchant: Enchants.GLOVES_SPELLPOWER,
 				gems: [
 					Gems.RUNED_LIVING_RUBY,
@@ -207,8 +207,12 @@ export const P2_BIS = {
 				],
 			}),
 			ItemSpec.create({
-				id: -5, // gliders-foot-wraps
+				id: 21870, // Frozen Shadoweave Boots
 				enchant: Enchants.BOARS_SPEED,
+				gems: [
+					Gems.RUNED_LIVING_RUBY,
+					Gems.RUNED_LIVING_RUBY,
+				],
 			}),
 			ItemSpec.create({
 				id: 30109, // ring-of-endless-coils
@@ -228,7 +232,7 @@ export const P2_BIS = {
 				id: 29982, // wand of forgotten star
 			}),
 			ItemSpec.create({
-				id: 32963, // merciless-gladiators-spellblade
+				id: 28770, // Nathrezim Mindblade
 				enchant: Enchants.SOULFROST,
 			}),
 			ItemSpec.create({

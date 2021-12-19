@@ -38,8 +38,8 @@ export const DefaultConsumes = Consumes.create({
 	blackenedBasilisk: true,
 });
 
-export const P1_ALLIANCE_BIS = {
-	name: 'P1 Alliance BIS',
+export const P1_ALLIANCE_PRESET = {
+	name: 'P1 Alliance Preset',
 	tooltip: Tooltips.BASIC_BIS_DISCLAIMER,
 	enableWhen: (player: Player<any>) => player.getFaction() == Faction.Alliance,
 	gear: EquipmentSpec.create({
@@ -142,8 +142,8 @@ export const P1_ALLIANCE_BIS = {
 	}),
 };
 
-export const P1_HORDE_BIS = {
-	name: 'P1 Horde BIS',
+export const P1_HORDE_PRESET = {
+	name: 'P1 Horde Preset',
 	tooltip: Tooltips.BASIC_BIS_DISCLAIMER,
 	enableWhen: (player: Player<any>) => player.getFaction() == Faction.Horde,
 	gear: EquipmentSpec.create({
@@ -246,8 +246,8 @@ export const P1_HORDE_BIS = {
 	}),
 };
 
-export const P2_ALLIANCE_BIS = {
-	name: 'P2 Alliance BIS',
+export const P2_ALLIANCE_PRESET = {
+	name: 'P2 Alliance Preset',
 	tooltip: Tooltips.BASIC_BIS_DISCLAIMER,
 	enableWhen: (player: Player<any>) => player.getFaction() == Faction.Alliance,
 	gear: EquipmentSpec.create({
@@ -339,8 +339,8 @@ export const P2_ALLIANCE_BIS = {
 	}),
 };
 
-export const P2_HORDE_BIS = {
-	name: 'P2 Horde BIS',
+export const P2_HORDE_PRESET = {
+	name: 'P2 Horde Preset',
 	tooltip: Tooltips.BASIC_BIS_DISCLAIMER,
 	enableWhen: (player: Player<any>) => player.getFaction() == Faction.Horde,
 	gear: EquipmentSpec.create({
