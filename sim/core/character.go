@@ -178,6 +178,10 @@ func (character *Character) AddStat(stat stats.Stat, amount float64) {
 }
 
 func (character *Character) SpendMana(sim *Simulation, amount float64, reason string) {
+	if amount < 0 {
+		panic("Trying to spend negative mana!")
+	}
+
 	newMana := character.CurrentMana() - amount
 
 	if sim.Log != nil {
@@ -188,6 +192,10 @@ func (character *Character) SpendMana(sim *Simulation, amount float64, reason st
 	character.Metrics.ManaSpent += amount
 }
 func (character *Character) AddMana(sim *Simulation, amount float64, reason string, isBonusMana bool) {
+	if amount < 0 {
+		panic("Trying to add negative mana!")
+	}
+
 	oldMana := character.CurrentMana()
 	newMana := MinFloat(oldMana+amount, character.MaxMana())
 
