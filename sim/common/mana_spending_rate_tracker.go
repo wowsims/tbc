@@ -6,7 +6,8 @@ import (
 	"github.com/wowsims/tbc/sim/core"
 )
 
-const manaTrackingWindowSeconds = 30
+const manaBuffer = 500.0
+const manaTrackingWindowSeconds = 60
 const manaTrackingWindow = time.Second * manaTrackingWindowSeconds
 
 // 2 * (# of seconds) should be plenty of slots
@@ -86,8 +87,12 @@ func (tracker *ManaSpendingRateTracker) Update(sim *core.Simulation, character *
 		manaSpent:       manaSpent,
 		manaGained:      manaGained,
 		manaSpentDelta:  (manaSpent - tracker.previousManaSpent) * manaDeltaCoefficient,
-		manaGainedDelta: (manaGained - tracker.previousManaGained) * manaDeltaCoefficient,
+		manaGainedDelta: (manaGained - tracker.previousManaGained) * manaDeltaCoefficient / character.PseudoStats.SpiritRegenMultiplier,
 	}
+
+	//if sim.Log != nil {
+	//	character.Log(sim, "Init speed: %0.02f, prev cast speed: %0.02f, Mana gained: %0.02f, Mana gained delta: %0.02f", character.InitialCastSpeed(), tracker.previousCastSpeed, snapshot.manaGained, snapshot.manaGainedDelta)
+	//}
 
 	nextIndex := (tracker.firstSnapshotIndex + tracker.numSnapshots) % manaSnapshotsBufferSize
 	tracker.previousCastSpeed = character.CastSpeed()
@@ -120,13 +125,19 @@ func (tracker *ManaSpendingRateTracker) ProjectedManaCost(sim *core.Simulation, 
 	projectedManaCost := manaSpentPerSecond * sim.GetRemainingDuration().Seconds()
 
 	//if sim.Log != nil {
-	//	remainingManaPool := character.ExpectedRemainingManaPool(sim)
-	//	character.Log(sim, "Mana spent: %0.02f, Projected: %0.02f, total: %0.02f (%0.02f + %0.02f)", character.Metrics.ManaSpent, projectedManaCost, remainingManaPool, character.CurrentMana(), character.ExpectedBonusMana)
+	//	remainingManaPool := character.CurrentMana() + character.ExpectedBonusMana - manaBuffer
+	//	character.Log(sim, "Mana spent: %0.02f, Mana gained: %0.02f, BonusManaGained: %0.02f, Projected: %0.02f, total: %0.02f (%0.02f + %0.02f)", character.Metrics.ManaSpent, character.Metrics.ManaGained, character.Metrics.BonusManaGained, projectedManaCost, remainingManaPool, character.CurrentMana(), character.ExpectedBonusMana)
 	//}
 
 	return projectedManaCost
 }
 
 func (tracker *ManaSpendingRateTracker) ProjectedManaSurplus(sim *core.Simulation, character *core.Character) bool {
-	return tracker.ProjectedManaCost(sim, character) < character.CurrentMana()+character.ExpectedBonusMana
+	// If we've gone OOM at least once, stop using surplus rotations.
+	// Spending time not casting while OOM will throw off the mana spend / gain rates so this is necessary.
+	if character.Metrics.WentOOM {
+		return false
+	}
+
+	return tracker.ProjectedManaCost(sim, character) < character.CurrentMana()+character.ExpectedBonusMana-manaBuffer
 }

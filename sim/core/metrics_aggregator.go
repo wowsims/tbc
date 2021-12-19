@@ -72,6 +72,8 @@ type CharacterMetrics struct {
 // Metrics for the current iteration, for 1 agent. Keep this as a separate
 // struct so its easy to clear.
 type CharacterIterationMetrics struct {
+	WentOOM bool // Whether the agent has hit OOM at least once in this iteration.
+
 	ManaSpent       float64
 	ManaGained      float64
 	BonusManaGained float64 // Only includes amount from mana pots / runes / innervates.
@@ -153,6 +155,7 @@ func (characterMetrics *CharacterMetrics) AddSpellCast(spellCast *SpellCast) {
 
 func (characterMetrics *CharacterMetrics) MarkOOM(sim *Simulation, character *Character, dur time.Duration) {
 	characterMetrics.CharacterIterationMetrics.OOMTime += dur
+	characterMetrics.CharacterIterationMetrics.WentOOM = true
 }
 
 // This should be called when a Sim iteration is complete.

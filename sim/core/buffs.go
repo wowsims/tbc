@@ -245,20 +245,37 @@ func registerInnervateCD(agent Agent, numInnervates int) {
 var InnervateCooldownID = NewCooldownID()
 var InnervateAuraID = NewAuraID()
 
+const InnervateDuration = time.Second * 20
+
 func AddInnervateAura(sim *Simulation, character *Character, expectedBonusManaReduction float64) {
 	character.PseudoStats.ForceFullSpiritRegen = true
 	character.PseudoStats.SpiritRegenMultiplier *= 5.0
+
+	lastUpdateTime := sim.CurrentTime
+	bonusManaSubtracted := 0.0
 
 	character.AddAura(sim, Aura{
 		ID:      InnervateAuraID,
 		SpellID: 29166,
 		Name:    "Innervate",
-		Expires: sim.CurrentTime + time.Second*20,
+		Expires: sim.CurrentTime + InnervateDuration,
+		OnCast: func(sim *Simulation, cast *Cast) {
+			timeDelta := sim.CurrentTime - lastUpdateTime
+			lastUpdateTime = sim.CurrentTime
+			progressRatio := float64(timeDelta) / float64(InnervateDuration)
+			amount := expectedBonusManaReduction * progressRatio
+
+			character.ExpectedBonusMana -= amount
+			character.Metrics.BonusManaGained += amount
+			bonusManaSubtracted += amount
+		},
 		OnExpire: func(sim *Simulation) {
 			character.PseudoStats.ForceFullSpiritRegen = false
 			character.PseudoStats.SpiritRegenMultiplier /= 5.0
-			character.ExpectedBonusMana -= expectedBonusManaReduction
-			character.Metrics.BonusManaGained += expectedBonusManaReduction
+
+			remainder := expectedBonusManaReduction - bonusManaSubtracted
+			character.ExpectedBonusMana -= remainder
+			character.Metrics.BonusManaGained += remainder
 		},
 	})
 }
