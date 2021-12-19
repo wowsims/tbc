@@ -100,11 +100,11 @@
 }
 
 .positive {
-  color: lawngreen;
+  color: lawngreen !important;
 }
 
 .negative {
-  color: red;
+  color: red !important;
 }
 
 :root {
@@ -208,11 +208,11 @@
 }
 
 .positive {
-  color: lawngreen;
+  color: lawngreen !important;
 }
 
 .negative {
-  color: red;
+  color: red !important;
 }
 
 :root {
@@ -316,11 +316,11 @@
 }
 
 .positive {
-  color: lawngreen;
+  color: lawngreen !important;
 }
 
 .negative {
-  color: red;
+  color: red !important;
 }
 
 .aura-metrics-table {

@@ -1,6 +1,7 @@
 import { Stat } from '/tbc/core/proto/common.js';
 import { statNames } from '/tbc/core/proto_utils/names.js';
 import { Stats } from '/tbc/core/proto_utils/stats.js';
+import * as Mechanics from '/tbc/core/constants/mechanics.js';
 import { Component } from './component.js';
 const spellPowerTypeStats = [
     Stat.StatArcaneSpellPower,
@@ -11,9 +12,11 @@ const spellPowerTypeStats = [
     Stat.StatShadowSpellPower,
 ];
 export class CharacterStats extends Component {
-    constructor(parent, stats, player) {
+    constructor(parent, player, stats, modifyDisplayStats) {
         super(parent, 'character-stats-root');
         this.stats = stats;
+        this.player = player;
+        this.modifyDisplayStats = modifyDisplayStats;
         const table = document.createElement('table');
         table.classList.add('character-stats-table');
         this.rootElem.appendChild(table);
@@ -37,6 +40,9 @@ export class CharacterStats extends Component {
         });
     }
     updateStats(newStats) {
+        if (this.modifyDisplayStats) {
+            newStats = this.modifyDisplayStats(this.player, newStats);
+        }
         this.stats.forEach((stat, idx) => {
             let rawValue = newStats.getStat(stat);
             if (spellPowerTypeStats.includes(stat)) {
@@ -44,16 +50,16 @@ export class CharacterStats extends Component {
             }
             let displayStr = String(Math.round(rawValue));
             if (stat == Stat.StatMeleeHit) {
-                displayStr += ` (${(rawValue / 15.8).toFixed(2)}%)`;
+                displayStr += ` (${(rawValue / Mechanics.MELEE_HIT_RATING_PER_HIT_CHANCE).toFixed(2)}%)`;
             }
             else if (stat == Stat.StatSpellHit) {
-                displayStr += ` (${(rawValue / 12.6).toFixed(2)}%)`;
+                displayStr += ` (${(rawValue / Mechanics.SPELL_HIT_RATING_PER_HIT_CHANCE).toFixed(2)}%)`;
             }
             else if (stat == Stat.StatMeleeCrit || stat == Stat.StatSpellCrit) {
-                displayStr += ` (${(rawValue / 22.08).toFixed(2)}%)`;
+                displayStr += ` (${(rawValue / Mechanics.SPELL_CRIT_RATING_PER_CRIT_CHANCE).toFixed(2)}%)`;
             }
             else if (stat == Stat.StatMeleeHaste || stat == Stat.StatSpellHaste) {
-                displayStr += ` (${(rawValue / 15.76).toFixed(2)}%)`;
+                displayStr += ` (${(rawValue / Mechanics.HASTE_RATING_PER_HASTE_PERCENT).toFixed(2)}%)`;
             }
             this.valueElems[idx].textContent = displayStr;
         });

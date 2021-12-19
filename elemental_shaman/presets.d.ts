@@ -12,12 +12,12 @@ export declare const PRERAID_GEAR: {
     name: string;
     gear: EquipmentSpec;
 };
-export declare const P1_BIS: {
+export declare const P1_PRESET: {
     name: string;
     tooltip: string;
     gear: EquipmentSpec;
 };
-export declare const P2_BIS: {
+export declare const P2_PRESET: {
     name: string;
     tooltip: string;
     gear: EquipmentSpec;

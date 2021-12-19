@@ -9,25 +9,25 @@ export declare const StandardTalents: {
 export declare const DefaultRotation: BalanceDruidRotation;
 export declare const DefaultOptions: BalanceDruidOptions;
 export declare const DefaultConsumes: Consumes;
-export declare const P1_ALLIANCE_BIS: {
+export declare const P1_ALLIANCE_PRESET: {
     name: string;
     tooltip: string;
     enableWhen: (player: Player<any>) => boolean;
     gear: EquipmentSpec;
 };
-export declare const P1_HORDE_BIS: {
+export declare const P1_HORDE_PRESET: {
     name: string;
     tooltip: string;
     enableWhen: (player: Player<any>) => boolean;
     gear: EquipmentSpec;
 };
-export declare const P2_ALLIANCE_BIS: {
+export declare const P2_ALLIANCE_PRESET: {
     name: string;
     tooltip: string;
     enableWhen: (player: Player<any>) => boolean;
     gear: EquipmentSpec;
 };
-export declare const P2_HORDE_BIS: {
+export declare const P2_HORDE_PRESET: {
     name: string;
     tooltip: string;
     enableWhen: (player: Player<any>) => boolean;

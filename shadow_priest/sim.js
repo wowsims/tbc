@@ -8,6 +8,7 @@ import { Stats } from '/tbc/core/proto_utils/stats.js';
 import { IndividualSimUI } from '/tbc/core/individual_sim_ui.js';
 import * as IconInputs from '/tbc/core/components/icon_inputs.js';
 import * as OtherInputs from '/tbc/core/components/other_inputs.js';
+import * as Mechanics from '/tbc/core/constants/mechanics.js';
 import * as ShadowPriestInputs from './inputs.js';
 import * as Presets from './presets.js';
 export class ShadowPriestSimUI extends IndividualSimUI {
@@ -43,9 +44,13 @@ export class ShadowPriestSimUI extends IndividualSimUI {
                 Stat.StatSpellHaste,
                 Stat.StatMP5,
             ],
+            modifyDisplayStats: (player, stats) => {
+                return stats.withStat(Stat.StatSpellHit, stats.getStat(Stat.StatSpellHit)
+                    + player.getTalents().shadowFocus * 2 * Mechanics.SPELL_HIT_RATING_PER_HIT_CHANCE);
+            },
             defaults: {
                 // Default equipped gear.
-                gear: Presets.P1_BIS.gear,
+                gear: Presets.P1_PRESET.gear,
                 // Default EP weights for sorting gear in the gear picker.
                 epWeights: Stats.fromMap({
                     [Stat.StatIntellect]: 0.05,
@@ -165,8 +170,8 @@ export class ShadowPriestSimUI extends IndividualSimUI {
                 ],
                 // Preset gear configurations that the user can quickly select.
                 gear: [
-                    Presets.P1_BIS,
-                    Presets.P2_BIS,
+                    Presets.P1_PRESET,
+                    Presets.P2_PRESET,
                 ],
             },
         });

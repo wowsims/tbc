@@ -27,8 +27,8 @@ export const DefaultConsumes = Consumes.create({
     superiorWizardOil: true,
     blackenedBasilisk: true,
 });
-export const P1_BIS = {
-    name: 'P1 BIS',
+export const P1_PRESET = {
+    name: 'P1 Preset',
     tooltip: Tooltips.BASIC_BIS_DISCLAIMER,
     gear: EquipmentSpec.create({
         items: [
@@ -130,8 +130,8 @@ export const P1_BIS = {
         ],
     }),
 };
-export const P2_BIS = {
-    name: 'P2 BIS',
+export const P2_PRESET = {
+    name: 'P2 Preset',
     tooltip: Tooltips.BASIC_BIS_DISCLAIMER,
     gear: EquipmentSpec.create({
         items: [
@@ -155,7 +155,7 @@ export const P2_BIS = {
                 ],
             }),
             ItemSpec.create({
-                id: -18,
+                id: 29992,
                 enchant: Enchants.SUBTLETY,
             }),
             ItemSpec.create({
@@ -168,7 +168,7 @@ export const P2_BIS = {
                 ],
             }),
             ItemSpec.create({
-                id: -14,
+                id: -19,
                 enchant: Enchants.WRIST_SPELLPOWER,
             }),
             ItemSpec.create({
@@ -196,8 +196,12 @@ export const P2_BIS = {
                 ],
             }),
             ItemSpec.create({
-                id: -5,
+                id: 21870,
                 enchant: Enchants.BOARS_SPEED,
+                gems: [
+                    Gems.RUNED_LIVING_RUBY,
+                    Gems.RUNED_LIVING_RUBY,
+                ],
             }),
             ItemSpec.create({
                 id: 30109,
@@ -217,7 +221,7 @@ export const P2_BIS = {
                 id: 29982, // wand of forgotten star
             }),
             ItemSpec.create({
-                id: 32963,
+                id: 28770,
                 enchant: Enchants.SOULFROST,
             }),
             ItemSpec.create({

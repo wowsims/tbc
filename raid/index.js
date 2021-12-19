@@ -25,12 +25,12 @@ const ui = new RaidSimUI(document.body, {
             defaultGear: {
                 [Faction.Unknown]: {},
                 [Faction.Alliance]: {
-                    1: BalanceDruidPresets.P1_ALLIANCE_BIS.gear,
-                    2: BalanceDruidPresets.P2_ALLIANCE_BIS.gear,
+                    1: BalanceDruidPresets.P1_ALLIANCE_PRESET.gear,
+                    2: BalanceDruidPresets.P2_ALLIANCE_PRESET.gear,
                 },
                 [Faction.Horde]: {
-                    1: BalanceDruidPresets.P1_HORDE_BIS.gear,
-                    2: BalanceDruidPresets.P2_HORDE_BIS.gear,
+                    1: BalanceDruidPresets.P1_HORDE_PRESET.gear,
+                    2: BalanceDruidPresets.P2_HORDE_PRESET.gear,
                 },
             },
             tooltip: specNames[Spec.SpecBalanceDruid],
@@ -51,12 +51,12 @@ const ui = new RaidSimUI(document.body, {
             defaultGear: {
                 [Faction.Unknown]: {},
                 [Faction.Alliance]: {
-                    1: ElementalShamanPresets.P1_BIS.gear,
-                    2: ElementalShamanPresets.P2_BIS.gear,
+                    1: ElementalShamanPresets.P1_PRESET.gear,
+                    2: ElementalShamanPresets.P2_PRESET.gear,
                 },
                 [Faction.Horde]: {
-                    1: ElementalShamanPresets.P1_BIS.gear,
-                    2: ElementalShamanPresets.P2_BIS.gear,
+                    1: ElementalShamanPresets.P1_PRESET.gear,
+                    2: ElementalShamanPresets.P2_PRESET.gear,
                 },
             },
             tooltip: specNames[Spec.SpecElementalShaman],
@@ -77,12 +77,12 @@ const ui = new RaidSimUI(document.body, {
             defaultGear: {
                 [Faction.Unknown]: {},
                 [Faction.Alliance]: {
-                    1: ShadowPriestPresets.P1_BIS.gear,
-                    2: ShadowPriestPresets.P2_BIS.gear,
+                    1: ShadowPriestPresets.P1_PRESET.gear,
+                    2: ShadowPriestPresets.P2_PRESET.gear,
                 },
                 [Faction.Horde]: {
-                    1: ShadowPriestPresets.P1_BIS.gear,
-                    2: ShadowPriestPresets.P2_BIS.gear,
+                    1: ShadowPriestPresets.P1_PRESET.gear,
+                    2: ShadowPriestPresets.P2_PRESET.gear,
                 },
             },
             tooltip: specNames[Spec.SpecShadowPriest],

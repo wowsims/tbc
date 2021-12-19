@@ -117,8 +117,8 @@ export const PRERAID_GEAR = {
         ],
     }),
 };
-export const P1_BIS = {
-    name: 'P1 BIS',
+export const P1_PRESET = {
+    name: 'P1 Preset',
     tooltip: Tooltips.BASIC_BIS_DISCLAIMER,
     gear: EquipmentSpec.create({
         items: [
@@ -220,8 +220,8 @@ export const P1_BIS = {
         ],
     }),
 };
-export const P2_BIS = {
-    name: 'P2 BIS',
+export const P2_PRESET = {
+    name: 'P2 Preset',
     tooltip: Tooltips.BASIC_BIS_DISCLAIMER,
     gear: EquipmentSpec.create({
         items: [

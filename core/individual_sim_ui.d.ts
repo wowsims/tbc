@@ -50,6 +50,7 @@ export interface IndividualSimUIConfig<SpecType extends Spec> {
     epStats: Array<Stat>;
     epReferenceStat: Stat;
     displayStats: Array<Stat>;
+    modifyDisplayStats?: (player: Player<SpecType>, stats: Stats) => Stats;
     defaults: {
         gear: EquipmentSpec;
         epWeights: Stats;

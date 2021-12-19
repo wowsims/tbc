@@ -240,11 +240,11 @@
 }
 
 .positive {
-  color: lawngreen;
+  color: lawngreen !important;
 }
 
 .negative {
-  color: red;
+  color: red !important;
 }
 
 .gear-picker-root {
@@ -531,11 +531,11 @@
 }
 
 .positive {
-  color: lawngreen;
+  color: lawngreen !important;
 }
 
 .negative {
-  color: red;
+  color: red !important;
 }
 
 .icon-input {
@@ -735,11 +735,11 @@
 }
 
 .positive {
-  color: lawngreen;
+  color: lawngreen !important;
 }
 
 .negative {
-  color: red;
+  color: red !important;
 }
 
 .results-sim {
@@ -952,11 +952,11 @@
 }
 
 .positive {
-  color: lawngreen;
+  color: lawngreen !important;
 }
 
 .negative {
-  color: red;
+  color: red !important;
 }
 
 .results-ep-table {
@@ -1156,11 +1156,11 @@
 }
 
 .positive {
-  color: lawngreen;
+  color: lawngreen !important;
 }
 
 .negative {
-  color: red;
+  color: red !important;
 }
 
 html {
@@ -1429,11 +1429,11 @@ td, th {
 }
 
 .positive {
-  color: lawngreen;
+  color: lawngreen !important;
 }
 
 .negative {
-  color: red;
+  color: red !important;
 }
 
 .talents-picker-root {
