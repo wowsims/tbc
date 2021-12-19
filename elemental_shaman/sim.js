@@ -43,8 +43,12 @@ export class ElementalShamanSimUI extends IndividualSimUI {
                 Stat.StatMP5,
             ],
             modifyDisplayStats: (player, stats) => {
-                return stats.withStat(Stat.StatSpellHit, stats.getStat(Stat.StatSpellHit)
+                stats = stats.withStat(Stat.StatSpellHit, stats.getStat(Stat.StatSpellHit)
                     + player.getTalents().elementalPrecision * 2 * Mechanics.SPELL_HIT_RATING_PER_HIT_CHANCE);
+                stats = stats.withStat(Stat.StatSpellCrit, stats.getStat(Stat.StatSpellCrit)
+                    + player.getTalents().lightningMastery * 1 * Mechanics.SPELL_CRIT_RATING_PER_CRIT_CHANCE
+                    + player.getTalents().tidalMastery * 1 * Mechanics.SPELL_CRIT_RATING_PER_CRIT_CHANCE);
+                return stats;
             },
             defaults: {
                 // Default equipped gear.
