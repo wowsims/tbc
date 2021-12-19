@@ -7,12 +7,14 @@ export class PercentOom extends ResultComponent {
     onSimResult(resultData) {
         const players = resultData.result.getPlayers(resultData.filter);
         if (players.length == 1) {
-            const percentOom = players[0].oomPercent;
+            const player = players[0];
+            const secondsOOM = player.secondsOomAvg;
+            const percentOOM = secondsOOM / resultData.result.encounterMetrics.durationSeconds;
             this.rootElem.innerHTML = `
-				<span class="percent-oom-value">${Math.round(percentOom)}%</span>
-				<span class="percent-oom-label">of simulations went OOM</span>
+				<span class="percent-oom-value">${secondsOOM.toFixed(1)}</span>
+				<span class="percent-oom-label">seconds spent OOM on average</span>
 			`;
-            const dangerLevel = percentOom < 5 ? 'safe' : (percentOom < 25 ? 'warning' : 'danger');
+            const dangerLevel = percentOOM < 0.01 ? 'safe' : (percentOOM < 0.05 ? 'warning' : 'danger');
             this.rootElem.classList.remove('safe', 'warning', 'danger');
             this.rootElem.classList.add(dangerLevel);
             this.rootElem.style.display = 'initial';

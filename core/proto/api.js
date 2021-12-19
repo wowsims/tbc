@@ -360,12 +360,11 @@ class SimOptions$Type extends MessageType {
             { no: 1, name: "iterations", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 2, name: "random_seed", kind: "scalar", T: 3 /*ScalarType.INT64*/, L: 0 /*LongType.BIGINT*/ },
             { no: 3, name: "debug", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
-            { no: 4, name: "exit_on_oom", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 5, name: "is_test", kind: "scalar", T: 8 /*ScalarType.BOOL*/ }
         ]);
     }
     create(value) {
-        const message = { iterations: 0, randomSeed: 0n, debug: false, exitOnOom: false, isTest: false };
+        const message = { iterations: 0, randomSeed: 0n, debug: false, isTest: false };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -384,9 +383,6 @@ class SimOptions$Type extends MessageType {
                     break;
                 case /* bool debug */ 3:
                     message.debug = reader.bool();
-                    break;
-                case /* bool exit_on_oom */ 4:
-                    message.exitOnOom = reader.bool();
                     break;
                 case /* bool is_test */ 5:
                     message.isTest = reader.bool();
@@ -412,9 +408,6 @@ class SimOptions$Type extends MessageType {
         /* bool debug = 3; */
         if (message.debug !== false)
             writer.tag(3, WireType.Varint).bool(message.debug);
-        /* bool exit_on_oom = 4; */
-        if (message.exitOnOom !== false)
-            writer.tag(4, WireType.Varint).bool(message.exitOnOom);
         /* bool is_test = 5; */
         if (message.isTest !== false)
             writer.tag(5, WireType.Varint).bool(message.isTest);
@@ -737,15 +730,13 @@ class PlayerMetrics$Type extends MessageType {
     constructor() {
         super("proto.PlayerMetrics", [
             { no: 1, name: "dps", kind: "message", T: () => DpsMetrics },
-            { no: 2, name: "num_oom", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
-            { no: 3, name: "oom_at_avg", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
-            { no: 4, name: "dps_at_oom_avg", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
+            { no: 3, name: "seconds_oom_avg", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
             { no: 5, name: "actions", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => ActionMetrics },
             { no: 6, name: "auras", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => AuraMetrics }
         ]);
     }
     create(value) {
-        const message = { numOom: 0, oomAtAvg: 0, dpsAtOomAvg: 0, actions: [], auras: [] };
+        const message = { secondsOomAvg: 0, actions: [], auras: [] };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -759,14 +750,8 @@ class PlayerMetrics$Type extends MessageType {
                 case /* proto.DpsMetrics dps */ 1:
                     message.dps = DpsMetrics.internalBinaryRead(reader, reader.uint32(), options, message.dps);
                     break;
-                case /* int32 num_oom */ 2:
-                    message.numOom = reader.int32();
-                    break;
-                case /* double oom_at_avg */ 3:
-                    message.oomAtAvg = reader.double();
-                    break;
-                case /* double dps_at_oom_avg */ 4:
-                    message.dpsAtOomAvg = reader.double();
+                case /* double seconds_oom_avg */ 3:
+                    message.secondsOomAvg = reader.double();
                     break;
                 case /* repeated proto.ActionMetrics actions */ 5:
                     message.actions.push(ActionMetrics.internalBinaryRead(reader, reader.uint32(), options));
@@ -789,15 +774,9 @@ class PlayerMetrics$Type extends MessageType {
         /* proto.DpsMetrics dps = 1; */
         if (message.dps)
             DpsMetrics.internalBinaryWrite(message.dps, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
-        /* int32 num_oom = 2; */
-        if (message.numOom !== 0)
-            writer.tag(2, WireType.Varint).int32(message.numOom);
-        /* double oom_at_avg = 3; */
-        if (message.oomAtAvg !== 0)
-            writer.tag(3, WireType.Bit64).double(message.oomAtAvg);
-        /* double dps_at_oom_avg = 4; */
-        if (message.dpsAtOomAvg !== 0)
-            writer.tag(4, WireType.Bit64).double(message.dpsAtOomAvg);
+        /* double seconds_oom_avg = 3; */
+        if (message.secondsOomAvg !== 0)
+            writer.tag(3, WireType.Bit64).double(message.secondsOomAvg);
         /* repeated proto.ActionMetrics actions = 5; */
         for (let i = 0; i < message.actions.length; i++)
             ActionMetrics.internalBinaryWrite(message.actions[i], writer.tag(5, WireType.LengthDelimited).fork(), options).join();

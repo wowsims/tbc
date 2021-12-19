@@ -71,7 +71,7 @@ export declare class PlayerMetrics {
     private readonly duration;
     private constructor();
     get label(): string;
-    get oomPercent(): number;
+    get secondsOomAvg(): number;
     get totalDamage(): number;
     static makeNew(iterations: number, duration: number, player: PlayerProto, metrics: PlayerMetricsProto, raidIndex: number): Promise<PlayerMetrics>;
 }
@@ -81,6 +81,7 @@ export declare class EncounterMetrics {
     readonly targets: Array<TargetMetrics>;
     private constructor();
     static makeNew(iterations: number, duration: number, encounter: EncounterProto, metrics: EncounterMetricsProto): Promise<EncounterMetrics>;
+    get durationSeconds(): number;
 }
 export declare class TargetMetrics {
     private readonly target;

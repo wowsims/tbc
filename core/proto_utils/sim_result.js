@@ -139,8 +139,8 @@ export class PlayerMetrics {
     get label() {
         return `${this.name} (#${this.raidIndex + 1})`;
     }
-    get oomPercent() {
-        return (this.metrics.numOom / this.iterations) * 100;
+    get secondsOomAvg() {
+        return this.metrics.secondsOomAvg;
     }
     get totalDamage() {
         return this.dps.avg * this.duration;
@@ -164,6 +164,9 @@ export class EncounterMetrics {
         const targets = await Promise.all([...new Array(numTargets).keys()]
             .map(i => TargetMetrics.makeNew(iterations, duration, encounter.targets[i], metrics.targets[i], i)));
         return new EncounterMetrics(encounter, metrics, targets);
+    }
+    get durationSeconds() {
+        return this.encounter.duration;
     }
 }
 export class TargetMetrics {

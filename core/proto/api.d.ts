@@ -176,10 +176,6 @@ export interface SimOptions {
      */
     debug: boolean;
     /**
-     * @generated from protobuf field: bool exit_on_oom = 4;
-     */
-    exitOnOom: boolean;
-    /**
      * @generated from protobuf field: bool is_test = 5;
      */
     isTest: boolean;
@@ -314,17 +310,11 @@ export interface PlayerMetrics {
      */
     dps?: DpsMetrics;
     /**
-     * @generated from protobuf field: int32 num_oom = 2;
+     * average seconds spent oom per iteration
+     *
+     * @generated from protobuf field: double seconds_oom_avg = 3;
      */
-    numOom: number;
-    /**
-     * @generated from protobuf field: double oom_at_avg = 3;
-     */
-    oomAtAvg: number;
-    /**
-     * @generated from protobuf field: double dps_at_oom_avg = 4;
-     */
-    dpsAtOomAvg: number;
+    secondsOomAvg: number;
     /**
      * @generated from protobuf field: repeated proto.ActionMetrics actions = 5;
      */
