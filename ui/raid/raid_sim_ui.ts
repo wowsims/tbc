@@ -19,7 +19,7 @@ import { SavedDataManager } from '/tbc/core/components/saved_data_manager.js';
 import { addRaidSimAction, RaidSimResultsManager, ReferenceData } from '/tbc/core/components/raid_sim_action.js';
 
 import { BlessingsPicker } from './blessings_picker.js';
-import { RaidPicker, BuffBotSettings, PresetSpecSettings } from './raid_picker.js';
+import { RaidPicker, BuffBotData, BuffBotSettings, PresetSpecSettings } from './raid_picker.js';
 
 declare var tippy: any;
 
@@ -169,7 +169,7 @@ export class RaidSimUI extends SimUI {
 
 	private modifyRaidProto(raidProto: RaidProto) {
 		// Invoke all the buff bot callbacks.
-		this.raidPicker!.getBuffBots().forEach(buffBotData => {
+		this.getBuffBots().forEach(buffBotData => {
 			const partyProto = raidProto.parties[buffBotData.partyIndex];
 			if (!partyProto) {
 				throw new Error('No party proto for party index: ' + buffBotData.partyIndex);
@@ -203,7 +203,7 @@ export class RaidSimUI extends SimUI {
 
 	private modifyEncounterProto(encounterProto: EncounterProto) {
 		// Invoke all the buff bot callbacks.
-		this.raidPicker!.getBuffBots().forEach(buffBotData => {
+		this.getBuffBots().forEach(buffBotData => {
 			buffBotData.buffBot.modifyEncounterProto(encounterProto);
 		});
 	}
@@ -226,8 +226,12 @@ export class RaidSimUI extends SimUI {
 
 	getClassCount(playerClass: Class): number {
 		return this.sim.raid.getClassCount(playerClass)
-				+ this.raidPicker!.getBuffBots()
+				+ this.getBuffBots()
 						.filter(buffBotData => specToClass[buffBotData.buffBot.spec] == playerClass).length;
+	}
+
+	getBuffBots(): Array<BuffBotData> {
+		return this.raidPicker!.getBuffBots();
 	}
 
 	// Returns the actual key to use for local storage, based on the given key part and the site context.

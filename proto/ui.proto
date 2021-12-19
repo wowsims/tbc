@@ -1,0 +1,20 @@
+syntax = "proto3";
+package proto;
+
+option go_package = "./proto";
+
+// A buff bot placed in a raid.
+message BuffBot {
+	// Uniquely identifies which buffbot this is.
+	string id = 1;
+
+	int32 raid_index = 2;
+
+	// Raid index of assigned player to innervate. Only used for druid buffbots.
+	// A value of -1 indicates no assignment.
+	int32 innervate_assignment = 3;
+
+	// Raid index of assigned player to PI. Only used for disc priest buffbots.
+	// A value of -1 indicates no assignment.
+	int32 power_infusion_assignment = 4;
+}

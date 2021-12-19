@@ -46,13 +46,6 @@ enum DragType {
 	Copy,
 }
 
-// Represents a buff bot in a raid.
-export interface BuffBotData {
-	buffBot: BuffBotSettings,
-	partyIndex: number,
-	raidIndex: number,
-};
-
 export class RaidPicker extends Component {
 	readonly raidSimUI: RaidSimUI;
 	readonly raid: Raid;
@@ -741,18 +734,4 @@ export interface PresetSpecSettings<SpecType extends Spec> {
 
 	tooltip: string,
 	iconUrl: string,
-}
-
-export interface BuffBotSettings {
-	// The value of this field must never change, to preserve local storage data.
-	buffBotId: string,
-
-	spec: Spec,
-	name: string,
-	tooltip: string,
-	iconUrl: string,
-
-	// Callback to apply buffs from this buff bot.
-	modifyRaidProto: (raidProto: RaidProto, partyProto: PartyProto) => void,
-	modifyEncounterProto: (encounterProto: EncounterProto) => void,
 }
