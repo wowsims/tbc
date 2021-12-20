@@ -223,7 +223,7 @@ export class PlayerPicker extends Component {
 
 		this.partyPicker.party.compChangeEmitter.on(() => {
 			const newPlayer = this.partyPicker.party.getPlayer(this.index);
-			if (newPlayer != this.player) {
+			if (newPlayer != this.player && !(newPlayer == null && this.player instanceof BuffBot)) {
 				this.setPlayer(newPlayer);
 			}
 		});
@@ -455,6 +455,7 @@ export class PlayerPicker extends Component {
 
 		this.player = newPlayer;
 		if (newPlayer instanceof BuffBot) {
+			this.partyPicker.party.setPlayer(this.index, null);
 			newPlayer.setRaidIndex(this.raidIndex);
 		} else {
 			this.partyPicker.party.setPlayer(this.index, newPlayer);

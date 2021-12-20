@@ -43,7 +43,7 @@ export class RaidSimUI extends SimUI {
 
   constructor(parentElem: HTMLElement, config: RaidSimConfig) {
 		super(parentElem, new Sim(), {
-			title: 'TBC RaidSim',
+			title: 'TBC Raid Sim',
 			knownIssues: config.knownIssues,
 		});
 		this.rootElem.classList.add('raid-sim-ui');
@@ -174,7 +174,7 @@ export class RaidSimUI extends SimUI {
 			if (!partyProto) {
 				throw new Error('No party proto for party index: ' + buffBot.getPartyIndex());
 			}
-			buffBot.settings.modifyRaidProto(raidProto, partyProto);
+			buffBot.settings.modifyRaidProto(buffBot, raidProto, partyProto);
 		});
 
 		// Apply blessings.
@@ -204,7 +204,7 @@ export class RaidSimUI extends SimUI {
 	private modifyEncounterProto(encounterProto: EncounterProto) {
 		// Invoke all the buff bot callbacks.
 		this.getBuffBots().forEach(buffBot => {
-			buffBot.settings.modifyEncounterProto(encounterProto);
+			buffBot.settings.modifyEncounterProto(buffBot, encounterProto);
 		});
 	}
 

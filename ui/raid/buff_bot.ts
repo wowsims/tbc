@@ -71,6 +71,7 @@ export class BuffBot {
 		if (newRaidIndex != this.raidIndex) {
 			this.raidIndex = newRaidIndex;
 			this.raidIndexChangeEmitter.emit();
+			this.sim.raid.compChangeEmitter.emit();
 		}
 	}
 

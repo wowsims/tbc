@@ -15,10 +15,14 @@ export interface RaidTargetPickerConfig<ModObject> extends InputConfig<ModObject
 	getOptions: () => Array<RaidTargetOption>,
 }
 
-export interface RaidTargetOption {
+export interface RaidTargetElemOption {
 	iconUrl: string,
 	text: string,
 	color: string,
+	isDropdown: boolean,
+};
+
+export interface RaidTargetOption extends RaidTargetElemOption {
 	value: RaidTarget,
 };
 
@@ -26,6 +30,7 @@ export interface RaidTargetOption {
 export class RaidTargetPicker<ModObject> extends Input<ModObject, RaidTarget> {
 	private readonly config: RaidTargetPickerConfig<ModObject>;
 	private readonly noTargetOption: RaidTargetOption;
+
 	private raidTarget: RaidTarget;
 
 	private currentOptions: Array<RaidTargetOption>;
@@ -44,6 +49,7 @@ export class RaidTargetPicker<ModObject> extends Input<ModObject, RaidTarget> {
 			text: config.noTargetLabel,
 			color: 'black',
 			value: emptyRaidTarget(),
+			isDropdown: true,
 		};
 		this.currentOptions = [this.noTargetOption];
 
@@ -81,38 +87,13 @@ export class RaidTargetPicker<ModObject> extends Input<ModObject, RaidTarget> {
 	}
 
 	private makeOption(data: RaidTargetOption): HTMLElement {
-		const option = this.makeOptionElem(data);
+		const option = RaidTargetPicker.makeOptionElem(data);
 
 		option.addEventListener('click', event => {
 			event.preventDefault();
 			this.raidTarget = data.value;
 			this.inputChanged();
 		});
-
-		return option;
-	}
-
-	private makeOptionElem(data: RaidTargetOption): HTMLElement {
-		const option = document.createElement('div');
-		option.classList.add('dropdown-option', 'raid-target-picker-option');
-
-		if (data.color) {
-			option.style.backgroundColor = data.color;
-		}
-
-		if (data.iconUrl) {
-			const icon = document.createElement('img');
-			icon.src = data.iconUrl;
-			icon.classList.add('raid-target-picker-icon');
-			option.appendChild(icon);
-		}
-
-		if (data.text) {
-			const label = document.createElement('span');
-			label.textContent = data.text;
-			label.classList.add('raid-target-picker-label');
-			option.appendChild(label);
-		}
 
 		return option;
 	}
@@ -134,6 +115,34 @@ export class RaidTargetPicker<ModObject> extends Input<ModObject, RaidTarget> {
 		}
 
 		this.buttonElem.innerHTML = '';
-		this.buttonElem.appendChild(this.makeOptionElem(optionData));
+		this.buttonElem.appendChild(RaidTargetPicker.makeOptionElem(optionData));
   }
+
+	static makeOptionElem(data: RaidTargetElemOption): HTMLElement {
+		const option = document.createElement('div');
+		option.classList.add('raid-target-picker-option');
+		if (data.isDropdown) {
+			option.classList.add('dropdown-option');
+		}
+
+		if (data.color) {
+			option.style.backgroundColor = data.color;
+		}
+
+		if (data.iconUrl) {
+			const icon = document.createElement('img');
+			icon.src = data.iconUrl;
+			icon.classList.add('raid-target-picker-icon');
+			option.appendChild(icon);
+		}
+
+		if (data.text) {
+			const label = document.createElement('span');
+			label.textContent = data.text;
+			label.classList.add('raid-target-picker-label');
+			option.appendChild(label);
+		}
+
+		return option;
+	}
 }

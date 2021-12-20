@@ -1,3 +1,4 @@
+@import "./assignments_picker";
 @import "./blessings_picker";
 @import "./raid_picker";
 
@@ -8,10 +9,17 @@
   position: relative;
 }
 
-.raid-encounter-section {
+.raid-settings-section-container {
+	vertical-align: top;
 	display: inline-block;
 }
 
-.blessings-section {
+.blessings-section-container {
+	vertical-align: top;
+	display: inline-block;
+}
+
+.assignments-section-container {
+	vertical-align: top;
 	display: inline-block;
 }

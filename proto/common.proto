@@ -248,7 +248,7 @@ message IndividualBuffs {
     bool mana_tide_totem = 5;
 
     // How many innervates will you get?
-    int32 innervate = 6;
+    int32 innervates = 6;
 }
 
 message Consumes {

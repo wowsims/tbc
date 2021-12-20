@@ -147,7 +147,10 @@
 	margin-bottom: 15px;
 }
 
-.faction-selector .input-root {
+.faction-selector .input-root, .phase-selector .input-root {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
 	white-space: nowrap;
 }
 
