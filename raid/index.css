@@ -844,6 +844,27 @@
   user-select: none;
 }
 
+.raid-target-picker-root {
+  border: 1px solid white;
+  margin: 2px;
+  color: white;
+  text-shadow: 0 0 3px black, 0 0 3px black, 0 0 3px black;
+}
+
+.raid-target-picker-option {
+  height: 30px;
+}
+
+.raid-target-picker-icon {
+  margin: 2px;
+  height: 25px;
+}
+
+.raid-target-picker-label {
+  font-size: 14px;
+  margin: 2px;
+}
+
 .saved-data-set-chip {
   display: inline-block;
   border: 2px solid black;
@@ -1812,6 +1833,23 @@ td, th {
   font-size: 10px;
 }
 
+.innervate-player {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 3px;
+}
+
+.innervate-player > * {
+  margin: 3px;
+}
+
+.innervate-player .raid-target-picker-option {
+  display: flex;
+  align-items: center;
+  min-width: 200px;
+}
+
 .blessings-table-header-cell {
   padding: 2px 10px;
 }
@@ -1971,7 +2009,10 @@ td, th {
   margin-bottom: 15px;
 }
 
-.faction-selector .input-root {
+.faction-selector .input-root, .phase-selector .input-root {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   white-space: nowrap;
 }
 
@@ -2046,11 +2087,18 @@ td, th {
   position: relative;
 }
 
-.raid-encounter-section {
+.raid-settings-section-container {
+  vertical-align: top;
   display: inline-block;
 }
 
-.blessings-section {
+.blessings-section-container {
+  vertical-align: top;
+  display: inline-block;
+}
+
+.assignments-section-container {
+  vertical-align: top;
   display: inline-block;
 }
 

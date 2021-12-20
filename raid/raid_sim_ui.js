@@ -1,23 +1,24 @@
 import { Sim } from '/tbc/core/sim.js';
 import { SimUI } from '/tbc/core/sim_ui.js';
 import { TypedEvent } from '/tbc/core/typed_event.js';
-import { Blessings } from '/tbc/core/proto/common.js';
+import { Blessings } from '/tbc/core/proto/ui.js';
 import { Class } from '/tbc/core/proto/common.js';
 import { Encounter as EncounterProto } from '/tbc/core/proto/common.js';
 import { TristateEffect } from '/tbc/core/proto/common.js';
-import { specToClass } from '/tbc/core/proto_utils/utils.js';
 import { playerToSpec } from '/tbc/core/proto_utils/utils.js';
 import { DetailedResults } from '/tbc/core/components/detailed_results.js';
 import { EncounterPicker } from '/tbc/core/components/encounter_picker.js';
 import { LogRunner } from '/tbc/core/components/log_runner.js';
 import { SavedDataManager } from '/tbc/core/components/saved_data_manager.js';
 import { addRaidSimAction } from '/tbc/core/components/raid_sim_action.js';
+import { AssignmentsPicker } from './assignments_picker.js';
 import { BlessingsPicker } from './blessings_picker.js';
 import { RaidPicker } from './raid_picker.js';
+import { implementedSpecs } from './presets.js';
 export class RaidSimUI extends SimUI {
     constructor(parentElem, config) {
         super(parentElem, new Sim(), {
-            title: 'TBC RaidSim',
+            title: 'TBC Raid Sim',
             knownIssues: config.knownIssues,
         });
         this.raidSimResultsManager = null;
@@ -28,7 +29,6 @@ export class RaidSimUI extends SimUI {
         this.referenceChangeEmitter = new TypedEvent();
         this.rootElem.classList.add('raid-sim-ui');
         this.config = config;
-        this.implementedSpecs = [...new Set(config.presets.map(preset => preset.spec))];
         this.sim.raid.compChangeEmitter.on(() => this.compChangeEmitter.emit());
         this.sim.raid.setModifyRaidProto(raidProto => this.modifyRaidProto(raidProto));
         this.sim.encounter.setModifyEncounterProto(encounterProto => this.modifyEncounterProto(encounterProto));
@@ -74,8 +74,7 @@ export class RaidSimUI extends SimUI {
 				</div>
 			</div>
 		`);
-        this.raidPicker = new RaidPicker(this.rootElem.getElementsByClassName('raid-picker')[0], this, this.config.presets, this.config.buffBots);
-        this.raidPicker.buffBotChangeEmitter.on(() => this.compChangeEmitter.emit());
+        this.raidPicker = new RaidPicker(this.rootElem.getElementsByClassName('raid-picker')[0], this);
     }
     addSettingsTab() {
         this.addTab('Settings', 'raid-settings-tab', `
@@ -89,6 +88,8 @@ export class RaidSimUI extends SimUI {
 					<section class="settings-section blessings-section">
 						<label>Blessings</label>
 					</section>
+				</div>
+				<div class="assignments-section-container">
 				</div>
 			</div>
 			<div class="settings-bottom-bar">
@@ -114,7 +115,8 @@ export class RaidSimUI extends SimUI {
         this.sim.waitForInit().then(() => {
             savedEncounterManager.loadUserData();
         });
-        this.blessingsPicker = new BlessingsPicker(this.rootElem.getElementsByClassName('blessings-section')[0], this, this.implementedSpecs);
+        this.blessingsPicker = new BlessingsPicker(this.rootElem.getElementsByClassName('blessings-section')[0], this);
+        const assignmentsPicker = new AssignmentsPicker(this.rootElem.getElementsByClassName('assignments-section-container')[0], this);
     }
     addDetailedResultsTab() {
         this.addTab('Detailed Results', 'detailed-results-tab', `
@@ -132,17 +134,17 @@ export class RaidSimUI extends SimUI {
     }
     modifyRaidProto(raidProto) {
         // Invoke all the buff bot callbacks.
-        this.raidPicker.getBuffBots().forEach(buffBotData => {
-            const partyProto = raidProto.parties[buffBotData.partyIndex];
+        this.getBuffBots().forEach(buffBot => {
+            const partyProto = raidProto.parties[buffBot.getPartyIndex()];
             if (!partyProto) {
-                throw new Error('No party proto for party index: ' + buffBotData.partyIndex);
+                throw new Error('No party proto for party index: ' + buffBot.getPartyIndex());
             }
-            buffBotData.buffBot.modifyRaidProto(raidProto, partyProto);
+            buffBot.settings.modifyRaidProto(buffBot, raidProto, partyProto);
         });
         // Apply blessings.
         const numPaladins = this.getClassCount(Class.ClassPaladin);
         const blessingsAssignments = this.blessingsPicker.getAssignments();
-        this.implementedSpecs.forEach(spec => {
+        implementedSpecs.forEach(spec => {
             const playerProtos = raidProto.parties
                 .map(party => party.players.filter(player => player.class != Class.ClassUnknown && playerToSpec(player) == spec))
                 .flat();
@@ -164,8 +166,8 @@ export class RaidSimUI extends SimUI {
     }
     modifyEncounterProto(encounterProto) {
         // Invoke all the buff bot callbacks.
-        this.raidPicker.getBuffBots().forEach(buffBotData => {
-            buffBotData.buffBot.modifyEncounterProto(encounterProto);
+        this.getBuffBots().forEach(buffBot => {
+            buffBot.settings.modifyEncounterProto(buffBot, encounterProto);
         });
     }
     getCurrentData() {
@@ -186,8 +188,20 @@ export class RaidSimUI extends SimUI {
     }
     getClassCount(playerClass) {
         return this.sim.raid.getClassCount(playerClass)
-            + this.raidPicker.getBuffBots()
-                .filter(buffBotData => specToClass[buffBotData.buffBot.spec] == playerClass).length;
+            + this.getBuffBots()
+                .filter(buffBot => buffBot.getClass() == playerClass).length;
+    }
+    getBuffBots() {
+        return this.raidPicker.getBuffBots();
+    }
+    getPlayersAndBuffBots() {
+        const players = this.sim.raid.getPlayers();
+        const buffBots = this.getBuffBots();
+        const playersAndBuffBots = players.slice();
+        buffBots.forEach(buffBot => {
+            playersAndBuffBots[buffBot.getRaidIndex()] = buffBot;
+        });
+        return playersAndBuffBots;
     }
     // Returns the actual key to use for local storage, based on the given key part and the site context.
     getStorageKey(keyPart) {

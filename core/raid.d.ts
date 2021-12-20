@@ -1,4 +1,5 @@
 import { Class } from '/tbc/core/proto/common.js';
+import { RaidTarget } from '/tbc/core/proto/common.js';
 import { Raid as RaidProto } from '/tbc/core/proto/api.js';
 import { RaidBuffs } from '/tbc/core/proto/common.js';
 import { Party } from './party.js';
@@ -21,6 +22,7 @@ export declare class Raid {
     getParty(index: number): Party;
     getPlayers(): Array<Player<any> | null>;
     getPlayer(index: number): Player<any> | null;
+    getPlayerFromRaidTarget(raidTarget: RaidTarget): Player<any> | null;
     setPlayer(index: number, newPlayer: Player<any> | null): void;
     getClassCount(playerClass: Class): number;
     getBuffs(): RaidBuffs;

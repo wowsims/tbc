@@ -2,12 +2,13 @@ import { Component } from '/tbc/core/components/component.js';
 import { IconEnumPicker } from '/tbc/core/components/icon_enum_picker.js';
 import { TypedEvent } from '/tbc/core/typed_event.js';
 import { Class } from '/tbc/core/proto/common.js';
-import { Blessings } from '/tbc/core/proto/common.js';
-import { BlessingsAssignment } from '/tbc/core/proto/common.js';
-import { BlessingsAssignments } from '/tbc/core/proto/common.js';
 import { Spec } from '/tbc/core/proto/common.js';
+import { Blessings } from '/tbc/core/proto/ui.js';
+import { BlessingsAssignment } from '/tbc/core/proto/ui.js';
+import { BlessingsAssignments } from '/tbc/core/proto/ui.js';
 import { classColors, specIconsLarge, specNames, } from '/tbc/core/proto_utils/utils.js';
 import { getEnumValues } from '/tbc/core/utils.js';
+import { implementedSpecs } from './presets.js';
 const MAX_PALADINS = 4;
 const NUM_SPECS = getEnumValues(Spec).length;
 const specOrder = [
@@ -54,7 +55,7 @@ const defaultBlessings = makeBlessingsAssignments([
     { spec: Spec.SpecWarrior, blessings: [Blessings.BlessingOfKings, Blessings.BlessingOfSalvation, Blessings.BlessingOfMight] },
 ]);
 export class BlessingsPicker extends Component {
-    constructor(parentElem, raidSimUI, specsToShow) {
+    constructor(parentElem, raidSimUI) {
         super(parentElem, 'blessings-picker-root');
         this.changeEmitter = new TypedEvent();
         this.raidSimUI = raidSimUI;
@@ -73,7 +74,7 @@ export class BlessingsPicker extends Component {
         const headerRow = this.rootElem.getElementsByClassName('blessings-table-header-row')[0];
         const bodyElem = this.rootElem.getElementsByClassName('blessings-table-body')[0];
         specOrder.forEach(spec => {
-            if (!specsToShow.includes(spec)) {
+            if (!implementedSpecs.includes(spec)) {
                 return;
             }
             const cell = document.createElement('th');
@@ -96,7 +97,7 @@ export class BlessingsPicker extends Component {
             cell.textContent = 'Paladin ' + (rowIndex + 1);
             row.appendChild(cell);
             specOrder.forEach(spec => {
-                if (!specsToShow.includes(spec)) {
+                if (!implementedSpecs.includes(spec)) {
                     return;
                 }
                 const cell = document.createElement('td');

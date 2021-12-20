@@ -7,6 +7,7 @@ import { ItemCategory } from '/tbc/core/proto/common.js';
 import { ItemSlot } from '/tbc/core/proto/common.js';
 import { Item } from '/tbc/core/proto/common.js';
 import { Race } from '/tbc/core/proto/common.js';
+import { RaidTarget } from '/tbc/core/proto/common.js';
 import { Spec } from '/tbc/core/proto/common.js';
 import { Stats } from './stats.js';
 import { BalanceDruid, BalanceDruid_Rotation as BalanceDruidRotation, DruidTalents, BalanceDruid_Options as BalanceDruidOptions } from '/tbc/core/proto/druid.js';
@@ -83,3 +84,5 @@ export declare function enchantAppliesToItem(enchant: Enchant, item: Item): bool
 export declare function gemMatchesSocket(gem: Gem, socketColor: GemColor): boolean;
 export declare function gemEligibleForSocket(gem: Gem, socketColor: GemColor): boolean;
 export declare const NO_TARGET = -1;
+export declare function newRaidTarget(raidIndex: number): RaidTarget;
+export declare function emptyRaidTarget(): RaidTarget;

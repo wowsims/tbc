@@ -56,6 +56,9 @@ export class Player {
             this.specOptionsChangeEmitter,
         ].forEach(emitter => emitter.on(() => this.changeEmitter.emit()));
     }
+    getSpecIcon() {
+        return getTalentTreeIcon(this.spec, this.getTalentsString());
+    }
     getClass() {
         return specToClass[this.spec];
     }
@@ -136,6 +139,14 @@ export class Player {
         if (newName != this.name) {
             this.name = newName;
             this.nameChangeEmitter.emit();
+        }
+    }
+    getLabel() {
+        if (this.party) {
+            return `${this.name} (#${this.getRaidIndex() + 1})`;
+        }
+        else {
+            return this.name;
         }
     }
     getRace() {

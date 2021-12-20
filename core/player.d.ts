@@ -51,6 +51,7 @@ export declare class Player<SpecType extends Spec> {
     readonly currentStatsEmitter: TypedEvent<void>;
     readonly changeEmitter: TypedEvent<void>;
     constructor(spec: Spec, sim: Sim);
+    getSpecIcon(): string;
     getClass(): Class;
     getClassColor(): string;
     getParty(): Party | null;
@@ -69,6 +70,7 @@ export declare class Player<SpecType extends Spec> {
     setCurrentStats(newStats: PlayerStats): void;
     getName(): string;
     setName(newName: string): void;
+    getLabel(): string;
     getRace(): Race;
     setRace(newRace: Race): void;
     getFaction(): Faction;

@@ -13,6 +13,7 @@ import { ItemSlot } from '/tbc/core/proto/common.js';
 import { ItemType } from '/tbc/core/proto/common.js';
 import { Item } from '/tbc/core/proto/common.js';
 import { Race } from '/tbc/core/proto/common.js';
+import { RaidTarget } from '/tbc/core/proto/common.js';
 import { RangedWeaponType } from '/tbc/core/proto/common.js';
 import { Spec } from '/tbc/core/proto/common.js';
 import { Stat } from '/tbc/core/proto/common.js';
@@ -935,3 +936,11 @@ export function gemEligibleForSocket(gem, socketColor) {
     return (gem.color == GemColor.GemColorMeta) == (socketColor == GemColor.GemColorMeta);
 }
 export const NO_TARGET = -1;
+export function newRaidTarget(raidIndex) {
+    return RaidTarget.create({
+        targetIndex: raidIndex,
+    });
+}
+export function emptyRaidTarget() {
+    return newRaidTarget(NO_TARGET);
+}

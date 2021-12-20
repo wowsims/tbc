@@ -4,7 +4,6 @@ import { EnumPicker } from '/tbc/core/components/enum_picker.js';
 import { MAX_PARTY_SIZE } from '/tbc/core/party.js';
 import { Player } from '/tbc/core/player.js';
 import { Class } from '/tbc/core/proto/common.js';
-import { Spec } from '/tbc/core/proto/common.js';
 import { Faction } from '/tbc/core/proto_utils/utils.js';
 import { classColors } from '/tbc/core/proto_utils/utils.js';
 import { specToClass } from '/tbc/core/proto_utils/utils.js';
@@ -12,10 +11,8 @@ import { newTalentsPicker } from '/tbc/core/talents/factory.js';
 import { TypedEvent } from '/tbc/core/typed_event.js';
 import { getEnumValues } from '/tbc/core/utils.js';
 import { hexToRgba } from '/tbc/core/utils.js';
-import { BalanceDruidSimUI } from '/tbc/balance_druid/sim.js';
-import { EnhancementShamanSimUI } from '/tbc/enhancement_shaman/sim.js';
-import { ElementalShamanSimUI } from '/tbc/elemental_shaman/sim.js';
-import { ShadowPriestSimUI } from '/tbc/shadow_priest/sim.js';
+import { BuffBot } from './buff_bot.js';
+import { buffBotPresets, playerPresets, specSimFactories } from './presets.js';
 const NEW_PLAYER = -1;
 var DragType;
 (function (DragType) {
@@ -24,19 +21,15 @@ var DragType;
     DragType[DragType["Swap"] = 2] = "Swap";
     DragType[DragType["Copy"] = 3] = "Copy";
 })(DragType || (DragType = {}));
-;
 export class RaidPicker extends Component {
-    constructor(parent, raidSimUI, presets, buffBots) {
+    constructor(parent, raidSimUI) {
         super(parent, 'raid-picker-root');
-        this.buffBotChangeEmitter = new TypedEvent();
         // Hold data about the player being dragged while the drag is happening.
         this.currentDragPlayer = null;
         this.currentDragPlayerFromIndex = NEW_PLAYER;
         this.currentDragType = DragType.New;
         this.raidSimUI = raidSimUI;
         this.raid = raidSimUI.sim.raid;
-        this.presets = presets;
-        this.buffBots = buffBots;
         const raidViewer = document.createElement('div');
         raidViewer.classList.add('current-raid-viewer');
         this.rootElem.appendChild(raidViewer);
@@ -73,14 +66,8 @@ export class RaidPicker extends Component {
     }
     getBuffBots() {
         return this.getPlayerPickers()
-            .filter(picker => picker.player != null && 'buffBotId' in picker.player)
-            .map(picker => {
-            return {
-                buffBot: picker.player,
-                partyIndex: picker.partyPicker.index,
-                raidIndex: picker.raidIndex,
-            };
-        });
+            .filter(picker => picker.player instanceof BuffBot)
+            .map(picker => picker.player);
     }
     setDragPlayer(player, fromIndex, type) {
         this.clearDragPlayer();
@@ -163,7 +150,7 @@ export class PlayerPicker extends Component {
         this.raidPicker = partyPicker.raidPicker;
         this.partyPicker.party.compChangeEmitter.on(() => {
             const newPlayer = this.partyPicker.party.getPlayer(this.index);
-            if (newPlayer != this.player) {
+            if (newPlayer != this.player && !(newPlayer == null && this.player instanceof BuffBot)) {
                 this.setPlayer(newPlayer);
             }
         });
@@ -308,12 +295,7 @@ export class PlayerPicker extends Component {
                 }
             }
             if (dragType == DragType.Copy) {
-                if ('buffBotId' in this.raidPicker.currentDragPlayer) {
-                    this.setPlayer(this.raidPicker.currentDragPlayer);
-                }
-                else {
-                    this.setPlayer(this.raidPicker.currentDragPlayer.clone());
-                }
+                this.setPlayer(this.raidPicker.currentDragPlayer.clone());
             }
             else {
                 this.setPlayer(this.raidPicker.currentDragPlayer);
@@ -367,16 +349,14 @@ export class PlayerPicker extends Component {
         }
         this.dpsResultElem.textContent = '';
         this.referenceDeltaElem.textContent = '';
-        const oldPlayerWasBuffBot = this.player != null && 'buffBotId' in this.player;
+        const oldPlayerWasBuffBot = this.player instanceof BuffBot;
         this.player = newPlayer;
-        if (newPlayer == null || newPlayer instanceof Player) {
-            this.partyPicker.party.setPlayer(this.index, newPlayer);
-            if (oldPlayerWasBuffBot) {
-                this.raidPicker.buffBotChangeEmitter.emit();
-            }
+        if (newPlayer instanceof BuffBot) {
+            this.partyPicker.party.setPlayer(this.index, null);
+            newPlayer.setRaidIndex(this.raidIndex);
         }
         else {
-            this.raidPicker.buffBotChangeEmitter.emit();
+            this.partyPicker.party.setPlayer(this.index, newPlayer);
         }
         this.update();
     }
@@ -390,7 +370,7 @@ export class PlayerPicker extends Component {
             this.nameElem.textContent = '';
             this.nameElem.removeAttribute('contenteditable');
         }
-        else if ('buffBotId' in this.player) {
+        else if (this.player instanceof BuffBot) {
             this.rootElem.classList.remove('empty');
             this.rootElem.classList.add('buff-bot');
             this.rootElem.style.backgroundColor = classColors[specToClass[this.player.spec]];
@@ -482,7 +462,7 @@ class NewPlayerPicker extends Component {
             if (wowClass == Class.ClassUnknown) {
                 return;
             }
-            const matchingPresets = this.raidPicker.presets.filter(preset => specToClass[preset.spec] == wowClass);
+            const matchingPresets = playerPresets.filter(preset => specToClass[preset.spec] == wowClass);
             if (matchingPresets.length == 0) {
                 return;
             }
@@ -536,7 +516,7 @@ class NewPlayerPicker extends Component {
             if (wowClass == Class.ClassUnknown) {
                 return;
             }
-            const matchingBuffBots = this.raidPicker.buffBots.filter(buffBot => specToClass[buffBot.spec] == wowClass);
+            const matchingBuffBots = buffBotPresets.filter(buffBot => specToClass[buffBot.spec] == wowClass);
             if (matchingBuffBots.length == 0) {
                 return;
             }
@@ -564,15 +544,9 @@ class NewPlayerPicker extends Component {
                     event.dataTransfer.setDragImage(dragImage, 30, 30);
                     event.dataTransfer.setData("text/plain", matchingBuffBot.iconUrl);
                     event.dataTransfer.dropEffect = 'copy';
-                    this.raidPicker.setDragPlayer(matchingBuffBot, NEW_PLAYER, DragType.New);
+                    this.raidPicker.setDragPlayer(new BuffBot(matchingBuffBot.buffBotId, this.raidPicker.raidSimUI.sim), NEW_PLAYER, DragType.New);
                 };
             });
         });
     }
 }
-export const specSimFactories = {
-    [Spec.SpecBalanceDruid]: (parentElem, player) => new BalanceDruidSimUI(parentElem, player),
-    [Spec.SpecElementalShaman]: (parentElem, player) => new ElementalShamanSimUI(parentElem, player),
-    [Spec.SpecEnhancementShaman]: (parentElem, player) => new EnhancementShamanSimUI(parentElem, player),
-    [Spec.SpecShadowPriest]: (parentElem, player) => new ShadowPriestSimUI(parentElem, player),
-};
