@@ -18,6 +18,7 @@ import { SavedDataConfig } from '/tbc/core/components/saved_data_manager.js';
 import { SavedDataManager } from '/tbc/core/components/saved_data_manager.js';
 import { addRaidSimAction, RaidSimResultsManager, ReferenceData } from '/tbc/core/components/raid_sim_action.js';
 
+import { AssignmentsPicker } from './assignments_picker.js';
 import { BlessingsPicker } from './blessings_picker.js';
 import { BuffBot } from './buff_bot.js';
 import { RaidPicker } from './raid_picker.js';
@@ -116,6 +117,8 @@ export class RaidSimUI extends SimUI {
 						<label>Blessings</label>
 					</section>
 				</div>
+				<div class="assignments-section-container">
+				</div>
 			</div>
 			<div class="settings-bottom-bar">
 				<div class="saved-encounter-manager">
@@ -143,6 +146,7 @@ export class RaidSimUI extends SimUI {
 		});
 
 		this.blessingsPicker = new BlessingsPicker(this.rootElem.getElementsByClassName('blessings-section')[0] as HTMLElement, this);
+		const assignmentsPicker = new AssignmentsPicker(this.rootElem.getElementsByClassName('assignments-section-container')[0] as HTMLElement, this);
 	}
 
 	private addDetailedResultsTab() {
