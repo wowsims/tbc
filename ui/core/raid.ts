@@ -1,8 +1,10 @@
 import { Class } from '/tbc/core/proto/common.js';
+import { RaidTarget } from '/tbc/core/proto/common.js';
 import { Raid as RaidProto } from '/tbc/core/proto/api.js';
 import { RaidStats as RaidStatsProto } from '/tbc/core/proto/api.js';
 import { RaidBuffs } from '/tbc/core/proto/common.js';
 import { Spec } from '/tbc/core/proto/common.js';
+import { NO_TARGET } from '/tbc/core/proto_utils/utils.js';
 
 import { Party, MAX_PARTY_SIZE } from './party.js';
 import { Player } from './player.js';
@@ -71,6 +73,14 @@ export class Raid {
 	getPlayer(index: number): Player<any> | null {
 		const party = this.parties[Math.floor(index / MAX_PARTY_SIZE)];
 		return party.getPlayer(index % MAX_PARTY_SIZE);
+	}
+
+	getPlayerFromRaidTarget(raidTarget: RaidTarget): Player<any> | null {
+		if (raidTarget.targetIndex == NO_TARGET) {
+			return null;
+		} else {
+			return this.getPlayer(raidTarget.targetIndex);
+		}
 	}
 
 	setPlayer(index: number, newPlayer: Player<any> | null) {

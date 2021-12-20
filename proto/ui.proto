@@ -1,0 +1,38 @@
+syntax = "proto3";
+package proto;
+
+option go_package = "./proto";
+
+import "common.proto";
+
+// A buff bot placed in a raid.
+message BuffBot {
+	// Uniquely identifies which buffbot this is.
+	string id = 1;
+
+	int32 raid_index = 2;
+
+	// The assigned player to innervate. Only used for druid buffbots.
+	RaidTarget innervate_assignment = 3;
+
+	// The assigned player to PI. Only used for disc priest buffbots.
+	RaidTarget power_infusion_assignment = 4;
+}
+
+enum Blessings {
+	BlessingUnknown = 0;
+	BlessingOfKings = 1;
+	BlessingOfMight = 2;
+	BlessingOfSalvation = 3;
+	BlessingOfWisdom = 4;
+}
+
+message BlessingsAssignment {
+	// Index corresponds to Spec that the blessing should be applied to.
+	repeated Blessings blessings = 1;
+}
+
+message BlessingsAssignments {
+	// Assignments for each paladin.
+	repeated BlessingsAssignment paladins = 1;
+}
