@@ -24,6 +24,7 @@ export declare const DrumsOfRestorationBuff: IndividualSimIconPickerConfig<Party
 export declare const BlessingOfKings: IndividualSimIconPickerConfig<Player<any>, boolean>;
 export declare const BlessingOfWisdom: IndividualSimIconPickerConfig<Player<any>, number>;
 export declare const ManaTideTotem: IndividualSimIconPickerConfig<Player<any>, boolean>;
+export declare const Innervate: IndividualSimIconPickerConfig<Player<any>, number>;
 export declare const ImprovedSealOfTheCrusader: IndividualSimIconPickerConfig<Target, boolean>;
 export declare const JudgementOfWisdom: IndividualSimIconPickerConfig<Target, boolean>;
 export declare const Misery: IndividualSimIconPickerConfig<Target, boolean>;

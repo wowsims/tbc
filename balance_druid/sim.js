@@ -122,6 +122,7 @@ export class BalanceDruidSimUI extends IndividualSimUI {
             playerBuffInputs: [
                 IconInputs.BlessingOfKings,
                 IconInputs.BlessingOfWisdom,
+                IconInputs.Innervate,
             ],
             // IconInputs to include in the 'Debuffs' section on the settings tab.
             debuffInputs: [

@@ -26,6 +26,7 @@ export const DrumsOfRestorationBuff = makeEnumValuePartyBuffInput({ spellId: 354
 export const BlessingOfKings = makeBooleanIndividualBuffInput({ spellId: 25898 }, 'blessingOfKings');
 export const BlessingOfWisdom = makeTristateIndividualBuffInput({ spellId: 27143 }, { spellId: 20245 }, 'blessingOfWisdom');
 export const ManaTideTotem = makeBooleanIndividualBuffInput({ spellId: 16190 }, 'manaTideTotem');
+export const Innervate = makeMultistateIndividualBuffInput({ spellId: 29166 }, 6, 'innervates');
 // Debuffs
 export const ImprovedSealOfTheCrusader = makeBooleanDebuffInput({ spellId: 20337 }, 'improvedSealOfTheCrusader');
 export const JudgementOfWisdom = makeBooleanDebuffInput({ spellId: 27164 }, 'judgementOfWisdom');
@@ -164,6 +165,19 @@ function makeTristateIndividualBuffInput(id, impId, buffsFieldName) {
         id: id,
         states: 3,
         improvedId: impId,
+        changedEvent: (player) => player.buffsChangeEmitter,
+        getValue: (player) => player.getBuffs()[buffsFieldName],
+        setValue: (eventID, player, newValue) => {
+            const newBuffs = player.getBuffs();
+            newBuffs[buffsFieldName] = newValue;
+            player.setBuffs(eventID, newBuffs);
+        },
+    };
+}
+function makeMultistateIndividualBuffInput(id, numStates, buffsFieldName) {
+    return {
+        id: id,
+        states: numStates,
         changedEvent: (player) => player.buffsChangeEmitter,
         getValue: (player) => player.getBuffs()[buffsFieldName],
         setValue: (eventID, player, newValue) => {
