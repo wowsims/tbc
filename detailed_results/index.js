@@ -97,11 +97,13 @@ const debuffAuraMetrics = new AuraMetrics({
 const dpsHistogram = new DpsHistogram({ parent: document.body.getElementsByClassName('dps-histogram')[0], resultsEmitter: resultsEmitter, colorSettings: colorSettings });
 let currentSimResult = null;
 function updateResults() {
+    const eventID = TypedEvent.nextEventID();
     if (currentSimResult == null) {
-        resultsEmitter.emit(null);
+        resultsEmitter.emit(eventID, null);
     }
     else {
-        resultsEmitter.emit({
+        resultsEmitter.emit(eventID, {
+            eventID: eventID,
             result: currentSimResult,
             filter: resultsFilter.getFilter(),
         });
@@ -120,7 +122,7 @@ window.addEventListener('message', async (event) => {
 });
 resultsFilter.changeEmitter.on(() => updateResults());
 const rootDiv = document.body.getElementsByClassName('dr-root')[0];
-resultsEmitter.on(resultData => {
+resultsEmitter.on((eventID, resultData) => {
     if (resultData?.filter.player || resultData?.filter.player === 0) {
         rootDiv.classList.remove('all-players');
         rootDiv.classList.add('single-player');

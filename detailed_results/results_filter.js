@@ -14,7 +14,7 @@ export class ResultsFilter extends ResultComponent {
         };
         this.changeEmitter = new TypedEvent();
         this.playerFilter = new PlayerFilter(this.rootElem, this.currentFilter);
-        this.playerFilter.changeEmitter.on(() => this.changeEmitter.emit());
+        this.playerFilter.changeEmitter.on(eventID => this.changeEmitter.emit(eventID));
     }
     getFilter() {
         return {
@@ -23,11 +23,11 @@ export class ResultsFilter extends ResultComponent {
         };
     }
     onSimResult(resultData) {
-        this.playerFilter.setOptions(resultData.result);
+        this.playerFilter.setOptions(resultData.eventID, resultData.result);
     }
-    setPlayer(newPlayer) {
+    setPlayer(eventID, newPlayer) {
         this.currentFilter.player = (newPlayer === null) ? ALL_PLAYERS : newPlayer;
-        this.playerFilter.changeEmitter.emit();
+        this.playerFilter.changeEmitter.emit(eventID);
     }
 }
 ;
@@ -47,7 +47,7 @@ class PlayerFilter extends Input {
             ],
             changedEvent: (filterData) => changeEmitter,
             getValue: (filterData) => filterData.player,
-            setValue: (filterData, newValue) => filterData.player = newValue,
+            setValue: (eventID, filterData, newValue) => filterData.player = newValue,
         });
         this.filterData = filterData;
         this.currentOptions = [allPlayersOption];
@@ -63,7 +63,7 @@ class PlayerFilter extends Input {
         });
         this.init();
     }
-    setOptions(simResult) {
+    setOptions(eventID, simResult) {
         this.currentOptions = [allPlayersOption].concat(simResult.getPlayers().map(player => {
             return {
                 iconUrl: player.iconUrl,
@@ -75,7 +75,7 @@ class PlayerFilter extends Input {
         const hasSameOption = this.currentOptions.find(option => option.value == this.getInputValue()) != null;
         if (!hasSameOption) {
             this.filterData.player = allPlayersOption.value;
-            this.changeEmitter.emit();
+            this.changeEmitter.emit(eventID);
         }
         this.dropdownElem.innerHTML = '';
         this.currentOptions.forEach(option => this.dropdownElem.appendChild(this.makeOption(option)));
@@ -85,7 +85,7 @@ class PlayerFilter extends Input {
         option.addEventListener('click', event => {
             event.preventDefault();
             this.filterData.player = data.value;
-            this.changeEmitter.emit();
+            this.changeEmitter.emit(TypedEvent.nextEventID());
         });
         return option;
     }

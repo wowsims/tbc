@@ -1,4 +1,4 @@
-import { TypedEvent } from '/tbc/core/typed_event.js';
+import { EventID, TypedEvent } from '/tbc/core/typed_event.js';
 import { Component } from './component.js';
 /**
  * Data for creating a new input UI element.
@@ -10,7 +10,7 @@ export interface InputConfig<ModObject, T> {
     defaultValue?: T;
     changedEvent: (obj: ModObject) => TypedEvent<any>;
     getValue: (obj: ModObject) => T;
-    setValue: (obj: ModObject, newValue: T) => void;
+    setValue: (eventID: EventID, obj: ModObject, newValue: T) => void;
     enableWhen?: (obj: ModObject) => boolean;
     rootElem?: HTMLElement;
 }
@@ -24,5 +24,5 @@ export declare abstract class Input<ModObject, T> extends Component {
     abstract getInputElem(): HTMLElement;
     abstract getInputValue(): T;
     abstract setInputValue(newValue: T): void;
-    inputChanged(): void;
+    inputChanged(eventID: EventID): void;
 }

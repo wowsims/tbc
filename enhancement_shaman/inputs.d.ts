@@ -3,6 +3,7 @@ import { EnhancementShaman_Rotation_RotationType as RotationType } from '/tbc/co
 import { Spec } from '/tbc/core/proto/common.js';
 import { Player } from '/tbc/core/player.js';
 import { IndividualSimUI } from '/tbc/core/individual_sim_ui.js';
+import { EventID, TypedEvent } from '/tbc/core/typed_event.js';
 export declare const IconBloodlust: IconPickerConfig<Player<any>, boolean>;
 export declare const IconWaterShield: IconPickerConfig<Player<any>, boolean>;
 export declare const EnhancementShamanRotationConfig: {
@@ -17,9 +18,9 @@ export declare const EnhancementShamanRotationConfig: {
                 value: RotationType;
                 tooltip: string;
             }[];
-            changedEvent: (player: Player<Spec.SpecEnhancementShaman>) => import("/tbc/core/typed_event").TypedEvent<void>;
+            changedEvent: (player: Player<Spec.SpecEnhancementShaman>) => TypedEvent<void>;
             getValue: (player: Player<Spec.SpecEnhancementShaman>) => RotationType;
-            setValue: (player: Player<Spec.SpecEnhancementShaman>, newValue: number) => void;
+            setValue: (eventID: EventID, player: Player<Spec.SpecEnhancementShaman>, newValue: number) => void;
         };
     }[];
 };

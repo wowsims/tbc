@@ -23,10 +23,10 @@ export const ShadowPriestRotationConfig = {
                 ],
                 changedEvent: (player) => player.rotationChangeEmitter,
                 getValue: (player) => player.getRotation().rotationType,
-                setValue: (player, newValue) => {
+                setValue: (eventID, player, newValue) => {
                     const newRotation = player.getRotation();
                     newRotation.rotationType = newValue;
-                    player.setRotation(newRotation);
+                    player.setRotation(eventID, newRotation);
                 },
             },
         },
@@ -39,10 +39,10 @@ export const ShadowPriestRotationConfig = {
                 labelTooltip: 'Use Shadowfiend when low mana and off CD.',
                 changedEvent: (player) => player.rotationChangeEmitter,
                 getValue: (player) => player.getSpecOptions().useShadowfiend,
-                setValue: (player, newValue) => {
+                setValue: (eventID, player, newValue) => {
                     const newOptions = player.getSpecOptions();
                     newOptions.useShadowfiend = newValue;
-                    player.setSpecOptions(newOptions);
+                    player.setSpecOptions(eventID, newOptions);
                 },
             },
         },
@@ -55,10 +55,10 @@ export const ShadowPriestRotationConfig = {
                 labelTooltip: 'Start fight with VT landing at time 0',
                 changedEvent: (player) => player.rotationChangeEmitter,
                 getValue: (player) => player.getRotation().precastVt,
-                setValue: (player, newValue) => {
+                setValue: (eventID, player, newValue) => {
                     const newRotation = player.getRotation();
                     newRotation.precastVt = newValue;
-                    player.setRotation(newRotation);
+                    player.setRotation(eventID, newRotation);
                 },
             },
         },
@@ -71,10 +71,10 @@ export const ShadowPriestRotationConfig = {
                 labelTooltip: 'Use Devouring Plague whenever off CD.',
                 changedEvent: (player) => player.raceChangeEmitter,
                 getValue: (player) => player.getRotation().useDevPlague,
-                setValue: (player, newValue) => {
+                setValue: (eventID, player, newValue) => {
                     const newRotation = player.getRotation();
                     newRotation.useDevPlague = newValue;
-                    player.setRotation(newRotation);
+                    player.setRotation(eventID, newRotation);
                 },
                 enableWhen: (player) => player.getRace() == Race.RaceUndead,
             },
@@ -88,10 +88,10 @@ export const ShadowPriestRotationConfig = {
                 labelTooltip: 'Use Starshards whenever off CD.',
                 changedEvent: (player) => player.raceChangeEmitter,
                 getValue: (player) => player.getRotation().useStarshards,
-                setValue: (player, newValue) => {
+                setValue: (eventID, player, newValue) => {
                     const newRotation = player.getRotation();
                     newRotation.useStarshards = newValue;
-                    player.setRotation(newRotation);
+                    player.setRotation(eventID, newRotation);
                 },
                 enableWhen: (player) => player.getRace() == Race.RaceNightElf,
             },
@@ -105,10 +105,10 @@ export const ShadowPriestRotationConfig = {
                 labelTooltip: 'Latency after a channel that lasts longer than GCD. 0 to disable. Has a minimum value of 100ms if set.',
                 changedEvent: (player) => player.rotationChangeEmitter,
                 getValue: (player) => player.getRotation().latency,
-                setValue: (player, newValue) => {
+                setValue: (eventID, player, newValue) => {
                     const newRotation = player.getRotation();
                     newRotation.latency = newValue;
-                    player.setRotation(newRotation);
+                    player.setRotation(eventID, newRotation);
                 },
             },
         },

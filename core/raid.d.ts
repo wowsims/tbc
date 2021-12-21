@@ -4,7 +4,7 @@ import { Raid as RaidProto } from '/tbc/core/proto/api.js';
 import { RaidBuffs } from '/tbc/core/proto/common.js';
 import { Party } from './party.js';
 import { Player } from './player.js';
-import { TypedEvent } from './typed_event.js';
+import { EventID, TypedEvent } from './typed_event.js';
 import { Sim } from './sim.js';
 export declare const MAX_NUM_PARTIES = 5;
 export declare class Raid {
@@ -23,13 +23,13 @@ export declare class Raid {
     getPlayers(): Array<Player<any> | null>;
     getPlayer(index: number): Player<any> | null;
     getPlayerFromRaidTarget(raidTarget: RaidTarget): Player<any> | null;
-    setPlayer(index: number, newPlayer: Player<any> | null): void;
+    setPlayer(eventID: EventID, index: number, newPlayer: Player<any> | null): void;
     getClassCount(playerClass: Class): number;
     getBuffs(): RaidBuffs;
-    setBuffs(newBuffs: RaidBuffs): void;
+    setBuffs(eventID: EventID, newBuffs: RaidBuffs): void;
     setModifyRaidProto(newModFn: (raidProto: RaidProto) => void): void;
     toProto(): RaidProto;
-    fromProto(proto: RaidProto): void;
+    fromProto(eventID: EventID, proto: RaidProto): void;
     toJson(): Object;
-    fromJson(obj: any): void;
+    fromJson(eventID: EventID, obj: any): void;
 }

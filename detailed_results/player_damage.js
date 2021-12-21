@@ -48,7 +48,7 @@ export class PlayerDamageMetrics extends ResultComponent {
             rowElem.classList.add('player-damage-row');
             this.bodyElem.appendChild(rowElem);
             rowElem.addEventListener('click', event => {
-                this.resultsFilter.setPlayer(player.raidIndex);
+                this.resultsFilter.setPlayer(resultData.eventID, player.raidIndex);
             });
             let chart = null;
             const makeChart = () => {

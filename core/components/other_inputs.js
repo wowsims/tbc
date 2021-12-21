@@ -14,8 +14,8 @@ export function makePhaseSelector(parent, sim) {
         ],
         changedEvent: (sim) => sim.phaseChangeEmitter,
         getValue: (sim) => sim.getPhase(),
-        setValue: (sim, newValue) => {
-            sim.setPhase(newValue);
+        setValue: (eventID, sim, newValue) => {
+            sim.setPhase(eventID, newValue);
         },
     });
 }
@@ -35,10 +35,10 @@ export const StartingPotion = {
         ],
         changedEvent: (player) => player.consumesChangeEmitter,
         getValue: (player) => player.getConsumes().startingPotion,
-        setValue: (player, newValue) => {
+        setValue: (eventID, player, newValue) => {
             const newConsumes = player.getConsumes();
             newConsumes.startingPotion = newValue;
-            player.setConsumes(newConsumes);
+            player.setConsumes(eventID, newConsumes);
         },
     },
 };
@@ -53,10 +53,10 @@ export const NumStartingPotions = {
         labelTooltip: 'The number of starting potions to use before going back to the default potion.',
         changedEvent: (player) => player.consumesChangeEmitter,
         getValue: (player) => player.getConsumes().numStartingPotions,
-        setValue: (player, newValue) => {
+        setValue: (eventID, player, newValue) => {
             const newConsumes = player.getConsumes();
             newConsumes.numStartingPotions = newValue;
-            player.setConsumes(newConsumes);
+            player.setConsumes(eventID, newConsumes);
         },
         enableWhen: (player) => player.getConsumes().startingPotion != Potions.UnknownPotion,
     },
@@ -73,10 +73,10 @@ export const ShadowPriestDPS = {
         label: 'Shadow Priest DPS',
         changedEvent: (player) => player.buffsChangeEmitter,
         getValue: (player) => player.getBuffs().shadowPriestDps,
-        setValue: (player, newValue) => {
+        setValue: (eventID, player, newValue) => {
             const buffs = player.getBuffs();
             buffs.shadowPriestDps = newValue;
-            player.setBuffs(buffs);
+            player.setBuffs(eventID, buffs);
         },
     },
 };
@@ -91,10 +91,10 @@ export const ISBUptime = {
         label: 'ISB Uptime %',
         changedEvent: (target) => target.debuffsChangeEmitter,
         getValue: (target) => Math.round(target.getDebuffs().isbUptime * 100),
-        setValue: (target, newValue) => {
+        setValue: (eventID, target, newValue) => {
             const newDebuffs = target.getDebuffs();
             newDebuffs.isbUptime = newValue / 100;
-            target.setDebuffs(newDebuffs);
+            target.setDebuffs(eventID, newDebuffs);
         },
     },
 };

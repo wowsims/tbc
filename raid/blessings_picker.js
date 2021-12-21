@@ -116,11 +116,11 @@ export class BlessingsPicker extends Component {
                     ],
                     changedEvent: (picker) => picker.changeEmitter,
                     getValue: (picker) => picker.assignments.paladins[rowIndex]?.blessings[spec] || Blessings.BlessingUnknown,
-                    setValue: (picker, newValue) => {
+                    setValue: (eventID, picker, newValue) => {
                         const currentValue = picker.assignments.paladins[rowIndex].blessings[spec];
                         if (currentValue != newValue) {
                             picker.assignments.paladins[rowIndex].blessings[spec] = newValue;
-                            this.changeEmitter.emit();
+                            this.changeEmitter.emit(eventID);
                         }
                     },
                 });
@@ -128,7 +128,7 @@ export class BlessingsPicker extends Component {
             return row;
         });
         this.setNumPaladins(raidSimUI.getClassCount(Class.ClassPaladin));
-        raidSimUI.compChangeEmitter.on(() => {
+        raidSimUI.compChangeEmitter.on(eventID => {
             this.setNumPaladins(raidSimUI.getClassCount(Class.ClassPaladin));
         });
     }

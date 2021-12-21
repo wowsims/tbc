@@ -2,7 +2,7 @@ import { Party as PartyProto } from '/tbc/core/proto/api.js';
 import { PartyBuffs } from '/tbc/core/proto/common.js';
 import { Raid } from './raid.js';
 import { Player } from './player.js';
-import { TypedEvent } from './typed_event.js';
+import { EventID, TypedEvent } from './typed_event.js';
 import { Sim } from './sim.js';
 export declare const MAX_PARTY_SIZE = 5;
 export declare class Party {
@@ -17,15 +17,15 @@ export declare class Party {
     constructor(raid: Raid, sim: Sim);
     size(): number;
     isEmpty(): boolean;
-    clear(): void;
+    clear(eventID: EventID): void;
     getIndex(): number;
     getPlayers(): Array<Player<any> | null>;
     getPlayer(playerIndex: number): Player<any> | null;
-    setPlayer(playerIndex: number, newPlayer: Player<any> | null): void;
+    setPlayer(eventID: EventID, playerIndex: number, newPlayer: Player<any> | null): void;
     getBuffs(): PartyBuffs;
-    setBuffs(newBuffs: PartyBuffs): void;
+    setBuffs(eventID: EventID, newBuffs: PartyBuffs): void;
     toProto(): PartyProto;
-    fromProto(proto: PartyProto): void;
+    fromProto(eventID: EventID, proto: PartyProto): void;
     toJson(): Object;
-    fromJson(obj: any): void;
+    fromJson(eventID: EventID, obj: any): void;
 }

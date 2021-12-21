@@ -1,5 +1,6 @@
 import { getIconUrl } from '/tbc/core/resources.js';
 import { setWowheadHref } from '/tbc/core/resources.js';
+import { TypedEvent } from '/tbc/core/typed_event.js';
 import { isRightClick } from '/tbc/core/utils.js';
 import { Input } from './input.js';
 ;
@@ -49,13 +50,13 @@ export class IconPicker extends Input {
             if (rightClick) {
                 if (this.currentValue > 0) {
                     this.currentValue--;
-                    this.inputChanged();
+                    this.inputChanged(TypedEvent.nextEventID());
                 }
             }
             else {
                 if (this.config.states == 0 || (this.currentValue + 1) < this.config.states) {
                     this.currentValue++;
-                    this.inputChanged();
+                    this.inputChanged(TypedEvent.nextEventID());
                 }
             }
         });

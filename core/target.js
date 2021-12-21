@@ -18,36 +18,36 @@ export class Target {
             this.armorChangeEmitter,
             this.mobTypeChangeEmitter,
             this.debuffsChangeEmitter,
-        ].forEach(emitter => emitter.on(() => this.changeEmitter.emit()));
+        ].forEach(emitter => emitter.on(eventID => this.changeEmitter.emit(eventID)));
     }
     getArmor() {
         return this.armor;
     }
-    setArmor(newArmor) {
+    setArmor(eventID, newArmor) {
         if (newArmor == this.armor)
             return;
         this.armor = newArmor;
-        this.armorChangeEmitter.emit();
+        this.armorChangeEmitter.emit(eventID);
     }
     getMobType() {
         return this.mobType;
     }
-    setMobType(newMobType) {
+    setMobType(eventID, newMobType) {
         if (newMobType == this.mobType)
             return;
         this.mobType = newMobType;
-        this.mobTypeChangeEmitter.emit();
+        this.mobTypeChangeEmitter.emit(eventID);
     }
     getDebuffs() {
         // Make a defensive copy
         return Debuffs.clone(this.debuffs);
     }
-    setDebuffs(newDebuffs) {
+    setDebuffs(eventID, newDebuffs) {
         if (Debuffs.equals(this.debuffs, newDebuffs))
             return;
         // Make a defensive copy
         this.debuffs = Debuffs.clone(newDebuffs);
-        this.debuffsChangeEmitter.emit();
+        this.debuffsChangeEmitter.emit(eventID);
     }
     toProto() {
         return TargetProto.create({
@@ -56,15 +56,17 @@ export class Target {
             debuffs: this.debuffs,
         });
     }
-    fromProto(proto) {
-        this.setArmor(proto.armor);
-        this.setMobType(proto.mobType);
-        this.setDebuffs(proto.debuffs || Debuffs.create());
+    fromProto(eventID, proto) {
+        TypedEvent.freezeAll();
+        this.setArmor(eventID, proto.armor);
+        this.setMobType(eventID, proto.mobType);
+        this.setDebuffs(eventID, proto.debuffs || Debuffs.create());
+        TypedEvent.unfreezeAll();
     }
     toJson() {
         return TargetProto.toJson(this.toProto());
     }
-    fromJson(obj) {
-        this.fromProto(TargetProto.fromJson(obj));
+    fromJson(eventID, obj) {
+        this.fromProto(eventID, TargetProto.fromJson(obj));
     }
 }

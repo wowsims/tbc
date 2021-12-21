@@ -14,7 +14,6 @@ import { gemMatchesSocket } from '/tbc/core/proto_utils/utils.js';
 import { Encounter } from './encounter.js';
 import { Raid } from './raid.js';
 import { TypedEvent } from './typed_event.js';
-import { wait } from './utils.js';
 import { WorkerPool } from './worker_pool.js';
 import * as OtherConstants from '/tbc/core/constants/other.js';
 // Core Sim module which deals only with api types, no UI-related stuff.
@@ -45,10 +44,8 @@ export class Sim {
             this.phaseChangeEmitter,
             this.raid.changeEmitter,
             this.encounter.changeEmitter,
-        ].forEach(emitter => emitter.on(() => this.changeEmitter.emit()));
-        this.raid.changeEmitter.on(() => {
-            this.updateCharacterStats();
-        });
+        ].forEach(emitter => emitter.on(eventID => this.changeEmitter.emit(eventID)));
+        this.raid.changeEmitter.on(eventID => this.updateCharacterStats(eventID));
     }
     waitForInit() {
         return this._initPromise;
@@ -63,7 +60,7 @@ export class Sim {
             }),
         });
     }
-    async runRaidSim() {
+    async runRaidSim(eventID) {
         if (this.raid.isEmpty()) {
             throw new Error('Raid is empty! Try adding some players first.');
         }
@@ -74,10 +71,10 @@ export class Sim {
         const request = this.makeRaidSimRequest(false);
         const result = await this.workerPool.raidSim(request);
         const simResult = await SimResult.makeNew(request, result);
-        this.simResultEmitter.emit(simResult);
+        this.simResultEmitter.emit(eventID, simResult);
         return simResult;
     }
-    async runRaidSimWithLogs() {
+    async runRaidSimWithLogs(eventID) {
         if (this.raid.isEmpty()) {
             throw new Error('Raid is empty! Try adding some players first.');
         }
@@ -88,23 +85,22 @@ export class Sim {
         const request = this.makeRaidSimRequest(true);
         const result = await this.workerPool.raidSim(request);
         const simResult = await SimResult.makeNew(request, result);
-        this.simResultEmitter.emit(simResult);
+        this.simResultEmitter.emit(eventID, simResult);
         return simResult;
     }
     // This should be invoked internally whenever stats might have changed.
-    async updateCharacterStats() {
+    async updateCharacterStats(eventID) {
         await this.waitForInit();
-        // Sometimes a ui change triggers other changes, so waiting a bit makes sure
-        // we get all of them.
-        await wait(10);
         // Capture the current players so we avoid issues if something changes while
         // request is in-flight.
         const players = this.raid.getPlayers();
         const result = await this.workerPool.computeStats(ComputeStatsRequest.create({
             raid: this.raid.toProto(),
         }));
+        TypedEvent.freezeAll();
         result.raidStats.parties
-            .forEach((partyStats, partyIndex) => partyStats.players.forEach((playerStats, playerIndex) => players[partyIndex * 5 + playerIndex]?.setCurrentStats(playerStats)));
+            .forEach((partyStats, partyIndex) => partyStats.players.forEach((playerStats, playerIndex) => players[partyIndex * 5 + playerIndex]?.setCurrentStats(eventID, playerStats)));
+        TypedEvent.unfreezeAll();
     }
     async statWeights(player, epStats, epReferenceStat) {
         if (this.raid.isEmpty()) {
@@ -161,19 +157,19 @@ export class Sim {
     getPhase() {
         return this.phase;
     }
-    setPhase(newPhase) {
+    setPhase(eventID, newPhase) {
         if (newPhase != this.phase) {
             this.phase = newPhase;
-            this.phaseChangeEmitter.emit();
+            this.phaseChangeEmitter.emit(eventID);
         }
     }
     getIterations() {
         return this.iterations;
     }
-    setIterations(newIterations) {
+    setIterations(eventID, newIterations) {
         if (newIterations != this.iterations) {
             this.iterations = newIterations;
-            this.iterationsChangeEmitter.emit();
+            this.iterationsChangeEmitter.emit(eventID);
         }
     }
     lookupItemSpec(itemSpec) {
@@ -208,7 +204,8 @@ export class Sim {
         };
     }
     // Set all the current values, assumes obj is the same type returned by toJson().
-    fromJson(obj, spec) {
+    fromJson(eventID, obj, spec) {
+        TypedEvent.freezeAll();
         // For legacy format. Do not remove this until 2022/01/05 (1 month).
         if (obj['sim']) {
             if (!obj['raid']) {
@@ -230,10 +227,11 @@ export class Sim {
             }
         }
         if (obj['raid']) {
-            this.raid.fromJson(obj['raid']);
+            this.raid.fromJson(eventID, obj['raid']);
         }
         if (obj['encounter']) {
-            this.encounter.fromJson(obj['encounter']);
+            this.encounter.fromJson(eventID, obj['encounter']);
         }
+        TypedEvent.unfreezeAll();
     }
 }

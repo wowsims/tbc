@@ -4,6 +4,7 @@ import { Player } from '/tbc/core/player.js';
 import { Sim } from '/tbc/core/sim.js';
 import { Target } from '/tbc/core/target.js';
 import { IndividualSimUI } from '/tbc/core/individual_sim_ui.js';
+import { EventID, TypedEvent } from '/tbc/core/typed_event.js';
 export declare function makePhaseSelector(parent: HTMLElement, sim: Sim): EnumPicker<Sim>;
 export declare const StartingPotion: {
     type: "enum";
@@ -16,9 +17,9 @@ export declare const StartingPotion: {
             name: string;
             value: Potions;
         }[];
-        changedEvent: (player: Player<any>) => import("../typed_event").TypedEvent<void>;
+        changedEvent: (player: Player<any>) => TypedEvent<void>;
         getValue: (player: Player<any>) => Potions;
-        setValue: (player: Player<any>, newValue: number) => void;
+        setValue: (eventID: EventID, player: Player<any>, newValue: number) => void;
     };
 };
 export declare const NumStartingPotions: {
@@ -28,9 +29,9 @@ export declare const NumStartingPotions: {
         extraCssClasses: string[];
         label: string;
         labelTooltip: string;
-        changedEvent: (player: Player<any>) => import("../typed_event").TypedEvent<void>;
+        changedEvent: (player: Player<any>) => TypedEvent<void>;
         getValue: (player: Player<any>) => number;
-        setValue: (player: Player<any>, newValue: number) => void;
+        setValue: (eventID: EventID, player: Player<any>, newValue: number) => void;
         enableWhen: (player: Player<any>) => boolean;
     };
 };
@@ -41,9 +42,9 @@ export declare const ShadowPriestDPS: {
     config: {
         extraCssClasses: string[];
         label: string;
-        changedEvent: (player: Player<any>) => import("../typed_event").TypedEvent<void>;
+        changedEvent: (player: Player<any>) => TypedEvent<void>;
         getValue: (player: Player<any>) => number;
-        setValue: (player: Player<any>, newValue: number) => void;
+        setValue: (eventID: EventID, player: Player<any>, newValue: number) => void;
     };
 };
 export declare const ISBUptime: {
@@ -52,8 +53,8 @@ export declare const ISBUptime: {
     config: {
         extraCssClasses: string[];
         label: string;
-        changedEvent: (target: Target) => import("../typed_event").TypedEvent<void>;
+        changedEvent: (target: Target) => TypedEvent<void>;
         getValue: (target: Target) => number;
-        setValue: (target: Target, newValue: number) => void;
+        setValue: (eventID: EventID, target: Target, newValue: number) => void;
     };
 };

@@ -1,3 +1,4 @@
+import { TypedEvent } from '/tbc/core/typed_event.js';
 import { Component } from '/tbc/core/components/component.js';
 export class SavedDataManager extends Component {
     constructor(parent, modObject, config) {
@@ -64,7 +65,7 @@ export class SavedDataManager extends Component {
     <span class="saved-data-set-delete fa fa-times"></span>
     `;
         dataElem.addEventListener('click', event => {
-            this.config.setData(this.modObject, config.data);
+            this.config.setData(TypedEvent.nextEventID(), this.modObject, config.data);
             this.saveInput.value = config.name;
         });
         if (config.isPreset) {

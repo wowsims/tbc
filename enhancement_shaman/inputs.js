@@ -21,10 +21,10 @@ export const EnhancementShamanRotationConfig = {
                 ],
                 changedEvent: (player) => player.rotationChangeEmitter,
                 getValue: (player) => player.getRotation().type,
-                setValue: (player, newValue) => {
+                setValue: (eventID, player, newValue) => {
                     const newRotation = player.getRotation();
                     newRotation.type = newValue;
-                    player.setRotation(newRotation);
+                    player.setRotation(eventID, newRotation);
                 },
             },
         }
@@ -36,10 +36,10 @@ function makeBooleanShamanBuffInput(id, optionsFieldName) {
         states: 2,
         changedEvent: (player) => player.specOptionsChangeEmitter,
         getValue: (player) => player.getSpecOptions()[optionsFieldName],
-        setValue: (player, newValue) => {
+        setValue: (eventID, player, newValue) => {
             const newOptions = player.getSpecOptions();
             newOptions[optionsFieldName] = newValue;
-            player.setSpecOptions(newOptions);
+            player.setSpecOptions(eventID, newOptions);
         },
     };
 }

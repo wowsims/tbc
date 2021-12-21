@@ -12,6 +12,7 @@ import { setWowheadHref } from '/tbc/core/resources.js';
 import { setWowheadItemHref } from '/tbc/core/resources.js';
 import { setGemSocketCssClass } from '/tbc/core/css_utils.js';
 import { setItemQualityCssClass } from '/tbc/core/css_utils.js';
+import { TypedEvent } from '/tbc/core/typed_event.js';
 import { Component } from './component.js';
 import { CloseButton } from './close_button.js';
 import { makePhaseSelector } from './other_inputs.js';
@@ -154,18 +155,18 @@ class SelectorModal extends Component {
                 name: item.name,
                 quality: item.quality,
                 phase: item.phase,
-                onEquip: item => {
+                onEquip: (eventID, item) => {
                     const equippedItem = this.player.getEquippedItem(slot);
                     if (equippedItem) {
-                        this.player.equipItem(slot, equippedItem.withItem(item));
+                        this.player.equipItem(eventID, slot, equippedItem.withItem(item));
                     }
                     else {
-                        this.player.equipItem(slot, new EquippedItem(item));
+                        this.player.equipItem(eventID, slot, new EquippedItem(item));
                     }
                 },
             };
-        }, () => {
-            this.player.equipItem(slot, null);
+        }, eventID => {
+            this.player.equipItem(eventID, slot, null);
         });
         this.addTab('Enchants', slot, equippedItem, eligibleEnchants, enchant => this.player.computeEnchantEP(enchant), equippedItem => equippedItem?.enchant, enchant => {
             return {
@@ -174,16 +175,16 @@ class SelectorModal extends Component {
                 name: enchant.name,
                 quality: enchant.quality,
                 phase: 1,
-                onEquip: enchant => {
+                onEquip: (eventID, enchant) => {
                     const equippedItem = this.player.getEquippedItem(slot);
                     if (equippedItem)
-                        this.player.equipItem(slot, equippedItem.withEnchant(enchant));
+                        this.player.equipItem(eventID, slot, equippedItem.withEnchant(enchant));
                 },
             };
-        }, () => {
+        }, eventID => {
             const equippedItem = this.player.getEquippedItem(slot);
             if (equippedItem)
-                this.player.equipItem(slot, equippedItem.withEnchant(null));
+                this.player.equipItem(eventID, slot, equippedItem.withEnchant(null));
         });
         this.addGemTabs(slot, equippedItem);
         $('#selectorModal').bPopup({
@@ -202,16 +203,16 @@ class SelectorModal extends Component {
                     name: gem.name,
                     quality: gem.quality,
                     phase: gem.phase,
-                    onEquip: gem => {
+                    onEquip: (eventID, gem) => {
                         const equippedItem = this.player.getEquippedItem(slot);
                         if (equippedItem)
-                            this.player.equipItem(slot, equippedItem.withGem(gem, socketIdx));
+                            this.player.equipItem(eventID, slot, equippedItem.withGem(gem, socketIdx));
                     },
                 };
-            }, () => {
+            }, eventID => {
                 const equippedItem = this.player.getEquippedItem(slot);
                 if (equippedItem)
-                    this.player.equipItem(slot, equippedItem.withGem(null, socketIdx));
+                    this.player.equipItem(eventID, slot, equippedItem.withGem(null, socketIdx));
             });
         });
     }
@@ -281,7 +282,7 @@ class SelectorModal extends Component {
             setItemQualityCssClass(nameElem, itemData.quality);
             const onclick = (event) => {
                 event.preventDefault();
-                itemData.onEquip(item);
+                itemData.onEquip(TypedEvent.nextEventID(), item);
                 // If the item changes, the gem slots might change, so remove and recreate the gem tabs
                 if (Item.is(item)) {
                     this.removeTabs('Gem');
@@ -295,7 +296,7 @@ class SelectorModal extends Component {
         const removeButton = tabContent.getElementsByClassName('selector-modal-remove-button')[0];
         removeButton.addEventListener('click', event => {
             listItemElems.forEach(elem => elem.classList.remove('active'));
-            onRemove();
+            onRemove(TypedEvent.nextEventID());
         });
         const updateSelected = () => {
             const newEquippedItem = this.player.getEquippedItem(slot);

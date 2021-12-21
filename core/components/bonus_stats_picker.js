@@ -17,9 +17,9 @@ export class BonusStatsPicker extends Component {
             label: statNames[stat],
             changedEvent: (player) => player.bonusStatsChangeEmitter,
             getValue: (player) => player.getBonusStats().getStat(stat),
-            setValue: (player, newValue) => {
+            setValue: (eventID, player, newValue) => {
                 const bonusStats = player.getBonusStats().withStat(stat, newValue);
-                player.setBonusStats(bonusStats);
+                player.setBonusStats(eventID, bonusStats);
             },
         }));
         player.bonusStatsChangeEmitter.on(() => {

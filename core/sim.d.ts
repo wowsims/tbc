@@ -15,7 +15,7 @@ import { SimResult } from '/tbc/core/proto_utils/sim_result.js';
 import { Encounter } from './encounter.js';
 import { Player } from './player.js';
 import { Raid } from './raid.js';
-import { TypedEvent } from './typed_event.js';
+import { EventID, TypedEvent } from './typed_event.js';
 export declare type RaidSimData = {
     request: RaidSimRequest;
     result: RaidSimResult;
@@ -41,8 +41,8 @@ export declare class Sim {
     constructor();
     waitForInit(): Promise<void>;
     private makeRaidSimRequest;
-    runRaidSim(): Promise<SimResult>;
-    runRaidSimWithLogs(): Promise<SimResult>;
+    runRaidSim(eventID: EventID): Promise<SimResult>;
+    runRaidSimWithLogs(eventID: EventID): Promise<SimResult>;
     private updateCharacterStats;
     statWeights(player: Player<any>, epStats: Array<Stat>, epReferenceStat: Stat): Promise<StatWeightsResult>;
     getItems(slot: ItemSlot | undefined): Array<Item>;
@@ -50,11 +50,11 @@ export declare class Sim {
     getGems(socketColor: GemColor | undefined): Array<Gem>;
     getMatchingGems(socketColor: GemColor): Array<Gem>;
     getPhase(): number;
-    setPhase(newPhase: number): void;
+    setPhase(eventID: EventID, newPhase: number): void;
     getIterations(): number;
-    setIterations(newIterations: number): void;
+    setIterations(eventID: EventID, newIterations: number): void;
     lookupItemSpec(itemSpec: ItemSpec): EquippedItem | null;
     lookupEquipmentSpec(equipSpec: EquipmentSpec): Gear;
     toJson(): Object;
-    fromJson(obj: any, spec?: Spec): void;
+    fromJson(eventID: EventID, obj: any, spec?: Spec): void;
 }

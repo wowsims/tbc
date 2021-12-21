@@ -18,14 +18,14 @@ export class Raid {
         this.sim = sim;
         this.parties = [...Array(MAX_NUM_PARTIES).keys()].map(i => {
             const newParty = new Party(this, sim);
-            newParty.compChangeEmitter.on(() => this.compChangeEmitter.emit());
-            newParty.changeEmitter.on(() => this.changeEmitter.emit());
+            newParty.compChangeEmitter.on(eventID => this.compChangeEmitter.emit(eventID));
+            newParty.changeEmitter.on(eventID => this.changeEmitter.emit(eventID));
             return newParty;
         });
         [
             this.compChangeEmitter,
             this.buffsChangeEmitter,
-        ].forEach(emitter => emitter.on(() => this.changeEmitter.emit()));
+        ].forEach(emitter => emitter.on(eventID => this.changeEmitter.emit(eventID)));
     }
     size() {
         return sum(this.parties.map(party => party.size()));
@@ -55,9 +55,9 @@ export class Raid {
             return this.getPlayer(raidTarget.targetIndex);
         }
     }
-    setPlayer(index, newPlayer) {
+    setPlayer(eventID, index, newPlayer) {
         const party = this.parties[Math.floor(index / MAX_PARTY_SIZE)];
-        party.setPlayer(index % MAX_PARTY_SIZE, newPlayer);
+        party.setPlayer(eventID, index % MAX_PARTY_SIZE, newPlayer);
     }
     getClassCount(playerClass) {
         return this.getPlayers().filter(player => player != null && player.getClass() == playerClass).length;
@@ -66,12 +66,12 @@ export class Raid {
         // Make a defensive copy
         return RaidBuffs.clone(this.buffs);
     }
-    setBuffs(newBuffs) {
+    setBuffs(eventID, newBuffs) {
         if (RaidBuffs.equals(this.buffs, newBuffs))
             return;
         // Make a defensive copy
         this.buffs = RaidBuffs.clone(newBuffs);
-        this.buffsChangeEmitter.emit();
+        this.buffsChangeEmitter.emit(eventID);
     }
     setModifyRaidProto(newModFn) {
         this.modifyRaidProto = newModFn;
@@ -84,16 +84,18 @@ export class Raid {
         this.modifyRaidProto(raidProto);
         return raidProto;
     }
-    fromProto(proto) {
-        this.setBuffs(proto.buffs || RaidBuffs.create());
+    fromProto(eventID, proto) {
+        TypedEvent.freezeAll();
+        this.setBuffs(eventID, proto.buffs || RaidBuffs.create());
         for (let i = 0; i < MAX_NUM_PARTIES; i++) {
             if (proto.parties[i]) {
-                this.parties[i].fromProto(proto.parties[i]);
+                this.parties[i].fromProto(eventID, proto.parties[i]);
             }
             else {
-                this.parties[i].clear();
+                this.parties[i].clear(eventID);
             }
         }
+        TypedEvent.unfreezeAll();
     }
     // Returns JSON representing all the current values.
     toJson() {
@@ -103,9 +105,10 @@ export class Raid {
         };
     }
     // Set all the current values, assumes obj is the same type returned by toJson().
-    fromJson(obj) {
+    fromJson(eventID, obj) {
+        TypedEvent.freezeAll();
         try {
-            this.setBuffs(RaidBuffs.fromJson(obj['buffs']));
+            this.setBuffs(eventID, RaidBuffs.fromJson(obj['buffs']));
         }
         catch (e) {
             console.warn('Failed to parse raid buffs: ' + e);
@@ -114,11 +117,12 @@ export class Raid {
             for (let i = 0; i < MAX_NUM_PARTIES; i++) {
                 const partyObj = obj['parties'][i];
                 if (!partyObj) {
-                    this.parties[i].clear();
+                    this.parties[i].clear(eventID);
                     continue;
                 }
-                this.parties[i].fromJson(partyObj);
+                this.parties[i].fromJson(eventID, partyObj);
             }
         }
+        TypedEvent.unfreezeAll();
     }
 }

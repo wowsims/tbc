@@ -1,3 +1,4 @@
+import { TypedEvent } from '/tbc/core/typed_event.js';
 import { Input } from './input.js';
 export class EnumPicker extends Input {
     constructor(parent, modObject, config) {
@@ -16,7 +17,7 @@ export class EnumPicker extends Input {
         });
         this.init();
         this.selectElem.addEventListener('change', event => {
-            this.inputChanged();
+            this.inputChanged(TypedEvent.nextEventID());
         });
     }
     getInputElem() {

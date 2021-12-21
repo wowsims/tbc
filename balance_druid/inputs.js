@@ -12,12 +12,12 @@ export const SelfInnervate = {
     ],
     changedEvent: (player) => player.specOptionsChangeEmitter,
     getValue: (player) => player.getSpecOptions().innervateTarget?.targetIndex != NO_TARGET,
-    setValue: (player, newValue) => {
+    setValue: (eventID, player, newValue) => {
         const newOptions = player.getSpecOptions();
         newOptions.innervateTarget = RaidTarget.create({
             targetIndex: newValue ? 0 : NO_TARGET,
         });
-        player.setSpecOptions(newOptions);
+        player.setSpecOptions(eventID, newOptions);
     },
 };
 export const BalanceDruidRotationConfig = {
@@ -47,10 +47,10 @@ export const BalanceDruidRotationConfig = {
                 ],
                 changedEvent: (player) => player.rotationChangeEmitter,
                 getValue: (player) => player.getRotation().primarySpell,
-                setValue: (player, newValue) => {
+                setValue: (eventID, player, newValue) => {
                     const newRotation = player.getRotation();
                     newRotation.primarySpell = newValue;
-                    player.setRotation(newRotation);
+                    player.setRotation(eventID, newRotation);
                 },
             },
         },
@@ -65,10 +65,10 @@ export const BalanceDruidRotationConfig = {
                 labelTooltip: 'Use Moonfire as the next cast after the dot expires.',
                 changedEvent: (player) => player.rotationChangeEmitter,
                 getValue: (player) => player.getRotation().moonfire,
-                setValue: (player, newValue) => {
+                setValue: (eventID, player, newValue) => {
                     const newRotation = player.getRotation();
                     newRotation.moonfire = newValue;
-                    player.setRotation(newRotation);
+                    player.setRotation(eventID, newRotation);
                 },
                 enableWhen: (player) => player.getRotation().primarySpell != PrimarySpell.Adaptive,
             },
@@ -84,10 +84,10 @@ export const BalanceDruidRotationConfig = {
                 labelTooltip: 'Keep Faerie Fire active on the primary target.',
                 changedEvent: (player) => player.rotationChangeEmitter,
                 getValue: (player) => player.getRotation().faerieFire,
-                setValue: (player, newValue) => {
+                setValue: (eventID, player, newValue) => {
                     const newRotation = player.getRotation();
                     newRotation.faerieFire = newValue;
-                    player.setRotation(newRotation);
+                    player.setRotation(eventID, newRotation);
                 },
             },
         },
@@ -102,10 +102,10 @@ export const BalanceDruidRotationConfig = {
                 labelTooltip: 'Keep Insect Swarm active on the primary target.',
                 changedEvent: (player) => player.rotationChangeEmitter,
                 getValue: (player) => player.getRotation().insectSwarm,
-                setValue: (player, newValue) => {
+                setValue: (eventID, player, newValue) => {
                     const newRotation = player.getRotation();
                     newRotation.insectSwarm = newValue;
-                    player.setRotation(newRotation);
+                    player.setRotation(eventID, newRotation);
                 },
                 enableWhen: (player) => player.getTalents().insectSwarm,
             },
@@ -121,10 +121,10 @@ export const BalanceDruidRotationConfig = {
                 labelTooltip: 'Cast Battle Res on an ally sometime during the encounter.',
                 changedEvent: (player) => player.specOptionsChangeEmitter,
                 getValue: (player) => player.getSpecOptions().battleRes,
-                setValue: (player, newValue) => {
+                setValue: (eventID, player, newValue) => {
                     const newOptions = player.getSpecOptions();
                     newOptions.battleRes = newValue;
-                    player.setSpecOptions(newOptions);
+                    player.setSpecOptions(eventID, newOptions);
                 },
             },
         },

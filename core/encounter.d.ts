@@ -1,7 +1,7 @@
 import { Encounter as EncounterProto } from '/tbc/core/proto/common.js';
 import { Target } from '/tbc/core/target.js';
 import { Sim } from './sim.js';
-import { TypedEvent } from './typed_event.js';
+import { EventID, TypedEvent } from './typed_event.js';
 export declare class Encounter {
     private readonly sim;
     private duration;
@@ -13,12 +13,12 @@ export declare class Encounter {
     private modifyEncounterProto;
     constructor(sim: Sim);
     getDuration(): number;
-    setDuration(newDuration: number): void;
+    setDuration(eventID: EventID, newDuration: number): void;
     getNumTargets(): number;
-    setNumTargets(newNumTargets: number): void;
+    setNumTargets(eventID: EventID, newNumTargets: number): void;
     setModifyEncounterProto(newModFn: (encounterProto: EncounterProto) => void): void;
     toProto(): EncounterProto;
-    fromProto(proto: EncounterProto): void;
+    fromProto(eventID: EventID, proto: EncounterProto): void;
     toJson(): Object;
-    fromJson(obj: any): void;
+    fromJson(eventID: EventID, obj: any): void;
 }

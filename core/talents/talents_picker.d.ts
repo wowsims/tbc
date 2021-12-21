@@ -2,6 +2,7 @@ import { Component } from '/tbc/core/components/component.js';
 import { Spec } from '/tbc/core/proto/common.js';
 import { SpecTalents } from '/tbc/core/proto_utils/utils.js';
 import { Player } from '/tbc/core/player.js';
+import { EventID } from '/tbc/core/typed_event.js';
 export declare abstract class TalentsPicker<SpecType extends Spec> extends Component {
     private readonly player;
     frozen: boolean;
@@ -9,10 +10,10 @@ export declare abstract class TalentsPicker<SpecType extends Spec> extends Compo
     constructor(parent: HTMLElement, player: Player<SpecType>, treeConfigs: Array<TalentTreeConfig<SpecType>>);
     get numPoints(): number;
     isFull(): boolean;
-    update(): void;
+    update(eventID: EventID): void;
     getTalents(): SpecTalents<SpecType>;
     getTalentsString(): string;
-    setTalentsString(str: string): void;
+    setTalentsString(eventID: EventID, str: string): void;
     freeze(): void;
 }
 declare class TalentTreePicker<SpecType extends Spec> extends Component {

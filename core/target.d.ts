@@ -2,7 +2,7 @@ import { Debuffs } from '/tbc/core/proto/common.js';
 import { MobType } from '/tbc/core/proto/common.js';
 import { Target as TargetProto } from '/tbc/core/proto/common.js';
 import { Sim } from './sim.js';
-import { TypedEvent } from './typed_event.js';
+import { EventID, TypedEvent } from './typed_event.js';
 export declare class Target {
     private readonly sim;
     private armor;
@@ -14,13 +14,13 @@ export declare class Target {
     readonly changeEmitter: TypedEvent<void>;
     constructor(sim: Sim);
     getArmor(): number;
-    setArmor(newArmor: number): void;
+    setArmor(eventID: EventID, newArmor: number): void;
     getMobType(): MobType;
-    setMobType(newMobType: MobType): void;
+    setMobType(eventID: EventID, newMobType: MobType): void;
     getDebuffs(): Debuffs;
-    setDebuffs(newDebuffs: Debuffs): void;
+    setDebuffs(eventID: EventID, newDebuffs: Debuffs): void;
     toProto(): TargetProto;
-    fromProto(proto: TargetProto): void;
+    fromProto(eventID: EventID, proto: TargetProto): void;
     toJson(): Object;
-    fromJson(obj: any): void;
+    fromJson(eventID: EventID, obj: any): void;
 }

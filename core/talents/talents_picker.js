@@ -1,6 +1,7 @@
 import { Component } from '/tbc/core/components/component.js';
 import { getIconUrl } from '/tbc/core/resources.js';
 import { setWowheadHref } from '/tbc/core/resources.js';
+import { TypedEvent } from '/tbc/core/typed_event.js';
 import { isRightClick } from '/tbc/core/utils.js';
 import { sum } from '/tbc/core/utils.js';
 const MAX_TALENT_POINTS = 61;
@@ -13,11 +14,10 @@ export class TalentsPicker extends Component {
         this.frozen = false;
         this.trees = treeConfigs.map(treeConfig => new TalentTreePicker(this.rootElem, player, treeConfig, this));
         this.trees.forEach(tree => tree.talents.forEach(talent => talent.setPoints(0, false)));
-        this.setTalentsString(this.player.getTalentsString());
-        this.player.talentsStringChangeEmitter.on(() => {
-            this.setTalentsString(this.player.getTalentsString());
+        this.setTalentsString(TypedEvent.nextEventID(), this.player.getTalentsString());
+        this.player.talentsStringChangeEmitter.on(eventID => {
+            this.setTalentsString(eventID, this.player.getTalentsString());
         });
-        this.update();
     }
     get numPoints() {
         return sum(this.trees.map(tree => tree.numPoints));
@@ -25,7 +25,7 @@ export class TalentsPicker extends Component {
     isFull() {
         return this.numPoints >= MAX_TALENT_POINTS;
     }
-    update() {
+    update(eventID) {
         if (this.isFull()) {
             this.rootElem.classList.add('talents-full');
         }
@@ -33,8 +33,8 @@ export class TalentsPicker extends Component {
             this.rootElem.classList.remove('talents-full');
         }
         this.trees.forEach(tree => tree.update());
-        this.player.setTalentsString(this.getTalentsString());
-        this.player.setTalents(this.getTalents());
+        this.player.setTalentsString(eventID, this.getTalentsString());
+        this.player.setTalents(eventID, this.getTalents());
     }
     getTalents() {
         const talents = this.player.specTypeFunctions.talentsCreate();
@@ -53,10 +53,10 @@ export class TalentsPicker extends Component {
     getTalentsString() {
         return this.trees.map(tree => tree.getTalentsString()).join('-').replace(/-+$/g, '');
     }
-    setTalentsString(str) {
+    setTalentsString(eventID, str) {
         const parts = str.split('-');
         this.trees.forEach((tree, idx) => tree.setTalentsString(parts[idx] || ''));
-        this.update();
+        this.update(eventID);
     }
     // Freezes the talent calculator so that user input cannot change it.
     freeze() {
@@ -91,7 +91,7 @@ class TalentTreePicker extends Component {
         reset.addEventListener('click', event => {
             if (!this.picker.frozen) {
                 this.talents.forEach(talent => talent.setPoints(0, false));
-                this.picker.update();
+                this.picker.update(TypedEvent.nextEventID());
             }
         });
     }
@@ -140,7 +140,7 @@ class TalentPicker extends Component {
             else {
                 this.setPoints(this.getPoints() + 1, true);
             }
-            this.tree.picker.update();
+            this.tree.picker.update(TypedEvent.nextEventID());
         });
     }
     getRow() {

@@ -5,7 +5,7 @@ export class ResultComponent extends Component {
     constructor(config) {
         super(config.parent, config.rootCssClass || '');
         this.colorSettings = config.colorSettings;
-        config.resultsEmitter.on(resultData => {
+        config.resultsEmitter.on((eventID, resultData) => {
             if (!resultData)
                 return;
             this.onSimResult(resultData);

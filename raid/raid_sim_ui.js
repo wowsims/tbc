@@ -29,7 +29,7 @@ export class RaidSimUI extends SimUI {
         this.referenceChangeEmitter = new TypedEvent();
         this.rootElem.classList.add('raid-sim-ui');
         this.config = config;
-        this.sim.raid.compChangeEmitter.on(() => this.compChangeEmitter.emit());
+        this.sim.raid.compChangeEmitter.on(eventID => this.compChangeEmitter.emit(eventID));
         this.sim.raid.setModifyRaidProto(raidProto => this.modifyRaidProto(raidProto));
         this.sim.encounter.setModifyEncounterProto(encounterProto => this.modifyEncounterProto(encounterProto));
         this.addSidebarComponents();
@@ -41,7 +41,7 @@ export class RaidSimUI extends SimUI {
     }
     addSidebarComponents() {
         this.raidSimResultsManager = addRaidSimAction(this);
-        this.raidSimResultsManager.referenceChangeEmitter.on(() => this.referenceChangeEmitter.emit());
+        this.raidSimResultsManager.referenceChangeEmitter.on(eventID => this.referenceChangeEmitter.emit(eventID));
     }
     addTopbarComponents() {
         //Array.from(document.getElementsByClassName('share-link')).forEach(element => {
@@ -106,7 +106,7 @@ export class RaidSimUI extends SimUI {
             label: 'Encounter',
             storageKey: this.getSavedEncounterStorageKey(),
             getData: (encounter) => encounter.toProto(),
-            setData: (encounter, newEncounter) => encounter.fromProto(newEncounter),
+            setData: (eventID, encounter, newEncounter) => encounter.fromProto(eventID, newEncounter),
             changeEmitters: [this.sim.encounter.changeEmitter],
             equals: (a, b) => EncounterProto.equals(a, b),
             toJson: (a) => EncounterProto.toJson(a),

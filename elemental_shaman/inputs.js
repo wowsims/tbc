@@ -37,10 +37,10 @@ export const ElementalShamanRotationConfig = {
                 ],
                 changedEvent: (player) => player.rotationChangeEmitter,
                 getValue: (player) => player.getRotation().type,
-                setValue: (player, newValue) => {
+                setValue: (eventID, player, newValue) => {
                     const newRotation = player.getRotation();
                     newRotation.type = newValue;
-                    player.setRotation(newRotation);
+                    player.setRotation(eventID, newRotation);
                 },
             },
         },
@@ -53,10 +53,10 @@ export const ElementalShamanRotationConfig = {
                 labelTooltip: 'The number of Lightning Bolts to cast between each Chain Lightning. Only used if Rotation is set to \'Fixed LB+CL\'.',
                 changedEvent: (player) => player.rotationChangeEmitter,
                 getValue: (player) => player.getRotation().lbsPerCl,
-                setValue: (player, newValue) => {
+                setValue: (eventID, player, newValue) => {
                     const newRotation = player.getRotation();
                     newRotation.lbsPerCl = newValue;
-                    player.setRotation(newRotation);
+                    player.setRotation(eventID, newRotation);
                 },
                 enableWhen: (player) => player.getRotation().type == RotationType.FixedLBCL,
             },
@@ -69,10 +69,10 @@ function makeBooleanShamanBuffInput(id, optionsFieldName) {
         states: 2,
         changedEvent: (player) => player.specOptionsChangeEmitter,
         getValue: (player) => player.getSpecOptions()[optionsFieldName],
-        setValue: (player, newValue) => {
+        setValue: (eventID, player, newValue) => {
             const newOptions = player.getSpecOptions();
             newOptions[optionsFieldName] = newValue;
-            player.setSpecOptions(newOptions);
+            player.setSpecOptions(eventID, newOptions);
         },
     };
 }

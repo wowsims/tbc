@@ -9,8 +9,8 @@ export class EncounterPicker extends Component {
             label: 'Duration',
             changedEvent: (encounter) => encounter.durationChangeEmitter,
             getValue: (encounter) => encounter.getDuration(),
-            setValue: (encounter, newValue) => {
-                encounter.setDuration(newValue);
+            setValue: (eventID, encounter, newValue) => {
+                encounter.setDuration(eventID, newValue);
             },
         });
         if (config.showTargetArmor) {
@@ -18,8 +18,8 @@ export class EncounterPicker extends Component {
                 label: 'Target Armor',
                 changedEvent: (target) => target.armorChangeEmitter,
                 getValue: (target) => target.getArmor(),
-                setValue: (target, newValue) => {
-                    target.setArmor(newValue);
+                setValue: (eventID, target, newValue) => {
+                    target.setArmor(eventID, newValue);
                 },
             });
         }
@@ -29,8 +29,8 @@ export class EncounterPicker extends Component {
                 label: '# of Targets',
                 changedEvent: (encounter) => encounter.numTargetsChangeEmitter,
                 getValue: (encounter) => encounter.getNumTargets(),
-                setValue: (encounter, newValue) => {
-                    encounter.setNumTargets(newValue);
+                setValue: (eventID, encounter, newValue) => {
+                    encounter.setNumTargets(eventID, newValue);
                 },
             });
         }
@@ -51,7 +51,7 @@ export const MobTypePickerConfig = {
     ],
     changedEvent: (target) => target.mobTypeChangeEmitter,
     getValue: (target) => target.getMobType(),
-    setValue: (target, newValue) => {
-        target.setMobType(newValue);
+    setValue: (eventID, target, newValue) => {
+        target.setMobType(eventID, newValue);
     },
 };

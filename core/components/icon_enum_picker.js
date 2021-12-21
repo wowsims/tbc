@@ -1,5 +1,6 @@
 import { getIconUrl } from '/tbc/core/resources.js';
 import { setWowheadHref } from '/tbc/core/resources.js';
+import { TypedEvent } from '/tbc/core/typed_event.js';
 import { Input } from './input.js';
 // Icon-based UI for picking enum values.
 // ModObject is the object being modified (Sim, Player, or Target).
@@ -26,7 +27,7 @@ export class IconEnumPicker extends Input {
             option.addEventListener('click', event => {
                 event.preventDefault();
                 this.currentValue = valueConfig.value;
-                this.inputChanged();
+                this.inputChanged(TypedEvent.nextEventID());
             });
         });
         this.init();

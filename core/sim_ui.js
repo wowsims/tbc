@@ -11,7 +11,7 @@ export class SimUI extends Component {
         this.rootElem.innerHTML = simHTML;
         [
             this.sim.changeEmitter,
-        ].forEach(emitter => emitter.on(() => this.changeEmitter.emit()));
+        ].forEach(emitter => emitter.on(eventID => this.changeEmitter.emit(eventID)));
         Array.from(document.getElementsByClassName('known-issues')).forEach(element => {
             if (config.knownIssues?.length) {
                 element.style.display = 'initial';
@@ -42,8 +42,8 @@ export class SimUI extends Component {
             ],
             changedEvent: (sim) => sim.iterationsChangeEmitter,
             getValue: (sim) => sim.getIterations(),
-            setValue: (sim, newValue) => {
-                sim.setIterations(newValue);
+            setValue: (eventID, sim, newValue) => {
+                sim.setIterations(eventID, newValue);
             },
         });
     }

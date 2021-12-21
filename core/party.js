@@ -18,11 +18,11 @@ export class Party {
         this.sim = sim;
         this.raid = raid;
         this.players = [...Array(MAX_PARTY_SIZE).keys()].map(i => null);
-        this.playerChangeListener = () => this.changeEmitter.emit();
+        this.playerChangeListener = eventID => this.changeEmitter.emit(eventID);
         [
             this.compChangeEmitter,
             this.buffsChangeEmitter,
-        ].forEach(emitter => emitter.on(() => this.changeEmitter.emit()));
+        ].forEach(emitter => emitter.on(eventID => this.changeEmitter.emit(eventID)));
     }
     size() {
         return this.players.filter(player => player != null).length;
@@ -30,10 +30,10 @@ export class Party {
     isEmpty() {
         return this.size() == 0;
     }
-    clear() {
-        this.setBuffs(PartyBuffs.create());
+    clear(eventID) {
+        this.setBuffs(eventID, PartyBuffs.create());
         for (let i = 0; i < MAX_PARTY_SIZE; i++) {
-            this.setPlayer(i, null);
+            this.setPlayer(eventID, i, null);
         }
     }
     // Returns this party's index within the raid [0-4].
@@ -47,13 +47,14 @@ export class Party {
     getPlayer(playerIndex) {
         return this.players[playerIndex];
     }
-    setPlayer(playerIndex, newPlayer) {
+    setPlayer(eventID, playerIndex, newPlayer) {
         if (playerIndex < 0 || playerIndex >= MAX_PARTY_SIZE) {
             throw new Error('Invalid player index: ' + playerIndex);
         }
         if (newPlayer == this.players[playerIndex]) {
             return;
         }
+        TypedEvent.freezeAll();
         const oldPlayer = this.players[playerIndex];
         this.players[playerIndex] = newPlayer;
         if (oldPlayer != null) {
@@ -63,23 +64,24 @@ export class Party {
         if (newPlayer != null) {
             const newPlayerOldParty = newPlayer.getParty();
             if (newPlayerOldParty) {
-                newPlayerOldParty.setPlayer(newPlayer.getPartyIndex(), null);
+                newPlayerOldParty.setPlayer(eventID, newPlayer.getPartyIndex(), null);
             }
             newPlayer.changeEmitter.on(this.playerChangeListener);
             newPlayer.setParty(this);
         }
-        this.compChangeEmitter.emit();
+        this.compChangeEmitter.emit(eventID);
+        TypedEvent.unfreezeAll();
     }
     getBuffs() {
         // Make a defensive copy
         return PartyBuffs.clone(this.buffs);
     }
-    setBuffs(newBuffs) {
+    setBuffs(eventID, newBuffs) {
         if (PartyBuffs.equals(this.buffs, newBuffs))
             return;
         // Make a defensive copy
         this.buffs = PartyBuffs.clone(newBuffs);
-        this.buffsChangeEmitter.emit();
+        this.buffsChangeEmitter.emit(eventID);
     }
     toProto() {
         return PartyProto.create({
@@ -87,19 +89,21 @@ export class Party {
             buffs: this.buffs,
         });
     }
-    fromProto(proto) {
-        this.setBuffs(proto.buffs || PartyBuffs.create());
+    fromProto(eventID, proto) {
+        TypedEvent.freezeAll();
+        this.setBuffs(eventID, proto.buffs || PartyBuffs.create());
         for (let i = 0; i < MAX_PARTY_SIZE; i++) {
             if (!proto.players[i] || proto.players[i].class == Class.ClassUnknown) {
-                this.setPlayer(i, null);
+                this.setPlayer(eventID, i, null);
                 continue;
             }
             const playerProto = proto.players[i];
             const spec = playerToSpec(playerProto);
             const newPlayer = new Player(spec, this.sim);
-            newPlayer.fromProto(playerProto);
-            this.setPlayer(i, newPlayer);
+            newPlayer.fromProto(eventID, playerProto);
+            this.setPlayer(eventID, i, newPlayer);
         }
+        TypedEvent.unfreezeAll();
     }
     // Returns JSON representing all the current values.
     toJson() {
@@ -119,9 +123,10 @@ export class Party {
         };
     }
     // Set all the current values, assumes obj is the same type returned by toJson().
-    fromJson(obj) {
+    fromJson(eventID, obj) {
+        TypedEvent.unfreezeAll();
         try {
-            this.setBuffs(PartyBuffs.fromJson(obj['buffs']));
+            this.setBuffs(eventID, PartyBuffs.fromJson(obj['buffs']));
         }
         catch (e) {
             console.warn('Failed to parse party buffs: ' + e);
@@ -130,19 +135,20 @@ export class Party {
             for (let i = 0; i < MAX_PARTY_SIZE; i++) {
                 const playerObj = obj['players'][i];
                 if (!playerObj) {
-                    this.setPlayer(i, null);
+                    this.setPlayer(eventID, i, null);
                     continue;
                 }
                 const newSpec = playerObj['spec'];
                 if (this.players[i] != null && this.players[i].spec == newSpec) {
-                    this.players[i].fromJson(playerObj['player']);
+                    this.players[i].fromJson(eventID, playerObj['player']);
                 }
                 else {
                     const newPlayer = new Player(playerObj['spec'], this.sim);
-                    newPlayer.fromJson(playerObj['player']);
-                    this.setPlayer(i, newPlayer);
+                    newPlayer.fromJson(eventID, playerObj['player']);
+                    this.setPlayer(eventID, i, newPlayer);
                 }
             }
         }
+        TypedEvent.unfreezeAll();
     }
 }

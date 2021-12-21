@@ -29,7 +29,7 @@ export class Input extends Component {
                 labelDiv.appendChild(tooltip);
             }
         }
-        config.changedEvent(this.modObject).on(() => {
+        config.changedEvent(this.modObject).on(eventID => {
             this.setInputValue(config.getValue(this.modObject));
             this.update();
         });
@@ -56,8 +56,8 @@ export class Input extends Component {
         this.update();
     }
     // Child classes should call this method when the value in the input element changes.
-    inputChanged() {
-        this.inputConfig.setValue(this.modObject, this.getInputValue());
-        this.changeEmitter.emit();
+    inputChanged(eventID) {
+        this.inputConfig.setValue(eventID, this.modObject, this.getInputValue());
+        this.changeEmitter.emit(eventID);
     }
 }

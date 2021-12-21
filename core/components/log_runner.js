@@ -1,3 +1,4 @@
+import { TypedEvent } from '/tbc/core/typed_event.js';
 import { Component } from './component.js';
 export class LogRunner extends Component {
     constructor(parent, simUI) {
@@ -15,14 +16,14 @@ export class LogRunner extends Component {
         simButton.addEventListener('click', async () => {
             simUI.setResultsPending();
             try {
-                const result = await simUI.sim.runRaidSimWithLogs();
+                const result = await simUI.sim.runRaidSimWithLogs(TypedEvent.nextEventID());
             }
             catch (e) {
                 simUI.hideAllResults();
                 alert(e);
             }
         });
-        simUI.sim.simResultEmitter.on(simResult => {
+        simUI.sim.simResultEmitter.on((eventID, simResult) => {
             const logs = simResult.getLogs();
             logsDiv.textContent = '';
             logs.forEach(log => {
