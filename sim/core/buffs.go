@@ -106,6 +106,7 @@ func applyBuffEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs proto.P
 	})
 
 	registerBloodlustCD(agent, partyBuffs.Bloodlust)
+	registerInnervateCD(agent, individualBuffs.Innervates)
 
 	character.AddStats(stats.Stats{
 		stats.SpellCrit: 28 * float64(partyBuffs.AtieshMage),
@@ -194,24 +195,45 @@ func AddBloodlustAura(sim *Simulation, character *Character) {
 	})
 }
 
-func registerInnervateCD(agent Agent, numInnervates int) {
+var sharedInnervateCooldownID = NewCooldownID()
+var InnervateAuraID = NewAuraID()
+
+const InnervateDuration = time.Second * 20
+const InnervateCD = time.Minute * 6
+
+func InnervateManaThreshold(character *Character) float64 {
+	if character.Class == proto.Class_ClassMage {
+		// Mages burn mana really fast so they probably need a higher threshold.
+		return 2000
+	} else {
+		return 1000
+	}
+}
+
+func registerInnervateCD(agent Agent, numInnervates int32) {
 	if numInnervates == 0 {
 		return
 	}
 
 	// Cooldowns for each innervate are separate, since they are cast by different players.
 	innervateCDs := make([]InternalCD, numInnervates)
-	const dur = time.Second * 20
-	const cd = time.Minute * 6
 
-	agent.GetCharacter().AddMajorCooldown(MajorCooldown{
-		CooldownID: InnervateCooldownID,
-		Cooldown:   dur, // Just put on CD for the duration because we can get other innervates after
+	character := agent.GetCharacter()
+
+	character.AddMajorCooldown(MajorCooldown{
+		CooldownID: sharedInnervateCooldownID,
+		Cooldown:   InnervateDuration, // Just put on CD for the duration because we can get other innervates after
 		ActivationFactory: func(sim *Simulation) CooldownActivation {
-			for i := 0; i < numInnervates; i++ {
+			for i := 0; i < int(numInnervates); i++ {
 				innervateCDs[i] = NewICD()
 			}
 			nextInnervateIndex := 0
+
+			innervateThreshold := InnervateManaThreshold(character)
+			expectedManaPerInnervate := character.SpiritManaRegenPerSecond() * 5 * 20
+
+			remainingInnervateUsages := int(1 + (MaxDuration(0, sim.Duration))/InnervateCD)
+			character.ExpectedBonusMana += expectedManaPerInnervate * float64(remainingInnervateUsages)
 
 			return func(sim *Simulation, character *Character) bool {
 				if innervateCDs[nextInnervateIndex].IsOnCD(sim) {
@@ -223,29 +245,30 @@ func registerInnervateCD(agent Agent, numInnervates int) {
 				}
 
 				// Only cast innervate when very low on mana, to make sure all other mana CDs are prioritized.
-				if character.CurrentMana() > 1000 {
+				if character.CurrentMana() > innervateThreshold {
 					return false
 				}
 
-				AddInnervateAura(sim, character, 0)
-				innervateCDs[nextInnervateIndex] = InternalCD(sim.CurrentTime + cd)
+				AddInnervateAura(sim, character, expectedManaPerInnervate)
+
+				newRemainingUsages := int(sim.GetRemainingDuration() / InnervateCD)
+				// AddInnervateAura already accounts for 1 usage, which is why we subtract 1 extra.
+				character.ExpectedBonusMana -= expectedManaPerInnervate * MaxFloat(0, float64(remainingInnervateUsages-1-newRemainingUsages))
+				remainingInnervateUsages = newRemainingUsages
+
+				innervateCDs[nextInnervateIndex] = InternalCD(sim.CurrentTime + InnervateCD)
 				nextInnervateIndex = (nextInnervateIndex + 1) % len(innervateCDs)
 
 				if innervateCDs[nextInnervateIndex].IsOnCD(sim) {
-					character.SetCD(InnervateCooldownID, sim.CurrentTime+innervateCDs[nextInnervateIndex].GetRemainingCD(sim))
+					character.SetCD(sharedInnervateCooldownID, sim.CurrentTime+innervateCDs[nextInnervateIndex].GetRemainingCD(sim))
 				} else {
-					character.SetCD(InnervateCooldownID, sim.CurrentTime+dur)
+					character.SetCD(sharedInnervateCooldownID, sim.CurrentTime+InnervateDuration)
 				}
 				return true
 			}
 		},
 	})
 }
-
-var InnervateCooldownID = NewCooldownID()
-var InnervateAuraID = NewAuraID()
-
-const InnervateDuration = time.Second * 20
 
 func AddInnervateAura(sim *Simulation, character *Character, expectedBonusManaReduction float64) {
 	character.PseudoStats.ForceFullSpiritRegen = true
