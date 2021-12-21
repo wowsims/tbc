@@ -57,6 +57,9 @@ export class TypedEvent<T> {
 
   emit(eventID: EventID, event: T) {
 		if (this.firedEvents.includes(eventID)) {
+			if (!thawing) {
+				console.warn('EventID collision outside of thawing!');
+			}
 			return;
 		}
 		this.firedEvents.push(eventID);
@@ -84,6 +87,10 @@ export class TypedEvent<T> {
 	//
 	// This is used when a single user action activates multiple separate events, to ensure
 	// none of them fire until all changes have been applied.
+	//
+	// All usages of this function should be followed by a call to unfreezeAll()
+	// within the same scope. These two functions are very similar to a locking
+	// mechanism.
 	static freezeAll() {
 		freezeCount++;
 	}
@@ -95,6 +102,7 @@ export class TypedEvent<T> {
 			return;
 		}
 
+		thawing = true;
 		const typedEvents = frozenTypedEvents.slice();
 		frozenTypedEvents = [];
 
@@ -104,6 +112,7 @@ export class TypedEvent<T> {
 
 			frozenEvents.forEach(frozenEvent => typedEvent.fireEventInternal(frozenEvent.eventID, frozenEvent.event));
 		});
+		thawing = false;
 	}
 
 	static nextEventID(): EventID {
@@ -113,6 +122,9 @@ export class TypedEvent<T> {
 
 // If this is > 0 then events are frozen.
 let freezeCount = 0;
+
+// Indicates whether we are currently in the process of unfreezing. Just used to add a warning.
+let thawing = false;
 
 let frozenTypedEvents: Array<TypedEvent<any>> = [];
 let nextEventID: EventID = 0;

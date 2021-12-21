@@ -83,6 +83,7 @@ export class Party {
 			return;
 		}
 
+		TypedEvent.freezeAll();
 		const oldPlayer = this.players[playerIndex];
 		this.players[playerIndex] = newPlayer;
 
@@ -100,6 +101,7 @@ export class Party {
 		}
 
 		this.compChangeEmitter.emit(eventID);
+		TypedEvent.unfreezeAll();
 	}
 
   getBuffs(): PartyBuffs {
