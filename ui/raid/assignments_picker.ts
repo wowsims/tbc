@@ -3,7 +3,7 @@ import { Input, InputConfig } from '/tbc/core/components/input.js';
 import { RaidTargetPicker } from '/tbc/core/components/raid_target_picker.js';
 import { Player } from '/tbc/core/player.js';
 import { Raid } from '/tbc/core/raid.js';
-import { TypedEvent } from '/tbc/core/typed_event.js';
+import { EventID, TypedEvent } from '/tbc/core/typed_event.js';
 import { Class } from '/tbc/core/proto/common.js';
 import { RaidTarget } from '/tbc/core/proto/common.js';
 import { Spec } from '/tbc/core/proto/common.js';
@@ -44,20 +44,18 @@ export class InnervatesPicker extends Component {
 	private readonly playersContainer: HTMLElement;
 
 	private targetPickers: Array<AssignmentTargetPicker>;
-	private recoveringRaidTargets: boolean;
 
   constructor(parentElem: HTMLElement, raidSimUI: RaidSimUI) {
     super(parentElem, 'innervates-picker-root');
 		this.raidSimUI = raidSimUI;
 		this.targetPickers = [];
-		this.recoveringRaidTargets = false;
 
 		this.playersContainer = document.createElement('div');
 		this.playersContainer.classList.add('innervate-players-container', 'settings-section');
 		this.rootElem.appendChild(this.playersContainer);
 
 		this.update(this.raidSimUI.getPlayersAndBuffBots());
-		this.raidSimUI.compChangeEmitter.on(() => {
+		this.raidSimUI.compChangeEmitter.on(eventID => {
 			this.recoverRaidTargets();
 			this.update(this.raidSimUI.getPlayersAndBuffBots());
 		});
@@ -115,10 +113,10 @@ export class InnervatesPicker extends Component {
 
 					changedEvent: (player: Player<any>) => player.specOptionsChangeEmitter,
 					getValue: (player: Player<any>) => (player.getSpecOptions() as DruidOptions).innervateTarget || emptyRaidTarget(),
-					setValue: (player: Player<any>, newValue: RaidTarget) => {
+					setValue: (eventID: EventID, player: Player<any>, newValue: RaidTarget) => {
 						const newOptions = player.getSpecOptions() as DruidOptions;
 						newOptions.innervateTarget = newValue;
-						player.setSpecOptions(newOptions);
+						player.setSpecOptions(eventID, newOptions);
 					},
 				});
 			} else {
@@ -142,11 +140,11 @@ export class InnervatesPicker extends Component {
 
 					changedEvent: (player: BuffBot) => player.innervateAssignmentChangeEmitter,
 					getValue: (player: BuffBot) => player.getInnervateAssignment(),
-					setValue: (player: BuffBot, newValue: RaidTarget) => player.setInnervateAssignment(newValue),
+					setValue: (eventID: EventID, player: BuffBot, newValue: RaidTarget) => player.setInnervateAssignment(eventID, newValue),
 				});
 			}
 
-			raidTargetPicker!.changeEmitter.on(() => {
+			raidTargetPicker!.changeEmitter.on(eventID => {
 				this.targetPickers[druidIndex].targetPlayer = this.raidSimUI.sim.raid.getPlayerFromRaidTarget(raidTargetPicker!.getInputValue());
 			});
 
@@ -166,45 +164,36 @@ export class InnervatesPicker extends Component {
 	// and one of the characters will momentarily not be part of the raid. To address
 	// this we have to wait a bit before checking.
 	private recoverRaidTargets() {
-		// If there is already a stickyPromise running, don't make another one.
-		if (this.recoveringRaidTargets)
-			return;
-
-		// Store the current values before doing any async work in case they get changed.
 		const oldTargetPickers = this.targetPickers.slice();
 		const oldPlayerTargets = oldTargetPickers.map(otp => otp.targetPlayer);
 
-		this.recoveringRaidTargets = true;
-		(async () => {
-			try {
-				// Wait because there might be multiple compChange events fired together, and we want
-				// to wait for them all to finish.
-				await wait(10);
+		// TODO: This needs to somehow reference the 'parent' eventID so that undo
+		// actions undo them together.
+		const eventID = TypedEvent.nextEventID();
+		TypedEvent.freezeAll();
 
-				oldTargetPickers.forEach((targetPicker, i) => {
-					const oldPlayerOrBot = targetPicker.playerOrBot;
-					const oldPlayerTarget = oldPlayerTargets[i];
-					const newPlayersAndBots = this.raidSimUI.getPlayersAndBuffBots();
+		oldTargetPickers.forEach((targetPicker, i) => {
+			const oldPlayerOrBot = targetPicker.playerOrBot;
+			const oldPlayerTarget = oldPlayerTargets[i];
+			const newPlayersAndBots = this.raidSimUI.getPlayersAndBuffBots();
 
-					if (!newPlayersAndBots.includes(oldPlayerOrBot))
-						return;
+			if (!newPlayersAndBots.includes(oldPlayerOrBot))
+				return;
 
-					if (!oldPlayerTarget || !newPlayersAndBots.includes(oldPlayerTarget))
-						return;
+			if (!oldPlayerTarget || !newPlayersAndBots.includes(oldPlayerTarget))
+				return;
 
-					const raidTarget = newRaidTarget(oldPlayerTarget.getRaidIndex());
+			const raidTarget = newRaidTarget(oldPlayerTarget.getRaidIndex());
 
-					if (oldPlayerOrBot instanceof Player) {
-						const newOptions = oldPlayerOrBot.getSpecOptions() as DruidOptions;
-						newOptions.innervateTarget = raidTarget;
-						oldPlayerOrBot.setSpecOptions(newOptions);
-					} else {
-						oldPlayerOrBot.setInnervateAssignment(raidTarget);
-					}
-				});
-			} finally {
-				this.recoveringRaidTargets = false;
+			if (oldPlayerOrBot instanceof Player) {
+				const newOptions = oldPlayerOrBot.getSpecOptions() as DruidOptions;
+				newOptions.innervateTarget = raidTarget;
+				oldPlayerOrBot.setSpecOptions(eventID, newOptions);
+			} else {
+				oldPlayerOrBot.setInnervateAssignment(eventID, raidTarget);
 			}
-		})();
+		});
+
+		TypedEvent.unfreezeAll();
 	}
 }

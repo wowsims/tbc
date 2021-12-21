@@ -1,7 +1,7 @@
 import { Race } from '/tbc/core/proto/common.js';
 import { specToEligibleRaces } from '/tbc/core/proto_utils/utils.js';
 import { raceNames } from '/tbc/core/proto_utils/names.js';
-import { TypedEvent } from '/tbc/core/typed_event.js';
+import { EventID, TypedEvent } from '/tbc/core/typed_event.js';
 
 import { Input, InputConfig } from './input.js';
 
@@ -39,7 +39,7 @@ export class EnumPicker<ModObject> extends Input<ModObject, number> {
 		this.init();
 
     this.selectElem.addEventListener('change', event => {
-			this.inputChanged();
+			this.inputChanged(TypedEvent.nextEventID());
     });
   }
 

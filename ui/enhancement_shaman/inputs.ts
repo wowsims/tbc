@@ -7,6 +7,7 @@ import { Player } from '/tbc/core/player.js';
 import { Sim } from '/tbc/core/sim.js';
 import { IndividualSimUI } from '/tbc/core/individual_sim_ui.js';
 import { Target } from '/tbc/core/target.js';
+import { EventID, TypedEvent } from '/tbc/core/typed_event.js';
 
 // Configuration for spec-specific UI elements on the settings tab.
 // These don't need to be in a separate file but it keeps things cleaner.
@@ -32,10 +33,10 @@ export const EnhancementShamanRotationConfig = {
 				],
 				changedEvent: (player: Player<Spec.SpecEnhancementShaman>) => player.rotationChangeEmitter,
 				getValue: (player: Player<Spec.SpecEnhancementShaman>) => player.getRotation().type,
-				setValue: (player: Player<Spec.SpecEnhancementShaman>, newValue: number) => {
+				setValue: (eventID: EventID, player: Player<Spec.SpecEnhancementShaman>, newValue: number) => {
 					const newRotation = player.getRotation();
 					newRotation.type = newValue;
-					player.setRotation(newRotation);
+					player.setRotation(eventID, newRotation);
 				},
 			},
 		}
@@ -48,10 +49,10 @@ function makeBooleanShamanBuffInput(id: ItemOrSpellId, optionsFieldName: keyof S
 	  states: 2,
 		  changedEvent: (player: Player<Spec.SpecEnhancementShaman>) => player.specOptionsChangeEmitter,
 		  getValue: (player: Player<Spec.SpecEnhancementShaman>) => player.getSpecOptions()[optionsFieldName] as boolean,
-		  setValue: (player: Player<Spec.SpecEnhancementShaman>, newValue: boolean) => {
+		  setValue: (eventID: EventID, player: Player<Spec.SpecEnhancementShaman>, newValue: boolean) => {
 			  const newOptions = player.getSpecOptions();
 		(newOptions[optionsFieldName] as boolean) = newValue;
-			  player.setSpecOptions(newOptions);
+			  player.setSpecOptions(eventID, newOptions);
 		  },
 	}
 }

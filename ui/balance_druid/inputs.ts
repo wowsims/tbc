@@ -6,6 +6,7 @@ import { NO_TARGET } from '/tbc/core/proto_utils/utils.js';
 import { ItemOrSpellId } from '/tbc/core/resources.js';
 import { Player } from '/tbc/core/player.js';
 import { Sim } from '/tbc/core/sim.js';
+import { EventID, TypedEvent } from '/tbc/core/typed_event.js';
 import { IndividualSimUI } from '/tbc/core/individual_sim_ui.js';
 import { Target } from '/tbc/core/target.js';
 
@@ -21,12 +22,12 @@ export const SelfInnervate = {
 	],
 	changedEvent: (player: Player<Spec.SpecBalanceDruid>) => player.specOptionsChangeEmitter,
 	getValue: (player: Player<Spec.SpecBalanceDruid>) => player.getSpecOptions().innervateTarget?.targetIndex != NO_TARGET,
-	setValue: (player: Player<Spec.SpecBalanceDruid>, newValue: boolean) => {
+	setValue: (eventID: EventID, player: Player<Spec.SpecBalanceDruid>, newValue: boolean) => {
 		const newOptions = player.getSpecOptions();
 		newOptions.innervateTarget = RaidTarget.create({
 			targetIndex: newValue ? 0 : NO_TARGET,
 		});
-		player.setSpecOptions(newOptions);
+		player.setSpecOptions(eventID, newOptions);
 	},
 };
 
@@ -57,10 +58,10 @@ export const BalanceDruidRotationConfig = {
 				],
 				changedEvent: (player: Player<Spec.SpecBalanceDruid>) => player.rotationChangeEmitter,
 				getValue: (player: Player<Spec.SpecBalanceDruid>) => player.getRotation().primarySpell,
-				setValue: (player: Player<Spec.SpecBalanceDruid>, newValue: number) => {
+				setValue: (eventID: EventID, player: Player<Spec.SpecBalanceDruid>, newValue: number) => {
 					const newRotation = player.getRotation();
 					newRotation.primarySpell = newValue;
-					player.setRotation(newRotation);
+					player.setRotation(eventID, newRotation);
 				},
 			},
 		},
@@ -75,10 +76,10 @@ export const BalanceDruidRotationConfig = {
 				labelTooltip: 'Use Moonfire as the next cast after the dot expires.',
 				changedEvent: (player: Player<Spec.SpecBalanceDruid>) => player.rotationChangeEmitter,
 				getValue: (player: Player<Spec.SpecBalanceDruid>) => player.getRotation().moonfire,
-				setValue: (player: Player<Spec.SpecBalanceDruid>, newValue: boolean) => {
+				setValue: (eventID: EventID, player: Player<Spec.SpecBalanceDruid>, newValue: boolean) => {
 					const newRotation = player.getRotation();
 					newRotation.moonfire = newValue;
-					player.setRotation(newRotation);
+					player.setRotation(eventID, newRotation);
 				},
 				enableWhen: (player: Player<Spec.SpecBalanceDruid>) => player.getRotation().primarySpell != PrimarySpell.Adaptive,
 			},
@@ -94,10 +95,10 @@ export const BalanceDruidRotationConfig = {
 				labelTooltip: 'Keep Faerie Fire active on the primary target.',
 				changedEvent: (player: Player<Spec.SpecBalanceDruid>) => player.rotationChangeEmitter,
 				getValue: (player: Player<Spec.SpecBalanceDruid>) => player.getRotation().faerieFire,
-				setValue: (player: Player<Spec.SpecBalanceDruid>, newValue: boolean) => {
+				setValue: (eventID: EventID, player: Player<Spec.SpecBalanceDruid>, newValue: boolean) => {
 					const newRotation = player.getRotation();
 					newRotation.faerieFire = newValue;
-					player.setRotation(newRotation);
+					player.setRotation(eventID, newRotation);
 				},
 			},
 		},
@@ -112,10 +113,10 @@ export const BalanceDruidRotationConfig = {
 				labelTooltip: 'Keep Insect Swarm active on the primary target.',
 				changedEvent: (player: Player<Spec.SpecBalanceDruid>) => player.rotationChangeEmitter,
 				getValue: (player: Player<Spec.SpecBalanceDruid>) => player.getRotation().insectSwarm,
-				setValue: (player: Player<Spec.SpecBalanceDruid>, newValue: boolean) => {
+				setValue: (eventID: EventID, player: Player<Spec.SpecBalanceDruid>, newValue: boolean) => {
 					const newRotation = player.getRotation();
 					newRotation.insectSwarm = newValue;
-					player.setRotation(newRotation);
+					player.setRotation(eventID, newRotation);
 				},
 				enableWhen: (player: Player<Spec.SpecBalanceDruid>) => player.getTalents().insectSwarm,
 			},
@@ -131,10 +132,10 @@ export const BalanceDruidRotationConfig = {
         labelTooltip: 'Cast Battle Res on an ally sometime during the encounter.',
         changedEvent: (player: Player<Spec.SpecBalanceDruid>) => player.specOptionsChangeEmitter,
         getValue: (player: Player<Spec.SpecBalanceDruid>) =>player.getSpecOptions().battleRes,
-        setValue: (player: Player<Spec.SpecBalanceDruid>, newValue: boolean) => {
+        setValue: (eventID: EventID, player: Player<Spec.SpecBalanceDruid>, newValue: boolean) => {
           const newOptions = player.getSpecOptions();                
           newOptions.battleRes = newValue;
-          player.setSpecOptions(newOptions);
+          player.setSpecOptions(eventID, newOptions);
         },
       },
     },

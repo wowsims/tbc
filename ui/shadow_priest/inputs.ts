@@ -7,6 +7,7 @@ import { Player } from '/tbc/core/player.js';
 import { Sim } from '/tbc/core/sim.js';
 import { IndividualSimUI } from '/tbc/core/individual_sim_ui.js';
 import { Target } from '/tbc/core/target.js';
+import { EventID, TypedEvent } from '/tbc/core/typed_event.js';
 
 // Configuration for spec-specific UI elements on the settings tab.
 // These don't need to be in a separate file but it keeps things cleaner.
@@ -32,10 +33,10 @@ export const ShadowPriestRotationConfig = {
 				],
 				changedEvent: (player: Player<Spec.SpecShadowPriest>) => player.rotationChangeEmitter,
 				getValue: (player: Player<Spec.SpecShadowPriest>) => player.getRotation().rotationType,
-				setValue: (player: Player<Spec.SpecShadowPriest>, newValue: number) => {
+				setValue: (eventID: EventID, player: Player<Spec.SpecShadowPriest>, newValue: number) => {
 					const newRotation = player.getRotation();
 					newRotation.rotationType = newValue;
-					player.setRotation(newRotation);
+					player.setRotation(eventID, newRotation);
 				},
 			},
 		},
@@ -48,10 +49,10 @@ export const ShadowPriestRotationConfig = {
 				labelTooltip: 'Use Shadowfiend when low mana and off CD.',
 				changedEvent: (player: Player<Spec.SpecShadowPriest>) => player.rotationChangeEmitter,
 				getValue: (player: Player<Spec.SpecShadowPriest>) => player.getSpecOptions().useShadowfiend,
-				setValue: (player: Player<Spec.SpecShadowPriest>, newValue: boolean) => {
+				setValue: (eventID: EventID, player: Player<Spec.SpecShadowPriest>, newValue: boolean) => {
 					const newOptions = player.getSpecOptions();
 					newOptions.useShadowfiend = newValue;
-					player.setSpecOptions(newOptions);
+					player.setSpecOptions(eventID, newOptions);
 				},
 			},
 		},
@@ -64,10 +65,10 @@ export const ShadowPriestRotationConfig = {
 				labelTooltip: 'Start fight with VT landing at time 0',
 				changedEvent: (player: Player<Spec.SpecShadowPriest>) => player.rotationChangeEmitter,
 				getValue: (player: Player<Spec.SpecShadowPriest>) => player.getRotation().precastVt,
-				setValue: (player: Player<Spec.SpecShadowPriest>, newValue: boolean) => {
+				setValue: (eventID: EventID, player: Player<Spec.SpecShadowPriest>, newValue: boolean) => {
 					const newRotation = player.getRotation();
 					newRotation.precastVt = newValue;
-					player.setRotation(newRotation);
+					player.setRotation(eventID, newRotation);
 				},
 			},
 		},
@@ -80,10 +81,10 @@ export const ShadowPriestRotationConfig = {
 				labelTooltip: 'Use Devouring Plague whenever off CD.',
 				changedEvent: (player: Player<Spec.SpecShadowPriest>) => player.raceChangeEmitter,
 				getValue: (player: Player<Spec.SpecShadowPriest>) => player.getRotation().useDevPlague,
-				setValue: (player: Player<Spec.SpecShadowPriest>, newValue: boolean) => {
+				setValue: (eventID: EventID, player: Player<Spec.SpecShadowPriest>, newValue: boolean) => {
 					const newRotation = player.getRotation();
 					newRotation.useDevPlague = newValue;
-					player.setRotation(newRotation);
+					player.setRotation(eventID, newRotation);
 				},
 				enableWhen: (player: Player<Spec.SpecShadowPriest>) => player.getRace() == Race.RaceUndead,
 			},
@@ -97,10 +98,10 @@ export const ShadowPriestRotationConfig = {
 				labelTooltip: 'Use Starshards whenever off CD.',
 				changedEvent: (player: Player<Spec.SpecShadowPriest>) => player.raceChangeEmitter,
 				getValue: (player: Player<Spec.SpecShadowPriest>) => player.getRotation().useStarshards,
-				setValue: (player: Player<Spec.SpecShadowPriest>, newValue: boolean) => {
+				setValue: (eventID: EventID, player: Player<Spec.SpecShadowPriest>, newValue: boolean) => {
 					const newRotation = player.getRotation();
 					newRotation.useStarshards = newValue;
-					player.setRotation(newRotation);
+					player.setRotation(eventID, newRotation);
 				},
 				enableWhen: (player: Player<Spec.SpecShadowPriest>) => player.getRace() == Race.RaceNightElf,
 			},
@@ -114,10 +115,10 @@ export const ShadowPriestRotationConfig = {
 				labelTooltip: 'Latency after a channel that lasts longer than GCD. 0 to disable. Has a minimum value of 100ms if set.',
 				changedEvent: (player: Player<Spec.SpecShadowPriest>) => player.rotationChangeEmitter,
 				getValue: (player: Player<Spec.SpecShadowPriest>) => player.getRotation().latency,
-				setValue: (player: Player<Spec.SpecShadowPriest>, newValue: number) => {
+				setValue: (eventID: EventID, player: Player<Spec.SpecShadowPriest>, newValue: number) => {
 					const newRotation = player.getRotation();
 					newRotation.latency = newValue;
-					player.setRotation(newRotation);
+					player.setRotation(eventID, newRotation);
 				},
 			},
 		},		

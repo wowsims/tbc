@@ -1,5 +1,5 @@
 import { Sim } from '/tbc/core/sim.js';
-import { TypedEvent } from '/tbc/core/typed_event.js';
+import { EventID, TypedEvent } from '/tbc/core/typed_event.js';
 
 import { Component } from './component.js';
 
@@ -20,7 +20,7 @@ export interface InputConfig<ModObject, T> {
 
 	// Get and set the mapped value.
   getValue: (obj: ModObject) => T,
-  setValue: (obj: ModObject, newValue: T) => void,
+  setValue: (eventID: EventID, obj: ModObject, newValue: T) => void,
 
 	// If set, will automatically disable the input when this evaluates to false.
 	enableWhen?: (obj: ModObject) => boolean,
@@ -66,7 +66,7 @@ export abstract class Input<ModObject, T> extends Component {
 			}
     }
 
-    config.changedEvent(this.modObject).on(() => {
+    config.changedEvent(this.modObject).on(eventID => {
 			this.setInputValue(config.getValue(this.modObject));
 			this.update();
     });
@@ -100,8 +100,8 @@ export abstract class Input<ModObject, T> extends Component {
 	abstract setInputValue(newValue: T): void;
 
 	// Child classes should call this method when the value in the input element changes.
-	inputChanged() {
-		this.inputConfig.setValue(this.modObject, this.getInputValue());
-		this.changeEmitter.emit();
+	inputChanged(eventID: EventID) {
+		this.inputConfig.setValue(eventID, this.modObject, this.getInputValue());
+		this.changeEmitter.emit(eventID);
 	}
 }

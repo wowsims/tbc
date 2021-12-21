@@ -1,4 +1,4 @@
-import { TypedEvent } from '/tbc/core/typed_event.js';
+import { EventID, TypedEvent } from '/tbc/core/typed_event.js';
 import { SimResult, SimResultFilter } from '/tbc/core/proto_utils/sim_result.js';
 
 import { SimResultData } from './result_component.js';
@@ -112,10 +112,12 @@ const dpsHistogram = new DpsHistogram({ parent: document.body.getElementsByClass
 
 let currentSimResult: SimResult | null = null;
 function updateResults() {
+	const eventID = TypedEvent.nextEventID();
 	if (currentSimResult == null) {
-		resultsEmitter.emit(null);
+		resultsEmitter.emit(eventID, null);
 	} else {
-		resultsEmitter.emit({
+		resultsEmitter.emit(eventID, {
+			eventID: eventID,
 			result: currentSimResult,
 			filter: resultsFilter.getFilter(),
 		});
@@ -137,7 +139,7 @@ window.addEventListener('message', async event => {
 resultsFilter.changeEmitter.on(() => updateResults());
 
 const rootDiv = document.body.getElementsByClassName('dr-root')[0] as HTMLElement;
-resultsEmitter.on(resultData => {
+resultsEmitter.on((eventID, resultData) => {
 	if (resultData?.filter.player || resultData?.filter.player === 0) {
 		rootDiv.classList.remove('all-players');
 		rootDiv.classList.add('single-player');
