@@ -164,12 +164,12 @@ export class Sim {
 			raid: this.raid.toProto(),
 		}));
 
-		TypedEvent.freezeAll();
-		result.raidStats!.parties
-				.forEach((partyStats, partyIndex) =>
-						partyStats.players.forEach((playerStats, playerIndex) =>
-								players[partyIndex*5 + playerIndex]?.setCurrentStats(eventID, playerStats)));
-		TypedEvent.unfreezeAll();
+		TypedEvent.freezeAllAndDo(() => {
+			result.raidStats!.parties
+					.forEach((partyStats, partyIndex) =>
+							partyStats.players.forEach((playerStats, playerIndex) =>
+									players[partyIndex*5 + playerIndex]?.setCurrentStats(eventID, playerStats)));
+		});
 	}
 
   async statWeights(player: Player<any>, epStats: Array<Stat>, epReferenceStat: Stat): Promise<StatWeightsResult> {
@@ -294,35 +294,35 @@ export class Sim {
 
   // Set all the current values, assumes obj is the same type returned by toJson().
   fromJson(eventID: EventID, obj: any, spec?: Spec) {
-		TypedEvent.freezeAll();
-		// For legacy format. Do not remove this until 2022/01/05 (1 month).
-		if (obj['sim']) {
-			if (!obj['raid']) {
-				obj['raid'] = {
-					'parties': [
-						{
-							'players': [
-								{
-									'spec': spec,
-									'player': obj['player'],
-								},
-							],
-							'buffs': obj['sim']['partyBuffs'],
-						},
-					],
-					'buffs': obj['sim']['raidBuffs'],
-				};
-				obj['raid']['parties'][0]['players'][0]['player']['buffs'] = obj['sim']['individualBuffs'];
+		TypedEvent.freezeAllAndDo(() => {
+			// For legacy format. Do not remove this until 2022/01/05 (1 month).
+			if (obj['sim']) {
+				if (!obj['raid']) {
+					obj['raid'] = {
+						'parties': [
+							{
+								'players': [
+									{
+										'spec': spec,
+										'player': obj['player'],
+									},
+								],
+								'buffs': obj['sim']['partyBuffs'],
+							},
+						],
+						'buffs': obj['sim']['raidBuffs'],
+					};
+					obj['raid']['parties'][0]['players'][0]['player']['buffs'] = obj['sim']['individualBuffs'];
+				}
 			}
-		}
 
-		if (obj['raid']) {
-			this.raid.fromJson(eventID, obj['raid']);
-		}
+			if (obj['raid']) {
+				this.raid.fromJson(eventID, obj['raid']);
+			}
 
-		if (obj['encounter']) {
-			this.encounter.fromJson(eventID, obj['encounter']);
-		}
-		TypedEvent.unfreezeAll();
+			if (obj['encounter']) {
+				this.encounter.fromJson(eventID, obj['encounter']);
+			}
+		});
   }
 }

@@ -75,22 +75,22 @@ export class Player<SpecType extends Spec> {
 	private epWeights: Stats = new Stats();
 	private currentStats: PlayerStats = PlayerStats.create();
 
-  readonly nameChangeEmitter = new TypedEvent<void>();
-  readonly buffsChangeEmitter = new TypedEvent<void>();
-  readonly consumesChangeEmitter = new TypedEvent<void>();
-  readonly bonusStatsChangeEmitter = new TypedEvent<void>();
-  readonly gearChangeEmitter = new TypedEvent<void>();
-  readonly raceChangeEmitter = new TypedEvent<void>();
-  readonly rotationChangeEmitter = new TypedEvent<void>();
-  readonly talentsChangeEmitter = new TypedEvent<void>();
+  readonly nameChangeEmitter = new TypedEvent<void>('PlayerName');
+  readonly buffsChangeEmitter = new TypedEvent<void>('PlayerBuffs');
+  readonly consumesChangeEmitter = new TypedEvent<void>('PlayerConsumes');
+  readonly bonusStatsChangeEmitter = new TypedEvent<void>('PlayerBonusStats');
+  readonly gearChangeEmitter = new TypedEvent<void>('PlayerGear');
+  readonly raceChangeEmitter = new TypedEvent<void>('PlayerRace');
+  readonly rotationChangeEmitter = new TypedEvent<void>('PlayerRotation');
+  readonly talentsChangeEmitter = new TypedEvent<void>('PlayerTalents');
   // Talents dont have all fields so we need this.
-  readonly talentsStringChangeEmitter = new TypedEvent<void>();
-  readonly specOptionsChangeEmitter = new TypedEvent<void>();
+  readonly talentsStringChangeEmitter = new TypedEvent<void>('PlayerTalentsString');
+  readonly specOptionsChangeEmitter = new TypedEvent<void>('PlayerSpecOptions');
 
-  readonly currentStatsEmitter = new TypedEvent<void>();
+  readonly currentStatsEmitter = new TypedEvent<void>('PlayerCurrentStats');
 
   // Emits when any of the above emitters emit.
-  readonly changeEmitter = new TypedEvent<void>();
+  readonly changeEmitter = new TypedEvent<void>('PlayerChange');
 
   constructor(spec: Spec, sim: Sim) {
 		this.sim = sim;
@@ -439,18 +439,18 @@ export class Player<SpecType extends Spec> {
 	}
 
 	fromProto(eventID: EventID, proto: PlayerProto) {
-		TypedEvent.freezeAll();
-		this.setName(eventID, proto.name);
-		this.setRace(eventID, proto.race);
-		this.setGear(eventID, proto.equipment ? this.sim.lookupEquipmentSpec(proto.equipment) : new Gear({}));
-		this.setConsumes(eventID, proto.consumes || Consumes.create());
-		this.setBonusStats(eventID, new Stats(proto.bonusStats));
-		this.setBuffs(eventID, proto.buffs || IndividualBuffs.create());
-		this.setTalentsString(eventID, proto.talentsString);
-		this.setRotation(eventID, this.specTypeFunctions.rotationFromPlayer(proto));
-		this.setTalents(eventID, this.specTypeFunctions.talentsFromPlayer(proto));
-		this.setSpecOptions(eventID, this.specTypeFunctions.optionsFromPlayer(proto));
-		TypedEvent.unfreezeAll();
+		TypedEvent.freezeAllAndDo(() => {
+			this.setName(eventID, proto.name);
+			this.setRace(eventID, proto.race);
+			this.setGear(eventID, proto.equipment ? this.sim.lookupEquipmentSpec(proto.equipment) : new Gear({}));
+			this.setConsumes(eventID, proto.consumes || Consumes.create());
+			this.setBonusStats(eventID, new Stats(proto.bonusStats));
+			this.setBuffs(eventID, proto.buffs || IndividualBuffs.create());
+			this.setTalentsString(eventID, proto.talentsString);
+			this.setRotation(eventID, this.specTypeFunctions.rotationFromPlayer(proto));
+			this.setTalents(eventID, this.specTypeFunctions.talentsFromPlayer(proto));
+			this.setSpecOptions(eventID, this.specTypeFunctions.optionsFromPlayer(proto));
+		});
 	}
 
 	// TODO: Remove to/from json functions and use proto versions instead. This will require
@@ -472,68 +472,68 @@ export class Player<SpecType extends Spec> {
 
   // Set all the current values, assumes obj is the same type returned by toJson().
   fromJson(eventID: EventID, obj: any) {
-		TypedEvent.freezeAll();
-		try {
-			if (obj['name']) {
-				this.setName(eventID, obj['name']);
+		TypedEvent.freezeAllAndDo(() => {
+			try {
+				if (obj['name']) {
+					this.setName(eventID, obj['name']);
+				}
+			} catch (e) {
+				console.warn('Failed to parse name: ' + e);
 			}
-		} catch (e) {
-			console.warn('Failed to parse name: ' + e);
-		}
 
-		try {
-			this.setBuffs(eventID, IndividualBuffs.fromJson(obj['buffs']));
-		} catch (e) {
-			console.warn('Failed to parse player buffs: ' + e);
-		}
+			try {
+				this.setBuffs(eventID, IndividualBuffs.fromJson(obj['buffs']));
+			} catch (e) {
+				console.warn('Failed to parse player buffs: ' + e);
+			}
 
-		try {
-			this.setConsumes(eventID, Consumes.fromJson(obj['consumes']));
-		} catch (e) {
-			console.warn('Failed to parse consumes: ' + e);
-		}
+			try {
+				this.setConsumes(eventID, Consumes.fromJson(obj['consumes']));
+			} catch (e) {
+				console.warn('Failed to parse consumes: ' + e);
+			}
 
-		// For legacy format. Do not remove this until 2022/01/02 (1 month).
-		if (obj['customStats']) {
-			obj['bonusStats'] = obj['customStats'];
-		}
+			// For legacy format. Do not remove this until 2022/01/02 (1 month).
+			if (obj['customStats']) {
+				obj['bonusStats'] = obj['customStats'];
+			}
 
-		try {
-			this.setBonusStats(eventID, Stats.fromJson(obj['bonusStats']));
-		} catch (e) {
-			console.warn('Failed to parse bonus stats: ' + e);
-		}
+			try {
+				this.setBonusStats(eventID, Stats.fromJson(obj['bonusStats']));
+			} catch (e) {
+				console.warn('Failed to parse bonus stats: ' + e);
+			}
 
-		try {
-			this.setGear(eventID, this.sim.lookupEquipmentSpec(EquipmentSpec.fromJson(obj['gear'])));
-		} catch (e) {
-			console.warn('Failed to parse gear: ' + e);
-		}
+			try {
+				this.setGear(eventID, this.sim.lookupEquipmentSpec(EquipmentSpec.fromJson(obj['gear'])));
+			} catch (e) {
+				console.warn('Failed to parse gear: ' + e);
+			}
 
-		try {
-			this.setRace(eventID, obj['race']);
-		} catch (e) {
-			console.warn('Failed to parse race: ' + e);
-		}
+			try {
+				this.setRace(eventID, obj['race']);
+			} catch (e) {
+				console.warn('Failed to parse race: ' + e);
+			}
 
-		try {
-			this.setRotation(eventID, this.specTypeFunctions.rotationFromJson(obj['rotation']));
-		} catch (e) {
-			console.warn('Failed to parse rotation: ' + e);
-		}
+			try {
+				this.setRotation(eventID, this.specTypeFunctions.rotationFromJson(obj['rotation']));
+			} catch (e) {
+				console.warn('Failed to parse rotation: ' + e);
+			}
 
-		try {
-			this.setTalentsString(eventID, obj['talents']);
-		} catch (e) {
-			console.warn('Failed to parse talents: ' + e);
-		}
+			try {
+				this.setTalentsString(eventID, obj['talents']);
+			} catch (e) {
+				console.warn('Failed to parse talents: ' + e);
+			}
 
-		try {
-			this.setSpecOptions(eventID, this.specTypeFunctions.optionsFromJson(obj['specOptions']));
-		} catch (e) {
-			console.warn('Failed to parse spec options: ' + e);
-		}
-		TypedEvent.unfreezeAll();
+			try {
+				this.setSpecOptions(eventID, this.specTypeFunctions.optionsFromJson(obj['specOptions']));
+			} catch (e) {
+				console.warn('Failed to parse spec options: ' + e);
+			}
+		});
   }
 
 	clone(eventID: EventID): Player<SpecType> {
