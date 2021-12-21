@@ -13,7 +13,6 @@ type Druid struct {
 	SelfBuffs
 	Talents proto.DruidTalents
 
-	innervateCD  time.Duration
 	NaturesGrace bool // when true next spellcast is 0.5s faster
 	RebirthUsed  bool
 
@@ -34,16 +33,22 @@ type Druid struct {
 	FaerieFireSpell        core.SimpleSpell
 	faerieFireCastTemplate core.SimpleSpellTemplate
 
-	malorne4p bool // cached since we need to check on every innervate
+	// The target to use innervate on, or nil if not using it.
+	innervateTarget *core.Character
 
-	// Used for accounting for bonus mana expected from future innervates.
-	RemainingInnervateUsages int
-	ExpectedManaPerInnervate float64
+	// Use innervate when target has less than this much mana.
+	innervateManaThreshold float64
+
+	// Used for accounting for bonus mana expected from future innervates, for the innervate target.
+	remainingInnervateUsages int
+	expectedManaPerInnervate float64
+	innervateCD              time.Duration
 }
 
 type SelfBuffs struct {
-	Omen      bool
-	Innervate bool
+	Omen bool
+
+	InnervateTarget proto.RaidTarget
 }
 
 func (druid *Druid) GetCharacter() *core.Character {
@@ -79,8 +84,22 @@ func (druid *Druid) Init(sim *core.Simulation) {
 	druid.insectSwarmCastTemplate = druid.newInsectSwarmTemplate(sim)
 	druid.faerieFireCastTemplate = druid.newFaerieFireTemplate(sim)
 
-	if druid.SelfBuffs.Innervate {
-		druid.ExpectedManaPerInnervate = druid.SpiritManaRegenPerSecond() * 5 * 20
+	innervateTarget := sim.Raid.GetPlayerFromRaidTarget(druid.SelfBuffs.InnervateTarget)
+	if innervateTarget != nil {
+		druid.innervateTarget = innervateTarget.GetCharacter()
+		druid.expectedManaPerInnervate = druid.innervateTarget.SpiritManaRegenPerSecond() * 5 * 20
+
+		if druid.innervateTarget == druid.GetCharacter() {
+			// Threshold can be lower when casting on self because its never mid-cast.
+			druid.innervateManaThreshold = 500
+		} else {
+			druid.innervateManaThreshold = core.InnervateManaThreshold(druid.innervateTarget)
+		}
+
+		druid.innervateCD = core.InnervateCD
+		if ItemSetMalorne.CharacterHasSetBonus(druid.GetCharacter(), 4) {
+			druid.innervateCD -= time.Second * 48
+		}
 	}
 }
 
@@ -93,14 +112,9 @@ func (druid *Druid) Reset(sim *core.Simulation) {
 	druid.wrathSpell = core.SimpleSpell{}
 	druid.RebirthUsed = false
 
-	innervateCD := time.Minute * 6
-	if druid.malorne4p {
-		innervateCD -= time.Second * 48
-	}
-
-	if druid.SelfBuffs.Innervate {
-		druid.RemainingInnervateUsages = int(1 + (core.MaxDuration(0, sim.Duration))/innervateCD)
-		druid.ExpectedBonusMana += druid.ExpectedManaPerInnervate * float64(druid.RemainingInnervateUsages)
+	if druid.innervateTarget != nil {
+		druid.remainingInnervateUsages = int(1 + (core.MaxDuration(0, sim.Duration))/druid.innervateCD)
+		druid.innervateTarget.ExpectedBonusMana += druid.expectedManaPerInnervate * float64(druid.remainingInnervateUsages)
 	}
 }
 
@@ -244,7 +258,6 @@ func New(char core.Character, selfBuffs SelfBuffs, talents proto.DruidTalents) D
 		Character:   char,
 		SelfBuffs:   selfBuffs,
 		Talents:     talents,
-		malorne4p:   ItemSetMalorne.CharacterHasSetBonus(&char, 4),
 		RebirthUsed: false,
 	}
 

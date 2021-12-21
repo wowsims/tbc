@@ -46,6 +46,7 @@ export const DrumsOfRestorationBuff = makeEnumValuePartyBuffInput({spellId:35478
 export const BlessingOfKings = makeBooleanIndividualBuffInput({spellId:25898}, 'blessingOfKings');
 export const BlessingOfWisdom = makeTristateIndividualBuffInput({spellId:27143}, {spellId:20245}, 'blessingOfWisdom');
 export const ManaTideTotem = makeBooleanIndividualBuffInput({spellId:16190}, 'manaTideTotem');
+export const Innervate = makeMultistateIndividualBuffInput({spellId:29166}, 6, 'innervates');
 
 // Debuffs
 export const ImprovedSealOfTheCrusader = makeBooleanDebuffInput({spellId:20337}, 'improvedSealOfTheCrusader');
@@ -195,6 +196,20 @@ function makeTristateIndividualBuffInput(id: ItemOrSpellId, impId: ItemOrSpellId
     id: id,
     states: 3,
     improvedId: impId,
+    changedEvent: (player: Player<any>) => player.buffsChangeEmitter,
+    getValue: (player: Player<any>) => player.getBuffs()[buffsFieldName] as number,
+    setValue: (eventID: EventID, player: Player<any>, newValue: number) => {
+      const newBuffs = player.getBuffs();
+      (newBuffs[buffsFieldName] as number) = newValue;
+      player.setBuffs(eventID, newBuffs);
+    },
+  }
+}
+
+function makeMultistateIndividualBuffInput(id: ItemOrSpellId, numStates: number, buffsFieldName: keyof IndividualBuffs): IndividualSimIconPickerConfig<Player<any>, number> {
+  return {
+    id: id,
+    states: numStates,
     changedEvent: (player: Player<any>) => player.buffsChangeEmitter,
     getValue: (player: Player<any>) => player.getBuffs()[buffsFieldName] as number,
     setValue: (eventID: EventID, player: Player<any>, newValue: number) => {

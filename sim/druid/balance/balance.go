@@ -20,7 +20,9 @@ func NewBalanceDruid(character core.Character, options proto.Player) *BalanceDru
 
 	selfBuffs := druid.SelfBuffs{}
 	if balanceOptions.Options.InnervateTarget != nil {
-		selfBuffs.Innervate = balanceOptions.Options.InnervateTarget.TargetIndex == int32(character.RaidIndex)
+		selfBuffs.InnervateTarget = *balanceOptions.Options.InnervateTarget
+	} else {
+		selfBuffs.InnervateTarget.TargetIndex = -1
 	}
 
 	druid := druid.New(character, selfBuffs, *balanceOptions.Talents)

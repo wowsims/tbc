@@ -191,6 +191,25 @@ func (raid Raid) AddStats(s stats.Stats) {
 	}
 }
 
+func (raid Raid) GetPlayerFromRaidTarget(raidTarget proto.RaidTarget) Agent {
+	raidIndex := raidTarget.TargetIndex
+
+	partyIndex := int(raidIndex / 5)
+	playerIndex := int(raidIndex % 5)
+
+	if partyIndex < 0 || partyIndex >= len(raid.Parties) {
+		return nil
+	}
+
+	party := raid.Parties[partyIndex]
+
+	if playerIndex < 0 || playerIndex >= len(party.Players) {
+		return nil
+	}
+
+	return party.Players[playerIndex]
+}
+
 func (raid *Raid) doneIteration(simDuration time.Duration) {
 	// This needs to happen before the doneIteration calls because they reset
 	// the iteration damage.
