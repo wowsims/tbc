@@ -156,10 +156,6 @@ export class Sim {
 	private async updateCharacterStats(eventID: EventID) {
 		await this.waitForInit();
 
-		// Sometimes a ui change triggers other changes, so waiting a bit makes sure
-		// we get all of them.
-		await wait(10);
-
 		// Capture the current players so we avoid issues if something changes while
 		// request is in-flight.
 		const players = this.raid.getPlayers();
@@ -168,10 +164,12 @@ export class Sim {
 			raid: this.raid.toProto(),
 		}));
 
+		TypedEvent.freezeAll();
 		result.raidStats!.parties
 				.forEach((partyStats, partyIndex) =>
 						partyStats.players.forEach((playerStats, playerIndex) =>
 								players[partyIndex*5 + playerIndex]?.setCurrentStats(eventID, playerStats)));
+		TypedEvent.unfreezeAll();
 	}
 
   async statWeights(player: Player<any>, epStats: Array<Stat>, epReferenceStat: Stat): Promise<StatWeightsResult> {
