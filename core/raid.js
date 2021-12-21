@@ -85,17 +85,17 @@ export class Raid {
         return raidProto;
     }
     fromProto(eventID, proto) {
-        TypedEvent.freezeAll();
-        this.setBuffs(eventID, proto.buffs || RaidBuffs.create());
-        for (let i = 0; i < MAX_NUM_PARTIES; i++) {
-            if (proto.parties[i]) {
-                this.parties[i].fromProto(eventID, proto.parties[i]);
+        TypedEvent.freezeAllAndDo(() => {
+            this.setBuffs(eventID, proto.buffs || RaidBuffs.create());
+            for (let i = 0; i < MAX_NUM_PARTIES; i++) {
+                if (proto.parties[i]) {
+                    this.parties[i].fromProto(eventID, proto.parties[i]);
+                }
+                else {
+                    this.parties[i].clear(eventID);
+                }
             }
-            else {
-                this.parties[i].clear(eventID);
-            }
-        }
-        TypedEvent.unfreezeAll();
+        });
     }
     // Returns JSON representing all the current values.
     toJson() {
@@ -106,23 +106,23 @@ export class Raid {
     }
     // Set all the current values, assumes obj is the same type returned by toJson().
     fromJson(eventID, obj) {
-        TypedEvent.freezeAll();
-        try {
-            this.setBuffs(eventID, RaidBuffs.fromJson(obj['buffs']));
-        }
-        catch (e) {
-            console.warn('Failed to parse raid buffs: ' + e);
-        }
-        if (obj['parties']) {
-            for (let i = 0; i < MAX_NUM_PARTIES; i++) {
-                const partyObj = obj['parties'][i];
-                if (!partyObj) {
-                    this.parties[i].clear(eventID);
-                    continue;
-                }
-                this.parties[i].fromJson(eventID, partyObj);
+        TypedEvent.freezeAllAndDo(() => {
+            try {
+                this.setBuffs(eventID, RaidBuffs.fromJson(obj['buffs']));
             }
-        }
-        TypedEvent.unfreezeAll();
+            catch (e) {
+                console.warn('Failed to parse raid buffs: ' + e);
+            }
+            if (obj['parties']) {
+                for (let i = 0; i < MAX_NUM_PARTIES; i++) {
+                    const partyObj = obj['parties'][i];
+                    if (!partyObj) {
+                        this.parties[i].clear(eventID);
+                        continue;
+                    }
+                    this.parties[i].fromJson(eventID, partyObj);
+                }
+            }
+        });
     }
 }

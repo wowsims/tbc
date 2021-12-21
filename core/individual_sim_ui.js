@@ -94,55 +94,55 @@ export class IndividualSimUI extends SimUI {
     }
     loadSettings() {
         const initEventID = TypedEvent.nextEventID();
-        TypedEvent.freezeAll();
-        let loadedSettings = false;
-        let hash = window.location.hash;
-        if (hash.length > 1) {
-            // Remove leading '#'
-            hash = hash.substring(1);
-            try {
-                let jsonData;
-                if (new URLSearchParams(window.location.search).has('uncompressed')) {
-                    const jsonStr = atob(hash);
-                    jsonData = JSON.parse(jsonStr);
-                }
-                else {
-                    const binary = atob(hash);
-                    const bytes = new Uint8Array(binary.length);
-                    for (let i = 0; i < bytes.length; i++) {
-                        bytes[i] = binary.charCodeAt(i);
+        TypedEvent.freezeAllAndDo(() => {
+            let loadedSettings = false;
+            let hash = window.location.hash;
+            if (hash.length > 1) {
+                // Remove leading '#'
+                hash = hash.substring(1);
+                try {
+                    let jsonData;
+                    if (new URLSearchParams(window.location.search).has('uncompressed')) {
+                        const jsonStr = atob(hash);
+                        jsonData = JSON.parse(jsonStr);
                     }
-                    const jsonStr = pako.inflate(bytes, { to: 'string' });
-                    jsonData = JSON.parse(jsonStr);
+                    else {
+                        const binary = atob(hash);
+                        const bytes = new Uint8Array(binary.length);
+                        for (let i = 0; i < bytes.length; i++) {
+                            bytes[i] = binary.charCodeAt(i);
+                        }
+                        const jsonStr = pako.inflate(bytes, { to: 'string' });
+                        jsonData = JSON.parse(jsonStr);
+                    }
+                    this.sim.fromJson(initEventID, jsonData, this.player.spec);
+                    loadedSettings = true;
                 }
-                this.sim.fromJson(initEventID, jsonData, this.player.spec);
-                loadedSettings = true;
+                catch (e) {
+                    console.warn('Failed to parse settings from window hash: ' + e);
+                }
             }
-            catch (e) {
-                console.warn('Failed to parse settings from window hash: ' + e);
+            window.location.hash = '';
+            const savedSettings = window.localStorage.getItem(this.getSettingsStorageKey());
+            if (!loadedSettings && savedSettings != null) {
+                try {
+                    this.sim.fromJson(initEventID, JSON.parse(savedSettings), this.player.spec);
+                    loadedSettings = true;
+                }
+                catch (e) {
+                    console.warn('Failed to parse saved settings: ' + e);
+                }
             }
-        }
-        window.location.hash = '';
-        const savedSettings = window.localStorage.getItem(this.getSettingsStorageKey());
-        if (!loadedSettings && savedSettings != null) {
-            try {
-                this.sim.fromJson(initEventID, JSON.parse(savedSettings), this.player.spec);
-                loadedSettings = true;
+            if (!loadedSettings) {
+                this.applyDefaults(initEventID);
             }
-            catch (e) {
-                console.warn('Failed to parse saved settings: ' + e);
-            }
-        }
-        if (!loadedSettings) {
-            this.applyDefaults(initEventID);
-        }
-        this.player.setName(initEventID, 'Player');
-        // This needs to go last so it doesn't re-store things as they are initialized.
-        this.changeEmitter.on(eventID => {
-            const jsonStr = JSON.stringify(this.sim.toJson());
-            window.localStorage.setItem(this.getSettingsStorageKey(), jsonStr);
+            this.player.setName(initEventID, 'Player');
+            // This needs to go last so it doesn't re-store things as they are initialized.
+            this.changeEmitter.on(eventID => {
+                const jsonStr = JSON.stringify(this.sim.toJson());
+                window.localStorage.setItem(this.getSettingsStorageKey(), jsonStr);
+            });
         });
-        TypedEvent.unfreezeAll();
     }
     addSidebarComponents() {
         this.raidSimResultsManager = addRaidSimAction(this);

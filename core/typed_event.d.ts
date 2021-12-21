@@ -7,6 +7,8 @@ export interface Listener<T> {
 }
 /** Provides a type-safe event interface. */
 export declare class TypedEvent<T> {
+    private label;
+    constructor(label?: string);
     private listeners;
     private firedEvents;
     private frozenEvents;
@@ -15,7 +17,6 @@ export declare class TypedEvent<T> {
     once(listener: Listener<T>): Disposable;
     emit(eventID: EventID, event: T): void;
     private fireEventInternal;
-    static freezeAll(): void;
-    static unfreezeAll(): void;
+    static freezeAllAndDo(func: () => void): void;
     static nextEventID(): EventID;
 }

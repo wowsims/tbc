@@ -239,12 +239,12 @@ function makeEnumValueConsumeInput(id, consumesFieldName, enumValue, exclusivity
         setValue: (eventID, player, newValue) => {
             const newConsumes = player.getConsumes();
             newConsumes[consumesFieldName] = newValue ? enumValue : 0;
-            TypedEvent.freezeAll();
-            player.setConsumes(eventID, newConsumes);
-            if (onSet) {
-                onSet(eventID, player, newValue);
-            }
-            TypedEvent.unfreezeAll();
+            TypedEvent.freezeAllAndDo(() => {
+                player.setConsumes(eventID, newConsumes);
+                if (onSet) {
+                    onSet(eventID, player, newValue);
+                }
+            });
         },
     };
 }

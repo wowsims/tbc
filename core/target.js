@@ -57,11 +57,11 @@ export class Target {
         });
     }
     fromProto(eventID, proto) {
-        TypedEvent.freezeAll();
-        this.setArmor(eventID, proto.armor);
-        this.setMobType(eventID, proto.mobType);
-        this.setDebuffs(eventID, proto.debuffs || Debuffs.create());
-        TypedEvent.unfreezeAll();
+        TypedEvent.freezeAllAndDo(() => {
+            this.setArmor(eventID, proto.armor);
+            this.setMobType(eventID, proto.mobType);
+            this.setDebuffs(eventID, proto.debuffs || Debuffs.create());
+        });
     }
     toJson() {
         return TargetProto.toJson(this.toProto());

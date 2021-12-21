@@ -276,35 +276,35 @@ export class PlayerPicker extends Component {
             event.preventDefault();
             dragEnterCounter = 0;
             this.rootElem.classList.remove('dragto');
-            if (this.raidPicker.currentDragPlayer == null) {
-                return;
-            }
-            if (this.raidPicker.currentDragPlayerFromIndex == this.raidIndex) {
-                this.raidPicker.clearDragPlayer();
-                return;
-            }
             const eventID = TypedEvent.nextEventID();
-            TypedEvent.freezeAll();
-            const dragType = this.raidPicker.currentDragType;
-            if (this.raidPicker.currentDragPlayerFromIndex != NEW_PLAYER) {
-                const fromPlayerPicker = this.raidPicker.getPlayerPicker(this.raidPicker.currentDragPlayerFromIndex);
-                if (dragType == DragType.Swap) {
-                    fromPlayerPicker.setPlayer(eventID, this.player);
-                    fromPlayerPicker.iconElem.src = this.iconElem.src;
+            TypedEvent.freezeAllAndDo(() => {
+                if (this.raidPicker.currentDragPlayer == null) {
+                    return;
                 }
-                else if (dragType == DragType.Move) {
-                    fromPlayerPicker.setPlayer(eventID, null);
+                if (this.raidPicker.currentDragPlayerFromIndex == this.raidIndex) {
+                    this.raidPicker.clearDragPlayer();
+                    return;
                 }
-            }
-            if (dragType == DragType.Copy) {
-                this.setPlayer(eventID, this.raidPicker.currentDragPlayer.clone(eventID));
-            }
-            else {
-                this.setPlayer(eventID, this.raidPicker.currentDragPlayer);
-            }
-            this.iconElem.src = event.dataTransfer.getData('text/plain');
-            this.raidPicker.clearDragPlayer();
-            TypedEvent.unfreezeAll();
+                const dragType = this.raidPicker.currentDragType;
+                if (this.raidPicker.currentDragPlayerFromIndex != NEW_PLAYER) {
+                    const fromPlayerPicker = this.raidPicker.getPlayerPicker(this.raidPicker.currentDragPlayerFromIndex);
+                    if (dragType == DragType.Swap) {
+                        fromPlayerPicker.setPlayer(eventID, this.player);
+                        fromPlayerPicker.iconElem.src = this.iconElem.src;
+                    }
+                    else if (dragType == DragType.Move) {
+                        fromPlayerPicker.setPlayer(eventID, null);
+                    }
+                }
+                if (dragType == DragType.Copy) {
+                    this.setPlayer(eventID, this.raidPicker.currentDragPlayer.clone(eventID));
+                }
+                else {
+                    this.setPlayer(eventID, this.raidPicker.currentDragPlayer);
+                }
+                this.iconElem.src = event.dataTransfer.getData('text/plain');
+                this.raidPicker.clearDragPlayer();
+            });
         };
         const editElem = this.rootElem.getElementsByClassName('player-edit')[0];
         tippy(editElem, {
@@ -353,16 +353,16 @@ export class PlayerPicker extends Component {
         this.dpsResultElem.textContent = '';
         this.referenceDeltaElem.textContent = '';
         const oldPlayerWasBuffBot = this.player instanceof BuffBot;
-        TypedEvent.freezeAll();
-        this.player = newPlayer;
-        if (newPlayer instanceof BuffBot) {
-            this.partyPicker.party.setPlayer(eventID, this.index, null);
-            newPlayer.setRaidIndex(eventID, this.raidIndex);
-        }
-        else {
-            this.partyPicker.party.setPlayer(eventID, this.index, newPlayer);
-        }
-        TypedEvent.unfreezeAll();
+        TypedEvent.freezeAllAndDo(() => {
+            this.player = newPlayer;
+            if (newPlayer instanceof BuffBot) {
+                this.partyPicker.party.setPlayer(eventID, this.index, null);
+                newPlayer.setRaidIndex(eventID, this.raidIndex);
+            }
+            else {
+                this.partyPicker.party.setPlayer(eventID, this.index, newPlayer);
+            }
+        });
         this.update();
     }
     update() {
@@ -490,27 +490,27 @@ class NewPlayerPicker extends Component {
                 presetElem.setAttribute('draggable', 'true');
                 presetElem.ondragstart = event => {
                     const eventID = TypedEvent.nextEventID();
-                    TypedEvent.freezeAll();
-                    const dragImage = new Image();
-                    dragImage.src = matchingPreset.iconUrl;
-                    event.dataTransfer.setDragImage(dragImage, 30, 30);
-                    event.dataTransfer.setData("text/plain", matchingPreset.iconUrl);
-                    event.dataTransfer.dropEffect = 'copy';
-                    const newPlayer = new Player(matchingPreset.spec, this.raidPicker.raid.sim);
-                    newPlayer.setRace(eventID, matchingPreset.defaultFactionRaces[this.raidPicker.getCurrentFaction()]);
-                    newPlayer.setRotation(eventID, matchingPreset.rotation);
-                    newPlayer.setTalentsString(eventID, matchingPreset.talents);
-                    // TalentPicker needed to convert from talents string into talents proto.
-                    newTalentsPicker(newPlayer.spec, document.createElement('div'), newPlayer);
-                    newPlayer.setSpecOptions(eventID, matchingPreset.specOptions);
-                    newPlayer.setConsumes(eventID, matchingPreset.consumes);
-                    newPlayer.setName(eventID, matchingPreset.defaultName);
-                    // Need to wait because the gear might not be loaded yet.
-                    this.raidPicker.raid.sim.waitForInit().then(() => {
-                        newPlayer.setGear(eventID, this.raidPicker.raid.sim.lookupEquipmentSpec(matchingPreset.defaultGear[this.raidPicker.getCurrentFaction()][this.raidPicker.getCurrentPhase()]));
+                    TypedEvent.freezeAllAndDo(() => {
+                        const dragImage = new Image();
+                        dragImage.src = matchingPreset.iconUrl;
+                        event.dataTransfer.setDragImage(dragImage, 30, 30);
+                        event.dataTransfer.setData("text/plain", matchingPreset.iconUrl);
+                        event.dataTransfer.dropEffect = 'copy';
+                        const newPlayer = new Player(matchingPreset.spec, this.raidPicker.raid.sim);
+                        newPlayer.setRace(eventID, matchingPreset.defaultFactionRaces[this.raidPicker.getCurrentFaction()]);
+                        newPlayer.setRotation(eventID, matchingPreset.rotation);
+                        newPlayer.setTalentsString(eventID, matchingPreset.talents);
+                        // TalentPicker needed to convert from talents string into talents proto.
+                        newTalentsPicker(newPlayer.spec, document.createElement('div'), newPlayer);
+                        newPlayer.setSpecOptions(eventID, matchingPreset.specOptions);
+                        newPlayer.setConsumes(eventID, matchingPreset.consumes);
+                        newPlayer.setName(eventID, matchingPreset.defaultName);
+                        // Need to wait because the gear might not be loaded yet.
+                        this.raidPicker.raid.sim.waitForInit().then(() => {
+                            newPlayer.setGear(eventID, this.raidPicker.raid.sim.lookupEquipmentSpec(matchingPreset.defaultGear[this.raidPicker.getCurrentFaction()][this.raidPicker.getCurrentPhase()]));
+                        });
+                        this.raidPicker.setDragPlayer(newPlayer, NEW_PLAYER, DragType.New);
                     });
-                    this.raidPicker.setDragPlayer(newPlayer, NEW_PLAYER, DragType.New);
-                    TypedEvent.unfreezeAll();
                 };
             });
         });

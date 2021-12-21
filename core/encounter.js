@@ -54,13 +54,13 @@ export class Encounter {
         return proto;
     }
     fromProto(eventID, proto) {
-        TypedEvent.freezeAll();
-        this.setDuration(eventID, proto.duration);
-        this.setNumTargets(eventID, proto.targets.length);
-        if (proto.targets.length > 0) {
-            this.primaryTarget.fromProto(eventID, proto.targets[0]);
-        }
-        TypedEvent.unfreezeAll();
+        TypedEvent.freezeAllAndDo(() => {
+            this.setDuration(eventID, proto.duration);
+            this.setNumTargets(eventID, proto.targets.length);
+            if (proto.targets.length > 0) {
+                this.primaryTarget.fromProto(eventID, proto.targets[0]);
+            }
+        });
     }
     // Returns JSON representing all the current values.
     toJson() {
@@ -72,21 +72,21 @@ export class Encounter {
     }
     // Set all the current values, assumes obj is the same type returned by toJson().
     fromJson(eventID, obj) {
-        TypedEvent.freezeAll();
-        const parsedDuration = parseInt(obj['duration']);
-        if (!isNaN(parsedDuration) && parsedDuration != 0) {
-            this.setDuration(eventID, parsedDuration);
-        }
-        const parsedNumTargets = parseInt(obj['numTargets']);
-        if (!isNaN(parsedNumTargets) && parsedNumTargets != 0) {
-            this.setNumTargets(eventID, parsedNumTargets);
-        }
-        try {
-            this.primaryTarget.fromJson(eventID, obj['primaryTarget']);
-        }
-        catch (e) {
-            console.warn('Failed to parse debuffs: ' + e);
-        }
-        TypedEvent.unfreezeAll();
+        TypedEvent.freezeAllAndDo(() => {
+            const parsedDuration = parseInt(obj['duration']);
+            if (!isNaN(parsedDuration) && parsedDuration != 0) {
+                this.setDuration(eventID, parsedDuration);
+            }
+            const parsedNumTargets = parseInt(obj['numTargets']);
+            if (!isNaN(parsedNumTargets) && parsedNumTargets != 0) {
+                this.setNumTargets(eventID, parsedNumTargets);
+            }
+            try {
+                this.primaryTarget.fromJson(eventID, obj['primaryTarget']);
+            }
+            catch (e) {
+                console.warn('Failed to parse debuffs: ' + e);
+            }
+        });
     }
 }

@@ -97,10 +97,10 @@ export class Sim {
         const result = await this.workerPool.computeStats(ComputeStatsRequest.create({
             raid: this.raid.toProto(),
         }));
-        TypedEvent.freezeAll();
-        result.raidStats.parties
-            .forEach((partyStats, partyIndex) => partyStats.players.forEach((playerStats, playerIndex) => players[partyIndex * 5 + playerIndex]?.setCurrentStats(eventID, playerStats)));
-        TypedEvent.unfreezeAll();
+        TypedEvent.freezeAllAndDo(() => {
+            result.raidStats.parties
+                .forEach((partyStats, partyIndex) => partyStats.players.forEach((playerStats, playerIndex) => players[partyIndex * 5 + playerIndex]?.setCurrentStats(eventID, playerStats)));
+        });
     }
     async statWeights(player, epStats, epReferenceStat) {
         if (this.raid.isEmpty()) {
@@ -205,33 +205,33 @@ export class Sim {
     }
     // Set all the current values, assumes obj is the same type returned by toJson().
     fromJson(eventID, obj, spec) {
-        TypedEvent.freezeAll();
-        // For legacy format. Do not remove this until 2022/01/05 (1 month).
-        if (obj['sim']) {
-            if (!obj['raid']) {
-                obj['raid'] = {
-                    'parties': [
-                        {
-                            'players': [
-                                {
-                                    'spec': spec,
-                                    'player': obj['player'],
-                                },
-                            ],
-                            'buffs': obj['sim']['partyBuffs'],
-                        },
-                    ],
-                    'buffs': obj['sim']['raidBuffs'],
-                };
-                obj['raid']['parties'][0]['players'][0]['player']['buffs'] = obj['sim']['individualBuffs'];
+        TypedEvent.freezeAllAndDo(() => {
+            // For legacy format. Do not remove this until 2022/01/05 (1 month).
+            if (obj['sim']) {
+                if (!obj['raid']) {
+                    obj['raid'] = {
+                        'parties': [
+                            {
+                                'players': [
+                                    {
+                                        'spec': spec,
+                                        'player': obj['player'],
+                                    },
+                                ],
+                                'buffs': obj['sim']['partyBuffs'],
+                            },
+                        ],
+                        'buffs': obj['sim']['raidBuffs'],
+                    };
+                    obj['raid']['parties'][0]['players'][0]['player']['buffs'] = obj['sim']['individualBuffs'];
+                }
             }
-        }
-        if (obj['raid']) {
-            this.raid.fromJson(eventID, obj['raid']);
-        }
-        if (obj['encounter']) {
-            this.encounter.fromJson(eventID, obj['encounter']);
-        }
-        TypedEvent.unfreezeAll();
+            if (obj['raid']) {
+                this.raid.fromJson(eventID, obj['raid']);
+            }
+            if (obj['encounter']) {
+                this.encounter.fromJson(eventID, obj['encounter']);
+            }
+        });
     }
 }

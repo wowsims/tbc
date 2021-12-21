@@ -57,7 +57,8 @@ export class RaidSimResultsManager {
         const simReferenceSetButton = this.simUI.resultsContentElem.getElementsByClassName('results-sim-set-reference')[0];
         simReferenceSetButton.addEventListener('click', event => {
             this.referenceData = this.currentData;
-            this.updateReference(TypedEvent.nextEventID());
+            this.referenceChangeEmitter.emit(TypedEvent.nextEventID());
+            this.updateReference();
         });
         tippy(simReferenceSetButton, {
             'content': 'Use as reference',
@@ -65,18 +66,19 @@ export class RaidSimResultsManager {
         });
         const simReferenceSwapButton = this.simUI.resultsContentElem.getElementsByClassName('results-sim-reference-swap')[0];
         simReferenceSwapButton.addEventListener('click', event => {
-            if (this.currentData && this.referenceData) {
-                const eventID = TypedEvent.nextEventID();
-                TypedEvent.freezeAll();
-                const tmpData = this.currentData;
-                this.currentData = this.referenceData;
-                this.referenceData = tmpData;
-                this.simUI.sim.raid.fromProto(eventID, this.currentData.raidProto);
-                this.simUI.sim.encounter.fromProto(eventID, this.currentData.encounterProto);
-                this.setSimResult(eventID, this.currentData.simResult);
-                this.updateReference(eventID);
-                TypedEvent.unfreezeAll();
-            }
+            TypedEvent.freezeAllAndDo(() => {
+                if (this.currentData && this.referenceData) {
+                    const swapEventID = TypedEvent.nextEventID();
+                    const tmpData = this.currentData;
+                    this.currentData = this.referenceData;
+                    this.referenceData = tmpData;
+                    this.simUI.sim.raid.fromProto(swapEventID, this.currentData.raidProto);
+                    this.simUI.sim.encounter.fromProto(swapEventID, this.currentData.encounterProto);
+                    this.setSimResult(swapEventID, this.currentData.simResult);
+                    this.referenceChangeEmitter.emit(swapEventID);
+                    this.updateReference();
+                }
+            });
         });
         tippy(simReferenceSwapButton, {
             'content': 'Swap reference with current',
@@ -85,16 +87,16 @@ export class RaidSimResultsManager {
         const simReferenceDeleteButton = this.simUI.resultsContentElem.getElementsByClassName('results-sim-reference-delete')[0];
         simReferenceDeleteButton.addEventListener('click', event => {
             this.referenceData = null;
-            this.updateReference(TypedEvent.nextEventID());
+            this.referenceChangeEmitter.emit(TypedEvent.nextEventID());
+            this.updateReference();
         });
         tippy(simReferenceDeleteButton, {
             'content': 'Remove reference',
             'allowHTML': true,
         });
-        this.updateReference(eventID);
+        this.updateReference();
     }
-    updateReference(eventID) {
-        this.referenceChangeEmitter.emit(eventID);
+    updateReference() {
         const simReferenceElem = this.simUI.resultsContentElem.getElementsByClassName('results-sim-reference')[0];
         const simReferenceDiffElem = this.simUI.resultsContentElem.getElementsByClassName('results-sim-reference-diff')[0];
         if (!this.referenceData || !this.currentData) {
