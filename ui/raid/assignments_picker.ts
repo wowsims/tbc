@@ -170,30 +170,28 @@ export class InnervatesPicker extends Component {
 		// TODO: This needs to somehow reference the 'parent' eventID so that undo
 		// actions undo them together.
 		const eventID = TypedEvent.nextEventID();
-		TypedEvent.freezeAll();
+		TypedEvent.freezeAllAndDo(() => {
+			oldTargetPickers.forEach((targetPicker, i) => {
+				const oldPlayerOrBot = targetPicker.playerOrBot;
+				const oldPlayerTarget = oldPlayerTargets[i];
+				const newPlayersAndBots = this.raidSimUI.getPlayersAndBuffBots();
 
-		oldTargetPickers.forEach((targetPicker, i) => {
-			const oldPlayerOrBot = targetPicker.playerOrBot;
-			const oldPlayerTarget = oldPlayerTargets[i];
-			const newPlayersAndBots = this.raidSimUI.getPlayersAndBuffBots();
+				if (!newPlayersAndBots.includes(oldPlayerOrBot))
+					return;
 
-			if (!newPlayersAndBots.includes(oldPlayerOrBot))
-				return;
+				if (!oldPlayerTarget || !newPlayersAndBots.includes(oldPlayerTarget))
+					return;
 
-			if (!oldPlayerTarget || !newPlayersAndBots.includes(oldPlayerTarget))
-				return;
+				const raidTarget = newRaidTarget(oldPlayerTarget.getRaidIndex());
 
-			const raidTarget = newRaidTarget(oldPlayerTarget.getRaidIndex());
-
-			if (oldPlayerOrBot instanceof Player) {
-				const newOptions = oldPlayerOrBot.getSpecOptions() as DruidOptions;
-				newOptions.innervateTarget = raidTarget;
-				oldPlayerOrBot.setSpecOptions(eventID, newOptions);
-			} else {
-				oldPlayerOrBot.setInnervateAssignment(eventID, raidTarget);
-			}
+				if (oldPlayerOrBot instanceof Player) {
+					const newOptions = oldPlayerOrBot.getSpecOptions() as DruidOptions;
+					newOptions.innervateTarget = raidTarget;
+					oldPlayerOrBot.setSpecOptions(eventID, newOptions);
+				} else {
+					oldPlayerOrBot.setInnervateAssignment(eventID, raidTarget);
+				}
+			});
 		});
-
-		TypedEvent.unfreezeAll();
 	}
 }

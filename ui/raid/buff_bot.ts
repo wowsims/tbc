@@ -70,10 +70,10 @@ export class BuffBot {
 	setRaidIndex(eventID: EventID, newRaidIndex: number) {
 		if (newRaidIndex != this.raidIndex) {
 			this.raidIndex = newRaidIndex;
-			TypedEvent.freezeAll();
-			this.raidIndexChangeEmitter.emit(eventID);
-			this.sim.raid.compChangeEmitter.emit(eventID);
-			TypedEvent.unfreezeAll();
+			TypedEvent.freezeAllAndDo(() => {
+				this.raidIndexChangeEmitter.emit(eventID);
+				this.sim.raid.compChangeEmitter.emit(eventID);
+			});
 		}
 	}
 
@@ -123,11 +123,11 @@ export class BuffBot {
 		}
 		this.settings = settings;
 		this.updateSettings();
-		TypedEvent.freezeAll();
-		this.setRaidIndex(eventID, proto.raidIndex);
-		this.setInnervateAssignment(eventID, proto.innervateAssignment || emptyRaidTarget());
-		this.setPowerInfusionAssignment(eventID, proto.powerInfusionAssignment || emptyRaidTarget());
-		TypedEvent.unfreezeAll();
+		TypedEvent.freezeAllAndDo(() => {
+			this.setRaidIndex(eventID, proto.raidIndex);
+			this.setInnervateAssignment(eventID, proto.innervateAssignment || emptyRaidTarget());
+			this.setPowerInfusionAssignment(eventID, proto.powerInfusionAssignment || emptyRaidTarget());
+		});
 	}
 
 	clone(eventID: EventID): BuffBot {

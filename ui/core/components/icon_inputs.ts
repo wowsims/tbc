@@ -275,12 +275,12 @@ function makeEnumValueConsumeInput(id: ItemOrSpellId, consumesFieldName: keyof C
     setValue: (eventID: EventID, player: Player<any>, newValue: boolean) => {
 			const newConsumes = player.getConsumes();
 			(newConsumes[consumesFieldName] as number) = newValue ? enumValue : 0;
-			TypedEvent.freezeAll();
-			player.setConsumes(eventID, newConsumes);
-			if (onSet) {
-				onSet(eventID, player, newValue);
-			}
-			TypedEvent.unfreezeAll();
+			TypedEvent.freezeAllAndDo(() => {
+				player.setConsumes(eventID, newConsumes);
+				if (onSet) {
+					onSet(eventID, player, newValue);
+				}
+			});
     },
   }
 }

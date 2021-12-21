@@ -13,6 +13,11 @@ export interface Listener<T> {
   (eventID: EventID, event: T): any;
 }
 
+interface FiredEventData {
+	eventID: EventID,
+	error: Error,
+}
+
 interface FrozenEventData<T> {
 	eventID: EventID,
 	event: T,
@@ -20,12 +25,19 @@ interface FrozenEventData<T> {
 
 /** Provides a type-safe event interface. */
 export class TypedEvent<T> {
+	// Optional label to help debug.
+	private label: string;
+
+	constructor(label?: string) {
+		this.label = label || '';
+	}
+
   private listeners: Array<Listener<T>> = [];
 
-	// The IDs of events which have already been fired from this TypedEvent.
-	private firedEvents: Array<EventID> = [];
+	// The events which have already been fired from this TypedEvent.
+	private firedEvents: Array<FiredEventData> = [];
 
-	// IDs for currently frozen events pending on this TypedEvent. See freezeAll()
+	// Currently frozen events pending on this TypedEvent. See freezeAll()
 	// for more details.
 	private frozenEvents: Array<FrozenEventData<T>> = [];
 
@@ -56,13 +68,17 @@ export class TypedEvent<T> {
   }
 
   emit(eventID: EventID, event: T) {
-		if (this.firedEvents.includes(eventID)) {
+		const originalEvent = this.firedEvents.find(fe => fe.eventID == eventID);
+		if (originalEvent) {
 			if (!thawing) {
-				console.warn('EventID collision outside of thawing!');
+				console.warn('EventID collision outside of thawing, original event: ' + (originalEvent.error.stack || originalEvent.error));
 			}
 			return;
 		}
-		this.firedEvents.push(eventID);
+		this.firedEvents.push({
+			eventID: eventID,
+			error: new Error('Original event'),
+		});
 
 		if (freezeCount > 0) {
 			if (this.frozenEvents.length == 0) {
@@ -81,38 +97,41 @@ export class TypedEvent<T> {
 		this.listeners.forEach(listener => listener(eventID, event));
 	}
 
+	// Executes the provided callback while all TypedEvents are frozen.
 	// Freezes all TypedEvent objects so that new calls to emit() do not fire the event.
-	// Instead, the events will be held until the next call to unfreezeAll(), at which point
-	// all events will fire all of the events that were frozen.
+	// Instead, the events will be held until the execution is finishd, at which point
+	// all TypedEvents will fire all of the events that were frozen.
 	//
 	// This is used when a single user action activates multiple separate events, to ensure
 	// none of them fire until all changes have been applied.
 	//
-	// All usages of this function should be followed by a call to unfreezeAll()
-	// within the same scope. These two functions are very similar to a locking
-	// mechanism.
-	static freezeAll() {
+	// This function is very similar to a locking mechanism.
+	static freezeAllAndDo(func: () => void) {
 		freezeCount++;
-	}
 
-	static unfreezeAll() {
-		freezeCount--;
-		if (freezeCount > 0) {
-			// Don't do anything until things are fully unfrozen.
-			return;
+		try {
+			func();
+		} catch (e) {
+			console.error('Caught error in freezeAllAndDo: ' + e);
+		} finally {
+			freezeCount--;
+			if (freezeCount > 0) {
+				// Don't do anything until things are fully unfrozen.
+				return;
+			}
+
+			thawing = true;
+			const typedEvents = frozenTypedEvents.slice();
+			frozenTypedEvents = [];
+
+			typedEvents.forEach(typedEvent => {
+				const frozenEvents = typedEvent.frozenEvents.slice();
+				typedEvent.frozenEvents = [];
+
+				frozenEvents.forEach(frozenEvent => typedEvent.fireEventInternal(frozenEvent.eventID, frozenEvent.event));
+			});
+			thawing = false;
 		}
-
-		thawing = true;
-		const typedEvents = frozenTypedEvents.slice();
-		frozenTypedEvents = [];
-
-		typedEvents.forEach(typedEvent => {
-			const frozenEvents = typedEvent.frozenEvents.slice();
-			typedEvent.frozenEvents = [];
-
-			frozenEvents.forEach(frozenEvent => typedEvent.fireEventInternal(frozenEvent.eventID, frozenEvent.event));
-		});
-		thawing = false;
 	}
 
 	static nextEventID(): EventID {
