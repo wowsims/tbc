@@ -1,5 +1,5 @@
 import { Spec } from '/tbc/core/proto/common.js';
-import { TypedEvent } from '/tbc/core/typed_event.js';
+import { EventID, TypedEvent } from '/tbc/core/typed_event.js';
 
 import { Component } from '/tbc/core/components/component.js';
 
@@ -11,7 +11,7 @@ export type SavedDataManagerConfig<ModObject, T> = {
   changeEmitters: Array<TypedEvent<any>>,
   equals: (a: T, b: T) => boolean;
   getData: (modObject: ModObject) => T;
-  setData: (modObject: ModObject, data: T) => void;
+  setData: (eventID: EventID, modObject: ModObject, data: T) => void;
   toJson: (a: T) => any;
   fromJson: (obj: any) => T;
 };
@@ -118,7 +118,7 @@ export class SavedDataManager<ModObject, T> extends Component {
     `;
 
     dataElem.addEventListener('click', event => {
-      this.config.setData(this.modObject, config.data);
+      this.config.setData(TypedEvent.nextEventID(), this.modObject, config.data);
       this.saveInput.value = config.name;
     });
 

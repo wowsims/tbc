@@ -6,7 +6,7 @@ import { classColors } from '/tbc/core/proto_utils/utils.js';
 import { emptyRaidTarget } from '/tbc/core/proto_utils/utils.js';
 import { specToClass } from '/tbc/core/proto_utils/utils.js';
 import { Sim } from '/tbc/core/sim.js';
-import { TypedEvent } from '/tbc/core/typed_event.js';
+import { EventID, TypedEvent } from '/tbc/core/typed_event.js';
 import { BuffBotSettings, buffBotPresets } from './presets.js';
 
 export const NO_ASSIGNMENT = -1;
@@ -42,9 +42,9 @@ export class BuffBot {
       this.raidIndexChangeEmitter,
       this.innervateAssignmentChangeEmitter,
       this.powerInfusionAssignmentChangeEmitter,
-    ].forEach(emitter => emitter.on(() => this.changeEmitter.emit()));
+    ].forEach(emitter => emitter.on(eventID => this.changeEmitter.emit(eventID)));
 
-		this.changeEmitter.on(() => sim.raid.getParty(this.getPartyIndex()).changeEmitter.emit());
+		this.changeEmitter.on(eventID => sim.raid.getParty(this.getPartyIndex()).changeEmitter.emit(eventID));
 	}
 
 	private updateSettings() {
@@ -67,11 +67,13 @@ export class BuffBot {
 	getRaidIndex(): number {
 		return this.raidIndex;
 	}
-	setRaidIndex(newRaidIndex: number) {
+	setRaidIndex(eventID: EventID, newRaidIndex: number) {
 		if (newRaidIndex != this.raidIndex) {
 			this.raidIndex = newRaidIndex;
-			this.raidIndexChangeEmitter.emit();
-			this.sim.raid.compChangeEmitter.emit();
+			TypedEvent.freezeAll();
+			this.raidIndexChangeEmitter.emit(eventID);
+			this.sim.raid.compChangeEmitter.emit(eventID);
+			TypedEvent.unfreezeAll();
 		}
 	}
 
@@ -83,26 +85,26 @@ export class BuffBot {
 		// Defensive copy.
 		return RaidTarget.clone(this.innervateAssignment);
 	}
-	setInnervateAssignment(newInnervateAssignment: RaidTarget) {
+	setInnervateAssignment(eventID: EventID, newInnervateAssignment: RaidTarget) {
 		if (RaidTarget.equals(newInnervateAssignment, this.innervateAssignment))
 			return;
 
 		// Defensive copy.
 		this.innervateAssignment = RaidTarget.clone(newInnervateAssignment);
-		this.innervateAssignmentChangeEmitter.emit();
+		this.innervateAssignmentChangeEmitter.emit(eventID);
 	}
 
 	getPowerInfusionAssignment(): RaidTarget {
 		// Defensive copy.
 		return RaidTarget.clone(this.powerInfusionAssignment);
 	}
-	setPowerInfusionAssignment(newPowerInfusionAssignment: RaidTarget) {
+	setPowerInfusionAssignment(eventID: EventID, newPowerInfusionAssignment: RaidTarget) {
 		if (RaidTarget.equals(newPowerInfusionAssignment, this.powerInfusionAssignment))
 			return;
 
 		// Defensive copy.
 		this.powerInfusionAssignment = RaidTarget.clone(newPowerInfusionAssignment);
-		this.powerInfusionAssignmentChangeEmitter.emit();
+		this.powerInfusionAssignmentChangeEmitter.emit(eventID);
 	}
 
 	toProto(): BuffBotProto {
@@ -114,21 +116,23 @@ export class BuffBot {
 		});
 	}
 
-	fromProto(proto: BuffBotProto) {
+	fromProto(eventID: EventID, proto: BuffBotProto) {
 		const settings = buffBotPresets.find(preset => preset.buffBotId == proto.id);
 		if (!settings) {
 			throw new Error('No buff bot config with id \'' + proto.id + '\'!');
 		}
 		this.settings = settings;
 		this.updateSettings();
-		this.setRaidIndex(proto.raidIndex);
-		this.setInnervateAssignment(proto.innervateAssignment || emptyRaidTarget());
-		this.setPowerInfusionAssignment(proto.powerInfusionAssignment || emptyRaidTarget());
+		TypedEvent.freezeAll();
+		this.setRaidIndex(eventID, proto.raidIndex);
+		this.setInnervateAssignment(eventID, proto.innervateAssignment || emptyRaidTarget());
+		this.setPowerInfusionAssignment(eventID, proto.powerInfusionAssignment || emptyRaidTarget());
+		TypedEvent.unfreezeAll();
 	}
 
-	clone(): BuffBot {
+	clone(eventID: EventID): BuffBot {
 		const newBuffBot = new BuffBot(this.settings.buffBotId, this.sim);
-		newBuffBot.fromProto(this.toProto());
+		newBuffBot.fromProto(eventID, this.toProto());
 		return newBuffBot;
 	}
 }

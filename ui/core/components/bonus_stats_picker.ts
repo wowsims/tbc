@@ -2,6 +2,7 @@ import { Stat } from '/tbc/core/proto/common.js';
 import { statNames } from '/tbc/core/proto_utils/names.js';
 import { Stats } from '/tbc/core/proto_utils/stats.js';
 import { Player } from '/tbc/core/player.js';
+import { EventID, TypedEvent } from '/tbc/core/typed_event.js';
 
 import { Component } from './component.js';
 import { NumberPicker } from './number_picker.js';
@@ -29,9 +30,9 @@ export class BonusStatsPicker extends Component {
       label: statNames[stat],
       changedEvent: (player: Player<any>) => player.bonusStatsChangeEmitter,
       getValue: (player: Player<any>) => player.getBonusStats().getStat(stat),
-      setValue: (player: Player<any>, newValue: number) => {
+      setValue: (eventID: EventID, player: Player<any>, newValue: number) => {
         const bonusStats = player.getBonusStats().withStat(stat, newValue);
-        player.setBonusStats(bonusStats);
+        player.setBonusStats(eventID, bonusStats);
       },
     }));
 

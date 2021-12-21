@@ -2,7 +2,7 @@ import { Encounter as EncounterProto } from '/tbc/core/proto/common.js';
 import { Target } from '/tbc/core/target.js';
 
 import { Sim } from './sim.js';
-import { TypedEvent } from './typed_event.js';
+import { EventID, TypedEvent } from './typed_event.js';
 
 // Manages all the settings for an Encounter.
 export class Encounter {
@@ -28,29 +28,29 @@ export class Encounter {
       this.durationChangeEmitter,
       this.numTargetsChangeEmitter,
       this.primaryTarget.changeEmitter,
-    ].forEach(emitter => emitter.on(() => this.changeEmitter.emit()));
+    ].forEach(emitter => emitter.on(eventID => this.changeEmitter.emit(eventID)));
   }
   
   getDuration(): number {
     return this.duration;
   }
-  setDuration(newDuration: number) {
+  setDuration(eventID: EventID, newDuration: number) {
     if (newDuration == this.duration)
 			return;
 
 		this.duration = newDuration;
-		this.durationChangeEmitter.emit();
+		this.durationChangeEmitter.emit(eventID);
   }
   
   getNumTargets(): number {
     return this.numTargets;
   }
-  setNumTargets(newNumTargets: number) {
+  setNumTargets(eventID: EventID, newNumTargets: number) {
     if (newNumTargets == this.numTargets)
 			return;
 
 		this.numTargets = newNumTargets;
-		this.numTargetsChangeEmitter.emit();
+		this.numTargetsChangeEmitter.emit(eventID);
   }
 
 	setModifyEncounterProto(newModFn: (encounterProto: EncounterProto) => void) {
@@ -74,13 +74,15 @@ export class Encounter {
 		return proto;
 	}
 
-	fromProto(proto: EncounterProto) {
-		this.setDuration(proto.duration);
-		this.setNumTargets(proto.targets.length);
+	fromProto(eventID: EventID, proto: EncounterProto) {
+		TypedEvent.freezeAll();
+		this.setDuration(eventID, proto.duration);
+		this.setNumTargets(eventID, proto.targets.length);
 
 		if (proto.targets.length > 0) {
-			this.primaryTarget.fromProto(proto.targets[0]);
+			this.primaryTarget.fromProto(eventID, proto.targets[0]);
 		}
+		TypedEvent.unfreezeAll();
 	}
 
   // Returns JSON representing all the current values.
@@ -93,21 +95,23 @@ export class Encounter {
   }
 
   // Set all the current values, assumes obj is the same type returned by toJson().
-  fromJson(obj: any) {
+  fromJson(eventID: EventID, obj: any) {
+		TypedEvent.freezeAll();
 		const parsedDuration = parseInt(obj['duration']);
 		if (!isNaN(parsedDuration) && parsedDuration != 0) {
-			this.setDuration(parsedDuration);
+			this.setDuration(eventID, parsedDuration);
 		}
 
 		const parsedNumTargets = parseInt(obj['numTargets']);
 		if (!isNaN(parsedNumTargets) && parsedNumTargets != 0) {
-			this.setNumTargets(parsedNumTargets);
+			this.setNumTargets(eventID, parsedNumTargets);
 		}
 
 		try {
-			this.primaryTarget.fromJson(obj['primaryTarget']);
+			this.primaryTarget.fromJson(eventID, obj['primaryTarget']);
 		} catch (e) {
 			console.warn('Failed to parse debuffs: ' + e);
 		}
+		TypedEvent.unfreezeAll();
   }
 }

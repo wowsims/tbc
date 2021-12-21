@@ -5,6 +5,7 @@ import { Sim } from '/tbc/core/sim.js';
 import { Target } from '/tbc/core/target.js';
 import { SimUI } from '/tbc/core/sim_ui.js';
 import { IndividualSimUI } from '/tbc/core/individual_sim_ui.js';
+import { EventID, TypedEvent } from '/tbc/core/typed_event.js';
 
 export function makePhaseSelector(parent: HTMLElement, sim: Sim): EnumPicker<Sim> {
 	return new EnumPicker<Sim>(parent, sim, {
@@ -20,8 +21,8 @@ export function makePhaseSelector(parent: HTMLElement, sim: Sim): EnumPicker<Sim
 		],
 		changedEvent: (sim: Sim) => sim.phaseChangeEmitter,
 		getValue: (sim: Sim) => sim.getPhase(),
-		setValue: (sim: Sim, newValue: number) => {
-			sim.setPhase(newValue);
+		setValue: (eventID: EventID, sim: Sim, newValue: number) => {
+			sim.setPhase(eventID, newValue);
 		},
 	});
 }
@@ -42,10 +43,10 @@ export const StartingPotion = {
 		],
 		changedEvent: (player: Player<any>) => player.consumesChangeEmitter,
 		getValue: (player: Player<any>) => player.getConsumes().startingPotion,
-		setValue: (player: Player<any>, newValue: number) => {
+		setValue: (eventID: EventID, player: Player<any>, newValue: number) => {
 			const newConsumes = player.getConsumes();
 			newConsumes.startingPotion = newValue;
-			player.setConsumes(newConsumes);
+			player.setConsumes(eventID, newConsumes);
 		},
 	},
 };
@@ -61,10 +62,10 @@ export const NumStartingPotions = {
 		labelTooltip: 'The number of starting potions to use before going back to the default potion.',
 		changedEvent: (player: Player<any>) => player.consumesChangeEmitter,
 		getValue: (player: Player<any>) => player.getConsumes().numStartingPotions,
-		setValue: (player: Player<any>, newValue: number) => {
+		setValue: (eventID: EventID, player: Player<any>, newValue: number) => {
 			const newConsumes = player.getConsumes();
 			newConsumes.numStartingPotions = newValue;
-			player.setConsumes(newConsumes);
+			player.setConsumes(eventID, newConsumes);
 		},
 		enableWhen: (player: Player<any>) => player.getConsumes().startingPotion != Potions.UnknownPotion,
 	},
@@ -82,10 +83,10 @@ export const ShadowPriestDPS = {
     label: 'Shadow Priest DPS',
     changedEvent: (player: Player<any>) => player.buffsChangeEmitter,
     getValue: (player: Player<any>) => player.getBuffs().shadowPriestDps,
-    setValue: (player: Player<any>, newValue: number) => {
+    setValue: (eventID: EventID, player: Player<any>, newValue: number) => {
       const buffs = player.getBuffs();
       buffs.shadowPriestDps = newValue;
-      player.setBuffs(buffs);
+      player.setBuffs(eventID, buffs);
     },
   },
 };
@@ -101,10 +102,10 @@ export const ISBUptime = {
 		label: 'ISB Uptime %',
 		changedEvent: (target: Target) => target.debuffsChangeEmitter,
 		getValue: (target: Target) => Math.round(target.getDebuffs().isbUptime*100),
-		setValue: (target: Target, newValue: number) => {
+		setValue: (eventID: EventID, target: Target, newValue: number) => {
 			const newDebuffs = target.getDebuffs();
 			newDebuffs.isbUptime = newValue/100;
-			target.setDebuffs(newDebuffs);
+			target.setDebuffs(eventID, newDebuffs);
 		},
 	},
 };

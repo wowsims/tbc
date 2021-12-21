@@ -5,7 +5,7 @@ import { specToLocalStorageKey } from '/tbc/core/proto_utils/utils.js';
 
 import { Sim } from './sim.js';
 import { Target } from './target.js';
-import { TypedEvent } from './typed_event.js';
+import { EventID, TypedEvent } from './typed_event.js';
 
 declare var tippy: any;
 declare var pako: any;
@@ -32,7 +32,7 @@ export abstract class SimUI extends Component {
 
     [
       this.sim.changeEmitter,
-    ].forEach(emitter => emitter.on(() => this.changeEmitter.emit()));
+    ].forEach(emitter => emitter.on(eventID => this.changeEmitter.emit(eventID)));
 
 		Array.from(document.getElementsByClassName('known-issues')).forEach(element => {
 			if (config.knownIssues?.length) {
@@ -68,8 +68,8 @@ export abstract class SimUI extends Component {
 			],
 			changedEvent: (sim: Sim) => sim.iterationsChangeEmitter,
 			getValue: (sim: Sim) => sim.getIterations(),
-			setValue: (sim: Sim, newValue: number) => {
-				sim.setIterations(newValue);
+			setValue: (eventID: EventID, sim: Sim, newValue: number) => {
+				sim.setIterations(eventID, newValue);
 			},
 		});
   }

@@ -33,7 +33,7 @@ import { Stat } from '/tbc/core/proto/common.js';
 import { StatWeightsRequest } from '/tbc/core/proto/api.js';
 import { Stats } from '/tbc/core/proto_utils/stats.js';
 import { Target } from './target.js';
-import { TypedEvent } from './typed_event.js';
+import { EventID, TypedEvent } from './typed_event.js';
 import { addRaidSimAction, RaidSimResultsManager } from '/tbc/core/components/raid_sim_action.js';
 import { addStatWeightsAction } from '/tbc/core/components/stat_weights_action.js';
 import { equalsOrBothNull } from '/tbc/core/utils.js';
@@ -222,6 +222,9 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
   }
 
 	private loadSettings() {
+		const initEventID = TypedEvent.nextEventID();
+		TypedEvent.freezeAll();
+
     let loadedSettings = false;
 
     let hash = window.location.hash;
@@ -242,7 +245,7 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
           const jsonStr = pako.inflate(bytes, { to: 'string' });  
           jsonData = JSON.parse(jsonStr);
         }
-        this.sim.fromJson(jsonData, this.player.spec);
+        this.sim.fromJson(initEventID, jsonData, this.player.spec);
         loadedSettings = true;
       } catch (e) {
         console.warn('Failed to parse settings from window hash: ' + e);
@@ -253,7 +256,7 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
     const savedSettings = window.localStorage.getItem(this.getSettingsStorageKey());
     if (!loadedSettings && savedSettings != null) {
       try {
-        this.sim.fromJson(JSON.parse(savedSettings), this.player.spec);
+        this.sim.fromJson(initEventID, JSON.parse(savedSettings), this.player.spec);
         loadedSettings = true;
       } catch (e) {
         console.warn('Failed to parse saved settings: ' + e);
@@ -261,15 +264,17 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
     }
 
 		if (!loadedSettings) {
-			this.applyDefaults();
+			this.applyDefaults(initEventID);
 		}
-		this.player.setName('Player');
+		this.player.setName(initEventID, 'Player');
 
 		// This needs to go last so it doesn't re-store things as they are initialized.
-		this.changeEmitter.on(() => {
+		this.changeEmitter.on(eventID => {
 			const jsonStr = JSON.stringify(this.sim.toJson());
 			window.localStorage.setItem(this.getSettingsStorageKey(), jsonStr);
 		});
+
+		TypedEvent.unfreezeAll();
 	}
 
 	private addSidebarComponents() {
@@ -335,10 +340,10 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 					bonusStats: player.getBonusStats(),
 				};
 			},
-			setData: (player: Player<any>, newGearAndStats: GearAndStats) => {
-				player.setGear(newGearAndStats.gear);
+			setData: (eventID: EventID, player: Player<any>, newGearAndStats: GearAndStats) => {
+				player.setGear(eventID, newGearAndStats.gear);
 				if (newGearAndStats.bonusStats) {
-					player.setBonusStats(newGearAndStats.bonusStats);
+					player.setBonusStats(eventID, newGearAndStats.bonusStats);
 				}
 			},
 			changeEmitters: [this.player.changeEmitter],
@@ -491,7 +496,7 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
       label: 'Rotation',
 			storageKey: this.getSavedRotationStorageKey(),
       getData: (player: Player<SpecType>) => player.getRotation(),
-      setData: (player: Player<SpecType>, newRotation: SpecRotation<SpecType>) => player.setRotation(newRotation),
+      setData: (eventID: EventID, player: Player<SpecType>, newRotation: SpecRotation<SpecType>) => player.setRotation(eventID, newRotation),
       changeEmitters: [this.player.rotationChangeEmitter],
       equals: (a: SpecRotation<SpecType>, b: SpecRotation<SpecType>) => this.player.specTypeFunctions.rotationEquals(a, b),
       toJson: (a: SpecRotation<SpecType>) => this.player.specTypeFunctions.rotationToJson(a),
@@ -520,7 +525,7 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 			}),
       changedEvent: sim => sim.raceChangeEmitter,
       getValue: sim => sim.getRace(),
-      setValue: (sim, newValue) => sim.setRace(newValue),
+      setValue: (eventID, sim, newValue) => sim.setRace(eventID, newValue),
     });
 
     const encounterSectionElem = settingsTab.getElementsByClassName('encounter-section')[0] as HTMLElement;
@@ -529,7 +534,7 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
       label: 'Encounter',
 			storageKey: this.getSavedEncounterStorageKey(),
       getData: (encounter: Encounter) => encounter.toProto(),
-      setData: (encounter: Encounter, newEncounter: EncounterProto) => encounter.fromProto(newEncounter),
+      setData: (eventID: EventID, encounter: Encounter, newEncounter: EncounterProto) => encounter.fromProto(eventID, newEncounter),
       changeEmitters: [this.sim.encounter.changeEmitter],
       equals: (a: EncounterProto, b: EncounterProto) => EncounterProto.equals(a, b),
       toJson: (a: EncounterProto) => EncounterProto.toJson(a),
@@ -561,12 +566,12 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
           race: simUI.player.getRace(),
         };
       },
-      setData: (simUI: IndividualSimUI<any>, newSettings: Settings) => {
-        simUI.sim.raid.setBuffs(newSettings.raidBuffs);
-        simUI.player.getParty()!.setBuffs(newSettings.partyBuffs);
-        simUI.player.setBuffs(newSettings.individualBuffs);
-        simUI.player.setConsumes(newSettings.consumes);
-        simUI.player.setRace(newSettings.race);
+      setData: (eventID: EventID, simUI: IndividualSimUI<any>, newSettings: Settings) => {
+        simUI.sim.raid.setBuffs(eventID, newSettings.raidBuffs);
+        simUI.player.getParty()!.setBuffs(eventID, newSettings.partyBuffs);
+        simUI.player.setBuffs(eventID, newSettings.individualBuffs);
+        simUI.player.setConsumes(eventID, newSettings.consumes);
+        simUI.player.setRace(eventID, newSettings.race);
       },
       changeEmitters: [
 				this.sim.raid.buffsChangeEmitter,
@@ -620,7 +625,7 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 			label: 'Talents',
 			storageKey: this.getSavedTalentsStorageKey(),
 			getData: (player: Player<any>) => player.getTalentsString(),
-			setData: (player: Player<any>, newTalentsString: string) => player.setTalentsString(newTalentsString),
+			setData: (eventID: EventID, player: Player<any>, newTalentsString: string) => player.setTalentsString(eventID, newTalentsString),
 			changeEmitters: [this.player.talentsStringChangeEmitter],
 			equals: (a: string, b: string) => a == b,
 			toJson: (a: string) => a,
@@ -661,16 +666,16 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
     const logRunner = new LogRunner(this.rootElem.getElementsByClassName('log-runner')[0] as HTMLElement, this);
 	}
 
-	private applyDefaults() {
-		this.player.setGear(this.sim.lookupEquipmentSpec(this.individualConfig.defaults.gear));
-		this.player.setConsumes(this.individualConfig.defaults.consumes);
-		this.player.setRotation(this.individualConfig.defaults.rotation);
-		this.player.setTalentsString(this.individualConfig.defaults.talents);
-		this.player.setSpecOptions(this.individualConfig.defaults.specOptions);
-		this.player.setBuffs(this.individualConfig.defaults.individualBuffs);
-		this.player.getParty()!.setBuffs(this.individualConfig.defaults.partyBuffs);
-		this.player.getRaid()!.setBuffs(this.individualConfig.defaults.raidBuffs);
-		this.sim.encounter.primaryTarget.setDebuffs(this.individualConfig.defaults.debuffs);
+	private applyDefaults(eventID: EventID) {
+		this.player.setGear(eventID, this.sim.lookupEquipmentSpec(this.individualConfig.defaults.gear));
+		this.player.setConsumes(eventID, this.individualConfig.defaults.consumes);
+		this.player.setRotation(eventID, this.individualConfig.defaults.rotation);
+		this.player.setTalentsString(eventID, this.individualConfig.defaults.talents);
+		this.player.setSpecOptions(eventID, this.individualConfig.defaults.specOptions);
+		this.player.setBuffs(eventID, this.individualConfig.defaults.individualBuffs);
+		this.player.getParty()!.setBuffs(eventID, this.individualConfig.defaults.partyBuffs);
+		this.player.getRaid()!.setBuffs(eventID, this.individualConfig.defaults.raidBuffs);
+		this.sim.encounter.primaryTarget.setDebuffs(eventID, this.individualConfig.defaults.debuffs);
 	}
 
   registerExclusiveEffect(effect: ExclusiveEffect) {

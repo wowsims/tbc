@@ -17,7 +17,7 @@ import { classColors } from '/tbc/core/proto_utils/utils.js';
 import { specToClass } from '/tbc/core/proto_utils/utils.js';
 import { repoName } from '/tbc/core/resources.js';
 import { newTalentsPicker } from '/tbc/core/talents/factory.js';
-import { TypedEvent } from '/tbc/core/typed_event.js';
+import { EventID, TypedEvent } from '/tbc/core/typed_event.js';
 import { camelToSnakeCase } from '/tbc/core/utils.js';
 import { getEnumValues } from '/tbc/core/utils.js';
 import { hexToRgba } from '/tbc/core/utils.js';
@@ -221,10 +221,10 @@ export class PlayerPicker extends Component {
 		this.partyPicker = partyPicker;
 		this.raidPicker = partyPicker.raidPicker;
 
-		this.partyPicker.party.compChangeEmitter.on(() => {
+		this.partyPicker.party.compChangeEmitter.on(eventID => {
 			const newPlayer = this.partyPicker.party.getPlayer(this.index);
 			if (newPlayer != this.player && !(newPlayer == null && this.player instanceof BuffBot)) {
-				this.setPlayer(newPlayer);
+				this.setPlayer(eventID, newPlayer);
 			}
 		});
 
@@ -253,7 +253,7 @@ export class PlayerPicker extends Component {
 
     this.nameElem.addEventListener('input', event => {
 			if (this.player instanceof Player) {
-				this.player.setName(this.nameElem.textContent || '');
+				this.player.setName(TypedEvent.nextEventID(), this.nameElem.textContent || '');
 			}
 		});
 
@@ -296,7 +296,7 @@ export class PlayerPicker extends Component {
 			if (!this.nameElem.textContent) {
 				this.nameElem.textContent = emptyName;
 				if (this.player instanceof Player) {
-					this.player.setName(emptyName);
+					this.player.setName(TypedEvent.nextEventID(), emptyName);
 				}
 			}
 		});
@@ -340,7 +340,7 @@ export class PlayerPicker extends Component {
 			'allowHTML': true,
 		});
 		deleteElem.addEventListener('click', event => {
-			this.setPlayer(null);
+			this.setPlayer(TypedEvent.nextEventID(), null);
 		});
 
 		let dragEnterCounter = 0;
@@ -373,27 +373,31 @@ export class PlayerPicker extends Component {
 				return;
 			}
 			
+			const eventID = TypedEvent.nextEventID();
+			TypedEvent.freezeAll();
+
 			const dragType = this.raidPicker.currentDragType;
 
 			if (this.raidPicker.currentDragPlayerFromIndex != NEW_PLAYER) {
 				const fromPlayerPicker = this.raidPicker.getPlayerPicker(this.raidPicker.currentDragPlayerFromIndex);
 
 				if (dragType == DragType.Swap) {
-					fromPlayerPicker.setPlayer(this.player);
+					fromPlayerPicker.setPlayer(eventID, this.player);
 					fromPlayerPicker.iconElem.src = this.iconElem.src;
 				} else if (dragType == DragType.Move) {
-					fromPlayerPicker.setPlayer(null);
+					fromPlayerPicker.setPlayer(eventID, null);
 				}
 			}
 
 			if (dragType == DragType.Copy) {
-				this.setPlayer(this.raidPicker.currentDragPlayer.clone());
+				this.setPlayer(eventID, this.raidPicker.currentDragPlayer.clone(eventID));
 			} else {
-				this.setPlayer(this.raidPicker.currentDragPlayer);
+				this.setPlayer(eventID, this.raidPicker.currentDragPlayer);
 			}
 			this.iconElem.src = event.dataTransfer!.getData('text/plain');
 
 			this.raidPicker.clearDragPlayer();
+			TypedEvent.unfreezeAll();
 		};
 
 		const editElem = this.rootElem.getElementsByClassName('player-edit')[0] as HTMLSpanElement;
@@ -443,7 +447,7 @@ export class PlayerPicker extends Component {
 		this.update();
 	}
 
-	setPlayer(newPlayer: Player<any> | BuffBot | null) {
+	setPlayer(eventID: EventID, newPlayer: Player<any> | BuffBot | null) {
 		if (newPlayer == this.player) {
 			return;
 		}
@@ -453,13 +457,15 @@ export class PlayerPicker extends Component {
 
 		const oldPlayerWasBuffBot = this.player instanceof BuffBot;
 
+		TypedEvent.freezeAll();
 		this.player = newPlayer;
 		if (newPlayer instanceof BuffBot) {
-			this.partyPicker.party.setPlayer(this.index, null);
-			newPlayer.setRaidIndex(this.raidIndex);
+			this.partyPicker.party.setPlayer(eventID, this.index, null);
+			newPlayer.setRaidIndex(eventID, this.raidIndex);
 		} else {
-			this.partyPicker.party.setPlayer(this.index, newPlayer);
+			this.partyPicker.party.setPlayer(eventID, this.index, newPlayer);
 		}
+		TypedEvent.unfreezeAll();
 
 		this.update();
 	}
@@ -553,7 +559,7 @@ class NewPlayerPicker extends Component {
 			],
 			changedEvent: (picker: NewPlayerPicker) => new TypedEvent<void>(),
 			getValue: (picker: NewPlayerPicker) => picker.currentFaction,
-			setValue: (picker: NewPlayerPicker, newValue: number) => {
+			setValue: (eventID: EventID, picker: NewPlayerPicker, newValue: number) => {
 				picker.currentFaction = newValue;
 			},
 		});
@@ -567,8 +573,8 @@ class NewPlayerPicker extends Component {
 			],
 			changedEvent: (picker: NewPlayerPicker) => this.raidPicker.raid.sim.phaseChangeEmitter,
 			getValue: (picker: NewPlayerPicker) => this.raidPicker.raid.sim.getPhase(),
-			setValue: (picker: NewPlayerPicker, newValue: number) => {
-				this.raidPicker.raid.sim.setPhase(newValue);
+			setValue: (eventID: EventID, picker: NewPlayerPicker, newValue: number) => {
+				this.raidPicker.raid.sim.setPhase(eventID, newValue);
 			},
 		});
 
@@ -604,6 +610,9 @@ class NewPlayerPicker extends Component {
 
 				presetElem.setAttribute('draggable', 'true');
 				presetElem.ondragstart = event => {
+					const eventID = TypedEvent.nextEventID();
+					TypedEvent.freezeAll();
+
 					const dragImage = new Image();
 					dragImage.src = matchingPreset.iconUrl;
 					event.dataTransfer!.setDragImage(dragImage, 30, 30);
@@ -612,25 +621,27 @@ class NewPlayerPicker extends Component {
 					event.dataTransfer!.dropEffect = 'copy';
 
 					const newPlayer = new Player(matchingPreset.spec, this.raidPicker.raid.sim);
-					newPlayer.setRace(matchingPreset.defaultFactionRaces[this.raidPicker.getCurrentFaction()]);
-					newPlayer.setRotation(matchingPreset.rotation);
+					newPlayer.setRace(eventID, matchingPreset.defaultFactionRaces[this.raidPicker.getCurrentFaction()]);
+					newPlayer.setRotation(eventID, matchingPreset.rotation);
 
-					newPlayer.setTalentsString(matchingPreset.talents);
+					newPlayer.setTalentsString(eventID, matchingPreset.talents);
 					// TalentPicker needed to convert from talents string into talents proto.
 					newTalentsPicker(newPlayer.spec, document.createElement('div'), newPlayer);
 
-					newPlayer.setSpecOptions(matchingPreset.specOptions);
-					newPlayer.setConsumes(matchingPreset.consumes);
-					newPlayer.setName(matchingPreset.defaultName);
+					newPlayer.setSpecOptions(eventID, matchingPreset.specOptions);
+					newPlayer.setConsumes(eventID, matchingPreset.consumes);
+					newPlayer.setName(eventID, matchingPreset.defaultName);
 
 					// Need to wait because the gear might not be loaded yet.
 					this.raidPicker.raid.sim.waitForInit().then(() => {
 						newPlayer.setGear(
+								eventID,
 								this.raidPicker.raid.sim.lookupEquipmentSpec(
 										matchingPreset.defaultGear[this.raidPicker.getCurrentFaction()][this.raidPicker.getCurrentPhase()]));
 					});
 
 					this.raidPicker.setDragPlayer(newPlayer, NEW_PLAYER, DragType.New);
+					TypedEvent.unfreezeAll();
 				};
 			});
 		});

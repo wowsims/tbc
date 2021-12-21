@@ -1,6 +1,7 @@
 import { getIconUrl } from '/tbc/core/resources.js';
 import { ItemOrSpellId } from '/tbc/core/resources.js';
 import { setWowheadHref } from '/tbc/core/resources.js';
+import { EventID, TypedEvent } from '/tbc/core/typed_event.js';
 
 import { Component } from './component.js';
 import { Input, InputConfig } from './input.js';
@@ -54,7 +55,7 @@ export class IconEnumPicker<ModObject> extends Input<ModObject, number> {
 			option.addEventListener('click', event => {
 				event.preventDefault();
 				this.currentValue = valueConfig.value;
-				this.inputChanged();
+				this.inputChanged(TypedEvent.nextEventID());
 			});
 		});
 

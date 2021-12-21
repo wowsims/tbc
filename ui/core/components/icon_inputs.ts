@@ -12,6 +12,7 @@ import { Player } from '/tbc/core/player.js';
 import { Raid } from '/tbc/core/raid.js';
 import { Sim } from '/tbc/core/sim.js';
 import { Target } from '/tbc/core/target.js';
+import { EventID, TypedEvent } from '/tbc/core/typed_event.js';
 
 import { ExclusivityTag } from '/tbc/core/individual_sim_ui.js';
 import { IconPickerConfig } from './icon_picker.js';
@@ -73,12 +74,12 @@ export const SuperiorWizardOil = makeBooleanConsumeInput({itemId:22522}, 'superi
 export const DefaultDestructionPotion = makeEnumValueConsumeInput({itemId:22839}, 'defaultPotion', Potions.DestructionPotion, ['Potion']);
 export const DefaultSuperManaPotion = makeEnumValueConsumeInput({itemId:22832}, 'defaultPotion', Potions.SuperManaPotion, ['Potion']);
 
-function removeOtherPartyMembersDrums(player: Player<any>, newValue: boolean) {
+function removeOtherPartyMembersDrums(eventID: EventID, player: Player<any>, newValue: boolean) {
 	if (newValue) {
 		player.getOtherPartyMembers().forEach(otherPlayer => {
 			const otherConsumes = otherPlayer.getConsumes();
 			otherConsumes.drums = Drums.DrumsUnknown;
-			otherPlayer.setConsumes(otherConsumes);
+			otherPlayer.setConsumes(eventID, otherConsumes);
 		});
 	}
 };
@@ -92,10 +93,10 @@ function makeBooleanRaidBuffInput(id: ItemOrSpellId, buffsFieldName: keyof RaidB
     exclusivityTags: exclusivityTags,
     changedEvent: (raid: Raid) => raid.buffsChangeEmitter,
     getValue: (raid: Raid) => raid.getBuffs()[buffsFieldName] as boolean,
-    setValue: (raid: Raid, newValue: boolean) => {
+    setValue: (eventID: EventID, raid: Raid, newValue: boolean) => {
       const newBuffs = raid.getBuffs();
       (newBuffs[buffsFieldName] as boolean) = newValue;
-      raid.setBuffs(newBuffs);
+      raid.setBuffs(eventID, newBuffs);
     },
   }
 }
@@ -107,10 +108,10 @@ function makeTristateRaidBuffInput(id: ItemOrSpellId, impId: ItemOrSpellId, buff
     improvedId: impId,
     changedEvent: (raid: Raid) => raid.buffsChangeEmitter,
     getValue: (raid: Raid) => raid.getBuffs()[buffsFieldName] as number,
-    setValue: (raid: Raid, newValue: number) => {
+    setValue: (eventID: EventID, raid: Raid, newValue: number) => {
       const newBuffs = raid.getBuffs();
       (newBuffs[buffsFieldName] as number) = newValue;
-      raid.setBuffs(newBuffs);
+      raid.setBuffs(eventID, newBuffs);
     },
   }
 }
@@ -122,10 +123,10 @@ function makeBooleanPartyBuffInput(id: ItemOrSpellId, buffsFieldName: keyof Part
     exclusivityTags: exclusivityTags,
     changedEvent: (party: Party) => party.buffsChangeEmitter,
     getValue: (party: Party) => party.getBuffs()[buffsFieldName] as boolean,
-    setValue: (party: Party, newValue: boolean) => {
+    setValue: (eventID: EventID, party: Party, newValue: boolean) => {
       const newBuffs = party.getBuffs();
       (newBuffs[buffsFieldName] as boolean) = newValue;
-      party.setBuffs(newBuffs);
+      party.setBuffs(eventID, newBuffs);
     },
   }
 }
@@ -137,10 +138,10 @@ function makeTristatePartyBuffInput(id: ItemOrSpellId, impId: ItemOrSpellId, buf
     improvedId: impId,
     changedEvent: (party: Party) => party.buffsChangeEmitter,
     getValue: (party: Party) => party.getBuffs()[buffsFieldName] as number,
-    setValue: (party: Party, newValue: number) => {
+    setValue: (eventID: EventID, party: Party, newValue: number) => {
       const newBuffs = party.getBuffs();
       (newBuffs[buffsFieldName] as number) = newValue;
-      party.setBuffs(newBuffs);
+      party.setBuffs(eventID, newBuffs);
     },
   }
 }
@@ -151,10 +152,10 @@ function makeMultistatePartyBuffInput(id: ItemOrSpellId, numStates: number, buff
     states: numStates,
     changedEvent: (party: Party) => party.buffsChangeEmitter,
     getValue: (party: Party) => party.getBuffs()[buffsFieldName] as number,
-    setValue: (party: Party, newValue: number) => {
+    setValue: (eventID: EventID, party: Party, newValue: number) => {
       const newBuffs = party.getBuffs();
       (newBuffs[buffsFieldName] as number) = newValue;
-      party.setBuffs(newBuffs);
+      party.setBuffs(eventID, newBuffs);
     },
   }
 }
@@ -166,10 +167,10 @@ function makeEnumValuePartyBuffInput(id: ItemOrSpellId, buffsFieldName: keyof Pa
     exclusivityTags: exclusivityTags,
     changedEvent: (party: Party) => party.buffsChangeEmitter,
     getValue: (party: Party) => party.getBuffs()[buffsFieldName] == enumValue,
-    setValue: (party: Party, newValue: boolean) => {
+    setValue: (eventID: EventID, party: Party, newValue: boolean) => {
 			const newBuffs = party.getBuffs();
 			(newBuffs[buffsFieldName] as number) = newValue ? enumValue : 0;
-			party.setBuffs(newBuffs);
+			party.setBuffs(eventID, newBuffs);
     },
   }
 }
@@ -181,10 +182,10 @@ function makeBooleanIndividualBuffInput(id: ItemOrSpellId, buffsFieldName: keyof
     exclusivityTags: exclusivityTags,
     changedEvent: (player: Player<any>) => player.buffsChangeEmitter,
     getValue: (player: Player<any>) => player.getBuffs()[buffsFieldName] as boolean,
-    setValue: (player: Player<any>, newValue: boolean) => {
+    setValue: (eventID: EventID, player: Player<any>, newValue: boolean) => {
       const newBuffs = player.getBuffs();
       (newBuffs[buffsFieldName] as boolean) = newValue;
-      player.setBuffs(newBuffs);
+      player.setBuffs(eventID, newBuffs);
     },
   }
 }
@@ -196,10 +197,10 @@ function makeTristateIndividualBuffInput(id: ItemOrSpellId, impId: ItemOrSpellId
     improvedId: impId,
     changedEvent: (player: Player<any>) => player.buffsChangeEmitter,
     getValue: (player: Player<any>) => player.getBuffs()[buffsFieldName] as number,
-    setValue: (player: Player<any>, newValue: number) => {
+    setValue: (eventID: EventID, player: Player<any>, newValue: number) => {
       const newBuffs = player.getBuffs();
       (newBuffs[buffsFieldName] as number) = newValue;
-      player.setBuffs(newBuffs);
+      player.setBuffs(eventID, newBuffs);
     },
   }
 }
@@ -211,10 +212,10 @@ function makeBooleanDebuffInput(id: ItemOrSpellId, debuffsFieldName: keyof Debuf
     exclusivityTags: exclusivityTags,
     changedEvent: (target: Target) => target.debuffsChangeEmitter,
     getValue: (target: Target) => target.getDebuffs()[debuffsFieldName] as boolean,
-    setValue: (target: Target, newValue: boolean) => {
+    setValue: (eventID: EventID, target: Target, newValue: boolean) => {
       const newDebuffs = target.getDebuffs();
       (newDebuffs[debuffsFieldName] as boolean) = newValue;
-      target.setDebuffs(newDebuffs);
+      target.setDebuffs(eventID, newDebuffs);
     },
   }
 }
@@ -226,10 +227,10 @@ function makeTristateDebuffInput(id: ItemOrSpellId, impId: ItemOrSpellId, debuff
     improvedId: impId,
     changedEvent: (target: Target) => target.debuffsChangeEmitter,
     getValue: (target: Target) => target.getDebuffs()[debuffsFieldName] as number,
-    setValue: (target: Target, newValue: number) => {
+    setValue: (eventID: EventID, target: Target, newValue: number) => {
       const newDebuffs = target.getDebuffs();
       (newDebuffs[debuffsFieldName] as number) = newValue;
-      target.setDebuffs(newDebuffs);
+      target.setDebuffs(eventID, newDebuffs);
     },
   }
 }
@@ -241,28 +242,30 @@ function makeBooleanConsumeInput(id: ItemOrSpellId, consumesFieldName: keyof Con
     exclusivityTags: exclusivityTags,
     changedEvent: (player: Player<any>) => player.consumesChangeEmitter,
     getValue: (player: Player<any>) => player.getConsumes()[consumesFieldName] as boolean,
-    setValue: (player: Player<any>, newValue: boolean) => {
+    setValue: (eventID: EventID, player: Player<any>, newValue: boolean) => {
       const newBuffs = player.getConsumes();
       (newBuffs[consumesFieldName] as boolean) = newValue;
-      player.setConsumes(newBuffs);
+      player.setConsumes(eventID, newBuffs);
     },
   }
 }
 
-function makeEnumValueConsumeInput(id: ItemOrSpellId, consumesFieldName: keyof Consumes, enumValue: number, exclusivityTags?: Array<ExclusivityTag>, onSet?: (player: Player<any>, newValue: boolean) => void): IndividualSimIconPickerConfig<Player<any>, boolean> {
+function makeEnumValueConsumeInput(id: ItemOrSpellId, consumesFieldName: keyof Consumes, enumValue: number, exclusivityTags?: Array<ExclusivityTag>, onSet?: (eventID: EventID, player: Player<any>, newValue: boolean) => void): IndividualSimIconPickerConfig<Player<any>, boolean> {
   return {
     id: id,
     states: 2,
     exclusivityTags: exclusivityTags,
     changedEvent: (player: Player<any>) => player.consumesChangeEmitter,
     getValue: (player: Player<any>) => player.getConsumes()[consumesFieldName] == enumValue,
-    setValue: (player: Player<any>, newValue: boolean) => {
+    setValue: (eventID: EventID, player: Player<any>, newValue: boolean) => {
 			const newConsumes = player.getConsumes();
 			(newConsumes[consumesFieldName] as number) = newValue ? enumValue : 0;
-			player.setConsumes(newConsumes);
+			TypedEvent.freezeAll();
+			player.setConsumes(eventID, newConsumes);
 			if (onSet) {
-				onSet(player, newValue);
+				onSet(eventID, player, newValue);
 			}
+			TypedEvent.unfreezeAll();
     },
   }
 }

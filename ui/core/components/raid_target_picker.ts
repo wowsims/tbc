@@ -2,7 +2,7 @@ import { Component } from '/tbc/core/components/component.js';
 import { Input, InputConfig } from '/tbc/core/components/input.js';
 import { Player } from '/tbc/core/player.js';
 import { Raid } from '/tbc/core/raid.js';
-import { TypedEvent } from '/tbc/core/typed_event.js';
+import { EventID, TypedEvent } from '/tbc/core/typed_event.js';
 import { RaidTarget } from '/tbc/core/proto/common.js';
 import { Spec } from '/tbc/core/proto/common.js';
 import { newRaidTarget, emptyRaidTarget } from '/tbc/core/proto_utils/utils.js';
@@ -65,21 +65,21 @@ export class RaidTargetPicker<ModObject> extends Input<ModObject, RaidTarget> {
 			event.preventDefault();
 		});
 
-		this.setOptions(config.getOptions());
-		config.compChangeEmitter.on(() => {
-			this.setOptions(config.getOptions());
+		this.setOptions(TypedEvent.nextEventID(), config.getOptions());
+		config.compChangeEmitter.on(eventID => {
+			this.setOptions(eventID, config.getOptions());
 		});
 
 		this.init();
   }
 
-	private setOptions(options: Array<RaidTargetOption>) {
+	private setOptions(eventID: EventID, options: Array<RaidTargetOption>) {
 		this.currentOptions = [this.noTargetOption].concat(options);
 
 		const hasSameOption = this.currentOptions.find(option => RaidTarget.equals(option.value, this.getInputValue())) != null;
 		if (!hasSameOption) {
 			this.raidTarget = this.noTargetOption.value;
-			this.inputChanged();
+			this.inputChanged(eventID);
 		}
 
 		this.dropdownElem.innerHTML = '';
@@ -92,7 +92,7 @@ export class RaidTargetPicker<ModObject> extends Input<ModObject, RaidTarget> {
 		option.addEventListener('click', event => {
 			event.preventDefault();
 			this.raidTarget = data.value;
-			this.inputChanged();
+			this.inputChanged(TypedEvent.nextEventID());
 		});
 
 		return option;

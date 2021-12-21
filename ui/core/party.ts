@@ -8,7 +8,7 @@ import { playerToSpec } from '/tbc/core/proto_utils/utils.js';
 
 import { Raid } from './raid.js';
 import { Player } from './player.js';
-import { TypedEvent } from './typed_event.js';
+import { EventID, TypedEvent } from './typed_event.js';
 import { Sim } from './sim.js';
 
 export const MAX_PARTY_SIZE = 5;
@@ -31,18 +31,18 @@ export class Party {
 	// Should always hold exactly MAX_PARTY_SIZE elements.
 	private players: Array<Player<any> | null>;
 
-	private readonly playerChangeListener: () => void;
+	private readonly playerChangeListener: (eventID: EventID) => void;
 
   constructor(raid: Raid, sim: Sim) {
 		this.sim = sim;
 		this.raid = raid;
 		this.players = [...Array(MAX_PARTY_SIZE).keys()].map(i => null);
-		this.playerChangeListener = () => this.changeEmitter.emit();
+		this.playerChangeListener = eventID => this.changeEmitter.emit(eventID);
 
 		[
 			this.compChangeEmitter,
 			this.buffsChangeEmitter,
-		].forEach(emitter => emitter.on(() => this.changeEmitter.emit()));
+		].forEach(emitter => emitter.on(eventID => this.changeEmitter.emit(eventID)));
   }
 
 	size(): number {
@@ -53,10 +53,10 @@ export class Party {
 		return this.size() == 0;
 	}
 
-	clear() {
-		this.setBuffs(PartyBuffs.create());
+	clear(eventID: EventID) {
+		this.setBuffs(eventID, PartyBuffs.create());
 		for (let i = 0; i < MAX_PARTY_SIZE; i++) {
-			this.setPlayer(i, null);
+			this.setPlayer(eventID, i, null);
 		}
 	}
 
@@ -74,7 +74,7 @@ export class Party {
 		return this.players[playerIndex];
 	}
 
-	setPlayer(playerIndex: number, newPlayer: Player<any> | null) {
+	setPlayer(eventID: EventID, playerIndex: number, newPlayer: Player<any> | null) {
 		if (playerIndex < 0 || playerIndex >= MAX_PARTY_SIZE) {
 			throw new Error('Invalid player index: ' + playerIndex);
 		}
@@ -83,6 +83,7 @@ export class Party {
 			return;
 		}
 
+		TypedEvent.freezeAll();
 		const oldPlayer = this.players[playerIndex];
 		this.players[playerIndex] = newPlayer;
 
@@ -93,13 +94,14 @@ export class Party {
 		if (newPlayer != null) {
 			const newPlayerOldParty = newPlayer.getParty();
 			if (newPlayerOldParty) {
-				newPlayerOldParty.setPlayer(newPlayer.getPartyIndex(), null);
+				newPlayerOldParty.setPlayer(eventID, newPlayer.getPartyIndex(), null);
 			}
 			newPlayer.changeEmitter.on(this.playerChangeListener);
 			newPlayer.setParty(this);
 		}
 
-		this.compChangeEmitter.emit();
+		this.compChangeEmitter.emit(eventID);
+		TypedEvent.unfreezeAll();
 	}
 
   getBuffs(): PartyBuffs {
@@ -107,13 +109,13 @@ export class Party {
     return PartyBuffs.clone(this.buffs);
   }
 
-  setBuffs(newBuffs: PartyBuffs) {
+  setBuffs(eventID: EventID, newBuffs: PartyBuffs) {
     if (PartyBuffs.equals(this.buffs, newBuffs))
       return;
 
     // Make a defensive copy
     this.buffs = PartyBuffs.clone(newBuffs);
-    this.buffsChangeEmitter.emit();
+    this.buffsChangeEmitter.emit(eventID);
   }
 
 	toProto(): PartyProto {
@@ -123,21 +125,23 @@ export class Party {
 		});
 	}
 
-	fromProto(proto: PartyProto) {
-		this.setBuffs(proto.buffs || PartyBuffs.create());
+	fromProto(eventID: EventID, proto: PartyProto) {
+		TypedEvent.freezeAll();
+		this.setBuffs(eventID, proto.buffs || PartyBuffs.create());
 
 		for (let i = 0; i < MAX_PARTY_SIZE; i++) {
 			if (!proto.players[i] || proto.players[i].class == Class.ClassUnknown) {
-				this.setPlayer(i, null);
+				this.setPlayer(eventID, i, null);
 				continue;
 			}
 
 			const playerProto = proto.players[i];
 			const spec = playerToSpec(playerProto);
 			const newPlayer = new Player(spec, this.sim);
-			newPlayer.fromProto(playerProto);
-			this.setPlayer(i, newPlayer);
+			newPlayer.fromProto(eventID, playerProto);
+			this.setPlayer(eventID, i, newPlayer);
 		}
+		TypedEvent.unfreezeAll();
 	}
 
   // Returns JSON representing all the current values.
@@ -158,9 +162,10 @@ export class Party {
   }
 
   // Set all the current values, assumes obj is the same type returned by toJson().
-  fromJson(obj: any) {
+  fromJson(eventID: EventID, obj: any) {
+		TypedEvent.unfreezeAll();
 		try {
-			this.setBuffs(PartyBuffs.fromJson(obj['buffs']));
+			this.setBuffs(eventID, PartyBuffs.fromJson(obj['buffs']));
 		} catch (e) {
 			console.warn('Failed to parse party buffs: ' + e);
 		}
@@ -169,19 +174,20 @@ export class Party {
 			for (let i = 0; i < MAX_PARTY_SIZE; i++) {
 				const playerObj = obj['players'][i];
 				if (!playerObj) {
-					this.setPlayer(i, null);
+					this.setPlayer(eventID, i, null);
 					continue;
 				}
 
 				const newSpec = playerObj['spec'] as Spec;
 				if (this.players[i] != null && this.players[i]!.spec == newSpec) {
-					this.players[i]!.fromJson(playerObj['player']);
+					this.players[i]!.fromJson(eventID, playerObj['player']);
 				} else {
 					const newPlayer = new Player(playerObj['spec'] as Spec, this.sim);
-					newPlayer.fromJson(playerObj['player']);
-					this.setPlayer(i, newPlayer);
+					newPlayer.fromJson(eventID, playerObj['player']);
+					this.setPlayer(eventID, i, newPlayer);
 				}
 			}
 		}
+		TypedEvent.unfreezeAll();
   }
 }

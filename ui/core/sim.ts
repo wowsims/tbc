@@ -38,7 +38,7 @@ import { Encounter } from './encounter.js';
 import { Player } from './player.js';
 import { Raid } from './raid.js';
 import { Listener } from './typed_event.js';
-import { TypedEvent } from './typed_event.js';
+import { EventID, TypedEvent } from './typed_event.js';
 import { sum } from './utils.js';
 import { wait } from './utils.js';
 import { WorkerPool } from './worker_pool.js';
@@ -98,11 +98,9 @@ export class Sim {
       this.phaseChangeEmitter,
 			this.raid.changeEmitter,
 			this.encounter.changeEmitter,
-    ].forEach(emitter => emitter.on(() => this.changeEmitter.emit()));
+    ].forEach(emitter => emitter.on(eventID => this.changeEmitter.emit(eventID)));
 
-		this.raid.changeEmitter.on(() => {
-			this.updateCharacterStats();
-		});
+		this.raid.changeEmitter.on(eventID => this.updateCharacterStats(eventID));
   }
 
   waitForInit(): Promise<void> {
@@ -120,7 +118,7 @@ export class Sim {
 		});
   }
 
-  async runRaidSim(): Promise<SimResult> {
+  async runRaidSim(eventID: EventID): Promise<SimResult> {
 		if (this.raid.isEmpty()) {
 			throw new Error('Raid is empty! Try adding some players first.');
 		} else if (this.encounter.getNumTargets() < 1) {
@@ -133,11 +131,11 @@ export class Sim {
 		const result = await this.workerPool.raidSim(request);
 
 		const simResult = await SimResult.makeNew(request, result);
-		this.simResultEmitter.emit(simResult);
+		this.simResultEmitter.emit(eventID, simResult);
 		return simResult;
 	}
 
-  async runRaidSimWithLogs(): Promise<SimResult> {
+  async runRaidSimWithLogs(eventID: EventID): Promise<SimResult> {
 		if (this.raid.isEmpty()) {
 			throw new Error('Raid is empty! Try adding some players first.');
 		} else if (this.encounter.getNumTargets() < 1) {
@@ -150,17 +148,13 @@ export class Sim {
 		const result = await this.workerPool.raidSim(request);
 
 		const simResult = await SimResult.makeNew(request, result);
-		this.simResultEmitter.emit(simResult);
+		this.simResultEmitter.emit(eventID, simResult);
 		return simResult;
 	}
 
 	// This should be invoked internally whenever stats might have changed.
-	private async updateCharacterStats() {
+	private async updateCharacterStats(eventID: EventID) {
 		await this.waitForInit();
-
-		// Sometimes a ui change triggers other changes, so waiting a bit makes sure
-		// we get all of them.
-		await wait(10);
 
 		// Capture the current players so we avoid issues if something changes while
 		// request is in-flight.
@@ -170,10 +164,12 @@ export class Sim {
 			raid: this.raid.toProto(),
 		}));
 
+		TypedEvent.freezeAll();
 		result.raidStats!.parties
 				.forEach((partyStats, partyIndex) =>
 						partyStats.players.forEach((playerStats, playerIndex) =>
-								players[partyIndex*5 + playerIndex]?.setCurrentStats(playerStats)));
+								players[partyIndex*5 + playerIndex]?.setCurrentStats(eventID, playerStats)));
+		TypedEvent.unfreezeAll();
 	}
 
   async statWeights(player: Player<any>, epStats: Array<Stat>, epReferenceStat: Stat): Promise<StatWeightsResult> {
@@ -238,20 +234,20 @@ export class Sim {
   getPhase(): number {
     return this.phase;
   }
-  setPhase(newPhase: number) {
+  setPhase(eventID: EventID, newPhase: number) {
     if (newPhase != this.phase) {
       this.phase = newPhase;
-      this.phaseChangeEmitter.emit();
+      this.phaseChangeEmitter.emit(eventID);
     }
   }
   
   getIterations(): number {
     return this.iterations;
   }
-  setIterations(newIterations: number) {
+  setIterations(eventID: EventID, newIterations: number) {
     if (newIterations != this.iterations) {
       this.iterations = newIterations;
-      this.iterationsChangeEmitter.emit();
+      this.iterationsChangeEmitter.emit(eventID);
     }
   }
 
@@ -297,7 +293,8 @@ export class Sim {
 	}
 
   // Set all the current values, assumes obj is the same type returned by toJson().
-  fromJson(obj: any, spec?: Spec) {
+  fromJson(eventID: EventID, obj: any, spec?: Spec) {
+		TypedEvent.freezeAll();
 		// For legacy format. Do not remove this until 2022/01/05 (1 month).
 		if (obj['sim']) {
 			if (!obj['raid']) {
@@ -320,11 +317,12 @@ export class Sim {
 		}
 
 		if (obj['raid']) {
-			this.raid.fromJson(obj['raid']);
+			this.raid.fromJson(eventID, obj['raid']);
 		}
 
 		if (obj['encounter']) {
-			this.encounter.fromJson(obj['encounter']);
+			this.encounter.fromJson(eventID, obj['encounter']);
 		}
+		TypedEvent.unfreezeAll();
   }
 }

@@ -1,6 +1,6 @@
 import { Component } from '/tbc/core/components/component.js';
 import { IconEnumPicker } from '/tbc/core/components/icon_enum_picker.js';
-import { TypedEvent } from '/tbc/core/typed_event.js';
+import { EventID, TypedEvent } from '/tbc/core/typed_event.js';
 import { Class } from '/tbc/core/proto/common.js';
 import { Spec } from '/tbc/core/proto/common.js';
 import { Blessings } from '/tbc/core/proto/ui.js';
@@ -146,11 +146,11 @@ export class BlessingsPicker extends Component {
 					],
 					changedEvent: (picker: BlessingsPicker) => picker.changeEmitter,
 					getValue: (picker: BlessingsPicker) => picker.assignments.paladins[rowIndex]?.blessings[spec] || Blessings.BlessingUnknown,
-					setValue: (picker: BlessingsPicker, newValue: number) => {
+					setValue: (eventID: EventID, picker: BlessingsPicker, newValue: number) => {
 						const currentValue = picker.assignments.paladins[rowIndex].blessings[spec];
 						if (currentValue != newValue) {
 							picker.assignments.paladins[rowIndex].blessings[spec] = newValue;
-							this.changeEmitter.emit();
+							this.changeEmitter.emit(eventID);
 						}
 					},
 				});
@@ -160,7 +160,7 @@ export class BlessingsPicker extends Component {
 		});
 
 		this.setNumPaladins(raidSimUI.getClassCount(Class.ClassPaladin));
-		raidSimUI.compChangeEmitter.on(() => {
+		raidSimUI.compChangeEmitter.on(eventID => {
 			this.setNumPaladins(raidSimUI.getClassCount(Class.ClassPaladin));
 		});
 	}

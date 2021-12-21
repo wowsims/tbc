@@ -1,6 +1,7 @@
 import { MobType } from '/tbc/core/proto/common.js';
 import { Encounter } from '/tbc/core/encounter.js';
 import { Target } from '/tbc/core/target.js';
+import { EventID, TypedEvent } from '/tbc/core/typed_event.js';
 import { EnumPicker, EnumPickerConfig } from '/tbc/core/components/enum_picker.js';
 import { NumberPicker } from '/tbc/core/components/number_picker.js';
 
@@ -19,8 +20,8 @@ export class EncounterPicker extends Component {
       label: 'Duration',
       changedEvent: (encounter: Encounter) => encounter.durationChangeEmitter,
       getValue: (encounter: Encounter) => encounter.getDuration(),
-      setValue: (encounter: Encounter, newValue: number) => {
-				encounter.setDuration(newValue);
+      setValue: (eventID: EventID, encounter: Encounter, newValue: number) => {
+				encounter.setDuration(eventID, newValue);
       },
     });
 
@@ -29,8 +30,8 @@ export class EncounterPicker extends Component {
         label: 'Target Armor',
         changedEvent: (target: Target) => target.armorChangeEmitter,
         getValue: (target: Target) => target.getArmor(),
-        setValue: (target: Target, newValue: number) => {
-					target.setArmor(newValue);
+        setValue: (eventID: EventID, target: Target, newValue: number) => {
+					target.setArmor(eventID, newValue);
         },
       });
     }
@@ -42,8 +43,8 @@ export class EncounterPicker extends Component {
         label: '# of Targets',
         changedEvent: (encounter: Encounter) => encounter.numTargetsChangeEmitter,
         getValue: (encounter: Encounter) => encounter.getNumTargets(),
-        setValue: (encounter: Encounter, newValue: number) => {
-					encounter.setNumTargets(newValue);
+        setValue: (eventID: EventID, encounter: Encounter, newValue: number) => {
+					encounter.setNumTargets(eventID, newValue);
         },
       });
     }
@@ -65,7 +66,7 @@ export const MobTypePickerConfig: EnumPickerConfig<Target> = {
 	],
 	changedEvent: (target: Target) => target.mobTypeChangeEmitter,
 	getValue: (target: Target) => target.getMobType(),
-	setValue: (target: Target, newValue: number) => {
-		target.setMobType(newValue);
+	setValue: (eventID: EventID, target: Target, newValue: number) => {
+		target.setMobType(eventID, newValue);
 	},
 };

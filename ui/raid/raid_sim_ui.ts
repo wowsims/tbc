@@ -3,7 +3,7 @@ import { Player } from '/tbc/core/player.js';
 import { Raid } from '/tbc/core/raid.js';
 import { Sim } from '/tbc/core/sim.js';
 import { SimUI } from '/tbc/core/sim_ui.js';
-import { TypedEvent } from '/tbc/core/typed_event.js';
+import { EventID, TypedEvent } from '/tbc/core/typed_event.js';
 import { Raid as RaidProto } from '/tbc/core/proto/api.js';
 import { Blessings } from '/tbc/core/proto/ui.js';
 import { Class } from '/tbc/core/proto/common.js';
@@ -50,7 +50,7 @@ export class RaidSimUI extends SimUI {
 
     this.config = config;
 
-		this.sim.raid.compChangeEmitter.on(() => this.compChangeEmitter.emit());
+		this.sim.raid.compChangeEmitter.on(eventID => this.compChangeEmitter.emit(eventID));
 		this.sim.raid.setModifyRaidProto(raidProto => this.modifyRaidProto(raidProto));
 		this.sim.encounter.setModifyEncounterProto(encounterProto => this.modifyEncounterProto(encounterProto));
 
@@ -64,7 +64,7 @@ export class RaidSimUI extends SimUI {
 
 	private addSidebarComponents() {
 		this.raidSimResultsManager = addRaidSimAction(this);
-		this.raidSimResultsManager.referenceChangeEmitter.on(() => this.referenceChangeEmitter.emit());
+		this.raidSimResultsManager.referenceChangeEmitter.on(eventID => this.referenceChangeEmitter.emit(eventID));
 	}
 
 	private addTopbarComponents() {
@@ -135,7 +135,7 @@ export class RaidSimUI extends SimUI {
       label: 'Encounter',
 			storageKey: this.getSavedEncounterStorageKey(),
       getData: (encounter: Encounter) => encounter.toProto(),
-      setData: (encounter: Encounter, newEncounter: EncounterProto) => encounter.fromProto(newEncounter),
+      setData: (eventID: EventID, encounter: Encounter, newEncounter: EncounterProto) => encounter.fromProto(eventID, newEncounter),
       changeEmitters: [this.sim.encounter.changeEmitter],
       equals: (a: EncounterProto, b: EncounterProto) => EncounterProto.equals(a, b),
       toJson: (a: EncounterProto) => EncounterProto.toJson(a),

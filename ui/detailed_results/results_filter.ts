@@ -1,5 +1,5 @@
 import { SimResult, SimResultFilter } from '/tbc/core/proto_utils/sim_result.js';
-import { TypedEvent } from '/tbc/core/typed_event.js';
+import { EventID, TypedEvent } from '/tbc/core/typed_event.js';
 import { EnumPicker } from '/tbc/core/components/enum_picker.js';
 import { Input } from '/tbc/core/components/input.js';
 
@@ -30,7 +30,7 @@ export class ResultsFilter extends ResultComponent {
 		this.changeEmitter = new TypedEvent<void>();
 
 		this.playerFilter = new PlayerFilter(this.rootElem, this.currentFilter);
-		this.playerFilter.changeEmitter.on(() => this.changeEmitter.emit());
+		this.playerFilter.changeEmitter.on(eventID => this.changeEmitter.emit(eventID));
   }
 
 	getFilter(): SimResultFilter {
@@ -41,12 +41,12 @@ export class ResultsFilter extends ResultComponent {
 	}
 
 	onSimResult(resultData: SimResultData) {
-		this.playerFilter.setOptions(resultData.result);
+		this.playerFilter.setOptions(resultData.eventID, resultData.result);
 	}
 
-	setPlayer(newPlayer: number | null) {
+	setPlayer(eventID: EventID, newPlayer: number | null) {
 		this.currentFilter.player = (newPlayer === null) ? ALL_PLAYERS : newPlayer;
-		this.playerFilter.changeEmitter.emit();
+		this.playerFilter.changeEmitter.emit(eventID);
 	}
 }
 
@@ -82,7 +82,7 @@ class PlayerFilter extends Input<FilterData, number> {
 			],
 			changedEvent: (filterData: FilterData) => changeEmitter,
 			getValue: (filterData: FilterData) => filterData.player,
-			setValue: (filterData: FilterData, newValue: number) => filterData.player = newValue,
+			setValue: (eventID: EventID, filterData: FilterData, newValue: number) => filterData.player = newValue,
 		});
 		this.filterData = filterData;
 		this.currentOptions = [allPlayersOption];
@@ -103,7 +103,7 @@ class PlayerFilter extends Input<FilterData, number> {
 		this.init();
   }
 
-	setOptions(simResult: SimResult) {
+	setOptions(eventID: EventID, simResult: SimResult) {
 		this.currentOptions = [allPlayersOption].concat(simResult.getPlayers().map(player => {
 			return {
 				iconUrl: player.iconUrl,
@@ -116,7 +116,7 @@ class PlayerFilter extends Input<FilterData, number> {
 		const hasSameOption = this.currentOptions.find(option => option.value == this.getInputValue()) != null;
 		if (!hasSameOption) {
 			this.filterData.player = allPlayersOption.value;
-			this.changeEmitter.emit();
+			this.changeEmitter.emit(eventID);
 		}
 
 		this.dropdownElem.innerHTML = '';
@@ -129,7 +129,7 @@ class PlayerFilter extends Input<FilterData, number> {
 		option.addEventListener('click', event => {
 			event.preventDefault();
 			this.filterData.player = data.value;
-			this.changeEmitter.emit();
+			this.changeEmitter.emit(TypedEvent.nextEventID());
 		});
 
 		return option;
