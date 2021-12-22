@@ -1,9 +1,11 @@
+import { Class } from '/tbc/core/proto/common.js';
 import { Race } from '/tbc/core/proto/common.js';
 import { Spec } from '/tbc/core/proto/common.js';
 import { TristateEffect } from '/tbc/core/proto/common.js';
 import { Faction } from '/tbc/core/proto_utils/utils.js';
 import { specIconsLarge } from '/tbc/core/proto_utils/utils.js';
 import { specNames } from '/tbc/core/proto_utils/utils.js';
+import { talentTreeIcons } from '/tbc/core/proto_utils/utils.js';
 import { NO_TARGET } from '/tbc/core/proto_utils/utils.js';
 import * as BalanceDruidPresets from '/tbc/balance_druid/presets.js';
 import * as ElementalShamanPresets from '/tbc/elemental_shaman/presets.js';
@@ -105,7 +107,7 @@ export const buffBotPresets = [
         buffBotId: 'Resto Druid',
         spec: Spec.SpecBalanceDruid,
         name: 'Resto Druid',
-        tooltip: 'Adds Improved Gift of the Wild, and an Innervate.',
+        tooltip: 'Resto Druid: Adds Improved Gift of the Wild, and an Innervate.',
         iconUrl: 'https://wow.zamimg.com/images/wow/icons/large/spell_nature_healingtouch.jpg',
         modifyRaidProto: (buffBot, raidProto, partyProto) => {
             raidProto.buffs.giftOfTheWild = TristateEffect.TristateEffectImproved;
@@ -127,7 +129,7 @@ export const buffBotPresets = [
         buffBotId: 'Mage',
         spec: Spec.SpecMage,
         name: 'Mage',
-        tooltip: 'Adds Arcane Brilliance.',
+        tooltip: 'Mage: Adds Arcane Brilliance.',
         iconUrl: 'https://wow.zamimg.com/images/wow/icons/large/spell_holy_arcaneintellect.jpg',
         modifyRaidProto: (buffBot, raidProto, partyProto) => {
             raidProto.buffs.arcaneBrilliance = true;
@@ -139,9 +141,9 @@ export const buffBotPresets = [
         // The value of this field must never change, to preserve local storage data.
         buffBotId: 'Paladin',
         spec: Spec.SpecRetributionPaladin,
-        name: 'Paladin',
-        tooltip: 'Adds a set of blessings.',
-        iconUrl: specIconsLarge[Spec.SpecRetributionPaladin],
+        name: 'Holy Paladin',
+        tooltip: 'Holy Paladin: Adds a set of blessings.',
+        iconUrl: talentTreeIcons[Class.ClassPaladin][0],
         modifyRaidProto: (buffBot, raidProto, partyProto) => {
             // Do nothing, blessings are handled elswhere.
         },
@@ -153,7 +155,7 @@ export const buffBotPresets = [
         buffBotId: 'JoW Paladin',
         spec: Spec.SpecRetributionPaladin,
         name: 'JoW Paladin',
-        tooltip: 'Adds a set of blessings and Judgement of Wisdom.',
+        tooltip: 'JoW Paladin: Adds a set of blessings and Judgement of Wisdom.',
         iconUrl: 'https://wow.zamimg.com/images/wow/icons/large/spell_holy_righteousnessaura.jpg',
         modifyRaidProto: (buffBot, raidProto, partyProto) => {
             // Do nothing, blessings are handled elswhere.
@@ -167,7 +169,7 @@ export const buffBotPresets = [
         buffBotId: 'JoC Paladin',
         spec: Spec.SpecRetributionPaladin,
         name: 'JoC Paladin',
-        tooltip: 'Adds a set of blessings and Improved Judgement of the Crusader (+3% crit).',
+        tooltip: 'JoC Paladin: Adds a set of blessings and Improved Judgement of the Crusader (+3% crit).',
         iconUrl: 'https://wow.zamimg.com/images/wow/icons/large/spell_holy_holysmite.jpg',
         modifyRaidProto: (buffBot, raidProto, partyProto) => {
             // Do nothing, blessings are handled elswhere.
@@ -194,7 +196,7 @@ export const buffBotPresets = [
         buffBotId: 'CoE Warlock',
         spec: Spec.SpecWarlock,
         name: 'CoE Warlock',
-        tooltip: 'Adds Curse of Elements (regular). Also adds +20% uptime to ISB.',
+        tooltip: 'CoE Warlock: Adds Curse of Elements (regular). Also adds +20% uptime to ISB.',
         iconUrl: 'https://wow.zamimg.com/images/wow/icons/large/spell_shadow_chilltouch.jpg',
         modifyRaidProto: (buffBot, raidProto, partyProto) => {
         },
@@ -209,7 +211,7 @@ export const buffBotPresets = [
         buffBotId: 'Malediction Warlock',
         spec: Spec.SpecWarlock,
         name: 'Malediction Warlock',
-        tooltip: 'Adds Curse of Elements (improved). Also adds +20% uptime to ISB.',
+        tooltip: 'Afflication Warlock: Adds Curse of Elements (improved). Also adds +20% uptime to ISB.',
         iconUrl: 'https://wow.zamimg.com/images/wow/icons/large/spell_shadow_curseofachimonde.jpg',
         modifyRaidProto: (buffBot, raidProto, partyProto) => {
         },
