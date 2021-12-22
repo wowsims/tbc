@@ -144,15 +144,17 @@ export class InnervatesPicker extends Component {
 				});
 			}
 
-			raidTargetPicker!.changeEmitter.on(eventID => {
-				this.targetPickers[druidIndex].targetPlayer = this.raidSimUI.sim.raid.getPlayerFromRaidTarget(raidTargetPicker!.getInputValue());
-			});
-
-			return {
+			const targetPickerData = {
 				playerOrBot: druid,
 				targetPicker: raidTargetPicker!,
 				targetPlayer: this.raidSimUI.sim.raid.getPlayerFromRaidTarget(raidTargetPicker!.getInputValue()),
 			};
+
+			raidTargetPicker!.changeEmitter.on(eventID => {
+				targetPickerData.targetPlayer = this.raidSimUI.sim.raid.getPlayerFromRaidTarget(raidTargetPicker!.getInputValue());
+			});
+
+			return targetPickerData;
 		});
 	}
 

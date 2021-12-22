@@ -3,6 +3,7 @@ package proto;
 
 option go_package = "./proto";
 
+import "api.proto";
 import "common.proto";
 
 // A buff bot placed in a raid.
@@ -35,4 +36,24 @@ message BlessingsAssignment {
 message BlessingsAssignments {
 	// Assignments for each paladin.
 	repeated BlessingsAssignment paladins = 1;
+}
+
+// Local storage data for a saved encounter.
+message SavedEncounter {
+	Encounter encounter = 1;
+}
+
+// Local storage data for raid sim settings.
+message SavedRaid {
+	Raid raid = 1;
+	repeated BuffBot buff_bots = 2;
+	BlessingsAssignments blessings = 3;
+}
+
+// Contains all information that is imported/exported from a raid sim.
+message RaidSimSettings {
+	Raid raid = 1;
+	repeated BuffBot buff_bots = 2;
+	BlessingsAssignments blessings = 3;
+	Encounter encounter = 4;
 }

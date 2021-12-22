@@ -6,6 +6,10 @@ import { SimUI } from '/tbc/core/sim_ui.js';
 import { EventID, TypedEvent } from '/tbc/core/typed_event.js';
 import { Raid as RaidProto } from '/tbc/core/proto/api.js';
 import { Blessings } from '/tbc/core/proto/ui.js';
+import { BlessingsAssignments } from '/tbc/core/proto/ui.js';
+import { RaidSimSettings } from '/tbc/core/proto/ui.js';
+import { SavedEncounter } from '/tbc/core/proto/ui.js';
+import { SavedRaid } from '/tbc/core/proto/ui.js';
 import { Class } from '/tbc/core/proto/common.js';
 import { Encounter as EncounterProto } from '/tbc/core/proto/common.js';
 import { Spec } from '/tbc/core/proto/common.js';
@@ -17,6 +21,7 @@ import { LogRunner } from '/tbc/core/components/log_runner.js';
 import { SavedDataConfig } from '/tbc/core/components/saved_data_manager.js';
 import { SavedDataManager } from '/tbc/core/components/saved_data_manager.js';
 import { addRaidSimAction, RaidSimResultsManager, ReferenceData } from '/tbc/core/components/raid_sim_action.js';
+import { downloadJson } from '/tbc/core/utils.js';
 
 import { AssignmentsPicker } from './assignments_picker.js';
 import { BlessingsPicker } from './blessings_picker.js';
@@ -38,6 +43,7 @@ export class RaidSimUI extends SimUI {
 
 	// Emits when the raid comp changes. Includes changes to buff bots.
   readonly compChangeEmitter = new TypedEvent<void>();
+  readonly changeEmitter = new TypedEvent<void>();
 
   readonly referenceChangeEmitter = new TypedEvent<void>();
 
@@ -51,8 +57,15 @@ export class RaidSimUI extends SimUI {
     this.config = config;
 
 		this.sim.raid.compChangeEmitter.on(eventID => this.compChangeEmitter.emit(eventID));
-		this.sim.raid.setModifyRaidProto(raidProto => this.modifyRaidProto(raidProto));
-		this.sim.encounter.setModifyEncounterProto(encounterProto => this.modifyEncounterProto(encounterProto));
+		this.sim.setModifyRaidProto(raidProto => this.modifyRaidProto(raidProto));
+		this.sim.setModifyEncounterProto(encounterProto => this.modifyEncounterProto(encounterProto));
+
+		[
+			this.compChangeEmitter,
+			this.sim.changeEmitter,
+		].forEach(emitter => emitter.on(eventID => this.changeEmitter.emit(eventID)));
+
+		this.sim.waitForInit().then(() => this.loadSettings());
 
 		this.addSidebarComponents();
 		this.addTopbarComponents();
@@ -62,33 +75,84 @@ export class RaidSimUI extends SimUI {
 		this.addLogTab();
   }
 
+	private loadSettings() {
+		const initEventID = TypedEvent.nextEventID();
+		TypedEvent.freezeAllAndDo(() => {
+			let loadedSettings = false;
+
+			const savedSettings = window.localStorage.getItem(this.getSettingsStorageKey());
+			if (savedSettings != null) {
+				try {
+					const settings = RaidSimSettings.fromJsonString(savedSettings);
+					this.fromProto(initEventID, settings);
+					loadedSettings = true;
+				} catch (e) {
+					console.warn('Failed to parse saved settings: ' + e);
+				}
+			}
+
+			if (!loadedSettings) {
+				// Apply any defaults here.
+			}
+
+			// This needs to go last so it doesn't re-store things as they are initialized.
+			this.changeEmitter.on(eventID => {
+				const jsonStr = RaidSimSettings.toJsonString(this.toProto());
+				window.localStorage.setItem(this.getSettingsStorageKey(), jsonStr);
+			});
+		});
+	}
+
 	private addSidebarComponents() {
 		this.raidSimResultsManager = addRaidSimAction(this);
 		this.raidSimResultsManager.referenceChangeEmitter.on(eventID => this.referenceChangeEmitter.emit(eventID));
 	}
 
 	private addTopbarComponents() {
-		//Array.from(document.getElementsByClassName('share-link')).forEach(element => {
-		//	tippy(element, {
-		//		'content': 'Shareable link',
-		//		'allowHTML': true,
-		//	});
+		const downloadSettings = document.createElement('span');
+		downloadSettings.classList.add('download-settings', 'fa', 'fa-download');
+		tippy(downloadSettings, {
+			'content': 'Download',
+			'allowHTML': true,
+		});
+		downloadSettings.addEventListener('click', event => {
+			const json = RaidSimSettings.toJson(this.toProto());
+			downloadJson(json, 'tbc_raid_sim.json');
+		});
+		this.addToolbarItem(downloadSettings);
 
-		//	element.addEventListener('click', event => {
-		//		const jsonStr = JSON.stringify(this.sim.toJson());
-    //    const val = pako.deflate(jsonStr, { to: 'string' });
-    //    const encoded = btoa(String.fromCharCode(...val));
-		//		
-    //    const linkUrl = new URL(window.location.href);
-    //    linkUrl.hash = encoded;
-    //    if (navigator.clipboard == undefined) {
-    //      alert(linkUrl.toString());
-    //    } else {
-    //      navigator.clipboard.writeText(linkUrl.toString());
-    //      alert('Current settings copied to clipboard!');
-    //    }
-		//	});
-		//});
+		const uploadContainer = document.createElement('div');
+		uploadContainer.classList.add('upload-container');
+		uploadContainer.innerHTML = `
+			<span class="upload-settings fa fa-upload"></span>
+			<input class="upload-input" type="file" accept="application/json" style="display:none">
+		`;
+
+		const uploadInput = uploadContainer.getElementsByClassName('upload-input')[0] as HTMLInputElement;
+		uploadInput.addEventListener('change', event => {
+			const file = (uploadInput.files && uploadInput.files[0]) || null;
+			if (!file) {
+				return;
+			}
+
+			const reader = new FileReader();
+			reader.onload = (event) => {
+				const text = event.target!.result as string;
+				const settings = RaidSimSettings.fromJsonString(text);
+				this.fromProto(TypedEvent.nextEventID(), settings);
+			};
+			reader.readAsText(file, 'UTF-8');
+		});
+
+		const uploadSettings = uploadContainer.getElementsByClassName('upload-settings')[0] as HTMLSpanElement;
+		tippy(uploadSettings, {
+			'content': 'Upload',
+			'allowHTML': true,
+		});
+		uploadSettings.addEventListener('click', event => {
+			uploadInput.click();
+		});
+		this.addToolbarItem(uploadSettings);
 	}
 
 	private addRaidTab() {
@@ -102,6 +166,32 @@ export class RaidSimUI extends SimUI {
 		`);
 
 		this.raidPicker = new RaidPicker(this.rootElem.getElementsByClassName('raid-picker')[0] as HTMLElement, this);
+
+    const savedRaidManager = new SavedDataManager<RaidSimUI, SavedRaid>(this.rootElem.getElementsByClassName('saved-raids-manager')[0] as HTMLElement, this, {
+      label: 'Raid',
+			storageKey: this.getSavedRaidStorageKey(),
+      getData: (raidSimUI: RaidSimUI) => SavedRaid.create({
+				raid: this.sim.raid.toProto(),
+				buffBots: this.getBuffBots().map(b => b.toProto()),
+				blessings: this.blessingsPicker!.getAssignments(),
+			}),
+      setData: (eventID: EventID, raidSimUI: RaidSimUI, newRaid: SavedRaid) => {
+				TypedEvent.freezeAllAndDo(() => {
+					this.sim.raid.fromProto(eventID, newRaid.raid || RaidProto.create());
+					this.raidPicker!.setBuffBots(eventID, newRaid.buffBots);
+					this.blessingsPicker!.setAssignments(eventID, newRaid.blessings || BlessingsAssignments.create());
+				});
+			},
+      changeEmitters: [this.sim.changeEmitter],
+      equals: (a: SavedRaid, b: SavedRaid) => {
+				return SavedRaid.equals(a, b);
+			},
+      toJson: (a: SavedRaid) => SavedRaid.toJson(a),
+      fromJson: (obj: any) => SavedRaid.fromJson(obj),
+    });
+		this.sim.waitForInit().then(() => {
+			savedRaidManager.loadUserData();
+		});
 	}
 
 	private addSettingsTab() {
@@ -131,15 +221,15 @@ export class RaidSimUI extends SimUI {
 			showTargetArmor: true,
 			showNumTargets: true,
 		});
-    const savedEncounterManager = new SavedDataManager<Encounter, EncounterProto>(this.rootElem.getElementsByClassName('saved-encounter-manager')[0] as HTMLElement, this.sim.encounter, {
+    const savedEncounterManager = new SavedDataManager<Encounter, SavedEncounter>(this.rootElem.getElementsByClassName('saved-encounter-manager')[0] as HTMLElement, this.sim.encounter, {
       label: 'Encounter',
 			storageKey: this.getSavedEncounterStorageKey(),
-      getData: (encounter: Encounter) => encounter.toProto(),
-      setData: (eventID: EventID, encounter: Encounter, newEncounter: EncounterProto) => encounter.fromProto(eventID, newEncounter),
+      getData: (encounter: Encounter) => SavedEncounter.create({ encounter: encounter.toProto() }),
+      setData: (eventID: EventID, encounter: Encounter, newEncounter: SavedEncounter) => encounter.fromProto(eventID, newEncounter.encounter!),
       changeEmitters: [this.sim.encounter.changeEmitter],
-      equals: (a: EncounterProto, b: EncounterProto) => EncounterProto.equals(a, b),
-      toJson: (a: EncounterProto) => EncounterProto.toJson(a),
-      fromJson: (obj: any) => EncounterProto.fromJson(obj),
+      equals: (a: SavedEncounter, b: SavedEncounter) => SavedEncounter.equals(a, b),
+      toJson: (a: SavedEncounter) => SavedEncounter.toJson(a),
+      fromJson: (obj: any) => SavedEncounter.fromJson(obj),
     });
 		this.sim.waitForInit().then(() => {
 			savedEncounterManager.loadUserData();
@@ -246,8 +336,30 @@ export class RaidSimUI extends SimUI {
 		return playersAndBuffBots;
 	}
 
+	toProto(): RaidSimSettings {
+		return RaidSimSettings.create({
+			raid: this.sim.raid.toProto(),
+			buffBots: this.getBuffBots().map(b => b.toProto()),
+			blessings: this.blessingsPicker!.getAssignments(),
+			encounter: this.sim.encounter.toProto(),
+		});
+	}
+
+	fromProto(eventID: EventID, settings: RaidSimSettings) {
+		TypedEvent.freezeAllAndDo(() => {
+			this.sim.raid.fromProto(eventID, settings.raid || RaidProto.create());
+			this.sim.encounter.fromProto(eventID, settings.encounter || EncounterProto.create());
+			this.raidPicker!.setBuffBots(eventID, settings.buffBots);
+			this.blessingsPicker!.setAssignments(eventID, settings.blessings || BlessingsAssignments.create());
+		});
+	}
+
 	// Returns the actual key to use for local storage, based on the given key part and the site context.
 	getStorageKey(keyPart: string): string {
 		return '__raid__' + keyPart;
+	}
+
+	getSavedRaidStorageKey(): string {
+		return this.getStorageKey('__savedRaid__');
 	}
 }

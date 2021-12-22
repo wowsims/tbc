@@ -113,6 +113,7 @@ export abstract class SimUI extends Component {
 
 	addToolbarItem(elem: HTMLElement) {
 		const topBar = this.rootElem.getElementsByClassName('sim-top-bar')[0] as HTMLElement;
+		elem.classList.add('sim-top-bar-item');
 		topBar.appendChild(elem);
 	}
 

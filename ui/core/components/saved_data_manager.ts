@@ -174,12 +174,12 @@ export class SavedDataManager<ModObject, T> extends Component {
 
   // Save data to window.localStorage.
   private saveUserData() {
-    const gearData: Record<string, Object> = {};
+    const userData: Record<string, Object> = {};
     this.userData.forEach(savedData => {
-      gearData[savedData.name] = this.config.toJson(savedData.data);
+      userData[savedData.name] = this.config.toJson(savedData.data);
     });
 
-    window.localStorage.setItem(this.config.storageKey, JSON.stringify(gearData));
+    window.localStorage.setItem(this.config.storageKey, JSON.stringify(userData));
   }
 
   // Load data from window.localStorage.

@@ -18,8 +18,6 @@ export class Encounter {
   // Emits when any of the above emitters emit.
   readonly changeEmitter = new TypedEvent<void>();
 
-	private modifyEncounterProto: ((encounterProto: EncounterProto) => void) = () => {};
-
   constructor(sim: Sim) {
 		this.sim = sim;
 		this.primaryTarget = new Target(sim);
@@ -53,10 +51,6 @@ export class Encounter {
 		this.numTargetsChangeEmitter.emit(eventID);
   }
 
-	setModifyEncounterProto(newModFn: (encounterProto: EncounterProto) => void) {
-		this.modifyEncounterProto = newModFn;
-	}
-
 	toProto(): EncounterProto {
 		const numTargets = Math.max(1, this.numTargets);
 		const targetProtos = [];
@@ -64,14 +58,10 @@ export class Encounter {
 			targetProtos.push(this.primaryTarget.toProto());
 		}
 
-		const proto = EncounterProto.create({
+		return EncounterProto.create({
 			duration: this.duration,
 			targets: targetProtos,
 		});
-
-		this.modifyEncounterProto(proto);
-
-		return proto;
 	}
 
 	fromProto(eventID: EventID, proto: EncounterProto) {
