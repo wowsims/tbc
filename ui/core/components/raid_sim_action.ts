@@ -36,6 +36,8 @@ export class RaidSimResultsManager {
 	readonly currentChangeEmitter: TypedEvent<void> = new TypedEvent<void>();
 	readonly referenceChangeEmitter: TypedEvent<void> = new TypedEvent<void>();
 
+	readonly changeEmitter: TypedEvent<void> = new TypedEvent<void>();
+
 	private readonly simUI: SimUI;
 
 	private currentData: ReferenceData | null = null;
@@ -43,6 +45,11 @@ export class RaidSimResultsManager {
 
   constructor(simUI: SimUI) {
 		this.simUI = simUI;
+
+		[
+      this.currentChangeEmitter,
+      this.referenceChangeEmitter,
+    ].forEach(emitter => emitter.on(eventID => this.changeEmitter.emit(eventID)));
   }
 
   setSimResult(eventID: EventID, simResult: SimResult) {
