@@ -105,7 +105,7 @@ export class RaidSimUI extends SimUI {
 
 	private addSidebarComponents() {
 		this.raidSimResultsManager = addRaidSimAction(this);
-		this.raidSimResultsManager.referenceChangeEmitter.on(eventID => this.referenceChangeEmitter.emit(eventID));
+		this.raidSimResultsManager.changeEmitter.on(eventID => this.referenceChangeEmitter.emit(eventID));
 	}
 
 	private addTopbarComponents() {
