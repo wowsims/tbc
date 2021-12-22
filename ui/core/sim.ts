@@ -1,6 +1,7 @@
 import { Class } from '/tbc/core/proto/common.js';
 import { Consumes } from '/tbc/core/proto/common.js';
 import { Enchant } from '/tbc/core/proto/common.js';
+import { Encounter as EncounterProto } from '/tbc/core/proto/common.js';
 import { EquipmentSpec } from '/tbc/core/proto/common.js';
 import { Gem } from '/tbc/core/proto/common.js';
 import { GemColor } from '/tbc/core/proto/common.js';
@@ -12,6 +13,7 @@ import { Item } from '/tbc/core/proto/common.js';
 import { Race } from '/tbc/core/proto/common.js';
 import { Spec } from '/tbc/core/proto/common.js';
 import { Stat } from '/tbc/core/proto/common.js';
+import { Raid as RaidProto } from '/tbc/core/proto/api.js';
 import { ComputeStatsRequest, ComputeStatsResult } from '/tbc/core/proto/api.js';
 import { GearListRequest, GearListResult } from '/tbc/core/proto/api.js';
 import { RaidSimRequest, RaidSimResult } from '/tbc/core/proto/api.js';
@@ -81,6 +83,10 @@ export class Sim {
 
 	private readonly _initPromise: Promise<void>;
 
+	// These callbacks are needed so we can apply BuffBot modifications automatically before sending requests.
+	private modifyRaidProto: ((raidProto: RaidProto) => void) = () => {};
+	private modifyEncounterProto: ((encounterProto: EncounterProto) => void) = () => {};
+
   constructor() {
 		this.workerPool = new WorkerPool(3);
 
@@ -107,10 +113,22 @@ export class Sim {
 		return this._initPromise;
   }
 
+	setModifyRaidProto(newModFn: (raidProto: RaidProto) => void) {
+		this.modifyRaidProto = newModFn;
+	}
+	setModifyEncounterProto(newModFn: (encounterProto: EncounterProto) => void) {
+		this.modifyEncounterProto = newModFn;
+	}
+
   private makeRaidSimRequest(debug: boolean): RaidSimRequest {
+		const raidProto = this.raid.toProto();
+		const encounterProto = this.encounter.toProto();
+		this.modifyRaidProto(raidProto);
+		this.modifyEncounterProto(encounterProto);
+
 		return RaidSimRequest.create({
-			raid: this.raid.toProto(),
-			encounter: this.encounter.toProto(),
+			raid: raidProto,
+			encounter: encounterProto,
 			simOptions: SimOptions.create({
 				iterations: debug ? 1 : this.getIterations(),
 				debug: debug,
@@ -160,8 +178,10 @@ export class Sim {
 		// request is in-flight.
 		const players = this.raid.getPlayers();
 
+		const raidProto = this.raid.toProto();
+		this.modifyRaidProto(raidProto);
 		const result = await this.workerPool.computeStats(ComputeStatsRequest.create({
-			raid: this.raid.toProto(),
+			raid: raidProto,
 		}));
 
 		TypedEvent.freezeAllAndDo(() => {

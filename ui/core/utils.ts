@@ -78,3 +78,13 @@ export function camelToSnakeCase(str: string): string {
 	}
 	return result;
 }
+
+export function downloadJson(json: any, fileName: string) {
+	const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(json));
+	const downloadAnchorNode = document.createElement('a');
+	downloadAnchorNode.setAttribute("href", dataStr);
+	downloadAnchorNode.setAttribute("download", fileName);
+	document.body.appendChild(downloadAnchorNode); // required for firefox
+	downloadAnchorNode.click();
+	downloadAnchorNode.remove();
+}

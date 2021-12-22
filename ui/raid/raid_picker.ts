@@ -12,6 +12,7 @@ import { Party as PartyProto } from '/tbc/core/proto/api.js';
 import { Class } from '/tbc/core/proto/common.js';
 import { Race } from '/tbc/core/proto/common.js';
 import { Spec } from '/tbc/core/proto/common.js';
+import { BuffBot as BuffBotProto } from '/tbc/core/proto/ui.js';
 import { Faction } from '/tbc/core/proto_utils/utils.js';
 import { classColors } from '/tbc/core/proto_utils/utils.js';
 import { specToClass } from '/tbc/core/proto_utils/utils.js';
@@ -102,6 +103,24 @@ export class RaidPicker extends Component {
 		return this.getPlayerPickers()
 				.filter(picker => picker.player instanceof BuffBot)
 				.map(picker => picker.player as BuffBot);
+	}
+	
+	setBuffBots(eventID: EventID, newBuffBotProtos: Array<BuffBotProto>) {
+		TypedEvent.freezeAllAndDo(() => {
+			this.getBuffBots().forEach(buffBot => this.getPlayerPicker(buffBot.getRaidIndex()).setPlayer(eventID, null));
+
+			newBuffBotProtos.forEach(buffBotProto => {
+				const settings = buffBotPresets.find(preset => preset.buffBotId == buffBotProto.id);
+				if (!settings) {
+					console.warn('Invalid buff bot ID: ' + buffBotProto.id);
+					return;
+				}
+
+				const buffBot = new BuffBot(buffBotProto.id, this.raid.sim);
+				buffBot.fromProto(eventID, buffBotProto);
+				this.getPlayerPicker(buffBotProto.raidIndex).setPlayer(eventID, buffBot);
+			});
+		});
 	}
 
 	setDragPlayer(player: Player<any> | BuffBot, fromIndex: number, type: DragType) {
@@ -454,8 +473,6 @@ export class PlayerPicker extends Component {
 		this.dpsResultElem.textContent = '';
 		this.referenceDeltaElem.textContent = '';
 
-		const oldPlayerWasBuffBot = this.player instanceof BuffBot;
-
 		TypedEvent.freezeAllAndDo(() => {
 			this.player = newPlayer;
 			if (newPlayer instanceof BuffBot) {
@@ -463,6 +480,10 @@ export class PlayerPicker extends Component {
 				newPlayer.setRaidIndex(eventID, this.raidIndex);
 			} else {
 				this.partyPicker.party.setPlayer(eventID, this.index, newPlayer);
+
+				if (newPlayer == null) {
+					this.partyPicker.party.compChangeEmitter.emit(eventID);
+				}
 			}
 		});
 
@@ -486,6 +507,7 @@ export class PlayerPicker extends Component {
 			this.resultsElem.setAttribute('draggable', 'true');
 			this.nameElem.textContent = this.player.name;
 			this.nameElem.removeAttribute('contenteditable');
+			this.iconElem.src = this.player.settings.iconUrl;
 		} else {
 			this.rootElem.classList.remove('empty');
 			this.rootElem.classList.remove('buff-bot');

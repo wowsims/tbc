@@ -29,8 +29,6 @@ export class Raid {
 	// Should always hold exactly MAX_NUM_PARTIES elements.
 	private parties: Array<Party>;
 
-	private modifyRaidProto: ((raidProto: RaidProto) => void) = () => {};
-
 	readonly sim: Sim;
 
   constructor(sim: Sim) {
@@ -106,19 +104,11 @@ export class Raid {
     this.buffsChangeEmitter.emit(eventID);
   }
 
-	setModifyRaidProto(newModFn: (raidProto: RaidProto) => void) {
-		this.modifyRaidProto = newModFn;
-	}
-
 	toProto(): RaidProto {
-		const raidProto = RaidProto.create({
+		return RaidProto.create({
 			parties: this.parties.map(party => party.toProto()),
 			buffs: this.buffs,
 		});
-
-		this.modifyRaidProto(raidProto);
-
-		return raidProto;
 	}
 
 	fromProto(eventID: EventID, proto: RaidProto) {

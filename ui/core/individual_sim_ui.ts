@@ -203,9 +203,7 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 		if (!this.isWithinRaidSim) {
 			// This needs to go before all the UI components so that gear loading is the
 			// first callback invoked from waitForInit().
-			this.sim.waitForInit().then(() => {
-				this.loadSettings();
-			});
+			this.sim.waitForInit().then(() => this.loadSettings());
 		}
 		this.player.setEpWeights(this.individualConfig.defaults.epWeights);
 
@@ -339,10 +337,12 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 				};
 			},
 			setData: (eventID: EventID, player: Player<any>, newGearAndStats: GearAndStats) => {
-				player.setGear(eventID, newGearAndStats.gear);
-				if (newGearAndStats.bonusStats) {
-					player.setBonusStats(eventID, newGearAndStats.bonusStats);
-				}
+				TypedEvent.freezeAllAndDo(() => {
+					player.setGear(eventID, newGearAndStats.gear);
+					if (newGearAndStats.bonusStats) {
+						player.setBonusStats(eventID, newGearAndStats.bonusStats);
+					}
+				});
 			},
 			changeEmitters: [this.player.changeEmitter],
 			equals: (a: GearAndStats, b: GearAndStats) => a.gear.equals(b.gear) && equalsOrBothNull(a.bonusStats, b.bonusStats, (a, b) => a.equals(b)),
