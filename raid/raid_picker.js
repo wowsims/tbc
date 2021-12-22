@@ -69,6 +69,21 @@ export class RaidPicker extends Component {
             .filter(picker => picker.player instanceof BuffBot)
             .map(picker => picker.player);
     }
+    setBuffBots(eventID, newBuffBotProtos) {
+        TypedEvent.freezeAllAndDo(() => {
+            this.getBuffBots().forEach(buffBot => this.getPlayerPicker(buffBot.getRaidIndex()).setPlayer(eventID, null));
+            newBuffBotProtos.forEach(buffBotProto => {
+                const settings = buffBotPresets.find(preset => preset.buffBotId == buffBotProto.id);
+                if (!settings) {
+                    console.warn('Invalid buff bot ID: ' + buffBotProto.id);
+                    return;
+                }
+                const buffBot = new BuffBot(buffBotProto.id, this.raid.sim);
+                buffBot.fromProto(eventID, buffBotProto);
+                this.getPlayerPicker(buffBotProto.raidIndex).setPlayer(eventID, buffBot);
+            });
+        });
+    }
     setDragPlayer(player, fromIndex, type) {
         this.clearDragPlayer();
         this.currentDragPlayer = player;
@@ -352,7 +367,6 @@ export class PlayerPicker extends Component {
         }
         this.dpsResultElem.textContent = '';
         this.referenceDeltaElem.textContent = '';
-        const oldPlayerWasBuffBot = this.player instanceof BuffBot;
         TypedEvent.freezeAllAndDo(() => {
             this.player = newPlayer;
             if (newPlayer instanceof BuffBot) {
@@ -361,6 +375,9 @@ export class PlayerPicker extends Component {
             }
             else {
                 this.partyPicker.party.setPlayer(eventID, this.index, newPlayer);
+                if (newPlayer == null) {
+                    this.partyPicker.party.compChangeEmitter.emit(eventID);
+                }
             }
         });
         this.update();
@@ -383,6 +400,7 @@ export class PlayerPicker extends Component {
             this.resultsElem.setAttribute('draggable', 'true');
             this.nameElem.textContent = this.player.name;
             this.nameElem.removeAttribute('contenteditable');
+            this.iconElem.src = this.player.settings.iconUrl;
         }
         else {
             this.rootElem.classList.remove('empty');

@@ -4,6 +4,8 @@ import type { BinaryReadOptions } from "@protobuf-ts/runtime";
 import type { IBinaryReader } from "@protobuf-ts/runtime";
 import type { PartialMessage } from "@protobuf-ts/runtime";
 import { MessageType } from "@protobuf-ts/runtime";
+import { Raid } from "./api";
+import { Encounter } from "./common";
 import { RaidTarget } from "./common";
 /**
  * A buff bot placed in a raid.
@@ -55,6 +57,59 @@ export interface BlessingsAssignments {
      * @generated from protobuf field: repeated proto.BlessingsAssignment paladins = 1;
      */
     paladins: BlessingsAssignment[];
+}
+/**
+ * Local storage data for a saved encounter.
+ *
+ * @generated from protobuf message proto.SavedEncounter
+ */
+export interface SavedEncounter {
+    /**
+     * @generated from protobuf field: proto.Encounter encounter = 1;
+     */
+    encounter?: Encounter;
+}
+/**
+ * Local storage data for raid sim settings.
+ *
+ * @generated from protobuf message proto.SavedRaid
+ */
+export interface SavedRaid {
+    /**
+     * @generated from protobuf field: proto.Raid raid = 1;
+     */
+    raid?: Raid;
+    /**
+     * @generated from protobuf field: repeated proto.BuffBot buff_bots = 2;
+     */
+    buffBots: BuffBot[];
+    /**
+     * @generated from protobuf field: proto.BlessingsAssignments blessings = 3;
+     */
+    blessings?: BlessingsAssignments;
+}
+/**
+ * Contains all information that is imported/exported from a raid sim.
+ *
+ * @generated from protobuf message proto.RaidSimSettings
+ */
+export interface RaidSimSettings {
+    /**
+     * @generated from protobuf field: proto.Raid raid = 1;
+     */
+    raid?: Raid;
+    /**
+     * @generated from protobuf field: repeated proto.BuffBot buff_bots = 2;
+     */
+    buffBots: BuffBot[];
+    /**
+     * @generated from protobuf field: proto.BlessingsAssignments blessings = 3;
+     */
+    blessings?: BlessingsAssignments;
+    /**
+     * @generated from protobuf field: proto.Encounter encounter = 4;
+     */
+    encounter?: Encounter;
 }
 /**
  * @generated from protobuf enum proto.Blessings
@@ -111,4 +166,34 @@ declare class BlessingsAssignments$Type extends MessageType<BlessingsAssignments
  * @generated MessageType for protobuf message proto.BlessingsAssignments
  */
 export declare const BlessingsAssignments: BlessingsAssignments$Type;
+declare class SavedEncounter$Type extends MessageType<SavedEncounter> {
+    constructor();
+    create(value?: PartialMessage<SavedEncounter>): SavedEncounter;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: SavedEncounter): SavedEncounter;
+    internalBinaryWrite(message: SavedEncounter, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message proto.SavedEncounter
+ */
+export declare const SavedEncounter: SavedEncounter$Type;
+declare class SavedRaid$Type extends MessageType<SavedRaid> {
+    constructor();
+    create(value?: PartialMessage<SavedRaid>): SavedRaid;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: SavedRaid): SavedRaid;
+    internalBinaryWrite(message: SavedRaid, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message proto.SavedRaid
+ */
+export declare const SavedRaid: SavedRaid$Type;
+declare class RaidSimSettings$Type extends MessageType<RaidSimSettings> {
+    constructor();
+    create(value?: PartialMessage<RaidSimSettings>): RaidSimSettings;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: RaidSimSettings): RaidSimSettings;
+    internalBinaryWrite(message: RaidSimSettings, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message proto.RaidSimSettings
+ */
+export declare const RaidSimSettings: RaidSimSettings$Type;
 export {};

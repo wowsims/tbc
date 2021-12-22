@@ -9,3 +9,4 @@ export declare function getEnumValues<E>(enumType: any): Array<E>;
 export declare function isRightClick(event: MouseEvent): boolean;
 export declare function hexToRgba(hex: string, alpha: number): string;
 export declare function camelToSnakeCase(str: string): string;
+export declare function downloadJson(json: any, fileName: string): void;

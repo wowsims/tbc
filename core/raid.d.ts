@@ -13,7 +13,6 @@ export declare class Raid {
     readonly buffsChangeEmitter: TypedEvent<void>;
     readonly changeEmitter: TypedEvent<void>;
     private parties;
-    private modifyRaidProto;
     readonly sim: Sim;
     constructor(sim: Sim);
     size(): number;
@@ -27,7 +26,6 @@ export declare class Raid {
     getClassCount(playerClass: Class): number;
     getBuffs(): RaidBuffs;
     setBuffs(eventID: EventID, newBuffs: RaidBuffs): void;
-    setModifyRaidProto(newModFn: (raidProto: RaidProto) => void): void;
     toProto(): RaidProto;
     fromProto(eventID: EventID, proto: RaidProto): void;
     toJson(): Object;

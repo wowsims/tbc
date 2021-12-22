@@ -14,7 +14,6 @@ export class Raid {
         this.buffsChangeEmitter = new TypedEvent();
         // Emits when anything in the raid changes.
         this.changeEmitter = new TypedEvent();
-        this.modifyRaidProto = () => { };
         this.sim = sim;
         this.parties = [...Array(MAX_NUM_PARTIES).keys()].map(i => {
             const newParty = new Party(this, sim);
@@ -73,16 +72,11 @@ export class Raid {
         this.buffs = RaidBuffs.clone(newBuffs);
         this.buffsChangeEmitter.emit(eventID);
     }
-    setModifyRaidProto(newModFn) {
-        this.modifyRaidProto = newModFn;
-    }
     toProto() {
-        const raidProto = RaidProto.create({
+        return RaidProto.create({
             parties: this.parties.map(party => party.toProto()),
             buffs: this.buffs,
         });
-        this.modifyRaidProto(raidProto);
-        return raidProto;
     }
     fromProto(eventID, proto) {
         TypedEvent.freezeAllAndDo(() => {

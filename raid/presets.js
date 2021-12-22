@@ -113,7 +113,10 @@ export const buffBotPresets = [
             if (innervateIndex != NO_TARGET) {
                 const partyIndex = Math.floor(innervateIndex / 5);
                 const playerIndex = innervateIndex % 5;
-                raidProto.parties[partyIndex].players[playerIndex].buffs.innervates++;
+                const playerProto = raidProto.parties[partyIndex].players[playerIndex];
+                if (playerProto.buffs) {
+                    playerProto.buffs.innervates++;
+                }
             }
         },
         modifyEncounterProto: (buffBot, encounterProto) => {

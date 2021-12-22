@@ -35,7 +35,9 @@ export class TypedEvent {
         const originalEvent = this.firedEvents.find(fe => fe.eventID == eventID);
         if (originalEvent) {
             if (!thawing) {
-                console.warn('EventID collision outside of thawing, original event: ' + (originalEvent.error.stack || originalEvent.error));
+                // Uncomment this for debugging TypedEvent stuff. There are a few legitimate
+                // cases where it fires though and it can be very noisy.
+                //console.warn('EventID collision outside of thawing, original event: ' + (originalEvent.error.stack || originalEvent.error));
             }
             return;
         }

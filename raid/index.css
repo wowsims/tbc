@@ -1388,6 +1388,12 @@ td, th {
   height: 100% !important;
 }
 
+.sim-top-bar-item {
+  margin: 10px;
+  font-size: 20px;
+  cursor: pointer;
+}
+
 .known-issues {
   display: none;
   background-color: red;
@@ -1616,12 +1622,6 @@ td, th {
   border-bottom: 1px solid var(--sidebar-text-color);
   font-size: 16px;
   font-weight: 600;
-}
-
-.share-link {
-  margin: 10px;
-  font-size: 20px;
-  cursor: pointer;
 }
 
 .gear-tab-columns {

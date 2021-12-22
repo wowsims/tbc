@@ -116,11 +116,11 @@ export class SavedDataManager extends Component {
     }
     // Save data to window.localStorage.
     saveUserData() {
-        const gearData = {};
+        const userData = {};
         this.userData.forEach(savedData => {
-            gearData[savedData.name] = this.config.toJson(savedData.data);
+            userData[savedData.name] = this.config.toJson(savedData.data);
         });
-        window.localStorage.setItem(this.config.storageKey, JSON.stringify(gearData));
+        window.localStorage.setItem(this.config.storageKey, JSON.stringify(userData));
     }
     // Load data from window.localStorage.
     loadUserData() {

@@ -145,4 +145,8 @@ export class BlessingsPicker extends Component {
         // Defensive copy.
         return BlessingsAssignments.clone(this.assignments);
     }
+    setAssignments(eventID, newAssignments) {
+        this.assignments = BlessingsAssignments.clone(newAssignments);
+        this.changeEmitter.emit(eventID);
+    }
 }

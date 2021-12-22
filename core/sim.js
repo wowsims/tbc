@@ -31,6 +31,9 @@ export class Sim {
         this.changeEmitter = new TypedEvent();
         // Fires when a raid sim API call completes.
         this.simResultEmitter = new TypedEvent();
+        // These callbacks are needed so we can apply BuffBot modifications automatically before sending requests.
+        this.modifyRaidProto = () => { };
+        this.modifyEncounterProto = () => { };
         this.workerPool = new WorkerPool(3);
         this._initPromise = this.workerPool.getGearList(GearListRequest.create()).then(result => {
             result.items.forEach(item => this.items[item.id] = item);
@@ -50,10 +53,20 @@ export class Sim {
     waitForInit() {
         return this._initPromise;
     }
+    setModifyRaidProto(newModFn) {
+        this.modifyRaidProto = newModFn;
+    }
+    setModifyEncounterProto(newModFn) {
+        this.modifyEncounterProto = newModFn;
+    }
     makeRaidSimRequest(debug) {
+        const raidProto = this.raid.toProto();
+        const encounterProto = this.encounter.toProto();
+        this.modifyRaidProto(raidProto);
+        this.modifyEncounterProto(encounterProto);
         return RaidSimRequest.create({
-            raid: this.raid.toProto(),
-            encounter: this.encounter.toProto(),
+            raid: raidProto,
+            encounter: encounterProto,
             simOptions: SimOptions.create({
                 iterations: debug ? 1 : this.getIterations(),
                 debug: debug,
@@ -94,8 +107,10 @@ export class Sim {
         // Capture the current players so we avoid issues if something changes while
         // request is in-flight.
         const players = this.raid.getPlayers();
+        const raidProto = this.raid.toProto();
+        this.modifyRaidProto(raidProto);
         const result = await this.workerPool.computeStats(ComputeStatsRequest.create({
-            raid: this.raid.toProto(),
+            raid: raidProto,
         }));
         TypedEvent.freezeAllAndDo(() => {
             result.raidStats.parties

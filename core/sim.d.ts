@@ -1,4 +1,5 @@
 import { Enchant } from '/tbc/core/proto/common.js';
+import { Encounter as EncounterProto } from '/tbc/core/proto/common.js';
 import { EquipmentSpec } from '/tbc/core/proto/common.js';
 import { Gem } from '/tbc/core/proto/common.js';
 import { GemColor } from '/tbc/core/proto/common.js';
@@ -7,6 +8,7 @@ import { ItemSpec } from '/tbc/core/proto/common.js';
 import { Item } from '/tbc/core/proto/common.js';
 import { Spec } from '/tbc/core/proto/common.js';
 import { Stat } from '/tbc/core/proto/common.js';
+import { Raid as RaidProto } from '/tbc/core/proto/api.js';
 import { RaidSimRequest, RaidSimResult } from '/tbc/core/proto/api.js';
 import { StatWeightsRequest, StatWeightsResult } from '/tbc/core/proto/api.js';
 import { EquippedItem } from '/tbc/core/proto_utils/equipped_item.js';
@@ -38,8 +40,12 @@ export declare class Sim {
     readonly changeEmitter: TypedEvent<void>;
     readonly simResultEmitter: TypedEvent<SimResult>;
     private readonly _initPromise;
+    private modifyRaidProto;
+    private modifyEncounterProto;
     constructor();
     waitForInit(): Promise<void>;
+    setModifyRaidProto(newModFn: (raidProto: RaidProto) => void): void;
+    setModifyEncounterProto(newModFn: (encounterProto: EncounterProto) => void): void;
     private makeRaidSimRequest;
     runRaidSim(eventID: EventID): Promise<SimResult>;
     runRaidSimWithLogs(eventID: EventID): Promise<SimResult>;
