@@ -76,6 +76,10 @@ export class SimUI extends Component {
         simTabsContainer.insertBefore(newTab, topBar);
         simTabContentsContainer.appendChild(newContent);
     }
+    addToolbarItem(elem) {
+        const topBar = this.rootElem.getElementsByClassName('sim-top-bar')[0];
+        topBar.appendChild(elem);
+    }
     hideAllResults() {
         this.resultsContentElem.style.display = 'none';
         this.resultsPendingElem.style.display = 'none';
@@ -117,7 +121,6 @@ const simHTML = `
     <ul class="sim-tabs nav nav-tabs">
       <li class="sim-top-bar">
 				<div class="known-issues">Known Issues</div>
-				<span class="share-link fa fa-link within-raid-sim-hide"></span>
 			</li>
     </ul>
     <div class="tab-content">

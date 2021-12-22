@@ -13,6 +13,7 @@ export declare abstract class SimUI extends Component {
     constructor(parentElem: HTMLElement, sim: Sim, config: SimUIConfig);
     addAction(name: string, cssClass: string, actFn: () => void): void;
     addTab(title: string, cssClass: string, innerHTML: string): void;
+    addToolbarItem(elem: HTMLElement): void;
     hideAllResults(): void;
     setResultsPending(): void;
     setResultsContent(innerHTML: string): void;

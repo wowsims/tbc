@@ -150,26 +150,27 @@ export class IndividualSimUI extends SimUI {
         const characterStats = new CharacterStats(this.rootElem.getElementsByClassName('sim-sidebar-footer')[0], this.player, this.individualConfig.displayStats, this.individualConfig.modifyDisplayStats);
     }
     addTopbarComponents() {
-        Array.from(document.getElementsByClassName('share-link')).forEach(element => {
-            tippy(element, {
-                'content': 'Shareable link',
-                'allowHTML': true,
-            });
-            element.addEventListener('click', event => {
-                const jsonStr = JSON.stringify(this.sim.toJson());
-                const val = pako.deflate(jsonStr, { to: 'string' });
-                const encoded = btoa(String.fromCharCode(...val));
-                const linkUrl = new URL(window.location.href);
-                linkUrl.hash = encoded;
-                if (navigator.clipboard == undefined) {
-                    alert(linkUrl.toString());
-                }
-                else {
-                    navigator.clipboard.writeText(linkUrl.toString());
-                    alert('Current settings copied to clipboard!');
-                }
-            });
+        const shareLink = document.createElement('span');
+        shareLink.classList.add('share-link', 'fa', 'fa-link', 'within-raid-sim-hide');
+        tippy(shareLink, {
+            'content': 'Shareable link',
+            'allowHTML': true,
         });
+        shareLink.addEventListener('click', event => {
+            const jsonStr = JSON.stringify(this.sim.toJson());
+            const val = pako.deflate(jsonStr, { to: 'string' });
+            const encoded = btoa(String.fromCharCode(...val));
+            const linkUrl = new URL(window.location.href);
+            linkUrl.hash = encoded;
+            if (navigator.clipboard == undefined) {
+                alert(linkUrl.toString());
+            }
+            else {
+                navigator.clipboard.writeText(linkUrl.toString());
+                alert('Current settings copied to clipboard!');
+            }
+        });
+        this.addToolbarItem(shareLink);
     }
     addGearTab() {
         this.addTab('Gear', 'gear-tab', `
