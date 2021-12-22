@@ -13,6 +13,7 @@ export declare type ReferenceData = {
 export declare class RaidSimResultsManager {
     readonly currentChangeEmitter: TypedEvent<void>;
     readonly referenceChangeEmitter: TypedEvent<void>;
+    readonly changeEmitter: TypedEvent<void>;
     private readonly simUI;
     private currentData;
     private referenceData;

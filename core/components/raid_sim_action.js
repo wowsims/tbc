@@ -22,9 +22,14 @@ export class RaidSimResultsManager {
     constructor(simUI) {
         this.currentChangeEmitter = new TypedEvent();
         this.referenceChangeEmitter = new TypedEvent();
+        this.changeEmitter = new TypedEvent();
         this.currentData = null;
         this.referenceData = null;
         this.simUI = simUI;
+        [
+            this.currentChangeEmitter,
+            this.referenceChangeEmitter,
+        ].forEach(emitter => emitter.on(eventID => this.changeEmitter.emit(eventID)));
     }
     setSimResult(eventID, simResult) {
         this.currentData = {
