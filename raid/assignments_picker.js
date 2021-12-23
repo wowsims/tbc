@@ -4,61 +4,63 @@ import { Player } from '/tbc/core/player.js';
 import { TypedEvent } from '/tbc/core/typed_event.js';
 import { Class } from '/tbc/core/proto/common.js';
 import { newRaidTarget, emptyRaidTarget } from '/tbc/core/proto_utils/utils.js';
+import { BuffBot } from './buff_bot.js';
 export class AssignmentsPicker extends Component {
     constructor(parentElem, raidSimUI) {
         super(parentElem, 'assignments-picker-root');
         this.changeEmitter = new TypedEvent();
         this.raidSimUI = raidSimUI;
         this.innervatesPicker = new InnervatesPicker(this.rootElem, raidSimUI);
+        this.powerInfusionsPicker = new PowerInfusionsPicker(this.rootElem, raidSimUI);
     }
 }
 ;
-export class InnervatesPicker extends Component {
+class AssignedBuffPicker extends Component {
     constructor(parentElem, raidSimUI) {
-        super(parentElem, 'innervates-picker-root');
+        super(parentElem, 'assigned-buff-picker-root');
         this.changeEmitter = new TypedEvent();
         this.raidSimUI = raidSimUI;
         this.targetPickers = [];
         this.playersContainer = document.createElement('div');
-        this.playersContainer.classList.add('innervate-players-container', 'settings-section');
+        this.playersContainer.classList.add('assigned-buff-players-container', 'settings-section');
         this.rootElem.appendChild(this.playersContainer);
-        this.update(this.raidSimUI.getPlayersAndBuffBots());
-        this.raidSimUI.compChangeEmitter.on(eventID => {
+        this.update();
+        this.raidSimUI.changeEmitter.on(eventID => {
             this.recoverRaidTargets();
-            this.update(this.raidSimUI.getPlayersAndBuffBots());
+            this.update();
         });
     }
-    update(playersAndBots) {
+    update() {
         this.playersContainer.innerHTML = `
-			<label>Innervates</label>
+			<label>${this.getTitle()}</label>
 		`;
-        const druids = playersAndBots.filter(playerOrBot => playerOrBot?.getClass() == Class.ClassDruid);
-        if (druids.length == 0) {
+        const sourcePlayers = this.getSourcePlayers();
+        if (sourcePlayers.length == 0) {
             this.rootElem.style.display = 'none';
         }
         else {
             this.rootElem.style.display = 'initial';
         }
-        this.targetPickers = druids.map((druid, druidIndex) => {
+        this.targetPickers = sourcePlayers.map((sourcePlayer, sourcePlayerIndex) => {
             const row = document.createElement('div');
-            row.classList.add('innervate-player');
+            row.classList.add('assigned-buff-player');
             this.playersContainer.appendChild(row);
-            const innervateSourceElem = RaidTargetPicker.makeOptionElem({
-                iconUrl: druid instanceof Player ? druid.getTalentTreeIcon() : druid.settings.iconUrl,
-                text: druid.getLabel(),
-                color: druid.getClassColor(),
+            const sourceElem = RaidTargetPicker.makeOptionElem({
+                iconUrl: sourcePlayer instanceof Player ? sourcePlayer.getTalentTreeIcon() : sourcePlayer.settings.iconUrl,
+                text: sourcePlayer.getLabel(),
+                color: sourcePlayer.getClassColor(),
                 isDropdown: false,
             });
-            innervateSourceElem.classList.add('raid-target-picker-root');
-            row.appendChild(innervateSourceElem);
+            sourceElem.classList.add('raid-target-picker-root');
+            row.appendChild(sourceElem);
             const arrow = document.createElement('span');
-            arrow.classList.add('innervate-arrow', 'fa', 'fa-arrow-right');
+            arrow.classList.add('assigned-buff-arrow', 'fa', 'fa-arrow-right');
             row.appendChild(arrow);
             let raidTargetPicker = null;
-            if (druid instanceof Player) {
-                raidTargetPicker = new RaidTargetPicker(row, druid, {
+            if (sourcePlayer instanceof Player) {
+                raidTargetPicker = new RaidTargetPicker(row, sourcePlayer, {
                     extraCssClasses: [
-                        'innervate-target-picker',
+                        'assigned-buff-target-picker',
                     ],
                     noTargetLabel: 'Unassigned',
                     compChangeEmitter: this.raidSimUI.sim.raid.compChangeEmitter,
@@ -74,18 +76,14 @@ export class InnervatesPicker extends Component {
                         });
                     },
                     changedEvent: (player) => player.specOptionsChangeEmitter,
-                    getValue: (player) => player.getSpecOptions().innervateTarget || emptyRaidTarget(),
-                    setValue: (eventID, player, newValue) => {
-                        const newOptions = player.getSpecOptions();
-                        newOptions.innervateTarget = newValue;
-                        player.setSpecOptions(eventID, newOptions);
-                    },
+                    getValue: (player) => this.getPlayerValue(player),
+                    setValue: (eventID, player, newValue) => this.setPlayerValue(eventID, player, newValue),
                 });
             }
             else {
-                raidTargetPicker = new RaidTargetPicker(row, druid, {
+                raidTargetPicker = new RaidTargetPicker(row, sourcePlayer, {
                     extraCssClasses: [
-                        'innervate-target-picker',
+                        'assigned-buff-target-picker',
                     ],
                     noTargetLabel: 'Unassigned',
                     compChangeEmitter: this.raidSimUI.sim.raid.compChangeEmitter,
@@ -100,13 +98,13 @@ export class InnervatesPicker extends Component {
                             };
                         });
                     },
-                    changedEvent: (player) => player.innervateAssignmentChangeEmitter,
-                    getValue: (player) => player.getInnervateAssignment(),
-                    setValue: (eventID, player, newValue) => player.setInnervateAssignment(eventID, newValue),
+                    changedEvent: (buffBot) => buffBot.changeEmitter,
+                    getValue: (buffBot) => this.getBuffBotValue(buffBot),
+                    setValue: (eventID, buffBot, newValue) => this.setBuffBotValue(eventID, buffBot, newValue),
                 });
             }
             const targetPickerData = {
-                playerOrBot: druid,
+                playerOrBot: sourcePlayer,
                 targetPicker: raidTargetPicker,
                 targetPlayer: this.raidSimUI.sim.raid.getPlayerFromRaidTarget(raidTargetPicker.getInputValue()),
             };
@@ -149,5 +147,58 @@ export class InnervatesPicker extends Component {
                 }
             });
         });
+    }
+}
+class InnervatesPicker extends AssignedBuffPicker {
+    getTitle() {
+        return 'Innervates';
+    }
+    getSourcePlayers() {
+        return this.raidSimUI.getPlayersAndBuffBots().filter(playerOrBot => playerOrBot?.getClass() == Class.ClassDruid);
+    }
+    getPlayerValue(player) {
+        return player.getSpecOptions().innervateTarget || emptyRaidTarget();
+    }
+    setPlayerValue(eventID, player, newValue) {
+        const newOptions = player.getSpecOptions();
+        newOptions.innervateTarget = newValue;
+        player.setSpecOptions(eventID, newOptions);
+    }
+    getBuffBotValue(buffBot) {
+        return buffBot.getInnervateAssignment();
+    }
+    setBuffBotValue(eventID, buffBot, newValue) {
+        buffBot.setInnervateAssignment(eventID, newValue);
+    }
+}
+class PowerInfusionsPicker extends AssignedBuffPicker {
+    getTitle() {
+        return 'Power Infusions';
+    }
+    getSourcePlayers() {
+        return this.raidSimUI.getPlayersAndBuffBots()
+            .filter(playerOrBot => playerOrBot?.getClass() == Class.ClassPriest)
+            .filter(playerOrBot => {
+            if (playerOrBot instanceof BuffBot) {
+                return playerOrBot.settings.buffBotId == 'Divine Spirit Priest';
+            }
+            else {
+                // Only include bots for now, because shadow priest doesn't have a PI field
+                // on its spec proto.
+                return false;
+            }
+        });
+    }
+    getPlayerValue(player) {
+        throw new Error('Unimplemented PowerInfusionsPicker.getPlayerValue');
+    }
+    setPlayerValue(eventID, player, newValue) {
+        throw new Error('Unimplemented PowerInfusionsPicker.setPlayerValue');
+    }
+    getBuffBotValue(buffBot) {
+        return buffBot.getPowerInfusionAssignment();
+    }
+    setBuffBotValue(eventID, buffBot, newValue) {
+        buffBot.setPowerInfusionAssignment(eventID, newValue);
     }
 }

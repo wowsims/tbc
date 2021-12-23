@@ -16,6 +16,7 @@ export declare const DraeneiRacialMelee: IndividualSimIconPickerConfig<Party, bo
 export declare const EyeOfTheNight: IndividualSimIconPickerConfig<Party, boolean>;
 export declare const JadePendantOfBlasting: IndividualSimIconPickerConfig<Party, boolean>;
 export declare const ManaSpringTotem: IndividualSimIconPickerConfig<Party, number>;
+export declare const ManaTideTotem: IndividualSimIconPickerConfig<Party, number>;
 export declare const MoonkinAura: IndividualSimIconPickerConfig<Party, number>;
 export declare const TotemOfWrath: IndividualSimIconPickerConfig<Party, number>;
 export declare const WrathOfAirTotem: IndividualSimIconPickerConfig<Party, number>;
@@ -23,8 +24,8 @@ export declare const DrumsOfBattleBuff: IndividualSimIconPickerConfig<Party, boo
 export declare const DrumsOfRestorationBuff: IndividualSimIconPickerConfig<Party, boolean>;
 export declare const BlessingOfKings: IndividualSimIconPickerConfig<Player<any>, boolean>;
 export declare const BlessingOfWisdom: IndividualSimIconPickerConfig<Player<any>, number>;
-export declare const ManaTideTotem: IndividualSimIconPickerConfig<Player<any>, boolean>;
 export declare const Innervate: IndividualSimIconPickerConfig<Player<any>, number>;
+export declare const PowerInfusion: IndividualSimIconPickerConfig<Player<any>, number>;
 export declare const ImprovedSealOfTheCrusader: IndividualSimIconPickerConfig<Target, boolean>;
 export declare const JudgementOfWisdom: IndividualSimIconPickerConfig<Target, boolean>;
 export declare const Misery: IndividualSimIconPickerConfig<Target, boolean>;

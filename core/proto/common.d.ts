@@ -84,6 +84,10 @@ export interface PartyBuffs {
      */
     manaSpringTotem: TristateEffect;
     /**
+     * @generated from protobuf field: int32 mana_tide_totems = 17;
+     */
+    manaTideTotems: number;
+    /**
      * @generated from protobuf field: int32 totem_of_wrath = 13;
      */
     totemOfWrath: number;
@@ -124,15 +128,15 @@ export interface IndividualBuffs {
      */
     shadowPriestDps: number;
     /**
-     * @generated from protobuf field: bool mana_tide_totem = 5;
-     */
-    manaTideTotem: boolean;
-    /**
-     * How many innervates will you get?
+     * How many of each of these buffs the player will be receiving.
      *
-     * @generated from protobuf field: int32 innervates = 6;
+     * @generated from protobuf field: int32 innervates = 5;
      */
     innervates: number;
+    /**
+     * @generated from protobuf field: int32 power_infusions = 6;
+     */
+    powerInfusions: number;
 }
 /**
  * @generated from protobuf message proto.Consumes

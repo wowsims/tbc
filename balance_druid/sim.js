@@ -112,6 +112,7 @@ export class BalanceDruidSimUI extends IndividualSimUI {
                 IconInputs.WrathOfAirTotem,
                 IconInputs.TotemOfWrath,
                 IconInputs.ManaSpringTotem,
+                IconInputs.ManaTideTotem,
                 IconInputs.DraeneiRacialCaster,
                 IconInputs.EyeOfTheNight,
                 IconInputs.ChainOfTheTwilightOwl,
@@ -123,6 +124,7 @@ export class BalanceDruidSimUI extends IndividualSimUI {
                 IconInputs.BlessingOfKings,
                 IconInputs.BlessingOfWisdom,
                 IconInputs.Innervate,
+                IconInputs.PowerInfusion,
             ],
             // IconInputs to include in the 'Debuffs' section on the settings tab.
             debuffInputs: [

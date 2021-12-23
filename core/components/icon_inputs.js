@@ -17,6 +17,7 @@ export const DraeneiRacialMelee = makeBooleanPartyBuffInput({ spellId: 6562 }, '
 export const EyeOfTheNight = makeBooleanPartyBuffInput({ spellId: 31033 }, 'eyeOfTheNight');
 export const JadePendantOfBlasting = makeBooleanPartyBuffInput({ spellId: 25607 }, 'jadePendantOfBlasting');
 export const ManaSpringTotem = makeTristatePartyBuffInput({ spellId: 25570 }, { spellId: 16208 }, 'manaSpringTotem');
+export const ManaTideTotem = makeMultistatePartyBuffInput({ spellId: 16190 }, 5, 'manaTideTotems');
 export const MoonkinAura = makeTristatePartyBuffInput({ spellId: 24907 }, { itemId: 32387 }, 'moonkinAura');
 export const TotemOfWrath = makeMultistatePartyBuffInput({ spellId: 30706 }, 5, 'totemOfWrath');
 export const WrathOfAirTotem = makeTristatePartyBuffInput({ spellId: 3738 }, { spellId: 37212 }, 'wrathOfAirTotem');
@@ -25,8 +26,8 @@ export const DrumsOfRestorationBuff = makeEnumValuePartyBuffInput({ spellId: 354
 // Individual Buffs
 export const BlessingOfKings = makeBooleanIndividualBuffInput({ spellId: 25898 }, 'blessingOfKings');
 export const BlessingOfWisdom = makeTristateIndividualBuffInput({ spellId: 27143 }, { spellId: 20245 }, 'blessingOfWisdom');
-export const ManaTideTotem = makeBooleanIndividualBuffInput({ spellId: 16190 }, 'manaTideTotem');
-export const Innervate = makeMultistateIndividualBuffInput({ spellId: 29166 }, 6, 'innervates');
+export const Innervate = makeMultistateIndividualBuffInput({ spellId: 29166 }, 11, 'innervates');
+export const PowerInfusion = makeMultistateIndividualBuffInput({ spellId: 10060 }, 11, 'powerInfusions');
 // Debuffs
 export const ImprovedSealOfTheCrusader = makeBooleanDebuffInput({ spellId: 20337 }, 'improvedSealOfTheCrusader');
 export const JudgementOfWisdom = makeBooleanDebuffInput({ spellId: 27164 }, 'judgementOfWisdom');

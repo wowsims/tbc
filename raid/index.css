@@ -17,7 +17,7 @@
 }
 
 .balance-druid-sim-ui .buffs-section {
-  grid-template-columns: repeat(6, 1fr);
+  grid-template-columns: repeat(5, 1fr);
 }
 
 .balance-druid-sim-ui .debuffs-section {
@@ -1777,7 +1777,7 @@ td, th {
 }
 
 .elemental-shaman-sim-ui .buffs-section {
-  grid-template-columns: repeat(6, 1fr);
+  grid-template-columns: repeat(5, 1fr);
 }
 
 .elemental-shaman-sim-ui .debuffs-section {
@@ -1802,7 +1802,7 @@ td, th {
 }
 
 .shadow-priest-sim-ui .buffs-section {
-  grid-template-columns: repeat(6, 1fr);
+  grid-template-columns: repeat(7, 1fr);
 }
 
 .shadow-priest-sim-ui .debuffs-section {
@@ -1833,18 +1833,18 @@ td, th {
   font-size: 10px;
 }
 
-.innervate-player {
+.assigned-buff-player {
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin: 3px;
 }
 
-.innervate-player > * {
+.assigned-buff-player > * {
   margin: 3px;
 }
 
-.innervate-player .raid-target-picker-option {
+.assigned-buff-player .raid-target-picker-option {
   display: flex;
   align-items: center;
   min-width: 200px;
