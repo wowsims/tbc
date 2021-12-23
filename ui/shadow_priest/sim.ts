@@ -32,8 +32,6 @@ import * as Presets from './presets.js';
 export class ShadowPriestSimUI extends IndividualSimUI<Spec.SpecShadowPriest> {
   constructor(parentElem: HTMLElement, player: Player<Spec.SpecShadowPriest>) {
 		super(parentElem, player, {
-			// Can be 'Alpha', 'Beta', or 'Live'. Just adds a postfix to the generated title.
-			releaseStatus: 'Alpha',
 			cssClass: 'shadow-priest-sim-ui',
 			// List any known bugs / issues here and they'll be shown on the site.
 			knownIssues: [

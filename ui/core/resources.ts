@@ -1,15 +1,13 @@
+import { REPO_NAME } from '/tbc/core/constants/other.js'
 import { getWowheadItemId } from '/tbc/core/proto_utils/equipped_item.js';
 import { GemColor } from './proto/common.js';
 import { Item } from './proto/common.js';
 import { ItemQuality } from './proto/common.js';
 import { ItemSlot } from './proto/common.js';
 
-// Github pages serves our site under the /tbc directory (because the repo name is tbc)
-export const repoName = 'tbc';
-
 // Get 'elemental_shaman', the pathname part after the repo name
 const pathnameParts = window.location.pathname.split('/');
-const repoPartIdx = pathnameParts.findIndex(part => part == repoName);
+const repoPartIdx = pathnameParts.findIndex(part => part == REPO_NAME);
 export const specDirectory = repoPartIdx == -1 ? '' : pathnameParts[repoPartIdx + 1];
 
 const emptySlotIcons: Record<ItemSlot, string> = {

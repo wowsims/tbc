@@ -35,6 +35,10 @@ export interface RaidSimConfig {
 	knownIssues?: Array<string>,
 }
 
+const extraKnownIssues = [
+	'We\'re still missing implementations for many specs. If you\'d like to help us out, check out our <a href="https://github.com/wowsims/tbc">Github project</a> or <a href="https://discord.gg/jJMPr9JWwx">join our discord</a>!',
+];
+
 export class RaidSimUI extends SimUI {
   private readonly config: RaidSimConfig;
 	private raidSimResultsManager: RaidSimResultsManager | null = null;
@@ -49,8 +53,8 @@ export class RaidSimUI extends SimUI {
 
   constructor(parentElem: HTMLElement, config: RaidSimConfig) {
 		super(parentElem, new Sim(), {
-			title: 'TBC Raid Sim',
-			knownIssues: config.knownIssues,
+			spec: null,
+			knownIssues: (config.knownIssues || []).concat(extraKnownIssues),
 		});
 		this.rootElem.classList.add('raid-sim-ui');
 

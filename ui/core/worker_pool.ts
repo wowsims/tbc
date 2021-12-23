@@ -1,3 +1,4 @@
+import { REPO_NAME } from '/tbc/core/constants/other.js'
 import { Enchant } from './proto/common.js';
 import { Gem } from './proto/common.js';
 import { GemColor } from './proto/common.js';
@@ -13,10 +14,9 @@ import { GearListRequest, GearListResult } from './proto/api.js';
 import { RaidSimRequest, RaidSimResult } from './proto/api.js';
 import { StatWeightsRequest, StatWeightsResult } from './proto/api.js';
 
-import { repoName } from './resources.js';
 import { wait } from './utils.js';
 
-const SIM_WORKER_URL = `/${repoName}/sim_worker.js`;
+const SIM_WORKER_URL = `/${REPO_NAME}/sim_worker.js`;
 
 export class WorkerPool {
 	private workers: Array<SimWorker>;

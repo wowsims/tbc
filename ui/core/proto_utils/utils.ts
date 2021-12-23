@@ -1,3 +1,5 @@
+import { REPO_NAME } from '/tbc/core/constants/other.js'
+import { camelToSnakeCase } from '/tbc/core/utils.js';
 import { getEnumValues } from '/tbc/core/utils.js';
 import { intersection } from '/tbc/core/utils.js';
 import { maxIndex } from '/tbc/core/utils.js';
@@ -45,6 +47,15 @@ export type ShamanSpecs = [Spec.SpecElementalShaman, Spec.SpecEnhancementShaman]
 export type WarlockSpecs = Spec.SpecWarlock;
 export type WarriorSpecs = Spec.SpecWarrior;
 
+// This list controls which links are shown in the top-left dropdown menu on
+// all sims. DO NOT add your spec to this list until it is ready for everyone
+// to view.
+export const linkedSpecs: Array<Spec> = [
+	Spec.SpecBalanceDruid,
+	Spec.SpecElementalShaman,
+	Spec.SpecShadowPriest,
+];
+
 export const specNames: Record<Spec, string> = {
   [Spec.SpecBalanceDruid]: 'Balance Druid',
   [Spec.SpecElementalShaman]: 'Elemental Shaman',
@@ -83,6 +94,8 @@ export const specIconsLarge: Record<Spec, string> = {
   [Spec.SpecWarlock]: 'https://wow.zamimg.com/images/wow/icons/large/spell_shadow_metamorphosis.jpg',
   [Spec.SpecWarrior]: 'https://wow.zamimg.com/images/wow/icons/large/ability_warrior_innerrage.jpg',
 };
+
+export const raidSimIcon: string = 'https://wow.zamimg.com/images/wow/icons/large/spell_holy_championsgrace.jpg';
 
 export const talentTreeIcons: Record<Class, Array<string>> = {
 	[Class.ClassUnknown]: [],
@@ -147,13 +160,14 @@ export function getTalentTreeIcon(spec: Spec, talentsString: string): string {
 }
 
 // Gets the URL for the individual sim corresponding to the given spec.
-//const specSiteUrlTemplate = new URL(`${window.location.protocol}//${window.location.host}/${repoName}/SPEC/index.html`);
-//export function getSpecSiteUrl(spec: Spec): string {
-//	let specString = Spec[spec]; // Returns 'SpecBalanceDruid' for BalanceDruid.
-//	specString = specString.substring('Spec'.length); // 'BalanceDruid'
-//	specString = camelToSnakeCase(specString); // 'balance_druid'
-//	return specSiteUrlTemplate.replace('SPEC', specString);
-//}
+const specSiteUrlTemplate = new URL(`${window.location.protocol}//${window.location.host}/${REPO_NAME}/SPEC/index.html`);
+export function getSpecSiteUrl(spec: Spec): string {
+	let specString = Spec[spec]; // Returns 'SpecBalanceDruid' for BalanceDruid.
+	specString = specString.substring('Spec'.length); // 'BalanceDruid'
+	specString = camelToSnakeCase(specString); // 'balance_druid'
+	return specSiteUrlTemplate.toString().replace('SPEC', specString);
+}
+export const raidSimSiteUrl = new URL(`${window.location.protocol}//${window.location.host}/${REPO_NAME}/raid/index.html`).toString();
 
 export type RotationUnion =
 		BalanceDruidRotation |
