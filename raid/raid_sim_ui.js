@@ -21,11 +21,14 @@ import { AssignmentsPicker } from './assignments_picker.js';
 import { BlessingsPicker } from './blessings_picker.js';
 import { RaidPicker } from './raid_picker.js';
 import { implementedSpecs } from './presets.js';
+const extraKnownIssues = [
+    'We\'re still missing implementations for many specs. If you\'d like to help us out, check out our <a href="https://github.com/wowsims/tbc">Github project</a> or <a href="https://discord.gg/jJMPr9JWwx">join our discord</a>!',
+];
 export class RaidSimUI extends SimUI {
     constructor(parentElem, config) {
         super(parentElem, new Sim(), {
-            title: 'TBC Raid Sim',
-            knownIssues: config.knownIssues,
+            spec: null,
+            knownIssues: (config.knownIssues || []).concat(extraKnownIssues),
         });
         this.raidSimResultsManager = null;
         this.raidPicker = null;

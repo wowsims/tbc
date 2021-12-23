@@ -23,7 +23,6 @@ import { addStatWeightsAction } from '/tbc/core/components/stat_weights_action.j
 import { equalsOrBothNull } from '/tbc/core/utils.js';
 import { newTalentsPicker } from '/tbc/core/talents/factory.js';
 import { raceNames } from '/tbc/core/proto_utils/names.js';
-import { specNames } from '/tbc/core/proto_utils/utils.js';
 import { specToEligibleRaces } from '/tbc/core/proto_utils/utils.js';
 import { specToLocalStorageKey } from '/tbc/core/proto_utils/utils.js';
 import * as Tooltips from '/tbc/core/constants/tooltips.js';
@@ -48,15 +47,8 @@ class IndividualSimIconPicker extends IconPicker {
 // Extended shared UI for all individual player sims.
 export class IndividualSimUI extends SimUI {
     constructor(parentElem, player, config) {
-        let title = 'TBC ' + specNames[player.spec] + ' Sim';
-        if (config.releaseStatus == 'Alpha') {
-            title += ' Alpha';
-        }
-        else if (config.releaseStatus == 'Beta') {
-            title += ' Beta';
-        }
         super(parentElem, player.sim, {
-            title: title,
+            spec: player.spec,
             knownIssues: config.knownIssues,
         });
         this.rootElem.classList.add('individual-sim-ui', config.cssClass);

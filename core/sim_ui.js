@@ -1,5 +1,6 @@
 import { Component } from '/tbc/core/components/component.js';
 import { NumberPicker } from '/tbc/core/components/number_picker.js';
+import { Title } from '/tbc/core/components/title.js';
 import { TypedEvent } from './typed_event.js';
 // Shared UI for all individual sims and the raid sim.
 export class SimUI extends Component {
@@ -12,27 +13,24 @@ export class SimUI extends Component {
         [
             this.sim.changeEmitter,
         ].forEach(emitter => emitter.on(eventID => this.changeEmitter.emit(eventID)));
-        Array.from(document.getElementsByClassName('known-issues')).forEach(element => {
-            if (config.knownIssues?.length) {
-                element.style.display = 'initial';
-            }
-            else {
-                return;
-            }
-            tippy(element, {
-                'content': `
+        if (config.knownIssues && config.knownIssues.length) {
+            const knownIssuesContainer = document.getElementsByClassName('known-issues')[0];
+            knownIssuesContainer.style.display = 'initial';
+            tippy(knownIssuesContainer, {
+                content: `
 				<ul class="known-issues-tooltip">
 					${config.knownIssues.map(issue => '<li>' + issue + '</li>').join('')}
 				</ul>
 				`,
-                'allowHTML': true,
+                allowHTML: true,
+                interactive: true,
             });
-        });
+        }
         this.resultsPendingElem = this.rootElem.getElementsByClassName('results-pending')[0];
         this.resultsContentElem = this.rootElem.getElementsByClassName('results-content')[0];
         this.hideAllResults();
         const titleElem = this.rootElem.getElementsByClassName('sim-sidebar-title')[0];
-        titleElem.textContent = config.title;
+        const title = new Title(titleElem, config.spec);
         const simActionsContainer = this.rootElem.getElementsByClassName('sim-sidebar-actions')[0];
         const iterationsPicker = new NumberPicker(simActionsContainer, this.sim, {
             label: 'Iterations',
@@ -119,11 +117,13 @@ const simHTML = `
     <div class="sim-sidebar-footer"></div>
   </section>
   <section class="sim-main">
-    <ul class="sim-tabs nav nav-tabs">
-      <li class="sim-top-bar">
-				<div class="known-issues">Known Issues</div>
-			</li>
-    </ul>
+		<div class="sim-toolbar">
+			<ul class="sim-tabs nav nav-tabs">
+				<li class="sim-top-bar">
+					<div class="known-issues">Known Issues</div>
+				</li>
+			</ul>
+    </div>
     <div class="tab-content">
     </div>
   </section>

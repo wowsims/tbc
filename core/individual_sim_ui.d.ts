@@ -26,7 +26,6 @@ import { TypedEvent } from './typed_event.js';
 export interface IndividualSimIconPickerConfig<ModObject, ValueType> extends IconPickerConfig<ModObject, ValueType> {
     exclusivityTags?: Array<ExclusivityTag>;
 }
-export declare type ReleaseStatus = 'Alpha' | 'Beta' | 'Live';
 export interface InputSection {
     tooltip?: string;
     inputs: Array<{
@@ -45,7 +44,6 @@ export interface InputSection {
 }
 export interface IndividualSimUIConfig<SpecType extends Spec> {
     cssClass: string;
-    releaseStatus: ReleaseStatus;
     knownIssues?: Array<string>;
     epStats: Array<Stat>;
     epReferenceStat: Stat;

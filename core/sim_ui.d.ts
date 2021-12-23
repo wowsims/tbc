@@ -1,8 +1,9 @@
 import { Component } from '/tbc/core/components/component.js';
+import { Spec } from '/tbc/core/proto/common.js';
 import { Sim } from './sim.js';
 import { TypedEvent } from './typed_event.js';
 export interface SimUIConfig {
-    title: string;
+    spec: Spec | null;
     knownIssues?: Array<string>;
 }
 export declare abstract class SimUI extends Component {
