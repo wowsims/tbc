@@ -23,11 +23,13 @@ export class AssignmentsPicker extends Component {
 	readonly changeEmitter: TypedEvent<void> = new TypedEvent<void>();
 
 	private readonly innervatesPicker: InnervatesPicker;
+	private readonly powerInfusionsPicker: PowerInfusionsPicker;
 
   constructor(parentElem: HTMLElement, raidSimUI: RaidSimUI) {
     super(parentElem, 'assignments-picker-root');
 		this.raidSimUI = raidSimUI;
 		this.innervatesPicker = new InnervatesPicker(this.rootElem, raidSimUI);
+		this.powerInfusionsPicker = new PowerInfusionsPicker(this.rootElem, raidSimUI);
 	}
 }
 
@@ -37,7 +39,7 @@ interface AssignmentTargetPicker {
 	targetPlayer: Player<any> | null;
 };
 
-export class InnervatesPicker extends Component {
+abstract class AssignedBuffPicker extends Component {
 	readonly raidSimUI: RaidSimUI;
 	readonly changeEmitter: TypedEvent<void> = new TypedEvent<void>();
 
@@ -46,56 +48,56 @@ export class InnervatesPicker extends Component {
 	private targetPickers: Array<AssignmentTargetPicker>;
 
   constructor(parentElem: HTMLElement, raidSimUI: RaidSimUI) {
-    super(parentElem, 'innervates-picker-root');
+    super(parentElem, 'assigned-buff-picker-root');
 		this.raidSimUI = raidSimUI;
 		this.targetPickers = [];
 
 		this.playersContainer = document.createElement('div');
-		this.playersContainer.classList.add('innervate-players-container', 'settings-section');
+		this.playersContainer.classList.add('assigned-buff-players-container', 'settings-section');
 		this.rootElem.appendChild(this.playersContainer);
 
-		this.update(this.raidSimUI.getPlayersAndBuffBots());
-		this.raidSimUI.compChangeEmitter.on(eventID => {
+		this.update();
+		this.raidSimUI.changeEmitter.on(eventID => {
 			this.recoverRaidTargets();
-			this.update(this.raidSimUI.getPlayersAndBuffBots());
+			this.update();
 		});
 	}
 
-	private update(playersAndBots: Array<Player<any> | BuffBot | null>) {
+	private update() {
 		this.playersContainer.innerHTML = `
-			<label>Innervates</label>
+			<label>${this.getTitle()}</label>
 		`;
 
-		const druids = playersAndBots.filter(playerOrBot => playerOrBot?.getClass() == Class.ClassDruid) as Array<Player<any> | BuffBot>;
-		if (druids.length == 0) {
+		const sourcePlayers = this.getSourcePlayers();
+		if (sourcePlayers.length == 0) {
 			this.rootElem.style.display = 'none';
 		} else {
 			this.rootElem.style.display = 'initial';
 		}
 
-		this.targetPickers = druids.map((druid, druidIndex) => {
+		this.targetPickers = sourcePlayers.map((sourcePlayer, sourcePlayerIndex) => {
 			const row = document.createElement('div');
-			row.classList.add('innervate-player');
+			row.classList.add('assigned-buff-player');
 			this.playersContainer.appendChild(row);
 
-			const innervateSourceElem = RaidTargetPicker.makeOptionElem({
-				iconUrl: druid instanceof Player ? druid.getTalentTreeIcon() : druid.settings.iconUrl,
-				text: druid.getLabel(),
-				color: druid.getClassColor(),
+			const sourceElem = RaidTargetPicker.makeOptionElem({
+				iconUrl: sourcePlayer instanceof Player ? sourcePlayer.getTalentTreeIcon() : sourcePlayer.settings.iconUrl,
+				text: sourcePlayer.getLabel(),
+				color: sourcePlayer.getClassColor(),
 				isDropdown: false,
 			});
-			innervateSourceElem.classList.add('raid-target-picker-root');
-			row.appendChild(innervateSourceElem);
+			sourceElem.classList.add('raid-target-picker-root');
+			row.appendChild(sourceElem);
 
 			const arrow = document.createElement('span');
-			arrow.classList.add('innervate-arrow', 'fa', 'fa-arrow-right');
+			arrow.classList.add('assigned-buff-arrow', 'fa', 'fa-arrow-right');
 			row.appendChild(arrow);
 
 			let raidTargetPicker: RaidTargetPicker<Player<any> | BuffBot> | null = null;
-			if (druid instanceof Player) {
-				raidTargetPicker = new RaidTargetPicker<Player<any>>(row, druid, {
+			if (sourcePlayer instanceof Player) {
+				raidTargetPicker = new RaidTargetPicker<Player<any>>(row, sourcePlayer, {
 					extraCssClasses: [
-						'innervate-target-picker',
+						'assigned-buff-target-picker',
 					],
 					noTargetLabel: 'Unassigned',
 					compChangeEmitter: this.raidSimUI.sim.raid.compChangeEmitter,
@@ -112,17 +114,13 @@ export class InnervatesPicker extends Component {
 					},
 
 					changedEvent: (player: Player<any>) => player.specOptionsChangeEmitter,
-					getValue: (player: Player<any>) => (player.getSpecOptions() as DruidOptions).innervateTarget || emptyRaidTarget(),
-					setValue: (eventID: EventID, player: Player<any>, newValue: RaidTarget) => {
-						const newOptions = player.getSpecOptions() as DruidOptions;
-						newOptions.innervateTarget = newValue;
-						player.setSpecOptions(eventID, newOptions);
-					},
+					getValue: (player: Player<any>) => this.getPlayerValue(player),
+					setValue: (eventID: EventID, player: Player<any>, newValue: RaidTarget) => this.setPlayerValue(eventID, player, newValue),
 				});
 			} else {
-				raidTargetPicker = new RaidTargetPicker<BuffBot>(row, druid, {
+				raidTargetPicker = new RaidTargetPicker<BuffBot>(row, sourcePlayer, {
 					extraCssClasses: [
-						'innervate-target-picker',
+						'assigned-buff-target-picker',
 					],
 					noTargetLabel: 'Unassigned',
 					compChangeEmitter: this.raidSimUI.sim.raid.compChangeEmitter,
@@ -138,14 +136,14 @@ export class InnervatesPicker extends Component {
 						});
 					},
 
-					changedEvent: (player: BuffBot) => player.innervateAssignmentChangeEmitter,
-					getValue: (player: BuffBot) => player.getInnervateAssignment(),
-					setValue: (eventID: EventID, player: BuffBot, newValue: RaidTarget) => player.setInnervateAssignment(eventID, newValue),
+					changedEvent: (buffBot: BuffBot) => buffBot.changeEmitter,
+					getValue: (buffBot: BuffBot) => this.getBuffBotValue(buffBot),
+					setValue: (eventID: EventID, buffBot: BuffBot, newValue: RaidTarget) => this.setBuffBotValue(eventID, buffBot, newValue),
 				});
 			}
 
 			const targetPickerData = {
-				playerOrBot: druid,
+				playerOrBot: sourcePlayer,
 				targetPicker: raidTargetPicker!,
 				targetPlayer: this.raidSimUI.sim.raid.getPlayerFromRaidTarget(raidTargetPicker!.getInputValue()),
 			};
@@ -195,5 +193,78 @@ export class InnervatesPicker extends Component {
 				}
 			});
 		});
+	}
+
+	abstract getTitle(): string;
+	abstract getSourcePlayers(): Array<Player<any> | BuffBot>;
+
+	abstract getPlayerValue(player: Player<any>): RaidTarget;
+	abstract setPlayerValue(eventID: EventID, player: Player<any>, newValue: RaidTarget): void;
+
+	abstract getBuffBotValue(buffBot: BuffBot): RaidTarget;
+	abstract setBuffBotValue(eventID: EventID, buffBot: BuffBot, newValue: RaidTarget): void;
+}
+
+class InnervatesPicker extends AssignedBuffPicker {
+	getTitle(): string {
+		return 'Innervates';
+	}
+
+	getSourcePlayers(): Array<Player<any> | BuffBot> {
+		return this.raidSimUI.getPlayersAndBuffBots().filter(playerOrBot => playerOrBot?.getClass() == Class.ClassDruid) as Array<Player<any> | BuffBot>;
+	}
+
+	getPlayerValue(player: Player<any>): RaidTarget {
+		return (player.getSpecOptions() as DruidOptions).innervateTarget || emptyRaidTarget();
+	}
+
+	setPlayerValue(eventID: EventID, player: Player<any>, newValue: RaidTarget) {
+		const newOptions = player.getSpecOptions() as DruidOptions;
+		newOptions.innervateTarget = newValue;
+		player.setSpecOptions(eventID, newOptions);
+	}
+
+	getBuffBotValue(buffBot: BuffBot): RaidTarget {
+		return buffBot.getInnervateAssignment();
+	}
+
+	setBuffBotValue(eventID: EventID, buffBot: BuffBot, newValue: RaidTarget) {
+		buffBot.setInnervateAssignment(eventID, newValue);
+	}
+}
+
+class PowerInfusionsPicker extends AssignedBuffPicker {
+	getTitle(): string {
+		return 'Power Infusions';
+	}
+
+	getSourcePlayers(): Array<Player<any> | BuffBot> {
+		return this.raidSimUI.getPlayersAndBuffBots()
+				.filter(playerOrBot => playerOrBot?.getClass() == Class.ClassPriest)
+				.filter(playerOrBot => {
+					if (playerOrBot instanceof BuffBot) {
+						return playerOrBot.settings.buffBotId == 'Divine Spirit Priest';
+					} else {
+						// Only include bots for now, because shadow priest doesn't have a PI field
+						// on its spec proto.
+						return false;
+					}
+				}) as Array<Player<any> | BuffBot>;
+	}
+
+	getPlayerValue(player: Player<any>): RaidTarget {
+		throw new Error('Unimplemented PowerInfusionsPicker.getPlayerValue');
+	}
+
+	setPlayerValue(eventID: EventID, player: Player<any>, newValue: RaidTarget) {
+		throw new Error('Unimplemented PowerInfusionsPicker.setPlayerValue');
+	}
+
+	getBuffBotValue(buffBot: BuffBot): RaidTarget {
+		return buffBot.getPowerInfusionAssignment();
+	}
+
+	setBuffBotValue(eventID: EventID, buffBot: BuffBot, newValue: RaidTarget) {
+		buffBot.setPowerInfusionAssignment(eventID, newValue);
 	}
 }

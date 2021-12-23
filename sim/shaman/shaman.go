@@ -293,8 +293,12 @@ func (shaman *Shaman) registerBloodlustCD() {
 		Priority:   core.CooldownPriorityBloodlust,
 		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
 			return func(sim *core.Simulation, character *core.Character) bool {
-				if character.HasAura(core.BloodlustAuraID) {
-					return false
+				// Need to check if any party member has lust, not just self, because of
+				// major CD ordering issues with the shared bloodlust.
+				for _, partyMember := range character.Party.Players {
+					if partyMember.GetCharacter().HasAura(core.BloodlustAuraID) {
+						return false
+					}
 				}
 
 				for _, partyMember := range character.Party.Players {

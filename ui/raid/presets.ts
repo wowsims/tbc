@@ -3,6 +3,7 @@ import { Raid as RaidProto } from '/tbc/core/proto/api.js';
 import { Party as PartyProto } from '/tbc/core/proto/api.js';
 import { Class } from '/tbc/core/proto/common.js';
 import { Consumes } from '/tbc/core/proto/common.js';
+import { Drums } from '/tbc/core/proto/common.js';
 import { Encounter as EncounterProto } from '/tbc/core/proto/common.js';
 import { EquipmentSpec } from '/tbc/core/proto/common.js';
 import { Race } from '/tbc/core/proto/common.js';
@@ -229,13 +230,52 @@ export const buffBotPresets: Array<BuffBotSettings> = [
 	},
 	{
 		// The value of this field must never change, to preserve local storage data.
-		buffBotId: 'Divine Spirit Priest',
+		buffBotId: 'Holy Priest',
 		spec: Spec.SpecShadowPriest,
 		name: 'Holy Priest',
-		tooltip: 'Adds Improved Divine Spirit',
-		iconUrl: 'https://wow.zamimg.com/images/wow/icons/large/spell_holy_divinespirit.jpg',
+		tooltip: 'Holy Priest: Doesn\'t contribute to DPS, just fills a raid slot.',
+		iconUrl: talentTreeIcons[Class.ClassPriest][1],
+		modifyRaidProto: (buffBot: BuffBot, raidProto: RaidProto, partyProto: PartyProto) => {
+		},
+		modifyEncounterProto: (buffBot: BuffBot, encounterProto: EncounterProto) => {
+		},
+	},
+	{
+		// The value of this field must never change, to preserve local storage data.
+		buffBotId: 'Divine Spirit Priest',
+		spec: Spec.SpecShadowPriest,
+		name: 'Disc Priest',
+		tooltip: 'Disc Priest: Adds Improved Divine Spirit and a Power Infusion.',
+		iconUrl: 'https://wow.zamimg.com/images/wow/icons/medium/spell_holy_powerinfusion.jpg',
 		modifyRaidProto: (buffBot: BuffBot, raidProto: RaidProto, partyProto: PartyProto) => {
 			raidProto.buffs!.divineSpirit = TristateEffect.TristateEffectImproved;
+
+			const powerInfusionIndex = buffBot.getPowerInfusionAssignment().targetIndex;
+			if (powerInfusionIndex != NO_TARGET) {
+				const partyIndex = Math.floor(powerInfusionIndex / 5);
+				const playerIndex = powerInfusionIndex % 5;
+				const playerProto = raidProto.parties[partyIndex].players[playerIndex];
+				if (playerProto.buffs) {
+					playerProto.buffs.powerInfusions++;
+				}
+			}
+		},
+		modifyEncounterProto: (buffBot: BuffBot, encounterProto: EncounterProto) => {
+		},
+	},
+	{
+		// The value of this field must never change, to preserve local storage data.
+		buffBotId: 'Resto Shaman',
+		spec: Spec.SpecElementalShaman,
+		name: 'Resto Shaman',
+		tooltip: 'Resto Shaman: Adds Bloodlust, Mana Spring Totem, Wrath of Air Totem, Mana Tide Totem, and Drums of Battle.',
+		iconUrl: talentTreeIcons[Class.ClassShaman][2],
+		modifyRaidProto: (buffBot: BuffBot, raidProto: RaidProto, partyProto: PartyProto) => {
+			partyProto.buffs!.bloodlust++;
+			partyProto.buffs!.manaSpringTotem = TristateEffect.TristateEffectRegular;
+			partyProto.buffs!.wrathOfAirTotem = Math.max(partyProto.buffs!.wrathOfAirTotem, TristateEffect.TristateEffectRegular);
+			partyProto.buffs!.manaTideTotems++;
+			partyProto.buffs!.drums = Drums.DrumsOfBattle;
 		},
 		modifyEncounterProto: (buffBot: BuffBot, encounterProto: EncounterProto) => {
 		},

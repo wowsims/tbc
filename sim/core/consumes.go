@@ -90,6 +90,8 @@ func consumesStats(c proto.Consumes) stats.Stats {
 var DrumsAuraID = NewAuraID()
 var DrumsCooldownID = NewCooldownID()
 
+const DrumsCD = time.Minute * 2 // Tinnitus
+
 func registerDrumsCD(agent Agent, partyBuffs proto.PartyBuffs, consumes proto.Consumes) {
 	//character := agent.GetCharacter()
 	drumsType := proto.Drums_DrumsUnknown
@@ -112,53 +114,72 @@ func registerDrumsCD(agent Agent, partyBuffs proto.PartyBuffs, consumes proto.Co
 	}
 
 	// If we aren't casting drums, and there is another real party member doing so, then we're done.
-	otherRealDrummer := agent.GetCharacter().Party.Size() > 1
-	if !drumsSelfCast && otherRealDrummer {
+	if !drumsSelfCast {
+		for _, partyMember := range agent.GetCharacter().Party.Players {
+			if partyMember != agent && partyMember.GetCharacter().consumes.Drums != proto.Drums_DrumsUnknown {
+				return
+			}
+		}
+	}
+
+	var applyDrums func(sim *Simulation, character *Character)
+	spellID := int32(0)
+	if drumsType == proto.Drums_DrumsOfBattle {
+		applyDrums = applyDrumsOfBattle
+		spellID = 35476
+	} else if drumsType == proto.Drums_DrumsOfRestoration {
+		applyDrums = applyDrumsOfRestoration
+		spellID = 35478
+	}
+
+	if applyDrums == nil {
 		return
 	}
 
-	// TODO: If drumsSelfCast == true, then do a cast time
 	mcd := MajorCooldown{
 		CooldownID: DrumsCooldownID,
-		Cooldown:   time.Minute * 2,
+		Cooldown:   DrumsCD,
 		Priority:   CooldownPriorityDrums,
 	}
 
-	if drumsType == proto.Drums_DrumsOfBattle {
+	if drumsSelfCast {
+		// When a real player is using drums, their cast applies to the whole party.
 		mcd.ActivationFactory = func(sim *Simulation) CooldownActivation {
 			return func(sim *Simulation, character *Character) bool {
-				const hasteBonus = 80
 				for _, agent := range character.Party.Players {
-					agent.GetCharacter().SetCD(DrumsCooldownID, time.Minute*2+sim.CurrentTime) // tinnitus
-					agent.GetCharacter().AddAuraWithTemporaryStats(sim, DrumsAuraID, 35476, "Drums of Battle", stats.SpellHaste, hasteBonus, time.Second*30)
-					// TODO: Add melee haste to drums
+					applyDrums(sim, agent.GetCharacter())
 				}
-				if drumsSelfCast {
-					character.Metrics.AddInstantCast(ActionID{SpellID: 35476})
-				}
+				// TODO: Do a cast time
+				character.Metrics.AddInstantCast(ActionID{SpellID: spellID})
 				return true
 			}
 		}
-	} else if drumsType == proto.Drums_DrumsOfRestoration {
+	} else {
+		// When there is no real player using drums, each player gets a fake CD that
+		// gives just themself the buff, with no cast time.
 		mcd.ActivationFactory = func(sim *Simulation) CooldownActivation {
 			return func(sim *Simulation, character *Character) bool {
-				// 600 mana over 15 seconds == 200 mp5
-				const mp5Bonus = 200
-				for _, agent := range character.Party.Players {
-					agent.GetCharacter().SetCD(DrumsCooldownID, time.Minute*2+sim.CurrentTime) // tinnitus
-					agent.GetCharacter().AddAuraWithTemporaryStats(sim, DrumsAuraID, 35478, "Drums of Restoration", stats.MP5, mp5Bonus, time.Second*15)
-				}
-				if drumsSelfCast {
-					character.Metrics.AddInstantCast(ActionID{SpellID: 35478})
-				}
+				applyDrums(sim, character)
 				return true
 			}
 		}
 	}
 
-	if mcd.ActivationFactory != nil {
-		agent.GetCharacter().AddMajorCooldown(mcd)
-	}
+	agent.GetCharacter().AddMajorCooldown(mcd)
+}
+
+func applyDrumsOfBattle(sim *Simulation, character *Character) {
+	const hasteBonus = 80
+	character.SetCD(DrumsCooldownID, sim.CurrentTime+DrumsCD)
+	character.AddAuraWithTemporaryStats(sim, DrumsAuraID, 35476, "Drums of Battle", stats.SpellHaste, hasteBonus, time.Second*30)
+	// TODO: Add melee haste to drums
+}
+
+func applyDrumsOfRestoration(sim *Simulation, character *Character) {
+	// 600 mana over 15 seconds == 200 mp5
+	const mp5Bonus = 200
+	character.SetCD(DrumsCooldownID, sim.CurrentTime+DrumsCD)
+	character.AddAuraWithTemporaryStats(sim, DrumsAuraID, 35478, "Drums of Restoration", stats.MP5, mp5Bonus, time.Second*15)
 }
 
 var PotionAuraID = NewAuraID()
