@@ -5,6 +5,8 @@ The primary goal of this project is to provide a framework that makes it easy to
 Live sims:
  - [Balance Druid](https://wowsims.github.io/tbc/balance_druid/ "https://wowsims.github.io/tbc/balance_druid/")
  - [Elemental Shaman](https://wowsims.github.io/tbc/elemental_shaman/ "https://wowsims.github.io/tbc/elemental_shaman/")
+ - [Shadow Priest](https://wowsims.github.io/tbc/shadow_priest/ "https://wowsims.github.io/tbc/shadow_priest/")
+ - [Raid Sim](https://wowsims.github.io/tbc/raid/ "https://wowsims.github.io/tbc/raid/")
 
 # Installation
 This project has dependencies on Go >=1.16, protobuf-compiler and the corresponding Go plugins, and node >= 14.0.
