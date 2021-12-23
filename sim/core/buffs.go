@@ -106,6 +106,8 @@ func applyBuffEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs proto.P
 	})
 
 	registerBloodlustCD(agent, partyBuffs.Bloodlust)
+	registerPowerInfusionCD(agent, individualBuffs.PowerInfusions)
+	registerManaTideTotemCD(agent, partyBuffs.ManaTideTotems)
 	registerInnervateCD(agent, individualBuffs.Innervates)
 
 	character.AddStats(stats.Stats{
@@ -130,45 +132,67 @@ func applyBuffEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs proto.P
 	}
 }
 
-var BloodlustAuraID = NewAuraID()
-var sharedBloodlustCooldownID = NewCooldownID() // Different from shaman bloodlust CD.
-const BloodlustDuration = time.Second * 40
-const BloodlustCD = time.Minute * 10
+// Used for approximating cooldowns applied by other players to you, such as
+// bloodlust, innervate, power infusion, etc. This is specifically for buffs
+// which can be consecutively applied multiple times to a single player.
+type externalConsecutiveCDApproximation struct {
+	AuraID           AuraID
+	CooldownID       CooldownID
+	CooldownPriority float64
+	AuraDuration     time.Duration
+	AuraCD           time.Duration
 
-func registerBloodlustCD(agent Agent, numBloodlusts int32) {
-	if numBloodlusts == 0 {
+	// Callback for any special initialization.
+	Init func(sim *Simulation, character *Character)
+
+	// Applies the buff.
+	AddAura func(sim *Simulation, character *Character) bool
+}
+
+// numSources is the number of other players assigned to apply the buff to this player.
+// E.g. the number of other shaman in the group using bloodlust.
+func registerExternalConsecutiveCDApproximation(agent Agent, config externalConsecutiveCDApproximation, numSources int32) {
+	if numSources == 0 {
 		return
 	}
 
-	bloodlustCDs := make([]InternalCD, numBloodlusts)
+	externalCDs := make([]InternalCD, numSources)
 
 	agent.GetCharacter().AddMajorCooldown(MajorCooldown{
-		CooldownID: sharedBloodlustCooldownID,
-		Cooldown:   BloodlustDuration, // assumes that multiple BLs are different shaman.
-		Priority:   CooldownPriorityBloodlust,
+		CooldownID: config.CooldownID,
+		Cooldown:   config.AuraDuration, // Assumes that multiple buffs are different sources.
+		Priority:   config.CooldownPriority,
 		ActivationFactory: func(sim *Simulation) CooldownActivation {
-			for i := 0; i < int(numBloodlusts); i++ {
-				bloodlustCDs[i] = NewICD()
+			for i := 0; i < int(numSources); i++ {
+				externalCDs[i] = NewICD()
 			}
-			nextBloodlustIndex := 0
+			nextExternalIndex := 0
+
+			if config.Init != nil {
+				config.Init(sim, agent.GetCharacter())
+			}
 
 			return func(sim *Simulation, character *Character) bool {
-				if bloodlustCDs[nextBloodlustIndex].IsOnCD(sim) {
+				if externalCDs[nextExternalIndex].IsOnCD(sim) {
 					return false
 				}
 
-				if character.HasAura(BloodlustAuraID) {
+				if character.HasAura(config.AuraID) {
 					return false
 				}
 
-				AddBloodlustAura(sim, character)
-				bloodlustCDs[nextBloodlustIndex] = InternalCD(sim.CurrentTime + BloodlustCD)
-				nextBloodlustIndex = (nextBloodlustIndex + 1) % len(bloodlustCDs)
+				success := config.AddAura(sim, character)
+				if !success {
+					return false
+				}
 
-				if bloodlustCDs[nextBloodlustIndex].IsOnCD(sim) {
-					character.SetCD(sharedBloodlustCooldownID, sim.CurrentTime+bloodlustCDs[nextBloodlustIndex].GetRemainingCD(sim))
+				externalCDs[nextExternalIndex] = InternalCD(sim.CurrentTime + config.AuraCD)
+				nextExternalIndex = (nextExternalIndex + 1) % len(externalCDs)
+
+				if externalCDs[nextExternalIndex].IsOnCD(sim) {
+					character.SetCD(config.CooldownID, sim.CurrentTime+externalCDs[nextExternalIndex].GetRemainingCD(sim))
 				} else {
-					character.SetCD(sharedBloodlustCooldownID, sim.CurrentTime+BloodlustDuration)
+					character.SetCD(config.CooldownID, sim.CurrentTime+config.AuraDuration)
 				}
 				return true
 			}
@@ -176,9 +200,31 @@ func registerBloodlustCD(agent Agent, numBloodlusts int32) {
 	})
 }
 
+var BloodlustAuraID = NewAuraID()
+var sharedBloodlustCooldownID = NewCooldownID() // Different from shaman bloodlust CD.
+const BloodlustDuration = time.Second * 40
+const BloodlustCD = time.Minute * 10
+
+func registerBloodlustCD(agent Agent, numBloodlusts int32) {
+	registerExternalConsecutiveCDApproximation(
+		agent,
+		externalConsecutiveCDApproximation{
+			AuraID:           BloodlustAuraID,
+			CooldownID:       sharedBloodlustCooldownID,
+			CooldownPriority: CooldownPriorityBloodlust,
+			AuraDuration:     BloodlustDuration,
+			AuraCD:           BloodlustCD,
+			AddAura: func(sim *Simulation, character *Character) bool {
+				AddBloodlustAura(sim, character)
+				return true
+			},
+		},
+		numBloodlusts)
+}
+
 func AddBloodlustAura(sim *Simulation, character *Character) {
 	const bonus = 1.3
-	const inverseBonus = 1 / 1.3
+	const inverseBonus = 1 / bonus
 
 	character.PseudoStats.CastSpeedMultiplier *= bonus
 	character.MultiplyMeleeSpeed(sim, bonus)
@@ -191,6 +237,49 @@ func AddBloodlustAura(sim *Simulation, character *Character) {
 		OnExpire: func(sim *Simulation) {
 			character.PseudoStats.CastSpeedMultiplier *= inverseBonus
 			character.MultiplyMeleeSpeed(sim, inverseBonus)
+		},
+	})
+}
+
+var PowerInfusionAuraID = NewAuraID()
+var sharedPowerInfusionCooldownID = NewCooldownID() // Different from priest PI CD.
+const PowerInfusionDuration = time.Second * 15
+const PowerInfusionCD = time.Minute * 3
+
+func registerPowerInfusionCD(agent Agent, numPowerInfusions int32) {
+	registerExternalConsecutiveCDApproximation(
+		agent,
+		externalConsecutiveCDApproximation{
+			AuraID:           PowerInfusionAuraID,
+			CooldownID:       sharedPowerInfusionCooldownID,
+			CooldownPriority: CooldownPriorityDefault,
+			AuraDuration:     PowerInfusionDuration,
+			AuraCD:           PowerInfusionCD,
+			AddAura: func(sim *Simulation, character *Character) bool {
+				AddPowerInfusionAura(sim, character)
+				return true
+			},
+		},
+		numPowerInfusions)
+}
+
+func AddPowerInfusionAura(sim *Simulation, character *Character) {
+	const bonus = 1.2
+	const inverseBonus = 1 / bonus
+
+	character.PseudoStats.CastSpeedMultiplier *= bonus
+
+	character.AddAura(sim, Aura{
+		ID:      PowerInfusionAuraID,
+		SpellID: 10060,
+		Name:    "Power Infusion",
+		Expires: sim.CurrentTime + PowerInfusionDuration,
+		OnCast: func(sim *Simulation, cast *Cast) {
+			// TODO: Double-check this is how the calculation works.
+			cast.ManaCost = MaxFloat(0, cast.ManaCost-cast.BaseManaCost*0.2)
+		},
+		OnExpire: func(sim *Simulation) {
+			character.PseudoStats.CastSpeedMultiplier *= inverseBonus
 		},
 	})
 }
@@ -211,39 +300,24 @@ func InnervateManaThreshold(character *Character) float64 {
 }
 
 func registerInnervateCD(agent Agent, numInnervates int32) {
-	if numInnervates == 0 {
-		return
-	}
+	innervateThreshold := InnervateManaThreshold(agent.GetCharacter())
+	expectedManaPerInnervate := 0.0
+	remainingInnervateUsages := 0
 
-	// Cooldowns for each innervate are separate, since they are cast by different players.
-	innervateCDs := make([]InternalCD, numInnervates)
-
-	character := agent.GetCharacter()
-
-	character.AddMajorCooldown(MajorCooldown{
-		CooldownID: sharedInnervateCooldownID,
-		Cooldown:   InnervateDuration, // Just put on CD for the duration because we can get other innervates after
-		ActivationFactory: func(sim *Simulation) CooldownActivation {
-			for i := 0; i < int(numInnervates); i++ {
-				innervateCDs[i] = NewICD()
-			}
-			nextInnervateIndex := 0
-
-			innervateThreshold := InnervateManaThreshold(character)
-			expectedManaPerInnervate := character.SpiritManaRegenPerSecond() * 5 * 20
-
-			remainingInnervateUsages := int(1 + (MaxDuration(0, sim.Duration))/InnervateCD)
-			character.ExpectedBonusMana += expectedManaPerInnervate * float64(remainingInnervateUsages)
-
-			return func(sim *Simulation, character *Character) bool {
-				if innervateCDs[nextInnervateIndex].IsOnCD(sim) {
-					return false
-				}
-
-				if character.HasAura(InnervateAuraID) {
-					return false
-				}
-
+	registerExternalConsecutiveCDApproximation(
+		agent,
+		externalConsecutiveCDApproximation{
+			AuraID:           InnervateAuraID,
+			CooldownID:       sharedInnervateCooldownID,
+			CooldownPriority: CooldownPriorityDefault,
+			AuraDuration:     InnervateDuration,
+			AuraCD:           InnervateCD,
+			Init: func(sim *Simulation, character *Character) {
+				expectedManaPerInnervate = character.SpiritManaRegenPerSecond() * 5 * 20
+				remainingInnervateUsages = int(1 + (MaxDuration(0, sim.Duration))/InnervateCD)
+				character.ExpectedBonusMana += expectedManaPerInnervate * float64(remainingInnervateUsages)
+			},
+			AddAura: func(sim *Simulation, character *Character) bool {
 				// Only cast innervate when very low on mana, to make sure all other mana CDs are prioritized.
 				if character.CurrentMana() > innervateThreshold {
 					return false
@@ -252,22 +326,14 @@ func registerInnervateCD(agent Agent, numInnervates int32) {
 				AddInnervateAura(sim, character, expectedManaPerInnervate)
 
 				newRemainingUsages := int(sim.GetRemainingDuration() / InnervateCD)
-				// AddInnervateAura already accounts for 1 usage, which is why we subtract 1 extra.
-				character.ExpectedBonusMana -= expectedManaPerInnervate * MaxFloat(0, float64(remainingInnervateUsages-1-newRemainingUsages))
+				// AddInnervateAura already accounts for 1 usage, which is why we subtract 1 less.
+				character.ExpectedBonusMana -= expectedManaPerInnervate * MaxFloat(0, float64(remainingInnervateUsages-newRemainingUsages-1))
 				remainingInnervateUsages = newRemainingUsages
 
-				innervateCDs[nextInnervateIndex] = InternalCD(sim.CurrentTime + InnervateCD)
-				nextInnervateIndex = (nextInnervateIndex + 1) % len(innervateCDs)
-
-				if innervateCDs[nextInnervateIndex].IsOnCD(sim) {
-					character.SetCD(sharedInnervateCooldownID, sim.CurrentTime+innervateCDs[nextInnervateIndex].GetRemainingCD(sim))
-				} else {
-					character.SetCD(sharedInnervateCooldownID, sim.CurrentTime+InnervateDuration)
-				}
 				return true
-			}
+			},
 		},
-	})
+		numInnervates)
 }
 
 func AddInnervateAura(sim *Simulation, character *Character, expectedBonusManaReduction float64) {
@@ -299,6 +365,87 @@ func AddInnervateAura(sim *Simulation, character *Character, expectedBonusManaRe
 			remainder := expectedBonusManaReduction - bonusManaSubtracted
 			character.ExpectedBonusMana -= remainder
 			character.Metrics.BonusManaGained += remainder
+		},
+	})
+}
+
+var sharedManaTideTotemCooldownID = NewCooldownID()
+var ManaTideTotemAuraID = NewAuraID()
+
+const ManaTideTotemDuration = time.Second * 12
+const ManaTideTotemCD = time.Minute * 5
+
+func ManaTideTotemAmount(character *Character) float64 {
+	// Subtract 120 mana to simulate the loss of mana spring while MTT is active.
+	// This isn't correct for multi-resto shaman groups, but that isnt a common case.
+	return character.MaxMana()*0.24 - 120
+}
+
+func registerManaTideTotemCD(agent Agent, numManaTideTotems int32) {
+	expectedManaPerManaTideTotem := 0.0
+	remainingManaTideTotemUsages := 0
+	initialDelay := time.Duration(0)
+
+	registerExternalConsecutiveCDApproximation(
+		agent,
+		externalConsecutiveCDApproximation{
+			AuraID:           ManaTideTotemAuraID,
+			CooldownID:       sharedManaTideTotemCooldownID,
+			CooldownPriority: CooldownPriorityDefault,
+			AuraDuration:     ManaTideTotemDuration,
+			AuraCD:           ManaTideTotemCD,
+			Init: func(sim *Simulation, character *Character) {
+				// Use first MTT at 60s, or halfway through the fight, whichever comes first.
+				initialDelay = MinDuration(sim.Duration/2, time.Second*60)
+
+				expectedManaPerManaTideTotem = ManaTideTotemAmount(character)
+				remainingManaTideTotemUsages = int(1 + MaxDuration(0, sim.Duration-initialDelay)/ManaTideTotemCD)
+				character.ExpectedBonusMana += expectedManaPerManaTideTotem * float64(remainingManaTideTotemUsages)
+			},
+			AddAura: func(sim *Simulation, character *Character) bool {
+				// A normal resto shaman would wait to use MTT.
+				if sim.CurrentTime < initialDelay {
+					return false
+				}
+
+				AddManaTideTotemAura(sim, character)
+
+				newRemainingUsages := int(sim.GetRemainingDuration() / ManaTideTotemCD)
+				// AddManaTideTotemAura already accounts for 1 usage, which is why we subtract 1 less.
+				character.ExpectedBonusMana -= expectedManaPerManaTideTotem * MaxFloat(0, float64(remainingManaTideTotemUsages-newRemainingUsages-1))
+				remainingManaTideTotemUsages = newRemainingUsages
+
+				return true
+			},
+		},
+		numManaTideTotems)
+}
+
+func AddManaTideTotemAura(sim *Simulation, character *Character) {
+	lastUpdateTime := sim.CurrentTime
+	totalBonusMana := ManaTideTotemAmount(character)
+	bonusManaSubtracted := 0.0
+
+	character.AddAura(sim, Aura{
+		ID:      ManaTideTotemAuraID,
+		SpellID: 16190,
+		Name:    "Mana Tide Totem",
+		Expires: sim.CurrentTime + ManaTideTotemDuration,
+		OnCast: func(sim *Simulation, cast *Cast) {
+			timeDelta := sim.CurrentTime - lastUpdateTime
+			lastUpdateTime = sim.CurrentTime
+			progressRatio := float64(timeDelta) / float64(ManaTideTotemDuration)
+			remainder := totalBonusMana - bonusManaSubtracted
+			amount := MinFloat(remainder, totalBonusMana*progressRatio)
+
+			character.AddMana(sim, amount, "Mana Tide Totem", true)
+			character.ExpectedBonusMana -= amount
+			bonusManaSubtracted += amount
+		},
+		OnExpire: func(sim *Simulation) {
+			remainder := totalBonusMana - bonusManaSubtracted
+			character.AddMana(sim, remainder, "Mana Tide Totem", true)
+			character.ExpectedBonusMana -= remainder
 		},
 	})
 }

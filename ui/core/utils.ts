@@ -80,7 +80,7 @@ export function camelToSnakeCase(str: string): string {
 }
 
 export function downloadJson(json: any, fileName: string) {
-	const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(json));
+	const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(json, null, 2));
 	const downloadAnchorNode = document.createElement('a');
 	downloadAnchorNode.setAttribute("href", dataStr);
 	downloadAnchorNode.setAttribute("download", fileName);

@@ -231,6 +231,7 @@ message PartyBuffs {
 
     // Totems
     TristateEffect mana_spring_totem = 12;
+    int32 mana_tide_totems = 17;
     int32 totem_of_wrath = 13;
     TristateEffect wrath_of_air_totem = 14;
     TristateEffect grace_of_air_totem = 15;
@@ -245,10 +246,10 @@ message IndividualBuffs {
     TristateEffect blessing_of_might = 3;
 
     int32 shadow_priest_dps = 4;
-    bool mana_tide_totem = 5;
 
-    // How many innervates will you get?
-    int32 innervates = 6;
+    // How many of each of these buffs the player will be receiving.
+    int32 innervates = 5;
+    int32 power_infusions = 6;
 }
 
 message Consumes {
