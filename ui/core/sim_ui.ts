@@ -1,5 +1,7 @@
 import { Component } from '/tbc/core/components/component.js';
 import { NumberPicker } from '/tbc/core/components/number_picker.js';
+import { Title } from '/tbc/core/components/title.js';
+import { Spec } from '/tbc/core/proto/common.js';
 import { SimOptions } from '/tbc/core/proto/api.js';
 import { specToLocalStorageKey } from '/tbc/core/proto_utils/utils.js';
 
@@ -11,8 +13,10 @@ declare var tippy: any;
 declare var pako: any;
 
 export interface SimUIConfig {
-	title: string,
-	knownIssues?: Array<string>;
+	// The spec, if an individual sim, or null if the raid sim.
+	spec: Spec | null,
+
+	knownIssues?: Array<string>,
 }
 
 // Shared UI for all individual sims and the raid sim.
@@ -34,30 +38,26 @@ export abstract class SimUI extends Component {
       this.sim.changeEmitter,
     ].forEach(emitter => emitter.on(eventID => this.changeEmitter.emit(eventID)));
 
-		Array.from(document.getElementsByClassName('known-issues')).forEach(element => {
-			if (config.knownIssues?.length) {
-				(element as HTMLElement).style.display = 'initial';
-			} else {
-				return;
-			}
-
-			
-			tippy(element, {
-				'content': `
+		if (config.knownIssues && config.knownIssues.length) {
+			const knownIssuesContainer = document.getElementsByClassName('known-issues')[0] as HTMLElement;
+			knownIssuesContainer.style.display = 'initial';
+			tippy(knownIssuesContainer, {
+				content: `
 				<ul class="known-issues-tooltip">
 					${config.knownIssues.map(issue => '<li>' + issue + '</li>').join('')}
 				</ul>
 				`,
-				'allowHTML': true,
+				allowHTML: true,
+				interactive: true,
 			});
-		});
+		}
 
 		this.resultsPendingElem = this.rootElem.getElementsByClassName('results-pending')[0] as HTMLElement;
 		this.resultsContentElem = this.rootElem.getElementsByClassName('results-content')[0] as HTMLElement;
 		this.hideAllResults();
 
-		const titleElem = this.rootElem.getElementsByClassName('sim-sidebar-title')[0];
-		titleElem.textContent = config.title;
+		const titleElem = this.rootElem.getElementsByClassName('sim-sidebar-title')[0] as HTMLElement;
+		const title = new Title(titleElem, config.spec);
 
 		const simActionsContainer = this.rootElem.getElementsByClassName('sim-sidebar-actions')[0] as HTMLElement;
 		const iterationsPicker = new NumberPicker(simActionsContainer, this.sim, {
@@ -164,11 +164,13 @@ const simHTML = `
     <div class="sim-sidebar-footer"></div>
   </section>
   <section class="sim-main">
-    <ul class="sim-tabs nav nav-tabs">
-      <li class="sim-top-bar">
-				<div class="known-issues">Known Issues</div>
-			</li>
-    </ul>
+		<div class="sim-toolbar">
+			<ul class="sim-tabs nav nav-tabs">
+				<li class="sim-top-bar">
+					<div class="known-issues">Known Issues</div>
+				</li>
+			</ul>
+    </div>
     <div class="tab-content">
     </div>
   </section>

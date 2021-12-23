@@ -75,8 +75,6 @@ class IndividualSimIconPicker<ModObject, ValueType> extends IconPicker<ModObject
 	}
 }
 
-export type ReleaseStatus = 'Alpha' | 'Beta' | 'Live';
-
 export interface InputSection {
 	tooltip?: string,
 	inputs: Array<{
@@ -100,7 +98,6 @@ export interface IndividualSimUIConfig<SpecType extends Spec> {
 	// Additional css class to add to the root element.
 	cssClass: string,
 
-  releaseStatus: ReleaseStatus;
 	knownIssues?: Array<string>;
 
   epStats: Array<Stat>;
@@ -172,15 +169,8 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 	private raidSimResultsManager: RaidSimResultsManager | null;
 
   constructor(parentElem: HTMLElement, player: Player<SpecType>, config: IndividualSimUIConfig<SpecType>) {
-		let title = 'TBC ' + specNames[player.spec] + ' Sim';
-		if (config.releaseStatus == 'Alpha') {
-			title += ' Alpha';
-		} else if (config.releaseStatus == 'Beta') {
-			title += ' Beta';
-		}
-
 		super(parentElem, player.sim, {
-			title: title,
+			spec: player.spec,
 			knownIssues: config.knownIssues,
 		});
 		this.rootElem.classList.add('individual-sim-ui', config.cssClass);

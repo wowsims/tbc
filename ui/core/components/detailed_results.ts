@@ -1,6 +1,6 @@
+import { REPO_NAME } from '/tbc/core/constants/other.js'
 import { RaidSimRequest, RaidSimResult } from '/tbc/core/proto/api.js';
 import { SimResult } from '/tbc/core/proto_utils/sim_result.js';
-import { repoName } from '/tbc/core/resources.js';
 import { SimUI } from '/tbc/core/sim_ui.js';
 
 import { Component } from './component.js';
@@ -18,7 +18,7 @@ export class DetailedResults extends Component {
 
 		const computedStyles = window.getComputedStyle(this.rootElem);
 
-		const url = new URL(`${window.location.protocol}//${window.location.host}/${repoName}/detailed_results/index.html`);
+		const url = new URL(`${window.location.protocol}//${window.location.host}/${REPO_NAME}/detailed_results/index.html`);
 		url.searchParams.append('mainBgColor', computedStyles.getPropertyValue('--main-bg-color').trim());
 		url.searchParams.append('mainTextColor', computedStyles.getPropertyValue('--main-text-color').trim());
 		if (simUI.isIndividualSim()) {

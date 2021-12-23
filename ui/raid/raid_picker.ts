@@ -16,7 +16,6 @@ import { BuffBot as BuffBotProto } from '/tbc/core/proto/ui.js';
 import { Faction } from '/tbc/core/proto_utils/utils.js';
 import { classColors } from '/tbc/core/proto_utils/utils.js';
 import { specToClass } from '/tbc/core/proto_utils/utils.js';
-import { repoName } from '/tbc/core/resources.js';
 import { newTalentsPicker } from '/tbc/core/talents/factory.js';
 import { EventID, TypedEvent } from '/tbc/core/typed_event.js';
 import { camelToSnakeCase } from '/tbc/core/utils.js';

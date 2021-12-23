@@ -31,8 +31,6 @@ import * as Presets from './presets.js';
 export class ElementalShamanSimUI extends IndividualSimUI<Spec.SpecElementalShaman> {
   constructor(parentElem: HTMLElement, player: Player<Spec.SpecElementalShaman>) {
 		super(parentElem, player, {
-			// Can be 'Alpha', 'Beta', or 'Live'. Just adds a postfix to the generated title.
-			releaseStatus: 'Beta',
 			cssClass: 'elemental-shaman-sim-ui',
 			// List any known bugs / issues here and they'll be shown on the site.
 			knownIssues: [
