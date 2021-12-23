@@ -31,7 +31,7 @@ export class Title extends Component {
 
     this.rootElem.innerHTML = `
 			<div class="dropdown-button sim-title-button"></div>
-			<div class="dropdown-panel sim-title-dropdown"></div>
+			<div class="dropdown-panel sim-title-dropdown within-raid-sim-hide"></div>
     `;
 
 		this.buttonElem = this.rootElem.getElementsByClassName('sim-title-button')[0] as HTMLElement;
@@ -55,7 +55,11 @@ export class Title extends Component {
 		}
 
 		this.buttonElem.appendChild(Title.makeOptionElem(currentOption));
-		otherOptions.forEach(option => this.dropdownElem.appendChild(this.makeOption(option)));
+
+		const isWithinRaidSim = this.rootElem.closest('.within-raid-sim') != null;
+		if (!isWithinRaidSim) {
+			otherOptions.forEach(option => this.dropdownElem.appendChild(this.makeOption(option)));
+		}
   }
 
 	private makeOptionData(spec: Spec | null, isButton: boolean) {
