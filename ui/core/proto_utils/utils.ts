@@ -9,6 +9,7 @@ import { Player } from '/tbc/core/proto/api.js';
 import { ArmorType } from '/tbc/core/proto/common.js';
 import { Class } from '/tbc/core/proto/common.js';
 import { Enchant } from '/tbc/core/proto/common.js';
+import { EnchantType } from '/tbc/core/proto/common.js';
 import { Gem } from '/tbc/core/proto/common.js';
 import { GemColor } from '/tbc/core/proto/common.js';
 import { HandType } from '/tbc/core/proto/common.js';
@@ -1139,15 +1140,14 @@ export function enchantAppliesToItem(enchant: Enchant, item: Item): boolean {
   if (sharedSlots.length == 0)
     return false;
 
-  if (sharedSlots.includes(ItemSlot.ItemSlotMainHand)) {
-    if (enchant.twoHandedOnly && item.handType != HandType.HandTypeTwoHand)
-      return false;
-  }
+	if (enchant.enchantType == EnchantType.EnchantTypeTwoHanded && item.handType != HandType.HandTypeTwoHand)
+		return false;
 
-  if (sharedSlots.includes(ItemSlot.ItemSlotOffHand)) {
-    if (enchant.shieldOnly && item.weaponType != WeaponType.WeaponTypeShield)
-      return false;
-  }
+	if ((enchant.enchantType == EnchantType.EnchantTypeShield) != (item.weaponType == WeaponType.WeaponTypeShield))
+		return false;
+	
+	if (item.weaponType == WeaponType.WeaponTypeOffHand)
+		return false;
 
   if (sharedSlots.includes(ItemSlot.ItemSlotRanged)) {
     if (![

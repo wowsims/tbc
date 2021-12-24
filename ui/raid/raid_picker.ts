@@ -16,6 +16,7 @@ import { BuffBot as BuffBotProto } from '/tbc/core/proto/ui.js';
 import { Faction } from '/tbc/core/proto_utils/utils.js';
 import { classColors } from '/tbc/core/proto_utils/utils.js';
 import { specToClass } from '/tbc/core/proto_utils/utils.js';
+import { newRaidTarget } from '/tbc/core/proto_utils/utils.js';
 import { newTalentsPicker } from '/tbc/core/talents/factory.js';
 import { EventID, TypedEvent } from '/tbc/core/typed_event.js';
 import { camelToSnakeCase } from '/tbc/core/utils.js';
@@ -25,6 +26,8 @@ import { hexToRgba } from '/tbc/core/utils.js';
 import { BuffBot } from './buff_bot.js';
 import { RaidSimUI } from './raid_sim_ui.js';
 import { buffBotPresets, playerPresets, specSimFactories } from './presets.js';
+
+import { BalanceDruid_Options as BalanceDruidOptions } from '/tbc/core/proto/druid.js';
 
 declare var tippy: any;
 declare var $: any;
@@ -477,12 +480,17 @@ export class PlayerPicker extends Component {
 			if (newPlayer instanceof BuffBot) {
 				this.partyPicker.party.setPlayer(eventID, this.index, null);
 				newPlayer.setRaidIndex(eventID, this.raidIndex);
-			} else {
+			} else if (newPlayer instanceof Player) {
+				const wasInRaid = newPlayer.getRaid() != null;
 				this.partyPicker.party.setPlayer(eventID, this.index, newPlayer);
 
-				if (newPlayer == null) {
-					this.partyPicker.party.compChangeEmitter.emit(eventID);
+				// On creation, boomies should default to innervating themselves.
+				if (!wasInRaid && newPlayer.spec == Spec.SpecBalanceDruid) {
+					setBalanceDruidSelfInnervate(eventID, newPlayer);
 				}
+			} else {
+				this.partyPicker.party.setPlayer(eventID, this.index, newPlayer);
+				this.partyPicker.party.compChangeEmitter.emit(eventID);
 			}
 		});
 
@@ -717,4 +725,10 @@ class NewPlayerPicker extends Component {
 			});
 		});
 	}
+}
+
+function setBalanceDruidSelfInnervate(eventID: EventID, player: Player<any>) {
+	const newOptions = player.getSpecOptions() as BalanceDruidOptions;
+	newOptions.innervateTarget = newRaidTarget(player.getRaidIndex());
+	player.setSpecOptions(eventID, newOptions);
 }
