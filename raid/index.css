@@ -465,10 +465,18 @@
   color: white;
 }
 
+.icon-enum-picker-root {
+  border: 2px solid dimgray;
+}
+
 .icon-enum-picker-root a {
   height: 40px;
   width: 40px;
   display: block;
+}
+
+.icon-enum-picker-root.active {
+  border-color: lawngreen;
 }
 
 .icon-enum-picker-button {

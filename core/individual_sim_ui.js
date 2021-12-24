@@ -241,6 +241,8 @@ export class IndividualSimUI extends SimUI {
 						<label>Rotation</label>
 					</section>
 				</div>
+				<div class="settings-section-container custom-sections-container">
+				</div>
 				<div class="settings-section-container">
 					<section class="settings-section self-buffs-section">
 						<label>Self Buffs</label>
@@ -333,18 +335,6 @@ export class IndividualSimUI extends SimUI {
             toJson: (a) => this.player.specTypeFunctions.rotationToJson(a),
             fromJson: (obj) => this.player.specTypeFunctions.rotationFromJson(obj),
         });
-        const makeInputSection = (sectionName, sectionConfig) => {
-            const sectionCssPrefix = sectionName.replace(/\s+/g, '');
-            const sectionElem = document.createElement('section');
-            sectionElem.classList.add('settings-section', sectionCssPrefix + '-section');
-            sectionElem.innerHTML = `<label>${sectionName}</label>`;
-            settingsTab.appendChild(sectionElem);
-            configureInputSection(sectionElem, sectionConfig);
-        };
-        for (const [sectionName, sectionConfig] of Object.entries(this.individualConfig.additionalSections || {})) {
-            makeInputSection(sectionName, sectionConfig);
-        }
-        ;
         const races = specToEligibleRaces[this.player.spec];
         const racePicker = new EnumPicker(this.rootElem.getElementsByClassName('race-section')[0], this.player, {
             values: races.map(race => {
@@ -430,6 +420,26 @@ export class IndividualSimUI extends SimUI {
                     race: Number(obj['race']),
                 };
             },
+        });
+        const customSectionsContainer = this.rootElem.getElementsByClassName('custom-sections-container')[0];
+        for (const [sectionName, sectionConfig] of Object.entries(this.individualConfig.additionalSections || {})) {
+            const sectionCssPrefix = sectionName.replace(/\s+/g, '');
+            const sectionElem = document.createElement('section');
+            sectionElem.classList.add('settings-section', sectionCssPrefix + '-section');
+            sectionElem.innerHTML = `<label>${sectionName}</label>`;
+            customSectionsContainer.appendChild(sectionElem);
+            configureInputSection(sectionElem, sectionConfig);
+        }
+        ;
+        (this.individualConfig.customSections || []).forEach(customSection => {
+            const sectionElem = document.createElement('section');
+            customSectionsContainer.appendChild(sectionElem);
+            const sectionName = customSection(this, sectionElem);
+            const sectionCssPrefix = sectionName.replace(/\s+/g, '');
+            sectionElem.classList.add('settings-section', sectionCssPrefix + '-section');
+            const labelElem = document.createElement('label');
+            labelElem.textContent = sectionName;
+            sectionElem.prepend(labelElem);
         });
         this.sim.waitForInit().then(() => {
             savedEncounterManager.loadUserData();

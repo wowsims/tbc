@@ -70,6 +70,7 @@ export interface IndividualSimUIConfig<SpecType extends Spec> {
     rotationInputs: InputSection;
     otherInputs?: InputSection;
     additionalSections?: Record<string, InputSection>;
+    customSections?: Array<(simUI: IndividualSimUI<SpecType>, parentElem: HTMLElement) => string>;
     encounterPicker: EncounterPickerConfig;
     freezeTalents?: boolean;
     presets: {

@@ -777,7 +777,8 @@ export const EnhancementShaman = new EnhancementShaman$Type();
 class EnhancementShaman_Rotation$Type extends MessageType {
     constructor() {
         super("proto.EnhancementShaman.Rotation", [
-            { no: 1, name: "type", kind: "enum", T: () => ["proto.EnhancementShaman.Rotation.RotationType", EnhancementShaman_Rotation_RotationType] }
+            { no: 1, name: "type", kind: "enum", T: () => ["proto.EnhancementShaman.Rotation.RotationType", EnhancementShaman_Rotation_RotationType] },
+            { no: 2, name: "totems", kind: "message", T: () => ShamanTotems }
         ]);
     }
     create(value) {
@@ -795,6 +796,9 @@ class EnhancementShaman_Rotation$Type extends MessageType {
                 case /* proto.EnhancementShaman.Rotation.RotationType type */ 1:
                     message.type = reader.int32();
                     break;
+                case /* proto.ShamanTotems totems */ 2:
+                    message.totems = ShamanTotems.internalBinaryRead(reader, reader.uint32(), options, message.totems);
+                    break;
                 default:
                     let u = options.readUnknownField;
                     if (u === "throw")
@@ -810,6 +814,9 @@ class EnhancementShaman_Rotation$Type extends MessageType {
         /* proto.EnhancementShaman.Rotation.RotationType type = 1; */
         if (message.type !== 0)
             writer.tag(1, WireType.Varint).int32(message.type);
+        /* proto.ShamanTotems totems = 2; */
+        if (message.totems)
+            ShamanTotems.internalBinaryWrite(message.totems, writer.tag(2, WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -825,8 +832,7 @@ class EnhancementShaman_Options$Type extends MessageType {
     constructor() {
         super("proto.EnhancementShaman.Options", [
             { no: 1, name: "water_shield", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
-            { no: 2, name: "bloodlust", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
-            { no: 3, name: "totems", kind: "message", T: () => ShamanTotems }
+            { no: 2, name: "bloodlust", kind: "scalar", T: 8 /*ScalarType.BOOL*/ }
         ]);
     }
     create(value) {
@@ -847,9 +853,6 @@ class EnhancementShaman_Options$Type extends MessageType {
                 case /* bool bloodlust */ 2:
                     message.bloodlust = reader.bool();
                     break;
-                case /* proto.ShamanTotems totems */ 3:
-                    message.totems = ShamanTotems.internalBinaryRead(reader, reader.uint32(), options, message.totems);
-                    break;
                 default:
                     let u = options.readUnknownField;
                     if (u === "throw")
@@ -868,9 +871,6 @@ class EnhancementShaman_Options$Type extends MessageType {
         /* bool bloodlust = 2; */
         if (message.bloodlust !== false)
             writer.tag(2, WireType.Varint).bool(message.bloodlust);
-        /* proto.ShamanTotems totems = 3; */
-        if (message.totems)
-            ShamanTotems.internalBinaryWrite(message.totems, writer.tag(3, WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

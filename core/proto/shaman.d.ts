@@ -188,7 +188,7 @@ export interface ShamanTotems {
      */
     twistFireNova: boolean;
     /**
-     * If set, will use mana tide when appripriate.
+     * If set, will use mana tide when appropriate.
      *
      * @generated from protobuf field: bool use_mana_tide = 7;
      */
@@ -327,6 +327,10 @@ export interface EnhancementShaman_Rotation {
      * @generated from protobuf field: proto.EnhancementShaman.Rotation.RotationType type = 1;
      */
     type: EnhancementShaman_Rotation_RotationType;
+    /**
+     * @generated from protobuf field: proto.ShamanTotems totems = 2;
+     */
+    totems?: ShamanTotems;
 }
 /**
  * @generated from protobuf enum proto.EnhancementShaman.Rotation.RotationType
@@ -353,10 +357,6 @@ export interface EnhancementShaman_Options {
      * @generated from protobuf field: bool bloodlust = 2;
      */
     bloodlust: boolean;
-    /**
-     * @generated from protobuf field: proto.ShamanTotems totems = 3;
-     */
-    totems?: ShamanTotems;
 }
 /**
  * @generated from protobuf enum proto.EarthTotem

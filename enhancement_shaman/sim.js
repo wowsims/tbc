@@ -140,6 +140,9 @@ export class EnhancementShamanSimUI extends IndividualSimUI {
                     OtherInputs.NumStartingPotions,
                 ],
             },
+            customSections: [
+                ShamanInputs.TotemsSection,
+            ],
             encounterPicker: {
                 // Whether to include 'Target Armor' in the 'Encounter' section of the settings tab.
                 showTargetArmor: false,

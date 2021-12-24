@@ -24,3 +24,4 @@ export declare const EnhancementShamanRotationConfig: {
         };
     }[];
 };
+export declare function TotemsSection(simUI: IndividualSimUI<Spec.SpecEnhancementShaman>, parentElem: HTMLElement): string;
