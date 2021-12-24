@@ -404,13 +404,9 @@ export interface Enchant {
      */
     type: ItemType;
     /**
-     * @generated from protobuf field: bool two_handed_only = 5;
+     * @generated from protobuf field: proto.EnchantType enchant_type = 9;
      */
-    twoHandedOnly: boolean;
-    /**
-     * @generated from protobuf field: bool shield_only = 6;
-     */
-    shieldOnly: boolean;
+    enchantType: EnchantType;
     /**
      * @generated from protobuf field: repeated double stats = 7;
      */
@@ -1191,6 +1187,26 @@ export declare enum MobType {
      * @generated from protobuf enum value: MobTypeUndead = 8;
      */
     MobTypeUndead = 8
+}
+/**
+ * Extra enum for describing which items are eligible for an enchant, when
+ * ItemType alone is not enough.
+ *
+ * @generated from protobuf enum proto.EnchantType
+ */
+export declare enum EnchantType {
+    /**
+     * @generated from protobuf enum value: EnchantTypeNormal = 0;
+     */
+    EnchantTypeNormal = 0,
+    /**
+     * @generated from protobuf enum value: EnchantTypeTwoHanded = 1;
+     */
+    EnchantTypeTwoHanded = 1,
+    /**
+     * @generated from protobuf enum value: EnchantTypeShield = 2;
+     */
+    EnchantTypeShield = 2
 }
 declare class RaidBuffs$Type extends MessageType<RaidBuffs> {
     constructor();

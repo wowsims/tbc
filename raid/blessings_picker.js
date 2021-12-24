@@ -2,64 +2,17 @@ import { Component } from '/tbc/core/components/component.js';
 import { IconEnumPicker } from '/tbc/core/components/icon_enum_picker.js';
 import { TypedEvent } from '/tbc/core/typed_event.js';
 import { Class } from '/tbc/core/proto/common.js';
-import { Spec } from '/tbc/core/proto/common.js';
 import { Blessings } from '/tbc/core/proto/ui.js';
-import { BlessingsAssignment } from '/tbc/core/proto/ui.js';
 import { BlessingsAssignments } from '/tbc/core/proto/ui.js';
-import { classColors, specIconsLarge, specNames, } from '/tbc/core/proto_utils/utils.js';
-import { getEnumValues } from '/tbc/core/utils.js';
+import { makeDefaultBlessings, classColors, naturalSpecOrder, specIconsLarge, specNames, } from '/tbc/core/proto_utils/utils.js';
 import { implementedSpecs } from './presets.js';
 const MAX_PALADINS = 4;
-const NUM_SPECS = getEnumValues(Spec).length;
-const specOrder = [
-    Spec.SpecBalanceDruid,
-    Spec.SpecHunter,
-    Spec.SpecMage,
-    Spec.SpecRetributionPaladin,
-    Spec.SpecShadowPriest,
-    Spec.SpecRogue,
-    Spec.SpecElementalShaman,
-    Spec.SpecWarlock,
-    Spec.SpecWarrior,
-];
-// Makes a new set of assignments with everything 0'd out.
-function makeBlankBlessingsAssignments() {
-    const assignments = BlessingsAssignments.create();
-    for (let i = 0; i < MAX_PALADINS; i++) {
-        assignments.paladins.push(BlessingsAssignment.create({
-            blessings: new Array(NUM_SPECS).fill(Blessings.BlessingUnknown),
-        }));
-    }
-    return assignments;
-}
-function makeBlessingsAssignments(data) {
-    const assignments = makeBlankBlessingsAssignments();
-    for (let i = 0; i < data.length; i++) {
-        const spec = data[i].spec;
-        const blessings = data[i].blessings;
-        for (let j = 0; j < blessings.length; j++) {
-            assignments.paladins[j].blessings[spec] = blessings[j];
-        }
-    }
-    return assignments;
-}
-const defaultBlessings = makeBlessingsAssignments([
-    { spec: Spec.SpecBalanceDruid, blessings: [Blessings.BlessingOfKings, Blessings.BlessingOfSalvation, Blessings.BlessingOfWisdom] },
-    { spec: Spec.SpecHunter, blessings: [Blessings.BlessingOfKings, Blessings.BlessingOfSalvation, Blessings.BlessingOfMight, Blessings.BlessingOfWisdom] },
-    { spec: Spec.SpecMage, blessings: [Blessings.BlessingOfKings, Blessings.BlessingOfSalvation, Blessings.BlessingOfWisdom] },
-    { spec: Spec.SpecRetributionPaladin, blessings: [Blessings.BlessingOfKings, Blessings.BlessingOfMight, Blessings.BlessingOfSalvation, Blessings.BlessingOfWisdom] },
-    { spec: Spec.SpecShadowPriest, blessings: [Blessings.BlessingOfKings, Blessings.BlessingOfSalvation, Blessings.BlessingOfWisdom] },
-    { spec: Spec.SpecRogue, blessings: [Blessings.BlessingOfKings, Blessings.BlessingOfSalvation, Blessings.BlessingOfMight] },
-    { spec: Spec.SpecElementalShaman, blessings: [Blessings.BlessingOfKings, Blessings.BlessingOfSalvation, Blessings.BlessingOfWisdom] },
-    { spec: Spec.SpecWarlock, blessings: [Blessings.BlessingOfKings, Blessings.BlessingOfSalvation, Blessings.BlessingOfWisdom] },
-    { spec: Spec.SpecWarrior, blessings: [Blessings.BlessingOfKings, Blessings.BlessingOfSalvation, Blessings.BlessingOfMight] },
-]);
 export class BlessingsPicker extends Component {
     constructor(parentElem, raidSimUI) {
         super(parentElem, 'blessings-picker-root');
         this.changeEmitter = new TypedEvent();
         this.raidSimUI = raidSimUI;
-        this.assignments = BlessingsAssignments.clone(defaultBlessings);
+        this.assignments = BlessingsAssignments.clone(makeDefaultBlessings(4));
         this.rootElem.innerHTML = `
 		<table class="blessings-table">
 			<thead class="blessings-table-header">
@@ -73,7 +26,7 @@ export class BlessingsPicker extends Component {
 		`;
         const headerRow = this.rootElem.getElementsByClassName('blessings-table-header-row')[0];
         const bodyElem = this.rootElem.getElementsByClassName('blessings-table-body')[0];
-        specOrder.forEach(spec => {
+        naturalSpecOrder.forEach(spec => {
             if (!implementedSpecs.includes(spec)) {
                 return;
             }
@@ -96,7 +49,7 @@ export class BlessingsPicker extends Component {
             cell.classList.add('blessings-table-cell', 'blessings-table-label-cell');
             cell.textContent = 'Paladin ' + (rowIndex + 1);
             row.appendChild(cell);
-            specOrder.forEach(spec => {
+            naturalSpecOrder.forEach(spec => {
                 if (!implementedSpecs.includes(spec)) {
                     return;
                 }

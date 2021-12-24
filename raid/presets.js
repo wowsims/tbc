@@ -228,7 +228,7 @@ export const buffBotPresets = [
         iconUrl: talentTreeIcons[Class.ClassShaman][2],
         modifyRaidProto: (buffBot, raidProto, partyProto) => {
             partyProto.buffs.bloodlust++;
-            partyProto.buffs.manaSpringTotem = TristateEffect.TristateEffectRegular;
+            partyProto.buffs.manaSpringTotem = TristateEffect.TristateEffectImproved;
             partyProto.buffs.wrathOfAirTotem = Math.max(partyProto.buffs.wrathOfAirTotem, TristateEffect.TristateEffectRegular);
             partyProto.buffs.manaTideTotems++;
             partyProto.buffs.drums = Drums.DrumsOfBattle;

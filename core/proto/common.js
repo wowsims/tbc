@@ -748,6 +748,27 @@ export var MobType;
      */
     MobType[MobType["MobTypeUndead"] = 8] = "MobTypeUndead";
 })(MobType || (MobType = {}));
+/**
+ * Extra enum for describing which items are eligible for an enchant, when
+ * ItemType alone is not enough.
+ *
+ * @generated from protobuf enum proto.EnchantType
+ */
+export var EnchantType;
+(function (EnchantType) {
+    /**
+     * @generated from protobuf enum value: EnchantTypeNormal = 0;
+     */
+    EnchantType[EnchantType["EnchantTypeNormal"] = 0] = "EnchantTypeNormal";
+    /**
+     * @generated from protobuf enum value: EnchantTypeTwoHanded = 1;
+     */
+    EnchantType[EnchantType["EnchantTypeTwoHanded"] = 1] = "EnchantTypeTwoHanded";
+    /**
+     * @generated from protobuf enum value: EnchantTypeShield = 2;
+     */
+    EnchantType[EnchantType["EnchantTypeShield"] = 2] = "EnchantTypeShield";
+})(EnchantType || (EnchantType = {}));
 // @generated message type with reflection information, may provide speed optimized methods
 class RaidBuffs$Type extends MessageType {
     constructor() {
@@ -1743,14 +1764,13 @@ class Enchant$Type extends MessageType {
             { no: 2, name: "effect_id", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 3, name: "name", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
             { no: 4, name: "type", kind: "enum", T: () => ["proto.ItemType", ItemType] },
-            { no: 5, name: "two_handed_only", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
-            { no: 6, name: "shield_only", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 9, name: "enchant_type", kind: "enum", T: () => ["proto.EnchantType", EnchantType] },
             { no: 7, name: "stats", kind: "scalar", repeat: 1 /*RepeatType.PACKED*/, T: 1 /*ScalarType.DOUBLE*/ },
             { no: 8, name: "quality", kind: "enum", T: () => ["proto.ItemQuality", ItemQuality] }
         ]);
     }
     create(value) {
-        const message = { id: 0, effectId: 0, name: "", type: 0, twoHandedOnly: false, shieldOnly: false, stats: [], quality: 0 };
+        const message = { id: 0, effectId: 0, name: "", type: 0, enchantType: 0, stats: [], quality: 0 };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -1773,11 +1793,8 @@ class Enchant$Type extends MessageType {
                 case /* proto.ItemType type */ 4:
                     message.type = reader.int32();
                     break;
-                case /* bool two_handed_only */ 5:
-                    message.twoHandedOnly = reader.bool();
-                    break;
-                case /* bool shield_only */ 6:
-                    message.shieldOnly = reader.bool();
+                case /* proto.EnchantType enchant_type */ 9:
+                    message.enchantType = reader.int32();
                     break;
                 case /* repeated double stats */ 7:
                     if (wireType === WireType.LengthDelimited)
@@ -1813,12 +1830,9 @@ class Enchant$Type extends MessageType {
         /* proto.ItemType type = 4; */
         if (message.type !== 0)
             writer.tag(4, WireType.Varint).int32(message.type);
-        /* bool two_handed_only = 5; */
-        if (message.twoHandedOnly !== false)
-            writer.tag(5, WireType.Varint).bool(message.twoHandedOnly);
-        /* bool shield_only = 6; */
-        if (message.shieldOnly !== false)
-            writer.tag(6, WireType.Varint).bool(message.shieldOnly);
+        /* proto.EnchantType enchant_type = 9; */
+        if (message.enchantType !== 0)
+            writer.tag(9, WireType.Varint).int32(message.enchantType);
         /* repeated double stats = 7; */
         if (message.stats.length) {
             writer.tag(7, WireType.LengthDelimited).fork();

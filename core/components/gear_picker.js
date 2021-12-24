@@ -1,5 +1,6 @@
 import { getWowheadItemId } from '/tbc/core/proto_utils/equipped_item.js';
 import { EquippedItem } from '/tbc/core/proto_utils/equipped_item.js';
+import { enchantAppliesToItem } from '/tbc/core/proto_utils/utils.js';
 import { Item } from '/tbc/core/proto/common.js';
 import { ItemSlot } from '/tbc/core/proto/common.js';
 import { enchantDescriptions } from '/tbc/core/proto_utils/names.js';
@@ -333,10 +334,21 @@ class SelectorModal extends Component {
         updateSelected();
         this.player.gearChangeEmitter.on(updateSelected);
         const applyFilters = () => {
+            let validItemElems = listItemElems;
             const searchQuery = searchInput.value.toLowerCase();
+            validItemElems = validItemElems.filter(elem => elem.dataset.name.toLowerCase().includes(searchQuery));
             const phase = this.player.sim.getPhase();
+            validItemElems = validItemElems.filter(elem => Number(elem.dataset.phase) <= phase);
+            const currentEquippedItem = this.player.getEquippedItem(slot);
+            if (label == 'Enchants' && currentEquippedItem) {
+                validItemElems = validItemElems.filter(elem => {
+                    const listItemId = parseInt(elem.dataset.id);
+                    const listItem = items.find(item => getItemData(item).id == listItemId);
+                    return enchantAppliesToItem(listItem, currentEquippedItem.item);
+                });
+            }
             listItemElems.forEach(elem => {
-                if (elem.dataset.name.toLowerCase().includes(searchQuery) && Number(elem.dataset.phase) <= phase) {
+                if (validItemElems.includes(elem)) {
                     elem.style.display = 'flex';
                 }
                 else {
@@ -350,6 +362,10 @@ class SelectorModal extends Component {
         this.player.sim.phaseChangeEmitter.on(() => {
             tabContent.dataset.phase = String(this.player.sim.getPhase());
             applyFilters();
+        });
+        this.player.gearChangeEmitter.on(() => {
+            applyFilters();
+            updateSelected();
         });
         applyFilters();
     }

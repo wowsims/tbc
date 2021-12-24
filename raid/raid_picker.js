@@ -4,9 +4,11 @@ import { EnumPicker } from '/tbc/core/components/enum_picker.js';
 import { MAX_PARTY_SIZE } from '/tbc/core/party.js';
 import { Player } from '/tbc/core/player.js';
 import { Class } from '/tbc/core/proto/common.js';
+import { Spec } from '/tbc/core/proto/common.js';
 import { Faction } from '/tbc/core/proto_utils/utils.js';
 import { classColors } from '/tbc/core/proto_utils/utils.js';
 import { specToClass } from '/tbc/core/proto_utils/utils.js';
+import { newRaidTarget } from '/tbc/core/proto_utils/utils.js';
 import { newTalentsPicker } from '/tbc/core/talents/factory.js';
 import { TypedEvent } from '/tbc/core/typed_event.js';
 import { getEnumValues } from '/tbc/core/utils.js';
@@ -373,11 +375,17 @@ export class PlayerPicker extends Component {
                 this.partyPicker.party.setPlayer(eventID, this.index, null);
                 newPlayer.setRaidIndex(eventID, this.raidIndex);
             }
+            else if (newPlayer instanceof Player) {
+                const wasInRaid = newPlayer.getRaid() != null;
+                this.partyPicker.party.setPlayer(eventID, this.index, newPlayer);
+                // On creation, boomies should default to innervating themselves.
+                if (!wasInRaid && newPlayer.spec == Spec.SpecBalanceDruid) {
+                    setBalanceDruidSelfInnervate(eventID, newPlayer);
+                }
+            }
             else {
                 this.partyPicker.party.setPlayer(eventID, this.index, newPlayer);
-                if (newPlayer == null) {
-                    this.partyPicker.party.compChangeEmitter.emit(eventID);
-                }
+                this.partyPicker.party.compChangeEmitter.emit(eventID);
             }
         });
         this.update();
@@ -576,4 +584,9 @@ class NewPlayerPicker extends Component {
             });
         });
     }
+}
+function setBalanceDruidSelfInnervate(eventID, player) {
+    const newOptions = player.getSpecOptions();
+    newOptions.innervateTarget = newRaidTarget(player.getRaidIndex());
+    player.setSpecOptions(eventID, newOptions);
 }

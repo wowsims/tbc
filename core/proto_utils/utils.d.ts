@@ -9,6 +9,8 @@ import { Item } from '/tbc/core/proto/common.js';
 import { Race } from '/tbc/core/proto/common.js';
 import { RaidTarget } from '/tbc/core/proto/common.js';
 import { Spec } from '/tbc/core/proto/common.js';
+import { Blessings } from '/tbc/core/proto/ui.js';
+import { BlessingsAssignments } from '/tbc/core/proto/ui.js';
 import { Stats } from './stats.js';
 import { BalanceDruid, BalanceDruid_Rotation as BalanceDruidRotation, DruidTalents, BalanceDruid_Options as BalanceDruidOptions } from '/tbc/core/proto/druid.js';
 import { ElementalShaman, EnhancementShaman_Rotation as EnhancementShamanRotation, ElementalShaman_Rotation as ElementalShamanRotation, ShamanTalents, ElementalShaman_Options as ElementalShamanOptions, EnhancementShaman_Options as EnhancementShamanOptions, EnhancementShaman } from '/tbc/core/proto/shaman.js';
@@ -28,7 +30,9 @@ export declare type PriestSpecs = Spec.SpecShadowPriest;
 export declare type ShamanSpecs = [Spec.SpecElementalShaman, Spec.SpecEnhancementShaman];
 export declare type WarlockSpecs = Spec.SpecWarlock;
 export declare type WarriorSpecs = Spec.SpecWarrior;
+export declare const NUM_SPECS: number;
 export declare const linkedSpecs: Array<Spec>;
+export declare const naturalSpecOrder: Array<Spec>;
 export declare const specNames: Record<Spec, string>;
 export declare const classColors: Record<Class, string>;
 export declare const specIconsLarge: Record<Spec, string>;
@@ -90,3 +94,9 @@ export declare function gemEligibleForSocket(gem: Gem, socketColor: GemColor): b
 export declare const NO_TARGET = -1;
 export declare function newRaidTarget(raidIndex: number): RaidTarget;
 export declare function emptyRaidTarget(): RaidTarget;
+export declare function makeBlankBlessingsAssignments(numPaladins: number): BlessingsAssignments;
+export declare function makeBlessingsAssignments(numPaladins: number, data: Array<{
+    spec: Spec;
+    blessings: Array<Blessings>;
+}>): BlessingsAssignments;
+export declare function makeDefaultBlessings(numPaladins: number): BlessingsAssignments;
