@@ -33,3 +33,8 @@ export declare const P2_HORDE_PRESET: {
     enableWhen: (player: Player<any>) => boolean;
     gear: EquipmentSpec;
 };
+export declare const P3_PRESET: {
+    name: string;
+    tooltip: string;
+    gear: EquipmentSpec;
+};

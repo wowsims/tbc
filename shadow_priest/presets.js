@@ -230,3 +230,95 @@ export const P2_PRESET = {
         ],
     }),
 };
+export const P3_PRESET = {
+    name: 'P3 Preset',
+    tooltip: Tooltips.BASIC_BIS_DISCLAIMER,
+    gear: EquipmentSpec.create({
+        items: [
+            ItemSpec.create({
+                id: 31064,
+                enchant: Enchants.GLYPH_OF_POWER,
+                gems: [
+                    Gems.MYSTICAL_SKYFIRE_DIAMOND,
+                    Gems.GLOWING_SHADOWSONG_AMETHYST,
+                ],
+            }),
+            ItemSpec.create({
+                id: 30666, // Ritssyn's Lost Pendant
+            }),
+            ItemSpec.create({
+                id: 31070,
+                enchant: Enchants.GREATER_INSCRIPTION_OF_DISCIPLINE,
+                gems: [
+                    Gems.RUNED_CRIMSON_SPINEL,
+                    Gems.RUNED_CRIMSON_SPINEL,
+                ],
+            }),
+            ItemSpec.create({
+                id: 32590,
+                enchant: Enchants.SUBTLETY,
+            }),
+            ItemSpec.create({
+                id: 31065,
+                enchant: Enchants.CHEST_EXCEPTIONAL_STATS,
+                gems: [
+                    Gems.RUNED_CRIMSON_SPINEL,
+                    Gems.RUNED_CRIMSON_SPINEL,
+                    Gems.RUNED_CRIMSON_SPINEL,
+                ],
+            }),
+            ItemSpec.create({
+                id: 32586,
+                enchant: Enchants.WRIST_SPELLPOWER,
+            }),
+            ItemSpec.create({
+                id: 31061,
+                enchant: Enchants.GLOVES_SPELLPOWER,
+                gems: [
+                    Gems.RUNED_CRIMSON_SPINEL,
+                ],
+            }),
+            ItemSpec.create({
+                id: 32256, // Waistwrap of Infinity
+            }),
+            ItemSpec.create({
+                id: 30916,
+                enchant: Enchants.RUNIC_SPELLTHREAD,
+                gems: [
+                    Gems.RUNED_CRIMSON_SPINEL,
+                    Gems.RUNED_CRIMSON_SPINEL,
+                    Gems.RUNED_CRIMSON_SPINEL,
+                ],
+            }),
+            ItemSpec.create({
+                id: 32239,
+                enchant: Enchants.BOARS_SPEED,
+                gems: [
+                    Gems.RUNED_CRIMSON_SPINEL,
+                    Gems.RUNED_CRIMSON_SPINEL,
+                ],
+            }),
+            ItemSpec.create({
+                id: 32527,
+                enchant: Enchants.RING_SPELLPOWER,
+            }),
+            ItemSpec.create({
+                id: 32527,
+                enchant: Enchants.RING_SPELLPOWER,
+            }),
+            ItemSpec.create({
+                id: 32483, // The Skull Of Guldan
+            }),
+            ItemSpec.create({
+                id: 29370, // Icon of the Silver Crescent
+            }),
+            ItemSpec.create({
+                id: 29982, // Wand of Forgotten Star
+            }),
+            ItemSpec.create({
+                id: 32374,
+                enchant: Enchants.SOULFROST,
+            }),
+        ],
+    }),
+};
