@@ -77,9 +77,6 @@ func PerformAutoAttack(sim *Simulation, c *Character, target *Target, weapon *it
 	hit := PerformAttack(sim, c, target)
 
 	hitStr := ""
-	if isOH {
-		dmgMult *= 0.5
-	}
 	if hit == MeleeHitTypeGlance {
 		dmgMult *= 0.75
 		hitStr = "glances"
@@ -104,9 +101,7 @@ func PerformAutoAttack(sim *Simulation, c *Character, target *Target, weapon *it
 		return // skip the attack
 	}
 
-	dmg := weapon.WeaponDamageMin + (weapon.WeaponDamageMax-weapon.WeaponDamageMin)*sim.RandomFloat("auto attack")
-	dmg += (weapon.SwingSpeed * c.stats[stats.AttackPower]) / MeleeAttackRatingPerDamage
-	dmg *= dmgMult
+	dmg := meleeDamage(sim, weapon.WeaponDamageMin, weapon.WeaponDamageMax, 0, weapon.SwingSpeed, isOH, dmgMult, c.stats[stats.AttackPower], target.ArmorDamageReduction())
 	c.Metrics.TotalDamage += dmg
 
 	if sim.Log != nil {
@@ -281,10 +276,7 @@ func (ama *ActiveMeleeAbility) Attack(sim *Simulation) bool {
 		if roll < critChance {
 			dmgMult *= 2.0
 		}
-		dmg := weapon.WeaponDamageMin + (weapon.WeaponDamageMax-weapon.WeaponDamageMin)*sim.RandomFloat("auto attack")
-		dmg += (speed * c.stats[stats.AttackPower]) / MeleeAttackRatingPerDamage
-		dmg *= dmgMult
-		dmg += ama.WeaponDamageInput.MainHandFlat
+		dmg := meleeDamage(sim, weapon.WeaponDamageMin, weapon.WeaponDamageMax, ama.WeaponDamageInput.MainHandFlat, speed, false, ama.WeaponDamageInput.MainHand, c.stats[stats.AttackPower], ama.Target.armor)
 		c.Metrics.TotalDamage += dmg
 		if sim.Log != nil {
 			sim.Log("%s mainhand for %0.1f", ama.Name, dmg)
@@ -297,14 +289,11 @@ func (ama *ActiveMeleeAbility) Attack(sim *Simulation) bool {
 		if speed == 0 {
 			speed = weapon.SwingSpeed
 		}
-		dmgMult := ama.WeaponDamageInput.Offhand * 0.5
+		dmgMult := ama.WeaponDamageInput.Offhand
 		if roll < critChance {
 			dmgMult *= 2.0
 		}
-		dmg := weapon.WeaponDamageMin + (weapon.WeaponDamageMax-weapon.WeaponDamageMin)*sim.RandomFloat("auto attack")
-		dmg += (speed * c.stats[stats.AttackPower]) / MeleeAttackRatingPerDamage
-		dmg *= dmgMult
-		dmg += ama.WeaponDamageInput.OffhandFlat
+		dmg := meleeDamage(sim, weapon.WeaponDamageMin, weapon.WeaponDamageMax, ama.WeaponDamageInput.OffhandFlat, speed, true, ama.WeaponDamageInput.Offhand, c.stats[stats.AttackPower], ama.Target.armor)
 		c.Metrics.TotalDamage += dmg
 		if sim.Log != nil {
 			sim.Log("%s offhand for %0.1f", ama.Name, dmg)
@@ -313,6 +302,19 @@ func (ama *ActiveMeleeAbility) Attack(sim *Simulation) bool {
 	}
 
 	return true
+}
+
+func meleeDamage(sim *Simulation, weaponMin, weaponMax, flatBonus, speed float64, offhand bool, multiplier float64, attackPower float64, damageReduction float64) float64 {
+	if offhand {
+		multiplier *= 0.5
+	}
+	dmg := weaponMin + (weaponMax-weaponMin)*sim.RandomFloat("auto attack")
+	dmg += (speed * attackPower) / MeleeAttackRatingPerDamage
+	dmg *= multiplier
+	dmg += flatBonus
+
+	dmg *= damageReduction
+	return dmg
 }
 
 type AbilityEffect struct {

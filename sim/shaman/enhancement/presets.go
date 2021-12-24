@@ -58,6 +58,7 @@ var FullConsumes = &proto.Consumes{
 
 var NoDebuffTarget = &proto.Target{
 	Debuffs: &proto.Debuffs{},
+	Armor:   6700,
 }
 
 var FullDebuffTarget = &proto.Target{

@@ -62,7 +62,7 @@ type Target struct {
 	// 2nd target has index 1, etc.
 	Index int32
 
-	armor int32
+	armor float64
 
 	Level int32 // level of target
 
@@ -82,11 +82,14 @@ type Target struct {
 func NewTarget(options proto.Target, targetIndex int32) *Target {
 	target := &Target{
 		Index:       targetIndex,
-		armor:       options.Armor,
+		armor:       float64(options.Armor),
 		MobType:     options.MobType,
 		auraTracker: newAuraTracker(true),
 		Name:        "Target " + strconv.Itoa(int(targetIndex)+1),
 		Level:       73,
+	}
+	if target.armor == 0 {
+		target.armor = 7700
 	}
 	if options.Level > 0 {
 		target.Level = options.Level
@@ -128,4 +131,8 @@ func (target *Target) GetMetricsProto(numIterations int32) *proto.TargetMetrics 
 	return &proto.TargetMetrics{
 		Auras: target.auraTracker.GetMetricsProto(numIterations),
 	}
+}
+
+func (target *Target) ArmorDamageReduction() float64 {
+	return 0
 }
