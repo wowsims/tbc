@@ -25,20 +25,24 @@ var StandardTalents = &proto.ShamanTalents{
 
 var PlayerOptionsBasic = &proto.Player_EnhancementShaman{
 	EnhancementShaman: &proto.EnhancementShaman{
-		Talents: StandardTalents,
-		Options: enhShamOptions,
+		Talents:  StandardTalents,
+		Options:  enhShamOptions,
+		Rotation: enhShamRotation,
 	},
 }
 
-var enhShamOptions = &proto.EnhancementShaman_Options{
-	WaterShield: true,
-	Bloodlust:   true,
+var enhShamRotation = &proto.EnhancementShaman_Rotation{
 	Totems: &proto.ShamanTotems{
 		Earth: proto.EarthTotem_StrengthOfEarthTotem,
 		Air:   proto.AirTotem_GraceOfAirTotem,
 		Water: proto.WaterTotem_ManaSpringTotem,
 		Fire:  proto.FireTotem_NoFireTotem, // TODO: deal with fire totem later... can fire totems just be a DoT?
 	},
+}
+
+var enhShamOptions = &proto.EnhancementShaman_Options{
+	WaterShield: true,
+	Bloodlust:   true,
 }
 
 var FullRaidBuffs = &proto.RaidBuffs{

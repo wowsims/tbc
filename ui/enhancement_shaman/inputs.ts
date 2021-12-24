@@ -1,5 +1,7 @@
+import { BooleanPicker } from '/tbc/core/components/boolean_picker.js';
+import { IconEnumPicker } from '/tbc/core/components/icon_enum_picker.js';
 import { IconPickerConfig } from '/tbc/core/components/icon_picker.js';
-import { EarthTotem, EnhancementShaman_Rotation_RotationType as RotationType, ShamanTotems } from '/tbc/core/proto/shaman.js';
+import { AirTotem, EarthTotem, FireTotem, WaterTotem, EnhancementShaman_Rotation_RotationType as RotationType, ShamanTotems } from '/tbc/core/proto/shaman.js';
 import { EnhancementShaman_Options as ShamanOptions } from '/tbc/core/proto/shaman.js';
 import { Spec } from '/tbc/core/proto/common.js';
 import { ItemOrSpellId } from '/tbc/core/resources.js';
@@ -55,6 +57,136 @@ function makeBooleanShamanBuffInput(id: ItemOrSpellId, optionsFieldName: keyof S
 			  player.setSpecOptions(eventID, newOptions);
 		  },
 	}
+}
+
+export function TotemsSection(simUI: IndividualSimUI<Spec.SpecEnhancementShaman>, parentElem: HTMLElement): string {
+	const customSectionsContainer = parentElem.closest('.custom-sections-container') as HTMLElement;
+	customSectionsContainer.style.zIndex = '1000';
+
+	parentElem.innerHTML = `
+		<div class="totem-dropdowns-container"></div>
+		<div class="totem-inputs-container"></div>
+	`;
+	const totemDropdownsContainer = parentElem.getElementsByClassName('totem-dropdowns-container')[0] as HTMLElement;
+	const totemInputsContainer = parentElem.getElementsByClassName('totem-inputs-container')[0] as HTMLElement;
+
+	const earthTotemPicker = new IconEnumPicker(totemDropdownsContainer, simUI.player, {
+		extraCssClasses: [
+			'earth-totem-picker',
+		],
+		values: [
+			{ color: '#ffdfba', value: EarthTotem.NoEarthTotem },
+			{ id: { spellId: 25528 }, value: EarthTotem.StrengthOfEarthTotem },
+			{ id: { spellId: 8143 }, value: EarthTotem.TremorTotem },
+		],
+		changedEvent: (player: Player<Spec.SpecEnhancementShaman>) => player.rotationChangeEmitter,
+		getValue: (player: Player<Spec.SpecEnhancementShaman>) => player.getRotation().totems?.earth || EarthTotem.NoEarthTotem,
+		setValue: (eventID: EventID, player: Player<Spec.SpecEnhancementShaman>, newValue: number) => {
+			const newRotation = player.getRotation();
+			if (!newRotation.totems)
+				newRotation.totems = ShamanTotems.create();
+			newRotation.totems!.earth = newValue;
+			player.setRotation(eventID, newRotation);
+		},
+	});
+
+	const airTotemPicker = new IconEnumPicker(totemDropdownsContainer, simUI.player, {
+		extraCssClasses: [
+			'air-totem-picker',
+		],
+		values: [
+			{ color: '#baffc9', value: AirTotem.NoAirTotem },
+			{ id: { spellId: 25359 }, value: AirTotem.GraceOfAirTotem },
+			{ id: { spellId: 25908 }, value: AirTotem.TranquilAirTotem },
+			{ id: { spellId: 25587 }, value: AirTotem.WindfuryTotem },
+			{ id: { spellId: 3738 }, value: AirTotem.WrathOfAirTotem },
+		],
+		changedEvent: (player: Player<Spec.SpecEnhancementShaman>) => player.rotationChangeEmitter,
+		getValue: (player: Player<Spec.SpecEnhancementShaman>) => player.getRotation().totems?.air || AirTotem.NoAirTotem,
+		setValue: (eventID: EventID, player: Player<Spec.SpecEnhancementShaman>, newValue: number) => {
+			const newRotation = player.getRotation();
+			if (!newRotation.totems)
+				newRotation.totems = ShamanTotems.create();
+			newRotation.totems!.air = newValue;
+			player.setRotation(eventID, newRotation);
+		},
+	});
+
+	const fireTotemPicker = new IconEnumPicker(totemDropdownsContainer, simUI.player, {
+		extraCssClasses: [
+			'fire-totem-picker',
+		],
+		values: [
+			{ color: '#ffb3ba', value: FireTotem.NoFireTotem },
+			{ id: { spellId: 25552 }, value: FireTotem.MagmaTotem },
+			{ id: { spellId: 25533 }, value: FireTotem.SearingTotem },
+			{ id: { spellId: 30706 }, value: FireTotem.TotemOfWrath },
+		],
+		changedEvent: (player: Player<Spec.SpecEnhancementShaman>) => player.rotationChangeEmitter,
+		getValue: (player: Player<Spec.SpecEnhancementShaman>) => player.getRotation().totems?.fire || FireTotem.NoFireTotem,
+		setValue: (eventID: EventID, player: Player<Spec.SpecEnhancementShaman>, newValue: number) => {
+			const newRotation = player.getRotation();
+			if (!newRotation.totems)
+				newRotation.totems = ShamanTotems.create();
+			newRotation.totems!.fire = newValue;
+			player.setRotation(eventID, newRotation);
+		},
+	});
+
+	const waterTotemPicker = new IconEnumPicker(totemDropdownsContainer, simUI.player, {
+		extraCssClasses: [
+			'water-totem-picker',
+		],
+		values: [
+			{ color: '#bae1ff', value: WaterTotem.NoWaterTotem },
+			{ id: { spellId: 25570 }, value: WaterTotem.ManaSpringTotem },
+		],
+		changedEvent: (player: Player<Spec.SpecEnhancementShaman>) => player.rotationChangeEmitter,
+		getValue: (player: Player<Spec.SpecEnhancementShaman>) => player.getRotation().totems?.water || WaterTotem.NoWaterTotem,
+		setValue: (eventID: EventID, player: Player<Spec.SpecEnhancementShaman>, newValue: number) => {
+			const newRotation = player.getRotation();
+			if (!newRotation.totems)
+				newRotation.totems = ShamanTotems.create();
+			newRotation.totems!.water = newValue;
+			player.setRotation(eventID, newRotation);
+		},
+	});
+
+	const twistWindfuryPicker = new BooleanPicker(totemInputsContainer, simUI.player, {
+		extraCssClasses: [
+			'twist-windfury-picker',
+		],
+		label: 'Twist Windfury',
+		labelTooltip: 'Twist Windfury Totem with whichever air totem is selected.',
+		changedEvent: (player: Player<Spec.SpecEnhancementShaman>) => player.rotationChangeEmitter,
+		getValue: (player: Player<Spec.SpecEnhancementShaman>) => player.getRotation().totems?.twistWindfury || false,
+		setValue: (eventID: EventID, player: Player<Spec.SpecEnhancementShaman>, newValue: boolean) => {
+			const newRotation = player.getRotation();
+			if (!newRotation.totems)
+				newRotation.totems = ShamanTotems.create();
+			newRotation.totems!.twistWindfury = newValue;
+			player.setRotation(eventID, newRotation);
+		},
+	});
+
+	const twistFireNovaPicker = new BooleanPicker(totemInputsContainer, simUI.player, {
+		extraCssClasses: [
+			'twist-fire-nova-picker',
+		],
+		label: 'Twist Fire Nova',
+		labelTooltip: 'Twist Fire Nova Totem with whichever fire totem is selected.',
+		changedEvent: (player: Player<Spec.SpecEnhancementShaman>) => player.rotationChangeEmitter,
+		getValue: (player: Player<Spec.SpecEnhancementShaman>) => player.getRotation().totems?.twistFireNova || false,
+		setValue: (eventID: EventID, player: Player<Spec.SpecEnhancementShaman>, newValue: boolean) => {
+			const newRotation = player.getRotation();
+			if (!newRotation.totems)
+				newRotation.totems = ShamanTotems.create();
+			newRotation.totems!.twistFireNova = newValue;
+			player.setRotation(eventID, newRotation);
+		},
+	});
+
+	return 'Totems';
 }
 
 // function makeBoolShamanTotem(id: ItemOrSpellId, optionsFieldName: keyof totems?): IconPickerConfig<Player<any>, boolean> {
