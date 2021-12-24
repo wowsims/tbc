@@ -85,10 +85,12 @@ export const playerPresets: Array<PresetSpecSettings<any>> = [
 			[Faction.Alliance]: {
 				1: BalanceDruidPresets.P1_ALLIANCE_PRESET.gear,
 				2: BalanceDruidPresets.P2_ALLIANCE_PRESET.gear,
+				3: BalanceDruidPresets.P3_PRESET.gear,
 			},
 			[Faction.Horde]: {
 				1: BalanceDruidPresets.P1_HORDE_PRESET.gear,
 				2: BalanceDruidPresets.P2_HORDE_PRESET.gear,
+				3: BalanceDruidPresets.P3_PRESET.gear,
 			},
 		},
 		tooltip: specNames[Spec.SpecBalanceDruid],
@@ -111,10 +113,12 @@ export const playerPresets: Array<PresetSpecSettings<any>> = [
 			[Faction.Alliance]: {
 				1: ElementalShamanPresets.P1_PRESET.gear,
 				2: ElementalShamanPresets.P2_PRESET.gear,
+				3: ElementalShamanPresets.P3_PRESET.gear,
 			},
 			[Faction.Horde]: {
 				1: ElementalShamanPresets.P1_PRESET.gear,
 				2: ElementalShamanPresets.P2_PRESET.gear,
+				3: ElementalShamanPresets.P3_PRESET.gear,
 			},
 		},
 		tooltip: specNames[Spec.SpecElementalShaman],
@@ -137,10 +141,12 @@ export const playerPresets: Array<PresetSpecSettings<any>> = [
 			[Faction.Alliance]: {
 				1: ShadowPriestPresets.P1_PRESET.gear,
 				2: ShadowPriestPresets.P2_PRESET.gear,
+				3: ShadowPriestPresets.P3_PRESET.gear,
 			},
 			[Faction.Horde]: {
 				1: ShadowPriestPresets.P1_PRESET.gear,
 				2: ShadowPriestPresets.P2_PRESET.gear,
+				3: ShadowPriestPresets.P3_PRESET.gear,
 			},
 		},
 		tooltip: specNames[Spec.SpecShadowPriest],

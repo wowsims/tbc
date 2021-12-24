@@ -431,3 +431,96 @@ export const P2_HORDE_PRESET = {
 		],
 	}),
 };
+
+export const P3_PRESET = {
+	name: 'P3 Preset',
+	tooltip: Tooltips.BASIC_BIS_DISCLAIMER,
+	gear: EquipmentSpec.create({
+		items: [
+			ItemSpec.create({
+				id: 31040, // Thunderheart Headguard
+				enchant: Enchants.GLYPH_OF_POWER,
+				gems: [
+					Gems.POTENT_PYRESTONE,
+					Gems.CHAOTIC_SKYFIRE_DIAMOND,
+				],
+			}),
+			ItemSpec.create({
+				id: 30015, // The Sun King's Talisman
+			}),
+			ItemSpec.create({
+				id: 31049, // Thunderheart Shoulderpads
+				enchant: Enchants.GREATER_INSCRIPTION_OF_DISCIPLINE,
+				gems: [
+					Gems.GLOWING_SHADOWSONG_AMETHYST,
+					Gems.POTENT_PYRESTONE,
+				],
+			}),
+			ItemSpec.create({
+				id: 32331, // Cloak of the Illidari Council
+				enchant: Enchants.SUBTLETY,
+			}),
+			ItemSpec.create({
+				id: 31043, // Thunderheart Vest
+				enchant: Enchants.CHEST_EXCEPTIONAL_STATS,
+				gems: [
+					Gems.RUNED_CRIMSON_SPINEL,
+					Gems.RUNED_CRIMSON_SPINEL,
+					Gems.RUNED_CRIMSON_SPINEL,
+				],
+			}),
+			ItemSpec.create({
+				id: 32586, // Bracers of Nimble Thought
+				enchant: Enchants.WRIST_SPELLPOWER,
+			}),
+			ItemSpec.create({
+				id: 31035, // Thunderheart Handguards
+				enchant: Enchants.GLOVES_SPELLPOWER,
+				gems: [
+					Gems.POTENT_PYRESTONE,
+				],
+			}),
+			ItemSpec.create({
+				id: 30914, // Belt of the Crescent Moon
+			}),
+			ItemSpec.create({
+				id: 30916, // Leggings of Channeled Elements
+				enchant: Enchants.RUNIC_SPELLTHREAD,
+				gems: [
+					Gems.RUNED_CRIMSON_SPINEL,
+					Gems.RUNED_CRIMSON_SPINEL,
+					Gems.RUNED_CRIMSON_SPINEL,
+				],
+			}),
+			ItemSpec.create({
+				id: 32352, // Naturewarden's Treads
+				enchant: Enchants.BOARS_SPEED,
+				gems: [
+					Gems.POTENT_PYRESTONE,
+					Gems.GLOWING_SHADOWSONG_AMETHYST,
+				],
+			}),
+			ItemSpec.create({
+				id: 32527, // Ring of Ancient Knowledge
+				enchant: Enchants.RING_SPELLPOWER,
+			}),
+			ItemSpec.create({
+				id: 29305, // Band of the Eternal Sage
+				enchant: Enchants.RING_SPELLPOWER,
+			}),
+			ItemSpec.create({
+				id: 32486, // Ashtongue Talisman of Equilibrium
+			}),
+			ItemSpec.create({
+				id: 32483, // The Skull Of Guldan
+			}),
+			ItemSpec.create({
+				id: 32374, // Zhar'doom, Greatstaff of the Devourer
+				enchant: Enchants.SUNFIRE,
+			}),
+			ItemSpec.create({
+				id: 32387, // Idol of the Raven Goddess
+			}),
+		],
+	}),
+};

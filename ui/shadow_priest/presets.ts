@@ -241,3 +241,96 @@ export const P2_PRESET = {
 		],
 	}),
 };
+
+export const P3_PRESET = {
+	name: 'P3 Preset',
+	tooltip: Tooltips.BASIC_BIS_DISCLAIMER,
+	gear: EquipmentSpec.create({
+		items: [
+			ItemSpec.create({
+				id: 31064, // Hood of Absolution
+				enchant: Enchants.GLYPH_OF_POWER,
+				gems: [
+					Gems.MYSTICAL_SKYFIRE_DIAMOND,
+					Gems.GLOWING_SHADOWSONG_AMETHYST,
+				],
+			}),
+			ItemSpec.create({
+				id: 30666, // Ritssyn's Lost Pendant
+			}),
+			ItemSpec.create({
+				id: 31070, // Shoulderpads of Absolution
+				enchant: Enchants.GREATER_INSCRIPTION_OF_DISCIPLINE,
+				gems: [
+					Gems.RUNED_CRIMSON_SPINEL,
+					Gems.RUNED_CRIMSON_SPINEL,
+				],
+			}),
+			ItemSpec.create({
+				id: 32590, // Nethervoid Cloak
+				enchant: Enchants.SUBTLETY,
+			}),
+			ItemSpec.create({
+				id: 31065, // Shroud of Absolution
+				enchant: Enchants.CHEST_EXCEPTIONAL_STATS,
+				gems: [
+					Gems.RUNED_CRIMSON_SPINEL,
+					Gems.RUNED_CRIMSON_SPINEL,
+					Gems.RUNED_CRIMSON_SPINEL,
+				],
+			}),
+			ItemSpec.create({
+				id: 32586, // Bracers of Nimble Thought
+				enchant: Enchants.WRIST_SPELLPOWER,
+			}),
+			ItemSpec.create({
+				id: 31061, // Handguards of Absolution
+				enchant: Enchants.GLOVES_SPELLPOWER,
+				gems: [
+					Gems.RUNED_CRIMSON_SPINEL,
+				],
+			}),
+			ItemSpec.create({
+				id: 32256, // Waistwrap of Infinity
+			}),
+			ItemSpec.create({
+				id: 30916, // Leggings of Channeled Elements
+				enchant: Enchants.RUNIC_SPELLTHREAD,
+				gems: [
+					Gems.RUNED_CRIMSON_SPINEL,
+					Gems.RUNED_CRIMSON_SPINEL,
+					Gems.RUNED_CRIMSON_SPINEL,
+				],
+			}),
+			ItemSpec.create({
+				id: 32239, // Slippers of the Seacaller
+				enchant: Enchants.BOARS_SPEED,
+				gems: [
+					Gems.RUNED_CRIMSON_SPINEL,
+					Gems.RUNED_CRIMSON_SPINEL,
+				],
+			}),
+			ItemSpec.create({
+				id: 32527, // Ring Of Ancient Knowledge
+				enchant: Enchants.RING_SPELLPOWER,
+			}),
+			ItemSpec.create({
+				id: 32527, // Ring Of Ancient Knowledge
+				enchant: Enchants.RING_SPELLPOWER,
+			}),
+			ItemSpec.create({
+				id: 32483, // The Skull Of Guldan
+			}),
+			ItemSpec.create({
+				id: 29370, // Icon of the Silver Crescent
+			}),
+			ItemSpec.create({
+				id: 29982, // Wand of Forgotten Star
+			}),
+			ItemSpec.create({
+				id: 32374, // Zhar'doom, Greatstaff of the Devourer
+				enchant: Enchants.SOULFROST,
+			}),
+		],
+	}),
+};
