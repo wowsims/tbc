@@ -117,24 +117,24 @@ func (item Item) ToProto() *proto.Item {
 }
 
 type Enchant struct {
-	ID         int32 // ID of the enchant item.
-	EffectID   int32 // Used by UI to apply effect to tooltip
-	Name       string
-	Quality    proto.ItemQuality
-	Bonus      stats.Stats
-	ItemType   proto.ItemType // which slot does the enchant go on.
-	HandType   proto.HandType // If ItemType is weapon, check hand type / weapon type
-	WeaponType proto.WeaponType
+	ID          int32 // ID of the enchant item.
+	EffectID    int32 // Used by UI to apply effect to tooltip
+	Name        string
+	Quality     proto.ItemQuality
+	Bonus       stats.Stats
+	ItemType    proto.ItemType    // Which slot the enchant goes on.
+	EnchantType proto.EnchantType // Additional category when ItemType isn't enough.
 }
 
 func (enchant Enchant) ToProto() *proto.Enchant {
 	return &proto.Enchant{
-		Id:       enchant.ID,
-		EffectId: enchant.EffectID,
-		Name:     enchant.Name,
-		Type:     enchant.ItemType,
-		Stats:    enchant.Bonus[:],
-		Quality:  enchant.Quality,
+		Id:          enchant.ID,
+		EffectId:    enchant.EffectID,
+		Name:        enchant.Name,
+		Type:        enchant.ItemType,
+		EnchantType: enchant.EnchantType,
+		Stats:       enchant.Bonus[:],
+		Quality:     enchant.Quality,
 	}
 }
 

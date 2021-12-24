@@ -1,5 +1,6 @@
 import { getWowheadItemId } from '/tbc/core/proto_utils/equipped_item.js';
 import { EquippedItem } from '/tbc/core/proto_utils/equipped_item.js';
+import { enchantAppliesToItem } from '/tbc/core/proto_utils/utils.js';
 import { Enchant } from '/tbc/core/proto/common.js';
 import { Item } from '/tbc/core/proto/common.js';
 import { ItemQuality } from '/tbc/core/proto/common.js';
@@ -446,11 +447,25 @@ class SelectorModal extends Component {
     this.player.gearChangeEmitter.on(updateSelected);
 
 		const applyFilters = () => {
+			let validItemElems = listItemElems;
+
 			const searchQuery = searchInput.value.toLowerCase();
+			validItemElems = validItemElems.filter(elem => elem.dataset.name!.toLowerCase().includes(searchQuery))
+
 			const phase = this.player.sim.getPhase();
+			validItemElems = validItemElems.filter(elem => Number(elem.dataset.phase!) <= phase)
+
+			const currentEquippedItem = this.player.getEquippedItem(slot);
+			if (label == 'Enchants' && currentEquippedItem) {
+				validItemElems = validItemElems.filter(elem => {
+					const listItemId = parseInt(elem.dataset.id!);
+					const listItem = items.find(item => getItemData(item).id == listItemId) as unknown as Enchant;
+					return enchantAppliesToItem(listItem, currentEquippedItem.item);
+				});
+			}
 
       listItemElems.forEach(elem => {
-        if (elem.dataset.name!.toLowerCase().includes(searchQuery) && Number(elem.dataset.phase!) <= phase) {
+        if (validItemElems.includes(elem)) {
           elem.style.display = 'flex';
         } else {
           elem.style.display = 'none';
@@ -465,6 +480,10 @@ class SelectorModal extends Component {
 		this.player.sim.phaseChangeEmitter.on(() => {
 			tabContent.dataset.phase = String(this.player.sim.getPhase());
 			applyFilters();
+		});
+		this.player.gearChangeEmitter.on(() => {
+			applyFilters();
+			updateSelected();
 		});
 
 		applyFilters();
