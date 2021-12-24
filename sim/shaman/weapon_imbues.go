@@ -9,6 +9,8 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
+var TotemOfTheAstralWinds int32 = 27815
+
 var WFImbueAuraID = core.NewAuraID()
 
 func ApplyWindfuryImbue(shaman *Shaman, mh bool, oh bool) {
@@ -43,6 +45,10 @@ func ApplyWindfuryImbue(shaman *Shaman, mh bool, oh bool) {
 		const icdDur = time.Second * 3
 
 		apBonus := 475.0
+
+		if shaman.Equip[proto.ItemSlot_ItemSlotRanged].ID == TotemOfTheAstralWinds {
+			apBonus += 80
+		}
 
 		return core.Aura{
 			ID:   WFImbueAuraID,

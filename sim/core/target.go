@@ -133,6 +133,7 @@ func (target *Target) GetMetricsProto(numIterations int32) *proto.TargetMetrics 
 	}
 }
 
+// ArmorDamageReduction currently assumes a level 70 attacker
 func (target *Target) ArmorDamageReduction() float64 {
 	armor := target.armor
 	if target.HasAura(FaerieFireDebuffID) {

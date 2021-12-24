@@ -316,12 +316,11 @@ func meleeDamage(sim *Simulation, weaponMin, weaponMax, flatBonus, speed float64
 	if offhand {
 		multiplier *= 0.5
 	}
-	dmg := weaponMin + (weaponMax-weaponMin)*sim.RandomFloat("auto attack")
+	dmg := weaponMin + (weaponMax-weaponMin)*sim.RandomFloat("melee")
 	dmg += (speed * attackPower) / MeleeAttackRatingPerDamage
 	dmg *= multiplier
 	dmg += flatBonus
-
-	dmg *= damageReduction
+	dmg *= 1 - damageReduction
 	return dmg
 }
 

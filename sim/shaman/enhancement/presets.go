@@ -72,63 +72,28 @@ var FullDebuffTarget = &proto.Target{
 		Misery:                    true,
 	},
 }
+var Phase2Gear = items.EquipmentSpecFromStrings([]items.ItemStringSpec{
+	{Name: "Band of the Ranger-General"},
+	{Name: "Bloodlust Brooch"},
+	{Name: "Boots of Utter Darkness"},
+	{Name: "Belt of One-Hundred Deaths"},
+	{Name: "Cataclysm Chestplate"},
+	{Name: "Cataclysm Gauntlets"},
+	{Name: "Cataclysm Helm"},
+	{Name: "Cataclysm Legplates"},
+	{Name: "Dragonspine Trophy"},
+	{Name: "Ring of Lethality"},
+	{Name: "Shoulderpads of the Stranger"},
+	{Name: "Totem of the Astral Winds"},
+	{Name: "True-Aim Stalker Bands"},
+	{Name: "Thalassian Wildercloak"},
+	{Name: "Telonicus's Pendant of Mayhem"},
+
+	{Name: "Talon of the Phoenix"},
+	{Name: "Rod of the Sun King"},
+})
 
 var PreRaidGear = items.EquipmentSpecFromStrings([]items.ItemStringSpec{
-	items.ItemStringSpec{
-		Name:    "Tidefury Helm",
-		Enchant: "Glyph of Power",
-		Gems: []string{
-			"Runed Living Ruby",
-			"Insightful Earthstorm Diamond",
-		},
-	},
-	items.ItemStringSpec{
-		Name:    "Brooch of Heightened Potential",
-		Enchant: "Zandalar Signet of Mojo",
-	},
-	items.ItemStringSpec{
-		Name: "Tidefury Shoulderguards",
-	},
-	items.ItemStringSpec{
-		Name: "Cloak of the Black Void",
-	},
-	items.ItemStringSpec{
-		Name: "Tidefury Chestpiece",
-	},
-	items.ItemStringSpec{
-		Name: "Shattrath Wraps",
-	},
-	items.ItemStringSpec{
-		Name: "Tidefury Gauntlets",
-	},
-	items.ItemStringSpec{
-		Name: "Moonrage Girdle",
-	},
-	items.ItemStringSpec{
-		Name:    "Tidefury Kilt",
-		Enchant: "Mystic Spellthread",
-	},
-	items.ItemStringSpec{
-		Name: "Earthbreaker's Greaves",
-	},
-	items.ItemStringSpec{
-		Name: "Seal of the Exorcist",
-	},
-	items.ItemStringSpec{
-		Name: "Spectral Band of Innervation",
-	},
-	items.ItemStringSpec{
-		Name: "Xi'ri's Gift",
-	},
-	items.ItemStringSpec{
-		Name: "Quagmirran's Eye",
-	},
-	items.ItemStringSpec{
-		Name: "Totem of the Void",
-	},
-	items.ItemStringSpec{
-		Name: "Gladiator's Cleaver",
-	},
 	items.ItemStringSpec{
 		Name: "Gladiator's Cleaver",
 	},

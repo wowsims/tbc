@@ -20,7 +20,7 @@ func TestSimulatePreRaidNoBuffs(t *testing.T) {
 			Player: &proto.Player{
 				Race:      proto.Race_RaceTroll10,
 				Class:     proto.Class_ClassShaman,
-				Equipment: PreRaidGear,
+				Equipment: Phase2Gear,
 				// no consumes
 				Spec: PlayerOptionsBasic,
 			},

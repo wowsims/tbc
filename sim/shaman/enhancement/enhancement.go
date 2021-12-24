@@ -57,21 +57,22 @@ func (enh *EnhancementShaman) Act(sim *core.Simulation) time.Duration {
 		return sim.CurrentTime + enh.AutoAttacks.TimeUntil(sim, nil, nil, dropTime)
 	}
 
-	if enh.GetRemainingCD(shaman.StormstrikeCD, sim.CurrentTime) == 0 {
-		ss := enh.NewStormstrike(sim, sim.GetPrimaryTarget())
-		ss.Attack(sim)
-		return sim.CurrentTime + enh.AutoAttacks.TimeUntil(sim, nil, ss, 0)
-	} else if enh.GetRemainingCD(shaman.ShockCooldownID, sim.CurrentTime) == 0 {
-		shock := enh.NewEarthShock(sim, sim.GetPrimaryTarget())
-		shock.Cast(sim)
-		return sim.CurrentTime + enh.AutoAttacks.TimeUntil(sim, shock, nil, 0)
-	}
+	// if enh.GetRemainingCD(shaman.StormstrikeCD, sim.CurrentTime) == 0 {
+	// 	ss := enh.NewStormstrike(sim, sim.GetPrimaryTarget())
+	// 	ss.Attack(sim)
+	// 	return sim.CurrentTime + enh.AutoAttacks.TimeUntil(sim, nil, ss, 0)
+	// } else if enh.GetRemainingCD(shaman.ShockCooldownID, sim.CurrentTime) == 0 {
+	// 	shock := enh.NewEarthShock(sim, sim.GetPrimaryTarget())
+	// 	shock.Cast(sim)
+	// 	return sim.CurrentTime + enh.AutoAttacks.TimeUntil(sim, shock, nil, 0)
+	// }
 
 	// Do nothing, just swing axes until next CD available
-	nextCD := enh.GetRemainingCD(shaman.StormstrikeCD, sim.CurrentTime)
-	shockCD := enh.GetRemainingCD(shaman.ShockCooldownID, sim.CurrentTime)
-	if shockCD < nextCD {
-		nextCD = shockCD
-	}
+	// nextCD := enh.GetRemainingCD(shaman.StormstrikeCD, sim.CurrentTime)
+	// shockCD := enh.GetRemainingCD(shaman.ShockCooldownID, sim.CurrentTime)
+	// if shockCD < nextCD {
+	// 	nextCD = shockCD
+	// }
+	nextCD := sim.Duration
 	return sim.CurrentTime + enh.AutoAttacks.TimeUntil(sim, nil, nil, nextCD)
 }
