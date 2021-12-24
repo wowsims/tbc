@@ -84,7 +84,7 @@ message ShamanTotems {
 		// If set, will twist fire nova with whichever fire totem is selected.
 		bool twist_fire_nova = 6;
 
-		// If set, will use mana tide when appripriate.
+		// If set, will use mana tide when appropriate.
 		bool use_mana_tide = 7;
 
 		// If set, will use fire elemental totem at the start and revert to regular
@@ -111,15 +111,13 @@ message ElementalShaman {
           FixedLBCL = 4;
           LBOnly = 5;
       }
+
       RotationType type = 1;
 
 			// Only used if type == FixedLBCL
       int32 lbs_per_cl = 2;
     }
-    Rotation rotation = 1;
 
-    ShamanTalents talents = 2;
-    
     message Options {
         bool water_shield = 1;
 				bool bloodlust = 2;
@@ -128,6 +126,9 @@ message ElementalShaman {
 				bool wrath_of_air_totem = 5;
         // int32 WaterShieldPPM
     }
+
+    Rotation rotation = 1;
+    ShamanTalents talents = 2;
     Options options = 3;
 }
 
@@ -138,16 +139,17 @@ message EnhancementShaman {
         Unknown = 0;
         Basic = 1;
     }
-    RotationType type = 1;
-  }
-  Rotation rotation = 1;
 
-  ShamanTalents talents = 2;
-  
+    RotationType type = 1;
+		ShamanTotems totems = 2;
+  }
+
   message Options {
       bool water_shield = 1;
       bool bloodlust = 2;
-      ShamanTotems totems = 3;
   }
+
+  Rotation rotation = 1;
+  ShamanTalents talents = 2;
   Options options = 3;
 }

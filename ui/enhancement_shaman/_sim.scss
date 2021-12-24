@@ -21,3 +21,21 @@
 .enhancement-shaman-sim-ui .debuffs-section {
   grid-template-columns: repeat(3, 1fr);
 }
+
+.totem-dropdowns-container {
+}
+
+.totem-dropdowns-container > * {
+	margin: 2px;
+}
+
+.totem-dropdowns-container .icon-enum-picker-root a {
+	height: 50px;
+	width: 50px;
+}
+
+.totem-inputs-container > div {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
