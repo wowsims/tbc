@@ -85,6 +85,12 @@ export class IconEnumPicker<ModObject> extends Input<ModObject, number> {
   setInputValue(newValue: number) {
     this.currentValue = newValue;
 
+    if (this.currentValue > 0) {
+      this.rootElem.classList.add('active');
+    } else {
+      this.rootElem.classList.remove('active');
+    }
+
 		const valueConfig = this.config.values.find(valueConfig => valueConfig.value == this.currentValue)!;
 		this.setImage(this.buttonElem, valueConfig);
   }
