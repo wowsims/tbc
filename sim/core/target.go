@@ -134,5 +134,16 @@ func (target *Target) GetMetricsProto(numIterations int32) *proto.TargetMetrics 
 }
 
 func (target *Target) ArmorDamageReduction() float64 {
-	return 0
+	armor := target.armor
+	if target.HasAura(FaerieFireDebuffID) {
+		armor -= 610
+	}
+	if target.HasAura(SunderArmorDebuffID) {
+		stacks := target.auras[SunderArmorDebuffID].Stacks
+		armor -= float64(stacks) * 450.0
+	}
+	if target.HasAura(CurseOfRecklessnessDebuffID) {
+		armor -= 800
+	}
+	return armor / (armor + 10557.5)
 }

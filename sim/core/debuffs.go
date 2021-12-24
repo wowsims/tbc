@@ -168,3 +168,4 @@ func ImprovedShadowBoltAura(uptime float64) Aura {
 
 var FaerieFireDebuffID = NewDebuffID()
 var SunderArmorDebuffID = NewDebuffID()
+var CurseOfRecklessnessDebuffID = NewDebuffID()

@@ -170,6 +170,7 @@ type Shaman struct {
 	// Shocks
 	shockSpell         core.SimpleSpell
 	frostShockTemplate core.SimpleSpellTemplate
+	earthShockTemplate core.SimpleSpellTemplate
 
 	unleashedRages []core.Aura
 }
@@ -241,6 +242,7 @@ func (shaman *Shaman) Init(sim *core.Simulation) {
 		shaman.chainLightningLOCastTemplates = append(shaman.chainLightningLOCastTemplates, shaman.newChainLightningTemplate(sim, true))
 	}
 	shaman.frostShockTemplate = shaman.newFrostShockTemplate(sim)
+	shaman.earthShockTemplate = shaman.newEarthShockTemplate(sim)
 }
 
 func (shaman *Shaman) Reset(sim *core.Simulation) {

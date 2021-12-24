@@ -10,6 +10,7 @@ import (
 const SpellIDSS int32 = 17364
 
 var StormstrikeCD = core.NewCooldownID()
+var StormstrikeDebuffID = core.NewDebuffID()
 
 func (shaman *Shaman) newStormstrikeTemplate(sim *core.Simulation) core.MeleeAbilittyTemplate {
 	ss := core.ActiveMeleeAbility{
@@ -38,6 +39,23 @@ func (shaman *Shaman) newStormstrikeTemplate(sim *core.Simulation) core.MeleeAbi
 		WeaponDamageInput: core.WeaponDamageInput{
 			MainHand: 1.0,
 			Offhand:  1.0,
+		},
+		OnMeleeAttack: func(sim *core.Simulation, target *core.Target, result core.MeleeHitType, ability *core.ActiveMeleeAbility, isOH bool) {
+			stacks := 2
+			target.ReplaceAura(sim, core.Aura{
+				ID:   StormstrikeDebuffID,
+				Name: "Stormstrike",
+				OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+					if spellCast.SpellSchool != stats.NatureSpellPower {
+						return
+					}
+					spellEffect.DamageMultiplier *= 1.2
+					stacks--
+					if stacks == 0 {
+						target.RemoveAura(sim, StormstrikeDebuffID)
+					}
+				},
+			})
 		},
 	}
 

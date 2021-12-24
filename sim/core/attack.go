@@ -191,6 +191,8 @@ func PerformAttack(sim *Simulation, c *Character, target *Target) MeleeHitType {
 type ActiveMeleeAbility struct {
 	MeleeAbility
 
+	OnMeleeAttack OnMeleeAttack
+
 	Hits               int32
 	Misses             int32
 	Crits              int32
@@ -276,10 +278,13 @@ func (ama *ActiveMeleeAbility) Attack(sim *Simulation) bool {
 		if roll < critChance {
 			dmgMult *= 2.0
 		}
-		dmg := meleeDamage(sim, weapon.WeaponDamageMin, weapon.WeaponDamageMax, ama.WeaponDamageInput.MainHandFlat, speed, false, ama.WeaponDamageInput.MainHand, c.stats[stats.AttackPower], ama.Target.armor)
+		dmg := meleeDamage(sim, weapon.WeaponDamageMin, weapon.WeaponDamageMax, ama.WeaponDamageInput.MainHandFlat, speed, false, ama.WeaponDamageInput.MainHand, c.stats[stats.AttackPower], ama.Target.ArmorDamageReduction())
 		c.Metrics.TotalDamage += dmg
 		if sim.Log != nil {
 			sim.Log("%s mainhand for %0.1f", ama.Name, dmg)
+		}
+		if ama.OnMeleeAttack != nil {
+			ama.OnMeleeAttack(sim, ama.Target, hit, ama, false)
 		}
 		c.OnMeleeAttack(sim, ama.Target, ama.Result, ama, false)
 	}
@@ -293,10 +298,13 @@ func (ama *ActiveMeleeAbility) Attack(sim *Simulation) bool {
 		if roll < critChance {
 			dmgMult *= 2.0
 		}
-		dmg := meleeDamage(sim, weapon.WeaponDamageMin, weapon.WeaponDamageMax, ama.WeaponDamageInput.OffhandFlat, speed, true, ama.WeaponDamageInput.Offhand, c.stats[stats.AttackPower], ama.Target.armor)
+		dmg := meleeDamage(sim, weapon.WeaponDamageMin, weapon.WeaponDamageMax, ama.WeaponDamageInput.OffhandFlat, speed, true, ama.WeaponDamageInput.Offhand, c.stats[stats.AttackPower], ama.Target.ArmorDamageReduction())
 		c.Metrics.TotalDamage += dmg
 		if sim.Log != nil {
 			sim.Log("%s offhand for %0.1f", ama.Name, dmg)
+		}
+		if ama.OnMeleeAttack != nil {
+			ama.OnMeleeAttack(sim, ama.Target, hit, ama, true)
 		}
 		c.OnMeleeAttack(sim, ama.Target, ama.Result, ama, true)
 	}
