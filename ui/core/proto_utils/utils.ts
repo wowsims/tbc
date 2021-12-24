@@ -22,6 +22,9 @@ import { RangedWeaponType } from '/tbc/core/proto/common.js';
 import { Spec } from '/tbc/core/proto/common.js';
 import { Stat } from '/tbc/core/proto/common.js';
 import { WeaponType } from '/tbc/core/proto/common.js';
+import { Blessings } from '/tbc/core/proto/ui.js';
+import { BlessingsAssignment } from '/tbc/core/proto/ui.js';
+import { BlessingsAssignments } from '/tbc/core/proto/ui.js';
 
 import { Stats } from './stats.js';
 
@@ -47,6 +50,8 @@ export type ShamanSpecs = [Spec.SpecElementalShaman, Spec.SpecEnhancementShaman]
 export type WarlockSpecs = Spec.SpecWarlock;
 export type WarriorSpecs = Spec.SpecWarrior;
 
+export const NUM_SPECS = getEnumValues(Spec).length;
+
 // This list controls which links are shown in the top-left dropdown menu on
 // all sims. DO NOT add your spec to this list until it is ready for everyone
 // to view.
@@ -54,6 +59,20 @@ export const linkedSpecs: Array<Spec> = [
 	Spec.SpecBalanceDruid,
 	Spec.SpecElementalShaman,
 	Spec.SpecShadowPriest,
+];
+
+// The order in which specs should be presented, when it matters.
+// Currently this is only used for the order of the paladin blessings UI.
+export const naturalSpecOrder: Array<Spec> = [
+	Spec.SpecBalanceDruid,
+	Spec.SpecHunter,
+	Spec.SpecMage,
+	Spec.SpecRetributionPaladin,
+	Spec.SpecShadowPriest,
+	Spec.SpecRogue,
+	Spec.SpecElementalShaman,
+	Spec.SpecWarlock,
+	Spec.SpecWarrior,
 ];
 
 export const specNames: Record<Spec, string> = {
@@ -1169,3 +1188,41 @@ export function newRaidTarget(raidIndex: number): RaidTarget {
 export function emptyRaidTarget(): RaidTarget {
 	return newRaidTarget(NO_TARGET);
 }
+
+// Makes a new set of assignments with everything 0'd out.
+export function makeBlankBlessingsAssignments(numPaladins: number): BlessingsAssignments {
+	const assignments = BlessingsAssignments.create();
+	for (let i = 0; i < numPaladins; i++) {
+		assignments.paladins.push(BlessingsAssignment.create({
+			blessings: new Array(NUM_SPECS).fill(Blessings.BlessingUnknown),
+		}));
+	}
+	return assignments;
+}
+
+export function makeBlessingsAssignments(numPaladins: number, data: Array<{spec: Spec, blessings: Array<Blessings>}>): BlessingsAssignments {
+	const assignments = makeBlankBlessingsAssignments(numPaladins);
+	for (let i = 0; i < data.length; i++) {
+		const spec = data[i].spec;
+		const blessings = data[i].blessings;
+		for (let j = 0; j < blessings.length; j++) {
+			assignments.paladins[j].blessings[spec] = blessings[j];
+		}
+	}
+	return assignments;
+}
+
+// Default blessings settings in the raid sim UI.
+export function makeDefaultBlessings(numPaladins: number): BlessingsAssignments {
+	return makeBlessingsAssignments(numPaladins, [
+		{ spec: Spec.SpecBalanceDruid, blessings: [ Blessings.BlessingOfKings, Blessings.BlessingOfSalvation, Blessings.BlessingOfWisdom ] },
+		{ spec: Spec.SpecHunter, blessings: [ Blessings.BlessingOfKings, Blessings.BlessingOfSalvation, Blessings.BlessingOfMight, Blessings.BlessingOfWisdom ] },
+		{ spec: Spec.SpecMage, blessings: [ Blessings.BlessingOfKings, Blessings.BlessingOfSalvation, Blessings.BlessingOfWisdom ] },
+		{ spec: Spec.SpecRetributionPaladin, blessings: [ Blessings.BlessingOfKings, Blessings.BlessingOfMight, Blessings.BlessingOfSalvation, Blessings.BlessingOfWisdom ] },
+		{ spec: Spec.SpecShadowPriest, blessings: [ Blessings.BlessingOfKings, Blessings.BlessingOfSalvation, Blessings.BlessingOfWisdom ] },
+		{ spec: Spec.SpecRogue, blessings: [ Blessings.BlessingOfKings, Blessings.BlessingOfSalvation, Blessings.BlessingOfMight ] },
+		{ spec: Spec.SpecElementalShaman, blessings: [ Blessings.BlessingOfKings, Blessings.BlessingOfSalvation, Blessings.BlessingOfWisdom ] },
+		{ spec: Spec.SpecWarlock, blessings: [ Blessings.BlessingOfKings, Blessings.BlessingOfSalvation, Blessings.BlessingOfWisdom ] },
+		{ spec: Spec.SpecWarrior, blessings: [ Blessings.BlessingOfKings, Blessings.BlessingOfSalvation, Blessings.BlessingOfMight ] },
+	]);
+};
