@@ -131,7 +131,7 @@ test: $(OUT_DIR)/lib.wasm binary_dist/dist.go
 
 update-tests:
 	find . -name "*.testresults" -type f -delete
-	find . -name "*.testresults.tmp" -exec bash -c 'cp "$$1" "$${1%.testresults.tmp}".testresults' - '{}' +
+	find . -name "*.testresults.tmp" -exec bash -c 'cp "$$1" "$${1%.testresults.tmp}".testresults' _ {} \;
 
 fmt:
 	gofmt -w ./sim

@@ -115,11 +115,7 @@ var FullDebuffs = &proto.Debuffs{
 }
 
 var FullDebuffTarget = &proto.Target{
-	Debuffs: &proto.Debuffs{
-		ImprovedSealOfTheCrusader: true,
-		JudgementOfWisdom:         true,
-		Misery:                    true,
-	},
+	Debuffs: FullDebuffs,
 }
 
 var PreRaidGear = items.EquipmentSpecFromStrings([]items.ItemStringSpec{

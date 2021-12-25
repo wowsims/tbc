@@ -5,12 +5,6 @@ import (
 	"github.com/wowsims/tbc/sim/core/proto"
 )
 
-var BasicRaidBuffs = &proto.RaidBuffs{}
-var BasicPartyBuffs = &proto.PartyBuffs{
-	Bloodlust: 1,
-}
-var BasicIndividualBuffs = &proto.IndividualBuffs{}
-
 var StandardTalents = &proto.DruidTalents{
 	StarlightWrath:   5,
 	FocusedStarlight: 2,
@@ -42,9 +36,6 @@ var FullIndividualBuffs = &proto.IndividualBuffs{
 	ShadowPriestDps:  500,
 }
 
-var BasicConsumes = &proto.Consumes{
-	DefaultPotion: proto.Potions_SuperManaPotion,
-}
 var FullConsumes = &proto.Consumes{
 	FlaskOfBlindingLight: true,
 	BrilliantWizardOil:   true,
@@ -56,16 +47,14 @@ var FullConsumes = &proto.Consumes{
 	Drums:                proto.Drums_DrumsOfBattle,
 }
 
-var NoDebuffTarget = &proto.Target{
-	Debuffs: &proto.Debuffs{},
+var FullDebuffs = &proto.Debuffs{
+	JudgementOfWisdom: true,
+	Misery:            true,
+	CurseOfElements:   proto.TristateEffect_TristateEffectImproved,
 }
 
 var FullDebuffTarget = &proto.Target{
-	Debuffs: &proto.Debuffs{
-		JudgementOfWisdom: true,
-		Misery:            true,
-		CurseOfElements:   proto.TristateEffect_TristateEffectImproved,
-	},
+	Debuffs: FullDebuffs,
 }
 
 var PlayerOptionsAdaptive = &proto.Player_BalanceDruid{
@@ -107,8 +96,6 @@ var PlayerOptionsWrath = &proto.Player_BalanceDruid{
 		},
 	},
 }
-
-var PreRaidGear = items.EquipmentSpecFromStrings([]items.ItemStringSpec{})
 
 var P1Gear = items.EquipmentSpecFromStrings([]items.ItemStringSpec{
 	{
