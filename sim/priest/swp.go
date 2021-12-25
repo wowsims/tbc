@@ -7,8 +7,9 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-// Starfire spell IDs
-const SpellIDSWP int32 = 25368
+const SpellIDShadowWordPain int32 = 25368
+
+var ShadowWordPainDebuffID = core.NewDebuffID()
 
 func (priest *Priest) newSWPTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
 	baseCast := core.Cast{
@@ -20,7 +21,7 @@ func (priest *Priest) newSWPTemplate(sim *core.Simulation) core.SimpleSpellTempl
 		ManaCost:       575,
 		CastTime:       0,
 		ActionID: core.ActionID{
-			SpellID: SpellIDSWP,
+			SpellID: SpellIDShadowWordPain,
 		},
 	}
 
@@ -34,6 +35,8 @@ func (priest *Priest) newSWPTemplate(sim *core.Simulation) core.SimpleSpellTempl
 			TickLength:           time.Second * 3,
 			TickBaseDamage:       1236 / 6,
 			TickSpellCoefficient: 0.183,
+			DebuffID:             ShadowWordPainDebuffID,
+			SpellID:              SpellIDShadowWordPain,
 		},
 	}
 

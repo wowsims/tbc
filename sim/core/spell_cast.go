@@ -154,8 +154,9 @@ func (spellEffect *SpellEffect) applyDot(sim *Simulation, spellCast *SpellCast, 
 	totalSpellPower := spellCast.Character.GetStat(stats.SpellPower) + spellCast.Character.GetStat(spellCast.SpellSchool) + spellEffect.BonusSpellPower
 
 	// snapshot total damage per tick, including any static damage multipliers
-	ddInput.damagePerTick = (ddInput.TickBaseDamage + totalSpellPower*ddInput.TickSpellCoefficient) * spellEffect.StaticDamageMultiplier
+	ddInput.startTime = sim.CurrentTime
 	ddInput.finalTickTime = sim.CurrentTime + time.Duration(ddInput.NumberOfTicks)*ddInput.TickLength
+	ddInput.damagePerTick = (ddInput.TickBaseDamage + totalSpellPower*ddInput.TickSpellCoefficient) * spellEffect.StaticDamageMultiplier
 
 	pa := &PendingAction{
 		Name:         spellCast.Name,
@@ -199,6 +200,10 @@ func (spellEffect *SpellEffect) applyDot(sim *Simulation, spellCast *SpellCast, 
 		spellEffect.applyResultsToCast(spellCast)
 		spellCast.Character.Metrics.AddSpellCast(spellCast)
 		spellCast.objectInUse = false
+
+		if ddInput.DebuffID != 0 && ddInput.SpellID != 0 {
+			spellEffect.Target.AddAuraUptime(ddInput.DebuffID, ddInput.SpellID, sim.CurrentTime-ddInput.startTime)
+		}
 
 		// Kills the pending action from the main run loop.
 		pa.NextActionAt = NeverExpires

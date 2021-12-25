@@ -104,6 +104,8 @@ func (sim *Simulation) reset() {
 		sim.Log("----------------------")
 	}
 
+	sim.CurrentTime = 0.0
+
 	// Reset all players
 	for _, party := range sim.Raid.Parties {
 		for _, agent := range party.Players {
@@ -115,8 +117,6 @@ func (sim *Simulation) reset() {
 	for _, target := range sim.encounter.Targets {
 		target.Reset(sim)
 	}
-
-	sim.CurrentTime = 0.0
 }
 
 type PendingAction struct {

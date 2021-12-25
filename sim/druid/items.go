@@ -130,7 +130,7 @@ func ApplyIdoloftheUnseenMoon(agent core.Agent) {
 			ID:   IdoloftheUnseenMoonAuraID,
 			Name: "Idol of the Unseen Moon",
 			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-				if spellCast.ActionID.SpellID == SpellIDMF {
+				if spellCast.ActionID.SpellID == SpellIDMoonfire {
 					if sim.RandomFloat("Idol of the Unseen Moon") > 0.5 {
 						return
 					}
@@ -138,7 +138,7 @@ func ApplyIdoloftheUnseenMoon(agent core.Agent) {
 				}
 			},
 			OnSpellMiss: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-				if spellCast.ActionID.SpellID == SpellIDMF {
+				if spellCast.ActionID.SpellID == SpellIDMoonfire {
 					if sim.RandomFloat("Idol of the Unseen Moon") > 0.5 {
 						return
 					}
