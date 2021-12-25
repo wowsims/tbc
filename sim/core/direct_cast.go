@@ -150,9 +150,14 @@ type DotDamageInput struct {
 
 	OnPeriodicDamage OnPeriodicDamage // Specific on-tick logic for this dot.
 
+	// If both of these are set, will display uptime metrics for this dot.
+	DebuffID AuraID
+	SpellID  int32
+
 	// Internal fields
-	damagePerTick float64
+	startTime     time.Duration
 	finalTickTime time.Duration
+	damagePerTick float64
 	tickIndex     int
 }
 

@@ -64,7 +64,7 @@ func NewShadowPriest(character core.Character, options proto.Player) *ShadowPrie
 						}
 					}
 
-					if spellCast.ActionID.SpellID == priest.SpellIDSWP || spellCast.ActionID.SpellID == priest.SpellIDVT || spellCast.ActionID.SpellID == priest.SpellIDMF {
+					if spellCast.ActionID.SpellID == priest.SpellIDShadowWordPain || spellCast.ActionID.SpellID == priest.SpellIDVampiricTouch || spellCast.ActionID.SpellID == priest.SpellIDMF {
 						spriest.ApplyMisery(sim, spellEffect.Target)
 					}
 				},

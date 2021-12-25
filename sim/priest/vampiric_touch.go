@@ -7,8 +7,9 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-// Starfire spell IDs
-const SpellIDVT int32 = 34917
+const SpellIDVampiricTouch int32 = 34917
+
+var VampiricTouchDebuffID = core.NewDebuffID()
 
 func (priest *Priest) newVTTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
 	baseCast := core.Cast{
@@ -20,7 +21,7 @@ func (priest *Priest) newVTTemplate(sim *core.Simulation) core.SimpleSpellTempla
 		ManaCost:       425,
 		CastTime:       time.Millisecond * 1500,
 		ActionID: core.ActionID{
-			SpellID: SpellIDVT,
+			SpellID: SpellIDVampiricTouch,
 		},
 	}
 
@@ -34,6 +35,8 @@ func (priest *Priest) newVTTemplate(sim *core.Simulation) core.SimpleSpellTempla
 			TickLength:           time.Second * 3,
 			TickBaseDamage:       650 / 5,
 			TickSpellCoefficient: 0.2,
+			DebuffID:             VampiricTouchDebuffID,
+			SpellID:              SpellIDVampiricTouch,
 		},
 	}
 
