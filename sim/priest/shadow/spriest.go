@@ -11,9 +11,19 @@ import (
 )
 
 func RegisterShadowPriest() {
-	core.RegisterAgentFactory(proto.Player_ShadowPriest{}, func(character core.Character, options proto.Player) core.Agent {
-		return NewShadowPriest(character, options)
-	})
+	core.RegisterAgentFactory(
+		proto.Player_ShadowPriest{},
+		func(character core.Character, options proto.Player) core.Agent {
+			return NewShadowPriest(character, options)
+		},
+		func(player *proto.Player, spec interface{}) {
+			playerSpec, ok := spec.(*proto.Player_ShadowPriest)
+			if !ok {
+				panic("Invalid spec value for Shadow Priest!")
+			}
+			player.Spec = playerSpec
+		},
+	)
 }
 
 var ShadowWeaverAuraID = core.NewAuraID()

@@ -10,9 +10,19 @@ import (
 )
 
 func RegisterElementalShaman() {
-	core.RegisterAgentFactory(proto.Player_ElementalShaman{}, func(character core.Character, options proto.Player) core.Agent {
-		return NewElementalShaman(character, options)
-	})
+	core.RegisterAgentFactory(
+		proto.Player_ElementalShaman{},
+		func(character core.Character, options proto.Player) core.Agent {
+			return NewElementalShaman(character, options)
+		},
+		func(player *proto.Player, spec interface{}) {
+			playerSpec, ok := spec.(*proto.Player_ElementalShaman)
+			if !ok {
+				panic("Invalid spec value for Elemental Shaman!")
+			}
+			player.Spec = playerSpec
+		},
+	)
 }
 
 func NewElementalShaman(character core.Character, options proto.Player) *ElementalShaman {

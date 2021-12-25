@@ -10,9 +10,19 @@ import (
 )
 
 func RegisterBalanceDruid() {
-	core.RegisterAgentFactory(proto.Player_BalanceDruid{}, func(character core.Character, options proto.Player) core.Agent {
-		return NewBalanceDruid(character, options)
-	})
+	core.RegisterAgentFactory(
+		proto.Player_BalanceDruid{},
+		func(character core.Character, options proto.Player) core.Agent {
+			return NewBalanceDruid(character, options)
+		},
+		func(player *proto.Player, spec interface{}) {
+			playerSpec, ok := spec.(*proto.Player_BalanceDruid)
+			if !ok {
+				panic("Invalid spec value for Balance Druid!")
+			}
+			player.Spec = playerSpec
+		},
+	)
 }
 
 func NewBalanceDruid(character core.Character, options proto.Player) *BalanceDruid {

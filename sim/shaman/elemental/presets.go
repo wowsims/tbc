@@ -5,12 +5,6 @@ import (
 	"github.com/wowsims/tbc/sim/core/proto"
 )
 
-var BasicRaidBuffs = &proto.RaidBuffs{}
-var BasicPartyBuffs = &proto.PartyBuffs{
-	Bloodlust: 1,
-}
-var BasicIndividualBuffs = &proto.IndividualBuffs{}
-
 var StandardTalents = &proto.ShamanTalents{
 	Convection:         5,
 	Concussion:         5,
@@ -31,17 +25,13 @@ var StandardTalents = &proto.ShamanTalents{
 
 var eleShamOptionsNoBuffs = &proto.ElementalShaman_Options{
 	WaterShield: true,
-	// Bloodlust:       true,
-	// ManaSpringTotem: true,
-	// TotemOfWrath:    true,
-	// WrathOfAirTotem: true,
 }
-var PlayerOptionsAdaptiveNoBuffs = &proto.Player_ElementalShaman{
+var PlayerOptionsCLOnClearcastNoBuffs = &proto.Player_ElementalShaman{
 	ElementalShaman: &proto.ElementalShaman{
 		Talents: StandardTalents,
 		Options: eleShamOptionsNoBuffs,
 		Rotation: &proto.ElementalShaman_Rotation{
-			Type: proto.ElementalShaman_Rotation_Adaptive,
+			Type: proto.ElementalShaman_Rotation_CLOnClearcast,
 		},
 	},
 }
@@ -69,6 +59,17 @@ var PlayerOptionsLBOnly = &proto.Player_ElementalShaman{
 		Options: eleShamOptions,
 		Rotation: &proto.ElementalShaman_Rotation{
 			Type: proto.ElementalShaman_Rotation_LBOnly,
+		},
+	},
+}
+
+var PlayerOptionsFixed3LBCL = &proto.Player_ElementalShaman{
+	ElementalShaman: &proto.ElementalShaman{
+		Talents: StandardTalents,
+		Options: eleShamOptions,
+		Rotation: &proto.ElementalShaman_Rotation{
+			Type:     proto.ElementalShaman_Rotation_FixedLBCL,
+			LbsPerCl: 3,
 		},
 	},
 }
@@ -107,8 +108,10 @@ var FullConsumes = &proto.Consumes{
 	Drums:                proto.Drums_DrumsOfBattle,
 }
 
-var NoDebuffTarget = &proto.Target{
-	Debuffs: &proto.Debuffs{},
+var FullDebuffs = &proto.Debuffs{
+	ImprovedSealOfTheCrusader: true,
+	JudgementOfWisdom:         true,
+	Misery:                    true,
 }
 
 var FullDebuffTarget = &proto.Target{
