@@ -528,7 +528,7 @@ class NewPlayerPicker extends Component {
                         newPlayer.setRotation(eventID, matchingPreset.rotation);
                         newPlayer.setTalentsString(eventID, matchingPreset.talents);
                         // TalentPicker needed to convert from talents string into talents proto.
-                        newTalentsPicker(newPlayer.spec, document.createElement('div'), newPlayer);
+                        newTalentsPicker(document.createElement('div'), newPlayer);
                         newPlayer.setSpecOptions(eventID, matchingPreset.specOptions);
                         newPlayer.setConsumes(eventID, matchingPreset.consumes);
                         newPlayer.setName(eventID, matchingPreset.defaultName);

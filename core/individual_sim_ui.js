@@ -422,6 +422,7 @@ export class IndividualSimUI extends SimUI {
             },
         });
         const customSectionsContainer = this.rootElem.getElementsByClassName('custom-sections-container')[0];
+        let anyCustomSections = false;
         for (const [sectionName, sectionConfig] of Object.entries(this.individualConfig.additionalSections || {})) {
             const sectionCssPrefix = sectionName.replace(/\s+/g, '');
             const sectionElem = document.createElement('section');
@@ -429,6 +430,7 @@ export class IndividualSimUI extends SimUI {
             sectionElem.innerHTML = `<label>${sectionName}</label>`;
             customSectionsContainer.appendChild(sectionElem);
             configureInputSection(sectionElem, sectionConfig);
+            anyCustomSections = true;
         }
         ;
         (this.individualConfig.customSections || []).forEach(customSection => {
@@ -440,7 +442,11 @@ export class IndividualSimUI extends SimUI {
             const labelElem = document.createElement('label');
             labelElem.textContent = sectionName;
             sectionElem.prepend(labelElem);
+            anyCustomSections = true;
         });
+        if (!anyCustomSections) {
+            customSectionsContainer.remove();
+        }
         this.sim.waitForInit().then(() => {
             savedEncounterManager.loadUserData();
             savedSettingsManager.loadUserData();
@@ -453,7 +459,7 @@ export class IndividualSimUI extends SimUI {
 			<div class="saved-talents-manager">
 			</div>
 		`);
-        const talentsPicker = newTalentsPicker(this.player.spec, this.rootElem.getElementsByClassName('talents-picker')[0], this.player);
+        const talentsPicker = newTalentsPicker(this.rootElem.getElementsByClassName('talents-picker')[0], this.player);
         const savedTalentsManager = new SavedDataManager(this.rootElem.getElementsByClassName('saved-talents-manager')[0], this.player, {
             label: 'Talents',
             storageKey: this.getSavedTalentsStorageKey(),
