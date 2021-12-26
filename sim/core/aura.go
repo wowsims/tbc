@@ -221,9 +221,7 @@ func (at *auraTracker) reset(sim *Simulation) {
 }
 
 func (at *auraTracker) advance(sim *Simulation) {
-	// Go in reverse order so we can safely delete while looping
-	for i := len(at.activeAuraIDs) - 1; i >= 0; i-- {
-		id := at.activeAuraIDs[i]
+	for _, id := range at.activeAuraIDs {
 		if at.auras[id].Expires != 0 && at.auras[id].Expires <= sim.CurrentTime {
 			at.RemoveAura(sim, id)
 		}

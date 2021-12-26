@@ -235,6 +235,7 @@ var ItemDeclarations = []ItemDeclaration{
 	{ /** Leggings of the Seventh Circle */ ID: 30734, Categories: []proto.ItemCategory{CasterCategory}},
 	{ /** Leggings of the Third Coin */ ID: 29314, Categories: []proto.ItemCategory{CasterCategory}},
 	{ /** Lightning Crown */ ID: 31330, Categories: []proto.ItemCategory{CasterCategory}},
+	{ /** Lightning Etched Crown */ ID: 34355, Categories: []proto.ItemCategory{CasterCategory}},
 	{ /** Living Root of the Wildheart */ ID: 30664, Categories: []proto.ItemCategory{CasterCategory}},
 	{ /** Lola's Eve */ ID: 31339, Categories: []proto.ItemCategory{CasterCategory}},
 	{ /** Loop of Cursed Bones */ ID: 33466, Categories: []proto.ItemCategory{CasterCategory}},

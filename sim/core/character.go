@@ -371,9 +371,12 @@ func (character *Character) SpiritManaRegenPerSecond() float64 {
 func (character *Character) manaRegenPerSecondWhileCasting() float64 {
 	regenRate := character.MP5ManaRegenPerSecond()
 
-	spiritRegenRate := character.SpiritManaRegenPerSecond() * character.PseudoStats.SpiritRegenMultiplier
-	if !character.PseudoStats.ForceFullSpiritRegen {
-		spiritRegenRate *= character.PseudoStats.SpiritRegenRateCasting
+	spiritRegenRate := 0.0
+	if character.PseudoStats.SpiritRegenRateCasting != 0 || character.PseudoStats.ForceFullSpiritRegen {
+		spiritRegenRate = character.SpiritManaRegenPerSecond() * character.PseudoStats.SpiritRegenMultiplier
+		if !character.PseudoStats.ForceFullSpiritRegen {
+			spiritRegenRate *= character.PseudoStats.SpiritRegenRateCasting
+		}
 	}
 	regenRate += spiritRegenRate
 
@@ -393,7 +396,11 @@ func (character *Character) manaRegenPerSecondWhileNotCasting() float64 {
 // Regenerates mana based on MP5 stat, spirit regen allowed while casting and the elapsed time.
 func (character *Character) RegenManaCasting(sim *Simulation, elapsedTime time.Duration) {
 	manaRegen := character.manaRegenPerSecondWhileCasting() * elapsedTime.Seconds()
-	character.AddMana(sim, manaRegen, fmt.Sprintf("%0.1fs Regen", elapsedTime.Seconds()), false)
+	reason := ""
+	if sim.Log != nil {
+		reason = fmt.Sprintf("%0.1fs Regen", elapsedTime.Seconds())
+	}
+	character.AddMana(sim, manaRegen, reason, false)
 }
 
 // Regenerates mana using mp5 and spirit. Will calculate time since last cast and then enable spirit regen if needed.
@@ -412,7 +419,11 @@ func (character *Character) RegenMana(sim *Simulation, elapsedTime time.Duration
 	} else {
 		regen = character.manaRegenPerSecondWhileCasting() * elapsedTime.Seconds()
 	}
-	character.AddMana(sim, regen, fmt.Sprintf("%0.1fs Regen", elapsedTime.Seconds()), false)
+	reason := ""
+	if sim.Log != nil {
+		reason = fmt.Sprintf("%0.1fs Regen", elapsedTime.Seconds())
+	}
+	character.AddMana(sim, regen, reason, false)
 }
 
 // Returns the amount of time this Character would need to wait in order to reach
