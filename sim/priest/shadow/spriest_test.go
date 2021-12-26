@@ -3,7 +3,7 @@ package shadow
 import (
 	"testing"
 
-	_ "github.com/wowsims/tbc/sim/common" // imported to get caster sets included. (we use spellfire here)
+	_ "github.com/wowsims/tbc/sim/common" // imported to get caster sets included.
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/proto"
 )
