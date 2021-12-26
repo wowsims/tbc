@@ -188,12 +188,22 @@ export class SavedDataManager<ModObject, T> extends Component {
     if (!dataStr)
       return;
 
-    const jsonData = JSON.parse(dataStr);
+		let jsonData;
+		try {
+			jsonData = JSON.parse(dataStr);
+		} catch (e) {
+			console.warn('Invalid json for local storage value: ' + dataStr);
+		}
+
     for (let name in jsonData) {
-      this.addSavedData({
-				name: name,
-				data: this.config.fromJson(jsonData[name]),
-			});
+			try {
+				this.addSavedData({
+					name: name,
+					data: this.config.fromJson(jsonData[name]),
+				});
+			} catch (e) {
+				console.warn('Failed parsing saved data: ' + jsonData[name]);
+			}
     }
   }
 

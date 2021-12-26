@@ -141,7 +141,7 @@ export abstract class SimUI extends Component {
 	}
 
 	getSavedEncounterStorageKey(): string {
-		return this.getStorageKey('__savedEncounter__');
+		return 'sharedData__savedEncounter__';
 	}
 
 	isIndividualSim(): boolean {
