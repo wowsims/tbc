@@ -6,6 +6,33 @@ option go_package = "./proto";
 import "api.proto";
 import "common.proto";
 
+// Contains all information that is imported/exported from an individual sim.
+message IndividualSimSettings {
+	RaidBuffs raid_buffs = 1;
+	PartyBuffs party_buffs = 2;
+	Player player = 3;
+	Encounter encounter = 4;
+}
+
+// Local storage data for gear settings.
+message SavedGearSet {
+	EquipmentSpec gear = 1;
+	repeated double bonus_stats = 2;
+}
+
+// Local storage data for other settings.
+message SavedSettings {
+	RaidBuffs raid_buffs = 1;
+	PartyBuffs party_buffs = 2;
+	IndividualBuffs player_buffs = 3;
+	Consumes consumes = 4;
+	Race race = 5;
+}
+
+message SavedTalents {
+	string talents_string = 1;
+}
+
 // A buff bot placed in a raid.
 message BuffBot {
 	// Uniquely identifies which buffbot this is.
