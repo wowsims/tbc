@@ -5,8 +5,89 @@ import type { IBinaryReader } from "@protobuf-ts/runtime";
 import type { PartialMessage } from "@protobuf-ts/runtime";
 import { MessageType } from "@protobuf-ts/runtime";
 import { Raid } from "./api";
-import { Encounter } from "./common";
 import { RaidTarget } from "./common";
+import { Race } from "./common";
+import { Consumes } from "./common";
+import { IndividualBuffs } from "./common";
+import { EquipmentSpec } from "./common";
+import { Encounter } from "./common";
+import { Player } from "./api";
+import { PartyBuffs } from "./common";
+import { RaidBuffs } from "./common";
+/**
+ * Contains all information that is imported/exported from an individual sim.
+ *
+ * @generated from protobuf message proto.IndividualSimSettings
+ */
+export interface IndividualSimSettings {
+    /**
+     * @generated from protobuf field: proto.RaidBuffs raid_buffs = 1;
+     */
+    raidBuffs?: RaidBuffs;
+    /**
+     * @generated from protobuf field: proto.PartyBuffs party_buffs = 2;
+     */
+    partyBuffs?: PartyBuffs;
+    /**
+     * @generated from protobuf field: proto.Player player = 3;
+     */
+    player?: Player;
+    /**
+     * @generated from protobuf field: proto.Encounter encounter = 4;
+     */
+    encounter?: Encounter;
+}
+/**
+ * Local storage data for gear settings.
+ *
+ * @generated from protobuf message proto.SavedGearSet
+ */
+export interface SavedGearSet {
+    /**
+     * @generated from protobuf field: proto.EquipmentSpec gear = 1;
+     */
+    gear?: EquipmentSpec;
+    /**
+     * @generated from protobuf field: repeated double bonus_stats = 2;
+     */
+    bonusStats: number[];
+}
+/**
+ * Local storage data for other settings.
+ *
+ * @generated from protobuf message proto.SavedSettings
+ */
+export interface SavedSettings {
+    /**
+     * @generated from protobuf field: proto.RaidBuffs raid_buffs = 1;
+     */
+    raidBuffs?: RaidBuffs;
+    /**
+     * @generated from protobuf field: proto.PartyBuffs party_buffs = 2;
+     */
+    partyBuffs?: PartyBuffs;
+    /**
+     * @generated from protobuf field: proto.IndividualBuffs player_buffs = 3;
+     */
+    playerBuffs?: IndividualBuffs;
+    /**
+     * @generated from protobuf field: proto.Consumes consumes = 4;
+     */
+    consumes?: Consumes;
+    /**
+     * @generated from protobuf field: proto.Race race = 5;
+     */
+    race: Race;
+}
+/**
+ * @generated from protobuf message proto.SavedTalents
+ */
+export interface SavedTalents {
+    /**
+     * @generated from protobuf field: string talents_string = 1;
+     */
+    talentsString: string;
+}
 /**
  * A buff bot placed in a raid.
  *
@@ -136,6 +217,46 @@ export declare enum Blessings {
      */
     BlessingOfWisdom = 4
 }
+declare class IndividualSimSettings$Type extends MessageType<IndividualSimSettings> {
+    constructor();
+    create(value?: PartialMessage<IndividualSimSettings>): IndividualSimSettings;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: IndividualSimSettings): IndividualSimSettings;
+    internalBinaryWrite(message: IndividualSimSettings, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message proto.IndividualSimSettings
+ */
+export declare const IndividualSimSettings: IndividualSimSettings$Type;
+declare class SavedGearSet$Type extends MessageType<SavedGearSet> {
+    constructor();
+    create(value?: PartialMessage<SavedGearSet>): SavedGearSet;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: SavedGearSet): SavedGearSet;
+    internalBinaryWrite(message: SavedGearSet, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message proto.SavedGearSet
+ */
+export declare const SavedGearSet: SavedGearSet$Type;
+declare class SavedSettings$Type extends MessageType<SavedSettings> {
+    constructor();
+    create(value?: PartialMessage<SavedSettings>): SavedSettings;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: SavedSettings): SavedSettings;
+    internalBinaryWrite(message: SavedSettings, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message proto.SavedSettings
+ */
+export declare const SavedSettings: SavedSettings$Type;
+declare class SavedTalents$Type extends MessageType<SavedTalents> {
+    constructor();
+    create(value?: PartialMessage<SavedTalents>): SavedTalents;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: SavedTalents): SavedTalents;
+    internalBinaryWrite(message: SavedTalents, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message proto.SavedTalents
+ */
+export declare const SavedTalents: SavedTalents$Type;
 declare class BuffBot$Type extends MessageType<BuffBot> {
     constructor();
     create(value?: PartialMessage<BuffBot>): BuffBot;

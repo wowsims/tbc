@@ -4,8 +4,15 @@ import { reflectionMergePartial } from '/tbc/protobuf-ts/index.js';
 import { MESSAGE_TYPE } from '/tbc/protobuf-ts/index.js';
 import { MessageType } from '/tbc/protobuf-ts/index.js';
 import { Raid } from './api.js';
-import { Encounter } from './common.js';
 import { RaidTarget } from './common.js';
+import { Race } from './common.js';
+import { Consumes } from './common.js';
+import { IndividualBuffs } from './common.js';
+import { EquipmentSpec } from './common.js';
+import { Encounter } from './common.js';
+import { Player } from './api.js';
+import { PartyBuffs } from './common.js';
+import { RaidBuffs } from './common.js';
 /**
  * @generated from protobuf enum proto.Blessings
  */
@@ -32,6 +39,258 @@ export var Blessings;
      */
     Blessings[Blessings["BlessingOfWisdom"] = 4] = "BlessingOfWisdom";
 })(Blessings || (Blessings = {}));
+// @generated message type with reflection information, may provide speed optimized methods
+class IndividualSimSettings$Type extends MessageType {
+    constructor() {
+        super("proto.IndividualSimSettings", [
+            { no: 1, name: "raid_buffs", kind: "message", T: () => RaidBuffs },
+            { no: 2, name: "party_buffs", kind: "message", T: () => PartyBuffs },
+            { no: 3, name: "player", kind: "message", T: () => Player },
+            { no: 4, name: "encounter", kind: "message", T: () => Encounter }
+        ]);
+    }
+    create(value) {
+        const message = {};
+        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader, length, options, target) {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* proto.RaidBuffs raid_buffs */ 1:
+                    message.raidBuffs = RaidBuffs.internalBinaryRead(reader, reader.uint32(), options, message.raidBuffs);
+                    break;
+                case /* proto.PartyBuffs party_buffs */ 2:
+                    message.partyBuffs = PartyBuffs.internalBinaryRead(reader, reader.uint32(), options, message.partyBuffs);
+                    break;
+                case /* proto.Player player */ 3:
+                    message.player = Player.internalBinaryRead(reader, reader.uint32(), options, message.player);
+                    break;
+                case /* proto.Encounter encounter */ 4:
+                    message.encounter = Encounter.internalBinaryRead(reader, reader.uint32(), options, message.encounter);
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message, writer, options) {
+        /* proto.RaidBuffs raid_buffs = 1; */
+        if (message.raidBuffs)
+            RaidBuffs.internalBinaryWrite(message.raidBuffs, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+        /* proto.PartyBuffs party_buffs = 2; */
+        if (message.partyBuffs)
+            PartyBuffs.internalBinaryWrite(message.partyBuffs, writer.tag(2, WireType.LengthDelimited).fork(), options).join();
+        /* proto.Player player = 3; */
+        if (message.player)
+            Player.internalBinaryWrite(message.player, writer.tag(3, WireType.LengthDelimited).fork(), options).join();
+        /* proto.Encounter encounter = 4; */
+        if (message.encounter)
+            Encounter.internalBinaryWrite(message.encounter, writer.tag(4, WireType.LengthDelimited).fork(), options).join();
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message proto.IndividualSimSettings
+ */
+export const IndividualSimSettings = new IndividualSimSettings$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class SavedGearSet$Type extends MessageType {
+    constructor() {
+        super("proto.SavedGearSet", [
+            { no: 1, name: "gear", kind: "message", T: () => EquipmentSpec },
+            { no: 2, name: "bonus_stats", kind: "scalar", repeat: 1 /*RepeatType.PACKED*/, T: 1 /*ScalarType.DOUBLE*/ }
+        ]);
+    }
+    create(value) {
+        const message = { bonusStats: [] };
+        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader, length, options, target) {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* proto.EquipmentSpec gear */ 1:
+                    message.gear = EquipmentSpec.internalBinaryRead(reader, reader.uint32(), options, message.gear);
+                    break;
+                case /* repeated double bonus_stats */ 2:
+                    if (wireType === WireType.LengthDelimited)
+                        for (let e = reader.int32() + reader.pos; reader.pos < e;)
+                            message.bonusStats.push(reader.double());
+                    else
+                        message.bonusStats.push(reader.double());
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message, writer, options) {
+        /* proto.EquipmentSpec gear = 1; */
+        if (message.gear)
+            EquipmentSpec.internalBinaryWrite(message.gear, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+        /* repeated double bonus_stats = 2; */
+        if (message.bonusStats.length) {
+            writer.tag(2, WireType.LengthDelimited).fork();
+            for (let i = 0; i < message.bonusStats.length; i++)
+                writer.double(message.bonusStats[i]);
+            writer.join();
+        }
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message proto.SavedGearSet
+ */
+export const SavedGearSet = new SavedGearSet$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class SavedSettings$Type extends MessageType {
+    constructor() {
+        super("proto.SavedSettings", [
+            { no: 1, name: "raid_buffs", kind: "message", T: () => RaidBuffs },
+            { no: 2, name: "party_buffs", kind: "message", T: () => PartyBuffs },
+            { no: 3, name: "player_buffs", kind: "message", T: () => IndividualBuffs },
+            { no: 4, name: "consumes", kind: "message", T: () => Consumes },
+            { no: 5, name: "race", kind: "enum", T: () => ["proto.Race", Race] }
+        ]);
+    }
+    create(value) {
+        const message = { race: 0 };
+        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader, length, options, target) {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* proto.RaidBuffs raid_buffs */ 1:
+                    message.raidBuffs = RaidBuffs.internalBinaryRead(reader, reader.uint32(), options, message.raidBuffs);
+                    break;
+                case /* proto.PartyBuffs party_buffs */ 2:
+                    message.partyBuffs = PartyBuffs.internalBinaryRead(reader, reader.uint32(), options, message.partyBuffs);
+                    break;
+                case /* proto.IndividualBuffs player_buffs */ 3:
+                    message.playerBuffs = IndividualBuffs.internalBinaryRead(reader, reader.uint32(), options, message.playerBuffs);
+                    break;
+                case /* proto.Consumes consumes */ 4:
+                    message.consumes = Consumes.internalBinaryRead(reader, reader.uint32(), options, message.consumes);
+                    break;
+                case /* proto.Race race */ 5:
+                    message.race = reader.int32();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message, writer, options) {
+        /* proto.RaidBuffs raid_buffs = 1; */
+        if (message.raidBuffs)
+            RaidBuffs.internalBinaryWrite(message.raidBuffs, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+        /* proto.PartyBuffs party_buffs = 2; */
+        if (message.partyBuffs)
+            PartyBuffs.internalBinaryWrite(message.partyBuffs, writer.tag(2, WireType.LengthDelimited).fork(), options).join();
+        /* proto.IndividualBuffs player_buffs = 3; */
+        if (message.playerBuffs)
+            IndividualBuffs.internalBinaryWrite(message.playerBuffs, writer.tag(3, WireType.LengthDelimited).fork(), options).join();
+        /* proto.Consumes consumes = 4; */
+        if (message.consumes)
+            Consumes.internalBinaryWrite(message.consumes, writer.tag(4, WireType.LengthDelimited).fork(), options).join();
+        /* proto.Race race = 5; */
+        if (message.race !== 0)
+            writer.tag(5, WireType.Varint).int32(message.race);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message proto.SavedSettings
+ */
+export const SavedSettings = new SavedSettings$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class SavedTalents$Type extends MessageType {
+    constructor() {
+        super("proto.SavedTalents", [
+            { no: 1, name: "talents_string", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
+        ]);
+    }
+    create(value) {
+        const message = { talentsString: "" };
+        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader, length, options, target) {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* string talents_string */ 1:
+                    message.talentsString = reader.string();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message, writer, options) {
+        /* string talents_string = 1; */
+        if (message.talentsString !== "")
+            writer.tag(1, WireType.LengthDelimited).string(message.talentsString);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message proto.SavedTalents
+ */
+export const SavedTalents = new SavedTalents$Type();
 // @generated message type with reflection information, may provide speed optimized methods
 class BuffBot$Type extends MessageType {
     constructor() {

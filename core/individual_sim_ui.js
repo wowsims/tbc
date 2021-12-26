@@ -10,17 +10,21 @@ import { EquipmentSpec } from '/tbc/core/proto/common.js';
 import { GearPicker } from '/tbc/core/components/gear_picker.js';
 import { IconPicker } from '/tbc/core/components/icon_picker.js';
 import { IndividualBuffs } from '/tbc/core/proto/common.js';
+import { IndividualSimSettings } from '/tbc/core/proto/ui.js';
 import { LogRunner } from '/tbc/core/components/log_runner.js';
 import { NumberPicker } from '/tbc/core/components/number_picker.js';
 import { PartyBuffs } from '/tbc/core/proto/common.js';
 import { RaidBuffs } from '/tbc/core/proto/common.js';
 import { SavedDataManager } from '/tbc/core/components/saved_data_manager.js';
+import { SavedEncounter } from '/tbc/core/proto/ui.js';
+import { SavedGearSet } from '/tbc/core/proto/ui.js';
+import { SavedSettings } from '/tbc/core/proto/ui.js';
+import { SavedTalents } from '/tbc/core/proto/ui.js';
 import { SimUI } from './sim_ui.js';
 import { Stats } from '/tbc/core/proto_utils/stats.js';
 import { TypedEvent } from './typed_event.js';
 import { addRaidSimAction } from '/tbc/core/components/raid_sim_action.js';
 import { addStatWeightsAction } from '/tbc/core/components/stat_weights_action.js';
-import { equalsOrBothNull } from '/tbc/core/utils.js';
 import { newTalentsPicker } from '/tbc/core/talents/factory.js';
 import { raceNames } from '/tbc/core/proto_utils/names.js';
 import { specToEligibleRaces } from '/tbc/core/proto_utils/utils.js';
@@ -94,7 +98,9 @@ export class IndividualSimUI extends SimUI {
                     let jsonData;
                     if (new URLSearchParams(window.location.search).has('uncompressed')) {
                         const jsonStr = atob(hash);
-                        jsonData = JSON.parse(jsonStr);
+                        const jsonData = JSON.parse(jsonStr);
+                        this.sim.fromJson(initEventID, jsonData, this.player.spec);
+                        loadedSettings = true;
                     }
                     else {
                         const binary = atob(hash);
@@ -103,10 +109,23 @@ export class IndividualSimUI extends SimUI {
                             bytes[i] = binary.charCodeAt(i);
                         }
                         const jsonStr = pako.inflate(bytes, { to: 'string' });
-                        jsonData = JSON.parse(jsonStr);
+                        try {
+                            jsonData = JSON.parse(jsonStr);
+                        }
+                        catch (e) {
+                            // Json parse failure just means we're using the new proto format so its ok.
+                        }
+                        if (jsonData) {
+                            this.sim.fromJson(initEventID, jsonData, this.player.spec);
+                            loadedSettings = true;
+                        }
+                        else {
+                            // TODO: Deprecate the json pathways and make this the default on January 25th, 2022 (1 month).
+                            const settingsBytes = pako.inflate(bytes);
+                            const settings = IndividualSimSettings.fromBinary(settingsBytes);
+                            this.fromProto(initEventID, settings);
+                        }
                     }
-                    this.sim.fromJson(initEventID, jsonData, this.player.spec);
-                    loadedSettings = true;
                 }
                 catch (e) {
                     console.warn('Failed to parse settings from window hash: ' + e);
@@ -116,7 +135,14 @@ export class IndividualSimUI extends SimUI {
             const savedSettings = window.localStorage.getItem(this.getSettingsStorageKey());
             if (!loadedSettings && savedSettings != null) {
                 try {
-                    this.sim.fromJson(initEventID, JSON.parse(savedSettings), this.player.spec);
+                    const jsonData = JSON.parse(savedSettings);
+                    if (jsonData?.raid) {
+                        this.sim.fromJson(initEventID, jsonData, this.player.spec);
+                    }
+                    else {
+                        const settings = IndividualSimSettings.fromJsonString(savedSettings);
+                        this.fromProto(initEventID, settings);
+                    }
                     loadedSettings = true;
                 }
                 catch (e) {
@@ -129,7 +155,7 @@ export class IndividualSimUI extends SimUI {
             this.player.setName(initEventID, 'Player');
             // This needs to go last so it doesn't re-store things as they are initialized.
             this.changeEmitter.on(eventID => {
-                const jsonStr = JSON.stringify(this.sim.toJson());
+                const jsonStr = IndividualSimSettings.toJsonString(this.toProto());
                 window.localStorage.setItem(this.getSettingsStorageKey(), jsonStr);
             });
         });
@@ -147,9 +173,9 @@ export class IndividualSimUI extends SimUI {
             'allowHTML': true,
         });
         shareLink.addEventListener('click', event => {
-            const jsonStr = JSON.stringify(this.sim.toJson());
-            const val = pako.deflate(jsonStr, { to: 'string' });
-            const encoded = btoa(String.fromCharCode(...val));
+            const protoBytes = IndividualSimSettings.toBinary(this.toProto());
+            const deflated = pako.deflate(protoBytes, { to: 'string' });
+            const encoded = btoa(String.fromCharCode(...deflated));
             const linkUrl = new URL(window.location.href);
             linkUrl.hash = encoded;
             if (navigator.clipboard == undefined) {
@@ -183,33 +209,23 @@ export class IndividualSimUI extends SimUI {
             label: 'Gear',
             storageKey: this.getSavedGearStorageKey(),
             getData: (player) => {
-                return {
-                    gear: player.getGear(),
-                    bonusStats: player.getBonusStats(),
-                };
+                return SavedGearSet.create({
+                    gear: player.getGear().asSpec(),
+                    bonusStats: player.getBonusStats().asArray(),
+                });
             },
-            setData: (eventID, player, newGearAndStats) => {
+            setData: (eventID, player, newSavedGear) => {
                 TypedEvent.freezeAllAndDo(() => {
-                    player.setGear(eventID, newGearAndStats.gear);
-                    if (newGearAndStats.bonusStats) {
-                        player.setBonusStats(eventID, newGearAndStats.bonusStats);
+                    player.setGear(eventID, this.sim.lookupEquipmentSpec(newSavedGear.gear || EquipmentSpec.create()));
+                    if (newSavedGear.bonusStats) {
+                        player.setBonusStats(eventID, new Stats(newSavedGear.bonusStats || []));
                     }
                 });
             },
             changeEmitters: [this.player.changeEmitter],
-            equals: (a, b) => a.gear.equals(b.gear) && equalsOrBothNull(a.bonusStats, b.bonusStats, (a, b) => a.equals(b)),
-            toJson: (a) => {
-                return {
-                    gear: EquipmentSpec.toJson(a.gear.asSpec()),
-                    bonusStats: a.bonusStats?.toJson(),
-                };
-            },
-            fromJson: (obj) => {
-                return {
-                    gear: this.sim.lookupEquipmentSpec(EquipmentSpec.fromJson(obj['gear'])),
-                    bonusStats: Stats.fromJson(obj['bonusStats']),
-                };
-            },
+            equals: (a, b) => SavedGearSet.equals(a, b),
+            toJson: (a) => SavedGearSet.toJson(a),
+            fromJson: (obj) => SavedGearSet.fromJson(obj),
         });
         this.sim.waitForInit().then(() => {
             savedGearManager.loadUserData();
@@ -218,10 +234,10 @@ export class IndividualSimUI extends SimUI {
                     name: presetGear.name,
                     tooltip: presetGear.tooltip,
                     isPreset: true,
-                    data: {
-                        gear: this.sim.lookupEquipmentSpec(presetGear.gear),
-                        bonusStats: new Stats(),
-                    },
+                    data: SavedGearSet.create({
+                        gear: presetGear.gear,
+                        bonusStats: [],
+                    }),
                     enableWhen: presetGear.enableWhen,
                 });
             });
@@ -271,8 +287,6 @@ export class IndividualSimUI extends SimUI {
 			</div>
 			<div class="settings-bottom-bar">
 				<div class="saved-encounter-manager within-raid-sim-hide">
-				</div>
-				<div class="saved-rotation-manager">
 				</div>
 				<div class="saved-settings-manager within-raid-sim-hide">
 				</div>
@@ -325,16 +339,6 @@ export class IndividualSimUI extends SimUI {
         if (this.individualConfig.otherInputs?.inputs.length) {
             configureInputSection(this.rootElem.getElementsByClassName('other-settings-section')[0], this.individualConfig.otherInputs);
         }
-        const savedRotationManager = new SavedDataManager(this.rootElem.getElementsByClassName('saved-rotation-manager')[0], this.player, {
-            label: 'Rotation',
-            storageKey: this.getSavedRotationStorageKey(),
-            getData: (player) => player.getRotation(),
-            setData: (eventID, player, newRotation) => player.setRotation(eventID, newRotation),
-            changeEmitters: [this.player.rotationChangeEmitter],
-            equals: (a, b) => this.player.specTypeFunctions.rotationEquals(a, b),
-            toJson: (a) => this.player.specTypeFunctions.rotationToJson(a),
-            fromJson: (obj) => this.player.specTypeFunctions.rotationFromJson(obj),
-        });
         const races = specToEligibleRaces[this.player.spec];
         const racePicker = new EnumPicker(this.rootElem.getElementsByClassName('race-section')[0], this.player, {
             values: races.map(race => {
@@ -352,12 +356,12 @@ export class IndividualSimUI extends SimUI {
         const savedEncounterManager = new SavedDataManager(this.rootElem.getElementsByClassName('saved-encounter-manager')[0], this.sim.encounter, {
             label: 'Encounter',
             storageKey: this.getSavedEncounterStorageKey(),
-            getData: (encounter) => encounter.toProto(),
-            setData: (eventID, encounter, newEncounter) => encounter.fromProto(eventID, newEncounter),
+            getData: (encounter) => SavedEncounter.create({ encounter: encounter.toProto() }),
+            setData: (eventID, encounter, newEncounter) => encounter.fromProto(eventID, newEncounter.encounter),
             changeEmitters: [this.sim.encounter.changeEmitter],
-            equals: (a, b) => EncounterProto.equals(a, b),
-            toJson: (a) => EncounterProto.toJson(a),
-            fromJson: (obj) => EncounterProto.fromJson(obj),
+            equals: (a, b) => SavedEncounter.equals(a, b),
+            toJson: (a) => SavedEncounter.toJson(a),
+            fromJson: (obj) => SavedEncounter.fromJson(obj),
         });
         // Init Muuri layout only when settings tab is clicked, because it needs the elements
         // to be shown so it can calculate sizes.
@@ -375,20 +379,25 @@ export class IndividualSimUI extends SimUI {
             label: 'Settings',
             storageKey: this.getSavedSettingsStorageKey(),
             getData: (simUI) => {
-                return {
+                return SavedSettings.create({
                     raidBuffs: simUI.sim.raid.getBuffs(),
-                    partyBuffs: simUI.player.getParty().getBuffs(),
-                    individualBuffs: simUI.player.getBuffs(),
+                    partyBuffs: simUI.player.getParty()?.getBuffs() || PartyBuffs.create(),
+                    playerBuffs: simUI.player.getBuffs(),
                     consumes: simUI.player.getConsumes(),
                     race: simUI.player.getRace(),
-                };
+                });
             },
             setData: (eventID, simUI, newSettings) => {
-                simUI.sim.raid.setBuffs(eventID, newSettings.raidBuffs);
-                simUI.player.getParty().setBuffs(eventID, newSettings.partyBuffs);
-                simUI.player.setBuffs(eventID, newSettings.individualBuffs);
-                simUI.player.setConsumes(eventID, newSettings.consumes);
-                simUI.player.setRace(eventID, newSettings.race);
+                TypedEvent.freezeAllAndDo(() => {
+                    simUI.sim.raid.setBuffs(eventID, newSettings.raidBuffs || RaidBuffs.create());
+                    const party = simUI.player.getParty();
+                    if (party) {
+                        party.setBuffs(eventID, newSettings.partyBuffs || PartyBuffs.create());
+                    }
+                    simUI.player.setBuffs(eventID, newSettings.playerBuffs || IndividualBuffs.create());
+                    simUI.player.setConsumes(eventID, newSettings.consumes || Consumes.create());
+                    simUI.player.setRace(eventID, newSettings.race);
+                });
             },
             changeEmitters: [
                 this.sim.raid.buffsChangeEmitter,
@@ -397,29 +406,9 @@ export class IndividualSimUI extends SimUI {
                 this.player.consumesChangeEmitter,
                 this.player.raceChangeEmitter,
             ],
-            equals: (a, b) => RaidBuffs.equals(a.raidBuffs, b.raidBuffs)
-                && PartyBuffs.equals(a.partyBuffs, b.partyBuffs)
-                && IndividualBuffs.equals(a.individualBuffs, b.individualBuffs)
-                && Consumes.equals(a.consumes, b.consumes)
-                && a.race == b.race,
-            toJson: (a) => {
-                return {
-                    raidBuffs: RaidBuffs.toJson(a.raidBuffs),
-                    partyBuffs: PartyBuffs.toJson(a.partyBuffs),
-                    individualBuffs: IndividualBuffs.toJson(a.individualBuffs),
-                    consumes: Consumes.toJson(a.consumes),
-                    race: a.race,
-                };
-            },
-            fromJson: (obj) => {
-                return {
-                    raidBuffs: RaidBuffs.fromJson(obj['raidBuffs']),
-                    partyBuffs: PartyBuffs.fromJson(obj['partyBuffs']),
-                    individualBuffs: IndividualBuffs.fromJson(obj['individualBuffs']),
-                    consumes: Consumes.fromJson(obj['consumes']),
-                    race: Number(obj['race']),
-                };
-            },
+            equals: (a, b) => SavedSettings.equals(a, b),
+            toJson: (a) => SavedSettings.toJson(a),
+            fromJson: (obj) => SavedSettings.fromJson(obj),
         });
         const customSectionsContainer = this.rootElem.getElementsByClassName('custom-sections-container')[0];
         let anyCustomSections = false;
@@ -463,12 +452,14 @@ export class IndividualSimUI extends SimUI {
         const savedTalentsManager = new SavedDataManager(this.rootElem.getElementsByClassName('saved-talents-manager')[0], this.player, {
             label: 'Talents',
             storageKey: this.getSavedTalentsStorageKey(),
-            getData: (player) => player.getTalentsString(),
-            setData: (eventID, player, newTalentsString) => player.setTalentsString(eventID, newTalentsString),
+            getData: (player) => SavedTalents.create({
+                talentsString: player.getTalentsString(),
+            }),
+            setData: (eventID, player, newTalents) => player.setTalentsString(eventID, newTalents.talentsString),
             changeEmitters: [this.player.talentsStringChangeEmitter],
-            equals: (a, b) => a == b,
-            toJson: (a) => a,
-            fromJson: (obj) => obj,
+            equals: (a, b) => SavedTalents.equals(a, b),
+            toJson: (a) => SavedTalents.toJson(a),
+            fromJson: (obj) => SavedTalents.fromJson(obj),
         });
         // Add a url parameter to help people trapped in the wrong talents   ;)
         const freezeTalents = this.individualConfig.freezeTalents && !(new URLSearchParams(window.location.search).has('unlockTalents'));
@@ -480,7 +471,12 @@ export class IndividualSimUI extends SimUI {
             savedTalentsManager.loadUserData();
             this.individualConfig.presets.talents.forEach(config => {
                 config.isPreset = true;
-                savedTalentsManager.addSavedData(config);
+                savedTalentsManager.addSavedData({
+                    name: config.name,
+                    data: SavedTalents.create({
+                        talentsString: config.data,
+                    }),
+                });
             });
         });
     }
@@ -540,5 +536,27 @@ export class IndividualSimUI extends SimUI {
         // Local storage is shared by all sites under the same domain, so we need to use
         // different keys for each spec site.
         return specToLocalStorageKey[this.player.spec] + keyPart;
+    }
+    toProto() {
+        return IndividualSimSettings.create({
+            player: this.player.toProto(),
+            raidBuffs: this.sim.raid.getBuffs(),
+            partyBuffs: this.player.getParty()?.getBuffs() || PartyBuffs.create(),
+            encounter: this.sim.encounter.toProto(),
+        });
+    }
+    fromProto(eventID, settings) {
+        TypedEvent.freezeAllAndDo(() => {
+            if (!settings.player) {
+                return;
+            }
+            this.player.fromProto(eventID, settings.player);
+            this.sim.raid.setBuffs(eventID, settings.raidBuffs || RaidBuffs.create());
+            const party = this.player.getParty();
+            if (party) {
+                party.setBuffs(eventID, settings.partyBuffs || PartyBuffs.create());
+            }
+            this.sim.encounter.fromProto(eventID, settings.encounter || EncounterProto.create());
+        });
     }
 }

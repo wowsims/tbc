@@ -96,7 +96,9 @@ export class SimUI extends Component {
         return this.getStorageKey('__currentSettings__');
     }
     getSavedEncounterStorageKey() {
-        return this.getStorageKey('__savedEncounter__');
+        // By skipping the call to this.getStorageKey(), saved encounters will be
+        // shared across all sims.
+        return 'sharedData__savedEncounter__';
     }
     isIndividualSim() {
         return this.rootElem.classList.contains('individual-sim-ui');

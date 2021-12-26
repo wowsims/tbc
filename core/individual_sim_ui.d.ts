@@ -7,6 +7,7 @@ import { EquipmentSpec } from '/tbc/core/proto/common.js';
 import { Gear } from '/tbc/core/proto_utils/gear.js';
 import { IconPickerConfig } from '/tbc/core/components/icon_picker.js';
 import { IndividualBuffs } from '/tbc/core/proto/common.js';
+import { IndividualSimSettings } from '/tbc/core/proto/ui.js';
 import { NumberPickerConfig } from '/tbc/core/components/number_picker.js';
 import { Party } from './party.js';
 import { PartyBuffs } from '/tbc/core/proto/common.js';
@@ -22,7 +23,7 @@ import { SpecRotation } from '/tbc/core/proto_utils/utils.js';
 import { Stat } from '/tbc/core/proto/common.js';
 import { Stats } from '/tbc/core/proto_utils/stats.js';
 import { Target } from './target.js';
-import { TypedEvent } from './typed_event.js';
+import { EventID, TypedEvent } from './typed_event.js';
 export interface IndividualSimIconPickerConfig<ModObject, ValueType> extends IconPickerConfig<ModObject, ValueType> {
     exclusivityTags?: Array<ExclusivityTag>;
 }
@@ -117,6 +118,8 @@ export declare abstract class IndividualSimUI<SpecType extends Spec> extends Sim
     getSavedSettingsStorageKey(): string;
     getSavedTalentsStorageKey(): string;
     getStorageKey(keyPart: string): string;
+    toProto(): IndividualSimSettings;
+    fromProto(eventID: EventID, settings: IndividualSimSettings): void;
 }
 export declare type ExclusivityTag = 'Battle Elixir' | 'Drums' | 'Food' | 'Alchohol' | 'Guardian Elixir' | 'Potion' | 'Rune' | 'Weapon Imbue';
 export interface ExclusiveEffect {
