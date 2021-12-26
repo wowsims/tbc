@@ -26,6 +26,7 @@ clean:
 	rm -f wowsimtbc-amd64-linux
 	rm -rf dist
 	rm -rf binary_dist
+	find . -name "*.results.tmp" -type f -delete
 
 # Host a local server, for dev testing
 host: $(OUT_DIR)
@@ -39,6 +40,7 @@ ui/core/proto/proto.ts: proto/*.proto node_modules
 	sed -i -E "s/from '(.*)';/from '\1\.js';/g" $(OUT_DIR)/protobuf-ts/*
 	sed -i -E "s/from \"(.*)\";/from '\1\.js';/g" $(OUT_DIR)/protobuf-ts/*
 	npx protoc --ts_opt generate_dependencies --ts_out ui/core/proto --proto_path proto proto/api.proto
+	npx protoc --ts_out ui/core/proto --proto_path proto proto/test.proto
 	npx protoc --ts_out ui/core/proto --proto_path proto proto/ui.proto
 
 node_modules: package-lock.json
@@ -126,6 +128,10 @@ sim/core/items/all_items.go: generate_items/*.go $(call rwildcard,sim/core/proto
 
 test: $(OUT_DIR)/lib.wasm binary_dist/dist.go
 	go test ./...
+
+update-tests:
+	find . -name "*.results" -type f -delete
+	find . -name "*.results.tmp" -exec bash -c 'cp "$$1" "$${1%.results.tmp}".results' _ {} \;
 
 fmt:
 	gofmt -w ./sim

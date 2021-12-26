@@ -14,15 +14,21 @@ import { Gear } from '/tbc/core/proto_utils/gear.js';
 import { GearPicker } from '/tbc/core/components/gear_picker.js';
 import { IconPicker, IconPickerConfig } from '/tbc/core/components/icon_picker.js';
 import { IndividualBuffs } from '/tbc/core/proto/common.js';
+import { IndividualSimSettings } from '/tbc/core/proto/ui.js';
 import { LogRunner } from '/tbc/core/components/log_runner.js';
 import { NumberPicker, NumberPickerConfig } from '/tbc/core/components/number_picker.js';
 import { Party } from './party.js';
 import { PartyBuffs } from '/tbc/core/proto/common.js';
 import { Player } from './player.js';
+import { Player as PlayerProto } from '/tbc/core/proto/api.js';
 import { Race } from '/tbc/core/proto/common.js';
 import { Raid } from './raid.js';
 import { RaidBuffs } from '/tbc/core/proto/common.js';
 import { SavedDataConfig, SavedDataManager } from '/tbc/core/components/saved_data_manager.js';
+import { SavedEncounter } from '/tbc/core/proto/ui.js';
+import { SavedGearSet } from '/tbc/core/proto/ui.js';
+import { SavedSettings } from '/tbc/core/proto/ui.js';
+import { SavedTalents } from '/tbc/core/proto/ui.js';
 import { Sim } from './sim.js';
 import { SimOptions } from '/tbc/core/proto/api.js';
 import { SimUI } from './sim_ui.js';
@@ -69,7 +75,7 @@ class IndividualSimIconPicker<ModObject, ValueType> extends IconPicker<ModObject
         tags: input.exclusivityTags,
         changedEvent: this.changeEmitter,
         isActive: () => Boolean(this.getInputValue()),
-        deactivate: () => this.setInputValue(0 as unknown as ValueType),
+        deactivate: (eventID: EventID) => this.setValue(eventID, (typeof this.getInputValue() == 'number') ? 0 as unknown as ValueType : false as unknown as ValueType),
       });
     }
 	}
@@ -229,7 +235,9 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 					let jsonData;
 					if (new URLSearchParams(window.location.search).has('uncompressed')) {
 						const jsonStr = atob(hash);
-						jsonData = JSON.parse(jsonStr);
+						const jsonData = JSON.parse(jsonStr);
+						this.sim.fromJson(initEventID, jsonData, this.player.spec);
+						loadedSettings = true;
 					} else {
 						const binary = atob(hash);
 						const bytes = new Uint8Array(binary.length);
@@ -237,10 +245,22 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 								bytes[i] = binary.charCodeAt(i);
 						}
 						const jsonStr = pako.inflate(bytes, { to: 'string' });  
-						jsonData = JSON.parse(jsonStr);
+						try {
+							jsonData = JSON.parse(jsonStr);
+						} catch (e) {
+							// Json parse failure just means we're using the new proto format so its ok.
+						}
+
+						if (jsonData) {
+							this.sim.fromJson(initEventID, jsonData, this.player.spec);
+							loadedSettings = true;
+						} else {
+							// TODO: Deprecate the json pathways and make this the default on January 25th, 2022 (1 month).
+							const settingsBytes = pako.inflate(bytes);  
+							const settings = IndividualSimSettings.fromBinary(settingsBytes);
+							this.fromProto(initEventID, settings);
+						}
 					}
-					this.sim.fromJson(initEventID, jsonData, this.player.spec);
-					loadedSettings = true;
 				} catch (e) {
 					console.warn('Failed to parse settings from window hash: ' + e);
 				}
@@ -250,7 +270,13 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 			const savedSettings = window.localStorage.getItem(this.getSettingsStorageKey());
 			if (!loadedSettings && savedSettings != null) {
 				try {
-					this.sim.fromJson(initEventID, JSON.parse(savedSettings), this.player.spec);
+					const jsonData = JSON.parse(savedSettings);
+					if (jsonData?.raid) {
+						this.sim.fromJson(initEventID, jsonData, this.player.spec);
+					} else {
+						const settings = IndividualSimSettings.fromJsonString(savedSettings);
+						this.fromProto(initEventID, settings);
+					}
 					loadedSettings = true;
 				} catch (e) {
 					console.warn('Failed to parse saved settings: ' + e);
@@ -264,7 +290,7 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 
 			// This needs to go last so it doesn't re-store things as they are initialized.
 			this.changeEmitter.on(eventID => {
-				const jsonStr = JSON.stringify(this.sim.toJson());
+				const jsonStr = IndividualSimSettings.toJsonString(this.toProto());
 				window.localStorage.setItem(this.getSettingsStorageKey(), jsonStr);
 			});
 		});
@@ -289,12 +315,13 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 			'allowHTML': true,
 		});
 		shareLink.addEventListener('click', event => {
-			const jsonStr = JSON.stringify(this.sim.toJson());
-			const val = pako.deflate(jsonStr, { to: 'string' });
-			const encoded = btoa(String.fromCharCode(...val));
-			
+			const protoBytes = IndividualSimSettings.toBinary(this.toProto());
+			const deflated = pako.deflate(protoBytes, { to: 'string' });
+			const encoded = btoa(String.fromCharCode(...deflated));
+
 			const linkUrl = new URL(window.location.href);
 			linkUrl.hash = encoded;
+			
 			if (navigator.clipboard == undefined) {
 				alert(linkUrl.toString());
 			} else {
@@ -324,37 +351,27 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
     const gearPicker = new GearPicker(this.rootElem.getElementsByClassName('gear-picker')[0] as HTMLElement, this.player);
     const bonusStatsPicker = new BonusStatsPicker(this.rootElem.getElementsByClassName('bonus-stats-picker')[0] as HTMLElement, this.player, this.individualConfig.epStats);
 
-		const savedGearManager = new SavedDataManager<Player<any>, GearAndStats>(this.rootElem.getElementsByClassName('saved-gear-manager')[0] as HTMLElement, this.player, {
+		const savedGearManager = new SavedDataManager<Player<any>, SavedGearSet>(this.rootElem.getElementsByClassName('saved-gear-manager')[0] as HTMLElement, this.player, {
 			label: 'Gear',
 			storageKey: this.getSavedGearStorageKey(),
 			getData: (player: Player<any>) => {
-				return {
-					gear: player.getGear(),
-					bonusStats: player.getBonusStats(),
-				};
+				return SavedGearSet.create({
+					gear: player.getGear().asSpec(),
+					bonusStats: player.getBonusStats().asArray(),
+				});
 			},
-			setData: (eventID: EventID, player: Player<any>, newGearAndStats: GearAndStats) => {
+			setData: (eventID: EventID, player: Player<any>, newSavedGear: SavedGearSet) => {
 				TypedEvent.freezeAllAndDo(() => {
-					player.setGear(eventID, newGearAndStats.gear);
-					if (newGearAndStats.bonusStats) {
-						player.setBonusStats(eventID, newGearAndStats.bonusStats);
+					player.setGear(eventID, this.sim.lookupEquipmentSpec(newSavedGear.gear || EquipmentSpec.create()));
+					if (newSavedGear.bonusStats) {
+						player.setBonusStats(eventID, new Stats(newSavedGear.bonusStats || []));
 					}
 				});
 			},
 			changeEmitters: [this.player.changeEmitter],
-			equals: (a: GearAndStats, b: GearAndStats) => a.gear.equals(b.gear) && equalsOrBothNull(a.bonusStats, b.bonusStats, (a, b) => a.equals(b)),
-			toJson: (a: GearAndStats) => {
-				return {
-					gear: EquipmentSpec.toJson(a.gear.asSpec()),
-					bonusStats: a.bonusStats?.toJson(),
-				};
-			},
-			fromJson: (obj: any) => {
-				return {
-					gear: this.sim.lookupEquipmentSpec(EquipmentSpec.fromJson(obj['gear'])),
-					bonusStats: Stats.fromJson(obj['bonusStats']),
-				};
-			},
+			equals: (a: SavedGearSet, b: SavedGearSet) => SavedGearSet.equals(a, b),
+			toJson: (a: SavedGearSet) => SavedGearSet.toJson(a),
+			fromJson: (obj: any) => SavedGearSet.fromJson(obj),
 		});
 
 		this.sim.waitForInit().then(() => {
@@ -364,10 +381,10 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 					name: presetGear.name,
 					tooltip: presetGear.tooltip,
 					isPreset: true,
-					data: {
-						gear: this.sim.lookupEquipmentSpec(presetGear.gear),
-						bonusStats: new Stats(),
-					},
+					data: SavedGearSet.create({
+						gear: presetGear.gear,
+						bonusStats: [],
+					}),
 					enableWhen: presetGear.enableWhen,
 				});
 			});
@@ -418,8 +435,6 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 			</div>
 			<div class="settings-bottom-bar">
 				<div class="saved-encounter-manager within-raid-sim-hide">
-				</div>
-				<div class="saved-rotation-manager">
 				</div>
 				<div class="saved-settings-manager within-raid-sim-hide">
 				</div>
@@ -489,16 +504,6 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 		if (this.individualConfig.otherInputs?.inputs.length) {
       configureInputSection(this.rootElem.getElementsByClassName('other-settings-section')[0] as HTMLElement, this.individualConfig.otherInputs);
 		}
-    const savedRotationManager = new SavedDataManager<Player<any>, SpecRotation<SpecType>>(this.rootElem.getElementsByClassName('saved-rotation-manager')[0] as HTMLElement, this.player, {
-      label: 'Rotation',
-			storageKey: this.getSavedRotationStorageKey(),
-      getData: (player: Player<SpecType>) => player.getRotation(),
-      setData: (eventID: EventID, player: Player<SpecType>, newRotation: SpecRotation<SpecType>) => player.setRotation(eventID, newRotation),
-      changeEmitters: [this.player.rotationChangeEmitter],
-      equals: (a: SpecRotation<SpecType>, b: SpecRotation<SpecType>) => this.player.specTypeFunctions.rotationEquals(a, b),
-      toJson: (a: SpecRotation<SpecType>) => this.player.specTypeFunctions.rotationToJson(a),
-      fromJson: (obj: any) => this.player.specTypeFunctions.rotationFromJson(obj),
-    });
 
     const races = specToEligibleRaces[this.player.spec];
     const racePicker = new EnumPicker(this.rootElem.getElementsByClassName('race-section')[0] as HTMLElement, this.player, {
@@ -515,15 +520,15 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 
     const encounterSectionElem = settingsTab.getElementsByClassName('encounter-section')[0] as HTMLElement;
 		new EncounterPicker(encounterSectionElem, this.sim.encounter, this.individualConfig.encounterPicker);
-    const savedEncounterManager = new SavedDataManager<Encounter, EncounterProto>(this.rootElem.getElementsByClassName('saved-encounter-manager')[0] as HTMLElement, this.sim.encounter, {
+    const savedEncounterManager = new SavedDataManager<Encounter, SavedEncounter>(this.rootElem.getElementsByClassName('saved-encounter-manager')[0] as HTMLElement, this.sim.encounter, {
       label: 'Encounter',
 			storageKey: this.getSavedEncounterStorageKey(),
-      getData: (encounter: Encounter) => encounter.toProto(),
-      setData: (eventID: EventID, encounter: Encounter, newEncounter: EncounterProto) => encounter.fromProto(eventID, newEncounter),
+      getData: (encounter: Encounter) => SavedEncounter.create({ encounter: encounter.toProto() }),
+      setData: (eventID: EventID, encounter: Encounter, newEncounter: SavedEncounter) => encounter.fromProto(eventID, newEncounter.encounter!),
       changeEmitters: [this.sim.encounter.changeEmitter],
-      equals: (a: EncounterProto, b: EncounterProto) => EncounterProto.equals(a, b),
-      toJson: (a: EncounterProto) => EncounterProto.toJson(a),
-      fromJson: (obj: any) => EncounterProto.fromJson(obj),
+      equals: (a: SavedEncounter, b: SavedEncounter) => SavedEncounter.equals(a, b),
+      toJson: (a: SavedEncounter) => SavedEncounter.toJson(a),
+      fromJson: (obj: any) => SavedEncounter.fromJson(obj),
     });
 
     // Init Muuri layout only when settings tab is clicked, because it needs the elements
@@ -539,24 +544,29 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
       }, 200); // Magic amount of time before Muuri init seems to work
     });
 
-    const savedSettingsManager = new SavedDataManager<IndividualSimUI<any>, Settings>(this.rootElem.getElementsByClassName('saved-settings-manager')[0] as HTMLElement, this, {
+    const savedSettingsManager = new SavedDataManager<IndividualSimUI<any>, SavedSettings>(this.rootElem.getElementsByClassName('saved-settings-manager')[0] as HTMLElement, this, {
       label: 'Settings',
 			storageKey: this.getSavedSettingsStorageKey(),
       getData: (simUI: IndividualSimUI<any>) => {
-        return {
+        return SavedSettings.create({
           raidBuffs: simUI.sim.raid.getBuffs(),
-          partyBuffs: simUI.player.getParty()!.getBuffs(),
-          individualBuffs: simUI.player.getBuffs(),
+          partyBuffs: simUI.player.getParty()?.getBuffs() || PartyBuffs.create(),
+          playerBuffs: simUI.player.getBuffs(),
           consumes: simUI.player.getConsumes(),
           race: simUI.player.getRace(),
-        };
+        });
       },
-      setData: (eventID: EventID, simUI: IndividualSimUI<any>, newSettings: Settings) => {
-        simUI.sim.raid.setBuffs(eventID, newSettings.raidBuffs);
-        simUI.player.getParty()!.setBuffs(eventID, newSettings.partyBuffs);
-        simUI.player.setBuffs(eventID, newSettings.individualBuffs);
-        simUI.player.setConsumes(eventID, newSettings.consumes);
-        simUI.player.setRace(eventID, newSettings.race);
+      setData: (eventID: EventID, simUI: IndividualSimUI<any>, newSettings: SavedSettings) => {
+				TypedEvent.freezeAllAndDo(() => {
+					simUI.sim.raid.setBuffs(eventID, newSettings.raidBuffs || RaidBuffs.create());
+					const party = simUI.player.getParty();
+					if (party) {
+						party.setBuffs(eventID, newSettings.partyBuffs || PartyBuffs.create());
+					}
+					simUI.player.setBuffs(eventID, newSettings.playerBuffs || IndividualBuffs.create());
+					simUI.player.setConsumes(eventID, newSettings.consumes || Consumes.create());
+					simUI.player.setRace(eventID, newSettings.race);
+				});
       },
       changeEmitters: [
 				this.sim.raid.buffsChangeEmitter,
@@ -565,33 +575,13 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 				this.player.consumesChangeEmitter,
 				this.player.raceChangeEmitter,
 			],
-      equals: (a: Settings, b: Settings) =>
-					RaidBuffs.equals(a.raidBuffs, b.raidBuffs)
-					&& PartyBuffs.equals(a.partyBuffs, b.partyBuffs)
-					&& IndividualBuffs.equals(a.individualBuffs, b.individualBuffs)
-					&& Consumes.equals(a.consumes, b.consumes)
-					&& a.race == b.race,
-      toJson: (a: Settings) => {
-        return {
-          raidBuffs: RaidBuffs.toJson(a.raidBuffs),
-          partyBuffs: PartyBuffs.toJson(a.partyBuffs),
-          individualBuffs: IndividualBuffs.toJson(a.individualBuffs),
-          consumes: Consumes.toJson(a.consumes),
-          race: a.race,
-        };
-      },
-      fromJson: (obj: any) => {
-        return {
-          raidBuffs: RaidBuffs.fromJson(obj['raidBuffs']),
-          partyBuffs: PartyBuffs.fromJson(obj['partyBuffs']),
-          individualBuffs: IndividualBuffs.fromJson(obj['individualBuffs']),
-          consumes: Consumes.fromJson(obj['consumes']),
-          race: Number(obj['race']),
-        };
-      },
+      equals: (a: SavedSettings, b: SavedSettings) => SavedSettings.equals(a, b),
+      toJson: (a: SavedSettings) => SavedSettings.toJson(a),
+      fromJson: (obj: any) => SavedSettings.fromJson(obj),
     });
 
     const customSectionsContainer = this.rootElem.getElementsByClassName('custom-sections-container')[0] as HTMLElement;
+		let anyCustomSections = false;
 		for (const [sectionName, sectionConfig] of Object.entries(this.individualConfig.additionalSections || {})) {
 			const sectionCssPrefix = sectionName.replace(/\s+/g, '');
       const sectionElem = document.createElement('section');
@@ -599,6 +589,7 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
       sectionElem.innerHTML = `<label>${sectionName}</label>`;
       customSectionsContainer.appendChild(sectionElem);
       configureInputSection(sectionElem, sectionConfig);
+			anyCustomSections = true;
     };
 
 		(this.individualConfig.customSections || []).forEach(customSection => {
@@ -610,7 +601,12 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 			const labelElem = document.createElement('label');
 			labelElem.textContent = sectionName;
 			sectionElem.prepend(labelElem);
+			anyCustomSections = true;
 		});
+
+		if (!anyCustomSections) {
+			customSectionsContainer.remove();
+		}
 
 		this.sim.waitForInit().then(() => {
 			savedEncounterManager.loadUserData();
@@ -626,16 +622,18 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 			</div>
 		`);
 
-    const talentsPicker = newTalentsPicker(this.player.spec, this.rootElem.getElementsByClassName('talents-picker')[0] as HTMLElement, this.player);
-		const savedTalentsManager = new SavedDataManager<Player<any>, string>(this.rootElem.getElementsByClassName('saved-talents-manager')[0] as HTMLElement, this.player, {
+    const talentsPicker = newTalentsPicker(this.rootElem.getElementsByClassName('talents-picker')[0] as HTMLElement, this.player);
+		const savedTalentsManager = new SavedDataManager<Player<any>, SavedTalents>(this.rootElem.getElementsByClassName('saved-talents-manager')[0] as HTMLElement, this.player, {
 			label: 'Talents',
 			storageKey: this.getSavedTalentsStorageKey(),
-			getData: (player: Player<any>) => player.getTalentsString(),
-			setData: (eventID: EventID, player: Player<any>, newTalentsString: string) => player.setTalentsString(eventID, newTalentsString),
+			getData: (player: Player<any>) => SavedTalents.create({
+				talentsString: player.getTalentsString(),
+			}),
+			setData: (eventID: EventID, player: Player<any>, newTalents: SavedTalents) => player.setTalentsString(eventID, newTalents.talentsString),
 			changeEmitters: [this.player.talentsStringChangeEmitter],
-			equals: (a: string, b: string) => a == b,
-			toJson: (a: string) => a,
-			fromJson: (obj: any) => obj,
+			equals: (a: SavedTalents, b: SavedTalents) => SavedTalents.equals(a, b),
+			toJson: (a: SavedTalents) => SavedTalents.toJson(a),
+			fromJson: (obj: any) => SavedTalents.fromJson(obj),
 		});
 
 		// Add a url parameter to help people trapped in the wrong talents   ;)
@@ -649,7 +647,12 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 			savedTalentsManager.loadUserData();
 			this.individualConfig.presets.talents.forEach(config => {
 				config.isPreset = true;
-				savedTalentsManager.addSavedData(config);
+				savedTalentsManager.addSavedData({
+					name: config.name,
+					data: SavedTalents.create({
+						talentsString: config.data,
+					}),
+				});
 			});
 		});
 	}
@@ -688,16 +691,20 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
     effect.tags.forEach(tag => {
       this.exclusivityMap[tag].push(effect);
 
-      effect.changedEvent.on(() => {
+      effect.changedEvent.on(eventID => {
         if (!effect.isActive())
           return;
 
-        this.exclusivityMap[tag].forEach(otherEffect => {
-          if (otherEffect == effect || !otherEffect.isActive())
-            return;
+				// TODO: Mark the parent somehow so we can track this for undo/redo.
+				const newEventID = TypedEvent.nextEventID();
+				TypedEvent.freezeAllAndDo(() => {
+					this.exclusivityMap[tag].forEach(otherEffect => {
+						if (otherEffect == effect || !otherEffect.isActive())
+							return;
 
-          otherEffect.deactivate();
-        });
+						otherEffect.deactivate(newEventID);
+					});
+				});
       });
     });
   }
@@ -724,6 +731,30 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 		// different keys for each spec site.
 		return specToLocalStorageKey[this.player.spec] + keyPart;
 	}
+
+	toProto(): IndividualSimSettings {
+		return IndividualSimSettings.create({
+			player: this.player.toProto(),
+			raidBuffs: this.sim.raid.getBuffs(),
+			partyBuffs: this.player.getParty()?.getBuffs() || PartyBuffs.create(),
+			encounter: this.sim.encounter.toProto(),
+		});
+	}
+
+	fromProto(eventID: EventID, settings: IndividualSimSettings) {
+		TypedEvent.freezeAllAndDo(() => {
+			if (!settings.player) {
+				return;
+			}
+			this.player.fromProto(eventID, settings.player);
+			this.sim.raid.setBuffs(eventID, settings.raidBuffs || RaidBuffs.create());
+			const party = this.player.getParty();
+			if (party) {
+				party.setBuffs(eventID, settings.partyBuffs || PartyBuffs.create());
+			}
+			this.sim.encounter.fromProto(eventID, settings.encounter || EncounterProto.create());
+		});
+	}
 }
 
 export type ExclusivityTag =
@@ -740,5 +771,5 @@ export interface ExclusiveEffect {
   tags: Array<ExclusivityTag>;
   changedEvent: TypedEvent<any>;
   isActive: () => boolean;
-  deactivate: () => void;
+  deactivate: (eventID: EventID) => void;
 }

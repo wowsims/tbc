@@ -10,12 +10,6 @@ import (
 	"github.com/wowsims/tbc/sim/core/proto"
 )
 
-func debugFunc(sim *Simulation) func(string, ...interface{}) {
-	return func(s string, vals ...interface{}) {
-		fmt.Printf("[%0.1f] "+s, append([]interface{}{sim.CurrentTime.Seconds()}, vals...)...)
-	}
-}
-
 type InitialAura func(*Simulation) Aura
 
 type Simulation struct {
@@ -104,6 +98,8 @@ func (sim *Simulation) reset() {
 		sim.Log("----------------------")
 	}
 
+	sim.CurrentTime = 0.0
+
 	// Reset all players
 	for _, party := range sim.Raid.Parties {
 		for _, agent := range party.Players {
@@ -115,8 +111,6 @@ func (sim *Simulation) reset() {
 	for _, target := range sim.encounter.Targets {
 		target.Reset(sim)
 	}
-
-	sim.CurrentTime = 0.0
 }
 
 type PendingAction struct {
@@ -135,6 +129,11 @@ func (sim *Simulation) run() *proto.RaidSimResult {
 			logsBuffer.WriteString(fmt.Sprintf("[%0.1f] "+message+"\n", append([]interface{}{sim.CurrentTime.Seconds()}, vals...)...))
 		}
 	}
+
+	// Uncomment this to print logs directly to console.
+	//sim.Log = func(message string, vals ...interface{}) {
+	//	fmt.Printf(fmt.Sprintf("[%0.1f] "+message+"\n", append([]interface{}{sim.CurrentTime.Seconds()}, vals...)...))
+	//}
 
 	for _, party := range sim.Raid.Parties {
 		for _, player := range party.Players {
@@ -186,7 +185,7 @@ func (sim *Simulation) runOnce() {
 				ag.GetCharacter().TryUseCooldowns(sim)
 				dur := ag.Act(sim)
 				if dur <= sim.CurrentTime {
-					panic(fmt.Sprintf("Agent returned invalid time delta: %dns", sim.CurrentTime-dur))
+					panic(fmt.Sprintf("Agent returned invalid time delta: %s (%s - %s)", sim.CurrentTime-dur, sim.CurrentTime, dur))
 				}
 				pa.NextActionAt = dur
 			}

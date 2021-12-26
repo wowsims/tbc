@@ -439,14 +439,19 @@ func (character *Character) RegenMana(sim *Simulation, elapsedTime time.Duration
 func (character *Character) TimeUntilManaRegen(desiredMana float64) time.Duration {
 	// +1 at the end is to deal with floating point math rounding errors.
 	manaNeeded := desiredMana - character.CurrentMana()
-	regenTime := DurationFromSeconds(manaNeeded/character.manaRegenPerSecondWhileCasting()) + 1
+	regenTime := NeverExpires
+
+	regenWhileCasting := character.manaRegenPerSecondWhileCasting()
+	if regenWhileCasting != 0 {
+		regenTime = DurationFromSeconds(manaNeeded/regenWhileCasting) + 1
+	}
 
 	// TODO: this needs to have access to the sim to see current time vs character.PseudoStats.FiveSecondRule.
 	//  it is possible that we have been waiting.
 	//  In practice this function is always used right after a previous cast so no big deal for now.
 	if regenTime > time.Second*5 {
 		regenTime = time.Second * 5
-		manaNeeded -= character.manaRegenPerSecondWhileCasting() * 5
+		manaNeeded -= regenWhileCasting * 5
 		// now we move into spirit based regen.
 		regenTime += DurationFromSeconds(manaNeeded / character.manaRegenPerSecondWhileNotCasting())
 	}

@@ -8,7 +8,9 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-const SpellIDIS int32 = 27013
+const SpellIDInsectSwarm int32 = 27013
+
+var InsectSwarmDebuffID = core.NewDebuffID()
 
 func (druid *Druid) newInsectSwarmTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
 	baseCast := core.Cast{
@@ -20,7 +22,7 @@ func (druid *Druid) newInsectSwarmTemplate(sim *core.Simulation) core.SimpleSpel
 		ManaCost:       175,
 		CastTime:       0,
 		ActionID: core.ActionID{
-			SpellID: SpellIDIS,
+			SpellID: SpellIDInsectSwarm,
 		},
 	}
 
@@ -34,6 +36,8 @@ func (druid *Druid) newInsectSwarmTemplate(sim *core.Simulation) core.SimpleSpel
 			TickLength:           time.Second * 2,
 			TickBaseDamage:       792 / 6,
 			TickSpellCoefficient: 0.127,
+			DebuffID:             InsectSwarmDebuffID,
+			SpellID:              SpellIDInsectSwarm,
 		},
 	}
 	return core.NewSimpleSpellTemplate(core.SimpleSpell{

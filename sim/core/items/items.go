@@ -116,10 +116,23 @@ func (item Item) ToProto() *proto.Item {
 	}
 }
 
+func (item Item) ToItemSpecProto() *proto.ItemSpec {
+	itemSpec := &proto.ItemSpec{
+		Id:      item.ID,
+		Enchant: item.Enchant.ID,
+		Gems:    []int32{},
+	}
+	for _, gem := range item.Gems {
+		itemSpec.Gems = append(itemSpec.Gems, gem.ID)
+	}
+	return itemSpec
+}
+
 type Enchant struct {
 	ID          int32 // ID of the enchant item.
 	EffectID    int32 // Used by UI to apply effect to tooltip
 	Name        string
+	IsSpellID   bool
 	Quality     proto.ItemQuality
 	Bonus       stats.Stats
 	ItemType    proto.ItemType    // Which slot the enchant goes on.
@@ -131,6 +144,7 @@ func (enchant Enchant) ToProto() *proto.Enchant {
 		Id:          enchant.ID,
 		EffectId:    enchant.EffectID,
 		Name:        enchant.Name,
+		IsSpellId:   enchant.IsSpellID,
 		Type:        enchant.ItemType,
 		EnchantType: enchant.EnchantType,
 		Stats:       enchant.Bonus[:],
@@ -169,6 +183,51 @@ type ItemSpec struct {
 
 type Equipment [proto.ItemSlot_ItemSlotRanged + 1]Item
 
+func (equipment *Equipment) EquipItem(item Item) {
+	if item.Type == proto.ItemType_ItemTypeFinger {
+		if equipment[ItemSlotFinger1].Name == "" {
+			equipment[ItemSlotFinger1] = item
+		} else {
+			equipment[ItemSlotFinger2] = item
+		}
+	} else if item.Type == proto.ItemType_ItemTypeTrinket {
+		if equipment[ItemSlotTrinket1].Name == "" {
+			equipment[ItemSlotTrinket1] = item
+		} else {
+			equipment[ItemSlotTrinket2] = item
+		}
+	} else if item.Type == proto.ItemType_ItemTypeWeapon {
+		if item.WeaponType == proto.WeaponType_WeaponTypeShield && equipment[ItemSlotMainHand].HandType != proto.HandType_HandTypeTwoHand {
+			equipment[ItemSlotOffHand] = item
+		} else if item.HandType == proto.HandType_HandTypeMainHand || item.HandType == proto.HandType_HandTypeUnknown {
+			equipment[ItemSlotMainHand] = item
+		} else if item.HandType == proto.HandType_HandTypeTwoHand {
+			equipment[ItemSlotMainHand] = item
+			equipment[ItemSlotOffHand] = Item{} // clear offhand
+		} else if item.HandType == proto.HandType_HandTypeOffHand && equipment[ItemSlotMainHand].HandType != proto.HandType_HandTypeTwoHand {
+			equipment[ItemSlotOffHand] = item
+		} else if item.HandType == proto.HandType_HandTypeOneHand {
+			if equipment[ItemSlotMainHand].ID == 0 {
+				equipment[ItemSlotMainHand] = item
+			} else if equipment[ItemSlotOffHand].ID == 0 {
+				equipment[ItemSlotOffHand] = item
+			}
+		}
+	} else {
+		equipment[ItemTypeToSlot(item.Type)] = item
+	}
+}
+
+func (equipment *Equipment) ToEquipmentSpecProto() *proto.EquipmentSpec {
+	equipSpec := &proto.EquipmentSpec{
+		Items: []*proto.ItemSpec{},
+	}
+	for _, item := range equipment {
+		equipSpec.Items = append(equipSpec.Items, item.ToItemSpecProto())
+	}
+	return equipSpec
+}
+
 // Structs used for looking up items/gems/enchants
 type EquipmentSpec [proto.ItemSlot_ItemSlotRanged + 1]ItemSpec
 
@@ -187,75 +246,45 @@ func ProtoToEquipmentSpec(es proto.EquipmentSpec) EquipmentSpec {
 	return coreEquip
 }
 
+func NewItem(itemSpec ItemSpec) Item {
+	item := Item{}
+	if foundItem, ok := ByID[itemSpec.ID]; ok {
+		item = foundItem
+	} else {
+		panic(fmt.Sprintf("No item with id: %d", itemSpec.ID))
+	}
+
+	if itemSpec.Enchant != 0 {
+		if enchant, ok := EnchantsByID[itemSpec.Enchant]; ok {
+			item.Enchant = enchant
+		} else {
+			panic(fmt.Sprintf("No enchant with id: %d", itemSpec.Enchant))
+		}
+	}
+
+	if len(itemSpec.Gems) > 0 {
+		item.Gems = make([]Gem, len(item.GemSockets))
+		for gemIdx, gemID := range itemSpec.Gems {
+			if gemIdx >= len(item.GemSockets) {
+				break // in case we get invalid gem settings.
+			}
+			if gem, ok := GemsByID[gemID]; ok {
+				item.Gems[gemIdx] = gem
+			} else {
+				if gemID != 0 {
+					panic(fmt.Sprintf("No gem with id: %d", gemID))
+				}
+			}
+		}
+	}
+	return item
+}
+
 func NewEquipmentSet(equipSpec EquipmentSpec) Equipment {
 	equipment := Equipment{}
-
 	for _, itemSpec := range equipSpec {
-		item := Item{}
-		if foundItem, ok := ByID[itemSpec.ID]; ok {
-			item = foundItem
-		} else {
-			if itemSpec.ID != 0 {
-				panic(fmt.Sprintf("No item with id: %d", itemSpec.ID))
-			}
-			continue
-		}
-
-		if itemSpec.Enchant != 0 {
-			if enchant, ok := EnchantsByID[itemSpec.Enchant]; ok {
-				item.Enchant = enchant
-			} else {
-				panic(fmt.Sprintf("No enchant with id: %d", itemSpec.Enchant))
-			}
-		}
-
-		if len(itemSpec.Gems) > 0 {
-			item.Gems = make([]Gem, len(item.GemSockets))
-			for gemIdx, gemID := range itemSpec.Gems {
-				if gemIdx >= len(item.GemSockets) {
-					break // in case we get invalid gem settings.
-				}
-				if gem, ok := GemsByID[gemID]; ok {
-					item.Gems[gemIdx] = gem
-				} else {
-					if gemID != 0 {
-						panic(fmt.Sprintf("No gem with id: %d", gemID))
-					}
-				}
-			}
-		}
-
-		if item.Type == proto.ItemType_ItemTypeFinger {
-			if equipment[ItemSlotFinger1].Name == "" {
-				equipment[ItemSlotFinger1] = item
-			} else {
-				equipment[ItemSlotFinger2] = item
-			}
-		} else if item.Type == proto.ItemType_ItemTypeTrinket {
-			if equipment[ItemSlotTrinket1].Name == "" {
-				equipment[ItemSlotTrinket1] = item
-			} else {
-				equipment[ItemSlotTrinket2] = item
-			}
-		} else if item.Type == proto.ItemType_ItemTypeWeapon {
-			if item.WeaponType == proto.WeaponType_WeaponTypeShield && equipment[ItemSlotMainHand].HandType != proto.HandType_HandTypeTwoHand {
-				equipment[ItemSlotOffHand] = item
-			} else if item.HandType == proto.HandType_HandTypeMainHand || item.HandType == proto.HandType_HandTypeUnknown {
-				equipment[ItemSlotMainHand] = item
-			} else if item.HandType == proto.HandType_HandTypeTwoHand {
-				equipment[ItemSlotMainHand] = item
-				equipment[ItemSlotOffHand] = Item{} // clear offhand
-			} else if item.HandType == proto.HandType_HandTypeOffHand && equipment[ItemSlotMainHand].HandType != proto.HandType_HandTypeTwoHand {
-				equipment[ItemSlotOffHand] = item
-			} else if item.HandType == proto.HandType_HandTypeOneHand {
-				if equipment[ItemSlotMainHand].ID == 0 {
-					equipment[ItemSlotMainHand] = item
-				} else if equipment[ItemSlotOffHand].ID == 0 {
-					equipment[ItemSlotOffHand] = item
-				}
-			}
-		} else {
-			equipment[ItemTypeToSlot(item.Type)] = item
+		if itemSpec.ID != 0 {
+			equipment.EquipItem(NewItem(itemSpec))
 		}
 	}
 	return equipment

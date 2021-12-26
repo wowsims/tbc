@@ -167,6 +167,10 @@ func init() {
 			SharedCooldownID: core.OffensiveTrinketSharedCooldownID,
 		},
 	))
+
+	// Even though these item effects are handled elsewhere, add them so they are
+	// detected for automatic testing.
+	core.AddItemEffect(core.AlchStoneItemID, func(core.Agent) {})
 }
 
 var MarkOfTheChampionCasterAuraID = core.NewAuraID()

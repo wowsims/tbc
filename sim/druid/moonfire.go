@@ -8,8 +8,9 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-// Starfire spell IDs
-const SpellIDMF int32 = 26988
+const SpellIDMoonfire int32 = 26988
+
+var MoonfireDebuffID = core.NewDebuffID()
 
 func (druid *Druid) newMoonfireTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
 	baseCast := core.Cast{
@@ -21,7 +22,7 @@ func (druid *Druid) newMoonfireTemplate(sim *core.Simulation) core.SimpleSpellTe
 		ManaCost:       495,
 		CastTime:       0,
 		ActionID: core.ActionID{
-			SpellID: SpellIDMF,
+			SpellID: SpellIDMoonfire,
 		},
 	}
 
@@ -40,9 +41,8 @@ func (druid *Druid) newMoonfireTemplate(sim *core.Simulation) core.SimpleSpellTe
 			TickLength:           time.Second * 3,
 			TickBaseDamage:       600 / 4,
 			TickSpellCoefficient: 0.13,
-
-			// TODO: does druid care about dot ticks?
-			// OnDamageTick: func(sim *core.Simulation) {},
+			DebuffID:             MoonfireDebuffID,
+			SpellID:              SpellIDMoonfire,
 		},
 	}
 

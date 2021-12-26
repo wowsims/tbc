@@ -47,6 +47,7 @@ func MiseryAura(sim *Simulation, numPoints int32) Aura {
 	return Aura{
 		ID:      MiseryDebuffID,
 		Name:    "Misery",
+		SpellID: 33195,
 		Expires: sim.CurrentTime + time.Second*24,
 		Stacks:  numPoints,
 		OnBeforeSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect) {
@@ -66,6 +67,7 @@ func ShadowWeavingAura(sim *Simulation, numStacks int32) Aura {
 	return Aura{
 		ID:      ShadowWeavingDebuffID,
 		Name:    "Shadow Weaving",
+		SpellID: 15334,
 		Expires: sim.CurrentTime + time.Second*15,
 		Stacks:  numStacks,
 		OnBeforeSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect) {
@@ -86,8 +88,9 @@ var JudgementOfWisdomDebuffID = NewDebuffID()
 func JudgementOfWisdomAura() Aura {
 	const mana = 74 / 2 // 50% proc
 	return Aura{
-		ID:   JudgementOfWisdomDebuffID,
-		Name: "Judgement of Wisdom",
+		ID:      JudgementOfWisdomDebuffID,
+		Name:    "Judgement of Wisdom",
+		SpellID: 27164,
 		OnSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect) {
 			if spellCast.ActionID.ItemID == ItemIDTheLightningCapacitor {
 				return // TLC cant proc JoW
@@ -106,8 +109,9 @@ var ImprovedSealOfTheCrusaderDebuffID = NewDebuffID()
 
 func ImprovedSealOfTheCrusaderAura() Aura {
 	return Aura{
-		ID:   ImprovedSealOfTheCrusaderDebuffID,
-		Name: "Improved Seal of the Crusader",
+		ID:      ImprovedSealOfTheCrusaderDebuffID,
+		Name:    "Improved Seal of the Crusader",
+		SpellID: 20337,
 		OnBeforeSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect) {
 			spellEffect.BonusSpellCritRating += 3 * SpellCritRatingPerCritChance
 			// FUTURE: melee crit bonus, research actual value
@@ -123,8 +127,9 @@ func CurseOfElementsAura(coe proto.TristateEffect) Aura {
 		mult = 1.13
 	}
 	return Aura{
-		ID:   CurseOfElementsDebuffID,
-		Name: "Curse of the Elements",
+		ID:      CurseOfElementsDebuffID,
+		Name:    "Curse of the Elements",
+		SpellID: 27228,
 		OnBeforeSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect) {
 			if spellCast.SpellSchool == stats.NatureSpellPower ||
 				spellCast.SpellSchool == stats.HolySpellPower ||

@@ -63,13 +63,6 @@ var StatsToTest = []proto.Stat{
 var ReferenceStat = proto.Stat_StatSpellPower
 
 func TestCalcStatWeight(t *testing.T) {
-	//rsr := &proto.RaidSimRequest{
-	//	Raid: SinglePlayerRaidProto(
-	//			FullPartyBuffs,
-	//			FullRaidBuffs),
-	//	Encounter:  request.Encounter,
-	//}
-
 	swr := &proto.StatWeightsRequest{
 		Player: &proto.Player{
 			Race:      proto.Race_RaceTroll10,
@@ -99,227 +92,96 @@ func TestCalcStatWeight(t *testing.T) {
 	})
 }
 
-func TestSimulatePreRaidNoBuffs(t *testing.T) {
-	core.IndividualSimAllEncountersTest(core.AllEncountersTestOptions{
-		Label: "preRaid",
-		T:     t,
-
-		Inputs: core.IndividualSimInputs{
-			Player: &proto.Player{
-				Race:      proto.Race_RaceTroll10,
-				Class:     proto.Class_ClassShaman,
-				Equipment: PreRaidGear,
-				// no consumes
-				Spec: PlayerOptionsAdaptiveNoBuffs,
-			},
-
-			RaidBuffs:       BasicRaidBuffs,
-			PartyBuffs:      BasicPartyBuffs,
-			IndividualBuffs: BasicIndividualBuffs,
-
-			Target: NoDebuffTarget,
+func TestAllSettings(t *testing.T) {
+	core.RunTestSuite(t, t.Name(), &core.SettingsCombos{
+		Class: proto.Class_ClassShaman,
+		Races: []core.RaceCombo{
+			core.RaceCombo{Label: "Orc", Race: proto.Race_RaceOrc},
+			core.RaceCombo{Label: "Troll10", Race: proto.Race_RaceTroll10},
 		},
-
-		ExpectedDpsShort: 1010.6,
-		ExpectedDpsLong:  421.5,
+		GearSets: []core.GearSetCombo{
+			core.GearSetCombo{Label: "P1", GearSet: P1Gear},
+		},
+		SpecOptions: []core.SpecOptionsCombo{
+			core.SpecOptionsCombo{Label: "LBOnly", SpecOptions: PlayerOptionsLBOnly},
+			core.SpecOptionsCombo{Label: "Fixed3LBCL", SpecOptions: PlayerOptionsFixed3LBCL},
+			core.SpecOptionsCombo{Label: "CLOnClearcast", SpecOptions: PlayerOptionsCLOnClearcast},
+			core.SpecOptionsCombo{Label: "CLOnClearcastNoBuffs", SpecOptions: PlayerOptionsCLOnClearcastNoBuffs},
+			core.SpecOptionsCombo{Label: "Adaptive", SpecOptions: PlayerOptionsAdaptive},
+		},
+		Buffs: []core.BuffsCombo{
+			core.BuffsCombo{
+				Label: "NoBuffs",
+			},
+			core.BuffsCombo{
+				Label:    "FullBuffs",
+				Raid:     FullRaidBuffs,
+				Party:    FullPartyBuffs,
+				Player:   FullIndividualBuffs,
+				Consumes: FullConsumes,
+			},
+		},
+		Encounters: core.MakeDefaultEncounterCombos(FullDebuffs),
+		SimOptions: core.DefaultSimTestOptions,
 	})
 }
 
-func TestSimulatePreRaid(t *testing.T) {
-	core.IndividualSimAllEncountersTest(core.AllEncountersTestOptions{
-		Label: "preRaid",
-		T:     t,
-
-		Inputs: core.IndividualSimInputs{
-			Player: &proto.Player{
-				Race:      proto.Race_RaceOrc,
-				Class:     proto.Class_ClassShaman,
-				Equipment: PreRaidGear,
-				Consumes:  FullConsumes,
-				Spec:      PlayerOptionsAdaptive,
-			},
-
-			RaidBuffs:       FullRaidBuffs,
-			PartyBuffs:      FullPartyBuffs,
-			IndividualBuffs: FullIndividualBuffs,
-
-			Target: FullDebuffTarget,
+func TestAllItemEffects(t *testing.T) {
+	core.RunTestSuite(t, t.Name(), &core.ItemsTestGenerator{
+		Player: &proto.Player{
+			Race:      proto.Race_RaceOrc,
+			Class:     proto.Class_ClassShaman,
+			Spec:      PlayerOptionsCLOnClearcast,
+			Equipment: P1Gear,
+			Consumes:  FullConsumes,
+			Buffs:     FullIndividualBuffs,
 		},
+		RaidBuffs:  FullRaidBuffs,
+		PartyBuffs: FullPartyBuffs,
+		Encounter:  core.MakeSingleTargetFullDebuffEncounter(FullDebuffs),
+		SimOptions: core.DefaultSimTestOptions,
 
-		ExpectedDpsShort: 1557.8,
-		ExpectedDpsLong:  1181.8,
-	})
-}
-
-func TestSimulateP1(t *testing.T) {
-	core.IndividualSimAllEncountersTest(core.AllEncountersTestOptions{
-		Label: "phase1",
-		T:     t,
-
-		Inputs: core.IndividualSimInputs{
-			Player: &proto.Player{
-				Race:      proto.Race_RaceOrc,
-				Class:     proto.Class_ClassShaman,
-				Equipment: P1Gear,
-				Consumes:  FullConsumes,
-				Spec:      PlayerOptionsAdaptive,
+		ItemFilter: core.ItemFilter{
+			Categories: []proto.ItemCategory{
+				proto.ItemCategory_ItemCategoryCaster,
 			},
-
-			RaidBuffs:       FullRaidBuffs,
-			PartyBuffs:      FullPartyBuffs,
-			IndividualBuffs: FullIndividualBuffs,
-
-			Target: FullDebuffTarget,
-		},
-
-		ExpectedDpsShort: 2166.0,
-		ExpectedDpsLong:  1603.1,
-	})
-}
-func TestMultiTarget(t *testing.T) {
-	core.IndividualSimAllEncountersTest(core.AllEncountersTestOptions{
-		Label: "multiTarget",
-		T:     t,
-
-		Inputs: core.IndividualSimInputs{
-			Player: &proto.Player{
-				Race:      proto.Race_RaceOrc,
-				Class:     proto.Class_ClassShaman,
-				Equipment: P1Gear,
-				Consumes:  FullConsumes,
-				Spec:      PlayerOptionsAdaptive,
+			ArmorTypes: []proto.ArmorType{
+				proto.ArmorType_ArmorTypeUnknown,
+				proto.ArmorType_ArmorTypeCloth,
+				proto.ArmorType_ArmorTypeLeather,
+				proto.ArmorType_ArmorTypeMail,
 			},
-
-			RaidBuffs:       FullRaidBuffs,
-			PartyBuffs:      FullPartyBuffs,
-			IndividualBuffs: FullIndividualBuffs,
-
-			Targets: []*proto.Target{
-				FullDebuffTarget,
-				NoDebuffTarget,
-				NoDebuffTarget,
-				NoDebuffTarget,
+			RangedWeaponTypes: []proto.RangedWeaponType{
+				proto.RangedWeaponType_RangedWeaponTypeTotem,
 			},
 		},
-
-		ExpectedDpsShort: 2684.5,
-		ExpectedDpsLong:  2053.3,
-	})
-
-	core.IndividualSimAllEncountersTest(core.AllEncountersTestOptions{
-		Label: "multiTarget-tidefury",
-		T:     t,
-
-		Inputs: core.IndividualSimInputs{
-			Player: &proto.Player{
-				Race:      proto.Race_RaceOrc,
-				Class:     proto.Class_ClassShaman,
-				Equipment: P1Tidefury,
-				Consumes:  FullConsumes,
-				Spec:      PlayerOptionsAdaptive,
-			},
-
-			RaidBuffs:       FullRaidBuffs,
-			PartyBuffs:      FullPartyBuffs,
-			IndividualBuffs: FullIndividualBuffs,
-
-			Targets: []*proto.Target{
-				FullDebuffTarget,
-				NoDebuffTarget,
-				NoDebuffTarget,
-				NoDebuffTarget,
-			},
-		},
-
-		ExpectedDpsShort: 2731.0,
-		ExpectedDpsLong:  2093.3,
-	})
-}
-
-func TestLBOnlyAgent(t *testing.T) {
-	core.IndividualSimAllEncountersTest(core.AllEncountersTestOptions{
-		Label: "lbonly",
-		T:     t,
-
-		Inputs: core.IndividualSimInputs{
-			Player: &proto.Player{
-				Race:      proto.Race_RaceOrc,
-				Class:     proto.Class_ClassShaman,
-				Equipment: P1Gear,
-				Consumes:  FullConsumes,
-				Spec:      PlayerOptionsLBOnly,
-			},
-
-			RaidBuffs:       FullRaidBuffs,
-			PartyBuffs:      FullPartyBuffs,
-			IndividualBuffs: FullIndividualBuffs,
-
-			Target: FullDebuffTarget,
-		},
-
-		ExpectedDpsShort: 2041.9,
-		ExpectedDpsLong:  1536.8,
-	})
-}
-
-// func TestFixedAgent(t *testing.T) {
-// 	core.IndividualSimAllEncountersTest(core.AllEncountersTestOptions{
-// 		Label: "fixedAgent",
-// 	 T:     t,
-
-// 		Options:   FullOptions,
-// 		Gear:      p1Gear,
-// 		AgentType: AGENT_TYPE_FIXED_4LB_1CL,
-
-// 		ExpectedDpsShort: 1489.3,
-// 		ExpectedDpsLong:  1284.2,
-// 	})
-// }
-
-func TestClearcastAgent(t *testing.T) {
-	core.IndividualSimAllEncountersTest(core.AllEncountersTestOptions{
-		Label: "clearcast",
-		T:     t,
-
-		Inputs: core.IndividualSimInputs{
-			Player: &proto.Player{
-				Race:      proto.Race_RaceOrc,
-				Class:     proto.Class_ClassShaman,
-				Equipment: P1Gear,
-				Consumes:  FullConsumes,
-				Spec:      PlayerOptionsCLOnClearcast,
-			},
-
-			RaidBuffs:       FullRaidBuffs,
-			PartyBuffs:      FullPartyBuffs,
-			IndividualBuffs: FullIndividualBuffs,
-
-			Target: FullDebuffTarget,
-		},
-
-		ExpectedDpsShort: 2135.3,
-		ExpectedDpsLong:  1578.9,
 	})
 }
 
 func TestAverageDPS(t *testing.T) {
-	isr := core.NewIndividualSimRequest(core.IndividualSimInputs{
-		Player: &proto.Player{
-			Race:      proto.Race_RaceOrc,
-			Class:     proto.Class_ClassShaman,
-			Equipment: P1Gear,
-			Consumes:  FullConsumes,
-			Spec:      PlayerOptionsAdaptive,
+	core.RunTestSuite(t, t.Name(), &core.SettingsCombos{
+		Class: proto.Class_ClassShaman,
+		Races: []core.RaceCombo{
+			core.RaceCombo{Label: "Orc", Race: proto.Race_RaceOrc},
 		},
-
-		RaidBuffs:       FullRaidBuffs,
-		PartyBuffs:      FullPartyBuffs,
-		IndividualBuffs: FullIndividualBuffs,
-
-		Target: FullDebuffTarget,
+		GearSets: []core.GearSetCombo{
+			core.GearSetCombo{Label: "P1", GearSet: P1Gear},
+		},
+		SpecOptions: []core.SpecOptionsCombo{
+			core.SpecOptionsCombo{Label: "Adaptive", SpecOptions: PlayerOptionsAdaptive},
+		},
+		Buffs: []core.BuffsCombo{
+			core.BuffsCombo{
+				Label:    "FullBuffs",
+				Raid:     FullRaidBuffs,
+				Party:    FullPartyBuffs,
+				Player:   FullIndividualBuffs,
+				Consumes: FullConsumes,
+			},
+		},
+		Encounters: core.MakeAverageDefaultEncounterCombos(FullDebuffs),
+		SimOptions: core.AverageDefaultSimTestOptions,
 	})
-
-	core.IndividualSimAverageTest("P1Average", t, isr, 1593.9)
 }
 
 func BenchmarkSimulate(b *testing.B) {
