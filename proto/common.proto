@@ -366,6 +366,10 @@ message Enchant {
     int32 effect_id = 2; // ID of the effect (for the item tooltip UI)
     string name = 3;     
 
+		// If true, then id is the ID of the enchant spell instead of the formula item.
+		// This is used by enchants for which a formula doesn't exist (its taught by a trainer).
+		bool is_spell_id = 10;
+
     ItemType type = 4;   // Which type of item this enchant can be applied to.
 		EnchantType enchant_type = 9;
 

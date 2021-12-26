@@ -38,7 +38,7 @@ func (testSuite *IndividualTestSuite) Done(t *testing.T) {
 	testSuite.evaluateResults(t)
 }
 
-const tolerance = 0.5
+const tolerance = 0.00001
 
 func (testSuite *IndividualTestSuite) evaluateResults(t *testing.T) {
 	expectedResults := testSuite.readExpectedResults()

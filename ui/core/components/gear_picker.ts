@@ -5,7 +5,7 @@ import { Enchant } from '/tbc/core/proto/common.js';
 import { Item } from '/tbc/core/proto/common.js';
 import { ItemQuality } from '/tbc/core/proto/common.js';
 import { ItemSlot } from '/tbc/core/proto/common.js';
-import { enchantDescriptions } from '/tbc/core/proto_utils/names.js';
+import { enchantDescriptions } from '/tbc/core/constants/enchants.js';
 import { slotNames } from '/tbc/core/proto_utils/names.js';
 import { getEmptyGemSocketIconUrl } from '/tbc/core/resources.js';
 import { getEmptySlotIconUrl } from '/tbc/core/resources.js';
@@ -209,6 +209,7 @@ class SelectorModal extends Component {
           return {
             id: item.id,
             wowheadId: getWowheadItemId(item),
+						wowheadIdIsSpell: false,
             name: item.name,
             quality: item.quality,
 						phase: item.phase,
@@ -237,6 +238,7 @@ class SelectorModal extends Component {
           return {
             id: enchant.id,
 						wowheadId: enchant.id,
+						wowheadIdIsSpell: enchant.isSpellId,
             name: enchant.name,
             quality: enchant.quality,
 						phase: 1,
@@ -276,6 +278,7 @@ class SelectorModal extends Component {
             return {
               id: gem.id,
 							wowheadId: gem.id,
+							wowheadIdIsSpell: false,
               name: gem.name,
               quality: gem.quality,
 							phase: gem.phase,
@@ -310,6 +313,7 @@ class SelectorModal extends Component {
         getItemData: (item: T) => {
           id: number,
           wowheadId: number,
+          wowheadIdIsSpell: boolean,
           name: string,
           quality: ItemQuality,
 					phase: number,
@@ -375,11 +379,16 @@ class SelectorModal extends Component {
 					<span class="selector-modal-list-item-ep-delta"></span>
 				</div>
       `;
-      setWowheadHref(listItemElem.children[0] as HTMLAnchorElement, { itemId: itemData.wowheadId });
-      setWowheadHref(listItemElem.children[1] as HTMLAnchorElement, { itemId: itemData.wowheadId });
 
       const iconElem = listItemElem.getElementsByClassName('selector-modal-list-item-icon')[0] as HTMLImageElement;
-      getIconUrl({itemId: itemData.wowheadId}).then(url => {
+
+			const actionId = itemData.wowheadIdIsSpell
+					? { spellId: itemData.wowheadId }
+					: { itemId: itemData.wowheadId };
+		
+      setWowheadHref(listItemElem.children[0] as HTMLAnchorElement, actionId);
+      setWowheadHref(listItemElem.children[1] as HTMLAnchorElement, actionId);
+      getIconUrl(actionId).then(url => {
         iconElem.style.backgroundImage = `url('${url}')`;
       });
 

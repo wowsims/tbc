@@ -75,7 +75,7 @@ class IndividualSimIconPicker<ModObject, ValueType> extends IconPicker<ModObject
         tags: input.exclusivityTags,
         changedEvent: this.changeEmitter,
         isActive: () => Boolean(this.getInputValue()),
-        deactivate: () => this.setInputValue(0 as unknown as ValueType),
+        deactivate: (eventID: EventID) => this.setValue(eventID, (typeof this.getInputValue() == 'number') ? 0 as unknown as ValueType : false as unknown as ValueType),
       });
     }
 	}
@@ -691,16 +691,20 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
     effect.tags.forEach(tag => {
       this.exclusivityMap[tag].push(effect);
 
-      effect.changedEvent.on(() => {
+      effect.changedEvent.on(eventID => {
         if (!effect.isActive())
           return;
 
-        this.exclusivityMap[tag].forEach(otherEffect => {
-          if (otherEffect == effect || !otherEffect.isActive())
-            return;
+				// TODO: Mark the parent somehow so we can track this for undo/redo.
+				const newEventID = TypedEvent.nextEventID();
+				TypedEvent.freezeAllAndDo(() => {
+					this.exclusivityMap[tag].forEach(otherEffect => {
+						if (otherEffect == effect || !otherEffect.isActive())
+							return;
 
-          otherEffect.deactivate();
-        });
+						otherEffect.deactivate(newEventID);
+					});
+				});
       });
     });
   }
@@ -767,5 +771,5 @@ export interface ExclusiveEffect {
   tags: Array<ExclusivityTag>;
   changedEvent: TypedEvent<any>;
   isActive: () => boolean;
-  deactivate: () => void;
+  deactivate: (eventID: EventID) => void;
 }
