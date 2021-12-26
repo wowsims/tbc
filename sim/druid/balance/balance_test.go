@@ -13,7 +13,7 @@ func init() {
 }
 
 func TestAllSettings(t *testing.T) {
-	core.TestSuiteAllSettingsCombos(t, t.Name(), core.SettingsCombos{
+	core.RunTestSuite(t, t.Name(), &core.SettingsCombos{
 		Class: proto.Class_ClassDruid,
 		Races: []core.RaceCombo{
 			core.RaceCombo{Label: "Tauren", Race: proto.Race_RaceTauren},
@@ -44,8 +44,39 @@ func TestAllSettings(t *testing.T) {
 	})
 }
 
+func TestAllItemEffects(t *testing.T) {
+	core.RunTestSuite(t, t.Name(), &core.ItemsTestGenerator{
+		Player: &proto.Player{
+			Race:      proto.Race_RaceNightElf,
+			Class:     proto.Class_ClassDruid,
+			Spec:      PlayerOptionsStarfire,
+			Equipment: P2Gear,
+			Consumes:  FullConsumes,
+			Buffs:     FullIndividualBuffs,
+		},
+		RaidBuffs:  FullRaidBuffs,
+		PartyBuffs: FullPartyBuffs,
+		Encounter:  core.MakeSingleTargetFullDebuffEncounter(FullDebuffs),
+		SimOptions: core.DefaultSimTestOptions,
+
+		ItemFilter: core.ItemFilter{
+			Categories: []proto.ItemCategory{
+				proto.ItemCategory_ItemCategoryCaster,
+			},
+			ArmorTypes: []proto.ArmorType{
+				proto.ArmorType_ArmorTypeUnknown,
+				proto.ArmorType_ArmorTypeCloth,
+				proto.ArmorType_ArmorTypeLeather,
+			},
+			RangedWeaponTypes: []proto.RangedWeaponType{
+				proto.RangedWeaponType_RangedWeaponTypeIdol,
+			},
+		},
+	})
+}
+
 func TestAverageDPS(t *testing.T) {
-	core.TestSuiteAllSettingsCombos(t, t.Name(), core.SettingsCombos{
+	core.RunTestSuite(t, t.Name(), &core.SettingsCombos{
 		Class: proto.Class_ClassDruid,
 		Races: []core.RaceCombo{
 			core.RaceCombo{Label: "Tauren", Race: proto.Race_RaceTauren},

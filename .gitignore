@@ -2,4 +2,4 @@ node_modules
 .vscode
 dist
 binary_dist
-*.testresults.tmp
+*.results.tmp

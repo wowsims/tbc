@@ -93,16 +93,14 @@ func TestCalcStatWeight(t *testing.T) {
 }
 
 func TestAllSettings(t *testing.T) {
-	core.TestSuiteAllSettingsCombos(t, t.Name(), core.SettingsCombos{
+	core.RunTestSuite(t, t.Name(), &core.SettingsCombos{
 		Class: proto.Class_ClassShaman,
 		Races: []core.RaceCombo{
 			core.RaceCombo{Label: "Orc", Race: proto.Race_RaceOrc},
 			core.RaceCombo{Label: "Troll10", Race: proto.Race_RaceTroll10},
 		},
 		GearSets: []core.GearSetCombo{
-			core.GearSetCombo{Label: "PreRaid", GearSet: PreRaidGear},
 			core.GearSetCombo{Label: "P1", GearSet: P1Gear},
-			core.GearSetCombo{Label: "P1Tidefury", GearSet: P1Tidefury},
 		},
 		SpecOptions: []core.SpecOptionsCombo{
 			core.SpecOptionsCombo{Label: "LBOnly", SpecOptions: PlayerOptionsLBOnly},
@@ -128,14 +126,45 @@ func TestAllSettings(t *testing.T) {
 	})
 }
 
+func TestAllItemEffects(t *testing.T) {
+	core.RunTestSuite(t, t.Name(), &core.ItemsTestGenerator{
+		Player: &proto.Player{
+			Race:      proto.Race_RaceOrc,
+			Class:     proto.Class_ClassShaman,
+			Spec:      PlayerOptionsCLOnClearcast,
+			Equipment: P1Gear,
+			Consumes:  FullConsumes,
+			Buffs:     FullIndividualBuffs,
+		},
+		RaidBuffs:  FullRaidBuffs,
+		PartyBuffs: FullPartyBuffs,
+		Encounter:  core.MakeSingleTargetFullDebuffEncounter(FullDebuffs),
+		SimOptions: core.DefaultSimTestOptions,
+
+		ItemFilter: core.ItemFilter{
+			Categories: []proto.ItemCategory{
+				proto.ItemCategory_ItemCategoryCaster,
+			},
+			ArmorTypes: []proto.ArmorType{
+				proto.ArmorType_ArmorTypeUnknown,
+				proto.ArmorType_ArmorTypeCloth,
+				proto.ArmorType_ArmorTypeLeather,
+				proto.ArmorType_ArmorTypeMail,
+			},
+			RangedWeaponTypes: []proto.RangedWeaponType{
+				proto.RangedWeaponType_RangedWeaponTypeTotem,
+			},
+		},
+	})
+}
+
 func TestAverageDPS(t *testing.T) {
-	core.TestSuiteAllSettingsCombos(t, t.Name(), core.SettingsCombos{
+	core.RunTestSuite(t, t.Name(), &core.SettingsCombos{
 		Class: proto.Class_ClassShaman,
 		Races: []core.RaceCombo{
 			core.RaceCombo{Label: "Orc", Race: proto.Race_RaceOrc},
 		},
 		GearSets: []core.GearSetCombo{
-			core.GearSetCombo{Label: "PreRaid", GearSet: PreRaidGear},
 			core.GearSetCombo{Label: "P1", GearSet: P1Gear},
 		},
 		SpecOptions: []core.SpecOptionsCombo{

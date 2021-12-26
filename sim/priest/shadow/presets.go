@@ -175,3 +175,89 @@ var P1Gear = items.EquipmentSpecFromStrings([]items.ItemStringSpec{
 		Name: "Orb of the Soul-Eater",
 	},
 })
+
+var P3Gear = items.EquipmentSpecFromStrings([]items.ItemStringSpec{
+	{
+		Name:    "Hood of Absolution",
+		Enchant: "Glyph of Power",
+		Gems: []string{
+			"Mystical Skyfire Diamond",
+			"Glowing Nightseye",
+		},
+	},
+	{
+		Name: "Ritssyn's Lost Pendant",
+	},
+	{
+		Name:    "Shoulderpads of Absolution",
+		Enchant: "Greater Inscription of Discipline",
+		Gems: []string{
+			"Runed Living Ruby",
+			"Runed Living Ruby",
+		},
+	},
+	{
+		Name: "Nethervoid Cloak",
+	},
+	{
+		Name:    "Shroud of Absolution",
+		Enchant: "Chest - Exceptional Stats",
+		Gems: []string{
+			"Runed Living Ruby",
+			"Runed Living Ruby",
+			"Runed Living Ruby",
+		},
+	},
+	{
+		Name:    "Bracers of Nimble Thought",
+		Enchant: "Bracer - Spellpower",
+	},
+	{
+		Name:    "Handguards of Absolution",
+		Enchant: "Gloves - Major Spellpower",
+		Gems: []string{
+			"Runed Living Ruby",
+		},
+	},
+	{
+		Name: "Waistwrap of Infinity",
+	},
+	{
+		Name:    "Leggings of Channeled Elements",
+		Enchant: "Runic Spellthread",
+		Gems: []string{
+			"Runed Living Ruby",
+			"Runed Living Ruby",
+			"Runed Living Ruby",
+		},
+	},
+	{
+		Name: "Slippers of the Seacaller",
+		Gems: []string{
+			"Runed Living Ruby",
+			"Runed Living Ruby",
+		},
+	},
+	{
+		Name: "Ring of Ancient Knowledge",
+	},
+	{
+		Name: "Ring of Ancient Knowledge",
+	},
+	{
+		Name: "The Skull of Gul'dan",
+	},
+	{
+		Name: "Icon of the Silver Crescent",
+	},
+	{
+		Name: "Wand of the Forgotten Star",
+	},
+	{
+		Name:    "The Maelstrom's Fury",
+		Enchant: "Weapon - Major Spellpower",
+	},
+	{
+		Name: "Orb of the Soul-Eater",
+	},
+})

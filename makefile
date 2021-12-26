@@ -26,7 +26,7 @@ clean:
 	rm -f wowsimtbc-amd64-linux
 	rm -rf dist
 	rm -rf binary_dist
-	find . -name "*.testresults.tmp" -type f -delete
+	find . -name "*.results.tmp" -type f -delete
 
 # Host a local server, for dev testing
 host: $(OUT_DIR)
@@ -130,8 +130,8 @@ test: $(OUT_DIR)/lib.wasm binary_dist/dist.go
 	go test ./...
 
 update-tests:
-	find . -name "*.testresults" -type f -delete
-	find . -name "*.testresults.tmp" -exec bash -c 'cp "$$1" "$${1%.testresults.tmp}".testresults' _ {} \;
+	find . -name "*.results" -type f -delete
+	find . -name "*.results.tmp" -exec bash -c 'cp "$$1" "$${1%.results.tmp}".results' _ {} \;
 
 fmt:
 	gofmt -w ./sim
