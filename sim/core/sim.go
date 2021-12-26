@@ -278,7 +278,7 @@ func (queue ActionsQueue) Len() int {
 	return len(queue)
 }
 func (queue ActionsQueue) Less(i, j int) bool {
-	return queue[i].NextActionAt < queue[j].NextActionAt
+	return queue[i].NextActionAt <= queue[j].NextActionAt
 }
 func (queue ActionsQueue) Swap(i, j int) {
 	queue[i], queue[j] = queue[j], queue[i]

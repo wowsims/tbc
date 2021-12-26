@@ -7,7 +7,7 @@ dps_results: {
 dps_results: {
   key: "TestAllItemEffects-AvatarRegalia"
   value: {
-    dps: 1276.1400646579004
+    dps: 1276.1125477454002
   }
 }
 dps_results: {
@@ -43,7 +43,7 @@ dps_results: {
 dps_results: {
   key: "TestAllItemEffects-EmberSkyfireDiamond"
   value: {
-    dps: 1432.2403314378162
+    dps: 1432.17520165762
   }
 }
 dps_results: {
@@ -133,7 +133,7 @@ dps_results: {
 dps_results: {
   key: "TestAllItemEffects-ShiftingNaaruSliver-34429"
   value: {
-    dps: 1457.5735467059121
+    dps: 1457.274492900862
   }
 }
 dps_results: {

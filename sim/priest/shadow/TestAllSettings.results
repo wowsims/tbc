@@ -1,145 +1,145 @@
 dps_results: {
   key: "TestAllSettings-Undead-P1-Basic-FullBuffs-LongMultiTarget"
   value: {
-    dps: 1266.4609460420713
+    dps: 1260.6869969957088
   }
 }
 dps_results: {
   key: "TestAllSettings-Undead-P1-Basic-FullBuffs-LongSingleTargetFullDebuffs"
   value: {
-    dps: 1266.4609460420713
+    dps: 1260.6869969957088
   }
 }
 dps_results: {
   key: "TestAllSettings-Undead-P1-Basic-FullBuffs-LongSingleTargetNoDebuffs"
   value: {
-    dps: 1102.0594387294354
+    dps: 1097.2373118231117
   }
 }
 dps_results: {
   key: "TestAllSettings-Undead-P1-Basic-FullBuffs-ShortSingleTargetFullDebuffs"
   value: {
-    dps: 1231.496198673368
+    dps: 1225.4623537049122
   }
 }
 dps_results: {
   key: "TestAllSettings-Undead-P1-Basic-NoBuffs-LongMultiTarget"
   value: {
-    dps: 559.3553891368566
+    dps: 559.8733818477906
   }
 }
 dps_results: {
   key: "TestAllSettings-Undead-P1-Basic-NoBuffs-LongSingleTargetFullDebuffs"
   value: {
-    dps: 559.3553891368566
+    dps: 559.8733818477906
   }
 }
 dps_results: {
   key: "TestAllSettings-Undead-P1-Basic-NoBuffs-LongSingleTargetNoDebuffs"
   value: {
-    dps: 394.6621511315559
+    dps: 393.5805104137473
   }
 }
 dps_results: {
   key: "TestAllSettings-Undead-P1-Basic-NoBuffs-ShortSingleTargetFullDebuffs"
   value: {
-    dps: 1127.5370932788721
+    dps: 1121.811115032079
   }
 }
 dps_results: {
   key: "TestAllSettings-Undead-P1-Clipping-FullBuffs-LongMultiTarget"
   value: {
-    dps: 1244.08703583769
+    dps: 1263.8933797517122
   }
 }
 dps_results: {
   key: "TestAllSettings-Undead-P1-Clipping-FullBuffs-LongSingleTargetFullDebuffs"
   value: {
-    dps: 1244.08703583769
+    dps: 1263.8933797517122
   }
 }
 dps_results: {
   key: "TestAllSettings-Undead-P1-Clipping-FullBuffs-LongSingleTargetNoDebuffs"
   value: {
-    dps: 1001.8756399735894
+    dps: 992.3057151856343
   }
 }
 dps_results: {
   key: "TestAllSettings-Undead-P1-Clipping-FullBuffs-ShortSingleTargetFullDebuffs"
   value: {
-    dps: 1171.6716086119718
+    dps: 1165.8768305793162
   }
 }
 dps_results: {
   key: "TestAllSettings-Undead-P1-Clipping-NoBuffs-LongMultiTarget"
   value: {
-    dps: 483.797386825236
+    dps: 481.9938105206375
   }
 }
 dps_results: {
   key: "TestAllSettings-Undead-P1-Clipping-NoBuffs-LongSingleTargetFullDebuffs"
   value: {
-    dps: 483.797386825236
+    dps: 481.9938105206375
   }
 }
 dps_results: {
   key: "TestAllSettings-Undead-P1-Clipping-NoBuffs-LongSingleTargetNoDebuffs"
   value: {
-    dps: 351.59453641547395
+    dps: 351.1451807741654
   }
 }
 dps_results: {
   key: "TestAllSettings-Undead-P1-Clipping-NoBuffs-ShortSingleTargetFullDebuffs"
   value: {
-    dps: 1103.1684053486197
+    dps: 1093.3799402079762
   }
 }
 dps_results: {
   key: "TestAllSettings-Undead-P1-Ideal-FullBuffs-LongMultiTarget"
   value: {
-    dps: 1313.708957218594
+    dps: 1313.8967362919707
   }
 }
 dps_results: {
   key: "TestAllSettings-Undead-P1-Ideal-FullBuffs-LongSingleTargetFullDebuffs"
   value: {
-    dps: 1313.708957218594
+    dps: 1313.8967362919707
   }
 }
 dps_results: {
   key: "TestAllSettings-Undead-P1-Ideal-FullBuffs-LongSingleTargetNoDebuffs"
   value: {
-    dps: 1063.6215276012908
+    dps: 1075.3482493297179
   }
 }
 dps_results: {
   key: "TestAllSettings-Undead-P1-Ideal-FullBuffs-ShortSingleTargetFullDebuffs"
   value: {
-    dps: 1271.7209166702928
+    dps: 1267.106614183887
   }
 }
 dps_results: {
   key: "TestAllSettings-Undead-P1-Ideal-NoBuffs-LongMultiTarget"
   value: {
-    dps: 519.6012655570678
+    dps: 519.5438801510459
   }
 }
 dps_results: {
   key: "TestAllSettings-Undead-P1-Ideal-NoBuffs-LongSingleTargetFullDebuffs"
   value: {
-    dps: 519.6012655570678
+    dps: 519.5438801510459
   }
 }
 dps_results: {
   key: "TestAllSettings-Undead-P1-Ideal-NoBuffs-LongSingleTargetNoDebuffs"
   value: {
-    dps: 396.46254795167965
+    dps: 387.4564844968711
   }
 }
 dps_results: {
   key: "TestAllSettings-Undead-P1-Ideal-NoBuffs-ShortSingleTargetFullDebuffs"
   value: {
-    dps: 1178.638712839096
+    dps: 1172.4750505820775
   }
 }
 dps_results: {
@@ -157,7 +157,7 @@ dps_results: {
 dps_results: {
   key: "TestAllSettings-Undead-P3-Basic-FullBuffs-LongSingleTargetNoDebuffs"
   value: {
-    dps: 1266.8394481519906
+    dps: 1266.7783131213032
   }
 }
 dps_results: {
@@ -169,19 +169,19 @@ dps_results: {
 dps_results: {
   key: "TestAllSettings-Undead-P3-Basic-NoBuffs-LongMultiTarget"
   value: {
-    dps: 519.3057950218575
+    dps: 520.8841951413075
   }
 }
 dps_results: {
   key: "TestAllSettings-Undead-P3-Basic-NoBuffs-LongSingleTargetFullDebuffs"
   value: {
-    dps: 519.3057950218575
+    dps: 520.8841951413075
   }
 }
 dps_results: {
   key: "TestAllSettings-Undead-P3-Basic-NoBuffs-LongSingleTargetNoDebuffs"
   value: {
-    dps: 630.4627769272672
+    dps: 630.4346401647672
   }
 }
 dps_results: {
@@ -241,48 +241,48 @@ dps_results: {
 dps_results: {
   key: "TestAllSettings-Undead-P3-Ideal-FullBuffs-LongMultiTarget"
   value: {
-    dps: 1478.3107381656537
+    dps: 1475.4859850572464
   }
 }
 dps_results: {
   key: "TestAllSettings-Undead-P3-Ideal-FullBuffs-LongSingleTargetFullDebuffs"
   value: {
-    dps: 1478.3107381656537
+    dps: 1475.4859850572464
   }
 }
 dps_results: {
   key: "TestAllSettings-Undead-P3-Ideal-FullBuffs-LongSingleTargetNoDebuffs"
   value: {
-    dps: 1316.7449146111494
+    dps: 1316.9362569931495
   }
 }
 dps_results: {
   key: "TestAllSettings-Undead-P3-Ideal-FullBuffs-ShortSingleTargetFullDebuffs"
   value: {
-    dps: 1481.3775619503647
+    dps: 1482.4586464086647
   }
 }
 dps_results: {
   key: "TestAllSettings-Undead-P3-Ideal-NoBuffs-LongMultiTarget"
   value: {
-    dps: 495.44160606897185
+    dps: 842.1554774691433
   }
 }
 dps_results: {
   key: "TestAllSettings-Undead-P3-Ideal-NoBuffs-LongSingleTargetFullDebuffs"
   value: {
-    dps: 495.44160606897185
+    dps: 842.1554774691433
   }
 }
 dps_results: {
   key: "TestAllSettings-Undead-P3-Ideal-NoBuffs-LongSingleTargetNoDebuffs"
   value: {
-    dps: 607.2254347245806
+    dps: 608.6348723455184
   }
 }
 dps_results: {
   key: "TestAllSettings-Undead-P3-Ideal-NoBuffs-ShortSingleTargetFullDebuffs"
   value: {
-    dps: 1307.2382894500781
+    dps: 1305.9550748892339
   }
 }
