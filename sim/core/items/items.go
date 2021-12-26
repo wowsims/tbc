@@ -132,6 +132,7 @@ type Enchant struct {
 	ID          int32 // ID of the enchant item.
 	EffectID    int32 // Used by UI to apply effect to tooltip
 	Name        string
+	IsSpellID   bool
 	Quality     proto.ItemQuality
 	Bonus       stats.Stats
 	ItemType    proto.ItemType    // Which slot the enchant goes on.
@@ -143,6 +144,7 @@ func (enchant Enchant) ToProto() *proto.Enchant {
 		Id:          enchant.ID,
 		EffectId:    enchant.EffectID,
 		Name:        enchant.Name,
+		IsSpellId:   enchant.IsSpellID,
 		Type:        enchant.ItemType,
 		EnchantType: enchant.EnchantType,
 		Stats:       enchant.Bonus[:],
