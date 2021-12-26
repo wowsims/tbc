@@ -345,6 +345,7 @@ func (character *Character) reset(sim *Simulation) {
 	character.majorCooldownManager.reset(sim)
 
 	if character.AutoAttacks.mh != nil {
+		character.AutoAttacks = AutoAttacks{}
 		character.EnableAutoAttacks() // resets auto attack timers etc
 	}
 }

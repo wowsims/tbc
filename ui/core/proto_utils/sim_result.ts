@@ -455,7 +455,11 @@ export class ActionMetrics {
 				}
 			} else {
 				if (actionId.tag == 1) {
-					name += ' (LO)';
+				 	name += ' (LO)';
+				} else if (actionId.tag == 10) {
+					name += ' (Auto)';
+				} else if (actionId.tag == 11) {
+					name += ' (Offhand Auto)';
 				} else {
 					name += ' (??)';
 				}

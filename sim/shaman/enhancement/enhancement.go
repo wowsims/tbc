@@ -22,6 +22,7 @@ func NewEnhancementShaman(character core.Character, options proto.Player) *Enhan
 	if enhOptions.Rotation.Totems != nil {
 		selfBuffs.StrengthOfEarth = enhOptions.Rotation.Totems.Earth == proto.EarthTotem_StrengthOfEarthTotem
 		selfBuffs.GraceOfAir = enhOptions.Rotation.Totems.Air == proto.AirTotem_GraceOfAirTotem
+		selfBuffs.ManaSpring = enhOptions.Rotation.Totems.Water == proto.WaterTotem_ManaSpringTotem
 	}
 	enh := &EnhancementShaman{
 		Shaman: shaman.NewShaman(character, *enhOptions.Talents, selfBuffs),

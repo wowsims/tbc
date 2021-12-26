@@ -109,7 +109,8 @@ func IndividualSimTest(label string, t *testing.T, isr *proto.IndividualSimReque
 
 func IndividualSimAverageTest(label string, t *testing.T, isr *proto.IndividualSimRequest, expectedDps float64) {
 	isr.Encounter.Duration = LongDuration
-	isr.SimOptions.Iterations = 10000
+	isr.SimOptions.Iterations = 2
+	isr.SimOptions.Debug = true
 
 	result := RunIndividualSim(isr)
 

@@ -251,7 +251,11 @@ func (shaman *Shaman) Reset(sim *core.Simulation) {
 		shaman.SelfBuffs.NextTotemDrops[i] = core.NeverExpires
 		switch i {
 		case AirTotem:
-			if shaman.SelfBuffs.WrathOfAir {
+			if shaman.SelfBuffs.WrathOfAir || shaman.SelfBuffs.GraceOfAir {
+				shaman.SelfBuffs.NextTotemDrops[i] = time.Second * 120 // 2 min until drop totems
+			}
+		case EarthTotem:
+			if shaman.SelfBuffs.StrengthOfEarth {
 				shaman.SelfBuffs.NextTotemDrops[i] = time.Second * 120 // 2 min until drop totems
 			}
 		case FireTotem:
@@ -275,6 +279,8 @@ func (shaman *Shaman) Reset(sim *core.Simulation) {
 	shaman.chainLightningSpellLOs = make([]core.MultiTargetDirectDamageSpell, numHits)
 
 	shaman.unleashedRages = shaman.unleashedRages[0:]
+	shaman.ElementalFocusStacks = 0
+	shaman.FlurryStacks = 0
 }
 
 func (shaman *Shaman) Advance(sim *core.Simulation, elapsedTime time.Duration) {
