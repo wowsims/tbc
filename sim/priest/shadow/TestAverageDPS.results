@@ -1,12 +1,12 @@
 dps_results: {
   key: "TestAverageDPS-Undead-P1-Clipping-FullBuffs-LongSingleTarget"
   value: {
-    dps: 1294.3328161263353
+    dps: 1249.6372673218877
   }
 }
 dps_results: {
   key: "TestAverageDPS-Undead-P1-Clipping-NoBuffs-LongSingleTarget"
   value: {
-    dps: 518.4288946008086
+    dps: 483.43429413960297
   }
 }
