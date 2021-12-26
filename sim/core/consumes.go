@@ -254,7 +254,7 @@ func registerPotionCD(agent Agent, consumes proto.Consumes) {
 	})
 }
 
-const alchStoneItemID = 35749
+const AlchStoneItemID = 35749
 
 func makePotionActivation(potionType proto.Potions, character *Character) CooldownActivation {
 	if potionType == proto.Potions_DestructionPotion {
@@ -282,7 +282,7 @@ func makePotionActivation(potionType proto.Potions, character *Character) Cooldo
 			return true
 		}
 	} else if potionType == proto.Potions_SuperManaPotion {
-		alchStoneEquipped := character.HasTrinketEquipped(alchStoneItemID)
+		alchStoneEquipped := character.HasTrinketEquipped(AlchStoneItemID)
 		return func(sim *Simulation, character *Character) bool {
 			// Only pop if we have less than the max mana provided by the potion minus 1mp5 tick.
 			totalRegen := character.manaRegenPerSecondWhileCasting() * 5

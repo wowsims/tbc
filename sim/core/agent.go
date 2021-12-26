@@ -65,10 +65,12 @@ func (actionID ActionID) ToProto() *proto.ActionID {
 }
 
 type AgentFactory func(Character, proto.Player) Agent
+type SpecSetter func(*proto.Player, interface{})
 
 var agentFactories map[string]AgentFactory = make(map[string]AgentFactory)
+var specSetters map[string]SpecSetter = make(map[string]SpecSetter)
 
-func RegisterAgentFactory(emptyOptions interface{}, factory AgentFactory) {
+func RegisterAgentFactory(emptyOptions interface{}, factory AgentFactory, specSetter SpecSetter) {
 	typeName := reflect.TypeOf(emptyOptions).Name()
 	if _, ok := agentFactories[typeName]; ok {
 		panic("Aleady registered agent factory: " + typeName)
@@ -76,6 +78,7 @@ func RegisterAgentFactory(emptyOptions interface{}, factory AgentFactory) {
 	//fmt.Printf("Registering type: %s", typeName)
 
 	agentFactories[typeName] = factory
+	specSetters[typeName] = specSetter
 }
 
 // Constructs a new Agent.
@@ -89,4 +92,19 @@ func NewAgent(party *Party, partyIndex int, player proto.Player) Agent {
 
 	character := NewCharacter(party, partyIndex, player)
 	return factory(character, player)
+}
+
+// Applies the spec options to the given player. This is only necessary because
+// the generated proto code does not export oneof interface types.
+// Player is returned so this function can be used in-line with player creation.
+func WithSpec(player *proto.Player, spec interface{}) *proto.Player {
+	typeName := reflect.TypeOf(spec).Elem().Name()
+
+	specSetter, ok := specSetters[typeName]
+	if !ok {
+		panic("No spec setter for type: " + typeName)
+	}
+
+	specSetter(player, spec)
+	return player
 }

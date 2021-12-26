@@ -5,12 +5,6 @@ import (
 	"github.com/wowsims/tbc/sim/core/proto"
 )
 
-var BasicRaidBuffs = &proto.RaidBuffs{}
-var BasicPartyBuffs = &proto.PartyBuffs{
-	Bloodlust: 1,
-}
-var BasicIndividualBuffs = &proto.IndividualBuffs{}
-
 var StandardTalents = &proto.PriestTalents{
 	ImprovedShadowWordPain: 2,
 	ImprovedMindBlast:      5,
@@ -41,9 +35,6 @@ var FullIndividualBuffs = &proto.IndividualBuffs{
 	BlessingOfWisdom: proto.TristateEffect_TristateEffectImproved,
 }
 
-var BasicConsumes = &proto.Consumes{
-	DefaultPotion: proto.Potions_SuperManaPotion,
-}
 var FullConsumes = &proto.Consumes{
 	FlaskOfPureDeath:   true,
 	BrilliantWizardOil: true,
@@ -53,15 +44,13 @@ var FullConsumes = &proto.Consumes{
 	DarkRune:           true,
 }
 
-var NoDebuffTarget = &proto.Target{
-	Debuffs: &proto.Debuffs{},
+var FullDebuffs = &proto.Debuffs{
+	JudgementOfWisdom: true,
+	CurseOfElements:   proto.TristateEffect_TristateEffectImproved,
 }
 
 var FullDebuffTarget = &proto.Target{
-	Debuffs: &proto.Debuffs{
-		JudgementOfWisdom: true,
-		CurseOfElements:   proto.TristateEffect_TristateEffectImproved,
-	},
+	Debuffs: FullDebuffs,
 }
 
 var PlayerOptionsBasic = &proto.Player_ShadowPriest{
@@ -99,8 +88,6 @@ var PlayerOptionsIdeal = &proto.Player_ShadowPriest{
 		},
 	},
 }
-
-// var PreRaidGear = items.EquipmentSpecFromStrings([]items.ItemStringSpec{})
 
 var P1Gear = items.EquipmentSpecFromStrings([]items.ItemStringSpec{
 	{
@@ -182,6 +169,92 @@ var P1Gear = items.EquipmentSpecFromStrings([]items.ItemStringSpec{
 	},
 	{
 		Name:    "Nathrezim Mindblade",
+		Enchant: "Weapon - Major Spellpower",
+	},
+	{
+		Name: "Orb of the Soul-Eater",
+	},
+})
+
+var P3Gear = items.EquipmentSpecFromStrings([]items.ItemStringSpec{
+	{
+		Name:    "Hood of Absolution",
+		Enchant: "Glyph of Power",
+		Gems: []string{
+			"Mystical Skyfire Diamond",
+			"Glowing Nightseye",
+		},
+	},
+	{
+		Name: "Ritssyn's Lost Pendant",
+	},
+	{
+		Name:    "Shoulderpads of Absolution",
+		Enchant: "Greater Inscription of Discipline",
+		Gems: []string{
+			"Runed Living Ruby",
+			"Runed Living Ruby",
+		},
+	},
+	{
+		Name: "Nethervoid Cloak",
+	},
+	{
+		Name:    "Shroud of Absolution",
+		Enchant: "Chest - Exceptional Stats",
+		Gems: []string{
+			"Runed Living Ruby",
+			"Runed Living Ruby",
+			"Runed Living Ruby",
+		},
+	},
+	{
+		Name:    "Bracers of Nimble Thought",
+		Enchant: "Bracer - Spellpower",
+	},
+	{
+		Name:    "Handguards of Absolution",
+		Enchant: "Gloves - Major Spellpower",
+		Gems: []string{
+			"Runed Living Ruby",
+		},
+	},
+	{
+		Name: "Waistwrap of Infinity",
+	},
+	{
+		Name:    "Leggings of Channeled Elements",
+		Enchant: "Runic Spellthread",
+		Gems: []string{
+			"Runed Living Ruby",
+			"Runed Living Ruby",
+			"Runed Living Ruby",
+		},
+	},
+	{
+		Name: "Slippers of the Seacaller",
+		Gems: []string{
+			"Runed Living Ruby",
+			"Runed Living Ruby",
+		},
+	},
+	{
+		Name: "Ring of Ancient Knowledge",
+	},
+	{
+		Name: "Ring of Ancient Knowledge",
+	},
+	{
+		Name: "The Skull of Gul'dan",
+	},
+	{
+		Name: "Icon of the Silver Crescent",
+	},
+	{
+		Name: "Wand of the Forgotten Star",
+	},
+	{
+		Name:    "The Maelstrom's Fury",
 		Enchant: "Weapon - Major Spellpower",
 	},
 	{

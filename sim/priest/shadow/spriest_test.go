@@ -3,6 +3,7 @@ package shadow
 import (
 	"testing"
 
+	_ "github.com/wowsims/tbc/sim/common" // imported to get caster sets included.
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/proto"
 )
@@ -11,100 +12,93 @@ func init() {
 	RegisterShadowPriest()
 }
 
-func TestSimulateP1Lazy(t *testing.T) {
-	core.IndividualSimAllEncountersTest(core.AllEncountersTestOptions{
-		Label: "phase1-lazy",
-		T:     t,
-
-		Inputs: core.IndividualSimInputs{
-			Player: &proto.Player{
-				Race:      proto.Race_RaceUndead,
-				Class:     proto.Class_ClassPriest,
-				Equipment: P1Gear,
-				Consumes:  FullConsumes,
-				Spec:      PlayerOptionsBasic,
-			},
-
-			RaidBuffs:       FullRaidBuffs,
-			PartyBuffs:      FullPartyBuffs,
-			IndividualBuffs: FullIndividualBuffs,
-
-			Target: FullDebuffTarget,
+func TestAllSettings(t *testing.T) {
+	core.RunTestSuite(t, t.Name(), &core.SettingsCombos{
+		Class: proto.Class_ClassPriest,
+		Races: []core.RaceCombo{
+			core.RaceCombo{Label: "Undead", Race: proto.Race_RaceUndead},
 		},
-
-		ExpectedDpsShort: 1199.2,
-		ExpectedDpsLong:  1228.9,
+		GearSets: []core.GearSetCombo{
+			core.GearSetCombo{Label: "P1", GearSet: P1Gear},
+			core.GearSetCombo{Label: "P3", GearSet: P3Gear},
+		},
+		SpecOptions: []core.SpecOptionsCombo{
+			core.SpecOptionsCombo{Label: "Basic", SpecOptions: PlayerOptionsBasic},
+			core.SpecOptionsCombo{Label: "Clipping", SpecOptions: PlayerOptionsClipping},
+			core.SpecOptionsCombo{Label: "Ideal", SpecOptions: PlayerOptionsIdeal},
+		},
+		Buffs: []core.BuffsCombo{
+			core.BuffsCombo{
+				Label: "NoBuffs",
+			},
+			core.BuffsCombo{
+				Label:    "FullBuffs",
+				Raid:     FullRaidBuffs,
+				Party:    FullPartyBuffs,
+				Player:   FullIndividualBuffs,
+				Consumes: FullConsumes,
+			},
+		},
+		Encounters: core.MakeDefaultEncounterCombos(FullDebuffs),
+		SimOptions: core.DefaultSimTestOptions,
 	})
 }
 
-func TestSimulateP1Clipping(t *testing.T) {
-	core.IndividualSimAllEncountersTest(core.AllEncountersTestOptions{
-		Label: "phase1-clipping",
-		T:     t,
-
-		Inputs: core.IndividualSimInputs{
-			Player: &proto.Player{
-				Race:      proto.Race_RaceUndead,
-				Class:     proto.Class_ClassPriest,
-				Equipment: P1Gear,
-				Consumes:  FullConsumes,
-				Spec:      PlayerOptionsClipping,
-			},
-
-			RaidBuffs:       FullRaidBuffs,
-			PartyBuffs:      FullPartyBuffs,
-			IndividualBuffs: FullIndividualBuffs,
-
-			Target: FullDebuffTarget,
+func TestAllItemEffects(t *testing.T) {
+	core.RunTestSuite(t, t.Name(), &core.ItemsTestGenerator{
+		Player: &proto.Player{
+			Race:      proto.Race_RaceDwarf,
+			Class:     proto.Class_ClassPriest,
+			Spec:      PlayerOptionsClipping,
+			Equipment: P3Gear,
+			Consumes:  FullConsumes,
+			Buffs:     FullIndividualBuffs,
 		},
+		RaidBuffs:  FullRaidBuffs,
+		PartyBuffs: FullPartyBuffs,
+		Encounter:  core.MakeSingleTargetFullDebuffEncounter(FullDebuffs),
+		SimOptions: core.DefaultSimTestOptions,
 
-		ExpectedDpsShort: 1191.1,
-		ExpectedDpsLong:  1262.2,
-	})
-}
-
-func TestSimulateP1Ideal(t *testing.T) {
-	core.IndividualSimAllEncountersTest(core.AllEncountersTestOptions{
-		Label: "phase1-ideal",
-		T:     t,
-
-		Inputs: core.IndividualSimInputs{
-			Player: &proto.Player{
-				Race:      proto.Race_RaceUndead,
-				Class:     proto.Class_ClassPriest,
-				Equipment: P1Gear,
-				Consumes:  FullConsumes,
-				Spec:      PlayerOptionsIdeal,
+		ItemFilter: core.ItemFilter{
+			Categories: []proto.ItemCategory{
+				proto.ItemCategory_ItemCategoryCaster,
 			},
-
-			RaidBuffs:       FullRaidBuffs,
-			PartyBuffs:      FullPartyBuffs,
-			IndividualBuffs: FullIndividualBuffs,
-
-			Target: FullDebuffTarget,
+			ArmorTypes: []proto.ArmorType{
+				proto.ArmorType_ArmorTypeUnknown,
+				proto.ArmorType_ArmorTypeCloth,
+			},
+			RangedWeaponTypes: []proto.RangedWeaponType{
+				proto.RangedWeaponType_RangedWeaponTypeWand,
+			},
 		},
-
-		ExpectedDpsShort: 1220.5,
-		ExpectedDpsLong:  1266.2,
 	})
 }
 
 func TestAverageDPS(t *testing.T) {
-	isr := core.NewIndividualSimRequest(core.IndividualSimInputs{
-		Player: &proto.Player{
-			Race:      proto.Race_RaceUndead,
-			Class:     proto.Class_ClassPriest,
-			Equipment: P1Gear,
-			Consumes:  FullConsumes,
-			Spec:      PlayerOptionsIdeal,
+	core.RunTestSuite(t, t.Name(), &core.SettingsCombos{
+		Class: proto.Class_ClassPriest,
+		Races: []core.RaceCombo{
+			core.RaceCombo{Label: "Undead", Race: proto.Race_RaceUndead},
 		},
-
-		RaidBuffs:       FullRaidBuffs,
-		PartyBuffs:      FullPartyBuffs,
-		IndividualBuffs: FullIndividualBuffs,
-
-		Target: FullDebuffTarget,
+		GearSets: []core.GearSetCombo{
+			core.GearSetCombo{Label: "P1", GearSet: P1Gear},
+		},
+		SpecOptions: []core.SpecOptionsCombo{
+			core.SpecOptionsCombo{Label: "Clipping", SpecOptions: PlayerOptionsClipping},
+		},
+		Buffs: []core.BuffsCombo{
+			core.BuffsCombo{
+				Label: "NoBuffs",
+			},
+			core.BuffsCombo{
+				Label:    "FullBuffs",
+				Raid:     FullRaidBuffs,
+				Party:    FullPartyBuffs,
+				Player:   FullIndividualBuffs,
+				Consumes: FullConsumes,
+			},
+		},
+		Encounters: core.MakeAverageDefaultEncounterCombos(FullDebuffs),
+		SimOptions: core.AverageDefaultSimTestOptions,
 	})
-
-	core.IndividualSimAverageTest("P1Average", t, isr, 1271.8)
 }

@@ -17,6 +17,10 @@ func init() {
 	core.AddItemSet(ItemSetCycloneRegalia)
 	core.AddItemSet(ItemSetCataclysmRegalia)
 	core.AddItemSet(ItemSetSkyshatterRegalia)
+
+	// Even though these item effects are handled elsewhere, add them so they are
+	// detected for automatic testing.
+	core.AddItemEffect(TotemOfThePulsingEarth, func(core.Agent) {})
 }
 
 var Tidefury2PcAuraID = core.NewAuraID()

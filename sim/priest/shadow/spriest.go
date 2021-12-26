@@ -11,9 +11,19 @@ import (
 )
 
 func RegisterShadowPriest() {
-	core.RegisterAgentFactory(proto.Player_ShadowPriest{}, func(character core.Character, options proto.Player) core.Agent {
-		return NewShadowPriest(character, options)
-	})
+	core.RegisterAgentFactory(
+		proto.Player_ShadowPriest{},
+		func(character core.Character, options proto.Player) core.Agent {
+			return NewShadowPriest(character, options)
+		},
+		func(player *proto.Player, spec interface{}) {
+			playerSpec, ok := spec.(*proto.Player_ShadowPriest)
+			if !ok {
+				panic("Invalid spec value for Shadow Priest!")
+			}
+			player.Spec = playerSpec
+		},
+	)
 }
 
 var ShadowWeaverAuraID = core.NewAuraID()
@@ -197,11 +207,8 @@ func (spriest *ShadowPriest) Act(sim *core.Simulation) time.Duration {
 			if wait > gcd && spriest.rotation.Latency > 0 {
 				base := spriest.rotation.Latency * 0.66
 				variation := base + sim.RandomFloat("spriest latency")*base // should vary from 0.66 - 1.33 of given latency
+				variation = core.MaxFloat(variation, 10)                    // no player can go under XXXms response time
 
-				const minimumLatencyMS = 10
-				if variation < minimumLatencyMS {
-					variation = minimumLatencyMS // no player can go under XXXms response time
-				}
 				wait += time.Duration(variation) * time.Millisecond
 			}
 		}

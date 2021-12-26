@@ -17,6 +17,14 @@ type ItemSet struct {
 	Bonuses map[int32]ApplyEffect
 }
 
+func (set ItemSet) ItemIDs() []int32 {
+	ids := []int32{}
+	for id, _ := range set.Items {
+		ids = append(ids, id)
+	}
+	return ids
+}
+
 func (set ItemSet) ItemIsInSet(itemID int32) bool {
 	_, ok := set.Items[itemID]
 	return ok
@@ -38,6 +46,13 @@ func (set ItemSet) CharacterHasSetBonus(character *Character, numItems int32) bo
 }
 
 var sets = []ItemSet{}
+
+func GetAllItemSets() []ItemSet {
+	// Defensive copy to prevent modifications.
+	tmp := make([]ItemSet, len(sets))
+	copy(tmp, sets)
+	return tmp
+}
 
 // cache for mapping item to set for fast resetting of sim.
 var itemSetLookup = map[int32]*ItemSet{}

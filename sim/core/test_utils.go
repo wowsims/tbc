@@ -9,13 +9,101 @@ import (
 	googleProto "google.golang.org/protobuf/proto"
 )
 
-const ShortDuration = 60
-const LongDuration = 300
-
 var DefaultSimTestOptions = &proto.SimOptions{
 	Iterations: 1,
 	IsTest:     true,
 	Debug:      false,
+}
+var AverageDefaultSimTestOptions = &proto.SimOptions{
+	Iterations: 10000,
+	IsTest:     true,
+	Debug:      false,
+}
+
+const ShortDuration = 60
+const LongDuration = 300
+
+func MakeDefaultEncounterCombos(debuffs *proto.Debuffs) []EncounterCombo {
+	var NoDebuffTarget = &proto.Target{
+		Level:   73,
+		Armor:   7700,
+		MobType: proto.MobType_MobTypeBeast,
+		Debuffs: &proto.Debuffs{},
+	}
+
+	var FullDebuffTarget = &proto.Target{
+		Level:   73,
+		Armor:   7700,
+		MobType: proto.MobType_MobTypeDemon,
+		Debuffs: debuffs,
+	}
+
+	return []EncounterCombo{
+		EncounterCombo{
+			Label: "LongSingleTargetNoDebuffs",
+			Encounter: &proto.Encounter{
+				Duration: LongDuration,
+				Targets: []*proto.Target{
+					NoDebuffTarget,
+				},
+			},
+		},
+		EncounterCombo{
+			Label: "ShortSingleTargetFullDebuffs",
+			Encounter: &proto.Encounter{
+				Duration: ShortDuration,
+				Targets: []*proto.Target{
+					FullDebuffTarget,
+				},
+			},
+		},
+		EncounterCombo{
+			Label: "LongSingleTargetFullDebuffs",
+			Encounter: &proto.Encounter{
+				Duration: LongDuration,
+				Targets: []*proto.Target{
+					FullDebuffTarget,
+				},
+			},
+		},
+		EncounterCombo{
+			Label: "LongMultiTarget",
+			Encounter: &proto.Encounter{
+				Duration: LongDuration,
+				Targets: []*proto.Target{
+					FullDebuffTarget,
+					FullDebuffTarget,
+					FullDebuffTarget,
+				},
+			},
+		},
+	}
+}
+
+func MakeSingleTargetFullDebuffEncounter(debuffs *proto.Debuffs) *proto.Encounter {
+	return &proto.Encounter{
+		Duration: LongDuration,
+		Targets: []*proto.Target{
+			&proto.Target{
+				Level:   73,
+				Armor:   7700,
+				MobType: proto.MobType_MobTypeDemon,
+				Debuffs: debuffs,
+			},
+		},
+	}
+}
+
+// Returns default encounter combos, for testing average DPS.
+// When doing average DPS tests we use a lot more iterations, so to save time
+// we test fewer encounters.
+func MakeAverageDefaultEncounterCombos(debuffs *proto.Debuffs) []EncounterCombo {
+	return []EncounterCombo{
+		EncounterCombo{
+			Label:     "LongSingleTarget",
+			Encounter: MakeSingleTargetFullDebuffEncounter(debuffs),
+		},
+	}
 }
 
 type IndividualSimInputs struct {
@@ -104,6 +192,19 @@ func IndividualSimTest(label string, t *testing.T, isr *proto.IndividualSimReque
 			log.Printf("LOGS:\n%s\n", result.Logs)
 		}
 		t.Fatalf("%s failed: expected %0f dps from sim but was %0f", label, expectedDps, result.PlayerMetrics.Dps.Avg)
+	}
+}
+
+func RaidSimTest(label string, t *testing.T, rsr *proto.RaidSimRequest, expectedDps float64) {
+	result := RunRaidSim(rsr)
+
+	tolerance := 0.5
+	if result.RaidMetrics.Dps.Avg < expectedDps-tolerance || result.RaidMetrics.Dps.Avg > expectedDps+tolerance {
+		// Automatically print output if we had debugging enabled.
+		if rsr.SimOptions.Debug {
+			log.Printf("LOGS:\n%s\n", result.Logs)
+		}
+		t.Fatalf("%s failed: expected %0f dps from sim but was %0f", label, expectedDps, result.RaidMetrics.Dps.Avg)
 	}
 }
 

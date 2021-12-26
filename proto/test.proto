@@ -1,0 +1,13 @@
+syntax = "proto3";
+package proto;
+
+option go_package = "./proto";
+
+message DpsTestResult {
+	double dps = 2;
+}
+
+message TestSuiteResult {
+	// Maps test names to their results.
+	map<string, DpsTestResult> dps_results = 1;
+}

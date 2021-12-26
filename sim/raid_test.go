@@ -1,7 +1,6 @@
 package sim
 
 import (
-	"log"
 	"testing"
 
 	"github.com/wowsims/tbc/sim/core"
@@ -102,7 +101,7 @@ func TestSparseRaid(t *testing.T) {
 		SimOptions: SimOptions,
 	}
 
-	RaidSimTest("Sparse", t, rsr, 1238.3)
+	core.RaidSimTest("Sparse", t, rsr, 1238.3)
 }
 
 func TestBasicRaid(t *testing.T) {
@@ -112,18 +111,5 @@ func TestBasicRaid(t *testing.T) {
 		SimOptions: SimOptions,
 	}
 
-	RaidSimTest("P1 ST", t, rsr, 3955.1)
-}
-
-func RaidSimTest(label string, t *testing.T, rsr *proto.RaidSimRequest, expectedDps float64) {
-	result := core.RunRaidSim(rsr)
-
-	tolerance := 0.5
-	if result.RaidMetrics.Dps.Avg < expectedDps-tolerance || result.RaidMetrics.Dps.Avg > expectedDps+tolerance {
-		// Automatically print output if we had debugging enabled.
-		if rsr.SimOptions.Debug {
-			log.Printf("LOGS:\n%s\n", result.Logs)
-		}
-		t.Fatalf("%s failed: expected %0f dps from sim but was %0f", label, expectedDps, result.RaidMetrics.Dps.Avg)
-	}
+	core.RaidSimTest("P1 ST", t, rsr, 3955.1)
 }
