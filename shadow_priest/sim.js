@@ -135,6 +135,7 @@ export class ShadowPriestSimUI extends IndividualSimUI {
                 IconInputs.DarkRune,
                 IconInputs.FlaskOfPureDeath,
                 IconInputs.FlaskOfSupremePower,
+                IconInputs.ElixirOfMajorShadowPower,
                 IconInputs.AdeptsElixir,
                 IconInputs.ElixirOfMajorMageblood,
                 IconInputs.ElixirOfDraenicWisdom,

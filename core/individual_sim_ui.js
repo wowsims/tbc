@@ -43,7 +43,7 @@ class IndividualSimIconPicker extends IconPicker {
                 tags: input.exclusivityTags,
                 changedEvent: this.changeEmitter,
                 isActive: () => Boolean(this.getInputValue()),
-                deactivate: () => this.setInputValue(0),
+                deactivate: (eventID) => this.setValue(eventID, (typeof this.getInputValue() == 'number') ? 0 : false),
             });
         }
     }
@@ -508,13 +508,17 @@ export class IndividualSimUI extends SimUI {
     registerExclusiveEffect(effect) {
         effect.tags.forEach(tag => {
             this.exclusivityMap[tag].push(effect);
-            effect.changedEvent.on(() => {
+            effect.changedEvent.on(eventID => {
                 if (!effect.isActive())
                     return;
-                this.exclusivityMap[tag].forEach(otherEffect => {
-                    if (otherEffect == effect || !otherEffect.isActive())
-                        return;
-                    otherEffect.deactivate();
+                // TODO: Mark the parent somehow so we can track this for undo/redo.
+                const newEventID = TypedEvent.nextEventID();
+                TypedEvent.freezeAllAndDo(() => {
+                    this.exclusivityMap[tag].forEach(otherEffect => {
+                        if (otherEffect == effect || !otherEffect.isActive())
+                            return;
+                        otherEffect.deactivate(newEventID);
+                    });
                 });
             });
         });

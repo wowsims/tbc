@@ -1763,6 +1763,7 @@ class Enchant$Type extends MessageType {
             { no: 1, name: "id", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 2, name: "effect_id", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 3, name: "name", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 10, name: "is_spell_id", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 4, name: "type", kind: "enum", T: () => ["proto.ItemType", ItemType] },
             { no: 9, name: "enchant_type", kind: "enum", T: () => ["proto.EnchantType", EnchantType] },
             { no: 7, name: "stats", kind: "scalar", repeat: 1 /*RepeatType.PACKED*/, T: 1 /*ScalarType.DOUBLE*/ },
@@ -1770,7 +1771,7 @@ class Enchant$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { id: 0, effectId: 0, name: "", type: 0, enchantType: 0, stats: [], quality: 0 };
+        const message = { id: 0, effectId: 0, name: "", isSpellId: false, type: 0, enchantType: 0, stats: [], quality: 0 };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -1789,6 +1790,9 @@ class Enchant$Type extends MessageType {
                     break;
                 case /* string name */ 3:
                     message.name = reader.string();
+                    break;
+                case /* bool is_spell_id */ 10:
+                    message.isSpellId = reader.bool();
                     break;
                 case /* proto.ItemType type */ 4:
                     message.type = reader.int32();
@@ -1827,6 +1831,9 @@ class Enchant$Type extends MessageType {
         /* string name = 3; */
         if (message.name !== "")
             writer.tag(3, WireType.LengthDelimited).string(message.name);
+        /* bool is_spell_id = 10; */
+        if (message.isSpellId !== false)
+            writer.tag(10, WireType.Varint).bool(message.isSpellId);
         /* proto.ItemType type = 4; */
         if (message.type !== 0)
             writer.tag(4, WireType.Varint).int32(message.type);

@@ -400,6 +400,13 @@ export interface Enchant {
      */
     name: string;
     /**
+     * If true, then id is the ID of the enchant spell instead of the formula item.
+     * This is used by enchants for which a formula doesn't exist (its taught by a trainer).
+     *
+     * @generated from protobuf field: bool is_spell_id = 10;
+     */
+    isSpellId: boolean;
+    /**
      * @generated from protobuf field: proto.ItemType type = 4;
      */
     type: ItemType;

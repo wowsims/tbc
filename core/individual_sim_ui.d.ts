@@ -126,5 +126,5 @@ export interface ExclusiveEffect {
     tags: Array<ExclusivityTag>;
     changedEvent: TypedEvent<any>;
     isActive: () => boolean;
-    deactivate: () => void;
+    deactivate: (eventID: EventID) => void;
 }

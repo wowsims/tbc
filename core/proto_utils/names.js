@@ -64,5 +64,3 @@ export const slotNames = {
     [ItemSlot.ItemSlotOffHand]: 'Off Hand',
     [ItemSlot.ItemSlotRanged]: 'Ranged',
 };
-export const enchantDescriptions = new Map();
-enchantDescriptions.set(29191, '+22 Spell Damage and 14 Spell Hit Rating');

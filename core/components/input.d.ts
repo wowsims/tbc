@@ -25,4 +25,5 @@ export declare abstract class Input<ModObject, T> extends Component {
     abstract getInputValue(): T;
     abstract setInputValue(newValue: T): void;
     inputChanged(eventID: EventID): void;
+    setValue(eventID: EventID, newValue: T): void;
 }

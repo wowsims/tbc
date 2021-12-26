@@ -60,4 +60,8 @@ export class Input extends Component {
         this.inputConfig.setValue(eventID, this.modObject, this.getInputValue());
         this.changeEmitter.emit(eventID);
     }
+    // Sets the underlying value directly.
+    setValue(eventID, newValue) {
+        this.inputConfig.setValue(eventID, this.modObject, newValue);
+    }
 }
