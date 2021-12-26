@@ -1,6 +1,7 @@
 package core
 
 import (
+	"container/heap"
 	"fmt"
 	"math/rand"
 	"sort"
@@ -25,7 +26,7 @@ type Simulation struct {
 	testRands map[uint32]*rand.Rand
 
 	// Current Simulation State
-	pendingActions []*PendingAction
+	pendingActions ActionsQueue
 	CurrentTime    time.Duration // duration that has elapsed in the sim since starting
 
 	Log  func(string, ...interface{})
@@ -113,13 +114,6 @@ func (sim *Simulation) reset() {
 	}
 }
 
-type PendingAction struct {
-	Name         string
-	OnAction     func(*Simulation)
-	CleanUp      func(*Simulation)
-	NextActionAt time.Duration
-}
-
 // Run runs the simulation for the configured number of iterations, and
 // collects all the metrics together.
 func (sim *Simulation) run() *proto.RaidSimResult {
@@ -169,7 +163,7 @@ func (sim *Simulation) run() *proto.RaidSimResult {
 func (sim *Simulation) runOnce() {
 	sim.reset()
 
-	sim.pendingActions = make([]*PendingAction, 0, 25)
+	sim.pendingActions = make([]*PendingAction, 0, 64)
 	// setup initial actions.
 	for _, party := range sim.Raid.Parties {
 		for _, agent := range party.Players {
@@ -199,8 +193,11 @@ func (sim *Simulation) runOnce() {
 	})
 
 	for true {
-		pa := sim.pendingActions[0]
+		pa := heap.Pop(&sim.pendingActions).(*PendingAction)
 		if pa.NextActionAt > sim.Duration {
+			if pa.CleanUp != nil {
+				pa.CleanUp(sim)
+			}
 			break
 		}
 
@@ -210,37 +207,10 @@ func (sim *Simulation) runOnce() {
 
 		pa.OnAction(sim)
 
-		if len(sim.pendingActions) == 1 {
-			// We know in a single user sim, just always make the next pending action ours.
-			sim.pendingActions[0] = pa
-		} else {
-			// This path is only used when there is more than one
-			//  action sitting on the list.
-			// This path is not currently used by individual shaman sim.
-			if pa.NextActionAt == NeverExpires {
-				sim.pendingActions = sim.pendingActions[1:] // cut off front
-			} else {
-				handled := false
-				for i, v := range sim.pendingActions {
-					if i == 0 {
-						continue
-					}
-					if v.NextActionAt >= pa.NextActionAt {
-						handled = true
-						if i == 1 {
-							sim.pendingActions[0] = pa
-							break // just leave it there
-						}
-						copy(sim.pendingActions, sim.pendingActions[1:i])
-						sim.pendingActions[i-1] = pa
-						break
-					}
-				}
-				if !handled {
-					copy(sim.pendingActions, sim.pendingActions[1:])
-					sim.pendingActions[len(sim.pendingActions)-1] = pa
-				}
-			}
+		if pa.NextActionAt != NeverExpires && pa.NextActionAt > sim.CurrentTime {
+			sim.AddPendingAction(pa)
+		} else if pa.CleanUp != nil {
+			pa.CleanUp(sim)
 		}
 	}
 
@@ -255,19 +225,7 @@ func (sim *Simulation) runOnce() {
 }
 
 func (sim *Simulation) AddPendingAction(pa *PendingAction) {
-	handled := false
-	for i, v := range sim.pendingActions {
-		if v.NextActionAt >= pa.NextActionAt {
-			handled = true
-			sim.pendingActions = append(sim.pendingActions, &PendingAction{})
-			copy(sim.pendingActions[i+1:], sim.pendingActions[i:])
-			sim.pendingActions[i] = pa
-			break
-		}
-	}
-	if !handled {
-		sim.pendingActions = append(sim.pendingActions, pa)
-	}
+	heap.Push(&sim.pendingActions, pa)
 }
 
 // TODO: remove pending actions
@@ -305,4 +263,34 @@ func (sim *Simulation) GetTarget(index int32) *Target {
 
 func (sim *Simulation) GetPrimaryTarget() *Target {
 	return sim.GetTarget(0)
+}
+
+type PendingAction struct {
+	Name         string
+	OnAction     func(*Simulation)
+	CleanUp      func(*Simulation)
+	NextActionAt time.Duration
+}
+
+type ActionsQueue []*PendingAction
+
+func (queue ActionsQueue) Len() int {
+	return len(queue)
+}
+func (queue ActionsQueue) Less(i, j int) bool {
+	return queue[i].NextActionAt < queue[j].NextActionAt
+}
+func (queue ActionsQueue) Swap(i, j int) {
+	queue[i], queue[j] = queue[j], queue[i]
+}
+func (queue *ActionsQueue) Push(newAction interface{}) {
+	*queue = append(*queue, newAction.(*PendingAction))
+}
+func (queue *ActionsQueue) Pop() interface{} {
+	old := *queue
+	n := len(old)
+	action := old[n-1]
+	old[n-1] = nil
+	*queue = old[0 : n-1]
+	return action
 }

@@ -102,7 +102,10 @@ func (cast *Cast) IsInUse() bool {
 // Should be called exactly once after creation.
 func (cast *Cast) init(sim *Simulation) {
 	if cast.Character == nil {
-		panic("character not set on cast")
+		panic("Character not set on cast")
+	}
+	if cast.objectInUse {
+		panic("Cast object already in use")
 	}
 	cast.objectInUse = true
 	cast.CastTime = time.Duration(float64(cast.CastTime) / cast.Character.CastSpeed())

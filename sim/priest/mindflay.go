@@ -54,14 +54,13 @@ func (priest *Priest) newMindflayTemplate(sim *core.Simulation) core.SimpleSpell
 func (priest *Priest) NewMindFlay(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
 	// Initialize cast from precomputed template.
 	mf := &priest.MindFlaySpell
-
 	priest.mindflayCastTemplate.Apply(mf)
-
-	// Channels accelerate tick speed by haste.
-	mf.DotInput.TickLength = time.Duration(float64(mf.DotInput.TickLength) / priest.CastSpeed())
 
 	// Set dynamic fields, i.e. the stuff we couldn't precompute.
 	mf.Target = target
+	// Channels accelerate tick speed by haste.
+	mf.DotInput.TickLength = time.Duration(float64(mf.DotInput.TickLength) / priest.CastSpeed())
+
 	mf.Init(sim)
 
 	return mf

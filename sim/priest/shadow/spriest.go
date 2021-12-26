@@ -176,9 +176,9 @@ func (spriest *ShadowPriest) Act(sim *core.Simulation) time.Duration {
 			switch spriest.rotation.RotationType {
 			case proto.ShadowPriest_Rotation_Ideal:
 				// PerfectMindflayRotation to modify how many mindflay ticks to perform.
-				wait = spriest.IdealMindflayRotation(sim, spell, allCDs, gcd)
+				wait = spriest.IdealMindflayRotation(sim, spell, allCDs, gcd) + 1
 			case proto.ShadowPriest_Rotation_Clipping:
-				wait = spriest.ClippingMindflayRotation(sim, spell, allCDs, gcd)
+				wait = spriest.ClippingMindflayRotation(sim, spell, allCDs, gcd) + 1
 			case proto.ShadowPriest_Rotation_Basic:
 				// just do MF3, never clipping
 				nextCD := core.NeverExpires
@@ -192,7 +192,7 @@ func (spriest *ShadowPriest) Act(sim *core.Simulation) time.Duration {
 					spell.DotInput.NumberOfTicks = 0
 					wait = nextCD + 1
 				} else {
-					wait = time.Duration(spell.DotInput.NumberOfTicks) * spell.DotInput.TickLength
+					wait = time.Duration(spell.DotInput.NumberOfTicks)*spell.DotInput.TickLength + 1
 				}
 
 			}

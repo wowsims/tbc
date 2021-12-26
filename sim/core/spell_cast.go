@@ -185,16 +185,15 @@ func (spellEffect *SpellEffect) applyDot(sim *Simulation, spellCast *SpellCast, 
 
 		ddInput.tickIndex++
 		if ddInput.tickIndex < ddInput.NumberOfTicks {
-			// add more pending
+			// Refresh pending time.
 			pa.NextActionAt = sim.CurrentTime + ddInput.TickLength
-		} else {
-			pa.CleanUp(sim)
 		}
 	}
 	pa.CleanUp = func(sim *Simulation) {
 		if pa.NextActionAt == NeverExpires {
 			panic("Already cleaned up dot")
 		}
+		pa.NextActionAt = NeverExpires
 
 		// Complete metrics and adding results etc
 		spellEffect.applyResultsToCast(spellCast)
@@ -204,9 +203,6 @@ func (spellEffect *SpellEffect) applyDot(sim *Simulation, spellCast *SpellCast, 
 		if ddInput.DebuffID != 0 && ddInput.SpellID != 0 {
 			spellEffect.Target.AddAuraUptime(ddInput.DebuffID, ddInput.SpellID, sim.CurrentTime-ddInput.startTime)
 		}
-
-		// Kills the pending action from the main run loop.
-		pa.NextActionAt = NeverExpires
 	}
 
 	sim.AddPendingAction(pa)
