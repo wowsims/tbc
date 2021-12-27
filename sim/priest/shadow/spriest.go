@@ -145,7 +145,7 @@ func (spriest *ShadowPriest) Act(sim *core.Simulation) time.Duration {
 		spriest.CurrentMana()/spriest.MaxMana() < 0.5 &&
 		spriest.GetRemainingCD(priest.ShadowfiendCD, sim.CurrentTime) == 0 {
 		spell = spriest.NewShadowfiend(sim, target)
-	} else if spriest.Talents.VampiricTouch && spriest.VTSpell.DotInput.TimeRemaining(sim) < vtCastTime {
+	} else if spriest.Talents.VampiricTouch && spriest.VTSpell.DotInput.TimeRemaining(sim) <= vtCastTime {
 		spell = spriest.NewVT(sim, target)
 	} else if !spriest.SWPSpell.DotInput.IsTicking(sim) {
 		spell = spriest.NewSWP(sim, target)
@@ -176,9 +176,9 @@ func (spriest *ShadowPriest) Act(sim *core.Simulation) time.Duration {
 			switch spriest.rotation.RotationType {
 			case proto.ShadowPriest_Rotation_Ideal:
 				// PerfectMindflayRotation to modify how many mindflay ticks to perform.
-				wait = spriest.IdealMindflayRotation(sim, spell, allCDs, gcd) + 1
+				wait = spriest.IdealMindflayRotation(sim, spell, allCDs, gcd)
 			case proto.ShadowPriest_Rotation_Clipping:
-				wait = spriest.ClippingMindflayRotation(sim, spell, allCDs, gcd) + 1
+				wait = spriest.ClippingMindflayRotation(sim, spell, allCDs, gcd)
 			case proto.ShadowPriest_Rotation_Basic:
 				// just do MF3, never clipping
 				nextCD := core.NeverExpires
@@ -190,9 +190,9 @@ func (spriest *ShadowPriest) Act(sim *core.Simulation) time.Duration {
 				// But don't start a MF if we can't get a single tick off.
 				if nextCD < gcd {
 					spell.DotInput.NumberOfTicks = 0
-					wait = nextCD + 1
+					wait = nextCD
 				} else {
-					wait = time.Duration(spell.DotInput.NumberOfTicks)*spell.DotInput.TickLength + 1
+					wait = time.Duration(spell.DotInput.NumberOfTicks) * spell.DotInput.TickLength
 				}
 
 			}

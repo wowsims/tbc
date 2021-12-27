@@ -169,7 +169,8 @@ func (sim *Simulation) runOnce() {
 		for _, agent := range party.Players {
 			ag := agent
 			pa := &PendingAction{
-				Name: "Agent",
+				Name:     "Agent",
+				Priority: -1, // Give lower priority so that dot ticks always happen before player actions.
 			}
 			pa.OnAction = func(sim *Simulation) {
 				// If char has AA enabled (a MH weapon is set), try to swing
@@ -267,6 +268,7 @@ func (sim *Simulation) GetPrimaryTarget() *Target {
 
 type PendingAction struct {
 	Name         string
+	Priority     int
 	OnAction     func(*Simulation)
 	CleanUp      func(*Simulation)
 	NextActionAt time.Duration
@@ -278,7 +280,8 @@ func (queue ActionsQueue) Len() int {
 	return len(queue)
 }
 func (queue ActionsQueue) Less(i, j int) bool {
-	return queue[i].NextActionAt <= queue[j].NextActionAt
+	return queue[i].NextActionAt < queue[j].NextActionAt ||
+		(queue[i].NextActionAt == queue[j].NextActionAt && queue[i].Priority > queue[j].Priority)
 }
 func (queue ActionsQueue) Swap(i, j int) {
 	queue[i], queue[j] = queue[j], queue[i]
