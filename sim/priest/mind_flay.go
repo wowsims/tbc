@@ -7,7 +7,7 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-const SpellIDMF int32 = 25387
+const SpellIDMindFlay int32 = 25387
 
 const TagMF2 = 2
 const TagMF3 = 3
@@ -23,7 +23,7 @@ func (priest *Priest) newMindflayTemplate(sim *core.Simulation) core.SimpleSpell
 		CastTime:       0,
 		Binary:         true,
 		ActionID: core.ActionID{
-			SpellID: SpellIDMF,
+			SpellID: SpellIDMindFlay,
 			Tag:     3, // default to 3 tick mf
 		},
 	}

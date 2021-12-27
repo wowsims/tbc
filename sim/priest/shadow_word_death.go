@@ -7,11 +7,11 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-const SpellIDSWD int32 = 32996
+const SpellIDShadowWordDeath int32 = 32996
 
 var SWDCooldownID = core.NewCooldownID()
 
-func (priest *Priest) newSWDTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
+func (priest *Priest) newShadowWordDeathTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
 	baseCast := core.Cast{
 		Name:           "Shadow Word: Death",
 		CritMultiplier: 1.5,
@@ -22,7 +22,7 @@ func (priest *Priest) newSWDTemplate(sim *core.Simulation) core.SimpleSpellTempl
 		CastTime:       0,
 		Cooldown:       time.Second * 12,
 		ActionID: core.ActionID{
-			SpellID:    SpellIDSWD,
+			SpellID:    SpellIDShadowWordDeath,
 			CooldownID: SWDCooldownID,
 		},
 	}
@@ -49,7 +49,7 @@ func (priest *Priest) newSWDTemplate(sim *core.Simulation) core.SimpleSpellTempl
 	})
 }
 
-func (priest *Priest) NewSWD(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
+func (priest *Priest) NewShadowWordDeath(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
 	// Initialize cast from precomputed template.
 	mf := &priest.swdSpell
 

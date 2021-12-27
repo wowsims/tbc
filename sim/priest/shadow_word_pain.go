@@ -11,7 +11,7 @@ const SpellIDShadowWordPain int32 = 25368
 
 var ShadowWordPainDebuffID = core.NewDebuffID()
 
-func (priest *Priest) newSWPTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
+func (priest *Priest) newShadowWordPainTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
 	baseCast := core.Cast{
 		Name:           "Shadow Word: Pain",
 		CritMultiplier: 1.5,
@@ -56,7 +56,7 @@ func (priest *Priest) newSWPTemplate(sim *core.Simulation) core.SimpleSpellTempl
 	})
 }
 
-func (priest *Priest) NewSWP(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
+func (priest *Priest) NewShadowWordPain(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
 	// Initialize cast from precomputed template.
 	mf := &priest.SWPSpell
 
