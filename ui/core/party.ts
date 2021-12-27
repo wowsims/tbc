@@ -26,7 +26,7 @@ export class Party {
   readonly buffsChangeEmitter = new TypedEvent<void>();
 
   // Emits when anything in the party changes.
-  readonly changeEmitter = new TypedEvent<void>();
+  readonly changeEmitter: TypedEvent<void>;
 
 	// Should always hold exactly MAX_PARTY_SIZE elements.
 	private players: Array<Player<any> | null>;
@@ -39,10 +39,10 @@ export class Party {
 		this.players = [...Array(MAX_PARTY_SIZE).keys()].map(i => null);
 		this.playerChangeListener = eventID => this.changeEmitter.emit(eventID);
 
-		[
+		this.changeEmitter = TypedEvent.onAny([
 			this.compChangeEmitter,
 			this.buffsChangeEmitter,
-		].forEach(emitter => emitter.on(eventID => this.changeEmitter.emit(eventID)));
+		], 'PartyChange');
   }
 
 	size(): number {

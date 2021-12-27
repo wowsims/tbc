@@ -24,7 +24,7 @@ export class Raid {
   readonly buffsChangeEmitter = new TypedEvent<void>();
 
   // Emits when anything in the raid changes.
-  readonly changeEmitter = new TypedEvent<void>();
+  readonly changeEmitter: TypedEvent<void>;
 
 	// Should always hold exactly MAX_NUM_PARTIES elements.
 	private parties: Array<Party>;
@@ -41,10 +41,10 @@ export class Raid {
 			return newParty;
 		});
 
-    [
+		this.changeEmitter = TypedEvent.onAny([
       this.compChangeEmitter,
       this.buffsChangeEmitter,
-    ].forEach(emitter => emitter.on(eventID => this.changeEmitter.emit(eventID)));
+		], 'RaidChange');
   }
 
 	size(): number {

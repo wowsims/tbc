@@ -1,3 +1,4 @@
+import { GemColor } from '/tbc/core/proto/common.js';
 import { ItemSlot } from '/tbc/core/proto/common.js';
 import { ItemSpec } from '/tbc/core/proto/common.js';
 import { EquipmentSpec } from '/tbc/core/proto/common.js';
@@ -89,4 +90,9 @@ export class Gear {
       items: this.asArray().map(ei => ei ? ei.asSpec() : ItemSpec.create()),
     });
   }
+
+	metaGemEquipped(): boolean {
+		const headItem = this.gear[ItemSlot.ItemSlotHead];
+		return headItem?.gems.some(gem => gem.color == GemColor.GemColorMeta) || false;
+	}
 }

@@ -191,6 +191,11 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 		this.individualConfig = config;
 		this.isWithinRaidSim = this.rootElem.closest('.within-raid-sim') != null;
 		this.raidSimResultsManager = null;
+		this.addWarning({
+			updateOn: this.sim.changeEmitter,
+			shouldDisplay: () => true,
+			getContent: () => 'Test Warning!',
+		});
 
     this.exclusivityMap = {
       'Battle Elixir': [],
