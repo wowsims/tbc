@@ -210,7 +210,7 @@ func RaidSimTest(label string, t *testing.T, rsr *proto.RaidSimRequest, expected
 
 func IndividualSimAverageTest(label string, t *testing.T, isr *proto.IndividualSimRequest, expectedDps float64) {
 	isr.Encounter.Duration = LongDuration
-	isr.SimOptions.Iterations = 1000
+	isr.SimOptions.Iterations = 10000
 	// isr.SimOptions.Debug = true
 
 	result := RunIndividualSim(isr)
@@ -237,7 +237,7 @@ type AllEncountersTestOptions struct {
 
 func IndividualSimAllEncountersTest(testOpts AllEncountersTestOptions) {
 	isr := NewIndividualSimRequest(testOpts.Inputs)
-	isr.SimOptions.Debug = true
+	// isr.SimOptions.Debug = true
 
 	isr.Encounter.Duration = ShortDuration
 	IndividualSimTest(
