@@ -99,6 +99,11 @@ func (cast *Cast) IsInUse() bool {
 	return cast.objectInUse
 }
 
+// Cancel will disable 'in use' so the cast can be reused. Useful if deciding not to cast.
+func (cast *Cast) Cancel() {
+	cast.objectInUse = false
+}
+
 // Should be called exactly once after creation.
 func (cast *Cast) init(sim *Simulation) {
 	if cast.Character == nil {
@@ -149,6 +154,18 @@ func (cast *Cast) startCasting(sim *Simulation, onCastComplete OnCastComplete) b
 	if cast.CastTime == 0 {
 		cast.internalOnComplete(sim, onCastComplete)
 	} else {
+		// This version is slower.
+		//pa := &cast.Character.Hardcast
+		//pa.Name = cast.Name
+		//pa.NextActionAt = sim.CurrentTime + cast.CastTime
+		//pa.OnAction = func(sim *Simulation) {
+		//	cast.internalOnComplete(sim, onCastComplete)
+		//}
+		//pa.CleanUp = func(sim *Simulation) {
+		//	cast.objectInUse = false
+		//}
+		//sim.AddPendingAction(pa)
+
 		cast.Character.Hardcast.Expires = sim.CurrentTime + cast.CastTime
 		cast.Character.Hardcast.Cast = cast
 		cast.Character.Hardcast.OnComplete = onCastComplete

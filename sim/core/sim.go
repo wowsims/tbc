@@ -183,6 +183,7 @@ func (sim *Simulation) runOnce() {
 					panic(fmt.Sprintf("Agent returned invalid time delta: %s (%s - %s)", sim.CurrentTime-dur, sim.CurrentTime, dur))
 				}
 				pa.NextActionAt = dur
+				sim.AddPendingAction(pa)
 			}
 			sim.AddPendingAction(pa)
 		}
@@ -207,12 +208,6 @@ func (sim *Simulation) runOnce() {
 		}
 
 		pa.OnAction(sim)
-
-		if pa.NextActionAt != NeverExpires && pa.NextActionAt > sim.CurrentTime {
-			sim.AddPendingAction(pa)
-		} else if pa.CleanUp != nil {
-			pa.CleanUp(sim)
-		}
 	}
 
 	for _, pa := range sim.pendingActions {

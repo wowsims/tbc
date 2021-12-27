@@ -104,12 +104,6 @@ func (druid *Druid) Init(sim *core.Simulation) {
 }
 
 func (druid *Druid) Reset(sim *core.Simulation) {
-	// Cleanup and pending dots and casts
-	druid.MoonfireSpell = core.SimpleSpell{}
-	druid.InsectSwarmSpell = core.SimpleSpell{}
-	druid.FaerieFireSpell = core.SimpleSpell{}
-	druid.starfireSpell = core.SimpleSpell{}
-	druid.wrathSpell = core.SimpleSpell{}
 	druid.RebirthUsed = false
 
 	if druid.innervateTarget != nil {

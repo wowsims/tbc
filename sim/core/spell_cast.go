@@ -185,19 +185,25 @@ func (spellEffect *SpellEffect) applyDot(sim *Simulation, spellCast *SpellCast, 
 
 		ddInput.tickIndex++
 		if ddInput.tickIndex < ddInput.NumberOfTicks {
-			// Refresh pending time.
+			// Refresh action.
 			pa.NextActionAt = sim.CurrentTime + ddInput.TickLength
+			sim.AddPendingAction(pa)
+		} else {
+			pa.CleanUp(sim)
 		}
 	}
 	pa.CleanUp = func(sim *Simulation) {
-		if pa.NextActionAt == NeverExpires {
+		if pa.NextActionAt == 0 {
 			panic("Already cleaned up dot")
 		}
-		pa.NextActionAt = NeverExpires
+		pa.NextActionAt = 0
 
 		// Complete metrics and adding results etc
 		spellEffect.applyResultsToCast(spellCast)
 		spellCast.Character.Metrics.AddSpellCast(spellCast)
+
+		// Clean up the dot object.
+		ddInput.finalTickTime = 0
 		spellCast.objectInUse = false
 
 		if ddInput.DebuffID != 0 && ddInput.SpellID != 0 {
