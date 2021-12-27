@@ -93,6 +93,8 @@ func NewTarget(options proto.Target, targetIndex int32) *Target {
 	if target.armor == 0 {
 		target.armor = 7700
 	}
+	target.calculateReduction()
+
 	if options.Level > 0 {
 		target.Level = options.Level
 	}
@@ -141,6 +143,14 @@ func (target *Target) GetMetricsProto(numIterations int32) *proto.TargetMetrics 
 func (target *Target) calculateReduction() {
 	target.armorDamageReduction = target.currentArmor / (target.currentArmor + 10557.5)
 }
+
+// if target.HasAura(SunderArmorDebuffID) {
+// 	stacks := target.auras[SunderArmorDebuffID].Stacks
+// 	armor -= float64(stacks) * 450.0
+// }
+// if target.HasAura(CurseOfRecklessnessDebuffID) {
+// 	armor -= 800
+// }
 
 func (target *Target) AddArmor(value float64) {
 	target.currentArmor += value

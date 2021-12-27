@@ -272,7 +272,6 @@ func (shaman *Shaman) Reset(sim *core.Simulation) {
 	// Reset stacks and unleashed rage auras
 	shaman.unleashedRages = shaman.unleashedRages[0:]
 	shaman.ElementalFocusStacks = 0
-	shaman.FlurryStacks = 0
 }
 
 func (shaman *Shaman) Advance(sim *core.Simulation, elapsedTime time.Duration) {
@@ -467,6 +466,7 @@ var FlurryProcAuraID = core.NewAuraID()
 
 func (shaman *Shaman) applyFlurry(level int32) {
 	shaman.AddPermanentAura(func(sim *core.Simulation) core.Aura {
+		shaman.FlurryStacks = 0 // this function is invoked on reset, so this resets the stacks.
 		icdDur := time.Millisecond * 500
 		var icd core.InternalCD
 

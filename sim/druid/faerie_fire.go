@@ -21,11 +21,15 @@ func (druid *Druid) newFaerieFireTemplate(sim *core.Simulation) core.SimpleSpell
 		SpellHitEffect: core.SpellHitEffect{
 			SpellEffect: core.SpellEffect{
 				OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+					spellEffect.Target.AddArmor(-610)
 					spellEffect.Target.AddAura(sim, core.Aura{
 						ID:      core.FaerieFireDebuffID,
 						SpellID: 26993,
 						Name:    "Faerie Fire",
 						Expires: sim.CurrentTime + time.Second*40,
+						OnExpire: func(sim *core.Simulation) {
+							spellEffect.Target.AddArmor(-610)
+						},
 						// TODO: implement increased melee hit
 					})
 				},
