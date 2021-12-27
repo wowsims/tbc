@@ -217,9 +217,7 @@ export class IndividualSimUI extends SimUI {
             setData: (eventID, player, newSavedGear) => {
                 TypedEvent.freezeAllAndDo(() => {
                     player.setGear(eventID, this.sim.lookupEquipmentSpec(newSavedGear.gear || EquipmentSpec.create()));
-                    if (newSavedGear.bonusStats) {
-                        player.setBonusStats(eventID, new Stats(newSavedGear.bonusStats || []));
-                    }
+                    player.setBonusStats(eventID, new Stats(newSavedGear.bonusStats || []));
                 });
             },
             changeEmitters: [this.player.changeEmitter],
@@ -235,8 +233,9 @@ export class IndividualSimUI extends SimUI {
                     tooltip: presetGear.tooltip,
                     isPreset: true,
                     data: SavedGearSet.create({
-                        gear: presetGear.gear,
-                        bonusStats: [],
+                        // Convert to gear and back so order is always the same.
+                        gear: this.sim.lookupEquipmentSpec(presetGear.gear).asSpec(),
+                        bonusStats: new Stats().asArray(),
                     }),
                     enableWhen: presetGear.enableWhen,
                 });
