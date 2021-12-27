@@ -1,7 +1,7 @@
 dps_results:  {
   key:  "TestAverageDPS-Tauren-P1-Adaptive-FullBuffs-LongSingleTarget"
   value:  {
-    dps:  1256.7299830439958
+    dps:  1256.6916868660896
   }
 }
 dps_results:  {
@@ -13,12 +13,12 @@ dps_results:  {
 dps_results:  {
   key:  "TestAverageDPS-Tauren-P2-Adaptive-FullBuffs-LongSingleTarget"
   value:  {
-    dps:  1424.9534034948472
+    dps:  1425.7430583581943
   }
 }
 dps_results:  {
   key:  "TestAverageDPS-Tauren-P2-Adaptive-NoBuffs-LongSingleTarget"
   value:  {
-    dps:  870.3808391702315
+    dps:  870.4120184130363
   }
 }

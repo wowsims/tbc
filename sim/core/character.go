@@ -69,6 +69,7 @@ type Character struct {
 	// Used for applying the effects of hardcast / channeled spells at a later time.
 	// By definition there can be only 1 hardcast spell being cast at any moment.
 	Hardcast Hardcast
+	//Hardcast PendingAction
 
 	// AutoAttacks is the manager for auto attack swings.
 	// Must be enabled to use "EnableAutoAttacks()"
@@ -469,6 +470,10 @@ func (character *Character) HasMetaGemEquipped(gemID int32) bool {
 }
 
 func (character *Character) doneIteration(simDuration time.Duration) {
+	if character.Hardcast.Cast != nil {
+		character.Hardcast.Cast.Cancel()
+		character.Hardcast = Hardcast{}
+	}
 	character.Metrics.doneIteration(simDuration.Seconds())
 	character.auraTracker.doneIteration(simDuration)
 }
