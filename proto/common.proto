@@ -304,7 +304,7 @@ enum MobType {
 }
 
 message Target {
-		int32 armor = 1;
+		double armor = 1;
         int32 level = 4;
 		MobType mob_type = 3;
 		Debuffs debuffs = 2;

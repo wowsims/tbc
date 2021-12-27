@@ -76,16 +76,9 @@ func (priest *Priest) Init(sim *core.Simulation) {
 }
 
 func (priest *Priest) Reset(newsim *core.Simulation) {
-	// Cleanup and pending dots and casts
-	priest.mindblastSpell = core.SimpleSpell{}
-	priest.swdSpell = core.SimpleSpell{}
-	priest.MindFlaySpell = core.SimpleSpell{}
-	priest.SWPSpell = core.SimpleSpell{}
+	// These spells still need special cleanup because they're wierd.
 	priest.VTSpell = &core.SimpleSpell{}
 	priest.VTSpellCasting = &core.SimpleSpell{}
-	priest.ShadowfiendSpell = core.SimpleSpell{}
-	priest.DevouringPlagueSpell = core.SimpleSpell{}
-	priest.StarshardsSpell = core.SimpleSpell{}
 }
 
 func (priest *Priest) Advance(sim *core.Simulation, elapsedTime time.Duration) {

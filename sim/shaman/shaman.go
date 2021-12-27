@@ -269,15 +269,7 @@ func (shaman *Shaman) Reset(sim *core.Simulation) {
 		}
 	}
 
-	// Reset all spells so any pending casts are cleaned up
-	shaman.lightningBoltSpell = core.SimpleSpell{}
-	shaman.lightningBoltSpellLO = core.SimpleSpell{}
-	shaman.chainLightningSpell = core.MultiTargetDirectDamageSpell{}
-	shaman.shockSpell = core.SimpleSpell{} // technically nothing to clean since its instant cast..
-
-	numHits := core.MinInt32(3, sim.GetNumTargets())
-	shaman.chainLightningSpellLOs = make([]core.MultiTargetDirectDamageSpell, numHits)
-
+	// Reset stacks and unleashed rage auras
 	shaman.unleashedRages = shaman.unleashedRages[0:]
 	shaman.ElementalFocusStacks = 0
 	shaman.FlurryStacks = 0
