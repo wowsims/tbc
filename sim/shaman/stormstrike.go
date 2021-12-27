@@ -13,6 +13,26 @@ var StormstrikeCD = core.NewCooldownID()
 var StormstrikeDebuffID = core.NewDebuffID()
 
 func (shaman *Shaman) newStormstrikeTemplate(sim *core.Simulation) core.MeleeAbilittyTemplate {
+
+	ssDebuffAura := core.Aura{
+		ID:     StormstrikeDebuffID,
+		Name:   "Stormstrike",
+		Stacks: 2,
+	}
+	ssDebuffAura.OnBeforeSpellHit = func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+		if spellCast.SpellSchool != stats.NatureSpellPower {
+			return
+		}
+		spellEffect.DamageMultiplier *= 1.2
+		stacks := spellEffect.Target.NumStacks(StormstrikeDebuffID) - 1
+		if stacks == 0 {
+			spellEffect.Target.RemoveAura(sim, StormstrikeDebuffID)
+		} else {
+			ssDebuffAura.Stacks = stacks
+			spellEffect.Target.ReplaceAura(sim, ssDebuffAura)
+		}
+	}
+
 	ss := core.ActiveMeleeAbility{
 		MeleeAbility: core.MeleeAbility{
 			// ID for the action.
@@ -41,21 +61,8 @@ func (shaman *Shaman) newStormstrikeTemplate(sim *core.Simulation) core.MeleeAbi
 			Offhand:  1.0,
 		},
 		OnMeleeAttack: func(sim *core.Simulation, target *core.Target, result core.MeleeHitType, ability *core.ActiveMeleeAbility, isOH bool) {
-			stacks := 2
-			target.ReplaceAura(sim, core.Aura{
-				ID:   StormstrikeDebuffID,
-				Name: "Stormstrike",
-				OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-					if spellCast.SpellSchool != stats.NatureSpellPower {
-						return
-					}
-					spellEffect.DamageMultiplier *= 1.2
-					stacks--
-					if stacks == 0 {
-						target.RemoveAura(sim, StormstrikeDebuffID)
-					}
-				},
-			})
+			ssDebuffAura.Stacks = 2
+			target.ReplaceAura(sim, ssDebuffAura)
 		},
 	}
 

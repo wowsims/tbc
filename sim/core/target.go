@@ -62,7 +62,9 @@ type Target struct {
 	// 2nd target has index 1, etc.
 	Index int32
 
-	armor float64
+	armor                float64 // base armor
+	currentArmor         float64 // current armor, can be mutated by spells
+	armorDamageReduction float64 // cached armor damage reduction
 
 	Level int32 // level of target
 
@@ -117,6 +119,9 @@ func (target *Target) finalize() {
 
 func (target *Target) Reset(sim *Simulation) {
 	target.auraTracker.reset(sim)
+	// Reset after removing any auras above
+	target.currentArmor = target.armor
+	target.calculateReduction()
 }
 
 func (target *Target) Advance(sim *Simulation, elapsedTime time.Duration) {
@@ -133,18 +138,16 @@ func (target *Target) GetMetricsProto(numIterations int32) *proto.TargetMetrics 
 	}
 }
 
+func (target *Target) calculateReduction() {
+	target.armorDamageReduction = target.currentArmor / (target.currentArmor + 10557.5)
+}
+
+func (target *Target) AddArmor(value float64) {
+	target.currentArmor += value
+	target.calculateReduction()
+}
+
 // ArmorDamageReduction currently assumes a level 70 attacker
 func (target *Target) ArmorDamageReduction() float64 {
-	armor := target.armor
-	if target.HasAura(FaerieFireDebuffID) {
-		armor -= 610
-	}
-	if target.HasAura(SunderArmorDebuffID) {
-		stacks := target.auras[SunderArmorDebuffID].Stacks
-		armor -= float64(stacks) * 450.0
-	}
-	if target.HasAura(CurseOfRecklessnessDebuffID) {
-		armor -= 800
-	}
-	return armor / (armor + 10557.5)
+	return target.armorDamageReduction
 }

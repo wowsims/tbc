@@ -33,8 +33,8 @@ func TestSimulatePhase2(t *testing.T) {
 		},
 
 		// these numbers will change while we are still implementing and fixing up enh shaman and melee
-		ExpectedDpsShort: 739.6,
-		ExpectedDpsLong:  751.9,
+		ExpectedDpsShort: 628.5,
+		ExpectedDpsLong:  525.1,
 	})
 }
 
@@ -55,5 +55,5 @@ func TestAverageDPS(t *testing.T) {
 		Target: FullDebuffTarget,
 	})
 
-	core.IndividualSimAverageTest("P2Average", t, isr, 1271.8)
+	core.IndividualSimAverageTest("P2Average", t, isr, 591.1)
 }
