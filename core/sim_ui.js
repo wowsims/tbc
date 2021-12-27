@@ -44,6 +44,16 @@ export class SimUI extends Component {
                 sim.setIterations(eventID, newValue);
             },
         });
+        const reportBug = document.createElement('span');
+        reportBug.classList.add('report-bug', 'fa', 'fa-bug');
+        tippy(reportBug, {
+            'content': 'Report a bug / request a feature',
+            'allowHTML': true,
+        });
+        reportBug.addEventListener('click', event => {
+            window.open('https://github.com/wowsims/tbc/issues/new/choose', '_blank');
+        });
+        this.addToolbarItem(reportBug);
     }
     addAction(name, cssClass, actFn) {
         const simActionsContainer = this.rootElem.getElementsByClassName('sim-sidebar-actions')[0];
