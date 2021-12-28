@@ -61,15 +61,14 @@ func (priest *Priest) AddRaidBuffs(raidBuffs *proto.RaidBuffs) {
 }
 
 func (priest *Priest) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {
-
 }
 
 func (priest *Priest) Init(sim *core.Simulation) {
 	priest.mindflayCastTemplate = priest.newMindflayTemplate(sim)
 	priest.mindblastCastTemplate = priest.newMindBlastTemplate(sim)
-	priest.swpCastTemplate = priest.newSWPTemplate(sim)
-	priest.vtCastTemplate = priest.newVTTemplate(sim)
-	priest.swdCastTemplate = priest.newSWDTemplate(sim)
+	priest.swpCastTemplate = priest.newShadowWordPainTemplate(sim)
+	priest.vtCastTemplate = priest.newVampiricTouchTemplate(sim)
+	priest.swdCastTemplate = priest.newShadowWordDeathTemplate(sim)
 	priest.shadowfiendTemplate = priest.newShadowfiendTemplate(sim)
 	priest.devouringPlagueTemplate = priest.newDevouringPlagueTemplate(sim)
 	priest.starshardsTemplate = priest.newStarshardsTemplate(sim)
@@ -84,25 +83,6 @@ func (priest *Priest) Reset(newsim *core.Simulation) {
 func (priest *Priest) Advance(sim *core.Simulation, elapsedTime time.Duration) {
 	// spriest should never be outside the 5s window, use combat regen.
 	priest.Character.RegenManaCasting(sim, elapsedTime)
-}
-
-func (priest *Priest) applyTalentsToShadowSpell(cast *core.Cast, effect *core.SpellHitEffect) {
-	if cast.ActionID.SpellID == SpellIDSWD || cast.ActionID.SpellID == SpellIDMB {
-		effect.BonusSpellCritRating += float64(priest.Talents.ShadowPower) * 3 * core.SpellCritRatingPerCritChance
-	}
-	if cast.ActionID.SpellID == SpellIDMF || cast.ActionID.SpellID == SpellIDMB {
-		cast.ManaCost -= cast.BaseManaCost * float64(priest.Talents.FocusedMind) * 0.05
-	}
-	if cast.SpellSchool == stats.ShadowSpellPower {
-		effect.StaticDamageMultiplier *= 1 + float64(priest.Talents.Darkness)*0.02
-
-		if priest.Talents.Shadowform {
-			effect.StaticDamageMultiplier *= 1.15
-		}
-
-		// shadow focus gives 2% hit per level
-		effect.BonusSpellHitRating += float64(priest.Talents.ShadowFocus) * 2 * core.SpellHitRatingPerHitChance
-	}
 }
 
 func New(char core.Character, selfBuffs SelfBuffs, talents proto.PriestTalents) Priest {
