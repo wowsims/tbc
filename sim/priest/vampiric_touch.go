@@ -11,7 +11,7 @@ const SpellIDVampiricTouch int32 = 34917
 
 var VampiricTouchDebuffID = core.NewDebuffID()
 
-func (priest *Priest) newVTTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
+func (priest *Priest) newVampiricTouchTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
 	baseCast := core.Cast{
 		Name:           "Vampiric Touch",
 		CritMultiplier: 1.5,
@@ -50,7 +50,7 @@ func (priest *Priest) newVTTemplate(sim *core.Simulation) core.SimpleSpellTempla
 	})
 }
 
-func (priest *Priest) NewVT(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
+func (priest *Priest) NewVampiricTouch(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
 	// Initialize cast from precomputed template.
 	mf := priest.VTSpellCasting
 

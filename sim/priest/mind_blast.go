@@ -7,7 +7,7 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-const SpellIDMB int32 = 25375
+const SpellIDMindBlast int32 = 25375
 
 var MBCooldownID = core.NewCooldownID()
 
@@ -22,7 +22,7 @@ func (priest *Priest) newMindBlastTemplate(sim *core.Simulation) core.SimpleSpel
 		CastTime:       time.Millisecond * 1500,
 		Cooldown:       time.Second * 8,
 		ActionID: core.ActionID{
-			SpellID:    SpellIDMB,
+			SpellID:    SpellIDMindBlast,
 			CooldownID: MBCooldownID,
 		},
 	}
