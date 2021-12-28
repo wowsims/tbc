@@ -10,7 +10,7 @@ import { ElementalShaman, ElementalShaman_Rotation as ElementalShamanRotation, E
 import { ElementalShaman_Rotation_RotationType as RotationType } from '/tbc/core/proto/shaman.js';
 
 import * as Enchants from '/tbc/core/constants/enchants.js';
-import * as Gems from '/tbc/core/constants/gems.js';
+import * as Gems from '/tbc/core/proto_utils/gems.js';
 import * as Tooltips from '/tbc/core/constants/tooltips.js';
 
 // Preset options for this spec.

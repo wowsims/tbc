@@ -20,6 +20,10 @@ import { StatWeightsResult } from '/tbc/core/proto/api.js';
 
 import { EquippedItem } from '/tbc/core/proto_utils/equipped_item.js';
 import { Gear } from '/tbc/core/proto_utils/gear.js';
+import {
+	gemEligibleForSocket,
+	gemMatchesSocket,
+} from '/tbc/core/proto_utils/gems.js';
 import { Stats } from '/tbc/core/proto_utils/stats.js';
 
 import {
@@ -31,11 +35,9 @@ import {
 	canEquipItem,
 	classColors,
 	getEligibleEnchantSlots,
-	gemEligibleForSocket,
 	getEligibleItemSlots,
 	getTalentTreeIcon,
 	getMetaGemEffectEP,
-	gemMatchesSocket,
 	raceToFaction,
 	specToClass,
 	specToEligibleRaces,
