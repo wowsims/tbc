@@ -41,9 +41,9 @@ func (priest *Priest) newShadowfiendTemplate(sim *core.Simulation) core.SimpleSp
 			TickLength:           time.Millisecond * 1500,
 			TickBaseDamage:       1191 / 10,
 			TickSpellCoefficient: 0.06,
-			OnPeriodicDamage: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect, tickDamage *float64) {
+			OnPeriodicDamage: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect, tickDamage float64) {
 				// TODO: This should also do something with ExpectedBonusMana
-				priest.AddMana(sim, *tickDamage*2.5, "Shadowfiend", false)
+				priest.AddMana(sim, tickDamage*2.5, "Shadowfiend", false)
 			},
 		},
 	}

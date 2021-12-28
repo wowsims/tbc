@@ -108,7 +108,7 @@ func ApplyTimbals(agent core.Agent) {
 		return core.Aura{
 			ID:   AugmentPainAuraID,
 			Name: "Timbal's - Augment Pain", // added Timbals to the front
-			OnPeriodicDamage: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect, tickDamage *float64) {
+			OnPeriodicDamage: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect, tickDamage float64) {
 				if icd.IsOnCD(sim) || sim.RandomFloat("timbals") > proc { // can't activate if on CD or didn't proc
 					return
 				}

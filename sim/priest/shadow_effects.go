@@ -58,9 +58,9 @@ func (priest *Priest) ApplyShadowOnHitEffects() {
 		return core.Aura{
 			ID:   ShadowWeaverAuraID,
 			Name: "Shadow Weaver",
-			OnPeriodicDamage: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect, tickDamage *float64) {
-				if *tickDamage > 0 && priest.VTSpell.DotInput.IsTicking(sim) {
-					amount := *tickDamage * 0.05
+			OnPeriodicDamage: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect, tickDamage float64) {
+				if tickDamage > 0 && priest.VTSpell.DotInput.IsTicking(sim) {
+					amount := tickDamage * 0.05
 					for _, partyMember := range priest.Party.Players {
 						partyMember.GetCharacter().AddMana(sim, amount, "Vampiric Touch", false)
 					}

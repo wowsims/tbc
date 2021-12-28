@@ -9,7 +9,7 @@ import (
 
 const SpellIDDevouringPlague int32 = 25467
 
-var DPCooldownID = core.NewCooldownID()
+var DevouringPlagueCooldownID = core.NewCooldownID()
 
 func (priest *Priest) newDevouringPlagueTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
 	baseCast := core.Cast{
@@ -23,7 +23,7 @@ func (priest *Priest) newDevouringPlagueTemplate(sim *core.Simulation) core.Simp
 		Cooldown:       time.Minute * 3,
 		ActionID: core.ActionID{
 			SpellID:    SpellIDDevouringPlague,
-			CooldownID: DPCooldownID,
+			CooldownID: DevouringPlagueCooldownID,
 		},
 	}
 

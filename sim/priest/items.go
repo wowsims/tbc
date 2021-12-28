@@ -44,7 +44,7 @@ var ItemSetAvatar = core.ItemSet{
 				return core.Aura{
 					ID:   Avatar4PcAuraID,
 					Name: "Avatar 4pc Bonus",
-					OnPeriodicDamage: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect, tickDamage *float64) {
+					OnPeriodicDamage: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect, tickDamage float64) {
 						if spellCast.ActionID.SpellID != SpellIDShadowWordPain {
 							return
 						}
