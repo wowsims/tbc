@@ -60,8 +60,8 @@ func applyDebuffEffects(target *Target, debuffs proto.Debuffs) {
 		}
 	}
 
-	if debuffs.SunderArmor > 0 {
-		target.armor -= float64(debuffs.SunderArmor) * 520.0
+	if debuffs.SunderArmor {
+		target.armor -= 5 * 520.0 // assume 5 stacks
 	}
 
 	if debuffs.CurseOfRecklessness {

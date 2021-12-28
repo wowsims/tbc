@@ -438,7 +438,7 @@ func (aa *AutoAttacks) OffhandSwingSpeed() time.Duration {
 
 // Swing will check any swing timers if they are up, and if so, swing!
 func (aa *AutoAttacks) Swing(sim *Simulation, target *Target) {
-	aa.active.Target = target
+	aa.AbilityEffect.Target = target
 	if aa.MainhandSwingAt <= sim.CurrentTime {
 		// Make a MH swing!
 		aa.active.AbilityEffect = aa.AbilityEffect
