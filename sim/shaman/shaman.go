@@ -170,6 +170,7 @@ type Shaman struct {
 	// Shocks
 	shockSpell         core.SimpleSpell
 	frostShockTemplate core.SimpleSpellTemplate
+	earthShockTemplate core.SimpleSpellTemplate
 
 	unleashedRages []core.Aura
 }
@@ -241,6 +242,7 @@ func (shaman *Shaman) Init(sim *core.Simulation) {
 		shaman.chainLightningLOCastTemplates = append(shaman.chainLightningLOCastTemplates, shaman.newChainLightningTemplate(sim, true))
 	}
 	shaman.frostShockTemplate = shaman.newFrostShockTemplate(sim)
+	shaman.earthShockTemplate = shaman.newEarthShockTemplate(sim)
 }
 
 func (shaman *Shaman) Reset(sim *core.Simulation) {
@@ -249,7 +251,11 @@ func (shaman *Shaman) Reset(sim *core.Simulation) {
 		shaman.SelfBuffs.NextTotemDrops[i] = core.NeverExpires
 		switch i {
 		case AirTotem:
-			if shaman.SelfBuffs.WrathOfAir {
+			if shaman.SelfBuffs.WrathOfAir || shaman.SelfBuffs.GraceOfAir {
+				shaman.SelfBuffs.NextTotemDrops[i] = time.Second * 120 // 2 min until drop totems
+			}
+		case EarthTotem:
+			if shaman.SelfBuffs.StrengthOfEarth {
 				shaman.SelfBuffs.NextTotemDrops[i] = time.Second * 120 // 2 min until drop totems
 			}
 		case FireTotem:
@@ -262,6 +268,10 @@ func (shaman *Shaman) Reset(sim *core.Simulation) {
 			}
 		}
 	}
+
+	// Reset stacks and unleashed rage auras
+	shaman.unleashedRages = shaman.unleashedRages[0:]
+	shaman.ElementalFocusStacks = 0
 }
 
 func (shaman *Shaman) Advance(sim *core.Simulation, elapsedTime time.Duration) {
@@ -456,6 +466,7 @@ var FlurryProcAuraID = core.NewAuraID()
 
 func (shaman *Shaman) applyFlurry(level int32) {
 	shaman.AddPermanentAura(func(sim *core.Simulation) core.Aura {
+		shaman.FlurryStacks = 0 // this function is invoked on reset, so this resets the stacks.
 		icdDur := time.Millisecond * 500
 		var icd core.InternalCD
 

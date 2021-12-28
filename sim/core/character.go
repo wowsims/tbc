@@ -344,6 +344,11 @@ func (character *Character) reset(sim *Simulation) {
 	character.auraTracker.reset(sim)
 
 	character.majorCooldownManager.reset(sim)
+
+	if character.AutoAttacks.mh != nil {
+		character.AutoAttacks = AutoAttacks{}
+		character.EnableAutoAttacks() // resets auto attack timers etc
+	}
 }
 
 // Advance moves time forward counting down auras, CDs, mana regen, etc

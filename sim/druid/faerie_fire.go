@@ -7,8 +7,6 @@ import (
 	"github.com/wowsims/tbc/sim/core/proto"
 )
 
-var FaerieFireDebuffID = core.NewDebuffID()
-
 func (druid *Druid) newFaerieFireTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
 	return core.NewSimpleSpellTemplate(core.SimpleSpell{
 		SpellCast: core.SpellCast{
@@ -23,11 +21,15 @@ func (druid *Druid) newFaerieFireTemplate(sim *core.Simulation) core.SimpleSpell
 		SpellHitEffect: core.SpellHitEffect{
 			SpellEffect: core.SpellEffect{
 				OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+					spellEffect.Target.AddArmor(-610)
 					spellEffect.Target.AddAura(sim, core.Aura{
-						ID:      FaerieFireDebuffID,
+						ID:      core.FaerieFireDebuffID,
 						SpellID: 26993,
 						Name:    "Faerie Fire",
 						Expires: sim.CurrentTime + time.Second*40,
+						OnExpire: func(sim *core.Simulation) {
+							spellEffect.Target.AddArmor(-610)
+						},
 						// TODO: implement increased melee hit
 					})
 				},
@@ -49,5 +51,5 @@ func (druid *Druid) NewFaerieFire(sim *core.Simulation, target *core.Target) *co
 }
 
 func (druid *Druid) ShouldCastFaerieFire(sim *core.Simulation, target *core.Target, rotation proto.BalanceDruid_Rotation) bool {
-	return rotation.FaerieFire && !target.HasAura(FaerieFireDebuffID)
+	return rotation.FaerieFire && !target.HasAura(core.FaerieFireDebuffID)
 }

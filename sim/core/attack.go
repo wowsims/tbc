@@ -77,9 +77,6 @@ func PerformAutoAttack(sim *Simulation, c *Character, target *Target, weapon *it
 	hit := PerformAttack(sim, c, target)
 
 	hitStr := ""
-	if isOH {
-		dmgMult *= 0.5
-	}
 	if hit == MeleeHitTypeGlance {
 		dmgMult *= 0.75
 		hitStr = "glances"
@@ -95,6 +92,7 @@ func PerformAutoAttack(sim *Simulation, c *Character, target *Target, weapon *it
 			sim.Log("Melee auto attack did not hit.")
 		}
 		c.OnMeleeAttack(sim, target, hit, nil, isOH)
+		c.Metrics.AddAutoAttack(weapon.ID, hit, 0, isOH)
 		return // no damage from a block/miss
 	}
 
@@ -104,15 +102,12 @@ func PerformAutoAttack(sim *Simulation, c *Character, target *Target, weapon *it
 		return // skip the attack
 	}
 
-	dmg := weapon.WeaponDamageMin + (weapon.WeaponDamageMax-weapon.WeaponDamageMin)*sim.RandomFloat("auto attack")
-	dmg += (weapon.SwingSpeed * c.stats[stats.AttackPower]) / MeleeAttackRatingPerDamage
-	dmg *= dmgMult
-	c.Metrics.TotalDamage += dmg
-
+	dmg := meleeDamage(sim, weapon.WeaponDamageMin, weapon.WeaponDamageMax, 0, weapon.SwingSpeed, isOH, dmgMult, c.stats[stats.AttackPower], target.ArmorDamageReduction())
 	if sim.Log != nil {
 		sim.Log("Melee auto attack %s for %0.1f", hitStr, dmg)
 	}
 	c.OnMeleeAttack(sim, target, hit, nil, isOH)
+	c.Metrics.AddAutoAttack(weapon.ID, hit, dmg, isOH)
 }
 
 type MeleeHitType byte
@@ -196,13 +191,13 @@ func PerformAttack(sim *Simulation, c *Character, target *Target) MeleeHitType {
 type ActiveMeleeAbility struct {
 	MeleeAbility
 
-	Hits               int32
-	Misses             int32
-	Crits              int32
-	PartialResists_1_4 int32   // 1/4 of the spell was resisted
-	PartialResists_2_4 int32   // 2/4 of the spell was resisted
-	PartialResists_3_4 int32   // 3/4 of the spell was resisted
-	TotalDamage        float64 // Damage done by this cast.
+	OnMeleeAttack OnMeleeAttack
+
+	Result      MeleeHitType // Hit roll result
+	Hits        int32
+	Misses      int32
+	Crits       int32
+	TotalDamage float64 // Damage done by this cast.
 
 	DirectDamageInput
 	WeaponDamageInput
@@ -220,99 +215,132 @@ type WeaponDamageInput struct {
 // Attack will perform the attack
 //  Returns false if unable to attack (due to resource lacking)
 // TODO: add AbilityResult data to action metrics.
-func (ama *ActiveMeleeAbility) Attack(sim *Simulation) bool {
-	if ama.MeleeAbility.Cost.Type != 0 {
-		if ama.Character.stats[ama.MeleeAbility.Cost.Type] < ama.MeleeAbility.Cost.Value {
+func (ability *ActiveMeleeAbility) Attack(sim *Simulation) bool {
+	result := ability.performAttack(sim)
+	if result {
+		ability.Character.Metrics.AddMeleeAbility(ability)
+	}
+	return result
+}
+
+func (ability *ActiveMeleeAbility) performAttack(sim *Simulation) bool {
+	if ability.MeleeAbility.Cost.Type != 0 {
+		if ability.Character.stats[ability.MeleeAbility.Cost.Type] < ability.MeleeAbility.Cost.Value {
 			return false
 		}
-		if ama.MeleeAbility.Cost.Type == stats.Mana {
-			ama.Character.SpendMana(sim, ama.MeleeAbility.Cost.Value, ama.MeleeAbility.Name)
+		if ability.MeleeAbility.Cost.Type == stats.Mana {
+			ability.Character.SpendMana(sim, ability.MeleeAbility.Cost.Value, ability.MeleeAbility.Name)
 		} else {
-			ama.Character.AddStat(ama.MeleeAbility.Cost.Type, -ama.MeleeAbility.Cost.Value)
+			ability.Character.AddStat(ability.MeleeAbility.Cost.Type, -ability.MeleeAbility.Cost.Value)
 		}
 	}
 
 	// Goes on CD on use
-	if ama.ActionID.CooldownID != 0 {
-		ama.Character.SetCD(ama.ActionID.CooldownID, sim.CurrentTime+ama.Cooldown)
+	if ability.ActionID.CooldownID != 0 {
+		ability.Character.SetCD(ability.ActionID.CooldownID, sim.CurrentTime+ability.Cooldown)
 	}
 
 	// 1. Attack Roll
-	hit := PerformAttack(sim, ama.Character, ama.Target)
-	ama.Result = hit
+	hit := PerformAttack(sim, ability.Character, ability.Target)
+	ability.Result = hit
 	if hit != MeleeHitTypeCrit && hit != MeleeHitTypeGlance && hit != MeleeHitTypeHit {
 		// TODO: add metrics
 		if sim.Log != nil {
-			sim.Log("%s did not hit.", ama.Name)
+			sim.Log("%s did not hit.", ability.Name)
+		}
+		if ability.WeaponDamageInput.MainHand > 0 {
+			ability.Misses++
+		}
+		if ability.WeaponDamageInput.Offhand > 0 {
+			ability.Misses++
+		}
+		if ability.DirectDamageInput.FlatDamageBonus > 0 {
+			ability.Misses++
 		}
 		// Not sure MH/OH Matters for an attack
-		ama.Character.OnMeleeAttack(sim, ama.Target, hit, ama, false)
-		return true
+		ability.Character.OnMeleeAttack(sim, ability.Target, hit, ability, false)
 	}
 
-	c := ama.Character
-
-	if ama.DirectDamageInput.FlatDamageBonus > 0 || ama.DirectDamageInput.MinBaseDamage > 0 {
-		// Do a 'direct damage' if ability has it
-		dmg := ama.DirectDamageInput.MinBaseDamage + (ama.DirectDamageInput.MaxBaseDamage-ama.DirectDamageInput.MinBaseDamage)*sim.RandomFloat("melee direct damage") + ama.DirectDamageInput.FlatDamageBonus
-		c.Metrics.TotalDamage += dmg
-		if sim.Log != nil {
-			sim.Log("%s for %0.1f", ama.Name, dmg)
-		}
-	}
-
-	// Only calculate attack if there is a weapon swing involved.
-	if ama.WeaponDamageInput.MainHand == 0 && ama.WeaponDamageInput.Offhand == 0 {
-		return true
-	}
-
+	c := ability.Character
 	skill := 350.0
-	level := float64(ama.Target.Level)
+	level := float64(ability.Target.Level)
 	critReduction := (level - 70*0.01) + 0.018
 	critChance := c.stats[stats.MeleeCrit]/(MeleeCritRatingPerCritChance*100) + (skill - (level*5)*0.002) - critReduction
-	roll := sim.RandomFloat("weapon swing")
-	if ama.WeaponDamageInput.MainHand > 0 {
-		weapon := c.Equip[proto.ItemSlot_ItemSlotMainHand]
-		speed := ama.NormalizeWeaponSpeed
-		if speed == 0 {
-			speed = weapon.SwingSpeed
-		}
-		dmgMult := ama.WeaponDamageInput.MainHand
-		if roll < critChance {
-			dmgMult *= 2.0
-		}
-		dmg := weapon.WeaponDamageMin + (weapon.WeaponDamageMax-weapon.WeaponDamageMin)*sim.RandomFloat("auto attack")
-		dmg += (speed * c.stats[stats.AttackPower]) / MeleeAttackRatingPerDamage
-		dmg *= dmgMult
-		dmg += ama.WeaponDamageInput.MainHandFlat
-		c.Metrics.TotalDamage += dmg
-		if sim.Log != nil {
-			sim.Log("%s mainhand for %0.1f", ama.Name, dmg)
-		}
-		c.OnMeleeAttack(sim, ama.Target, ama.Result, ama, false)
+
+	if ability.DirectDamageInput.FlatDamageBonus > 0 || ability.DirectDamageInput.MinBaseDamage > 0 {
+		ability.applyFlatDamage(sim, critChance)
 	}
 
-	if weapon := c.Equip[proto.ItemSlot_ItemSlotOffHand]; ama.WeaponDamageInput.Offhand > 0 && weapon.ID > 0 { // only attack if we have it
-		speed := ama.NormalizeWeaponSpeed
-		if speed == 0 {
-			speed = weapon.SwingSpeed
-		}
-		dmgMult := ama.WeaponDamageInput.Offhand * 0.5
-		if roll < critChance {
-			dmgMult *= 2.0
-		}
-		dmg := weapon.WeaponDamageMin + (weapon.WeaponDamageMax-weapon.WeaponDamageMin)*sim.RandomFloat("auto attack")
-		dmg += (speed * c.stats[stats.AttackPower]) / MeleeAttackRatingPerDamage
-		dmg *= dmgMult
-		dmg += ama.WeaponDamageInput.OffhandFlat
-		c.Metrics.TotalDamage += dmg
-		if sim.Log != nil {
-			sim.Log("%s offhand for %0.1f", ama.Name, dmg)
-		}
-		c.OnMeleeAttack(sim, ama.Target, ama.Result, ama, true)
+	if ability.WeaponDamageInput.MainHand > 0 {
+		ability.applySwingDamage(sim, proto.ItemSlot_ItemSlotMainHand, ability.WeaponDamageInput.MainHand, critChance)
+	}
+
+	if weapon := c.Equip[proto.ItemSlot_ItemSlotOffHand]; ability.WeaponDamageInput.Offhand > 0 && weapon.ID > 0 { // only attack if we have it
+		ability.applySwingDamage(sim, proto.ItemSlot_ItemSlotOffHand, ability.WeaponDamageInput.Offhand, critChance)
 	}
 
 	return true
+}
+
+func (ability *ActiveMeleeAbility) applySwingDamage(sim *Simulation, slot proto.ItemSlot, dmgMult, critChance float64) {
+	roll := sim.RandomFloat("weapon swing")
+	hit := MeleeHitTypeHit
+	if roll < critChance {
+		hit = MeleeHitTypeCrit
+		dmgMult *= 2
+		ability.Crits++
+	}
+	char := ability.Character // just to shorten usage.
+
+	weapon := ability.Character.Equip[slot]
+	speed := ability.NormalizeWeaponSpeed
+	if speed == 0 {
+		speed = weapon.SwingSpeed
+	}
+	dmg := meleeDamage(sim, weapon.WeaponDamageMin, weapon.WeaponDamageMax, ability.WeaponDamageInput.MainHandFlat, speed, false, ability.WeaponDamageInput.MainHand, char.stats[stats.AttackPower], ability.Target.ArmorDamageReduction())
+	if sim.Log != nil {
+		sim.Log("%s mainhand for %0.1f", ability.Name, dmg)
+	}
+	if ability.OnMeleeAttack != nil {
+		ability.OnMeleeAttack(sim, ability.Target, hit, ability, false)
+	}
+	char.OnMeleeAttack(sim, ability.Target, ability.Result, ability, false)
+	ability.Hits++
+	ability.TotalDamage += dmg
+}
+
+func (ability *ActiveMeleeAbility) applyFlatDamage(sim *Simulation, critChance float64) {
+	roll := sim.RandomFloat("weapon swing")
+	hit := MeleeHitTypeHit
+	dmgMult := 1.0
+	if roll < critChance {
+		hit = MeleeHitTypeCrit
+		dmgMult = 2.0
+		ability.Crits++
+	}
+
+	// Do a 'direct damage' if ability has it
+	dmg := ability.DirectDamageInput.MinBaseDamage + (ability.DirectDamageInput.MaxBaseDamage-ability.DirectDamageInput.MinBaseDamage)*sim.RandomFloat("melee direct damage") + ability.DirectDamageInput.FlatDamageBonus
+	ability.TotalDamage += dmg * dmgMult
+	ability.Hits++
+	if hit == MeleeHitTypeCrit {
+		ability.Crits++
+	}
+	if sim.Log != nil {
+		sim.Log("%s for %0.1f", ability.Name, dmg)
+	}
+}
+
+func meleeDamage(sim *Simulation, weaponMin, weaponMax, flatBonus, speed float64, offhand bool, multiplier float64, attackPower float64, damageReduction float64) float64 {
+	if offhand {
+		multiplier *= 0.5
+	}
+	dmg := weaponMin + (weaponMax-weaponMin)*sim.RandomFloat("melee")
+	dmg += (speed * attackPower) / MeleeAttackRatingPerDamage
+	dmg *= multiplier
+	dmg += flatBonus
+	dmg *= 1 - damageReduction
+	return dmg
 }
 
 type AbilityEffect struct {
@@ -331,10 +359,6 @@ type AbilityEffect struct {
 	//  Only use multipliers that don't change for the lifetime of the sim.
 	//  This should probably only be mutated in a template and not changed in auras.
 	StaticDamageMultiplier float64
-
-	// Results:
-	Result MeleeHitType
-	Damage float64 // Damage done by this ability
 }
 
 func NewAutoAttacks(c *Character) AutoAttacks {

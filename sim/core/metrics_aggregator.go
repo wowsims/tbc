@@ -153,6 +153,52 @@ func (characterMetrics *CharacterMetrics) AddSpellCast(spellCast *SpellCast) {
 	characterMetrics.actions[actionKey] = actionMetrics
 }
 
+// Adds the results of a melee action to the aggregated metrics.
+func (characterMetrics *CharacterMetrics) AddAutoAttack(itemID int32, result MeleeHitType, dmg float64, isOH bool) {
+	var tag int32 = 10
+	if isOH {
+		tag = 11
+	}
+	actionID := ActionID{ItemID: itemID, Tag: tag}
+	actionKey := NewActionKey(actionID)
+	actionMetrics, ok := characterMetrics.actions[actionKey]
+	if !ok {
+		actionMetrics.ActionID = actionID
+	}
+	actionMetrics.Casts++
+	if result == MeleeHitTypeBlock || result == MeleeHitTypeMiss || result == MeleeHitTypeParry || result == MeleeHitTypeDodge {
+		actionMetrics.Misses++
+	} else {
+		actionMetrics.Hits++
+		if result == MeleeHitTypeCrit {
+			actionMetrics.Crits++
+		}
+	}
+	actionMetrics.Damage += dmg
+	characterMetrics.TotalDamage += dmg
+	characterMetrics.actions[actionKey] = actionMetrics
+}
+
+// Adds the results of a melee action to the aggregated metrics.
+func (characterMetrics *CharacterMetrics) AddMeleeAbility(ability *ActiveMeleeAbility) {
+	actionID := ability.ActionID
+	actionKey := NewActionKey(actionID)
+	actionMetrics, ok := characterMetrics.actions[actionKey]
+
+	if !ok {
+		actionMetrics.ActionID = actionID
+	}
+
+	actionMetrics.Casts++
+	actionMetrics.Hits += ability.Hits
+	actionMetrics.Misses += ability.Misses
+	actionMetrics.Crits += ability.Crits
+	actionMetrics.Damage += ability.TotalDamage
+	characterMetrics.TotalDamage += ability.TotalDamage
+
+	characterMetrics.actions[actionKey] = actionMetrics
+}
+
 func (characterMetrics *CharacterMetrics) MarkOOM(sim *Simulation, character *Character, dur time.Duration) {
 	characterMetrics.CharacterIterationMetrics.OOMTime += dur
 	characterMetrics.CharacterIterationMetrics.WentOOM = true

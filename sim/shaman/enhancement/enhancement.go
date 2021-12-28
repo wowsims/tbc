@@ -32,6 +32,7 @@ func NewEnhancementShaman(character core.Character, options proto.Player) *Enhan
 	if enhOptions.Rotation.Totems != nil {
 		selfBuffs.StrengthOfEarth = enhOptions.Rotation.Totems.Earth == proto.EarthTotem_StrengthOfEarthTotem
 		selfBuffs.GraceOfAir = enhOptions.Rotation.Totems.Air == proto.AirTotem_GraceOfAirTotem
+		selfBuffs.ManaSpring = enhOptions.Rotation.Totems.Water == proto.WaterTotem_ManaSpringTotem
 	}
 	enh := &EnhancementShaman{
 		Shaman: shaman.NewShaman(character, *enhOptions.Talents, selfBuffs),
@@ -72,7 +73,7 @@ func (enh *EnhancementShaman) Act(sim *core.Simulation) time.Duration {
 		ss.Attack(sim)
 		return sim.CurrentTime + enh.AutoAttacks.TimeUntil(sim, nil, ss, 0)
 	} else if enh.GetRemainingCD(shaman.ShockCooldownID, sim.CurrentTime) == 0 {
-		shock := enh.NewFrostShock(sim, sim.GetPrimaryTarget())
+		shock := enh.NewEarthShock(sim, sim.GetPrimaryTarget())
 		shock.Cast(sim)
 		return sim.CurrentTime + enh.AutoAttacks.TimeUntil(sim, shock, nil, 0)
 	}

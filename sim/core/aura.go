@@ -538,7 +538,11 @@ func (character *Character) AddAuraWithTemporaryStats(sim *Simulation, auraID Au
 	if sim.Log != nil {
 		character.Log(sim, "Gained %0.0f %s from %s.", amount, stat.StatName(), auraName)
 	}
-	character.AddStat(stat, amount)
+	if stat == stats.MeleeHaste {
+		character.AddMeleeHaste(sim, amount)
+	} else {
+		character.AddStat(stat, amount)
+	}
 
 	character.AddAura(sim, Aura{
 		ID:      auraID,
@@ -549,7 +553,11 @@ func (character *Character) AddAuraWithTemporaryStats(sim *Simulation, auraID Au
 			if sim.Log != nil {
 				character.Log(sim, "Lost %0.0f %s from fading %s.", amount, stat.StatName(), auraName)
 			}
-			character.AddStat(stat, -amount)
+			if stat == stats.MeleeHaste {
+				character.AddMeleeHaste(sim, -amount)
+			} else {
+				character.AddStat(stat, -amount)
+			}
 		},
 	})
 }

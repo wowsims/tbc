@@ -18,8 +18,27 @@ const MeleeCategory = proto.ItemCategory_ItemCategoryMelee
 
 // Keep these sorted alphabetically by item Name.
 var ItemDeclarations = []ItemDeclaration{
+	// Melee
+	{ /** Band of the Ranger-General */ ID: 29997, Categories: []proto.ItemCategory{MeleeCategory}},
+	{ /** Bloodlust Brooch */ ID: 29383, Categories: []proto.ItemCategory{MeleeCategory}},
+	{ /** Boots of Utter Darkness */ ID: 30039, Categories: []proto.ItemCategory{MeleeCategory}},
+	{ /** Belt of One-Hundred Deaths */ ID: 30106, Categories: []proto.ItemCategory{MeleeCategory}},
+	{ /** Cataclysm Chestplate */ ID: 30185, Categories: []proto.ItemCategory{MeleeCategory}},
+	{ /** Cataclysm Gauntlets */ ID: 30189, Categories: []proto.ItemCategory{MeleeCategory}},
+	{ /** Cataclysm Helm */ ID: 30190, Categories: []proto.ItemCategory{MeleeCategory}},
+	{ /** Cataclysm Legplates */ ID: 30192, Categories: []proto.ItemCategory{MeleeCategory}},
+	{ /** Dragonspine Trophy */ ID: 28830, Categories: []proto.ItemCategory{MeleeCategory}},
 	{ /** Gladiators Cleaver */ ID: 28308, Categories: []proto.ItemCategory{MeleeCategory}},
+	{ /** Ring of Lethality */ ID: 30052, Categories: []proto.ItemCategory{MeleeCategory}},
+	{ /** Rod of the Sun King */ ID: 29996, Categories: []proto.ItemCategory{MeleeCategory}},
+	{ /** Shoulderpads of the Stranger */ ID: 30055, Categories: []proto.ItemCategory{MeleeCategory}},
+	{ /** Talon of the Phoenix */ ID: 32944, Categories: []proto.ItemCategory{MeleeCategory}},
+	{ /** Totem of the Astral Winds */ ID: 27815, Categories: []proto.ItemCategory{MeleeCategory}},
+	{ /** True-Aim Stalker Bands */ ID: 30091, Categories: []proto.ItemCategory{MeleeCategory}},
+	{ /** Thalassian Wildercloak */ ID: 29994, Categories: []proto.ItemCategory{MeleeCategory}},
+	{ /** Telonicus's Pendant of Mayhem */ ID: 30017, Categories: []proto.ItemCategory{MeleeCategory}},
 
+	// Caster
 	{ /** A'dal's Gift */ ID: 31461, Categories: []proto.ItemCategory{CasterCategory}},
 	{ /** Adornment of Stolen Souls */ ID: 28762, Categories: []proto.ItemCategory{CasterCategory}},
 	{ /** Amani Punisher */ ID: 33283, Categories: []proto.ItemCategory{CasterCategory}},
