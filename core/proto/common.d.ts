@@ -253,7 +253,7 @@ export interface Debuffs {
  */
 export interface Target {
     /**
-     * @generated from protobuf field: int32 armor = 1;
+     * @generated from protobuf field: double armor = 1;
      */
     armor: number;
     /**

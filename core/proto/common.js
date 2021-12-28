@@ -1330,7 +1330,7 @@ export const Debuffs = new Debuffs$Type();
 class Target$Type extends MessageType {
     constructor() {
         super("proto.Target", [
-            { no: 1, name: "armor", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 1, name: "armor", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
             { no: 4, name: "level", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 3, name: "mob_type", kind: "enum", T: () => ["proto.MobType", MobType] },
             { no: 2, name: "debuffs", kind: "message", T: () => Debuffs }
@@ -1348,8 +1348,8 @@ class Target$Type extends MessageType {
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
-                case /* int32 armor */ 1:
-                    message.armor = reader.int32();
+                case /* double armor */ 1:
+                    message.armor = reader.double();
                     break;
                 case /* int32 level */ 4:
                     message.level = reader.int32();
@@ -1372,9 +1372,9 @@ class Target$Type extends MessageType {
         return message;
     }
     internalBinaryWrite(message, writer, options) {
-        /* int32 armor = 1; */
+        /* double armor = 1; */
         if (message.armor !== 0)
-            writer.tag(1, WireType.Varint).int32(message.armor);
+            writer.tag(1, WireType.Bit64).double(message.armor);
         /* int32 level = 4; */
         if (message.level !== 0)
             writer.tag(4, WireType.Varint).int32(message.level);
