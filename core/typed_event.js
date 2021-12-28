@@ -98,6 +98,11 @@ export class TypedEvent {
     static nextEventID() {
         return nextEventID++;
     }
+    static onAny(events, label) {
+        const newEvent = new TypedEvent(label);
+        events.forEach(emitter => emitter.on(eventID => newEvent.emit(eventID)));
+        return newEvent;
+    }
 }
 // If this is > 0 then events are frozen.
 let freezeCount = 0;

@@ -9,7 +9,6 @@ import { ArmorType } from '/tbc/core/proto/common.js';
 import { Class } from '/tbc/core/proto/common.js';
 import { Enchant } from '/tbc/core/proto/common.js';
 import { EnchantType } from '/tbc/core/proto/common.js';
-import { GemColor } from '/tbc/core/proto/common.js';
 import { HandType } from '/tbc/core/proto/common.js';
 import { ItemCategory } from '/tbc/core/proto/common.js';
 import { ItemSlot } from '/tbc/core/proto/common.js';
@@ -24,7 +23,7 @@ import { WeaponType } from '/tbc/core/proto/common.js';
 import { Blessings } from '/tbc/core/proto/ui.js';
 import { BlessingsAssignment } from '/tbc/core/proto/ui.js';
 import { BlessingsAssignments } from '/tbc/core/proto/ui.js';
-import * as Gems from '/tbc/core/constants/gems.js';
+import * as Gems from '/tbc/core/proto_utils/gems.js';
 import { BalanceDruid, BalanceDruid_Rotation as BalanceDruidRotation, DruidTalents, BalanceDruid_Options as BalanceDruidOptions } from '/tbc/core/proto/druid.js';
 import { ElementalShaman, EnhancementShaman_Rotation as EnhancementShamanRotation, ElementalShaman_Rotation as ElementalShamanRotation, ShamanTalents, ElementalShaman_Options as ElementalShamanOptions, EnhancementShaman_Options as EnhancementShamanOptions, EnhancementShaman } from '/tbc/core/proto/shaman.js';
 import { Hunter, Hunter_Rotation as HunterRotation, HunterTalents, Hunter_Options as HunterOptions } from '/tbc/core/proto/hunter.js';
@@ -958,19 +957,6 @@ export function enchantAppliesToItem(enchant, item) {
     return true;
 }
 ;
-const socketToMatchingColors = new Map();
-socketToMatchingColors.set(GemColor.GemColorMeta, [GemColor.GemColorMeta]);
-socketToMatchingColors.set(GemColor.GemColorBlue, [GemColor.GemColorBlue, GemColor.GemColorPurple, GemColor.GemColorGreen]);
-socketToMatchingColors.set(GemColor.GemColorRed, [GemColor.GemColorRed, GemColor.GemColorPurple, GemColor.GemColorOrange]);
-socketToMatchingColors.set(GemColor.GemColorYellow, [GemColor.GemColorYellow, GemColor.GemColorOrange, GemColor.GemColorGreen]);
-// Whether the gem matches the given socket color, for the purposes of gaining the socket bonuses.
-export function gemMatchesSocket(gem, socketColor) {
-    return socketToMatchingColors.has(socketColor) && socketToMatchingColors.get(socketColor).includes(gem.color);
-}
-// Whether the gem is capable of slotting into a socket of the given color.
-export function gemEligibleForSocket(gem, socketColor) {
-    return (gem.color == GemColor.GemColorMeta) == (socketColor == GemColor.GemColorMeta);
-}
 export const NO_TARGET = -1;
 export function newRaidTarget(raidIndex) {
     return RaidTarget.create({

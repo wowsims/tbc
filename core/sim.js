@@ -7,10 +7,10 @@ import { StatWeightsRequest, StatWeightsResult } from '/tbc/core/proto/api.js';
 import { EquippedItem } from '/tbc/core/proto_utils/equipped_item.js';
 import { Gear } from '/tbc/core/proto_utils/gear.js';
 import { SimResult } from '/tbc/core/proto_utils/sim_result.js';
+import { gemEligibleForSocket } from '/tbc/core/proto_utils/gems.js';
+import { gemMatchesSocket } from '/tbc/core/proto_utils/gems.js';
 import { getEligibleItemSlots } from '/tbc/core/proto_utils/utils.js';
 import { getEligibleEnchantSlots } from '/tbc/core/proto_utils/utils.js';
-import { gemEligibleForSocket } from '/tbc/core/proto_utils/utils.js';
-import { gemMatchesSocket } from '/tbc/core/proto_utils/utils.js';
 import { Encounter } from './encounter.js';
 import { Raid } from './raid.js';
 import { TypedEvent } from './typed_event.js';
@@ -27,8 +27,6 @@ export class Sim {
         this.gems = {};
         this.iterationsChangeEmitter = new TypedEvent();
         this.phaseChangeEmitter = new TypedEvent();
-        // Emits when any of the above emitters emit.
-        this.changeEmitter = new TypedEvent();
         // Fires when a raid sim API call completes.
         this.simResultEmitter = new TypedEvent();
         // These callbacks are needed so we can apply BuffBot modifications automatically before sending requests.
@@ -42,12 +40,12 @@ export class Sim {
         });
         this.raid = new Raid(this);
         this.encounter = new Encounter(this);
-        [
+        this.changeEmitter = TypedEvent.onAny([
             this.iterationsChangeEmitter,
             this.phaseChangeEmitter,
             this.raid.changeEmitter,
             this.encounter.changeEmitter,
-        ].forEach(emitter => emitter.on(eventID => this.changeEmitter.emit(eventID)));
+        ]);
         this.raid.changeEmitter.on(eventID => this.updateCharacterStats(eventID));
     }
     waitForInit() {
@@ -56,17 +54,35 @@ export class Sim {
     setModifyRaidProto(newModFn) {
         this.modifyRaidProto = newModFn;
     }
+    getModifiedRaidProto() {
+        const raidProto = this.raid.toProto();
+        this.modifyRaidProto(raidProto);
+        // Remove any inactive meta gems, since the backend doesn't have its own validation.
+        raidProto.parties.forEach(party => {
+            party.players.forEach(player => {
+                if (!player.equipment) {
+                    return;
+                }
+                const gear = this.lookupEquipmentSpec(player.equipment);
+                if (gear.hasInactiveMetaGem()) {
+                    player.equipment = gear.withoutMetaGem().asSpec();
+                }
+            });
+        });
+        return raidProto;
+    }
     setModifyEncounterProto(newModFn) {
         this.modifyEncounterProto = newModFn;
     }
-    makeRaidSimRequest(debug) {
-        const raidProto = this.raid.toProto();
+    getModifiedEncounterProto() {
         const encounterProto = this.encounter.toProto();
-        this.modifyRaidProto(raidProto);
         this.modifyEncounterProto(encounterProto);
+        return encounterProto;
+    }
+    makeRaidSimRequest(debug) {
         return RaidSimRequest.create({
-            raid: raidProto,
-            encounter: encounterProto,
+            raid: this.getModifiedRaidProto(),
+            encounter: this.getModifiedEncounterProto(),
             simOptions: SimOptions.create({
                 iterations: debug ? 1 : this.getIterations(),
                 debug: debug,
@@ -107,10 +123,8 @@ export class Sim {
         // Capture the current players so we avoid issues if something changes while
         // request is in-flight.
         const players = this.raid.getPlayers();
-        const raidProto = this.raid.toProto();
-        this.modifyRaidProto(raidProto);
         const result = await this.workerPool.computeStats(ComputeStatsRequest.create({
-            raid: raidProto,
+            raid: this.getModifiedRaidProto(),
         }));
         TypedEvent.freezeAllAndDo(() => {
             result.raidStats.parties

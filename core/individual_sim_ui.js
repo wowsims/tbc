@@ -21,6 +21,7 @@ import { SavedGearSet } from '/tbc/core/proto/ui.js';
 import { SavedSettings } from '/tbc/core/proto/ui.js';
 import { SavedTalents } from '/tbc/core/proto/ui.js';
 import { SimUI } from './sim_ui.js';
+import { getMetaGemConditionDescription } from '/tbc/core/proto_utils/gems.js';
 import { Stats } from '/tbc/core/proto_utils/stats.js';
 import { TypedEvent } from './typed_event.js';
 import { addRaidSimAction } from '/tbc/core/components/raid_sim_action.js';
@@ -60,6 +61,14 @@ export class IndividualSimUI extends SimUI {
         this.individualConfig = config;
         this.isWithinRaidSim = this.rootElem.closest('.within-raid-sim') != null;
         this.raidSimResultsManager = null;
+        this.addWarning({
+            updateOn: this.player.gearChangeEmitter,
+            shouldDisplay: () => this.player.getGear().hasInactiveMetaGem(),
+            getContent: () => {
+                const metaGem = this.player.getGear().getMetaGem();
+                return `Meta gem disabled (${metaGem.name}): ${getMetaGemConditionDescription(metaGem)}`;
+            },
+        });
         this.exclusivityMap = {
             'Battle Elixir': [],
             'Drums': [],

@@ -12,8 +12,6 @@ export class Raid {
         // Emits when a raid member is added/removed/moved.
         this.compChangeEmitter = new TypedEvent();
         this.buffsChangeEmitter = new TypedEvent();
-        // Emits when anything in the raid changes.
-        this.changeEmitter = new TypedEvent();
         this.sim = sim;
         this.parties = [...Array(MAX_NUM_PARTIES).keys()].map(i => {
             const newParty = new Party(this, sim);
@@ -21,10 +19,10 @@ export class Raid {
             newParty.changeEmitter.on(eventID => this.changeEmitter.emit(eventID));
             return newParty;
         });
-        [
+        this.changeEmitter = TypedEvent.onAny([
             this.compChangeEmitter,
             this.buffsChangeEmitter,
-        ].forEach(emitter => emitter.on(eventID => this.changeEmitter.emit(eventID)));
+        ], 'RaidChange');
     }
     size() {
         return sum(this.parties.map(party => party.size()));

@@ -1457,6 +1457,13 @@ td, th {
   cursor: pointer;
 }
 
+.warnings {
+  font-size: 30px;
+  color: yellow;
+  margin: 0 20px;
+  text-shadow: 0 0 10px red, 0 0 10px red, 0 0 10px red;
+}
+
 .known-issues {
   display: none;
   background-color: red;

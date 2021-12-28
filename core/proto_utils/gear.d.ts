@@ -1,3 +1,5 @@
+import { Gem } from '/tbc/core/proto/common.js';
+import { GemColor } from '/tbc/core/proto/common.js';
 import { ItemSlot } from '/tbc/core/proto/common.js';
 import { EquipmentSpec } from '/tbc/core/proto/common.js';
 import { EquippedItem } from './equipped_item.js';
@@ -20,5 +22,11 @@ export declare class Gear {
     getEquippedItem(slot: ItemSlot): EquippedItem | null;
     asArray(): Array<EquippedItem | null>;
     asSpec(): EquipmentSpec;
+    getAllGems(): Array<Gem>;
+    getGemsOfColor(color: GemColor): Array<Gem>;
+    getMetaGem(): Gem | null;
+    hasActiveMetaGem(): boolean;
+    hasInactiveMetaGem(): boolean;
+    withoutMetaGem(): Gear;
 }
 export {};

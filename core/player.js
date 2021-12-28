@@ -4,8 +4,9 @@ import { IndividualBuffs } from '/tbc/core/proto/common.js';
 import { PlayerStats } from '/tbc/core/proto/api.js';
 import { Player as PlayerProto } from '/tbc/core/proto/api.js';
 import { Gear } from '/tbc/core/proto_utils/gear.js';
+import { gemMatchesSocket, } from '/tbc/core/proto_utils/gems.js';
 import { Stats } from '/tbc/core/proto_utils/stats.js';
-import { canEquipItem, classColors, getEligibleItemSlots, getTalentTreeIcon, getMetaGemEffectEP, gemMatchesSocket, raceToFaction, specToClass, specToEligibleRaces, specTypeFunctions, withSpecProto, } from '/tbc/core/proto_utils/utils.js';
+import { canEquipItem, classColors, getEligibleItemSlots, getTalentTreeIcon, getMetaGemEffectEP, raceToFaction, specToClass, specToEligibleRaces, specTypeFunctions, withSpecProto, } from '/tbc/core/proto_utils/utils.js';
 import { TypedEvent } from './typed_event.js';
 import { MAX_PARTY_SIZE } from './party.js';
 import { sum } from './utils.js';
@@ -32,8 +33,6 @@ export class Player {
         this.talentsStringChangeEmitter = new TypedEvent('PlayerTalentsString');
         this.specOptionsChangeEmitter = new TypedEvent('PlayerSpecOptions');
         this.currentStatsEmitter = new TypedEvent('PlayerCurrentStats');
-        // Emits when any of the above emitters emit.
-        this.changeEmitter = new TypedEvent('PlayerChange');
         this.sim = sim;
         this.party = null;
         this.raid = null;
@@ -43,7 +42,7 @@ export class Player {
         this.rotation = this.specTypeFunctions.rotationCreate();
         this.talents = this.specTypeFunctions.talentsCreate();
         this.specOptions = this.specTypeFunctions.optionsCreate();
-        [
+        this.changeEmitter = TypedEvent.onAny([
             this.nameChangeEmitter,
             this.buffsChangeEmitter,
             this.consumesChangeEmitter,
@@ -54,7 +53,7 @@ export class Player {
             this.talentsChangeEmitter,
             this.talentsStringChangeEmitter,
             this.specOptionsChangeEmitter,
-        ].forEach(emitter => emitter.on(eventID => this.changeEmitter.emit(eventID)));
+        ], 'PlayerChange');
     }
     getSpecIcon() {
         return getTalentTreeIcon(this.spec, this.getTalentsString());

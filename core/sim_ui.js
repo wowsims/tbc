@@ -6,13 +6,13 @@ import { TypedEvent } from './typed_event.js';
 export class SimUI extends Component {
     constructor(parentElem, sim, config) {
         super(parentElem, 'sim-ui');
-        // Emits when anything from the sim, raid, or encounter changes.
-        this.changeEmitter = new TypedEvent();
         this.sim = sim;
         this.rootElem.innerHTML = simHTML;
-        [
+        this.changeEmitter = TypedEvent.onAny([
             this.sim.changeEmitter,
-        ].forEach(emitter => emitter.on(eventID => this.changeEmitter.emit(eventID)));
+        ], 'SimUIChange');
+        this.warnings = [];
+        this.updateWarnings();
         if (config.knownIssues && config.knownIssues.length) {
             const knownIssuesContainer = document.getElementsByClassName('known-issues')[0];
             knownIssuesContainer.style.display = 'initial';
@@ -102,6 +102,28 @@ export class SimUI extends Component {
         this.resultsContentElem.style.display = 'initial';
         this.resultsPendingElem.style.display = 'none';
     }
+    updateWarnings() {
+        const activeWarnings = this.warnings.filter(warning => warning.shouldDisplay());
+        const warningsElem = document.getElementsByClassName('warnings')[0];
+        if (activeWarnings.length == 0) {
+            warningsElem.style.display = 'none';
+        }
+        else {
+            warningsElem.style.display = 'initial';
+            tippy(warningsElem, {
+                content: `
+				<ul class="known-issues-tooltip">
+					${activeWarnings.map(warning => '<li>' + warning.getContent() + '</li>').join('')}
+				</ul>
+				`,
+                allowHTML: true,
+            });
+        }
+    }
+    addWarning(warning) {
+        this.warnings.push(warning);
+        warning.updateOn.on(() => this.updateWarnings());
+    }
     getSettingsStorageKey() {
         return this.getStorageKey('__currentSettings__');
     }
@@ -132,6 +154,7 @@ const simHTML = `
 		<div class="sim-toolbar">
 			<ul class="sim-tabs nav nav-tabs">
 				<li class="sim-top-bar">
+					<span class="warnings fa fa-exclamation-triangle"></span>
 					<div class="known-issues">Known Issues</div>
 				</li>
 			</ul>

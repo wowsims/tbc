@@ -1,8 +1,11 @@
+import { GemColor } from '/tbc/core/proto/common.js';
 import { ItemSlot } from '/tbc/core/proto/common.js';
 import { ItemSpec } from '/tbc/core/proto/common.js';
 import { EquipmentSpec } from '/tbc/core/proto/common.js';
 import { equalsOrBothNull } from '/tbc/core/utils.js';
 import { getEnumValues } from '/tbc/core/utils.js';
+import { isMetaGemActive } from './gems.js';
+import { gemMatchesSocket } from './gems.js';
 import { validWeaponCombo } from './utils.js';
 /**
  * Represents a full gear set, including items/enchants/gems for every slot.
@@ -72,5 +75,38 @@ export class Gear {
         return EquipmentSpec.create({
             items: this.asArray().map(ei => ei ? ei.asSpec() : ItemSpec.create()),
         });
+    }
+    getAllGems() {
+        return this.asArray()
+            .map(equippedItem => equippedItem == null ? [] : equippedItem.gems.filter(gem => gem != null))
+            .flat();
+    }
+    getGemsOfColor(color) {
+        return this.getAllGems().filter(gem => gem.color == color);
+    }
+    getMetaGem() {
+        return this.getGemsOfColor(GemColor.GemColorMeta)[0] || null;
+    }
+    // Returns true if this gear set has a meta gem AND the other gems meet the meta's conditions.
+    hasActiveMetaGem() {
+        const metaGem = this.getMetaGem();
+        if (!metaGem) {
+            return false;
+        }
+        const gems = this.getAllGems();
+        return isMetaGemActive(metaGem, gems.filter(gem => gemMatchesSocket(gem, GemColor.GemColorRed)).length, gems.filter(gem => gemMatchesSocket(gem, GemColor.GemColorYellow)).length, gems.filter(gem => gemMatchesSocket(gem, GemColor.GemColorBlue)).length);
+    }
+    hasInactiveMetaGem() {
+        return this.getMetaGem() != null && !this.hasActiveMetaGem();
+    }
+    withoutMetaGem() {
+        const headItem = this.getEquippedItem(ItemSlot.ItemSlotHead);
+        const metaGem = this.getMetaGem();
+        if (headItem && metaGem) {
+            return this.withEquippedItem(ItemSlot.ItemSlotHead, headItem.removeGemsWithId(metaGem.id));
+        }
+        else {
+            return this;
+        }
     }
 }

@@ -3,8 +3,8 @@ import { Gem } from '/tbc/core/proto/common.js';
 import { Item } from '/tbc/core/proto/common.js';
 import { ItemSpec } from '/tbc/core/proto/common.js';
 import { enchantAppliesToItem } from './utils.js';
-import { gemEligibleForSocket } from './utils.js';
-import { gemMatchesSocket } from './utils.js';
+import { gemEligibleForSocket } from './gems.js';
+import { gemMatchesSocket } from './gems.js';
 export function getWowheadItemId(item) {
     return item.wowheadId || item.id;
 }

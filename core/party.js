@@ -13,16 +13,14 @@ export class Party {
         // Emits when a party member is added/removed/moved.
         this.compChangeEmitter = new TypedEvent();
         this.buffsChangeEmitter = new TypedEvent();
-        // Emits when anything in the party changes.
-        this.changeEmitter = new TypedEvent();
         this.sim = sim;
         this.raid = raid;
         this.players = [...Array(MAX_PARTY_SIZE).keys()].map(i => null);
         this.playerChangeListener = eventID => this.changeEmitter.emit(eventID);
-        [
+        this.changeEmitter = TypedEvent.onAny([
             this.compChangeEmitter,
             this.buffsChangeEmitter,
-        ].forEach(emitter => emitter.on(eventID => this.changeEmitter.emit(eventID)));
+        ], 'PartyChange');
     }
     size() {
         return this.players.filter(player => player != null).length;

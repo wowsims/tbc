@@ -19,4 +19,5 @@ export declare class TypedEvent<T> {
     private fireEventInternal;
     static freezeAllAndDo(func: () => void): void;
     static nextEventID(): EventID;
+    static onAny(events: Array<TypedEvent<any>>, label?: string): TypedEvent<void>;
 }

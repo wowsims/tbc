@@ -45,7 +45,9 @@ export declare class Sim {
     constructor();
     waitForInit(): Promise<void>;
     setModifyRaidProto(newModFn: (raidProto: RaidProto) => void): void;
+    getModifiedRaidProto(): RaidProto;
     setModifyEncounterProto(newModFn: (encounterProto: EncounterProto) => void): void;
+    getModifiedEncounterProto(): EncounterProto;
     private makeRaidSimRequest;
     runRaidSim(eventID: EventID): Promise<SimResult>;
     runRaidSimWithLogs(eventID: EventID): Promise<SimResult>;
