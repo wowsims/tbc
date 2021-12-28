@@ -118,7 +118,7 @@ func (spriest *ShadowPriest) Act(sim *core.Simulation) time.Duration {
 		spell = spriest.NewShadowWordPain(sim, target)
 	} else if spriest.rotation.UseStarshards && spriest.GetRemainingCD(priest.SSCooldownID, sim.CurrentTime) == 0 {
 		spell = spriest.NewStarshards(sim, target)
-	} else if spriest.rotation.UseDevPlague && spriest.GetRemainingCD(priest.DPCooldownID, sim.CurrentTime) == 0 {
+	} else if spriest.rotation.UseDevPlague && spriest.GetRemainingCD(priest.DevouringPlagueCooldownID, sim.CurrentTime) == 0 {
 		spell = spriest.NewDevouringPlague(sim, target)
 	} else if spriest.Talents.MindFlay {
 

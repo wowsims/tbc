@@ -8,18 +8,24 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-// Callback for after a spell hits the target but before damage has been calculated.
+// Callback for after a spell hits the target, before damage has been calculated.
+// Use it to modify the spell damage or results.
 type OnBeforeSpellHit func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect)
 
-// Callback for after a spell hits the target but before damage is calculated.
-// The damage result can still be modified by changing the result fields.
+// Callback for after a spell hits the target and after damage is calculated. Use it for proc effects
+// or anything that comes from the final result of the spell.
 type OnSpellHit func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect)
 
 // Callback for after a spell is fully resisted on a target.
 type OnSpellMiss func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect)
 
-// OnPeriodicDamage is called when dots tick. Able to mutate tickDamage as needed
-type OnPeriodicDamage func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect, tickDamage *float64)
+// OnBeforePeriodicDamage is called when dots tick, before damage is calculated.
+// Use it to modify the spell damage or results.
+type OnBeforePeriodicDamage func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect, tickDamage *float64)
+
+// OnPeriodicDamage is called when dots tick, after damage is calculated. Use it for proc effects
+// or anything that comes from the final result of a tick.
+type OnPeriodicDamage func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect, tickDamage float64)
 
 // A Spell is a type of cast that can hit/miss using spell stats, and has a spell school.
 type SpellCast struct {
@@ -166,15 +172,15 @@ func (spellEffect *SpellEffect) applyDot(sim *Simulation, spellCast *SpellCast, 
 	pa.OnAction = func(sim *Simulation) {
 		// fmt.Printf("DOT (%s) Ticking, Time Remaining: %0.2f\n", spellCast.Name, ddInput.TimeRemaining(sim).Seconds())
 		damage := ddInput.damagePerTick
-		spellCast.Character.OnPeriodicDamage(sim, spellCast, spellEffect, &damage)
-		spellEffect.Target.OnPeriodicDamage(sim, spellCast, spellEffect, &damage)
+
+		spellCast.Character.OnBeforePeriodicDamage(sim, spellCast, spellEffect, &damage)
+		spellEffect.Target.OnBeforePeriodicDamage(sim, spellCast, spellEffect, &damage)
+		if ddInput.OnBeforePeriodicDamage != nil {
+			ddInput.OnBeforePeriodicDamage(sim, spellCast, spellEffect, &damage)
+		}
 
 		if !spellCast.Binary {
 			damage = calculateResists(sim, damage, spellEffect)
-		}
-
-		if ddInput.OnPeriodicDamage != nil {
-			ddInput.OnPeriodicDamage(sim, spellCast, spellEffect, &damage)
 		}
 
 		if sim.Log != nil {
@@ -182,6 +188,12 @@ func (spellEffect *SpellEffect) applyDot(sim *Simulation, spellCast *SpellCast, 
 		}
 
 		spellEffect.Damage += damage
+
+		spellCast.Character.OnPeriodicDamage(sim, spellCast, spellEffect, damage)
+		spellEffect.Target.OnPeriodicDamage(sim, spellCast, spellEffect, damage)
+		if ddInput.OnPeriodicDamage != nil {
+			ddInput.OnPeriodicDamage(sim, spellCast, spellEffect, damage)
+		}
 
 		ddInput.tickIndex++
 		if ddInput.tickIndex < ddInput.NumberOfTicks {
