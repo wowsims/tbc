@@ -139,6 +139,12 @@ export class TypedEvent<T> {
 	static nextEventID(): EventID {
 		return nextEventID++;
 	}
+
+	static onAny(events: Array<TypedEvent<any>>, label?: string): TypedEvent<void> {
+		const newEvent = new TypedEvent<void>(label);
+    events.forEach(emitter => emitter.on(eventID => newEvent.emit(eventID)));
+		return newEvent;
+	}
 }
 
 // If this is > 0 then events are frozen.

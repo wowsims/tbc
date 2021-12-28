@@ -29,7 +29,7 @@ import { BlessingsAssignments } from '/tbc/core/proto/ui.js';
 
 import { Stats } from './stats.js';
 
-import * as Gems from '/tbc/core/constants/gems.js';
+import * as Gems from '/tbc/core/proto_utils/gems.js';
 
 import { BalanceDruid, BalanceDruid_Rotation as BalanceDruidRotation, DruidTalents, BalanceDruid_Options as BalanceDruidOptions} from '/tbc/core/proto/druid.js';
 import { ElementalShaman, EnhancementShaman_Rotation as EnhancementShamanRotation, ElementalShaman_Rotation as ElementalShamanRotation, ShamanTalents, ElementalShaman_Options as ElementalShamanOptions, EnhancementShaman_Options as EnhancementShamanOptions, EnhancementShaman } from '/tbc/core/proto/shaman.js';
@@ -1160,22 +1160,6 @@ export function enchantAppliesToItem(enchant: Enchant, item: Item): boolean {
 
   return true;
 };
-
-const socketToMatchingColors = new Map<GemColor, Array<GemColor>>();
-socketToMatchingColors.set(GemColor.GemColorMeta,   [GemColor.GemColorMeta]);
-socketToMatchingColors.set(GemColor.GemColorBlue,   [GemColor.GemColorBlue, GemColor.GemColorPurple, GemColor.GemColorGreen]);
-socketToMatchingColors.set(GemColor.GemColorRed,    [GemColor.GemColorRed, GemColor.GemColorPurple, GemColor.GemColorOrange]);
-socketToMatchingColors.set(GemColor.GemColorYellow, [GemColor.GemColorYellow, GemColor.GemColorOrange, GemColor.GemColorGreen]);
-
-// Whether the gem matches the given socket color, for the purposes of gaining the socket bonuses.
-export function gemMatchesSocket(gem: Gem, socketColor: GemColor) {
-  return socketToMatchingColors.has(socketColor) && socketToMatchingColors.get(socketColor)!.includes(gem.color);
-}
-
-// Whether the gem is capable of slotting into a socket of the given color.
-export function gemEligibleForSocket(gem: Gem, socketColor: GemColor) {
-  return (gem.color == GemColor.GemColorMeta) == (socketColor == GemColor.GemColorMeta);
-}
 
 export const NO_TARGET = -1;
 

@@ -20,6 +20,10 @@ import { StatWeightsResult } from '/tbc/core/proto/api.js';
 
 import { EquippedItem } from '/tbc/core/proto_utils/equipped_item.js';
 import { Gear } from '/tbc/core/proto_utils/gear.js';
+import {
+	gemEligibleForSocket,
+	gemMatchesSocket,
+} from '/tbc/core/proto_utils/gems.js';
 import { Stats } from '/tbc/core/proto_utils/stats.js';
 
 import {
@@ -31,11 +35,9 @@ import {
 	canEquipItem,
 	classColors,
 	getEligibleEnchantSlots,
-	gemEligibleForSocket,
 	getEligibleItemSlots,
 	getTalentTreeIcon,
 	getMetaGemEffectEP,
-	gemMatchesSocket,
 	raceToFaction,
 	specToClass,
 	specToEligibleRaces,
@@ -90,7 +92,7 @@ export class Player<SpecType extends Spec> {
   readonly currentStatsEmitter = new TypedEvent<void>('PlayerCurrentStats');
 
   // Emits when any of the above emitters emit.
-  readonly changeEmitter = new TypedEvent<void>('PlayerChange');
+  readonly changeEmitter: TypedEvent<void>;
 
   constructor(spec: Spec, sim: Sim) {
 		this.sim = sim;
@@ -104,7 +106,7 @@ export class Player<SpecType extends Spec> {
     this.talents = this.specTypeFunctions.talentsCreate();
 		this.specOptions = this.specTypeFunctions.optionsCreate();
 
-    [
+		this.changeEmitter = TypedEvent.onAny([
       this.nameChangeEmitter,
       this.buffsChangeEmitter,
       this.consumesChangeEmitter,
@@ -115,7 +117,7 @@ export class Player<SpecType extends Spec> {
       this.talentsChangeEmitter,
       this.talentsStringChangeEmitter,
       this.specOptionsChangeEmitter,
-    ].forEach(emitter => emitter.on(eventID => this.changeEmitter.emit(eventID)));
+		], 'PlayerChange');
   }
 
 	getSpecIcon(): string {
