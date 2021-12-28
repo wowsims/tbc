@@ -86,6 +86,13 @@ func applyBuffEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs proto.P
 		}
 	}
 
+	if individualBuffs.BattleShout != proto.TristateEffect_TristateEffectMissing {
+		character.AddStat(stats.AttackPower, 306)
+		if individualBuffs.BattleShout == proto.TristateEffect_TristateEffectImproved {
+			character.AddStat(stats.AttackPower, 76.5) // assumes max rank of Commanding Presence
+		}
+	}
+
 	if partyBuffs.TotemOfWrath > 0 {
 		character.AddStats(stats.Stats{
 			stats.SpellCrit: 3 * SpellCritRatingPerCritChance * float64(partyBuffs.TotemOfWrath),

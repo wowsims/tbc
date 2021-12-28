@@ -202,6 +202,7 @@ enum Potions {
 	UnknownPotion = 0;
 	DestructionPotion = 1;
 	SuperManaPotion = 2;
+    HastePotion = 3;
 }
 
 // Buffs that affect the entire raid.
@@ -250,6 +251,8 @@ message IndividualBuffs {
     // How many of each of these buffs the player will be receiving.
     int32 innervates = 5;
     int32 power_infusions = 6;
+
+    TristateEffect battle_shout = 7;
 }
 
 message Consumes {
@@ -257,30 +260,36 @@ message Consumes {
     bool flask_of_mighty_restoration = 2;
     bool flask_of_pure_death = 3;
     bool flask_of_supreme_power = 4;
+    bool flask_of_relentless_assault = 21;
 
     bool adepts_elixir = 5;
     bool elixir_of_major_fire_power = 6;
     bool elixir_of_major_frost_power = 7;
     bool elixir_of_major_shadow_power = 8;
-
     bool elixir_of_draenic_wisdom = 9;
     bool elixir_of_major_mageblood = 10;
+    bool elixir_of_major_agility = 22;
+    bool elixir_of_demonslaying = 23;
 
     bool brilliant_wizard_oil = 11; 
     bool superior_wizard_oil = 12; 
 
     bool blackened_basilisk = 13;
     bool skullfish_soup = 14;
+    bool roasted_clefthoof = 24;
 
-		bool kreegsStoutBeatdown = 20;
+    bool kreegsStoutBeatdown = 20;
 
-		Potions default_potion = 15;
-		Potions starting_potion = 16;
-		int32 num_starting_potions = 17;
+    bool scroll_of_strength_v = 25; // 20 str
+    bool scroll_of_agility_v = 26; // 20 agi
+
+    Potions default_potion = 15;
+    Potions starting_potion = 16;
+    int32 num_starting_potions = 17;
 
     bool dark_rune = 18;
 
-		Drums drums = 19;
+	Drums drums = 19;
 }
 
 message Debuffs {
@@ -289,6 +298,12 @@ message Debuffs {
     bool misery = 3;
     TristateEffect curse_of_elements = 4;
     double isb_uptime = 5;
+
+    bool blood_frenzy = 6; // Blood Frenzy: +4% phy dmg
+    TristateEffect expose_armor = 7; // Expose Armor (If you have a rogue):    5 points: 2050 armor / imp 5 points: 3075 armor
+    TristateEffect faerie_fire = 8; // Faerie Fire: -610 armor / imp 3% hit
+    int32 sunder_armor = 9; // Number of stacks of sunder armor: -520 armor per stack, 5 max.
+    bool curse_of_recklessness = 10; // -800 armor
 }
 
 enum MobType {

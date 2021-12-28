@@ -144,14 +144,6 @@ func (target *Target) calculateReduction() {
 	target.armorDamageReduction = target.currentArmor / (target.currentArmor + 10557.5)
 }
 
-// if target.HasAura(SunderArmorDebuffID) {
-// 	stacks := target.auras[SunderArmorDebuffID].Stacks
-// 	armor -= float64(stacks) * 450.0
-// }
-// if target.HasAura(CurseOfRecklessnessDebuffID) {
-// 	armor -= 800
-// }
-
 func (target *Target) AddArmor(value float64) {
 	target.currentArmor += value
 	target.calculateReduction()

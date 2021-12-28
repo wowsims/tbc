@@ -37,6 +37,36 @@ func applyDebuffEffects(target *Target, debuffs proto.Debuffs) {
 			return ImprovedShadowBoltAura(debuffs.IsbUptime)
 		})
 	}
+
+	if debuffs.BloodFrenzy {
+		target.AddPermanentAura(func(sim *Simulation) Aura {
+			return BloodFrenzyAura()
+		})
+	}
+
+	if debuffs.ExposeArmor != proto.TristateEffect_TristateEffectMissing {
+		target.armor -= 2050 // 5 points: 2050 armor / imp 5 points: 3075 armor
+		if debuffs.ExposeArmor == proto.TristateEffect_TristateEffectImproved {
+			target.armor -= 1025
+		}
+	}
+
+	if debuffs.FaerieFire != proto.TristateEffect_TristateEffectMissing {
+		target.armor -= 610
+		if debuffs.FaerieFire == proto.TristateEffect_TristateEffectImproved {
+			target.AddPermanentAura(func(sim *Simulation) Aura {
+				return FaerieFireAura(0, target)
+			})
+		}
+	}
+
+	if debuffs.SunderArmor > 0 {
+		target.armor -= float64(debuffs.SunderArmor) * 520.0
+	}
+
+	if debuffs.CurseOfRecklessness {
+		target.armor -= 800
+	}
 }
 
 var MiseryDebuffID = NewDebuffID()
@@ -171,6 +201,37 @@ func ImprovedShadowBoltAura(uptime float64) Aura {
 	}
 }
 
+var BloodFrenzyDebuffID = NewDebuffID()
+
+func BloodFrenzyAura() Aura {
+	return Aura{
+		ID:   BloodFrenzyDebuffID,
+		Name: "Blood Frenzy",
+		OnBeforeMelee: func(sim *Simulation, ability *ActiveMeleeAbility, isOH bool) {
+			ability.DamageMultiplier *= 1.04
+		},
+	}
+}
+
 var FaerieFireDebuffID = NewDebuffID()
+
+func FaerieFireAura(currentTime time.Duration, target *Target) Aura {
+	const hitBonus = 3 * MeleeHitRatingPerHitChance
+	target.AddArmor(-610)
+	return Aura{
+		ID:      FaerieFireDebuffID,
+		SpellID: 26993,
+		Name:    "Faerie Fire",
+		Expires: currentTime + time.Second*40,
+		OnExpire: func(sim *Simulation) {
+			target.AddArmor(-610)
+		},
+		OnBeforeMelee: func(sim *Simulation, ability *ActiveMeleeAbility, isOH bool) {
+			ability.BonusHitRating += hitBonus
+		},
+	}
+
+}
+
 var SunderArmorDebuffID = NewDebuffID()
 var CurseOfRecklessnessDebuffID = NewDebuffID()

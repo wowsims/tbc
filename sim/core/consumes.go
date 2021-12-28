@@ -13,6 +13,9 @@ func applyConsumeEffects(agent Agent, partyBuffs proto.PartyBuffs) {
 
 	agent.GetCharacter().AddStats(consumesStats(consumes))
 
+	// TODO: demon slaying elixir needs an aura to only apply to demons...
+	//  The other option is to include target type in this function.
+
 	registerDrumsCD(agent, partyBuffs, consumes)
 	registerPotionCD(agent, consumes)
 	registerDarkRuneCD(agent, consumes)
@@ -52,6 +55,10 @@ func consumesStats(c proto.Consumes) stats.Stats {
 		s[stats.Intellect] += 30
 		s[stats.Spirit] += 30
 	}
+	if c.ElixirOfMajorAgility {
+		s[stats.Agility] += 35
+		s[stats.MeleeCrit] += 20
+	}
 
 	if c.FlaskOfSupremePower {
 		s[stats.SpellPower] += 70
@@ -69,6 +76,10 @@ func consumesStats(c proto.Consumes) stats.Stats {
 	if c.FlaskOfMightyRestoration {
 		s[stats.MP5] += 25
 	}
+	if c.FlaskOfRelentlessAssault {
+		s[stats.AttackPower] += 120
+	}
+
 	if c.BlackenedBasilisk {
 		s[stats.SpellPower] += 23
 		s[stats.HealingPower] += 23
@@ -81,6 +92,15 @@ func consumesStats(c proto.Consumes) stats.Stats {
 	if c.KreegsStoutBeatdown {
 		s[stats.Intellect] -= 5
 		s[stats.Spirit] += 25
+	}
+	if c.RoastedClefthoof {
+		s[stats.Strength] += 20
+	}
+	if c.ScrollOfAgilityV {
+		s[stats.Agility] += 20
+	}
+	if c.ScrollOfStrengthV {
+		s[stats.Strength] += 20
 	}
 
 	return s
@@ -300,6 +320,27 @@ func makePotionActivation(potionType proto.Potions, character *Character) Cooldo
 			character.AddMana(sim, manaGain, "Super Mana Potion", true)
 			character.SetCD(PotionCooldownID, time.Minute*2+sim.CurrentTime)
 			character.Metrics.AddInstantCast(ActionID{ItemID: 22832})
+			return true
+		}
+	} else if potionType == proto.Potions_HastePotion {
+		return func(sim *Simulation, character *Character) bool {
+			const hasteBonus = 400
+			const dur = time.Second * 15
+
+			character.AddMeleeHaste(sim, hasteBonus)
+
+			character.AddAura(sim, Aura{
+				ID:      PotionAuraID,
+				SpellID: 28507,
+				Name:    "Haste Potion",
+				Expires: sim.CurrentTime + dur,
+				OnExpire: func(sim *Simulation) {
+					character.AddMeleeHaste(sim, -hasteBonus)
+				},
+			})
+
+			character.SetCD(PotionCooldownID, time.Minute*2+sim.CurrentTime)
+			character.Metrics.AddInstantCast(ActionID{ItemID: 22838})
 			return true
 		}
 	} else {
