@@ -17,6 +17,7 @@ func NewShaman(character core.Character, talents proto.ShamanTalents, selfBuffs 
 
 	if shaman.Talents.NaturesGuidance > 0 {
 		shaman.AddStat(stats.SpellHit, float64(shaman.Talents.NaturesGuidance)*1*core.SpellHitRatingPerHitChance)
+		shaman.AddStat(stats.MeleeHit, float64(shaman.Talents.NaturesGuidance)*1*core.MeleeHitRatingPerHitChance)
 	}
 
 	if shaman.Talents.ThunderingStrikes > 0 {
@@ -24,7 +25,8 @@ func NewShaman(character core.Character, talents proto.ShamanTalents, selfBuffs 
 	}
 
 	if shaman.Talents.DualWieldSpecialization > 0 {
-		shaman.AddStat(stats.MeleeHit, core.MeleeCritRatingPerCritChance*2*float64(shaman.Talents.DualWieldSpecialization))
+		// TODO: Check that player is actually dual wielding
+		shaman.AddStat(stats.MeleeHit, core.MeleeHitRatingPerHitChance*2*float64(shaman.Talents.DualWieldSpecialization))
 	}
 
 	if shaman.Talents.UnleashedRage > 0 {

@@ -213,9 +213,11 @@ func (character *Character) AddMana(sim *Simulation, amount float64, reason stri
 
 func (character *Character) AddMeleeHaste(sim *Simulation, amount float64) {
 	if amount > 0 {
-		character.AutoAttacks.ModifySwingTime(sim, 1+(amount/HasteRatingPerHastePercent*100))
+		mod := 1 + (amount / (HasteRatingPerHastePercent * 100))
+		character.AutoAttacks.ModifySwingTime(sim, mod)
 	} else {
-		character.AutoAttacks.ModifySwingTime(sim, 1/(1+(amount/HasteRatingPerHastePercent*100)))
+		mod := 1 / (1 + (-amount / (HasteRatingPerHastePercent * 100)))
+		character.AutoAttacks.ModifySwingTime(sim, mod)
 	}
 	character.stats[stats.MeleeHaste] += amount
 }

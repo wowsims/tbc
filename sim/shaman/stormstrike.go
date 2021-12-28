@@ -57,6 +57,7 @@ func (shaman *Shaman) newStormstrikeTemplate(sim *core.Simulation) core.MeleeAbi
 		AbilityEffect: core.AbilityEffect{
 			DamageMultiplier:       1.0,
 			StaticDamageMultiplier: 1.0,
+			IgnoreDualWieldPenalty: true,
 		},
 		OnMeleeAttack: func(sim *core.Simulation, target *core.Target, result core.MeleeHitType, ability *core.ActiveMeleeAbility, isOH bool) {
 			ssDebuffAura.Stacks = 2

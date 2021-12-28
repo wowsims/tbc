@@ -145,27 +145,26 @@ func PerformAttack(sim *Simulation, c *Character, target *Target, effect Ability
 	missChance := 0.05 + (levelMinusSkill)*0.002
 	hitSuppression := (levelMinusSkill - 10) * 0.002
 
-	if c.Equip[proto.ItemSlot_ItemSlotOffHand].WeaponType != 0 {
+	if !effect.IgnoreDualWieldPenalty && c.Equip[proto.ItemSlot_ItemSlotOffHand].WeaponType != 0 {
 		missChance += 0.19
 	}
 
 	hitBonus := ((c.stats[stats.MeleeHit] + effect.BonusHitRating) / (MeleeHitRatingPerHitChance * 100)) - hitSuppression
+	// log.Printf("Hit Bonus: %0.3f", hitBonus)
 	if hitBonus > 0 {
 		missChance -= hitBonus
 	}
 
 	chance := missChance
 	if roll < chance {
-		// log.Printf("miss")
 		return MeleeHitTypeMiss
 	}
 
-	expertise := c.stats[stats.Expertise] / (ExpertisePerPercentReduction * 100)
+	expertisePercentage := math.Floor(c.stats[stats.Expertise]/(ExpertisePerQuarterPercentReduction)) / 400
 	// Next Dodge
-	chance += 0.05 + levelMinusSkill*0.001 - expertise
+	chance += 0.05 + levelMinusSkill*0.001 - expertisePercentage
 
 	if roll < chance {
-		// log.Printf("dodge")
 		return MeleeHitTypeDodge
 	}
 
@@ -376,6 +375,8 @@ type AbilityEffect struct {
 	BonusAttackPower float64
 	BonusCritRating  float64
 
+	IgnoreDualWieldPenalty bool
+
 	// Additional multiplier that is always applied.
 	DamageMultiplier float64
 
@@ -467,9 +468,11 @@ func (aa *AutoAttacks) ModifySwingTime(sim *Simulation, amount float64) {
 	}
 	ohSwingTime := aa.OffhandSwingAt - sim.CurrentTime
 	if ohSwingTime > 0 {
-		aa.OffhandSwingAt = sim.CurrentTime + time.Duration(float64(ohSwingTime)/amount)
+		newTime := time.Duration(float64(ohSwingTime) / amount)
+		if newTime > 0 {
+			aa.OffhandSwingAt = sim.CurrentTime + newTime
+		}
 	}
-
 }
 
 // TimeUntil compares swing timers to the next cast or attack and returns the time the next event occurs at.
@@ -495,7 +498,6 @@ func (aa *AutoAttacks) TimeUntil(sim *Simulation, cast *SimpleSpell, atk *Active
 		nextEventTime = MaxDuration(atk.CastTime, atk.Character.GetRemainingCD(GCDCooldownID, sim.CurrentTime))
 	}
 	mhswing := aa.MainhandSwingAt - sim.CurrentTime
-
 	if mhswing < nextEventTime || nextEventTime == 0 {
 		nextEventTime = mhswing
 	}
