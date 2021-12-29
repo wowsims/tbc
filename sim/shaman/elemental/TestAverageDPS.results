@@ -1,6 +1,6 @@
-dps_results:  {
-  key:  "TestAverageDPS-Orc-P1-Adaptive-FullBuffs-LongSingleTarget"
-  value:  {
-    dps:  1593.4389536255046
-  }
+dps_results: {
+ key: "TestAverageDPS-Orc-P1-Adaptive-FullBuffs-LongSingleTarget"
+ value: {
+  dps: 1593.4389536255046
+ }
 }
