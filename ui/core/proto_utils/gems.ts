@@ -75,3 +75,33 @@ export const GLOWING_SHADOWSONG_AMETHYST = 32215;
 export const RUNED_CRIMSON_SPINEL = 32196;
 export const RUNED_LIVING_RUBY = 24030;
 export const RUNED_ORNATE_RUBY = 28118;
+
+const gemSocketCssClasses: Partial<Record<GemColor, string>> = {
+  [GemColor.GemColorBlue]: 'socket-color-blue',
+  [GemColor.GemColorMeta]: 'socket-color-meta',
+  [GemColor.GemColorRed]: 'socket-color-red',
+  [GemColor.GemColorYellow]: 'socket-color-yellow',
+};
+export function setGemSocketCssClass(elem: HTMLElement, color: GemColor) {
+  Object.values(gemSocketCssClasses).forEach(cssClass => elem.classList.remove(cssClass));
+
+  if (gemSocketCssClasses[color]) {
+    elem.classList.add(gemSocketCssClasses[color] as string);
+    return;
+  }
+
+  throw new Error('No css class for gem socket color: ' + color);
+}
+
+const emptyGemSocketIcons: Partial<Record<GemColor, string>> = {
+  [GemColor.GemColorBlue]: 'https://wow.zamimg.com/images/icons/socket-blue.gif',
+  [GemColor.GemColorMeta]: 'https://wow.zamimg.com/images/icons/socket-meta.gif',
+  [GemColor.GemColorRed]: 'https://wow.zamimg.com/images/icons/socket-red.gif',
+  [GemColor.GemColorYellow]: 'https://wow.zamimg.com/images/icons/socket-yellow.gif',
+};
+export function getEmptyGemSocketIconUrl(color: GemColor): string {
+  if (emptyGemSocketIcons[color])
+    return emptyGemSocketIcons[color] as string;
+
+  throw new Error('No empty socket url for gem socket color: ' + color);
+}
