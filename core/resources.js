@@ -1,6 +1,5 @@
 import { REPO_NAME } from '/tbc/core/constants/other.js';
 import { getWowheadItemId } from '/tbc/core/proto_utils/equipped_item.js';
-import { GemColor } from './proto/common.js';
 import { ItemSlot } from './proto/common.js';
 // Get 'elemental_shaman', the pathname part after the repo name
 const pathnameParts = window.location.pathname.split('/');
@@ -105,15 +104,4 @@ export function setWowheadHref(elem, id) {
 }
 export function setWowheadItemHref(elem, item) {
     return setWowheadHref(elem, { itemId: getWowheadItemId(item) });
-}
-const emptyGemSocketIcons = {
-    [GemColor.GemColorBlue]: 'https://wow.zamimg.com/images/icons/socket-blue.gif',
-    [GemColor.GemColorMeta]: 'https://wow.zamimg.com/images/icons/socket-meta.gif',
-    [GemColor.GemColorRed]: 'https://wow.zamimg.com/images/icons/socket-red.gif',
-    [GemColor.GemColorYellow]: 'https://wow.zamimg.com/images/icons/socket-yellow.gif',
-};
-export function getEmptyGemSocketIconUrl(color) {
-    if (emptyGemSocketIcons[color])
-        return emptyGemSocketIcons[color];
-    throw new Error('No empty socket url for gem socket color: ' + color);
 }

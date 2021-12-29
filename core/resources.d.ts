@@ -1,4 +1,3 @@
-import { GemColor } from './proto/common.js';
 import { Item } from './proto/common.js';
 import { ItemSlot } from './proto/common.js';
 export declare const specDirectory: string;
@@ -26,4 +25,3 @@ export declare function getItemIconUrl(item: Item): Promise<string>;
 export declare function getName(id: ItemOrSpellId | RawActionId): Promise<string>;
 export declare function setWowheadHref(elem: HTMLAnchorElement, id: ItemOrSpellId): void;
 export declare function setWowheadItemHref(elem: HTMLAnchorElement, item: Item): void;
-export declare function getEmptyGemSocketIconUrl(color: GemColor): string;

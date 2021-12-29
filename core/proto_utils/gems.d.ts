@@ -19,3 +19,5 @@ export declare const GLOWING_SHADOWSONG_AMETHYST = 32215;
 export declare const RUNED_CRIMSON_SPINEL = 32196;
 export declare const RUNED_LIVING_RUBY = 24030;
 export declare const RUNED_ORNATE_RUBY = 28118;
+export declare function setGemSocketCssClass(elem: HTMLElement, color: GemColor): void;
+export declare function getEmptyGemSocketIconUrl(color: GemColor): string;
