@@ -5,6 +5,12 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestAllItemEffects-AshtongueTalismanofAcumen-32490"
+ value: {
+  dps: 1412.3406499442383
+ }
+}
+dps_results: {
  key: "TestAllItemEffects-AvatarRegalia"
  value: {
   dps: 1275.7679233995857
