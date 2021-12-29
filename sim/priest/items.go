@@ -9,8 +9,24 @@ import (
 func init() {
 	// core.AddItemEffect(30664, ApplyLivingRootoftheWildheart)
 
+	core.AddItemSet(ItemSetIncarnate)
 	core.AddItemSet(ItemSetAvatar)
 	core.AddItemSet(ItemSetAbsolution)
+}
+
+var ItemSetIncarnate = core.ItemSet{
+	Name:  "Incarnate Raiment",
+	Items: map[int32]struct{}{29056: {}, 29057: {}, 29058: {}, 29059: {}, 29060: {}},
+	Bonuses: map[int32]core.ApplyEffect{
+		2: func(agent core.Agent) {
+			// Your shadowfiend now has 75 more stamina and lasts 3 sec. longer.
+			// Implemented in shadowfiend.go.
+		},
+		4: func(agent core.Agent) {
+			// Your Mind Flay and Smite spells deal 5% more damage.
+			// Implemented in mind_flay.go.
+		},
+	},
 }
 
 var Avatar2PcAuraID = core.NewAuraID()

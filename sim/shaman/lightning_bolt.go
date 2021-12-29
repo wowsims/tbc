@@ -49,6 +49,10 @@ func (shaman *Shaman) newLightningBoltTemplate(sim *core.Simulation, isLightning
 		}
 	}
 
+	if ItemSetSkyshatterRegalia.CharacterHasSetBonus(&shaman.Character, 4) {
+		spellTemplate.SpellHitEffect.StaticDamageMultiplier *= 1.05
+	}
+
 	return core.NewSimpleSpellTemplate(spellTemplate)
 }
 

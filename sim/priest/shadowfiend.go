@@ -48,8 +48,11 @@ func (priest *Priest) newShadowfiendTemplate(sim *core.Simulation) core.SimpleSp
 		},
 	}
 
-	effect.DotInput.NumberOfTicks += int(priest.Talents.ImprovedShadowWordPain) // extra tick per point
 	priest.applyTalentsToShadowSpell(&baseCast, &effect)
+
+	if ItemSetIncarnate.CharacterHasSetBonus(&priest.Character, 2) { // Increases duration by 3s
+		effect.DotInput.NumberOfTicks += 2
+	}
 
 	return core.NewSimpleSpellTemplate(core.SimpleSpell{
 		SpellCast: core.SpellCast{

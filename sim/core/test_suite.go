@@ -3,6 +3,7 @@ package core
 import (
 	"errors"
 	"os"
+	"strings"
 	"testing"
 
 	"github.com/wowsims/tbc/sim/core/proto"
@@ -62,6 +63,9 @@ func (testSuite *IndividualTestSuite) evaluateResults(t *testing.T) {
 
 func (testSuite *IndividualTestSuite) writeToFile() {
 	str := prototext.Format(&testSuite.testResults)
+	// For some reason the formatter sometimes outputs 2 spaces instead of one.
+	// Replace so we get consistent output.
+	str = strings.ReplaceAll(str, "  ", " ")
 	data := []byte(str)
 
 	err := os.WriteFile(testSuite.Name+".results.tmp", data, 0644)

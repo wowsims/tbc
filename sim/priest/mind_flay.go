@@ -43,6 +43,10 @@ func (priest *Priest) newMindflayTemplate(sim *core.Simulation) core.SimpleSpell
 
 	priest.applyTalentsToShadowSpell(&baseCast, &effect)
 
+	if ItemSetIncarnate.CharacterHasSetBonus(&priest.Character, 4) {
+		effect.StaticDamageMultiplier *= 1.05
+	}
+
 	return core.NewSimpleSpellTemplate(core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: baseCast,

@@ -105,7 +105,6 @@ var ItemSetCataclysmRegalia = core.ItemSet{
 	},
 }
 
-var Skyshatter4PcAuraID = core.NewAuraID()
 var ItemSetSkyshatterRegalia = core.ItemSet{
 	Name:  "Skyshatter Regalia",
 	Items: map[int32]struct{}{34437: {}, 31017: {}, 34542: {}, 31008: {}, 31014: {}, 31020: {}, 31023: {}, 34566: {}},
@@ -116,18 +115,8 @@ var ItemSetSkyshatterRegalia = core.ItemSet{
 			agent.GetCharacter().AddStat(stats.SpellPower, 45)
 		},
 		4: func(agent core.Agent) {
-			character := agent.GetCharacter()
-			character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
-				return core.Aura{
-					ID:   Skyshatter4PcAuraID,
-					Name: "Skyshatter 4pc Bonus",
-					OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-						if spellCast.ActionID.SpellID == SpellIDLB12 {
-							spellEffect.DamageMultiplier *= 1.05
-						}
-					},
-				}
-			})
+			// Increases damage done by Lightning Bolt by 5%.
+			// Implemented in lightning_bolt.go.
 		},
 	},
 }
