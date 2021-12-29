@@ -1,5 +1,7 @@
 import { getWowheadItemId } from '/tbc/core/proto_utils/equipped_item.js';
 import { EquippedItem } from '/tbc/core/proto_utils/equipped_item.js';
+import { getEmptyGemSocketIconUrl } from '/tbc/core/proto_utils/gems.js';
+import { setGemSocketCssClass } from '/tbc/core/proto_utils/gems.js';
 import { enchantAppliesToItem } from '/tbc/core/proto_utils/utils.js';
 import { Enchant } from '/tbc/core/proto/common.js';
 import { Item } from '/tbc/core/proto/common.js';
@@ -7,13 +9,11 @@ import { ItemQuality } from '/tbc/core/proto/common.js';
 import { ItemSlot } from '/tbc/core/proto/common.js';
 import { enchantDescriptions } from '/tbc/core/constants/enchants.js';
 import { slotNames } from '/tbc/core/proto_utils/names.js';
-import { getEmptyGemSocketIconUrl } from '/tbc/core/resources.js';
 import { getEmptySlotIconUrl } from '/tbc/core/resources.js';
 import { getIconUrl } from '/tbc/core/resources.js';
 import { getItemIconUrl } from '/tbc/core/resources.js';
 import { setWowheadHref } from '/tbc/core/resources.js';
 import { setWowheadItemHref } from '/tbc/core/resources.js';
-import { setGemSocketCssClass } from '/tbc/core/css_utils.js';
 import { setItemQualityCssClass } from '/tbc/core/css_utils.js';
 import { Player } from '/tbc/core/player.js';
 import { EventID, TypedEvent } from '/tbc/core/typed_event.js';
@@ -293,7 +293,28 @@ class SelectorModal extends Component {
             const equippedItem = this.player.getEquippedItem(slot);
             if (equippedItem)
               this.player.equipItem(eventID, slot, equippedItem.withGem(null, socketIdx));
-          });
+          },
+					tabAnchor => {
+						tabAnchor.classList.add('selector-modal-tab-gem-icon');
+						setGemSocketCssClass(tabAnchor, socketColor);
+
+						const updateGemIcon = () => {
+							const equippedItem = this.player.getEquippedItem(slot);
+							const gem = equippedItem?.gems[socketIdx];
+							if (!gem) {
+								const url = getEmptyGemSocketIconUrl(socketColor);
+								tabAnchor.style.backgroundImage = `url('${url}')`;
+								return;
+							}
+
+							getIconUrl({itemId: gem.id}).then(url => {
+								tabAnchor.style.backgroundImage = `url('${url}')`;
+							});
+						};
+
+						this.player.gearChangeEmitter.on(updateGemIcon);
+						updateGemIcon();
+					});
     });
   }
 
@@ -319,7 +340,8 @@ class SelectorModal extends Component {
 					phase: number,
           onEquip: (eventID: EventID, item: T) => void,
         },
-        onRemove: (eventID: EventID) => void) {
+        onRemove: (eventID: EventID) => void,
+				setTabContent?: (tabElem: HTMLAnchorElement) => void) {
     if (items.length == 0) {
       return;
     }
@@ -334,7 +356,14 @@ class SelectorModal extends Component {
     const tabElem = document.createElement('li');
     this.tabsElem.appendChild(tabElem);
     const tabContentId = (label + '-tab').split(' ').join('');
-    tabElem.innerHTML = `<a class="selector-modal-item-tab" data-toggle="tab" href="#${tabContentId}">${label}</a>`;
+    tabElem.innerHTML = `<a class="selector-modal-item-tab" data-toggle="tab" href="#${tabContentId}"></a>`;
+
+		const tabAnchor = tabElem.getElementsByClassName('selector-modal-item-tab')[0] as HTMLAnchorElement;
+		if (setTabContent) {
+			setTabContent(tabAnchor);
+		} else {
+			tabAnchor.textContent = label;
+		}
 
     const tabContent = document.createElement('div');
     tabContent.id = tabContentId;
@@ -420,11 +449,9 @@ class SelectorModal extends Component {
     const updateSelected = () => {
       const newEquippedItem = this.player.getEquippedItem(slot);
 			const newItem = equippedToItemFn(newEquippedItem);
-			if (!newItem)
-				return;
 
-			const newItemId = equippedToIdFn(newEquippedItem);
-			const newEP = computeEP(newItem);
+			const newItemId = equippedToIdFn(newEquippedItem) || 0;
+			const newEP = newItem ? computeEP(newItem) : 0;
 
       listItemElems.forEach(elem => {
 				const listItemId = parseInt(elem.dataset.id!);

@@ -73,6 +73,20 @@
 	align-items: center;
 }
 
+.selector-modal-tab-gem-icon {
+  @include wowhead-background-icon;
+  width: 35px;
+  height: 35px;
+	margin: 5px 20px;
+}
+
+.selector-modal-tab-gem-icon:hover, li.active>.selector-modal-tab-gem-icon {
+	box-shadow:
+			0 0 10px white,
+			0 0 10px white,
+			0 0 10px white;
+}
+
 .selector-modal-search {
   border: 1px inset black;
   border-radius: 4px;
