@@ -169,7 +169,7 @@ func ApplyAshtongueTalisman(agent core.Agent) {
 					if sim.RandomFloat("Ashtongue Talisman") > 0.25 {
 						return
 					}
-					char.AddAuraWithTemporaryStats(sim, AshtongueTalismanAuraID, 0, "Ashtongue Spellpower", stats.SpellPower, spellBonus, dur)
+					char.AddAuraWithTemporaryStats(sim, AshtongueTalismanAuraID, 40442, "Ashtongue Spellpower", stats.SpellPower, spellBonus, dur)
 				}
 			},
 			OnSpellMiss: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
@@ -177,7 +177,7 @@ func ApplyAshtongueTalisman(agent core.Agent) {
 					if sim.RandomFloat("Ashtongue Talisman") > 0.25 {
 						return
 					}
-					char.AddAuraWithTemporaryStats(sim, AshtongueTalismanAuraID, 0, "Ashtongue Spellpower", stats.SpellPower, spellBonus, dur)
+					char.AddAuraWithTemporaryStats(sim, AshtongueTalismanAuraID, 40442, "Ashtongue Spellpower", stats.SpellPower, spellBonus, dur)
 				}
 			},
 		}

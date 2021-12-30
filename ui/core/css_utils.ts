@@ -1,22 +1,4 @@
-import { GemColor } from './proto/common.js';
 import { ItemQuality } from './proto/common.js';
-
-const gemSocketCssClasses: Partial<Record<GemColor, string>> = {
-  [GemColor.GemColorBlue]: 'socket-color-blue',
-  [GemColor.GemColorMeta]: 'socket-color-meta',
-  [GemColor.GemColorRed]: 'socket-color-red',
-  [GemColor.GemColorYellow]: 'socket-color-yellow',
-};
-export function setGemSocketCssClass(elem: HTMLElement, color: GemColor) {
-  Object.values(gemSocketCssClasses).forEach(cssClass => elem.classList.remove(cssClass));
-
-  if (gemSocketCssClasses[color]) {
-    elem.classList.add(gemSocketCssClasses[color] as string);
-    return;
-  }
-
-  throw new Error('No css class for gem socket color: ' + color);
-}
 
 const itemQualityCssClasses: Record<ItemQuality, string> = {
   [ItemQuality.ItemQualityJunk]: 'item-quality-junk',

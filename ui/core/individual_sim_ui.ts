@@ -33,6 +33,7 @@ import { Sim } from './sim.js';
 import { SimOptions } from '/tbc/core/proto/api.js';
 import { SimUI } from './sim_ui.js';
 import { Spec } from '/tbc/core/proto/common.js';
+import { getMetaGemConditionDescription } from '/tbc/core/proto_utils/gems.js';
 import { SpecOptions } from '/tbc/core/proto_utils/utils.js';
 import { SpecRotation } from '/tbc/core/proto_utils/utils.js';
 import { Stat } from '/tbc/core/proto/common.js';
@@ -191,6 +192,14 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 		this.individualConfig = config;
 		this.isWithinRaidSim = this.rootElem.closest('.within-raid-sim') != null;
 		this.raidSimResultsManager = null;
+		this.addWarning({
+			updateOn: this.player.gearChangeEmitter,
+			shouldDisplay: () => this.player.getGear().hasInactiveMetaGem(),
+			getContent: () => {
+				const metaGem = this.player.getGear().getMetaGem()!;
+				return `Meta gem disabled (${metaGem.name}): ${getMetaGemConditionDescription(metaGem)}`;
+			},
+		});
 
     this.exclusivityMap = {
       'Battle Elixir': [],

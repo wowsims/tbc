@@ -8,7 +8,7 @@ import { Player } from '/tbc/core/player.js';
 import { ShadowPriest, ShadowPriest_Rotation as Rotation, ShadowPriest_Options as Options, ShadowPriest_Rotation_RotationType } from '/tbc/core/proto/priest.js';
 
 import * as Enchants from '/tbc/core/constants/enchants.js';
-import * as Gems from '/tbc/core/constants/gems.js';
+import * as Gems from '/tbc/core/proto_utils/gems.js';
 import * as Tooltips from '/tbc/core/constants/tooltips.js';
 
 // Preset options for this spec.

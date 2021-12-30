@@ -83,7 +83,7 @@ func MiseryAura(sim *Simulation, numPoints int32) Aura {
 		OnBeforeSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect) {
 			spellEffect.DamageMultiplier *= multiplier
 		},
-		OnPeriodicDamage: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect, tickDamage *float64) {
+		OnBeforePeriodicDamage: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect, tickDamage *float64) {
 			*tickDamage *= multiplier
 		},
 	}
@@ -105,7 +105,7 @@ func ShadowWeavingAura(sim *Simulation, numStacks int32) Aura {
 				spellEffect.DamageMultiplier *= multiplier
 			}
 		},
-		OnPeriodicDamage: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect, tickDamage *float64) {
+		OnBeforePeriodicDamage: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect, tickDamage *float64) {
 			if spellCast.SpellSchool == stats.ShadowSpellPower {
 				*tickDamage *= multiplier
 			}
@@ -168,7 +168,7 @@ func CurseOfElementsAura(coe proto.TristateEffect) Aura {
 			}
 			spellEffect.DamageMultiplier *= mult
 		},
-		OnPeriodicDamage: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect, tickDamage *float64) {
+		OnBeforePeriodicDamage: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect, tickDamage *float64) {
 			if spellCast.SpellSchool == stats.NatureSpellPower ||
 				spellCast.SpellSchool == stats.HolySpellPower ||
 				spellCast.SpellSchool == stats.AttackPower {
@@ -192,7 +192,7 @@ func ImprovedShadowBoltAura(uptime float64) Aura {
 			}
 			spellEffect.DamageMultiplier *= mult
 		},
-		OnPeriodicDamage: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect, tickDamage *float64) {
+		OnBeforePeriodicDamage: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect, tickDamage *float64) {
 			if spellCast.SpellSchool != stats.ShadowSpellPower {
 				return // does not apply to these schools
 			}

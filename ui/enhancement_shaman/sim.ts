@@ -21,7 +21,6 @@ import { EnhancementShaman, EnhancementShaman_Rotation as EnhancementShamanRotat
 
 import * as IconInputs from '/tbc/core/components/icon_inputs.js';
 import * as OtherInputs from '/tbc/core/components/other_inputs.js';
-import * as Gems from '/tbc/core/constants/gems.js';
 import * as Tooltips from '/tbc/core/constants/tooltips.js';
 
 import * as ShamanInputs from './inputs.js';

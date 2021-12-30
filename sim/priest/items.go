@@ -4,13 +4,30 @@ import (
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
+	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 func init() {
-	// core.AddItemEffect(30664, ApplyLivingRootoftheWildheart)
+	core.AddItemEffect(32490, ApplyAshtongueTalismanOfAcumen)
 
+	core.AddItemSet(ItemSetIncarnate)
 	core.AddItemSet(ItemSetAvatar)
 	core.AddItemSet(ItemSetAbsolution)
+}
+
+var ItemSetIncarnate = core.ItemSet{
+	Name:  "Incarnate Raiment",
+	Items: map[int32]struct{}{29056: {}, 29057: {}, 29058: {}, 29059: {}, 29060: {}},
+	Bonuses: map[int32]core.ApplyEffect{
+		2: func(agent core.Agent) {
+			// Your shadowfiend now has 75 more stamina and lasts 3 sec. longer.
+			// Implemented in shadowfiend.go.
+		},
+		4: func(agent core.Agent) {
+			// Your Mind Flay and Smite spells deal 5% more damage.
+			// Implemented in mind_flay.go.
+		},
+	},
 }
 
 var Avatar2PcAuraID = core.NewAuraID()
@@ -44,7 +61,7 @@ var ItemSetAvatar = core.ItemSet{
 				return core.Aura{
 					ID:   Avatar4PcAuraID,
 					Name: "Avatar 4pc Bonus",
-					OnPeriodicDamage: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect, tickDamage *float64) {
+					OnPeriodicDamage: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect, tickDamage float64) {
 						if spellCast.ActionID.SpellID != SpellIDShadowWordPain {
 							return
 						}
@@ -83,4 +100,35 @@ var ItemSetAbsolution = core.ItemSet{
 			// this is implemented in mindblast.go
 		},
 	},
+}
+
+var AshtongueTalismanOfAcumenItemAuraID = core.NewAuraID()
+var AshtongueTalismanOfAcumenAuraID = core.NewAuraID()
+
+func ApplyAshtongueTalismanOfAcumen(agent core.Agent) {
+	// Not in the game yet so cant test; this logic assumes that:
+	// - procrate is 10%
+	// - no ICD on proc
+	const spellBonus = 220
+	const dur = time.Second * 10
+	const procrate = 0.1
+
+	char := agent.GetCharacter()
+	char.AddPermanentAura(func(sim *core.Simulation) core.Aura {
+		return core.Aura{
+			ID:   AshtongueTalismanOfAcumenItemAuraID,
+			Name: "Ashtongue Talisman of Acumen",
+			OnPeriodicDamage: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect, tickDamage float64) {
+				if spellCast.ActionID.SpellID != SpellIDShadowWordPain {
+					return
+				}
+
+				if sim.RandomFloat("Ashtongue Talisman of Acumen") > procrate {
+					return
+				}
+
+				char.AddAuraWithTemporaryStats(sim, AshtongueTalismanOfAcumenAuraID, 40438, "Ashtongue Talisman of Acumen", stats.SpellPower, spellBonus, dur)
+			},
+		}
+	})
 }

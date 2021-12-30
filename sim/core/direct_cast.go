@@ -143,7 +143,8 @@ type DotDamageInput struct {
 	TickBaseDamage       float64
 	TickSpellCoefficient float64
 
-	OnPeriodicDamage OnPeriodicDamage // Specific on-tick logic for this dot.
+	OnBeforePeriodicDamage OnBeforePeriodicDamage // Before-calculation logic for this dot.
+	OnPeriodicDamage       OnPeriodicDamage       // After-calculation logic for this dot.
 
 	// If both of these are set, will display uptime metrics for this dot.
 	DebuffID AuraID
