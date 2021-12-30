@@ -26,10 +26,12 @@ export declare const BlessingOfKings: IndividualSimIconPickerConfig<Player<any>,
 export declare const BlessingOfWisdom: IndividualSimIconPickerConfig<Player<any>, number>;
 export declare const Innervate: IndividualSimIconPickerConfig<Player<any>, number>;
 export declare const PowerInfusion: IndividualSimIconPickerConfig<Player<any>, number>;
+export declare const ImprovedScorch: IndividualSimIconPickerConfig<Target, boolean>;
 export declare const ImprovedSealOfTheCrusader: IndividualSimIconPickerConfig<Target, boolean>;
 export declare const JudgementOfWisdom: IndividualSimIconPickerConfig<Target, boolean>;
 export declare const Misery: IndividualSimIconPickerConfig<Target, boolean>;
 export declare const CurseOfElements: IndividualSimIconPickerConfig<Target, number>;
+export declare const WintersChill: IndividualSimIconPickerConfig<Target, boolean>;
 export declare const AdeptsElixir: IndividualSimIconPickerConfig<Player<any>, boolean>;
 export declare const BlackenedBasilisk: IndividualSimIconPickerConfig<Player<any>, boolean>;
 export declare const BrilliantWizardOil: IndividualSimIconPickerConfig<Player<any>, boolean>;

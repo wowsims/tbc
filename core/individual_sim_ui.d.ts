@@ -102,6 +102,7 @@ export declare abstract class IndividualSimUI<SpecType extends Spec> extends Sim
     readonly isWithinRaidSim: boolean;
     private readonly exclusivityMap;
     private raidSimResultsManager;
+    private settingsMuuri;
     constructor(parentElem: HTMLElement, player: Player<SpecType>, config: IndividualSimUIConfig<SpecType>);
     private loadSettings;
     private addSidebarComponents;
@@ -117,6 +118,7 @@ export declare abstract class IndividualSimUI<SpecType extends Spec> extends Sim
     getSavedRotationStorageKey(): string;
     getSavedSettingsStorageKey(): string;
     getSavedTalentsStorageKey(): string;
+    recomputeSettingsLayout(): void;
     getStorageKey(keyPart: string): string;
     toProto(): IndividualSimSettings;
     fromProto(eventID: EventID, settings: IndividualSimSettings): void;

@@ -2,6 +2,7 @@ import { RaidBuffs } from '/tbc/core/proto/common.js';
 import { PartyBuffs } from '/tbc/core/proto/common.js';
 import { IndividualBuffs } from '/tbc/core/proto/common.js';
 import { Debuffs } from '/tbc/core/proto/common.js';
+import { Drums } from '/tbc/core/proto/common.js';
 import { RaidTarget } from '/tbc/core/proto/common.js';
 import { Stat } from '/tbc/core/proto/common.js';
 import { TristateEffect } from '/tbc/core/proto/common.js';
@@ -77,6 +78,7 @@ export class BalanceDruidSimUI extends IndividualSimUI {
                     divineSpirit: TristateEffect.TristateEffectImproved,
                 }),
                 partyBuffs: PartyBuffs.create({
+                    drums: Drums.DrumsOfBattle,
                     bloodlust: 1,
                     manaSpringTotem: TristateEffect.TristateEffectRegular,
                     totemOfWrath: 1,
@@ -84,7 +86,7 @@ export class BalanceDruidSimUI extends IndividualSimUI {
                 }),
                 individualBuffs: IndividualBuffs.create({
                     blessingOfKings: true,
-                    blessingOfWisdom: 2,
+                    blessingOfWisdom: TristateEffect.TristateEffectImproved,
                 }),
                 debuffs: Debuffs.create({
                     judgementOfWisdom: true,

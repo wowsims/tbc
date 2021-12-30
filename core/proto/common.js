@@ -1259,11 +1259,13 @@ class Debuffs$Type extends MessageType {
             { no: 2, name: "improved_seal_of_the_crusader", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 3, name: "misery", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 4, name: "curse_of_elements", kind: "enum", T: () => ["proto.TristateEffect", TristateEffect] },
-            { no: 5, name: "isb_uptime", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ }
+            { no: 5, name: "isb_uptime", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
+            { no: 6, name: "improved_scorch", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 7, name: "winters_chill", kind: "scalar", T: 8 /*ScalarType.BOOL*/ }
         ]);
     }
     create(value) {
-        const message = { judgementOfWisdom: false, improvedSealOfTheCrusader: false, misery: false, curseOfElements: 0, isbUptime: 0 };
+        const message = { judgementOfWisdom: false, improvedSealOfTheCrusader: false, misery: false, curseOfElements: 0, isbUptime: 0, improvedScorch: false, wintersChill: false };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -1288,6 +1290,12 @@ class Debuffs$Type extends MessageType {
                     break;
                 case /* double isb_uptime */ 5:
                     message.isbUptime = reader.double();
+                    break;
+                case /* bool improved_scorch */ 6:
+                    message.improvedScorch = reader.bool();
+                    break;
+                case /* bool winters_chill */ 7:
+                    message.wintersChill = reader.bool();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -1316,6 +1324,12 @@ class Debuffs$Type extends MessageType {
         /* double isb_uptime = 5; */
         if (message.isbUptime !== 0)
             writer.tag(5, WireType.Bit64).double(message.isbUptime);
+        /* bool improved_scorch = 6; */
+        if (message.improvedScorch !== false)
+            writer.tag(6, WireType.Varint).bool(message.improvedScorch);
+        /* bool winters_chill = 7; */
+        if (message.wintersChill !== false)
+            writer.tag(7, WireType.Varint).bool(message.wintersChill);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

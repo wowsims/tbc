@@ -3,6 +3,59 @@ import { UnknownFieldHandler } from '/tbc/protobuf-ts/index.js';
 import { reflectionMergePartial } from '/tbc/protobuf-ts/index.js';
 import { MESSAGE_TYPE } from '/tbc/protobuf-ts/index.js';
 import { MessageType } from '/tbc/protobuf-ts/index.js';
+/**
+ * @generated from protobuf enum proto.Mage.Rotation.FireRotation.PrimarySpell
+ */
+export var Mage_Rotation_FireRotation_PrimarySpell;
+(function (Mage_Rotation_FireRotation_PrimarySpell) {
+    /**
+     * @generated from protobuf enum value: Fireball = 0;
+     */
+    Mage_Rotation_FireRotation_PrimarySpell[Mage_Rotation_FireRotation_PrimarySpell["Fireball"] = 0] = "Fireball";
+    /**
+     * @generated from protobuf enum value: Scorch = 1;
+     */
+    Mage_Rotation_FireRotation_PrimarySpell[Mage_Rotation_FireRotation_PrimarySpell["Scorch"] = 1] = "Scorch";
+})(Mage_Rotation_FireRotation_PrimarySpell || (Mage_Rotation_FireRotation_PrimarySpell = {}));
+/**
+ * Just used for controlling which options are displayed in the UI. Is not
+ * used by the sim.
+ *
+ * @generated from protobuf enum proto.Mage.Rotation.Type
+ */
+export var Mage_Rotation_Type;
+(function (Mage_Rotation_Type) {
+    /**
+     * @generated from protobuf enum value: Arcane = 0;
+     */
+    Mage_Rotation_Type[Mage_Rotation_Type["Arcane"] = 0] = "Arcane";
+    /**
+     * @generated from protobuf enum value: Fire = 1;
+     */
+    Mage_Rotation_Type[Mage_Rotation_Type["Fire"] = 1] = "Fire";
+    /**
+     * @generated from protobuf enum value: Frost = 2;
+     */
+    Mage_Rotation_Type[Mage_Rotation_Type["Frost"] = 2] = "Frost";
+})(Mage_Rotation_Type || (Mage_Rotation_Type = {}));
+/**
+ * @generated from protobuf enum proto.Mage.Options.ArmorType
+ */
+export var Mage_Options_ArmorType;
+(function (Mage_Options_ArmorType) {
+    /**
+     * @generated from protobuf enum value: NoArmor = 0;
+     */
+    Mage_Options_ArmorType[Mage_Options_ArmorType["NoArmor"] = 0] = "NoArmor";
+    /**
+     * @generated from protobuf enum value: MageArmor = 1;
+     */
+    Mage_Options_ArmorType[Mage_Options_ArmorType["MageArmor"] = 1] = "MageArmor";
+    /**
+     * @generated from protobuf enum value: MoltenArmor = 2;
+     */
+    Mage_Options_ArmorType[Mage_Options_ArmorType["MoltenArmor"] = 2] = "MoltenArmor";
+})(Mage_Options_ArmorType || (Mage_Options_ArmorType = {}));
 // @generated message type with reflection information, may provide speed optimized methods
 class MageTalents$Type extends MessageType {
     constructor() {
@@ -429,7 +482,75 @@ export const Mage = new Mage$Type();
 // @generated message type with reflection information, may provide speed optimized methods
 class Mage_Rotation$Type extends MessageType {
     constructor() {
-        super("proto.Mage.Rotation", []);
+        super("proto.Mage.Rotation", [
+            { no: 1, name: "type", kind: "enum", T: () => ["proto.Mage.Rotation.Type", Mage_Rotation_Type] },
+            { no: 2, name: "arcane", kind: "message", T: () => Mage_Rotation_ArcaneRotation },
+            { no: 3, name: "fire", kind: "message", T: () => Mage_Rotation_FireRotation },
+            { no: 4, name: "frost", kind: "message", T: () => Mage_Rotation_FrostRotation }
+        ]);
+    }
+    create(value) {
+        const message = { type: 0 };
+        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader, length, options, target) {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* proto.Mage.Rotation.Type type */ 1:
+                    message.type = reader.int32();
+                    break;
+                case /* proto.Mage.Rotation.ArcaneRotation arcane */ 2:
+                    message.arcane = Mage_Rotation_ArcaneRotation.internalBinaryRead(reader, reader.uint32(), options, message.arcane);
+                    break;
+                case /* proto.Mage.Rotation.FireRotation fire */ 3:
+                    message.fire = Mage_Rotation_FireRotation.internalBinaryRead(reader, reader.uint32(), options, message.fire);
+                    break;
+                case /* proto.Mage.Rotation.FrostRotation frost */ 4:
+                    message.frost = Mage_Rotation_FrostRotation.internalBinaryRead(reader, reader.uint32(), options, message.frost);
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message, writer, options) {
+        /* proto.Mage.Rotation.Type type = 1; */
+        if (message.type !== 0)
+            writer.tag(1, WireType.Varint).int32(message.type);
+        /* proto.Mage.Rotation.ArcaneRotation arcane = 2; */
+        if (message.arcane)
+            Mage_Rotation_ArcaneRotation.internalBinaryWrite(message.arcane, writer.tag(2, WireType.LengthDelimited).fork(), options).join();
+        /* proto.Mage.Rotation.FireRotation fire = 3; */
+        if (message.fire)
+            Mage_Rotation_FireRotation.internalBinaryWrite(message.fire, writer.tag(3, WireType.LengthDelimited).fork(), options).join();
+        /* proto.Mage.Rotation.FrostRotation frost = 4; */
+        if (message.frost)
+            Mage_Rotation_FrostRotation.internalBinaryWrite(message.frost, writer.tag(4, WireType.LengthDelimited).fork(), options).join();
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message proto.Mage.Rotation
+ */
+export const Mage_Rotation = new Mage_Rotation$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class Mage_Rotation_ArcaneRotation$Type extends MessageType {
+    constructor() {
+        super("proto.Mage.Rotation.ArcaneRotation", []);
     }
     create(value) {
         const message = {};
@@ -449,13 +570,74 @@ class Mage_Rotation$Type extends MessageType {
     }
 }
 /**
- * @generated MessageType for protobuf message proto.Mage.Rotation
+ * @generated MessageType for protobuf message proto.Mage.Rotation.ArcaneRotation
  */
-export const Mage_Rotation = new Mage_Rotation$Type();
+export const Mage_Rotation_ArcaneRotation = new Mage_Rotation_ArcaneRotation$Type();
 // @generated message type with reflection information, may provide speed optimized methods
-class Mage_Options$Type extends MessageType {
+class Mage_Rotation_FireRotation$Type extends MessageType {
     constructor() {
-        super("proto.Mage.Options", []);
+        super("proto.Mage.Rotation.FireRotation", [
+            { no: 1, name: "primary_spell", kind: "enum", T: () => ["proto.Mage.Rotation.FireRotation.PrimarySpell", Mage_Rotation_FireRotation_PrimarySpell] },
+            { no: 2, name: "maintain_improved_scorch", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 3, name: "weave_fire_blast", kind: "scalar", T: 8 /*ScalarType.BOOL*/ }
+        ]);
+    }
+    create(value) {
+        const message = { primarySpell: 0, maintainImprovedScorch: false, weaveFireBlast: false };
+        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader, length, options, target) {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* proto.Mage.Rotation.FireRotation.PrimarySpell primary_spell */ 1:
+                    message.primarySpell = reader.int32();
+                    break;
+                case /* bool maintain_improved_scorch */ 2:
+                    message.maintainImprovedScorch = reader.bool();
+                    break;
+                case /* bool weave_fire_blast */ 3:
+                    message.weaveFireBlast = reader.bool();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message, writer, options) {
+        /* proto.Mage.Rotation.FireRotation.PrimarySpell primary_spell = 1; */
+        if (message.primarySpell !== 0)
+            writer.tag(1, WireType.Varint).int32(message.primarySpell);
+        /* bool maintain_improved_scorch = 2; */
+        if (message.maintainImprovedScorch !== false)
+            writer.tag(2, WireType.Varint).bool(message.maintainImprovedScorch);
+        /* bool weave_fire_blast = 3; */
+        if (message.weaveFireBlast !== false)
+            writer.tag(3, WireType.Varint).bool(message.weaveFireBlast);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message proto.Mage.Rotation.FireRotation
+ */
+export const Mage_Rotation_FireRotation = new Mage_Rotation_FireRotation$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class Mage_Rotation_FrostRotation$Type extends MessageType {
+    constructor() {
+        super("proto.Mage.Rotation.FrostRotation", []);
     }
     create(value) {
         const message = {};
@@ -468,6 +650,53 @@ class Mage_Options$Type extends MessageType {
         return target ?? this.create();
     }
     internalBinaryWrite(message, writer, options) {
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message proto.Mage.Rotation.FrostRotation
+ */
+export const Mage_Rotation_FrostRotation = new Mage_Rotation_FrostRotation$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class Mage_Options$Type extends MessageType {
+    constructor() {
+        super("proto.Mage.Options", [
+            { no: 1, name: "armor", kind: "enum", T: () => ["proto.Mage.Options.ArmorType", Mage_Options_ArmorType] }
+        ]);
+    }
+    create(value) {
+        const message = { armor: 0 };
+        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader, length, options, target) {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* proto.Mage.Options.ArmorType armor */ 1:
+                    message.armor = reader.int32();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message, writer, options) {
+        /* proto.Mage.Options.ArmorType armor = 1; */
+        if (message.armor !== 0)
+            writer.tag(1, WireType.Varint).int32(message.armor);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

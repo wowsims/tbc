@@ -300,7 +300,7 @@ export class Player {
         elem.setAttribute('data-wowhead', parts.join('&'));
     }
     toProto() {
-        return withSpecProto(PlayerProto.create({
+        return withSpecProto(this.spec, PlayerProto.create({
             name: this.getName(),
             race: this.getRace(),
             class: this.getClass(),

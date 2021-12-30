@@ -12,6 +12,7 @@ export interface InputConfig<ModObject, T> {
     getValue: (obj: ModObject) => T;
     setValue: (eventID: EventID, obj: ModObject, newValue: T) => void;
     enableWhen?: (obj: ModObject) => boolean;
+    showWhen?: (obj: ModObject) => boolean;
     rootElem?: HTMLElement;
 }
 export declare abstract class Input<ModObject, T> extends Component {

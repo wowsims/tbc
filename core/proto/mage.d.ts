@@ -220,11 +220,108 @@ export interface Mage {
  * @generated from protobuf message proto.Mage.Rotation
  */
 export interface Mage_Rotation {
+    /**
+     * @generated from protobuf field: proto.Mage.Rotation.Type type = 1;
+     */
+    type: Mage_Rotation_Type;
+    /**
+     * @generated from protobuf field: proto.Mage.Rotation.ArcaneRotation arcane = 2;
+     */
+    arcane?: Mage_Rotation_ArcaneRotation;
+    /**
+     * @generated from protobuf field: proto.Mage.Rotation.FireRotation fire = 3;
+     */
+    fire?: Mage_Rotation_FireRotation;
+    /**
+     * @generated from protobuf field: proto.Mage.Rotation.FrostRotation frost = 4;
+     */
+    frost?: Mage_Rotation_FrostRotation;
+}
+/**
+ * @generated from protobuf message proto.Mage.Rotation.ArcaneRotation
+ */
+export interface Mage_Rotation_ArcaneRotation {
+}
+/**
+ * @generated from protobuf message proto.Mage.Rotation.FireRotation
+ */
+export interface Mage_Rotation_FireRotation {
+    /**
+     * @generated from protobuf field: proto.Mage.Rotation.FireRotation.PrimarySpell primary_spell = 1;
+     */
+    primarySpell: Mage_Rotation_FireRotation_PrimarySpell;
+    /**
+     * @generated from protobuf field: bool maintain_improved_scorch = 2;
+     */
+    maintainImprovedScorch: boolean;
+    /**
+     * @generated from protobuf field: bool weave_fire_blast = 3;
+     */
+    weaveFireBlast: boolean;
+}
+/**
+ * @generated from protobuf enum proto.Mage.Rotation.FireRotation.PrimarySpell
+ */
+export declare enum Mage_Rotation_FireRotation_PrimarySpell {
+    /**
+     * @generated from protobuf enum value: Fireball = 0;
+     */
+    Fireball = 0,
+    /**
+     * @generated from protobuf enum value: Scorch = 1;
+     */
+    Scorch = 1
+}
+/**
+ * @generated from protobuf message proto.Mage.Rotation.FrostRotation
+ */
+export interface Mage_Rotation_FrostRotation {
+}
+/**
+ * Just used for controlling which options are displayed in the UI. Is not
+ * used by the sim.
+ *
+ * @generated from protobuf enum proto.Mage.Rotation.Type
+ */
+export declare enum Mage_Rotation_Type {
+    /**
+     * @generated from protobuf enum value: Arcane = 0;
+     */
+    Arcane = 0,
+    /**
+     * @generated from protobuf enum value: Fire = 1;
+     */
+    Fire = 1,
+    /**
+     * @generated from protobuf enum value: Frost = 2;
+     */
+    Frost = 2
 }
 /**
  * @generated from protobuf message proto.Mage.Options
  */
 export interface Mage_Options {
+    /**
+     * @generated from protobuf field: proto.Mage.Options.ArmorType armor = 1;
+     */
+    armor: Mage_Options_ArmorType;
+}
+/**
+ * @generated from protobuf enum proto.Mage.Options.ArmorType
+ */
+export declare enum Mage_Options_ArmorType {
+    /**
+     * @generated from protobuf enum value: NoArmor = 0;
+     */
+    NoArmor = 0,
+    /**
+     * @generated from protobuf enum value: MageArmor = 1;
+     */
+    MageArmor = 1,
+    /**
+     * @generated from protobuf enum value: MoltenArmor = 2;
+     */
+    MoltenArmor = 2
 }
 declare class MageTalents$Type extends MessageType<MageTalents> {
     constructor();
@@ -256,6 +353,36 @@ declare class Mage_Rotation$Type extends MessageType<Mage_Rotation> {
  * @generated MessageType for protobuf message proto.Mage.Rotation
  */
 export declare const Mage_Rotation: Mage_Rotation$Type;
+declare class Mage_Rotation_ArcaneRotation$Type extends MessageType<Mage_Rotation_ArcaneRotation> {
+    constructor();
+    create(value?: PartialMessage<Mage_Rotation_ArcaneRotation>): Mage_Rotation_ArcaneRotation;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: Mage_Rotation_ArcaneRotation): Mage_Rotation_ArcaneRotation;
+    internalBinaryWrite(message: Mage_Rotation_ArcaneRotation, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message proto.Mage.Rotation.ArcaneRotation
+ */
+export declare const Mage_Rotation_ArcaneRotation: Mage_Rotation_ArcaneRotation$Type;
+declare class Mage_Rotation_FireRotation$Type extends MessageType<Mage_Rotation_FireRotation> {
+    constructor();
+    create(value?: PartialMessage<Mage_Rotation_FireRotation>): Mage_Rotation_FireRotation;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: Mage_Rotation_FireRotation): Mage_Rotation_FireRotation;
+    internalBinaryWrite(message: Mage_Rotation_FireRotation, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message proto.Mage.Rotation.FireRotation
+ */
+export declare const Mage_Rotation_FireRotation: Mage_Rotation_FireRotation$Type;
+declare class Mage_Rotation_FrostRotation$Type extends MessageType<Mage_Rotation_FrostRotation> {
+    constructor();
+    create(value?: PartialMessage<Mage_Rotation_FrostRotation>): Mage_Rotation_FrostRotation;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: Mage_Rotation_FrostRotation): Mage_Rotation_FrostRotation;
+    internalBinaryWrite(message: Mage_Rotation_FrostRotation, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message proto.Mage.Rotation.FrostRotation
+ */
+export declare const Mage_Rotation_FrostRotation: Mage_Rotation_FrostRotation$Type;
 declare class Mage_Options$Type extends MessageType<Mage_Options> {
     constructor();
     create(value?: PartialMessage<Mage_Options>): Mage_Options;

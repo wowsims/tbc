@@ -85,6 +85,10 @@
   filter: opacity(0.5);
 }
 
+.input-root.hide {
+  display: none;
+}
+
 .boolean-picker-input {
   margin: 5px !important;
   width: 70px;
@@ -143,6 +147,10 @@
   filter: opacity(0.5);
 }
 
+.input-root.hide {
+  display: none;
+}
+
 .enum-picker-selector {
   margin: 5px;
 }
@@ -158,6 +166,10 @@
 
 .input-root.disabled .input-label, .input-root.disabled .input-tooltip {
   filter: opacity(0.5);
+}
+
+.input-root.hide {
+  display: none;
 }
 
 .number-picker-input {
@@ -182,6 +194,10 @@
 
 .input-root.disabled .input-label, .input-root.disabled .input-tooltip {
   filter: opacity(0.5);
+}
+
+.input-root.hide {
+  display: none;
 }
 
 .enum-picker-selector {
@@ -701,6 +717,10 @@
   filter: opacity(0.5);
 }
 
+.input-root.hide {
+  display: none;
+}
+
 .number-picker-input {
   margin: 5px;
   width: 70px;
@@ -1141,6 +1161,10 @@
 
 .input-root.disabled .input-label, .input-root.disabled .input-tooltip {
   filter: opacity(0.5);
+}
+
+.input-root.hide {
+  display: none;
 }
 
 .number-picker-input {
@@ -1786,6 +1810,7 @@ td, th {
   background: var(--main-bg-color);
   padding: 5px 10px 5px 10px;
   font-size: 18px;
+  white-space: nowrap;
 }
 
 .settings-bottom-bar {

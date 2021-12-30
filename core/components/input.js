@@ -44,6 +44,13 @@ export class Input extends Component {
             this.rootElem.classList.add('disabled');
             this.getInputElem().setAttribute('disabled', '');
         }
+        const show = !this.inputConfig.showWhen || this.inputConfig.showWhen(this.modObject);
+        if (show) {
+            this.rootElem.classList.remove('hide');
+        }
+        else {
+            this.rootElem.classList.add('hide');
+        }
     }
     // Can't call abstract functions in constructor, so need an init() call.
     init() {

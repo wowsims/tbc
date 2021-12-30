@@ -80,7 +80,7 @@ export declare const specToClass: Record<Spec, Class>;
 export declare const specToEligibleRaces: Record<Spec, Array<Race>>;
 export declare const specToEligibleItemCategories: Record<Spec, Array<ItemCategory>>;
 export declare const specToLocalStorageKey: Record<Spec, string>;
-export declare function withSpecProto<SpecType extends Spec>(player: Player, rotation: SpecRotation<SpecType>, talents: SpecTalents<SpecType>, specOptions: SpecOptions<SpecType>): Player;
+export declare function withSpecProto<SpecType extends Spec>(spec: Spec, player: Player, rotation: SpecRotation<SpecType>, talents: SpecTalents<SpecType>, specOptions: SpecOptions<SpecType>): Player;
 export declare function playerToSpec(player: Player): Spec;
 export declare function getMetaGemEffectEP(spec: Spec, gem: Gem, playerStats: Stats): number;
 export declare function canEquipItem(item: Item, spec: Spec): boolean;

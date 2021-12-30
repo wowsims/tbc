@@ -247,6 +247,14 @@ export interface Debuffs {
      * @generated from protobuf field: double isb_uptime = 5;
      */
     isbUptime: number;
+    /**
+     * @generated from protobuf field: bool improved_scorch = 6;
+     */
+    improvedScorch: boolean;
+    /**
+     * @generated from protobuf field: bool winters_chill = 7;
+     */
+    wintersChill: boolean;
 }
 /**
  * @generated from protobuf message proto.Target

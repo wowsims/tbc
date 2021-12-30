@@ -2,6 +2,7 @@ import { RaidBuffs } from '/tbc/core/proto/common.js';
 import { PartyBuffs } from '/tbc/core/proto/common.js';
 import { IndividualBuffs } from '/tbc/core/proto/common.js';
 import { Debuffs } from '/tbc/core/proto/common.js';
+import { Drums } from '/tbc/core/proto/common.js';
 import { Stat } from '/tbc/core/proto/common.js';
 import { TristateEffect } from '/tbc/core/proto/common.js';
 import { Stats } from '/tbc/core/proto_utils/stats.js';
@@ -74,6 +75,7 @@ export class ShadowPriestSimUI extends IndividualSimUI {
                     giftOfTheWild: TristateEffect.TristateEffectImproved,
                 }),
                 partyBuffs: PartyBuffs.create({
+                    drums: Drums.DrumsOfBattle,
                     bloodlust: 1,
                     manaSpringTotem: TristateEffect.TristateEffectRegular,
                     totemOfWrath: 1,
