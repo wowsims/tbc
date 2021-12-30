@@ -302,6 +302,9 @@ export class ActionMetrics {
                     name += ' (3 Tick)';
                 }
             }
+            else if (name == 'Fireball') {
+                name += ' (DoT)';
+            }
             else {
                 if (actionId.tag == 1) {
                     name += ' (LO)';
