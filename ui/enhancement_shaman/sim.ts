@@ -70,14 +70,14 @@ export class EnhancementShamanSimUI extends IndividualSimUI<Spec.SpecEnhancement
 				gear: Presets.PRERAID_GEAR.gear,
 				// Default EP weights for sorting gear in the gear picker.
 				epWeights: Stats.fromMap({
-					[Stat.StatIntellect]: 1.0,
-					[Stat.StatAgility]: 1.0,
-					[Stat.StatStrength]: 1.0,
-					[Stat.StatSpellPower]: 1.0,
+					[Stat.StatIntellect]: 1.02,
+					[Stat.StatAgility]: 2.23,
+					[Stat.StatStrength]: 2.04,
+					[Stat.StatSpellPower]: 0.45,
 					[Stat.StatAttackPower]: 1.0,
 					[Stat.StatMeleeHit]: 1.0,
-					[Stat.StatMeleeCrit]: 1.0,
-					[Stat.StatMeleeHaste]: 1.0,
+					[Stat.StatMeleeCrit]: 2.86,
+					[Stat.StatMeleeHaste]: 0.62,
 				}),
 				// Default consumes settings.
 				consumes: Presets.DefaultConsumes,
