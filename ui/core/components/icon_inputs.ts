@@ -39,6 +39,7 @@ export const ManaTideTotem = makeMultistatePartyBuffInput({spellId:16190}, 5, 'm
 export const MoonkinAura = makeTristatePartyBuffInput({spellId:24907}, {itemId:32387}, 'moonkinAura');
 export const TotemOfWrath = makeMultistatePartyBuffInput({spellId:30706}, 5, 'totemOfWrath');
 export const WrathOfAirTotem = makeTristatePartyBuffInput({spellId:3738}, {spellId:37212}, 'wrathOfAirTotem');
+export const BattleShout = makeTristatePartyBuffInput({spellId:2048}, {spellId:12861}, 'battleShout');
 
 export const DrumsOfBattleBuff = makeEnumValuePartyBuffInput({spellId:35476}, 'drums', Drums.DrumsOfBattle, ['Drums']);
 export const DrumsOfRestorationBuff = makeEnumValuePartyBuffInput({spellId:35478}, 'drums', Drums.DrumsOfRestoration, ['Drums']);
@@ -46,6 +47,7 @@ export const DrumsOfRestorationBuff = makeEnumValuePartyBuffInput({spellId:35478
 // Individual Buffs
 export const BlessingOfKings = makeBooleanIndividualBuffInput({spellId:25898}, 'blessingOfKings');
 export const BlessingOfWisdom = makeTristateIndividualBuffInput({spellId:27143}, {spellId:20245}, 'blessingOfWisdom');
+export const BlessingOfMight = makeTristateIndividualBuffInput({spellId:27140}, {spellId:20048}, 'blessingOfMight');
 export const Innervate = makeMultistateIndividualBuffInput({spellId:29166}, 11, 'innervates');
 export const PowerInfusion = makeMultistateIndividualBuffInput({spellId:10060}, 11, 'powerInfusions');
 
@@ -55,6 +57,10 @@ export const ImprovedSealOfTheCrusader = makeBooleanDebuffInput({spellId:20337},
 export const JudgementOfWisdom = makeBooleanDebuffInput({spellId:27164}, 'judgementOfWisdom');
 export const Misery = makeBooleanDebuffInput({spellId:33195}, 'misery');
 export const CurseOfElements = makeTristateDebuffInput({spellId:27228}, {spellId:32484}, 'curseOfElements');
+export const CurseOfRecklessness = makeBooleanDebuffInput({spellId:27226}, 'curseOfRecklessness');
+export const FaerieFire = makeTristateDebuffInput({spellId:26993}, {spellId:33602}, 'faerieFire');
+export const ExposeArmor = makeTristateDebuffInput({spellId:26866}, {spellId:14169}, 'exposeArmor');
+export const SunderArmor = makeBooleanDebuffInput({spellId:25225}, 'sunderArmor');
 export const WintersChill = makeBooleanDebuffInput({spellId:28595}, 'wintersChill');
 
 // Consumes
@@ -67,15 +73,21 @@ export const ElixirOfMajorFirePower = makeBooleanConsumeInput({itemId:22833}, 'e
 export const ElixirOfMajorFrostPower = makeBooleanConsumeInput({itemId:22827}, 'elixirOfMajorFrostPower', ['Battle Elixir']);
 export const ElixirOfMajorMageblood = makeBooleanConsumeInput({itemId:22840}, 'elixirOfMajorMageblood', ['Guardian Elixir']);
 export const ElixirOfMajorShadowPower = makeBooleanConsumeInput({itemId:22835}, 'elixirOfMajorShadowPower', ['Battle Elixir']);
+export const ElixirOfMajorAgility = makeBooleanConsumeInput({itemId:22831}, 'elixirOfMajorAgility', ['Battle Elixir']);
 export const FlaskOfBlindingLight = makeBooleanConsumeInput({itemId:22861}, 'flaskOfBlindingLight', ['Battle Elixir', 'Guardian Elixir']);
 export const FlaskOfMightyRestoration = makeBooleanConsumeInput({itemId:22853}, 'flaskOfMightyRestoration', ['Battle Elixir', 'Guardian Elixir']);
 export const FlaskOfPureDeath = makeBooleanConsumeInput({itemId:22866}, 'flaskOfPureDeath', ['Battle Elixir', 'Guardian Elixir']);
 export const FlaskOfSupremePower = makeBooleanConsumeInput({itemId:13512}, 'flaskOfSupremePower', ['Battle Elixir', 'Guardian Elixir']);
+export const FlaskOfRelentlessAssault = makeBooleanConsumeInput({itemId:22854}, 'flaskOfRelentlessAssault', ['Battle Elixir', 'Guardian Elixir']);
 export const KreegsStoutBeatdown = makeBooleanConsumeInput({itemId:18284}, 'kreegsStoutBeatdown', ['Alchohol']);
 export const SkullfishSoup = makeBooleanConsumeInput({itemId:33825}, 'skullfishSoup', ['Food']);
 export const SuperiorWizardOil = makeBooleanConsumeInput({itemId:22522}, 'superiorWizardOil', ['Weapon Imbue']);
+export const RoastedClefthoof = makeBooleanConsumeInput({itemId:27658}, 'roastedClefthoof', ['Food']);
+export const ScrollOfStrengthV = makeBooleanConsumeInput({itemId:27503}, 'scrollOfStrengthV');
+export const ScrollOfAgilityV = makeBooleanConsumeInput({itemId:27498}, 'scrollOfAgilityV');
 
 export const DefaultDestructionPotion = makeEnumValueConsumeInput({itemId:22839}, 'defaultPotion', Potions.DestructionPotion, ['Potion']);
+export const DefaultHastePotion = makeEnumValueConsumeInput({itemId:22838}, 'defaultPotion', Potions.HastePotion, ['Potion']);
 export const DefaultSuperManaPotion = makeEnumValueConsumeInput({itemId:22832}, 'defaultPotion', Potions.SuperManaPotion, ['Potion']);
 
 function removeOtherPartyMembersDrums(eventID: EventID, player: Player<any>, newValue: boolean) {

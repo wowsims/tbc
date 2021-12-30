@@ -66,6 +66,10 @@ func applyBuffEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs proto.P
 		stats.MP5: GetTristateValueFloat(individualBuffs.BlessingOfWisdom, 42.0, 50.0),
 	})
 
+	character.AddStats(stats.Stats{
+		stats.AttackPower: GetTristateValueFloat(individualBuffs.BlessingOfMight, 220, 264),
+	})
+
 	if individualBuffs.BlessingOfKings {
 		bokStats := [5]stats.Stat{
 			stats.Agility,
@@ -85,6 +89,10 @@ func applyBuffEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs proto.P
 			})
 		}
 	}
+
+	character.AddStats(stats.Stats{
+		stats.AttackPower: GetTristateValueFloat(partyBuffs.BattleShout, 306, 382.5),
+	})
 
 	if partyBuffs.TotemOfWrath > 0 {
 		character.AddStats(stats.Stats{

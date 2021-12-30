@@ -37,25 +37,32 @@ export class EnhancementShamanSimUI extends IndividualSimUI<Spec.SpecEnhancement
 			// All stats for which EP should be calculated.
 			epStats: [
 				Stat.StatIntellect,
+				Stat.StatAgility,
+				Stat.StatStrength,
 				Stat.StatSpellPower,
-				Stat.StatNatureSpellPower,
-				Stat.StatSpellHit,
-				Stat.StatSpellCrit,
-				Stat.StatSpellHaste,
-				Stat.StatMP5,
+				Stat.StatAttackPower,
+				Stat.StatMeleeHit,
+				Stat.StatMeleeCrit,
+				Stat.StatMeleeHaste,
 			],
 			// Reference stat against which to calculate EP. I think all classes use either spell power or attack power.
-			epReferenceStat: Stat.StatSpellPower,
+			epReferenceStat: Stat.StatAttackPower,
 			// Which stats to display in the Character Stats section, at the bottom of the left-hand sidebar.
 			displayStats: [
 				Stat.StatStamina,
+				Stat.StatAttackPower,
+				Stat.StatExpertise,
+				Stat.StatMeleeHit,
+				Stat.StatMeleeCrit,
+				Stat.StatMeleeHaste,
+				Stat.StatStrength,
+				Stat.StatAgility,
 				Stat.StatIntellect,
 				Stat.StatSpellPower,
 				Stat.StatNatureSpellPower,
 				Stat.StatSpellHit,
 				Stat.StatSpellCrit,
 				Stat.StatSpellHaste,
-				Stat.StatMP5,
 			],
 
 			defaults: {
@@ -63,12 +70,14 @@ export class EnhancementShamanSimUI extends IndividualSimUI<Spec.SpecEnhancement
 				gear: Presets.PRERAID_GEAR.gear,
 				// Default EP weights for sorting gear in the gear picker.
 				epWeights: Stats.fromMap({
-					[Stat.StatIntellect]: 0.33,
-					[Stat.StatSpellPower]: 1,
-					[Stat.StatNatureSpellPower]: 1,
-					[Stat.StatSpellCrit]: 0.78,
-					[Stat.StatSpellHaste]: 1.25,
-					[Stat.StatMP5]: 0.08,
+					[Stat.StatIntellect]: 1.02,
+					[Stat.StatAgility]: 2.23,
+					[Stat.StatStrength]: 2.04,
+					[Stat.StatSpellPower]: 0.45,
+					[Stat.StatAttackPower]: 1.0,
+					[Stat.StatMeleeHit]: 1.0,
+					[Stat.StatMeleeCrit]: 2.86,
+					[Stat.StatMeleeHaste]: 0.62,
 				}),
 				// Default consumes settings.
 				consumes: Presets.DefaultConsumes,
@@ -85,14 +94,18 @@ export class EnhancementShamanSimUI extends IndividualSimUI<Spec.SpecEnhancement
 					giftOfTheWild: TristateEffect.TristateEffectImproved,
 				}),
 				partyBuffs: PartyBuffs.create({
+					
 				}),
 				individualBuffs: IndividualBuffs.create({
 					blessingOfKings: true,
 					blessingOfWisdom: 2,
+					blessingOfMight: 2,
 				}),
 				debuffs: Debuffs.create({
-					judgementOfWisdom: true,
-					misery: true,
+					faerieFire: 2,
+					improvedSealOfTheCrusader: true,
+					sunderArmor: true,
+					curseOfRecklessness: true,
 				}),
 			},
 
@@ -101,8 +114,6 @@ export class EnhancementShamanSimUI extends IndividualSimUI<Spec.SpecEnhancement
 				ShamanInputs.IconWaterShield,
 				ShamanInputs.IconBloodlust,
 				// TODO: add totem icons
-				// ShamanInputs.IconWrathOfAirTotem,
-				// ShamanInputs.IconTotemOfWrath,
 				// ShamanInputs.IconManaSpringTotem,
 				IconInputs.DrumsOfBattleConsume,
 				IconInputs.DrumsOfRestorationConsume,
@@ -110,53 +121,43 @@ export class EnhancementShamanSimUI extends IndividualSimUI<Spec.SpecEnhancement
 			// IconInputs to include in the 'Other Buffs' section on the settings tab.
 			raidBuffInputs: [
 				IconInputs.ArcaneBrilliance,
-				IconInputs.DivineSpirit,
 				IconInputs.GiftOfTheWild,
 			],
 			partyBuffInputs: [
-				IconInputs.MoonkinAura,
 				IconInputs.DrumsOfBattleBuff,
-				IconInputs.DrumsOfRestorationBuff,
 				IconInputs.Bloodlust,
-				IconInputs.WrathOfAirTotem,
-				IconInputs.TotemOfWrath,
 				IconInputs.ManaSpringTotem,
-				IconInputs.EyeOfTheNight,
-				IconInputs.ChainOfTheTwilightOwl,
-				IconInputs.JadePendantOfBlasting,
-				IconInputs.AtieshWarlock,
-				IconInputs.AtieshMage,
+				IconInputs.BattleShout,
 			],
 			playerBuffInputs: [
 				IconInputs.BlessingOfKings,
 				IconInputs.BlessingOfWisdom,
+				IconInputs.BlessingOfMight,
 			],
 			// IconInputs to include in the 'Debuffs' section on the settings tab.
 			debuffInputs: [
-				IconInputs.JudgementOfWisdom,
 				IconInputs.ImprovedSealOfTheCrusader,
-				IconInputs.Misery,
-				IconInputs.CurseOfElements,
+				IconInputs.FaerieFire,
+				IconInputs.SunderArmor,
+				IconInputs.CurseOfRecklessness,
+				IconInputs.ExposeArmor,
 			],
 			// IconInputs to include in the 'Consumes' section on the settings tab.
 			consumeInputs: [
 				IconInputs.DefaultSuperManaPotion,
-				IconInputs.DefaultDestructionPotion,
+				IconInputs.DefaultHastePotion,
 				IconInputs.DarkRune,
-				IconInputs.FlaskOfBlindingLight,
-				IconInputs.FlaskOfSupremePower,
-				IconInputs.AdeptsElixir,
-				IconInputs.ElixirOfMajorMageblood,
-				IconInputs.ElixirOfDraenicWisdom,
-				IconInputs.BrilliantWizardOil,
-				IconInputs.SuperiorWizardOil,
+				IconInputs.FlaskOfRelentlessAssault,
+				IconInputs.ElixirOfMajorAgility,
+				IconInputs.RoastedClefthoof,
+				IconInputs.ScrollOfAgilityV,
+				IconInputs.ScrollOfStrengthV,
 			],
 			// Inputs to include in the 'Rotation' section on the settings tab.
 			rotationInputs: ShamanInputs.EnhancementShamanRotationConfig,
 			// Inputs to include in the 'Other' section on the settings tab.
 			otherInputs: {
 				inputs: [
-					OtherInputs.ShadowPriestDPS,
 					OtherInputs.StartingPotion,
 					OtherInputs.NumStartingPotions,
 				],

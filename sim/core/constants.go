@@ -13,7 +13,7 @@ const MeleeCritRatingPerCritChance = 22.08
 const MeleeHitRatingPerHitChance = 15.77
 const MeleeAttackRatingPerDamage = 14
 
-const ExpertisePerPercentReduction = 15.77
+const ExpertisePerQuarterPercentReduction = 3.94
 const ArmorPenPerPercentArmor = 5.92
 
 const SpellCritRatingPerCritChance = 22.08

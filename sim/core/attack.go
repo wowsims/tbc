@@ -19,6 +19,11 @@ type OnBeforeSwingHit func(sim *Simulation, isOH bool) bool
 //  Ability can be nil if this was activated by an ability.
 type OnMeleeAttack func(sim *Simulation, target *Target, result MeleeHitType, ability *ActiveMeleeAbility, isOH bool)
 
+// OnBeforeMelee is invoked before the hit/dmg rolls are made.
+//  This is invoked on both auto attacks and melee abilities.
+//
+type OnBeforeMelee func(sim *Simulation, ability *ActiveMeleeAbility, isOH bool)
+
 type ResourceCost struct {
 	Type  stats.Stat // stats.Mana, stats.Energy, stats.Rage
 	Value float64
@@ -73,15 +78,19 @@ type MeleeAbility struct {
 }
 
 // PerformAutoAttack performs a basic weapon swing of the given type.
-func PerformAutoAttack(sim *Simulation, c *Character, target *Target, weapon *items.Item, dmgMult float64, isOH bool) {
-	hit := PerformAttack(sim, c, target)
+func PerformAutoAttack(sim *Simulation, c *Character, weapon *items.Item, effect *ActiveMeleeAbility, isOH bool) {
+	target := effect.Target
+	target.OnBeforeMelee(sim, effect, isOH)
+	c.OnBeforeMelee(sim, effect, isOH)
+
+	hit := PerformAttack(sim, c, target, effect.AbilityEffect)
 
 	hitStr := ""
 	if hit == MeleeHitTypeGlance {
-		dmgMult *= 0.75
+		effect.DamageMultiplier *= 0.75
 		hitStr = "glances"
 	} else if hit == MeleeHitTypeCrit {
-		dmgMult *= 2.0
+		effect.DamageMultiplier *= 2.0
 		hitStr = "crits"
 	} else if hit == MeleeHitTypeHit {
 		// no change to multiplier
@@ -95,14 +104,13 @@ func PerformAutoAttack(sim *Simulation, c *Character, target *Target, weapon *it
 		c.Metrics.AddAutoAttack(weapon.ID, hit, 0, isOH)
 		return // no damage from a block/miss
 	}
-
 	// Main use of OnBeforeSwingHit is if the swing needs to turn into a yellow hit (skipping the white hit damage below)
 	doSwing := c.OnBeforeSwingHit(sim, isOH)
 	if !doSwing {
 		return // skip the attack
 	}
 
-	dmg := meleeDamage(sim, weapon.WeaponDamageMin, weapon.WeaponDamageMax, 0, weapon.SwingSpeed, isOH, dmgMult, c.stats[stats.AttackPower], target.ArmorDamageReduction())
+	dmg := meleeDamage(sim, weapon.WeaponDamageMin, weapon.WeaponDamageMax, 0, weapon.SwingSpeed, isOH, effect.DamageMultiplier*effect.StaticDamageMultiplier, c.stats[stats.AttackPower]+effect.BonusAttackPower, target.ArmorDamageReduction())
 	if sim.Log != nil {
 		sim.Log("Melee auto attack %s for %0.1f", hitStr, dmg)
 	}
@@ -123,7 +131,7 @@ const (
 )
 
 // PerformAttack performs a basic weapon swing of the given type.
-func PerformAttack(sim *Simulation, c *Character, target *Target) MeleeHitType {
+func PerformAttack(sim *Simulation, c *Character, target *Target, effect AbilityEffect) MeleeHitType {
 	// 1. Single roll -> Miss				Dodge	Parry	Glance	Block	Crit / Hit
 	// 3 				8.0%(9.0% hit cap)	6.5%	14.0%	24% 	5%		-4.8%
 
@@ -137,27 +145,25 @@ func PerformAttack(sim *Simulation, c *Character, target *Target) MeleeHitType {
 	missChance := 0.05 + (levelMinusSkill)*0.002
 	hitSuppression := (levelMinusSkill - 10) * 0.002
 
-	if c.Equip[proto.ItemSlot_ItemSlotOffHand].WeaponType != 0 {
+	if !effect.IgnoreDualWieldPenalty && c.Equip[proto.ItemSlot_ItemSlotOffHand].WeaponType != 0 {
 		missChance += 0.19
 	}
 
-	hitBonus := (c.stats[stats.MeleeHit] / (MeleeHitRatingPerHitChance * 100)) - hitSuppression
+	hitBonus := ((c.stats[stats.MeleeHit] + effect.BonusHitRating) / (MeleeHitRatingPerHitChance * 100)) - hitSuppression
 	if hitBonus > 0 {
-		missChance -= hitBonus
+		missChance -= math.Min(missChance, hitBonus)
 	}
 
 	chance := missChance
 	if roll < chance {
-		// log.Printf("miss")
 		return MeleeHitTypeMiss
 	}
 
-	expertise := c.stats[stats.Expertise] / (ExpertisePerPercentReduction * 100)
+	expertisePercentage := math.Floor(c.stats[stats.Expertise]/(ExpertisePerQuarterPercentReduction)) / 400
 	// Next Dodge
-	chance += 0.05 + levelMinusSkill*0.001 - expertise
+	chance += 0.05 + levelMinusSkill*0.001 - expertisePercentage
 
 	if roll < chance {
-		// log.Printf("dodge")
 		return MeleeHitTypeDodge
 	}
 
@@ -178,8 +184,7 @@ func PerformAttack(sim *Simulation, c *Character, target *Target) MeleeHitType {
 		return MeleeHitTypeGlance
 	}
 	// Crit Check
-	critReduction := (level - 70*0.01) + 0.018
-	chance += c.stats[stats.MeleeCrit]/(MeleeCritRatingPerCritChance*100) + (skill - (level*5)*0.002) - critReduction
+	chance += ((c.stats[stats.MeleeCrit] + effect.BonusCritRating) / (MeleeCritRatingPerCritChance * 100)) + ((skill - (level * 5)) * 0.002) - 0.018
 
 	if roll < chance {
 		return MeleeHitTypeCrit
@@ -235,13 +240,16 @@ func (ability *ActiveMeleeAbility) performAttack(sim *Simulation) bool {
 		}
 	}
 
+	ability.Target.OnBeforeMelee(sim, ability, false)
+	ability.Character.OnBeforeMelee(sim, ability, false)
+
 	// Goes on CD on use
 	if ability.ActionID.CooldownID != 0 {
 		ability.Character.SetCD(ability.ActionID.CooldownID, sim.CurrentTime+ability.Cooldown)
 	}
 
 	// 1. Attack Roll
-	hit := PerformAttack(sim, ability.Character, ability.Target)
+	hit := PerformAttack(sim, ability.Character, ability.Target, ability.AbilityEffect)
 	ability.Result = hit
 	if hit != MeleeHitTypeCrit && hit != MeleeHitTypeGlance && hit != MeleeHitTypeHit {
 		// TODO: add metrics
@@ -254,7 +262,7 @@ func (ability *ActiveMeleeAbility) performAttack(sim *Simulation) bool {
 		if ability.WeaponDamageInput.Offhand > 0 {
 			ability.Misses++
 		}
-		if ability.DirectDamageInput.FlatDamageBonus > 0 {
+		if ability.DirectDamageInput.FlatDamageBonus > 0 || ability.DirectDamageInput.MinBaseDamage > 0 {
 			ability.Misses++
 		}
 		// Not sure MH/OH Matters for an attack
@@ -264,8 +272,7 @@ func (ability *ActiveMeleeAbility) performAttack(sim *Simulation) bool {
 	c := ability.Character
 	skill := 350.0
 	level := float64(ability.Target.Level)
-	critReduction := (level - 70*0.01) + 0.018
-	critChance := c.stats[stats.MeleeCrit]/(MeleeCritRatingPerCritChance*100) + (skill - (level*5)*0.002) - critReduction
+	critChance := ((c.stats[stats.MeleeCrit] + ability.BonusCritRating) / (MeleeCritRatingPerCritChance * 100)) + ((skill - (level * 5)) * 0.002) - 0.018
 
 	if ability.DirectDamageInput.FlatDamageBonus > 0 || ability.DirectDamageInput.MinBaseDamage > 0 {
 		ability.applyFlatDamage(sim, critChance)
@@ -297,7 +304,20 @@ func (ability *ActiveMeleeAbility) applySwingDamage(sim *Simulation, slot proto.
 	if speed == 0 {
 		speed = weapon.SwingSpeed
 	}
-	dmg := meleeDamage(sim, weapon.WeaponDamageMin, weapon.WeaponDamageMax, ability.WeaponDamageInput.MainHandFlat, speed, false, ability.WeaponDamageInput.MainHand, char.stats[stats.AttackPower], ability.Target.ArmorDamageReduction())
+
+	isOH := slot != proto.ItemSlot_ItemSlotMainHand
+
+	multiplier := ability.DamageMultiplier * ability.StaticDamageMultiplier
+	flat := 0.0
+	if !isOH {
+		multiplier *= ability.WeaponDamageInput.MainHand
+		flat += ability.MainHandFlat
+	} else {
+		multiplier *= ability.WeaponDamageInput.Offhand
+		flat += ability.OffhandFlat
+	}
+
+	dmg := meleeDamage(sim, weapon.WeaponDamageMin, weapon.WeaponDamageMax, flat, speed, isOH, multiplier, char.stats[stats.AttackPower]+ability.BonusAttackPower, ability.Target.ArmorDamageReduction())
 	if sim.Log != nil {
 		sim.Log("%s mainhand for %0.1f", ability.Name, dmg)
 	}
@@ -347,10 +367,12 @@ type AbilityEffect struct {
 	// Target of the spell.
 	Target *Target
 
-	// Bonus stats to be added to the spell.
-	BonusSpellHitRating  float64
-	BonusSpellPower      float64
-	BonusSpellCritRating float64
+	// Bonus stats to be added to the attack.
+	BonusHitRating   float64
+	BonusAttackPower float64
+	BonusCritRating  float64
+
+	IgnoreDualWieldPenalty bool
 
 	// Additional multiplier that is always applied.
 	DamageMultiplier float64
@@ -363,8 +385,16 @@ type AbilityEffect struct {
 
 func NewAutoAttacks(c *Character) AutoAttacks {
 	st := AutoAttacks{
-		c:                c,
-		DamageMultiplier: 1.0,
+		c: c,
+		AbilityEffect: AbilityEffect{
+			DamageMultiplier:       1.0,
+			StaticDamageMultiplier: 1.0,
+		},
+		active: ActiveMeleeAbility{
+			MeleeAbility: MeleeAbility{
+				Name: "Auto Attacks",
+			},
+		},
 	}
 
 	// Setup initial swing timers
@@ -390,9 +420,10 @@ type AutoAttacks struct {
 	mhbase time.Duration
 	ohbase time.Duration
 
-	MainhandSwingAt  time.Duration
-	OffhandSwingAt   time.Duration
-	DamageMultiplier float64 // auto attack damage multiplier
+	MainhandSwingAt time.Duration
+	OffhandSwingAt  time.Duration
+	AbilityEffect                      // bonuses to auto attacks
+	active          ActiveMeleeAbility // Mostly just for passing AbilityEffect to OnBeforeMelee to allow modification to auto attacks.
 }
 
 func (aa *AutoAttacks) MainhandSwingSpeed() time.Duration {
@@ -405,14 +436,17 @@ func (aa *AutoAttacks) OffhandSwingSpeed() time.Duration {
 
 // Swing will check any swing timers if they are up, and if so, swing!
 func (aa *AutoAttacks) Swing(sim *Simulation, target *Target) {
+	aa.AbilityEffect.Target = target
 	if aa.MainhandSwingAt <= sim.CurrentTime {
 		// Make a MH swing!
-		PerformAutoAttack(sim, aa.c, target, aa.mh, aa.DamageMultiplier, false)
+		aa.active.AbilityEffect = aa.AbilityEffect
+		PerformAutoAttack(sim, aa.c, aa.mh, &aa.active, false)
 		aa.MainhandSwingAt = sim.CurrentTime + aa.MainhandSwingSpeed()
 	}
 	if aa.OffhandSwingAt <= sim.CurrentTime {
 		// Make a OH swing!
-		PerformAutoAttack(sim, aa.c, target, aa.oh, aa.DamageMultiplier, true)
+		aa.active.AbilityEffect = aa.AbilityEffect
+		PerformAutoAttack(sim, aa.c, aa.oh, &aa.active, true)
 		aa.OffhandSwingAt = sim.CurrentTime + aa.OffhandSwingSpeed()
 	}
 }
@@ -431,9 +465,11 @@ func (aa *AutoAttacks) ModifySwingTime(sim *Simulation, amount float64) {
 	}
 	ohSwingTime := aa.OffhandSwingAt - sim.CurrentTime
 	if ohSwingTime > 0 {
-		aa.OffhandSwingAt = sim.CurrentTime + time.Duration(float64(ohSwingTime)/amount)
+		newTime := time.Duration(float64(ohSwingTime) / amount)
+		if newTime > 0 {
+			aa.OffhandSwingAt = sim.CurrentTime + newTime
+		}
 	}
-
 }
 
 // TimeUntil compares swing timers to the next cast or attack and returns the time the next event occurs at.
@@ -459,7 +495,6 @@ func (aa *AutoAttacks) TimeUntil(sim *Simulation, cast *SimpleSpell, atk *Active
 		nextEventTime = MaxDuration(atk.CastTime, atk.Character.GetRemainingCD(GCDCooldownID, sim.CurrentTime))
 	}
 	mhswing := aa.MainhandSwingAt - sim.CurrentTime
-
 	if mhswing < nextEventTime || nextEventTime == 0 {
 		nextEventTime = mhswing
 	}

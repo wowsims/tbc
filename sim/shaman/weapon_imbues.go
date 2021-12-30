@@ -6,7 +6,6 @@ import (
 
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/proto"
-	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 var TotemOfTheAstralWinds int32 = 27815
@@ -18,6 +17,12 @@ func ApplyWindfuryImbue(shaman *Shaman, mh bool, oh bool) {
 	if mh && oh {
 		proc = 0.36
 	}
+	apBonus := 475.0
+
+	if shaman.Equip[proto.ItemSlot_ItemSlotRanged].ID == TotemOfTheAstralWinds {
+		apBonus += 80
+	}
+
 	wftempl := core.ActiveMeleeAbility{
 		MeleeAbility: core.MeleeAbility{
 			Name: "Windfury Attack",
@@ -31,6 +36,12 @@ func ApplyWindfuryImbue(shaman *Shaman, mh bool, oh bool) {
 			MainHand: 1.0,
 			Offhand:  1.0,
 		},
+		AbilityEffect: core.AbilityEffect{
+			DamageMultiplier:       1.0,
+			StaticDamageMultiplier: 1.0,
+			BonusAttackPower:       apBonus,
+			IgnoreDualWieldPenalty: true,
+		},
 	}
 	if shaman.Talents.ElementalWeapons > 0 {
 		wftempl.MainHand *= 1 + math.Round(float64(shaman.Talents.ElementalWeapons)*13.33)/100
@@ -43,12 +54,6 @@ func ApplyWindfuryImbue(shaman *Shaman, mh bool, oh bool) {
 	shaman.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		var icd core.InternalCD
 		const icdDur = time.Second * 3
-
-		apBonus := 475.0
-
-		if shaman.Equip[proto.ItemSlot_ItemSlotRanged].ID == TotemOfTheAstralWinds {
-			apBonus += 80
-		}
 
 		return core.Aura{
 			ID:   WFImbueAuraID,
@@ -66,15 +71,12 @@ func ApplyWindfuryImbue(shaman *Shaman, mh bool, oh bool) {
 				icd = core.InternalCD(sim.CurrentTime + icdDur)
 				for i := 0; i < 2; i++ {
 					wfTemplate.Apply(&wfAtk)
+					wfAtk.BonusAttackPower += apBonus
 					// Set so only the proc'd hand attacks
 					if isOH {
-						speed := shaman.Equip[proto.ItemSlot_ItemSlotOffHand].SwingSpeed
 						wfAtk.MainHand = 0
-						wfAtk.OffhandFlat += (speed * (shaman.GetStat(stats.AttackPower) + apBonus)) / core.MeleeAttackRatingPerDamage
 					} else {
-						speed := shaman.Equip[proto.ItemSlot_ItemSlotMainHand].SwingSpeed
 						wfAtk.Offhand = 0
-						wfAtk.OffhandFlat += (speed * (shaman.GetStat(stats.AttackPower) + apBonus)) / core.MeleeAttackRatingPerDamage
 					}
 					wfAtk.Target = target
 					wfAtk.Attack(sim)
