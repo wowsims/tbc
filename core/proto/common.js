@@ -705,6 +705,10 @@ export var Potions;
      * @generated from protobuf enum value: SuperManaPotion = 2;
      */
     Potions[Potions["SuperManaPotion"] = 2] = "SuperManaPotion";
+    /**
+     * @generated from protobuf enum value: HastePotion = 3;
+     */
+    Potions[Potions["HastePotion"] = 3] = "HastePotion";
 })(Potions || (Potions = {}));
 /**
  * @generated from protobuf enum proto.MobType
@@ -850,11 +854,12 @@ class PartyBuffs$Type extends MessageType {
             { no: 13, name: "totem_of_wrath", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 14, name: "wrath_of_air_totem", kind: "enum", T: () => ["proto.TristateEffect", TristateEffect] },
             { no: 15, name: "grace_of_air_totem", kind: "enum", T: () => ["proto.TristateEffect", TristateEffect] },
-            { no: 16, name: "strength_of_earth_totem", kind: "enum", T: () => ["proto.TristateEffect", TristateEffect] }
+            { no: 16, name: "strength_of_earth_totem", kind: "enum", T: () => ["proto.TristateEffect", TristateEffect] },
+            { no: 18, name: "battle_shout", kind: "enum", T: () => ["proto.TristateEffect", TristateEffect] }
         ]);
     }
     create(value) {
-        const message = { bloodlust: 0, moonkinAura: 0, draeneiRacialMelee: false, draeneiRacialCaster: false, drums: 0, atieshMage: 0, atieshWarlock: 0, braidedEterniumChain: false, eyeOfTheNight: false, chainOfTheTwilightOwl: false, jadePendantOfBlasting: false, manaSpringTotem: 0, manaTideTotems: 0, totemOfWrath: 0, wrathOfAirTotem: 0, graceOfAirTotem: 0, strengthOfEarthTotem: 0 };
+        const message = { bloodlust: 0, moonkinAura: 0, draeneiRacialMelee: false, draeneiRacialCaster: false, drums: 0, atieshMage: 0, atieshWarlock: 0, braidedEterniumChain: false, eyeOfTheNight: false, chainOfTheTwilightOwl: false, jadePendantOfBlasting: false, manaSpringTotem: 0, manaTideTotems: 0, totemOfWrath: 0, wrathOfAirTotem: 0, graceOfAirTotem: 0, strengthOfEarthTotem: 0, battleShout: 0 };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -915,6 +920,9 @@ class PartyBuffs$Type extends MessageType {
                     break;
                 case /* proto.TristateEffect strength_of_earth_totem */ 16:
                     message.strengthOfEarthTotem = reader.int32();
+                    break;
+                case /* proto.TristateEffect battle_shout */ 18:
+                    message.battleShout = reader.int32();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -979,6 +987,9 @@ class PartyBuffs$Type extends MessageType {
         /* proto.TristateEffect strength_of_earth_totem = 16; */
         if (message.strengthOfEarthTotem !== 0)
             writer.tag(16, WireType.Varint).int32(message.strengthOfEarthTotem);
+        /* proto.TristateEffect battle_shout = 18; */
+        if (message.battleShout !== 0)
+            writer.tag(18, WireType.Varint).int32(message.battleShout);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -1079,17 +1090,23 @@ class Consumes$Type extends MessageType {
             { no: 2, name: "flask_of_mighty_restoration", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 3, name: "flask_of_pure_death", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 4, name: "flask_of_supreme_power", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 21, name: "flask_of_relentless_assault", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 5, name: "adepts_elixir", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 6, name: "elixir_of_major_fire_power", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 7, name: "elixir_of_major_frost_power", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 8, name: "elixir_of_major_shadow_power", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 9, name: "elixir_of_draenic_wisdom", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 10, name: "elixir_of_major_mageblood", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 22, name: "elixir_of_major_agility", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 23, name: "elixir_of_demonslaying", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 11, name: "brilliant_wizard_oil", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 12, name: "superior_wizard_oil", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 13, name: "blackened_basilisk", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 14, name: "skullfish_soup", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 24, name: "roasted_clefthoof", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 20, name: "kreegsStoutBeatdown", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 25, name: "scroll_of_strength_v", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 26, name: "scroll_of_agility_v", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 15, name: "default_potion", kind: "enum", T: () => ["proto.Potions", Potions] },
             { no: 16, name: "starting_potion", kind: "enum", T: () => ["proto.Potions", Potions] },
             { no: 17, name: "num_starting_potions", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
@@ -1098,7 +1115,7 @@ class Consumes$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { flaskOfBlindingLight: false, flaskOfMightyRestoration: false, flaskOfPureDeath: false, flaskOfSupremePower: false, adeptsElixir: false, elixirOfMajorFirePower: false, elixirOfMajorFrostPower: false, elixirOfMajorShadowPower: false, elixirOfDraenicWisdom: false, elixirOfMajorMageblood: false, brilliantWizardOil: false, superiorWizardOil: false, blackenedBasilisk: false, skullfishSoup: false, kreegsStoutBeatdown: false, defaultPotion: 0, startingPotion: 0, numStartingPotions: 0, darkRune: false, drums: 0 };
+        const message = { flaskOfBlindingLight: false, flaskOfMightyRestoration: false, flaskOfPureDeath: false, flaskOfSupremePower: false, flaskOfRelentlessAssault: false, adeptsElixir: false, elixirOfMajorFirePower: false, elixirOfMajorFrostPower: false, elixirOfMajorShadowPower: false, elixirOfDraenicWisdom: false, elixirOfMajorMageblood: false, elixirOfMajorAgility: false, elixirOfDemonslaying: false, brilliantWizardOil: false, superiorWizardOil: false, blackenedBasilisk: false, skullfishSoup: false, roastedClefthoof: false, kreegsStoutBeatdown: false, scrollOfStrengthV: false, scrollOfAgilityV: false, defaultPotion: 0, startingPotion: 0, numStartingPotions: 0, darkRune: false, drums: 0 };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -1121,6 +1138,9 @@ class Consumes$Type extends MessageType {
                 case /* bool flask_of_supreme_power */ 4:
                     message.flaskOfSupremePower = reader.bool();
                     break;
+                case /* bool flask_of_relentless_assault */ 21:
+                    message.flaskOfRelentlessAssault = reader.bool();
+                    break;
                 case /* bool adepts_elixir */ 5:
                     message.adeptsElixir = reader.bool();
                     break;
@@ -1139,6 +1159,12 @@ class Consumes$Type extends MessageType {
                 case /* bool elixir_of_major_mageblood */ 10:
                     message.elixirOfMajorMageblood = reader.bool();
                     break;
+                case /* bool elixir_of_major_agility */ 22:
+                    message.elixirOfMajorAgility = reader.bool();
+                    break;
+                case /* bool elixir_of_demonslaying */ 23:
+                    message.elixirOfDemonslaying = reader.bool();
+                    break;
                 case /* bool brilliant_wizard_oil */ 11:
                     message.brilliantWizardOil = reader.bool();
                     break;
@@ -1151,8 +1177,17 @@ class Consumes$Type extends MessageType {
                 case /* bool skullfish_soup */ 14:
                     message.skullfishSoup = reader.bool();
                     break;
+                case /* bool roasted_clefthoof */ 24:
+                    message.roastedClefthoof = reader.bool();
+                    break;
                 case /* bool kreegsStoutBeatdown */ 20:
                     message.kreegsStoutBeatdown = reader.bool();
+                    break;
+                case /* bool scroll_of_strength_v */ 25:
+                    message.scrollOfStrengthV = reader.bool();
+                    break;
+                case /* bool scroll_of_agility_v */ 26:
+                    message.scrollOfAgilityV = reader.bool();
                     break;
                 case /* proto.Potions default_potion */ 15:
                     message.defaultPotion = reader.int32();
@@ -1193,6 +1228,9 @@ class Consumes$Type extends MessageType {
         /* bool flask_of_supreme_power = 4; */
         if (message.flaskOfSupremePower !== false)
             writer.tag(4, WireType.Varint).bool(message.flaskOfSupremePower);
+        /* bool flask_of_relentless_assault = 21; */
+        if (message.flaskOfRelentlessAssault !== false)
+            writer.tag(21, WireType.Varint).bool(message.flaskOfRelentlessAssault);
         /* bool adepts_elixir = 5; */
         if (message.adeptsElixir !== false)
             writer.tag(5, WireType.Varint).bool(message.adeptsElixir);
@@ -1211,6 +1249,12 @@ class Consumes$Type extends MessageType {
         /* bool elixir_of_major_mageblood = 10; */
         if (message.elixirOfMajorMageblood !== false)
             writer.tag(10, WireType.Varint).bool(message.elixirOfMajorMageblood);
+        /* bool elixir_of_major_agility = 22; */
+        if (message.elixirOfMajorAgility !== false)
+            writer.tag(22, WireType.Varint).bool(message.elixirOfMajorAgility);
+        /* bool elixir_of_demonslaying = 23; */
+        if (message.elixirOfDemonslaying !== false)
+            writer.tag(23, WireType.Varint).bool(message.elixirOfDemonslaying);
         /* bool brilliant_wizard_oil = 11; */
         if (message.brilliantWizardOil !== false)
             writer.tag(11, WireType.Varint).bool(message.brilliantWizardOil);
@@ -1223,9 +1267,18 @@ class Consumes$Type extends MessageType {
         /* bool skullfish_soup = 14; */
         if (message.skullfishSoup !== false)
             writer.tag(14, WireType.Varint).bool(message.skullfishSoup);
+        /* bool roasted_clefthoof = 24; */
+        if (message.roastedClefthoof !== false)
+            writer.tag(24, WireType.Varint).bool(message.roastedClefthoof);
         /* bool kreegsStoutBeatdown = 20; */
         if (message.kreegsStoutBeatdown !== false)
             writer.tag(20, WireType.Varint).bool(message.kreegsStoutBeatdown);
+        /* bool scroll_of_strength_v = 25; */
+        if (message.scrollOfStrengthV !== false)
+            writer.tag(25, WireType.Varint).bool(message.scrollOfStrengthV);
+        /* bool scroll_of_agility_v = 26; */
+        if (message.scrollOfAgilityV !== false)
+            writer.tag(26, WireType.Varint).bool(message.scrollOfAgilityV);
         /* proto.Potions default_potion = 15; */
         if (message.defaultPotion !== 0)
             writer.tag(15, WireType.Varint).int32(message.defaultPotion);
@@ -1261,11 +1314,16 @@ class Debuffs$Type extends MessageType {
             { no: 4, name: "curse_of_elements", kind: "enum", T: () => ["proto.TristateEffect", TristateEffect] },
             { no: 5, name: "isb_uptime", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
             { no: 6, name: "improved_scorch", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
-            { no: 7, name: "winters_chill", kind: "scalar", T: 8 /*ScalarType.BOOL*/ }
+            { no: 7, name: "winters_chill", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 8, name: "blood_frenzy", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 9, name: "expose_armor", kind: "enum", T: () => ["proto.TristateEffect", TristateEffect] },
+            { no: 10, name: "faerie_fire", kind: "enum", T: () => ["proto.TristateEffect", TristateEffect] },
+            { no: 11, name: "sunder_armor", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 12, name: "curse_of_recklessness", kind: "scalar", T: 8 /*ScalarType.BOOL*/ }
         ]);
     }
     create(value) {
-        const message = { judgementOfWisdom: false, improvedSealOfTheCrusader: false, misery: false, curseOfElements: 0, isbUptime: 0, improvedScorch: false, wintersChill: false };
+        const message = { judgementOfWisdom: false, improvedSealOfTheCrusader: false, misery: false, curseOfElements: 0, isbUptime: 0, improvedScorch: false, wintersChill: false, bloodFrenzy: false, exposeArmor: 0, faerieFire: 0, sunderArmor: false, curseOfRecklessness: false };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -1296,6 +1354,21 @@ class Debuffs$Type extends MessageType {
                     break;
                 case /* bool winters_chill */ 7:
                     message.wintersChill = reader.bool();
+                    break;
+                case /* bool blood_frenzy */ 8:
+                    message.bloodFrenzy = reader.bool();
+                    break;
+                case /* proto.TristateEffect expose_armor */ 9:
+                    message.exposeArmor = reader.int32();
+                    break;
+                case /* proto.TristateEffect faerie_fire */ 10:
+                    message.faerieFire = reader.int32();
+                    break;
+                case /* bool sunder_armor */ 11:
+                    message.sunderArmor = reader.bool();
+                    break;
+                case /* bool curse_of_recklessness */ 12:
+                    message.curseOfRecklessness = reader.bool();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -1330,6 +1403,21 @@ class Debuffs$Type extends MessageType {
         /* bool winters_chill = 7; */
         if (message.wintersChill !== false)
             writer.tag(7, WireType.Varint).bool(message.wintersChill);
+        /* bool blood_frenzy = 8; */
+        if (message.bloodFrenzy !== false)
+            writer.tag(8, WireType.Varint).bool(message.bloodFrenzy);
+        /* proto.TristateEffect expose_armor = 9; */
+        if (message.exposeArmor !== 0)
+            writer.tag(9, WireType.Varint).int32(message.exposeArmor);
+        /* proto.TristateEffect faerie_fire = 10; */
+        if (message.faerieFire !== 0)
+            writer.tag(10, WireType.Varint).int32(message.faerieFire);
+        /* bool sunder_armor = 11; */
+        if (message.sunderArmor !== false)
+            writer.tag(11, WireType.Varint).bool(message.sunderArmor);
+        /* bool curse_of_recklessness = 12; */
+        if (message.curseOfRecklessness !== false)
+            writer.tag(12, WireType.Varint).bool(message.curseOfRecklessness);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

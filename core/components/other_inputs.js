@@ -31,6 +31,7 @@ export const StartingPotion = {
         values: [
             { name: 'None', value: Potions.UnknownPotion },
             { name: 'Destruction', value: Potions.DestructionPotion },
+            { name: 'Haste', value: Potions.HastePotion },
             { name: 'Super Mana', value: Potions.SuperManaPotion },
         ],
         changedEvent: (player) => player.consumesChangeEmitter,

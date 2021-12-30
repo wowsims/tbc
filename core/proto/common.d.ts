@@ -103,6 +103,10 @@ export interface PartyBuffs {
      * @generated from protobuf field: proto.TristateEffect strength_of_earth_totem = 16;
      */
     strengthOfEarthTotem: TristateEffect;
+    /**
+     * @generated from protobuf field: proto.TristateEffect battle_shout = 18;
+     */
+    battleShout: TristateEffect;
 }
 /**
  * Buffs are only used by individual sims, never the raid sim.
@@ -159,6 +163,10 @@ export interface Consumes {
      */
     flaskOfSupremePower: boolean;
     /**
+     * @generated from protobuf field: bool flask_of_relentless_assault = 21;
+     */
+    flaskOfRelentlessAssault: boolean;
+    /**
      * @generated from protobuf field: bool adepts_elixir = 5;
      */
     adeptsElixir: boolean;
@@ -183,6 +191,14 @@ export interface Consumes {
      */
     elixirOfMajorMageblood: boolean;
     /**
+     * @generated from protobuf field: bool elixir_of_major_agility = 22;
+     */
+    elixirOfMajorAgility: boolean;
+    /**
+     * @generated from protobuf field: bool elixir_of_demonslaying = 23;
+     */
+    elixirOfDemonslaying: boolean;
+    /**
      * @generated from protobuf field: bool brilliant_wizard_oil = 11;
      */
     brilliantWizardOil: boolean;
@@ -199,9 +215,21 @@ export interface Consumes {
      */
     skullfishSoup: boolean;
     /**
+     * @generated from protobuf field: bool roasted_clefthoof = 24;
+     */
+    roastedClefthoof: boolean;
+    /**
      * @generated from protobuf field: bool kreegsStoutBeatdown = 20;
      */
     kreegsStoutBeatdown: boolean;
+    /**
+     * @generated from protobuf field: bool scroll_of_strength_v = 25;
+     */
+    scrollOfStrengthV: boolean;
+    /**
+     * @generated from protobuf field: bool scroll_of_agility_v = 26;
+     */
+    scrollOfAgilityV: boolean;
     /**
      * @generated from protobuf field: proto.Potions default_potion = 15;
      */
@@ -255,6 +283,26 @@ export interface Debuffs {
      * @generated from protobuf field: bool winters_chill = 7;
      */
     wintersChill: boolean;
+    /**
+     * @generated from protobuf field: bool blood_frenzy = 8;
+     */
+    bloodFrenzy: boolean;
+    /**
+     * @generated from protobuf field: proto.TristateEffect expose_armor = 9;
+     */
+    exposeArmor: TristateEffect;
+    /**
+     * @generated from protobuf field: proto.TristateEffect faerie_fire = 10;
+     */
+    faerieFire: TristateEffect;
+    /**
+     * @generated from protobuf field: bool sunder_armor = 11;
+     */
+    sunderArmor: boolean;
+    /**
+     * @generated from protobuf field: bool curse_of_recklessness = 12;
+     */
+    curseOfRecklessness: boolean;
 }
 /**
  * @generated from protobuf message proto.Target
@@ -1160,7 +1208,11 @@ export declare enum Potions {
     /**
      * @generated from protobuf enum value: SuperManaPotion = 2;
      */
-    SuperManaPotion = 2
+    SuperManaPotion = 2,
+    /**
+     * @generated from protobuf enum value: HastePotion = 3;
+     */
+    HastePotion = 3
 }
 /**
  * @generated from protobuf enum proto.MobType
