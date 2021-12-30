@@ -43,6 +43,9 @@ type Mage struct {
 	fireballSpell        core.SimpleSpell
 	fireballCastTemplate core.SimpleSpellTemplate
 
+	fireballDotSpell        core.SimpleSpell
+	fireballDotCastTemplate core.SimpleSpellTemplate
+
 	frostboltSpell        core.SimpleSpell
 	frostboltCastTemplate core.SimpleSpellTemplate
 
@@ -63,6 +66,7 @@ func (mage *Mage) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {
 func (mage *Mage) Init(sim *core.Simulation) {
 	mage.arcaneBlastCastTemplate = mage.newArcaneBlastTemplate(sim)
 	mage.fireballCastTemplate = mage.newFireballTemplate(sim)
+	mage.fireballDotCastTemplate = mage.newFireballDotTemplate(sim)
 	mage.frostboltCastTemplate = mage.newFrostboltTemplate(sim)
 	mage.scorchCastTemplate = mage.newScorchTemplate(sim)
 }

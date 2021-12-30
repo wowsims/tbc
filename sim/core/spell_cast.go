@@ -170,6 +170,11 @@ func (spellEffect *SpellEffect) applyDot(sim *Simulation, spellCast *SpellCast, 
 	}
 
 	pa.OnAction = func(sim *Simulation) {
+		if ddInput.currentDotAction == nil {
+			// Means this dot has been cleaned up, so just do nothing.
+			return
+		}
+
 		// fmt.Printf("DOT (%s) Ticking, Time Remaining: %0.2f\n", spellCast.Name, ddInput.TimeRemaining(sim).Seconds())
 		damage := ddInput.damagePerTick
 
@@ -205,10 +210,10 @@ func (spellEffect *SpellEffect) applyDot(sim *Simulation, spellCast *SpellCast, 
 		}
 	}
 	pa.CleanUp = func(sim *Simulation) {
-		if pa.NextActionAt == 0 {
-			panic("Already cleaned up dot")
+		if ddInput.currentDotAction == nil {
+			return
 		}
-		pa.NextActionAt = 0
+		ddInput.currentDotAction = nil
 
 		// Complete metrics and adding results etc
 		spellEffect.applyResultsToCast(spellCast)
@@ -223,6 +228,7 @@ func (spellEffect *SpellEffect) applyDot(sim *Simulation, spellCast *SpellCast, 
 		}
 	}
 
+	ddInput.currentDotAction = pa
 	sim.AddPendingAction(pa)
 }
 

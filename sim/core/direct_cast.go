@@ -96,6 +96,11 @@ func (spell *SimpleSpell) Cast(sim *Simulation) bool {
 	})
 }
 
+func (spell *SimpleSpell) Cancel(sim *Simulation) {
+	spell.SpellCast.Cancel()
+	spell.SpellHitEffect.cancel(sim)
+}
+
 type SpellHitEffect struct {
 	SpellEffect
 	DotInput    DotDamageInput
@@ -134,6 +139,12 @@ func (hitEffect *SpellHitEffect) apply(sim *Simulation, spellCast *SpellCast, ap
 	hitEffect.afterCalculations(sim, spellCast)
 }
 
+func (hitEffect *SpellHitEffect) cancel(sim *Simulation) {
+	if hitEffect.DotInput.currentDotAction != nil {
+		hitEffect.DotInput.currentDotAction.CleanUp(sim)
+	}
+}
+
 // DotDamageInput is the data needed to kick of the dot ticking in pendingActions.
 //  For now the only way for a caster to track their dot is to keep a reference to the cast object
 //  that started this and check the DotDamageInput.IsTicking()
@@ -155,6 +166,9 @@ type DotDamageInput struct {
 	finalTickTime time.Duration
 	damagePerTick float64
 	tickIndex     int
+
+	// The action currently used for this dot, or nil if not ticking.
+	currentDotAction *PendingAction
 }
 
 // DamagePerTick returns the cached damage per tick on the spell.
