@@ -472,6 +472,19 @@ func (at *auraTracker) NumStacks(id AuraID) int32 {
 	}
 }
 
+func (at *auraTracker) RemainingAuraDuration(sim *Simulation, id AuraID) time.Duration {
+	if at.HasAura(id) {
+		expires := at.auras[id].Expires
+		if expires == NeverExpires {
+			return NeverExpires
+		} else {
+			return expires - sim.CurrentTime
+		}
+	} else {
+		return 0
+	}
+}
+
 func (at *auraTracker) IsOnCD(id CooldownID, currentTime time.Duration) bool {
 	return at.cooldowns[id] > currentTime
 }

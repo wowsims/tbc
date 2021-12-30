@@ -18,20 +18,19 @@ import { Player } from '/tbc/core/player.js';
 import { Sim } from '/tbc/core/sim.js';
 import { IndividualSimUI } from '/tbc/core/individual_sim_ui.js';
 
-import { BalanceDruid, BalanceDruid_Rotation as BalanceDruidRotation, DruidTalents as DruidTalents, BalanceDruid_Options as BalanceDruidOptions } from '/tbc/core/proto/druid.js';
-import { BalanceDruid_Rotation_PrimarySpell as PrimarySpell } from '/tbc/core/proto/druid.js';
+import { Mage, Mage_Rotation as MageRotation, MageTalents as MageTalents, Mage_Options as MageOptions } from '/tbc/core/proto/mage.js';
 
 import * as IconInputs from '/tbc/core/components/icon_inputs.js';
 import * as OtherInputs from '/tbc/core/components/other_inputs.js';
 import * as Tooltips from '/tbc/core/constants/tooltips.js';
 
-import * as DruidInputs from './inputs.js';
+import * as MageInputs from './inputs.js';
 import * as Presets from './presets.js';
 
-export class BalanceDruidSimUI extends IndividualSimUI<Spec.SpecBalanceDruid> {
-  constructor(parentElem: HTMLElement, player: Player<Spec.SpecBalanceDruid>) {
+export class MageSimUI extends IndividualSimUI<Spec.SpecMage> {
+  constructor(parentElem: HTMLElement, player: Player<Spec.SpecMage>) {
 		super(parentElem, player, {
-			cssClass: 'balance-druid-sim-ui',
+			cssClass: 'mage-sim-ui',
 			// List any known bugs / issues here and they'll be shown on the site.
 			knownIssues: [
 			],
@@ -42,7 +41,8 @@ export class BalanceDruidSimUI extends IndividualSimUI<Spec.SpecBalanceDruid> {
 				Stat.StatSpirit,
 				Stat.StatSpellPower,
 				Stat.StatArcaneSpellPower,
-				Stat.StatNatureSpellPower,
+				Stat.StatFireSpellPower,
+				Stat.StatFrostSpellPower,
 				Stat.StatSpellHit,
 				Stat.StatSpellCrit,
 				Stat.StatSpellHaste,
@@ -56,8 +56,6 @@ export class BalanceDruidSimUI extends IndividualSimUI<Spec.SpecBalanceDruid> {
 				Stat.StatIntellect,
 				Stat.StatSpirit,
 				Stat.StatSpellPower,
-				Stat.StatArcaneSpellPower,
-				Stat.StatNatureSpellPower,
 				Stat.StatSpellHit,
 				Stat.StatSpellCrit,
 				Stat.StatSpellHaste,
@@ -66,45 +64,42 @@ export class BalanceDruidSimUI extends IndividualSimUI<Spec.SpecBalanceDruid> {
 
 			defaults: {
 				// Default equipped gear.
-				gear: Presets.P1_ALLIANCE_PRESET.gear,
+				gear: Presets.P1_FIRE_PRESET.gear,
 				// Default EP weights for sorting gear in the gear picker.
 				epWeights: Stats.fromMap({
 					[Stat.StatIntellect]: 0.54,
 					[Stat.StatSpirit]: 0.1,
 					[Stat.StatSpellPower]: 1,
 					[Stat.StatArcaneSpellPower]: 1,
-					[Stat.StatNatureSpellPower]: 0,
+					[Stat.StatFireSpellPower]: 0,
+					[Stat.StatFrostSpellPower]: 0,
 					[Stat.StatSpellCrit]: 0.84,
 					[Stat.StatSpellHaste]: 1.29,
 					[Stat.StatMP5]: 0.00,
 				}),
 				// Default consumes settings.
-				consumes: Presets.DefaultConsumes,
+				consumes: Presets.DefaultFireConsumes,
 				// Default rotation settings.
-				rotation: Presets.DefaultRotation,
+				rotation: Presets.DefaultFireRotation,
 				// Default talents.
-				talents: Presets.StandardTalents.data,
+				talents: Presets.FireTalents.data,
 				// Default spec-specific settings.
-				specOptions: BalanceDruidOptions.create({
-					innervateTarget: RaidTarget.create({
-						targetIndex: 0, // In an individual sim the 0-indexed player is ourself.
-					}),
-				}),
+				specOptions: Presets.DefaultFireOptions,
 				// Default raid/party buffs settings.
 				raidBuffs: RaidBuffs.create({
-					arcaneBrilliance: true,
-					divineSpirit: TristateEffect.TristateEffectImproved,
+					giftOfTheWild: TristateEffect.TristateEffectImproved,
 				}),
 				partyBuffs: PartyBuffs.create({
 					drums: Drums.DrumsOfBattle,
 					bloodlust: 1,
-					manaSpringTotem: TristateEffect.TristateEffectRegular,
-					totemOfWrath: 1,
+					manaSpringTotem: TristateEffect.TristateEffectImproved,
+					manaTideTotems: 1,
 					wrathOfAirTotem: TristateEffect.TristateEffectRegular,
 				}),
 				individualBuffs: IndividualBuffs.create({
 					blessingOfKings: true,
 					blessingOfWisdom: TristateEffect.TristateEffectImproved,
+					innervates: 1,
 				}),
 				debuffs: Debuffs.create({
 					judgementOfWisdom: true,
@@ -115,14 +110,15 @@ export class BalanceDruidSimUI extends IndividualSimUI<Spec.SpecBalanceDruid> {
 
 			// IconInputs to include in the 'Self Buffs' section on the settings tab.
 			selfBuffInputs: [
-				DruidInputs.SelfInnervate,
+				MageInputs.MageArmor,
+				MageInputs.MoltenArmor,
 				IconInputs.DrumsOfBattleConsume,
 				IconInputs.DrumsOfRestorationConsume,
 			],
 			// IconInputs to include in the 'Other Buffs' section on the settings tab.
 			raidBuffInputs: [
-				IconInputs.ArcaneBrilliance,
 				IconInputs.DivineSpirit,
+				IconInputs.GiftOfTheWild,
 			],
 			partyBuffInputs: [
 				IconInputs.DrumsOfBattleBuff,
@@ -151,6 +147,8 @@ export class BalanceDruidSimUI extends IndividualSimUI<Spec.SpecBalanceDruid> {
 				IconInputs.ImprovedSealOfTheCrusader,
 				IconInputs.CurseOfElements,
 				IconInputs.Misery,
+				IconInputs.ImprovedScorch,
+				IconInputs.WintersChill,
 			],
 			// IconInputs to include in the 'Consumes' section on the settings tab.
 			consumeInputs: [
@@ -158,8 +156,11 @@ export class BalanceDruidSimUI extends IndividualSimUI<Spec.SpecBalanceDruid> {
 				IconInputs.DefaultDestructionPotion,
 				IconInputs.DarkRune,
 				IconInputs.FlaskOfBlindingLight,
+				IconInputs.FlaskOfPureDeath,
 				IconInputs.FlaskOfSupremePower,
 				IconInputs.AdeptsElixir,
+				IconInputs.ElixirOfMajorFirePower,
+				IconInputs.ElixirOfMajorFrostPower,
 				IconInputs.ElixirOfMajorMageblood,
 				IconInputs.ElixirOfDraenicWisdom,
 				IconInputs.BrilliantWizardOil,
@@ -169,7 +170,7 @@ export class BalanceDruidSimUI extends IndividualSimUI<Spec.SpecBalanceDruid> {
 				IconInputs.KreegsStoutBeatdown,
 			],
 			// Inputs to include in the 'Rotation' section on the settings tab.
-			rotationInputs: DruidInputs.BalanceDruidRotationConfig,
+			rotationInputs: MageInputs.MageRotationConfig,
 			// Inputs to include in the 'Other' section on the settings tab.
 			otherInputs: {
 				inputs: [
@@ -192,15 +193,13 @@ export class BalanceDruidSimUI extends IndividualSimUI<Spec.SpecBalanceDruid> {
 			presets: {
 				// Preset talents that the user can quickly select.
 				talents: [
-					Presets.StandardTalents,
+					Presets.ArcaneTalents,
+					Presets.FireTalents,
+					Presets.FrostTalents,
 				],
 				// Preset gear configurations that the user can quickly select.
 				gear: [
-					Presets.P1_ALLIANCE_PRESET,
-					Presets.P2_ALLIANCE_PRESET,
-					Presets.P1_HORDE_PRESET,
-					Presets.P2_HORDE_PRESET,
-					Presets.P3_PRESET,
+					Presets.P1_FIRE_PRESET,
 				],
 			},
 		});

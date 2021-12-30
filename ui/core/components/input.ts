@@ -25,6 +25,9 @@ export interface InputConfig<ModObject, T> {
 	// If set, will automatically disable the input when this evaluates to false.
 	enableWhen?: (obj: ModObject) => boolean,
 
+	// If set, will automatically hide the input when this evaluates to false.
+	showWhen?: (obj: ModObject) => boolean,
+
 	// Overrides the default root element (new div).
 	rootElem?: HTMLElement,
 }
@@ -80,6 +83,13 @@ export abstract class Input<ModObject, T> extends Component {
 		} else {
 			this.rootElem.classList.add('disabled');
 			this.getInputElem().setAttribute('disabled', '');
+		}
+
+		const show = !this.inputConfig.showWhen || this.inputConfig.showWhen(this.modObject);
+		if (show) {
+			this.rootElem.classList.remove('hide');
+		} else {
+			this.rootElem.classList.add('hide');
 		}
 	}
 

@@ -141,7 +141,6 @@ func ApplyInnerFocus(sim *core.Simulation, priest *Priest) bool {
 }
 
 func init() {
-
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceHuman, Class: proto.Class_ClassPriest}] = stats.Stats{
 		stats.Strength:  39,
 		stats.Agility:   45,
@@ -209,7 +208,7 @@ func init() {
 	}
 }
 
-// Agent is a generic way to access underlying priest on any of the agents
+// Agent is a generic way to access underlying priest on any of the agents.
 type Agent interface {
 	GetPriest() *Priest
 }

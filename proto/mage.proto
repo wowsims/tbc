@@ -59,12 +59,48 @@ message MageTalents {
 
 message Mage {
     message Rotation {
+			// Just used for controlling which options are displayed in the UI. Is not
+			// used by the sim.
+			enum Type {
+				Arcane = 0;
+				Fire = 1;
+				Frost = 2;
+			}
+
+			Type type = 1;
+
+			message ArcaneRotation {
+			}
+			ArcaneRotation arcane = 2;
+
+			message FireRotation {
+				enum PrimarySpell {
+					Fireball = 0;
+					Scorch = 1;
+				}
+				PrimarySpell primary_spell = 1;
+
+				bool maintain_improved_scorch = 2;
+
+				bool weave_fire_blast = 3;
+			}
+			FireRotation fire = 3;
+
+			message FrostRotation {
+			}
+			FrostRotation frost = 4;
     }
     Rotation rotation = 1;
 
     MageTalents talents = 2;
     
     message Options {
+			enum ArmorType {
+				NoArmor = 0;
+				MageArmor = 1;
+				MoltenArmor = 2;
+			}
+			ArmorType armor = 1;
     }
     Options options = 3;
 }

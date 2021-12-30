@@ -754,115 +754,115 @@ export const specToLocalStorageKey: Record<Spec, string> = {
 
 // Returns a copy of playerOptions, with the class field set.
 export function withSpecProto<SpecType extends Spec>(
+		spec: Spec,
     player: Player,
     rotation: SpecRotation<SpecType>,
     talents: SpecTalents<SpecType>,
     specOptions: SpecOptions<SpecType>): Player {
   const copy = Player.clone(player);
-  if (BalanceDruidRotation.is(rotation)) {
-		copy.class = Class.ClassDruid;
-    copy.spec = {
-      oneofKind: 'balanceDruid',
-      balanceDruid: BalanceDruid.create({
-        rotation: rotation,
-        talents: talents as DruidTalents,
-        options: specOptions as BalanceDruidOptions,
-      }),
-    };
-  } else if (ElementalShamanRotation.is(rotation)) {
-		copy.class = Class.ClassShaman;
-    copy.spec = {
-      oneofKind: 'elementalShaman',
-      elementalShaman: ElementalShaman.create({
-        rotation: rotation,
-        talents: talents as ShamanTalents,
-        options: specOptions as ElementalShamanOptions,
-      }),
-    };
-  } else if (EnhancementShamanRotation.is(rotation)) {
-		copy.class = Class.ClassShaman;
-    copy.spec = {
-      oneofKind: 'enhancementShaman',
-      enhancementShaman: EnhancementShaman.create({
-        rotation: rotation,
-        talents: talents as ShamanTalents,
-        options: specOptions as ElementalShamanOptions,
-      }),
-    };
-  } else if (HunterRotation.is(rotation)) {
-		copy.class = Class.ClassHunter;
-    copy.spec = {
-      oneofKind: 'hunter',
-      hunter: Hunter.create({
-        rotation: rotation,
-        talents: talents as HunterTalents,
-        options: specOptions as HunterOptions,
-      }),
-    };
-  } else if (MageRotation.is(rotation)) {
-		copy.class = Class.ClassMage;
-    copy.spec = {
-      oneofKind: 'mage',
-      mage: Mage.create({
-        rotation: rotation,
-        talents: talents as MageTalents,
-        options: specOptions as MageOptions,
-      }),
-    };
-  } else if (RetributionPaladinRotation.is(rotation)) {
-		copy.class = Class.ClassPaladin;
-    copy.spec = {
-      oneofKind: 'retributionPaladin',
-      retributionPaladin: RetributionPaladin.create({
-        rotation: rotation,
-        talents: talents as PaladinTalents,
-        options: specOptions as RetributionPaladinOptions,
-      }),
-    };
-  } else if (RogueRotation.is(rotation)) {
-		copy.class = Class.ClassRogue;
-    copy.spec = {
-      oneofKind: 'rogue',
-      rogue: Rogue.create({
-        rotation: rotation,
-        talents: talents as RogueTalents,
-        options: specOptions as RogueOptions,
-      }),
-    };
-  } else if (ShadowPriestRotation.is(rotation)) {
-		copy.class = Class.ClassPriest;
-    copy.spec = {
-      oneofKind: 'shadowPriest',
-      shadowPriest: ShadowPriest.create({
-        rotation: rotation,
-        talents: talents as PriestTalents,
-        options: specOptions as ShadowPriestOptions,
-      }),
-    };
-  } else if (WarlockRotation.is(rotation)) {
-		copy.class = Class.ClassWarlock;
-    copy.spec = {
-      oneofKind: 'warlock',
-      warlock: Warlock.create({
-        rotation: rotation,
-        talents: talents as WarlockTalents,
-        options: specOptions as WarlockOptions,
-      }),
-    };
-  } else if (WarriorRotation.is(rotation)) {
-		copy.class = Class.ClassWarrior;
-    copy.spec = {
-      oneofKind: 'warrior',
-      warrior: Warrior.create({
-        rotation: rotation,
-        talents: talents as WarriorTalents,
-        options: specOptions as WarriorOptions,
-      }),
-    };
-  } else {
-    throw new Error('Unrecognized talents with options: ' + Player.toJsonString(player));
-  }
-  return copy;
+
+	switch (spec) {
+	case Spec.SpecBalanceDruid:
+		copy.spec = {
+			oneofKind: 'balanceDruid',
+			balanceDruid: BalanceDruid.create({
+				rotation: rotation as BalanceDruidRotation,
+				talents: talents as DruidTalents,
+				options: specOptions as BalanceDruidOptions,
+			}),
+		};
+		return copy;
+	case Spec.SpecElementalShaman:
+		copy.spec = {
+			oneofKind: 'elementalShaman',
+			elementalShaman: ElementalShaman.create({
+				rotation: rotation as ElementalShamanRotation,
+				talents: talents as ShamanTalents,
+				options: specOptions as ElementalShamanOptions,
+			}),
+		};
+		return copy;
+	case Spec.SpecEnhancementShaman:
+		copy.spec = {
+			oneofKind: 'enhancementShaman',
+			enhancementShaman: EnhancementShaman.create({
+				rotation: rotation as EnhancementShamanRotation,
+				talents: talents as ShamanTalents,
+				options: specOptions as ElementalShamanOptions,
+			}),
+		};
+		return copy;
+	case Spec.SpecHunter:
+		copy.spec = {
+			oneofKind: 'hunter',
+			hunter: Hunter.create({
+				rotation: rotation as HunterRotation,
+				talents: talents as HunterTalents,
+				options: specOptions as HunterOptions,
+			}),
+		};
+		return copy;
+	case Spec.SpecMage:
+		copy.spec = {
+			oneofKind: 'mage',
+			mage: Mage.create({
+				rotation: rotation as MageRotation,
+				talents: talents as MageTalents,
+				options: specOptions as MageOptions,
+			}),
+		};
+		return copy;
+	case Spec.SpecRetributionPaladin:
+		copy.spec = {
+			oneofKind: 'retributionPaladin',
+			retributionPaladin: RetributionPaladin.create({
+				rotation: rotation as RetributionPaladinRotation,
+				talents: talents as PaladinTalents,
+				options: specOptions as RetributionPaladinOptions,
+			}),
+		};
+		return copy;
+	case Spec.SpecRogue:
+		copy.spec = {
+			oneofKind: 'rogue',
+			rogue: Rogue.create({
+				rotation: rotation as RogueRotation,
+				talents: talents as RogueTalents,
+				options: specOptions as RogueOptions,
+			}),
+		};
+		return copy;
+	case Spec.SpecShadowPriest:
+		copy.spec = {
+			oneofKind: 'shadowPriest',
+			shadowPriest: ShadowPriest.create({
+				rotation: rotation as ShadowPriestRotation,
+				talents: talents as PriestTalents,
+				options: specOptions as ShadowPriestOptions,
+			}),
+		};
+		return copy;
+	case Spec.SpecWarlock:
+		copy.spec = {
+			oneofKind: 'warlock',
+			warlock: Warlock.create({
+				rotation: rotation as WarlockRotation,
+				talents: talents as WarlockTalents,
+				options: specOptions as WarlockOptions,
+			}),
+		};
+		return copy;
+	case Spec.SpecWarrior:
+		copy.spec = {
+			oneofKind: 'warrior',
+			warrior: Warrior.create({
+				rotation: rotation as WarriorRotation,
+				talents: talents as WarriorTalents,
+				options: specOptions as WarriorOptions,
+			}),
+		};
+		return copy;
+	}
 }
 
 export function playerToSpec(player: Player): Spec {
@@ -878,7 +878,7 @@ export function playerToSpec(player: Player): Spec {
 		}
 	}
 
-	throw new Error('Unable to parse spec from player proto: ' + player);
+	throw new Error('Unable to parse spec from player proto: ' + JSON.stringify(Player.toJson(player), null, 2));
 }
 
 const classToMaxArmorType: Record<Class, ArmorType> = {

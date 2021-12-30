@@ -336,7 +336,7 @@ func (shaman *Shaman) registerElementalMasteryCD() {
 					Expires: core.NeverExpires,
 					OnCast: func(sim *core.Simulation, cast *core.Cast) {
 						cast.ManaCost = 0
-						cast.GuaranteedCrit = true
+						cast.BonusCritRating = 100.0 * core.SpellCritRatingPerCritChance
 					},
 					OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
 						// Remove the buff and put skill on CD
