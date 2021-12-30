@@ -64,12 +64,9 @@ func applyDebuffEffects(target *Target, debuffs proto.Debuffs) {
 	}
 
 	if debuffs.FaerieFire != proto.TristateEffect_TristateEffectMissing {
-		target.armor -= 610
-		if debuffs.FaerieFire == proto.TristateEffect_TristateEffectImproved {
-			target.AddPermanentAura(func(sim *Simulation) Aura {
-				return FaerieFireAura(0, target)
-			})
-		}
+		target.AddPermanentAura(func(sim *Simulation) Aura {
+			return FaerieFireAura(0, target, debuffs.FaerieFire == proto.TristateEffect_TristateEffectImproved)
+		})
 	}
 
 	if debuffs.SunderArmor {
@@ -270,10 +267,10 @@ func WintersChillAura(sim *Simulation, numStacks int32) Aura {
 
 var FaerieFireDebuffID = NewDebuffID()
 
-func FaerieFireAura(currentTime time.Duration, target *Target) Aura {
+func FaerieFireAura(currentTime time.Duration, target *Target, improved bool) Aura {
 	const hitBonus = 3 * MeleeHitRatingPerHitChance
 	target.AddArmor(-610)
-	return Aura{
+	aura := Aura{
 		ID:      FaerieFireDebuffID,
 		SpellID: 26993,
 		Name:    "Faerie Fire",
@@ -281,11 +278,14 @@ func FaerieFireAura(currentTime time.Duration, target *Target) Aura {
 		OnExpire: func(sim *Simulation) {
 			target.AddArmor(-610)
 		},
-		OnBeforeMelee: func(sim *Simulation, ability *ActiveMeleeAbility, isOH bool) {
+	}
+	if improved {
+		aura.OnBeforeMelee = func(sim *Simulation, ability *ActiveMeleeAbility, isOH bool) {
 			ability.BonusHitRating += hitBonus
-		},
+		}
 	}
 
+	return aura
 }
 
 var SunderArmorDebuffID = NewDebuffID()
