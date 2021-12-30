@@ -182,6 +182,8 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 
 	private raidSimResultsManager: RaidSimResultsManager | null;
 
+	private settingsMuuri: any;
+
   constructor(parentElem: HTMLElement, player: Player<SpecType>, config: IndividualSimUIConfig<SpecType>) {
 		super(parentElem, player.sim, {
 			spec: player.spec,
@@ -192,6 +194,7 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 		this.individualConfig = config;
 		this.isWithinRaidSim = this.rootElem.closest('.within-raid-sim') != null;
 		this.raidSimResultsManager = null;
+		this.settingsMuuri = null;
 		this.addWarning({
 			updateOn: this.player.gearChangeEmitter,
 			shouldDisplay: () => this.player.getGear().hasInactiveMetaGem(),
@@ -483,7 +486,8 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 		const debuffsSection = this.rootElem.getElementsByClassName('debuffs-section')[0] as HTMLElement;
     configureIconSection(
 				debuffsSection,
-				this.individualConfig.debuffInputs.map(iconInput => new IndividualSimIconPicker(debuffsSection, this.sim.encounter.primaryTarget, iconInput, this)));
+				this.individualConfig.debuffInputs.map(iconInput => new IndividualSimIconPicker(debuffsSection, this.sim.encounter.primaryTarget, iconInput, this)),
+				Tooltips.DEBUFFS_SECTION);
 
 		const consumesSection = this.rootElem.getElementsByClassName('consumes-section')[0] as HTMLElement;
     configureIconSection(
@@ -541,15 +545,16 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 
     // Init Muuri layout only when settings tab is clicked, because it needs the elements
     // to be shown so it can calculate sizes.
-    let muuriInit = false;
     (this.rootElem.getElementsByClassName('settings-tab-tab')[0] as HTMLElement)!.addEventListener('click', event => {
-      if (muuriInit) {
-        return;
+      if (this.settingsMuuri == null) {
+				setTimeout(() => {
+					this.settingsMuuri = new Muuri('.settings-inputs');
+				}, 200); // Magic amount of time before Muuri init seems to work
       }
-      muuriInit = true;
-      setTimeout(() => {
-        new Muuri('.settings-inputs');
-      }, 200); // Magic amount of time before Muuri init seems to work
+
+			setTimeout(() => {
+				this.recomputeSettingsLayout();
+			}, 200);
     });
 
     const savedSettingsManager = new SavedDataManager<IndividualSimUI<any>, SavedSettings>(this.rootElem.getElementsByClassName('saved-settings-manager')[0] as HTMLElement, this, {
@@ -731,6 +736,10 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 
 	getSavedTalentsStorageKey(): string {
 		return this.getStorageKey(SAVED_TALENTS_STORAGE_KEY);
+	}
+
+	recomputeSettingsLayout() {
+		window.dispatchEvent(new Event('resize'));
 	}
 
 	// Returns the actual key to use for local storage, based on the given key part and the site context.

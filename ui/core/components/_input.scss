@@ -10,3 +10,7 @@
 .input-root.disabled .input-label, .input-root.disabled .input-tooltip {
 	filter: opacity(0.5);
 }
+
+.input-root.hide {
+	display: none;
+}

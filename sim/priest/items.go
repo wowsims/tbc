@@ -86,9 +86,6 @@ var ItemSetAvatar = core.ItemSet{
 	},
 }
 
-var Absolution2PcAuraID = core.NewAuraID()
-var Absolution4PcAuraID = core.NewAuraID()
-
 var ItemSetAbsolution = core.ItemSet{
 	Name:  "Absolution Regalia",
 	Items: map[int32]struct{}{31061: {}, 31064: {}, 31067: {}, 31070: {}, 31065: {}, 34434: {}, 34528: {}, 34563: {}},

@@ -425,6 +425,7 @@ export class Player<SpecType extends Spec> {
 
 	toProto(): PlayerProto {
     return withSpecProto(
+				this.spec,
 				PlayerProto.create({
 					name: this.getName(),
 					race: this.getRace(),

@@ -1,0 +1,6 @@
+dps_results: {
+ key: "TestAverageDPS-Troll10-P1Fire-Fire-FullBuffs-LongSingleTarget"
+ value: {
+  dps: 1241.7775631127492
+ }
+}

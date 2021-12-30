@@ -50,10 +50,12 @@ export const Innervate = makeMultistateIndividualBuffInput({spellId:29166}, 11, 
 export const PowerInfusion = makeMultistateIndividualBuffInput({spellId:10060}, 11, 'powerInfusions');
 
 // Debuffs
+export const ImprovedScorch = makeBooleanDebuffInput({spellId:12873}, 'improvedScorch');
 export const ImprovedSealOfTheCrusader = makeBooleanDebuffInput({spellId:20337}, 'improvedSealOfTheCrusader');
 export const JudgementOfWisdom = makeBooleanDebuffInput({spellId:27164}, 'judgementOfWisdom');
 export const Misery = makeBooleanDebuffInput({spellId:33195}, 'misery');
 export const CurseOfElements = makeTristateDebuffInput({spellId:27228}, {spellId:32484}, 'curseOfElements');
+export const WintersChill = makeBooleanDebuffInput({spellId:28595}, 'wintersChill');
 
 // Consumes
 export const AdeptsElixir = makeBooleanConsumeInput({itemId:28103}, 'adeptsElixir', ['Battle Elixir']);
