@@ -37,6 +37,18 @@ func applyDebuffEffects(target *Target, debuffs proto.Debuffs) {
 			return ImprovedShadowBoltAura(debuffs.IsbUptime)
 		})
 	}
+
+	if debuffs.ImprovedScorch {
+		target.AddPermanentAura(func(sim *Simulation) Aura {
+			return ImprovedScorchAura(sim, 5)
+		})
+	}
+
+	if debuffs.WintersChill {
+		target.AddPermanentAura(func(sim *Simulation) Aura {
+			return WintersChillAura(sim, 5)
+		})
+	}
 }
 
 var MiseryDebuffID = NewDebuffID()
@@ -167,6 +179,49 @@ func ImprovedShadowBoltAura(uptime float64) Aura {
 				return // does not apply to these schools
 			}
 			*tickDamage *= mult
+		},
+	}
+}
+
+var ImprovedScorchDebuffID = NewDebuffID()
+
+func ImprovedScorchAura(sim *Simulation, numStacks int32) Aura {
+	multiplier := 1.0 + 0.03*float64(numStacks)
+
+	return Aura{
+		ID:      ImprovedScorchDebuffID,
+		Name:    "Improved Scorch",
+		SpellID: 12873,
+		Expires: sim.CurrentTime + time.Second*30,
+		Stacks:  numStacks,
+		OnBeforeSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect) {
+			if spellCast.SpellSchool == stats.FireSpellPower {
+				spellEffect.DamageMultiplier *= multiplier
+			}
+		},
+		OnBeforePeriodicDamage: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect, tickDamage *float64) {
+			if spellCast.SpellSchool == stats.FireSpellPower {
+				*tickDamage *= multiplier
+			}
+		},
+	}
+}
+
+var WintersChillDebuffID = NewDebuffID()
+
+func WintersChillAura(sim *Simulation, numStacks int32) Aura {
+	bonusCrit := 2 * float64(numStacks) * SpellCritRatingPerCritChance
+
+	return Aura{
+		ID:      WintersChillDebuffID,
+		Name:    "Winter's Chill",
+		SpellID: 28595,
+		Expires: sim.CurrentTime + time.Second*15,
+		Stacks:  numStacks,
+		OnBeforeSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect) {
+			if spellCast.SpellSchool == stats.FrostSpellPower {
+				spellEffect.BonusSpellCritRating += bonusCrit
+			}
 		},
 	}
 }

@@ -143,8 +143,8 @@ func (spellEffect *SpellEffect) calculateDirectDamage(sim *Simulation, spellCast
 
 	damage *= spellEffect.DamageMultiplier * spellEffect.StaticDamageMultiplier
 
-	crit := (spellCast.Character.GetStat(stats.SpellCrit) + spellEffect.BonusSpellCritRating) / (SpellCritRatingPerCritChance * 100)
-	if spellCast.GuaranteedCrit || sim.RandomFloat("DirectSpell Crit") < crit {
+	crit := (spellCast.Character.GetStat(stats.SpellCrit) + spellCast.BonusCritRating + spellEffect.BonusSpellCritRating) / (SpellCritRatingPerCritChance * 100)
+	if sim.RandomFloat("DirectSpell Crit") < crit {
 		spellEffect.Crit = true
 		damage *= spellCast.CritMultiplier
 	}

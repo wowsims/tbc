@@ -1,0 +1,210 @@
+dps_results: {
+ key: "TestAllItemEffects-AldorRegalia"
+ value: {
+  dps: 1163.1900154485568
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-AshtongueTalismanofInsight-32488"
+ value: {
+  dps: 1279.3538671319825
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-BandoftheEternalSage-29305"
+ value: {
+  dps: 1365.209977389221
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-BracingEarthstormDiamond"
+ value: {
+  dps: 1296.5530717421573
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-ChaoticSkyfireDiamond"
+ value: {
+  dps: 1315.6427946360454
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-DarkIronSmokingPipe-38290"
+ value: {
+  dps: 1315.6427946360454
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-DarkmoonCard:Crusade-31856"
+ value: {
+  dps: 1312.2780569813456
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-EmberSkyfireDiamond"
+ value: {
+  dps: 1308.6152766062073
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-EssenceoftheMartyr-29376"
+ value: {
+  dps: 1296.3894341746281
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-EyeofMagtheridon-28789"
+ value: {
+  dps: 1300.7938977708793
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-Figurine-LivingRubySerpent-24126"
+ value: {
+  dps: 1290.2469228354923
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-HexShrunkenHead-33829"
+ value: {
+  dps: 1331.6285800751862
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-ImbuedUnstableDiamond"
+ value: {
+  dps: 1296.5530717421573
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-InsightfulEarthstormDiamond"
+ value: {
+  dps: 1311.5687214742186
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-Mana-EtchedRegalia"
+ value: {
+  dps: 1076.2610892577109
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-MarkoftheChampion-23207"
+ value: {
+  dps: 1316.9324161417362
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-MindQuickeningGem-19339"
+ value: {
+  dps: 1264.2925006007106
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-MysticalSkyfireDiamond"
+ value: {
+  dps: 1290.070508563954
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-RobeoftheElderScribes-28602"
+ value: {
+  dps: 1268.2117428028646
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-Scryer'sBloodgem-29132"
+ value: {
+  dps: 1281.8681839410879
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-SextantofUnstableCurrents-30626"
+ value: {
+  dps: 1317.0676352012076
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-Shiffar'sNexus-Horn-28418"
+ value: {
+  dps: 1320.612719692483
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-ShiftingNaaruSliver-34429"
+ value: {
+  dps: 1325.579132686065
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-Sorcerer'sAlchemistStone-35749"
+ value: {
+  dps: 1335.5656150632967
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-SpellfireSet"
+ value: {
+  dps: 1255.2764558520887
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-SpellstrikeInfusion"
+ value: {
+  dps: 1207.2577118461961
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-SwiftStarfireDiamond"
+ value: {
+  dps: 1295.2735235101761
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-TempestRegalia"
+ value: {
+  dps: 1426.733974271076
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-TheLightningCapacitor-28785"
+ value: {
+  dps: 1242.3440622357286
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-TheRestrainedEssenceofSapphiron-23046"
+ value: {
+  dps: 1309.463215964382
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-TheSkullofGul'dan-32483"
+ value: {
+  dps: 1325.846278591658
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-TheTwinStars"
+ value: {
+  dps: 1326.086985986539
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-Timbal'sFocusingCrystal-34470"
+ value: {
+  dps: 1290.138300959061
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-TirisfalRegalia"
+ value: {
+  dps: 1237.0288135392614
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-Xi'ri'sGift-29179"
+ value: {
+  dps: 1312.6180029497514
+ }
+}

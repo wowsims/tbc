@@ -95,6 +95,7 @@ export class ShadowPriestSimUI extends IndividualSimUI<Spec.SpecShadowPriest> {
 					giftOfTheWild: TristateEffect.TristateEffectImproved,
 				}),
 				partyBuffs: PartyBuffs.create({
+					drums: Drums.DrumsOfBattle,
 					bloodlust: 1,
 					manaSpringTotem: TristateEffect.TristateEffectRegular,
 					totemOfWrath: 1,
