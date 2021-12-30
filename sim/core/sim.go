@@ -224,11 +224,6 @@ func (sim *Simulation) AddPendingAction(pa *PendingAction) {
 	heap.Push(&sim.pendingActions, pa)
 }
 
-// TODO: remove pending actions
-func (sim *Simulation) RemovePendingAction(id int32) {
-
-}
-
 // Advance moves time forward counting down auras, CDs, mana regen, etc
 func (sim *Simulation) advance(elapsedTime time.Duration) {
 	sim.CurrentTime += elapsedTime

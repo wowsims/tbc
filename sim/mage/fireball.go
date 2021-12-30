@@ -7,6 +7,10 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
+const (
+	CastTagFireballDot int32 = 1
+)
+
 const SpellIDFireball int32 = 27070
 
 func (mage *Mage) newFireballTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
@@ -29,6 +33,10 @@ func (mage *Mage) newFireballTemplate(sim *core.Simulation) core.SimpleSpellTemp
 			SpellEffect: core.SpellEffect{
 				DamageMultiplier:       1,
 				StaticDamageMultiplier: mage.spellDamageMultiplier,
+				OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+					fireballDot := mage.newFireballDot(sim, spellEffect.Target)
+					fireballDot.Cast(sim)
+				},
 			},
 			DirectInput: core.DirectDamageInput{
 				MinBaseDamage:    649,
@@ -53,6 +61,62 @@ func (mage *Mage) newFireballTemplate(sim *core.Simulation) core.SimpleSpellTemp
 	// TODO: Fireball built-in dot
 
 	return core.NewSimpleSpellTemplate(spell)
+}
+
+var FireballDotDebuffID = core.NewDebuffID()
+
+func (mage *Mage) newFireballDotTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
+	spell := core.SimpleSpell{
+		SpellCast: core.SpellCast{
+			Cast: core.Cast{
+				Name:        "Fireball",
+				SpellSchool: stats.FireSpellPower,
+				Character:   &mage.Character,
+				ActionID: core.ActionID{
+					SpellID: SpellIDFireball,
+					Tag:     CastTagFireballDot,
+				},
+				IgnoreCooldowns: true,
+				IgnoreManaCost:  true,
+			},
+		},
+		SpellHitEffect: core.SpellHitEffect{
+			SpellEffect: core.SpellEffect{
+				DamageMultiplier:       1,
+				StaticDamageMultiplier: mage.spellDamageMultiplier,
+			},
+			DotInput: core.DotDamageInput{
+				NumberOfTicks:        4,
+				TickLength:           time.Second * 2,
+				TickBaseDamage:       84 / 4,
+				TickSpellCoefficient: 0,
+				DebuffID:             FireballDotDebuffID,
+				SpellID:              SpellIDFireball,
+			},
+		},
+	}
+
+	spell.SpellHitEffect.SpellEffect.StaticDamageMultiplier *= 1 + 0.02*float64(mage.Talents.FirePower)
+
+	if ItemSetTempestRegalia.CharacterHasSetBonus(&mage.Character, 4) {
+		spell.SpellHitEffect.SpellEffect.StaticDamageMultiplier *= 1.05
+	}
+
+	return core.NewSimpleSpellTemplate(spell)
+}
+
+func (mage *Mage) newFireballDot(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
+	// Cancel the current fireball dot.
+	mage.fireballDotSpell.Cancel(sim)
+
+	fireballDot := &mage.fireballDotSpell
+	mage.fireballDotCastTemplate.Apply(fireballDot)
+
+	// Set dynamic fields, i.e. the stuff we couldn't precompute.
+	fireballDot.Target = target
+	fireballDot.Init(sim)
+
+	return fireballDot
 }
 
 func (mage *Mage) NewFireball(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
