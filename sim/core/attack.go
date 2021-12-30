@@ -150,9 +150,8 @@ func PerformAttack(sim *Simulation, c *Character, target *Target, effect Ability
 	}
 
 	hitBonus := ((c.stats[stats.MeleeHit] + effect.BonusHitRating) / (MeleeHitRatingPerHitChance * 100)) - hitSuppression
-	// log.Printf("Hit Bonus: %0.3f", hitBonus)
 	if hitBonus > 0 {
-		missChance -= hitBonus
+		missChance -= math.Min(missChance, hitBonus)
 	}
 
 	chance := missChance
@@ -185,8 +184,7 @@ func PerformAttack(sim *Simulation, c *Character, target *Target, effect Ability
 		return MeleeHitTypeGlance
 	}
 	// Crit Check
-	critReduction := (level - 70*0.01) + 0.018
-	chance += (c.stats[stats.MeleeCrit]+effect.BonusCritRating)/(MeleeCritRatingPerCritChance*100) + (skill - (level*5)*0.002) - critReduction
+	chance += ((c.stats[stats.MeleeCrit] + effect.BonusCritRating) / (MeleeCritRatingPerCritChance * 100)) + ((skill - (level * 5)) * 0.002) - 0.018
 
 	if roll < chance {
 		return MeleeHitTypeCrit
@@ -274,8 +272,7 @@ func (ability *ActiveMeleeAbility) performAttack(sim *Simulation) bool {
 	c := ability.Character
 	skill := 350.0
 	level := float64(ability.Target.Level)
-	critReduction := (level - 70*0.01) + 0.018
-	critChance := c.stats[stats.MeleeCrit]/(MeleeCritRatingPerCritChance*100) + (skill - (level*5)*0.002) - critReduction
+	critChance := ((c.stats[stats.MeleeCrit] + ability.BonusCritRating) / (MeleeCritRatingPerCritChance * 100)) + ((skill - (level * 5)) * 0.002) - 0.018
 
 	if ability.DirectDamageInput.FlatDamageBonus > 0 || ability.DirectDamageInput.MinBaseDamage > 0 {
 		ability.applyFlatDamage(sim, critChance)
