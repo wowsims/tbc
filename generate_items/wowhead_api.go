@@ -72,6 +72,7 @@ var shadowSpellPowerRegex = regexp.MustCompile("Increases damage done by Shadow 
 var spellHitRegex = regexp.MustCompile("Improves spell hit rating by <!--rtg18-->([0-9]+)\\.")
 var spellHitRegex2 = regexp.MustCompile("Increases your spell hit rating by (8|16)\\.")
 var spellCritRegex = regexp.MustCompile("Improves spell critical strike rating by <!--rtg21-->([0-9]+)\\.")
+var spellCritRegex2 = regexp.MustCompile("Increases your spell critical strike rating by ([0-9]+)\\.")
 var spellHasteRegex = regexp.MustCompile("Improves spell haste rating by <!--rtg30-->([0-9]+)\\.")
 var spellPenetrationRegex = regexp.MustCompile("Improves your spell penetration by ([0-9]+)\\.")
 var mp5Regex = regexp.MustCompile("Restores ([0-9]+) mana per 5 sec\\.")
@@ -110,14 +111,14 @@ func (item WowheadItemResponse) GetStats() Stats {
 		proto.Stat_StatHolySpellPower:   float64(item.GetIntValue(holySpellPowerRegex)),
 		proto.Stat_StatNatureSpellPower: float64(item.GetIntValue(natureSpellPowerRegex)),
 		proto.Stat_StatShadowSpellPower: float64(item.GetIntValue(shadowSpellPowerRegex)),
-		proto.Stat_StatSpellHit:         float64(item.GetIntValue(spellHitRegex)) + float64(item.GetIntValue(spellHitRegex2)),
-		proto.Stat_StatSpellCrit:        float64(item.GetIntValue(spellCritRegex)),
+		proto.Stat_StatSpellHit:         float64(item.GetIntValue(spellHitRegex) + item.GetIntValue(spellHitRegex2)),
+		proto.Stat_StatSpellCrit:        float64(item.GetIntValue(spellCritRegex) + item.GetIntValue(spellCritRegex2)),
 		proto.Stat_StatSpellHaste:       float64(item.GetIntValue(spellHasteRegex)),
 		proto.Stat_StatSpellPenetration: float64(item.GetIntValue(spellPenetrationRegex)),
 		proto.Stat_StatMP5:              float64(item.GetIntValue(mp5Regex)),
 		proto.Stat_StatAttackPower:      float64(item.GetIntValue(attackPowerRegex)),
-		proto.Stat_StatMeleeHit:         float64(item.GetIntValue(meleeHitRegex)) + float64(item.GetIntValue(meleeHitRegex2)),
-		proto.Stat_StatMeleeCrit:        float64(item.GetIntValue(meleeCritRegex)) + float64(item.GetIntValue(meleeCritRegex2)),
+		proto.Stat_StatMeleeHit:         float64(item.GetIntValue(meleeHitRegex) + item.GetIntValue(meleeHitRegex2)),
+		proto.Stat_StatMeleeCrit:        float64(item.GetIntValue(meleeCritRegex) + item.GetIntValue(meleeCritRegex2)),
 		proto.Stat_StatMeleeHaste:       float64(item.GetIntValue(meleeHasteRegex)),
 		proto.Stat_StatArmorPenetration: float64(item.GetIntValue(armorPenetrationRegex)),
 		proto.Stat_StatExpertise:        float64(item.GetIntValue(expertiseRegex)),
