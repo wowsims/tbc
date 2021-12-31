@@ -160,6 +160,8 @@ func (character *Character) applyItemEffects(agent Agent) {
 				applyGemEffect(agent)
 			}
 		}
+
+		// TODO: applyEnchantEffect() for mongoose
 	}
 }
 
