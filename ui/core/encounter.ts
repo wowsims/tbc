@@ -10,10 +10,12 @@ export class Encounter {
 
   private duration: number = 300;
   private numTargets: number = 1;
+  private executeProportion: number = 0.2;
 	readonly primaryTarget: Target;
 
   readonly durationChangeEmitter = new TypedEvent<void>();
   readonly numTargetsChangeEmitter = new TypedEvent<void>();
+  readonly executeProportionChangeEmitter = new TypedEvent<void>();
 
   // Emits when any of the above emitters emit.
   readonly changeEmitter = new TypedEvent<void>();
@@ -25,6 +27,7 @@ export class Encounter {
     [
       this.durationChangeEmitter,
       this.numTargetsChangeEmitter,
+      this.executeProportionChangeEmitter,
       this.primaryTarget.changeEmitter,
     ].forEach(emitter => emitter.on(eventID => this.changeEmitter.emit(eventID)));
   }
@@ -38,6 +41,17 @@ export class Encounter {
 
 		this.duration = newDuration;
 		this.durationChangeEmitter.emit(eventID);
+  }
+  
+  getExecuteProportion(): number {
+    return this.executeProportion;
+  }
+  setExecuteProportion(eventID: EventID, newExecuteProportion: number) {
+    if (newExecuteProportion == this.executeProportion)
+			return;
+
+		this.executeProportion = newExecuteProportion;
+		this.executeProportionChangeEmitter.emit(eventID);
   }
   
   getNumTargets(): number {
@@ -60,6 +74,7 @@ export class Encounter {
 
 		return EncounterProto.create({
 			duration: this.duration,
+			executeProportion: this.executeProportion,
 			targets: targetProtos,
 		});
 	}
@@ -67,6 +82,7 @@ export class Encounter {
 	fromProto(eventID: EventID, proto: EncounterProto) {
 		TypedEvent.freezeAllAndDo(() => {
 			this.setDuration(eventID, proto.duration);
+			this.setExecuteProportion(eventID, proto.executeProportion);
 			this.setNumTargets(eventID, proto.targets.length);
 
 			if (proto.targets.length > 0) {
@@ -79,6 +95,7 @@ export class Encounter {
   toJson(): Object {
     return {
 			'duration': this.getDuration(),
+			'executeProportion': this.getExecuteProportion(),
 			'numTargets': this.getNumTargets(),
 			'primaryTarget': this.primaryTarget.toJson(),
     };
@@ -90,6 +107,11 @@ export class Encounter {
 			const parsedDuration = parseInt(obj['duration']);
 			if (!isNaN(parsedDuration) && parsedDuration != 0) {
 				this.setDuration(eventID, parsedDuration);
+			}
+
+			const parsedExecuteProportion = parseInt(obj['executeProportion']);
+			if (!isNaN(parsedExecuteProportion) && parsedExecuteProportion != 0) {
+				this.setExecuteProportion(eventID, parsedExecuteProportion);
 			}
 
 			const parsedNumTargets = parseInt(obj['numTargets']);

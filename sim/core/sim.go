@@ -57,7 +57,7 @@ func newSim(rsr proto.RaidSimRequest) *Simulation {
 		Raid:      raid,
 		encounter: encounter,
 		Options:   simOptions,
-		Duration:  DurationFromSeconds(encounter.Duration),
+		Duration:  encounter.Duration,
 		Log:       nil,
 
 		rand: rand.New(rand.NewSource(rseed)),
@@ -240,6 +240,10 @@ func (sim *Simulation) advance(elapsedTime time.Duration) {
 	for _, target := range sim.encounter.Targets {
 		target.Advance(sim, elapsedTime)
 	}
+}
+
+func (sim *Simulation) IsExecutePhase() bool {
+	return sim.CurrentTime > sim.encounter.executePhaseBegins
 }
 
 func (sim *Simulation) GetRemainingDuration() time.Duration {

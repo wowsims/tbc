@@ -10,6 +10,7 @@ import { Component } from './component.js';
 export interface EncounterPickerConfig {
   showTargetArmor: boolean;
   showNumTargets: boolean;
+  showExecuteProportion: boolean;
 }
 
 export class EncounterPicker extends Component {
@@ -45,6 +46,18 @@ export class EncounterPicker extends Component {
         getValue: (encounter: Encounter) => encounter.getNumTargets(),
         setValue: (eventID: EventID, encounter: Encounter, newValue: number) => {
 					encounter.setNumTargets(eventID, newValue);
+        },
+      });
+    }
+
+    if (config.showExecuteProportion) {
+      new NumberPicker(this.rootElem, modEncounter, {
+        label: 'Execute Duration (%)',
+				labelTooltip: 'Percentage of the total encounter duration, for which the targets will be considered to be in execute range (< 20% HP) for the purpose of effects like Warrior Execute or Mage Molten Fury.',
+        changedEvent: (encounter: Encounter) => encounter.executeProportionChangeEmitter,
+        getValue: (encounter: Encounter) => encounter.getExecuteProportion() * 100,
+        setValue: (eventID: EventID, encounter: Encounter, newValue: number) => {
+					encounter.setExecuteProportion(eventID, newValue / 100);
         },
       });
     }
