@@ -306,7 +306,7 @@ func (sdm *StatDependencyManager) ApplyStatDependencies(stats Stats) Stats {
 
 type PseudoStats struct {
 	CastSpeedMultiplier   float64
-	AttackSpeedMultiplier float64 // not used yet
+	AttackSpeedMultiplier float64
 
 	FiveSecondRuleRefreshTime time.Duration // last time a spell was cast
 	SpiritRegenRateCasting    float64       // percentage of spirit regen allowed during casting

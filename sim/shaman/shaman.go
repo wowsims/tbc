@@ -60,7 +60,7 @@ func NewShaman(character core.Character, talents proto.ShamanTalents, selfBuffs 
 		SourceStat:   stats.Agility,
 		ModifiedStat: stats.MeleeCrit,
 		Modifier: func(agility float64, meleeCrit float64) float64 {
-			return meleeCrit + (agility/33)*core.MeleeCritRatingPerCritChance
+			return meleeCrit + (agility/25)*core.MeleeCritRatingPerCritChance
 		},
 	})
 
