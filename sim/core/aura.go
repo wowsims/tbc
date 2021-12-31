@@ -347,7 +347,7 @@ func (at *auraTracker) AddAura(sim *Simulation, newAura Aura) {
 		at.onBeforeMeleeIDs = append(at.onBeforeMeleeIDs, newAura.ID)
 	}
 
-	if sim.Log != nil {
+	if sim.Log != nil && newAura.SpellID != 0 {
 		at.logFn("Aura gained: %s", newAura.Name)
 	}
 }
@@ -362,7 +362,7 @@ func (at *auraTracker) RemoveAura(sim *Simulation, id AuraID) {
 		at.AddAuraUptime(id, at.auras[id].SpellID, sim.CurrentTime-at.auras[id].startTime)
 	}
 
-	if sim.Log != nil {
+	if sim.Log != nil && at.auras[id].SpellID != 0 {
 		at.logFn("Aura faded: %s", at.auras[id].Name)
 	}
 

@@ -60,6 +60,10 @@ type SpellEffect struct {
 	//  This should probably only be mutated in a template and not changed in auras.
 	StaticDamageMultiplier float64
 
+	// Skips the hit check, i.e. this effect will always hit.
+	// This is generally used only for proc effects, like Mage Ignite.
+	IgnoreHitCheck bool
+
 	// Callbacks for providing additional custom behavior.
 	OnSpellHit  OnSpellHit
 	OnSpellMiss OnSpellMiss
@@ -77,7 +81,6 @@ type SpellEffect struct {
 }
 
 func (spellEffect *SpellEffect) beforeCalculations(sim *Simulation, spellCast *SpellCast) {
-
 	spellCast.Character.OnBeforeSpellHit(sim, spellCast, spellEffect)
 	spellEffect.Target.OnBeforeSpellHit(sim, spellCast, spellEffect)
 
@@ -85,6 +88,10 @@ func (spellEffect *SpellEffect) beforeCalculations(sim *Simulation, spellCast *S
 }
 
 func (spellEffect *SpellEffect) afterCalculations(sim *Simulation, spellCast *SpellCast) {
+	if sim.Log != nil {
+		spellCast.Character.Log(sim, "%s result: %s", spellCast.Name, spellEffect)
+	}
+
 	if spellEffect.Hit {
 		if spellEffect.OnSpellHit != nil {
 			spellEffect.OnSpellHit(sim, spellCast, spellEffect)
@@ -98,14 +105,15 @@ func (spellEffect *SpellEffect) afterCalculations(sim *Simulation, spellCast *Sp
 		spellCast.Character.OnSpellMiss(sim, spellCast, spellEffect)
 		spellEffect.Target.OnSpellMiss(sim, spellCast, spellEffect)
 	}
-
-	if sim.Log != nil {
-		spellCast.Character.Log(sim, "%s result: %s", spellCast.Name, spellEffect)
-	}
 }
 
 // Calculates whether this spell 'hit' and updates the effect field with the result.
 func (spellEffect *SpellEffect) calculateHit(sim *Simulation, spellCast *SpellCast) {
+	if spellEffect.IgnoreHitCheck {
+		spellEffect.Hit = true
+		return
+	}
+
 	hit := 0.83 + (spellCast.Character.GetStat(stats.SpellHit)+spellEffect.BonusSpellHitRating)/(SpellHitRatingPerHitChance*100)
 	hit = MinFloat(hit, 0.99) // can't get away from the 1% miss
 
@@ -150,7 +158,7 @@ func (spellEffect *SpellEffect) calculateDirectDamage(sim *Simulation, spellCast
 	}
 
 	if !spellCast.Binary {
-		damage = calculateResists(sim, damage, spellEffect)
+		damage, _ = calculateResists(sim, damage, spellEffect)
 	}
 
 	spellEffect.Damage = damage
@@ -170,11 +178,6 @@ func (spellEffect *SpellEffect) applyDot(sim *Simulation, spellCast *SpellCast, 
 	}
 
 	pa.OnAction = func(sim *Simulation) {
-		if ddInput.currentDotAction == nil {
-			// Means this dot has been cleaned up, so just do nothing.
-			return
-		}
-
 		// fmt.Printf("DOT (%s) Ticking, Time Remaining: %0.2f\n", spellCast.Name, ddInput.TimeRemaining(sim).Seconds())
 		damage := ddInput.damagePerTick
 
@@ -183,15 +186,18 @@ func (spellEffect *SpellEffect) applyDot(sim *Simulation, spellCast *SpellCast, 
 		if ddInput.OnBeforePeriodicDamage != nil {
 			ddInput.OnBeforePeriodicDamage(sim, spellCast, spellEffect, &damage)
 		}
+		if ddInput.IgnoreDamageModifiers {
+			damage = ddInput.damagePerTick
+		}
 
+		resistMultiplier := 0.0
 		if !spellCast.Binary {
-			damage = calculateResists(sim, damage, spellEffect)
+			damage, resistMultiplier = calculateResists(sim, damage, spellEffect)
 		}
 
 		if sim.Log != nil {
-			spellCast.Character.Log(sim, "%s ticked for %0.1f.", spellCast.Name, damage)
+			spellCast.Character.Log(sim, "%s %s.", spellCast.Name, spellEffect.DotResultToString(damage, resistMultiplier))
 		}
-
 		spellEffect.Damage += damage
 
 		spellCast.Character.OnPeriodicDamage(sim, spellCast, spellEffect, damage)
@@ -239,14 +245,6 @@ func (spellEffect *SpellEffect) String() string {
 
 	var sb strings.Builder
 
-	if spellEffect.PartialResist_1_4 {
-		sb.WriteString("25% Resist ")
-	} else if spellEffect.PartialResist_2_4 {
-		sb.WriteString("50% Resist ")
-	} else if spellEffect.PartialResist_3_4 {
-		sb.WriteString("75% Resist ")
-	}
-
 	if spellEffect.Crit {
 		sb.WriteString("Crit")
 	} else {
@@ -254,10 +252,36 @@ func (spellEffect *SpellEffect) String() string {
 	}
 
 	fmt.Fprintf(&sb, " for %0.2f damage", spellEffect.Damage)
+
+	if spellEffect.PartialResist_1_4 {
+		sb.WriteString(" (25% Resist)")
+	} else if spellEffect.PartialResist_2_4 {
+		sb.WriteString(" (50% Resist)")
+	} else if spellEffect.PartialResist_3_4 {
+		sb.WriteString(" (75% Resist)")
+	}
+
 	return sb.String()
 }
 
-func calculateResists(sim *Simulation, damage float64, spellEffect *SpellEffect) float64 {
+func (spellEffect *SpellEffect) DotResultToString(damage float64, resistMultiplier float64) string {
+	var sb strings.Builder
+
+	fmt.Fprintf(&sb, "ticked for %0.2f damage", damage)
+
+	if resistMultiplier == 0.75 {
+		sb.WriteString(" (25% Resist)")
+	} else if resistMultiplier == 0.5 {
+		sb.WriteString(" (50% Resist)")
+	} else if resistMultiplier == 0.25 {
+		sb.WriteString(" (75% Resist)")
+	}
+
+	return sb.String()
+}
+
+// Return value is (newDamage, resistMultiplier)
+func calculateResists(sim *Simulation, damage float64, spellEffect *SpellEffect) (float64, float64) {
 	// Average Resistance (AR) = (Target's Resistance / (Caster's Level * 5)) * 0.75
 	// P(x) = 50% - 250%*|x - AR| <- where X is %resisted
 	// Using these stats:
@@ -265,19 +289,21 @@ func calculateResists(sim *Simulation, damage float64, spellEffect *SpellEffect)
 	//  FUTURE: handle boss resists for fights/classes that are actually impacted by that.
 	resVal := sim.RandomFloat("DirectSpell Resist")
 	if resVal > 0.18 { // 13% chance for 25% resist, 4% for 50%, 1% for 75%
-		return damage // means didn't resist
+		// No partial resist.
+		return damage, 0
 	}
 
+	var multiplier float64
 	if resVal < 0.01 {
 		spellEffect.PartialResist_3_4 = true
-		damage *= 0.25
+		multiplier = 0.25
 	} else if resVal < 0.05 {
 		spellEffect.PartialResist_2_4 = true
-		damage *= 0.5
+		multiplier = 0.5
 	} else {
 		spellEffect.PartialResist_1_4 = true
-		damage *= 0.75
+		multiplier = 0.75
 	}
 
-	return damage
+	return damage * multiplier, multiplier
 }

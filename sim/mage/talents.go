@@ -11,6 +11,7 @@ func (mage *Mage) applyTalents() {
 	mage.applyArcaneConcentration()
 	mage.applyIgnite()
 	mage.applyMasterOfElements()
+	mage.applyWintersChill()
 	mage.registerPresenceOfMindCD()
 	mage.registerCombustionCD()
 	mage.registerIcyVeinsCD()
@@ -148,6 +149,7 @@ func (mage *Mage) registerArcanePowerCD() {
 			return func(sim *core.Simulation, character *core.Character) bool {
 				character.Metrics.AddInstantCast(core.ActionID{SpellID: 12042})
 
+				mage.spellDamageMultiplier *= 1.3
 				character.AddAura(sim, core.Aura{
 					ID:      ArcanePowerAuraID,
 					SpellID: 12042,
@@ -156,41 +158,14 @@ func (mage *Mage) registerArcanePowerCD() {
 					OnCast: func(sim *core.Simulation, cast *core.Cast) {
 						cast.ManaCost *= 1.3
 					},
-					OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-						spellEffect.DamageMultiplier *= 1.3
-					},
-					OnBeforePeriodicDamage: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect, tickDamage *float64) {
-						*tickDamage *= 1.3
+					OnExpire: func(sim *core.Simulation) {
+						mage.spellDamageMultiplier /= 1.3
 					},
 				})
 				mage.SetCD(ArcanePowerCooldownID, sim.CurrentTime+time.Minute*3)
 				return true
 			}
 		},
-	})
-}
-
-var IgniteAuraID = core.NewAuraID()
-
-func (mage *Mage) applyIgnite() {
-	if mage.Talents.Ignite == 0 {
-		return
-	}
-
-	//coeff := 0.08 * float64(mage.Talents.Ignite)
-
-	mage.AddPermanentAura(func(sim *core.Simulation) core.Aura {
-		return core.Aura{
-			ID: IgniteAuraID,
-			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-				if !spellEffect.Crit {
-					return
-				}
-
-				//igniteDamage := spellEffect.Damage * coeff
-				// TODO
-			},
-		}
 	})
 }
 

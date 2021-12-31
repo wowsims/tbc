@@ -141,7 +141,7 @@ func (hitEffect *SpellHitEffect) apply(sim *Simulation, spellCast *SpellCast, ap
 
 func (hitEffect *SpellHitEffect) cancel(sim *Simulation) {
 	if hitEffect.DotInput.currentDotAction != nil {
-		hitEffect.DotInput.currentDotAction.CleanUp(sim)
+		hitEffect.DotInput.currentDotAction.Cancel(sim)
 	}
 }
 
@@ -153,6 +153,10 @@ type DotDamageInput struct {
 	TickLength           time.Duration // time between each tick
 	TickBaseDamage       float64
 	TickSpellCoefficient float64
+
+	// Causes all modifications applied by callbacks to the initial damagePerTick
+	// value to be ignored.
+	IgnoreDamageModifiers bool
 
 	OnBeforePeriodicDamage OnBeforePeriodicDamage // Before-calculation logic for this dot.
 	OnPeriodicDamage       OnPeriodicDamage       // After-calculation logic for this dot.
@@ -178,6 +182,18 @@ func (ddi DotDamageInput) DamagePerTick() float64 {
 
 func (ddi DotDamageInput) TimeRemaining(sim *Simulation) time.Duration {
 	return MaxDuration(0, ddi.finalTickTime-sim.CurrentTime)
+}
+
+// Returns the remaining number of times this dot is expected to tick, assuming
+// it lasts for its full duration.
+func (ddi DotDamageInput) RemainingTicks() int {
+	return ddi.NumberOfTicks - ddi.tickIndex
+}
+
+// Returns the amount of additional damage this dot is expected to do, assuming
+// it lasts for its full duration.
+func (ddi DotDamageInput) RemainingDamage() float64 {
+	return float64(ddi.RemainingTicks()) * ddi.DamagePerTick()
 }
 
 func (ddi DotDamageInput) IsTicking(sim *Simulation) bool {

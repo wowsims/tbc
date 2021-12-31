@@ -8,6 +8,11 @@ import (
 )
 
 func (mage *Mage) Act(sim *core.Simulation) time.Duration {
+	// If a major cooldown uses the GCD, it might already be on CD when Act() is called.
+	if mage.IsOnCD(core.GCDCooldownID, sim.CurrentTime) {
+		return sim.CurrentTime + mage.GetRemainingCD(core.GCDCooldownID, sim.CurrentTime)
+	}
+
 	var spell *core.SimpleSpell
 	if mage.RotationType == proto.Mage_Rotation_Arcane {
 		spell = mage.doArcaneRotation(sim)
