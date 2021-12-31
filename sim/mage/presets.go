@@ -62,6 +62,7 @@ var PlayerOptionsFire = &proto.Player_Mage{
 			Fire: &proto.Mage_Rotation_FireRotation{
 				PrimarySpell:           proto.Mage_Rotation_FireRotation_Fireball,
 				MaintainImprovedScorch: true,
+				WeaveFireBlast:         true,
 			},
 		},
 	},

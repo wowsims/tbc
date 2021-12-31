@@ -9,16 +9,21 @@ import (
 var EvocationAuraID = core.NewAuraID()
 var EvocationCooldownID = core.NewCooldownID()
 
-func (mage *Mage) registerEvocationCD() {
+func (mage *Mage) registerEvocationCD(numTicks int32) {
 	cooldown := time.Minute * 8
 
 	mage.AddMajorCooldown(core.MajorCooldown{
 		CooldownID: EvocationCooldownID,
 		Cooldown:   cooldown,
 		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
-			numTicks := 4
+			maxTicks := int32(4)
 			if ItemSetTempestRegalia.CharacterHasSetBonus(&mage.Character, 2) {
-				numTicks++
+				maxTicks++
+			}
+
+			numTicks = core.MaxInt32(0, core.MinInt32(maxTicks, numTicks))
+			if numTicks == 0 {
+				numTicks = maxTicks
 			}
 
 			baseDuration := time.Duration(numTicks) * time.Second * 2

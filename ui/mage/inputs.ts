@@ -50,6 +50,25 @@ export const MoltenArmor = {
 	},
 };
 
+export const EvocationTicks = {
+	type: 'number' as const,
+	getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
+	config: {
+		extraCssClasses: [
+			'evocation-ticks-picker',
+		],
+		label: '# Evocation Ticks',
+		labelTooltip: 'The number of ticks of Evocation to use, or 0 to use the full duration.',
+		changedEvent: (player: Player<Spec.SpecMage>) => player.specOptionsChangeEmitter,
+		getValue: (player: Player<Spec.SpecMage>) => player.getSpecOptions().evocationTicks,
+		setValue: (eventID: EventID, player: Player<Spec.SpecMage>, newValue: number) => {
+			const newOptions = player.getSpecOptions();
+			newOptions.evocationTicks = newValue;
+			player.setSpecOptions(eventID, newOptions);
+		},
+	},
+};
+
 export const MageRotationConfig = {
 	inputs: [
 		{
@@ -144,6 +163,26 @@ export const MageRotationConfig = {
 						newRotation.fire = FireRotation.create();
 					}
 					newRotation.fire.maintainImprovedScorch = newValue;
+					player.setRotation(eventID, newRotation);
+				},
+				showWhen: (player: Player<Spec.SpecMage>) => player.getRotation().type == RotationType.Fire,
+			},
+		},
+		{
+			type: 'boolean' as const,
+			cssClass: 'weave-fire-blast-picker',
+			getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
+			config: {
+				label: 'Weave Fire Blast',
+				labelTooltip: 'Use Fire Blast whenever its off CD.',
+				changedEvent: (player: Player<Spec.SpecMage>) => player.rotationChangeEmitter,
+				getValue: (player: Player<Spec.SpecMage>) => player.getRotation().fire?.weaveFireBlast || false,
+				setValue: (eventID: EventID, player: Player<Spec.SpecMage>, newValue: boolean) => {
+					const newRotation = player.getRotation();
+					if (!newRotation.fire) {
+						newRotation.fire = FireRotation.create();
+					}
+					newRotation.fire.weaveFireBlast = newValue;
 					player.setRotation(eventID, newRotation);
 				},
 				showWhen: (player: Player<Spec.SpecMage>) => player.getRotation().type == RotationType.Fire,

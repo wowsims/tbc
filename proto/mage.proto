@@ -101,6 +101,9 @@ message Mage {
 				MoltenArmor = 2;
 			}
 			ArmorType armor = 1;
+
+			// Number of Evocation ticks to use. If 0, use all of them.
+			int32 evocation_ticks = 2;
     }
     Options options = 3;
 }
