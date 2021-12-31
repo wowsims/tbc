@@ -664,11 +664,12 @@ export const Mage_Rotation_FrostRotation = new Mage_Rotation_FrostRotation$Type(
 class Mage_Options$Type extends MessageType {
     constructor() {
         super("proto.Mage.Options", [
-            { no: 1, name: "armor", kind: "enum", T: () => ["proto.Mage.Options.ArmorType", Mage_Options_ArmorType] }
+            { no: 1, name: "armor", kind: "enum", T: () => ["proto.Mage.Options.ArmorType", Mage_Options_ArmorType] },
+            { no: 2, name: "evocation_ticks", kind: "scalar", T: 5 /*ScalarType.INT32*/ }
         ]);
     }
     create(value) {
-        const message = { armor: 0 };
+        const message = { armor: 0, evocationTicks: 0 };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -681,6 +682,9 @@ class Mage_Options$Type extends MessageType {
             switch (fieldNo) {
                 case /* proto.Mage.Options.ArmorType armor */ 1:
                     message.armor = reader.int32();
+                    break;
+                case /* int32 evocation_ticks */ 2:
+                    message.evocationTicks = reader.int32();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -697,6 +701,9 @@ class Mage_Options$Type extends MessageType {
         /* proto.Mage.Options.ArmorType armor = 1; */
         if (message.armor !== 0)
             writer.tag(1, WireType.Varint).int32(message.armor);
+        /* int32 evocation_ticks = 2; */
+        if (message.evocationTicks !== 0)
+            writer.tag(2, WireType.Varint).int32(message.evocationTicks);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

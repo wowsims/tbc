@@ -24,6 +24,18 @@ export declare const MoltenArmor: {
     getValue: (player: Player<Spec.SpecMage>) => boolean;
     setValue: (eventID: EventID, player: Player<Spec.SpecMage>, newValue: boolean) => void;
 };
+export declare const EvocationTicks: {
+    type: "number";
+    getModObject: (simUI: IndividualSimUI<any>) => Player<any>;
+    config: {
+        extraCssClasses: string[];
+        label: string;
+        labelTooltip: string;
+        changedEvent: (player: Player<Spec.SpecMage>) => TypedEvent<void>;
+        getValue: (player: Player<Spec.SpecMage>) => number;
+        setValue: (eventID: EventID, player: Player<Spec.SpecMage>, newValue: number) => void;
+    };
+};
 export declare const MageRotationConfig: {
     inputs: ({
         type: "enum";

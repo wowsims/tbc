@@ -305,6 +305,12 @@ export interface Mage_Options {
      * @generated from protobuf field: proto.Mage.Options.ArmorType armor = 1;
      */
     armor: Mage_Options_ArmorType;
+    /**
+     * Number of Evocation ticks to use. If 0, use all of them.
+     *
+     * @generated from protobuf field: int32 evocation_ticks = 2;
+     */
+    evocationTicks: number;
 }
 /**
  * @generated from protobuf enum proto.Mage.Options.ArmorType

@@ -32,6 +32,24 @@ export const MoltenArmor = {
         player.setSpecOptions(eventID, newOptions);
     },
 };
+export const EvocationTicks = {
+    type: 'number',
+    getModObject: (simUI) => simUI.player,
+    config: {
+        extraCssClasses: [
+            'evocation-ticks-picker',
+        ],
+        label: '# Evocation Ticks',
+        labelTooltip: 'The number of ticks of Evocation to use, or 0 to use the full duration.',
+        changedEvent: (player) => player.specOptionsChangeEmitter,
+        getValue: (player) => player.getSpecOptions().evocationTicks,
+        setValue: (eventID, player, newValue) => {
+            const newOptions = player.getSpecOptions();
+            newOptions.evocationTicks = newValue;
+            player.setSpecOptions(eventID, newOptions);
+        },
+    },
+};
 export const MageRotationConfig = {
     inputs: [
         {
@@ -126,6 +144,26 @@ export const MageRotationConfig = {
                         newRotation.fire = FireRotation.create();
                     }
                     newRotation.fire.maintainImprovedScorch = newValue;
+                    player.setRotation(eventID, newRotation);
+                },
+                showWhen: (player) => player.getRotation().type == RotationType.Fire,
+            },
+        },
+        {
+            type: 'boolean',
+            cssClass: 'weave-fire-blast-picker',
+            getModObject: (simUI) => simUI.player,
+            config: {
+                label: 'Weave Fire Blast',
+                labelTooltip: 'Use Fire Blast whenever its off CD.',
+                changedEvent: (player) => player.rotationChangeEmitter,
+                getValue: (player) => player.getRotation().fire?.weaveFireBlast || false,
+                setValue: (eventID, player, newValue) => {
+                    const newRotation = player.getRotation();
+                    if (!newRotation.fire) {
+                        newRotation.fire = FireRotation.create();
+                    }
+                    newRotation.fire.weaveFireBlast = newValue;
                     player.setRotation(eventID, newRotation);
                 },
                 showWhen: (player) => player.getRotation().type == RotationType.Fire,
