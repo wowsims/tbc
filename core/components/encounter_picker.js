@@ -34,6 +34,17 @@ export class EncounterPicker extends Component {
                 },
             });
         }
+        if (config.showExecuteProportion) {
+            new NumberPicker(this.rootElem, modEncounter, {
+                label: 'Execute Duration (%)',
+                labelTooltip: 'Percentage of the total encounter duration, for which the targets will be considered to be in execute range (< 20% HP) for the purpose of effects like Warrior Execute or Mage Molten Fury.',
+                changedEvent: (encounter) => encounter.executeProportionChangeEmitter,
+                getValue: (encounter) => encounter.getExecuteProportion() * 100,
+                setValue: (eventID, encounter, newValue) => {
+                    encounter.setExecuteProportion(eventID, newValue / 100);
+                },
+            });
+        }
     }
 }
 export const MobTypePickerConfig = {

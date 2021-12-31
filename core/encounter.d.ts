@@ -6,13 +6,17 @@ export declare class Encounter {
     private readonly sim;
     private duration;
     private numTargets;
+    private executeProportion;
     readonly primaryTarget: Target;
     readonly durationChangeEmitter: TypedEvent<void>;
     readonly numTargetsChangeEmitter: TypedEvent<void>;
+    readonly executeProportionChangeEmitter: TypedEvent<void>;
     readonly changeEmitter: TypedEvent<void>;
     constructor(sim: Sim);
     getDuration(): number;
     setDuration(eventID: EventID, newDuration: number): void;
+    getExecuteProportion(): number;
+    setExecuteProportion(eventID: EventID, newExecuteProportion: number): void;
     getNumTargets(): number;
     setNumTargets(eventID: EventID, newNumTargets: number): void;
     toProto(): EncounterProto;
