@@ -29,6 +29,27 @@ var FireTalents = &proto.MageTalents{
 	IcyVeins:           true,
 }
 
+var FrostTalents = &proto.MageTalents{
+	ArcaneFocus:         5,
+	ArcaneConcentration: 5,
+	ArcaneImpact:        3,
+	ArcaneMeditation:    3,
+
+	ImprovedFrostbolt:    5,
+	ElementalPrecision:   3,
+	IceShards:            5,
+	IcyVeins:             true,
+	PiercingIce:          5,
+	FrostChanneling:      5,
+	ColdSnap:             true,
+	ImprovedConeOfCold:   2,
+	IceFloes:             2,
+	WintersChill:         4,
+	ArcticWinds:          5,
+	EmpoweredFrostbolt:   5,
+	SummonWaterElemental: true,
+}
+
 var fireMageOptions = &proto.Mage_Options{
 	Armor: proto.Mage_Options_MageArmor,
 }
@@ -46,6 +67,20 @@ var PlayerOptionsFire = &proto.Player_Mage{
 	},
 }
 
+var frostMageOptions = &proto.Mage_Options{
+	Armor: proto.Mage_Options_MageArmor,
+}
+var PlayerOptionsFrost = &proto.Player_Mage{
+	Mage: &proto.Mage{
+		Talents: FrostTalents,
+		Options: frostMageOptions,
+		Rotation: &proto.Mage_Rotation{
+			Type:  proto.Mage_Rotation_Frost,
+			Frost: &proto.Mage_Rotation_FrostRotation{},
+		},
+	},
+}
+
 var FullRaidBuffs = &proto.RaidBuffs{
 	GiftOfTheWild: proto.TristateEffect_TristateEffectImproved,
 }
@@ -57,6 +92,7 @@ var FullFirePartyBuffs = &proto.PartyBuffs{
 	TotemOfWrath:    1,
 	WrathOfAirTotem: proto.TristateEffect_TristateEffectRegular,
 }
+var FullFrostPartyBuffs = FullFirePartyBuffs
 var FullIndividualBuffs = &proto.IndividualBuffs{
 	BlessingOfKings:  true,
 	BlessingOfWisdom: proto.TristateEffect_TristateEffectImproved,
@@ -69,6 +105,7 @@ var FullFireConsumes = &proto.Consumes{
 	DefaultPotion:      proto.Potions_SuperManaPotion,
 	DarkRune:           true,
 }
+var FullFrostConsumes = FullFireConsumes
 
 var FullDebuffs = &proto.Debuffs{
 	CurseOfElements:           proto.TristateEffect_TristateEffectImproved,
@@ -176,3 +213,4 @@ var P1FireGear = items.EquipmentSpecFromStrings([]items.ItemStringSpec{
 		Name: "Flametongue Seal",
 	},
 })
+var P1FrostGear = P1FireGear

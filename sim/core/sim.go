@@ -207,7 +207,9 @@ func (sim *Simulation) runOnce() {
 			sim.advance(pa.NextActionAt - sim.CurrentTime)
 		}
 
-		pa.OnAction(sim)
+		if !pa.cancelled {
+			pa.OnAction(sim)
+		}
 	}
 
 	for _, pa := range sim.pendingActions {
@@ -262,6 +264,21 @@ type PendingAction struct {
 	OnAction     func(*Simulation)
 	CleanUp      func(*Simulation)
 	NextActionAt time.Duration
+
+	cancelled bool
+}
+
+func (pa *PendingAction) Cancel(sim *Simulation) {
+	if pa.cancelled {
+		return
+	}
+
+	if pa.CleanUp != nil {
+		pa.CleanUp(sim)
+		pa.CleanUp = nil
+	}
+
+	pa.cancelled = true
 }
 
 type ActionsQueue []*PendingAction

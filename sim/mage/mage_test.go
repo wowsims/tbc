@@ -41,6 +41,35 @@ func TestAllFireSettings(t *testing.T) {
 	})
 }
 
+func TestAllFrostSettings(t *testing.T) {
+	core.RunTestSuite(t, t.Name(), &core.SettingsCombos{
+		Class: proto.Class_ClassMage,
+		Races: []core.RaceCombo{
+			core.RaceCombo{Label: "Troll10", Race: proto.Race_RaceTroll10},
+		},
+		GearSets: []core.GearSetCombo{
+			core.GearSetCombo{Label: "P1Frost", GearSet: P1FrostGear},
+		},
+		SpecOptions: []core.SpecOptionsCombo{
+			core.SpecOptionsCombo{Label: "FrostRotation", SpecOptions: PlayerOptionsFrost},
+		},
+		Buffs: []core.BuffsCombo{
+			core.BuffsCombo{
+				Label: "NoBuffs",
+			},
+			core.BuffsCombo{
+				Label:    "FullBuffs",
+				Raid:     FullRaidBuffs,
+				Party:    FullFrostPartyBuffs,
+				Player:   FullIndividualBuffs,
+				Consumes: FullFrostConsumes,
+			},
+		},
+		Encounters: core.MakeDefaultEncounterCombos(FullDebuffs),
+		SimOptions: core.DefaultSimTestOptions,
+	})
+}
+
 func TestAllItemEffects(t *testing.T) {
 	core.RunTestSuite(t, t.Name(), &core.ItemsTestGenerator{
 		Player: &proto.Player{

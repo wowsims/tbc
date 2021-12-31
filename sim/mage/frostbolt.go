@@ -23,6 +23,7 @@ func (mage *Mage) newFrostboltTemplate(sim *core.Simulation) core.SimpleSpellTem
 				ActionID: core.ActionID{
 					SpellID: SpellIDFrostbolt,
 				},
+				Binary: true,
 			},
 		},
 		SpellHitEffect: core.SpellHitEffect{
@@ -34,7 +35,6 @@ func (mage *Mage) newFrostboltTemplate(sim *core.Simulation) core.SimpleSpellTem
 				MinBaseDamage:    600,
 				MaxBaseDamage:    647,
 				SpellCoefficient: (3.0 / 3.5) * 0.95,
-				// TODO: binary: true,
 			},
 		},
 	}
@@ -49,24 +49,6 @@ func (mage *Mage) newFrostboltTemplate(sim *core.Simulation) core.SimpleSpellTem
 
 	if ItemSetTempestRegalia.CharacterHasSetBonus(&mage.Character, 4) {
 		spell.SpellHitEffect.SpellEffect.StaticDamageMultiplier *= 1.05
-	}
-
-	// TODO: Winters chill applies to other frost spells also, but we don't implement them yet.
-	if mage.Talents.WintersChill > 0 {
-		procChance := float64(mage.Talents.WintersChill) / 5.0
-		spell.SpellHitEffect.OnSpellHit = func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-			// Don't overwrite the permanent version.
-			if spellEffect.Target.RemainingAuraDuration(sim, core.WintersChillDebuffID) == core.NeverExpires {
-				return
-			}
-
-			if procChance != 1.0 || sim.RandomFloat("Winters Chill") > procChance {
-				return
-			}
-
-			newNumStacks := core.MinInt32(5, spellEffect.Target.NumStacks(core.WintersChillDebuffID)+1)
-			spellEffect.Target.ReplaceAura(sim, core.WintersChillAura(sim, newNumStacks))
-		}
 	}
 
 	return core.NewSimpleSpellTemplate(spell)
