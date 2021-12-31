@@ -49,6 +49,10 @@ func (mage *Mage) doFireRotation(sim *core.Simulation) *core.SimpleSpell {
 		return mage.NewScorch(sim, target)
 	}
 
+	if mage.FireRotation.WeaveFireBlast && !mage.IsOnCD(FireBlastCooldownID, sim.CurrentTime) {
+		return mage.NewFireBlast(sim, target)
+	}
+
 	if mage.FireRotation.PrimarySpell == proto.Mage_Rotation_FireRotation_Fireball {
 		return mage.NewFireball(sim, target)
 	} else {

@@ -49,6 +49,9 @@ type Mage struct {
 	fireballDotSpell        core.SimpleSpell
 	fireballDotCastTemplate core.SimpleSpellTemplate
 
+	fireBlastSpell        core.SimpleSpell
+	fireBlastCastTemplate core.SimpleSpellTemplate
+
 	frostboltSpell        core.SimpleSpell
 	frostboltCastTemplate core.SimpleSpellTemplate
 
@@ -74,6 +77,7 @@ func (mage *Mage) Init(sim *core.Simulation) {
 	mage.igniteCastTemplate = mage.newIgniteTemplate(sim)
 	mage.fireballCastTemplate = mage.newFireballTemplate(sim)
 	mage.fireballDotCastTemplate = mage.newFireballDotTemplate(sim)
+	mage.fireBlastCastTemplate = mage.newFireBlastTemplate(sim)
 	mage.frostboltCastTemplate = mage.newFrostboltTemplate(sim)
 	mage.scorchCastTemplate = mage.newScorchTemplate(sim)
 	mage.wintersChillCastTemplate = mage.newWintersChillTemplate(sim)
@@ -127,7 +131,7 @@ func NewMage(character core.Character, options proto.Player) *Mage {
 		mage.AddStat(stats.SpellCrit, 3*core.SpellCritRatingPerCritChance)
 	}
 
-	mage.registerEvocationCD()
+	mage.registerEvocationCD(mageOptions.Options.EvocationTicks)
 	mage.applyTalents()
 
 	return mage

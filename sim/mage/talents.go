@@ -148,7 +148,6 @@ func (mage *Mage) registerArcanePowerCD() {
 			return func(sim *core.Simulation, character *core.Character) bool {
 				character.Metrics.AddInstantCast(core.ActionID{SpellID: 12042})
 
-				mage.spellDamageMultiplier *= 1.3
 				character.AddAura(sim, core.Aura{
 					ID:      ArcanePowerAuraID,
 					SpellID: 12042,
@@ -157,8 +156,11 @@ func (mage *Mage) registerArcanePowerCD() {
 					OnCast: func(sim *core.Simulation, cast *core.Cast) {
 						cast.ManaCost *= 1.3
 					},
-					OnExpire: func(sim *core.Simulation) {
-						mage.spellDamageMultiplier /= 1.3
+					OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+						spellEffect.DamageMultiplier *= 1.3
+					},
+					OnBeforePeriodicDamage: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect, tickDamage *float64) {
+						*tickDamage *= 1.3
 					},
 				})
 				mage.SetCD(ArcanePowerCooldownID, sim.CurrentTime+time.Minute*3)
@@ -202,6 +204,10 @@ func (mage *Mage) registerCombustionCD() {
 		Cooldown:   time.Minute * 3,
 		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
 			return func(sim *core.Simulation, character *core.Character) bool {
+				if character.HasAura(CombustionAuraID) {
+					return false
+				}
+
 				character.Metrics.AddInstantCast(core.ActionID{SpellID: 11129})
 
 				numHits := 0
@@ -220,7 +226,7 @@ func (mage *Mage) registerCombustionCD() {
 						if spellEffect.Crit {
 							numCrits++
 							if numCrits == 3 {
-								character.RemoveAura(sim, CombustionAuraID)
+								character.RemoveAuraOnNextAdvance(sim, CombustionAuraID)
 								character.SetCD(CombustionCooldownID, sim.CurrentTime+time.Minute*3)
 								character.UpdateMajorCooldowns(sim)
 							}

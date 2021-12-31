@@ -58,8 +58,6 @@ func (mage *Mage) newFireballTemplate(sim *core.Simulation) core.SimpleSpellTemp
 		spell.SpellHitEffect.SpellEffect.StaticDamageMultiplier *= 1.05
 	}
 
-	// TODO: Fireball built-in dot
-
 	return core.NewSimpleSpellTemplate(spell)
 }
 
