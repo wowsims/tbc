@@ -136,8 +136,10 @@ func PerformAttack(sim *Simulation, c *Character, target *Target, effect Ability
 	// 1. Single roll -> Miss				Dodge	Parry	Glance	Block	Crit / Hit
 	// 3 				8.0%(9.0% hit cap)	6.5%	14.0%	24% 	5%		-4.8%
 
-	roll := sim.RandomFloat("auto attack")
+	// TODO: many calculations in here can be cached. For now its just written out fully.
+	//  Once everything is working we can start caching values.
 
+	roll := sim.RandomFloat("auto attack")
 	level := float64(target.Level)
 	skill := 350.0 // assume max skill level for now.
 
@@ -160,10 +162,10 @@ func PerformAttack(sim *Simulation, c *Character, target *Target, effect Ability
 		return MeleeHitTypeMiss
 	}
 
-	expertisePercentage := math.Floor(c.stats[stats.Expertise]/(ExpertisePerQuarterPercentReduction)) / 400
+	dodge := 0.05 + levelMinusSkill*0.001
+	expertisePercentage := math.Min(math.Floor(c.stats[stats.Expertise]/(ExpertisePerQuarterPercentReduction))/400, dodge)
 	// Next Dodge
-	chance += 0.05 + levelMinusSkill*0.001 - expertisePercentage
-
+	chance += dodge - expertisePercentage
 	if roll < chance {
 		return MeleeHitTypeDodge
 	}
@@ -218,6 +220,14 @@ type WeaponDamageInput struct {
 	OffhandFlat  float64 // Flat bonus added to OH swing
 }
 
+func (ability *ActiveMeleeAbility) CalculatedGCD(char *Character) time.Duration {
+	baseGCD := GCDDefault
+	if ability.GCDCooldown != 0 {
+		baseGCD = ability.GCDCooldown
+	}
+	return MaxDuration(GCDMin, time.Duration(float64(baseGCD)/char.SwingSpeed()))
+}
+
 // Attack will perform the attack
 //  Returns false if unable to attack (due to resource lacking)
 // TODO: add AbilityResult data to action metrics.
@@ -225,6 +235,10 @@ func (ability *ActiveMeleeAbility) Attack(sim *Simulation) bool {
 	result := ability.performAttack(sim)
 	if result {
 		ability.Character.Metrics.AddMeleeAbility(ability)
+		if !ability.IgnoreCooldowns {
+			gcdCD := MaxDuration(ability.CalculatedGCD(ability.Character), ability.CastTime)
+			ability.Character.SetCD(GCDCooldownID, sim.CurrentTime+gcdCD)
+		}
 	}
 	return result
 }
@@ -522,4 +536,11 @@ func NewMeleeAbilittyTemplate(spellTemplate ActiveMeleeAbility) MeleeAbilittyTem
 	return MeleeAbilittyTemplate{
 		template: spellTemplate,
 	}
+}
+
+// PPMToChance converts a character proc-per-minute into mh/oh proc chances
+func PPMToChance(char *Character, ppm float64) (float64, float64) {
+	procChance := (char.Equip[proto.ItemSlot_ItemSlotMainHand].SwingSpeed * ppm) / 60.0
+	ohProcChance := (char.Equip[proto.ItemSlot_ItemSlotOffHand].SwingSpeed * ppm) / 60.0
+	return procChance, ohProcChance
 }

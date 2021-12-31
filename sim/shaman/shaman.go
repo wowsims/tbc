@@ -496,6 +496,7 @@ func (shaman *Shaman) applyFlurry(level int32) {
 					shaman.MultiplyMeleeSpeed(sim, bonus)
 					shaman.AddAura(sim, core.Aura{
 						ID:      FlurryProcAuraID,
+						SpellID: 16280,
 						Name:    "Flurry",
 						Expires: core.NeverExpires,
 						OnExpire: func(sim *core.Simulation) {
