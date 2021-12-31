@@ -12,6 +12,7 @@ func (mage *Mage) applyTalents() {
 	mage.applyIgnite()
 	mage.applyMasterOfElements()
 	mage.applyWintersChill()
+	mage.applyMoltenFury()
 	mage.registerPresenceOfMindCD()
 	mage.registerCombustionCD()
 	mage.registerIcyVeinsCD()
@@ -49,8 +50,6 @@ func (mage *Mage) applyTalents() {
 	if mage.Talents.PlayingWithFire > 0 {
 		mage.spellDamageMultiplier += float64(mage.Talents.PlayingWithFire) * 0.01
 	}
-
-	// TODO: Molten Fury
 }
 
 var ArcaneConcentrationAuraID = core.NewAuraID()
@@ -306,5 +305,31 @@ func (mage *Mage) registerColdSnapCD() {
 				return true
 			}
 		},
+	})
+}
+
+var MoltenFuryAuraID = core.NewAuraID()
+
+func (mage *Mage) applyMoltenFury() {
+	if mage.Talents.MoltenFury == 0 {
+		return
+	}
+
+	multiplier := 1.0 + 0.1*float64(mage.Talents.MoltenFury)
+
+	mage.AddPermanentAura(func(sim *core.Simulation) core.Aura {
+		return core.Aura{
+			ID: MoltenFuryAuraID,
+			OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+				if sim.IsExecutePhase() {
+					spellEffect.DamageMultiplier *= multiplier
+				}
+			},
+			OnBeforePeriodicDamage: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect, tickDamage *float64) {
+				if sim.IsExecutePhase() {
+					*tickDamage *= multiplier
+				}
+			},
+		}
 	})
 }

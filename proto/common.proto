@@ -330,6 +330,12 @@ message Target {
 
 message Encounter {
     double duration = 1;
+
+		// The ratio of the encounter duration, between 0 and 1, for which the targets
+		// will be in execute range for the purposes of Warrior Execute, Mage Molten
+		// Fury, etc.
+		double execute_proportion = 3;
+
 		repeated Target targets = 2;
 }
 

@@ -182,6 +182,8 @@ export class MageSimUI extends IndividualSimUI<Spec.SpecMage> {
 			encounterPicker: {
 				// Whether to include 'Target Armor' in the 'Encounter' section of the settings tab.
 				showTargetArmor: false,
+				// Whether to include 'Execute Duration (%)' in the 'Encounter' section of the settings tab.
+				showExecuteProportion: true,
 				// Whether to include 'Num Targets' in the 'Encounter' section of the settings tab.
 				showNumTargets: true,
 			},
