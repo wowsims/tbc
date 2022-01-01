@@ -164,7 +164,13 @@ var FullFireConsumes = &proto.Consumes{
 	DefaultPotion:      proto.Potions_SuperManaPotion,
 	DefaultConjured:    proto.Conjured_ConjuredFlameCap,
 }
-var FullFrostConsumes = FullFireConsumes
+var FullFrostConsumes = &proto.Consumes{
+	FlaskOfPureDeath:   true,
+	BrilliantWizardOil: true,
+	BlackenedBasilisk:  true,
+	DefaultPotion:      proto.Potions_SuperManaPotion,
+	DefaultConjured:    proto.Conjured_ConjuredDarkRune,
+}
 
 var FullArcaneConsumes = &proto.Consumes{
 	FlaskOfBlindingLight: true,
