@@ -7,6 +7,9 @@ import { Player } from '/tbc/core/player.js';
 
 import { Mage, Mage_Rotation as MageRotation, MageTalents as MageTalents, Mage_Options as MageOptions } from '/tbc/core/proto/mage.js';
 import { Mage_Rotation_Type as RotationType, Mage_Rotation_ArcaneRotation as ArcaneRotation, Mage_Rotation_FireRotation as FireRotation, Mage_Rotation_FrostRotation as FrostRotation } from '/tbc/core/proto/mage.js';
+import { Mage_Rotation_FireRotation_PrimarySpell as PrimaryFireSpell } from '/tbc/core/proto/mage.js';
+import { Mage_Rotation_ArcaneRotation_Filler as ArcaneFiller } from '/tbc/core/proto/mage.js';
+import { Mage_Options_ArmorType as ArmorType } from '/tbc/core/proto/mage.js';
 
 import * as Enchants from '/tbc/core/constants/enchants.js';
 import * as Gems from '/tbc/core/proto_utils/gems.js';
@@ -34,15 +37,41 @@ export const FrostTalents = {
 export const DefaultFireRotation = MageRotation.create({
 	type: RotationType.Fire,
 	fire: FireRotation.create({
+		primarySpell: PrimaryFireSpell.Fireball,
+		maintainImprovedScorch: true,
 	}),
 });
 
 export const DefaultFireOptions = MageOptions.create({
+	armor: ArmorType.MageArmor,
+	useManaEmeralds: true,
 });
 
 export const DefaultFireConsumes = Consumes.create({
 	defaultPotion: Potions.SuperManaPotion,
 	flaskOfPureDeath: true,
+	brilliantWizardOil: true,
+	blackenedBasilisk: true,
+});
+
+export const DefaultArcaneRotation = MageRotation.create({
+	type: RotationType.Arcane,
+	arcane: ArcaneRotation.create({
+		filler: ArcaneFiller.Frostbolt,
+		arcaneBlastsBetweenFillers: 3,
+		startRegenRotationPercent: 0.2,
+		stopRegenRotationPercent: 0.3,
+	}),
+});
+
+export const DefaultArcaneOptions = MageOptions.create({
+	armor: ArmorType.MageArmor,
+	useManaEmeralds: true,
+});
+
+export const DefaultArcaneConsumes = Consumes.create({
+	defaultPotion: Potions.SuperManaPotion,
+	flaskOfBlindingLight: true,
 	brilliantWizardOil: true,
 	blackenedBasilisk: true,
 });

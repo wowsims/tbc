@@ -70,18 +70,47 @@ func TestAllFrostSettings(t *testing.T) {
 	})
 }
 
+func TestAllArcaneSettings(t *testing.T) {
+	core.RunTestSuite(t, t.Name(), &core.SettingsCombos{
+		Class: proto.Class_ClassMage,
+		Races: []core.RaceCombo{
+			core.RaceCombo{Label: "Troll10", Race: proto.Race_RaceTroll10},
+		},
+		GearSets: []core.GearSetCombo{
+			core.GearSetCombo{Label: "P1Arcane", GearSet: P1ArcaneGear},
+		},
+		SpecOptions: []core.SpecOptionsCombo{
+			core.SpecOptionsCombo{Label: "ArcaneRotation", SpecOptions: PlayerOptionsArcane},
+		},
+		Buffs: []core.BuffsCombo{
+			core.BuffsCombo{
+				Label: "NoBuffs",
+			},
+			core.BuffsCombo{
+				Label:    "FullBuffs",
+				Raid:     FullRaidBuffs,
+				Party:    FullArcanePartyBuffs,
+				Player:   FullArcaneIndividualBuffs,
+				Consumes: FullArcaneConsumes,
+			},
+		},
+		Encounters: core.MakeDefaultEncounterCombos(FullDebuffs),
+		SimOptions: core.DefaultSimTestOptions,
+	})
+}
+
 func TestAllItemEffects(t *testing.T) {
 	core.RunTestSuite(t, t.Name(), &core.ItemsTestGenerator{
 		Player: &proto.Player{
 			Race:      proto.Race_RaceUndead,
 			Class:     proto.Class_ClassMage,
-			Spec:      PlayerOptionsFire,
-			Equipment: P1FireGear,
-			Consumes:  FullFireConsumes,
-			Buffs:     FullIndividualBuffs,
+			Spec:      PlayerOptionsArcane,
+			Equipment: P1ArcaneGear,
+			Consumes:  FullArcaneConsumes,
+			Buffs:     FullArcaneIndividualBuffs,
 		},
 		RaidBuffs:  FullRaidBuffs,
-		PartyBuffs: FullFirePartyBuffs,
+		PartyBuffs: FullArcanePartyBuffs,
 		Encounter:  core.MakeSingleTargetFullDebuffEncounter(FullDebuffs),
 		SimOptions: core.DefaultSimTestOptions,
 
@@ -107,18 +136,18 @@ func TestAverageDPS(t *testing.T) {
 			core.RaceCombo{Label: "Troll10", Race: proto.Race_RaceTroll10},
 		},
 		GearSets: []core.GearSetCombo{
-			core.GearSetCombo{Label: "P1Fire", GearSet: P1FireGear},
+			core.GearSetCombo{Label: "P1Arcane", GearSet: P1ArcaneGear},
 		},
 		SpecOptions: []core.SpecOptionsCombo{
-			core.SpecOptionsCombo{Label: "Fire", SpecOptions: PlayerOptionsFire},
+			core.SpecOptionsCombo{Label: "Arcane", SpecOptions: PlayerOptionsArcane},
 		},
 		Buffs: []core.BuffsCombo{
 			core.BuffsCombo{
 				Label:    "FullBuffs",
 				Raid:     FullRaidBuffs,
-				Party:    FullFirePartyBuffs,
-				Player:   FullIndividualBuffs,
-				Consumes: FullFireConsumes,
+				Party:    FullArcanePartyBuffs,
+				Player:   FullArcaneIndividualBuffs,
+				Consumes: FullArcaneConsumes,
 			},
 		},
 		Encounters: core.MakeAverageDefaultEncounterCombos(FullDebuffs),

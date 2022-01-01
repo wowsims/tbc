@@ -470,10 +470,6 @@ func registerConjuredCD(agent Agent, consumes proto.Consumes) {
 			expectedManaPerUsage := float64((900 + 600) / 2)
 
 			remainingUsages := int(1 + (MaxDuration(0, sim.Duration))/(time.Minute*2))
-			if character.Class == proto.Class_ClassMage {
-				// Hack for better estimates for mages, who pretty much always use mana emeralds.
-				remainingUsages = MaxInt(0, remainingUsages-3)
-			}
 
 			if consumes.DefaultConjured == proto.Conjured_ConjuredDarkRune {
 				character.ExpectedBonusMana += expectedManaPerUsage * float64(remainingUsages)

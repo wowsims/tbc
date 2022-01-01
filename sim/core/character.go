@@ -249,6 +249,9 @@ func (character *Character) MaxMana() float64 {
 func (character *Character) CurrentMana() float64 {
 	return character.GetStat(stats.Mana)
 }
+func (character *Character) CurrentManaPercent() float64 {
+	return character.CurrentMana() / character.MaxMana()
+}
 
 // Returns whether the indicates stat is currently modified by a temporary bonus.
 func (character *Character) HasTemporaryBonusForStat(stat stats.Stat) bool {

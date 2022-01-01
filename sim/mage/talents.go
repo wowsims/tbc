@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
+	"github.com/wowsims/tbc/sim/core/proto"
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
@@ -92,7 +93,6 @@ func (mage *Mage) applyArcaneConcentration() {
 	})
 }
 
-var PresenceOfMindAuraID = core.NewAuraID()
 var PresenceOfMindCooldownID = core.NewCooldownID()
 
 func (mage *Mage) registerPresenceOfMindCD() {
@@ -105,11 +105,31 @@ func (mage *Mage) registerPresenceOfMindCD() {
 		cooldown -= time.Second * 24
 	}
 
+	var spell *core.SimpleSpell
+
 	mage.AddMajorCooldown(core.MajorCooldown{
 		ActionID:   core.ActionID{SpellID: 12043},
 		CooldownID: PresenceOfMindCooldownID,
 		Cooldown:   cooldown,
 		CanActivate: func(sim *core.Simulation, character *core.Character) bool {
+			if character.IsOnCD(core.GCDCooldownID, sim.CurrentTime) {
+				return false
+			}
+
+			target := sim.GetPrimaryTarget()
+			if mage.Talents.Pyroblast {
+				spell = mage.NewPyroblast(sim, target)
+			} else if mage.RotationType == proto.Mage_Rotation_Fire {
+				spell = mage.NewFireball(sim, target)
+			} else {
+				spell = mage.NewFrostbolt(sim, target)
+			}
+
+			if character.CurrentMana() < spell.ManaCost {
+				spell.Cancel(sim)
+				return false
+			}
+
 			return true
 		},
 		ShouldActivate: func(sim *core.Simulation, character *core.Character) bool {
@@ -117,23 +137,10 @@ func (mage *Mage) registerPresenceOfMindCD() {
 		},
 		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
 			return func(sim *core.Simulation, character *core.Character) {
+				spell.CastTime = 0
+				spell.Cast(sim)
 				character.Metrics.AddInstantCast(core.ActionID{SpellID: 12043})
-
-				character.AddAura(sim, core.Aura{
-					ID:      PresenceOfMindAuraID,
-					SpellID: 12043,
-					Name:    "Presence of Mind",
-					Expires: core.NeverExpires,
-					OnCast: func(sim *core.Simulation, cast *core.Cast) {
-						cast.CastTime = 0
-					},
-					OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
-						// Remove the buff and put skill on CD
-						character.SetCD(PresenceOfMindCooldownID, sim.CurrentTime+cooldown)
-						character.RemoveAura(sim, PresenceOfMindAuraID)
-						character.UpdateMajorCooldowns()
-					},
-				})
+				character.SetCD(PresenceOfMindCooldownID, sim.CurrentTime+cooldown)
 			}
 		},
 	})

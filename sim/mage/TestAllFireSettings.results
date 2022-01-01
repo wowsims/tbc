@@ -1,25 +1,25 @@
 dps_results: {
  key: "TestAllFireSettings-Troll10-P1Fire-FireRotation-FullBuffs-LongMultiTarget"
  value: {
-  dps: 1951.4293143716081
+  dps: 1669.3652306367749
  }
 }
 dps_results: {
  key: "TestAllFireSettings-Troll10-P1Fire-FireRotation-FullBuffs-LongSingleTargetFullDebuffs"
  value: {
-  dps: 1951.4293143716081
+  dps: 1669.3652306367749
  }
 }
 dps_results: {
  key: "TestAllFireSettings-Troll10-P1Fire-FireRotation-FullBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 1384.2840858266743
+  dps: 1112.2203149536408
  }
 }
 dps_results: {
  key: "TestAllFireSettings-Troll10-P1Fire-FireRotation-FullBuffs-ShortSingleTargetFullDebuffs"
  value: {
-  dps: 2379.978728458868
+  dps: 2467.273544270696
  }
 }
 dps_results: {
