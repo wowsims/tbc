@@ -1,3 +1,4 @@
+import { Conjured } from '/tbc/core/proto/common.js';
 import { Consumes } from '/tbc/core/proto/common.js';
 import { EquipmentSpec } from '/tbc/core/proto/common.js';
 import { IndividualBuffs } from '/tbc/core/proto/common.js';
@@ -313,6 +314,10 @@ export class Player {
     }
     fromProto(eventID, proto) {
         TypedEvent.freezeAllAndDo(() => {
+            // TODO: Remove this on 1/31/2022 (1 month).
+            if (proto.consumes && proto.consumes.darkRune) {
+                proto.consumes.defaultConjured = Conjured.ConjuredDarkRune;
+            }
             this.setName(eventID, proto.name);
             this.setRace(eventID, proto.race);
             this.setGear(eventID, proto.equipment ? this.sim.lookupEquipmentSpec(proto.equipment) : new Gear({}));
@@ -359,7 +364,11 @@ export class Player {
                 console.warn('Failed to parse player buffs: ' + e);
             }
             try {
-                this.setConsumes(eventID, Consumes.fromJson(obj['consumes']));
+                const consumes = Consumes.fromJson(obj['consumes']);
+                if (consumes.darkRune) {
+                    consumes.defaultConjured = Conjured.ConjuredDarkRune;
+                }
+                this.setConsumes(eventID, consumes);
             }
             catch (e) {
                 console.warn('Failed to parse consumes: ' + e);

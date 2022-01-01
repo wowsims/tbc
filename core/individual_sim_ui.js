@@ -77,7 +77,7 @@ export class IndividualSimUI extends SimUI {
             'Alchohol': [],
             'Guardian Elixir': [],
             'Potion': [],
-            'Rune': [],
+            'Conjured': [],
             'Weapon Imbue': [],
         };
         if (!this.isWithinRaidSim) {

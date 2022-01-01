@@ -51,6 +51,7 @@ export function actionIdToString(id) {
 // Some items/spells have weird icons, so use this to show a different icon instead.
 const idOverrides = {};
 idOverrides[JSON.stringify({ spellId: 37212 })] = { itemId: 29035 }; // Improved Wrath of Air Totem
+idOverrides[JSON.stringify({ spellId: 37447 })] = { itemId: 30720 }; // Serpent-Coil Braid
 async function getTooltipDataHelper(id, tooltipPostfix, cache) {
     if (!cache.has(id)) {
         cache.set(id, fetch(`https://tbc.wowhead.com/tooltip/${tooltipPostfix}/${id}`)

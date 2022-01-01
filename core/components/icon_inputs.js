@@ -1,3 +1,4 @@
+import { Conjured } from '/tbc/core/proto/common.js';
 import { Drums } from '/tbc/core/proto/common.js';
 import { Potions } from '/tbc/core/proto/common.js';
 import { TypedEvent } from '/tbc/core/typed_event.js';
@@ -45,7 +46,6 @@ export const WintersChill = makeBooleanDebuffInput({ spellId: 28595 }, 'wintersC
 export const AdeptsElixir = makeBooleanConsumeInput({ itemId: 28103 }, 'adeptsElixir', ['Battle Elixir']);
 export const BlackenedBasilisk = makeBooleanConsumeInput({ itemId: 27657 }, 'blackenedBasilisk', ['Food']);
 export const BrilliantWizardOil = makeBooleanConsumeInput({ itemId: 20749 }, 'brilliantWizardOil', ['Weapon Imbue']);
-export const DarkRune = makeBooleanConsumeInput({ itemId: 12662 }, 'darkRune', ['Rune']);
 export const ElixirOfDraenicWisdom = makeBooleanConsumeInput({ itemId: 32067 }, 'elixirOfDraenicWisdom', ['Guardian Elixir']);
 export const ElixirOfMajorFirePower = makeBooleanConsumeInput({ itemId: 22833 }, 'elixirOfMajorFirePower', ['Battle Elixir']);
 export const ElixirOfMajorFrostPower = makeBooleanConsumeInput({ itemId: 22827 }, 'elixirOfMajorFrostPower', ['Battle Elixir']);
@@ -66,6 +66,8 @@ export const ScrollOfAgilityV = makeBooleanConsumeInput({ itemId: 27498 }, 'scro
 export const DefaultDestructionPotion = makeEnumValueConsumeInput({ itemId: 22839 }, 'defaultPotion', Potions.DestructionPotion, ['Potion']);
 export const DefaultHastePotion = makeEnumValueConsumeInput({ itemId: 22838 }, 'defaultPotion', Potions.HastePotion, ['Potion']);
 export const DefaultSuperManaPotion = makeEnumValueConsumeInput({ itemId: 22832 }, 'defaultPotion', Potions.SuperManaPotion, ['Potion']);
+export const DefaultDarkRune = makeEnumValueConsumeInput({ itemId: 12662 }, 'defaultConjured', Conjured.ConjuredDarkRune, ['Conjured']);
+export const DefaultFlameCap = makeEnumValueConsumeInput({ itemId: 22788 }, 'defaultConjured', Conjured.ConjuredFlameCap, ['Conjured']);
 function removeOtherPartyMembersDrums(eventID, player, newValue) {
     if (newValue) {
         player.getOtherPartyMembers().forEach(otherPlayer => {

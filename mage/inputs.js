@@ -4,6 +4,7 @@ import { Mage_Options_ArmorType as ArmorType } from '/tbc/core/proto/mage.js';
 import * as Presets from './presets.js';
 // Configuration for spec-specific UI elements on the settings tab.
 // These don't need to be in a separate file but it keeps things cleaner.
+export const ManaEmerald = makeBooleanMageBuffInput({ itemId: 22044 }, 'useManaEmeralds');
 export const MageArmor = {
     id: { spellId: 27125 },
     states: 2,
@@ -171,3 +172,16 @@ export const MageRotationConfig = {
         },
     ],
 };
+function makeBooleanMageBuffInput(id, optionsFieldName) {
+    return {
+        id: id,
+        states: 2,
+        changedEvent: (player) => player.specOptionsChangeEmitter,
+        getValue: (player) => player.getSpecOptions()[optionsFieldName],
+        setValue: (eventID, player, newValue) => {
+            const newOptions = player.getSpecOptions();
+            newOptions[optionsFieldName] = newValue;
+            player.setSpecOptions(eventID, newOptions);
+        },
+    };
+}

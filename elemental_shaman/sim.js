@@ -131,7 +131,7 @@ export class ElementalShamanSimUI extends IndividualSimUI {
             consumeInputs: [
                 IconInputs.DefaultSuperManaPotion,
                 IconInputs.DefaultDestructionPotion,
-                IconInputs.DarkRune,
+                IconInputs.DefaultDarkRune,
                 IconInputs.FlaskOfBlindingLight,
                 IconInputs.FlaskOfSupremePower,
                 IconInputs.AdeptsElixir,

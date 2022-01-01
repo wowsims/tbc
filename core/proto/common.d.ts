@@ -247,6 +247,10 @@ export interface Consumes {
      */
     darkRune: boolean;
     /**
+     * @generated from protobuf field: proto.Conjured default_conjured = 27;
+     */
+    defaultConjured: Conjured;
+    /**
      * @generated from protobuf field: proto.Drums drums = 19;
      */
     drums: Drums;
@@ -1221,6 +1225,23 @@ export declare enum Potions {
      * @generated from protobuf enum value: HastePotion = 3;
      */
     HastePotion = 3
+}
+/**
+ * @generated from protobuf enum proto.Conjured
+ */
+export declare enum Conjured {
+    /**
+     * @generated from protobuf enum value: ConjuredUnknown = 0;
+     */
+    ConjuredUnknown = 0,
+    /**
+     * @generated from protobuf enum value: ConjuredDarkRune = 1;
+     */
+    ConjuredDarkRune = 1,
+    /**
+     * @generated from protobuf enum value: ConjuredFlameCap = 2;
+     */
+    ConjuredFlameCap = 2
 }
 /**
  * @generated from protobuf enum proto.MobType

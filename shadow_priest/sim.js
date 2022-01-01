@@ -134,7 +134,7 @@ export class ShadowPriestSimUI extends IndividualSimUI {
             consumeInputs: [
                 IconInputs.DefaultSuperManaPotion,
                 IconInputs.DefaultDestructionPotion,
-                IconInputs.DarkRune,
+                IconInputs.DefaultDarkRune,
                 IconInputs.FlaskOfPureDeath,
                 IconInputs.FlaskOfSupremePower,
                 IconInputs.ElixirOfMajorShadowPower,

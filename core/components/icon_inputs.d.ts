@@ -41,7 +41,6 @@ export declare const WintersChill: IndividualSimIconPickerConfig<Target, boolean
 export declare const AdeptsElixir: IndividualSimIconPickerConfig<Player<any>, boolean>;
 export declare const BlackenedBasilisk: IndividualSimIconPickerConfig<Player<any>, boolean>;
 export declare const BrilliantWizardOil: IndividualSimIconPickerConfig<Player<any>, boolean>;
-export declare const DarkRune: IndividualSimIconPickerConfig<Player<any>, boolean>;
 export declare const ElixirOfDraenicWisdom: IndividualSimIconPickerConfig<Player<any>, boolean>;
 export declare const ElixirOfMajorFirePower: IndividualSimIconPickerConfig<Player<any>, boolean>;
 export declare const ElixirOfMajorFrostPower: IndividualSimIconPickerConfig<Player<any>, boolean>;
@@ -62,5 +61,7 @@ export declare const ScrollOfAgilityV: IndividualSimIconPickerConfig<Player<any>
 export declare const DefaultDestructionPotion: IndividualSimIconPickerConfig<Player<any>, boolean>;
 export declare const DefaultHastePotion: IndividualSimIconPickerConfig<Player<any>, boolean>;
 export declare const DefaultSuperManaPotion: IndividualSimIconPickerConfig<Player<any>, boolean>;
+export declare const DefaultDarkRune: IndividualSimIconPickerConfig<Player<any>, boolean>;
+export declare const DefaultFlameCap: IndividualSimIconPickerConfig<Player<any>, boolean>;
 export declare const DrumsOfBattleConsume: IndividualSimIconPickerConfig<Player<any>, boolean>;
 export declare const DrumsOfRestorationConsume: IndividualSimIconPickerConfig<Player<any>, boolean>;

@@ -123,7 +123,7 @@ export declare abstract class IndividualSimUI<SpecType extends Spec> extends Sim
     toProto(): IndividualSimSettings;
     fromProto(eventID: EventID, settings: IndividualSimSettings): void;
 }
-export declare type ExclusivityTag = 'Battle Elixir' | 'Drums' | 'Food' | 'Alchohol' | 'Guardian Elixir' | 'Potion' | 'Rune' | 'Weapon Imbue';
+export declare type ExclusivityTag = 'Battle Elixir' | 'Drums' | 'Food' | 'Alchohol' | 'Guardian Elixir' | 'Potion' | 'Conjured' | 'Weapon Imbue';
 export interface ExclusiveEffect {
     tags: Array<ExclusivityTag>;
     changedEvent: TypedEvent<any>;
