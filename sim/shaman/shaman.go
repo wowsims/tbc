@@ -289,26 +289,30 @@ func (shaman *Shaman) registerBloodlustCD() {
 	}
 
 	shaman.AddMajorCooldown(core.MajorCooldown{
+		ActionID:   core.ActionID{SpellID: 2825},
 		CooldownID: BloodlustCooldownID,
 		Cooldown:   core.BloodlustCD,
 		Priority:   core.CooldownPriorityBloodlust,
-		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
-			return func(sim *core.Simulation, character *core.Character) bool {
-				// Need to check if any party member has lust, not just self, because of
-				// major CD ordering issues with the shared bloodlust.
-				for _, partyMember := range character.Party.Players {
-					if partyMember.GetCharacter().HasAura(core.BloodlustAuraID) {
-						return false
-					}
+		CanActivate: func(sim *core.Simulation, character *core.Character) bool {
+			// Need to check if any party member has lust, not just self, because of
+			// major CD ordering issues with the shared bloodlust.
+			for _, partyMember := range character.Party.Players {
+				if partyMember.GetCharacter().HasAura(core.BloodlustAuraID) {
+					return false
 				}
-
+			}
+			return true
+		},
+		ShouldActivate: func(sim *core.Simulation, character *core.Character) bool {
+			return true
+		},
+		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
+			return func(sim *core.Simulation, character *core.Character) {
 				for _, partyMember := range character.Party.Players {
 					core.AddBloodlustAura(sim, partyMember.GetCharacter())
 				}
 				character.SetCD(BloodlustCooldownID, sim.CurrentTime+core.BloodlustCD)
 				character.Metrics.AddInstantCast(core.ActionID{SpellID: 2825})
-
-				return true
 			}
 		},
 	})
@@ -323,10 +327,17 @@ func (shaman *Shaman) registerElementalMasteryCD() {
 	}
 
 	shaman.AddMajorCooldown(core.MajorCooldown{
+		ActionID:   core.ActionID{SpellID: 16166},
 		CooldownID: ElementalMasteryCooldownID,
 		Cooldown:   time.Minute * 3,
+		CanActivate: func(sim *core.Simulation, character *core.Character) bool {
+			return true
+		},
+		ShouldActivate: func(sim *core.Simulation, character *core.Character) bool {
+			return true
+		},
 		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
-			return func(sim *core.Simulation, character *core.Character) bool {
+			return func(sim *core.Simulation, character *core.Character) {
 				character.Metrics.AddInstantCast(core.ActionID{SpellID: 16166})
 
 				character.AddAura(sim, core.Aura{
@@ -342,10 +353,9 @@ func (shaman *Shaman) registerElementalMasteryCD() {
 						// Remove the buff and put skill on CD
 						character.SetCD(ElementalMasteryCooldownID, sim.CurrentTime+time.Minute*3)
 						character.RemoveAura(sim, ElementalMasteryAuraID)
-						character.UpdateMajorCooldowns(sim)
+						character.UpdateMajorCooldowns()
 					},
 				})
-				return true
 			}
 		},
 	})
@@ -360,17 +370,22 @@ func (shaman *Shaman) registerNaturesSwiftnessCD() {
 	}
 
 	shaman.AddMajorCooldown(core.MajorCooldown{
+		ActionID:   core.ActionID{SpellID: 16188},
 		CooldownID: NaturesSwiftnessCooldownID,
 		Cooldown:   time.Minute * 3,
+		CanActivate: func(sim *core.Simulation, character *core.Character) bool {
+			// Don't use NS unless we're casting a full-length lightning bolt, which is
+			// the only spell shamans have with a cast longer than GCD.
+			if character.HasTemporarySpellCastSpeedIncrease() {
+				return false
+			}
+			return true
+		},
+		ShouldActivate: func(sim *core.Simulation, character *core.Character) bool {
+			return true
+		},
 		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
-			return func(sim *core.Simulation, character *core.Character) bool {
-				// Don't use NS unless we're casting a full-length lightning bolt, which is
-				// the only spell shamans have with a cast longer than GCD.
-
-				if character.HasTemporarySpellCastSpeedIncrease() {
-					return false
-				}
-
+			return func(sim *core.Simulation, character *core.Character) {
 				character.AddAura(sim, core.Aura{
 					ID:      NaturesSwiftnessAuraID,
 					Name:    "Nature's Swiftness",
@@ -390,11 +405,10 @@ func (shaman *Shaman) registerNaturesSwiftnessCD() {
 						// Remove the buff and put skill on CD
 						character.SetCD(NaturesSwiftnessCooldownID, sim.CurrentTime+time.Minute*3)
 						character.RemoveAura(sim, NaturesSwiftnessAuraID)
-						character.UpdateMajorCooldowns(sim)
+						character.UpdateMajorCooldowns()
 						character.Metrics.AddInstantCast(core.ActionID{SpellID: 16188})
 					},
 				})
-				return true
 			}
 		},
 	})

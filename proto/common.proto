@@ -205,6 +205,15 @@ enum Potions {
     HastePotion = 3;
 }
 
+enum Conjured {
+	ConjuredUnknown = 0;
+	ConjuredDarkRune = 1;
+	ConjuredFlameCap = 2;
+
+	// Mage's mana emerald is in this category too, but it is handled seperately
+	// because there is always a max of 3 per encounter.
+}
+
 // Buffs that affect the entire raid.
 message RaidBuffs {
     bool arcane_brilliance = 1;
@@ -287,7 +296,8 @@ message Consumes {
     Potions starting_potion = 16;
     int32 num_starting_potions = 17;
 
-    bool dark_rune = 18;
+    bool dark_rune = 18; // Deprecated, use default_conjured instead.
+    Conjured default_conjured = 27;
 
 	Drums drums = 19;
 }

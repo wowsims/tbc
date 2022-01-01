@@ -43,7 +43,7 @@ var FullConsumes = &proto.Consumes{
 	DefaultPotion:        proto.Potions_SuperManaPotion,
 	StartingPotion:       proto.Potions_DestructionPotion,
 	NumStartingPotions:   1,
-	DarkRune:             true,
+	DefaultConjured:      proto.Conjured_ConjuredDarkRune,
 	Drums:                proto.Drums_DrumsOfBattle,
 }
 

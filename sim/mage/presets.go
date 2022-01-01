@@ -51,7 +51,8 @@ var FrostTalents = &proto.MageTalents{
 }
 
 var fireMageOptions = &proto.Mage_Options{
-	Armor: proto.Mage_Options_MageArmor,
+	Armor:           proto.Mage_Options_MageArmor,
+	UseManaEmeralds: true,
 }
 var PlayerOptionsFire = &proto.Player_Mage{
 	Mage: &proto.Mage{
@@ -69,7 +70,8 @@ var PlayerOptionsFire = &proto.Player_Mage{
 }
 
 var frostMageOptions = &proto.Mage_Options{
-	Armor: proto.Mage_Options_MageArmor,
+	Armor:           proto.Mage_Options_MageArmor,
+	UseManaEmeralds: true,
 }
 var PlayerOptionsFrost = &proto.Player_Mage{
 	Mage: &proto.Mage{
@@ -104,7 +106,7 @@ var FullFireConsumes = &proto.Consumes{
 	BrilliantWizardOil: true,
 	BlackenedBasilisk:  true,
 	DefaultPotion:      proto.Potions_SuperManaPotion,
-	DarkRune:           true,
+	DefaultConjured:    proto.Conjured_ConjuredDarkRune,
 }
 var FullFrostConsumes = FullFireConsumes
 

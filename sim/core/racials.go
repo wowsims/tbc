@@ -50,14 +50,20 @@ func applyRaceEffects(agent Agent) {
 		const spBonus = 143
 
 		character.AddMajorCooldown(MajorCooldown{
+			ActionID:   ActionID{SpellID: 33697},
 			CooldownID: OrcBloodFuryCooldownID,
 			Cooldown:   cd,
+			CanActivate: func(sim *Simulation, character *Character) bool {
+				return true
+			},
+			ShouldActivate: func(sim *Simulation, character *Character) bool {
+				return true
+			},
 			ActivationFactory: func(sim *Simulation) CooldownActivation {
-				return func(sim *Simulation, character *Character) bool {
+				return func(sim *Simulation, character *Character) {
 					character.SetCD(OrcBloodFuryCooldownID, cd+sim.CurrentTime)
 					character.AddAuraWithTemporaryStats(sim, OrcBloodFuryAuraID, 33697, "Orc Blood Fury", stats.SpellPower, spBonus, dur)
 					character.Metrics.AddInstantCast(ActionID{SpellID: 33697})
-					return true
 				}
 			},
 		})
@@ -93,10 +99,17 @@ func applyRaceEffects(agent Agent) {
 		const cd = time.Minute * 3
 
 		character.AddMajorCooldown(MajorCooldown{
+			ActionID:   ActionID{SpellID: 20554},
 			CooldownID: TrollBerserkingCooldownID,
 			Cooldown:   cd,
+			CanActivate: func(sim *Simulation, character *Character) bool {
+				return true
+			},
+			ShouldActivate: func(sim *Simulation, character *Character) bool {
+				return true
+			},
 			ActivationFactory: func(sim *Simulation) CooldownActivation {
-				return func(sim *Simulation, character *Character) bool {
+				return func(sim *Simulation, character *Character) {
 					character.SetCD(TrollBerserkingCooldownID, cd+sim.CurrentTime)
 					// Increase cast speed multiplier
 					character.PseudoStats.CastSpeedMultiplier *= hasteBonus
@@ -112,7 +125,6 @@ func applyRaceEffects(agent Agent) {
 					})
 					character.Metrics.AddInstantCast(ActionID{SpellID: 20554})
 					character.AddAuraUptime(TrollBerserkingAuraID, 20554, MinDuration(dur, sim.Duration-sim.CurrentTime))
-					return true
 				}
 			},
 		})

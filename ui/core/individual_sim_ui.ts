@@ -211,7 +211,7 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
       'Alchohol': [],
       'Guardian Elixir': [],
       'Potion': [],
-      'Rune': [],
+      'Conjured': [],
       'Weapon Imbue': [],
     };
 
@@ -781,7 +781,7 @@ export type ExclusivityTag =
     | 'Alchohol'
     | 'Guardian Elixir'
     | 'Potion'
-    | 'Rune'
+    | 'Conjured'
     | 'Weapon Imbue';
 
 export interface ExclusiveEffect {

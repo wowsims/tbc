@@ -1,6 +1,7 @@
 import { RaidBuffs } from '/tbc/core/proto/common.js';
 import { PartyBuffs } from '/tbc/core/proto/common.js';
 import { IndividualBuffs } from '/tbc/core/proto/common.js';
+import { Conjured } from '/tbc/core/proto/common.js';
 import { Consumes } from '/tbc/core/proto/common.js';
 import { Debuffs } from '/tbc/core/proto/common.js';
 import { Drums } from '/tbc/core/proto/common.js';
@@ -67,7 +68,6 @@ export const WintersChill = makeBooleanDebuffInput({spellId:28595}, 'wintersChil
 export const AdeptsElixir = makeBooleanConsumeInput({itemId:28103}, 'adeptsElixir', ['Battle Elixir']);
 export const BlackenedBasilisk = makeBooleanConsumeInput({itemId:27657}, 'blackenedBasilisk', ['Food']);
 export const BrilliantWizardOil = makeBooleanConsumeInput({itemId:20749}, 'brilliantWizardOil', ['Weapon Imbue']);
-export const DarkRune = makeBooleanConsumeInput({itemId:12662}, 'darkRune', ['Rune']);
 export const ElixirOfDraenicWisdom = makeBooleanConsumeInput({itemId:32067}, 'elixirOfDraenicWisdom', ['Guardian Elixir']);
 export const ElixirOfMajorFirePower = makeBooleanConsumeInput({itemId:22833}, 'elixirOfMajorFirePower', ['Battle Elixir']);
 export const ElixirOfMajorFrostPower = makeBooleanConsumeInput({itemId:22827}, 'elixirOfMajorFrostPower', ['Battle Elixir']);
@@ -89,6 +89,9 @@ export const ScrollOfAgilityV = makeBooleanConsumeInput({itemId:27498}, 'scrollO
 export const DefaultDestructionPotion = makeEnumValueConsumeInput({itemId:22839}, 'defaultPotion', Potions.DestructionPotion, ['Potion']);
 export const DefaultHastePotion = makeEnumValueConsumeInput({itemId:22838}, 'defaultPotion', Potions.HastePotion, ['Potion']);
 export const DefaultSuperManaPotion = makeEnumValueConsumeInput({itemId:22832}, 'defaultPotion', Potions.SuperManaPotion, ['Potion']);
+
+export const DefaultDarkRune = makeEnumValueConsumeInput({itemId:12662}, 'defaultConjured', Conjured.ConjuredDarkRune, ['Conjured']);
+export const DefaultFlameCap = makeEnumValueConsumeInput({itemId:22788}, 'defaultConjured', Conjured.ConjuredFlameCap, ['Conjured']);
 
 function removeOtherPartyMembersDrums(eventID: EventID, player: Player<any>, newValue: boolean) {
 	if (newValue) {

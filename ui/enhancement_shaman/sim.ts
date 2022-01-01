@@ -146,7 +146,7 @@ export class EnhancementShamanSimUI extends IndividualSimUI<Spec.SpecEnhancement
 			consumeInputs: [
 				IconInputs.DefaultSuperManaPotion,
 				IconInputs.DefaultHastePotion,
-				IconInputs.DarkRune,
+				IconInputs.DefaultDarkRune,
 				IconInputs.FlaskOfRelentlessAssault,
 				IconInputs.ElixirOfMajorAgility,
 				IconInputs.RoastedClefthoof,

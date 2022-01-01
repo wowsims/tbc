@@ -13,9 +13,13 @@ const (
 	CooldownPriorityBloodlust = 1.0
 )
 
+// Condition for whether a cooldown can/should be activated.
+// Returning false prevents the cooldown from being activated.
+type CooldownActivationCondition func(*Simulation, *Character) bool
+
 // Function for activating a cooldown.
 // Returns whether the activation was successful.
-type CooldownActivation func(*Simulation, *Character) bool
+type CooldownActivation func(*Simulation, *Character)
 
 // Function for making a CooldownActivation.
 //
@@ -24,6 +28,9 @@ type CooldownActivation func(*Simulation, *Character) bool
 type CooldownActivationFactory func(*Simulation) CooldownActivation
 
 type MajorCooldown struct {
+	// Unique ID for this cooldown, used to look it up.
+	ActionID
+
 	// Primary cooldown ID for checking whether this cooldown is ready.
 	CooldownID CooldownID
 
@@ -47,22 +54,40 @@ type MajorCooldown struct {
 	// before Bloodlust.
 	Priority float64
 
+	// Whether the cooldown meets all hard requirements for activation (e.g. resource cost).
+	// Note chat whether the cooldown is off CD is automatically checked, so it does not
+	// need to be checked again by this function.
+	CanActivate CooldownActivationCondition
+
+	// Whether the cooldown meets all optional conditions for activation. These
+	// conditions will be ignored when the user specifies their own activation time.
+	// This is for things like mana thresholds, which are optimizations for better
+	// automatic timing.
+	ShouldActivate CooldownActivationCondition
+
 	// Factory for creating the activate function on every Sim reset.
 	ActivationFactory CooldownActivationFactory
 
 	// Internal lambda function to use the cooldown.
 	activate CooldownActivation
+
+	// Whether this MCD is currently disabled.
+	disabled bool
 }
 
-func (mcd MajorCooldown) IsOnCD(sim *Simulation, character *Character) bool {
+func (mcd *MajorCooldown) IsOnCD(sim *Simulation, character *Character) bool {
 	// Even if SharedCooldownID == 0 this will work since we never call SetCD(0, currentTime)
 	return character.IsOnCD(mcd.CooldownID, sim.CurrentTime) || character.IsOnCD(mcd.SharedCooldownID, sim.CurrentTime)
 }
 
-func (mcd MajorCooldown) GetRemainingCD(sim *Simulation, character *Character) time.Duration {
+func (mcd *MajorCooldown) GetRemainingCD(currentTime time.Duration, character *Character) time.Duration {
 	return MaxDuration(
-		character.GetRemainingCD(mcd.CooldownID, sim.CurrentTime),
-		character.GetRemainingCD(mcd.SharedCooldownID, sim.CurrentTime))
+		character.GetRemainingCD(mcd.CooldownID, currentTime),
+		character.GetRemainingCD(mcd.SharedCooldownID, currentTime))
+}
+
+func (mcd *MajorCooldown) IsEnabled() bool {
+	return !mcd.disabled
 }
 
 type majorCooldownManager struct {
@@ -78,7 +103,7 @@ type majorCooldownManager struct {
 	// Major cooldowns, ordered by next available. This should always contain
 	// the same cooldows as initialMajorCooldowns, but the order will change over
 	// the course of the sim.
-	majorCooldowns []MajorCooldown
+	majorCooldowns []*MajorCooldown
 }
 
 func (mcdm *majorCooldownManager) finalize(character *Character) {
@@ -97,11 +122,18 @@ func (mcdm *majorCooldownManager) finalize(character *Character) {
 	sort.SliceStable(mcdm.initialMajorCooldowns, func(i, j int) bool {
 		return mcdm.initialMajorCooldowns[i].Priority > mcdm.initialMajorCooldowns[j].Priority
 	})
+
+	mcdm.majorCooldowns = make([]*MajorCooldown, len(mcdm.initialMajorCooldowns))
 }
 
 func (mcdm *majorCooldownManager) reset(sim *Simulation) {
-	mcdm.majorCooldowns = make([]MajorCooldown, len(mcdm.initialMajorCooldowns))
-	copy(mcdm.majorCooldowns, mcdm.initialMajorCooldowns)
+	// Need to create all cooldowns before calling ActivationFactory on any of them,
+	// so that any cooldown can do lookups on other cooldowns.
+	for i, _ := range mcdm.majorCooldowns {
+		newMCD := &MajorCooldown{}
+		*newMCD = mcdm.initialMajorCooldowns[i]
+		mcdm.majorCooldowns[i] = newMCD
+	}
 
 	for i, _ := range mcdm.majorCooldowns {
 		mcdm.majorCooldowns[i].activate = mcdm.majorCooldowns[i].ActivationFactory(sim)
@@ -118,30 +150,71 @@ func (mcdm *majorCooldownManager) AddMajorCooldown(mcd MajorCooldown) {
 		panic("Major cooldowns may not be added once finalized!")
 	}
 
+	if mcd.IsEmptyAction() {
+		panic("Major cooldown must have an ActionID!")
+	}
+
+	if mcd.CanActivate == nil || mcd.ShouldActivate == nil {
+		panic("Major cooldown must provide CanActivate and ShouldActivate callbacks!")
+	}
+
 	mcdm.initialMajorCooldowns = append(mcdm.initialMajorCooldowns, mcd)
+}
+
+func (mcdm *majorCooldownManager) GetMajorCooldown(actionID ActionID) *MajorCooldown {
+	for _, mcd := range mcdm.majorCooldowns {
+		if mcd.SameAction(actionID) {
+			return mcd
+		}
+	}
+
+	return nil
+}
+
+func (mcdm *majorCooldownManager) HasMajorCooldown(actionID ActionID) bool {
+	return mcdm.GetMajorCooldown(actionID) != nil
+}
+
+func (mcdm *majorCooldownManager) DisableMajorCooldown(actionID ActionID) {
+	mcd := mcdm.GetMajorCooldown(actionID)
+	if mcd != nil {
+		mcd.disabled = true
+	}
+}
+
+func (mcdm *majorCooldownManager) EnableMajorCooldown(actionID ActionID) {
+	mcd := mcdm.GetMajorCooldown(actionID)
+	if mcd != nil {
+		mcd.disabled = false
+	}
 }
 
 func (mcdm *majorCooldownManager) TryUseCooldowns(sim *Simulation) {
 	anyCooldownsUsed := false
 	for curIdx := 0; curIdx < len(mcdm.majorCooldowns) && !mcdm.majorCooldowns[curIdx].IsOnCD(sim, mcdm.character); curIdx++ {
-		success := mcdm.majorCooldowns[curIdx].activate(sim, mcdm.character)
-		anyCooldownsUsed = anyCooldownsUsed || success
+		mcd := mcdm.majorCooldowns[curIdx]
+		if !mcd.disabled && mcd.CanActivate(sim, mcdm.character) {
+			if mcd.ShouldActivate(sim, mcdm.character) {
+				mcdm.majorCooldowns[curIdx].activate(sim, mcdm.character)
+				anyCooldownsUsed = true
+			}
+		}
 	}
 
 	if anyCooldownsUsed {
 		// Re-sort by availability.
 		// TODO: Probably a much faster way to do this, especially since we know which cooldowns need to be re-ordered.
-		sort.Slice(mcdm.majorCooldowns, func(i, j int) bool {
-			return mcdm.majorCooldowns[i].GetRemainingCD(sim, mcdm.character) < mcdm.majorCooldowns[j].GetRemainingCD(sim, mcdm.character)
-		})
+		// Maybe not because MCDs with shared cooldowns put each other on CD.
+		mcdm.UpdateMajorCooldowns()
 	}
 }
 
 // This function should be called if the CD for a major cooldown changes outside
 // of the TryActivate() call.
-func (mcdm *majorCooldownManager) UpdateMajorCooldowns(sim *Simulation) {
+func (mcdm *majorCooldownManager) UpdateMajorCooldowns() {
 	sort.Slice(mcdm.majorCooldowns, func(i, j int) bool {
-		return mcdm.majorCooldowns[i].GetRemainingCD(sim, mcdm.character) < mcdm.majorCooldowns[j].GetRemainingCD(sim, mcdm.character)
+		// Since we're just comparing and don't actually care about the remaining CD, ok to use 0 instead of sim.CurrentTime.
+		return mcdm.majorCooldowns[i].GetRemainingCD(0, mcdm.character) < mcdm.majorCooldowns[j].GetRemainingCD(0, mcdm.character)
 	})
 }
 
@@ -155,14 +228,16 @@ func RegisterTemporaryStatsOnUseCD(agent Agent, auraID AuraID, spellID int32, au
 		mcd.SharedCooldown = duration
 	}
 
+	mcd.CanActivate = func(sim *Simulation, character *Character) bool { return true }
+	mcd.ShouldActivate = func(sim *Simulation, character *Character) bool { return true }
+
 	mcd.ActivationFactory = func(sim *Simulation) CooldownActivation {
-		return func(sim *Simulation, character *Character) bool {
+		return func(sim *Simulation, character *Character) {
 			character.AddAuraWithTemporaryStats(sim, auraID, spellID, auraName, stat, amount, duration)
 			character.SetCD(mcd.CooldownID, sim.CurrentTime+mcd.Cooldown)
 			if mcd.SharedCooldownID != 0 {
 				character.SetCD(mcd.SharedCooldownID, sim.CurrentTime+mcd.SharedCooldown)
 			}
-			return true
 		}
 	}
 

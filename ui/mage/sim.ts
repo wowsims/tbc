@@ -56,6 +56,9 @@ export class MageSimUI extends IndividualSimUI<Spec.SpecMage> {
 				Stat.StatIntellect,
 				Stat.StatSpirit,
 				Stat.StatSpellPower,
+				Stat.StatArcaneSpellPower,
+				Stat.StatFireSpellPower,
+				Stat.StatFrostSpellPower,
 				Stat.StatSpellHit,
 				Stat.StatSpellCrit,
 				Stat.StatSpellHaste,
@@ -121,6 +124,7 @@ export class MageSimUI extends IndividualSimUI<Spec.SpecMage> {
 				IconInputs.GiftOfTheWild,
 			],
 			partyBuffInputs: [
+				IconInputs.MoonkinAura,
 				IconInputs.DrumsOfBattleBuff,
 				IconInputs.DrumsOfRestorationBuff,
 				IconInputs.Bloodlust,
@@ -154,7 +158,9 @@ export class MageSimUI extends IndividualSimUI<Spec.SpecMage> {
 			consumeInputs: [
 				IconInputs.DefaultSuperManaPotion,
 				IconInputs.DefaultDestructionPotion,
-				IconInputs.DarkRune,
+				MageInputs.ManaEmerald,
+				IconInputs.DefaultDarkRune,
+				IconInputs.DefaultFlameCap,
 				IconInputs.FlaskOfBlindingLight,
 				IconInputs.FlaskOfPureDeath,
 				IconInputs.FlaskOfSupremePower,

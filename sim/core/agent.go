@@ -48,6 +48,30 @@ type ActionID struct {
 	CooldownID CooldownID // used only for tracking CDs internally
 }
 
+func (actionID ActionID) IsEmptyAction() bool {
+	return actionID.SpellID == 0 && actionID.ItemID == 0 && actionID.OtherID == 0
+}
+
+func (actionID ActionID) IsSpellAction(spellID int32) bool {
+	return actionID.SpellID == spellID
+}
+
+func (actionID ActionID) IsItemAction(itemID int32) bool {
+	return actionID.ItemID == itemID
+}
+
+func (actionID ActionID) IsOtherAction(otherID proto.OtherAction) bool {
+	return actionID.OtherID == otherID
+}
+
+func (actionID ActionID) SameActionIgnoreTag(other ActionID) bool {
+	return actionID.SpellID == other.SpellID && actionID.ItemID == other.ItemID && actionID.OtherID == other.OtherID
+}
+
+func (actionID ActionID) SameAction(other ActionID) bool {
+	return actionID.SameActionIgnoreTag(other) && actionID.Tag == other.Tag
+}
+
 func (actionID ActionID) ToProto() *proto.ActionID {
 	protoID := &proto.ActionID{
 		Tag: actionID.Tag,

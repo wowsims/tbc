@@ -18,7 +18,7 @@ func applyConsumeEffects(agent Agent, partyBuffs proto.PartyBuffs) {
 
 	registerDrumsCD(agent, partyBuffs, consumes)
 	registerPotionCD(agent, consumes)
-	registerDarkRuneCD(agent, consumes)
+	registerConjuredCD(agent, consumes)
 }
 
 func consumesStats(c proto.Consumes) stats.Stats {
@@ -106,12 +106,12 @@ func consumesStats(c proto.Consumes) stats.Stats {
 	return s
 }
 
-// Adds drums as a major cooldown to the character, if it's being used.
 var DrumsAuraID = NewAuraID()
 var DrumsCooldownID = NewCooldownID()
 
 const DrumsCD = time.Minute * 2 // Tinnitus
 
+// Adds drums as a major cooldown to the character, if it's being used.
 func registerDrumsCD(agent Agent, partyBuffs proto.PartyBuffs, consumes proto.Consumes) {
 	//character := agent.GetCharacter()
 	drumsType := proto.Drums_DrumsUnknown
@@ -157,31 +157,31 @@ func registerDrumsCD(agent Agent, partyBuffs proto.PartyBuffs, consumes proto.Co
 	}
 
 	mcd := MajorCooldown{
+		ActionID:   ActionID{SpellID: spellID},
 		CooldownID: DrumsCooldownID,
 		Cooldown:   DrumsCD,
 		Priority:   CooldownPriorityDrums,
+
+		CanActivate:    func(sim *Simulation, character *Character) bool { return true },
+		ShouldActivate: func(sim *Simulation, character *Character) bool { return true },
 	}
 
 	if drumsSelfCast {
 		// When a real player is using drums, their cast applies to the whole party.
 		mcd.ActivationFactory = func(sim *Simulation) CooldownActivation {
-			return func(sim *Simulation, character *Character) bool {
+			return func(sim *Simulation, character *Character) {
 				for _, agent := range character.Party.Players {
 					applyDrums(sim, agent.GetCharacter())
 				}
 				// TODO: Do a cast time
 				character.Metrics.AddInstantCast(ActionID{SpellID: spellID})
-				return true
 			}
 		}
 	} else {
 		// When there is no real player using drums, each player gets a fake CD that
 		// gives just themself the buff, with no cast time.
 		mcd.ActivationFactory = func(sim *Simulation) CooldownActivation {
-			return func(sim *Simulation, character *Character) bool {
-				applyDrums(sim, character)
-				return true
-			}
+			return applyDrums
 		}
 	}
 
@@ -206,190 +206,343 @@ var PotionAuraID = NewAuraID()
 var PotionCooldownID = NewCooldownID()
 
 func registerPotionCD(agent Agent, consumes proto.Consumes) {
+	if consumes.DefaultPotion == consumes.StartingPotion {
+		// Starting potion is redundant in this case.
+		consumes.StartingPotion = proto.Potions_UnknownPotion
+	}
+	if consumes.StartingPotion == proto.Potions_UnknownPotion {
+		consumes.NumStartingPotions = 0
+	}
+
 	character := agent.GetCharacter()
 	defaultPotion := consumes.DefaultPotion
 	startingPotion := consumes.StartingPotion
 	numStartingPotions := int(consumes.NumStartingPotions)
 
-	defaultPotionActivation := makePotionActivation(defaultPotion, character)
-	startingPotionActivation := makePotionActivation(startingPotion, character)
-
-	if startingPotionActivation == nil {
-		numStartingPotions = 0
-	}
+	defaultMCD, defaultPotionActivation := makePotionActivation(defaultPotion, character)
+	startingMCD, startingPotionActivation := makePotionActivation(startingPotion, character)
 
 	if defaultPotionActivation == nil && startingPotionActivation == nil {
 		return
 	}
 
-	agent.GetCharacter().AddMajorCooldown(MajorCooldown{
-		CooldownID: PotionCooldownID,
-		Cooldown:   time.Minute * 2,
-		Priority:   CooldownPriorityDefault,
-		ActivationFactory: func(sim *Simulation) CooldownActivation {
-			// Capture this inside ActivationFactory so it resets on Sim reset.
-			numPotionsUsed := 0
+	numStartingPotionsUsed := 0
+	var mageManaGemMCD *MajorCooldown
 
-			expectedManaPerUsage := float64((3000 + 1800) / 2)
-			remainingUsages := int(1 + (MaxDuration(0, sim.Duration))/(time.Minute*2))
+	// Setup for expected bonus mana management.
+	expectedManaPerUsage := float64((3000 + 1800) / 2)
+	remainingUsages := 0
+	remainingManaPotionUsages := 0
+	eitherPotionIsManaPotion := startingPotion == proto.Potions_SuperManaPotion || defaultPotion == proto.Potions_SuperManaPotion
+	initExpectedBonusMana := func(sim *Simulation, potionType proto.Potions, isStartingPotion bool) {
+		if potionType != proto.Potions_SuperManaPotion {
+			return
+		}
+		mageManaGemMCD = character.GetMajorCooldown(MageManaGemMCDActionID)
 
-			remainingManaPotionUsages := 0
-			if startingPotion == proto.Potions_SuperManaPotion {
-				remainingManaPotionUsages += MinInt(numStartingPotions, remainingUsages)
-			}
-			if defaultPotion == proto.Potions_SuperManaPotion {
-				remainingManaPotionUsages += MaxInt(0, remainingUsages-numStartingPotions)
-			}
+		remainingUsages = int(1 + (MaxDuration(0, sim.Duration))/(time.Minute*2))
+		if isStartingPotion {
+			remainingManaPotionUsages = MinInt(numStartingPotions, remainingUsages)
+		} else {
+			remainingManaPotionUsages = MaxInt(0, remainingUsages-numStartingPotions)
+		}
 
-			character.ExpectedBonusMana += expectedManaPerUsage * float64(remainingManaPotionUsages)
+		character.ExpectedBonusMana += expectedManaPerUsage * float64(remainingManaPotionUsages)
+	}
 
-			return func(sim *Simulation, character *Character) bool {
-				usedPotion := false
-				if startingPotionActivation != nil && numPotionsUsed < numStartingPotions {
-					usedPotion = startingPotionActivation(sim, character)
-				} else if defaultPotionActivation != nil {
-					usedPotion = defaultPotionActivation(sim, character)
+	updateExpectedBonusMana := func(sim *Simulation, character *Character, potionType proto.Potions, isStartingPotion bool) {
+		if !eitherPotionIsManaPotion {
+			return
+		}
+		thisPotionIsManaPotion := potionType == proto.Potions_SuperManaPotion
+
+		newRemainingUsages := int(sim.GetRemainingDuration() / (time.Minute * 2))
+		numRemainingStartingPotionUsages := MinInt(numStartingPotions-numStartingPotionsUsed, remainingUsages)
+		numRemainingDefaultPotionUsages := MaxInt(0, newRemainingUsages-MaxInt(0, numStartingPotions-numStartingPotionsUsed))
+
+		newRemainingManaPotionUsages := 0
+		if thisPotionIsManaPotion == isStartingPotion {
+			newRemainingManaPotionUsages = numRemainingStartingPotionUsages
+		} else {
+			newRemainingManaPotionUsages = numRemainingDefaultPotionUsages
+		}
+
+		character.ExpectedBonusMana -= expectedManaPerUsage * float64(remainingManaPotionUsages-newRemainingManaPotionUsages)
+		remainingManaPotionUsages = newRemainingManaPotionUsages
+	}
+
+	if startingPotionActivation != nil {
+		character.AddMajorCooldown(MajorCooldown{
+			ActionID: startingMCD.ActionID,
+			CanActivate: func(sim *Simulation, character *Character) bool {
+				if numStartingPotionsUsed >= numStartingPotions {
+					return false
 				}
-
-				if usedPotion {
-					numPotionsUsed++
-
-					// Update expected bonus mana
-					newRemainingUsages := int(sim.GetRemainingDuration() / (time.Minute * 2))
-					newRemainingManaPotionUsages := 0
-					if startingPotion == proto.Potions_SuperManaPotion {
-						newRemainingManaPotionUsages += MinInt(numStartingPotions-numPotionsUsed, remainingUsages)
-					}
-					if defaultPotion == proto.Potions_SuperManaPotion {
-						newRemainingManaPotionUsages += MaxInt(0, newRemainingUsages-MaxInt(0, numStartingPotions-numPotionsUsed))
-					}
-
-					character.ExpectedBonusMana -= expectedManaPerUsage * float64(remainingManaPotionUsages-newRemainingManaPotionUsages)
-					remainingManaPotionUsages = newRemainingManaPotionUsages
+				return startingMCD.CanActivate(sim, character)
+			},
+			ShouldActivate: func(sim *Simulation, character *Character) bool {
+				if startingPotion == proto.Potions_SuperManaPotion &&
+					mageManaGemMCD != nil &&
+					mageManaGemMCD.IsEnabled() &&
+					!mageManaGemMCD.IsOnCD(sim, character) {
+					return false
 				}
+				return startingMCD.ShouldActivate(sim, character)
+			},
 
-				return usedPotion
-			}
-		},
-	})
+			CooldownID: PotionCooldownID,
+			Cooldown:   time.Minute * 2,
+
+			ActivationFactory: func(sim *Simulation) CooldownActivation {
+				numStartingPotionsUsed = 0
+				initExpectedBonusMana(sim, startingPotion, true)
+
+				return func(sim *Simulation, character *Character) {
+					startingPotionActivation(sim, character)
+					numStartingPotionsUsed++
+					updateExpectedBonusMana(sim, character, startingPotion, true)
+				}
+			},
+		})
+	}
+
+	if defaultPotionActivation != nil {
+		character.AddMajorCooldown(MajorCooldown{
+			ActionID: defaultMCD.ActionID,
+			CanActivate: func(sim *Simulation, character *Character) bool {
+				if numStartingPotionsUsed < numStartingPotions {
+					return false
+				}
+				return defaultMCD.CanActivate(sim, character)
+			},
+			ShouldActivate: func(sim *Simulation, character *Character) bool {
+				if defaultPotion == proto.Potions_SuperManaPotion &&
+					mageManaGemMCD != nil &&
+					mageManaGemMCD.IsEnabled() &&
+					!mageManaGemMCD.IsOnCD(sim, character) {
+					return false
+				}
+				return defaultMCD.ShouldActivate(sim, character)
+			},
+
+			CooldownID: PotionCooldownID,
+			Cooldown:   time.Minute * 2,
+
+			ActivationFactory: func(sim *Simulation) CooldownActivation {
+				initExpectedBonusMana(sim, defaultPotion, true)
+
+				return func(sim *Simulation, character *Character) {
+					defaultPotionActivation(sim, character)
+					updateExpectedBonusMana(sim, character, defaultPotion, true)
+				}
+			},
+		})
+	}
 }
 
 const AlchStoneItemID = 35749
 
-func makePotionActivation(potionType proto.Potions, character *Character) CooldownActivation {
+func makePotionActivation(potionType proto.Potions, character *Character) (MajorCooldown, CooldownActivation) {
 	if potionType == proto.Potions_DestructionPotion {
-		return func(sim *Simulation, character *Character) bool {
-			const spBonus = 120
-			const critBonus = 2 * SpellCritRatingPerCritChance
-			const dur = time.Second * 15
-
-			character.AddStat(stats.SpellPower, spBonus)
-			character.AddStat(stats.SpellCrit, critBonus)
-
-			character.AddAura(sim, Aura{
-				ID:      PotionAuraID,
-				SpellID: 28508,
-				Name:    "Destruction Potion",
-				Expires: sim.CurrentTime + dur,
-				OnExpire: func(sim *Simulation) {
-					character.AddStat(stats.SpellPower, -spBonus)
-					character.AddStat(stats.SpellCrit, -critBonus)
+		return MajorCooldown{
+				ActionID: ActionID{ItemID: 22839},
+				CanActivate: func(sim *Simulation, character *Character) bool {
+					return true
 				},
-			})
+				ShouldActivate: func(sim *Simulation, character *Character) bool {
+					return true
+				},
+			},
+			func(sim *Simulation, character *Character) {
+				const spBonus = 120
+				const critBonus = 2 * SpellCritRatingPerCritChance
+				const dur = time.Second * 15
 
-			character.SetCD(PotionCooldownID, time.Minute*2+sim.CurrentTime)
-			character.Metrics.AddInstantCast(ActionID{ItemID: 22839})
-			return true
-		}
+				character.AddStat(stats.SpellPower, spBonus)
+				character.AddStat(stats.SpellCrit, critBonus)
+
+				character.AddAura(sim, Aura{
+					ID:      PotionAuraID,
+					SpellID: 28508,
+					Name:    "Destruction Potion",
+					Expires: sim.CurrentTime + dur,
+					OnExpire: func(sim *Simulation) {
+						character.AddStat(stats.SpellPower, -spBonus)
+						character.AddStat(stats.SpellCrit, -critBonus)
+					},
+				})
+
+				character.SetCD(PotionCooldownID, time.Minute*2+sim.CurrentTime)
+				character.Metrics.AddInstantCast(ActionID{ItemID: 22839})
+			}
 	} else if potionType == proto.Potions_SuperManaPotion {
 		alchStoneEquipped := character.HasTrinketEquipped(AlchStoneItemID)
-		return func(sim *Simulation, character *Character) bool {
-			// Only pop if we have less than the max mana provided by the potion minus 1mp5 tick.
-			totalRegen := character.manaRegenPerSecondWhileCasting() * 5
-			if character.MaxMana()-(character.CurrentMana()+totalRegen) < 3000 {
-				return false
-			}
-
-			// Restores 1800 to 3000 mana. (2 Min Cooldown)
-			manaGain := 1800 + (sim.RandomFloat("super mana") * 1200)
-
-			if alchStoneEquipped {
-				manaGain *= 1.4
-			}
-
-			character.AddMana(sim, manaGain, "Super Mana Potion", true)
-			character.SetCD(PotionCooldownID, time.Minute*2+sim.CurrentTime)
-			character.Metrics.AddInstantCast(ActionID{ItemID: 22832})
-			return true
-		}
-	} else if potionType == proto.Potions_HastePotion {
-		return func(sim *Simulation, character *Character) bool {
-			const hasteBonus = 400
-			const dur = time.Second * 15
-
-			character.AddMeleeHaste(sim, hasteBonus)
-
-			character.AddAura(sim, Aura{
-				ID:      PotionAuraID,
-				SpellID: 28507,
-				Name:    "Haste Potion",
-				Expires: sim.CurrentTime + dur,
-				OnExpire: func(sim *Simulation) {
-					character.AddMeleeHaste(sim, -hasteBonus)
+		return MajorCooldown{
+				ActionID: ActionID{ItemID: 22832},
+				CanActivate: func(sim *Simulation, character *Character) bool {
+					return true
 				},
-			})
+				ShouldActivate: func(sim *Simulation, character *Character) bool {
+					// Only pop if we have less than the max mana provided by the potion minus 1mp5 tick.
+					totalRegen := character.ManaRegenPerSecondWhileCasting() * 5
+					if character.MaxMana()-(character.CurrentMana()+totalRegen) < 3000 {
+						return false
+					}
 
-			character.SetCD(PotionCooldownID, time.Minute*2+sim.CurrentTime)
-			character.Metrics.AddInstantCast(ActionID{ItemID: 22838})
-			return true
-		}
+					return true
+				},
+			},
+			func(sim *Simulation, character *Character) {
+				// Restores 1800 to 3000 mana. (2 Min Cooldown)
+				manaGain := 1800 + (sim.RandomFloat("super mana") * 1200)
+
+				if alchStoneEquipped {
+					manaGain *= 1.4
+				}
+
+				character.AddMana(sim, manaGain, "Super Mana Potion", true)
+				character.SetCD(PotionCooldownID, time.Minute*2+sim.CurrentTime)
+				character.Metrics.AddInstantCast(ActionID{ItemID: 22832})
+			}
+	} else if potionType == proto.Potions_HastePotion {
+		return MajorCooldown{
+				ActionID: ActionID{ItemID: 22838},
+				CanActivate: func(sim *Simulation, character *Character) bool {
+					return true
+				},
+				ShouldActivate: func(sim *Simulation, character *Character) bool {
+					return true
+				},
+			},
+			func(sim *Simulation, character *Character) {
+				const hasteBonus = 400
+				const dur = time.Second * 15
+
+				character.AddMeleeHaste(sim, hasteBonus)
+
+				character.AddAura(sim, Aura{
+					ID:      PotionAuraID,
+					SpellID: 28507,
+					Name:    "Haste Potion",
+					Expires: sim.CurrentTime + dur,
+					OnExpire: func(sim *Simulation) {
+						character.AddMeleeHaste(sim, -hasteBonus)
+					},
+				})
+
+				character.SetCD(PotionCooldownID, time.Minute*2+sim.CurrentTime)
+				character.Metrics.AddInstantCast(ActionID{ItemID: 22838})
+			}
 	} else {
-		return nil
+		return MajorCooldown{}, nil
 	}
 }
 
-var RuneCooldownID = NewCooldownID()
+var ConjuredAuraID = NewAuraID()
+var ConjuredCooldownID = NewCooldownID()
 
-func registerDarkRuneCD(agent Agent, consumes proto.Consumes) {
-	if !consumes.DarkRune {
+func registerConjuredCD(agent Agent, consumes proto.Consumes) {
+	character := agent.GetCharacter()
+
+	mcd, activationFn := makeConjuredActivation(consumes.DefaultConjured, character)
+	if activationFn == nil {
 		return
 	}
 
-	character := agent.GetCharacter()
+	var mageManaGemMCD *MajorCooldown
+
 	character.AddMajorCooldown(MajorCooldown{
-		CooldownID: RuneCooldownID,
-		Cooldown:   time.Minute * 2,
-		Priority:   CooldownPriorityDefault,
+		ActionID:    mcd.ActionID,
+		CooldownID:  ConjuredCooldownID,
+		Cooldown:    mcd.Cooldown,
+		CanActivate: mcd.CanActivate,
+		ShouldActivate: func(sim *Simulation, character *Character) bool {
+			if consumes.DefaultConjured == proto.Conjured_ConjuredDarkRune &&
+				mageManaGemMCD != nil &&
+				mageManaGemMCD.IsEnabled() &&
+				!mageManaGemMCD.IsOnCD(sim, character) {
+				return false
+			}
+			return mcd.ShouldActivate(sim, character)
+		},
 		ActivationFactory: func(sim *Simulation) CooldownActivation {
+			mageManaGemMCD = character.GetMajorCooldown(MageManaGemMCDActionID)
 			expectedManaPerUsage := float64((900 + 600) / 2)
+
 			remainingUsages := int(1 + (MaxDuration(0, sim.Duration))/(time.Minute*2))
-			character.ExpectedBonusMana += expectedManaPerUsage * float64(remainingUsages)
+			if character.Class == proto.Class_ClassMage {
+				// Hack for better estimates for mages, who pretty much always use mana emeralds.
+				remainingUsages = MaxInt(0, remainingUsages-3)
+			}
 
-			return func(sim *Simulation, character *Character) bool {
-				// Only pop if we have less than the max mana provided by the potion minus 1mp5 tick.
-				totalRegen := character.manaRegenPerSecondWhileCasting() * 5
-				if character.MaxMana()-(character.CurrentMana()+totalRegen) < 1500 {
-					return false
+			if consumes.DefaultConjured == proto.Conjured_ConjuredDarkRune {
+				character.ExpectedBonusMana += expectedManaPerUsage * float64(remainingUsages)
+			}
+
+			return func(sim *Simulation, character *Character) {
+				activationFn(sim, character)
+
+				if consumes.DefaultConjured == proto.Conjured_ConjuredDarkRune {
+					// Update expected bonus mana
+					newRemainingUsages := int(sim.GetRemainingDuration() / (time.Minute * 2))
+					character.ExpectedBonusMana -= expectedManaPerUsage * float64(remainingUsages-newRemainingUsages)
+					remainingUsages = newRemainingUsages
 				}
-
-				// Restores 900 to 1500 mana. (2 Min Cooldown)
-				manaGain := 900 + (sim.RandomFloat("dark rune") * 600)
-
-				character.AddMana(sim, manaGain, "Dark Rune", true)
-				character.SetCD(RuneCooldownID, time.Minute*2+sim.CurrentTime)
-
-				// Update expected bonus mana
-				newRemainingUsages := int(sim.GetRemainingDuration() / (time.Minute * 2))
-				character.ExpectedBonusMana -= expectedManaPerUsage * float64(remainingUsages-newRemainingUsages)
-				remainingUsages = newRemainingUsages
-
-				if sim.Log != nil {
-					character.Log(sim, "Used Dark Rune")
-				}
-				character.Metrics.AddInstantCast(ActionID{SpellID: 27869})
-
-				return true
 			}
 		},
 	})
 }
+
+func makeConjuredActivation(conjuredType proto.Conjured, character *Character) (MajorCooldown, CooldownActivation) {
+	if conjuredType == proto.Conjured_ConjuredDarkRune {
+		return MajorCooldown{
+				ActionID: ActionID{ItemID: 20520},
+				Cooldown: time.Minute * 2,
+				CanActivate: func(sim *Simulation, character *Character) bool {
+					return true
+				},
+				ShouldActivate: func(sim *Simulation, character *Character) bool {
+					// Only pop if we have less than the max mana provided by the potion minus 1mp5 tick.
+					totalRegen := character.ManaRegenPerSecondWhileCasting() * 5
+					if character.MaxMana()-(character.CurrentMana()+totalRegen) < 1500 {
+						return false
+					}
+					return true
+				},
+			},
+			func(sim *Simulation, character *Character) {
+				// Restores 900 to 1500 mana. (2 Min Cooldown)
+				manaGain := 900 + (sim.RandomFloat("dark rune") * 600)
+				character.AddMana(sim, manaGain, "Dark Rune", true)
+				character.SetCD(ConjuredCooldownID, time.Minute*2+sim.CurrentTime)
+				character.Metrics.AddInstantCast(ActionID{ItemID: 20520})
+			}
+	} else if conjuredType == proto.Conjured_ConjuredFlameCap {
+		return MajorCooldown{
+				ActionID: ActionID{ItemID: 22788},
+				Cooldown: time.Minute * 3,
+				CanActivate: func(sim *Simulation, character *Character) bool {
+					return true
+				},
+				ShouldActivate: func(sim *Simulation, character *Character) bool {
+					return true
+				},
+			},
+			func(sim *Simulation, character *Character) {
+				const fireBonus = 80
+				const dur = time.Minute * 1
+
+				character.AddAuraWithTemporaryStats(sim, ConjuredAuraID, 28714, "Flame Cap", stats.FireSpellPower, fireBonus, dur)
+				// TODO: Add separate aura for damage proc on melee/ranged swings
+
+				character.SetCD(ConjuredCooldownID, time.Minute*3+sim.CurrentTime)
+				character.Metrics.AddInstantCast(ActionID{ItemID: 22788})
+			}
+	} else {
+		return MajorCooldown{}, nil
+	}
+}
+
+// Mana-related consumes need to know this so they can wait for the Mage to use
+// gems first.
+var MageManaGemMCDActionID = ActionID{ItemID: 22044}
