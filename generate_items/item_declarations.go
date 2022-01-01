@@ -407,6 +407,7 @@ var ItemDeclarations = []ItemDeclaration{
 	{ /** Seal of the Exorcist */ ID: 28555, Categories: []proto.ItemCategory{CasterCategory}},
 	{ /** Seer's Signet */ ID: 29126, Categories: []proto.ItemCategory{CasterCategory}},
 	{ /** Sergeant's Heavy Cape */ ID: 28379, Categories: []proto.ItemCategory{CasterCategory}},
+	{ /** Serpent-Coil Braid */ ID: 30720, Categories: []proto.ItemCategory{CasterCategory}},
 	{ /** Sethekk Oracle Cloak */ ID: 27981, Categories: []proto.ItemCategory{CasterCategory}},
 	{ /** Sextant of Unstable Currents */ ID: 30626, Categories: []proto.ItemCategory{CasterCategory}},
 	{ /** Shadow-Cloak of Dalaran */ ID: 28570, Categories: []proto.ItemCategory{CasterCategory}},

@@ -7,6 +7,8 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
+const SerpentCoilBraidID = 30720
+
 func init() {
 	var MindQuickeningGemCooldownID = core.NewCooldownID()
 	core.AddItemEffect(19339, core.MakeTemporaryStatsOnUseCDRegistration(
@@ -17,6 +19,7 @@ func init() {
 		330,
 		time.Second*20,
 		core.MajorCooldown{
+			ActionID:         core.ActionID{ItemID: 19339},
 			CooldownID:       MindQuickeningGemCooldownID,
 			Cooldown:         time.Minute * 5,
 			SharedCooldownID: core.OffensiveTrinketSharedCooldownID,
@@ -28,6 +31,10 @@ func init() {
 	core.AddItemSet(ItemSetAldorRegalia)
 	core.AddItemSet(ItemSetTirisfalRegalia)
 	core.AddItemSet(ItemSetTempestRegalia)
+
+	// Even though these item effects are handled elsewhere, add them so they are
+	// detected for automatic testing.
+	core.AddItemEffect(SerpentCoilBraidID, func(core.Agent) {})
 }
 
 var ItemSetAldorRegalia = core.ItemSet{

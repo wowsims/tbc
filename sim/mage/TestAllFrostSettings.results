@@ -13,7 +13,7 @@ dps_results: {
 dps_results: {
  key: "TestAllFrostSettings-Troll10-P1Frost-FrostRotation-FullBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 1298.5728821831192
+  dps: 1302.1132805831194
  }
 }
 dps_results: {
@@ -25,19 +25,19 @@ dps_results: {
 dps_results: {
  key: "TestAllFrostSettings-Troll10-P1Frost-FrostRotation-NoBuffs-LongMultiTarget"
  value: {
-  dps: 963.1412515414715
+  dps: 1102.9302636701502
  }
 }
 dps_results: {
  key: "TestAllFrostSettings-Troll10-P1Frost-FrostRotation-NoBuffs-LongSingleTargetFullDebuffs"
  value: {
-  dps: 963.1412515414715
+  dps: 1102.9302636701502
  }
 }
 dps_results: {
  key: "TestAllFrostSettings-Troll10-P1Frost-FrostRotation-NoBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 648.128954007194
+  dps: 832.9083426227731
  }
 }
 dps_results: {

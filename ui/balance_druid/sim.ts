@@ -156,7 +156,7 @@ export class BalanceDruidSimUI extends IndividualSimUI<Spec.SpecBalanceDruid> {
 			consumeInputs: [
 				IconInputs.DefaultSuperManaPotion,
 				IconInputs.DefaultDestructionPotion,
-				IconInputs.DarkRune,
+				IconInputs.DefaultDarkRune,
 				IconInputs.FlaskOfBlindingLight,
 				IconInputs.FlaskOfSupremePower,
 				IconInputs.AdeptsElixir,

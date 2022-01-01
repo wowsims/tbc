@@ -72,6 +72,7 @@ export function actionIdToString(id: ActionId): string {
 // Some items/spells have weird icons, so use this to show a different icon instead.
 const idOverrides: Record<string, ItemOrSpellId> = {};
 idOverrides[JSON.stringify({spellId: 37212})] = { itemId: 29035 }; // Improved Wrath of Air Totem
+idOverrides[JSON.stringify({spellId: 37447})] = { itemId: 30720 }; // Serpent-Coil Braid
 
 async function getTooltipDataHelper(id: number, tooltipPostfix: string, cache: Map<number, Promise<any>>): Promise<any> {
   if (!cache.has(id)) {

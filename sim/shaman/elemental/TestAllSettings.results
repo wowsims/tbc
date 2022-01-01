@@ -13,7 +13,7 @@ dps_results: {
 dps_results: {
  key: "TestAllSettings-Orc-P1-Adaptive-FullBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 1496.9720963275674
+  dps: 1497.355232230255
  }
 }
 dps_results: {
@@ -253,7 +253,7 @@ dps_results: {
 dps_results: {
  key: "TestAllSettings-Troll10-P1-Adaptive-FullBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 1566.9751377717535
+  dps: 1571.839645653646
  }
 }
 dps_results: {

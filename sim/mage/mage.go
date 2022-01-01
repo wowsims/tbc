@@ -28,10 +28,13 @@ type Mage struct {
 	core.Character
 	Talents proto.MageTalents
 
+	Options        proto.Mage_Options
 	RotationType   proto.Mage_Rotation_Type
 	ArcaneRotation proto.Mage_Rotation_ArcaneRotation
 	FireRotation   proto.Mage_Rotation_FireRotation
 	FrostRotation  proto.Mage_Rotation_FrostRotation
+
+	remainingManaEmeralds int
 
 	// Cached value for a few talents.
 	spellDamageMultiplier float64
@@ -84,6 +87,9 @@ func (mage *Mage) Init(sim *core.Simulation) {
 }
 
 func (mage *Mage) Reset(newsim *core.Simulation) {
+	if mage.Options.UseManaEmeralds {
+		mage.remainingManaEmeralds = 3
+	}
 }
 
 func (mage *Mage) Advance(sim *core.Simulation, elapsedTime time.Duration) {
@@ -96,6 +102,7 @@ func NewMage(character core.Character, options proto.Player) *Mage {
 	mage := &Mage{
 		Character:    character,
 		Talents:      *mageOptions.Talents,
+		Options:      *mageOptions.Options,
 		RotationType: mageOptions.Rotation.Type,
 
 		spellDamageMultiplier: 1.0,
@@ -125,13 +132,14 @@ func NewMage(character core.Character, options proto.Player) *Mage {
 		},
 	})
 
-	if mageOptions.Options.Armor == proto.Mage_Options_MageArmor {
+	if mage.Options.Armor == proto.Mage_Options_MageArmor {
 		mage.PseudoStats.SpiritRegenRateCasting += 0.3
-	} else if mageOptions.Options.Armor == proto.Mage_Options_MoltenArmor {
+	} else if mage.Options.Armor == proto.Mage_Options_MoltenArmor {
 		mage.AddStat(stats.SpellCrit, 3*core.SpellCritRatingPerCritChance)
 	}
 
-	mage.registerEvocationCD(mageOptions.Options.EvocationTicks)
+	mage.registerEvocationCD()
+	mage.registerManaGemsCD()
 	mage.applyTalents()
 
 	return mage

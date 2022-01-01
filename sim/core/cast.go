@@ -21,7 +21,7 @@ type OnCastComplete func(sim *Simulation, cast *Cast)
 // Manages cooldowns and the GCD.
 type Cast struct {
 	// ID for the action.
-	ActionID ActionID
+	ActionID
 
 	// The name of the cast action, e.g. 'Shadowbolt'.
 	Name string

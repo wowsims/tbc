@@ -331,7 +331,7 @@ func (character *Character) Finalize() {
 	character.initialStats = character.stats
 	character.initialPseudoStats = character.PseudoStats
 
-	character.initialManaRegenPerSecondWhileCasting = character.manaRegenPerSecondWhileCasting()
+	character.initialManaRegenPerSecondWhileCasting = character.ManaRegenPerSecondWhileCasting()
 	character.initialCastSpeed = character.CastSpeed()
 
 	character.auraTracker.finalize()
@@ -376,7 +376,7 @@ func (character *Character) SpiritManaRegenPerSecond() float64 {
 
 // Returns the rate of mana regen per second, assuming this character is
 // considered to be casting.
-func (character *Character) manaRegenPerSecondWhileCasting() float64 {
+func (character *Character) ManaRegenPerSecondWhileCasting() float64 {
 	regenRate := character.MP5ManaRegenPerSecond()
 
 	spiritRegenRate := 0.0
@@ -393,7 +393,7 @@ func (character *Character) manaRegenPerSecondWhileCasting() float64 {
 
 // Returns the rate of mana regen per second, assuming this character is
 // considered to be not casting.
-func (character *Character) manaRegenPerSecondWhileNotCasting() float64 {
+func (character *Character) ManaRegenPerSecondWhileNotCasting() float64 {
 	regenRate := character.MP5ManaRegenPerSecond()
 
 	regenRate += character.SpiritManaRegenPerSecond() * character.PseudoStats.SpiritRegenMultiplier
@@ -403,7 +403,7 @@ func (character *Character) manaRegenPerSecondWhileNotCasting() float64 {
 
 // Regenerates mana based on MP5 stat, spirit regen allowed while casting and the elapsed time.
 func (character *Character) RegenManaCasting(sim *Simulation, elapsedTime time.Duration) {
-	manaRegen := character.manaRegenPerSecondWhileCasting() * elapsedTime.Seconds()
+	manaRegen := character.ManaRegenPerSecondWhileCasting() * elapsedTime.Seconds()
 	reason := ""
 	if sim.Log != nil {
 		reason = fmt.Sprintf("%0.1fs Regen", elapsedTime.Seconds())
@@ -417,15 +417,15 @@ func (character *Character) RegenMana(sim *Simulation, elapsedTime time.Duration
 	if sim.CurrentTime-elapsedTime > character.PseudoStats.FiveSecondRuleRefreshTime {
 		// Five second rule activated before the advance window started, so use full
 		// spirit regen for the full duration.
-		regen = character.manaRegenPerSecondWhileNotCasting() * elapsedTime.Seconds()
+		regen = character.ManaRegenPerSecondWhileNotCasting() * elapsedTime.Seconds()
 	} else if sim.CurrentTime > character.PseudoStats.FiveSecondRuleRefreshTime {
 		// Five second rule activated sometime in the middle of the advance window,
 		// so regen is a combination of casting and not-casting regen.
 		notCastingRegenTime := sim.CurrentTime - character.PseudoStats.FiveSecondRuleRefreshTime // how many seconds of full spirit regen
 		castingRegenTime := elapsedTime - notCastingRegenTime
-		regen = (character.manaRegenPerSecondWhileNotCasting() * notCastingRegenTime.Seconds()) + (character.manaRegenPerSecondWhileCasting() * castingRegenTime.Seconds())
+		regen = (character.ManaRegenPerSecondWhileNotCasting() * notCastingRegenTime.Seconds()) + (character.ManaRegenPerSecondWhileCasting() * castingRegenTime.Seconds())
 	} else {
-		regen = character.manaRegenPerSecondWhileCasting() * elapsedTime.Seconds()
+		regen = character.ManaRegenPerSecondWhileCasting() * elapsedTime.Seconds()
 	}
 	reason := ""
 	if sim.Log != nil {
@@ -444,7 +444,7 @@ func (character *Character) TimeUntilManaRegen(desiredMana float64) time.Duratio
 	manaNeeded := desiredMana - character.CurrentMana()
 	regenTime := NeverExpires
 
-	regenWhileCasting := character.manaRegenPerSecondWhileCasting()
+	regenWhileCasting := character.ManaRegenPerSecondWhileCasting()
 	if regenWhileCasting != 0 {
 		regenTime = DurationFromSeconds(manaNeeded/regenWhileCasting) + 1
 	}
@@ -456,7 +456,7 @@ func (character *Character) TimeUntilManaRegen(desiredMana float64) time.Duratio
 		regenTime = time.Second * 5
 		manaNeeded -= regenWhileCasting * 5
 		// now we move into spirit based regen.
-		regenTime += DurationFromSeconds(manaNeeded / character.manaRegenPerSecondWhileNotCasting())
+		regenTime += DurationFromSeconds(manaNeeded / character.ManaRegenPerSecondWhileNotCasting())
 	}
 
 	return regenTime

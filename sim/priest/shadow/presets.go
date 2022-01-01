@@ -41,7 +41,7 @@ var FullConsumes = &proto.Consumes{
 	BlackenedBasilisk:  true,
 	DefaultPotion:      proto.Potions_SuperManaPotion,
 	NumStartingPotions: 1,
-	DarkRune:           true,
+	DefaultConjured:    proto.Conjured_ConjuredDarkRune,
 }
 
 var FullDebuffs = &proto.Debuffs{

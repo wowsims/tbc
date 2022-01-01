@@ -27,6 +27,7 @@ func init() {
 		130,
 		time.Second*20,
 		core.MajorCooldown{
+			ActionID:         core.ActionID{ItemID: 28779},
 			CooldownID:       RestrainedEssenceOfSapphironCooldownID,
 			Cooldown:         time.Minute * 2,
 			SharedCooldownID: core.OffensiveTrinketSharedCooldownID,
@@ -42,6 +43,7 @@ func init() {
 		150,
 		time.Second*20,
 		core.MajorCooldown{
+			ActionID:         core.ActionID{ItemID: 24126},
 			CooldownID:       LivingRubySerpentCooldownID,
 			Cooldown:         time.Minute * 5,
 			SharedCooldownID: core.OffensiveTrinketSharedCooldownID,
@@ -57,6 +59,7 @@ func init() {
 		150,
 		time.Second*15,
 		core.MajorCooldown{
+			ActionID:         core.ActionID{ItemID: 29132},
 			CooldownID:       ScryersBloodgemCooldownID,
 			Cooldown:         time.Second * 90,
 			SharedCooldownID: core.OffensiveTrinketSharedCooldownID,
@@ -72,6 +75,7 @@ func init() {
 		150,
 		time.Second*15,
 		core.MajorCooldown{
+			ActionID:         core.ActionID{ItemID: 29179},
 			CooldownID:       XirisGiftCooldownID,
 			Cooldown:         time.Second * 90,
 			SharedCooldownID: core.OffensiveTrinketSharedCooldownID,
@@ -87,6 +91,7 @@ func init() {
 		155,
 		time.Second*20,
 		core.MajorCooldown{
+			ActionID:         core.ActionID{ItemID: 29370},
 			CooldownID:       IconOfTheSilverCrescentCooldownID,
 			Cooldown:         time.Minute * 2,
 			SharedCooldownID: core.OffensiveTrinketSharedCooldownID,
@@ -102,6 +107,7 @@ func init() {
 		99,
 		time.Second*20,
 		core.MajorCooldown{
+			ActionID:         core.ActionID{ItemID: 29376},
 			CooldownID:       EssenceOfTheMartyrCooldownID,
 			Cooldown:         time.Minute * 2,
 			SharedCooldownID: core.DefensiveTrinketSharedCooldownID,
@@ -117,6 +123,7 @@ func init() {
 		175,
 		time.Second*20,
 		core.MajorCooldown{
+			ActionID:         core.ActionID{ItemID: 32483},
 			CooldownID:       SkullOfGuldanCooldownID,
 			Cooldown:         time.Minute * 2,
 			SharedCooldownID: core.OffensiveTrinketSharedCooldownID,
@@ -132,6 +139,7 @@ func init() {
 		211,
 		time.Second*20,
 		core.MajorCooldown{
+			ActionID:         core.ActionID{ItemID: 33829},
 			CooldownID:       HexShrunkenHeadCooldownID,
 			Cooldown:         time.Minute * 2,
 			SharedCooldownID: core.OffensiveTrinketSharedCooldownID,
@@ -147,6 +155,7 @@ func init() {
 		320,
 		time.Second*15,
 		core.MajorCooldown{
+			ActionID:         core.ActionID{ItemID: 34429},
 			CooldownID:       ShiftingNaaruSliverCooldownID,
 			Cooldown:         time.Second * 90,
 			SharedCooldownID: core.OffensiveTrinketSharedCooldownID,
@@ -162,6 +171,7 @@ func init() {
 		155,
 		time.Second*20,
 		core.MajorCooldown{
+			ActionID:         core.ActionID{ItemID: 38290},
 			CooldownID:       DarkIronSmokingPipeCooldownID,
 			Cooldown:         time.Minute * 2,
 			SharedCooldownID: core.OffensiveTrinketSharedCooldownID,

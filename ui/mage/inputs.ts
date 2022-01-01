@@ -1,5 +1,4 @@
-import { BalanceDruid_Rotation_PrimarySpell as PrimarySpell } from '/tbc/core/proto/druid.js';
-import { BalanceDruid_Options as DruidOptions } from '/tbc/core/proto/druid.js';
+import { IconPickerConfig } from '/tbc/core/components/icon_picker.js';
 import { RaidTarget } from '/tbc/core/proto/common.js';
 import { Spec } from '/tbc/core/proto/common.js';
 import { NO_TARGET } from '/tbc/core/proto_utils/utils.js';
@@ -19,6 +18,8 @@ import * as Presets from './presets.js';
 
 // Configuration for spec-specific UI elements on the settings tab.
 // These don't need to be in a separate file but it keeps things cleaner.
+
+export const ManaEmerald = makeBooleanMageBuffInput({ itemId: 22044 }, 'useManaEmeralds');
 
 export const MageArmor = {
 	id: { spellId: 27125 },
@@ -190,3 +191,17 @@ export const MageRotationConfig = {
 		},
 	],
 };
+
+function makeBooleanMageBuffInput(id: ItemOrSpellId, optionsFieldName: keyof MageOptions): IconPickerConfig<Player<any>, boolean> {
+  return {
+    id: id,
+    states: 2,
+		changedEvent: (player: Player<Spec.SpecMage>) => player.specOptionsChangeEmitter,
+		getValue: (player: Player<Spec.SpecMage>) => player.getSpecOptions()[optionsFieldName] as boolean,
+		setValue: (eventID: EventID, player: Player<Spec.SpecMage>, newValue: boolean) => {
+			const newOptions = player.getSpecOptions();
+      (newOptions[optionsFieldName] as boolean) = newValue;
+			player.setSpecOptions(eventID, newOptions);
+		},
+  }
+}

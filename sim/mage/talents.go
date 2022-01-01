@@ -106,10 +106,17 @@ func (mage *Mage) registerPresenceOfMindCD() {
 	}
 
 	mage.AddMajorCooldown(core.MajorCooldown{
+		ActionID:   core.ActionID{SpellID: 12043},
 		CooldownID: PresenceOfMindCooldownID,
 		Cooldown:   cooldown,
+		CanActivate: func(sim *core.Simulation, character *core.Character) bool {
+			return true
+		},
+		ShouldActivate: func(sim *core.Simulation, character *core.Character) bool {
+			return true
+		},
 		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
-			return func(sim *core.Simulation, character *core.Character) bool {
+			return func(sim *core.Simulation, character *core.Character) {
 				character.Metrics.AddInstantCast(core.ActionID{SpellID: 12043})
 
 				character.AddAura(sim, core.Aura{
@@ -124,10 +131,9 @@ func (mage *Mage) registerPresenceOfMindCD() {
 						// Remove the buff and put skill on CD
 						character.SetCD(PresenceOfMindCooldownID, sim.CurrentTime+cooldown)
 						character.RemoveAura(sim, PresenceOfMindAuraID)
-						character.UpdateMajorCooldowns(sim)
+						character.UpdateMajorCooldowns()
 					},
 				})
-				return true
 			}
 		},
 	})
@@ -142,10 +148,17 @@ func (mage *Mage) registerArcanePowerCD() {
 	}
 
 	mage.AddMajorCooldown(core.MajorCooldown{
+		ActionID:   core.ActionID{SpellID: 12042},
 		CooldownID: ArcanePowerCooldownID,
 		Cooldown:   time.Minute * 3,
+		CanActivate: func(sim *core.Simulation, character *core.Character) bool {
+			return true
+		},
+		ShouldActivate: func(sim *core.Simulation, character *core.Character) bool {
+			return true
+		},
 		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
-			return func(sim *core.Simulation, character *core.Character) bool {
+			return func(sim *core.Simulation, character *core.Character) {
 				character.Metrics.AddInstantCast(core.ActionID{SpellID: 12042})
 
 				character.AddAura(sim, core.Aura{
@@ -164,7 +177,6 @@ func (mage *Mage) registerArcanePowerCD() {
 					},
 				})
 				mage.SetCD(ArcanePowerCooldownID, sim.CurrentTime+time.Minute*3)
-				return true
 			}
 		},
 	})
@@ -200,14 +212,20 @@ func (mage *Mage) registerCombustionCD() {
 	}
 
 	mage.AddMajorCooldown(core.MajorCooldown{
+		ActionID:   core.ActionID{SpellID: 11129},
 		CooldownID: CombustionCooldownID,
 		Cooldown:   time.Minute * 3,
+		CanActivate: func(sim *core.Simulation, character *core.Character) bool {
+			if character.HasAura(CombustionAuraID) {
+				return false
+			}
+			return true
+		},
+		ShouldActivate: func(sim *core.Simulation, character *core.Character) bool {
+			return true
+		},
 		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
-			return func(sim *core.Simulation, character *core.Character) bool {
-				if character.HasAura(CombustionAuraID) {
-					return false
-				}
-
+			return func(sim *core.Simulation, character *core.Character) {
 				character.Metrics.AddInstantCast(core.ActionID{SpellID: 11129})
 
 				numHits := 0
@@ -228,12 +246,11 @@ func (mage *Mage) registerCombustionCD() {
 							if numCrits == 3 {
 								character.RemoveAuraOnNextAdvance(sim, CombustionAuraID)
 								character.SetCD(CombustionCooldownID, sim.CurrentTime+time.Minute*3)
-								character.UpdateMajorCooldowns(sim)
+								character.UpdateMajorCooldowns()
 							}
 						}
 					},
 				})
-				return true
 			}
 		},
 	})
@@ -247,24 +264,33 @@ func (mage *Mage) registerIcyVeinsCD() {
 		return
 	}
 
+	manaCost := 0.0
+
 	mage.AddMajorCooldown(core.MajorCooldown{
+		ActionID:   core.ActionID{SpellID: 12472},
 		CooldownID: IcyVeinsCooldownID,
 		Cooldown:   time.Minute * 3,
+		CanActivate: func(sim *core.Simulation, character *core.Character) bool {
+			// Need to check for icy veins already active in case Cold Snap is used right after.
+			if character.HasAura(IcyVeinsAuraID) {
+				return false
+			}
+
+			if character.CurrentMana() < manaCost {
+				return false
+			}
+
+			return true
+		},
+		ShouldActivate: func(sim *core.Simulation, character *core.Character) bool {
+			return true
+		},
 		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
 			const bonus = 1.2
 			const inverseBonus = 1 / bonus
-			manaCost := mage.BaseMana() * 0.03
+			manaCost = mage.BaseMana() * 0.03
 
-			return func(sim *core.Simulation, character *core.Character) bool {
-				if character.CurrentMana() < manaCost {
-					return false
-				}
-
-				// Need to check for icy veins already active in case Cold Snap is used right after.
-				if character.HasAura(IcyVeinsAuraID) {
-					return false
-				}
-
+			return func(sim *core.Simulation, character *core.Character) {
 				character.PseudoStats.CastSpeedMultiplier *= bonus
 
 				character.AddAura(sim, core.Aura{
@@ -279,7 +305,6 @@ func (mage *Mage) registerIcyVeinsCD() {
 				character.SpendMana(sim, manaCost, "Icy Veins")
 				character.Metrics.AddInstantCast(core.ActionID{SpellID: 12472})
 				character.SetCD(IcyVeinsCooldownID, sim.CurrentTime+time.Minute*3)
-				return true
 			}
 		},
 	})
@@ -295,20 +320,26 @@ func (mage *Mage) registerColdSnapCD() {
 	cooldown := time.Duration(float64(time.Minute*8) * (1.0 - float64(mage.Talents.IceFloes)*0.1))
 
 	mage.AddMajorCooldown(core.MajorCooldown{
+		ActionID:   core.ActionID{SpellID: 11958},
 		CooldownID: ColdSnapCooldownID,
 		Cooldown:   cooldown,
+		CanActivate: func(sim *core.Simulation, character *core.Character) bool {
+			// Don't use if there are no cooldowns to reset.
+			if character.GetRemainingCD(IcyVeinsCooldownID, sim.CurrentTime) == 0 {
+				return false
+			}
+			return true
+		},
+		ShouldActivate: func(sim *core.Simulation, character *core.Character) bool {
+			return true
+		},
 		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
-			return func(sim *core.Simulation, character *core.Character) bool {
-				if character.GetRemainingCD(IcyVeinsCooldownID, sim.CurrentTime) == 0 {
-					return false
-				}
-
+			return func(sim *core.Simulation, character *core.Character) {
 				character.SetCD(IcyVeinsCooldownID, 0)
 				// TODO: Also reset water ele
 
 				character.Metrics.AddInstantCast(core.ActionID{SpellID: 11958})
 				character.SetCD(ColdSnapCooldownID, sim.CurrentTime+cooldown)
-				return true
 			}
 		},
 	})

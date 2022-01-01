@@ -104,6 +104,8 @@ message Mage {
 
 			// Number of Evocation ticks to use. If 0, use all of them.
 			int32 evocation_ticks = 2;
+
+			bool use_mana_emeralds = 3;
     }
     Options options = 3;
 }
