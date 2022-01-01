@@ -97,18 +97,23 @@ func applyRaceEffects(agent Agent) {
 		inverseBonus := 1 / hasteBonus
 		const dur = time.Second * 10
 		const cd = time.Minute * 3
+		manaCost := 0.0
 
 		character.AddMajorCooldown(MajorCooldown{
 			ActionID:   ActionID{SpellID: 20554},
 			CooldownID: TrollBerserkingCooldownID,
 			Cooldown:   cd,
 			CanActivate: func(sim *Simulation, character *Character) bool {
+				if character.CurrentMana() < manaCost {
+					return false
+				}
 				return true
 			},
 			ShouldActivate: func(sim *Simulation, character *Character) bool {
 				return true
 			},
 			ActivationFactory: func(sim *Simulation) CooldownActivation {
+				manaCost = character.BaseMana() * 0.06
 				return func(sim *Simulation, character *Character) {
 					character.SetCD(TrollBerserkingCooldownID, cd+sim.CurrentTime)
 					// Increase cast speed multiplier
@@ -123,6 +128,7 @@ func applyRaceEffects(agent Agent) {
 							character.MultiplyMeleeSpeed(sim, inverseBonus)
 						},
 					})
+					character.SpendMana(sim, manaCost, "Troll Berserking")
 					character.Metrics.AddInstantCast(ActionID{SpellID: 20554})
 					character.AddAuraUptime(TrollBerserkingAuraID, 20554, MinDuration(dur, sim.Duration-sim.CurrentTime))
 				}
