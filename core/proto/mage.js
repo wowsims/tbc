@@ -4,6 +4,40 @@ import { reflectionMergePartial } from '/tbc/protobuf-ts/index.js';
 import { MESSAGE_TYPE } from '/tbc/protobuf-ts/index.js';
 import { MessageType } from '/tbc/protobuf-ts/index.js';
 /**
+ * @generated from protobuf enum proto.Mage.Rotation.ArcaneRotation.Filler
+ */
+export var Mage_Rotation_ArcaneRotation_Filler;
+(function (Mage_Rotation_ArcaneRotation_Filler) {
+    /**
+     * @generated from protobuf enum value: Frostbolt = 0;
+     */
+    Mage_Rotation_ArcaneRotation_Filler[Mage_Rotation_ArcaneRotation_Filler["Frostbolt"] = 0] = "Frostbolt";
+    /**
+     * @generated from protobuf enum value: ArcaneMissles = 1;
+     */
+    Mage_Rotation_ArcaneRotation_Filler[Mage_Rotation_ArcaneRotation_Filler["ArcaneMissles"] = 1] = "ArcaneMissles";
+    /**
+     * @generated from protobuf enum value: Scorch = 2;
+     */
+    Mage_Rotation_ArcaneRotation_Filler[Mage_Rotation_ArcaneRotation_Filler["Scorch"] = 2] = "Scorch";
+    /**
+     * @generated from protobuf enum value: Fireball = 3;
+     */
+    Mage_Rotation_ArcaneRotation_Filler[Mage_Rotation_ArcaneRotation_Filler["Fireball"] = 3] = "Fireball";
+    /**
+     * @generated from protobuf enum value: ArcaneMisslesFrostbolt = 4;
+     */
+    Mage_Rotation_ArcaneRotation_Filler[Mage_Rotation_ArcaneRotation_Filler["ArcaneMisslesFrostbolt"] = 4] = "ArcaneMisslesFrostbolt";
+    /**
+     * @generated from protobuf enum value: ArcaneMisslesScorch = 5;
+     */
+    Mage_Rotation_ArcaneRotation_Filler[Mage_Rotation_ArcaneRotation_Filler["ArcaneMisslesScorch"] = 5] = "ArcaneMisslesScorch";
+    /**
+     * @generated from protobuf enum value: ScorchTwoFireball = 6;
+     */
+    Mage_Rotation_ArcaneRotation_Filler[Mage_Rotation_ArcaneRotation_Filler["ScorchTwoFireball"] = 6] = "ScorchTwoFireball";
+})(Mage_Rotation_ArcaneRotation_Filler || (Mage_Rotation_ArcaneRotation_Filler = {}));
+/**
  * @generated from protobuf enum proto.Mage.Rotation.FireRotation.PrimarySpell
  */
 export var Mage_Rotation_FireRotation_PrimarySpell;
@@ -550,19 +584,61 @@ export const Mage_Rotation = new Mage_Rotation$Type();
 // @generated message type with reflection information, may provide speed optimized methods
 class Mage_Rotation_ArcaneRotation$Type extends MessageType {
     constructor() {
-        super("proto.Mage.Rotation.ArcaneRotation", []);
+        super("proto.Mage.Rotation.ArcaneRotation", [
+            { no: 1, name: "filler", kind: "enum", T: () => ["proto.Mage.Rotation.ArcaneRotation.Filler", Mage_Rotation_ArcaneRotation_Filler] },
+            { no: 2, name: "arcane_blasts_between_fillers", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 3, name: "start_regen_rotation_percent", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
+            { no: 4, name: "stop_regen_rotation_percent", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ }
+        ]);
     }
     create(value) {
-        const message = {};
+        const message = { filler: 0, arcaneBlastsBetweenFillers: 0, startRegenRotationPercent: 0, stopRegenRotationPercent: 0 };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
         return message;
     }
     internalBinaryRead(reader, length, options, target) {
-        return target ?? this.create();
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* proto.Mage.Rotation.ArcaneRotation.Filler filler */ 1:
+                    message.filler = reader.int32();
+                    break;
+                case /* int32 arcane_blasts_between_fillers */ 2:
+                    message.arcaneBlastsBetweenFillers = reader.int32();
+                    break;
+                case /* double start_regen_rotation_percent */ 3:
+                    message.startRegenRotationPercent = reader.double();
+                    break;
+                case /* double stop_regen_rotation_percent */ 4:
+                    message.stopRegenRotationPercent = reader.double();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
     }
     internalBinaryWrite(message, writer, options) {
+        /* proto.Mage.Rotation.ArcaneRotation.Filler filler = 1; */
+        if (message.filler !== 0)
+            writer.tag(1, WireType.Varint).int32(message.filler);
+        /* int32 arcane_blasts_between_fillers = 2; */
+        if (message.arcaneBlastsBetweenFillers !== 0)
+            writer.tag(2, WireType.Varint).int32(message.arcaneBlastsBetweenFillers);
+        /* double start_regen_rotation_percent = 3; */
+        if (message.startRegenRotationPercent !== 0)
+            writer.tag(3, WireType.Bit64).double(message.startRegenRotationPercent);
+        /* double stop_regen_rotation_percent = 4; */
+        if (message.stopRegenRotationPercent !== 0)
+            writer.tag(4, WireType.Bit64).double(message.stopRegenRotationPercent);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

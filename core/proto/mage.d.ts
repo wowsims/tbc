@@ -241,6 +241,63 @@ export interface Mage_Rotation {
  * @generated from protobuf message proto.Mage.Rotation.ArcaneRotation
  */
 export interface Mage_Rotation_ArcaneRotation {
+    /**
+     * The spells to use to fill time while waiting for arcane blast stacks to drop.
+     *
+     * @generated from protobuf field: proto.Mage.Rotation.ArcaneRotation.Filler filler = 1;
+     */
+    filler: Mage_Rotation_ArcaneRotation_Filler;
+    /**
+     * Number of arcane blasts to cast before switching to filler.
+     *
+     * @generated from protobuf field: int32 arcane_blasts_between_fillers = 2;
+     */
+    arcaneBlastsBetweenFillers: number;
+    /**
+     * Percentage of mana (0-1) below which to switch to regen rotation.
+     *
+     * @generated from protobuf field: double start_regen_rotation_percent = 3;
+     */
+    startRegenRotationPercent: number;
+    /**
+     * Percentage of mana (0-1) above which to switch to regular rotation.
+     *
+     * @generated from protobuf field: double stop_regen_rotation_percent = 4;
+     */
+    stopRegenRotationPercent: number;
+}
+/**
+ * @generated from protobuf enum proto.Mage.Rotation.ArcaneRotation.Filler
+ */
+export declare enum Mage_Rotation_ArcaneRotation_Filler {
+    /**
+     * @generated from protobuf enum value: Frostbolt = 0;
+     */
+    Frostbolt = 0,
+    /**
+     * @generated from protobuf enum value: ArcaneMissles = 1;
+     */
+    ArcaneMissles = 1,
+    /**
+     * @generated from protobuf enum value: Scorch = 2;
+     */
+    Scorch = 2,
+    /**
+     * @generated from protobuf enum value: Fireball = 3;
+     */
+    Fireball = 3,
+    /**
+     * @generated from protobuf enum value: ArcaneMisslesFrostbolt = 4;
+     */
+    ArcaneMisslesFrostbolt = 4,
+    /**
+     * @generated from protobuf enum value: ArcaneMisslesScorch = 5;
+     */
+    ArcaneMisslesScorch = 5,
+    /**
+     * @generated from protobuf enum value: ScorchTwoFireball = 6;
+     */
+    ScorchTwoFireball = 6
 }
 /**
  * @generated from protobuf message proto.Mage.Rotation.FireRotation

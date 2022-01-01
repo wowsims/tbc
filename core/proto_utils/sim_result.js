@@ -305,6 +305,9 @@ export class ActionMetrics {
             else if (name == 'Fireball') {
                 name += ' (DoT)';
             }
+            else if (name == 'Pyroblast') {
+                name += ' (DoT)';
+            }
             else {
                 if (actionId.tag == 1) {
                     name += ' (LO)';

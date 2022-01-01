@@ -62,13 +62,13 @@ export class MageSimUI extends IndividualSimUI {
                     [Stat.StatMP5]: 0.00,
                 }),
                 // Default consumes settings.
-                consumes: Presets.DefaultFireConsumes,
+                consumes: Presets.DefaultArcaneConsumes,
                 // Default rotation settings.
-                rotation: Presets.DefaultFireRotation,
+                rotation: Presets.DefaultArcaneRotation,
                 // Default talents.
                 talents: Presets.FireTalents.data,
                 // Default spec-specific settings.
-                specOptions: Presets.DefaultFireOptions,
+                specOptions: Presets.DefaultArcaneOptions,
                 // Default raid/party buffs settings.
                 raidBuffs: RaidBuffs.create({
                     giftOfTheWild: TristateEffect.TristateEffectImproved,

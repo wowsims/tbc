@@ -16,6 +16,9 @@ export declare const FrostTalents: {
 export declare const DefaultFireRotation: MageRotation;
 export declare const DefaultFireOptions: MageOptions;
 export declare const DefaultFireConsumes: Consumes;
+export declare const DefaultArcaneRotation: MageRotation;
+export declare const DefaultArcaneOptions: MageOptions;
+export declare const DefaultArcaneConsumes: Consumes;
 export declare const P1_FIRE_PRESET: {
     name: string;
     tooltip: string;
