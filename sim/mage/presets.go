@@ -40,7 +40,7 @@ var FrostTalents = &proto.MageTalents{
 	IceShards:            5,
 	IcyVeins:             true,
 	PiercingIce:          5,
-	FrostChanneling:      5,
+	FrostChanneling:      3,
 	ColdSnap:             true,
 	ImprovedConeOfCold:   2,
 	IceFloes:             2,
@@ -48,6 +48,28 @@ var FrostTalents = &proto.MageTalents{
 	ArcticWinds:          5,
 	EmpoweredFrostbolt:   5,
 	SummonWaterElemental: true,
+}
+
+var ArcaneTalents = &proto.MageTalents{
+	ArcaneFocus:         5,
+	ArcaneConcentration: 5,
+	ArcaneImpact:        3,
+	ArcaneMeditation:    3,
+	PresenceOfMind:      true,
+	ArcaneMind:          5,
+	ArcaneInstability:   3,
+	ArcanePotency:       3,
+	ArcanePower:         true,
+	SpellPower:          2,
+	MindMastery:         5,
+
+	ImprovedFrostbolt:  5,
+	ElementalPrecision: 3,
+	IceShards:          5,
+	IcyVeins:           true,
+	PiercingIce:        5,
+	FrostChanneling:    3,
+	ColdSnap:           true,
 }
 
 var fireMageOptions = &proto.Mage_Options{
@@ -84,6 +106,26 @@ var PlayerOptionsFrost = &proto.Player_Mage{
 	},
 }
 
+var arcaneMageOptions = &proto.Mage_Options{
+	Armor:           proto.Mage_Options_MageArmor,
+	UseManaEmeralds: true,
+}
+var PlayerOptionsArcane = &proto.Player_Mage{
+	Mage: &proto.Mage{
+		Talents: ArcaneTalents,
+		Options: arcaneMageOptions,
+		Rotation: &proto.Mage_Rotation{
+			Type: proto.Mage_Rotation_Arcane,
+			Arcane: &proto.Mage_Rotation_ArcaneRotation{
+				Filler:                     proto.Mage_Rotation_ArcaneRotation_ArcaneMisslesFrostbolt,
+				ArcaneBlastsBetweenFillers: 3,
+				StartRegenRotationPercent:  0.2,
+				StopRegenRotationPercent:   0.3,
+			},
+		},
+	},
+}
+
 var FullRaidBuffs = &proto.RaidBuffs{
 	GiftOfTheWild: proto.TristateEffect_TristateEffectImproved,
 }
@@ -101,14 +143,36 @@ var FullIndividualBuffs = &proto.IndividualBuffs{
 	BlessingOfWisdom: proto.TristateEffect_TristateEffectImproved,
 }
 
+var FullArcanePartyBuffs = &proto.PartyBuffs{
+	Drums:           proto.Drums_DrumsOfBattle,
+	Bloodlust:       1,
+	MoonkinAura:     proto.TristateEffect_TristateEffectRegular,
+	ManaSpringTotem: proto.TristateEffect_TristateEffectImproved,
+	ManaTideTotems:  1,
+	WrathOfAirTotem: proto.TristateEffect_TristateEffectRegular,
+}
+var FullArcaneIndividualBuffs = &proto.IndividualBuffs{
+	BlessingOfKings:  true,
+	BlessingOfWisdom: proto.TristateEffect_TristateEffectImproved,
+	Innervates:       1,
+}
+
 var FullFireConsumes = &proto.Consumes{
 	FlaskOfPureDeath:   true,
 	BrilliantWizardOil: true,
 	BlackenedBasilisk:  true,
 	DefaultPotion:      proto.Potions_SuperManaPotion,
-	DefaultConjured:    proto.Conjured_ConjuredDarkRune,
+	DefaultConjured:    proto.Conjured_ConjuredFlameCap,
 }
 var FullFrostConsumes = FullFireConsumes
+
+var FullArcaneConsumes = &proto.Consumes{
+	FlaskOfBlindingLight: true,
+	BrilliantWizardOil:   true,
+	BlackenedBasilisk:    true,
+	DefaultPotion:        proto.Potions_SuperManaPotion,
+	DefaultConjured:      proto.Conjured_ConjuredDarkRune,
+}
 
 var FullDebuffs = &proto.Debuffs{
 	CurseOfElements:           proto.TristateEffect_TristateEffectImproved,
@@ -217,3 +281,4 @@ var P1FireGear = items.EquipmentSpecFromStrings([]items.ItemStringSpec{
 	},
 })
 var P1FrostGear = P1FireGear
+var P1ArcaneGear = P1FireGear

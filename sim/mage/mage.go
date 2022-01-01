@@ -3,6 +3,7 @@ package mage
 import (
 	"time"
 
+	"github.com/wowsims/tbc/sim/common"
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/proto"
 	"github.com/wowsims/tbc/sim/core/stats"
@@ -36,7 +37,11 @@ type Mage struct {
 
 	remainingManaEmeralds int
 
-	// Cached value for a few talents.
+	isDoingRegenRotation bool
+	tryingToDropStacks   bool
+	numCastsDone         int32
+
+	// Cached values for a few mechanics.
 	spellDamageMultiplier float64
 
 	// cached cast stuff
@@ -58,11 +63,19 @@ type Mage struct {
 	frostboltSpell        core.SimpleSpell
 	frostboltCastTemplate core.SimpleSpellTemplate
 
+	pyroblastSpell        core.SimpleSpell
+	pyroblastCastTemplate core.SimpleSpellTemplate
+
+	pyroblastDotSpell        core.SimpleSpell
+	pyroblastDotCastTemplate core.SimpleSpellTemplate
+
 	scorchSpell        core.SimpleSpell
 	scorchCastTemplate core.SimpleSpellTemplate
 
 	wintersChillSpell        core.SimpleSpell
 	wintersChillCastTemplate core.SimpleSpellTemplate
+
+	manaTracker common.ManaSpendingRateTracker
 }
 
 func (mage *Mage) GetCharacter() *core.Character {
@@ -82,6 +95,8 @@ func (mage *Mage) Init(sim *core.Simulation) {
 	mage.fireballDotCastTemplate = mage.newFireballDotTemplate(sim)
 	mage.fireBlastCastTemplate = mage.newFireBlastTemplate(sim)
 	mage.frostboltCastTemplate = mage.newFrostboltTemplate(sim)
+	mage.pyroblastCastTemplate = mage.newPyroblastTemplate(sim)
+	mage.pyroblastDotCastTemplate = mage.newPyroblastDotTemplate(sim)
 	mage.scorchCastTemplate = mage.newScorchTemplate(sim)
 	mage.wintersChillCastTemplate = mage.newWintersChillTemplate(sim)
 }
@@ -90,6 +105,7 @@ func (mage *Mage) Reset(newsim *core.Simulation) {
 	if mage.Options.UseManaEmeralds {
 		mage.remainingManaEmeralds = 3
 	}
+	mage.manaTracker.Reset()
 }
 
 func (mage *Mage) Advance(sim *core.Simulation, elapsedTime time.Duration) {
@@ -106,6 +122,7 @@ func NewMage(character core.Character, options proto.Player) *Mage {
 		RotationType: mageOptions.Rotation.Type,
 
 		spellDamageMultiplier: 1.0,
+		manaTracker:           common.NewManaSpendingRateTracker(),
 	}
 
 	if mage.RotationType == proto.Mage_Rotation_Arcane && mageOptions.Rotation.Arcane != nil {

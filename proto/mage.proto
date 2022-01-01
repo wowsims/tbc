@@ -70,6 +70,26 @@ message Mage {
 			Type type = 1;
 
 			message ArcaneRotation {
+				enum Filler {
+					Frostbolt = 0;
+					ArcaneMissles = 1;
+					Scorch = 2;
+					Fireball = 3;
+					ArcaneMisslesFrostbolt = 4;
+					ArcaneMisslesScorch = 5;
+					ScorchTwoFireball = 6;
+				}
+				// The spells to use to fill time while waiting for arcane blast stacks to drop.
+				Filler filler = 1;
+
+				// Number of arcane blasts to cast before switching to filler.
+				int32 arcane_blasts_between_fillers = 2;
+
+				// Percentage of mana (0-1) below which to switch to regen rotation.
+				double start_regen_rotation_percent = 3;
+
+				// Percentage of mana (0-1) above which to switch to regular rotation.
+				double stop_regen_rotation_percent = 4;
 			}
 			ArcaneRotation arcane = 2;
 
