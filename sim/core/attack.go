@@ -87,7 +87,10 @@ func PerformAutoAttack(sim *Simulation, c *Character, weapon *items.Item, effect
 
 	hitStr := ""
 	dmgMult := effect.DamageMultiplier * effect.StaticDamageMultiplier
-	if hit == MeleeHitTypeGlance {
+	if hit == MeleeHitTypeBlock {
+		// TODO: How does block reduce damage.
+		hitStr = "blocked"
+	} else if hit == MeleeHitTypeGlance {
 		dmgMult *= 0.75
 		hitStr = "glances"
 	} else if hit == MeleeHitTypeCrit {
@@ -266,7 +269,7 @@ func (ability *ActiveMeleeAbility) performAttack(sim *Simulation) bool {
 	// 1. Attack Roll
 	hit := PerformAttack(sim, ability.Character, ability.Target, ability.AbilityEffect)
 	ability.Result = hit
-	if hit != MeleeHitTypeCrit && hit != MeleeHitTypeGlance && hit != MeleeHitTypeHit {
+	if hit == MeleeHitTypeMiss || hit == MeleeHitTypeDodge || hit == MeleeHitTypeParry {
 		if sim.Log != nil {
 			sim.Log("%s did not hit.", ability.Name)
 		}
