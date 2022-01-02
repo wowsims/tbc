@@ -2,6 +2,7 @@ package core
 
 import (
 	"fmt"
+	"log"
 	"math"
 	"time"
 
@@ -10,10 +11,10 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-// OnBeforeSwingHit is called right before an auto attack lands.
-//  if false is returned the weapon swing dmg is not calculated.
+// OnBeforeSwingHit is called right before an auto attack fires
+//  if false is returned the weapon swing is cancelled.
 //  This allows for abilities that convert a white attack into yellow attack.
-type OnBeforeSwingHit func(sim *Simulation, isOH bool) bool
+type OnBeforeSwing func(sim *Simulation, isOH bool) bool
 
 // OnMeleeAttack is invoked on auto attacks and abilities.
 //  Ability can be nil if this was activated by an ability.
@@ -83,6 +84,13 @@ func PerformAutoAttack(sim *Simulation, c *Character, weapon *items.Item, effect
 	target.OnBeforeMelee(sim, effect, isOH)
 	c.OnBeforeMelee(sim, effect, isOH)
 
+	// Main use of OnBeforeSwing is if the swing needs to turn into a yellow hit (skipping the white hit damage below)
+	if c.AutoAttacks.OnBeforeSwing != nil {
+		if doSwing := c.AutoAttacks.OnBeforeSwing(sim, isOH); !doSwing {
+			return // skip the attack, metrics should be recorded in the replaced attack.
+		}
+	}
+
 	hit := PerformAttack(sim, c, target, effect.AbilityEffect)
 
 	hitStr := ""
@@ -107,11 +115,6 @@ func PerformAutoAttack(sim *Simulation, c *Character, weapon *items.Item, effect
 		c.OnMeleeAttack(sim, target, hit, nil, isOH)
 		c.Metrics.AddAutoAttack(weapon.ID, hit, 0, isOH)
 		return // no damage from a block/miss
-	}
-	// Main use of OnBeforeSwingHit is if the swing needs to turn into a yellow hit (skipping the white hit damage below)
-	doSwing := c.OnBeforeSwingHit(sim, isOH)
-	if !doSwing {
-		return // skip the attack, metrics should be recorded in the replaced attack.
 	}
 
 	dmg := meleeDamage(sim, weapon.WeaponDamageMin, weapon.WeaponDamageMax, 0, weapon.SwingSpeed, isOH, dmgMult, c.stats[stats.AttackPower]+effect.BonusAttackPower, target.ArmorDamageReduction())
@@ -235,18 +238,9 @@ func (ability *ActiveMeleeAbility) CalculatedGCD(char *Character) time.Duration 
 //  Returns false if unable to attack (due to resource lacking)
 // TODO: add AbilityResult data to action metrics.
 func (ability *ActiveMeleeAbility) Attack(sim *Simulation) bool {
-	result := ability.performAttack(sim)
-	if result {
-		ability.Character.Metrics.AddMeleeAbility(ability)
-		if !ability.IgnoreCooldowns {
-			gcdCD := MaxDuration(ability.CalculatedGCD(ability.Character), ability.CastTime)
-			ability.Character.SetCD(GCDCooldownID, sim.CurrentTime+gcdCD)
-		}
+	if !ability.IgnoreCooldowns && ability.Character.GetRemainingCD(GCDCooldownID, sim.CurrentTime) > 0 {
+		log.Fatalf("Ability used while on GCD\n-------\nAbility %s: %#v\n-------\nCharacter: %#v", ability.Name, ability, ability.Character)
 	}
-	return result
-}
-
-func (ability *ActiveMeleeAbility) performAttack(sim *Simulation) bool {
 	if ability.MeleeAbility.Cost.Type != 0 {
 		if ability.Character.stats[ability.MeleeAbility.Cost.Type] < ability.MeleeAbility.Cost.Value {
 			return false
@@ -258,6 +252,16 @@ func (ability *ActiveMeleeAbility) performAttack(sim *Simulation) bool {
 		}
 	}
 
+	ability.performAttack(sim)
+	ability.Character.Metrics.AddMeleeAbility(ability)
+	if !ability.IgnoreCooldowns {
+		gcdCD := MaxDuration(ability.CalculatedGCD(ability.Character), ability.CastTime)
+		ability.Character.SetCD(GCDCooldownID, sim.CurrentTime+gcdCD)
+	}
+	return true
+}
+
+func (ability *ActiveMeleeAbility) performAttack(sim *Simulation) {
 	ability.Target.OnBeforeMelee(sim, ability, false)
 	ability.Character.OnBeforeMelee(sim, ability, false)
 
@@ -284,7 +288,7 @@ func (ability *ActiveMeleeAbility) performAttack(sim *Simulation) bool {
 		}
 		// Not sure MH/OH Matters for an attack
 		ability.Character.OnMeleeAttack(sim, ability.Target, hit, ability, false)
-		return true // we know we missed.
+		return // we know we missed.
 	}
 
 	c := ability.Character
@@ -304,7 +308,7 @@ func (ability *ActiveMeleeAbility) performAttack(sim *Simulation) bool {
 		ability.applySwingDamage(sim, proto.ItemSlot_ItemSlotOffHand, ability.WeaponDamageInput.Offhand, critChance)
 	}
 
-	return true
+	return
 }
 
 func (ability *ActiveMeleeAbility) applySwingDamage(sim *Simulation, slot proto.ItemSlot, dmgMult, critChance float64) {
@@ -437,6 +441,8 @@ type AutoAttacks struct {
 	AbilityEffect   // bonuses to auto attacks
 	MeleeAbility
 	active ActiveMeleeAbility // Mostly just for passing AbilityEffect to OnBeforeMelee to allow modification to auto attacks.
+
+	OnBeforeSwing OnBeforeSwing
 }
 
 func (aa *AutoAttacks) MainhandSwingSpeed() time.Duration {
