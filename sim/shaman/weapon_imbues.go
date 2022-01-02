@@ -29,8 +29,9 @@ func ApplyWindfuryImbue(shaman *Shaman, mh bool, oh bool) {
 			ActionID: core.ActionID{
 				SpellID: 25505,
 			},
-			CritMultiplier: 2.0,
-			Character:      &shaman.Character,
+			CritMultiplier:  2.0,
+			Character:       &shaman.Character,
+			IgnoreCooldowns: true,
 		},
 		WeaponDamageInput: core.WeaponDamageInput{
 			MainHand: 1.0,
