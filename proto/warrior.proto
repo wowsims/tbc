@@ -58,47 +58,59 @@ message WarriorTalents {
 message Warrior {
     message Rotation {
 		enum Type {
-			Unknown = 0;
-			Arms = 1;
+			ArmsSlam = 0;
+			ArmsDW = 1;
 			Fury = 2;
 		}
 
 		Type type = 1;
 
 		message ArmsSlamRotation {
-			enum PrimarySpell {
-				MortalStrike = 0;
-				Whirlwind = 1;
-				Slam = 2;
-				HeroicStrike = 3;
-				Overpower = 4;
-				Hamstring = 5;
-			}
-			PrimarySpell primary_spell = 1;
+
+			bool use_slam_exec = 1;
+			double slam_latency = 2;
+			bool use_ms_exec = 3;
+			bool use_ww_exec = 4;
+			bool use_hs = 5;
+			bool use_hs_exec = 6;
+			double hs_rage_tresh = 7;
+			bool use_cleave = 8; // only when > 1 targets
+			bool use_overpower = 9;
+			bool use_hamstring = 10;
+			double sunder_global = 11;
 		}
-		ArmsSlamRotation arms = 2;
+		ArmsSlamRotation arms_siam = 2;
 
 		message ArmsDWRotation {
-			enum PrimarySpell {
-				MortalStrike = 0;
-				Whirlwind = 1;
-				HeroicStrike = 2;
-				Overpower = 3;
-				Hamstring = 4;
-			}
-			PrimarySpell primary_spell = 1;
+
+			bool use_ms_exec = 1;
+			bool use_ww_exec = 2;
+			bool use_hs_exec = 3;
+			double hs_rage_tresh = 4;
+			bool use_cleave = 5; // only when > 1 targets
+			bool use_overpower = 6;
+			bool use_hamstring = 7;
+			double sunder_global = 8;
 		}
 		ArmsDWRotation  arms_dw = 3;
 
 		message FuryRotation {
-			enum PrimarySpell {
+			enum PrimaryInstant {
 				Bloodthirst = 0;
 				Whirlwind = 1;
-				HeroicStrike = 2;
-				Overpower = 3;
-				Hamstring = 4;
 			}
-			PrimarySpell primary_spell = 1;
+			PrimaryInstant primary_instant = 1;
+
+			bool use_bt_exec = 2;
+			bool use_ww_exec = 3;
+			bool use_hs_exec = 4;
+			double hs_rage_tresh = 5;
+			bool use_cleave = 6; // only when > 1 targets
+			bool use_overpower = 7;
+			bool use_hamstring = 8;
+			double sunder_global = 9;
+			double rampage_cd_tresh = 10; // only when using rampage
+
 		}
 		FuryRotation fury = 4;
     }
@@ -107,14 +119,9 @@ message Warrior {
     WarriorTalents talents = 2;
     
     message Options {
-		bool use_ms_bt_exec = 1;
-		bool use_ww_exec = 2;
-		bool use_slam_exec = 3;
-		double slam_latency = 4;
-		bool use_hs_exec = 5;
-		double hs_rage_tresh = 6;
-		bool use_cleave = 7; // only when > 1 targets
-		bool use_overpower = 8;
+		double starting_rage = 1;
+		bool precast_t2 = 2;
+		bool precast_sapphire = 3; // Disabled if sapphire is equipped
     }
     Options options = 3;
 }
