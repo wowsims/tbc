@@ -57,12 +57,64 @@ message WarriorTalents {
 
 message Warrior {
     message Rotation {
+		enum Type {
+			Unknown = 0;
+			Arms = 1;
+			Fury = 2;
+		}
+
+		Type type = 1;
+
+		message ArmsSlamRotation {
+			enum PrimarySpell {
+				MortalStrike = 0;
+				Whirlwind = 1;
+				Slam = 2;
+				HeroicStrike = 3;
+				Overpower = 4;
+				Hamstring = 5;
+			}
+			PrimarySpell primary_spell = 1;
+		}
+		ArmsSlamRotation arms = 2;
+
+		message ArmsDWRotation {
+			enum PrimarySpell {
+				MortalStrike = 0;
+				Whirlwind = 1;
+				HeroicStrike = 2;
+				Overpower = 3;
+				Hamstring = 4;
+			}
+			PrimarySpell primary_spell = 1;
+		}
+		ArmsDWRotation  arms_dw = 3;
+
+		message FuryRotation {
+			enum PrimarySpell {
+				Bloodthirst = 0;
+				Whirlwind = 1;
+				HeroicStrike = 2;
+				Overpower = 3;
+				Hamstring = 4;
+			}
+			PrimarySpell primary_spell = 1;
+		}
+		FuryRotation fury = 4;
     }
     Rotation rotation = 1;
 
     WarriorTalents talents = 2;
     
     message Options {
+		bool use_ms_bt_exec = 1;
+		bool use_ww_exec = 2;
+		bool use_slam_exec = 3;
+		double slam_latency = 4;
+		bool use_hs_exec = 5;
+		double hs_rage_tresh = 6;
+		bool use_cleave = 7; // only when > 1 targets
+		bool use_overpower = 8;
     }
     Options options = 3;
 }
