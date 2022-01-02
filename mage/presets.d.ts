@@ -13,9 +13,14 @@ export declare const FrostTalents: {
     name: string;
     data: string;
 };
+export declare const DeepFrostTalents: {
+    name: string;
+    data: string;
+};
 export declare const DefaultFireRotation: MageRotation;
 export declare const DefaultFireOptions: MageOptions;
 export declare const DefaultFireConsumes: Consumes;
+export declare const DefaultFrostRotation: MageRotation;
 export declare const DefaultArcaneRotation: MageRotation;
 export declare const DefaultArcaneOptions: MageOptions;
 export declare const DefaultArcaneConsumes: Consumes;

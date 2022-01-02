@@ -732,11 +732,12 @@ class PlayerMetrics$Type extends MessageType {
             { no: 1, name: "dps", kind: "message", T: () => DpsMetrics },
             { no: 3, name: "seconds_oom_avg", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
             { no: 5, name: "actions", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => ActionMetrics },
-            { no: 6, name: "auras", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => AuraMetrics }
+            { no: 6, name: "auras", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => AuraMetrics },
+            { no: 7, name: "pets", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => PlayerMetrics }
         ]);
     }
     create(value) {
-        const message = { secondsOomAvg: 0, actions: [], auras: [] };
+        const message = { secondsOomAvg: 0, actions: [], auras: [], pets: [] };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -758,6 +759,9 @@ class PlayerMetrics$Type extends MessageType {
                     break;
                 case /* repeated proto.AuraMetrics auras */ 6:
                     message.auras.push(AuraMetrics.internalBinaryRead(reader, reader.uint32(), options));
+                    break;
+                case /* repeated proto.PlayerMetrics pets */ 7:
+                    message.pets.push(PlayerMetrics.internalBinaryRead(reader, reader.uint32(), options));
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -783,6 +787,9 @@ class PlayerMetrics$Type extends MessageType {
         /* repeated proto.AuraMetrics auras = 6; */
         for (let i = 0; i < message.auras.length; i++)
             AuraMetrics.internalBinaryWrite(message.auras[i], writer.tag(6, WireType.LengthDelimited).fork(), options).join();
+        /* repeated proto.PlayerMetrics pets = 7; */
+        for (let i = 0; i < message.pets.length; i++)
+            PlayerMetrics.internalBinaryWrite(message.pets[i], writer.tag(7, WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

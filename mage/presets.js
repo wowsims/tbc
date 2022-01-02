@@ -3,7 +3,7 @@ import { EquipmentSpec } from '/tbc/core/proto/common.js';
 import { ItemSpec } from '/tbc/core/proto/common.js';
 import { Potions } from '/tbc/core/proto/common.js';
 import { Mage_Rotation as MageRotation, Mage_Options as MageOptions } from '/tbc/core/proto/mage.js';
-import { Mage_Rotation_Type as RotationType, Mage_Rotation_ArcaneRotation as ArcaneRotation, Mage_Rotation_FireRotation as FireRotation } from '/tbc/core/proto/mage.js';
+import { Mage_Rotation_Type as RotationType, Mage_Rotation_ArcaneRotation as ArcaneRotation, Mage_Rotation_FireRotation as FireRotation, Mage_Rotation_FrostRotation as FrostRotation } from '/tbc/core/proto/mage.js';
 import { Mage_Rotation_FireRotation_PrimarySpell as PrimaryFireSpell } from '/tbc/core/proto/mage.js';
 import { Mage_Rotation_ArcaneRotation_Filler as ArcaneFiller } from '/tbc/core/proto/mage.js';
 import { Mage_Options_ArmorType as ArmorType } from '/tbc/core/proto/mage.js';
@@ -27,6 +27,10 @@ export const FrostTalents = {
     name: 'Frost',
     data: '2500250300030150330125--053500031003001',
 };
+export const DeepFrostTalents = {
+    name: 'Deep Frost',
+    data: '230015031003--0535000310230012241551',
+};
 export const DefaultFireRotation = MageRotation.create({
     type: RotationType.Fire,
     fire: FireRotation.create({
@@ -43,6 +47,12 @@ export const DefaultFireConsumes = Consumes.create({
     flaskOfPureDeath: true,
     brilliantWizardOil: true,
     blackenedBasilisk: true,
+});
+export const DefaultFrostRotation = MageRotation.create({
+    type: RotationType.Frost,
+    frost: FrostRotation.create({
+        waterElementalDisobeyChance: 0.1,
+    }),
 });
 export const DefaultArcaneRotation = MageRotation.create({
     type: RotationType.Arcane,

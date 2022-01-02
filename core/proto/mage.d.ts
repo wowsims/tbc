@@ -333,6 +333,12 @@ export declare enum Mage_Rotation_FireRotation_PrimarySpell {
  * @generated from protobuf message proto.Mage.Rotation.FrostRotation
  */
 export interface Mage_Rotation_FrostRotation {
+    /**
+     * Chance for water elemental to disobey, doing nothing rather than cast.
+     *
+     * @generated from protobuf field: double water_elemental_disobey_chance = 3;
+     */
+    waterElementalDisobeyChance: number;
 }
 /**
  * Just used for controlling which options are displayed in the UI. Is not

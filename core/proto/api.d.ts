@@ -323,6 +323,10 @@ export interface PlayerMetrics {
      * @generated from protobuf field: repeated proto.AuraMetrics auras = 6;
      */
     auras: AuraMetrics[];
+    /**
+     * @generated from protobuf field: repeated proto.PlayerMetrics pets = 7;
+     */
+    pets: PlayerMetrics[];
 }
 /**
  * Results for a whole raid.

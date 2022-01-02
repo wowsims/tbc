@@ -55,6 +55,7 @@ export declare const MageRotationConfig: {
             getValue: (simUI: IndividualSimUI<Spec.SpecMage>) => RotationType;
             setValue: (eventID: EventID, simUI: IndividualSimUI<Spec.SpecMage>, newValue: number) => void;
             showWhen?: undefined;
+            enableWhen?: undefined;
         };
         cssClass?: undefined;
     } | {
@@ -72,6 +73,7 @@ export declare const MageRotationConfig: {
             setValue: (eventID: EventID, player: Player<Spec.SpecMage>, newValue: number) => void;
             showWhen: (player: Player<Spec.SpecMage>) => boolean;
             labelTooltip?: undefined;
+            enableWhen?: undefined;
         };
         cssClass?: undefined;
     } | {
@@ -85,6 +87,22 @@ export declare const MageRotationConfig: {
             getValue: (player: Player<Spec.SpecMage>) => boolean;
             setValue: (eventID: EventID, player: Player<Spec.SpecMage>, newValue: boolean) => void;
             showWhen: (player: Player<Spec.SpecMage>) => boolean;
+            extraCssClasses?: undefined;
+            values?: undefined;
+            enableWhen?: undefined;
+        };
+    } | {
+        type: "number";
+        cssClass: string;
+        getModObject: (simUI: IndividualSimUI<any>) => Player<any>;
+        config: {
+            label: string;
+            labelTooltip: string;
+            changedEvent: (player: Player<Spec.SpecMage>) => TypedEvent<void>;
+            getValue: (player: Player<Spec.SpecMage>) => number;
+            setValue: (eventID: EventID, player: Player<Spec.SpecMage>, newValue: number) => void;
+            showWhen: (player: Player<Spec.SpecMage>) => boolean;
+            enableWhen: (player: Player<Spec.SpecMage>) => boolean;
             extraCssClasses?: undefined;
             values?: undefined;
         };
@@ -103,6 +121,7 @@ export declare const MageRotationConfig: {
             getValue: (player: Player<Spec.SpecMage>) => ArcaneFiller;
             setValue: (eventID: EventID, player: Player<Spec.SpecMage>, newValue: number) => void;
             showWhen: (player: Player<Spec.SpecMage>) => boolean;
+            enableWhen?: undefined;
         };
         cssClass?: undefined;
     } | {
@@ -118,6 +137,7 @@ export declare const MageRotationConfig: {
             showWhen: (player: Player<Spec.SpecMage>) => boolean;
             extraCssClasses?: undefined;
             values?: undefined;
+            enableWhen?: undefined;
         };
     })[];
 };

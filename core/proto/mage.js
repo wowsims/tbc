@@ -713,19 +713,40 @@ export const Mage_Rotation_FireRotation = new Mage_Rotation_FireRotation$Type();
 // @generated message type with reflection information, may provide speed optimized methods
 class Mage_Rotation_FrostRotation$Type extends MessageType {
     constructor() {
-        super("proto.Mage.Rotation.FrostRotation", []);
+        super("proto.Mage.Rotation.FrostRotation", [
+            { no: 3, name: "water_elemental_disobey_chance", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ }
+        ]);
     }
     create(value) {
-        const message = {};
+        const message = { waterElementalDisobeyChance: 0 };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
         return message;
     }
     internalBinaryRead(reader, length, options, target) {
-        return target ?? this.create();
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* double water_elemental_disobey_chance */ 3:
+                    message.waterElementalDisobeyChance = reader.double();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
     }
     internalBinaryWrite(message, writer, options) {
+        /* double water_elemental_disobey_chance = 3; */
+        if (message.waterElementalDisobeyChance !== 0)
+            writer.tag(3, WireType.Bit64).double(message.waterElementalDisobeyChance);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
