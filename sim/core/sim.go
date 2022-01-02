@@ -4,7 +4,6 @@ import (
 	"container/heap"
 	"fmt"
 	"math/rand"
-	"sort"
 	"strings"
 	"time"
 
@@ -100,30 +99,12 @@ func (sim *Simulation) reset() {
 	}
 
 	sim.CurrentTime = 0.0
+	sim.pendingActions = make([]*PendingAction, 0, 64)
 
-	// Reset all players
-	for _, party := range sim.Raid.Parties {
-		for _, agent := range party.Players {
-			agent.GetCharacter().reset(sim)
-			agent.Reset(sim)
-		}
-	}
+	sim.Raid.reset(sim)
 
 	for _, target := range sim.encounter.Targets {
 		target.Reset(sim)
-	}
-
-	// setup initial actions.
-	sim.pendingActions = make([]*PendingAction, 0, 64)
-	for _, party := range sim.Raid.Parties {
-		for _, agent := range party.Players {
-			sim.AddPendingAction(sim.newDefaultAgentAction(agent))
-			for _, petAgent := range agent.GetCharacter().Pets {
-				if petAgent.GetPet().initialEnabled {
-					petAgent.GetPet().Enable(sim, petAgent)
-				}
-			}
-		}
 	}
 }
 
@@ -183,11 +164,6 @@ func (sim *Simulation) run() *proto.RaidSimResult {
 // RunOnce is the main event loop. It will run the simulation for number of seconds.
 func (sim *Simulation) runOnce() {
 	sim.reset()
-
-	// order pending by execution time.
-	sort.Slice(sim.pendingActions, func(i, j int) bool {
-		return sim.pendingActions[i].NextActionAt < sim.pendingActions[j].NextActionAt
-	})
 
 	for true {
 		pa := heap.Pop(&sim.pendingActions).(*PendingAction)

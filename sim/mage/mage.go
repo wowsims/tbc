@@ -167,7 +167,7 @@ func NewMage(character core.Character, options proto.Player) *Mage {
 	}
 
 	if mage.Talents.SummonWaterElemental {
-		mage.waterElemental = mage.NewWaterElemental(0.9)
+		mage.waterElemental = mage.NewWaterElemental(mage.FrostRotation.WaterElementalDisobeyChance)
 	}
 
 	mage.registerEvocationCD()
