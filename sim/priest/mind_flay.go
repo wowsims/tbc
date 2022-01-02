@@ -38,6 +38,7 @@ func (priest *Priest) newMindflayTemplate(sim *core.Simulation) core.SimpleSpell
 			TickLength:           time.Second,
 			TickBaseDamage:       528 / 3,
 			TickSpellCoefficient: 0.19,
+			AffectedByCastSpeed:  true,
 		},
 	}
 
@@ -52,6 +53,7 @@ func (priest *Priest) newMindflayTemplate(sim *core.Simulation) core.SimpleSpell
 			Cast: baseCast,
 		},
 		SpellHitEffect: effect,
+		IsChannel:      true,
 	})
 }
 
@@ -62,8 +64,6 @@ func (priest *Priest) NewMindFlay(sim *core.Simulation, target *core.Target) *co
 
 	// Set dynamic fields, i.e. the stuff we couldn't precompute.
 	mf.Target = target
-	// Channels accelerate tick speed by haste.
-	mf.DotInput.TickLength = time.Duration(float64(mf.DotInput.TickLength) / priest.CastSpeed())
 
 	mf.Init(sim)
 

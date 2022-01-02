@@ -35,11 +35,12 @@ type Mage struct {
 	FireRotation   proto.Mage_Rotation_FireRotation
 	FrostRotation  proto.Mage_Rotation_FrostRotation
 
-	remainingManaEmeralds int
+	remainingManaGems int
 
 	isDoingRegenRotation bool
 	tryingToDropStacks   bool
 	numCastsDone         int32
+	isBlastSpamming      bool
 
 	// Cached values for a few mechanics.
 	spellDamageMultiplier float64
@@ -47,6 +48,9 @@ type Mage struct {
 	// cached cast stuff
 	arcaneBlastSpell        core.SimpleSpell
 	arcaneBlastCastTemplate core.SimpleSpellTemplate
+
+	arcaneMissilesSpell        core.SimpleSpell
+	arcaneMissilesCastTemplate core.SimpleSpellTemplate
 
 	igniteSpell        core.SimpleSpell
 	igniteCastTemplate core.SimpleSpellTemplate
@@ -90,6 +94,7 @@ func (mage *Mage) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {
 
 func (mage *Mage) Init(sim *core.Simulation) {
 	mage.arcaneBlastCastTemplate = mage.newArcaneBlastTemplate(sim)
+	mage.arcaneMissilesCastTemplate = mage.newArcaneMissilesTemplate(sim)
 	mage.igniteCastTemplate = mage.newIgniteTemplate(sim)
 	mage.fireballCastTemplate = mage.newFireballTemplate(sim)
 	mage.fireballDotCastTemplate = mage.newFireballDotTemplate(sim)
@@ -103,8 +108,12 @@ func (mage *Mage) Init(sim *core.Simulation) {
 
 func (mage *Mage) Reset(newsim *core.Simulation) {
 	if mage.Options.UseManaEmeralds {
-		mage.remainingManaEmeralds = 3
+		mage.remainingManaGems = 4
 	}
+	mage.isDoingRegenRotation = false
+	mage.tryingToDropStacks = false
+	mage.numCastsDone = 0
+	mage.isBlastSpamming = false
 	mage.manaTracker.Reset()
 }
 

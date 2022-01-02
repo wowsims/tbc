@@ -26,19 +26,22 @@ func (mage *Mage) Act(sim *core.Simulation) time.Duration {
 
 	if !actionSuccessful {
 		regenTime := mage.TimeUntilManaRegen(spell.GetManaCost())
-		waitAction := core.NewWaitAction(sim, mage.GetCharacter(), regenTime, core.WaitReasonOOM)
+		// Waiting too long can give us enough mana to pick less mana-effecient spells.
+		waitTime := core.MinDuration(regenTime, time.Second*1)
+		waitAction := core.NewWaitAction(sim, mage.GetCharacter(), waitTime, core.WaitReasonOOM)
 		waitAction.Cast(sim)
 		return sim.CurrentTime + waitAction.GetDuration()
 	}
 
 	return sim.CurrentTime + core.MaxDuration(
 		mage.GetRemainingCD(core.GCDCooldownID, sim.CurrentTime),
-		spell.CastTime)
+		spell.GetDuration())
 }
 
 func (mage *Mage) doArcaneRotation(sim *core.Simulation) *core.SimpleSpell {
 	// Only arcane rotation cares about mana tracking so update it here.
-	mage.manaTracker.Update(sim, mage.GetCharacter())
+	// Don't need to update tracker because we only use certain functions.
+	//mage.manaTracker.Update(sim, mage.GetCharacter())
 
 	target := sim.GetPrimaryTarget()
 
@@ -46,7 +49,8 @@ func (mage *Mage) doArcaneRotation(sim *core.Simulation) *core.SimpleSpell {
 	arcaneBlast, numStacks := mage.NewArcaneBlast(sim, target)
 	willDropStacks := mage.willDropArcaneBlastStacks(sim, arcaneBlast, numStacks)
 
-	if mage.canBlast(sim, arcaneBlast, numStacks, willDropStacks) {
+	mage.isBlastSpamming = mage.canBlast(sim, arcaneBlast, numStacks, willDropStacks)
+	if mage.isBlastSpamming {
 		return arcaneBlast
 	}
 
@@ -66,6 +70,8 @@ func (mage *Mage) doArcaneRotation(sim *core.Simulation) *core.SimpleSpell {
 
 		if currentManaPercent < startThreshold {
 			mage.isDoingRegenRotation = true
+			mage.tryingToDropStacks = true
+			mage.numCastsDone = 0
 		}
 	}
 
@@ -85,21 +91,21 @@ func (mage *Mage) doArcaneRotation(sim *core.Simulation) *core.SimpleSpell {
 			switch mage.ArcaneRotation.Filler {
 			case proto.Mage_Rotation_ArcaneRotation_Frostbolt:
 				return mage.NewFrostbolt(sim, target)
-			case proto.Mage_Rotation_ArcaneRotation_ArcaneMissles:
-				return mage.NewFrostbolt(sim, target)
+			case proto.Mage_Rotation_ArcaneRotation_ArcaneMissiles:
+				return mage.NewArcaneMissiles(sim, target)
 			case proto.Mage_Rotation_ArcaneRotation_Scorch:
 				return mage.NewScorch(sim, target)
 			case proto.Mage_Rotation_ArcaneRotation_Fireball:
 				return mage.NewFireball(sim, target)
-			case proto.Mage_Rotation_ArcaneRotation_ArcaneMisslesFrostbolt:
+			case proto.Mage_Rotation_ArcaneRotation_ArcaneMissilesFrostbolt:
 				if mage.numCastsDone%2 == 1 {
-					return mage.NewFrostbolt(sim, target)
+					return mage.NewArcaneMissiles(sim, target)
 				} else {
 					return mage.NewFrostbolt(sim, target)
 				}
-			case proto.Mage_Rotation_ArcaneRotation_ArcaneMisslesScorch:
+			case proto.Mage_Rotation_ArcaneRotation_ArcaneMissilesScorch:
 				if mage.numCastsDone%2 == 1 {
-					return mage.NewScorch(sim, target)
+					return mage.NewArcaneMissiles(sim, target)
 				} else {
 					return mage.NewScorch(sim, target)
 				}

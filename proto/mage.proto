@@ -15,7 +15,7 @@ message MageTalents {
 	int32 arcane_mind = 8;
 	int32 arcane_instability = 9;
 	int32 arcane_potency = 10;
-	int32 empowered_arcane_missles = 11;
+	int32 empowered_arcane_missiles = 11;
 	bool arcane_power = 12;
 	int32 spell_power = 13;
 	int32 mind_mastery = 14;
@@ -72,11 +72,11 @@ message Mage {
 			message ArcaneRotation {
 				enum Filler {
 					Frostbolt = 0;
-					ArcaneMissles = 1;
+					ArcaneMissiles = 1;
 					Scorch = 2;
 					Fireball = 3;
-					ArcaneMisslesFrostbolt = 4;
-					ArcaneMisslesScorch = 5;
+					ArcaneMissilesFrostbolt = 4;
+					ArcaneMissilesScorch = 5;
 					ScorchTwoFireball = 6;
 				}
 				// The spells to use to fill time while waiting for arcane blast stacks to drop.

@@ -70,6 +70,11 @@ func (mage *Mage) applyArcaneConcentration() {
 		return core.Aura{
 			ID: ArcaneConcentrationAuraID,
 			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+				if spellCast.IsSpellAction(SpellIDArcaneMissiles) {
+					// AM shouldn't proc clearcasting.
+					return
+				}
+
 				// TODO: This should only get 1 roll for each aoe cast.
 				if icd.IsOnCD(sim) || sim.RandomFloat("Arcane Concentration") > procChance {
 					return

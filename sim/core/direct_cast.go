@@ -35,6 +35,11 @@ type MultiTargetDirectDamageSpell struct {
 
 func (spell *MultiTargetDirectDamageSpell) Init(sim *Simulation) {
 	spell.SpellCast.init(sim)
+	for effectIdx := range spell.Effects {
+		if spell.Effects[effectIdx].DotInput.NumberOfTicks > 0 {
+			spell.Effects[effectIdx].DotInput.init(&spell.SpellCast)
+		}
+	}
 }
 
 // TODO: If there are multiple Effects.DotEffect then each one will apply to the metrics (creating too high of a resulting DPS)
@@ -82,12 +87,25 @@ type SimpleSpell struct {
 
 	// Individual direct damage effect of this spell.
 	SpellHitEffect
+
+	IsChannel bool
 }
 
 // Init will call any 'OnCast' effects associated with the caster and then apply spell haste to the cast.
 //  Init will panic if the spell or the GCD is still on CD.
 func (spell *SimpleSpell) Init(sim *Simulation) {
-	spell.init(sim)
+	spell.SpellCast.init(sim)
+	if spell.SpellHitEffect.DotInput.NumberOfTicks > 0 {
+		spell.SpellHitEffect.DotInput.init(&spell.SpellCast)
+	}
+}
+
+func (spell *SimpleSpell) GetDuration() time.Duration {
+	if spell.IsChannel {
+		return spell.SpellHitEffect.DotInput.FullDuration()
+	} else {
+		return spell.CastTime
+	}
 }
 
 func (spell *SimpleSpell) Cast(sim *Simulation) bool {
@@ -153,10 +171,17 @@ type DotDamageInput struct {
 	TickLength           time.Duration // time between each tick
 	TickBaseDamage       float64
 	TickSpellCoefficient float64
+	TicksCanMissAndCrit  bool // Allows individual ticks to hit/miss, and also crit.
+
+	// If true, tick length will be shortened based on casting speed.
+	AffectedByCastSpeed bool
 
 	// Causes all modifications applied by callbacks to the initial damagePerTick
 	// value to be ignored.
 	IgnoreDamageModifiers bool
+
+	// Whether ticks can proc spell hit effects such as Judgement of Wisdom.
+	TicksProcSpellHitEffects bool
 
 	OnBeforePeriodicDamage OnBeforePeriodicDamage // Before-calculation logic for this dot.
 	OnPeriodicDamage       OnPeriodicDamage       // After-calculation logic for this dot.
@@ -175,9 +200,19 @@ type DotDamageInput struct {
 	currentDotAction *PendingAction
 }
 
+func (ddi *DotDamageInput) init(spellCast *SpellCast) {
+	if ddi.AffectedByCastSpeed {
+		ddi.TickLength = time.Duration(float64(ddi.TickLength) / spellCast.Character.CastSpeed())
+	}
+}
+
 // DamagePerTick returns the cached damage per tick on the spell.
 func (ddi DotDamageInput) DamagePerTick() float64 {
 	return ddi.damagePerTick
+}
+
+func (ddi DotDamageInput) FullDuration() time.Duration {
+	return ddi.TickLength * time.Duration(ddi.NumberOfTicks)
 }
 
 func (ddi DotDamageInput) TimeRemaining(sim *Simulation) time.Duration {

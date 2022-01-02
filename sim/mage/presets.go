@@ -117,7 +117,7 @@ var PlayerOptionsArcane = &proto.Player_Mage{
 		Rotation: &proto.Mage_Rotation{
 			Type: proto.Mage_Rotation_Arcane,
 			Arcane: &proto.Mage_Rotation_ArcaneRotation{
-				Filler:                     proto.Mage_Rotation_ArcaneRotation_ArcaneMisslesFrostbolt,
+				Filler:                     proto.Mage_Rotation_ArcaneRotation_ArcaneMissilesFrostbolt,
 				ArcaneBlastsBetweenFillers: 3,
 				StartRegenRotationPercent:  0.2,
 				StopRegenRotationPercent:   0.3,
