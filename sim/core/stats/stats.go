@@ -139,6 +139,29 @@ func (this Stats) Add(other Stats) Stats {
 	return newStats
 }
 
+// Subtracts another Stats from this one, returning the new Stats.
+func (stats Stats) Subtract(other Stats) Stats {
+	newStats := Stats{}
+
+	for k, v := range stats {
+		newStats[k] = v - other[k]
+	}
+
+	return newStats
+}
+
+// Multiplies two Stats together by multiplying the values of corresponding
+// stats, like a dot product operation.
+func (stats Stats) DotProduct(other Stats) Stats {
+	newStats := Stats{}
+
+	for k, v := range stats {
+		newStats[k] = v * other[k]
+	}
+
+	return newStats
+}
+
 func (this Stats) Equals(other Stats) bool {
 	for i := range this {
 		if this[i] != other[i] {
@@ -294,8 +317,8 @@ func (sdm *StatDependencyManager) ApplyStatDependencies(stats Stats) Stats {
 }
 
 type PseudoStats struct {
-	CastSpeedMultiplier       float64
-	AttackSpeedMultiplier     float64       // not used yet
+	CastSpeedMultiplier   float64
+	AttackSpeedMultiplier float64 // not used yet
 
 	FiveSecondRuleRefreshTime time.Duration // last time a spell was cast
 	SpiritRegenRateCasting    float64       // percentage of spirit regen allowed during casting

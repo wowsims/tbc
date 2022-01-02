@@ -23,6 +23,9 @@ type Character struct {
 	// Current gear.
 	Equip items.Equipment
 
+	// Pets owned by this Character.
+	Pets []PetAgent
+
 	// Consumables this Character will be using.
 	consumes proto.Consumes
 
@@ -163,8 +166,22 @@ func (character *Character) applyItemEffects(agent Agent) {
 	}
 }
 
+func (character *Character) AddPet(pet PetAgent) {
+	if character.finalized {
+		panic("Pets must be added before finalization!")
+	}
+
+	character.Pets = append(character.Pets, pet)
+}
+
 func (character *Character) AddStats(stat stats.Stats) {
 	character.stats = character.stats.Add(stat)
+
+	if len(character.Pets) > 0 {
+		for _, petAgent := range character.Pets {
+			petAgent.GetPet().addOwnerStats(stat)
+		}
+	}
 }
 func (character *Character) AddStat(stat stats.Stat, amount float64) {
 	if character.finalized {
@@ -175,7 +192,14 @@ func (character *Character) AddStat(stat stats.Stat, amount float64) {
 			panic("Use AddMeleeHaste!")
 		}
 	}
+
 	character.stats[stat] += amount
+
+	if len(character.Pets) > 0 {
+		for _, petAgent := range character.Pets {
+			petAgent.GetPet().addOwnerStat(stat, amount)
+		}
+	}
 }
 
 func (character *Character) SpendMana(sim *Simulation, amount float64, reason string) {
@@ -220,6 +244,9 @@ func (character *Character) AddMeleeHaste(sim *Simulation, amount float64) {
 		character.AutoAttacks.ModifySwingTime(sim, mod)
 	}
 	character.stats[stats.MeleeHaste] += amount
+
+	// Could add melee haste to pets too, but not aware of any pets that scale with
+	// owner's melee haste.
 }
 
 // MultiplyMeleeSpeed will alter the attack speed multiplier and change swing speed of all autoattack swings in progress.
@@ -339,6 +366,10 @@ func (character *Character) Finalize() {
 
 	character.auraTracker.finalize()
 	character.majorCooldownManager.finalize(character)
+
+	for _, petAgent := range character.Pets {
+		petAgent.GetPet().Finalize()
+	}
 }
 
 func (character *Character) reset(sim *Simulation) {
@@ -354,6 +385,11 @@ func (character *Character) reset(sim *Simulation) {
 		character.AutoAttacks = AutoAttacks{}
 		character.EnableAutoAttacks() // resets auto attack timers etc
 	}
+
+	for _, petAgent := range character.Pets {
+		petAgent.GetPet().reset(sim)
+		petAgent.Reset(sim)
+	}
 }
 
 // Advance moves time forward counting down auras, CDs, mana regen, etc
@@ -364,6 +400,13 @@ func (character *Character) advance(sim *Simulation, elapsedTime time.Duration) 
 	if character.Hardcast.Expires != 0 && character.Hardcast.Expires <= sim.CurrentTime {
 		character.Hardcast.OnExpire(sim)
 		character.Hardcast.Expires = 0
+	}
+
+	if len(character.Pets) > 0 {
+		for _, petAgent := range character.Pets {
+			petAgent.GetPet().advance(sim, elapsedTime)
+			petAgent.Advance(sim, elapsedTime)
+		}
 	}
 }
 
