@@ -112,6 +112,19 @@ func (sim *Simulation) reset() {
 	for _, target := range sim.encounter.Targets {
 		target.Reset(sim)
 	}
+
+	// setup initial actions.
+	sim.pendingActions = make([]*PendingAction, 0, 64)
+	for _, party := range sim.Raid.Parties {
+		for _, agent := range party.Players {
+			sim.AddPendingAction(sim.newDefaultAgentAction(agent))
+			for _, petAgent := range agent.GetCharacter().Pets {
+				if petAgent.GetPet().initialEnabled {
+					petAgent.GetPet().Enable(sim, petAgent)
+				}
+			}
+		}
+	}
 }
 
 // Run runs the simulation for the configured number of iterations, and
@@ -136,6 +149,14 @@ func (sim *Simulation) run() *proto.RaidSimResult {
 			character := player.GetCharacter()
 			character.auraTracker.logFn = func(message string, vals ...interface{}) {
 				character.Log(sim, message, vals)
+			}
+
+			for _, petAgent := range character.Pets {
+				petAgent.Init(sim)
+				petCharacter := petAgent.GetCharacter()
+				petCharacter.auraTracker.logFn = func(message string, vals ...interface{}) {
+					petCharacter.Log(sim, message, vals)
+				}
 			}
 		}
 	}
@@ -162,32 +183,6 @@ func (sim *Simulation) run() *proto.RaidSimResult {
 // RunOnce is the main event loop. It will run the simulation for number of seconds.
 func (sim *Simulation) runOnce() {
 	sim.reset()
-
-	sim.pendingActions = make([]*PendingAction, 0, 64)
-	// setup initial actions.
-	for _, party := range sim.Raid.Parties {
-		for _, agent := range party.Players {
-			ag := agent
-			pa := &PendingAction{
-				Name:     "Agent",
-				Priority: -1, // Give lower priority so that dot ticks always happen before player actions.
-			}
-			pa.OnAction = func(sim *Simulation) {
-				// If char has AA enabled (a MH weapon is set), try to swing
-				if ag.GetCharacter().AutoAttacks.mh != nil {
-					ag.GetCharacter().AutoAttacks.Swing(sim, sim.GetPrimaryTarget())
-				}
-				ag.GetCharacter().TryUseCooldowns(sim)
-				dur := ag.Act(sim)
-				if dur <= sim.CurrentTime {
-					panic(fmt.Sprintf("Agent returned invalid time delta: %s (%s - %s)", sim.CurrentTime-dur, sim.CurrentTime, dur))
-				}
-				pa.NextActionAt = dur
-				sim.AddPendingAction(pa)
-			}
-			sim.AddPendingAction(pa)
-		}
-	}
 
 	// order pending by execution time.
 	sort.Slice(sim.pendingActions, func(i, j int) bool {
@@ -226,12 +221,35 @@ func (sim *Simulation) AddPendingAction(pa *PendingAction) {
 	heap.Push(&sim.pendingActions, pa)
 }
 
+// Creates a PendingAction which repeatedly asks an Agent for actions.
+func (sim *Simulation) newDefaultAgentAction(agent Agent) *PendingAction {
+	pa := &PendingAction{
+		Name:     "Agent",
+		Priority: -1, // Give lower priority so that dot ticks always happen before player actions.
+	}
+	pa.OnAction = func(sim *Simulation) {
+		// If char has AA enabled (a MH weapon is set), try to swing
+		if agent.GetCharacter().AutoAttacks.mh != nil {
+			agent.GetCharacter().AutoAttacks.Swing(sim, sim.GetPrimaryTarget())
+		}
+		agent.GetCharacter().TryUseCooldowns(sim)
+		dur := agent.Act(sim)
+		if dur <= sim.CurrentTime {
+			panic(fmt.Sprintf("Agent returned invalid time delta: %s (%s - %s)", sim.CurrentTime-dur, sim.CurrentTime, dur))
+		}
+		pa.NextActionAt = dur
+		sim.AddPendingAction(pa)
+	}
+	return pa
+}
+
 // Advance moves time forward counting down auras, CDs, mana regen, etc
 func (sim *Simulation) advance(elapsedTime time.Duration) {
 	sim.CurrentTime += elapsedTime
 
 	for _, party := range sim.Raid.Parties {
 		for _, agent := range party.Players {
+			// TODO: Switch the order here to match other things like this.
 			agent.Advance(sim, elapsedTime)
 			agent.GetCharacter().advance(sim, elapsedTime)
 		}
