@@ -80,25 +80,27 @@ export const MageRotationConfig = {
                 setValue: (eventID, simUI, newValue) => {
                     const newRotation = simUI.player.getRotation();
                     newRotation.type = newValue;
-                    if (newRotation.type == RotationType.Arcane) {
-                        simUI.player.setTalentsString(eventID, Presets.ArcaneTalents.data);
-                        if (!newRotation.arcane) {
-                            newRotation.arcane = ArcaneRotation.clone(Presets.DefaultArcaneRotation.arcane);
+                    TypedEvent.freezeAllAndDo(() => {
+                        if (newRotation.type == RotationType.Arcane) {
+                            simUI.player.setTalentsString(eventID, Presets.ArcaneTalents.data);
+                            if (!newRotation.arcane) {
+                                newRotation.arcane = ArcaneRotation.clone(Presets.DefaultArcaneRotation.arcane);
+                            }
                         }
-                    }
-                    else if (newRotation.type == RotationType.Fire) {
-                        simUI.player.setTalentsString(eventID, Presets.FireTalents.data);
-                        if (!newRotation.fire) {
-                            newRotation.fire = FireRotation.clone(Presets.DefaultFireRotation.fire);
+                        else if (newRotation.type == RotationType.Fire) {
+                            simUI.player.setTalentsString(eventID, Presets.FireTalents.data);
+                            if (!newRotation.fire) {
+                                newRotation.fire = FireRotation.clone(Presets.DefaultFireRotation.fire);
+                            }
                         }
-                    }
-                    else {
-                        simUI.player.setTalentsString(eventID, Presets.FrostTalents.data);
-                        if (!newRotation.frost) {
-                            newRotation.frost = FrostRotation.clone(Presets.DefaultFrostRotation.frost);
+                        else {
+                            simUI.player.setTalentsString(eventID, Presets.DeepFrostTalents.data);
+                            if (!newRotation.frost) {
+                                newRotation.frost = FrostRotation.clone(Presets.DefaultFrostRotation.frost);
+                            }
                         }
-                    }
-                    simUI.player.setRotation(eventID, newRotation);
+                        simUI.player.setRotation(eventID, newRotation);
+                    });
                     simUI.recomputeSettingsLayout();
                 },
             },

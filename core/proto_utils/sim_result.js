@@ -56,7 +56,7 @@ export class SimResult {
         return this.raidMetrics.dps;
     }
     getActionMetrics(filter) {
-        return ActionMetrics.join(this.getPlayers(filter).map(player => player.actions).flat());
+        return ActionMetrics.join(this.getPlayers(filter).map(player => player.getPlayerAndPetActions()).flat());
     }
     getSpellMetrics(filter) {
         return this.getActionMetrics(filter).filter(e => e.hits + e.misses != 0);
@@ -117,22 +117,24 @@ export class PartyMetrics {
         const numPlayers = Math.min(party.players.length, metrics.players.length);
         const players = await Promise.all([...new Array(numPlayers).keys()]
             .filter(i => party.players[i].class != Class.ClassUnknown)
-            .map(i => PlayerMetrics.makeNew(iterations, duration, party.players[i], metrics.players[i], partyIndex * 5 + i)));
+            .map(i => PlayerMetrics.makeNew(iterations, duration, party.players[i], metrics.players[i], partyIndex * 5 + i, false)));
         return new PartyMetrics(party, metrics, partyIndex, players);
     }
 }
 export class PlayerMetrics {
-    constructor(player, metrics, raidIndex, actions, auras, iterations, duration) {
+    constructor(player, isPet, metrics, raidIndex, actions, auras, pets, iterations, duration) {
         this.player = player;
         this.metrics = metrics;
         this.raidIndex = raidIndex;
         this.name = player.name;
         this.spec = playerToSpec(player);
+        this.isPet = isPet;
         this.iconUrl = getTalentTreeIcon(this.spec, player.talentsString);
         this.classColor = classColors[specToClass[this.spec]];
         this.dps = this.metrics.dps;
         this.actions = actions;
         this.auras = auras;
+        this.pets = pets;
         this.iterations = iterations;
         this.duration = duration;
     }
@@ -145,12 +147,17 @@ export class PlayerMetrics {
     get totalDamage() {
         return this.dps.avg * this.duration;
     }
-    static async makeNew(iterations, duration, player, metrics, raidIndex) {
+    getPlayerAndPetActions() {
+        return this.actions.concat(this.pets.map(pet => pet.getPlayerAndPetActions()).flat());
+    }
+    static async makeNew(iterations, duration, player, metrics, raidIndex, isPet) {
         const actionsPromise = Promise.all(metrics.actions.map(actionMetrics => ActionMetrics.makeNew(iterations, duration, actionMetrics)));
         const aurasPromise = Promise.all(metrics.auras.map(auraMetrics => AuraMetrics.makeNew(iterations, duration, auraMetrics)));
+        const petsPromise = Promise.all(metrics.pets.map(petMetrics => PlayerMetrics.makeNew(iterations, duration, player, petMetrics, raidIndex, true)));
         const actions = await actionsPromise;
         const auras = await aurasPromise;
-        return new PlayerMetrics(player, metrics, raidIndex, actions, auras, iterations, duration);
+        const pets = await petsPromise;
+        return new PlayerMetrics(player, isPet, metrics, raidIndex, actions, auras, pets, iterations, duration);
     }
 }
 export class EncounterMetrics {

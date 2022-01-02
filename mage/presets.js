@@ -73,9 +73,108 @@ export const DefaultArcaneConsumes = Consumes.create({
     brilliantWizardOil: true,
     blackenedBasilisk: true,
 });
+export const P1_ARCANE_PRESET = {
+    name: 'P1 Arcane Preset',
+    tooltip: Tooltips.BASIC_BIS_DISCLAIMER,
+    enableWhen: (player) => player.getRotation().type == RotationType.Arcane,
+    gear: EquipmentSpec.create({
+        items: [
+            ItemSpec.create({
+                id: 29076,
+                enchant: Enchants.GLYPH_OF_POWER,
+                gems: [
+                    Gems.CHAOTIC_SKYFIRE_DIAMOND,
+                    Gems.GLOWING_NIGHTSEYE,
+                ],
+            }),
+            ItemSpec.create({
+                id: 28762, // Adornment of Stolen Souls
+            }),
+            ItemSpec.create({
+                id: 29079,
+                enchant: Enchants.GREATER_INSCRIPTION_OF_DISCIPLINE,
+                gems: [
+                    Gems.BRILLIANT_DAWNSTONE,
+                    Gems.VEILED_NOBLE_TOPAZ,
+                ],
+            }),
+            ItemSpec.create({
+                id: 28766,
+                enchant: Enchants.SUBTLETY,
+            }),
+            ItemSpec.create({
+                id: 21848,
+                enchant: Enchants.CHEST_EXCEPTIONAL_STATS,
+                gems: [
+                    Gems.VEILED_NOBLE_TOPAZ,
+                    Gems.VEILED_NOBLE_TOPAZ,
+                ],
+            }),
+            ItemSpec.create({
+                id: 28411,
+                enchant: Enchants.WRIST_SPELLPOWER,
+                gems: [
+                    Gems.VEILED_NOBLE_TOPAZ,
+                ],
+            }),
+            ItemSpec.create({
+                id: 21847,
+                enchant: Enchants.GLOVES_SPELLPOWER,
+                gems: [
+                    Gems.BRILLIANT_DAWNSTONE,
+                    Gems.VEILED_NOBLE_TOPAZ,
+                ],
+            }),
+            ItemSpec.create({
+                id: 21846,
+                gems: [
+                    Gems.BRILLIANT_DAWNSTONE,
+                    Gems.GLOWING_NIGHTSEYE,
+                ],
+            }),
+            ItemSpec.create({
+                id: 29078,
+                enchant: Enchants.RUNIC_SPELLTHREAD,
+            }),
+            ItemSpec.create({
+                id: 28517,
+                enchant: Enchants.BOARS_SPEED,
+                gems: [
+                    Gems.RUNED_LIVING_RUBY,
+                    Gems.BRILLIANT_DAWNSTONE,
+                ],
+            }),
+            ItemSpec.create({
+                id: 28753,
+                enchant: Enchants.RING_SPELLPOWER,
+            }),
+            ItemSpec.create({
+                id: 29287,
+                enchant: Enchants.RING_SPELLPOWER,
+            }),
+            ItemSpec.create({
+                id: 29370, // Icon of the Silver Crescent
+            }),
+            ItemSpec.create({
+                id: 28785, // Lightning Capacitor
+            }),
+            ItemSpec.create({
+                id: 28770,
+                enchant: Enchants.SUNFIRE,
+            }),
+            ItemSpec.create({
+                id: 29271, // Talisman of Kalecgos
+            }),
+            ItemSpec.create({
+                id: 28783, // Eredar Wand of Obliteration
+            }),
+        ],
+    }),
+};
 export const P1_FIRE_PRESET = {
     name: 'P1 Fire Preset',
     tooltip: Tooltips.BASIC_BIS_DISCLAIMER,
+    enableWhen: (player) => player.getRotation().type == RotationType.Fire,
     gear: EquipmentSpec.create({
         items: [
             ItemSpec.create({
@@ -168,6 +267,109 @@ export const P1_FIRE_PRESET = {
             }),
             ItemSpec.create({
                 id: 29270, // Flametongue Seal
+            }),
+            ItemSpec.create({
+                id: 28673, // Tirisfal Wand of Ascendancy
+            }),
+        ],
+    }),
+};
+export const P1_FROST_PRESET = {
+    name: 'P1 Frost Preset',
+    tooltip: Tooltips.BASIC_BIS_DISCLAIMER,
+    enableWhen: (player) => player.getRotation().type == RotationType.Frost,
+    gear: EquipmentSpec.create({
+        items: [
+            ItemSpec.create({
+                id: 29076,
+                enchant: Enchants.GLYPH_OF_POWER,
+                gems: [
+                    Gems.CHAOTIC_SKYFIRE_DIAMOND,
+                    Gems.GLOWING_NIGHTSEYE,
+                ],
+            }),
+            ItemSpec.create({
+                id: 28762, // Adornment of Stolen Souls
+            }),
+            ItemSpec.create({
+                id: 29079,
+                enchant: Enchants.GREATER_INSCRIPTION_OF_DISCIPLINE,
+                gems: [
+                    Gems.VEILED_NOBLE_TOPAZ,
+                    Gems.VEILED_NOBLE_TOPAZ,
+                ],
+            }),
+            ItemSpec.create({
+                id: 28766,
+                enchant: Enchants.SUBTLETY,
+            }),
+            ItemSpec.create({
+                id: 21871,
+                enchant: Enchants.CHEST_EXCEPTIONAL_STATS,
+                gems: [
+                    Gems.VEILED_NOBLE_TOPAZ,
+                    Gems.VEILED_NOBLE_TOPAZ,
+                ],
+            }),
+            ItemSpec.create({
+                id: 28411,
+                enchant: Enchants.WRIST_SPELLPOWER,
+                gems: [
+                    Gems.VEILED_NOBLE_TOPAZ,
+                ],
+            }),
+            ItemSpec.create({
+                id: 28780,
+                enchant: Enchants.GLOVES_SPELLPOWER,
+                gems: [
+                    Gems.VEILED_NOBLE_TOPAZ,
+                    Gems.GLOWING_NIGHTSEYE,
+                ],
+            }),
+            ItemSpec.create({
+                id: 24256,
+                gems: [
+                    Gems.VEILED_NOBLE_TOPAZ,
+                    Gems.VEILED_NOBLE_TOPAZ,
+                ],
+            }),
+            ItemSpec.create({
+                id: 24262,
+                enchant: Enchants.RUNIC_SPELLTHREAD,
+                gems: [
+                    Gems.VEILED_NOBLE_TOPAZ,
+                    Gems.VEILED_NOBLE_TOPAZ,
+                    Gems.VEILED_NOBLE_TOPAZ,
+                ],
+            }),
+            ItemSpec.create({
+                id: 21870,
+                enchant: Enchants.BOARS_SPEED,
+                gems: [
+                    Gems.VEILED_NOBLE_TOPAZ,
+                    Gems.VEILED_NOBLE_TOPAZ,
+                ],
+            }),
+            ItemSpec.create({
+                id: 28793,
+                enchant: Enchants.RING_SPELLPOWER,
+            }),
+            ItemSpec.create({
+                id: 29172,
+                enchant: Enchants.RING_SPELLPOWER,
+            }),
+            ItemSpec.create({
+                id: 29370, // Icon of the Silver Crescent
+            }),
+            ItemSpec.create({
+                id: 27683, // Quagmirran's Eye
+            }),
+            ItemSpec.create({
+                id: 28802,
+                enchant: Enchants.SOULFROST,
+            }),
+            ItemSpec.create({
+                id: 29269, // Sapphiron's Wing Bone
             }),
             ItemSpec.create({
                 id: 28673, // Tirisfal Wand of Ascendancy

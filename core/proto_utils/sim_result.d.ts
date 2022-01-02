@@ -62,18 +62,21 @@ export declare class PlayerMetrics {
     readonly raidIndex: number;
     readonly name: string;
     readonly spec: Spec;
+    readonly isPet: boolean;
     readonly iconUrl: string;
     readonly classColor: string;
     readonly dps: DpsMetricsProto;
     readonly actions: Array<ActionMetrics>;
     readonly auras: Array<AuraMetrics>;
+    readonly pets: Array<PlayerMetrics>;
     private readonly iterations;
     private readonly duration;
     private constructor();
     get label(): string;
     get secondsOomAvg(): number;
     get totalDamage(): number;
-    static makeNew(iterations: number, duration: number, player: PlayerProto, metrics: PlayerMetricsProto, raidIndex: number): Promise<PlayerMetrics>;
+    getPlayerAndPetActions(): Array<ActionMetrics>;
+    static makeNew(iterations: number, duration: number, player: PlayerProto, metrics: PlayerMetricsProto, raidIndex: number, isPet: boolean): Promise<PlayerMetrics>;
 }
 export declare class EncounterMetrics {
     private readonly encounter;

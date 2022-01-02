@@ -60,6 +60,8 @@ export const GLOWING_SHADOWSONG_AMETHYST = 32215;
 export const RUNED_CRIMSON_SPINEL = 32196;
 export const RUNED_LIVING_RUBY = 24030;
 export const RUNED_ORNATE_RUBY = 28118;
+// Red
+export const BRILLIANT_DAWNSTONE = 24047;
 const gemSocketCssClasses = {
     [GemColor.GemColorBlue]: 'socket-color-blue',
     [GemColor.GemColorMeta]: 'socket-color-meta',

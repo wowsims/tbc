@@ -187,7 +187,9 @@ export class MageSimUI extends IndividualSimUI {
                 ],
                 // Preset gear configurations that the user can quickly select.
                 gear: [
+                    Presets.P1_ARCANE_PRESET,
                     Presets.P1_FIRE_PRESET,
+                    Presets.P1_FROST_PRESET,
                 ],
             },
         });
