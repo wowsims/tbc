@@ -139,6 +139,37 @@ func (stats Stats) Add(other Stats) Stats {
 	return newStats
 }
 
+// Subtracts another Stats from this one, returning the new Stats.
+func (stats Stats) Subtract(other Stats) Stats {
+	newStats := Stats{}
+
+	for k, v := range stats {
+		newStats[k] = v - other[k]
+	}
+
+	return newStats
+}
+
+func (stats Stats) Multiply(multiplier float64) Stats {
+	newStats := stats
+	for k, v := range newStats {
+		newStats[k] = v * multiplier
+	}
+	return newStats
+}
+
+// Multiplies two Stats together by multiplying the values of corresponding
+// stats, like a dot product operation.
+func (stats Stats) DotProduct(other Stats) Stats {
+	newStats := Stats{}
+
+	for k, v := range stats {
+		newStats[k] = v * other[k]
+	}
+
+	return newStats
+}
+
 func (stats Stats) Equals(other Stats) bool {
 	for i := range stats {
 		if stats[i] != other[i] {
@@ -174,14 +205,6 @@ func (stats Stats) String() string {
 
 	sb.WriteString("\n}")
 	return sb.String()
-}
-
-func (stats Stats) Multiply(multiplier float64) Stats {
-	newStats := stats
-	for k, v := range newStats {
-		newStats[k] = v * multiplier
-	}
-	return newStats
 }
 
 // Given the current values for source and mod stats, should return the new
