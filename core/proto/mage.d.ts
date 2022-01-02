@@ -51,9 +51,9 @@ export interface MageTalents {
      */
     arcanePotency: number;
     /**
-     * @generated from protobuf field: int32 empowered_arcane_missles = 11;
+     * @generated from protobuf field: int32 empowered_arcane_missiles = 11;
      */
-    empoweredArcaneMissles: number;
+    empoweredArcaneMissiles: number;
     /**
      * @generated from protobuf field: bool arcane_power = 12;
      */
@@ -275,9 +275,9 @@ export declare enum Mage_Rotation_ArcaneRotation_Filler {
      */
     Frostbolt = 0,
     /**
-     * @generated from protobuf enum value: ArcaneMissles = 1;
+     * @generated from protobuf enum value: ArcaneMissiles = 1;
      */
-    ArcaneMissles = 1,
+    ArcaneMissiles = 1,
     /**
      * @generated from protobuf enum value: Scorch = 2;
      */
@@ -287,13 +287,13 @@ export declare enum Mage_Rotation_ArcaneRotation_Filler {
      */
     Fireball = 3,
     /**
-     * @generated from protobuf enum value: ArcaneMisslesFrostbolt = 4;
+     * @generated from protobuf enum value: ArcaneMissilesFrostbolt = 4;
      */
-    ArcaneMisslesFrostbolt = 4,
+    ArcaneMissilesFrostbolt = 4,
     /**
-     * @generated from protobuf enum value: ArcaneMisslesScorch = 5;
+     * @generated from protobuf enum value: ArcaneMissilesScorch = 5;
      */
-    ArcaneMisslesScorch = 5,
+    ArcaneMissilesScorch = 5,
     /**
      * @generated from protobuf enum value: ScorchTwoFireball = 6;
      */

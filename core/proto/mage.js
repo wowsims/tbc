@@ -13,9 +13,9 @@ export var Mage_Rotation_ArcaneRotation_Filler;
      */
     Mage_Rotation_ArcaneRotation_Filler[Mage_Rotation_ArcaneRotation_Filler["Frostbolt"] = 0] = "Frostbolt";
     /**
-     * @generated from protobuf enum value: ArcaneMissles = 1;
+     * @generated from protobuf enum value: ArcaneMissiles = 1;
      */
-    Mage_Rotation_ArcaneRotation_Filler[Mage_Rotation_ArcaneRotation_Filler["ArcaneMissles"] = 1] = "ArcaneMissles";
+    Mage_Rotation_ArcaneRotation_Filler[Mage_Rotation_ArcaneRotation_Filler["ArcaneMissiles"] = 1] = "ArcaneMissiles";
     /**
      * @generated from protobuf enum value: Scorch = 2;
      */
@@ -25,13 +25,13 @@ export var Mage_Rotation_ArcaneRotation_Filler;
      */
     Mage_Rotation_ArcaneRotation_Filler[Mage_Rotation_ArcaneRotation_Filler["Fireball"] = 3] = "Fireball";
     /**
-     * @generated from protobuf enum value: ArcaneMisslesFrostbolt = 4;
+     * @generated from protobuf enum value: ArcaneMissilesFrostbolt = 4;
      */
-    Mage_Rotation_ArcaneRotation_Filler[Mage_Rotation_ArcaneRotation_Filler["ArcaneMisslesFrostbolt"] = 4] = "ArcaneMisslesFrostbolt";
+    Mage_Rotation_ArcaneRotation_Filler[Mage_Rotation_ArcaneRotation_Filler["ArcaneMissilesFrostbolt"] = 4] = "ArcaneMissilesFrostbolt";
     /**
-     * @generated from protobuf enum value: ArcaneMisslesScorch = 5;
+     * @generated from protobuf enum value: ArcaneMissilesScorch = 5;
      */
-    Mage_Rotation_ArcaneRotation_Filler[Mage_Rotation_ArcaneRotation_Filler["ArcaneMisslesScorch"] = 5] = "ArcaneMisslesScorch";
+    Mage_Rotation_ArcaneRotation_Filler[Mage_Rotation_ArcaneRotation_Filler["ArcaneMissilesScorch"] = 5] = "ArcaneMissilesScorch";
     /**
      * @generated from protobuf enum value: ScorchTwoFireball = 6;
      */
@@ -104,7 +104,7 @@ class MageTalents$Type extends MessageType {
             { no: 8, name: "arcane_mind", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 9, name: "arcane_instability", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 10, name: "arcane_potency", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
-            { no: 11, name: "empowered_arcane_missles", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 11, name: "empowered_arcane_missiles", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 12, name: "arcane_power", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 13, name: "spell_power", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 14, name: "mind_mastery", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
@@ -143,7 +143,7 @@ class MageTalents$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { arcaneSubtlety: 0, arcaneFocus: 0, wandSpecialization: 0, arcaneConcentration: 0, arcaneImpact: 0, arcaneMeditation: 0, presenceOfMind: false, arcaneMind: 0, arcaneInstability: 0, arcanePotency: 0, empoweredArcaneMissles: 0, arcanePower: false, spellPower: 0, mindMastery: 0, improvedFireball: 0, ignite: 0, improvedFireBlast: 0, incineration: 0, improvedFlamestrike: 0, pyroblast: false, improvedScorch: 0, masterOfElements: 0, playingWithFire: 0, criticalMass: 0, blastWave: false, firePower: 0, pyromaniac: 0, combustion: false, moltenFury: 0, empoweredFireball: 0, dragonsBreath: false, improvedFrostbolt: 0, elementalPrecision: 0, iceShards: 0, improvedFrostNova: 0, piercingIce: 0, icyVeins: false, frostChanneling: 0, shatter: 0, coldSnap: false, improvedConeOfCold: 0, iceFloes: 0, wintersChill: 0, arcticWinds: 0, empoweredFrostbolt: 0, summonWaterElemental: false };
+        const message = { arcaneSubtlety: 0, arcaneFocus: 0, wandSpecialization: 0, arcaneConcentration: 0, arcaneImpact: 0, arcaneMeditation: 0, presenceOfMind: false, arcaneMind: 0, arcaneInstability: 0, arcanePotency: 0, empoweredArcaneMissiles: 0, arcanePower: false, spellPower: 0, mindMastery: 0, improvedFireball: 0, ignite: 0, improvedFireBlast: 0, incineration: 0, improvedFlamestrike: 0, pyroblast: false, improvedScorch: 0, masterOfElements: 0, playingWithFire: 0, criticalMass: 0, blastWave: false, firePower: 0, pyromaniac: 0, combustion: false, moltenFury: 0, empoweredFireball: 0, dragonsBreath: false, improvedFrostbolt: 0, elementalPrecision: 0, iceShards: 0, improvedFrostNova: 0, piercingIce: 0, icyVeins: false, frostChanneling: 0, shatter: 0, coldSnap: false, improvedConeOfCold: 0, iceFloes: 0, wintersChill: 0, arcticWinds: 0, empoweredFrostbolt: 0, summonWaterElemental: false };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -184,8 +184,8 @@ class MageTalents$Type extends MessageType {
                 case /* int32 arcane_potency */ 10:
                     message.arcanePotency = reader.int32();
                     break;
-                case /* int32 empowered_arcane_missles */ 11:
-                    message.empoweredArcaneMissles = reader.int32();
+                case /* int32 empowered_arcane_missiles */ 11:
+                    message.empoweredArcaneMissiles = reader.int32();
                     break;
                 case /* bool arcane_power */ 12:
                     message.arcanePower = reader.bool();
@@ -334,9 +334,9 @@ class MageTalents$Type extends MessageType {
         /* int32 arcane_potency = 10; */
         if (message.arcanePotency !== 0)
             writer.tag(10, WireType.Varint).int32(message.arcanePotency);
-        /* int32 empowered_arcane_missles = 11; */
-        if (message.empoweredArcaneMissles !== 0)
-            writer.tag(11, WireType.Varint).int32(message.empoweredArcaneMissles);
+        /* int32 empowered_arcane_missiles = 11; */
+        if (message.empoweredArcaneMissiles !== 0)
+            writer.tag(11, WireType.Varint).int32(message.empoweredArcaneMissiles);
         /* bool arcane_power = 12; */
         if (message.arcanePower !== false)
             writer.tag(12, WireType.Varint).bool(message.arcanePower);

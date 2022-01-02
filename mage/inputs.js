@@ -191,7 +191,7 @@ export const MageRotationConfig = {
                         name: 'Frostbolt', value: ArcaneFiller.Frostbolt,
                     },
                     {
-                        name: 'Arcane Missles', value: ArcaneFiller.ArcaneMissles,
+                        name: 'Arcane Missiles', value: ArcaneFiller.ArcaneMissiles,
                     },
                     {
                         name: 'Scorch', value: ArcaneFiller.Fireball,
@@ -200,10 +200,10 @@ export const MageRotationConfig = {
                         name: 'Fireball', value: ArcaneFiller.Fireball,
                     },
                     {
-                        name: 'AM + FrB', value: ArcaneFiller.ArcaneMisslesFrostbolt,
+                        name: 'AM + FrB', value: ArcaneFiller.ArcaneMissilesFrostbolt,
                     },
                     {
-                        name: 'AM + Scorch', value: ArcaneFiller.ArcaneMisslesScorch,
+                        name: 'AM + Scorch', value: ArcaneFiller.ArcaneMissilesScorch,
                     },
                     {
                         name: 'Scorch + 2xFiB', value: ArcaneFiller.ScorchTwoFireball,
@@ -230,7 +230,7 @@ export const MageRotationConfig = {
                 label: '# ABs between Fillers',
                 labelTooltip: 'Number of Arcane Blasts to cast once the stacks drop.',
                 changedEvent: (player) => player.rotationChangeEmitter,
-                getValue: (player) => player.getRotation().arcane?.arcaneBlastsBetweenFillers || 3,
+                getValue: (player) => player.getRotation().arcane?.arcaneBlastsBetweenFillers || 0,
                 setValue: (eventID, player, newValue) => {
                     const newRotation = player.getRotation();
                     if (!newRotation.arcane) {
@@ -250,7 +250,7 @@ export const MageRotationConfig = {
                 label: 'Start regen rotation at mana %',
                 labelTooltip: 'Percent of mana pool, below which the regen rotation should be used (alternate fillers and a few ABs).',
                 changedEvent: (player) => player.rotationChangeEmitter,
-                getValue: (player) => (player.getRotation().arcane?.startRegenRotationPercent || 0.2) * 100,
+                getValue: (player) => (player.getRotation().arcane?.startRegenRotationPercent || 0) * 100,
                 setValue: (eventID, player, newValue) => {
                     const newRotation = player.getRotation();
                     if (!newRotation.arcane) {
@@ -270,7 +270,7 @@ export const MageRotationConfig = {
                 label: 'Stop regen rotation at mana %',
                 labelTooltip: 'Percent of mana pool, above which will go back to AB spam.',
                 changedEvent: (player) => player.rotationChangeEmitter,
-                getValue: (player) => (player.getRotation().arcane?.stopRegenRotationPercent || 0.3) * 100,
+                getValue: (player) => (player.getRotation().arcane?.stopRegenRotationPercent || 0) * 100,
                 setValue: (eventID, player, newValue) => {
                     const newRotation = player.getRotation();
                     if (!newRotation.arcane) {
