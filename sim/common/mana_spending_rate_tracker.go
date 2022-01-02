@@ -11,7 +11,7 @@ const manaTrackingWindowSeconds = 60
 const manaTrackingWindow = time.Second * manaTrackingWindowSeconds
 
 // 2 * (# of seconds) should be plenty of slots
-const manaSnapshotsBufferSize = manaTrackingWindowSeconds * 5
+const manaSnapshotsBufferSize = manaTrackingWindowSeconds * 2
 
 // Tracks how fast mana is being spent. This is used by some specs to decide
 // whether to use more mana-efficient or higher-dps spells.
@@ -89,7 +89,6 @@ func (tracker *ManaSpendingRateTracker) Update(sim *core.Simulation, character *
 		manaSpentDelta:  (manaSpent - tracker.previousManaSpent) * manaDeltaCoefficient,
 		manaGainedDelta: (manaGained - tracker.previousManaGained) * manaDeltaCoefficient / character.PseudoStats.SpiritRegenMultiplier,
 	}
-
 	//if sim.Log != nil {
 	//	character.Log(sim, "Init speed: %0.02f, prev cast speed: %0.02f, Mana gained: %0.02f, Mana gained delta: %0.02f", character.InitialCastSpeed(), tracker.previousCastSpeed, snapshot.manaGained, snapshot.manaGainedDelta)
 	//}

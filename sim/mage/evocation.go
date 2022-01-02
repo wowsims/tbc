@@ -24,9 +24,23 @@ func (mage *Mage) registerEvocationCD() {
 			return true
 		},
 		ShouldActivate: func(sim *core.Simulation, character *core.Character) bool {
-			if character.CurrentMana() > manaThreshold {
+			if character.HasAura(core.InnervateAuraID) || character.HasAura(core.ManaTideTotemAuraID) {
 				return false
 			}
+
+			curMana := character.CurrentMana()
+			if curMana > manaThreshold {
+				return false
+			}
+
+			if character.HasAura(core.BloodlustAuraID) && curMana > manaThreshold/2 {
+				return false
+			}
+
+			if mage.isBlastSpamming {
+				return false
+			}
+
 			return true
 		},
 		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
@@ -42,7 +56,7 @@ func (mage *Mage) registerEvocationCD() {
 
 			baseDuration := time.Duration(numTicks) * time.Second * 2
 			totalAmount := float64(numTicks) * mage.MaxMana() * 0.15
-			manaThreshold = float64(numTicks) * mage.MaxMana() * 0.15
+			manaThreshold = mage.MaxMana() * 0.2
 
 			return func(sim *core.Simulation, character *core.Character) {
 				duration := time.Duration(float64(baseDuration) / character.CastSpeed())

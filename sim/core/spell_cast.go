@@ -84,14 +84,10 @@ func (spellEffect *SpellEffect) beforeCalculations(sim *Simulation, spellCast *S
 	spellCast.Character.OnBeforeSpellHit(sim, spellCast, spellEffect)
 	spellEffect.Target.OnBeforeSpellHit(sim, spellCast, spellEffect)
 
-	spellEffect.calculateHit(sim, spellCast)
+	spellEffect.Hit = spellEffect.IgnoreHitCheck || spellEffect.hitCheck(sim, spellCast)
 }
 
-func (spellEffect *SpellEffect) afterCalculations(sim *Simulation, spellCast *SpellCast) {
-	if sim.Log != nil {
-		spellCast.Character.Log(sim, "%s result: %s", spellCast.Name, spellEffect)
-	}
-
+func (spellEffect *SpellEffect) triggerSpellProcs(sim *Simulation, spellCast *SpellCast) {
 	if spellEffect.Hit {
 		if spellEffect.OnSpellHit != nil {
 			spellEffect.OnSpellHit(sim, spellCast, spellEffect)
@@ -107,17 +103,26 @@ func (spellEffect *SpellEffect) afterCalculations(sim *Simulation, spellCast *Sp
 	}
 }
 
-// Calculates whether this spell 'hit' and updates the effect field with the result.
-func (spellEffect *SpellEffect) calculateHit(sim *Simulation, spellCast *SpellCast) {
-	if spellEffect.IgnoreHitCheck {
-		spellEffect.Hit = true
-		return
+func (spellEffect *SpellEffect) afterCalculations(sim *Simulation, spellCast *SpellCast) {
+	if sim.Log != nil && !spellEffect.IgnoreHitCheck {
+		spellCast.Character.Log(sim, "%s result: %s", spellCast.Name, spellEffect)
 	}
 
+	spellEffect.triggerSpellProcs(sim, spellCast)
+}
+
+// Calculates a hit check using the stats from this spell.
+func (spellEffect *SpellEffect) hitCheck(sim *Simulation, spellCast *SpellCast) bool {
 	hit := 0.83 + (spellCast.Character.GetStat(stats.SpellHit)+spellEffect.BonusSpellHitRating)/(SpellHitRatingPerHitChance*100)
 	hit = MinFloat(hit, 0.99) // can't get away from the 1% miss
 
-	spellEffect.Hit = sim.RandomFloat("SpellCast Hit") < hit
+	return sim.RandomFloat("SpellCast Hit") < hit
+}
+
+// Calculates a crit check using the stats from this spell.
+func (spellEffect *SpellEffect) critCheck(sim *Simulation, spellCast *SpellCast) bool {
+	critChance := (spellCast.Character.GetStat(stats.SpellCrit) + spellCast.BonusCritRating + spellEffect.BonusSpellCritRating) / (SpellCritRatingPerCritChance * 100)
+	return sim.RandomFloat("DirectSpell Crit") < critChance
 }
 
 func (spellEffect *SpellEffect) applyResultsToCast(spellCast *SpellCast) {
@@ -141,6 +146,32 @@ func (spellEffect *SpellEffect) applyResultsToCast(spellCast *SpellCast) {
 	spellCast.TotalDamage += spellEffect.Damage
 }
 
+// Only applies the results from the ticks, not the initial dot application.
+// This is used for spells like Arcane Missiles or Magma Totem, where the initial
+// cast always hits and we just care about the dot itself.
+func (spellEffect *SpellEffect) applyDotTickResultsToCast(spellCast *SpellCast, hit bool, crit bool, resistMultiplier float64, damage float64) {
+	spellEffect.Hit = hit
+	spellEffect.Crit = crit
+	if hit {
+		spellCast.Hits++
+		if crit {
+			spellCast.Crits++
+		}
+	} else {
+		spellCast.Misses++
+	}
+
+	if resistMultiplier == 0.75 {
+		spellCast.PartialResists_1_4++
+	} else if resistMultiplier == 0.5 {
+		spellCast.PartialResists_2_4++
+	} else if resistMultiplier == 0.25 {
+		spellCast.PartialResists_3_4++
+	}
+
+	spellCast.TotalDamage += damage
+}
+
 func (spellEffect *SpellEffect) calculateDirectDamage(sim *Simulation, spellCast *SpellCast, ddInput *DirectDamageInput) {
 	baseDamage := ddInput.MinBaseDamage + sim.RandomFloat("DirectSpell Base Damage")*(ddInput.MaxBaseDamage-ddInput.MinBaseDamage)
 
@@ -151,8 +182,7 @@ func (spellEffect *SpellEffect) calculateDirectDamage(sim *Simulation, spellCast
 
 	damage *= spellEffect.DamageMultiplier * spellEffect.StaticDamageMultiplier
 
-	crit := (spellCast.Character.GetStat(stats.SpellCrit) + spellCast.BonusCritRating + spellEffect.BonusSpellCritRating) / (SpellCritRatingPerCritChance * 100)
-	if sim.RandomFloat("DirectSpell Crit") < crit {
+	if spellEffect.critCheck(sim, spellCast) {
 		spellEffect.Crit = true
 		damage *= spellCast.CritMultiplier
 	}
@@ -190,15 +220,35 @@ func (spellEffect *SpellEffect) applyDot(sim *Simulation, spellCast *SpellCast, 
 			damage = ddInput.damagePerTick
 		}
 
-		resistMultiplier := 0.0
-		if !spellCast.Binary {
-			damage, resistMultiplier = calculateResists(sim, damage, spellEffect)
+		hit := !ddInput.TicksCanMissAndCrit || spellEffect.hitCheck(sim, spellCast)
+		crit := false
+		resistMultiplier := 1.0
+
+		if hit {
+			if ddInput.TicksCanMissAndCrit && spellEffect.critCheck(sim, spellCast) {
+				crit = true
+				damage *= spellCast.CritMultiplier
+			}
+
+			if !spellCast.Binary {
+				damage, resistMultiplier = calculateResists(sim, damage, spellEffect)
+			}
+		} else {
+			damage = 0
 		}
 
 		if sim.Log != nil {
-			spellCast.Character.Log(sim, "%s %s.", spellCast.Name, spellEffect.DotResultToString(damage, resistMultiplier))
+			spellCast.Character.Log(sim, "%s %s.", spellCast.Name, spellEffect.DotResultToString(damage, hit, crit, resistMultiplier))
 		}
 		spellEffect.Damage += damage
+
+		if ddInput.TicksCanMissAndCrit {
+			spellEffect.applyDotTickResultsToCast(spellCast, hit, crit, resistMultiplier, damage)
+		}
+
+		if ddInput.TicksProcSpellHitEffects {
+			spellEffect.triggerSpellProcs(sim, spellCast)
+		}
 
 		spellCast.Character.OnPeriodicDamage(sim, spellCast, spellEffect, damage)
 		spellEffect.Target.OnPeriodicDamage(sim, spellCast, spellEffect, damage)
@@ -222,7 +272,9 @@ func (spellEffect *SpellEffect) applyDot(sim *Simulation, spellCast *SpellCast, 
 		ddInput.currentDotAction = nil
 
 		// Complete metrics and adding results etc
-		spellEffect.applyResultsToCast(spellCast)
+		if !ddInput.TicksCanMissAndCrit { // If false, results were already applied in applyDot().
+			spellEffect.applyResultsToCast(spellCast)
+		}
 		spellCast.Character.Metrics.AddSpellCast(spellCast)
 
 		// Clean up the dot object.
@@ -264,7 +316,11 @@ func (spellEffect *SpellEffect) String() string {
 	return sb.String()
 }
 
-func (spellEffect *SpellEffect) DotResultToString(damage float64, resistMultiplier float64) string {
+func (spellEffect *SpellEffect) DotResultToString(damage float64, hit bool, crit bool, resistMultiplier float64) string {
+	if !hit {
+		return "tick Missed"
+	}
+
 	var sb strings.Builder
 
 	fmt.Fprintf(&sb, "ticked for %0.2f damage", damage)
@@ -275,6 +331,10 @@ func (spellEffect *SpellEffect) DotResultToString(damage float64, resistMultipli
 		sb.WriteString(" (50% Resist)")
 	} else if resistMultiplier == 0.25 {
 		sb.WriteString(" (75% Resist)")
+	}
+
+	if crit {
+		sb.WriteString(" (Crit)")
 	}
 
 	return sb.String()
