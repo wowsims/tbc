@@ -56,9 +56,26 @@ func (party *Party) AddStat(stat stats.Stat, amount float64) {
 	}
 }
 
+func (party *Party) reset(sim *Simulation) {
+	for _, agent := range party.Players {
+		agent.GetCharacter().reset(sim)
+		agent.Reset(sim)
+
+		sim.AddPendingAction(sim.newDefaultAgentAction(agent))
+		for _, petAgent := range agent.GetCharacter().Pets {
+			if petAgent.GetPet().initialEnabled {
+				petAgent.GetPet().Enable(sim, petAgent)
+			}
+		}
+	}
+
+	party.dpsMetrics.reset()
+}
+
 func (party *Party) doneIteration(simDuration time.Duration) {
 	for _, agent := range party.Players {
 		agent.GetCharacter().doneIteration(simDuration)
+		party.dpsMetrics.TotalDamage += agent.GetCharacter().Metrics.TotalDamage
 	}
 
 	party.dpsMetrics.doneIteration(simDuration.Seconds())
@@ -210,18 +227,17 @@ func (raid Raid) GetPlayerFromRaidTarget(raidTarget proto.RaidTarget) Agent {
 	return party.Players[playerIndex]
 }
 
-func (raid *Raid) doneIteration(simDuration time.Duration) {
-	// This needs to happen before the doneIteration calls because they reset
-	// the iteration damage.
+func (raid *Raid) reset(sim *Simulation) {
 	for _, party := range raid.Parties {
-		for _, player := range party.Players {
-			party.dpsMetrics.TotalDamage += player.GetCharacter().Metrics.TotalDamage
-		}
-		raid.dpsMetrics.TotalDamage += party.dpsMetrics.TotalDamage
+		party.reset(sim)
 	}
+	raid.dpsMetrics.reset()
+}
 
+func (raid *Raid) doneIteration(simDuration time.Duration) {
 	for _, party := range raid.Parties {
 		party.doneIteration(simDuration)
+		raid.dpsMetrics.TotalDamage += party.dpsMetrics.TotalDamage
 	}
 
 	raid.dpsMetrics.doneIteration(simDuration.Seconds())

@@ -205,6 +205,7 @@ export class MageSimUI extends IndividualSimUI<Spec.SpecMage> {
 					Presets.ArcaneTalents,
 					Presets.FireTalents,
 					Presets.FrostTalents,
+					Presets.DeepFrostTalents,
 				],
 				// Preset gear configurations that the user can quickly select.
 				gear: [

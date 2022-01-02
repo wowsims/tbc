@@ -102,17 +102,17 @@ export const MageRotationConfig = {
 					if (newRotation.type == RotationType.Arcane) {
 						simUI.player.setTalentsString(eventID, Presets.ArcaneTalents.data);
 						if (!newRotation.arcane) {
-							newRotation.arcane = ArcaneRotation.create();
+							newRotation.arcane = ArcaneRotation.clone(Presets.DefaultArcaneRotation.arcane!);
 						}
 					} else if (newRotation.type == RotationType.Fire) {
 						simUI.player.setTalentsString(eventID, Presets.FireTalents.data);
 						if (!newRotation.fire) {
-							newRotation.fire = FireRotation.create();
+							newRotation.fire = FireRotation.clone(Presets.DefaultFireRotation.fire!);
 						}
 					} else {
 						simUI.player.setTalentsString(eventID, Presets.FrostTalents.data);
 						if (!newRotation.frost) {
-							newRotation.frost = FrostRotation.create();
+							newRotation.frost = FrostRotation.clone(Presets.DefaultFrostRotation.frost!);
 						}
 					}
 
@@ -145,7 +145,7 @@ export const MageRotationConfig = {
 				setValue: (eventID: EventID, player: Player<Spec.SpecMage>, newValue: number) => {
 					const newRotation = player.getRotation();
 					if (!newRotation.fire) {
-						newRotation.fire = FireRotation.create();
+						newRotation.fire = FireRotation.clone(Presets.DefaultFireRotation.fire!);
 					}
 					newRotation.fire.primarySpell = newValue;
 					player.setRotation(eventID, newRotation);
@@ -165,7 +165,7 @@ export const MageRotationConfig = {
 				setValue: (eventID: EventID, player: Player<Spec.SpecMage>, newValue: boolean) => {
 					const newRotation = player.getRotation();
 					if (!newRotation.fire) {
-						newRotation.fire = FireRotation.create();
+						newRotation.fire = FireRotation.clone(Presets.DefaultFireRotation.fire!);
 					}
 					newRotation.fire.maintainImprovedScorch = newValue;
 					player.setRotation(eventID, newRotation);
@@ -185,12 +185,36 @@ export const MageRotationConfig = {
 				setValue: (eventID: EventID, player: Player<Spec.SpecMage>, newValue: boolean) => {
 					const newRotation = player.getRotation();
 					if (!newRotation.fire) {
-						newRotation.fire = FireRotation.create();
+						newRotation.fire = FireRotation.clone(Presets.DefaultFireRotation.fire!);
 					}
 					newRotation.fire.weaveFireBlast = newValue;
 					player.setRotation(eventID, newRotation);
 				},
 				showWhen: (player: Player<Spec.SpecMage>) => player.getRotation().type == RotationType.Fire,
+			},
+		},
+		// ********************************************************
+		//                       FROST INPUTS
+		// ********************************************************
+		{
+			type: 'number' as const,
+			cssClass: 'water-elemental-disobey-chance-picker',
+			getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
+			config: {
+				label: 'Water Ele Disobey %',
+				labelTooltip: 'Percent of Water Elemental actions which will fail. This represents the Water Elemental moving around or standing still instead of casting.',
+				changedEvent: (player: Player<Spec.SpecMage>) => TypedEvent.onAny([player.rotationChangeEmitter, player.talentsChangeEmitter]),
+				getValue: (player: Player<Spec.SpecMage>) => (player.getRotation().frost?.waterElementalDisobeyChance || 0) * 100,
+				setValue: (eventID: EventID, player: Player<Spec.SpecMage>, newValue: number) => {
+					const newRotation = player.getRotation();
+					if (!newRotation.frost) {
+						newRotation.frost = FrostRotation.clone(Presets.DefaultFrostRotation.frost!);
+					}
+					newRotation.frost.waterElementalDisobeyChance = newValue / 100;
+					player.setRotation(eventID, newRotation);
+				},
+				showWhen: (player: Player<Spec.SpecMage>) => player.getRotation().type == RotationType.Frost,
+				enableWhen: (player: Player<Spec.SpecMage>) => player.getTalents().summonWaterElemental,
 			},
 		},
 		// ********************************************************
@@ -233,7 +257,7 @@ export const MageRotationConfig = {
 				setValue: (eventID: EventID, player: Player<Spec.SpecMage>, newValue: number) => {
 					const newRotation = player.getRotation();
 					if (!newRotation.arcane) {
-						newRotation.arcane = ArcaneRotation.create();
+						newRotation.arcane = ArcaneRotation.clone(Presets.DefaultArcaneRotation.arcane!);
 					}
 					newRotation.arcane.filler = newValue;
 					player.setRotation(eventID, newRotation);
@@ -253,7 +277,7 @@ export const MageRotationConfig = {
 				setValue: (eventID: EventID, player: Player<Spec.SpecMage>, newValue: number) => {
 					const newRotation = player.getRotation();
 					if (!newRotation.arcane) {
-						newRotation.arcane = ArcaneRotation.create();
+						newRotation.arcane = ArcaneRotation.clone(Presets.DefaultArcaneRotation.arcane!);
 					}
 					newRotation.arcane.arcaneBlastsBetweenFillers = newValue;
 					player.setRotation(eventID, newRotation);
@@ -273,7 +297,7 @@ export const MageRotationConfig = {
 				setValue: (eventID: EventID, player: Player<Spec.SpecMage>, newValue: number) => {
 					const newRotation = player.getRotation();
 					if (!newRotation.arcane) {
-						newRotation.arcane = ArcaneRotation.create();
+						newRotation.arcane = ArcaneRotation.clone(Presets.DefaultArcaneRotation.arcane!);
 					}
 					newRotation.arcane.startRegenRotationPercent = newValue / 100;
 					player.setRotation(eventID, newRotation);
@@ -293,7 +317,7 @@ export const MageRotationConfig = {
 				setValue: (eventID: EventID, player: Player<Spec.SpecMage>, newValue: number) => {
 					const newRotation = player.getRotation();
 					if (!newRotation.arcane) {
-						newRotation.arcane = ArcaneRotation.create();
+						newRotation.arcane = ArcaneRotation.clone(Presets.DefaultArcaneRotation.arcane!);
 					}
 					newRotation.arcane.stopRegenRotationPercent = newValue / 100;
 					player.setRotation(eventID, newRotation);

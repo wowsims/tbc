@@ -225,6 +225,11 @@ func (at *auraTracker) reset(sim *Simulation) {
 
 	at.auraIDsToRemove = []AuraID{}
 
+	for i, _ := range at.metrics {
+		auraMetric := &at.metrics[i]
+		auraMetric.reset()
+	}
+
 	for _, permAura := range at.permanentAuras {
 		aura := permAura(sim)
 		aura.Expires = NeverExpires

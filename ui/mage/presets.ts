@@ -33,6 +33,10 @@ export const FrostTalents = {
 	name: 'Frost',
 	data: '2500250300030150330125--053500031003001',
 };
+export const DeepFrostTalents = {
+	name: 'Deep Frost',
+	data: '230015031003--0535000310230012241551',
+};
 
 export const DefaultFireRotation = MageRotation.create({
 	type: RotationType.Fire,
@@ -52,6 +56,13 @@ export const DefaultFireConsumes = Consumes.create({
 	flaskOfPureDeath: true,
 	brilliantWizardOil: true,
 	blackenedBasilisk: true,
+});
+
+export const DefaultFrostRotation = MageRotation.create({
+	type: RotationType.Frost,
+	frost: FrostRotation.create({
+		waterElementalDisobeyChance: 0.1,
+	}),
 });
 
 export const DefaultArcaneRotation = MageRotation.create({

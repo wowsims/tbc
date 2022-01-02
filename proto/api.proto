@@ -126,6 +126,8 @@ message PlayerMetrics {
 
     repeated ActionMetrics actions = 5;
 		repeated AuraMetrics auras = 6;
+
+		repeated PlayerMetrics pets = 7;
 }
 
 // Results for a whole raid.
