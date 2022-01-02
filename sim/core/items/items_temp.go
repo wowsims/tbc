@@ -9,6 +9,7 @@ import (
 
 var Gems = []Gem{
 	{ID: 34220, Name: "Chaotic Skyfire Diamond", Quality: proto.ItemQuality_ItemQualityRare, Phase: 1, Color: proto.GemColor_GemColorMeta, Stats: stats.Stats{stats.SpellCrit: 12}},
+	{ID: 32409, Name: "Relentless Earthstorm Diamond", Quality: proto.ItemQuality_ItemQualityRare, Phase: 1, Color: proto.GemColor_GemColorMeta, Stats: stats.Stats{stats.Agility: 12}},
 	{ID: 25897, Name: "Bracing Earthstorm Diamond", Quality: proto.ItemQuality_ItemQualityRare, Phase: 1, Color: proto.GemColor_GemColorMeta, Stats: stats.Stats{stats.SpellPower: 14}},
 	{ID: 32641, Name: "Imbued Unstable Diamond", Quality: proto.ItemQuality_ItemQualityRare, Phase: 1, Color: proto.GemColor_GemColorMeta, Stats: stats.Stats{stats.SpellPower: 14}},
 	{ID: 35503, Name: "Ember Skyfire Diamond", Quality: proto.ItemQuality_ItemQualityRare, Phase: 1, Color: proto.GemColor_GemColorMeta, Stats: stats.Stats{stats.SpellPower: 14}},
@@ -53,6 +54,9 @@ var Gems = []Gem{
 	{ID: 31116, Name: "Infused Amethyst", Quality: proto.ItemQuality_ItemQualityEpic, Phase: 1, Color: proto.GemColor_GemColorPurple, Stats: stats.Stats{stats.SpellPower: 6, stats.Stamina: 6}, Unique: true},
 	{ID: 30600, Name: "Fluorescent Tanzanite", Quality: proto.ItemQuality_ItemQualityEpic, Phase: 1, Color: proto.GemColor_GemColorPurple, Stats: stats.Stats{stats.SpellPower: 6, stats.Spirit: 4}, Unique: true},
 	{ID: 30605, Name: "Vivid Chrysoprase", Quality: proto.ItemQuality_ItemQualityEpic, Phase: 1, Color: proto.GemColor_GemColorGreen, Stats: stats.Stats{stats.SpellHit: 5, stats.Stamina: 6}, Unique: true},
+	{ID: 24027, Name: "Bold Living Ruby", Quality: proto.ItemQuality_ItemQualityRare, Phase: 1, Color: proto.GemColor_GemColorRed, Stats: stats.Stats{stats.Strength: 8}},
+	{ID: 24058, Name: "Inscribed Noble Topaz", Quality: proto.ItemQuality_ItemQualityRare, Phase: 1, Color: proto.GemColor_GemColorOrange, Stats: stats.Stats{stats.MeleeCrit: 4, stats.Strength: 4}},
+	{ID: 24054, Name: "Sovereign Nightseye", Quality: proto.ItemQuality_ItemQualityRare, Phase: 1, Color: proto.GemColor_GemColorPurple, Stats: stats.Stats{stats.Strength: 4, stats.Stamina: 6}},
 }
 
 var Enchants = []Enchant{
@@ -79,4 +83,12 @@ var Enchants = []Enchant{
 	{ID: 35297, EffectID: 2940, Name: "Enchant Boots - Boar's Speed", Quality: proto.ItemQuality_ItemQualityRare, Bonus: stats.Stats{stats.Stamina: 9}, ItemType: proto.ItemType_ItemTypeFeet},
 	{ID: 35298, EffectID: 2656, Name: "Enchant Boots - Vitality", Quality: proto.ItemQuality_ItemQualityUncommon, Bonus: stats.Stats{stats.MP5: 4}, ItemType: proto.ItemType_ItemTypeFeet},
 	{ID: 33150, EffectID: 2621, Name: "Enchant Cloak - Subtlety", Quality: proto.ItemQuality_ItemQualityRare, Bonus: stats.Stats{}, ItemType: proto.ItemType_ItemTypeBack},
+
+	{ID: 29192, EffectID: 3003, Name: "Glyph of Ferocity", Quality: proto.ItemQuality_ItemQualityUncommon, Bonus: stats.Stats{stats.AttackPower: 34, stats.MeleeHit: 16}, ItemType: proto.ItemType_ItemTypeHead},
+	{ID: 28888, EffectID: 2986, Name: "Greater Inscription of Vengeance", Quality: proto.ItemQuality_ItemQualityRare, Bonus: stats.Stats{stats.AttackPower: 30, stats.MeleeCrit: 10}, ItemType: proto.ItemType_ItemTypeShoulder},
+	{ID: 29535, EffectID: 3012, Name: "Nethercobra Leg Armor", Quality: proto.ItemQuality_ItemQualityEpic, Bonus: stats.Stats{stats.AttackPower: 50, stats.MeleeCrit: 12}, ItemType: proto.ItemType_ItemTypeLegs},
+	{ID: 27899, EffectID: 2647, Name: "Bracer - Brawn", IsSpellID: true, Quality: proto.ItemQuality_ItemQualityUncommon, Bonus: stats.Stats{stats.Strength: 12}, ItemType: proto.ItemType_ItemTypeWrist},
+	{ID: 33995, EffectID: 684, Name: "Gloves - Major Strength", IsSpellID: true, Quality: proto.ItemQuality_ItemQualityUncommon, Bonus: stats.Stats{stats.Strength: 15}, ItemType: proto.ItemType_ItemTypeHands},
+	{ID: 28279, EffectID: 2939, Name: "Enchant Boots - Cat's Swiftness", Quality: proto.ItemQuality_ItemQualityRare, Bonus: stats.Stats{stats.Agility: 6}, ItemType: proto.ItemType_ItemTypeFeet},
+	{ID: 22559, EffectID: 2673, Name: "Weapon - Mongoose", Quality: proto.ItemQuality_ItemQualityRare, Bonus: stats.Stats{}, ItemType: proto.ItemType_ItemTypeWeapon},
 }
