@@ -34,7 +34,7 @@ func TestSimulatePhase2(t *testing.T) {
 
 		// these numbers will change while we are still implementing and fixing up enh shaman and melee
 		ExpectedDpsShort: 728.1,
-		ExpectedDpsLong:  524.9,
+		ExpectedDpsLong:  535.5,
 	})
 }
 

@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
+	"github.com/wowsims/tbc/sim/core/proto"
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
@@ -11,6 +12,8 @@ func (mage *Mage) applyTalents() {
 	mage.applyArcaneConcentration()
 	mage.applyIgnite()
 	mage.applyMasterOfElements()
+	mage.applyWintersChill()
+	mage.applyMoltenFury()
 	mage.registerPresenceOfMindCD()
 	mage.registerCombustionCD()
 	mage.registerIcyVeinsCD()
@@ -48,8 +51,6 @@ func (mage *Mage) applyTalents() {
 	if mage.Talents.PlayingWithFire > 0 {
 		mage.spellDamageMultiplier += float64(mage.Talents.PlayingWithFire) * 0.01
 	}
-
-	// TODO: Molten Fury
 }
 
 var ArcaneConcentrationAuraID = core.NewAuraID()
@@ -69,6 +70,11 @@ func (mage *Mage) applyArcaneConcentration() {
 		return core.Aura{
 			ID: ArcaneConcentrationAuraID,
 			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+				if spellCast.IsSpellAction(SpellIDArcaneMissiles) {
+					// AM shouldn't proc clearcasting.
+					return
+				}
+
 				// TODO: This should only get 1 roll for each aoe cast.
 				if icd.IsOnCD(sim) || sim.RandomFloat("Arcane Concentration") > procChance {
 					return
@@ -92,7 +98,6 @@ func (mage *Mage) applyArcaneConcentration() {
 	})
 }
 
-var PresenceOfMindAuraID = core.NewAuraID()
 var PresenceOfMindCooldownID = core.NewCooldownID()
 
 func (mage *Mage) registerPresenceOfMindCD() {
@@ -105,29 +110,42 @@ func (mage *Mage) registerPresenceOfMindCD() {
 		cooldown -= time.Second * 24
 	}
 
+	var spell *core.SimpleSpell
+
 	mage.AddMajorCooldown(core.MajorCooldown{
+		ActionID:   core.ActionID{SpellID: 12043},
 		CooldownID: PresenceOfMindCooldownID,
 		Cooldown:   cooldown,
-		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
-			return func(sim *core.Simulation, character *core.Character) bool {
-				character.Metrics.AddInstantCast(core.ActionID{SpellID: 12043})
+		CanActivate: func(sim *core.Simulation, character *core.Character) bool {
+			if character.IsOnCD(core.GCDCooldownID, sim.CurrentTime) {
+				return false
+			}
 
-				character.AddAura(sim, core.Aura{
-					ID:      PresenceOfMindAuraID,
-					SpellID: 12043,
-					Name:    "Presence of Mind",
-					Expires: core.NeverExpires,
-					OnCast: func(sim *core.Simulation, cast *core.Cast) {
-						cast.CastTime = 0
-					},
-					OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
-						// Remove the buff and put skill on CD
-						character.SetCD(PresenceOfMindCooldownID, sim.CurrentTime+cooldown)
-						character.RemoveAura(sim, PresenceOfMindAuraID)
-						character.UpdateMajorCooldowns(sim)
-					},
-				})
-				return true
+			target := sim.GetPrimaryTarget()
+			if mage.Talents.Pyroblast {
+				spell = mage.NewPyroblast(sim, target)
+			} else if mage.RotationType == proto.Mage_Rotation_Fire {
+				spell = mage.NewFireball(sim, target)
+			} else {
+				spell = mage.NewFrostbolt(sim, target)
+			}
+
+			if character.CurrentMana() < spell.ManaCost {
+				spell.Cancel(sim)
+				return false
+			}
+
+			return true
+		},
+		ShouldActivate: func(sim *core.Simulation, character *core.Character) bool {
+			return true
+		},
+		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
+			return func(sim *core.Simulation, character *core.Character) {
+				spell.CastTime = 0
+				spell.Cast(sim)
+				character.Metrics.AddInstantCast(core.ActionID{SpellID: 12043})
+				character.SetCD(PresenceOfMindCooldownID, sim.CurrentTime+cooldown)
 			}
 		},
 	})
@@ -142,10 +160,17 @@ func (mage *Mage) registerArcanePowerCD() {
 	}
 
 	mage.AddMajorCooldown(core.MajorCooldown{
+		ActionID:   core.ActionID{SpellID: 12042},
 		CooldownID: ArcanePowerCooldownID,
 		Cooldown:   time.Minute * 3,
+		CanActivate: func(sim *core.Simulation, character *core.Character) bool {
+			return true
+		},
+		ShouldActivate: func(sim *core.Simulation, character *core.Character) bool {
+			return true
+		},
 		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
-			return func(sim *core.Simulation, character *core.Character) bool {
+			return func(sim *core.Simulation, character *core.Character) {
 				character.Metrics.AddInstantCast(core.ActionID{SpellID: 12042})
 
 				character.AddAura(sim, core.Aura{
@@ -164,33 +189,8 @@ func (mage *Mage) registerArcanePowerCD() {
 					},
 				})
 				mage.SetCD(ArcanePowerCooldownID, sim.CurrentTime+time.Minute*3)
-				return true
 			}
 		},
-	})
-}
-
-var IgniteAuraID = core.NewAuraID()
-
-func (mage *Mage) applyIgnite() {
-	if mage.Talents.Ignite == 0 {
-		return
-	}
-
-	//coeff := 0.08 * float64(mage.Talents.Ignite)
-
-	mage.AddPermanentAura(func(sim *core.Simulation) core.Aura {
-		return core.Aura{
-			ID: IgniteAuraID,
-			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-				if !spellEffect.Crit {
-					return
-				}
-
-				//igniteDamage := spellEffect.Damage * coeff
-				// TODO
-			},
-		}
 	})
 }
 
@@ -224,10 +224,20 @@ func (mage *Mage) registerCombustionCD() {
 	}
 
 	mage.AddMajorCooldown(core.MajorCooldown{
+		ActionID:   core.ActionID{SpellID: 11129},
 		CooldownID: CombustionCooldownID,
 		Cooldown:   time.Minute * 3,
+		CanActivate: func(sim *core.Simulation, character *core.Character) bool {
+			if character.HasAura(CombustionAuraID) {
+				return false
+			}
+			return true
+		},
+		ShouldActivate: func(sim *core.Simulation, character *core.Character) bool {
+			return true
+		},
 		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
-			return func(sim *core.Simulation, character *core.Character) bool {
+			return func(sim *core.Simulation, character *core.Character) {
 				character.Metrics.AddInstantCast(core.ActionID{SpellID: 11129})
 
 				numHits := 0
@@ -246,14 +256,13 @@ func (mage *Mage) registerCombustionCD() {
 						if spellEffect.Crit {
 							numCrits++
 							if numCrits == 3 {
-								character.RemoveAura(sim, CombustionAuraID)
+								character.RemoveAuraOnNextAdvance(sim, CombustionAuraID)
 								character.SetCD(CombustionCooldownID, sim.CurrentTime+time.Minute*3)
-								character.UpdateMajorCooldowns(sim)
+								character.UpdateMajorCooldowns()
 							}
 						}
 					},
 				})
-				return true
 			}
 		},
 	})
@@ -267,24 +276,33 @@ func (mage *Mage) registerIcyVeinsCD() {
 		return
 	}
 
+	manaCost := 0.0
+
 	mage.AddMajorCooldown(core.MajorCooldown{
+		ActionID:   core.ActionID{SpellID: 12472},
 		CooldownID: IcyVeinsCooldownID,
 		Cooldown:   time.Minute * 3,
+		CanActivate: func(sim *core.Simulation, character *core.Character) bool {
+			// Need to check for icy veins already active in case Cold Snap is used right after.
+			if character.HasAura(IcyVeinsAuraID) {
+				return false
+			}
+
+			if character.CurrentMana() < manaCost {
+				return false
+			}
+
+			return true
+		},
+		ShouldActivate: func(sim *core.Simulation, character *core.Character) bool {
+			return true
+		},
 		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
 			const bonus = 1.2
 			const inverseBonus = 1 / bonus
-			manaCost := mage.BaseMana() * 0.03
+			manaCost = mage.BaseMana() * 0.03
 
-			return func(sim *core.Simulation, character *core.Character) bool {
-				if character.CurrentMana() < manaCost {
-					return false
-				}
-
-				// Need to check for icy veins already active in case Cold Snap is used right after.
-				if character.HasAura(IcyVeinsAuraID) {
-					return false
-				}
-
+			return func(sim *core.Simulation, character *core.Character) {
 				character.PseudoStats.CastSpeedMultiplier *= bonus
 
 				character.AddAura(sim, core.Aura{
@@ -299,7 +317,6 @@ func (mage *Mage) registerIcyVeinsCD() {
 				character.SpendMana(sim, manaCost, "Icy Veins")
 				character.Metrics.AddInstantCast(core.ActionID{SpellID: 12472})
 				character.SetCD(IcyVeinsCooldownID, sim.CurrentTime+time.Minute*3)
-				return true
 			}
 		},
 	})
@@ -315,21 +332,53 @@ func (mage *Mage) registerColdSnapCD() {
 	cooldown := time.Duration(float64(time.Minute*8) * (1.0 - float64(mage.Talents.IceFloes)*0.1))
 
 	mage.AddMajorCooldown(core.MajorCooldown{
+		ActionID:   core.ActionID{SpellID: 11958},
 		CooldownID: ColdSnapCooldownID,
 		Cooldown:   cooldown,
+		CanActivate: func(sim *core.Simulation, character *core.Character) bool {
+			// Don't use if there are no cooldowns to reset.
+			if character.GetRemainingCD(IcyVeinsCooldownID, sim.CurrentTime) == 0 {
+				return false
+			}
+			return true
+		},
+		ShouldActivate: func(sim *core.Simulation, character *core.Character) bool {
+			return true
+		},
 		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
-			return func(sim *core.Simulation, character *core.Character) bool {
-				if character.GetRemainingCD(IcyVeinsCooldownID, sim.CurrentTime) == 0 {
-					return false
-				}
-
+			return func(sim *core.Simulation, character *core.Character) {
 				character.SetCD(IcyVeinsCooldownID, 0)
 				// TODO: Also reset water ele
 
 				character.Metrics.AddInstantCast(core.ActionID{SpellID: 11958})
 				character.SetCD(ColdSnapCooldownID, sim.CurrentTime+cooldown)
-				return true
 			}
 		},
+	})
+}
+
+var MoltenFuryAuraID = core.NewAuraID()
+
+func (mage *Mage) applyMoltenFury() {
+	if mage.Talents.MoltenFury == 0 {
+		return
+	}
+
+	multiplier := 1.0 + 0.1*float64(mage.Talents.MoltenFury)
+
+	mage.AddPermanentAura(func(sim *core.Simulation) core.Aura {
+		return core.Aura{
+			ID: MoltenFuryAuraID,
+			OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+				if sim.IsExecutePhase() {
+					spellEffect.DamageMultiplier *= multiplier
+				}
+			},
+			OnBeforePeriodicDamage: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect, tickDamage *float64) {
+				if sim.IsExecutePhase() {
+					*tickDamage *= multiplier
+				}
+			},
+		}
 	})
 }

@@ -86,10 +86,10 @@ func TestCalcStatWeight(t *testing.T) {
 	}
 
 	core.StatWeightsTest("p1Full", t, swr, stats.Stats{
-		stats.Intellect:  0.184,
-		stats.SpellPower: 0.700,
-		stats.SpellHit:   0.128,
-		stats.SpellCrit:  0.584,
+		stats.Intellect:  0.188,
+		stats.SpellPower: 0.701,
+		stats.SpellHit:   0.070,
+		stats.SpellCrit:  0.565,
 	})
 }
 

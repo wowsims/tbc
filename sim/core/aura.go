@@ -162,6 +162,8 @@ type auraTracker struct {
 	onMeleeAttackIDs          []AuraID
 	onBeforeMeleeIDs          []AuraID
 
+	auraIDsToRemove []AuraID
+
 	// Metrics for each aura.
 	metrics []AuraMetrics
 }
@@ -228,6 +230,8 @@ func (at *auraTracker) reset(sim *Simulation) {
 	at.onMeleeAttackIDs = at.onMeleeAttackIDs[:0]
 	at.onBeforeMeleeIDs = at.onBeforeMeleeIDs[:0]
 
+	at.auraIDsToRemove = []AuraID{}
+
 	for _, permAura := range at.permanentAuras {
 		aura := permAura(sim)
 		aura.Expires = NeverExpires
@@ -236,6 +240,17 @@ func (at *auraTracker) reset(sim *Simulation) {
 }
 
 func (at *auraTracker) advance(sim *Simulation) {
+	if len(at.auraIDsToRemove) > 0 {
+		// Copy to temp array so there are no issues if RemoveAuraOnNextAdvance()
+		// is called within the loop.
+		toRemove := at.auraIDsToRemove
+		at.auraIDsToRemove = []AuraID{}
+
+		for _, id := range toRemove {
+			at.RemoveAura(sim, id)
+		}
+	}
+
 	for _, id := range at.activeAuraIDs {
 		if at.auras[id].Expires != 0 && at.auras[id].Expires <= sim.CurrentTime {
 			at.RemoveAura(sim, id)
@@ -347,7 +362,7 @@ func (at *auraTracker) AddAura(sim *Simulation, newAura Aura) {
 		at.onBeforeMeleeIDs = append(at.onBeforeMeleeIDs, newAura.ID)
 	}
 
-	if sim.Log != nil {
+	if sim.Log != nil && newAura.SpellID != 0 {
 		at.logFn("Aura gained: %s", newAura.Name)
 	}
 }
@@ -362,7 +377,7 @@ func (at *auraTracker) RemoveAura(sim *Simulation, id AuraID) {
 		at.AddAuraUptime(id, at.auras[id].SpellID, sim.CurrentTime-at.auras[id].startTime)
 	}
 
-	if sim.Log != nil {
+	if sim.Log != nil && at.auras[id].SpellID != 0 {
 		at.logFn("Aura faded: %s", at.auras[id].Name)
 	}
 
@@ -451,6 +466,13 @@ func (at *auraTracker) RemoveAura(sim *Simulation, id AuraID) {
 	}
 
 	at.auras[id] = Aura{}
+}
+
+// Registers an ID to be removed on the next advance() call. This is used instead
+// of RemoveAura() when calling from inside a callback like OnSpellHit() to avoid
+// modifying auraTracker arrays while they are being looped over.
+func (at *auraTracker) RemoveAuraOnNextAdvance(sim *Simulation, id AuraID) {
+	at.auraIDsToRemove = append(at.auraIDsToRemove, id)
 }
 
 // Constant-time removal from slice by swapping with the last element before removing.

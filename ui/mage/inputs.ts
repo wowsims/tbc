@@ -1,5 +1,4 @@
-import { BalanceDruid_Rotation_PrimarySpell as PrimarySpell } from '/tbc/core/proto/druid.js';
-import { BalanceDruid_Options as DruidOptions } from '/tbc/core/proto/druid.js';
+import { IconPickerConfig } from '/tbc/core/components/icon_picker.js';
 import { RaidTarget } from '/tbc/core/proto/common.js';
 import { Spec } from '/tbc/core/proto/common.js';
 import { NO_TARGET } from '/tbc/core/proto_utils/utils.js';
@@ -13,12 +12,15 @@ import { Target } from '/tbc/core/target.js';
 import { Mage, Mage_Rotation as MageRotation, MageTalents as MageTalents, Mage_Options as MageOptions } from '/tbc/core/proto/mage.js';
 import { Mage_Rotation_Type as RotationType, Mage_Rotation_ArcaneRotation as ArcaneRotation, Mage_Rotation_FireRotation as FireRotation, Mage_Rotation_FrostRotation as FrostRotation } from '/tbc/core/proto/mage.js';
 import { Mage_Rotation_FireRotation_PrimarySpell as PrimaryFireSpell } from '/tbc/core/proto/mage.js';
+import { Mage_Rotation_ArcaneRotation_Filler as ArcaneFiller } from '/tbc/core/proto/mage.js';
 import { Mage_Options_ArmorType as ArmorType } from '/tbc/core/proto/mage.js';
 
 import * as Presets from './presets.js';
 
 // Configuration for spec-specific UI elements on the settings tab.
 // These don't need to be in a separate file but it keeps things cleaner.
+
+export const ManaEmerald = makeBooleanMageBuffInput({ itemId: 22044 }, 'useManaEmeralds');
 
 export const MageArmor = {
 	id: { spellId: 27125 },
@@ -47,6 +49,25 @@ export const MoltenArmor = {
 		const newOptions = player.getSpecOptions();
 		newOptions.armor = newValue ? ArmorType.MoltenArmor : ArmorType.NoArmor;
 		player.setSpecOptions(eventID, newOptions);
+	},
+};
+
+export const EvocationTicks = {
+	type: 'number' as const,
+	getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
+	config: {
+		extraCssClasses: [
+			'evocation-ticks-picker',
+		],
+		label: '# Evocation Ticks',
+		labelTooltip: 'The number of ticks of Evocation to use, or 0 to use the full duration.',
+		changedEvent: (player: Player<Spec.SpecMage>) => player.specOptionsChangeEmitter,
+		getValue: (player: Player<Spec.SpecMage>) => player.getSpecOptions().evocationTicks,
+		setValue: (eventID: EventID, player: Player<Spec.SpecMage>, newValue: number) => {
+			const newOptions = player.getSpecOptions();
+			newOptions.evocationTicks = newValue;
+			player.setSpecOptions(eventID, newOptions);
+		},
 	},
 };
 
@@ -100,6 +121,9 @@ export const MageRotationConfig = {
 				},
 			},
 		},
+		// ********************************************************
+		//                       FIRE INPUTS
+		// ********************************************************
 		{
 			type: 'enum' as const,
 			getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
@@ -149,5 +173,147 @@ export const MageRotationConfig = {
 				showWhen: (player: Player<Spec.SpecMage>) => player.getRotation().type == RotationType.Fire,
 			},
 		},
+		{
+			type: 'boolean' as const,
+			cssClass: 'weave-fire-blast-picker',
+			getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
+			config: {
+				label: 'Weave Fire Blast',
+				labelTooltip: 'Use Fire Blast whenever its off CD.',
+				changedEvent: (player: Player<Spec.SpecMage>) => player.rotationChangeEmitter,
+				getValue: (player: Player<Spec.SpecMage>) => player.getRotation().fire?.weaveFireBlast || false,
+				setValue: (eventID: EventID, player: Player<Spec.SpecMage>, newValue: boolean) => {
+					const newRotation = player.getRotation();
+					if (!newRotation.fire) {
+						newRotation.fire = FireRotation.create();
+					}
+					newRotation.fire.weaveFireBlast = newValue;
+					player.setRotation(eventID, newRotation);
+				},
+				showWhen: (player: Player<Spec.SpecMage>) => player.getRotation().type == RotationType.Fire,
+			},
+		},
+		// ********************************************************
+		//                      ARCANE INPUTS
+		// ********************************************************
+		{
+			type: 'enum' as const,
+			getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
+			config: {
+				extraCssClasses: [
+					'filler-enum-picker',
+				],
+				label: 'Filler',
+				labelTooltip: 'Spells to cast while waiting for Arcane Blast stacks to drop.',
+				values: [
+					{
+						name: 'Frostbolt', value: ArcaneFiller.Frostbolt,
+					},
+					{
+						name: 'Arcane Missiles', value: ArcaneFiller.ArcaneMissiles,
+					},
+					{
+						name: 'Scorch', value: ArcaneFiller.Fireball,
+					},
+					{
+						name: 'Fireball', value: ArcaneFiller.Fireball,
+					},
+					{
+						name: 'AM + FrB', value: ArcaneFiller.ArcaneMissilesFrostbolt,
+					},
+					{
+						name: 'AM + Scorch', value: ArcaneFiller.ArcaneMissilesScorch,
+					},
+					{
+						name: 'Scorch + 2xFiB', value: ArcaneFiller.ScorchTwoFireball,
+					},
+				],
+				changedEvent: (player: Player<Spec.SpecMage>) => player.rotationChangeEmitter,
+				getValue: (player: Player<Spec.SpecMage>) => player.getRotation().arcane?.filler || ArcaneFiller.Frostbolt,
+				setValue: (eventID: EventID, player: Player<Spec.SpecMage>, newValue: number) => {
+					const newRotation = player.getRotation();
+					if (!newRotation.arcane) {
+						newRotation.arcane = ArcaneRotation.create();
+					}
+					newRotation.arcane.filler = newValue;
+					player.setRotation(eventID, newRotation);
+				},
+				showWhen: (player: Player<Spec.SpecMage>) => player.getRotation().type == RotationType.Arcane,
+			},
+		},
+		{
+			type: 'number' as const,
+			cssClass: 'arcane-blasts-between-fillers-picker',
+			getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
+			config: {
+				label: '# ABs between Fillers',
+				labelTooltip: 'Number of Arcane Blasts to cast once the stacks drop.',
+				changedEvent: (player: Player<Spec.SpecMage>) => player.rotationChangeEmitter,
+				getValue: (player: Player<Spec.SpecMage>) => player.getRotation().arcane?.arcaneBlastsBetweenFillers || 0,
+				setValue: (eventID: EventID, player: Player<Spec.SpecMage>, newValue: number) => {
+					const newRotation = player.getRotation();
+					if (!newRotation.arcane) {
+						newRotation.arcane = ArcaneRotation.create();
+					}
+					newRotation.arcane.arcaneBlastsBetweenFillers = newValue;
+					player.setRotation(eventID, newRotation);
+				},
+				showWhen: (player: Player<Spec.SpecMage>) => player.getRotation().type == RotationType.Arcane,
+			},
+		},
+		{
+			type: 'number' as const,
+			cssClass: 'start-regen-rotation-percent-picker',
+			getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
+			config: {
+				label: 'Start regen rotation at mana %',
+				labelTooltip: 'Percent of mana pool, below which the regen rotation should be used (alternate fillers and a few ABs).',
+				changedEvent: (player: Player<Spec.SpecMage>) => player.rotationChangeEmitter,
+				getValue: (player: Player<Spec.SpecMage>) => (player.getRotation().arcane?.startRegenRotationPercent || 0) * 100,
+				setValue: (eventID: EventID, player: Player<Spec.SpecMage>, newValue: number) => {
+					const newRotation = player.getRotation();
+					if (!newRotation.arcane) {
+						newRotation.arcane = ArcaneRotation.create();
+					}
+					newRotation.arcane.startRegenRotationPercent = newValue / 100;
+					player.setRotation(eventID, newRotation);
+				},
+				showWhen: (player: Player<Spec.SpecMage>) => player.getRotation().type == RotationType.Arcane,
+			},
+		},
+		{
+			type: 'number' as const,
+			cssClass: 'stop-regen-rotation-percent-picker',
+			getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
+			config: {
+				label: 'Stop regen rotation at mana %',
+				labelTooltip: 'Percent of mana pool, above which will go back to AB spam.',
+				changedEvent: (player: Player<Spec.SpecMage>) => player.rotationChangeEmitter,
+				getValue: (player: Player<Spec.SpecMage>) => (player.getRotation().arcane?.stopRegenRotationPercent || 0) * 100,
+				setValue: (eventID: EventID, player: Player<Spec.SpecMage>, newValue: number) => {
+					const newRotation = player.getRotation();
+					if (!newRotation.arcane) {
+						newRotation.arcane = ArcaneRotation.create();
+					}
+					newRotation.arcane.stopRegenRotationPercent = newValue / 100;
+					player.setRotation(eventID, newRotation);
+				},
+				showWhen: (player: Player<Spec.SpecMage>) => player.getRotation().type == RotationType.Arcane,
+			},
+		},
 	],
 };
+
+function makeBooleanMageBuffInput(id: ItemOrSpellId, optionsFieldName: keyof MageOptions): IconPickerConfig<Player<any>, boolean> {
+  return {
+    id: id,
+    states: 2,
+		changedEvent: (player: Player<Spec.SpecMage>) => player.specOptionsChangeEmitter,
+		getValue: (player: Player<Spec.SpecMage>) => player.getSpecOptions()[optionsFieldName] as boolean,
+		setValue: (eventID: EventID, player: Player<Spec.SpecMage>, newValue: boolean) => {
+			const newOptions = player.getSpecOptions();
+      (newOptions[optionsFieldName] as boolean) = newValue;
+			player.setSpecOptions(eventID, newOptions);
+		},
+  }
+}

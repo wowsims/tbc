@@ -57,7 +57,7 @@ func newSim(rsr proto.RaidSimRequest) *Simulation {
 		Raid:      raid,
 		encounter: encounter,
 		Options:   simOptions,
-		Duration:  DurationFromSeconds(encounter.Duration),
+		Duration:  encounter.Duration,
 		Log:       nil,
 
 		rand: rand.New(rand.NewSource(rseed)),
@@ -207,7 +207,9 @@ func (sim *Simulation) runOnce() {
 			sim.advance(pa.NextActionAt - sim.CurrentTime)
 		}
 
-		pa.OnAction(sim)
+		if !pa.cancelled {
+			pa.OnAction(sim)
+		}
 	}
 
 	for _, pa := range sim.pendingActions {
@@ -224,11 +226,6 @@ func (sim *Simulation) AddPendingAction(pa *PendingAction) {
 	heap.Push(&sim.pendingActions, pa)
 }
 
-// TODO: remove pending actions
-func (sim *Simulation) RemovePendingAction(id int32) {
-
-}
-
 // Advance moves time forward counting down auras, CDs, mana regen, etc
 func (sim *Simulation) advance(elapsedTime time.Duration) {
 	sim.CurrentTime += elapsedTime
@@ -243,6 +240,10 @@ func (sim *Simulation) advance(elapsedTime time.Duration) {
 	for _, target := range sim.encounter.Targets {
 		target.Advance(sim, elapsedTime)
 	}
+}
+
+func (sim *Simulation) IsExecutePhase() bool {
+	return sim.CurrentTime > sim.encounter.executePhaseBegins
 }
 
 func (sim *Simulation) GetRemainingDuration() time.Duration {
@@ -267,6 +268,21 @@ type PendingAction struct {
 	OnAction     func(*Simulation)
 	CleanUp      func(*Simulation)
 	NextActionAt time.Duration
+
+	cancelled bool
+}
+
+func (pa *PendingAction) Cancel(sim *Simulation) {
+	if pa.cancelled {
+		return
+	}
+
+	if pa.CleanUp != nil {
+		pa.CleanUp(sim)
+		pa.CleanUp = nil
+	}
+
+	pa.cancelled = true
 }
 
 type ActionsQueue []*PendingAction

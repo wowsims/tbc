@@ -156,7 +156,7 @@ export class ElementalShamanSimUI extends IndividualSimUI<Spec.SpecElementalSham
 			consumeInputs: [
 				IconInputs.DefaultSuperManaPotion,
 				IconInputs.DefaultDestructionPotion,
-				IconInputs.DarkRune,
+				IconInputs.DefaultDarkRune,
 				IconInputs.FlaskOfBlindingLight,
 				IconInputs.FlaskOfSupremePower,
 				IconInputs.AdeptsElixir,
@@ -180,6 +180,8 @@ export class ElementalShamanSimUI extends IndividualSimUI<Spec.SpecElementalSham
 			encounterPicker: {
 				// Whether to include 'Target Armor' in the 'Encounter' section of the settings tab.
 				showTargetArmor: false,
+				// Whether to include 'Execute Duration (%)' in the 'Encounter' section of the settings tab.
+				showExecuteProportion: false,
 				// Whether to include 'Num Targets' in the 'Encounter' section of the settings tab.
 				showNumTargets: true,
 			},

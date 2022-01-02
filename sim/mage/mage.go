@@ -3,6 +3,7 @@ package mage
 import (
 	"time"
 
+	"github.com/wowsims/tbc/sim/common"
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/proto"
 	"github.com/wowsims/tbc/sim/core/stats"
@@ -28,26 +29,57 @@ type Mage struct {
 	core.Character
 	Talents proto.MageTalents
 
+	Options        proto.Mage_Options
 	RotationType   proto.Mage_Rotation_Type
 	ArcaneRotation proto.Mage_Rotation_ArcaneRotation
 	FireRotation   proto.Mage_Rotation_FireRotation
 	FrostRotation  proto.Mage_Rotation_FrostRotation
 
-	// Cached value for a few talents.
+	remainingManaGems int
+
+	isDoingRegenRotation bool
+	tryingToDropStacks   bool
+	numCastsDone         int32
+	isBlastSpamming      bool
+
+	// Cached values for a few mechanics.
 	spellDamageMultiplier float64
 
 	// cached cast stuff
 	arcaneBlastSpell        core.SimpleSpell
 	arcaneBlastCastTemplate core.SimpleSpellTemplate
 
+	arcaneMissilesSpell        core.SimpleSpell
+	arcaneMissilesCastTemplate core.SimpleSpellTemplate
+
+	igniteSpell        core.SimpleSpell
+	igniteCastTemplate core.SimpleSpellTemplate
+
 	fireballSpell        core.SimpleSpell
 	fireballCastTemplate core.SimpleSpellTemplate
+
+	fireballDotSpell        core.SimpleSpell
+	fireballDotCastTemplate core.SimpleSpellTemplate
+
+	fireBlastSpell        core.SimpleSpell
+	fireBlastCastTemplate core.SimpleSpellTemplate
 
 	frostboltSpell        core.SimpleSpell
 	frostboltCastTemplate core.SimpleSpellTemplate
 
+	pyroblastSpell        core.SimpleSpell
+	pyroblastCastTemplate core.SimpleSpellTemplate
+
+	pyroblastDotSpell        core.SimpleSpell
+	pyroblastDotCastTemplate core.SimpleSpellTemplate
+
 	scorchSpell        core.SimpleSpell
 	scorchCastTemplate core.SimpleSpellTemplate
+
+	wintersChillSpell        core.SimpleSpell
+	wintersChillCastTemplate core.SimpleSpellTemplate
+
+	manaTracker common.ManaSpendingRateTracker
 }
 
 func (mage *Mage) GetCharacter() *core.Character {
@@ -62,12 +94,27 @@ func (mage *Mage) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {
 
 func (mage *Mage) Init(sim *core.Simulation) {
 	mage.arcaneBlastCastTemplate = mage.newArcaneBlastTemplate(sim)
+	mage.arcaneMissilesCastTemplate = mage.newArcaneMissilesTemplate(sim)
+	mage.igniteCastTemplate = mage.newIgniteTemplate(sim)
 	mage.fireballCastTemplate = mage.newFireballTemplate(sim)
+	mage.fireballDotCastTemplate = mage.newFireballDotTemplate(sim)
+	mage.fireBlastCastTemplate = mage.newFireBlastTemplate(sim)
 	mage.frostboltCastTemplate = mage.newFrostboltTemplate(sim)
+	mage.pyroblastCastTemplate = mage.newPyroblastTemplate(sim)
+	mage.pyroblastDotCastTemplate = mage.newPyroblastDotTemplate(sim)
 	mage.scorchCastTemplate = mage.newScorchTemplate(sim)
+	mage.wintersChillCastTemplate = mage.newWintersChillTemplate(sim)
 }
 
 func (mage *Mage) Reset(newsim *core.Simulation) {
+	if mage.Options.UseManaEmeralds {
+		mage.remainingManaGems = 4
+	}
+	mage.isDoingRegenRotation = false
+	mage.tryingToDropStacks = false
+	mage.numCastsDone = 0
+	mage.isBlastSpamming = false
+	mage.manaTracker.Reset()
 }
 
 func (mage *Mage) Advance(sim *core.Simulation, elapsedTime time.Duration) {
@@ -80,9 +127,11 @@ func NewMage(character core.Character, options proto.Player) *Mage {
 	mage := &Mage{
 		Character:    character,
 		Talents:      *mageOptions.Talents,
+		Options:      *mageOptions.Options,
 		RotationType: mageOptions.Rotation.Type,
 
 		spellDamageMultiplier: 1.0,
+		manaTracker:           common.NewManaSpendingRateTracker(),
 	}
 
 	if mage.RotationType == proto.Mage_Rotation_Arcane && mageOptions.Rotation.Arcane != nil {
@@ -109,60 +158,17 @@ func NewMage(character core.Character, options proto.Player) *Mage {
 		},
 	})
 
-	if mageOptions.Options.Armor == proto.Mage_Options_MageArmor {
+	if mage.Options.Armor == proto.Mage_Options_MageArmor {
 		mage.PseudoStats.SpiritRegenRateCasting += 0.3
-	} else if mageOptions.Options.Armor == proto.Mage_Options_MoltenArmor {
+	} else if mage.Options.Armor == proto.Mage_Options_MoltenArmor {
 		mage.AddStat(stats.SpellCrit, 3*core.SpellCritRatingPerCritChance)
 	}
 
+	mage.registerEvocationCD()
+	mage.registerManaGemsCD()
 	mage.applyTalents()
 
 	return mage
-}
-
-var EvocationAuraID = core.NewAuraID()
-var EvocationCooldownID = core.NewCooldownID()
-
-func (mage *Mage) registerEvocationCD() {
-	cooldown := time.Minute * 8
-
-	mage.AddMajorCooldown(core.MajorCooldown{
-		CooldownID: EvocationCooldownID,
-		Cooldown:   cooldown,
-		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
-			duration := time.Second * 8
-			totalAmount := mage.MaxMana() * 0.6
-			threshold := mage.MaxMana() * 0.15
-
-			if ItemSetTempestRegalia.CharacterHasSetBonus(&mage.Character, 2) {
-				duration += time.Second * 2
-				totalAmount += mage.MaxMana() * 0.15
-				threshold += mage.MaxMana() * 0.1
-			}
-
-			return func(sim *core.Simulation, character *core.Character) bool {
-				if character.CurrentMana() > threshold {
-					return false
-				}
-
-				if character.IsOnCD(core.GCDCooldownID, sim.CurrentTime) {
-					return false
-				}
-
-				character.AddMana(sim, totalAmount, "Evocation", true)
-				character.AddAura(sim, core.Aura{
-					ID:      EvocationAuraID,
-					SpellID: 12051,
-					Name:    "Evocation",
-					Expires: sim.CurrentTime + duration,
-				})
-				character.Metrics.AddInstantCast(core.ActionID{SpellID: 12051})
-				character.SetCD(EvocationCooldownID, sim.CurrentTime+cooldown)
-				character.SetCD(core.GCDCooldownID, sim.CurrentTime+duration)
-				return true
-			}
-		},
-	})
 }
 
 func init() {

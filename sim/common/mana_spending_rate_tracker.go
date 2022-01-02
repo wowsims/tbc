@@ -89,7 +89,6 @@ func (tracker *ManaSpendingRateTracker) Update(sim *core.Simulation, character *
 		manaSpentDelta:  (manaSpent - tracker.previousManaSpent) * manaDeltaCoefficient,
 		manaGainedDelta: (manaGained - tracker.previousManaGained) * manaDeltaCoefficient / character.PseudoStats.SpiritRegenMultiplier,
 	}
-
 	//if sim.Log != nil {
 	//	character.Log(sim, "Init speed: %0.02f, prev cast speed: %0.02f, Mana gained: %0.02f, Mana gained delta: %0.02f", character.InitialCastSpeed(), tracker.previousCastSpeed, snapshot.manaGained, snapshot.manaGainedDelta)
 	//}
@@ -132,6 +131,10 @@ func (tracker *ManaSpendingRateTracker) ProjectedManaCost(sim *core.Simulation, 
 	return projectedManaCost
 }
 
+func (tracker *ManaSpendingRateTracker) ProjectedRemainingMana(sim *core.Simulation, character *core.Character) float64 {
+	return character.CurrentMana() + character.ExpectedBonusMana - manaBuffer
+}
+
 func (tracker *ManaSpendingRateTracker) ProjectedManaSurplus(sim *core.Simulation, character *core.Character) bool {
 	// If we've gone OOM at least once, stop using surplus rotations.
 	// Spending time not casting while OOM will throw off the mana spend / gain rates so this is necessary.
@@ -139,5 +142,5 @@ func (tracker *ManaSpendingRateTracker) ProjectedManaSurplus(sim *core.Simulatio
 		return false
 	}
 
-	return tracker.ProjectedManaCost(sim, character) < character.CurrentMana()+character.ExpectedBonusMana-manaBuffer
+	return tracker.ProjectedManaCost(sim, character) < tracker.ProjectedRemainingMana(sim, character)
 }

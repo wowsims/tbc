@@ -15,7 +15,7 @@ message MageTalents {
 	int32 arcane_mind = 8;
 	int32 arcane_instability = 9;
 	int32 arcane_potency = 10;
-	int32 empowered_arcane_missles = 11;
+	int32 empowered_arcane_missiles = 11;
 	bool arcane_power = 12;
 	int32 spell_power = 13;
 	int32 mind_mastery = 14;
@@ -70,6 +70,26 @@ message Mage {
 			Type type = 1;
 
 			message ArcaneRotation {
+				enum Filler {
+					Frostbolt = 0;
+					ArcaneMissiles = 1;
+					Scorch = 2;
+					Fireball = 3;
+					ArcaneMissilesFrostbolt = 4;
+					ArcaneMissilesScorch = 5;
+					ScorchTwoFireball = 6;
+				}
+				// The spells to use to fill time while waiting for arcane blast stacks to drop.
+				Filler filler = 1;
+
+				// Number of arcane blasts to cast before switching to filler.
+				int32 arcane_blasts_between_fillers = 2;
+
+				// Percentage of mana (0-1) below which to switch to regen rotation.
+				double start_regen_rotation_percent = 3;
+
+				// Percentage of mana (0-1) above which to switch to regular rotation.
+				double stop_regen_rotation_percent = 4;
 			}
 			ArcaneRotation arcane = 2;
 
@@ -101,6 +121,11 @@ message Mage {
 				MoltenArmor = 2;
 			}
 			ArmorType armor = 1;
+
+			// Number of Evocation ticks to use. If 0, use all of them.
+			int32 evocation_ticks = 2;
+
+			bool use_mana_emeralds = 3;
     }
     Options options = 3;
 }

@@ -154,7 +154,7 @@ func (spriest *ShadowPriest) Act(sim *core.Simulation) time.Duration {
 			}
 
 			if spell.DotInput.NumberOfTicks == 0 {
-				spell.Cancel()
+				spell.Cancel(sim)
 				return sim.CurrentTime + core.MaxDuration(spriest.GetRemainingCD(core.GCDCooldownID, sim.CurrentTime), wait)
 			}
 
@@ -209,7 +209,7 @@ func (spriest *ShadowPriest) BasicMindflayRotation(sim *core.Simulation, spell *
 		spell.DotInput.NumberOfTicks = 0
 		return nextCD
 	} else {
-		return time.Duration(spell.DotInput.NumberOfTicks) * spell.DotInput.TickLength
+		return spell.DotInput.FullDuration()
 	}
 }
 
@@ -284,7 +284,7 @@ func (spriest *ShadowPriest) IdealMindflayRotation(sim *core.Simulation, spell *
 		}
 		spell.ActionID.Tag = int32(spell.DotInput.NumberOfTicks)
 
-		return spell.DotInput.TickLength * time.Duration(spell.DotInput.NumberOfTicks)
+		return spell.DotInput.FullDuration()
 	}
 
 	// TODO: Should spriest latency be added to the second option here?
@@ -416,7 +416,7 @@ func (spriest *ShadowPriest) IdealMindflayRotation(sim *core.Simulation, spell *
 
 	//  ONE BIG CAVEAT THAT STILL NEEDS WORK.. THIS NEEDS TO BE UPDATED TO INCLUDE HASTE PROCS THAT CAN OCCUR/DROP OFF MID MF SEQUENCE
 
-	return spell.DotInput.TickLength * time.Duration(spell.DotInput.NumberOfTicks)
+	return spell.DotInput.FullDuration()
 }
 
 // ClippingMindflayRotation is to be a 'sweaty but not perfect' rotation.
@@ -452,5 +452,5 @@ func (spriest *ShadowPriest) ClippingMindflayRotation(sim *core.Simulation, spel
 	}
 
 	spell.ActionID.Tag = int32(spell.DotInput.NumberOfTicks)
-	return spell.DotInput.TickLength * time.Duration(spell.DotInput.NumberOfTicks)
+	return spell.DotInput.FullDuration()
 }

@@ -8,14 +8,16 @@ import (
 )
 
 type Encounter struct {
-	Duration float64
-	Targets  []*Target
+	Duration           time.Duration
+	executePhaseBegins time.Duration
+	Targets            []*Target
 }
 
 func NewEncounter(options proto.Encounter) Encounter {
 	encounter := Encounter{
-		Duration: options.Duration,
-		Targets:  []*Target{},
+		Duration:           DurationFromSeconds(options.Duration),
+		executePhaseBegins: DurationFromSeconds(options.Duration * (1 - options.ExecuteProportion)),
+		Targets:            []*Target{},
 	}
 
 	for targetIndex, targetOptions := range options.Targets {

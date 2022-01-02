@@ -129,18 +129,27 @@ func ApplyNaturalAlignmentCrystal(agent core.Agent) {
 	const cd = time.Minute * 5
 
 	agent.GetCharacter().AddMajorCooldown(core.MajorCooldown{
+		ActionID:         core.ActionID{ItemID: 19344},
 		CooldownID:       NaturalAlignmentCrystalCooldownID,
 		Cooldown:         cd,
 		SharedCooldownID: core.OffensiveTrinketSharedCooldownID,
 		SharedCooldown:   dur,
+		CanActivate: func(sim *core.Simulation, character *core.Character) bool {
+			return true
+		},
+		ShouldActivate: func(sim *core.Simulation, character *core.Character) bool {
+			return true
+		},
 		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
-			return func(sim *core.Simulation, character *core.Character) bool {
+			return func(sim *core.Simulation, character *core.Character) {
 				character.SetCD(NaturalAlignmentCrystalCooldownID, sim.CurrentTime+cd)
 				character.AddStat(stats.SpellPower, sp)
+				character.Metrics.AddInstantCast(core.ActionID{SpellID: 23734})
 
 				character.AddAura(sim, core.Aura{
 					ID:      core.OffensiveTrinketActiveAuraID,
 					Name:    "Natural Alignment Crystal",
+					SpellID: 23734,
 					Expires: sim.CurrentTime + dur,
 					OnCast: func(sim *core.Simulation, cast *core.Cast) {
 						cast.ManaCost *= 1.2
@@ -149,8 +158,6 @@ func ApplyNaturalAlignmentCrystal(agent core.Agent) {
 						character.AddStat(stats.SpellPower, -sp)
 					},
 				})
-
-				return true
 			}
 		},
 	})

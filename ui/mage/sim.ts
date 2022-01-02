@@ -56,6 +56,9 @@ export class MageSimUI extends IndividualSimUI<Spec.SpecMage> {
 				Stat.StatIntellect,
 				Stat.StatSpirit,
 				Stat.StatSpellPower,
+				Stat.StatArcaneSpellPower,
+				Stat.StatFireSpellPower,
+				Stat.StatFrostSpellPower,
 				Stat.StatSpellHit,
 				Stat.StatSpellCrit,
 				Stat.StatSpellHaste,
@@ -78,13 +81,13 @@ export class MageSimUI extends IndividualSimUI<Spec.SpecMage> {
 					[Stat.StatMP5]: 0.00,
 				}),
 				// Default consumes settings.
-				consumes: Presets.DefaultFireConsumes,
+				consumes: Presets.DefaultArcaneConsumes,
 				// Default rotation settings.
-				rotation: Presets.DefaultFireRotation,
+				rotation: Presets.DefaultArcaneRotation,
 				// Default talents.
 				talents: Presets.FireTalents.data,
 				// Default spec-specific settings.
-				specOptions: Presets.DefaultFireOptions,
+				specOptions: Presets.DefaultArcaneOptions,
 				// Default raid/party buffs settings.
 				raidBuffs: RaidBuffs.create({
 					giftOfTheWild: TristateEffect.TristateEffectImproved,
@@ -121,6 +124,7 @@ export class MageSimUI extends IndividualSimUI<Spec.SpecMage> {
 				IconInputs.GiftOfTheWild,
 			],
 			partyBuffInputs: [
+				IconInputs.MoonkinAura,
 				IconInputs.DrumsOfBattleBuff,
 				IconInputs.DrumsOfRestorationBuff,
 				IconInputs.Bloodlust,
@@ -154,7 +158,9 @@ export class MageSimUI extends IndividualSimUI<Spec.SpecMage> {
 			consumeInputs: [
 				IconInputs.DefaultSuperManaPotion,
 				IconInputs.DefaultDestructionPotion,
-				IconInputs.DarkRune,
+				MageInputs.ManaEmerald,
+				IconInputs.DefaultDarkRune,
+				IconInputs.DefaultFlameCap,
 				IconInputs.FlaskOfBlindingLight,
 				IconInputs.FlaskOfPureDeath,
 				IconInputs.FlaskOfSupremePower,
@@ -174,6 +180,7 @@ export class MageSimUI extends IndividualSimUI<Spec.SpecMage> {
 			// Inputs to include in the 'Other' section on the settings tab.
 			otherInputs: {
 				inputs: [
+					MageInputs.EvocationTicks,
 					OtherInputs.ShadowPriestDPS,
 					OtherInputs.StartingPotion,
 					OtherInputs.NumStartingPotions,
@@ -182,6 +189,8 @@ export class MageSimUI extends IndividualSimUI<Spec.SpecMage> {
 			encounterPicker: {
 				// Whether to include 'Target Armor' in the 'Encounter' section of the settings tab.
 				showTargetArmor: false,
+				// Whether to include 'Execute Duration (%)' in the 'Encounter' section of the settings tab.
+				showExecuteProportion: true,
 				// Whether to include 'Num Targets' in the 'Encounter' section of the settings tab.
 				showNumTargets: true,
 			},

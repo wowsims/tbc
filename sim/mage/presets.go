@@ -29,8 +29,52 @@ var FireTalents = &proto.MageTalents{
 	IcyVeins:           true,
 }
 
+var FrostTalents = &proto.MageTalents{
+	ArcaneFocus:         5,
+	ArcaneConcentration: 5,
+	ArcaneImpact:        3,
+	ArcaneMeditation:    3,
+
+	ImprovedFrostbolt:    5,
+	ElementalPrecision:   3,
+	IceShards:            5,
+	IcyVeins:             true,
+	PiercingIce:          5,
+	FrostChanneling:      3,
+	ColdSnap:             true,
+	ImprovedConeOfCold:   2,
+	IceFloes:             2,
+	WintersChill:         4,
+	ArcticWinds:          5,
+	EmpoweredFrostbolt:   5,
+	SummonWaterElemental: true,
+}
+
+var ArcaneTalents = &proto.MageTalents{
+	ArcaneFocus:         5,
+	ArcaneConcentration: 5,
+	ArcaneImpact:        3,
+	ArcaneMeditation:    3,
+	PresenceOfMind:      true,
+	ArcaneMind:          5,
+	ArcaneInstability:   3,
+	ArcanePotency:       3,
+	ArcanePower:         true,
+	SpellPower:          2,
+	MindMastery:         5,
+
+	ImprovedFrostbolt:  5,
+	ElementalPrecision: 3,
+	IceShards:          5,
+	IcyVeins:           true,
+	PiercingIce:        5,
+	FrostChanneling:    3,
+	ColdSnap:           true,
+}
+
 var fireMageOptions = &proto.Mage_Options{
-	Armor: proto.Mage_Options_MageArmor,
+	Armor:           proto.Mage_Options_MageArmor,
+	UseManaEmeralds: true,
 }
 var PlayerOptionsFire = &proto.Player_Mage{
 	Mage: &proto.Mage{
@@ -41,6 +85,42 @@ var PlayerOptionsFire = &proto.Player_Mage{
 			Fire: &proto.Mage_Rotation_FireRotation{
 				PrimarySpell:           proto.Mage_Rotation_FireRotation_Fireball,
 				MaintainImprovedScorch: true,
+				WeaveFireBlast:         true,
+			},
+		},
+	},
+}
+
+var frostMageOptions = &proto.Mage_Options{
+	Armor:           proto.Mage_Options_MageArmor,
+	UseManaEmeralds: true,
+}
+var PlayerOptionsFrost = &proto.Player_Mage{
+	Mage: &proto.Mage{
+		Talents: FrostTalents,
+		Options: frostMageOptions,
+		Rotation: &proto.Mage_Rotation{
+			Type:  proto.Mage_Rotation_Frost,
+			Frost: &proto.Mage_Rotation_FrostRotation{},
+		},
+	},
+}
+
+var arcaneMageOptions = &proto.Mage_Options{
+	Armor:           proto.Mage_Options_MageArmor,
+	UseManaEmeralds: true,
+}
+var PlayerOptionsArcane = &proto.Player_Mage{
+	Mage: &proto.Mage{
+		Talents: ArcaneTalents,
+		Options: arcaneMageOptions,
+		Rotation: &proto.Mage_Rotation{
+			Type: proto.Mage_Rotation_Arcane,
+			Arcane: &proto.Mage_Rotation_ArcaneRotation{
+				Filler:                     proto.Mage_Rotation_ArcaneRotation_ArcaneMissilesFrostbolt,
+				ArcaneBlastsBetweenFillers: 3,
+				StartRegenRotationPercent:  0.2,
+				StopRegenRotationPercent:   0.3,
 			},
 		},
 	},
@@ -57,9 +137,24 @@ var FullFirePartyBuffs = &proto.PartyBuffs{
 	TotemOfWrath:    1,
 	WrathOfAirTotem: proto.TristateEffect_TristateEffectRegular,
 }
+var FullFrostPartyBuffs = FullFirePartyBuffs
 var FullIndividualBuffs = &proto.IndividualBuffs{
 	BlessingOfKings:  true,
 	BlessingOfWisdom: proto.TristateEffect_TristateEffectImproved,
+}
+
+var FullArcanePartyBuffs = &proto.PartyBuffs{
+	Drums:           proto.Drums_DrumsOfBattle,
+	Bloodlust:       1,
+	MoonkinAura:     proto.TristateEffect_TristateEffectRegular,
+	ManaSpringTotem: proto.TristateEffect_TristateEffectImproved,
+	ManaTideTotems:  1,
+	WrathOfAirTotem: proto.TristateEffect_TristateEffectRegular,
+}
+var FullArcaneIndividualBuffs = &proto.IndividualBuffs{
+	BlessingOfKings:  true,
+	BlessingOfWisdom: proto.TristateEffect_TristateEffectImproved,
+	Innervates:       1,
 }
 
 var FullFireConsumes = &proto.Consumes{
@@ -67,7 +162,22 @@ var FullFireConsumes = &proto.Consumes{
 	BrilliantWizardOil: true,
 	BlackenedBasilisk:  true,
 	DefaultPotion:      proto.Potions_SuperManaPotion,
-	DarkRune:           true,
+	DefaultConjured:    proto.Conjured_ConjuredFlameCap,
+}
+var FullFrostConsumes = &proto.Consumes{
+	FlaskOfPureDeath:   true,
+	BrilliantWizardOil: true,
+	BlackenedBasilisk:  true,
+	DefaultPotion:      proto.Potions_SuperManaPotion,
+	DefaultConjured:    proto.Conjured_ConjuredDarkRune,
+}
+
+var FullArcaneConsumes = &proto.Consumes{
+	FlaskOfBlindingLight: true,
+	BrilliantWizardOil:   true,
+	BlackenedBasilisk:    true,
+	DefaultPotion:        proto.Potions_SuperManaPotion,
+	DefaultConjured:      proto.Conjured_ConjuredDarkRune,
 }
 
 var FullDebuffs = &proto.Debuffs{
@@ -176,3 +286,5 @@ var P1FireGear = items.EquipmentSpecFromStrings([]items.ItemStringSpec{
 		Name: "Flametongue Seal",
 	},
 })
+var P1FrostGear = P1FireGear
+var P1ArcaneGear = P1FireGear

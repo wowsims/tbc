@@ -21,6 +21,7 @@ func init() {
 		278,
 		time.Second*20,
 		core.MajorCooldown{
+			ActionID:         core.ActionID{ItemID: 29383},
 			CooldownID:       BloodlustBroochCooldownID,
 			Cooldown:         time.Minute * 2,
 			SharedCooldownID: core.OffensiveTrinketSharedCooldownID,

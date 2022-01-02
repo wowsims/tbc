@@ -269,16 +269,21 @@ func (druid *Druid) registerNaturesSwiftnessCD() {
 	}
 
 	druid.AddMajorCooldown(core.MajorCooldown{
+		ActionID:   core.ActionID{SpellID: 17116},
 		CooldownID: NaturesSwiftnessCooldownID,
 		Cooldown:   time.Minute * 3,
+		CanActivate: func(sim *core.Simulation, character *core.Character) bool {
+			return true
+		},
+		ShouldActivate: func(sim *core.Simulation, character *core.Character) bool {
+			// Don't use NS unless we're casting a full-length starfire or wrath.
+			if character.HasTemporarySpellCastSpeedIncrease() {
+				return false
+			}
+			return true
+		},
 		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
-			return func(sim *core.Simulation, character *core.Character) bool {
-				// Don't use NS unless we're casting a full-length starfire or wrath.
-
-				if character.HasTemporarySpellCastSpeedIncrease() {
-					return false
-				}
-
+			return func(sim *core.Simulation, character *core.Character) {
 				character.AddAura(sim, core.Aura{
 					ID:      NaturesSwiftnessAuraID,
 					Name:    "Nature's Swiftness",
@@ -298,11 +303,10 @@ func (druid *Druid) registerNaturesSwiftnessCD() {
 						// Remove the buff and put skill on CD
 						character.SetCD(NaturesSwiftnessCooldownID, sim.CurrentTime+time.Minute*3)
 						character.RemoveAura(sim, NaturesSwiftnessAuraID)
-						character.UpdateMajorCooldowns(sim)
+						character.UpdateMajorCooldowns()
 						character.Metrics.AddInstantCast(core.ActionID{SpellID: 17116})
 					},
 				})
-				return true
 			}
 		},
 	})
