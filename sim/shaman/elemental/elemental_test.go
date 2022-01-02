@@ -47,7 +47,7 @@ func TestP1FullCharacterStats(t *testing.T) {
 
 		stats.AttackPower: 401.4,
 		stats.MeleeHit:    47.310,
-		stats.MeleeCrit:   118.132,
+		stats.MeleeCrit:   139.541,
 
 		stats.Mana:  10646,
 		stats.Armor: 9370.0,
