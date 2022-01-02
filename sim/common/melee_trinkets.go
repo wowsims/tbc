@@ -45,7 +45,7 @@ func ApplyDragonspineTrophy(agent core.Agent) {
 			ID:   DragonspineTrophyAuraID,
 			Name: "Dragonspine Trophy",
 			OnMeleeAttack: func(sim *core.Simulation, target *core.Target, result core.MeleeHitType, ability *core.ActiveMeleeAbility, isOH bool) {
-				if result == core.MeleeHitTypeMiss || result == core.MeleeHitTypeDodge || result == core.MeleeHitTypeBlock || result == core.MeleeHitTypeParry {
+				if result == core.MeleeHitTypeMiss || result == core.MeleeHitTypeDodge || result == core.MeleeHitTypeParry {
 					return
 				}
 				if icd.IsOnCD(sim) {
