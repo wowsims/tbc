@@ -4,7 +4,6 @@ import (
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
-	"github.com/wowsims/tbc/sim/core/proto"
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
@@ -41,16 +40,14 @@ func ApplyDragonspineTrophy(agent core.Agent) {
 		const dur = time.Second * 10
 		const icdDur = time.Second * 20
 
-		procChance := character.Equip[proto.ItemSlot_ItemSlotMainHand].SwingSpeed / 60.0
-		ohProcChance := character.Equip[proto.ItemSlot_ItemSlotOffHand].SwingSpeed / 60.0
+		procChance, ohProcChance := core.PPMToChance(character, 1.0)
 		return core.Aura{
 			ID:   DragonspineTrophyAuraID,
 			Name: "Dragonspine Trophy",
 			OnMeleeAttack: func(sim *core.Simulation, target *core.Target, result core.MeleeHitType, ability *core.ActiveMeleeAbility, isOH bool) {
-				if result == core.MeleeHitTypeMiss {
+				if result == core.MeleeHitTypeMiss || result == core.MeleeHitTypeDodge || result == core.MeleeHitTypeParry {
 					return
 				}
-				// Do blocked/parried/dodged attacks proc DST?
 				if icd.IsOnCD(sim) {
 					return // dont activate
 				}

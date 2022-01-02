@@ -13,6 +13,7 @@ func init() {
 	core.AddItemEffect(25901, ApplyInsightfulEarthstormDiamond)
 	core.AddItemEffect(34220, ApplyChaoticSkyfireDiamond)
 	core.AddItemEffect(35503, ApplyEmberSkyfireDiamond)
+	core.AddItemEffect(32409, ApplyRelentlessEarthstormDiamond)
 }
 
 var MysticalSkyfireDiamondAuraID = core.NewAuraID()
@@ -88,5 +89,23 @@ func ApplyEmberSkyfireDiamond(agent core.Agent) {
 		Modifier: func(intellect float64, _ float64) float64 {
 			return intellect * 1.02
 		},
+	})
+}
+
+var RelentlessEarthstormDiamondAuraID = core.NewAuraID()
+
+func ApplyRelentlessEarthstormDiamond(agent core.Agent) {
+	character := agent.GetCharacter()
+	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
+		return core.Aura{
+			ID:   RelentlessEarthstormDiamondAuraID,
+			Name: "Relentless Earthstorm Diamond",
+			OnBeforeMelee: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, isOH bool) {
+				// For a normal spell with crit multiplier of 1.5, this will be 1.
+				// For a spell with a multiplier of 2 (i.e. 100% increased critical damage) this will be 2.
+				improvedCritRatio := (ability.CritMultiplier - 1) / 0.5
+				ability.CritMultiplier += 0.045 * improvedCritRatio
+			},
+		}
 	})
 }

@@ -60,7 +60,7 @@ func NewShaman(character core.Character, talents proto.ShamanTalents, selfBuffs 
 		SourceStat:   stats.Agility,
 		ModifiedStat: stats.MeleeCrit,
 		Modifier: func(agility float64, meleeCrit float64) float64 {
-			return meleeCrit + (agility/33)*core.MeleeCritRatingPerCritChance
+			return meleeCrit + (agility/25)*core.MeleeCritRatingPerCritChance
 		},
 	})
 
@@ -510,6 +510,7 @@ func (shaman *Shaman) applyFlurry(level int32) {
 					shaman.MultiplyMeleeSpeed(sim, bonus)
 					shaman.AddAura(sim, core.Aura{
 						ID:      FlurryProcAuraID,
+						SpellID: 16280,
 						Name:    "Flurry",
 						Expires: core.NeverExpires,
 						OnExpire: func(sim *core.Simulation) {

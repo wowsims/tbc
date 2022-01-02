@@ -166,7 +166,7 @@ func (characterMetrics *CharacterMetrics) AddAutoAttack(itemID int32, result Mel
 		actionMetrics.ActionID = actionID
 	}
 	actionMetrics.Casts++
-	if result == MeleeHitTypeBlock || result == MeleeHitTypeMiss || result == MeleeHitTypeParry || result == MeleeHitTypeDodge {
+	if result == MeleeHitTypeMiss || result == MeleeHitTypeParry || result == MeleeHitTypeDodge {
 		actionMetrics.Misses++
 	} else {
 		actionMetrics.Hits++

@@ -152,16 +152,19 @@ func (character *Character) applyAllEffects(agent Agent) {
 // Apply effects from all equipped items.
 func (character *Character) applyItemEffects(agent Agent) {
 	for _, eq := range character.Equip {
-		applyItemEffect, ok := itemEffects[eq.ID]
-		if ok {
+		if applyItemEffect, ok := itemEffects[eq.ID]; ok {
 			applyItemEffect(agent)
 		}
 
 		for _, g := range eq.Gems {
-			applyGemEffect, ok := itemEffects[g.ID]
-			if ok {
+			if applyGemEffect, ok := itemEffects[g.ID]; ok {
 				applyGemEffect(agent)
 			}
+		}
+
+		// TODO: should we use eq.Enchant.EffectID because some enchants use a spellID instead of itemID?
+		if applyEnchantEffect, ok := itemEffects[eq.Enchant.ID]; ok {
+			applyEnchantEffect(agent)
 		}
 	}
 }
