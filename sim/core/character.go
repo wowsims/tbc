@@ -179,6 +179,9 @@ func (character *Character) AddStat(stat stats.Stat, amount float64) {
 		}
 	}
 	character.stats[stat] += amount
+	if character.stats[stat] < 0 {
+		panic("negative stats!?")
+	}
 }
 
 func (character *Character) SpendMana(sim *Simulation, amount float64, reason string) {
