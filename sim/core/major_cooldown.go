@@ -4,6 +4,7 @@ import (
 	"sort"
 	"time"
 
+	"github.com/wowsims/tbc/sim/core/proto"
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
@@ -68,6 +69,13 @@ type MajorCooldown struct {
 	// Factory for creating the activate function on every Sim reset.
 	ActivationFactory CooldownActivationFactory
 
+	// Fixed timings at which to use this cooldown. If these are specified, they
+	// are used instead of ShouldActivate.
+	timings []time.Duration
+
+	// Number of times this MCD was used so far in the current iteration.
+	numUsages int
+
 	// Internal lambda function to use the cooldown.
 	activate CooldownActivation
 
@@ -90,9 +98,38 @@ func (mcd *MajorCooldown) IsEnabled() bool {
 	return !mcd.disabled
 }
 
+// Activates this MCD, if all the conditions pass.
+// Returns whether the MCD was activated.
+func (mcd *MajorCooldown) tryActivate(sim *Simulation, character *Character) bool {
+	if mcd.disabled {
+		return false
+	}
+
+	if !mcd.CanActivate(sim, character) {
+		return false
+	}
+
+	var shouldActivate bool
+	if mcd.numUsages < len(mcd.timings) {
+		shouldActivate = sim.CurrentTime >= mcd.timings[mcd.numUsages]
+	} else {
+		shouldActivate = mcd.ShouldActivate(sim, character)
+	}
+
+	if shouldActivate {
+		mcd.activate(sim, character)
+		mcd.numUsages++
+	}
+
+	return shouldActivate
+}
+
 type majorCooldownManager struct {
 	// The Character whose cooldowns are being managed.
 	character *Character
+
+	// User-specified cooldown configs.
+	cooldownConfigs proto.Cooldowns
 
 	// Cached list of major cooldowns sorted by priority, for resetting quickly.
 	initialMajorCooldowns []MajorCooldown
@@ -104,6 +141,17 @@ type majorCooldownManager struct {
 	// the same cooldows as initialMajorCooldowns, but the order will change over
 	// the course of the sim.
 	majorCooldowns []*MajorCooldown
+}
+
+func newMajorCooldownManager(cooldowns *proto.Cooldowns) majorCooldownManager {
+	cds := proto.Cooldowns{}
+	if cooldowns != nil {
+		cds = *cooldowns
+	}
+
+	return majorCooldownManager{
+		cooldownConfigs: cds,
+	}
 }
 
 func (mcdm *majorCooldownManager) finalize(character *Character) {
@@ -122,6 +170,25 @@ func (mcdm *majorCooldownManager) finalize(character *Character) {
 	sort.SliceStable(mcdm.initialMajorCooldowns, func(i, j int) bool {
 		return mcdm.initialMajorCooldowns[i].Priority > mcdm.initialMajorCooldowns[j].Priority
 	})
+
+	// Match user-specified cooldown configs to existing cooldowns.
+	for i, _ := range mcdm.initialMajorCooldowns {
+		mcd := &mcdm.initialMajorCooldowns[i]
+		mcd.timings = []time.Duration{}
+
+		if mcdm.cooldownConfigs.Cooldowns != nil {
+			for _, cooldownConfig := range mcdm.cooldownConfigs.Cooldowns {
+				configID := ProtoToActionID(*cooldownConfig.Id)
+				if configID.SameAction(mcd.ActionID) {
+					mcd.timings = make([]time.Duration, len(cooldownConfig.Timings))
+					for t, timing := range cooldownConfig.Timings {
+						mcd.timings[t] = DurationFromSeconds(timing)
+					}
+					break
+				}
+			}
+		}
+	}
 
 	mcdm.majorCooldowns = make([]*MajorCooldown, len(mcdm.initialMajorCooldowns))
 }
@@ -171,6 +238,14 @@ func (mcdm *majorCooldownManager) GetMajorCooldown(actionID ActionID) *MajorCool
 	return nil
 }
 
+func (mcdm *majorCooldownManager) GetMajorCooldownIDs() []*proto.ActionID {
+	ids := make([]*proto.ActionID, len(mcdm.initialMajorCooldowns))
+	for i, mcd := range mcdm.initialMajorCooldowns {
+		ids[i] = mcd.ActionID.ToProto()
+	}
+	return ids
+}
+
 func (mcdm *majorCooldownManager) HasMajorCooldown(actionID ActionID) bool {
 	return mcdm.GetMajorCooldown(actionID) != nil
 }
@@ -193,11 +268,8 @@ func (mcdm *majorCooldownManager) TryUseCooldowns(sim *Simulation) {
 	anyCooldownsUsed := false
 	for curIdx := 0; curIdx < len(mcdm.majorCooldowns) && !mcdm.majorCooldowns[curIdx].IsOnCD(sim, mcdm.character); curIdx++ {
 		mcd := mcdm.majorCooldowns[curIdx]
-		if !mcd.disabled && mcd.CanActivate(sim, mcdm.character) {
-			if mcd.ShouldActivate(sim, mcdm.character) {
-				mcdm.majorCooldowns[curIdx].activate(sim, mcdm.character)
-				anyCooldownsUsed = true
-			}
+		if mcd.tryActivate(sim, mcdm.character) {
+			anyCooldownsUsed = true
 		}
 	}
 

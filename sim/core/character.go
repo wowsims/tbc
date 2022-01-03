@@ -101,11 +101,14 @@ func NewCharacter(party *Party, partyIndex int, player proto.Player) Character {
 			CastSpeedMultiplier:   1,
 			SpiritRegenMultiplier: 1,
 		},
-		Party:       party,
-		PartyIndex:  partyIndex,
-		RaidIndex:   party.Index*5 + partyIndex,
-		auraTracker: newAuraTracker(false),
-		Metrics:     NewCharacterMetrics(),
+		Party:      party,
+		PartyIndex: partyIndex,
+		RaidIndex:  party.Index*5 + partyIndex,
+
+		auraTracker:          newAuraTracker(false),
+		majorCooldownManager: newMajorCooldownManager(player.Cooldowns),
+
+		Metrics: NewCharacterMetrics(),
 	}
 
 	if player.Consumes != nil {
@@ -560,6 +563,7 @@ func (character *Character) GetStatsProto() *proto.PlayerStats {
 		GearOnly:   gearStats[:],
 		FinalStats: finalStats[:],
 		Sets:       setBonusNames,
+		Cooldowns:  character.GetMajorCooldownIDs(),
 	}
 }
 
