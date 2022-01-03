@@ -66,6 +66,7 @@ metaGemActiveConditions.set(SWIFT_STARFIRE_DIAMOND, (numRed, numYellow, numBlue)
 export const POTENT_NOBLE_TOPAZ = 24059;
 export const POTENT_PYRESTONE = 32218;
 export const VEILED_NOBLE_TOPAZ = 31867;
+export const VEILED_PYRESTONE = 32221;
 
 // Purple
 export const GLOWING_NIGHTSEYE = 24056;
@@ -76,8 +77,9 @@ export const RUNED_CRIMSON_SPINEL = 32196;
 export const RUNED_LIVING_RUBY = 24030;
 export const RUNED_ORNATE_RUBY = 28118;
 
-// Red
+// Yellow
 export const BRILLIANT_DAWNSTONE = 24047;
+export const BRILLIANT_LIONSEYE = 32204;
 
 const gemSocketCssClasses: Partial<Record<GemColor, string>> = {
   [GemColor.GemColorBlue]: 'socket-color-blue',
