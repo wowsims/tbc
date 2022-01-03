@@ -791,6 +791,22 @@ export var EnchantType;
      */
     EnchantType[EnchantType["EnchantTypeShield"] = 2] = "EnchantTypeShield";
 })(EnchantType || (EnchantType = {}));
+/**
+ * ID for actions that aren't spells or items.
+ *
+ * @generated from protobuf enum proto.OtherAction
+ */
+export var OtherAction;
+(function (OtherAction) {
+    /**
+     * @generated from protobuf enum value: OtherActionNone = 0;
+     */
+    OtherAction[OtherAction["OtherActionNone"] = 0] = "OtherActionNone";
+    /**
+     * @generated from protobuf enum value: OtherActionWait = 1;
+     */
+    OtherAction[OtherAction["OtherActionWait"] = 1] = "OtherActionWait";
+})(OtherAction || (OtherAction = {}));
 // @generated message type with reflection information, may provide speed optimized methods
 class RaidBuffs$Type extends MessageType {
     constructor() {
@@ -2138,3 +2154,189 @@ class RaidTarget$Type extends MessageType {
  * @generated MessageType for protobuf message proto.RaidTarget
  */
 export const RaidTarget = new RaidTarget$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class ActionID$Type extends MessageType {
+    constructor() {
+        super("proto.ActionID", [
+            { no: 1, name: "spell_id", kind: "scalar", oneof: "rawId", T: 5 /*ScalarType.INT32*/ },
+            { no: 2, name: "item_id", kind: "scalar", oneof: "rawId", T: 5 /*ScalarType.INT32*/ },
+            { no: 3, name: "other_id", kind: "enum", oneof: "rawId", T: () => ["proto.OtherAction", OtherAction] },
+            { no: 4, name: "tag", kind: "scalar", T: 5 /*ScalarType.INT32*/ }
+        ]);
+    }
+    create(value) {
+        const message = { rawId: { oneofKind: undefined }, tag: 0 };
+        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader, length, options, target) {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* int32 spell_id */ 1:
+                    message.rawId = {
+                        oneofKind: "spellId",
+                        spellId: reader.int32()
+                    };
+                    break;
+                case /* int32 item_id */ 2:
+                    message.rawId = {
+                        oneofKind: "itemId",
+                        itemId: reader.int32()
+                    };
+                    break;
+                case /* proto.OtherAction other_id */ 3:
+                    message.rawId = {
+                        oneofKind: "otherId",
+                        otherId: reader.int32()
+                    };
+                    break;
+                case /* int32 tag */ 4:
+                    message.tag = reader.int32();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message, writer, options) {
+        /* int32 spell_id = 1; */
+        if (message.rawId.oneofKind === "spellId")
+            writer.tag(1, WireType.Varint).int32(message.rawId.spellId);
+        /* int32 item_id = 2; */
+        if (message.rawId.oneofKind === "itemId")
+            writer.tag(2, WireType.Varint).int32(message.rawId.itemId);
+        /* proto.OtherAction other_id = 3; */
+        if (message.rawId.oneofKind === "otherId")
+            writer.tag(3, WireType.Varint).int32(message.rawId.otherId);
+        /* int32 tag = 4; */
+        if (message.tag !== 0)
+            writer.tag(4, WireType.Varint).int32(message.tag);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message proto.ActionID
+ */
+export const ActionID = new ActionID$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class Cooldown$Type extends MessageType {
+    constructor() {
+        super("proto.Cooldown", [
+            { no: 1, name: "id", kind: "message", T: () => ActionID },
+            { no: 2, name: "timings", kind: "scalar", repeat: 1 /*RepeatType.PACKED*/, T: 1 /*ScalarType.DOUBLE*/ }
+        ]);
+    }
+    create(value) {
+        const message = { timings: [] };
+        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader, length, options, target) {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* proto.ActionID id */ 1:
+                    message.id = ActionID.internalBinaryRead(reader, reader.uint32(), options, message.id);
+                    break;
+                case /* repeated double timings */ 2:
+                    if (wireType === WireType.LengthDelimited)
+                        for (let e = reader.int32() + reader.pos; reader.pos < e;)
+                            message.timings.push(reader.double());
+                    else
+                        message.timings.push(reader.double());
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message, writer, options) {
+        /* proto.ActionID id = 1; */
+        if (message.id)
+            ActionID.internalBinaryWrite(message.id, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+        /* repeated double timings = 2; */
+        if (message.timings.length) {
+            writer.tag(2, WireType.LengthDelimited).fork();
+            for (let i = 0; i < message.timings.length; i++)
+                writer.double(message.timings[i]);
+            writer.join();
+        }
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message proto.Cooldown
+ */
+export const Cooldown = new Cooldown$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class Cooldowns$Type extends MessageType {
+    constructor() {
+        super("proto.Cooldowns", [
+            { no: 1, name: "cooldowns", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => Cooldown }
+        ]);
+    }
+    create(value) {
+        const message = { cooldowns: [] };
+        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader, length, options, target) {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* repeated proto.Cooldown cooldowns */ 1:
+                    message.cooldowns.push(Cooldown.internalBinaryRead(reader, reader.uint32(), options));
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message, writer, options) {
+        /* repeated proto.Cooldown cooldowns = 1; */
+        for (let i = 0; i < message.cooldowns.length; i++)
+            Cooldown.internalBinaryWrite(message.cooldowns[i], writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message proto.Cooldowns
+ */
+export const Cooldowns = new Cooldowns$Type();

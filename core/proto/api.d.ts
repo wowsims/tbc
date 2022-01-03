@@ -9,8 +9,10 @@ import { Gem } from "./common";
 import { Enchant } from "./common";
 import { Item } from "./common";
 import { Encounter } from "./common";
+import { ActionID } from "./common";
 import { RaidBuffs } from "./common";
 import { PartyBuffs } from "./common";
+import { Cooldowns } from "./common";
 import { Warrior } from "./warrior";
 import { Warlock } from "./warlock";
 import { EnhancementShaman } from "./shaman";
@@ -132,6 +134,10 @@ export interface Player {
      * @generated from protobuf field: string talentsString = 17;
      */
     talentsString: string;
+    /**
+     * @generated from protobuf field: proto.Cooldowns cooldowns = 19;
+     */
+    cooldowns?: Cooldowns;
 }
 /**
  * @generated from protobuf message proto.Party
@@ -179,42 +185,6 @@ export interface SimOptions {
      * @generated from protobuf field: bool is_test = 5;
      */
     isTest: boolean;
-}
-/**
- * @generated from protobuf message proto.ActionID
- */
-export interface ActionID {
-    /**
-     * @generated from protobuf oneof: raw_id
-     */
-    rawId: {
-        oneofKind: "spellId";
-        /**
-         * @generated from protobuf field: int32 spell_id = 1;
-         */
-        spellId: number;
-    } | {
-        oneofKind: "itemId";
-        /**
-         * @generated from protobuf field: int32 item_id = 2;
-         */
-        itemId: number;
-    } | {
-        oneofKind: "otherId";
-        /**
-         * @generated from protobuf field: proto.OtherAction other_id = 3;
-         */
-        otherId: OtherAction;
-    } | {
-        oneofKind: undefined;
-    };
-    /**
-     * Distinguishes between different versions of the same action.
-     * Currently the only use for this is Shaman Lightning Overload.
-     *
-     * @generated from protobuf field: int32 tag = 4;
-     */
-    tag: number;
 }
 /**
  * The aggregated results from all uses of a particular action.
@@ -513,6 +483,10 @@ export interface PlayerStats {
      * @generated from protobuf field: proto.IndividualBuffs buffs = 4;
      */
     buffs?: IndividualBuffs;
+    /**
+     * @generated from protobuf field: repeated proto.ActionID cooldowns = 5;
+     */
+    cooldowns: ActionID[];
 }
 /**
  * @generated from protobuf message proto.PartyStats
@@ -597,21 +571,6 @@ export interface StatWeightsResult {
      */
     epValuesStdev: number[];
 }
-/**
- * ID for actions that aren't spells or items.
- *
- * @generated from protobuf enum proto.OtherAction
- */
-export declare enum OtherAction {
-    /**
-     * @generated from protobuf enum value: OtherActionNone = 0;
-     */
-    OtherActionNone = 0,
-    /**
-     * @generated from protobuf enum value: OtherActionWait = 1;
-     */
-    OtherActionWait = 1
-}
 declare class Player$Type extends MessageType<Player> {
     constructor();
     create(value?: PartialMessage<Player>): Player;
@@ -652,16 +611,6 @@ declare class SimOptions$Type extends MessageType<SimOptions> {
  * @generated MessageType for protobuf message proto.SimOptions
  */
 export declare const SimOptions: SimOptions$Type;
-declare class ActionID$Type extends MessageType<ActionID> {
-    constructor();
-    create(value?: PartialMessage<ActionID>): ActionID;
-    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: ActionID): ActionID;
-    internalBinaryWrite(message: ActionID, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
-}
-/**
- * @generated MessageType for protobuf message proto.ActionID
- */
-export declare const ActionID: ActionID$Type;
 declare class ActionMetrics$Type extends MessageType<ActionMetrics> {
     constructor();
     create(value?: PartialMessage<ActionMetrics>): ActionMetrics;

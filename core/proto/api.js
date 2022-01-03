@@ -8,8 +8,10 @@ import { Gem } from './common.js';
 import { Enchant } from './common.js';
 import { Item } from './common.js';
 import { Encounter } from './common.js';
+import { ActionID } from './common.js';
 import { RaidBuffs } from './common.js';
 import { PartyBuffs } from './common.js';
+import { Cooldowns } from './common.js';
 import { Warrior } from './warrior.js';
 import { Warlock } from './warlock.js';
 import { EnhancementShaman } from './shaman.js';
@@ -25,22 +27,6 @@ import { Consumes } from './common.js';
 import { EquipmentSpec } from './common.js';
 import { Class } from './common.js';
 import { Race } from './common.js';
-/**
- * ID for actions that aren't spells or items.
- *
- * @generated from protobuf enum proto.OtherAction
- */
-export var OtherAction;
-(function (OtherAction) {
-    /**
-     * @generated from protobuf enum value: OtherActionNone = 0;
-     */
-    OtherAction[OtherAction["OtherActionNone"] = 0] = "OtherActionNone";
-    /**
-     * @generated from protobuf enum value: OtherActionWait = 1;
-     */
-    OtherAction[OtherAction["OtherActionWait"] = 1] = "OtherActionWait";
-})(OtherAction || (OtherAction = {}));
 // @generated message type with reflection information, may provide speed optimized methods
 class Player$Type extends MessageType {
     constructor() {
@@ -62,7 +48,8 @@ class Player$Type extends MessageType {
             { no: 18, name: "enhancement_shaman", kind: "message", oneof: "spec", T: () => EnhancementShaman },
             { no: 13, name: "warlock", kind: "message", oneof: "spec", T: () => Warlock },
             { no: 14, name: "warrior", kind: "message", oneof: "spec", T: () => Warrior },
-            { no: 17, name: "talentsString", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
+            { no: 17, name: "talentsString", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 19, name: "cooldowns", kind: "message", T: () => Cooldowns }
         ]);
     }
     create(value) {
@@ -165,6 +152,9 @@ class Player$Type extends MessageType {
                 case /* string talentsString */ 17:
                     message.talentsString = reader.string();
                     break;
+                case /* proto.Cooldowns cooldowns */ 19:
+                    message.cooldowns = Cooldowns.internalBinaryRead(reader, reader.uint32(), options, message.cooldowns);
+                    break;
                 default:
                     let u = options.readUnknownField;
                     if (u === "throw")
@@ -235,6 +225,9 @@ class Player$Type extends MessageType {
         /* string talentsString = 17; */
         if (message.talentsString !== "")
             writer.tag(17, WireType.LengthDelimited).string(message.talentsString);
+        /* proto.Cooldowns cooldowns = 19; */
+        if (message.cooldowns)
+            Cooldowns.internalBinaryWrite(message.cooldowns, writer.tag(19, WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -421,83 +414,6 @@ class SimOptions$Type extends MessageType {
  * @generated MessageType for protobuf message proto.SimOptions
  */
 export const SimOptions = new SimOptions$Type();
-// @generated message type with reflection information, may provide speed optimized methods
-class ActionID$Type extends MessageType {
-    constructor() {
-        super("proto.ActionID", [
-            { no: 1, name: "spell_id", kind: "scalar", oneof: "rawId", T: 5 /*ScalarType.INT32*/ },
-            { no: 2, name: "item_id", kind: "scalar", oneof: "rawId", T: 5 /*ScalarType.INT32*/ },
-            { no: 3, name: "other_id", kind: "enum", oneof: "rawId", T: () => ["proto.OtherAction", OtherAction] },
-            { no: 4, name: "tag", kind: "scalar", T: 5 /*ScalarType.INT32*/ }
-        ]);
-    }
-    create(value) {
-        const message = { rawId: { oneofKind: undefined }, tag: 0 };
-        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
-        if (value !== undefined)
-            reflectionMergePartial(this, message, value);
-        return message;
-    }
-    internalBinaryRead(reader, length, options, target) {
-        let message = target ?? this.create(), end = reader.pos + length;
-        while (reader.pos < end) {
-            let [fieldNo, wireType] = reader.tag();
-            switch (fieldNo) {
-                case /* int32 spell_id */ 1:
-                    message.rawId = {
-                        oneofKind: "spellId",
-                        spellId: reader.int32()
-                    };
-                    break;
-                case /* int32 item_id */ 2:
-                    message.rawId = {
-                        oneofKind: "itemId",
-                        itemId: reader.int32()
-                    };
-                    break;
-                case /* proto.OtherAction other_id */ 3:
-                    message.rawId = {
-                        oneofKind: "otherId",
-                        otherId: reader.int32()
-                    };
-                    break;
-                case /* int32 tag */ 4:
-                    message.tag = reader.int32();
-                    break;
-                default:
-                    let u = options.readUnknownField;
-                    if (u === "throw")
-                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
-                    let d = reader.skip(wireType);
-                    if (u !== false)
-                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
-            }
-        }
-        return message;
-    }
-    internalBinaryWrite(message, writer, options) {
-        /* int32 spell_id = 1; */
-        if (message.rawId.oneofKind === "spellId")
-            writer.tag(1, WireType.Varint).int32(message.rawId.spellId);
-        /* int32 item_id = 2; */
-        if (message.rawId.oneofKind === "itemId")
-            writer.tag(2, WireType.Varint).int32(message.rawId.itemId);
-        /* proto.OtherAction other_id = 3; */
-        if (message.rawId.oneofKind === "otherId")
-            writer.tag(3, WireType.Varint).int32(message.rawId.otherId);
-        /* int32 tag = 4; */
-        if (message.tag !== 0)
-            writer.tag(4, WireType.Varint).int32(message.tag);
-        let u = options.writeUnknownFields;
-        if (u !== false)
-            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
-        return writer;
-    }
-}
-/**
- * @generated MessageType for protobuf message proto.ActionID
- */
-export const ActionID = new ActionID$Type();
 // @generated message type with reflection information, may provide speed optimized methods
 class ActionMetrics$Type extends MessageType {
     constructor() {
@@ -1401,11 +1317,12 @@ class PlayerStats$Type extends MessageType {
             { no: 1, name: "gear_only", kind: "scalar", repeat: 1 /*RepeatType.PACKED*/, T: 1 /*ScalarType.DOUBLE*/ },
             { no: 2, name: "final_stats", kind: "scalar", repeat: 1 /*RepeatType.PACKED*/, T: 1 /*ScalarType.DOUBLE*/ },
             { no: 3, name: "sets", kind: "scalar", repeat: 2 /*RepeatType.UNPACKED*/, T: 9 /*ScalarType.STRING*/ },
-            { no: 4, name: "buffs", kind: "message", T: () => IndividualBuffs }
+            { no: 4, name: "buffs", kind: "message", T: () => IndividualBuffs },
+            { no: 5, name: "cooldowns", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => ActionID }
         ]);
     }
     create(value) {
-        const message = { gearOnly: [], finalStats: [], sets: [] };
+        const message = { gearOnly: [], finalStats: [], sets: [], cooldowns: [] };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -1435,6 +1352,9 @@ class PlayerStats$Type extends MessageType {
                     break;
                 case /* proto.IndividualBuffs buffs */ 4:
                     message.buffs = IndividualBuffs.internalBinaryRead(reader, reader.uint32(), options, message.buffs);
+                    break;
+                case /* repeated proto.ActionID cooldowns */ 5:
+                    message.cooldowns.push(ActionID.internalBinaryRead(reader, reader.uint32(), options));
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -1468,6 +1388,9 @@ class PlayerStats$Type extends MessageType {
         /* proto.IndividualBuffs buffs = 4; */
         if (message.buffs)
             IndividualBuffs.internalBinaryWrite(message.buffs, writer.tag(4, WireType.LengthDelimited).fork(), options).join();
+        /* repeated proto.ActionID cooldowns = 5; */
+        for (let i = 0; i < message.cooldowns.length; i++)
+            ActionID.internalBinaryWrite(message.cooldowns[i], writer.tag(5, WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

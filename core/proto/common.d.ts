@@ -536,6 +536,73 @@ export interface RaidTarget {
     targetIndex: number;
 }
 /**
+ * @generated from protobuf message proto.ActionID
+ */
+export interface ActionID {
+    /**
+     * @generated from protobuf oneof: raw_id
+     */
+    rawId: {
+        oneofKind: "spellId";
+        /**
+         * @generated from protobuf field: int32 spell_id = 1;
+         */
+        spellId: number;
+    } | {
+        oneofKind: "itemId";
+        /**
+         * @generated from protobuf field: int32 item_id = 2;
+         */
+        itemId: number;
+    } | {
+        oneofKind: "otherId";
+        /**
+         * @generated from protobuf field: proto.OtherAction other_id = 3;
+         */
+        otherId: OtherAction;
+    } | {
+        oneofKind: undefined;
+    };
+    /**
+     * Distinguishes between different versions of the same action.
+     * Currently the only use for this is Shaman Lightning Overload.
+     *
+     * @generated from protobuf field: int32 tag = 4;
+     */
+    tag: number;
+}
+/**
+ * Custom options for a particular cooldown.
+ *
+ * @generated from protobuf message proto.Cooldown
+ */
+export interface Cooldown {
+    /**
+     * Identifies the cooldown to which these settings will apply.
+     *
+     * @generated from protobuf field: proto.ActionID id = 1;
+     */
+    id?: ActionID;
+    /**
+     * Fixed times at which to use this cooldown. Each value corresponds to a usage,
+     * e.g. first value is the first usage, second value is the second usage.
+     * Any usages after the specified timings will occur as soon as possible, subject
+     * to the ShouldActivate() condition.
+     *
+     * @generated from protobuf field: repeated double timings = 2;
+     */
+    timings: number[];
+}
+/**
+ * @generated from protobuf message proto.Cooldowns
+ */
+export interface Cooldowns {
+    /**
+     * @generated from protobuf field: repeated proto.Cooldown cooldowns = 1;
+     */
+    cooldowns: Cooldown[];
+}
+/**
  * @generated from protobuf enum proto.Spec
  */
 export declare enum Spec {
@@ -1304,6 +1371,21 @@ export declare enum EnchantType {
      */
     EnchantTypeShield = 2
 }
+/**
+ * ID for actions that aren't spells or items.
+ *
+ * @generated from protobuf enum proto.OtherAction
+ */
+export declare enum OtherAction {
+    /**
+     * @generated from protobuf enum value: OtherActionNone = 0;
+     */
+    OtherActionNone = 0,
+    /**
+     * @generated from protobuf enum value: OtherActionWait = 1;
+     */
+    OtherActionWait = 1
+}
 declare class RaidBuffs$Type extends MessageType<RaidBuffs> {
     constructor();
     create(value?: PartialMessage<RaidBuffs>): RaidBuffs;
@@ -1434,4 +1516,34 @@ declare class RaidTarget$Type extends MessageType<RaidTarget> {
  * @generated MessageType for protobuf message proto.RaidTarget
  */
 export declare const RaidTarget: RaidTarget$Type;
+declare class ActionID$Type extends MessageType<ActionID> {
+    constructor();
+    create(value?: PartialMessage<ActionID>): ActionID;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: ActionID): ActionID;
+    internalBinaryWrite(message: ActionID, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message proto.ActionID
+ */
+export declare const ActionID: ActionID$Type;
+declare class Cooldown$Type extends MessageType<Cooldown> {
+    constructor();
+    create(value?: PartialMessage<Cooldown>): Cooldown;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: Cooldown): Cooldown;
+    internalBinaryWrite(message: Cooldown, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message proto.Cooldown
+ */
+export declare const Cooldown: Cooldown$Type;
+declare class Cooldowns$Type extends MessageType<Cooldowns> {
+    constructor();
+    create(value?: PartialMessage<Cooldowns>): Cooldowns;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: Cooldowns): Cooldowns;
+    internalBinaryWrite(message: Cooldowns, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message proto.Cooldowns
+ */
+export declare const Cooldowns: Cooldowns$Type;
 export {};
