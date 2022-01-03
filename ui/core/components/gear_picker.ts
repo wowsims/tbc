@@ -359,6 +359,7 @@ class SelectorModal extends Component {
     tabElem.innerHTML = `<a class="selector-modal-item-tab" data-toggle="tab" href="#${tabContentId}"></a>`;
 
 		const tabAnchor = tabElem.getElementsByClassName('selector-modal-item-tab')[0] as HTMLAnchorElement;
+		tabAnchor.dataset.label = label;
 		if (setTabContent) {
 			setTabContent(tabAnchor);
 		} else {
@@ -526,12 +527,14 @@ class SelectorModal extends Component {
   }
 
   private removeTabs(labelSubstring: string) {
-    const tabElems = Array.prototype.slice.call(this.tabsElem.getElementsByClassName('selector-modal-item-tab')).filter(tab => tab.textContent.includes(labelSubstring));
+    const tabElems = Array.prototype.slice.call(this.tabsElem.getElementsByClassName('selector-modal-item-tab'))
+				.filter(tab => tab.dataset.label.includes(labelSubstring));
+
     const contentElems = tabElems
         .map(tabElem => document.getElementById(tabElem.href.substring(1)))
         .filter(tabElem => Boolean(tabElem));
 
-    tabElems.forEach(elem => elem.remove());
+    tabElems.forEach(elem => elem.parentElement.remove());
     contentElems.forEach(elem => elem!.remove());
   }
 }

@@ -126,9 +126,10 @@ var waterElementalInheritanceCoeffs = stats.Stats{
 	stats.Stamina:   0.2238,
 	stats.Intellect: 0.01,
 
-	stats.SpellPower: 0.333,
-	stats.SpellHit:   0,
-	stats.SpellCrit:  0,
+	stats.SpellPower:      0.333,
+	stats.FrostSpellPower: 0.333,
+	stats.SpellHit:        0,
+	stats.SpellCrit:       0,
 }
 
 const SpellIDWaterbolt int32 = 31707

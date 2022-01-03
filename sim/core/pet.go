@@ -22,8 +22,6 @@ type Pet struct {
 
 	Owner *Character
 
-	baseStats stats.Stats
-
 	// Coefficients for each stat that correspond to the proportion
 	// of that stat inherited from the owner.
 	statInheritanceCoeffs stats.Stats
@@ -57,15 +55,16 @@ func NewPet(name string, owner *Character, baseStats stats.Stats, statInheritanc
 			PartyIndex:  owner.PartyIndex,
 			RaidIndex:   owner.RaidIndex,
 			auraTracker: newAuraTracker(false),
+			baseStats:   baseStats,
 			Metrics:     NewCharacterMetrics(),
 		},
 		Owner:                 owner,
-		baseStats:             baseStats,
 		statInheritanceCoeffs: statInheritanceCoeffs,
 		initialEnabled:        enabledOnStart,
 	}
 
 	pet.AddStats(baseStats)
+	pet.addUniversalStatDependencies()
 
 	return pet
 }
@@ -112,14 +111,14 @@ func (pet *Pet) Enable(sim *Simulation, petAgent PetAgent) {
 		panic("Pet is already enabled!")
 	}
 
-	if sim.Log != nil {
-		pet.Log(sim, "Pet summoned")
-	}
-
 	pet.pendingAction = sim.newDefaultAgentAction(petAgent)
 	sim.AddPendingAction(pet.pendingAction)
 
 	pet.enabled = true
+
+	if sim.Log != nil {
+		pet.Log(sim, "Pet summoned")
+	}
 }
 func (pet *Pet) Disable(sim *Simulation) {
 	if !pet.enabled {
