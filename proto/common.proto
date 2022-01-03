@@ -413,18 +413,53 @@ message Enchant {
 }
 
 message Gem {
-    int32 id = 1;
-    string name = 2;
+	int32 id = 1;
+	string name = 2;
 
-    repeated double stats = 3;
-    GemColor color = 4;
+	repeated double stats = 3;
+	GemColor color = 4;
 
-    int32 phase = 5;
-    ItemQuality quality = 6;
+	int32 phase = 5;
+	ItemQuality quality = 6;
 	bool unique = 7;
 }
 
 message RaidTarget {
-		// Raid index of the player to target. A value of -1 indicates no target.
-    int32 target_index = 1;
+	// Raid index of the player to target. A value of -1 indicates no target.
+	int32 target_index = 1;
+}
+
+// ID for actions that aren't spells or items.
+enum OtherAction {
+	OtherActionNone = 0;
+	OtherActionWait = 1;
+}
+
+message ActionID {
+	// Identifies this action.
+	oneof raw_id {
+		int32 spell_id = 1;
+		int32 item_id = 2;
+		OtherAction other_id = 3;
+	}
+
+	// Distinguishes between different versions of the same action.
+	// Currently the only use for this is Shaman Lightning Overload.
+	int32 tag = 4;
+}
+
+// Custom options for a particular cooldown.
+message Cooldown {
+	// Identifies the cooldown to which these settings will apply.
+	ActionID id = 1;
+
+	// Fixed times at which to use this cooldown. Each value corresponds to a usage,
+	// e.g. first value is the first usage, second value is the second usage.
+	// Any usages after the specified timings will occur as soon as possible, subject
+	// to the ShouldActivate() condition.
+	repeated double timings = 2;
+}
+
+message Cooldowns {
+	repeated Cooldown cooldowns = 1;
 }

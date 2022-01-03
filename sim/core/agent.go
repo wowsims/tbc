@@ -88,6 +88,16 @@ func (actionID ActionID) ToProto() *proto.ActionID {
 	return protoID
 }
 
+func ProtoToActionID(protoID proto.ActionID) ActionID {
+	actionID := ActionID{
+		ItemID:  protoID.GetItemId(),
+		SpellID: protoID.GetSpellId(),
+		OtherID: protoID.GetOtherId(),
+		Tag:     protoID.Tag,
+	}
+	return actionID
+}
+
 type AgentFactory func(Character, proto.Player) Agent
 type SpecSetter func(*proto.Player, interface{})
 
