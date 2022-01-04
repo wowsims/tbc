@@ -76,7 +76,7 @@ func (shaman *Shaman) NewFrostShock(sim *core.Simulation, target *core.Target) *
 	return shock
 }
 
-const SpellIDEarthShock int32 = 25464
+const SpellIDEarthShock int32 = 25454
 
 func (shaman *Shaman) newEarthShockTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
 	baseManaCost := 535.0

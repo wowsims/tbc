@@ -503,10 +503,7 @@ func (aa *AutoAttacks) ModifySwingTime(sim *Simulation, amount float64) {
 // TimeUntil compares swing timers to the next cast or attack and returns the time the next event occurs at.
 //   This could probably be broken into TimeUntil(cast), TimeUntil(attack), TimeUntil(event)
 func (aa *AutoAttacks) TimeUntil(sim *Simulation, cast *SimpleSpell, atk *ActiveMeleeAbility, event time.Duration) time.Duration {
-	var nextEventTime time.Duration
-	if event > 0 {
-		nextEventTime = event
-	}
+	nextEventTime := event
 	if cast != nil {
 		if cast.CastTime > 0 {
 			// Resume swings after cast is completed

@@ -72,18 +72,29 @@ func (enh *EnhancementShaman) Act(sim *core.Simulation) time.Duration {
 		return enh.AutoAttacks.TimeUntil(sim, nil, nil, dropTime)
 	}
 
+	success := true
+	cost := 0.0
 	useSRManaPercent := 0.1
 	if enh.CurrentMana() < enh.MaxMana()*useSRManaPercent && enh.TryActivateShamanisticRage(sim) {
 		// Just wait for GCD
 		return enh.AutoAttacks.TimeUntil(sim, nil, nil, 0)
 	} else if enh.GetRemainingCD(shaman.StormstrikeCD, sim.CurrentTime) == 0 {
 		ss := enh.NewStormstrike(sim, sim.GetPrimaryTarget())
-		ss.Attack(sim)
-		return enh.AutoAttacks.TimeUntil(sim, nil, ss, 0)
+		cost = ss.Cost.Value
+		if success = ss.Attack(sim); success {
+			return enh.AutoAttacks.TimeUntil(sim, nil, ss, 0)
+		}
 	} else if enh.GetRemainingCD(shaman.ShockCooldownID, sim.CurrentTime) == 0 {
 		shock := enh.NewEarthShock(sim, sim.GetPrimaryTarget())
-		shock.Cast(sim)
-		return enh.AutoAttacks.TimeUntil(sim, shock, nil, 0)
+		cost = shock.ManaCost
+		if success = shock.Cast(sim); success {
+			return enh.AutoAttacks.TimeUntil(sim, shock, nil, 0)
+		}
+	}
+	if !success {
+		regenTime := enh.TimeUntilManaRegen(cost)
+		enh.Character.Metrics.MarkOOM(sim, &enh.Character, regenTime)
+		return sim.CurrentTime + regenTime
 	}
 
 	// Do nothing, just swing axes until next CD available

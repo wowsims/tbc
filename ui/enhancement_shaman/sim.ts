@@ -138,13 +138,14 @@ export class EnhancementShamanSimUI extends IndividualSimUI<Spec.SpecEnhancement
 			// IconInputs to include in the 'Debuffs' section on the settings tab.
 			debuffInputs: [
 				IconInputs.ImprovedSealOfTheCrusader,
+				IconInputs.JudgementOfWisdom,
 				IconInputs.FaerieFire,
 				IconInputs.SunderArmor,
-				IconInputs.CurseOfRecklessness,
 				IconInputs.ExposeArmor,
-				IconInputs.JudgementOfWisdom,
+				IconInputs.CurseOfRecklessness,
 				IconInputs.Misery,
 				IconInputs.ImprovedScorch,
+				IconInputs.CurseOfElements,
 			],
 			// IconInputs to include in the 'Consumes' section on the settings tab.
 			consumeInputs: [
