@@ -116,8 +116,6 @@ export class EnhancementShamanSimUI extends IndividualSimUI<Spec.SpecEnhancement
 			selfBuffInputs: [
 				ShamanInputs.IconWaterShield,
 				ShamanInputs.IconBloodlust,
-				// TODO: add totem icons
-				// ShamanInputs.IconManaSpringTotem,
 				IconInputs.DrumsOfBattleConsume,
 				IconInputs.DrumsOfRestorationConsume,
 			],
@@ -144,10 +142,12 @@ export class EnhancementShamanSimUI extends IndividualSimUI<Spec.SpecEnhancement
 				IconInputs.SunderArmor,
 				IconInputs.CurseOfRecklessness,
 				IconInputs.ExposeArmor,
+				IconInputs.JudgementOfWisdom,
+				IconInputs.Misery,
+				IconInputs.ImprovedScorch,
 			],
 			// IconInputs to include in the 'Consumes' section on the settings tab.
 			consumeInputs: [
-				IconInputs.DefaultSuperManaPotion,
 				IconInputs.DefaultHastePotion,
 				IconInputs.DefaultDarkRune,
 				IconInputs.FlaskOfRelentlessAssault,
