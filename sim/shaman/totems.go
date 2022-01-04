@@ -34,6 +34,9 @@ func (shaman *Shaman) NewWrathOfAirTotem(sim *core.Simulation) *core.SimpleCast 
 			ManaCost:     manaCost,
 			GCDCooldown:  time.Second * 1,
 		},
+		OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
+			shaman.SelfBuffs.NextTotemDrops[AirTotem] = sim.CurrentTime + time.Second*120
+		},
 	}
 	cast.Init(sim)
 	return cast
@@ -53,6 +56,10 @@ func (shaman *Shaman) NewGraceOfAirTotem(sim *core.Simulation) *core.SimpleCast 
 			ManaCost:     manaCost,
 			GCDCooldown:  time.Second * 1,
 		},
+		OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
+			shaman.SelfBuffs.NextTotemDrops[AirTotem] = sim.CurrentTime + time.Second*120
+			shaman.tryTwistWindfury(sim)
+		},
 	}
 	cast.Init(sim)
 	return cast
@@ -71,6 +78,10 @@ func (shaman *Shaman) NewWindfuryTotem(sim *core.Simulation) *core.SimpleCast {
 			BaseManaCost: baseManaCost,
 			ManaCost:     manaCost,
 			GCDCooldown:  time.Second * 1,
+		},
+		OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
+			shaman.SelfBuffs.NextTotemDrops[AirTotem] = sim.CurrentTime + time.Second*120
+			shaman.tryTwistWindfury(sim)
 		},
 	}
 	cast.Init(sim)
@@ -143,6 +154,21 @@ func (shaman *Shaman) NewEarthTotem(sim *core.Simulation) *core.SimpleCast {
 	return cast
 }
 
+func (shaman *Shaman) tryTwistWindfury(sim *core.Simulation) {
+	if !shaman.SelfBuffs.TwistWindfury {
+		return
+	}
+
+	// Swap to WF if we didn't just cast it, otherwise drop the other air totem immediately.
+	if shaman.SelfBuffs.NextTotemDropType[AirTotem] != windfuryTotem {
+		shaman.SelfBuffs.NextTotemDropType[AirTotem] = windfuryTotem
+		shaman.SelfBuffs.NextTotemDrops[AirTotem] = sim.CurrentTime + time.Second*10 // 10s until you need to drop WF
+	} else {
+		shaman.SelfBuffs.NextTotemDropType[AirTotem] = int32(shaman.SelfBuffs.AirTotem)
+		shaman.SelfBuffs.NextTotemDrops[AirTotem] = sim.CurrentTime + time.Second // drop immediately
+	}
+}
+
 // TryDropTotems will check to see if totems need to be re-cast.
 //  If they do time.Duration will be returned will be >0.
 func (shaman *Shaman) TryDropTotems(sim *core.Simulation) time.Duration {
@@ -171,24 +197,12 @@ func (shaman *Shaman) TryDropTotems(sim *core.Simulation) time.Duration {
 				case graceOfAirTotem:
 					cast = shaman.NewGraceOfAirTotem(sim)
 				}
-				if shaman.SelfBuffs.TwistWindfury {
-					if nextDrop != windfuryTotem {
-						shaman.SelfBuffs.NextTotemDropType[AirTotem] = windfuryTotem
-						shaman.SelfBuffs.NextTotemDrops[AirTotem] = sim.CurrentTime + time.Second*10 // 10s until you need to drop WF
-					} else {
-						shaman.SelfBuffs.NextTotemDropType[AirTotem] = int32(shaman.SelfBuffs.AirTotem)
-						shaman.SelfBuffs.NextTotemDrops[AirTotem] = sim.CurrentTime + time.Second // drop immediately
-					}
-				} else {
-					shaman.SelfBuffs.NextTotemDrops[AirTotem] = sim.CurrentTime + time.Second*120
-				}
 			case EarthTotem:
 				cast = shaman.NewEarthTotem(sim)
 			case FireTotem:
 				switch nextDrop {
 				case totemOfWrath:
 					cast = shaman.NewTotemOfWrath(sim)
-					shaman.SelfBuffs.NextTotemDrops[FireTotem] = sim.CurrentTime + time.Second*120
 				case searingTotem:
 					attackCast = shaman.NewSearingTotem(sim, sim.GetPrimaryTarget())
 					shaman.SelfBuffs.NextTotemDrops[FireTotem] = sim.CurrentTime + time.Second*60 + 1
@@ -228,7 +242,6 @@ func (shaman *Shaman) TryDropTotems(sim *core.Simulation) time.Duration {
 				shaman.SelfBuffs.NextTotemDrops[FireTotem] = sim.CurrentTime + shaman.GetRemainingCD(CooldownIDNovaTotem, sim.CurrentTime)
 			} else {
 				shaman.SelfBuffs.NextTotemDropType[FireTotem] = int32(shaman.SelfBuffs.FireTotem)
-				shaman.SelfBuffs.NextTotemDrops[FireTotem] = sim.CurrentTime + time.Second*5 + 1 // drop immediately after nova goes off
 			}
 		}
 	} else {
