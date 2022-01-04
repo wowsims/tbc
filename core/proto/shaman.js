@@ -112,6 +112,10 @@ export var FireTotem;
      * @generated from protobuf enum value: TotemOfWrath = 3;
      */
     FireTotem[FireTotem["TotemOfWrath"] = 3] = "TotemOfWrath";
+    /**
+     * @generated from protobuf enum value: FireNovaTotem = 4;
+     */
+    FireTotem[FireTotem["FireNovaTotem"] = 4] = "FireNovaTotem";
 })(FireTotem || (FireTotem = {}));
 /**
  * @generated from protobuf enum proto.WaterTotem

@@ -32,279 +32,92 @@ export const DefaultConsumes = Consumes.create({
     brilliantWizardOil: true,
     blackenedBasilisk: true,
 });
-export const PRERAID_GEAR = {
-    name: 'PreRaid Gear',
-    gear: EquipmentSpec.create({
-        items: [
-            ItemSpec.create({
-                id: 28349,
-                enchant: Enchants.GLYPH_OF_POWER,
-                gems: [
-                    Gems.POTENT_NOBLE_TOPAZ,
-                    Gems.CHAOTIC_SKYFIRE_DIAMOND,
-                ],
-            }),
-            ItemSpec.create({
-                id: 28134, // Brooch of Heightened Potential
-            }),
-            ItemSpec.create({
-                id: 27802,
-                enchant: Enchants.GREATER_INSCRIPTION_OF_DISCIPLINE,
-                gems: [
-                    Gems.RUNED_LIVING_RUBY,
-                    Gems.GLOWING_NIGHTSEYE,
-                ],
-            }),
-            ItemSpec.create({
-                id: 28269, // Baba's Cloak of Arcanistry
-            }),
-            ItemSpec.create({
-                id: 28231,
-                enchant: Enchants.CHEST_EXCEPTIONAL_STATS,
-                gems: [
-                    Gems.GLOWING_NIGHTSEYE,
-                    Gems.POTENT_NOBLE_TOPAZ,
-                    Gems.POTENT_NOBLE_TOPAZ,
-                ],
-            }),
-            ItemSpec.create({
-                id: 28174,
-                enchant: Enchants.WRIST_SPELLPOWER,
-                gems: [
-                    Gems.RUNED_LIVING_RUBY,
-                ],
-            }),
-            ItemSpec.create({
-                id: 27510,
-                enchant: Enchants.GLOVES_SPELLPOWER,
-            }),
-            ItemSpec.create({
-                id: 27783, // Moonrage Girdle
-            }),
-            ItemSpec.create({
-                id: 27909,
-                enchant: Enchants.RUNIC_SPELLTHREAD,
-            }),
-            ItemSpec.create({
-                id: 29313, // Earthbreaker's Greaves
-            }),
-            ItemSpec.create({
-                id: 28555,
-                enchant: Enchants.RING_SPELLPOWER,
-            }),
-            ItemSpec.create({
-                id: 28510,
-                enchant: Enchants.RING_SPELLPOWER,
-            }),
-            ItemSpec.create({
-                id: 29370, // Icon of the Silver Crescent
-            }),
-            ItemSpec.create({
-                id: 27683, // Quagmirran's Eye
-            }),
-            ItemSpec.create({
-                id: 30832,
-                enchant: Enchants.WEAPON_SPELLPOWER,
-            }),
-            ItemSpec.create({
-                id: 29268, // Mazthoril Honor Shield
-            }),
-            ItemSpec.create({
-                id: 28248, // Totem of the Void
-            }),
-        ],
-    }),
-};
-export const P1_BIS = {
-    name: 'P1 BIS',
-    tooltip: Tooltips.BASIC_BIS_DISCLAIMER,
-    gear: EquipmentSpec.create({
-        items: [
-            ItemSpec.create({
-                id: 29035,
-                enchant: Enchants.GLYPH_OF_POWER,
-                gems: [
-                    Gems.CHAOTIC_SKYFIRE_DIAMOND,
-                    Gems.POTENT_NOBLE_TOPAZ,
-                ],
-            }),
-            ItemSpec.create({
-                id: 28762, // Adornment of Stolen Souls
-            }),
-            ItemSpec.create({
-                id: 29037,
-                enchant: Enchants.GREATER_INSCRIPTION_OF_DISCIPLINE,
-                gems: [
-                    Gems.POTENT_NOBLE_TOPAZ,
-                    Gems.POTENT_NOBLE_TOPAZ,
-                ],
-            }),
-            ItemSpec.create({
-                id: 28797,
-                enchant: Enchants.SUBTLETY,
-            }),
-            ItemSpec.create({
-                id: 29519,
-                enchant: Enchants.CHEST_EXCEPTIONAL_STATS,
-                gems: [
-                    Gems.RUNED_LIVING_RUBY,
-                    Gems.RUNED_LIVING_RUBY,
-                    Gems.RUNED_LIVING_RUBY,
-                ],
-            }),
-            ItemSpec.create({
-                id: 29521,
-                enchant: Enchants.WRIST_SPELLPOWER,
-                gems: [
-                    Gems.POTENT_NOBLE_TOPAZ,
-                ],
-            }),
-            ItemSpec.create({
-                id: 28780,
-                enchant: Enchants.GLOVES_SPELLPOWER,
-                gems: [
-                    Gems.POTENT_NOBLE_TOPAZ,
-                    Gems.GLOWING_NIGHTSEYE,
-                ],
-            }),
-            ItemSpec.create({
-                id: 29520,
-                gems: [
-                    Gems.GLOWING_NIGHTSEYE,
-                    Gems.POTENT_NOBLE_TOPAZ,
-                ],
-            }),
-            ItemSpec.create({
-                id: 24262,
-                enchant: Enchants.RUNIC_SPELLTHREAD,
-                gems: [
-                    Gems.RUNED_LIVING_RUBY,
-                    Gems.RUNED_LIVING_RUBY,
-                    Gems.RUNED_LIVING_RUBY,
-                ],
-            }),
-            ItemSpec.create({
-                id: 28517,
-                enchant: Enchants.BOARS_SPEED,
-                gems: [
-                    Gems.RUNED_LIVING_RUBY,
-                    Gems.RUNED_LIVING_RUBY,
-                ],
-            }),
-            ItemSpec.create({
-                id: 30667,
-                enchant: Enchants.RING_SPELLPOWER,
-            }),
-            ItemSpec.create({
-                id: 28753,
-                enchant: Enchants.RING_SPELLPOWER,
-            }),
-            ItemSpec.create({
-                id: 29370, // Icon of the Silver Crescent
-            }),
-            ItemSpec.create({
-                id: 28785, // Lightning Capacitor
-            }),
-            ItemSpec.create({
-                id: 28770,
-                enchant: Enchants.WEAPON_SPELLPOWER,
-            }),
-            ItemSpec.create({
-                id: 29273, // Khadgar's Knapsack
-            }),
-            ItemSpec.create({
-                id: 28248, // Totem of the Void
-            }),
-        ],
-    }),
-};
 export const P2_BIS = {
     name: 'P2 BIS',
     tooltip: Tooltips.BASIC_BIS_DISCLAIMER,
     gear: EquipmentSpec.create({
         items: [
             ItemSpec.create({
-                id: 29035,
-                enchant: Enchants.GLYPH_OF_POWER,
+                id: 30190,
+                enchant: Enchants.GLYPH_OF_FEROCITY,
                 gems: [
-                    Gems.CHAOTIC_SKYFIRE_DIAMOND,
-                    Gems.POTENT_NOBLE_TOPAZ,
+                    Gems.RELENTLESS_EARTHSTORM_DIAMOND,
+                    Gems.INSCRIBED_NOBLE_TOPAZ,
                 ],
             }),
             ItemSpec.create({
-                id: 30015, // The Sun King's Talisman
+                id: 30017, // Telonicus's Pendant of Mayhem
             }),
             ItemSpec.create({
-                id: 29037,
-                enchant: Enchants.GREATER_INSCRIPTION_OF_DISCIPLINE,
+                id: 30055,
+                enchant: Enchants.GREATER_INSCRIPTION_OF_VENGEANCE,
                 gems: [
-                    Gems.POTENT_NOBLE_TOPAZ,
-                    Gems.POTENT_NOBLE_TOPAZ,
+                    Gems.BOLD_LIVING_RUBY,
                 ],
             }),
             ItemSpec.create({
-                id: 28797,
-                enchant: Enchants.SUBTLETY,
+                id: 29994, // Thalassian Wildercloak
             }),
             ItemSpec.create({
-                id: 30169,
+                id: 30185,
                 enchant: Enchants.CHEST_EXCEPTIONAL_STATS,
                 gems: [
-                    Gems.RUNED_LIVING_RUBY,
-                    Gems.RUNED_LIVING_RUBY,
-                    Gems.RUNED_LIVING_RUBY,
+                    Gems.BOLD_LIVING_RUBY,
+                    Gems.SOVEREIGN_NIGHTSEYE,
+                    Gems.INSCRIBED_NOBLE_TOPAZ,
                 ],
             }),
             ItemSpec.create({
-                id: 29918,
-                enchant: Enchants.WRIST_SPELLPOWER,
-            }),
-            ItemSpec.create({
-                id: 28780,
-                enchant: Enchants.GLOVES_SPELLPOWER,
+                id: 30091,
+                enchant: Enchants.WRIST_BRAWN,
                 gems: [
-                    Gems.POTENT_NOBLE_TOPAZ,
-                    Gems.GLOWING_NIGHTSEYE,
+                    Gems.BOLD_LIVING_RUBY,
                 ],
             }),
             ItemSpec.create({
-                id: 30038,
+                id: 30189,
+                enchant: Enchants.GLOVES_STRENGTH,
+            }),
+            ItemSpec.create({
+                id: 30106,
                 gems: [
-                    Gems.GLOWING_NIGHTSEYE,
-                    Gems.POTENT_NOBLE_TOPAZ,
+                    Gems.BOLD_LIVING_RUBY,
+                    Gems.SOVEREIGN_NIGHTSEYE,
                 ],
             }),
             ItemSpec.create({
-                id: 30172,
-                enchant: Enchants.RUNIC_SPELLTHREAD,
+                id: 30192,
+                enchant: Enchants.NETHERCOBRA_LEG_ARMOR,
                 gems: [
-                    Gems.POTENT_NOBLE_TOPAZ,
+                    Gems.BOLD_LIVING_RUBY,
                 ],
             }),
             ItemSpec.create({
-                id: 30067,
-                enchant: Enchants.BOARS_SPEED,
+                id: 30039,
+                enchant: Enchants.FEET_CATS_SWIFTNESS,
             }),
             ItemSpec.create({
-                id: 30667,
-                enchant: Enchants.RING_SPELLPOWER,
+                id: 29997, // Band of the Ranger-General
             }),
             ItemSpec.create({
-                id: 30109,
-                enchant: Enchants.RING_SPELLPOWER,
+                id: 30052, // Ring of Lethality
             }),
             ItemSpec.create({
-                id: 29370, // Icon of the Silver Crescent
+                id: 28830, // Dragonspine Trophy
             }),
             ItemSpec.create({
-                id: 28785, // Lightning Capacitor
+                id: 29383, // Bloodlust Brooch
             }),
             ItemSpec.create({
-                id: 29988,
-                enchant: Enchants.WEAPON_SPELLPOWER,
+                id: 32944,
+                enchant: Enchants.MONGOOSE,
             }),
             ItemSpec.create({
-                id: 28248, // Totem of the Void
+                id: 29996,
+                enchant: Enchants.MONGOOSE,
+            }),
+            ItemSpec.create({
+                id: 27815, // Totem of the Astral Winds
             }),
         ],
     }),

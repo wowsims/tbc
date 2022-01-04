@@ -51,7 +51,7 @@ export class EnhancementShamanSimUI extends IndividualSimUI {
             ],
             defaults: {
                 // Default equipped gear.
-                gear: Presets.PRERAID_GEAR.gear,
+                gear: Presets.P2_BIS.gear,
                 // Default EP weights for sorting gear in the gear picker.
                 epWeights: Stats.fromMap({
                     [Stat.StatIntellect]: 1.02,
@@ -116,13 +116,14 @@ export class EnhancementShamanSimUI extends IndividualSimUI {
             // IconInputs to include in the 'Debuffs' section on the settings tab.
             debuffInputs: [
                 IconInputs.ImprovedSealOfTheCrusader,
+                IconInputs.JudgementOfWisdom,
                 IconInputs.FaerieFire,
                 IconInputs.SunderArmor,
-                IconInputs.CurseOfRecklessness,
                 IconInputs.ExposeArmor,
-                IconInputs.JudgementOfWisdom,
+                IconInputs.CurseOfRecklessness,
                 IconInputs.Misery,
                 IconInputs.ImprovedScorch,
+                IconInputs.CurseOfElements,
             ],
             // IconInputs to include in the 'Consumes' section on the settings tab.
             consumeInputs: [
@@ -164,7 +165,7 @@ export class EnhancementShamanSimUI extends IndividualSimUI {
                 ],
                 // Preset gear configurations that the user can quickly select.
                 gear: [
-                    Presets.PRERAID_GEAR,
+                    Presets.P2_BIS,
                 ],
             },
         });

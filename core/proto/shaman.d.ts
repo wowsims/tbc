@@ -419,7 +419,11 @@ export declare enum FireTotem {
     /**
      * @generated from protobuf enum value: TotemOfWrath = 3;
      */
-    TotemOfWrath = 3
+    TotemOfWrath = 3,
+    /**
+     * @generated from protobuf enum value: FireNovaTotem = 4;
+     */
+    FireNovaTotem = 4
 }
 /**
  * @generated from protobuf enum proto.WaterTotem
