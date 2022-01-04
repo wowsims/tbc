@@ -503,31 +503,28 @@ func (aa *AutoAttacks) ModifySwingTime(sim *Simulation, amount float64) {
 // TimeUntil compares swing timers to the next cast or attack and returns the time the next event occurs at.
 //   This could probably be broken into TimeUntil(cast), TimeUntil(attack), TimeUntil(event)
 func (aa *AutoAttacks) TimeUntil(sim *Simulation, cast *SimpleSpell, atk *ActiveMeleeAbility, event time.Duration) time.Duration {
-	var nextEventTime time.Duration
-	if event > 0 {
-		nextEventTime = event
-	}
+	nextEventTime := event
 	if cast != nil {
 		if cast.CastTime > 0 {
 			// Resume swings after cast is completed
 			aa.MainhandSwingAt = sim.CurrentTime + cast.CastTime + aa.MainhandSwingSpeed()
 			aa.OffhandSwingAt = sim.CurrentTime + cast.CastTime + aa.OffhandSwingSpeed()
 		}
-		nextEventTime = MaxDuration(cast.CastTime, cast.Character.GetRemainingCD(GCDCooldownID, sim.CurrentTime))
+		nextEventTime = sim.CurrentTime + MaxDuration(cast.CastTime, cast.Character.GetRemainingCD(GCDCooldownID, sim.CurrentTime))
 	}
 	if atk != nil {
 		if atk.ResetSwingTimer {
 			aa.MainhandSwingAt = sim.CurrentTime + aa.MainhandSwingSpeed()
 			aa.OffhandSwingAt = sim.CurrentTime + aa.OffhandSwingSpeed()
 		}
-		nextEventTime = MaxDuration(atk.CastTime, atk.Character.GetRemainingCD(GCDCooldownID, sim.CurrentTime))
+		nextEventTime = sim.CurrentTime + MaxDuration(atk.CastTime, atk.Character.GetRemainingCD(GCDCooldownID, sim.CurrentTime))
 	}
-	mhswing := aa.MainhandSwingAt - sim.CurrentTime
+	mhswing := aa.MainhandSwingAt
 	if mhswing < nextEventTime || nextEventTime == 0 {
 		nextEventTime = mhswing
 	}
 	if aa.ohbase > 0 {
-		ohswing := aa.OffhandSwingAt - sim.CurrentTime
+		ohswing := aa.OffhandSwingAt
 		if ohswing < nextEventTime {
 			nextEventTime = ohswing
 		}

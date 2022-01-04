@@ -62,7 +62,12 @@ export const SWIFT_STARFIRE_DIAMOND = 28557;
 metaGemConditionDescriptions.set(SWIFT_STARFIRE_DIAMOND, 'Requires at least 2 Yellow Gems and at least 1 Red Gem.');
 metaGemActiveConditions.set(SWIFT_STARFIRE_DIAMOND, (numRed, numYellow, numBlue) => numYellow >= 2 && numRed >= 1);
 
+export const RELENTLESS_EARTHSTORM_DIAMOND = 32409;
+metaGemConditionDescriptions.set(RELENTLESS_EARTHSTORM_DIAMOND, 'Requires at least 2 Red Gems. Requires at least 2 Yellow Gems. Requires at least 2 Blue Gems');
+metaGemActiveConditions.set(RELENTLESS_EARTHSTORM_DIAMOND, (numRed, numYellow, numBlue) => numYellow >= 2 && numRed >= 2 && numBlue >= 2);
+
 // Orange
+export const INSCRIBED_NOBLE_TOPAZ = 24058;
 export const POTENT_NOBLE_TOPAZ = 24059;
 export const POTENT_PYRESTONE = 32218;
 export const VEILED_NOBLE_TOPAZ = 31867;
@@ -70,10 +75,12 @@ export const VEILED_PYRESTONE = 32221;
 
 // Purple
 export const GLOWING_NIGHTSEYE = 24056;
+export const SOVEREIGN_NIGHTSEYE = 24054;
 export const GLOWING_SHADOWSONG_AMETHYST = 32215;
 
 // Red
 export const RUNED_CRIMSON_SPINEL = 32196;
+export const BOLD_LIVING_RUBY = 24027;
 export const RUNED_LIVING_RUBY = 24030;
 export const RUNED_ORNATE_RUBY = 28118;
 
