@@ -2083,12 +2083,11 @@ input, select {
 }
 
 .mage-sim-ui {
-  --main-bg-color: Navy;
+  --theme-color-primary: #10abb5;
+  --theme-color-background: #101a20;
+  --theme-color-background-raw: 16, 26, 32;
+  --theme-background-image: url("/tbc/assets/mage_background.jpg");
   --main-text-color: White;
-  --main-secondary-color: Black;
-  --sidebar-bg-color: #222;
-  --sidebar-text-color: White;
-  --sidebar-highlight-color: #ff9900;
 }
 
 .mage-sim-ui .self-buffs-section {

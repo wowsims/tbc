@@ -2083,12 +2083,10 @@ input, select {
 }
 
 .enhancement-shaman-sim-ui {
-  --main-bg-color: MidnightBlue;
-  --main-text-color: White;
-  --main-secondary-color: Black;
-  --sidebar-bg-color: #222;
-  --sidebar-text-color: White;
-  --sidebar-highlight-color: Blue;
+  --theme-color-primary: #228db0;
+  --theme-color-background: #181d2d;
+  --theme-color-background-raw: 24, 29, 45;
+  --theme-background-image: url("/tbc/assets/enhancement_shaman_background.jpg");
 }
 
 .enhancement-shaman-sim-ui .self-buffs-section {

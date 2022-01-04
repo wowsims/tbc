@@ -1,15 +1,10 @@
 @charset "UTF-8";
 .balance-druid-sim-ui {
-  --theme-color-primary: #e1a336;
-  --theme-color-background: #1d1610;
-  --theme-color-background-raw: 29, 22, 16;
+  --theme-color-primary: #e0a335;
+  --theme-color-background: #1d1510;
+  --theme-color-background-raw: 29, 21, 16;
   --theme-background-image: url("/tbc/assets/balance_druid_background.jpg");
-  --main-bg-color: #522e00;
   --main-text-color: White;
-  --main-secondary-color: Black;
-  --sidebar-bg-color: #222;
-  --sidebar-text-color: White;
-  --sidebar-highlight-color: #ff9900;
 }
 
 .balance-druid-sim-ui .self-buffs-section {
@@ -2136,16 +2131,11 @@ input, select {
 }
 
 .elemental-shaman-sim-ui {
-  --theme-color-primary: #64bfdc;
-  --theme-color-background: #171d2d;
-  --theme-color-background-raw: 23, 29, 45;
+  --theme-color-primary: #228db0;
+  --theme-color-background: #181d2d;
+  --theme-color-background-raw: 24, 29, 45;
   --theme-background-image: url("/tbc/assets/elemental_shaman_background.jpg");
-  --main-bg-color: MidnightBlue;
   --main-text-color: White;
-  --main-secondary-color: Black;
-  --sidebar-bg-color: #111218;
-  --sidebar-text-color: White;
-  --sidebar-highlight-color: Blue;
 }
 
 .elemental-shaman-sim-ui .self-buffs-section {
@@ -2165,15 +2155,11 @@ input, select {
 }
 
 .shadow-priest-sim-ui {
-  --theme-color-primary: #9b57f8;
-  --theme-color-background: #1e1727;
-  --theme-color-background-raw: 30, 23, 39;
-  --main-bg-color: #512F59;
+  --theme-color-primary: #9b57f7;
+  --theme-color-background: #1d1726;
+  --theme-color-background-raw: 29, 23, 38;
+  --theme-background-image: url("/tbc/assets/shadow_priest_background.jpg");
   --main-text-color: White;
-  --main-secondary-color: Black;
-  --sidebar-bg-color: #222;
-  --sidebar-text-color: White;
-  --sidebar-highlight-color: #AAA;
 }
 
 .shadow-priest-sim-ui .self-buffs-section {
