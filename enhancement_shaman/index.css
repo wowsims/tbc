@@ -1930,6 +1930,10 @@ td, th {
   display: grid;
 }
 
+.cooldowns-section-container {
+  z-index: 1000;
+}
+
 .saved-encounter-manager {
   display: inline-block;
   text-align: left;
