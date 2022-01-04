@@ -71,12 +71,23 @@
 
 .saved-data-set-chip {
 	color: var(--main-text-color);
-	border-color: var(--main-text-color);
+	border-color: var(--theme-color-primary);
 }
 .saved-data-set-chip.active {
-	color: var(--main-secondary-color);
-	border-color: var(--main-secondary-color);
-	background-color: var(--main-text-color);
+	color: var(--main-text-color);
+	background-color: var(--theme-color-primary);
+}
+
+.saved-data-save-button, .log-runner-button, .detailed-results-new-tab-button {
+	color: var(--main-text-color);
+	background-color: var(--theme-color-primary);
+	border: none;
+	padding: 3px;
+	font-weight: bold;
+}
+
+.saved-data-set-delete {
+	color: var(--main-text-color);
 }
 
 .settings-tab {
@@ -89,27 +100,22 @@
   position: absolute;
 }
 .settings-section {
-  border: 4px solid var(--main-text-color);
-  border-radius: 8px;
-  position: relative;
+  border: 2px solid var(--main-text-color);
   padding: 4px;
-  padding-top: 15px;
-  margin: 10px;
-  margin-top: 20px;
+  margin: 5px;
 	display: grid;
+	transform: none !important;
 }
 
-.settings-section>label {
-  position: absolute;
-  left: 12px;
-  top: -20px;
+.settings-section>legend {
+  padding: 0 10px;
+	margin: 0 3px;
   font-weight: 900;
-  display: inline-block;
 	color: var(--main-text-color);
-  background: var(--main-bg-color);
-  padding: 5px 10px 5px 10px;
   font-size: 18px;
 	white-space: nowrap;
+	border: none;
+	width: auto;
 }
 
 .settings-bottom-bar {
@@ -121,6 +127,9 @@
 
 .race-section {
   text-align: center;
+}
+.race-section > legend {
+  text-align: left;
 }
 
 .rotation-section > div, .other-settings-section > div {
