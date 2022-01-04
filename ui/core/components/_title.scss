@@ -9,6 +9,7 @@
 }
 
 .sim-title-button {
+	background-color: transparent !important;
 }
 
 .sim-title-button .sim-title-label {
@@ -25,6 +26,10 @@
 
 .sim-title-dropdown {
 	width: 100%;
+}
+
+.sim-title-button .sim-title-dropdown-option-container {
+	background: transparent;
 }
 
 .sim-title-option {
