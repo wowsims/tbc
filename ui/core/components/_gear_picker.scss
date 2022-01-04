@@ -50,12 +50,14 @@
 .item-picker-name {
   display: block;
   font-size: 18px;
+	letter-spacing: normal;
 }
 
 .item-picker-enchant {
   display: block;
   font-size: 14px;
   color: lawngreen;
+	letter-spacing: normal;
 }
 
 .selector-modal {
@@ -141,6 +143,7 @@
   text-decoration: none !important;
   cursor: pointer;
   margin-left: 10px;
+	letter-spacing: normal;
 }
 
 .selector-modal-list-item-padding {

@@ -32,8 +32,8 @@
 }
 
 .character-stats-table-row {
-	color: var(--sidebar-text-color);
-	border-bottom: 1px solid var(--sidebar-text-color);
+	color: var(--main-text-color);
+	border-bottom: 1px solid #315869;
 	font-size: 16px;
 	font-weight: 600;
 }
@@ -76,14 +76,6 @@
 .saved-data-set-chip.active {
 	color: var(--main-text-color);
 	background-color: var(--theme-color-primary);
-}
-
-.saved-data-save-button, .log-runner-button, .detailed-results-new-tab-button {
-	color: var(--main-text-color);
-	background-color: var(--theme-color-primary);
-	border: none;
-	padding: 3px;
-	font-weight: bold;
 }
 
 .saved-data-set-delete {

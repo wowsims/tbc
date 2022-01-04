@@ -58,7 +58,7 @@ export class SavedDataManager<ModObject, T> extends Component {
     </div>
     <div class="saved-data-create-container">
       <input class="saved-data-save-input" type="text" placeholder="Label">
-      <button class="saved-data-save-button">SAVE CURRENT ${config.label.toUpperCase()}</button>
+      <button class="saved-data-save-button sim-button">SAVE CURRENT ${config.label.toUpperCase()}</button>
     </div>
     `;
 

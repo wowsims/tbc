@@ -18,7 +18,16 @@ td, th {
 input, select {
 	color: var(--main-text-color);
 	background-color: #1e2633;
-	border: 1px solid #171d2d;
+	border: 1px solid #373e58;
+	padding: 3px;
+}
+
+.sim-button {
+	color: var(--main-text-color);
+	background-color: var(--theme-color-primary);
+	border: none;
+	padding: 5px;
+	font-weight: bold;
 }
 
 .sim-root {
@@ -41,7 +50,7 @@ input, select {
 }
 
 .sim-sidebar-title {
-	margin: 0 0 25px 0 !important;
+	margin: 0 0 50px 0 !important;
 }
 
 .sim-sidebar-title, .sim-toolbar {
@@ -71,7 +80,6 @@ input, select {
 .sim-sidebar-actions-button:hover {
   color: var(--main-text-color);
   background: var(--theme-color-primary);
-  box-shadow: 0 0 10px var(--theme-color-primary);
 }
 
 .iterations-picker {
