@@ -4,6 +4,7 @@ import { CharacterStats } from '/tbc/core/components/character_stats.js';
 import { Class } from '/tbc/core/proto/common.js';
 import { CooldownsPicker } from '/tbc/core/components/cooldowns_picker.js';
 import { Consumes } from '/tbc/core/proto/common.js';
+import { Cooldowns } from '/tbc/core/proto/common.js';
 import { Debuffs } from '/tbc/core/proto/common.js';
 import { DetailedResults } from '/tbc/core/components/detailed_results.js';
 import { Encounter as EncounterProto } from '/tbc/core/proto/common.js';
@@ -588,6 +589,7 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
           playerBuffs: simUI.player.getBuffs(),
           consumes: simUI.player.getConsumes(),
           race: simUI.player.getRace(),
+          cooldowns: simUI.player.getCooldowns(),
         });
       },
       setData: (eventID: EventID, simUI: IndividualSimUI<any>, newSettings: SavedSettings) => {
@@ -600,6 +602,7 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 					simUI.player.setBuffs(eventID, newSettings.playerBuffs || IndividualBuffs.create());
 					simUI.player.setConsumes(eventID, newSettings.consumes || Consumes.create());
 					simUI.player.setRace(eventID, newSettings.race);
+					simUI.player.setCooldowns(eventID, newSettings.cooldowns || Cooldowns.create());
 				});
       },
       changeEmitters: [
@@ -608,6 +611,7 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 				this.player.buffsChangeEmitter,
 				this.player.consumesChangeEmitter,
 				this.player.raceChangeEmitter,
+				this.player.cooldownsChangeEmitter,
 			],
       equals: (a: SavedSettings, b: SavedSettings) => SavedSettings.equals(a, b),
       toJson: (a: SavedSettings) => SavedSettings.toJson(a),

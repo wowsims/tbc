@@ -27,6 +27,7 @@ message SavedSettings {
 	IndividualBuffs player_buffs = 3;
 	Consumes consumes = 4;
 	Race race = 5;
+	Cooldowns cooldowns = 6;
 }
 
 message SavedTalents {
