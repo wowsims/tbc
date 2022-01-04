@@ -9,7 +9,9 @@ var BasicRaidBuffs = &proto.RaidBuffs{}
 var BasicPartyBuffs = &proto.PartyBuffs{
 	Bloodlust: 1,
 }
-var BasicIndividualBuffs = &proto.IndividualBuffs{}
+var BasicIndividualBuffs = &proto.IndividualBuffs{
+	BlessingOfKings: true,
+}
 
 var StandardTalents = &proto.ShamanTalents{
 	ThunderingStrikes:       5,
@@ -21,6 +23,7 @@ var StandardTalents = &proto.ShamanTalents{
 	WeaponMastery:           5,
 	UnleashedRage:           5,
 	ShamanisticFocus:        true,
+	ShamanisticRage:         true,
 }
 
 var PlayerOptionsBasic = &proto.Player_EnhancementShaman{
@@ -49,11 +52,13 @@ var FullRaidBuffs = &proto.RaidBuffs{
 	ArcaneBrilliance: true,
 	GiftOfTheWild:    proto.TristateEffect_TristateEffectImproved,
 }
-var FullPartyBuffs = &proto.PartyBuffs{}
+var FullPartyBuffs = &proto.PartyBuffs{
+	BattleShout: proto.TristateEffect_TristateEffectImproved,
+}
 var FullIndividualBuffs = &proto.IndividualBuffs{
 	BlessingOfKings:  true,
 	BlessingOfWisdom: proto.TristateEffect_TristateEffectImproved,
-	ShadowPriestDps:  500,
+	BlessingOfMight:  proto.TristateEffect_TristateEffectImproved,
 }
 
 var FullConsumes = &proto.Consumes{
@@ -67,6 +72,10 @@ var NoDebuffTarget = &proto.Target{
 
 var FullDebuffTarget = &proto.Target{
 	Debuffs: &proto.Debuffs{
+		BloodFrenzy:               true,
+		ExposeArmor:               proto.TristateEffect_TristateEffectImproved,
+		FaerieFire:                proto.TristateEffect_TristateEffectImproved,
+		SunderArmor:               true,
 		ImprovedSealOfTheCrusader: true,
 		JudgementOfWisdom:         true,
 		Misery:                    true,
