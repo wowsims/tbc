@@ -225,7 +225,7 @@ func registerBloodlustCD(agent Agent, numBloodlusts int32) {
 	registerExternalConsecutiveCDApproximation(
 		agent,
 		externalConsecutiveCDApproximation{
-			ActionID:         ActionID{SpellID: 2825},
+			ActionID:         ActionID{SpellID: 2825, Tag: -1},
 			AuraID:           BloodlustAuraID,
 			CooldownID:       sharedBloodlustCooldownID,
 			CooldownPriority: CooldownPriorityBloodlust,
@@ -268,7 +268,7 @@ func registerPowerInfusionCD(agent Agent, numPowerInfusions int32) {
 	registerExternalConsecutiveCDApproximation(
 		agent,
 		externalConsecutiveCDApproximation{
-			ActionID:         ActionID{SpellID: 10060},
+			ActionID:         ActionID{SpellID: 10060, Tag: -1},
 			AuraID:           PowerInfusionAuraID,
 			CooldownID:       sharedPowerInfusionCooldownID,
 			CooldownPriority: CooldownPriorityDefault,
@@ -327,7 +327,7 @@ func registerInnervateCD(agent Agent, numInnervates int32) {
 	registerExternalConsecutiveCDApproximation(
 		agent,
 		externalConsecutiveCDApproximation{
-			ActionID:         ActionID{SpellID: 29166},
+			ActionID:         ActionID{SpellID: 29166, Tag: -1},
 			AuraID:           InnervateAuraID,
 			CooldownID:       sharedInnervateCooldownID,
 			CooldownPriority: CooldownPriorityDefault,
@@ -410,7 +410,7 @@ func registerManaTideTotemCD(agent Agent, numManaTideTotems int32) {
 	registerExternalConsecutiveCDApproximation(
 		agent,
 		externalConsecutiveCDApproximation{
-			ActionID:         ActionID{SpellID: 16190},
+			ActionID:         ActionID{SpellID: 16190, Tag: -1},
 			AuraID:           ManaTideTotemAuraID,
 			CooldownID:       sharedManaTideTotemCooldownID,
 			CooldownPriority: CooldownPriorityDefault,

@@ -1,5 +1,5 @@
+import { ItemOrSpellId } from '/tbc/core/proto_utils/action_id.js';
 import { getIconUrl } from '/tbc/core/resources.js';
-import { ItemOrSpellId } from '/tbc/core/resources.js';
 import { setWowheadHref } from '/tbc/core/resources.js';
 import { EventID, TypedEvent } from '/tbc/core/typed_event.js';
 import { isRightClick } from '/tbc/core/utils.js';
