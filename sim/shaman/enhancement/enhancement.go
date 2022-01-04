@@ -33,10 +33,20 @@ func NewEnhancementShaman(character core.Character, options proto.Player) *Enhan
 		selfBuffs.StrengthOfEarth = enhOptions.Rotation.Totems.Earth == proto.EarthTotem_StrengthOfEarthTotem
 		selfBuffs.ManaSpring = enhOptions.Rotation.Totems.Water == proto.WaterTotem_ManaSpringTotem
 		selfBuffs.AirTotem = enhOptions.Rotation.Totems.Air
+		selfBuffs.NextTotemDropType[shaman.AirTotem] = int32(enhOptions.Rotation.Totems.Air)
 		selfBuffs.FireTotem = enhOptions.Rotation.Totems.Fire
+		selfBuffs.NextTotemDropType[shaman.FireTotem] = int32(enhOptions.Rotation.Totems.Fire)
 
 		selfBuffs.TwistWindfury = enhOptions.Rotation.Totems.TwistWindfury
+		if selfBuffs.TwistWindfury {
+			selfBuffs.NextTotemDropType[shaman.AirTotem] = int32(proto.AirTotem_WindfuryTotem)
+			selfBuffs.NextTotemDrops[shaman.AirTotem] = 0 // drop windfury immediately
+		}
+
 		selfBuffs.TwistFireNova = enhOptions.Rotation.Totems.TwistFireNova
+		if selfBuffs.TwistFireNova {
+			selfBuffs.NextTotemDropType[shaman.FireTotem] = int32(proto.FireTotem_NovaTotem) // start by dropping nova, then alternating.
+		}
 	}
 	enh := &EnhancementShaman{
 		Shaman: shaman.NewShaman(character, *enhOptions.Talents, selfBuffs),

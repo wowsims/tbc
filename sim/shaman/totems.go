@@ -11,6 +11,11 @@ const windfuryTotem = int32(proto.AirTotem_WindfuryTotem)
 const wrathOfAirTotem = int32(proto.AirTotem_WrathOfAirTotem)
 const graceOfAirTotem = int32(proto.AirTotem_GraceOfAirTotem)
 
+const totemOfWrath = int32(proto.FireTotem_TotemOfWrath)
+const searingTotem = int32(proto.FireTotem_SearingTotem)
+const magmaTotem = int32(proto.FireTotem_MagmaTotem)
+const novaTotem = int32(proto.FireTotem_NovaTotem)
+
 // Totems that shaman will cast.
 // TODO: add logic inside these to select each totem based on options on the shaman?
 // TODO: Include mental quickness mana cost reduction when we figure out what it is.
@@ -94,7 +99,7 @@ func (shaman *Shaman) NewWaterTotem(sim *core.Simulation) *core.SimpleCast {
 	return cast
 }
 
-func (shaman *Shaman) NewFireTotem(sim *core.Simulation) *core.SimpleCast {
+func (shaman *Shaman) NewTotemOfWrath(sim *core.Simulation) *core.SimpleCast {
 	baseManaCost := shaman.BaseMana() * 0.05
 	manaCost := baseManaCost * (1 - float64(shaman.Talents.TotemicFocus)*0.05)
 	manaCost -= baseManaCost * float64(shaman.Talents.MentalQuickness) * 0.02
@@ -145,11 +150,13 @@ func (shaman *Shaman) TryDropTotems(sim *core.Simulation) time.Duration {
 	if gcd > 0 {
 		return sim.CurrentTime + gcd // can't drop totems in GCD
 	}
+
 	var cast *core.SimpleCast
+	var attackCast *core.SimpleSpell // if using fire totems this will be an attack cast.
 
 	// currently hardcoded to include 25% mana cost reduction from resto talents
 	for totemTypeIdx, totemExpiration := range shaman.SelfBuffs.NextTotemDrops {
-		if cast != nil {
+		if cast != nil || attackCast != nil {
 			break
 		}
 		nextDrop := shaman.SelfBuffs.NextTotemDropType[totemTypeIdx]
@@ -176,20 +183,57 @@ func (shaman *Shaman) TryDropTotems(sim *core.Simulation) time.Duration {
 			case EarthTotem:
 				cast = shaman.NewEarthTotem(sim)
 			case FireTotem:
-				cast = shaman.NewFireTotem(sim)
+				switch nextDrop {
+				case totemOfWrath:
+					cast = shaman.NewTotemOfWrath(sim)
+				case searingTotem:
+					attackCast = shaman.NewSearingTotem(sim, sim.GetPrimaryTarget())
+					shaman.SelfBuffs.NextTotemDrops[FireTotem] = sim.CurrentTime + time.Second*60 + 1
+				case magmaTotem:
+					attackCast = shaman.NewMagmaTotem(sim, sim.GetPrimaryTarget())
+					shaman.SelfBuffs.NextTotemDrops[FireTotem] = sim.CurrentTime + time.Second*20 + 1
+				case novaTotem:
+					if shaman.FireTotemSpell.DotInput.IsTicking(sim) {
+						shaman.FireTotemSpell.Cancel(sim) // if we drop nova while another totem is running, cancel it.
+					}
+					attackCast = shaman.NewNovaTotem(sim, sim.GetPrimaryTarget())
+					shaman.SelfBuffs.NextTotemDrops[FireTotem] = sim.CurrentTime + time.Second*5 + 1
+				}
 			case WaterTotem:
 				cast = shaman.NewWaterTotem(sim)
 			}
 		}
 	}
 
-	if cast == nil {
+	success := false
+	cost := 0.0
+	if cast != nil {
+		if attackCast != nil {
+			panic("wtf")
+		}
+		success = cast.StartCast(sim)
+		cost = cast.GetManaCost()
+	} else if attackCast != nil {
+		success = attackCast.Cast(sim)
+		cost = attackCast.GetManaCost()
+
+		if shaman.SelfBuffs.TwistFireNova {
+			nextDrop := shaman.SelfBuffs.NextTotemDropType[FireTotem]
+			if nextDrop != novaTotem {
+				shaman.SelfBuffs.NextTotemDropType[FireTotem] = novaTotem
+				// place nova as soon as off CD
+				shaman.SelfBuffs.NextTotemDrops[FireTotem] = sim.CurrentTime + shaman.GetRemainingCD(CooldownIDNovaTotem, sim.CurrentTime)
+			} else {
+				shaman.SelfBuffs.NextTotemDropType[FireTotem] = int32(shaman.SelfBuffs.FireTotem)
+				shaman.SelfBuffs.NextTotemDrops[FireTotem] = sim.CurrentTime + time.Second*5 + 1 // drop immediately after nova goes off
+			}
+		}
+	} else {
 		return 0 // no totem to cast
 	}
 
-	success := cast.StartCast(sim)
 	if !success {
-		regenTime := shaman.TimeUntilManaRegen(cast.GetManaCost())
+		regenTime := shaman.TimeUntilManaRegen(cost)
 		shaman.Character.Metrics.MarkOOM(sim, &shaman.Character, regenTime)
 		return sim.CurrentTime + regenTime
 	}

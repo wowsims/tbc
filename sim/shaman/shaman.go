@@ -181,6 +181,12 @@ type Shaman struct {
 	frostShockTemplate core.SimpleSpellTemplate
 	earthShockTemplate core.SimpleSpellTemplate
 
+	// Fire Totems
+	FireTotemSpell       core.SimpleSpell
+	searingTotemTemplate core.SimpleSpellTemplate
+	magmaTotemTemplate   core.SimpleSpellTemplate
+	novaTotemTemplate    core.SimpleSpellTemplate
+
 	unleashedRages []core.Aura
 }
 
@@ -251,6 +257,10 @@ func (shaman *Shaman) Init(sim *core.Simulation) {
 	}
 	shaman.frostShockTemplate = shaman.newFrostShockTemplate(sim)
 	shaman.earthShockTemplate = shaman.newEarthShockTemplate(sim)
+
+	shaman.searingTotemTemplate = shaman.newSearingTotemTemplate(sim)
+	shaman.magmaTotemTemplate = shaman.newMagmaTotemTemplate(sim)
+	shaman.novaTotemTemplate = shaman.newNovaTotemTemplate(sim)
 }
 
 func (shaman *Shaman) Reset(sim *core.Simulation) {
@@ -273,6 +283,9 @@ func (shaman *Shaman) Reset(sim *core.Simulation) {
 		case FireTotem:
 			if shaman.SelfBuffs.FireTotem != proto.FireTotem_NoFireTotem {
 				shaman.SelfBuffs.NextTotemDrops[i] = time.Second * 120 // 2 min until drop totems
+				if shaman.SelfBuffs.FireTotem != proto.FireTotem_TotemOfWrath {
+					shaman.SelfBuffs.NextTotemDrops[i] = 0 // attack totems we drop immediately
+				}
 			}
 		case WaterTotem:
 			if shaman.SelfBuffs.ManaSpring {
