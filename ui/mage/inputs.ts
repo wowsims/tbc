@@ -2,7 +2,7 @@ import { IconPickerConfig } from '/tbc/core/components/icon_picker.js';
 import { RaidTarget } from '/tbc/core/proto/common.js';
 import { Spec } from '/tbc/core/proto/common.js';
 import { NO_TARGET } from '/tbc/core/proto_utils/utils.js';
-import { ItemOrSpellId } from '/tbc/core/resources.js';
+import { ItemOrSpellId } from '/tbc/core/proto_utils/action_id.js';
 import { Player } from '/tbc/core/player.js';
 import { Sim } from '/tbc/core/sim.js';
 import { EventID, TypedEvent } from '/tbc/core/typed_event.js';

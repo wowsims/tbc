@@ -289,7 +289,7 @@ func (shaman *Shaman) registerBloodlustCD() {
 	}
 
 	shaman.AddMajorCooldown(core.MajorCooldown{
-		ActionID:   core.ActionID{SpellID: 2825},
+		ActionID:   core.ActionID{SpellID: 2825, Tag: int32(shaman.RaidIndex)},
 		CooldownID: BloodlustCooldownID,
 		Cooldown:   core.BloodlustCD,
 		Priority:   core.CooldownPriorityBloodlust,

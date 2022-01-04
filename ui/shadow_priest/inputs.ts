@@ -2,7 +2,7 @@ import { ShadowPriest_Rotation_RotationType as RotationType } from '/tbc/core/pr
 import { Race, RaidTarget } from '/tbc/core/proto/common.js';
 import { Spec } from '/tbc/core/proto/common.js';
 import { NO_TARGET } from '/tbc/core/proto_utils/utils.js';
-import { ItemOrSpellId } from '/tbc/core/resources.js';
+import { ItemOrSpellId } from '/tbc/core/proto_utils/action_id.js';
 import { Player } from '/tbc/core/player.js';
 import { Sim } from '/tbc/core/sim.js';
 import { IndividualSimUI } from '/tbc/core/individual_sim_ui.js';

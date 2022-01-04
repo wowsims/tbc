@@ -225,7 +225,7 @@ func registerBloodlustCD(agent Agent, numBloodlusts int32) {
 	registerExternalConsecutiveCDApproximation(
 		agent,
 		externalConsecutiveCDApproximation{
-			ActionID:         ActionID{SpellID: 2825},
+			ActionID:         ActionID{SpellID: 2825, Tag: -1},
 			AuraID:           BloodlustAuraID,
 			CooldownID:       sharedBloodlustCooldownID,
 			CooldownPriority: CooldownPriorityBloodlust,
@@ -233,6 +233,10 @@ func registerBloodlustCD(agent Agent, numBloodlusts int32) {
 			AuraCD:           BloodlustCD,
 
 			ShouldActivate: func(sim *Simulation, character *Character) bool {
+				// Haste portion doesn't stack with Power Infusion, so prefer to wait.
+				if character.HasAura(PowerInfusionAuraID) {
+					return false
+				}
 				return true
 			},
 			AddAura: AddBloodlustAura,
@@ -244,6 +248,9 @@ func AddBloodlustAura(sim *Simulation, character *Character) {
 	const bonus = 1.3
 	const inverseBonus = 1 / bonus
 
+	if character.HasAura(PowerInfusionAuraID) {
+		character.PseudoStats.CastSpeedMultiplier /= 1.2
+	}
 	character.PseudoStats.CastSpeedMultiplier *= bonus
 	character.MultiplyMeleeSpeed(sim, bonus)
 
@@ -254,6 +261,9 @@ func AddBloodlustAura(sim *Simulation, character *Character) {
 		Expires: sim.CurrentTime + BloodlustDuration,
 		OnExpire: func(sim *Simulation) {
 			character.PseudoStats.CastSpeedMultiplier *= inverseBonus
+			if character.HasAura(PowerInfusionAuraID) {
+				character.PseudoStats.CastSpeedMultiplier *= 1.2
+			}
 			character.MultiplyMeleeSpeed(sim, inverseBonus)
 		},
 	})
@@ -268,7 +278,7 @@ func registerPowerInfusionCD(agent Agent, numPowerInfusions int32) {
 	registerExternalConsecutiveCDApproximation(
 		agent,
 		externalConsecutiveCDApproximation{
-			ActionID:         ActionID{SpellID: 10060},
+			ActionID:         ActionID{SpellID: 10060, Tag: -1},
 			AuraID:           PowerInfusionAuraID,
 			CooldownID:       sharedPowerInfusionCooldownID,
 			CooldownPriority: CooldownPriorityDefault,
@@ -276,6 +286,10 @@ func registerPowerInfusionCD(agent Agent, numPowerInfusions int32) {
 			AuraCD:           PowerInfusionCD,
 
 			ShouldActivate: func(sim *Simulation, character *Character) bool {
+				// Haste portion doesn't stack with Bloodlust, so prefer to wait.
+				if character.HasAura(BloodlustAuraID) {
+					return false
+				}
 				return true
 			},
 			AddAura: AddPowerInfusionAura,
@@ -287,7 +301,9 @@ func AddPowerInfusionAura(sim *Simulation, character *Character) {
 	const bonus = 1.2
 	const inverseBonus = 1 / bonus
 
-	character.PseudoStats.CastSpeedMultiplier *= bonus
+	if !character.HasAura(BloodlustAuraID) {
+		character.PseudoStats.CastSpeedMultiplier *= bonus
+	}
 
 	character.AddAura(sim, Aura{
 		ID:      PowerInfusionAuraID,
@@ -299,7 +315,9 @@ func AddPowerInfusionAura(sim *Simulation, character *Character) {
 			cast.ManaCost = MaxFloat(0, cast.ManaCost-cast.BaseManaCost*0.2)
 		},
 		OnExpire: func(sim *Simulation) {
-			character.PseudoStats.CastSpeedMultiplier *= inverseBonus
+			if !character.HasAura(BloodlustAuraID) {
+				character.PseudoStats.CastSpeedMultiplier *= inverseBonus
+			}
 		},
 	})
 }
@@ -327,7 +345,7 @@ func registerInnervateCD(agent Agent, numInnervates int32) {
 	registerExternalConsecutiveCDApproximation(
 		agent,
 		externalConsecutiveCDApproximation{
-			ActionID:         ActionID{SpellID: 29166},
+			ActionID:         ActionID{SpellID: 29166, Tag: -1},
 			AuraID:           InnervateAuraID,
 			CooldownID:       sharedInnervateCooldownID,
 			CooldownPriority: CooldownPriorityDefault,
@@ -410,7 +428,7 @@ func registerManaTideTotemCD(agent Agent, numManaTideTotems int32) {
 	registerExternalConsecutiveCDApproximation(
 		agent,
 		externalConsecutiveCDApproximation{
-			ActionID:         ActionID{SpellID: 16190},
+			ActionID:         ActionID{SpellID: 16190, Tag: -1},
 			AuraID:           ManaTideTotemAuraID,
 			CooldownID:       sharedManaTideTotemCooldownID,
 			CooldownPriority: CooldownPriorityDefault,

@@ -2,6 +2,7 @@ import { BonusStatsPicker } from '/tbc/core/components/bonus_stats_picker.js';
 import { BooleanPicker, BooleanPickerConfig } from '/tbc/core/components/boolean_picker.js';
 import { CharacterStats } from '/tbc/core/components/character_stats.js';
 import { Class } from '/tbc/core/proto/common.js';
+import { CooldownsPicker } from '/tbc/core/components/cooldowns_picker.js';
 import { Consumes } from '/tbc/core/proto/common.js';
 import { Debuffs } from '/tbc/core/proto/common.js';
 import { DetailedResults } from '/tbc/core/components/detailed_results.js';
@@ -433,6 +434,13 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 						<label>Consumes</label>
 					</section>
 				</div>
+				<div class="settings-section-container cooldowns-section-container">
+					<section class="settings-section cooldowns-section">
+						<label>Cooldowns</label>
+						<div class="cooldowns-section-content">
+						</div>
+					</section>
+				</div>
 				<div class="settings-section-container within-raid-sim-hide">
 					<section class="settings-section debuffs-section">
 						<label>Debuffs</label>
@@ -542,6 +550,18 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
       toJson: (a: SavedEncounter) => SavedEncounter.toJson(a),
       fromJson: (obj: any) => SavedEncounter.fromJson(obj),
     });
+
+    const cooldownSectionElem = settingsTab.getElementsByClassName('cooldowns-section')[0] as HTMLElement;
+    const cooldownContentElem = settingsTab.getElementsByClassName('cooldowns-section-content')[0] as HTMLElement;
+		new CooldownsPicker(cooldownContentElem, this.player);
+		tippy(cooldownSectionElem, {
+			content: Tooltips.COOLDOWNS_SECTION,
+			allowHTML: true,
+			placement: 'left',
+		});
+		this.player.cooldownsChangeEmitter.on(() => {
+			this.recomputeSettingsLayout();
+		});
 
     // Init Muuri layout only when settings tab is clicked, because it needs the elements
     // to be shown so it can calculate sizes.
@@ -739,6 +759,9 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 	}
 
 	recomputeSettingsLayout() {
+		if (this.settingsMuuri) {
+			//this.settingsMuuri.refreshItems();
+		}
 		window.dispatchEvent(new Event('resize'));
 	}
 

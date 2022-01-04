@@ -4,7 +4,7 @@ import { IconPickerConfig } from '/tbc/core/components/icon_picker.js';
 import { AirTotem, EarthTotem, FireTotem, WaterTotem, EnhancementShaman_Rotation_RotationType as RotationType, ShamanTotems } from '/tbc/core/proto/shaman.js';
 import { EnhancementShaman_Options as ShamanOptions } from '/tbc/core/proto/shaman.js';
 import { Spec } from '/tbc/core/proto/common.js';
-import { ItemOrSpellId } from '/tbc/core/resources.js';
+import { ItemOrSpellId } from '/tbc/core/proto_utils/action_id.js';
 import { Player } from '/tbc/core/player.js';
 import { Sim } from '/tbc/core/sim.js';
 import { IndividualSimUI } from '/tbc/core/individual_sim_ui.js';
@@ -74,11 +74,14 @@ export function TotemsSection(simUI: IndividualSimUI<Spec.SpecEnhancementShaman>
 		extraCssClasses: [
 			'earth-totem-picker',
 		],
+		numColumns: 1,
 		values: [
 			{ color: '#ffdfba', value: EarthTotem.NoEarthTotem },
-			{ id: { spellId: 25528 }, value: EarthTotem.StrengthOfEarthTotem },
-			{ id: { spellId: 8143 }, value: EarthTotem.TremorTotem },
+			{ actionId: { id: { spellId: 25528 }}, value: EarthTotem.StrengthOfEarthTotem },
+			{ actionId: { id: { spellId: 8143 }}, value: EarthTotem.TremorTotem },
 		],
+		equals: (a: EarthTotem, b: EarthTotem) => a == b,
+		zeroValue: EarthTotem.NoEarthTotem,
 		changedEvent: (player: Player<Spec.SpecEnhancementShaman>) => player.rotationChangeEmitter,
 		getValue: (player: Player<Spec.SpecEnhancementShaman>) => player.getRotation().totems?.earth || EarthTotem.NoEarthTotem,
 		setValue: (eventID: EventID, player: Player<Spec.SpecEnhancementShaman>, newValue: number) => {
@@ -94,13 +97,16 @@ export function TotemsSection(simUI: IndividualSimUI<Spec.SpecEnhancementShaman>
 		extraCssClasses: [
 			'air-totem-picker',
 		],
+		numColumns: 1,
 		values: [
 			{ color: '#baffc9', value: AirTotem.NoAirTotem },
-			{ id: { spellId: 25359 }, value: AirTotem.GraceOfAirTotem },
-			{ id: { spellId: 25908 }, value: AirTotem.TranquilAirTotem },
-			{ id: { spellId: 25587 }, value: AirTotem.WindfuryTotem },
-			{ id: { spellId: 3738 }, value: AirTotem.WrathOfAirTotem },
+			{ actionId: { id: { spellId: 25359 }}, value: AirTotem.GraceOfAirTotem },
+			{ actionId: { id: { spellId: 25908 }}, value: AirTotem.TranquilAirTotem },
+			{ actionId: { id: { spellId: 25587 }}, value: AirTotem.WindfuryTotem },
+			{ actionId: { id: { spellId: 3738 }}, value: AirTotem.WrathOfAirTotem },
 		],
+		equals: (a: AirTotem, b: AirTotem) => a == b,
+		zeroValue: AirTotem.NoAirTotem,
 		changedEvent: (player: Player<Spec.SpecEnhancementShaman>) => player.rotationChangeEmitter,
 		getValue: (player: Player<Spec.SpecEnhancementShaman>) => player.getRotation().totems?.air || AirTotem.NoAirTotem,
 		setValue: (eventID: EventID, player: Player<Spec.SpecEnhancementShaman>, newValue: number) => {
@@ -116,12 +122,15 @@ export function TotemsSection(simUI: IndividualSimUI<Spec.SpecEnhancementShaman>
 		extraCssClasses: [
 			'fire-totem-picker',
 		],
+		numColumns: 1,
 		values: [
 			{ color: '#ffb3ba', value: FireTotem.NoFireTotem },
-			{ id: { spellId: 25552 }, value: FireTotem.MagmaTotem },
-			{ id: { spellId: 25533 }, value: FireTotem.SearingTotem },
-			{ id: { spellId: 30706 }, value: FireTotem.TotemOfWrath },
+			{ actionId: { id: { spellId: 25552 }}, value: FireTotem.MagmaTotem },
+			{ actionId: { id: { spellId: 25533 }}, value: FireTotem.SearingTotem },
+			{ actionId: { id: { spellId: 30706 }}, value: FireTotem.TotemOfWrath },
 		],
+		equals: (a: FireTotem, b: FireTotem) => a == b,
+		zeroValue: FireTotem.NoFireTotem,
 		changedEvent: (player: Player<Spec.SpecEnhancementShaman>) => player.rotationChangeEmitter,
 		getValue: (player: Player<Spec.SpecEnhancementShaman>) => player.getRotation().totems?.fire || FireTotem.NoFireTotem,
 		setValue: (eventID: EventID, player: Player<Spec.SpecEnhancementShaman>, newValue: number) => {
@@ -137,10 +146,13 @@ export function TotemsSection(simUI: IndividualSimUI<Spec.SpecEnhancementShaman>
 		extraCssClasses: [
 			'water-totem-picker',
 		],
+		numColumns: 1,
 		values: [
 			{ color: '#bae1ff', value: WaterTotem.NoWaterTotem },
-			{ id: { spellId: 25570 }, value: WaterTotem.ManaSpringTotem },
+			{ actionId: { id: { spellId: 25570 }}, value: WaterTotem.ManaSpringTotem },
 		],
+		equals: (a: WaterTotem, b: WaterTotem) => a == b,
+		zeroValue: WaterTotem.NoWaterTotem,
 		changedEvent: (player: Player<Spec.SpecEnhancementShaman>) => player.rotationChangeEmitter,
 		getValue: (player: Player<Spec.SpecEnhancementShaman>) => player.getRotation().totems?.water || WaterTotem.NoWaterTotem,
 		setValue: (eventID: EventID, player: Player<Spec.SpecEnhancementShaman>, newValue: number) => {
