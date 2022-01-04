@@ -129,19 +129,50 @@ func FromFloatArray(values []float64) Stats {
 }
 
 // Adds two Stats together, returning the new Stats.
-func (this Stats) Add(other Stats) Stats {
+func (stats Stats) Add(other Stats) Stats {
 	newStats := Stats{}
 
-	for i, thisStat := range this {
+	for i, thisStat := range stats {
 		newStats[i] = thisStat + other[i]
 	}
 
 	return newStats
 }
 
-func (this Stats) Equals(other Stats) bool {
-	for i := range this {
-		if this[i] != other[i] {
+// Subtracts another Stats from this one, returning the new Stats.
+func (stats Stats) Subtract(other Stats) Stats {
+	newStats := Stats{}
+
+	for k, v := range stats {
+		newStats[k] = v - other[k]
+	}
+
+	return newStats
+}
+
+func (stats Stats) Multiply(multiplier float64) Stats {
+	newStats := stats
+	for k, v := range newStats {
+		newStats[k] = v * multiplier
+	}
+	return newStats
+}
+
+// Multiplies two Stats together by multiplying the values of corresponding
+// stats, like a dot product operation.
+func (stats Stats) DotProduct(other Stats) Stats {
+	newStats := Stats{}
+
+	for k, v := range stats {
+		newStats[k] = v * other[k]
+	}
+
+	return newStats
+}
+
+func (stats Stats) Equals(other Stats) bool {
+	for i := range stats {
+		if stats[i] != other[i] {
 			return false
 		}
 	}
@@ -149,9 +180,9 @@ func (this Stats) Equals(other Stats) bool {
 	return true
 }
 
-func (this Stats) EqualsWithTolerance(other Stats, tolerance float64) bool {
-	for i := range this {
-		if this[i] < other[i]-tolerance || this[i] > other[i]+tolerance {
+func (stats Stats) EqualsWithTolerance(other Stats, tolerance float64) bool {
+	for i := range stats {
+		if stats[i] < other[i]-tolerance || stats[i] > other[i]+tolerance {
 			return false
 		}
 	}
@@ -159,11 +190,11 @@ func (this Stats) EqualsWithTolerance(other Stats, tolerance float64) bool {
 	return true
 }
 
-func (this Stats) String() string {
+func (stats Stats) String() string {
 	var sb strings.Builder
 	sb.WriteString("\n{\n")
 
-	for statIdx, statValue := range this {
+	for statIdx, statValue := range stats {
 		name := Stat(statIdx).StatName()
 		if name == "none" || statValue == 0 {
 			continue
@@ -284,8 +315,11 @@ func (sdm *StatDependencyManager) Finalize() {
 
 // Applies all stat dependencies and returns the new Stats.
 func (sdm *StatDependencyManager) ApplyStatDependencies(stats Stats) Stats {
-	newStats := stats
+	if !sdm.finalized {
+		panic("StatDependencyManager not yet finalized, cannot calculate stats")
+	}
 
+	newStats := stats
 	for _, dep := range sdm.sortedDeps {
 		newStats[dep.ModifiedStat] = dep.Modifier(newStats[dep.SourceStat], newStats[dep.ModifiedStat])
 	}
@@ -294,8 +328,8 @@ func (sdm *StatDependencyManager) ApplyStatDependencies(stats Stats) Stats {
 }
 
 type PseudoStats struct {
-	CastSpeedMultiplier       float64
-	AttackSpeedMultiplier     float64       // not used yet
+	CastSpeedMultiplier   float64
+	AttackSpeedMultiplier float64
 
 	FiveSecondRuleRefreshTime time.Duration // last time a spell was cast
 	SpiritRegenRateCasting    float64       // percentage of spirit regen allowed during casting

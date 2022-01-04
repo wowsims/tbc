@@ -14,10 +14,11 @@ import { TargetMetrics as TargetMetricsProto } from '/tbc/core/proto/api.js';
 import { RaidSimRequest, RaidSimResult } from '/tbc/core/proto/api.js';
 import { Class } from '/tbc/core/proto/common.js';
 import { Spec } from '/tbc/core/proto/common.js';
-import { ActionId } from '/tbc/core/resources.js';
+import { ActionId } from '/tbc/core/proto_utils/action_id.js';
+import { actionIdToString } from '/tbc/core/proto_utils/action_id.js';
+import { protoToActionId } from '/tbc/core/proto_utils/action_id.js';
 import { getIconUrl } from '/tbc/core/resources.js';
-import { getName } from '/tbc/core/resources.js';
-import { actionIdToString } from '/tbc/core/resources.js';
+import { getFullActionName } from '/tbc/core/resources.js';
 import { classColors } from '/tbc/core/proto_utils/utils.js';
 import { getTalentTreeIcon } from '/tbc/core/proto_utils/utils.js';
 import { playerToSpec } from '/tbc/core/proto_utils/utils.js';
@@ -89,7 +90,7 @@ export class SimResult {
 	}
 
 	getActionMetrics(filter: SimResultFilter): Array<ActionMetrics> {
-		return ActionMetrics.join(this.getPlayers(filter).map(player => player.actions).flat());
+		return ActionMetrics.join(this.getPlayers(filter).map(player => player.getPlayerAndPetActions()).flat());
 	}
 
 	getSpellMetrics(filter: SimResultFilter): Array<ActionMetrics> {
@@ -191,39 +192,54 @@ export class PartyMetrics {
 								duration,
 								party.players[i],
 								metrics.players[i],
-								partyIndex * 5 + i)));
+								partyIndex * 5 + i,
+								false)));
 
 		return new PartyMetrics(party, metrics, partyIndex, players);
 	}
 }
 
 export class PlayerMetrics {
+	// If this Player is a pet, player is the owner.
 	private readonly player: PlayerProto;
 	private readonly metrics: PlayerMetricsProto;
 
 	readonly raidIndex: number;
 	readonly name: string;
 	readonly spec: Spec;
+	readonly isPet: boolean;
 	readonly iconUrl: string;
 	readonly classColor: string;
 	readonly dps: DpsMetricsProto;
 	readonly actions: Array<ActionMetrics>;
 	readonly auras: Array<AuraMetrics>;
+	readonly pets: Array<PlayerMetrics>;
 	private readonly iterations: number;
 	private readonly duration: number;
 
-	private constructor(player: PlayerProto, metrics: PlayerMetricsProto, raidIndex: number, actions: Array<ActionMetrics>, auras: Array<AuraMetrics>, iterations: number, duration: number) {
+	private constructor(
+			player: PlayerProto,
+			isPet: boolean,
+			metrics: PlayerMetricsProto,
+			raidIndex: number,
+			actions: Array<ActionMetrics>,
+			auras: Array<AuraMetrics>,
+			pets: Array<PlayerMetrics>,
+			iterations: number,
+			duration: number) {
 		this.player = player;
 		this.metrics = metrics;
 
 		this.raidIndex = raidIndex;
 		this.name = player.name;
 		this.spec = playerToSpec(player);
+		this.isPet = isPet;
 		this.iconUrl = getTalentTreeIcon(this.spec, player.talentsString);
 		this.classColor = classColors[specToClass[this.spec]];
 		this.dps = this.metrics.dps!;
 		this.actions = actions;
 		this.auras = auras;
+		this.pets = pets;
 		this.iterations = iterations;
 		this.duration = duration;
 	}
@@ -240,13 +256,19 @@ export class PlayerMetrics {
 		return this.dps.avg * this.duration;
 	}
 
-	static async makeNew(iterations: number, duration: number, player: PlayerProto, metrics: PlayerMetricsProto, raidIndex: number): Promise<PlayerMetrics> {
+	getPlayerAndPetActions(): Array<ActionMetrics> {
+		return this.actions.concat(this.pets.map(pet => pet.getPlayerAndPetActions()).flat());
+	}
+
+	static async makeNew(iterations: number, duration: number, player: PlayerProto, metrics: PlayerMetricsProto, raidIndex: number, isPet: boolean): Promise<PlayerMetrics> {
 		const actionsPromise = Promise.all(metrics.actions.map(actionMetrics => ActionMetrics.makeNew(iterations, duration, actionMetrics)));
 		const aurasPromise = Promise.all(metrics.auras.map(auraMetrics => AuraMetrics.makeNew(iterations, duration, auraMetrics)));
+		const petsPromise = Promise.all(metrics.pets.map(petMetrics => PlayerMetrics.makeNew(iterations, duration, player, petMetrics, raidIndex, true)));
 
 		const actions = await actionsPromise;
 		const auras = await aurasPromise;
-		return new PlayerMetrics(player, metrics, raidIndex, actions, auras, iterations, duration);
+		const pets = await petsPromise;
+		return new PlayerMetrics(player, isPet, metrics, raidIndex, actions, auras, pets, iterations, duration);
 	}
 }
 
@@ -331,11 +353,8 @@ export class AuraMetrics {
 			tag: 0,
 		};
 
-		const namePromise = getName(actionId.id);
-		const iconPromise = getIconUrl(actionId.id);
-
-		const name = await namePromise;
-		const iconUrl = await iconPromise;
+		const name = await getFullActionName(actionId);
+		const iconUrl = await getIconUrl(actionId.id);
 
 		return new AuraMetrics(actionId, name, iconUrl, iterations, duration, auraMetrics);
 	}
@@ -414,63 +433,9 @@ export class ActionMetrics {
 	}
 
 	static async makeNew(iterations: number, duration: number, actionMetrics: ActionMetricsProto): Promise<ActionMetrics> {
-		let actionId: ActionId | null = null;
-		if (actionMetrics.id!.rawId.oneofKind == 'spellId') {
-			actionId = {
-				id: {
-					spellId: actionMetrics.id!.rawId.spellId,
-				},
-				tag: actionMetrics.id!.tag,
-			};
-		} else if (actionMetrics.id!.rawId.oneofKind == 'itemId') {
-			actionId = {
-				id: {
-					itemId: actionMetrics.id!.rawId.itemId,
-				},
-				tag: actionMetrics.id!.tag,
-			};
-		} else if (actionMetrics.id!.rawId.oneofKind == 'otherId') {
-			actionId = {
-				id: {
-					otherId: actionMetrics.id!.rawId.otherId,
-				},
-				tag: actionMetrics.id!.tag,
-			};
-		} else {
-			throw new Error('Invalid action metric with no ID');
-		}
-
-		const namePromise = getName(actionId.id);
-		const iconPromise = getIconUrl(actionId.id);
-
-		let name = await namePromise;
-		if (actionId.tag != 0) {
-			if (name == "Mind Flay") { // for now we can just check the name and use special tagging rules.
-				if (actionId.tag == 1) {
-					name += ' (1 Tick)';
-				} else if (actionId.tag == 2) {
-					name += ' (2 Tick)';
-				} else if (actionId.tag == 3) {
-					name += ' (3 Tick)';
-				}
-			} else if (name == 'Fireball') {
-				name += ' (DoT)';
-			} else if (name == 'Pyroblast') {
-				name += ' (DoT)';
-			} else {
-				if (actionId.tag == 1) {
-				 	name += ' (LO)';
-				} else if (actionId.tag == 10) {
-					name += ' (Auto)';
-				} else if (actionId.tag == 11) {
-					name += ' (Offhand Auto)';
-				} else {
-					name += ' (??)';
-				}
-			} 
-		} 
-
-		const iconUrl = await iconPromise;
+		const actionId = protoToActionId(actionMetrics.id!);
+		const name = await getFullActionName(actionId);
+		const iconUrl = await getIconUrl(actionId.id);
 
 		return new ActionMetrics(actionId, name, iconUrl, iterations, duration, actionMetrics);
 	}

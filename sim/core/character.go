@@ -23,8 +23,14 @@ type Character struct {
 	// Current gear.
 	Equip items.Equipment
 
+	// Pets owned by this Character.
+	Pets []PetAgent
+
 	// Consumables this Character will be using.
 	consumes proto.Consumes
+
+	// Base stats for this Character.
+	baseStats stats.Stats
 
 	// Stats this Character will have at the very start of each Sim iteration.
 	// Includes all equipment / buffs / permanent effects but not temporary
@@ -95,18 +101,22 @@ func NewCharacter(party *Party, partyIndex int, player proto.Player) Character {
 			CastSpeedMultiplier:   1,
 			SpiritRegenMultiplier: 1,
 		},
-		Party:       party,
-		PartyIndex:  partyIndex,
-		RaidIndex:   party.Index*5 + partyIndex,
-		auraTracker: newAuraTracker(false),
-		Metrics:     NewCharacterMetrics(),
+		Party:      party,
+		PartyIndex: partyIndex,
+		RaidIndex:  party.Index*5 + partyIndex,
+
+		auraTracker:          newAuraTracker(false),
+		majorCooldownManager: newMajorCooldownManager(player.Cooldowns),
+
+		Metrics: NewCharacterMetrics(),
 	}
 
 	if player.Consumes != nil {
 		character.consumes = *player.Consumes
 	}
 
-	character.AddStats(BaseStats[BaseStatsKey{Race: character.Race, Class: character.Class}])
+	character.baseStats = BaseStats[BaseStatsKey{Race: character.Race, Class: character.Class}]
+	character.AddStats(character.baseStats)
 	character.AddStats(character.Equip.Stats())
 
 	if player.BonusStats != nil {
@@ -115,7 +125,12 @@ func NewCharacter(party *Party, partyIndex int, player proto.Player) Character {
 		character.AddStats(bonusStats)
 	}
 
-	// Universal stat dependencies
+	character.addUniversalStatDependencies()
+
+	return character
+}
+
+func (character *Character) addUniversalStatDependencies() {
 	character.AddStatDependency(stats.StatDependency{
 		SourceStat:   stats.Agility,
 		ModifiedStat: stats.Armor,
@@ -132,8 +147,6 @@ func NewCharacter(party *Party, partyIndex int, player proto.Player) Character {
 			return mana + (20 + 15*(intellect-20))
 		},
 	})
-
-	return character
 }
 
 func (character *Character) Log(sim *Simulation, message string, vals ...interface{}) {
@@ -149,22 +162,39 @@ func (character *Character) applyAllEffects(agent Agent) {
 // Apply effects from all equipped items.
 func (character *Character) applyItemEffects(agent Agent) {
 	for _, eq := range character.Equip {
-		applyItemEffect, ok := itemEffects[eq.ID]
-		if ok {
+		if applyItemEffect, ok := itemEffects[eq.ID]; ok {
 			applyItemEffect(agent)
 		}
 
 		for _, g := range eq.Gems {
-			applyGemEffect, ok := itemEffects[g.ID]
-			if ok {
+			if applyGemEffect, ok := itemEffects[g.ID]; ok {
 				applyGemEffect(agent)
 			}
+		}
+
+		// TODO: should we use eq.Enchant.EffectID because some enchants use a spellID instead of itemID?
+		if applyEnchantEffect, ok := itemEffects[eq.Enchant.ID]; ok {
+			applyEnchantEffect(agent)
 		}
 	}
 }
 
+func (character *Character) AddPet(pet PetAgent) {
+	if character.finalized {
+		panic("Pets must be added before finalization!")
+	}
+
+	character.Pets = append(character.Pets, pet)
+}
+
 func (character *Character) AddStats(stat stats.Stats) {
 	character.stats = character.stats.Add(stat)
+
+	if len(character.Pets) > 0 {
+		for _, petAgent := range character.Pets {
+			petAgent.GetPet().addOwnerStats(stat)
+		}
+	}
 }
 func (character *Character) AddStat(stat stats.Stat, amount float64) {
 	if character.finalized {
@@ -175,7 +205,14 @@ func (character *Character) AddStat(stat stats.Stat, amount float64) {
 			panic("Use AddMeleeHaste!")
 		}
 	}
+
 	character.stats[stat] += amount
+
+	if len(character.Pets) > 0 {
+		for _, petAgent := range character.Pets {
+			petAgent.GetPet().addOwnerStat(stat, amount)
+		}
+	}
 }
 
 func (character *Character) SpendMana(sim *Simulation, amount float64, reason string) {
@@ -220,6 +257,9 @@ func (character *Character) AddMeleeHaste(sim *Simulation, amount float64) {
 		character.AutoAttacks.ModifySwingTime(sim, mod)
 	}
 	character.stats[stats.MeleeHaste] += amount
+
+	// Could add melee haste to pets too, but not aware of any pets that scale with
+	// owner's melee haste.
 }
 
 // MultiplyMeleeSpeed will alter the attack speed multiplier and change swing speed of all autoattack swings in progress.
@@ -232,7 +272,7 @@ func (character *Character) GetInitialStat(stat stats.Stat) float64 {
 	return character.initialStats[stat]
 }
 func (character *Character) GetBaseStats() stats.Stats {
-	return BaseStats[BaseStatsKey{Race: character.Race, Class: character.Class}]
+	return character.baseStats
 }
 func (character *Character) GetStats() stats.Stats {
 	return character.stats
@@ -339,6 +379,10 @@ func (character *Character) Finalize() {
 
 	character.auraTracker.finalize()
 	character.majorCooldownManager.finalize(character)
+
+	for _, petAgent := range character.Pets {
+		petAgent.GetPet().Finalize()
+	}
 }
 
 func (character *Character) reset(sim *Simulation) {
@@ -347,12 +391,18 @@ func (character *Character) reset(sim *Simulation) {
 	character.ExpectedBonusMana = 0
 
 	character.auraTracker.reset(sim)
+	character.Metrics.reset()
 
 	character.majorCooldownManager.reset(sim)
 
 	if character.AutoAttacks.mh != nil {
 		character.AutoAttacks = AutoAttacks{}
 		character.EnableAutoAttacks() // resets auto attack timers etc
+	}
+
+	for _, petAgent := range character.Pets {
+		petAgent.GetPet().reset(sim)
+		petAgent.Reset(sim)
 	}
 }
 
@@ -364,6 +414,13 @@ func (character *Character) advance(sim *Simulation, elapsedTime time.Duration) 
 	if character.Hardcast.Expires != 0 && character.Hardcast.Expires <= sim.CurrentTime {
 		character.Hardcast.OnExpire(sim)
 		character.Hardcast.Expires = 0
+	}
+
+	if len(character.Pets) > 0 {
+		for _, petAgent := range character.Pets {
+			petAgent.GetPet().advance(sim, elapsedTime)
+			petAgent.Advance(sim, elapsedTime)
+		}
 	}
 }
 
@@ -480,6 +537,15 @@ func (character *Character) HasMetaGemEquipped(gemID int32) bool {
 }
 
 func (character *Character) doneIteration(simDuration time.Duration) {
+	// Need to do pets first so we can add their results to the owners.
+	if len(character.Pets) > 0 {
+		for _, petAgent := range character.Pets {
+			pet := petAgent.GetPet()
+			pet.doneIteration(simDuration)
+			character.Metrics.AddFinalPetMetrics(&pet.Metrics)
+		}
+	}
+
 	if character.Hardcast.Cast != nil {
 		character.Hardcast.Cast.Cancel()
 		character.Hardcast = Hardcast{}
@@ -497,12 +563,19 @@ func (character *Character) GetStatsProto() *proto.PlayerStats {
 		GearOnly:   gearStats[:],
 		FinalStats: finalStats[:],
 		Sets:       setBonusNames,
+		Cooldowns:  character.GetMajorCooldownIDs(),
 	}
 }
 
 func (character *Character) GetMetricsProto(numIterations int32) *proto.PlayerMetrics {
 	metrics := character.Metrics.ToProto(numIterations)
 	metrics.Auras = character.auraTracker.GetMetricsProto(numIterations)
+
+	metrics.Pets = []*proto.PlayerMetrics{}
+	for _, petAgent := range character.Pets {
+		metrics.Pets = append(metrics.Pets, petAgent.GetPet().GetMetricsProto(numIterations))
+	}
+
 	return metrics
 }
 

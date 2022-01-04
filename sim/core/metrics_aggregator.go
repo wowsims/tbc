@@ -28,6 +28,10 @@ type DpsMetrics struct {
 	hist       map[int32]int32 // rounded DPS to count
 }
 
+func (dpsMetrics *DpsMetrics) reset() {
+	dpsMetrics.TotalDamage = 0
+}
+
 // This should be called when a Sim iteration is complete.
 func (dpsMetrics *DpsMetrics) doneIteration(encounterDurationSeconds float64) {
 	dps := dpsMetrics.TotalDamage / encounterDurationSeconds
@@ -38,9 +42,6 @@ func (dpsMetrics *DpsMetrics) doneIteration(encounterDurationSeconds float64) {
 
 	dpsRounded := int32(math.Round(dps/10) * 10)
 	dpsMetrics.hist[dpsRounded]++
-
-	// Clear the iteration metrics
-	dpsMetrics.TotalDamage = 0
 }
 
 func (dpsMetrics *DpsMetrics) ToProto(numIterations int32) *proto.DpsMetrics {
@@ -166,7 +167,7 @@ func (characterMetrics *CharacterMetrics) AddAutoAttack(itemID int32, result Mel
 		actionMetrics.ActionID = actionID
 	}
 	actionMetrics.Casts++
-	if result == MeleeHitTypeBlock || result == MeleeHitTypeMiss || result == MeleeHitTypeParry || result == MeleeHitTypeDodge {
+	if result == MeleeHitTypeMiss || result == MeleeHitTypeParry || result == MeleeHitTypeDodge {
 		actionMetrics.Misses++
 	} else {
 		actionMetrics.Hits++
@@ -199,18 +200,27 @@ func (characterMetrics *CharacterMetrics) AddMeleeAbility(ability *ActiveMeleeAb
 	characterMetrics.actions[actionKey] = actionMetrics
 }
 
+// This should be called at the end of each iteration, to include metrics from Pets in
+// those of their owner.
+// Assumes that doneIteration() has already been called on the pet metrics.
+func (characterMetrics *CharacterMetrics) AddFinalPetMetrics(petMetrics *CharacterMetrics) {
+	characterMetrics.TotalDamage += petMetrics.TotalDamage
+}
+
 func (characterMetrics *CharacterMetrics) MarkOOM(sim *Simulation, character *Character, dur time.Duration) {
 	characterMetrics.CharacterIterationMetrics.OOMTime += dur
 	characterMetrics.CharacterIterationMetrics.WentOOM = true
+}
+
+func (characterMetrics *CharacterMetrics) reset() {
+	characterMetrics.DpsMetrics.reset()
+	characterMetrics.CharacterIterationMetrics = CharacterIterationMetrics{}
 }
 
 // This should be called when a Sim iteration is complete.
 func (characterMetrics *CharacterMetrics) doneIteration(encounterDurationSeconds float64) {
 	characterMetrics.DpsMetrics.doneIteration(encounterDurationSeconds)
 	characterMetrics.oomTimeSum += float64(characterMetrics.OOMTime.Seconds())
-
-	// Clear the iteration metrics
-	characterMetrics.CharacterIterationMetrics = CharacterIterationMetrics{}
 }
 
 func (characterMetrics *CharacterMetrics) ToProto(numIterations int32) *proto.PlayerMetrics {
@@ -237,12 +247,14 @@ type AuraMetrics struct {
 	uptimeSumSquared time.Duration
 }
 
+func (auraMetrics *AuraMetrics) reset() {
+	auraMetrics.Uptime = 0
+}
+
 // This should be called when a Sim iteration is complete.
 func (auraMetrics *AuraMetrics) doneIteration() {
 	auraMetrics.uptimeSum += auraMetrics.Uptime
 	auraMetrics.uptimeSumSquared += auraMetrics.Uptime * auraMetrics.Uptime
-
-	auraMetrics.Uptime = 0
 }
 
 func (auraMetrics *AuraMetrics) ToProto(numIterations int32) *proto.AuraMetrics {

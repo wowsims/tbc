@@ -42,6 +42,8 @@ message Player {
 
 		// Only used by the UI. Sim uses talents within the spec protos.
 		string talentsString = 17;
+
+		Cooldowns cooldowns = 19;
 }
 
 message Party {
@@ -61,25 +63,6 @@ message SimOptions {
     int64 random_seed = 2;
     bool debug = 3; // Enables debug logging.
 		bool is_test = 5; // Only used internally.
-}
-
-// ID for actions that aren't spells or items.
-enum OtherAction {
-    OtherActionNone = 0;
-    OtherActionWait = 1;
-}
-
-message ActionID {
-    // Identifies this action.
-    oneof raw_id {
-        int32 spell_id = 1;
-        int32 item_id = 2;
-        OtherAction other_id = 3;
-    }
-
-		// Distinguishes between different versions of the same action.
-		// Currently the only use for this is Shaman Lightning Overload.
-		int32 tag = 4;
 }
 
 // The aggregated results from all uses of a particular action.
@@ -126,6 +109,8 @@ message PlayerMetrics {
 
     repeated ActionMetrics actions = 5;
 		repeated AuraMetrics auras = 6;
+
+		repeated PlayerMetrics pets = 7;
 }
 
 // Results for a whole raid.
@@ -201,6 +186,7 @@ message PlayerStats {
     repeated double final_stats = 2;
     repeated string sets = 3;
 		IndividualBuffs buffs = 4;
+		repeated ActionID cooldowns = 5;
 }
 message PartyStats {
     repeated PlayerStats players = 1;

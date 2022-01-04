@@ -1,6 +1,7 @@
 @import "./components/bonus_stats_picker";
 @import "./components/boolean_picker";
 @import "./components/character_stats";
+@import "./components/cooldowns_picker";
 @import "./components/detailed_results";
 @import "./components/encounter_picker";
 @import "./components/enum_picker";
@@ -8,6 +9,7 @@
 @import "./components/icon_enum_picker";
 @import "./components/icon_picker";
 @import "./components/log_runner";
+@import "./components/number_list_picker";
 @import "./components/number_picker";
 @import "./components/raid_sim_action";
 @import "./components/raid_target_picker";
@@ -141,6 +143,10 @@
 
 .debuffs-section>div {
   display: grid;
+}
+
+.cooldowns-section-container {
+	z-index: 1000;
 }
 
 .saved-encounter-manager {

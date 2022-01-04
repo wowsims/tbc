@@ -42,6 +42,8 @@ type Mage struct {
 	numCastsDone         int32
 	isBlastSpamming      bool
 
+	waterElemental *WaterElemental
+
 	// Cached values for a few mechanics.
 	spellDamageMultiplier float64
 
@@ -162,6 +164,10 @@ func NewMage(character core.Character, options proto.Player) *Mage {
 		mage.PseudoStats.SpiritRegenRateCasting += 0.3
 	} else if mage.Options.Armor == proto.Mage_Options_MoltenArmor {
 		mage.AddStat(stats.SpellCrit, 3*core.SpellCritRatingPerCritChance)
+	}
+
+	if mage.Talents.SummonWaterElemental {
+		mage.waterElemental = mage.NewWaterElemental(mage.FrostRotation.WaterElementalDisobeyChance)
 	}
 
 	mage.registerEvocationCD()

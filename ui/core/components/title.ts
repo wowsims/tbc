@@ -92,8 +92,12 @@ export class Title extends Component {
 	}
 
 	static makeOptionElem(data: SimLinkOption): HTMLElement {
+		const optionContainer = document.createElement('div');
+		optionContainer.classList.add('sim-title-dropdown-option-container', 'dropdown-option-container');
+
 		const option = document.createElement('div');
 		option.classList.add('sim-title-option', 'dropdown-option');
+		optionContainer.appendChild(option);
 
 		if (data.color) {
 			option.style.backgroundColor = data.color;
@@ -120,6 +124,6 @@ export class Title extends Component {
 		label.classList.add('sim-title-label');
 		labelDiv.appendChild(label);
 
-		return option;
+		return optionContainer;
 	}
 }

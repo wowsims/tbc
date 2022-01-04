@@ -119,6 +119,12 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestAllItemEffects-RelentlessEarthstormDiamond"
+ value: {
+  dps: 1415.2730855540874
+ }
+}
+dps_results: {
  key: "TestAllItemEffects-RobeoftheElderScribes-28602"
  value: {
   dps: 1278.4663168219768

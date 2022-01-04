@@ -1,3 +1,4 @@
+import { ItemOrSpellId } from '/tbc/core/proto_utils/action_id.js';
 import { RaidBuffs } from '/tbc/core/proto/common.js';
 import { PartyBuffs } from '/tbc/core/proto/common.js';
 import { IndividualBuffs } from '/tbc/core/proto/common.js';
@@ -6,7 +7,6 @@ import { Consumes } from '/tbc/core/proto/common.js';
 import { Debuffs } from '/tbc/core/proto/common.js';
 import { Drums } from '/tbc/core/proto/common.js';
 import { Potions } from '/tbc/core/proto/common.js';
-import { ItemOrSpellId } from '/tbc/core/resources.js';
 import { IndividualSimIconPickerConfig } from '/tbc/core/individual_sim_ui.js';
 import { Party } from '/tbc/core/party.js';
 import { Player } from '/tbc/core/player.js';

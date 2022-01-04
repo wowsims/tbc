@@ -18,6 +18,7 @@ func (mage *Mage) applyTalents() {
 	mage.registerCombustionCD()
 	mage.registerIcyVeinsCD()
 	mage.registerColdSnapCD()
+	mage.registerSummonWaterElementalCD()
 
 	if mage.Talents.ArcaneMeditation > 0 {
 		mage.PseudoStats.SpiritRegenRateCasting += float64(mage.Talents.ArcaneMeditation) * 0.1
@@ -337,18 +338,26 @@ func (mage *Mage) registerColdSnapCD() {
 		Cooldown:   cooldown,
 		CanActivate: func(sim *core.Simulation, character *core.Character) bool {
 			// Don't use if there are no cooldowns to reset.
-			if character.GetRemainingCD(IcyVeinsCooldownID, sim.CurrentTime) == 0 {
+			if !character.IsOnCD(IcyVeinsCooldownID, sim.CurrentTime) && !character.IsOnCD(SummonWaterElementalCooldownID, sim.CurrentTime) {
 				return false
 			}
 			return true
 		},
 		ShouldActivate: func(sim *core.Simulation, character *core.Character) bool {
+			// Ideally wait for both water ele and icy veins so we can reset both.
+			if mage.Talents.IcyVeins && !character.IsOnCD(IcyVeinsCooldownID, sim.CurrentTime) {
+				return false
+			}
+			if mage.Talents.SummonWaterElemental && !character.IsOnCD(SummonWaterElementalCooldownID, sim.CurrentTime) {
+				return false
+			}
+
 			return true
 		},
 		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
 			return func(sim *core.Simulation, character *core.Character) {
 				character.SetCD(IcyVeinsCooldownID, 0)
-				// TODO: Also reset water ele
+				character.SetCD(SummonWaterElementalCooldownID, 0)
 
 				character.Metrics.AddInstantCast(core.ActionID{SpellID: 11958})
 				character.SetCD(ColdSnapCooldownID, sim.CurrentTime+cooldown)

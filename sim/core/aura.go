@@ -78,7 +78,6 @@ type Aura struct {
 	onSpellMissIndex            int32 // Position of this aura's index in the sim.onSpellMissIDs array.
 	onBeforePeriodicDamageIndex int32 // Position of this aura's index in the sim.onBeforePeriodicDamageIDs array.
 	onPeriodicDamageIndex       int32 // Position of this aura's index in the sim.onPeriodicDamageIDs array.
-	onBeforeSwingHitIndex       int32 // Position of this aura's index in the sim.onBeforeSwingHit array.
 	OnMeleeAttackIndex          int32 // Position of this aura's index in the sim.OnMeleeAttack array.
 	OnBeforeMeleeIndex          int32 // Position of this aura's index in the sim.OnBeforeMelee array.
 
@@ -110,9 +109,6 @@ type Aura struct {
 
 	// Invoked when a dot tick occurs, after damage is calculated.
 	OnPeriodicDamage OnPeriodicDamage
-
-	// Invoked before an auto attack swing happens.
-	OnBeforeSwingHit OnBeforeSwingHit
 
 	// Invoked after a melee hit has occured (could be auto or skill).
 	OnMeleeAttack OnMeleeAttack
@@ -158,7 +154,6 @@ type auraTracker struct {
 	onSpellMissIDs            []AuraID
 	onBeforePeriodicDamageIDs []AuraID
 	onPeriodicDamageIDs       []AuraID
-	onBeforeSwingHitIDs       []AuraID
 	onMeleeAttackIDs          []AuraID
 	onBeforeMeleeIDs          []AuraID
 
@@ -183,7 +178,6 @@ func newAuraTracker(useDebuffIDs bool) auraTracker {
 		onSpellMissIDs:            make([]AuraID, 0, 16),
 		onBeforePeriodicDamageIDs: make([]AuraID, 0, 16),
 		onPeriodicDamageIDs:       make([]AuraID, 0, 16),
-		onBeforeSwingHitIDs:       make([]AuraID, 0, 16),
 		onMeleeAttackIDs:          make([]AuraID, 0, 16),
 		onBeforeMeleeIDs:          make([]AuraID, 0, 16),
 		auras:                     make([]Aura, numAura),
@@ -226,11 +220,15 @@ func (at *auraTracker) reset(sim *Simulation) {
 	at.onSpellMissIDs = at.onSpellMissIDs[:0]
 	at.onBeforePeriodicDamageIDs = at.onBeforePeriodicDamageIDs[:0]
 	at.onPeriodicDamageIDs = at.onPeriodicDamageIDs[:0]
-	at.onBeforeSwingHitIDs = at.onBeforeSwingHitIDs[:0]
 	at.onMeleeAttackIDs = at.onMeleeAttackIDs[:0]
 	at.onBeforeMeleeIDs = at.onBeforeMeleeIDs[:0]
 
 	at.auraIDsToRemove = []AuraID{}
+
+	for i, _ := range at.metrics {
+		auraMetric := &at.metrics[i]
+		auraMetric.reset()
+	}
 
 	for _, permAura := range at.permanentAuras {
 		aura := permAura(sim)
@@ -287,7 +285,6 @@ func (at *auraTracker) ReplaceAura(sim *Simulation, newAura Aura) {
 		newAura.onSpellMissIndex = old.onSpellMissIndex
 		newAura.onBeforePeriodicDamageIndex = old.onBeforePeriodicDamageIndex
 		newAura.onPeriodicDamageIndex = old.onPeriodicDamageIndex
-		newAura.onBeforeSwingHitIndex = old.onBeforeSwingHitIndex
 		newAura.OnMeleeAttackIndex = old.OnMeleeAttackIndex
 		newAura.OnBeforeMeleeIndex = old.OnBeforeMeleeIndex
 		newAura.startTime = old.startTime
@@ -345,11 +342,6 @@ func (at *auraTracker) AddAura(sim *Simulation, newAura Aura) {
 	if newAura.OnPeriodicDamage != nil {
 		at.auras[newAura.ID].onPeriodicDamageIndex = int32(len(at.onPeriodicDamageIDs))
 		at.onPeriodicDamageIDs = append(at.onPeriodicDamageIDs, newAura.ID)
-	}
-
-	if newAura.OnBeforeSwingHit != nil {
-		at.auras[newAura.ID].onBeforeSwingHitIndex = int32(len(at.onBeforeSwingHitIDs))
-		at.onBeforeSwingHitIDs = append(at.onBeforeSwingHitIDs, newAura.ID)
 	}
 
 	if newAura.OnMeleeAttack != nil {
@@ -443,13 +435,6 @@ func (at *auraTracker) RemoveAura(sim *Simulation, id AuraID) {
 		}
 	}
 
-	if at.auras[id].OnBeforeSwingHit != nil {
-		removeOnBeforeSwingHit := at.auras[id].onBeforeSwingHitIndex
-		at.onBeforeSwingHitIDs = removeBySwappingToBack(at.onBeforeSwingHitIDs, removeOnBeforeSwingHit)
-		if removeOnBeforeSwingHit < int32(len(at.onBeforeSwingHitIDs)) {
-			at.auras[at.onBeforeSwingHitIDs[removeOnBeforeSwingHit]].onBeforeSwingHitIndex = removeOnBeforeSwingHit
-		}
-	}
 	if at.auras[id].OnMeleeAttack != nil {
 		removeOnMeleeAttack := at.auras[id].OnMeleeAttackIndex
 		at.onMeleeAttackIDs = removeBySwappingToBack(at.onMeleeAttackIDs, removeOnMeleeAttack)
@@ -570,14 +555,6 @@ func (at *auraTracker) OnPeriodicDamage(sim *Simulation, spellCast *SpellCast, s
 	for _, id := range at.onPeriodicDamageIDs {
 		at.auras[id].OnPeriodicDamage(sim, spellCast, spellEffect, tickDamage)
 	}
-}
-
-func (at *auraTracker) OnBeforeSwingHit(sim *Simulation, isOH bool) bool {
-	doSwing := true
-	for _, id := range at.onBeforeSwingHitIDs {
-		doSwing = at.auras[id].OnBeforeSwingHit(sim, isOH) && doSwing
-	}
-	return doSwing
 }
 
 func (at *auraTracker) OnMeleeAttack(sim *Simulation, target *Target, result MeleeHitType, ability *ActiveMeleeAbility, isOH bool) {
