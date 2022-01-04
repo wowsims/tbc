@@ -271,6 +271,7 @@ func (shaman *Shaman) Reset(sim *core.Simulation) {
 		case AirTotem:
 			if shaman.SelfBuffs.AirTotem != proto.AirTotem_NoAirTotem {
 				shaman.SelfBuffs.NextTotemDrops[i] = time.Second * 120 // 2 min until drop totems
+				shaman.SelfBuffs.NextTotemDropType[i] = int32(shaman.SelfBuffs.AirTotem)
 			}
 			if shaman.SelfBuffs.TwistWindfury {
 				shaman.SelfBuffs.NextTotemDropType[i] = int32(proto.AirTotem_WindfuryTotem)

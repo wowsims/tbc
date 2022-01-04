@@ -179,6 +179,8 @@ func (shaman *Shaman) TryDropTotems(sim *core.Simulation) time.Duration {
 						shaman.SelfBuffs.NextTotemDropType[AirTotem] = int32(shaman.SelfBuffs.AirTotem)
 						shaman.SelfBuffs.NextTotemDrops[AirTotem] = sim.CurrentTime + time.Second // drop immediately
 					}
+				} else {
+					shaman.SelfBuffs.NextTotemDrops[AirTotem] = sim.CurrentTime + time.Second*120
 				}
 			case EarthTotem:
 				cast = shaman.NewEarthTotem(sim)
@@ -186,6 +188,7 @@ func (shaman *Shaman) TryDropTotems(sim *core.Simulation) time.Duration {
 				switch nextDrop {
 				case totemOfWrath:
 					cast = shaman.NewTotemOfWrath(sim)
+					shaman.SelfBuffs.NextTotemDrops[FireTotem] = sim.CurrentTime + time.Second*120
 				case searingTotem:
 					attackCast = shaman.NewSearingTotem(sim, sim.GetPrimaryTarget())
 					shaman.SelfBuffs.NextTotemDrops[FireTotem] = sim.CurrentTime + time.Second*60 + 1
