@@ -69,8 +69,11 @@ export class RaidTargetPicker extends Input {
         this.buttonElem.appendChild(RaidTargetPicker.makeOptionElem(optionData));
     }
     static makeOptionElem(data) {
+        const optionContainer = document.createElement('div');
+        optionContainer.classList.add('dropdown-option-container');
         const option = document.createElement('div');
         option.classList.add('raid-target-picker-option');
+        optionContainer.appendChild(option);
         if (data.isDropdown) {
             option.classList.add('dropdown-option');
         }
@@ -89,6 +92,6 @@ export class RaidTargetPicker extends Input {
             label.classList.add('raid-target-picker-label');
             option.appendChild(label);
         }
-        return option;
+        return optionContainer;
     }
 }

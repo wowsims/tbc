@@ -1,5 +1,19 @@
 import { Component } from '/tbc/core/components/component.js';
-import { classColors, getSpecSiteUrl, linkedSpecs, raidSimIcon, raidSimSiteUrl, specIconsLarge, specNames, specToClass, } from '/tbc/core/proto_utils/utils.js';
+import { Spec } from '/tbc/core/proto/common.js';
+import { classColors, getSpecSiteUrl, linkedSpecs, raidSimSiteUrl, specNames, specToClass, } from '/tbc/core/proto_utils/utils.js';
+export const titleIcons = {
+    [Spec.SpecBalanceDruid]: '/tbc/assets/balance_druid_icon.png',
+    [Spec.SpecElementalShaman]: '/tbc/assets/elemental_shaman_icon.png',
+    [Spec.SpecEnhancementShaman]: '/tbc/assets/enhancement_shaman_icon.png',
+    [Spec.SpecHunter]: 'https://wow.zamimg.com/images/wow/icons/large/ability_marksmanship.jpg',
+    [Spec.SpecMage]: '/tbc/assets/mage_icon.png',
+    [Spec.SpecRogue]: 'https://wow.zamimg.com/images/wow/icons/large/ability_rogue_eviscerate.jpg',
+    [Spec.SpecRetributionPaladin]: 'https://wow.zamimg.com/images/wow/icons/large/spell_holy_auraoflight.jpg',
+    [Spec.SpecShadowPriest]: '/tbc/assets/shadow_priest_icon.png',
+    [Spec.SpecWarlock]: 'https://wow.zamimg.com/images/wow/icons/large/spell_shadow_metamorphosis.jpg',
+    [Spec.SpecWarrior]: 'https://wow.zamimg.com/images/wow/icons/large/ability_warrior_innerrage.jpg',
+};
+export const raidSimIcon = '/tbc/assets/raid_icon.png';
 ;
 // Dropdown menu for selecting a player.
 export class Title extends Component {
@@ -39,15 +53,15 @@ export class Title extends Component {
             return {
                 iconUrl: raidSimIcon,
                 href: raidSimSiteUrl,
-                text: 'Raid',
+                text: 'RAID',
                 color: isButton ? '' : 'black',
             };
         }
         else {
             return {
-                iconUrl: specIconsLarge[spec],
+                iconUrl: titleIcons[spec],
                 href: getSpecSiteUrl(spec),
-                text: specNames[spec],
+                text: specNames[spec].toUpperCase(),
                 color: isButton ? '' : classColors[specToClass[spec]],
             };
         }
@@ -78,13 +92,13 @@ export class Title extends Component {
         option.appendChild(labelDiv);
         if (!data.color) { // Hacky check for 'isButton'
             const simLabel = document.createElement('span');
-            simLabel.textContent = 'TBC Simulator';
+            simLabel.textContent = 'TBC SIMULATOR';
             simLabel.classList.add('sim-title-sim-label', 'sim-title-label');
             labelDiv.appendChild(simLabel);
         }
         const label = document.createElement('span');
         label.textContent = data.text;
-        label.classList.add('sim-title-label');
+        label.classList.add('sim-title-spec-label', 'sim-title-label');
         labelDiv.appendChild(label);
         return optionContainer;
     }

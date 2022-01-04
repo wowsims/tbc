@@ -8,7 +8,7 @@ export class LogRunner extends Component {
         this.rootElem.appendChild(controlBar);
         const simButton = document.createElement('button');
         simButton.classList.add('log-runner-button');
-        simButton.textContent = 'Sim once with logs';
+        simButton.textContent = 'SIM ONCE WITH LOGS';
         controlBar.appendChild(simButton);
         const logsDiv = document.createElement('div');
         logsDiv.classList.add('log-runner-logs');

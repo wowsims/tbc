@@ -21,7 +21,7 @@ class AssignedBuffPicker extends Component {
         this.changeEmitter = new TypedEvent();
         this.raidSimUI = raidSimUI;
         this.targetPickers = [];
-        this.playersContainer = document.createElement('div');
+        this.playersContainer = document.createElement('fieldset');
         this.playersContainer.classList.add('assigned-buff-players-container', 'settings-section');
         this.rootElem.appendChild(this.playersContainer);
         this.update();
@@ -32,7 +32,7 @@ class AssignedBuffPicker extends Component {
     }
     update() {
         this.playersContainer.innerHTML = `
-			<label>${this.getTitle()}</label>
+			<legend>${this.getTitle().toUpperCase()}</legend>
 		`;
         const sourcePlayers = this.getSourcePlayers();
         if (sourcePlayers.length == 0) {

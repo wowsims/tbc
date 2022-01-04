@@ -200,7 +200,7 @@ export class IndividualSimUI extends SimUI {
         this.addToolbarItem(shareLink);
     }
     addGearTab() {
-        this.addTab('Gear', 'gear-tab', `
+        this.addTab('GEAR', 'gear-tab', `
 			<div class="gear-tab-columns">
 				<div class="left-gear-panel">
 					<div class="gear-picker">
@@ -254,52 +254,52 @@ export class IndividualSimUI extends SimUI {
         });
     }
     addSettingsTab() {
-        this.addTab('Settings', 'settings-tab', `
+        this.addTab('SETTINGS', 'settings-tab', `
 			<div class="settings-inputs">
 				<div class="settings-section-container">
-					<section class="settings-section encounter-section within-raid-sim-hide">
-						<label>Encounter</label>
-					</section>
-					<section class="settings-section race-section">
-						<label>Race</label>
-					</section>
-					<section class="settings-section rotation-section">
-						<label>Rotation</label>
-					</section>
+					<fieldset class="settings-section encounter-section within-raid-sim-hide">
+						<legend>Encounter</legend>
+					</fieldset>
+					<fieldset class="settings-section race-section">
+						<legend>Race</legend>
+					</fieldset>
+					<fieldset class="settings-section rotation-section">
+						<legend>Rotation</legend>
+					</fieldset>
 				</div>
 				<div class="settings-section-container custom-sections-container">
 				</div>
 				<div class="settings-section-container">
-					<section class="settings-section self-buffs-section">
-						<label>Self Buffs</label>
-					</section>
+					<fieldset class="settings-section self-buffs-section">
+						<legend>Self Buffs</legend>
+					</fieldset>
 				</div>
 				<div class="settings-section-container within-raid-sim-hide">
-					<section class="settings-section buffs-section">
-						<label>Other Buffs</label>
-					</section>
+					<fieldset class="settings-section buffs-section">
+						<legend>Other Buffs</legend>
+					</fieldset>
 				</div>
 				<div class="settings-section-container">
-					<section class="settings-section consumes-section">
-						<label>Consumes</label>
-					</section>
+					<fieldset class="settings-section consumes-section">
+						<legend>Consumes</legend>
+					</fieldset>
 				</div>
 				<div class="settings-section-container cooldowns-section-container">
-					<section class="settings-section cooldowns-section">
-						<label>Cooldowns</label>
+					<fieldset class="settings-section cooldowns-section">
+						<legend>Cooldowns</legend>
 						<div class="cooldowns-section-content">
 						</div>
-					</section>
+					</fieldset>
 				</div>
 				<div class="settings-section-container within-raid-sim-hide">
-					<section class="settings-section debuffs-section">
-						<label>Debuffs</label>
-					</section>
+					<fieldset class="settings-section debuffs-section">
+						<legend>Debuffs</legend>
+					</fieldset>
 				</div>
 				<div class="settings-section-container">
-					<section class="settings-section other-settings-section">
-						<label>Other</label>
-					</section>
+					<fieldset class="settings-section other-settings-section">
+						<legend>Other</legend>
+					</fieldset>
 				</div>
 			</div>
 			<div class="settings-bottom-bar">
@@ -470,7 +470,7 @@ export class IndividualSimUI extends SimUI {
         });
     }
     addTalentsTab() {
-        this.addTab('Talents', 'talents-tab', `
+        this.addTab('TALENTS', 'talents-tab', `
 			<div class="talents-picker">
 			</div>
 			<div class="saved-talents-manager">
@@ -509,14 +509,14 @@ export class IndividualSimUI extends SimUI {
         });
     }
     addDetailedResultsTab() {
-        this.addTab('Detailed Results', 'detailed-results-tab', `
+        this.addTab('DETAILED RESULTS', 'detailed-results-tab', `
 			<div class="detailed-results">
 			</div>
 		`);
         const detailedResults = new DetailedResults(this.rootElem.getElementsByClassName('detailed-results')[0], this, this.raidSimResultsManager);
     }
     addLogTab() {
-        this.addTab('Log', 'log-tab', `
+        this.addTab('LOG', 'log-tab', `
 			<div class="log-runner">
 			</div>
 		`);

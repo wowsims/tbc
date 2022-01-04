@@ -9,15 +9,28 @@ import { DpsHistogram } from './dps_histogram.js';
 import { DpsResult } from './dps_result.js';
 import { PercentOom } from './percent_oom.js';
 const urlParams = new URLSearchParams(window.location.search);
-if (urlParams.has('mainBgColor')) {
-    document.body.style.setProperty('--main-bg-color', urlParams.get('mainBgColor'));
-}
 if (urlParams.has('mainTextColor')) {
     document.body.style.setProperty('--main-text-color', urlParams.get('mainTextColor'));
+}
+if (urlParams.has('themeColorPrimary')) {
+    document.body.style.setProperty('--theme-color-primary', urlParams.get('themeColorPrimary'));
+}
+if (urlParams.has('themeColorBackground')) {
+    document.body.style.setProperty('--theme-color-background', urlParams.get('themeColorBackground'));
+}
+if (urlParams.has('themeColorBackgroundRaw')) {
+    document.body.style.setProperty('--theme-color-background-raw', urlParams.get('themeColorBackgroundRaw'));
+}
+if (urlParams.has('themeBackgroundImage')) {
+    document.body.style.setProperty('--theme-background-image', urlParams.get('themeBackgroundImage'));
 }
 const isIndividualSim = urlParams.has('isIndividualSim');
 if (isIndividualSim) {
     document.body.classList.add('individual-sim');
+}
+if (!window.frameElement) {
+    // Means we're not inside an iframe, i.e. this is a new tab.
+    document.body.classList.add('new-tab');
 }
 const colorSettings = {
     mainTextColor: document.body.style.getPropertyValue('--main-text-color'),
@@ -30,10 +43,10 @@ const layoutHTML = `
 		</li>
 		<li class="tabs-filler">
 		</li>
-		<li class="dr-tab-tab active"><a data-toggle="tab" href="#damageTab">Damage</a></li>
-		<li class="dr-tab-tab"><a data-toggle="tab" href="#buffsTab">Buffs</a></li>
-		<li class="dr-tab-tab"><a data-toggle="tab" href="#debuffsTab">Debuffs</a></li>
-		<li class="dr-tab-tab"><a data-toggle="tab" href="#castsTab">Casts</a></li>
+		<li class="dr-tab-tab active"><a data-toggle="tab" href="#damageTab">DAMAGE</a></li>
+		<li class="dr-tab-tab"><a data-toggle="tab" href="#buffsTab">BUFFS</a></li>
+		<li class="dr-tab-tab"><a data-toggle="tab" href="#debuffsTab">DEBUFFS</a></li>
+		<li class="dr-tab-tab"><a data-toggle="tab" href="#castsTab">CASTS</a></li>
 	</ul>
 	<div class="tab-content">
 		<div id="damageTab" class="tab-pane dr-tab-content damage-content fade active in">

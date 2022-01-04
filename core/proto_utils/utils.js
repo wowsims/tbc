@@ -91,7 +91,6 @@ export const specIconsLarge = {
     [Spec.SpecWarlock]: 'https://wow.zamimg.com/images/wow/icons/large/spell_shadow_metamorphosis.jpg',
     [Spec.SpecWarrior]: 'https://wow.zamimg.com/images/wow/icons/large/ability_warrior_innerrage.jpg',
 };
-export const raidSimIcon = 'https://wow.zamimg.com/images/wow/icons/large/spell_holy_championsgrace.jpg';
 export const talentTreeIcons = {
     [Class.ClassUnknown]: [],
     [Class.ClassDruid]: [

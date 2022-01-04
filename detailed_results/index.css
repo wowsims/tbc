@@ -1,11 +1,28 @@
 @charset "UTF-8";
 :root {
+  --theme-color-primary: DarkSlateGrey;
+  --theme-color-background: DarkSlateGrey;
+  --theme-color-background-raw: 0, 0, 0;
+  --theme-background-image: linear-gradient(black, black);
   --main-bg-color: DarkSlateGrey;
   --main-text-color: White;
   --main-secondary-color: Black;
   --sidebar-bg-color: DarkKhaki;
   --sidebar-text-color: White;
   --sidebar-highlight-color: Blue;
+}
+
+@font-face {
+  font-family: SimDefaultFont;
+  src: url(/tbc/assets/PlusJakartaSans-Regular.woff2);
+}
+@font-face {
+  font-family: SimDefaultFont;
+  src: url(/tbc/assets/PlusJakartaSans-Bold.woff2);
+  font-weight: bold;
+}
+* {
+  font-family: SimDefaultFont;
 }
 
 .loader {
@@ -117,12 +134,29 @@
 }
 
 :root {
+  --theme-color-primary: DarkSlateGrey;
+  --theme-color-background: DarkSlateGrey;
+  --theme-color-background-raw: 0, 0, 0;
+  --theme-background-image: linear-gradient(black, black);
   --main-bg-color: DarkSlateGrey;
   --main-text-color: White;
   --main-secondary-color: Black;
   --sidebar-bg-color: DarkKhaki;
   --sidebar-text-color: White;
   --sidebar-highlight-color: Blue;
+}
+
+@font-face {
+  font-family: SimDefaultFont;
+  src: url(/tbc/assets/PlusJakartaSans-Regular.woff2);
+}
+@font-face {
+  font-family: SimDefaultFont;
+  src: url(/tbc/assets/PlusJakartaSans-Bold.woff2);
+  font-weight: bold;
+}
+* {
+  font-family: SimDefaultFont;
 }
 
 .loader {
@@ -234,12 +268,29 @@
 }
 
 :root {
+  --theme-color-primary: DarkSlateGrey;
+  --theme-color-background: DarkSlateGrey;
+  --theme-color-background-raw: 0, 0, 0;
+  --theme-background-image: linear-gradient(black, black);
   --main-bg-color: DarkSlateGrey;
   --main-text-color: White;
   --main-secondary-color: Black;
   --sidebar-bg-color: DarkKhaki;
   --sidebar-text-color: White;
   --sidebar-highlight-color: Blue;
+}
+
+@font-face {
+  font-family: SimDefaultFont;
+  src: url(/tbc/assets/PlusJakartaSans-Regular.woff2);
+}
+@font-face {
+  font-family: SimDefaultFont;
+  src: url(/tbc/assets/PlusJakartaSans-Bold.woff2);
+  font-weight: bold;
+}
+* {
+  font-family: SimDefaultFont;
 }
 
 .loader {
@@ -509,7 +560,11 @@
 }
 
 body {
-  background-color: var(--main-bg-color);
+  background-color: transparent;
+}
+
+body.new-tab {
+  background-image: linear-gradient(rgba(var(--theme-color-background-raw), 0.95), rgba(var(--theme-color-background-raw), 0.95)), var(--theme-background-image);
 }
 
 .all-players .single-player-only {
@@ -545,16 +600,20 @@ body {
 }
 
 .nav-tabs {
-  border-bottom-color: var(--main-text-color);
-}
-
-.nav-tabs > li > a {
+  border-bottom-color: var(--theme-color-primary);
   color: var(--main-text-color);
 }
 
+.nav-tabs > li > a {
+  color: var(--main-text-color) !important;
+  border: none !important;
+  border-radius: 0 !important;
+  margin-bottom: 1px;
+  font-weight: bold;
+}
+
 .nav-tabs > li > a:hover, .nav-tabs > li.active > a {
-  color: var(--main-secondary-color);
-  background-color: var(--main-text-color);
+  background-color: var(--theme-color-primary) !important;
 }
 
 .results-filter {

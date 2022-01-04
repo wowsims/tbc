@@ -3,7 +3,7 @@ import { statNames } from '/tbc/core/proto_utils/names.js';
 import { stDevToConf90 } from '/tbc/core/utils.js';
 export function addStatWeightsAction(simUI, epStats, epReferenceStat) {
     const resultsManager = new StatWeightsResultsManager(simUI);
-    simUI.addAction('EP Weights', 'ep-weights-action', async () => {
+    simUI.addAction('EP WEIGHTS', 'ep-weights-action', async () => {
         simUI.setResultsPending();
         const iterations = simUI.sim.getIterations();
         const result = await simUI.player.computeStatWeights(epStats, epReferenceStat);

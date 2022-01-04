@@ -27,7 +27,7 @@ export class CharacterStats extends Component {
             table.appendChild(row);
             const label = document.createElement('td');
             label.classList.add('character-stats-table-label');
-            label.textContent = statNames[stat];
+            label.textContent = statNames[stat].toUpperCase();
             row.appendChild(label);
             const value = document.createElement('td');
             value.classList.add('character-stats-table-value');

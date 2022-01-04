@@ -1,5 +1,7 @@
 import { Component } from '/tbc/core/components/component.js';
 import { Spec } from '/tbc/core/proto/common.js';
+export declare const titleIcons: Record<Spec, string>;
+export declare const raidSimIcon: string;
 export interface SimLinkOption {
     iconUrl: string;
     href: string;

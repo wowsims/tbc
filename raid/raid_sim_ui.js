@@ -126,7 +126,7 @@ export class RaidSimUI extends SimUI {
         this.addToolbarItem(uploadSettings);
     }
     addRaidTab() {
-        this.addTab('Raid', 'raid-tab', `
+        this.addTab('RAID', 'raid-tab', `
 			<div class="raid-picker">
 			</div>
 			<div class="saved-raids-div">
@@ -162,17 +162,17 @@ export class RaidSimUI extends SimUI {
         });
     }
     addSettingsTab() {
-        this.addTab('Settings', 'raid-settings-tab', `
+        this.addTab('SETTINGS', 'raid-settings-tab', `
 			<div class="raid-settings-sections">
 				<div class="raid-settings-section-container">
-					<section class="settings-section raid-encounter-section">
-						<label>Encounter</label>
-					</section>
+					<fieldset class="settings-section raid-encounter-section">
+						<legend>Encounter</legend>
+					</fieldset>
 				</div>
 				<div class="blessings-section-container">
-					<section class="settings-section blessings-section">
-						<label>Blessings</label>
-					</section>
+					<fieldset class="settings-section blessings-section">
+						<legend>Blessings</legend>
+					</fieldset>
 				</div>
 				<div class="assignments-section-container">
 				</div>
@@ -205,14 +205,14 @@ export class RaidSimUI extends SimUI {
         const assignmentsPicker = new AssignmentsPicker(this.rootElem.getElementsByClassName('assignments-section-container')[0], this);
     }
     addDetailedResultsTab() {
-        this.addTab('Detailed Results', 'detailed-results-tab', `
+        this.addTab('DETAILED RESULTS', 'detailed-results-tab', `
 			<div class="detailed-results">
 			</div>
 		`);
         const detailedResults = new DetailedResults(this.rootElem.getElementsByClassName('detailed-results')[0], this, this.raidSimResultsManager);
     }
     addLogTab() {
-        this.addTab('Log', 'log-tab', `
+        this.addTab('LOG', 'log-tab', `
 			<div class="log-runner">
 			</div>
 		`);
