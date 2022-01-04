@@ -55,8 +55,8 @@ export const WarriorRotationConfig = {
 						name: 'Fury', value: RotationType.Fury,
 					},
 				],
-				changedEvent: (simUI: IndividualSimUI<Spec.SpecMage>) => simUI.player.rotationChangeEmitter,
-				getValue: (simUI: IndividualSimUI<Spec.SpecMage>) => simUI.player.getRotation().type,
+				changedEvent: (simUI: IndividualSimUI<Spec.SpecWarrior>) => simUI.player.rotationChangeEmitter,
+				getValue: (simUI: IndividualSimUI<Spec.SpecWarrior>) => simUI.player.getRotation().type,
 				setValue: (eventID: EventID, simUI: IndividualSimUI<Spec.SpecWarrior>, newValue: number) => {
 					const newRotation = simUI.player.getRotation();
 					newRotation.type = newValue;
