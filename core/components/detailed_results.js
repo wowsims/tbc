@@ -17,7 +17,7 @@ export class DetailedResults extends Component {
         }
         this.rootElem.innerHTML = `
 		<div class="detailed-results-controls-div">
-			<button class="detailed-results-new-tab-button">VIEW IN SEPARATE TAB</button>
+			<button class="detailed-results-new-tab-button sim-button">VIEW IN SEPARATE TAB</button>
 		</div>
 		<iframe class="detailed-results-iframe" src="${url.href}" allowtransparency="true"></iframe>
 		`;

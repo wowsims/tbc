@@ -228,6 +228,7 @@
 }
 * {
   font-family: SimDefaultFont;
+  letter-spacing: 1px;
 }
 
 .loader {
@@ -402,12 +403,14 @@
 .item-picker-name {
   display: block;
   font-size: 18px;
+  letter-spacing: normal;
 }
 
 .item-picker-enchant {
   display: block;
   font-size: 14px;
   color: lawngreen;
+  letter-spacing: normal;
 }
 
 .selector-modal {
@@ -504,6 +507,7 @@
   text-decoration: none !important;
   cursor: pointer;
   margin-left: 10px;
+  letter-spacing: normal;
 }
 
 .selector-modal-list-item-padding {
@@ -568,6 +572,7 @@
 }
 * {
   font-family: SimDefaultFont;
+  letter-spacing: 1px;
 }
 
 .loader {
@@ -824,6 +829,7 @@
 }
 * {
   font-family: SimDefaultFont;
+  letter-spacing: 1px;
 }
 
 .loader {
@@ -1088,6 +1094,7 @@
 }
 * {
   font-family: SimDefaultFont;
+  letter-spacing: 1px;
 }
 
 .loader {
@@ -1379,6 +1386,7 @@
 }
 * {
   font-family: SimDefaultFont;
+  letter-spacing: 1px;
 }
 
 .loader {
@@ -1504,7 +1512,16 @@ td, th {
 input, select {
   color: var(--main-text-color);
   background-color: #1e2633;
-  border: 1px solid #171d2d;
+  border: 1px solid #373e58;
+  padding: 3px;
+}
+
+.sim-button {
+  color: var(--main-text-color);
+  background-color: var(--theme-color-primary);
+  border: none;
+  padding: 5px;
+  font-weight: bold;
 }
 
 .sim-root {
@@ -1527,7 +1544,7 @@ input, select {
 }
 
 .sim-sidebar-title {
-  margin: 0 0 25px 0 !important;
+  margin: 0 0 50px 0 !important;
 }
 
 .sim-sidebar-title, .sim-toolbar {
@@ -1556,7 +1573,6 @@ input, select {
 .sim-sidebar-actions-button:hover {
   color: var(--main-text-color);
   background: var(--theme-color-primary);
-  box-shadow: 0 0 10px var(--theme-color-primary);
 }
 
 .iterations-picker {
@@ -1710,6 +1726,7 @@ input, select {
 }
 * {
   font-family: SimDefaultFont;
+  letter-spacing: 1px;
 }
 
 .loader {
@@ -1926,8 +1943,8 @@ input, select {
 }
 
 .character-stats-table-row {
-  color: var(--sidebar-text-color);
-  border-bottom: 1px solid var(--sidebar-text-color);
+  color: var(--main-text-color);
+  border-bottom: 1px solid #315869;
   font-size: 16px;
   font-weight: 600;
 }
@@ -1973,14 +1990,6 @@ input, select {
 .saved-data-set-chip.active {
   color: var(--main-text-color);
   background-color: var(--theme-color-primary);
-}
-
-.saved-data-save-button, .log-runner-button, .detailed-results-new-tab-button {
-  color: var(--main-text-color);
-  background-color: var(--theme-color-primary);
-  border: none;
-  padding: 3px;
-  font-weight: bold;
 }
 
 .saved-data-set-delete {

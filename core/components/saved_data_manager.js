@@ -13,7 +13,7 @@ export class SavedDataManager extends Component {
     </div>
     <div class="saved-data-create-container">
       <input class="saved-data-save-input" type="text" placeholder="Label">
-      <button class="saved-data-save-button">SAVE CURRENT ${config.label.toUpperCase()}</button>
+      <button class="saved-data-save-button sim-button">SAVE CURRENT ${config.label.toUpperCase()}</button>
     </div>
     `;
         this.savedDataDiv = this.rootElem.getElementsByClassName('saved-data-container')[0];
