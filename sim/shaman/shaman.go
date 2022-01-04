@@ -228,7 +228,7 @@ func (shaman *Shaman) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {
 		if shaman.Talents.EnhancingTotems == 2 {
 			value = proto.TristateEffect_TristateEffectImproved
 		}
-		partyBuffs.GraceOfAirTotem = core.MaxTristate(partyBuffs.WrathOfAirTotem, value)
+		partyBuffs.GraceOfAirTotem = core.MaxTristate(partyBuffs.GraceOfAirTotem, value)
 
 	}
 
@@ -237,7 +237,7 @@ func (shaman *Shaman) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {
 		if shaman.Talents.EnhancingTotems == 2 {
 			value = proto.TristateEffect_TristateEffectImproved
 		}
-		partyBuffs.StrengthOfEarthTotem = core.MaxTristate(partyBuffs.WrathOfAirTotem, value)
+		partyBuffs.StrengthOfEarthTotem = core.MaxTristate(partyBuffs.StrengthOfEarthTotem, value)
 	}
 }
 
@@ -282,6 +282,10 @@ func (shaman *Shaman) Reset(sim *core.Simulation) {
 			}
 		case FireTotem:
 			if shaman.SelfBuffs.FireTotem != proto.FireTotem_NoFireTotem {
+				shaman.SelfBuffs.NextTotemDropType[i] = int32(shaman.SelfBuffs.FireTotem)
+				if shaman.SelfBuffs.TwistFireNova {
+					shaman.SelfBuffs.NextTotemDropType[FireTotem] = int32(proto.FireTotem_NovaTotem) // start by dropping nova, then alternating.
+				}
 				shaman.SelfBuffs.NextTotemDrops[i] = time.Second * 120 // 2 min until drop totems
 				if shaman.SelfBuffs.FireTotem != proto.FireTotem_TotemOfWrath {
 					shaman.SelfBuffs.NextTotemDrops[i] = 0 // attack totems we drop immediately
