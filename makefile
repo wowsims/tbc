@@ -63,7 +63,7 @@ $(OUT_DIR)/%/index.css: ui/%/index.scss ui/%/*.scss $(call rwildcard,ui/core,*.s
 	npx sass $< $@
 
 # Generic rule for building index.html for any class directory
-$(OUT_DIR)/%/index.html: ui/index_template.html
+$(OUT_DIR)/%/index.html: ui/index_template.html $(OUT_DIR)/assets
 	$(eval title := $(shell echo $(shell basename $(@D)) | sed -r 's/(^|_)([a-z])/\U \2/g' | cut -c 2-))
 	echo $(title)
 	mkdir -p $(@D)
@@ -89,6 +89,9 @@ $(OUT_DIR)/sim_worker.js: ui/worker/sim_worker.js
 
 $(OUT_DIR)/net_worker.js: ui/worker/net_worker.js
 	cp ui/worker/net_worker.js $(OUT_DIR)
+
+$(OUT_DIR)/assets: assets/*
+	cp -r assets $(OUT_DIR)
 
 binary_dist/dist.go: sim/web/dist.go.tmpl
 	mkdir -p binary_dist/tbc

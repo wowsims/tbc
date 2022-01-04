@@ -115,8 +115,6 @@ export const specIconsLarge: Record<Spec, string> = {
   [Spec.SpecWarrior]: 'https://wow.zamimg.com/images/wow/icons/large/ability_warrior_innerrage.jpg',
 };
 
-export const raidSimIcon: string = 'https://wow.zamimg.com/images/wow/icons/large/spell_holy_championsgrace.jpg';
-
 export const talentTreeIcons: Record<Class, Array<string>> = {
 	[Class.ClassUnknown]: [],
 	[Class.ClassDruid]: [

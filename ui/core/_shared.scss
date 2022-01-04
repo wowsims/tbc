@@ -1,10 +1,29 @@
 :root {
+	--theme-color-primary: DarkSlateGrey;
+	--theme-color-background: DarkSlateGrey;
+	--theme-color-background-raw: 0, 0, 0;
+	--theme-background-image: linear-gradient(black, black);
 	--main-bg-color: DarkSlateGrey;
 	--main-text-color: White;
 	--main-secondary-color: Black;
 	--sidebar-bg-color: DarkKhaki;
 	--sidebar-text-color: White;
 	--sidebar-highlight-color: Blue;
+}
+
+@font-face {
+	font-family: SimDefaultFont;
+	src: url(/tbc/assets/PlusJakartaSans-Regular.woff2);
+}
+
+@font-face {
+	font-family: SimDefaultFont;
+	src: url(/tbc/assets/PlusJakartaSans-Bold.woff2);
+	font-weight: bold;
+}
+
+* {
+	font-family: SimDefaultFont;
 }
 
 @mixin vertical-center {

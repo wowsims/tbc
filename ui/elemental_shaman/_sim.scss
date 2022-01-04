@@ -1,9 +1,13 @@
 // Set color variables which control the site theme.
 .elemental-shaman-sim-ui {
+	--theme-color-primary: #64bfdc;
+	--theme-color-background: #171d2d;
+	--theme-color-background-raw: 23, 29, 45;
+	--theme-background-image: url('/tbc/assets/elemental_shaman_background.jpg');
 	--main-bg-color: MidnightBlue;
 	--main-text-color: White;
 	--main-secondary-color: Black;
-	--sidebar-bg-color: #222;
+	--sidebar-bg-color: #111218;
 	--sidebar-text-color: White;
 	--sidebar-highlight-color: Blue;
 }
