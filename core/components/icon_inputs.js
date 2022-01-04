@@ -5,7 +5,7 @@ import { TypedEvent } from '/tbc/core/typed_event.js';
 // Keep each section in alphabetical order.
 // Raid Buffs
 export const ArcaneBrilliance = makeBooleanRaidBuffInput({ spellId: 27127 }, 'arcaneBrilliance');
-export const DivineSpirit = makeTristateRaidBuffInput({ spellId: 25312 }, { spellId: 33182 }, 'divineSpirit');
+export const DivineSpirit = makeTristateRaidBuffInput({ spellId: 25312 }, { spellId: 33182 }, 'divineSpirit', ['Spirit']);
 export const GiftOfTheWild = makeTristateRaidBuffInput({ spellId: 26991 }, { spellId: 17055 }, 'giftOfTheWild');
 // Party Buffs
 export const AtieshMage = makeMultistatePartyBuffInput({ spellId: 28142 }, 5, 'atieshMage');
@@ -63,6 +63,7 @@ export const SuperiorWizardOil = makeBooleanConsumeInput({ itemId: 22522 }, 'sup
 export const RoastedClefthoof = makeBooleanConsumeInput({ itemId: 27658 }, 'roastedClefthoof', ['Food']);
 export const ScrollOfStrengthV = makeBooleanConsumeInput({ itemId: 27503 }, 'scrollOfStrengthV');
 export const ScrollOfAgilityV = makeBooleanConsumeInput({ itemId: 27498 }, 'scrollOfAgilityV');
+export const ScrollOfSpiritV = makeBooleanConsumeInput({ itemId: 27501 }, 'scrollOfSpiritV', ['Spirit']);
 export const DefaultDestructionPotion = makeEnumValueConsumeInput({ itemId: 22839 }, 'defaultPotion', Potions.DestructionPotion, ['Potion']);
 export const DefaultHastePotion = makeEnumValueConsumeInput({ itemId: 22838 }, 'defaultPotion', Potions.HastePotion, ['Potion']);
 export const DefaultSuperManaPotion = makeEnumValueConsumeInput({ itemId: 22832 }, 'defaultPotion', Potions.SuperManaPotion, ['Potion']);
@@ -94,11 +95,12 @@ function makeBooleanRaidBuffInput(id, buffsFieldName, exclusivityTags) {
         },
     };
 }
-function makeTristateRaidBuffInput(id, impId, buffsFieldName) {
+function makeTristateRaidBuffInput(id, impId, buffsFieldName, exclusivityTags) {
     return {
         id: id,
         states: 3,
         improvedId: impId,
+        exclusivityTags: exclusivityTags,
         changedEvent: (raid) => raid.buffsChangeEmitter,
         getValue: (raid) => raid.getBuffs()[buffsFieldName],
         setValue: (eventID, raid, newValue) => {

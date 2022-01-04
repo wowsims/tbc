@@ -5,6 +5,7 @@ import { MESSAGE_TYPE } from '/tbc/protobuf-ts/index.js';
 import { MessageType } from '/tbc/protobuf-ts/index.js';
 import { Raid } from './api.js';
 import { RaidTarget } from './common.js';
+import { Cooldowns } from './common.js';
 import { Race } from './common.js';
 import { Consumes } from './common.js';
 import { IndividualBuffs } from './common.js';
@@ -177,7 +178,8 @@ class SavedSettings$Type extends MessageType {
             { no: 2, name: "party_buffs", kind: "message", T: () => PartyBuffs },
             { no: 3, name: "player_buffs", kind: "message", T: () => IndividualBuffs },
             { no: 4, name: "consumes", kind: "message", T: () => Consumes },
-            { no: 5, name: "race", kind: "enum", T: () => ["proto.Race", Race] }
+            { no: 5, name: "race", kind: "enum", T: () => ["proto.Race", Race] },
+            { no: 6, name: "cooldowns", kind: "message", T: () => Cooldowns }
         ]);
     }
     create(value) {
@@ -207,6 +209,9 @@ class SavedSettings$Type extends MessageType {
                 case /* proto.Race race */ 5:
                     message.race = reader.int32();
                     break;
+                case /* proto.Cooldowns cooldowns */ 6:
+                    message.cooldowns = Cooldowns.internalBinaryRead(reader, reader.uint32(), options, message.cooldowns);
+                    break;
                 default:
                     let u = options.readUnknownField;
                     if (u === "throw")
@@ -234,6 +239,9 @@ class SavedSettings$Type extends MessageType {
         /* proto.Race race = 5; */
         if (message.race !== 0)
             writer.tag(5, WireType.Varint).int32(message.race);
+        /* proto.Cooldowns cooldowns = 6; */
+        if (message.cooldowns)
+            Cooldowns.internalBinaryWrite(message.cooldowns, writer.tag(6, WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

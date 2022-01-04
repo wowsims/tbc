@@ -6,6 +6,7 @@ import type { PartialMessage } from "@protobuf-ts/runtime";
 import { MessageType } from "@protobuf-ts/runtime";
 import { Raid } from "./api";
 import { RaidTarget } from "./common";
+import { Cooldowns } from "./common";
 import { Race } from "./common";
 import { Consumes } from "./common";
 import { IndividualBuffs } from "./common";
@@ -78,6 +79,10 @@ export interface SavedSettings {
      * @generated from protobuf field: proto.Race race = 5;
      */
     race: Race;
+    /**
+     * @generated from protobuf field: proto.Cooldowns cooldowns = 6;
+     */
+    cooldowns?: Cooldowns;
 }
 /**
  * @generated from protobuf message proto.SavedTalents

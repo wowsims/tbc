@@ -154,6 +154,7 @@ export class MageSimUI extends IndividualSimUI {
                 IconInputs.SuperiorWizardOil,
                 IconInputs.BlackenedBasilisk,
                 IconInputs.SkullfishSoup,
+                IconInputs.ScrollOfSpiritV,
                 IconInputs.KreegsStoutBeatdown,
             ],
             // Inputs to include in the 'Rotation' section on the settings tab.

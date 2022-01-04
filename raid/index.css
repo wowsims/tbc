@@ -322,19 +322,19 @@
   color: #ff8000 !important;
 }
 
-.socket-color-blue {
+#bootstrap-overrides .socket-color-blue {
   border: 1px solid blue !important;
 }
 
-.socket-color-meta {
+#bootstrap-overrides .socket-color-meta {
   border: 1px solid white !important;
 }
 
-.socket-color-red {
+#bootstrap-overrides .socket-color-red {
   border: 1px solid red !important;
 }
 
-.socket-color-yellow {
+#bootstrap-overrides .socket-color-yellow {
   border: 1px solid yellow !important;
 }
 
@@ -576,6 +576,7 @@
 
 .icon-enum-picker-root {
   border: 2px solid dimgray;
+  transition: 0.2s ease-in;
 }
 
 .icon-enum-picker-root a {
@@ -666,19 +667,19 @@
   color: #ff8000 !important;
 }
 
-.socket-color-blue {
+#bootstrap-overrides .socket-color-blue {
   border: 1px solid blue !important;
 }
 
-.socket-color-meta {
+#bootstrap-overrides .socket-color-meta {
   border: 1px solid white !important;
 }
 
-.socket-color-red {
+#bootstrap-overrides .socket-color-red {
   border: 1px solid red !important;
 }
 
-.socket-color-yellow {
+#bootstrap-overrides .socket-color-yellow {
   border: 1px solid yellow !important;
 }
 
@@ -923,19 +924,19 @@
   color: #ff8000 !important;
 }
 
-.socket-color-blue {
+#bootstrap-overrides .socket-color-blue {
   border: 1px solid blue !important;
 }
 
-.socket-color-meta {
+#bootstrap-overrides .socket-color-meta {
   border: 1px solid white !important;
 }
 
-.socket-color-red {
+#bootstrap-overrides .socket-color-red {
   border: 1px solid red !important;
 }
 
-.socket-color-yellow {
+#bootstrap-overrides .socket-color-yellow {
   border: 1px solid yellow !important;
 }
 
@@ -1188,19 +1189,19 @@
   color: #ff8000 !important;
 }
 
-.socket-color-blue {
+#bootstrap-overrides .socket-color-blue {
   border: 1px solid blue !important;
 }
 
-.socket-color-meta {
+#bootstrap-overrides .socket-color-meta {
   border: 1px solid white !important;
 }
 
-.socket-color-red {
+#bootstrap-overrides .socket-color-red {
   border: 1px solid red !important;
 }
 
-.socket-color-yellow {
+#bootstrap-overrides .socket-color-yellow {
   border: 1px solid yellow !important;
 }
 
@@ -1480,19 +1481,19 @@
   color: #ff8000 !important;
 }
 
-.socket-color-blue {
+#bootstrap-overrides .socket-color-blue {
   border: 1px solid blue !important;
 }
 
-.socket-color-meta {
+#bootstrap-overrides .socket-color-meta {
   border: 1px solid white !important;
 }
 
-.socket-color-red {
+#bootstrap-overrides .socket-color-red {
   border: 1px solid red !important;
 }
 
-.socket-color-yellow {
+#bootstrap-overrides .socket-color-yellow {
   border: 1px solid yellow !important;
 }
 
@@ -1696,7 +1697,7 @@ input, select {
 }
 
 .nav-tabs > li > a:hover, .nav-tabs > li.active > a {
-  background-color: var(--theme-color-primary) !important;
+  background-color: var(--theme-color-primary);
 }
 
 .sim-main > .tab-content {
@@ -1820,19 +1821,19 @@ input, select {
   color: #ff8000 !important;
 }
 
-.socket-color-blue {
+#bootstrap-overrides .socket-color-blue {
   border: 1px solid blue !important;
 }
 
-.socket-color-meta {
+#bootstrap-overrides .socket-color-meta {
   border: 1px solid white !important;
 }
 
-.socket-color-red {
+#bootstrap-overrides .socket-color-red {
   border: 1px solid red !important;
 }
 
-.socket-color-yellow {
+#bootstrap-overrides .socket-color-yellow {
   border: 1px solid yellow !important;
 }
 

@@ -58,6 +58,7 @@ export declare const SuperiorWizardOil: IndividualSimIconPickerConfig<Player<any
 export declare const RoastedClefthoof: IndividualSimIconPickerConfig<Player<any>, boolean>;
 export declare const ScrollOfStrengthV: IndividualSimIconPickerConfig<Player<any>, boolean>;
 export declare const ScrollOfAgilityV: IndividualSimIconPickerConfig<Player<any>, boolean>;
+export declare const ScrollOfSpiritV: IndividualSimIconPickerConfig<Player<any>, boolean>;
 export declare const DefaultDestructionPotion: IndividualSimIconPickerConfig<Player<any>, boolean>;
 export declare const DefaultHastePotion: IndividualSimIconPickerConfig<Player<any>, boolean>;
 export declare const DefaultSuperManaPotion: IndividualSimIconPickerConfig<Player<any>, boolean>;

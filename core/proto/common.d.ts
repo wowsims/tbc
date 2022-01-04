@@ -231,6 +231,10 @@ export interface Consumes {
      */
     scrollOfAgilityV: boolean;
     /**
+     * @generated from protobuf field: bool scroll_of_spirit_v = 28;
+     */
+    scrollOfSpiritV: boolean;
+    /**
      * @generated from protobuf field: proto.Potions default_potion = 15;
      */
     defaultPotion: Potions;

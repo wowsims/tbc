@@ -1141,6 +1141,7 @@ class Consumes$Type extends MessageType {
             { no: 20, name: "kreegsStoutBeatdown", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 25, name: "scroll_of_strength_v", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 26, name: "scroll_of_agility_v", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 28, name: "scroll_of_spirit_v", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 15, name: "default_potion", kind: "enum", T: () => ["proto.Potions", Potions] },
             { no: 16, name: "starting_potion", kind: "enum", T: () => ["proto.Potions", Potions] },
             { no: 17, name: "num_starting_potions", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
@@ -1150,7 +1151,7 @@ class Consumes$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { flaskOfBlindingLight: false, flaskOfMightyRestoration: false, flaskOfPureDeath: false, flaskOfSupremePower: false, flaskOfRelentlessAssault: false, adeptsElixir: false, elixirOfMajorFirePower: false, elixirOfMajorFrostPower: false, elixirOfMajorShadowPower: false, elixirOfDraenicWisdom: false, elixirOfMajorMageblood: false, elixirOfMajorAgility: false, elixirOfDemonslaying: false, brilliantWizardOil: false, superiorWizardOil: false, blackenedBasilisk: false, skullfishSoup: false, roastedClefthoof: false, kreegsStoutBeatdown: false, scrollOfStrengthV: false, scrollOfAgilityV: false, defaultPotion: 0, startingPotion: 0, numStartingPotions: 0, darkRune: false, defaultConjured: 0, drums: 0 };
+        const message = { flaskOfBlindingLight: false, flaskOfMightyRestoration: false, flaskOfPureDeath: false, flaskOfSupremePower: false, flaskOfRelentlessAssault: false, adeptsElixir: false, elixirOfMajorFirePower: false, elixirOfMajorFrostPower: false, elixirOfMajorShadowPower: false, elixirOfDraenicWisdom: false, elixirOfMajorMageblood: false, elixirOfMajorAgility: false, elixirOfDemonslaying: false, brilliantWizardOil: false, superiorWizardOil: false, blackenedBasilisk: false, skullfishSoup: false, roastedClefthoof: false, kreegsStoutBeatdown: false, scrollOfStrengthV: false, scrollOfAgilityV: false, scrollOfSpiritV: false, defaultPotion: 0, startingPotion: 0, numStartingPotions: 0, darkRune: false, defaultConjured: 0, drums: 0 };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -1223,6 +1224,9 @@ class Consumes$Type extends MessageType {
                     break;
                 case /* bool scroll_of_agility_v */ 26:
                     message.scrollOfAgilityV = reader.bool();
+                    break;
+                case /* bool scroll_of_spirit_v */ 28:
+                    message.scrollOfSpiritV = reader.bool();
                     break;
                 case /* proto.Potions default_potion */ 15:
                     message.defaultPotion = reader.int32();
@@ -1317,6 +1321,9 @@ class Consumes$Type extends MessageType {
         /* bool scroll_of_agility_v = 26; */
         if (message.scrollOfAgilityV !== false)
             writer.tag(26, WireType.Varint).bool(message.scrollOfAgilityV);
+        /* bool scroll_of_spirit_v = 28; */
+        if (message.scrollOfSpiritV !== false)
+            writer.tag(28, WireType.Varint).bool(message.scrollOfSpiritV);
         /* proto.Potions default_potion = 15; */
         if (message.defaultPotion !== 0)
             writer.tag(15, WireType.Varint).int32(message.defaultPotion);
