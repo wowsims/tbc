@@ -112,7 +112,8 @@ func PerformAutoAttack(sim *Simulation, c *Character, weapon *items.Item, effect
 			// TODO: log actual type of not-hit
 			sim.Log("Melee auto attack did not hit.")
 		}
-		c.OnMeleeAttack(sim, target, hit, nil, isOH)
+		c.OnMeleeAttack(sim, target, hit, effect, isOH)
+		target.OnMeleeAttack(sim, target, hit, effect, isOH)
 		c.Metrics.AddAutoAttack(weapon.ID, hit, 0, isOH)
 		return // no damage from a block/miss
 	}
@@ -121,7 +122,8 @@ func PerformAutoAttack(sim *Simulation, c *Character, weapon *items.Item, effect
 	if sim.Log != nil {
 		sim.Log("Melee auto attack %s for %0.1f", hitStr, dmg)
 	}
-	c.OnMeleeAttack(sim, target, hit, nil, isOH)
+	c.OnMeleeAttack(sim, target, hit, effect, isOH)
+	target.OnMeleeAttack(sim, target, hit, effect, isOH)
 	c.Metrics.AddAutoAttack(weapon.ID, hit, dmg, isOH)
 }
 
@@ -287,6 +289,7 @@ func (ability *ActiveMeleeAbility) performAttack(sim *Simulation) {
 			ability.Misses++
 		}
 		// Not sure MH/OH Matters for an attack
+		ability.Target.OnMeleeAttack(sim, ability.Target, hit, ability, false)
 		ability.Character.OnMeleeAttack(sim, ability.Target, hit, ability, false)
 		return // we know we missed.
 	}
@@ -347,6 +350,7 @@ func (ability *ActiveMeleeAbility) applySwingDamage(sim *Simulation, slot proto.
 	if ability.OnMeleeAttack != nil {
 		ability.OnMeleeAttack(sim, ability.Target, hit, ability, false)
 	}
+	ability.Target.OnMeleeAttack(sim, ability.Target, ability.Result, ability, false)
 	char.OnMeleeAttack(sim, ability.Target, ability.Result, ability, false)
 	ability.TotalDamage += dmg
 }
@@ -366,6 +370,8 @@ func (ability *ActiveMeleeAbility) applyFlatDamage(sim *Simulation, critChance f
 	if sim.Log != nil {
 		sim.Log("%s for %0.1f", ability.Name, dmg)
 	}
+	ability.Target.OnMeleeAttack(sim, ability.Target, ability.Result, ability, false)
+	ability.Character.OnMeleeAttack(sim, ability.Target, ability.Result, ability, false)
 }
 
 func meleeDamage(sim *Simulation, weaponMin, weaponMax, flatBonus, speed float64, offhand bool, multiplier float64, attackPower float64, damageReduction float64) float64 {
@@ -410,6 +416,7 @@ func NewAutoAttacks(c *Character) AutoAttacks {
 		MeleeAbility: MeleeAbility{
 			Name:           "Auto Attacks",
 			CritMultiplier: 2.0,
+			Character:      c,
 		},
 	}
 

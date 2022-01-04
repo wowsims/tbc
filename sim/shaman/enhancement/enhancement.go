@@ -68,7 +68,11 @@ func (enh *EnhancementShaman) Act(sim *core.Simulation) time.Duration {
 		return sim.CurrentTime + enh.AutoAttacks.TimeUntil(sim, nil, nil, dropTime)
 	}
 
-	if enh.GetRemainingCD(shaman.StormstrikeCD, sim.CurrentTime) == 0 {
+	useSRManaPercent := 0.1
+	if enh.CurrentMana() < enh.MaxMana()*useSRManaPercent && enh.TryActivateShamanisticRage(sim) {
+		// Just wait for GCD
+		return sim.CurrentTime + enh.AutoAttacks.TimeUntil(sim, nil, nil, 0)
+	} else if enh.GetRemainingCD(shaman.StormstrikeCD, sim.CurrentTime) == 0 {
 		ss := enh.NewStormstrike(sim, sim.GetPrimaryTarget())
 		ss.Attack(sim)
 		return sim.CurrentTime + enh.AutoAttacks.TimeUntil(sim, nil, ss, 0)
