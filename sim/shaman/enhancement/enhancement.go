@@ -45,7 +45,7 @@ func NewEnhancementShaman(character core.Character, options proto.Player) *Enhan
 
 		selfBuffs.TwistFireNova = enhOptions.Rotation.Totems.TwistFireNova
 		if selfBuffs.TwistFireNova {
-			selfBuffs.NextTotemDropType[shaman.FireTotem] = int32(proto.FireTotem_NovaTotem) // start by dropping nova, then alternating.
+			selfBuffs.NextTotemDropType[shaman.FireTotem] = int32(proto.FireTotem_FireNovaTotem) // start by dropping nova, then alternating.
 		}
 	}
 	enh := &EnhancementShaman{
