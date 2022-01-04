@@ -35,6 +35,8 @@ func NewElementalShaman(character core.Character, options proto.Player) *Element
 	}
 	if eleShamOptions.Options.TotemOfWrath {
 		selfBuffs.FireTotem = proto.FireTotem_TotemOfWrath
+	} else {
+		selfBuffs.FireTotem = proto.FireTotem_SearingTotem
 	}
 	if eleShamOptions.Options.WrathOfAirTotem {
 		selfBuffs.AirTotem = proto.AirTotem_WrathOfAirTotem

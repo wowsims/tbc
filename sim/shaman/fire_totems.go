@@ -47,6 +47,8 @@ func (shaman *Shaman) newSearingTotemTemplate(sim *core.Simulation) core.SimpleS
 		},
 	}
 
+	spell.DamageMultiplier *= 1 + float64(shaman.Talents.CallOfFlame)*0.05
+
 	return core.NewSimpleSpellTemplate(spell)
 }
 
@@ -97,6 +99,8 @@ func (shaman *Shaman) newMagmaTotemTemplate(sim *core.Simulation) core.SimpleSpe
 			},
 		},
 	}
+
+	spell.DamageMultiplier *= 1 + float64(shaman.Talents.CallOfFlame)*0.05
 
 	return core.NewSimpleSpellTemplate(spell)
 }
@@ -152,6 +156,8 @@ func (shaman *Shaman) newNovaTotemTemplate(sim *core.Simulation) core.SimpleSpel
 			},
 		},
 	}
+
+	spell.DamageMultiplier *= 1 + float64(shaman.Talents.CallOfFlame)*0.05
 
 	return core.NewSimpleSpellTemplate(spell)
 }

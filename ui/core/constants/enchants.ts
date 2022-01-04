@@ -5,7 +5,7 @@ export const enchantDescriptions = new Map<number, string>();
 // Head
 export const GLYPH_OF_POWER = 29191;
 enchantDescriptions.set(GLYPH_OF_POWER, '+22 Spell Damage and +14 Spell Hit Rating');
-export const GLYPH_OF_FEROCITY = 35452;
+export const GLYPH_OF_FEROCITY = 29192;
 enchantDescriptions.set(GLYPH_OF_FEROCITY, '+34 Attack Power and +16 Hit Rating');
 
 // Shoulder
@@ -15,7 +15,7 @@ export const GREATER_INSCRIPTION_OF_THE_ORB = 28909;
 enchantDescriptions.set(GREATER_INSCRIPTION_OF_THE_ORB, '+15 Spell Damage and +12 Spell Crit Rating');
 export const POWER_OF_THE_SCOURGE = 23545;
 enchantDescriptions.set(POWER_OF_THE_SCOURGE, '+15 Spell Damage and +14 Spell Crit Rating');
-export const GREATER_INSCRIPTION_OF_VENGEANCE = 35417;
+export const GREATER_INSCRIPTION_OF_VENGEANCE = 28888;
 enchantDescriptions.set(GREATER_INSCRIPTION_OF_VENGEANCE, '+30 Attack Power and +10 Crit Rating');
 
 // Back
@@ -51,7 +51,7 @@ export const RUNIC_SPELLTHREAD = 24274;
 enchantDescriptions.set(RUNIC_SPELLTHREAD, '+35 Spell Damage and +20 Stamina');
 export const MYSTIC_SPELLTHREAD = 24273;
 enchantDescriptions.set(MYSTIC_SPELLTHREAD, '+25 Spell Damage and +15 Stamina');
-export const NETHERCOBRA_LEG_ARMOR = 35490;
+export const NETHERCOBRA_LEG_ARMOR = 29535;
 enchantDescriptions.set(NETHERCOBRA_LEG_ARMOR, '+50 Attack Power and +12 Crit Rating');
 
 // Feet
@@ -59,7 +59,7 @@ export const BOARS_SPEED = 35297;
 enchantDescriptions.set(BOARS_SPEED, 'Minor Speed and +9 Stamina');
 export const FEET_VITALITY = 35298;
 enchantDescriptions.set(FEET_VITALITY, '+4 Mana Per 5 Sec.');
-export const FEET_CATS_SWIFTNESS = 34007;
+export const FEET_CATS_SWIFTNESS = 28279;
 enchantDescriptions.set(FEET_CATS_SWIFTNESS, 'Minor Speed and +6 Agility');
 
 
@@ -70,7 +70,7 @@ export const WEAPON_SPELLPOWER = 22555;
 enchantDescriptions.set(WEAPON_SPELLPOWER, '+40 Spell Damage');
 export const SUNFIRE = 22560;
 export const SOULFROST = 22561;
-export const MONGOOSE = 27984;
+export const MONGOOSE = 22559;
 
 // Shield
 export const SHIELD_INTELLECT = 22539;
