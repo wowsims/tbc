@@ -687,7 +687,7 @@ export const P3_ARCANE_PRESET = {
 	gear: EquipmentSpec.create({
 		items: [
 			ItemSpec.create({
-				id: 31056, // Cowl of the Tempest
+				id: 30206, // Cowl of Tirisfal
 				enchant: Enchants.GLYPH_OF_POWER,
 				gems: [
 					Gems.CHAOTIC_SKYFIRE_DIAMOND,
@@ -710,7 +710,7 @@ export const P3_ARCANE_PRESET = {
 				enchant: Enchants.SUBTLETY,
 			}),
 			ItemSpec.create({
-				id: 31057, // Robes of the Tempest
+				id: 30196, // Robes of Tirisfal
 				enchant: Enchants.CHEST_EXCEPTIONAL_STATS,
 				gems: [
 					Gems.BRILLIANT_LIONSEYE,
@@ -733,7 +733,7 @@ export const P3_ARCANE_PRESET = {
 				id: 30888, // Anetheron's Noose
 				gems: [
 					Gems.BRILLIANT_LIONSEYE,
-					Gems.GLOWING_SHADOWSONG_AMETHYST,
+					Gems.BRILLIANT_LIONSEYE,
 				],
 			}),
 			ItemSpec.create({
@@ -748,7 +748,7 @@ export const P3_ARCANE_PRESET = {
 				enchant: Enchants.BOARS_SPEED,
 				gems: [
 					Gems.BRILLIANT_LIONSEYE,
-					Gems.GLOWING_SHADOWSONG_AMETHYST,
+					Gems.BRILLIANT_LIONSEYE,
 				],
 			}),
 			ItemSpec.create({
@@ -766,14 +766,11 @@ export const P3_ARCANE_PRESET = {
 				id: 30720, // Serpent-Coil Braid
 			}),
 			ItemSpec.create({
-				id: 30910, // Tempest of Chaos
+				id: 32374, // Zhar'doom, Greatstaff of the Devourer
 				enchant: Enchants.SUNFIRE,
 			}),
 			ItemSpec.create({
-				id: 30872, // Chronicle of Dark Secrets
-			}),
-			ItemSpec.create({
-				id: 32363, // Naaru-Blessed Life Rod
+				id: 28783, // Eredar Wand of Obliteration
 			}),
 		],
 	}),
