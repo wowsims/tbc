@@ -19,17 +19,20 @@ export class DetailedResults extends Component {
 		const computedStyles = window.getComputedStyle(this.rootElem);
 
 		const url = new URL(`${window.location.protocol}//${window.location.host}/${REPO_NAME}/detailed_results/index.html`);
-		url.searchParams.append('mainBgColor', computedStyles.getPropertyValue('--main-bg-color').trim());
 		url.searchParams.append('mainTextColor', computedStyles.getPropertyValue('--main-text-color').trim());
+		url.searchParams.append('themeColorPrimary', computedStyles.getPropertyValue('--theme-color-primary').trim());
+		url.searchParams.append('themeColorBackground', computedStyles.getPropertyValue('--theme-color-background').trim());
+		url.searchParams.append('themeColorBackgroundRaw', computedStyles.getPropertyValue('--theme-color-background-raw').trim());
+		url.searchParams.append('themeBackgroundImage', computedStyles.getPropertyValue('--theme-background-image').trim());
 		if (simUI.isIndividualSim()) {
 			url.searchParams.append('isIndividualSim', '');
 		}
 
 		this.rootElem.innerHTML = `
 		<div class="detailed-results-controls-div">
-			<button class="detailed-results-new-tab-button">View in separate tab</button>
+			<button class="detailed-results-new-tab-button">VIEW IN SEPARATE TAB</button>
 		</div>
-		<iframe class="detailed-results-iframe" src="${url.href}"></iframe>
+		<iframe class="detailed-results-iframe" src="${url.href}" allowtransparency="true"></iframe>
 		`;
 
 		this.iframeElem = this.rootElem.getElementsByClassName('detailed-results-iframe')[0] as HTMLIFrameElement;

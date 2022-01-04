@@ -119,8 +119,12 @@ export class RaidTargetPicker<ModObject> extends Input<ModObject, RaidTarget> {
   }
 
 	static makeOptionElem(data: RaidTargetElemOption): HTMLElement {
+		const optionContainer = document.createElement('div');
+		optionContainer.classList.add('dropdown-option-container');
+
 		const option = document.createElement('div');
 		option.classList.add('raid-target-picker-option');
+		optionContainer.appendChild(option);
 		if (data.isDropdown) {
 			option.classList.add('dropdown-option');
 		}
@@ -143,6 +147,6 @@ export class RaidTargetPicker<ModObject> extends Input<ModObject, RaidTarget> {
 			option.appendChild(label);
 		}
 
-		return option;
+		return optionContainer;
 	}
 }

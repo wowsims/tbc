@@ -10,7 +10,7 @@ declare var tippy: any;
 
 export function addStatWeightsAction(simUI: IndividualSimUI<any>, epStats: Array<Stat>, epReferenceStat: Stat) {
 	const resultsManager = new StatWeightsResultsManager(simUI);
-	simUI.addAction('EP Weights', 'ep-weights-action', async () => {
+	simUI.addAction('EP WEIGHTS', 'ep-weights-action', async () => {
 		simUI.setResultsPending();
 		const iterations = simUI.sim.getIterations();
 		const result = await simUI.player.computeStatWeights(epStats, epReferenceStat);

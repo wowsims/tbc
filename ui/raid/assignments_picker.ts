@@ -52,7 +52,7 @@ abstract class AssignedBuffPicker extends Component {
 		this.raidSimUI = raidSimUI;
 		this.targetPickers = [];
 
-		this.playersContainer = document.createElement('div');
+		this.playersContainer = document.createElement('fieldset');
 		this.playersContainer.classList.add('assigned-buff-players-container', 'settings-section');
 		this.rootElem.appendChild(this.playersContainer);
 
@@ -65,7 +65,7 @@ abstract class AssignedBuffPicker extends Component {
 
 	private update() {
 		this.playersContainer.innerHTML = `
-			<label>${this.getTitle()}</label>
+			<legend>${this.getTitle().toUpperCase()}</legend>
 		`;
 
 		const sourcePlayers = this.getSourcePlayers();
