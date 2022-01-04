@@ -18,76 +18,71 @@ import { Player } from '/tbc/core/player.js';
 import { Sim } from '/tbc/core/sim.js';
 import { IndividualSimUI } from '/tbc/core/individual_sim_ui.js';
 
-import { Mage, Mage_Rotation as MageRotation, MageTalents as MageTalents, Mage_Options as MageOptions } from '/tbc/core/proto/mage.js';
+import { Warrior, Warrior_Rotation as WarriorRotation, WarriorTalents as WarriorTalents, Warrior_Options as WarriorOptions } from '/tbc/core/proto/warrior.js';
 
 import * as IconInputs from '/tbc/core/components/icon_inputs.js';
 import * as OtherInputs from '/tbc/core/components/other_inputs.js';
 import * as Tooltips from '/tbc/core/constants/tooltips.js';
 
-import * as MageInputs from './inputs.js';
+import * as WarriorInputs from './inputs.js';
 import * as Presets from './presets.js';
 
-export class MageSimUI extends IndividualSimUI<Spec.SpecMage> {
-  constructor(parentElem: HTMLElement, player: Player<Spec.SpecMage>) {
+export class WarriorSimUI extends IndividualSimUI<Spec.SpecWarrior> {
+  constructor(parentElem: HTMLElement, player: Player<Spec.SpecWarrior>) {
 		super(parentElem, player, {
-			cssClass: 'mage-sim-ui',
+			cssClass: 'warrior-sim-ui',
 			// List any known bugs / issues here and they'll be shown on the site.
 			knownIssues: [
 			],
 
 			// All stats for which EP should be calculated.
 			epStats: [
-				Stat.StatIntellect,
-				Stat.StatSpirit,
-				Stat.StatSpellPower,
-				Stat.StatArcaneSpellPower,
-				Stat.StatFireSpellPower,
-				Stat.StatFrostSpellPower,
-				Stat.StatSpellHit,
-				Stat.StatSpellCrit,
-				Stat.StatSpellHaste,
-				Stat.StatMP5,
+				Stat.StatStrength,
+				Stat.StatAgility,
+				Stat.StatAttackPower,
+				Stat.StatExpertise,
+				Stat.StatMeleeHit,
+				Stat.StatMeleeCrit,
+				Stat.StatMeleeHaste,
+				Stat.StatArmorPenetration,
 			],
 			// Reference stat against which to calculate EP. I think all classes use either spell power or attack power.
-			epReferenceStat: Stat.StatSpellPower,
+			epReferenceStat: Stat.StatAttackPower,
 			// Which stats to display in the Character Stats section, at the bottom of the left-hand sidebar.
 			displayStats: [
 				Stat.StatStamina,
-				Stat.StatIntellect,
-				Stat.StatSpirit,
-				Stat.StatSpellPower,
-				Stat.StatArcaneSpellPower,
-				Stat.StatFireSpellPower,
-				Stat.StatFrostSpellPower,
-				Stat.StatSpellHit,
-				Stat.StatSpellCrit,
-				Stat.StatSpellHaste,
-				Stat.StatMP5,
+				Stat.StatStrength,
+				Stat.StatAgility,
+				Stat.StatAttackPower,
+				Stat.StatExpertise,
+				Stat.StatMeleeHit,
+				Stat.StatMeleeCrit,
+				Stat.StatMeleeHaste,
+				Stat.StatArmorPenetration,
 			],
 
 			defaults: {
 				// Default equipped gear.
-				gear: Presets.P1_FIRE_PRESET.gear,
+				gear: Presets.P1_FURY_PRESET.gear,
 				// Default EP weights for sorting gear in the gear picker.
 				epWeights: Stats.fromMap({
-					[Stat.StatIntellect]: 0.54,
-					[Stat.StatSpirit]: 0.1,
-					[Stat.StatSpellPower]: 1,
-					[Stat.StatArcaneSpellPower]: 1,
-					[Stat.StatFireSpellPower]: 0,
-					[Stat.StatFrostSpellPower]: 0,
-					[Stat.StatSpellCrit]: 0.84,
-					[Stat.StatSpellHaste]: 1.29,
-					[Stat.StatMP5]: 0.00,
+					[Stat.StatStrength]: 2.5,
+					[Stat.StatAgility]: 1.75,
+					[Stat.StatAttackPower]: 1,
+					[Stat.StatExpertise]: 3.75,
+					[Stat.StatMeleeHit]: 1.5,
+					[Stat.StatMeleeCrit]: 2.5,
+					[Stat.StatMeleeHaste]: 3,
+					[Stat.StatArmorPenetration]: 0.5,
 				}),
 				// Default consumes settings.
-				consumes: Presets.DefaultArcaneConsumes,
+				consumes: Presets.DefaultFuryConsumes,
 				// Default rotation settings.
-				rotation: Presets.DefaultArcaneRotation,
+				rotation: Presets.DefaultFuryRotation,
 				// Default talents.
-				talents: Presets.FireTalents.data,
+				talents: Presets.FuryTalents.data,
 				// Default spec-specific settings.
-				specOptions: Presets.DefaultArcaneOptions,
+				specOptions: Presets.DefaultFuryOptions,
 				// Default raid/party buffs settings.
 				raidBuffs: RaidBuffs.create({
 					giftOfTheWild: TristateEffect.TristateEffectImproved,
@@ -95,28 +90,26 @@ export class MageSimUI extends IndividualSimUI<Spec.SpecMage> {
 				partyBuffs: PartyBuffs.create({
 					drums: Drums.DrumsOfBattle,
 					bloodlust: 1,
-					manaSpringTotem: TristateEffect.TristateEffectImproved,
-					manaTideTotems: 1,
+					strengthOfEarthTotem: TristateEffect.TristateEffectImproved,
+					//Replace with windfury
 					wrathOfAirTotem: TristateEffect.TristateEffectRegular,
 				}),
 				individualBuffs: IndividualBuffs.create({
 					blessingOfKings: true,
-					blessingOfWisdom: TristateEffect.TristateEffectImproved,
+					blessingOfMight: TristateEffect.TristateEffectImproved,
 					innervates: 1,
 				}),
 				debuffs: Debuffs.create({
-					judgementOfWisdom: true,
-					misery: true,
-					curseOfElements: TristateEffect.TristateEffectRegular,
+					bloodFrenzy: true,
+					curseOfRecklessness: true,
+					exposeArmor: TristateEffect.TristateEffectRegular
 				}),
 			},
 
 			// IconInputs to include in the 'Self Buffs' section on the settings tab.
 			selfBuffInputs: [
-				MageInputs.MageArmor,
-				MageInputs.MoltenArmor,
+				WarriorInputs.Recklessness ,
 				IconInputs.DrumsOfBattleConsume,
-				IconInputs.DrumsOfRestorationConsume,
 			],
 			// IconInputs to include in the 'Other Buffs' section on the settings tab.
 			raidBuffInputs: [
@@ -124,51 +117,36 @@ export class MageSimUI extends IndividualSimUI<Spec.SpecMage> {
 				IconInputs.GiftOfTheWild,
 			],
 			partyBuffInputs: [
+				//Replace with Feral aura
 				IconInputs.MoonkinAura,
 				IconInputs.DrumsOfBattleBuff,
-				IconInputs.DrumsOfRestorationBuff,
 				IconInputs.Bloodlust,
+				// Replace with windfury totem
 				IconInputs.WrathOfAirTotem,
-				IconInputs.TotemOfWrath,
-				IconInputs.ManaSpringTotem,
+				// Replace with strength of earth totem
 				IconInputs.ManaTideTotem,
-				IconInputs.DraeneiRacialCaster,
-				IconInputs.EyeOfTheNight,
-				IconInputs.ChainOfTheTwilightOwl,
-				IconInputs.JadePendantOfBlasting,
-				IconInputs.AtieshWarlock,
-				IconInputs.AtieshMage,
+				// Add Unleashed Rage
+				IconInputs.DraeneiRacialMelee,
+				IconInputs.BraidedEterniumChain
 			],
 			playerBuffInputs: [
 				IconInputs.BlessingOfKings,
-				IconInputs.BlessingOfWisdom,
-				IconInputs.Innervate,
-				IconInputs.PowerInfusion,
+				IconInputs.BlessingOfMight,
 			],
 			// IconInputs to include in the 'Debuffs' section on the settings tab.
 			debuffInputs: [
-				IconInputs.JudgementOfWisdom,
+				// Add Improved hunters mark and bloodfrenzy
 				IconInputs.ImprovedSealOfTheCrusader,
-				IconInputs.CurseOfElements,
-				IconInputs.Misery,
-				IconInputs.ImprovedScorch,
-				IconInputs.WintersChill,
+				IconInputs.CurseOfRecklessness,
 			],
 			// IconInputs to include in the 'Consumes' section on the settings tab.
 			consumeInputs: [
-				IconInputs.DefaultSuperManaPotion,
+				IconInputs.DefaultHastePotion,
+				// Replace with Mighty Rage potion
 				IconInputs.DefaultDestructionPotion,
-				MageInputs.ManaEmerald,
-				IconInputs.DefaultDarkRune,
-				IconInputs.DefaultFlameCap,
-				IconInputs.FlaskOfBlindingLight,
-				IconInputs.FlaskOfPureDeath,
-				IconInputs.FlaskOfSupremePower,
-				IconInputs.AdeptsElixir,
-				IconInputs.ElixirOfMajorFirePower,
+				IconInputs.ElixirOfMajorAgility,
+				// Replace with Elixir of the Mongoose
 				IconInputs.ElixirOfMajorFrostPower,
-				IconInputs.ElixirOfMajorMageblood,
-				IconInputs.ElixirOfDraenicWisdom,
 				IconInputs.BrilliantWizardOil,
 				IconInputs.SuperiorWizardOil,
 				IconInputs.BlackenedBasilisk,
@@ -176,19 +154,15 @@ export class MageSimUI extends IndividualSimUI<Spec.SpecMage> {
 				IconInputs.KreegsStoutBeatdown,
 			],
 			// Inputs to include in the 'Rotation' section on the settings tab.
-			rotationInputs: MageInputs.MageRotationConfig,
+			rotationInputs: WarriorInputs.WarriorRotationConfig,
 			// Inputs to include in the 'Other' section on the settings tab.
 			otherInputs: {
 				inputs: [
-					MageInputs.EvocationTicks,
-					OtherInputs.ShadowPriestDPS,
-					OtherInputs.StartingPotion,
-					OtherInputs.NumStartingPotions,
 				],
 			},
 			encounterPicker: {
 				// Whether to include 'Target Armor' in the 'Encounter' section of the settings tab.
-				showTargetArmor: false,
+				showTargetArmor: true,
 				// Whether to include 'Execute Duration (%)' in the 'Encounter' section of the settings tab.
 				showExecuteProportion: true,
 				// Whether to include 'Num Targets' in the 'Encounter' section of the settings tab.
@@ -202,13 +176,13 @@ export class MageSimUI extends IndividualSimUI<Spec.SpecMage> {
 			presets: {
 				// Preset talents that the user can quickly select.
 				talents: [
-					Presets.ArcaneTalents,
-					Presets.FireTalents,
-					Presets.FrostTalents,
+					Presets.ArmsSlamTalents,
+					Presets.ArmsDWTalents,
+					Presets.FuryTalents,
 				],
 				// Preset gear configurations that the user can quickly select.
 				gear: [
-					Presets.P1_FIRE_PRESET,
+					Presets.P1_FURY_PRESET,
 				],
 			},
 		});

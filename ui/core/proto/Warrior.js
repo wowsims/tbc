@@ -841,11 +841,12 @@ class Warrior_Options$Type extends MessageType {
         super("proto.Warrior.Options", [
             { no: 1, name: "starting_rage", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
             { no: 2, name: "precast_t2", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
-            { no: 3, name: "precast_sapphire", kind: "scalar", T: 8 /*ScalarType.BOOL*/ }
+            { no: 3, name: "precast_sapphire", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 4, name: "recklessness", kind: "scalar", T: 8 /*ScalarType.BOOL*/ }
         ]);
     }
     create(value) {
-        const message = { startingRage: 0, precastT2: false, precastSapphire: false };
+        const message = { startingRage: 0, precastT2: false, precastSapphire: false, recklessness: false };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -864,6 +865,9 @@ class Warrior_Options$Type extends MessageType {
                     break;
                 case /* bool precast_sapphire */ 3:
                     message.precastSapphire = reader.bool();
+                    break;
+                case /* bool recklessness */ 4:
+                    message.recklessness = reader.bool();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -886,6 +890,9 @@ class Warrior_Options$Type extends MessageType {
         /* bool precast_sapphire = 3; */
         if (message.precastSapphire !== false)
             writer.tag(3, WireType.Varint).bool(message.precastSapphire);
+        /* bool recklessness = 4; */
+        if (message.recklessness !== false)
+            writer.tag(4, WireType.Varint).bool(message.recklessness);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
