@@ -16,6 +16,9 @@ const searingTotem = int32(proto.FireTotem_SearingTotem)
 const magmaTotem = int32(proto.FireTotem_MagmaTotem)
 const novaTotem = int32(proto.FireTotem_NovaTotem)
 
+const strengthOfEarthTotem = int32(proto.EarthTotem_StrengthOfEarthTotem)
+const tremorTotem = int32(proto.EarthTotem_TremorTotem)
+
 // Totems that shaman will cast.
 func (shaman *Shaman) NewWrathOfAirTotem(sim *core.Simulation) *core.SimpleCast {
 	baseManaCost := 320.0
@@ -129,7 +132,7 @@ func (shaman *Shaman) NewTotemOfWrath(sim *core.Simulation) *core.SimpleCast {
 	return cast
 }
 
-func (shaman *Shaman) NewEarthTotem(sim *core.Simulation) *core.SimpleCast {
+func (shaman *Shaman) NewStrengthOfEarthTotem(sim *core.Simulation) *core.SimpleCast {
 	baseManaCost := 125.0
 	manaCost := baseManaCost * (1 - float64(shaman.Talents.TotemicFocus)*0.05)
 	manaCost -= baseManaCost * float64(shaman.Talents.MentalQuickness) * 0.02
@@ -150,7 +153,27 @@ func (shaman *Shaman) NewEarthTotem(sim *core.Simulation) *core.SimpleCast {
 	cast.Init(sim)
 	return cast
 }
+func (shaman *Shaman) NewTremorTotem(sim *core.Simulation) *core.SimpleCast {
+	baseManaCost := 60.0
+	manaCost := baseManaCost * (1 - float64(shaman.Talents.TotemicFocus)*0.05)
+	manaCost -= baseManaCost * float64(shaman.Talents.MentalQuickness) * 0.02
 
+	cast := &core.SimpleCast{
+		Cast: core.Cast{
+			Name:         "Tremor Totem",
+			ActionID:     core.ActionID{SpellID: 8143},
+			Character:    shaman.GetCharacter(),
+			BaseManaCost: baseManaCost,
+			ManaCost:     manaCost,
+			GCDCooldown:  time.Second * 1,
+		},
+		OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
+			shaman.SelfBuffs.NextTotemDrops[EarthTotem] = sim.CurrentTime + time.Second*120
+		},
+	}
+	cast.Init(sim)
+	return cast
+}
 func (shaman *Shaman) tryTwistWindfury(sim *core.Simulation) {
 	if !shaman.SelfBuffs.TwistWindfury {
 		return
@@ -195,7 +218,13 @@ func (shaman *Shaman) TryDropTotems(sim *core.Simulation) time.Duration {
 					cast = shaman.NewGraceOfAirTotem(sim)
 				}
 			case EarthTotem:
-				cast = shaman.NewEarthTotem(sim)
+				switch nextDrop {
+				case strengthOfEarthTotem:
+					cast = shaman.NewStrengthOfEarthTotem(sim)
+				case tremorTotem:
+					cast = shaman.NewTremorTotem(sim)
+				}
+
 			case FireTotem:
 				switch nextDrop {
 				case totemOfWrath:

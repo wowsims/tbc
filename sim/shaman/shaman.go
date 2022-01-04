@@ -279,6 +279,7 @@ func (shaman *Shaman) Reset(sim *core.Simulation) {
 		case EarthTotem:
 			if shaman.SelfBuffs.EarthTotem != proto.EarthTotem_NoEarthTotem {
 				shaman.SelfBuffs.NextTotemDrops[i] = time.Second * 120 // 2 min until drop totems
+				shaman.SelfBuffs.NextTotemDropType[i] = int32(shaman.SelfBuffs.EarthTotem)
 			}
 		case FireTotem:
 			if shaman.SelfBuffs.FireTotem != proto.FireTotem_NoFireTotem {
