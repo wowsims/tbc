@@ -141,6 +141,14 @@ func JudgementOfWisdomAura() Aura {
 				character.AddMana(sim, mana, "Judgement of Wisdom", false)
 			}
 		},
+		OnMeleeAttack: func(sim *Simulation, target *Target, result MeleeHitType, ability *ActiveMeleeAbility, isOH bool) {
+			// if ability.ActionID =
+			character := ability.Character
+			// Only apply to agents that have mana.
+			if character.MaxMana() > 0 {
+				character.AddMana(sim, mana, "Judgement of Wisdom", false)
+			}
+		},
 	}
 }
 

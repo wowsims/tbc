@@ -418,6 +418,15 @@ var UnleasedRageTalentAuraID = core.NewAuraID()
 var UnleasedRageProcAuraID = core.NewAuraID()
 
 func (shaman *Shaman) applyUnleashedRage(level int32) {
+	if len(shaman.unleashedRages) == 0 {
+		shaman.unleashedRages = make([]core.Aura, 5) //pre-fill up to 5 auras
+		for i := range shaman.unleashedRages {
+			shaman.unleashedRages[i] = core.Aura{
+				ID:   UnleasedRageProcAuraID,
+				Name: "Unleased Rage",
+			}
+		}
+	}
 	shaman.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		dur := time.Second * 10
 		bonus := 0.02 * float64(level)
@@ -430,22 +439,22 @@ func (shaman *Shaman) applyUnleashedRage(level int32) {
 				}
 				for i, player := range shaman.GetCharacter().Party.Players {
 					char := player.GetCharacter()
+
+					// Set new expire time.
+					shaman.unleashedRages[i].Expires = sim.CurrentTime + dur
+
 					if char.HasAura(UnleasedRageProcAuraID) {
-						// Renew
-						shaman.unleashedRages[i].Expires = sim.CurrentTime + dur
+						// Renew existing
 						char.ReplaceAura(sim, shaman.unleashedRages[i])
 						continue
 					}
+
+					// Update aura with new OnExpire
 					ap := char.GetStat(stats.AttackPower) * bonus
 					char.AddStat(stats.AttackPower, ap)
-					shaman.unleashedRages = append(shaman.unleashedRages, core.Aura{
-						ID:      UnleasedRageProcAuraID,
-						Name:    "Unleased Rage",
-						Expires: sim.CurrentTime + dur,
-						OnExpire: func(sim *core.Simulation) {
-							char.AddStat(stats.AttackPower, -ap)
-						},
-					})
+					shaman.unleashedRages[i].OnExpire = func(sim *core.Simulation) {
+						char.AddStat(stats.AttackPower, -ap)
+					}
 					char.AddAura(sim, shaman.unleashedRages[i])
 				}
 			},
