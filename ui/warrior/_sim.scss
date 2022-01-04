@@ -1,23 +1,42 @@
 // Set color variables which control the site theme.
 .warrior-sim-ui {
-	--main-bg-color: #1e0f0c;	;
+	--theme-color-primary: #e2563f;
+	--theme-color-background: #1e0f0c;
+	--theme-color-background-raw: 29, 21, 16;
+	--theme-background-image: url('/tbc/assets/warrior_background.jpg');
 	--main-text-color: White;
-	--main-secondary-color: Black;
-	--sidebar-bg-color: #222;
-	--sidebar-text-color: White;
-	--sidebar-highlight-color: #e2563f;
 }
 
 // Set grid width for icon sections based on how many buffs we configured.
 .warrior-sim-ui .self-buffs-section {
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, 1fr);
 }
 .warrior-sim-ui .consumes-section {
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, 1fr);
 }
 .warrior-sim-ui .buffs-section {
   grid-template-columns: repeat(5, 1fr);
 }
 .warrior-sim-ui .debuffs-section {
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
+}
+
+// Balance has a lot of EP stats, so make the text smaller so it fits vertically.
+.warrior-sim-ui .character-stats-table-row {
+  font-size: 14px;
+}
+.warrior-sim-ui .results-ep-table tr td:nth-child(1) {
+  font-size: 12px;
+}
+.warrior-sim-ui .results-ep-table tr td:nth-child(2), .results-ep-table tr td:nth-child(4) {
+  font-size: 12px;
+}
+.warrior-sim-ui .results-ep-table tr td:nth-child(2):after {
+  font-size: 11px;
+}
+.warrior-sim-ui .results-ep-table tr td:nth-child(4):after {
+  font-size: 11px;
+}
+.warrior-sim-ui .results-ep-table tr td:nth-child(3), .results-ep-table tr td:nth-child(5) {
+  font-size: 10px;
 }
