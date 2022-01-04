@@ -214,7 +214,8 @@ func (shaman *Shaman) TryDropTotems(sim *core.Simulation) time.Duration {
 						shaman.FireTotemSpell.Cancel(sim) // if we drop nova while another totem is running, cancel it.
 					}
 					attackCast = shaman.NewNovaTotem(sim, sim.GetPrimaryTarget())
-					shaman.SelfBuffs.NextTotemDrops[FireTotem] = sim.CurrentTime + time.Second*5 + 1
+					// use attackCast.DotInput.TickLength as input in case ImprovedFireTotems reduces time to explode
+					shaman.SelfBuffs.NextTotemDrops[FireTotem] = sim.CurrentTime + attackCast.DotInput.TickLength + 1
 				}
 			case WaterTotem:
 				cast = shaman.NewWaterTotem(sim)

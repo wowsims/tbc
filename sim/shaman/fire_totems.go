@@ -9,8 +9,6 @@ import (
 
 // TODO: magma and nova totems need to apply to all targets probably instead of just the primary target.
 
-// TODO: talents need to apply to totems.
-
 const SpellIDSearingTotem int32 = 25533
 
 // This is probably not worth simming since no other spell in the game does this and AM isn't
@@ -158,6 +156,7 @@ func (shaman *Shaman) newNovaTotemTemplate(sim *core.Simulation) core.SimpleSpel
 	}
 
 	spell.DamageMultiplier *= 1 + float64(shaman.Talents.CallOfFlame)*0.05
+	spell.DotInput.TickLength -= time.Duration(shaman.Talents.ImprovedFireTotems) * time.Second
 
 	return core.NewSimpleSpellTemplate(spell)
 }
