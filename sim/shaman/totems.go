@@ -14,7 +14,7 @@ const graceOfAirTotem = int32(proto.AirTotem_GraceOfAirTotem)
 const totemOfWrath = int32(proto.FireTotem_TotemOfWrath)
 const searingTotem = int32(proto.FireTotem_SearingTotem)
 const magmaTotem = int32(proto.FireTotem_MagmaTotem)
-const novaTotem = int32(proto.FireTotem_NovaTotem)
+const novaTotem = int32(proto.FireTotem_FireNovaTotem)
 
 const strengthOfEarthTotem = int32(proto.EarthTotem_StrengthOfEarthTotem)
 const tremorTotem = int32(proto.EarthTotem_TremorTotem)

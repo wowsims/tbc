@@ -285,7 +285,7 @@ func (shaman *Shaman) Reset(sim *core.Simulation) {
 			if shaman.SelfBuffs.FireTotem != proto.FireTotem_NoFireTotem {
 				shaman.SelfBuffs.NextTotemDropType[i] = int32(shaman.SelfBuffs.FireTotem)
 				if shaman.SelfBuffs.TwistFireNova {
-					shaman.SelfBuffs.NextTotemDropType[FireTotem] = int32(proto.FireTotem_NovaTotem) // start by dropping nova, then alternating.
+					shaman.SelfBuffs.NextTotemDropType[FireTotem] = int32(proto.FireTotem_FireNovaTotem) // start by dropping nova, then alternating.
 				}
 				shaman.SelfBuffs.NextTotemDrops[i] = time.Second * 120 // 2 min until drop totems
 				if shaman.SelfBuffs.FireTotem != proto.FireTotem_TotemOfWrath {

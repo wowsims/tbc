@@ -65,7 +65,7 @@ enum FireTotem {
 	MagmaTotem = 1;
 	SearingTotem = 2;
 	TotemOfWrath = 3;
-  NovaTotem = 4;
+  FireNovaTotem = 4;
 }
 
 enum WaterTotem {
