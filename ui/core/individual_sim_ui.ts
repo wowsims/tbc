@@ -434,7 +434,7 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 						<label>Consumes</label>
 					</section>
 				</div>
-				<div class="settings-section-container">
+				<div class="settings-section-container cooldowns-section-container">
 					<section class="settings-section cooldowns-section">
 						<label>Cooldowns</label>
 						<div class="cooldowns-section-content">
