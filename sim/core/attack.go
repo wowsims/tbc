@@ -513,21 +513,21 @@ func (aa *AutoAttacks) TimeUntil(sim *Simulation, cast *SimpleSpell, atk *Active
 			aa.MainhandSwingAt = sim.CurrentTime + cast.CastTime + aa.MainhandSwingSpeed()
 			aa.OffhandSwingAt = sim.CurrentTime + cast.CastTime + aa.OffhandSwingSpeed()
 		}
-		nextEventTime = MaxDuration(cast.CastTime, cast.Character.GetRemainingCD(GCDCooldownID, sim.CurrentTime))
+		nextEventTime = sim.CurrentTime + MaxDuration(cast.CastTime, cast.Character.GetRemainingCD(GCDCooldownID, sim.CurrentTime))
 	}
 	if atk != nil {
 		if atk.ResetSwingTimer {
 			aa.MainhandSwingAt = sim.CurrentTime + aa.MainhandSwingSpeed()
 			aa.OffhandSwingAt = sim.CurrentTime + aa.OffhandSwingSpeed()
 		}
-		nextEventTime = MaxDuration(atk.CastTime, atk.Character.GetRemainingCD(GCDCooldownID, sim.CurrentTime))
+		nextEventTime = sim.CurrentTime + MaxDuration(atk.CastTime, atk.Character.GetRemainingCD(GCDCooldownID, sim.CurrentTime))
 	}
-	mhswing := aa.MainhandSwingAt - sim.CurrentTime
+	mhswing := aa.MainhandSwingAt
 	if mhswing < nextEventTime || nextEventTime == 0 {
 		nextEventTime = mhswing
 	}
 	if aa.ohbase > 0 {
-		ohswing := aa.OffhandSwingAt - sim.CurrentTime
+		ohswing := aa.OffhandSwingAt
 		if ohswing < nextEventTime {
 			nextEventTime = ohswing
 		}
