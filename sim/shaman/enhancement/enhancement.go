@@ -30,8 +30,8 @@ func NewEnhancementShaman(character core.Character, options proto.Player) *Enhan
 	selfBuffs := shaman.SelfBuffs{}
 
 	if enhOptions.Rotation.Totems != nil {
-		selfBuffs.StrengthOfEarth = enhOptions.Rotation.Totems.Earth == proto.EarthTotem_StrengthOfEarthTotem
 		selfBuffs.ManaSpring = enhOptions.Rotation.Totems.Water == proto.WaterTotem_ManaSpringTotem
+		selfBuffs.EarthTotem = enhOptions.Rotation.Totems.Earth
 		selfBuffs.AirTotem = enhOptions.Rotation.Totems.Air
 		selfBuffs.NextTotemDropType[shaman.AirTotem] = int32(enhOptions.Rotation.Totems.Air)
 		selfBuffs.FireTotem = enhOptions.Rotation.Totems.Fire

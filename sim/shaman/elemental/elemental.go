@@ -39,6 +39,9 @@ func NewElementalShaman(character core.Character, options proto.Player) *Element
 	if eleShamOptions.Options.WrathOfAirTotem {
 		selfBuffs.AirTotem = proto.AirTotem_WrathOfAirTotem
 	}
+	if shaman.ItemSetSkyshatterRegalia.CharacterHasSetBonus(&character, 2) {
+		selfBuffs.EarthTotem = proto.EarthTotem_TremorTotem
+	}
 
 	var rotation Rotation
 

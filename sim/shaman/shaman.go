@@ -124,9 +124,8 @@ type SelfBuffs struct {
 	Bloodlust   bool
 	WaterShield bool
 
-	ManaSpring      bool
-	StrengthOfEarth bool
-
+	ManaSpring    bool
+	EarthTotem    proto.EarthTotem
 	AirTotem      proto.AirTotem
 	TwistWindfury bool // if true will cast WF every 10s and then GoA
 
@@ -232,7 +231,7 @@ func (shaman *Shaman) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {
 
 	}
 
-	if shaman.SelfBuffs.StrengthOfEarth {
+	if shaman.SelfBuffs.EarthTotem == proto.EarthTotem_StrengthOfEarthTotem {
 		value := proto.TristateEffect_TristateEffectRegular
 		if shaman.Talents.EnhancingTotems == 2 {
 			value = proto.TristateEffect_TristateEffectImproved
@@ -278,7 +277,7 @@ func (shaman *Shaman) Reset(sim *core.Simulation) {
 				shaman.SelfBuffs.NextTotemDrops[i] = time.Second * 10 // gotta recast windfury after 10s
 			}
 		case EarthTotem:
-			if shaman.SelfBuffs.StrengthOfEarth {
+			if shaman.SelfBuffs.EarthTotem != proto.EarthTotem_NoEarthTotem {
 				shaman.SelfBuffs.NextTotemDrops[i] = time.Second * 120 // 2 min until drop totems
 			}
 		case FireTotem:

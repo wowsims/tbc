@@ -17,9 +17,6 @@ const magmaTotem = int32(proto.FireTotem_MagmaTotem)
 const novaTotem = int32(proto.FireTotem_NovaTotem)
 
 // Totems that shaman will cast.
-// TODO: add logic inside these to select each totem based on options on the shaman?
-// TODO: Include mental quickness mana cost reduction when we figure out what it is.
-
 func (shaman *Shaman) NewWrathOfAirTotem(sim *core.Simulation) *core.SimpleCast {
 	baseManaCost := 320.0
 	manaCost := baseManaCost * (1 - float64(shaman.Talents.TotemicFocus)*0.05)
@@ -226,9 +223,6 @@ func (shaman *Shaman) TryDropTotems(sim *core.Simulation) time.Duration {
 	success := false
 	cost := 0.0
 	if cast != nil {
-		if attackCast != nil {
-			panic("wtf")
-		}
 		success = cast.StartCast(sim)
 		cost = cast.GetManaCost()
 	} else if attackCast != nil {

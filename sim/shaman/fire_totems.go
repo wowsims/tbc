@@ -92,7 +92,7 @@ func (shaman *Shaman) newMagmaTotemTemplate(sim *core.Simulation) core.SimpleSpe
 				NumberOfTicks:        10,
 				TickLength:           time.Second * 2,
 				TickBaseDamage:       97,
-				TickSpellCoefficient: 0.067, // TODO: What is magma totem coeff
+				TickSpellCoefficient: 0.067,
 				TicksCanMissAndCrit:  true,
 			},
 		},
@@ -149,7 +149,7 @@ func (shaman *Shaman) newNovaTotemTemplate(sim *core.Simulation) core.SimpleSpel
 				NumberOfTicks:        1,
 				TickLength:           time.Second * 5,
 				TickBaseDamage:       692,
-				TickSpellCoefficient: 0.214, // TODO: What is magma totem coeff
+				TickSpellCoefficient: 0.214,
 				TicksCanMissAndCrit:  true,
 			},
 		},
