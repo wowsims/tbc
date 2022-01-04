@@ -213,6 +213,7 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
       'Guardian Elixir': [],
       'Potion': [],
       'Conjured': [],
+      'Spirit': [],
       'Weapon Imbue': [],
     };
 
@@ -617,21 +618,21 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 		let anyCustomSections = false;
 		for (const [sectionName, sectionConfig] of Object.entries(this.individualConfig.additionalSections || {})) {
 			const sectionCssPrefix = sectionName.replace(/\s+/g, '');
-      const sectionElem = document.createElement('section');
+      const sectionElem = document.createElement('fieldset');
       sectionElem.classList.add('settings-section', sectionCssPrefix + '-section');
-      sectionElem.innerHTML = `<label>${sectionName}</label>`;
+      sectionElem.innerHTML = `<legend>${sectionName}</legend>`;
       customSectionsContainer.appendChild(sectionElem);
       configureInputSection(sectionElem, sectionConfig);
 			anyCustomSections = true;
     };
 
 		(this.individualConfig.customSections || []).forEach(customSection => {
-      const sectionElem = document.createElement('section');
+      const sectionElem = document.createElement('fieldset');
       customSectionsContainer.appendChild(sectionElem);
 			const sectionName = customSection(this, sectionElem);
 			const sectionCssPrefix = sectionName.replace(/\s+/g, '');
       sectionElem.classList.add('settings-section', sectionCssPrefix + '-section');
-			const labelElem = document.createElement('label');
+			const labelElem = document.createElement('legend');
 			labelElem.textContent = sectionName;
 			sectionElem.prepend(labelElem);
 			anyCustomSections = true;
@@ -805,6 +806,7 @@ export type ExclusivityTag =
     | 'Guardian Elixir'
     | 'Potion'
     | 'Conjured'
+    | 'Spirit'
     | 'Weapon Imbue';
 
 export interface ExclusiveEffect {

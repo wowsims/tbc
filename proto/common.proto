@@ -291,6 +291,7 @@ message Consumes {
 
     bool scroll_of_strength_v = 25; // 20 str
     bool scroll_of_agility_v = 26; // 20 agi
+    bool scroll_of_spirit_v = 28; // 30 spirit
 
     Potions default_potion = 15;
     Potions starting_potion = 16;
