@@ -4,6 +4,7 @@ import { CharacterStats } from '/tbc/core/components/character_stats.js';
 import { Class } from '/tbc/core/proto/common.js';
 import { CooldownsPicker } from '/tbc/core/components/cooldowns_picker.js';
 import { Consumes } from '/tbc/core/proto/common.js';
+import { Cooldowns } from '/tbc/core/proto/common.js';
 import { Debuffs } from '/tbc/core/proto/common.js';
 import { DetailedResults } from '/tbc/core/components/detailed_results.js';
 import { Encounter as EncounterProto } from '/tbc/core/proto/common.js';
@@ -213,6 +214,7 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
       'Guardian Elixir': [],
       'Potion': [],
       'Conjured': [],
+      'Spirit': [],
       'Weapon Imbue': [],
     };
 
@@ -587,6 +589,7 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
           playerBuffs: simUI.player.getBuffs(),
           consumes: simUI.player.getConsumes(),
           race: simUI.player.getRace(),
+          cooldowns: simUI.player.getCooldowns(),
         });
       },
       setData: (eventID: EventID, simUI: IndividualSimUI<any>, newSettings: SavedSettings) => {
@@ -599,6 +602,7 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 					simUI.player.setBuffs(eventID, newSettings.playerBuffs || IndividualBuffs.create());
 					simUI.player.setConsumes(eventID, newSettings.consumes || Consumes.create());
 					simUI.player.setRace(eventID, newSettings.race);
+					simUI.player.setCooldowns(eventID, newSettings.cooldowns || Cooldowns.create());
 				});
       },
       changeEmitters: [
@@ -607,6 +611,7 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 				this.player.buffsChangeEmitter,
 				this.player.consumesChangeEmitter,
 				this.player.raceChangeEmitter,
+				this.player.cooldownsChangeEmitter,
 			],
       equals: (a: SavedSettings, b: SavedSettings) => SavedSettings.equals(a, b),
       toJson: (a: SavedSettings) => SavedSettings.toJson(a),
@@ -617,21 +622,21 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 		let anyCustomSections = false;
 		for (const [sectionName, sectionConfig] of Object.entries(this.individualConfig.additionalSections || {})) {
 			const sectionCssPrefix = sectionName.replace(/\s+/g, '');
-      const sectionElem = document.createElement('section');
+      const sectionElem = document.createElement('fieldset');
       sectionElem.classList.add('settings-section', sectionCssPrefix + '-section');
-      sectionElem.innerHTML = `<label>${sectionName}</label>`;
+      sectionElem.innerHTML = `<legend>${sectionName}</legend>`;
       customSectionsContainer.appendChild(sectionElem);
       configureInputSection(sectionElem, sectionConfig);
 			anyCustomSections = true;
     };
 
 		(this.individualConfig.customSections || []).forEach(customSection => {
-      const sectionElem = document.createElement('section');
+      const sectionElem = document.createElement('fieldset');
       customSectionsContainer.appendChild(sectionElem);
 			const sectionName = customSection(this, sectionElem);
 			const sectionCssPrefix = sectionName.replace(/\s+/g, '');
       sectionElem.classList.add('settings-section', sectionCssPrefix + '-section');
-			const labelElem = document.createElement('label');
+			const labelElem = document.createElement('legend');
 			labelElem.textContent = sectionName;
 			sectionElem.prepend(labelElem);
 			anyCustomSections = true;
@@ -805,6 +810,7 @@ export type ExclusivityTag =
     | 'Guardian Elixir'
     | 'Potion'
     | 'Conjured'
+    | 'Spirit'
     | 'Weapon Imbue';
 
 export interface ExclusiveEffect {

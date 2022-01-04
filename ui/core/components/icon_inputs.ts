@@ -22,7 +22,7 @@ import { IconPickerConfig } from './icon_picker.js';
 
 // Raid Buffs
 export const ArcaneBrilliance = makeBooleanRaidBuffInput({spellId:27127}, 'arcaneBrilliance');
-export const DivineSpirit = makeTristateRaidBuffInput({spellId:25312}, {spellId:33182}, 'divineSpirit');
+export const DivineSpirit = makeTristateRaidBuffInput({spellId:25312}, {spellId:33182}, 'divineSpirit', ['Spirit']);
 export const GiftOfTheWild = makeTristateRaidBuffInput({spellId:26991}, {spellId:17055}, 'giftOfTheWild');
 
 // Party Buffs
@@ -85,6 +85,7 @@ export const SuperiorWizardOil = makeBooleanConsumeInput({itemId:22522}, 'superi
 export const RoastedClefthoof = makeBooleanConsumeInput({itemId:27658}, 'roastedClefthoof', ['Food']);
 export const ScrollOfStrengthV = makeBooleanConsumeInput({itemId:27503}, 'scrollOfStrengthV');
 export const ScrollOfAgilityV = makeBooleanConsumeInput({itemId:27498}, 'scrollOfAgilityV');
+export const ScrollOfSpiritV = makeBooleanConsumeInput({itemId:27501}, 'scrollOfSpiritV', ['Spirit']);
 
 export const DefaultDestructionPotion = makeEnumValueConsumeInput({itemId:22839}, 'defaultPotion', Potions.DestructionPotion, ['Potion']);
 export const DefaultHastePotion = makeEnumValueConsumeInput({itemId:22838}, 'defaultPotion', Potions.HastePotion, ['Potion']);
@@ -120,11 +121,12 @@ function makeBooleanRaidBuffInput(id: ItemOrSpellId, buffsFieldName: keyof RaidB
   }
 }
 
-function makeTristateRaidBuffInput(id: ItemOrSpellId, impId: ItemOrSpellId, buffsFieldName: keyof RaidBuffs): IndividualSimIconPickerConfig<Raid, number> {
+function makeTristateRaidBuffInput(id: ItemOrSpellId, impId: ItemOrSpellId, buffsFieldName: keyof RaidBuffs, exclusivityTags?: Array<ExclusivityTag>): IndividualSimIconPickerConfig<Raid, number> {
   return {
     id: id,
     states: 3,
     improvedId: impId,
+    exclusivityTags: exclusivityTags,
     changedEvent: (raid: Raid) => raid.buffsChangeEmitter,
     getValue: (raid: Raid) => raid.getBuffs()[buffsFieldName] as number,
     setValue: (eventID: EventID, raid: Raid, newValue: number) => {

@@ -8,10 +8,10 @@ import (
 )
 
 // Registers all consume-related effects to the Agent.
-func applyConsumeEffects(agent Agent, partyBuffs proto.PartyBuffs) {
+func applyConsumeEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs proto.PartyBuffs) {
 	consumes := agent.GetCharacter().consumes
 
-	agent.GetCharacter().AddStats(consumesStats(consumes))
+	agent.GetCharacter().AddStats(consumesStats(consumes, raidBuffs))
 
 	// TODO: demon slaying elixir needs an aura to only apply to demons...
 	//  The other option is to include target type in this function.
@@ -21,7 +21,7 @@ func applyConsumeEffects(agent Agent, partyBuffs proto.PartyBuffs) {
 	registerConjuredCD(agent, consumes)
 }
 
-func consumesStats(c proto.Consumes) stats.Stats {
+func consumesStats(c proto.Consumes, raidBuffs proto.RaidBuffs) stats.Stats {
 	s := stats.Stats{}
 
 	if c.BrilliantWizardOil {
@@ -101,6 +101,11 @@ func consumesStats(c proto.Consumes) stats.Stats {
 	}
 	if c.ScrollOfStrengthV {
 		s[stats.Strength] += 20
+	}
+
+	// Doesn't stack with DS
+	if c.ScrollOfSpiritV && raidBuffs.DivineSpirit == proto.TristateEffect_TristateEffectMissing {
+		s[stats.Spirit] += 30
 	}
 
 	return s
