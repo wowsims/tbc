@@ -1,4 +1,5 @@
 import { Class } from '/tbc/core/proto/common.js';
+import { Cooldowns } from '/tbc/core/proto/common.js';
 import { Consumes } from '/tbc/core/proto/common.js';
 import { Enchant } from '/tbc/core/proto/common.js';
 import { Gem } from '/tbc/core/proto/common.js';
@@ -35,6 +36,7 @@ export declare class Player<SpecType extends Spec> {
     private talents;
     private talentsString;
     private specOptions;
+    private cooldowns;
     readonly specTypeFunctions: SpecTypeFunctions<SpecType>;
     private epWeights;
     private currentStats;
@@ -48,6 +50,7 @@ export declare class Player<SpecType extends Spec> {
     readonly talentsChangeEmitter: TypedEvent<void>;
     readonly talentsStringChangeEmitter: TypedEvent<void>;
     readonly specOptionsChangeEmitter: TypedEvent<void>;
+    readonly cooldownsChangeEmitter: TypedEvent<void>;
     readonly currentStatsEmitter: TypedEvent<void>;
     readonly changeEmitter: TypedEvent<void>;
     constructor(spec: Spec, sim: Sim);
@@ -78,6 +81,8 @@ export declare class Player<SpecType extends Spec> {
     setBuffs(eventID: EventID, newBuffs: IndividualBuffs): void;
     getConsumes(): Consumes;
     setConsumes(eventID: EventID, newConsumes: Consumes): void;
+    getCooldowns(): Cooldowns;
+    setCooldowns(eventID: EventID, newCooldowns: Cooldowns): void;
     equipItem(eventID: EventID, slot: ItemSlot, newItem: EquippedItem | null): void;
     getEquippedItem(slot: ItemSlot): EquippedItem | null;
     getGear(): Gear;

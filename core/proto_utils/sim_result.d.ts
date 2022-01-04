@@ -13,7 +13,7 @@ import { Target as TargetProto } from '/tbc/core/proto/common.js';
 import { TargetMetrics as TargetMetricsProto } from '/tbc/core/proto/api.js';
 import { RaidSimRequest, RaidSimResult } from '/tbc/core/proto/api.js';
 import { Spec } from '/tbc/core/proto/common.js';
-import { ActionId } from '/tbc/core/resources.js';
+import { ActionId } from '/tbc/core/proto_utils/action_id.js';
 export interface SimResultFilter {
     player?: number | null;
     target?: number | null;

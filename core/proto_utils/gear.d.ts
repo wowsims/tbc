@@ -20,6 +20,7 @@ export declare class Gear {
      */
     withEquippedItem(newSlot: ItemSlot, newItem: EquippedItem | null): Gear;
     getEquippedItem(slot: ItemSlot): EquippedItem | null;
+    getTrinkets(): Array<EquippedItem | null>;
     asArray(): Array<EquippedItem | null>;
     asSpec(): EquipmentSpec;
     getAllGems(): Array<Gem>;

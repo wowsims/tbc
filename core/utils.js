@@ -14,6 +14,11 @@ export function maxIndex(arr) {
     return arr.reduce((cur, v, i, arr) => v > arr[cur] ? i : cur, 0);
 }
 // Returns a new array containing only elements present in both a and b.
+export function arrayEquals(a, b, comparator) {
+    comparator = comparator || ((a, b) => a == b);
+    return a.length == b.length && a.every((val, i) => comparator(val, b[i]));
+}
+// Returns a new array containing only elements present in both a and b.
 export function intersection(a, b) {
     return a.filter(value => b.includes(value));
 }

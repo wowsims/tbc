@@ -58,11 +58,14 @@ export function TotemsSection(simUI, parentElem) {
         extraCssClasses: [
             'earth-totem-picker',
         ],
+        numColumns: 1,
         values: [
             { color: '#ffdfba', value: EarthTotem.NoEarthTotem },
-            { id: { spellId: 25528 }, value: EarthTotem.StrengthOfEarthTotem },
-            { id: { spellId: 8143 }, value: EarthTotem.TremorTotem },
+            { actionId: { id: { spellId: 25528 } }, value: EarthTotem.StrengthOfEarthTotem },
+            { actionId: { id: { spellId: 8143 } }, value: EarthTotem.TremorTotem },
         ],
+        equals: (a, b) => a == b,
+        zeroValue: EarthTotem.NoEarthTotem,
         changedEvent: (player) => player.rotationChangeEmitter,
         getValue: (player) => player.getRotation().totems?.earth || EarthTotem.NoEarthTotem,
         setValue: (eventID, player, newValue) => {
@@ -77,13 +80,16 @@ export function TotemsSection(simUI, parentElem) {
         extraCssClasses: [
             'air-totem-picker',
         ],
+        numColumns: 1,
         values: [
             { color: '#baffc9', value: AirTotem.NoAirTotem },
-            { id: { spellId: 25359 }, value: AirTotem.GraceOfAirTotem },
-            { id: { spellId: 25908 }, value: AirTotem.TranquilAirTotem },
-            { id: { spellId: 25587 }, value: AirTotem.WindfuryTotem },
-            { id: { spellId: 3738 }, value: AirTotem.WrathOfAirTotem },
+            { actionId: { id: { spellId: 25359 } }, value: AirTotem.GraceOfAirTotem },
+            { actionId: { id: { spellId: 25908 } }, value: AirTotem.TranquilAirTotem },
+            { actionId: { id: { spellId: 25587 } }, value: AirTotem.WindfuryTotem },
+            { actionId: { id: { spellId: 3738 } }, value: AirTotem.WrathOfAirTotem },
         ],
+        equals: (a, b) => a == b,
+        zeroValue: AirTotem.NoAirTotem,
         changedEvent: (player) => player.rotationChangeEmitter,
         getValue: (player) => player.getRotation().totems?.air || AirTotem.NoAirTotem,
         setValue: (eventID, player, newValue) => {
@@ -98,12 +104,15 @@ export function TotemsSection(simUI, parentElem) {
         extraCssClasses: [
             'fire-totem-picker',
         ],
+        numColumns: 1,
         values: [
             { color: '#ffb3ba', value: FireTotem.NoFireTotem },
-            { id: { spellId: 25552 }, value: FireTotem.MagmaTotem },
-            { id: { spellId: 25533 }, value: FireTotem.SearingTotem },
-            { id: { spellId: 30706 }, value: FireTotem.TotemOfWrath },
+            { actionId: { id: { spellId: 25552 } }, value: FireTotem.MagmaTotem },
+            { actionId: { id: { spellId: 25533 } }, value: FireTotem.SearingTotem },
+            { actionId: { id: { spellId: 30706 } }, value: FireTotem.TotemOfWrath },
         ],
+        equals: (a, b) => a == b,
+        zeroValue: FireTotem.NoFireTotem,
         changedEvent: (player) => player.rotationChangeEmitter,
         getValue: (player) => player.getRotation().totems?.fire || FireTotem.NoFireTotem,
         setValue: (eventID, player, newValue) => {
@@ -118,10 +127,13 @@ export function TotemsSection(simUI, parentElem) {
         extraCssClasses: [
             'water-totem-picker',
         ],
+        numColumns: 1,
         values: [
             { color: '#bae1ff', value: WaterTotem.NoWaterTotem },
-            { id: { spellId: 25570 }, value: WaterTotem.ManaSpringTotem },
+            { actionId: { id: { spellId: 25570 } }, value: WaterTotem.ManaSpringTotem },
         ],
+        equals: (a, b) => a == b,
+        zeroValue: WaterTotem.NoWaterTotem,
         changedEvent: (player) => player.rotationChangeEmitter,
         getValue: (player) => player.getRotation().totems?.water || WaterTotem.NoWaterTotem,
         setValue: (eventID, player, newValue) => {

@@ -1,4 +1,4 @@
-import { ItemOrSpellId } from '/tbc/core/resources.js';
+import { ItemOrSpellId } from '/tbc/core/proto_utils/action_id.js';
 import { Input, InputConfig } from './input.js';
 export interface IconPickerConfig<ModObject, ValueType> extends InputConfig<ModObject, ValueType> {
     id: ItemOrSpellId;

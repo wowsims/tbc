@@ -68,6 +68,12 @@ export class Gear {
     getEquippedItem(slot) {
         return this.gear[slot];
     }
+    getTrinkets() {
+        return [
+            this.getEquippedItem(ItemSlot.ItemSlotTrinket1),
+            this.getEquippedItem(ItemSlot.ItemSlotTrinket2),
+        ];
+    }
     asArray() {
         return Object.values(this.gear);
     }

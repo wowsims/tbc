@@ -1,6 +1,8 @@
 import { REPO_NAME } from '/tbc/core/constants/other.js';
 import { getWowheadItemId } from '/tbc/core/proto_utils/equipped_item.js';
+import { NO_TARGET } from '/tbc/core/proto_utils/utils.js';
 import { ItemSlot } from './proto/common.js';
+import { OtherAction } from './proto/common.js';
 // Get 'elemental_shaman', the pathname part after the repo name
 const pathnameParts = window.location.pathname.split('/');
 const repoPartIdx = pathnameParts.findIndex(part => part == REPO_NAME);
@@ -26,27 +28,6 @@ const emptySlotIcons = {
 };
 export function getEmptySlotIconUrl(slot) {
     return emptySlotIcons[slot];
-}
-export function sameActionId(id1, id2) {
-    return ((('itemId' in id1.id && 'itemId' in id2.id && id1.id.itemId == id2.id.itemId)
-        || ('spellId' in id1.id && 'spellId' in id2.id && id1.id.spellId == id2.id.spellId)
-        || ('otherId' in id1.id && 'otherId' in id2.id && id1.id.otherId == id2.id.otherId))
-        && id1.tag == id2.tag);
-}
-export function actionIdToString(id) {
-    let tagStr = id.tag ? ('-' + id.tag) : '';
-    if ('itemId' in id.id) {
-        return 'item-' + id.id.itemId + tagStr;
-    }
-    else if ('spellId' in id.id) {
-        return 'spell-' + id.id.spellId + tagStr;
-    }
-    else if ('otherId' in id.id) {
-        return 'other-' + id.id.otherId + tagStr;
-    }
-    else {
-        throw new Error('Invalid Action Id: ' + JSON.stringify(id));
-    }
 }
 // Some items/spells have weird icons, so use this to show a different icon instead.
 const idOverrides = {};
@@ -86,7 +67,14 @@ export async function getItemIconUrl(item) {
     return getIconUrl({ itemId: getWowheadItemId(item) });
 }
 function getOtherActionName(id) {
-    throw new Error('No other actions!');
+    switch (id) {
+        case OtherAction.OtherActionNone:
+            return '';
+        case OtherAction.OtherActionWait:
+            return 'Wait';
+        default:
+            throw new Error('Invalid OtherAction: ' + id);
+    }
 }
 export async function getName(id) {
     if ('otherId' in id) {
@@ -95,11 +83,63 @@ export async function getName(id) {
     const tooltipData = await getTooltipData(id);
     return tooltipData['name'];
 }
+export async function getFullActionName(actionId, playerIndex) {
+    const tag = actionId.tag || 0;
+    let name = await getName(actionId.id);
+    switch (name) {
+        case 'Fireball':
+        case 'Pyroblast':
+            if (tag)
+                name += ' (DoT)';
+            break;
+        case 'Mind Flay':
+            if (tag == 1) {
+                name += ' (1 Tick)';
+            }
+            else if (tag == 2) {
+                name += ' (2 Tick)';
+            }
+            else if (tag == 3) {
+                name += ' (3 Tick)';
+            }
+            break;
+        case 'Lightning Bolt':
+            if (tag)
+                name += ' (LO)';
+            break;
+        // For targetted buffs, tag is the source player's raid index or -1 if none.
+        case 'Bloodlust':
+        case 'Innervate':
+        case 'Mana Tide Totem':
+        case 'Power Infusion':
+            if (tag != NO_TARGET) {
+                if (tag === playerIndex) {
+                    name += ` (self)`;
+                }
+                else {
+                    name += ` (from #${tag + 1})`;
+                }
+            }
+            break;
+        default:
+            if (tag == 10) {
+                name += ' (Auto)';
+            }
+            else if (tag == 11) {
+                name += ' (Offhand Auto)';
+            }
+            else if (tag) {
+                name += ' (??)';
+            }
+            break;
+    }
+    return name;
+}
 export function setWowheadHref(elem, id) {
     if ('itemId' in id) {
         elem.href = 'https://tbc.wowhead.com/item=' + id.itemId;
     }
-    else {
+    else if ('spellId' in id) {
         elem.href = 'https://tbc.wowhead.com/spell=' + id.spellId;
     }
 }

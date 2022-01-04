@@ -8,7 +8,7 @@ export class IconEnumPicker extends Input {
     constructor(parent, modObj, config) {
         super(parent, 'icon-enum-picker-root', modObj, config);
         this.config = config;
-        this.currentValue = 0;
+        this.currentValue = this.config.zeroValue;
         this.rootElem.classList.add('dropdown-root');
         this.rootElem.innerHTML = `
 			<a class="dropdown-button icon-enum-picker-button"></a>
@@ -19,25 +19,46 @@ export class IconEnumPicker extends Input {
         this.buttonElem.addEventListener('click', event => {
             event.preventDefault();
         });
-        config.values.forEach(valueConfig => {
+        let columns = [];
+        for (let i = 0; i < this.config.numColumns; i++) {
+            const column = document.createElement('div');
+            column.classList.add('dropdown-panel-column', 'icon-enum-picker-column');
+            dropdownElem.appendChild(column);
+            columns.push(column);
+        }
+        const numOptions = config.values.length;
+        const maxOptionsPerColumn = Math.ceil(numOptions / this.config.numColumns);
+        config.values.forEach((valueConfig, i) => {
+            const colIdx = Math.floor(i / maxOptionsPerColumn);
+            const column = columns[colIdx];
+            const optionContainer = document.createElement('div');
+            optionContainer.classList.add('dropdown-option-container');
+            column.appendChild(optionContainer);
             const option = document.createElement('a');
             option.classList.add('dropdown-option', 'icon-enum-picker-option');
-            dropdownElem.appendChild(option);
+            optionContainer.appendChild(option);
             this.setImage(option, valueConfig);
             option.addEventListener('click', event => {
                 event.preventDefault();
                 this.currentValue = valueConfig.value;
                 this.inputChanged(TypedEvent.nextEventID());
+                // Wowhead tooltips can't seem to detect when an element is hidden while
+                // being moused over, and the tooltip doesn't disappear. Patch this by
+                // dispatching our own mouseout event.
+                option.dispatchEvent(new Event('mouseout'));
             });
         });
         this.init();
     }
+    setActionImage(elem, actionId) {
+        setWowheadHref(elem, actionId.id);
+        getIconUrl(actionId.id).then(url => {
+            elem.style.backgroundImage = `url('${url}')`;
+        });
+    }
     setImage(elem, valueConfig) {
-        if (valueConfig.id) {
-            setWowheadHref(elem, valueConfig.id);
-            getIconUrl(valueConfig.id).then(url => {
-                elem.style.backgroundImage = `url('${url}')`;
-            });
+        if (valueConfig.actionId) {
+            this.setActionImage(elem, valueConfig.actionId);
         }
         else {
             elem.style.backgroundImage = '';
@@ -52,13 +73,20 @@ export class IconEnumPicker extends Input {
     }
     setInputValue(newValue) {
         this.currentValue = newValue;
-        if (this.currentValue > 0) {
+        if (!this.config.equals(this.currentValue, this.config.zeroValue)) {
             this.rootElem.classList.add('active');
         }
         else {
             this.rootElem.classList.remove('active');
         }
-        const valueConfig = this.config.values.find(valueConfig => valueConfig.value == this.currentValue);
-        this.setImage(this.buttonElem, valueConfig);
+        const valueConfig = this.config.values.find(valueConfig => this.config.equals(valueConfig.value, this.currentValue));
+        if (valueConfig) {
+            this.setImage(this.buttonElem, valueConfig);
+        }
+        else if (this.config.backupIconUrl) {
+            const backupId = this.config.backupIconUrl(this.currentValue);
+            this.setActionImage(this.buttonElem, backupId);
+            this.rootElem.classList.remove('active');
+        }
     }
 }

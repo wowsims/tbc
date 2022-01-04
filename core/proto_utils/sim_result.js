@@ -3,9 +3,10 @@ import { AuraMetrics as AuraMetricsProto } from '/tbc/core/proto/api.js';
 import { DpsMetrics as DpsMetricsProto } from '/tbc/core/proto/api.js';
 import { RaidSimRequest, RaidSimResult } from '/tbc/core/proto/api.js';
 import { Class } from '/tbc/core/proto/common.js';
+import { actionIdToString } from '/tbc/core/proto_utils/action_id.js';
+import { protoToActionId } from '/tbc/core/proto_utils/action_id.js';
 import { getIconUrl } from '/tbc/core/resources.js';
-import { getName } from '/tbc/core/resources.js';
-import { actionIdToString } from '/tbc/core/resources.js';
+import { getFullActionName } from '/tbc/core/resources.js';
 import { classColors } from '/tbc/core/proto_utils/utils.js';
 import { getTalentTreeIcon } from '/tbc/core/proto_utils/utils.js';
 import { playerToSpec } from '/tbc/core/proto_utils/utils.js';
@@ -207,10 +208,8 @@ export class AuraMetrics {
             },
             tag: 0,
         };
-        const namePromise = getName(actionId.id);
-        const iconPromise = getIconUrl(actionId.id);
-        const name = await namePromise;
-        const iconUrl = await iconPromise;
+        const name = await getFullActionName(actionId);
+        const iconUrl = await getIconUrl(actionId.id);
         return new AuraMetrics(actionId, name, iconUrl, iterations, duration, auraMetrics);
     }
     // Merges aura metrics that have the same name/ID, adding their stats together.
@@ -266,71 +265,9 @@ export class ActionMetrics {
         return (this.data.misses / (this.data.hits + this.data.misses)) * 100;
     }
     static async makeNew(iterations, duration, actionMetrics) {
-        let actionId = null;
-        if (actionMetrics.id.rawId.oneofKind == 'spellId') {
-            actionId = {
-                id: {
-                    spellId: actionMetrics.id.rawId.spellId,
-                },
-                tag: actionMetrics.id.tag,
-            };
-        }
-        else if (actionMetrics.id.rawId.oneofKind == 'itemId') {
-            actionId = {
-                id: {
-                    itemId: actionMetrics.id.rawId.itemId,
-                },
-                tag: actionMetrics.id.tag,
-            };
-        }
-        else if (actionMetrics.id.rawId.oneofKind == 'otherId') {
-            actionId = {
-                id: {
-                    otherId: actionMetrics.id.rawId.otherId,
-                },
-                tag: actionMetrics.id.tag,
-            };
-        }
-        else {
-            throw new Error('Invalid action metric with no ID');
-        }
-        const namePromise = getName(actionId.id);
-        const iconPromise = getIconUrl(actionId.id);
-        let name = await namePromise;
-        if (actionId.tag != 0) {
-            if (name == "Mind Flay") { // for now we can just check the name and use special tagging rules.
-                if (actionId.tag == 1) {
-                    name += ' (1 Tick)';
-                }
-                else if (actionId.tag == 2) {
-                    name += ' (2 Tick)';
-                }
-                else if (actionId.tag == 3) {
-                    name += ' (3 Tick)';
-                }
-            }
-            else if (name == 'Fireball') {
-                name += ' (DoT)';
-            }
-            else if (name == 'Pyroblast') {
-                name += ' (DoT)';
-            }
-            else {
-                if (actionId.tag == 1) {
-                    name += ' (LO)';
-                }
-                else if (actionId.tag == 10) {
-                    name += ' (Auto)';
-                }
-                else if (actionId.tag == 11) {
-                    name += ' (Offhand Auto)';
-                }
-                else {
-                    name += ' (??)';
-                }
-            }
-        }
-        const iconUrl = await iconPromise;
+        const actionId = protoToActionId(actionMetrics.id);
+        const name = await getFullActionName(actionId);
+        const iconUrl = await getIconUrl(actionId.id);
         return new ActionMetrics(actionId, name, iconUrl, iterations, duration, actionMetrics);
     }
     // Merges action metrics that have the same name/ID, adding their stats together.

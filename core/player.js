@@ -1,3 +1,4 @@
+import { Cooldowns } from '/tbc/core/proto/common.js';
 import { Conjured } from '/tbc/core/proto/common.js';
 import { Consumes } from '/tbc/core/proto/common.js';
 import { EquipmentSpec } from '/tbc/core/proto/common.js';
@@ -20,6 +21,7 @@ export class Player {
         this.bonusStats = new Stats();
         this.gear = new Gear({});
         this.talentsString = '';
+        this.cooldowns = Cooldowns.create();
         this.epWeights = new Stats();
         this.currentStats = PlayerStats.create();
         this.nameChangeEmitter = new TypedEvent('PlayerName');
@@ -33,6 +35,7 @@ export class Player {
         // Talents dont have all fields so we need this.
         this.talentsStringChangeEmitter = new TypedEvent('PlayerTalentsString');
         this.specOptionsChangeEmitter = new TypedEvent('PlayerSpecOptions');
+        this.cooldownsChangeEmitter = new TypedEvent('PlayerCooldowns');
         this.currentStatsEmitter = new TypedEvent('PlayerCurrentStats');
         this.sim = sim;
         this.party = null;
@@ -54,6 +57,7 @@ export class Player {
             this.talentsChangeEmitter,
             this.talentsStringChangeEmitter,
             this.specOptionsChangeEmitter,
+            this.cooldownsChangeEmitter,
         ], 'PlayerChange');
     }
     getSpecIcon() {
@@ -131,6 +135,18 @@ export class Player {
     setCurrentStats(eventID, newStats) {
         this.currentStats = newStats;
         this.currentStatsEmitter.emit(eventID);
+        //// Remove item cooldowns if there is no cooldown available for the item.
+        //const availableCooldowns = this.currentStats.cooldowns;
+        //const newCooldowns = this.getCooldowns();
+        //newCooldowns.cooldowns = newCooldowns.cooldowns.filter(cd => {
+        //	if (cd.id && 'itemId' in cd.id.rawId) {
+        //		return availableCooldowns.find(acd => ActionIdProto.equals(acd, cd.id)) != null;
+        //	} else {
+        //		return true;
+        //	}
+        //});
+        //// TODO: Reference the parent event ID
+        //this.setCooldowns(TypedEvent.nextEventID(), newCooldowns);
     }
     getName() {
         return this.name;
@@ -183,12 +199,19 @@ export class Player {
         this.consumes = Consumes.clone(newConsumes);
         this.consumesChangeEmitter.emit(eventID);
     }
-    equipItem(eventID, slot, newItem) {
-        const newGear = this.gear.withEquippedItem(slot, newItem);
-        if (newGear.equals(this.gear))
+    getCooldowns() {
+        // Make a defensive copy
+        return Cooldowns.clone(this.cooldowns);
+    }
+    setCooldowns(eventID, newCooldowns) {
+        if (Cooldowns.equals(this.cooldowns, newCooldowns))
             return;
-        this.gear = newGear;
-        this.gearChangeEmitter.emit(eventID);
+        // Make a defensive copy
+        this.cooldowns = Cooldowns.clone(newCooldowns);
+        this.cooldownsChangeEmitter.emit(eventID);
+    }
+    equipItem(eventID, slot, newItem) {
+        this.setGear(eventID, this.gear.withEquippedItem(slot, newItem));
     }
     getEquippedItem(slot) {
         return this.gear.getEquippedItem(slot);
@@ -199,8 +222,35 @@ export class Player {
     setGear(eventID, newGear) {
         if (newGear.equals(this.gear))
             return;
-        this.gear = newGear;
-        this.gearChangeEmitter.emit(eventID);
+        // Commented for now because the UI for this is weird.
+        //// If trinkets have changed and there were cooldowns assigned for those trinkets,
+        //// try to match them up and switch to the new trinkets.
+        //const newCooldowns = this.getCooldowns();
+        //const oldTrinketIds = this.gear.getTrinkets().map(trinket => trinket?.asActionIdProto() || ActionIdProto.create());
+        //const newTrinketIds = newGear.getTrinkets().map(trinket => trinket?.asActionIdProto() || ActionIdProto.create());
+        //for (let i = 0; i < 2; i++) {
+        //	const oldTrinketId = oldTrinketIds[i];
+        //	const newTrinketId = newTrinketIds[i];
+        //	if (ActionIdProto.equals(oldTrinketId, ActionIdProto.create())) {
+        //		continue;
+        //	}
+        //	if (ActionIdProto.equals(newTrinketId, ActionIdProto.create())) {
+        //		continue;
+        //	}
+        //	if (ActionIdProto.equals(oldTrinketId, newTrinketId)) {
+        //		continue;
+        //	}
+        //	newCooldowns.cooldowns.forEach(cd => {
+        //		if (ActionIdProto.equals(cd.id, oldTrinketId)) {
+        //			cd.id = newTrinketId;
+        //		}
+        //	});
+        //}
+        TypedEvent.freezeAllAndDo(() => {
+            this.gear = newGear;
+            this.gearChangeEmitter.emit(eventID);
+            //this.setCooldowns(eventID, newCooldowns);
+        });
     }
     getBonusStats() {
         return this.bonusStats;
@@ -309,6 +359,7 @@ export class Player {
             consumes: this.getConsumes(),
             bonusStats: this.getBonusStats().asArray(),
             buffs: this.getBuffs(),
+            cooldowns: this.getCooldowns(),
             talentsString: this.getTalentsString(),
         }), this.getRotation(), this.getTalents(), this.getSpecOptions());
     }
@@ -324,6 +375,7 @@ export class Player {
             this.setConsumes(eventID, proto.consumes || Consumes.create());
             this.setBonusStats(eventID, new Stats(proto.bonusStats));
             this.setBuffs(eventID, proto.buffs || IndividualBuffs.create());
+            this.setCooldowns(eventID, proto.cooldowns || Cooldowns.create());
             this.setTalentsString(eventID, proto.talentsString);
             this.setRotation(eventID, this.specTypeFunctions.rotationFromPlayer(proto));
             this.setTalents(eventID, this.specTypeFunctions.talentsFromPlayer(proto));

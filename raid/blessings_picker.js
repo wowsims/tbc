@@ -60,13 +60,16 @@ export class BlessingsPicker extends Component {
                     extraCssClasses: [
                         'blessing-picker',
                     ],
+                    numColumns: 1,
                     values: [
                         { color: classColors[Class.ClassPaladin], value: Blessings.BlessingUnknown },
-                        { id: { spellId: 25898 }, value: Blessings.BlessingOfKings },
-                        { id: { spellId: 25895 }, value: Blessings.BlessingOfSalvation },
-                        { id: { spellId: 27141 }, value: Blessings.BlessingOfMight },
-                        { id: { spellId: 27143 }, value: Blessings.BlessingOfWisdom },
+                        { actionId: { id: { spellId: 25898 } }, value: Blessings.BlessingOfKings },
+                        { actionId: { id: { spellId: 25895 } }, value: Blessings.BlessingOfSalvation },
+                        { actionId: { id: { spellId: 27141 } }, value: Blessings.BlessingOfMight },
+                        { actionId: { id: { spellId: 27143 } }, value: Blessings.BlessingOfWisdom },
                     ],
+                    equals: (a, b) => a == b,
+                    zeroValue: Blessings.BlessingUnknown,
                     changedEvent: (picker) => picker.changeEmitter,
                     getValue: (picker) => picker.assignments.paladins[rowIndex]?.blessings[spec] || Blessings.BlessingUnknown,
                     setValue: (eventID, picker, newValue) => {

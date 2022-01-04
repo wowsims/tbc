@@ -1,6 +1,7 @@
 import { BonusStatsPicker } from '/tbc/core/components/bonus_stats_picker.js';
 import { BooleanPicker } from '/tbc/core/components/boolean_picker.js';
 import { CharacterStats } from '/tbc/core/components/character_stats.js';
+import { CooldownsPicker } from '/tbc/core/components/cooldowns_picker.js';
 import { Consumes } from '/tbc/core/proto/common.js';
 import { DetailedResults } from '/tbc/core/components/detailed_results.js';
 import { Encounter as EncounterProto } from '/tbc/core/proto/common.js';
@@ -283,6 +284,13 @@ export class IndividualSimUI extends SimUI {
 						<label>Consumes</label>
 					</section>
 				</div>
+				<div class="settings-section-container">
+					<section class="settings-section cooldowns-section">
+						<label>Cooldowns</label>
+						<div class="cooldowns-section-content">
+						</div>
+					</section>
+				</div>
 				<div class="settings-section-container within-raid-sim-hide">
 					<section class="settings-section debuffs-section">
 						<label>Debuffs</label>
@@ -371,6 +379,17 @@ export class IndividualSimUI extends SimUI {
             equals: (a, b) => SavedEncounter.equals(a, b),
             toJson: (a) => SavedEncounter.toJson(a),
             fromJson: (obj) => SavedEncounter.fromJson(obj),
+        });
+        const cooldownSectionElem = settingsTab.getElementsByClassName('cooldowns-section')[0];
+        const cooldownContentElem = settingsTab.getElementsByClassName('cooldowns-section-content')[0];
+        new CooldownsPicker(cooldownContentElem, this.player);
+        tippy(cooldownSectionElem, {
+            content: Tooltips.COOLDOWNS_SECTION,
+            allowHTML: true,
+            placement: 'left',
+        });
+        this.player.cooldownsChangeEmitter.on(() => {
+            this.recomputeSettingsLayout();
         });
         // Init Muuri layout only when settings tab is clicked, because it needs the elements
         // to be shown so it can calculate sizes.
@@ -545,6 +564,9 @@ export class IndividualSimUI extends SimUI {
         return this.getStorageKey(SAVED_TALENTS_STORAGE_KEY);
     }
     recomputeSettingsLayout() {
+        if (this.settingsMuuri) {
+            //this.settingsMuuri.refreshItems();
+        }
         window.dispatchEvent(new Event('resize'));
     }
     // Returns the actual key to use for local storage, based on the given key part and the site context.

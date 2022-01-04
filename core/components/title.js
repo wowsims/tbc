@@ -61,8 +61,11 @@ export class Title extends Component {
         return option;
     }
     static makeOptionElem(data) {
+        const optionContainer = document.createElement('div');
+        optionContainer.classList.add('sim-title-dropdown-option-container', 'dropdown-option-container');
         const option = document.createElement('div');
         option.classList.add('sim-title-option', 'dropdown-option');
+        optionContainer.appendChild(option);
         if (data.color) {
             option.style.backgroundColor = data.color;
         }
@@ -83,6 +86,6 @@ export class Title extends Component {
         label.textContent = data.text;
         label.classList.add('sim-title-label');
         labelDiv.appendChild(label);
-        return option;
+        return optionContainer;
     }
 }
