@@ -127,8 +127,16 @@ type SelfBuffs struct {
 	WrathOfAir      bool
 	ManaSpring      bool
 	StrengthOfEarth bool
-	GraceOfAir      bool
-	WindfuryTotem   bool
+
+	GraceOfAir    bool
+	WindfuryTotem bool
+	AirTwist      bool // if true will cast WF every 10s and then GoA
+
+	SearingTotem bool
+	MagmaTotem   bool
+	// If true Fire Nova will be dropped on CD.
+	// After it will recast whatever other fire totem is available
+	TwistFireNova bool
 
 	NextTotemDrops [4]time.Duration // track when to drop totems
 }
