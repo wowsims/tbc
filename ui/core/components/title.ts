@@ -21,7 +21,7 @@ export const titleIcons: Record<Spec, string> = {
   [Spec.SpecRetributionPaladin]: 'https://wow.zamimg.com/images/wow/icons/large/spell_holy_auraoflight.jpg',
   [Spec.SpecShadowPriest]: '/tbc/assets/shadow_priest_icon.png',
   [Spec.SpecWarlock]: 'https://wow.zamimg.com/images/wow/icons/large/spell_shadow_metamorphosis.jpg',
-  [Spec.SpecWarrior]: 'https://wow.zamimg.com/images/wow/icons/large/ability_warrior_innerrage.jpg',
+  [Spec.SpecWarrior]: '/tbc/assets/warrior_icon.png',
 };
 
 export const raidSimIcon: string = '/tbc/assets/raid_icon.png';
