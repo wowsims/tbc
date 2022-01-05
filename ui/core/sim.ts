@@ -153,7 +153,7 @@ export class Sim {
 			encounter: this.getModifiedEncounterProto(),
 			simOptions: SimOptions.create({
 				iterations: debug ? 1 : this.getIterations(),
-				debug: debug,
+				debugFirstIteration: true,
 			}),
 		});
   }

@@ -112,7 +112,7 @@ func (sim *Simulation) reset() {
 // collects all the metrics together.
 func (sim *Simulation) run() *proto.RaidSimResult {
 	logsBuffer := &strings.Builder{}
-	if sim.Options.Debug {
+	if sim.Options.Debug || sim.Options.DebugFirstIteration {
 		sim.Log = func(message string, vals ...interface{}) {
 			logsBuffer.WriteString(fmt.Sprintf("[%0.1f] "+message+"\n", append([]interface{}{sim.CurrentTime.Seconds()}, vals...)...))
 		}
@@ -125,19 +125,18 @@ func (sim *Simulation) run() *proto.RaidSimResult {
 
 	for _, party := range sim.Raid.Parties {
 		for _, player := range party.Players {
-			player.Init(sim)
-
 			character := player.GetCharacter()
 			character.auraTracker.logFn = func(message string, vals ...interface{}) {
 				character.Log(sim, message, vals)
 			}
+			player.Init(sim)
 
 			for _, petAgent := range character.Pets {
-				petAgent.Init(sim)
 				petCharacter := petAgent.GetCharacter()
 				petCharacter.auraTracker.logFn = func(message string, vals ...interface{}) {
 					petCharacter.Log(sim, message, vals)
 				}
+				petAgent.Init(sim)
 			}
 		}
 	}
@@ -148,7 +147,13 @@ func (sim *Simulation) run() *proto.RaidSimResult {
 		}
 	}
 
-	for i := int32(0); i < sim.Options.Iterations; i++ {
+	sim.runOnce()
+
+	if !sim.Options.Debug {
+		sim.Log = nil
+	}
+
+	for i := int32(1); i < sim.Options.Iterations; i++ {
 		sim.runOnce()
 	}
 
