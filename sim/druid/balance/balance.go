@@ -114,6 +114,11 @@ func (moonkin *BalanceDruid) Reset(sim *core.Simulation) {
 }
 
 func (moonkin *BalanceDruid) Act(sim *core.Simulation) time.Duration {
+	// If a major cooldown uses the GCD, it might already be on CD when Act() is called.
+	if moonkin.IsOnCD(core.GCDCooldownID, sim.CurrentTime) {
+		return sim.CurrentTime + moonkin.GetRemainingCD(core.GCDCooldownID, sim.CurrentTime)
+	}
+
 	if moonkin.useSurplusRotation {
 		moonkin.manaTracker.Update(sim, moonkin.GetCharacter())
 
@@ -138,10 +143,6 @@ func (moonkin *BalanceDruid) actRotation(sim *core.Simulation, rotation proto.Ba
 		if rebirthTime > 0 {
 			return rebirthTime
 		}
-	}
-	innervateWait := moonkin.TryInnervate(sim)
-	if innervateWait != 0 {
-		return innervateWait
 	}
 
 	target := sim.GetPrimaryTarget()
