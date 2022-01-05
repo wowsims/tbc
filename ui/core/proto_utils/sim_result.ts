@@ -26,6 +26,8 @@ import { specToClass } from '/tbc/core/proto_utils/utils.js';
 import { bucket } from '/tbc/core/utils.js';
 import { sum } from '/tbc/core/utils.js';
 
+import { SimLog } from './logs_parser.js';
+
 export interface SimResultFilter {
 	// Raid index of the player to display, or null for all players.
 	player?: number | null;
@@ -42,12 +44,14 @@ export class SimResult {
 
 	readonly raidMetrics: RaidMetrics;
 	readonly encounterMetrics: EncounterMetrics;
+	readonly logs: Array<SimLog>;
 
-	private constructor(request: RaidSimRequest, result: RaidSimResult, raidMetrics: RaidMetrics, encounterMetrics: EncounterMetrics) {
+	private constructor(request: RaidSimRequest, result: RaidSimResult, raidMetrics: RaidMetrics, encounterMetrics: EncounterMetrics, logs: Array<SimLog>) {
 		this.request = request;
 		this.result = result;
 		this.raidMetrics = raidMetrics;
 		this.encounterMetrics = encounterMetrics;
+		this.logs = logs;
 	}
 
 	getPlayers(filter?: SimResultFilter): Array<PlayerMetrics> {
@@ -125,6 +129,7 @@ export class SimResult {
 	static async makeNew(request: RaidSimRequest, result: RaidSimResult): Promise<SimResult> {
 		const iterations = request.simOptions?.iterations || 1;
 		const duration = request.encounter?.duration || 1;
+		const logs = SimLog.parseAll(result);
 
 		const raidPromise = RaidMetrics.makeNew(iterations, duration, request.raid!, result.raidMetrics!);
 		const encounterPromise = EncounterMetrics.makeNew(iterations, duration, request.encounter!, result.encounterMetrics!);
@@ -132,7 +137,7 @@ export class SimResult {
 		const raidMetrics = await raidPromise;
 		const encounterMetrics = await encounterPromise;
 
-		return new SimResult(request, result, raidMetrics, encounterMetrics);
+		return new SimResult(request, result, raidMetrics, encounterMetrics, logs);
 	}
 }
 

@@ -15,7 +15,7 @@ import (
 // All players have stats, equipment, auras, etc
 type Character struct {
 	// Label for logging.
-	Name string
+	Name  string
 	Label string
 
 	Race  proto.Race
@@ -112,7 +112,7 @@ func NewCharacter(party *Party, partyIndex int, player proto.Player) Character {
 		Metrics: NewCharacterMetrics(),
 	}
 
-	character.Label = fmt.Sprintf("%s (%d)", character.Name, character.RaidIndex + 1),
+	character.Label = fmt.Sprintf("%s (%d)", character.Name, character.RaidIndex+1)
 
 	if player.Consumes != nil {
 		character.consumes = *player.Consumes
