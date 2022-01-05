@@ -1,6 +1,7 @@
 package core
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/wowsims/tbc/sim/core/proto"
@@ -45,7 +46,8 @@ type Pet struct {
 func NewPet(name string, owner *Character, baseStats stats.Stats, statInheritanceCoeffs stats.Stats, enabledOnStart bool) Pet {
 	pet := Pet{
 		Character: Character{
-			Name: name,
+			Name:  name,
+			Label: fmt.Sprintf("%s - %s", owner.Label, name),
 			PseudoStats: stats.PseudoStats{
 				AttackSpeedMultiplier: 1,
 				CastSpeedMultiplier:   1,
