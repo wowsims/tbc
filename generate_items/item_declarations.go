@@ -23,6 +23,7 @@ var ItemDeclarations = []ItemDeclaration{
 	{ /** Ancestral Ring of Conquest */ ID: 30061, Categories: []proto.ItemCategory{MeleeCategory}},
 	{ /** Band of Eternity */ ID: 29298, Categories: []proto.ItemCategory{MeleeCategory}},
 	{ /** Band of the Ranger-General */ ID: 29997, Categories: []proto.ItemCategory{MeleeCategory}},
+	{ /** Bands of the Celestial Archer */ ID: 30026, Categories: []proto.ItemCategory{MeleeCategory}},
 	{ /** Belt of One-Hundred Deaths */ ID: 30106, Categories: []proto.ItemCategory{MeleeCategory}},
 	{ /** Black Planar Edge */ ID: 28432, Categories: []proto.ItemCategory{MeleeCategory}},
 	{ /** Bloodlust Brooch */ ID: 29383, Categories: []proto.ItemCategory{MeleeCategory}},
@@ -89,6 +90,7 @@ var ItemDeclarations = []ItemDeclaration{
 	{ /** Vambraces of Ending */ ID: 29966, Categories: []proto.ItemCategory{MeleeCategory}},
 	{ /** Vengeance Wrap */ ID: 24259, Categories: []proto.ItemCategory{MeleeCategory}},
 	{ /** Violet Signet of the Master Assassin */ ID: 29283, Categories: []proto.ItemCategory{MeleeCategory}},
+	{ /** Wicked Edge of the Planes */ ID: 28433, Categories: []proto.ItemCategory{MeleeCategory}},
 	{ /** Worgen Claw Necklace */ ID: 28509, Categories: []proto.ItemCategory{MeleeCategory}},
 
 	// Caster
