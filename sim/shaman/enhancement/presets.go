@@ -75,7 +75,6 @@ var FullDebuffTarget = &proto.Target{
 		BloodFrenzy:               true,
 		ExposeArmor:               proto.TristateEffect_TristateEffectImproved,
 		FaerieFire:                proto.TristateEffect_TristateEffectImproved,
-		SunderArmor:               true,
 		ImprovedSealOfTheCrusader: true,
 		JudgementOfWisdom:         true,
 		Misery:                    true,

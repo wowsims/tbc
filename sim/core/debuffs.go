@@ -56,21 +56,18 @@ func applyDebuffEffects(target *Target, debuffs proto.Debuffs) {
 		})
 	}
 
-	if debuffs.ExposeArmor != proto.TristateEffect_TristateEffectMissing {
-		target.armor -= 2050 // 5 points: 2050 armor / imp 5 points: 3075 armor
-		if debuffs.ExposeArmor == proto.TristateEffect_TristateEffectImproved {
-			target.armor -= 1025
-		}
+	if debuffs.ExposeArmor == proto.TristateEffect_TristateEffectImproved {
+		target.armor -= 3075.0 // 5 points: 2050 armor / imp 5 points: 3075 armor
+	} else if debuffs.SunderArmor {
+		target.armor -= 2600.0 // assume 5 stacks
+	} else if debuffs.ExposeArmor == proto.TristateEffect_TristateEffectRegular {
+		target.armor -= 2050.0 // 5 points: 2050 armor / imp 5 points: 3075 armor
 	}
 
 	if debuffs.FaerieFire != proto.TristateEffect_TristateEffectMissing {
 		target.AddPermanentAura(func(sim *Simulation) Aura {
 			return FaerieFireAura(0, target, debuffs.FaerieFire == proto.TristateEffect_TristateEffectImproved)
 		})
-	}
-
-	if debuffs.SunderArmor {
-		target.armor -= 5 * 520.0 // assume 5 stacks
 	}
 
 	if debuffs.CurseOfRecklessness {
