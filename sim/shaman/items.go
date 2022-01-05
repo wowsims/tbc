@@ -224,8 +224,6 @@ func ApplySkycallTotem(agent core.Agent) {
 // (2) Set : Your Strength of Earth Totem ability grants an additional 12 strength.
 // (4) Set : Your Stormstrike ability does an additional 30 damage per weapon.
 
-// var Cyclone4PcAuraID = core.NewAuraID()
-// var Cyclone4PcManaRegainAuraID = core.NewAuraID()
 var ItemSetCycloneHarness = core.ItemSet{
 	Name:  "Cyclone Harness",
 	Items: map[int32]struct{}{29038: {}, 29039: {}, 29040: {}, 29043: {}, 29042: {}},
