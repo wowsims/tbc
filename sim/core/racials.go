@@ -50,14 +50,20 @@ func applyRaceEffects(agent Agent) {
 		const spBonus = 143
 
 		character.AddMajorCooldown(MajorCooldown{
+			ActionID:   ActionID{SpellID: 33697},
 			CooldownID: OrcBloodFuryCooldownID,
 			Cooldown:   cd,
+			CanActivate: func(sim *Simulation, character *Character) bool {
+				return true
+			},
+			ShouldActivate: func(sim *Simulation, character *Character) bool {
+				return true
+			},
 			ActivationFactory: func(sim *Simulation) CooldownActivation {
-				return func(sim *Simulation, character *Character) bool {
+				return func(sim *Simulation, character *Character) {
 					character.SetCD(OrcBloodFuryCooldownID, cd+sim.CurrentTime)
 					character.AddAuraWithTemporaryStats(sim, OrcBloodFuryAuraID, 33697, "Orc Blood Fury", stats.SpellPower, spBonus, dur)
 					character.Metrics.AddInstantCast(ActionID{SpellID: 33697})
-					return true
 				}
 			},
 		})
@@ -77,6 +83,9 @@ func applyRaceEffects(agent Agent) {
 						spellEffect.DamageMultiplier *= 1.05
 					}
 				},
+				OnBeforePeriodicDamage: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect, tickDamage *float64) {
+					*tickDamage *= 1.05
+				},
 			}
 		})
 
@@ -85,28 +94,43 @@ func applyRaceEffects(agent Agent) {
 		if character.Race == proto.Race_RaceTroll30 {
 			hasteBonus = 1.3
 		}
+		inverseBonus := 1 / hasteBonus
 		const dur = time.Second * 10
 		const cd = time.Minute * 3
+		manaCost := 0.0
 
 		character.AddMajorCooldown(MajorCooldown{
+			ActionID:   ActionID{SpellID: 20554},
 			CooldownID: TrollBerserkingCooldownID,
 			Cooldown:   cd,
+			CanActivate: func(sim *Simulation, character *Character) bool {
+				if character.CurrentMana() < manaCost {
+					return false
+				}
+				return true
+			},
+			ShouldActivate: func(sim *Simulation, character *Character) bool {
+				return true
+			},
 			ActivationFactory: func(sim *Simulation) CooldownActivation {
-				return func(sim *Simulation, character *Character) bool {
+				manaCost = character.BaseMana() * 0.06
+				return func(sim *Simulation, character *Character) {
 					character.SetCD(TrollBerserkingCooldownID, cd+sim.CurrentTime)
 					// Increase cast speed multiplier
 					character.PseudoStats.CastSpeedMultiplier *= hasteBonus
+					character.MultiplyMeleeSpeed(sim, hasteBonus)
 					character.AddAura(sim, Aura{
 						ID:      TrollBerserkingAuraID,
 						Name:    "Troll Berserking",
 						Expires: sim.CurrentTime + dur,
 						OnExpire: func(sim *Simulation) {
 							character.PseudoStats.CastSpeedMultiplier /= hasteBonus
+							character.MultiplyMeleeSpeed(sim, inverseBonus)
 						},
 					})
+					character.SpendMana(sim, manaCost, "Troll Berserking")
 					character.Metrics.AddInstantCast(ActionID{SpellID: 20554})
-					character.AddAuraUptime(TrollBerserkingAuraID, 20554, MinDuration(dur, sim.Duration - sim.CurrentTime))
-					return true
+					character.AddAuraUptime(TrollBerserkingAuraID, 20554, MinDuration(dur, sim.Duration-sim.CurrentTime))
 				}
 			},
 		})

@@ -4,11 +4,13 @@ import (
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
+	"github.com/wowsims/tbc/sim/core/proto"
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-// Starfire spell IDs
-const SpellIDMF int32 = 26988
+const SpellIDMoonfire int32 = 26988
+
+var MoonfireDebuffID = core.NewDebuffID()
 
 func (druid *Druid) newMoonfireTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
 	baseCast := core.Cast{
@@ -20,15 +22,16 @@ func (druid *Druid) newMoonfireTemplate(sim *core.Simulation) core.SimpleSpellTe
 		ManaCost:       495,
 		CastTime:       0,
 		ActionID: core.ActionID{
-			SpellID: SpellIDMF,
+			SpellID: SpellIDMoonfire,
 		},
 	}
 
 	effect := core.SpellHitEffect{
 		SpellEffect: core.SpellEffect{
-			DamageMultiplier: 1,
+			DamageMultiplier:       1,
+			StaticDamageMultiplier: 1,
 		},
-		DirectInput: core.DirectDamageSpellInput{
+		DirectInput: core.DirectDamageInput{
 			MinBaseDamage:    305,
 			MaxBaseDamage:    357,
 			SpellCoefficient: 0.15,
@@ -38,9 +41,8 @@ func (druid *Druid) newMoonfireTemplate(sim *core.Simulation) core.SimpleSpellTe
 			TickLength:           time.Second * 3,
 			TickBaseDamage:       600 / 4,
 			TickSpellCoefficient: 0.13,
-
-			// TODO: does druid care about dot ticks?
-			// OnDamageTick: func(sim *core.Simulation) {},
+			DebuffID:             MoonfireDebuffID,
+			SpellID:              SpellIDMoonfire,
 		},
 	}
 
@@ -49,12 +51,13 @@ func (druid *Druid) newMoonfireTemplate(sim *core.Simulation) core.SimpleSpellTe
 	}
 
 	// Moonfire only talents
-	effect.SpellEffect.DamageMultiplier *= 1 + 0.05*float64(druid.Talents.ImprovedMoonfire)
+	effect.SpellEffect.StaticDamageMultiplier *= 1 + 0.05*float64(druid.Talents.ImprovedMoonfire)
 	effect.SpellEffect.BonusSpellCritRating += float64(druid.Talents.ImprovedMoonfire) * 5 * core.SpellCritRatingPerCritChance
 
 	// TODO: Shared talents
 	baseCast.ManaCost -= baseCast.BaseManaCost * float64(druid.Talents.Moonglow) * 0.03
-	effect.SpellEffect.DamageMultiplier *= 1 + 0.02*float64(druid.Talents.Moonfury)
+	effect.SpellEffect.StaticDamageMultiplier *= 1 + 0.02*float64(druid.Talents.Moonfury)
+
 	// Convert to percent, multiply by percent increase, convert back to multiplier by adding 1
 	baseCast.CritMultiplier = (baseCast.CritMultiplier-1)*(1+float64(druid.Talents.Vengeance)*0.2) + 1
 
@@ -81,4 +84,8 @@ func (druid *Druid) NewMoonfire(sim *core.Simulation, target *core.Target) *core
 	sf.Init(sim)
 
 	return sf
+}
+
+func (druid *Druid) ShouldCastMoonfire(sim *core.Simulation, target *core.Target, rotation proto.BalanceDruid_Rotation) bool {
+	return rotation.Moonfire && !druid.MoonfireSpell.DotInput.IsTicking(sim)
 }

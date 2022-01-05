@@ -7,6 +7,22 @@ import (
 	"github.com/wowsims/tbc/sim/core/proto"
 )
 
+func MinInt(a int, b int) int {
+	if a < b {
+		return a
+	} else {
+		return b
+	}
+}
+
+func MaxInt(a int, b int) int {
+	if a > b {
+		return a
+	} else {
+		return b
+	}
+}
+
 func MinInt32(a int32, b int32) int32 {
 	if a < b {
 		return a

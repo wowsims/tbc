@@ -1,264 +1,228 @@
-import { IndividualSimRequest, IndividualSimResult } from '/tbc/core/proto/api.js';
+import { Component } from '/tbc/core/components/component.js';
+import { NumberPicker } from '/tbc/core/components/number_picker.js';
+import { Title } from '/tbc/core/components/title.js';
 import { Spec } from '/tbc/core/proto/common.js';
-import { makeIndividualSimRequest } from '/tbc/core/proto_utils/request_helpers.js';
+import { SimOptions } from '/tbc/core/proto/api.js';
 import { specToLocalStorageKey } from '/tbc/core/proto_utils/utils.js';
-import { Player, PlayerConfig } from './player.js';
-import { Sim, SimConfig } from './sim.js';
-import { Target, TargetConfig } from './target.js';
-import { TypedEvent } from './typed_event.js';
+
+import { Sim } from './sim.js';
+import { Target } from './target.js';
+import { EventID, TypedEvent } from './typed_event.js';
 
 declare var tippy: any;
 declare var pako: any;
 
-const CURRENT_SETTINGS_STORAGE_KEY = '__currentSettings__';
-const SAVED_GEAR_STORAGE_KEY = '__savedGear__';
-const SAVED_ENCOUNTER_STORAGE_KEY = '__savedEncounter__';
-const SAVED_ROTATION_STORAGE_KEY = '__savedRotation__';
-const SAVED_SETTINGS_STORAGE_KEY = '__savedSettings__';
-const SAVED_TALENTS_STORAGE_KEY = '__savedTalents__';
-
-export type ReleaseStatus = 'Alpha' | 'Beta' | 'Live';
-
-export interface SimUIConfig<SpecType extends Spec> {
-  releaseStatus: ReleaseStatus;
-	knownIssues?: Array<string>;
-	sim: SimConfig;
-	player: PlayerConfig<SpecType>;
-	target: TargetConfig;
+// Config for displaying a warning to the user whenever a condition is met.
+export interface SimWarning {
+  updateOn: TypedEvent<any>,
+	shouldDisplay: () => boolean,
+	getContent: () => string,
 }
 
-// Core UI module.
-export abstract class SimUI<SpecType extends Spec> {
-  readonly parentElem: HTMLElement;
+export interface SimUIConfig {
+	// The spec, if an individual sim, or null if the raid sim.
+	spec: Spec | null,
+
+	knownIssues?: Array<string>,
+}
+
+// Shared UI for all individual sims and the raid sim.
+export abstract class SimUI extends Component {
   readonly sim: Sim;
-  readonly player: Player<SpecType>;
-  readonly target: Target;
-	readonly simUiConfig: SimUIConfig<SpecType>;
 
-  // Emits when anything from sim, player, or target changes.
-  readonly changeEmitter = new TypedEvent<void>();
+  // Emits when anything from the sim, raid, or encounter changes.
+  readonly changeEmitter;
 
-  private readonly exclusivityMap: Record<ExclusivityTag, Array<ExclusiveEffect>>;
+	readonly resultsPendingElem: HTMLElement;
+	readonly resultsContentElem: HTMLElement;
 
-  constructor(parentElem: HTMLElement, config: SimUIConfig<SpecType>) {
-    this.parentElem = parentElem;
-    this.sim = new Sim(config.sim);
-		this.player = new Player<SpecType>(config.player, this.sim);
-    this.target = new Target(config.target, this.sim);
-		this.simUiConfig = config;
+	private warnings: Array<SimWarning>;
 
-    [
+  constructor(parentElem: HTMLElement, sim: Sim, config: SimUIConfig) {
+		super(parentElem, 'sim-ui');
+    this.sim = sim;
+    this.rootElem.innerHTML = simHTML;
+
+		this.changeEmitter = TypedEvent.onAny([
       this.sim.changeEmitter,
-      this.player.changeEmitter,
-      this.target.changeEmitter,
-    ].forEach(emitter => emitter.on(() => this.changeEmitter.emit()));
+		], 'SimUIChange');
 
-    this.exclusivityMap = {
-      'Battle Elixir': [],
-      'Drums': [],
-      'Food': [],
-      'Alchohol': [],
-      'Guardian Elixir': [],
-      'Potion': [],
-      'Rune': [],
-      'Weapon Imbue': [],
-    };
+		this.warnings = [];
+		this.updateWarnings();
 
-		Array.from(document.getElementsByClassName('known-issues')).forEach(element => {
-			if (this.simUiConfig.knownIssues?.length) {
-				(element as HTMLElement).style.display = 'initial';
-			} else {
-				return;
-			}
-
-			
-			tippy(element, {
-				'content': `
+		if (config.knownIssues && config.knownIssues.length) {
+			const knownIssuesContainer = document.getElementsByClassName('known-issues')[0] as HTMLElement;
+			knownIssuesContainer.style.display = 'initial';
+			tippy(knownIssuesContainer, {
+				content: `
 				<ul class="known-issues-tooltip">
-					${this.simUiConfig.knownIssues.map(issue => '<li>' + issue + '</li>').join('')}
+					${config.knownIssues.map(issue => '<li>' + issue + '</li>').join('')}
 				</ul>
 				`,
-				'allowHTML': true,
+				allowHTML: true,
+				interactive: true,
 			});
+		}
+
+		this.resultsPendingElem = this.rootElem.getElementsByClassName('results-pending')[0] as HTMLElement;
+		this.resultsContentElem = this.rootElem.getElementsByClassName('results-content')[0] as HTMLElement;
+		this.hideAllResults();
+
+		const titleElem = this.rootElem.getElementsByClassName('sim-sidebar-title')[0] as HTMLElement;
+		const title = new Title(titleElem, config.spec);
+
+		const simActionsContainer = this.rootElem.getElementsByClassName('sim-sidebar-actions')[0] as HTMLElement;
+		const iterationsPicker = new NumberPicker(simActionsContainer, this.sim, {
+			label: 'Iterations',
+			extraCssClasses: [
+				'iterations-picker',
+				'within-raid-sim-hide',
+			],
+			changedEvent: (sim: Sim) => sim.iterationsChangeEmitter,
+			getValue: (sim: Sim) => sim.getIterations(),
+			setValue: (eventID: EventID, sim: Sim, newValue: number) => {
+				sim.setIterations(eventID, newValue);
+			},
 		});
+
+		const reportBug = document.createElement('span');
+		reportBug.classList.add('report-bug', 'fa', 'fa-bug');
+		tippy(reportBug, {
+			'content': 'Report a bug / request a feature',
+			'allowHTML': true,
+		});
+		reportBug.addEventListener('click', event => {
+			window.open('https://github.com/wowsims/tbc/issues/new/choose', '_blank');
+		});
+		this.addToolbarItem(reportBug);
   }
 
-  // Returns JSON representing all the current values.
-  toJson(): Object {
-    return {
-      'sim': this.sim.toJson(),
-      'player': this.player.toJson(),
-      'target': this.target.toJson(),
-    };
+	addAction(name: string, cssClass: string, actFn: () => void) {
+		const simActionsContainer = this.rootElem.getElementsByClassName('sim-sidebar-actions')[0] as HTMLElement;
+		const iterationsPicker = this.rootElem.getElementsByClassName('iterations-picker')[0] as HTMLElement;
+
+    const button = document.createElement('button');
+    button.classList.add('sim-sidebar-actions-button', cssClass);
+    button.textContent = name;
+    button.addEventListener('click', actFn);
+    simActionsContainer.insertBefore(button, iterationsPicker);
 	}
 
-  // Set all the current values, assumes obj is the same type returned by toJson().
-  fromJson(obj: any) {
-		if (obj['sim']) {
-			this.sim.fromJson(obj['sim']);
+	addTab(title: string, cssClass: string, innerHTML: string) {
+		const simTabsContainer = this.rootElem.getElementsByClassName('sim-tabs')[0] as HTMLElement;
+		const simTabContentsContainer = this.rootElem.getElementsByClassName('tab-content')[0] as HTMLElement;
+		const topBar = simTabsContainer.getElementsByClassName('sim-top-bar')[0] as HTMLElement;
+
+		const contentId = cssClass.replace(/\s+/g, '-') + '-tab';
+		const isFirstTab = simTabsContainer.children.length == 1;
+
+		const newTab = document.createElement('li');
+		newTab.innerHTML = `<a data-toggle="tab" href="#${contentId}">${title}</a>`;
+		newTab.classList.add(cssClass + '-tab');
+
+		const newContent = document.createElement('div');
+		newContent.id = contentId;
+		newContent.classList.add(cssClass, 'tab-pane', 'fade');
+		newContent.innerHTML = innerHTML;
+
+		if (isFirstTab) {
+			newTab.classList.add('active');
+			newContent.classList.add('active', 'in');
 		}
 
-		if (obj['player']) {
-			this.player.fromJson(obj['player']);
-		}
+		simTabsContainer.insertBefore(newTab, topBar);
+		simTabContentsContainer.appendChild(newContent);
+	}
 
-		if (obj['target']) {
-			this.target.fromJson(obj['target']);
-		}
+	addToolbarItem(elem: HTMLElement) {
+		const topBar = this.rootElem.getElementsByClassName('sim-top-bar')[0] as HTMLElement;
+		elem.classList.add('sim-top-bar-item');
+		topBar.appendChild(elem);
+	}
+
+	hideAllResults() {
+		this.resultsContentElem.style.display = 'none';
+    this.resultsPendingElem.style.display = 'none';
+	}
+
+  setResultsPending() {
+		this.resultsContentElem.style.display = 'none';
+    this.resultsPendingElem.style.display = 'initial';
   }
 
-  async init(): Promise<void> {
-    await this.sim.init(this.player.spec);
+	setResultsContent(innerHTML: string) {
+		this.resultsContentElem.innerHTML = innerHTML;
+		this.resultsContentElem.style.display = 'initial';
+    this.resultsPendingElem.style.display = 'none';
+	}
 
-    let loadedSettings = false;
+	private updateWarnings() {
+		const activeWarnings = this.warnings.filter(warning => warning.shouldDisplay());
 
-    let hash = window.location.hash;
-    if (hash.length > 1) {
-      // Remove leading '#'
-      hash = hash.substring(1);
-      try {
-        let jsonData;
-        if (new URLSearchParams(window.location.search).has('uncompressed')) {
-          const jsonStr = atob(hash);
-          jsonData = JSON.parse(jsonStr);
-        } else {
-          const binary = atob(hash);
-          const bytes = new Uint8Array(binary.length);
-          for (let i = 0; i < bytes.length; i++) {
-              bytes[i] = binary.charCodeAt(i);
-          }
-          const jsonStr = pako.inflate(bytes, { to: 'string' });  
-          jsonData = JSON.parse(jsonStr);
-        }
-        this.fromJson(jsonData);
-        loadedSettings = true;
-      } catch (e) {
-        console.warn('Failed to parse settings from window hash: ' + e);
-      }
-    }
-		window.location.hash = '';
-
-    const savedSettings = window.localStorage.getItem(this.getStorageKey(CURRENT_SETTINGS_STORAGE_KEY));
-    if (!loadedSettings && savedSettings != null) {
-      try {
-        this.fromJson(JSON.parse(savedSettings));
-        loadedSettings = true;
-      } catch (e) {
-        console.warn('Failed to parse saved settings: ' + e);
-      }
-    }
-
-		if (!loadedSettings) {
-			this.player.setGear(this.sim.lookupEquipmentSpec(this.player.defaultGear));
-		}
-
-    this.changeEmitter.on(() => {
-      const jsonStr = JSON.stringify(this.toJson());
-      window.localStorage.setItem(this.getStorageKey(CURRENT_SETTINGS_STORAGE_KEY), jsonStr);
-    });
-
-		
-		Array.from(document.getElementsByClassName('share-link')).forEach(element => {
-			tippy(element, {
-				'content': 'Shareable link',
-				'allowHTML': true,
+		const warningsElem = document.getElementsByClassName('warnings')[0] as HTMLElement;
+		if (activeWarnings.length == 0) {
+			warningsElem.style.display = 'none';
+		} else {
+			warningsElem.style.display = 'initial';
+			tippy(warningsElem, {
+				content: `
+				<ul class="known-issues-tooltip">
+					${activeWarnings.map(warning => '<li>' + warning.getContent() + '</li>').join('')}
+				</ul>
+				`,
+				allowHTML: true,
 			});
+		}
+	}
 
-			element.addEventListener('click', event => {
-				const jsonStr = JSON.stringify(this.toJson());
-        const val = pako.deflate(jsonStr, { to: 'string' });
-        const encoded = btoa(String.fromCharCode(...val));
-				
-        const linkUrl = new URL(window.location.href);
-        linkUrl.hash = encoded;
-				navigator.clipboard.writeText(linkUrl.toString());
-				alert('Current settings copied to clipboard!');
-			});
-		});
-  }
+	addWarning(warning: SimWarning) {
+		this.warnings.push(warning);
+		warning.updateOn.on(() => this.updateWarnings());
+	}
 
-  registerExclusiveEffect(effect: ExclusiveEffect) {
-    effect.tags.forEach(tag => {
-      this.exclusivityMap[tag].push(effect);
+	// Returns a key suitable for the browser's localStorage feature.
+	abstract getStorageKey(postfix: string): string;
 
-      effect.changedEvent.on(() => {
-        if (!effect.isActive())
-          return;
-
-        this.exclusivityMap[tag].forEach(otherEffect => {
-          if (otherEffect == effect || !otherEffect.isActive())
-            return;
-
-          otherEffect.deactivate();
-        });
-      });
-    });
-  }
-
-	getSavedGearStorageKey(): string {
-		return this.getStorageKey(SAVED_GEAR_STORAGE_KEY);
+	getSettingsStorageKey(): string {
+		return this.getStorageKey('__currentSettings__');
 	}
 
 	getSavedEncounterStorageKey(): string {
-		return this.getStorageKey(SAVED_ENCOUNTER_STORAGE_KEY);
+		// By skipping the call to this.getStorageKey(), saved encounters will be
+		// shared across all sims.
+		return 'sharedData__savedEncounter__';
 	}
 
-	getSavedRotationStorageKey(): string {
-		return this.getStorageKey(SAVED_ROTATION_STORAGE_KEY);
+	isIndividualSim(): boolean {
+		return this.rootElem.classList.contains('individual-sim-ui');
 	}
-
-	getSavedSettingsStorageKey(): string {
-		return this.getStorageKey(SAVED_SETTINGS_STORAGE_KEY);
-	}
-
-	getSavedTalentsStorageKey(): string {
-		return this.getStorageKey(SAVED_TALENTS_STORAGE_KEY);
-	}
-
-	// Returns the actual key to use for local storage, based on the given key part and the site context.
-	private getStorageKey(keyPart: string): string {
-		// Local storage is shared by all sites under the same domain, so we need to use
-		// different keys for each spec site.
-		return specToLocalStorageKey[this.player.spec] + keyPart;
-	}
-
-  makeCurrentIndividualSimRequest(iterations: number, debug: boolean): IndividualSimRequest {
-		const encounter = this.sim.getEncounter();
-		const numTargets = Math.max(1, this.sim.getNumTargets());
-		for (let i = 0; i < numTargets; i++) {
-			encounter.targets.push(this.target.toProto());
-		}
-
-    return makeIndividualSimRequest(
-      this.sim.getRaidBuffs(),
-      this.sim.getPartyBuffs(),
-      this.sim.getIndividualBuffs(),
-      this.player.getConsumes(),
-      this.player.getCustomStats(),
-      encounter,
-      this.player.getGear(),
-      this.player.getRace(),
-      this.player.getRotation(),
-      this.player.getTalents(),
-      this.player.getSpecOptions(),
-      iterations,
-      debug);
-  }
 }
 
-export type ExclusivityTag =
-    'Battle Elixir'
-    | 'Drums'
-    | 'Food'
-    | 'Alchohol'
-    | 'Guardian Elixir'
-    | 'Potion'
-    | 'Rune'
-    | 'Weapon Imbue';
-
-export interface ExclusiveEffect {
-  tags: Array<ExclusivityTag>;
-  changedEvent: TypedEvent<any>;
-  isActive: () => boolean;
-  deactivate: () => void;
-}
+const simHTML = `
+<div class="sim-root">
+  <section class="sim-sidebar">
+    <div class="sim-sidebar-title"></div>
+    <div class="sim-sidebar-actions within-raid-sim-hide"></div>
+    <div class="sim-sidebar-results within-raid-sim-hide">
+      <div class="results-pending">
+        <div class="loader"></div>
+      </div>
+      <div class="results-content">
+      </div>
+		</div>
+    <div class="sim-sidebar-footer"></div>
+  </section>
+  <section class="sim-main">
+		<div class="sim-toolbar">
+			<ul class="sim-tabs nav nav-tabs">
+				<li class="sim-top-bar">
+					<span class="warnings fa fa-exclamation-triangle"></span>
+					<div class="known-issues">Known Issues</div>
+				</li>
+			</ul>
+    </div>
+    <div class="tab-content">
+    </div>
+  </section>
+</div>
+`;

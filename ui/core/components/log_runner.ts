@@ -1,14 +1,10 @@
-import { IndividualSimRequest } from '/tbc/core/proto/api.js';
-import { Stat } from '/tbc/core/proto/common.js';
-import { StatWeightsRequest } from '/tbc/core/proto/api.js';
 import { SimUI } from '/tbc/core/sim_ui.js';
+import { EventID, TypedEvent } from '/tbc/core/typed_event.js';
 
 import { Component } from './component.js';
-import { DetailedResults } from './detailed_results.js';
-import { Results } from './results.js';
 
 export class LogRunner extends Component {
-  constructor(parent: HTMLElement, simUI: SimUI<any>, results: Results, detailedResults: DetailedResults) {
+  constructor(parent: HTMLElement, simUI: SimUI) {
     super(parent, 'log-runner-root');
 
 		const controlBar = document.createElement('div');
@@ -16,8 +12,8 @@ export class LogRunner extends Component {
 		this.rootElem.appendChild(controlBar);
 
     const simButton = document.createElement('button');
-    simButton.classList.add('log-runner-button');
-    simButton.textContent = 'Sim once with logs';
+    simButton.classList.add('log-runner-button', 'sim-button');
+    simButton.textContent = 'SIM 1 ITERATION';
     controlBar.appendChild(simButton);
 
 		const logsDiv = document.createElement('div');
@@ -25,21 +21,23 @@ export class LogRunner extends Component {
 		this.rootElem.appendChild(logsDiv);
 
     simButton.addEventListener('click', async () => {
-      const simRequest = simUI.makeCurrentIndividualSimRequest(1, true);
+			simUI.setResultsPending();
+			try {
+				const result = await simUI.sim.runRaidSimWithLogs(TypedEvent.nextEventID());
+			} catch (e) {
+				simUI.hideAllResults();
+				alert(e);
+			}
+    });
 
-      results.setPending();
-      detailedResults.setPending();
-      const result = await simUI.sim.individualSim(simRequest);
-      results.setSimResult(simRequest, result);
-      detailedResults.setSimResult(simRequest, result);
-
-			const lines = result.logs.split('\n');
+		simUI.sim.simResultEmitter.on((eventID, simResult) => {
+			const logs = simResult.getLogs();
 			logsDiv.textContent = '';
-			lines.forEach(line => {
+			logs.forEach(log => {
 				const lineElem = document.createElement('span');
-				lineElem.textContent = line;
+				lineElem.textContent = log;
 				logsDiv.appendChild(lineElem);
 			});
-    });
+		});
   }
 }

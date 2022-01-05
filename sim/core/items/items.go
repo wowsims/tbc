@@ -43,6 +43,13 @@ func init() {
 		{Name: "Ravager's Cuffs of Frozen Wrath", WowheadID: 30684, ID: -13, Categories: []proto.ItemCategory{proto.ItemCategory_ItemCategoryCaster}, Type: proto.ItemType_ItemTypeWrist, ArmorType: proto.ArmorType_ArmorTypeCloth, Phase: 1, Quality: proto.ItemQuality_ItemQualityEpic, Stats: stats.Stats{stats.Armor: 85, stats.FrostSpellPower: 58}},
 		{Name: "Ravager's Cuffs of Shadow Wrath", WowheadID: 30684, ID: -14, Categories: []proto.ItemCategory{proto.ItemCategory_ItemCategoryCaster}, Type: proto.ItemType_ItemTypeWrist, ArmorType: proto.ArmorType_ArmorTypeCloth, Phase: 1, Quality: proto.ItemQuality_ItemQualityEpic, Stats: stats.Stats{stats.Armor: 85, stats.ShadowSpellPower: 58}},
 		{Name: "Ravager's Wrist-Wraps of Nature's Wrath", WowheadID: 30685, ID: -15, Categories: []proto.ItemCategory{proto.ItemCategory_ItemCategoryCaster}, Type: proto.ItemType_ItemTypeWrist, ArmorType: proto.ArmorType_ArmorTypeLeather, Phase: 1, Quality: proto.ItemQuality_ItemQualityEpic, Stats: stats.Stats{stats.Armor: 159, stats.NatureSpellPower: 58}},
+		{Name: "Flawless Wand of Shadow Wrath", WowheadID: 25295, ID: -16, Categories: []proto.ItemCategory{proto.ItemCategory_ItemCategoryCaster}, Type: proto.ItemType_ItemTypeRanged, RangedWeaponType: proto.RangedWeaponType_RangedWeaponTypeWand, Phase: 1, Quality: proto.ItemQuality_ItemQualityUncommon, Stats: stats.Stats{stats.ShadowSpellPower: 25}},
+		{Name: "Amber Cape of Shadow Wrath", WowheadID: 25043, ID: -17, Categories: []proto.ItemCategory{proto.ItemCategory_ItemCategoryCaster}, Type: proto.ItemType_ItemTypeBack, Phase: 1, Quality: proto.ItemQuality_ItemQualityUncommon, Stats: stats.Stats{stats.ShadowSpellPower: 45}},
+		{Name: "Illidari Cape of Shadow Wrath", WowheadID: 31201, ID: -18, Categories: []proto.ItemCategory{proto.ItemCategory_ItemCategoryCaster}, Type: proto.ItemType_ItemTypeBack, Phase: 1, Quality: proto.ItemQuality_ItemQualityRare, Stats: stats.Stats{stats.ShadowSpellPower: 47}},
+		{Name: "Elementalist Bracelets of Shadow Wrath", WowheadID: 24692, ID: -19, Categories: []proto.ItemCategory{proto.ItemCategory_ItemCategoryCaster}, Type: proto.ItemType_ItemTypeWrist, Phase: 1, Quality: proto.ItemQuality_ItemQualityUncommon, Stats: stats.Stats{stats.ShadowSpellPower: 45}},
+		{Name: "Amber Cape of Shadow Wrath", WowheadID: 25043, ID: -20, Categories: []proto.ItemCategory{proto.ItemCategory_ItemCategoryCaster}, Type: proto.ItemType_ItemTypeBack, Phase: 1, Quality: proto.ItemQuality_ItemQualityUncommon, Stats: stats.Stats{stats.ShadowSpellPower: 45}},
+		{Name: "Elementalist Gloves of Shadow Wrath", WowheadID: 24688, ID: -21, Categories: []proto.ItemCategory{proto.ItemCategory_ItemCategoryCaster}, Type: proto.ItemType_ItemTypeHands, Phase: 1, Quality: proto.ItemQuality_ItemQualityUncommon, Stats: stats.Stats{stats.ShadowSpellPower: 60}},
+		{Name: "Nethersteel-Lined Handwraps of Shadow Wrath", WowheadID: 31166, ID: -22, Categories: []proto.ItemCategory{proto.ItemCategory_ItemCategoryCaster}, Type: proto.ItemType_ItemTypeHands, Phase: 1, Quality: proto.ItemQuality_ItemQualityRare, Stats: stats.Stats{stats.ShadowSpellPower: 62}},
 	}...)
 
 	for _, v := range Items {
@@ -56,13 +63,17 @@ func init() {
 }
 
 type Item struct {
-	ID               int32
-	WowheadID        int32
-	Type             proto.ItemType
-	ArmorType        proto.ArmorType
+	ID        int32
+	WowheadID int32
+	Type      proto.ItemType
+	ArmorType proto.ArmorType
+	// Weapon Stats
 	WeaponType       proto.WeaponType
 	HandType         proto.HandType
 	RangedWeaponType proto.RangedWeaponType
+	WeaponDamageMin  float64
+	WeaponDamageMax  float64
+	SwingSpeed       float64
 
 	// Used by the UI to filter which items are shown.
 	Categories     []proto.ItemCategory
@@ -105,25 +116,39 @@ func (item Item) ToProto() *proto.Item {
 	}
 }
 
+func (item Item) ToItemSpecProto() *proto.ItemSpec {
+	itemSpec := &proto.ItemSpec{
+		Id:      item.ID,
+		Enchant: item.Enchant.ID,
+		Gems:    []int32{},
+	}
+	for _, gem := range item.Gems {
+		itemSpec.Gems = append(itemSpec.Gems, gem.ID)
+	}
+	return itemSpec
+}
+
 type Enchant struct {
-	ID         int32 // ID of the enchant item.
-	EffectID   int32 // Used by UI to apply effect to tooltip
-	Name       string
-	Quality    proto.ItemQuality
-	Bonus      stats.Stats
-	ItemType   proto.ItemType // which slot does the enchant go on.
-	HandType   proto.HandType // If ItemType is weapon, check hand type / weapon type
-	WeaponType proto.WeaponType
+	ID          int32 // ID of the enchant item.
+	EffectID    int32 // Used by UI to apply effect to tooltip
+	Name        string
+	IsSpellID   bool
+	Quality     proto.ItemQuality
+	Bonus       stats.Stats
+	ItemType    proto.ItemType    // Which slot the enchant goes on.
+	EnchantType proto.EnchantType // Additional category when ItemType isn't enough.
 }
 
 func (enchant Enchant) ToProto() *proto.Enchant {
 	return &proto.Enchant{
-		Id:       enchant.ID,
-		EffectId: enchant.EffectID,
-		Name:     enchant.Name,
-		Type:     enchant.ItemType,
-		Stats:    enchant.Bonus[:],
-		Quality:  enchant.Quality,
+		Id:          enchant.ID,
+		EffectId:    enchant.EffectID,
+		Name:        enchant.Name,
+		IsSpellId:   enchant.IsSpellID,
+		Type:        enchant.ItemType,
+		EnchantType: enchant.EnchantType,
+		Stats:       enchant.Bonus[:],
+		Quality:     enchant.Quality,
 	}
 }
 
@@ -158,6 +183,51 @@ type ItemSpec struct {
 
 type Equipment [proto.ItemSlot_ItemSlotRanged + 1]Item
 
+func (equipment *Equipment) EquipItem(item Item) {
+	if item.Type == proto.ItemType_ItemTypeFinger {
+		if equipment[ItemSlotFinger1].Name == "" {
+			equipment[ItemSlotFinger1] = item
+		} else {
+			equipment[ItemSlotFinger2] = item
+		}
+	} else if item.Type == proto.ItemType_ItemTypeTrinket {
+		if equipment[ItemSlotTrinket1].Name == "" {
+			equipment[ItemSlotTrinket1] = item
+		} else {
+			equipment[ItemSlotTrinket2] = item
+		}
+	} else if item.Type == proto.ItemType_ItemTypeWeapon {
+		if item.WeaponType == proto.WeaponType_WeaponTypeShield && equipment[ItemSlotMainHand].HandType != proto.HandType_HandTypeTwoHand {
+			equipment[ItemSlotOffHand] = item
+		} else if item.HandType == proto.HandType_HandTypeMainHand || item.HandType == proto.HandType_HandTypeUnknown {
+			equipment[ItemSlotMainHand] = item
+		} else if item.HandType == proto.HandType_HandTypeTwoHand {
+			equipment[ItemSlotMainHand] = item
+			equipment[ItemSlotOffHand] = Item{} // clear offhand
+		} else if item.HandType == proto.HandType_HandTypeOffHand && equipment[ItemSlotMainHand].HandType != proto.HandType_HandTypeTwoHand {
+			equipment[ItemSlotOffHand] = item
+		} else if item.HandType == proto.HandType_HandTypeOneHand {
+			if equipment[ItemSlotMainHand].ID == 0 {
+				equipment[ItemSlotMainHand] = item
+			} else if equipment[ItemSlotOffHand].ID == 0 {
+				equipment[ItemSlotOffHand] = item
+			}
+		}
+	} else {
+		equipment[ItemTypeToSlot(item.Type)] = item
+	}
+}
+
+func (equipment *Equipment) ToEquipmentSpecProto() *proto.EquipmentSpec {
+	equipSpec := &proto.EquipmentSpec{
+		Items: []*proto.ItemSpec{},
+	}
+	for _, item := range equipment {
+		equipSpec.Items = append(equipSpec.Items, item.ToItemSpecProto())
+	}
+	return equipSpec
+}
+
 // Structs used for looking up items/gems/enchants
 type EquipmentSpec [proto.ItemSlot_ItemSlotRanged + 1]ItemSpec
 
@@ -176,69 +246,45 @@ func ProtoToEquipmentSpec(es proto.EquipmentSpec) EquipmentSpec {
 	return coreEquip
 }
 
+func NewItem(itemSpec ItemSpec) Item {
+	item := Item{}
+	if foundItem, ok := ByID[itemSpec.ID]; ok {
+		item = foundItem
+	} else {
+		panic(fmt.Sprintf("No item with id: %d", itemSpec.ID))
+	}
+
+	if itemSpec.Enchant != 0 {
+		if enchant, ok := EnchantsByID[itemSpec.Enchant]; ok {
+			item.Enchant = enchant
+		} else {
+			panic(fmt.Sprintf("No enchant with id: %d", itemSpec.Enchant))
+		}
+	}
+
+	if len(itemSpec.Gems) > 0 {
+		item.Gems = make([]Gem, len(item.GemSockets))
+		for gemIdx, gemID := range itemSpec.Gems {
+			if gemIdx >= len(item.GemSockets) {
+				break // in case we get invalid gem settings.
+			}
+			if gem, ok := GemsByID[gemID]; ok {
+				item.Gems[gemIdx] = gem
+			} else {
+				if gemID != 0 {
+					panic(fmt.Sprintf("No gem with id: %d", gemID))
+				}
+			}
+		}
+	}
+	return item
+}
+
 func NewEquipmentSet(equipSpec EquipmentSpec) Equipment {
 	equipment := Equipment{}
-
 	for _, itemSpec := range equipSpec {
-		item := Item{}
-		if foundItem, ok := ByID[itemSpec.ID]; ok {
-			item = foundItem
-		} else {
-			if itemSpec.ID != 0 {
-				panic(fmt.Sprintf("No item with id: %d", itemSpec.ID))
-			}
-			continue
-		}
-
-		if itemSpec.Enchant != 0 {
-			if enchant, ok := EnchantsByID[itemSpec.Enchant]; ok {
-				item.Enchant = enchant
-			} else {
-				panic(fmt.Sprintf("No enchant with id: %d", itemSpec.Enchant))
-			}
-		}
-
-		if len(itemSpec.Gems) > 0 {
-			item.Gems = make([]Gem, len(item.GemSockets))
-			for gemIdx, gemID := range itemSpec.Gems {
-				if gemIdx >= len(item.GemSockets) {
-					break // in case we get invalid gem settings.
-				}
-				if gem, ok := GemsByID[gemID]; ok {
-					item.Gems[gemIdx] = gem
-				} else {
-					if gemID != 0 {
-						panic(fmt.Sprintf("No gem with id: %d", gemID))
-					}
-				}
-			}
-		}
-
-		if item.Type == proto.ItemType_ItemTypeFinger {
-			if equipment[ItemSlotFinger1].Name == "" {
-				equipment[ItemSlotFinger1] = item
-			} else {
-				equipment[ItemSlotFinger2] = item
-			}
-		} else if item.Type == proto.ItemType_ItemTypeTrinket {
-			if equipment[ItemSlotTrinket1].Name == "" {
-				equipment[ItemSlotTrinket1] = item
-			} else {
-				equipment[ItemSlotTrinket2] = item
-			}
-		} else if item.Type == proto.ItemType_ItemTypeWeapon {
-			if item.WeaponType == proto.WeaponType_WeaponTypeShield && equipment[ItemSlotMainHand].HandType != proto.HandType_HandTypeTwoHand {
-				equipment[ItemSlotOffHand] = item
-			} else if item.HandType == proto.HandType_HandTypeMainHand || item.HandType == proto.HandType_HandTypeUnknown {
-				equipment[ItemSlotMainHand] = item
-			} else if item.HandType == proto.HandType_HandTypeTwoHand {
-				equipment[ItemSlotMainHand] = item
-				equipment[ItemSlotOffHand] = Item{} // clear offhand
-			} else if item.HandType == proto.HandType_HandTypeOffHand && equipment[ItemSlotMainHand].HandType != proto.HandType_HandTypeTwoHand {
-				equipment[ItemSlotOffHand] = item
-			}
-		} else {
-			equipment[ItemTypeToSlot(item.Type)] = item
+		if itemSpec.ID != 0 {
+			equipment.EquipItem(NewItem(itemSpec))
 		}
 	}
 	return equipment
@@ -263,7 +309,7 @@ func EquipmentSpecFromStrings(itemStringSpecs []ItemStringSpec) *proto.Equipment
 	for i, itemStringSpec := range itemStringSpecs {
 		item := ByName[itemStringSpec.Name]
 		if item.ID == 0 {
-			log.Fatalf("Item not found: %s", itemStringSpec.Name)
+			log.Fatalf("Item not found: %#v", itemStringSpec)
 		}
 		itemSpec := &proto.ItemSpec{
 			Id: item.ID,

@@ -1,12 +1,13 @@
-import { IconInput } from '/tbc/core/components/icon_picker.js';
+import { IconPickerConfig } from '/tbc/core/components/icon_picker.js';
 import { ElementalShaman_Rotation_RotationType as RotationType } from '/tbc/core/proto/shaman.js';
 import { ElementalShaman_Options as ShamanOptions } from '/tbc/core/proto/shaman.js';
 import { Spec } from '/tbc/core/proto/common.js';
-import { ItemOrSpellId } from '/tbc/core/resources.js';
+import { ItemOrSpellId } from '/tbc/core/proto_utils/action_id.js';
 import { Player } from '/tbc/core/player.js';
 import { Sim } from '/tbc/core/sim.js';
-import { SimUI } from '/tbc/core/sim_ui.js';
+import { IndividualSimUI } from '/tbc/core/individual_sim_ui.js';
 import { Target } from '/tbc/core/target.js';
+import { EventID, TypedEvent } from '/tbc/core/typed_event.js';
 
 // Configuration for spec-specific UI elements on the settings tab.
 // These don't need to be in a separate file but it keeps things cleaner.
@@ -21,7 +22,7 @@ export const ElementalShamanRotationConfig = {
 	inputs: [
 		{
 			type: 'enum' as const, cssClass: 'rotation-enum-picker',
-			getModObject: (simUI: SimUI<any>) => simUI.player,
+			getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
 			config: {
 				label: 'Type',
 				values: [
@@ -48,26 +49,26 @@ export const ElementalShamanRotationConfig = {
 				],
 				changedEvent: (player: Player<Spec.SpecElementalShaman>) => player.rotationChangeEmitter,
 				getValue: (player: Player<Spec.SpecElementalShaman>) => player.getRotation().type,
-				setValue: (player: Player<Spec.SpecElementalShaman>, newValue: number) => {
+				setValue: (eventID: EventID, player: Player<Spec.SpecElementalShaman>, newValue: number) => {
 					const newRotation = player.getRotation();
 					newRotation.type = newValue;
-					player.setRotation(newRotation);
+					player.setRotation(eventID, newRotation);
 				},
 			},
 		},
 		{
 			type: 'number' as const,
 			cssClass: 'num-lbs-per-cl-picker',
-			getModObject: (simUI: SimUI<any>) => simUI.player,
+			getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
 			config: {
 				label: 'LBs per CL',
 				labelTooltip: 'The number of Lightning Bolts to cast between each Chain Lightning. Only used if Rotation is set to \'Fixed LB+CL\'.',
 				changedEvent: (player: Player<Spec.SpecElementalShaman>) => player.rotationChangeEmitter,
 				getValue: (player: Player<Spec.SpecElementalShaman>) => player.getRotation().lbsPerCl,
-				setValue: (player: Player<Spec.SpecElementalShaman>, newValue: number) => {
+				setValue: (eventID: EventID, player: Player<Spec.SpecElementalShaman>, newValue: number) => {
 					const newRotation = player.getRotation();
 					newRotation.lbsPerCl = newValue;
-					player.setRotation(newRotation);
+					player.setRotation(eventID, newRotation);
 				},
 				enableWhen: (player: Player<Spec.SpecElementalShaman>) => player.getRotation().type == RotationType.FixedLBCL,
 			},
@@ -75,16 +76,16 @@ export const ElementalShamanRotationConfig = {
 	],
 };
 
-function makeBooleanShamanBuffInput(id: ItemOrSpellId, optionsFieldName: keyof ShamanOptions): IconInput<Player<any>> {
+function makeBooleanShamanBuffInput(id: ItemOrSpellId, optionsFieldName: keyof ShamanOptions): IconPickerConfig<Player<any>, boolean> {
   return {
     id: id,
     states: 2,
 		changedEvent: (player: Player<Spec.SpecElementalShaman>) => player.specOptionsChangeEmitter,
-		getValue: (player: Player<Spec.SpecElementalShaman>) => player.getSpecOptions()[optionsFieldName],
-		setBooleanValue: (player: Player<Spec.SpecElementalShaman>, newValue: boolean) => {
+		getValue: (player: Player<Spec.SpecElementalShaman>) => player.getSpecOptions()[optionsFieldName] as boolean,
+		setValue: (eventID: EventID, player: Player<Spec.SpecElementalShaman>, newValue: boolean) => {
 			const newOptions = player.getSpecOptions();
       (newOptions[optionsFieldName] as boolean) = newValue;
-			player.setSpecOptions(newOptions);
+			player.setSpecOptions(eventID, newOptions);
 		},
   }
 }

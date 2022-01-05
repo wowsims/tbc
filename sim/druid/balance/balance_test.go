@@ -12,116 +12,95 @@ func init() {
 	RegisterBalanceDruid()
 }
 
-func TestNordBonus(t *testing.T) {
-	core.IndividualSimAllEncountersTest(core.AllEncountersTestOptions{
-		Label: "phase2-nordbonus",
-		T:     t,
-
-		Inputs: core.IndividualSimInputs{
-			RaidBuffs:       FullRaidBuffs,
-			PartyBuffs:      FullPartyBuffs,
-			IndividualBuffs: FullIndividualBuffs,
-
-			Consumes: FullConsumes,
-			Target:   FullDebuffTarget,
-			Race:     proto.Race_RaceTauren,
-			Class:    proto.Class_ClassDruid,
-
-			PlayerOptions: PlayerOptionsStarfire,
-			Gear:          P2Gear,
+func TestAllSettings(t *testing.T) {
+	core.RunTestSuite(t, t.Name(), &core.SettingsCombos{
+		Class: proto.Class_ClassDruid,
+		Races: []core.RaceCombo{
+			core.RaceCombo{Label: "Tauren", Race: proto.Race_RaceTauren},
 		},
-
-		ExpectedDpsShort: 1538.2,
-		ExpectedDpsLong:  1467.9,
+		GearSets: []core.GearSetCombo{
+			core.GearSetCombo{Label: "P1", GearSet: P1Gear},
+			core.GearSetCombo{Label: "P2", GearSet: P2Gear},
+		},
+		SpecOptions: []core.SpecOptionsCombo{
+			core.SpecOptionsCombo{Label: "Wrath", SpecOptions: PlayerOptionsWrath},
+			core.SpecOptionsCombo{Label: "Starfire", SpecOptions: PlayerOptionsStarfire},
+			core.SpecOptionsCombo{Label: "Adaptive", SpecOptions: PlayerOptionsAdaptive},
+		},
+		Buffs: []core.BuffsCombo{
+			core.BuffsCombo{
+				Label: "NoBuffs",
+			},
+			core.BuffsCombo{
+				Label:    "FullBuffs",
+				Raid:     FullRaidBuffs,
+				Party:    FullPartyBuffs,
+				Player:   FullIndividualBuffs,
+				Consumes: FullConsumes,
+			},
+		},
+		Encounters: core.MakeDefaultEncounterCombos(FullDebuffs),
+		SimOptions: core.DefaultSimTestOptions,
 	})
 }
 
-func TestSimulateP1Starfire(t *testing.T) {
-	core.IndividualSimAllEncountersTest(core.AllEncountersTestOptions{
-		Label: "phase1-starfire",
-		T:     t,
-
-		Inputs: core.IndividualSimInputs{
-			RaidBuffs:       FullRaidBuffs,
-			PartyBuffs:      FullPartyBuffs,
-			IndividualBuffs: FullIndividualBuffs,
-
-			Consumes: FullConsumes,
-			Target:   FullDebuffTarget,
-			Race:     proto.Race_RaceTauren,
-			Class:    proto.Class_ClassDruid,
-
-			PlayerOptions: PlayerOptionsStarfire,
-			Gear:          P1Gear,
+func TestAllItemEffects(t *testing.T) {
+	core.RunTestSuite(t, t.Name(), &core.ItemsTestGenerator{
+		Player: &proto.Player{
+			Race:      proto.Race_RaceNightElf,
+			Class:     proto.Class_ClassDruid,
+			Spec:      PlayerOptionsStarfire,
+			Equipment: P2Gear,
+			Consumes:  FullConsumes,
+			Buffs:     FullIndividualBuffs,
 		},
+		RaidBuffs:  FullRaidBuffs,
+		PartyBuffs: FullPartyBuffs,
+		Encounter:  core.MakeSingleTargetFullDebuffEncounter(FullDebuffs),
+		SimOptions: core.DefaultSimTestOptions,
 
-		ExpectedDpsShort: 1413.4,
-		ExpectedDpsLong:  1302.9,
-	})
-}
-
-func TestSimulateP1Wrath(t *testing.T) {
-	core.IndividualSimAllEncountersTest(core.AllEncountersTestOptions{
-		Label: "phase1-wrath",
-		T:     t,
-
-		Inputs: core.IndividualSimInputs{
-			RaidBuffs:       FullRaidBuffs,
-			PartyBuffs:      FullPartyBuffs,
-			IndividualBuffs: FullIndividualBuffs,
-
-			Consumes: FullConsumes,
-			Target:   FullDebuffTarget,
-			Race:     proto.Race_RaceTauren,
-			Class:    proto.Class_ClassDruid,
-
-			PlayerOptions: PlayerOptionsWrath,
-			Gear:          P1Gear,
+		ItemFilter: core.ItemFilter{
+			Categories: []proto.ItemCategory{
+				proto.ItemCategory_ItemCategoryCaster,
+			},
+			ArmorTypes: []proto.ArmorType{
+				proto.ArmorType_ArmorTypeUnknown,
+				proto.ArmorType_ArmorTypeCloth,
+				proto.ArmorType_ArmorTypeLeather,
+			},
+			RangedWeaponTypes: []proto.RangedWeaponType{
+				proto.RangedWeaponType_RangedWeaponTypeIdol,
+			},
 		},
-
-		ExpectedDpsShort: 1258.0,
-		ExpectedDpsLong:  1141.1,
-	})
-}
-
-func TestAdaptive(t *testing.T) {
-	core.IndividualSimAllEncountersTest(core.AllEncountersTestOptions{
-		Label: "phase2-adaptive",
-		T:     t,
-
-		Inputs: core.IndividualSimInputs{
-			RaidBuffs:       BasicRaidBuffs,
-			PartyBuffs:      BasicPartyBuffs,
-			IndividualBuffs: BasicIndividualBuffs,
-
-			Consumes: BasicConsumes,
-			Target:   FullDebuffTarget,
-			Race:     proto.Race_RaceTauren,
-			Class:    proto.Class_ClassDruid,
-
-			PlayerOptions: PlayerOptionsAdaptive,
-			Gear:          P2Gear,
-		},
-
-		ExpectedDpsShort: 1569.7,
-		ExpectedDpsLong:  1083.0,
 	})
 }
 
 func TestAverageDPS(t *testing.T) {
-	isr := core.NewIndividualSimRequest(core.IndividualSimInputs{
-		Gear:     P1Gear,
-		Race:     proto.Race_RaceNightElf,
-		Class:    proto.Class_ClassDruid,
-		Consumes: FullConsumes,
-
-		RaidBuffs:       FullRaidBuffs,
-		PartyBuffs:      FullPartyBuffs,
-		IndividualBuffs: FullIndividualBuffs,
-
-		Target:        FullDebuffTarget,
-		PlayerOptions: PlayerOptionsStarfire,
+	core.RunTestSuite(t, t.Name(), &core.SettingsCombos{
+		Class: proto.Class_ClassDruid,
+		Races: []core.RaceCombo{
+			core.RaceCombo{Label: "Tauren", Race: proto.Race_RaceTauren},
+		},
+		GearSets: []core.GearSetCombo{
+			core.GearSetCombo{Label: "P1", GearSet: P1Gear},
+			core.GearSetCombo{Label: "P2", GearSet: P2Gear},
+		},
+		SpecOptions: []core.SpecOptionsCombo{
+			core.SpecOptionsCombo{Label: "Adaptive", SpecOptions: PlayerOptionsAdaptive},
+		},
+		Buffs: []core.BuffsCombo{
+			core.BuffsCombo{
+				Label: "NoBuffs",
+			},
+			core.BuffsCombo{
+				Label:    "FullBuffs",
+				Raid:     FullRaidBuffs,
+				Party:    FullPartyBuffs,
+				Player:   FullIndividualBuffs,
+				Consumes: FullConsumes,
+			},
+		},
+		Encounters: core.MakeAverageDefaultEncounterCombos(FullDebuffs),
+		SimOptions: core.AverageDefaultSimTestOptions,
 	})
-
-	core.IndividualSimAverageTest("P1Average", t, isr, 1258.8)
 }

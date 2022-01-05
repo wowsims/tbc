@@ -1,15 +1,21 @@
-import { IndividualSimRequest, IndividualSimResult } from '/tbc/core/proto/api.js';
-import { IndividualSimData } from '/tbc/core/components/detailed_results.js';
+import { RaidSimRequest, RaidSimResult } from '/tbc/core/proto/api.js';
+import { SimResult, SimResultFilter } from '/tbc/core/proto_utils/sim_result.js';
 import { Component } from '/tbc/core/components/component.js';
-import { TypedEvent } from '/tbc/core/typed_event.js';
+import { EventID, TypedEvent } from '/tbc/core/typed_event.js';
 
 import { ColorSettings } from './color_settings.js';
 
-export type ResultComponentConfig = {
+export interface SimResultData {
+	eventID: EventID,
+	result: SimResult,
+	filter: SimResultFilter,
+};
+
+export interface ResultComponentConfig {
 	parent: HTMLElement,
 	rootCssClass?: string,
-	resultsEmitter: TypedEvent<IndividualSimData | null>;
-	colorSettings: ColorSettings;
+	resultsEmitter: TypedEvent<SimResultData | null>,
+	colorSettings: ColorSettings,
 };
 
 export abstract class ResultComponent extends Component {
@@ -19,13 +25,13 @@ export abstract class ResultComponent extends Component {
     super(config.parent, config.rootCssClass || '');
 		this.colorSettings = config.colorSettings;
 
-		config.resultsEmitter.on(simData => {
-			if (!simData)
+		config.resultsEmitter.on((eventID, resultData) => {
+			if (!resultData)
 				return;
 
-			this.onSimResult(simData.request, simData.result);
+			this.onSimResult(resultData);
 		});
 	}
 
-	abstract onSimResult(request: IndividualSimRequest, result: IndividualSimResult): void;
+	abstract onSimResult(resultData: SimResultData): void;
 }

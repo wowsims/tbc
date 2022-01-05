@@ -32,26 +32,11 @@ func GetGearList(request *proto.GearListRequest) *proto.GearListResult {
 /**
  * Returns character stats taking into account gear / buffs / consumes / etc
  */
-func ComputeStats(request *proto.ComputeStatsRequest) *proto.ComputeStatsResult {
-	agent := NewAgent(*request.Player, proto.IndividualSimRequest{
-		Player: request.Player,
-		RaidBuffs: request.RaidBuffs,
-		PartyBuffs: request.PartyBuffs,
-		IndividualBuffs: request.IndividualBuffs,
-	})
-
-	raid := NewRaid(*request.RaidBuffs, *request.PartyBuffs, *request.IndividualBuffs)
-	raid.AddPlayer(agent)
-	raid.Finalize()
-
-	gearStats := agent.GetCharacter().Equip.Stats()
-	finalStats := agent.GetCharacter().GetStats()
-	setBonusNames := agent.GetCharacter().GetActiveSetBonusNames()
+func ComputeStats(csr *proto.ComputeStatsRequest) *proto.ComputeStatsResult {
+	raid := NewRaid(*csr.Raid)
 
 	return &proto.ComputeStatsResult{
-		GearOnly:   gearStats[:],
-		FinalStats: finalStats[:],
-		Sets:       setBonusNames,
+		RaidStats: raid.GetStats(),
 	}
 }
 
@@ -61,7 +46,7 @@ func ComputeStats(request *proto.ComputeStatsRequest) *proto.ComputeStatsResult 
 func StatWeights(request *proto.StatWeightsRequest) *proto.StatWeightsResult {
 	statsToWeigh := stats.ProtoArrayToStatsList(request.StatsToWeigh)
 
-	result := CalcStatWeight(*request.Options, statsToWeigh, stats.Stat(request.EpReferenceStat))
+	result := CalcStatWeight(*request, statsToWeigh, stats.Stat(request.EpReferenceStat))
 
 	return &proto.StatWeightsResult{
 		Weights:       result.Weights[:],
@@ -72,9 +57,25 @@ func StatWeights(request *proto.StatWeightsRequest) *proto.StatWeightsResult {
 }
 
 /**
- * Runs multiple iterations of the sim with a single set of options / gear.
+ * Runs multiple iterations of the sim with just 1 player.
  */
 func RunIndividualSim(request *proto.IndividualSimRequest) *proto.IndividualSimResult {
-	sim := NewIndividualSim(*request)
-	return sim.RunIndividual()
+	raidResult := RunRaidSim(&proto.RaidSimRequest{
+		Raid:       SinglePlayerRaidProto(request.Player, request.PartyBuffs, request.RaidBuffs),
+		Encounter:  request.Encounter,
+		SimOptions: request.SimOptions,
+	})
+
+	return &proto.IndividualSimResult{
+		PlayerMetrics:    raidResult.RaidMetrics.Parties[0].Players[0],
+		EncounterMetrics: raidResult.EncounterMetrics,
+		Logs:             raidResult.Logs,
+	}
+}
+
+/**
+ * Runs multiple iterations of the sim with a full raid.
+ */
+func RunRaidSim(request *proto.RaidSimRequest) *proto.RaidSimResult {
+	return RunSim(*request)
 }

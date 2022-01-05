@@ -1,6 +1,7 @@
 package core
 
 import (
+	"fmt"
 	"time"
 )
 
@@ -11,7 +12,7 @@ import (
 //
 // This struct holds additional inputs beyond what a SpellEffect already contains,
 // which are necessary for a direct spell damage calculation.
-type DirectDamageSpellInput struct {
+type DirectDamageInput struct {
 	MinBaseDamage float64
 	MaxBaseDamage float64
 
@@ -34,6 +35,11 @@ type MultiTargetDirectDamageSpell struct {
 
 func (spell *MultiTargetDirectDamageSpell) Init(sim *Simulation) {
 	spell.SpellCast.init(sim)
+	for effectIdx := range spell.Effects {
+		if spell.Effects[effectIdx].DotInput.NumberOfTicks > 0 {
+			spell.Effects[effectIdx].DotInput.init(&spell.SpellCast)
+		}
+	}
 }
 
 // TODO: If there are multiple Effects.DotEffect then each one will apply to the metrics (creating too high of a resulting DPS)
@@ -81,12 +87,25 @@ type SimpleSpell struct {
 
 	// Individual direct damage effect of this spell.
 	SpellHitEffect
+
+	IsChannel bool
 }
 
 // Init will call any 'OnCast' effects associated with the caster and then apply spell haste to the cast.
 //  Init will panic if the spell or the GCD is still on CD.
 func (spell *SimpleSpell) Init(sim *Simulation) {
-	spell.init(sim)
+	spell.SpellCast.init(sim)
+	if spell.SpellHitEffect.DotInput.NumberOfTicks > 0 {
+		spell.SpellHitEffect.DotInput.init(&spell.SpellCast)
+	}
+}
+
+func (spell *SimpleSpell) GetDuration() time.Duration {
+	if spell.IsChannel {
+		return spell.SpellHitEffect.DotInput.FullDuration()
+	} else {
+		return spell.CastTime
+	}
 }
 
 func (spell *SimpleSpell) Cast(sim *Simulation) bool {
@@ -95,10 +114,15 @@ func (spell *SimpleSpell) Cast(sim *Simulation) bool {
 	})
 }
 
+func (spell *SimpleSpell) Cancel(sim *Simulation) {
+	spell.SpellCast.Cancel()
+	spell.SpellHitEffect.cancel(sim)
+}
+
 type SpellHitEffect struct {
 	SpellEffect
 	DotInput    DotDamageInput
-	DirectInput DirectDamageSpellInput
+	DirectInput DirectDamageInput
 }
 
 // applies the hit/miss/dmg effects to the spellCast
@@ -127,13 +151,20 @@ func (hitEffect *SpellHitEffect) apply(sim *Simulation, spellCast *SpellCast, ap
 		hitEffect.applyResultsToCast(spellCast)
 		if applyMetrics {
 			spellCast.Character.Metrics.AddSpellCast(spellCast)
+			if sim.Log != nil {
+				spellCast.Character.Log(sim, "Adding metrics for spell, damage: %0.02f, total: %0.02f", spellCast.TotalDamage, spellCast.Character.Metrics.TotalDamage)
+			}
 		}
 		spellCast.objectInUse = false
 	}
 	hitEffect.afterCalculations(sim, spellCast)
 }
 
-type OnDamageTick func(*Simulation)
+func (hitEffect *SpellHitEffect) cancel(sim *Simulation) {
+	if hitEffect.DotInput.currentDotAction != nil {
+		hitEffect.DotInput.currentDotAction.Cancel(sim)
+	}
+}
 
 // DotDamageInput is the data needed to kick of the dot ticking in pendingActions.
 //  For now the only way for a caster to track their dot is to keep a reference to the cast object
@@ -143,17 +174,64 @@ type DotDamageInput struct {
 	TickLength           time.Duration // time between each tick
 	TickBaseDamage       float64
 	TickSpellCoefficient float64
+	TicksCanMissAndCrit  bool // Allows individual ticks to hit/miss, and also crit.
 
-	OnDamageTick OnDamageTick // TODO: Do we need an OnExpire?
+	// If true, tick length will be shortened based on casting speed.
+	AffectedByCastSpeed bool
+
+	// Causes all modifications applied by callbacks to the initial damagePerTick
+	// value to be ignored.
+	IgnoreDamageModifiers bool
+
+	// Whether ticks can proc spell hit effects such as Judgement of Wisdom.
+	TicksProcSpellHitEffects bool
+
+	OnBeforePeriodicDamage OnBeforePeriodicDamage // Before-calculation logic for this dot.
+	OnPeriodicDamage       OnPeriodicDamage       // After-calculation logic for this dot.
+
+	// If both of these are set, will display uptime metrics for this dot.
+	DebuffID AuraID
+	SpellID  int32
 
 	// Internal fields
-	damagePerTick float64
+	startTime     time.Duration
 	finalTickTime time.Duration
+	damagePerTick float64
 	tickIndex     int
+
+	// The action currently used for this dot, or nil if not ticking.
+	currentDotAction *PendingAction
+}
+
+func (ddi *DotDamageInput) init(spellCast *SpellCast) {
+	if ddi.AffectedByCastSpeed {
+		ddi.TickLength = time.Duration(float64(ddi.TickLength) / spellCast.Character.CastSpeed())
+	}
+}
+
+// DamagePerTick returns the cached damage per tick on the spell.
+func (ddi DotDamageInput) DamagePerTick() float64 {
+	return ddi.damagePerTick
+}
+
+func (ddi DotDamageInput) FullDuration() time.Duration {
+	return ddi.TickLength * time.Duration(ddi.NumberOfTicks)
 }
 
 func (ddi DotDamageInput) TimeRemaining(sim *Simulation) time.Duration {
 	return MaxDuration(0, ddi.finalTickTime-sim.CurrentTime)
+}
+
+// Returns the remaining number of times this dot is expected to tick, assuming
+// it lasts for its full duration.
+func (ddi DotDamageInput) RemainingTicks() int {
+	return ddi.NumberOfTicks - ddi.tickIndex
+}
+
+// Returns the amount of additional damage this dot is expected to do, assuming
+// it lasts for its full duration.
+func (ddi DotDamageInput) RemainingDamage() float64 {
+	return float64(ddi.RemainingTicks()) * ddi.DamagePerTick()
 }
 
 func (ddi DotDamageInput) IsTicking(sim *Simulation) bool {
@@ -170,7 +248,7 @@ type SimpleSpellTemplate struct {
 
 func (template *SimpleSpellTemplate) Apply(newAction *SimpleSpell) {
 	if newAction.objectInUse {
-		panic("Damage over time spell already in use")
+		panic(fmt.Sprintf("Damage over time spell (%s) already in use", newAction.Name))
 	}
 	*newAction = template.template
 }

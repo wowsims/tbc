@@ -29,9 +29,10 @@ func (druid *Druid) newWrathTemplate(sim *core.Simulation) core.SimpleSpellTempl
 
 	effect := core.SpellHitEffect{
 		SpellEffect: core.SpellEffect{
-			DamageMultiplier: 1,
+			DamageMultiplier:       1,
+			StaticDamageMultiplier: 1,
 		},
-		DirectInput: core.DirectDamageSpellInput{
+		DirectInput: core.DirectDamageInput{
 			MinBaseDamage:    383,
 			MaxBaseDamage:    432,
 			SpellCoefficient: 0.571 + 0.02*float64(druid.Talents.WrathOfCenarius),
@@ -52,7 +53,7 @@ func (druid *Druid) newWrathTemplate(sim *core.Simulation) core.SimpleSpellTempl
 	// Convert to percent, multiply by percent increase, convert back to multiplier by adding 1
 	baseCast.CritMultiplier = (baseCast.CritMultiplier-1)*(1+float64(druid.Talents.Vengeance)*0.2) + 1
 	baseCast.ManaCost -= baseCast.BaseManaCost * float64(druid.Talents.Moonglow) * 0.03
-	effect.SpellEffect.DamageMultiplier *= 1 + 0.02*float64(druid.Talents.Moonfury)
+	effect.SpellEffect.StaticDamageMultiplier *= 1 + 0.02*float64(druid.Talents.Moonfury)
 
 	effect.OnSpellHit = druid.applyOnHitTalents
 	spCast := &core.SpellCast{

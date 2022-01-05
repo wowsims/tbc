@@ -1,10 +1,16 @@
+import { Consumes } from '/tbc/core/proto/common.js';
+import { Drums } from '/tbc/core/proto/common.js';
 import { EquipmentSpec } from '/tbc/core/proto/common.js';
 import { ItemSpec } from '/tbc/core/proto/common.js';
+import { Potions } from '/tbc/core/proto/common.js';
 import { Faction } from '/tbc/core/proto_utils/utils.js';
 import { Player } from '/tbc/core/player.js';
 
+import { ElementalShaman, ElementalShaman_Rotation as ElementalShamanRotation, ElementalShaman_Options as ElementalShamanOptions } from '/tbc/core/proto/shaman.js';
+import { ElementalShaman_Rotation_RotationType as RotationType } from '/tbc/core/proto/shaman.js';
+
 import * as Enchants from '/tbc/core/constants/enchants.js';
-import * as Gems from '/tbc/core/constants/gems.js';
+import * as Gems from '/tbc/core/proto_utils/gems.js';
 import * as Tooltips from '/tbc/core/constants/tooltips.js';
 
 // Preset options for this spec.
@@ -18,92 +24,28 @@ export const StandardTalents = {
 	data: '55030105100213351051--05105301005',
 };
 
-export const PRERAID_GEAR = {
-	name: 'PreRaid Gear',
-	gear: EquipmentSpec.create({
-		items: [
-			ItemSpec.create({
-				id: 28349, // Tidefury Helm
-				enchant: Enchants.GLYPH_OF_POWER,
-				gems: [
-					Gems.POTENT_NOBLE_TOPAZ,
-					Gems.CHAOTIC_SKYFIRE_DIAMOND,
-				],
-			}),
-			ItemSpec.create({
-				id: 28134, // Brooch of Heightened Potential
-			}),
-			ItemSpec.create({
-				id: 27802, // Tidefury Shoulderguards
-				enchant: Enchants.GREATER_INSCRIPTION_OF_DISCIPLINE,
-				gems: [
-					Gems.RUNED_LIVING_RUBY,
-					Gems.GLOWING_NIGHTSEYE,
-				],
-			}),
-			ItemSpec.create({
-				id: 28269, // Baba's Cloak of Arcanistry
-			}),
-			ItemSpec.create({
-				id: 28231, //Tidefury Chestpiece 
-				enchant: Enchants.CHEST_EXCEPTIONAL_STATS,
-				gems: [
-					Gems.GLOWING_NIGHTSEYE,
-					Gems.POTENT_NOBLE_TOPAZ,
-					Gems.POTENT_NOBLE_TOPAZ,
-				],
-			}),
-			ItemSpec.create({
-				id: 28174, // Shattrath Wraps
-				enchant: Enchants.WRIST_SPELLPOWER,
-				gems: [
-					Gems.RUNED_LIVING_RUBY,
-				],
-			}),
-			ItemSpec.create({
-				id: 27510, // Tidefury Gauntlets
-				enchant: Enchants.GLOVES_SPELLPOWER,
-			}),
-			ItemSpec.create({
-				id: 27783, // Moonrage Girdle
-			}),
-			ItemSpec.create({
-				id: 27909, // Tidefury Kilt
-				enchant: Enchants.RUNIC_SPELLTHREAD,
-			}),
-			ItemSpec.create({
-				id: 29313, // Earthbreaker's Greaves
-			}),
-			ItemSpec.create({
-				id: 28555, // Seal of the Exorcist
-				enchant: Enchants.RING_SPELLPOWER,
-			}),
-			ItemSpec.create({
-				id: 28510, // Spectral Band of Innervation
-				enchant: Enchants.RING_SPELLPOWER,
-			}),
-			ItemSpec.create({
-				id: 29370, // Icon of the Silver Crescent
-			}),
-			ItemSpec.create({
-				id: 27683, // Quagmirran's Eye
-			}),
-			ItemSpec.create({
-				id: 30832, // Gavel of Unearthed Secrets
-				enchant: Enchants.WEAPON_SPELLPOWER,
-			}),
-			ItemSpec.create({
-				id: 29268, // Mazthoril Honor Shield
-			}),
-			ItemSpec.create({
-				id: 28248, // Totem of the Void
-			}),
-		],
-	}),
-};
+export const DefaultRotation = ElementalShamanRotation.create({
+	type: RotationType.Adaptive,
+});
 
-export const P1_BIS = {
-	name: 'P1 BIS',
+export const DefaultOptions = ElementalShamanOptions.create({
+	waterShield: true,
+	bloodlust: true,
+	totemOfWrath: true,
+	manaSpringTotem: true,
+	wrathOfAirTotem: true,
+});
+
+export const DefaultConsumes = Consumes.create({
+	drums: Drums.DrumsOfBattle,
+	defaultPotion: Potions.SuperManaPotion,
+	flaskOfBlindingLight: true,
+	brilliantWizardOil: true,
+	blackenedBasilisk: true,
+});
+
+export const P1_PRESET = {
+	name: 'P1 Preset',
 	tooltip: Tooltips.BASIC_BIS_DISCLAIMER,
 	gear: EquipmentSpec.create({
 		items: [
@@ -206,8 +148,8 @@ export const P1_BIS = {
 	}),
 };
 
-export const P2_BIS = {
-	name: 'P2 BIS',
+export const P2_PRESET = {
+	name: 'P2 Preset',
 	tooltip: Tooltips.BASIC_BIS_DISCLAIMER,
 	gear: EquipmentSpec.create({
 		items: [
@@ -293,6 +235,99 @@ export const P2_BIS = {
 			}),
 			ItemSpec.create({
 				id: 28248, // Totem of the Void
+			}),
+		],
+	}),
+};
+
+export const P3_PRESET = {
+	name: 'P3 Preset',
+	tooltip: Tooltips.BASIC_BIS_DISCLAIMER,
+	gear: EquipmentSpec.create({
+		items: [
+			ItemSpec.create({
+				id: 31014, // Skyshatter Headguard
+				enchant: Enchants.GLYPH_OF_POWER,
+				gems: [
+					Gems.CHAOTIC_SKYFIRE_DIAMOND,
+					Gems.GLOWING_SHADOWSONG_AMETHYST,
+				],
+			}),
+			ItemSpec.create({
+				id: 30015, // The Sun King's Talisman
+			}),
+			ItemSpec.create({
+				id: 31023, // Skyshatter Mantle
+				enchant: Enchants.GREATER_INSCRIPTION_OF_DISCIPLINE,
+				gems: [
+					Gems.GLOWING_SHADOWSONG_AMETHYST,
+					Gems.POTENT_PYRESTONE,
+				],
+			}),
+			ItemSpec.create({
+				id: 32331, // Cloak of the Illidari Council
+				enchant: Enchants.SUBTLETY,
+			}),
+			ItemSpec.create({
+				id: 31017, // Skyshatter Breastplate
+				enchant: Enchants.CHEST_EXCEPTIONAL_STATS,
+				gems: [
+					Gems.RUNED_CRIMSON_SPINEL,
+					Gems.RUNED_CRIMSON_SPINEL,
+					Gems.RUNED_CRIMSON_SPINEL,
+				],
+			}),
+			ItemSpec.create({
+				id: 32586, // Bracers of Nimble Thought
+				enchant: Enchants.WRIST_SPELLPOWER,
+			}),
+			ItemSpec.create({
+				id: 31008, // Skyshatter Gauntlets
+				enchant: Enchants.GLOVES_SPELLPOWER,
+				gems: [
+					Gems.POTENT_PYRESTONE,
+				],
+			}),
+			ItemSpec.create({
+				id: 32276, // Flashfire Girdle
+			}),
+			ItemSpec.create({
+				id: 30916, // Leggings of Channeled Elements
+				enchant: Enchants.RUNIC_SPELLTHREAD,
+				gems: [
+					Gems.RUNED_CRIMSON_SPINEL,
+					Gems.RUNED_CRIMSON_SPINEL,
+					Gems.RUNED_CRIMSON_SPINEL,
+				],
+			}),
+			ItemSpec.create({
+				id: 32352, // Naturewarden's Treads
+				enchant: Enchants.BOARS_SPEED,
+				gems: [
+					Gems.RUNED_CRIMSON_SPINEL,
+					Gems.RUNED_CRIMSON_SPINEL,
+				],
+			}),
+			ItemSpec.create({
+				id: 32527, // Ring of Ancient Knowledge
+				enchant: Enchants.RING_SPELLPOWER,
+			}),
+			ItemSpec.create({
+				id: 29305, // Band of the Eternal Sage
+				enchant: Enchants.RING_SPELLPOWER,
+			}),
+			ItemSpec.create({
+				id: 32483, // The Skull Of Guldan
+			}),
+			ItemSpec.create({
+				id: 28785, // Lightning Capacitor
+			}),
+			ItemSpec.create({
+				id: 32374, // Zhar'doom, Greatstaff of the Devourer
+				enchant: Enchants.WEAPON_SPELLPOWER,
+			}),
+			ItemSpec.create({
+				id: 32330, // Totem of Ancestral Guidance
 			}),
 		],
 	}),

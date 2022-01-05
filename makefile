@@ -4,11 +4,16 @@ rwildcard=$(foreach d,$(wildcard $(1:=/*)),$(call rwildcard,$d,$2) $(filter $(su
 OUT_DIR=dist/tbc
 
 # Make everything. Keep this first so it's the default rule.
-$(OUT_DIR): balance_druid elemental_shaman
+$(OUT_DIR): balance_druid elemental_shaman enhancement_shaman mage shadow_priest raid
 
 # Add new sim rules here! Don't forget to add it as a dependency to the default rule above.
 balance_druid: $(OUT_DIR)/balance_druid/index.js $(OUT_DIR)/balance_druid/index.css $(OUT_DIR)/balance_druid/index.html ui_shared
 elemental_shaman: $(OUT_DIR)/elemental_shaman/index.js $(OUT_DIR)/elemental_shaman/index.css $(OUT_DIR)/elemental_shaman/index.html ui_shared
+enhancement_shaman: $(OUT_DIR)/enhancement_shaman/index.js $(OUT_DIR)/enhancement_shaman/index.css $(OUT_DIR)/enhancement_shaman/index.html ui_shared
+mage: $(OUT_DIR)/mage/index.js $(OUT_DIR)/mage/index.css $(OUT_DIR)/mage/index.html ui_shared
+shadow_priest: $(OUT_DIR)/shadow_priest/index.js $(OUT_DIR)/shadow_priest/index.css $(OUT_DIR)/shadow_priest/index.html ui_shared
+
+raid: $(OUT_DIR)/raid/index.js $(OUT_DIR)/raid/index.css $(OUT_DIR)/raid/index.html
 
 ui_shared: $(OUT_DIR)/lib.wasm $(OUT_DIR)/sim_worker.js $(OUT_DIR)/net_worker.js detailed_results
 detailed_results: $(OUT_DIR)/detailed_results/index.js $(OUT_DIR)/detailed_results/index.css $(OUT_DIR)/detailed_results/index.html
@@ -22,6 +27,7 @@ clean:
 	rm -f wowsimtbc-amd64-linux
 	rm -rf dist
 	rm -rf binary_dist
+	find . -name "*.results.tmp" -type f -delete
 
 # Host a local server, for dev testing
 host: $(OUT_DIR)
@@ -29,12 +35,17 @@ host: $(OUT_DIR)
 	# directory just like github pages.
 	npx http-server $(OUT_DIR)/..
 
-ui/core/proto/proto.ts: proto/*.proto
+ui/core/proto/proto.ts: proto/*.proto node_modules
 	mkdir -p $(OUT_DIR)/protobuf-ts
 	cp -r node_modules/@protobuf-ts/runtime/build/es2015/* $(OUT_DIR)/protobuf-ts
 	sed -i -E "s/from '(.*)';/from '\1\.js';/g" $(OUT_DIR)/protobuf-ts/*
 	sed -i -E "s/from \"(.*)\";/from '\1\.js';/g" $(OUT_DIR)/protobuf-ts/*
 	npx protoc --ts_opt generate_dependencies --ts_out ui/core/proto --proto_path proto proto/api.proto
+	npx protoc --ts_out ui/core/proto --proto_path proto proto/test.proto
+	npx protoc --ts_out ui/core/proto --proto_path proto proto/ui.proto
+
+node_modules: package-lock.json
+	npm install
 
 $(OUT_DIR)/core/tsconfig.tsbuildinfo: $(call rwildcard,ui/core,*.ts) ui/core/proto/proto.ts
 	npx tsc -p ui/core
@@ -51,7 +62,7 @@ $(OUT_DIR)/%/index.css: ui/%/index.scss ui/%/*.scss $(call rwildcard,ui/core,*.s
 	npx sass $< $@
 
 # Generic rule for building index.html for any class directory
-$(OUT_DIR)/%/index.html: ui/index_template.html
+$(OUT_DIR)/%/index.html: ui/index_template.html $(OUT_DIR)/assets
 	$(eval title := $(shell echo $(shell basename $(@D)) | sed -r 's/(^|_)([a-z])/\U \2/g' | cut -c 2-))
 	echo $(title)
 	mkdir -p $(@D)
@@ -62,7 +73,14 @@ wasm: $(OUT_DIR)/lib.wasm
 
 # Builds the generic .wasm, with all items included.
 $(OUT_DIR)/lib.wasm: sim/wasm/* sim/core/proto/api.pb.go $(filter-out sim/core/items/all_items.go, $(call rwildcard,sim,*.go))
-	GOOS=js GOARCH=wasm go build -o ./$(OUT_DIR)/lib.wasm ./sim/wasm/
+	@echo "Starting webassembly compile now..."
+	@if GOOS=js GOARCH=wasm go build -o ./$(OUT_DIR)/lib.wasm ./sim/wasm/; then \
+		echo "\033[1;32mWASM compile successful.\033[0m"; \
+	else \
+		echo "\033[1;31mWASM COMPILE FAILED\033[0m"; \
+		exit 1; \
+	fi
+	
 
 # Generic sim_worker that uses the generic lib.wasm
 $(OUT_DIR)/sim_worker.js: ui/worker/sim_worker.js
@@ -70,6 +88,9 @@ $(OUT_DIR)/sim_worker.js: ui/worker/sim_worker.js
 
 $(OUT_DIR)/net_worker.js: ui/worker/net_worker.js
 	cp ui/worker/net_worker.js $(OUT_DIR)
+
+$(OUT_DIR)/assets: assets/*
+	cp -r assets $(OUT_DIR)
 
 binary_dist/dist.go: sim/web/dist.go.tmpl
 	mkdir -p binary_dist/tbc
@@ -91,6 +112,7 @@ devserver:
 		echo "\033[1;32mBuild Completed Succeessfully\033[0m"; \
 	else \
 		echo "\033[1;31mBUILD FAILED\033[0m"; \
+		exit 1; \
 	fi
 
 release: wowsimtbc
@@ -102,7 +124,7 @@ sim/core/proto/api.pb.go: proto/*.proto
 	protoc -I=./proto --go_out=./sim/core ./proto/*.proto
 
 .PHONY: items
-items: sim/core/items/all_items.go
+items: sim/core/items/all_items.go sim/core/proto/api.pb.go
 
 sim/core/items/all_items.go: generate_items/*.go $(call rwildcard,sim/core/proto,*.go)
 	go run generate_items/*.go -outDir=sim/core/items
@@ -111,10 +133,14 @@ sim/core/items/all_items.go: generate_items/*.go $(call rwildcard,sim/core/proto
 test: $(OUT_DIR)/lib.wasm binary_dist/dist.go
 	go test ./...
 
+update-tests:
+	find . -name "*.results" -type f -delete
+	find . -name "*.results.tmp" -exec bash -c 'cp "$$1" "$${1%.results.tmp}".results' _ {} \;
+
 fmt:
 	gofmt -w ./sim
 
-# one time setup to install pre-commit hook for gofmt
+# one time setup to install pre-commit hook for gofmt and npm install needed packages
 setup:
 	cp pre-commit .git/hooks
 	chmod +x .git/hooks/pre-commit

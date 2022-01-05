@@ -1,5 +1,5 @@
 import { Spec } from '/tbc/core/proto/common.js';
-import { TypedEvent } from '/tbc/core/typed_event.js';
+import { EventID, TypedEvent } from '/tbc/core/typed_event.js';
 
 import { Component } from '/tbc/core/components/component.js';
 
@@ -11,7 +11,7 @@ export type SavedDataManagerConfig<ModObject, T> = {
   changeEmitters: Array<TypedEvent<any>>,
   equals: (a: T, b: T) => boolean;
   getData: (modObject: ModObject) => T;
-  setData: (modObject: ModObject, data: T) => void;
+  setData: (eventID: EventID, modObject: ModObject, data: T) => void;
   toJson: (a: T) => any;
   fromJson: (obj: any) => T;
 };
@@ -58,7 +58,7 @@ export class SavedDataManager<ModObject, T> extends Component {
     </div>
     <div class="saved-data-create-container">
       <input class="saved-data-save-input" type="text" placeholder="Label">
-      <button class="saved-data-save-button">Save current ${config.label}</button>
+      <button class="saved-data-save-button sim-button">SAVE CURRENT ${config.label.toUpperCase()}</button>
     </div>
     `;
 
@@ -118,7 +118,7 @@ export class SavedDataManager<ModObject, T> extends Component {
     `;
 
     dataElem.addEventListener('click', event => {
-      this.config.setData(this.modObject, config.data);
+      this.config.setData(TypedEvent.nextEventID(), this.modObject, config.data);
       this.saveInput.value = config.name;
     });
 
@@ -174,12 +174,12 @@ export class SavedDataManager<ModObject, T> extends Component {
 
   // Save data to window.localStorage.
   private saveUserData() {
-    const gearData: Record<string, Object> = {};
+    const userData: Record<string, Object> = {};
     this.userData.forEach(savedData => {
-      gearData[savedData.name] = this.config.toJson(savedData.data);
+      userData[savedData.name] = this.config.toJson(savedData.data);
     });
 
-    window.localStorage.setItem(this.config.storageKey, JSON.stringify(gearData));
+    window.localStorage.setItem(this.config.storageKey, JSON.stringify(userData));
   }
 
   // Load data from window.localStorage.
@@ -188,12 +188,22 @@ export class SavedDataManager<ModObject, T> extends Component {
     if (!dataStr)
       return;
 
-    const jsonData = JSON.parse(dataStr);
+		let jsonData;
+		try {
+			jsonData = JSON.parse(dataStr);
+		} catch (e) {
+			console.warn('Invalid json for local storage value: ' + dataStr);
+		}
+
     for (let name in jsonData) {
-      this.addSavedData({
-				name: name,
-				data: this.config.fromJson(jsonData[name]),
-			});
+			try {
+				this.addSavedData({
+					name: name,
+					data: this.config.fromJson(jsonData[name]),
+				});
+			} catch (e) {
+				console.warn('Failed parsing saved data: ' + jsonData[name]);
+			}
     }
   }
 

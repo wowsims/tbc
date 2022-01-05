@@ -1,3 +1,4 @@
+import { REPO_NAME } from '/tbc/core/constants/other.js'
 import { Enchant } from './proto/common.js';
 import { Gem } from './proto/common.js';
 import { GemColor } from './proto/common.js';
@@ -10,13 +11,12 @@ import { Stat } from './proto/common.js';
 
 import { ComputeStatsRequest, ComputeStatsResult } from './proto/api.js';
 import { GearListRequest, GearListResult } from './proto/api.js';
-import { IndividualSimRequest, IndividualSimResult } from './proto/api.js';
+import { RaidSimRequest, RaidSimResult } from './proto/api.js';
 import { StatWeightsRequest, StatWeightsResult } from './proto/api.js';
 
-import { repoName } from './resources.js';
 import { wait } from './utils.js';
 
-const SIM_WORKER_URL = `/${repoName}/sim_worker.js`;
+const SIM_WORKER_URL = `/${REPO_NAME}/sim_worker.js`;
 
 export class WorkerPool {
 	private workers: Array<SimWorker>;
@@ -52,11 +52,16 @@ export class WorkerPool {
 		return StatWeightsResult.fromBinary(result);
   }
 
-  async individualSim(request: IndividualSimRequest): Promise<IndividualSimResult> {
-    console.log('Individual sim request: ' + IndividualSimRequest.toJsonString(request));
-		const resultData = await this.makeApiCall('individualSim', IndividualSimRequest.toBinary(request));
-		const result = IndividualSimResult.fromBinary(resultData);
-    console.log('Individual sim result: ' + IndividualSimResult.toJsonString(result));
+  async raidSim(request: RaidSimRequest): Promise<RaidSimResult> {
+    console.log('Raid sim request: ' + RaidSimRequest.toJsonString(request));
+		const resultData = await this.makeApiCall('raidSim', RaidSimRequest.toBinary(request));
+		const result = RaidSimResult.fromBinary(resultData);
+
+		// Don't print the logs because it just clogs the console.
+		const resultJson = RaidSimResult.toJson(result) as any;
+		delete resultJson!['logs'];
+    console.log('Raid sim result: ' + JSON.stringify(resultJson));
+
 		return result;
   }
 }

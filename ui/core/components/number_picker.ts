@@ -1,4 +1,4 @@
-import { TypedEvent } from '/tbc/core/typed_event.js';
+import { EventID, TypedEvent } from '/tbc/core/typed_event.js';
 
 import { Input, InputConfig } from './input.js';
 
@@ -16,14 +16,14 @@ export class NumberPicker<ModObject> extends Input<ModObject, number> {
     super(parent, 'number-picker-root', modObject, config);
 
     this.inputElem = document.createElement('input');
-    this.inputElem.type = "number";
+    this.inputElem.type = 'number';
     this.inputElem.classList.add('number-picker-input');
     this.rootElem.appendChild(this.inputElem);
 
 		this.init();
 
     this.inputElem.addEventListener('input', event => {
-			this.inputChanged();
+			this.inputChanged(TypedEvent.nextEventID());
     });
   }
 

@@ -1,12 +1,15 @@
+import { ActionID as ActionIdProto } from '/tbc/core/proto/common.js';
 import { Enchant } from '/tbc/core/proto/common.js';
 import { Gem } from '/tbc/core/proto/common.js';
 import { Item } from '/tbc/core/proto/common.js';
 import { ItemSlot } from '/tbc/core/proto/common.js';
 import { ItemSpec } from '/tbc/core/proto/common.js';
 
+import { ActionId } from './action_id.js';
+import { actionIdToProto } from './action_id.js';
 import { enchantAppliesToItem } from './utils.js';
-import { gemEligibleForSocket } from './utils.js';
-import { gemMatchesSocket } from './utils.js';
+import { gemEligibleForSocket } from './gems.js';
+import { gemMatchesSocket } from './gems.js';
 
 export function getWowheadItemId(item: Item): number {
 	return item.wowheadId || item.id;
@@ -140,6 +143,18 @@ export class EquippedItem {
 			}
 		}
 		return curItem;
+	}
+
+	asActionId(): ActionId {
+		return {
+			id: {
+				itemId: this._item.id,
+			},
+		};
+	}
+
+	asActionIdProto(): ActionIdProto {
+		return actionIdToProto(this.asActionId());
 	}
 
   asSpec(): ItemSpec {

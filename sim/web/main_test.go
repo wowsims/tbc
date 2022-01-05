@@ -13,7 +13,7 @@ import (
 	googleProto "google.golang.org/protobuf/proto"
 )
 
-var basicSpec = &proto.PlayerOptions_ElementalShaman{
+var basicSpec = &proto.Player_ElementalShaman{
 	ElementalShaman: &proto.ElementalShaman{
 		Rotation: &proto.ElementalShaman_Rotation{
 			Type: proto.ElementalShaman_Rotation_Adaptive,
@@ -69,7 +69,7 @@ var p1Equip = &proto.EquipmentSpec{
 
 func init() {
 	go func() {
-		runServer(true, ":3333", false, bufio.NewReader(bytes.NewBuffer([]byte{})))
+		runServer(true, ":3333", false, "", false, bufio.NewReader(bytes.NewBuffer([]byte{})))
 	}()
 
 	time.Sleep(time.Second) // hack so we have time for server to startup. Probably could repeatedly curl the endpoint until it responds.
@@ -80,17 +80,12 @@ func init() {
 func TestIndividualSim(t *testing.T) {
 	req := &proto.IndividualSimRequest{
 		Player: &proto.Player{
-			Options: &proto.PlayerOptions{
-				Race:     proto.Race_RaceTroll10,
-				Class:    proto.Class_ClassShaman,
-				Spec:     basicSpec,
-				Consumes: basicConsumes,
-			},
+			Race:      proto.Race_RaceTroll10,
+			Class:     proto.Class_ClassShaman,
 			Equipment: p1Equip,
+			Consumes:  basicConsumes,
+			Spec:      basicSpec,
 		},
-		RaidBuffs: &proto.RaidBuffs{},
-		PartyBuffs: &proto.PartyBuffs{},
-		IndividualBuffs: &proto.IndividualBuffs{},
 		Encounter: &proto.Encounter{
 			Duration: 120,
 			Targets: []*proto.Target{
@@ -121,61 +116,6 @@ func TestIndividualSim(t *testing.T) {
 	}
 
 	isr := &proto.IndividualSimResult{}
-	if err := googleProto.Unmarshal(body, isr); err != nil {
-		t.Fatalf("Failed to parse request: %s", err.Error())
-		return
-	}
-
-	log.Printf("RESULT: %#v", isr)
-}
-
-func TestCalcStatWeight(t *testing.T) {
-	req := &proto.IndividualSimRequest{
-		Player: &proto.Player{
-			Options: &proto.PlayerOptions{
-				Race:     proto.Race_RaceTroll10,
-				Spec:     basicSpec,
-				Consumes: basicConsumes,
-			},
-			Equipment: p1Equip,
-		},
-		RaidBuffs: &proto.RaidBuffs{},
-		PartyBuffs: &proto.PartyBuffs{},
-		IndividualBuffs: &proto.IndividualBuffs{},
-		Encounter: &proto.Encounter{
-			Duration: 120,
-			Targets: []*proto.Target{
-				&proto.Target{},
-			},
-		},
-		SimOptions: &proto.SimOptions{
-			Iterations: 5000,
-			RandomSeed: 1,
-			Debug:      false,
-		},
-	}
-
-	msgBytes, err := googleProto.Marshal(&proto.StatWeightsRequest{
-		Options:         req,
-		StatsToWeigh:    []proto.Stat{proto.Stat_StatSpellPower, proto.Stat_StatSpellCrit, proto.Stat_StatSpellHit},
-		EpReferenceStat: proto.Stat_StatSpellPower,
-	})
-	if err != nil {
-		t.Fatalf("Failed to encode request: %s", err.Error())
-	}
-
-	r, err := http.Post("http://localhost:3333/statWeights", "application/x-protobuf", bytes.NewReader(msgBytes))
-	if err != nil {
-		t.Fatalf("Failed to POST request: %s", err.Error())
-	}
-
-	body, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		t.Fatalf("Failed to read result body: %s", err.Error())
-		return
-	}
-
-	isr := &proto.StatWeightsResult{}
 	if err := googleProto.Unmarshal(body, isr); err != nil {
 		t.Fatalf("Failed to parse request: %s", err.Error())
 		return

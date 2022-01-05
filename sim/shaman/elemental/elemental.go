@@ -6,32 +6,48 @@ import (
 	"github.com/wowsims/tbc/sim/common"
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/proto"
-	. "github.com/wowsims/tbc/sim/shaman"
-	googleProto "google.golang.org/protobuf/proto"
+	"github.com/wowsims/tbc/sim/shaman"
 )
 
 func RegisterElementalShaman() {
-	core.RegisterAgentFactory(proto.PlayerOptions_ElementalShaman{}, func(character core.Character, options proto.PlayerOptions, isr proto.IndividualSimRequest) core.Agent {
-		return NewElementalShaman(character, options, isr)
-	})
+	core.RegisterAgentFactory(
+		proto.Player_ElementalShaman{},
+		func(character core.Character, options proto.Player) core.Agent {
+			return NewElementalShaman(character, options)
+		},
+		func(player *proto.Player, spec interface{}) {
+			playerSpec, ok := spec.(*proto.Player_ElementalShaman)
+			if !ok {
+				panic("Invalid spec value for Elemental Shaman!")
+			}
+			player.Spec = playerSpec
+		},
+	)
 }
 
-func NewElementalShaman(character core.Character, options proto.PlayerOptions, isr proto.IndividualSimRequest) *ElementalShaman {
+func NewElementalShaman(character core.Character, options proto.Player) *ElementalShaman {
 	eleShamOptions := options.GetElementalShaman()
 
-	selfBuffs := SelfBuffs{
-		Bloodlust:    eleShamOptions.Options.Bloodlust,
-		ManaSpring:   eleShamOptions.Options.ManaSpringTotem,
-		TotemOfWrath: eleShamOptions.Options.TotemOfWrath,
-		WrathOfAir:   eleShamOptions.Options.WrathOfAirTotem,
-		WaterShield:  eleShamOptions.Options.WaterShield,
+	selfBuffs := shaman.SelfBuffs{
+		Bloodlust:   eleShamOptions.Options.Bloodlust,
+		ManaSpring:  eleShamOptions.Options.ManaSpringTotem,
+		WaterShield: eleShamOptions.Options.WaterShield,
+	}
+	if eleShamOptions.Options.TotemOfWrath {
+		selfBuffs.FireTotem = proto.FireTotem_TotemOfWrath
+	}
+	if eleShamOptions.Options.WrathOfAirTotem {
+		selfBuffs.AirTotem = proto.AirTotem_WrathOfAirTotem
+	}
+	if shaman.ItemSetSkyshatterRegalia.CharacterHasSetBonus(&character, 2) {
+		selfBuffs.EarthTotem = proto.EarthTotem_TremorTotem
 	}
 
 	var rotation Rotation
 
 	switch eleShamOptions.Rotation.Type {
 	case proto.ElementalShaman_Rotation_Adaptive:
-		rotation = NewAdaptiveRotation(isr)
+		rotation = NewAdaptiveRotation()
 	case proto.ElementalShaman_Rotation_CLOnClearcast:
 		rotation = NewCLOnClearcastRotation()
 	case proto.ElementalShaman_Rotation_CLOnCD:
@@ -43,19 +59,23 @@ func NewElementalShaman(character core.Character, options proto.PlayerOptions, i
 	}
 
 	return &ElementalShaman{
-		Shaman:   NewShaman(character, *eleShamOptions.Talents, selfBuffs),
+		Shaman:   shaman.NewShaman(character, *eleShamOptions.Talents, selfBuffs),
 		rotation: rotation,
 	}
 }
 
 type ElementalShaman struct {
-	Shaman
+	*shaman.Shaman
 
 	rotation Rotation
 }
 
-func (eleShaman *ElementalShaman) GetShaman() *Shaman {
-	return &eleShaman.Shaman
+func (eleShaman *ElementalShaman) GetShaman() *shaman.Shaman {
+	return eleShaman.Shaman
+}
+
+func (eleShaman *ElementalShaman) GetPresimOptions() *core.PresimOptions {
+	return eleShaman.rotation.GetPresimOptions()
 }
 
 func (eleShaman *ElementalShaman) Reset(sim *core.Simulation) {
@@ -80,14 +100,17 @@ func (eleShaman *ElementalShaman) Act(sim *core.Simulation) time.Duration {
 		// Only way for a shaman spell to fail is due to mana cost.
 		// Wait until we have enough mana to cast.
 		regenTime := eleShaman.TimeUntilManaRegen(newAction.GetManaCost())
-		newAction = core.NewWaitAction(sim, eleShaman.GetCharacter(), regenTime)
+		newAction = core.NewWaitAction(sim, eleShaman.GetCharacter(), regenTime, core.WaitReasonOOM)
+		newAction.Cast(sim)
 		eleShaman.rotation.OnActionAccepted(eleShaman, sim, newAction)
-		return sim.CurrentTime + regenTime
+		return sim.CurrentTime + newAction.GetDuration()
 	}
 }
 
 // Picks which attacks / abilities the Shaman does.
 type Rotation interface {
+	GetPresimOptions() *core.PresimOptions
+
 	// Returns the action this rotation would like to take next.
 	ChooseAction(*ElementalShaman, *core.Simulation) AgentAction
 
@@ -112,6 +135,7 @@ func (rotation *LBOnlyRotation) ChooseAction(eleShaman *ElementalShaman, sim *co
 func (rotation *LBOnlyRotation) OnActionAccepted(eleShaman *ElementalShaman, sim *core.Simulation, action AgentAction) {
 }
 func (rotation *LBOnlyRotation) Reset(eleShaman *ElementalShaman, sim *core.Simulation) {}
+func (rotation *LBOnlyRotation) GetPresimOptions() *core.PresimOptions                  { return nil }
 
 func NewLBOnlyRotation() *LBOnlyRotation {
 	return &LBOnlyRotation{}
@@ -124,7 +148,7 @@ type CLOnCDRotation struct {
 }
 
 func (rotation *CLOnCDRotation) ChooseAction(eleShaman *ElementalShaman, sim *core.Simulation) AgentAction {
-	if eleShaman.IsOnCD(ChainLightningCooldownID, sim.CurrentTime) {
+	if eleShaman.IsOnCD(shaman.ChainLightningCooldownID, sim.CurrentTime) {
 		return eleShaman.NewLightningBolt(sim, sim.GetPrimaryTarget(), false)
 	} else {
 		return eleShaman.NewChainLightning(sim, sim.GetPrimaryTarget(), false)
@@ -134,6 +158,7 @@ func (rotation *CLOnCDRotation) ChooseAction(eleShaman *ElementalShaman, sim *co
 func (rotation *CLOnCDRotation) OnActionAccepted(eleShaman *ElementalShaman, sim *core.Simulation, action AgentAction) {
 }
 func (rotation *CLOnCDRotation) Reset(eleShaman *ElementalShaman, sim *core.Simulation) {}
+func (rotation *CLOnCDRotation) GetPresimOptions() *core.PresimOptions                  { return nil }
 
 func NewCLOnCDRotation() *CLOnCDRotation {
 	return &CLOnCDRotation{}
@@ -152,7 +177,7 @@ func (rotation *FixedRotation) ChooseAction(eleShaman *ElementalShaman, sim *cor
 		return eleShaman.NewLightningBolt(sim, sim.GetPrimaryTarget(), false)
 	}
 
-	if !eleShaman.IsOnCD(ChainLightningCooldownID, sim.CurrentTime) {
+	if !eleShaman.IsOnCD(shaman.ChainLightningCooldownID, sim.CurrentTime) {
 		return eleShaman.NewChainLightning(sim, sim.GetPrimaryTarget(), false)
 	}
 
@@ -162,13 +187,13 @@ func (rotation *FixedRotation) ChooseAction(eleShaman *ElementalShaman, sim *cor
 		return eleShaman.NewLightningBolt(sim, sim.GetPrimaryTarget(), false)
 	}
 
-	return core.NewWaitAction(sim, eleShaman.GetCharacter(), eleShaman.GetRemainingCD(ChainLightningCooldownID, sim.CurrentTime))
+	return core.NewWaitAction(sim, eleShaman.GetCharacter(), eleShaman.GetRemainingCD(shaman.ChainLightningCooldownID, sim.CurrentTime), core.WaitReasonRotation)
 }
 
 func (rotation *FixedRotation) OnActionAccepted(eleShaman *ElementalShaman, sim *core.Simulation, action AgentAction) {
-	if action.GetActionID().SpellID == SpellIDLB12 {
+	if action.GetActionID().SpellID == shaman.SpellIDLB12 {
 		rotation.numLBsSinceLastCL++
-	} else if action.GetActionID().SpellID == SpellIDCL6 {
+	} else if action.GetActionID().SpellID == shaman.SpellIDCL6 {
 		rotation.numLBsSinceLastCL = 0
 	}
 }
@@ -176,6 +201,8 @@ func (rotation *FixedRotation) OnActionAccepted(eleShaman *ElementalShaman, sim 
 func (rotation *FixedRotation) Reset(eleShaman *ElementalShaman, sim *core.Simulation) {
 	rotation.numLBsSinceLastCL = rotation.numLBsPerCL // This lets us cast CL first
 }
+
+func (rotation *FixedRotation) GetPresimOptions() *core.PresimOptions { return nil }
 
 func NewFixedRotation(numLBsPerCL int32) *FixedRotation {
 	return &FixedRotation{
@@ -192,7 +219,7 @@ type CLOnClearcastRotation struct {
 }
 
 func (rotation *CLOnClearcastRotation) ChooseAction(eleShaman *ElementalShaman, sim *core.Simulation) AgentAction {
-	if eleShaman.IsOnCD(ChainLightningCooldownID, sim.CurrentTime) || !rotation.prevPrevCastProccedCC {
+	if eleShaman.IsOnCD(shaman.ChainLightningCooldownID, sim.CurrentTime) || !rotation.prevPrevCastProccedCC {
 		return eleShaman.NewLightningBolt(sim, sim.GetPrimaryTarget(), false)
 	}
 
@@ -206,6 +233,8 @@ func (rotation *CLOnClearcastRotation) OnActionAccepted(eleShaman *ElementalSham
 func (rotation *CLOnClearcastRotation) Reset(eleShaman *ElementalShaman, sim *core.Simulation) {
 	rotation.prevPrevCastProccedCC = true // Lets us cast CL first
 }
+
+func (rotation *CLOnClearcastRotation) GetPresimOptions() *core.PresimOptions { return nil }
 
 func NewCLOnClearcastRotation() *CLOnClearcastRotation {
 	return &CLOnClearcastRotation{}
@@ -222,10 +251,8 @@ type AdaptiveRotation struct {
 }
 
 func (rotation *AdaptiveRotation) ChooseAction(eleShaman *ElementalShaman, sim *core.Simulation) AgentAction {
-	projectedManaCost := rotation.manaTracker.ProjectedManaCost(sim, eleShaman.GetCharacter())
-
 	// If we have enough mana to burn, use the surplus rotation.
-	if projectedManaCost < eleShaman.CurrentMana() {
+	if rotation.manaTracker.ProjectedManaSurplus(sim, eleShaman.GetCharacter()) {
 		return rotation.surplusRotation.ChooseAction(eleShaman, sim)
 	} else {
 		return rotation.baseRotation.ChooseAction(eleShaman, sim)
@@ -243,37 +270,29 @@ func (rotation *AdaptiveRotation) Reset(eleShaman *ElementalShaman, sim *core.Si
 	rotation.surplusRotation.Reset(eleShaman, sim)
 }
 
-func NewAdaptiveRotation(isr proto.IndividualSimRequest) *AdaptiveRotation {
-	rotation := &AdaptiveRotation{
+func (rotation *AdaptiveRotation) GetPresimOptions() *core.PresimOptions {
+	return &core.PresimOptions{
+		SetPresimPlayerOptions: func(player *proto.Player) {
+			player.Spec.(*proto.Player_ElementalShaman).ElementalShaman.Rotation.Type = proto.ElementalShaman_Rotation_CLOnClearcast
+		},
+
+		OnPresimResult: func(presimResult proto.PlayerMetrics, iterations int32, duration time.Duration) bool {
+			if float64(presimResult.SecondsOomAvg) >= 0.03*duration.Seconds() {
+				rotation.baseRotation = NewLBOnlyRotation()
+				rotation.surplusRotation = NewCLOnClearcastRotation()
+			} else {
+				rotation.baseRotation = NewCLOnClearcastRotation()
+				rotation.surplusRotation = NewCLOnCDRotation()
+			}
+			return true
+		},
+	}
+}
+
+func NewAdaptiveRotation() *AdaptiveRotation {
+	return &AdaptiveRotation{
 		manaTracker: common.NewManaSpendingRateTracker(),
 	}
-
-	// If no encounter is set, it means we aren't going to run a sim at all.
-	// So just return something valid.
-	// TODO: Probably need some organized way of doing presims so we dont have
-	// to check these types of things.
-	if isr.Encounter == nil || len(isr.Encounter.Targets) == 0 {
-		rotation.baseRotation = NewLBOnlyRotation()
-		rotation.surplusRotation = NewCLOnClearcastRotation()
-		return rotation
-	}
-
-	presimRequest := googleProto.Clone(&isr).(*proto.IndividualSimRequest)
-	presimRequest.SimOptions.Debug = false
-	presimRequest.SimOptions.Iterations = 100
-	presimRequest.Player.Options.Spec.(*proto.PlayerOptions_ElementalShaman).ElementalShaman.Rotation.Type = proto.ElementalShaman_Rotation_CLOnClearcast
-
-	presimResult := core.RunIndividualSim(presimRequest)
-
-	if presimResult.PlayerMetrics.NumOom >= 5 {
-		rotation.baseRotation = NewLBOnlyRotation()
-		rotation.surplusRotation = NewCLOnClearcastRotation()
-	} else {
-		rotation.baseRotation = NewCLOnClearcastRotation()
-		rotation.surplusRotation = NewCLOnCDRotation()
-	}
-
-	return rotation
 }
 
 // A single action that an Agent can take.

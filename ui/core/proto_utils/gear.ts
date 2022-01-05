@@ -1,9 +1,13 @@
+import { Gem } from '/tbc/core/proto/common.js';
+import { GemColor } from '/tbc/core/proto/common.js';
 import { ItemSlot } from '/tbc/core/proto/common.js';
 import { ItemSpec } from '/tbc/core/proto/common.js';
 import { EquipmentSpec } from '/tbc/core/proto/common.js';
 import { equalsOrBothNull } from '/tbc/core/utils.js';
 import { getEnumValues } from '/tbc/core/utils.js';
 
+import { isMetaGemActive } from './gems.js';
+import { gemMatchesSocket } from './gems.js';
 import { EquippedItem } from './equipped_item.js';
 import { validWeaponCombo } from './utils.js';
 
@@ -80,6 +84,13 @@ export class Gear {
     return this.gear[slot];
   }
 
+	getTrinkets(): Array<EquippedItem | null> {
+		return [
+			this.getEquippedItem(ItemSlot.ItemSlotTrinket1),
+			this.getEquippedItem(ItemSlot.ItemSlotTrinket2),
+		];
+	}
+
   asArray(): Array<EquippedItem | null> {
     return Object.values(this.gear);
   }
@@ -89,4 +100,47 @@ export class Gear {
       items: this.asArray().map(ei => ei ? ei.asSpec() : ItemSpec.create()),
     });
   }
+
+	getAllGems(): Array<Gem> {
+		return this.asArray()
+			.map(equippedItem => equippedItem == null ? [] : equippedItem.gems.filter(gem => gem != null) as Array<Gem>)
+			.flat();
+	}
+
+	getGemsOfColor(color: GemColor): Array<Gem> {
+		return this.getAllGems().filter(gem => gem.color == color);
+	}
+
+	getMetaGem(): Gem | null {
+		return this.getGemsOfColor(GemColor.GemColorMeta)[0] || null;
+	}
+
+	// Returns true if this gear set has a meta gem AND the other gems meet the meta's conditions.
+	hasActiveMetaGem(): boolean {
+		const metaGem = this.getMetaGem();
+		if (!metaGem) {
+			return false;
+		}
+
+		const gems = this.getAllGems();
+		return isMetaGemActive(
+				metaGem,
+				gems.filter(gem => gemMatchesSocket(gem, GemColor.GemColorRed)).length,
+				gems.filter(gem => gemMatchesSocket(gem, GemColor.GemColorYellow)).length,
+				gems.filter(gem => gemMatchesSocket(gem, GemColor.GemColorBlue)).length);
+	}
+
+	hasInactiveMetaGem(): boolean {
+		return this.getMetaGem() != null && !this.hasActiveMetaGem();
+	}
+
+	withoutMetaGem(): Gear {
+		const headItem = this.getEquippedItem(ItemSlot.ItemSlotHead);
+		const metaGem = this.getMetaGem();
+		if (headItem && metaGem) {
+			return this.withEquippedItem(ItemSlot.ItemSlotHead, headItem.removeGemsWithId(metaGem.id));
+		} else {
+			return this;
+		}
+	}
 }

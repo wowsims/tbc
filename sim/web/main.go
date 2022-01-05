@@ -29,16 +29,18 @@ func init() {
 }
 
 func main() {
-	var useFS = flag.Bool("usefs", false, "Use local file system and wasm. Set to true during development.")
+	var useFS = flag.Bool("usefs", false, "Use local file system for client files. Set to true during development.")
+	var wasm = flag.Bool("wasm", false, "Use wasm for sim instead of web server apis. Can only be used with usefs=true")
+	var simName = flag.String("sim", "", "Name of simulator to launch (ex: balance_druid, elemental_shaman, etc)")
 	var host = flag.String("host", ":3333", "URL to host the interface on.")
 	var launch = flag.Bool("launch", true, "auto launch browser")
 
 	flag.Parse()
 
-	runServer(*useFS, *host, *launch, bufio.NewReader(os.Stdin))
+	runServer(*useFS, *host, *launch, *simName, *wasm, bufio.NewReader(os.Stdin))
 }
 
-func runServer(useFS bool, host string, launchBrowser bool, inputReader *bufio.Reader) {
+func runServer(useFS bool, host string, launchBrowser bool, simName string, wasm bool, inputReader *bufio.Reader) {
 	var fs http.Handler
 	if useFS {
 		log.Printf("Using local file system for development.")
@@ -51,26 +53,39 @@ func runServer(useFS bool, host string, launchBrowser bool, inputReader *bufio.R
 	http.HandleFunc("/statWeights", handleAPI)
 	http.HandleFunc("/computeStats", handleAPI)
 	http.HandleFunc("/individualSim", handleAPI)
+	http.HandleFunc("/raidSim", handleAPI)
 	http.HandleFunc("/gearList", handleAPI)
 
 	http.HandleFunc("/", func(resp http.ResponseWriter, req *http.Request) {
 		resp.Header().Add("Cache-Control", "no-cache")
+		if strings.HasSuffix(req.URL.Path, "/tbc/") {
+			resp.Write([]byte(`
+				<html><body><a href="/tbc/elemental_shaman">Elemental Shaman Sim</a"><br>
+				<html><body><a href="/tbc/enhancement_shaman">Enhancement Shaman Sim</a"><br>
+				<a href="/tbc/balance_druid">Balance Druid Sim</a"><br>
+				<a href="/tbc/shadow_priest">Shadow Priest Sim</a"></body></html>
+		    `))
+			return
+		}
+
 		if strings.HasSuffix(req.URL.Path, ".wasm") {
 			resp.Header().Set("content-type", "application/wasm")
 		}
-		if strings.HasSuffix(req.URL.Path, "sim_worker.js") {
-			req.URL.Path = strings.Replace(req.URL.Path, "sim_worker.js", "net_worker.js", 1)
+		if !useFS || (useFS && !wasm) {
+			if strings.HasSuffix(req.URL.Path, "sim_worker.js") {
+				req.URL.Path = strings.Replace(req.URL.Path, "sim_worker.js", "net_worker.js", 1)
+			}
 		}
 		fs.ServeHTTP(resp, req)
 	})
 
 	if launchBrowser {
-		url := fmt.Sprintf("http://localhost%s/tbc/elemental_shaman/", host)
+		url := fmt.Sprintf("http://localhost%s/tbc/%s", host, simName)
 		log.Printf("Launching interface on %s", url)
 		go func() {
 			var cmd *exec.Cmd
 			if runtime.GOOS == "windows" {
-				cmd = exec.Command("explorer", url)
+				cmd = exec.Command("start", "msedge", url)
 			} else if runtime.GOOS == "darwin" {
 				cmd = exec.Command("open", url)
 			} else if runtime.GOOS == "linux" {
@@ -146,6 +161,9 @@ type apiHandler struct {
 
 // Handlers to decode and handle each proto function
 var handlers = map[string]apiHandler{
+	"/raidSim": {msg: func() googleProto.Message { return &proto.RaidSimRequest{} }, handle: func(msg googleProto.Message) googleProto.Message {
+		return core.RunRaidSim(msg.(*proto.RaidSimRequest))
+	}},
 	"/individualSim": {msg: func() googleProto.Message { return &proto.IndividualSimRequest{} }, handle: func(msg googleProto.Message) googleProto.Message {
 		return core.RunIndividualSim(msg.(*proto.IndividualSimRequest))
 	}},

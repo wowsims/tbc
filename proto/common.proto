@@ -6,6 +6,7 @@ option go_package = "./proto";
 enum Spec {
     SpecBalanceDruid = 0;
     SpecElementalShaman = 1;
+    SpecEnhancementShaman = 9;
     SpecHunter = 8;
     SpecMage = 2;
     SpecRetributionPaladin = 3;
@@ -201,6 +202,16 @@ enum Potions {
 	UnknownPotion = 0;
 	DestructionPotion = 1;
 	SuperManaPotion = 2;
+    HastePotion = 3;
+}
+
+enum Conjured {
+	ConjuredUnknown = 0;
+	ConjuredDarkRune = 1;
+	ConjuredFlameCap = 2;
+
+	// Mage's mana emerald is in this category too, but it is handled seperately
+	// because there is always a max of 3 per encounter.
 }
 
 // Buffs that affect the entire raid.
@@ -230,8 +241,13 @@ message PartyBuffs {
 
     // Totems
     TristateEffect mana_spring_totem = 12;
+    int32 mana_tide_totems = 17;
     int32 totem_of_wrath = 13;
     TristateEffect wrath_of_air_totem = 14;
+    TristateEffect grace_of_air_totem = 15;
+    TristateEffect strength_of_earth_totem = 16;
+
+    TristateEffect battle_shout = 18;
 }
 
 // Buffs are only used by individual sims, never the raid sim.
@@ -242,10 +258,10 @@ message IndividualBuffs {
     TristateEffect blessing_of_might = 3;
 
     int32 shadow_priest_dps = 4;
-    bool mana_tide_totem = 5;
 
-    // How many innervates will you get?
-    int32 innervate = 6;
+    // How many of each of these buffs the player will be receiving.
+    int32 innervates = 5;
+    int32 power_infusions = 6;
 }
 
 message Consumes {
@@ -253,30 +269,38 @@ message Consumes {
     bool flask_of_mighty_restoration = 2;
     bool flask_of_pure_death = 3;
     bool flask_of_supreme_power = 4;
+    bool flask_of_relentless_assault = 21;
 
     bool adepts_elixir = 5;
     bool elixir_of_major_fire_power = 6;
     bool elixir_of_major_frost_power = 7;
     bool elixir_of_major_shadow_power = 8;
-
     bool elixir_of_draenic_wisdom = 9;
     bool elixir_of_major_mageblood = 10;
+    bool elixir_of_major_agility = 22;
+    bool elixir_of_demonslaying = 23;
 
     bool brilliant_wizard_oil = 11; 
     bool superior_wizard_oil = 12; 
 
     bool blackened_basilisk = 13;
     bool skullfish_soup = 14;
+    bool roasted_clefthoof = 24;
 
-		bool kreegsStoutBeatdown = 20;
+    bool kreegsStoutBeatdown = 20;
 
-		Potions default_potion = 15;
-		Potions starting_potion = 16;
-		int32 num_starting_potions = 17;
+    bool scroll_of_strength_v = 25; // 20 str
+    bool scroll_of_agility_v = 26; // 20 agi
+    bool scroll_of_spirit_v = 28; // 30 spirit
 
-    bool dark_rune = 18;
+    Potions default_potion = 15;
+    Potions starting_potion = 16;
+    int32 num_starting_potions = 17;
 
-		Drums drums = 19;
+    bool dark_rune = 18; // Deprecated, use default_conjured instead.
+    Conjured default_conjured = 27;
+
+	Drums drums = 19;
 }
 
 message Debuffs {
@@ -284,6 +308,16 @@ message Debuffs {
     bool improved_seal_of_the_crusader = 2;
     bool misery = 3;
     TristateEffect curse_of_elements = 4;
+    double isb_uptime = 5;
+
+    bool improved_scorch = 6;
+    bool winters_chill = 7;
+
+    bool blood_frenzy = 8; // Blood Frenzy: +4% phy dmg
+    TristateEffect expose_armor = 9; // Expose Armor (If you have a rogue):    5 points: 2050 armor / imp 5 points: 3075 armor
+    TristateEffect faerie_fire = 10; // Faerie Fire: -610 armor / imp 3% hit
+    bool sunder_armor = 11; // Number of stacks of sunder armor: -520 armor per stack, 5 max
+    bool curse_of_recklessness = 12; // -800 armor
 }
 
 enum MobType {
@@ -299,13 +333,20 @@ enum MobType {
 }
 
 message Target {
-		int32 armor = 1;
+		double armor = 1;
+        int32 level = 4;
 		MobType mob_type = 3;
 		Debuffs debuffs = 2;
 }
 
 message Encounter {
     double duration = 1;
+
+		// The ratio of the encounter duration, between 0 and 1, for which the targets
+		// will be in execute range for the purposes of Warrior Execute, Mage Molten
+		// Fury, etc.
+		double execute_proportion = 3;
+
 		repeated Target targets = 2;
 }
 
@@ -347,14 +388,25 @@ message Item {
 		bool unique = 13;
 }
 
+// Extra enum for describing which items are eligible for an enchant, when
+// ItemType alone is not enough.
+enum EnchantType {
+    EnchantTypeNormal = 0;
+    EnchantTypeTwoHanded = 1;
+    EnchantTypeShield = 2;
+}
+
 message Enchant {
     int32 id = 1;        // ID of the enchant "item".
     int32 effect_id = 2; // ID of the effect (for the item tooltip UI)
     string name = 3;     
 
+		// If true, then id is the ID of the enchant spell instead of the formula item.
+		// This is used by enchants for which a formula doesn't exist (its taught by a trainer).
+		bool is_spell_id = 10;
+
     ItemType type = 4;   // Which type of item this enchant can be applied to.
-    bool two_handed_only = 5;
-    bool shield_only = 6;
+		EnchantType enchant_type = 9;
 
     repeated double stats = 7;
 
@@ -362,17 +414,53 @@ message Enchant {
 }
 
 message Gem {
-    int32 id = 1;
-    string name = 2;
+	int32 id = 1;
+	string name = 2;
 
-    repeated double stats = 3;
-    GemColor color = 4;
+	repeated double stats = 3;
+	GemColor color = 4;
 
-    int32 phase = 5;
-    ItemQuality quality = 6;
+	int32 phase = 5;
+	ItemQuality quality = 6;
 	bool unique = 7;
 }
 
 message RaidTarget {
-    int32 target_index = 1;
+	// Raid index of the player to target. A value of -1 indicates no target.
+	int32 target_index = 1;
+}
+
+// ID for actions that aren't spells or items.
+enum OtherAction {
+	OtherActionNone = 0;
+	OtherActionWait = 1;
+}
+
+message ActionID {
+	// Identifies this action.
+	oneof raw_id {
+		int32 spell_id = 1;
+		int32 item_id = 2;
+		OtherAction other_id = 3;
+	}
+
+	// Distinguishes between different versions of the same action.
+	// Currently the only use for this is Shaman Lightning Overload.
+	int32 tag = 4;
+}
+
+// Custom options for a particular cooldown.
+message Cooldown {
+	// Identifies the cooldown to which these settings will apply.
+	ActionID id = 1;
+
+	// Fixed times at which to use this cooldown. Each value corresponds to a usage,
+	// e.g. first value is the first usage, second value is the second usage.
+	// Any usages after the specified timings will occur as soon as possible, subject
+	// to the ShouldActivate() condition.
+	repeated double timings = 2;
+}
+
+message Cooldowns {
+	repeated Cooldown cooldowns = 1;
 }

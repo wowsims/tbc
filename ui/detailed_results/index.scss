@@ -1,12 +1,35 @@
 @import "../core/shared";
 @import "cast_metrics";
+@import "aura_metrics";
 @import "dps_histogram";
 @import "dps_result";
 @import "percent_oom";
+@import "player_damage";
+@import "results_filter";
 @import "source_chart";
 
 body {
-	background-color: var(--main-bg-color);
+	background-color: transparent;
+}
+body.new-tab {
+	background-image:
+		linear-gradient(rgba(var(--theme-color-background-raw), 0.95), rgba(var(--theme-color-background-raw), 0.95)),
+		var(--theme-background-image);
+}
+
+.all-players .single-player-only {
+	display: none;
+}
+
+.single-player .all-players-only {
+	display: none;
+}
+
+.individual-sim .single-player-only {
+	display: initial;
+}
+.individual-sim .all-players-only {
+	display: none;
 }
 
 .dr-root {
@@ -14,7 +37,48 @@ body {
 }
 
 .dr-row {
-	margin: 10px;
+	padding: 10px;
+}
+
+.table-container {
+	border: 1px solid white;
+}
+
+.dr-toolbar {
+	display: flex;
+}
+
+.nav-tabs {
+	border-bottom-color: var(--theme-color-primary);
+	color: var(--main-text-color);
+}
+.nav-tabs>li>a {
+	color: var(--main-text-color) !important;
+	border: none !important;
+	border-radius: 0 !important;
+	margin-bottom: 1px;
+	font-weight: bold;
+}
+.nav-tabs>li>a:hover, .nav-tabs>li.active>a {
+	background-color: var(--theme-color-primary) !important;
+}
+
+.results-filter {
+	display: flex !important;
+	align-items: center;
+}
+
+.individual-sim .results-filter {
+	display: none !important;
+}
+
+.tabs-filler {
+	flex-grow: 1;
+}
+
+.other-metrics {
+	display: flex;
+	width: 100%;
 }
 
 .topline-results {
@@ -22,7 +86,42 @@ body {
 	justify-content: space-around;
 }
 
-// This isnt finished yet, so dont display
-.source-stats {
-	display: none;
+.metrics-table {
+  color: var(--main-text-color);
+	width: 100%;
+}
+
+.metrics-table-header-row {
+	border-bottom: 2px solid white;
+}
+
+.metrics-table-header-cell {
+	padding: 3px 1px;
+	cursor: pointer;
+}
+
+.metrics-table-body tr {
+	border-bottom: 1px solid var(--main-text-color);
+}
+
+.metrics-table-body tr:hover {
+	background-color: rgba(255, 255, 0, 0.2);
+}
+
+.metrics-table-body td {
+	padding: 2px 1px;
+}
+
+.metrics-table-header-cell:first-child, .metrics-table-body td:first-child {
+	text-align: left;
+}
+.metrics-table-header-cell:not(:first-child), .metrics-table-body td:not(:first-child) {
+	text-align: right;
+}
+
+.metrics-action-icon {
+  @include wowhead-background-icon;
+	height: 30px;
+	width: 30px;
+	vertical-align: middle;
 }

@@ -21,7 +21,7 @@ type OnCastComplete func(sim *Simulation, cast *Cast)
 // Manages cooldowns and the GCD.
 type Cast struct {
 	// ID for the action.
-	ActionID ActionID
+	ActionID
 
 	// The name of the cast action, e.g. 'Shadowbolt'.
 	Name string
@@ -60,11 +60,13 @@ type Cast struct {
 	// How much to multiply damage by, if this cast crits.
 	CritMultiplier float64
 
-	// If true, will force the cast to crit (if it doesnt miss).
-	GuaranteedCrit bool
+	// Bonus crit to be applied to all effects resulting from this cast.
+	BonusCritRating float64
 
 	// Callbacks for providing additional custom behavior.
 	OnCastComplete OnCastComplete
+
+	Binary bool // if spell is binary it ignores partial resists
 
 	// Internal field only, used to prevent cast pool objects from being used by
 	// multiple casts simultaneously.
@@ -97,8 +99,19 @@ func (cast *Cast) IsInUse() bool {
 	return cast.objectInUse
 }
 
+// Cancel will disable 'in use' so the cast can be reused. Useful if deciding not to cast.
+func (cast *Cast) Cancel() {
+	cast.objectInUse = false
+}
+
 // Should be called exactly once after creation.
 func (cast *Cast) init(sim *Simulation) {
+	if cast.Character == nil {
+		panic("Character not set on cast")
+	}
+	if cast.objectInUse {
+		panic("Cast object already in use")
+	}
 	cast.objectInUse = true
 	cast.CastTime = time.Duration(float64(cast.CastTime) / cast.Character.CastSpeed())
 
@@ -124,36 +137,31 @@ func (cast *Cast) startCasting(sim *Simulation, onCastComplete OnCastComplete) b
 	if !cast.IgnoreManaCost && cast.ManaCost > 0 {
 		if cast.Character.CurrentMana() < cast.ManaCost {
 			if sim.Log != nil {
-				sim.Log("(%d) Failed casting %s, not enough mana. (Current Mana = %0.0f, Mana Cost = %0.0f)\n",
-					cast.Character.ID, cast.Name, cast.Character.CurrentMana(), cast.ManaCost)
+				cast.Character.Log(sim, "Failed casting %s, not enough mana. (Current Mana = %0.0f, Mana Cost = %0.0f)",
+					cast.Name, cast.Character.CurrentMana(), cast.ManaCost)
 			}
-			cast.Character.Metrics.MarkOOM(sim, cast.Character)
 			cast.objectInUse = false // cast failed and we aren't using it
 			return false
 		}
 	}
 
 	if sim.Log != nil {
-		sim.Log("(%d) Casting %s (Current Mana = %0.0f, Mana Cost = %0.0f, Cast Time = %s)\n",
-			cast.Character.ID, cast.Name, cast.Character.CurrentMana(), cast.ManaCost, cast.CastTime)
+		cast.Character.Log(sim, "Casting %s (Current Mana = %0.0f, Mana Cost = %0.0f, Cast Time = %s)",
+			cast.Name, cast.Character.CurrentMana(), cast.ManaCost, cast.CastTime)
 	}
 
 	// For instant-cast spells we can skip creating an aura.
 	if cast.CastTime == 0 {
 		cast.internalOnComplete(sim, onCastComplete)
 	} else {
-		cast.Character.HardcastAura = Aura{
-			Expires: sim.CurrentTime + cast.CastTime,
-			OnExpire: func(sim *Simulation) {
-				cast.internalOnComplete(sim, onCastComplete)
-			},
-		}
+		cast.Character.Hardcast.Expires = sim.CurrentTime + cast.CastTime
+		cast.Character.Hardcast.Cast = cast
+		cast.Character.Hardcast.OnComplete = onCastComplete
 	}
 
 	if !cast.IgnoreCooldowns {
 		// Prevent any actions on the GCD until the cast AND the GCD are done.
-		gcd := MaxDuration(GCDMin, cast.calculatedGCD(cast.Character))
-		gcdCD := MaxDuration(gcd, cast.CastTime)
+		gcdCD := MaxDuration(cast.CalculatedGCD(cast.Character), cast.CastTime)
 		cast.Character.SetCD(GCDCooldownID, sim.CurrentTime+gcdCD)
 
 		// TODO: Hardcasts seem to also reset swing timers, so we should set those CDs as well.
@@ -162,7 +170,7 @@ func (cast *Cast) startCasting(sim *Simulation, onCastComplete OnCastComplete) b
 	return true
 }
 
-func (cast *Cast) calculatedGCD(char *Character) time.Duration {
+func (cast *Cast) CalculatedGCD(char *Character) time.Duration {
 	baseGCD := GCDDefault
 	if cast.GCDCooldown != 0 {
 		baseGCD = cast.GCDCooldown
@@ -173,7 +181,7 @@ func (cast *Cast) calculatedGCD(char *Character) time.Duration {
 // Cast has finished, activate the effects of the cast.
 func (cast *Cast) internalOnComplete(sim *Simulation, onCastComplete OnCastComplete) {
 	if !cast.IgnoreManaCost && cast.ManaCost > 0 {
-		cast.Character.AddStat(stats.Mana, -cast.ManaCost)
+		cast.Character.SpendMana(sim, cast.ManaCost, cast.Name)
 		cast.Character.PseudoStats.FiveSecondRuleRefreshTime = sim.CurrentTime + time.Second*5
 	}
 
@@ -208,4 +216,14 @@ func (simpleCast *SimpleCast) StartCast(sim *Simulation) bool {
 			simpleCast.OnCastComplete(sim, cast)
 		}
 	})
+}
+
+type Hardcast struct {
+	Cast       *Cast
+	Expires    time.Duration
+	OnComplete OnCastComplete
+}
+
+func (hc Hardcast) OnExpire(sim *Simulation) {
+	hc.Cast.internalOnComplete(sim, hc.OnComplete)
 }

@@ -14,64 +14,56 @@ import "shaman.proto";
 import "warlock.proto";
 import "warrior.proto";
 
-message PlayerOptions {
+message Player {
+		// Label used for logging.
+		string name = 16;
+
     Race race = 1;
     Class class = 2;
 
+    EquipmentSpec equipment = 3;
+    Consumes consumes = 4;
+    repeated double bonus_stats = 5;
+
+		IndividualBuffs buffs = 15;
+
     oneof spec {
-        BalanceDruid balance_druid = 3;
-        Hunter hunter = 4;
-        Mage mage = 5;
-        RetributionPaladin retribution_paladin = 6;
-        ShadowPriest shadow_priest = 7;
-        Rogue rogue = 8;
-        ElementalShaman elemental_shaman = 9;
-        Warlock warlock = 10;
-        Warrior warrior = 11;
+        BalanceDruid balance_druid = 6;
+        Hunter hunter = 7;
+        Mage mage = 8;
+        RetributionPaladin retribution_paladin = 9;
+        ShadowPriest shadow_priest = 10;
+        Rogue rogue = 11;
+        ElementalShaman elemental_shaman = 12;
+        EnhancementShaman enhancement_shaman = 18;
+        Warlock warlock = 13;
+        Warrior warrior = 14;
     }
 
-    Consumes consumes = 12; // What consumes this player is going to be using.
-}
+		// Only used by the UI. Sim uses talents within the spec protos.
+		string talentsString = 17;
 
-message Player {
-    PlayerOptions options = 1;
-    EquipmentSpec equipment = 2;
-    repeated double custom_stats = 3;
+		Cooldowns cooldowns = 19;
 }
 
 message Party {
     repeated Player players = 1;
+
+		PartyBuffs buffs = 2;
 }
 
 message Raid {
     repeated Party parties = 1; 
+
+		RaidBuffs buffs = 2;
 }
 
 message SimOptions {
     int32 iterations = 1;
     int64 random_seed = 2;
     bool debug = 3; // Enables debug logging.
-    bool exit_on_oom = 4;
+    bool debug_first_iteration = 6;
 		bool is_test = 5; // Only used internally.
-}
-
-// ID for actions that aren't spells or items.
-enum OtherAction {
-    OtherActionNone = 0;
-    OtherActionWait = 1;
-}
-
-message ActionID {
-    // Identifies this action.
-    oneof raw_id {
-        int32 spell_id = 1;
-        int32 item_id = 2;
-        OtherAction other_id = 3;
-    }
-
-		// Distinguishes between different versions of the same action.
-		// Currently the only use for this is Shaman Lightning Overload.
-		int32 tag = 4;
 }
 
 // The aggregated results from all uses of a particular action.
@@ -98,34 +90,42 @@ message AuraMetrics {
 		// The in-game spell ID for the aura.
 		int32 id = 1;
 
-		// Total time, in seconds, that this aura was active.
-		double uptime_seconds = 2;
+		double uptime_seconds_avg = 2;
+		double uptime_seconds_stdev = 3;
+}
+
+message DpsMetrics {
+    double avg   = 1;
+    double stdev = 2;
+    double max   = 3;
+    map<int32, int32> hist = 4;
 }
 
 // All the results for a single Player.
 message PlayerMetrics {
-    double dps_avg   = 1;
-    double dps_stdev = 2;
-    double dps_max   = 3;
-    map<int32, int32> dps_hist = 4;
+		DpsMetrics dps = 1;
 
-    int32 num_oom = 5;
-    double oom_at_avg = 6;
-    double dps_at_oom_avg = 7;
+    // average seconds spent oom per iteration
+    double seconds_oom_avg = 3; 
 
-    repeated ActionMetrics actions = 8;
+    repeated ActionMetrics actions = 5;
+		repeated AuraMetrics auras = 6;
 
-		repeated AuraMetrics auras = 9;
+		repeated PlayerMetrics pets = 7;
 }
 
 // Results for a whole raid.
 message PartyMetrics {
-		repeated PlayerMetrics players = 1;
+		DpsMetrics dps = 1;
+
+		repeated PlayerMetrics players = 2;
 }
 
 // Results for a whole raid.
 message RaidMetrics {
-		repeated PartyMetrics parties = 1;
+		DpsMetrics dps = 1;
+
+		repeated PartyMetrics parties = 2;
 }
 
 message TargetMetrics {
@@ -157,7 +157,6 @@ message IndividualSimRequest {
 
     RaidBuffs raid_buffs = 2;
     PartyBuffs party_buffs = 3;
-    IndividualBuffs Individual_buffs = 4;
 
     Encounter encounter = 5;
 		SimOptions sim_options = 6;
@@ -172,7 +171,6 @@ message IndividualSimResult {
 
 // RPC GearList
 message GearListRequest {
-    Spec spec = 1; // Each spec has a custom gear list
 }
 message GearListResult {
     repeated Item items = 1;
@@ -182,22 +180,35 @@ message GearListResult {
 
 // RPC ComputeStats
 message ComputeStatsRequest {
-    Player player = 1;
-    RaidBuffs raid_buffs = 2;
-    PartyBuffs party_buffs = 3;
-    IndividualBuffs individual_buffs = 4;
+    Raid raid = 1;
+}
+message PlayerStats {
+    repeated double gear_only = 1;
+    repeated double final_stats = 2;
+    repeated string sets = 3;
+		IndividualBuffs buffs = 4;
+		repeated ActionID cooldowns = 5;
+}
+message PartyStats {
+    repeated PlayerStats players = 1;
+}
+message RaidStats {
+    repeated PartyStats parties = 1;
 }
 message ComputeStatsResult {
-    repeated double gear_only = 1;
-    repeated double finalStats = 2;
-    repeated string sets = 3;
+		RaidStats raid_stats = 1;
 }
 
 // RPC StatWeights
 message StatWeightsRequest {
-    IndividualSimRequest options = 1;
-    repeated Stat stats_to_weigh = 2;
-    Stat ep_reference_stat = 3;
+    Player player = 1;
+    RaidBuffs raid_buffs = 2;
+    PartyBuffs party_buffs = 3;
+    Encounter encounter = 4;
+		SimOptions sim_options = 5;
+
+    repeated Stat stats_to_weigh = 6;
+    Stat ep_reference_stat = 7;
 }
 message StatWeightsResult {
     repeated double weights = 1;

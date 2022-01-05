@@ -1,15 +1,23 @@
+import { REPO_NAME } from '/tbc/core/constants/other.js'
 import { getWowheadItemId } from '/tbc/core/proto_utils/equipped_item.js';
-import { GemColor } from './proto/common.js';
+import { NO_TARGET } from '/tbc/core/proto_utils/utils.js';
 import { Item } from './proto/common.js';
 import { ItemQuality } from './proto/common.js';
 import { ItemSlot } from './proto/common.js';
+import { OtherAction } from './proto/common.js';
 
-// Github pages serves our site under the /tbc directory (because the repo name is tbc)
-export const repoName = 'tbc';
+import {
+	ActionId,
+	ItemId,
+	ItemOrSpellId,
+	OtherId,
+	RawActionId,
+	SpellId,
+} from '/tbc/core/proto_utils/action_id.js';
 
 // Get 'elemental_shaman', the pathname part after the repo name
 const pathnameParts = window.location.pathname.split('/');
-const repoPartIdx = pathnameParts.findIndex(part => part == repoName);
+const repoPartIdx = pathnameParts.findIndex(part => part == REPO_NAME);
 export const specDirectory = repoPartIdx == -1 ? '' : pathnameParts[repoPartIdx + 1];
 
 const emptySlotIcons: Record<ItemSlot, string> = {
@@ -35,21 +43,10 @@ export function getEmptySlotIconUrl(slot: ItemSlot): string {
   return emptySlotIcons[slot];
 }
 
-export type ItemId = {
-  itemId: number;
-};
-export type SpellId = {
-  spellId: number;
-};
-export type OtherId = {
-  otherId: number;
-};
-export type ItemOrSpellId = ItemId | SpellId;
-export type ActionId = ItemId | SpellId | OtherId;
-
 // Some items/spells have weird icons, so use this to show a different icon instead.
 const idOverrides: Record<string, ItemOrSpellId> = {};
 idOverrides[JSON.stringify({spellId: 37212})] = { itemId: 29035 }; // Improved Wrath of Air Totem
+idOverrides[JSON.stringify({spellId: 37447})] = { itemId: 30720 }; // Serpent-Coil Braid
 
 async function getTooltipDataHelper(id: number, tooltipPostfix: string, cache: Map<number, Promise<any>>): Promise<any> {
   if (!cache.has(id)) {
@@ -77,7 +74,7 @@ export async function getTooltipData(id: ItemOrSpellId): Promise<any> {
 function getOtherActionIconUrl(id: number): string {
 	throw new Error('No other actions!');
 }
-export async function getIconUrl(id: ActionId): Promise<string> {
+export async function getIconUrl(id: RawActionId): Promise<string> {
 	if ('otherId' in id) {
 		return getOtherActionIconUrl(id.otherId);
 	}
@@ -91,9 +88,16 @@ export async function getItemIconUrl(item: Item): Promise<string> {
 }
 
 function getOtherActionName(id: number): string {
-	throw new Error('No other actions!');
+	switch (id) {
+		case OtherAction.OtherActionNone:
+			return '';
+		case OtherAction.OtherActionWait:
+			return 'Wait';
+		default:
+			throw new Error('Invalid OtherAction: ' + id);
+	}
 }
-export async function getName(id: ItemOrSpellId | ActionId): Promise<string> {
+export async function getName(id: RawActionId): Promise<string> {
 	if ('otherId' in id) {
 		return getOtherActionName(id.otherId);
 	}
@@ -101,28 +105,62 @@ export async function getName(id: ItemOrSpellId | ActionId): Promise<string> {
 	const tooltipData = await getTooltipData(id);
 	return tooltipData['name'];
 }
+export async function getFullActionName(actionId: ActionId, playerIndex?: number): Promise<string> {
+	const tag = actionId.tag || 0;
+	let name = await getName(actionId.id);
 
-export function setWowheadHref(elem: HTMLAnchorElement, id: ItemOrSpellId) {
+	switch (name) {
+		case 'Fireball':
+		case 'Pyroblast':
+			if (tag) name += ' (DoT)';
+			break;
+		case 'Mind Flay':
+			if (tag == 1) {
+				name += ' (1 Tick)';
+			} else if (tag == 2) {
+				name += ' (2 Tick)';
+			} else if (tag == 3) {
+				name += ' (3 Tick)';
+			}
+			break;
+		case 'Lightning Bolt':
+			if (tag) name += ' (LO)';
+			break;
+		// For targetted buffs, tag is the source player's raid index or -1 if none.
+		case 'Bloodlust':
+		case 'Innervate':
+		case 'Mana Tide Totem':
+		case 'Power Infusion':
+			if (tag != NO_TARGET) {
+				if (tag === playerIndex) {
+					name += ` (self)`;
+				} else {
+					name += ` (from #${tag+1})`;
+				}
+			}
+			break;
+		default:
+			if (tag == 10) {
+				name += ' (Auto)';
+			} else if (tag == 11) {
+				name += ' (Offhand Auto)';
+			} else if (tag) {
+				name += ' (??)';
+			}
+			break;
+	}
+
+	return name;
+}
+
+export function setWowheadHref(elem: HTMLAnchorElement, id: RawActionId) {
   if ('itemId' in id) {
     elem.href = 'https://tbc.wowhead.com/item=' + id.itemId;
-  } else {
+  } else if ('spellId' in id) {
     elem.href = 'https://tbc.wowhead.com/spell=' + id.spellId;
   }
 }
 
 export function setWowheadItemHref(elem: HTMLAnchorElement, item: Item) {
 	return setWowheadHref(elem, { itemId: getWowheadItemId(item) });
-}
-
-const emptyGemSocketIcons: Partial<Record<GemColor, string>> = {
-  [GemColor.GemColorBlue]: 'https://wow.zamimg.com/images/icons/socket-blue.gif',
-  [GemColor.GemColorMeta]: 'https://wow.zamimg.com/images/icons/socket-meta.gif',
-  [GemColor.GemColorRed]: 'https://wow.zamimg.com/images/icons/socket-red.gif',
-  [GemColor.GemColorYellow]: 'https://wow.zamimg.com/images/icons/socket-yellow.gif',
-};
-export function getEmptyGemSocketIconUrl(color: GemColor): string {
-  if (emptyGemSocketIcons[color])
-    return emptyGemSocketIcons[color] as string;
-
-  throw new Error('No empty socket url for gem socket color: ' + color);
 }

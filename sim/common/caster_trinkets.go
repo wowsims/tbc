@@ -27,6 +27,7 @@ func init() {
 		130,
 		time.Second*20,
 		core.MajorCooldown{
+			ActionID:         core.ActionID{ItemID: 28779},
 			CooldownID:       RestrainedEssenceOfSapphironCooldownID,
 			Cooldown:         time.Minute * 2,
 			SharedCooldownID: core.OffensiveTrinketSharedCooldownID,
@@ -42,6 +43,7 @@ func init() {
 		150,
 		time.Second*20,
 		core.MajorCooldown{
+			ActionID:         core.ActionID{ItemID: 24126},
 			CooldownID:       LivingRubySerpentCooldownID,
 			Cooldown:         time.Minute * 5,
 			SharedCooldownID: core.OffensiveTrinketSharedCooldownID,
@@ -57,6 +59,7 @@ func init() {
 		150,
 		time.Second*15,
 		core.MajorCooldown{
+			ActionID:         core.ActionID{ItemID: 29132},
 			CooldownID:       ScryersBloodgemCooldownID,
 			Cooldown:         time.Second * 90,
 			SharedCooldownID: core.OffensiveTrinketSharedCooldownID,
@@ -72,6 +75,7 @@ func init() {
 		150,
 		time.Second*15,
 		core.MajorCooldown{
+			ActionID:         core.ActionID{ItemID: 29179},
 			CooldownID:       XirisGiftCooldownID,
 			Cooldown:         time.Second * 90,
 			SharedCooldownID: core.OffensiveTrinketSharedCooldownID,
@@ -87,6 +91,7 @@ func init() {
 		155,
 		time.Second*20,
 		core.MajorCooldown{
+			ActionID:         core.ActionID{ItemID: 29370},
 			CooldownID:       IconOfTheSilverCrescentCooldownID,
 			Cooldown:         time.Minute * 2,
 			SharedCooldownID: core.OffensiveTrinketSharedCooldownID,
@@ -102,6 +107,7 @@ func init() {
 		99,
 		time.Second*20,
 		core.MajorCooldown{
+			ActionID:         core.ActionID{ItemID: 29376},
 			CooldownID:       EssenceOfTheMartyrCooldownID,
 			Cooldown:         time.Minute * 2,
 			SharedCooldownID: core.DefensiveTrinketSharedCooldownID,
@@ -117,6 +123,7 @@ func init() {
 		175,
 		time.Second*20,
 		core.MajorCooldown{
+			ActionID:         core.ActionID{ItemID: 32483},
 			CooldownID:       SkullOfGuldanCooldownID,
 			Cooldown:         time.Minute * 2,
 			SharedCooldownID: core.OffensiveTrinketSharedCooldownID,
@@ -132,6 +139,7 @@ func init() {
 		211,
 		time.Second*20,
 		core.MajorCooldown{
+			ActionID:         core.ActionID{ItemID: 33829},
 			CooldownID:       HexShrunkenHeadCooldownID,
 			Cooldown:         time.Minute * 2,
 			SharedCooldownID: core.OffensiveTrinketSharedCooldownID,
@@ -147,6 +155,7 @@ func init() {
 		320,
 		time.Second*15,
 		core.MajorCooldown{
+			ActionID:         core.ActionID{ItemID: 34429},
 			CooldownID:       ShiftingNaaruSliverCooldownID,
 			Cooldown:         time.Second * 90,
 			SharedCooldownID: core.OffensiveTrinketSharedCooldownID,
@@ -162,11 +171,16 @@ func init() {
 		155,
 		time.Second*20,
 		core.MajorCooldown{
+			ActionID:         core.ActionID{ItemID: 38290},
 			CooldownID:       DarkIronSmokingPipeCooldownID,
 			Cooldown:         time.Minute * 2,
 			SharedCooldownID: core.OffensiveTrinketSharedCooldownID,
 		},
 	))
+
+	// Even though these item effects are handled elsewhere, add them so they are
+	// detected for automatic testing.
+	core.AddItemEffect(core.AlchStoneItemID, func(core.Agent) {})
 }
 
 var MarkOfTheChampionCasterAuraID = core.NewAuraID()
@@ -199,10 +213,11 @@ func ApplyQuagmirransEye(agent core.Agent) {
 			ID:   QuagmirransEyeAuraID,
 			Name: "Quagmirran's Eye",
 			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
-				if !icd.IsOnCD(sim) && sim.RandomFloat("Quagmirran's Eye") < 0.1 {
-					icd = core.InternalCD(sim.CurrentTime + dur)
-					character.AddAuraWithTemporaryStats(sim, FungalFrenzyAuraID, 33370, "Fungal Frenzy", stats.SpellHaste, hasteBonus, time.Second*6)
+				if icd.IsOnCD(sim) || sim.RandomFloat("Quagmirran's Eye") > 0.1 {
+					return
 				}
+				icd = core.InternalCD(sim.CurrentTime + dur)
+				character.AddAuraWithTemporaryStats(sim, FungalFrenzyAuraID, 33370, "Fungal Frenzy", stats.SpellHaste, hasteBonus, time.Second*6)
 			},
 		}
 	})
@@ -225,10 +240,11 @@ func ApplyShiffarsNexusHorn(agent core.Agent) {
 				if spellCast.ActionID.ItemID == core.ItemIDTheLightningCapacitor {
 					return // TLC can't proc Sextant
 				}
-				if !icd.IsOnCD(sim) && spellEffect.Crit && sim.RandomFloat("Shiffar's Nexus-Horn") < 0.2 {
-					icd = core.InternalCD(sim.CurrentTime + dur)
-					character.AddAuraWithTemporaryStats(sim, CallOfTheNexusAuraID, 34321, "Call of the Nexus", stats.SpellPower, spellBonus, time.Second*10)
+				if icd.IsOnCD(sim) || spellEffect.Crit && sim.RandomFloat("Shiffar's Nexus-Horn") > 0.2 {
+					return
 				}
+				icd = core.InternalCD(sim.CurrentTime + dur)
+				character.AddAuraWithTemporaryStats(sim, CallOfTheNexusAuraID, 34321, "Call of the Nexus", stats.SpellPower, spellBonus, time.Second*10)
 			},
 		}
 	})
@@ -271,10 +287,11 @@ func ApplySextantOfUnstableCurrents(agent core.Agent) {
 				if spellCast.ActionID.ItemID == core.ItemIDTheLightningCapacitor {
 					return // TLC can't proc Sextant
 				}
-				if spellEffect.Crit && !icd.IsOnCD(sim) && sim.RandomFloat("Sextant of Unstable Currents") < 0.2 {
-					icd = core.InternalCD(sim.CurrentTime + icdDur)
-					character.AddAuraWithTemporaryStats(sim, UnstableCurrentsAuraID, 38348, "Unstable Currents", stats.SpellPower, spellBonus, dur)
+				if !spellEffect.Crit || icd.IsOnCD(sim) || sim.RandomFloat("Sextant of Unstable Currents") > 0.2 {
+					return // if not crit, or on cd, or didn't proc, dont activate
 				}
+				icd = core.InternalCD(sim.CurrentTime + icdDur)
+				character.AddAuraWithTemporaryStats(sim, UnstableCurrentsAuraID, 38348, "Unstable Currents", stats.SpellPower, spellBonus, dur)
 			},
 		}
 	})
@@ -295,7 +312,7 @@ func ApplyDarkmoonCardCrusade(agent core.Agent) {
 			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
 				if stacks < 10 {
 					if sim.Log != nil {
-						sim.Log("(%d) Darkmoon Card Crusade: Stacks %d\n", cast.Character.ID, stacks)
+						character.Log(sim, "Darkmoon Card Crusade: %d stacks.", stacks)
 					}
 					stacks++
 					character.AddStat(stats.SpellPower, spellBonus)

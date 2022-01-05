@@ -1,0 +1,51 @@
+@import "../shared";
+
+.results-sim {
+  text-align: center;
+}
+
+.results-sim-dps {
+  text-align: center;
+}
+
+.results-sim-dps-avg {
+  font-size: 30px;
+  font-weight: 700;
+}
+.results-sim-dps-avg:after {
+  content: " DPS";
+  font-size: 18px;
+}
+
+.results-sim-dps-stdev {
+  font-size: 18px;
+  font-weight: 700;
+}
+.results-sim-dps-stdev:before {
+  content: " \00b1";
+  padding: 2px;
+}
+
+.results-sim-reference.has-reference .results-sim-set-reference {
+	display: none;
+}
+.results-sim-reference:not(.has-reference) .results-sim-reference-bar {
+	display: none;
+}
+
+.results-sim-set-reference {
+	cursor: pointer;
+	font-size: 24px;
+}
+
+.results-sim-reference-swap {
+	color: blue;
+	cursor: pointer;
+	user-select: none;
+}
+
+.results-sim-reference-delete {
+	color: red;
+	cursor: pointer;
+	user-select: none;
+}

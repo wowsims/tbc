@@ -1,0 +1,208 @@
+@import "./components/close_button";
+@import "./components/number_picker";
+@import "./components/title";
+@import "./shared";
+
+html {
+	overflow: hidden;
+}
+
+body {
+  margin: 0;
+}
+
+td, th {
+  padding: auto;
+}
+
+input, select {
+	color: var(--main-text-color);
+	background-color: #1e2633;
+	border: 1px solid #373e58;
+	padding: 3px;
+}
+
+.sim-button {
+	color: var(--main-text-color);
+	background-color: var(--theme-color-primary);
+	border: none;
+	padding: 5px;
+	font-weight: bold;
+}
+
+.sim-root {
+  height: 100%;
+  display: flex;
+}
+
+.sim-sidebar {
+  height: 100%;
+  width: 20%;
+  min-width: 200px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  background: #111218;
+}
+
+.sim-sidebar>div {
+  margin: 10px 0;
+}
+
+.sim-sidebar-title {
+	margin: 0 0 50px 0 !important;
+}
+
+.sim-sidebar-title, .sim-toolbar {
+	height: 60px;
+	border-bottom: 1px solid white;
+}
+
+.sim-sidebar-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.sim-sidebar-actions-button {
+  width: 150px;
+  height: 40px;
+  cursor: pointer;
+  margin: 5px;
+
+  background: transparent;
+  color: var(--main-text-color);
+  border: 1px solid var(--theme-color-primary);
+  font-weight: 1000;
+  transition: all .2s ease-in;
+}
+
+.sim-sidebar-actions-button:hover {
+  color: var(--main-text-color);
+  background: var(--theme-color-primary);
+}
+
+.iterations-picker {
+  text-align: center;
+}
+
+.iterations-picker .input-label {
+  color: var(--sidebar-text-color);
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.sim-sidebar-results {
+  flex-grow: 1;
+}
+
+.sim-sidebar-results {
+  height: 100%;
+  position: relative;
+}
+
+.sim-sidebar-results > div {
+  @include vertical-horizontal-center;
+  width: 100%;
+	text-align: center;
+}
+
+.results-pending .loader {
+  margin: auto;
+}
+
+.sim-sidebar-actions, .sim-sidebar-footer {
+	margin: 0 !important;
+}
+
+.iterations-label {
+	color: var(--sidebar-text-color);
+}
+
+.results-sim, .results-ep-table {
+	color: var(--sidebar-text-color);
+	text-shadow: 0 0 10px var(--sidebar-highlight-color);
+}
+
+.sim-main {
+  height: 100%;
+  width: 80%;
+  display: flex;
+  flex-direction: column;
+	background-image:
+		linear-gradient(rgba(var(--theme-color-background-raw), 0.95), rgba(var(--theme-color-background-raw), 0.95)),
+		var(--theme-background-image);
+	background-size: cover;
+	background-position: center center;
+  color: var(--main-text-color);
+}
+
+.nav-tabs {
+  padding-left: 40px;
+  padding-top: 15px;
+	border-bottom-color: var(--theme-color-primary);
+	color: var(--main-text-color);
+}
+.nav-tabs>li>a {
+	color: var(--main-text-color) !important;
+	border: none !important;
+	border-radius: 0 !important;
+	margin-bottom: 1px;
+	font-weight: bold;
+}
+.nav-tabs>li>a:hover, .nav-tabs>li.active>a {
+	background-color: var(--theme-color-primary) !important;
+}
+
+.sim-main > .tab-content {
+  flex-grow: 1;
+	height: 80%;
+}
+.sim-main > .tab-content > .tab-pane {
+	height: 100%;
+  padding: 25px;
+}
+
+.sim-toolbar {
+	display: flex;
+	align-items: flex-end;
+}
+
+.sim-tabs {
+	padding-top: 0;
+	width: 100%;
+	border: none;
+}
+
+.sim-top-bar {
+	float: right !important;
+	display: flex !important;
+	align-items: center !important;
+	margin-right: 10px;
+}
+
+.sim-top-bar-item {
+	margin: 10px;
+	font-size: 20px;
+	cursor: pointer;
+}
+
+.warnings {
+	font-size: 30px;
+	color: yellow;
+	margin: 0 20px;
+	text-shadow:
+			0 0 10px red,
+			0 0 10px red,
+			0 0 10px red;
+}
+
+.known-issues {
+	display: none;
+	background-color: red;
+	border: 2px solid var(--main-text-color);
+	padding: 2px;
+	margin: 0 10px;
+	font-size: 14px;
+	font-weight: 900;
+}

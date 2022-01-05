@@ -50,45 +50,58 @@
 .item-picker-name {
   display: block;
   font-size: 18px;
+	letter-spacing: normal;
 }
 
 .item-picker-enchant {
   display: block;
   font-size: 14px;
   color: lawngreen;
+	letter-spacing: normal;
 }
 
 .selector-modal {
-}
-
-.selector-modal .modal-content {
+	display: none;
+	@include vertical-horizontal-center;
+	min-width: 50%;
+	padding: 8px;
 	background-color: #666;
-}
-
-.selector-modal-tabs .close {
-	color: red;
-	opacity: 0.5;
-	text-shadow: none;
-}
-.selector-modal-tabs .close:hover {
-	opacity: 1;
-}
-
-.selector-modal .modal-dialog {
-  @include screen-vertical-horizontal-center;
+	border-radius: 6px;
 }
 
 .selector-modal-tab-content-header {
   margin: 5px;
+	display: flex;
+	align-items: center;
+}
+
+.selector-modal-tab-gem-icon {
+  @include wowhead-background-icon;
+  width: 35px;
+  height: 35px;
+	margin: 5px 20px;
+}
+
+.selector-modal-tab-gem-icon:hover, li.active>.selector-modal-tab-gem-icon {
+	box-shadow:
+			0 0 10px white,
+			0 0 10px white,
+			0 0 10px white;
 }
 
 .selector-modal-search {
   border: 1px inset black;
   border-radius: 4px;
+	margin: 5px;
 }
 
-.selector-modal-phase-select {
-	float: right;
+.selector-modal-filter-bar-filler {
+	flex-grow: 1;
+}
+
+.selector-modal-phase-selector {
+	font-size: 18px;
+	font-weight: 700;
 }
 
 .selector-modal-list {
@@ -130,6 +143,7 @@
   text-decoration: none !important;
   cursor: pointer;
   margin-left: 10px;
+	letter-spacing: normal;
 }
 
 .selector-modal-list-item-padding {
@@ -146,11 +160,4 @@
 	width: 30px;
 	margin: 5px;
 	color: white;
-}
-
-.selector-modal-list-item-ep-delta.positive {
-	color: lawngreen;
-}
-.selector-modal-list-item-ep-delta.negative {
-	color: red;
 }

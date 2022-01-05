@@ -1,20 +1,14 @@
 package core
 
 import (
+	"container/heap"
 	"fmt"
 	"math/rand"
-	"sort"
 	"strings"
 	"time"
 
 	"github.com/wowsims/tbc/sim/core/proto"
 )
-
-func debugFunc(sim *Simulation) func(string, ...interface{}) {
-	return func(s string, vals ...interface{}) {
-		fmt.Printf("[%0.1f] "+s, append([]interface{}{sim.CurrentTime.Seconds()}, vals...)...)
-	}
-}
 
 type InitialAura func(*Simulation) Aura
 
@@ -31,7 +25,7 @@ type Simulation struct {
 	testRands map[uint32]*rand.Rand
 
 	// Current Simulation State
-	pendingActions []*PendingAction
+	pendingActions ActionsQueue
 	CurrentTime    time.Duration // duration that has elapsed in the sim since starting
 
 	ProgressReport func(*proto.ProgressMetrics)
@@ -40,19 +34,17 @@ type Simulation struct {
 	logs []string
 }
 
-func NewIndividualSim(isr proto.IndividualSimRequest) *Simulation {
-	raid := NewRaid(*isr.RaidBuffs, *isr.PartyBuffs, *isr.IndividualBuffs)
-	raid.AddPlayer(NewAgent(*isr.Player, isr))
-	raid.Finalize()
-
-	encounter := NewEncounter(*isr.Encounter)
-	encounter.Finalize()
-
-	return newSim(raid, encounter, *isr.SimOptions)
+func RunSim(rsr proto.RaidSimRequest) *proto.RaidSimResult {
+	sim := newSim(rsr)
+	sim.runPresims(rsr)
+	return sim.run()
 }
 
-// New sim contructs a simulator with the given raid and target settings.
-func newSim(raid *Raid, encounter Encounter, simOptions proto.SimOptions) *Simulation {
+func newSim(rsr proto.RaidSimRequest) *Simulation {
+	raid := NewRaid(*rsr.Raid)
+	encounter := NewEncounter(*rsr.Encounter)
+	simOptions := *rsr.SimOptions
+
 	if len(encounter.Targets) == 0 {
 		panic("Must have at least 1 target!")
 	}
@@ -66,7 +58,7 @@ func newSim(raid *Raid, encounter Encounter, simOptions proto.SimOptions) *Simul
 		Raid:      raid,
 		encounter: encounter,
 		Options:   simOptions,
-		Duration:  DurationFromSeconds(encounter.Duration),
+		Duration:  encounter.Duration,
 		Log:       nil,
 
 		rand: rand.New(rand.NewSource(rseed)),
@@ -88,7 +80,7 @@ func (sim *Simulation) RandomFloat(label string) float64 {
 	}
 
 	// if sim.Log != nil {
-	// 	sim.Log("FLOAT64 FROM: %s\n", label)
+	// 	sim.Log("FLOAT64 FROM: %s", label)
 	// }
 
 	labelHash := hash(label)
@@ -104,111 +96,92 @@ func (sim *Simulation) RandomFloat(label string) float64 {
 // This is automatically called before every 'Run'.
 func (sim *Simulation) reset() {
 	if sim.Log != nil {
-		sim.Log("SIM RESET\n")
-		sim.Log("----------------------\n")
+		sim.Log("SIM RESET")
+		sim.Log("----------------------")
 	}
 
-	// Reset all players
-	for _, party := range sim.Raid.Parties {
-		for _, agent := range party.Players {
-			agent.GetCharacter().reset(sim)
-			agent.Reset(sim)
-		}
-	}
+	sim.CurrentTime = 0.0
+	sim.pendingActions = make([]*PendingAction, 0, 64)
+
+	sim.Raid.reset(sim)
 
 	for _, target := range sim.encounter.Targets {
 		target.Reset(sim)
 	}
-
-	sim.CurrentTime = 0.0
-}
-
-type PendingAction struct {
-	OnAction     func(*Simulation)
-	CleanUp      func(*Simulation)
-	NextActionAt time.Duration
 }
 
 // Run runs the simulation for the configured number of iterations, and
 // collects all the metrics together.
-func (sim *Simulation) Run() *proto.RaidSimResult {
-	pid := 0
-	for _, raidParty := range sim.Raid.Parties {
-		for _, player := range raidParty.Players {
-			player.GetCharacter().ID = pid
-			player.GetCharacter().auraTracker.playerID = pid
-			pid++
-			player.Init(sim)
-		}
-	}
+func (sim *Simulation) run() *proto.RaidSimResult {
 	logsBuffer := &strings.Builder{}
-
-	if sim.Options.Debug {
-		sim.Log = func(s string, vals ...interface{}) {
-			logsBuffer.WriteString(fmt.Sprintf("[%0.1f] "+s, append([]interface{}{sim.CurrentTime.Seconds()}, vals...)...))
+	if sim.Options.Debug || sim.Options.DebugFirstIteration {
+		sim.Log = func(message string, vals ...interface{}) {
+			logsBuffer.WriteString(fmt.Sprintf("[%0.1f] "+message+"\n", append([]interface{}{sim.CurrentTime.Seconds()}, vals...)...))
 		}
 	}
 
-	simDurationSeconds := sim.Duration.Seconds()
-	st := time.Now()
-	for i := int32(0); i < sim.Options.Iterations; i++ {
-		sim.RunOnce()
+	// Uncomment this to print logs directly to console.
+	//sim.Log = func(message string, vals ...interface{}) {
+	//	fmt.Printf(fmt.Sprintf("[%0.1f] "+message+"\n", append([]interface{}{sim.CurrentTime.Seconds()}, vals...)...))
+	//}
 
-		sim.Raid.doneIteration(simDurationSeconds)
+	for _, party := range sim.Raid.Parties {
+		for _, player := range party.Players {
+			character := player.GetCharacter()
+			character.auraTracker.logFn = func(message string, vals ...interface{}) {
+				character.Log(sim, message, vals)
+			}
+			player.Init(sim)
+
+			for _, petAgent := range character.Pets {
+				petCharacter := petAgent.GetCharacter()
+				petCharacter.auraTracker.logFn = func(message string, vals ...interface{}) {
+					petCharacter.Log(sim, message, vals)
+				}
+				petAgent.Init(sim)
+			}
+		}
+	}
+
+	for _, target := range sim.encounter.Targets {
+		target.auraTracker.logFn = func(message string, vals ...interface{}) {
+			target.Log(sim, message, vals)
+		}
+	}
+
+	sim.runOnce()
+
+	if !sim.Options.Debug {
+		sim.Log = nil
+	}
+
+	for i := int32(1); i < sim.Options.Iterations; i++ {
 		if sim.ProgressReport != nil && time.Since(st) > time.Millisecond*250 {
 			sim.ProgressReport(&proto.ProgressMetrics{TotalIterations: sim.Options.Iterations, CompletedIterations: i, Dps: sim.Raid.Parties[0].Players[0].GetCharacter().Metrics.dpsSum / float64(i)})
 			st = time.Now()
 		}
+		sim.runOnce()
 	}
-
-	// Reset after the last iteration, because some metrics get updated in reset().
-	sim.reset()
 
 	result := &proto.RaidSimResult{
 		RaidMetrics:      sim.Raid.GetMetrics(sim.Options.Iterations),
-		EncounterMetrics: sim.encounter.GetMetricsProto(),
+		EncounterMetrics: sim.encounter.GetMetricsProto(sim.Options.Iterations),
 
 		Logs: logsBuffer.String(),
 	}
 	return result
 }
 
-// Runs a full sim for an individual player.
-func (sim *Simulation) RunIndividual() *proto.IndividualSimResult {
-	raidResult := sim.Run()
-	return &proto.IndividualSimResult{
-		PlayerMetrics:    raidResult.RaidMetrics.Parties[0].Players[0],
-		EncounterMetrics: raidResult.EncounterMetrics,
-		Logs:             raidResult.Logs,
-	}
-}
-
 // RunOnce is the main event loop. It will run the simulation for number of seconds.
-func (sim *Simulation) RunOnce() {
+func (sim *Simulation) runOnce() {
 	sim.reset()
 
-	sim.pendingActions = make([]*PendingAction, 0, 25)
-	// setup initial actions.
-	for _, party := range sim.Raid.Parties {
-		for _, agent := range party.Players {
-			ag := agent
-			pa := &PendingAction{}
-			pa.OnAction = func(sim *Simulation) {
-				ag.GetCharacter().TryUseCooldowns(sim)
-				pa.NextActionAt = ag.Act(sim)
-			}
-			sim.AddPendingAction(pa)
-		}
-	}
-
-	// order pending by execution time.
-	sort.Slice(sim.pendingActions, func(i, j int) bool {
-		return sim.pendingActions[i].NextActionAt < sim.pendingActions[j].NextActionAt
-	})
-
 	for true {
-		pa := sim.pendingActions[0]
+		pa := heap.Pop(&sim.pendingActions).(*PendingAction)
 		if pa.NextActionAt > sim.Duration {
+			if pa.CleanUp != nil {
+				pa.CleanUp(sim)
+			}
 			break
 		}
 
@@ -216,21 +189,8 @@ func (sim *Simulation) RunOnce() {
 			sim.advance(pa.NextActionAt - sim.CurrentTime)
 		}
 
-		pa.OnAction(sim)
-
-		if len(sim.pendingActions) == 1 {
-			// We know in a single user sim, just always make the next pending action ours.
-			sim.pendingActions[0] = pa
-		} else {
-			// This path is only used when there is more than one
-			//  action sitting on the list.
-			// This path is not currently used by individual shaman sim.
-			if pa.NextActionAt == NeverExpires {
-				sim.pendingActions = sim.pendingActions[1:] // cut off front
-			}
-			sort.Slice(sim.pendingActions, func(i, j int) bool {
-				return sim.pendingActions[i].NextActionAt < sim.pendingActions[j].NextActionAt
-			})
+		if !pa.cancelled {
+			pa.OnAction(sim)
 		}
 	}
 
@@ -239,15 +199,35 @@ func (sim *Simulation) RunOnce() {
 			pa.CleanUp(sim)
 		}
 	}
+
+	sim.Raid.doneIteration(sim.Duration)
+	sim.encounter.doneIteration(sim.Duration)
 }
 
 func (sim *Simulation) AddPendingAction(pa *PendingAction) {
-	sim.pendingActions = append(sim.pendingActions, pa)
+	heap.Push(&sim.pendingActions, pa)
 }
 
-// TODO: remove pending actions
-func (sim *Simulation) RemovePendingAction(id int32) {
-
+// Creates a PendingAction which repeatedly asks an Agent for actions.
+func (sim *Simulation) newDefaultAgentAction(agent Agent) *PendingAction {
+	pa := &PendingAction{
+		Name:     "Agent",
+		Priority: -1, // Give lower priority so that dot ticks always happen before player actions.
+	}
+	pa.OnAction = func(sim *Simulation) {
+		// If char has AA enabled (a MH weapon is set), try to swing
+		if agent.GetCharacter().AutoAttacks.mh != nil {
+			agent.GetCharacter().AutoAttacks.Swing(sim, sim.GetPrimaryTarget())
+		}
+		agent.GetCharacter().TryUseCooldowns(sim)
+		dur := agent.Act(sim)
+		if dur <= sim.CurrentTime {
+			panic(fmt.Sprintf("Agent returned invalid time delta: %s (%s - %s)", sim.CurrentTime-dur, sim.CurrentTime, dur))
+		}
+		pa.NextActionAt = dur
+		sim.AddPendingAction(pa)
+	}
+	return pa
 }
 
 // Advance moves time forward counting down auras, CDs, mana regen, etc
@@ -256,6 +236,7 @@ func (sim *Simulation) advance(elapsedTime time.Duration) {
 
 	for _, party := range sim.Raid.Parties {
 		for _, agent := range party.Players {
+			// TODO: Switch the order here to match other things like this.
 			agent.Advance(sim, elapsedTime)
 			agent.GetCharacter().advance(sim, elapsedTime)
 		}
@@ -264,6 +245,14 @@ func (sim *Simulation) advance(elapsedTime time.Duration) {
 	for _, target := range sim.encounter.Targets {
 		target.Advance(sim, elapsedTime)
 	}
+}
+
+func (sim *Simulation) IsExecutePhase() bool {
+	return sim.CurrentTime > sim.encounter.executePhaseBegins
+}
+
+func (sim *Simulation) GetRemainingDuration() time.Duration {
+	return sim.Duration - sim.CurrentTime
 }
 
 func (sim *Simulation) GetNumTargets() int32 {
@@ -276,4 +265,51 @@ func (sim *Simulation) GetTarget(index int32) *Target {
 
 func (sim *Simulation) GetPrimaryTarget() *Target {
 	return sim.GetTarget(0)
+}
+
+type PendingAction struct {
+	Name         string
+	Priority     int
+	OnAction     func(*Simulation)
+	CleanUp      func(*Simulation)
+	NextActionAt time.Duration
+
+	cancelled bool
+}
+
+func (pa *PendingAction) Cancel(sim *Simulation) {
+	if pa.cancelled {
+		return
+	}
+
+	if pa.CleanUp != nil {
+		pa.CleanUp(sim)
+		pa.CleanUp = nil
+	}
+
+	pa.cancelled = true
+}
+
+type ActionsQueue []*PendingAction
+
+func (queue ActionsQueue) Len() int {
+	return len(queue)
+}
+func (queue ActionsQueue) Less(i, j int) bool {
+	return queue[i].NextActionAt < queue[j].NextActionAt ||
+		(queue[i].NextActionAt == queue[j].NextActionAt && queue[i].Priority > queue[j].Priority)
+}
+func (queue ActionsQueue) Swap(i, j int) {
+	queue[i], queue[j] = queue[j], queue[i]
+}
+func (queue *ActionsQueue) Push(newAction interface{}) {
+	*queue = append(*queue, newAction.(*PendingAction))
+}
+func (queue *ActionsQueue) Pop() interface{} {
+	old := *queue
+	n := len(old)
+	action := old[n-1]
+	old[n-1] = nil
+	*queue = old[0 : n-1]
+	return action
 }

@@ -48,6 +48,30 @@ type ActionID struct {
 	CooldownID CooldownID // used only for tracking CDs internally
 }
 
+func (actionID ActionID) IsEmptyAction() bool {
+	return actionID.SpellID == 0 && actionID.ItemID == 0 && actionID.OtherID == 0
+}
+
+func (actionID ActionID) IsSpellAction(spellID int32) bool {
+	return actionID.SpellID == spellID
+}
+
+func (actionID ActionID) IsItemAction(itemID int32) bool {
+	return actionID.ItemID == itemID
+}
+
+func (actionID ActionID) IsOtherAction(otherID proto.OtherAction) bool {
+	return actionID.OtherID == otherID
+}
+
+func (actionID ActionID) SameActionIgnoreTag(other ActionID) bool {
+	return actionID.SpellID == other.SpellID && actionID.ItemID == other.ItemID && actionID.OtherID == other.OtherID
+}
+
+func (actionID ActionID) SameAction(other ActionID) bool {
+	return actionID.SameActionIgnoreTag(other) && actionID.Tag == other.Tag
+}
+
 func (actionID ActionID) ToProto() *proto.ActionID {
 	protoID := &proto.ActionID{
 		Tag: actionID.Tag,
@@ -64,11 +88,22 @@ func (actionID ActionID) ToProto() *proto.ActionID {
 	return protoID
 }
 
-type AgentFactory func(Character, proto.PlayerOptions, proto.IndividualSimRequest) Agent
+func ProtoToActionID(protoID proto.ActionID) ActionID {
+	return ActionID{
+		ItemID:  protoID.GetItemId(),
+		SpellID: protoID.GetSpellId(),
+		OtherID: protoID.GetOtherId(),
+		Tag:     protoID.Tag,
+	}
+}
+
+type AgentFactory func(Character, proto.Player) Agent
+type SpecSetter func(*proto.Player, interface{})
 
 var agentFactories map[string]AgentFactory = make(map[string]AgentFactory)
+var specSetters map[string]SpecSetter = make(map[string]SpecSetter)
 
-func RegisterAgentFactory(emptyOptions interface{}, factory AgentFactory) {
+func RegisterAgentFactory(emptyOptions interface{}, factory AgentFactory, specSetter SpecSetter) {
 	typeName := reflect.TypeOf(emptyOptions).Name()
 	if _, ok := agentFactories[typeName]; ok {
 		panic("Aleady registered agent factory: " + typeName)
@@ -76,21 +111,33 @@ func RegisterAgentFactory(emptyOptions interface{}, factory AgentFactory) {
 	//fmt.Printf("Registering type: %s", typeName)
 
 	agentFactories[typeName] = factory
+	specSetters[typeName] = specSetter
 }
 
-// Constructs a new Agent. isr is only used for presims.
-func NewAgent(player proto.Player, isr proto.IndividualSimRequest) Agent {
-	if player.Options == nil {
-		panic("No player options provided!")
-	}
-
-	typeName := reflect.TypeOf(player.Options.GetSpec()).Elem().Name()
+// Constructs a new Agent.
+func NewAgent(party *Party, partyIndex int, player proto.Player) Agent {
+	typeName := reflect.TypeOf(player.GetSpec()).Elem().Name()
 
 	factory, ok := agentFactories[typeName]
 	if !ok {
 		panic("No agent factory for type: " + typeName)
 	}
 
-	character := NewCharacter(player)
-	return factory(character, *player.Options, isr)
+	character := NewCharacter(party, partyIndex, player)
+	return factory(character, player)
+}
+
+// Applies the spec options to the given player. This is only necessary because
+// the generated proto code does not export oneof interface types.
+// Player is returned so this function can be used in-line with player creation.
+func WithSpec(player *proto.Player, spec interface{}) *proto.Player {
+	typeName := reflect.TypeOf(spec).Elem().Name()
+
+	specSetter, ok := specSetters[typeName]
+	if !ok {
+		panic("No spec setter for type: " + typeName)
+	}
+
+	specSetter(player, spec)
+	return player
 }

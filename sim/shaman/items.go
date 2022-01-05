@@ -17,6 +17,10 @@ func init() {
 	core.AddItemSet(ItemSetCycloneRegalia)
 	core.AddItemSet(ItemSetCataclysmRegalia)
 	core.AddItemSet(ItemSetSkyshatterRegalia)
+
+	// Even though these item effects are handled elsewhere, add them so they are
+	// detected for automatic testing.
+	core.AddItemEffect(TotemOfThePulsingEarth, func(core.Agent) {})
 }
 
 var Tidefury2PcAuraID = core.NewAuraID()
@@ -57,19 +61,20 @@ var ItemSetCycloneRegalia = core.ItemSet{
 					ID:   Cyclone4PcAuraID,
 					Name: "Cyclone 4pc Bonus",
 					OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-						if spellEffect.Crit && sim.RandomFloat("cycl4p") < 0.11 {
-							character.AddAura(sim, core.Aura{
-								ID:   Cyclone4PcManaRegainAuraID,
-								Name: "Cyclone Mana Cost Reduction",
-								OnCast: func(sim *core.Simulation, cast *core.Cast) {
-									// TODO: how to make sure this goes in before clearcasting?
-									cast.ManaCost -= 270
-								},
-								OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
-									character.RemoveAura(sim, Cyclone4PcManaRegainAuraID)
-								},
-							})
+						if !spellEffect.Crit || sim.RandomFloat("cycl4p") > 0.11 {
+							return // if not a crit or didn't proc, don't activate
 						}
+						character.AddAura(sim, core.Aura{
+							ID:   Cyclone4PcManaRegainAuraID,
+							Name: "Cyclone Mana Cost Reduction",
+							OnCast: func(sim *core.Simulation, cast *core.Cast) {
+								// TODO: how to make sure this goes in before clearcasting?
+								cast.ManaCost -= 270
+							},
+							OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
+								character.RemoveAura(sim, Cyclone4PcManaRegainAuraID)
+							},
+						})
 					},
 				}
 			})
@@ -89,9 +94,10 @@ var ItemSetCataclysmRegalia = core.ItemSet{
 					ID:   Cataclysm4PcAuraID,
 					Name: "Cataclysm 4pc Bonus",
 					OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-						if spellEffect.Crit && sim.RandomFloat("cata4p") < 0.25 {
-							character.AddStat(stats.Mana, 120)
+						if !spellEffect.Crit || sim.RandomFloat("cata4p") > 0.25 {
+							return
 						}
+						character.AddMana(sim, 120, "Cataclysm 4p Bonus", false)
 					},
 				}
 			})
@@ -99,7 +105,6 @@ var ItemSetCataclysmRegalia = core.ItemSet{
 	},
 }
 
-var Skyshatter4PcAuraID = core.NewAuraID()
 var ItemSetSkyshatterRegalia = core.ItemSet{
 	Name:  "Skyshatter Regalia",
 	Items: map[int32]struct{}{34437: {}, 31017: {}, 34542: {}, 31008: {}, 31014: {}, 31020: {}, 31023: {}, 34566: {}},
@@ -110,18 +115,8 @@ var ItemSetSkyshatterRegalia = core.ItemSet{
 			agent.GetCharacter().AddStat(stats.SpellPower, 45)
 		},
 		4: func(agent core.Agent) {
-			character := agent.GetCharacter()
-			character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
-				return core.Aura{
-					ID:   Skyshatter4PcAuraID,
-					Name: "Skyshatter 4pc Bonus",
-					OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-						if spellCast.ActionID.SpellID == SpellIDLB12 {
-							spellEffect.DamageMultiplier *= 1.05
-						}
-					},
-				}
-			})
+			// Increases damage done by Lightning Bolt by 5%.
+			// Implemented in lightning_bolt.go.
 		},
 	},
 }
@@ -131,19 +126,30 @@ var NaturalAlignmentCrystalCooldownID = core.NewCooldownID()
 func ApplyNaturalAlignmentCrystal(agent core.Agent) {
 	const sp = 250
 	const dur = time.Second * 20
+	const cd = time.Minute * 5
 
 	agent.GetCharacter().AddMajorCooldown(core.MajorCooldown{
+		ActionID:         core.ActionID{ItemID: 19344},
 		CooldownID:       NaturalAlignmentCrystalCooldownID,
-		Cooldown:         time.Minute * 5,
+		Cooldown:         cd,
 		SharedCooldownID: core.OffensiveTrinketSharedCooldownID,
 		SharedCooldown:   dur,
+		CanActivate: func(sim *core.Simulation, character *core.Character) bool {
+			return true
+		},
+		ShouldActivate: func(sim *core.Simulation, character *core.Character) bool {
+			return true
+		},
 		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
-			return func(sim *core.Simulation, character *core.Character) bool {
+			return func(sim *core.Simulation, character *core.Character) {
+				character.SetCD(NaturalAlignmentCrystalCooldownID, sim.CurrentTime+cd)
 				character.AddStat(stats.SpellPower, sp)
+				character.Metrics.AddInstantCast(core.ActionID{SpellID: 23734})
 
 				character.AddAura(sim, core.Aura{
 					ID:      core.OffensiveTrinketActiveAuraID,
 					Name:    "Natural Alignment Crystal",
+					SpellID: 23734,
 					Expires: sim.CurrentTime + dur,
 					OnCast: func(sim *core.Simulation, cast *core.Cast) {
 						cast.ManaCost *= 1.2
@@ -152,8 +158,6 @@ func ApplyNaturalAlignmentCrystal(agent core.Agent) {
 						character.AddStat(stats.SpellPower, -sp)
 					},
 				})
-
-				return true
 			}
 		},
 	})
@@ -179,10 +183,11 @@ func ApplyFathomBroochOfTheTidewalker(agent core.Agent) {
 				if cast.SpellSchool != stats.NatureSpellPower {
 					return
 				}
-				if sim.RandomFloat("Fathom-Brooch of the Tidewalker") < 0.15 {
-					icd = core.InternalCD(sim.CurrentTime + icdDur)
-					character.AddStat(stats.Mana, 335)
+				if sim.RandomFloat("Fathom-Brooch of the Tidewalker") > 0.15 {
+					return
 				}
+				icd = core.InternalCD(sim.CurrentTime + icdDur)
+				character.AddMana(sim, 335, "Fathom-Brooch of the Tidewalker", false)
 			},
 		}
 	})
@@ -202,9 +207,10 @@ func ApplySkycallTotem(agent core.Agent) {
 			Name:    "Skycall Totem",
 			Expires: core.NeverExpires,
 			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
-				if cast.ActionID.SpellID == SpellIDLB12 && sim.RandomFloat("Skycall Totem") < 0.15 {
-					character.AddAuraWithTemporaryStats(sim, EnergizedAuraID, 0, "Energized", stats.SpellHaste, hasteBonus, dur)
+				if cast.ActionID.SpellID != SpellIDLB12 || sim.RandomFloat("Skycall Totem") > 0.15 {
+					return
 				}
+				character.AddAuraWithTemporaryStats(sim, EnergizedAuraID, 0, "Energized", stats.SpellHaste, hasteBonus, dur)
 			},
 		}
 	})

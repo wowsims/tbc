@@ -9,6 +9,7 @@ import (
 
 var Gems = []Gem{
 	{ID: 34220, Name: "Chaotic Skyfire Diamond", Quality: proto.ItemQuality_ItemQualityRare, Phase: 1, Color: proto.GemColor_GemColorMeta, Stats: stats.Stats{stats.SpellCrit: 12}},
+	{ID: 32409, Name: "Relentless Earthstorm Diamond", Quality: proto.ItemQuality_ItemQualityRare, Phase: 1, Color: proto.GemColor_GemColorMeta, Stats: stats.Stats{stats.Agility: 12}},
 	{ID: 25897, Name: "Bracing Earthstorm Diamond", Quality: proto.ItemQuality_ItemQualityRare, Phase: 1, Color: proto.GemColor_GemColorMeta, Stats: stats.Stats{stats.SpellPower: 14}},
 	{ID: 32641, Name: "Imbued Unstable Diamond", Quality: proto.ItemQuality_ItemQualityRare, Phase: 1, Color: proto.GemColor_GemColorMeta, Stats: stats.Stats{stats.SpellPower: 14}},
 	{ID: 35503, Name: "Ember Skyfire Diamond", Quality: proto.ItemQuality_ItemQualityRare, Phase: 1, Color: proto.GemColor_GemColorMeta, Stats: stats.Stats{stats.SpellPower: 14}},
@@ -31,6 +32,8 @@ var Gems = []Gem{
 	{ID: 24050, Name: "Gleaming Dawnstone", Quality: proto.ItemQuality_ItemQualityRare, Phase: 1, Color: proto.GemColor_GemColorYellow, Stats: stats.Stats{stats.SpellCrit: 8}},
 	{ID: 32207, Name: "Gleaming Lionseye", Quality: proto.ItemQuality_ItemQualityEpic, Phase: 3, Color: proto.GemColor_GemColorYellow, Stats: stats.Stats{stats.SpellCrit: 10}},
 	{ID: 28120, Name: "Gleaming Ornate Dawnstone", Quality: proto.ItemQuality_ItemQualityUncommon, Phase: 1, Color: proto.GemColor_GemColorYellow, Stats: stats.Stats{stats.SpellCrit: 10}, Unique: true},
+	{ID: 31861, Name: "Great Dawnstone", Quality: proto.ItemQuality_ItemQualityRare, Phase: 1, Color: proto.GemColor_GemColorYellow, Stats: stats.Stats{stats.SpellHit: 8}},
+	{ID: 32210, Name: "Great Lionseye", Quality: proto.ItemQuality_ItemQualityEpic, Phase: 5, Color: proto.GemColor_GemColorYellow, Stats: stats.Stats{stats.SpellHit: 10}},
 	{ID: 35761, Name: "Quick Lionseye", Quality: proto.ItemQuality_ItemQualityEpic, Phase: 5, Color: proto.GemColor_GemColorYellow, Stats: stats.Stats{stats.SpellHaste: 10}},
 	{ID: 30551, Name: "Infused Fire Opal", Quality: proto.ItemQuality_ItemQualityEpic, Phase: 1, Color: proto.GemColor_GemColorOrange, Stats: stats.Stats{stats.Intellect: 4, stats.SpellPower: 6}, Unique: true},
 	{ID: 23101, Name: "Potent Flame Spessarite", Quality: proto.ItemQuality_ItemQualityUncommon, Phase: 1, Color: proto.GemColor_GemColorOrange, Stats: stats.Stats{stats.SpellCrit: 3, stats.SpellPower: 4}},
@@ -52,6 +55,9 @@ var Gems = []Gem{
 	{ID: 31116, Name: "Infused Amethyst", Quality: proto.ItemQuality_ItemQualityEpic, Phase: 1, Color: proto.GemColor_GemColorPurple, Stats: stats.Stats{stats.SpellPower: 6, stats.Stamina: 6}, Unique: true},
 	{ID: 30600, Name: "Fluorescent Tanzanite", Quality: proto.ItemQuality_ItemQualityEpic, Phase: 1, Color: proto.GemColor_GemColorPurple, Stats: stats.Stats{stats.SpellPower: 6, stats.Spirit: 4}, Unique: true},
 	{ID: 30605, Name: "Vivid Chrysoprase", Quality: proto.ItemQuality_ItemQualityEpic, Phase: 1, Color: proto.GemColor_GemColorGreen, Stats: stats.Stats{stats.SpellHit: 5, stats.Stamina: 6}, Unique: true},
+	{ID: 24027, Name: "Bold Living Ruby", Quality: proto.ItemQuality_ItemQualityRare, Phase: 1, Color: proto.GemColor_GemColorRed, Stats: stats.Stats{stats.Strength: 8}},
+	{ID: 24058, Name: "Inscribed Noble Topaz", Quality: proto.ItemQuality_ItemQualityRare, Phase: 1, Color: proto.GemColor_GemColorOrange, Stats: stats.Stats{stats.MeleeCrit: 4, stats.Strength: 4}},
+	{ID: 24054, Name: "Sovereign Nightseye", Quality: proto.ItemQuality_ItemQualityRare, Phase: 1, Color: proto.GemColor_GemColorPurple, Stats: stats.Stats{stats.Strength: 4, stats.Stamina: 6}},
 }
 
 var Enchants = []Enchant{
@@ -60,8 +66,10 @@ var Enchants = []Enchant{
 	{ID: 28886, EffectID: 2982, Name: "Greater Inscription of Discipline", Quality: proto.ItemQuality_ItemQualityRare, Bonus: stats.Stats{stats.SpellPower: 18, stats.SpellCrit: 10}, ItemType: proto.ItemType_ItemTypeShoulder},
 	{ID: 20076, EffectID: 2605, Name: "Zandalar Signet of Mojo", Quality: proto.ItemQuality_ItemQualityRare, Bonus: stats.Stats{stats.SpellPower: 18}, ItemType: proto.ItemType_ItemTypeShoulder},
 	{ID: 23545, EffectID: 2721, Name: "Power of the Scourge", Quality: proto.ItemQuality_ItemQualityEpic, Bonus: stats.Stats{stats.SpellPower: 15, stats.SpellCrit: 14}, ItemType: proto.ItemType_ItemTypeShoulder},
+	{ID: 22546, EffectID: 2660, Name: "Chest - Exceptional Mana", Quality: proto.ItemQuality_ItemQualityCommon, Bonus: stats.Stats{stats.Mana: 150}, ItemType: proto.ItemType_ItemTypeChest},
 	{ID: 24003, EffectID: 2661, Name: "Chest - Exceptional Stats", Quality: proto.ItemQuality_ItemQualityCommon, Bonus: stats.Stats{stats.Stamina: 6, stats.Intellect: 6, stats.Spirit: 6, stats.Strength: 6, stats.Agility: 6}, ItemType: proto.ItemType_ItemTypeChest},
-	{ID: 33991, EffectID: 3150, Name: "Chest - Restore Mana Prime", Quality: proto.ItemQuality_ItemQualityCommon, Bonus: stats.Stats{stats.MP5: 6}, ItemType: proto.ItemType_ItemTypeChest},
+	{ID: 33990, EffectID: 1144, Name: "Chest - Major Spirit", IsSpellID: true, Quality: proto.ItemQuality_ItemQualityCommon, Bonus: stats.Stats{stats.Spirit: 15}, ItemType: proto.ItemType_ItemTypeChest},
+	{ID: 33991, EffectID: 3150, Name: "Chest - Restore Mana Prime", IsSpellID: true, Quality: proto.ItemQuality_ItemQualityCommon, Bonus: stats.Stats{stats.MP5: 6}, ItemType: proto.ItemType_ItemTypeChest},
 	{ID: 22534, EffectID: 2650, Name: "Bracer - Spellpower", Quality: proto.ItemQuality_ItemQualityUncommon, Bonus: stats.Stats{stats.SpellPower: 15}, ItemType: proto.ItemType_ItemTypeWrist},
 	{ID: 28271, EffectID: 2935, Name: "Gloves - Spell Strike", Quality: proto.ItemQuality_ItemQualityUncommon, Bonus: stats.Stats{stats.SpellHit: 15}, ItemType: proto.ItemType_ItemTypeHands},
 	{ID: 28272, EffectID: 2937, Name: "Gloves - Major Spellpower", Quality: proto.ItemQuality_ItemQualityUncommon, Bonus: stats.Stats{stats.SpellPower: 20}, ItemType: proto.ItemType_ItemTypeHands},
@@ -72,8 +80,16 @@ var Enchants = []Enchant{
 	{ID: 22560, EffectID: 2671, Name: "Sunfire", Quality: proto.ItemQuality_ItemQualityRare, Bonus: stats.Stats{stats.ArcaneSpellPower: 50, stats.FireSpellPower: 50}, ItemType: proto.ItemType_ItemTypeWeapon},
 	{ID: 22561, EffectID: 2672, Name: "Soulfrost", Quality: proto.ItemQuality_ItemQualityRare, Bonus: stats.Stats{stats.FrostSpellPower: 50, stats.ShadowSpellPower: 50}, ItemType: proto.ItemType_ItemTypeWeapon},
 	{ID: 22536, EffectID: 2928, Name: "Ring - Spellpower", Quality: proto.ItemQuality_ItemQualityCommon, Bonus: stats.Stats{stats.SpellPower: 12}, ItemType: proto.ItemType_ItemTypeFinger},
-	{ID: 22539, EffectID: 2654, Name: "Shield - Intellect", Quality: proto.ItemQuality_ItemQualityCommon, Bonus: stats.Stats{stats.Intellect: 12}, ItemType: proto.ItemType_ItemTypeWeapon, WeaponType: proto.WeaponType_WeaponTypeShield},
+	{ID: 22539, EffectID: 2654, Name: "Shield - Intellect", Quality: proto.ItemQuality_ItemQualityCommon, Bonus: stats.Stats{stats.Intellect: 12}, ItemType: proto.ItemType_ItemTypeWeapon, EnchantType: proto.EnchantType_EnchantTypeShield},
 	{ID: 35297, EffectID: 2940, Name: "Enchant Boots - Boar's Speed", Quality: proto.ItemQuality_ItemQualityRare, Bonus: stats.Stats{stats.Stamina: 9}, ItemType: proto.ItemType_ItemTypeFeet},
 	{ID: 35298, EffectID: 2656, Name: "Enchant Boots - Vitality", Quality: proto.ItemQuality_ItemQualityUncommon, Bonus: stats.Stats{stats.MP5: 4}, ItemType: proto.ItemType_ItemTypeFeet},
 	{ID: 33150, EffectID: 2621, Name: "Enchant Cloak - Subtlety", Quality: proto.ItemQuality_ItemQualityRare, Bonus: stats.Stats{}, ItemType: proto.ItemType_ItemTypeBack},
+
+	{ID: 29192, EffectID: 3003, Name: "Glyph of Ferocity", Quality: proto.ItemQuality_ItemQualityUncommon, Bonus: stats.Stats{stats.AttackPower: 34, stats.MeleeHit: 16}, ItemType: proto.ItemType_ItemTypeHead},
+	{ID: 28888, EffectID: 2986, Name: "Greater Inscription of Vengeance", Quality: proto.ItemQuality_ItemQualityRare, Bonus: stats.Stats{stats.AttackPower: 30, stats.MeleeCrit: 10}, ItemType: proto.ItemType_ItemTypeShoulder},
+	{ID: 29535, EffectID: 3012, Name: "Nethercobra Leg Armor", Quality: proto.ItemQuality_ItemQualityEpic, Bonus: stats.Stats{stats.AttackPower: 50, stats.MeleeCrit: 12}, ItemType: proto.ItemType_ItemTypeLegs},
+	{ID: 27899, EffectID: 2647, Name: "Bracer - Brawn", IsSpellID: true, Quality: proto.ItemQuality_ItemQualityUncommon, Bonus: stats.Stats{stats.Strength: 12}, ItemType: proto.ItemType_ItemTypeWrist},
+	{ID: 33995, EffectID: 684, Name: "Gloves - Major Strength", IsSpellID: true, Quality: proto.ItemQuality_ItemQualityUncommon, Bonus: stats.Stats{stats.Strength: 15}, ItemType: proto.ItemType_ItemTypeHands},
+	{ID: 28279, EffectID: 2939, Name: "Enchant Boots - Cat's Swiftness", Quality: proto.ItemQuality_ItemQualityRare, Bonus: stats.Stats{stats.Agility: 6}, ItemType: proto.ItemType_ItemTypeFeet},
+	{ID: 22559, EffectID: 2673, Name: "Weapon - Mongoose", Quality: proto.ItemQuality_ItemQualityRare, Bonus: stats.Stats{}, ItemType: proto.ItemType_ItemTypeWeapon},
 }

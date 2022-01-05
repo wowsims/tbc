@@ -45,15 +45,23 @@ message ShadowPriest {
     message Rotation {
       enum RotationType {
           Unknown = 0;
-          Standard = 1;
+          Basic = 1;
+		  Clipping = 2;
+		  Ideal = 3;
       }
-      RotationType type = 1;
+	  
+      RotationType rotation_type = 1;
+	  bool use_dev_plague = 3; // only undead
+	  bool precast_vt = 4; // casts VT ahead of the start of the fight so that it lands on 0
+	  double latency = 5; // Latency between actions
+	  bool use_starshards = 6; // only nelf
     }
     Rotation rotation = 1;
 
     PriestTalents talents = 2;
     
     message Options {
+		bool use_shadowfiend = 1;
     }
     Options options = 3;
 }

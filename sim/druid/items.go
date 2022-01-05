@@ -30,9 +30,10 @@ var ItemSetMalorne = core.ItemSet{
 					ID:   Malorne2PcAuraID,
 					Name: "Malorne 2pc Bonus",
 					OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-						if sim.RandomFloat("malorne 2p") < 0.05 {
-							spellCast.Character.AddStat(stats.Mana, 120)
+						if sim.RandomFloat("malorne 2p") > 0.05 {
+							return
 						}
+						spellCast.Character.AddMana(sim, 120, "Malorne 2p Bonus", false)
 					},
 				}
 			})
@@ -105,9 +106,10 @@ func ApplyLivingRootoftheWildheart(agent core.Agent) {
 			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
 				// technically only works while in moonkin form... but i think we can assume thats always true.
 				if druid.Talents.MoonkinForm {
-					if sim.RandomFloat("Living Root of the Wildheart") < 0.03 {
-						druid.AddAuraWithTemporaryStats(sim, LunarBlessingAuraID, 0, "Lunar Blessing", stats.SpellPower, spellBonus, dur)
+					if sim.RandomFloat("Living Root of the Wildheart") > 0.03 {
+						return
 					}
+					druid.AddAuraWithTemporaryStats(sim, LunarBlessingAuraID, 0, "Lunar Blessing", stats.SpellPower, spellBonus, dur)
 				}
 			},
 		}
@@ -128,17 +130,19 @@ func ApplyIdoloftheUnseenMoon(agent core.Agent) {
 			ID:   IdoloftheUnseenMoonAuraID,
 			Name: "Idol of the Unseen Moon",
 			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-				if spellCast.ActionID.SpellID == SpellIDMF {
-					if sim.RandomFloat("Idol of the Unseen Moon") < 0.5 {
-						druid.AddAuraWithTemporaryStats(sim, LunarGraceAuraID, 0, "Lunar Blessing", stats.SpellPower, spellBonus, dur)
+				if spellCast.ActionID.SpellID == SpellIDMoonfire {
+					if sim.RandomFloat("Idol of the Unseen Moon") > 0.5 {
+						return
 					}
+					druid.AddAuraWithTemporaryStats(sim, LunarGraceAuraID, 0, "Lunar Blessing", stats.SpellPower, spellBonus, dur)
 				}
 			},
 			OnSpellMiss: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-				if spellCast.ActionID.SpellID == SpellIDMF {
-					if sim.RandomFloat("Idol of the Unseen Moon") < 0.5 {
-						druid.AddAuraWithTemporaryStats(sim, LunarGraceAuraID, 0, "Lunar Blessing", stats.SpellPower, spellBonus, dur)
+				if spellCast.ActionID.SpellID == SpellIDMoonfire {
+					if sim.RandomFloat("Idol of the Unseen Moon") > 0.5 {
+						return
 					}
+					druid.AddAuraWithTemporaryStats(sim, LunarGraceAuraID, 0, "Lunar Blessing", stats.SpellPower, spellBonus, dur)
 				}
 			},
 		}
@@ -162,16 +166,18 @@ func ApplyAshtongueTalisman(agent core.Agent) {
 			Name: "Ashtongue Talisman of Equilibrium",
 			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 				if spellCast.ActionID.SpellID == SpellIDSF8 || spellCast.ActionID.SpellID == SpellIDSF6 {
-					if sim.RandomFloat("Ashtongue Talisman") < 0.25 {
-						char.AddAuraWithTemporaryStats(sim, AshtongueTalismanAuraID, 0, "Ashtongue Spellpower", stats.SpellPower, spellBonus, dur)
+					if sim.RandomFloat("Ashtongue Talisman") > 0.25 {
+						return
 					}
+					char.AddAuraWithTemporaryStats(sim, AshtongueTalismanAuraID, 40442, "Ashtongue Spellpower", stats.SpellPower, spellBonus, dur)
 				}
 			},
 			OnSpellMiss: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 				if spellCast.ActionID.SpellID == SpellIDSF8 || spellCast.ActionID.SpellID == SpellIDSF6 {
-					if sim.RandomFloat("Ashtongue Talisman") < 0.25 {
-						char.AddAuraWithTemporaryStats(sim, AshtongueTalismanAuraID, 0, "Ashtongue Spellpower", stats.SpellPower, spellBonus, dur)
+					if sim.RandomFloat("Ashtongue Talisman") > 0.25 {
+						return
 					}
+					char.AddAuraWithTemporaryStats(sim, AshtongueTalismanAuraID, 40442, "Ashtongue Spellpower", stats.SpellPower, spellBonus, dur)
 				}
 			},
 		}

@@ -1,0 +1,42 @@
+// Set color variables which control the site theme.
+.shadow-priest-sim-ui {
+	--theme-color-primary: #9b57f7;
+	--theme-color-background: #1d1726;
+	--theme-color-background-raw: 29, 23, 38;
+	--theme-background-image: url('/tbc/assets/shadow_priest_background.jpg');
+	--main-text-color: White;
+}
+
+// Set grid width for icon sections based on how many buffs we configured.
+.shadow-priest-sim-ui .self-buffs-section {
+  grid-template-columns: repeat(3, 1fr);
+}
+.shadow-priest-sim-ui .consumes-section {
+  grid-template-columns: repeat(5, 1fr);
+}
+.shadow-priest-sim-ui .buffs-section {
+  grid-template-columns: repeat(7, 1fr);
+}
+.shadow-priest-sim-ui .debuffs-section {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+// Shadow has a lot of EP stats, so make the text smaller so it fits vertically.
+.shadow-priest-sim-ui .character-stats-table-row {
+  font-size: 14px;
+}
+.shadow-priest-sim-ui .results-ep-table tr td:nth-child(1) {
+  font-size: 12px;
+}
+.shadow-priest-sim-ui .results-ep-table tr td:nth-child(2), .results-ep-table tr td:nth-child(4) {
+  font-size: 12px;
+}
+.shadow-priest-sim-ui .results-ep-table tr td:nth-child(2):after {
+  font-size: 11px;
+}
+.shadow-priest-sim-ui .results-ep-table tr td:nth-child(4):after {
+  font-size: 11px;
+}
+.shadow-priest-sim-ui .results-ep-table tr td:nth-child(3), .results-ep-table tr td:nth-child(5) {
+  font-size: 10px;
+}

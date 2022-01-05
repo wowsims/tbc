@@ -4,10 +4,13 @@ import (
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
+	"github.com/wowsims/tbc/sim/core/proto"
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-const SpellIDIS int32 = 27013
+const SpellIDInsectSwarm int32 = 27013
+
+var InsectSwarmDebuffID = core.NewDebuffID()
 
 func (druid *Druid) newInsectSwarmTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
 	baseCast := core.Cast{
@@ -19,19 +22,22 @@ func (druid *Druid) newInsectSwarmTemplate(sim *core.Simulation) core.SimpleSpel
 		ManaCost:       175,
 		CastTime:       0,
 		ActionID: core.ActionID{
-			SpellID: SpellIDIS,
+			SpellID: SpellIDInsectSwarm,
 		},
 	}
 
 	effect := core.SpellHitEffect{
 		SpellEffect: core.SpellEffect{
-			DamageMultiplier: 1,
+			DamageMultiplier:       1,
+			StaticDamageMultiplier: 1,
 		},
 		DotInput: core.DotDamageInput{
 			NumberOfTicks:        6,
 			TickLength:           time.Second * 2,
 			TickBaseDamage:       792 / 6,
 			TickSpellCoefficient: 0.127,
+			DebuffID:             InsectSwarmDebuffID,
+			SpellID:              SpellIDInsectSwarm,
 		},
 	}
 	return core.NewSimpleSpellTemplate(core.SimpleSpell{
@@ -54,4 +60,8 @@ func (druid *Druid) NewInsectSwarm(sim *core.Simulation, target *core.Target) *c
 	sf.Init(sim)
 
 	return sf
+}
+
+func (druid *Druid) ShouldCastInsectSwarm(sim *core.Simulation, target *core.Target, rotation proto.BalanceDruid_Rotation) bool {
+	return rotation.InsectSwarm && !druid.InsectSwarmSpell.DotInput.IsTicking(sim)
 }

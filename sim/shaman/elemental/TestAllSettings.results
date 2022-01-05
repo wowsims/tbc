@@ -1,0 +1,480 @@
+dps_results: {
+ key: "TestAllSettings-Orc-P1-Adaptive-FullBuffs-LongMultiTarget"
+ value: {
+  dps: 2067.4920764484364
+ }
+}
+dps_results: {
+ key: "TestAllSettings-Orc-P1-Adaptive-FullBuffs-LongSingleTargetFullDebuffs"
+ value: {
+  dps: 1613.9579445101228
+ }
+}
+dps_results: {
+ key: "TestAllSettings-Orc-P1-Adaptive-FullBuffs-LongSingleTargetNoDebuffs"
+ value: {
+  dps: 1497.355232230255
+ }
+}
+dps_results: {
+ key: "TestAllSettings-Orc-P1-Adaptive-FullBuffs-ShortSingleTargetFullDebuffs"
+ value: {
+  dps: 2155.98083103576
+ }
+}
+dps_results: {
+ key: "TestAllSettings-Orc-P1-Adaptive-NoBuffs-LongMultiTarget"
+ value: {
+  dps: 1114.0068923598494
+ }
+}
+dps_results: {
+ key: "TestAllSettings-Orc-P1-Adaptive-NoBuffs-LongSingleTargetFullDebuffs"
+ value: {
+  dps: 1091.8616478313288
+ }
+}
+dps_results: {
+ key: "TestAllSettings-Orc-P1-Adaptive-NoBuffs-LongSingleTargetNoDebuffs"
+ value: {
+  dps: 805.0083932369454
+ }
+}
+dps_results: {
+ key: "TestAllSettings-Orc-P1-Adaptive-NoBuffs-ShortSingleTargetFullDebuffs"
+ value: {
+  dps: 1719.7110195442226
+ }
+}
+dps_results: {
+ key: "TestAllSettings-Orc-P1-CLOnClearcast-FullBuffs-LongMultiTarget"
+ value: {
+  dps: 1953.4549765775307
+ }
+}
+dps_results: {
+ key: "TestAllSettings-Orc-P1-CLOnClearcast-FullBuffs-LongSingleTargetFullDebuffs"
+ value: {
+  dps: 1598.2214492991886
+ }
+}
+dps_results: {
+ key: "TestAllSettings-Orc-P1-CLOnClearcast-FullBuffs-LongSingleTargetNoDebuffs"
+ value: {
+  dps: 1463.3692140864557
+ }
+}
+dps_results: {
+ key: "TestAllSettings-Orc-P1-CLOnClearcast-FullBuffs-ShortSingleTargetFullDebuffs"
+ value: {
+  dps: 2126.155255181571
+ }
+}
+dps_results: {
+ key: "TestAllSettings-Orc-P1-CLOnClearcast-NoBuffs-LongMultiTarget"
+ value: {
+  dps: 1288.926038220863
+ }
+}
+dps_results: {
+ key: "TestAllSettings-Orc-P1-CLOnClearcast-NoBuffs-LongSingleTargetFullDebuffs"
+ value: {
+  dps: 862.3657142964463
+ }
+}
+dps_results: {
+ key: "TestAllSettings-Orc-P1-CLOnClearcast-NoBuffs-LongSingleTargetNoDebuffs"
+ value: {
+  dps: 674.1984516803287
+ }
+}
+dps_results: {
+ key: "TestAllSettings-Orc-P1-CLOnClearcast-NoBuffs-ShortSingleTargetFullDebuffs"
+ value: {
+  dps: 1693.734637147787
+ }
+}
+dps_results: {
+ key: "TestAllSettings-Orc-P1-CLOnClearcastNoBuffs-FullBuffs-LongMultiTarget"
+ value: {
+  dps: 1733.8968636372776
+ }
+}
+dps_results: {
+ key: "TestAllSettings-Orc-P1-CLOnClearcastNoBuffs-FullBuffs-LongSingleTargetFullDebuffs"
+ value: {
+  dps: 1423.117469898458
+ }
+}
+dps_results: {
+ key: "TestAllSettings-Orc-P1-CLOnClearcastNoBuffs-FullBuffs-LongSingleTargetNoDebuffs"
+ value: {
+  dps: 1308.1650116408832
+ }
+}
+dps_results: {
+ key: "TestAllSettings-Orc-P1-CLOnClearcastNoBuffs-FullBuffs-ShortSingleTargetFullDebuffs"
+ value: {
+  dps: 1643.1255801370364
+ }
+}
+dps_results: {
+ key: "TestAllSettings-Orc-P1-CLOnClearcastNoBuffs-NoBuffs-LongMultiTarget"
+ value: {
+  dps: 1032.799407452721
+ }
+}
+dps_results: {
+ key: "TestAllSettings-Orc-P1-CLOnClearcastNoBuffs-NoBuffs-LongSingleTargetFullDebuffs"
+ value: {
+  dps: 704.5271329063105
+ }
+}
+dps_results: {
+ key: "TestAllSettings-Orc-P1-CLOnClearcastNoBuffs-NoBuffs-LongSingleTargetNoDebuffs"
+ value: {
+  dps: 554.4447151561459
+ }
+}
+dps_results: {
+ key: "TestAllSettings-Orc-P1-CLOnClearcastNoBuffs-NoBuffs-ShortSingleTargetFullDebuffs"
+ value: {
+  dps: 1236.2726713014788
+ }
+}
+dps_results: {
+ key: "TestAllSettings-Orc-P1-Fixed3LBCL-FullBuffs-LongMultiTarget"
+ value: {
+  dps: 2069.7003516596465
+ }
+}
+dps_results: {
+ key: "TestAllSettings-Orc-P1-Fixed3LBCL-FullBuffs-LongSingleTargetFullDebuffs"
+ value: {
+  dps: 1601.8835166141184
+ }
+}
+dps_results: {
+ key: "TestAllSettings-Orc-P1-Fixed3LBCL-FullBuffs-LongSingleTargetNoDebuffs"
+ value: {
+  dps: 1458.767289090049
+ }
+}
+dps_results: {
+ key: "TestAllSettings-Orc-P1-Fixed3LBCL-FullBuffs-ShortSingleTargetFullDebuffs"
+ value: {
+  dps: 2155.98083103576
+ }
+}
+dps_results: {
+ key: "TestAllSettings-Orc-P1-Fixed3LBCL-NoBuffs-LongMultiTarget"
+ value: {
+  dps: 1218.6416275161498
+ }
+}
+dps_results: {
+ key: "TestAllSettings-Orc-P1-Fixed3LBCL-NoBuffs-LongSingleTargetFullDebuffs"
+ value: {
+  dps: 780.2989825565018
+ }
+}
+dps_results: {
+ key: "TestAllSettings-Orc-P1-Fixed3LBCL-NoBuffs-LongSingleTargetNoDebuffs"
+ value: {
+  dps: 604.9054056198606
+ }
+}
+dps_results: {
+ key: "TestAllSettings-Orc-P1-Fixed3LBCL-NoBuffs-ShortSingleTargetFullDebuffs"
+ value: {
+  dps: 1690.8045779069894
+ }
+}
+dps_results: {
+ key: "TestAllSettings-Orc-P1-LBOnly-FullBuffs-LongMultiTarget"
+ value: {
+  dps: 1526.0136008302845
+ }
+}
+dps_results: {
+ key: "TestAllSettings-Orc-P1-LBOnly-FullBuffs-LongSingleTargetFullDebuffs"
+ value: {
+  dps: 1526.0136008302845
+ }
+}
+dps_results: {
+ key: "TestAllSettings-Orc-P1-LBOnly-FullBuffs-LongSingleTargetNoDebuffs"
+ value: {
+  dps: 1430.612303860107
+ }
+}
+dps_results: {
+ key: "TestAllSettings-Orc-P1-LBOnly-FullBuffs-ShortSingleTargetFullDebuffs"
+ value: {
+  dps: 2066.9419061956532
+ }
+}
+dps_results: {
+ key: "TestAllSettings-Orc-P1-LBOnly-NoBuffs-LongMultiTarget"
+ value: {
+  dps: 1097.484672164406
+ }
+}
+dps_results: {
+ key: "TestAllSettings-Orc-P1-LBOnly-NoBuffs-LongSingleTargetFullDebuffs"
+ value: {
+  dps: 1097.484672164406
+ }
+}
+dps_results: {
+ key: "TestAllSettings-Orc-P1-LBOnly-NoBuffs-LongSingleTargetNoDebuffs"
+ value: {
+  dps: 832.5622355854426
+ }
+}
+dps_results: {
+ key: "TestAllSettings-Orc-P1-LBOnly-NoBuffs-ShortSingleTargetFullDebuffs"
+ value: {
+  dps: 1677.3917645602296
+ }
+}
+dps_results: {
+ key: "TestAllSettings-Troll10-P1-Adaptive-FullBuffs-LongMultiTarget"
+ value: {
+  dps: 2053.8014195623164
+ }
+}
+dps_results: {
+ key: "TestAllSettings-Troll10-P1-Adaptive-FullBuffs-LongSingleTargetFullDebuffs"
+ value: {
+  dps: 1625.6437338309133
+ }
+}
+dps_results: {
+ key: "TestAllSettings-Troll10-P1-Adaptive-FullBuffs-LongSingleTargetNoDebuffs"
+ value: {
+  dps: 1566.0464825647377
+ }
+}
+dps_results: {
+ key: "TestAllSettings-Troll10-P1-Adaptive-FullBuffs-ShortSingleTargetFullDebuffs"
+ value: {
+  dps: 2124.8863606576347
+ }
+}
+dps_results: {
+ key: "TestAllSettings-Troll10-P1-Adaptive-NoBuffs-LongMultiTarget"
+ value: {
+  dps: 1092.9704816835097
+ }
+}
+dps_results: {
+ key: "TestAllSettings-Troll10-P1-Adaptive-NoBuffs-LongSingleTargetFullDebuffs"
+ value: {
+  dps: 1105.43740736384
+ }
+}
+dps_results: {
+ key: "TestAllSettings-Troll10-P1-Adaptive-NoBuffs-LongSingleTargetNoDebuffs"
+ value: {
+  dps: 828.9450259863877
+ }
+}
+dps_results: {
+ key: "TestAllSettings-Troll10-P1-Adaptive-NoBuffs-ShortSingleTargetFullDebuffs"
+ value: {
+  dps: 1661.8939781183367
+ }
+}
+dps_results: {
+ key: "TestAllSettings-Troll10-P1-CLOnClearcast-FullBuffs-LongMultiTarget"
+ value: {
+  dps: 1995.687498398023
+ }
+}
+dps_results: {
+ key: "TestAllSettings-Troll10-P1-CLOnClearcast-FullBuffs-LongSingleTargetFullDebuffs"
+ value: {
+  dps: 1608.4878419307572
+ }
+}
+dps_results: {
+ key: "TestAllSettings-Troll10-P1-CLOnClearcast-FullBuffs-LongSingleTargetNoDebuffs"
+ value: {
+  dps: 1555.1308095626466
+ }
+}
+dps_results: {
+ key: "TestAllSettings-Troll10-P1-CLOnClearcast-FullBuffs-ShortSingleTargetFullDebuffs"
+ value: {
+  dps: 2124.931206765966
+ }
+}
+dps_results: {
+ key: "TestAllSettings-Troll10-P1-CLOnClearcast-NoBuffs-LongMultiTarget"
+ value: {
+  dps: 1239.6280955446582
+ }
+}
+dps_results: {
+ key: "TestAllSettings-Troll10-P1-CLOnClearcast-NoBuffs-LongSingleTargetFullDebuffs"
+ value: {
+  dps: 843.8373209834984
+ }
+}
+dps_results: {
+ key: "TestAllSettings-Troll10-P1-CLOnClearcast-NoBuffs-LongSingleTargetNoDebuffs"
+ value: {
+  dps: 713.3444755579017
+ }
+}
+dps_results: {
+ key: "TestAllSettings-Troll10-P1-CLOnClearcast-NoBuffs-ShortSingleTargetFullDebuffs"
+ value: {
+  dps: 1691.329994643215
+ }
+}
+dps_results: {
+ key: "TestAllSettings-Troll10-P1-CLOnClearcastNoBuffs-FullBuffs-LongMultiTarget"
+ value: {
+  dps: 1715.6658748335158
+ }
+}
+dps_results: {
+ key: "TestAllSettings-Troll10-P1-CLOnClearcastNoBuffs-FullBuffs-LongSingleTargetFullDebuffs"
+ value: {
+  dps: 1409.3612739611074
+ }
+}
+dps_results: {
+ key: "TestAllSettings-Troll10-P1-CLOnClearcastNoBuffs-FullBuffs-LongSingleTargetNoDebuffs"
+ value: {
+  dps: 1373.8451735437552
+ }
+}
+dps_results: {
+ key: "TestAllSettings-Troll10-P1-CLOnClearcastNoBuffs-FullBuffs-ShortSingleTargetFullDebuffs"
+ value: {
+  dps: 1641.0047408457249
+ }
+}
+dps_results: {
+ key: "TestAllSettings-Troll10-P1-CLOnClearcastNoBuffs-NoBuffs-LongMultiTarget"
+ value: {
+  dps: 982.4128932899221
+ }
+}
+dps_results: {
+ key: "TestAllSettings-Troll10-P1-CLOnClearcastNoBuffs-NoBuffs-LongSingleTargetFullDebuffs"
+ value: {
+  dps: 690.6413550300789
+ }
+}
+dps_results: {
+ key: "TestAllSettings-Troll10-P1-CLOnClearcastNoBuffs-NoBuffs-LongSingleTargetNoDebuffs"
+ value: {
+  dps: 544.7140727047012
+ }
+}
+dps_results: {
+ key: "TestAllSettings-Troll10-P1-CLOnClearcastNoBuffs-NoBuffs-ShortSingleTargetFullDebuffs"
+ value: {
+  dps: 1219.6565696664786
+ }
+}
+dps_results: {
+ key: "TestAllSettings-Troll10-P1-Fixed3LBCL-FullBuffs-LongMultiTarget"
+ value: {
+  dps: 2060.148555653983
+ }
+}
+dps_results: {
+ key: "TestAllSettings-Troll10-P1-Fixed3LBCL-FullBuffs-LongSingleTargetFullDebuffs"
+ value: {
+  dps: 1617.5070412846212
+ }
+}
+dps_results: {
+ key: "TestAllSettings-Troll10-P1-Fixed3LBCL-FullBuffs-LongSingleTargetNoDebuffs"
+ value: {
+  dps: 1513.8599465135323
+ }
+}
+dps_results: {
+ key: "TestAllSettings-Troll10-P1-Fixed3LBCL-FullBuffs-ShortSingleTargetFullDebuffs"
+ value: {
+  dps: 2124.8863606576347
+ }
+}
+dps_results: {
+ key: "TestAllSettings-Troll10-P1-Fixed3LBCL-NoBuffs-LongMultiTarget"
+ value: {
+  dps: 1123.762747231336
+ }
+}
+dps_results: {
+ key: "TestAllSettings-Troll10-P1-Fixed3LBCL-NoBuffs-LongSingleTargetFullDebuffs"
+ value: {
+  dps: 758.602602660774
+ }
+}
+dps_results: {
+ key: "TestAllSettings-Troll10-P1-Fixed3LBCL-NoBuffs-LongSingleTargetNoDebuffs"
+ value: {
+  dps: 646.8474252198423
+ }
+}
+dps_results: {
+ key: "TestAllSettings-Troll10-P1-Fixed3LBCL-NoBuffs-ShortSingleTargetFullDebuffs"
+ value: {
+  dps: 1661.855386441156
+ }
+}
+dps_results: {
+ key: "TestAllSettings-Troll10-P1-LBOnly-FullBuffs-LongMultiTarget"
+ value: {
+  dps: 1515.0222225509729
+ }
+}
+dps_results: {
+ key: "TestAllSettings-Troll10-P1-LBOnly-FullBuffs-LongSingleTargetFullDebuffs"
+ value: {
+  dps: 1515.0222225509729
+ }
+}
+dps_results: {
+ key: "TestAllSettings-Troll10-P1-LBOnly-FullBuffs-LongSingleTargetNoDebuffs"
+ value: {
+  dps: 1492.061182506802
+ }
+}
+dps_results: {
+ key: "TestAllSettings-Troll10-P1-LBOnly-FullBuffs-ShortSingleTargetFullDebuffs"
+ value: {
+  dps: 2024.8843621400285
+ }
+}
+dps_results: {
+ key: "TestAllSettings-Troll10-P1-LBOnly-NoBuffs-LongMultiTarget"
+ value: {
+  dps: 1079.2864357567285
+ }
+}
+dps_results: {
+ key: "TestAllSettings-Troll10-P1-LBOnly-NoBuffs-LongSingleTargetFullDebuffs"
+ value: {
+  dps: 1079.2864357567285
+ }
+}
+dps_results: {
+ key: "TestAllSettings-Troll10-P1-LBOnly-NoBuffs-LongSingleTargetNoDebuffs"
+ value: {
+  dps: 849.4710954971413
+ }
+}
+dps_results: {
+ key: "TestAllSettings-Troll10-P1-LBOnly-NoBuffs-ShortSingleTargetFullDebuffs"
+ value: {
+  dps: 1644.3025033552296
+ }
+}

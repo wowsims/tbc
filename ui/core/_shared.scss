@@ -1,4 +1,8 @@
 :root {
+	--theme-color-primary: DarkSlateGrey;
+	--theme-color-background: DarkSlateGrey;
+	--theme-color-background-raw: 0, 0, 0;
+	--theme-background-image: linear-gradient(black, black);
 	--main-bg-color: DarkSlateGrey;
 	--main-text-color: White;
 	--main-secondary-color: Black;
@@ -6,6 +10,24 @@
 	--sidebar-text-color: White;
 	--sidebar-highlight-color: Blue;
 }
+
+@font-face {
+	font-family: SimDefaultFont;
+	src: url(/tbc/assets/PlusJakartaSans-Regular.woff2);
+}
+
+@font-face {
+	font-family: SimDefaultFont;
+	src: url(/tbc/assets/PlusJakartaSans-Bold.woff2);
+	font-weight: bold;
+}
+
+* {
+	font-family: SimDefaultFont;
+	letter-spacing: 1px;
+}
+
+$sim-transitions: .2s ease-in;
 
 @mixin vertical-center {
   margin: 0;
@@ -22,11 +44,11 @@
 }
 
 @mixin vertical-horizontal-center {
-  margin: 0;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  margin: 0 !important;
+  position: absolute !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
 }
 
 @mixin vertical-bottom {
@@ -66,10 +88,6 @@
   100% { transform: rotate(360deg); }
 }
 
-.socket-color-blue {
-  border: 1px solid blue;
-}
-
 .item-quality-junk {
   color: #fff !important;
 }
@@ -94,16 +112,20 @@
   color: #ff8000 !important;
 }
 
-.socket-color-meta {
-  border: 1px solid white;
+#bootstrap-overrides .socket-color-blue {
+  border: 1px solid blue !important;
 }
 
-.socket-color-red {
-  border: 1px solid red;
+#bootstrap-overrides .socket-color-meta {
+  border: 1px solid white !important;
 }
 
-.socket-color-yellow {
-  border: 1px solid yellow;
+#bootstrap-overrides .socket-color-red {
+  border: 1px solid red !important;
+}
+
+#bootstrap-overrides .socket-color-yellow {
+  border: 1px solid yellow !important;
 }
 
 @mixin wowhead-background-icon {
@@ -112,4 +134,52 @@
   position: relative;
   cursor: pointer;
   display: inline-block;
+}
+
+.dropdown-root {
+	position: relative;
+	display: inline-block;
+	white-space: nowrap;
+}
+
+.dropdown-button {
+	cursor: pointer;
+	background-color: gray;
+}
+
+.dropdown-panel {
+	display: none;
+	position: absolute;
+	box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+	z-index: 1;
+}
+
+.dropdown-panel-column {
+	display: inline-flex;
+	flex-direction: column;
+}
+
+.dropdown-root:hover .dropdown-panel {
+	display: block !important;
+}
+
+.dropdown-option-container {
+	background-color: gray;
+}
+
+.dropdown-option {
+	display: flex;
+	align-items: center;
+	cursor: pointer;
+}
+
+*:not(.dropdown-button) > * > .dropdown-option:not(:hover) {
+	opacity: 0.7;
+}
+
+.positive {
+	color: lawngreen !important;
+}
+.negative {
+	color: red !important;
 }

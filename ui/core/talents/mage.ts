@@ -31,7 +31,7 @@ export class MageTalentsPicker extends TalentsPicker<Spec.SpecMage> {
             maxPoints: 5,
           },
           {
-            //fieldName: 'improvedArcaneMissles',
+            //fieldName: 'improvedArcaneMissiles',
             location: {
               rowIdx: 0,
               colIdx: 2,
@@ -183,7 +183,7 @@ export class MageTalentsPicker extends TalentsPicker<Spec.SpecMage> {
             maxPoints: 3,
           },
           {
-            fieldName: 'empoweredArcaneMissles',
+            fieldName: 'empoweredArcaneMissiles',
             location: {
               rowIdx: 6,
               colIdx: 0,

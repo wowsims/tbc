@@ -98,6 +98,16 @@ func itemToGoString(itemDeclaration ItemDeclaration, itemResponse WowheadItemRes
 		}
 	}
 
+	min, max := itemResponse.GetWeaponDamage()
+	if min != 0 && max != 0 {
+		itemStr += fmt.Sprintf("WeaponDamageMin: %0.1f, ", min)
+		itemStr += fmt.Sprintf("WeaponDamageMax: %0.1f, ", max)
+	}
+	speed := itemResponse.GetWeaponSpeed()
+	if speed != 0 {
+		itemStr += fmt.Sprintf("SwingSpeed: %0.2f, ", speed)
+	}
+
 	phase := itemDeclaration.Phase
 	if phase == 0 {
 		phase = itemResponse.GetPhase()

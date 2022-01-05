@@ -4,20 +4,18 @@ import { Target as TargetProto } from '/tbc/core/proto/common.js';
 
 import { Listener } from './typed_event.js';
 import { Sim } from './sim.js';
-import { TypedEvent } from './typed_event.js';
+import { EventID, TypedEvent } from './typed_event.js';
 import { sum } from './utils.js';
 import { wait } from './utils.js';
 
-export interface TargetConfig {
-  defaults: {
-		armor: number,
-		mobType: MobType,
-		debuffs: Debuffs,
-  },
-}
-
 // Manages all the settings for a single Target.
 export class Target {
+	private readonly sim: Sim;
+
+	private armor: number = 7700;
+	private mobType: MobType = MobType.MobTypeDemon;
+  private debuffs: Debuffs = Debuffs.create();
+
   readonly armorChangeEmitter = new TypedEvent<void>();
   readonly mobTypeChangeEmitter = new TypedEvent<void>();
   readonly debuffsChangeEmitter = new TypedEvent<void>();
@@ -25,49 +23,38 @@ export class Target {
   // Emits when any of the above emitters emit.
   readonly changeEmitter = new TypedEvent<void>();
 
-  // Current values
-	private armor: number;
-	private mobType: MobType;
-  private debuffs: Debuffs;
-
-	private readonly sim: Sim;
-
-  constructor(config: TargetConfig, sim: Sim) {
+  constructor(sim: Sim) {
 		this.sim = sim;
-
-    this.armor = config.defaults.armor;
-    this.mobType = config.defaults.mobType;
-    this.debuffs = config.defaults.debuffs;
 
     [
       this.armorChangeEmitter,
       this.mobTypeChangeEmitter,
       this.debuffsChangeEmitter,
-    ].forEach(emitter => emitter.on(() => this.changeEmitter.emit()));
+    ].forEach(emitter => emitter.on(eventID => this.changeEmitter.emit(eventID)));
   }
 
   getArmor(): number {
     return this.armor;
   }
 
-  setArmor(newArmor: number) {
+  setArmor(eventID: EventID, newArmor: number) {
     if (newArmor == this.armor)
       return;
 
 		this.armor = newArmor;
-    this.armorChangeEmitter.emit();
+    this.armorChangeEmitter.emit(eventID);
   }
 
   getMobType(): MobType {
     return this.mobType;
   }
 
-  setMobType(newMobType: MobType) {
+  setMobType(eventID: EventID, newMobType: MobType) {
     if (newMobType == this.mobType)
       return;
 
 		this.mobType = newMobType;
-    this.mobTypeChangeEmitter.emit();
+    this.mobTypeChangeEmitter.emit(eventID);
   }
 
   getDebuffs(): Debuffs {
@@ -75,13 +62,13 @@ export class Target {
     return Debuffs.clone(this.debuffs);
   }
 
-  setDebuffs(newDebuffs: Debuffs) {
+  setDebuffs(eventID: EventID, newDebuffs: Debuffs) {
     if (Debuffs.equals(this.debuffs, newDebuffs))
       return;
 
     // Make a defensive copy
     this.debuffs = Debuffs.clone(newDebuffs);
-    this.debuffsChangeEmitter.emit();
+    this.debuffsChangeEmitter.emit(eventID);
   }
 
 	toProto(): TargetProto {
@@ -92,31 +79,19 @@ export class Target {
 		});
 	}
 
-  // Returns JSON representing all the current values.
+	fromProto(eventID: EventID, proto: TargetProto) {
+		TypedEvent.freezeAllAndDo(() => {
+			this.setArmor(eventID, proto.armor);
+			this.setMobType(eventID, proto.mobType);
+			this.setDebuffs(eventID, proto.debuffs || Debuffs.create());
+		});
+	}
+
   toJson(): Object {
-    return {
-      'armor': this.armor,
-      'mobType': this.mobType,
-      'debuffs': Debuffs.toJson(this.debuffs),
-    };
+		return TargetProto.toJson(this.toProto()) as Object;
   }
 
-  // Set all the current values, assumes obj is the same type returned by toJson().
-  fromJson(obj: any) {
-		const parsedArmor = parseInt(obj['armor']);
-		if (!isNaN(parsedArmor) && parsedArmor != 0) {
-			this.setArmor(parsedArmor);
-		}
-
-		const parsedMobType = parseInt(obj['mobType']);
-		if (!isNaN(parsedMobType) && parsedMobType != 0) {
-			this.setMobType(parsedMobType);
-		}
-
-		try {
-			this.setDebuffs(Debuffs.fromJson(obj['debuffs']));
-		} catch (e) {
-			console.warn('Failed to parse debuffs: ' + e);
-		}
+  fromJson(eventID: EventID, obj: any) {
+		this.fromProto(eventID, TargetProto.fromJson(obj));
   }
 }

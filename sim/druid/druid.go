@@ -13,9 +13,8 @@ type Druid struct {
 	SelfBuffs
 	Talents proto.DruidTalents
 
-	innervateCD  time.Duration
 	NaturesGrace bool // when true next spellcast is 0.5s faster
-	RebirthUsed bool
+	RebirthUsed  bool
 
 	// cached cast stuff
 	starfireSpell         core.SimpleSpell
@@ -31,12 +30,14 @@ type Druid struct {
 	InsectSwarmSpell        core.SimpleSpell
 	insectSwarmCastTemplate core.SimpleSpellTemplate
 
-	malorne4p bool // cached since we need to check on every innervate
+	FaerieFireSpell        core.SimpleSpell
+	faerieFireCastTemplate core.SimpleSpellTemplate
 }
 
 type SelfBuffs struct {
-	Omen      bool
-	Innervate bool
+	Omen bool
+
+	InnervateTarget proto.RaidTarget
 }
 
 func (druid *Druid) GetCharacter() *core.Character {
@@ -70,20 +71,16 @@ func (druid *Druid) Init(sim *core.Simulation) {
 	druid.moonfireCastTemplate = druid.newMoonfireTemplate(sim)
 	druid.wrathCastTemplate = druid.newWrathTemplate(sim)
 	druid.insectSwarmCastTemplate = druid.newInsectSwarmTemplate(sim)
+	druid.faerieFireCastTemplate = druid.newFaerieFireTemplate(sim)
 }
 
-func (druid *Druid) Reset(newsim *core.Simulation) {
-	// Cleanup and pending dots and casts
-	druid.MoonfireSpell = core.SimpleSpell{}
-	druid.InsectSwarmSpell = core.SimpleSpell{}
-	druid.starfireSpell = core.SimpleSpell{}
-	druid.wrathSpell = core.SimpleSpell{}
+func (druid *Druid) Reset(sim *core.Simulation) {
 	druid.RebirthUsed = false
 }
 
 func (druid *Druid) Advance(sim *core.Simulation, elapsedTime time.Duration) {
 	// druid should never be outside the 5s window, use combat regen.
-	druid.Character.RegenManaCasting(sim, elapsedTime)
+	druid.Character.RegenMana(sim, elapsedTime)
 }
 
 func (druid *Druid) Act(sim *core.Simulation) time.Duration {
@@ -107,7 +104,7 @@ func (druid *Druid) applyNaturesGrace(spellCast *core.SpellCast) {
 	}
 }
 
-func NewDruid(char core.Character, selfBuffs SelfBuffs, talents proto.DruidTalents) Druid {
+func New(char core.Character, selfBuffs SelfBuffs, talents proto.DruidTalents) Druid {
 
 	char.AddStat(stats.SpellHit, float64(talents.BalanceOfPower)*2*core.SpellHitRatingPerHitChance)
 
@@ -218,13 +215,13 @@ func NewDruid(char core.Character, selfBuffs SelfBuffs, talents proto.DruidTalen
 	}
 
 	druid := Druid{
-		Character: char,
-		SelfBuffs: selfBuffs,
-		Talents:   talents,
-		malorne4p: ItemSetMalorne.CharacterHasSetBonus(&char, 4),
+		Character:   char,
+		SelfBuffs:   selfBuffs,
+		Talents:     talents,
 		RebirthUsed: false,
 	}
 
+	druid.registerInnervateCD()
 	druid.registerNaturesSwiftnessCD()
 
 	return druid
@@ -239,16 +236,21 @@ func (druid *Druid) registerNaturesSwiftnessCD() {
 	}
 
 	druid.AddMajorCooldown(core.MajorCooldown{
+		ActionID:   core.ActionID{SpellID: 17116},
 		CooldownID: NaturesSwiftnessCooldownID,
 		Cooldown:   time.Minute * 3,
+		CanActivate: func(sim *core.Simulation, character *core.Character) bool {
+			return true
+		},
+		ShouldActivate: func(sim *core.Simulation, character *core.Character) bool {
+			// Don't use NS unless we're casting a full-length starfire or wrath.
+			if character.HasTemporarySpellCastSpeedIncrease() {
+				return false
+			}
+			return true
+		},
 		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
-			return func(sim *core.Simulation, character *core.Character) bool {
-				// Don't use NS unless we're casting a full-length starfire or wrath.
-
-				if character.HasTemporarySpellCastSpeedIncrease() {
-					return false
-				}
-
+			return func(sim *core.Simulation, character *core.Character) {
 				character.AddAura(sim, core.Aura{
 					ID:      NaturesSwiftnessAuraID,
 					Name:    "Nature's Swiftness",
@@ -268,11 +270,10 @@ func (druid *Druid) registerNaturesSwiftnessCD() {
 						// Remove the buff and put skill on CD
 						character.SetCD(NaturesSwiftnessCooldownID, sim.CurrentTime+time.Minute*3)
 						character.RemoveAura(sim, NaturesSwiftnessAuraID)
-						character.UpdateMajorCooldowns(sim)
+						character.UpdateMajorCooldowns()
 						character.Metrics.AddInstantCast(core.ActionID{SpellID: 17116})
 					},
 				})
-				return true
 			}
 		},
 	})
@@ -285,7 +286,7 @@ func init() {
 		stats.Stamina:   85,
 		stats.Intellect: 115,
 		stats.Spirit:    135,
-		stats.Mana:      2090,  // 3815 mana shown on naked character
+		stats.Mana:      2370,
 		stats.SpellCrit: 40.66, // 3.29% chance to crit shown on naked character screen
 		// 4498 health shown on naked character (would include tauren bonus)
 	}
@@ -295,7 +296,7 @@ func init() {
 		stats.Stamina:   82,
 		stats.Intellect: 120,
 		stats.Spirit:    133,
-		stats.Mana:      2090,  // 3890 mana shown on naked character
+		stats.Mana:      2370,
 		stats.SpellCrit: 40.60, // 3.35% chance to crit shown on naked character screen
 		// 4254 health shown on naked character
 	}

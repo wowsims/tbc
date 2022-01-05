@@ -1,147 +1,18 @@
+import { ItemOrSpellId } from '/tbc/core/proto_utils/action_id.js';
 import { getIconUrl } from '/tbc/core/resources.js';
-import { ItemOrSpellId } from '/tbc/core/resources.js';
 import { setWowheadHref } from '/tbc/core/resources.js';
-import { TypedEvent } from '/tbc/core/typed_event.js';
+import { EventID, TypedEvent } from '/tbc/core/typed_event.js';
 import { isRightClick } from '/tbc/core/utils.js';
-import { ExclusivityTag } from '/tbc/core/sim_ui.js';
-import { SimUI } from '/tbc/core/sim_ui.js';
 
 import { Component } from './component.js';
-
-// Icon-based UI for picking buffs / consumes / etc
-// ModObject is the object being modified (Sim, Player, or Target).
-export class IconPicker<ModObject> extends Component {
-  private readonly _inputs: Array<IconInputComponent<ModObject>>;
-
-  constructor(parent: HTMLElement, modObj: ModObject, inputs: Array<IconInput<ModObject>>, simUI: SimUI<any>) {
-    super(parent, 'icon-picker-root');
-
-    this._inputs = inputs.map(input => new IconInputComponent(this.rootElem, modObj, input, simUI));
-  }
-}
-
-// ModObject is the object being modified (Sim, Player, or Target).
-class IconInputComponent<ModObject> extends Component {
-  private readonly _input: IconInput<ModObject>;
-  private readonly _modObject: ModObject;
-
-  private readonly _rootAnchor: HTMLAnchorElement;
-  private readonly _improvedAnchor: HTMLAnchorElement;
-  private readonly _counterElem: HTMLElement;
-  private readonly _clickedEmitter = new TypedEvent<void>();
-
-  constructor(parent: HTMLElement, modObj: ModObject, input: IconInput<ModObject>, simUI: SimUI<any>) {
-    super(parent, 'icon-input', document.createElement('a'));
-    this._input = input;
-    this._modObject = modObj;
-
-    this._rootAnchor = this.rootElem as HTMLAnchorElement;
-    this._rootAnchor.target = '_blank';
-    this._rootAnchor.dataset.states = String(this._input.states);
-
-    this._rootAnchor.innerHTML = `
-    <div class="icon-input-level-container">
-      <a class="icon-input-improved"></a>
-      <span class="icon-input-counter"></span>
-    </div>
-    `;
-
-    this._improvedAnchor = this._rootAnchor.getElementsByClassName('icon-input-improved')[0] as HTMLAnchorElement;
-    this._counterElem = this._rootAnchor.getElementsByClassName('icon-input-counter')[0] as HTMLAnchorElement;
-
-    setWowheadHref(this._rootAnchor, this._input.id);
-    getIconUrl(this._input.id).then(url => {
-      this._rootAnchor.style.backgroundImage = `url('${url}')`;
-    });
-
-    if (this._input.states == 3) {
-      if (this._input.improvedId) {
-        setWowheadHref(this._improvedAnchor, this._input.improvedId);
-        getIconUrl(this._input.improvedId).then(url => {
-          this._improvedAnchor.style.backgroundImage = `url('${url}')`;
-        });
-      } else {
-        throw new Error('IconInput missing improved icon id');
-      }
-    }
-
-    this.updateIcon();
-    this._input.changedEvent(this._modObject).on(() => this.updateIcon());
-
-    this._rootAnchor.addEventListener('click', event => {
-      event.preventDefault();
-    });
-    this._rootAnchor.addEventListener('contextmenu', event => {
-      event.preventDefault();
-    });
-    this._rootAnchor.addEventListener('mousedown', event => {
-      const rightClick = isRightClick(event);
-      const value = this.getValue();
-
-      if (rightClick) {
-        if (value > 0) {
-          this.setValue(value - 1);
-        }
-      } else {
-        if (this._input.states == 0 || (value + 1) < this._input.states) {
-          this.setValue(value + 1);
-        }
-      }
-      this._clickedEmitter.emit();
-    });
-
-    if (this._input.exclusivityTags) {
-      simUI.registerExclusiveEffect({
-        tags: this._input.exclusivityTags,
-        changedEvent: this._clickedEmitter,
-        isActive: () => Boolean(this.getValue()),
-        deactivate: () => this.setValue(0),
-      });
-    }
-  }
-
-  // Instead of dealing with bool | number, just convert everything to numbers
-  private getValue(): number {
-    return Number(this._input.getValue(this._modObject));
-  }
-
-  private setValue(newValue: number) {
-    if (this._input.setBooleanValue) {
-      this._input.setBooleanValue(this._modObject, newValue > 0);
-    } else if (this._input.setNumberValue) {
-      this._input.setNumberValue(this._modObject, newValue);
-    }
-  }
-
-  private updateIcon() {
-    const value = this.getValue();
-    if (value > 0) {
-      this._rootAnchor.classList.add('active');
-      this._counterElem.classList.add('active');
-    } else {
-      this._rootAnchor.classList.remove('active');
-      this._counterElem.classList.remove('active');
-    }
-
-    if (this._input.states == 3) {
-      if (value > 1) {
-        this._improvedAnchor.classList.add('active');
-      } else {
-        this._improvedAnchor.classList.remove('active');
-      }
-    }
-
-    if (this._input.states > 3 || this._input.states == 0) {
-      this._counterElem.textContent = String(value);
-    }
-  }
-}
+import { Input, InputConfig } from './input.js';
 
 // Data for creating an icon-based input component.
 // 
 // E.g. one of these for arcane brilliance, another for kings, etc.
 // ModObject is the object being modified (Sim, Player, or Target).
-export type IconInput<ModObject> = {
+// ValueType is either number or boolean.
+export interface IconPickerConfig<ModObject, ValueType> extends InputConfig<ModObject, ValueType> {
   id: ItemOrSpellId;
   
   // The number of possible 'states' this icon can have. Most inputs will use 2
@@ -150,15 +21,113 @@ export type IconInput<ModObject> = {
 
   // Only used if states == 3.
   improvedId?: ItemOrSpellId;
-  
-  // If set, all effects with matching tags will be deactivated when this
-  // effect is enabled.
-  exclusivityTags?: Array<ExclusivityTag>;
-
-  changedEvent: (obj: ModObject) => TypedEvent<any>;
-  getValue: (obj: ModObject) => boolean | number;
-
-  // Exactly one of these should be set.
-  setBooleanValue?: (obj: ModObject, newValue: boolean) => void;
-  setNumberValue?: (obj: ModObject, newValue: number) => void;
 };
+
+// Icon-based UI for picking buffs / consumes / etc
+// ModObject is the object being modified (Sim, Player, or Target).
+export class IconPicker<ModObject, ValueType> extends Input<ModObject, ValueType> {
+  private readonly config: IconPickerConfig<ModObject, ValueType>;
+
+  private readonly rootAnchor: HTMLAnchorElement;
+  private readonly improvedAnchor: HTMLAnchorElement;
+  private readonly counterElem: HTMLElement;
+
+	private currentValue: number;
+
+  constructor(parent: HTMLElement, modObj: ModObject, config: IconPickerConfig<ModObject, ValueType>) {
+		config.rootElem = document.createElement('a');
+    super(parent, 'icon-input', modObj, config);
+    this.config = config;
+		this.currentValue = 0;
+
+    this.rootAnchor = this.rootElem as HTMLAnchorElement;
+    this.rootAnchor.target = '_blank';
+    this.rootAnchor.dataset.states = String(this.config.states);
+
+    this.rootAnchor.innerHTML = `
+    <div class="icon-input-level-container">
+      <a class="icon-input-improved"></a>
+      <span class="icon-input-counter"></span>
+    </div>
+    `;
+
+    this.improvedAnchor = this.rootAnchor.getElementsByClassName('icon-input-improved')[0] as HTMLAnchorElement;
+    this.counterElem = this.rootAnchor.getElementsByClassName('icon-input-counter')[0] as HTMLElement;
+
+    setWowheadHref(this.rootAnchor, this.config.id);
+    getIconUrl(this.config.id).then(url => {
+      this.rootAnchor.style.backgroundImage = `url('${url}')`;
+    });
+
+    if (this.config.states == 3) {
+      if (this.config.improvedId) {
+        setWowheadHref(this.improvedAnchor, this.config.improvedId);
+        getIconUrl(this.config.improvedId).then(url => {
+          this.improvedAnchor.style.backgroundImage = `url('${url}')`;
+        });
+      } else {
+        throw new Error('IconInput missing improved icon id');
+      }
+    }
+
+		this.init();
+
+    this.rootAnchor.addEventListener('click', event => {
+      event.preventDefault();
+    });
+    this.rootAnchor.addEventListener('contextmenu', event => {
+      event.preventDefault();
+    });
+    this.rootAnchor.addEventListener('mousedown', event => {
+      const rightClick = isRightClick(event);
+
+      if (rightClick) {
+        if (this.currentValue > 0) {
+					this.currentValue--;
+					this.inputChanged(TypedEvent.nextEventID());
+        }
+      } else {
+        if (this.config.states == 0 || (this.currentValue + 1) < this.config.states) {
+					this.currentValue++;
+					this.inputChanged(TypedEvent.nextEventID());
+        }
+      }
+    });
+  }
+
+	getInputElem(): HTMLElement {
+		return this.rootAnchor;
+	}
+
+	getInputValue(): ValueType {
+		if (this.config.states == 2) {
+			return Boolean(this.currentValue) as unknown as ValueType;
+		} else {
+			return this.currentValue as unknown as ValueType;
+		}
+	}
+
+  setInputValue(newValue: ValueType) {
+    this.currentValue = Number(newValue);
+
+    if (this.currentValue > 0) {
+      this.rootAnchor.classList.add('active');
+      this.counterElem.classList.add('active');
+    } else {
+      this.rootAnchor.classList.remove('active');
+      this.counterElem.classList.remove('active');
+    }
+
+    if (this.config.states == 3) {
+      if (this.currentValue > 1) {
+        this.improvedAnchor.classList.add('active');
+      } else {
+        this.improvedAnchor.classList.remove('active');
+      }
+    }
+
+    if (this.config.states > 3 || this.config.states == 0) {
+      this.counterElem.textContent = String(this.currentValue);
+    }
+  }
+}

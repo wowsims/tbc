@@ -1,0 +1,39 @@
+// Set color variables which control the site theme.
+.enhancement-shaman-sim-ui {
+	--theme-color-primary: #228db0;
+	--theme-color-background: #181d2d;
+	--theme-color-background-raw: 24, 29, 45;
+	--theme-background-image: url('/tbc/assets/enhancement_shaman_background.jpg');
+}
+
+// Set grid width for icon sections based on how many buffs we configured.
+.enhancement-shaman-sim-ui .self-buffs-section {
+  grid-template-columns: repeat(4, 1fr);
+}
+.enhancement-shaman-sim-ui .consumes-section {
+  grid-template-columns: repeat(4, 1fr);
+}
+.enhancement-shaman-sim-ui .buffs-section {
+  grid-template-columns: repeat(6, 1fr);
+}
+.enhancement-shaman-sim-ui .debuffs-section {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.totem-dropdowns-container {
+}
+
+.totem-dropdowns-container > * {
+	margin: 2px;
+}
+
+.totem-dropdowns-container .icon-enum-picker-root a {
+	height: 50px;
+	width: 50px;
+}
+
+.totem-inputs-container > div {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}

@@ -22,6 +22,7 @@ func main() {
 	js.Global().Set("computeStats", js.FuncOf(computeStats))
 	js.Global().Set("gearList", js.FuncOf(gearList))
 	js.Global().Set("individualSim", js.FuncOf(individualSim))
+	js.Global().Set("raidSim", js.FuncOf(raidSim))
 	js.Global().Set("statWeights", js.FuncOf(statWeights))
 	js.Global().Call("wasmready")
 	<-c
@@ -86,6 +87,30 @@ func individualSim(this js.Value, args []js.Value) interface{} {
 		return nil
 	}
 	result := core.RunIndividualSim(isr)
+
+	outbytes, err := googleProto.Marshal(result)
+	if err != nil {
+		log.Printf("[ERROR] Failed to marshal result: %s", err.Error())
+		return nil
+	}
+
+	outArray := js.Global().Get("Uint8Array").New(len(outbytes))
+	js.CopyBytesToJS(outArray, outbytes)
+
+	return outArray
+}
+
+func raidSim(this js.Value, args []js.Value) interface{} {
+	// Assumes args[0] is a Uint8Array
+	data := make([]byte, args[0].Get("length").Int())
+	js.CopyBytesToGo(data, args[0])
+
+	rsr := &proto.RaidSimRequest{}
+	if err := googleProto.Unmarshal(data, rsr); err != nil {
+		log.Printf("Failed to parse request: %s", err)
+		return nil
+	}
+	result := core.RunRaidSim(rsr)
 
 	outbytes, err := googleProto.Marshal(result)
 	if err != nil {

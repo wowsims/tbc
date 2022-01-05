@@ -1,10 +1,7 @@
-import { RaidBuffs } from '/tbc/core/proto/common.js';
-import { PartyBuffs } from '/tbc/core/proto/common.js';
-import { IndividualBuffs } from '/tbc/core/proto/common.js';
 import { Class } from '/tbc/core/proto/common.js';
 import { Consumes } from '/tbc/core/proto/common.js';
 import { Enchant } from '/tbc/core/proto/common.js';
-import { Encounter } from '/tbc/core/proto/common.js';
+import { Encounter as EncounterProto } from '/tbc/core/proto/common.js';
 import { EquipmentSpec } from '/tbc/core/proto/common.js';
 import { Gem } from '/tbc/core/proto/common.js';
 import { GemColor } from '/tbc/core/proto/common.js';
@@ -16,16 +13,19 @@ import { Item } from '/tbc/core/proto/common.js';
 import { Race } from '/tbc/core/proto/common.js';
 import { Spec } from '/tbc/core/proto/common.js';
 import { Stat } from '/tbc/core/proto/common.js';
-import { Player } from '/tbc/core/proto/api.js';
-import { PlayerOptions } from '/tbc/core/proto/api.js';
+import { Raid as RaidProto } from '/tbc/core/proto/api.js';
+import { ComputeStatsRequest, ComputeStatsResult } from '/tbc/core/proto/api.js';
 import { GearListRequest, GearListResult } from '/tbc/core/proto/api.js';
-import { IndividualSimRequest, IndividualSimResult } from '/tbc/core/proto/api.js';
+import { RaidSimRequest, RaidSimResult } from '/tbc/core/proto/api.js';
+import { SimOptions } from '/tbc/core/proto/api.js';
 import { StatWeightsRequest, StatWeightsResult } from '/tbc/core/proto/api.js';
 
 import { EquippedItem } from '/tbc/core/proto_utils/equipped_item.js';
 import { Gear } from '/tbc/core/proto_utils/gear.js';
-import { makeIndividualSimRequest } from '/tbc/core/proto_utils/request_helpers.js';
+import { SimResult } from '/tbc/core/proto_utils/sim_result.js';
 import { Stats } from '/tbc/core/proto_utils/stats.js';
+import { gemEligibleForSocket } from '/tbc/core/proto_utils/gems.js';
+import { gemMatchesSocket } from '/tbc/core/proto_utils/gems.js';
 import { SpecRotation } from '/tbc/core/proto_utils/utils.js';
 import { SpecTalents } from '/tbc/core/proto_utils/utils.js';
 import { SpecTypeFunctions } from '/tbc/core/proto_utils/utils.js';
@@ -35,92 +35,216 @@ import { specToClass } from '/tbc/core/proto_utils/utils.js';
 import { specToEligibleRaces } from '/tbc/core/proto_utils/utils.js';
 import { getEligibleItemSlots } from '/tbc/core/proto_utils/utils.js';
 import { getEligibleEnchantSlots } from '/tbc/core/proto_utils/utils.js';
-import { gemEligibleForSocket } from '/tbc/core/proto_utils/utils.js';
-import { gemMatchesSocket } from '/tbc/core/proto_utils/utils.js';
 
+import { Encounter } from './encounter.js';
+import { Player } from './player.js';
+import { Raid } from './raid.js';
 import { Listener } from './typed_event.js';
-import { TypedEvent } from './typed_event.js';
+import { EventID, TypedEvent } from './typed_event.js';
 import { sum } from './utils.js';
 import { wait } from './utils.js';
 import { WorkerPool } from './worker_pool.js';
 
-export interface SimConfig {
-  defaults: {
-		phase: number,
-    encounter: Encounter,
-    raidBuffs: RaidBuffs,
-    partyBuffs: PartyBuffs,
-    individualBuffs: IndividualBuffs,
-  },
-}
+import * as OtherConstants from '/tbc/core/constants/other.js';
+
+export type RaidSimData = {
+	request: RaidSimRequest,
+	result: RaidSimResult,
+};
+
+export type StatWeightsData = {
+	request: StatWeightsRequest,
+	result: StatWeightsResult,
+};
 
 // Core Sim module which deals only with api types, no UI-related stuff.
-export class Sim extends WorkerPool {
-  readonly phaseChangeEmitter = new TypedEvent<void>();
-  readonly raidBuffsChangeEmitter = new TypedEvent<void>();
-  readonly partyBuffsChangeEmitter = new TypedEvent<void>();
-  readonly individualBuffsChangeEmitter = new TypedEvent<void>();
-  readonly encounterChangeEmitter = new TypedEvent<void>();
-  readonly numTargetsChangeEmitter = new TypedEvent<void>();
+export class Sim {
+	private readonly workerPool: WorkerPool;
 
-  // Emits when any of the above emitters emit.
-  readonly changeEmitter = new TypedEvent<void>();
+	private iterations: number = 3000;
+  private phase: number = OtherConstants.CURRENT_PHASE;
+
+  readonly raid: Raid;
+  readonly encounter: Encounter;
 
   // Database
-  private _items: Record<number, Item> = {};
-  private _enchants: Record<number, Enchant> = {};
-  private _gems: Record<number, Gem> = {};
+  private items: Record<number, Item> = {};
+  private enchants: Record<number, Enchant> = {};
+  private gems: Record<number, Gem> = {};
 
-  readonly gearListEmitter = new TypedEvent<void>();
+  readonly iterationsChangeEmitter = new TypedEvent<void>();
+  readonly phaseChangeEmitter = new TypedEvent<void>();
 
-  // Current values
-  private _phase: number;
-  private _raidBuffs: RaidBuffs;
-  private _partyBuffs: PartyBuffs;
-  private _individualBuffs: IndividualBuffs;
-  private _encounter: Encounter;
-  private _numTargets: number;
+  // Emits when any of the above emitters emit.
+  readonly changeEmitter: TypedEvent<void>;
 
-  private _init = false;
+	// Fires when a raid sim API call completes.
+  readonly simResultEmitter = new TypedEvent<SimResult>();
 
-  constructor(config: SimConfig) {
-		super(3);
+	private readonly _initPromise: Promise<void>;
 
-		this._phase = config.defaults.phase;
-    this._raidBuffs = config.defaults.raidBuffs;
-    this._partyBuffs = config.defaults.partyBuffs;
-    this._individualBuffs = config.defaults.individualBuffs;
-    this._encounter = config.defaults.encounter;
-    this._numTargets = 1;
+	// These callbacks are needed so we can apply BuffBot modifications automatically before sending requests.
+	private modifyRaidProto: ((raidProto: RaidProto) => void) = () => {};
+	private modifyEncounterProto: ((encounterProto: EncounterProto) => void) = () => {};
 
-    [
-      this.raidBuffsChangeEmitter,
-      this.partyBuffsChangeEmitter,
-      this.individualBuffsChangeEmitter,
-      this.encounterChangeEmitter,
-      this.numTargetsChangeEmitter,
+  constructor() {
+		this.workerPool = new WorkerPool(3);
+
+    this._initPromise = this.workerPool.getGearList(GearListRequest.create()).then(result => {
+			result.items.forEach(item => this.items[item.id] = item);
+			result.enchants.forEach(enchant => this.enchants[enchant.id] = enchant);
+			result.gems.forEach(gem => this.gems[gem.id] = gem);
+		});
+
+		this.raid = new Raid(this);
+    this.encounter = new Encounter(this);
+
+		
+		this.changeEmitter = TypedEvent.onAny([
+      this.iterationsChangeEmitter,
       this.phaseChangeEmitter,
-    ].forEach(emitter => emitter.on(() => this.changeEmitter.emit()));
+			this.raid.changeEmitter,
+			this.encounter.changeEmitter,
+		]);
+
+		this.raid.changeEmitter.on(eventID => this.updateCharacterStats(eventID));
   }
 
-  async init(spec: Spec): Promise<void> {
-    if (this._init)
-      return;
-    this._init = true;
-
-    const result = await this.getGearList(GearListRequest.create({
-      spec: spec,
-    }));
-
-    result.items.forEach(item => this._items[item.id] = item);
-    result.enchants.forEach(enchant => this._enchants[enchant.id] = enchant);
-    result.gems.forEach(gem => this._gems[gem.id] = gem);
-
-    this.gearListEmitter.emit();
+  waitForInit(): Promise<void> {
+		return this._initPromise;
   }
+
+	setModifyRaidProto(newModFn: (raidProto: RaidProto) => void) {
+		this.modifyRaidProto = newModFn;
+	}
+	getModifiedRaidProto(): RaidProto {
+		const raidProto = this.raid.toProto();
+		this.modifyRaidProto(raidProto);
+
+		// Remove any inactive meta gems, since the backend doesn't have its own validation.
+		raidProto.parties.forEach(party => {
+			party.players.forEach(player => {
+				if (!player.equipment) {
+					return;
+				}
+
+				const gear = this.lookupEquipmentSpec(player.equipment);
+				if (gear.hasInactiveMetaGem()) {
+					player.equipment = gear.withoutMetaGem().asSpec();
+				}
+			});
+		});
+
+		return raidProto;
+	}
+
+	setModifyEncounterProto(newModFn: (encounterProto: EncounterProto) => void) {
+		this.modifyEncounterProto = newModFn;
+	}
+	getModifiedEncounterProto(): EncounterProto {
+		const encounterProto = this.encounter.toProto();
+		this.modifyEncounterProto(encounterProto);
+		return encounterProto;
+	}
+
+  private makeRaidSimRequest(debug: boolean): RaidSimRequest {
+		return RaidSimRequest.create({
+			raid: this.getModifiedRaidProto(),
+			encounter: this.getModifiedEncounterProto(),
+			simOptions: SimOptions.create({
+				iterations: debug ? 1 : this.getIterations(),
+				debugFirstIteration: true,
+			}),
+		});
+  }
+
+  async runRaidSim(eventID: EventID): Promise<SimResult> {
+		if (this.raid.isEmpty()) {
+			throw new Error('Raid is empty! Try adding some players first.');
+		} else if (this.encounter.getNumTargets() < 1) {
+			throw new Error('Encounter has no targets! Try adding some targets first.');
+		}
+
+		await this.waitForInit();
+
+		const request = this.makeRaidSimRequest(false);
+		const result = await this.workerPool.raidSim(request);
+
+		const simResult = await SimResult.makeNew(request, result);
+		this.simResultEmitter.emit(eventID, simResult);
+		return simResult;
+	}
+
+  async runRaidSimWithLogs(eventID: EventID): Promise<SimResult> {
+		if (this.raid.isEmpty()) {
+			throw new Error('Raid is empty! Try adding some players first.');
+		} else if (this.encounter.getNumTargets() < 1) {
+			throw new Error('Encounter has no targets! Try adding some targets first.');
+		}
+
+		await this.waitForInit();
+
+		const request = this.makeRaidSimRequest(true);
+		const result = await this.workerPool.raidSim(request);
+
+		const simResult = await SimResult.makeNew(request, result);
+		this.simResultEmitter.emit(eventID, simResult);
+		return simResult;
+	}
+
+	// This should be invoked internally whenever stats might have changed.
+	private async updateCharacterStats(eventID: EventID) {
+		await this.waitForInit();
+
+		// Capture the current players so we avoid issues if something changes while
+		// request is in-flight.
+		const players = this.raid.getPlayers();
+
+		const result = await this.workerPool.computeStats(ComputeStatsRequest.create({
+			raid: this.getModifiedRaidProto(),
+		}));
+
+		TypedEvent.freezeAllAndDo(() => {
+			result.raidStats!.parties
+					.forEach((partyStats, partyIndex) =>
+							partyStats.players.forEach((playerStats, playerIndex) =>
+									players[partyIndex*5 + playerIndex]?.setCurrentStats(eventID, playerStats)));
+		});
+	}
+
+  async statWeights(player: Player<any>, epStats: Array<Stat>, epReferenceStat: Stat): Promise<StatWeightsResult> {
+		if (this.raid.isEmpty()) {
+			throw new Error('Raid is empty! Try adding some players first.');
+		} else if (this.encounter.getNumTargets() < 1) {
+			throw new Error('Encounter has no targets! Try adding some targets first.');
+		}
+
+		await this.waitForInit();
+
+		if (player.getParty() == null) {
+			console.warn('Trying to get stat weights without a party!');
+			return StatWeightsResult.create();
+		} else {
+			const request = StatWeightsRequest.create({
+				player: player.toProto(),
+				raidBuffs: this.raid.getBuffs(),
+				partyBuffs: player.getParty()!.getBuffs(),
+				encounter: this.encounter.toProto(),
+				simOptions: SimOptions.create({
+					iterations: this.getIterations(),
+					debug: false,
+				}),
+
+				statsToWeigh: epStats,
+				epReferenceStat: epReferenceStat,
+			});
+
+			return await this.workerPool.statWeights(request);
+		}
+	}
 
 	getItems(slot: ItemSlot | undefined): Array<Item> {
-		let items = Object.values(this._items);
+		let items = Object.values(this.items);
 		if (slot != undefined) {
 			items = items.filter(item => getEligibleItemSlots(item).includes(slot));
 		}
@@ -128,7 +252,7 @@ export class Sim extends WorkerPool {
 	}
 
 	getEnchants(slot: ItemSlot | undefined): Array<Enchant> {
-		let enchants = Object.values(this._enchants);
+		let enchants = Object.values(this.enchants);
 		if (slot != undefined) {
 			enchants = enchants.filter(enchant => getEligibleEnchantSlots(enchant).includes(slot));
 		}
@@ -136,7 +260,7 @@ export class Sim extends WorkerPool {
 	}
 
   getGems(socketColor: GemColor | undefined): Array<Gem> {
-    let gems = Object.values(this._gems);
+    let gems = Object.values(this.gems);
 		if (socketColor) {
 			gems = gems.filter(gem => gemEligibleForSocket(gem, socketColor));
 		}
@@ -144,93 +268,36 @@ export class Sim extends WorkerPool {
   }
 
 	getMatchingGems(socketColor: GemColor): Array<Gem> {
-    return Object.values(this._gems).filter(gem => gemMatchesSocket(gem, socketColor));
+    return Object.values(this.gems).filter(gem => gemMatchesSocket(gem, socketColor));
 	}
   
   getPhase(): number {
-    return this._phase;
+    return this.phase;
   }
-  setPhase(newPhase: number) {
-    if (newPhase != this._phase) {
-      this._phase = newPhase;
-      this.phaseChangeEmitter.emit();
+  setPhase(eventID: EventID, newPhase: number) {
+    if (newPhase != this.phase) {
+      this.phase = newPhase;
+      this.phaseChangeEmitter.emit(eventID);
+    }
+  }
+  
+  getIterations(): number {
+    return this.iterations;
+  }
+  setIterations(eventID: EventID, newIterations: number) {
+    if (newIterations != this.iterations) {
+      this.iterations = newIterations;
+      this.iterationsChangeEmitter.emit(eventID);
     }
   }
 
-  getRaidBuffs(): RaidBuffs {
-    // Make a defensive copy
-    return RaidBuffs.clone(this._raidBuffs);
-  }
-
-  setRaidBuffs(newRaidBuffs: RaidBuffs) {
-    if (RaidBuffs.equals(this._raidBuffs, newRaidBuffs))
-      return;
-
-    // Make a defensive copy
-    this._raidBuffs = RaidBuffs.clone(newRaidBuffs);
-    this.raidBuffsChangeEmitter.emit();
-  }
-
-  getPartyBuffs(): PartyBuffs {
-    // Make a defensive copy
-    return PartyBuffs.clone(this._partyBuffs);
-  }
-
-  setPartyBuffs(newPartyBuffs: PartyBuffs) {
-    if (PartyBuffs.equals(this._partyBuffs, newPartyBuffs))
-      return;
-
-    // Make a defensive copy
-    this._partyBuffs = PartyBuffs.clone(newPartyBuffs);
-    this.partyBuffsChangeEmitter.emit();
-  }
-
-  getIndividualBuffs(): IndividualBuffs {
-    // Make a defensive copy
-    return IndividualBuffs.clone(this._individualBuffs);
-  }
-
-  setIndividualBuffs(newIndividualBuffs: IndividualBuffs) {
-    if (IndividualBuffs.equals(this._individualBuffs, newIndividualBuffs))
-      return;
-
-    // Make a defensive copy
-    this._individualBuffs = IndividualBuffs.clone(newIndividualBuffs);
-    this.individualBuffsChangeEmitter.emit();
-  }
-
-  getEncounter(): Encounter {
-    // Make a defensive copy
-    return Encounter.clone(this._encounter);
-  }
-
-  setEncounter(newEncounter: Encounter) {
-    if (Encounter.equals(this._encounter, newEncounter))
-      return;
-
-    // Make a defensive copy
-    this._encounter = Encounter.clone(newEncounter);
-    this.encounterChangeEmitter.emit();
-  }
-  
-  getNumTargets(): number {
-    return this._numTargets;
-  }
-  setNumTargets(newNumTargets: number) {
-    if (newNumTargets == this._numTargets)
-			return;
-
-		this._numTargets = newNumTargets;
-		this.numTargetsChangeEmitter.emit();
-  }
-
   lookupItemSpec(itemSpec: ItemSpec): EquippedItem | null {
-    const item = this._items[itemSpec.id];
+    const item = this.items[itemSpec.id];
     if (!item)
       return null;
 
-    const enchant = this._enchants[itemSpec.enchant] || null;
-    const gems = itemSpec.gems.map(gemId => this._gems[gemId] || null);
+    const enchant = this.enchants[itemSpec.enchant] || null;
+    const gems = itemSpec.gems.map(gemId => this.gems[gemId] || null);
 
     return new EquippedItem(item, enchant, gems);
   }
@@ -260,43 +327,42 @@ export class Sim extends WorkerPool {
   // Returns JSON representing all the current values.
   toJson(): Object {
     return {
-      'raidBuffs': RaidBuffs.toJson(this._raidBuffs),
-      'partyBuffs': PartyBuffs.toJson(this._partyBuffs),
-      'individualBuffs': IndividualBuffs.toJson(this._individualBuffs),
-      'encounter': Encounter.toJson(this._encounter),
-      'numTargets': this._numTargets,
+      'raid': this.raid.toJson(),
+      'encounter': this.encounter.toJson(),
     };
-  }
+	}
 
   // Set all the current values, assumes obj is the same type returned by toJson().
-  fromJson(obj: any) {
-		try {
-			this.setRaidBuffs(RaidBuffs.fromJson(obj['raidBuffs']));
-		} catch (e) {
-			console.warn('Failed to parse raid buffs: ' + e);
-		}
+  fromJson(eventID: EventID, obj: any, spec?: Spec) {
+		TypedEvent.freezeAllAndDo(() => {
+			// For legacy format. Do not remove this until 2022/01/05 (1 month).
+			if (obj['sim']) {
+				if (!obj['raid']) {
+					obj['raid'] = {
+						'parties': [
+							{
+								'players': [
+									{
+										'spec': spec,
+										'player': obj['player'],
+									},
+								],
+								'buffs': obj['sim']['partyBuffs'],
+							},
+						],
+						'buffs': obj['sim']['raidBuffs'],
+					};
+					obj['raid']['parties'][0]['players'][0]['player']['buffs'] = obj['sim']['individualBuffs'];
+				}
+			}
 
-		try {
-			this.setPartyBuffs(PartyBuffs.fromJson(obj['partyBuffs']));
-		} catch (e) {
-			console.warn('Failed to parse party buffs: ' + e);
-		}
+			if (obj['raid']) {
+				this.raid.fromJson(eventID, obj['raid']);
+			}
 
-		try {
-			this.setIndividualBuffs(IndividualBuffs.fromJson(obj['individualBuffs']));
-		} catch (e) {
-			console.warn('Failed to parse individual buffs: ' + e);
-		}
-
-		try {
-			this.setEncounter(Encounter.fromJson(obj['encounter']));
-		} catch (e) {
-			console.warn('Failed to parse encounter: ' + e);
-		}
-
-		const parsedNumTargets = parseInt(obj['numTargets']);
-		if (!isNaN(parsedNumTargets) && parsedNumTargets != 0) {
-			this.setNumTargets(parsedNumTargets);
-		}
+			if (obj['encounter']) {
+				this.encounter.fromJson(eventID, obj['encounter']);
+			}
+		});
   }
 }

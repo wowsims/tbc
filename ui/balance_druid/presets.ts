@@ -1,10 +1,15 @@
+import { Consumes } from '/tbc/core/proto/common.js';
 import { EquipmentSpec } from '/tbc/core/proto/common.js';
 import { ItemSpec } from '/tbc/core/proto/common.js';
+import { Potions } from '/tbc/core/proto/common.js';
 import { Faction } from '/tbc/core/proto_utils/utils.js';
 import { Player } from '/tbc/core/player.js';
 
+import { BalanceDruid, BalanceDruid_Rotation as BalanceDruidRotation, DruidTalents as DruidTalents, BalanceDruid_Options as BalanceDruidOptions } from '/tbc/core/proto/druid.js';
+import { BalanceDruid_Rotation_PrimarySpell as PrimarySpell } from '/tbc/core/proto/druid.js';
+
 import * as Enchants from '/tbc/core/constants/enchants.js';
-import * as Gems from '/tbc/core/constants/gems.js';
+import * as Gems from '/tbc/core/proto_utils/gems.js';
 import * as Tooltips from '/tbc/core/constants/tooltips.js';
 
 // Preset options for this spec.
@@ -18,8 +23,23 @@ export const StandardTalents = {
 	data: '510022312503135231351--520033',
 };
 
-export const P1_ALLIANCE_BIS = {
-	name: 'P1 Alliance BIS',
+export const DefaultRotation = BalanceDruidRotation.create({
+	primarySpell: PrimarySpell.Adaptive,
+	faerieFire: true,
+});
+
+export const DefaultOptions = BalanceDruidOptions.create({
+});
+
+export const DefaultConsumes = Consumes.create({
+	defaultPotion: Potions.SuperManaPotion,
+	flaskOfBlindingLight: true,
+	brilliantWizardOil: true,
+	blackenedBasilisk: true,
+});
+
+export const P1_ALLIANCE_PRESET = {
+	name: 'P1 Alliance Preset',
 	tooltip: Tooltips.BASIC_BIS_DISCLAIMER,
 	enableWhen: (player: Player<any>) => player.getFaction() == Faction.Alliance,
 	gear: EquipmentSpec.create({
@@ -122,8 +142,8 @@ export const P1_ALLIANCE_BIS = {
 	}),
 };
 
-export const P1_HORDE_BIS = {
-	name: 'P1 Horde BIS',
+export const P1_HORDE_PRESET = {
+	name: 'P1 Horde Preset',
 	tooltip: Tooltips.BASIC_BIS_DISCLAIMER,
 	enableWhen: (player: Player<any>) => player.getFaction() == Faction.Horde,
 	gear: EquipmentSpec.create({
@@ -226,8 +246,8 @@ export const P1_HORDE_BIS = {
 	}),
 };
 
-export const P2_ALLIANCE_BIS = {
-	name: 'P2 Alliance BIS',
+export const P2_ALLIANCE_PRESET = {
+	name: 'P2 Alliance Preset',
 	tooltip: Tooltips.BASIC_BIS_DISCLAIMER,
 	enableWhen: (player: Player<any>) => player.getFaction() == Faction.Alliance,
 	gear: EquipmentSpec.create({
@@ -319,8 +339,8 @@ export const P2_ALLIANCE_BIS = {
 	}),
 };
 
-export const P2_HORDE_BIS = {
-	name: 'P2 Horde BIS',
+export const P2_HORDE_PRESET = {
+	name: 'P2 Horde Preset',
 	tooltip: Tooltips.BASIC_BIS_DISCLAIMER,
 	enableWhen: (player: Player<any>) => player.getFaction() == Faction.Horde,
 	gear: EquipmentSpec.create({
@@ -403,6 +423,99 @@ export const P2_HORDE_BIS = {
 			}),
 			ItemSpec.create({
 				id: 29988, // The Nexus Key
+				enchant: Enchants.SUNFIRE,
+			}),
+			ItemSpec.create({
+				id: 32387, // Idol of the Raven Goddess
+			}),
+		],
+	}),
+};
+
+export const P3_PRESET = {
+	name: 'P3 Preset',
+	tooltip: Tooltips.BASIC_BIS_DISCLAIMER,
+	gear: EquipmentSpec.create({
+		items: [
+			ItemSpec.create({
+				id: 31040, // Thunderheart Headguard
+				enchant: Enchants.GLYPH_OF_POWER,
+				gems: [
+					Gems.POTENT_PYRESTONE,
+					Gems.CHAOTIC_SKYFIRE_DIAMOND,
+				],
+			}),
+			ItemSpec.create({
+				id: 30015, // The Sun King's Talisman
+			}),
+			ItemSpec.create({
+				id: 31049, // Thunderheart Shoulderpads
+				enchant: Enchants.GREATER_INSCRIPTION_OF_DISCIPLINE,
+				gems: [
+					Gems.GLOWING_SHADOWSONG_AMETHYST,
+					Gems.POTENT_PYRESTONE,
+				],
+			}),
+			ItemSpec.create({
+				id: 32331, // Cloak of the Illidari Council
+				enchant: Enchants.SUBTLETY,
+			}),
+			ItemSpec.create({
+				id: 31043, // Thunderheart Vest
+				enchant: Enchants.CHEST_EXCEPTIONAL_STATS,
+				gems: [
+					Gems.RUNED_CRIMSON_SPINEL,
+					Gems.RUNED_CRIMSON_SPINEL,
+					Gems.RUNED_CRIMSON_SPINEL,
+				],
+			}),
+			ItemSpec.create({
+				id: 32586, // Bracers of Nimble Thought
+				enchant: Enchants.WRIST_SPELLPOWER,
+			}),
+			ItemSpec.create({
+				id: 31035, // Thunderheart Handguards
+				enchant: Enchants.GLOVES_SPELLPOWER,
+				gems: [
+					Gems.POTENT_PYRESTONE,
+				],
+			}),
+			ItemSpec.create({
+				id: 30914, // Belt of the Crescent Moon
+			}),
+			ItemSpec.create({
+				id: 30916, // Leggings of Channeled Elements
+				enchant: Enchants.RUNIC_SPELLTHREAD,
+				gems: [
+					Gems.RUNED_CRIMSON_SPINEL,
+					Gems.RUNED_CRIMSON_SPINEL,
+					Gems.RUNED_CRIMSON_SPINEL,
+				],
+			}),
+			ItemSpec.create({
+				id: 32352, // Naturewarden's Treads
+				enchant: Enchants.BOARS_SPEED,
+				gems: [
+					Gems.POTENT_PYRESTONE,
+					Gems.GLOWING_SHADOWSONG_AMETHYST,
+				],
+			}),
+			ItemSpec.create({
+				id: 32527, // Ring of Ancient Knowledge
+				enchant: Enchants.RING_SPELLPOWER,
+			}),
+			ItemSpec.create({
+				id: 29305, // Band of the Eternal Sage
+				enchant: Enchants.RING_SPELLPOWER,
+			}),
+			ItemSpec.create({
+				id: 32486, // Ashtongue Talisman of Equilibrium
+			}),
+			ItemSpec.create({
+				id: 32483, // The Skull Of Guldan
+			}),
+			ItemSpec.create({
+				id: 32374, // Zhar'doom, Greatstaff of the Devourer
 				enchant: Enchants.SUNFIRE,
 			}),
 			ItemSpec.create({

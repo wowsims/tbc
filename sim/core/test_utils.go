@@ -6,51 +6,136 @@ import (
 
 	"github.com/wowsims/tbc/sim/core/proto"
 	"github.com/wowsims/tbc/sim/core/stats"
+	googleProto "google.golang.org/protobuf/proto"
 )
+
+var DefaultSimTestOptions = &proto.SimOptions{
+	Iterations: 1,
+	IsTest:     true,
+	Debug:      false,
+}
+var AverageDefaultSimTestOptions = &proto.SimOptions{
+	Iterations: 10000,
+	IsTest:     true,
+	Debug:      false,
+}
 
 const ShortDuration = 60
 const LongDuration = 300
 
+func MakeDefaultEncounterCombos(debuffs *proto.Debuffs) []EncounterCombo {
+	var NoDebuffTarget = &proto.Target{
+		Level:   73,
+		Armor:   7700,
+		MobType: proto.MobType_MobTypeBeast,
+		Debuffs: &proto.Debuffs{},
+	}
+
+	var FullDebuffTarget = &proto.Target{
+		Level:   73,
+		Armor:   7700,
+		MobType: proto.MobType_MobTypeDemon,
+		Debuffs: debuffs,
+	}
+
+	return []EncounterCombo{
+		EncounterCombo{
+			Label: "LongSingleTargetNoDebuffs",
+			Encounter: &proto.Encounter{
+				Duration:          LongDuration,
+				ExecuteProportion: 0.2,
+				Targets: []*proto.Target{
+					NoDebuffTarget,
+				},
+			},
+		},
+		EncounterCombo{
+			Label: "ShortSingleTargetFullDebuffs",
+			Encounter: &proto.Encounter{
+				Duration:          ShortDuration,
+				ExecuteProportion: 0.2,
+				Targets: []*proto.Target{
+					FullDebuffTarget,
+				},
+			},
+		},
+		EncounterCombo{
+			Label: "LongSingleTargetFullDebuffs",
+			Encounter: &proto.Encounter{
+				Duration:          LongDuration,
+				ExecuteProportion: 0.2,
+				Targets: []*proto.Target{
+					FullDebuffTarget,
+				},
+			},
+		},
+		EncounterCombo{
+			Label: "LongMultiTarget",
+			Encounter: &proto.Encounter{
+				Duration:          LongDuration,
+				ExecuteProportion: 0.2,
+				Targets: []*proto.Target{
+					FullDebuffTarget,
+					FullDebuffTarget,
+					FullDebuffTarget,
+				},
+			},
+		},
+	}
+}
+
+func MakeSingleTargetFullDebuffEncounter(debuffs *proto.Debuffs) *proto.Encounter {
+	return &proto.Encounter{
+		Duration:          LongDuration,
+		ExecuteProportion: 0.2,
+		Targets: []*proto.Target{
+			&proto.Target{
+				Level:   73,
+				Armor:   7700,
+				MobType: proto.MobType_MobTypeDemon,
+				Debuffs: debuffs,
+			},
+		},
+	}
+}
+
+// Returns default encounter combos, for testing average DPS.
+// When doing average DPS tests we use a lot more iterations, so to save time
+// we test fewer encounters.
+func MakeAverageDefaultEncounterCombos(debuffs *proto.Debuffs) []EncounterCombo {
+	return []EncounterCombo{
+		EncounterCombo{
+			Label:     "LongSingleTarget",
+			Encounter: MakeSingleTargetFullDebuffEncounter(debuffs),
+		},
+	}
+}
+
 type IndividualSimInputs struct {
-	SimOptions      *proto.SimOptions
-	Gear            *proto.EquipmentSpec
+	Player          *proto.Player
 	RaidBuffs       *proto.RaidBuffs
 	PartyBuffs      *proto.PartyBuffs
 	IndividualBuffs *proto.IndividualBuffs
-	Consumes        *proto.Consumes
-	Race            proto.Race
-	Class           proto.Class
+	SimOptions      *proto.SimOptions
 
 	Duration int
 
 	// Convenience field if only 1 target is desired
 	Target  *proto.Target
 	Targets []*proto.Target
-
-	PlayerOptions *proto.PlayerOptions
 }
 
 func NewIndividualSimRequest(inputs IndividualSimInputs) *proto.IndividualSimRequest {
 	isr := &proto.IndividualSimRequest{
-		Player: &proto.Player{
-			Equipment: inputs.Gear,
-			Options:   inputs.PlayerOptions,
-		},
-
-		RaidBuffs:       inputs.RaidBuffs,
-		PartyBuffs:      inputs.PartyBuffs,
-		IndividualBuffs: inputs.IndividualBuffs,
+		Player:     inputs.Player,
+		RaidBuffs:  inputs.RaidBuffs,
+		PartyBuffs: inputs.PartyBuffs,
 
 		Encounter:  &proto.Encounter{},
 		SimOptions: inputs.SimOptions,
 	}
 
-	if isr.Player.Options == nil {
-		isr.Player.Options = &proto.PlayerOptions{}
-	}
-	isr.Player.Options.Race = inputs.Race
-	isr.Player.Options.Class = inputs.Class
-	isr.Player.Options.Consumes = inputs.Consumes
+	isr.Player.Buffs = inputs.IndividualBuffs
 
 	isr.Encounter.Duration = float64(inputs.Duration)
 	if inputs.Target != nil {
@@ -71,14 +156,11 @@ func NewIndividualSimRequest(inputs IndividualSimInputs) *proto.IndividualSimReq
 
 func CharacterStatsTest(label string, t *testing.T, isr *proto.IndividualSimRequest, expectedStats stats.Stats) {
 	csr := &proto.ComputeStatsRequest{
-		Player:          isr.Player,
-		RaidBuffs:       isr.RaidBuffs,
-		PartyBuffs:      isr.PartyBuffs,
-		IndividualBuffs: isr.IndividualBuffs,
+		Raid: SinglePlayerRaidProto(isr.Player, isr.PartyBuffs, isr.RaidBuffs),
 	}
 
 	result := ComputeStats(csr)
-	finalStats := stats.FromFloatArray(result.FinalStats)
+	finalStats := stats.FromFloatArray(result.RaidStats.Parties[0].Players[0].FinalStats)
 
 	const tolerance = 0.5
 	if !finalStats.EqualsWithTolerance(expectedStats, tolerance) {
@@ -86,15 +168,12 @@ func CharacterStatsTest(label string, t *testing.T, isr *proto.IndividualSimRequ
 	}
 }
 
-func StatWeightsTest(label string, t *testing.T, isr *proto.IndividualSimRequest, statsToTest []proto.Stat, referenceStat proto.Stat, expectedStatWeights stats.Stats) {
-	isr.Encounter.Duration = LongDuration
-	isr.SimOptions.Iterations = 5000
+func StatWeightsTest(label string, t *testing.T, _swr *proto.StatWeightsRequest, expectedStatWeights stats.Stats) {
+	// Make a copy so we can safely change fields.
+	swr := googleProto.Clone(_swr).(*proto.StatWeightsRequest)
 
-	swr := &proto.StatWeightsRequest{
-		Options:         isr,
-		StatsToWeigh:    statsToTest,
-		EpReferenceStat: referenceStat,
-	}
+	swr.Encounter.Duration = LongDuration
+	swr.SimOptions.Iterations = 5000
 
 	result := StatWeights(swr)
 	resultWeights := stats.FromFloatArray(result.Weights)
@@ -111,19 +190,33 @@ func StatWeightsTest(label string, t *testing.T, isr *proto.IndividualSimRequest
 func IndividualSimTest(label string, t *testing.T, isr *proto.IndividualSimRequest, expectedDps float64) {
 	result := RunIndividualSim(isr)
 
-	if isr.SimOptions.Debug {
-		log.Printf("LOGS:\n%s\n", result.Logs)
+	tolerance := 0.5
+	if result.PlayerMetrics.Dps.Avg < expectedDps-tolerance || result.PlayerMetrics.Dps.Avg > expectedDps+tolerance {
+		// Automatically print output if we had debugging enabled.
+		if isr.SimOptions.Debug {
+			log.Printf("LOGS:\n%s\n", result.Logs)
+		}
+		t.Fatalf("%s failed: expected %0f dps from sim but was %0f", label, expectedDps, result.PlayerMetrics.Dps.Avg)
 	}
+}
+
+func RaidSimTest(label string, t *testing.T, rsr *proto.RaidSimRequest, expectedDps float64) {
+	result := RunRaidSim(rsr)
 
 	tolerance := 0.5
-	if result.PlayerMetrics.DpsAvg < expectedDps-tolerance || result.PlayerMetrics.DpsAvg > expectedDps+tolerance {
-		t.Fatalf("%s failed: expected %0f dps from sim but was %0f", label, expectedDps, result.PlayerMetrics.DpsAvg)
+	if result.RaidMetrics.Dps.Avg < expectedDps-tolerance || result.RaidMetrics.Dps.Avg > expectedDps+tolerance {
+		// Automatically print output if we had debugging enabled.
+		if rsr.SimOptions.Debug {
+			log.Printf("LOGS:\n%s\n", result.Logs)
+		}
+		t.Fatalf("%s failed: expected %0f dps from sim but was %0f", label, expectedDps, result.RaidMetrics.Dps.Avg)
 	}
 }
 
 func IndividualSimAverageTest(label string, t *testing.T, isr *proto.IndividualSimRequest, expectedDps float64) {
 	isr.Encounter.Duration = LongDuration
 	isr.SimOptions.Iterations = 10000
+	// isr.SimOptions.Debug = true
 
 	result := RunIndividualSim(isr)
 
@@ -132,8 +225,8 @@ func IndividualSimAverageTest(label string, t *testing.T, isr *proto.IndividualS
 	}
 
 	tolerance := 0.5
-	if result.PlayerMetrics.DpsAvg < expectedDps-tolerance || result.PlayerMetrics.DpsAvg > expectedDps+tolerance {
-		t.Fatalf("%s failed: expected %0f dps from sim but was %0f", label, expectedDps, result.PlayerMetrics.DpsAvg)
+	if result.PlayerMetrics.Dps.Avg < expectedDps-tolerance || result.PlayerMetrics.Dps.Avg > expectedDps+tolerance {
+		t.Fatalf("%s failed: expected %0f dps from sim but was %0f", label, expectedDps, result.PlayerMetrics.Dps.Avg)
 	}
 }
 
@@ -174,7 +267,6 @@ func IndividualBenchmark(b *testing.B, isr *proto.IndividualSimRequest) {
 	isr.SimOptions.IsTest = false
 
 	for i := 0; i < b.N; i++ {
-		sim := NewIndividualSim(*isr)
-		sim.Run()
+		RunIndividualSim(isr)
 	}
 }

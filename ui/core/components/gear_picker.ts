@@ -1,23 +1,29 @@
 import { getWowheadItemId } from '/tbc/core/proto_utils/equipped_item.js';
 import { EquippedItem } from '/tbc/core/proto_utils/equipped_item.js';
+import { getEmptyGemSocketIconUrl } from '/tbc/core/proto_utils/gems.js';
+import { setGemSocketCssClass } from '/tbc/core/proto_utils/gems.js';
+import { enchantAppliesToItem } from '/tbc/core/proto_utils/utils.js';
 import { Enchant } from '/tbc/core/proto/common.js';
 import { Item } from '/tbc/core/proto/common.js';
 import { ItemQuality } from '/tbc/core/proto/common.js';
 import { ItemSlot } from '/tbc/core/proto/common.js';
-import { enchantDescriptions } from '/tbc/core/proto_utils/names.js';
+import { enchantDescriptions } from '/tbc/core/constants/enchants.js';
 import { slotNames } from '/tbc/core/proto_utils/names.js';
-import { getEmptyGemSocketIconUrl } from '/tbc/core/resources.js';
 import { getEmptySlotIconUrl } from '/tbc/core/resources.js';
 import { getIconUrl } from '/tbc/core/resources.js';
 import { getItemIconUrl } from '/tbc/core/resources.js';
 import { setWowheadHref } from '/tbc/core/resources.js';
 import { setWowheadItemHref } from '/tbc/core/resources.js';
-import { setGemSocketCssClass } from '/tbc/core/css_utils.js';
 import { setItemQualityCssClass } from '/tbc/core/css_utils.js';
 import { Player } from '/tbc/core/player.js';
+import { EventID, TypedEvent } from '/tbc/core/typed_event.js';
 import { getEnumValues } from '/tbc/core/utils.js';
 
 import { Component } from './component.js';
+import { CloseButton } from './close_button.js';
+import { makePhaseSelector } from './other_inputs.js';
+
+declare var $: any;
 
 export class GearPicker extends Component {
   // ItemSlot is used as the index
@@ -34,8 +40,6 @@ export class GearPicker extends Component {
     rightSide.classList.add('gear-picker-right');
     this.rootElem.appendChild(rightSide);
 
-    const selectorModal = new SelectorModal(document.body, player);
-
     const leftItemPickers = [
       ItemSlot.ItemSlotHead,
       ItemSlot.ItemSlotNeck,
@@ -45,7 +49,7 @@ export class GearPicker extends Component {
       ItemSlot.ItemSlotWrist,
       ItemSlot.ItemSlotMainHand,
       ItemSlot.ItemSlotOffHand,
-    ].map(slot => new ItemPicker(leftSide, player, slot, selectorModal));
+    ].map(slot => new ItemPicker(leftSide, player, slot));
 
     const rightItemPickers = [
       ItemSlot.ItemSlotHands,
@@ -57,7 +61,7 @@ export class GearPicker extends Component {
       ItemSlot.ItemSlotTrinket1,
       ItemSlot.ItemSlotTrinket2,
       ItemSlot.ItemSlotRanged,
-    ].map(slot => new ItemPicker(rightSide, player, slot, selectorModal));
+    ].map(slot => new ItemPicker(rightSide, player, slot));
 
     this.itemPickers = leftItemPickers.concat(rightItemPickers).sort((a, b) => a.slot - b.slot);
   }
@@ -79,13 +83,13 @@ class ItemPicker extends Component {
   private _equippedItem: EquippedItem | null = null;
   
 
-  constructor(parent: HTMLElement, player: Player<any>, slot: ItemSlot, selectorModal: SelectorModal) {
+  constructor(parent: HTMLElement, player: Player<any>, slot: ItemSlot) {
     super(parent, 'item-picker-root');
     this.slot = slot;
     this.player = player;
 
     this.rootElem.innerHTML = `
-      <a class="item-picker-icon" target="_blank" data-toggle="modal" data-target="#selectorModal">
+      <a class="item-picker-icon">
         <div class="item-picker-sockets-container">
         </div>
       </a>
@@ -100,13 +104,14 @@ class ItemPicker extends Component {
     this.enchantElem = this.rootElem.getElementsByClassName('item-picker-enchant')[0] as HTMLElement;
     this.socketsContainerElem = this.rootElem.getElementsByClassName('item-picker-sockets-container')[0] as HTMLElement;
 
-    this.item = null;
-    player.sim.gearListEmitter.on(() => {
+    this.item = player.getEquippedItem(slot);
+    player.sim.waitForInit().then(() => {
       this._items = this.player.getItems(this.slot);
       this._enchants = this.player.getEnchants(this.slot);
 
       this.iconElem.addEventListener('click', event => {
-        selectorModal.setData(this.slot, this._equippedItem, this._items, this._enchants);
+				event.preventDefault();
+        const selectorModal = new SelectorModal(this.rootElem.closest('.individual-sim-ui')!, this.player, this.slot, this._equippedItem, this._items, this._enchants);
       });
     });
     player.gearChangeEmitter.on(() => {
@@ -162,45 +167,36 @@ class ItemPicker extends Component {
 }
 
 class SelectorModal extends Component {
-  private readonly player: Player<any>;
+  private player: Player<any>;
   private readonly tabsElem: HTMLElement;
   private readonly contentElem: HTMLElement;
-  private readonly closeButton: HTMLButtonElement;
 
-  constructor(parent: HTMLElement, player: Player<any>) {
-    super(parent, 'selector-model-root');
+  constructor(parent: HTMLElement, player: Player<any>, slot: ItemSlot, equippedItem: EquippedItem | null, eligibleItems: Array<Item>, eligibleEnchants: Array<Enchant>) {
+    super(parent, 'selector-modal');
     this.player = player;
 
-    this.rootElem.innerHTML = `
-    <div class="modal fade selector-modal" id="selectorModal" tabindex="-1" role="dialog" aria-labelledby="selectorModalTitle" aria-hidden="true">
-      <div class="modal-dialog" role="document">
-        <div class="modal-content">
-          <div class="modal-body">
-            <ul class="nav nav-tabs selector-modal-tabs">
-            </ul>
-            <div class="tab-content selector-modal-tab-content">
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary selector-modal-close-button" data-dismiss="modal">Close</button>
-          </div>
-        </div>
-      </div>
-    </div>
-    `;
+		this.rootElem.id = 'selectorModal';
+		this.rootElem.innerHTML = `
+			<ul class="nav nav-tabs selector-modal-tabs">
+			</ul>
+			<div class="tab-content selector-modal-tab-content">
+			</div>
+		`;
+
+		new CloseButton(this.rootElem, () => {
+			$('#selectorModal').bPopup().close();
+			this.rootElem.remove();
+		});
 
     this.tabsElem = this.rootElem.getElementsByClassName('selector-modal-tabs')[0] as HTMLElement;
     this.contentElem = this.rootElem.getElementsByClassName('selector-modal-tab-content')[0] as HTMLElement;
-    this.closeButton = this.rootElem.getElementsByClassName('selector-modal-close-button')[0] as HTMLButtonElement;
+
+		this.setData(slot, equippedItem, eligibleItems, eligibleEnchants);
   }
 
   setData(slot: ItemSlot, equippedItem: EquippedItem | null, eligibleItems: Array<Item>, eligibleEnchants: Array<Enchant>) {
     this.tabsElem.innerHTML = '';
     this.contentElem.innerHTML = '';
-    this.tabsElem.innerHTML = `
-    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-      <span aria-hidden="true">&times;</span>
-    </button>
-    `;
 
     this.addTab(
         'Items',
@@ -213,21 +209,22 @@ class SelectorModal extends Component {
           return {
             id: item.id,
             wowheadId: getWowheadItemId(item),
+						wowheadIdIsSpell: false,
             name: item.name,
             quality: item.quality,
 						phase: item.phase,
-            onEquip: item => {
+            onEquip: (eventID, item) => {
               const equippedItem = this.player.getEquippedItem(slot);
               if (equippedItem) {
-                this.player.equipItem(slot, equippedItem.withItem(item));
+                this.player.equipItem(eventID, slot, equippedItem.withItem(item));
               } else {
-                this.player.equipItem(slot, new EquippedItem(item));
+                this.player.equipItem(eventID, slot, new EquippedItem(item));
               }
             },
           };
         },
-        () => {
-          this.player.equipItem(slot, null);
+        eventID => {
+          this.player.equipItem(eventID, slot, null);
         });
 
     this.addTab(
@@ -241,23 +238,31 @@ class SelectorModal extends Component {
           return {
             id: enchant.id,
 						wowheadId: enchant.id,
+						wowheadIdIsSpell: enchant.isSpellId,
             name: enchant.name,
             quality: enchant.quality,
 						phase: 1,
-            onEquip: enchant => {
+            onEquip: (eventID, enchant) => {
               const equippedItem = this.player.getEquippedItem(slot);
               if (equippedItem)
-                this.player.equipItem(slot, equippedItem.withEnchant(enchant));
+                this.player.equipItem(eventID, slot, equippedItem.withEnchant(enchant));
             },
           };
         },
-        () => {
+        eventID => {
           const equippedItem = this.player.getEquippedItem(slot);
           if (equippedItem)
-            this.player.equipItem(slot, equippedItem.withEnchant(null));
+            this.player.equipItem(eventID, slot, equippedItem.withEnchant(null));
         });
 
     this.addGemTabs(slot, equippedItem);
+
+		$('#selectorModal').bPopup({
+			closeClass: 'item-picker-close',
+			onClose: () => {
+				this.rootElem.remove();
+			},
+		});
   }
 
   private addGemTabs(slot: ItemSlot, equippedItem: EquippedItem | null) {
@@ -273,21 +278,43 @@ class SelectorModal extends Component {
             return {
               id: gem.id,
 							wowheadId: gem.id,
+							wowheadIdIsSpell: false,
               name: gem.name,
               quality: gem.quality,
 							phase: gem.phase,
-              onEquip: gem => {
+              onEquip: (eventID, gem) => {
                 const equippedItem = this.player.getEquippedItem(slot);
                 if (equippedItem)
-                  this.player.equipItem(slot, equippedItem.withGem(gem, socketIdx));
+                  this.player.equipItem(eventID, slot, equippedItem.withGem(gem, socketIdx));
               },
             };
           },
-          () => {
+          eventID => {
             const equippedItem = this.player.getEquippedItem(slot);
             if (equippedItem)
-              this.player.equipItem(slot, equippedItem.withGem(null, socketIdx));
-          });
+              this.player.equipItem(eventID, slot, equippedItem.withGem(null, socketIdx));
+          },
+					tabAnchor => {
+						tabAnchor.classList.add('selector-modal-tab-gem-icon');
+						setGemSocketCssClass(tabAnchor, socketColor);
+
+						const updateGemIcon = () => {
+							const equippedItem = this.player.getEquippedItem(slot);
+							const gem = equippedItem?.gems[socketIdx];
+							if (!gem) {
+								const url = getEmptyGemSocketIconUrl(socketColor);
+								tabAnchor.style.backgroundImage = `url('${url}')`;
+								return;
+							}
+
+							getIconUrl({itemId: gem.id}).then(url => {
+								tabAnchor.style.backgroundImage = `url('${url}')`;
+							});
+						};
+
+						this.player.gearChangeEmitter.on(updateGemIcon);
+						updateGemIcon();
+					});
     });
   }
 
@@ -307,12 +334,14 @@ class SelectorModal extends Component {
         getItemData: (item: T) => {
           id: number,
           wowheadId: number,
+          wowheadIdIsSpell: boolean,
           name: string,
           quality: ItemQuality,
 					phase: number,
-          onEquip: (item: T) => void,
+          onEquip: (eventID: EventID, item: T) => void,
         },
-        onRemove: () => void) {
+        onRemove: (eventID: EventID) => void,
+				setTabContent?: (tabElem: HTMLAnchorElement) => void) {
     if (items.length == 0) {
       return;
     }
@@ -325,9 +354,17 @@ class SelectorModal extends Component {
 		items.sort((itemA, itemB) => computeEP(itemB) - computeEP(itemA));
 
     const tabElem = document.createElement('li');
-    this.tabsElem.insertBefore(tabElem, this.tabsElem.lastChild);
+    this.tabsElem.appendChild(tabElem);
     const tabContentId = (label + '-tab').split(' ').join('');
-    tabElem.innerHTML = `<a class="selector-modal-item-tab" data-toggle="tab" href="#${tabContentId}">${label}</a>`;
+    tabElem.innerHTML = `<a class="selector-modal-item-tab" data-toggle="tab" href="#${tabContentId}"></a>`;
+
+		const tabAnchor = tabElem.getElementsByClassName('selector-modal-item-tab')[0] as HTMLAnchorElement;
+		tabAnchor.dataset.label = label;
+		if (setTabContent) {
+			setTabContent(tabAnchor);
+		} else {
+			tabAnchor.textContent = label;
+		}
 
     const tabContent = document.createElement('div');
     tabContent.id = tabContentId;
@@ -337,16 +374,12 @@ class SelectorModal extends Component {
     <div class="selector-modal-tab-content-header">
       <button class="selector-modal-remove-button">Remove</button>
       <input class="selector-modal-search" type="text" placeholder="Search...">
-      <select class="selector-modal-phase-select">
-				<option value="1">Phase 1</option>
-				<option value="2">Phase 2</option>
-				<option value="3">Phase 3</option>
-				<option value="4">Phase 4</option>
-				<option value="5">Phase 5</option>
-			</select>
+			<div class="selector-modal-filter-bar-filler"></div>
+			<div class="selector-modal-phase-selector"></div>
     </div>
     <ul class="selector-modal-list"></ul>
     `;
+		const phaseSelector = makePhaseSelector(tabContent.getElementsByClassName('selector-modal-phase-selector')[0] as HTMLElement, this.player.sim);
 
     if (label == 'Items') {
       tabElem.classList.add('active', 'in');
@@ -376,11 +409,16 @@ class SelectorModal extends Component {
 					<span class="selector-modal-list-item-ep-delta"></span>
 				</div>
       `;
-      setWowheadHref(listItemElem.children[0] as HTMLAnchorElement, { itemId: itemData.wowheadId });
-      setWowheadHref(listItemElem.children[1] as HTMLAnchorElement, { itemId: itemData.wowheadId });
 
       const iconElem = listItemElem.getElementsByClassName('selector-modal-list-item-icon')[0] as HTMLImageElement;
-      getIconUrl({itemId: itemData.wowheadId}).then(url => {
+
+			const actionId = itemData.wowheadIdIsSpell
+					? { spellId: itemData.wowheadId }
+					: { itemId: itemData.wowheadId };
+		
+      setWowheadHref(listItemElem.children[0] as HTMLAnchorElement, actionId);
+      setWowheadHref(listItemElem.children[1] as HTMLAnchorElement, actionId);
+      getIconUrl(actionId).then(url => {
         iconElem.style.backgroundImage = `url('${url}')`;
       });
 
@@ -389,7 +427,7 @@ class SelectorModal extends Component {
 
       const onclick = (event: Event) => {
         event.preventDefault();
-        itemData.onEquip(item);
+        itemData.onEquip(TypedEvent.nextEventID(), item);
 
         // If the item changes, the gem slots might change, so remove and recreate the gem tabs
         if (Item.is(item)) {
@@ -406,17 +444,15 @@ class SelectorModal extends Component {
     const removeButton = tabContent.getElementsByClassName('selector-modal-remove-button')[0] as HTMLButtonElement;
     removeButton.addEventListener('click', event => {
       listItemElems.forEach(elem => elem.classList.remove('active'));
-      onRemove();
+      onRemove(TypedEvent.nextEventID());
     });
 
     const updateSelected = () => {
       const newEquippedItem = this.player.getEquippedItem(slot);
 			const newItem = equippedToItemFn(newEquippedItem);
-			if (!newItem)
-				return;
 
-			const newItemId = equippedToIdFn(newEquippedItem);
-			const newEP = computeEP(newItem);
+			const newItemId = equippedToIdFn(newEquippedItem) || 0;
+			const newEP = newItem ? computeEP(newItem) : 0;
 
       listItemElems.forEach(elem => {
 				const listItemId = parseInt(elem.dataset.id!);
@@ -448,11 +484,25 @@ class SelectorModal extends Component {
     this.player.gearChangeEmitter.on(updateSelected);
 
 		const applyFilters = () => {
+			let validItemElems = listItemElems;
+
 			const searchQuery = searchInput.value.toLowerCase();
+			validItemElems = validItemElems.filter(elem => elem.dataset.name!.toLowerCase().includes(searchQuery))
+
 			const phase = this.player.sim.getPhase();
+			validItemElems = validItemElems.filter(elem => Number(elem.dataset.phase!) <= phase)
+
+			const currentEquippedItem = this.player.getEquippedItem(slot);
+			if (label == 'Enchants' && currentEquippedItem) {
+				validItemElems = validItemElems.filter(elem => {
+					const listItemId = parseInt(elem.dataset.id!);
+					const listItem = items.find(item => getItemData(item).id == listItemId) as unknown as Enchant;
+					return enchantAppliesToItem(listItem, currentEquippedItem.item);
+				});
+			}
 
       listItemElems.forEach(elem => {
-        if (elem.dataset.name!.toLowerCase().includes(searchQuery) && Number(elem.dataset.phase!) <= phase) {
+        if (validItemElems.includes(elem)) {
           elem.style.display = 'flex';
         } else {
           elem.style.display = 'none';
@@ -463,28 +513,28 @@ class SelectorModal extends Component {
     const searchInput = tabContent.getElementsByClassName('selector-modal-search')[0] as HTMLInputElement;
     searchInput.addEventListener('input', applyFilters);
 
-    const phaseSelect = tabContent.getElementsByClassName('selector-modal-phase-select')[0] as HTMLSelectElement;
-		phaseSelect.value = String(this.player.sim.getPhase());
 		tabContent.dataset.phase = String(this.player.sim.getPhase());
-		phaseSelect.addEventListener('input', event => {
-			this.player.sim.setPhase(Number(phaseSelect.value));
-		});
 		this.player.sim.phaseChangeEmitter.on(() => {
 			tabContent.dataset.phase = String(this.player.sim.getPhase());
-			phaseSelect.value = String(this.player.sim.getPhase());
 			applyFilters();
+		});
+		this.player.gearChangeEmitter.on(() => {
+			applyFilters();
+			updateSelected();
 		});
 
 		applyFilters();
   }
 
   private removeTabs(labelSubstring: string) {
-    const tabElems = Array.prototype.slice.call(this.tabsElem.getElementsByClassName('selector-modal-item-tab')).filter(tab => tab.textContent.includes(labelSubstring));
+    const tabElems = Array.prototype.slice.call(this.tabsElem.getElementsByClassName('selector-modal-item-tab'))
+				.filter(tab => tab.dataset.label.includes(labelSubstring));
+
     const contentElems = tabElems
         .map(tabElem => document.getElementById(tabElem.href.substring(1)))
         .filter(tabElem => Boolean(tabElem));
 
-    tabElems.forEach(elem => elem.remove());
+    tabElems.forEach(elem => elem.parentElement.remove());
     contentElems.forEach(elem => elem!.remove());
   }
 }

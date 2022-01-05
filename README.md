@@ -5,6 +5,8 @@ The primary goal of this project is to provide a framework that makes it easy to
 Live sims:
  - [Balance Druid](https://wowsims.github.io/tbc/balance_druid/ "https://wowsims.github.io/tbc/balance_druid/")
  - [Elemental Shaman](https://wowsims.github.io/tbc/elemental_shaman/ "https://wowsims.github.io/tbc/elemental_shaman/")
+ - [Shadow Priest](https://wowsims.github.io/tbc/shadow_priest/ "https://wowsims.github.io/tbc/shadow_priest/")
+ - [Raid Sim](https://wowsims.github.io/tbc/raid/ "https://wowsims.github.io/tbc/raid/")
 
 # Installation
 This project has dependencies on Go >=1.16, protobuf-compiler and the corresponding Go plugins, and node >= 14.0.
@@ -36,7 +38,7 @@ npm install
 ```
 
 ## Windows
-If you want to develop on Windows, we recommend setting up Docker using [this guide](https://docs.docker.com/desktop/windows/wsl/ "https://docs.docker.com/desktop/windows/wsl/") and then following the Docker instructions below.
+If you want to develop on Windows, we recommend setting up a Ubuntu virtual machine (VM) or running Docker using [this guide](https://docs.docker.com/desktop/windows/wsl/ "https://docs.docker.com/desktop/windows/wsl/") and then following the Ubuntu or Docker instructions, respectively.
 
 ## Docker
 Alternatively, install Docker and your workflow will look something like this:
@@ -123,9 +125,9 @@ Don't forget to write unit tests! Again, look at existing tests for examples. Ru
 
 ## Implement the UI
 If you've made it this far, you're almost there! The UI is very generalized and it doesn't take much work to build an entire sim UI using our templating system. To use it:
-  - Create a directory 'ui/$SPEC'. So if your Spec enum value was named, 'elemental_shaman', create a directory, 'ui/elemental_shaman'.
-  - This directory must contain a file, 'index.ts'.
-  - This directory must contain a file, 'index.scss'.
+  - Create a directory `ui/$SPEC`. So if your Spec enum value was named, `elemental_shaman`, create a directory, `ui/elemental_shaman`.
+  - This directory must contain 3 files: `tsconfig.json`, `index.ts`, and `index.scss`.
+  - Most of the settings are fairly obvious, just copy+paste from one of the other spec's UI code and work from there.
 
 No .html is needed, it will be generated based on `ui/index_template.html` and the `$SPEC` name.
 
@@ -135,6 +137,10 @@ Steps for building a new UI:
   - Finally, add a rule to the `makefile` for the new sim site. Just copy from the other site rules already there and change the `$SPEC` names.
 
 When you're ready to try out the site, run `make host` and navigate to `http://localhost:8080/tbc/$SPEC`.
+
+To add your new spec to the raid sim, do the following:
+ - Add a reference to the individual sim in `ui/raid/tsconfig.json`. DO NOT FORGET THIS STEP or Typescipt will silently do very bad things.
+ - Update `ui/raid/presets.ts` to include a constructor factory in the `specSimFactories` variable and add configurations for new Players in the `playerPresets` variable.
 
 # Deployment
 Thanks to the workflow defined in `.github/workflows/deploy.yml`, pushes to `master` automatically build and deploy a new site so there's nothing to do here. Sit back and appreciate your new sim!

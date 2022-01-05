@@ -5,12 +5,6 @@ import (
 	"github.com/wowsims/tbc/sim/core/proto"
 )
 
-var BasicRaidBuffs = &proto.RaidBuffs{}
-var BasicPartyBuffs = &proto.PartyBuffs{
-	Bloodlust: 1,
-}
-var BasicIndividualBuffs = &proto.IndividualBuffs{}
-
 var StandardTalents = &proto.DruidTalents{
 	StarlightWrath:   5,
 	FocusedStarlight: 2,
@@ -42,9 +36,6 @@ var FullIndividualBuffs = &proto.IndividualBuffs{
 	ShadowPriestDps:  500,
 }
 
-var BasicConsumes = &proto.Consumes{
-	DefaultPotion:        proto.Potions_SuperManaPotion,
-}
 var FullConsumes = &proto.Consumes{
 	FlaskOfBlindingLight: true,
 	BrilliantWizardOil:   true,
@@ -52,69 +43,59 @@ var FullConsumes = &proto.Consumes{
 	DefaultPotion:        proto.Potions_SuperManaPotion,
 	StartingPotion:       proto.Potions_DestructionPotion,
 	NumStartingPotions:   1,
-	DarkRune:             true,
+	DefaultConjured:      proto.Conjured_ConjuredDarkRune,
 	Drums:                proto.Drums_DrumsOfBattle,
 }
 
-var NoDebuffTarget = &proto.Target{
-	Debuffs: &proto.Debuffs{},
+var FullDebuffs = &proto.Debuffs{
+	JudgementOfWisdom: true,
+	Misery:            true,
+	CurseOfElements:   proto.TristateEffect_TristateEffectImproved,
 }
 
 var FullDebuffTarget = &proto.Target{
-	Debuffs: &proto.Debuffs{
-		JudgementOfWisdom: true,
-		Misery:            true,
-		CurseOfElements:   proto.TristateEffect_TristateEffectImproved,
-	},
+	Debuffs: FullDebuffs,
 }
 
-var PlayerOptionsAdaptive = &proto.PlayerOptions{
-	Spec: &proto.PlayerOptions_BalanceDruid{
-		BalanceDruid: &proto.BalanceDruid{
-			Talents: StandardTalents,
-			Options: &proto.BalanceDruid_Options{
-				InnervateTarget: &proto.RaidTarget{TargetIndex: 0}, // self innervate
-			},
-			Rotation: &proto.BalanceDruid_Rotation{
-				PrimarySpell: proto.BalanceDruid_Rotation_Adaptive,
-				FaerieFire: true,
-			},
+var PlayerOptionsAdaptive = &proto.Player_BalanceDruid{
+	BalanceDruid: &proto.BalanceDruid{
+		Talents: StandardTalents,
+		Options: &proto.BalanceDruid_Options{
+			InnervateTarget: &proto.RaidTarget{TargetIndex: 0}, // self innervate
+		},
+		Rotation: &proto.BalanceDruid_Rotation{
+			PrimarySpell: proto.BalanceDruid_Rotation_Adaptive,
+			FaerieFire:   true,
 		},
 	},
 }
 
-var PlayerOptionsStarfire = &proto.PlayerOptions{
-	Spec: &proto.PlayerOptions_BalanceDruid{
-		BalanceDruid: &proto.BalanceDruid{
-			Talents: StandardTalents,
-			Options: &proto.BalanceDruid_Options{
-				InnervateTarget: &proto.RaidTarget{TargetIndex: 0}, // self innervate
-			},
-			Rotation: &proto.BalanceDruid_Rotation{
-				PrimarySpell: proto.BalanceDruid_Rotation_Starfire,
-				Moonfire:     true,
-				FaerieFire:   true,
-			},
+var PlayerOptionsStarfire = &proto.Player_BalanceDruid{
+	BalanceDruid: &proto.BalanceDruid{
+		Talents: StandardTalents,
+		Options: &proto.BalanceDruid_Options{
+			InnervateTarget: &proto.RaidTarget{TargetIndex: 0}, // self innervate
+		},
+		Rotation: &proto.BalanceDruid_Rotation{
+			PrimarySpell: proto.BalanceDruid_Rotation_Starfire,
+			Moonfire:     true,
+			FaerieFire:   true,
 		},
 	},
 }
 
-var PlayerOptionsWrath = &proto.PlayerOptions{
-	Spec: &proto.PlayerOptions_BalanceDruid{
-		BalanceDruid: &proto.BalanceDruid{
-			Talents: StandardTalents,
-			Options: &proto.BalanceDruid_Options{
-				InnervateTarget: &proto.RaidTarget{TargetIndex: 0}, // self innervate
-			},
-			Rotation: &proto.BalanceDruid_Rotation{
-				PrimarySpell: proto.BalanceDruid_Rotation_Wrath,
-				Moonfire:     true,
-			},
+var PlayerOptionsWrath = &proto.Player_BalanceDruid{
+	BalanceDruid: &proto.BalanceDruid{
+		Talents: StandardTalents,
+		Options: &proto.BalanceDruid_Options{
+			InnervateTarget: &proto.RaidTarget{TargetIndex: 0}, // self innervate
+		},
+		Rotation: &proto.BalanceDruid_Rotation{
+			PrimarySpell: proto.BalanceDruid_Rotation_Wrath,
+			Moonfire:     true,
 		},
 	},
 }
-
-var PreRaidGear = items.EquipmentSpecFromStrings([]items.ItemStringSpec{})
 
 var P1Gear = items.EquipmentSpecFromStrings([]items.ItemStringSpec{
 	{

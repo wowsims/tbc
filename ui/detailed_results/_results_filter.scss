@@ -1,0 +1,29 @@
+.results-filter-root {
+	display: flex;
+	align-items: center;
+	font-size: 20px;
+}
+
+.player-filter-root {
+	border: 1px solid white;
+	margin: 2px;
+	color: white;
+	text-shadow:
+		0 0 3px black,
+		0 0 3px black,
+		0 0 3px black;
+}
+
+.player-filter-option {
+	height: 30px;
+}
+
+.player-filter-icon {
+	margin: 2px;
+	height: 25px;
+}
+
+.player-filter-label {
+	font-size: 14px;
+	margin: 2px;
+}
