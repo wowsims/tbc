@@ -82,6 +82,14 @@ var ItemDeclarations = []ItemDeclaration{
 	{ /** Enhancement List*/ ID: 28288, Categories: []proto.ItemCategory{MeleeCategory}},
 	{ /** Enhancement List*/ ID: 38287, Categories: []proto.ItemCategory{MeleeCategory}},
 	{ /** Enhancement List*/ ID: 30061, Categories: []proto.ItemCategory{MeleeCategory}},
+	{ /** Skyshatter Harness */ ID: 31018, Categories: []proto.ItemCategory{MeleeCategory}},
+	{ /** Skyshatter Harness */ ID: 31011, Categories: []proto.ItemCategory{MeleeCategory}},
+	{ /** Skyshatter Harness */ ID: 31015, Categories: []proto.ItemCategory{MeleeCategory}},
+	{ /** Skyshatter Harness */ ID: 31021, Categories: []proto.ItemCategory{MeleeCategory}},
+	{ /** Skyshatter Harness */ ID: 31024, Categories: []proto.ItemCategory{MeleeCategory}},
+	{ /** Skyshatter Harness */ ID: 34567, Categories: []proto.ItemCategory{MeleeCategory}},
+	{ /** Skyshatter Harness */ ID: 34439, Categories: []proto.ItemCategory{MeleeCategory}},
+	{ /** Skyshatter Harness */ ID: 34545, Categories: []proto.ItemCategory{MeleeCategory}},
 
 	// Caster
 	{ /** A'dal's Gift */ ID: 31461, Categories: []proto.ItemCategory{CasterCategory}},

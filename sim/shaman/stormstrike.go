@@ -11,6 +11,7 @@ const SpellIDSS int32 = 17364
 
 var StormstrikeCD = core.NewCooldownID()
 var StormstrikeDebuffID = core.NewDebuffID()
+var SkyshatterAPBonusAuraID = core.NewAuraID()
 
 func (shaman *Shaman) newStormstrikeTemplate(sim *core.Simulation) core.MeleeAbilittyTemplate {
 
@@ -33,6 +34,8 @@ func (shaman *Shaman) newStormstrikeTemplate(sim *core.Simulation) core.MeleeAbi
 		}
 	}
 
+	hasSkyshatter4p := ItemSetSkyshatterHarness.CharacterHasSetBonus(&shaman.Character, 4)
+	const skyshatterDur = time.Second * 12
 	ss := core.ActiveMeleeAbility{
 		MeleeAbility: core.MeleeAbility{
 			// ID for the action.
@@ -62,7 +65,15 @@ func (shaman *Shaman) newStormstrikeTemplate(sim *core.Simulation) core.MeleeAbi
 		OnMeleeAttack: func(sim *core.Simulation, target *core.Target, result core.MeleeHitType, ability *core.ActiveMeleeAbility, isOH bool) {
 			ssDebuffAura.Stacks = 2
 			target.ReplaceAura(sim, ssDebuffAura)
+			if hasSkyshatter4p {
+				shaman.Character.AddAuraWithTemporaryStats(sim, SkyshatterAPBonusAuraID, 38432, "Stormstrike AP Buff", stats.SpellPower, 70, skyshatterDur)
+			}
 		},
+	}
+
+	if ItemSetCycloneHarness.CharacterHasSetBonus(&shaman.Character, 4) {
+		ss.WeaponDamageInput.MainHandFlat += 30
+		ss.WeaponDamageInput.OffhandFlat += 30
 	}
 
 	// Add weapon % bonus to stormstrike weapons

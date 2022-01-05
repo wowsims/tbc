@@ -32,6 +32,11 @@ func (shaman *Shaman) newFrostShockTemplate(sim *core.Simulation) core.SimpleSpe
 	baseCast.ManaCost -= baseCast.BaseManaCost * float64(shaman.Talents.MentalQuickness) * 0.02
 	baseCast.Cooldown -= time.Millisecond * 200 * time.Duration(shaman.Talents.Reverberation)
 
+	// TODO: confirm this is how it reduces mana cost.
+	if ItemSetSkyshatterHarness.CharacterHasSetBonus(&shaman.Character, 2) {
+		baseCast.ManaCost -= baseCast.BaseManaCost * 0.1
+	}
+
 	effect := core.SpellHitEffect{
 		SpellEffect: core.SpellEffect{
 			DamageMultiplier:       1,
@@ -97,6 +102,11 @@ func (shaman *Shaman) newEarthShockTemplate(sim *core.Simulation) core.SimpleSpe
 	baseCast.ManaCost -= baseCast.BaseManaCost * float64(shaman.Talents.Convection) * 0.02
 	baseCast.ManaCost -= baseCast.BaseManaCost * float64(shaman.Talents.MentalQuickness) * 0.02
 	baseCast.Cooldown -= time.Millisecond * 200 * time.Duration(shaman.Talents.Reverberation)
+
+	// TODO: confirm this is how it reduces mana cost.
+	if ItemSetSkyshatterHarness.CharacterHasSetBonus(&shaman.Character, 2) {
+		baseCast.ManaCost -= baseCast.BaseManaCost * 0.1
+	}
 
 	effect := core.SpellHitEffect{
 		SpellEffect: core.SpellEffect{

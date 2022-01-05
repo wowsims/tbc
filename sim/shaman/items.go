@@ -18,6 +18,10 @@ func init() {
 	core.AddItemSet(ItemSetCataclysmRegalia)
 	core.AddItemSet(ItemSetSkyshatterRegalia)
 
+	core.AddItemSet(ItemSetCycloneHarness)
+	core.AddItemSet(ItemSetCataclysmHarness)
+	core.AddItemSet(ItemSetSkyshatterHarness)
+
 	// Even though these item effects are handled elsewhere, add them so they are
 	// detected for automatic testing.
 	core.AddItemEffect(TotemOfThePulsingEarth, func(core.Agent) {})
@@ -214,4 +218,53 @@ func ApplySkycallTotem(agent core.Agent) {
 			},
 		}
 	})
+}
+
+// Cyclone Harness
+// (2) Set : Your Strength of Earth Totem ability grants an additional 12 strength.
+// (4) Set : Your Stormstrike ability does an additional 30 damage per weapon.
+
+// var Cyclone4PcAuraID = core.NewAuraID()
+// var Cyclone4PcManaRegainAuraID = core.NewAuraID()
+var ItemSetCycloneHarness = core.ItemSet{
+	Name:  "Cyclone Harness",
+	Items: map[int32]struct{}{29038: {}, 29039: {}, 29040: {}, 29043: {}, 29042: {}},
+	Bonuses: map[int32]core.ApplyEffect{
+		2: func(agent core.Agent) {
+		},
+		4: func(agent core.Agent) {
+			// stormstrike.go
+		},
+	},
+}
+
+// Cataclysm Harness
+// (2) Set : Your melee attacks have a chance to reduce the cast time of your next Lesser Healing Wave by 1.5 sec. (Proc chance: 2%)
+// (4) Set : You gain 5% additional haste from your Flurry ability.
+
+var ItemSetCataclysmHarness = core.ItemSet{
+	Name:  "Cataclysm Harness",
+	Items: map[int32]struct{}{30185: {}, 30189: {}, 30190: {}, 30192: {}, 30194: {}},
+	Bonuses: map[int32]core.ApplyEffect{
+		4: func(agent core.Agent) {
+			// shaman.go
+		},
+	},
+}
+
+// Skyshatter Harness
+// 2 pieces: Your Earth Shock, Flame Shock, and Frost Shock abilities cost 10% less mana.
+// 4 pieces: Whenever you use Stormstrike, you gain 70 attack power for 12 sec.
+
+var ItemSetSkyshatterHarness = core.ItemSet{
+	Name:  "Skyshatter Harness",
+	Items: map[int32]struct{}{31018: {}, 31011: {}, 31015: {}, 31021: {}, 31024: {}, 34567: {}, 34439: {}, 34545: {}},
+	Bonuses: map[int32]core.ApplyEffect{
+		2: func(agent core.Agent) {
+			// implemented in shocks.go
+		},
+		4: func(agent core.Agent) {
+			// implemented in stormstrike.go
+		},
+	},
 }

@@ -524,6 +524,9 @@ func (shaman *Shaman) applyFlurry(level int32) {
 		var icd core.InternalCD
 
 		bonus := 1.3
+		if ItemSetCataclysmRegalia.CharacterHasSetBonus(&shaman.Character, 4) {
+			bonus *= 1.05
+		}
 		inverseBonus := 1 / 1.3
 		return core.Aura{
 			ID:   FlurryTalentAuraID,
