@@ -353,11 +353,12 @@ class SimOptions$Type extends MessageType {
             { no: 1, name: "iterations", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 2, name: "random_seed", kind: "scalar", T: 3 /*ScalarType.INT64*/, L: 0 /*LongType.BIGINT*/ },
             { no: 3, name: "debug", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 6, name: "debug_first_iteration", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 5, name: "is_test", kind: "scalar", T: 8 /*ScalarType.BOOL*/ }
         ]);
     }
     create(value) {
-        const message = { iterations: 0, randomSeed: 0n, debug: false, isTest: false };
+        const message = { iterations: 0, randomSeed: 0n, debug: false, debugFirstIteration: false, isTest: false };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -376,6 +377,9 @@ class SimOptions$Type extends MessageType {
                     break;
                 case /* bool debug */ 3:
                     message.debug = reader.bool();
+                    break;
+                case /* bool debug_first_iteration */ 6:
+                    message.debugFirstIteration = reader.bool();
                     break;
                 case /* bool is_test */ 5:
                     message.isTest = reader.bool();
@@ -401,6 +405,9 @@ class SimOptions$Type extends MessageType {
         /* bool debug = 3; */
         if (message.debug !== false)
             writer.tag(3, WireType.Varint).bool(message.debug);
+        /* bool debug_first_iteration = 6; */
+        if (message.debugFirstIteration !== false)
+            writer.tag(6, WireType.Varint).bool(message.debugFirstIteration);
         /* bool is_test = 5; */
         if (message.isTest !== false)
             writer.tag(5, WireType.Varint).bool(message.isTest);

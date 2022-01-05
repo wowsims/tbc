@@ -1649,7 +1649,7 @@ input, select {
 }
 
 .nav-tabs > li > a:hover, .nav-tabs > li.active > a {
-  background-color: var(--theme-color-primary);
+  background-color: var(--theme-color-primary) !important;
 }
 
 .sim-main > .tab-content {

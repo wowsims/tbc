@@ -182,6 +182,10 @@ export interface SimOptions {
      */
     debug: boolean;
     /**
+     * @generated from protobuf field: bool debug_first_iteration = 6;
+     */
+    debugFirstIteration: boolean;
+    /**
      * @generated from protobuf field: bool is_test = 5;
      */
     isTest: boolean;
