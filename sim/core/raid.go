@@ -191,7 +191,7 @@ func (raid *Raid) finalize(raidConfig proto.Raid) {
 
 			player.GetCharacter().applyAllEffects(player)
 			applyBuffEffects(player, raidBuffs, partyBuffs, individualBuffs)
-			applyConsumeEffects(player, partyBuffs)
+			applyConsumeEffects(player, raidBuffs, partyBuffs)
 		}
 	}
 

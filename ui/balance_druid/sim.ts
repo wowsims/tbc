@@ -166,6 +166,7 @@ export class BalanceDruidSimUI extends IndividualSimUI<Spec.SpecBalanceDruid> {
 				IconInputs.SuperiorWizardOil,
 				IconInputs.BlackenedBasilisk,
 				IconInputs.SkullfishSoup,
+				IconInputs.ScrollOfSpiritV,
 				IconInputs.KreegsStoutBeatdown,
 			],
 			// Inputs to include in the 'Rotation' section on the settings tab.

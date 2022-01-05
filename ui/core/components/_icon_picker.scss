@@ -9,7 +9,7 @@ $icon-active-border-color: lawngreen;
   @include wowhead-background-icon;
   width: 50px;
   height: 50px;
-  transition: .2s ease-in;
+  transition: $sim-transitions;
   border: 2px solid $icon-active-border-color;
   margin: 1px;
 }

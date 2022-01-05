@@ -62,6 +62,7 @@ message SimOptions {
     int32 iterations = 1;
     int64 random_seed = 2;
     bool debug = 3; // Enables debug logging.
+    bool debug_first_iteration = 6;
 		bool is_test = 5; // Only used internally.
 }
 

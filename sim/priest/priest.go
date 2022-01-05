@@ -85,7 +85,7 @@ func (priest *Priest) Advance(sim *core.Simulation, elapsedTime time.Duration) {
 	priest.Character.RegenManaCasting(sim, elapsedTime)
 }
 
-func New(char core.Character, selfBuffs SelfBuffs, talents proto.PriestTalents) Priest {
+func New(char core.Character, selfBuffs SelfBuffs, talents proto.PriestTalents) *Priest {
 
 	char.AddStatDependency(stats.StatDependency{
 		SourceStat:   stats.Intellect,
@@ -107,11 +107,13 @@ func New(char core.Character, selfBuffs SelfBuffs, talents proto.PriestTalents) 
 		char.PseudoStats.SpiritRegenRateCasting = float64(talents.Meditation) * 0.1
 	}
 
-	priest := Priest{
+	priest := &Priest{
 		Character: char,
 		SelfBuffs: selfBuffs,
 		Talents:   talents,
 	}
+
+	priest.registerShadowfiendCD()
 
 	return priest
 }

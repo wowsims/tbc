@@ -10,55 +10,85 @@ var InnervateCooldownID = core.NewCooldownID()
 
 // Returns the time to wait before the next action, or 0 if innervate is on CD
 // or disabled.
-func (druid *Druid) TryInnervate(sim *core.Simulation) time.Duration {
-	if druid.innervateTarget == nil || druid.GetRemainingCD(InnervateCooldownID, sim.CurrentTime) != 0 {
-		return 0
-	}
-
-	// If target already has another innervate, don't cast.
-	if druid.innervateTarget.HasAura(core.InnervateAuraID) {
-		return 0
-	}
-
-	// Innervate needs to be activated as late as possible to maximize DPS. The issue is that
-	// innervate gives so much mana that it can cause Super Mana Potion or Dark Rune usages
-	// to be delayed, if they come off CD soon after innervate. This delay is minimized by
-	// activating innervate from the smallest amount of mana possible.
-	if druid.innervateTarget.CurrentMana() > druid.innervateManaThreshold {
-		return 0
-	}
-
+func (druid *Druid) registerInnervateCD() {
+	baseCastTime := time.Millisecond * 1500
 	baseManaCost := druid.BaseMana() * 0.04
-
-	// Update expected bonus mana
-	newRemainingUsages := int(sim.GetRemainingDuration() / druid.innervateCD)
-	expectedBonusManaReduction := druid.expectedManaPerInnervate * float64(druid.remainingInnervateUsages-newRemainingUsages)
-	druid.remainingInnervateUsages = newRemainingUsages
-
-	cast := &core.SimpleCast{
-		Cast: core.Cast{
-			Name:         "Innervate",
-			Character:    druid.GetCharacter(),
-			BaseManaCost: baseManaCost,
-			ManaCost:     baseManaCost,
-			Cooldown:     druid.innervateCD,
-
-			ActionID: core.ActionID{
-				SpellID:    29166,
-				CooldownID: InnervateCooldownID,
-			},
-		},
-		OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
-			core.AddInnervateAura(sim, druid.innervateTarget, expectedBonusManaReduction)
-		},
+	innervateCD := core.InnervateCD
+	if ItemSetMalorne.CharacterHasSetBonus(druid.GetCharacter(), 4) {
+		innervateCD -= time.Second * 48
 	}
-	cast.Init(sim)
 
-	success := cast.StartCast(sim)
-	if !success {
-		regenTime := druid.TimeUntilManaRegen(cast.GetManaCost())
-		druid.Character.Metrics.MarkOOM(sim, &druid.Character, regenTime)
-		return sim.CurrentTime + regenTime
-	}
-	return sim.CurrentTime + druid.GetRemainingCD(core.GCDCooldownID, sim.CurrentTime)
+	var innervateTarget *core.Character
+	expectedManaPerInnervate := 0.0
+	innervateManaThreshold := 0.0
+	remainingInnervateUsages := 0
+	expectedBonusMana := 0.0
+
+	druid.AddMajorCooldown(core.MajorCooldown{
+		ActionID:   core.ActionID{SpellID: 29166},
+		CooldownID: InnervateCooldownID,
+		Cooldown:   innervateCD,
+		CanActivate: func(sim *core.Simulation, character *core.Character) bool {
+			if innervateTarget == nil {
+				return false
+			}
+
+			if character.IsOnCD(core.GCDCooldownID, sim.CurrentTime) {
+				return false
+			}
+
+			if character.CurrentMana() < baseManaCost {
+				return false
+			}
+
+			// If target already has another innervate, don't cast.
+			if innervateTarget.HasAura(core.InnervateAuraID) {
+				return false
+			}
+
+			return true
+		},
+		ShouldActivate: func(sim *core.Simulation, character *core.Character) bool {
+			// Innervate needs to be activated as late as possible to maximize DPS. The issue is that
+			// innervate gives so much mana that it can cause Super Mana Potion or Dark Rune usages
+			// to be delayed, if they come off CD soon after innervate. This delay is minimized by
+			// activating innervate from the smallest amount of mana possible.
+			if innervateTarget.CurrentMana() > innervateManaThreshold {
+				return false
+			}
+
+			return true
+		},
+		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
+			innervateTargetAgent := sim.Raid.GetPlayerFromRaidTarget(druid.SelfBuffs.InnervateTarget)
+			if innervateTargetAgent != nil {
+				innervateTarget = innervateTargetAgent.GetCharacter()
+				expectedManaPerInnervate = innervateTarget.SpiritManaRegenPerSecond() * 5 * 20
+				if innervateTarget == druid.GetCharacter() {
+					// Threshold can be lower when casting on self because its never mid-cast.
+					innervateManaThreshold = 500
+				} else {
+					innervateManaThreshold = core.InnervateManaThreshold(innervateTarget)
+				}
+
+				remainingInnervateUsages = int(1 + (core.MaxDuration(0, sim.Duration))/innervateCD)
+				expectedBonusMana += expectedManaPerInnervate * float64(remainingInnervateUsages)
+			}
+
+			return func(sim *core.Simulation, character *core.Character) {
+				// Update expected bonus mana
+				newRemainingUsages := int(sim.GetRemainingDuration() / innervateCD)
+				expectedBonusManaReduction := expectedManaPerInnervate * float64(remainingInnervateUsages-newRemainingUsages)
+				remainingInnervateUsages = newRemainingUsages
+
+				castTime := time.Duration(float64(baseCastTime) / character.CastSpeed())
+
+				core.AddInnervateAura(sim, innervateTarget, expectedBonusManaReduction)
+				character.SpendMana(sim, baseManaCost, "Innervate")
+				character.Metrics.AddInstantCast(core.ActionID{SpellID: 29166})
+				character.SetCD(InnervateCooldownID, sim.CurrentTime+innervateCD)
+				character.SetCD(core.GCDCooldownID, sim.CurrentTime+castTime)
+			}
+		},
+	})
 }

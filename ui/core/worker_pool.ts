@@ -56,7 +56,12 @@ export class WorkerPool {
     console.log('Raid sim request: ' + RaidSimRequest.toJsonString(request));
 		const resultData = await this.makeApiCall('raidSim', RaidSimRequest.toBinary(request));
 		const result = RaidSimResult.fromBinary(resultData);
-    console.log('Raid sim result: ' + RaidSimResult.toJsonString(result));
+
+		// Don't print the logs because it just clogs the console.
+		const resultJson = RaidSimResult.toJson(result) as any;
+		delete resultJson!['logs'];
+    console.log('Raid sim result: ' + JSON.stringify(resultJson));
+
 		return result;
   }
 }
