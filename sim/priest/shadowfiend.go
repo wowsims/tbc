@@ -13,6 +13,41 @@ const SpellIDShadowfiend int32 = 34433
 
 var ShadowfiendCD = core.NewCooldownID()
 
+func (priest *Priest) registerShadowfiendCD() {
+	if !priest.UseShadowfiend {
+		return
+	}
+
+	priest.AddMajorCooldown(core.MajorCooldown{
+		ActionID:   core.ActionID{SpellID: SpellIDShadowfiend},
+		CooldownID: ShadowfiendCD,
+		Cooldown:   time.Minute * 5,
+		CanActivate: func(sim *core.Simulation, character *core.Character) bool {
+			if character.IsOnCD(core.GCDCooldownID, sim.CurrentTime) {
+				return false
+			}
+
+			if character.CurrentMana() < 575 {
+				return false
+			}
+
+			return true
+		},
+		ShouldActivate: func(sim *core.Simulation, character *core.Character) bool {
+			if character.CurrentManaPercent() >= 0.5 {
+				return false
+			}
+
+			return true
+		},
+		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
+			return func(sim *core.Simulation, character *core.Character) {
+				priest.NewShadowfiend(sim, sim.GetPrimaryTarget()).Cast(sim)
+			}
+		},
+	})
+}
+
 func (priest *Priest) newShadowfiendTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
 	baseCast := core.Cast{
 		Name:           "Shadowfiend",
