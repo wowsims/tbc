@@ -80,10 +80,6 @@ export class Timeline extends ResultComponent {
 		this.resultData = resultData;
 
 		this.updatePlot();
-
-		// Doesn't work if this is called before updatePlot().
-		const duration = this.resultData!.result.request.encounter!.duration || 1;
-		this.plot.zoomX(0, duration);
 	}
 
 	private updatePlot() {
@@ -152,10 +148,9 @@ export class Timeline extends ResultComponent {
 				min: 0,
 				max: duration,
 				tickAmount: 10,
-				categories: manaLogsToShow.map(log => log.timestamp),
+				decimalsInFloat: 1,
 				labels: {
 					show: true,
-					formatter: (val: string) => val,
 				},
 			},
 			yaxis: [
