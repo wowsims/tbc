@@ -54,9 +54,6 @@ export class Timeline extends ResultComponent {
     onSimResult(resultData) {
         this.resultData = resultData;
         this.updatePlot();
-        // Doesn't work if this is called before updatePlot().
-        const duration = this.resultData.result.request.encounter.duration || 1;
-        this.plot.zoomX(0, duration);
     }
     updatePlot() {
         const players = this.resultData.result.getPlayers(this.resultData.filter);
@@ -117,10 +114,9 @@ export class Timeline extends ResultComponent {
                 min: 0,
                 max: duration,
                 tickAmount: 10,
-                categories: manaLogsToShow.map(log => log.timestamp),
+                decimalsInFloat: 1,
                 labels: {
                     show: true,
-                    formatter: (val) => val,
                 },
             },
             yaxis: [
