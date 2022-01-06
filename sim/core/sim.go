@@ -127,14 +127,14 @@ func (sim *Simulation) run() *proto.RaidSimResult {
 		for _, player := range party.Players {
 			character := player.GetCharacter()
 			character.auraTracker.logFn = func(message string, vals ...interface{}) {
-				character.Log(sim, message, vals)
+				character.Log(sim, message, vals...)
 			}
 			player.Init(sim)
 
 			for _, petAgent := range character.Pets {
 				petCharacter := petAgent.GetCharacter()
 				petCharacter.auraTracker.logFn = func(message string, vals ...interface{}) {
-					petCharacter.Log(sim, message, vals)
+					petCharacter.Log(sim, message, vals...)
 				}
 				petAgent.Init(sim)
 			}
@@ -143,7 +143,7 @@ func (sim *Simulation) run() *proto.RaidSimResult {
 
 	for _, target := range sim.encounter.Targets {
 		target.auraTracker.logFn = func(message string, vals ...interface{}) {
-			target.Log(sim, message, vals)
+			target.Log(sim, message, vals...)
 		}
 	}
 

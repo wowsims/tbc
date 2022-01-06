@@ -183,3 +183,11 @@ $sim-transitions: .2s ease-in;
 .negative {
 	color: red !important;
 }
+
+.sim-button {
+	color: var(--main-text-color);
+	background-color: var(--theme-color-primary);
+	border: none;
+	padding: 5px;
+	font-weight: bold;
+}

@@ -15,7 +15,8 @@ import (
 // All players have stats, equipment, auras, etc
 type Character struct {
 	// Label for logging.
-	Name string
+	Name  string
+	Label string
 
 	Race  proto.Race
 	Class proto.Class
@@ -111,6 +112,8 @@ func NewCharacter(party *Party, partyIndex int, player proto.Player) Character {
 		Metrics: NewCharacterMetrics(),
 	}
 
+	character.Label = fmt.Sprintf("%s (#%d)", character.Name, character.RaidIndex+1)
+
 	if player.Consumes != nil {
 		character.consumes = *player.Consumes
 	}
@@ -150,7 +153,7 @@ func (character *Character) addUniversalStatDependencies() {
 }
 
 func (character *Character) Log(sim *Simulation, message string, vals ...interface{}) {
-	sim.Log("%s (#%d): "+message, append([]interface{}{character.Name, character.RaidIndex + 1}, vals...)...)
+	sim.Log("[%s] "+message, append([]interface{}{character.Label}, vals...)...)
 }
 
 func (character *Character) applyAllEffects(agent Agent) {

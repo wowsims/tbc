@@ -29,6 +29,7 @@ export interface SimUIConfig {
 // Shared UI for all individual sims and the raid sim.
 export abstract class SimUI extends Component {
   readonly sim: Sim;
+	readonly isWithinRaidSim: boolean;
 
   // Emits when anything from the sim, raid, or encounter changes.
   readonly changeEmitter;
@@ -42,6 +43,7 @@ export abstract class SimUI extends Component {
 		super(parentElem, 'sim-ui');
     this.sim = sim;
     this.rootElem.innerHTML = simHTML;
+		this.isWithinRaidSim = this.rootElem.closest('.within-raid-sim') != null;
 
 		this.changeEmitter = TypedEvent.onAny([
       this.sim.changeEmitter,
@@ -95,6 +97,14 @@ export abstract class SimUI extends Component {
 			window.open('https://github.com/wowsims/tbc/issues/new/choose', '_blank');
 		});
 		this.addToolbarItem(reportBug);
+
+		if (!this.isWithinRaidSim) {
+			window.addEventListener('message', async event => {
+				if (event.data == 'runOnce') {
+					this.runSimOnce();
+				}
+			});
+		}
   }
 
 	addAction(name: string, cssClass: string, actFn: () => void) {
@@ -195,6 +205,26 @@ export abstract class SimUI extends Component {
 
 	isIndividualSim(): boolean {
 		return this.rootElem.classList.contains('individual-sim-ui');
+	}
+
+	async runSim() {
+		this.setResultsPending();
+		try {
+			const result = await this.sim.runRaidSim(TypedEvent.nextEventID());
+		} catch (e) {
+			this.hideAllResults();
+			alert(e);
+		}
+	}
+
+	async runSimOnce() {
+		this.setResultsPending();
+		try {
+			const result = await this.sim.runRaidSimWithLogs(TypedEvent.nextEventID());
+		} catch (e) {
+			this.hideAllResults();
+			alert(e);
+		}
 	}
 }
 
