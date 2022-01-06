@@ -2,16 +2,7 @@ import { Encounter as EncounterProto } from '/tbc/core/proto/common.js';
 import { Raid as RaidProto } from '/tbc/core/proto/api.js';
 import { TypedEvent } from '/tbc/core/typed_event.js';
 export function addRaidSimAction(simUI) {
-    simUI.addAction('DPS', 'dps-action', async () => {
-        simUI.setResultsPending();
-        try {
-            const result = await simUI.sim.runRaidSim(TypedEvent.nextEventID());
-        }
-        catch (e) {
-            simUI.hideAllResults();
-            alert(e);
-        }
-    });
+    simUI.addAction('DPS', 'dps-action', async () => simUI.runSim());
     const resultsManager = new RaidSimResultsManager(simUI);
     simUI.sim.simResultEmitter.on((eventID, simResult) => {
         resultsManager.setSimResult(eventID, simResult);

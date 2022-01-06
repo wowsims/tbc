@@ -8,6 +8,7 @@ import { AuraMetrics } from './aura_metrics.js';
 import { DpsHistogram } from './dps_histogram.js';
 import { DpsResult } from './dps_result.js';
 import { PercentOom } from './percent_oom.js';
+import { Timeline } from './timeline.js';
 const urlParams = new URLSearchParams(window.location.search);
 if (urlParams.has('mainTextColor')) {
     document.body.style.setProperty('--main-text-color', urlParams.get('mainTextColor'));
@@ -47,6 +48,7 @@ const layoutHTML = `
 		<li class="dr-tab-tab"><a data-toggle="tab" href="#buffsTab">BUFFS</a></li>
 		<li class="dr-tab-tab"><a data-toggle="tab" href="#debuffsTab">DEBUFFS</a></li>
 		<li class="dr-tab-tab"><a data-toggle="tab" href="#castsTab">CASTS</a></li>
+		<li class="dr-tab-tab"><a data-toggle="tab" href="#timelineTab" id="timelineTabTab">TIMELINE</a></li>
 	</ul>
 	<div class="tab-content">
 		<div id="damageTab" class="tab-pane dr-tab-content damage-content fade active in">
@@ -81,6 +83,12 @@ const layoutHTML = `
 				</div>
 			</div>
 		</div>
+		<div id="timelineTab" class="tab-pane dr-tab-content timeline-content fade">
+			<div class="dr-row">
+				<div class="timeline">
+				</div>
+			</div>
+		</div>
 	</div>
 </div>
 `;
@@ -108,6 +116,12 @@ const debuffAuraMetrics = new AuraMetrics({
     colorSettings: colorSettings,
 }, true);
 const dpsHistogram = new DpsHistogram({ parent: document.body.getElementsByClassName('dps-histogram')[0], resultsEmitter: resultsEmitter, colorSettings: colorSettings });
+const timeline = new Timeline({
+    parent: document.body.getElementsByClassName('timeline')[0],
+    resultsEmitter: resultsEmitter,
+    colorSettings: colorSettings,
+});
+document.getElementById('timelineTabTab').addEventListener('click', event => timeline.render());
 let currentSimResult = null;
 function updateResults() {
     const eventID = TypedEvent.nextEventID();

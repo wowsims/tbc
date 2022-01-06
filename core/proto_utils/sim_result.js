@@ -13,14 +13,16 @@ import { playerToSpec } from '/tbc/core/proto_utils/utils.js';
 import { specToClass } from '/tbc/core/proto_utils/utils.js';
 import { bucket } from '/tbc/core/utils.js';
 import { sum } from '/tbc/core/utils.js';
+import { ManaChangedLog, SimLog, } from './logs_parser.js';
 // Holds all the data from a simulation call, and provides helper functions
 // for parsing it.
 export class SimResult {
-    constructor(request, result, raidMetrics, encounterMetrics) {
+    constructor(request, result, raidMetrics, encounterMetrics, logs) {
         this.request = request;
         this.result = result;
         this.raidMetrics = raidMetrics;
         this.encounterMetrics = encounterMetrics;
+        this.logs = logs;
     }
     getPlayers(filter) {
         if (filter?.player || filter?.player === 0) {
@@ -68,9 +70,6 @@ export class SimResult {
     getDebuffMetrics(filter) {
         return AuraMetrics.join(this.getTargets(filter).map(target => target.auras).flat());
     }
-    getLogs() {
-        return this.result.logs.split('\n');
-    }
     toJson() {
         return {
             'request': RaidSimRequest.toJson(this.request),
@@ -85,11 +84,12 @@ export class SimResult {
     static async makeNew(request, result) {
         const iterations = request.simOptions?.iterations || 1;
         const duration = request.encounter?.duration || 1;
-        const raidPromise = RaidMetrics.makeNew(iterations, duration, request.raid, result.raidMetrics);
-        const encounterPromise = EncounterMetrics.makeNew(iterations, duration, request.encounter, result.encounterMetrics);
+        const logs = SimLog.parseAll(result);
+        const raidPromise = RaidMetrics.makeNew(iterations, duration, request.raid, result.raidMetrics, logs);
+        const encounterPromise = EncounterMetrics.makeNew(iterations, duration, request.encounter, result.encounterMetrics, logs);
         const raidMetrics = await raidPromise;
         const encounterMetrics = await encounterPromise;
-        return new SimResult(request, result, raidMetrics, encounterMetrics);
+        return new SimResult(request, result, raidMetrics, encounterMetrics, logs);
     }
 }
 export class RaidMetrics {
@@ -99,10 +99,10 @@ export class RaidMetrics {
         this.dps = this.metrics.dps;
         this.parties = parties;
     }
-    static async makeNew(iterations, duration, raid, metrics) {
+    static async makeNew(iterations, duration, raid, metrics, logs) {
         const numParties = Math.min(raid.parties.length, metrics.parties.length);
         const parties = await Promise.all([...new Array(numParties).keys()]
-            .map(i => PartyMetrics.makeNew(iterations, duration, raid.parties[i], metrics.parties[i], i)));
+            .map(i => PartyMetrics.makeNew(iterations, duration, raid.parties[i], metrics.parties[i], i, logs)));
         return new RaidMetrics(raid, metrics, parties);
     }
 }
@@ -114,16 +114,16 @@ export class PartyMetrics {
         this.dps = this.metrics.dps;
         this.players = players;
     }
-    static async makeNew(iterations, duration, party, metrics, partyIndex) {
+    static async makeNew(iterations, duration, party, metrics, partyIndex, logs) {
         const numPlayers = Math.min(party.players.length, metrics.players.length);
         const players = await Promise.all([...new Array(numPlayers).keys()]
             .filter(i => party.players[i].class != Class.ClassUnknown)
-            .map(i => PlayerMetrics.makeNew(iterations, duration, party.players[i], metrics.players[i], partyIndex * 5 + i, false)));
+            .map(i => PlayerMetrics.makeNew(iterations, duration, party.players[i], metrics.players[i], partyIndex * 5 + i, false, logs)));
         return new PartyMetrics(party, metrics, partyIndex, players);
     }
 }
 export class PlayerMetrics {
-    constructor(player, isPet, metrics, raidIndex, actions, auras, pets, iterations, duration) {
+    constructor(player, isPet, metrics, raidIndex, actions, auras, pets, logs, iterations, duration) {
         this.player = player;
         this.metrics = metrics;
         this.raidIndex = raidIndex;
@@ -136,8 +136,10 @@ export class PlayerMetrics {
         this.actions = actions;
         this.auras = auras;
         this.pets = pets;
+        this.logs = logs;
         this.iterations = iterations;
         this.duration = duration;
+        this.manaChangedLogs = this.logs.filter((log) => log instanceof ManaChangedLog);
     }
     get label() {
         return `${this.name} (#${this.raidIndex + 1})`;
@@ -151,14 +153,15 @@ export class PlayerMetrics {
     getPlayerAndPetActions() {
         return this.actions.concat(this.pets.map(pet => pet.getPlayerAndPetActions()).flat());
     }
-    static async makeNew(iterations, duration, player, metrics, raidIndex, isPet) {
+    static async makeNew(iterations, duration, player, metrics, raidIndex, isPet, logs) {
+        const playerLogs = logs.filter(log => log.source && (!log.source.isTarget && (isPet == log.source.isPet) && log.source.index == raidIndex));
         const actionsPromise = Promise.all(metrics.actions.map(actionMetrics => ActionMetrics.makeNew(iterations, duration, actionMetrics)));
         const aurasPromise = Promise.all(metrics.auras.map(auraMetrics => AuraMetrics.makeNew(iterations, duration, auraMetrics)));
-        const petsPromise = Promise.all(metrics.pets.map(petMetrics => PlayerMetrics.makeNew(iterations, duration, player, petMetrics, raidIndex, true)));
+        const petsPromise = Promise.all(metrics.pets.map(petMetrics => PlayerMetrics.makeNew(iterations, duration, player, petMetrics, raidIndex, true, logs)));
         const actions = await actionsPromise;
         const auras = await aurasPromise;
         const pets = await petsPromise;
-        return new PlayerMetrics(player, isPet, metrics, raidIndex, actions, auras, pets, iterations, duration);
+        return new PlayerMetrics(player, isPet, metrics, raidIndex, actions, auras, pets, playerLogs, iterations, duration);
     }
 }
 export class EncounterMetrics {
@@ -167,10 +170,10 @@ export class EncounterMetrics {
         this.metrics = metrics;
         this.targets = targets;
     }
-    static async makeNew(iterations, duration, encounter, metrics) {
+    static async makeNew(iterations, duration, encounter, metrics, logs) {
         const numTargets = Math.min(encounter.targets.length, metrics.targets.length);
         const targets = await Promise.all([...new Array(numTargets).keys()]
-            .map(i => TargetMetrics.makeNew(iterations, duration, encounter.targets[i], metrics.targets[i], i)));
+            .map(i => TargetMetrics.makeNew(iterations, duration, encounter.targets[i], metrics.targets[i], i, logs)));
         return new EncounterMetrics(encounter, metrics, targets);
     }
     get durationSeconds() {
@@ -178,15 +181,17 @@ export class EncounterMetrics {
     }
 }
 export class TargetMetrics {
-    constructor(target, metrics, index, auras) {
+    constructor(target, metrics, index, auras, logs) {
         this.target = target;
         this.metrics = metrics;
         this.index = index;
         this.auras = auras;
+        this.logs = logs;
     }
-    static async makeNew(iterations, duration, target, metrics, index) {
+    static async makeNew(iterations, duration, target, metrics, index, logs) {
+        const targetLogs = logs.filter(log => log.source && (log.source.isTarget && log.source.index == index));
         const auras = await Promise.all(metrics.auras.map(auraMetrics => AuraMetrics.makeNew(iterations, duration, auraMetrics)));
-        return new TargetMetrics(target, metrics, index, auras);
+        return new TargetMetrics(target, metrics, index, auras, targetLogs);
     }
 }
 export class AuraMetrics {

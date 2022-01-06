@@ -339,6 +339,14 @@
   color: red !important;
 }
 
+.sim-button {
+  color: var(--main-text-color);
+  background-color: var(--theme-color-primary);
+  border: none;
+  padding: 5px;
+  font-weight: bold;
+}
+
 .gear-picker-root {
   display: flex;
   margin: 15px;
@@ -684,6 +692,14 @@
   color: red !important;
 }
 
+.sim-button {
+  color: var(--main-text-color);
+  background-color: var(--theme-color-primary);
+  border: none;
+  padding: 5px;
+  font-weight: bold;
+}
+
 .icon-input {
   background-repeat: no-repeat;
   background-size: cover;
@@ -939,6 +955,14 @@
 
 .negative {
   color: red !important;
+}
+
+.sim-button {
+  color: var(--main-text-color);
+  background-color: var(--theme-color-primary);
+  border: none;
+  padding: 5px;
+  font-weight: bold;
 }
 
 .results-sim {
@@ -1204,6 +1228,14 @@
 
 .negative {
   color: red !important;
+}
+
+.sim-button {
+  color: var(--main-text-color);
+  background-color: var(--theme-color-primary);
+  border: none;
+  padding: 5px;
+  font-weight: bold;
 }
 
 .results-ep-table {
@@ -1498,6 +1530,14 @@
   color: red !important;
 }
 
+.sim-button {
+  color: var(--main-text-color);
+  background-color: var(--theme-color-primary);
+  border: none;
+  padding: 5px;
+  font-weight: bold;
+}
+
 html {
   overflow: hidden;
 }
@@ -1515,14 +1555,6 @@ input, select {
   background-color: #1e2633;
   border: 1px solid #373e58;
   padding: 3px;
-}
-
-.sim-button {
-  color: var(--main-text-color);
-  background-color: var(--theme-color-primary);
-  border: none;
-  padding: 5px;
-  font-weight: bold;
 }
 
 .sim-root {
@@ -1836,6 +1868,14 @@ input, select {
 
 .negative {
   color: red !important;
+}
+
+.sim-button {
+  color: var(--main-text-color);
+  background-color: var(--theme-color-primary);
+  border: none;
+  padding: 5px;
+  font-weight: bold;
 }
 
 .talents-picker-root {

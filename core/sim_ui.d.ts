@@ -13,6 +13,7 @@ export interface SimUIConfig {
 }
 export declare abstract class SimUI extends Component {
     readonly sim: Sim;
+    readonly isWithinRaidSim: boolean;
     readonly changeEmitter: TypedEvent<void>;
     readonly resultsPendingElem: HTMLElement;
     readonly resultsContentElem: HTMLElement;
@@ -30,4 +31,6 @@ export declare abstract class SimUI extends Component {
     getSettingsStorageKey(): string;
     getSavedEncounterStorageKey(): string;
     isIndividualSim(): boolean;
+    runSim(): Promise<void>;
+    runSimOnce(): Promise<void>;
 }

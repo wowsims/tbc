@@ -14,6 +14,7 @@ import { TargetMetrics as TargetMetricsProto } from '/tbc/core/proto/api.js';
 import { RaidSimRequest, RaidSimResult } from '/tbc/core/proto/api.js';
 import { Spec } from '/tbc/core/proto/common.js';
 import { ActionId } from '/tbc/core/proto_utils/action_id.js';
+import { ManaChangedLog, SimLog } from './logs_parser.js';
 export interface SimResultFilter {
     player?: number | null;
     target?: number | null;
@@ -23,6 +24,7 @@ export declare class SimResult {
     readonly result: RaidSimResult;
     readonly raidMetrics: RaidMetrics;
     readonly encounterMetrics: EncounterMetrics;
+    readonly logs: Array<SimLog>;
     private constructor();
     getPlayers(filter?: SimResultFilter): Array<PlayerMetrics>;
     getFirstPlayer(): PlayerMetrics | null;
@@ -34,7 +36,6 @@ export declare class SimResult {
     getSpellMetrics(filter: SimResultFilter): Array<ActionMetrics>;
     getBuffMetrics(filter: SimResultFilter): Array<AuraMetrics>;
     getDebuffMetrics(filter: SimResultFilter): Array<AuraMetrics>;
-    getLogs(): Array<string>;
     toJson(): any;
     static fromJson(obj: any): Promise<SimResult>;
     static makeNew(request: RaidSimRequest, result: RaidSimResult): Promise<SimResult>;
@@ -45,7 +46,7 @@ export declare class RaidMetrics {
     readonly dps: DpsMetricsProto;
     readonly parties: Array<PartyMetrics>;
     private constructor();
-    static makeNew(iterations: number, duration: number, raid: RaidProto, metrics: RaidMetricsProto): Promise<RaidMetrics>;
+    static makeNew(iterations: number, duration: number, raid: RaidProto, metrics: RaidMetricsProto, logs: Array<SimLog>): Promise<RaidMetrics>;
 }
 export declare class PartyMetrics {
     private readonly party;
@@ -54,7 +55,7 @@ export declare class PartyMetrics {
     readonly dps: DpsMetricsProto;
     readonly players: Array<PlayerMetrics>;
     private constructor();
-    static makeNew(iterations: number, duration: number, party: PartyProto, metrics: PartyMetricsProto, partyIndex: number): Promise<PartyMetrics>;
+    static makeNew(iterations: number, duration: number, party: PartyProto, metrics: PartyMetricsProto, partyIndex: number, logs: Array<SimLog>): Promise<PartyMetrics>;
 }
 export declare class PlayerMetrics {
     private readonly player;
@@ -71,19 +72,21 @@ export declare class PlayerMetrics {
     readonly pets: Array<PlayerMetrics>;
     private readonly iterations;
     private readonly duration;
+    readonly logs: Array<SimLog>;
+    readonly manaChangedLogs: Array<ManaChangedLog>;
     private constructor();
     get label(): string;
     get secondsOomAvg(): number;
     get totalDamage(): number;
     getPlayerAndPetActions(): Array<ActionMetrics>;
-    static makeNew(iterations: number, duration: number, player: PlayerProto, metrics: PlayerMetricsProto, raidIndex: number, isPet: boolean): Promise<PlayerMetrics>;
+    static makeNew(iterations: number, duration: number, player: PlayerProto, metrics: PlayerMetricsProto, raidIndex: number, isPet: boolean, logs: Array<SimLog>): Promise<PlayerMetrics>;
 }
 export declare class EncounterMetrics {
     private readonly encounter;
     private readonly metrics;
     readonly targets: Array<TargetMetrics>;
     private constructor();
-    static makeNew(iterations: number, duration: number, encounter: EncounterProto, metrics: EncounterMetricsProto): Promise<EncounterMetrics>;
+    static makeNew(iterations: number, duration: number, encounter: EncounterProto, metrics: EncounterMetricsProto, logs: Array<SimLog>): Promise<EncounterMetrics>;
     get durationSeconds(): number;
 }
 export declare class TargetMetrics {
@@ -91,8 +94,9 @@ export declare class TargetMetrics {
     private readonly metrics;
     readonly index: number;
     readonly auras: Array<AuraMetrics>;
+    readonly logs: Array<SimLog>;
     private constructor();
-    static makeNew(iterations: number, duration: number, target: TargetProto, metrics: TargetMetricsProto, index: number): Promise<TargetMetrics>;
+    static makeNew(iterations: number, duration: number, target: TargetProto, metrics: TargetMetricsProto, index: number, logs: Array<SimLog>): Promise<TargetMetrics>;
 }
 export declare class AuraMetrics {
     readonly actionId: ActionId;
