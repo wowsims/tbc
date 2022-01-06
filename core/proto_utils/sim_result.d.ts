@@ -14,7 +14,7 @@ import { TargetMetrics as TargetMetricsProto } from '/tbc/core/proto/api.js';
 import { RaidSimRequest, RaidSimResult } from '/tbc/core/proto/api.js';
 import { Spec } from '/tbc/core/proto/common.js';
 import { ActionId } from '/tbc/core/proto_utils/action_id.js';
-import { ManaChangedLog, SimLog } from './logs_parser.js';
+import { DamageDealtLog, DpsLog, ManaChangedLog, SimLog } from './logs_parser.js';
 export interface SimResultFilter {
     player?: number | null;
     target?: number | null;
@@ -73,7 +73,9 @@ export declare class PlayerMetrics {
     private readonly iterations;
     private readonly duration;
     readonly logs: Array<SimLog>;
+    readonly damageDealtLogs: Array<DamageDealtLog>;
     readonly manaChangedLogs: Array<ManaChangedLog>;
+    readonly dpsLogs: Array<DpsLog>;
     private constructor();
     get label(): string;
     get secondsOomAvg(): number;

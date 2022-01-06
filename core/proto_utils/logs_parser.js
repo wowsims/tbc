@@ -54,13 +54,88 @@ export class SimLog {
             const entities = Entity.parseAll(remainder);
             params.source = entities[0] || null;
             params.target = entities[1] || null;
-            return AuraGainedLog.parse(params)
-                || AuraFadedLog.parse(params)
+            // Order from most to least common to reduce number of checks.
+            return DamageDealtLog.parse(params)
                 || ManaChangedLog.parse(params)
+                || AuraGainedLog.parse(params)
+                || AuraFadedLog.parse(params)
                 || new SimLog(params);
         });
     }
+    // Remove events that happen at the same time.
+    // Make sure we always keep the last log for each timestamp.
+    static filterDuplicateTimestamps(logs) {
+        const numLogs = logs.length;
+        if (numLogs == 0) {
+            return logs;
+        }
+        return logs.filter((log, i) => {
+            return i == 0 || i == (numLogs - 1) || log.timestamp != logs[i + 1].timestamp;
+        });
+    }
 }
+export class DamageDealtLog extends SimLog {
+    constructor(params, amount, miss, crit, partialResist1_4, partialResist2_4, partialResist3_4, cause) {
+        super(params);
+        this.amount = amount;
+        this.miss = miss;
+        this.hit = !miss && !crit;
+        this.crit = crit;
+        this.partialResist1_4 = partialResist1_4;
+        this.partialResist2_4 = partialResist2_4;
+        this.partialResist3_4 = partialResist3_4;
+        this.cause = cause;
+    }
+    static parse(params) {
+        const match = params.raw.match(/] (.*?) ((Miss)|(Hit)|(Crit)|(ticked))( for (\d+\.\d+) damage.( \((\d+)% Resist\))?)?/);
+        if (match) {
+            const cause = match[1];
+            if (match[2] == 'Miss') {
+                return new DamageDealtLog(params, 0, true, false, false, false, false, cause);
+            }
+            const amount = parseFloat(match[8]);
+            return new DamageDealtLog(params, amount, false, match[2] == 'Crit', match[10] == '25', match[10] == '50', match[10] == '75', cause);
+        }
+        else {
+            return null;
+        }
+    }
+}
+export class DpsLog extends SimLog {
+    constructor(params, dps) {
+        super(params);
+        this.dps = dps;
+    }
+    static fromDamageDealt(damageDealtLogs) {
+        let curDamageLogs = [];
+        let curDamageTotal = 0;
+        return damageDealtLogs.map(ddLog => {
+            curDamageLogs.push(ddLog);
+            curDamageTotal += ddLog.amount;
+            const newStartIdx = curDamageLogs.findIndex(curLog => {
+                const inWindow = curLog.timestamp > ddLog.timestamp - DpsLog.DPS_WINDOW;
+                if (!inWindow) {
+                    curDamageTotal -= curLog.amount;
+                }
+                return inWindow;
+            });
+            if (newStartIdx == -1) {
+                curDamageLogs = [];
+            }
+            else {
+                curDamageLogs = curDamageLogs.slice(newStartIdx);
+            }
+            const dps = curDamageTotal / DpsLog.DPS_WINDOW;
+            return new DpsLog({
+                raw: ddLog.raw,
+                timestamp: ddLog.timestamp,
+                source: ddLog.source,
+                target: ddLog.target,
+            }, dps);
+        });
+    }
+}
+DpsLog.DPS_WINDOW = 15; // Window over which to calculate DPS.
 export class AuraGainedLog extends SimLog {
     constructor(params, auraName) {
         super(params);

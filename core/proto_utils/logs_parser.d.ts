@@ -22,6 +22,25 @@ export declare class SimLog {
     readonly target: Entity | null;
     constructor(params: SimLogParams);
     static parseAll(result: RaidSimResult): Array<SimLog>;
+    static filterDuplicateTimestamps<LogType extends SimLog>(logs: Array<LogType>): Array<LogType>;
+}
+export declare class DamageDealtLog extends SimLog {
+    readonly amount: number;
+    readonly miss: boolean;
+    readonly hit: boolean;
+    readonly crit: boolean;
+    readonly partialResist1_4: boolean;
+    readonly partialResist2_4: boolean;
+    readonly partialResist3_4: boolean;
+    readonly cause: string;
+    constructor(params: SimLogParams, amount: number, miss: boolean, crit: boolean, partialResist1_4: boolean, partialResist2_4: boolean, partialResist3_4: boolean, cause: string);
+    static parse(params: SimLogParams): DamageDealtLog | null;
+}
+export declare class DpsLog extends SimLog {
+    readonly dps: number;
+    constructor(params: SimLogParams, dps: number);
+    static DPS_WINDOW: number;
+    static fromDamageDealt(damageDealtLogs: Array<DamageDealtLog>): Array<DpsLog>;
 }
 export declare class AuraGainedLog extends SimLog {
     readonly auraName: string;

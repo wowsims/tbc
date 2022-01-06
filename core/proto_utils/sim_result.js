@@ -13,7 +13,7 @@ import { playerToSpec } from '/tbc/core/proto_utils/utils.js';
 import { specToClass } from '/tbc/core/proto_utils/utils.js';
 import { bucket } from '/tbc/core/utils.js';
 import { sum } from '/tbc/core/utils.js';
-import { ManaChangedLog, SimLog, } from './logs_parser.js';
+import { DamageDealtLog, DpsLog, ManaChangedLog, SimLog, } from './logs_parser.js';
 // Holds all the data from a simulation call, and provides helper functions
 // for parsing it.
 export class SimResult {
@@ -139,7 +139,9 @@ export class PlayerMetrics {
         this.logs = logs;
         this.iterations = iterations;
         this.duration = duration;
+        this.damageDealtLogs = this.logs.filter((log) => log instanceof DamageDealtLog);
         this.manaChangedLogs = this.logs.filter((log) => log instanceof ManaChangedLog);
+        this.dpsLogs = DpsLog.fromDamageDealt(this.damageDealtLogs);
     }
     get label() {
         return `${this.name} (#${this.raidIndex + 1})`;
