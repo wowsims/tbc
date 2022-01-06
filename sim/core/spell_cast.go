@@ -105,7 +105,7 @@ func (spellEffect *SpellEffect) triggerSpellProcs(sim *Simulation, spellCast *Sp
 
 func (spellEffect *SpellEffect) afterCalculations(sim *Simulation, spellCast *SpellCast) {
 	if sim.Log != nil && !spellEffect.IgnoreHitCheck {
-		spellCast.Character.Log(sim, "%s result: %s", spellCast.Name, spellEffect)
+		spellCast.Character.Log(sim, "%s %s.", spellCast.Name, spellEffect)
 	}
 
 	spellEffect.triggerSpellProcs(sim, spellCast)

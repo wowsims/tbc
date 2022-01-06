@@ -1,5 +1,12 @@
 import { SimResult, SimResultFilter } from '/tbc/core/proto_utils/sim_result.js';
-import { sum } from '/tbc/core/utils.js';
+import { maxIndex, sum } from '/tbc/core/utils.js';
+
+import {
+	DamageDealtLog,
+	DpsLog,
+	ManaChangedLog,
+	SimLog,
+} from '/tbc/core/proto_utils/logs_parser.js';
 
 import { ResultComponent, ResultComponentConfig, SimResultData } from './result_component.js';
 
@@ -7,14 +14,20 @@ declare var $: any;
 declare var tippy: any;
 declare var ApexCharts: any;
 
+const dpsColor = '#ed5653';
+const manaColor = '#2E93fA';
+
 export class Timeline extends ResultComponent {
 	private readonly plotElem: HTMLElement;
 
 	private readonly plot: any;
 
+	private resultData: SimResultData | null;
+
   constructor(config: ResultComponentConfig) {
 		config.rootCssClass = 'timeline-root';
     super(config);
+		this.resultData = null;
 
 		this.rootElem.innerHTML = `
 		<div class="timeline-disclaimer">
@@ -34,10 +47,18 @@ export class Timeline extends ResultComponent {
 		this.plotElem = this.rootElem.getElementsByClassName('timeline-plot')[0] as HTMLElement;
 		this.plot = new ApexCharts(this.plotElem, {
 			chart: {
-				type: 'line',
 				foreColor: 'white',
 				animations: {
 					enabled: false,
+				},
+				height: '100%',
+				events: {
+					zoomed: (charContext: any) => {
+						//this.updatePlot();
+					},
+					scrolled: (charContext: any) => {
+						//this.updatePlot();
+					},
 				},
 			},
 			series: [], // Set dynamically
@@ -56,94 +77,147 @@ export class Timeline extends ResultComponent {
 	}
 
 	onSimResult(resultData: SimResultData) {
-		const players = resultData.result.getPlayers(resultData.filter);
+		this.resultData = resultData;
+
+		this.updatePlot();
+
+		// Doesn't work if this is called before updatePlot().
+		const duration = this.resultData!.result.request.encounter!.duration || 1;
+		this.plot.zoomX(0, duration);
+	}
+
+	private updatePlot() {
+		const players = this.resultData!.result.getPlayers(this.resultData!.filter);
 		if (players.length != 1) {
 			this.plotElem.textContent = '';
 			return;
 		}
 		const player = players[0];
 
-		const duration = resultData.result.request.encounter!.duration || 1;
+		const duration = this.resultData!.result.request.encounter!.duration || 1;
 
-		let logsToShow = player.manaChangedLogs;
-		if (logsToShow.length == 0) {
+		let manaLogsToShow = player.manaChangedLogs;
+		let dpsLogsToShow = player.dpsLogs;
+		if (manaLogsToShow.length == 0) {
 			return;
 		}
-		const maxMana = logsToShow[0].manaBefore;
+		const maxMana = manaLogsToShow[0].manaBefore;
 
-		// Remove events that happen at the same time.
-		let curTime = -1;
-		logsToShow = logsToShow.filter(log => {
-			if (log.timestamp == curTime) {
-				return false;
-			}
-			curTime = log.timestamp;
-			return true;
-		});
+		manaLogsToShow = SimLog.filterDuplicateTimestamps(manaLogsToShow);
+		dpsLogsToShow = SimLog.filterDuplicateTimestamps(dpsLogsToShow);
 
 		// Reduce to ~100 logs.
 		const desiredNumLogs = 100;
-		if (logsToShow.length / desiredNumLogs >= 2) {
-			const reductionFactor = Math.floor(logsToShow.length / desiredNumLogs);
-			logsToShow = logsToShow.filter((log, i) => i % reductionFactor == 0);
+		if (manaLogsToShow.length / desiredNumLogs >= 2) {
+			const reductionFactor = Math.floor(manaLogsToShow.length / desiredNumLogs);
+			manaLogsToShow = manaLogsToShow.filter((log, i) => i % reductionFactor == 0);
 		}
 
-		const data = logsToShow.map(log => log.manaAfter);
+		if (dpsLogsToShow.length / desiredNumLogs >= 2) {
+			const reductionFactor = Math.floor(dpsLogsToShow.length / desiredNumLogs);
+			dpsLogsToShow = dpsLogsToShow.filter((log, i) => i % reductionFactor == 0);
+		}
+
+		const maxDps = dpsLogsToShow[maxIndex(dpsLogsToShow.map(l => l.dps))!].dps;
+		const dpsAxisMax = (Math.floor(maxDps / 100) + 1) * 100;
 
 		this.plot.updateOptions({
+			colors: [
+				dpsColor,
+				manaColor,
+			],
 			series: [
 				{
+					name: 'DPS',
+					type: 'line',
+					data: dpsLogsToShow.map(log => {
+						return {
+							x: log.timestamp,
+							y: log.dps,
+						};
+					}),
+				},
+				{
 					name: 'Mana',
-					data: data,
+					type: 'line',
+					data: manaLogsToShow.map(log => {
+						return {
+							x: log.timestamp,
+							y: log.manaAfter,
+						};
+					}),
 				},
 			],
 			xaxis: {
 				min: 0,
 				max: duration,
 				tickAmount: 10,
-				categories: logsToShow.map(log => log.timestamp),
+				categories: manaLogsToShow.map(log => log.timestamp),
 				labels: {
 					show: true,
 					formatter: (val: string) => val,
 				},
 			},
-			yaxis: {
-				min: 0,
-				max: maxMana,
-				tickAmount: 10,
-				title: {
-					text: 'Mana',
-				},
-				labels: {
-					formatter: (val: string) => {
-						const v = parseFloat(val);
-						return `${v.toFixed(0)} (${(v/maxMana*100).toFixed(0)}%)`;
+			yaxis: [
+				{
+					color: dpsColor,
+					seriesName: 'DPS',
+					min: 0,
+					max: dpsAxisMax,
+					tickAmount: 10,
+					decimalsInFloat: 0,
+					title: {
+						text: 'DPS',
+						style: {
+							color: dpsColor,
+						},
+					},
+					axisBorder: {
+						show: true,
+						color: dpsColor,
+					},
+					axisTicks: {
+						color: dpsColor,
+					},
+					labels: {
+						style: {
+							colors: [dpsColor],
+						},
 					},
 				},
-			},
-			dataLabels: {
-				formatter: (val: string) => {
-					const v = parseFloat(val);
-					return `${v.toFixed(0)} (${(v/maxMana*100).toFixed(0)}%)`;
+				{
+					seriesName: 'Mana',
+					opposite: true, // Appear on right side
+					min: 0,
+					max: maxMana,
+					tickAmount: 10,
+					title: {
+						text: 'Mana',
+						style: {
+							color: manaColor,
+						},
+					},
+					axisBorder: {
+						show: true,
+						color: manaColor,
+					},
+					axisTicks: {
+						color: manaColor,
+					},
+					labels: {
+						style: {
+							colors: [manaColor],
+						},
+						formatter: (val: string) => {
+							const v = parseFloat(val);
+							return `${v.toFixed(0)} (${(v/maxMana*100).toFixed(0)}%)`;
+						},
+					},
 				},
+			],
+			dataLabels: {
 			},
 		});
-		this.plot.zoomX(0, duration);
-	}
-
-	// Returns the time intervals to use for the chart.
-	private getTimeIntervals(duration: number): Array<number> {
-		const candidateWindows = [1, 5, 10, 30, 60];
-		const candidateWindow = 30;
-
-		const intervals = [];
-		let cur = 0;
-		while (cur < duration) {
-			intervals.push(cur);
-			cur += candidateWindow;
-		}
-		intervals.push(duration);
-		return intervals;
 	}
 
 	render() {
