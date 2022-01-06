@@ -64,6 +64,7 @@ message SimOptions {
     bool debug = 3; // Enables debug logging.
     bool debug_first_iteration = 6;
 		bool is_test = 5; // Only used internally.
+    bool live_update = 7; // report back live updates
 }
 
 // The aggregated results from all uses of a particular action.
@@ -217,8 +218,13 @@ message StatWeightsResult {
     repeated double ep_values_stdev = 4;
 }
 
+message RaidSimAsyncResult {
+  string progress_id = 1;
+} 
+
 message ProgressMetrics {
     int32 completed_iterations = 1;
     int32 total_iterations = 2;
     double dps = 3;
+    RaidSimResult final_result = 4; // only set when completed
 }

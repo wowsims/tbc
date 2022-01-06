@@ -34,9 +34,14 @@ type Simulation struct {
 	logs []string
 }
 
-func RunSim(rsr proto.RaidSimRequest) *proto.RaidSimResult {
+func RunSim(rsr proto.RaidSimRequest, progress chan *proto.ProgressMetrics) *proto.RaidSimResult {
 	sim := newSim(rsr)
 	sim.runPresims(rsr)
+	if progress != nil {
+		sim.ProgressReport = func(progMetric *proto.ProgressMetrics) {
+			progress <- progMetric
+		}
+	}
 	return sim.run()
 }
 
@@ -129,14 +134,14 @@ func (sim *Simulation) run() *proto.RaidSimResult {
 		for _, player := range party.Players {
 			character := player.GetCharacter()
 			character.auraTracker.logFn = func(message string, vals ...interface{}) {
-				character.Log(sim, message, vals)
+				character.Log(sim, message, vals...)
 			}
 			player.Init(sim)
 
 			for _, petAgent := range character.Pets {
 				petCharacter := petAgent.GetCharacter()
 				petCharacter.auraTracker.logFn = func(message string, vals ...interface{}) {
-					petCharacter.Log(sim, message, vals)
+					petCharacter.Log(sim, message, vals...)
 				}
 				petAgent.Init(sim)
 			}
@@ -145,7 +150,7 @@ func (sim *Simulation) run() *proto.RaidSimResult {
 
 	for _, target := range sim.encounter.Targets {
 		target.auraTracker.logFn = func(message string, vals ...interface{}) {
-			target.Log(sim, message, vals)
+			target.Log(sim, message, vals...)
 		}
 	}
 
@@ -155,20 +160,27 @@ func (sim *Simulation) run() *proto.RaidSimResult {
 		sim.Log = nil
 	}
 
+	st := time.Now()
 	for i := int32(1); i < sim.Options.Iterations; i++ {
 		if sim.ProgressReport != nil && time.Since(st) > time.Millisecond*250 {
-			sim.ProgressReport(&proto.ProgressMetrics{TotalIterations: sim.Options.Iterations, CompletedIterations: i, Dps: sim.Raid.Parties[0].Players[0].GetCharacter().Metrics.dpsSum / float64(i)})
+			metrics := sim.Raid.GetMetrics(i + 1)
+			sim.ProgressReport(&proto.ProgressMetrics{TotalIterations: sim.Options.Iterations, CompletedIterations: i + 1, Dps: metrics.Dps.Avg})
 			st = time.Now()
 		}
 		sim.runOnce()
 	}
-
 	result := &proto.RaidSimResult{
 		RaidMetrics:      sim.Raid.GetMetrics(sim.Options.Iterations),
 		EncounterMetrics: sim.encounter.GetMetricsProto(sim.Options.Iterations),
 
 		Logs: logsBuffer.String(),
 	}
+
+	// Final progress report
+	if sim.ProgressReport != nil {
+		sim.ProgressReport(&proto.ProgressMetrics{TotalIterations: sim.Options.Iterations, CompletedIterations: sim.Options.Iterations, Dps: result.RaidMetrics.Dps.Avg, FinalResult: result})
+	}
+
 	return result
 }
 

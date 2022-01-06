@@ -13,9 +13,13 @@ import (
 	"runtime"
 	"runtime/pprof"
 	"strings"
+	"sync"
+	"sync/atomic"
 	"syscall"
 	"time"
+	"unsafe"
 
+	uuid "github.com/satori/go.uuid"
 	dist "github.com/wowsims/tbc/binary_dist"
 	"github.com/wowsims/tbc/sim"
 	"github.com/wowsims/tbc/sim/core"
@@ -37,7 +41,103 @@ func main() {
 
 	flag.Parse()
 
+	setupAsyncServer()
 	runServer(*useFS, *host, *launch, *simName, *wasm, bufio.NewReader(os.Stdin))
+}
+
+type simProgReportCreator func() (string, progReport)
+type progReport func(progMetric *proto.ProgressMetrics)
+
+func handleAsyncAPI(w http.ResponseWriter, r *http.Request, addNewSim simProgReportCreator) {
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+
+		return
+	}
+	msg := &proto.RaidSimRequest{}
+	if err := googleProto.Unmarshal(body, msg); err != nil {
+		log.Printf("Failed to parse request: %s", err.Error())
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	reporter := make(chan *proto.ProgressMetrics, 100)
+	core.RunRaidSimAsync(msg, reporter)
+
+	id, report := addNewSim()
+	go func() {
+		for {
+			// TODO: cleanup so we dont collect these
+			select {
+			case progMetric, ok := <-reporter:
+				if !ok {
+					return
+				}
+				report(progMetric)
+				if progMetric.FinalResult != nil {
+					return
+				}
+				time.Sleep(time.Millisecond * 100)
+			}
+		}
+	}()
+
+	protoResult := &proto.RaidSimAsyncResult{
+		ProgressId: id,
+	}
+
+	outbytes, err := googleProto.Marshal(protoResult)
+	if err != nil {
+		log.Printf("[ERROR] Failed to marshal result: %s", err.Error())
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Add("Content-Type", "application/x-protobuf")
+	w.Write(outbytes)
+}
+
+func setupAsyncServer() {
+	type asyncProgress struct {
+		latestProgress *proto.ProgressMetrics
+	}
+	progresses := map[string]asyncProgress{}
+	progMut := &sync.RWMutex{}
+	addNewSim := func() (string, progReport) {
+		newID := uuid.NewV4().String()
+		latest := &proto.ProgressMetrics{}
+		prog := asyncProgress{latestProgress: latest}
+		progMut.Lock()
+		progresses[newID] = prog
+		progMut.Unlock()
+
+		unsafeProg := unsafe.Pointer(&latest)
+		return newID, func(newProg *proto.ProgressMetrics) {
+			atomic.SwapPointer((*unsafe.Pointer)(unsafe.Pointer(newProg)), unsafeProg)
+		}
+	}
+	type progReport func(progMetric *proto.ProgressMetrics)
+
+	http.HandleFunc("/raidSimAsync", func(w http.ResponseWriter, r *http.Request) {
+		handleAsyncAPI(w, r, addNewSim)
+	})
+	http.HandleFunc("/raidSimAsyncProgress", func(w http.ResponseWriter, r *http.Request) {
+		id := r.URL.Query().Get("id")
+		progMut.RLock()
+		progress := progresses[id].latestProgress
+		progMut.RUnlock()
+		if progress == nil {
+			progress = &proto.ProgressMetrics{}
+		}
+		outbytes, err := googleProto.Marshal(progress)
+		if err != nil {
+			log.Printf("[ERROR] Failed to marshal result: %s", err.Error())
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		w.Header().Add("Content-Type", "application/x-protobuf")
+		w.Write(outbytes)
+	})
 }
 
 func runServer(useFS bool, host string, launchBrowser bool, simName string, wasm bool, inputReader *bufio.Reader) {
@@ -55,7 +155,6 @@ func runServer(useFS bool, host string, launchBrowser bool, simName string, wasm
 	http.HandleFunc("/individualSim", handleAPI)
 	http.HandleFunc("/raidSim", handleAPI)
 	http.HandleFunc("/gearList", handleAPI)
-
 	http.HandleFunc("/", func(resp http.ResponseWriter, req *http.Request) {
 		resp.Header().Add("Cache-Control", "no-cache")
 		if strings.HasSuffix(req.URL.Path, "/tbc/") {
@@ -63,6 +162,7 @@ func runServer(useFS bool, host string, launchBrowser bool, simName string, wasm
 				<html><body><a href="/tbc/elemental_shaman">Elemental Shaman Sim</a"><br>
 				<html><body><a href="/tbc/enhancement_shaman">Enhancement Shaman Sim</a"><br>
 				<a href="/tbc/balance_druid">Balance Druid Sim</a"><br>
+				<a href="/tbc/mage">Mage Sim</a"><br>
 				<a href="/tbc/shadow_priest">Shadow Priest Sim</a"></body></html>
 		    `))
 			return
@@ -93,7 +193,8 @@ func runServer(useFS bool, host string, launchBrowser bool, simName string, wasm
 			}
 			err := cmd.Start()
 			if err != nil {
-				log.Printf("Error launching browser: %#v", err.Error())
+				fmt.Printf("Error launching browser: %#v\n", err.Error())
+				fmt.Printf("You will need to manually open your web browser to %s\n", url)
 			}
 		}()
 	}

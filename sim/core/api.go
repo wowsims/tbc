@@ -77,5 +77,9 @@ func RunIndividualSim(request *proto.IndividualSimRequest) *proto.IndividualSimR
  * Runs multiple iterations of the sim with a full raid.
  */
 func RunRaidSim(request *proto.RaidSimRequest) *proto.RaidSimResult {
-	return RunSim(*request)
+	return RunSim(*request, nil)
+}
+
+func RunRaidSimAsync(request *proto.RaidSimRequest, progress chan *proto.ProgressMetrics) {
+	go RunSim(*request, progress)
 }

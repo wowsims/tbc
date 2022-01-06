@@ -11,7 +11,7 @@ import { Stat } from './proto/common.js';
 
 import { ComputeStatsRequest, ComputeStatsResult } from './proto/api.js';
 import { GearListRequest, GearListResult } from './proto/api.js';
-import { RaidSimRequest, RaidSimResult } from './proto/api.js';
+import { RaidSimRequest, RaidSimResult, RaidSimAsyncResult} from './proto/api.js';
 import { StatWeightsRequest, StatWeightsResult } from './proto/api.js';
 
 import { wait } from './utils.js';
@@ -54,15 +54,22 @@ export class WorkerPool {
 
   async raidSim(request: RaidSimRequest): Promise<RaidSimResult> {
     console.log('Raid sim request: ' + RaidSimRequest.toJsonString(request));
-		const resultData = await this.makeApiCall('raidSim', RaidSimRequest.toBinary(request));
-		const result = RaidSimResult.fromBinary(resultData);
+		const resultData = await this.makeApiCall('raidSimAsync', RaidSimRequest.toBinary(request));
+		
+    const result = RaidSimAsyncResult.fromBinary(resultData);
 
+    var done = false;
+    while (!done) {
+      const progress = await this.makeApiCall('raidSimAsyncProgress', RaidSimRequest.toBinary(result));
+
+    }
+    
 		// Don't print the logs because it just clogs the console.
-		const resultJson = RaidSimResult.toJson(result) as any;
-		delete resultJson!['logs'];
-    console.log('Raid sim result: ' + JSON.stringify(resultJson));
+		// const resultJson = RaidSimResult.toJson(result) as any;
+		// delete resultJson!['logs'];
+    // console.log('Raid sim result: ' + JSON.stringify(resultJson));
 
-		return result;
+		// return result;
   }
 }
 
