@@ -112,7 +112,7 @@ func NewCharacter(party *Party, partyIndex int, player proto.Player) Character {
 		Metrics: NewCharacterMetrics(),
 	}
 
-	character.Label = fmt.Sprintf("%s (%d)", character.Name, character.RaidIndex+1)
+	character.Label = fmt.Sprintf("%s (#%d)", character.Name, character.RaidIndex+1)
 
 	if player.Consumes != nil {
 		character.consumes = *player.Consumes

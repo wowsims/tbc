@@ -6,10 +6,10 @@ export class Entity {
 
 	// Either target index, player index, or owner index depending on what kind
 	// of entity this is.
-	private readonly index: number;
+	readonly index: number;
 
-	private readonly isTarget: boolean;
-	private readonly isPet: boolean;
+	readonly isTarget: boolean;
+	readonly isPet: boolean;
 
 	constructor(name: string, ownerName: string, index: number, isTarget: boolean, isPet: boolean) {
 		this.name = name;
@@ -28,11 +28,11 @@ export class Entity {
 	static parseAll(str: string): Array<Entity> {
 		return Array.from(str.matchAll(Entity.parseRegex)).map(match => {
 			if (match[1]) {
-				return new Entity(match[1], '', parseInt(match[2]), true, false);
+				return new Entity(match[1], '', parseInt(match[2]) - 1, true, false);
 			} else if (match[3]) {
-				return new Entity(match[6], match[4], parseInt(match[5]), false, true);
+				return new Entity(match[6], match[4], parseInt(match[5]) - 1, false, true);
 			} else if (match[7]) {
-				return new Entity(match[8], '', parseInt(match[9]), false, false);
+				return new Entity(match[8], '', parseInt(match[9]) - 1, false, false);
 			} else {
 				throw new Error('Invalid Entity match');
 			}
@@ -88,6 +88,7 @@ export class SimLog {
 
 			return AuraGainedLog.parse(params)
 					|| AuraFadedLog.parse(params)
+					|| ManaChangedLog.parse(params)
 					|| new SimLog(params);
 		});
 	}
@@ -123,6 +124,32 @@ export class AuraFadedLog extends SimLog {
 		const match = params.raw.match(/Aura faded: \[(.*)\]/);
 		if (match && match[1]) {
 			return new AuraFadedLog(params, match[1]);
+		} else {
+			return null;
+		}
+	}
+}
+
+export class ManaChangedLog extends SimLog {
+	readonly manaBefore: number;
+	readonly manaAfter: number;
+	readonly cause: string;
+
+	constructor(params: SimLogParams, manaBefore: number, manaAfter: number, cause: string) {
+		super(params);
+		this.manaBefore = manaBefore;
+		this.manaAfter = manaAfter;
+		this.cause = cause;
+	}
+
+	static parse(params: SimLogParams): ManaChangedLog | null {
+		const match = params.raw.match(/[Gained|Spent] \d+\.\d+ mana from (.*) \((\d+\.\d+) --> (\d+\.\d+)\)/);
+		if (match && match[1]) {
+			let cause = match[1];
+			//if (cause.endsWith('s Regen')) {
+			//	cause = 'Regen';
+			//}
+			return new ManaChangedLog(params, parseFloat(match[2]), parseFloat(match[3]), cause);
 		} else {
 			return null;
 		}

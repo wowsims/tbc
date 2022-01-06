@@ -11,6 +11,7 @@ import { DpsHistogram } from './dps_histogram.js';
 import { DpsResult } from './dps_result.js';
 import { PercentOom } from './percent_oom.js';
 import { SourceChart } from './source_chart.js';
+import { Timeline } from './timeline.js';
 
 declare var Chart: any;
 
@@ -58,6 +59,7 @@ const layoutHTML = `
 		<li class="dr-tab-tab"><a data-toggle="tab" href="#buffsTab">BUFFS</a></li>
 		<li class="dr-tab-tab"><a data-toggle="tab" href="#debuffsTab">DEBUFFS</a></li>
 		<li class="dr-tab-tab"><a data-toggle="tab" href="#castsTab">CASTS</a></li>
+		<li class="dr-tab-tab"><a data-toggle="tab" href="#timelineTab" id="timelineTabTab">TIMELINE</a></li>
 	</ul>
 	<div class="tab-content">
 		<div id="damageTab" class="tab-pane dr-tab-content damage-content fade active in">
@@ -92,6 +94,12 @@ const layoutHTML = `
 				</div>
 			</div>
 		</div>
+		<div id="timelineTab" class="tab-pane dr-tab-content timeline-content fade">
+			<div class="dr-row">
+				<div class="timeline">
+				</div>
+			</div>
+		</div>
 	</div>
 </div>
 `;
@@ -123,6 +131,13 @@ const debuffAuraMetrics = new AuraMetrics({
 	colorSettings: colorSettings,
 }, true);
 const dpsHistogram = new DpsHistogram({ parent: document.body.getElementsByClassName('dps-histogram')[0] as HTMLElement, resultsEmitter: resultsEmitter, colorSettings: colorSettings });
+
+const timeline = new Timeline({
+	parent: document.body.getElementsByClassName('timeline')[0] as HTMLElement,
+	resultsEmitter: resultsEmitter,
+	colorSettings: colorSettings,
+});
+(document.getElementById('timelineTabTab') as HTMLElement).addEventListener('click', event => timeline.render());
 
 let currentSimResult: SimResult | null = null;
 function updateResults() {
