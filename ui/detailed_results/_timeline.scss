@@ -1,0 +1,31 @@
+@import "../core/shared";
+
+.timeline-root {
+}
+
+.timeline-warning {
+	color: yellow;
+	margin: 0 10px;
+	text-shadow:
+			0 0 10px red,
+			0 0 10px red;
+}
+
+.timeline-warning-description {
+	color: var(--main-text-color);
+}
+
+.timeline-run-again-button {
+	margin-left: 10px;
+	display: inline-block;
+	cursor: pointer;
+}
+
+.timeline-plot {
+	margin: 5px;
+	margin-top: 15px;
+}
+
+.timeline-plot > div {
+	margin: auto;
+}
