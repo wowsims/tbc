@@ -27,6 +27,8 @@ import { bucket } from '/tbc/core/utils.js';
 import { sum } from '/tbc/core/utils.js';
 
 import {
+	DamageDealtLog,
+	DpsLog,
 	ManaChangedLog,
 	SimLog,
 } from './logs_parser.js';
@@ -224,7 +226,9 @@ export class PlayerMetrics {
 	private readonly duration: number;
 
 	readonly logs: Array<SimLog>;
+	readonly damageDealtLogs: Array<DamageDealtLog>;
 	readonly manaChangedLogs: Array<ManaChangedLog>;
+	readonly dpsLogs: Array<DpsLog>;
 
 	private constructor(
 			player: PlayerProto,
@@ -254,7 +258,10 @@ export class PlayerMetrics {
 		this.iterations = iterations;
 		this.duration = duration;
 
+		this.damageDealtLogs = this.logs.filter((log): log is DamageDealtLog => log instanceof DamageDealtLog);
 		this.manaChangedLogs = this.logs.filter((log): log is ManaChangedLog => log instanceof ManaChangedLog);
+
+		this.dpsLogs = DpsLog.fromDamageDealt(this.damageDealtLogs);
 	}
 
 	get label() {
