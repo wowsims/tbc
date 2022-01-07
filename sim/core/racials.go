@@ -48,9 +48,10 @@ func applyRaceEffects(agent Agent) {
 		const cd = time.Minute * 2
 		const dur = time.Second * 15
 		const spBonus = 143
+		actionID := ActionID{SpellID: 33697}
 
 		character.AddMajorCooldown(MajorCooldown{
-			ActionID:   ActionID{SpellID: 33697},
+			ActionID:   actionID,
 			CooldownID: OrcBloodFuryCooldownID,
 			Cooldown:   cd,
 			CanActivate: func(sim *Simulation, character *Character) bool {
@@ -62,8 +63,8 @@ func applyRaceEffects(agent Agent) {
 			ActivationFactory: func(sim *Simulation) CooldownActivation {
 				return func(sim *Simulation, character *Character) {
 					character.SetCD(OrcBloodFuryCooldownID, cd+sim.CurrentTime)
-					character.AddAuraWithTemporaryStats(sim, OrcBloodFuryAuraID, 33697, "Orc Blood Fury", stats.SpellPower, spBonus, dur)
-					character.Metrics.AddInstantCast(ActionID{SpellID: 33697})
+					character.AddAuraWithTemporaryStats(sim, OrcBloodFuryAuraID, actionID, stats.SpellPower, spBonus, dur)
+					character.Metrics.AddInstantCast(actionID)
 				}
 			},
 		})
@@ -76,8 +77,7 @@ func applyRaceEffects(agent Agent) {
 		// Beast Slaying (+5% damage to beasts)
 		character.AddPermanentAura(func(sim *Simulation) Aura {
 			return Aura{
-				ID:   TrollBeastSlayingAuraID,
-				Name: "Beast Slaying (Troll Racial)",
+				ID: TrollBeastSlayingAuraID,
 				OnBeforeSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect) {
 					if spellEffect.Target.MobType == proto.MobType_MobTypeBeast {
 						spellEffect.DamageMultiplier *= 1.05
@@ -98,9 +98,10 @@ func applyRaceEffects(agent Agent) {
 		const dur = time.Second * 10
 		const cd = time.Minute * 3
 		manaCost := 0.0
+		actionID := ActionID{SpellID: 20554}
 
 		character.AddMajorCooldown(MajorCooldown{
-			ActionID:   ActionID{SpellID: 20554},
+			ActionID:   actionID,
 			CooldownID: TrollBerserkingCooldownID,
 			Cooldown:   cd,
 			CanActivate: func(sim *Simulation, character *Character) bool {
@@ -120,17 +121,17 @@ func applyRaceEffects(agent Agent) {
 					character.PseudoStats.CastSpeedMultiplier *= hasteBonus
 					character.MultiplyMeleeSpeed(sim, hasteBonus)
 					character.AddAura(sim, Aura{
-						ID:      TrollBerserkingAuraID,
-						Name:    "Troll Berserking",
-						Expires: sim.CurrentTime + dur,
+						ID:       TrollBerserkingAuraID,
+						ActionID: actionID,
+						Expires:  sim.CurrentTime + dur,
 						OnExpire: func(sim *Simulation) {
 							character.PseudoStats.CastSpeedMultiplier /= hasteBonus
 							character.MultiplyMeleeSpeed(sim, inverseBonus)
 						},
 					})
-					character.SpendMana(sim, manaCost, "Troll Berserking")
-					character.Metrics.AddInstantCast(ActionID{SpellID: 20554})
-					character.AddAuraUptime(TrollBerserkingAuraID, 20554, MinDuration(dur, sim.Duration-sim.CurrentTime))
+					character.SpendMana(sim, manaCost, actionID)
+					character.Metrics.AddInstantCast(actionID)
+					character.AddAuraUptime(TrollBerserkingAuraID, actionID, MinDuration(dur, sim.Duration-sim.CurrentTime))
 				}
 			},
 		})

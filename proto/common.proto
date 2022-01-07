@@ -434,6 +434,7 @@ message RaidTarget {
 enum OtherAction {
 	OtherActionNone = 0;
 	OtherActionWait = 1;
+	OtherActionManaRegen = 2;
 }
 
 message ActionID {

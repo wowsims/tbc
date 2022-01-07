@@ -20,6 +20,10 @@ export class Entity {
 		this.isPet = isPet;
 	}
 
+	equals(other: Entity) {
+		return this.isTarget == other.isTarget && this.isPet == other.isPet && this.index == other.index && this.name == other.name;
+	}
+
 	// Parses one or more Entities from a string.
 	// Each entity label should be one of:
 	//   'Target 1' if a target,
@@ -94,6 +98,22 @@ export class SimLog {
 					|| AuraFadedLog.parse(params)
 					|| new SimLog(params);
 		});
+	}
+
+	isDamageDealt(): this is DamageDealtLog {
+		return this instanceof DamageDealtLog;
+	}
+
+	isManaChanged(): this is ManaChangedLog {
+		return this instanceof ManaChangedLog;
+	}
+
+	isAuraGained(): this is AuraGainedLog {
+		return this instanceof AuraGainedLog;
+	}
+
+	isAuraFaded(): this is AuraFadedLog {
+		return this instanceof AuraFadedLog;
 	}
 
 	// Remove events that happen at the same time.
@@ -199,7 +219,7 @@ export class AuraGainedLog extends SimLog {
 	}
 
 	static parse(params: SimLogParams): AuraGainedLog | null {
-		const match = params.raw.match(/Aura gained: \[(.*)\]/);
+		const match = params.raw.match(/Aura gained: (.*)/);
 		if (match && match[1]) {
 			return new AuraGainedLog(params, match[1]);
 		} else {
@@ -217,12 +237,56 @@ export class AuraFadedLog extends SimLog {
 	}
 
 	static parse(params: SimLogParams): AuraFadedLog | null {
-		const match = params.raw.match(/Aura faded: \[(.*)\]/);
+		const match = params.raw.match(/Aura faded: (.*)/);
 		if (match && match[1]) {
 			return new AuraFadedLog(params, match[1]);
 		} else {
 			return null;
 		}
+	}
+}
+
+export class AuraUptimeLog extends SimLog {
+	readonly gainedAt: number;
+	readonly fadedAt: number;
+
+	constructor(params: SimLogParams, fadedAt: number) {
+		super(params);
+		this.gainedAt = params.timestamp;
+		this.fadedAt = fadedAt;
+	}
+
+	static fromLogs(logs: Array<SimLog>, entity: Entity): Array<AuraUptimeLog> {
+		let unmatchedGainedLogs: Array<AuraGainedLog> = [];
+		const uptimeLogs: Array<AuraUptimeLog> = [];
+
+		logs.forEach(log => {
+			if (!log.source || !log.source.equals(entity)) {
+				return;
+			}
+			if (log.isAuraGained()) {
+				unmatchedGainedLogs.push(log);
+				return;
+			}
+			if (!log.isAuraFaded()) {
+				return;
+			}
+
+			const matchingGainedIdx = unmatchedGainedLogs.findIndex(gainedLog => gainedLog.auraName == log.auraName);
+			if (matchingGainedIdx == -1) {
+				console.warn('Unmatched aura faded log: ' + log.auraName);
+				return;
+			}
+			const gainedLog = unmatchedGainedLogs.splice(matchingGainedIdx, 1)[0];
+
+			uptimeLogs.push(new AuraUptimeLog({
+				raw: log.raw,
+				timestamp: gainedLog.timestamp,
+				source: log.source,
+				target: log.target,
+			}, log.timestamp));
+		});
+		return uptimeLogs;
 	}
 }
 

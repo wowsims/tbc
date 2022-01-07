@@ -1,7 +1,9 @@
 package core
 
 import (
+	"fmt"
 	"reflect"
+	"strings"
 	"time"
 
 	"github.com/wowsims/tbc/sim/core/proto"
@@ -70,6 +72,26 @@ func (actionID ActionID) SameActionIgnoreTag(other ActionID) bool {
 
 func (actionID ActionID) SameAction(other ActionID) bool {
 	return actionID.SameActionIgnoreTag(other) && actionID.Tag == other.Tag
+}
+
+func (actionID ActionID) String() string {
+	var sb strings.Builder
+	sb.WriteString("{")
+
+	if actionID.SpellID != 0 {
+		fmt.Fprintf(&sb, "SpellID: ", actionID.SpellID)
+	} else if actionID.ItemID != 0 {
+		fmt.Fprintf(&sb, "ItemID: ", actionID.ItemID)
+	} else if actionID.OtherID != 0 {
+		fmt.Fprintf(&sb, "OtherID: ", actionID.OtherID)
+	}
+
+	if actionID.Tag != 0 {
+		fmt.Fprintf(&sb, ", Tag: %d", actionID.Tag)
+	}
+	sb.WriteString("}")
+
+	return sb.String()
 }
 
 func (actionID ActionID) ToProto() *proto.ActionID {

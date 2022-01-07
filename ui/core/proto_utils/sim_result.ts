@@ -27,8 +27,10 @@ import { bucket } from '/tbc/core/utils.js';
 import { sum } from '/tbc/core/utils.js';
 
 import {
+	AuraUptimeLog,
 	DamageDealtLog,
 	DpsLog,
+	Entity,
 	ManaChangedLog,
 	SimLog,
 } from './logs_parser.js';
@@ -229,6 +231,7 @@ export class PlayerMetrics {
 	readonly damageDealtLogs: Array<DamageDealtLog>;
 	readonly manaChangedLogs: Array<ManaChangedLog>;
 	readonly dpsLogs: Array<DpsLog>;
+	readonly auraUptimeLogs: Array<AuraUptimeLog>;
 
 	private constructor(
 			player: PlayerProto,
@@ -258,10 +261,11 @@ export class PlayerMetrics {
 		this.iterations = iterations;
 		this.duration = duration;
 
-		this.damageDealtLogs = this.logs.filter((log): log is DamageDealtLog => log instanceof DamageDealtLog);
-		this.manaChangedLogs = this.logs.filter((log): log is ManaChangedLog => log instanceof ManaChangedLog);
+		this.damageDealtLogs = this.logs.filter((log): log is DamageDealtLog => log.isDamageDealt());
+		this.manaChangedLogs = this.logs.filter((log): log is ManaChangedLog => log.isManaChanged());
 
 		this.dpsLogs = DpsLog.fromDamageDealt(this.damageDealtLogs);
+		this.auraUptimeLogs = AuraUptimeLog.fromLogs(this.logs, new Entity(this.name, '', this.raidIndex, false, this.isPet));
 	}
 
 	get label() {
