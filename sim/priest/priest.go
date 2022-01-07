@@ -122,11 +122,12 @@ var InnerFocusAuraID = core.NewAuraID()
 var InnerFocusCooldownID = core.NewCooldownID()
 
 func ApplyInnerFocus(sim *core.Simulation, priest *Priest) bool {
-	priest.Metrics.AddInstantCast(core.ActionID{SpellID: 14751})
+	actionID := core.ActionID{SpellID: 14751}
+	priest.Metrics.AddInstantCast(actionID)
 	priest.Character.AddAura(sim, core.Aura{
-		ID:      InnerFocusAuraID,
-		Name:    "Inner Focus",
-		Expires: core.NeverExpires,
+		ID:       InnerFocusAuraID,
+		ActionID: actionID,
+		Expires:  core.NeverExpires,
 		OnCast: func(sim *core.Simulation, cast *core.Cast) {
 			cast.ManaCost = 0
 		},

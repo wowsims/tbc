@@ -14,7 +14,6 @@ func (druid *Druid) NewRebirth(sim *core.Simulation) *core.SimpleCast {
 
 	rb := &core.SimpleCast{
 		Cast: core.Cast{
-			Name:         "Rebirth",
 			ActionID:     core.ActionID{SpellID: 26994},
 			Character:    druid.GetCharacter(),
 			BaseManaCost: manaCost,

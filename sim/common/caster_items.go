@@ -29,14 +29,13 @@ func ApplyRobeOfTheElderScribes(agent core.Agent) {
 		const proc = 0.2
 
 		return core.Aura{
-			ID:   RobeOfTheElderScribeAuraID,
-			Name: "Robes of the Elder Scibe",
+			ID: RobeOfTheElderScribeAuraID,
 			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 				if icd.IsOnCD(sim) || sim.RandomFloat("Robe of the Elder Scribe") > proc { // can't activate if on CD or didn't proc
 					return
 				}
 				icd = core.InternalCD(sim.CurrentTime + icdDur)
-				character.AddAuraWithTemporaryStats(sim, PowerOfArcanagosAuraID, 34357, "Power of Arcanagos", stats.SpellPower, spellBonus, dur)
+				character.AddAuraWithTemporaryStats(sim, PowerOfArcanagosAuraID, core.ActionID{ItemID: 28602}, stats.SpellPower, spellBonus, dur)
 			},
 		}
 	})
@@ -56,14 +55,13 @@ func ApplyEternalSage(agent core.Agent) {
 		const proc = 0.1
 
 		return core.Aura{
-			ID:   EternalSageItemAuraID,
-			Name: "Band of the Enternal Sage Passive",
+			ID: EternalSageItemAuraID,
 			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 				if icd.IsOnCD(sim) || sim.RandomFloat("Band of the Eternal Sage") > proc { // can't activate if on CD or didn't proc
 					return
 				}
 				icd = core.InternalCD(sim.CurrentTime + icdDur)
-				character.AddAuraWithTemporaryStats(sim, BandoftheEternalSageAuraID, 35084, "Band of the Eternal Sage", stats.SpellPower, spellBonus, dur)
+				character.AddAuraWithTemporaryStats(sim, BandoftheEternalSageAuraID, core.ActionID{ItemID: 29305}, stats.SpellPower, spellBonus, dur)
 			},
 		}
 	})
@@ -75,7 +73,6 @@ func ApplyTimbals(agent core.Agent) {
 	timbalsTemplate := core.NewSimpleSpellTemplate(core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				Name:            "Timbal's Shadow Bolt",
 				CritMultiplier:  1.5,
 				SpellSchool:     stats.ShadowSpellPower,
 				IgnoreCooldowns: true,
@@ -106,8 +103,7 @@ func ApplyTimbals(agent core.Agent) {
 		const proc = 0.1
 
 		return core.Aura{
-			ID:   AugmentPainAuraID,
-			Name: "Timbal's - Augment Pain", // added Timbals to the front
+			ID: AugmentPainAuraID,
 			OnPeriodicDamage: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect, tickDamage float64) {
 				if icd.IsOnCD(sim) || sim.RandomFloat("timbals") > proc { // can't activate if on CD or didn't proc
 					return

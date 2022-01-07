@@ -9,20 +9,19 @@ import (
 
 const SpellIDShadowWordPain int32 = 25368
 
+var ShadowWordPainActionID = core.ActionID{SpellID: SpellIDShadowWordPain}
+
 var ShadowWordPainDebuffID = core.NewDebuffID()
 
 func (priest *Priest) newShadowWordPainTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
 	baseCast := core.Cast{
-		Name:           "Shadow Word: Pain",
 		CritMultiplier: 1.5,
 		SpellSchool:    stats.ShadowSpellPower,
 		Character:      &priest.Character,
 		BaseManaCost:   575,
 		ManaCost:       575,
 		CastTime:       0,
-		ActionID: core.ActionID{
-			SpellID: SpellIDShadowWordPain,
-		},
+		ActionID:       ShadowWordPainActionID,
 	}
 
 	effect := core.SpellHitEffect{
@@ -36,7 +35,6 @@ func (priest *Priest) newShadowWordPainTemplate(sim *core.Simulation) core.Simpl
 			TickBaseDamage:       1236 / 6,
 			TickSpellCoefficient: 0.183,
 			DebuffID:             ShadowWordPainDebuffID,
-			SpellID:              SpellIDShadowWordPain,
 		},
 	}
 

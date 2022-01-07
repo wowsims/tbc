@@ -15,9 +15,10 @@ func (mage *Mage) registerSummonWaterElementalCD() {
 	}
 
 	manaCost := 0.0
+	actionID := core.ActionID{SpellID: 31687}
 
 	mage.AddMajorCooldown(core.MajorCooldown{
-		ActionID:   core.ActionID{SpellID: 31687},
+		ActionID:   actionID,
 		CooldownID: SummonWaterElementalCooldownID,
 		Cooldown:   time.Minute * 3,
 		CanActivate: func(sim *core.Simulation, character *core.Character) bool {
@@ -39,8 +40,8 @@ func (mage *Mage) registerSummonWaterElementalCD() {
 
 				mage.waterElemental.EnableWithTimeout(sim, mage.waterElemental, time.Second*45)
 
-				character.SpendMana(sim, manaCost, "Summon Water Elemental")
-				character.Metrics.AddInstantCast(core.ActionID{SpellID: 31687})
+				character.SpendMana(sim, manaCost, actionID)
+				character.Metrics.AddInstantCast(actionID)
 				character.SetCD(SummonWaterElementalCooldownID, sim.CurrentTime+time.Minute*3)
 			}
 		},
@@ -139,7 +140,6 @@ func (we *WaterElemental) newWaterboltTemplate(sim *core.Simulation) core.Simple
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				Name:           "Waterbolt",
 				CritMultiplier: 1.5,
 				SpellSchool:    stats.FrostSpellPower,
 				Character:      &we.Character,

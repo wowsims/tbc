@@ -299,9 +299,6 @@ func NewAdaptiveRotation() *AdaptiveRotation {
 type AgentAction interface {
 	GetActionID() core.ActionID
 
-	// For logging / debugging.
-	GetName() string
-
 	// The Character performing this action.
 	GetCharacter() *core.Character
 

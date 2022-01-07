@@ -26,6 +26,9 @@ func ApplyMongooseEffect(agent core.Agent) {
 	procChance, ohProcChance := core.PPMToChance(character, 1.0)
 	mh := character.Equip[proto.ItemSlot_ItemSlotMainHand].Enchant.ID == 22559
 	oh := character.Equip[proto.ItemSlot_ItemSlotOffHand].Enchant.ID == 22559
+	if !mh && !oh {
+		return
+	}
 
 	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		buffs := character.ApplyStatDependencies(stats.Stats{stats.Agility: 120})
@@ -36,17 +39,16 @@ func ApplyMongooseEffect(agent core.Agent) {
 			// https://tbc.wowhead.com/spell=28093/lightning-speed
 			character.AddStats(buffs)
 			character.AddMeleeHaste(sim, haste)
-			var nameStr string
+			var tag int32
 			if id == LightningSpeedMHAuraID {
-				nameStr = "Lightning Speed MH"
+				tag = 0
 			} else {
-				nameStr = "Lightning Speed OH"
+				tag = 1
 			}
 			character.AddAura(sim, core.Aura{
-				ID:      id,
-				SpellID: 28093,
-				Name:    nameStr,
-				Expires: sim.CurrentTime + (time.Second * 15),
+				ID:       id,
+				ActionID: core.ActionID{SpellID: 28093, Tag: tag},
+				Expires:  sim.CurrentTime + (time.Second * 15),
 				OnExpire: func(sim *core.Simulation) {
 					character.AddStats(unbuffs)
 					character.AddMeleeHaste(sim, -haste)
@@ -54,8 +56,7 @@ func ApplyMongooseEffect(agent core.Agent) {
 			})
 		}
 		return core.Aura{
-			ID:   MongooseAuraID,
-			Name: "Mongoose Enchant",
+			ID: MongooseAuraID,
 			OnBeforeMelee: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, isOH bool) {
 				if mh && !isOH && sim.RandomFloat("mongoose") < procChance {
 					applyLightningSpeed(sim, character, LightningSpeedMHAuraID)

@@ -30,10 +30,9 @@ const (
 // Normal: 246, w/ EF: 136
 
 // Shared precomputation logic for LB and CL.
-func (shaman *Shaman) newElectricSpellCast(name string, actionID core.ActionID, baseManaCost float64, baseCastTime time.Duration, isLightningOverload bool) core.SpellCast {
+func (shaman *Shaman) newElectricSpellCast(actionID core.ActionID, baseManaCost float64, baseCastTime time.Duration, isLightningOverload bool) core.SpellCast {
 	spellCast := core.SpellCast{
 		Cast: core.Cast{
-			Name:           name,
 			ActionID:       actionID,
 			Character:      shaman.GetCharacter(),
 			BaseManaCost:   baseManaCost,
@@ -49,7 +48,6 @@ func (shaman *Shaman) newElectricSpellCast(name string, actionID core.ActionID, 
 	}
 
 	if isLightningOverload {
-		spellCast.Name += " (LO)"
 		spellCast.ActionID.Tag = CastTagLightningOverload
 		spellCast.CastTime = 0
 		spellCast.ManaCost = 0

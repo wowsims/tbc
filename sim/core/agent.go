@@ -79,11 +79,11 @@ func (actionID ActionID) String() string {
 	sb.WriteString("{")
 
 	if actionID.SpellID != 0 {
-		fmt.Fprintf(&sb, "SpellID: ", actionID.SpellID)
+		fmt.Fprintf(&sb, "SpellID: %d", actionID.SpellID)
 	} else if actionID.ItemID != 0 {
-		fmt.Fprintf(&sb, "ItemID: ", actionID.ItemID)
+		fmt.Fprintf(&sb, "ItemID: %d", actionID.ItemID)
 	} else if actionID.OtherID != 0 {
-		fmt.Fprintf(&sb, "OtherID: ", actionID.OtherID)
+		fmt.Fprintf(&sb, "OtherID: %d", actionID.OtherID)
 	}
 
 	if actionID.Tag != 0 {
