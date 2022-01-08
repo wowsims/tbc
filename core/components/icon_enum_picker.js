@@ -1,5 +1,3 @@
-import { getIconUrl } from '/tbc/core/resources.js';
-import { setWowheadHref } from '/tbc/core/resources.js';
 import { TypedEvent } from '/tbc/core/typed_event.js';
 import { Input } from './input.js';
 // Icon-based UI for picking enum values.
@@ -51,10 +49,7 @@ export class IconEnumPicker extends Input {
         this.init();
     }
     setActionImage(elem, actionId) {
-        setWowheadHref(elem, actionId.id);
-        getIconUrl(actionId.id).then(url => {
-            elem.style.backgroundImage = `url('${url}')`;
-        });
+        actionId.fillAndSet(elem, true, true);
     }
     setImage(elem, valueConfig) {
         if (valueConfig.actionId) {

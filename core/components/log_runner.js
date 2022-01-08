@@ -18,7 +18,7 @@ export class LogRunner extends Component {
             logsDiv.textContent = '';
             logs.forEach(log => {
                 const lineElem = document.createElement('span');
-                lineElem.textContent = log.raw;
+                lineElem.textContent = log.toString();
                 logsDiv.appendChild(lineElem);
             });
         });

@@ -806,6 +806,10 @@ export var OtherAction;
      * @generated from protobuf enum value: OtherActionWait = 1;
      */
     OtherAction[OtherAction["OtherActionWait"] = 1] = "OtherActionWait";
+    /**
+     * @generated from protobuf enum value: OtherActionManaRegen = 2;
+     */
+    OtherAction[OtherAction["OtherActionManaRegen"] = 2] = "OtherActionManaRegen";
 })(OtherAction || (OtherAction = {}));
 // @generated message type with reflection information, may provide speed optimized methods
 class RaidBuffs$Type extends MessageType {

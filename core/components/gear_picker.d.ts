@@ -19,4 +19,5 @@ declare class ItemPicker extends Component {
     constructor(parent: HTMLElement, player: Player<any>, slot: ItemSlot);
     set item(newItem: EquippedItem | null);
 }
+export declare function getEmptySlotIconUrl(slot: ItemSlot): string;
 export {};

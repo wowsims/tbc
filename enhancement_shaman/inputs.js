@@ -1,13 +1,14 @@
 import { BooleanPicker } from '/tbc/core/components/boolean_picker.js';
 import { IconEnumPicker } from '/tbc/core/components/icon_enum_picker.js';
 import { AirTotem, EarthTotem, FireTotem, WaterTotem, EnhancementShaman_Rotation_RotationType as RotationType, ShamanTotems } from '/tbc/core/proto/shaman.js';
+import { ActionId } from '/tbc/core/proto_utils/action_id.js';
 // Configuration for spec-specific UI elements on the settings tab.
 // These don't need to be in a separate file but it keeps things cleaner.
-export const IconBloodlust = makeBooleanShamanBuffInput({ spellId: 2825 }, 'bloodlust');
-// export const IconManaSpringTotem = makeBoolShamanTotem({ spellId: 25570 }, 'manaSpringTotem');
-// export const IconTotemOfWrath = makeBoolShamanTotem({ spellId: 30706 }, 'totemOfWrath');
-export const IconWaterShield = makeBooleanShamanBuffInput({ spellId: 33736 }, 'waterShield');
-// export const IconWrathOfAirTotem = makeBoolShamanTotem({ spellId: 3738 }, 'wrathOfAirTotem');
+export const IconBloodlust = makeBooleanShamanBuffInput(ActionId.fromSpellId(2825), 'bloodlust');
+// export const IconManaSpringTotem = makeBoolShamanTotem(ActionId.fromSpellId(25570), 'manaSpringTotem');
+// export const IconTotemOfWrath = makeBoolShamanTotem(ActionId.fromSpellId(30706), 'totemOfWrath');
+export const IconWaterShield = makeBooleanShamanBuffInput(ActionId.fromSpellId(33736), 'waterShield');
+// export const IconWrathOfAirTotem = makeBoolShamanTotem(ActionId.fromSpellId(3738), 'wrathOfAirTotem');
 export const EnhancementShamanRotationConfig = {
     inputs: [
         {
@@ -61,8 +62,8 @@ export function TotemsSection(simUI, parentElem) {
         numColumns: 1,
         values: [
             { color: '#ffdfba', value: EarthTotem.NoEarthTotem },
-            { actionId: { id: { spellId: 25528 } }, value: EarthTotem.StrengthOfEarthTotem },
-            { actionId: { id: { spellId: 8143 } }, value: EarthTotem.TremorTotem },
+            { actionId: ActionId.fromSpellId(25528), value: EarthTotem.StrengthOfEarthTotem },
+            { actionId: ActionId.fromSpellId(8143), value: EarthTotem.TremorTotem },
         ],
         equals: (a, b) => a == b,
         zeroValue: EarthTotem.NoEarthTotem,
@@ -83,10 +84,10 @@ export function TotemsSection(simUI, parentElem) {
         numColumns: 1,
         values: [
             { color: '#baffc9', value: AirTotem.NoAirTotem },
-            { actionId: { id: { spellId: 25359 } }, value: AirTotem.GraceOfAirTotem },
-            { actionId: { id: { spellId: 25908 } }, value: AirTotem.TranquilAirTotem },
-            { actionId: { id: { spellId: 25587 } }, value: AirTotem.WindfuryTotem },
-            { actionId: { id: { spellId: 3738 } }, value: AirTotem.WrathOfAirTotem },
+            { actionId: ActionId.fromSpellId(25359), value: AirTotem.GraceOfAirTotem },
+            { actionId: ActionId.fromSpellId(25908), value: AirTotem.TranquilAirTotem },
+            { actionId: ActionId.fromSpellId(25587), value: AirTotem.WindfuryTotem },
+            { actionId: ActionId.fromSpellId(3738), value: AirTotem.WrathOfAirTotem },
         ],
         equals: (a, b) => a == b,
         zeroValue: AirTotem.NoAirTotem,
@@ -107,9 +108,9 @@ export function TotemsSection(simUI, parentElem) {
         numColumns: 1,
         values: [
             { color: '#ffb3ba', value: FireTotem.NoFireTotem },
-            { actionId: { id: { spellId: 25552 } }, value: FireTotem.MagmaTotem },
-            { actionId: { id: { spellId: 25533 } }, value: FireTotem.SearingTotem },
-            { actionId: { id: { spellId: 30706 } }, value: FireTotem.TotemOfWrath },
+            { actionId: ActionId.fromSpellId(25552), value: FireTotem.MagmaTotem },
+            { actionId: ActionId.fromSpellId(25533), value: FireTotem.SearingTotem },
+            { actionId: ActionId.fromSpellId(30706), value: FireTotem.TotemOfWrath },
         ],
         equals: (a, b) => a == b,
         zeroValue: FireTotem.NoFireTotem,
@@ -130,7 +131,7 @@ export function TotemsSection(simUI, parentElem) {
         numColumns: 1,
         values: [
             { color: '#bae1ff', value: WaterTotem.NoWaterTotem },
-            { actionId: { id: { spellId: 25570 } }, value: WaterTotem.ManaSpringTotem },
+            { actionId: ActionId.fromSpellId(25570), value: WaterTotem.ManaSpringTotem },
         ],
         equals: (a, b) => a == b,
         zeroValue: WaterTotem.NoWaterTotem,
@@ -178,7 +179,7 @@ export function TotemsSection(simUI, parentElem) {
     });
     return 'Totems';
 }
-// function makeBoolShamanTotem(id: ItemOrSpellId, optionsFieldName: keyof totems?): IconPickerConfig<Player<any>, boolean> {
+// function makeBoolShamanTotem(id: ActionId, optionsFieldName: keyof totems?): IconPickerConfig<Player<any>, boolean> {
 //   return {
 //     id: id,
 //     states: 2,

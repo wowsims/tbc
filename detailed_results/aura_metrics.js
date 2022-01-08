@@ -1,4 +1,3 @@
-import { setWowheadHref } from '/tbc/core/resources.js';
 import { ResultComponent } from './result_component.js';
 export class AuraMetrics extends ResultComponent {
     constructor(config, useDebuffs) {
@@ -47,10 +46,7 @@ export class AuraMetrics extends ResultComponent {
 			<span class="metrics-action-name">${auraMetric.name}</span>
 			`;
             const iconElem = nameCellElem.getElementsByClassName('metrics-action-icon')[0];
-            iconElem.style.backgroundImage = `url('${auraMetric.iconUrl}')`;
-            if (!('otherId' in auraMetric.actionId.id)) {
-                setWowheadHref(iconElem, auraMetric.actionId.id);
-            }
+            auraMetric.actionId.setBackgroundAndHref(iconElem);
             const addCell = (value) => {
                 const cellElem = document.createElement('td');
                 cellElem.textContent = String(value);

@@ -1,18 +1,6 @@
 import { Component } from '/tbc/core/components/component.js';
 import { sum } from '/tbc/core/utils.js';
-const sliceColors = [
-    '#dd9933',
-    '#67074e',
-    '#5a175d',
-    '#074e67',
-    '#05878a',
-    '#c9c1e7',
-    '#bdd5ef',
-    '#c7e3d0',
-    '#e7e6ce',
-    '#f2d8cc',
-    '#e9ccce',
-];
+import { actionColors } from './color_settings.js';
 export class SourceChart extends Component {
     constructor(parentElem, allActionMetrics) {
         const chartCanvas = document.createElement("canvas");
@@ -27,7 +15,7 @@ export class SourceChart extends Component {
         const names = actionMetrics.map(am => am.name);
         const totalDmg = sum(actionMetrics.map(actionMetric => actionMetric.damage));
         const vals = actionMetrics.map(actionMetric => actionMetric.damage / totalDmg);
-        const bgColors = sliceColors.slice(0, actionMetrics.length);
+        const bgColors = actionColors.slice(0, actionMetrics.length);
         const ctx = chartCanvas.getContext('2d');
         const chart = new Chart(ctx, {
             type: 'pie',

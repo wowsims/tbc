@@ -1,9 +1,9 @@
-import { ItemOrSpellId } from '/tbc/core/proto_utils/action_id.js';
+import { ActionId } from '/tbc/core/proto_utils/action_id.js';
 import { Input, InputConfig } from './input.js';
 export interface IconPickerConfig<ModObject, ValueType> extends InputConfig<ModObject, ValueType> {
-    id: ItemOrSpellId;
+    id: ActionId;
     states: number;
-    improvedId?: ItemOrSpellId;
+    improvedId?: ActionId;
 }
 export declare class IconPicker<ModObject, ValueType> extends Input<ModObject, ValueType> {
     private readonly config;

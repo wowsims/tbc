@@ -387,6 +387,10 @@
   color: red !important;
 }
 
+.bold {
+  font-weight: bold;
+}
+
 .sim-button {
   color: var(--main-text-color);
   background-color: var(--theme-color-primary);
@@ -740,6 +744,10 @@
   color: red !important;
 }
 
+.bold {
+  font-weight: bold;
+}
+
 .sim-button {
   color: var(--main-text-color);
   background-color: var(--theme-color-primary);
@@ -1003,6 +1011,10 @@
 
 .negative {
   color: red !important;
+}
+
+.bold {
+  font-weight: bold;
 }
 
 .sim-button {
@@ -1276,6 +1288,10 @@
 
 .negative {
   color: red !important;
+}
+
+.bold {
+  font-weight: bold;
 }
 
 .sim-button {
@@ -1576,6 +1592,10 @@
 
 .negative {
   color: red !important;
+}
+
+.bold {
+  font-weight: bold;
 }
 
 .sim-button {
@@ -1916,6 +1936,10 @@ input, select {
 
 .negative {
   color: red !important;
+}
+
+.bold {
+  font-weight: bold;
 }
 
 .sim-button {

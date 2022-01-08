@@ -1388,7 +1388,11 @@ export declare enum OtherAction {
     /**
      * @generated from protobuf enum value: OtherActionWait = 1;
      */
-    OtherActionWait = 1
+    OtherActionWait = 1,
+    /**
+     * @generated from protobuf enum value: OtherActionManaRegen = 2;
+     */
+    OtherActionManaRegen = 2
 }
 declare class RaidBuffs$Type extends MessageType<RaidBuffs> {
     constructor();

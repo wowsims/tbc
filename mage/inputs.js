@@ -1,3 +1,4 @@
+import { ActionId } from '/tbc/core/proto_utils/action_id.js';
 import { TypedEvent } from '/tbc/core/typed_event.js';
 import { Mage_Rotation_Type as RotationType, Mage_Rotation_ArcaneRotation as ArcaneRotation, Mage_Rotation_FireRotation as FireRotation, Mage_Rotation_FrostRotation as FrostRotation } from '/tbc/core/proto/mage.js';
 import { Mage_Rotation_FireRotation_PrimarySpell as PrimaryFireSpell } from '/tbc/core/proto/mage.js';
@@ -6,9 +7,9 @@ import { Mage_Options_ArmorType as ArmorType } from '/tbc/core/proto/mage.js';
 import * as Presets from './presets.js';
 // Configuration for spec-specific UI elements on the settings tab.
 // These don't need to be in a separate file but it keeps things cleaner.
-export const ManaEmerald = makeBooleanMageBuffInput({ itemId: 22044 }, 'useManaEmeralds');
+export const ManaEmerald = makeBooleanMageBuffInput(ActionId.fromItemId(22044), 'useManaEmeralds');
 export const MageArmor = {
-    id: { spellId: 27125 },
+    id: ActionId.fromSpellId(27125),
     states: 2,
     extraCssClasses: [
         'mage-armor-picker',
@@ -22,7 +23,7 @@ export const MageArmor = {
     },
 };
 export const MoltenArmor = {
-    id: { spellId: 30482 },
+    id: ActionId.fromSpellId(30482),
     states: 2,
     extraCssClasses: [
         'molten-armor-picker',

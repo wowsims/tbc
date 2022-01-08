@@ -1,4 +1,3 @@
-import { setWowheadHref } from '/tbc/core/resources.js';
 import { ResultComponent } from './result_component.js';
 export class SpellMetrics extends ResultComponent {
     constructor(config) {
@@ -75,10 +74,7 @@ export class SpellMetrics extends ResultComponent {
 			<span class="metrics-action-name">${spellMetric.name}</span>
 			`;
             const iconElem = nameCellElem.getElementsByClassName('metrics-action-icon')[0];
-            iconElem.style.backgroundImage = `url('${spellMetric.iconUrl}')`;
-            if (!('otherId' in spellMetric.actionId.id)) {
-                setWowheadHref(iconElem, spellMetric.actionId.id);
-            }
+            spellMetric.actionId.setBackgroundAndHref(iconElem);
             const addCell = (value) => {
                 const cellElem = document.createElement('td');
                 cellElem.textContent = String(value);

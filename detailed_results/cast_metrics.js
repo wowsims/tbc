@@ -1,4 +1,3 @@
-import { setWowheadHref } from '/tbc/core/resources.js';
 import { ResultComponent } from './result_component.js';
 // For the no-damage casts
 export class CastMetrics extends ResultComponent {
@@ -46,10 +45,7 @@ export class CastMetrics extends ResultComponent {
 			<span class="metrics-action-name">${actionMetric.name}</span>
 			`;
             const iconElem = nameCellElem.getElementsByClassName('metrics-action-icon')[0];
-            iconElem.style.backgroundImage = `url('${actionMetric.iconUrl}')`;
-            if (!('otherId' in actionMetric.actionId.id)) {
-                setWowheadHref(iconElem, actionMetric.actionId.id);
-            }
+            actionMetric.actionId.setBackgroundAndHref(iconElem);
             const addCell = (value) => {
                 const cellElem = document.createElement('td');
                 cellElem.textContent = String(value);

@@ -1,5 +1,3 @@
-import { getIconUrl } from '/tbc/core/resources.js';
-import { setWowheadHref } from '/tbc/core/resources.js';
 import { TypedEvent } from '/tbc/core/typed_event.js';
 import { isRightClick } from '/tbc/core/utils.js';
 import { Input } from './input.js';
@@ -23,16 +21,10 @@ export class IconPicker extends Input {
     `;
         this.improvedAnchor = this.rootAnchor.getElementsByClassName('icon-input-improved')[0];
         this.counterElem = this.rootAnchor.getElementsByClassName('icon-input-counter')[0];
-        setWowheadHref(this.rootAnchor, this.config.id);
-        getIconUrl(this.config.id).then(url => {
-            this.rootAnchor.style.backgroundImage = `url('${url}')`;
-        });
+        this.config.id.fillAndSet(this.rootAnchor, true, true);
         if (this.config.states == 3) {
             if (this.config.improvedId) {
-                setWowheadHref(this.improvedAnchor, this.config.improvedId);
-                getIconUrl(this.config.improvedId).then(url => {
-                    this.improvedAnchor.style.backgroundImage = `url('${url}')`;
-                });
+                this.config.improvedId.fillAndSet(this.improvedAnchor, true, true);
             }
             else {
                 throw new Error('IconInput missing improved icon id');

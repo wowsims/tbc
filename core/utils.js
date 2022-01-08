@@ -6,6 +6,18 @@ export function equalsOrBothNull(a, b, comparator) {
         return false;
     return (comparator || ((_a, _b) => a == b))(a, b);
 }
+// Default comparator function for strings. Used with functions like Array.sort().
+export function stringComparator(a, b) {
+    if (a < b) {
+        return -1;
+    }
+    else if (b < a) {
+        return 1;
+    }
+    else {
+        return 0;
+    }
+}
 export function sum(arr) {
     return arr.reduce((total, cur) => total + cur, 0);
 }
@@ -21,6 +33,17 @@ export function arrayEquals(a, b, comparator) {
 // Returns a new array containing only elements present in both a and b.
 export function intersection(a, b) {
     return a.filter(value => b.includes(value));
+}
+// Returns a new array containing only distinct elements of arr.
+export function distinct(arr, comparator) {
+    comparator = comparator || ((a, b) => a == b);
+    const distinctArr = [];
+    arr.forEach(val => {
+        if (distinctArr.find(dVal => comparator(dVal, val)) == null) {
+            distinctArr.push(val);
+        }
+    });
+    return distinctArr;
 }
 // Splits an array into buckets, where elements are placed in the same bucket if the
 // toString function returns the same value.

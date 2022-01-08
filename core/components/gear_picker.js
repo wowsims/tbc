@@ -1,4 +1,3 @@
-import { getWowheadItemId } from '/tbc/core/proto_utils/equipped_item.js';
 import { EquippedItem } from '/tbc/core/proto_utils/equipped_item.js';
 import { getEmptyGemSocketIconUrl } from '/tbc/core/proto_utils/gems.js';
 import { setGemSocketCssClass } from '/tbc/core/proto_utils/gems.js';
@@ -6,12 +5,8 @@ import { enchantAppliesToItem } from '/tbc/core/proto_utils/utils.js';
 import { Item } from '/tbc/core/proto/common.js';
 import { ItemSlot } from '/tbc/core/proto/common.js';
 import { enchantDescriptions } from '/tbc/core/constants/enchants.js';
+import { ActionId } from '/tbc/core/proto_utils/action_id.js';
 import { slotNames } from '/tbc/core/proto_utils/names.js';
-import { getEmptySlotIconUrl } from '/tbc/core/resources.js';
-import { getIconUrl } from '/tbc/core/resources.js';
-import { getItemIconUrl } from '/tbc/core/resources.js';
-import { setWowheadHref } from '/tbc/core/resources.js';
-import { setWowheadItemHref } from '/tbc/core/resources.js';
 import { setItemQualityCssClass } from '/tbc/core/css_utils.js';
 import { TypedEvent } from '/tbc/core/typed_event.js';
 import { Component } from './component.js';
@@ -94,20 +89,14 @@ class ItemPicker extends Component {
         this.nameElem.textContent = slotNames[this.slot];
         setItemQualityCssClass(this.nameElem, null);
         this.enchantElem.textContent = '';
-        //this.enchantElem.removeAttribute('data-wowhead');
-        //this.enchantElem.removeAttribute('href');
         this.socketsContainerElem.innerHTML = '';
         if (newItem != null) {
             this.nameElem.textContent = newItem.item.name;
             setItemQualityCssClass(this.nameElem, newItem.item.quality);
             this.player.setWowheadData(newItem, this.iconElem);
-            setWowheadItemHref(this.iconElem, newItem.item);
-            getItemIconUrl(newItem.item).then(url => {
-                this.iconElem.style.backgroundImage = `url('${url}')`;
-            });
+            newItem.asActionId().fillAndSet(this.iconElem, true, true);
             if (newItem.enchant) {
                 this.enchantElem.textContent = enchantDescriptions.get(newItem.enchant.id) || newItem.enchant.name;
-                //this.enchantElem.setAttribute('href', 'https://tbc.wowhead.com/item=' + newItem.enchant.id);
             }
             newItem.item.gemSockets.forEach((socketColor, gemIdx) => {
                 const gemIconElem = document.createElement('img');
@@ -117,8 +106,8 @@ class ItemPicker extends Component {
                     gemIconElem.src = getEmptyGemSocketIconUrl(socketColor);
                 }
                 else {
-                    getIconUrl({ itemId: newItem.gems[gemIdx].id }).then(url => {
-                        gemIconElem.src = url;
+                    ActionId.fromItemId(newItem.gems[gemIdx].id).fill().then(filledId => {
+                        gemIconElem.src = filledId.iconUrl;
                     });
                 }
                 this.socketsContainerElem.appendChild(gemIconElem);
@@ -152,8 +141,7 @@ class SelectorModal extends Component {
         this.addTab('Items', slot, equippedItem, eligibleItems, item => this.player.computeItemEP(item), equippedItem => equippedItem?.item, item => {
             return {
                 id: item.id,
-                wowheadId: getWowheadItemId(item),
-                wowheadIdIsSpell: false,
+                actionId: ActionId.fromItem(item),
                 name: item.name,
                 quality: item.quality,
                 phase: item.phase,
@@ -173,8 +161,7 @@ class SelectorModal extends Component {
         this.addTab('Enchants', slot, equippedItem, eligibleEnchants, enchant => this.player.computeEnchantEP(enchant), equippedItem => equippedItem?.enchant, enchant => {
             return {
                 id: enchant.id,
-                wowheadId: enchant.id,
-                wowheadIdIsSpell: enchant.isSpellId,
+                actionId: enchant.isSpellId ? ActionId.fromSpellId(enchant.id) : ActionId.fromItemId(enchant.id),
                 name: enchant.name,
                 quality: enchant.quality,
                 phase: 1,
@@ -202,8 +189,7 @@ class SelectorModal extends Component {
             this.addTab('Gem ' + (socketIdx + 1), slot, equippedItem, this.player.getGems(socketColor), gem => this.player.computeGemEP(gem), equippedItem => equippedItem?.gems[socketIdx], gem => {
                 return {
                     id: gem.id,
-                    wowheadId: gem.id,
-                    wowheadIdIsSpell: false,
+                    actionId: ActionId.fromItemId(gem.id),
                     name: gem.name,
                     quality: gem.quality,
                     phase: gem.phase,
@@ -223,14 +209,15 @@ class SelectorModal extends Component {
                 const updateGemIcon = () => {
                     const equippedItem = this.player.getEquippedItem(slot);
                     const gem = equippedItem?.gems[socketIdx];
-                    if (!gem) {
+                    if (gem) {
+                        ActionId.fromItemId(gem.id).fill().then(filledId => {
+                            tabAnchor.style.backgroundImage = `url('${filledId.iconUrl}')`;
+                        });
+                    }
+                    else {
                         const url = getEmptyGemSocketIconUrl(socketColor);
                         tabAnchor.style.backgroundImage = `url('${url}')`;
-                        return;
                     }
-                    getIconUrl({ itemId: gem.id }).then(url => {
-                        tabAnchor.style.backgroundImage = `url('${url}')`;
-                    });
                 };
                 this.player.gearChangeEmitter.on(updateGemIcon);
                 updateGemIcon();
@@ -302,13 +289,10 @@ class SelectorModal extends Component {
 				</div>
       `;
             const iconElem = listItemElem.getElementsByClassName('selector-modal-list-item-icon')[0];
-            const actionId = itemData.wowheadIdIsSpell
-                ? { spellId: itemData.wowheadId }
-                : { itemId: itemData.wowheadId };
-            setWowheadHref(listItemElem.children[0], actionId);
-            setWowheadHref(listItemElem.children[1], actionId);
-            getIconUrl(actionId).then(url => {
-                iconElem.style.backgroundImage = `url('${url}')`;
+            itemData.actionId.fill().then(filledId => {
+                filledId.setWowheadHref(listItemElem.children[0]);
+                filledId.setWowheadHref(listItemElem.children[1]);
+                iconElem.style.backgroundImage = `url('${filledId.iconUrl}')`;
             });
             const nameElem = listItemElem.getElementsByClassName('selector-modal-list-item-name')[0];
             setItemQualityCssClass(nameElem, itemData.quality);
@@ -407,4 +391,26 @@ class SelectorModal extends Component {
         tabElems.forEach(elem => elem.parentElement.remove());
         contentElems.forEach(elem => elem.remove());
     }
+}
+const emptySlotIcons = {
+    [ItemSlot.ItemSlotHead]: 'https://cdn.seventyupgrades.com/item-slots/Head.jpg',
+    [ItemSlot.ItemSlotNeck]: 'https://cdn.seventyupgrades.com/item-slots/Neck.jpg',
+    [ItemSlot.ItemSlotShoulder]: 'https://cdn.seventyupgrades.com/item-slots/Shoulders.jpg',
+    [ItemSlot.ItemSlotBack]: 'https://cdn.seventyupgrades.com/item-slots/Back.jpg',
+    [ItemSlot.ItemSlotChest]: 'https://cdn.seventyupgrades.com/item-slots/Chest.jpg',
+    [ItemSlot.ItemSlotWrist]: 'https://cdn.seventyupgrades.com/item-slots/Wrists.jpg',
+    [ItemSlot.ItemSlotHands]: 'https://cdn.seventyupgrades.com/item-slots/Hands.jpg',
+    [ItemSlot.ItemSlotWaist]: 'https://cdn.seventyupgrades.com/item-slots/Waist.jpg',
+    [ItemSlot.ItemSlotLegs]: 'https://cdn.seventyupgrades.com/item-slots/Legs.jpg',
+    [ItemSlot.ItemSlotFeet]: 'https://cdn.seventyupgrades.com/item-slots/Feet.jpg',
+    [ItemSlot.ItemSlotFinger1]: 'https://cdn.seventyupgrades.com/item-slots/Finger.jpg',
+    [ItemSlot.ItemSlotFinger2]: 'https://cdn.seventyupgrades.com/item-slots/Finger.jpg',
+    [ItemSlot.ItemSlotTrinket1]: 'https://cdn.seventyupgrades.com/item-slots/Trinket.jpg',
+    [ItemSlot.ItemSlotTrinket2]: 'https://cdn.seventyupgrades.com/item-slots/Trinket.jpg',
+    [ItemSlot.ItemSlotMainHand]: 'https://cdn.seventyupgrades.com/item-slots/MainHand.jpg',
+    [ItemSlot.ItemSlotOffHand]: 'https://cdn.seventyupgrades.com/item-slots/OffHand.jpg',
+    [ItemSlot.ItemSlotRanged]: 'https://cdn.seventyupgrades.com/item-slots/Ranged.jpg',
+};
+export function getEmptySlotIconUrl(slot) {
+    return emptySlotIcons[slot];
 }

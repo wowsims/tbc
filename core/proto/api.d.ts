@@ -236,11 +236,9 @@ export interface ActionMetrics {
  */
 export interface AuraMetrics {
     /**
-     * The in-game spell ID for the aura.
-     *
-     * @generated from protobuf field: int32 id = 1;
+     * @generated from protobuf field: proto.ActionID id = 1;
      */
-    id: number;
+    id?: ActionID;
     /**
      * @generated from protobuf field: double uptime_seconds_avg = 2;
      */

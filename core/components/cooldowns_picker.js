@@ -4,8 +4,7 @@ import { NumberListPicker } from '/tbc/core/components/number_list_picker.js';
 import { TypedEvent } from '/tbc/core/typed_event.js';
 import { ActionID as ActionIdProto } from '/tbc/core/proto/common.js';
 import { Cooldown } from '/tbc/core/proto/common.js';
-import { protoToActionId } from '/tbc/core/proto_utils/action_id.js';
-import { getFullActionName } from '/tbc/core/resources.js';
+import { ActionId } from '/tbc/core/proto_utils/action_id.js';
 export class CooldownsPicker extends Component {
     constructor(parentElem, player) {
         super(parentElem, 'cooldowns-picker-root');
@@ -39,7 +38,7 @@ export class CooldownsPicker extends Component {
             const label = document.createElement('span');
             label.classList.add('cooldown-picker-label');
             if (cooldown && cooldown.id) {
-                getFullActionName(protoToActionId(cooldown.id), this.player.getRaidIndex()).then(actionName => label.textContent = actionName);
+                ActionId.fromProto(cooldown.id).fill(this.player.getRaidIndex()).then(filledId => label.textContent = filledId.name);
             }
             row.appendChild(label);
             const timingsPicker = this.makeTimingsPicker(row, i);
@@ -56,11 +55,11 @@ export class CooldownsPicker extends Component {
             values: [
                 { color: '#grey', value: ActionIdProto.create() },
             ].concat(availableCooldowns.map(cooldownAction => {
-                return { actionId: protoToActionId(cooldownAction), value: cooldownAction };
+                return { actionId: ActionId.fromProto(cooldownAction), value: cooldownAction };
             })),
             equals: (a, b) => ActionIdProto.equals(a, b),
             zeroValue: ActionIdProto.create(),
-            backupIconUrl: (value) => protoToActionId(value),
+            backupIconUrl: (value) => ActionId.fromProto(value),
             changedEvent: (player) => player.cooldownsChangeEmitter,
             getValue: (player) => player.getCooldowns().cooldowns[cooldownIndex]?.id || ActionIdProto.create(),
             setValue: (eventID, player, newValue) => {

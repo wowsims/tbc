@@ -14,7 +14,7 @@ import { TargetMetrics as TargetMetricsProto } from '/tbc/core/proto/api.js';
 import { RaidSimRequest, RaidSimResult } from '/tbc/core/proto/api.js';
 import { Spec } from '/tbc/core/proto/common.js';
 import { ActionId } from '/tbc/core/proto_utils/action_id.js';
-import { DamageDealtLog, DpsLog, ManaChangedLog, SimLog } from './logs_parser.js';
+import { AuraUptimeLog, DamageDealtLog, DpsLog, MajorCooldownUsedLog, ManaChangedLogGroup, SimLog } from './logs_parser.js';
 export interface SimResultFilter {
     player?: number | null;
     target?: number | null;
@@ -74,8 +74,11 @@ export declare class PlayerMetrics {
     private readonly duration;
     readonly logs: Array<SimLog>;
     readonly damageDealtLogs: Array<DamageDealtLog>;
-    readonly manaChangedLogs: Array<ManaChangedLog>;
+    readonly manaChangedLogs: Array<ManaChangedLogGroup>;
     readonly dpsLogs: Array<DpsLog>;
+    readonly auraUptimeLogs: Array<AuraUptimeLog>;
+    readonly majorCooldownLogs: Array<MajorCooldownUsedLog>;
+    readonly majorCooldownAuraUptimeLogs: Array<AuraUptimeLog>;
     private constructor();
     get label(): string;
     get secondsOomAvg(): number;
@@ -109,7 +112,7 @@ export declare class AuraMetrics {
     private readonly data;
     private constructor();
     get uptimePercent(): number;
-    static makeNew(iterations: number, duration: number, auraMetrics: AuraMetricsProto): Promise<AuraMetrics>;
+    static makeNew(iterations: number, duration: number, auraMetrics: AuraMetricsProto, playerIndex?: number): Promise<AuraMetrics>;
     static join(auras: Array<AuraMetrics>): Array<AuraMetrics>;
 }
 export declare class ActionMetrics {
@@ -130,6 +133,6 @@ export declare class ActionMetrics {
     get critPercent(): number;
     get misses(): number;
     get missPercent(): number;
-    static makeNew(iterations: number, duration: number, actionMetrics: ActionMetricsProto): Promise<ActionMetrics>;
+    static makeNew(iterations: number, duration: number, actionMetrics: ActionMetricsProto, playerIndex?: number): Promise<ActionMetrics>;
     static join(actions: Array<ActionMetrics>): Array<ActionMetrics>;
 }

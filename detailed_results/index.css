@@ -134,6 +134,10 @@
   color: red !important;
 }
 
+.bold {
+  font-weight: bold;
+}
+
 .sim-button {
   color: var(--main-text-color);
   background-color: var(--theme-color-primary);
@@ -277,6 +281,10 @@
   color: red !important;
 }
 
+.bold {
+  font-weight: bold;
+}
+
 .sim-button {
   color: var(--main-text-color);
   background-color: var(--theme-color-primary);
@@ -418,6 +426,10 @@
 
 .negative {
   color: red !important;
+}
+
+.bold {
+  font-weight: bold;
 }
 
 .sim-button {
@@ -721,6 +733,10 @@
   color: red !important;
 }
 
+.bold {
+  font-weight: bold;
+}
+
 .sim-button {
   color: var(--main-text-color);
   background-color: var(--theme-color-primary);
@@ -745,7 +761,7 @@
   cursor: pointer;
 }
 
-.timeline-plot {
+.timeline-plots-container {
   margin: 5px;
   margin-top: 15px;
   height: 70vh;
@@ -753,6 +769,70 @@
 
 .timeline-plot > div {
   margin: auto;
+}
+
+.cooldowns-plot {
+  display: none;
+}
+
+.timeline-tooltip {
+  padding: 3px;
+}
+
+.timeline-tooltip-header {
+  border-bottom: 1px solid black;
+  margin-bottom: 5px;
+}
+
+.timeline-tooltip-body-row {
+  display: flex;
+  align-items: center;
+}
+
+.timeline-tooltip-icon {
+  width: 20px;
+  height: 20px;
+}
+
+.timeline-tooltip ul {
+  list-style: none;
+  padding-left: 1em;
+}
+
+.timeline-tooltip ul li::before {
+  content: "•";
+  font-weight: bold;
+  font-size: 16px;
+  display: inline-block;
+  width: 1em;
+  margin-left: -1em;
+}
+
+.timeline-tooltip.dps ul li::before {
+  color: #ed5653;
+}
+
+.timeline-tooltip.mana ul li::before {
+  color: #2E93fA;
+}
+
+.timeline-tooltip.dps .series-color {
+  font-weight: bold;
+  color: #ed5653;
+}
+
+.timeline-tooltip.mana .series-color {
+  font-weight: bold;
+  color: #2E93fA;
+}
+
+.timeline-tooltip-auras {
+  border-top: 1px solid black;
+  margin-top: 5px;
+}
+
+.timeline-tooltip-auras ul li::before {
+  color: black;
 }
 
 body {

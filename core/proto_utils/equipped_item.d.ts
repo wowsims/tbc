@@ -1,4 +1,3 @@
-import { ActionID as ActionIdProto } from '/tbc/core/proto/common.js';
 import { Enchant } from '/tbc/core/proto/common.js';
 import { Gem } from '/tbc/core/proto/common.js';
 import { Item } from '/tbc/core/proto/common.js';
@@ -39,6 +38,5 @@ export declare class EquippedItem {
     withGem(gem: Gem | null, socketIdx: number): EquippedItem;
     removeGemsWithId(gemId: number): EquippedItem;
     asActionId(): ActionId;
-    asActionIdProto(): ActionIdProto;
     asSpec(): ItemSpec;
 }

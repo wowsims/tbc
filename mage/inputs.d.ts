@@ -1,5 +1,6 @@
 import { IconPickerConfig } from '/tbc/core/components/icon_picker.js';
 import { Spec } from '/tbc/core/proto/common.js';
+import { ActionId } from '/tbc/core/proto_utils/action_id.js';
 import { Player } from '/tbc/core/player.js';
 import { EventID, TypedEvent } from '/tbc/core/typed_event.js';
 import { IndividualSimUI } from '/tbc/core/individual_sim_ui.js';
@@ -8,9 +9,7 @@ import { Mage_Rotation_FireRotation_PrimarySpell as PrimaryFireSpell } from '/tb
 import { Mage_Rotation_ArcaneRotation_Filler as ArcaneFiller } from '/tbc/core/proto/mage.js';
 export declare const ManaEmerald: IconPickerConfig<Player<any>, boolean>;
 export declare const MageArmor: {
-    id: {
-        spellId: number;
-    };
+    id: ActionId;
     states: number;
     extraCssClasses: string[];
     changedEvent: (player: Player<Spec.SpecMage>) => TypedEvent<void>;
@@ -18,9 +17,7 @@ export declare const MageArmor: {
     setValue: (eventID: EventID, player: Player<Spec.SpecMage>, newValue: boolean) => void;
 };
 export declare const MoltenArmor: {
-    id: {
-        spellId: number;
-    };
+    id: ActionId;
     states: number;
     extraCssClasses: string[];
     changedEvent: (player: Player<Spec.SpecMage>) => TypedEvent<void>;

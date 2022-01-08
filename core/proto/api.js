@@ -507,13 +507,13 @@ export const ActionMetrics = new ActionMetrics$Type();
 class AuraMetrics$Type extends MessageType {
     constructor() {
         super("proto.AuraMetrics", [
-            { no: 1, name: "id", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 1, name: "id", kind: "message", T: () => ActionID },
             { no: 2, name: "uptime_seconds_avg", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
             { no: 3, name: "uptime_seconds_stdev", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ }
         ]);
     }
     create(value) {
-        const message = { id: 0, uptimeSecondsAvg: 0, uptimeSecondsStdev: 0 };
+        const message = { uptimeSecondsAvg: 0, uptimeSecondsStdev: 0 };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -524,8 +524,8 @@ class AuraMetrics$Type extends MessageType {
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
-                case /* int32 id */ 1:
-                    message.id = reader.int32();
+                case /* proto.ActionID id */ 1:
+                    message.id = ActionID.internalBinaryRead(reader, reader.uint32(), options, message.id);
                     break;
                 case /* double uptime_seconds_avg */ 2:
                     message.uptimeSecondsAvg = reader.double();
@@ -545,9 +545,9 @@ class AuraMetrics$Type extends MessageType {
         return message;
     }
     internalBinaryWrite(message, writer, options) {
-        /* int32 id = 1; */
-        if (message.id !== 0)
-            writer.tag(1, WireType.Varint).int32(message.id);
+        /* proto.ActionID id = 1; */
+        if (message.id)
+            ActionID.internalBinaryWrite(message.id, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
         /* double uptime_seconds_avg = 2; */
         if (message.uptimeSecondsAvg !== 0)
             writer.tag(2, WireType.Bit64).double(message.uptimeSecondsAvg);
