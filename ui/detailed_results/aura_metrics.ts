@@ -1,5 +1,4 @@
 import { SimResult, SimResultFilter } from '/tbc/core/proto_utils/sim_result.js';
-import { setWowheadHref } from '/tbc/core/resources.js';
 import { sum } from '/tbc/core/utils.js';
 
 import { ResultComponent, ResultComponentConfig, SimResultData } from './result_component.js';
@@ -67,10 +66,7 @@ export class AuraMetrics extends ResultComponent {
 			`;
 
 			const iconElem = nameCellElem.getElementsByClassName('metrics-action-icon')[0] as HTMLAnchorElement;
-			iconElem.style.backgroundImage = `url('${auraMetric.iconUrl}')`;
-			if (!('otherId' in auraMetric.actionId.id)) {
-				setWowheadHref(iconElem, auraMetric.actionId.id);
-			}
+			auraMetric.actionId.setBackgroundAndHref(iconElem);
 
 			const addCell = (value: string | number): HTMLElement => {
 				const cellElem = document.createElement('td');

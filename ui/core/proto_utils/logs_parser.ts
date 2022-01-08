@@ -1,4 +1,5 @@
 import { RaidSimRequest, RaidSimResult } from '/tbc/core/proto/api.js';
+import { ActionId } from '/tbc/core/proto_utils/action_id.js';
 import { sum } from '/tbc/core/utils.js';
 
 export class Entity {
@@ -22,6 +23,16 @@ export class Entity {
 
 	equals(other: Entity) {
 		return this.isTarget == other.isTarget && this.isPet == other.isPet && this.index == other.index && this.name == other.name;
+	}
+
+	toString(): string {
+		if (this.isTarget) {
+			return 'Target ' + (this.index + 1);
+		} else if (this.isPet) {
+			return `${this.ownerName} (#${this.index + 1}) - ${this.name}`;
+		} else {
+			return `${this.name} (#${this.index + 1})`;
+		}
 	}
 
 	// Parses one or more Entities from a string.
@@ -68,10 +79,23 @@ export class SimLog {
 		this.target = params.target;
 	}
 
-	static parseAll(result: RaidSimResult): Array<SimLog> {
+	toString(): string {
+		return this.raw;
+	}
+
+	toStringPrefix(): string {
+		const timestampStr = `[${this.timestamp.toFixed(2)}]`;
+		if (this.source) {
+			return `${timestampStr} [${this.source}]`;
+		} else {
+			return timestampStr;
+		}
+	}
+
+	static async parseAll(result: RaidSimResult): Promise<Array<SimLog>> {
 		const lines = result.logs.split('\n');
 
-		return lines.map(line => {
+		return Promise.all(lines.map(line => {
 			const params: SimLogParams = {
 				raw: line,
 				timestamp: 0,
@@ -96,8 +120,11 @@ export class SimLog {
 					|| ManaChangedLog.parse(params)
 					|| AuraGainedLog.parse(params)
 					|| AuraFadedLog.parse(params)
-					|| new SimLog(params);
-		});
+					|| MajorCooldownUsedLog.parse(params)
+					|| CastBeganLog.parse(params)
+					|| StatChangeLog.parse(params)
+					|| Promise.resolve(new SimLog(params));
+		}));
 	}
 
 	isDamageDealt(): this is DamageDealtLog {
@@ -114,6 +141,18 @@ export class SimLog {
 
 	isAuraFaded(): this is AuraFadedLog {
 		return this instanceof AuraFadedLog;
+	}
+
+	isMajorCooldownUsed(): this is MajorCooldownUsedLog {
+		return this instanceof MajorCooldownUsedLog;
+	}
+
+	isCastBegan(): this is CastBeganLog {
+		return this instanceof CastBeganLog;
+	}
+
+	isStatChange(): this is StatChangeLog {
+		return this instanceof StatChangeLog;
 	}
 
 	// Remove events that happen at the same time.
@@ -135,33 +174,53 @@ export class DamageDealtLog extends SimLog {
 	readonly miss: boolean;
 	readonly hit: boolean;
 	readonly crit: boolean;
+	readonly tick: boolean;
 	readonly partialResist1_4: boolean;
 	readonly partialResist2_4: boolean;
 	readonly partialResist3_4: boolean;
-	readonly cause: string;
+	readonly cause: ActionId;
 
-	constructor(params: SimLogParams, amount: number, miss: boolean, crit: boolean, partialResist1_4: boolean, partialResist2_4: boolean, partialResist3_4: boolean, cause: string) {
+	constructor(params: SimLogParams, amount: number, miss: boolean, crit: boolean, tick: boolean, partialResist1_4: boolean, partialResist2_4: boolean, partialResist3_4: boolean, cause: ActionId) {
 		super(params);
 		this.amount = amount;
 		this.miss = miss;
 		this.hit = !miss && !crit;
 		this.crit = crit;
+		this.tick = tick;
 		this.partialResist1_4 = partialResist1_4;
 		this.partialResist2_4 = partialResist2_4;
 		this.partialResist3_4 = partialResist3_4;
 		this.cause = cause;
 	}
 
-	static parse(params: SimLogParams): DamageDealtLog | null {
+	toString(): string {
+		let result = this.miss ? 'Miss' : this.tick ? 'ticked' : this.crit ? 'Crit' : 'Hit';
+		if (!this.miss) {
+			result += ` for ${this.amount.toFixed(2)} damage`;
+			if (this.partialResist1_4) {
+				result += ' (25% Resist)';
+			} else if (this.partialResist2_4) {
+				result += ' (50% Resist)';
+			} else if (this.partialResist3_4) {
+				result += ' (75% Resist)';
+			}
+			result += '.'
+		}
+		let str = this.toStringPrefix();
+		return `${this.toStringPrefix()} ${this.cause.name} ${result}`;
+	}
+
+	static parse(params: SimLogParams): Promise<DamageDealtLog> | null {
 		const match = params.raw.match(/] (.*?) ((Miss)|(Hit)|(Crit)|(ticked))( for (\d+\.\d+) damage.( \((\d+)% Resist\))?)?/);
 		if (match) {
-			const cause = match[1];
-			if (match[2] == 'Miss') {
-				return new DamageDealtLog(params, 0, true, false, false, false, false, cause);
-			}
+			return ActionId.fromLogString(match[1]).fill().then(cause => {
+				if (match[2] == 'Miss') {
+					return new DamageDealtLog(params, 0, true, false, false, false, false, false, cause);
+				}
 
-			const amount = parseFloat(match[8]);
-			return new DamageDealtLog(params, amount, false, match[2] == 'Crit', match[10] == '25', match[10] == '50', match[10] == '75', cause);
+				const amount = parseFloat(match[8]);
+				return new DamageDealtLog(params, amount, false, match[2] == 'Crit', match[2] == 'ticked', match[10] == '25', match[10] == '50', match[10] == '75', cause);
+			});
 		} else {
 			return null;
 		}
@@ -211,17 +270,21 @@ export class DpsLog extends SimLog {
 }
 
 export class AuraGainedLog extends SimLog {
-	readonly auraName: string;
+	readonly aura: ActionId;
 
-	constructor(params: SimLogParams, auraName: string) {
+	constructor(params: SimLogParams, aura: ActionId) {
 		super(params);
-		this.auraName = auraName;
+		this.aura = aura;
 	}
 
-	static parse(params: SimLogParams): AuraGainedLog | null {
+	toString(): string {
+		return `${this.toStringPrefix()} Aura gained: ${this.aura.name}.`;
+	}
+
+	static parse(params: SimLogParams): Promise<AuraGainedLog> | null {
 		const match = params.raw.match(/Aura gained: (.*)/);
 		if (match && match[1]) {
-			return new AuraGainedLog(params, match[1]);
+			return ActionId.fromLogString(match[1]).fill().then(aura => new AuraGainedLog(params, aura));
 		} else {
 			return null;
 		}
@@ -229,17 +292,21 @@ export class AuraGainedLog extends SimLog {
 }
 
 export class AuraFadedLog extends SimLog {
-	readonly auraName: string;
+	readonly aura: ActionId;
 
-	constructor(params: SimLogParams, auraName: string) {
+	constructor(params: SimLogParams, aura: ActionId) {
 		super(params);
-		this.auraName = auraName;
+		this.aura = aura;
 	}
 
-	static parse(params: SimLogParams): AuraFadedLog | null {
+	toString(): string {
+		return `${this.toStringPrefix()} Aura faded: ${this.aura.name}.`;
+	}
+
+	static parse(params: SimLogParams): Promise<AuraFadedLog> | null {
 		const match = params.raw.match(/Aura faded: (.*)/);
 		if (match && match[1]) {
-			return new AuraFadedLog(params, match[1]);
+			return ActionId.fromLogString(match[1]).fill().then(aura => new AuraFadedLog(params, aura));
 		} else {
 			return null;
 		}
@@ -249,11 +316,13 @@ export class AuraFadedLog extends SimLog {
 export class AuraUptimeLog extends SimLog {
 	readonly gainedAt: number;
 	readonly fadedAt: number;
+	readonly aura: ActionId;
 
-	constructor(params: SimLogParams, fadedAt: number) {
+	constructor(params: SimLogParams, fadedAt: number, aura: ActionId) {
 		super(params);
 		this.gainedAt = params.timestamp;
 		this.fadedAt = fadedAt;
+		this.aura = aura;
 	}
 
 	static fromLogs(logs: Array<SimLog>, entity: Entity): Array<AuraUptimeLog> {
@@ -272,9 +341,9 @@ export class AuraUptimeLog extends SimLog {
 				return;
 			}
 
-			const matchingGainedIdx = unmatchedGainedLogs.findIndex(gainedLog => gainedLog.auraName == log.auraName);
+			const matchingGainedIdx = unmatchedGainedLogs.findIndex(gainedLog => gainedLog.aura.equals(log.aura));
 			if (matchingGainedIdx == -1) {
-				console.warn('Unmatched aura faded log: ' + log.auraName);
+				console.warn('Unmatched aura faded log: ' + log.aura.name);
 				return;
 			}
 			const gainedLog = unmatchedGainedLogs.splice(matchingGainedIdx, 1)[0];
@@ -284,7 +353,7 @@ export class AuraUptimeLog extends SimLog {
 				timestamp: gainedLog.timestamp,
 				source: log.source,
 				target: log.target,
-			}, log.timestamp));
+			}, log.timestamp, gainedLog.aura));
 		});
 		return uptimeLogs;
 	}
@@ -293,23 +362,111 @@ export class AuraUptimeLog extends SimLog {
 export class ManaChangedLog extends SimLog {
 	readonly manaBefore: number;
 	readonly manaAfter: number;
-	readonly cause: string;
+	readonly isSpend: boolean;
+	readonly cause: ActionId;
 
-	constructor(params: SimLogParams, manaBefore: number, manaAfter: number, cause: string) {
+	constructor(params: SimLogParams, manaBefore: number, manaAfter: number, isSpend: boolean, cause: ActionId) {
 		super(params);
 		this.manaBefore = manaBefore;
 		this.manaAfter = manaAfter;
+		this.isSpend = isSpend;
 		this.cause = cause;
 	}
 
-	static parse(params: SimLogParams): ManaChangedLog | null {
-		const match = params.raw.match(/[Gained|Spent] \d+\.\d+ mana from (.*) \((\d+\.\d+) --> (\d+\.\d+)\)/);
-		if (match && match[1]) {
-			let cause = match[1];
-			//if (cause.endsWith('s Regen')) {
-			//	cause = 'Regen';
-			//}
-			return new ManaChangedLog(params, parseFloat(match[2]), parseFloat(match[3]), cause);
+	toString(): string {
+		const signedDiff = (this.manaAfter - this.manaBefore) * (this.isSpend ? -1 : 1);
+		return `${this.toStringPrefix()} ${this.isSpend ? 'Spent' : 'Gained'} ${signedDiff.toFixed(1)} mana from ${this.cause.name}.`;
+	}
+
+	static parse(params: SimLogParams): Promise<ManaChangedLog> | null {
+		const match = params.raw.match(/((Gained)|(Spent)) \d+\.\d+ mana from (.*) \((\d+\.\d+) --> (\d+\.\d+)\)/);
+		if (match) {
+			return ActionId.fromLogString(match[4]).fill().then(cause => {
+				return new ManaChangedLog(params, parseFloat(match[5]), parseFloat(match[6]), match[1] == 'Spent', cause);
+			});
+		} else {
+			return null;
+		}
+	}
+}
+
+export class MajorCooldownUsedLog extends SimLog {
+	readonly cooldownId: ActionId;
+
+	constructor(params: SimLogParams, cooldownId: ActionId) {
+		super(params);
+		this.cooldownId = cooldownId;
+	}
+
+	toString(): string {
+		return `${this.toStringPrefix()} Major cooldown used: ${this.cooldownId.name}.`;
+	}
+
+	static parse(params: SimLogParams): Promise<MajorCooldownUsedLog> | null {
+		const match = params.raw.match(/Major cooldown used: (.*)/);
+		if (match) {
+			return ActionId.fromLogString(match[1]).fill().then(cooldownId => new MajorCooldownUsedLog(params, cooldownId));
+		} else {
+			return null;
+		}
+	}
+}
+
+export class CastBeganLog extends SimLog {
+	readonly castId: ActionId;
+	readonly currentMana: number;
+	readonly manaCost: number;
+	readonly castTime: number;
+
+	constructor(params: SimLogParams, castId: ActionId, currentMana: number, manaCost: number, castTime: number) {
+		super(params);
+		this.castId = castId;
+		this.currentMana = currentMana;
+		this.manaCost = manaCost;
+		this.castTime = castTime;
+	}
+
+	toString(): string {
+		return `${this.toStringPrefix()} Casting ${this.castId.name} (Cast time = ${this.castTime.toFixed(2)}s, Mana cost = ${this.manaCost.toFixed(0)}).`;
+	}
+
+	static parse(params: SimLogParams): Promise<CastBeganLog> | null {
+		const match = params.raw.match(/Casting (.*) \(Current Mana = (\d+), Mana Cost = (\d+), Cast Time = (\d+\.?\d*)s\)/);
+		if (match) {
+			return ActionId.fromLogString(match[1]).fill().then(castId => new CastBeganLog(params, castId, parseFloat(match[2]), parseFloat(match[3]), parseFloat(match[4])));
+		} else {
+			return null;
+		}
+	}
+}
+
+export class StatChangeLog extends SimLog {
+	readonly effectId: ActionId;
+	readonly amount: number;
+	readonly stat: string;
+
+	constructor(params: SimLogParams, effectId: ActionId, amount: number, stat: string) {
+		super(params);
+		this.effectId = effectId;
+		this.amount = amount;
+		this.stat = stat;
+	}
+
+	toString(): string {
+		if (this.amount > 0) {
+			return `${this.toStringPrefix()} Gained ${this.amount.toFixed(0)} ${this.stat} from ${this.effectId.name}.`;
+		} else {
+			return `${this.toStringPrefix()} Lost ${(-this.amount).toFixed(0)} ${this.stat} from fading ${this.effectId.name}.`;
+		}
+	}
+
+	static parse(params: SimLogParams): Promise<StatChangeLog> | null {
+		const match = params.raw.match(/((Gained)|(Lost)) (\d+\.?\d*) (.*) from (fading )?(.*)/);
+		if (match) {
+			return ActionId.fromLogString(match[7]).fill().then(effectId => {
+				const sign = match[1] == 'Lost' ? -1 : 1;
+				return new StatChangeLog(params, effectId, parseFloat(match[4]) * sign, match[5]);
+			});
 		} else {
 			return null;
 		}
