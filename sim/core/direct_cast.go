@@ -151,9 +151,6 @@ func (hitEffect *SpellHitEffect) apply(sim *Simulation, spellCast *SpellCast, ap
 		hitEffect.applyResultsToCast(spellCast)
 		if applyMetrics {
 			spellCast.Character.Metrics.AddSpellCast(spellCast)
-			if sim.Log != nil {
-				spellCast.Character.Log(sim, "Adding metrics for spell, damage: %0.02f, total: %0.02f", spellCast.TotalDamage, spellCast.Character.Metrics.TotalDamage)
-			}
 		}
 		spellCast.objectInUse = false
 	}

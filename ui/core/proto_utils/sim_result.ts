@@ -26,6 +26,13 @@ import { specToClass } from '/tbc/core/proto_utils/utils.js';
 import { bucket } from '/tbc/core/utils.js';
 import { sum } from '/tbc/core/utils.js';
 
+import {
+	DamageDealtLog,
+	DpsLog,
+	ManaChangedLog,
+	SimLog,
+} from './logs_parser.js';
+
 export interface SimResultFilter {
 	// Raid index of the player to display, or null for all players.
 	player?: number | null;
@@ -42,12 +49,14 @@ export class SimResult {
 
 	readonly raidMetrics: RaidMetrics;
 	readonly encounterMetrics: EncounterMetrics;
+	readonly logs: Array<SimLog>;
 
-	private constructor(request: RaidSimRequest, result: RaidSimResult, raidMetrics: RaidMetrics, encounterMetrics: EncounterMetrics) {
+	private constructor(request: RaidSimRequest, result: RaidSimResult, raidMetrics: RaidMetrics, encounterMetrics: EncounterMetrics, logs: Array<SimLog>) {
 		this.request = request;
 		this.result = result;
 		this.raidMetrics = raidMetrics;
 		this.encounterMetrics = encounterMetrics;
+		this.logs = logs;
 	}
 
 	getPlayers(filter?: SimResultFilter): Array<PlayerMetrics> {
@@ -105,10 +114,6 @@ export class SimResult {
 		return AuraMetrics.join(this.getTargets(filter).map(target => target.auras).flat());
 	}
 
-	getLogs(): Array<string> {
-		return this.result.logs.split('\n');
-	}
-
 	toJson(): any {
 		return {
 			'request': RaidSimRequest.toJson(this.request),
@@ -125,14 +130,15 @@ export class SimResult {
 	static async makeNew(request: RaidSimRequest, result: RaidSimResult): Promise<SimResult> {
 		const iterations = request.simOptions?.iterations || 1;
 		const duration = request.encounter?.duration || 1;
+		const logs = SimLog.parseAll(result);
 
-		const raidPromise = RaidMetrics.makeNew(iterations, duration, request.raid!, result.raidMetrics!);
-		const encounterPromise = EncounterMetrics.makeNew(iterations, duration, request.encounter!, result.encounterMetrics!);
+		const raidPromise = RaidMetrics.makeNew(iterations, duration, request.raid!, result.raidMetrics!, logs);
+		const encounterPromise = EncounterMetrics.makeNew(iterations, duration, request.encounter!, result.encounterMetrics!, logs);
 
 		const raidMetrics = await raidPromise;
 		const encounterMetrics = await encounterPromise;
 
-		return new SimResult(request, result, raidMetrics, encounterMetrics);
+		return new SimResult(request, result, raidMetrics, encounterMetrics, logs);
 	}
 }
 
@@ -150,7 +156,7 @@ export class RaidMetrics {
 		this.parties = parties;
 	}
 
-	static async makeNew(iterations: number, duration: number, raid: RaidProto, metrics: RaidMetricsProto): Promise<RaidMetrics> {
+	static async makeNew(iterations: number, duration: number, raid: RaidProto, metrics: RaidMetricsProto, logs: Array<SimLog>): Promise<RaidMetrics> {
 		const numParties = Math.min(raid.parties.length, metrics.parties.length);
 		
 		const parties = await Promise.all(
@@ -160,7 +166,8 @@ export class RaidMetrics {
 								duration,
 								raid.parties[i],
 								metrics.parties[i],
-								i)));
+								i,
+								logs)));
 
 		return new RaidMetrics(raid, metrics, parties);
 	}
@@ -182,7 +189,7 @@ export class PartyMetrics {
 		this.players = players;
 	}
 
-	static async makeNew(iterations: number, duration: number, party: PartyProto, metrics: PartyMetricsProto, partyIndex: number): Promise<PartyMetrics> {
+	static async makeNew(iterations: number, duration: number, party: PartyProto, metrics: PartyMetricsProto, partyIndex: number, logs: Array<SimLog>): Promise<PartyMetrics> {
 		const numPlayers = Math.min(party.players.length, metrics.players.length);
 		const players = await Promise.all(
 				[...new Array(numPlayers).keys()]
@@ -193,7 +200,8 @@ export class PartyMetrics {
 								party.players[i],
 								metrics.players[i],
 								partyIndex * 5 + i,
-								false)));
+								false,
+								logs)));
 
 		return new PartyMetrics(party, metrics, partyIndex, players);
 	}
@@ -217,6 +225,11 @@ export class PlayerMetrics {
 	private readonly iterations: number;
 	private readonly duration: number;
 
+	readonly logs: Array<SimLog>;
+	readonly damageDealtLogs: Array<DamageDealtLog>;
+	readonly manaChangedLogs: Array<ManaChangedLog>;
+	readonly dpsLogs: Array<DpsLog>;
+
 	private constructor(
 			player: PlayerProto,
 			isPet: boolean,
@@ -225,6 +238,7 @@ export class PlayerMetrics {
 			actions: Array<ActionMetrics>,
 			auras: Array<AuraMetrics>,
 			pets: Array<PlayerMetrics>,
+			logs: Array<SimLog>,
 			iterations: number,
 			duration: number) {
 		this.player = player;
@@ -240,8 +254,14 @@ export class PlayerMetrics {
 		this.actions = actions;
 		this.auras = auras;
 		this.pets = pets;
+		this.logs = logs;
 		this.iterations = iterations;
 		this.duration = duration;
+
+		this.damageDealtLogs = this.logs.filter((log): log is DamageDealtLog => log instanceof DamageDealtLog);
+		this.manaChangedLogs = this.logs.filter((log): log is ManaChangedLog => log instanceof ManaChangedLog);
+
+		this.dpsLogs = DpsLog.fromDamageDealt(this.damageDealtLogs);
 	}
 
 	get label() {
@@ -260,15 +280,16 @@ export class PlayerMetrics {
 		return this.actions.concat(this.pets.map(pet => pet.getPlayerAndPetActions()).flat());
 	}
 
-	static async makeNew(iterations: number, duration: number, player: PlayerProto, metrics: PlayerMetricsProto, raidIndex: number, isPet: boolean): Promise<PlayerMetrics> {
+	static async makeNew(iterations: number, duration: number, player: PlayerProto, metrics: PlayerMetricsProto, raidIndex: number, isPet: boolean, logs: Array<SimLog>): Promise<PlayerMetrics> {
+		const playerLogs = logs.filter(log => log.source && (!log.source.isTarget && (isPet == log.source.isPet) && log.source.index == raidIndex));
 		const actionsPromise = Promise.all(metrics.actions.map(actionMetrics => ActionMetrics.makeNew(iterations, duration, actionMetrics)));
 		const aurasPromise = Promise.all(metrics.auras.map(auraMetrics => AuraMetrics.makeNew(iterations, duration, auraMetrics)));
-		const petsPromise = Promise.all(metrics.pets.map(petMetrics => PlayerMetrics.makeNew(iterations, duration, player, petMetrics, raidIndex, true)));
+		const petsPromise = Promise.all(metrics.pets.map(petMetrics => PlayerMetrics.makeNew(iterations, duration, player, petMetrics, raidIndex, true, logs)));
 
 		const actions = await actionsPromise;
 		const auras = await aurasPromise;
 		const pets = await petsPromise;
-		return new PlayerMetrics(player, isPet, metrics, raidIndex, actions, auras, pets, iterations, duration);
+		return new PlayerMetrics(player, isPet, metrics, raidIndex, actions, auras, pets, playerLogs, iterations, duration);
 	}
 }
 
@@ -284,7 +305,7 @@ export class EncounterMetrics {
 		this.targets = targets;
 	}
 
-	static async makeNew(iterations: number, duration: number, encounter: EncounterProto, metrics: EncounterMetricsProto): Promise<EncounterMetrics> {
+	static async makeNew(iterations: number, duration: number, encounter: EncounterProto, metrics: EncounterMetricsProto, logs: Array<SimLog>): Promise<EncounterMetrics> {
 		const numTargets = Math.min(encounter.targets.length, metrics.targets.length);
 		const targets = await Promise.all(
 				[...new Array(numTargets).keys()]
@@ -293,7 +314,8 @@ export class EncounterMetrics {
 								duration,
 								encounter.targets[i],
 								metrics.targets[i],
-								i)));
+								i,
+								logs)));
 
 		return new EncounterMetrics(encounter, metrics, targets);
 	}
@@ -309,18 +331,21 @@ export class TargetMetrics {
 
 	readonly index: number;
 	readonly auras: Array<AuraMetrics>;
+	readonly logs: Array<SimLog>;
 
-	private constructor(target: TargetProto, metrics: TargetMetricsProto, index: number, auras: Array<AuraMetrics>) {
+	private constructor(target: TargetProto, metrics: TargetMetricsProto, index: number, auras: Array<AuraMetrics>, logs: Array<SimLog>) {
 		this.target = target;
 		this.metrics = metrics;
 
 		this.index = index;
 		this.auras = auras;
+		this.logs = logs;
 	}
 
-	static async makeNew(iterations: number, duration: number, target: TargetProto, metrics: TargetMetricsProto, index: number): Promise<TargetMetrics> {
+	static async makeNew(iterations: number, duration: number, target: TargetProto, metrics: TargetMetricsProto, index: number, logs: Array<SimLog>): Promise<TargetMetrics> {
+		const targetLogs = logs.filter(log => log.source && (log.source.isTarget && log.source.index == index));
 		const auras = await Promise.all(metrics.auras.map(auraMetrics => AuraMetrics.makeNew(iterations, duration, auraMetrics)));
-		return new TargetMetrics(target, metrics, index, auras);
+		return new TargetMetrics(target, metrics, index, auras, targetLogs);
 	}
 }
 

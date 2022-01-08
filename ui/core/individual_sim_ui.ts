@@ -178,7 +178,6 @@ export interface Settings {
 export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
   readonly player: Player<SpecType>;
 	readonly individualConfig: IndividualSimUIConfig<SpecType>;
-	readonly isWithinRaidSim: boolean;
 
   private readonly exclusivityMap: Record<ExclusivityTag, Array<ExclusiveEffect>>;
 
@@ -194,7 +193,6 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 		this.rootElem.classList.add('individual-sim-ui', config.cssClass);
 		this.player = player;
 		this.individualConfig = config;
-		this.isWithinRaidSim = this.rootElem.closest('.within-raid-sim') != null;
 		this.raidSimResultsManager = null;
 		this.settingsMuuri = null;
 		this.addWarning({
