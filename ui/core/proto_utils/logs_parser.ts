@@ -1,6 +1,6 @@
 import { RaidSimRequest, RaidSimResult } from '/tbc/core/proto/api.js';
 import { ActionId } from '/tbc/core/proto_utils/action_id.js';
-import { sum } from '/tbc/core/utils.js';
+import { stringComparator, sum } from '/tbc/core/utils.js';
 
 export class Entity {
 	readonly name: string;
@@ -72,11 +72,16 @@ export class SimLog {
 	readonly source: Entity | null;
 	readonly target: Entity | null;
 
+	// Logs for auras that were active at this timestamp.
+	// This is only filled if populateActiveAuras() is called.
+	activeAuras: Array<AuraUptimeLog>;
+
 	constructor(params: SimLogParams) {
 		this.raw = params.raw;
 		this.timestamp = params.timestamp;
 		this.source = params.source;
 		this.target = params.target;
+		this.activeAuras = [];
 	}
 
 	toString(): string {
@@ -155,17 +160,24 @@ export class SimLog {
 		return this instanceof StatChangeLog;
 	}
 
-	// Remove events that happen at the same time.
-	// Make sure we always keep the last log for each timestamp.
-	static filterDuplicateTimestamps<LogType extends SimLog>(logs: Array<LogType>): Array<LogType> {
-		const numLogs = logs.length;
-		if (numLogs == 0) {
-			return logs;
+	// Group events that happen at the same time.
+	static groupDuplicateTimestamps<LogType extends SimLog>(logs: Array<LogType>): Array<Array<LogType>> {
+		const grouped: Array<Array<LogType>> = [];
+		let curGroup: Array<LogType> = [];
+
+		logs.forEach(log => {
+			if (curGroup.length == 0 || log.timestamp == curGroup[0].timestamp) {
+				curGroup.push(log);
+			} else {
+				grouped.push(curGroup);
+				curGroup = [log];
+			}
+		});
+		if (curGroup.length > 0) {
+			grouped.push(curGroup);
 		}
 
-		return logs.filter((log, i) => {
-			return i == 0 || i == (numLogs - 1) || log.timestamp != logs[i + 1].timestamp;
-		});
+		return grouped;
 	}
 }
 
@@ -193,10 +205,10 @@ export class DamageDealtLog extends SimLog {
 		this.cause = cause;
 	}
 
-	toString(): string {
-		let result = this.miss ? 'Miss' : this.tick ? 'ticked' : this.crit ? 'Crit' : 'Hit';
+	resultString(): string {
+		let result = this.miss ? 'Miss' : this.tick ? 'Tick' : this.crit ? 'Crit' : 'Hit';
 		if (!this.miss) {
-			result += ` for ${this.amount.toFixed(2)} damage`;
+			result += ` for ${this.amount.toFixed(2)}`;
 			if (this.partialResist1_4) {
 				result += ' (25% Resist)';
 			} else if (this.partialResist2_4) {
@@ -206,8 +218,11 @@ export class DamageDealtLog extends SimLog {
 			}
 			result += '.'
 		}
-		let str = this.toStringPrefix();
-		return `${this.toStringPrefix()} ${this.cause.name} ${result}`;
+		return result;
+	}
+
+	toString(): string {
+		return `${this.toStringPrefix()} ${this.cause.name} ${this.resultString()}`;
 	}
 
 	static parse(params: SimLogParams): Promise<DamageDealtLog> | null {
@@ -230,22 +245,30 @@ export class DamageDealtLog extends SimLog {
 export class DpsLog extends SimLog {
 	readonly dps: number;
 
-	constructor(params: SimLogParams, dps: number) {
+	// Damage events that occurred at the same time as this log.
+	readonly damageLogs: Array<DamageDealtLog>;
+
+	constructor(params: SimLogParams, dps: number, damageLogs: Array<DamageDealtLog>) {
 		super(params);
 		this.dps = dps;
+		this.damageLogs = damageLogs;
 	}
 
 	static DPS_WINDOW = 15; // Window over which to calculate DPS.
-	static fromDamageDealt(damageDealtLogs: Array<DamageDealtLog>): Array<DpsLog> {
+	static fromLogs(damageDealtLogs: Array<DamageDealtLog>): Array<DpsLog> {
+		const groupedDamageLogs = SimLog.groupDuplicateTimestamps(damageDealtLogs);
+
 		let curDamageLogs: Array<DamageDealtLog> = [];
 		let curDamageTotal = 0;
 
-		return damageDealtLogs.map(ddLog => {
-			curDamageLogs.push(ddLog);
-			curDamageTotal += ddLog.amount;
+		return groupedDamageLogs.map(ddLogGroup => {
+			ddLogGroup.forEach(ddLog => {
+				curDamageLogs.push(ddLog);
+				curDamageTotal += ddLog.amount;
+			});
 
 			const newStartIdx = curDamageLogs.findIndex(curLog => {
-				const inWindow = curLog.timestamp > ddLog.timestamp - DpsLog.DPS_WINDOW;
+				const inWindow = curLog.timestamp > ddLogGroup[0].timestamp - DpsLog.DPS_WINDOW;
 				if (!inWindow) {
 					curDamageTotal -= curLog.amount;
 				}
@@ -260,11 +283,11 @@ export class DpsLog extends SimLog {
 			const dps = curDamageTotal / DpsLog.DPS_WINDOW;
 
 			return new DpsLog({
-				raw: ddLog.raw,
-				timestamp: ddLog.timestamp,
-				source: ddLog.source,
-				target: ddLog.target,
-			}, dps);
+				raw: '',
+				timestamp: ddLogGroup[0].timestamp,
+				source: ddLogGroup[0].source,
+				target: null,
+			}, dps, ddLogGroup);
 		});
 	}
 }
@@ -355,7 +378,26 @@ export class AuraUptimeLog extends SimLog {
 				target: log.target,
 			}, log.timestamp, gainedLog.aura));
 		});
+		uptimeLogs.sort((a, b) => a.gainedAt - b.gainedAt);
 		return uptimeLogs;
+	}
+
+	// Populates the activeAuras field for all logs using the provided auras.
+	static populateActiveAuras(logs: Array<SimLog>, auraLogs: Array<AuraUptimeLog>) {
+		let curAuras: Array<AuraUptimeLog> = [];
+		let auraLogsIndex = 0;
+
+		logs.forEach(log => {
+			while (auraLogsIndex < auraLogs.length && auraLogs[auraLogsIndex].gainedAt <= log.timestamp) {
+				curAuras.push(auraLogs[auraLogsIndex]);
+				auraLogsIndex++;
+			}
+			curAuras = curAuras.filter(curAura => curAura.fadedAt > log.timestamp);
+
+			const activeAuras = curAuras.slice();
+			activeAuras.sort((a, b) => stringComparator(a.aura.name, b.aura.name));
+			log.activeAuras = activeAuras;
+		});
 	}
 }
 
@@ -378,8 +420,17 @@ export class ManaChangedLog extends SimLog {
 		return `${this.toStringPrefix()} ${this.isSpend ? 'Spent' : 'Gained'} ${signedDiff.toFixed(1)} mana from ${this.cause.name}.`;
 	}
 
+	resultString(): string {
+		const delta = this.manaAfter - this.manaBefore;
+		if (delta < 0) {
+			return delta.toFixed(1);
+		} else {
+			return '+' + delta.toFixed(1);
+		}
+	}
+
 	static parse(params: SimLogParams): Promise<ManaChangedLog> | null {
-		const match = params.raw.match(/((Gained)|(Spent)) \d+\.\d+ mana from (.*) \((\d+\.\d+) --> (\d+\.\d+)\)/);
+		const match = params.raw.match(/((Gained)|(Spent)) \d+\.?\d* mana from (.*) \((\d+\.?\d*) --> (\d+\.?\d*)\)/);
 		if (match) {
 			return ActionId.fromLogString(match[4]).fill().then(cause => {
 				return new ManaChangedLog(params, parseFloat(match[5]), parseFloat(match[6]), match[1] == 'Spent', cause);
@@ -387,6 +438,38 @@ export class ManaChangedLog extends SimLog {
 		} else {
 			return null;
 		}
+	}
+}
+
+export class ManaChangedLogGroup extends SimLog {
+	readonly manaBefore: number;
+	readonly manaAfter: number;
+	readonly logs: Array<ManaChangedLog>;
+
+	constructor(params: SimLogParams, manaBefore: number, manaAfter: number, logs: Array<ManaChangedLog>) {
+		super(params);
+		this.manaBefore = manaBefore;
+		this.manaAfter = manaAfter;
+		this.logs = logs;
+	}
+
+	toString(): string {
+		return `${this.toStringPrefix()} Mana: ${this.manaBefore.toFixed(1)} --> ${this.manaAfter.toFixed(1)}`;
+	}
+
+	static fromLogs(logs: Array<SimLog>): Array<ManaChangedLogGroup> {
+		const manaChangedLogs = logs.filter((log): log is ManaChangedLog => log.isManaChanged());
+		const groupedLogs = SimLog.groupDuplicateTimestamps(manaChangedLogs);
+		return groupedLogs.map(logGroup => new ManaChangedLogGroup(
+				{
+					raw: '',
+					timestamp: logGroup[0].timestamp,
+					source: logGroup[0].source,
+					target: logGroup[0].target,
+				},
+				logGroup[0].manaBefore,
+				logGroup[logGroup.length - 1].manaAfter,
+				logGroup));
 	}
 }
 
@@ -427,11 +510,11 @@ export class CastBeganLog extends SimLog {
 	}
 
 	toString(): string {
-		return `${this.toStringPrefix()} Casting ${this.castId.name} (Cast time = ${this.castTime.toFixed(2)}s, Mana cost = ${this.manaCost.toFixed(0)}).`;
+		return `${this.toStringPrefix()} Casting ${this.castId.name} (Cast time = ${this.castTime.toFixed(2)}s, Mana cost = ${this.manaCost.toFixed(1)}).`;
 	}
 
 	static parse(params: SimLogParams): Promise<CastBeganLog> | null {
-		const match = params.raw.match(/Casting (.*) \(Current Mana = (\d+), Mana Cost = (\d+), Cast Time = (\d+\.?\d*)s\)/);
+		const match = params.raw.match(/Casting (.*) \(Current Mana = (\d+\.?\d*), Mana Cost = (\d+\.?\d*), Cast Time = (\d+\.?\d*)s\)/);
 		if (match) {
 			return ActionId.fromLogString(match[1]).fill().then(castId => new CastBeganLog(params, castId, parseFloat(match[2]), parseFloat(match[3]), parseFloat(match[4])));
 		} else {

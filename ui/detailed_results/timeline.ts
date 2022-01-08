@@ -1,5 +1,5 @@
 import { SimResult, SimResultFilter } from '/tbc/core/proto_utils/sim_result.js';
-import { maxIndex, sum } from '/tbc/core/utils.js';
+import { distinct, maxIndex, stringComparator, sum } from '/tbc/core/utils.js';
 
 import {
 	DamageDealtLog,
@@ -8,6 +8,7 @@ import {
 	SimLog,
 } from '/tbc/core/proto_utils/logs_parser.js';
 
+import { actionColors } from './color_settings.js';
 import { ResultComponent, ResultComponentConfig, SimResultData } from './result_component.js';
 
 declare var $: any;
@@ -48,26 +49,54 @@ export class Timeline extends ResultComponent {
 		});
 
 		this.dpsResourcesPlotElem = this.rootElem.getElementsByClassName('dps-resources-plot')[0] as HTMLElement;
-
-		this.cooldownsPlotElem = this.rootElem.getElementsByClassName('cooldowns-plot')[0] as HTMLElement;
-		this.cooldownsPlot = new ApexCharts(this.cooldownsPlotElem, {
+		this.dpsResourcesPlot = new ApexCharts(this.dpsResourcesPlotElem, {
 			chart: {
-				type: 'rangeBar',
+				type: 'line',
 				foreColor: 'white',
-				id: 'cooldowns',
+				id: 'dpsResources',
 				animations: {
 					enabled: false,
 				},
-				height: '50%',
+				height: '100%',
 			},
+			colors: [
+				dpsColor,
+				manaColor,
+			],
 			series: [], // Set dynamically
+			xaxis: {
+				title: {
+					text: 'Time (s)',
+				},
+				type: 'datetime',
+			},
+			yaxis: {
+			},
 			noData: {
 				text: 'Waiting for data...',
 			},
+			stroke: {
+				width: 2,
+				curve: 'straight',
+			},
 		});
 
-		//this.dpsResourcesPlot.render();
-		//this.cooldownsPlot.render();
+		this.cooldownsPlotElem = this.rootElem.getElementsByClassName('cooldowns-plot')[0] as HTMLElement;
+		//this.cooldownsPlot = new ApexCharts(this.cooldownsPlotElem, {
+		//	chart: {
+		//		type: 'rangeBar',
+		//		foreColor: 'white',
+		//		id: 'cooldowns',
+		//		animations: {
+		//			enabled: false,
+		//		},
+		//		height: '50%',
+		//	},
+		//	series: [], // Set dynamically
+		//	noData: {
+		//		text: 'Waiting for data...',
+		//	},
+		//});
 	}
 
 	onSimResult(resultData: SimResultData) {
@@ -85,56 +114,35 @@ export class Timeline extends ResultComponent {
 
 		const duration = this.resultData!.result.request.encounter!.duration || 1;
 
-		let manaLogsToShow = player.manaChangedLogs;
-		let dpsLogsToShow = player.dpsLogs;
-		if (manaLogsToShow.length == 0) {
+		let manaLogs = player.manaChangedLogs;
+		let dpsLogs = player.dpsLogs;
+		let mcdLogs = player.majorCooldownLogs;
+		let mcdAuraLogs = player.majorCooldownAuraUptimeLogs;
+		if (manaLogs.length == 0) {
 			return;
 		}
-		const maxMana = manaLogsToShow[0].manaBefore;
+		const maxMana = manaLogs[0].manaBefore;
 
-		manaLogsToShow = SimLog.filterDuplicateTimestamps(manaLogsToShow);
-		dpsLogsToShow = SimLog.filterDuplicateTimestamps(dpsLogsToShow);
-
-		const maxDps = dpsLogsToShow[maxIndex(dpsLogsToShow.map(l => l.dps))!].dps;
+		const maxDps = dpsLogs[maxIndex(dpsLogs.map(l => l.dps))!].dps;
 		const dpsAxisMax = (Math.floor(maxDps / 100) + 1) * 100;
 
-		this.dpsResourcesPlot = new ApexCharts(this.dpsResourcesPlotElem, {
-		//	chart: {
-		//		type: 'line',
-		//		foreColor: 'white',
-		//		id: 'dpsResources',
-		//		animations: {
-		//			enabled: false,
-		//		},
-		//		height: '50%',
-		//	},
-		//	series: [], // Set dynamically
-		//	xaxis: {
-		//		title: {
-		//			text: 'Time (s)',
-		//		},
-		//		type: 'datetime',
-		//	},
-		//	yaxis: {
-		//	},
-		//	noData: {
-		//		text: 'Waiting for data...',
-		//	},
-		//	stroke: {
-		//		width: 2,
-		//		curve: 'straight',
-		//	},
-		//});
-		//this.dpsResourcesPlot.updateOptions({
-			colors: [
-				dpsColor,
-				manaColor,
-			],
+		// Figure out how much to vertically offset cooldown icons, for cooldowns
+		// used very close to each other. This is so the icons don't overlap.
+		const MAX_ALLOWED_DIST = 10;
+		const cooldownIconOffsets = mcdLogs.map((mcdLog, mcdIdx) => mcdLogs.filter((cdLog, cdIdx) => (cdIdx < mcdIdx) && (cdLog.timestamp > mcdLog.timestamp - MAX_ALLOWED_DIST)).length);
+
+		const distinctMcdAuras = distinct(mcdAuraLogs, (a, b) => a.aura.equalsIgnoringTag(b.aura));
+		// Sort by name so auras keep their same colors even if timings change.
+		distinctMcdAuras.sort((a, b) => stringComparator(a.aura.name, b.aura.name));
+		const mcdAuraColors = mcdAuraLogs.map(mcdAuraLog => actionColors[distinctMcdAuras.findIndex(dAura => dAura.aura.equalsIgnoringTag(mcdAuraLog.aura))]);
+
+		//this.dpsResourcesPlot = new ApexCharts(this.dpsResourcesPlotElem, {
+		this.dpsResourcesPlot.updateOptions({
 			series: [
 				{
 					name: 'DPS',
 					type: 'line',
-					data: dpsLogsToShow.map(log => {
+					data: dpsLogs.map(log => {
 						return {
 							x: this.toDatetime(log.timestamp),
 							y: log.dps,
@@ -144,7 +152,7 @@ export class Timeline extends ResultComponent {
 				{
 					name: 'Mana',
 					type: 'line',
-					data: manaLogsToShow.map(log => {
+					data: manaLogs.map(log => {
 						return {
 							x: this.toDatetime(log.timestamp),
 							y: log.manaAfter,
@@ -227,8 +235,130 @@ export class Timeline extends ResultComponent {
 					},
 				},
 			],
+			annotations: {
+				position: 'back',
+				xaxis: mcdAuraLogs.map((log, i) => {
+					return {
+						x: this.toDatetime(log.gainedAt).getTime(),
+						x2: this.toDatetime(log.fadedAt).getTime(),
+						fillColor: mcdAuraColors[i],
+					};
+				}),
+				points: mcdLogs.map((log, i) => {
+					return {
+						x: this.toDatetime(log.timestamp).getTime(),
+						y: 0,
+						image: {
+							path: log.cooldownId.iconUrl,
+							width: 20,
+							height: 20,
+							offsetY: cooldownIconOffsets[i] * -25,
+						},
+					};
+				}),
+			},
 			tooltip: {
 				enabled: true,
+				custom: (data: {series: any, seriesIndex: number, dataPointIndex: number, w: any}) => {
+					if (data.seriesIndex == 0) {
+						// DPS
+						const log = dpsLogs[data.dataPointIndex];
+						return `<div class="timeline-tooltip dps">
+							<div class="timeline-tooltip-header">
+								<span class="bold">${log.timestamp.toFixed(2)}s</span>
+							</div>
+							<div class="timeline-tooltip-body">
+								<ul class="timeline-dps-events">
+									${log.damageLogs.map(damageLog => {
+										let iconElem = '';
+										if (damageLog.cause.iconUrl) {
+											iconElem = `<img class="timeline-tooltip-icon" src="${damageLog.cause.iconUrl}">`;
+										}
+										return `
+										<li>
+											${iconElem}
+											<span>${damageLog.cause.name}:</span>
+											<span class="series-color">${damageLog.resultString()}</span>
+										</li>`;
+									}).join('')}
+								</ul>
+								<div class="timeline-tooltip-body-row">
+									<span class="series-color">DPS: ${log.dps.toFixed(2)}</span>
+								</div>
+							</div>
+							${log.activeAuras.length == 0 ? '' : `
+								<div class="timeline-tooltip-auras">
+									<div class="timeline-tooltip-body-row">
+										<span class="bold">Active Auras</span>
+									</div>
+									<ul class="timeline-active-auras">
+										${log.activeAuras.map(auraLog => {
+											let iconElem = '';
+											if (auraLog.aura.iconUrl) {
+												iconElem = `<img class="timeline-tooltip-icon" src="${auraLog.aura.iconUrl}">`;
+											}
+											return `
+											<li>
+												${iconElem}
+												<span>${auraLog.aura.name}</span>
+											</li>`;
+										}).join('')}
+									</ul>
+								</div>`
+							}
+						</div>`;
+					} else if (data.seriesIndex == 1) {
+						// Mana
+						const log = manaLogs[data.dataPointIndex];
+						return `<div class="timeline-tooltip mana">
+							<div class="timeline-tooltip-header">
+								<span class="bold">${log.timestamp.toFixed(2)}s</span>
+							</div>
+							<div class="timeline-tooltip-body">
+								<div class="timeline-tooltip-body-row">
+									<span class="series-color">Before: ${log.manaBefore.toFixed(1)} (${(log.manaBefore/maxMana*100).toFixed(0)}%)</span>
+								</div>
+								<ul class="timeline-mana-events">
+									${log.logs.map(manaChangedLog => {
+										let iconElem = '';
+										if (manaChangedLog.cause.iconUrl) {
+											iconElem = `<img class="timeline-tooltip-icon" src="${manaChangedLog.cause.iconUrl}">`;
+										}
+										return `
+										<li>
+											${iconElem}
+											<span>${manaChangedLog.cause.name}:</span>
+											<span class="series-color">${manaChangedLog.resultString()}</span>
+										</li>`;
+									}).join('')}
+								</ul>
+								<div class="timeline-tooltip-body-row">
+									<span class="series-color">After: ${log.manaAfter.toFixed(1)} (${(log.manaAfter/maxMana*100).toFixed(0)}%)</span>
+								</div>
+							</div>
+							${log.activeAuras.length == 0 ? '' : `
+								<div class="timeline-tooltip-auras">
+									<div class="timeline-tooltip-body-row">
+										<span class="bold">Active Auras</span>
+									</div>
+									<ul class="timeline-active-auras">
+										${log.activeAuras.map(auraLog => {
+											let iconElem = '';
+											if (auraLog.aura.iconUrl) {
+												iconElem = `<img class="timeline-tooltip-icon" src="${auraLog.aura.iconUrl}">`;
+											}
+											return `
+											<li>
+												${iconElem}
+												<span>${auraLog.aura.name}</span>
+											</li>`;
+										}).join('')}
+									</ul>
+								</div>`
+							}
+						</div>`;
+					}
+				}
 			},
 			chart: {
 				events: {
@@ -241,65 +371,8 @@ export class Timeline extends ResultComponent {
 						};
 					},
 				},
-				type: 'line',
-				foreColor: 'white',
-				id: 'dpsResources',
-				animations: {
-					enabled: false,
-				},
-				height: '50%',
-			},
-			annotations: {
-				position: 'back',
-				xaxis: [
-					{
-						x: this.toDatetime(20).getTime(),
-						x2: this.toDatetime(60).getTime(),
-						fillColor: '#B3F7CA',
-					},
-					{
-						x: this.toDatetime(40).getTime(),
-						x2: this.toDatetime(80).getTime(),
-						fillColor: '#ff742e',
-					},
-				],
-				points: [
-					{
-						x: this.toDatetime(60).getTime(),
-						y: 0,
-						image: {
-							path: 'https://wow.zamimg.com/images/wow/icons/medium/spell_nature_starfall.jpg',
-							width: 20,
-							height: 20,
-						},
-					},
-					{
-						x: this.toDatetime(80).getTime(),
-						y: 0,
-						image: {
-							path: 'https://wow.zamimg.com/images/wow/icons/medium/spell_nature_starfall.jpg',
-							width: 20,
-							height: 20,
-						},
-					},
-					{
-						x: this.toDatetime(80).getTime(),
-						y: 0,
-						image: {
-							path: 'https://wow.zamimg.com/images/wow/icons/medium/ability_racial_bearform.jpg',
-							width: 20,
-							height: 20,
-							offsetY: -25,
-						},
-					},
-				],
-			},
-			stroke: {
-				width: 2,
-				curve: 'straight',
 			},
 		});
-		this.dpsResourcesPlot.render();
 
 		//this.cooldownsPlot.updateOptions({
 		//	series: [
@@ -406,41 +479,12 @@ export class Timeline extends ResultComponent {
 
 	render() {
 		setTimeout(() => {
-			//this.dpsResourcesPlot = new ApexCharts(this.dpsResourcesPlotElem, {
-			//	chart: {
-			//		type: 'line',
-			//		foreColor: 'white',
-			//		id: 'dpsResources',
-			//		animations: {
-			//			enabled: false,
-			//		},
-			//		height: '50%',
-			//	},
-			//	series: [], // Set dynamically
-			//	xaxis: {
-			//		title: {
-			//			text: 'Time (s)',
-			//		},
-			//		type: 'datetime',
-			//	},
-			//	yaxis: {
-			//	},
-			//	noData: {
-			//		text: 'Waiting for data...',
-			//	},
-			//	stroke: {
-			//		width: 2,
-			//		curve: 'straight',
-			//	},
-			//});
-			//this.dpsResourcesPlot.render();
-			this.cooldownsPlot.render();
+			this.dpsResourcesPlot.render();
+			//this.cooldownsPlot.render();
 		}, 300);
 	}
 
 	private toDatetime(timestamp: number): Date {
-		//return timestamp;
 		return new Date(timestamp * 1000);
-		//return timestamp * 1000;
 	}
 }

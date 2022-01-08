@@ -226,7 +226,7 @@ func (character *Character) SpendMana(sim *Simulation, amount float64, actionID 
 	newMana := character.CurrentMana() - amount
 
 	if sim.Log != nil {
-		character.Log(sim, "Spent %0.1f mana from %s (%0.1f --> %0.1f).", amount, actionID, character.CurrentMana(), newMana)
+		character.Log(sim, "Spent %0.3f mana from %s (%0.3f --> %0.3f).", amount, actionID, character.CurrentMana(), newMana)
 	}
 
 	character.stats[stats.Mana] = newMana
@@ -241,7 +241,7 @@ func (character *Character) AddMana(sim *Simulation, amount float64, actionID Ac
 	newMana := MinFloat(oldMana+amount, character.MaxMana())
 
 	if sim.Log != nil {
-		character.Log(sim, "Gained %0.1f mana from %s (%0.1f --> %0.1f).", amount, actionID, oldMana, newMana)
+		character.Log(sim, "Gained %0.3f mana from %s (%0.3f --> %0.3f).", amount, actionID, oldMana, newMana)
 	}
 
 	character.stats[stats.Mana] = newMana

@@ -303,7 +303,7 @@ func (spellEffect *SpellEffect) String() string {
 		sb.WriteString("Hit")
 	}
 
-	fmt.Fprintf(&sb, " for %0.2f damage", spellEffect.Damage)
+	fmt.Fprintf(&sb, " for %0.3f damage", spellEffect.Damage)
 
 	if spellEffect.PartialResist_1_4 {
 		sb.WriteString(" (25% Resist)")
@@ -323,7 +323,7 @@ func (spellEffect *SpellEffect) DotResultToString(damage float64, hit bool, crit
 
 	var sb strings.Builder
 
-	fmt.Fprintf(&sb, "ticked for %0.2f damage", damage)
+	fmt.Fprintf(&sb, "ticked for %0.3f damage", damage)
 
 	if resistMultiplier == 0.75 {
 		sb.WriteString(" (25% Resist)")

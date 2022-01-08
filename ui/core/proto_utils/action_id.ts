@@ -39,11 +39,14 @@ export class ActionId {
 	}
 
 	equals(other: ActionId): boolean {
+		return this.equalsIgnoringTag(other) && this.tag == other.tag;
+	}
+
+	equalsIgnoringTag(other: ActionId): boolean {
 		return (
 				this.itemId == other.itemId
 				&& this.spellId == other.spellId
-				&& this.otherId == other.otherId
-				&& this.tag == other.tag);
+				&& this.otherId == other.otherId);
 	}
 
 	setBackground(elem: HTMLElement) {

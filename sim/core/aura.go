@@ -605,7 +605,7 @@ func NewICD() InternalCD {
 // Helper for the common case of adding an Aura that gives a temporary stat boost.
 func (character *Character) AddAuraWithTemporaryStats(sim *Simulation, auraID AuraID, actionID ActionID, stat stats.Stat, amount float64, duration time.Duration) {
 	if sim.Log != nil {
-		character.Log(sim, "Gained %0.0f %s from %s.", amount, stat.StatName(), actionID)
+		character.Log(sim, "Gained %0.02f %s from %s.", amount, stat.StatName(), actionID)
 	}
 	if stat == stats.MeleeHaste {
 		character.AddMeleeHaste(sim, amount)
@@ -619,7 +619,7 @@ func (character *Character) AddAuraWithTemporaryStats(sim *Simulation, auraID Au
 		Expires:  sim.CurrentTime + duration,
 		OnExpire: func(sim *Simulation) {
 			if sim.Log != nil {
-				character.Log(sim, "Lost %0.0f %s from fading %s.", amount, stat.StatName(), actionID)
+				character.Log(sim, "Lost %0.02f %s from fading %s.", amount, stat.StatName(), actionID)
 			}
 			if stat == stats.MeleeHaste {
 				character.AddMeleeHaste(sim, -amount)

@@ -27,7 +27,8 @@ import {
 	DamageDealtLog,
 	DpsLog,
 	Entity,
-	ManaChangedLog,
+	MajorCooldownUsedLog,
+	ManaChangedLogGroup,
 	SimLog,
 } from './logs_parser.js';
 
@@ -225,9 +226,14 @@ export class PlayerMetrics {
 
 	readonly logs: Array<SimLog>;
 	readonly damageDealtLogs: Array<DamageDealtLog>;
-	readonly manaChangedLogs: Array<ManaChangedLog>;
+	readonly manaChangedLogs: Array<ManaChangedLogGroup>;
 	readonly dpsLogs: Array<DpsLog>;
 	readonly auraUptimeLogs: Array<AuraUptimeLog>;
+	readonly majorCooldownLogs: Array<MajorCooldownUsedLog>;
+
+	// Aura uptime logs, filtered to include only auras that correspond to a
+	// major cooldown.
+	readonly majorCooldownAuraUptimeLogs: Array<AuraUptimeLog>;
 
 	private constructor(
 			player: PlayerProto,
@@ -258,10 +264,16 @@ export class PlayerMetrics {
 		this.duration = duration;
 
 		this.damageDealtLogs = this.logs.filter((log): log is DamageDealtLog => log.isDamageDealt());
-		this.manaChangedLogs = this.logs.filter((log): log is ManaChangedLog => log.isManaChanged());
+		this.dpsLogs = DpsLog.fromLogs(this.damageDealtLogs);
 
-		this.dpsLogs = DpsLog.fromDamageDealt(this.damageDealtLogs);
 		this.auraUptimeLogs = AuraUptimeLog.fromLogs(this.logs, new Entity(this.name, '', this.raidIndex, false, this.isPet));
+		this.majorCooldownLogs = this.logs.filter((log): log is MajorCooldownUsedLog => log.isMajorCooldownUsed());
+
+		this.manaChangedLogs = ManaChangedLogGroup.fromLogs(this.logs);
+		AuraUptimeLog.populateActiveAuras(this.dpsLogs, this.auraUptimeLogs);
+		AuraUptimeLog.populateActiveAuras(this.manaChangedLogs, this.auraUptimeLogs);
+
+		this.majorCooldownAuraUptimeLogs = this.auraUptimeLogs.filter(auraLog => this.majorCooldownLogs.find(mcdLog => mcdLog.cooldownId.equals(auraLog.aura)));
 	}
 
 	get label() {
