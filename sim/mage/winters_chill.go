@@ -12,7 +12,6 @@ func (mage *Mage) newWintersChillTemplate(sim *core.Simulation) core.SimpleSpell
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				Name:        "Winters Chill",
 				SpellSchool: stats.FrostSpellPower,
 				Character:   &mage.Character,
 				ActionID: core.ActionID{

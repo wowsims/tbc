@@ -12,6 +12,7 @@ import (
 const SpellIDShadowfiend int32 = 34433
 
 var ShadowfiendCD = core.NewCooldownID()
+var ShadowfiendActionID = core.ActionID{SpellID: SpellIDShadowfiend, CooldownID: ShadowfiendCD}
 
 func (priest *Priest) registerShadowfiendCD() {
 	if !priest.UseShadowfiend {
@@ -19,7 +20,7 @@ func (priest *Priest) registerShadowfiendCD() {
 	}
 
 	priest.AddMajorCooldown(core.MajorCooldown{
-		ActionID:   core.ActionID{SpellID: SpellIDShadowfiend},
+		ActionID:   ShadowfiendActionID,
 		CooldownID: ShadowfiendCD,
 		Cooldown:   time.Minute * 5,
 		CanActivate: func(sim *core.Simulation, character *core.Character) bool {
@@ -50,7 +51,6 @@ func (priest *Priest) registerShadowfiendCD() {
 
 func (priest *Priest) newShadowfiendTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
 	baseCast := core.Cast{
-		Name:           "Shadowfiend",
 		CritMultiplier: 1.5,
 		SpellSchool:    stats.ShadowSpellPower,
 		Character:      &priest.Character,
@@ -58,10 +58,7 @@ func (priest *Priest) newShadowfiendTemplate(sim *core.Simulation) core.SimpleSp
 		ManaCost:       575,
 		CastTime:       0,
 		Cooldown:       time.Minute * 5,
-		ActionID: core.ActionID{
-			SpellID:    SpellIDShadowfiend,
-			CooldownID: ShadowfiendCD,
-		},
+		ActionID:       ShadowfiendActionID,
 	}
 
 	// Dmg over 15 sec = shadow_dmg*.6 + 1191
@@ -78,7 +75,7 @@ func (priest *Priest) newShadowfiendTemplate(sim *core.Simulation) core.SimpleSp
 			TickSpellCoefficient: 0.06,
 			OnPeriodicDamage: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect, tickDamage float64) {
 				// TODO: This should also do something with ExpectedBonusMana
-				priest.AddMana(sim, tickDamage*2.5, "Shadowfiend", false)
+				priest.AddMana(sim, tickDamage*2.5, ShadowfiendActionID, false)
 			},
 		},
 	}

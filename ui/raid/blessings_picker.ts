@@ -6,6 +6,7 @@ import { Spec } from '/tbc/core/proto/common.js';
 import { Blessings } from '/tbc/core/proto/ui.js';
 import { BlessingsAssignment } from '/tbc/core/proto/ui.js';
 import { BlessingsAssignments } from '/tbc/core/proto/ui.js';
+import { ActionId } from '/tbc/core/proto_utils/action_id.js';
 import {
 	makeDefaultBlessings,
 	classColors,
@@ -94,10 +95,10 @@ export class BlessingsPicker extends Component {
 					numColumns: 1,
 					values: [
 						{ color: classColors[Class.ClassPaladin], value: Blessings.BlessingUnknown },
-						{ actionId: { id: { spellId: 25898 }}, value: Blessings.BlessingOfKings },
-						{ actionId: { id: { spellId: 25895 }}, value: Blessings.BlessingOfSalvation },
-						{ actionId: { id: { spellId: 27141 }}, value: Blessings.BlessingOfMight },
-						{ actionId: { id: { spellId: 27143 }}, value: Blessings.BlessingOfWisdom },
+						{ actionId: ActionId.fromSpellId(25898), value: Blessings.BlessingOfKings },
+						{ actionId: ActionId.fromSpellId(25895), value: Blessings.BlessingOfSalvation },
+						{ actionId: ActionId.fromSpellId(27141), value: Blessings.BlessingOfMight },
+						{ actionId: ActionId.fromSpellId(27143), value: Blessings.BlessingOfWisdom },
 					],
 					equals: (a: Blessings, b: Blessings) => a == b,
 					zeroValue: Blessings.BlessingUnknown,

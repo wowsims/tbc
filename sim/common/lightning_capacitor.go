@@ -25,8 +25,7 @@ func ApplyTheLightningCapacitor(agent core.Agent) {
 		icd := core.NewICD()
 
 		return core.Aura{
-			ID:   TheLightningCapacitorAuraID,
-			Name: "The Lightning Capacitor",
+			ID: TheLightningCapacitorAuraID,
 			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 				if icd.IsOnCD(sim) {
 					return
@@ -57,7 +56,6 @@ func newLightningCapacitorCastTemplate(sim *core.Simulation, character *core.Cha
 	return core.NewSimpleSpellTemplate(core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				Name: "Lightning Capacitor",
 				ActionID: core.ActionID{
 					ItemID: core.ItemIDTheLightningCapacitor,
 				},

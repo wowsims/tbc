@@ -1,6 +1,4 @@
-import { ItemOrSpellId } from '/tbc/core/proto_utils/action_id.js';
-import { getIconUrl } from '/tbc/core/resources.js';
-import { setWowheadHref } from '/tbc/core/resources.js';
+import { ActionId } from '/tbc/core/proto_utils/action_id.js';
 import { EventID, TypedEvent } from '/tbc/core/typed_event.js';
 import { isRightClick } from '/tbc/core/utils.js';
 
@@ -13,14 +11,14 @@ import { Input, InputConfig } from './input.js';
 // ModObject is the object being modified (Sim, Player, or Target).
 // ValueType is either number or boolean.
 export interface IconPickerConfig<ModObject, ValueType> extends InputConfig<ModObject, ValueType> {
-  id: ItemOrSpellId;
+  id: ActionId;
   
   // The number of possible 'states' this icon can have. Most inputs will use 2
   // for a bi-state icon (on or off). 0 indicates an unlimited number of states.
   states: number;
 
   // Only used if states == 3.
-  improvedId?: ItemOrSpellId;
+  improvedId?: ActionId;
 };
 
 // Icon-based UI for picking buffs / consumes / etc
@@ -54,17 +52,11 @@ export class IconPicker<ModObject, ValueType> extends Input<ModObject, ValueType
     this.improvedAnchor = this.rootAnchor.getElementsByClassName('icon-input-improved')[0] as HTMLAnchorElement;
     this.counterElem = this.rootAnchor.getElementsByClassName('icon-input-counter')[0] as HTMLElement;
 
-    setWowheadHref(this.rootAnchor, this.config.id);
-    getIconUrl(this.config.id).then(url => {
-      this.rootAnchor.style.backgroundImage = `url('${url}')`;
-    });
+		this.config.id.fillAndSet(this.rootAnchor, true, true);
 
     if (this.config.states == 3) {
       if (this.config.improvedId) {
-        setWowheadHref(this.improvedAnchor, this.config.improvedId);
-        getIconUrl(this.config.improvedId).then(url => {
-          this.improvedAnchor.style.backgroundImage = `url('${url}')`;
-        });
+				this.config.improvedId.fillAndSet(this.improvedAnchor, true, true);
       } else {
         throw new Error('IconInput missing improved icon id');
       }

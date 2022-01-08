@@ -42,15 +42,14 @@ var ItemSetAvatar = core.ItemSet{
 			character := agent.GetCharacter()
 			character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 				return core.Aura{
-					ID:   Avatar2PcAuraID,
-					Name: "Avatar 2pc Bonus",
+					ID: Avatar2PcAuraID,
 					OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
 						if sim.RandomFloat("avatar 2p") > 0.06 {
 							return
 						}
 						// This is a cheat...
 						// easier than adding another aura the subtracts 150 mana from next cast.
-						character.AddMana(sim, 150, "Avatar 2p Bonus", false)
+						character.AddMana(sim, 150, core.ActionID{SpellID: 37600}, false)
 					},
 				}
 			})
@@ -59,8 +58,7 @@ var ItemSetAvatar = core.ItemSet{
 			character := agent.GetCharacter()
 			character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 				return core.Aura{
-					ID:   Avatar4PcAuraID,
-					Name: "Avatar 4pc Bonus",
+					ID: Avatar4PcAuraID,
 					OnPeriodicDamage: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect, tickDamage float64) {
 						if spellCast.ActionID.SpellID != SpellIDShadowWordPain {
 							return
@@ -71,9 +69,9 @@ var ItemSetAvatar = core.ItemSet{
 						}
 
 						character.AddAura(sim, core.Aura{
-							ID:      SadistAuraID,
-							Name:    "Sadist",
-							Expires: sim.CurrentTime + time.Second*15,
+							ID:       SadistAuraID,
+							ActionID: core.ActionID{SpellID: 37604},
+							Expires:  sim.CurrentTime + time.Second*15,
 							OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 								spellEffect.BonusSpellPower += 100
 								character.RemoveAura(sim, SadistAuraID)
@@ -113,8 +111,7 @@ func ApplyAshtongueTalismanOfAcumen(agent core.Agent) {
 	char := agent.GetCharacter()
 	char.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		return core.Aura{
-			ID:   AshtongueTalismanOfAcumenItemAuraID,
-			Name: "Ashtongue Talisman of Acumen",
+			ID: AshtongueTalismanOfAcumenItemAuraID,
 			OnPeriodicDamage: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect, tickDamage float64) {
 				if spellCast.ActionID.SpellID != SpellIDShadowWordPain {
 					return
@@ -124,7 +121,7 @@ func ApplyAshtongueTalismanOfAcumen(agent core.Agent) {
 					return
 				}
 
-				char.AddAuraWithTemporaryStats(sim, AshtongueTalismanOfAcumenAuraID, 40438, "Ashtongue Talisman of Acumen", stats.SpellPower, spellBonus, dur)
+				char.AddAuraWithTemporaryStats(sim, AshtongueTalismanOfAcumenAuraID, core.ActionID{ItemID: 32490}, stats.SpellPower, spellBonus, dur)
 			},
 		}
 	})

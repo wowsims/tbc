@@ -1,5 +1,8 @@
 @import "../core/shared";
 
+$dps-color: #ed5653;
+$mana-color: #2E93fA;
+
 .timeline-root {
 }
 
@@ -21,7 +24,7 @@
 	cursor: pointer;
 }
 
-.timeline-plot {
+.timeline-plots-container {
 	margin: 5px;
 	margin-top: 15px;
 	height: 70vh;
@@ -29,4 +32,66 @@
 
 .timeline-plot > div {
 	margin: auto;
+}
+
+.dps-resources-plot {
+}
+
+.cooldowns-plot {
+	display: none;
+}
+
+.timeline-tooltip {
+	padding: 3px;
+}
+
+.timeline-tooltip-header {
+	border-bottom: 1px solid black;
+	margin-bottom: 5px;
+}
+
+.timeline-tooltip-body-row {
+	display: flex;
+	align-items: center;
+}
+
+.timeline-tooltip-icon {
+	width: 20px;
+	height: 20px;
+}
+
+.timeline-tooltip ul { // Remove default bullets
+	list-style: none;
+	padding-left: 1em;
+}
+.timeline-tooltip ul li::before { // Add our own bullets (so we can have separate color).
+	content: "\2022";
+	font-weight: bold;
+	font-size: 16px;
+	display: inline-block;
+	width: 1em;
+	margin-left: -1em;
+}
+.timeline-tooltip.dps ul li::before {
+	color: $dps-color;
+}
+.timeline-tooltip.mana ul li::before {
+	color: $mana-color;
+}
+
+.timeline-tooltip.dps .series-color {
+	font-weight: bold;
+	color: $dps-color;
+}
+.timeline-tooltip.mana .series-color {
+	font-weight: bold;
+	color: $mana-color;
+}
+
+.timeline-tooltip-auras {
+	border-top: 1px solid black;
+	margin-top: 5px;
+}
+.timeline-tooltip-auras ul li::before {
+	color: black;
 }

@@ -184,6 +184,10 @@ $sim-transitions: .2s ease-in;
 	color: red !important;
 }
 
+.bold {
+	font-weight: bold;
+}
+
 .sim-button {
 	color: var(--main-text-color);
 	background-color: var(--theme-color-primary);

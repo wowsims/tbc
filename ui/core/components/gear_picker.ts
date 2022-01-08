@@ -8,12 +8,8 @@ import { Item } from '/tbc/core/proto/common.js';
 import { ItemQuality } from '/tbc/core/proto/common.js';
 import { ItemSlot } from '/tbc/core/proto/common.js';
 import { enchantDescriptions } from '/tbc/core/constants/enchants.js';
+import { ActionId } from '/tbc/core/proto_utils/action_id.js';
 import { slotNames } from '/tbc/core/proto_utils/names.js';
-import { getEmptySlotIconUrl } from '/tbc/core/resources.js';
-import { getIconUrl } from '/tbc/core/resources.js';
-import { getItemIconUrl } from '/tbc/core/resources.js';
-import { setWowheadHref } from '/tbc/core/resources.js';
-import { setWowheadItemHref } from '/tbc/core/resources.js';
 import { setItemQualityCssClass } from '/tbc/core/css_utils.js';
 import { Player } from '/tbc/core/player.js';
 import { EventID, TypedEvent } from '/tbc/core/typed_event.js';
@@ -129,8 +125,6 @@ class ItemPicker extends Component {
     setItemQualityCssClass(this.nameElem, null);
 
     this.enchantElem.textContent = '';
-    //this.enchantElem.removeAttribute('data-wowhead');
-    //this.enchantElem.removeAttribute('href');
     this.socketsContainerElem.innerHTML = '';
 
     if (newItem != null) {
@@ -138,14 +132,10 @@ class ItemPicker extends Component {
       setItemQualityCssClass(this.nameElem, newItem.item.quality);
 
       this.player.setWowheadData(newItem, this.iconElem);
-      setWowheadItemHref(this.iconElem, newItem.item);
-      getItemIconUrl(newItem.item).then(url => {
-        this.iconElem.style.backgroundImage = `url('${url}')`;
-      });
+			newItem.asActionId().fillAndSet(this.iconElem, true, true);
 
       if (newItem.enchant) {
         this.enchantElem.textContent = enchantDescriptions.get(newItem.enchant.id) || newItem.enchant.name;
-        //this.enchantElem.setAttribute('href', 'https://tbc.wowhead.com/item=' + newItem.enchant.id);
       }
 
       newItem.item.gemSockets.forEach((socketColor, gemIdx) => {
@@ -155,9 +145,9 @@ class ItemPicker extends Component {
         if (newItem.gems[gemIdx] == null) {
           gemIconElem.src = getEmptyGemSocketIconUrl(socketColor);
         } else {
-          getIconUrl({itemId: newItem.gems[gemIdx]!.id}).then(url => {
-            gemIconElem.src = url;
-          });
+					ActionId.fromItemId(newItem.gems[gemIdx]!.id).fill().then(filledId => {
+            gemIconElem.src = filledId.iconUrl;
+					});
         }
         this.socketsContainerElem.appendChild(gemIconElem);
       });
@@ -208,8 +198,7 @@ class SelectorModal extends Component {
         item => {
           return {
             id: item.id,
-            wowheadId: getWowheadItemId(item),
-						wowheadIdIsSpell: false,
+            actionId: ActionId.fromItem(item),
             name: item.name,
             quality: item.quality,
 						phase: item.phase,
@@ -237,8 +226,7 @@ class SelectorModal extends Component {
         enchant => {
           return {
             id: enchant.id,
-						wowheadId: enchant.id,
-						wowheadIdIsSpell: enchant.isSpellId,
+						actionId: enchant.isSpellId ? ActionId.fromSpellId(enchant.id) : ActionId.fromItemId(enchant.id),
             name: enchant.name,
             quality: enchant.quality,
 						phase: 1,
@@ -277,8 +265,7 @@ class SelectorModal extends Component {
           gem => {
             return {
               id: gem.id,
-							wowheadId: gem.id,
-							wowheadIdIsSpell: false,
+							actionId: ActionId.fromItemId(gem.id),
               name: gem.name,
               quality: gem.quality,
 							phase: gem.phase,
@@ -301,15 +288,15 @@ class SelectorModal extends Component {
 						const updateGemIcon = () => {
 							const equippedItem = this.player.getEquippedItem(slot);
 							const gem = equippedItem?.gems[socketIdx];
-							if (!gem) {
+
+							if (gem) {
+								ActionId.fromItemId(gem.id).fill().then(filledId => {
+									tabAnchor.style.backgroundImage = `url('${filledId.iconUrl}')`;
+								});
+							} else {
 								const url = getEmptyGemSocketIconUrl(socketColor);
 								tabAnchor.style.backgroundImage = `url('${url}')`;
-								return;
 							}
-
-							getIconUrl({itemId: gem.id}).then(url => {
-								tabAnchor.style.backgroundImage = `url('${url}')`;
-							});
 						};
 
 						this.player.gearChangeEmitter.on(updateGemIcon);
@@ -333,8 +320,7 @@ class SelectorModal extends Component {
         equippedToItemFn: (equippedItem: EquippedItem | null) => (T | null | undefined),
         getItemData: (item: T) => {
           id: number,
-          wowheadId: number,
-          wowheadIdIsSpell: boolean,
+          actionId: ActionId,
           name: string,
           quality: ItemQuality,
 					phase: number,
@@ -412,15 +398,12 @@ class SelectorModal extends Component {
 
       const iconElem = listItemElem.getElementsByClassName('selector-modal-list-item-icon')[0] as HTMLImageElement;
 
-			const actionId = itemData.wowheadIdIsSpell
-					? { spellId: itemData.wowheadId }
-					: { itemId: itemData.wowheadId };
 		
-      setWowheadHref(listItemElem.children[0] as HTMLAnchorElement, actionId);
-      setWowheadHref(listItemElem.children[1] as HTMLAnchorElement, actionId);
-      getIconUrl(actionId).then(url => {
-        iconElem.style.backgroundImage = `url('${url}')`;
-      });
+			itemData.actionId.fill().then(filledId => {
+				filledId.setWowheadHref(listItemElem.children[0] as HTMLAnchorElement);
+				filledId.setWowheadHref(listItemElem.children[1] as HTMLAnchorElement);
+				iconElem.style.backgroundImage = `url('${filledId.iconUrl}')`;
+			});
 
       const nameElem = listItemElem.getElementsByClassName('selector-modal-list-item-name')[0] as HTMLImageElement;
       setItemQualityCssClass(nameElem, itemData.quality);
@@ -537,4 +520,27 @@ class SelectorModal extends Component {
     tabElems.forEach(elem => elem.parentElement.remove());
     contentElems.forEach(elem => elem!.remove());
   }
+}
+
+const emptySlotIcons: Record<ItemSlot, string> = {
+  [ItemSlot.ItemSlotHead]: 'https://cdn.seventyupgrades.com/item-slots/Head.jpg',
+  [ItemSlot.ItemSlotNeck]: 'https://cdn.seventyupgrades.com/item-slots/Neck.jpg',
+  [ItemSlot.ItemSlotShoulder]: 'https://cdn.seventyupgrades.com/item-slots/Shoulders.jpg',
+  [ItemSlot.ItemSlotBack]: 'https://cdn.seventyupgrades.com/item-slots/Back.jpg',
+  [ItemSlot.ItemSlotChest]: 'https://cdn.seventyupgrades.com/item-slots/Chest.jpg',
+  [ItemSlot.ItemSlotWrist]: 'https://cdn.seventyupgrades.com/item-slots/Wrists.jpg',
+  [ItemSlot.ItemSlotHands]: 'https://cdn.seventyupgrades.com/item-slots/Hands.jpg',
+  [ItemSlot.ItemSlotWaist]: 'https://cdn.seventyupgrades.com/item-slots/Waist.jpg',
+  [ItemSlot.ItemSlotLegs]: 'https://cdn.seventyupgrades.com/item-slots/Legs.jpg',
+  [ItemSlot.ItemSlotFeet]: 'https://cdn.seventyupgrades.com/item-slots/Feet.jpg',
+  [ItemSlot.ItemSlotFinger1]: 'https://cdn.seventyupgrades.com/item-slots/Finger.jpg',
+  [ItemSlot.ItemSlotFinger2]: 'https://cdn.seventyupgrades.com/item-slots/Finger.jpg',
+  [ItemSlot.ItemSlotTrinket1]: 'https://cdn.seventyupgrades.com/item-slots/Trinket.jpg',
+  [ItemSlot.ItemSlotTrinket2]: 'https://cdn.seventyupgrades.com/item-slots/Trinket.jpg',
+  [ItemSlot.ItemSlotMainHand]: 'https://cdn.seventyupgrades.com/item-slots/MainHand.jpg',
+  [ItemSlot.ItemSlotOffHand]: 'https://cdn.seventyupgrades.com/item-slots/OffHand.jpg',
+  [ItemSlot.ItemSlotRanged]: 'https://cdn.seventyupgrades.com/item-slots/Ranged.jpg',
+};
+export function getEmptySlotIconUrl(slot: ItemSlot): string {
+  return emptySlotIcons[slot];
 }

@@ -115,6 +115,8 @@ var DrumsAuraID = NewAuraID()
 var DrumsCooldownID = NewCooldownID()
 
 const DrumsCD = time.Minute * 2 // Tinnitus
+var DrumsOfBattleActionID = ActionID{SpellID: 35476}
+var DrumsOfRestorationActionID = ActionID{SpellID: 35478}
 
 // Adds drums as a major cooldown to the character, if it's being used.
 func registerDrumsCD(agent Agent, partyBuffs proto.PartyBuffs, consumes proto.Consumes) {
@@ -148,13 +150,13 @@ func registerDrumsCD(agent Agent, partyBuffs proto.PartyBuffs, consumes proto.Co
 	}
 
 	var applyDrums func(sim *Simulation, character *Character)
-	spellID := int32(0)
+	var actionID ActionID
 	if drumsType == proto.Drums_DrumsOfBattle {
 		applyDrums = applyDrumsOfBattle
-		spellID = 35476
+		actionID = DrumsOfBattleActionID
 	} else if drumsType == proto.Drums_DrumsOfRestoration {
 		applyDrums = applyDrumsOfRestoration
-		spellID = 35478
+		actionID = DrumsOfRestorationActionID
 	}
 
 	if applyDrums == nil {
@@ -162,7 +164,7 @@ func registerDrumsCD(agent Agent, partyBuffs proto.PartyBuffs, consumes proto.Co
 	}
 
 	mcd := MajorCooldown{
-		ActionID:   ActionID{SpellID: spellID},
+		ActionID:   actionID,
 		CooldownID: DrumsCooldownID,
 		Cooldown:   DrumsCD,
 		Priority:   CooldownPriorityDrums,
@@ -179,7 +181,7 @@ func registerDrumsCD(agent Agent, partyBuffs proto.PartyBuffs, consumes proto.Co
 					applyDrums(sim, agent.GetCharacter())
 				}
 				// TODO: Do a cast time
-				character.Metrics.AddInstantCast(ActionID{SpellID: spellID})
+				character.Metrics.AddInstantCast(actionID)
 			}
 		}
 	} else {
@@ -196,7 +198,7 @@ func registerDrumsCD(agent Agent, partyBuffs proto.PartyBuffs, consumes proto.Co
 func applyDrumsOfBattle(sim *Simulation, character *Character) {
 	const hasteBonus = 80
 	character.SetCD(DrumsCooldownID, sim.CurrentTime+DrumsCD)
-	character.AddAuraWithTemporaryStats(sim, DrumsAuraID, 35476, "Drums of Battle", stats.SpellHaste, hasteBonus, time.Second*30)
+	character.AddAuraWithTemporaryStats(sim, DrumsAuraID, DrumsOfBattleActionID, stats.SpellHaste, hasteBonus, time.Second*30)
 	// TODO: Add melee haste to drums
 }
 
@@ -204,7 +206,7 @@ func applyDrumsOfRestoration(sim *Simulation, character *Character) {
 	// 600 mana over 15 seconds == 200 mp5
 	const mp5Bonus = 200
 	character.SetCD(DrumsCooldownID, sim.CurrentTime+DrumsCD)
-	character.AddAuraWithTemporaryStats(sim, DrumsAuraID, 35478, "Drums of Restoration", stats.MP5, mp5Bonus, time.Second*15)
+	character.AddAuraWithTemporaryStats(sim, DrumsAuraID, DrumsOfRestorationActionID, stats.MP5, mp5Bonus, time.Second*15)
 }
 
 var PotionAuraID = NewAuraID()
@@ -349,8 +351,9 @@ const AlchStoneItemID = 35749
 
 func makePotionActivation(potionType proto.Potions, character *Character) (MajorCooldown, CooldownActivation) {
 	if potionType == proto.Potions_DestructionPotion {
+		actionID := ActionID{ItemID: 22839}
 		return MajorCooldown{
-				ActionID: ActionID{ItemID: 22839},
+				ActionID: actionID,
 				CanActivate: func(sim *Simulation, character *Character) bool {
 					return true
 				},
@@ -367,10 +370,9 @@ func makePotionActivation(potionType proto.Potions, character *Character) (Major
 				character.AddStat(stats.SpellCrit, critBonus)
 
 				character.AddAura(sim, Aura{
-					ID:      PotionAuraID,
-					SpellID: 28508,
-					Name:    "Destruction Potion",
-					Expires: sim.CurrentTime + dur,
+					ID:       PotionAuraID,
+					ActionID: actionID,
+					Expires:  sim.CurrentTime + dur,
 					OnExpire: func(sim *Simulation) {
 						character.AddStat(stats.SpellPower, -spBonus)
 						character.AddStat(stats.SpellCrit, -critBonus)
@@ -378,12 +380,13 @@ func makePotionActivation(potionType proto.Potions, character *Character) (Major
 				})
 
 				character.SetCD(PotionCooldownID, time.Minute*2+sim.CurrentTime)
-				character.Metrics.AddInstantCast(ActionID{ItemID: 22839})
+				character.Metrics.AddInstantCast(actionID)
 			}
 	} else if potionType == proto.Potions_SuperManaPotion {
 		alchStoneEquipped := character.HasTrinketEquipped(AlchStoneItemID)
+		actionID := ActionID{ItemID: 22832}
 		return MajorCooldown{
-				ActionID: ActionID{ItemID: 22832},
+				ActionID: actionID,
 				CanActivate: func(sim *Simulation, character *Character) bool {
 					return true
 				},
@@ -405,13 +408,14 @@ func makePotionActivation(potionType proto.Potions, character *Character) (Major
 					manaGain *= 1.4
 				}
 
-				character.AddMana(sim, manaGain, "Super Mana Potion", true)
+				character.AddMana(sim, manaGain, actionID, true)
 				character.SetCD(PotionCooldownID, time.Minute*2+sim.CurrentTime)
-				character.Metrics.AddInstantCast(ActionID{ItemID: 22832})
+				character.Metrics.AddInstantCast(actionID)
 			}
 	} else if potionType == proto.Potions_HastePotion {
+		actionID := ActionID{ItemID: 22838}
 		return MajorCooldown{
-				ActionID: ActionID{ItemID: 22838},
+				ActionID: actionID,
 				CanActivate: func(sim *Simulation, character *Character) bool {
 					return true
 				},
@@ -426,17 +430,16 @@ func makePotionActivation(potionType proto.Potions, character *Character) (Major
 				character.AddMeleeHaste(sim, hasteBonus)
 
 				character.AddAura(sim, Aura{
-					ID:      PotionAuraID,
-					SpellID: 28507,
-					Name:    "Haste Potion",
-					Expires: sim.CurrentTime + dur,
+					ID:       PotionAuraID,
+					ActionID: actionID,
+					Expires:  sim.CurrentTime + dur,
 					OnExpire: func(sim *Simulation) {
 						character.AddMeleeHaste(sim, -hasteBonus)
 					},
 				})
 
 				character.SetCD(PotionCooldownID, time.Minute*2+sim.CurrentTime)
-				character.Metrics.AddInstantCast(ActionID{ItemID: 22838})
+				character.Metrics.AddInstantCast(actionID)
 			}
 	} else {
 		return MajorCooldown{}, nil
@@ -496,8 +499,9 @@ func registerConjuredCD(agent Agent, consumes proto.Consumes) {
 
 func makeConjuredActivation(conjuredType proto.Conjured, character *Character) (MajorCooldown, CooldownActivation) {
 	if conjuredType == proto.Conjured_ConjuredDarkRune {
+		actionID := ActionID{ItemID: 20520}
 		return MajorCooldown{
-				ActionID: ActionID{ItemID: 20520},
+				ActionID: actionID,
 				Cooldown: time.Minute * 2,
 				CanActivate: func(sim *Simulation, character *Character) bool {
 					return true
@@ -514,13 +518,14 @@ func makeConjuredActivation(conjuredType proto.Conjured, character *Character) (
 			func(sim *Simulation, character *Character) {
 				// Restores 900 to 1500 mana. (2 Min Cooldown)
 				manaGain := 900 + (sim.RandomFloat("dark rune") * 600)
-				character.AddMana(sim, manaGain, "Dark Rune", true)
+				character.AddMana(sim, manaGain, actionID, true)
 				character.SetCD(ConjuredCooldownID, time.Minute*2+sim.CurrentTime)
-				character.Metrics.AddInstantCast(ActionID{ItemID: 20520})
+				character.Metrics.AddInstantCast(actionID)
 			}
 	} else if conjuredType == proto.Conjured_ConjuredFlameCap {
+		actionID := ActionID{ItemID: 22788}
 		return MajorCooldown{
-				ActionID: ActionID{ItemID: 22788},
+				ActionID: actionID,
 				Cooldown: time.Minute * 3,
 				CanActivate: func(sim *Simulation, character *Character) bool {
 					return true
@@ -533,11 +538,11 @@ func makeConjuredActivation(conjuredType proto.Conjured, character *Character) (
 				const fireBonus = 80
 				const dur = time.Minute * 1
 
-				character.AddAuraWithTemporaryStats(sim, ConjuredAuraID, 28714, "Flame Cap", stats.FireSpellPower, fireBonus, dur)
+				character.AddAuraWithTemporaryStats(sim, ConjuredAuraID, actionID, stats.FireSpellPower, fireBonus, dur)
 				// TODO: Add separate aura for damage proc on melee/ranged swings
 
 				character.SetCD(ConjuredCooldownID, time.Minute*3+sim.CurrentTime)
-				character.Metrics.AddInstantCast(ActionID{ItemID: 22788})
+				character.Metrics.AddInstantCast(actionID)
 			}
 	} else {
 		return MajorCooldown{}, nil

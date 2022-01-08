@@ -105,7 +105,7 @@ func (spellEffect *SpellEffect) triggerSpellProcs(sim *Simulation, spellCast *Sp
 
 func (spellEffect *SpellEffect) afterCalculations(sim *Simulation, spellCast *SpellCast) {
 	if sim.Log != nil && !spellEffect.IgnoreHitCheck {
-		spellCast.Character.Log(sim, "%s %s.", spellCast.Name, spellEffect)
+		spellCast.Character.Log(sim, "%s %s.", spellCast.ActionID, spellEffect)
 	}
 
 	spellEffect.triggerSpellProcs(sim, spellCast)
@@ -203,7 +203,7 @@ func (spellEffect *SpellEffect) applyDot(sim *Simulation, spellCast *SpellCast, 
 	ddInput.damagePerTick = (ddInput.TickBaseDamage + totalSpellPower*ddInput.TickSpellCoefficient) * spellEffect.StaticDamageMultiplier
 
 	pa := &PendingAction{
-		Name:         spellCast.Name,
+		Name:         spellCast.ActionID.String(),
 		NextActionAt: sim.CurrentTime + ddInput.TickLength,
 	}
 
@@ -238,7 +238,7 @@ func (spellEffect *SpellEffect) applyDot(sim *Simulation, spellCast *SpellCast, 
 		}
 
 		if sim.Log != nil {
-			spellCast.Character.Log(sim, "%s %s.", spellCast.Name, spellEffect.DotResultToString(damage, hit, crit, resistMultiplier))
+			spellCast.Character.Log(sim, "%s %s.", spellCast.ActionID, spellEffect.DotResultToString(damage, hit, crit, resistMultiplier))
 		}
 		spellEffect.Damage += damage
 
@@ -281,8 +281,8 @@ func (spellEffect *SpellEffect) applyDot(sim *Simulation, spellCast *SpellCast, 
 		ddInput.finalTickTime = 0
 		spellCast.objectInUse = false
 
-		if ddInput.DebuffID != 0 && ddInput.SpellID != 0 {
-			spellEffect.Target.AddAuraUptime(ddInput.DebuffID, ddInput.SpellID, sim.CurrentTime-ddInput.startTime)
+		if ddInput.DebuffID != 0 {
+			spellEffect.Target.AddAuraUptime(ddInput.DebuffID, spellCast.ActionID, sim.CurrentTime-ddInput.startTime)
 		}
 	}
 
@@ -303,7 +303,7 @@ func (spellEffect *SpellEffect) String() string {
 		sb.WriteString("Hit")
 	}
 
-	fmt.Fprintf(&sb, " for %0.2f damage", spellEffect.Damage)
+	fmt.Fprintf(&sb, " for %0.3f damage", spellEffect.Damage)
 
 	if spellEffect.PartialResist_1_4 {
 		sb.WriteString(" (25% Resist)")
@@ -323,7 +323,7 @@ func (spellEffect *SpellEffect) DotResultToString(damage float64, hit bool, crit
 
 	var sb strings.Builder
 
-	fmt.Fprintf(&sb, "ticked for %0.2f damage", damage)
+	fmt.Fprintf(&sb, "ticked for %0.3f damage", damage)
 
 	if resistMultiplier == 0.75 {
 		sb.WriteString(" (25% Resist)")

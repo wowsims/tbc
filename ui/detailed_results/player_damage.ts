@@ -1,5 +1,4 @@
 import { SimResult, SimResultFilter } from '/tbc/core/proto_utils/sim_result.js';
-import { setWowheadHref } from '/tbc/core/resources.js';
 import { maxIndex } from '/tbc/core/utils.js';
 import { sum } from '/tbc/core/utils.js';
 

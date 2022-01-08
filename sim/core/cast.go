@@ -23,9 +23,6 @@ type Cast struct {
 	// ID for the action.
 	ActionID
 
-	// The name of the cast action, e.g. 'Shadowbolt'.
-	Name string
-
 	// The character performing this action.
 	Character *Character
 
@@ -79,10 +76,6 @@ func (cast *Cast) GetActionID() ActionID {
 	return cast.ActionID
 }
 
-func (cast *Cast) GetName() string {
-	return cast.Name
-}
-
 func (cast *Cast) GetCharacter() *Character {
 	return cast.Character
 }
@@ -121,12 +114,12 @@ func (cast *Cast) init(sim *Simulation) {
 	// By panicking if spell is on CD, we force each sim to properly check for their own CDs.
 	if !cast.IgnoreCooldowns {
 		if cast.Character.IsOnCD(GCDCooldownID, sim.CurrentTime) {
-			panic(fmt.Sprintf("Trying to cast %s but GCD on cooldown for %s", cast.Name, cast.Character.GetRemainingCD(GCDCooldownID, sim.CurrentTime)))
+			panic(fmt.Sprintf("Trying to cast %s but GCD on cooldown for %s", cast.ActionID, cast.Character.GetRemainingCD(GCDCooldownID, sim.CurrentTime)))
 		}
 
 		cooldownID := cast.ActionID.CooldownID
 		if cast.Character.IsOnCD(cooldownID, sim.CurrentTime) {
-			panic(fmt.Sprintf("Trying to cast %s but is still on cooldown for %s", cast.Name, cast.Character.GetRemainingCD(cooldownID, sim.CurrentTime)))
+			panic(fmt.Sprintf("Trying to cast %s but is still on cooldown for %s", cast.ActionID, cast.Character.GetRemainingCD(cooldownID, sim.CurrentTime)))
 		}
 	}
 }
@@ -137,8 +130,8 @@ func (cast *Cast) startCasting(sim *Simulation, onCastComplete OnCastComplete) b
 	if !cast.IgnoreManaCost && cast.ManaCost > 0 {
 		if cast.Character.CurrentMana() < cast.ManaCost {
 			if sim.Log != nil {
-				cast.Character.Log(sim, "Failed casting %s, not enough mana. (Current Mana = %0.0f, Mana Cost = %0.0f)",
-					cast.Name, cast.Character.CurrentMana(), cast.ManaCost)
+				cast.Character.Log(sim, "Failed casting %s, not enough mana. (Current Mana = %0.03f, Mana Cost = %0.03f)",
+					cast.ActionID, cast.Character.CurrentMana(), cast.ManaCost)
 			}
 			cast.objectInUse = false // cast failed and we aren't using it
 			return false
@@ -146,8 +139,8 @@ func (cast *Cast) startCasting(sim *Simulation, onCastComplete OnCastComplete) b
 	}
 
 	if sim.Log != nil {
-		cast.Character.Log(sim, "Casting %s (Current Mana = %0.0f, Mana Cost = %0.0f, Cast Time = %s)",
-			cast.Name, cast.Character.CurrentMana(), cast.ManaCost, cast.CastTime)
+		cast.Character.Log(sim, "Casting %s (Current Mana = %0.03f, Mana Cost = %0.03f, Cast Time = %s)",
+			cast.ActionID, cast.Character.CurrentMana(), cast.ManaCost, cast.CastTime)
 	}
 
 	// For instant-cast spells we can skip creating an aura.
@@ -181,7 +174,7 @@ func (cast *Cast) CalculatedGCD(char *Character) time.Duration {
 // Cast has finished, activate the effects of the cast.
 func (cast *Cast) internalOnComplete(sim *Simulation, onCastComplete OnCastComplete) {
 	if !cast.IgnoreManaCost && cast.ManaCost > 0 {
-		cast.Character.SpendMana(sim, cast.ManaCost, cast.Name)
+		cast.Character.SpendMana(sim, cast.ManaCost, cast.ActionID)
 		cast.Character.PseudoStats.FiveSecondRuleRefreshTime = sim.CurrentTime + time.Second*5
 	}
 

@@ -17,7 +17,6 @@ func (shaman *Shaman) newSearingTotemTemplate(sim *core.Simulation) core.SimpleS
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				Name:           "Searing Totem",
 				CritMultiplier: 1.5,
 				SpellSchool:    stats.FireSpellPower,
 				Character:      &shaman.Character,
@@ -70,7 +69,6 @@ func (shaman *Shaman) newMagmaTotemTemplate(sim *core.Simulation) core.SimpleSpe
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				Name:           "Magma Totem",
 				CritMultiplier: 1.5,
 				SpellSchool:    stats.FireSpellPower,
 				Character:      &shaman.Character,
@@ -125,7 +123,6 @@ func (shaman *Shaman) newNovaTotemTemplate(sim *core.Simulation) core.SimpleSpel
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				Name:           "Fire Nova Totem",
 				CritMultiplier: 1.5,
 				SpellSchool:    stats.FireSpellPower,
 				Character:      &shaman.Character,

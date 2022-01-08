@@ -13,7 +13,6 @@ var SWDCooldownID = core.NewCooldownID()
 
 func (priest *Priest) newShadowWordDeathTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
 	baseCast := core.Cast{
-		Name:           "Shadow Word: Death",
 		CritMultiplier: 1.5,
 		SpellSchool:    stats.ShadowSpellPower,
 		Character:      &priest.Character,

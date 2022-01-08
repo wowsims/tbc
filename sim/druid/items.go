@@ -27,13 +27,12 @@ var ItemSetMalorne = core.ItemSet{
 			character := agent.GetCharacter()
 			character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 				return core.Aura{
-					ID:   Malorne2PcAuraID,
-					Name: "Malorne 2pc Bonus",
+					ID: Malorne2PcAuraID,
 					OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 						if sim.RandomFloat("malorne 2p") > 0.05 {
 							return
 						}
-						spellCast.Character.AddMana(sim, 120, "Malorne 2p Bonus", false)
+						spellCast.Character.AddMana(sim, 120, core.ActionID{SpellID: 37295}, false)
 					},
 				}
 			})
@@ -54,8 +53,7 @@ var ItemSetNordrassil = core.ItemSet{
 			character := agent.GetCharacter()
 			character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 				return core.Aura{
-					ID:   Nordrassil4pAuraID,
-					Name: "Nordrassil 4p Bonus",
+					ID: Nordrassil4pAuraID,
 					OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 						agent, ok := agent.(Agent)
 						if !ok {
@@ -101,15 +99,14 @@ func ApplyLivingRootoftheWildheart(agent core.Agent) {
 	druid := druidAgent.GetDruid()
 	druid.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		return core.Aura{
-			ID:   LivingRootoftheWildheartAuraID,
-			Name: "Living Root of the Wildheart",
+			ID: LivingRootoftheWildheartAuraID,
 			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
 				// technically only works while in moonkin form... but i think we can assume thats always true.
 				if druid.Talents.MoonkinForm {
 					if sim.RandomFloat("Living Root of the Wildheart") > 0.03 {
 						return
 					}
-					druid.AddAuraWithTemporaryStats(sim, LunarBlessingAuraID, 0, "Lunar Blessing", stats.SpellPower, spellBonus, dur)
+					druid.AddAuraWithTemporaryStats(sim, LunarBlessingAuraID, core.ActionID{ItemID: 30664}, stats.SpellPower, spellBonus, dur)
 				}
 			},
 		}
@@ -122,19 +119,19 @@ var LunarGraceAuraID = core.NewAuraID()
 func ApplyIdoloftheUnseenMoon(agent core.Agent) {
 	const spellBonus = 140
 	const dur = time.Second * 10
+	actionID := core.ActionID{ItemID: 33510}
 
 	druidAgent := agent.(Agent)
 	druid := druidAgent.GetDruid()
 	druid.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		return core.Aura{
-			ID:   IdoloftheUnseenMoonAuraID,
-			Name: "Idol of the Unseen Moon",
+			ID: IdoloftheUnseenMoonAuraID,
 			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 				if spellCast.ActionID.SpellID == SpellIDMoonfire {
 					if sim.RandomFloat("Idol of the Unseen Moon") > 0.5 {
 						return
 					}
-					druid.AddAuraWithTemporaryStats(sim, LunarGraceAuraID, 0, "Lunar Blessing", stats.SpellPower, spellBonus, dur)
+					druid.AddAuraWithTemporaryStats(sim, LunarGraceAuraID, actionID, stats.SpellPower, spellBonus, dur)
 				}
 			},
 			OnSpellMiss: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
@@ -142,7 +139,7 @@ func ApplyIdoloftheUnseenMoon(agent core.Agent) {
 					if sim.RandomFloat("Idol of the Unseen Moon") > 0.5 {
 						return
 					}
-					druid.AddAuraWithTemporaryStats(sim, LunarGraceAuraID, 0, "Lunar Blessing", stats.SpellPower, spellBonus, dur)
+					druid.AddAuraWithTemporaryStats(sim, LunarGraceAuraID, actionID, stats.SpellPower, spellBonus, dur)
 				}
 			},
 		}
@@ -158,18 +155,18 @@ func ApplyAshtongueTalisman(agent core.Agent) {
 	// - can proc off of any completed cast, not just hits
 	const spellBonus = 150
 	const dur = time.Second * 8
+	actionID := core.ActionID{ItemID: 32486}
 
 	char := agent.GetCharacter()
 	char.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		return core.Aura{
-			ID:   AshtongueTalismanItemAuraID,
-			Name: "Ashtongue Talisman of Equilibrium",
+			ID: AshtongueTalismanItemAuraID,
 			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 				if spellCast.ActionID.SpellID == SpellIDSF8 || spellCast.ActionID.SpellID == SpellIDSF6 {
 					if sim.RandomFloat("Ashtongue Talisman") > 0.25 {
 						return
 					}
-					char.AddAuraWithTemporaryStats(sim, AshtongueTalismanAuraID, 40442, "Ashtongue Spellpower", stats.SpellPower, spellBonus, dur)
+					char.AddAuraWithTemporaryStats(sim, AshtongueTalismanAuraID, actionID, stats.SpellPower, spellBonus, dur)
 				}
 			},
 			OnSpellMiss: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
@@ -177,7 +174,7 @@ func ApplyAshtongueTalisman(agent core.Agent) {
 					if sim.RandomFloat("Ashtongue Talisman") > 0.25 {
 						return
 					}
-					char.AddAuraWithTemporaryStats(sim, AshtongueTalismanAuraID, 40442, "Ashtongue Spellpower", stats.SpellPower, spellBonus, dur)
+					char.AddAuraWithTemporaryStats(sim, AshtongueTalismanAuraID, actionID, stats.SpellPower, spellBonus, dur)
 				}
 			},
 		}

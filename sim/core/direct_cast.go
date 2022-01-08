@@ -188,7 +188,6 @@ type DotDamageInput struct {
 
 	// If both of these are set, will display uptime metrics for this dot.
 	DebuffID AuraID
-	SpellID  int32
 
 	// Internal fields
 	startTime     time.Duration
@@ -245,7 +244,7 @@ type SimpleSpellTemplate struct {
 
 func (template *SimpleSpellTemplate) Apply(newAction *SimpleSpell) {
 	if newAction.objectInUse {
-		panic(fmt.Sprintf("Damage over time spell (%s) already in use", newAction.Name))
+		panic(fmt.Sprintf("Damage over time spell (%s) already in use", newAction.ActionID))
 	}
 	*newAction = template.template
 }

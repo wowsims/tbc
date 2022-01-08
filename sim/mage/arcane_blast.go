@@ -15,7 +15,6 @@ func (mage *Mage) newArcaneBlastTemplate(sim *core.Simulation) core.SimpleSpellT
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				Name:           "Arcane Blast",
 				CritMultiplier: 1.5 + 0.125*float64(mage.Talents.SpellPower),
 				SpellSchool:    stats.ArcaneSpellPower,
 				Character:      &mage.Character,
@@ -75,11 +74,10 @@ var ArcaneBlastAuraID = core.NewAuraID()
 
 func (mage *Mage) ArcaneBlastAura(sim *core.Simulation, numStacks int32) core.Aura {
 	return core.Aura{
-		ID:      ArcaneBlastAuraID,
-		Name:    "Arcane Blast",
-		SpellID: 36032,
-		Expires: sim.CurrentTime + time.Second*8,
-		Stacks:  numStacks,
+		ID:       ArcaneBlastAuraID,
+		ActionID: core.ActionID{SpellID: 36032},
+		Expires:  sim.CurrentTime + time.Second*8,
+		Stacks:   numStacks,
 		OnExpire: func(sim *core.Simulation) {
 			// Reset the mana cost on expiration.
 			if mage.arcaneBlastSpell.IsInUse() {

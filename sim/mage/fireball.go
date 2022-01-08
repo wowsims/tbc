@@ -17,7 +17,6 @@ func (mage *Mage) newFireballTemplate(sim *core.Simulation) core.SimpleSpellTemp
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				Name:           "Fireball",
 				CritMultiplier: 1.5 + 0.125*float64(mage.Talents.SpellPower),
 				SpellSchool:    stats.FireSpellPower,
 				Character:      &mage.Character,
@@ -67,7 +66,6 @@ func (mage *Mage) newFireballDotTemplate(sim *core.Simulation) core.SimpleSpellT
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				Name:        "Fireball",
 				SpellSchool: stats.FireSpellPower,
 				Character:   &mage.Character,
 				ActionID: core.ActionID{
@@ -90,7 +88,6 @@ func (mage *Mage) newFireballDotTemplate(sim *core.Simulation) core.SimpleSpellT
 				TickBaseDamage:       84 / 4,
 				TickSpellCoefficient: 0,
 				DebuffID:             FireballDotDebuffID,
-				SpellID:              SpellIDFireball,
 			},
 		},
 	}

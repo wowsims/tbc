@@ -315,9 +315,10 @@ func (shaman *Shaman) registerBloodlustCD() {
 	if !shaman.SelfBuffs.Bloodlust {
 		return
 	}
+	actionID := core.ActionID{SpellID: 2825, Tag: int32(shaman.RaidIndex)}
 
 	shaman.AddMajorCooldown(core.MajorCooldown{
-		ActionID:   core.ActionID{SpellID: 2825, Tag: int32(shaman.RaidIndex)},
+		ActionID:   actionID,
 		CooldownID: BloodlustCooldownID,
 		Cooldown:   core.BloodlustCD,
 		Priority:   core.CooldownPriorityBloodlust,
@@ -337,10 +338,10 @@ func (shaman *Shaman) registerBloodlustCD() {
 		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
 			return func(sim *core.Simulation, character *core.Character) {
 				for _, partyMember := range character.Party.Players {
-					core.AddBloodlustAura(sim, partyMember.GetCharacter())
+					core.AddBloodlustAura(sim, partyMember.GetCharacter(), actionID.Tag)
 				}
 				character.SetCD(BloodlustCooldownID, sim.CurrentTime+core.BloodlustCD)
-				character.Metrics.AddInstantCast(core.ActionID{SpellID: 2825})
+				character.Metrics.AddInstantCast(actionID)
 			}
 		},
 	})
@@ -353,9 +354,10 @@ func (shaman *Shaman) registerElementalMasteryCD() {
 	if !shaman.Talents.ElementalMastery {
 		return
 	}
+	actionID := core.ActionID{SpellID: 16166}
 
 	shaman.AddMajorCooldown(core.MajorCooldown{
-		ActionID:   core.ActionID{SpellID: 16166},
+		ActionID:   actionID,
 		CooldownID: ElementalMasteryCooldownID,
 		Cooldown:   time.Minute * 3,
 		CanActivate: func(sim *core.Simulation, character *core.Character) bool {
@@ -366,13 +368,12 @@ func (shaman *Shaman) registerElementalMasteryCD() {
 		},
 		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
 			return func(sim *core.Simulation, character *core.Character) {
-				character.Metrics.AddInstantCast(core.ActionID{SpellID: 16166})
+				character.Metrics.AddInstantCast(actionID)
 
 				character.AddAura(sim, core.Aura{
-					ID:      ElementalMasteryAuraID,
-					SpellID: 16166,
-					Name:    "Elemental Mastery",
-					Expires: core.NeverExpires,
+					ID:       ElementalMasteryAuraID,
+					ActionID: actionID,
+					Expires:  core.NeverExpires,
 					OnCast: func(sim *core.Simulation, cast *core.Cast) {
 						cast.ManaCost = 0
 						cast.BonusCritRating = 100.0 * core.SpellCritRatingPerCritChance
@@ -396,9 +397,10 @@ func (shaman *Shaman) registerNaturesSwiftnessCD() {
 	if !shaman.Talents.NaturesSwiftness {
 		return
 	}
+	actionID := core.ActionID{SpellID: 16188}
 
 	shaman.AddMajorCooldown(core.MajorCooldown{
-		ActionID:   core.ActionID{SpellID: 16188},
+		ActionID:   actionID,
 		CooldownID: NaturesSwiftnessCooldownID,
 		Cooldown:   time.Minute * 3,
 		CanActivate: func(sim *core.Simulation, character *core.Character) bool {
@@ -415,9 +417,9 @@ func (shaman *Shaman) registerNaturesSwiftnessCD() {
 		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
 			return func(sim *core.Simulation, character *core.Character) {
 				character.AddAura(sim, core.Aura{
-					ID:      NaturesSwiftnessAuraID,
-					Name:    "Nature's Swiftness",
-					Expires: core.NeverExpires,
+					ID:       NaturesSwiftnessAuraID,
+					ActionID: actionID,
+					Expires:  core.NeverExpires,
 					OnCast: func(sim *core.Simulation, cast *core.Cast) {
 						if cast.ActionID.SpellID != SpellIDLB12 {
 							return
@@ -434,7 +436,7 @@ func (shaman *Shaman) registerNaturesSwiftnessCD() {
 						character.SetCD(NaturesSwiftnessCooldownID, sim.CurrentTime+time.Minute*3)
 						character.RemoveAura(sim, NaturesSwiftnessAuraID)
 						character.UpdateMajorCooldowns()
-						character.Metrics.AddInstantCast(core.ActionID{SpellID: 16188})
+						character.Metrics.AddInstantCast(actionID)
 					},
 				})
 			}
@@ -450,8 +452,7 @@ func (shaman *Shaman) applyUnleashedRage(level int32) {
 		shaman.unleashedRages = make([]core.Aura, 5) //pre-fill up to 5 auras
 		for i := range shaman.unleashedRages {
 			shaman.unleashedRages[i] = core.Aura{
-				ID:   UnleasedRageProcAuraID,
-				Name: "Unleased Rage",
+				ID: UnleasedRageProcAuraID,
 			}
 		}
 	}
@@ -459,8 +460,7 @@ func (shaman *Shaman) applyUnleashedRage(level int32) {
 		dur := time.Second * 10
 		bonus := 0.02 * float64(level)
 		return core.Aura{
-			ID:   UnleasedRageTalentAuraID,
-			Name: "Unleashed Rage Talent",
+			ID: UnleasedRageTalentAuraID,
 			OnMeleeAttack: func(sim *core.Simulation, target *core.Target, result core.MeleeHitType, ability *core.ActiveMeleeAbility, isOH bool) {
 				if result != core.MeleeHitTypeCrit {
 					return
@@ -495,8 +495,7 @@ var ShamanisticFocusTalentAuraID = core.NewAuraID()
 func (shaman *Shaman) applyShamanisticFocus() {
 	shaman.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		return core.Aura{
-			ID:   ShamanisticFocusTalentAuraID,
-			Name: "Shamanistic Focus Talent",
+			ID: ShamanisticFocusTalentAuraID,
 			OnMeleeAttack: func(sim *core.Simulation, target *core.Target, result core.MeleeHitType, ability *core.ActiveMeleeAbility, isOH bool) {
 				if result != core.MeleeHitTypeCrit {
 					return
@@ -526,8 +525,7 @@ func (shaman *Shaman) applyFlurry(level int32) {
 		bonus := 1.3
 		inverseBonus := 1 / 1.3
 		return core.Aura{
-			ID:   FlurryTalentAuraID,
-			Name: "Flurry Talent",
+			ID: FlurryTalentAuraID,
 			OnMeleeAttack: func(sim *core.Simulation, target *core.Target, result core.MeleeHitType, ability *core.ActiveMeleeAbility, isOH bool) {
 				if result != core.MeleeHitTypeCrit {
 					if ability == nil {
@@ -546,10 +544,9 @@ func (shaman *Shaman) applyFlurry(level int32) {
 				if shaman.FlurryStacks == 0 {
 					shaman.MultiplyMeleeSpeed(sim, bonus)
 					shaman.AddAura(sim, core.Aura{
-						ID:      FlurryProcAuraID,
-						SpellID: 16280,
-						Name:    "Flurry",
-						Expires: core.NeverExpires,
+						ID:       FlurryProcAuraID,
+						ActionID: core.ActionID{SpellID: 16280},
+						Expires:  core.NeverExpires,
 						OnExpire: func(sim *core.Simulation) {
 							shaman.MultiplyMeleeSpeed(sim, inverseBonus)
 						},

@@ -9,7 +9,6 @@ func (druid *Druid) newFaerieFireTemplate(sim *core.Simulation) core.SimpleSpell
 	return core.NewSimpleSpellTemplate(core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				Name:         "Faerie Fire",
 				ActionID:     core.ActionID{SpellID: 26993},
 				Character:    druid.GetCharacter(),
 				BaseManaCost: 145,

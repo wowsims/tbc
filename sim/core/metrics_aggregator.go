@@ -237,7 +237,7 @@ func (characterMetrics *CharacterMetrics) ToProto(numIterations int32) *proto.Pl
 }
 
 type AuraMetrics struct {
-	ID int32
+	ID ActionID
 
 	// Metrics for the current iteration.
 	Uptime time.Duration
@@ -261,7 +261,7 @@ func (auraMetrics *AuraMetrics) ToProto(numIterations int32) *proto.AuraMetrics 
 	uptimeAvg := auraMetrics.uptimeSum.Seconds() / float64(numIterations)
 
 	return &proto.AuraMetrics{
-		Id: auraMetrics.ID,
+		Id: auraMetrics.ID.ToProto(),
 
 		UptimeSecondsAvg:   uptimeAvg,
 		UptimeSecondsStdev: math.Sqrt((auraMetrics.uptimeSumSquared.Seconds() / float64(numIterations)) - (uptimeAvg * uptimeAvg)),

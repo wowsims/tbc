@@ -15,8 +15,6 @@ func init() {
 	var BloodlustBroochCooldownID = core.NewCooldownID()
 	core.AddItemEffect(29383, core.MakeTemporaryStatsOnUseCDRegistration(
 		core.OffensiveTrinketActiveAuraID,
-		35166,
-		"Lust for Battle",
 		stats.AttackPower,
 		278,
 		time.Second*20,
@@ -42,8 +40,7 @@ func ApplyDragonspineTrophy(agent core.Agent) {
 
 		procChance, ohProcChance := core.PPMToChance(character, 1.0)
 		return core.Aura{
-			ID:   DragonspineTrophyAuraID,
-			Name: "Dragonspine Trophy",
+			ID: DragonspineTrophyAuraID,
 			OnMeleeAttack: func(sim *core.Simulation, target *core.Target, result core.MeleeHitType, ability *core.ActiveMeleeAbility, isOH bool) {
 				if result == core.MeleeHitTypeMiss || result == core.MeleeHitTypeDodge || result == core.MeleeHitTypeParry {
 					return
@@ -61,7 +58,7 @@ func ApplyDragonspineTrophy(agent core.Agent) {
 					}
 				}
 				icd = core.InternalCD(sim.CurrentTime + icdDur)
-				character.AddAuraWithTemporaryStats(sim, MeleeHasteAuraID, 34775, "Haste", stats.MeleeHaste, hasteBonus, dur)
+				character.AddAuraWithTemporaryStats(sim, MeleeHasteAuraID, core.ActionID{ItemID: 28830}, stats.MeleeHaste, hasteBonus, dur)
 			},
 		}
 	})

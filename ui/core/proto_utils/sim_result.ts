@@ -15,10 +15,6 @@ import { RaidSimRequest, RaidSimResult } from '/tbc/core/proto/api.js';
 import { Class } from '/tbc/core/proto/common.js';
 import { Spec } from '/tbc/core/proto/common.js';
 import { ActionId } from '/tbc/core/proto_utils/action_id.js';
-import { actionIdToString } from '/tbc/core/proto_utils/action_id.js';
-import { protoToActionId } from '/tbc/core/proto_utils/action_id.js';
-import { getIconUrl } from '/tbc/core/resources.js';
-import { getFullActionName } from '/tbc/core/resources.js';
 import { classColors } from '/tbc/core/proto_utils/utils.js';
 import { getTalentTreeIcon } from '/tbc/core/proto_utils/utils.js';
 import { playerToSpec } from '/tbc/core/proto_utils/utils.js';
@@ -27,9 +23,12 @@ import { bucket } from '/tbc/core/utils.js';
 import { sum } from '/tbc/core/utils.js';
 
 import {
+	AuraUptimeLog,
 	DamageDealtLog,
 	DpsLog,
-	ManaChangedLog,
+	Entity,
+	MajorCooldownUsedLog,
+	ManaChangedLogGroup,
 	SimLog,
 } from './logs_parser.js';
 
@@ -130,7 +129,7 @@ export class SimResult {
 	static async makeNew(request: RaidSimRequest, result: RaidSimResult): Promise<SimResult> {
 		const iterations = request.simOptions?.iterations || 1;
 		const duration = request.encounter?.duration || 1;
-		const logs = SimLog.parseAll(result);
+		const logs = await SimLog.parseAll(result);
 
 		const raidPromise = RaidMetrics.makeNew(iterations, duration, request.raid!, result.raidMetrics!, logs);
 		const encounterPromise = EncounterMetrics.makeNew(iterations, duration, request.encounter!, result.encounterMetrics!, logs);
@@ -227,8 +226,14 @@ export class PlayerMetrics {
 
 	readonly logs: Array<SimLog>;
 	readonly damageDealtLogs: Array<DamageDealtLog>;
-	readonly manaChangedLogs: Array<ManaChangedLog>;
+	readonly manaChangedLogs: Array<ManaChangedLogGroup>;
 	readonly dpsLogs: Array<DpsLog>;
+	readonly auraUptimeLogs: Array<AuraUptimeLog>;
+	readonly majorCooldownLogs: Array<MajorCooldownUsedLog>;
+
+	// Aura uptime logs, filtered to include only auras that correspond to a
+	// major cooldown.
+	readonly majorCooldownAuraUptimeLogs: Array<AuraUptimeLog>;
 
 	private constructor(
 			player: PlayerProto,
@@ -258,10 +263,17 @@ export class PlayerMetrics {
 		this.iterations = iterations;
 		this.duration = duration;
 
-		this.damageDealtLogs = this.logs.filter((log): log is DamageDealtLog => log instanceof DamageDealtLog);
-		this.manaChangedLogs = this.logs.filter((log): log is ManaChangedLog => log instanceof ManaChangedLog);
+		this.damageDealtLogs = this.logs.filter((log): log is DamageDealtLog => log.isDamageDealt());
+		this.dpsLogs = DpsLog.fromLogs(this.damageDealtLogs);
 
-		this.dpsLogs = DpsLog.fromDamageDealt(this.damageDealtLogs);
+		this.auraUptimeLogs = AuraUptimeLog.fromLogs(this.logs, new Entity(this.name, '', this.raidIndex, false, this.isPet));
+		this.majorCooldownLogs = this.logs.filter((log): log is MajorCooldownUsedLog => log.isMajorCooldownUsed());
+
+		this.manaChangedLogs = ManaChangedLogGroup.fromLogs(this.logs);
+		AuraUptimeLog.populateActiveAuras(this.dpsLogs, this.auraUptimeLogs);
+		AuraUptimeLog.populateActiveAuras(this.manaChangedLogs, this.auraUptimeLogs);
+
+		this.majorCooldownAuraUptimeLogs = this.auraUptimeLogs.filter(auraLog => this.majorCooldownLogs.find(mcdLog => mcdLog.cooldownId.equals(auraLog.aura)));
 	}
 
 	get label() {
@@ -282,9 +294,10 @@ export class PlayerMetrics {
 
 	static async makeNew(iterations: number, duration: number, player: PlayerProto, metrics: PlayerMetricsProto, raidIndex: number, isPet: boolean, logs: Array<SimLog>): Promise<PlayerMetrics> {
 		const playerLogs = logs.filter(log => log.source && (!log.source.isTarget && (isPet == log.source.isPet) && log.source.index == raidIndex));
-		const actionsPromise = Promise.all(metrics.actions.map(actionMetrics => ActionMetrics.makeNew(iterations, duration, actionMetrics)));
-		const aurasPromise = Promise.all(metrics.auras.map(auraMetrics => AuraMetrics.makeNew(iterations, duration, auraMetrics)));
-		const petsPromise = Promise.all(metrics.pets.map(petMetrics => PlayerMetrics.makeNew(iterations, duration, player, petMetrics, raidIndex, true, logs)));
+
+		const actionsPromise = Promise.all(metrics.actions.map(actionMetrics => ActionMetrics.makeNew(iterations, duration, actionMetrics, raidIndex)));
+		const aurasPromise = Promise.all(metrics.auras.map(auraMetrics => AuraMetrics.makeNew(iterations, duration, auraMetrics, raidIndex)));
+		const petsPromise = Promise.all(metrics.pets.map(petMetrics => PlayerMetrics.makeNew(iterations, duration, player, petMetrics, raidIndex, true, playerLogs)));
 
 		const actions = await actionsPromise;
 		const auras = await aurasPromise;
@@ -357,10 +370,10 @@ export class AuraMetrics {
 	private readonly duration: number;
 	private readonly data: AuraMetricsProto;
 
-	private constructor(actionId: ActionId, name: string, iconUrl: string, iterations: number, duration: number, data: AuraMetricsProto) {
+	private constructor(actionId: ActionId, iterations: number, duration: number, data: AuraMetricsProto) {
 		this.actionId = actionId;
-		this.name = name;
-		this.iconUrl = iconUrl;
+		this.name = actionId.name;
+		this.iconUrl = actionId.iconUrl;
 		this.iterations = iterations;
 		this.duration = duration;
 		this.data = data;
@@ -370,28 +383,19 @@ export class AuraMetrics {
 		return this.data.uptimeSecondsAvg / this.duration * 100;
 	}
 
-	static async makeNew(iterations: number, duration: number, auraMetrics: AuraMetricsProto): Promise<AuraMetrics> {
-		const actionId = {
-			id: {
-				spellId: auraMetrics.id,
-			},
-			tag: 0,
-		};
-
-		const name = await getFullActionName(actionId);
-		const iconUrl = await getIconUrl(actionId.id);
-
-		return new AuraMetrics(actionId, name, iconUrl, iterations, duration, auraMetrics);
+	static async makeNew(iterations: number, duration: number, auraMetrics: AuraMetricsProto, playerIndex?: number): Promise<AuraMetrics> {
+		const actionId = await ActionId.fromProto(auraMetrics.id!).fill(playerIndex);
+		return new AuraMetrics(actionId, iterations, duration, auraMetrics);
 	}
 
 	// Merges aura metrics that have the same name/ID, adding their stats together.
 	static join(auras: Array<AuraMetrics>): Array<AuraMetrics> {
-		const joinedById = bucket(auras, aura => actionIdToString(aura.actionId));
+		const joinedById = bucket(auras, aura => aura.actionId.toString());
 
 		return Object.values(joinedById).map(aurasToJoin => {
 			const firstAura = aurasToJoin[0];
 			return new AuraMetrics(
-					firstAura.actionId, firstAura.name, firstAura.iconUrl, firstAura.iterations, firstAura.duration,
+					firstAura.actionId, firstAura.iterations, firstAura.duration,
 					AuraMetricsProto.create({
 						uptimeSecondsAvg: Math.max(...aurasToJoin.map(a => a.data.uptimeSecondsAvg)),
 					}));
@@ -408,10 +412,10 @@ export class ActionMetrics {
 	private readonly duration: number;
 	private readonly data: ActionMetricsProto;
 
-	private constructor(actionId: ActionId, name: string, iconUrl: string, iterations: number, duration: number, data: ActionMetricsProto) {
+	private constructor(actionId: ActionId, iterations: number, duration: number, data: ActionMetricsProto) {
 		this.actionId = actionId;
-		this.name = name;
-		this.iconUrl = iconUrl;
+		this.name = actionId.name;
+		this.iconUrl = actionId.iconUrl;
 		this.iterations = iterations;
 		this.duration = duration;
 		this.data = data;
@@ -457,22 +461,19 @@ export class ActionMetrics {
 		return (this.data.misses / (this.data.hits + this.data.misses)) * 100;
 	}
 
-	static async makeNew(iterations: number, duration: number, actionMetrics: ActionMetricsProto): Promise<ActionMetrics> {
-		const actionId = protoToActionId(actionMetrics.id!);
-		const name = await getFullActionName(actionId);
-		const iconUrl = await getIconUrl(actionId.id);
-
-		return new ActionMetrics(actionId, name, iconUrl, iterations, duration, actionMetrics);
+	static async makeNew(iterations: number, duration: number, actionMetrics: ActionMetricsProto, playerIndex?: number): Promise<ActionMetrics> {
+		const actionId = await ActionId.fromProto(actionMetrics.id!).fill(playerIndex);
+		return new ActionMetrics(actionId, iterations, duration, actionMetrics);
 	}
 
 	// Merges action metrics that have the same name/ID, adding their stats together.
 	static join(actions: Array<ActionMetrics>): Array<ActionMetrics> {
-		const joinedById = bucket(actions, action => actionIdToString(action.actionId));
+		const joinedById = bucket(actions, action => action.actionId.toString());
 
 		return Object.values(joinedById).map(actionsToJoin => {
 			const firstAction = actionsToJoin[0];
 			return new ActionMetrics(
-					firstAction.actionId, firstAction.name, firstAction.iconUrl, firstAction.iterations, firstAction.duration,
+					firstAction.actionId, firstAction.iterations, firstAction.duration,
 					ActionMetricsProto.create({
 						casts: sum(actionsToJoin.map(a => a.data.casts)),
 						hits: sum(actionsToJoin.map(a => a.data.hits)),

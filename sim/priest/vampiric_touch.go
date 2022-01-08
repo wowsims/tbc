@@ -7,22 +7,19 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-const SpellIDVampiricTouch int32 = 34917
+var VampiricTouchActionID = core.ActionID{SpellID: 34917}
 
 var VampiricTouchDebuffID = core.NewDebuffID()
 
 func (priest *Priest) newVampiricTouchTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
 	baseCast := core.Cast{
-		Name:           "Vampiric Touch",
 		CritMultiplier: 1.5,
 		SpellSchool:    stats.ShadowSpellPower,
 		Character:      &priest.Character,
 		BaseManaCost:   425,
 		ManaCost:       425,
 		CastTime:       time.Millisecond * 1500,
-		ActionID: core.ActionID{
-			SpellID: SpellIDVampiricTouch,
-		},
+		ActionID:       VampiricTouchActionID,
 	}
 
 	effect := core.SpellHitEffect{
@@ -36,7 +33,6 @@ func (priest *Priest) newVampiricTouchTemplate(sim *core.Simulation) core.Simple
 			TickBaseDamage:       650 / 5,
 			TickSpellCoefficient: 0.2,
 			DebuffID:             VampiricTouchDebuffID,
-			SpellID:              SpellIDVampiricTouch,
 		},
 	}
 

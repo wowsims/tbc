@@ -11,6 +11,7 @@ var InnervateCooldownID = core.NewCooldownID()
 // Returns the time to wait before the next action, or 0 if innervate is on CD
 // or disabled.
 func (druid *Druid) registerInnervateCD() {
+	actionID := core.ActionID{SpellID: 29166, Tag: int32(druid.RaidIndex)}
 	baseCastTime := time.Millisecond * 1500
 	baseManaCost := druid.BaseMana() * 0.04
 	innervateCD := core.InnervateCD
@@ -25,7 +26,7 @@ func (druid *Druid) registerInnervateCD() {
 	expectedBonusMana := 0.0
 
 	druid.AddMajorCooldown(core.MajorCooldown{
-		ActionID:   core.ActionID{SpellID: 29166},
+		ActionID:   actionID,
 		CooldownID: InnervateCooldownID,
 		Cooldown:   innervateCD,
 		CanActivate: func(sim *core.Simulation, character *core.Character) bool {
@@ -83,9 +84,9 @@ func (druid *Druid) registerInnervateCD() {
 
 				castTime := time.Duration(float64(baseCastTime) / character.CastSpeed())
 
-				core.AddInnervateAura(sim, innervateTarget, expectedBonusManaReduction)
-				character.SpendMana(sim, baseManaCost, "Innervate")
-				character.Metrics.AddInstantCast(core.ActionID{SpellID: 29166})
+				core.AddInnervateAura(sim, innervateTarget, expectedBonusManaReduction, actionID.Tag)
+				character.SpendMana(sim, baseManaCost, actionID)
+				character.Metrics.AddInstantCast(actionID)
 				character.SetCD(InnervateCooldownID, sim.CurrentTime+innervateCD)
 				character.SetCD(core.GCDCooldownID, sim.CurrentTime+castTime)
 			}

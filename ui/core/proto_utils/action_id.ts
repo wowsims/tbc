@@ -1,94 +1,261 @@
 import { ActionID as ActionIdProto } from '/tbc/core/proto/common.js';
+import { Item } from '/tbc/core/proto/common.js';
+import { OtherAction } from '/tbc/core/proto/common.js';
+import { getWowheadItemId } from '/tbc/core/proto_utils/equipped_item.js';
+import { NO_TARGET } from '/tbc/core/proto_utils/utils.js';
 
-export type ItemId = {
-  itemId: number;
-};
-export type SpellId = {
-  spellId: number;
-};
-export type OtherId = {
-  otherId: number;
-};
-export type ItemOrSpellId = ItemId | SpellId;
-export type RawActionId = ItemId | SpellId | OtherId;
-export type ActionId = {
-	id: RawActionId,
-	tag?: number,
-};
+// Uniquely identifies a specific item / spell / thing in WoW. This object is immutable.
+export class ActionId {
+	readonly itemId: number;
+	readonly spellId: number;
+	readonly otherId: OtherAction;
+	readonly tag: number;
 
-export function sameActionId(id1: ActionId, id2: ActionId): boolean {
-	return ((('itemId' in id1.id && 'itemId' in id2.id && id1.id.itemId == id2.id.itemId)
-					|| ('spellId' in id1.id && 'spellId' in id2.id && id1.id.spellId == id2.id.spellId)
-					|| ('otherId' in id1.id && 'otherId' in id2.id && id1.id.otherId == id2.id.otherId))
-					&& id1.tag == id2.tag);
-}
+	readonly name: string;
+	readonly iconUrl: string;
 
-export function actionIdToString(id: ActionId): string {
-	let tagStr = id.tag ? ('-' + id.tag) : '';
+	private constructor(itemId: number, spellId: number, otherId: OtherAction, tag: number, name: string, iconUrl: string) {
+		this.itemId = itemId;
+		this.spellId = spellId;
+		this.otherId = otherId;
+		this.tag = tag;
 
-	if ('itemId' in id.id) {
-		return 'item-' + id.id.itemId + tagStr;
-	} else if ('spellId' in id.id) {
-		return 'spell-' + id.id.spellId + tagStr;
-	} else if ('otherId' in id.id) {
-		return 'other-' + id.id.otherId + tagStr;
-	} else {
-		throw new Error('Invalid Action Id: ' + JSON.stringify(id));
+		switch (otherId) {
+			case OtherAction.OtherActionNone:
+				break;
+			case OtherAction.OtherActionWait:
+				name = 'Wait';
+				break;
+			case OtherAction.OtherActionManaRegen:
+				name = 'Regen';
+				// Tag is number of milliseconds worth of regen.
+				if (tag) {
+					name = (tag/1000).toFixed(3) + 's ' + name;
+				}
+				break;
+		}
+		this.name = name;
+		this.iconUrl = iconUrl;
+	}
+
+	equals(other: ActionId): boolean {
+		return this.equalsIgnoringTag(other) && this.tag == other.tag;
+	}
+
+	equalsIgnoringTag(other: ActionId): boolean {
+		return (
+				this.itemId == other.itemId
+				&& this.spellId == other.spellId
+				&& this.otherId == other.otherId);
+	}
+
+	setBackground(elem: HTMLElement) {
+		if (this.iconUrl) {
+			elem.style.backgroundImage = `url('${this.iconUrl}')`;
+		}
+	}
+
+	setWowheadHref(elem: HTMLAnchorElement) {
+		if (this.itemId) {
+			elem.href = 'https://tbc.wowhead.com/item=' + this.itemId;
+		} else if (this.spellId) {
+			elem.href = 'https://tbc.wowhead.com/spell=' + this.spellId;
+		}
+	}
+
+	setBackgroundAndHref(elem: HTMLAnchorElement) {
+		this.setBackground(elem);
+		this.setWowheadHref(elem);
+	}
+
+	async fillAndSet(elem: HTMLAnchorElement, setHref: boolean, setBackground: boolean): Promise<ActionId> {
+		const filled = await this.fill();
+		if (setHref) {
+			filled.setWowheadHref(elem);
+		}
+		if (setBackground) {
+			filled.setBackground(elem);
+		}
+		return filled;
+	}
+
+	private static async getTooltipDataHelper(id: number, tooltipPostfix: string, cache: Map<number, Promise<any>>): Promise<any> {
+		if (!cache.has(id)) {
+			cache.set(id,
+					fetch(`https://tbc.wowhead.com/tooltip/${tooltipPostfix}/${id}`)
+					.then(response => response.json()));
+		}
+
+		return cache.get(id) as Promise<any>;
+	}
+
+	private async getTooltipData(): Promise<any> {
+		const idString = this.toProtoString();
+		const idToLookup = idOverrides[idString] ? idOverrides[idString] : this;
+
+		if (idToLookup.itemId) {
+			return await ActionId.getTooltipDataHelper(idToLookup.itemId, 'item', itemToTooltipDataCache);
+		} else {
+			return await ActionId.getTooltipDataHelper(idToLookup.spellId, 'spell', spellToTooltipDataCache);
+		}
+	}
+
+	// Returns an ActionId with the name and iconUrl fields filled.
+	// playerIndex is the optional index of the player to whom this ID corresponds.
+	async fill(playerIndex?: number): Promise<ActionId> {
+		if (this.name || this.iconUrl) {
+			return this;
+		}
+
+		if (this.otherId) {
+			return this;
+		}
+
+		const tooltipData = await this.getTooltipData();
+		const iconUrl = "https://wow.zamimg.com/images/wow/icons/large/" + tooltipData['icon'] + ".jpg";
+
+		let name = tooltipData['name'];
+		switch (name) {
+			case 'Fireball':
+			case 'Pyroblast':
+				if (this.tag) name += ' (DoT)';
+				break;
+			case 'Mind Flay':
+				if (this.tag == 1) {
+					name += ' (1 Tick)';
+				} else if (this.tag == 2) {
+					name += ' (2 Tick)';
+				} else if (this.tag == 3) {
+					name += ' (3 Tick)';
+				}
+				break;
+			case 'Lightning Bolt':
+				if (this.tag) name += ' (LO)';
+				break;
+			// For targetted buffs, tag is the source player's raid index or -1 if none.
+			case 'Bloodlust':
+			case 'Innervate':
+			case 'Mana Tide Totem':
+			case 'Power Infusion':
+				if (this.tag != NO_TARGET) {
+					if (this.tag === playerIndex) {
+						name += ` (self)`;
+					} else {
+						name += ` (from #${this.tag+1})`;
+					}
+				}
+				break;
+			default:
+				if (this.tag == 10) {
+					name += ' (Auto)';
+				} else if (this.tag == 11) {
+					name += ' (Offhand Auto)';
+				} else if (this.tag) {
+					name += ' (??)';
+				}
+				break;
+		}
+
+		return new ActionId(this.itemId, this.spellId, this.otherId, this.tag, name, iconUrl);
+	}
+
+	toString(): string {
+		let tagStr = this.tag ? ('-' + this.tag) : '';
+
+		if (this.itemId) {
+			return 'item-' + this.itemId + tagStr;
+		} else if (this.spellId) {
+			return 'spell-' + this.spellId + tagStr;
+		} else if (this.otherId) {
+			return 'other-' + this.otherId + tagStr;
+		} else {
+			throw new Error('Empty action id!');
+		}
+	}
+
+	toProto(): ActionIdProto {
+		const protoId = ActionIdProto.create({
+			tag: this.tag,
+		});
+
+		if (this.itemId) {
+			protoId.rawId = {
+				oneofKind: 'itemId',
+				itemId: this.itemId,
+			};
+		} else if (this.spellId) {
+			protoId.rawId = {
+				oneofKind: 'spellId',
+				spellId: this.spellId,
+			};
+		} else if (this.otherId) {
+			protoId.rawId = {
+				oneofKind: 'otherId',
+				otherId: this.otherId,
+			};
+		}
+
+		return protoId;
+	}
+
+	toProtoString(): string {
+		return ActionIdProto.toJsonString(this.toProto());
+	}
+
+	static fromEmpty(): ActionId {
+		return new ActionId(0, 0, OtherAction.OtherActionNone, 0, '', '');
+	}
+
+	static fromItemId(itemId: number, tag?: number): ActionId {
+		return new ActionId(itemId, 0, OtherAction.OtherActionNone, tag || 0, '', '');
+	}
+
+	static fromSpellId(spellId: number, tag?: number): ActionId {
+		return new ActionId(0, spellId, OtherAction.OtherActionNone, tag || 0, '', '');
+	}
+
+	static fromOtherId(otherId: OtherAction, tag?: number): ActionId {
+		return new ActionId(0, 0, otherId, tag || 0, '', '');
+	}
+
+	static fromItem(item: Item): ActionId {
+		return ActionId.fromItemId(getWowheadItemId(item));
+	}
+
+	static fromProto(protoId: ActionIdProto): ActionId {
+		if (protoId.rawId.oneofKind == 'spellId') {
+			return ActionId.fromSpellId(protoId.rawId.spellId, protoId.tag);
+		} else if (protoId.rawId.oneofKind == 'itemId') {
+			return ActionId.fromItemId(protoId.rawId.itemId, protoId.tag);
+		} else if (protoId.rawId.oneofKind == 'otherId') {
+			return ActionId.fromOtherId(protoId.rawId.otherId, protoId.tag);
+		} else {
+			return ActionId.fromEmpty();
+		}
+	}
+
+	static fromLogString(str: string): ActionId {
+		const match = str.match(/{((SpellID)|(ItemID)|(OtherID)): (\d+)(, Tag: (-?\d+))?}/);
+		if (match) {
+			const idType = match[1];
+			const id = parseInt(match[5]);
+			return new ActionId(
+					idType == 'ItemID' ? id : 0,
+					idType == 'SpellID' ? id : 0,
+					idType == 'OtherID' ? id : 0,
+					match[7] ? parseInt(match[7]) : 0,
+					'', '');
+		} else {
+			console.warn('Failed to parse action id from log: ' + str);
+			return ActionId.fromEmpty();
+		}
 	}
 }
 
-export function actionIdToProto(actionId: ActionId): ActionIdProto {
-	const protoId = ActionIdProto.create({
-		tag: actionId.tag,
-	});
+const itemToTooltipDataCache = new Map<number, Promise<any>>();
+const spellToTooltipDataCache = new Map<number, Promise<any>>();
 
-	if ('itemId' in actionId.id) {
-		protoId.rawId = {
-			oneofKind: 'itemId',
-			itemId: actionId.id.itemId,
-		};
-	} else if ('spellId' in actionId.id) {
-		protoId.rawId = {
-			oneofKind: 'spellId',
-			spellId: actionId.id.spellId,
-		};
-	} else if ('otherId' in actionId.id) {
-		protoId.rawId = {
-			oneofKind: 'otherId',
-			otherId: actionId.id.otherId,
-		};
-	}
-
-	return protoId;
-}
-
-export function protoToActionId(protoId: ActionIdProto): ActionId {
-	if (protoId.rawId.oneofKind == 'spellId') {
-		return {
-			id: {
-				spellId: protoId.rawId.spellId,
-			},
-			tag: protoId.tag,
-		};
-	} else if (protoId.rawId.oneofKind == 'itemId') {
-		return {
-			id: {
-				itemId: protoId.rawId.itemId,
-			},
-			tag: protoId.tag,
-		};
-	} else if (protoId.rawId.oneofKind == 'otherId') {
-		return {
-			id: {
-				otherId: protoId.rawId.otherId,
-			},
-			tag: protoId.tag,
-		};
-	} else {
-		return {
-			id: {
-				otherId: 0,
-			},
-		};
-	}
-}
+// Some items/spells have weird icons, so use this to show a different icon instead.
+const idOverrides: Record<string, ActionId> = {};
+idOverrides[ActionId.fromSpellId(37212).toProtoString()] = ActionId.fromItemId(29035); // Improved Wrath of Air Totem
+idOverrides[ActionId.fromSpellId(37447).toProtoString()] = ActionId.fromItemId(30720); // Serpent-Coil Braid

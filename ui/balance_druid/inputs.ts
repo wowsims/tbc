@@ -3,7 +3,7 @@ import { BalanceDruid_Options as DruidOptions } from '/tbc/core/proto/druid.js';
 import { RaidTarget } from '/tbc/core/proto/common.js';
 import { Spec } from '/tbc/core/proto/common.js';
 import { NO_TARGET } from '/tbc/core/proto_utils/utils.js';
-import { ItemOrSpellId } from '/tbc/core/proto_utils/action_id.js';
+import { ActionId } from '/tbc/core/proto_utils/action_id.js';
 import { Player } from '/tbc/core/player.js';
 import { Sim } from '/tbc/core/sim.js';
 import { EventID, TypedEvent } from '/tbc/core/typed_event.js';
@@ -14,7 +14,7 @@ import { Target } from '/tbc/core/target.js';
 // These don't need to be in a separate file but it keeps things cleaner.
 
 export const SelfInnervate = {
-	id: { spellId: 29166 },
+	id: ActionId.fromSpellId(29166),
 	states: 2,
 	extraCssClasses: [
 		'self-innervate-picker',
