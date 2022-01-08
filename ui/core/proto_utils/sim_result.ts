@@ -294,9 +294,10 @@ export class PlayerMetrics {
 
 	static async makeNew(iterations: number, duration: number, player: PlayerProto, metrics: PlayerMetricsProto, raidIndex: number, isPet: boolean, logs: Array<SimLog>): Promise<PlayerMetrics> {
 		const playerLogs = logs.filter(log => log.source && (!log.source.isTarget && (isPet == log.source.isPet) && log.source.index == raidIndex));
-		const actionsPromise = Promise.all(metrics.actions.map(actionMetrics => ActionMetrics.makeNew(iterations, duration, actionMetrics)));
-		const aurasPromise = Promise.all(metrics.auras.map(auraMetrics => AuraMetrics.makeNew(iterations, duration, auraMetrics)));
-		const petsPromise = Promise.all(metrics.pets.map(petMetrics => PlayerMetrics.makeNew(iterations, duration, player, petMetrics, raidIndex, true, logs)));
+
+		const actionsPromise = Promise.all(metrics.actions.map(actionMetrics => ActionMetrics.makeNew(iterations, duration, actionMetrics, raidIndex)));
+		const aurasPromise = Promise.all(metrics.auras.map(auraMetrics => AuraMetrics.makeNew(iterations, duration, auraMetrics, raidIndex)));
+		const petsPromise = Promise.all(metrics.pets.map(petMetrics => PlayerMetrics.makeNew(iterations, duration, player, petMetrics, raidIndex, true, playerLogs)));
 
 		const actions = await actionsPromise;
 		const auras = await aurasPromise;
@@ -382,8 +383,8 @@ export class AuraMetrics {
 		return this.data.uptimeSecondsAvg / this.duration * 100;
 	}
 
-	static async makeNew(iterations: number, duration: number, auraMetrics: AuraMetricsProto): Promise<AuraMetrics> {
-		const actionId = await ActionId.fromProto(auraMetrics.id!).fill();
+	static async makeNew(iterations: number, duration: number, auraMetrics: AuraMetricsProto, playerIndex?: number): Promise<AuraMetrics> {
+		const actionId = await ActionId.fromProto(auraMetrics.id!).fill(playerIndex);
 		return new AuraMetrics(actionId, iterations, duration, auraMetrics);
 	}
 
@@ -460,8 +461,8 @@ export class ActionMetrics {
 		return (this.data.misses / (this.data.hits + this.data.misses)) * 100;
 	}
 
-	static async makeNew(iterations: number, duration: number, actionMetrics: ActionMetricsProto): Promise<ActionMetrics> {
-		const actionId = await ActionId.fromProto(actionMetrics.id!).fill();
+	static async makeNew(iterations: number, duration: number, actionMetrics: ActionMetricsProto, playerIndex?: number): Promise<ActionMetrics> {
+		const actionId = await ActionId.fromProto(actionMetrics.id!).fill(playerIndex);
 		return new ActionMetrics(actionId, iterations, duration, actionMetrics);
 	}
 

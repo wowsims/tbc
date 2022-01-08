@@ -228,7 +228,7 @@ export class DamageDealtLog extends SimLog {
 	static parse(params: SimLogParams): Promise<DamageDealtLog> | null {
 		const match = params.raw.match(/] (.*?) ((Miss)|(Hit)|(Crit)|(ticked))( for (\d+\.\d+) damage.( \((\d+)% Resist\))?)?/);
 		if (match) {
-			return ActionId.fromLogString(match[1]).fill().then(cause => {
+			return ActionId.fromLogString(match[1]).fill(params.source?.index).then(cause => {
 				if (match[2] == 'Miss') {
 					return new DamageDealtLog(params, 0, true, false, false, false, false, false, cause);
 				}
@@ -307,7 +307,7 @@ export class AuraGainedLog extends SimLog {
 	static parse(params: SimLogParams): Promise<AuraGainedLog> | null {
 		const match = params.raw.match(/Aura gained: (.*)/);
 		if (match && match[1]) {
-			return ActionId.fromLogString(match[1]).fill().then(aura => new AuraGainedLog(params, aura));
+			return ActionId.fromLogString(match[1]).fill(params.source?.index).then(aura => new AuraGainedLog(params, aura));
 		} else {
 			return null;
 		}
@@ -329,7 +329,7 @@ export class AuraFadedLog extends SimLog {
 	static parse(params: SimLogParams): Promise<AuraFadedLog> | null {
 		const match = params.raw.match(/Aura faded: (.*)/);
 		if (match && match[1]) {
-			return ActionId.fromLogString(match[1]).fill().then(aura => new AuraFadedLog(params, aura));
+			return ActionId.fromLogString(match[1]).fill(params.source?.index).then(aura => new AuraFadedLog(params, aura));
 		} else {
 			return null;
 		}
@@ -432,7 +432,7 @@ export class ManaChangedLog extends SimLog {
 	static parse(params: SimLogParams): Promise<ManaChangedLog> | null {
 		const match = params.raw.match(/((Gained)|(Spent)) \d+\.?\d* mana from (.*) \((\d+\.?\d*) --> (\d+\.?\d*)\)/);
 		if (match) {
-			return ActionId.fromLogString(match[4]).fill().then(cause => {
+			return ActionId.fromLogString(match[4]).fill(params.source?.index).then(cause => {
 				return new ManaChangedLog(params, parseFloat(match[5]), parseFloat(match[6]), match[1] == 'Spent', cause);
 			});
 		} else {
@@ -488,7 +488,7 @@ export class MajorCooldownUsedLog extends SimLog {
 	static parse(params: SimLogParams): Promise<MajorCooldownUsedLog> | null {
 		const match = params.raw.match(/Major cooldown used: (.*)/);
 		if (match) {
-			return ActionId.fromLogString(match[1]).fill().then(cooldownId => new MajorCooldownUsedLog(params, cooldownId));
+			return ActionId.fromLogString(match[1]).fill(params.source?.index).then(cooldownId => new MajorCooldownUsedLog(params, cooldownId));
 		} else {
 			return null;
 		}
@@ -516,7 +516,7 @@ export class CastBeganLog extends SimLog {
 	static parse(params: SimLogParams): Promise<CastBeganLog> | null {
 		const match = params.raw.match(/Casting (.*) \(Current Mana = (\d+\.?\d*), Mana Cost = (\d+\.?\d*), Cast Time = (\d+\.?\d*)s\)/);
 		if (match) {
-			return ActionId.fromLogString(match[1]).fill().then(castId => new CastBeganLog(params, castId, parseFloat(match[2]), parseFloat(match[3]), parseFloat(match[4])));
+			return ActionId.fromLogString(match[1]).fill(params.source?.index).then(castId => new CastBeganLog(params, castId, parseFloat(match[2]), parseFloat(match[3]), parseFloat(match[4])));
 		} else {
 			return null;
 		}
@@ -546,7 +546,7 @@ export class StatChangeLog extends SimLog {
 	static parse(params: SimLogParams): Promise<StatChangeLog> | null {
 		const match = params.raw.match(/((Gained)|(Lost)) (\d+\.?\d*) (.*) from (fading )?(.*)/);
 		if (match) {
-			return ActionId.fromLogString(match[7]).fill().then(effectId => {
+			return ActionId.fromLogString(match[7]).fill(params.source?.index).then(effectId => {
 				const sign = match[1] == 'Lost' ? -1 : 1;
 				return new StatChangeLog(params, effectId, parseFloat(match[4]) * sign, match[5]);
 			});
