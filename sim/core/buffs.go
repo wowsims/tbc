@@ -269,6 +269,15 @@ func AddBloodlustAura(sim *Simulation, character *Character, actionTag int32) {
 			character.MultiplyMeleeSpeed(sim, inverseBonus)
 		},
 	})
+
+	if len(character.Pets) > 0 {
+		for _, petAgent := range character.Pets {
+			pet := petAgent.GetPet()
+			if pet.IsEnabled() {
+				AddBloodlustAura(sim, &pet.Character, actionTag)
+			}
+		}
+	}
 }
 
 var PowerInfusionAuraID = NewAuraID()

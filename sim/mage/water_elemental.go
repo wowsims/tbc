@@ -22,6 +22,7 @@ func (mage *Mage) registerSummonWaterElementalCD() {
 		ActionID:   actionID,
 		CooldownID: SummonWaterElementalCooldownID,
 		Cooldown:   time.Minute * 3,
+		Priority:   core.CooldownPriorityDrums + 1,
 		Type:       core.CooldownTypeDPS,
 		CanActivate: func(sim *core.Simulation, character *core.Character) bool {
 			if mage.waterElemental.IsEnabled() {
@@ -119,8 +120,10 @@ func (we *WaterElemental) Act(sim *core.Simulation) time.Duration {
 // These numbers are just rough guesses based on looking at some logs.
 var waterElementalBaseStats = stats.Stats{
 	stats.Intellect:  100,
-	stats.SpellPower: 500,
+	stats.SpellPower: 300,
 	stats.Mana:       2000,
+	stats.SpellHit:   3 * core.SpellHitRatingPerHitChance,
+	stats.SpellCrit:  8 * core.SpellCritRatingPerCritChance,
 }
 
 // These numbers are just rough guesses based on looking at some logs.
@@ -131,8 +134,8 @@ var waterElementalInheritanceCoeffs = stats.Stats{
 
 	stats.SpellPower:      0.333,
 	stats.FrostSpellPower: 0.333,
-	stats.SpellHit:        0,
-	stats.SpellCrit:       0,
+	stats.SpellHit:        0.01,
+	stats.SpellCrit:       0.01,
 }
 
 const SpellIDWaterbolt int32 = 31707
