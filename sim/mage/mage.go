@@ -41,6 +41,7 @@ type Mage struct {
 	tryingToDropStacks   bool
 	numCastsDone         int32
 	isBlastSpamming      bool
+	disabledMCDs         []*core.MajorCooldown
 
 	waterElemental *WaterElemental
 

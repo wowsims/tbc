@@ -21,6 +21,7 @@ func (mage *Mage) registerSummonWaterElementalCD() {
 		ActionID:   actionID,
 		CooldownID: SummonWaterElementalCooldownID,
 		Cooldown:   time.Minute * 3,
+		Type:       core.CooldownTypeDPS,
 		CanActivate: func(sim *core.Simulation, character *core.Character) bool {
 			if mage.waterElemental.IsEnabled() {
 				return false

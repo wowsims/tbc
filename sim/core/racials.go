@@ -54,6 +54,7 @@ func applyRaceEffects(agent Agent) {
 			ActionID:   actionID,
 			CooldownID: OrcBloodFuryCooldownID,
 			Cooldown:   cd,
+			Type:       CooldownTypeDPS,
 			CanActivate: func(sim *Simulation, character *Character) bool {
 				return true
 			},
@@ -104,6 +105,7 @@ func applyRaceEffects(agent Agent) {
 			ActionID:   actionID,
 			CooldownID: TrollBerserkingCooldownID,
 			Cooldown:   cd,
+			Type:       CooldownTypeDPS,
 			CanActivate: func(sim *Simulation, character *Character) bool {
 				if character.CurrentMana() < manaCost {
 					return false

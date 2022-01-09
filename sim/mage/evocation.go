@@ -18,6 +18,7 @@ func (mage *Mage) registerEvocationCD() {
 		ActionID:   actionID,
 		CooldownID: EvocationCooldownID,
 		Cooldown:   cooldown,
+		Type:       core.CooldownTypeMana,
 		CanActivate: func(sim *core.Simulation, character *core.Character) bool {
 			if character.IsOnCD(core.GCDCooldownID, sim.CurrentTime) {
 				return false

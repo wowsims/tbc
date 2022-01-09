@@ -240,6 +240,7 @@ func (druid *Druid) registerNaturesSwiftnessCD() {
 		ActionID:   actionID,
 		CooldownID: NaturesSwiftnessCooldownID,
 		Cooldown:   time.Minute * 3,
+		Type:       core.CooldownTypeDPS,
 		CanActivate: func(sim *core.Simulation, character *core.Character) bool {
 			return true
 		},

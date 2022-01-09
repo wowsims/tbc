@@ -117,9 +117,14 @@ func (mage *Mage) registerPresenceOfMindCD() {
 		ActionID:   actionID,
 		CooldownID: PresenceOfMindCooldownID,
 		Cooldown:   cooldown,
+		Type:       core.CooldownTypeDPS,
 		CanActivate: func(sim *core.Simulation, character *core.Character) bool {
 			if character.IsOnCD(core.GCDCooldownID, sim.CurrentTime) {
 				return false
+			}
+
+			if spell != nil && spell.IsInUse() {
+				spell.Cancel(sim)
 			}
 
 			target := sim.GetPrimaryTarget()
@@ -165,6 +170,7 @@ func (mage *Mage) registerArcanePowerCD() {
 		ActionID:   actionID,
 		CooldownID: ArcanePowerCooldownID,
 		Cooldown:   time.Minute * 3,
+		Type:       core.CooldownTypeDPS,
 		CanActivate: func(sim *core.Simulation, character *core.Character) bool {
 			return true
 		},
@@ -229,6 +235,7 @@ func (mage *Mage) registerCombustionCD() {
 		ActionID:   actionID,
 		CooldownID: CombustionCooldownID,
 		Cooldown:   time.Minute * 3,
+		Type:       core.CooldownTypeDPS,
 		CanActivate: func(sim *core.Simulation, character *core.Character) bool {
 			if character.HasAura(CombustionAuraID) {
 				return false
@@ -284,6 +291,7 @@ func (mage *Mage) registerIcyVeinsCD() {
 		ActionID:   actionID,
 		CooldownID: IcyVeinsCooldownID,
 		Cooldown:   time.Minute * 3,
+		Type:       core.CooldownTypeDPS,
 		CanActivate: func(sim *core.Simulation, character *core.Character) bool {
 			// Need to check for icy veins already active in case Cold Snap is used right after.
 			if character.HasAura(IcyVeinsAuraID) {
@@ -337,6 +345,7 @@ func (mage *Mage) registerColdSnapCD() {
 		ActionID:   actionID,
 		CooldownID: ColdSnapCooldownID,
 		Cooldown:   cooldown,
+		Type:       core.CooldownTypeDPS,
 		CanActivate: func(sim *core.Simulation, character *core.Character) bool {
 			// Don't use if there are no cooldowns to reset.
 			if !character.IsOnCD(IcyVeinsCooldownID, sim.CurrentTime) && !character.IsOnCD(SummonWaterElementalCooldownID, sim.CurrentTime) {

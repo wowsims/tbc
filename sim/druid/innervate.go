@@ -29,6 +29,7 @@ func (druid *Druid) registerInnervateCD() {
 		ActionID:   actionID,
 		CooldownID: InnervateCooldownID,
 		Cooldown:   innervateCD,
+		Type:       core.CooldownTypeMana,
 		CanActivate: func(sim *core.Simulation, character *core.Character) bool {
 			if innervateTarget == nil {
 				return false
