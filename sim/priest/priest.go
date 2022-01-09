@@ -85,7 +85,7 @@ func (priest *Priest) Advance(sim *core.Simulation, elapsedTime time.Duration) {
 	priest.Character.RegenManaCasting(sim, elapsedTime)
 }
 
-func New(char core.Character, selfBuffs SelfBuffs, talents proto.PriestTalents) Priest {
+func New(char core.Character, selfBuffs SelfBuffs, talents proto.PriestTalents) *Priest {
 
 	char.AddStatDependency(stats.StatDependency{
 		SourceStat:   stats.Intellect,
@@ -107,11 +107,13 @@ func New(char core.Character, selfBuffs SelfBuffs, talents proto.PriestTalents) 
 		char.PseudoStats.SpiritRegenRateCasting = float64(talents.Meditation) * 0.1
 	}
 
-	priest := Priest{
+	priest := &Priest{
 		Character: char,
 		SelfBuffs: selfBuffs,
 		Talents:   talents,
 	}
+
+	priest.registerShadowfiendCD()
 
 	return priest
 }
@@ -120,11 +122,12 @@ var InnerFocusAuraID = core.NewAuraID()
 var InnerFocusCooldownID = core.NewCooldownID()
 
 func ApplyInnerFocus(sim *core.Simulation, priest *Priest) bool {
-	priest.Metrics.AddInstantCast(core.ActionID{SpellID: 14751})
+	actionID := core.ActionID{SpellID: 14751}
+	priest.Metrics.AddInstantCast(actionID)
 	priest.Character.AddAura(sim, core.Aura{
-		ID:      InnerFocusAuraID,
-		Name:    "Inner Focus",
-		Expires: core.NeverExpires,
+		ID:       InnerFocusAuraID,
+		ActionID: actionID,
+		Expires:  core.NeverExpires,
 		OnCast: func(sim *core.Simulation, cast *core.Cast) {
 			cast.ManaCost = 0
 		},

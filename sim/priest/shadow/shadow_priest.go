@@ -3,6 +3,7 @@ package shadow
 import (
 	"time"
 
+	"github.com/wowsims/tbc/sim/common"
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/proto"
 	"github.com/wowsims/tbc/sim/core/stats"
@@ -53,13 +54,13 @@ func NewShadowPriest(character core.Character, options proto.Player) *ShadowPrie
 }
 
 type ShadowPriest struct {
-	priest.Priest
+	*priest.Priest
 
 	rotation proto.ShadowPriest_Rotation
 }
 
 func (spriest *ShadowPriest) GetPriest() *priest.Priest {
-	return &spriest.Priest
+	return spriest.Priest
 }
 
 func (spriest *ShadowPriest) Reset(sim *core.Simulation) {
@@ -75,6 +76,11 @@ const (
 )
 
 func (spriest *ShadowPriest) Act(sim *core.Simulation) time.Duration {
+	// If a major cooldown uses the GCD, it might already be on CD when Act() is called.
+	if spriest.IsOnCD(core.GCDCooldownID, sim.CurrentTime) {
+		return sim.CurrentTime + spriest.GetRemainingCD(core.GCDCooldownID, sim.CurrentTime)
+	}
+
 	if spriest.rotation.PrecastVt && sim.CurrentTime == 0 {
 		spell := spriest.NewVampiricTouch(sim, sim.GetPrimaryTarget())
 		spell.CastTime = 0
@@ -108,11 +114,7 @@ func (spriest *ShadowPriest) Act(sim *core.Simulation) time.Duration {
 	// timeForDots := sim.Duration-sim.CurrentTime > time.Second*12
 	// TODO: stop casting dots near the end?
 
-	if spriest.UseShadowfiend &&
-		spriest.CurrentMana()/spriest.MaxMana() < 0.5 &&
-		spriest.GetRemainingCD(priest.ShadowfiendCD, sim.CurrentTime) == 0 {
-		spell = spriest.NewShadowfiend(sim, target)
-	} else if spriest.Talents.VampiricTouch && spriest.VTSpell.DotInput.TimeRemaining(sim) <= vtCastTime {
+	if spriest.Talents.VampiricTouch && spriest.VTSpell.DotInput.TimeRemaining(sim) <= vtCastTime {
 		spell = spriest.NewVampiricTouch(sim, target)
 	} else if !spriest.SWPSpell.DotInput.IsTicking(sim) {
 		spell = spriest.NewShadowWordPain(sim, target)
@@ -131,7 +133,7 @@ func (spriest *ShadowPriest) Act(sim *core.Simulation) time.Duration {
 
 		if allCDs[mbidx] == 0 {
 			if spriest.Talents.InnerFocus && spriest.GetRemainingCD(priest.InnerFocusCooldownID, sim.CurrentTime) == 0 {
-				priest.ApplyInnerFocus(sim, &spriest.Priest)
+				priest.ApplyInnerFocus(sim, spriest.Priest)
 			}
 			spell = spriest.NewMindBlast(sim, target)
 		} else if allCDs[swdidx] == 0 {
@@ -183,7 +185,7 @@ func (spriest *ShadowPriest) Act(sim *core.Simulation) time.Duration {
 	// fmt.Printf("\tCasting: %s, %0.2f\n", spell.Name, spell.CastTime.Seconds())
 	if !actionSuccessful {
 		regenTime := spriest.TimeUntilManaRegen(spell.GetManaCost())
-		waitAction := core.NewWaitAction(sim, spriest.GetCharacter(), regenTime, core.WaitReasonOOM)
+		waitAction := common.NewWaitAction(sim, spriest.GetCharacter(), regenTime, common.WaitReasonOOM)
 		waitAction.Cast(sim)
 		return sim.CurrentTime + waitAction.GetDuration()
 	}

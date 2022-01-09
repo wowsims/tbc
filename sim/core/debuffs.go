@@ -81,11 +81,10 @@ func MiseryAura(sim *Simulation, numPoints int32) Aura {
 	multiplier := 1.0 + 0.01*float64(numPoints)
 
 	return Aura{
-		ID:      MiseryDebuffID,
-		Name:    "Misery",
-		SpellID: 33195,
-		Expires: sim.CurrentTime + time.Second*24,
-		Stacks:  numPoints,
+		ID:       MiseryDebuffID,
+		ActionID: ActionID{SpellID: 33195},
+		Expires:  sim.CurrentTime + time.Second*24,
+		Stacks:   numPoints,
 		OnBeforeSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect) {
 			spellEffect.DamageMultiplier *= multiplier
 		},
@@ -101,11 +100,10 @@ func ShadowWeavingAura(sim *Simulation, numStacks int32) Aura {
 	multiplier := 1.0 + 0.02*float64(numStacks)
 
 	return Aura{
-		ID:      ShadowWeavingDebuffID,
-		Name:    "Shadow Weaving",
-		SpellID: 15334,
-		Expires: sim.CurrentTime + time.Second*15,
-		Stacks:  numStacks,
+		ID:       ShadowWeavingDebuffID,
+		ActionID: ActionID{SpellID: 15334},
+		Expires:  sim.CurrentTime + time.Second*15,
+		Stacks:   numStacks,
 		OnBeforeSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect) {
 			if spellCast.SpellSchool == stats.ShadowSpellPower {
 				spellEffect.DamageMultiplier *= multiplier
@@ -123,10 +121,10 @@ var JudgementOfWisdomDebuffID = NewDebuffID()
 
 func JudgementOfWisdomAura() Aura {
 	const mana = 74 / 2 // 50% proc
+	actionID := ActionID{SpellID: 27164}
 	return Aura{
-		ID:      JudgementOfWisdomDebuffID,
-		Name:    "Judgement of Wisdom",
-		SpellID: 27164,
+		ID:       JudgementOfWisdomDebuffID,
+		ActionID: actionID,
 		OnSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect) {
 			if spellCast.ActionID.ItemID == ItemIDTheLightningCapacitor {
 				return // TLC cant proc JoW
@@ -135,7 +133,7 @@ func JudgementOfWisdomAura() Aura {
 			character := spellCast.Character
 			// Only apply to agents that have mana.
 			if character.MaxMana() > 0 {
-				character.AddMana(sim, mana, "Judgement of Wisdom", false)
+				character.AddMana(sim, mana, actionID, false)
 			}
 		},
 		OnMeleeAttack: func(sim *Simulation, target *Target, result MeleeHitType, ability *ActiveMeleeAbility, isOH bool) {
@@ -143,7 +141,7 @@ func JudgementOfWisdomAura() Aura {
 			character := ability.Character
 			// Only apply to agents that have mana.
 			if character.MaxMana() > 0 {
-				character.AddMana(sim, mana, "Judgement of Wisdom", false)
+				character.AddMana(sim, mana, actionID, false)
 			}
 		},
 	}
@@ -153,9 +151,8 @@ var ImprovedSealOfTheCrusaderDebuffID = NewDebuffID()
 
 func ImprovedSealOfTheCrusaderAura() Aura {
 	return Aura{
-		ID:      ImprovedSealOfTheCrusaderDebuffID,
-		Name:    "Improved Seal of the Crusader",
-		SpellID: 20337,
+		ID:       ImprovedSealOfTheCrusaderDebuffID,
+		ActionID: ActionID{SpellID: 20337},
 		OnBeforeSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect) {
 			spellEffect.BonusSpellCritRating += 3 * SpellCritRatingPerCritChance
 			// FUTURE: melee crit bonus, research actual value
@@ -171,9 +168,8 @@ func CurseOfElementsAura(coe proto.TristateEffect) Aura {
 		mult = 1.13
 	}
 	return Aura{
-		ID:      CurseOfElementsDebuffID,
-		Name:    "Curse of the Elements",
-		SpellID: 27228,
+		ID:       CurseOfElementsDebuffID,
+		ActionID: ActionID{SpellID: 27228},
 		OnBeforeSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect) {
 			if spellCast.SpellSchool == stats.NatureSpellPower ||
 				spellCast.SpellSchool == stats.HolySpellPower ||
@@ -198,8 +194,8 @@ var ImprovedShadowBoltID = NewDebuffID()
 func ImprovedShadowBoltAura(uptime float64) Aura {
 	mult := (1 + uptime*0.2)
 	return Aura{
-		ID:   ImprovedShadowBoltID,
-		Name: "Improved Shadow Bolt",
+		ID:       ImprovedShadowBoltID,
+		ActionID: ActionID{SpellID: 17803},
 		OnBeforeSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect) {
 			if spellCast.SpellSchool != stats.ShadowSpellPower {
 				return // does not apply to these schools
@@ -219,8 +215,8 @@ var BloodFrenzyDebuffID = NewDebuffID()
 
 func BloodFrenzyAura() Aura {
 	return Aura{
-		ID:   BloodFrenzyDebuffID,
-		Name: "Blood Frenzy",
+		ID:       BloodFrenzyDebuffID,
+		ActionID: ActionID{SpellID: 29859},
 		OnBeforeMelee: func(sim *Simulation, ability *ActiveMeleeAbility, isOH bool) {
 			ability.DamageMultiplier *= 1.04
 		},
@@ -233,11 +229,10 @@ func ImprovedScorchAura(sim *Simulation, numStacks int32) Aura {
 	multiplier := 1.0 + 0.03*float64(numStacks)
 
 	return Aura{
-		ID:      ImprovedScorchDebuffID,
-		Name:    "Improved Scorch",
-		SpellID: 12873,
-		Expires: sim.CurrentTime + time.Second*30,
-		Stacks:  numStacks,
+		ID:       ImprovedScorchDebuffID,
+		ActionID: ActionID{SpellID: 12873},
+		Expires:  sim.CurrentTime + time.Second*30,
+		Stacks:   numStacks,
 		OnBeforeSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect) {
 			if spellCast.SpellSchool == stats.FireSpellPower {
 				spellEffect.DamageMultiplier *= multiplier
@@ -257,11 +252,10 @@ func WintersChillAura(sim *Simulation, numStacks int32) Aura {
 	bonusCrit := 2 * float64(numStacks) * SpellCritRatingPerCritChance
 
 	return Aura{
-		ID:      WintersChillDebuffID,
-		Name:    "Winter's Chill",
-		SpellID: 28595,
-		Expires: sim.CurrentTime + time.Second*15,
-		Stacks:  numStacks,
+		ID:       WintersChillDebuffID,
+		ActionID: ActionID{SpellID: 28595},
+		Expires:  sim.CurrentTime + time.Second*15,
+		Stacks:   numStacks,
 		OnBeforeSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect) {
 			if spellCast.SpellSchool == stats.FrostSpellPower {
 				spellEffect.BonusSpellCritRating += bonusCrit
@@ -276,12 +270,11 @@ func FaerieFireAura(currentTime time.Duration, target *Target, improved bool) Au
 	const hitBonus = 3 * MeleeHitRatingPerHitChance
 	target.AddArmor(-610)
 	aura := Aura{
-		ID:      FaerieFireDebuffID,
-		SpellID: 26993,
-		Name:    "Faerie Fire",
-		Expires: currentTime + time.Second*40,
+		ID:       FaerieFireDebuffID,
+		ActionID: ActionID{SpellID: 26993},
+		Expires:  currentTime + time.Second*40,
 		OnExpire: func(sim *Simulation) {
-			target.AddArmor(-610)
+			target.AddArmor(610)
 		},
 	}
 	if improved {

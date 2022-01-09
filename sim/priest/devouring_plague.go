@@ -13,7 +13,6 @@ var DevouringPlagueCooldownID = core.NewCooldownID()
 
 func (priest *Priest) newDevouringPlagueTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
 	baseCast := core.Cast{
-		Name:           "Devouring Plague",
 		CritMultiplier: 1.5,
 		SpellSchool:    stats.ShadowSpellPower,
 		Character:      &priest.Character,

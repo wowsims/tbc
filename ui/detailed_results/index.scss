@@ -7,6 +7,7 @@
 @import "player_damage";
 @import "results_filter";
 @import "source_chart";
+@import "timeline";
 
 body {
 	background-color: transparent;
@@ -124,4 +125,22 @@ body.new-tab {
 	height: 30px;
 	width: 30px;
 	vertical-align: middle;
+}
+
+.parent-metric {
+	cursor: pointer;
+}
+.child-metric>*:first-child {
+	padding-left: 20px;
+}
+.expand-toggle {
+}
+tr:not(.parent-metric) .expand-toggle {
+	display: none;
+}
+.parent-metric.expand .fa-caret-down {
+	display: none;
+}
+.parent-metric:not(.expand) .fa-caret-right {
+	display: none;
 }

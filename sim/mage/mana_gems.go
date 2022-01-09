@@ -34,6 +34,7 @@ func (mage *Mage) registerManaGemsCD() {
 		CooldownID: core.ConjuredCooldownID,
 		Cooldown:   time.Minute * 2,
 		Priority:   core.CooldownPriorityDefault,
+		Type:       core.CooldownTypeMana,
 		CanActivate: func(sim *core.Simulation, character *core.Character) bool {
 			if mage.remainingManaGems == 0 {
 				return false
@@ -58,13 +59,13 @@ func (mage *Mage) registerManaGemsCD() {
 				if mage.remainingManaGems == 1 {
 					// Mana Ruby: Restores 1073 to 1127 mana. (2 Min Cooldown)
 					manaGain := minManaRubyGain + (sim.RandomFloat("Mana Gem") * manaRubyGainRange)
-					character.AddMana(sim, manaGain, "Mana Gem", true)
+					character.AddMana(sim, manaGain, core.MageManaGemMCDActionID, true)
 					character.SetCD(core.ConjuredCooldownID, time.Minute*2+sim.CurrentTime)
 					character.Metrics.AddInstantCast(core.MageManaGemMCDActionID)
 				} else {
 					// Mana Emerald: Restores 2340 to 2460 mana. (2 Min Cooldown)
 					manaGain := minManaEmeraldGain + (sim.RandomFloat("Mana Gem") * manaEmeraldGainRange)
-					character.AddMana(sim, manaGain, "Mana Gem", true)
+					character.AddMana(sim, manaGain, core.MageManaGemMCDActionID, true)
 					character.SetCD(core.ConjuredCooldownID, time.Minute*2+sim.CurrentTime)
 					character.Metrics.AddInstantCast(core.MageManaGemMCDActionID)
 				}
@@ -87,5 +88,5 @@ func (mage *Mage) registerManaGemsCD() {
 var SerpentCoilBraidAuraID = core.NewAuraID()
 
 func (mage *Mage) activateSerpentCoilBraid(sim *core.Simulation) {
-	mage.AddAuraWithTemporaryStats(sim, SerpentCoilBraidAuraID, 37447, "Serpent-Coil Braid", stats.SpellPower, 225, time.Second*15)
+	mage.AddAuraWithTemporaryStats(sim, SerpentCoilBraidAuraID, core.ActionID{ItemID: SerpentCoilBraidID}, stats.SpellPower, 225, time.Second*15)
 }

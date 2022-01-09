@@ -86,7 +86,7 @@ export class MageSimUI extends IndividualSimUI<Spec.SpecMage> {
 				// Default rotation settings.
 				rotation: Presets.DefaultArcaneRotation,
 				// Default talents.
-				talents: Presets.FireTalents.data,
+				talents: Presets.ArcaneTalents.data,
 				// Default spec-specific settings.
 				specOptions: Presets.DefaultArcaneOptions,
 				// Default raid/party buffs settings.
@@ -174,6 +174,7 @@ export class MageSimUI extends IndividualSimUI<Spec.SpecMage> {
 				IconInputs.SuperiorWizardOil,
 				IconInputs.BlackenedBasilisk,
 				IconInputs.SkullfishSoup,
+				IconInputs.ScrollOfSpiritV,
 				IconInputs.KreegsStoutBeatdown,
 			],
 			// Inputs to include in the 'Rotation' section on the settings tab.
@@ -193,7 +194,7 @@ export class MageSimUI extends IndividualSimUI<Spec.SpecMage> {
 				// Whether to include 'Execute Duration (%)' in the 'Encounter' section of the settings tab.
 				showExecuteProportion: true,
 				// Whether to include 'Num Targets' in the 'Encounter' section of the settings tab.
-				showNumTargets: true,
+				showNumTargets: false,
 			},
 
 			// If true, the talents on the talents tab will not be individually modifiable by the user.

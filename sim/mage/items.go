@@ -13,8 +13,6 @@ func init() {
 	var MindQuickeningGemCooldownID = core.NewCooldownID()
 	core.AddItemEffect(19339, core.MakeTemporaryStatsOnUseCDRegistration(
 		core.OffensiveTrinketActiveAuraID,
-		23723,
-		"Mind Quickening Gem",
 		stats.SpellHaste,
 		330,
 		time.Second*20,
@@ -69,7 +67,7 @@ var ItemSetTirisfalRegalia = core.ItemSet{
 					ID: Tirisfal4PcAuraID,
 					OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 						if spellEffect.Crit {
-							character.AddAuraWithTemporaryStats(sim, Tirisfal4PcProcAuraID, 37743, "Tirisfal Crit Bonus Damage", stats.SpellPower, 70, time.Second*6)
+							character.AddAuraWithTemporaryStats(sim, Tirisfal4PcProcAuraID, core.ActionID{SpellID: 37443}, stats.SpellPower, 70, time.Second*6)
 						}
 					},
 				}
@@ -106,8 +104,7 @@ func ApplyAshtongueTalismanOfInsight(agent core.Agent) {
 	char := agent.GetCharacter()
 	char.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		return core.Aura{
-			ID:   AshtongueTalismanOfInsightAuraID,
-			Name: "Ashtongue Talisman of Insight",
+			ID: AshtongueTalismanOfInsightAuraID,
 			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 				if !spellEffect.Crit {
 					return
@@ -117,7 +114,7 @@ func ApplyAshtongueTalismanOfInsight(agent core.Agent) {
 					return
 				}
 
-				char.AddAuraWithTemporaryStats(sim, AshtongueTalismanOfInsightProcAuraID, 40482, "Ashtongue Talisman of Insight", stats.SpellHaste, hasteBonus, dur)
+				char.AddAuraWithTemporaryStats(sim, AshtongueTalismanOfInsightProcAuraID, core.ActionID{ItemID: 32488}, stats.SpellHaste, hasteBonus, dur)
 			},
 		}
 	})

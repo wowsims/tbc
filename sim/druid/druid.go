@@ -32,17 +32,6 @@ type Druid struct {
 
 	FaerieFireSpell        core.SimpleSpell
 	faerieFireCastTemplate core.SimpleSpellTemplate
-
-	// The target to use innervate on, or nil if not using it.
-	innervateTarget *core.Character
-
-	// Use innervate when target has less than this much mana.
-	innervateManaThreshold float64
-
-	// Used for accounting for bonus mana expected from future innervates, for the innervate target.
-	remainingInnervateUsages int
-	expectedManaPerInnervate float64
-	innervateCD              time.Duration
 }
 
 type SelfBuffs struct {
@@ -83,33 +72,10 @@ func (druid *Druid) Init(sim *core.Simulation) {
 	druid.wrathCastTemplate = druid.newWrathTemplate(sim)
 	druid.insectSwarmCastTemplate = druid.newInsectSwarmTemplate(sim)
 	druid.faerieFireCastTemplate = druid.newFaerieFireTemplate(sim)
-
-	innervateTarget := sim.Raid.GetPlayerFromRaidTarget(druid.SelfBuffs.InnervateTarget)
-	if innervateTarget != nil {
-		druid.innervateTarget = innervateTarget.GetCharacter()
-		druid.expectedManaPerInnervate = druid.innervateTarget.SpiritManaRegenPerSecond() * 5 * 20
-
-		if druid.innervateTarget == druid.GetCharacter() {
-			// Threshold can be lower when casting on self because its never mid-cast.
-			druid.innervateManaThreshold = 500
-		} else {
-			druid.innervateManaThreshold = core.InnervateManaThreshold(druid.innervateTarget)
-		}
-
-		druid.innervateCD = core.InnervateCD
-		if ItemSetMalorne.CharacterHasSetBonus(druid.GetCharacter(), 4) {
-			druid.innervateCD -= time.Second * 48
-		}
-	}
 }
 
 func (druid *Druid) Reset(sim *core.Simulation) {
 	druid.RebirthUsed = false
-
-	if druid.innervateTarget != nil {
-		druid.remainingInnervateUsages = int(1 + (core.MaxDuration(0, sim.Duration))/druid.innervateCD)
-		druid.innervateTarget.ExpectedBonusMana += druid.expectedManaPerInnervate * float64(druid.remainingInnervateUsages)
-	}
 }
 
 func (druid *Druid) Advance(sim *core.Simulation, elapsedTime time.Duration) {
@@ -255,6 +221,7 @@ func New(char core.Character, selfBuffs SelfBuffs, talents proto.DruidTalents) D
 		RebirthUsed: false,
 	}
 
+	druid.registerInnervateCD()
 	druid.registerNaturesSwiftnessCD()
 
 	return druid
@@ -267,11 +234,13 @@ func (druid *Druid) registerNaturesSwiftnessCD() {
 	if !druid.Talents.NaturesSwiftness {
 		return
 	}
+	actionID := core.ActionID{SpellID: 17116}
 
 	druid.AddMajorCooldown(core.MajorCooldown{
-		ActionID:   core.ActionID{SpellID: 17116},
+		ActionID:   actionID,
 		CooldownID: NaturesSwiftnessCooldownID,
 		Cooldown:   time.Minute * 3,
+		Type:       core.CooldownTypeDPS,
 		CanActivate: func(sim *core.Simulation, character *core.Character) bool {
 			return true
 		},
@@ -285,9 +254,9 @@ func (druid *Druid) registerNaturesSwiftnessCD() {
 		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
 			return func(sim *core.Simulation, character *core.Character) {
 				character.AddAura(sim, core.Aura{
-					ID:      NaturesSwiftnessAuraID,
-					Name:    "Nature's Swiftness",
-					Expires: core.NeverExpires,
+					ID:       NaturesSwiftnessAuraID,
+					ActionID: actionID,
+					Expires:  core.NeverExpires,
 					OnCast: func(sim *core.Simulation, cast *core.Cast) {
 						if cast.ActionID.SpellID != SpellIDWrath && cast.ActionID.SpellID != SpellIDSF8 && cast.ActionID.SpellID != SpellIDSF6 {
 							return
@@ -304,7 +273,7 @@ func (druid *Druid) registerNaturesSwiftnessCD() {
 						character.SetCD(NaturesSwiftnessCooldownID, sim.CurrentTime+time.Minute*3)
 						character.RemoveAura(sim, NaturesSwiftnessAuraID)
 						character.UpdateMajorCooldowns()
-						character.Metrics.AddInstantCast(core.ActionID{SpellID: 17116})
+						character.Metrics.AddInstantCast(actionID)
 					},
 				})
 			}

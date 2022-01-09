@@ -1,6 +1,7 @@
 package core
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/wowsims/tbc/sim/core/proto"
@@ -45,7 +46,8 @@ type Pet struct {
 func NewPet(name string, owner *Character, baseStats stats.Stats, statInheritanceCoeffs stats.Stats, enabledOnStart bool) Pet {
 	pet := Pet{
 		Character: Character{
-			Name: name,
+			Name:  name,
+			Label: fmt.Sprintf("%s - %s", owner.Label, name),
 			PseudoStats: stats.PseudoStats{
 				AttackSpeedMultiplier: 1,
 				CastSpeedMultiplier:   1,
@@ -108,7 +110,7 @@ func (pet *Pet) IsEnabled() bool {
 // petAgent should be the PetAgent which embeds this Pet.
 func (pet *Pet) Enable(sim *Simulation, petAgent PetAgent) {
 	if pet.enabled {
-		panic("Pet is already enabled!")
+		return
 	}
 
 	pet.pendingAction = sim.newDefaultAgentAction(petAgent)
@@ -122,12 +124,23 @@ func (pet *Pet) Enable(sim *Simulation, petAgent PetAgent) {
 }
 func (pet *Pet) Disable(sim *Simulation) {
 	if !pet.enabled {
-		panic("Pet is already disabled!")
+		return
 	}
 
 	pet.pendingAction.Cancel(sim)
 	pet.pendingAction = nil
 	pet.enabled = false
+
+	// If a pet is immediately re-summoned it might try to use GCD, so we need to
+	// clear it.
+	pet.SetCD(GCDCooldownID, 0)
+	if pet.Hardcast.Cast != nil {
+		pet.Hardcast.Cast.Cancel()
+		pet.Hardcast = Hardcast{}
+	}
+
+	// Reset pet mana.
+	pet.stats[stats.Mana] = pet.MaxMana()
 
 	if pet.timeoutAction != nil {
 		pet.timeoutAction.Cancel(sim)

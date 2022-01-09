@@ -9,6 +9,17 @@ export function equalsOrBothNull<T>(a: T, b: T, comparator?: (_a: NonNullable<T>
   return (comparator || ((_a: NonNullable<T>, _b: NonNullable<T>) => a == b))(a!, b!);
 }
 
+// Default comparator function for strings. Used with functions like Array.sort().
+export function stringComparator(a: string, b: string): number {
+	if (a < b) {
+		return -1;
+	} else if (b < a) {
+		return 1;
+	} else {
+		return 0;
+	}
+}
+
 export function sum(arr: Array<number>): number {
   return arr.reduce((total, cur) => total + cur, 0);
 }
@@ -27,6 +38,18 @@ export function arrayEquals<T>(a: Array<T>, b: Array<T>, comparator?: (a: T, b: 
 // Returns a new array containing only elements present in both a and b.
 export function intersection<T>(a: Array<T>, b: Array<T>): Array<T> {
   return a.filter(value => b.includes(value));
+}
+
+// Returns a new array containing only distinct elements of arr.
+export function distinct<T>(arr: Array<T>, comparator?: (a: T, b: T) => boolean): Array<T> {
+	comparator = comparator || ((a: T, b: T) => a == b);
+	const distinctArr: Array<T> = [];
+	arr.forEach(val => {
+		if (distinctArr.find(dVal => comparator!(dVal, val)) == null) {
+			distinctArr.push(val);
+		}
+	});
+	return distinctArr;
 }
 
 // Splits an array into buckets, where elements are placed in the same bucket if the

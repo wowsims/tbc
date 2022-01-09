@@ -15,7 +15,6 @@ const IdolAvenger int32 = 31025
 
 func (druid *Druid) newWrathTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
 	baseCast := core.Cast{
-		Name:           "Wrath",
 		CritMultiplier: 1.5,
 		SpellSchool:    stats.NatureSpellPower,
 		Character:      &druid.Character,

@@ -100,7 +100,7 @@ func (eleShaman *ElementalShaman) Act(sim *core.Simulation) time.Duration {
 		// Only way for a shaman spell to fail is due to mana cost.
 		// Wait until we have enough mana to cast.
 		regenTime := eleShaman.TimeUntilManaRegen(newAction.GetManaCost())
-		newAction = core.NewWaitAction(sim, eleShaman.GetCharacter(), regenTime, core.WaitReasonOOM)
+		newAction = common.NewWaitAction(sim, eleShaman.GetCharacter(), regenTime, common.WaitReasonOOM)
 		newAction.Cast(sim)
 		eleShaman.rotation.OnActionAccepted(eleShaman, sim, newAction)
 		return sim.CurrentTime + newAction.GetDuration()
@@ -187,7 +187,7 @@ func (rotation *FixedRotation) ChooseAction(eleShaman *ElementalShaman, sim *cor
 		return eleShaman.NewLightningBolt(sim, sim.GetPrimaryTarget(), false)
 	}
 
-	return core.NewWaitAction(sim, eleShaman.GetCharacter(), eleShaman.GetRemainingCD(shaman.ChainLightningCooldownID, sim.CurrentTime), core.WaitReasonRotation)
+	return common.NewWaitAction(sim, eleShaman.GetCharacter(), eleShaman.GetRemainingCD(shaman.ChainLightningCooldownID, sim.CurrentTime), common.WaitReasonRotation)
 }
 
 func (rotation *FixedRotation) OnActionAccepted(eleShaman *ElementalShaman, sim *core.Simulation, action AgentAction) {
@@ -298,9 +298,6 @@ func NewAdaptiveRotation() *AdaptiveRotation {
 // A single action that an Agent can take.
 type AgentAction interface {
 	GetActionID() core.ActionID
-
-	// For logging / debugging.
-	GetName() string
 
 	// The Character performing this action.
 	GetCharacter() *core.Character

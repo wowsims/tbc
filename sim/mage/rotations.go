@@ -3,6 +3,7 @@ package mage
 import (
 	"time"
 
+	"github.com/wowsims/tbc/sim/common"
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/proto"
 )
@@ -28,7 +29,7 @@ func (mage *Mage) Act(sim *core.Simulation) time.Duration {
 		regenTime := mage.TimeUntilManaRegen(spell.GetManaCost())
 		// Waiting too long can give us enough mana to pick less mana-effecient spells.
 		waitTime := core.MinDuration(regenTime, time.Second*1)
-		waitAction := core.NewWaitAction(sim, mage.GetCharacter(), waitTime, core.WaitReasonOOM)
+		waitAction := common.NewWaitAction(sim, mage.GetCharacter(), waitTime, common.WaitReasonOOM)
 		waitAction.Cast(sim)
 		return sim.CurrentTime + waitAction.GetDuration()
 	}
@@ -60,6 +61,12 @@ func (mage *Mage) doArcaneRotation(sim *core.Simulation) *core.SimpleSpell {
 		// Check if we should stop regen rotation.
 		if currentManaPercent > mage.ArcaneRotation.StopRegenRotationPercent && willDropStacks {
 			mage.isDoingRegenRotation = false
+			if mage.disabledMCDs != nil {
+				for _, mcd := range mage.disabledMCDs {
+					mage.EnableMajorCooldown(mcd.ActionID)
+				}
+				mage.disabledMCDs = nil
+			}
 		}
 	} else {
 		// Check if we should start regen rotation.
@@ -72,6 +79,17 @@ func (mage *Mage) doArcaneRotation(sim *core.Simulation) *core.SimpleSpell {
 			mage.isDoingRegenRotation = true
 			mage.tryingToDropStacks = true
 			mage.numCastsDone = 0
+
+			if mage.ArcaneRotation.DisableDpsCooldownsDuringRegen {
+				disabledMCDs := []*core.MajorCooldown{}
+				for _, mcd := range mage.GetMajorCooldowns() {
+					if mcd.IsEnabled() && mcd.Type == core.CooldownTypeDPS {
+						mage.DisableMajorCooldown(mcd.ActionID)
+						disabledMCDs = append(disabledMCDs, mcd)
+					}
+				}
+				mage.disabledMCDs = disabledMCDs
+			}
 		}
 	}
 

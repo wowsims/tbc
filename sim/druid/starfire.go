@@ -17,7 +17,6 @@ const IvoryMoongoddess int32 = 27518
 
 func (druid *Druid) newStarfireTemplate(sim *core.Simulation, rank int) core.SimpleSpellTemplate {
 	baseCast := core.Cast{
-		Name:           "Starfire (Rank 8)",
 		CritMultiplier: 1.5,
 		SpellSchool:    stats.ArcaneSpellPower,
 		Character:      &druid.Character,
@@ -42,7 +41,6 @@ func (druid *Druid) newStarfireTemplate(sim *core.Simulation, rank int) core.Sim
 	}
 
 	if rank == 6 {
-		baseCast.Name = "Starfire (Rank 6)"
 		baseCast.BaseManaCost = 315
 		baseCast.ManaCost = 315
 		baseCast.ActionID = core.ActionID{

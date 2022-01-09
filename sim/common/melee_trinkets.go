@@ -16,8 +16,6 @@ func init() {
 	var BloodlustBroochCooldownID = core.NewCooldownID()
 	core.AddItemEffect(29383, core.MakeTemporaryStatsOnUseCDRegistration(
 		core.OffensiveTrinketActiveAuraID,
-		35166,
-		"Lust for Battle",
 		stats.AttackPower,
 		278,
 		time.Second*20,
@@ -32,8 +30,6 @@ func init() {
 	var AbacusViolentOddsCooldownID = core.NewCooldownID()
 	core.AddItemEffect(28288, core.MakeTemporaryStatsOnUseCDRegistration(
 		core.OffensiveTrinketActiveAuraID,
-		33807,
-		"Haste",
 		stats.MeleeHaste,
 		260,
 		time.Second*10,
@@ -48,8 +44,6 @@ func init() {
 	var EmptyDirebrewMugCooldownID = core.NewCooldownID()
 	core.AddItemEffect(38287, core.MakeTemporaryStatsOnUseCDRegistration(
 		core.OffensiveTrinketActiveAuraID,
-		51955,
-		"Dire Drunkard",
 		stats.AttackPower,
 		278,
 		time.Second*20,
@@ -75,8 +69,7 @@ func ApplyDragonspineTrophy(agent core.Agent) {
 
 		procChance, ohProcChance := core.PPMToChance(character, 1.0)
 		return core.Aura{
-			ID:   DragonspineTrophyAuraID,
-			Name: "Dragonspine Trophy",
+			ID: DragonspineTrophyAuraID,
 			OnMeleeAttack: func(sim *core.Simulation, target *core.Target, result core.MeleeHitType, ability *core.ActiveMeleeAbility, isOH bool) {
 				if result == core.MeleeHitTypeMiss || result == core.MeleeHitTypeDodge || result == core.MeleeHitTypeParry {
 					return
@@ -94,7 +87,7 @@ func ApplyDragonspineTrophy(agent core.Agent) {
 					}
 				}
 				icd = core.InternalCD(sim.CurrentTime + icdDur)
-				character.AddAuraWithTemporaryStats(sim, MeleeHasteAuraID, 34775, "Haste", stats.MeleeHaste, hasteBonus, dur)
+				character.AddAuraWithTemporaryStats(sim, MeleeHasteAuraID, core.ActionID{ItemID: 28830}, stats.MeleeHaste, hasteBonus, dur)
 			},
 		}
 	})
@@ -113,8 +106,7 @@ func ApplyHourglassUnraveller(agent core.Agent) {
 
 		procChance, ohProcChance := core.PPMToChance(character, 1.0)
 		return core.Aura{
-			ID:   HourglassUnravellerAuraID,
-			Name: "Hourglass of the Unraveller",
+			ID: HourglassUnravellerAuraID,
 			OnMeleeAttack: func(sim *core.Simulation, target *core.Target, result core.MeleeHitType, ability *core.ActiveMeleeAbility, isOH bool) {
 				if result != core.MeleeHitTypeCrit {
 					return
@@ -132,7 +124,7 @@ func ApplyHourglassUnraveller(agent core.Agent) {
 					}
 				}
 				icd = core.InternalCD(sim.CurrentTime + icdDur)
-				character.AddAuraWithTemporaryStats(sim, RageOfUnravellerAuraID, 33648, "Rage of the Unraveller", stats.AttackPower, statBonus, dur)
+				character.AddAuraWithTemporaryStats(sim, RageOfUnravellerAuraID, core.ActionID{ItemID: 33648}, stats.AttackPower, statBonus, dur)
 			},
 		}
 	})

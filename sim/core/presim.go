@@ -61,6 +61,7 @@ func (sim *Simulation) runPresims(request proto.RaidSimRequest) {
 	presimRequest := googleProto.Clone(&request).(*proto.RaidSimRequest)
 	presimRequest.SimOptions.RandomSeed = 1
 	presimRequest.SimOptions.Debug = false
+	presimRequest.SimOptions.DebugFirstIteration = false
 	presimRequest.SimOptions.Iterations = numPresimIterations
 	duration := DurationFromSeconds(presimRequest.Encounter.Duration)
 

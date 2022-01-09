@@ -14,7 +14,6 @@ var ChainLightningCooldownID = core.NewCooldownID()
 func (shaman *Shaman) newChainLightningTemplate(sim *core.Simulation, isLightningOverload bool) core.MultiTargetDirectDamageSpellTemplate {
 	spellTemplate := core.MultiTargetDirectDamageSpell{
 		SpellCast: shaman.newElectricSpellCast(
-			"Chain Lightning",
 			core.ActionID{
 				SpellID:    SpellIDCL6,
 				CooldownID: ChainLightningCooldownID,

@@ -8,15 +8,7 @@ import { EventID, TypedEvent } from '/tbc/core/typed_event.js';
 declare var tippy: any;
 
 export function addRaidSimAction(simUI: SimUI): RaidSimResultsManager {
-	simUI.addAction('DPS', 'dps-action', async () => {
-		simUI.setResultsPending();
-		try {
-			const result = await simUI.sim.runRaidSim(TypedEvent.nextEventID());
-		} catch (e) {
-			simUI.hideAllResults();
-			alert(e);
-		}
-	});
+	simUI.addAction('DPS', 'dps-action', async () => simUI.runSim());
 
 	const resultsManager = new RaidSimResultsManager(simUI);
 	simUI.sim.simResultEmitter.on((eventID, simResult) => {

@@ -1,5 +1,4 @@
-import { SimResult, SimResultFilter } from '/tbc/core/proto_utils/sim_result.js';
-import { setWowheadHref } from '/tbc/core/resources.js';
+import { ActionMetrics, SimResult, SimResultFilter } from '/tbc/core/proto_utils/sim_result.js';
 import { sum } from '/tbc/core/utils.js';
 
 import { ResultComponent, ResultComponentConfig, SimResultData } from './result_component.js';
@@ -87,9 +86,11 @@ export class SpellMetrics extends ResultComponent {
 	onSimResult(resultData: SimResultData) {
 		this.bodyElem.textContent = '';
 
-		const spellMetrics = resultData.result.getSpellMetrics(resultData.filter);
-		spellMetrics.forEach(spellMetric => {
+		const addRow = (spellMetric: ActionMetrics, isChildMetric: boolean): HTMLElement => {
 			const rowElem = document.createElement('tr');
+			if (isChildMetric) {
+				rowElem.classList.add('child-metric');
+			}
 			this.bodyElem.appendChild(rowElem);
 
 			const nameCellElem = document.createElement('td');
@@ -97,13 +98,12 @@ export class SpellMetrics extends ResultComponent {
 			nameCellElem.innerHTML = `
 			<a class="metrics-action-icon"></a>
 			<span class="metrics-action-name">${spellMetric.name}</span>
+			<span class="expand-toggle fa fa-caret-down"></span>
+			<span class="expand-toggle fa fa-caret-right"></span>
 			`;
 
 			const iconElem = nameCellElem.getElementsByClassName('metrics-action-icon')[0] as HTMLAnchorElement;
-			iconElem.style.backgroundImage = `url('${spellMetric.iconUrl}')`;
-			if (!('otherId' in spellMetric.actionId.id)) {
-				setWowheadHref(iconElem, spellMetric.actionId.id);
-			}
+			spellMetric.actionId.setBackgroundAndHref(iconElem);
 
 			const addCell = (value: string | number): HTMLElement => {
 				const cellElem = document.createElement('td');
@@ -119,6 +119,35 @@ export class SpellMetrics extends ResultComponent {
 			addCell(spellMetric.avgHit.toFixed(1)); // Avg Hit
 			addCell(spellMetric.critPercent.toFixed(2) + ' %'); // Crit %
 			addCell(spellMetric.missPercent.toFixed(2) + ' %'); // Miss %
+			return rowElem;
+		};
+
+		const spellMetrics = resultData.result.getSpellMetrics(resultData.filter);
+		const spellGroups = ActionMetrics.groupById(spellMetrics);
+
+		spellGroups.forEach(spellGroup => {
+			if (spellGroup.length == 1) {
+				addRow(spellGroup[0], false);
+				return;
+			}
+
+			const mergedMetrics = ActionMetrics.merge(spellGroup, true);
+			const parentRow = addRow(mergedMetrics, false);
+			const childRows = spellGroup.map(spellMetric => addRow(spellMetric, true));
+			const defaultDisplay = childRows[0].style.display;
+
+			let expand = true;
+			parentRow.classList.add('parent-metric', 'expand');
+			parentRow.addEventListener('click', event => {
+				expand = !expand;
+				const newDisplayValue = expand ? defaultDisplay : 'none';
+				childRows.forEach(row => row.style.display = newDisplayValue);
+				if (expand) {
+					parentRow.classList.add('expand');
+				} else {
+					parentRow.classList.remove('expand');
+				}
+			});
 		});
 
 		$(this.tableElem).trigger('update');

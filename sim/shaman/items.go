@@ -62,15 +62,13 @@ var ItemSetCycloneRegalia = core.ItemSet{
 			character := agent.GetCharacter()
 			character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 				return core.Aura{
-					ID:   Cyclone4PcAuraID,
-					Name: "Cyclone 4pc Bonus",
+					ID: Cyclone4PcAuraID,
 					OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 						if !spellEffect.Crit || sim.RandomFloat("cycl4p") > 0.11 {
 							return // if not a crit or didn't proc, don't activate
 						}
 						character.AddAura(sim, core.Aura{
-							ID:   Cyclone4PcManaRegainAuraID,
-							Name: "Cyclone Mana Cost Reduction",
+							ID: Cyclone4PcManaRegainAuraID,
 							OnCast: func(sim *core.Simulation, cast *core.Cast) {
 								// TODO: how to make sure this goes in before clearcasting?
 								cast.ManaCost -= 270
@@ -95,13 +93,12 @@ var ItemSetCataclysmRegalia = core.ItemSet{
 			character := agent.GetCharacter()
 			character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 				return core.Aura{
-					ID:   Cataclysm4PcAuraID,
-					Name: "Cataclysm 4pc Bonus",
+					ID: Cataclysm4PcAuraID,
 					OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 						if !spellEffect.Crit || sim.RandomFloat("cata4p") > 0.25 {
 							return
 						}
-						character.AddMana(sim, 120, "Cataclysm 4p Bonus", false)
+						character.AddMana(sim, 120, core.ActionID{SpellID: 37237}, false)
 					},
 				}
 			})
@@ -131,9 +128,10 @@ func ApplyNaturalAlignmentCrystal(agent core.Agent) {
 	const sp = 250
 	const dur = time.Second * 20
 	const cd = time.Minute * 5
+	actionID := core.ActionID{ItemID: 19344}
 
 	agent.GetCharacter().AddMajorCooldown(core.MajorCooldown{
-		ActionID:         core.ActionID{ItemID: 19344},
+		ActionID:         actionID,
 		CooldownID:       NaturalAlignmentCrystalCooldownID,
 		Cooldown:         cd,
 		SharedCooldownID: core.OffensiveTrinketSharedCooldownID,
@@ -148,13 +146,12 @@ func ApplyNaturalAlignmentCrystal(agent core.Agent) {
 			return func(sim *core.Simulation, character *core.Character) {
 				character.SetCD(NaturalAlignmentCrystalCooldownID, sim.CurrentTime+cd)
 				character.AddStat(stats.SpellPower, sp)
-				character.Metrics.AddInstantCast(core.ActionID{SpellID: 23734})
+				character.Metrics.AddInstantCast(actionID)
 
 				character.AddAura(sim, core.Aura{
-					ID:      core.OffensiveTrinketActiveAuraID,
-					Name:    "Natural Alignment Crystal",
-					SpellID: 23734,
-					Expires: sim.CurrentTime + dur,
+					ID:       core.OffensiveTrinketActiveAuraID,
+					ActionID: actionID,
+					Expires:  sim.CurrentTime + dur,
 					OnCast: func(sim *core.Simulation, cast *core.Cast) {
 						cast.ManaCost *= 1.2
 					},
@@ -178,8 +175,7 @@ func ApplyFathomBroochOfTheTidewalker(agent core.Agent) {
 		const icdDur = time.Second * 40
 
 		return core.Aura{
-			ID:   FathomBroochOfTheTidewalkerAuraID,
-			Name: "Fathom-Brooch of the Tidewalker",
+			ID: FathomBroochOfTheTidewalkerAuraID,
 			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
 				if icd.IsOnCD(sim) {
 					return
@@ -191,7 +187,7 @@ func ApplyFathomBroochOfTheTidewalker(agent core.Agent) {
 					return
 				}
 				icd = core.InternalCD(sim.CurrentTime + icdDur)
-				character.AddMana(sim, 335, "Fathom-Brooch of the Tidewalker", false)
+				character.AddMana(sim, 335, core.ActionID{ItemID: 30663}, false)
 			},
 		}
 	})
@@ -208,13 +204,12 @@ func ApplySkycallTotem(agent core.Agent) {
 
 		return core.Aura{
 			ID:      SkycallTotemAuraID,
-			Name:    "Skycall Totem",
 			Expires: core.NeverExpires,
 			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
 				if cast.ActionID.SpellID != SpellIDLB12 || sim.RandomFloat("Skycall Totem") > 0.15 {
 					return
 				}
-				character.AddAuraWithTemporaryStats(sim, EnergizedAuraID, 0, "Energized", stats.SpellHaste, hasteBonus, dur)
+				character.AddAuraWithTemporaryStats(sim, EnergizedAuraID, core.ActionID{ItemID: 33506}, stats.SpellHaste, hasteBonus, dur)
 			},
 		}
 	})
@@ -229,6 +224,7 @@ var ItemSetCycloneHarness = core.ItemSet{
 	Items: map[int32]struct{}{29038: {}, 29039: {}, 29040: {}, 29043: {}, 29042: {}},
 	Bonuses: map[int32]core.ApplyEffect{
 		2: func(agent core.Agent) {
+			// shaman.go
 		},
 		4: func(agent core.Agent) {
 			// stormstrike.go

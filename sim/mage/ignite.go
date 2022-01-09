@@ -15,7 +15,6 @@ func (mage *Mage) newIgniteTemplate(sim *core.Simulation) core.SimpleSpellTempla
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				Name:        "Ignite",
 				SpellSchool: stats.FireSpellPower,
 				Character:   &mage.Character,
 				ActionID: core.ActionID{
@@ -39,7 +38,6 @@ func (mage *Mage) newIgniteTemplate(sim *core.Simulation) core.SimpleSpellTempla
 				TickSpellCoefficient:  0,
 				IgnoreDamageModifiers: true,
 				DebuffID:              IgniteDebuffID,
-				SpellID:               SpellIDIgnite,
 			},
 		},
 	}

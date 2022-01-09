@@ -15,7 +15,6 @@ var ShockCooldownID = core.NewCooldownID() // shared CD for all shocks
 func (shaman *Shaman) newFrostShockTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
 	baseManaCost := 525.0
 	baseCast := core.Cast{
-		Name:           "Frost Shock",
 		CritMultiplier: 1.5,
 		SpellSchool:    stats.FrostSpellPower,
 		Character:      &shaman.Character,
@@ -86,7 +85,6 @@ const SpellIDEarthShock int32 = 25454
 func (shaman *Shaman) newEarthShockTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
 	baseManaCost := 535.0
 	baseCast := core.Cast{
-		Name:           "Earth Shock",
 		CritMultiplier: 1.5,
 		SpellSchool:    stats.NatureSpellPower,
 		Character:      &shaman.Character,

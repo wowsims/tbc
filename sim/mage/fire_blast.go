@@ -15,7 +15,6 @@ func (mage *Mage) newFireBlastTemplate(sim *core.Simulation) core.SimpleSpellTem
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				Name:           "Fire Blast",
 				CritMultiplier: 1.5 + 0.125*float64(mage.Talents.SpellPower),
 				SpellSchool:    stats.FireSpellPower,
 				Character:      &mage.Character,

@@ -1,5 +1,4 @@
 import { SimResult, SimResultFilter } from '/tbc/core/proto_utils/sim_result.js';
-import { setWowheadHref } from '/tbc/core/resources.js';
 import { sum } from '/tbc/core/utils.js';
 
 import { ResultComponent, ResultComponentConfig, SimResultData } from './result_component.js';
@@ -66,10 +65,7 @@ export class CastMetrics extends ResultComponent {
 			`;
 
 			const iconElem = nameCellElem.getElementsByClassName('metrics-action-icon')[0] as HTMLAnchorElement;
-			iconElem.style.backgroundImage = `url('${actionMetric.iconUrl}')`;
-			if (!('otherId' in actionMetric.actionId.id)) {
-				setWowheadHref(iconElem, actionMetric.actionId.id);
-			}
+			actionMetric.actionId.setBackgroundAndHref(iconElem);
 
 			const addCell = (value: string | number): HTMLElement => {
 				const cellElem = document.createElement('td');

@@ -18,7 +18,6 @@ func (shaman *Shaman) newLightningBoltTemplate(sim *core.Simulation, isLightning
 
 	spellTemplate := core.SimpleSpell{
 		SpellCast: shaman.newElectricSpellCast(
-			"Lightning Bolt",
 			core.ActionID{
 				SpellID: SpellIDLB12,
 			},

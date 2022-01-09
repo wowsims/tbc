@@ -37,7 +37,7 @@ dps_results: {
 dps_results: {
  key: "TestAllItemEffects-DarkIronSmokingPipe-38290"
  value: {
-  dps: 1432.214071775264
+  dps: 1431.7406432957018
  }
 }
 dps_results: {
@@ -73,7 +73,7 @@ dps_results: {
 dps_results: {
  key: "TestAllItemEffects-HexShrunkenHead-33829"
  value: {
-  dps: 1443.8530496096841
+  dps: 1443.2085760020218
  }
 }
 dps_results: {
@@ -109,7 +109,7 @@ dps_results: {
 dps_results: {
  key: "TestAllItemEffects-MysticalSkyfireDiamond"
  value: {
-  dps: 1432.214071775264
+  dps: 1431.7406432957018
  }
 }
 dps_results: {
@@ -187,7 +187,7 @@ dps_results: {
 dps_results: {
  key: "TestAllItemEffects-TheRestrainedEssenceofSapphiron-23046"
  value: {
-  dps: 1427.8020050081798
+  dps: 1427.4049359608048
  }
 }
 dps_results: {

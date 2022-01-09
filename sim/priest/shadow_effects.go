@@ -56,13 +56,18 @@ func (priest *Priest) ApplyShadowOnHitEffects() {
 	//  Shadow Weaving, Vampiric Touch, and Misery
 	priest.Character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		return core.Aura{
-			ID:   ShadowWeaverAuraID,
-			Name: "Shadow Weaver",
+			ID: ShadowWeaverAuraID,
 			OnPeriodicDamage: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect, tickDamage float64) {
 				if tickDamage > 0 && priest.VTSpell.DotInput.IsTicking(sim) {
 					amount := tickDamage * 0.05
 					for _, partyMember := range priest.Party.Players {
-						partyMember.GetCharacter().AddMana(sim, amount, "Vampiric Touch", false)
+						partyMember.GetCharacter().AddMana(sim, amount, VampiricTouchActionID, false)
+					}
+					for _, petAgent := range priest.Party.Pets {
+						pet := petAgent.GetPet()
+						if pet.IsEnabled() {
+							pet.Character.AddMana(sim, amount, VampiricTouchActionID, false)
+						}
 					}
 				}
 			},
@@ -71,11 +76,17 @@ func (priest *Priest) ApplyShadowOnHitEffects() {
 				if spellEffect.Damage > 0 && priest.VTSpell.DotInput.IsTicking(sim) {
 					amount := spellEffect.Damage * 0.05
 					for _, partyMember := range priest.Party.Players {
-						partyMember.GetCharacter().AddMana(sim, amount, "Vampiric Touch", false)
+						partyMember.GetCharacter().AddMana(sim, amount, VampiricTouchActionID, false)
+					}
+					for _, petAgent := range priest.Party.Pets {
+						pet := petAgent.GetPet()
+						if pet.IsEnabled() {
+							pet.Character.AddMana(sim, amount, VampiricTouchActionID, false)
+						}
 					}
 				}
 
-				if spellCast.ActionID.SpellID == SpellIDShadowWordPain || spellCast.ActionID.SpellID == SpellIDVampiricTouch || spellCast.ActionID.SpellID == SpellIDMindFlay {
+				if spellCast.ActionID.SpellID == SpellIDShadowWordPain || spellCast.ActionID.SpellID == VampiricTouchActionID.SpellID || spellCast.ActionID.SpellID == SpellIDMindFlay {
 					priest.ApplyMisery(sim, spellEffect.Target)
 				}
 			},

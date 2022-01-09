@@ -14,7 +14,6 @@ var MoonfireDebuffID = core.NewDebuffID()
 
 func (druid *Druid) newMoonfireTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
 	baseCast := core.Cast{
-		Name:           "Moonfire",
 		CritMultiplier: 1.5,
 		SpellSchool:    stats.ArcaneSpellPower,
 		Character:      &druid.Character,
@@ -42,7 +41,6 @@ func (druid *Druid) newMoonfireTemplate(sim *core.Simulation) core.SimpleSpellTe
 			TickBaseDamage:       600 / 4,
 			TickSpellCoefficient: 0.13,
 			DebuffID:             MoonfireDebuffID,
-			SpellID:              SpellIDMoonfire,
 		},
 	}
 
