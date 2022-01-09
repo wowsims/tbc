@@ -106,9 +106,16 @@ func applyBuffEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs proto.P
 	character.AddStats(stats.Stats{
 		stats.Agility: GetTristateValueFloat(partyBuffs.GraceOfAirTotem, 77.0, 88.55),
 	})
-	character.AddStats(stats.Stats{
-		stats.Strength: GetTristateValueFloat(partyBuffs.StrengthOfEarthTotem, 86.0, 98.9),
-	})
+	switch partyBuffs.StrengthOfEarthTotem {
+	case proto.StrengthOfEarthType_Basic:
+		character.AddStat(stats.Strength, 86)
+	case proto.StrengthOfEarthType_CycloneBonus:
+		character.AddStat(stats.Strength, 98)
+	case proto.StrengthOfEarthType_EnhancingTotems:
+		character.AddStat(stats.Strength, 98.9)
+	case proto.StrengthOfEarthType_EnhancingAndCyclone:
+		character.AddStat(stats.Strength, 110.9)
+	}
 	character.AddStats(stats.Stats{
 		stats.MP5: GetTristateValueFloat(partyBuffs.ManaSpringTotem, 50, 62.5),
 	})

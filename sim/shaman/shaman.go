@@ -232,11 +232,20 @@ func (shaman *Shaman) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {
 	}
 
 	if shaman.SelfBuffs.EarthTotem == proto.EarthTotem_StrengthOfEarthTotem {
-		value := proto.TristateEffect_TristateEffectRegular
+		value := proto.StrengthOfEarthType_Basic
 		if shaman.Talents.EnhancingTotems == 2 {
-			value = proto.TristateEffect_TristateEffectImproved
+			value = proto.StrengthOfEarthType_EnhancingTotems
 		}
-		partyBuffs.StrengthOfEarthTotem = core.MaxTristate(partyBuffs.StrengthOfEarthTotem, value)
+		if ItemSetCycloneHarness.CharacterHasSetBonus(&shaman.Character, 2) {
+			if value == proto.StrengthOfEarthType_EnhancingTotems {
+				value = proto.StrengthOfEarthType_EnhancingAndCyclone
+			} else {
+				value = proto.StrengthOfEarthType_CycloneBonus
+			}
+		}
+		if value > partyBuffs.StrengthOfEarthTotem {
+			partyBuffs.StrengthOfEarthTotem = value
+		}
 	}
 }
 
@@ -526,6 +535,9 @@ func (shaman *Shaman) applyFlurry(level int32) {
 		var icd core.InternalCD
 
 		bonus := 1.3
+		if ItemSetCataclysmRegalia.CharacterHasSetBonus(&shaman.Character, 4) {
+			bonus += 1.05
+		}
 		inverseBonus := 1 / 1.3
 		return core.Aura{
 			ID: FlurryTalentAuraID,
