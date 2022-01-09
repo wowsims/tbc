@@ -90,6 +90,9 @@ message Mage {
 
 				// Percentage of mana (0-1) above which to switch to regular rotation.
 				double stop_regen_rotation_percent = 4;
+
+				// Prevents DPS cooldowns from being using during regen rotation.
+				bool disable_dps_cooldowns_during_regen = 5;
 			}
 			ArcaneRotation arcane = 2;
 

@@ -148,6 +148,7 @@ type externalConsecutiveCDApproximation struct {
 	AuraID           AuraID
 	CooldownID       CooldownID
 	CooldownPriority float64
+	Type             int32
 	AuraDuration     time.Duration
 	AuraCD           time.Duration
 
@@ -176,6 +177,7 @@ func registerExternalConsecutiveCDApproximation(agent Agent, config externalCons
 		CooldownID: config.CooldownID,
 		Cooldown:   config.AuraDuration, // Assumes that multiple buffs are different sources.
 		Priority:   config.CooldownPriority,
+		Type:       config.Type,
 
 		CanActivate: func(sim *Simulation, character *Character) bool {
 			if externalCDs[nextExternalIndex].IsOnCD(sim) {
@@ -231,6 +233,7 @@ func registerBloodlustCD(agent Agent, numBloodlusts int32) {
 			CooldownPriority: CooldownPriorityBloodlust,
 			AuraDuration:     BloodlustDuration,
 			AuraCD:           BloodlustCD,
+			Type:             CooldownTypeDPS,
 
 			ShouldActivate: func(sim *Simulation, character *Character) bool {
 				// Haste portion doesn't stack with Power Infusion, so prefer to wait.
@@ -283,6 +286,7 @@ func registerPowerInfusionCD(agent Agent, numPowerInfusions int32) {
 			CooldownPriority: CooldownPriorityDefault,
 			AuraDuration:     PowerInfusionDuration,
 			AuraCD:           PowerInfusionCD,
+			Type:             CooldownTypeDPS,
 
 			ShouldActivate: func(sim *Simulation, character *Character) bool {
 				// Haste portion doesn't stack with Bloodlust, so prefer to wait.
@@ -349,6 +353,7 @@ func registerInnervateCD(agent Agent, numInnervates int32) {
 			CooldownPriority: CooldownPriorityDefault,
 			AuraDuration:     InnervateDuration,
 			AuraCD:           InnervateCD,
+			Type:             CooldownTypeMana,
 			Init: func(sim *Simulation, character *Character) {
 				expectedManaPerInnervate = character.SpiritManaRegenPerSecond() * 5 * 20
 				remainingInnervateUsages = int(1 + (MaxDuration(0, sim.Duration))/InnervateCD)
@@ -431,6 +436,7 @@ func registerManaTideTotemCD(agent Agent, numManaTideTotems int32) {
 			CooldownPriority: CooldownPriorityDefault,
 			AuraDuration:     ManaTideTotemDuration,
 			AuraCD:           ManaTideTotemCD,
+			Type:             CooldownTypeMana,
 			Init: func(sim *Simulation, character *Character) {
 				// Use first MTT at 60s, or halfway through the fight, whichever comes first.
 				initialDelay = MinDuration(sim.Duration/2, time.Second*60)

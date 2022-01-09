@@ -83,6 +83,7 @@ func (mage *Mage) ArcaneBlastAura(sim *core.Simulation, numStacks int32) core.Au
 			// Reset the mana cost on expiration.
 			if mage.arcaneBlastSpell.IsInUse() {
 				mage.arcaneBlastSpell.ManaCost = core.MaxFloat(0, mage.arcaneBlastSpell.ManaCost-3.0*ArcaneBlastBaseManaCost*0.75)
+				mage.arcaneBlastSpell.ActionID.Tag = 1
 			}
 		},
 	}

@@ -151,12 +151,15 @@ func registerDrumsCD(agent Agent, partyBuffs proto.PartyBuffs, consumes proto.Co
 
 	var applyDrums func(sim *Simulation, character *Character)
 	var actionID ActionID
+	var cooldownType int32
 	if drumsType == proto.Drums_DrumsOfBattle {
 		applyDrums = applyDrumsOfBattle
 		actionID = DrumsOfBattleActionID
+		cooldownType = CooldownTypeDPS
 	} else if drumsType == proto.Drums_DrumsOfRestoration {
 		applyDrums = applyDrumsOfRestoration
 		actionID = DrumsOfRestorationActionID
+		cooldownType = CooldownTypeMana
 	}
 
 	if applyDrums == nil {
@@ -168,6 +171,7 @@ func registerDrumsCD(agent Agent, partyBuffs proto.PartyBuffs, consumes proto.Co
 		CooldownID: DrumsCooldownID,
 		Cooldown:   DrumsCD,
 		Priority:   CooldownPriorityDrums,
+		Type:       cooldownType,
 
 		CanActivate:    func(sim *Simulation, character *Character) bool { return true },
 		ShouldActivate: func(sim *Simulation, character *Character) bool { return true },
@@ -299,6 +303,7 @@ func registerPotionCD(agent Agent, consumes proto.Consumes) {
 
 			CooldownID: PotionCooldownID,
 			Cooldown:   time.Minute * 2,
+			Type:       startingMCD.Type,
 
 			ActivationFactory: func(sim *Simulation) CooldownActivation {
 				numStartingPotionsUsed = 0
@@ -334,6 +339,7 @@ func registerPotionCD(agent Agent, consumes proto.Consumes) {
 
 			CooldownID: PotionCooldownID,
 			Cooldown:   time.Minute * 2,
+			Type:       defaultMCD.Type,
 
 			ActivationFactory: func(sim *Simulation) CooldownActivation {
 				initExpectedBonusMana(sim, defaultPotion, true)
@@ -354,6 +360,7 @@ func makePotionActivation(potionType proto.Potions, character *Character) (Major
 		actionID := ActionID{ItemID: 22839}
 		return MajorCooldown{
 				ActionID: actionID,
+				Type:     CooldownTypeDPS,
 				CanActivate: func(sim *Simulation, character *Character) bool {
 					return true
 				},
@@ -387,6 +394,7 @@ func makePotionActivation(potionType proto.Potions, character *Character) (Major
 		actionID := ActionID{ItemID: 22832}
 		return MajorCooldown{
 				ActionID: actionID,
+				Type:     CooldownTypeMana,
 				CanActivate: func(sim *Simulation, character *Character) bool {
 					return true
 				},
@@ -416,6 +424,7 @@ func makePotionActivation(potionType proto.Potions, character *Character) (Major
 		actionID := ActionID{ItemID: 22838}
 		return MajorCooldown{
 				ActionID: actionID,
+				Type:     CooldownTypeDPS,
 				CanActivate: func(sim *Simulation, character *Character) bool {
 					return true
 				},
@@ -464,6 +473,7 @@ func registerConjuredCD(agent Agent, consumes proto.Consumes) {
 		CooldownID:  ConjuredCooldownID,
 		Cooldown:    mcd.Cooldown,
 		CanActivate: mcd.CanActivate,
+		Type:        mcd.Type,
 		ShouldActivate: func(sim *Simulation, character *Character) bool {
 			if consumes.DefaultConjured == proto.Conjured_ConjuredDarkRune &&
 				mageManaGemMCD != nil &&
@@ -503,6 +513,7 @@ func makeConjuredActivation(conjuredType proto.Conjured, character *Character) (
 		return MajorCooldown{
 				ActionID: actionID,
 				Cooldown: time.Minute * 2,
+				Type:     CooldownTypeMana,
 				CanActivate: func(sim *Simulation, character *Character) bool {
 					return true
 				},
@@ -527,6 +538,7 @@ func makeConjuredActivation(conjuredType proto.Conjured, character *Character) (
 		return MajorCooldown{
 				ActionID: actionID,
 				Cooldown: time.Minute * 3,
+				Type:     CooldownTypeDPS,
 				CanActivate: func(sim *Simulation, character *Character) bool {
 					return true
 				},

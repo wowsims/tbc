@@ -34,6 +34,7 @@ func (mage *Mage) registerManaGemsCD() {
 		CooldownID: core.ConjuredCooldownID,
 		Cooldown:   time.Minute * 2,
 		Priority:   core.CooldownPriorityDefault,
+		Type:       core.CooldownTypeMana,
 		CanActivate: func(sim *core.Simulation, character *core.Character) bool {
 			if mage.remainingManaGems == 0 {
 				return false

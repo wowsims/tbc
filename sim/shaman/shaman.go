@@ -322,6 +322,7 @@ func (shaman *Shaman) registerBloodlustCD() {
 		CooldownID: BloodlustCooldownID,
 		Cooldown:   core.BloodlustCD,
 		Priority:   core.CooldownPriorityBloodlust,
+		Type:       core.CooldownTypeDPS,
 		CanActivate: func(sim *core.Simulation, character *core.Character) bool {
 			// Need to check if any party member has lust, not just self, because of
 			// major CD ordering issues with the shared bloodlust.
@@ -360,6 +361,7 @@ func (shaman *Shaman) registerElementalMasteryCD() {
 		ActionID:   actionID,
 		CooldownID: ElementalMasteryCooldownID,
 		Cooldown:   time.Minute * 3,
+		Type:       core.CooldownTypeDPS,
 		CanActivate: func(sim *core.Simulation, character *core.Character) bool {
 			return true
 		},
@@ -403,6 +405,7 @@ func (shaman *Shaman) registerNaturesSwiftnessCD() {
 		ActionID:   actionID,
 		CooldownID: NaturesSwiftnessCooldownID,
 		Cooldown:   time.Minute * 3,
+		Type:       core.CooldownTypeDPS,
 		CanActivate: func(sim *core.Simulation, character *core.Character) bool {
 			// Don't use NS unless we're casting a full-length lightning bolt, which is
 			// the only spell shamans have with a cast longer than GCD.

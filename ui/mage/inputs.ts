@@ -328,6 +328,26 @@ export const MageRotationConfig = {
 				showWhen: (player: Player<Spec.SpecMage>) => player.getRotation().type == RotationType.Arcane,
 			},
 		},
+		{
+			type: 'boolean' as const,
+			cssClass: 'disable-dps-cooldowns-during-regen-picker',
+			getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
+			config: {
+				label: 'Disable DPS cooldowns during regen',
+				labelTooltip: 'Prevents the usage of any DPS cooldowns during regen rotation. Mana CDs are still allowed.',
+				changedEvent: (player: Player<Spec.SpecMage>) => player.rotationChangeEmitter,
+				getValue: (player: Player<Spec.SpecMage>) => player.getRotation().arcane?.disableDpsCooldownsDuringRegen || false,
+				setValue: (eventID: EventID, player: Player<Spec.SpecMage>, newValue: boolean) => {
+					const newRotation = player.getRotation();
+					if (!newRotation.arcane) {
+						newRotation.arcane = ArcaneRotation.clone(Presets.DefaultArcaneRotation.arcane!);
+					}
+					newRotation.arcane.disableDpsCooldownsDuringRegen = newValue;
+					player.setRotation(eventID, newRotation);
+				},
+				showWhen: (player: Player<Spec.SpecMage>) => player.getRotation().type == RotationType.Arcane,
+			},
+		},
 	],
 };
 

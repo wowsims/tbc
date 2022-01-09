@@ -14,6 +14,12 @@ const (
 	CooldownPriorityBloodlust = 1.0
 )
 
+const (
+	CooldownTypeUnknown = 0
+	CooldownTypeMana    = 1
+	CooldownTypeDPS     = 2
+)
+
 // Condition for whether a cooldown can/should be activated.
 // Returning false prevents the cooldown from being activated.
 type CooldownActivationCondition func(*Simulation, *Character) bool
@@ -54,6 +60,10 @@ type MajorCooldown struct {
 	// cooldowns have a non-zero cast time. For example, Drums should be used
 	// before Bloodlust.
 	Priority float64
+
+	// Internal category, used for filtering. For example, mages want to disable
+	// all DPS cooldowns during their regen rotation.
+	Type int32
 
 	// Whether the cooldown meets all hard requirements for activation (e.g. resource cost).
 	// Note chat whether the cooldown is off CD is automatically checked, so it does not
@@ -241,6 +251,11 @@ func (mcdm *majorCooldownManager) GetMajorCooldown(actionID ActionID) *MajorCool
 	return nil
 }
 
+// Returns all MCDs.
+func (mcdm *majorCooldownManager) GetMajorCooldowns() []*MajorCooldown {
+	return mcdm.majorCooldowns
+}
+
 func (mcdm *majorCooldownManager) GetMajorCooldownIDs() []*proto.ActionID {
 	ids := make([]*proto.ActionID, len(mcdm.initialMajorCooldowns))
 	for i, mcd := range mcdm.initialMajorCooldowns {
@@ -305,6 +320,7 @@ func RegisterTemporaryStatsOnUseCD(agent Agent, auraID AuraID, stat stats.Stat, 
 
 	mcd.CanActivate = func(sim *Simulation, character *Character) bool { return true }
 	mcd.ShouldActivate = func(sim *Simulation, character *Character) bool { return true }
+	mcd.Type = CooldownTypeDPS
 
 	mcd.ActivationFactory = func(sim *Simulation) CooldownActivation {
 		return func(sim *Simulation, character *Character) {
