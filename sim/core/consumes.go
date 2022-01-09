@@ -184,6 +184,12 @@ func registerDrumsCD(agent Agent, partyBuffs proto.PartyBuffs, consumes proto.Co
 				for _, agent := range character.Party.Players {
 					applyDrums(sim, agent.GetCharacter())
 				}
+				for _, petAgent := range character.Party.Pets {
+					pet := petAgent.GetPet()
+					if pet.IsEnabled() {
+						applyDrums(sim, &pet.Character)
+					}
+				}
 				// TODO: Do a cast time
 				character.Metrics.AddInstantCast(actionID)
 			}
@@ -193,6 +199,15 @@ func registerDrumsCD(agent Agent, partyBuffs proto.PartyBuffs, consumes proto.Co
 		// gives just themself the buff, with no cast time.
 		mcd.ActivationFactory = func(sim *Simulation) CooldownActivation {
 			return applyDrums
+			return func(sim *Simulation, character *Character) {
+				applyDrums(sim, character)
+				for _, petAgent := range character.Pets {
+					pet := petAgent.GetPet()
+					if pet.IsEnabled() {
+						applyDrums(sim, &pet.Character)
+					}
+				}
+			}
 		}
 	}
 

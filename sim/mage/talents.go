@@ -66,34 +66,47 @@ func (mage *Mage) applyArcaneConcentration() {
 	mage.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		procChance := 0.02 * float64(mage.Talents.ArcaneConcentration)
 		bonusCrit := float64(mage.Talents.ArcanePotency) * 10 * core.SpellCritRatingPerCritChance
-		icd := core.NewICD()
-		const icdDur = time.Second * 1
+
+		ccAura := core.Aura{
+			ID:       ClearcastingAuraID,
+			ActionID: core.ActionID{SpellID: 12536},
+			OnCast: func(sim *core.Simulation, cast *core.Cast) {
+				cast.ManaCost = 0
+				cast.BonusCritRating += bonusCrit
+			},
+			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
+				mage.RemoveAura(sim, ClearcastingAuraID)
+			},
+		}
 
 		return core.Aura{
 			ID: ArcaneConcentrationAuraID,
+			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
+				// Arcane missle initial hit can proc clearcasting.
+				if !cast.IsSpellAction(SpellIDArcaneMissiles) {
+					return
+				}
+
+				if sim.RandomFloat("Arcane Concentration") > procChance {
+					return
+				}
+
+				mage.AddAura(sim, ccAura)
+				// Also has special interaction with AM, gets the benefit of CC crit bonus on its own cast.
+				cast.BonusCritRating += bonusCrit
+			},
 			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 				if spellCast.IsSpellAction(SpellIDArcaneMissiles) {
-					// AM shouldn't proc clearcasting.
+					// Arcane missle bolts shouldn't proc clearcasting.
 					return
 				}
 
 				// TODO: This should only get 1 roll for each aoe cast.
-				if icd.IsOnCD(sim) || sim.RandomFloat("Arcane Concentration") > procChance {
+				if sim.RandomFloat("Arcane Concentration") > procChance {
 					return
 				}
-				icd = core.InternalCD(sim.CurrentTime + icdDur)
 
-				mage.AddAura(sim, core.Aura{
-					ID:       ClearcastingAuraID,
-					ActionID: core.ActionID{SpellID: 12536},
-					OnCast: func(sim *core.Simulation, cast *core.Cast) {
-						cast.ManaCost = 0
-						cast.BonusCritRating += bonusCrit
-					},
-					OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
-						mage.RemoveAura(sim, ClearcastingAuraID)
-					},
-				})
+				mage.AddAura(sim, ccAura)
 			},
 		}
 	})

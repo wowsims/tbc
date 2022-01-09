@@ -1,48 +1,48 @@
 dps_results: {
  key: "TestAllArcaneSettings-Troll10-P1Arcane-ArcaneRotation-FullBuffs-LongMultiTarget"
  value: {
-  dps: 1429.144244244104
+  dps: 1468.317663068797
  }
 }
 dps_results: {
  key: "TestAllArcaneSettings-Troll10-P1Arcane-ArcaneRotation-FullBuffs-LongSingleTargetFullDebuffs"
  value: {
-  dps: 1429.144244244104
+  dps: 1468.317663068797
  }
 }
 dps_results: {
  key: "TestAllArcaneSettings-Troll10-P1Arcane-ArcaneRotation-FullBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 1126.1329408539596
+  dps: 1175.6288540708204
  }
 }
 dps_results: {
  key: "TestAllArcaneSettings-Troll10-P1Arcane-ArcaneRotation-FullBuffs-ShortSingleTargetFullDebuffs"
  value: {
-  dps: 2398.467501876812
+  dps: 2394.78803501055
  }
 }
 dps_results: {
  key: "TestAllArcaneSettings-Troll10-P1Arcane-ArcaneRotation-NoBuffs-LongMultiTarget"
  value: {
-  dps: 824.4436627035565
+  dps: 792.4802456263039
  }
 }
 dps_results: {
  key: "TestAllArcaneSettings-Troll10-P1Arcane-ArcaneRotation-NoBuffs-LongSingleTargetFullDebuffs"
  value: {
-  dps: 824.4436627035565
+  dps: 792.4802456263039
  }
 }
 dps_results: {
  key: "TestAllArcaneSettings-Troll10-P1Arcane-ArcaneRotation-NoBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 631.0688943763445
+  dps: 657.2076001198413
  }
 }
 dps_results: {
  key: "TestAllArcaneSettings-Troll10-P1Arcane-ArcaneRotation-NoBuffs-ShortSingleTargetFullDebuffs"
  value: {
-  dps: 1724.0512400589614
+  dps: 1698.8144775440292
  }
 }

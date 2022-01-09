@@ -40,7 +40,7 @@ export class Entity {
 	//   'Target 1' if a target,
 	//   'PlayerName (#1)' if a player, or
 	//   'PlayerName (#1) - PetName' if a pet.
-	static parseRegex = /(Target (\d+))|(([a-zA-Z0-9]+) \(#(\d+)\) - ([a-zA-Z0-9]+))|(([a-zA-Z0-9]+) \(#(\d+)\))/g;
+	static parseRegex = /\[(Target (\d+))|(([a-zA-Z0-9]+) \(#(\d+)\) - ([a-zA-Z0-9\s]+))|(([a-zA-Z0-9]+) \(#(\d+)\))\]/g;
 	static parseAll(str: string): Array<Entity> {
 		return Array.from(str.matchAll(Entity.parseRegex)).map(match => {
 			if (match[1]) {
@@ -226,7 +226,7 @@ export class DamageDealtLog extends SimLog {
 	}
 
 	static parse(params: SimLogParams): Promise<DamageDealtLog> | null {
-		const match = params.raw.match(/] (.*?) ((Miss)|(Hit)|(Crit)|(ticked))( for (\d+\.\d+) damage.( \((\d+)% Resist\))?)?/);
+		const match = params.raw.match(/] (.*?) ((Miss)|(Hit)|(Crit)|(ticked))( for (\d+\.\d+) damage( \((\d+)% Resist\))?)?/);
 		if (match) {
 			return ActionId.fromLogString(match[1]).fill(params.source?.index).then(cause => {
 				if (match[2] == 'Miss') {

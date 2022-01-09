@@ -63,6 +63,12 @@ func (priest *Priest) ApplyShadowOnHitEffects() {
 					for _, partyMember := range priest.Party.Players {
 						partyMember.GetCharacter().AddMana(sim, amount, VampiricTouchActionID, false)
 					}
+					for _, petAgent := range priest.Party.Pets {
+						pet := petAgent.GetPet()
+						if pet.IsEnabled() {
+							pet.Character.AddMana(sim, amount, VampiricTouchActionID, false)
+						}
+					}
 				}
 			},
 			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
@@ -71,6 +77,12 @@ func (priest *Priest) ApplyShadowOnHitEffects() {
 					amount := spellEffect.Damage * 0.05
 					for _, partyMember := range priest.Party.Players {
 						partyMember.GetCharacter().AddMana(sim, amount, VampiricTouchActionID, false)
+					}
+					for _, petAgent := range priest.Party.Pets {
+						pet := petAgent.GetPet()
+						if pet.IsEnabled() {
+							pet.Character.AddMana(sim, amount, VampiricTouchActionID, false)
+						}
 					}
 				}
 
