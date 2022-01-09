@@ -1,30 +1,17 @@
 import { Component } from '/tbc/core/components/component.js';
+import { launchedSpecs } from '/tbc/core/launched_sims.js';
 import { Spec } from '/tbc/core/proto/common.js';
 import {
 	classColors,
 	getSpecSiteUrl,
-	linkedSpecs,
 	raidSimSiteUrl,
 	specNames,
 	specToClass,
+	titleIcons,
+	raidSimIcon,
 } from '/tbc/core/proto_utils/utils.js';
 
 declare var tippy: any;
-
-export const titleIcons: Record<Spec, string> = {
-  [Spec.SpecBalanceDruid]: '/tbc/assets/balance_druid_icon.png',
-  [Spec.SpecElementalShaman]: '/tbc/assets/elemental_shaman_icon.png',
-  [Spec.SpecEnhancementShaman]: '/tbc/assets/enhancement_shaman_icon.png',
-  [Spec.SpecHunter]: 'https://wow.zamimg.com/images/wow/icons/large/ability_marksmanship.jpg',
-  [Spec.SpecMage]: '/tbc/assets/mage_icon.png',
-  [Spec.SpecRogue]: 'https://wow.zamimg.com/images/wow/icons/large/ability_rogue_eviscerate.jpg',
-  [Spec.SpecRetributionPaladin]: 'https://wow.zamimg.com/images/wow/icons/large/spell_holy_auraoflight.jpg',
-  [Spec.SpecShadowPriest]: '/tbc/assets/shadow_priest_icon.png',
-  [Spec.SpecWarlock]: 'https://wow.zamimg.com/images/wow/icons/large/spell_shadow_metamorphosis.jpg',
-  [Spec.SpecWarrior]: '/tbc/assets/warrior_icon.png',
-};
-
-export const raidSimIcon: string = '/tbc/assets/raid_icon.png';
 
 export interface SimLinkOption {
 	iconUrl: string,
@@ -58,10 +45,10 @@ export class Title extends Component {
 		let otherOptions = [];
 		if (currentSpec == null) {
 			currentOption = this.makeOptionData(null, true);
-			otherOptions = linkedSpecs.map(spec => this.makeOptionData(spec, false));
+			otherOptions = launchedSpecs.map(spec => this.makeOptionData(spec, false));
 		} else {
 			currentOption = this.makeOptionData(currentSpec, true);
-			otherOptions = linkedSpecs
+			otherOptions = launchedSpecs
 					.filter(spec => spec != currentSpec)
 					.map(spec => this.makeOptionData(spec, false))
 					.concat([ this.makeOptionData(null, false) ]);

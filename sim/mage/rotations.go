@@ -3,6 +3,7 @@ package mage
 import (
 	"time"
 
+	"github.com/wowsims/tbc/sim/common"
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/proto"
 )
@@ -28,7 +29,7 @@ func (mage *Mage) Act(sim *core.Simulation) time.Duration {
 		regenTime := mage.TimeUntilManaRegen(spell.GetManaCost())
 		// Waiting too long can give us enough mana to pick less mana-effecient spells.
 		waitTime := core.MinDuration(regenTime, time.Second*1)
-		waitAction := core.NewWaitAction(sim, mage.GetCharacter(), waitTime, core.WaitReasonOOM)
+		waitAction := common.NewWaitAction(sim, mage.GetCharacter(), waitTime, common.WaitReasonOOM)
 		waitAction.Cast(sim)
 		return sim.CurrentTime + waitAction.GetDuration()
 	}

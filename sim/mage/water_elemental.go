@@ -3,6 +3,7 @@ package mage
 import (
 	"time"
 
+	"github.com/wowsims/tbc/sim/common"
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/stats"
 )
@@ -99,7 +100,7 @@ func (we *WaterElemental) Act(sim *core.Simulation) time.Duration {
 		// Water ele has decided not to cooperate, so just wait for the cast time
 		// instead of casting.
 		spell.Cancel(sim)
-		waitAction := core.NewWaitAction(sim, we.GetCharacter(), spell.GetDuration(), core.WaitReasonNone)
+		waitAction := common.NewWaitAction(sim, we.GetCharacter(), spell.GetDuration(), common.WaitReasonNone)
 		waitAction.Cast(sim)
 		return sim.CurrentTime + waitAction.GetDuration()
 	}
