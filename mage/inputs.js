@@ -222,7 +222,7 @@ export const MageRotationConfig = {
                         name: 'Arcane Missiles', value: ArcaneFiller.ArcaneMissiles,
                     },
                     {
-                        name: 'Scorch', value: ArcaneFiller.Fireball,
+                        name: 'Scorch', value: ArcaneFiller.Scorch,
                     },
                     {
                         name: 'Fireball', value: ArcaneFiller.Fireball,
