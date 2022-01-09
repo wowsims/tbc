@@ -24,6 +24,7 @@ import { SavedSettings } from '/tbc/core/proto/ui.js';
 import { SavedTalents } from '/tbc/core/proto/ui.js';
 import { SimUI } from './sim_ui.js';
 import { getMetaGemConditionDescription } from '/tbc/core/proto_utils/gems.js';
+import { launchedSpecs } from '/tbc/core/launched_sims.js';
 import { Stats } from '/tbc/core/proto_utils/stats.js';
 import { TypedEvent } from './typed_event.js';
 import { addRaidSimAction } from '/tbc/core/components/raid_sim_action.js';
@@ -63,6 +64,13 @@ export class IndividualSimUI extends SimUI {
         this.individualConfig = config;
         this.raidSimResultsManager = null;
         this.settingsMuuri = null;
+        if (!launchedSpecs.includes(this.player.spec)) {
+            this.addWarning({
+                updateOn: new TypedEvent(),
+                shouldDisplay: () => true,
+                getContent: () => 'This sim is still under development.',
+            });
+        }
         this.addWarning({
             updateOn: this.player.gearChangeEmitter,
             shouldDisplay: () => this.player.getGear().hasInactiveMetaGem(),

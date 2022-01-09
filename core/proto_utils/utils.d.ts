@@ -30,12 +30,13 @@ export declare type ShamanSpecs = [Spec.SpecElementalShaman, Spec.SpecEnhancemen
 export declare type WarlockSpecs = Spec.SpecWarlock;
 export declare type WarriorSpecs = Spec.SpecWarrior;
 export declare const NUM_SPECS: number;
-export declare const linkedSpecs: Array<Spec>;
 export declare const naturalSpecOrder: Array<Spec>;
 export declare const specNames: Record<Spec, string>;
 export declare const classColors: Record<Class, string>;
 export declare const specIconsLarge: Record<Spec, string>;
 export declare const talentTreeIcons: Record<Class, Array<string>>;
+export declare const titleIcons: Record<Spec, string>;
+export declare const raidSimIcon: string;
 export declare function getTalentTree(talentsString: string): number;
 export declare function getTalentTreeIcon(spec: Spec, talentsString: string): string;
 export declare function getSpecSiteUrl(spec: Spec): string;
