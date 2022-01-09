@@ -14,6 +14,12 @@ const (
 	CooldownPriorityBloodlust = 1.0
 )
 
+const (
+	CooldownTypeUnknown = 0
+	CooldownTypeMana    = 1
+	CooldownTypeDPS     = 2
+)
+
 // Condition for whether a cooldown can/should be activated.
 // Returning false prevents the cooldown from being activated.
 type CooldownActivationCondition func(*Simulation, *Character) bool
@@ -54,6 +60,10 @@ type MajorCooldown struct {
 	// cooldowns have a non-zero cast time. For example, Drums should be used
 	// before Bloodlust.
 	Priority float64
+
+	// Internal category, used for filtering. For example, mages want to disable
+	// all DPS cooldowns during their regen rotation.
+	Type int32
 
 	// Whether the cooldown meets all hard requirements for activation (e.g. resource cost).
 	// Note chat whether the cooldown is off CD is automatically checked, so it does not
@@ -119,6 +129,9 @@ func (mcd *MajorCooldown) tryActivate(sim *Simulation, character *Character) boo
 	if shouldActivate {
 		mcd.activate(sim, character)
 		mcd.numUsages++
+		if sim.Log != nil {
+			character.Log(sim, "Major cooldown used: %s", mcd.ActionID)
+		}
 	}
 
 	return shouldActivate
@@ -238,6 +251,11 @@ func (mcdm *majorCooldownManager) GetMajorCooldown(actionID ActionID) *MajorCool
 	return nil
 }
 
+// Returns all MCDs.
+func (mcdm *majorCooldownManager) GetMajorCooldowns() []*MajorCooldown {
+	return mcdm.majorCooldowns
+}
+
 func (mcdm *majorCooldownManager) GetMajorCooldownIDs() []*proto.ActionID {
 	ids := make([]*proto.ActionID, len(mcdm.initialMajorCooldowns))
 	for i, mcd := range mcdm.initialMajorCooldowns {
@@ -292,7 +310,7 @@ func (mcdm *majorCooldownManager) UpdateMajorCooldowns() {
 
 // Add a major cooldown to the given agent, which provides a temporary boost to a single stat.
 // This is use for effects like Icon of the Silver Crescent and Bloodlust Brooch.
-func RegisterTemporaryStatsOnUseCD(agent Agent, auraID AuraID, spellID int32, auraName string, stat stats.Stat, amount float64, duration time.Duration, mcd MajorCooldown) {
+func RegisterTemporaryStatsOnUseCD(agent Agent, auraID AuraID, stat stats.Stat, amount float64, duration time.Duration, mcd MajorCooldown) {
 	// If shared cooldown ID is set but shared cooldown isn't, default to duration.
 	// Most items on a shared cooldown put each other on that cooldown for the
 	// duration of their active effect.
@@ -302,10 +320,11 @@ func RegisterTemporaryStatsOnUseCD(agent Agent, auraID AuraID, spellID int32, au
 
 	mcd.CanActivate = func(sim *Simulation, character *Character) bool { return true }
 	mcd.ShouldActivate = func(sim *Simulation, character *Character) bool { return true }
+	mcd.Type = CooldownTypeDPS
 
 	mcd.ActivationFactory = func(sim *Simulation) CooldownActivation {
 		return func(sim *Simulation, character *Character) {
-			character.AddAuraWithTemporaryStats(sim, auraID, spellID, auraName, stat, amount, duration)
+			character.AddAuraWithTemporaryStats(sim, auraID, mcd.ActionID, stat, amount, duration)
 			character.SetCD(mcd.CooldownID, sim.CurrentTime+mcd.Cooldown)
 			if mcd.SharedCooldownID != 0 {
 				character.SetCD(mcd.SharedCooldownID, sim.CurrentTime+mcd.SharedCooldown)
@@ -317,8 +336,8 @@ func RegisterTemporaryStatsOnUseCD(agent Agent, auraID AuraID, spellID int32, au
 }
 
 // Helper function to make an ApplyEffect for a temporary stats on-use cooldown.
-func MakeTemporaryStatsOnUseCDRegistration(auraID AuraID, spellID int32, auraName string, stat stats.Stat, amount float64, duration time.Duration, mcd MajorCooldown) ApplyEffect {
+func MakeTemporaryStatsOnUseCDRegistration(auraID AuraID, stat stats.Stat, amount float64, duration time.Duration, mcd MajorCooldown) ApplyEffect {
 	return func(agent Agent) {
-		RegisterTemporaryStatsOnUseCD(agent, auraID, spellID, auraName, stat, amount, duration, mcd)
+		RegisterTemporaryStatsOnUseCD(agent, auraID, stat, amount, duration, mcd)
 	}
 }

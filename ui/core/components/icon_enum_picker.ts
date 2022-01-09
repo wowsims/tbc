@@ -1,6 +1,4 @@
 import { ActionId } from '/tbc/core/proto_utils/action_id.js';
-import { getIconUrl } from '/tbc/core/resources.js';
-import { setWowheadHref } from '/tbc/core/resources.js';
 import { EventID, TypedEvent } from '/tbc/core/typed_event.js';
 
 import { Component } from './component.js';
@@ -96,10 +94,7 @@ export class IconEnumPicker<ModObject, T> extends Input<ModObject, T> {
   }
 
 	private setActionImage(elem: HTMLAnchorElement, actionId: ActionId) {
-		setWowheadHref(elem, actionId.id);
-		getIconUrl(actionId.id).then(url => {
-			elem.style.backgroundImage = `url('${url}')`;
-		});
+		actionId.fillAndSet(elem, true, true);
 	}
 
 	private setImage(elem: HTMLAnchorElement, valueConfig: IconEnumValueConfig<T>) {

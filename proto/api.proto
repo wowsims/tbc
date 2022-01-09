@@ -87,8 +87,7 @@ message ActionMetrics {
 }
 
 message AuraMetrics {
-		// The in-game spell ID for the aura.
-		int32 id = 1;
+		ActionID id = 1;
 
 		double uptime_seconds_avg = 2;
 		double uptime_seconds_stdev = 3;

@@ -57,8 +57,7 @@ func ApplyWindfuryImbue(shaman *Shaman, mh bool, oh bool) {
 		const icdDur = time.Second * 3
 
 		return core.Aura{
-			ID:   WFImbueAuraID,
-			Name: "Windfury Imbue",
+			ID: WFImbueAuraID,
 			OnMeleeAttack: func(sim *core.Simulation, target *core.Target, result core.MeleeHitType, ability *core.ActiveMeleeAbility, isOH bool) {
 				if (!mh && !isOH) || (isOH && !oh) {
 					return // cant proc if not enchanted

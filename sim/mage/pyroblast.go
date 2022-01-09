@@ -17,7 +17,6 @@ func (mage *Mage) newPyroblastTemplate(sim *core.Simulation) core.SimpleSpellTem
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				Name:           "Pyroblast",
 				CritMultiplier: 1.5 + 0.125*float64(mage.Talents.SpellPower),
 				SpellSchool:    stats.FireSpellPower,
 				Character:      &mage.Character,
@@ -61,7 +60,6 @@ func (mage *Mage) newPyroblastDotTemplate(sim *core.Simulation) core.SimpleSpell
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				Name:        "Pyroblast",
 				SpellSchool: stats.FireSpellPower,
 				Character:   &mage.Character,
 				ActionID: core.ActionID{
@@ -84,7 +82,6 @@ func (mage *Mage) newPyroblastDotTemplate(sim *core.Simulation) core.SimpleSpell
 				TickBaseDamage:       356 / 4,
 				TickSpellCoefficient: 0,
 				DebuffID:             PyroblastDotDebuffID,
-				SpellID:              SpellIDPyroblast,
 			},
 		},
 	}

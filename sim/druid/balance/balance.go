@@ -170,7 +170,7 @@ func (moonkin *BalanceDruid) actRotation(sim *core.Simulation, rotation proto.Ba
 
 	if !actionSuccessful {
 		regenTime := moonkin.TimeUntilManaRegen(spell.GetManaCost())
-		waitAction := core.NewWaitAction(sim, moonkin.GetCharacter(), regenTime, core.WaitReasonOOM)
+		waitAction := common.NewWaitAction(sim, moonkin.GetCharacter(), regenTime, common.WaitReasonOOM)
 		waitAction.Cast(sim)
 		return sim.CurrentTime + waitAction.GetDuration()
 	}

@@ -13,7 +13,6 @@ var SSCooldownID = core.NewCooldownID()
 
 func (priest *Priest) newStarshardsTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
 	baseCast := core.Cast{
-		Name:           "Star Shards",
 		CritMultiplier: 1.5,
 		SpellSchool:    stats.ArcaneSpellPower,
 		Character:      &priest.Character,

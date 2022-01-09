@@ -53,15 +53,6 @@ export type WarriorSpecs = Spec.SpecWarrior;
 
 export const NUM_SPECS = getEnumValues(Spec).length;
 
-// This list controls which links are shown in the top-left dropdown menu on
-// all sims. DO NOT add your spec to this list until it is ready for everyone
-// to view.
-export const linkedSpecs: Array<Spec> = [
-	Spec.SpecBalanceDruid,
-	Spec.SpecElementalShaman,
-	Spec.SpecShadowPriest,
-];
-
 // The order in which specs should be presented, when it matters.
 // Currently this is only used for the order of the paladin blessings UI.
 export const naturalSpecOrder: Array<Spec> = [
@@ -72,6 +63,7 @@ export const naturalSpecOrder: Array<Spec> = [
 	Spec.SpecShadowPriest,
 	Spec.SpecRogue,
 	Spec.SpecElementalShaman,
+	Spec.SpecEnhancementShaman,
 	Spec.SpecWarlock,
 	Spec.SpecWarrior,
 ];
@@ -163,6 +155,21 @@ export const talentTreeIcons: Record<Class, Array<string>> = {
 		'https://wow.zamimg.com/images/wow/icons/medium/inv_shield_06.jpg',
 	],
 };
+
+export const titleIcons: Record<Spec, string> = {
+  [Spec.SpecBalanceDruid]: '/tbc/assets/balance_druid_icon.png',
+  [Spec.SpecElementalShaman]: '/tbc/assets/elemental_shaman_icon.png',
+  [Spec.SpecEnhancementShaman]: '/tbc/assets/enhancement_shaman_icon.png',
+  [Spec.SpecHunter]: 'https://wow.zamimg.com/images/wow/icons/large/ability_marksmanship.jpg',
+  [Spec.SpecMage]: '/tbc/assets/mage_icon.png',
+  [Spec.SpecRogue]: 'https://wow.zamimg.com/images/wow/icons/large/ability_rogue_eviscerate.jpg',
+  [Spec.SpecRetributionPaladin]: 'https://wow.zamimg.com/images/wow/icons/large/spell_holy_auraoflight.jpg',
+  [Spec.SpecShadowPriest]: '/tbc/assets/shadow_priest_icon.png',
+  [Spec.SpecWarlock]: 'https://wow.zamimg.com/images/wow/icons/large/spell_shadow_metamorphosis.jpg',
+  [Spec.SpecWarrior]: '/tbc/assets/warrior_icon.png',
+};
+
+export const raidSimIcon: string = '/tbc/assets/raid_icon.png';
 
 // Returns the index of the talent tree (0, 1, or 2) that has the most points.
 export function getTalentTree(talentsString: string): number {
@@ -1204,6 +1211,7 @@ export function makeDefaultBlessings(numPaladins: number): BlessingsAssignments 
 		{ spec: Spec.SpecShadowPriest, blessings: [ Blessings.BlessingOfKings, Blessings.BlessingOfSalvation, Blessings.BlessingOfWisdom ] },
 		{ spec: Spec.SpecRogue, blessings: [ Blessings.BlessingOfKings, Blessings.BlessingOfSalvation, Blessings.BlessingOfMight ] },
 		{ spec: Spec.SpecElementalShaman, blessings: [ Blessings.BlessingOfKings, Blessings.BlessingOfSalvation, Blessings.BlessingOfWisdom ] },
+		{ spec: Spec.SpecEnhancementShaman, blessings: [ Blessings.BlessingOfKings, Blessings.BlessingOfSalvation, Blessings.BlessingOfMight, Blessings.BlessingOfWisdom ] },
 		{ spec: Spec.SpecWarlock, blessings: [ Blessings.BlessingOfKings, Blessings.BlessingOfSalvation, Blessings.BlessingOfWisdom ] },
 		{ spec: Spec.SpecWarrior, blessings: [ Blessings.BlessingOfKings, Blessings.BlessingOfSalvation, Blessings.BlessingOfMight ] },
 	]);

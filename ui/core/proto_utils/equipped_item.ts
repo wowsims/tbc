@@ -1,4 +1,3 @@
-import { ActionID as ActionIdProto } from '/tbc/core/proto/common.js';
 import { Enchant } from '/tbc/core/proto/common.js';
 import { Gem } from '/tbc/core/proto/common.js';
 import { Item } from '/tbc/core/proto/common.js';
@@ -6,7 +5,6 @@ import { ItemSlot } from '/tbc/core/proto/common.js';
 import { ItemSpec } from '/tbc/core/proto/common.js';
 
 import { ActionId } from './action_id.js';
-import { actionIdToProto } from './action_id.js';
 import { enchantAppliesToItem } from './utils.js';
 import { gemEligibleForSocket } from './gems.js';
 import { gemMatchesSocket } from './gems.js';
@@ -146,15 +144,7 @@ export class EquippedItem {
 	}
 
 	asActionId(): ActionId {
-		return {
-			id: {
-				itemId: this._item.id,
-			},
-		};
-	}
-
-	asActionIdProto(): ActionIdProto {
-		return actionIdToProto(this.asActionId());
+		return ActionId.fromItemId(this._item.id);
 	}
 
   asSpec(): ItemSpec {

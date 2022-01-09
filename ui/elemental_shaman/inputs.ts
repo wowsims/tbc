@@ -2,7 +2,7 @@ import { IconPickerConfig } from '/tbc/core/components/icon_picker.js';
 import { ElementalShaman_Rotation_RotationType as RotationType } from '/tbc/core/proto/shaman.js';
 import { ElementalShaman_Options as ShamanOptions } from '/tbc/core/proto/shaman.js';
 import { Spec } from '/tbc/core/proto/common.js';
-import { ItemOrSpellId } from '/tbc/core/proto_utils/action_id.js';
+import { ActionId } from '/tbc/core/proto_utils/action_id.js';
 import { Player } from '/tbc/core/player.js';
 import { Sim } from '/tbc/core/sim.js';
 import { IndividualSimUI } from '/tbc/core/individual_sim_ui.js';
@@ -12,11 +12,11 @@ import { EventID, TypedEvent } from '/tbc/core/typed_event.js';
 // Configuration for spec-specific UI elements on the settings tab.
 // These don't need to be in a separate file but it keeps things cleaner.
 
-export const IconBloodlust = makeBooleanShamanBuffInput({ spellId: 2825 }, 'bloodlust');
-export const IconManaSpringTotem = makeBooleanShamanBuffInput({ spellId: 25570 }, 'manaSpringTotem');
-export const IconTotemOfWrath = makeBooleanShamanBuffInput({ spellId: 30706 }, 'totemOfWrath');
-export const IconWaterShield = makeBooleanShamanBuffInput({ spellId: 33736 }, 'waterShield');
-export const IconWrathOfAirTotem = makeBooleanShamanBuffInput({ spellId: 3738 }, 'wrathOfAirTotem');
+export const IconBloodlust = makeBooleanShamanBuffInput(ActionId.fromSpellId(2825), 'bloodlust');
+export const IconManaSpringTotem = makeBooleanShamanBuffInput(ActionId.fromSpellId(25570), 'manaSpringTotem');
+export const IconTotemOfWrath = makeBooleanShamanBuffInput(ActionId.fromSpellId(30706), 'totemOfWrath');
+export const IconWaterShield = makeBooleanShamanBuffInput(ActionId.fromSpellId(33736), 'waterShield');
+export const IconWrathOfAirTotem = makeBooleanShamanBuffInput(ActionId.fromSpellId(3738), 'wrathOfAirTotem');
 
 export const ElementalShamanRotationConfig = {
 	inputs: [
@@ -76,7 +76,7 @@ export const ElementalShamanRotationConfig = {
 	],
 };
 
-function makeBooleanShamanBuffInput(id: ItemOrSpellId, optionsFieldName: keyof ShamanOptions): IconPickerConfig<Player<any>, boolean> {
+function makeBooleanShamanBuffInput(id: ActionId, optionsFieldName: keyof ShamanOptions): IconPickerConfig<Player<any>, boolean> {
   return {
     id: id,
     states: 2,

@@ -27,7 +27,6 @@ func (shaman *Shaman) NewWrathOfAirTotem(sim *core.Simulation) *core.SimpleCast 
 
 	cast := &core.SimpleCast{
 		Cast: core.Cast{
-			Name:         "Wrath of Air",
 			ActionID:     core.ActionID{SpellID: 3738},
 			Character:    shaman.GetCharacter(),
 			BaseManaCost: baseManaCost,
@@ -49,7 +48,6 @@ func (shaman *Shaman) NewGraceOfAirTotem(sim *core.Simulation) *core.SimpleCast 
 
 	cast := &core.SimpleCast{
 		Cast: core.Cast{
-			Name:         "Grace Of Air",
 			ActionID:     core.ActionID{SpellID: 25359},
 			Character:    shaman.GetCharacter(),
 			BaseManaCost: baseManaCost,
@@ -72,7 +70,6 @@ func (shaman *Shaman) NewWindfuryTotem(sim *core.Simulation) *core.SimpleCast {
 
 	cast := &core.SimpleCast{
 		Cast: core.Cast{
-			Name:         "Windfury Totem",
 			ActionID:     core.ActionID{SpellID: 25587},
 			Character:    shaman.GetCharacter(),
 			BaseManaCost: baseManaCost,
@@ -95,7 +92,6 @@ func (shaman *Shaman) NewWaterTotem(sim *core.Simulation) *core.SimpleCast {
 
 	cast := &core.SimpleCast{
 		Cast: core.Cast{
-			Name:         "Mana Stream",
 			ActionID:     core.ActionID{SpellID: 25570},
 			Character:    shaman.GetCharacter(),
 			BaseManaCost: baseManaCost,
@@ -117,7 +113,6 @@ func (shaman *Shaman) NewTotemOfWrath(sim *core.Simulation) *core.SimpleCast {
 
 	cast := &core.SimpleCast{
 		Cast: core.Cast{
-			Name:         "Totem of Wrath",
 			ActionID:     core.ActionID{SpellID: 30706},
 			Character:    shaman.GetCharacter(),
 			BaseManaCost: baseManaCost,
@@ -139,7 +134,6 @@ func (shaman *Shaman) NewStrengthOfEarthTotem(sim *core.Simulation) *core.Simple
 
 	cast := &core.SimpleCast{
 		Cast: core.Cast{
-			Name:         "Strength of Earth",
 			ActionID:     core.ActionID{SpellID: 8161},
 			Character:    shaman.GetCharacter(),
 			BaseManaCost: baseManaCost,
@@ -160,7 +154,6 @@ func (shaman *Shaman) NewTremorTotem(sim *core.Simulation) *core.SimpleCast {
 
 	cast := &core.SimpleCast{
 		Cast: core.Cast{
-			Name:         "Tremor Totem",
 			ActionID:     core.ActionID{SpellID: 8143},
 			Character:    shaman.GetCharacter(),
 			BaseManaCost: baseManaCost,

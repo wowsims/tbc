@@ -7,17 +7,16 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-const SpellIDSS int32 = 17364
-
 var StormstrikeCD = core.NewCooldownID()
 var StormstrikeDebuffID = core.NewDebuffID()
+var StormstrikeActionID = core.ActionID{SpellID: 17364, CooldownID: StormstrikeCD}
 
 func (shaman *Shaman) newStormstrikeTemplate(sim *core.Simulation) core.MeleeAbilittyTemplate {
 
 	ssDebuffAura := core.Aura{
-		ID:     StormstrikeDebuffID,
-		Name:   "Stormstrike",
-		Stacks: 2,
+		ID:       StormstrikeDebuffID,
+		ActionID: StormstrikeActionID,
+		Stacks:   2,
 	}
 	ssDebuffAura.OnBeforeSpellHit = func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 		if spellCast.SpellSchool != stats.NatureSpellPower {
@@ -36,10 +35,7 @@ func (shaman *Shaman) newStormstrikeTemplate(sim *core.Simulation) core.MeleeAbi
 	ss := core.ActiveMeleeAbility{
 		MeleeAbility: core.MeleeAbility{
 			// ID for the action.
-			ActionID: core.ActionID{
-				SpellID:    SpellIDSS,
-				CooldownID: StormstrikeCD,
-			},
+			ActionID: StormstrikeActionID,
 			Name:     "Stormstrike",
 			Cooldown: time.Second * 10,
 			Cost: core.ResourceCost{

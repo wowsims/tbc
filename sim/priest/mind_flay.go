@@ -14,7 +14,6 @@ const TagMF3 = 3
 
 func (priest *Priest) newMindflayTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
 	baseCast := core.Cast{
-		Name:           "Mind Flay",
 		CritMultiplier: 1.5,
 		SpellSchool:    stats.ShadowSpellPower,
 		Character:      &priest.Character,

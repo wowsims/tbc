@@ -1,8 +1,7 @@
 import { Component } from '/tbc/core/components/component.js';
 import { Spec } from '/tbc/core/proto/common.js';
+import { ActionId } from '/tbc/core/proto_utils/action_id.js';
 import { SpecTalents } from '/tbc/core/proto_utils/utils.js';
-import { getIconUrl } from '/tbc/core/resources.js';
-import { setWowheadHref } from '/tbc/core/resources.js';
 import { Player } from '/tbc/core/player.js';
 import { EventID, TypedEvent } from '/tbc/core/typed_event.js';
 import { isRightClick } from '/tbc/core/utils.js';
@@ -274,10 +273,10 @@ class TalentPicker<SpecType extends Spec> extends Component {
     }
 
     const spellId = this.getSpellIdForPoints(newPoints);
-    setWowheadHref(this.rootElem as HTMLAnchorElement, {spellId: spellId});
-    getIconUrl({spellId: spellId}).then(url => {
-      this.rootElem.style.backgroundImage = `url('${url}')`;
-    });
+		ActionId.fromSpellId(spellId).fill().then(actionId => {
+			actionId.setWowheadHref(this.rootElem as HTMLAnchorElement);
+			this.rootElem.style.backgroundImage = `url('${actionId.iconUrl}')`;
+		});
   }
 
   getSpellIdForPoints(numPoints: number): number {
