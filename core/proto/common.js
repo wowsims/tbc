@@ -729,6 +729,32 @@ export var Conjured;
     Conjured[Conjured["ConjuredFlameCap"] = 2] = "ConjuredFlameCap";
 })(Conjured || (Conjured = {}));
 /**
+ * @generated from protobuf enum proto.StrengthOfEarthType
+ */
+export var StrengthOfEarthType;
+(function (StrengthOfEarthType) {
+    /**
+     * @generated from protobuf enum value: None = 0;
+     */
+    StrengthOfEarthType[StrengthOfEarthType["None"] = 0] = "None";
+    /**
+     * @generated from protobuf enum value: Basic = 1;
+     */
+    StrengthOfEarthType[StrengthOfEarthType["Basic"] = 1] = "Basic";
+    /**
+     * @generated from protobuf enum value: CycloneBonus = 2;
+     */
+    StrengthOfEarthType[StrengthOfEarthType["CycloneBonus"] = 2] = "CycloneBonus";
+    /**
+     * @generated from protobuf enum value: EnhancingTotems = 3;
+     */
+    StrengthOfEarthType[StrengthOfEarthType["EnhancingTotems"] = 3] = "EnhancingTotems";
+    /**
+     * @generated from protobuf enum value: EnhancingAndCyclone = 4;
+     */
+    StrengthOfEarthType[StrengthOfEarthType["EnhancingAndCyclone"] = 4] = "EnhancingAndCyclone";
+})(StrengthOfEarthType || (StrengthOfEarthType = {}));
+/**
  * @generated from protobuf enum proto.MobType
  */
 export var MobType;
@@ -892,7 +918,7 @@ class PartyBuffs$Type extends MessageType {
             { no: 13, name: "totem_of_wrath", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 14, name: "wrath_of_air_totem", kind: "enum", T: () => ["proto.TristateEffect", TristateEffect] },
             { no: 15, name: "grace_of_air_totem", kind: "enum", T: () => ["proto.TristateEffect", TristateEffect] },
-            { no: 16, name: "strength_of_earth_totem", kind: "enum", T: () => ["proto.TristateEffect", TristateEffect] },
+            { no: 16, name: "strength_of_earth_totem", kind: "enum", T: () => ["proto.StrengthOfEarthType", StrengthOfEarthType] },
             { no: 18, name: "battle_shout", kind: "enum", T: () => ["proto.TristateEffect", TristateEffect] }
         ]);
     }
@@ -956,7 +982,7 @@ class PartyBuffs$Type extends MessageType {
                 case /* proto.TristateEffect grace_of_air_totem */ 15:
                     message.graceOfAirTotem = reader.int32();
                     break;
-                case /* proto.TristateEffect strength_of_earth_totem */ 16:
+                case /* proto.StrengthOfEarthType strength_of_earth_totem */ 16:
                     message.strengthOfEarthTotem = reader.int32();
                     break;
                 case /* proto.TristateEffect battle_shout */ 18:
@@ -1022,7 +1048,7 @@ class PartyBuffs$Type extends MessageType {
         /* proto.TristateEffect grace_of_air_totem = 15; */
         if (message.graceOfAirTotem !== 0)
             writer.tag(15, WireType.Varint).int32(message.graceOfAirTotem);
-        /* proto.TristateEffect strength_of_earth_totem = 16; */
+        /* proto.StrengthOfEarthType strength_of_earth_totem = 16; */
         if (message.strengthOfEarthTotem !== 0)
             writer.tag(16, WireType.Varint).int32(message.strengthOfEarthTotem);
         /* proto.TristateEffect battle_shout = 18; */

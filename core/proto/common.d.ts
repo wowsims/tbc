@@ -100,9 +100,9 @@ export interface PartyBuffs {
      */
     graceOfAirTotem: TristateEffect;
     /**
-     * @generated from protobuf field: proto.TristateEffect strength_of_earth_totem = 16;
+     * @generated from protobuf field: proto.StrengthOfEarthType strength_of_earth_totem = 16;
      */
-    strengthOfEarthTotem: TristateEffect;
+    strengthOfEarthTotem: StrengthOfEarthType;
     /**
      * @generated from protobuf field: proto.TristateEffect battle_shout = 18;
      */
@@ -1313,6 +1313,31 @@ export declare enum Conjured {
      * @generated from protobuf enum value: ConjuredFlameCap = 2;
      */
     ConjuredFlameCap = 2
+}
+/**
+ * @generated from protobuf enum proto.StrengthOfEarthType
+ */
+export declare enum StrengthOfEarthType {
+    /**
+     * @generated from protobuf enum value: None = 0;
+     */
+    None = 0,
+    /**
+     * @generated from protobuf enum value: Basic = 1;
+     */
+    Basic = 1,
+    /**
+     * @generated from protobuf enum value: CycloneBonus = 2;
+     */
+    CycloneBonus = 2,
+    /**
+     * @generated from protobuf enum value: EnhancingTotems = 3;
+     */
+    EnhancingTotems = 3,
+    /**
+     * @generated from protobuf enum value: EnhancingAndCyclone = 4;
+     */
+    EnhancingAndCyclone = 4
 }
 /**
  * @generated from protobuf enum proto.MobType
