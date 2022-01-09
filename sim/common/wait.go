@@ -1,11 +1,9 @@
-package core
-
-// Ideally everything in here could go in sim/common, but these are needed by
-// core so it would create a circular dependency.
+package common
 
 import (
 	"time"
 
+	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/proto"
 )
 
@@ -19,14 +17,14 @@ const (
 )
 
 type WaitAction struct {
-	character *Character
+	character *core.Character
 
 	duration time.Duration
 	reason   WaitReason
 }
 
-func (action WaitAction) GetActionID() ActionID {
-	return ActionID{
+func (action WaitAction) GetActionID() core.ActionID {
+	return core.ActionID{
 		OtherID: proto.OtherAction_OtherActionWait,
 	}
 }
@@ -39,7 +37,7 @@ func (action WaitAction) GetTag() int32 {
 	return 0
 }
 
-func (action WaitAction) GetCharacter() *Character {
+func (action WaitAction) GetCharacter() *core.Character {
 	return action.character
 }
 
@@ -51,7 +49,7 @@ func (action WaitAction) GetManaCost() float64 {
 	return 0
 }
 
-func (action WaitAction) Cast(sim *Simulation) bool {
+func (action WaitAction) Cast(sim *core.Simulation) bool {
 	switch action.reason {
 	case WaitReasonNone:
 		if sim.Log != nil {
@@ -75,7 +73,7 @@ func (action WaitAction) Cast(sim *Simulation) bool {
 	return true
 }
 
-func NewWaitAction(sim *Simulation, character *Character, duration time.Duration, reason WaitReason) WaitAction {
+func NewWaitAction(sim *core.Simulation, character *core.Character, duration time.Duration, reason WaitReason) WaitAction {
 	return WaitAction{
 		character: character,
 		duration:  duration,
