@@ -136,6 +136,7 @@ export class IndividualSimUI extends SimUI {
                             const settingsBytes = pako.inflate(bytes);
                             const settings = IndividualSimSettings.fromBinary(settingsBytes);
                             this.fromProto(initEventID, settings);
+                            loadedSettings = true;
                         }
                     }
                 }
