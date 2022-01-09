@@ -14,6 +14,7 @@ func (mage *Mage) applyTalents() {
 	mage.applyMasterOfElements()
 	mage.applyWintersChill()
 	mage.applyMoltenFury()
+	mage.registerArcanePowerCD()
 	mage.registerPresenceOfMindCD()
 	mage.registerCombustionCD()
 	mage.registerIcyVeinsCD()
