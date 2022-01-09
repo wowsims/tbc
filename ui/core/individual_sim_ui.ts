@@ -272,6 +272,7 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 							const settingsBytes = pako.inflate(bytes);  
 							const settings = IndividualSimSettings.fromBinary(settingsBytes);
 							this.fromProto(initEventID, settings);
+							loadedSettings = true;
 						}
 					}
 				} catch (e) {
