@@ -124,7 +124,6 @@ func (mage *Mage) registerPresenceOfMindCD() {
 		cooldown -= time.Second * 24
 	}
 
-	var spell *core.SimpleSpell
 	actionID := core.ActionID{SpellID: 12043}
 
 	mage.AddMajorCooldown(core.MajorCooldown{
@@ -137,21 +136,21 @@ func (mage *Mage) registerPresenceOfMindCD() {
 				return false
 			}
 
-			if spell != nil && spell.IsInUse() {
-				spell.Cancel(sim)
+			manaCostCoeff := 1.0
+			if character.HasAura(ArcanePowerAuraID) {
+				manaCostCoeff = 1.3
 			}
 
-			target := sim.GetPrimaryTarget()
+			var manaCost float64
 			if mage.Talents.Pyroblast {
-				spell = mage.NewPyroblast(sim, target)
+				manaCost = 500 * manaCostCoeff
 			} else if mage.RotationType == proto.Mage_Rotation_Fire {
-				spell = mage.NewFireball(sim, target)
+				manaCost = 425 * manaCostCoeff
 			} else {
-				spell = mage.NewFrostbolt(sim, target)
+				manaCost = 330 * manaCostCoeff
 			}
 
-			if character.CurrentMana() < spell.ManaCost {
-				spell.Cancel(sim)
+			if character.CurrentMana() < manaCost {
 				return false
 			}
 
@@ -162,8 +161,19 @@ func (mage *Mage) registerPresenceOfMindCD() {
 		},
 		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
 			return func(sim *core.Simulation, character *core.Character) {
+				target := sim.GetPrimaryTarget()
+				var spell *core.SimpleSpell
+				if mage.Talents.Pyroblast {
+					spell = mage.NewPyroblast(sim, target)
+				} else if mage.RotationType == proto.Mage_Rotation_Fire {
+					spell = mage.NewFireball(sim, target)
+				} else {
+					spell = mage.NewFrostbolt(sim, target)
+				}
 				spell.CastTime = 0
+
 				spell.Cast(sim)
+
 				character.Metrics.AddInstantCast(actionID)
 				character.SetCD(PresenceOfMindCooldownID, sim.CurrentTime+cooldown)
 			}
