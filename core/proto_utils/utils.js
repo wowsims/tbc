@@ -777,7 +777,6 @@ const classToEligibleWeaponTypes = {
         { weaponType: WeaponType.WeaponTypeMace },
         { weaponType: WeaponType.WeaponTypeOffHand },
         { weaponType: WeaponType.WeaponTypeStaff, canUseTwoHand: true },
-        { weaponType: WeaponType.WeaponTypeSword },
     ],
     [Class.ClassRogue]: [
         { weaponType: WeaponType.WeaponTypeDagger },
