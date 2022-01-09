@@ -265,6 +265,12 @@ export interface Mage_Rotation_ArcaneRotation {
      * @generated from protobuf field: double stop_regen_rotation_percent = 4;
      */
     stopRegenRotationPercent: number;
+    /**
+     * Prevents DPS cooldowns from being using during regen rotation.
+     *
+     * @generated from protobuf field: bool disable_dps_cooldowns_during_regen = 5;
+     */
+    disableDpsCooldownsDuringRegen: boolean;
 }
 /**
  * @generated from protobuf enum proto.Mage.Rotation.ArcaneRotation.Filler

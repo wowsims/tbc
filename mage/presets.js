@@ -60,7 +60,7 @@ export const DefaultArcaneRotation = MageRotation.create({
         filler: ArcaneFiller.Frostbolt,
         arcaneBlastsBetweenFillers: 3,
         startRegenRotationPercent: 0.2,
-        stopRegenRotationPercent: 0.3,
+        stopRegenRotationPercent: 0.5,
     }),
 });
 export const DefaultArcaneOptions = MageOptions.create({

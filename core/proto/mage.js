@@ -588,11 +588,12 @@ class Mage_Rotation_ArcaneRotation$Type extends MessageType {
             { no: 1, name: "filler", kind: "enum", T: () => ["proto.Mage.Rotation.ArcaneRotation.Filler", Mage_Rotation_ArcaneRotation_Filler] },
             { no: 2, name: "arcane_blasts_between_fillers", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 3, name: "start_regen_rotation_percent", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
-            { no: 4, name: "stop_regen_rotation_percent", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ }
+            { no: 4, name: "stop_regen_rotation_percent", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
+            { no: 5, name: "disable_dps_cooldowns_during_regen", kind: "scalar", T: 8 /*ScalarType.BOOL*/ }
         ]);
     }
     create(value) {
-        const message = { filler: 0, arcaneBlastsBetweenFillers: 0, startRegenRotationPercent: 0, stopRegenRotationPercent: 0 };
+        const message = { filler: 0, arcaneBlastsBetweenFillers: 0, startRegenRotationPercent: 0, stopRegenRotationPercent: 0, disableDpsCooldownsDuringRegen: false };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -614,6 +615,9 @@ class Mage_Rotation_ArcaneRotation$Type extends MessageType {
                     break;
                 case /* double stop_regen_rotation_percent */ 4:
                     message.stopRegenRotationPercent = reader.double();
+                    break;
+                case /* bool disable_dps_cooldowns_during_regen */ 5:
+                    message.disableDpsCooldownsDuringRegen = reader.bool();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -639,6 +643,9 @@ class Mage_Rotation_ArcaneRotation$Type extends MessageType {
         /* double stop_regen_rotation_percent = 4; */
         if (message.stopRegenRotationPercent !== 0)
             writer.tag(4, WireType.Bit64).double(message.stopRegenRotationPercent);
+        /* bool disable_dps_cooldowns_during_regen = 5; */
+        if (message.disableDpsCooldownsDuringRegen !== false)
+            writer.tag(5, WireType.Varint).bool(message.disableDpsCooldownsDuringRegen);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

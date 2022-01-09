@@ -310,6 +310,26 @@ export const MageRotationConfig = {
                 showWhen: (player) => player.getRotation().type == RotationType.Arcane,
             },
         },
+        {
+            type: 'boolean',
+            cssClass: 'disable-dps-cooldowns-during-regen-picker',
+            getModObject: (simUI) => simUI.player,
+            config: {
+                label: 'Disable DPS cooldowns during regen',
+                labelTooltip: 'Prevents the usage of any DPS cooldowns during regen rotation. Mana CDs are still allowed.',
+                changedEvent: (player) => player.rotationChangeEmitter,
+                getValue: (player) => player.getRotation().arcane?.disableDpsCooldownsDuringRegen || false,
+                setValue: (eventID, player, newValue) => {
+                    const newRotation = player.getRotation();
+                    if (!newRotation.arcane) {
+                        newRotation.arcane = ArcaneRotation.clone(Presets.DefaultArcaneRotation.arcane);
+                    }
+                    newRotation.arcane.disableDpsCooldownsDuringRegen = newValue;
+                    player.setRotation(eventID, newRotation);
+                },
+                showWhen: (player) => player.getRotation().type == RotationType.Arcane,
+            },
+        },
     ],
 };
 function makeBooleanMageBuffInput(id, optionsFieldName) {
