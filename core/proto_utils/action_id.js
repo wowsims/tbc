@@ -4,7 +4,7 @@ import { getWowheadItemId } from '/tbc/core/proto_utils/equipped_item.js';
 import { NO_TARGET } from '/tbc/core/proto_utils/utils.js';
 // Uniquely identifies a specific item / spell / thing in WoW. This object is immutable.
 export class ActionId {
-    constructor(itemId, spellId, otherId, tag, name, iconUrl) {
+    constructor(itemId, spellId, otherId, tag, baseName, name, iconUrl) {
         this.itemId = itemId;
         this.spellId = spellId;
         this.otherId = otherId;
@@ -13,16 +13,17 @@ export class ActionId {
             case OtherAction.OtherActionNone:
                 break;
             case OtherAction.OtherActionWait:
-                name = 'Wait';
+                baseName = 'Wait';
                 break;
             case OtherAction.OtherActionManaRegen:
-                name = 'Regen';
+                baseName = 'Regen';
                 // Tag is number of milliseconds worth of regen.
                 if (tag) {
-                    name = (tag / 1000).toFixed(3) + 's ' + name;
+                    name = (tag / 1000).toFixed(3) + 's ' + baseName;
                 }
                 break;
         }
+        this.baseName = baseName;
         this.name = name;
         this.iconUrl = iconUrl;
     }
@@ -61,23 +62,6 @@ export class ActionId {
         }
         return filled;
     }
-    static async getTooltipDataHelper(id, tooltipPostfix, cache) {
-        if (!cache.has(id)) {
-            cache.set(id, fetch(`https://tbc.wowhead.com/tooltip/${tooltipPostfix}/${id}`)
-                .then(response => response.json()));
-        }
-        return cache.get(id);
-    }
-    async getTooltipData() {
-        const idString = this.toProtoString();
-        const idToLookup = idOverrides[idString] ? idOverrides[idString] : this;
-        if (idToLookup.itemId) {
-            return await ActionId.getTooltipDataHelper(idToLookup.itemId, 'item', itemToTooltipDataCache);
-        }
-        else {
-            return await ActionId.getTooltipDataHelper(idToLookup.spellId, 'spell', spellToTooltipDataCache);
-        }
-    }
     // Returns an ActionId with the name and iconUrl fields filled.
     // playerIndex is the optional index of the player to whom this ID corresponds.
     async fill(playerIndex) {
@@ -87,10 +71,21 @@ export class ActionId {
         if (this.otherId) {
             return this;
         }
-        const tooltipData = await this.getTooltipData();
-        const iconUrl = "https://wow.zamimg.com/images/wow/icons/large/" + tooltipData['icon'] + ".jpg";
-        let name = tooltipData['name'];
-        switch (name) {
+        const tooltipData = await ActionId.getTooltipData(this);
+        const baseName = tooltipData['name'];
+        let name = baseName;
+        switch (baseName) {
+            case 'Arcane Blast':
+                if (this.tag == 1) {
+                    name += ' (No Stacks)';
+                }
+                else if (this.tag == 2) {
+                    name += ` (1 Stack)`;
+                }
+                else if (this.tag > 2) {
+                    name += ` (${this.tag - 1} Stacks)`;
+                }
+                break;
             case 'Fireball':
             case 'Pyroblast':
                 if (this.tag)
@@ -137,18 +132,27 @@ export class ActionId {
                 }
                 break;
         }
-        return new ActionId(this.itemId, this.spellId, this.otherId, this.tag, name, iconUrl);
+        const idString = this.toProtoString();
+        const iconOverrideId = idOverrides[idString] || null;
+        let iconUrl = "https://wow.zamimg.com/images/wow/icons/large/" + tooltipData['icon'] + ".jpg";
+        if (iconOverrideId) {
+            const overrideTooltipData = await ActionId.getTooltipData(iconOverrideId);
+            iconUrl = "https://wow.zamimg.com/images/wow/icons/large/" + overrideTooltipData['icon'] + ".jpg";
+        }
+        return new ActionId(this.itemId, this.spellId, this.otherId, this.tag, baseName, name, iconUrl);
     }
     toString() {
-        let tagStr = this.tag ? ('-' + this.tag) : '';
+        return this.toStringIgnoringTag() + (this.tag ? ('-' + this.tag) : '');
+    }
+    toStringIgnoringTag() {
         if (this.itemId) {
-            return 'item-' + this.itemId + tagStr;
+            return 'item-' + this.itemId;
         }
         else if (this.spellId) {
-            return 'spell-' + this.spellId + tagStr;
+            return 'spell-' + this.spellId;
         }
         else if (this.otherId) {
-            return 'other-' + this.otherId + tagStr;
+            return 'other-' + this.otherId;
         }
         else {
             throw new Error('Empty action id!');
@@ -181,17 +185,20 @@ export class ActionId {
     toProtoString() {
         return ActionIdProto.toJsonString(this.toProto());
     }
+    withoutTag() {
+        return new ActionId(this.itemId, this.spellId, this.otherId, 0, this.baseName, this.baseName, this.iconUrl);
+    }
     static fromEmpty() {
-        return new ActionId(0, 0, OtherAction.OtherActionNone, 0, '', '');
+        return new ActionId(0, 0, OtherAction.OtherActionNone, 0, '', '', '');
     }
     static fromItemId(itemId, tag) {
-        return new ActionId(itemId, 0, OtherAction.OtherActionNone, tag || 0, '', '');
+        return new ActionId(itemId, 0, OtherAction.OtherActionNone, tag || 0, '', '', '');
     }
     static fromSpellId(spellId, tag) {
-        return new ActionId(0, spellId, OtherAction.OtherActionNone, tag || 0, '', '');
+        return new ActionId(0, spellId, OtherAction.OtherActionNone, tag || 0, '', '', '');
     }
     static fromOtherId(otherId, tag) {
-        return new ActionId(0, 0, otherId, tag || 0, '', '');
+        return new ActionId(0, 0, otherId, tag || 0, '', '', '');
     }
     static fromItem(item) {
         return ActionId.fromItemId(getWowheadItemId(item));
@@ -215,11 +222,26 @@ export class ActionId {
         if (match) {
             const idType = match[1];
             const id = parseInt(match[5]);
-            return new ActionId(idType == 'ItemID' ? id : 0, idType == 'SpellID' ? id : 0, idType == 'OtherID' ? id : 0, match[7] ? parseInt(match[7]) : 0, '', '');
+            return new ActionId(idType == 'ItemID' ? id : 0, idType == 'SpellID' ? id : 0, idType == 'OtherID' ? id : 0, match[7] ? parseInt(match[7]) : 0, '', '', '');
         }
         else {
             console.warn('Failed to parse action id from log: ' + str);
             return ActionId.fromEmpty();
+        }
+    }
+    static async getTooltipDataHelper(id, tooltipPostfix, cache) {
+        if (!cache.has(id)) {
+            cache.set(id, fetch(`https://tbc.wowhead.com/tooltip/${tooltipPostfix}/${id}`)
+                .then(response => response.json()));
+        }
+        return cache.get(id);
+    }
+    static async getTooltipData(actionId) {
+        if (actionId.itemId) {
+            return await ActionId.getTooltipDataHelper(actionId.itemId, 'item', itemToTooltipDataCache);
+        }
+        else {
+            return await ActionId.getTooltipDataHelper(actionId.spellId, 'spell', spellToTooltipDataCache);
         }
     }
 }
@@ -229,3 +251,4 @@ const spellToTooltipDataCache = new Map();
 const idOverrides = {};
 idOverrides[ActionId.fromSpellId(37212).toProtoString()] = ActionId.fromItemId(29035); // Improved Wrath of Air Totem
 idOverrides[ActionId.fromSpellId(37447).toProtoString()] = ActionId.fromItemId(30720); // Serpent-Coil Braid
+idOverrides[ActionId.fromSpellId(37443).toProtoString()] = ActionId.fromItemId(30196); // Robes of Tirisfal (4pc bonus)

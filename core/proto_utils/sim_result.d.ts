@@ -113,7 +113,8 @@ export declare class AuraMetrics {
     private constructor();
     get uptimePercent(): number;
     static makeNew(iterations: number, duration: number, auraMetrics: AuraMetricsProto, playerIndex?: number): Promise<AuraMetrics>;
-    static join(auras: Array<AuraMetrics>): Array<AuraMetrics>;
+    static merge(auras: Array<AuraMetrics>): AuraMetrics;
+    static joinById(auras: Array<AuraMetrics>): Array<AuraMetrics>;
 }
 export declare class ActionMetrics {
     readonly actionId: ActionId;
@@ -134,5 +135,7 @@ export declare class ActionMetrics {
     get misses(): number;
     get missPercent(): number;
     static makeNew(iterations: number, duration: number, actionMetrics: ActionMetricsProto, playerIndex?: number): Promise<ActionMetrics>;
-    static join(actions: Array<ActionMetrics>): Array<ActionMetrics>;
+    static merge(actions: Array<ActionMetrics>, removeTag?: boolean): ActionMetrics;
+    static joinById(actions: Array<ActionMetrics>): Array<ActionMetrics>;
+    static groupById(actions: Array<ActionMetrics>): Array<Array<ActionMetrics>>;
 }

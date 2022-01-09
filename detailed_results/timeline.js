@@ -8,6 +8,7 @@ export class Timeline extends ResultComponent {
         config.rootCssClass = 'timeline-root';
         super(config);
         this.resultData = null;
+        this.rendered = false;
         this.rootElem.innerHTML = `
 		<div class="timeline-disclaimer">
 			<span class="timeline-warning fa fa-exclamation-triangle"></span>
@@ -73,7 +74,9 @@ export class Timeline extends ResultComponent {
     }
     onSimResult(resultData) {
         this.resultData = resultData;
-        this.updatePlot();
+        if (this.rendered) {
+            this.updatePlot();
+        }
     }
     updatePlot() {
         const players = this.resultData.result.getPlayers(this.resultData.filter);
@@ -442,6 +445,10 @@ export class Timeline extends ResultComponent {
         setTimeout(() => {
             this.dpsResourcesPlot.render();
             //this.cooldownsPlot.render();
+            this.rendered = true;
+            if (this.resultData != null) {
+                this.updatePlot();
+            }
         }, 300);
     }
     toDatetime(timestamp) {

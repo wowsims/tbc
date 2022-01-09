@@ -6,6 +6,7 @@ export declare class ActionId {
     readonly spellId: number;
     readonly otherId: OtherAction;
     readonly tag: number;
+    readonly baseName: string;
     readonly name: string;
     readonly iconUrl: string;
     private constructor();
@@ -15,12 +16,12 @@ export declare class ActionId {
     setWowheadHref(elem: HTMLAnchorElement): void;
     setBackgroundAndHref(elem: HTMLAnchorElement): void;
     fillAndSet(elem: HTMLAnchorElement, setHref: boolean, setBackground: boolean): Promise<ActionId>;
-    private static getTooltipDataHelper;
-    private getTooltipData;
     fill(playerIndex?: number): Promise<ActionId>;
     toString(): string;
+    toStringIgnoringTag(): string;
     toProto(): ActionIdProto;
     toProtoString(): string;
+    withoutTag(): ActionId;
     static fromEmpty(): ActionId;
     static fromItemId(itemId: number, tag?: number): ActionId;
     static fromSpellId(spellId: number, tag?: number): ActionId;
@@ -28,4 +29,6 @@ export declare class ActionId {
     static fromItem(item: Item): ActionId;
     static fromProto(protoId: ActionIdProto): ActionId;
     static fromLogString(str: string): ActionId;
+    private static getTooltipDataHelper;
+    private static getTooltipData;
 }
