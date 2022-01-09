@@ -25,11 +25,13 @@ export class Timeline extends ResultComponent {
 	private cooldownsPlot: any;
 
 	private resultData: SimResultData | null;
+	private rendered: boolean;
 
   constructor(config: ResultComponentConfig) {
 		config.rootCssClass = 'timeline-root';
     super(config);
 		this.resultData = null;
+		this.rendered = false;
 
 		this.rootElem.innerHTML = `
 		<div class="timeline-disclaimer">
@@ -102,7 +104,9 @@ export class Timeline extends ResultComponent {
 	onSimResult(resultData: SimResultData) {
 		this.resultData = resultData;
 
-		this.updatePlot();
+		if (this.rendered) {
+			this.updatePlot();
+		}
 	}
 
 	private updatePlot() {
@@ -481,6 +485,10 @@ export class Timeline extends ResultComponent {
 		setTimeout(() => {
 			this.dpsResourcesPlot.render();
 			//this.cooldownsPlot.render();
+			this.rendered = true;
+			if (this.resultData != null) {
+				this.updatePlot();
+			}
 		}, 300);
 	}
 

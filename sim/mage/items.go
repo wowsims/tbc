@@ -67,7 +67,7 @@ var ItemSetTirisfalRegalia = core.ItemSet{
 					ID: Tirisfal4PcAuraID,
 					OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 						if spellEffect.Crit {
-							character.AddAuraWithTemporaryStats(sim, Tirisfal4PcProcAuraID, core.ActionID{SpellID: 37743}, stats.SpellPower, 70, time.Second*6)
+							character.AddAuraWithTemporaryStats(sim, Tirisfal4PcProcAuraID, core.ActionID{SpellID: 37443}, stats.SpellPower, 70, time.Second*6)
 						}
 					},
 				}

@@ -62,6 +62,7 @@ func (mage *Mage) NewArcaneBlast(sim *core.Simulation, target *core.Target) (*co
 	numStacks := mage.NumStacks(ArcaneBlastAuraID)
 	arcaneBlast.CastTime -= time.Duration(numStacks) * time.Second / 3
 	arcaneBlast.ManaCost += float64(numStacks) * ArcaneBlastBaseManaCost * 0.75
+	arcaneBlast.ActionID.Tag = numStacks + 1
 
 	// Set dynamic fields, i.e. the stuff we couldn't precompute.
 	arcaneBlast.Target = target

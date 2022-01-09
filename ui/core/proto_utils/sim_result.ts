@@ -98,7 +98,7 @@ export class SimResult {
 	}
 
 	getActionMetrics(filter: SimResultFilter): Array<ActionMetrics> {
-		return ActionMetrics.join(this.getPlayers(filter).map(player => player.getPlayerAndPetActions()).flat());
+		return ActionMetrics.joinById(this.getPlayers(filter).map(player => player.getPlayerAndPetActions()).flat());
 	}
 
 	getSpellMetrics(filter: SimResultFilter): Array<ActionMetrics> {
@@ -106,11 +106,11 @@ export class SimResult {
 	}
 
 	getBuffMetrics(filter: SimResultFilter): Array<AuraMetrics> {
-		return AuraMetrics.join(this.getPlayers(filter).map(player => player.auras).flat());
+		return AuraMetrics.joinById(this.getPlayers(filter).map(player => player.auras).flat());
 	}
 
 	getDebuffMetrics(filter: SimResultFilter): Array<AuraMetrics> {
-		return AuraMetrics.join(this.getTargets(filter).map(target => target.auras).flat());
+		return AuraMetrics.joinById(this.getTargets(filter).map(target => target.auras).flat());
 	}
 
 	toJson(): any {
@@ -388,18 +388,20 @@ export class AuraMetrics {
 		return new AuraMetrics(actionId, iterations, duration, auraMetrics);
 	}
 
-	// Merges aura metrics that have the same name/ID, adding their stats together.
-	static join(auras: Array<AuraMetrics>): Array<AuraMetrics> {
-		const joinedById = bucket(auras, aura => aura.actionId.toString());
+	// Merges an array of metrics into a single metrics.
+	static merge(auras: Array<AuraMetrics>): AuraMetrics {
+		const firstAura = auras[0];
+		return new AuraMetrics(
+				firstAura.actionId, firstAura.iterations, firstAura.duration,
+				AuraMetricsProto.create({
+					uptimeSecondsAvg: Math.max(...auras.map(a => a.data.uptimeSecondsAvg)),
+				}));
+	}
 
-		return Object.values(joinedById).map(aurasToJoin => {
-			const firstAura = aurasToJoin[0];
-			return new AuraMetrics(
-					firstAura.actionId, firstAura.iterations, firstAura.duration,
-					AuraMetricsProto.create({
-						uptimeSecondsAvg: Math.max(...aurasToJoin.map(a => a.data.uptimeSecondsAvg)),
-					}));
-		});
+	// Merges aura metrics that have the same name/ID, adding their stats together.
+	static joinById(auras: Array<AuraMetrics>): Array<AuraMetrics> {
+		const joinedById = bucket(auras, aura => aura.actionId.toString());
+		return Object.values(joinedById).map(aurasToJoin => AuraMetrics.merge(aurasToJoin));
 	}
 };
 
@@ -466,21 +468,33 @@ export class ActionMetrics {
 		return new ActionMetrics(actionId, iterations, duration, actionMetrics);
 	}
 
-	// Merges action metrics that have the same name/ID, adding their stats together.
-	static join(actions: Array<ActionMetrics>): Array<ActionMetrics> {
-		const joinedById = bucket(actions, action => action.actionId.toString());
+	// Merges an array of metrics into a single metric.
+	static merge(actions: Array<ActionMetrics>, removeTag?: boolean): ActionMetrics {
+		const firstAction = actions[0];
+		let actionId = firstAction.actionId;
+		if (removeTag) {
+			actionId = actionId.withoutTag();
+		}
+		return new ActionMetrics(
+				actionId, firstAction.iterations, firstAction.duration,
+				ActionMetricsProto.create({
+					casts: sum(actions.map(a => a.data.casts)),
+					hits: sum(actions.map(a => a.data.hits)),
+					crits: sum(actions.map(a => a.data.crits)),
+					misses: sum(actions.map(a => a.data.misses)),
+					damage: sum(actions.map(a => a.data.damage)),
+				}));
+	}
 
-		return Object.values(joinedById).map(actionsToJoin => {
-			const firstAction = actionsToJoin[0];
-			return new ActionMetrics(
-					firstAction.actionId, firstAction.iterations, firstAction.duration,
-					ActionMetricsProto.create({
-						casts: sum(actionsToJoin.map(a => a.data.casts)),
-						hits: sum(actionsToJoin.map(a => a.data.hits)),
-						crits: sum(actionsToJoin.map(a => a.data.crits)),
-						misses: sum(actionsToJoin.map(a => a.data.misses)),
-						damage: sum(actionsToJoin.map(a => a.data.damage)),
-					}));
-		});
+	// Merges action metrics that have the same name/ID, adding their stats together.
+	static joinById(actions: Array<ActionMetrics>): Array<ActionMetrics> {
+		const joinedById = bucket(actions, action => action.actionId.toString());
+		return Object.values(joinedById).map(actionsToJoin => ActionMetrics.merge(actionsToJoin));
+	}
+
+	// Groups similar metrics, i.e. metrics with the same item/spell/other ID but
+	// different tags, and returns them as separate arrays.
+	static groupById(actions: Array<ActionMetrics>): Array<Array<ActionMetrics>> {
+		return Object.values(bucket(actions, action => action.actionId.toStringIgnoringTag()));
 	}
 }
