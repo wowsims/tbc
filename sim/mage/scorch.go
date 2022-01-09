@@ -13,7 +13,6 @@ func (mage *Mage) newScorchTemplate(sim *core.Simulation) core.SimpleSpellTempla
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				Name:           "Scorch",
 				CritMultiplier: 1.5 + 0.125*float64(mage.Talents.SpellPower),
 				SpellSchool:    stats.FireSpellPower,
 				Character:      &mage.Character,

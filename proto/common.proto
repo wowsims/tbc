@@ -245,9 +245,17 @@ message PartyBuffs {
     int32 totem_of_wrath = 13;
     TristateEffect wrath_of_air_totem = 14;
     TristateEffect grace_of_air_totem = 15;
-    TristateEffect strength_of_earth_totem = 16;
+    StrengthOfEarthType strength_of_earth_totem = 16;
 
     TristateEffect battle_shout = 18;
+}
+
+enum StrengthOfEarthType {
+    None = 0;
+    Basic = 1;
+    CycloneBonus = 2;
+    EnhancingTotems = 3;
+    EnhancingAndCyclone = 4;
 }
 
 // Buffs are only used by individual sims, never the raid sim.
@@ -434,6 +442,7 @@ message RaidTarget {
 enum OtherAction {
 	OtherActionNone = 0;
 	OtherActionWait = 1;
+	OtherActionManaRegen = 2;
 }
 
 message ActionID {

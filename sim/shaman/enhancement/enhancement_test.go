@@ -55,5 +55,5 @@ func TestAverageDPS(t *testing.T) {
 		Target: FullDebuffTarget,
 	})
 
-	core.IndividualSimAverageTest("P2Average", t, isr, 1036.1)
+	core.IndividualSimAverageTest("P2Average", t, isr, 879.3)
 }

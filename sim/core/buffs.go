@@ -106,9 +106,16 @@ func applyBuffEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs proto.P
 	character.AddStats(stats.Stats{
 		stats.Agility: GetTristateValueFloat(partyBuffs.GraceOfAirTotem, 77.0, 88.55),
 	})
-	character.AddStats(stats.Stats{
-		stats.Strength: GetTristateValueFloat(partyBuffs.StrengthOfEarthTotem, 86.0, 98.9),
-	})
+	switch partyBuffs.StrengthOfEarthTotem {
+	case proto.StrengthOfEarthType_Basic:
+		character.AddStat(stats.Strength, 86)
+	case proto.StrengthOfEarthType_CycloneBonus:
+		character.AddStat(stats.Strength, 98)
+	case proto.StrengthOfEarthType_EnhancingTotems:
+		character.AddStat(stats.Strength, 98.9)
+	case proto.StrengthOfEarthType_EnhancingAndCyclone:
+		character.AddStat(stats.Strength, 110.9)
+	}
 	character.AddStats(stats.Stats{
 		stats.MP5: GetTristateValueFloat(partyBuffs.ManaSpringTotem, 50, 62.5),
 	})
@@ -148,6 +155,7 @@ type externalConsecutiveCDApproximation struct {
 	AuraID           AuraID
 	CooldownID       CooldownID
 	CooldownPriority float64
+	Type             int32
 	AuraDuration     time.Duration
 	AuraCD           time.Duration
 
@@ -176,6 +184,7 @@ func registerExternalConsecutiveCDApproximation(agent Agent, config externalCons
 		CooldownID: config.CooldownID,
 		Cooldown:   config.AuraDuration, // Assumes that multiple buffs are different sources.
 		Priority:   config.CooldownPriority,
+		Type:       config.Type,
 
 		CanActivate: func(sim *Simulation, character *Character) bool {
 			if externalCDs[nextExternalIndex].IsOnCD(sim) {
@@ -231,6 +240,7 @@ func registerBloodlustCD(agent Agent, numBloodlusts int32) {
 			CooldownPriority: CooldownPriorityBloodlust,
 			AuraDuration:     BloodlustDuration,
 			AuraCD:           BloodlustCD,
+			Type:             CooldownTypeDPS,
 
 			ShouldActivate: func(sim *Simulation, character *Character) bool {
 				// Haste portion doesn't stack with Power Infusion, so prefer to wait.
@@ -239,12 +249,12 @@ func registerBloodlustCD(agent Agent, numBloodlusts int32) {
 				}
 				return true
 			},
-			AddAura: AddBloodlustAura,
+			AddAura: func(sim *Simulation, character *Character) { AddBloodlustAura(sim, character, -1) },
 		},
 		numBloodlusts)
 }
 
-func AddBloodlustAura(sim *Simulation, character *Character) {
+func AddBloodlustAura(sim *Simulation, character *Character, actionTag int32) {
 	const bonus = 1.3
 	const inverseBonus = 1 / bonus
 
@@ -255,10 +265,9 @@ func AddBloodlustAura(sim *Simulation, character *Character) {
 	character.MultiplyMeleeSpeed(sim, bonus)
 
 	character.AddAura(sim, Aura{
-		ID:      BloodlustAuraID,
-		SpellID: 2825,
-		Name:    "Bloodlust",
-		Expires: sim.CurrentTime + BloodlustDuration,
+		ID:       BloodlustAuraID,
+		ActionID: ActionID{SpellID: 2825, Tag: actionTag},
+		Expires:  sim.CurrentTime + BloodlustDuration,
 		OnExpire: func(sim *Simulation) {
 			character.PseudoStats.CastSpeedMultiplier *= inverseBonus
 			if character.HasAura(PowerInfusionAuraID) {
@@ -267,6 +276,15 @@ func AddBloodlustAura(sim *Simulation, character *Character) {
 			character.MultiplyMeleeSpeed(sim, inverseBonus)
 		},
 	})
+
+	if len(character.Pets) > 0 {
+		for _, petAgent := range character.Pets {
+			pet := petAgent.GetPet()
+			if pet.IsEnabled() {
+				AddBloodlustAura(sim, &pet.Character, actionTag)
+			}
+		}
+	}
 }
 
 var PowerInfusionAuraID = NewAuraID()
@@ -284,6 +302,7 @@ func registerPowerInfusionCD(agent Agent, numPowerInfusions int32) {
 			CooldownPriority: CooldownPriorityDefault,
 			AuraDuration:     PowerInfusionDuration,
 			AuraCD:           PowerInfusionCD,
+			Type:             CooldownTypeDPS,
 
 			ShouldActivate: func(sim *Simulation, character *Character) bool {
 				// Haste portion doesn't stack with Bloodlust, so prefer to wait.
@@ -292,12 +311,12 @@ func registerPowerInfusionCD(agent Agent, numPowerInfusions int32) {
 				}
 				return true
 			},
-			AddAura: AddPowerInfusionAura,
+			AddAura: func(sim *Simulation, character *Character) { AddPowerInfusionAura(sim, character, -1) },
 		},
 		numPowerInfusions)
 }
 
-func AddPowerInfusionAura(sim *Simulation, character *Character) {
+func AddPowerInfusionAura(sim *Simulation, character *Character, actionTag int32) {
 	const bonus = 1.2
 	const inverseBonus = 1 / bonus
 
@@ -306,10 +325,9 @@ func AddPowerInfusionAura(sim *Simulation, character *Character) {
 	}
 
 	character.AddAura(sim, Aura{
-		ID:      PowerInfusionAuraID,
-		SpellID: 10060,
-		Name:    "Power Infusion",
-		Expires: sim.CurrentTime + PowerInfusionDuration,
+		ID:       PowerInfusionAuraID,
+		ActionID: ActionID{SpellID: 10060, Tag: actionTag},
+		Expires:  sim.CurrentTime + PowerInfusionDuration,
 		OnCast: func(sim *Simulation, cast *Cast) {
 			// TODO: Double-check this is how the calculation works.
 			cast.ManaCost = MaxFloat(0, cast.ManaCost-cast.BaseManaCost*0.2)
@@ -351,6 +369,7 @@ func registerInnervateCD(agent Agent, numInnervates int32) {
 			CooldownPriority: CooldownPriorityDefault,
 			AuraDuration:     InnervateDuration,
 			AuraCD:           InnervateCD,
+			Type:             CooldownTypeMana,
 			Init: func(sim *Simulation, character *Character) {
 				expectedManaPerInnervate = character.SpiritManaRegenPerSecond() * 5 * 20
 				remainingInnervateUsages = int(1 + (MaxDuration(0, sim.Duration))/InnervateCD)
@@ -364,7 +383,7 @@ func registerInnervateCD(agent Agent, numInnervates int32) {
 				return true
 			},
 			AddAura: func(sim *Simulation, character *Character) {
-				AddInnervateAura(sim, character, expectedManaPerInnervate)
+				AddInnervateAura(sim, character, expectedManaPerInnervate, -1)
 
 				newRemainingUsages := int(sim.GetRemainingDuration() / InnervateCD)
 				// AddInnervateAura already accounts for 1 usage, which is why we subtract 1 less.
@@ -375,7 +394,7 @@ func registerInnervateCD(agent Agent, numInnervates int32) {
 		numInnervates)
 }
 
-func AddInnervateAura(sim *Simulation, character *Character, expectedBonusManaReduction float64) {
+func AddInnervateAura(sim *Simulation, character *Character, expectedBonusManaReduction float64, actionTag int32) {
 	character.PseudoStats.ForceFullSpiritRegen = true
 	character.PseudoStats.SpiritRegenMultiplier *= 5.0
 
@@ -383,10 +402,9 @@ func AddInnervateAura(sim *Simulation, character *Character, expectedBonusManaRe
 	bonusManaSubtracted := 0.0
 
 	character.AddAura(sim, Aura{
-		ID:      InnervateAuraID,
-		SpellID: 29166,
-		Name:    "Innervate",
-		Expires: sim.CurrentTime + InnervateDuration,
+		ID:       InnervateAuraID,
+		ActionID: ActionID{SpellID: 29166, Tag: actionTag},
+		Expires:  sim.CurrentTime + InnervateDuration,
 		OnCast: func(sim *Simulation, cast *Cast) {
 			timeDelta := sim.CurrentTime - lastUpdateTime
 			lastUpdateTime = sim.CurrentTime
@@ -434,6 +452,7 @@ func registerManaTideTotemCD(agent Agent, numManaTideTotems int32) {
 			CooldownPriority: CooldownPriorityDefault,
 			AuraDuration:     ManaTideTotemDuration,
 			AuraCD:           ManaTideTotemCD,
+			Type:             CooldownTypeMana,
 			Init: func(sim *Simulation, character *Character) {
 				// Use first MTT at 60s, or halfway through the fight, whichever comes first.
 				initialDelay = MinDuration(sim.Duration/2, time.Second*60)
@@ -450,7 +469,7 @@ func registerManaTideTotemCD(agent Agent, numManaTideTotems int32) {
 				return true
 			},
 			AddAura: func(sim *Simulation, character *Character) {
-				AddManaTideTotemAura(sim, character)
+				AddManaTideTotemAura(sim, character, -1)
 
 				newRemainingUsages := int(sim.GetRemainingDuration() / ManaTideTotemCD)
 				// AddManaTideTotemAura already accounts for 1 usage, which is why we subtract 1 less.
@@ -461,16 +480,16 @@ func registerManaTideTotemCD(agent Agent, numManaTideTotems int32) {
 		numManaTideTotems)
 }
 
-func AddManaTideTotemAura(sim *Simulation, character *Character) {
+func AddManaTideTotemAura(sim *Simulation, character *Character, actionTag int32) {
 	lastUpdateTime := sim.CurrentTime
 	totalBonusMana := ManaTideTotemAmount(character)
 	bonusManaSubtracted := 0.0
+	actionID := ActionID{SpellID: 16190, Tag: actionTag}
 
 	character.AddAura(sim, Aura{
-		ID:      ManaTideTotemAuraID,
-		SpellID: 16190,
-		Name:    "Mana Tide Totem",
-		Expires: sim.CurrentTime + ManaTideTotemDuration,
+		ID:       ManaTideTotemAuraID,
+		ActionID: actionID,
+		Expires:  sim.CurrentTime + ManaTideTotemDuration,
 		OnCast: func(sim *Simulation, cast *Cast) {
 			timeDelta := sim.CurrentTime - lastUpdateTime
 			lastUpdateTime = sim.CurrentTime
@@ -478,13 +497,13 @@ func AddManaTideTotemAura(sim *Simulation, character *Character) {
 			remainder := totalBonusMana - bonusManaSubtracted
 			amount := MinFloat(remainder, totalBonusMana*progressRatio)
 
-			character.AddMana(sim, amount, "Mana Tide Totem", true)
+			character.AddMana(sim, amount, actionID, true)
 			character.ExpectedBonusMana -= amount
 			bonusManaSubtracted += amount
 		},
 		OnExpire: func(sim *Simulation) {
 			remainder := totalBonusMana - bonusManaSubtracted
-			character.AddMana(sim, remainder, "Mana Tide Totem", true)
+			character.AddMana(sim, remainder, actionID, true)
 			character.ExpectedBonusMana -= remainder
 		},
 	})

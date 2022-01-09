@@ -11,6 +11,7 @@ type Party struct {
 	Index int
 
 	Players []Agent
+	Pets    []PetAgent // Cached list of all the pets in the party.
 
 	dpsMetrics DpsMetrics
 }
@@ -157,6 +158,16 @@ func (raid *Raid) IsFull() bool {
 
 // Finalize the raid.
 func (raid *Raid) finalize(raidConfig proto.Raid) {
+	// Precompute the playersAndPets array for each party.
+	for _, party := range raid.Parties {
+		party.Pets = []PetAgent{}
+		for _, player := range party.Players {
+			for _, petAgent := range player.GetCharacter().Pets {
+				party.Pets = append(party.Pets, petAgent)
+			}
+		}
+	}
+
 	// Compute the full raid buffs from the raid.
 	raidBuffs := proto.RaidBuffs{}
 	if raidConfig.Buffs != nil {

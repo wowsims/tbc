@@ -15,7 +15,8 @@ import (
 // All players have stats, equipment, auras, etc
 type Character struct {
 	// Label for logging.
-	Name string
+	Name  string
+	Label string
 
 	Race  proto.Race
 	Class proto.Class
@@ -111,6 +112,8 @@ func NewCharacter(party *Party, partyIndex int, player proto.Player) Character {
 		Metrics: NewCharacterMetrics(),
 	}
 
+	character.Label = fmt.Sprintf("%s (#%d)", character.Name, character.RaidIndex+1)
+
 	if player.Consumes != nil {
 		character.consumes = *player.Consumes
 	}
@@ -150,7 +153,7 @@ func (character *Character) addUniversalStatDependencies() {
 }
 
 func (character *Character) Log(sim *Simulation, message string, vals ...interface{}) {
-	sim.Log("%s (#%d): "+message, append([]interface{}{character.Name, character.RaidIndex + 1}, vals...)...)
+	sim.Log("[%s] "+message, append([]interface{}{character.Label}, vals...)...)
 }
 
 func (character *Character) applyAllEffects(agent Agent) {
@@ -215,7 +218,7 @@ func (character *Character) AddStat(stat stats.Stat, amount float64) {
 	}
 }
 
-func (character *Character) SpendMana(sim *Simulation, amount float64, reason string) {
+func (character *Character) SpendMana(sim *Simulation, amount float64, actionID ActionID) {
 	if amount < 0 {
 		panic("Trying to spend negative mana!")
 	}
@@ -223,13 +226,13 @@ func (character *Character) SpendMana(sim *Simulation, amount float64, reason st
 	newMana := character.CurrentMana() - amount
 
 	if sim.Log != nil {
-		character.Log(sim, "Spent %0.1f mana from %s (%0.1f --> %0.1f).", amount, reason, character.CurrentMana(), newMana)
+		character.Log(sim, "Spent %0.3f mana from %s (%0.3f --> %0.3f).", amount, actionID, character.CurrentMana(), newMana)
 	}
 
 	character.stats[stats.Mana] = newMana
 	character.Metrics.ManaSpent += amount
 }
-func (character *Character) AddMana(sim *Simulation, amount float64, reason string, isBonusMana bool) {
+func (character *Character) AddMana(sim *Simulation, amount float64, actionID ActionID, isBonusMana bool) {
 	if amount < 0 {
 		panic("Trying to add negative mana!")
 	}
@@ -238,7 +241,7 @@ func (character *Character) AddMana(sim *Simulation, amount float64, reason stri
 	newMana := MinFloat(oldMana+amount, character.MaxMana())
 
 	if sim.Log != nil {
-		character.Log(sim, "Gained %0.1f mana from %s (%0.1f --> %0.1f).", amount, reason, oldMana, newMana)
+		character.Log(sim, "Gained %0.3f mana from %s (%0.3f --> %0.3f).", amount, actionID, oldMana, newMana)
 	}
 
 	character.stats[stats.Mana] = newMana
@@ -463,21 +466,19 @@ func (character *Character) ManaRegenPerSecondWhileNotCasting() float64 {
 
 // Regenerates mana based on MP5 stat, spirit regen allowed while casting and the elapsed time.
 func (character *Character) RegenManaCasting(sim *Simulation, elapsedTime time.Duration) {
-	manaRegen := character.ManaRegenPerSecondWhileCasting() * elapsedTime.Seconds()
-	reason := ""
-	if sim.Log != nil {
-		reason = fmt.Sprintf("%0.1fs Regen", elapsedTime.Seconds())
-	}
-	character.AddMana(sim, manaRegen, reason, false)
+	elapsedSeconds := elapsedTime.Seconds()
+	manaRegen := character.ManaRegenPerSecondWhileCasting() * elapsedSeconds
+	character.AddMana(sim, manaRegen, ActionID{OtherID: proto.OtherAction_OtherActionManaRegen, Tag: int32(elapsedSeconds * 1000)}, false)
 }
 
 // Regenerates mana using mp5 and spirit. Will calculate time since last cast and then enable spirit regen if needed.
 func (character *Character) RegenMana(sim *Simulation, elapsedTime time.Duration) {
+	elapsedSeconds := elapsedTime.Seconds()
 	var regen float64
 	if sim.CurrentTime-elapsedTime > character.PseudoStats.FiveSecondRuleRefreshTime {
 		// Five second rule activated before the advance window started, so use full
 		// spirit regen for the full duration.
-		regen = character.ManaRegenPerSecondWhileNotCasting() * elapsedTime.Seconds()
+		regen = character.ManaRegenPerSecondWhileNotCasting() * elapsedSeconds
 	} else if sim.CurrentTime > character.PseudoStats.FiveSecondRuleRefreshTime {
 		// Five second rule activated sometime in the middle of the advance window,
 		// so regen is a combination of casting and not-casting regen.
@@ -485,13 +486,9 @@ func (character *Character) RegenMana(sim *Simulation, elapsedTime time.Duration
 		castingRegenTime := elapsedTime - notCastingRegenTime
 		regen = (character.ManaRegenPerSecondWhileNotCasting() * notCastingRegenTime.Seconds()) + (character.ManaRegenPerSecondWhileCasting() * castingRegenTime.Seconds())
 	} else {
-		regen = character.ManaRegenPerSecondWhileCasting() * elapsedTime.Seconds()
+		regen = character.ManaRegenPerSecondWhileCasting() * elapsedSeconds
 	}
-	reason := ""
-	if sim.Log != nil {
-		reason = fmt.Sprintf("%0.1fs Regen", elapsedTime.Seconds())
-	}
-	character.AddMana(sim, regen, reason, false)
+	character.AddMana(sim, regen, ActionID{OtherID: proto.OtherAction_OtherActionManaRegen, Tag: int32(elapsedSeconds * 1000)}, false)
 }
 
 // Returns the amount of time this Character would need to wait in order to reach

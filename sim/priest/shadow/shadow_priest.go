@@ -3,6 +3,7 @@ package shadow
 import (
 	"time"
 
+	"github.com/wowsims/tbc/sim/common"
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/proto"
 	"github.com/wowsims/tbc/sim/core/stats"
@@ -184,7 +185,7 @@ func (spriest *ShadowPriest) Act(sim *core.Simulation) time.Duration {
 	// fmt.Printf("\tCasting: %s, %0.2f\n", spell.Name, spell.CastTime.Seconds())
 	if !actionSuccessful {
 		regenTime := spriest.TimeUntilManaRegen(spell.GetManaCost())
-		waitAction := core.NewWaitAction(sim, spriest.GetCharacter(), regenTime, core.WaitReasonOOM)
+		waitAction := common.NewWaitAction(sim, spriest.GetCharacter(), regenTime, common.WaitReasonOOM)
 		waitAction.Cast(sim)
 		return sim.CurrentTime + waitAction.GetDuration()
 	}

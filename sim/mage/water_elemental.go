@@ -3,6 +3,7 @@ package mage
 import (
 	"time"
 
+	"github.com/wowsims/tbc/sim/common"
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/stats"
 )
@@ -15,11 +16,14 @@ func (mage *Mage) registerSummonWaterElementalCD() {
 	}
 
 	manaCost := 0.0
+	actionID := core.ActionID{SpellID: 31687}
 
 	mage.AddMajorCooldown(core.MajorCooldown{
-		ActionID:   core.ActionID{SpellID: 31687},
+		ActionID:   actionID,
 		CooldownID: SummonWaterElementalCooldownID,
 		Cooldown:   time.Minute * 3,
+		Priority:   core.CooldownPriorityDrums + 1,
+		Type:       core.CooldownTypeDPS,
 		CanActivate: func(sim *core.Simulation, character *core.Character) bool {
 			if mage.waterElemental.IsEnabled() {
 				return false
@@ -39,8 +43,8 @@ func (mage *Mage) registerSummonWaterElementalCD() {
 
 				mage.waterElemental.EnableWithTimeout(sim, mage.waterElemental, time.Second*45)
 
-				character.SpendMana(sim, manaCost, "Summon Water Elemental")
-				character.Metrics.AddInstantCast(core.ActionID{SpellID: 31687})
+				character.SpendMana(sim, manaCost, actionID)
+				character.Metrics.AddInstantCast(actionID)
 				character.SetCD(SummonWaterElementalCooldownID, sim.CurrentTime+time.Minute*3)
 			}
 		},
@@ -97,7 +101,7 @@ func (we *WaterElemental) Act(sim *core.Simulation) time.Duration {
 		// Water ele has decided not to cooperate, so just wait for the cast time
 		// instead of casting.
 		spell.Cancel(sim)
-		waitAction := core.NewWaitAction(sim, we.GetCharacter(), spell.GetDuration(), core.WaitReasonNone)
+		waitAction := common.NewWaitAction(sim, we.GetCharacter(), spell.GetDuration(), common.WaitReasonNone)
 		waitAction.Cast(sim)
 		return sim.CurrentTime + waitAction.GetDuration()
 	}
@@ -116,8 +120,10 @@ func (we *WaterElemental) Act(sim *core.Simulation) time.Duration {
 // These numbers are just rough guesses based on looking at some logs.
 var waterElementalBaseStats = stats.Stats{
 	stats.Intellect:  100,
-	stats.SpellPower: 500,
+	stats.SpellPower: 300,
 	stats.Mana:       2000,
+	stats.SpellHit:   3 * core.SpellHitRatingPerHitChance,
+	stats.SpellCrit:  8 * core.SpellCritRatingPerCritChance,
 }
 
 // These numbers are just rough guesses based on looking at some logs.
@@ -128,8 +134,8 @@ var waterElementalInheritanceCoeffs = stats.Stats{
 
 	stats.SpellPower:      0.333,
 	stats.FrostSpellPower: 0.333,
-	stats.SpellHit:        0,
-	stats.SpellCrit:       0,
+	stats.SpellHit:        0.01,
+	stats.SpellCrit:       0.01,
 }
 
 const SpellIDWaterbolt int32 = 31707
@@ -139,7 +145,6 @@ func (we *WaterElemental) newWaterboltTemplate(sim *core.Simulation) core.Simple
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				Name:           "Waterbolt",
 				CritMultiplier: 1.5,
 				SpellSchool:    stats.FrostSpellPower,
 				Character:      &we.Character,

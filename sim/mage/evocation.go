@@ -12,11 +12,13 @@ var EvocationCooldownID = core.NewCooldownID()
 func (mage *Mage) registerEvocationCD() {
 	cooldown := time.Minute * 8
 	manaThreshold := 0.0
+	actionID := core.ActionID{SpellID: 12051}
 
 	mage.AddMajorCooldown(core.MajorCooldown{
-		ActionID:   core.ActionID{SpellID: 12051},
+		ActionID:   actionID,
 		CooldownID: EvocationCooldownID,
 		Cooldown:   cooldown,
+		Type:       core.CooldownTypeMana,
 		CanActivate: func(sim *core.Simulation, character *core.Character) bool {
 			if character.IsOnCD(core.GCDCooldownID, sim.CurrentTime) {
 				return false
@@ -61,14 +63,13 @@ func (mage *Mage) registerEvocationCD() {
 			return func(sim *core.Simulation, character *core.Character) {
 				duration := time.Duration(float64(baseDuration) / character.CastSpeed())
 
-				character.AddMana(sim, totalAmount, "Evocation", true)
+				character.AddMana(sim, totalAmount, actionID, true)
 				character.AddAura(sim, core.Aura{
-					ID:      EvocationAuraID,
-					SpellID: 12051,
-					Name:    "Evocation",
-					Expires: sim.CurrentTime + duration,
+					ID:       EvocationAuraID,
+					ActionID: actionID,
+					Expires:  sim.CurrentTime + duration,
 				})
-				character.Metrics.AddInstantCast(core.ActionID{SpellID: 12051})
+				character.Metrics.AddInstantCast(actionID)
 				character.SetCD(EvocationCooldownID, sim.CurrentTime+cooldown)
 				character.SetCD(core.GCDCooldownID, sim.CurrentTime+duration)
 			}

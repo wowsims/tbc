@@ -33,13 +33,12 @@ var ItemSetManaEtched = core.ItemSet{
 				const duration = time.Second * 15
 
 				return core.Aura{
-					ID:   ManaEtchedAuraID,
-					Name: "Mana-Etched Set",
+					ID: ManaEtchedAuraID,
 					OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
 						if sim.RandomFloat("Mana-Etched Insight") > 0.02 {
 							return
 						}
-						character.AddAuraWithTemporaryStats(sim, ManaEtchedInsightAuraID, 37619, "Mana-Etched Insight", stats.SpellPower, spellBonus, duration)
+						character.AddAuraWithTemporaryStats(sim, ManaEtchedInsightAuraID, core.ActionID{SpellID: 37619}, stats.SpellPower, spellBonus, duration)
 					},
 				}
 			})
@@ -70,13 +69,12 @@ var ItemSetSpellstrike = core.ItemSet{
 				const duration = time.Second * 10
 
 				return core.Aura{
-					ID:   SpellstrikeAuraID,
-					Name: "Spellstrike Set",
+					ID: SpellstrikeAuraID,
 					OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
 						if sim.RandomFloat("spellstrike") > 0.05 {
 							return
 						}
-						character.AddAuraWithTemporaryStats(sim, SpellstrikeInfusionAuraID, 32106, "Spellstrike Infusion", stats.SpellPower, spellBonus, duration)
+						character.AddAuraWithTemporaryStats(sim, SpellstrikeInfusionAuraID, core.ActionID{SpellID: 32106}, stats.SpellPower, spellBonus, duration)
 					},
 				}
 			})

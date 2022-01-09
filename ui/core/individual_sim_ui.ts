@@ -38,6 +38,7 @@ import { Spec } from '/tbc/core/proto/common.js';
 import { getMetaGemConditionDescription } from '/tbc/core/proto_utils/gems.js';
 import { SpecOptions } from '/tbc/core/proto_utils/utils.js';
 import { SpecRotation } from '/tbc/core/proto_utils/utils.js';
+import { launchedSpecs } from '/tbc/core/launched_sims.js';
 import { Stat } from '/tbc/core/proto/common.js';
 import { StatWeightsRequest } from '/tbc/core/proto/api.js';
 import { Stats } from '/tbc/core/proto_utils/stats.js';
@@ -178,7 +179,6 @@ export interface Settings {
 export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
   readonly player: Player<SpecType>;
 	readonly individualConfig: IndividualSimUIConfig<SpecType>;
-	readonly isWithinRaidSim: boolean;
 
   private readonly exclusivityMap: Record<ExclusivityTag, Array<ExclusiveEffect>>;
 
@@ -194,9 +194,15 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 		this.rootElem.classList.add('individual-sim-ui', config.cssClass);
 		this.player = player;
 		this.individualConfig = config;
-		this.isWithinRaidSim = this.rootElem.closest('.within-raid-sim') != null;
 		this.raidSimResultsManager = null;
 		this.settingsMuuri = null;
+		if (!launchedSpecs.includes(this.player.spec)) {
+			this.addWarning({
+				updateOn: new TypedEvent<void>(),
+				shouldDisplay: () => true,
+				getContent: () => 'This sim is still under development.',
+			});
+		}
 		this.addWarning({
 			updateOn: this.player.gearChangeEmitter,
 			shouldDisplay: () => this.player.getGear().hasInactiveMetaGem(),
@@ -274,6 +280,7 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 							const settingsBytes = pako.inflate(bytes);  
 							const settings = IndividualSimSettings.fromBinary(settingsBytes);
 							this.fromProto(initEventID, settings);
+							loadedSettings = true;
 						}
 					}
 				} catch (e) {

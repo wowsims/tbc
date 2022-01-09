@@ -248,7 +248,7 @@ func (ability *ActiveMeleeAbility) Attack(sim *Simulation) bool {
 			return false
 		}
 		if ability.MeleeAbility.Cost.Type == stats.Mana {
-			ability.Character.SpendMana(sim, ability.MeleeAbility.Cost.Value, ability.MeleeAbility.Name)
+			ability.Character.SpendMana(sim, ability.MeleeAbility.Cost.Value, ability.MeleeAbility.ActionID)
 		} else {
 			ability.Character.AddStat(ability.MeleeAbility.Cost.Type, -ability.MeleeAbility.Cost.Value)
 		}

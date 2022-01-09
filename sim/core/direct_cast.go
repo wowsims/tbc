@@ -151,9 +151,6 @@ func (hitEffect *SpellHitEffect) apply(sim *Simulation, spellCast *SpellCast, ap
 		hitEffect.applyResultsToCast(spellCast)
 		if applyMetrics {
 			spellCast.Character.Metrics.AddSpellCast(spellCast)
-			if sim.Log != nil {
-				spellCast.Character.Log(sim, "Adding metrics for spell, damage: %0.02f, total: %0.02f", spellCast.TotalDamage, spellCast.Character.Metrics.TotalDamage)
-			}
 		}
 		spellCast.objectInUse = false
 	}
@@ -191,7 +188,6 @@ type DotDamageInput struct {
 
 	// If both of these are set, will display uptime metrics for this dot.
 	DebuffID AuraID
-	SpellID  int32
 
 	// Internal fields
 	startTime     time.Duration
@@ -248,7 +244,7 @@ type SimpleSpellTemplate struct {
 
 func (template *SimpleSpellTemplate) Apply(newAction *SimpleSpell) {
 	if newAction.objectInUse {
-		panic(fmt.Sprintf("Damage over time spell (%s) already in use", newAction.Name))
+		panic(fmt.Sprintf("Damage over time spell (%s) already in use", newAction.ActionID))
 	}
 	*newAction = template.template
 }

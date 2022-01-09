@@ -64,8 +64,7 @@ type OnExpire func(sim *Simulation)
 
 type Aura struct {
 	ID          AuraID
-	SpellID     int32         // In-game spell ID. If set, metrics will be tracked for this aura using this ID.
-	Name        string        // Label used for logging.
+	ActionID    ActionID      // If set, metrics will be tracked for this aura using this ID.
 	Expires     time.Duration // Time at which aura will be removed.
 	activeIndex int32         // Position of this aura's index in the sim.activeAuraIDs array.
 
@@ -259,8 +258,8 @@ func (at *auraTracker) advance(sim *Simulation) {
 func (at *auraTracker) doneIteration(simDuration time.Duration) {
 	// Add metrics for any auras that are still active.
 	for _, aura := range at.auras {
-		if aura.SpellID != 0 {
-			at.AddAuraUptime(aura.ID, aura.SpellID, simDuration-aura.startTime)
+		if !aura.ActionID.IsEmptyAction() {
+			at.AddAuraUptime(aura.ID, aura.ActionID, simDuration-aura.startTime)
 		}
 	}
 
@@ -354,8 +353,8 @@ func (at *auraTracker) AddAura(sim *Simulation, newAura Aura) {
 		at.onBeforeMeleeIDs = append(at.onBeforeMeleeIDs, newAura.ID)
 	}
 
-	if sim.Log != nil && newAura.SpellID != 0 {
-		at.logFn("Aura gained: %s", newAura.Name)
+	if sim.Log != nil && !newAura.ActionID.IsEmptyAction() {
+		at.logFn("Aura gained: %s", newAura.ActionID)
 	}
 }
 
@@ -365,12 +364,12 @@ func (at *auraTracker) RemoveAura(sim *Simulation, id AuraID) {
 		at.auras[id].OnExpire(sim)
 	}
 
-	if at.auras[id].SpellID != 0 {
-		at.AddAuraUptime(id, at.auras[id].SpellID, sim.CurrentTime-at.auras[id].startTime)
+	if !at.auras[id].ActionID.IsEmptyAction() {
+		at.AddAuraUptime(id, at.auras[id].ActionID, sim.CurrentTime-at.auras[id].startTime)
 	}
 
-	if sim.Log != nil && at.auras[id].SpellID != 0 {
-		at.logFn("Aura faded: %s", at.auras[id].Name)
+	if sim.Log != nil && !at.auras[id].ActionID.IsEmptyAction() {
+		at.logFn("Aura faded: %s", at.auras[id].ActionID)
 	}
 
 	removeActiveIndex := at.auras[id].activeIndex
@@ -569,10 +568,10 @@ func (at *auraTracker) OnBeforeMelee(sim *Simulation, ability *ActiveMeleeAbilit
 	}
 }
 
-func (at *auraTracker) AddAuraUptime(auraID AuraID, spellID int32, uptime time.Duration) {
+func (at *auraTracker) AddAuraUptime(auraID AuraID, actionID ActionID, uptime time.Duration) {
 	metrics := &at.metrics[auraID]
 
-	metrics.ID = spellID
+	metrics.ID = actionID
 	metrics.Uptime += uptime
 }
 
@@ -580,7 +579,7 @@ func (at *auraTracker) GetMetricsProto(numIterations int32) []*proto.AuraMetrics
 	metrics := make([]*proto.AuraMetrics, 0, len(at.metrics))
 
 	for _, auraMetric := range at.metrics {
-		if auraMetric.ID != 0 {
+		if !auraMetric.ID.IsEmptyAction() {
 			metrics = append(metrics, auraMetric.ToProto(numIterations))
 		}
 	}
@@ -604,9 +603,9 @@ func NewICD() InternalCD {
 }
 
 // Helper for the common case of adding an Aura that gives a temporary stat boost.
-func (character *Character) AddAuraWithTemporaryStats(sim *Simulation, auraID AuraID, spellID int32, auraName string, stat stats.Stat, amount float64, duration time.Duration) {
+func (character *Character) AddAuraWithTemporaryStats(sim *Simulation, auraID AuraID, actionID ActionID, stat stats.Stat, amount float64, duration time.Duration) {
 	if sim.Log != nil {
-		character.Log(sim, "Gained %0.0f %s from %s.", amount, stat.StatName(), auraName)
+		character.Log(sim, "Gained %0.02f %s from %s.", amount, stat.StatName(), actionID)
 	}
 	if stat == stats.MeleeHaste {
 		character.AddMeleeHaste(sim, amount)
@@ -615,13 +614,12 @@ func (character *Character) AddAuraWithTemporaryStats(sim *Simulation, auraID Au
 	}
 
 	character.AddAura(sim, Aura{
-		ID:      auraID,
-		SpellID: spellID,
-		Name:    auraName,
-		Expires: sim.CurrentTime + duration,
+		ID:       auraID,
+		ActionID: actionID,
+		Expires:  sim.CurrentTime + duration,
 		OnExpire: func(sim *Simulation) {
 			if sim.Log != nil {
-				character.Log(sim, "Lost %0.0f %s from fading %s.", amount, stat.StatName(), auraName)
+				character.Log(sim, "Lost %0.02f %s from fading %s.", amount, stat.StatName(), actionID)
 			}
 			if stat == stats.MeleeHaste {
 				character.AddMeleeHaste(sim, -amount)

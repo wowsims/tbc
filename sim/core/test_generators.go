@@ -82,6 +82,21 @@ func (combos *SettingsCombos) GetTest(testIdx int) (string, *proto.RaidSimReques
 				Equipment: gearSetCombo.GearSet,
 				Consumes:  buffsCombo.Consumes,
 				Buffs:     buffsCombo.Player,
+				// TODO: Allow cooldowns in tests
+				//Cooldowns: &proto.Cooldowns{
+				//	Cooldowns: []*proto.Cooldown{
+				//		&proto.Cooldown{
+				//			Id: &proto.ActionID{
+				//				RawId: &proto.ActionID_SpellId{
+				//					SpellId: 12043,
+				//				},
+				//			},
+				//			Timings: []float64{
+				//				5,
+				//			},
+				//		},
+				//	},
+				//},
 			}, specOptionsCombo.SpecOptions),
 			buffsCombo.Party,
 			buffsCombo.Raid),

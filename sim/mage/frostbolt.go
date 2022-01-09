@@ -13,7 +13,6 @@ func (mage *Mage) newFrostboltTemplate(sim *core.Simulation) core.SimpleSpellTem
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				Name:           "Frostbolt",
 				CritMultiplier: 1.5 + 0.125*float64(mage.Talents.SpellPower) + 0.1*float64(mage.Talents.IceShards),
 				SpellSchool:    stats.FrostSpellPower,
 				Character:      &mage.Character,
