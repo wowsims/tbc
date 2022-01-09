@@ -67,7 +67,7 @@ export class MageSimUI extends IndividualSimUI {
                 // Default rotation settings.
                 rotation: Presets.DefaultArcaneRotation,
                 // Default talents.
-                talents: Presets.FireTalents.data,
+                talents: Presets.ArcaneTalents.data,
                 // Default spec-specific settings.
                 specOptions: Presets.DefaultArcaneOptions,
                 // Default raid/party buffs settings.
