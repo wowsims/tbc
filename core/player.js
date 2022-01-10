@@ -300,10 +300,21 @@ export class Player {
         this.specOptions = this.specTypeFunctions.optionsCopy(newSpecOptions);
         this.specOptionsChangeEmitter.emit(eventID);
     }
+    computeStatsEP(stats) {
+        if (stats == undefined) {
+            return 0;
+        }
+        return new Stats(stats).computeEP(this.epWeights);
+    }
     computeGemEP(gem) {
         const epFromStats = new Stats(gem.stats).computeEP(this.epWeights);
         const epFromEffect = getMetaGemEffectEP(this.spec, gem, new Stats(this.currentStats.finalStats));
-        return epFromStats + epFromEffect;
+        let bonusEP = 0;
+        // unique items are slightly worse than non-unique because you can have only one.
+        if (gem.unique) {
+            bonusEP -= 0.01;
+        }
+        return epFromStats + epFromEffect + bonusEP;
     }
     computeEnchantEP(enchant) {
         return new Stats(enchant.stats).computeEP(this.epWeights);
@@ -312,6 +323,10 @@ export class Player {
         if (item == null)
             return 0;
         let ep = new Stats(item.stats).computeEP(this.epWeights);
+        // unique items are slightly worse than non-unique because you can have only one.
+        if (item.unique) {
+            ep -= 0.01;
+        }
         const slot = getEligibleItemSlots(item)[0];
         const enchants = this.sim.getEnchants(slot);
         if (enchants.length > 0) {

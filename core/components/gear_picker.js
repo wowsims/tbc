@@ -1,5 +1,5 @@
 import { EquippedItem } from '/tbc/core/proto_utils/equipped_item.js';
-import { getEmptyGemSocketIconUrl } from '/tbc/core/proto_utils/gems.js';
+import { getEmptyGemSocketIconUrl, gemMatchesSocket } from '/tbc/core/proto_utils/gems.js';
 import { setGemSocketCssClass } from '/tbc/core/proto_utils/gems.js';
 import { enchantAppliesToItem } from '/tbc/core/proto_utils/utils.js';
 import { Item } from '/tbc/core/proto/common.js';
@@ -145,6 +145,7 @@ class SelectorModal extends Component {
                 name: item.name,
                 quality: item.quality,
                 phase: item.phase,
+                baseEP: this.player.computeStatsEP(item.stats),
                 onEquip: (eventID, item) => {
                     const equippedItem = this.player.getEquippedItem(slot);
                     if (equippedItem) {
@@ -165,6 +166,7 @@ class SelectorModal extends Component {
                 name: enchant.name,
                 quality: enchant.quality,
                 phase: 1,
+                baseEP: this.player.computeStatsEP(enchant.stats),
                 onEquip: (eventID, enchant) => {
                     const equippedItem = this.player.getEquippedItem(slot);
                     if (equippedItem)
@@ -185,14 +187,25 @@ class SelectorModal extends Component {
         });
     }
     addGemTabs(slot, equippedItem) {
-        equippedItem?.item.gemSockets.forEach((socketColor, socketIdx) => {
-            this.addTab('Gem ' + (socketIdx + 1), slot, equippedItem, this.player.getGems(socketColor), gem => this.player.computeGemEP(gem), equippedItem => equippedItem?.gems[socketIdx], gem => {
+        if (equippedItem == undefined) {
+            return;
+        }
+        const socketBonusEP = this.player.computeStatsEP(equippedItem.item.socketBonus) / equippedItem.item.gemSockets.length;
+        equippedItem.item.gemSockets.forEach((socketColor, socketIdx) => {
+            this.addTab('Gem ' + (socketIdx + 1), slot, equippedItem, this.player.getGems(socketColor), gem => {
+                let gemEP = this.player.computeGemEP(gem);
+                if (gemMatchesSocket(gem, socketColor)) {
+                    gemEP += socketBonusEP;
+                }
+                return gemEP;
+            }, equippedItem => equippedItem?.gems[socketIdx], gem => {
                 return {
                     id: gem.id,
                     actionId: ActionId.fromItemId(gem.id),
                     name: gem.name,
                     quality: gem.quality,
                     phase: gem.phase,
+                    baseEP: this.player.computeStatsEP(gem.stats),
                     onEquip: (eventID, gem) => {
                         const equippedItem = this.player.getEquippedItem(slot);
                         if (equippedItem)
@@ -259,8 +272,8 @@ class SelectorModal extends Component {
     <div class="selector-modal-tab-content-header">
       <button class="selector-modal-remove-button">Remove</button>
       <input class="selector-modal-search" type="text" placeholder="Search...">
-			<div class="selector-modal-filter-bar-filler"></div>
-			<div class="selector-modal-phase-selector"></div>
+      <div class="selector-modal-filter-bar-filler"></div>
+      <div class="selector-modal-phase-selector"></div>
     </div>
     <ul class="selector-modal-list"></ul>
     `;
@@ -279,6 +292,7 @@ class SelectorModal extends Component {
             listItemElem.dataset.id = String(itemData.id);
             listItemElem.dataset.name = itemData.name;
             listItemElem.dataset.phase = String(Math.max(itemData.phase, 1));
+            listItemElem.dataset.baseEP = String(itemData.baseEP);
             listItemElem.innerHTML = `
         <a class="selector-modal-list-item-icon"></a>
         <a class="selector-modal-list-item-name">${itemData.name}</a>
@@ -352,6 +366,10 @@ class SelectorModal extends Component {
             validItemElems = validItemElems.filter(elem => elem.dataset.name.toLowerCase().includes(searchQuery));
             const phase = this.player.sim.getPhase();
             validItemElems = validItemElems.filter(elem => Number(elem.dataset.phase) <= phase);
+            // If not a trinket slot, filter out items without EP values.
+            if (slot != ItemSlot.ItemSlotTrinket1 && slot != ItemSlot.ItemSlotTrinket2) {
+                validItemElems = validItemElems.filter(elem => Number(elem.dataset.baseEP) > 1);
+            }
             const currentEquippedItem = this.player.getEquippedItem(slot);
             if (label == 'Enchants' && currentEquippedItem) {
                 validItemElems = validItemElems.filter(elem => {

@@ -98,6 +98,7 @@ export declare class Player<SpecType extends Spec> {
     getTalentTreeIcon(): string;
     getSpecOptions(): SpecOptions<SpecType>;
     setSpecOptions(eventID: EventID, newSpecOptions: SpecOptions<SpecType>): void;
+    computeStatsEP(stats: number[] | undefined): number;
     computeGemEP(gem: Gem): number;
     computeEnchantEP(enchant: Enchant): number;
     computeItemEP(item: Item): number;
