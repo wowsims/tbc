@@ -186,6 +186,7 @@ var nonEquippableRegexes = []*regexp.Regexp{
 	regexp.MustCompile("Pattern:"),
 	regexp.MustCompile("Plans:"),
 	regexp.MustCompile("Schematic:"),
+	regexp.MustCompile("Random enchantment"),
 }
 
 func (item WowheadItemResponse) IsEquippable() bool {
