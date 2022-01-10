@@ -11,7 +11,7 @@ import { Stat } from './proto/common.js';
 
 import { ComputeStatsRequest, ComputeStatsResult } from './proto/api.js';
 import { GearListRequest, GearListResult } from './proto/api.js';
-import { RaidSimRequest, RaidSimResult, RaidSimAsyncResult} from './proto/api.js';
+import { RaidSimRequest, RaidSimResult, ProgressMetrics} from './proto/api.js';
 import { StatWeightsRequest, StatWeightsResult } from './proto/api.js';
 
 import { wait } from './utils.js';
@@ -34,7 +34,7 @@ export class WorkerPool {
   }
 
   async makeApiCall(requestName: string, request: Uint8Array): Promise<Uint8Array> {
-    return await this.getLeastBusyWorker().doApiCall(requestName, request);
+    return await this.getLeastBusyWorker().doApiCall(requestName, request, "");
   }
 
   async getGearList(request: GearListRequest): Promise<GearListResult> {
@@ -52,24 +52,33 @@ export class WorkerPool {
 		return StatWeightsResult.fromBinary(result);
   }
 
+  async raidSimAsync(request: RaidSimRequest, onProgress: Function): Promise<RaidSimResult>  {
+    console.log('Raid sim request: ' + RaidSimRequest.toJsonString(request));
+    const worker = this.getLeastBusyWorker();
+    const id = worker.makeTaskId();
+    var progressHandler = (progressData: any) => {};
+
+    progressHandler = (progressData: any) => {
+      var progress = ProgressMetrics.fromBinary(progressData);
+      onProgress(progress);
+      worker.addPromiseFunc(id+"progress", progressHandler, (err)=>{});
+    };
+
+    worker.addPromiseFunc(id+"progress", progressHandler, (err)=>{})
+		const resultData = await worker.doApiCall('raidSimAsync', RaidSimRequest.toBinary(request), id);
+    const result =  ProgressMetrics.fromBinary(resultData)
+    return result.finalResult!;
+  }
+
   async raidSim(request: RaidSimRequest): Promise<RaidSimResult> {
     console.log('Raid sim request: ' + RaidSimRequest.toJsonString(request));
-		const resultData = await this.makeApiCall('raidSimAsync', RaidSimRequest.toBinary(request));
-		
-    const result = RaidSimAsyncResult.fromBinary(resultData);
-
-    var done = false;
-    while (!done) {
-      const progress = await this.makeApiCall('raidSimAsyncProgress', RaidSimRequest.toBinary(result));
-
-    }
-    
-		// Don't print the logs because it just clogs the console.
-		// const resultJson = RaidSimResult.toJson(result) as any;
-		// delete resultJson!['logs'];
-    // console.log('Raid sim result: ' + JSON.stringify(resultJson));
-
-		// return result;
+		const resultData = await this.makeApiCall('raidSim', RaidSimRequest.toBinary(request));
+    const result = RaidSimResult.fromBinary(resultData);
+    // Don't print the logs because it just clogs the console.
+    const resultJson = RaidSimResult.toJson(result) as any;
+    delete resultJson!['logs'];
+    console.log('Raid sim result: ' + JSON.stringify(resultJson));
+    return result;
   }
 }
 
@@ -111,6 +120,10 @@ class SimWorker {
     };
   }
 
+  addPromiseFunc(id: string, callback: (result: any) => void, onError: (error: any) => void) {
+    this.taskIdsToPromiseFuncs[id] = [callback, onError];
+  }
+
   makeTaskId(): string {
 		let id = '';
 		const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -120,12 +133,14 @@ class SimWorker {
 		return id;
   }
 
-  async doApiCall(requestName: string, request: Uint8Array): Promise<Uint8Array> {
+  async doApiCall(requestName: string, request: Uint8Array, id: string): Promise<Uint8Array> {
     this.numTasksRunning++;
     await this.onReady;
 
     const taskPromise = new Promise<Uint8Array>((resolve, reject) => {
-      const id = this.makeTaskId();
+      if (id == null) {
+        id = this.makeTaskId();
+      }
       this.taskIdsToPromiseFuncs[id] = [resolve, reject];
       
       this.worker.postMessage({

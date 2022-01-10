@@ -158,7 +158,7 @@ export class Sim {
 		});
   }
 
-  async runRaidSim(eventID: EventID): Promise<SimResult> {
+  async runRaidSim(eventID: EventID, onProgress: Function): Promise<SimResult> {
 		if (this.raid.isEmpty()) {
 			throw new Error('Raid is empty! Try adding some players first.');
 		} else if (this.encounter.getNumTargets() < 1) {
@@ -168,7 +168,14 @@ export class Sim {
 		await this.waitForInit();
 
 		const request = this.makeRaidSimRequest(false);
-		const result = await this.workerPool.raidSim(request);
+		
+		var result;
+		if (onProgress != null) {
+			result = await this.workerPool.raidSimAsync(request, onProgress);
+		} else {
+			result = await this.workerPool.raidSim(request);
+		}
+		
 
 		const simResult = await SimResult.makeNew(request, result);
 		this.simResultEmitter.emit(eventID, simResult);

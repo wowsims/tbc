@@ -5,6 +5,7 @@ package main
 import (
 	"log"
 	"syscall/js"
+	"time"
 
 	"github.com/wowsims/tbc/sim"
 	"github.com/wowsims/tbc/sim/core"
@@ -23,6 +24,7 @@ func main() {
 	js.Global().Set("gearList", js.FuncOf(gearList))
 	js.Global().Set("individualSim", js.FuncOf(individualSim))
 	js.Global().Set("raidSim", js.FuncOf(raidSim))
+	js.Global().Set("raidSimAsync", js.FuncOf(raidSimAsync))
 	js.Global().Set("statWeights", js.FuncOf(statWeights))
 	js.Global().Call("wasmready")
 	<-c
@@ -122,6 +124,51 @@ func raidSim(this js.Value, args []js.Value) interface{} {
 	js.CopyBytesToJS(outArray, outbytes)
 
 	return outArray
+}
+
+func raidSimAsync(this js.Value, args []js.Value) interface{} {
+	log.Printf("Started async sim")
+	// Assumes args[0] is a Uint8Array
+	data := make([]byte, args[0].Get("length").Int())
+	js.CopyBytesToGo(data, args[0])
+
+	rsr := &proto.RaidSimRequest{}
+	if err := googleProto.Unmarshal(data, rsr); err != nil {
+		log.Printf("Failed to parse request: %s", err)
+		return nil
+	}
+	reporter := make(chan *proto.ProgressMetrics, 100)
+	core.RunRaidSimAsync(rsr, reporter)
+
+reader:
+	for {
+		// TODO: cleanup so we dont collect these
+		select {
+		case progMetric, ok := <-reporter:
+			if !ok {
+				break reader
+			}
+
+			outbytes, err := googleProto.Marshal(progMetric)
+			if err != nil {
+				log.Printf("[ERROR] Failed to marshal result: %s", err.Error())
+				return nil
+			}
+
+			outArray := js.Global().Get("Uint8Array").New(len(outbytes))
+			js.CopyBytesToJS(outArray, outbytes)
+
+			args[1].Invoke(outArray)
+
+			if progMetric.FinalResult != nil {
+				close(reporter)
+				return outArray
+			}
+			time.Sleep(time.Millisecond * 100)
+		}
+	}
+
+	return nil
 }
 
 func statWeights(this js.Value, args []js.Value) interface{} {

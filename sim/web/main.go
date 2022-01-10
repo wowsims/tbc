@@ -14,10 +14,8 @@ import (
 	"runtime/pprof"
 	"strings"
 	"sync"
-	"sync/atomic"
 	"syscall"
 	"time"
-	"unsafe"
 
 	uuid "github.com/satori/go.uuid"
 	dist "github.com/wowsims/tbc/binary_dist"
@@ -75,6 +73,7 @@ func handleAsyncAPI(w http.ResponseWriter, r *http.Request, addNewSim simProgRep
 				}
 				report(progMetric)
 				if progMetric.FinalResult != nil {
+					close(reporter)
 					return
 				}
 				time.Sleep(time.Millisecond * 100)
@@ -99,21 +98,21 @@ func handleAsyncAPI(w http.ResponseWriter, r *http.Request, addNewSim simProgRep
 
 func setupAsyncServer() {
 	type asyncProgress struct {
-		latestProgress *proto.ProgressMetrics
+		mut            sync.Mutex
+		latestProgress proto.ProgressMetrics
 	}
-	progresses := map[string]asyncProgress{}
+	progresses := map[string]*asyncProgress{}
 	progMut := &sync.RWMutex{}
 	addNewSim := func() (string, progReport) {
 		newID := uuid.NewV4().String()
-		latest := &proto.ProgressMetrics{}
-		prog := asyncProgress{latestProgress: latest}
 		progMut.Lock()
-		progresses[newID] = prog
+		progresses[newID] = &asyncProgress{}
 		progMut.Unlock()
 
-		unsafeProg := unsafe.Pointer(&latest)
 		return newID, func(newProg *proto.ProgressMetrics) {
-			atomic.SwapPointer((*unsafe.Pointer)(unsafe.Pointer(newProg)), unsafeProg)
+			progresses[newID].mut.Lock()
+			progresses[newID].latestProgress = *newProg
+			progresses[newID].mut.Unlock()
 		}
 	}
 	type progReport func(progMetric *proto.ProgressMetrics)
@@ -122,18 +121,38 @@ func setupAsyncServer() {
 		handleAsyncAPI(w, r, addNewSim)
 	})
 	http.HandleFunc("/raidSimAsyncProgress", func(w http.ResponseWriter, r *http.Request) {
-		id := r.URL.Query().Get("id")
-		progMut.RLock()
-		progress := progresses[id].latestProgress
-		progMut.RUnlock()
-		if progress == nil {
-			progress = &proto.ProgressMetrics{}
+		body, err := ioutil.ReadAll(r.Body)
+		if err != nil {
+
+			return
 		}
-		outbytes, err := googleProto.Marshal(progress)
+		msg := &proto.RaidSimAsyncResult{}
+		if err := googleProto.Unmarshal(body, msg); err != nil {
+			log.Printf("Failed to parse request: %s", err.Error())
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		progMut.RLock()
+		progress, ok := progresses[msg.ProgressId]
+		progMut.RUnlock()
+		if !ok {
+			w.WriteHeader(http.StatusNoContent)
+			return
+		}
+		progress.mut.Lock()
+		latest := progress.latestProgress
+		progress.mut.Unlock()
+		outbytes, err := googleProto.Marshal(&latest)
 		if err != nil {
 			log.Printf("[ERROR] Failed to marshal result: %s", err.Error())
 			w.WriteHeader(http.StatusInternalServerError)
 			return
+		}
+		if latest.FinalResult != nil {
+			progMut.Lock()
+			delete(progresses, msg.ProgressId)
+			progMut.Unlock()
 		}
 		w.Header().Add("Content-Type", "application/x-protobuf")
 		w.Write(outbytes)

@@ -19,8 +19,38 @@ addEventListener('message', async (e) => {
         body: e.data.inputData
     });
 
-    const content = await response.arrayBuffer();
-    var uint8View = new Uint8Array(content);
+    var content = await response.arrayBuffer();
+    var outputData;
+    if (msg == "raidSimAsync") {
+        while (true) {
+            let progressResponse = await fetch("/raidSimAsyncProgress", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-protobuf'
+                },
+                body: content,
+            }); 
+
+            // If no new data available, stop querying.
+            if (progressResponse.status == 204) {
+                break
+            }
+
+            outputData = await progressResponse.arrayBuffer();
+            var uint8View = new Uint8Array(outputData);
+            postMessage({
+                msg: msg,
+                outputData: uint8View,
+                id: id+"progress",
+            });        
+
+            await new Promise(resolve => setTimeout(resolve, 250));
+        }
+    } else {
+        outputData = content;
+    }
+
+    var uint8View = new Uint8Array(outputData);
     postMessage({
         msg: msg,
         outputData: uint8View,
