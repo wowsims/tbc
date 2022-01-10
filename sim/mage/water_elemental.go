@@ -8,6 +8,8 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
+// The numbers in this file are VERY rough approximations based on logs.
+
 var SummonWaterElementalCooldownID = core.NewCooldownID()
 
 func (mage *Mage) registerSummonWaterElementalCD() {
@@ -22,7 +24,7 @@ func (mage *Mage) registerSummonWaterElementalCD() {
 		ActionID:   actionID,
 		CooldownID: SummonWaterElementalCooldownID,
 		Cooldown:   time.Minute * 3,
-		Priority:   core.CooldownPriorityDrums + 1,
+		Priority:   core.CooldownPriorityDrums + 1, // Always prefer to cast before drums or lust so the ele gets their benefits.
 		Type:       core.CooldownTypeDPS,
 		CanActivate: func(sim *core.Simulation, character *core.Character) bool {
 			if mage.waterElemental.IsEnabled() {
@@ -40,12 +42,14 @@ func (mage *Mage) registerSummonWaterElementalCD() {
 			return func(sim *core.Simulation, character *core.Character) {
 				manaCost = mage.BaseMana() * 0.16
 				manaCost -= manaCost * float64(mage.Talents.FrostChanneling) * 0.05
+				duration := time.Duration(float64(time.Millisecond*1500) / character.CastSpeed())
 
 				mage.waterElemental.EnableWithTimeout(sim, mage.waterElemental, time.Second*45)
 
 				character.SpendMana(sim, manaCost, actionID)
 				character.Metrics.AddInstantCast(actionID)
 				character.SetCD(SummonWaterElementalCooldownID, sim.CurrentTime+time.Minute*3)
+				character.SetCD(core.GCDCooldownID, sim.CurrentTime+duration)
 			}
 		},
 	})
