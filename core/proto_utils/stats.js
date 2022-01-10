@@ -31,7 +31,7 @@ export class Stats {
     computeEP(epWeights) {
         let total = 0;
         this.stats.forEach((stat, idx) => {
-            if (stat != Stat.StatSpellHit && stat != Stat.StatMeleeHit) {
+            if (idx != Stat.StatSpellHit && idx != Stat.StatMeleeHit) {
                 total += stat * epWeights.stats[idx];
             }
         });
