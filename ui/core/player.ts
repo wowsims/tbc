@@ -76,6 +76,10 @@ export class Player<SpecType extends Spec> {
   private specOptions: SpecOptions<SpecType>;
   private cooldowns: Cooldowns = Cooldowns.create();
 
+  private itemEPCache: Map<number, number> = new Map<number, number>();
+  private gemEPCache: Map<number, number> = new Map<number, number>();
+  private enchantEPCache: Map<number, number> = new Map<number, number>();
+
   readonly specTypeFunctions: SpecTypeFunctions<SpecType>;
 
 	private epWeights: Stats = new Stats();
@@ -204,6 +208,10 @@ export class Player<SpecType extends Spec> {
 
 	setEpWeights(newEpWeights: Stats) {
 		this.epWeights = newEpWeights;
+
+		this.gemEPCache = new Map();
+		this.itemEPCache = new Map();
+		this.enchantEPCache = new Map();
 	}
 
   async computeStatWeights(epStats: Array<Stat>, epReferenceStat: Stat): Promise<StatWeightsResult> {
@@ -429,6 +437,10 @@ export class Player<SpecType extends Spec> {
 	}
 
 	computeGemEP(gem: Gem): number {
+		if (this.gemEPCache.has(gem.id)) {
+			return this.gemEPCache.get(gem.id)!;
+		}
+
 		const epFromStats = new Stats(gem.stats).computeEP(this.epWeights);
 		const epFromEffect = getMetaGemEffectEP(this.spec, gem, new Stats(this.currentStats.finalStats));
 		let bonusEP = 0;
@@ -436,16 +448,29 @@ export class Player<SpecType extends Spec> {
 		if (gem.unique) {
 			bonusEP -= 0.01;
 		}
-		return epFromStats + epFromEffect + bonusEP;
+
+		let ep = epFromStats + epFromEffect + bonusEP;
+		this.gemEPCache.set(gem.id, ep);
+		return ep;
 	}
 
 	computeEnchantEP(enchant: Enchant): number {
-		return new Stats(enchant.stats).computeEP(this.epWeights);
+		if (this.enchantEPCache.has(enchant.id)) {
+			return this.enchantEPCache.get(enchant.id)!;
+		}
+
+		let ep = new Stats(enchant.stats).computeEP(this.epWeights);
+		this.enchantEPCache.set(enchant.id, ep);
+		return ep
 	}
 
 	computeItemEP(item: Item): number {
 		if (item == null)
 			return 0;
+
+		if (this.itemEPCache.has(item.id)) {
+			return this.itemEPCache.get(item.id)!;
+		}
 
 		let ep = new Stats(item.stats).computeEP(this.epWeights);
 		
@@ -481,6 +506,7 @@ export class Player<SpecType extends Spec> {
 
 		ep += Math.max(bestGemEPMatchingSockets, bestGemEPNotMatchingSockets);
 
+		this.itemEPCache.set(item.id, ep);
 		return ep;
 	}
 
