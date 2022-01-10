@@ -37,26 +37,6 @@ var GemDeclarationOverrides = []GemDeclaration{
 	{ID: 35318, Filter: true},
 	{ID: 35759, Phase: 5},
 	{ID: 35760, Phase: 5},
-
-	// Meta gems.
-	{ID: 25890},
-	{ID: 25893},
-	{ID: 25894},
-	{ID: 25895},
-	{ID: 25896},
-	{ID: 25897},
-	{ID: 25898},
-	{ID: 25899},
-	{ID: 25901},
-	{ID: 28556},
-	{ID: 28557},
-	{ID: 32409},
-	{ID: 32410},
-	{ID: 32640},
-	{ID: 32641},
-	{ID: 34220},
-	{ID: 35501},
-	{ID: 35503},
 }
 
 // Allows manual overriding for Item fields in case WowHead is wrong.
