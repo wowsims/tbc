@@ -5,7 +5,6 @@ package main
 import (
 	"log"
 	"syscall/js"
-	"time"
 
 	"github.com/wowsims/tbc/sim"
 	"github.com/wowsims/tbc/sim/core"
@@ -164,7 +163,6 @@ reader:
 				close(reporter)
 				return outArray
 			}
-			time.Sleep(time.Millisecond * 100)
 		}
 	}
 
