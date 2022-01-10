@@ -157,12 +157,6 @@ func itemToGoString(itemDeclaration ItemDeclaration, itemResponse WowheadItemRes
 	itemStr += fmt.Sprintf("Name:\"%s\", ", strings.ReplaceAll(itemResponse.Name, "\"", "\\\""))
 	itemStr += fmt.Sprintf("ID:%d, ", itemDeclaration.ID)
 
-	itemStr += "Categories: []proto.ItemCategory{"
-	for _, category := range itemDeclaration.Categories {
-		itemStr += fmt.Sprintf("proto.ItemCategory_%s,", category.String())
-	}
-	itemStr += "}, "
-
 	classAllowlist := itemResponse.GetClassAllowlist()
 	if len(itemDeclaration.ClassAllowlist) > 0 {
 		classAllowlist = itemDeclaration.ClassAllowlist
