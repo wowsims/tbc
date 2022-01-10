@@ -7,7 +7,13 @@ dps_results: {
 dps_results: {
  key: "TestAllItemEffects-BracingEarthstormDiamond"
  value: {
-  dps: 1543.251341854498
+  dps: 1539.9140008544973
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-BrutalEarthstormDiamond"
+ value: {
+  dps: 1533.9067870544982
  }
 }
 dps_results: {
@@ -41,15 +47,33 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestAllItemEffects-DestructiveSkyfireDiamond"
+ value: {
+  dps: 1554.4744732921474
+ }
+}
+dps_results: {
  key: "TestAllItemEffects-EmberSkyfireDiamond"
  value: {
   dps: 1543.251341854498
  }
 }
 dps_results: {
+ key: "TestAllItemEffects-EnigmaticSkyfireDiamond"
+ value: {
+  dps: 1533.9067870544982
+ }
+}
+dps_results: {
  key: "TestAllItemEffects-EssenceoftheMartyr-29376"
  value: {
   dps: 1579.2498755241886
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-EternalEarthstormDiamond"
+ value: {
+  dps: 1533.9067870544982
  }
 }
 dps_results: {
@@ -116,6 +140,18 @@ dps_results: {
  key: "TestAllItemEffects-NetherstrikeArmor"
  value: {
   dps: 1535.8784066384749
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-PotentUnstableDiamond"
+ value: {
+  dps: 1533.9067870544982
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-PowerfulEarthstormDiamond"
+ value: {
+  dps: 1533.9067870544982
  }
 }
 dps_results: {
@@ -191,9 +227,27 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestAllItemEffects-SwiftSkyfireDiamond"
+ value: {
+  dps: 1533.9067870544982
+ }
+}
+dps_results: {
  key: "TestAllItemEffects-SwiftStarfireDiamond"
  value: {
   dps: 1541.916405454497
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-SwiftWindfireDiamond"
+ value: {
+  dps: 1533.9067870544982
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-TenaciousEarthstormDiamond"
+ value: {
+  dps: 1533.9067870544982
  }
 }
 dps_results: {
@@ -212,6 +266,12 @@ dps_results: {
  key: "TestAllItemEffects-TheTwinStars"
  value: {
   dps: 1562.7579801426934
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-ThunderingSkyfireDiamond"
+ value: {
+  dps: 1533.9067870544982
  }
 }
 dps_results: {

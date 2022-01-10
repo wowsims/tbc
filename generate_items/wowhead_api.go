@@ -364,33 +364,123 @@ func (item WowheadItemResponse) GetSocketBonus() Stats {
 	return stats
 }
 
-func getWowheadItemResponse(itemId int) WowheadItemResponse {
-	url := fmt.Sprintf("https://tbc.wowhead.com/tooltip/item/%d", itemId)
+var gemSocketColorPatterns = map[proto.GemColor]*regexp.Regexp{
+	proto.GemColor_GemColorMeta:      regexp.MustCompile("Only fits in a meta gem slot\\."),
+	proto.GemColor_GemColorBlue:      regexp.MustCompile("Matches a Blue Socket\\."),
+	proto.GemColor_GemColorRed:       regexp.MustCompile("Matches a Red Socket\\."),
+	proto.GemColor_GemColorYellow:    regexp.MustCompile("Matches a Yellow Socket\\."),
+	proto.GemColor_GemColorOrange:    regexp.MustCompile("Matches a ((Yellow)|(Red)) or ((Yellow)|(Red)) Socket\\."),
+	proto.GemColor_GemColorPurple:    regexp.MustCompile("Matches a ((Blue)|(Red)) or ((Blue)|(Red)) Socket\\."),
+	proto.GemColor_GemColorGreen:     regexp.MustCompile("Matches a ((Yellow)|(Blue)) or ((Yellow)|(Blue)) Socket\\."),
+	proto.GemColor_GemColorPrismatic: regexp.MustCompile("Matches a Red, Yellow or Blue Socket\\."),
+}
 
-	httpClient := http.Client{
-		Timeout: 5 * time.Second,
+func (item WowheadItemResponse) GetSocketColor() proto.GemColor {
+	for socketColor, pattern := range gemSocketColorPatterns {
+		if pattern.MatchString(item.Tooltip) {
+			return socketColor
+		}
+	}
+	fmt.Printf("Could not find socket color for gem %s\n", item.Name)
+	return proto.GemColor_GemColorUnknown
+}
+
+var strengthGemStatRegexes = []*regexp.Regexp{regexp.MustCompile("\\+([0-9]+) Strength")}
+var agilityGemStatRegexes = []*regexp.Regexp{regexp.MustCompile("\\+([0-9]+) Agility")}
+var staminaGemStatRegexes = []*regexp.Regexp{regexp.MustCompile("\\+([0-9]+) Stamina")}
+var intellectGemStatRegexes = []*regexp.Regexp{regexp.MustCompile("\\+([0-9]+) Intellect")}
+var spiritGemStatRegexes = []*regexp.Regexp{regexp.MustCompile("\\+([0-9]+) Spirit")}
+var spellPowerGemStatRegexes = []*regexp.Regexp{
+	regexp.MustCompile("\\+([0-9]+) Spell Damage"),
+	regexp.MustCompile("\\+([0-9]+) Spell Damage and Healing"),
+}
+var healingPowerGemStatRegexes = []*regexp.Regexp{
+	regexp.MustCompile("\\+([0-9]+) Healing and \\+([0-9]+) Spell Damage"),
+	regexp.MustCompile("\\+([0-9]+) Healing \\+([0-9]+) Spell Damage"),
+}
+var spellHitGemStatRegexes = []*regexp.Regexp{regexp.MustCompile("\\+([0-9]+) Spell Hit Rating")}
+var spellCritGemStatRegexes = []*regexp.Regexp{
+	regexp.MustCompile("\\+([0-9]+) Spell Crit Rating"),
+	regexp.MustCompile("\\+([0-9]+) Spell Critical Strike Rating"),
+	regexp.MustCompile("\\+([0-9]+) Spell Critical"),
+}
+var spellHasteGemStatRegexes = []*regexp.Regexp{
+	regexp.MustCompile("\\+([0-9]+) Spell Haste Rating"),
+}
+var mp5GemStatRegexes = []*regexp.Regexp{
+	regexp.MustCompile("([0-9]+) Mana per 5 sec"),
+	regexp.MustCompile("([0-9]+) mana per 5 sec"),
+	regexp.MustCompile("([0-9]+) Mana every 5 seconds"),
+}
+var attackPowerGemStatRegexes = []*regexp.Regexp{regexp.MustCompile("\\+([0-9]+) Attack Power")}
+var meleeHitGemStatRegexes = []*regexp.Regexp{regexp.MustCompile("\\+([0-9]+) Hit Rating")}
+var meleeCritGemStatRegexes = []*regexp.Regexp{
+	regexp.MustCompile("\\+([0-9]+) Critical Rating"),
+	regexp.MustCompile("\\+([0-9]+) Critical Strike Rating"),
+}
+
+func (item WowheadItemResponse) GetGemStats() Stats {
+	stats := Stats{
+		proto.Stat_StatStrength:    float64(GetBestRegexIntValue(item.Tooltip, strengthGemStatRegexes, 1)),
+		proto.Stat_StatAgility:     float64(GetBestRegexIntValue(item.Tooltip, agilityGemStatRegexes, 1)),
+		proto.Stat_StatStamina:     float64(GetBestRegexIntValue(item.Tooltip, staminaGemStatRegexes, 1)),
+		proto.Stat_StatIntellect:   float64(GetBestRegexIntValue(item.Tooltip, intellectGemStatRegexes, 1)),
+		proto.Stat_StatSpirit:      float64(GetBestRegexIntValue(item.Tooltip, spiritGemStatRegexes, 1)),
+		proto.Stat_StatSpellHit:    float64(GetBestRegexIntValue(item.Tooltip, spellHitGemStatRegexes, 1)),
+		proto.Stat_StatSpellCrit:   float64(GetBestRegexIntValue(item.Tooltip, spellCritGemStatRegexes, 1)),
+		proto.Stat_StatSpellHaste:  float64(GetBestRegexIntValue(item.Tooltip, spellHasteGemStatRegexes, 1)),
+		proto.Stat_StatMP5:         float64(GetBestRegexIntValue(item.Tooltip, mp5GemStatRegexes, 1)),
+		proto.Stat_StatAttackPower: float64(GetBestRegexIntValue(item.Tooltip, attackPowerGemStatRegexes, 1)),
+		proto.Stat_StatMeleeHit:    float64(GetBestRegexIntValue(item.Tooltip, meleeHitGemStatRegexes, 1)),
+		proto.Stat_StatMeleeCrit:   float64(GetBestRegexIntValue(item.Tooltip, meleeCritGemStatRegexes, 1)),
 	}
 
-	request, err := http.NewRequest(http.MethodGet, url, nil)
-	if err != nil {
-		log.Fatal(err)
+	spellPower := GetBestRegexIntValue(item.Tooltip, spellPowerGemStatRegexes, 1)
+	healingPower := GetBestRegexIntValue(item.Tooltip, healingPowerGemStatRegexes, 1)
+	spellPowerFromHealing := GetBestRegexIntValue(item.Tooltip, healingPowerGemStatRegexes, 2)
+
+	stats[proto.Stat_StatSpellPower] = math.Max(float64(spellPower), float64(spellPowerFromHealing))
+	stats[proto.Stat_StatHealingPower] = math.Max(float64(spellPower), float64(healingPower))
+
+	return stats
+}
+
+func getWowheadItemResponse(itemID int, tooltipsDB map[int]string) WowheadItemResponse {
+	// If the db already has it, just return the db value.
+	var tooltipBytes []byte
+
+	if tooltipStr, ok := tooltipsDB[itemID]; ok {
+		tooltipBytes = []byte(tooltipStr)
+	} else {
+		fmt.Printf("Item DB missing ID: %d\n", itemID)
+		url := fmt.Sprintf("https://tbc.wowhead.com/tooltip/item/%d", itemID)
+
+		httpClient := http.Client{
+			Timeout: 5 * time.Second,
+		}
+
+		request, err := http.NewRequest(http.MethodGet, url, nil)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		result, err := httpClient.Do(request)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		defer result.Body.Close()
+
+		resultBody, err := ioutil.ReadAll(result.Body)
+		if err != nil {
+			log.Fatal(err)
+		}
+		tooltipBytes = resultBody
 	}
 
-	result, err := httpClient.Do(request)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	defer result.Body.Close()
-
-	resultBody, err := ioutil.ReadAll(result.Body)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	//fmt.Printf(string(resultBody))
+	//fmt.Printf(string(tooltipStr))
 	itemResponse := WowheadItemResponse{}
-	err = json.Unmarshal(resultBody, &itemResponse)
+	err := json.Unmarshal(tooltipBytes, &itemResponse)
 	if err != nil {
 		log.Fatal(err)
 	}
