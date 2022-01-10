@@ -11,6 +11,7 @@ type ItemDeclaration struct {
 	// Override fields, in case wowhead is wrong.
 	ClassAllowlist []proto.Class
 	Phase          int
+	Filter         bool // If true, this item will be omitted from the sim.
 }
 type ItemData struct {
 	Declaration ItemDeclaration
@@ -55,6 +56,23 @@ var GemDeclarationOverrides = []GemDeclaration{
 	{ID: 34220},
 	{ID: 35501},
 	{ID: 35503},
+}
+
+// Allows manual overriding for Item fields in case WowHead is wrong.
+var ItemDeclarationOverrides = []ItemDeclaration{
+	{ /** Band of Eternity */ ID: 29302, Phase: 2},
+	{ /** Destruction Holo-gogs */ ID: 32494, ClassAllowlist: []proto.Class{proto.Class_ClassMage, proto.Class_ClassPriest, proto.Class_ClassWarlock}},
+	{ /** Gadgetstorm Goggles */ ID: 32476, ClassAllowlist: []proto.Class{proto.Class_ClassShaman}},
+	{ /** Idol of the Raven Goddess */ ID: 32387, Phase: 2},
+	{ /** Idol of the Unseen Moon */ ID: 33510, Phase: 4},
+	{ /** Magnified Moon Specs */ ID: 32480, ClassAllowlist: []proto.Class{proto.Class_ClassDruid}},
+	{ /** Skycall Totem */ ID: 33506, Phase: 4},
+
+	{ID: 18582, Filter: true},
+	{ID: 18583, Filter: true},
+	{ID: 18584, Filter: true},
+	{ID: 24265, Filter: true},
+	{ID: 24525, Filter: true},
 }
 
 const CasterCategory = proto.ItemCategory_ItemCategoryCaster

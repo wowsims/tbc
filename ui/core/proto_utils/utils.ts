@@ -13,7 +13,6 @@ import { EnchantType } from '/tbc/core/proto/common.js';
 import { Gem } from '/tbc/core/proto/common.js';
 import { GemColor } from '/tbc/core/proto/common.js';
 import { HandType } from '/tbc/core/proto/common.js';
-import { ItemCategory } from '/tbc/core/proto/common.js';
 import { ItemSlot } from '/tbc/core/proto/common.js';
 import { ItemType } from '/tbc/core/proto/common.js';
 import { Item } from '/tbc/core/proto/common.js';
@@ -719,19 +718,6 @@ export const specToEligibleRaces: Record<Spec, Array<Race>> = {
   [Spec.SpecShadowPriest]: priestRaces,
   [Spec.SpecWarlock]: warlockRaces,
   [Spec.SpecWarrior]: warriorRaces,
-};
-
-export const specToEligibleItemCategories: Record<Spec, Array<ItemCategory>> = {
-  [Spec.SpecBalanceDruid]: [ItemCategory.ItemCategoryCaster],
-  [Spec.SpecElementalShaman]: [ItemCategory.ItemCategoryCaster],
-  [Spec.SpecEnhancementShaman]: [ItemCategory.ItemCategoryMelee],
-  [Spec.SpecHunter]: [ItemCategory.ItemCategoryMelee],
-  [Spec.SpecMage]: [ItemCategory.ItemCategoryCaster],
-  [Spec.SpecRetributionPaladin]: [ItemCategory.ItemCategoryMelee, ItemCategory.ItemCategoryHybrid],
-  [Spec.SpecRogue]: [ItemCategory.ItemCategoryMelee],
-  [Spec.SpecShadowPriest]: [ItemCategory.ItemCategoryCaster],
-  [Spec.SpecWarlock]: [ItemCategory.ItemCategoryCaster],
-  [Spec.SpecWarrior]: [ItemCategory.ItemCategoryMelee],
 };
 
 // Specs that can dual wield. This could be based on class, except that

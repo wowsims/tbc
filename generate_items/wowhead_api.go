@@ -66,7 +66,7 @@ var healingPowerRegex = regexp.MustCompile("Increases healing done by up to ([0-
 var arcaneSpellPowerRegex = regexp.MustCompile("Increases damage done by Arcane spells and effects by up to ([0-9]+)\\.")
 var fireSpellPowerRegex = regexp.MustCompile("Increases damage done by Fire spells and effects by up to ([0-9]+)\\.")
 var frostSpellPowerRegex = regexp.MustCompile("Increases damage done by Frost spells and effects by up to ([0-9]+)\\.")
-var holySpellPowerRegex = regexp.MustCompile("Increases damage done by Holy spells and effects by up to ([0-9]+)\\.")
+var holySpellPowerRegex = regexp.MustCompile("Increases the damage done by Holy spells and effects by up to ([0-9]+)\\.")
 var natureSpellPowerRegex = regexp.MustCompile("Increases damage done by Nature spells and effects by up to ([0-9]+)\\.")
 var shadowSpellPowerRegex = regexp.MustCompile("Increases damage done by Shadow spells and effects by up to ([0-9]+)\\.")
 var spellHitRegex = regexp.MustCompile("Improves spell hit rating by <!--rtg18-->([0-9]+)\\.")
@@ -153,6 +153,65 @@ func (item WowheadItemResponse) GetClassAllowlist() []proto.Class {
 	}
 
 	return allowlist
+}
+
+// At least one of these regexes must be present for the item to be equippable.
+var requiredEquippableRegexes = []*regexp.Regexp{
+	regexp.MustCompile("<td>Head</td>"),
+	regexp.MustCompile("<td>Neck</td>"),
+	regexp.MustCompile("<td>Shoulder</td>"),
+	regexp.MustCompile("<td>Back</td>"),
+	regexp.MustCompile("<td>Chest</td>"),
+	regexp.MustCompile("<td>Wrist</td>"),
+	regexp.MustCompile("<td>Hands</td>"),
+	regexp.MustCompile("<td>Waist</td>"),
+	regexp.MustCompile("<td>Legs</td>"),
+	regexp.MustCompile("<td>Feet</td>"),
+	regexp.MustCompile("<td>Finger</td>"),
+	regexp.MustCompile("<td>Trinket</td>"),
+	regexp.MustCompile("<td>Ranged</td>"),
+	regexp.MustCompile("<td>Thrown</td>"),
+	regexp.MustCompile("<td>Relic</td>"),
+	regexp.MustCompile("<td>Main Hand</td>"),
+	regexp.MustCompile("<td>Two-Hand</td>"),
+	regexp.MustCompile("<td>One-Hand</td>"),
+	regexp.MustCompile("<td>Off Hand</td>"),
+	regexp.MustCompile("<td>Held In Off-hand</td>"),
+}
+
+// If any of these regexes are present, the item is not equippable.
+var nonEquippableRegexes = []*regexp.Regexp{
+	regexp.MustCompile("Design:"),
+	regexp.MustCompile("Recipe:"),
+	regexp.MustCompile("Pattern:"),
+	regexp.MustCompile("Plans:"),
+	regexp.MustCompile("Schematic:"),
+}
+
+func (item WowheadItemResponse) IsEquippable() bool {
+	found := false
+	for _, pattern := range requiredEquippableRegexes {
+		if pattern.MatchString(item.Tooltip) {
+			found = true
+		}
+	}
+	if !found {
+		return false
+	}
+
+	for _, pattern := range nonEquippableRegexes {
+		if pattern.MatchString(item.Tooltip) {
+			return false
+		}
+	}
+
+	return true
+}
+
+var itemLevelRegex = regexp.MustCompile("Item Level <!--ilvl-->([0-9]+)<")
+
+func (item WowheadItemResponse) GetItemLevel() int {
+	return item.GetIntValue(itemLevelRegex)
 }
 
 var phaseRegex = regexp.MustCompile("Phase ([0-9])")
