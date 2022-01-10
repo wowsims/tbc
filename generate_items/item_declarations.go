@@ -49,6 +49,8 @@ var ItemDeclarationOverrides = []ItemDeclaration{
 	{ /** Magnified Moon Specs */ ID: 32480, ClassAllowlist: []proto.Class{proto.Class_ClassDruid}},
 	{ /** Skycall Totem */ ID: 33506, Phase: 4},
 
+	{ID: 17782, Filter: true}, // talisman of the binding shard
+	{ID: 17783, Filter: true}, // talisman of the binding fragment
 	{ID: 18582, Filter: true},
 	{ID: 18583, Filter: true},
 	{ID: 18584, Filter: true},
