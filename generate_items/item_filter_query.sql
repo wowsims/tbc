@@ -1,6 +1,5 @@
 
 
-
 /*
 Query Below returns all equitable items quality 2 and above
 There are few additional columns included, but only column ITEMID will be used further
@@ -45,12 +44,6 @@ WHERE
   or TOOLTIP like ('%<td>Off Hand</td>%')
   or TOOLTIP like ('%<td>Held In Off-hand</td>%')
 )
-AND JSONCOL NOT LIKE ('%class=\"q1\">Alchemy</a>%')
-AND JSONCOL NOT LIKE ('%class=\"q1\">Tailoring</a>%')
-AND JSONCOL NOT LIKE ('%class=\"q1\">Jewelcrafting</a>%')
-AND JSONCOL NOT LIKE ('%class=\"q1\">Leatherworking</a>%')
-AND JSONCOL NOT LIKE ('%class=\"q1\">Blacksmithing</a>%')
-AND JSONCOL NOT LIKE ('%class=\"q1\">Engineering</a>%')
 AND QUALITY NOT IN ('0','1')
 AND NAME NOT LIKE ('%PH]%')
 AND NAME NOT LIKE ('%TEST%')
@@ -70,9 +63,33 @@ AND NAME NOT LIKE ('%66 Epic%')
 AND NAME NOT LIKE ('%63 Blue%')
 AND NAME NOT LIKE ('%90 Green%')
 AND NAME NOT LIKE ('%63 Green%')
+AND NAME NOT LIKE ('%Pattern:%')
+AND NAME NOT LIKE ('%Design:%')
+AND NAME NOT LIKE ('%Schematic:%')
+AND NAME NOT LIKE ('%Plans:%')
+AND NAME NOT LIKE ('%Recipe:%')
+--AND ITEMID = ('24262')
+AND REPLACE(REPLACE(REPLACE(REPLACE(SUBSTRING(TOOLTIP,CHARINDEX('<br>Item Level <!--ilvl-->',TOOLTIP)+26,3),'<',''),'/',''),'-->',''),'le=','') >= 70
 
 
 
+SELECT   ITEMID
+		,NAME
+		,QUALITY
+		,ICON
+		,TOOLTIP
+		,REPLACE(REPLACE(REPLACE(REPLACE(SUBSTRING(TOOLTIP,CHARINDEX('<br>Item Level <!--ilvl-->',TOOLTIP)+26,3),'<',''),'/',''),'-->',''),'le=','') ILVL
+		
+FROM WOWHEAD_ITEMLIST 
+CROSS APPLY OPENJSON (JSONCOL)
+WITH
+(	
+	 NAME    VARCHAR(1000) '$.name'	
+	,QUALITY INT		   '$.quality'
+	,ICON    varchar(1000) '$.icon'
+	,TOOLTIP varchar(max)  '$.tooltip'
+)
+WHERE NAME LIKE ('%SPELLSTRIKE%')
 
 /*
 Below Query returns list of Gems
@@ -97,11 +114,37 @@ WITH
 	,TOOLTIP varchar(max)  '$.tooltip'
 )
 WHERE TOOLTIP LIKE ('%Matches%')
-  AND JSONCOL NOT LIKE ('%class=\"q1\">Jewelcrafting</a>%')
   AND NAME NOT LIKE ('zzOLD%')
   AND NAME NOT LIKE ('%TEST%')
+AND NAME NOT LIKE ('%Pattern:%')
+AND NAME NOT LIKE ('%Design:%')
+AND NAME NOT LIKE ('%Schematic:%')
+AND NAME NOT LIKE ('%Plans:%')
+AND NAME NOT LIKE ('%Recipe:%')
 
-
-
-
-
+union all
+  
+SELECT   ITEMID
+		,NAME
+		,QUALITY
+		,ICON
+		,TOOLTIP
+		,REPLACE(REPLACE(REPLACE(REPLACE(SUBSTRING(TOOLTIP,CHARINDEX('<br>Item Level <!--ilvl-->',TOOLTIP)+26,3),'<',''),'/',''),'-->',''),'le=','') ILVL
+FROM WOWHEAD_ITEMLIST 
+CROSS APPLY OPENJSON (JSONCOL)
+WITH
+(	
+	 NAME    VARCHAR(1000) '$.name'	
+	,QUALITY INT		   '$.quality'
+	,ICON    varchar(1000) '$.icon'
+	,TOOLTIP varchar(max)  '$.tooltip'
+)
+WHERE 
+TOOLTIP LIKE ('%gemConditions%')
+  AND NAME NOT LIKE ('zz%')
+  AND NAME NOT LIKE ('%TEST%')
+  AND NAME NOT LIKE ('%Pattern:%')
+  AND NAME NOT LIKE ('%Design:%')
+  AND NAME NOT LIKE ('%Schematic:%')
+  AND NAME NOT LIKE ('%Plans:%')
+  AND NAME NOT LIKE ('%Recipe:%')
