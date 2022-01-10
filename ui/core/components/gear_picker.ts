@@ -1,6 +1,6 @@
 import { getWowheadItemId } from '/tbc/core/proto_utils/equipped_item.js';
 import { EquippedItem } from '/tbc/core/proto_utils/equipped_item.js';
-import { getEmptyGemSocketIconUrl } from '/tbc/core/proto_utils/gems.js';
+import { getEmptyGemSocketIconUrl, gemMatchesSocket } from '/tbc/core/proto_utils/gems.js';
 import { setGemSocketCssClass } from '/tbc/core/proto_utils/gems.js';
 import { enchantAppliesToItem } from '/tbc/core/proto_utils/utils.js';
 import { Enchant } from '/tbc/core/proto/common.js';
@@ -17,7 +17,7 @@ import { getEnumValues } from '/tbc/core/utils.js';
 
 import { Component } from './component.js';
 import { CloseButton } from './close_button.js';
-import { makePhaseSelector } from './other_inputs.js';
+import { makePhaseSelector, makeMatchingGemSelector } from './other_inputs.js';
 
 declare var $: any;
 
@@ -254,13 +254,24 @@ class SelectorModal extends Component {
   }
 
   private addGemTabs(slot: ItemSlot, equippedItem: EquippedItem | null) {
-    equippedItem?.item.gemSockets.forEach((socketColor, socketIdx) => {
+    if (equippedItem == undefined) {
+      return;
+    }
+
+    const socketBonusEP = this.player.computeStatsEP(equippedItem.item.socketBonus) / equippedItem.item.gemSockets.length;
+    equippedItem.item.gemSockets.forEach((socketColor, socketIdx) => {
       this.addTab(
           'Gem ' + (socketIdx + 1),
           slot,
           equippedItem,
           this.player.getGems(socketColor),
-					gem => this.player.computeGemEP(gem),
+					gem => {
+            let gemEP = this.player.computeGemEP(gem);
+            if (gemMatchesSocket(gem, socketColor)) {
+              gemEP += socketBonusEP;
+            }
+            return gemEP;
+          },
           equippedItem => equippedItem?.gems[socketIdx],
           gem => {
             return {
@@ -360,8 +371,8 @@ class SelectorModal extends Component {
     <div class="selector-modal-tab-content-header">
       <button class="selector-modal-remove-button">Remove</button>
       <input class="selector-modal-search" type="text" placeholder="Search...">
-			<div class="selector-modal-filter-bar-filler"></div>
-			<div class="selector-modal-phase-selector"></div>
+      <div class="selector-modal-filter-bar-filler"></div>
+      <div class="selector-modal-phase-selector"></div>
     </div>
     <ul class="selector-modal-list"></ul>
     `;
@@ -385,6 +396,7 @@ class SelectorModal extends Component {
       listItemElem.dataset.id = String(itemData.id);
       listItemElem.dataset.name = itemData.name;
       listItemElem.dataset.phase = String(Math.max(itemData.phase, 1));
+      listItemElem.dataset.ep = String(computeEP(item));
 
       listItemElem.innerHTML = `
         <a class="selector-modal-list-item-icon"></a>
@@ -474,6 +486,8 @@ class SelectorModal extends Component {
 
 			const phase = this.player.sim.getPhase();
 			validItemElems = validItemElems.filter(elem => Number(elem.dataset.phase!) <= phase)
+
+      validItemElems = validItemElems.filter(elem => Number(elem.dataset.ep) > 1)
 
 			const currentEquippedItem = this.player.getEquippedItem(slot);
 			if (label == 'Enchants' && currentEquippedItem) {
