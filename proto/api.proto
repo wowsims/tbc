@@ -216,9 +216,17 @@ message StatWeightsResult {
     repeated double ep_values_stdev = 4;
 }
 
-message RaidSimAsyncResult {
+message AsyncAPIResult {
   string progress_id = 1;
 } 
+
+message StatWeightProgress {
+  int32 completed_iterations = 1;
+  int32 total_iterations = 2;
+  int32 completed_sims = 3;
+  int32 total_sims = 4;
+  StatWeightsResult final_result = 5;
+}
 
 message ProgressMetrics {
     int32 completed_iterations = 1;

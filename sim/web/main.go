@@ -81,7 +81,7 @@ func handleAsyncAPI(w http.ResponseWriter, r *http.Request, addNewSim simProgRep
 		}
 	}()
 
-	protoResult := &proto.RaidSimAsyncResult{
+	protoResult := &proto.AsyncAPIResult{
 		ProgressId: id,
 	}
 
@@ -126,7 +126,7 @@ func setupAsyncServer() {
 
 			return
 		}
-		msg := &proto.RaidSimAsyncResult{}
+		msg := &proto.AsyncAPIResult{}
 		if err := googleProto.Unmarshal(body, msg); err != nil {
 			log.Printf("Failed to parse request: %s", err.Error())
 			w.WriteHeader(http.StatusInternalServerError)

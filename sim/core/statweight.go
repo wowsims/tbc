@@ -4,6 +4,7 @@ import (
 	"math"
 	"math/rand"
 	"sync"
+	"sync/atomic"
 
 	"github.com/wowsims/tbc/sim/core/proto"
 	"github.com/wowsims/tbc/sim/core/stats"
@@ -17,7 +18,7 @@ type StatWeightsResult struct {
 	EpValuesStdev stats.Stats
 }
 
-func CalcStatWeight(swr proto.StatWeightsRequest, statsToWeigh []stats.Stat, referenceStat stats.Stat) StatWeightsResult {
+func CalcStatWeight(swr proto.StatWeightsRequest, statsToWeigh []stats.Stat, referenceStat stats.Stat, progress chan *proto.ProgressMetrics) StatWeightsResult {
 	if swr.Player.BonusStats == nil {
 		swr.Player.BonusStats = make([]float64, stats.Len)
 	}
@@ -44,6 +45,9 @@ func CalcStatWeight(swr proto.StatWeightsRequest, statsToWeigh []stats.Stat, ref
 	dpsHistsLow := [stats.Len]map[int32]int32{}
 	dpsHistsHigh := [stats.Len]map[int32]int32{}
 
+	var iterationsTotal int32
+	var iterationsDone int32
+
 	doStat := func(stat stats.Stat, value float64, isLow bool) {
 		defer waitGroup.Done()
 
@@ -51,7 +55,26 @@ func CalcStatWeight(swr proto.StatWeightsRequest, statsToWeigh []stats.Stat, ref
 		simRequest.Raid.Parties[0].Players[0].BonusStats[stat] += value
 		simRequest.SimOptions.Iterations /= 2 // Cut in half since we're doing above and below separately.
 
-		simResult := RunRaidSim(simRequest)
+		reporter := make(chan *proto.ProgressMetrics, 10)
+		go RunSim(*simRequest, reporter) // RunRaidSim(simRequest)
+
+		var localIterations int32
+		var simResult *proto.RaidSimResult
+	statsim:
+		for {
+			select {
+			case metrics, ok := <-reporter:
+				if !ok {
+					break statsim
+				}
+				if metrics.FinalResult != nil {
+					simResult = metrics.FinalResult
+					break statsim
+				}
+				atomic.AddInt32(&iterationsDone, (metrics.CompletedIterations - localIterations))
+				localIterations = metrics.CompletedIterations
+			}
+		}
 		dpsMetrics := simResult.RaidMetrics.Parties[0].Players[0].Dps
 		dpsDiff := (dpsMetrics.Avg - baselineDpsMetrics.Avg) / value
 
@@ -89,11 +112,14 @@ func CalcStatWeight(swr proto.StatWeightsRequest, statsToWeigh []stats.Stat, ref
 			statModsLow[v] = -statMod
 		}
 	}
+
 	for stat, _ := range statModsLow {
 		if statModsLow[stat] == 0 {
 			continue
 		}
 		waitGroup.Add(2)
+		iterationsTotal += swr.SimOptions.Iterations
+
 		go doStat(stats.Stat(stat), statModsLow[stat], true)
 		go doStat(stats.Stat(stat), statModsHigh[stat], false)
 	}
