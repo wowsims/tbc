@@ -113,7 +113,6 @@ type ItemFilter struct {
 	Class proto.Class
 
 	// Blank list allows any value. Otherwise item must match 1 value from the list.
-	Categories        []proto.ItemCategory
 	ArmorTypes        []proto.ArmorType
 	WeaponTypes       []proto.WeaponType
 	HandTypes         []proto.HandType
@@ -134,21 +133,6 @@ func (filter *ItemFilter) Matches(item items.Item, equipChecksOnly bool) bool {
 			if class == filter.Class {
 				found = true
 				break
-			}
-		}
-		if !found {
-			return false
-		}
-	}
-
-	if len(filter.Categories) > 0 {
-		found := false
-		for _, itemCategory := range item.Categories {
-			for _, filterCategory := range filter.Categories {
-				if itemCategory == filterCategory {
-					found = true
-					break
-				}
 			}
 		}
 		if !found {

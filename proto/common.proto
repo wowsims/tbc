@@ -75,16 +75,6 @@ enum Stat {
     StatArmor = 27;
 }
 
-// Does not correspond to anything in-game; just our own label to help filter
-// items in the UI.
-enum ItemCategory {
-	ItemCategoryUnknown = 0;
-	ItemCategoryCaster = 1;
-	ItemCategoryMelee = 2;
-	ItemCategoryHybrid = 3;
-	ItemCategoryHealer = 4;
-}
-
 enum ItemType {
     ItemTypeUnknown = 0;
     ItemTypeHead = 1;
@@ -377,7 +367,6 @@ message Item {
 
     string name = 2;
 
-    repeated ItemCategory categories = 14;
 		// Classes that are allowed to use the item. Empty indicates no special class restrictions.
 		repeated Class class_allowlist = 15;
 

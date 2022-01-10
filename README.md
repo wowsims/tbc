@@ -54,11 +54,6 @@ docker run --rm -v $(pwd):/tbc wowsims-tbc npm install
 # For convenience, set this as an environment variable:
 TBC_CMD="docker run --rm -it -p 8080:8080 -v $(pwd):/tbc wowsims-tbc"
 
-# ... update the items ...
-
-# Update items
-$TBC_CMD make items
-
 # ... do some coding on the sim ...
 
 # Run tests
@@ -79,6 +74,9 @@ make items
 # Run all the tests. Currently only the backend sim has tests.
 make test
 
+# Update the expected test results. This will need to be run after adding/removing any tests, and also if test results change due to code changes.
+make update-tests
+
 # Host a local version of the UI at http://localhost:8080. Visit it by pointing a browser to
 # http://localhost:8080/tbc/YOUR_SPEC_HERE, where YOUR_SPEC_HERE is the directory under ui/ with your custom code.
 make host
@@ -90,9 +88,9 @@ make clean
 # Adding a Sim
 So you want to make a new sim for your class/spec! The basic steps are as follows:
  - [Create the proto interface between sim and UI.](#create-the-proto-interface-between-sim-and-ui)
- - [Add items your spec uses to the Items Generator.](#add-items-to-the-items-generator)
- - [Implement the sim.](#implement-the-sim)
  - [Implement the UI.](#implement-the-ui)
+ - [Implement the sim.](#implement-the-sim)
+ - [Launch the site.](#launch-the-site)
 
 
 ## Create the proto interface between Sim and UI
@@ -108,8 +106,17 @@ For a new sim, make the following changes:
 
 That's it! Now when you run `make` there will be generated .go and .ts code in `sim/core/proto` and `ui/core/proto` respectively. If you aren't familiar with protos, take a quick look at them to see what's happening.
 
-## Add items to the Items Generator
-`generate_items/item_declarations.go` contains a list of all items known to the sim, as well as a category label for each item. Add the items needed by your sim and run `make items` when you're done.
+## Implement the UI
+The UI and sim can be done in either order, but it is generally recommended to build the UI first because it can help with debugging. The UI is very generalized and it doesn't take much work to build an entire sim UI using our templating system. To use it:
+  - Modify `ui/core/proto_utils/utils.ts` to include boilerplate for your `$SPEC` name if it isn't already there.
+  - Create a directory `ui/$SPEC`. So if your Spec enum value was named, `elemental_shaman`, create a directory, `ui/elemental_shaman`.
+  - Copy+paste from another spec's UI code.
+  - Modify all the files for your spec; most of the settings are fairly obvious, if you need anything complex just ask and we can help!
+  - Finally, add a rule to the `makefile` for the new sim site. Just copy from the other site rules already there and change the `$SPEC` names.
+
+No .html is needed, it will be generated based on `ui/index_template.html` and the `$SPEC` name.
+
+When you're ready to try out the site, run `make host` and navigate to `http://localhost:8080/tbc/$SPEC`.
 
 ## Implement the Sim
 This step is where most of the magic happens. A few highlights to start understanding the sim code:
@@ -123,22 +130,11 @@ Read through the core code and some examples from other classes/specs to get a f
 
 Don't forget to write unit tests! Again, look at existing tests for examples. Run them with `make test` when you're ready.
 
-## Implement the UI
-If you've made it this far, you're almost there! The UI is very generalized and it doesn't take much work to build an entire sim UI using our templating system. To use it:
-  - Create a directory `ui/$SPEC`. So if your Spec enum value was named, `elemental_shaman`, create a directory, `ui/elemental_shaman`.
-  - This directory must contain 3 files: `tsconfig.json`, `index.ts`, and `index.scss`.
-  - Most of the settings are fairly obvious, just copy+paste from one of the other spec's UI code and work from there.
+# Launch the site
+When everything is ready for release, modify `ui/core/launched_sims.ts` to include the new spec value. This will add the sim to the dropdown menu so anyone can find it from the existing sims. This will also remove the UI warning that the sim is under development. Now tell everyone about your new sim!
 
-No .html is needed, it will be generated based on `ui/index_template.html` and the `$SPEC` name.
-
-Steps for building a new UI:
-  - Modify `ui/core/proto_utils/utils.ts` to include boilerplate for your `$SPEC` name if it isn't already there.
-  - Configure the UI by writing `ui/$SPEC/index.ts` and `ui/$SPEC/index.scss`. Start by copying from another spec's code, and change the configuration as needed.
-  - Finally, add a rule to the `makefile` for the new sim site. Just copy from the other site rules already there and change the `$SPEC` names.
-
-When you're ready to try out the site, run `make host` and navigate to `http://localhost:8080/tbc/$SPEC`.
-
-To add your new spec to the raid sim, do the following:
+# Add your spec to the raid sim
+Don't touch the raid sim until the individual sim is ready for launch; anything in the raid sim is publicly accessible. To add your new spec to the raid sim, do the following:
  - Add a reference to the individual sim in `ui/raid/tsconfig.json`. DO NOT FORGET THIS STEP or Typescipt will silently do very bad things.
  - Update `ui/raid/presets.ts` to include a constructor factory in the `specSimFactories` variable and add configurations for new Players in the `playerPresets` variable.
 

@@ -1,13 +1,37 @@
 dps_results: {
+ key: "TestAllItemEffects-AbacusofViolentOdds-28288"
+ value: {
+  dps: 1544.6740655185627
+ }
+}
+dps_results: {
  key: "TestAllItemEffects-BandoftheEternalSage-29305"
  value: {
   dps: 1602.9110784545737
  }
 }
 dps_results: {
+ key: "TestAllItemEffects-BloodlustBrooch-29383"
+ value: {
+  dps: 1544.6740655185627
+ }
+}
+dps_results: {
  key: "TestAllItemEffects-BracingEarthstormDiamond"
  value: {
-  dps: 1543.251341854498
+  dps: 1539.9140008544973
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-BrutalEarthstormDiamond"
+ value: {
+  dps: 1533.9067870544982
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-CataclysmHarness"
+ value: {
+  dps: 1202.0519278927259
  }
 }
 dps_results: {
@@ -20,6 +44,12 @@ dps_results: {
  key: "TestAllItemEffects-ChaoticSkyfireDiamond"
  value: {
   dps: 1598.2214492991886
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-CycloneHarness"
+ value: {
+  dps: 1202.0519278927259
  }
 }
 dps_results: {
@@ -41,15 +71,45 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestAllItemEffects-DestructiveSkyfireDiamond"
+ value: {
+  dps: 1554.4744732921474
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-DragonspineTrophy-28830"
+ value: {
+  dps: 1544.6740655185627
+ }
+}
+dps_results: {
  key: "TestAllItemEffects-EmberSkyfireDiamond"
  value: {
   dps: 1543.251341854498
  }
 }
 dps_results: {
+ key: "TestAllItemEffects-EmptyMugofDirebrew-38287"
+ value: {
+  dps: 1544.6740655185627
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-EnigmaticSkyfireDiamond"
+ value: {
+  dps: 1533.9067870544982
+ }
+}
+dps_results: {
  key: "TestAllItemEffects-EssenceoftheMartyr-29376"
  value: {
   dps: 1579.2498755241886
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-EternalEarthstormDiamond"
+ value: {
+  dps: 1533.9067870544982
  }
 }
 dps_results: {
@@ -74,6 +134,12 @@ dps_results: {
  key: "TestAllItemEffects-HexShrunkenHead-33829"
  value: {
   dps: 1613.695459424188
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-HourglassoftheUnraveller-28034"
+ value: {
+  dps: 1544.6740655185627
  }
 }
 dps_results: {
@@ -116,6 +182,18 @@ dps_results: {
  key: "TestAllItemEffects-NetherstrikeArmor"
  value: {
   dps: 1535.8784066384749
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-PotentUnstableDiamond"
+ value: {
+  dps: 1533.9067870544982
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-PowerfulEarthstormDiamond"
+ value: {
+  dps: 1533.9067870544982
  }
 }
 dps_results: {
@@ -167,6 +245,12 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestAllItemEffects-SkyshatterHarness"
+ value: {
+  dps: 1094.8228691294244
+ }
+}
+dps_results: {
  key: "TestAllItemEffects-SkyshatterRegalia"
  value: {
   dps: 1653.7393805082772
@@ -191,9 +275,27 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestAllItemEffects-SwiftSkyfireDiamond"
+ value: {
+  dps: 1533.9067870544982
+ }
+}
+dps_results: {
  key: "TestAllItemEffects-SwiftStarfireDiamond"
  value: {
   dps: 1541.916405454497
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-SwiftWindfireDiamond"
+ value: {
+  dps: 1533.9067870544982
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-TenaciousEarthstormDiamond"
+ value: {
+  dps: 1533.9067870544982
  }
 }
 dps_results: {
@@ -212,6 +314,12 @@ dps_results: {
  key: "TestAllItemEffects-TheTwinStars"
  value: {
   dps: 1562.7579801426934
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-ThunderingSkyfireDiamond"
+ value: {
+  dps: 1533.9067870544982
  }
 }
 dps_results: {
