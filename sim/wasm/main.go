@@ -25,6 +25,7 @@ func main() {
 	js.Global().Set("raidSim", js.FuncOf(raidSim))
 	js.Global().Set("raidSimAsync", js.FuncOf(raidSimAsync))
 	js.Global().Set("statWeights", js.FuncOf(statWeights))
+	js.Global().Set("statWeightsAsync", js.FuncOf(statWeightsAsync))
 	js.Global().Call("wasmready")
 	<-c
 }
@@ -159,7 +160,7 @@ reader:
 
 			args[1].Invoke(outArray)
 
-			if progMetric.FinalResult != nil {
+			if progMetric.FinalRaidResult != nil {
 				close(reporter)
 				return outArray
 			}
@@ -191,4 +192,47 @@ func statWeights(this js.Value, args []js.Value) interface{} {
 	js.CopyBytesToJS(outArray, outbytes)
 
 	return outArray
+}
+
+func statWeightsAsync(this js.Value, args []js.Value) interface{} {
+	// Assumes args[0] is a Uint8Array
+	data := make([]byte, args[0].Get("length").Int())
+	js.CopyBytesToGo(data, args[0])
+
+	rsr := &proto.StatWeightsRequest{}
+	if err := googleProto.Unmarshal(data, rsr); err != nil {
+		log.Printf("Failed to parse request: %s", err)
+		return nil
+	}
+	reporter := make(chan *proto.ProgressMetrics, 100)
+	core.StatWeightsAsync(rsr, reporter)
+
+reader:
+	for {
+		// TODO: cleanup so we dont collect these
+		select {
+		case progMetric, ok := <-reporter:
+			if !ok {
+				break reader
+			}
+
+			outbytes, err := googleProto.Marshal(progMetric)
+			if err != nil {
+				log.Printf("[ERROR] Failed to marshal result: %s", err.Error())
+				return nil
+			}
+
+			outArray := js.Global().Get("Uint8Array").New(len(outbytes))
+			js.CopyBytesToJS(outArray, outbytes)
+
+			args[1].Invoke(outArray)
+
+			if progMetric.FinalWeightResult != nil {
+				close(reporter)
+				return outArray
+			}
+		}
+	}
+
+	return nil
 }

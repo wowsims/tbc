@@ -219,7 +219,7 @@ export class Sim {
 		});
 	}
 
-  async statWeights(player: Player<any>, epStats: Array<Stat>, epReferenceStat: Stat): Promise<StatWeightsResult> {
+  async statWeights(player: Player<any>, epStats: Array<Stat>, epReferenceStat: Stat, onProgress: Function): Promise<StatWeightsResult> {
 		if (this.raid.isEmpty()) {
 			throw new Error('Raid is empty! Try adding some players first.');
 		} else if (this.encounter.getNumTargets() < 1) {
@@ -246,7 +246,13 @@ export class Sim {
 				epReferenceStat: epReferenceStat,
 			});
 
-			return await this.workerPool.statWeights(request);
+			var result;
+			if (onProgress != null) {
+				result = await this.workerPool.statWeightsAsync(request, onProgress);
+			} else {
+				result = await this.workerPool.statWeights(request);
+			}
+			return result;
 		}
 	}
 

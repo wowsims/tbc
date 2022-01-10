@@ -47,9 +47,27 @@ export class WorkerPool {
 		return ComputeStatsResult.fromBinary(result);
   }
 
+  async statWeightsAsync(request: StatWeightsRequest, onProgress: Function): Promise<StatWeightsResult> {
+    const worker = this.getLeastBusyWorker();
+    const id = worker.makeTaskId();
+    var progressHandler = (progressData: any) => {};
+
+    progressHandler = (progressData: any) => {
+      var progress = ProgressMetrics.fromBinary(progressData);
+      onProgress(progress);
+      worker.addPromiseFunc(id+"progress", progressHandler, (err)=>{});
+    };
+
+    worker.addPromiseFunc(id+"progress", progressHandler, (err)=>{})
+    const resultData = await worker.doApiCall('statWeightsAsync', StatWeightsRequest.toBinary(request), id);
+    const result =  ProgressMetrics.fromBinary(resultData)
+    return result.finalWeightResult!;
+  }
+
   async statWeights(request: StatWeightsRequest): Promise<StatWeightsResult> {
 		const result = await this.makeApiCall('statWeights', StatWeightsRequest.toBinary(request));
 		return StatWeightsResult.fromBinary(result);
+
   }
 
   async raidSimAsync(request: RaidSimRequest, onProgress: Function): Promise<RaidSimResult>  {
@@ -67,7 +85,7 @@ export class WorkerPool {
     worker.addPromiseFunc(id+"progress", progressHandler, (err)=>{})
 		const resultData = await worker.doApiCall('raidSimAsync', RaidSimRequest.toBinary(request), id);
     const result =  ProgressMetrics.fromBinary(resultData)
-    return result.finalResult!;
+    return result.finalRaidResult!;
   }
 
   async raidSim(request: RaidSimRequest): Promise<RaidSimResult> {

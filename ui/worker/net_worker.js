@@ -21,9 +21,9 @@ addEventListener('message', async (e) => {
 
     var content = await response.arrayBuffer();
     var outputData;
-    if (msg == "raidSimAsync") {
+    if (msg == "raidSimAsync" || msg == "statWeightsAsync") {
         while (true) {
-            let progressResponse = await fetch("/raidSimAsyncProgress", {
+            let progressResponse = await fetch("/asyncProgress", {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-protobuf'
@@ -43,8 +43,7 @@ addEventListener('message', async (e) => {
                 outputData: uint8View,
                 id: id+"progress",
             });        
-
-            await new Promise(resolve => setTimeout(resolve, 250));
+            await new Promise(resolve => setTimeout(resolve, 500));
         }
     } else {
         outputData = content;

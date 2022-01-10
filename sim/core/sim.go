@@ -181,7 +181,7 @@ func (sim *Simulation) run() *proto.RaidSimResult {
 
 	// Final progress report
 	if sim.ProgressReport != nil {
-		sim.ProgressReport(&proto.ProgressMetrics{TotalIterations: sim.Options.Iterations, CompletedIterations: sim.Options.Iterations, Dps: result.RaidMetrics.Dps.Avg, FinalResult: result})
+		sim.ProgressReport(&proto.ProgressMetrics{TotalIterations: sim.Options.Iterations, CompletedIterations: sim.Options.Iterations, Dps: result.RaidMetrics.Dps.Avg, FinalRaidResult: result})
 	}
 
 	return result

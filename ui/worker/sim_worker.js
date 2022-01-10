@@ -628,6 +628,15 @@ addEventListener('message', async (e) => {
 			});
 		}],
 		['statWeights', statWeights],
+		['statWeightsAsync', (data) => {
+			return statWeightsAsync(data, (result) => {
+				postMessage({
+					msg: "progress",
+					outputData: result,
+					id: id+"progress",
+				});
+			});
+		}],
 	].forEach(funcData => {
 		const funcName = funcData[0];
 		const func = funcData[1];

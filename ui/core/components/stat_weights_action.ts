@@ -1,4 +1,4 @@
-import { StatWeightsRequest, StatWeightsResult } from '/tbc/core/proto/api.js';
+import { StatWeightsRequest, StatWeightsResult, ProgressMetrics } from '/tbc/core/proto/api.js';
 import { Stat } from '/tbc/core/proto/common.js';
 import { statNames } from '/tbc/core/proto_utils/names.js';
 import { IndividualSimUI } from '/tbc/core/individual_sim_ui.js';
@@ -13,7 +13,9 @@ export function addStatWeightsAction(simUI: IndividualSimUI<any>, epStats: Array
 	simUI.addAction('EP WEIGHTS', 'ep-weights-action', async () => {
 		simUI.setResultsPending();
 		const iterations = simUI.sim.getIterations();
-		const result = await simUI.player.computeStatWeights(epStats, epReferenceStat);
+		const result = await simUI.player.computeStatWeights(epStats, epReferenceStat, (progress: ProgressMetrics) =>{
+			resultsManager.setSimProgress(progress);
+		});
 		resultsManager.setSimResult(iterations, epStats, epReferenceStat, result);
 	});
 }
@@ -25,6 +27,19 @@ class StatWeightsResultsManager {
   constructor(simUI: IndividualSimUI<any>) {
 		this.simUI = simUI;
 		this.statsType = 'ep';
+  }
+
+  setSimProgress(progress: ProgressMetrics) {
+	this.simUI.setResultsContent(`
+  <div class="results-sim">
+			<div class="results-sim-dps">
+				<span class="results-sim-dps-avg">${progress.dps.toFixed(2)}</span>
+			</div>
+			<div class="">
+				${progress.completedIterations} / ${progress.totalIterations} iterations complete
+			</div>
+  </div>
+`);
   }
 
   setSimResult(iterations: number, epStats: Array<Stat>, epReferenceStat: Stat, result: StatWeightsResult) {

@@ -46,7 +46,7 @@ func ComputeStats(csr *proto.ComputeStatsRequest) *proto.ComputeStatsResult {
 func StatWeights(request *proto.StatWeightsRequest) *proto.StatWeightsResult {
 	statsToWeigh := stats.ProtoArrayToStatsList(request.StatsToWeigh)
 
-	result := CalcStatWeight(*request, statsToWeigh, stats.Stat(request.EpReferenceStat))
+	result := CalcStatWeight(*request, statsToWeigh, stats.Stat(request.EpReferenceStat), nil)
 
 	return &proto.StatWeightsResult{
 		Weights:       result.Weights[:],
@@ -54,6 +54,21 @@ func StatWeights(request *proto.StatWeightsRequest) *proto.StatWeightsResult {
 		EpValues:      result.EpValues[:],
 		EpValuesStdev: result.EpValuesStdev[:],
 	}
+}
+
+func StatWeightsAsync(request *proto.StatWeightsRequest, progress chan *proto.ProgressMetrics) {
+	statsToWeigh := stats.ProtoArrayToStatsList(request.StatsToWeigh)
+	go func() {
+		result := CalcStatWeight(*request, statsToWeigh, stats.Stat(request.EpReferenceStat), progress)
+		progress <- &proto.ProgressMetrics{
+			FinalWeightResult: &proto.StatWeightsResult{
+				Weights:       result.Weights[:],
+				WeightsStdev:  result.WeightsStdev[:],
+				EpValues:      result.EpValues[:],
+				EpValuesStdev: result.EpValuesStdev[:],
+			},
+		}
+	}()
 }
 
 /**

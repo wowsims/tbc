@@ -21,7 +21,7 @@ import (
 	dist "github.com/wowsims/tbc/binary_dist"
 	"github.com/wowsims/tbc/sim"
 	"github.com/wowsims/tbc/sim/core"
-	"github.com/wowsims/tbc/sim/core/proto"
+	proto "github.com/wowsims/tbc/sim/core/proto"
 
 	googleProto "google.golang.org/protobuf/proto"
 )
@@ -45,14 +45,34 @@ func main() {
 
 type simProgReportCreator func() (string, progReport)
 type progReport func(progMetric *proto.ProgressMetrics)
+type asyncAPIHandler struct {
+	msg    func() googleProto.Message
+	handle func(googleProto.Message, chan *proto.ProgressMetrics)
+}
+
+var asyncAPIHandlers = map[string]asyncAPIHandler{
+	"/raidSimAsync": {msg: func() googleProto.Message { return &proto.RaidSimRequest{} }, handle: func(msg googleProto.Message, reporter chan *proto.ProgressMetrics) {
+		core.RunRaidSimAsync(msg.(*proto.RaidSimRequest), reporter)
+	}},
+	"/statWeightsAsync": {msg: func() googleProto.Message { return &proto.StatWeightsRequest{} }, handle: func(msg googleProto.Message, reporter chan *proto.ProgressMetrics) {
+		core.StatWeightsAsync(msg.(*proto.StatWeightsRequest), reporter)
+	}},
+}
 
 func handleAsyncAPI(w http.ResponseWriter, r *http.Request, addNewSim simProgReportCreator) {
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-
 		return
 	}
-	msg := &proto.RaidSimRequest{}
+	endpoint := r.URL.Path
+	handler, ok := asyncAPIHandlers[endpoint]
+	if !ok {
+		log.Printf("Invalid Endpoint: %s", endpoint)
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+
+	msg := handler.msg()
 	if err := googleProto.Unmarshal(body, msg); err != nil {
 		log.Printf("Failed to parse request: %s", err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
@@ -60,7 +80,7 @@ func handleAsyncAPI(w http.ResponseWriter, r *http.Request, addNewSim simProgRep
 	}
 
 	reporter := make(chan *proto.ProgressMetrics, 100)
-	core.RunRaidSimAsync(msg, reporter)
+	handler.handle(msg, reporter)
 
 	id, report := addNewSim()
 	go func() {
@@ -72,11 +92,10 @@ func handleAsyncAPI(w http.ResponseWriter, r *http.Request, addNewSim simProgRep
 					return
 				}
 				report(progMetric)
-				if progMetric.FinalResult != nil {
+				if progMetric.FinalRaidResult != nil || progMetric.FinalWeightResult != nil {
 					close(reporter)
 					return
 				}
-				time.Sleep(time.Millisecond * 100)
 			}
 		}
 	}()
@@ -110,6 +129,7 @@ func setupAsyncServer() {
 		progMut.Unlock()
 
 		return newID, func(newProg *proto.ProgressMetrics) {
+			fmt.Printf("New Progress: %d\n", newProg.CompletedIterations)
 			progresses[newID].mut.Lock()
 			progresses[newID].latestProgress = *newProg
 			progresses[newID].mut.Unlock()
@@ -117,10 +137,13 @@ func setupAsyncServer() {
 	}
 	type progReport func(progMetric *proto.ProgressMetrics)
 
+	http.HandleFunc("/statWeightsAsync", func(w http.ResponseWriter, r *http.Request) {
+		handleAsyncAPI(w, r, addNewSim)
+	})
 	http.HandleFunc("/raidSimAsync", func(w http.ResponseWriter, r *http.Request) {
 		handleAsyncAPI(w, r, addNewSim)
 	})
-	http.HandleFunc("/raidSimAsyncProgress", func(w http.ResponseWriter, r *http.Request) {
+	http.HandleFunc("/asyncProgress", func(w http.ResponseWriter, r *http.Request) {
 		body, err := ioutil.ReadAll(r.Body)
 		if err != nil {
 
@@ -149,7 +172,7 @@ func setupAsyncServer() {
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
-		if latest.FinalResult != nil {
+		if latest.FinalRaidResult != nil || latest.FinalWeightResult != nil {
 			progMut.Lock()
 			delete(progresses, msg.ProgressId)
 			progMut.Unlock()

@@ -58,6 +58,7 @@ export class RaidSimResultsManager {
   </div>
 `);
   }
+  
   setSimResult(eventID: EventID, simResult: SimResult) {
 		this.currentData = {
 			simResult: simResult,

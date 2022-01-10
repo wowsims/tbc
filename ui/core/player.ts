@@ -214,8 +214,8 @@ export class Player<SpecType extends Spec> {
 		this.enchantEPCache = new Map();
 	}
 
-  async computeStatWeights(epStats: Array<Stat>, epReferenceStat: Stat): Promise<StatWeightsResult> {
-		const result = await this.sim.statWeights(this, epStats, epReferenceStat);
+  async computeStatWeights(epStats: Array<Stat>, epReferenceStat: Stat, onProgress: Function): Promise<StatWeightsResult> {
+		const result = await this.sim.statWeights(this, epStats, epReferenceStat, onProgress);
 		this.epWeights = new Stats(result.epValues);
 		return result;
 	}
