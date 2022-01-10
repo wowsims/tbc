@@ -492,7 +492,7 @@ class SelectorModal extends Component {
 			validItemElems = validItemElems.filter(elem => Number(elem.dataset.phase!) <= phase)
 
       // If not a trinket slot, filter out items without EP values.
-      if (slot != ItemSlot.ItemSlotTrinket1 && slot != ItemSlot.ItemSlotTrinket2) {
+      if (slot != ItemSlot.ItemSlotTrinket1 && slot != ItemSlot.ItemSlotTrinket2 && slot != ItemSlot.ItemSlotRanged) {
         validItemElems = validItemElems.filter(elem => Number(elem.dataset.baseEP) > 1)
       }
 
