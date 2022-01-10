@@ -2,7 +2,6 @@ import { Player } from '/tbc/core/proto/api.js';
 import { Class } from '/tbc/core/proto/common.js';
 import { Enchant } from '/tbc/core/proto/common.js';
 import { Gem } from '/tbc/core/proto/common.js';
-import { ItemCategory } from '/tbc/core/proto/common.js';
 import { ItemSlot } from '/tbc/core/proto/common.js';
 import { Item } from '/tbc/core/proto/common.js';
 import { Race } from '/tbc/core/proto/common.js';
@@ -78,7 +77,6 @@ export declare enum Faction {
 export declare const raceToFaction: Record<Race, Faction>;
 export declare const specToClass: Record<Spec, Class>;
 export declare const specToEligibleRaces: Record<Spec, Array<Race>>;
-export declare const specToEligibleItemCategories: Record<Spec, Array<ItemCategory>>;
 export declare const specToLocalStorageKey: Record<Spec, string>;
 export declare function withSpecProto<SpecType extends Spec>(spec: Spec, player: Player, rotation: SpecRotation<SpecType>, talents: SpecTalents<SpecType>, specOptions: SpecOptions<SpecType>): Player;
 export declare function playerToSpec(player: Player): Spec;

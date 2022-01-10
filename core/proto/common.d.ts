@@ -401,10 +401,6 @@ export interface Item {
      */
     name: string;
     /**
-     * @generated from protobuf field: repeated proto.ItemCategory categories = 14;
-     */
-    categories: ItemCategory[];
-    /**
      * Classes that are allowed to use the item. Empty indicates no special class restrictions.
      *
      * @generated from protobuf field: repeated proto.Class class_allowlist = 15;
@@ -865,34 +861,6 @@ export declare enum Stat {
      * @generated from protobuf enum value: StatArmor = 27;
      */
     StatArmor = 27
-}
-/**
- * Does not correspond to anything in-game; just our own label to help filter
- * items in the UI.
- *
- * @generated from protobuf enum proto.ItemCategory
- */
-export declare enum ItemCategory {
-    /**
-     * @generated from protobuf enum value: ItemCategoryUnknown = 0;
-     */
-    ItemCategoryUnknown = 0,
-    /**
-     * @generated from protobuf enum value: ItemCategoryCaster = 1;
-     */
-    ItemCategoryCaster = 1,
-    /**
-     * @generated from protobuf enum value: ItemCategoryMelee = 2;
-     */
-    ItemCategoryMelee = 2,
-    /**
-     * @generated from protobuf enum value: ItemCategoryHybrid = 3;
-     */
-    ItemCategoryHybrid = 3,
-    /**
-     * @generated from protobuf enum value: ItemCategoryHealer = 4;
-     */
-    ItemCategoryHealer = 4
 }
 /**
  * @generated from protobuf enum proto.ItemType

@@ -10,7 +10,6 @@ import { Class } from '/tbc/core/proto/common.js';
 import { Enchant } from '/tbc/core/proto/common.js';
 import { EnchantType } from '/tbc/core/proto/common.js';
 import { HandType } from '/tbc/core/proto/common.js';
-import { ItemCategory } from '/tbc/core/proto/common.js';
 import { ItemSlot } from '/tbc/core/proto/common.js';
 import { ItemType } from '/tbc/core/proto/common.js';
 import { Item } from '/tbc/core/proto/common.js';
@@ -548,18 +547,6 @@ export const specToEligibleRaces = {
     [Spec.SpecShadowPriest]: priestRaces,
     [Spec.SpecWarlock]: warlockRaces,
     [Spec.SpecWarrior]: warriorRaces,
-};
-export const specToEligibleItemCategories = {
-    [Spec.SpecBalanceDruid]: [ItemCategory.ItemCategoryCaster],
-    [Spec.SpecElementalShaman]: [ItemCategory.ItemCategoryCaster],
-    [Spec.SpecEnhancementShaman]: [ItemCategory.ItemCategoryMelee],
-    [Spec.SpecHunter]: [ItemCategory.ItemCategoryMelee],
-    [Spec.SpecMage]: [ItemCategory.ItemCategoryCaster],
-    [Spec.SpecRetributionPaladin]: [ItemCategory.ItemCategoryMelee, ItemCategory.ItemCategoryHybrid],
-    [Spec.SpecRogue]: [ItemCategory.ItemCategoryMelee],
-    [Spec.SpecShadowPriest]: [ItemCategory.ItemCategoryCaster],
-    [Spec.SpecWarlock]: [ItemCategory.ItemCategoryCaster],
-    [Spec.SpecWarrior]: [ItemCategory.ItemCategoryMelee],
 };
 // Specs that can dual wield. This could be based on class, except that
 // Enhancement Shaman learn dual wield from a talent.
