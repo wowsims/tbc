@@ -103,16 +103,19 @@ var Items = []Item{
 		if !itemData.Response.IsEquippable() {
 			continue
 		}
-		if itemData.Response.Quality < int(proto.ItemQuality_ItemQualityUncommon) {
-			continue
-		} else if itemData.Response.Quality < int(proto.ItemQuality_ItemQualityEpic) {
-			if itemLevel < 105 {
+		allow := allowList[itemData.Declaration.ID]
+		if !allow {
+			if itemData.Response.Quality < int(proto.ItemQuality_ItemQualityUncommon) {
 				continue
-			}
-		} else {
-			// Epic and legendary items might come from classic, so use a lower ilvl threshold.
-			if itemLevel < 75 {
-				continue
+			} else if itemData.Response.Quality < int(proto.ItemQuality_ItemQualityEpic) {
+				if itemLevel < 105 {
+					continue
+				}
+			} else {
+				// Epic and legendary items might come from classic, so use a lower ilvl threshold.
+				if itemLevel < 75 {
+					continue
+				}
 			}
 		}
 		if itemLevel == 0 {
@@ -264,4 +267,9 @@ var denyListNameRegexes = []*regexp.Regexp{
 	regexp.MustCompile("63 Blue"),
 	regexp.MustCompile("90 Green"),
 	regexp.MustCompile("63 Green"),
+}
+
+// allowList allows overriding to allow an item
+var allowList = map[int]bool{
+	20966: true, // Jade Pendant of Blasting
 }
