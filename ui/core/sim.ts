@@ -266,16 +266,16 @@ export class Sim {
 		return enchants;
 	}
 
-  getGems(socketColor: GemColor | undefined): Array<Gem> {
-    let gems = Object.values(this.gems);
+	getGems(socketColor: GemColor | undefined): Array<Gem> {
+		let gems = Object.values(this.gems);
 		if (socketColor) {
 			gems = gems.filter(gem => gemEligibleForSocket(gem, socketColor));
 		}
 		return gems;
-  }
+	}
 
 	getMatchingGems(socketColor: GemColor): Array<Gem> {
-    return Object.values(this.gems).filter(gem => gemMatchesSocket(gem, socketColor));
+    	return Object.values(this.gems).filter(gem => gemMatchesSocket(gem, socketColor));
 	}
   
   getPhase(): number {
