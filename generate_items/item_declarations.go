@@ -32,9 +32,25 @@ type GemData struct {
 
 // Allows manual overriding for Gem fields in case WowHead is wrong.
 var GemDeclarationOverrides = []GemDeclaration{
+	// pvp non-unique gems not in game currently.
+	{ID: 35489, Filter: true},
+	{ID: 38545, Filter: true},
+	{ID: 38546, Filter: true},
+	{ID: 38547, Filter: true},
+	{ID: 38548, Filter: true},
+	{ID: 38549, Filter: true},
+	{ID: 38550, Filter: true},
+
+	// BoP version of gems that can be made non-bop
+	{ID: 35487, Filter: true},
+	{ID: 35488, Filter: true},
+	{ID: 35489, Filter: true},
+
+	// Other gems to ignore.
 	{ID: 35315, Filter: true},
 	{ID: 35316, Filter: true},
 	{ID: 35318, Filter: true},
+
 	{ID: 35759, Phase: 5},
 	{ID: 35760, Phase: 5},
 }

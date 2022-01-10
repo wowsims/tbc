@@ -194,9 +194,9 @@ export class Player<SpecType extends Spec> {
 	}
 
 	// Returns all gems that this player can wear of the given color.
-  getGems(socketColor: GemColor | undefined): Array<Gem> {
+	getGems(socketColor: GemColor | undefined): Array<Gem> {
 		return this.sim.getGems(socketColor);
-  }
+	}
 
 	getEpWeights(): Stats {
 		return this.epWeights;
@@ -421,10 +421,22 @@ export class Player<SpecType extends Spec> {
     this.specOptionsChangeEmitter.emit(eventID);
   }
 
+  	computeStatsEP(stats: number[] | undefined): number {
+		if (stats == undefined) {
+			return 0;
+		}
+		return new Stats(stats).computeEP(this.epWeights);
+	}
+
 	computeGemEP(gem: Gem): number {
 		const epFromStats = new Stats(gem.stats).computeEP(this.epWeights);
 		const epFromEffect = getMetaGemEffectEP(this.spec, gem, new Stats(this.currentStats.finalStats));
-		return epFromStats + epFromEffect;
+		let bonusEP = 0;
+		// unique items are slightly worse than non-unique because you can have only one.
+		if (gem.unique) {
+			bonusEP -= 0.01;
+		}
+		return epFromStats + epFromEffect + bonusEP;
 	}
 
 	computeEnchantEP(enchant: Enchant): number {
@@ -436,7 +448,12 @@ export class Player<SpecType extends Spec> {
 			return 0;
 
 		let ep = new Stats(item.stats).computeEP(this.epWeights);
-
+		
+		// unique items are slightly worse than non-unique because you can have only one.
+		if (item.unique) {
+			ep -= 0.01;
+		}
+		
 		const slot = getEligibleItemSlots(item)[0];
 		const enchants = this.sim.getEnchants(slot);
 		if (enchants.length > 0) {
