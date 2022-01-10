@@ -1,4 +1,10 @@
 dps_results: {
+ key: "TestAllItemEffects-AbacusofViolentOdds-28288"
+ value: {
+  dps: 1445.7713844475888
+ }
+}
+dps_results: {
  key: "TestAllItemEffects-AldorRegalia"
  value: {
   dps: 1352.009176143949
@@ -14,6 +20,12 @@ dps_results: {
  key: "TestAllItemEffects-BandoftheEternalSage-29305"
  value: {
   dps: 1523.3620631109632
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-BloodlustBrooch-29383"
+ value: {
+  dps: 1445.7713844475888
  }
 }
 dps_results: {
@@ -53,9 +65,21 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestAllItemEffects-DragonspineTrophy-28830"
+ value: {
+  dps: 1445.7713844475888
+ }
+}
+dps_results: {
  key: "TestAllItemEffects-EmberSkyfireDiamond"
  value: {
   dps: 1449.682711673263
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-EmptyMugofDirebrew-38287"
+ value: {
+  dps: 1445.7713844475888
  }
 }
 dps_results: {
@@ -92,6 +116,12 @@ dps_results: {
  key: "TestAllItemEffects-HexShrunkenHead-33829"
  value: {
   dps: 1512.7641042403989
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-HourglassoftheUnraveller-28034"
+ value: {
+  dps: 1445.7713844475888
  }
 }
 dps_results: {

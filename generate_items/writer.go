@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"os"
+	"regexp"
+	"strings"
 
 	"github.com/wowsims/tbc/sim/core/proto"
 	"github.com/wowsims/tbc/sim/core/stats"
@@ -59,7 +61,7 @@ var Gems = []Gem{
 	file.Sync()
 }
 
-func writeItemFile(outDir string, itemDeclarations []ItemDeclaration, itemResponses []WowheadItemResponse) {
+func writeItemFile(outDir string, itemsData []ItemData) {
 	err := os.MkdirAll(outDir, os.ModePerm)
 	if err != nil {
 		panic(err)
@@ -83,9 +85,41 @@ import (
 var Items = []Item{
 `)
 
-	for idx, itemDeclaration := range itemDeclarations {
-		itemResponse := itemResponses[idx]
-		file.WriteString(fmt.Sprintf("\t%s,\n", itemToGoString(itemDeclaration, itemResponse)))
+	for _, itemData := range itemsData {
+		itemLevel := itemData.Response.GetItemLevel()
+		if itemData.Declaration.Filter {
+			continue
+		}
+		deny := false
+		for _, pattern := range denyListNameRegexes {
+			if pattern.MatchString(itemData.Response.Name) {
+				deny = true
+				break
+			}
+		}
+		if deny {
+			continue
+		}
+		if !itemData.Response.IsEquippable() {
+			continue
+		}
+		if itemData.Response.Quality < int(proto.ItemQuality_ItemQualityUncommon) {
+			continue
+		} else if itemData.Response.Quality < int(proto.ItemQuality_ItemQualityEpic) {
+			if itemLevel < 105 {
+				continue
+			}
+		} else {
+			// Epic and legendary items might come from classic, so use a lower ilvl threshold.
+			if itemLevel < 75 {
+				continue
+			}
+		}
+		if itemLevel == 0 {
+			fmt.Printf("Missing ilvl: %s", itemData.Response.Name)
+		}
+
+		file.WriteString(fmt.Sprintf("\t%s,\n", itemToGoString(itemData.Declaration, itemData.Response)))
 	}
 
 	file.WriteString("}\n")
@@ -120,14 +154,8 @@ func gemToGoString(gemDeclaration GemDeclaration, gemResponse WowheadItemRespons
 func itemToGoString(itemDeclaration ItemDeclaration, itemResponse WowheadItemResponse) string {
 	itemStr := "{"
 
-	itemStr += fmt.Sprintf("Name:\"%s\", ", itemResponse.Name)
+	itemStr += fmt.Sprintf("Name:\"%s\", ", strings.ReplaceAll(itemResponse.Name, "\"", "\\\""))
 	itemStr += fmt.Sprintf("ID:%d, ", itemDeclaration.ID)
-
-	itemStr += "Categories: []proto.ItemCategory{"
-	for _, category := range itemDeclaration.Categories {
-		itemStr += fmt.Sprintf("proto.ItemCategory_%s,", category.String())
-	}
-	itemStr += "}, "
 
 	classAllowlist := itemResponse.GetClassAllowlist()
 	if len(itemDeclaration.ClassAllowlist) > 0 {
@@ -213,4 +241,27 @@ func statsToGoString(statlist Stats) string {
 
 	statsStr += "}"
 	return statsStr
+}
+
+// If any of these match the item name, don't include it.
+var denyListNameRegexes = []*regexp.Regexp{
+	regexp.MustCompile("PH\\]"),
+	regexp.MustCompile("TEST"),
+	regexp.MustCompile("Test"),
+	regexp.MustCompile("Bracer 3"),
+	regexp.MustCompile("Bracer 2"),
+	regexp.MustCompile("Bracer 1"),
+	regexp.MustCompile("Boots 3"),
+	regexp.MustCompile("Boots 2"),
+	regexp.MustCompile("Boots 1"),
+	regexp.MustCompile("zOLD"),
+	regexp.MustCompile("30 Epic"),
+	regexp.MustCompile("Indalamar"),
+	regexp.MustCompile("QR XXXX"),
+	regexp.MustCompile("Deprecated: Keanna"),
+	regexp.MustCompile("90 Epic"),
+	regexp.MustCompile("66 Epic"),
+	regexp.MustCompile("63 Blue"),
+	regexp.MustCompile("90 Green"),
+	regexp.MustCompile("63 Green"),
 }

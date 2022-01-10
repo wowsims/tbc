@@ -36,13 +36,20 @@ func main() {
 	})
 	writeGemFile(*outDir, gemsData)
 
-	itemResponses := make([]WowheadItemResponse, len(ItemDeclarations))
-	for idx, itemDeclaration := range ItemDeclarations {
-		itemResponse := getWowheadItemResponse(itemDeclaration.ID, tooltipsDB)
-		//fmt.Printf("\n\n%+v\n", itemResponse)
-		itemResponses[idx] = itemResponse
+	itemDeclarations := getItemDeclarations()
+	itemsData := make([]ItemData, len(itemDeclarations))
+	for idx, itemDeclaration := range itemDeclarations {
+		itemData := ItemData{
+			Declaration: itemDeclaration,
+			Response:    getWowheadItemResponse(itemDeclaration.ID, tooltipsDB),
+		}
+		//fmt.Printf("\n\n%+v\n", itemData.Response)
+		itemsData[idx] = itemData
 	}
-	writeItemFile(*outDir, ItemDeclarations, itemResponses)
+	sort.SliceStable(itemsData, func(i, j int) bool {
+		return itemsData[i].Response.Name < itemsData[j].Response.Name
+	})
+	writeItemFile(*outDir, itemsData)
 }
 
 func getGemDeclarations() []GemDeclaration {
@@ -86,6 +93,50 @@ func getGemDeclarations() []GemDeclaration {
 	}
 
 	return gemDeclarations
+}
+
+func getItemDeclarations() []ItemDeclaration {
+	//itemsData := readCsvFile("./assets/item_data/all_equippable_item_ids.csv")
+	itemsData := readCsvFile("./assets/item_data/all_item_ids.csv")
+
+	// Ignore first line
+	itemsData = itemsData[1:]
+
+	itemDeclarations := make([]ItemDeclaration, len(itemsData))
+	for i, itemsDataRow := range itemsData {
+		itemID, err := strconv.Atoi(itemsDataRow[0])
+		if err != nil {
+			log.Fatal("Invalid item ID: " + itemsDataRow[0])
+		}
+		declaration := ItemDeclaration{
+			ID: itemID,
+		}
+
+		for _, override := range ItemDeclarationOverrides {
+			if override.ID == itemID {
+				declaration = override
+				break
+			}
+		}
+
+		itemDeclarations[i] = declaration
+	}
+
+	// Add any declarations that were missing from the csv file.
+	for _, overrideItemDeclaration := range ItemDeclarationOverrides {
+		found := false
+		for _, itemDecl := range itemDeclarations {
+			if itemDecl.ID == overrideItemDeclaration.ID {
+				found = true
+				break
+			}
+		}
+		if !found {
+			itemDeclarations = append(itemDeclarations, overrideItemDeclaration)
+		}
+	}
+
+	return itemDeclarations
 }
 
 // Returns the prefetched list of all wowhead tooltips.

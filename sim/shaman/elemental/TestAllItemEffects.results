@@ -1,7 +1,19 @@
 dps_results: {
+ key: "TestAllItemEffects-AbacusofViolentOdds-28288"
+ value: {
+  dps: 1544.6740655185627
+ }
+}
+dps_results: {
  key: "TestAllItemEffects-BandoftheEternalSage-29305"
  value: {
   dps: 1602.9110784545737
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-BloodlustBrooch-29383"
+ value: {
+  dps: 1544.6740655185627
  }
 }
 dps_results: {
@@ -17,6 +29,12 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestAllItemEffects-CataclysmHarness"
+ value: {
+  dps: 1202.0519278927259
+ }
+}
+dps_results: {
  key: "TestAllItemEffects-CataclysmRegalia"
  value: {
   dps: 1423.8659794891028
@@ -26,6 +44,12 @@ dps_results: {
  key: "TestAllItemEffects-ChaoticSkyfireDiamond"
  value: {
   dps: 1598.2214492991886
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-CycloneHarness"
+ value: {
+  dps: 1202.0519278927259
  }
 }
 dps_results: {
@@ -53,9 +77,21 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestAllItemEffects-DragonspineTrophy-28830"
+ value: {
+  dps: 1544.6740655185627
+ }
+}
+dps_results: {
  key: "TestAllItemEffects-EmberSkyfireDiamond"
  value: {
   dps: 1543.251341854498
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-EmptyMugofDirebrew-38287"
+ value: {
+  dps: 1544.6740655185627
  }
 }
 dps_results: {
@@ -98,6 +134,12 @@ dps_results: {
  key: "TestAllItemEffects-HexShrunkenHead-33829"
  value: {
   dps: 1613.695459424188
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-HourglassoftheUnraveller-28034"
+ value: {
+  dps: 1544.6740655185627
  }
 }
 dps_results: {
@@ -200,6 +242,12 @@ dps_results: {
  key: "TestAllItemEffects-SkycallTotem-33506"
  value: {
   dps: 1612.7052379681265
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-SkyshatterHarness"
+ value: {
+  dps: 1094.8228691294244
  }
 }
 dps_results: {

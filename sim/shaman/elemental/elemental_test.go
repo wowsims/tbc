@@ -143,9 +143,6 @@ func TestAllItemEffects(t *testing.T) {
 		SimOptions: core.DefaultSimTestOptions,
 
 		ItemFilter: core.ItemFilter{
-			Categories: []proto.ItemCategory{
-				proto.ItemCategory_ItemCategoryCaster,
-			},
 			ArmorTypes: []proto.ArmorType{
 				proto.ArmorType_ArmorTypeUnknown,
 				proto.ArmorType_ArmorTypeCloth,
