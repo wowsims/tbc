@@ -17,7 +17,7 @@ import { getEnumValues } from '/tbc/core/utils.js';
 
 import { Component } from './component.js';
 import { CloseButton } from './close_button.js';
-import { makePhaseSelector, makeMatchingGemSelector } from './other_inputs.js';
+import { makePhaseSelector } from './other_inputs.js';
 
 declare var $: any;
 
