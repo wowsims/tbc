@@ -22,6 +22,9 @@ export class Player {
         this.gear = new Gear({});
         this.talentsString = '';
         this.cooldowns = Cooldowns.create();
+        this.itemEPCache = new Map();
+        this.gemEPCache = new Map();
+        this.enchantEPCache = new Map();
         this.epWeights = new Stats();
         this.currentStats = PlayerStats.create();
         this.nameChangeEmitter = new TypedEvent('PlayerName');
@@ -123,6 +126,9 @@ export class Player {
     }
     setEpWeights(newEpWeights) {
         this.epWeights = newEpWeights;
+        this.gemEPCache = new Map();
+        this.itemEPCache = new Map();
+        this.enchantEPCache = new Map();
     }
     async computeStatWeights(epStats, epReferenceStat) {
         const result = await this.sim.statWeights(this, epStats, epReferenceStat);
@@ -307,6 +313,9 @@ export class Player {
         return new Stats(stats).computeEP(this.epWeights);
     }
     computeGemEP(gem) {
+        if (this.gemEPCache.has(gem.id)) {
+            return this.gemEPCache.get(gem.id);
+        }
         const epFromStats = new Stats(gem.stats).computeEP(this.epWeights);
         const epFromEffect = getMetaGemEffectEP(this.spec, gem, new Stats(this.currentStats.finalStats));
         let bonusEP = 0;
@@ -314,14 +323,24 @@ export class Player {
         if (gem.unique) {
             bonusEP -= 0.01;
         }
-        return epFromStats + epFromEffect + bonusEP;
+        let ep = epFromStats + epFromEffect + bonusEP;
+        this.gemEPCache.set(gem.id, ep);
+        return ep;
     }
     computeEnchantEP(enchant) {
-        return new Stats(enchant.stats).computeEP(this.epWeights);
+        if (this.enchantEPCache.has(enchant.id)) {
+            return this.enchantEPCache.get(enchant.id);
+        }
+        let ep = new Stats(enchant.stats).computeEP(this.epWeights);
+        this.enchantEPCache.set(enchant.id, ep);
+        return ep;
     }
     computeItemEP(item) {
         if (item == null)
             return 0;
+        if (this.itemEPCache.has(item.id)) {
+            return this.itemEPCache.get(item.id);
+        }
         let ep = new Stats(item.stats).computeEP(this.epWeights);
         // unique items are slightly worse than non-unique because you can have only one.
         if (item.unique) {
@@ -352,6 +371,7 @@ export class Player {
             }
         })) + new Stats(item.socketBonus).computeEP(this.epWeights);
         ep += Math.max(bestGemEPMatchingSockets, bestGemEPNotMatchingSockets);
+        this.itemEPCache.set(item.id, ep);
         return ep;
     }
     setWowheadData(equippedItem, elem) {

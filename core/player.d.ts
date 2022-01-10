@@ -37,6 +37,9 @@ export declare class Player<SpecType extends Spec> {
     private talentsString;
     private specOptions;
     private cooldowns;
+    private itemEPCache;
+    private gemEPCache;
+    private enchantEPCache;
     readonly specTypeFunctions: SpecTypeFunctions<SpecType>;
     private epWeights;
     private currentStats;
