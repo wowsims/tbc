@@ -13,7 +13,13 @@ dps_results: {
 dps_results: {
  key: "TestAllItemEffects-BracingEarthstormDiamond"
  value: {
-  dps: 1430.763889587915
+  dps: 1427.19582021526
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-BrutalEarthstormDiamond"
+ value: {
+  dps: 1420.7732953444786
  }
 }
 dps_results: {
@@ -35,15 +41,33 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestAllItemEffects-DestructiveSkyfireDiamond"
+ value: {
+  dps: 1431.0826590640013
+ }
+}
+dps_results: {
  key: "TestAllItemEffects-EmberSkyfireDiamond"
  value: {
   dps: 1432.6513626053572
  }
 }
 dps_results: {
+ key: "TestAllItemEffects-EnigmaticSkyfireDiamond"
+ value: {
+  dps: 1420.7732953444786
+ }
+}
+dps_results: {
  key: "TestAllItemEffects-EssenceoftheMartyr-29376"
  value: {
   dps: 1409.536416465772
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-EternalEarthstormDiamond"
+ value: {
+  dps: 1420.7732953444786
  }
 }
 dps_results: {
@@ -119,6 +143,18 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestAllItemEffects-PotentUnstableDiamond"
+ value: {
+  dps: 1420.7732953444786
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-PowerfulEarthstormDiamond"
+ value: {
+  dps: 1420.7732953444786
+ }
+}
+dps_results: {
  key: "TestAllItemEffects-RelentlessEarthstormDiamond"
  value: {
   dps: 1420.7732953444786
@@ -173,9 +209,27 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestAllItemEffects-SwiftSkyfireDiamond"
+ value: {
+  dps: 1420.7732953444786
+ }
+}
+dps_results: {
  key: "TestAllItemEffects-SwiftStarfireDiamond"
  value: {
   dps: 1429.3366618388536
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-SwiftWindfireDiamond"
+ value: {
+  dps: 1420.7732953444786
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-TenaciousEarthstormDiamond"
+ value: {
+  dps: 1420.7732953444786
  }
 }
 dps_results: {
@@ -206,6 +260,12 @@ dps_results: {
  key: "TestAllItemEffects-ThunderheartRegalia"
  value: {
   dps: 1344.8000796183173
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-ThunderingSkyfireDiamond"
+ value: {
+  dps: 1420.7732953444786
  }
 }
 dps_results: {

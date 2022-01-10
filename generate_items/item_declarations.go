@@ -12,6 +12,50 @@ type ItemDeclaration struct {
 	ClassAllowlist []proto.Class
 	Phase          int
 }
+type ItemData struct {
+	Declaration ItemDeclaration
+	Response    WowheadItemResponse
+}
+
+type GemDeclaration struct {
+	ID    int
+	Phase int
+
+	Filter bool // If true, this item will be omitted from the sim.
+}
+type GemData struct {
+	Declaration GemDeclaration
+	Response    WowheadItemResponse
+}
+
+// Allows manual overriding for Gem fields in case WowHead is wrong.
+var GemDeclarationOverrides = []GemDeclaration{
+	{ID: 35315, Filter: true},
+	{ID: 35316, Filter: true},
+	{ID: 35318, Filter: true},
+	{ID: 35759, Phase: 5},
+	{ID: 35760, Phase: 5},
+
+	// Meta gems.
+	{ID: 25890},
+	{ID: 25893},
+	{ID: 25894},
+	{ID: 25895},
+	{ID: 25896},
+	{ID: 25897},
+	{ID: 25898},
+	{ID: 25899},
+	{ID: 25901},
+	{ID: 28556},
+	{ID: 28557},
+	{ID: 32409},
+	{ID: 32410},
+	{ID: 32640},
+	{ID: 32641},
+	{ID: 34220},
+	{ID: 35501},
+	{ID: 35503},
+}
 
 const CasterCategory = proto.ItemCategory_ItemCategoryCaster
 const MeleeCategory = proto.ItemCategory_ItemCategoryMelee
