@@ -215,3 +215,22 @@ message StatWeightsResult {
     repeated double ep_values = 3;
     repeated double ep_values_stdev = 4;
 }
+
+message AsyncAPIResult {
+  string progress_id = 1;
+} 
+
+// ProgressMetrics are used by all async APIs
+message ProgressMetrics {
+    int32 completed_iterations = 1;
+    int32 total_iterations = 2;
+    int32 completed_sims = 3;
+    int32 total_sims = 4;
+
+    // Partial Results 
+    double dps = 5;
+
+    // Final Results
+    RaidSimResult final_raid_result = 6; // only set when completed
+    StatWeightsResult final_weight_result = 7;
+}

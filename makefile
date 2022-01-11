@@ -104,9 +104,9 @@ binary_dist: $(OUT_DIR)
 	rm binary_dist/tbc/lib.wasm
 
 # Builds the web server with the compiled client.
-wowsimtbc: sim/web/main.go  binary_dist binary_dist/dist.go devserver
+wowsimtbc: sim/web/main.go  binary_dist devserver
 
-devserver:
+devserver: binary_dist/dist.go
 	@echo "Starting server compile now..."
 	@if go build -o wowsimtbc ./sim/web/main.go; then \
 		echo "\033[1;32mBuild Completed Succeessfully\033[0m"; \

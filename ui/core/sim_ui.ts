@@ -111,11 +111,11 @@ export abstract class SimUI extends Component {
 		const simActionsContainer = this.rootElem.getElementsByClassName('sim-sidebar-actions')[0] as HTMLElement;
 		const iterationsPicker = this.rootElem.getElementsByClassName('iterations-picker')[0] as HTMLElement;
 
-    const button = document.createElement('button');
-    button.classList.add('sim-sidebar-actions-button', cssClass);
-    button.textContent = name;
-    button.addEventListener('click', actFn);
-    simActionsContainer.insertBefore(button, iterationsPicker);
+		const button = document.createElement('button');
+		button.classList.add('sim-sidebar-actions-button', cssClass);
+		button.textContent = name;
+		button.addEventListener('click', actFn);
+		simActionsContainer.insertBefore(button, iterationsPicker);
 	}
 
 	addTab(title: string, cssClass: string, innerHTML: string) {
@@ -155,15 +155,15 @@ export abstract class SimUI extends Component {
     this.resultsPendingElem.style.display = 'none';
 	}
 
-  setResultsPending() {
+	setResultsPending() {
 		this.resultsContentElem.style.display = 'none';
-    this.resultsPendingElem.style.display = 'initial';
-  }
+		this.resultsPendingElem.style.display = 'initial';
+	}
 
 	setResultsContent(innerHTML: string) {
 		this.resultsContentElem.innerHTML = innerHTML;
 		this.resultsContentElem.style.display = 'initial';
-    this.resultsPendingElem.style.display = 'none';
+    	this.resultsPendingElem.style.display = 'none';
 	}
 
 	private updateWarnings() {
@@ -207,10 +207,10 @@ export abstract class SimUI extends Component {
 		return this.rootElem.classList.contains('individual-sim-ui');
 	}
 
-	async runSim() {
+	async runSim(onProgress: Function) {
 		this.setResultsPending();
 		try {
-			const result = await this.sim.runRaidSim(TypedEvent.nextEventID());
+			const result = await this.sim.runRaidSim(TypedEvent.nextEventID(), onProgress);
 		} catch (e) {
 			this.hideAllResults();
 			alert(e);

@@ -4,6 +4,7 @@ import (
 	"container/heap"
 	"fmt"
 	"math/rand"
+	"runtime"
 	"strings"
 	"time"
 
@@ -28,13 +29,20 @@ type Simulation struct {
 	pendingActions ActionsQueue
 	CurrentTime    time.Duration // duration that has elapsed in the sim since starting
 
+	ProgressReport func(*proto.ProgressMetrics)
+
 	Log  func(string, ...interface{})
 	logs []string
 }
 
-func RunSim(rsr proto.RaidSimRequest) *proto.RaidSimResult {
+func RunSim(rsr proto.RaidSimRequest, progress chan *proto.ProgressMetrics) *proto.RaidSimResult {
 	sim := newSim(rsr)
 	sim.runPresims(rsr)
+	if progress != nil {
+		sim.ProgressReport = func(progMetric *proto.ProgressMetrics) {
+			progress <- progMetric
+		}
+	}
 	return sim.run()
 }
 
@@ -153,16 +161,29 @@ func (sim *Simulation) run() *proto.RaidSimResult {
 		sim.Log = nil
 	}
 
+	st := time.Now()
 	for i := int32(1); i < sim.Options.Iterations; i++ {
+		// fmt.Printf("Iteration: %d\n", i)
+		if sim.ProgressReport != nil && time.Since(st) > time.Millisecond*250 {
+			metrics := sim.Raid.GetMetrics(i + 1)
+			sim.ProgressReport(&proto.ProgressMetrics{TotalIterations: sim.Options.Iterations, CompletedIterations: i + 1, Dps: metrics.Dps.Avg})
+			runtime.Gosched() // ensure that reporting threads are given time to report, mostly only important in wasm (only 1 thread)
+			st = time.Now()
+		}
 		sim.runOnce()
 	}
-
 	result := &proto.RaidSimResult{
 		RaidMetrics:      sim.Raid.GetMetrics(sim.Options.Iterations),
 		EncounterMetrics: sim.encounter.GetMetricsProto(sim.Options.Iterations),
 
 		Logs: logsBuffer.String(),
 	}
+
+	// Final progress report
+	if sim.ProgressReport != nil {
+		sim.ProgressReport(&proto.ProgressMetrics{TotalIterations: sim.Options.Iterations, CompletedIterations: sim.Options.Iterations, Dps: result.RaidMetrics.Dps.Avg, FinalRaidResult: result})
+	}
+
 	return result
 }
 
