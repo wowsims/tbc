@@ -129,7 +129,6 @@ func setupAsyncServer() {
 		progMut.Unlock()
 
 		return newID, func(newProg *proto.ProgressMetrics) {
-			fmt.Printf("New Progress: %d\n", newProg.CompletedIterations)
 			progresses[newID].mut.Lock()
 			progresses[newID].latestProgress = *newProg
 			progresses[newID].mut.Unlock()

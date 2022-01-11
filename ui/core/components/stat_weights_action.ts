@@ -32,7 +32,8 @@ class StatWeightsResultsManager {
   setSimProgress(progress: ProgressMetrics) {
 	this.simUI.setResultsContent(`
   <div class="results-sim">
-			<div class="">
+  			<div class=""> ${progress.completedSims} / ${progress.totalSims}<br>simulations complete</div>
+  			<div class="">
 				${progress.completedIterations} / ${progress.totalIterations}<br>iterations complete
 			</div>
   </div>
