@@ -14,11 +14,15 @@ export declare const ChainOfTheTwilightOwl: IndividualSimIconPickerConfig<Party,
 export declare const DraeneiRacialCaster: IndividualSimIconPickerConfig<Party, boolean>;
 export declare const DraeneiRacialMelee: IndividualSimIconPickerConfig<Party, boolean>;
 export declare const EyeOfTheNight: IndividualSimIconPickerConfig<Party, boolean>;
+export declare const FerociousInspiration: IndividualSimIconPickerConfig<Party, number>;
 export declare const JadePendantOfBlasting: IndividualSimIconPickerConfig<Party, boolean>;
+export declare const LeaderOfThePack: IndividualSimIconPickerConfig<Party, number>;
 export declare const ManaSpringTotem: IndividualSimIconPickerConfig<Party, number>;
 export declare const ManaTideTotem: IndividualSimIconPickerConfig<Party, number>;
 export declare const MoonkinAura: IndividualSimIconPickerConfig<Party, number>;
+export declare const SanctityAura: IndividualSimIconPickerConfig<Party, number>;
 export declare const TotemOfWrath: IndividualSimIconPickerConfig<Party, number>;
+export declare const TrueshotAura: IndividualSimIconPickerConfig<Party, boolean>;
 export declare const WrathOfAirTotem: IndividualSimIconPickerConfig<Party, number>;
 export declare const BattleShout: IndividualSimIconPickerConfig<Party, number>;
 export declare const DrumsOfBattleBuff: IndividualSimIconPickerConfig<Party, boolean>;
@@ -28,6 +32,7 @@ export declare const BlessingOfWisdom: IndividualSimIconPickerConfig<Player<any>
 export declare const BlessingOfMight: IndividualSimIconPickerConfig<Player<any>, number>;
 export declare const Innervate: IndividualSimIconPickerConfig<Player<any>, number>;
 export declare const PowerInfusion: IndividualSimIconPickerConfig<Player<any>, number>;
+export declare const BloodFrenzy: IndividualSimIconPickerConfig<Target, boolean>;
 export declare const ImprovedScorch: IndividualSimIconPickerConfig<Target, boolean>;
 export declare const ImprovedSealOfTheCrusader: IndividualSimIconPickerConfig<Target, boolean>;
 export declare const JudgementOfWisdom: IndividualSimIconPickerConfig<Target, boolean>;

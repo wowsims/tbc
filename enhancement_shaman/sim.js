@@ -110,6 +110,11 @@ export class EnhancementShamanSimUI extends IndividualSimUI {
                 IconInputs.Bloodlust,
                 IconInputs.ManaSpringTotem,
                 IconInputs.BattleShout,
+                IconInputs.DraeneiRacialMelee,
+                IconInputs.LeaderOfThePack,
+                IconInputs.FerociousInspiration,
+                IconInputs.TrueshotAura,
+                IconInputs.SanctityAura,
             ],
             playerBuffInputs: [
                 IconInputs.BlessingOfKings,
@@ -118,15 +123,17 @@ export class EnhancementShamanSimUI extends IndividualSimUI {
             ],
             // IconInputs to include in the 'Debuffs' section on the settings tab.
             debuffInputs: [
+                IconInputs.BloodFrenzy,
                 IconInputs.ImprovedSealOfTheCrusader,
                 IconInputs.JudgementOfWisdom,
                 IconInputs.FaerieFire,
                 IconInputs.SunderArmor,
                 IconInputs.ExposeArmor,
                 IconInputs.CurseOfRecklessness,
+                IconInputs.CurseOfElements,
                 IconInputs.Misery,
                 IconInputs.ImprovedScorch,
-                IconInputs.CurseOfElements,
+                IconInputs.WintersChill,
             ],
             // IconInputs to include in the 'Consumes' section on the settings tab.
             consumeInputs: [
@@ -145,6 +152,8 @@ export class EnhancementShamanSimUI extends IndividualSimUI {
                 inputs: [
                     OtherInputs.StartingPotion,
                     OtherInputs.NumStartingPotions,
+                    OtherInputs.ExposeWeaknessUptime,
+                    OtherInputs.ExposeWeaknessHunterAgility,
                 ],
             },
             customSections: [

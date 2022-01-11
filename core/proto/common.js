@@ -874,7 +874,11 @@ class PartyBuffs$Type extends MessageType {
     constructor() {
         super("proto.PartyBuffs", [
             { no: 1, name: "bloodlust", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 22, name: "ferocious_inspiration", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 2, name: "moonkin_aura", kind: "enum", T: () => ["proto.TristateEffect", TristateEffect] },
+            { no: 19, name: "leader_of_the_pack", kind: "enum", T: () => ["proto.TristateEffect", TristateEffect] },
+            { no: 20, name: "sanctity_aura", kind: "enum", T: () => ["proto.TristateEffect", TristateEffect] },
+            { no: 21, name: "trueshot_aura", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 3, name: "draenei_racial_melee", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 4, name: "draenei_racial_caster", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 5, name: "drums", kind: "enum", T: () => ["proto.Drums", Drums] },
@@ -894,7 +898,7 @@ class PartyBuffs$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { bloodlust: 0, moonkinAura: 0, draeneiRacialMelee: false, draeneiRacialCaster: false, drums: 0, atieshMage: 0, atieshWarlock: 0, braidedEterniumChain: false, eyeOfTheNight: false, chainOfTheTwilightOwl: false, jadePendantOfBlasting: false, manaSpringTotem: 0, manaTideTotems: 0, totemOfWrath: 0, wrathOfAirTotem: 0, graceOfAirTotem: 0, strengthOfEarthTotem: 0, battleShout: 0 };
+        const message = { bloodlust: 0, ferociousInspiration: 0, moonkinAura: 0, leaderOfThePack: 0, sanctityAura: 0, trueshotAura: false, draeneiRacialMelee: false, draeneiRacialCaster: false, drums: 0, atieshMage: 0, atieshWarlock: 0, braidedEterniumChain: false, eyeOfTheNight: false, chainOfTheTwilightOwl: false, jadePendantOfBlasting: false, manaSpringTotem: 0, manaTideTotems: 0, totemOfWrath: 0, wrathOfAirTotem: 0, graceOfAirTotem: 0, strengthOfEarthTotem: 0, battleShout: 0 };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -908,8 +912,20 @@ class PartyBuffs$Type extends MessageType {
                 case /* int32 bloodlust */ 1:
                     message.bloodlust = reader.int32();
                     break;
+                case /* int32 ferocious_inspiration */ 22:
+                    message.ferociousInspiration = reader.int32();
+                    break;
                 case /* proto.TristateEffect moonkin_aura */ 2:
                     message.moonkinAura = reader.int32();
+                    break;
+                case /* proto.TristateEffect leader_of_the_pack */ 19:
+                    message.leaderOfThePack = reader.int32();
+                    break;
+                case /* proto.TristateEffect sanctity_aura */ 20:
+                    message.sanctityAura = reader.int32();
+                    break;
+                case /* bool trueshot_aura */ 21:
+                    message.trueshotAura = reader.bool();
                     break;
                 case /* bool draenei_racial_melee */ 3:
                     message.draeneiRacialMelee = reader.bool();
@@ -974,9 +990,21 @@ class PartyBuffs$Type extends MessageType {
         /* int32 bloodlust = 1; */
         if (message.bloodlust !== 0)
             writer.tag(1, WireType.Varint).int32(message.bloodlust);
+        /* int32 ferocious_inspiration = 22; */
+        if (message.ferociousInspiration !== 0)
+            writer.tag(22, WireType.Varint).int32(message.ferociousInspiration);
         /* proto.TristateEffect moonkin_aura = 2; */
         if (message.moonkinAura !== 0)
             writer.tag(2, WireType.Varint).int32(message.moonkinAura);
+        /* proto.TristateEffect leader_of_the_pack = 19; */
+        if (message.leaderOfThePack !== 0)
+            writer.tag(19, WireType.Varint).int32(message.leaderOfThePack);
+        /* proto.TristateEffect sanctity_aura = 20; */
+        if (message.sanctityAura !== 0)
+            writer.tag(20, WireType.Varint).int32(message.sanctityAura);
+        /* bool trueshot_aura = 21; */
+        if (message.trueshotAura !== false)
+            writer.tag(21, WireType.Varint).bool(message.trueshotAura);
         /* bool draenei_racial_melee = 3; */
         if (message.draeneiRacialMelee !== false)
             writer.tag(3, WireType.Varint).bool(message.draeneiRacialMelee);
@@ -1368,11 +1396,13 @@ class Debuffs$Type extends MessageType {
             { no: 9, name: "expose_armor", kind: "enum", T: () => ["proto.TristateEffect", TristateEffect] },
             { no: 10, name: "faerie_fire", kind: "enum", T: () => ["proto.TristateEffect", TristateEffect] },
             { no: 11, name: "sunder_armor", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
-            { no: 12, name: "curse_of_recklessness", kind: "scalar", T: 8 /*ScalarType.BOOL*/ }
+            { no: 12, name: "curse_of_recklessness", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 13, name: "expose_weakness_uptime", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
+            { no: 14, name: "expose_weakness_hunter_agility", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ }
         ]);
     }
     create(value) {
-        const message = { judgementOfWisdom: false, improvedSealOfTheCrusader: false, misery: false, curseOfElements: 0, isbUptime: 0, improvedScorch: false, wintersChill: false, bloodFrenzy: false, exposeArmor: 0, faerieFire: 0, sunderArmor: false, curseOfRecklessness: false };
+        const message = { judgementOfWisdom: false, improvedSealOfTheCrusader: false, misery: false, curseOfElements: 0, isbUptime: 0, improvedScorch: false, wintersChill: false, bloodFrenzy: false, exposeArmor: 0, faerieFire: 0, sunderArmor: false, curseOfRecklessness: false, exposeWeaknessUptime: 0, exposeWeaknessHunterAgility: 0 };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -1418,6 +1448,12 @@ class Debuffs$Type extends MessageType {
                     break;
                 case /* bool curse_of_recklessness */ 12:
                     message.curseOfRecklessness = reader.bool();
+                    break;
+                case /* double expose_weakness_uptime */ 13:
+                    message.exposeWeaknessUptime = reader.double();
+                    break;
+                case /* double expose_weakness_hunter_agility */ 14:
+                    message.exposeWeaknessHunterAgility = reader.double();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -1467,6 +1503,12 @@ class Debuffs$Type extends MessageType {
         /* bool curse_of_recklessness = 12; */
         if (message.curseOfRecklessness !== false)
             writer.tag(12, WireType.Varint).bool(message.curseOfRecklessness);
+        /* double expose_weakness_uptime = 13; */
+        if (message.exposeWeaknessUptime !== 0)
+            writer.tag(13, WireType.Bit64).double(message.exposeWeaknessUptime);
+        /* double expose_weakness_hunter_agility = 14; */
+        if (message.exposeWeaknessHunterAgility !== 0)
+            writer.tag(14, WireType.Bit64).double(message.exposeWeaknessHunterAgility);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

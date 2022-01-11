@@ -58,3 +58,26 @@ export declare const ISBUptime: {
         setValue: (eventID: EventID, target: Target, newValue: number) => void;
     };
 };
+export declare const ExposeWeaknessUptime: {
+    type: "number";
+    getModObject: (simUI: IndividualSimUI<any>) => Target;
+    config: {
+        extraCssClasses: string[];
+        label: string;
+        changedEvent: (target: Target) => TypedEvent<void>;
+        getValue: (target: Target) => number;
+        setValue: (eventID: EventID, target: Target, newValue: number) => void;
+    };
+};
+export declare const ExposeWeaknessHunterAgility: {
+    type: "number";
+    getModObject: (simUI: IndividualSimUI<any>) => Target;
+    config: {
+        extraCssClasses: string[];
+        label: string;
+        labelTooltip: string;
+        changedEvent: (target: Target) => TypedEvent<void>;
+        getValue: (target: Target) => number;
+        setValue: (eventID: EventID, target: Target, newValue: number) => void;
+    };
+};

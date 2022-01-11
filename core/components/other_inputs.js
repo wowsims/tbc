@@ -99,3 +99,40 @@ export const ISBUptime = {
         },
     },
 };
+export const ExposeWeaknessUptime = {
+    type: 'number',
+    getModObject: (simUI) => simUI.sim.encounter.primaryTarget,
+    config: {
+        extraCssClasses: [
+            'expose-weakness-uptime-picker',
+            'within-raid-sim-hide',
+        ],
+        label: 'Expose Weakness Uptime %',
+        changedEvent: (target) => target.debuffsChangeEmitter,
+        getValue: (target) => Math.round(target.getDebuffs().exposeWeaknessUptime * 100),
+        setValue: (eventID, target, newValue) => {
+            const newDebuffs = target.getDebuffs();
+            newDebuffs.exposeWeaknessUptime = newValue / 100;
+            target.setDebuffs(eventID, newDebuffs);
+        },
+    },
+};
+export const ExposeWeaknessHunterAgility = {
+    type: 'number',
+    getModObject: (simUI) => simUI.sim.encounter.primaryTarget,
+    config: {
+        extraCssClasses: [
+            'expose-weakness-hunter-agility-picker',
+            'within-raid-sim-hide',
+        ],
+        label: 'EW Hunter Agility',
+        labelTooltip: 'The amount of agility on the Expose Weakness hunter.',
+        changedEvent: (target) => target.debuffsChangeEmitter,
+        getValue: (target) => Math.round(target.getDebuffs().exposeWeaknessHunterAgility),
+        setValue: (eventID, target, newValue) => {
+            const newDebuffs = target.getDebuffs();
+            newDebuffs.exposeWeaknessHunterAgility = newValue;
+            target.setDebuffs(eventID, newDebuffs);
+        },
+    },
+};

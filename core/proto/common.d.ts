@@ -34,9 +34,25 @@ export interface PartyBuffs {
      */
     bloodlust: number;
     /**
+     * @generated from protobuf field: int32 ferocious_inspiration = 22;
+     */
+    ferociousInspiration: number;
+    /**
      * @generated from protobuf field: proto.TristateEffect moonkin_aura = 2;
      */
     moonkinAura: TristateEffect;
+    /**
+     * @generated from protobuf field: proto.TristateEffect leader_of_the_pack = 19;
+     */
+    leaderOfThePack: TristateEffect;
+    /**
+     * @generated from protobuf field: proto.TristateEffect sanctity_aura = 20;
+     */
+    sanctityAura: TristateEffect;
+    /**
+     * @generated from protobuf field: bool trueshot_aura = 21;
+     */
+    trueshotAura: boolean;
     /**
      * @generated from protobuf field: bool draenei_racial_melee = 3;
      */
@@ -311,6 +327,14 @@ export interface Debuffs {
      * @generated from protobuf field: bool curse_of_recklessness = 12;
      */
     curseOfRecklessness: boolean;
+    /**
+     * @generated from protobuf field: double expose_weakness_uptime = 13;
+     */
+    exposeWeaknessUptime: number;
+    /**
+     * @generated from protobuf field: double expose_weakness_hunter_agility = 14;
+     */
+    exposeWeaknessHunterAgility: number;
 }
 /**
  * @generated from protobuf message proto.Target
