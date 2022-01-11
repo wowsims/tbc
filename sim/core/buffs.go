@@ -29,6 +29,21 @@ func applyBuffEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs proto.P
 	character.AddStats(stats.Stats{
 		stats.SpellCrit: GetTristateValueFloat(partyBuffs.MoonkinAura, 5*SpellCritRatingPerCritChance, 5*SpellCritRatingPerCritChance+20),
 	})
+	character.AddStats(stats.Stats{
+		stats.MeleeCrit: GetTristateValueFloat(partyBuffs.LeaderOfThePack, 5*MeleeCritRatingPerCritChance, 5*MeleeCritRatingPerCritChance+20),
+	})
+
+	if partyBuffs.TrueshotAura {
+		character.AddStats(stats.Stats{
+			stats.AttackPower: 125,
+		})
+	}
+
+	if partyBuffs.FerociousInspiration > 0 {
+		character.AddPermanentAura(func(sim *Simulation) Aura {
+			return FerociousInspirationAura(partyBuffs.FerociousInspiration)
+		})
+	}
 
 	if partyBuffs.DraeneiRacialMelee {
 		character.AddStats(stats.Stats{
@@ -54,14 +69,12 @@ func applyBuffEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs proto.P
 		})
 	}
 
-	// shadow priest buff bot just statically applies mp5
 	if individualBuffs.ShadowPriestDps > 0 {
 		character.AddStats(stats.Stats{
 			stats.MP5: float64(individualBuffs.ShadowPriestDps) * 0.25,
 		})
 	}
 
-	// TODO: Double-check these numbers
 	character.AddStats(stats.Stats{
 		stats.MP5: GetTristateValueFloat(individualBuffs.BlessingOfWisdom, 42.0, 50.0),
 	})
@@ -88,6 +101,12 @@ func applyBuffEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs proto.P
 				},
 			})
 		}
+	}
+
+	if partyBuffs.SanctityAura == proto.TristateEffect_TristateEffectImproved {
+		character.AddPermanentAura(func(sim *Simulation) Aura {
+			return ImprovedSanctityAura()
+		})
 	}
 
 	character.AddStats(stats.Stats{
@@ -144,6 +163,43 @@ func applyBuffEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs proto.P
 	}
 	if partyBuffs.ChainOfTheTwilightOwl {
 		character.AddStats(stats.Stats{stats.SpellCrit: 2 * SpellCritRatingPerCritChance})
+	}
+}
+
+var FerociousInspirationAuraID = NewAuraID()
+
+func FerociousInspirationAura(numBMHunters int32) Aura {
+	multiplier := float64(numBMHunters) * 1.03
+	return Aura{
+		ID:       FerociousInspirationAuraID,
+		ActionID: ActionID{SpellID: 31870},
+		OnBeforeMelee: func(sim *Simulation, ability *ActiveMeleeAbility, isOH bool) {
+			ability.DamageMultiplier *= multiplier
+		},
+		OnBeforeSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect) {
+			spellEffect.DamageMultiplier *= multiplier
+		},
+		OnBeforePeriodicDamage: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect, tickDamage *float64) {
+			*tickDamage *= multiplier
+		},
+	}
+}
+
+var ImprovedSanctityAuraID = NewAuraID()
+
+func ImprovedSanctityAura() Aura {
+	return Aura{
+		ID:       ImprovedSanctityAuraID,
+		ActionID: ActionID{SpellID: 31870},
+		OnBeforeMelee: func(sim *Simulation, ability *ActiveMeleeAbility, isOH bool) {
+			ability.DamageMultiplier *= 1.02
+		},
+		OnBeforeSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect) {
+			spellEffect.DamageMultiplier *= 1.02
+		},
+		OnBeforePeriodicDamage: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect, tickDamage *float64) {
+			*tickDamage *= 1.02
+		},
 	}
 }
 

@@ -63,7 +63,11 @@ var FullRaidBuffs = &proto.RaidBuffs{
 	GiftOfTheWild:    proto.TristateEffect_TristateEffectImproved,
 }
 var FullPartyBuffs = &proto.PartyBuffs{
-	BattleShout: proto.TristateEffect_TristateEffectImproved,
+	FerociousInspiration: 2,
+	BattleShout:          proto.TristateEffect_TristateEffectImproved,
+	LeaderOfThePack:      proto.TristateEffect_TristateEffectImproved,
+	SanctityAura:         proto.TristateEffect_TristateEffectImproved,
+	TrueshotAura:         true,
 }
 var FullIndividualBuffs = &proto.IndividualBuffs{
 	BlessingOfKings:  true,
@@ -81,12 +85,14 @@ var NoDebuffTarget = &proto.Target{
 }
 
 var FullDebuffs = &proto.Debuffs{
-	BloodFrenzy:               true,
-	ExposeArmor:               proto.TristateEffect_TristateEffectImproved,
-	FaerieFire:                proto.TristateEffect_TristateEffectImproved,
-	ImprovedSealOfTheCrusader: true,
-	JudgementOfWisdom:         true,
-	Misery:                    true,
+	BloodFrenzy:                 true,
+	ExposeArmor:                 proto.TristateEffect_TristateEffectImproved,
+	FaerieFire:                  proto.TristateEffect_TristateEffectImproved,
+	ImprovedSealOfTheCrusader:   true,
+	JudgementOfWisdom:           true,
+	Misery:                      true,
+	ExposeWeaknessUptime:        0.8,
+	ExposeWeaknessHunterAgility: 800,
 }
 
 var FullDebuffTarget = &proto.Target{

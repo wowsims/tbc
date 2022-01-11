@@ -73,6 +73,13 @@ func applyDebuffEffects(target *Target, debuffs proto.Debuffs) {
 	if debuffs.CurseOfRecklessness {
 		target.armor -= 800
 	}
+
+	if debuffs.ExposeWeaknessUptime > 0 && debuffs.ExposeWeaknessHunterAgility > 0 {
+		multiplier := MinFloat(1.0, debuffs.ExposeWeaknessUptime)
+		target.AddPermanentAura(func(sim *Simulation) Aura {
+			return ExposeWeaknessAura(debuffs.ExposeWeaknessHunterAgility, multiplier)
+		})
+	}
 }
 
 var MiseryDebuffID = NewDebuffID()
@@ -290,3 +297,18 @@ func FaerieFireAura(currentTime time.Duration, target *Target, improved bool) Au
 
 var SunderArmorDebuffID = NewDebuffID()
 var CurseOfRecklessnessDebuffID = NewDebuffID()
+
+var ExposeWeaknessDebuffID = NewDebuffID()
+
+// Multiplier is for accomodating uptime %. For a real hunter, always pass 1.0
+func ExposeWeaknessAura(hunterAgility float64, multiplier float64) Aura {
+	apBonus := hunterAgility * 0.25 * multiplier
+
+	return Aura{
+		ID:       ExposeWeaknessDebuffID,
+		ActionID: ActionID{SpellID: 34503},
+		OnBeforeMelee: func(sim *Simulation, ability *ActiveMeleeAbility, isOH bool) {
+			ability.AbilityEffect.BonusAttackPower += apBonus
+		},
+	}
+}

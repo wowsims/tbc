@@ -34,13 +34,13 @@ func TestP1FullCharacterStats(t *testing.T) {
 		stats.Intellect: 307.9,
 		stats.Spirit:    153.9,
 
-		stats.SpellPower: 693.0,
+		stats.SpellPower: 730.5,
 		stats.MP5:        100,
 		stats.SpellCrit:  134.9,
 
-		stats.AttackPower: 2309.9,
+		stats.AttackPower: 2434.9,
 		stats.MeleeHit:    254.6,
-		stats.MeleeCrit:   702.7,
+		stats.MeleeCrit:   833.1,
 		stats.Expertise:   35,
 
 		stats.Mana:  7661.2,
