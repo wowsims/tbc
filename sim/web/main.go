@@ -13,13 +13,15 @@ import (
 	"runtime"
 	"runtime/pprof"
 	"strings"
+	"sync"
 	"syscall"
 	"time"
 
+	uuid "github.com/satori/go.uuid"
 	dist "github.com/wowsims/tbc/binary_dist"
 	"github.com/wowsims/tbc/sim"
 	"github.com/wowsims/tbc/sim/core"
-	"github.com/wowsims/tbc/sim/core/proto"
+	proto "github.com/wowsims/tbc/sim/core/proto"
 
 	googleProto "google.golang.org/protobuf/proto"
 )
@@ -37,7 +39,146 @@ func main() {
 
 	flag.Parse()
 
+	setupAsyncServer()
 	runServer(*useFS, *host, *launch, *simName, *wasm, bufio.NewReader(os.Stdin))
+}
+
+type simProgReportCreator func() (string, progReport)
+type progReport func(progMetric *proto.ProgressMetrics)
+type asyncAPIHandler struct {
+	msg    func() googleProto.Message
+	handle func(googleProto.Message, chan *proto.ProgressMetrics)
+}
+
+var asyncAPIHandlers = map[string]asyncAPIHandler{
+	"/raidSimAsync": {msg: func() googleProto.Message { return &proto.RaidSimRequest{} }, handle: func(msg googleProto.Message, reporter chan *proto.ProgressMetrics) {
+		core.RunRaidSimAsync(msg.(*proto.RaidSimRequest), reporter)
+	}},
+	"/statWeightsAsync": {msg: func() googleProto.Message { return &proto.StatWeightsRequest{} }, handle: func(msg googleProto.Message, reporter chan *proto.ProgressMetrics) {
+		core.StatWeightsAsync(msg.(*proto.StatWeightsRequest), reporter)
+	}},
+}
+
+func handleAsyncAPI(w http.ResponseWriter, r *http.Request, addNewSim simProgReportCreator) {
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		return
+	}
+	endpoint := r.URL.Path
+	handler, ok := asyncAPIHandlers[endpoint]
+	if !ok {
+		log.Printf("Invalid Endpoint: %s", endpoint)
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+
+	msg := handler.msg()
+	if err := googleProto.Unmarshal(body, msg); err != nil {
+		log.Printf("Failed to parse request: %s", err.Error())
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	reporter := make(chan *proto.ProgressMetrics, 100)
+	handler.handle(msg, reporter)
+
+	id, report := addNewSim()
+	go func() {
+		for {
+			// TODO: cleanup so we dont collect these
+			select {
+			case progMetric, ok := <-reporter:
+				if !ok {
+					return
+				}
+				report(progMetric)
+				if progMetric.FinalRaidResult != nil || progMetric.FinalWeightResult != nil {
+					close(reporter)
+					return
+				}
+			}
+		}
+	}()
+
+	protoResult := &proto.AsyncAPIResult{
+		ProgressId: id,
+	}
+
+	outbytes, err := googleProto.Marshal(protoResult)
+	if err != nil {
+		log.Printf("[ERROR] Failed to marshal result: %s", err.Error())
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Add("Content-Type", "application/x-protobuf")
+	w.Write(outbytes)
+}
+
+func setupAsyncServer() {
+	type asyncProgress struct {
+		mut            sync.Mutex
+		latestProgress proto.ProgressMetrics
+	}
+	progresses := map[string]*asyncProgress{}
+	progMut := &sync.RWMutex{}
+	addNewSim := func() (string, progReport) {
+		newID := uuid.NewV4().String()
+		progMut.Lock()
+		progresses[newID] = &asyncProgress{}
+		progMut.Unlock()
+
+		return newID, func(newProg *proto.ProgressMetrics) {
+			progresses[newID].mut.Lock()
+			progresses[newID].latestProgress = *newProg
+			progresses[newID].mut.Unlock()
+		}
+	}
+	type progReport func(progMetric *proto.ProgressMetrics)
+
+	http.HandleFunc("/statWeightsAsync", func(w http.ResponseWriter, r *http.Request) {
+		handleAsyncAPI(w, r, addNewSim)
+	})
+	http.HandleFunc("/raidSimAsync", func(w http.ResponseWriter, r *http.Request) {
+		handleAsyncAPI(w, r, addNewSim)
+	})
+	http.HandleFunc("/asyncProgress", func(w http.ResponseWriter, r *http.Request) {
+		body, err := ioutil.ReadAll(r.Body)
+		if err != nil {
+
+			return
+		}
+		msg := &proto.AsyncAPIResult{}
+		if err := googleProto.Unmarshal(body, msg); err != nil {
+			log.Printf("Failed to parse request: %s", err.Error())
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		progMut.RLock()
+		progress, ok := progresses[msg.ProgressId]
+		progMut.RUnlock()
+		if !ok {
+			w.WriteHeader(http.StatusNoContent)
+			return
+		}
+		progress.mut.Lock()
+		latest := progress.latestProgress
+		progress.mut.Unlock()
+		outbytes, err := googleProto.Marshal(&latest)
+		if err != nil {
+			log.Printf("[ERROR] Failed to marshal result: %s", err.Error())
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		if latest.FinalRaidResult != nil || latest.FinalWeightResult != nil {
+			progMut.Lock()
+			delete(progresses, msg.ProgressId)
+			progMut.Unlock()
+		}
+		w.Header().Add("Content-Type", "application/x-protobuf")
+		w.Write(outbytes)
+	})
 }
 
 func runServer(useFS bool, host string, launchBrowser bool, simName string, wasm bool, inputReader *bufio.Reader) {
@@ -55,7 +196,6 @@ func runServer(useFS bool, host string, launchBrowser bool, simName string, wasm
 	http.HandleFunc("/individualSim", handleAPI)
 	http.HandleFunc("/raidSim", handleAPI)
 	http.HandleFunc("/gearList", handleAPI)
-
 	http.HandleFunc("/", func(resp http.ResponseWriter, req *http.Request) {
 		resp.Header().Add("Cache-Control", "no-cache")
 		if strings.HasSuffix(req.URL.Path, "/tbc/") {
@@ -63,6 +203,7 @@ func runServer(useFS bool, host string, launchBrowser bool, simName string, wasm
 				<html><body><a href="/tbc/elemental_shaman">Elemental Shaman Sim</a"><br>
 				<html><body><a href="/tbc/enhancement_shaman">Enhancement Shaman Sim</a"><br>
 				<a href="/tbc/balance_druid">Balance Druid Sim</a"><br>
+				<a href="/tbc/mage">Mage Sim</a"><br>
 				<a href="/tbc/shadow_priest">Shadow Priest Sim</a"></body></html>
 		    `))
 			return
@@ -93,7 +234,8 @@ func runServer(useFS bool, host string, launchBrowser bool, simName string, wasm
 			}
 			err := cmd.Start()
 			if err != nil {
-				log.Printf("Error launching browser: %#v", err.Error())
+				fmt.Printf("Error launching browser: %#v\n", err.Error())
+				fmt.Printf("You will need to manually open your web browser to %s\n", url)
 			}
 		}()
 	}

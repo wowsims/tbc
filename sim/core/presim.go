@@ -84,7 +84,7 @@ func (sim *Simulation) runPresims(request proto.RaidSimRequest) {
 		}
 
 		// Run the presim.
-		presimResult := RunSim(*presimRequest)
+		presimResult := RunSim(*presimRequest, nil)
 
 		// Provide each Agent with their own results.
 		for partyIdx, party := range sim.Raid.Parties {
