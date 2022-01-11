@@ -70,16 +70,20 @@ var NoDebuffTarget = &proto.Target{
 	Armor:   6700,
 }
 
-var FullDebuffTarget = &proto.Target{
-	Debuffs: &proto.Debuffs{
-		BloodFrenzy:               true,
-		ExposeArmor:               proto.TristateEffect_TristateEffectImproved,
-		FaerieFire:                proto.TristateEffect_TristateEffectImproved,
-		ImprovedSealOfTheCrusader: true,
-		JudgementOfWisdom:         true,
-		Misery:                    true,
-	},
+var FullDebuffs = &proto.Debuffs{
+	BloodFrenzy:               true,
+	ExposeArmor:               proto.TristateEffect_TristateEffectImproved,
+	FaerieFire:                proto.TristateEffect_TristateEffectImproved,
+	ImprovedSealOfTheCrusader: true,
+	JudgementOfWisdom:         true,
+	Misery:                    true,
 }
+
+var FullDebuffTarget = &proto.Target{
+	Debuffs: FullDebuffs,
+	Armor:   7700,
+}
+
 var Phase2Gear = items.EquipmentSpecFromStrings([]items.ItemStringSpec{
 	{Name: "Band of the Ranger-General"},
 	{Name: "Bloodlust Brooch"},

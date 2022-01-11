@@ -8,6 +8,8 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
+const SpellIDEarthShock int32 = 25454
+const SpellIDFlameShock int32 = 25457
 const SpellIDFrostShock int32 = 25464
 
 var ShockCooldownID = core.NewCooldownID() // shared CD for all shocks
@@ -70,17 +72,12 @@ func (shaman *Shaman) newFrostShockTemplate(sim *core.Simulation) core.SimpleSpe
 func (shaman *Shaman) NewFrostShock(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
 	shock := &shaman.shockSpell
 	shaman.frostShockTemplate.Apply(shock)
-	if shaman.Focused {
-		shaman.applyFocusedEffect(shock)
-	}
 	// Set dynamic fields, i.e. the stuff we couldn't precompute.
 	shock.Target = target
 	shock.Init(sim)
 
 	return shock
 }
-
-const SpellIDEarthShock int32 = 25454
 
 func (shaman *Shaman) newEarthShockTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
 	baseManaCost := 535.0
@@ -140,9 +137,6 @@ func (shaman *Shaman) newEarthShockTemplate(sim *core.Simulation) core.SimpleSpe
 func (shaman *Shaman) NewEarthShock(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
 	shock := &shaman.shockSpell
 	shaman.earthShockTemplate.Apply(shock)
-	if shaman.Focused {
-		shaman.applyFocusedEffect(shock)
-	}
 	// Set dynamic fields, i.e. the stuff we couldn't precompute.
 	shock.Target = target
 	shock.Init(sim)

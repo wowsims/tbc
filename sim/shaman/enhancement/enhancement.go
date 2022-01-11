@@ -84,11 +84,7 @@ func (enh *EnhancementShaman) Act(sim *core.Simulation) time.Duration {
 
 	success := true
 	cost := 0.0
-	const manaReserve = 1000 // if mana goes under 1000 we will need more soon. Pop shamanistic rage.
-	if enh.CurrentMana() < manaReserve && enh.TryActivateShamanisticRage(sim) {
-		// Just wait for GCD
-		return enh.AutoAttacks.TimeUntil(sim, nil, nil, 0)
-	} else if enh.GetRemainingCD(shaman.StormstrikeCD, sim.CurrentTime) == 0 {
+	if enh.GetRemainingCD(shaman.StormstrikeCD, sim.CurrentTime) == 0 {
 		ss := enh.NewStormstrike(sim, sim.GetPrimaryTarget())
 		cost = ss.Cost.Value
 		if success = ss.Attack(sim); success {
