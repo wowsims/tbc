@@ -28,23 +28,23 @@ func TestP1FullCharacterStats(t *testing.T) {
 	})
 
 	core.CharacterStatsTest("p2Full", t, isr, stats.Stats{
-		stats.Strength:  416.7,
-		stats.Agility:   477.9,
-		stats.Stamina:   575.2,
-		stats.Intellect: 307.9,
-		stats.Spirit:    153.9,
+		stats.Strength:  519.0,
+		stats.Agility:   512.0,
+		stats.Stamina:   595.0,
+		stats.Intellect: 314.5,
+		stats.Spirit:    160.5,
 
-		stats.SpellPower: 730.5,
+		stats.SpellPower: 826.0,
 		stats.MP5:        100,
-		stats.SpellCrit:  134.9,
+		stats.SpellCrit:  136.8,
 
-		stats.AttackPower: 2434.9,
-		stats.MeleeHit:    254.6,
-		stats.MeleeCrit:   833.1,
+		stats.AttackPower: 2753.5,
+		stats.MeleeHit:    270.6,
+		stats.MeleeCrit:   893.2,
 		stats.Expertise:   35,
 
-		stats.Mana:  7661.2,
-		stats.Armor: 5383.8,
+		stats.Mana:  7765.1,
+		stats.Armor: 5452.0,
 	})
 }
 
