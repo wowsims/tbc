@@ -101,24 +101,88 @@ var FullDebuffTarget = &proto.Target{
 }
 
 var Phase2Gear = items.EquipmentSpecFromStrings([]items.ItemStringSpec{
-	{Name: "Band of the Ranger-General"},
-	{Name: "Bloodlust Brooch"},
-	{Name: "Boots of Utter Darkness"},
-	{Name: "Belt of One-Hundred Deaths"},
-	{Name: "Cataclysm Chestplate"},
-	{Name: "Cataclysm Gauntlets"},
-	{Name: "Cataclysm Helm"},
-	{Name: "Cataclysm Legplates"},
-	{Name: "Dragonspine Trophy"},
-	{Name: "Ring of Lethality"},
-	{Name: "Shoulderpads of the Stranger"},
-	{Name: "Totem of the Astral Winds"},
-	{Name: "True-Aim Stalker Bands"},
-	{Name: "Thalassian Wildercloak"},
-	{Name: "Telonicus's Pendant of Mayhem"},
-
-	{Name: "Talon of the Phoenix"},
-	{Name: "Rod of the Sun King"},
+	{
+		Name:    "Cataclysm Helm",
+		Enchant: "Glyph of Ferocity",
+		Gems: []string{
+			"Relentless Earthstorm Diamond",
+			"Bold Living Ruby",
+		},
+	},
+	{
+		Name: "Telonicus's Pendant of Mayhem",
+	},
+	{
+		Name:    "Shoulderpads of the Stranger",
+		Enchant: "Greater Inscription of Vengeance",
+		Gems: []string{
+			"Bold Living Ruby",
+		},
+	},
+	{
+		Name: "Thalassian Wildercloak",
+	},
+	{
+		Name:    "Cataclysm Chestplate",
+		Enchant: "Chest - Exceptional Stats",
+		Gems: []string{
+			"Bold Living Ruby",
+			"Sovereign Nightseye",
+			"Inscribed Noble Topaz",
+		},
+	},
+	{
+		Name:    "True-Aim Stalker Bands",
+		Enchant: "Bracer - Brawn",
+		Gems: []string{
+			"Bold Living Ruby",
+		},
+	},
+	{
+		Name:    "Cataclysm Gauntlets",
+		Enchant: "Gloves - Major Strength",
+	},
+	{
+		Name: "Belt of One-Hundred Deaths",
+		Gems: []string{
+			"Bold Living Ruby",
+			"Sovereign Nightseye",
+		},
+	},
+	{
+		Name:    "Cataclysm Legplates",
+		Enchant: "Nethercobra Leg Armor",
+		Gems: []string{
+			"Bold Living Ruby",
+		},
+	},
+	{
+		Name:    "Boots of Utter Darkness",
+		Enchant: "Enchant Boots - Cat's Swiftness",
+	},
+	{
+		Name: "Ring of Lethality",
+	},
+	{
+		Name: "Band of the Ranger-General",
+	},
+	{
+		Name: "Dragonspine Trophy",
+	},
+	{
+		Name: "Bloodlust Brooch",
+	},
+	{
+		Name:    "Talon of the Phoenix",
+		Enchant: "Weapon - Mongoose",
+	},
+	{
+		Name:    "Rod of the Sun King",
+		Enchant: "Weapon - Mongoose",
+	},
+	{
+		Name: "Totem of the Astral Winds",
+	},
 })
 
 var PreRaidGear = items.EquipmentSpecFromStrings([]items.ItemStringSpec{

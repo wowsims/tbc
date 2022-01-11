@@ -1,6 +1,6 @@
 dps_results: {
  key: "TestAverageDPS-Troll10-P2-Basic-FullBuffs-LongSingleTarget"
  value: {
-  dps: 2242.3715547415322
+  dps: 1250.632580405265
  }
 }

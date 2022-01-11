@@ -169,7 +169,7 @@ func applyBuffEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs proto.P
 var FerociousInspirationAuraID = NewAuraID()
 
 func FerociousInspirationAura(numBMHunters int32) Aura {
-	multiplier := float64(numBMHunters) * 1.03
+	multiplier := 1.0 + float64(numBMHunters)*0.03
 	return Aura{
 		ID:       FerociousInspirationAuraID,
 		ActionID: ActionID{SpellID: 31870},

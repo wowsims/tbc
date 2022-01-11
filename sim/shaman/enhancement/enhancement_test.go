@@ -77,6 +77,35 @@ func TestAllSettings(t *testing.T) {
 	})
 }
 
+func TestAllItemEffects(t *testing.T) {
+	core.RunTestSuite(t, t.Name(), &core.ItemsTestGenerator{
+		Player: &proto.Player{
+			Race:      proto.Race_RaceOrc,
+			Class:     proto.Class_ClassShaman,
+			Spec:      PlayerOptionsBasic,
+			Equipment: Phase2Gear,
+			Consumes:  FullConsumes,
+			Buffs:     FullIndividualBuffs,
+		},
+		RaidBuffs:  FullRaidBuffs,
+		PartyBuffs: FullPartyBuffs,
+		Encounter:  core.MakeSingleTargetFullDebuffEncounter(FullDebuffs),
+		SimOptions: core.DefaultSimTestOptions,
+
+		ItemFilter: core.ItemFilter{
+			ArmorTypes: []proto.ArmorType{
+				proto.ArmorType_ArmorTypeUnknown,
+				proto.ArmorType_ArmorTypeCloth,
+				proto.ArmorType_ArmorTypeLeather,
+				proto.ArmorType_ArmorTypeMail,
+			},
+			RangedWeaponTypes: []proto.RangedWeaponType{
+				proto.RangedWeaponType_RangedWeaponTypeTotem,
+			},
+		},
+	})
+}
+
 func TestAverageDPS(t *testing.T) {
 	core.RunTestSuite(t, t.Name(), &core.SettingsCombos{
 		Class: proto.Class_ClassShaman,
