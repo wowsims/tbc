@@ -216,9 +216,20 @@ func registerDrumsCD(agent Agent, partyBuffs proto.PartyBuffs, consumes proto.Co
 
 func applyDrumsOfBattle(sim *Simulation, character *Character) {
 	const hasteBonus = 80
+
+	character.AddMeleeHaste(sim, hasteBonus)
+	character.AddStat(stats.SpellHaste, hasteBonus)
 	character.SetCD(DrumsCooldownID, sim.CurrentTime+DrumsCD)
-	character.AddAuraWithTemporaryStats(sim, DrumsAuraID, DrumsOfBattleActionID, stats.SpellHaste, hasteBonus, time.Second*30)
-	// TODO: Add melee haste to drums
+
+	character.AddAura(sim, Aura{
+		ID:       DrumsAuraID,
+		ActionID: DrumsOfBattleActionID,
+		Expires:  sim.CurrentTime + time.Second*30,
+		OnExpire: func(sim *Simulation) {
+			character.AddMeleeHaste(sim, -hasteBonus)
+			character.AddStat(stats.SpellHaste, -hasteBonus)
+		},
+	})
 }
 
 func applyDrumsOfRestoration(sim *Simulation, character *Character) {

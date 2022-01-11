@@ -155,7 +155,9 @@ func ImprovedSealOfTheCrusaderAura() Aura {
 		ActionID: ActionID{SpellID: 20337},
 		OnBeforeSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect) {
 			spellEffect.BonusSpellCritRating += 3 * SpellCritRatingPerCritChance
-			// FUTURE: melee crit bonus, research actual value
+		},
+		OnBeforeMelee: func(sim *Simulation, ability *ActiveMeleeAbility, isOH bool) {
+			ability.AbilityEffect.BonusCritRating += 3 * MeleeCritRatingPerCritChance
 		},
 	}
 }
