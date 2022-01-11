@@ -71,6 +71,12 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestAllItemEffects-DesolationBattlegear"
+ value: {
+  dps: 1202.0519278927259
+ }
+}
+dps_results: {
  key: "TestAllItemEffects-DestructiveSkyfireDiamond"
  value: {
   dps: 1554.4744732921474
@@ -80,6 +86,12 @@ dps_results: {
  key: "TestAllItemEffects-DragonspineTrophy-28830"
  value: {
   dps: 1544.6740655185627
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-EbonNetherscale"
+ value: {
+  dps: 1418.0000879408265
  }
 }
 dps_results: {
@@ -122,6 +134,12 @@ dps_results: {
  key: "TestAllItemEffects-Fathom-BroochoftheTidewalker-30663"
  value: {
   dps: 1544.6740655185627
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-Felstalker"
+ value: {
+  dps: 1418.0000879408265
  }
 }
 dps_results: {
@@ -194,6 +212,12 @@ dps_results: {
  key: "TestAllItemEffects-PowerfulEarthstormDiamond"
  value: {
   dps: 1533.9067870544982
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-Primalstrike"
+ value: {
+  dps: 1418.0000879408265
  }
 }
 dps_results: {
@@ -338,6 +362,12 @@ dps_results: {
  key: "TestAllItemEffects-TotemofthePulsingEarth-29389"
  value: {
   dps: 1559.7482491491887
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-WastewalkerArmor"
+ value: {
+  dps: 1176.0452617979633
  }
 }
 dps_results: {

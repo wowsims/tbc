@@ -214,7 +214,12 @@ message RaidBuffs {
 // Buffs that affect a single party.
 message PartyBuffs {
     int32 bloodlust = 1;
+		int32 ferocious_inspiration = 22; // Number of BM hunters in party.
+
     TristateEffect moonkin_aura = 2;
+    TristateEffect leader_of_the_pack = 19;
+    TristateEffect sanctity_aura = 20;
+    bool trueshot_aura = 21;
     bool draenei_racial_melee = 3;
     bool draenei_racial_caster = 4;
 
@@ -316,6 +321,9 @@ message Debuffs {
     TristateEffect faerie_fire = 10; // Faerie Fire: -610 armor / imp 3% hit
     bool sunder_armor = 11; // Number of stacks of sunder armor: -520 armor per stack, 5 max
     bool curse_of_recklessness = 12; // -800 armor
+
+		double expose_weakness_uptime = 13;
+		double expose_weakness_hunter_agility = 14;
 }
 
 enum MobType {
