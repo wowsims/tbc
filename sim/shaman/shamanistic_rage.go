@@ -13,33 +13,54 @@ var ShamanisticRageAuraID = core.NewAuraID()
 
 var ShamanisticRageActionID = core.ActionID{SpellID: 30823}
 
-func (shaman *Shaman) TryActivateShamanisticRage(sim *core.Simulation) bool {
-	if shaman.GetRemainingCD(ShamanisticRageCD, sim.CurrentTime) > 0 {
-		return false
+func (shaman *Shaman) registerShamanisticRageCD() {
+	if !shaman.Talents.ShamanisticRage {
+		return
 	}
+
 	const proc = 0.3
 	const dur = time.Second * 15
-	const cd = time.Second * 120
-	shaman.AddAura(sim, core.Aura{
-		ID:       ShamanisticRageAuraID,
-		ActionID: ShamanisticRageActionID,
-		Expires:  sim.CurrentTime + dur,
-		OnMeleeAttack: func(sim *core.Simulation, target *core.Target, result core.MeleeHitType, ability *core.ActiveMeleeAbility, isOH bool) {
-			if result == core.MeleeHitTypeMiss {
-				return
+	const cd = time.Minute * 2
+
+	shaman.AddMajorCooldown(core.MajorCooldown{
+		ActionID:   ShamanisticRageActionID,
+		CooldownID: ShamanisticRageCD,
+		Cooldown:   cd,
+		Type:       core.CooldownTypeMana,
+		CanActivate: func(sim *core.Simulation, character *core.Character) bool {
+			return true
+		},
+		ShouldActivate: func(sim *core.Simulation, character *core.Character) bool {
+			const manaReserve = 1000 // If mana goes under 1000 we will need more soon. Pop shamanistic rage.
+			if character.CurrentMana() > manaReserve {
+				return false
 			}
-			if sim.RandomFloat("shamanistic rage") > proc {
-				return
+
+			return true
+		},
+		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
+			return func(sim *core.Simulation, character *core.Character) {
+				character.AddAura(sim, core.Aura{
+					ID:       ShamanisticRageAuraID,
+					ActionID: ShamanisticRageActionID,
+					Expires:  sim.CurrentTime + dur,
+					OnMeleeAttack: func(sim *core.Simulation, target *core.Target, result core.MeleeHitType, ability *core.ActiveMeleeAbility, isOH bool) {
+						if result == core.MeleeHitTypeMiss {
+							return
+						}
+						if sim.RandomFloat("shamanistic rage") > proc {
+							return
+						}
+						mana := character.GetStat(stats.AttackPower) * 0.3
+						if mana < 0 {
+							log.Printf("Attack power!? %0.1f", character.GetStat(stats.AttackPower))
+						}
+						character.AddMana(sim, mana, ShamanisticRageActionID, true)
+					},
+				})
+				character.Metrics.AddInstantCast(ShamanisticRageActionID)
+				character.SetCD(ShamanisticRageCD, sim.CurrentTime+cd)
 			}
-			mana := shaman.GetStat(stats.AttackPower) * 0.3
-			if mana < 0 {
-				log.Printf("Attack power!? %0.1f", shaman.GetStat(stats.AttackPower))
-			}
-			shaman.AddMana(sim, mana, ShamanisticRageActionID, true)
 		},
 	})
-
-	shaman.Metrics.AddInstantCast(ShamanisticRageActionID)
-	shaman.SetCD(ShamanisticRageCD, sim.CurrentTime+cd)
-	return true
 }
