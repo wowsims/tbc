@@ -14,15 +14,25 @@ var BasicIndividualBuffs = &proto.IndividualBuffs{
 }
 
 var StandardTalents = &proto.ShamanTalents{
+	Convection:         2,
+	Concussion:         5,
+	CallOfFlame:        3,
+	ElementalFocus:     true,
+	Reverberation:      5,
+	ImprovedFireTotems: 1,
+
+	AncestralKnowledge:      5,
 	ThunderingStrikes:       5,
 	EnhancingTotems:         2,
+	ShamanisticFocus:        true,
 	Flurry:                  5,
+	ImprovedWeaponTotems:    1,
+	ElementalWeapons:        3,
+	MentalQuickness:         3,
+	WeaponMastery:           5,
 	DualWieldSpecialization: 3,
 	Stormstrike:             true,
-	ElementalWeapons:        3,
-	WeaponMastery:           5,
 	UnleashedRage:           5,
-	ShamanisticFocus:        true,
 	ShamanisticRage:         true,
 }
 

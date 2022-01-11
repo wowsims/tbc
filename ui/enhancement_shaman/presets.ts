@@ -48,7 +48,7 @@ export const P1_PRESET = {
 	gear: EquipmentSpec.create({
 		items: [
 			ItemSpec.create({
-				id: 30190, // Cyclone
+				id: 29040, // Cyclone Helm
 				enchant: Enchants.GLYPH_OF_FEROCITY,
 				gems: [
 					Gems.RELENTLESS_EARTHSTORM_DIAMOND,
@@ -145,7 +145,7 @@ export const P2_PRESET = {
 	gear: EquipmentSpec.create({
 		items: [
 			ItemSpec.create({
-				id: 30190, // Cyclone
+				id: 30190, // Cataclysm Helm
 				enchant: Enchants.GLYPH_OF_FEROCITY,
 				gems: [
 					Gems.RELENTLESS_EARTHSTORM_DIAMOND,
