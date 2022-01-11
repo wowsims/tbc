@@ -505,11 +505,18 @@ class SelectorModal extends Component {
 				});
 			}
 
+			let numShown = 0;
       listItemElems.forEach(elem => {
         if (validItemElems.includes(elem)) {
-          elem.style.display = 'flex';
+					elem.classList.remove('hidden');
+					numShown++;
+					if (numShown % 2 == 0) {
+						elem.classList.remove('odd');
+					} else {
+						elem.classList.add('odd');
+					}
         } else {
-          elem.style.display = 'none';
+					elem.classList.add('hidden');
         }
       });
 		};
