@@ -38,7 +38,7 @@ export const P1_PRESET = {
     gear: EquipmentSpec.create({
         items: [
             ItemSpec.create({
-                id: 30190,
+                id: 29040,
                 enchant: Enchants.GLYPH_OF_FEROCITY,
                 gems: [
                     Gems.RELENTLESS_EARTHSTORM_DIAMOND,

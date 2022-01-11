@@ -152,7 +152,7 @@ export class EnhancementShamanSimUI extends IndividualSimUI {
             ],
             encounterPicker: {
                 // Whether to include 'Target Armor' in the 'Encounter' section of the settings tab.
-                showTargetArmor: false,
+                showTargetArmor: true,
                 // Whether to include 'Execute Duration (%)' in the 'Encounter' section of the settings tab.
                 showExecuteProportion: false,
                 // Whether to include 'Num Targets' in the 'Encounter' section of the settings tab.
