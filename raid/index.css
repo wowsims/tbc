@@ -1066,6 +1066,7 @@
 .results-sim-set-reference {
   cursor: pointer;
   font-size: 24px;
+  color: var(--theme-color-primary);
 }
 
 .results-sim-reference-swap {

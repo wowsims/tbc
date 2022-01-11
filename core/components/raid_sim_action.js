@@ -52,7 +52,7 @@ export class RaidSimResultsManager {
 					<span class="results-sim-dps-stdev">${dpsMetrics.stdev.toFixed(2)}</span>
 				</div>
 				<div class="results-sim-reference">
-					<span class="results-sim-set-reference fa fa-bookmark"></span>
+					<span class="results-sim-set-reference fa fa-map-pin"></span>
 					<div class="results-sim-reference-bar">
 						<span class="results-sim-reference-diff"></span>
 						<span class="results-sim-reference-text"> vs. reference</span>
