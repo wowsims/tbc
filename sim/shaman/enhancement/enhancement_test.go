@@ -28,23 +28,23 @@ func TestP1FullCharacterStats(t *testing.T) {
 	})
 
 	core.CharacterStatsTest("p2Full", t, isr, stats.Stats{
-		stats.Strength:  416.7,
-		stats.Agility:   477.9,
-		stats.Stamina:   575.2,
-		stats.Intellect: 307.9,
-		stats.Spirit:    153.9,
+		stats.Strength:  519.0,
+		stats.Agility:   512.0,
+		stats.Stamina:   595.0,
+		stats.Intellect: 314.5,
+		stats.Spirit:    160.5,
 
-		stats.SpellPower: 693.0,
+		stats.SpellPower: 826.0,
 		stats.MP5:        100,
-		stats.SpellCrit:  134.9,
+		stats.SpellCrit:  136.8,
 
-		stats.AttackPower: 2309.9,
-		stats.MeleeHit:    254.6,
-		stats.MeleeCrit:   702.7,
+		stats.AttackPower: 2753.5,
+		stats.MeleeHit:    270.6,
+		stats.MeleeCrit:   893.2,
 		stats.Expertise:   35,
 
-		stats.Mana:  7661.2,
-		stats.Armor: 5383.8,
+		stats.Mana:  7765.1,
+		stats.Armor: 5452.0,
 	})
 }
 
@@ -74,6 +74,35 @@ func TestAllSettings(t *testing.T) {
 		},
 		Encounters: core.MakeDefaultEncounterCombos(FullDebuffs),
 		SimOptions: core.DefaultSimTestOptions,
+	})
+}
+
+func TestAllItemEffects(t *testing.T) {
+	core.RunTestSuite(t, t.Name(), &core.ItemsTestGenerator{
+		Player: &proto.Player{
+			Race:      proto.Race_RaceOrc,
+			Class:     proto.Class_ClassShaman,
+			Spec:      PlayerOptionsBasic,
+			Equipment: Phase2Gear,
+			Consumes:  FullConsumes,
+			Buffs:     FullIndividualBuffs,
+		},
+		RaidBuffs:  FullRaidBuffs,
+		PartyBuffs: FullPartyBuffs,
+		Encounter:  core.MakeSingleTargetFullDebuffEncounter(FullDebuffs),
+		SimOptions: core.DefaultSimTestOptions,
+
+		ItemFilter: core.ItemFilter{
+			ArmorTypes: []proto.ArmorType{
+				proto.ArmorType_ArmorTypeUnknown,
+				proto.ArmorType_ArmorTypeCloth,
+				proto.ArmorType_ArmorTypeLeather,
+				proto.ArmorType_ArmorTypeMail,
+			},
+			RangedWeaponTypes: []proto.RangedWeaponType{
+				proto.RangedWeaponType_RangedWeaponTypeTotem,
+			},
+		},
 	})
 }
 

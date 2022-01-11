@@ -185,6 +185,12 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestAllItemEffects-Primalstrike"
+ value: {
+  dps: 1129.589611334621
+ }
+}
+dps_results: {
  key: "TestAllItemEffects-RelentlessEarthstormDiamond"
  value: {
   dps: 1410.8860569683034
@@ -302,6 +308,12 @@ dps_results: {
  key: "TestAllItemEffects-Timbal'sFocusingCrystal-34470"
  value: {
   dps: 1435.7833160224852
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-WastewalkerArmor"
+ value: {
+  dps: 830.675291653731
  }
 }
 dps_results: {

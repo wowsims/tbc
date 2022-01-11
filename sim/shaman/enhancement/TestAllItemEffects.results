@@ -1,0 +1,174 @@
+dps_results: {
+ key: "TestAllItemEffects-BracingEarthstormDiamond"
+ value: {
+  dps: 1227.7578145096352
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-BrutalEarthstormDiamond"
+ value: {
+  dps: 1226.9585845445495
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-CataclysmHarness"
+ value: {
+  dps: 1154.030790365822
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-CataclysmRegalia"
+ value: {
+  dps: 1544.2227728240175
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-ChaoticSkyfireDiamond"
+ value: {
+  dps: 1229.3667362580095
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-CycloneHarness"
+ value: {
+  dps: 1137.2760630267042
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-CycloneRegalia"
+ value: {
+  dps: 1044.886729270171
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-DestructiveSkyfireDiamond"
+ value: {
+  dps: 1229.3667362580095
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-EmberSkyfireDiamond"
+ value: {
+  dps: 1228.2018311569059
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-EnigmaticSkyfireDiamond"
+ value: {
+  dps: 1228.1283113118404
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-EternalEarthstormDiamond"
+ value: {
+  dps: 1226.9585845445495
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-Fathom-BroochoftheTidewalker-30663"
+ value: {
+  dps: 1210.2023868390309
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-ImbuedUnstableDiamond"
+ value: {
+  dps: 1228.2018311569059
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-InsightfulEarthstormDiamond"
+ value: {
+  dps: 1229.3667362580095
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-MysticalSkyfireDiamond"
+ value: {
+  dps: 1226.9585845445495
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-NaturalAlignmentCrystal-19344"
+ value: {
+  dps: 1211.8894967250308
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-PotentUnstableDiamond"
+ value: {
+  dps: 1232.9272576310439
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-PowerfulEarthstormDiamond"
+ value: {
+  dps: 1226.9585845445495
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-RelentlessEarthstormDiamond"
+ value: {
+  dps: 1228.1283113118404
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-SkycallTotem-33506"
+ value: {
+  dps: 1217.4317724337366
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-SkyshatterHarness"
+ value: {
+  dps: 1192.4973402297408
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-SkyshatterRegalia"
+ value: {
+  dps: 1022.605435467307
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-SwiftSkyfireDiamond"
+ value: {
+  dps: 1232.9272576310439
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-SwiftStarfireDiamond"
+ value: {
+  dps: 1228.0242244979981
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-SwiftWindfireDiamond"
+ value: {
+  dps: 1231.9324787832943
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-TenaciousEarthstormDiamond"
+ value: {
+  dps: 1226.9585845445495
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-ThunderingSkyfireDiamond"
+ value: {
+  dps: 1226.9585845445495
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-TidefuryRaiment"
+ value: {
+  dps: 1035.8610358167518
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-TotemofthePulsingEarth-29389"
+ value: {
+  dps: 1217.4317724337366
+ }
+}
