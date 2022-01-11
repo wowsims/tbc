@@ -2,7 +2,9 @@ import { Encounter as EncounterProto } from '/tbc/core/proto/common.js';
 import { Raid as RaidProto } from '/tbc/core/proto/api.js';
 import { TypedEvent } from '/tbc/core/typed_event.js';
 export function addRaidSimAction(simUI) {
-    simUI.addAction('DPS', 'dps-action', async () => simUI.runSim());
+    simUI.addAction('DPS', 'dps-action', async () => simUI.runSim((progress) => {
+        resultsManager.setSimProgress(progress);
+    }));
     const resultsManager = new RaidSimResultsManager(simUI);
     simUI.sim.simResultEmitter.on((eventID, simResult) => {
         resultsManager.setSimResult(eventID, simResult);
@@ -21,6 +23,18 @@ export class RaidSimResultsManager {
             this.currentChangeEmitter,
             this.referenceChangeEmitter,
         ].forEach(emitter => emitter.on(eventID => this.changeEmitter.emit(eventID)));
+    }
+    setSimProgress(progress) {
+        this.simUI.setResultsContent(`
+  <div class="results-sim">
+			<div class="results-sim-dps">
+				<span class="results-sim-dps-avg">${progress.dps.toFixed(2)}</span>
+			</div>
+			<div class="">
+				${progress.completedIterations} / ${progress.totalIterations}<br>iterations complete
+			</div>
+  </div>
+`);
     }
     setSimResult(eventID, simResult) {
         this.currentData = {

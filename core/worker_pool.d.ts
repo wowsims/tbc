@@ -9,6 +9,18 @@ export declare class WorkerPool {
     makeApiCall(requestName: string, request: Uint8Array): Promise<Uint8Array>;
     getGearList(request: GearListRequest): Promise<GearListResult>;
     computeStats(request: ComputeStatsRequest): Promise<ComputeStatsResult>;
-    statWeights(request: StatWeightsRequest): Promise<StatWeightsResult>;
-    raidSim(request: RaidSimRequest): Promise<RaidSimResult>;
+    statWeightsAsync(request: StatWeightsRequest, onProgress: Function): Promise<StatWeightsResult>;
+    raidSimAsync(request: RaidSimRequest, onProgress: Function): Promise<RaidSimResult>;
+    newProgressHandler(id: string, worker: SimWorker, onProgress: Function): (progressData: any) => void;
 }
+declare class SimWorker {
+    numTasksRunning: number;
+    private taskIdsToPromiseFuncs;
+    private worker;
+    private onReady;
+    constructor();
+    addPromiseFunc(id: string, callback: (result: any) => void, onError: (error: any) => void): void;
+    makeTaskId(): string;
+    doApiCall(requestName: string, request: Uint8Array, id: string): Promise<Uint8Array>;
+}
+export {};

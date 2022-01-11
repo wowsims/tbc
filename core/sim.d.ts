@@ -49,10 +49,10 @@ export declare class Sim {
     setModifyEncounterProto(newModFn: (encounterProto: EncounterProto) => void): void;
     getModifiedEncounterProto(): EncounterProto;
     private makeRaidSimRequest;
-    runRaidSim(eventID: EventID): Promise<SimResult>;
+    runRaidSim(eventID: EventID, onProgress: Function): Promise<SimResult>;
     runRaidSimWithLogs(eventID: EventID): Promise<SimResult>;
     private updateCharacterStats;
-    statWeights(player: Player<any>, epStats: Array<Stat>, epReferenceStat: Stat): Promise<StatWeightsResult>;
+    statWeights(player: Player<any>, epStats: Array<Stat>, epReferenceStat: Stat, onProgress: Function): Promise<StatWeightsResult>;
     getItems(slot: ItemSlot | undefined): Array<Item>;
     getEnchants(slot: ItemSlot | undefined): Array<Enchant>;
     getGems(socketColor: GemColor | undefined): Array<Gem>;

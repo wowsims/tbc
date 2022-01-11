@@ -6,7 +6,9 @@ export function addStatWeightsAction(simUI, epStats, epReferenceStat) {
     simUI.addAction('EP WEIGHTS', 'ep-weights-action', async () => {
         simUI.setResultsPending();
         const iterations = simUI.sim.getIterations();
-        const result = await simUI.player.computeStatWeights(epStats, epReferenceStat);
+        const result = await simUI.player.computeStatWeights(epStats, epReferenceStat, (progress) => {
+            resultsManager.setSimProgress(progress);
+        });
         resultsManager.setSimResult(iterations, epStats, epReferenceStat, result);
     });
 }
@@ -14,6 +16,16 @@ class StatWeightsResultsManager {
     constructor(simUI) {
         this.simUI = simUI;
         this.statsType = 'ep';
+    }
+    setSimProgress(progress) {
+        this.simUI.setResultsContent(`
+  <div class="results-sim">
+  			<div class=""> ${progress.completedSims} / ${progress.totalSims}<br>simulations complete</div>
+  			<div class="">
+				${progress.completedIterations} / ${progress.totalIterations}<br>iterations complete
+			</div>
+  </div>
+`);
     }
     setSimResult(iterations, epStats, epReferenceStat, result) {
         if (epReferenceStat == Stat.StatSpellPower) {

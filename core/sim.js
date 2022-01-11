@@ -89,7 +89,7 @@ export class Sim {
             }),
         });
     }
-    async runRaidSim(eventID) {
+    async runRaidSim(eventID, onProgress) {
         if (this.raid.isEmpty()) {
             throw new Error('Raid is empty! Try adding some players first.');
         }
@@ -98,7 +98,7 @@ export class Sim {
         }
         await this.waitForInit();
         const request = this.makeRaidSimRequest(false);
-        const result = await this.workerPool.raidSim(request);
+        var result = await this.workerPool.raidSimAsync(request, onProgress);
         const simResult = await SimResult.makeNew(request, result);
         this.simResultEmitter.emit(eventID, simResult);
         return simResult;
@@ -112,7 +112,7 @@ export class Sim {
         }
         await this.waitForInit();
         const request = this.makeRaidSimRequest(true);
-        const result = await this.workerPool.raidSim(request);
+        const result = await this.workerPool.raidSimAsync(request, () => { });
         const simResult = await SimResult.makeNew(request, result);
         this.simResultEmitter.emit(eventID, simResult);
         return simResult;
@@ -135,7 +135,7 @@ export class Sim {
                 .forEach((partyStats, partyIndex) => partyStats.players.forEach((playerStats, playerIndex) => players[partyIndex * 5 + playerIndex]?.setCurrentStats(eventID, playerStats)));
         });
     }
-    async statWeights(player, epStats, epReferenceStat) {
+    async statWeights(player, epStats, epReferenceStat, onProgress) {
         if (this.raid.isEmpty()) {
             throw new Error('Raid is empty! Try adding some players first.');
         }
@@ -160,7 +160,8 @@ export class Sim {
                 statsToWeigh: epStats,
                 epReferenceStat: epReferenceStat,
             });
-            return await this.workerPool.statWeights(request);
+            var result = await this.workerPool.statWeightsAsync(request, onProgress);
+            return result;
         }
     }
     getItems(slot) {

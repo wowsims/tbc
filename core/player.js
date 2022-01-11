@@ -130,8 +130,8 @@ export class Player {
         this.itemEPCache = new Map();
         this.enchantEPCache = new Map();
     }
-    async computeStatWeights(epStats, epReferenceStat) {
-        const result = await this.sim.statWeights(this, epStats, epReferenceStat);
+    async computeStatWeights(epStats, epReferenceStat, onProgress) {
+        const result = await this.sim.statWeights(this, epStats, epReferenceStat, onProgress);
         this.epWeights = new Stats(result.epValues);
         return result;
     }

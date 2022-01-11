@@ -618,7 +618,25 @@ addEventListener('message', async (e) => {
 		['computeStats', computeStats],
 		['gearList', gearList],
 		['raidSim', raidSim],
+		['raidSimAsync', (data) => {
+			return raidSimAsync(data, (result) => {
+				postMessage({
+					msg: "progress",
+					outputData: result,
+					id: id+"progress",
+				});
+			});
+		}],
 		['statWeights', statWeights],
+		['statWeightsAsync', (data) => {
+			return statWeightsAsync(data, (result) => {
+				postMessage({
+					msg: "progress",
+					outputData: result,
+					id: id+"progress",
+				});
+			});
+		}],
 	].forEach(funcData => {
 		const funcName = funcData[0];
 		const func = funcData[1];

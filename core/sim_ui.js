@@ -143,10 +143,10 @@ export class SimUI extends Component {
     isIndividualSim() {
         return this.rootElem.classList.contains('individual-sim-ui');
     }
-    async runSim() {
+    async runSim(onProgress) {
         this.setResultsPending();
         try {
-            const result = await this.sim.runRaidSim(TypedEvent.nextEventID());
+            const result = await this.sim.runRaidSim(TypedEvent.nextEventID(), onProgress);
         }
         catch (e) {
             this.hideAllResults();

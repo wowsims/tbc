@@ -1,5 +1,6 @@
 import { Encounter as EncounterProto } from '/tbc/core/proto/common.js';
 import { Raid as RaidProto } from '/tbc/core/proto/api.js';
+import { ProgressMetrics } from '/tbc/core/proto/api.js';
 import { SimResult } from '/tbc/core/proto_utils/sim_result.js';
 import { SimUI } from '/tbc/core/sim_ui.js';
 import { EventID, TypedEvent } from '/tbc/core/typed_event.js';
@@ -18,6 +19,7 @@ export declare class RaidSimResultsManager {
     private currentData;
     private referenceData;
     constructor(simUI: SimUI);
+    setSimProgress(progress: ProgressMetrics): void;
     setSimResult(eventID: EventID, simResult: SimResult): void;
     private updateReference;
     getCurrentData(): ReferenceData | null;

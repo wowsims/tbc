@@ -1746,3 +1746,139 @@ class StatWeightsResult$Type extends MessageType {
  * @generated MessageType for protobuf message proto.StatWeightsResult
  */
 export const StatWeightsResult = new StatWeightsResult$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class AsyncAPIResult$Type extends MessageType {
+    constructor() {
+        super("proto.AsyncAPIResult", [
+            { no: 1, name: "progress_id", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
+        ]);
+    }
+    create(value) {
+        const message = { progressId: "" };
+        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader, length, options, target) {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* string progress_id */ 1:
+                    message.progressId = reader.string();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message, writer, options) {
+        /* string progress_id = 1; */
+        if (message.progressId !== "")
+            writer.tag(1, WireType.LengthDelimited).string(message.progressId);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message proto.AsyncAPIResult
+ */
+export const AsyncAPIResult = new AsyncAPIResult$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class ProgressMetrics$Type extends MessageType {
+    constructor() {
+        super("proto.ProgressMetrics", [
+            { no: 1, name: "completed_iterations", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 2, name: "total_iterations", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 3, name: "completed_sims", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 4, name: "total_sims", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 5, name: "dps", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
+            { no: 6, name: "final_raid_result", kind: "message", T: () => RaidSimResult },
+            { no: 7, name: "final_weight_result", kind: "message", T: () => StatWeightsResult }
+        ]);
+    }
+    create(value) {
+        const message = { completedIterations: 0, totalIterations: 0, completedSims: 0, totalSims: 0, dps: 0 };
+        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader, length, options, target) {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* int32 completed_iterations */ 1:
+                    message.completedIterations = reader.int32();
+                    break;
+                case /* int32 total_iterations */ 2:
+                    message.totalIterations = reader.int32();
+                    break;
+                case /* int32 completed_sims */ 3:
+                    message.completedSims = reader.int32();
+                    break;
+                case /* int32 total_sims */ 4:
+                    message.totalSims = reader.int32();
+                    break;
+                case /* double dps */ 5:
+                    message.dps = reader.double();
+                    break;
+                case /* proto.RaidSimResult final_raid_result */ 6:
+                    message.finalRaidResult = RaidSimResult.internalBinaryRead(reader, reader.uint32(), options, message.finalRaidResult);
+                    break;
+                case /* proto.StatWeightsResult final_weight_result */ 7:
+                    message.finalWeightResult = StatWeightsResult.internalBinaryRead(reader, reader.uint32(), options, message.finalWeightResult);
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message, writer, options) {
+        /* int32 completed_iterations = 1; */
+        if (message.completedIterations !== 0)
+            writer.tag(1, WireType.Varint).int32(message.completedIterations);
+        /* int32 total_iterations = 2; */
+        if (message.totalIterations !== 0)
+            writer.tag(2, WireType.Varint).int32(message.totalIterations);
+        /* int32 completed_sims = 3; */
+        if (message.completedSims !== 0)
+            writer.tag(3, WireType.Varint).int32(message.completedSims);
+        /* int32 total_sims = 4; */
+        if (message.totalSims !== 0)
+            writer.tag(4, WireType.Varint).int32(message.totalSims);
+        /* double dps = 5; */
+        if (message.dps !== 0)
+            writer.tag(5, WireType.Bit64).double(message.dps);
+        /* proto.RaidSimResult final_raid_result = 6; */
+        if (message.finalRaidResult)
+            RaidSimResult.internalBinaryWrite(message.finalRaidResult, writer.tag(6, WireType.LengthDelimited).fork(), options).join();
+        /* proto.StatWeightsResult final_weight_result = 7; */
+        if (message.finalWeightResult)
+            StatWeightsResult.internalBinaryWrite(message.finalWeightResult, writer.tag(7, WireType.LengthDelimited).fork(), options).join();
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message proto.ProgressMetrics
+ */
+export const ProgressMetrics = new ProgressMetrics$Type();

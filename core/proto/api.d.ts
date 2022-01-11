@@ -573,6 +573,54 @@ export interface StatWeightsResult {
      */
     epValuesStdev: number[];
 }
+/**
+ * @generated from protobuf message proto.AsyncAPIResult
+ */
+export interface AsyncAPIResult {
+    /**
+     * @generated from protobuf field: string progress_id = 1;
+     */
+    progressId: string;
+}
+/**
+ * ProgressMetrics are used by all async APIs
+ *
+ * @generated from protobuf message proto.ProgressMetrics
+ */
+export interface ProgressMetrics {
+    /**
+     * @generated from protobuf field: int32 completed_iterations = 1;
+     */
+    completedIterations: number;
+    /**
+     * @generated from protobuf field: int32 total_iterations = 2;
+     */
+    totalIterations: number;
+    /**
+     * @generated from protobuf field: int32 completed_sims = 3;
+     */
+    completedSims: number;
+    /**
+     * @generated from protobuf field: int32 total_sims = 4;
+     */
+    totalSims: number;
+    /**
+     * Partial Results
+     *
+     * @generated from protobuf field: double dps = 5;
+     */
+    dps: number;
+    /**
+     * Final Results
+     *
+     * @generated from protobuf field: proto.RaidSimResult final_raid_result = 6;
+     */
+    finalRaidResult?: RaidSimResult;
+    /**
+     * @generated from protobuf field: proto.StatWeightsResult final_weight_result = 7;
+     */
+    finalWeightResult?: StatWeightsResult;
+}
 declare class Player$Type extends MessageType<Player> {
     constructor();
     create(value?: PartialMessage<Player>): Player;
@@ -824,4 +872,24 @@ declare class StatWeightsResult$Type extends MessageType<StatWeightsResult> {
  * @generated MessageType for protobuf message proto.StatWeightsResult
  */
 export declare const StatWeightsResult: StatWeightsResult$Type;
+declare class AsyncAPIResult$Type extends MessageType<AsyncAPIResult> {
+    constructor();
+    create(value?: PartialMessage<AsyncAPIResult>): AsyncAPIResult;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: AsyncAPIResult): AsyncAPIResult;
+    internalBinaryWrite(message: AsyncAPIResult, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message proto.AsyncAPIResult
+ */
+export declare const AsyncAPIResult: AsyncAPIResult$Type;
+declare class ProgressMetrics$Type extends MessageType<ProgressMetrics> {
+    constructor();
+    create(value?: PartialMessage<ProgressMetrics>): ProgressMetrics;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: ProgressMetrics): ProgressMetrics;
+    internalBinaryWrite(message: ProgressMetrics, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message proto.ProgressMetrics
+ */
+export declare const ProgressMetrics: ProgressMetrics$Type;
 export {};

@@ -31,6 +31,6 @@ export declare abstract class SimUI extends Component {
     getSettingsStorageKey(): string;
     getSavedEncounterStorageKey(): string;
     isIndividualSim(): boolean;
-    runSim(): Promise<void>;
+    runSim(onProgress: Function): Promise<void>;
     runSimOnce(): Promise<void>;
 }
