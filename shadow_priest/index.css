@@ -477,19 +477,8 @@
 .selector-modal-list {
   max-height: 70vh;
   overflow-y: scroll;
+  overflow-x: hidden;
   padding: 0;
-}
-
-.selector-modal-list li {
-  background: #666;
-}
-
-.selector-modal-list li:nth-child(odd) {
-  background: #444;
-}
-
-.selector-modal-list li:hover {
-  background: #333;
 }
 
 .selector-modal-list-item {
@@ -497,6 +486,19 @@
   align-items: center;
   padding: 2px;
   text-shadow: 2px 2px 3px black;
+  background: #666;
+}
+
+.selector-modal-list-item.hidden {
+  display: none;
+}
+
+.selector-modal-list-item.odd {
+  background: #444;
+}
+
+.selector-modal-list-item:hover {
+  background: #333;
 }
 
 .selector-modal-list-item.active .selector-modal-list-item-icon {
