@@ -169,13 +169,7 @@ export class Sim {
 
 		const request = this.makeRaidSimRequest(false);
 		
-		var result;
-		if (onProgress != null) {
-			result = await this.workerPool.raidSimAsync(request, onProgress);
-		} else {
-			result = await this.workerPool.raidSim(request);
-		}
-		
+		var result = await this.workerPool.raidSimAsync(request, onProgress);
 
 		const simResult = await SimResult.makeNew(request, result);
 		this.simResultEmitter.emit(eventID, simResult);
@@ -192,7 +186,7 @@ export class Sim {
 		await this.waitForInit();
 
 		const request = this.makeRaidSimRequest(true);
-		const result = await this.workerPool.raidSim(request);
+		const result = await this.workerPool.raidSimAsync(request, () => {});
 
 		const simResult = await SimResult.makeNew(request, result);
 		this.simResultEmitter.emit(eventID, simResult);
@@ -245,13 +239,7 @@ export class Sim {
 				statsToWeigh: epStats,
 				epReferenceStat: epReferenceStat,
 			});
-
-			var result;
-			if (onProgress != null) {
-				result = await this.workerPool.statWeightsAsync(request, onProgress);
-			} else {
-				result = await this.workerPool.statWeights(request);
-			}
+			var result = await this.workerPool.statWeightsAsync(request, onProgress);
 			return result;
 		}
 	}
