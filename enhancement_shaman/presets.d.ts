@@ -8,7 +8,17 @@ export declare const StandardTalents: {
 export declare const DefaultRotation: EnhancementShamanRotation;
 export declare const DefaultOptions: EnhancementShamanOptions;
 export declare const DefaultConsumes: Consumes;
-export declare const P2_BIS: {
+export declare const P1_PRESET: {
+    name: string;
+    tooltip: string;
+    gear: EquipmentSpec;
+};
+export declare const P2_PRESET: {
+    name: string;
+    tooltip: string;
+    gear: EquipmentSpec;
+};
+export declare const P3_PRESET: {
     name: string;
     tooltip: string;
     gear: EquipmentSpec;
