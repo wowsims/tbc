@@ -8,15 +8,14 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"os/exec"
 	"os/signal"
-	"runtime"
 	"runtime/pprof"
 	"strings"
 	"sync"
 	"syscall"
 	"time"
 
+	"github.com/pkg/browser"
 	uuid "github.com/satori/go.uuid"
 	dist "github.com/wowsims/tbc/binary_dist"
 	"github.com/wowsims/tbc/sim"
@@ -224,15 +223,7 @@ func runServer(useFS bool, host string, launchBrowser bool, simName string, wasm
 		url := fmt.Sprintf("http://localhost%s/tbc/%s", host, simName)
 		log.Printf("Launching interface on %s", url)
 		go func() {
-			var cmd *exec.Cmd
-			if runtime.GOOS == "windows" {
-				cmd = exec.Command("start", "msedge", url)
-			} else if runtime.GOOS == "darwin" {
-				cmd = exec.Command("open", url)
-			} else if runtime.GOOS == "linux" {
-				cmd = exec.Command("xdg-open", url)
-			}
-			err := cmd.Start()
+			err := browser.OpenURL(url)
 			if err != nil {
 				fmt.Printf("Error launching browser: %#v\n", err.Error())
 				fmt.Printf("You will need to manually open your web browser to %s\n", url)
