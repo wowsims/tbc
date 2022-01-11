@@ -2,6 +2,7 @@
 rwildcard=$(foreach d,$(wildcard $(1:=/*)),$(call rwildcard,$d,$2) $(filter $(subst *,%,$2),$d))
 
 OUT_DIR=dist/tbc
+GOROOT:=$(shell go env GOROOT)
 
 # Make everything. Keep this first so it's the default rule.
 $(OUT_DIR): balance_druid elemental_shaman enhancement_shaman mage shadow_priest raid
@@ -84,7 +85,8 @@ $(OUT_DIR)/lib.wasm: sim/wasm/* sim/core/proto/api.pb.go $(filter-out sim/core/i
 
 # Generic sim_worker that uses the generic lib.wasm
 $(OUT_DIR)/sim_worker.js: ui/worker/sim_worker.js
-	cp ui/worker/sim_worker.js $(OUT_DIR)
+	cat $(GOROOT)/misc/wasm/wasm_exec.js > $(OUT_DIR)/sim_worker.js
+	cat ui/worker/sim_worker.js >> $(OUT_DIR)/sim_worker.js
 
 $(OUT_DIR)/net_worker.js: ui/worker/net_worker.js
 	cp ui/worker/net_worker.js $(OUT_DIR)
@@ -102,6 +104,7 @@ binary_dist: $(OUT_DIR)
 	mkdir -p binary_dist
 	cp -r $(OUT_DIR) binary_dist/
 	rm binary_dist/tbc/lib.wasm
+	rm -rf binary_dist/tbc/assets/item_data
 
 # Builds the web server with the compiled client.
 wowsimtbc: sim/web/main.go  binary_dist devserver
