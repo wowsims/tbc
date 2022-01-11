@@ -32,11 +32,8 @@ class StatWeightsResultsManager {
   setSimProgress(progress: ProgressMetrics) {
 	this.simUI.setResultsContent(`
   <div class="results-sim">
-			<div class="results-sim-dps">
-				<span class="results-sim-dps-avg">${progress.dps.toFixed(2)}</span>
-			</div>
 			<div class="">
-				${progress.completedIterations} / ${progress.totalIterations} iterations complete
+				${progress.completedIterations} / ${progress.totalIterations}<br>iterations complete
 			</div>
   </div>
 `);

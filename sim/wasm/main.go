@@ -8,7 +8,7 @@ import (
 
 	"github.com/wowsims/tbc/sim"
 	"github.com/wowsims/tbc/sim/core"
-	"github.com/wowsims/tbc/sim/core/proto"
+	proto "github.com/wowsims/tbc/sim/core/proto"
 	googleProto "google.golang.org/protobuf/proto"
 )
 
@@ -31,12 +31,8 @@ func main() {
 }
 
 func computeStats(this js.Value, args []js.Value) interface{} {
-	// Assumes args[0] is a Uint8Array
-	data := make([]byte, args[0].Get("length").Int())
-	js.CopyBytesToGo(data, args[0])
-
 	csr := &proto.ComputeStatsRequest{}
-	if err := googleProto.Unmarshal(data, csr); err != nil {
+	if err := googleProto.Unmarshal(getArgsBinary(args[0]), csr); err != nil {
 		log.Printf("Failed to parse request: %s", err)
 		return nil
 	}
@@ -55,12 +51,8 @@ func computeStats(this js.Value, args []js.Value) interface{} {
 }
 
 func gearList(this js.Value, args []js.Value) interface{} {
-	// Assumes args[0] is a Uint8Array
-	data := make([]byte, args[0].Get("length").Int())
-	js.CopyBytesToGo(data, args[0])
-
 	glr := &proto.GearListRequest{}
-	if err := googleProto.Unmarshal(data, glr); err != nil {
+	if err := googleProto.Unmarshal(getArgsBinary(args[0]), glr); err != nil {
 		log.Printf("Failed to parse request: %s", err)
 		return nil
 	}
@@ -79,12 +71,8 @@ func gearList(this js.Value, args []js.Value) interface{} {
 }
 
 func individualSim(this js.Value, args []js.Value) interface{} {
-	// Assumes args[0] is a Uint8Array
-	data := make([]byte, args[0].Get("length").Int())
-	js.CopyBytesToGo(data, args[0])
-
 	isr := &proto.IndividualSimRequest{}
-	if err := googleProto.Unmarshal(data, isr); err != nil {
+	if err := googleProto.Unmarshal(getArgsBinary(args[0]), isr); err != nil {
 		log.Printf("Failed to parse request: %s", err)
 		return nil
 	}
@@ -103,12 +91,8 @@ func individualSim(this js.Value, args []js.Value) interface{} {
 }
 
 func raidSim(this js.Value, args []js.Value) interface{} {
-	// Assumes args[0] is a Uint8Array
-	data := make([]byte, args[0].Get("length").Int())
-	js.CopyBytesToGo(data, args[0])
-
 	rsr := &proto.RaidSimRequest{}
-	if err := googleProto.Unmarshal(data, rsr); err != nil {
+	if err := googleProto.Unmarshal(getArgsBinary(args[0]), rsr); err != nil {
 		log.Printf("Failed to parse request: %s", err)
 		return nil
 	}
@@ -127,56 +111,22 @@ func raidSim(this js.Value, args []js.Value) interface{} {
 }
 
 func raidSimAsync(this js.Value, args []js.Value) interface{} {
-	log.Printf("Started async sim")
-	// Assumes args[0] is a Uint8Array
-	data := make([]byte, args[0].Get("length").Int())
-	js.CopyBytesToGo(data, args[0])
-
 	rsr := &proto.RaidSimRequest{}
-	if err := googleProto.Unmarshal(data, rsr); err != nil {
+	if err := googleProto.Unmarshal(getArgsBinary(args[0]), rsr); err != nil {
 		log.Printf("Failed to parse request: %s", err)
 		return nil
 	}
 	reporter := make(chan *proto.ProgressMetrics, 100)
 	core.RunRaidSimAsync(rsr, reporter)
 
-reader:
-	for {
-		// TODO: cleanup so we dont collect these
-		select {
-		case progMetric, ok := <-reporter:
-			if !ok {
-				break reader
-			}
-
-			outbytes, err := googleProto.Marshal(progMetric)
-			if err != nil {
-				log.Printf("[ERROR] Failed to marshal result: %s", err.Error())
-				return nil
-			}
-
-			outArray := js.Global().Get("Uint8Array").New(len(outbytes))
-			js.CopyBytesToJS(outArray, outbytes)
-
-			args[1].Invoke(outArray)
-
-			if progMetric.FinalRaidResult != nil {
-				close(reporter)
-				return outArray
-			}
-		}
-	}
-
-	return nil
+	result := processAsyncProgress(args[1], reporter)
+	close(reporter)
+	return result
 }
 
 func statWeights(this js.Value, args []js.Value) interface{} {
-	// Assumes args[0] is a Uint8Array
-	data := make([]byte, args[0].Get("length").Int())
-	js.CopyBytesToGo(data, args[0])
-
 	swr := &proto.StatWeightsRequest{}
-	if err := googleProto.Unmarshal(data, swr); err != nil {
+	if err := googleProto.Unmarshal(getArgsBinary(args[0]), swr); err != nil {
 		log.Printf("Failed to parse request: %s", err)
 		return nil
 	}
@@ -195,18 +145,27 @@ func statWeights(this js.Value, args []js.Value) interface{} {
 }
 
 func statWeightsAsync(this js.Value, args []js.Value) interface{} {
-	// Assumes args[0] is a Uint8Array
-	data := make([]byte, args[0].Get("length").Int())
-	js.CopyBytesToGo(data, args[0])
-
 	rsr := &proto.StatWeightsRequest{}
-	if err := googleProto.Unmarshal(data, rsr); err != nil {
+	if err := googleProto.Unmarshal(getArgsBinary(args[0]), rsr); err != nil {
 		log.Printf("Failed to parse request: %s", err)
 		return nil
 	}
 	reporter := make(chan *proto.ProgressMetrics, 100)
 	core.StatWeightsAsync(rsr, reporter)
 
+	result := processAsyncProgress(args[1], reporter)
+	close(reporter)
+	return result
+}
+
+// Assumes args[0] is a Uint8Array
+func getArgsBinary(value js.Value) []byte {
+	data := make([]byte, value.Get("length").Int())
+	js.CopyBytesToGo(data, value)
+	return data
+}
+
+func processAsyncProgress(progFunc js.Value, reporter chan *proto.ProgressMetrics) js.Value {
 reader:
 	for {
 		// TODO: cleanup so we dont collect these
@@ -215,24 +174,20 @@ reader:
 			if !ok {
 				break reader
 			}
-
 			outbytes, err := googleProto.Marshal(progMetric)
 			if err != nil {
 				log.Printf("[ERROR] Failed to marshal result: %s", err.Error())
-				return nil
+				return js.Undefined()
 			}
-
 			outArray := js.Global().Get("Uint8Array").New(len(outbytes))
 			js.CopyBytesToJS(outArray, outbytes)
+			progFunc.Invoke(outArray)
 
-			args[1].Invoke(outArray)
-
-			if progMetric.FinalWeightResult != nil {
-				close(reporter)
+			if progMetric.FinalWeightResult != nil || progMetric.FinalRaidResult != nil {
 				return outArray
 			}
 		}
 	}
 
-	return nil
+	return js.Undefined()
 }

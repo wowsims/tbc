@@ -53,12 +53,12 @@ export class RaidSimResultsManager {
 				<span class="results-sim-dps-avg">${progress.dps.toFixed(2)}</span>
 			</div>
 			<div class="">
-				${progress.completedIterations} / ${progress.totalIterations} iterations complete
+				${progress.completedIterations} / ${progress.totalIterations}<br>iterations complete
 			</div>
   </div>
 `);
   }
-  
+
   setSimResult(eventID: EventID, simResult: SimResult) {
 		this.currentData = {
 			simResult: simResult,
