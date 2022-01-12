@@ -49,7 +49,7 @@ func ApplyWindfuryImbue(shaman *Shaman, mh bool, oh bool) {
 		wftempl.Offhand *= 1 + math.Round(float64(shaman.Talents.ElementalWeapons)*13.33)/100
 	}
 
-	wfTemplate := core.NewMeleeAbilittyTemplate(wftempl)
+	wfTemplate := core.NewMeleeAbilityTemplate(wftempl)
 
 	wfAtk := core.ActiveMeleeAbility{}
 	shaman.AddPermanentAura(func(sim *core.Simulation) core.Aura {

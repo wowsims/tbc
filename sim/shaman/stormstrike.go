@@ -12,7 +12,7 @@ var StormstrikeDebuffID = core.NewDebuffID()
 var StormstrikeActionID = core.ActionID{SpellID: 17364, CooldownID: StormstrikeCD}
 var SkyshatterAPBonusAuraID = core.NewAuraID()
 
-func (shaman *Shaman) newStormstrikeTemplate(sim *core.Simulation) core.MeleeAbilittyTemplate {
+func (shaman *Shaman) newStormstrikeTemplate(sim *core.Simulation) core.MeleeAbilityTemplate {
 
 	ssDebuffAura := core.Aura{
 		ID:       StormstrikeDebuffID,
@@ -76,7 +76,7 @@ func (shaman *Shaman) newStormstrikeTemplate(sim *core.Simulation) core.MeleeAbi
 	ss.MainHand *= 1 + 0.02*float64(shaman.Talents.WeaponMastery)
 	ss.Offhand *= 1 + 0.02*float64(shaman.Talents.WeaponMastery)
 
-	return core.NewMeleeAbilittyTemplate(ss)
+	return core.NewMeleeAbilityTemplate(ss)
 }
 
 func (shaman *Shaman) NewStormstrike(sim *core.Simulation, target *core.Target) *core.ActiveMeleeAbility {

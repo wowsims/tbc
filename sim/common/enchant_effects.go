@@ -23,11 +23,17 @@ var LightningSpeedOHAuraID = core.NewAuraID()
 //   A single application of the aura will handle both mh and oh procs.
 func ApplyMongooseEffect(agent core.Agent) {
 	character := agent.GetCharacter()
-	procChance, ohProcChance := core.PPMToChance(character, 1.0)
+	ppmm := character.AutoAttacks.NewPPMManager(1.0)
 	mh := character.Equip[proto.ItemSlot_ItemSlotMainHand].Enchant.ID == 22559
 	oh := character.Equip[proto.ItemSlot_ItemSlotOffHand].Enchant.ID == 22559
 	if !mh && !oh {
 		return
+	}
+	if !mh {
+		ppmm.SetProcChance(false, 0)
+	}
+	if !oh {
+		ppmm.SetProcChance(true, 0)
 	}
 
 	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
@@ -35,18 +41,22 @@ func ApplyMongooseEffect(agent core.Agent) {
 		buffs[stats.Mana] = 0 // mana is weird
 		unbuffs := buffs.Multiply(-1)
 		haste := 2 * core.HasteRatingPerHastePercent
-		applyLightningSpeed := func(sim *core.Simulation, character *core.Character, id core.AuraID) {
+
+		applyLightningSpeed := func(sim *core.Simulation, character *core.Character, isOH bool) {
 			// https://tbc.wowhead.com/spell=28093/lightning-speed
 			character.AddStats(buffs)
 			character.AddMeleeHaste(sim, haste)
 			var tag int32
-			if id == LightningSpeedMHAuraID {
+			var auraID core.AuraID
+			if !isOH {
 				tag = 0
+				auraID = LightningSpeedMHAuraID
 			} else {
 				tag = 1
+				auraID = LightningSpeedOHAuraID
 			}
 			character.AddAura(sim, core.Aura{
-				ID:       id,
+				ID:       auraID,
 				ActionID: core.ActionID{SpellID: 28093, Tag: tag},
 				Expires:  sim.CurrentTime + (time.Second * 15),
 				OnExpire: func(sim *core.Simulation) {
@@ -55,13 +65,12 @@ func ApplyMongooseEffect(agent core.Agent) {
 				},
 			})
 		}
+
 		return core.Aura{
 			ID: MongooseAuraID,
 			OnBeforeMelee: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, isOH bool) {
-				if mh && !isOH && sim.RandomFloat("mongoose") < procChance {
-					applyLightningSpeed(sim, character, LightningSpeedMHAuraID)
-				} else if oh && isOH && sim.RandomFloat("mongoose") < ohProcChance {
-					applyLightningSpeed(sim, character, LightningSpeedOHAuraID)
+				if ppmm.Proc(sim, isOH, "mongoose") {
+					applyLightningSpeed(sim, character, isOH)
 				}
 			},
 		}

@@ -533,11 +533,60 @@ func (aa *AutoAttacks) TimeUntil(sim *Simulation, cast *SimpleSpell, atk *Active
 	return nextEventTime
 }
 
-type MeleeAbilittyTemplate struct {
+type PPMManager struct {
+	mhProcChance float64
+	ohProcChance float64
+}
+
+// For manually overriding proc chance.
+func (ppmm *PPMManager) SetProcChance(isOH bool, newChance float64) {
+	if isOH {
+		ppmm.ohProcChance = newChance
+	} else {
+		ppmm.mhProcChance = newChance
+	}
+}
+
+// Returns whether the effect procced.
+func (ppmm *PPMManager) Proc(sim *Simulation, isOH bool, label string) bool {
+	if isOH {
+		return ppmm.ProcOH(sim, label)
+	} else {
+		return ppmm.ProcMH(sim, label)
+	}
+}
+
+// Returns whether the effect procced, assuming MH.
+func (ppmm *PPMManager) ProcMH(sim *Simulation, label string) bool {
+	return ppmm.mhProcChance > 0 && sim.RandomFloat(label) < ppmm.mhProcChance
+}
+
+// Returns whether the effect procced, assuming OH.
+func (ppmm *PPMManager) ProcOH(sim *Simulation, label string) bool {
+	return ppmm.ohProcChance > 0 && sim.RandomFloat(label) < ppmm.ohProcChance
+}
+
+// PPMToChance converts a character proc-per-minute into mh/oh proc chances
+func (aa *AutoAttacks) NewPPMManager(ppm float64) PPMManager {
+	if aa.mh == nil {
+		// Means this character didn't enable autoattacks.
+		return PPMManager{
+			mhProcChance: 0,
+			ohProcChance: 0,
+		}
+	}
+
+	return PPMManager{
+		mhProcChance: (aa.mh.SwingSpeed * ppm) / 60.0,
+		ohProcChance: (aa.oh.SwingSpeed * ppm) / 60.0,
+	}
+}
+
+type MeleeAbilityTemplate struct {
 	template ActiveMeleeAbility
 }
 
-func (template *MeleeAbilittyTemplate) Apply(newAction *ActiveMeleeAbility) {
+func (template *MeleeAbilityTemplate) Apply(newAction *ActiveMeleeAbility) {
 	if newAction.objectInUse {
 		panic(fmt.Sprintf("Damage over time spell (%s) already in use", newAction.Name))
 	}
@@ -545,15 +594,8 @@ func (template *MeleeAbilittyTemplate) Apply(newAction *ActiveMeleeAbility) {
 }
 
 // Takes in a cast template and returns a template, so you don't need to keep track of which things to allocate yourself.
-func NewMeleeAbilittyTemplate(spellTemplate ActiveMeleeAbility) MeleeAbilittyTemplate {
-	return MeleeAbilittyTemplate{
+func NewMeleeAbilityTemplate(spellTemplate ActiveMeleeAbility) MeleeAbilityTemplate {
+	return MeleeAbilityTemplate{
 		template: spellTemplate,
 	}
-}
-
-// PPMToChance converts a character proc-per-minute into mh/oh proc chances
-func PPMToChance(char *Character, ppm float64) (float64, float64) {
-	procChance := (char.Equip[proto.ItemSlot_ItemSlotMainHand].SwingSpeed * ppm) / 60.0
-	ohProcChance := (char.Equip[proto.ItemSlot_ItemSlotOffHand].SwingSpeed * ppm) / 60.0
-	return procChance, ohProcChance
 }
