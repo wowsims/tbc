@@ -101,7 +101,7 @@ type Shaman struct {
 	chainLightningCastTemplate    core.MultiTargetDirectDamageSpellTemplate
 	chainLightningLOCastTemplates []core.MultiTargetDirectDamageSpellTemplate
 
-	stormstrikeTemplate core.MeleeAbilittyTemplate
+	stormstrikeTemplate core.MeleeAbilityTemplate
 	stormstrikeSpell    core.ActiveMeleeAbility
 
 	// Shocks

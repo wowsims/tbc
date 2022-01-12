@@ -67,7 +67,7 @@ func ApplyDragonspineTrophy(agent core.Agent) {
 		const dur = time.Second * 10
 		const icdDur = time.Second * 20
 
-		procChance, ohProcChance := core.PPMToChance(character, 1.0)
+		ppmm := character.AutoAttacks.NewPPMManager(1.0)
 		return core.Aura{
 			ID: DragonspineTrophyAuraID,
 			OnMeleeAttack: func(sim *core.Simulation, target *core.Target, result core.MeleeHitType, ability *core.ActiveMeleeAbility, isOH bool) {
@@ -75,18 +75,13 @@ func ApplyDragonspineTrophy(agent core.Agent) {
 					return
 				}
 				if icd.IsOnCD(sim) {
-					return // dont activate
+					return
 				}
-				if !isOH {
-					if sim.RandomFloat("dragonspine") > procChance {
-						return // didn't proc
-					}
-				} else {
-					if sim.RandomFloat("dragonspine") > ohProcChance {
-						return // didn't proc
-					}
+				if !ppmm.Proc(sim, isOH, "dragonspine") {
+					return
 				}
 				icd = core.InternalCD(sim.CurrentTime + icdDur)
+
 				character.AddAuraWithTemporaryStats(sim, MeleeHasteAuraID, core.ActionID{ItemID: 28830}, stats.MeleeHaste, hasteBonus, dur)
 			},
 		}
@@ -104,7 +99,8 @@ func ApplyHourglassUnraveller(agent core.Agent) {
 		const dur = time.Second * 10
 		const icdDur = time.Second * 50
 
-		procChance, ohProcChance := core.PPMToChance(character, 1.0)
+		ppmm := character.AutoAttacks.NewPPMManager(1.0)
+
 		return core.Aura{
 			ID: HourglassUnravellerAuraID,
 			OnMeleeAttack: func(sim *core.Simulation, target *core.Target, result core.MeleeHitType, ability *core.ActiveMeleeAbility, isOH bool) {
@@ -112,16 +108,10 @@ func ApplyHourglassUnraveller(agent core.Agent) {
 					return
 				}
 				if icd.IsOnCD(sim) {
-					return // dont activate
+					return
 				}
-				if !isOH {
-					if sim.RandomFloat("hourglass") > procChance {
-						return // didn't proc
-					}
-				} else {
-					if sim.RandomFloat("hourglass") > ohProcChance {
-						return // didn't proc
-					}
+				if !ppmm.Proc(sim, isOH, "hourglass") {
+					return
 				}
 				icd = core.InternalCD(sim.CurrentTime + icdDur)
 				character.AddAuraWithTemporaryStats(sim, RageOfUnravellerAuraID, core.ActionID{ItemID: 33648}, stats.AttackPower, statBonus, dur)

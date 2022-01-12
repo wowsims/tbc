@@ -1,6 +1,7 @@
 package core
 
 import (
+	"math"
 	"time"
 
 	"github.com/wowsims/tbc/sim/core/proto"
@@ -169,7 +170,7 @@ func applyBuffEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs proto.P
 var FerociousInspirationAuraID = NewAuraID()
 
 func FerociousInspirationAura(numBMHunters int32) Aura {
-	multiplier := 1.0 + float64(numBMHunters)*0.03
+	multiplier := math.Pow(1.03, float64(numBMHunters))
 	return Aura{
 		ID:       FerociousInspirationAuraID,
 		ActionID: ActionID{SpellID: 31870},

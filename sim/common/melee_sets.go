@@ -34,7 +34,7 @@ var ItemSetDesolationBattlegear = core.ItemSet{
 				icd := core.NewICD()
 				const icdDur = time.Second * 20
 
-				procChance, ohProcChance := core.PPMToChance(character, 1.0)
+				ppmm := character.AutoAttacks.NewPPMManager(1.0)
 
 				return core.Aura{
 					ID: DesolationBattlegearAuraID,
@@ -43,16 +43,10 @@ var ItemSetDesolationBattlegear = core.ItemSet{
 							return
 						}
 						if icd.IsOnCD(sim) {
-							return // dont activate
+							return
 						}
-						if !isOH {
-							if sim.RandomFloat("Desolation Battlegear") > procChance {
-								return // didn't proc
-							}
-						} else {
-							if sim.RandomFloat("Desolation Battlegear") > ohProcChance {
-								return // didn't proc
-							}
+						if !ppmm.Proc(sim, isOH, "Desolation Battlegear") {
+							return
 						}
 						icd = core.InternalCD(sim.CurrentTime + icdDur)
 						character.AddAuraWithTemporaryStats(sim, DesolationBattlegearProcAuraID, core.ActionID{ItemID: 28192}, stats.AttackPower, apBonus, duration)
@@ -111,7 +105,7 @@ var ItemSetWastewalkerArmor = core.ItemSet{
 				icd := core.NewICD()
 				const icdDur = time.Second * 20
 
-				procChance, ohProcChance := core.PPMToChance(character, 1.0)
+				ppmm := character.AutoAttacks.NewPPMManager(1.0)
 
 				return core.Aura{
 					ID: WastewalkerArmorAuraID,
@@ -120,16 +114,10 @@ var ItemSetWastewalkerArmor = core.ItemSet{
 							return
 						}
 						if icd.IsOnCD(sim) {
-							return // dont activate
+							return
 						}
-						if !isOH {
-							if sim.RandomFloat("Wastewalker Armor") > procChance {
-								return // didn't proc
-							}
-						} else {
-							if sim.RandomFloat("Wastewalker Armor") > ohProcChance {
-								return // didn't proc
-							}
+						if !ppmm.Proc(sim, isOH, "Wastewalker Armor") {
+							return
 						}
 						icd = core.InternalCD(sim.CurrentTime + icdDur)
 						character.AddAuraWithTemporaryStats(sim, WastewalkerArmorProcAuraID, core.ActionID{ItemID: 28192}, stats.AttackPower, apBonus, duration)
