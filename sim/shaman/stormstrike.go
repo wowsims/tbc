@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
+	"github.com/wowsims/tbc/sim/core/items"
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
@@ -65,6 +66,10 @@ func (shaman *Shaman) newStormstrikeTemplate(sim *core.Simulation) core.MeleeAbi
 				shaman.Character.AddAuraWithTemporaryStats(sim, SkyshatterAPBonusAuraID, core.ActionID{SpellID: 38432}, stats.SpellPower, 70, skyshatterDur)
 			}
 		},
+	}
+
+	if shaman.Equip[items.ItemSlotRanged].ID == StormfuryTotem {
+		ss.MeleeAbility.Cost.Value -= 22
 	}
 
 	if ItemSetCycloneHarness.CharacterHasSetBonus(&shaman.Character, 4) {

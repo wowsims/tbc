@@ -401,6 +401,12 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestAllItemEffects-Stonebreaker'sTotem-33507"
+ value: {
+  dps: 1559.7482491491887
+ }
+}
+dps_results: {
  key: "TestAllItemEffects-SwiftSkyfireDiamond"
  value: {
   dps: 1533.9067870544982

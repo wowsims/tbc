@@ -66,12 +66,36 @@ func (shaman *Shaman) applyTalents() {
 		})
 	}
 
+	shaman.applyElementalDevastation()
 	shaman.applyFlurry()
 	shaman.applyShamanisticFocus()
 	shaman.applyUnleashedRage()
 	shaman.registerElementalMasteryCD()
 	shaman.registerNaturesSwiftnessCD()
 	shaman.registerShamanisticRageCD()
+}
+
+var ElementalDevastationTalentAuraID = core.NewAuraID()
+var ElementalDevastationAuraID = core.NewAuraID()
+
+func (shaman *Shaman) applyElementalDevastation() {
+	if shaman.Talents.ElementalDevastation == 0 {
+		return
+	}
+
+	critBonus := 3.0 * float64(shaman.Talents.ElementalDevastation) * core.SpellCritRatingPerCritChance
+	const dur = time.Second * 10
+
+	shaman.AddPermanentAura(func(sim *core.Simulation) core.Aura {
+		return core.Aura{
+			ID: ElementalDevastationTalentAuraID,
+			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+				if spellEffect.Crit {
+					spellCast.Character.AddAuraWithTemporaryStats(sim, ElementalDevastationAuraID, core.ActionID{ItemID: 30160}, stats.MeleeCrit, critBonus, dur)
+				}
+			},
+		}
+	})
 }
 
 var ElementalMasteryAuraID = core.NewAuraID()
@@ -237,9 +261,11 @@ func (shaman *Shaman) applyShamanisticFocus() {
 		ActionID: core.ActionID{SpellID: 43338},
 		Expires:  core.NeverExpires,
 		OnCast: func(sim *core.Simulation, cast *core.Cast) {
-			if cast.IsSpellAction(SpellIDEarthShock) || cast.IsSpellAction(SpellIDFlameShock) || cast.IsSpellAction(SpellIDFrostShock) {
-				cast.ManaCost -= cast.BaseManaCost * 0.6
+			if !cast.IsSpellAction(SpellIDEarthShock) && !cast.IsSpellAction(SpellIDFlameShock) && !cast.IsSpellAction(SpellIDFrostShock) {
+				return
 			}
+
+			cast.ManaCost -= cast.BaseManaCost * 0.6
 		},
 		OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
 			if cast.IsSpellAction(SpellIDEarthShock) || cast.IsSpellAction(SpellIDFlameShock) || cast.IsSpellAction(SpellIDFrostShock) {
