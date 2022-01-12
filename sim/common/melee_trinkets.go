@@ -22,6 +22,62 @@ func init() {
 	core.AddItemEffect(34472, ApplyShardOfContempt)
 
 	// Activatable effects. Keep these in order by item ID.
+	var KissOfTheSpiderCooldownID = core.NewCooldownID()
+	core.AddItemEffect(22954, core.MakeTemporaryStatsOnUseCDRegistration(
+		core.OffensiveTrinketActiveAuraID,
+		stats.MeleeHaste,
+		200,
+		time.Second*15,
+		core.MajorCooldown{
+			ActionID:         core.ActionID{ItemID: 22954},
+			CooldownID:       KissOfTheSpiderCooldownID,
+			Cooldown:         time.Minute * 2,
+			SharedCooldownID: core.OffensiveTrinketSharedCooldownID,
+		},
+	))
+
+	var SlayersCrestCooldownID = core.NewCooldownID()
+	core.AddItemEffect(23041, core.MakeTemporaryStatsOnUseCDRegistration(
+		core.OffensiveTrinketActiveAuraID,
+		stats.AttackPower,
+		260,
+		time.Second*20,
+		core.MajorCooldown{
+			ActionID:         core.ActionID{ItemID: 23041},
+			CooldownID:       SlayersCrestCooldownID,
+			Cooldown:         time.Minute * 2,
+			SharedCooldownID: core.OffensiveTrinketSharedCooldownID,
+		},
+	))
+
+	var FigurineNightseyePantherCooldownID = core.NewCooldownID()
+	core.AddItemEffect(24128, core.MakeTemporaryStatsOnUseCDRegistration(
+		core.OffensiveTrinketActiveAuraID,
+		stats.AttackPower,
+		320,
+		time.Second*12,
+		core.MajorCooldown{
+			ActionID:         core.ActionID{ItemID: 24128},
+			CooldownID:       FigurineNightseyePantherCooldownID,
+			Cooldown:         time.Minute * 3,
+			SharedCooldownID: core.OffensiveTrinketSharedCooldownID,
+		},
+	))
+
+	var IconOfUnyieldingCourageCooldownID = core.NewCooldownID()
+	core.AddItemEffect(28121, core.MakeTemporaryStatsOnUseCDRegistration(
+		core.OffensiveTrinketActiveAuraID,
+		stats.ArmorPenetration,
+		600,
+		time.Second*20,
+		core.MajorCooldown{
+			ActionID:         core.ActionID{ItemID: 28121},
+			CooldownID:       IconOfUnyieldingCourageCooldownID,
+			Cooldown:         time.Minute * 2,
+			SharedCooldownID: core.OffensiveTrinketSharedCooldownID,
+		},
+	))
+
 	var AbacusViolentOddsCooldownID = core.NewCooldownID()
 	core.AddItemEffect(28288, core.MakeTemporaryStatsOnUseCDRegistration(
 		core.OffensiveTrinketActiveAuraID,
@@ -46,6 +102,77 @@ func init() {
 			ActionID:         core.ActionID{ItemID: 29383},
 			CooldownID:       BloodlustBroochCooldownID,
 			Cooldown:         time.Minute * 2,
+			SharedCooldownID: core.OffensiveTrinketSharedCooldownID,
+		},
+	))
+
+	var CoreOfArkelosCooldownID = core.NewCooldownID()
+	core.AddItemEffect(29776, core.MakeTemporaryStatsOnUseCDRegistration(
+		core.OffensiveTrinketActiveAuraID,
+		stats.AttackPower,
+		200,
+		time.Second*20,
+		core.MajorCooldown{
+			ActionID:         core.ActionID{ItemID: 29776},
+			CooldownID:       CoreOfArkelosCooldownID,
+			Cooldown:         time.Minute * 2,
+			SharedCooldownID: core.OffensiveTrinketSharedCooldownID,
+		},
+	))
+
+	// TODO: Make sure +7 weapon damage is accounted for.
+	var CrystalforgedTrinketCooldownID = core.NewCooldownID()
+	core.AddItemEffect(32654, core.MakeTemporaryStatsOnUseCDRegistration(
+		core.OffensiveTrinketActiveAuraID,
+		stats.AttackPower,
+		216,
+		time.Second*10,
+		core.MajorCooldown{
+			ActionID:         core.ActionID{ItemID: 32654},
+			CooldownID:       CrystalforgedTrinketCooldownID,
+			Cooldown:         time.Minute * 1,
+			SharedCooldownID: core.OffensiveTrinketSharedCooldownID,
+		},
+	))
+
+	var BadgeOfTenacityCooldownID = core.NewCooldownID()
+	core.AddItemEffect(32658, core.MakeTemporaryStatsOnUseCDRegistration(
+		core.OffensiveTrinketActiveAuraID,
+		stats.Agility,
+		150,
+		time.Second*20,
+		core.MajorCooldown{
+			ActionID:         core.ActionID{ItemID: 32658},
+			CooldownID:       BadgeOfTenacityCooldownID,
+			Cooldown:         time.Minute * 2,
+			SharedCooldownID: core.OffensiveTrinketSharedCooldownID,
+		},
+	))
+
+	var BerserkersCallCooldownID = core.NewCooldownID()
+	core.AddItemEffect(33831, core.MakeTemporaryStatsOnUseCDRegistration(
+		core.OffensiveTrinketActiveAuraID,
+		stats.AttackPower,
+		360,
+		time.Second*20,
+		core.MajorCooldown{
+			ActionID:         core.ActionID{ItemID: 33831},
+			CooldownID:       BerserkersCallCooldownID,
+			Cooldown:         time.Minute * 2,
+			SharedCooldownID: core.OffensiveTrinketSharedCooldownID,
+		},
+	))
+
+	var FigurineShadowsongPantherCooldownID = core.NewCooldownID()
+	core.AddItemEffect(35702, core.MakeTemporaryStatsOnUseCDRegistration(
+		core.OffensiveTrinketActiveAuraID,
+		stats.AttackPower,
+		320,
+		time.Second*15,
+		core.MajorCooldown{
+			ActionID:         core.ActionID{ItemID: 35702},
+			CooldownID:       FigurineShadowsongPantherCooldownID,
+			Cooldown:         time.Second * 90,
 			SharedCooldownID: core.OffensiveTrinketSharedCooldownID,
 		},
 	))

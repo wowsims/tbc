@@ -11,6 +11,12 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestAllItemEffects-BadgeofTenacity-32658"
+ value: {
+  dps: 1338.0985636353216
+ }
+}
+dps_results: {
  key: "TestAllItemEffects-BadgeoftheSwarmguard-21670"
  value: {
   dps: 1338.0985636353216
@@ -20,6 +26,12 @@ dps_results: {
  key: "TestAllItemEffects-BandoftheEternalSage-29305"
  value: {
   dps: 1373.5191666228025
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-Berserker'sCall-33831"
+ value: {
+  dps: 1389.9245577428824
  }
 }
 dps_results: {
@@ -56,6 +68,18 @@ dps_results: {
  key: "TestAllItemEffects-ChaoticSkyfireDiamond"
  value: {
   dps: 1360.8338790551322
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-CoreofAr'kelos-29776"
+ value: {
+  dps: 1367.4508710871426
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-CrystalforgedTrinket-32654"
+ value: {
+  dps: 1350.644442469306
  }
 }
 dps_results: {
@@ -161,6 +185,18 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestAllItemEffects-Figurine-NightseyePanther-24128"
+ value: {
+  dps: 1365.9040551736473
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-Figurine-ShadowsongPanther-35702"
+ value: {
+  dps: 1382.5972977857061
+ }
+}
+dps_results: {
  key: "TestAllItemEffects-HexShrunkenHead-33829"
  value: {
   dps: 1346.5744321556322
@@ -170,6 +206,12 @@ dps_results: {
  key: "TestAllItemEffects-HourglassoftheUnraveller-28034"
  value: {
   dps: 1357.4612101506812
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-IconofUnyieldingCourage-28121"
+ value: {
+  dps: 1350.6297861763444
  }
 }
 dps_results: {
@@ -188,6 +230,12 @@ dps_results: {
  key: "TestAllItemEffects-InsightfulEarthstormDiamond"
  value: {
   dps: 1360.1896011367794
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-KissoftheSpider-22954"
+ value: {
+  dps: 1320.947711363522
  }
 }
 dps_results: {
@@ -320,6 +368,12 @@ dps_results: {
  key: "TestAllItemEffects-SkyshatterRegalia"
  value: {
   dps: 1099.00030441421
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-Slayer'sCrest-23041"
+ value: {
+  dps: 1375.2484040169725
  }
 }
 dps_results: {

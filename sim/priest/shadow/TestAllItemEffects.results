@@ -23,6 +23,12 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestAllItemEffects-BadgeofTenacity-32658"
+ value: {
+  dps: 1400.7181558440295
+ }
+}
+dps_results: {
  key: "TestAllItemEffects-BadgeoftheSwarmguard-21670"
  value: {
   dps: 1400.7181558440295
@@ -32,6 +38,12 @@ dps_results: {
  key: "TestAllItemEffects-BandoftheEternalSage-29305"
  value: {
   dps: 1446.7929861625305
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-Berserker'sCall-33831"
+ value: {
+  dps: 1400.7181558440295
  }
 }
 dps_results: {
@@ -62,6 +74,18 @@ dps_results: {
  key: "TestAllItemEffects-ChaoticSkyfireDiamond"
  value: {
   dps: 1438.2759609888724
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-CoreofAr'kelos-29776"
+ value: {
+  dps: 1400.7181558440295
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-CrystalforgedTrinket-32654"
+ value: {
+  dps: 1400.7181558440295
  }
 }
 dps_results: {
@@ -137,6 +161,18 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestAllItemEffects-Figurine-NightseyePanther-24128"
+ value: {
+  dps: 1400.7181558440295
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-Figurine-ShadowsongPanther-35702"
+ value: {
+  dps: 1393.5353421110833
+ }
+}
+dps_results: {
  key: "TestAllItemEffects-HexShrunkenHead-33829"
  value: {
   dps: 1443.2085760020218
@@ -144,6 +180,12 @@ dps_results: {
 }
 dps_results: {
  key: "TestAllItemEffects-HourglassoftheUnraveller-28034"
+ value: {
+  dps: 1400.7181558440295
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-IconofUnyieldingCourage-28121"
  value: {
   dps: 1400.7181558440295
  }
@@ -164,6 +206,12 @@ dps_results: {
  key: "TestAllItemEffects-InsightfulEarthstormDiamond"
  value: {
   dps: 1423.921639546095
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-KissoftheSpider-22954"
+ value: {
+  dps: 1400.7181558440295
  }
 }
 dps_results: {
@@ -260,6 +308,12 @@ dps_results: {
  key: "TestAllItemEffects-ShiftingNaaruSliver-34429"
  value: {
   dps: 1451.849508498735
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-Slayer'sCrest-23041"
+ value: {
+  dps: 1400.7181558440295
  }
 }
 dps_results: {
