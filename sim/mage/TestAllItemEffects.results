@@ -137,6 +137,12 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestAllItemEffects-MadnessoftheBetrayer-32505"
+ value: {
+  dps: 1445.7713844475888
+ }
+}
+dps_results: {
  key: "TestAllItemEffects-Mana-EtchedRegalia"
  value: {
   dps: 1200.5308186600305
@@ -182,6 +188,12 @@ dps_results: {
  key: "TestAllItemEffects-RobeoftheElderScribes-28602"
  value: {
   dps: 1426.333604544652
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-Romulo'sPoisonVial-28579"
+ value: {
+  dps: 1445.7713844475888
  }
 }
 dps_results: {

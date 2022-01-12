@@ -143,6 +143,12 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestAllItemEffects-MadnessoftheBetrayer-32505"
+ value: {
+  dps: 1366.215038677366
+ }
+}
+dps_results: {
  key: "TestAllItemEffects-MalorneRainment"
  value: {
   dps: 1094.423691338042
@@ -200,6 +206,12 @@ dps_results: {
  key: "TestAllItemEffects-RobeoftheElderScribes-28602"
  value: {
   dps: 1274.4644449293642
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-Romulo'sPoisonVial-28579"
+ value: {
+  dps: 1366.215038677366
  }
 }
 dps_results: {

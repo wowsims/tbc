@@ -9,24 +9,12 @@ import (
 
 func init() {
 	// Proc effects. Keep these in order by item ID.
-	core.AddItemEffect(28830, ApplyDragonspineTrophy)
 	core.AddItemEffect(28034, ApplyHourglassUnraveller)
+	core.AddItemEffect(28579, ApplyRomulosPoisonVial)
+	core.AddItemEffect(28830, ApplyDragonspineTrophy)
+	core.AddItemEffect(32505, ApplyMadnessOfTheBetrayer)
 
 	// Activatable effects. Keep these in order by item ID.
-	var BloodlustBroochCooldownID = core.NewCooldownID()
-	core.AddItemEffect(29383, core.MakeTemporaryStatsOnUseCDRegistration(
-		core.OffensiveTrinketActiveAuraID,
-		stats.AttackPower,
-		278,
-		time.Second*20,
-		core.MajorCooldown{
-			ActionID:         core.ActionID{ItemID: 29383},
-			CooldownID:       BloodlustBroochCooldownID,
-			Cooldown:         time.Minute * 2,
-			SharedCooldownID: core.OffensiveTrinketSharedCooldownID,
-		},
-	))
-
 	var AbacusViolentOddsCooldownID = core.NewCooldownID()
 	core.AddItemEffect(28288, core.MakeTemporaryStatsOnUseCDRegistration(
 		core.OffensiveTrinketActiveAuraID,
@@ -36,6 +24,20 @@ func init() {
 		core.MajorCooldown{
 			ActionID:         core.ActionID{ItemID: 28288},
 			CooldownID:       AbacusViolentOddsCooldownID,
+			Cooldown:         time.Minute * 2,
+			SharedCooldownID: core.OffensiveTrinketSharedCooldownID,
+		},
+	))
+
+	var BloodlustBroochCooldownID = core.NewCooldownID()
+	core.AddItemEffect(29383, core.MakeTemporaryStatsOnUseCDRegistration(
+		core.OffensiveTrinketActiveAuraID,
+		stats.AttackPower,
+		278,
+		time.Second*20,
+		core.MajorCooldown{
+			ActionID:         core.ActionID{ItemID: 29383},
+			CooldownID:       BloodlustBroochCooldownID,
 			Cooldown:         time.Minute * 2,
 			SharedCooldownID: core.OffensiveTrinketSharedCooldownID,
 		},
@@ -54,6 +56,90 @@ func init() {
 			SharedCooldownID: core.OffensiveTrinketSharedCooldownID,
 		},
 	))
+}
+
+var HourglassUnravellerAuraID = core.NewAuraID()
+var RageOfUnravellerAuraID = core.NewAuraID()
+
+func ApplyHourglassUnraveller(agent core.Agent) {
+	character := agent.GetCharacter()
+	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
+		icd := core.NewICD()
+		const statBonus = 300.0
+		const dur = time.Second * 10
+		const icdDur = time.Second * 50
+
+		ppmm := character.AutoAttacks.NewPPMManager(1.0)
+
+		return core.Aura{
+			ID: HourglassUnravellerAuraID,
+			OnMeleeAttack: func(sim *core.Simulation, target *core.Target, result core.MeleeHitType, ability *core.ActiveMeleeAbility, isOH bool) {
+				if result != core.MeleeHitTypeCrit {
+					return
+				}
+				if icd.IsOnCD(sim) {
+					return
+				}
+				if !ppmm.Proc(sim, isOH, "hourglass") {
+					return
+				}
+				icd = core.InternalCD(sim.CurrentTime + icdDur)
+				character.AddAuraWithTemporaryStats(sim, RageOfUnravellerAuraID, core.ActionID{ItemID: 33648}, stats.AttackPower, statBonus, dur)
+			},
+		}
+	})
+}
+
+var RomulosPoisonVialAuraID = core.NewAuraID()
+
+func ApplyRomulosPoisonVial(agent core.Agent) {
+	character := agent.GetCharacter()
+	spellObj := core.SimpleSpell{}
+
+	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
+		ppmm := character.AutoAttacks.NewPPMManager(1.0)
+
+		castTemplate := core.NewSimpleSpellTemplate(core.SimpleSpell{
+			SpellCast: core.SpellCast{
+				Cast: core.Cast{
+					ActionID:        core.ActionID{ItemID: 28579},
+					Character:       character,
+					IgnoreCooldowns: true,
+					IgnoreManaCost:  true,
+					SpellSchool:     stats.NatureSpellPower,
+					CritMultiplier:  1.5,
+				},
+			},
+			SpellHitEffect: core.SpellHitEffect{
+				SpellEffect: core.SpellEffect{
+					DamageMultiplier:       1,
+					StaticDamageMultiplier: 1,
+				},
+				DirectInput: core.DirectDamageInput{
+					MinBaseDamage: 222,
+					MaxBaseDamage: 332,
+				},
+			},
+		})
+
+		return core.Aura{
+			ID: RomulosPoisonVialAuraID,
+			OnMeleeAttack: func(sim *core.Simulation, target *core.Target, result core.MeleeHitType, ability *core.ActiveMeleeAbility, isOH bool) {
+				if result == core.MeleeHitTypeMiss || result == core.MeleeHitTypeDodge || result == core.MeleeHitTypeParry {
+					return
+				}
+				if !ppmm.Proc(sim, isOH, "RomulosPoisonVial") {
+					return
+				}
+
+				castAction := &spellObj
+				castTemplate.Apply(castAction)
+				castAction.Target = target
+				castAction.Init(sim)
+				castAction.Cast(sim)
+			},
+		}
+	})
 }
 
 var DragonspineTrophyAuraID = core.NewAuraID()
@@ -88,33 +174,27 @@ func ApplyDragonspineTrophy(agent core.Agent) {
 	})
 }
 
-var HourglassUnravellerAuraID = core.NewAuraID()
-var RageOfUnravellerAuraID = core.NewAuraID()
+var MadnessOfTheBetrayerAuraID = core.NewAuraID()
+var MadnessOfTheBetrayerProcAuraID = core.NewAuraID()
 
-func ApplyHourglassUnraveller(agent core.Agent) {
+func ApplyMadnessOfTheBetrayer(agent core.Agent) {
 	character := agent.GetCharacter()
 	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
-		icd := core.NewICD()
-		const statBonus = 300.0
+		const arPenBonus = 300
 		const dur = time.Second * 10
-		const icdDur = time.Second * 50
-
 		ppmm := character.AutoAttacks.NewPPMManager(1.0)
 
 		return core.Aura{
-			ID: HourglassUnravellerAuraID,
+			ID: MadnessOfTheBetrayerAuraID,
 			OnMeleeAttack: func(sim *core.Simulation, target *core.Target, result core.MeleeHitType, ability *core.ActiveMeleeAbility, isOH bool) {
-				if result != core.MeleeHitTypeCrit {
+				if result == core.MeleeHitTypeMiss || result == core.MeleeHitTypeDodge || result == core.MeleeHitTypeParry {
 					return
 				}
-				if icd.IsOnCD(sim) {
+				if !ppmm.Proc(sim, isOH, "Madness of the Betrayer") {
 					return
 				}
-				if !ppmm.Proc(sim, isOH, "hourglass") {
-					return
-				}
-				icd = core.InternalCD(sim.CurrentTime + icdDur)
-				character.AddAuraWithTemporaryStats(sim, RageOfUnravellerAuraID, core.ActionID{ItemID: 33648}, stats.AttackPower, statBonus, dur)
+
+				character.AddAuraWithTemporaryStats(sim, MadnessOfTheBetrayerProcAuraID, core.ActionID{ItemID: 32505}, stats.ArmorPenetration, arPenBonus, dur)
 			},
 		}
 	})
