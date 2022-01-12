@@ -11,6 +11,7 @@ import (
 func init() {
 	core.AddItemEffect(19344, ApplyNaturalAlignmentCrystal)
 	core.AddItemEffect(30663, ApplyFathomBroochOfTheTidewalker)
+	core.AddItemEffect(32491, ApplyAshtongueTalismanOfVision)
 	core.AddItemEffect(33506, ApplySkycallTotem)
 
 	core.AddItemSet(ItemSetTidefury)
@@ -188,6 +189,31 @@ func ApplyFathomBroochOfTheTidewalker(agent core.Agent) {
 				}
 				icd = core.InternalCD(sim.CurrentTime + icdDur)
 				character.AddMana(sim, 335, core.ActionID{ItemID: 30663}, false)
+			},
+		}
+	})
+}
+
+var AshtongueTalismanOfVisionAuraID = core.NewAuraID()
+var AshtongueTalismanOfVisionProcAuraID = core.NewAuraID()
+
+func ApplyAshtongueTalismanOfVision(agent core.Agent) {
+	character := agent.GetCharacter()
+	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
+		const apBonus = 275
+		const dur = time.Second * 10
+		const procChance = 0.5
+
+		return core.Aura{
+			ID: AshtongueTalismanOfVisionAuraID,
+			OnMeleeAttack: func(sim *core.Simulation, target *core.Target, result core.MeleeHitType, ability *core.ActiveMeleeAbility, isOH bool) {
+				if !ability.ActionID.SameAction(StormstrikeActionID) {
+					return
+				}
+				if sim.RandomFloat("Ashtongue Talisman of Vision") > procChance {
+					return
+				}
+				character.AddAuraWithTemporaryStats(sim, AshtongueTalismanOfVisionProcAuraID, core.ActionID{ItemID: 32491}, stats.AttackPower, apBonus, dur)
 			},
 		}
 	})

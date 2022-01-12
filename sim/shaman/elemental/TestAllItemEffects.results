@@ -5,9 +5,27 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestAllItemEffects-AshtongueTalismanofVision-32491"
+ value: {
+  dps: 1544.6740655185627
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-BadgeoftheSwarmguard-21670"
+ value: {
+  dps: 1544.6740655185627
+ }
+}
+dps_results: {
  key: "TestAllItemEffects-BandoftheEternalSage-29305"
  value: {
   dps: 1602.9110784545737
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-BlackenedNaaruSliver-34427"
+ value: {
+  dps: 1544.6740655185627
  }
 }
 dps_results: {
@@ -67,7 +85,13 @@ dps_results: {
 dps_results: {
  key: "TestAllItemEffects-DarkmoonCard:Crusade-31856"
  value: {
-  dps: 1599.3510288490634
+  dps: 1599.0192534505634
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-DarkmoonCard:Wrath-31857"
+ value: {
+  dps: 1544.6740655185627
  }
 }
 dps_results: {
@@ -185,6 +209,12 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestAllItemEffects-MarkoftheChampion-23206"
+ value: {
+  dps: 1544.6740655185627
+ }
+}
+dps_results: {
  key: "TestAllItemEffects-MarkoftheChampion-23207"
  value: {
   dps: 1604.132647568563
@@ -260,6 +290,12 @@ dps_results: {
  key: "TestAllItemEffects-SextantofUnstableCurrents-30626"
  value: {
   dps: 1584.0603558011856
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-ShardofContempt-34472"
+ value: {
+  dps: 1544.6740655185627
  }
 }
 dps_results: {
@@ -374,6 +410,12 @@ dps_results: {
  key: "TestAllItemEffects-TotemofthePulsingEarth-29389"
  value: {
   dps: 1559.7482491491887
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-TsunamiTalisman-30627"
+ value: {
+  dps: 1544.6740655185627
  }
 }
 dps_results: {

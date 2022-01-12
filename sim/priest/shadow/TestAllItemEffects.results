@@ -23,9 +23,21 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestAllItemEffects-BadgeoftheSwarmguard-21670"
+ value: {
+  dps: 1400.7181558440295
+ }
+}
+dps_results: {
  key: "TestAllItemEffects-BandoftheEternalSage-29305"
  value: {
   dps: 1446.7929861625305
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-BlackenedNaaruSliver-34427"
+ value: {
+  dps: 1400.7181558440295
  }
 }
 dps_results: {
@@ -61,7 +73,13 @@ dps_results: {
 dps_results: {
  key: "TestAllItemEffects-DarkmoonCard:Crusade-31856"
  value: {
-  dps: 1433.0434327650294
+  dps: 1432.730006706476
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-DarkmoonCard:Wrath-31857"
+ value: {
+  dps: 1400.7181558440295
  }
 }
 dps_results: {
@@ -161,6 +179,12 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestAllItemEffects-MarkoftheChampion-23206"
+ value: {
+  dps: 1400.7181558440295
+ }
+}
+dps_results: {
  key: "TestAllItemEffects-MarkoftheChampion-23207"
  value: {
   dps: 1437.3014729214674
@@ -218,6 +242,12 @@ dps_results: {
  key: "TestAllItemEffects-SextantofUnstableCurrents-30626"
  value: {
   dps: 1409.5610523664445
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-ShardofContempt-34472"
+ value: {
+  dps: 1400.7181558440295
  }
 }
 dps_results: {
@@ -302,6 +332,12 @@ dps_results: {
  key: "TestAllItemEffects-Timbal'sFocusingCrystal-34470"
  value: {
   dps: 1426.40012052924
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-TsunamiTalisman-30627"
+ value: {
+  dps: 1400.7181558440295
  }
 }
 dps_results: {

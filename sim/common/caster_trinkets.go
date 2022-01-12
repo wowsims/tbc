@@ -273,34 +273,52 @@ func ApplySextantOfUnstableCurrents(agent core.Agent) {
 }
 
 var DarkmoonCardCrusadeAuraID = core.NewAuraID()
-var AuraOfTheCrusadeAuraID = core.NewAuraID()
+var AuraOfTheCrusadeMeleeAuraID = core.NewAuraID()
+var AuraOfTheCrusadeSpellAuraID = core.NewAuraID()
 
 func ApplyDarkmoonCardCrusade(agent core.Agent) {
 	character := agent.GetCharacter()
 	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
+		const meleeBonus = 6.0
 		const spellBonus = 8.0
-		stacks := 0
+		meleeStacks := 0
+		spellStacks := 0
 
 		return core.Aura{
 			ID: DarkmoonCardCrusadeAuraID,
-			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
-				if stacks < 10 {
-					if sim.Log != nil {
-						character.Log(sim, "Darkmoon Card Crusade: %d stacks.", stacks)
-					}
-					stacks++
+			OnMeleeAttack: func(sim *core.Simulation, target *core.Target, result core.MeleeHitType, ability *core.ActiveMeleeAbility, isOH bool) {
+				if meleeStacks < 20 {
+					meleeStacks++
+					character.AddStat(stats.AttackPower, meleeBonus)
+				}
+
+				// Removal aura will refresh with new total spellpower based on stacks.
+				//  This will remove the old stack removal buff.
+				character.ReplaceAura(sim, core.Aura{
+					ID:       AuraOfTheCrusadeMeleeAuraID,
+					ActionID: core.ActionID{ItemID: 31856, Tag: 1},
+					Expires:  sim.CurrentTime + time.Second*10,
+					OnExpire: func(sim *core.Simulation) {
+						character.AddStat(stats.AttackPower, -meleeBonus*float64(meleeStacks))
+						meleeStacks = 0
+					},
+				})
+			},
+			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+				if spellStacks < 10 {
+					spellStacks++
 					character.AddStat(stats.SpellPower, spellBonus)
 				}
 
 				// Removal aura will refresh with new total spellpower based on stacks.
 				//  This will remove the old stack removal buff.
 				character.ReplaceAura(sim, core.Aura{
-					ID:       AuraOfTheCrusadeAuraID,
-					ActionID: core.ActionID{SpellID: 39441},
+					ID:       AuraOfTheCrusadeSpellAuraID,
+					ActionID: core.ActionID{ItemID: 31856, Tag: 2},
 					Expires:  sim.CurrentTime + time.Second*10,
 					OnExpire: func(sim *core.Simulation) {
-						character.AddStat(stats.SpellPower, -spellBonus*float64(stacks))
-						stacks = 0
+						character.AddStat(stats.SpellPower, -spellBonus*float64(spellStacks))
+						spellStacks = 0
 					},
 				})
 			},
