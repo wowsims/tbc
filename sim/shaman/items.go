@@ -13,6 +13,7 @@ func init() {
 	core.AddItemEffect(30663, ApplyFathomBroochOfTheTidewalker)
 	core.AddItemEffect(32491, ApplyAshtongueTalismanOfVision)
 	core.AddItemEffect(33506, ApplySkycallTotem)
+	core.AddItemEffect(33507, ApplyStonebreakersTotem)
 
 	core.AddItemSet(ItemSetTidefury)
 	core.AddItemSet(ItemSetCycloneRegalia)
@@ -236,6 +237,34 @@ func ApplySkycallTotem(agent core.Agent) {
 					return
 				}
 				character.AddAuraWithTemporaryStats(sim, EnergizedAuraID, core.ActionID{ItemID: 33506}, stats.SpellHaste, hasteBonus, dur)
+			},
+		}
+	})
+}
+
+var StonebreakersTotemAuraID = core.NewAuraID()
+var ElementalStrengthAuraID = core.NewAuraID()
+
+func ApplyStonebreakersTotem(agent core.Agent) {
+	character := agent.GetCharacter()
+	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
+		const apBonus = 110
+		const dur = time.Second * 10
+		const procChance = 0.5
+
+		return core.Aura{
+			ID:      StonebreakersTotemAuraID,
+			Expires: core.NeverExpires,
+			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
+				if !cast.IsSpellAction(SpellIDEarthShock) && !cast.IsSpellAction(SpellIDFlameShock) && !cast.IsSpellAction(SpellIDFrostShock) {
+					return
+				}
+
+				if sim.RandomFloat("Stonebreakers Totem") > procChance {
+					return
+				}
+
+				cast.Character.AddAuraWithTemporaryStats(sim, ElementalStrengthAuraID, core.ActionID{ItemID: 33507}, stats.AttackPower, apBonus, dur)
 			},
 		}
 	})

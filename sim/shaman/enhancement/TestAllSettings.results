@@ -13,7 +13,7 @@ dps_results: {
 dps_results: {
  key: "TestAllSettings-Troll10-P2-Basic-FullBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 1017.1562784263921
+  dps: 978.2461354747545
  }
 }
 dps_results: {
@@ -37,7 +37,7 @@ dps_results: {
 dps_results: {
  key: "TestAllSettings-Troll10-P2-Basic-NoBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 521.942408044603
+  dps: 627.5552491766708
  }
 }
 dps_results: {
