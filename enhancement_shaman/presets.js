@@ -14,8 +14,12 @@ import * as Tooltips from '/tbc/core/constants/tooltips.js';
 // Default talents. Uses the wowhead calculator format, make the talents on
 // https://tbc.wowhead.com/talent-calc and copy the numbers in the url.
 export const StandardTalents = {
-    name: 'Standard',
+    name: 'Ele Sub',
     data: '250031501-500520210501133531151',
+};
+export const RestoSubspecTalents = {
+    name: 'Resto Sub',
+    data: '02-502500210502133531151-05005301',
 };
 export const DefaultRotation = EnhancementShamanRotation.create({
     type: RotationType.Basic,

@@ -5,6 +5,10 @@ export declare const StandardTalents: {
     name: string;
     data: string;
 };
+export declare const RestoSubspecTalents: {
+    name: string;
+    data: string;
+};
 export declare const DefaultRotation: EnhancementShamanRotation;
 export declare const DefaultOptions: EnhancementShamanOptions;
 export declare const DefaultConsumes: Consumes;
