@@ -23,9 +23,33 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestAllItemEffects-BadgeofTenacity-32658"
+ value: {
+  dps: 1400.7181558440295
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-BadgeoftheSwarmguard-21670"
+ value: {
+  dps: 1400.7181558440295
+ }
+}
+dps_results: {
  key: "TestAllItemEffects-BandoftheEternalSage-29305"
  value: {
   dps: 1446.7929861625305
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-Berserker'sCall-33831"
+ value: {
+  dps: 1400.7181558440295
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-BlackenedNaaruSliver-34427"
+ value: {
+  dps: 1400.7181558440295
  }
 }
 dps_results: {
@@ -53,6 +77,18 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestAllItemEffects-CoreofAr'kelos-29776"
+ value: {
+  dps: 1400.7181558440295
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-CrystalforgedTrinket-32654"
+ value: {
+  dps: 1400.7181558440295
+ }
+}
+dps_results: {
  key: "TestAllItemEffects-DarkIronSmokingPipe-38290"
  value: {
   dps: 1431.7406432957018
@@ -61,7 +97,13 @@ dps_results: {
 dps_results: {
  key: "TestAllItemEffects-DarkmoonCard:Crusade-31856"
  value: {
-  dps: 1433.0434327650294
+  dps: 1432.730006706476
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-DarkmoonCard:Wrath-31857"
+ value: {
+  dps: 1400.7181558440295
  }
 }
 dps_results: {
@@ -119,6 +161,18 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestAllItemEffects-Figurine-NightseyePanther-24128"
+ value: {
+  dps: 1400.7181558440295
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-Figurine-ShadowsongPanther-35702"
+ value: {
+  dps: 1393.5353421110833
+ }
+}
+dps_results: {
  key: "TestAllItemEffects-HexShrunkenHead-33829"
  value: {
   dps: 1443.2085760020218
@@ -126,6 +180,12 @@ dps_results: {
 }
 dps_results: {
  key: "TestAllItemEffects-HourglassoftheUnraveller-28034"
+ value: {
+  dps: 1400.7181558440295
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-IconofUnyieldingCourage-28121"
  value: {
   dps: 1400.7181558440295
  }
@@ -149,6 +209,12 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestAllItemEffects-KissoftheSpider-22954"
+ value: {
+  dps: 1400.7181558440295
+ }
+}
+dps_results: {
  key: "TestAllItemEffects-MadnessoftheBetrayer-32505"
  value: {
   dps: 1400.7181558440295
@@ -158,6 +224,12 @@ dps_results: {
  key: "TestAllItemEffects-Mana-EtchedRegalia"
  value: {
   dps: 1216.205297498028
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-MarkoftheChampion-23206"
+ value: {
+  dps: 1400.7181558440295
  }
 }
 dps_results: {
@@ -221,6 +293,12 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestAllItemEffects-ShardofContempt-34472"
+ value: {
+  dps: 1400.7181558440295
+ }
+}
+dps_results: {
  key: "TestAllItemEffects-Shiffar'sNexus-Horn-28418"
  value: {
   dps: 1424.4726538690213
@@ -230,6 +308,12 @@ dps_results: {
  key: "TestAllItemEffects-ShiftingNaaruSliver-34429"
  value: {
   dps: 1451.849508498735
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-Slayer'sCrest-23041"
+ value: {
+  dps: 1400.7181558440295
  }
 }
 dps_results: {
@@ -302,6 +386,12 @@ dps_results: {
  key: "TestAllItemEffects-Timbal'sFocusingCrystal-34470"
  value: {
   dps: 1426.40012052924
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-TsunamiTalisman-30627"
+ value: {
+  dps: 1400.7181558440295
  }
 }
 dps_results: {

@@ -4,17 +4,80 @@ import (
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
+	"github.com/wowsims/tbc/sim/core/proto"
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 func init() {
 	// Proc effects. Keep these in order by item ID.
+	core.AddItemEffect(21670, ApplyBadgeOfTheSwarmguard)
+	core.AddItemEffect(23206, ApplyMarkOfTheChampionMelee)
 	core.AddItemEffect(28034, ApplyHourglassUnraveller)
 	core.AddItemEffect(28579, ApplyRomulosPoisonVial)
 	core.AddItemEffect(28830, ApplyDragonspineTrophy)
+	core.AddItemEffect(30627, ApplyTsunamiTalisman)
+	core.AddItemEffect(31857, ApplyDarkmoonCardWrath)
 	core.AddItemEffect(32505, ApplyMadnessOfTheBetrayer)
+	core.AddItemEffect(34427, ApplyBlackenedNaaruSliver)
+	core.AddItemEffect(34472, ApplyShardOfContempt)
 
 	// Activatable effects. Keep these in order by item ID.
+	var KissOfTheSpiderCooldownID = core.NewCooldownID()
+	core.AddItemEffect(22954, core.MakeTemporaryStatsOnUseCDRegistration(
+		core.OffensiveTrinketActiveAuraID,
+		stats.MeleeHaste,
+		200,
+		time.Second*15,
+		core.MajorCooldown{
+			ActionID:         core.ActionID{ItemID: 22954},
+			CooldownID:       KissOfTheSpiderCooldownID,
+			Cooldown:         time.Minute * 2,
+			SharedCooldownID: core.OffensiveTrinketSharedCooldownID,
+		},
+	))
+
+	var SlayersCrestCooldownID = core.NewCooldownID()
+	core.AddItemEffect(23041, core.MakeTemporaryStatsOnUseCDRegistration(
+		core.OffensiveTrinketActiveAuraID,
+		stats.AttackPower,
+		260,
+		time.Second*20,
+		core.MajorCooldown{
+			ActionID:         core.ActionID{ItemID: 23041},
+			CooldownID:       SlayersCrestCooldownID,
+			Cooldown:         time.Minute * 2,
+			SharedCooldownID: core.OffensiveTrinketSharedCooldownID,
+		},
+	))
+
+	var FigurineNightseyePantherCooldownID = core.NewCooldownID()
+	core.AddItemEffect(24128, core.MakeTemporaryStatsOnUseCDRegistration(
+		core.OffensiveTrinketActiveAuraID,
+		stats.AttackPower,
+		320,
+		time.Second*12,
+		core.MajorCooldown{
+			ActionID:         core.ActionID{ItemID: 24128},
+			CooldownID:       FigurineNightseyePantherCooldownID,
+			Cooldown:         time.Minute * 3,
+			SharedCooldownID: core.OffensiveTrinketSharedCooldownID,
+		},
+	))
+
+	var IconOfUnyieldingCourageCooldownID = core.NewCooldownID()
+	core.AddItemEffect(28121, core.MakeTemporaryStatsOnUseCDRegistration(
+		core.OffensiveTrinketActiveAuraID,
+		stats.ArmorPenetration,
+		600,
+		time.Second*20,
+		core.MajorCooldown{
+			ActionID:         core.ActionID{ItemID: 28121},
+			CooldownID:       IconOfUnyieldingCourageCooldownID,
+			Cooldown:         time.Minute * 2,
+			SharedCooldownID: core.OffensiveTrinketSharedCooldownID,
+		},
+	))
+
 	var AbacusViolentOddsCooldownID = core.NewCooldownID()
 	core.AddItemEffect(28288, core.MakeTemporaryStatsOnUseCDRegistration(
 		core.OffensiveTrinketActiveAuraID,
@@ -43,6 +106,77 @@ func init() {
 		},
 	))
 
+	var CoreOfArkelosCooldownID = core.NewCooldownID()
+	core.AddItemEffect(29776, core.MakeTemporaryStatsOnUseCDRegistration(
+		core.OffensiveTrinketActiveAuraID,
+		stats.AttackPower,
+		200,
+		time.Second*20,
+		core.MajorCooldown{
+			ActionID:         core.ActionID{ItemID: 29776},
+			CooldownID:       CoreOfArkelosCooldownID,
+			Cooldown:         time.Minute * 2,
+			SharedCooldownID: core.OffensiveTrinketSharedCooldownID,
+		},
+	))
+
+	// TODO: Make sure +7 weapon damage is accounted for.
+	var CrystalforgedTrinketCooldownID = core.NewCooldownID()
+	core.AddItemEffect(32654, core.MakeTemporaryStatsOnUseCDRegistration(
+		core.OffensiveTrinketActiveAuraID,
+		stats.AttackPower,
+		216,
+		time.Second*10,
+		core.MajorCooldown{
+			ActionID:         core.ActionID{ItemID: 32654},
+			CooldownID:       CrystalforgedTrinketCooldownID,
+			Cooldown:         time.Minute * 1,
+			SharedCooldownID: core.OffensiveTrinketSharedCooldownID,
+		},
+	))
+
+	var BadgeOfTenacityCooldownID = core.NewCooldownID()
+	core.AddItemEffect(32658, core.MakeTemporaryStatsOnUseCDRegistration(
+		core.OffensiveTrinketActiveAuraID,
+		stats.Agility,
+		150,
+		time.Second*20,
+		core.MajorCooldown{
+			ActionID:         core.ActionID{ItemID: 32658},
+			CooldownID:       BadgeOfTenacityCooldownID,
+			Cooldown:         time.Minute * 2,
+			SharedCooldownID: core.OffensiveTrinketSharedCooldownID,
+		},
+	))
+
+	var BerserkersCallCooldownID = core.NewCooldownID()
+	core.AddItemEffect(33831, core.MakeTemporaryStatsOnUseCDRegistration(
+		core.OffensiveTrinketActiveAuraID,
+		stats.AttackPower,
+		360,
+		time.Second*20,
+		core.MajorCooldown{
+			ActionID:         core.ActionID{ItemID: 33831},
+			CooldownID:       BerserkersCallCooldownID,
+			Cooldown:         time.Minute * 2,
+			SharedCooldownID: core.OffensiveTrinketSharedCooldownID,
+		},
+	))
+
+	var FigurineShadowsongPantherCooldownID = core.NewCooldownID()
+	core.AddItemEffect(35702, core.MakeTemporaryStatsOnUseCDRegistration(
+		core.OffensiveTrinketActiveAuraID,
+		stats.AttackPower,
+		320,
+		time.Second*15,
+		core.MajorCooldown{
+			ActionID:         core.ActionID{ItemID: 35702},
+			CooldownID:       FigurineShadowsongPantherCooldownID,
+			Cooldown:         time.Second * 90,
+			SharedCooldownID: core.OffensiveTrinketSharedCooldownID,
+		},
+	))
+
 	var EmptyDirebrewMugCooldownID = core.NewCooldownID()
 	core.AddItemEffect(38287, core.MakeTemporaryStatsOnUseCDRegistration(
 		core.OffensiveTrinketActiveAuraID,
@@ -58,18 +192,82 @@ func init() {
 	))
 }
 
+var BadgeOfTheSwarmguardAuraID = core.NewAuraID()
+var BadgeOfTheSwarmguardProcAuraID = core.NewAuraID()
+var BadgeOfTheSwarmguardCooldownID = core.NewCooldownID()
+var BadgeOfTheSwarmguardActionID = core.ActionID{ItemID: 21670}
+
+func ApplyBadgeOfTheSwarmguard(agent core.Agent) {
+	character := agent.GetCharacter()
+	character.AddMajorCooldown(core.MajorCooldown{
+		ActionID:         BadgeOfTheSwarmguardActionID,
+		CooldownID:       BadgeOfTheSwarmguardCooldownID,
+		Cooldown:         time.Minute * 3,
+		SharedCooldownID: core.OffensiveTrinketSharedCooldownID,
+		Type:             core.CooldownTypeDPS,
+		CanActivate: func(sim *core.Simulation, character *core.Character) bool {
+			return true
+		},
+		ShouldActivate: func(sim *core.Simulation, character *core.Character) bool {
+			return true
+		},
+		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
+			return func(sim *core.Simulation, character *core.Character) {
+				const arPenBonus = 200.0
+				const dur = time.Second * 30
+				stacks := 0
+
+				character.AddAura(sim, core.Aura{
+					ID:       BadgeOfTheSwarmguardProcAuraID,
+					ActionID: BadgeOfTheSwarmguardActionID,
+					Expires:  sim.CurrentTime + dur,
+					OnMeleeAttack: func(sim *core.Simulation, target *core.Target, result core.MeleeHitType, ability *core.ActiveMeleeAbility, isOH bool) {
+						if result == core.MeleeHitTypeMiss || result == core.MeleeHitTypeDodge || result == core.MeleeHitTypeParry {
+							return
+						}
+
+						if stacks < 6 {
+							character.AddStat(stats.ArmorPenetration, arPenBonus)
+							stacks++
+						}
+					},
+					OnExpire: func(sim *core.Simulation) {
+						character.AddStat(stats.ArmorPenetration, -arPenBonus*float64(stacks))
+						stacks = 0
+					},
+				})
+			}
+		},
+	})
+}
+
+var MarkOfTheChampionMeleeAuraID = core.NewAuraID()
+
+func ApplyMarkOfTheChampionMelee(agent core.Agent) {
+	agent.GetCharacter().AddPermanentAura(func(sim *core.Simulation) core.Aura {
+		return core.Aura{
+			ID: MarkOfTheChampionMeleeAuraID,
+			OnBeforeMelee: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, isOH bool) {
+				if ability.Target.MobType == proto.MobType_MobTypeDemon || ability.Target.MobType == proto.MobType_MobTypeUndead {
+					ability.BonusAttackPower += 150
+				}
+			},
+		}
+	})
+}
+
 var HourglassUnravellerAuraID = core.NewAuraID()
 var RageOfUnravellerAuraID = core.NewAuraID()
 
 func ApplyHourglassUnraveller(agent core.Agent) {
 	character := agent.GetCharacter()
 	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
-		icd := core.NewICD()
 		const statBonus = 300.0
 		const dur = time.Second * 10
-		const icdDur = time.Second * 50
+		const procChance = 0.1
 
-		ppmm := character.AutoAttacks.NewPPMManager(1.0)
+		icd := core.NewICD()
+		const icdDur = time.Second * 50
 
 		return core.Aura{
 			ID: HourglassUnravellerAuraID,
@@ -80,11 +278,12 @@ func ApplyHourglassUnraveller(agent core.Agent) {
 				if icd.IsOnCD(sim) {
 					return
 				}
-				if !ppmm.Proc(sim, isOH, "hourglass") {
+				if sim.RandomFloat("Hourglass of the Unraveller") > procChance {
 					return
 				}
+
 				icd = core.InternalCD(sim.CurrentTime + icdDur)
-				character.AddAuraWithTemporaryStats(sim, RageOfUnravellerAuraID, core.ActionID{ItemID: 33648}, stats.AttackPower, statBonus, dur)
+				character.AddAuraWithTemporaryStats(sim, RageOfUnravellerAuraID, core.ActionID{ItemID: 28034}, stats.AttackPower, statBonus, dur)
 			},
 		}
 	})
@@ -174,6 +373,65 @@ func ApplyDragonspineTrophy(agent core.Agent) {
 	})
 }
 
+var TsunamiTalismanAuraID = core.NewAuraID()
+var TsunamiTalismanProcAuraID = core.NewAuraID()
+
+func ApplyTsunamiTalisman(agent core.Agent) {
+	character := agent.GetCharacter()
+	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
+		const apBonus = 340
+		const dur = time.Second * 10
+		const procChance = 0.1
+
+		icd := core.NewICD()
+		const icdDur = time.Second * 45
+
+		return core.Aura{
+			ID: TsunamiTalismanAuraID,
+			OnMeleeAttack: func(sim *core.Simulation, target *core.Target, result core.MeleeHitType, ability *core.ActiveMeleeAbility, isOH bool) {
+				if result == core.MeleeHitTypeMiss || result == core.MeleeHitTypeDodge || result == core.MeleeHitTypeParry {
+					return
+				}
+				if icd.IsOnCD(sim) {
+					return
+				}
+				if sim.RandomFloat("Madness of the Betrayer") > procChance {
+					return
+				}
+
+				icd = core.InternalCD(sim.CurrentTime + icdDur)
+				character.AddAuraWithTemporaryStats(sim, TsunamiTalismanProcAuraID, core.ActionID{ItemID: 30627}, stats.AttackPower, apBonus, dur)
+			},
+		}
+	})
+}
+
+var DarkmoonCardWrathAuraID = core.NewAuraID()
+
+func ApplyDarkmoonCardWrath(agent core.Agent) {
+	character := agent.GetCharacter()
+	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
+		const critBonus = 17.0
+		stacks := 0
+
+		return core.Aura{
+			ID: DarkmoonCardWrathAuraID,
+			OnMeleeAttack: func(sim *core.Simulation, target *core.Target, result core.MeleeHitType, ability *core.ActiveMeleeAbility, isOH bool) {
+				if result == core.MeleeHitTypeCrit {
+					removeAmount := -1 * critBonus * float64(stacks)
+					character.AddStat(stats.MeleeCrit, removeAmount)
+					character.AddStat(stats.SpellCrit, removeAmount)
+					stacks = 0
+				} else {
+					character.AddStat(stats.MeleeCrit, critBonus)
+					character.AddStat(stats.SpellCrit, critBonus)
+					stacks++
+				}
+			},
+		}
+	})
+}
+
 var MadnessOfTheBetrayerAuraID = core.NewAuraID()
 var MadnessOfTheBetrayerProcAuraID = core.NewAuraID()
 
@@ -195,6 +453,93 @@ func ApplyMadnessOfTheBetrayer(agent core.Agent) {
 				}
 
 				character.AddAuraWithTemporaryStats(sim, MadnessOfTheBetrayerProcAuraID, core.ActionID{ItemID: 32505}, stats.ArmorPenetration, arPenBonus, dur)
+			},
+		}
+	})
+}
+
+var BlackenedNaaruSliverAuraID = core.NewAuraID()
+var BlackenedNaaruSliverProcAuraID = core.NewAuraID()
+
+func ApplyBlackenedNaaruSliver(agent core.Agent) {
+	character := agent.GetCharacter()
+	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
+		const procChance = 0.1
+
+		icd := core.NewICD()
+		const icdDur = time.Second * 45
+
+		return core.Aura{
+			ID: BlackenedNaaruSliverAuraID,
+			OnMeleeAttack: func(sim *core.Simulation, target *core.Target, result core.MeleeHitType, ability *core.ActiveMeleeAbility, isOH bool) {
+				if result == core.MeleeHitTypeMiss || result == core.MeleeHitTypeDodge || result == core.MeleeHitTypeParry {
+					return
+				}
+				if icd.IsOnCD(sim) {
+					return
+				}
+				if sim.RandomFloat("Blackened Naaru Sliver") > procChance {
+					return
+				}
+
+				icd = core.InternalCD(sim.CurrentTime + icdDur)
+
+				const apBonus = 44.0
+				const dur = time.Second * 20
+				stacks := 0
+
+				character.AddAura(sim, core.Aura{
+					ID:       BlackenedNaaruSliverProcAuraID,
+					ActionID: core.ActionID{ItemID: 34427},
+					Expires:  sim.CurrentTime + dur,
+					OnMeleeAttack: func(sim *core.Simulation, target *core.Target, result core.MeleeHitType, ability *core.ActiveMeleeAbility, isOH bool) {
+						if result == core.MeleeHitTypeMiss || result == core.MeleeHitTypeDodge || result == core.MeleeHitTypeParry {
+							return
+						}
+
+						if stacks < 10 {
+							character.AddStat(stats.AttackPower, apBonus)
+							stacks++
+						}
+					},
+					OnExpire: func(sim *core.Simulation) {
+						character.AddStat(stats.AttackPower, -apBonus*float64(stacks))
+						stacks = 0
+					},
+				})
+			},
+		}
+	})
+}
+
+var ShardOfContemptAuraID = core.NewAuraID()
+var ShardOfContemptProcAuraID = core.NewAuraID()
+
+func ApplyShardOfContempt(agent core.Agent) {
+	character := agent.GetCharacter()
+	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
+		const apBonus = 230
+		const dur = time.Second * 20
+		const procChance = 0.1
+
+		icd := core.NewICD()
+		const icdDur = time.Second * 45
+
+		return core.Aura{
+			ID: ShardOfContemptAuraID,
+			OnMeleeAttack: func(sim *core.Simulation, target *core.Target, result core.MeleeHitType, ability *core.ActiveMeleeAbility, isOH bool) {
+				if result == core.MeleeHitTypeMiss || result == core.MeleeHitTypeDodge || result == core.MeleeHitTypeParry {
+					return
+				}
+				if icd.IsOnCD(sim) {
+					return
+				}
+				if sim.RandomFloat("Shard of Contempt") > procChance {
+					return
+				}
+
+				icd = core.InternalCD(sim.CurrentTime + icdDur)
+				character.AddAuraWithTemporaryStats(sim, ShardOfContemptProcAuraID, core.ActionID{ItemID: 34472}, stats.AttackPower, apBonus, dur)
 			},
 		}
 	})

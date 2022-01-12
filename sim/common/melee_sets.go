@@ -30,11 +30,10 @@ var ItemSetDesolationBattlegear = core.ItemSet{
 			character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 				const apBonus = 160.0
 				const duration = time.Second * 15
+				const procChance = 0.01
 
 				icd := core.NewICD()
 				const icdDur = time.Second * 20
-
-				ppmm := character.AutoAttacks.NewPPMManager(1.0)
 
 				return core.Aura{
 					ID: DesolationBattlegearAuraID,
@@ -45,7 +44,7 @@ var ItemSetDesolationBattlegear = core.ItemSet{
 						if icd.IsOnCD(sim) {
 							return
 						}
-						if !ppmm.Proc(sim, isOH, "Desolation Battlegear") {
+						if sim.RandomFloat("Desolation Battlegear") > procChance {
 							return
 						}
 						icd = core.InternalCD(sim.CurrentTime + icdDur)
@@ -101,11 +100,10 @@ var ItemSetWastewalkerArmor = core.ItemSet{
 			character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 				const apBonus = 160.0
 				const duration = time.Second * 15
+				const procChance = 0.02
 
 				icd := core.NewICD()
 				const icdDur = time.Second * 20
-
-				ppmm := character.AutoAttacks.NewPPMManager(1.0)
 
 				return core.Aura{
 					ID: WastewalkerArmorAuraID,
@@ -116,7 +114,7 @@ var ItemSetWastewalkerArmor = core.ItemSet{
 						if icd.IsOnCD(sim) {
 							return
 						}
-						if !ppmm.Proc(sim, isOH, "Wastewalker Armor") {
+						if sim.RandomFloat("Wastewalker Armor") > procChance {
 							return
 						}
 						icd = core.InternalCD(sim.CurrentTime + icdDur)
