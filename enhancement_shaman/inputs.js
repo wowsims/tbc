@@ -1,6 +1,7 @@
 import { BooleanPicker } from '/tbc/core/components/boolean_picker.js';
+import { EnumPicker } from '/tbc/core/components/enum_picker.js';
 import { IconEnumPicker } from '/tbc/core/components/icon_enum_picker.js';
-import { AirTotem, EarthTotem, FireTotem, WaterTotem, EnhancementShaman_Rotation_RotationType as RotationType, ShamanTotems } from '/tbc/core/proto/shaman.js';
+import { AirTotem, EarthTotem, FireTotem, WaterTotem, EnhancementShaman_Rotation_PrimaryShock as PrimaryShock, ShamanTotems } from '/tbc/core/proto/shaman.js';
 import { ActionId } from '/tbc/core/proto_utils/action_id.js';
 // Configuration for spec-specific UI elements on the settings tab.
 // These don't need to be in a separate file but it keeps things cleaner.
@@ -12,25 +13,45 @@ export const IconWaterShield = makeBooleanShamanBuffInput(ActionId.fromSpellId(3
 export const EnhancementShamanRotationConfig = {
     inputs: [
         {
-            type: 'enum', cssClass: 'rotation-enum-picker',
+            type: 'enum', cssClass: 'primary-shock-picker',
             getModObject: (simUI) => simUI.player,
             config: {
-                label: 'Type',
+                label: 'Primary Shock',
                 values: [
                     {
-                        name: 'Basic', value: RotationType.Basic,
-                        tooltip: 'does basic stuff',
+                        name: 'None', value: PrimaryShock.None,
+                    },
+                    {
+                        name: 'Earth Shock', value: PrimaryShock.Earth,
+                    },
+                    {
+                        name: 'Frost Shock', value: PrimaryShock.Frost,
                     },
                 ],
                 changedEvent: (player) => player.rotationChangeEmitter,
-                getValue: (player) => player.getRotation().type,
+                getValue: (player) => player.getRotation().primaryShock,
                 setValue: (eventID, player, newValue) => {
                     const newRotation = player.getRotation();
-                    newRotation.type = newValue;
+                    newRotation.primaryShock = newValue;
                     player.setRotation(eventID, newRotation);
                 },
             },
-        }
+        },
+        {
+            type: 'boolean', cssClass: 'weave-flame-shock-picker',
+            getModObject: (simUI) => simUI.player,
+            config: {
+                label: 'Weave Flame Shock',
+                labelTooltip: 'Use Flame Shock whenever the target does not already have the DoT.',
+                changedEvent: (player) => player.rotationChangeEmitter,
+                getValue: (player) => player.getRotation().weaveFlameShock,
+                setValue: (eventID, player, newValue) => {
+                    const newRotation = player.getRotation();
+                    newRotation.weaveFlameShock = newValue;
+                    player.setRotation(eventID, newRotation);
+                },
+            },
+        },
     ],
 };
 function makeBooleanShamanBuffInput(id, optionsFieldName) {
@@ -142,6 +163,27 @@ export function TotemsSection(simUI, parentElem) {
             if (!newRotation.totems)
                 newRotation.totems = ShamanTotems.create();
             newRotation.totems.water = newValue;
+            player.setRotation(eventID, newRotation);
+        },
+    });
+    const windfuryRankPicker = new EnumPicker(totemDropdownsContainer, simUI.player, {
+        extraCssClasses: [
+            'windfury-rank-picker',
+        ],
+        values: [
+            { name: '1', value: 1 },
+            { name: '2', value: 2 },
+            { name: '3', value: 3 },
+            { name: '4', value: 4 },
+            { name: '5', value: 5 },
+        ],
+        changedEvent: (player) => player.rotationChangeEmitter,
+        getValue: (player) => player.getRotation().totems?.windfuryRank || 0,
+        setValue: (eventID, player, newValue) => {
+            const newRotation = player.getRotation();
+            if (!newRotation.totems)
+                newRotation.totems = ShamanTotems.create();
+            newRotation.totems.windfuryRank = newValue;
             player.setRotation(eventID, newRotation);
         },
     });

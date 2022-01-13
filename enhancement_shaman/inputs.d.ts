@@ -1,5 +1,5 @@
 import { IconPickerConfig } from '/tbc/core/components/icon_picker.js';
-import { EnhancementShaman_Rotation_RotationType as RotationType } from '/tbc/core/proto/shaman.js';
+import { EnhancementShaman_Rotation_PrimaryShock as PrimaryShock } from '/tbc/core/proto/shaman.js';
 import { Spec } from '/tbc/core/proto/common.js';
 import { Player } from '/tbc/core/player.js';
 import { IndividualSimUI } from '/tbc/core/individual_sim_ui.js';
@@ -7,7 +7,7 @@ import { EventID, TypedEvent } from '/tbc/core/typed_event.js';
 export declare const IconBloodlust: IconPickerConfig<Player<any>, boolean>;
 export declare const IconWaterShield: IconPickerConfig<Player<any>, boolean>;
 export declare const EnhancementShamanRotationConfig: {
-    inputs: {
+    inputs: ({
         type: "enum";
         cssClass: string;
         getModObject: (simUI: IndividualSimUI<any>) => Player<any>;
@@ -15,13 +15,25 @@ export declare const EnhancementShamanRotationConfig: {
             label: string;
             values: {
                 name: string;
-                value: RotationType;
-                tooltip: string;
+                value: PrimaryShock;
             }[];
             changedEvent: (player: Player<Spec.SpecEnhancementShaman>) => TypedEvent<void>;
-            getValue: (player: Player<Spec.SpecEnhancementShaman>) => RotationType;
+            getValue: (player: Player<Spec.SpecEnhancementShaman>) => PrimaryShock;
             setValue: (eventID: EventID, player: Player<Spec.SpecEnhancementShaman>, newValue: number) => void;
+            labelTooltip?: undefined;
         };
-    }[];
+    } | {
+        type: "boolean";
+        cssClass: string;
+        getModObject: (simUI: IndividualSimUI<any>) => Player<any>;
+        config: {
+            label: string;
+            labelTooltip: string;
+            changedEvent: (player: Player<Spec.SpecEnhancementShaman>) => TypedEvent<void>;
+            getValue: (player: Player<Spec.SpecEnhancementShaman>) => boolean;
+            setValue: (eventID: EventID, player: Player<Spec.SpecEnhancementShaman>, newValue: boolean) => void;
+            values?: undefined;
+        };
+    })[];
 };
 export declare function TotemsSection(simUI: IndividualSimUI<Spec.SpecEnhancementShaman>, parentElem: HTMLElement): string;

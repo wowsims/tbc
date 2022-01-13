@@ -34,19 +34,23 @@ export var ElementalShaman_Rotation_RotationType;
     ElementalShaman_Rotation_RotationType[ElementalShaman_Rotation_RotationType["LBOnly"] = 5] = "LBOnly";
 })(ElementalShaman_Rotation_RotationType || (ElementalShaman_Rotation_RotationType = {}));
 /**
- * @generated from protobuf enum proto.EnhancementShaman.Rotation.RotationType
+ * @generated from protobuf enum proto.EnhancementShaman.Rotation.PrimaryShock
  */
-export var EnhancementShaman_Rotation_RotationType;
-(function (EnhancementShaman_Rotation_RotationType) {
+export var EnhancementShaman_Rotation_PrimaryShock;
+(function (EnhancementShaman_Rotation_PrimaryShock) {
     /**
-     * @generated from protobuf enum value: Unknown = 0;
+     * @generated from protobuf enum value: None = 0;
      */
-    EnhancementShaman_Rotation_RotationType[EnhancementShaman_Rotation_RotationType["Unknown"] = 0] = "Unknown";
+    EnhancementShaman_Rotation_PrimaryShock[EnhancementShaman_Rotation_PrimaryShock["None"] = 0] = "None";
     /**
-     * @generated from protobuf enum value: Basic = 1;
+     * @generated from protobuf enum value: Earth = 1;
      */
-    EnhancementShaman_Rotation_RotationType[EnhancementShaman_Rotation_RotationType["Basic"] = 1] = "Basic";
-})(EnhancementShaman_Rotation_RotationType || (EnhancementShaman_Rotation_RotationType = {}));
+    EnhancementShaman_Rotation_PrimaryShock[EnhancementShaman_Rotation_PrimaryShock["Earth"] = 1] = "Earth";
+    /**
+     * @generated from protobuf enum value: Frost = 2;
+     */
+    EnhancementShaman_Rotation_PrimaryShock[EnhancementShaman_Rotation_PrimaryShock["Frost"] = 2] = "Frost";
+})(EnhancementShaman_Rotation_PrimaryShock || (EnhancementShaman_Rotation_PrimaryShock = {}));
 /**
  * @generated from protobuf enum proto.EarthTotem
  */
@@ -425,6 +429,7 @@ class ShamanTotems$Type extends MessageType {
             { no: 3, name: "fire", kind: "enum", T: () => ["proto.FireTotem", FireTotem] },
             { no: 4, name: "water", kind: "enum", T: () => ["proto.WaterTotem", WaterTotem] },
             { no: 5, name: "twist_windfury", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 11, name: "windfury_rank", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 6, name: "twist_fire_nova", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 7, name: "use_mana_tide", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 8, name: "use_fire_elemental", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
@@ -433,7 +438,7 @@ class ShamanTotems$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { earth: 0, air: 0, fire: 0, water: 0, twistWindfury: false, twistFireNova: false, useManaTide: false, useFireElemental: false, recallFireElementalOnOom: false, recallTotems: false };
+        const message = { earth: 0, air: 0, fire: 0, water: 0, twistWindfury: false, windfuryRank: 0, twistFireNova: false, useManaTide: false, useFireElemental: false, recallFireElementalOnOom: false, recallTotems: false };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -458,6 +463,9 @@ class ShamanTotems$Type extends MessageType {
                     break;
                 case /* bool twist_windfury */ 5:
                     message.twistWindfury = reader.bool();
+                    break;
+                case /* int32 windfury_rank */ 11:
+                    message.windfuryRank = reader.int32();
                     break;
                 case /* bool twist_fire_nova */ 6:
                     message.twistFireNova = reader.bool();
@@ -501,6 +509,9 @@ class ShamanTotems$Type extends MessageType {
         /* bool twist_windfury = 5; */
         if (message.twistWindfury !== false)
             writer.tag(5, WireType.Varint).bool(message.twistWindfury);
+        /* int32 windfury_rank = 11; */
+        if (message.windfuryRank !== 0)
+            writer.tag(11, WireType.Varint).int32(message.windfuryRank);
         /* bool twist_fire_nova = 6; */
         if (message.twistFireNova !== false)
             writer.tag(6, WireType.Varint).bool(message.twistFireNova);
@@ -781,12 +792,13 @@ export const EnhancementShaman = new EnhancementShaman$Type();
 class EnhancementShaman_Rotation$Type extends MessageType {
     constructor() {
         super("proto.EnhancementShaman.Rotation", [
-            { no: 1, name: "type", kind: "enum", T: () => ["proto.EnhancementShaman.Rotation.RotationType", EnhancementShaman_Rotation_RotationType] },
-            { no: 2, name: "totems", kind: "message", T: () => ShamanTotems }
+            { no: 1, name: "totems", kind: "message", T: () => ShamanTotems },
+            { no: 2, name: "primary_shock", kind: "enum", T: () => ["proto.EnhancementShaman.Rotation.PrimaryShock", EnhancementShaman_Rotation_PrimaryShock] },
+            { no: 3, name: "weave_flame_shock", kind: "scalar", T: 8 /*ScalarType.BOOL*/ }
         ]);
     }
     create(value) {
-        const message = { type: 0 };
+        const message = { primaryShock: 0, weaveFlameShock: false };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -797,11 +809,14 @@ class EnhancementShaman_Rotation$Type extends MessageType {
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
-                case /* proto.EnhancementShaman.Rotation.RotationType type */ 1:
-                    message.type = reader.int32();
-                    break;
-                case /* proto.ShamanTotems totems */ 2:
+                case /* proto.ShamanTotems totems */ 1:
                     message.totems = ShamanTotems.internalBinaryRead(reader, reader.uint32(), options, message.totems);
+                    break;
+                case /* proto.EnhancementShaman.Rotation.PrimaryShock primary_shock */ 2:
+                    message.primaryShock = reader.int32();
+                    break;
+                case /* bool weave_flame_shock */ 3:
+                    message.weaveFlameShock = reader.bool();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -815,12 +830,15 @@ class EnhancementShaman_Rotation$Type extends MessageType {
         return message;
     }
     internalBinaryWrite(message, writer, options) {
-        /* proto.EnhancementShaman.Rotation.RotationType type = 1; */
-        if (message.type !== 0)
-            writer.tag(1, WireType.Varint).int32(message.type);
-        /* proto.ShamanTotems totems = 2; */
+        /* proto.ShamanTotems totems = 1; */
         if (message.totems)
-            ShamanTotems.internalBinaryWrite(message.totems, writer.tag(2, WireType.LengthDelimited).fork(), options).join();
+            ShamanTotems.internalBinaryWrite(message.totems, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+        /* proto.EnhancementShaman.Rotation.PrimaryShock primary_shock = 2; */
+        if (message.primaryShock !== 0)
+            writer.tag(2, WireType.Varint).int32(message.primaryShock);
+        /* bool weave_flame_shock = 3; */
+        if (message.weaveFlameShock !== false)
+            writer.tag(3, WireType.Varint).bool(message.weaveFlameShock);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

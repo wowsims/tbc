@@ -4,7 +4,7 @@ import { EquipmentSpec } from '/tbc/core/proto/common.js';
 import { ItemSpec } from '/tbc/core/proto/common.js';
 import { Potions } from '/tbc/core/proto/common.js';
 import { EnhancementShaman_Rotation as EnhancementShamanRotation, EnhancementShaman_Options as EnhancementShamanOptions } from '/tbc/core/proto/shaman.js';
-import { EnhancementShaman_Rotation_RotationType as RotationType } from '/tbc/core/proto/shaman.js';
+import { EnhancementShaman_Rotation_PrimaryShock as PrimaryShock } from '/tbc/core/proto/shaman.js';
 import * as Enchants from '/tbc/core/constants/enchants.js';
 import * as Gems from '/tbc/core/proto_utils/gems.js';
 import * as Tooltips from '/tbc/core/constants/tooltips.js';
@@ -15,14 +15,15 @@ import * as Tooltips from '/tbc/core/constants/tooltips.js';
 // https://tbc.wowhead.com/talent-calc and copy the numbers in the url.
 export const StandardTalents = {
     name: 'Ele Sub',
-    data: '250031501-500520210501133531151',
+    data: '250030501-500500212502133531151',
 };
 export const RestoSubspecTalents = {
     name: 'Resto Sub',
-    data: '02-502500210502133531151-05005301',
+    data: '-502520210502133531151-05005301',
 };
 export const DefaultRotation = EnhancementShamanRotation.create({
-    type: RotationType.Basic,
+    primaryShock: PrimaryShock.Frost,
+    weaveFlameShock: true,
 });
 export const DefaultOptions = EnhancementShamanOptions.create({
     waterShield: true,

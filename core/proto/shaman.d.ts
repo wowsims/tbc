@@ -182,6 +182,12 @@ export interface ShamanTotems {
      */
     twistWindfury: boolean;
     /**
+     * Rank of Windfury Totem to cast, if using Windfury Totem.
+     *
+     * @generated from protobuf field: int32 windfury_rank = 11;
+     */
+    windfuryRank: number;
+    /**
      * If set, will twist fire nova with whichever fire totem is selected.
      *
      * @generated from protobuf field: bool twist_fire_nova = 6;
@@ -324,26 +330,34 @@ export interface EnhancementShaman {
  */
 export interface EnhancementShaman_Rotation {
     /**
-     * @generated from protobuf field: proto.EnhancementShaman.Rotation.RotationType type = 1;
-     */
-    type: EnhancementShaman_Rotation_RotationType;
-    /**
-     * @generated from protobuf field: proto.ShamanTotems totems = 2;
+     * @generated from protobuf field: proto.ShamanTotems totems = 1;
      */
     totems?: ShamanTotems;
+    /**
+     * @generated from protobuf field: proto.EnhancementShaman.Rotation.PrimaryShock primary_shock = 2;
+     */
+    primaryShock: EnhancementShaman_Rotation_PrimaryShock;
+    /**
+     * @generated from protobuf field: bool weave_flame_shock = 3;
+     */
+    weaveFlameShock: boolean;
 }
 /**
- * @generated from protobuf enum proto.EnhancementShaman.Rotation.RotationType
+ * @generated from protobuf enum proto.EnhancementShaman.Rotation.PrimaryShock
  */
-export declare enum EnhancementShaman_Rotation_RotationType {
+export declare enum EnhancementShaman_Rotation_PrimaryShock {
     /**
-     * @generated from protobuf enum value: Unknown = 0;
+     * @generated from protobuf enum value: None = 0;
      */
-    Unknown = 0,
+    None = 0,
     /**
-     * @generated from protobuf enum value: Basic = 1;
+     * @generated from protobuf enum value: Earth = 1;
      */
-    Basic = 1
+    Earth = 1,
+    /**
+     * @generated from protobuf enum value: Frost = 2;
+     */
+    Frost = 2
 }
 /**
  * @generated from protobuf message proto.EnhancementShaman.Options

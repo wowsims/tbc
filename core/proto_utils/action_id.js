@@ -120,6 +120,14 @@ export class ActionId {
                     }
                 }
                 break;
+            case 'Darkmoon Card: Crusade':
+                if (this.tag == 1) {
+                    name += ' (Melee)';
+                }
+                else if (this.tag == 2) {
+                    name += ' (Spell)';
+                }
+                break;
             default:
                 if (this.tag == 10) {
                     name += ' (Auto)';
