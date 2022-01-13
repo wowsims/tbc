@@ -6,9 +6,7 @@ import (
 )
 
 var BasicRaidBuffs = &proto.RaidBuffs{}
-var BasicPartyBuffs = &proto.PartyBuffs{
-	Bloodlust: 1,
-}
+var BasicPartyBuffs = &proto.PartyBuffs{}
 var BasicIndividualBuffs = &proto.IndividualBuffs{
 	BlessingOfKings: true,
 }
@@ -56,8 +54,10 @@ var enhShamRotation = &proto.EnhancementShaman_Rotation{
 }
 
 var enhShamOptions = &proto.EnhancementShaman_Options{
-	WaterShield: true,
-	Bloodlust:   true,
+	WaterShield:   true,
+	Bloodlust:     true,
+	MainHandImbue: proto.ShamanWeaponImbue_ImbueWindfury,
+	OffHandImbue:  proto.ShamanWeaponImbue_ImbueFlametongue,
 }
 
 var FullRaidBuffs = &proto.RaidBuffs{

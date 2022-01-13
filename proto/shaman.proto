@@ -105,6 +105,14 @@ message ShamanTotems {
 		bool recall_totems = 10;
 }
 
+enum ShamanWeaponImbue {
+	ImbueNone = 0;
+	ImbueFlametongue = 1;
+	ImbueFrostbrand = 2;
+	ImbueRockbiter = 3;
+	ImbueWindfury = 4;
+}
+
 message ElementalShaman {
     message Rotation {
       enum RotationType {
@@ -152,8 +160,11 @@ message EnhancementShaman {
   }
 
   message Options {
-      bool water_shield = 1;
-      bool bloodlust = 2;
+		bool water_shield = 1;
+		bool bloodlust = 2;
+
+		ShamanWeaponImbue main_hand_imbue = 3;
+		ShamanWeaponImbue off_hand_imbue = 4;
   }
 
   Rotation rotation = 1;

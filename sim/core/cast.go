@@ -40,6 +40,11 @@ type Cast struct {
 	// If set, this spell will have its mana cost ignored.
 	IgnoreManaCost bool
 
+	// Whether this is a phantom cast. Phantom casts are usually casts triggered by some effect,
+	// like The Lightning Capacitor or Shaman Flametongue Weapon. Many on-hit effects do not
+	// proc from phantom casts, only regular casts.
+	IsPhantom bool
+
 	// Base mana cost. Many effects in the game which 'reduce mana cost by X%'
 	// are calculated using the base mana cost. Any effects which reduce the base
 	// mana cost should be applied before setting this value, and OnCast()
