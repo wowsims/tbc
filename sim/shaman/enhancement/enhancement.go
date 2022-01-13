@@ -49,7 +49,8 @@ func NewEnhancementShaman(character core.Character, options proto.Player) *Enhan
 		}
 	}
 	enh := &EnhancementShaman{
-		Shaman: shaman.NewShaman(character, *enhOptions.Talents, selfBuffs),
+		Shaman:   shaman.NewShaman(character, *enhOptions.Talents, selfBuffs),
+		Rotation: *enhOptions.Rotation,
 	}
 	// Enable Auto Attacks for this spec
 	enh.EnableAutoAttacks()
@@ -65,6 +66,8 @@ func NewEnhancementShaman(character core.Character, options proto.Player) *Enhan
 
 type EnhancementShaman struct {
 	*shaman.Shaman
+
+	Rotation proto.EnhancementShaman_Rotation
 }
 
 func (enh *EnhancementShaman) GetShaman() *shaman.Shaman {
@@ -82,19 +85,31 @@ func (enh *EnhancementShaman) Act(sim *core.Simulation) time.Duration {
 		return enh.AutoAttacks.TimeUntil(sim, nil, nil, dropTime)
 	}
 
+	target := sim.GetPrimaryTarget()
+
 	success := true
 	cost := 0.0
-	if enh.GetRemainingCD(shaman.StormstrikeCD, sim.CurrentTime) == 0 {
-		ss := enh.NewStormstrike(sim, sim.GetPrimaryTarget())
+	if !enh.IsOnCD(shaman.StormstrikeCD, sim.CurrentTime) {
+		ss := enh.NewStormstrike(sim, target)
 		cost = ss.Cost.Value
 		if success = ss.Attack(sim); success {
 			return enh.AutoAttacks.TimeUntil(sim, nil, ss, 0)
 		}
-	} else if enh.GetRemainingCD(shaman.ShockCooldownID, sim.CurrentTime) == 0 {
-		shock := enh.NewEarthShock(sim, sim.GetPrimaryTarget())
-		cost = shock.ManaCost
-		if success = shock.Cast(sim); success {
-			return enh.AutoAttacks.TimeUntil(sim, shock, nil, 0)
+	} else if !enh.IsOnCD(shaman.ShockCooldownID, sim.CurrentTime) {
+		var shock *core.SimpleSpell
+		if enh.Rotation.WeaveFlameShock && !enh.FlameShockSpell.IsInUse() {
+			shock = enh.NewFlameShock(sim, target)
+		} else if enh.Rotation.PrimaryShock == proto.EnhancementShaman_Rotation_Earth {
+			shock = enh.NewEarthShock(sim, target)
+		} else if enh.Rotation.PrimaryShock == proto.EnhancementShaman_Rotation_Frost {
+			shock = enh.NewFrostShock(sim, target)
+		}
+
+		if shock != nil {
+			cost = shock.ManaCost
+			if success = shock.Cast(sim); success {
+				return enh.AutoAttacks.TimeUntil(sim, shock, nil, 0)
+			}
 		}
 	}
 	if !success {
@@ -104,10 +119,14 @@ func (enh *EnhancementShaman) Act(sim *core.Simulation) time.Duration {
 	}
 
 	// Do nothing, just swing axes until next CD available
-	nextCD := enh.GetRemainingCD(shaman.StormstrikeCD, sim.CurrentTime)
+	ssCD := enh.GetRemainingCD(shaman.StormstrikeCD, sim.CurrentTime)
 	shockCD := enh.GetRemainingCD(shaman.ShockCooldownID, sim.CurrentTime)
-	if shockCD < nextCD {
+
+	nextCD := ssCD
+	// If we're not using any shocks the CD will be ready, but we don't want to return 0.
+	if shockCD != 0 && shockCD < ssCD {
 		nextCD = shockCD
 	}
+
 	return enh.AutoAttacks.TimeUntil(sim, nil, nil, sim.CurrentTime+nextCD)
 }
