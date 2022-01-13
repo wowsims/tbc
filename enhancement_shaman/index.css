@@ -292,7 +292,7 @@
 
 .dropdown-root {
   position: relative;
-  display: inline-block;
+  display: inline-block !important;
   white-space: nowrap;
 }
 
@@ -651,7 +651,7 @@
 
 .dropdown-root {
   position: relative;
-  display: inline-block;
+  display: inline-block !important;
   white-space: nowrap;
 }
 
@@ -920,7 +920,7 @@
 
 .dropdown-root {
   position: relative;
-  display: inline-block;
+  display: inline-block !important;
   white-space: nowrap;
 }
 
@@ -1198,7 +1198,7 @@
 
 .dropdown-root {
   position: relative;
-  display: inline-block;
+  display: inline-block !important;
   white-space: nowrap;
 }
 
@@ -1502,7 +1502,7 @@
 
 .dropdown-root {
   position: relative;
-  display: inline-block;
+  display: inline-block !important;
   white-space: nowrap;
 }
 
@@ -1846,7 +1846,7 @@ input, select {
 
 .dropdown-root {
   position: relative;
-  display: inline-block;
+  display: inline-block !important;
   white-space: nowrap;
 }
 
@@ -2095,6 +2095,15 @@ input, select {
   width: auto;
 }
 
+.settings-section .icon-enum-picker-root {
+  margin: 1px;
+}
+
+.settings-section .icon-enum-picker-root a {
+  height: 46px;
+  width: 46px;
+}
+
 .settings-bottom-bar {
   margin: 20px;
   display: flex;
@@ -2167,7 +2176,7 @@ input, select {
 }
 
 .enhancement-shaman-sim-ui .self-buffs-section {
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, 1fr);
 }
 
 .enhancement-shaman-sim-ui .consumes-section {
@@ -2179,16 +2188,12 @@ input, select {
 }
 
 .enhancement-shaman-sim-ui .debuffs-section {
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
 }
 
-.totem-dropdowns-container > * {
-  margin: 2px;
-}
-
-.totem-dropdowns-container .icon-enum-picker-root a {
-  height: 50px;
-  width: 50px;
+.totem-dropdowns-container {
+  display: flex;
+  justify-content: space-around;
 }
 
 .totem-inputs-container > div {

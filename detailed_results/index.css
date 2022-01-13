@@ -87,7 +87,7 @@
 
 .dropdown-root {
   position: relative;
-  display: inline-block;
+  display: inline-block !important;
   white-space: nowrap;
 }
 
@@ -234,7 +234,7 @@
 
 .dropdown-root {
   position: relative;
-  display: inline-block;
+  display: inline-block !important;
   white-space: nowrap;
 }
 
@@ -381,7 +381,7 @@
 
 .dropdown-root {
   position: relative;
-  display: inline-block;
+  display: inline-block !important;
   white-space: nowrap;
 }
 
@@ -686,7 +686,7 @@
 
 .dropdown-root {
   position: relative;
-  display: inline-block;
+  display: inline-block !important;
   white-space: nowrap;
 }
 

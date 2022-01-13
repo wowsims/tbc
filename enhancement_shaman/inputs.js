@@ -1,7 +1,7 @@
 import { BooleanPicker } from '/tbc/core/components/boolean_picker.js';
 import { EnumPicker } from '/tbc/core/components/enum_picker.js';
 import { IconEnumPicker } from '/tbc/core/components/icon_enum_picker.js';
-import { AirTotem, EarthTotem, FireTotem, WaterTotem, EnhancementShaman_Rotation_PrimaryShock as PrimaryShock, ShamanTotems } from '/tbc/core/proto/shaman.js';
+import { AirTotem, EarthTotem, FireTotem, WaterTotem, EnhancementShaman_Rotation_PrimaryShock as PrimaryShock, ShamanTotems, ShamanWeaponImbue, } from '/tbc/core/proto/shaman.js';
 import { ActionId } from '/tbc/core/proto_utils/action_id.js';
 // Configuration for spec-specific UI elements on the settings tab.
 // These don't need to be in a separate file but it keeps things cleaner.
@@ -9,7 +9,38 @@ export const IconBloodlust = makeBooleanShamanBuffInput(ActionId.fromSpellId(282
 // export const IconManaSpringTotem = makeBoolShamanTotem(ActionId.fromSpellId(25570), 'manaSpringTotem');
 // export const IconTotemOfWrath = makeBoolShamanTotem(ActionId.fromSpellId(30706), 'totemOfWrath');
 export const IconWaterShield = makeBooleanShamanBuffInput(ActionId.fromSpellId(33736), 'waterShield');
+export const MainHandImbue = makeShamanWeaponImbueInput(false);
+export const OffHandImbue = makeShamanWeaponImbueInput(true);
 // export const IconWrathOfAirTotem = makeBoolShamanTotem(ActionId.fromSpellId(3738), 'wrathOfAirTotem');
+function makeShamanWeaponImbueInput(isOffHand) {
+    return {
+        extraCssClasses: [
+            'shaman-weapon-imbue-picker',
+        ],
+        numColumns: 1,
+        values: [
+            { color: 'grey', value: ShamanWeaponImbue.ImbueNone },
+            { actionId: ActionId.fromSpellId(25505), value: ShamanWeaponImbue.ImbueWindfury },
+            { actionId: ActionId.fromSpellId(25489), value: ShamanWeaponImbue.ImbueFlametongue },
+            { actionId: ActionId.fromSpellId(25500), value: ShamanWeaponImbue.ImbueFrostbrand },
+            { actionId: ActionId.fromSpellId(25485), value: ShamanWeaponImbue.ImbueRockbiter },
+        ],
+        equals: (a, b) => a == b,
+        zeroValue: ShamanWeaponImbue.ImbueNone,
+        changedEvent: (player) => player.specOptionsChangeEmitter,
+        getValue: (player) => (!isOffHand ? player.getSpecOptions().mainHandImbue : player.getSpecOptions().offHandImbue) || ShamanWeaponImbue.ImbueNone,
+        setValue: (eventID, player, newValue) => {
+            const newOptions = player.getSpecOptions();
+            if (!isOffHand) {
+                newOptions.mainHandImbue = newValue;
+            }
+            else {
+                newOptions.offHandImbue = newValue;
+            }
+            player.setSpecOptions(eventID, newOptions);
+        },
+    };
+}
 export const EnhancementShamanRotationConfig = {
     inputs: [
         {
@@ -68,8 +99,6 @@ function makeBooleanShamanBuffInput(id, optionsFieldName) {
     };
 }
 export function TotemsSection(simUI, parentElem) {
-    const customSectionsContainer = parentElem.closest('.custom-sections-container');
-    customSectionsContainer.style.zIndex = '1000';
     parentElem.innerHTML = `
 		<div class="totem-dropdowns-container"></div>
 		<div class="totem-inputs-container"></div>
@@ -166,27 +195,6 @@ export function TotemsSection(simUI, parentElem) {
             player.setRotation(eventID, newRotation);
         },
     });
-    const windfuryRankPicker = new EnumPicker(totemDropdownsContainer, simUI.player, {
-        extraCssClasses: [
-            'windfury-rank-picker',
-        ],
-        values: [
-            { name: '1', value: 1 },
-            { name: '2', value: 2 },
-            { name: '3', value: 3 },
-            { name: '4', value: 4 },
-            { name: '5', value: 5 },
-        ],
-        changedEvent: (player) => player.rotationChangeEmitter,
-        getValue: (player) => player.getRotation().totems?.windfuryRank || 0,
-        setValue: (eventID, player, newValue) => {
-            const newRotation = player.getRotation();
-            if (!newRotation.totems)
-                newRotation.totems = ShamanTotems.create();
-            newRotation.totems.windfuryRank = newValue;
-            player.setRotation(eventID, newRotation);
-        },
-    });
     const twistWindfuryPicker = new BooleanPicker(totemInputsContainer, simUI.player, {
         extraCssClasses: [
             'twist-windfury-picker',
@@ -200,6 +208,30 @@ export function TotemsSection(simUI, parentElem) {
             if (!newRotation.totems)
                 newRotation.totems = ShamanTotems.create();
             newRotation.totems.twistWindfury = newValue;
+            player.setRotation(eventID, newRotation);
+        },
+    });
+    const windfuryRankPicker = new EnumPicker(totemInputsContainer, simUI.player, {
+        extraCssClasses: [
+            'windfury-rank-picker',
+        ],
+        values: [
+            { name: 'No WF', value: 0 },
+            { name: '1', value: 1 },
+            { name: '2', value: 2 },
+            { name: '3', value: 3 },
+            { name: '4', value: 4 },
+            { name: '5', value: 5 },
+        ],
+        label: 'WF Totem Rank',
+        labelTooltip: 'Rank of Windfury Totem to use, if using Windfury Totem.',
+        changedEvent: (player) => player.rotationChangeEmitter,
+        getValue: (player) => player.getRotation().totems?.windfuryRank || 0,
+        setValue: (eventID, player, newValue) => {
+            const newRotation = player.getRotation();
+            if (!newRotation.totems)
+                newRotation.totems = ShamanTotems.create();
+            newRotation.totems.windfuryRank = newValue;
             player.setRotation(eventID, newRotation);
         },
     });

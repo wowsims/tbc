@@ -292,7 +292,7 @@
 
 .dropdown-root {
   position: relative;
-  display: inline-block;
+  display: inline-block !important;
   white-space: nowrap;
 }
 
@@ -651,7 +651,7 @@
 
 .dropdown-root {
   position: relative;
-  display: inline-block;
+  display: inline-block !important;
   white-space: nowrap;
 }
 
@@ -920,7 +920,7 @@
 
 .dropdown-root {
   position: relative;
-  display: inline-block;
+  display: inline-block !important;
   white-space: nowrap;
 }
 
@@ -1198,7 +1198,7 @@
 
 .dropdown-root {
   position: relative;
-  display: inline-block;
+  display: inline-block !important;
   white-space: nowrap;
 }
 
@@ -1502,7 +1502,7 @@
 
 .dropdown-root {
   position: relative;
-  display: inline-block;
+  display: inline-block !important;
   white-space: nowrap;
 }
 
@@ -1846,7 +1846,7 @@ input, select {
 
 .dropdown-root {
   position: relative;
-  display: inline-block;
+  display: inline-block !important;
   white-space: nowrap;
 }
 
@@ -2093,6 +2093,15 @@ input, select {
   white-space: nowrap;
   border: none;
   width: auto;
+}
+
+.settings-section .icon-enum-picker-root {
+  margin: 1px;
+}
+
+.settings-section .icon-enum-picker-root a {
+  height: 46px;
+  width: 46px;
 }
 
 .settings-bottom-bar {

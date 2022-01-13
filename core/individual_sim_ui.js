@@ -11,6 +11,7 @@ import { EnumPicker } from '/tbc/core/components/enum_picker.js';
 import { EquipmentSpec } from '/tbc/core/proto/common.js';
 import { GearPicker } from '/tbc/core/components/gear_picker.js';
 import { IconPicker } from '/tbc/core/components/icon_picker.js';
+import { IconEnumPicker } from '/tbc/core/components/icon_enum_picker.js';
 import { IndividualBuffs } from '/tbc/core/proto/common.js';
 import { IndividualSimSettings } from '/tbc/core/proto/ui.js';
 import { LogRunner } from '/tbc/core/components/log_runner.js';
@@ -38,16 +39,21 @@ const SAVED_GEAR_STORAGE_KEY = '__savedGear__';
 const SAVED_ROTATION_STORAGE_KEY = '__savedRotation__';
 const SAVED_SETTINGS_STORAGE_KEY = '__savedSettings__';
 const SAVED_TALENTS_STORAGE_KEY = '__savedTalents__';
-;
-class IndividualSimIconPicker extends IconPicker {
+class IndividualSimIconPicker {
     constructor(parent, modObj, input, simUI) {
-        super(parent, modObj, input);
+        let picker = null;
+        if ('states' in input) {
+            picker = new IconPicker(parent, modObj, input);
+        }
+        else {
+            picker = new IconEnumPicker(parent, modObj, input);
+        }
         if (input.exclusivityTags) {
             simUI.registerExclusiveEffect({
                 tags: input.exclusivityTags,
-                changedEvent: this.changeEmitter,
-                isActive: () => Boolean(this.getInputValue()),
-                deactivate: (eventID) => this.setValue(eventID, (typeof this.getInputValue() == 'number') ? 0 : false),
+                changedEvent: picker.changeEmitter,
+                isActive: () => Boolean(picker.getInputValue()),
+                deactivate: (eventID) => picker.setValue(eventID, (typeof picker.getInputValue() == 'number') ? 0 : false),
             });
         }
     }
@@ -360,6 +366,9 @@ export class IndividualSimUI extends SimUI {
                 else if (inputConfig.type == 'enum') {
                     const picker = new EnumPicker(sectionElem, inputConfig.getModObject(this), inputConfig.config);
                 }
+                else if (inputConfig.type == 'iconEnum') {
+                    const picker = new IconEnumPicker(sectionElem, inputConfig.getModObject(this), inputConfig.config);
+                }
             });
         };
         configureInputSection(this.rootElem.getElementsByClassName('rotation-section')[0], this.individualConfig.rotationInputs);
@@ -480,6 +489,9 @@ export class IndividualSimUI extends SimUI {
         this.sim.waitForInit().then(() => {
             savedEncounterManager.loadUserData();
             savedSettingsManager.loadUserData();
+        });
+        Array.from(this.rootElem.getElementsByClassName('settings-section-container')).forEach((container, i) => {
+            container.style.zIndex = String(1000 - i);
         });
     }
     addTalentsTab() {

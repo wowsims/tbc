@@ -96,6 +96,8 @@ export class EnhancementShamanSimUI extends IndividualSimUI {
             // IconInputs to include in the 'Self Buffs' section on the settings tab.
             selfBuffInputs: [
                 ShamanInputs.IconWaterShield,
+                ShamanInputs.MainHandImbue,
+                ShamanInputs.OffHandImbue,
                 ShamanInputs.IconBloodlust,
                 IconInputs.DrumsOfBattleConsume,
                 IconInputs.DrumsOfRestorationConsume,

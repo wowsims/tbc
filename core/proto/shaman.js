@@ -135,6 +135,32 @@ export var WaterTotem;
      */
     WaterTotem[WaterTotem["ManaSpringTotem"] = 1] = "ManaSpringTotem";
 })(WaterTotem || (WaterTotem = {}));
+/**
+ * @generated from protobuf enum proto.ShamanWeaponImbue
+ */
+export var ShamanWeaponImbue;
+(function (ShamanWeaponImbue) {
+    /**
+     * @generated from protobuf enum value: ImbueNone = 0;
+     */
+    ShamanWeaponImbue[ShamanWeaponImbue["ImbueNone"] = 0] = "ImbueNone";
+    /**
+     * @generated from protobuf enum value: ImbueFlametongue = 1;
+     */
+    ShamanWeaponImbue[ShamanWeaponImbue["ImbueFlametongue"] = 1] = "ImbueFlametongue";
+    /**
+     * @generated from protobuf enum value: ImbueFrostbrand = 2;
+     */
+    ShamanWeaponImbue[ShamanWeaponImbue["ImbueFrostbrand"] = 2] = "ImbueFrostbrand";
+    /**
+     * @generated from protobuf enum value: ImbueRockbiter = 3;
+     */
+    ShamanWeaponImbue[ShamanWeaponImbue["ImbueRockbiter"] = 3] = "ImbueRockbiter";
+    /**
+     * @generated from protobuf enum value: ImbueWindfury = 4;
+     */
+    ShamanWeaponImbue[ShamanWeaponImbue["ImbueWindfury"] = 4] = "ImbueWindfury";
+})(ShamanWeaponImbue || (ShamanWeaponImbue = {}));
 // @generated message type with reflection information, may provide speed optimized methods
 class ShamanTalents$Type extends MessageType {
     constructor() {
@@ -854,11 +880,13 @@ class EnhancementShaman_Options$Type extends MessageType {
     constructor() {
         super("proto.EnhancementShaman.Options", [
             { no: 1, name: "water_shield", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
-            { no: 2, name: "bloodlust", kind: "scalar", T: 8 /*ScalarType.BOOL*/ }
+            { no: 2, name: "bloodlust", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 3, name: "main_hand_imbue", kind: "enum", T: () => ["proto.ShamanWeaponImbue", ShamanWeaponImbue] },
+            { no: 4, name: "off_hand_imbue", kind: "enum", T: () => ["proto.ShamanWeaponImbue", ShamanWeaponImbue] }
         ]);
     }
     create(value) {
-        const message = { waterShield: false, bloodlust: false };
+        const message = { waterShield: false, bloodlust: false, mainHandImbue: 0, offHandImbue: 0 };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -874,6 +902,12 @@ class EnhancementShaman_Options$Type extends MessageType {
                     break;
                 case /* bool bloodlust */ 2:
                     message.bloodlust = reader.bool();
+                    break;
+                case /* proto.ShamanWeaponImbue main_hand_imbue */ 3:
+                    message.mainHandImbue = reader.int32();
+                    break;
+                case /* proto.ShamanWeaponImbue off_hand_imbue */ 4:
+                    message.offHandImbue = reader.int32();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -893,6 +927,12 @@ class EnhancementShaman_Options$Type extends MessageType {
         /* bool bloodlust = 2; */
         if (message.bloodlust !== false)
             writer.tag(2, WireType.Varint).bool(message.bloodlust);
+        /* proto.ShamanWeaponImbue main_hand_imbue = 3; */
+        if (message.mainHandImbue !== 0)
+            writer.tag(3, WireType.Varint).int32(message.mainHandImbue);
+        /* proto.ShamanWeaponImbue off_hand_imbue = 4; */
+        if (message.offHandImbue !== 0)
+            writer.tag(4, WireType.Varint).int32(message.offHandImbue);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

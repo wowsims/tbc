@@ -6,6 +6,7 @@ import { EnumPickerConfig } from '/tbc/core/components/enum_picker.js';
 import { EquipmentSpec } from '/tbc/core/proto/common.js';
 import { Gear } from '/tbc/core/proto_utils/gear.js';
 import { IconPickerConfig } from '/tbc/core/components/icon_picker.js';
+import { IconEnumPickerConfig } from '/tbc/core/components/icon_enum_picker.js';
 import { IndividualBuffs } from '/tbc/core/proto/common.js';
 import { IndividualSimSettings } from '/tbc/core/proto/ui.js';
 import { NumberPickerConfig } from '/tbc/core/components/number_picker.js';
@@ -24,9 +25,9 @@ import { Stat } from '/tbc/core/proto/common.js';
 import { Stats } from '/tbc/core/proto_utils/stats.js';
 import { Target } from './target.js';
 import { EventID, TypedEvent } from './typed_event.js';
-export interface IndividualSimIconPickerConfig<ModObject, ValueType> extends IconPickerConfig<ModObject, ValueType> {
+export declare type IndividualSimIconPickerConfig<ModObject, ValueType> = (IconPickerConfig<ModObject, ValueType> | IconEnumPickerConfig<ModObject, ValueType>) & {
     exclusivityTags?: Array<ExclusivityTag>;
-}
+};
 export interface InputSection {
     tooltip?: string;
     inputs: Array<{
@@ -41,6 +42,10 @@ export interface InputSection {
         type: 'enum';
         getModObject: (simUI: IndividualSimUI<any>) => any;
         config: EnumPickerConfig<any>;
+    } | {
+        type: 'iconEnum';
+        getModObject: (simUI: IndividualSimUI<any>) => any;
+        config: IconEnumPickerConfig<any, any>;
     }>;
 }
 export interface IndividualSimUIConfig<SpecType extends Spec> {

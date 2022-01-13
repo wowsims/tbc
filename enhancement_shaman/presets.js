@@ -4,7 +4,7 @@ import { EquipmentSpec } from '/tbc/core/proto/common.js';
 import { ItemSpec } from '/tbc/core/proto/common.js';
 import { Potions } from '/tbc/core/proto/common.js';
 import { EnhancementShaman_Rotation as EnhancementShamanRotation, EnhancementShaman_Options as EnhancementShamanOptions } from '/tbc/core/proto/shaman.js';
-import { EnhancementShaman_Rotation_PrimaryShock as PrimaryShock } from '/tbc/core/proto/shaman.js';
+import { AirTotem, EarthTotem, FireTotem, WaterTotem, EnhancementShaman_Rotation_PrimaryShock as PrimaryShock, ShamanTotems, ShamanWeaponImbue, } from '/tbc/core/proto/shaman.js';
 import * as Enchants from '/tbc/core/constants/enchants.js';
 import * as Gems from '/tbc/core/proto_utils/gems.js';
 import * as Tooltips from '/tbc/core/constants/tooltips.js';
@@ -22,13 +22,22 @@ export const RestoSubspecTalents = {
     data: '-502520210502133531151-05005301',
 };
 export const DefaultRotation = EnhancementShamanRotation.create({
+    totems: ShamanTotems.create({
+        earth: EarthTotem.StrengthOfEarthTotem,
+        air: AirTotem.GraceOfAirTotem,
+        fire: FireTotem.SearingTotem,
+        water: WaterTotem.ManaSpringTotem,
+        twistWindfury: true,
+        windfuryRank: 5,
+    }),
     primaryShock: PrimaryShock.Frost,
     weaveFlameShock: true,
 });
 export const DefaultOptions = EnhancementShamanOptions.create({
     waterShield: true,
     bloodlust: true,
-    // TODO: set default totems
+    mainHandImbue: ShamanWeaponImbue.ImbueWindfury,
+    offHandImbue: ShamanWeaponImbue.ImbueWindfury,
 });
 export const DefaultConsumes = Consumes.create({
     drums: Drums.DrumsOfBattle,

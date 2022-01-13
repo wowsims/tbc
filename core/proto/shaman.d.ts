@@ -371,6 +371,14 @@ export interface EnhancementShaman_Options {
      * @generated from protobuf field: bool bloodlust = 2;
      */
     bloodlust: boolean;
+    /**
+     * @generated from protobuf field: proto.ShamanWeaponImbue main_hand_imbue = 3;
+     */
+    mainHandImbue: ShamanWeaponImbue;
+    /**
+     * @generated from protobuf field: proto.ShamanWeaponImbue off_hand_imbue = 4;
+     */
+    offHandImbue: ShamanWeaponImbue;
 }
 /**
  * @generated from protobuf enum proto.EarthTotem
@@ -451,6 +459,31 @@ export declare enum WaterTotem {
      * @generated from protobuf enum value: ManaSpringTotem = 1;
      */
     ManaSpringTotem = 1
+}
+/**
+ * @generated from protobuf enum proto.ShamanWeaponImbue
+ */
+export declare enum ShamanWeaponImbue {
+    /**
+     * @generated from protobuf enum value: ImbueNone = 0;
+     */
+    ImbueNone = 0,
+    /**
+     * @generated from protobuf enum value: ImbueFlametongue = 1;
+     */
+    ImbueFlametongue = 1,
+    /**
+     * @generated from protobuf enum value: ImbueFrostbrand = 2;
+     */
+    ImbueFrostbrand = 2,
+    /**
+     * @generated from protobuf enum value: ImbueRockbiter = 3;
+     */
+    ImbueRockbiter = 3,
+    /**
+     * @generated from protobuf enum value: ImbueWindfury = 4;
+     */
+    ImbueWindfury = 4
 }
 declare class ShamanTalents$Type extends MessageType<ShamanTalents> {
     constructor();
