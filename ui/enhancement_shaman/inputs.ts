@@ -1,7 +1,8 @@
 import { BooleanPicker } from '/tbc/core/components/boolean_picker.js';
+import { EnumPicker } from '/tbc/core/components/enum_picker.js';
 import { IconEnumPicker } from '/tbc/core/components/icon_enum_picker.js';
 import { IconPickerConfig } from '/tbc/core/components/icon_picker.js';
-import { AirTotem, EarthTotem, FireTotem, WaterTotem, EnhancementShaman_Rotation_RotationType as RotationType, ShamanTotems } from '/tbc/core/proto/shaman.js';
+import { AirTotem, EarthTotem, FireTotem, WaterTotem, EnhancementShaman_Rotation_PrimaryShock as PrimaryShock, ShamanTotems } from '/tbc/core/proto/shaman.js';
 import { EnhancementShaman_Options as ShamanOptions } from '/tbc/core/proto/shaman.js';
 import { Spec } from '/tbc/core/proto/common.js';
 import { ActionId } from '/tbc/core/proto_utils/action_id.js';
@@ -23,25 +24,45 @@ export const IconWaterShield = makeBooleanShamanBuffInput(ActionId.fromSpellId(3
 export const EnhancementShamanRotationConfig = {
 	inputs: [
 		{
-			type: 'enum' as const, cssClass: 'rotation-enum-picker',
+			type: 'enum' as const, cssClass: 'primary-shock-picker',
 			getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
 			config: {
-				label: 'Type',
+				label: 'Primary Shock',
 				values: [
 					{
-						name: 'Basic', value: RotationType.Basic,
-						tooltip: 'does basic stuff',
+						name: 'None', value: PrimaryShock.None,
+					},
+					{
+						name: 'Earth Shock', value: PrimaryShock.Earth,
+					},
+					{
+						name: 'Frost Shock', value: PrimaryShock.Frost,
 					},
 				],
 				changedEvent: (player: Player<Spec.SpecEnhancementShaman>) => player.rotationChangeEmitter,
-				getValue: (player: Player<Spec.SpecEnhancementShaman>) => player.getRotation().type,
+				getValue: (player: Player<Spec.SpecEnhancementShaman>) => player.getRotation().primaryShock,
 				setValue: (eventID: EventID, player: Player<Spec.SpecEnhancementShaman>, newValue: number) => {
 					const newRotation = player.getRotation();
-					newRotation.type = newValue;
+					newRotation.primaryShock = newValue;
 					player.setRotation(eventID, newRotation);
 				},
 			},
-		}
+		},
+		{
+			type: 'boolean' as const, cssClass: 'weave-flame-shock-picker',
+			getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
+			config: {
+				label: 'Weave Flame Shock',
+				labelTooltip: 'Use Flame Shock whenever the target does not already have the DoT.',
+				changedEvent: (player: Player<Spec.SpecEnhancementShaman>) => player.rotationChangeEmitter,
+				getValue: (player: Player<Spec.SpecEnhancementShaman>) => player.getRotation().weaveFlameShock,
+				setValue: (eventID: EventID, player: Player<Spec.SpecEnhancementShaman>, newValue: boolean) => {
+					const newRotation = player.getRotation();
+					newRotation.weaveFlameShock = newValue;
+					player.setRotation(eventID, newRotation);
+				},
+			},
+		},
 	],
 };
 
@@ -160,6 +181,28 @@ export function TotemsSection(simUI: IndividualSimUI<Spec.SpecEnhancementShaman>
 			if (!newRotation.totems)
 				newRotation.totems = ShamanTotems.create();
 			newRotation.totems!.water = newValue;
+			player.setRotation(eventID, newRotation);
+		},
+	});
+
+	const windfuryRankPicker = new EnumPicker(totemDropdownsContainer, simUI.player, {
+		extraCssClasses: [
+			'windfury-rank-picker',
+		],
+		values: [
+			{ name: '1', value: 1 },
+			{ name: '2', value: 2 },
+			{ name: '3', value: 3 },
+			{ name: '4', value: 4 },
+			{ name: '5', value: 5 },
+		],
+		changedEvent: (player: Player<Spec.SpecEnhancementShaman>) => player.rotationChangeEmitter,
+		getValue: (player: Player<Spec.SpecEnhancementShaman>) => player.getRotation().totems?.windfuryRank || 0,
+		setValue: (eventID: EventID, player: Player<Spec.SpecEnhancementShaman>, newValue: number) => {
+			const newRotation = player.getRotation();
+			if (!newRotation.totems)
+				newRotation.totems = ShamanTotems.create();
+			newRotation.totems!.windfuryRank = newValue;
 			player.setRotation(eventID, newRotation);
 		},
 	});

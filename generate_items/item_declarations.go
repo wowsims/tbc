@@ -72,4 +72,6 @@ var ItemDeclarationOverrides = []ItemDeclaration{
 	{ID: 18584, Filter: true},
 	{ID: 24265, Filter: true},
 	{ID: 24525, Filter: true},
+	{ID: 32421, Filter: true},
+	{ID: 32422, Filter: true},
 }

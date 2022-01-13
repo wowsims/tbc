@@ -106,8 +106,12 @@ type Shaman struct {
 
 	// Shocks
 	shockSpell         core.SimpleSpell
-	frostShockTemplate core.SimpleSpellTemplate
 	earthShockTemplate core.SimpleSpellTemplate
+	frostShockTemplate core.SimpleSpellTemplate
+
+	// Flame shock needs a separate spell object because of the dot.
+	FlameShockSpell    core.SimpleSpell
+	flameShockTemplate core.SimpleSpellTemplate
 
 	// Fire Totems
 	FireTotemSpell       core.SimpleSpell
@@ -192,8 +196,9 @@ func (shaman *Shaman) Init(sim *core.Simulation) {
 	for i := int32(0); i < numHits; i++ {
 		shaman.chainLightningLOCastTemplates = append(shaman.chainLightningLOCastTemplates, shaman.newChainLightningTemplate(sim, true))
 	}
-	shaman.frostShockTemplate = shaman.newFrostShockTemplate(sim)
 	shaman.earthShockTemplate = shaman.newEarthShockTemplate(sim)
+	shaman.flameShockTemplate = shaman.newFlameShockTemplate(sim)
+	shaman.frostShockTemplate = shaman.newFrostShockTemplate(sim)
 
 	shaman.searingTotemTemplate = shaman.newSearingTotemTemplate(sim)
 	shaman.magmaTotemTemplate = shaman.newMagmaTotemTemplate(sim)
