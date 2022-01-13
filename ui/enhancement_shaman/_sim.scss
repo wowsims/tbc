@@ -8,7 +8,7 @@
 
 // Set grid width for icon sections based on how many buffs we configured.
 .enhancement-shaman-sim-ui .self-buffs-section {
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, 1fr);
 }
 .enhancement-shaman-sim-ui .consumes-section {
   grid-template-columns: repeat(4, 1fr);
@@ -17,19 +17,12 @@
   grid-template-columns: repeat(6, 1fr);
 }
 .enhancement-shaman-sim-ui .debuffs-section {
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
 }
 
 .totem-dropdowns-container {
-}
-
-.totem-dropdowns-container > * {
-	margin: 2px;
-}
-
-.totem-dropdowns-container .icon-enum-picker-root a {
-	height: 50px;
-	width: 50px;
+	display: flex;
+	justify-content: space-around;
 }
 
 .totem-inputs-container > div {

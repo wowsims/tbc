@@ -27,7 +27,10 @@ func RegisterEnhancementShaman() {
 func NewEnhancementShaman(character core.Character, options proto.Player) *EnhancementShaman {
 	enhOptions := options.GetEnhancementShaman()
 
-	selfBuffs := shaman.SelfBuffs{}
+	selfBuffs := shaman.SelfBuffs{
+		Bloodlust:   enhOptions.Options.Bloodlust,
+		WaterShield: enhOptions.Options.WaterShield,
+	}
 
 	if enhOptions.Rotation.Totems != nil {
 		selfBuffs.ManaSpring = enhOptions.Rotation.Totems.Water == proto.WaterTotem_ManaSpringTotem
@@ -59,7 +62,15 @@ func NewEnhancementShaman(character core.Character, options proto.Player) *Enhan
 
 	// Modify auto attacks multiplier from weapon mastery.
 	enh.AutoAttacks.DamageMultiplier *= 1 + 0.02*float64(enhOptions.Talents.WeaponMastery)
-	shaman.ApplyWindfuryImbue(enh.Shaman, true, true)
+	enh.ApplyWindfuryImbue(
+		enhOptions.Options.MainHandImbue == proto.ShamanWeaponImbue_ImbueWindfury,
+		enhOptions.Options.OffHandImbue == proto.ShamanWeaponImbue_ImbueWindfury)
+	enh.ApplyFlametongueImbue(
+		enhOptions.Options.MainHandImbue == proto.ShamanWeaponImbue_ImbueFlametongue,
+		enhOptions.Options.OffHandImbue == proto.ShamanWeaponImbue_ImbueFlametongue)
+	enh.ApplyFrostbrandImbue(
+		enhOptions.Options.MainHandImbue == proto.ShamanWeaponImbue_ImbueFrostbrand,
+		enhOptions.Options.OffHandImbue == proto.ShamanWeaponImbue_ImbueFrostbrand)
 
 	return enh
 }

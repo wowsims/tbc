@@ -90,9 +90,13 @@ func (shaman *Shaman) applyElementalDevastation() {
 		return core.Aura{
 			ID: ElementalDevastationTalentAuraID,
 			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-				if spellEffect.Crit {
-					spellCast.Character.AddAuraWithTemporaryStats(sim, ElementalDevastationAuraID, core.ActionID{ItemID: 30160}, stats.MeleeCrit, critBonus, dur)
+				if spellCast.IsPhantom {
+					return
 				}
+				if !spellEffect.Crit {
+					return
+				}
+				spellCast.Character.AddAuraWithTemporaryStats(sim, ElementalDevastationAuraID, core.ActionID{ItemID: 30160}, stats.MeleeCrit, critBonus, dur)
 			},
 		}
 	})

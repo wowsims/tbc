@@ -305,6 +305,7 @@ func ApplyRomulosPoisonVial(agent core.Agent) {
 					Character:       character,
 					IgnoreCooldowns: true,
 					IgnoreManaCost:  true,
+					IsPhantom:       true,
 					SpellSchool:     stats.NatureSpellPower,
 					CritMultiplier:  1.5,
 				},

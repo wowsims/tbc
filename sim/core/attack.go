@@ -391,9 +391,10 @@ type AbilityEffect struct {
 	Target *Target
 
 	// Bonus stats to be added to the attack.
-	BonusHitRating   float64
-	BonusAttackPower float64
-	BonusCritRating  float64
+	BonusWeaponDamage float64
+	BonusHitRating    float64
+	BonusAttackPower  float64
+	BonusCritRating   float64
 
 	IgnoreDualWieldPenalty bool
 
