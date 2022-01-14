@@ -82,7 +82,7 @@ func (shaman *Shaman) ApplyWindfuryImbue(mh bool, oh bool) {
 					wfAtk.MainHit.BonusAttackPower += apBonus
 
 					// Set so only the proc'd hand attacks
-					wfAtk.MainHit.WeaponInput.IsMH = isMHHit
+					wfAtk.MainHit.WeaponInput.IsOH = !isMHHit
 
 					wfAtk.MainHit.Target = hitEffect.Target
 					wfAtk.Attack(sim)
@@ -225,6 +225,42 @@ func (shaman *Shaman) ApplyFrostbrandImbue(mh bool, oh bool) {
 				fbSpell.Target = hitEffect.Target
 				fbSpell.Init(sim)
 				fbSpell.Cast(sim)
+			},
+		}
+	})
+}
+
+var RBImbueAuraID = core.NewAuraID()
+
+func (shaman *Shaman) ApplyRockbiterImbue(mh bool, oh bool) {
+	if !mh && !oh {
+		return
+	}
+
+	mhBonus := 0.0
+	ohBonus := 0.0
+	if weapon := shaman.Equip[proto.ItemSlot_ItemSlotMainHand]; weapon.ID != 0 {
+		mhBonus = 62.0 * weapon.SwingSpeed
+	}
+	if weapon := shaman.Equip[proto.ItemSlot_ItemSlotOffHand]; weapon.ID != 0 {
+		ohBonus = 62.0 * weapon.SwingSpeed
+	}
+
+	shaman.AddPermanentAura(func(sim *core.Simulation) core.Aura {
+		return core.Aura{
+			ID: RBImbueAuraID,
+			OnBeforeMeleeHit: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
+				if !hitEffect.IsWeaponHit() {
+					return
+				}
+
+				if hitEffect.IsMH() {
+					if mh {
+						hitEffect.BonusWeaponDamage += mhBonus
+					}
+				} else if oh {
+					hitEffect.BonusWeaponDamage += ohBonus
+				}
 			},
 		}
 	})

@@ -71,6 +71,9 @@ func NewEnhancementShaman(character core.Character, options proto.Player) *Enhan
 	enh.ApplyFrostbrandImbue(
 		enhOptions.Options.MainHandImbue == proto.ShamanWeaponImbue_ImbueFrostbrand,
 		enhOptions.Options.OffHandImbue == proto.ShamanWeaponImbue_ImbueFrostbrand)
+	enh.ApplyRockbiterImbue(
+		enhOptions.Options.MainHandImbue == proto.ShamanWeaponImbue_ImbueRockbiter,
+		enhOptions.Options.OffHandImbue == proto.ShamanWeaponImbue_ImbueRockbiter)
 
 	return enh
 }
