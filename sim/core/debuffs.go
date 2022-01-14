@@ -56,12 +56,20 @@ func applyDebuffEffects(target *Target, debuffs proto.Debuffs) {
 		})
 	}
 
-	if debuffs.ExposeArmor == proto.TristateEffect_TristateEffectImproved {
-		target.armor -= 3075.0 // 5 points: 2050 armor / imp 5 points: 3075 armor
-	} else if debuffs.SunderArmor {
-		target.armor -= 2600.0 // assume 5 stacks
-	} else if debuffs.ExposeArmor == proto.TristateEffect_TristateEffectRegular {
-		target.armor -= 2050.0 // 5 points: 2050 armor / imp 5 points: 3075 armor
+	if debuffs.SunderArmor {
+		target.AddPermanentAura(func(sim *Simulation) Aura {
+			return SunderArmorAura(0, target, 5)
+		})
+	}
+
+	if debuffs.ExposeArmor != proto.TristateEffect_TristateEffectMissing {
+		points := 0
+		if debuffs.ExposeArmor == proto.TristateEffect_TristateEffectImproved {
+			points = 2
+		}
+		target.AddPermanentAura(func(sim *Simulation) Aura {
+			return ExposeArmorAura(0, target, points)
+		})
 	}
 
 	if debuffs.FaerieFire != proto.TristateEffect_TristateEffectMissing {
@@ -71,7 +79,9 @@ func applyDebuffEffects(target *Target, debuffs proto.Debuffs) {
 	}
 
 	if debuffs.CurseOfRecklessness {
-		target.armor -= 800
+		target.AddPermanentAura(func(sim *Simulation) Aura {
+			return CurseOfRecklessnessAura(0, target)
+		})
 	}
 
 	if debuffs.ExposeWeaknessUptime > 0 && debuffs.ExposeWeaknessHunterAgility > 0 {
@@ -296,7 +306,59 @@ func FaerieFireAura(currentTime time.Duration, target *Target, improved bool) Au
 }
 
 var SunderArmorDebuffID = NewDebuffID()
+
+func SunderArmorAura(currentTime time.Duration, target *Target, stacks int) Aura {
+	armorReduction := 520.0 * float64(stacks)
+	target.AddArmor(-armorReduction)
+
+	aura := Aura{
+		ID:       SunderArmorDebuffID,
+		ActionID: ActionID{SpellID: 25225},
+		Expires:  currentTime + time.Second*30,
+		OnExpire: func(sim *Simulation) {
+			target.AddArmor(armorReduction)
+		},
+	}
+
+	return aura
+}
+
+var ExposeArmorDebuffID = NewDebuffID()
+
+func ExposeArmorAura(currentTime time.Duration, target *Target, talentPoints int) Aura {
+	// TODO: Make this override sunder, not add
+	armorReduction := 2050.0 * (1.0 + 0.25*float64(talentPoints))
+	target.AddArmor(-armorReduction)
+
+	aura := Aura{
+		ID:       ExposeArmorDebuffID,
+		ActionID: ActionID{SpellID: 26866},
+		Expires:  currentTime + time.Second*30,
+		OnExpire: func(sim *Simulation) {
+			target.AddArmor(armorReduction)
+		},
+	}
+
+	return aura
+}
+
 var CurseOfRecklessnessDebuffID = NewDebuffID()
+
+func CurseOfRecklessnessAura(currentTime time.Duration, target *Target) Aura {
+	armorReduction := 800.0
+	target.AddArmor(-armorReduction)
+
+	aura := Aura{
+		ID:       CurseOfRecklessnessDebuffID,
+		ActionID: ActionID{SpellID: 27226},
+		Expires:  currentTime + time.Minute*2,
+		OnExpire: func(sim *Simulation) {
+			target.AddArmor(armorReduction)
+		},
+	}
+
+	return aura
+}
 
 var ExposeWeaknessDebuffID = NewDebuffID()
 

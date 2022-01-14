@@ -93,12 +93,17 @@ type AbilityEffect struct {
 	Target *Target
 
 	// Bonus stats to be added to the attack.
-	BonusWeaponDamage float64
-	BonusHitRating    float64
-	BonusAttackPower  float64
-	BonusCritRating   float64
+	BonusWeaponDamage    float64
+	BonusHitRating       float64
+	BonusAttackPower     float64
+	BonusCritRating      float64
+	BonusExpertiseRating float64
 
 	IsWhiteHit bool
+
+	// Causes the first roll for this hit to be copied from ActiveMeleeAbility.MainHit.HitType.
+	// This is only used by Shaman Stormstrike.
+	ReuseMainHitRoll bool
 
 	// Additional multiplier that is always applied.
 	DamageMultiplier float64
@@ -122,7 +127,6 @@ type Weapon struct {
 	BaseDamageMax float64
 	SwingSpeed    float64
 	SwingDuration time.Duration // Duration between 2 swings.
-	ID            int32         // Item ID, TODO: remove this.
 }
 
 func (weapon Weapon) calculateSwingDamage(sim *Simulation, bonusWeaponDamage float64, attackPower float64) float64 {
@@ -133,7 +137,10 @@ func (weapon Weapon) calculateSwingDamage(sim *Simulation, bonusWeaponDamage flo
 
 // If MainHand or Offhand is non-zero the associated ability will create a weapon swing.
 type WeaponDamageInput struct {
-	IsMH             bool    // Whether this input corresponds to the MH weapon.
+	// Whether this input corresponds to the OH weapon.
+	// It's important that this be 'IsOH' instead of 'IsMH' so that MH is the default.
+	IsOH bool
+
 	DamageMultiplier float64 // Damage multiplier on weapon damage.
 	FlatDamageBonus  float64 // Flat bonus added to swing.
 }
@@ -204,8 +211,7 @@ func (effect *AbilityEffect) WhiteHitTableResult(sim *Simulation, ability *Activ
 
 	// Next Dodge
 	dodge := 0.05 + skillDifference*0.001
-	// TODO: Add bonus expertise for human/orc racials
-	expertisePercentage := math.Min(math.Floor(character.stats[stats.Expertise]/(ExpertisePerQuarterPercentReduction))/400, dodge)
+	expertisePercentage := math.Min(math.Floor((character.stats[stats.Expertise]+effect.BonusExpertiseRating)/(ExpertisePerQuarterPercentReduction))/400, dodge)
 	chance += dodge - expertisePercentage
 	if roll < chance {
 		return MeleeHitTypeDodge
@@ -269,7 +275,11 @@ func (ahe *AbilityHitEffect) calculateDamage(sim *Simulation, ability *ActiveMel
 	attackPower := character.stats[stats.AttackPower] + ahe.BonusAttackPower
 	bonusWeaponDamage := ahe.BonusWeaponDamage
 
-	ahe.HitType = ahe.AbilityEffect.WhiteHitTableResult(sim, ability)
+	if ahe.AbilityEffect.ReuseMainHitRoll {
+		ahe.HitType = ability.MainHit.HitType
+	} else {
+		ahe.HitType = ahe.AbilityEffect.WhiteHitTableResult(sim, ability)
+	}
 
 	if !ahe.Landed() {
 		ahe.Damage = 0
@@ -278,7 +288,7 @@ func (ahe *AbilityHitEffect) calculateDamage(sim *Simulation, ability *ActiveMel
 
 	dmg := 0.0
 	if ahe.WeaponInput.DamageMultiplier != 0 {
-		if ahe.WeaponInput.IsMH {
+		if !ahe.WeaponInput.IsOH {
 			dmg += character.AutoAttacks.mh.calculateSwingDamage(sim, bonusWeaponDamage, attackPower)
 		} else {
 			dmg += character.AutoAttacks.oh.calculateSwingDamage(sim, bonusWeaponDamage, attackPower) * 0.5
@@ -310,7 +320,10 @@ func (ahe *AbilityHitEffect) calculateDamage(sim *Simulation, ability *ActiveMel
 	}
 
 	// Apply armor reduction.
-	dmg *= 1 - ahe.Target.ArmorDamageReduction()
+	dmg *= 1 - ahe.Target.ArmorDamageReduction(character.stats[stats.ArmorPenetration])
+	if sim.Log != nil {
+		character.Log(sim, "Target armor: %0.2f\n", ahe.Target.currentArmor)
+	}
 
 	// Apply all other effect multipliers.
 	dmg *= ahe.DamageMultiplier * ahe.StaticDamageMultiplier
@@ -326,12 +339,12 @@ func (ahe *AbilityHitEffect) IsWeaponHit() bool {
 
 // Returns whether this hit effect is associated with the main-hand weapon.
 func (ahe *AbilityHitEffect) IsMH() bool {
-	return ahe.WeaponInput.IsMH
+	return !ahe.WeaponInput.IsOH
 }
 
 // Returns whether this hit effect is associated with the off-hand weapon.
 func (ahe *AbilityHitEffect) IsOH() bool {
-	return !ahe.WeaponInput.IsMH
+	return ahe.WeaponInput.IsOH
 }
 
 func (ability *ActiveMeleeAbility) CalculatedGCD(char *Character) time.Duration {
@@ -344,7 +357,6 @@ func (ability *ActiveMeleeAbility) CalculatedGCD(char *Character) time.Duration 
 
 // Attack will perform the attack
 //  Returns false if unable to attack (due to resource lacking)
-// TODO: add AbilityResult data to action metrics.
 func (ability *ActiveMeleeAbility) Attack(sim *Simulation) bool {
 	if !ability.IgnoreCooldowns && ability.Character.GetRemainingCD(GCDCooldownID, sim.CurrentTime) > 0 {
 		log.Fatalf("Ability used while on GCD\n-------\nAbility %s: %#v\n", ability.ActionID, ability)
@@ -464,7 +476,6 @@ func NewAutoAttacks(c *Character) AutoAttacks {
 			BaseDamageMax: weapon.WeaponDamageMax,
 			SwingSpeed:    weapon.SwingSpeed,
 			SwingDuration: time.Duration(weapon.SwingSpeed * float64(time.Second)),
-			ID:            weapon.ID,
 		}
 		aa.MainhandSwingAt = time.Duration(float64(aa.mh.SwingDuration) / c.SwingSpeed())
 	}
@@ -474,7 +485,6 @@ func NewAutoAttacks(c *Character) AutoAttacks {
 			BaseDamageMax: weapon.WeaponDamageMax,
 			SwingSpeed:    weapon.SwingSpeed,
 			SwingDuration: time.Duration(weapon.SwingSpeed * float64(time.Second)),
-			ID:            weapon.ID,
 		}
 		aa.OffhandSwingAt = time.Duration(float64(aa.oh.SwingDuration) / c.SwingSpeed())
 	}
@@ -504,7 +514,7 @@ func (aa *AutoAttacks) Swing(sim *Simulation, target *Target) {
 			// Make a MH swing!
 			ama := aa.ActiveMeleeAbility
 			ama.ActionID.Tag = 1
-			ama.MainHit.WeaponInput.IsMH = true
+			ama.MainHit.WeaponInput.IsOH = false
 			ama.Attack(sim)
 			aa.MainhandSwingAt = sim.CurrentTime + aa.MainhandSwingSpeed()
 		}
@@ -513,7 +523,7 @@ func (aa *AutoAttacks) Swing(sim *Simulation, target *Target) {
 		// Make a OH swing!
 		ama := aa.ActiveMeleeAbility
 		ama.ActionID.Tag = 2
-		ama.MainHit.WeaponInput.IsMH = false
+		ama.MainHit.WeaponInput.IsOH = true
 		ama.Attack(sim)
 		aa.OffhandSwingAt = sim.CurrentTime + aa.OffhandSwingSpeed()
 	}

@@ -55,7 +55,7 @@ func (shaman *Shaman) newStormstrikeTemplate(sim *core.Simulation) core.MeleeAbi
 				StaticDamageMultiplier: 1.0,
 			},
 			WeaponInput: core.WeaponDamageInput{
-				IsMH:             true,
+				IsOH:             false,
 				DamageMultiplier: 1.0,
 			},
 		},
@@ -64,9 +64,10 @@ func (shaman *Shaman) newStormstrikeTemplate(sim *core.Simulation) core.MeleeAbi
 				AbilityEffect: core.AbilityEffect{
 					DamageMultiplier:       1.0,
 					StaticDamageMultiplier: 1.0,
+					ReuseMainHitRoll:       true,
 				},
 				WeaponInput: core.WeaponDamageInput{
-					IsMH:             false,
+					IsOH:             true,
 					DamageMultiplier: 1.0,
 				},
 			},
