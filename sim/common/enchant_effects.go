@@ -42,17 +42,17 @@ func ApplyMongooseEffect(agent core.Agent) {
 		unbuffs := buffs.Multiply(-1)
 		haste := 2 * core.HasteRatingPerHastePercent
 
-		applyLightningSpeed := func(sim *core.Simulation, character *core.Character, isOH bool) {
+		applyLightningSpeed := func(sim *core.Simulation, character *core.Character, isMH bool) {
 			// https://tbc.wowhead.com/spell=28093/lightning-speed
 			character.AddStats(buffs)
 			character.AddMeleeHaste(sim, haste)
 			var tag int32
 			var auraID core.AuraID
-			if !isOH {
-				tag = 0
+			if isMH {
+				tag = 1
 				auraID = LightningSpeedMHAuraID
 			} else {
-				tag = 1
+				tag = 2
 				auraID = LightningSpeedOHAuraID
 			}
 			character.AddAura(sim, core.Aura{
@@ -68,9 +68,13 @@ func ApplyMongooseEffect(agent core.Agent) {
 
 		return core.Aura{
 			ID: MongooseAuraID,
-			OnBeforeMelee: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, isOH bool) {
-				if ppmm.Proc(sim, isOH, "mongoose") {
-					applyLightningSpeed(sim, character, isOH)
+			OnBeforeMeleeHit: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
+				// TODO: Does mongoose apply to the hit that procs it? Otherwise this should be OnMeleeAttack
+				if hitEffect.IsWeaponHit() {
+					isMH := hitEffect.IsMH()
+					if ppmm.Proc(sim, isMH, "mongoose") {
+						applyLightningSpeed(sim, character, isMH)
+					}
 				}
 			},
 		}

@@ -6,7 +6,7 @@ import { ResultComponent, ResultComponentConfig, SimResultData } from './result_
 declare var $: any;
 declare var tippy: any;
 
-export class SpellMetrics extends ResultComponent {
+export class MeleeMetrics extends ResultComponent {
 	private readonly tableElem: HTMLTableSectionElement;
 	private readonly bodyElem: HTMLTableSectionElement;
 
@@ -26,6 +26,8 @@ export class SpellMetrics extends ResultComponent {
 					<th class="metrics-table-header-cell"><span>Avg Hit</span></th>
 					<th class="metrics-table-header-cell"><span>Crit %</span></th>
 					<th class="metrics-table-header-cell"><span>Miss %</span></th>
+					<th class="metrics-table-header-cell"><span>Dodge %</span></th>
+					<th class="metrics-table-header-cell"><span>Glance %</span></th>
 				</tr>
 			</thead>
 			<tbody class="metrics-table-body">
@@ -70,13 +72,25 @@ export class SpellMetrics extends ResultComponent {
 
 		// Crit %
 		tippy(headerElems[6], {
-			'content': 'Crits / Hits',
+			'content': 'Crits / Swings',
 			'allowHTML': true,
 		});
 
 		// Miss %
 		tippy(headerElems[7], {
-			'content': 'Misses / (Hits + Misses)',
+			'content': 'Misses / Swings',
+			'allowHTML': true,
+		});
+
+		// Dodge %
+		tippy(headerElems[8], {
+			'content': 'Dodges / Swings',
+			'allowHTML': true,
+		});
+
+		// Glance %
+		tippy(headerElems[9], {
+			'content': 'Glances / Swings',
 			'allowHTML': true,
 		});
 
@@ -86,7 +100,7 @@ export class SpellMetrics extends ResultComponent {
 	onSimResult(resultData: SimResultData) {
 		this.bodyElem.textContent = '';
 
-		const addRow = (spellMetric: ActionMetrics, isChildMetric: boolean): HTMLElement => {
+		const addRow = (meleeMetric: ActionMetrics, isChildMetric: boolean): HTMLElement => {
 			const rowElem = document.createElement('tr');
 			if (isChildMetric) {
 				rowElem.classList.add('child-metric');
@@ -97,13 +111,13 @@ export class SpellMetrics extends ResultComponent {
 			rowElem.appendChild(nameCellElem);
 			nameCellElem.innerHTML = `
 			<a class="metrics-action-icon"></a>
-			<span class="metrics-action-name">${spellMetric.name}</span>
+			<span class="metrics-action-name">${meleeMetric.name}</span>
 			<span class="expand-toggle fa fa-caret-down"></span>
 			<span class="expand-toggle fa fa-caret-right"></span>
 			`;
 
 			const iconElem = nameCellElem.getElementsByClassName('metrics-action-icon')[0] as HTMLAnchorElement;
-			spellMetric.actionId.setBackgroundAndHref(iconElem);
+			meleeMetric.actionId.setBackgroundAndHref(iconElem);
 
 			const addCell = (value: string | number): HTMLElement => {
 				const cellElem = document.createElement('td');
@@ -112,34 +126,36 @@ export class SpellMetrics extends ResultComponent {
 				return cellElem;
 			};
 
-			addCell(spellMetric.dps.toFixed(1)); // DPS
-			addCell(spellMetric.casts.toFixed(1)); // Casts
-			addCell(spellMetric.avgCast.toFixed(1)); // Avg Cast
-			addCell(spellMetric.hits.toFixed(1)); // Hits
-			addCell(spellMetric.avgHit.toFixed(1)); // Avg Hit
-			addCell(spellMetric.critPercent.toFixed(2) + ' %'); // Crit %
-			addCell(spellMetric.missPercent.toFixed(2) + ' %'); // Miss %
+			addCell(meleeMetric.dps.toFixed(1)); // DPS
+			addCell(meleeMetric.casts.toFixed(1)); // Casts
+			addCell(meleeMetric.avgCast.toFixed(1)); // Avg Cast
+			addCell(meleeMetric.hits.toFixed(1)); // Hits
+			addCell(meleeMetric.avgHit.toFixed(1)); // Avg Hit
+			addCell(meleeMetric.critPercent.toFixed(2) + ' %'); // Crit %
+			addCell(meleeMetric.missPercent.toFixed(2) + ' %'); // Miss %
+			addCell(meleeMetric.dodgePercent.toFixed(2) + ' %'); // Dodge %
+			addCell(meleeMetric.glancePercent.toFixed(2) + ' %'); // Glance %
 			return rowElem;
 		};
 
-		const spellMetrics = resultData.result.getSpellMetrics(resultData.filter);
-		const spellGroups = ActionMetrics.groupById(spellMetrics);
+		const meleeMetrics = resultData.result.getMeleeMetrics(resultData.filter);
+		const meleeGroups = ActionMetrics.groupById(meleeMetrics);
 
-		if (spellMetrics.length == 0) {
+		if (meleeMetrics.length == 0) {
 			this.rootElem.classList.add('empty');
 		} else {
 			this.rootElem.classList.remove('empty');
 		}
 
-		spellGroups.forEach(spellGroup => {
-			if (spellGroup.length == 1) {
-				addRow(spellGroup[0], false);
+		meleeGroups.forEach(meleeGroup => {
+			if (meleeGroup.length == 1) {
+				addRow(meleeGroup[0], false);
 				return;
 			}
 
-			const mergedMetrics = ActionMetrics.merge(spellGroup, true);
+			const mergedMetrics = ActionMetrics.merge(meleeGroup, true);
 			const parentRow = addRow(mergedMetrics, false);
-			const childRows = spellGroup.map(spellMetric => addRow(spellMetric, true));
+			const childRows = meleeGroup.map(meleeMetric => addRow(meleeMetric, true));
 			const defaultDisplay = childRows[0].style.display;
 
 			let expand = true;

@@ -102,7 +102,11 @@ export class SimResult {
 	}
 
 	getSpellMetrics(filter: SimResultFilter): Array<ActionMetrics> {
-		return this.getActionMetrics(filter).filter(e => e.hits + e.misses != 0);
+		return this.getActionMetrics(filter).filter(e => e.hitAttempts != 0 && !e.isMeleeAction)
+	}
+
+	getMeleeMetrics(filter: SimResultFilter): Array<ActionMetrics> {
+		return this.getActionMetrics(filter).filter(e => e.hitAttempts != 0 && e.isMeleeAction);
 	}
 
 	getBuffMetrics(filter: SimResultFilter): Array<AuraMetrics> {
@@ -423,6 +427,10 @@ export class ActionMetrics {
 		this.data = data;
 	}
 
+	get isMeleeAction() {
+		return this.data.isMelee;
+	}
+
 	get damage() {
 		return this.data.damage;
 	}
@@ -447,12 +455,34 @@ export class ActionMetrics {
 		return this.data.hits / this.iterations;
 	}
 
+	get landedHits() {
+		if (this.data.isMelee) {
+			return this.data.hits + this.data.crits + this.data.blocks + this.data.glances;
+		} else {
+			return this.data.hits;
+		}
+	}
+
+	get hitAttempts() {
+		if (this.data.isMelee) {
+			return this.data.misses
+					+ this.data.dodges
+					+ this.data.parries
+					+ this.data.blocks
+					+ this.data.glances
+					+ this.data.crits
+					+ this.data.hits;
+		} else {
+			return this.data.hits + this.data.misses;
+		}
+	}
+
 	get avgHit() {
-		return this.data.damage / this.data.hits;
+		return this.data.damage / this.landedHits;
 	}
 
 	get critPercent() {
-		return (this.data.crits / this.data.hits) * 100;
+		return (this.data.crits / this.landedHits) * 100;
 	}
 
 	get misses() {
@@ -460,7 +490,39 @@ export class ActionMetrics {
 	}
 
 	get missPercent() {
-		return (this.data.misses / (this.data.hits + this.data.misses)) * 100;
+		return (this.data.misses / this.hitAttempts) * 100;
+	}
+
+	get dodges() {
+		return this.data.dodges / this.iterations;
+	}
+
+	get dodgePercent() {
+		return (this.data.dodges / this.hitAttempts) * 100;
+	}
+
+	get parries() {
+		return this.data.parries / this.iterations;
+	}
+
+	get parryPercent() {
+		return (this.data.parries / this.hitAttempts) * 100;
+	}
+
+	get blocks() {
+		return this.data.blocks / this.iterations;
+	}
+
+	get blockPercent() {
+		return (this.data.blocks / this.hitAttempts) * 100;
+	}
+
+	get glances() {
+		return this.data.glances / this.iterations;
+	}
+
+	get glancePercent() {
+		return (this.data.glances / this.hitAttempts) * 100;
 	}
 
 	static async makeNew(iterations: number, duration: number, actionMetrics: ActionMetricsProto, playerIndex?: number): Promise<ActionMetrics> {
@@ -478,10 +540,15 @@ export class ActionMetrics {
 		return new ActionMetrics(
 				actionId, firstAction.iterations, firstAction.duration,
 				ActionMetricsProto.create({
+					isMelee: firstAction.isMeleeAction,
 					casts: sum(actions.map(a => a.data.casts)),
 					hits: sum(actions.map(a => a.data.hits)),
 					crits: sum(actions.map(a => a.data.crits)),
 					misses: sum(actions.map(a => a.data.misses)),
+					dodges: sum(actions.map(a => a.data.dodges)),
+					parries: sum(actions.map(a => a.data.parries)),
+					blocks: sum(actions.map(a => a.data.blocks)),
+					glances: sum(actions.map(a => a.data.glances)),
 					damage: sum(actions.map(a => a.data.damage)),
 				}));
 	}

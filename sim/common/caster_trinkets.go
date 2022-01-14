@@ -286,7 +286,7 @@ func ApplyDarkmoonCardCrusade(agent core.Agent) {
 
 		return core.Aura{
 			ID: DarkmoonCardCrusadeAuraID,
-			OnMeleeAttack: func(sim *core.Simulation, target *core.Target, result core.MeleeHitType, ability *core.ActiveMeleeAbility, isOH bool) {
+			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
 				if meleeStacks < 20 {
 					meleeStacks++
 					character.AddStat(stats.AttackPower, meleeBonus)

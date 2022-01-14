@@ -44,8 +44,8 @@ func (shaman *Shaman) registerShamanisticRageCD() {
 					ID:       ShamanisticRageAuraID,
 					ActionID: ShamanisticRageActionID,
 					Expires:  sim.CurrentTime + dur,
-					OnMeleeAttack: func(sim *core.Simulation, target *core.Target, result core.MeleeHitType, ability *core.ActiveMeleeAbility, isOH bool) {
-						if result == core.MeleeHitTypeMiss {
+					OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
+						if !hitEffect.Landed() || !hitEffect.IsWeaponHit() {
 							return
 						}
 						if sim.RandomFloat("shamanistic rage") > proc {

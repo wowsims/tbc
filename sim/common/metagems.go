@@ -96,7 +96,7 @@ func ApplyRelentlessEarthstormDiamond(agent core.Agent) {
 	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		return core.Aura{
 			ID: RelentlessEarthstormDiamondAuraID,
-			OnBeforeMelee: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, isOH bool) {
+			OnBeforeMelee: func(sim *core.Simulation, ability *core.ActiveMeleeAbility) {
 				// For a normal spell with crit multiplier of 1.5, this will be 1.
 				// For a spell with a multiplier of 2 (i.e. 100% increased critical damage) this will be 2.
 				improvedCritRatio := (ability.CritMultiplier - 1) / 0.5
