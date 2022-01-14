@@ -30,7 +30,6 @@ func (shaman *Shaman) ApplyWindfuryImbue(mh bool, oh bool) {
 
 	wftempl := core.ActiveMeleeAbility{
 		MeleeAbility: core.MeleeAbility{
-			Name: "Windfury Attack",
 			ActionID: core.ActionID{
 				SpellID: 25505,
 			},
@@ -38,20 +37,19 @@ func (shaman *Shaman) ApplyWindfuryImbue(mh bool, oh bool) {
 			Character:       &shaman.Character,
 			IgnoreCooldowns: true,
 		},
-		WeaponDamageInput: core.WeaponDamageInput{
-			MainHand: 1.0,
-			Offhand:  1.0,
-		},
-		AbilityEffect: core.AbilityEffect{
-			DamageMultiplier:       1.0,
-			StaticDamageMultiplier: 1.0,
-			BonusAttackPower:       apBonus,
-			IgnoreDualWieldPenalty: true,
+		MainHit: core.AbilityHitEffect{
+			AbilityEffect: core.AbilityEffect{
+				DamageMultiplier:       1.0,
+				StaticDamageMultiplier: 1.0,
+				BonusAttackPower:       apBonus,
+			},
+			WeaponInput: core.WeaponDamageInput{
+				DamageMultiplier: 1.0,
+			},
 		},
 	}
 	if shaman.Talents.ElementalWeapons > 0 {
-		wftempl.MainHand *= 1 + math.Round(float64(shaman.Talents.ElementalWeapons)*13.33)/100
-		wftempl.Offhand *= 1 + math.Round(float64(shaman.Talents.ElementalWeapons)*13.33)/100
+		wftempl.MainHit.WeaponInput.DamageMultiplier *= 1 + math.Round(float64(shaman.Talents.ElementalWeapons)*13.33)/100
 	}
 
 	wfTemplate := core.NewMeleeAbilityTemplate(wftempl)
@@ -63,8 +61,13 @@ func (shaman *Shaman) ApplyWindfuryImbue(mh bool, oh bool) {
 
 		return core.Aura{
 			ID: WFImbueAuraID,
-			OnMeleeAttack: func(sim *core.Simulation, target *core.Target, result core.MeleeHitType, ability *core.ActiveMeleeAbility, isOH bool) {
-				if (!mh && !isOH) || (isOH && !oh) {
+			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
+				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() {
+					return
+				}
+
+				isMHHit := hitEffect.IsMH()
+				if (isMHHit && !mh) || (!isMHHit && !oh) {
 					return // cant proc if not enchanted
 				}
 				if icd.IsOnCD(sim) {
@@ -76,14 +79,12 @@ func (shaman *Shaman) ApplyWindfuryImbue(mh bool, oh bool) {
 				icd = core.InternalCD(sim.CurrentTime + icdDur)
 				for i := 0; i < 2; i++ {
 					wfTemplate.Apply(&wfAtk)
-					wfAtk.BonusAttackPower += apBonus
+					wfAtk.MainHit.BonusAttackPower += apBonus
+
 					// Set so only the proc'd hand attacks
-					if isOH {
-						wfAtk.MainHand = 0
-					} else {
-						wfAtk.Offhand = 0
-					}
-					wfAtk.Target = target
+					wfAtk.MainHit.WeaponInput.IsMH = isMHHit
+
+					wfAtk.MainHit.Target = hitEffect.Target
 					wfAtk.Attack(sim)
 				}
 			},
@@ -143,21 +144,22 @@ func (shaman *Shaman) ApplyFlametongueImbue(mh bool, oh bool) {
 	shaman.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		return core.Aura{
 			ID: FTImbueAuraID,
-			OnMeleeAttack: func(sim *core.Simulation, target *core.Target, result core.MeleeHitType, ability *core.ActiveMeleeAbility, isOH bool) {
-				if (!mh && !isOH) || (isOH && !oh) {
-					return // cant proc if not enchanted
-				}
-
-				if result == core.MeleeHitTypeMiss || result == core.MeleeHitTypeDodge || result == core.MeleeHitTypeParry {
+			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
+				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() {
 					return
 				}
 
-				if !isOH {
+				isMHHit := hitEffect.IsMH()
+				if (isMHHit && !mh) || (!isMHHit && !oh) {
+					return // cant proc if not enchanted
+				}
+
+				if isMHHit {
 					mhTemplate.Apply(&ftSpell)
 				} else {
 					ohTemplate.Apply(&ftSpell)
 				}
-				ftSpell.Target = target
+				ftSpell.Target = hitEffect.Target
 				ftSpell.Init(sim)
 				ftSpell.Cast(sim)
 			},
@@ -205,21 +207,22 @@ func (shaman *Shaman) ApplyFrostbrandImbue(mh bool, oh bool) {
 		ppmm := shaman.AutoAttacks.NewPPMManager(9.0)
 		return core.Aura{
 			ID: FBImbueAuraID,
-			OnMeleeAttack: func(sim *core.Simulation, target *core.Target, result core.MeleeHitType, ability *core.ActiveMeleeAbility, isOH bool) {
-				if (!mh && !isOH) || (isOH && !oh) {
-					return // cant proc if not enchanted
-				}
-
-				if result == core.MeleeHitTypeMiss || result == core.MeleeHitTypeDodge || result == core.MeleeHitTypeParry {
+			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
+				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() {
 					return
 				}
 
-				if !ppmm.Proc(sim, isOH, "Frostbrand Weapon") {
+				isMHHit := hitEffect.IsMH()
+				if (isMHHit && !mh) || (!isMHHit && !oh) {
+					return // cant proc if not enchanted
+				}
+
+				if !ppmm.Proc(sim, isMHHit, "Frostbrand Weapon") {
 					return
 				}
 
 				fbTemplate.Apply(&fbSpell)
-				fbSpell.Target = target
+				fbSpell.Target = hitEffect.Target
 				fbSpell.Init(sim)
 				fbSpell.Cast(sim)
 			},

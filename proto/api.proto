@@ -70,6 +70,9 @@ message SimOptions {
 message ActionMetrics {
 		ActionID id = 1;
 
+		// True if a melee action, false if a spell action.
+		bool is_melee = 11;
+
 		// # of times this action was used by the agent.
     int32 casts = 2;
 
@@ -81,6 +84,18 @@ message ActionMetrics {
 
 		// # of times this action was a Miss or Resist.
     int32 misses = 5;
+
+		// # of times this action was a Dodge.
+    int32 dodges = 7;
+
+		// # of times this action was a Parry.
+    int32 parries = 8;
+
+		// # of times this action was a Block.
+    int32 blocks = 9;
+
+		// # of times this action was a Glance.
+    int32 glances = 10;
 
 		// Total damage done to all targets by this action.
     double damage = 6;

@@ -143,7 +143,7 @@ func JudgementOfWisdomAura() Aura {
 				character.AddMana(sim, mana, actionID, false)
 			}
 		},
-		OnMeleeAttack: func(sim *Simulation, target *Target, result MeleeHitType, ability *ActiveMeleeAbility, isOH bool) {
+		OnMeleeAttack: func(sim *Simulation, ability *ActiveMeleeAbility, hitEffect *AbilityHitEffect) {
 			// if ability.ActionID =
 			character := ability.Character
 			// Only apply to agents that have mana.
@@ -163,8 +163,8 @@ func ImprovedSealOfTheCrusaderAura() Aura {
 		OnBeforeSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect) {
 			spellEffect.BonusSpellCritRating += 3 * SpellCritRatingPerCritChance
 		},
-		OnBeforeMelee: func(sim *Simulation, ability *ActiveMeleeAbility, isOH bool) {
-			ability.AbilityEffect.BonusCritRating += 3 * MeleeCritRatingPerCritChance
+		OnBeforeMeleeHit: func(sim *Simulation, ability *ActiveMeleeAbility, hitEffect *AbilityHitEffect) {
+			hitEffect.BonusCritRating += 3 * MeleeCritRatingPerCritChance
 		},
 	}
 }
@@ -226,8 +226,8 @@ func BloodFrenzyAura() Aura {
 	return Aura{
 		ID:       BloodFrenzyDebuffID,
 		ActionID: ActionID{SpellID: 29859},
-		OnBeforeMelee: func(sim *Simulation, ability *ActiveMeleeAbility, isOH bool) {
-			ability.DamageMultiplier *= 1.04
+		OnBeforeMeleeHit: func(sim *Simulation, ability *ActiveMeleeAbility, hitEffect *AbilityHitEffect) {
+			hitEffect.DamageMultiplier *= 1.04
 		},
 	}
 }
@@ -287,8 +287,8 @@ func FaerieFireAura(currentTime time.Duration, target *Target, improved bool) Au
 		},
 	}
 	if improved {
-		aura.OnBeforeMelee = func(sim *Simulation, ability *ActiveMeleeAbility, isOH bool) {
-			ability.BonusHitRating += hitBonus
+		aura.OnBeforeMeleeHit = func(sim *Simulation, ability *ActiveMeleeAbility, hitEffect *AbilityHitEffect) {
+			hitEffect.BonusHitRating += hitBonus
 		}
 	}
 
@@ -307,8 +307,8 @@ func ExposeWeaknessAura(hunterAgility float64, multiplier float64) Aura {
 	return Aura{
 		ID:       ExposeWeaknessDebuffID,
 		ActionID: ActionID{SpellID: 34503},
-		OnBeforeMelee: func(sim *Simulation, ability *ActiveMeleeAbility, isOH bool) {
-			ability.AbilityEffect.BonusAttackPower += apBonus
+		OnBeforeMeleeHit: func(sim *Simulation, ability *ActiveMeleeAbility, hitEffect *AbilityHitEffect) {
+			hitEffect.BonusAttackPower += apBonus
 		},
 	}
 }

@@ -34,6 +34,15 @@ export class ActionId {
 					name = (tag/1000).toFixed(3) + 's ' + baseName;
 				}
 				break;
+			case OtherAction.OtherActionAttack:
+				name = 'Attack';
+				iconUrl = 'https://wow.zamimg.com/images/wow/icons/large/inv_sword_04.jpg';
+				if (tag == 1) {
+					name += ' (Main Hand)';
+				} else if (tag == 2) {
+					name += ' (Off Hand)';
+				}
+				break;
 		}
 		this.baseName = baseName;
 		this.name = name;

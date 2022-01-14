@@ -174,8 +174,8 @@ func FerociousInspirationAura(numBMHunters int32) Aura {
 	return Aura{
 		ID:       FerociousInspirationAuraID,
 		ActionID: ActionID{SpellID: 31870},
-		OnBeforeMelee: func(sim *Simulation, ability *ActiveMeleeAbility, isOH bool) {
-			ability.DamageMultiplier *= multiplier
+		OnBeforeMeleeHit: func(sim *Simulation, ability *ActiveMeleeAbility, hitEffect *AbilityHitEffect) {
+			hitEffect.DamageMultiplier *= multiplier
 		},
 		OnBeforeSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect) {
 			spellEffect.DamageMultiplier *= multiplier
@@ -192,8 +192,8 @@ func ImprovedSanctityAura() Aura {
 	return Aura{
 		ID:       ImprovedSanctityAuraID,
 		ActionID: ActionID{SpellID: 31870},
-		OnBeforeMelee: func(sim *Simulation, ability *ActiveMeleeAbility, isOH bool) {
-			ability.DamageMultiplier *= 1.02
+		OnBeforeMeleeHit: func(sim *Simulation, ability *ActiveMeleeAbility, hitEffect *AbilityHitEffect) {
+			hitEffect.DamageMultiplier *= 1.02
 		},
 		OnBeforeSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect) {
 			spellEffect.DamageMultiplier *= 1.02

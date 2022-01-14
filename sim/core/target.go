@@ -152,6 +152,7 @@ func (target *Target) AddArmor(value float64) {
 }
 
 // ArmorDamageReduction currently assumes a level 70 attacker
+// TODO: Add armor pen parameter
 func (target *Target) ArmorDamageReduction() float64 {
 	return target.armorDamageReduction
 }

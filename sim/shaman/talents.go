@@ -223,8 +223,8 @@ func (shaman *Shaman) applyUnleashedRage() {
 		bonus := 0.02 * float64(level)
 		return core.Aura{
 			ID: UnleasedRageTalentAuraID,
-			OnMeleeAttack: func(sim *core.Simulation, target *core.Target, result core.MeleeHitType, ability *core.ActiveMeleeAbility, isOH bool) {
-				if result != core.MeleeHitTypeCrit {
+			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
+				if hitEffect.HitType != core.MeleeHitTypeCrit || !hitEffect.IsWeaponHit() {
 					return
 				}
 				for i, player := range shaman.GetCharacter().Party.Players {
@@ -281,8 +281,8 @@ func (shaman *Shaman) applyShamanisticFocus() {
 	shaman.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		return core.Aura{
 			ID: ShamanisticFocusTalentAuraID,
-			OnMeleeAttack: func(sim *core.Simulation, target *core.Target, result core.MeleeHitType, ability *core.ActiveMeleeAbility, isOH bool) {
-				if result != core.MeleeHitTypeCrit {
+			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
+				if hitEffect.HitType != core.MeleeHitTypeCrit {
 					return
 				}
 				shaman.AddAura(sim, focusedAura)
@@ -312,8 +312,8 @@ func (shaman *Shaman) applyFlurry() {
 
 		return core.Aura{
 			ID: FlurryTalentAuraID,
-			OnMeleeAttack: func(sim *core.Simulation, target *core.Target, result core.MeleeHitType, ability *core.ActiveMeleeAbility, isOH bool) {
-				if result != core.MeleeHitTypeCrit {
+			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
+				if hitEffect.HitType != core.MeleeHitTypeCrit {
 					if ability == nil {
 						// Remove a stack from auto attacks
 						if flurryStacks > 0 && !icd.IsOnCD(sim) {

@@ -40,7 +40,6 @@ func (shaman *Shaman) newStormstrikeTemplate(sim *core.Simulation) core.MeleeAbi
 		MeleeAbility: core.MeleeAbility{
 			// ID for the action.
 			ActionID: StormstrikeActionID,
-			Name:     "Stormstrike",
 			Cooldown: time.Second * 10,
 			Cost: core.ResourceCost{
 				Type:  stats.Mana,
@@ -50,18 +49,35 @@ func (shaman *Shaman) newStormstrikeTemplate(sim *core.Simulation) core.MeleeAbi
 			ResetSwingTimer: true,
 			Character:       &shaman.Character,
 		},
-		WeaponDamageInput: core.WeaponDamageInput{
-			MainHand: 1.0,
-			Offhand:  1.0,
+		MainHit: core.AbilityHitEffect{
+			AbilityEffect: core.AbilityEffect{
+				DamageMultiplier:       1.0,
+				StaticDamageMultiplier: 1.0,
+			},
+			WeaponInput: core.WeaponDamageInput{
+				IsMH:             true,
+				DamageMultiplier: 1.0,
+			},
 		},
-		AbilityEffect: core.AbilityEffect{
-			DamageMultiplier:       1.0,
-			StaticDamageMultiplier: 1.0,
-			IgnoreDualWieldPenalty: true,
+		AdditionalHits: []core.AbilityHitEffect{
+			core.AbilityHitEffect{
+				AbilityEffect: core.AbilityEffect{
+					DamageMultiplier:       1.0,
+					StaticDamageMultiplier: 1.0,
+				},
+				WeaponInput: core.WeaponDamageInput{
+					IsMH:             false,
+					DamageMultiplier: 1.0,
+				},
+			},
 		},
-		OnMeleeAttack: func(sim *core.Simulation, target *core.Target, result core.MeleeHitType, ability *core.ActiveMeleeAbility, isOH bool) {
+		OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
+			if !hitEffect.Landed() {
+				return
+			}
+
 			ssDebuffAura.Stacks = 2
-			target.ReplaceAura(sim, ssDebuffAura)
+			hitEffect.Target.ReplaceAura(sim, ssDebuffAura)
 			if hasSkyshatter4p {
 				shaman.Character.AddAuraWithTemporaryStats(sim, SkyshatterAPBonusAuraID, core.ActionID{SpellID: 38432}, stats.SpellPower, 70, skyshatterDur)
 			}
@@ -73,13 +89,13 @@ func (shaman *Shaman) newStormstrikeTemplate(sim *core.Simulation) core.MeleeAbi
 	}
 
 	if ItemSetCycloneHarness.CharacterHasSetBonus(&shaman.Character, 4) {
-		ss.WeaponDamageInput.MainHandFlat += 30
-		ss.WeaponDamageInput.OffhandFlat += 30
+		ss.MainHit.WeaponInput.FlatDamageBonus += 30
+		ss.AdditionalHits[0].WeaponInput.FlatDamageBonus += 30
 	}
 
 	// Add weapon % bonus to stormstrike weapons
-	ss.MainHand *= 1 + 0.02*float64(shaman.Talents.WeaponMastery)
-	ss.Offhand *= 1 + 0.02*float64(shaman.Talents.WeaponMastery)
+	ss.MainHit.WeaponInput.DamageMultiplier *= 1 + 0.02*float64(shaman.Talents.WeaponMastery)
+	ss.AdditionalHits[0].WeaponInput.DamageMultiplier *= 1 + 0.02*float64(shaman.Talents.WeaponMastery)
 
 	return core.NewMeleeAbilityTemplate(ss)
 }
@@ -88,6 +104,7 @@ func (shaman *Shaman) NewStormstrike(sim *core.Simulation, target *core.Target) 
 	ss := &shaman.stormstrikeSpell
 	shaman.stormstrikeTemplate.Apply(ss)
 	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	ss.Target = target
+	ss.MainHit.Target = target
+	ss.AdditionalHits[0].Target = target
 	return ss
 }

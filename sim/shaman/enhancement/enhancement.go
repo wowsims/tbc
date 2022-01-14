@@ -61,7 +61,7 @@ func NewEnhancementShaman(character core.Character, options proto.Player) *Enhan
 	// TODO: de-sync dual weapons swing timers?
 
 	// Modify auto attacks multiplier from weapon mastery.
-	enh.AutoAttacks.DamageMultiplier *= 1 + 0.02*float64(enhOptions.Talents.WeaponMastery)
+	enh.AutoAttacks.MainHit.DamageMultiplier *= 1 + 0.02*float64(enhOptions.Talents.WeaponMastery)
 	enh.ApplyWindfuryImbue(
 		enhOptions.Options.MainHandImbue == proto.ShamanWeaponImbue_ImbueWindfury,
 		enhOptions.Options.OffHandImbue == proto.ShamanWeaponImbue_ImbueWindfury)

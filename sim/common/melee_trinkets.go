@@ -221,8 +221,8 @@ func ApplyBadgeOfTheSwarmguard(agent core.Agent) {
 					ID:       BadgeOfTheSwarmguardProcAuraID,
 					ActionID: BadgeOfTheSwarmguardActionID,
 					Expires:  sim.CurrentTime + dur,
-					OnMeleeAttack: func(sim *core.Simulation, target *core.Target, result core.MeleeHitType, ability *core.ActiveMeleeAbility, isOH bool) {
-						if result == core.MeleeHitTypeMiss || result == core.MeleeHitTypeDodge || result == core.MeleeHitTypeParry {
+					OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
+						if !hitEffect.Landed() {
 							return
 						}
 
@@ -247,9 +247,9 @@ func ApplyMarkOfTheChampionMelee(agent core.Agent) {
 	agent.GetCharacter().AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		return core.Aura{
 			ID: MarkOfTheChampionMeleeAuraID,
-			OnBeforeMelee: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, isOH bool) {
-				if ability.Target.MobType == proto.MobType_MobTypeDemon || ability.Target.MobType == proto.MobType_MobTypeUndead {
-					ability.BonusAttackPower += 150
+			OnBeforeMeleeHit: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
+				if hitEffect.Target.MobType == proto.MobType_MobTypeDemon || hitEffect.Target.MobType == proto.MobType_MobTypeUndead {
+					hitEffect.BonusAttackPower += 150
 				}
 			},
 		}
@@ -271,8 +271,8 @@ func ApplyHourglassUnraveller(agent core.Agent) {
 
 		return core.Aura{
 			ID: HourglassUnravellerAuraID,
-			OnMeleeAttack: func(sim *core.Simulation, target *core.Target, result core.MeleeHitType, ability *core.ActiveMeleeAbility, isOH bool) {
-				if result != core.MeleeHitTypeCrit {
+			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
+				if hitEffect.HitType != core.MeleeHitTypeCrit {
 					return
 				}
 				if icd.IsOnCD(sim) {
@@ -324,17 +324,17 @@ func ApplyRomulosPoisonVial(agent core.Agent) {
 
 		return core.Aura{
 			ID: RomulosPoisonVialAuraID,
-			OnMeleeAttack: func(sim *core.Simulation, target *core.Target, result core.MeleeHitType, ability *core.ActiveMeleeAbility, isOH bool) {
-				if result == core.MeleeHitTypeMiss || result == core.MeleeHitTypeDodge || result == core.MeleeHitTypeParry {
+			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
+				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() {
 					return
 				}
-				if !ppmm.Proc(sim, isOH, "RomulosPoisonVial") {
+				if !ppmm.Proc(sim, hitEffect.IsMH(), "RomulosPoisonVial") {
 					return
 				}
 
 				castAction := &spellObj
 				castTemplate.Apply(castAction)
-				castAction.Target = target
+				castAction.Target = hitEffect.Target
 				castAction.Init(sim)
 				castAction.Cast(sim)
 			},
@@ -356,14 +356,14 @@ func ApplyDragonspineTrophy(agent core.Agent) {
 		ppmm := character.AutoAttacks.NewPPMManager(1.0)
 		return core.Aura{
 			ID: DragonspineTrophyAuraID,
-			OnMeleeAttack: func(sim *core.Simulation, target *core.Target, result core.MeleeHitType, ability *core.ActiveMeleeAbility, isOH bool) {
-				if result == core.MeleeHitTypeMiss || result == core.MeleeHitTypeDodge || result == core.MeleeHitTypeParry {
+			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
+				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() {
 					return
 				}
 				if icd.IsOnCD(sim) {
 					return
 				}
-				if !ppmm.Proc(sim, isOH, "dragonspine") {
+				if !ppmm.Proc(sim, hitEffect.IsMH(), "dragonspine") {
 					return
 				}
 				icd = core.InternalCD(sim.CurrentTime + icdDur)
@@ -389,8 +389,8 @@ func ApplyTsunamiTalisman(agent core.Agent) {
 
 		return core.Aura{
 			ID: TsunamiTalismanAuraID,
-			OnMeleeAttack: func(sim *core.Simulation, target *core.Target, result core.MeleeHitType, ability *core.ActiveMeleeAbility, isOH bool) {
-				if result == core.MeleeHitTypeMiss || result == core.MeleeHitTypeDodge || result == core.MeleeHitTypeParry {
+			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
+				if hitEffect.HitType != core.MeleeHitTypeCrit {
 					return
 				}
 				if icd.IsOnCD(sim) {
@@ -417,8 +417,12 @@ func ApplyDarkmoonCardWrath(agent core.Agent) {
 
 		return core.Aura{
 			ID: DarkmoonCardWrathAuraID,
-			OnMeleeAttack: func(sim *core.Simulation, target *core.Target, result core.MeleeHitType, ability *core.ActiveMeleeAbility, isOH bool) {
-				if result == core.MeleeHitTypeCrit {
+			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
+				if !hitEffect.IsWeaponHit() {
+					return
+				}
+
+				if hitEffect.HitType == core.MeleeHitTypeCrit {
 					removeAmount := -1 * critBonus * float64(stacks)
 					character.AddStat(stats.MeleeCrit, removeAmount)
 					character.AddStat(stats.SpellCrit, removeAmount)
@@ -445,11 +449,11 @@ func ApplyMadnessOfTheBetrayer(agent core.Agent) {
 
 		return core.Aura{
 			ID: MadnessOfTheBetrayerAuraID,
-			OnMeleeAttack: func(sim *core.Simulation, target *core.Target, result core.MeleeHitType, ability *core.ActiveMeleeAbility, isOH bool) {
-				if result == core.MeleeHitTypeMiss || result == core.MeleeHitTypeDodge || result == core.MeleeHitTypeParry {
+			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
+				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() {
 					return
 				}
-				if !ppmm.Proc(sim, isOH, "Madness of the Betrayer") {
+				if !ppmm.Proc(sim, hitEffect.IsMH(), "Madness of the Betrayer") {
 					return
 				}
 
@@ -472,8 +476,8 @@ func ApplyBlackenedNaaruSliver(agent core.Agent) {
 
 		return core.Aura{
 			ID: BlackenedNaaruSliverAuraID,
-			OnMeleeAttack: func(sim *core.Simulation, target *core.Target, result core.MeleeHitType, ability *core.ActiveMeleeAbility, isOH bool) {
-				if result == core.MeleeHitTypeMiss || result == core.MeleeHitTypeDodge || result == core.MeleeHitTypeParry {
+			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
+				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() {
 					return
 				}
 				if icd.IsOnCD(sim) {
@@ -493,8 +497,8 @@ func ApplyBlackenedNaaruSliver(agent core.Agent) {
 					ID:       BlackenedNaaruSliverProcAuraID,
 					ActionID: core.ActionID{ItemID: 34427},
 					Expires:  sim.CurrentTime + dur,
-					OnMeleeAttack: func(sim *core.Simulation, target *core.Target, result core.MeleeHitType, ability *core.ActiveMeleeAbility, isOH bool) {
-						if result == core.MeleeHitTypeMiss || result == core.MeleeHitTypeDodge || result == core.MeleeHitTypeParry {
+					OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
+						if !hitEffect.Landed() || !hitEffect.IsWeaponHit() {
 							return
 						}
 
@@ -528,8 +532,8 @@ func ApplyShardOfContempt(agent core.Agent) {
 
 		return core.Aura{
 			ID: ShardOfContemptAuraID,
-			OnMeleeAttack: func(sim *core.Simulation, target *core.Target, result core.MeleeHitType, ability *core.ActiveMeleeAbility, isOH bool) {
-				if result == core.MeleeHitTypeMiss || result == core.MeleeHitTypeDodge || result == core.MeleeHitTypeParry {
+			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
+				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() {
 					return
 				}
 				if icd.IsOnCD(sim) {
