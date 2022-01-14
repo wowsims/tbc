@@ -426,15 +426,20 @@ class ActionMetrics$Type extends MessageType {
     constructor() {
         super("proto.ActionMetrics", [
             { no: 1, name: "id", kind: "message", T: () => ActionID },
+            { no: 11, name: "is_melee", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 2, name: "casts", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 3, name: "hits", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 4, name: "crits", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 5, name: "misses", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 7, name: "dodges", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 8, name: "parries", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 9, name: "blocks", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 10, name: "glances", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 6, name: "damage", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ }
         ]);
     }
     create(value) {
-        const message = { casts: 0, hits: 0, crits: 0, misses: 0, damage: 0 };
+        const message = { isMelee: false, casts: 0, hits: 0, crits: 0, misses: 0, dodges: 0, parries: 0, blocks: 0, glances: 0, damage: 0 };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -448,6 +453,9 @@ class ActionMetrics$Type extends MessageType {
                 case /* proto.ActionID id */ 1:
                     message.id = ActionID.internalBinaryRead(reader, reader.uint32(), options, message.id);
                     break;
+                case /* bool is_melee */ 11:
+                    message.isMelee = reader.bool();
+                    break;
                 case /* int32 casts */ 2:
                     message.casts = reader.int32();
                     break;
@@ -459,6 +467,18 @@ class ActionMetrics$Type extends MessageType {
                     break;
                 case /* int32 misses */ 5:
                     message.misses = reader.int32();
+                    break;
+                case /* int32 dodges */ 7:
+                    message.dodges = reader.int32();
+                    break;
+                case /* int32 parries */ 8:
+                    message.parries = reader.int32();
+                    break;
+                case /* int32 blocks */ 9:
+                    message.blocks = reader.int32();
+                    break;
+                case /* int32 glances */ 10:
+                    message.glances = reader.int32();
                     break;
                 case /* double damage */ 6:
                     message.damage = reader.double();
@@ -478,6 +498,9 @@ class ActionMetrics$Type extends MessageType {
         /* proto.ActionID id = 1; */
         if (message.id)
             ActionID.internalBinaryWrite(message.id, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+        /* bool is_melee = 11; */
+        if (message.isMelee !== false)
+            writer.tag(11, WireType.Varint).bool(message.isMelee);
         /* int32 casts = 2; */
         if (message.casts !== 0)
             writer.tag(2, WireType.Varint).int32(message.casts);
@@ -490,6 +513,18 @@ class ActionMetrics$Type extends MessageType {
         /* int32 misses = 5; */
         if (message.misses !== 0)
             writer.tag(5, WireType.Varint).int32(message.misses);
+        /* int32 dodges = 7; */
+        if (message.dodges !== 0)
+            writer.tag(7, WireType.Varint).int32(message.dodges);
+        /* int32 parries = 8; */
+        if (message.parries !== 0)
+            writer.tag(8, WireType.Varint).int32(message.parries);
+        /* int32 blocks = 9; */
+        if (message.blocks !== 0)
+            writer.tag(9, WireType.Varint).int32(message.blocks);
+        /* int32 glances = 10; */
+        if (message.glances !== 0)
+            writer.tag(10, WireType.Varint).int32(message.glances);
         /* double damage = 6; */
         if (message.damage !== 0)
             writer.tag(6, WireType.Bit64).double(message.damage);

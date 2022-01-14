@@ -201,6 +201,12 @@ export interface ActionMetrics {
      */
     id?: ActionID;
     /**
+     * True if a melee action, false if a spell action.
+     *
+     * @generated from protobuf field: bool is_melee = 11;
+     */
+    isMelee: boolean;
+    /**
      * # of times this action was used by the agent.
      *
      * @generated from protobuf field: int32 casts = 2;
@@ -224,6 +230,30 @@ export interface ActionMetrics {
      * @generated from protobuf field: int32 misses = 5;
      */
     misses: number;
+    /**
+     * # of times this action was a Dodge.
+     *
+     * @generated from protobuf field: int32 dodges = 7;
+     */
+    dodges: number;
+    /**
+     * # of times this action was a Parry.
+     *
+     * @generated from protobuf field: int32 parries = 8;
+     */
+    parries: number;
+    /**
+     * # of times this action was a Block.
+     *
+     * @generated from protobuf field: int32 blocks = 9;
+     */
+    blocks: number;
+    /**
+     * # of times this action was a Glance.
+     *
+     * @generated from protobuf field: int32 glances = 10;
+     */
+    glances: number;
     /**
      * Total damage done to all targets by this action.
      *

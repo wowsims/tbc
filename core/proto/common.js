@@ -807,6 +807,18 @@ export var OtherAction;
      * @generated from protobuf enum value: OtherActionManaRegen = 2;
      */
     OtherAction[OtherAction["OtherActionManaRegen"] = 2] = "OtherActionManaRegen";
+    /**
+     * A white hit, can be main hand or off hand.
+     *
+     * @generated from protobuf enum value: OtherActionAttack = 3;
+     */
+    OtherAction[OtherAction["OtherActionAttack"] = 3] = "OtherActionAttack";
+    /**
+     * Default shoot action using a wand/bow/gun.
+     *
+     * @generated from protobuf enum value: OtherActionShoot = 4;
+     */
+    OtherAction[OtherAction["OtherActionShoot"] = 4] = "OtherActionShoot";
 })(OtherAction || (OtherAction = {}));
 // @generated message type with reflection information, may provide speed optimized methods
 class RaidBuffs$Type extends MessageType {

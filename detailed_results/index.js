@@ -2,6 +2,7 @@ import { TypedEvent } from '/tbc/core/typed_event.js';
 import { SimResult } from '/tbc/core/proto_utils/sim_result.js';
 import { ResultsFilter } from './results_filter.js';
 import { CastMetrics } from './cast_metrics.js';
+import { MeleeMetrics } from './melee_metrics.js';
 import { SpellMetrics } from './spell_metrics.js';
 import { PlayerDamageMetrics } from './player_damage.js';
 import { AuraMetrics } from './aura_metrics.js';
@@ -59,6 +60,10 @@ const layoutHTML = `
 				</div>
 			</div>
 			<div class="dr-row single-player-only">
+				<div class="melee-metrics">
+				</div>
+			</div>
+			<div class="dr-row single-player-only">
 				<div class="spell-metrics">
 				</div>
 			</div>
@@ -103,6 +108,7 @@ const toplineResultsDiv = document.body.getElementsByClassName('topline-results'
 const dpsResult = new DpsResult({ parent: toplineResultsDiv, resultsEmitter: resultsEmitter, colorSettings: colorSettings });
 const percentOom = new PercentOom({ parent: toplineResultsDiv, resultsEmitter: resultsEmitter, colorSettings: colorSettings });
 const castMetrics = new CastMetrics({ parent: document.body.getElementsByClassName('cast-metrics')[0], resultsEmitter: resultsEmitter, colorSettings: colorSettings });
+const meleeMetrics = new MeleeMetrics({ parent: document.body.getElementsByClassName('melee-metrics')[0], resultsEmitter: resultsEmitter, colorSettings: colorSettings });
 const spellMetrics = new SpellMetrics({ parent: document.body.getElementsByClassName('spell-metrics')[0], resultsEmitter: resultsEmitter, colorSettings: colorSettings });
 const playerDamageMetrics = new PlayerDamageMetrics({ parent: document.body.getElementsByClassName('player-damage-metrics')[0], resultsEmitter: resultsEmitter, colorSettings: colorSettings }, resultsFilter);
 const buffAuraMetrics = new AuraMetrics({

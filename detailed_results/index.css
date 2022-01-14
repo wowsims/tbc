@@ -293,6 +293,10 @@
   font-weight: bold;
 }
 
+.cast-metrics-root.empty {
+  display: none;
+}
+
 :root {
   --theme-color-primary: DarkSlateGrey;
   --theme-color-background: DarkSlateGrey;

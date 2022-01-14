@@ -1409,7 +1409,19 @@ export declare enum OtherAction {
     /**
      * @generated from protobuf enum value: OtherActionManaRegen = 2;
      */
-    OtherActionManaRegen = 2
+    OtherActionManaRegen = 2,
+    /**
+     * A white hit, can be main hand or off hand.
+     *
+     * @generated from protobuf enum value: OtherActionAttack = 3;
+     */
+    OtherActionAttack = 3,
+    /**
+     * Default shoot action using a wand/bow/gun.
+     *
+     * @generated from protobuf enum value: OtherActionShoot = 4;
+     */
+    OtherActionShoot = 4
 }
 declare class RaidBuffs$Type extends MessageType<RaidBuffs> {
     constructor();
