@@ -56,12 +56,6 @@ func applyDebuffEffects(target *Target, debuffs proto.Debuffs) {
 		})
 	}
 
-	if debuffs.SunderArmor {
-		target.AddPermanentAura(func(sim *Simulation) Aura {
-			return SunderArmorAura(0, target, 5)
-		})
-	}
-
 	if debuffs.ExposeArmor != proto.TristateEffect_TristateEffectMissing {
 		points := 0
 		if debuffs.ExposeArmor == proto.TristateEffect_TristateEffectImproved {
@@ -69,6 +63,10 @@ func applyDebuffEffects(target *Target, debuffs proto.Debuffs) {
 		}
 		target.AddPermanentAura(func(sim *Simulation) Aura {
 			return ExposeArmorAura(0, target, points)
+		})
+	} else if debuffs.SunderArmor {
+		target.AddPermanentAura(func(sim *Simulation) Aura {
+			return SunderArmorAura(0, target, 5)
 		})
 	}
 

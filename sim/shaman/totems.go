@@ -191,11 +191,12 @@ func (shaman *Shaman) TryDropTotems(sim *core.Simulation) time.Duration {
 	}
 
 	var cast *core.SimpleCast
-	var attackCast *core.SimpleSpell // if using fire totems this will be an attack cast.
+	var attackCast *core.SimpleSpell                 // if using fire totems this will be an attack cast.
+	var multiCast *core.MultiTargetDirectDamageSpell // if using fire totems this will be an attack cast.
 
 	// currently hardcoded to include 25% mana cost reduction from resto talents
 	for totemTypeIdx, totemExpiration := range shaman.SelfBuffs.NextTotemDrops {
-		if cast != nil || attackCast != nil {
+		if cast != nil || attackCast != nil || multiCast != nil {
 			break
 		}
 		nextDrop := shaman.SelfBuffs.NextTotemDropType[totemTypeIdx]
@@ -210,6 +211,7 @@ func (shaman *Shaman) TryDropTotems(sim *core.Simulation) time.Duration {
 				case graceOfAirTotem:
 					cast = shaman.NewGraceOfAirTotem(sim)
 				}
+
 			case EarthTotem:
 				switch nextDrop {
 				case strengthOfEarthTotem:
@@ -226,16 +228,20 @@ func (shaman *Shaman) TryDropTotems(sim *core.Simulation) time.Duration {
 					attackCast = shaman.NewSearingTotem(sim, sim.GetPrimaryTarget())
 					shaman.SelfBuffs.NextTotemDrops[FireTotem] = sim.CurrentTime + time.Second*60 + 1
 				case magmaTotem:
-					attackCast = shaman.NewMagmaTotem(sim, sim.GetPrimaryTarget())
+					multiCast = shaman.NewMagmaTotem(sim)
 					shaman.SelfBuffs.NextTotemDrops[FireTotem] = sim.CurrentTime + time.Second*20 + 1
 				case novaTotem:
+					// If we drop nova while another totem is running, cancel it.
 					if shaman.FireTotemSpell.DotInput.IsTicking(sim) {
-						shaman.FireTotemSpell.Cancel(sim) // if we drop nova while another totem is running, cancel it.
+						shaman.FireTotemSpell.Cancel(sim)
+					} else if shaman.MultiTargetFireTotemSpell.IsInUse() {
+						shaman.MultiTargetFireTotemSpell.Cancel(sim)
 					}
-					attackCast = shaman.NewNovaTotem(sim, sim.GetPrimaryTarget())
+					multiCast = shaman.NewNovaTotem(sim)
 					// use attackCast.DotInput.TickLength as input in case ImprovedFireTotems reduces time to explode
-					shaman.SelfBuffs.NextTotemDrops[FireTotem] = sim.CurrentTime + attackCast.DotInput.TickLength + 1
+					shaman.SelfBuffs.NextTotemDrops[FireTotem] = sim.CurrentTime + multiCast.Effects[0].DotInput.TickLength + 1
 				}
+
 			case WaterTotem:
 				cast = shaman.NewWaterTotem(sim)
 			}
@@ -244,13 +250,29 @@ func (shaman *Shaman) TryDropTotems(sim *core.Simulation) time.Duration {
 
 	success := false
 	cost := 0.0
+	anyCast := false
+	isFireAttack := false
 	if cast != nil {
+		anyCast = true
 		success = cast.StartCast(sim)
 		cost = cast.GetManaCost()
 	} else if attackCast != nil {
+		anyCast = true
+		isFireAttack = true
 		success = attackCast.Cast(sim)
 		cost = attackCast.GetManaCost()
+	} else if multiCast != nil {
+		anyCast = true
+		isFireAttack = true
+		success = multiCast.Cast(sim)
+		cost = multiCast.GetManaCost()
+	}
 
+	if !anyCast {
+		return 0
+	}
+
+	if isFireAttack {
 		if shaman.SelfBuffs.TwistFireNova {
 			nextDrop := shaman.SelfBuffs.NextTotemDropType[FireTotem]
 			if nextDrop != novaTotem {
@@ -261,8 +283,6 @@ func (shaman *Shaman) TryDropTotems(sim *core.Simulation) time.Duration {
 				shaman.SelfBuffs.NextTotemDropType[FireTotem] = int32(shaman.SelfBuffs.FireTotem)
 			}
 		}
-	} else {
-		return 0 // no totem to cast
 	}
 
 	if !success {

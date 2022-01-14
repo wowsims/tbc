@@ -81,6 +81,9 @@ type Target struct {
 
 	// For logging.
 	Name string
+
+	// Cached value to handle sunder/expose overriding each other.
+	sunderOrExposeArmorReduction float64
 }
 
 func NewTarget(options proto.Target, targetIndex int32) *Target {
