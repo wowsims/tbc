@@ -114,10 +114,12 @@ type Shaman struct {
 	flameShockTemplate core.SimpleSpellTemplate
 
 	// Fire Totems
-	FireTotemSpell       core.SimpleSpell
+	FireTotemSpell            core.SimpleSpell
+	MultiTargetFireTotemSpell core.MultiTargetDirectDamageSpell
+
 	searingTotemTemplate core.SimpleSpellTemplate
-	magmaTotemTemplate   core.SimpleSpellTemplate
-	novaTotemTemplate    core.SimpleSpellTemplate
+	magmaTotemTemplate   core.MultiTargetDirectDamageSpellTemplate
+	novaTotemTemplate    core.MultiTargetDirectDamageSpellTemplate
 
 	unleashedRages []core.Aura
 }

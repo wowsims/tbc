@@ -11,8 +11,6 @@ import (
 
 const SpellIDSearingTotem int32 = 25533
 
-// This is probably not worth simming since no other spell in the game does this and AM isn't
-// even a popular choice for arcane mages.
 func (shaman *Shaman) newSearingTotemTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
@@ -43,8 +41,9 @@ func (shaman *Shaman) newSearingTotemTemplate(sim *core.Simulation) core.SimpleS
 			},
 		},
 	}
-
 	spell.DamageMultiplier *= 1 + float64(shaman.Talents.CallOfFlame)*0.05
+	spell.ManaCost -= spell.BaseManaCost * float64(shaman.Talents.TotemicFocus) * 0.05
+	spell.ManaCost -= spell.BaseManaCost * float64(shaman.Talents.MentalQuickness) * 0.02
 
 	return core.NewSimpleSpellTemplate(spell)
 }
@@ -65,8 +64,8 @@ const SpellIDMagmaTotem int32 = 25552
 
 // This is probably not worth simming since no other spell in the game does this and AM isn't
 // even a popular choice for arcane mages.
-func (shaman *Shaman) newMagmaTotemTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
-	spell := core.SimpleSpell{
+func (shaman *Shaman) newMagmaTotemTemplate(sim *core.Simulation) core.MultiTargetDirectDamageSpellTemplate {
+	spell := core.MultiTargetDirectDamageSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
 				CritMultiplier: 1.5,
@@ -80,34 +79,46 @@ func (shaman *Shaman) newMagmaTotemTemplate(sim *core.Simulation) core.SimpleSpe
 				GCDCooldown: time.Second,
 			},
 		},
-		SpellHitEffect: core.SpellHitEffect{
-			SpellEffect: core.SpellEffect{
-				DamageMultiplier:       1,
-				StaticDamageMultiplier: 1,
-				IgnoreHitCheck:         true,
-			},
-			DotInput: core.DotDamageInput{
-				NumberOfTicks:        10,
-				TickLength:           time.Second * 2,
-				TickBaseDamage:       97,
-				TickSpellCoefficient: 0.067,
-				TicksCanMissAndCrit:  true,
-			},
+	}
+	spell.ManaCost -= spell.BaseManaCost * float64(shaman.Talents.TotemicFocus) * 0.05
+	spell.ManaCost -= spell.BaseManaCost * float64(shaman.Talents.MentalQuickness) * 0.02
+
+	baseEffect := core.SpellHitEffect{
+		SpellEffect: core.SpellEffect{
+			DamageMultiplier:       1,
+			StaticDamageMultiplier: 1,
+			IgnoreHitCheck:         true,
+		},
+		DotInput: core.DotDamageInput{
+			NumberOfTicks:        10,
+			TickLength:           time.Second * 2,
+			TickBaseDamage:       97,
+			TickSpellCoefficient: 0.067,
+			TicksCanMissAndCrit:  true,
 		},
 	}
+	baseEffect.StaticDamageMultiplier *= 1 + float64(shaman.Talents.CallOfFlame)*0.05
 
-	spell.DamageMultiplier *= 1 + float64(shaman.Talents.CallOfFlame)*0.05
+	numHits := sim.GetNumTargets()
+	effects := make([]core.SpellHitEffect, 0, numHits)
+	for i := int32(0); i < numHits; i++ {
+		effects = append(effects, baseEffect)
+	}
+	spell.Effects = effects
 
-	return core.NewSimpleSpellTemplate(spell)
+	return core.NewMultiTargetDirectDamageSpellTemplate(spell)
 }
 
-func (shaman *Shaman) NewMagmaTotem(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
+func (shaman *Shaman) NewMagmaTotem(sim *core.Simulation) *core.MultiTargetDirectDamageSpell {
 	// Initialize cast from precomputed template.
-	magmaTotem := &shaman.FireTotemSpell
+	magmaTotem := &shaman.MultiTargetFireTotemSpell
 	shaman.magmaTotemTemplate.Apply(magmaTotem)
 
 	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	magmaTotem.Target = target
+	numHits := sim.GetNumTargets()
+	for i := int32(0); i < numHits; i++ {
+		magmaTotem.Effects[i].Target = sim.GetTarget(i)
+	}
 	magmaTotem.Init(sim)
 
 	return magmaTotem
@@ -119,8 +130,8 @@ var CooldownIDNovaTotem = core.NewCooldownID()
 
 // This is probably not worth simming since no other spell in the game does this and AM isn't
 // even a popular choice for arcane mages.
-func (shaman *Shaman) newNovaTotemTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
-	spell := core.SimpleSpell{
+func (shaman *Shaman) newNovaTotemTemplate(sim *core.Simulation) core.MultiTargetDirectDamageSpellTemplate {
+	spell := core.MultiTargetDirectDamageSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
 				CritMultiplier: 1.5,
@@ -136,35 +147,47 @@ func (shaman *Shaman) newNovaTotemTemplate(sim *core.Simulation) core.SimpleSpel
 				GCDCooldown: time.Second,
 			},
 		},
-		SpellHitEffect: core.SpellHitEffect{
-			SpellEffect: core.SpellEffect{
-				DamageMultiplier:       1,
-				StaticDamageMultiplier: 1,
-				IgnoreHitCheck:         true,
-			},
-			DotInput: core.DotDamageInput{
-				NumberOfTicks:        1,
-				TickLength:           time.Second * 5,
-				TickBaseDamage:       692,
-				TickSpellCoefficient: 0.214,
-				TicksCanMissAndCrit:  true,
-			},
+	}
+	spell.ManaCost -= spell.BaseManaCost * float64(shaman.Talents.TotemicFocus) * 0.05
+	spell.ManaCost -= spell.BaseManaCost * float64(shaman.Talents.MentalQuickness) * 0.02
+
+	baseEffect := core.SpellHitEffect{
+		SpellEffect: core.SpellEffect{
+			DamageMultiplier:       1,
+			StaticDamageMultiplier: 1,
+			IgnoreHitCheck:         true,
+		},
+		DotInput: core.DotDamageInput{
+			NumberOfTicks:        1,
+			TickLength:           time.Second * 5,
+			TickBaseDamage:       692,
+			TickSpellCoefficient: 0.214,
+			TicksCanMissAndCrit:  true,
 		},
 	}
+	baseEffect.StaticDamageMultiplier *= 1 + float64(shaman.Talents.CallOfFlame)*0.05
+	baseEffect.DotInput.TickLength -= time.Duration(shaman.Talents.ImprovedFireTotems) * time.Second
 
-	spell.DamageMultiplier *= 1 + float64(shaman.Talents.CallOfFlame)*0.05
-	spell.DotInput.TickLength -= time.Duration(shaman.Talents.ImprovedFireTotems) * time.Second
+	numHits := sim.GetNumTargets()
+	effects := make([]core.SpellHitEffect, 0, numHits)
+	for i := int32(0); i < numHits; i++ {
+		effects = append(effects, baseEffect)
+	}
+	spell.Effects = effects
 
-	return core.NewSimpleSpellTemplate(spell)
+	return core.NewMultiTargetDirectDamageSpellTemplate(spell)
 }
 
-func (shaman *Shaman) NewNovaTotem(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
+func (shaman *Shaman) NewNovaTotem(sim *core.Simulation) *core.MultiTargetDirectDamageSpell {
 	// Initialize cast from precomputed template.
-	novaTotem := &shaman.FireTotemSpell
+	novaTotem := &shaman.MultiTargetFireTotemSpell
 	shaman.novaTotemTemplate.Apply(novaTotem)
 
 	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	novaTotem.Target = target
+	numHits := sim.GetNumTargets()
+	for i := int32(0); i < numHits; i++ {
+		novaTotem.Effects[i].Target = sim.GetTarget(i)
+	}
 	novaTotem.Init(sim)
 
 	return novaTotem

@@ -136,7 +136,7 @@ func (shaman *Shaman) NewFlameShock(sim *core.Simulation, target *core.Target) *
 	}
 
 	shock := &shaman.FlameShockSpell
-	shaman.frostShockTemplate.Apply(shock)
+	shaman.flameShockTemplate.Apply(shock)
 	// Set dynamic fields, i.e. the stuff we couldn't precompute.
 	shock.Target = target
 	shaman.applyShockInitModifiers(&shock.SpellCast)

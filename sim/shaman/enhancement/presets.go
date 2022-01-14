@@ -47,7 +47,9 @@ var enhShamRotation = &proto.EnhancementShaman_Rotation{
 		Earth: proto.EarthTotem_StrengthOfEarthTotem,
 		Air:   proto.AirTotem_GraceOfAirTotem,
 		Water: proto.WaterTotem_ManaSpringTotem,
-		Fire:  proto.FireTotem_NoFireTotem, // TODO: deal with fire totem later... can fire totems just be a DoT?
+		Fire:  proto.FireTotem_MagmaTotem,
+
+		TwistFireNova: true,
 	},
 	PrimaryShock:    proto.EnhancementShaman_Rotation_Earth,
 	WeaveFlameShock: true,

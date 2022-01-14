@@ -57,6 +57,13 @@ func (spell *MultiTargetDirectDamageSpell) Cast(sim *Simulation) bool {
 	})
 }
 
+func (spell *MultiTargetDirectDamageSpell) Cancel(sim *Simulation) {
+	spell.SpellCast.Cancel()
+	for i, _ := range spell.Effects {
+		spell.Effects[i].cancel(sim)
+	}
+}
+
 type MultiTargetDirectDamageSpellTemplate struct {
 	template MultiTargetDirectDamageSpell
 	effects  []SpellHitEffect // cached effects to use on the actual cast so we don't mutate the template
