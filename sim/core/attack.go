@@ -624,7 +624,8 @@ func (aa *AutoAttacks) NewPPMManager(ppm float64) PPMManager {
 }
 
 type MeleeAbilityTemplate struct {
-	template ActiveMeleeAbility
+	template       ActiveMeleeAbility
+	additionalHits []AbilityHitEffect
 }
 
 func (template *MeleeAbilityTemplate) Apply(newAction *ActiveMeleeAbility) {
@@ -632,11 +633,14 @@ func (template *MeleeAbilityTemplate) Apply(newAction *ActiveMeleeAbility) {
 		panic(fmt.Sprintf("Melee ability (%s) already in use", newAction.ActionID))
 	}
 	*newAction = template.template
+	newAction.AdditionalHits = template.additionalHits
+	copy(newAction.AdditionalHits, template.template.AdditionalHits)
 }
 
 // Takes in a cast template and returns a template, so you don't need to keep track of which things to allocate yourself.
-func NewMeleeAbilityTemplate(spellTemplate ActiveMeleeAbility) MeleeAbilityTemplate {
+func NewMeleeAbilityTemplate(abilityTemplate ActiveMeleeAbility) MeleeAbilityTemplate {
 	return MeleeAbilityTemplate{
-		template: spellTemplate,
+		template:       abilityTemplate,
+		additionalHits: make([]AbilityHitEffect, len(abilityTemplate.AdditionalHits)),
 	}
 }

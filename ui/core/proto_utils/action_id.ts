@@ -151,12 +151,14 @@ export class ActionId {
 					name += ' (Spell)';
 				}
 				break;
+			case 'Lightning Speed':
+				if (this.tag == 1) {
+					name += ' (Main Hand)';
+				} else if (this.tag == 2) {
+					name += ' (Off Hand)';
+				}
 			default:
-				if (this.tag == 10) {
-					name += ' (Auto)';
-				} else if (this.tag == 11) {
-					name += ' (Offhand Auto)';
-				} else if (this.tag) {
+				if (this.tag) {
 					name += ' (??)';
 				}
 				break;

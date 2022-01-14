@@ -49,10 +49,10 @@ func ApplyMongooseEffect(agent core.Agent) {
 			var tag int32
 			var auraID core.AuraID
 			if isMH {
-				tag = 0
+				tag = 1
 				auraID = LightningSpeedMHAuraID
 			} else {
-				tag = 1
+				tag = 2
 				auraID = LightningSpeedOHAuraID
 			}
 			character.AddAura(sim, core.Aura{
