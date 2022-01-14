@@ -385,6 +385,7 @@ func (ability *ActiveMeleeAbility) Attack(sim *Simulation) bool {
 
 func (ahe *AbilityHitEffect) performAttack(sim *Simulation, ability *ActiveMeleeAbility) {
 	ability.Character.OnBeforeMeleeHit(sim, ability, ahe)
+	ahe.Target.OnBeforeMeleeHit(sim, ability, ahe)
 
 	ahe.calculateDamage(sim, ability)
 
@@ -409,8 +410,8 @@ func (ahe *AbilityHitEffect) performAttack(sim *Simulation, ability *ActiveMelee
 		ability.Character.Log(sim, "%s %s", ability.ActionID, ahe)
 	}
 
-	ahe.Target.OnMeleeAttack(sim, ability, ahe)
 	ability.Character.OnMeleeAttack(sim, ability, ahe)
+	ahe.Target.OnMeleeAttack(sim, ability, ahe)
 	if ability.OnMeleeAttack != nil {
 		ability.OnMeleeAttack(sim, ability, ahe)
 	}
