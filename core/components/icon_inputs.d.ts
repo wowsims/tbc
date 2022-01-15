@@ -46,6 +46,7 @@ export declare const WintersChill: IndividualSimIconPickerConfig<Target, boolean
 export declare const AdeptsElixir: IndividualSimIconPickerConfig<Player<any>, boolean>;
 export declare const BlackenedBasilisk: IndividualSimIconPickerConfig<Player<any>, boolean>;
 export declare const BrilliantWizardOil: IndividualSimIconPickerConfig<Player<any>, boolean>;
+export declare const ElixirOfDemonslaying: IndividualSimIconPickerConfig<Player<any>, boolean>;
 export declare const ElixirOfDraenicWisdom: IndividualSimIconPickerConfig<Player<any>, boolean>;
 export declare const ElixirOfMajorFirePower: IndividualSimIconPickerConfig<Player<any>, boolean>;
 export declare const ElixirOfMajorFrostPower: IndividualSimIconPickerConfig<Player<any>, boolean>;

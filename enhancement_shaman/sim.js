@@ -142,6 +142,7 @@ export class EnhancementShamanSimUI extends IndividualSimUI {
                 IconInputs.DefaultHastePotion,
                 IconInputs.DefaultDarkRune,
                 IconInputs.FlaskOfRelentlessAssault,
+                IconInputs.ElixirOfDemonslaying,
                 IconInputs.ElixirOfMajorAgility,
                 IconInputs.RoastedClefthoof,
                 IconInputs.ScrollOfAgilityV,

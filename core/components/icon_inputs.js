@@ -52,6 +52,7 @@ export const WintersChill = makeBooleanDebuffInput(ActionId.fromSpellId(28595), 
 export const AdeptsElixir = makeBooleanConsumeInput(ActionId.fromItemId(28103), 'adeptsElixir', ['Battle Elixir']);
 export const BlackenedBasilisk = makeBooleanConsumeInput(ActionId.fromItemId(27657), 'blackenedBasilisk', ['Food']);
 export const BrilliantWizardOil = makeBooleanConsumeInput(ActionId.fromItemId(20749), 'brilliantWizardOil', ['Weapon Imbue']);
+export const ElixirOfDemonslaying = makeBooleanConsumeInput(ActionId.fromItemId(9224), 'elixirOfDemonslaying', ['Battle Elixir']);
 export const ElixirOfDraenicWisdom = makeBooleanConsumeInput(ActionId.fromItemId(32067), 'elixirOfDraenicWisdom', ['Guardian Elixir']);
 export const ElixirOfMajorFirePower = makeBooleanConsumeInput(ActionId.fromItemId(22833), 'elixirOfMajorFirePower', ['Battle Elixir']);
 export const ElixirOfMajorFrostPower = makeBooleanConsumeInput(ActionId.fromItemId(22827), 'elixirOfMajorFrostPower', ['Battle Elixir']);

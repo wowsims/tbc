@@ -6,6 +6,7 @@ export declare const GREATER_INSCRIPTION_OF_THE_ORB = 28909;
 export declare const POWER_OF_THE_SCOURGE = 23545;
 export declare const GREATER_INSCRIPTION_OF_VENGEANCE = 28888;
 export declare const SUBTLETY = 33150;
+export declare const CLOAK_GREATER_AGILITY = 34004;
 export declare const CHEST_MAJOR_SPIRIT = 33990;
 export declare const CHEST_EXCEPTIONAL_MANA = 22546;
 export declare const CHEST_EXCEPTIONAL_STATS = 24003;

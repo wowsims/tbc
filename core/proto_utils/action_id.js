@@ -139,12 +139,14 @@ export class ActionId {
                 }
                 break;
             case 'Lightning Speed':
+            case 'Windfury Weapon':
                 if (this.tag == 1) {
                     name += ' (Main Hand)';
                 }
                 else if (this.tag == 2) {
                     name += ' (Off Hand)';
                 }
+                break;
             default:
                 if (this.tag) {
                     name += ' (??)';
