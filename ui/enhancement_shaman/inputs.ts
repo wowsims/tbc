@@ -60,6 +60,25 @@ function makeShamanWeaponImbueInput(isOffHand: boolean): IconEnumPickerConfig<Pl
 	};
 }
 
+export const DelayOffhandSwings = {
+	type: 'boolean' as const,
+	getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
+	config: {
+		extraCssClasses: [
+			'delay-offhand-swings-picker',
+		],
+		label: 'Delay Offhand Swings',
+		labelTooltip: 'Uses the startattack macro to delay OH swings, so they always follow within 0.5s of a MH swing.',
+		changedEvent: (player: Player<Spec.SpecEnhancementShaman>) => player.specOptionsChangeEmitter,
+		getValue: (player: Player<Spec.SpecEnhancementShaman>) => player.getSpecOptions().delayOffhandSwings,
+		setValue: (eventID: EventID, player: Player<Spec.SpecEnhancementShaman>, newValue: boolean) => {
+			const newOptions = player.getSpecOptions();
+			newOptions.delayOffhandSwings = newValue;
+			player.setSpecOptions(eventID, newOptions);
+		},
+	},
+};
+
 export const EnhancementShamanRotationConfig = {
 	inputs: [
 		{
@@ -116,7 +135,7 @@ function makeBooleanShamanBuffInput(id: ActionId, optionsFieldName: keyof Shaman
 	(newOptions[optionsFieldName] as boolean) = newValue;
 			player.setSpecOptions(eventID, newOptions);
 		},
-	}
+	};
 }
 
 export function TotemsSection(simUI: IndividualSimUI<Spec.SpecEnhancementShaman>, parentElem: HTMLElement): string {
@@ -282,22 +301,3 @@ export function TotemsSection(simUI: IndividualSimUI<Spec.SpecEnhancementShaman>
 
 	return 'Totems';
 }
-
-// function makeBoolShamanTotem(id: ActionId, optionsFieldName: keyof totems?): IconPickerConfig<Player<any>, boolean> {
-//   return {
-//     id: id,
-//     states: 2,
-// 		changedEvent: (player: Player<Spec.SpecEnhancementShaman>) => player.specOptionsChangeEmitter,
-// 		getValue: (player: Player<Spec.SpecEnhancementShaman>) => {
-// 			const totems = player.getSpecOptions().totems as ShamanTotems;
-// 			return totems[optionsFieldName] as boolean;
-// 		},
-// 		setValue: (player: Player<Spec.SpecEnhancementShaman>, newValue: boolean) => {
-// 			const newOptions = player.getSpecOptions();
-// 			const totems = newOptions.totems as ShamanTotems;
-//       		(totems[optionsFieldName] as boolean) = newValue;
-// 			newOptions.totems = totems;
-// 			player.setSpecOptions(newOptions);
-// 		},
-//   }
-// }

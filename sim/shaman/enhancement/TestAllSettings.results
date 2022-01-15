@@ -1,48 +1,48 @@
 dps_results: {
  key: "TestAllSettings-Troll10-P2-Basic-FullBuffs-LongMultiTarget"
  value: {
-  dps: 1898.7063081799029
+  dps: 2080.240504843147
  }
 }
 dps_results: {
  key: "TestAllSettings-Troll10-P2-Basic-FullBuffs-LongSingleTargetFullDebuffs"
  value: {
-  dps: 1686.6296102009899
+  dps: 1841.8994065506124
  }
 }
 dps_results: {
  key: "TestAllSettings-Troll10-P2-Basic-FullBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 1131.3903594233527
+  dps: 1279.9776516068555
  }
 }
 dps_results: {
  key: "TestAllSettings-Troll10-P2-Basic-FullBuffs-ShortSingleTargetFullDebuffs"
  value: {
-  dps: 2128.407673788076
+  dps: 2372.994301461133
  }
 }
 dps_results: {
  key: "TestAllSettings-Troll10-P2-Basic-NoBuffs-LongMultiTarget"
  value: {
-  dps: 1326.4848591931138
+  dps: 1427.1146446984033
  }
 }
 dps_results: {
  key: "TestAllSettings-Troll10-P2-Basic-NoBuffs-LongSingleTargetFullDebuffs"
  value: {
-  dps: 1114.5727503791602
+  dps: 1277.0459692250274
  }
 }
 dps_results: {
  key: "TestAllSettings-Troll10-P2-Basic-NoBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 665.8165107670029
+  dps: 838.6823834723979
  }
 }
 dps_results: {
  key: "TestAllSettings-Troll10-P2-Basic-NoBuffs-ShortSingleTargetFullDebuffs"
  value: {
-  dps: 1461.4595320071849
+  dps: 1721.8241463642184
  }
 }

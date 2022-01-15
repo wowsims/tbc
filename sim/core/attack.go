@@ -68,9 +68,6 @@ type MeleeAbility struct {
 	// If true, will force the cast to crit (if it doesnt miss).
 	GuaranteedCrit bool
 
-	// If true will reset swing timers.
-	ResetSwingTimer bool
-
 	// Internal field only, used to prevent pool objects from being used by
 	// multiple attacks simultaneously.
 	objectInUse bool
@@ -437,17 +434,26 @@ type AutoAttacks struct {
 
 	IsDualWielding bool
 
+	// Set this to true to use the OH delay macro, mostly used by enhance shamans.
+	// This will intentionally delay OH swings to that they always fall within the
+	// 0.5s window following a MH swing.
+	DelayOHSwings bool
+
 	MainhandSwingAt time.Duration
 	OffhandSwingAt  time.Duration
 
 	ActiveMeleeAbility // Parameters for auto attacks.
 
 	OnBeforeMHSwing OnBeforeMHSwing
+
+	// The time at which the last MH swing occurred.
+	previousMHSwingAt time.Duration
 }
 
-func NewAutoAttacks(c *Character) AutoAttacks {
+func NewAutoAttacks(c *Character, delayOHSwings bool) AutoAttacks {
 	aa := AutoAttacks{
-		character: c,
+		character:     c,
+		DelayOHSwings: delayOHSwings,
 		ActiveMeleeAbility: ActiveMeleeAbility{
 			MeleeAbility: MeleeAbility{
 				ActionID:        ActionID{OtherID: proto.OtherAction_OtherActionAttack},
@@ -469,7 +475,6 @@ func NewAutoAttacks(c *Character) AutoAttacks {
 		},
 	}
 
-	// Setup initial swing timers
 	if weapon := c.Equip[proto.ItemSlot_ItemSlotMainHand]; weapon.ID != 0 {
 		aa.mh = Weapon{
 			BaseDamageMin: weapon.WeaponDamageMin,
@@ -477,7 +482,6 @@ func NewAutoAttacks(c *Character) AutoAttacks {
 			SwingSpeed:    weapon.SwingSpeed,
 			SwingDuration: time.Duration(weapon.SwingSpeed * float64(time.Second)),
 		}
-		aa.MainhandSwingAt = time.Duration(float64(aa.mh.SwingDuration) / c.SwingSpeed())
 	}
 	if weapon := c.Equip[proto.ItemSlot_ItemSlotOffHand]; weapon.ID != 0 {
 		aa.oh = Weapon{
@@ -486,11 +490,37 @@ func NewAutoAttacks(c *Character) AutoAttacks {
 			SwingSpeed:    weapon.SwingSpeed,
 			SwingDuration: time.Duration(weapon.SwingSpeed * float64(time.Second)),
 		}
-		aa.OffhandSwingAt = time.Duration(float64(aa.oh.SwingDuration) / c.SwingSpeed())
 	}
 	aa.IsDualWielding = aa.mh.SwingSpeed != 0 && aa.oh.SwingSpeed != 0
 
 	return aa
+}
+
+func (aa *AutoAttacks) IsEnabled() bool {
+	return aa.mh.SwingSpeed != 0
+}
+
+func (aa *AutoAttacks) reset(sim *Simulation) {
+	if !aa.IsEnabled() {
+		return
+	}
+
+	aa.MainhandSwingAt = 0
+	aa.OffhandSwingAt = 0
+
+	// Set a fake value for previousMHSwing so that offhand swing delay works
+	// properly at the start.
+	aa.previousMHSwingAt = time.Second * -1
+
+	// Apply random delay of 0 - 0.5s, to one of the weapons.
+	delay := time.Duration(sim.RandomFloat("SwingResetDelay") * float64(time.Millisecond*500))
+	isMHDelay := sim.RandomFloat("SwingResetWeapon") < 0.5
+
+	if isMHDelay {
+		aa.MainhandSwingAt = delay
+	} else {
+		aa.OffhandSwingAt = delay
+	}
 }
 
 func (aa *AutoAttacks) MainhandSwingSpeed() time.Duration {
@@ -517,15 +547,21 @@ func (aa *AutoAttacks) Swing(sim *Simulation, target *Target) {
 			ama.MainHit.WeaponInput.IsOH = false
 			ama.Attack(sim)
 			aa.MainhandSwingAt = sim.CurrentTime + aa.MainhandSwingSpeed()
+			aa.previousMHSwingAt = sim.CurrentTime
 		}
 	}
 	if aa.OffhandSwingAt <= sim.CurrentTime {
-		// Make a OH swing!
-		ama := aa.ActiveMeleeAbility
-		ama.ActionID.Tag = 2
-		ama.MainHit.WeaponInput.IsOH = true
-		ama.Attack(sim)
-		aa.OffhandSwingAt = sim.CurrentTime + aa.OffhandSwingSpeed()
+		if aa.DelayOHSwings && (sim.CurrentTime-aa.previousMHSwingAt) > time.Millisecond*500 {
+			// Delay the OH swing for later, so it follows the MH swing.
+			aa.OffhandSwingAt = aa.MainhandSwingAt + time.Millisecond*250
+		} else {
+			// Make a OH swing!
+			ama := aa.ActiveMeleeAbility
+			ama.ActionID.Tag = 2
+			ama.MainHit.WeaponInput.IsOH = true
+			ama.Attack(sim)
+			aa.OffhandSwingAt = sim.CurrentTime + aa.OffhandSwingSpeed()
+		}
 	}
 }
 
@@ -550,38 +586,20 @@ func (aa *AutoAttacks) ModifySwingTime(sim *Simulation, amount float64) {
 	}
 }
 
-// TimeUntil compares swing timers to the next cast or attack and returns the time the next event occurs at.
-//   This could probably be broken into TimeUntil(cast), TimeUntil(attack), TimeUntil(event)
-func (aa *AutoAttacks) TimeUntil(sim *Simulation, cast *SimpleSpell, atk *ActiveMeleeAbility, event time.Duration) time.Duration {
-	nextEventTime := event
-	if cast != nil {
-		if cast.CastTime > 0 {
-			// Resume swings after cast is completed
-			// TODO: Isn't this going to speed up really slow weapons?
-			aa.MainhandSwingAt = sim.CurrentTime + cast.CastTime + aa.MainhandSwingSpeed()
-			aa.OffhandSwingAt = sim.CurrentTime + cast.CastTime + aa.OffhandSwingSpeed()
-		}
-		nextEventTime = sim.CurrentTime + MaxDuration(cast.CastTime, cast.Character.GetRemainingCD(GCDCooldownID, sim.CurrentTime))
-	}
-	if atk != nil {
-		if atk.ResetSwingTimer {
-			aa.MainhandSwingAt = sim.CurrentTime + aa.MainhandSwingSpeed()
-			aa.OffhandSwingAt = sim.CurrentTime + aa.OffhandSwingSpeed()
-		}
-		nextEventTime = sim.CurrentTime + MaxDuration(atk.CastTime, atk.Character.GetRemainingCD(GCDCooldownID, sim.CurrentTime))
-	}
-	mhswing := aa.MainhandSwingAt
-	if mhswing < nextEventTime || nextEventTime == 0 {
-		nextEventTime = mhswing
-	}
+// Returns the time at which the next attack will occur.
+func (aa *AutoAttacks) NextAttackAt() time.Duration {
+	nextAttack := aa.MainhandSwingAt
 	if aa.oh.SwingSpeed != 0 {
-		ohswing := aa.OffhandSwingAt
-		if ohswing < nextEventTime {
-			nextEventTime = ohswing
-		}
+		nextAttack = MinDuration(nextAttack, aa.OffhandSwingAt)
 	}
+	return nextAttack
+}
 
-	return nextEventTime
+// Returns the time at which the next event will occur, considering both autos and the gcd.
+func (aa *AutoAttacks) NextEventAt(sim *Simulation) time.Duration {
+	return MinDuration(
+		sim.CurrentTime+aa.Character.GetRemainingCD(GCDCooldownID, sim.CurrentTime),
+		aa.NextAttackAt())
 }
 
 type PPMManager struct {

@@ -56,9 +56,7 @@ func NewEnhancementShaman(character core.Character, options proto.Player) *Enhan
 		Rotation: *enhOptions.Rotation,
 	}
 	// Enable Auto Attacks for this spec
-	enh.EnableAutoAttacks()
-
-	// TODO: de-sync dual weapons swing timers?
+	enh.EnableAutoAttacks(enhOptions.Options.DelayOffhandSwings)
 
 	// Modify auto attacks multiplier from weapon mastery.
 	enh.AutoAttacks.MainHit.DamageMultiplier *= 1 + 0.02*float64(enhOptions.Talents.WeaponMastery)
@@ -96,7 +94,7 @@ func (enh *EnhancementShaman) Act(sim *core.Simulation) time.Duration {
 	// Redrop totems when needed.
 	dropTime := enh.TryDropTotems(sim)
 	if dropTime > 0 {
-		return enh.AutoAttacks.TimeUntil(sim, nil, nil, dropTime)
+		return core.MinDuration(dropTime, enh.AutoAttacks.NextAttackAt())
 	}
 
 	target := sim.GetPrimaryTarget()
@@ -107,7 +105,7 @@ func (enh *EnhancementShaman) Act(sim *core.Simulation) time.Duration {
 		ss := enh.NewStormstrike(sim, target)
 		cost = ss.Cost.Value
 		if success = ss.Attack(sim); success {
-			return enh.AutoAttacks.TimeUntil(sim, nil, ss, 0)
+			return enh.AutoAttacks.NextEventAt(sim)
 		}
 	} else if !enh.IsOnCD(shaman.ShockCooldownID, sim.CurrentTime) {
 		var shock *core.SimpleSpell
@@ -122,25 +120,17 @@ func (enh *EnhancementShaman) Act(sim *core.Simulation) time.Duration {
 		if shock != nil {
 			cost = shock.ManaCost
 			if success = shock.Cast(sim); success {
-				return enh.AutoAttacks.TimeUntil(sim, shock, nil, 0)
+				return enh.AutoAttacks.NextEventAt(sim)
 			}
 		}
 	}
 	if !success {
 		regenTime := enh.TimeUntilManaRegen(cost)
-		enh.Character.Metrics.MarkOOM(sim, &enh.Character, regenTime)
-		return sim.CurrentTime + regenTime
+		nextActionAt := core.MinDuration(sim.CurrentTime+regenTime, enh.AutoAttacks.NextAttackAt())
+		enh.Character.Metrics.MarkOOM(sim, &enh.Character, nextActionAt-sim.CurrentTime)
+		return nextActionAt
 	}
 
-	// Do nothing, just swing axes until next CD available
-	ssCD := enh.GetRemainingCD(shaman.StormstrikeCD, sim.CurrentTime)
-	shockCD := enh.GetRemainingCD(shaman.ShockCooldownID, sim.CurrentTime)
-
-	nextCD := ssCD
-	// If we're not using any shocks the CD will be ready, but we don't want to return 0.
-	if shockCD != 0 && shockCD < ssCD {
-		nextCD = shockCD
-	}
-
-	return enh.AutoAttacks.TimeUntil(sim, nil, nil, sim.CurrentTime+nextCD)
+	// We didn't try to cast anything. Just wait for next auto.
+	return enh.AutoAttacks.NextAttackAt()
 }

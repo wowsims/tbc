@@ -394,14 +394,9 @@ func (character *Character) reset(sim *Simulation) {
 	character.ExpectedBonusMana = 0
 
 	character.auraTracker.reset(sim)
-	character.Metrics.reset()
-
 	character.majorCooldownManager.reset(sim)
-
-	if character.AutoAttacks.mh.SwingSpeed != 0 {
-		character.AutoAttacks = AutoAttacks{}
-		character.EnableAutoAttacks() // resets auto attack timers etc
-	}
+	character.AutoAttacks.reset(sim)
+	character.Metrics.reset()
 
 	for _, petAgent := range character.Pets {
 		petAgent.GetPet().reset(sim)
@@ -576,8 +571,8 @@ func (character *Character) GetMetricsProto(numIterations int32) *proto.PlayerMe
 	return metrics
 }
 
-func (character *Character) EnableAutoAttacks() {
-	character.AutoAttacks = NewAutoAttacks(character)
+func (character *Character) EnableAutoAttacks(delayOHSwings bool) {
+	character.AutoAttacks = NewAutoAttacks(character, delayOHSwings)
 }
 
 type BaseStatsKey struct {
