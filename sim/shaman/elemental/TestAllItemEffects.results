@@ -41,6 +41,12 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestAllItemEffects-BlackoutTruncheon-27901"
+ value: {
+  dps: 1598.2214492991886
+ }
+}
+dps_results: {
  key: "TestAllItemEffects-BloodlustBrooch-29383"
  value: {
   dps: 1544.6740655185627
@@ -131,9 +137,33 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestAllItemEffects-Devastation-30316"
+ value: {
+  dps: 1358.0509198910916
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-Dragonmaw-28438"
+ value: {
+  dps: 1409.5981284847242
+ }
+}
+dps_results: {
  key: "TestAllItemEffects-DragonspineTrophy-28830"
  value: {
   dps: 1544.6740655185627
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-Dragonstrike-28439"
+ value: {
+  dps: 1409.5981284847242
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-DrakefistHammer-28437"
+ value: {
+  dps: 1409.5981284847242
  }
 }
 dps_results: {
@@ -209,6 +239,12 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestAllItemEffects-GlaiveofthePit-28774"
+ value: {
+  dps: 1358.0509198910916
+ }
+}
+dps_results: {
  key: "TestAllItemEffects-HexShrunkenHead-33829"
  value: {
   dps: 1613.695459424188
@@ -239,9 +275,27 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestAllItemEffects-KhoriumChampion-23541"
+ value: {
+  dps: 1358.0509198910916
+ }
+}
+dps_results: {
  key: "TestAllItemEffects-KissoftheSpider-22954"
  value: {
   dps: 1544.6740655185627
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-LionheartChampion-28429"
+ value: {
+  dps: 1358.0509198910916
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-LionheartExecutioner-28430"
+ value: {
+  dps: 1358.0509198910916
  }
 }
 dps_results: {
@@ -323,6 +377,12 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestAllItemEffects-RodoftheSunKing-29996"
+ value: {
+  dps: 1598.2214492991886
+ }
+}
+dps_results: {
  key: "TestAllItemEffects-Romulo'sPoisonVial-28579"
  value: {
   dps: 1544.6740655185627
@@ -356,6 +416,12 @@ dps_results: {
  key: "TestAllItemEffects-ShiftingNaaruSliver-34429"
  value: {
   dps: 1650.0733051798709
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-SingingCrystalAxe-31318"
+ value: {
+  dps: 1358.0509198910916
  }
 }
 dps_results: {
@@ -431,6 +497,24 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestAllItemEffects-TheBladefist-29348"
+ value: {
+  dps: 1409.5981284847242
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-TheFistsofFury"
+ value: {
+  dps: 1358.0509198910916
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-TheNightBlade-31331"
+ value: {
+  dps: 1598.2214492991886
+ }
+}
+dps_results: {
  key: "TestAllItemEffects-TheRestrainedEssenceofSapphiron-23046"
  value: {
   dps: 1592.337695562313
@@ -488,6 +572,12 @@ dps_results: {
  key: "TestAllItemEffects-WindhawkArmor"
  value: {
   dps: 1535.8784066384749
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-WorldBreaker-30090"
+ value: {
+  dps: 1358.0509198910916
  }
 }
 dps_results: {
