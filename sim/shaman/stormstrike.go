@@ -48,17 +48,17 @@ func (shaman *Shaman) newStormstrikeTemplate(sim *core.Simulation) core.MeleeAbi
 			CritMultiplier: 2.0,
 			Character:      &shaman.Character,
 		},
-		MainHit: core.AbilityHitEffect{
-			AbilityEffect: core.AbilityEffect{
-				DamageMultiplier:       1.0,
-				StaticDamageMultiplier: 1.0,
+		Effects: []core.AbilityHitEffect{
+			core.AbilityHitEffect{
+				AbilityEffect: core.AbilityEffect{
+					DamageMultiplier:       1.0,
+					StaticDamageMultiplier: 1.0,
+				},
+				WeaponInput: core.WeaponDamageInput{
+					IsOH:             false,
+					DamageMultiplier: 1.0,
+				},
 			},
-			WeaponInput: core.WeaponDamageInput{
-				IsOH:             false,
-				DamageMultiplier: 1.0,
-			},
-		},
-		AdditionalHits: []core.AbilityHitEffect{
 			core.AbilityHitEffect{
 				AbilityEffect: core.AbilityEffect{
 					DamageMultiplier:       1.0,
@@ -89,13 +89,13 @@ func (shaman *Shaman) newStormstrikeTemplate(sim *core.Simulation) core.MeleeAbi
 	}
 
 	if ItemSetCycloneHarness.CharacterHasSetBonus(&shaman.Character, 4) {
-		ss.MainHit.WeaponInput.FlatDamageBonus += 30
-		ss.AdditionalHits[0].WeaponInput.FlatDamageBonus += 30
+		ss.Effects[0].WeaponInput.FlatDamageBonus += 30
+		ss.Effects[1].WeaponInput.FlatDamageBonus += 30
 	}
 
 	// Add weapon % bonus to stormstrike weapons
-	ss.MainHit.WeaponInput.DamageMultiplier *= 1 + 0.02*float64(shaman.Talents.WeaponMastery)
-	ss.AdditionalHits[0].WeaponInput.DamageMultiplier *= 1 + 0.02*float64(shaman.Talents.WeaponMastery)
+	ss.Effects[0].WeaponInput.DamageMultiplier *= 1 + 0.02*float64(shaman.Talents.WeaponMastery)
+	ss.Effects[1].WeaponInput.DamageMultiplier *= 1 + 0.02*float64(shaman.Talents.WeaponMastery)
 
 	return core.NewMeleeAbilityTemplate(ss)
 }
@@ -104,7 +104,7 @@ func (shaman *Shaman) NewStormstrike(sim *core.Simulation, target *core.Target) 
 	ss := &shaman.stormstrikeSpell
 	shaman.stormstrikeTemplate.Apply(ss)
 	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	ss.MainHit.Target = target
-	ss.AdditionalHits[0].Target = target
+	ss.Effects[0].Target = target
+	ss.Effects[1].Target = target
 	return ss
 }

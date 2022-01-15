@@ -297,6 +297,10 @@ func (template *SimpleSpellTemplate) Apply(newAction *SimpleSpell) {
 
 // Takes in a cast template and returns a template, so you don't need to keep track of which things to allocate yourself.
 func NewSimpleSpellTemplate(spellTemplate SimpleSpell) SimpleSpellTemplate {
+	if len(spellTemplate.Effects) > 0 && spellTemplate.Effect.StaticDamageMultiplier != 0 {
+		panic("Cannot use both Effect and Effects, pick one!")
+	}
+
 	return SimpleSpellTemplate{
 		template: spellTemplate,
 		effects:  make([]SpellHitEffect, len(spellTemplate.Effects)),

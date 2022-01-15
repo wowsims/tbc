@@ -98,7 +98,7 @@ type AbilityEffect struct {
 
 	IsWhiteHit bool
 
-	// Causes the first roll for this hit to be copied from ActiveMeleeAbility.MainHit.HitType.
+	// Causes the first roll for this hit to be copied from ActiveMeleeAbility.Effects[0].HitType.
 	// This is only used by Shaman Stormstrike.
 	ReuseMainHitRoll bool
 
@@ -163,11 +163,11 @@ type ActiveMeleeAbility struct {
 	Blocks      int32
 	TotalDamage float64 // Damage done by this cast.
 
-	// All abilities have at least 1 hit, so this should always be filled.
-	MainHit AbilityHitEffect
+	// For abilities that only have 1 hit. Either this or Effects should be filled, not both.
+	Effect AbilityHitEffect
 
-	// For abilities that have more than 1 hit.
-	AdditionalHits []AbilityHitEffect
+	// For abilities that have more than 1 hit. Either this of Effect should be filled, not both.
+	Effects []AbilityHitEffect
 }
 
 func (effect *AbilityEffect) Landed() bool {
@@ -273,7 +273,7 @@ func (ahe *AbilityHitEffect) calculateDamage(sim *Simulation, ability *ActiveMel
 	bonusWeaponDamage := ahe.BonusWeaponDamage
 
 	if ahe.AbilityEffect.ReuseMainHitRoll {
-		ahe.HitType = ability.MainHit.HitType
+		ahe.HitType = ability.Effects[0].HitType
 	} else {
 		ahe.HitType = ahe.AbilityEffect.WhiteHitTableResult(sim, ability)
 	}
@@ -371,11 +371,11 @@ func (ability *ActiveMeleeAbility) Attack(sim *Simulation) bool {
 
 	ability.Character.OnBeforeMelee(sim, ability)
 
-	ability.MainHit.performAttack(sim, ability)
-
-	if len(ability.AdditionalHits) > 0 {
-		for i, _ := range ability.AdditionalHits {
-			ahe := &ability.AdditionalHits[i]
+	if len(ability.Effects) == 0 {
+		ability.Effect.performAttack(sim, ability)
+	} else {
+		for i, _ := range ability.Effects {
+			ahe := &ability.Effects[i]
 			ahe.performAttack(sim, ability)
 		}
 	}
@@ -462,7 +462,7 @@ func NewAutoAttacks(c *Character, delayOHSwings bool) AutoAttacks {
 				IgnoreCooldowns: true,
 				IgnoreCost:      true,
 			},
-			MainHit: AbilityHitEffect{
+			Effect: AbilityHitEffect{
 				AbilityEffect: AbilityEffect{
 					IsWhiteHit:             true,
 					DamageMultiplier:       1.0,
@@ -533,7 +533,7 @@ func (aa *AutoAttacks) OffhandSwingSpeed() time.Duration {
 
 // Swing will check any swing timers if they are up, and if so, swing!
 func (aa *AutoAttacks) Swing(sim *Simulation, target *Target) {
-	aa.MainHit.Target = target
+	aa.Effect.Target = target
 	if aa.MainhandSwingAt <= sim.CurrentTime {
 		doSwing := true
 		if aa.OnBeforeMHSwing != nil {
@@ -544,7 +544,7 @@ func (aa *AutoAttacks) Swing(sim *Simulation, target *Target) {
 			// Make a MH swing!
 			ama := aa.ActiveMeleeAbility
 			ama.ActionID.Tag = 1
-			ama.MainHit.WeaponInput.IsOH = false
+			ama.Effect.WeaponInput.IsOH = false
 			ama.Attack(sim)
 			aa.MainhandSwingAt = sim.CurrentTime + aa.MainhandSwingSpeed()
 			aa.previousMHSwingAt = sim.CurrentTime
@@ -558,7 +558,7 @@ func (aa *AutoAttacks) Swing(sim *Simulation, target *Target) {
 			// Make a OH swing!
 			ama := aa.ActiveMeleeAbility
 			ama.ActionID.Tag = 2
-			ama.MainHit.WeaponInput.IsOH = true
+			ama.Effect.WeaponInput.IsOH = true
 			ama.Attack(sim)
 			aa.OffhandSwingAt = sim.CurrentTime + aa.OffhandSwingSpeed()
 		}
@@ -652,8 +652,8 @@ func (aa *AutoAttacks) NewPPMManager(ppm float64) PPMManager {
 }
 
 type MeleeAbilityTemplate struct {
-	template       ActiveMeleeAbility
-	additionalHits []AbilityHitEffect
+	template ActiveMeleeAbility
+	effects  []AbilityHitEffect
 }
 
 func (template *MeleeAbilityTemplate) Apply(newAction *ActiveMeleeAbility) {
@@ -661,14 +661,18 @@ func (template *MeleeAbilityTemplate) Apply(newAction *ActiveMeleeAbility) {
 		panic(fmt.Sprintf("Melee ability (%s) already in use", newAction.ActionID))
 	}
 	*newAction = template.template
-	newAction.AdditionalHits = template.additionalHits
-	copy(newAction.AdditionalHits, template.template.AdditionalHits)
+	newAction.Effects = template.effects
+	copy(newAction.Effects, template.template.Effects)
 }
 
 // Takes in a cast template and returns a template, so you don't need to keep track of which things to allocate yourself.
 func NewMeleeAbilityTemplate(abilityTemplate ActiveMeleeAbility) MeleeAbilityTemplate {
+	if len(abilityTemplate.Effects) > 0 && abilityTemplate.Effect.StaticDamageMultiplier != 0 {
+		panic("Cannot use both Effect and Effects, pick one!")
+	}
+
 	return MeleeAbilityTemplate{
-		template:       abilityTemplate,
-		additionalHits: make([]AbilityHitEffect, len(abilityTemplate.AdditionalHits)),
+		template: abilityTemplate,
+		effects:  make([]AbilityHitEffect, len(abilityTemplate.Effects)),
 	}
 }

@@ -244,7 +244,7 @@ func WindfuryTotemAura(character *Character, rank int32, iwtTalentPoints int32) 
 			CritMultiplier: 2.0,
 			Character:      character,
 		},
-		MainHit: AbilityHitEffect{
+		Effect: AbilityHitEffect{
 			AbilityEffect: AbilityEffect{
 				DamageMultiplier:       1.0,
 				StaticDamageMultiplier: 1.0,
@@ -274,7 +274,7 @@ func WindfuryTotemAura(character *Character, rank int32, iwtTalentPoints int32) 
 			}
 
 			wfTemplate.Apply(&wfAtk)
-			wfAtk.MainHit.Target = hitEffect.Target
+			wfAtk.Effect.Target = hitEffect.Target
 			wfAtk.Attack(sim)
 		},
 	}

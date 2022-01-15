@@ -37,7 +37,7 @@ func (shaman *Shaman) ApplyWindfuryImbue(mh bool, oh bool) {
 			Character:       &shaman.Character,
 			IgnoreCooldowns: true,
 		},
-		MainHit: core.AbilityHitEffect{
+		Effect: core.AbilityHitEffect{
 			AbilityEffect: core.AbilityEffect{
 				DamageMultiplier:       1.0,
 				StaticDamageMultiplier: 1.0,
@@ -49,7 +49,7 @@ func (shaman *Shaman) ApplyWindfuryImbue(mh bool, oh bool) {
 		},
 	}
 	if shaman.Talents.ElementalWeapons > 0 {
-		wftempl.MainHit.WeaponInput.DamageMultiplier *= 1 + math.Round(float64(shaman.Talents.ElementalWeapons)*13.33)/100
+		wftempl.Effect.WeaponInput.DamageMultiplier *= 1 + math.Round(float64(shaman.Talents.ElementalWeapons)*13.33)/100
 	}
 
 	wfTemplate := core.NewMeleeAbilityTemplate(wftempl)
@@ -81,14 +81,14 @@ func (shaman *Shaman) ApplyWindfuryImbue(mh bool, oh bool) {
 					wfTemplate.Apply(&wfAtk)
 
 					// Set so only the proc'd hand attacks
-					wfAtk.MainHit.WeaponInput.IsOH = !isMHHit
+					wfAtk.Effect.WeaponInput.IsOH = !isMHHit
 					if isMHHit {
 						wfAtk.ActionID.Tag = 1
 					} else {
 						wfAtk.ActionID.Tag = 2
 					}
 
-					wfAtk.MainHit.Target = hitEffect.Target
+					wfAtk.Effect.Target = hitEffect.Target
 					wfAtk.Attack(sim)
 				}
 			},
