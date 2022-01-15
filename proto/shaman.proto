@@ -162,6 +162,7 @@ message EnhancementShaman {
   message Options {
 		bool water_shield = 1;
 		bool bloodlust = 2;
+		bool delay_offhand_swings = 5;
 
 		ShamanWeaponImbue main_hand_imbue = 3;
 		ShamanWeaponImbue off_hand_imbue = 4;

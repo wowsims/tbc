@@ -231,7 +231,7 @@ func (sim *Simulation) newDefaultAgentAction(agent Agent) *PendingAction {
 	}
 	pa.OnAction = func(sim *Simulation) {
 		// If char has AA enabled (a MH weapon is set), try to swing
-		if agent.GetCharacter().AutoAttacks.mh.SwingSpeed != 0 {
+		if agent.GetCharacter().AutoAttacks.IsEnabled() {
 			agent.GetCharacter().AutoAttacks.Swing(sim, sim.GetPrimaryTarget())
 		}
 		agent.GetCharacter().TryUseCooldowns(sim)

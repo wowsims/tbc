@@ -155,14 +155,18 @@ func (cast *Cast) startCasting(sim *Simulation, onCastComplete OnCastComplete) b
 		cast.Character.Hardcast.Expires = sim.CurrentTime + cast.CastTime
 		cast.Character.Hardcast.Cast = cast
 		cast.Character.Hardcast.OnComplete = onCastComplete
+
+		if cast.Character.AutoAttacks.IsEnabled() {
+			// Delay autoattacks until the cast is complete.
+			cast.Character.AutoAttacks.MainhandSwingAt = MaxDuration(cast.Character.AutoAttacks.MainhandSwingAt, cast.Character.Hardcast.Expires)
+			cast.Character.AutoAttacks.OffhandSwingAt = MaxDuration(cast.Character.AutoAttacks.OffhandSwingAt, cast.Character.Hardcast.Expires)
+		}
 	}
 
 	if !cast.IgnoreCooldowns {
 		// Prevent any actions on the GCD until the cast AND the GCD are done.
 		gcdCD := MaxDuration(cast.CalculatedGCD(cast.Character), cast.CastTime)
 		cast.Character.SetCD(GCDCooldownID, sim.CurrentTime+gcdCD)
-
-		// TODO: Hardcasts seem to also reset swing timers, so we should set those CDs as well.
 	}
 
 	return true

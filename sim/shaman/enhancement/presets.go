@@ -56,10 +56,11 @@ var enhShamRotation = &proto.EnhancementShaman_Rotation{
 }
 
 var enhShamOptions = &proto.EnhancementShaman_Options{
-	WaterShield:   true,
-	Bloodlust:     true,
-	MainHandImbue: proto.ShamanWeaponImbue_ImbueWindfury,
-	OffHandImbue:  proto.ShamanWeaponImbue_ImbueFlametongue,
+	WaterShield:        true,
+	Bloodlust:          true,
+	DelayOffhandSwings: true,
+	MainHandImbue:      proto.ShamanWeaponImbue_ImbueWindfury,
+	OffHandImbue:       proto.ShamanWeaponImbue_ImbueFlametongue,
 }
 
 var FullRaidBuffs = &proto.RaidBuffs{
