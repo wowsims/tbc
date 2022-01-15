@@ -73,7 +73,7 @@ func (shaman *Shaman) ApplyWindfuryImbue(mh bool, oh bool) {
 				if icd.IsOnCD(sim) {
 					return
 				}
-				if sim.RandomFloat("wf imbue") > proc {
+				if sim.RandomFloat("Windfury Imbue") > proc {
 					return
 				}
 				icd = core.InternalCD(sim.CurrentTime + icdDur)
@@ -82,6 +82,11 @@ func (shaman *Shaman) ApplyWindfuryImbue(mh bool, oh bool) {
 
 					// Set so only the proc'd hand attacks
 					wfAtk.MainHit.WeaponInput.IsOH = !isMHHit
+					if isMHHit {
+						wfAtk.ActionID.Tag = 1
+					} else {
+						wfAtk.ActionID.Tag = 2
+					}
 
 					wfAtk.MainHit.Target = hitEffect.Target
 					wfAtk.Attack(sim)

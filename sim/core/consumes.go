@@ -9,12 +9,16 @@ import (
 
 // Registers all consume-related effects to the Agent.
 func applyConsumeEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs proto.PartyBuffs) {
-	consumes := agent.GetCharacter().consumes
+	character := agent.GetCharacter()
+	consumes := character.consumes
 
-	agent.GetCharacter().AddStats(consumesStats(consumes, raidBuffs))
+	character.AddStats(consumesStats(consumes, raidBuffs))
 
-	// TODO: demon slaying elixir needs an aura to only apply to demons...
-	//  The other option is to include target type in this function.
+	if consumes.ElixirOfDemonslaying {
+		character.AddPermanentAura(func(sim *Simulation) Aura {
+			return ElixirOfDemonslayingAura()
+		})
+	}
 
 	registerDrumsCD(agent, partyBuffs, consumes)
 	registerPotionCD(agent, consumes)
@@ -109,6 +113,20 @@ func consumesStats(c proto.Consumes, raidBuffs proto.RaidBuffs) stats.Stats {
 	}
 
 	return s
+}
+
+var ElixirOfDemonslayingAuraID = NewAuraID()
+
+func ElixirOfDemonslayingAura() Aura {
+	return Aura{
+		ID:       ElixirOfDemonslayingAuraID,
+		ActionID: ActionID{ItemID: 9224},
+		OnBeforeMeleeHit: func(sim *Simulation, ability *ActiveMeleeAbility, hitEffect *AbilityHitEffect) {
+			if hitEffect.Target.MobType == proto.MobType_MobTypeDemon {
+				hitEffect.BonusAttackPower += 265
+			}
+		},
+	}
 }
 
 var DrumsAuraID = NewAuraID()

@@ -29,12 +29,12 @@ import * as Tooltips from '/tbc/core/constants/tooltips.js';
 // https://tbc.wowhead.com/talent-calc and copy the numbers in the url.
 export const StandardTalents = {
 	name: 'Ele Sub',
-	data: '250030501-500500212502133531151',
+	data: '250030502-502500210501133531151',
 };
 
 export const RestoSubspecTalents = {
 	name: 'Resto Sub',
-	data: '-502520210502133531151-05005301',
+	data: '02-502500210502133531151-05005301',
 };
 
 export const DefaultRotation = EnhancementShamanRotation.create({
@@ -92,6 +92,7 @@ export const P1_PRESET = {
 			}),
 			ItemSpec.create({
 				id: 24259, // Vengeance Wrap
+				enchant: Enchants.CLOAK_GREATER_AGILITY,
 				gems: [
 					Gems.BOLD_LIVING_RUBY,
 				],
@@ -188,6 +189,7 @@ export const P2_PRESET = {
 			}),
 			ItemSpec.create({
 				id: 29994, // Thalassian Wildercloak
+				enchant: Enchants.CLOAK_GREATER_AGILITY,
 			}),
 			ItemSpec.create({
 				id: 30185, // Cataclysm Chestplate
@@ -276,6 +278,7 @@ export const P3_PRESET = {
 			}),
 			ItemSpec.create({
 				id: 32323, // Shadowmoon Destroyer's Drape
+				enchant: Enchants.CLOAK_GREATER_AGILITY,
 			}),
 			ItemSpec.create({
 				id: 30905, // Midnight Chestguard
