@@ -63,14 +63,24 @@ func (shaman *Shaman) NewGraceOfAirTotem(sim *core.Simulation) *core.SimpleCast 
 	return cast
 }
 
-func (shaman *Shaman) NewWindfuryTotem(sim *core.Simulation) *core.SimpleCast {
-	baseManaCost := 325.0
+var windfuryBaseManaCosts = []float64{
+	95,
+	140,
+	200,
+	275,
+	325,
+}
+
+func (shaman *Shaman) NewWindfuryTotem(sim *core.Simulation, rank int32) *core.SimpleCast {
+	baseManaCost := windfuryBaseManaCosts[rank-1]
 	manaCost := baseManaCost * (1 - float64(shaman.Talents.TotemicFocus)*0.05)
 	manaCost -= baseManaCost * float64(shaman.Talents.MentalQuickness) * 0.02
 
+	spellID := core.WindfurySpellRanks[rank-1]
+
 	cast := &core.SimpleCast{
 		Cast: core.Cast{
-			ActionID:     core.ActionID{SpellID: 25587},
+			ActionID:     core.ActionID{SpellID: spellID},
 			Character:    shaman.GetCharacter(),
 			BaseManaCost: baseManaCost,
 			ManaCost:     manaCost,
@@ -79,6 +89,7 @@ func (shaman *Shaman) NewWindfuryTotem(sim *core.Simulation) *core.SimpleCast {
 		OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
 			shaman.SelfBuffs.NextTotemDrops[AirTotem] = sim.CurrentTime + time.Second*120
 			shaman.tryTwistWindfury(sim)
+			// We don't actually apply the aura here, that happens on initialization in buffs.go
 		},
 	}
 	cast.Init(sim)
@@ -206,7 +217,7 @@ func (shaman *Shaman) TryDropTotems(sim *core.Simulation) time.Duration {
 				case wrathOfAirTotem:
 					cast = shaman.NewWrathOfAirTotem(sim)
 				case windfuryTotem:
-					cast = shaman.NewWindfuryTotem(sim)
+					cast = shaman.NewWindfuryTotem(sim, shaman.SelfBuffs.WindfuryTotemRank)
 				case graceOfAirTotem:
 					cast = shaman.NewGraceOfAirTotem(sim)
 				}

@@ -49,7 +49,9 @@ var enhShamRotation = &proto.EnhancementShaman_Rotation{
 		Water: proto.WaterTotem_ManaSpringTotem,
 		Fire:  proto.FireTotem_MagmaTotem,
 
-		TwistFireNova: true,
+		WindfuryTotemRank: 5,
+		TwistWindfury:     true,
+		TwistFireNova:     true,
 	},
 	PrimaryShock:    proto.EnhancementShaman_Rotation_Earth,
 	WeaveFlameShock: true,

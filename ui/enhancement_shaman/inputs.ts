@@ -272,12 +272,12 @@ export function TotemsSection(simUI: IndividualSimUI<Spec.SpecEnhancementShaman>
 		label: 'WF Totem Rank',
 		labelTooltip: 'Rank of Windfury Totem to use, if using Windfury Totem.',
 		changedEvent: (player: Player<Spec.SpecEnhancementShaman>) => player.rotationChangeEmitter,
-		getValue: (player: Player<Spec.SpecEnhancementShaman>) => player.getRotation().totems?.windfuryRank || 0,
+		getValue: (player: Player<Spec.SpecEnhancementShaman>) => player.getRotation().totems?.windfuryTotemRank || 0,
 		setValue: (eventID: EventID, player: Player<Spec.SpecEnhancementShaman>, newValue: number) => {
 			const newRotation = player.getRotation();
 			if (!newRotation.totems)
 				newRotation.totems = ShamanTotems.create();
-			newRotation.totems!.windfuryRank = newValue;
+			newRotation.totems!.windfuryTotemRank = newValue;
 			player.setRotation(eventID, newRotation);
 		},
 	});

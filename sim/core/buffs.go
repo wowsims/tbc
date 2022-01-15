@@ -139,6 +139,11 @@ func applyBuffEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs proto.P
 	character.AddStats(stats.Stats{
 		stats.MP5: GetTristateValueFloat(partyBuffs.ManaSpringTotem, 50, 62.5),
 	})
+	if partyBuffs.WindfuryTotemRank > 0 && IsEligibleForWindfuryTotem(character) {
+		character.AddPermanentAura(func(sim *Simulation) Aura {
+			return WindfuryTotemAura(character, partyBuffs.WindfuryTotemRank, partyBuffs.WindfuryTotemIwt)
+		})
+	}
 
 	registerBloodlustCD(agent, partyBuffs.Bloodlust)
 	registerPowerInfusionCD(agent, individualBuffs.PowerInfusions)
@@ -200,6 +205,77 @@ func ImprovedSanctityAura() Aura {
 		},
 		OnBeforePeriodicDamage: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect, tickDamage *float64) {
 			*tickDamage *= 1.02
+		},
+	}
+}
+
+var WindfuryTotemAuraID = NewAuraID()
+
+var WindfurySpellRanks = []int32{
+	8512,
+	10613,
+	10614,
+	25585,
+	25587,
+}
+
+var windfuryAPBonuses = []float64{
+	122,
+	229,
+	315,
+	375,
+	445,
+}
+
+func IsEligibleForWindfuryTotem(character *Character) bool {
+	// TODO: Also check that no weapon imbue is applied.
+	return character.AutoAttacks.IsEnabled() && !character.HasMHWeaponImbue
+}
+
+func WindfuryTotemAura(character *Character, rank int32, iwtTalentPoints int32) Aura {
+	spellID := WindfurySpellRanks[rank-1]
+	actionID := ActionID{SpellID: spellID}
+	apBonus := windfuryAPBonuses[rank-1]
+	apBonus *= 1 + 0.15*float64(iwtTalentPoints)
+
+	wftempl := ActiveMeleeAbility{
+		MeleeAbility: MeleeAbility{
+			ActionID:       actionID,
+			CritMultiplier: 2.0,
+			Character:      character,
+		},
+		MainHit: AbilityHitEffect{
+			AbilityEffect: AbilityEffect{
+				DamageMultiplier:       1.0,
+				StaticDamageMultiplier: 1.0,
+				BonusAttackPower:       apBonus,
+			},
+			WeaponInput: WeaponDamageInput{
+				IsOH:             false,
+				DamageMultiplier: 1.0,
+			},
+		},
+	}
+
+	wfTemplate := NewMeleeAbilityTemplate(wftempl)
+	wfAtk := ActiveMeleeAbility{}
+
+	const procChance = 0.2
+
+	return Aura{
+		ID:       WindfuryTotemAuraID,
+		ActionID: actionID,
+		OnMeleeAttack: func(sim *Simulation, ability *ActiveMeleeAbility, hitEffect *AbilityHitEffect) {
+			if !hitEffect.Landed() || !hitEffect.IsWeaponHit() || !hitEffect.IsMH() {
+				return
+			}
+			if sim.RandomFloat("Windfury Totem") > procChance {
+				return
+			}
+
+			wfTemplate.Apply(&wfAtk)
+			wfAtk.MainHit.Target = hitEffect.Target
+			wfAtk.Attack(sim)
 		},
 	}
 }

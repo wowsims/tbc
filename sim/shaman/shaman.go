@@ -60,6 +60,8 @@ type SelfBuffs struct {
 	AirTotem      proto.AirTotem
 	TwistWindfury bool // if true will cast WF every 10s and then GoA
 
+	WindfuryTotemRank int32
+
 	FireTotem proto.FireTotem
 	// If true Fire Nova will be dropped on CD.
 	// After it will recast whatever other fire totem is available
@@ -162,7 +164,13 @@ func (shaman *Shaman) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {
 			value = proto.TristateEffect_TristateEffectImproved
 		}
 		partyBuffs.GraceOfAirTotem = core.MaxTristate(partyBuffs.GraceOfAirTotem, value)
-
+	case proto.AirTotem_WindfuryTotem:
+		if shaman.SelfBuffs.WindfuryTotemRank > partyBuffs.WindfuryTotemRank {
+			partyBuffs.WindfuryTotemRank = shaman.SelfBuffs.WindfuryTotemRank
+			partyBuffs.WindfuryTotemIwt = shaman.Talents.ImprovedWeaponTotems
+		} else if shaman.SelfBuffs.WindfuryTotemRank == partyBuffs.WindfuryTotemRank {
+			partyBuffs.WindfuryTotemIwt = core.MaxInt32(partyBuffs.WindfuryTotemIwt, shaman.Talents.ImprovedWeaponTotems)
+		}
 	}
 
 	if shaman.SelfBuffs.EarthTotem == proto.EarthTotem_StrengthOfEarthTotem {

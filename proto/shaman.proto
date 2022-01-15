@@ -83,7 +83,7 @@ message ShamanTotems {
 		bool twist_windfury = 5; 
 
 		// Rank of Windfury Totem to cast, if using Windfury Totem.
-		int32 windfury_rank = 11;
+		int32 windfury_totem_rank = 11;
 
 		// If set, will twist fire nova with whichever fire totem is selected.
 		bool twist_fire_nova = 6;
