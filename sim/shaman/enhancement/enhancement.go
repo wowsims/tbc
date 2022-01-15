@@ -40,7 +40,20 @@ func NewEnhancementShaman(character core.Character, options proto.Player) *Enhan
 		selfBuffs.FireTotem = enhOptions.Rotation.Totems.Fire
 		selfBuffs.NextTotemDropType[shaman.FireTotem] = int32(enhOptions.Rotation.Totems.Fire)
 
+		if enhOptions.Rotation.Totems.Air == proto.AirTotem_WindfuryTotem {
+			// No need to twist windfury if its already the default totem.
+			enhOptions.Rotation.Totems.TwistWindfury = false
+		}
+		if enhOptions.Rotation.Totems.WindfuryTotemRank == 0 {
+			// If rank is 0, disable windfury options.
+			enhOptions.Rotation.Totems.TwistWindfury = false
+			if enhOptions.Rotation.Totems.Air == proto.AirTotem_WindfuryTotem {
+				enhOptions.Rotation.Totems.Air = proto.AirTotem_NoAirTotem
+			}
+		}
+
 		selfBuffs.TwistWindfury = enhOptions.Rotation.Totems.TwistWindfury
+		selfBuffs.WindfuryTotemRank = enhOptions.Rotation.Totems.WindfuryTotemRank
 		if selfBuffs.TwistWindfury {
 			selfBuffs.NextTotemDropType[shaman.AirTotem] = int32(proto.AirTotem_WindfuryTotem)
 			selfBuffs.NextTotemDrops[shaman.AirTotem] = 0 // drop windfury immediately
@@ -72,6 +85,10 @@ func NewEnhancementShaman(character core.Character, options proto.Player) *Enhan
 	enh.ApplyRockbiterImbue(
 		enhOptions.Options.MainHandImbue == proto.ShamanWeaponImbue_ImbueRockbiter,
 		enhOptions.Options.OffHandImbue == proto.ShamanWeaponImbue_ImbueRockbiter)
+
+	if enhOptions.Options.MainHandImbue != proto.ShamanWeaponImbue_ImbueNone {
+		enh.HasMHWeaponImbue = true
+	}
 
 	return enh
 }

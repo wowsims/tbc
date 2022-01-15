@@ -242,6 +242,9 @@ message PartyBuffs {
     TristateEffect grace_of_air_totem = 15;
     StrengthOfEarthType strength_of_earth_totem = 16;
 
+		int32 windfury_totem_rank = 23; // 0 if none, otherwise rank of the ability (1-5).
+		int32 windfury_totem_iwt = 24;
+
     TristateEffect battle_shout = 18;
 }
 

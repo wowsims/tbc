@@ -89,6 +89,11 @@ type Character struct {
 
 	// Statistics describing the results of the sim.
 	Metrics CharacterMetrics
+
+	// Hack for ensuring we don't apply windfury totem aura if there's already
+	// a MH imbue.
+	// TODO: Figure out a cleaner way to do this.
+	HasMHWeaponImbue bool
 }
 
 func NewCharacter(party *Party, partyIndex int, player proto.Player) Character {

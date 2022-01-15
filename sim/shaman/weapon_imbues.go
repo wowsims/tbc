@@ -79,7 +79,6 @@ func (shaman *Shaman) ApplyWindfuryImbue(mh bool, oh bool) {
 				icd = core.InternalCD(sim.CurrentTime + icdDur)
 				for i := 0; i < 2; i++ {
 					wfTemplate.Apply(&wfAtk)
-					wfAtk.MainHit.BonusAttackPower += apBonus
 
 					// Set so only the proc'd hand attacks
 					wfAtk.MainHit.WeaponInput.IsOH = !isMHHit
