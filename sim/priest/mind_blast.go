@@ -50,7 +50,7 @@ func (priest *Priest) newMindBlastTemplate(sim *core.Simulation) core.SimpleSpel
 		SpellCast: core.SpellCast{
 			Cast: baseCast,
 		},
-		SpellHitEffect: effect,
+		Effect: effect,
 	})
 }
 
@@ -61,7 +61,7 @@ func (priest *Priest) NewMindBlast(sim *core.Simulation, target *core.Target) *c
 	priest.mindblastCastTemplate.Apply(mf)
 
 	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	mf.Target = target
+	mf.Effect.Target = target
 	mf.Init(sim)
 
 	return mf

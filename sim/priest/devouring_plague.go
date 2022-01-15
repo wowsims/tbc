@@ -45,7 +45,7 @@ func (priest *Priest) newDevouringPlagueTemplate(sim *core.Simulation) core.Simp
 		SpellCast: core.SpellCast{
 			Cast: baseCast,
 		},
-		SpellHitEffect: effect,
+		Effect: effect,
 	})
 }
 
@@ -56,7 +56,7 @@ func (priest *Priest) NewDevouringPlague(sim *core.Simulation, target *core.Targ
 	priest.devouringPlagueTemplate.Apply(mf)
 
 	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	mf.Target = target
+	mf.Effect.Target = target
 	mf.Init(sim)
 
 	return mf

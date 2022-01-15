@@ -13,13 +13,13 @@ dps_results: {
 dps_results: {
  key: "TestAllFireSettings-Troll10-P1Fire-FireRotation-FullBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 1242.2705995964593
+  dps: 1242.270599596459
  }
 }
 dps_results: {
  key: "TestAllFireSettings-Troll10-P1Fire-FireRotation-FullBuffs-ShortSingleTargetFullDebuffs"
  value: {
-  dps: 2467.273544270696
+  dps: 2467.2735442706967
  }
 }
 dps_results: {

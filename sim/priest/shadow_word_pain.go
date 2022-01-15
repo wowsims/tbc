@@ -50,7 +50,7 @@ func (priest *Priest) newShadowWordPainTemplate(sim *core.Simulation) core.Simpl
 		SpellCast: core.SpellCast{
 			Cast: baseCast,
 		},
-		SpellHitEffect: effect,
+		Effect: effect,
 	})
 }
 
@@ -61,7 +61,7 @@ func (priest *Priest) NewShadowWordPain(sim *core.Simulation, target *core.Targe
 	priest.swpCastTemplate.Apply(mf)
 
 	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	mf.Target = target
+	mf.Effect.Target = target
 	mf.Init(sim)
 
 	return mf

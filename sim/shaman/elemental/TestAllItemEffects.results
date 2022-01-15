@@ -163,7 +163,7 @@ dps_results: {
 dps_results: {
  key: "TestAllItemEffects-EssenceoftheMartyr-29376"
  value: {
-  dps: 1579.2498755241886
+  dps: 1579.2498755241884
  }
 }
 dps_results: {
@@ -265,7 +265,7 @@ dps_results: {
 dps_results: {
  key: "TestAllItemEffects-MarkoftheChampion-23207"
  value: {
-  dps: 1604.132647568563
+  dps: 1604.1326475685628
  }
 }
 dps_results: {
@@ -361,7 +361,7 @@ dps_results: {
 dps_results: {
  key: "TestAllItemEffects-SkycallTotem-33506"
  value: {
-  dps: 1612.7052379681265
+  dps: 1612.7052379681268
  }
 }
 dps_results: {
@@ -439,7 +439,7 @@ dps_results: {
 dps_results: {
  key: "TestAllItemEffects-TheSkullofGul'dan-32483"
  value: {
-  dps: 1624.3719756889177
+  dps: 1624.3719756889172
  }
 }
 dps_results: {
@@ -493,6 +493,6 @@ dps_results: {
 dps_results: {
  key: "TestAllItemEffects-Xi'ri'sGift-29179"
  value: {
-  dps: 1573.7855151761853
+  dps: 1573.7855151761848
  }
 }

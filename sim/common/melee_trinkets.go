@@ -310,7 +310,7 @@ func ApplyRomulosPoisonVial(agent core.Agent) {
 					CritMultiplier:  1.5,
 				},
 			},
-			SpellHitEffect: core.SpellHitEffect{
+			Effect: core.SpellHitEffect{
 				SpellEffect: core.SpellEffect{
 					DamageMultiplier:       1,
 					StaticDamageMultiplier: 1,
@@ -334,7 +334,7 @@ func ApplyRomulosPoisonVial(agent core.Agent) {
 
 				castAction := &spellObj
 				castTemplate.Apply(castAction)
-				castAction.Target = hitEffect.Target
+				castAction.Effect.Target = hitEffect.Target
 				castAction.Init(sim)
 				castAction.Cast(sim)
 			},

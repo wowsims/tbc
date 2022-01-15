@@ -63,8 +63,8 @@ var ItemSetNordrassil = core.ItemSet{
 						if spellCast.ActionID.SpellID == SpellIDSF8 || spellCast.ActionID.SpellID == SpellIDSF6 {
 							// Check if moonfire/insectswarm is ticking on the target.
 							// TODO: in a raid simulator we need to be able to see which dots are ticking from other druids.
-							if (druid.MoonfireSpell.DotInput.IsTicking(sim) && druid.MoonfireSpell.Target.Index == spellEffect.Target.Index) ||
-								(druid.InsectSwarmSpell.DotInput.IsTicking(sim) && druid.InsectSwarmSpell.Target.Index == spellEffect.Target.Index) {
+							if (druid.MoonfireSpell.Effect.DotInput.IsTicking(sim) && druid.MoonfireSpell.Effect.Target == spellEffect.Target) ||
+								(druid.InsectSwarmSpell.Effect.DotInput.IsTicking(sim) && druid.InsectSwarmSpell.Effect.Target == spellEffect.Target) {
 								spellEffect.DamageMultiplier *= 1.1
 							}
 						}

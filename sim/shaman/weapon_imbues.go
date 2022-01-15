@@ -111,7 +111,7 @@ func (shaman *Shaman) ApplyFlametongueImbue(mh bool, oh bool) {
 				CritMultiplier:  1.5,
 			},
 		},
-		SpellHitEffect: core.SpellHitEffect{
+		Effect: core.SpellHitEffect{
 			SpellEffect: core.SpellEffect{
 				DamageMultiplier:       1,
 				StaticDamageMultiplier: 1,
@@ -121,20 +121,20 @@ func (shaman *Shaman) ApplyFlametongueImbue(mh bool, oh bool) {
 			},
 		},
 	}
-	ftTmpl.SpellHitEffect.SpellEffect.StaticDamageMultiplier *= 1 + 0.05*float64(shaman.Talents.ElementalWeapons)
+	ftTmpl.Effect.StaticDamageMultiplier *= 1 + 0.05*float64(shaman.Talents.ElementalWeapons)
 
 	mhTmpl := ftTmpl
 	ohTmpl := ftTmpl
 
 	if weapon := shaman.Equip[proto.ItemSlot_ItemSlotMainHand]; weapon.ID != 0 {
 		baseDamage := weapon.SwingSpeed * 35.0
-		mhTmpl.SpellHitEffect.DirectInput.MinBaseDamage = baseDamage
-		mhTmpl.SpellHitEffect.DirectInput.MaxBaseDamage = baseDamage
+		mhTmpl.Effect.DirectInput.MinBaseDamage = baseDamage
+		mhTmpl.Effect.DirectInput.MaxBaseDamage = baseDamage
 	}
 	if weapon := shaman.Equip[proto.ItemSlot_ItemSlotOffHand]; weapon.ID != 0 {
 		baseDamage := weapon.SwingSpeed * 35.0
-		ohTmpl.SpellHitEffect.DirectInput.MinBaseDamage = baseDamage
-		ohTmpl.SpellHitEffect.DirectInput.MaxBaseDamage = baseDamage
+		ohTmpl.Effect.DirectInput.MinBaseDamage = baseDamage
+		ohTmpl.Effect.DirectInput.MaxBaseDamage = baseDamage
 	}
 
 	mhTemplate := core.NewSimpleSpellTemplate(mhTmpl)
@@ -159,7 +159,7 @@ func (shaman *Shaman) ApplyFlametongueImbue(mh bool, oh bool) {
 				} else {
 					ohTemplate.Apply(&ftSpell)
 				}
-				ftSpell.Target = hitEffect.Target
+				ftSpell.Effect.Target = hitEffect.Target
 				ftSpell.Init(sim)
 				ftSpell.Cast(sim)
 			},
@@ -186,7 +186,7 @@ func (shaman *Shaman) ApplyFrostbrandImbue(mh bool, oh bool) {
 				CritMultiplier:  1.5,
 			},
 		},
-		SpellHitEffect: core.SpellHitEffect{
+		Effect: core.SpellHitEffect{
 			SpellEffect: core.SpellEffect{
 				DamageMultiplier:       1,
 				StaticDamageMultiplier: 1,
@@ -198,7 +198,7 @@ func (shaman *Shaman) ApplyFrostbrandImbue(mh bool, oh bool) {
 			},
 		},
 	}
-	fbTmpl.SpellHitEffect.SpellEffect.StaticDamageMultiplier *= 1 + 0.05*float64(shaman.Talents.ElementalWeapons)
+	fbTmpl.Effect.StaticDamageMultiplier *= 1 + 0.05*float64(shaman.Talents.ElementalWeapons)
 
 	fbTemplate := core.NewSimpleSpellTemplate(fbTmpl)
 	fbSpell := core.SimpleSpell{}
@@ -222,7 +222,7 @@ func (shaman *Shaman) ApplyFrostbrandImbue(mh bool, oh bool) {
 				}
 
 				fbTemplate.Apply(&fbSpell)
-				fbSpell.Target = hitEffect.Target
+				fbSpell.Effect.Target = hitEffect.Target
 				fbSpell.Init(sim)
 				fbSpell.Cast(sim)
 			},
