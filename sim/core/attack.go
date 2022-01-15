@@ -90,11 +90,12 @@ type AbilityEffect struct {
 	Target *Target
 
 	// Bonus stats to be added to the attack.
-	BonusWeaponDamage    float64
-	BonusHitRating       float64
-	BonusAttackPower     float64
-	BonusCritRating      float64
-	BonusExpertiseRating float64
+	BonusWeaponDamage     float64
+	BonusHitRating        float64
+	BonusAttackPower      float64
+	BonusCritRating       float64
+	BonusExpertiseRating  float64
+	BonusArmorPenetration float64
 
 	IsWhiteHit bool
 
@@ -317,7 +318,7 @@ func (ahe *AbilityHitEffect) calculateDamage(sim *Simulation, ability *ActiveMel
 	}
 
 	// Apply armor reduction.
-	dmg *= 1 - ahe.Target.ArmorDamageReduction(character.stats[stats.ArmorPenetration])
+	dmg *= 1 - ahe.Target.ArmorDamageReduction(character.stats[stats.ArmorPenetration]+ahe.BonusArmorPenetration)
 	if sim.Log != nil {
 		character.Log(sim, "Target armor: %0.2f\n", ahe.Target.currentArmor)
 	}
