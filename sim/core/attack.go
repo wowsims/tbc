@@ -98,7 +98,7 @@ type AbilityEffect struct {
 
 	IsWhiteHit bool
 
-	// Causes the first roll for this hit to be copied from ActiveMeleeAbility.MainHit.HitType.
+	// Causes the first roll for this hit to be copied from ActiveMeleeAbility.Effects[0].HitType.
 	// This is only used by Shaman Stormstrike.
 	ReuseMainHitRoll bool
 
@@ -667,6 +667,10 @@ func (template *MeleeAbilityTemplate) Apply(newAction *ActiveMeleeAbility) {
 
 // Takes in a cast template and returns a template, so you don't need to keep track of which things to allocate yourself.
 func NewMeleeAbilityTemplate(abilityTemplate ActiveMeleeAbility) MeleeAbilityTemplate {
+	if len(abilityTemplate.Effects) > 0 && abilityTemplate.Effect.StaticDamageMultiplier != 0 {
+		panic("Cannot use both Effect and Effects, pick one!")
+	}
+
 	return MeleeAbilityTemplate{
 		template: abilityTemplate,
 		effects:  make([]AbilityHitEffect, len(abilityTemplate.Effects)),
