@@ -160,7 +160,7 @@ func (we *WaterElemental) newWaterboltTemplate(sim *core.Simulation) core.Simple
 				},
 			},
 		},
-		SpellHitEffect: core.SpellHitEffect{
+		Effect: core.SpellHitEffect{
 			SpellEffect: core.SpellEffect{
 				DamageMultiplier:       1,
 				StaticDamageMultiplier: 1,
@@ -182,7 +182,7 @@ func (we *WaterElemental) NewWaterbolt(sim *core.Simulation, target *core.Target
 	we.waterboltCastTemplate.Apply(waterbolt)
 
 	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	waterbolt.Target = target
+	waterbolt.Effect.Target = target
 	waterbolt.Init(sim)
 
 	return waterbolt

@@ -81,7 +81,7 @@ func ApplyTimbals(agent core.Agent) {
 				},
 			},
 		},
-		SpellHitEffect: core.SpellHitEffect{
+		Effect: core.SpellHitEffect{
 			SpellEffect: core.SpellEffect{
 				DamageMultiplier:       1,
 				StaticDamageMultiplier: 1,
@@ -112,7 +112,7 @@ func ApplyTimbals(agent core.Agent) {
 				timbalsTemplate.Apply(shadowBolt)
 				// Apply the caster/target from the cast that procd this.
 				shadowBolt.Character = spellCast.Character
-				shadowBolt.Target = spellEffect.Target
+				shadowBolt.Effect.Target = spellEffect.Target
 				shadowBolt.Cast(sim)
 			},
 		}

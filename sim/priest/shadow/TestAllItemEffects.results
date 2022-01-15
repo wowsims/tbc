@@ -361,7 +361,7 @@ dps_results: {
 dps_results: {
  key: "TestAllItemEffects-TheLightningCapacitor-28785"
  value: {
-  dps: 1429.1688008513104
+  dps: 1429.1688008513102
  }
 }
 dps_results: {

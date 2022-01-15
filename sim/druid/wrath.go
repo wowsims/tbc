@@ -43,16 +43,13 @@ func (druid *Druid) newWrathTemplate(sim *core.Simulation) core.SimpleSpellTempl
 		effect.DirectInput.FlatDamageBonus += 25 * effect.DirectInput.SpellCoefficient
 	}
 
-	// TODO: Applies to both starfire and moonfire
 	baseCast.CastTime -= time.Millisecond * 100 * time.Duration(druid.Talents.StarlightWrath)
-	effect.SpellEffect.BonusSpellCritRating += float64(druid.Talents.FocusedStarlight) * 2 * core.SpellCritRatingPerCritChance // 2% crit per point
-
-	// TODO: applies to starfire, wrath and moonfire
+	effect.BonusSpellCritRating += float64(druid.Talents.FocusedStarlight) * 2 * core.SpellCritRatingPerCritChance // 2% crit per point
 
 	// Convert to percent, multiply by percent increase, convert back to multiplier by adding 1
 	baseCast.CritMultiplier = (baseCast.CritMultiplier-1)*(1+float64(druid.Talents.Vengeance)*0.2) + 1
 	baseCast.ManaCost -= baseCast.BaseManaCost * float64(druid.Talents.Moonglow) * 0.03
-	effect.SpellEffect.StaticDamageMultiplier *= 1 + 0.02*float64(druid.Talents.Moonfury)
+	effect.StaticDamageMultiplier *= 1 + 0.02*float64(druid.Talents.Moonfury)
 
 	effect.OnSpellHit = druid.applyOnHitTalents
 	spCast := &core.SpellCast{
@@ -60,8 +57,8 @@ func (druid *Druid) newWrathTemplate(sim *core.Simulation) core.SimpleSpellTempl
 	}
 
 	return core.NewSimpleSpellTemplate(core.SimpleSpell{
-		SpellCast:      *spCast,
-		SpellHitEffect: effect,
+		SpellCast: *spCast,
+		Effect:    effect,
 	})
 }
 
@@ -75,7 +72,7 @@ func (druid *Druid) NewWrath(sim *core.Simulation, target *core.Target) *core.Si
 	druid.applyNaturesGrace(&sf.SpellCast)
 
 	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	sf.Target = target
+	sf.Effect.Target = target
 	sf.Init(sim)
 
 	return sf

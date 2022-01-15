@@ -26,7 +26,7 @@ func (shaman *Shaman) newSearingTotemTemplate(sim *core.Simulation) core.SimpleS
 				GCDCooldown: time.Second,
 			},
 		},
-		SpellHitEffect: core.SpellHitEffect{
+		Effect: core.SpellHitEffect{
 			SpellEffect: core.SpellEffect{
 				DamageMultiplier:       1,
 				StaticDamageMultiplier: 1,
@@ -41,7 +41,7 @@ func (shaman *Shaman) newSearingTotemTemplate(sim *core.Simulation) core.SimpleS
 			},
 		},
 	}
-	spell.DamageMultiplier *= 1 + float64(shaman.Talents.CallOfFlame)*0.05
+	spell.Effect.DamageMultiplier *= 1 + float64(shaman.Talents.CallOfFlame)*0.05
 	spell.ManaCost -= spell.BaseManaCost * float64(shaman.Talents.TotemicFocus) * 0.05
 	spell.ManaCost -= spell.BaseManaCost * float64(shaman.Talents.MentalQuickness) * 0.02
 
@@ -54,7 +54,7 @@ func (shaman *Shaman) NewSearingTotem(sim *core.Simulation, target *core.Target)
 	shaman.searingTotemTemplate.Apply(searingTotem)
 
 	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	searingTotem.Target = target
+	searingTotem.Effect.Target = target
 	searingTotem.Init(sim)
 
 	return searingTotem
@@ -64,8 +64,8 @@ const SpellIDMagmaTotem int32 = 25552
 
 // This is probably not worth simming since no other spell in the game does this and AM isn't
 // even a popular choice for arcane mages.
-func (shaman *Shaman) newMagmaTotemTemplate(sim *core.Simulation) core.MultiTargetDirectDamageSpellTemplate {
-	spell := core.MultiTargetDirectDamageSpell{
+func (shaman *Shaman) newMagmaTotemTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
+	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
 				CritMultiplier: 1.5,
@@ -106,12 +106,12 @@ func (shaman *Shaman) newMagmaTotemTemplate(sim *core.Simulation) core.MultiTarg
 	}
 	spell.Effects = effects
 
-	return core.NewMultiTargetDirectDamageSpellTemplate(spell)
+	return core.NewSimpleSpellTemplate(spell)
 }
 
-func (shaman *Shaman) NewMagmaTotem(sim *core.Simulation) *core.MultiTargetDirectDamageSpell {
+func (shaman *Shaman) NewMagmaTotem(sim *core.Simulation) *core.SimpleSpell {
 	// Initialize cast from precomputed template.
-	magmaTotem := &shaman.MultiTargetFireTotemSpell
+	magmaTotem := &shaman.FireTotemSpell
 	shaman.magmaTotemTemplate.Apply(magmaTotem)
 
 	// Set dynamic fields, i.e. the stuff we couldn't precompute.
@@ -130,8 +130,8 @@ var CooldownIDNovaTotem = core.NewCooldownID()
 
 // This is probably not worth simming since no other spell in the game does this and AM isn't
 // even a popular choice for arcane mages.
-func (shaman *Shaman) newNovaTotemTemplate(sim *core.Simulation) core.MultiTargetDirectDamageSpellTemplate {
-	spell := core.MultiTargetDirectDamageSpell{
+func (shaman *Shaman) newNovaTotemTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
+	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
 				CritMultiplier: 1.5,
@@ -175,12 +175,12 @@ func (shaman *Shaman) newNovaTotemTemplate(sim *core.Simulation) core.MultiTarge
 	}
 	spell.Effects = effects
 
-	return core.NewMultiTargetDirectDamageSpellTemplate(spell)
+	return core.NewSimpleSpellTemplate(spell)
 }
 
-func (shaman *Shaman) NewNovaTotem(sim *core.Simulation) *core.MultiTargetDirectDamageSpell {
+func (shaman *Shaman) NewNovaTotem(sim *core.Simulation) *core.SimpleSpell {
 	// Initialize cast from precomputed template.
-	novaTotem := &shaman.MultiTargetFireTotemSpell
+	novaTotem := &shaman.FireTotemSpell
 	shaman.novaTotemTemplate.Apply(novaTotem)
 
 	// Set dynamic fields, i.e. the stuff we couldn't precompute.

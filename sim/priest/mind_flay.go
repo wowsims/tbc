@@ -51,8 +51,8 @@ func (priest *Priest) newMindflayTemplate(sim *core.Simulation) core.SimpleSpell
 		SpellCast: core.SpellCast{
 			Cast: baseCast,
 		},
-		SpellHitEffect: effect,
-		IsChannel:      true,
+		Effect:    effect,
+		IsChannel: true,
 	})
 }
 
@@ -62,7 +62,7 @@ func (priest *Priest) NewMindFlay(sim *core.Simulation, target *core.Target) *co
 	priest.mindflayCastTemplate.Apply(mf)
 
 	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	mf.Target = target
+	mf.Effect.Target = target
 
 	mf.Init(sim)
 

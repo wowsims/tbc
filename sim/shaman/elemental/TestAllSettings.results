@@ -43,13 +43,13 @@ dps_results: {
 dps_results: {
  key: "TestAllSettings-Orc-P1-Adaptive-NoBuffs-ShortSingleTargetFullDebuffs"
  value: {
-  dps: 1719.7110195442226
+  dps: 1719.7110195442224
  }
 }
 dps_results: {
  key: "TestAllSettings-Orc-P1-CLOnClearcast-FullBuffs-LongMultiTarget"
  value: {
-  dps: 1953.4549765775307
+  dps: 1942.7444739321056
  }
 }
 dps_results: {
@@ -73,7 +73,7 @@ dps_results: {
 dps_results: {
  key: "TestAllSettings-Orc-P1-CLOnClearcast-NoBuffs-LongMultiTarget"
  value: {
-  dps: 1288.926038220863
+  dps: 1288.4696405880268
  }
 }
 dps_results: {
@@ -97,7 +97,7 @@ dps_results: {
 dps_results: {
  key: "TestAllSettings-Orc-P1-CLOnClearcastNoBuffs-FullBuffs-LongMultiTarget"
  value: {
-  dps: 1733.8968636372776
+  dps: 1699.4776200359227
  }
 }
 dps_results: {
@@ -115,13 +115,13 @@ dps_results: {
 dps_results: {
  key: "TestAllSettings-Orc-P1-CLOnClearcastNoBuffs-FullBuffs-ShortSingleTargetFullDebuffs"
  value: {
-  dps: 1643.1255801370364
+  dps: 1643.125580137036
  }
 }
 dps_results: {
  key: "TestAllSettings-Orc-P1-CLOnClearcastNoBuffs-NoBuffs-LongMultiTarget"
  value: {
-  dps: 1032.799407452721
+  dps: 1007.0854779259438
  }
 }
 dps_results: {
@@ -145,7 +145,7 @@ dps_results: {
 dps_results: {
  key: "TestAllSettings-Orc-P1-Fixed3LBCL-FullBuffs-LongMultiTarget"
  value: {
-  dps: 2069.7003516596465
+  dps: 2068.7974879768817
  }
 }
 dps_results: {
@@ -169,13 +169,13 @@ dps_results: {
 dps_results: {
  key: "TestAllSettings-Orc-P1-Fixed3LBCL-NoBuffs-LongMultiTarget"
  value: {
-  dps: 1218.6416275161498
+  dps: 1202.2885995301124
  }
 }
 dps_results: {
  key: "TestAllSettings-Orc-P1-Fixed3LBCL-NoBuffs-LongSingleTargetFullDebuffs"
  value: {
-  dps: 780.2989825565018
+  dps: 780.2989825565016
  }
 }
 dps_results: {
@@ -187,7 +187,7 @@ dps_results: {
 dps_results: {
  key: "TestAllSettings-Orc-P1-Fixed3LBCL-NoBuffs-ShortSingleTargetFullDebuffs"
  value: {
-  dps: 1690.8045779069894
+  dps: 1690.8045779069892
  }
 }
 dps_results: {
@@ -241,7 +241,7 @@ dps_results: {
 dps_results: {
  key: "TestAllSettings-Troll10-P1-Adaptive-FullBuffs-LongMultiTarget"
  value: {
-  dps: 2053.8014195623164
+  dps: 2057.284351063449
  }
 }
 dps_results: {
@@ -289,7 +289,7 @@ dps_results: {
 dps_results: {
  key: "TestAllSettings-Troll10-P1-CLOnClearcast-FullBuffs-LongMultiTarget"
  value: {
-  dps: 1995.687498398023
+  dps: 1937.425348461073
  }
 }
 dps_results: {
@@ -313,7 +313,7 @@ dps_results: {
 dps_results: {
  key: "TestAllSettings-Troll10-P1-CLOnClearcast-NoBuffs-LongMultiTarget"
  value: {
-  dps: 1239.6280955446582
+  dps: 1245.2731009786257
  }
 }
 dps_results: {
@@ -337,31 +337,31 @@ dps_results: {
 dps_results: {
  key: "TestAllSettings-Troll10-P1-CLOnClearcastNoBuffs-FullBuffs-LongMultiTarget"
  value: {
-  dps: 1715.6658748335158
+  dps: 1664.9494773854285
  }
 }
 dps_results: {
  key: "TestAllSettings-Troll10-P1-CLOnClearcastNoBuffs-FullBuffs-LongSingleTargetFullDebuffs"
  value: {
-  dps: 1409.3612739611074
+  dps: 1409.3612739611071
  }
 }
 dps_results: {
  key: "TestAllSettings-Troll10-P1-CLOnClearcastNoBuffs-FullBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 1373.8451735437552
+  dps: 1373.845173543755
  }
 }
 dps_results: {
  key: "TestAllSettings-Troll10-P1-CLOnClearcastNoBuffs-FullBuffs-ShortSingleTargetFullDebuffs"
  value: {
-  dps: 1641.0047408457249
+  dps: 1641.0047408457244
  }
 }
 dps_results: {
  key: "TestAllSettings-Troll10-P1-CLOnClearcastNoBuffs-NoBuffs-LongMultiTarget"
  value: {
-  dps: 982.4128932899221
+  dps: 1010.877528579885
  }
 }
 dps_results: {
@@ -385,7 +385,7 @@ dps_results: {
 dps_results: {
  key: "TestAllSettings-Troll10-P1-Fixed3LBCL-FullBuffs-LongMultiTarget"
  value: {
-  dps: 2060.148555653983
+  dps: 2059.7386165293137
  }
 }
 dps_results: {
@@ -409,7 +409,7 @@ dps_results: {
 dps_results: {
  key: "TestAllSettings-Troll10-P1-Fixed3LBCL-NoBuffs-LongMultiTarget"
  value: {
-  dps: 1123.762747231336
+  dps: 1134.9456626522483
  }
 }
 dps_results: {
@@ -457,13 +457,13 @@ dps_results: {
 dps_results: {
  key: "TestAllSettings-Troll10-P1-LBOnly-NoBuffs-LongMultiTarget"
  value: {
-  dps: 1079.2864357567285
+  dps: 1079.2864357567287
  }
 }
 dps_results: {
  key: "TestAllSettings-Troll10-P1-LBOnly-NoBuffs-LongSingleTargetFullDebuffs"
  value: {
-  dps: 1079.2864357567285
+  dps: 1079.2864357567287
  }
 }
 dps_results: {

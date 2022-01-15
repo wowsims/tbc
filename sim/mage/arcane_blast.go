@@ -30,7 +30,7 @@ func (mage *Mage) newArcaneBlastTemplate(sim *core.Simulation) core.SimpleSpellT
 				},
 			},
 		},
-		SpellHitEffect: core.SpellHitEffect{
+		Effect: core.SpellHitEffect{
 			SpellEffect: core.SpellEffect{
 				DamageMultiplier:       1,
 				StaticDamageMultiplier: mage.spellDamageMultiplier,
@@ -43,11 +43,11 @@ func (mage *Mage) newArcaneBlastTemplate(sim *core.Simulation) core.SimpleSpellT
 		},
 	}
 
-	spell.SpellHitEffect.SpellEffect.BonusSpellHitRating += float64(mage.Talents.ArcaneFocus) * 2 * core.SpellHitRatingPerHitChance
-	spell.SpellHitEffect.SpellEffect.BonusSpellCritRating += float64(mage.Talents.ArcaneImpact) * 2 * core.SpellCritRatingPerCritChance
+	spell.Effect.BonusSpellHitRating += float64(mage.Talents.ArcaneFocus) * 2 * core.SpellHitRatingPerHitChance
+	spell.Effect.BonusSpellCritRating += float64(mage.Talents.ArcaneImpact) * 2 * core.SpellCritRatingPerCritChance
 
 	if ItemSetTirisfalRegalia.CharacterHasSetBonus(&mage.Character, 2) {
-		spell.SpellHitEffect.SpellEffect.StaticDamageMultiplier *= 1.2
+		spell.Effect.StaticDamageMultiplier *= 1.2
 		spell.ManaCost += 0.2 * ArcaneBlastBaseManaCost
 	}
 
@@ -65,7 +65,7 @@ func (mage *Mage) NewArcaneBlast(sim *core.Simulation, target *core.Target) (*co
 	arcaneBlast.ActionID.Tag = numStacks + 1
 
 	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	arcaneBlast.Target = target
+	arcaneBlast.Effect.Target = target
 	arcaneBlast.Init(sim)
 
 	return arcaneBlast, numStacks

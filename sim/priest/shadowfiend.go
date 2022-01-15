@@ -91,7 +91,7 @@ func (priest *Priest) newShadowfiendTemplate(sim *core.Simulation) core.SimpleSp
 		SpellCast: core.SpellCast{
 			Cast: baseCast,
 		},
-		SpellHitEffect: effect,
+		Effect: effect,
 	})
 }
 
@@ -102,7 +102,7 @@ func (priest *Priest) NewShadowfiend(sim *core.Simulation, target *core.Target) 
 	priest.shadowfiendTemplate.Apply(mf)
 
 	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	mf.Target = target
+	mf.Effect.Target = target
 	mf.Init(sim)
 
 	return mf

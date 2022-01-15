@@ -191,12 +191,11 @@ func (shaman *Shaman) TryDropTotems(sim *core.Simulation) time.Duration {
 	}
 
 	var cast *core.SimpleCast
-	var attackCast *core.SimpleSpell                 // if using fire totems this will be an attack cast.
-	var multiCast *core.MultiTargetDirectDamageSpell // if using fire totems this will be an attack cast.
+	var attackCast *core.SimpleSpell // if using fire totems this will be an attack cast.
 
 	// currently hardcoded to include 25% mana cost reduction from resto talents
 	for totemTypeIdx, totemExpiration := range shaman.SelfBuffs.NextTotemDrops {
-		if cast != nil || attackCast != nil || multiCast != nil {
+		if cast != nil || attackCast != nil {
 			break
 		}
 		nextDrop := shaman.SelfBuffs.NextTotemDropType[totemTypeIdx]
@@ -228,18 +227,16 @@ func (shaman *Shaman) TryDropTotems(sim *core.Simulation) time.Duration {
 					attackCast = shaman.NewSearingTotem(sim, sim.GetPrimaryTarget())
 					shaman.SelfBuffs.NextTotemDrops[FireTotem] = sim.CurrentTime + time.Second*60 + 1
 				case magmaTotem:
-					multiCast = shaman.NewMagmaTotem(sim)
+					attackCast = shaman.NewMagmaTotem(sim)
 					shaman.SelfBuffs.NextTotemDrops[FireTotem] = sim.CurrentTime + time.Second*20 + 1
 				case novaTotem:
 					// If we drop nova while another totem is running, cancel it.
-					if shaman.FireTotemSpell.DotInput.IsTicking(sim) {
+					if shaman.FireTotemSpell.IsInUse() {
 						shaman.FireTotemSpell.Cancel(sim)
-					} else if shaman.MultiTargetFireTotemSpell.IsInUse() {
-						shaman.MultiTargetFireTotemSpell.Cancel(sim)
 					}
-					multiCast = shaman.NewNovaTotem(sim)
+					attackCast = shaman.NewNovaTotem(sim)
 					// use attackCast.DotInput.TickLength as input in case ImprovedFireTotems reduces time to explode
-					shaman.SelfBuffs.NextTotemDrops[FireTotem] = sim.CurrentTime + multiCast.Effects[0].DotInput.TickLength + 1
+					shaman.SelfBuffs.NextTotemDrops[FireTotem] = sim.CurrentTime + attackCast.Effects[0].DotInput.TickLength + 1
 				}
 
 			case WaterTotem:
@@ -261,11 +258,6 @@ func (shaman *Shaman) TryDropTotems(sim *core.Simulation) time.Duration {
 		isFireAttack = true
 		success = attackCast.Cast(sim)
 		cost = attackCast.GetManaCost()
-	} else if multiCast != nil {
-		anyCast = true
-		isFireAttack = true
-		success = multiCast.Cast(sim)
-		cost = multiCast.GetManaCost()
 	}
 
 	if !anyCast {

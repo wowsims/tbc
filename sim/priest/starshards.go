@@ -43,7 +43,7 @@ func (priest *Priest) newStarshardsTemplate(sim *core.Simulation) core.SimpleSpe
 		SpellCast: core.SpellCast{
 			Cast: baseCast,
 		},
-		SpellHitEffect: effect,
+		Effect: effect,
 	})
 }
 
@@ -54,7 +54,7 @@ func (priest *Priest) NewStarshards(sim *core.Simulation, target *core.Target) *
 	priest.starshardsTemplate.Apply(mf)
 
 	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	mf.Target = target
+	mf.Effect.Target = target
 	mf.Init(sim)
 
 	return mf

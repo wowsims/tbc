@@ -33,7 +33,7 @@ func (shaman *Shaman) newShockTemplateSpell(sim *core.Simulation, spellID int32,
 				Binary: true,
 			},
 		},
-		SpellHitEffect: core.SpellHitEffect{
+		Effect: core.SpellHitEffect{
 			SpellEffect: core.SpellEffect{
 				DamageMultiplier:       1,
 				StaticDamageMultiplier: 1,
@@ -54,13 +54,13 @@ func (shaman *Shaman) newShockTemplateSpell(sim *core.Simulation, spellID int32,
 		spell.CritMultiplier = 2
 	}
 
-	spell.SpellHitEffect.SpellEffect.DamageMultiplier *= 1 + 0.01*float64(shaman.Talents.Concussion)
-	spell.SpellHitEffect.SpellEffect.BonusSpellHitRating += float64(shaman.Talents.ElementalPrecision) * 2 * core.SpellHitRatingPerHitChance
+	spell.Effect.DamageMultiplier *= 1 + 0.01*float64(shaman.Talents.Concussion)
+	spell.Effect.BonusSpellHitRating += float64(shaman.Talents.ElementalPrecision) * 2 * core.SpellHitRatingPerHitChance
 
 	if shaman.Equip[items.ItemSlotRanged].ID == TotemOfRage {
-		spell.SpellHitEffect.SpellEffect.BonusSpellPower += 30
+		spell.Effect.BonusSpellPower += 30
 	} else if shaman.Equip[items.ItemSlotRanged].ID == TotemOfImpact {
-		spell.SpellHitEffect.SpellEffect.BonusSpellPower += 46
+		spell.Effect.BonusSpellPower += 46
 	}
 
 	if shaman.Talents.ElementalFocus {
@@ -69,7 +69,7 @@ func (shaman *Shaman) newShockTemplateSpell(sim *core.Simulation, spellID int32,
 				shaman.ElementalFocusStacks--
 			}
 		}
-		spell.SpellHitEffect.OnSpellHit = func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+		spell.Effect.OnSpellHit = func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 			if spellEffect.Crit {
 				shaman.ElementalFocusStacks = 2
 			}
@@ -90,7 +90,7 @@ func (shaman *Shaman) applyShockInitModifiers(spellCast *core.SpellCast) {
 func (shaman *Shaman) newEarthShockTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
 	spell := shaman.newShockTemplateSpell(sim, SpellIDEarthShock, stats.NatureSpellPower, 535.0)
 
-	spell.SpellHitEffect.DirectInput = core.DirectDamageInput{
+	spell.Effect.DirectInput = core.DirectDamageInput{
 		MinBaseDamage:    661,
 		MaxBaseDamage:    696,
 		SpellCoefficient: 0.386,
@@ -103,7 +103,7 @@ func (shaman *Shaman) NewEarthShock(sim *core.Simulation, target *core.Target) *
 	shock := &shaman.shockSpell
 	shaman.earthShockTemplate.Apply(shock)
 	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	shock.Target = target
+	shock.Effect.Target = target
 	shaman.applyShockInitModifiers(&shock.SpellCast)
 	shock.Init(sim)
 
@@ -113,12 +113,12 @@ func (shaman *Shaman) NewEarthShock(sim *core.Simulation, target *core.Target) *
 func (shaman *Shaman) newFlameShockTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
 	spell := shaman.newShockTemplateSpell(sim, SpellIDFlameShock, stats.FireSpellPower, 500.0)
 
-	spell.SpellHitEffect.DirectInput = core.DirectDamageInput{
+	spell.Effect.DirectInput = core.DirectDamageInput{
 		MinBaseDamage:    377,
 		MaxBaseDamage:    377,
 		SpellCoefficient: 0.214,
 	}
-	spell.SpellHitEffect.DotInput = core.DotDamageInput{
+	spell.Effect.DotInput = core.DotDamageInput{
 		NumberOfTicks:        4,
 		TickLength:           time.Second * 3,
 		TickBaseDamage:       420 / 4,
@@ -138,7 +138,7 @@ func (shaman *Shaman) NewFlameShock(sim *core.Simulation, target *core.Target) *
 	shock := &shaman.FlameShockSpell
 	shaman.flameShockTemplate.Apply(shock)
 	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	shock.Target = target
+	shock.Effect.Target = target
 	shaman.applyShockInitModifiers(&shock.SpellCast)
 	shock.Init(sim)
 
@@ -148,7 +148,7 @@ func (shaman *Shaman) NewFlameShock(sim *core.Simulation, target *core.Target) *
 func (shaman *Shaman) newFrostShockTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
 	spell := shaman.newShockTemplateSpell(sim, SpellIDFrostShock, stats.FrostSpellPower, 525.0)
 
-	spell.SpellHitEffect.DirectInput = core.DirectDamageInput{
+	spell.Effect.DirectInput = core.DirectDamageInput{
 		MinBaseDamage:    647,
 		MaxBaseDamage:    683,
 		SpellCoefficient: 0.386,
@@ -161,7 +161,7 @@ func (shaman *Shaman) NewFrostShock(sim *core.Simulation, target *core.Target) *
 	shock := &shaman.shockSpell
 	shaman.frostShockTemplate.Apply(shock)
 	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	shock.Target = target
+	shock.Effect.Target = target
 	shaman.applyShockInitModifiers(&shock.SpellCast)
 	shock.Init(sim)
 

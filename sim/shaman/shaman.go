@@ -91,15 +91,15 @@ type Shaman struct {
 	lightningBoltSpell   core.SimpleSpell
 	lightningBoltSpellLO core.SimpleSpell
 
-	chainLightningSpell    core.MultiTargetDirectDamageSpell
-	chainLightningSpellLOs []core.MultiTargetDirectDamageSpell
+	chainLightningSpell    core.SimpleSpell
+	chainLightningSpellLOs []core.SimpleSpell
 
 	// Precomputed templated cast generator for quickly resetting cast fields.
 	lightningBoltCastTemplate   core.SimpleSpellTemplate
 	lightningBoltLOCastTemplate core.SimpleSpellTemplate
 
-	chainLightningCastTemplate    core.MultiTargetDirectDamageSpellTemplate
-	chainLightningLOCastTemplates []core.MultiTargetDirectDamageSpellTemplate
+	chainLightningCastTemplate    core.SimpleSpellTemplate
+	chainLightningLOCastTemplates []core.SimpleSpellTemplate
 
 	stormstrikeTemplate core.MeleeAbilityTemplate
 	stormstrikeSpell    core.ActiveMeleeAbility
@@ -114,12 +114,11 @@ type Shaman struct {
 	flameShockTemplate core.SimpleSpellTemplate
 
 	// Fire Totems
-	FireTotemSpell            core.SimpleSpell
-	MultiTargetFireTotemSpell core.MultiTargetDirectDamageSpell
+	FireTotemSpell core.SimpleSpell
 
 	searingTotemTemplate core.SimpleSpellTemplate
-	magmaTotemTemplate   core.MultiTargetDirectDamageSpellTemplate
-	novaTotemTemplate    core.MultiTargetDirectDamageSpellTemplate
+	magmaTotemTemplate   core.SimpleSpellTemplate
+	novaTotemTemplate    core.SimpleSpellTemplate
 
 	unleashedRages []core.Aura
 }
@@ -193,8 +192,8 @@ func (shaman *Shaman) Init(sim *core.Simulation) {
 	shaman.chainLightningCastTemplate = shaman.newChainLightningTemplate(sim, false)
 
 	numHits := core.MinInt32(3, sim.GetNumTargets())
-	shaman.chainLightningSpellLOs = make([]core.MultiTargetDirectDamageSpell, numHits)
-	shaman.chainLightningLOCastTemplates = []core.MultiTargetDirectDamageSpellTemplate{}
+	shaman.chainLightningSpellLOs = make([]core.SimpleSpell, numHits)
+	shaman.chainLightningLOCastTemplates = []core.SimpleSpellTemplate{}
 	for i := int32(0); i < numHits; i++ {
 		shaman.chainLightningLOCastTemplates = append(shaman.chainLightningLOCastTemplates, shaman.newChainLightningTemplate(sim, true))
 	}

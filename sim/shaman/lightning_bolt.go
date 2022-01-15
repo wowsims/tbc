@@ -24,12 +24,12 @@ func (shaman *Shaman) newLightningBoltTemplate(sim *core.Simulation, isLightning
 			baseManaCost,
 			time.Millisecond*2500,
 			isLightningOverload),
-		SpellHitEffect: shaman.newElectricSpellEffect(571, 652, 0.794, isLightningOverload),
+		Effect: shaman.newElectricSpellEffect(571, 652, 0.794, isLightningOverload),
 	}
 
 	if !isLightningOverload && shaman.Talents.LightningOverload > 0 {
 		lightningOverloadChance := float64(shaman.Talents.LightningOverload) * 0.04
-		spellTemplate.SpellHitEffect.OnSpellHit = func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+		spellTemplate.Effect.OnSpellHit = func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 			if shaman.Talents.ElementalFocus && spellEffect.Crit {
 				shaman.ElementalFocusStacks = 2
 			}
@@ -41,7 +41,7 @@ func (shaman *Shaman) newLightningBoltTemplate(sim *core.Simulation, isLightning
 			overloadAction.Cast(sim)
 		}
 	} else {
-		spellTemplate.SpellHitEffect.OnSpellHit = func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+		spellTemplate.Effect.OnSpellHit = func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 			if shaman.Talents.ElementalFocus && spellEffect.Crit {
 				shaman.ElementalFocusStacks = 2
 			}
@@ -49,7 +49,7 @@ func (shaman *Shaman) newLightningBoltTemplate(sim *core.Simulation, isLightning
 	}
 
 	if ItemSetSkyshatterRegalia.CharacterHasSetBonus(&shaman.Character, 4) {
-		spellTemplate.SpellHitEffect.StaticDamageMultiplier *= 1.05
+		spellTemplate.Effect.StaticDamageMultiplier *= 1.05
 	}
 
 	return core.NewSimpleSpellTemplate(spellTemplate)
@@ -68,7 +68,7 @@ func (shaman *Shaman) NewLightningBolt(sim *core.Simulation, target *core.Target
 	}
 
 	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	lb.Target = target
+	lb.Effect.Target = target
 	shaman.applyElectricSpellCastInitModifiers(&lb.SpellCast)
 
 	lb.Init(sim)
