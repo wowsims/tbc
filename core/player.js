@@ -5,6 +5,7 @@ import { EquipmentSpec } from '/tbc/core/proto/common.js';
 import { IndividualBuffs } from '/tbc/core/proto/common.js';
 import { PlayerStats } from '/tbc/core/proto/api.js';
 import { Player as PlayerProto } from '/tbc/core/proto/api.js';
+import { computeItemEP } from '/tbc/core/proto_utils/equipped_item.js';
 import { Gear } from '/tbc/core/proto_utils/gear.js';
 import { gemMatchesSocket, } from '/tbc/core/proto_utils/gems.js';
 import { Stats } from '/tbc/core/proto_utils/stats.js';
@@ -341,7 +342,7 @@ export class Player {
         if (this.itemEPCache.has(item.id)) {
             return this.itemEPCache.get(item.id);
         }
-        let ep = new Stats(item.stats).computeEP(this.epWeights);
+        let ep = computeItemEP(item, this.epWeights);
         // unique items are slightly worse than non-unique because you can have only one.
         if (item.unique) {
             ep -= 0.01;

@@ -583,7 +583,6 @@
 
 .selector-modal-list-item-ep > span {
   display: inline-block;
-  width: 30px;
   margin: 5px;
   color: white;
 }
@@ -1654,6 +1653,10 @@ input, select {
 .sim-sidebar-title, .sim-toolbar {
   height: 60px;
   border-bottom: 1px solid white;
+}
+
+.sim-title-root {
+  width: 100%;
 }
 
 .sim-sidebar-actions {

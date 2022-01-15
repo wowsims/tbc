@@ -906,11 +906,13 @@ class PartyBuffs$Type extends MessageType {
             { no: 14, name: "wrath_of_air_totem", kind: "enum", T: () => ["proto.TristateEffect", TristateEffect] },
             { no: 15, name: "grace_of_air_totem", kind: "enum", T: () => ["proto.TristateEffect", TristateEffect] },
             { no: 16, name: "strength_of_earth_totem", kind: "enum", T: () => ["proto.StrengthOfEarthType", StrengthOfEarthType] },
+            { no: 23, name: "windfury_totem_rank", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 24, name: "windfury_totem_iwt", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 18, name: "battle_shout", kind: "enum", T: () => ["proto.TristateEffect", TristateEffect] }
         ]);
     }
     create(value) {
-        const message = { bloodlust: 0, ferociousInspiration: 0, moonkinAura: 0, leaderOfThePack: 0, sanctityAura: 0, trueshotAura: false, draeneiRacialMelee: false, draeneiRacialCaster: false, drums: 0, atieshMage: 0, atieshWarlock: 0, braidedEterniumChain: false, eyeOfTheNight: false, chainOfTheTwilightOwl: false, jadePendantOfBlasting: false, manaSpringTotem: 0, manaTideTotems: 0, totemOfWrath: 0, wrathOfAirTotem: 0, graceOfAirTotem: 0, strengthOfEarthTotem: 0, battleShout: 0 };
+        const message = { bloodlust: 0, ferociousInspiration: 0, moonkinAura: 0, leaderOfThePack: 0, sanctityAura: 0, trueshotAura: false, draeneiRacialMelee: false, draeneiRacialCaster: false, drums: 0, atieshMage: 0, atieshWarlock: 0, braidedEterniumChain: false, eyeOfTheNight: false, chainOfTheTwilightOwl: false, jadePendantOfBlasting: false, manaSpringTotem: 0, manaTideTotems: 0, totemOfWrath: 0, wrathOfAirTotem: 0, graceOfAirTotem: 0, strengthOfEarthTotem: 0, windfuryTotemRank: 0, windfuryTotemIwt: 0, battleShout: 0 };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -983,6 +985,12 @@ class PartyBuffs$Type extends MessageType {
                     break;
                 case /* proto.StrengthOfEarthType strength_of_earth_totem */ 16:
                     message.strengthOfEarthTotem = reader.int32();
+                    break;
+                case /* int32 windfury_totem_rank */ 23:
+                    message.windfuryTotemRank = reader.int32();
+                    break;
+                case /* int32 windfury_totem_iwt */ 24:
+                    message.windfuryTotemIwt = reader.int32();
                     break;
                 case /* proto.TristateEffect battle_shout */ 18:
                     message.battleShout = reader.int32();
@@ -1062,6 +1070,12 @@ class PartyBuffs$Type extends MessageType {
         /* proto.StrengthOfEarthType strength_of_earth_totem = 16; */
         if (message.strengthOfEarthTotem !== 0)
             writer.tag(16, WireType.Varint).int32(message.strengthOfEarthTotem);
+        /* int32 windfury_totem_rank = 23; */
+        if (message.windfuryTotemRank !== 0)
+            writer.tag(23, WireType.Varint).int32(message.windfuryTotemRank);
+        /* int32 windfury_totem_iwt = 24; */
+        if (message.windfuryTotemIwt !== 0)
+            writer.tag(24, WireType.Varint).int32(message.windfuryTotemIwt);
         /* proto.TristateEffect battle_shout = 18; */
         if (message.battleShout !== 0)
             writer.tag(18, WireType.Varint).int32(message.battleShout);
@@ -1792,13 +1806,16 @@ class Item$Type extends MessageType {
             { no: 8, name: "stats", kind: "scalar", repeat: 1 /*RepeatType.PACKED*/, T: 1 /*ScalarType.DOUBLE*/ },
             { no: 9, name: "gem_sockets", kind: "enum", repeat: 1 /*RepeatType.PACKED*/, T: () => ["proto.GemColor", GemColor] },
             { no: 10, name: "socketBonus", kind: "scalar", repeat: 1 /*RepeatType.PACKED*/, T: 1 /*ScalarType.DOUBLE*/ },
+            { no: 17, name: "weapon_damage_min", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
+            { no: 18, name: "weapon_damage_max", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
+            { no: 19, name: "weapon_speed", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
             { no: 11, name: "phase", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 12, name: "quality", kind: "enum", T: () => ["proto.ItemQuality", ItemQuality] },
             { no: 13, name: "unique", kind: "scalar", T: 8 /*ScalarType.BOOL*/ }
         ]);
     }
     create(value) {
-        const message = { id: 0, wowheadId: 0, name: "", classAllowlist: [], type: 0, armorType: 0, weaponType: 0, handType: 0, rangedWeaponType: 0, stats: [], gemSockets: [], socketBonus: [], phase: 0, quality: 0, unique: false };
+        const message = { id: 0, wowheadId: 0, name: "", classAllowlist: [], type: 0, armorType: 0, weaponType: 0, handType: 0, rangedWeaponType: 0, stats: [], gemSockets: [], socketBonus: [], weaponDamageMin: 0, weaponDamageMax: 0, weaponSpeed: 0, phase: 0, quality: 0, unique: false };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -1860,6 +1877,15 @@ class Item$Type extends MessageType {
                             message.socketBonus.push(reader.double());
                     else
                         message.socketBonus.push(reader.double());
+                    break;
+                case /* double weapon_damage_min */ 17:
+                    message.weaponDamageMin = reader.double();
+                    break;
+                case /* double weapon_damage_max */ 18:
+                    message.weaponDamageMax = reader.double();
+                    break;
+                case /* double weapon_speed */ 19:
+                    message.weaponSpeed = reader.double();
                     break;
                 case /* int32 phase */ 11:
                     message.phase = reader.int32();
@@ -1934,6 +1960,15 @@ class Item$Type extends MessageType {
                 writer.double(message.socketBonus[i]);
             writer.join();
         }
+        /* double weapon_damage_min = 17; */
+        if (message.weaponDamageMin !== 0)
+            writer.tag(17, WireType.Bit64).double(message.weaponDamageMin);
+        /* double weapon_damage_max = 18; */
+        if (message.weaponDamageMax !== 0)
+            writer.tag(18, WireType.Bit64).double(message.weaponDamageMax);
+        /* double weapon_speed = 19; */
+        if (message.weaponSpeed !== 0)
+            writer.tag(19, WireType.Bit64).double(message.weaponSpeed);
         /* int32 phase = 11; */
         if (message.phase !== 0)
             writer.tag(11, WireType.Varint).int32(message.phase);

@@ -184,9 +184,9 @@ export interface ShamanTotems {
     /**
      * Rank of Windfury Totem to cast, if using Windfury Totem.
      *
-     * @generated from protobuf field: int32 windfury_rank = 11;
+     * @generated from protobuf field: int32 windfury_totem_rank = 11;
      */
-    windfuryRank: number;
+    windfuryTotemRank: number;
     /**
      * If set, will twist fire nova with whichever fire totem is selected.
      *

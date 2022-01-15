@@ -3,7 +3,10 @@ import { Gem } from '/tbc/core/proto/common.js';
 import { Item } from '/tbc/core/proto/common.js';
 import { ItemSpec } from '/tbc/core/proto/common.js';
 import { ActionId } from './action_id.js';
+import { Stats } from './stats.js';
 export declare function getWowheadItemId(item: Item): number;
+export declare function getWeaponDPS(item: Item): number;
+export declare function computeItemEP(item: Item, epWeights: Stats): number;
 /**
  * Represents an equipped item along with enchants/gems attached to it.
  *

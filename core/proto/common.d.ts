@@ -120,6 +120,14 @@ export interface PartyBuffs {
      */
     strengthOfEarthTotem: StrengthOfEarthType;
     /**
+     * @generated from protobuf field: int32 windfury_totem_rank = 23;
+     */
+    windfuryTotemRank: number;
+    /**
+     * @generated from protobuf field: int32 windfury_totem_iwt = 24;
+     */
+    windfuryTotemIwt: number;
+    /**
      * @generated from protobuf field: proto.TristateEffect battle_shout = 18;
      */
     battleShout: TristateEffect;
@@ -462,6 +470,20 @@ export interface Item {
      * @generated from protobuf field: repeated double socketBonus = 10;
      */
     socketBonus: number[];
+    /**
+     * Weapon stats, needed for computing proper EP for melee weapons
+     *
+     * @generated from protobuf field: double weapon_damage_min = 17;
+     */
+    weaponDamageMin: number;
+    /**
+     * @generated from protobuf field: double weapon_damage_max = 18;
+     */
+    weaponDamageMax: number;
+    /**
+     * @generated from protobuf field: double weapon_speed = 19;
+     */
+    weaponSpeed: number;
     /**
      * @generated from protobuf field: int32 phase = 11;
      */

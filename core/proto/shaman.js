@@ -455,7 +455,7 @@ class ShamanTotems$Type extends MessageType {
             { no: 3, name: "fire", kind: "enum", T: () => ["proto.FireTotem", FireTotem] },
             { no: 4, name: "water", kind: "enum", T: () => ["proto.WaterTotem", WaterTotem] },
             { no: 5, name: "twist_windfury", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
-            { no: 11, name: "windfury_rank", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 11, name: "windfury_totem_rank", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 6, name: "twist_fire_nova", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 7, name: "use_mana_tide", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 8, name: "use_fire_elemental", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
@@ -464,7 +464,7 @@ class ShamanTotems$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { earth: 0, air: 0, fire: 0, water: 0, twistWindfury: false, windfuryRank: 0, twistFireNova: false, useManaTide: false, useFireElemental: false, recallFireElementalOnOom: false, recallTotems: false };
+        const message = { earth: 0, air: 0, fire: 0, water: 0, twistWindfury: false, windfuryTotemRank: 0, twistFireNova: false, useManaTide: false, useFireElemental: false, recallFireElementalOnOom: false, recallTotems: false };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -490,8 +490,8 @@ class ShamanTotems$Type extends MessageType {
                 case /* bool twist_windfury */ 5:
                     message.twistWindfury = reader.bool();
                     break;
-                case /* int32 windfury_rank */ 11:
-                    message.windfuryRank = reader.int32();
+                case /* int32 windfury_totem_rank */ 11:
+                    message.windfuryTotemRank = reader.int32();
                     break;
                 case /* bool twist_fire_nova */ 6:
                     message.twistFireNova = reader.bool();
@@ -535,9 +535,9 @@ class ShamanTotems$Type extends MessageType {
         /* bool twist_windfury = 5; */
         if (message.twistWindfury !== false)
             writer.tag(5, WireType.Varint).bool(message.twistWindfury);
-        /* int32 windfury_rank = 11; */
-        if (message.windfuryRank !== 0)
-            writer.tag(11, WireType.Varint).int32(message.windfuryRank);
+        /* int32 windfury_totem_rank = 11; */
+        if (message.windfuryTotemRank !== 0)
+            writer.tag(11, WireType.Varint).int32(message.windfuryTotemRank);
         /* bool twist_fire_nova = 6; */
         if (message.twistFireNova !== false)
             writer.tag(6, WireType.Varint).bool(message.twistFireNova);

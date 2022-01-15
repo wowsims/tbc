@@ -2,12 +2,28 @@ import { Enchant } from '/tbc/core/proto/common.js';
 import { Gem } from '/tbc/core/proto/common.js';
 import { Item } from '/tbc/core/proto/common.js';
 import { ItemSpec } from '/tbc/core/proto/common.js';
+import { Stat } from '/tbc/core/proto/common.js';
+import { WeaponType } from '/tbc/core/proto/common.js';
 import { ActionId } from './action_id.js';
 import { enchantAppliesToItem } from './utils.js';
 import { gemEligibleForSocket } from './gems.js';
 import { gemMatchesSocket } from './gems.js';
+import { Stats } from './stats.js';
 export function getWowheadItemId(item) {
     return item.wowheadId || item.id;
+}
+export function getWeaponDPS(item) {
+    return ((item.weaponDamageMin + item.weaponDamageMax) / 2) / (item.weaponSpeed || 1);
+}
+export function computeItemEP(item, epWeights) {
+    let itemStats = new Stats(item.stats);
+    if (item.weaponType != WeaponType.WeaponTypeUnknown) {
+        // Add weapon dps as attack power, so the EP is appropriate.
+        const weaponDps = getWeaponDPS(item);
+        const effectiveAttackPower = itemStats.getStat(Stat.StatAttackPower) + weaponDps * 14;
+        itemStats = itemStats.withStat(Stat.StatAttackPower, effectiveAttackPower);
+    }
+    return itemStats.computeEP(epWeights);
 }
 /**
  * Represents an equipped item along with enchants/gems attached to it.
