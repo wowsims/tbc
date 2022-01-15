@@ -21,6 +21,8 @@ enchantDescriptions.set(GREATER_INSCRIPTION_OF_VENGEANCE, '+30 Attack Power and 
 // Back
 export const SUBTLETY = 33150;
 enchantDescriptions.set(SUBTLETY, '2% Reduced Threat');
+export const CLOAK_GREATER_AGILITY = 34004;
+enchantDescriptions.set(CLOAK_GREATER_AGILITY, '+12 Agility');
 
 // Chest
 export const CHEST_MAJOR_SPIRIT = 33990;
