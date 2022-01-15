@@ -44,7 +44,7 @@ export const DefaultRotation = EnhancementShamanRotation.create({
 		fire: FireTotem.SearingTotem,
 		water: WaterTotem.ManaSpringTotem,
 		twistWindfury: true,
-		windfuryRank: 5,
+		windfuryTotemRank: 5,
 	}),
 	primaryShock: PrimaryShock.Frost,
 	weaveFlameShock: true,
