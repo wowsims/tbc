@@ -372,6 +372,10 @@ export interface EnhancementShaman_Options {
      */
     bloodlust: boolean;
     /**
+     * @generated from protobuf field: bool delay_offhand_swings = 5;
+     */
+    delayOffhandSwings: boolean;
+    /**
      * @generated from protobuf field: proto.ShamanWeaponImbue main_hand_imbue = 3;
      */
     mainHandImbue: ShamanWeaponImbue;

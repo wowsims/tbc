@@ -881,12 +881,13 @@ class EnhancementShaman_Options$Type extends MessageType {
         super("proto.EnhancementShaman.Options", [
             { no: 1, name: "water_shield", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 2, name: "bloodlust", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 5, name: "delay_offhand_swings", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 3, name: "main_hand_imbue", kind: "enum", T: () => ["proto.ShamanWeaponImbue", ShamanWeaponImbue] },
             { no: 4, name: "off_hand_imbue", kind: "enum", T: () => ["proto.ShamanWeaponImbue", ShamanWeaponImbue] }
         ]);
     }
     create(value) {
-        const message = { waterShield: false, bloodlust: false, mainHandImbue: 0, offHandImbue: 0 };
+        const message = { waterShield: false, bloodlust: false, delayOffhandSwings: false, mainHandImbue: 0, offHandImbue: 0 };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -902,6 +903,9 @@ class EnhancementShaman_Options$Type extends MessageType {
                     break;
                 case /* bool bloodlust */ 2:
                     message.bloodlust = reader.bool();
+                    break;
+                case /* bool delay_offhand_swings */ 5:
+                    message.delayOffhandSwings = reader.bool();
                     break;
                 case /* proto.ShamanWeaponImbue main_hand_imbue */ 3:
                     message.mainHandImbue = reader.int32();
@@ -927,6 +931,9 @@ class EnhancementShaman_Options$Type extends MessageType {
         /* bool bloodlust = 2; */
         if (message.bloodlust !== false)
             writer.tag(2, WireType.Varint).bool(message.bloodlust);
+        /* bool delay_offhand_swings = 5; */
+        if (message.delayOffhandSwings !== false)
+            writer.tag(5, WireType.Varint).bool(message.delayOffhandSwings);
         /* proto.ShamanWeaponImbue main_hand_imbue = 3; */
         if (message.mainHandImbue !== 0)
             writer.tag(3, WireType.Varint).int32(message.mainHandImbue);

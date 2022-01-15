@@ -36,6 +36,7 @@ export const DefaultRotation = EnhancementShamanRotation.create({
 export const DefaultOptions = EnhancementShamanOptions.create({
     waterShield: true,
     bloodlust: true,
+    delayOffhandSwings: true,
     mainHandImbue: ShamanWeaponImbue.ImbueWindfury,
     offHandImbue: ShamanWeaponImbue.ImbueWindfury,
 });
