@@ -42,12 +42,16 @@ export declare class DamageDealtLog extends SimLog {
     readonly miss: boolean;
     readonly hit: boolean;
     readonly crit: boolean;
+    readonly glance: boolean;
+    readonly dodge: boolean;
+    readonly parry: boolean;
+    readonly block: boolean;
     readonly tick: boolean;
     readonly partialResist1_4: boolean;
     readonly partialResist2_4: boolean;
     readonly partialResist3_4: boolean;
     readonly cause: ActionId;
-    constructor(params: SimLogParams, amount: number, miss: boolean, crit: boolean, tick: boolean, partialResist1_4: boolean, partialResist2_4: boolean, partialResist3_4: boolean, cause: ActionId);
+    constructor(params: SimLogParams, amount: number, miss: boolean, crit: boolean, glance: boolean, dodge: boolean, parry: boolean, block: boolean, tick: boolean, partialResist1_4: boolean, partialResist2_4: boolean, partialResist3_4: boolean, cause: ActionId);
     resultString(): string;
     toString(): string;
     static parse(params: SimLogParams): Promise<DamageDealtLog> | null;

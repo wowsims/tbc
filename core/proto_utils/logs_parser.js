@@ -135,10 +135,14 @@ export class SimLog {
     }
 }
 export class DamageDealtLog extends SimLog {
-    constructor(params, amount, miss, crit, tick, partialResist1_4, partialResist2_4, partialResist3_4, cause) {
+    constructor(params, amount, miss, crit, glance, dodge, parry, block, tick, partialResist1_4, partialResist2_4, partialResist3_4, cause) {
         super(params);
         this.amount = amount;
         this.miss = miss;
+        this.glance = glance;
+        this.dodge = dodge;
+        this.parry = parry;
+        this.block = block;
         this.hit = !miss && !crit;
         this.crit = crit;
         this.tick = tick;
@@ -148,8 +152,15 @@ export class DamageDealtLog extends SimLog {
         this.cause = cause;
     }
     resultString() {
-        let result = this.miss ? 'Miss' : this.tick ? 'Tick' : this.crit ? 'Crit' : 'Hit';
-        if (!this.miss) {
+        let result = this.miss ? 'Miss'
+            : this.dodge ? 'Dodge'
+                : this.parry ? 'Parry'
+                    : this.glance ? 'Glance'
+                        : this.crit ? 'Crit'
+                            : this.block ? 'Block'
+                                : this.tick ? 'Tick'
+                                    : 'Hit';
+        if (!this.miss && !this.dodge && !this.parry) {
             result += ` for ${this.amount.toFixed(2)}`;
             if (this.partialResist1_4) {
                 result += ' (25% Resist)';
@@ -168,14 +179,14 @@ export class DamageDealtLog extends SimLog {
         return `${this.toStringPrefix()} ${this.cause.name} ${this.resultString()}`;
     }
     static parse(params) {
-        const match = params.raw.match(/] (.*?) ((Miss)|(Hit)|(Crit)|(ticked))( for (\d+\.\d+) damage( \((\d+)% Resist\))?)?/);
+        const match = params.raw.match(/] (.*?) ((Miss)|(Hit)|(Crit)|(Glance)|(Dodge)|(Parry)|(Block)|(ticked))( for (\d+\.\d+) damage( \((\d+)% Resist\))?)?/);
         if (match) {
             return ActionId.fromLogString(match[1]).fill(params.source?.index).then(cause => {
                 if (match[2] == 'Miss') {
-                    return new DamageDealtLog(params, 0, true, false, false, false, false, false, cause);
+                    return new DamageDealtLog(params, 0, true, false, false, false, false, false, false, false, false, false, cause);
                 }
-                const amount = parseFloat(match[8]);
-                return new DamageDealtLog(params, amount, false, match[2] == 'Crit', match[2] == 'ticked', match[10] == '25', match[10] == '50', match[10] == '75', cause);
+                const amount = parseFloat(match[12]);
+                return new DamageDealtLog(params, amount, false, match[2] == 'Crit', match[2] == 'Glance', match[2] == 'Dodge', match[2] == 'Parry', match[2] == 'Block', match[2] == 'ticked', match[14] == '25', match[14] == '50', match[14] == '75', cause);
             });
         }
         else {

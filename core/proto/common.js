@@ -808,6 +808,10 @@ export var OtherAction;
      */
     OtherAction[OtherAction["OtherActionManaRegen"] = 2] = "OtherActionManaRegen";
     /**
+     * @generated from protobuf enum value: OtherActionEnergyRegen = 5;
+     */
+    OtherAction[OtherAction["OtherActionEnergyRegen"] = 5] = "OtherActionEnergyRegen";
+    /**
      * A white hit, can be main hand or off hand.
      *
      * @generated from protobuf enum value: OtherActionAttack = 3;
