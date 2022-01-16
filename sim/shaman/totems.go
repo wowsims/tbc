@@ -47,9 +47,9 @@ func (shaman *Shaman) newWrathOfAirTotemTemplate(sim *core.Simulation) core.Simp
 
 // Totems that shaman will cast.
 func (shaman *Shaman) NewWrathOfAirTotem(sim *core.Simulation) *core.SimpleCast {
-	shaman.wrathOfAirTotemSpell = shaman.wrathOfAirTotemTemplate
-	shaman.wrathOfAirTotemSpell.Init(sim)
-	return &shaman.wrathOfAirTotemSpell
+	shaman.totemSpell = shaman.wrathOfAirTotemTemplate
+	shaman.totemSpell.Init(sim)
+	return &shaman.totemSpell
 }
 
 func (shaman *Shaman) newGraceOfAirTotemTemplate(sim *core.Simulation) core.SimpleCast {
@@ -62,9 +62,9 @@ func (shaman *Shaman) newGraceOfAirTotemTemplate(sim *core.Simulation) core.Simp
 }
 
 func (shaman *Shaman) NewGraceOfAirTotem(sim *core.Simulation) *core.SimpleCast {
-	shaman.graceOfAirTotemSpell = shaman.graceOfAirTotemTemplate
-	shaman.graceOfAirTotemSpell.Init(sim)
-	return &shaman.graceOfAirTotemSpell
+	shaman.totemSpell = shaman.graceOfAirTotemTemplate
+	shaman.totemSpell.Init(sim)
+	return &shaman.totemSpell
 }
 
 var windfuryBaseManaCosts = []float64{
@@ -93,9 +93,9 @@ func (shaman *Shaman) newWindfuryTotemTemplate(sim *core.Simulation, rank int32)
 }
 
 func (shaman *Shaman) NewWindfuryTotem(sim *core.Simulation) *core.SimpleCast {
-	shaman.windfuryTotemSpell = shaman.windfuryTotemTemplate
-	shaman.windfuryTotemSpell.Init(sim)
-	return &shaman.windfuryTotemSpell
+	shaman.totemSpell = shaman.windfuryTotemTemplate
+	shaman.totemSpell.Init(sim)
+	return &shaman.totemSpell
 }
 
 func (shaman *Shaman) tryTwistWindfury(sim *core.Simulation) {
@@ -122,9 +122,9 @@ func (shaman *Shaman) newManaSpringTotemTemplate(sim *core.Simulation) core.Simp
 }
 
 func (shaman *Shaman) NewManaSpringTotem(sim *core.Simulation) *core.SimpleCast {
-	shaman.manaSpringTotemSpell = shaman.manaSpringTotemTemplate
-	shaman.manaSpringTotemSpell.Init(sim)
-	return &shaman.manaSpringTotemSpell
+	shaman.totemSpell = shaman.manaSpringTotemTemplate
+	shaman.totemSpell.Init(sim)
+	return &shaman.totemSpell
 }
 
 func (shaman *Shaman) newTotemOfWrathTemplate(sim *core.Simulation) core.SimpleCast {
@@ -137,9 +137,9 @@ func (shaman *Shaman) newTotemOfWrathTemplate(sim *core.Simulation) core.SimpleC
 }
 
 func (shaman *Shaman) NewTotemOfWrath(sim *core.Simulation) *core.SimpleCast {
-	shaman.totemOfWrathSpell = shaman.totemOfWrathTemplate
-	shaman.totemOfWrathSpell.Init(sim)
-	return &shaman.totemOfWrathSpell
+	shaman.totemSpell = shaman.totemOfWrathTemplate
+	shaman.totemSpell.Init(sim)
+	return &shaman.totemSpell
 }
 
 func (shaman *Shaman) newStrengthOfEarthTotemTemplate(sim *core.Simulation) core.SimpleCast {
@@ -151,9 +151,9 @@ func (shaman *Shaman) newStrengthOfEarthTotemTemplate(sim *core.Simulation) core
 }
 
 func (shaman *Shaman) NewStrengthOfEarthTotem(sim *core.Simulation) *core.SimpleCast {
-	shaman.strengthOfEarthTotemSpell = shaman.strengthOfEarthTotemTemplate
-	shaman.strengthOfEarthTotemSpell.Init(sim)
-	return &shaman.strengthOfEarthTotemSpell
+	shaman.totemSpell = shaman.strengthOfEarthTotemTemplate
+	shaman.totemSpell.Init(sim)
+	return &shaman.totemSpell
 }
 
 func (shaman *Shaman) newTremorTotemTemplate(sim *core.Simulation) core.SimpleCast {
@@ -165,9 +165,9 @@ func (shaman *Shaman) newTremorTotemTemplate(sim *core.Simulation) core.SimpleCa
 }
 
 func (shaman *Shaman) NewTremorTotem(sim *core.Simulation) *core.SimpleCast {
-	shaman.tremorTotemSpell = shaman.tremorTotemTemplate
-	shaman.tremorTotemSpell.Init(sim)
-	return &shaman.tremorTotemSpell
+	shaman.totemSpell = shaman.tremorTotemTemplate
+	shaman.totemSpell.Init(sim)
+	return &shaman.totemSpell
 }
 
 // TryDropTotems will check to see if totems need to be re-cast.

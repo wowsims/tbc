@@ -117,31 +117,18 @@ type Shaman struct {
 	flameShockTemplate core.SimpleSpellTemplate
 
 	strengthOfEarthTotemTemplate core.SimpleCast
-	strengthOfEarthTotemSpell    core.SimpleCast
-
-	tremorTotemTemplate core.SimpleCast
-	tremorTotemSpell    core.SimpleCast
-
-	graceOfAirTotemTemplate core.SimpleCast
-	graceOfAirTotemSpell    core.SimpleCast
-
-	wrathOfAirTotemTemplate core.SimpleCast
-	wrathOfAirTotemSpell    core.SimpleCast
-
-	windfuryTotemTemplate core.SimpleCast
-	windfuryTotemSpell    core.SimpleCast
-
-	totemOfWrathTemplate core.SimpleCast
-	totemOfWrathSpell    core.SimpleCast
-
-	manaSpringTotemTemplate core.SimpleCast
-	manaSpringTotemSpell    core.SimpleCast
-
-	FireTotemSpell core.SimpleSpell
+	tremorTotemTemplate          core.SimpleCast
+	graceOfAirTotemTemplate      core.SimpleCast
+	wrathOfAirTotemTemplate      core.SimpleCast
+	windfuryTotemTemplate        core.SimpleCast
+	totemOfWrathTemplate         core.SimpleCast
+	manaSpringTotemTemplate      core.SimpleCast
+	totemSpell                   core.SimpleCast
 
 	searingTotemTemplate core.SimpleSpellTemplate
 	magmaTotemTemplate   core.SimpleSpellTemplate
 	novaTotemTemplate    core.SimpleSpellTemplate
+	FireTotemSpell       core.SimpleSpell
 
 	unleashedRages []core.Aura
 }
