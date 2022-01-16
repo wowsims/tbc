@@ -298,7 +298,7 @@ export const WarriorRotationConfig = {
 			label: 'HS rage threshold',
 			labelTooltip: 'Queue HS when rage is above:',
 			changedEvent: (player: Player<Spec.SpecWarrior>) => player.rotationChangeEmitter,
-			getValue: (player: Player<Spec.SpecWarrior>) => player.getRotation().general?.hsRageThresh || 0,
+			getValue: (player: Player<Spec.SpecWarrior>) => player.getRotation().general?.hsRageThresh || 60,
 			setValue: (eventID: EventID, player: Player<Spec.SpecWarrior>, newValue: number) => {
 				const newRotation = player.getRotation();
 				if (!newRotation.general) {
