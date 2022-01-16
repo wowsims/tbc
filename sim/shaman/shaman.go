@@ -116,7 +116,27 @@ type Shaman struct {
 	FlameShockSpell    core.SimpleSpell
 	flameShockTemplate core.SimpleSpellTemplate
 
-	// Fire Totems
+	strengthOfEarthTotemTemplate core.SimpleCast
+	strengthOfEarthTotemSpell    core.SimpleCast
+
+	tremorTotemTemplate core.SimpleCast
+	tremorTotemSpell    core.SimpleCast
+
+	graceOfAirTotemTemplate core.SimpleCast
+	graceOfAirTotemSpell    core.SimpleCast
+
+	wrathOfAirTotemTemplate core.SimpleCast
+	wrathOfAirTotemSpell    core.SimpleCast
+
+	windfuryTotemTemplate core.SimpleCast
+	windfuryTotemSpell    core.SimpleCast
+
+	totemOfWrathTemplate core.SimpleCast
+	totemOfWrathSpell    core.SimpleCast
+
+	manaSpringTotemTemplate core.SimpleCast
+	manaSpringTotemSpell    core.SimpleCast
+
 	FireTotemSpell core.SimpleSpell
 
 	searingTotemTemplate core.SimpleSpellTemplate
@@ -209,6 +229,14 @@ func (shaman *Shaman) Init(sim *core.Simulation) {
 	shaman.earthShockTemplate = shaman.newEarthShockTemplate(sim)
 	shaman.flameShockTemplate = shaman.newFlameShockTemplate(sim)
 	shaman.frostShockTemplate = shaman.newFrostShockTemplate(sim)
+
+	shaman.strengthOfEarthTotemTemplate = shaman.newStrengthOfEarthTotemTemplate(sim)
+	shaman.tremorTotemTemplate = shaman.newTremorTotemTemplate(sim)
+	shaman.wrathOfAirTotemTemplate = shaman.newWrathOfAirTotemTemplate(sim)
+	shaman.graceOfAirTotemTemplate = shaman.newGraceOfAirTotemTemplate(sim)
+	shaman.windfuryTotemTemplate = shaman.newWindfuryTotemTemplate(sim, shaman.SelfBuffs.WindfuryTotemRank)
+	shaman.manaSpringTotemTemplate = shaman.newManaSpringTotemTemplate(sim)
+	shaman.totemOfWrathTemplate = shaman.newTotemOfWrathTemplate(sim)
 
 	shaman.searingTotemTemplate = shaman.newSearingTotemTemplate(sim)
 	shaman.magmaTotemTemplate = shaman.newMagmaTotemTemplate(sim)
