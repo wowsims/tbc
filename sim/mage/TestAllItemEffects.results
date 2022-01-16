@@ -107,6 +107,12 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestAllItemEffects-Despair-28573"
+ value: {
+  dps: 1304.9664882170764
+ }
+}
+dps_results: {
  key: "TestAllItemEffects-DestructiveSkyfireDiamond"
  value: {
   dps: 1462.626110328197
@@ -431,6 +437,12 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestAllItemEffects-TheDecapitator-28767"
+ value: {
+  dps: 1292.0496490675444
+ }
+}
+dps_results: {
  key: "TestAllItemEffects-TheFistsofFury"
  value: {
   dps: 1304.9664882170764
@@ -488,6 +500,12 @@ dps_results: {
  key: "TestAllItemEffects-TsunamiTalisman-30627"
  value: {
   dps: 1445.7713844475888
+ }
+}
+dps_results: {
+ key: "TestAllItemEffects-WarpSlicer-30311"
+ value: {
+  dps: 1497.5906180397553
  }
 }
 dps_results: {
