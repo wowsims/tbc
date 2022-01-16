@@ -319,9 +319,9 @@ func (ahe *AbilityHitEffect) calculateDamage(sim *Simulation, ability *ActiveMel
 
 	// Apply armor reduction.
 	dmg *= 1 - ahe.Target.ArmorDamageReduction(character.stats[stats.ArmorPenetration]+ahe.BonusArmorPenetration)
-	if sim.Log != nil {
-		character.Log(sim, "Target armor: %0.2f\n", ahe.Target.currentArmor)
-	}
+	//if sim.Log != nil {
+	//	character.Log(sim, "Target armor: %0.2f\n", ahe.Target.currentArmor)
+	//}
 
 	// Apply all other effect multipliers.
 	dmg *= ahe.DamageMultiplier * ahe.StaticDamageMultiplier
@@ -360,13 +360,21 @@ func (ability *ActiveMeleeAbility) Attack(sim *Simulation) bool {
 		log.Fatalf("Ability used while on GCD\n-------\nAbility %s: %#v\n", ability.ActionID, ability)
 	}
 	if ability.MeleeAbility.Cost.Type != 0 {
-		if ability.Character.stats[ability.MeleeAbility.Cost.Type] < ability.MeleeAbility.Cost.Value {
-			return false
-		}
 		if ability.MeleeAbility.Cost.Type == stats.Mana {
+			if ability.Character.CurrentMana() < ability.MeleeAbility.Cost.Value {
+				return false
+			}
 			ability.Character.SpendMana(sim, ability.MeleeAbility.Cost.Value, ability.MeleeAbility.ActionID)
+		} else if ability.MeleeAbility.Cost.Type == stats.Rage {
+			if ability.Character.CurrentRage() < ability.MeleeAbility.Cost.Value {
+				return false
+			}
+			ability.Character.SpendRage(sim, ability.MeleeAbility.Cost.Value, ability.MeleeAbility.ActionID)
 		} else {
-			ability.Character.AddStat(ability.MeleeAbility.Cost.Type, -ability.MeleeAbility.Cost.Value)
+			if ability.Character.CurrentEnergy() < ability.MeleeAbility.Cost.Value {
+				return false
+			}
+			ability.Character.SpendEnergy(sim, ability.MeleeAbility.Cost.Value, ability.MeleeAbility.ActionID)
 		}
 	}
 

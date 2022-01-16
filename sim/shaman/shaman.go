@@ -14,6 +14,7 @@ func NewShaman(character core.Character, talents proto.ShamanTalents, selfBuffs 
 		Talents:   talents,
 		SelfBuffs: selfBuffs,
 	}
+	shaman.EnableManaBar()
 
 	// Add Shaman stat dependencies
 	shaman.AddStatDependency(stats.StatDependency{
@@ -115,12 +116,19 @@ type Shaman struct {
 	FlameShockSpell    core.SimpleSpell
 	flameShockTemplate core.SimpleSpellTemplate
 
-	// Fire Totems
-	FireTotemSpell core.SimpleSpell
+	strengthOfEarthTotemTemplate core.SimpleCast
+	tremorTotemTemplate          core.SimpleCast
+	graceOfAirTotemTemplate      core.SimpleCast
+	wrathOfAirTotemTemplate      core.SimpleCast
+	windfuryTotemTemplate        core.SimpleCast
+	totemOfWrathTemplate         core.SimpleCast
+	manaSpringTotemTemplate      core.SimpleCast
+	totemSpell                   core.SimpleCast
 
 	searingTotemTemplate core.SimpleSpellTemplate
 	magmaTotemTemplate   core.SimpleSpellTemplate
 	novaTotemTemplate    core.SimpleSpellTemplate
+	FireTotemSpell       core.SimpleSpell
 
 	unleashedRages []core.Aura
 }
@@ -209,6 +217,14 @@ func (shaman *Shaman) Init(sim *core.Simulation) {
 	shaman.flameShockTemplate = shaman.newFlameShockTemplate(sim)
 	shaman.frostShockTemplate = shaman.newFrostShockTemplate(sim)
 
+	shaman.strengthOfEarthTotemTemplate = shaman.newStrengthOfEarthTotemTemplate(sim)
+	shaman.tremorTotemTemplate = shaman.newTremorTotemTemplate(sim)
+	shaman.wrathOfAirTotemTemplate = shaman.newWrathOfAirTotemTemplate(sim)
+	shaman.graceOfAirTotemTemplate = shaman.newGraceOfAirTotemTemplate(sim)
+	shaman.windfuryTotemTemplate = shaman.newWindfuryTotemTemplate(sim, shaman.SelfBuffs.WindfuryTotemRank)
+	shaman.manaSpringTotemTemplate = shaman.newManaSpringTotemTemplate(sim)
+	shaman.totemOfWrathTemplate = shaman.newTotemOfWrathTemplate(sim)
+
 	shaman.searingTotemTemplate = shaman.newSearingTotemTemplate(sim)
 	shaman.magmaTotemTemplate = shaman.newMagmaTotemTemplate(sim)
 	shaman.novaTotemTemplate = shaman.newNovaTotemTemplate(sim)
@@ -234,11 +250,11 @@ func (shaman *Shaman) Reset(sim *core.Simulation) {
 				shaman.SelfBuffs.NextTotemDropType[i] = int32(shaman.SelfBuffs.EarthTotem)
 			}
 		case FireTotem:
-			if shaman.SelfBuffs.FireTotem != proto.FireTotem_NoFireTotem {
-				shaman.SelfBuffs.NextTotemDropType[i] = int32(shaman.SelfBuffs.FireTotem)
-				if shaman.SelfBuffs.TwistFireNova {
-					shaman.SelfBuffs.NextTotemDropType[FireTotem] = int32(proto.FireTotem_FireNovaTotem) // start by dropping nova, then alternating.
-				}
+			shaman.SelfBuffs.NextTotemDropType[i] = int32(shaman.SelfBuffs.FireTotem)
+			if shaman.SelfBuffs.TwistFireNova {
+				shaman.SelfBuffs.NextTotemDropType[FireTotem] = int32(proto.FireTotem_FireNovaTotem) // start by dropping nova, then alternating.
+			}
+			if shaman.SelfBuffs.NextTotemDropType[i] != int32(proto.FireTotem_NoFireTotem) {
 				shaman.SelfBuffs.NextTotemDrops[i] = time.Second * 120 // 2 min until drop totems
 				if shaman.SelfBuffs.FireTotem != proto.FireTotem_TotemOfWrath {
 					shaman.SelfBuffs.NextTotemDrops[i] = 0 // attack totems we drop immediately

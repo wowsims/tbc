@@ -41,6 +41,7 @@ func NewBalanceDruid(character core.Character, options proto.Player) *BalanceDru
 		primaryRotation: *balanceOptions.Rotation,
 		useBattleRes:    balanceOptions.Options.BattleRes,
 	}
+	moonkin.EnableManaBar()
 
 	return moonkin
 }

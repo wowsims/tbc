@@ -84,8 +84,11 @@ func (eleShaman *ElementalShaman) Reset(sim *core.Simulation) {
 }
 
 func (eleShaman *ElementalShaman) Act(sim *core.Simulation) time.Duration {
-	dropTime := eleShaman.TryDropTotems(sim)
+	dropTime, dropSuccess := eleShaman.TryDropTotems(sim)
 	if dropTime > 0 {
+		if !dropSuccess {
+			eleShaman.Metrics.MarkOOM(sim, &eleShaman.Character, dropTime-sim.CurrentTime)
+		}
 		return dropTime
 	}
 	newAction := eleShaman.rotation.ChooseAction(eleShaman, sim)

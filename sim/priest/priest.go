@@ -86,6 +86,7 @@ func (priest *Priest) Advance(sim *core.Simulation, elapsedTime time.Duration) {
 }
 
 func New(char core.Character, selfBuffs SelfBuffs, talents proto.PriestTalents) *Priest {
+	char.EnableManaBar()
 
 	char.AddStatDependency(stats.StatDependency{
 		SourceStat:   stats.Intellect,

@@ -136,6 +136,7 @@ func NewMage(character core.Character, options proto.Player) *Mage {
 		spellDamageMultiplier: 1.0,
 		manaTracker:           common.NewManaSpendingRateTracker(),
 	}
+	mage.EnableManaBar()
 
 	if mage.RotationType == proto.Mage_Rotation_Arcane && mageOptions.Rotation.Arcane != nil {
 		mage.ArcaneRotation = *mageOptions.Rotation.Arcane

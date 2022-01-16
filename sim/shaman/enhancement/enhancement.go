@@ -40,16 +40,20 @@ func NewEnhancementShaman(character core.Character, options proto.Player) *Enhan
 		selfBuffs.FireTotem = enhOptions.Rotation.Totems.Fire
 		selfBuffs.NextTotemDropType[shaman.FireTotem] = int32(enhOptions.Rotation.Totems.Fire)
 
-		if enhOptions.Rotation.Totems.Air == proto.AirTotem_WindfuryTotem {
-			// No need to twist windfury if its already the default totem.
-			enhOptions.Rotation.Totems.TwistWindfury = false
-		}
 		if enhOptions.Rotation.Totems.WindfuryTotemRank == 0 {
 			// If rank is 0, disable windfury options.
 			enhOptions.Rotation.Totems.TwistWindfury = false
 			if enhOptions.Rotation.Totems.Air == proto.AirTotem_WindfuryTotem {
 				enhOptions.Rotation.Totems.Air = proto.AirTotem_NoAirTotem
 			}
+		}
+		if enhOptions.Rotation.Totems.Air == proto.AirTotem_WindfuryTotem {
+			// No need to twist windfury if its already the default totem.
+			enhOptions.Rotation.Totems.TwistWindfury = false
+		} else if enhOptions.Rotation.Totems.Air == proto.AirTotem_NoAirTotem && enhOptions.Rotation.Totems.TwistWindfury {
+			// If twisting windfury without a default air totem, make windfury the default instead.
+			enhOptions.Rotation.Totems.Air = proto.AirTotem_WindfuryTotem
+			enhOptions.Rotation.Totems.TwistWindfury = false
 		}
 
 		selfBuffs.TwistWindfury = enhOptions.Rotation.Totems.TwistWindfury
@@ -109,9 +113,13 @@ func (enh *EnhancementShaman) Reset(sim *core.Simulation) {
 
 func (enh *EnhancementShaman) Act(sim *core.Simulation) time.Duration {
 	// Redrop totems when needed.
-	dropTime := enh.TryDropTotems(sim)
+	dropTime, dropSuccess := enh.TryDropTotems(sim)
 	if dropTime > 0 {
-		return core.MinDuration(dropTime, enh.AutoAttacks.NextAttackAt())
+		nextEventTime := core.MinDuration(dropTime, enh.AutoAttacks.NextAttackAt())
+		if !dropSuccess {
+			enh.Metrics.MarkOOM(sim, &enh.Character, nextEventTime-sim.CurrentTime)
+		}
+		return nextEventTime
 	}
 
 	target := sim.GetPrimaryTarget()
@@ -144,7 +152,7 @@ func (enh *EnhancementShaman) Act(sim *core.Simulation) time.Duration {
 	if !success {
 		regenTime := enh.TimeUntilManaRegen(cost)
 		nextActionAt := core.MinDuration(sim.CurrentTime+regenTime, enh.AutoAttacks.NextAttackAt())
-		enh.Character.Metrics.MarkOOM(sim, &enh.Character, nextActionAt-sim.CurrentTime)
+		enh.Metrics.MarkOOM(sim, &enh.Character, nextActionAt-sim.CurrentTime)
 		return nextActionAt
 	}
 
