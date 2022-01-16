@@ -103,7 +103,6 @@ export class Timeline extends ResultComponent {
         // Sort by name so auras keep their same colors even if timings change.
         distinctMcdAuras.sort((a, b) => stringComparator(a.aura.name, b.aura.name));
         const mcdAuraColors = mcdAuraLogs.map(mcdAuraLog => actionColors[distinctMcdAuras.findIndex(dAura => dAura.aura.equalsIgnoringTag(mcdAuraLog.aura))]);
-        //this.dpsResourcesPlot = new ApexCharts(this.dpsResourcesPlotElem, {
         this.dpsResourcesPlot.updateOptions({
             series: [
                 {

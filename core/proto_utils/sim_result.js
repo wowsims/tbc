@@ -262,13 +262,16 @@ export class ActionMetrics {
     get hits() {
         return this.data.hits / this.iterations;
     }
-    get landedHits() {
+    get landedHitsRaw() {
         if (this.data.isMelee) {
             return this.data.hits + this.data.crits + this.data.blocks + this.data.glances;
         }
         else {
             return this.data.hits;
         }
+    }
+    get landedHits() {
+        return this.landedHitsRaw / this.iterations;
     }
     get hitAttempts() {
         if (this.data.isMelee) {
@@ -285,10 +288,10 @@ export class ActionMetrics {
         }
     }
     get avgHit() {
-        return this.data.damage / this.landedHits;
+        return this.data.damage / this.landedHitsRaw;
     }
     get critPercent() {
-        return (this.data.crits / this.landedHits) * 100;
+        return (this.data.crits / this.landedHitsRaw) * 100;
     }
     get misses() {
         return this.data.misses / this.iterations;
