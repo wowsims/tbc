@@ -33,8 +33,14 @@ func (shaman *Shaman) newSearingTotemTemplate(sim *core.Simulation) core.SimpleS
 				IgnoreHitCheck:         true,
 			},
 			DotInput: core.DotDamageInput{
-				NumberOfTicks:        30,
-				TickLength:           time.Second * 2,
+				// These are the real tick values, but searing totem doesn't start its next
+				// cast until the previous missile hits the target. We don't have an option
+				// for target distance yet so just pretend the tick rate is lower.
+				//NumberOfTicks:        30,
+				//TickLength:           time.Second * 2,
+				NumberOfTicks: 20,
+				TickLength:    time.Second * 3,
+
 				TickBaseDamage:       58,
 				TickSpellCoefficient: 0.167,
 				TicksCanMissAndCrit:  true,
@@ -46,7 +52,7 @@ func (shaman *Shaman) newSearingTotemTemplate(sim *core.Simulation) core.SimpleS
 	spell.ManaCost -= spell.BaseManaCost * float64(shaman.Talents.MentalQuickness) * 0.02
 
 	spell.OnCastComplete = func(sim *core.Simulation, cast *core.Cast) {
-		shaman.SelfBuffs.NextTotemDrops[FireTotem] = sim.CurrentTime + time.Second*60
+		shaman.NextTotemDrops[FireTotem] = sim.CurrentTime + time.Second*60
 		shaman.tryTwistFireNova(sim)
 	}
 
@@ -105,7 +111,7 @@ func (shaman *Shaman) newMagmaTotemTemplate(sim *core.Simulation) core.SimpleSpe
 	baseEffect.StaticDamageMultiplier *= 1 + float64(shaman.Talents.CallOfFlame)*0.05
 
 	spell.OnCastComplete = func(sim *core.Simulation, cast *core.Cast) {
-		shaman.SelfBuffs.NextTotemDrops[FireTotem] = sim.CurrentTime + time.Second*20
+		shaman.NextTotemDrops[FireTotem] = sim.CurrentTime + time.Second*20
 		shaman.tryTwistFireNova(sim)
 	}
 
@@ -180,7 +186,7 @@ func (shaman *Shaman) newNovaTotemTemplate(sim *core.Simulation) core.SimpleSpel
 
 	tickLength := baseEffect.DotInput.TickLength
 	spell.OnCastComplete = func(sim *core.Simulation, cast *core.Cast) {
-		shaman.SelfBuffs.NextTotemDrops[FireTotem] = sim.CurrentTime + tickLength
+		shaman.NextTotemDrops[FireTotem] = sim.CurrentTime + tickLength
 		shaman.tryTwistFireNova(sim)
 	}
 

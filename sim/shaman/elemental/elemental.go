@@ -30,17 +30,12 @@ func NewElementalShaman(character core.Character, options proto.Player) *Element
 
 	selfBuffs := shaman.SelfBuffs{
 		Bloodlust:   eleShamOptions.Options.Bloodlust,
-		ManaSpring:  eleShamOptions.Options.ManaSpringTotem,
 		WaterShield: eleShamOptions.Options.WaterShield,
 	}
-	if eleShamOptions.Options.TotemOfWrath {
-		selfBuffs.FireTotem = proto.FireTotem_TotemOfWrath
-	}
-	if eleShamOptions.Options.WrathOfAirTotem {
-		selfBuffs.AirTotem = proto.AirTotem_WrathOfAirTotem
-	}
-	if shaman.ItemSetSkyshatterRegalia.CharacterHasSetBonus(&character, 2) {
-		selfBuffs.EarthTotem = proto.EarthTotem_TremorTotem
+
+	totems := proto.ShamanTotems{}
+	if eleShamOptions.Rotation.Totems != nil {
+		totems = *eleShamOptions.Rotation.Totems
 	}
 
 	var rotation Rotation
@@ -59,7 +54,7 @@ func NewElementalShaman(character core.Character, options proto.Player) *Element
 	}
 
 	return &ElementalShaman{
-		Shaman:   shaman.NewShaman(character, *eleShamOptions.Talents, selfBuffs),
+		Shaman:   shaman.NewShaman(character, *eleShamOptions.Talents, totems, selfBuffs),
 		rotation: rotation,
 	}
 }
