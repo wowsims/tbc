@@ -26,6 +26,8 @@ type Character struct {
 	// Pets owned by this Character.
 	Pets []PetAgent
 
+	rageBar
+
 	// Consumables this Character will be using.
 	consumes proto.Consumes
 
@@ -342,6 +344,8 @@ func (character *Character) reset(sim *Simulation) {
 	character.stats = character.initialStats
 	character.PseudoStats = character.initialPseudoStats
 	character.ExpectedBonusMana = 0
+
+	character.rageBar.reset(sim)
 
 	character.auraTracker.reset(sim)
 	character.majorCooldownManager.reset(sim)

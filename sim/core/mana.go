@@ -8,7 +8,7 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-// Characters that have a mana bar need to call this function.
+// TODO: Make this into an object like rageBar or energyBar.
 func (character *Character) EnableManaBar() {
 	character.AddStatDependency(stats.StatDependency{
 		SourceStat:   stats.Intellect,
@@ -38,21 +38,6 @@ func (character *Character) CurrentManaPercent() float64 {
 	return character.CurrentMana() / character.MaxMana()
 }
 
-func (character *Character) SpendMana(sim *Simulation, amount float64, actionID ActionID) {
-	if amount < 0 {
-		panic("Trying to spend negative mana!")
-	}
-
-	newMana := character.CurrentMana() - amount
-
-	if sim.Log != nil {
-		character.Log(sim, "Spent %0.3f mana from %s (%0.3f --> %0.3f).", amount, actionID, character.CurrentMana(), newMana)
-	}
-
-	character.stats[stats.Mana] = newMana
-	character.Metrics.ManaSpent += amount
-}
-
 func (character *Character) AddMana(sim *Simulation, amount float64, actionID ActionID, isBonusMana bool) {
 	if amount < 0 {
 		panic("Trying to add negative mana!")
@@ -70,6 +55,21 @@ func (character *Character) AddMana(sim *Simulation, amount float64, actionID Ac
 	if isBonusMana {
 		character.Metrics.BonusManaGained += newMana - oldMana
 	}
+}
+
+func (character *Character) SpendMana(sim *Simulation, amount float64, actionID ActionID) {
+	if amount < 0 {
+		panic("Trying to spend negative mana!")
+	}
+
+	newMana := character.CurrentMana() - amount
+
+	if sim.Log != nil {
+		character.Log(sim, "Spent %0.3f mana from %s (%0.3f --> %0.3f).", amount, actionID, character.CurrentMana(), newMana)
+	}
+
+	character.stats[stats.Mana] = newMana
+	character.Metrics.ManaSpent += amount
 }
 
 // Returns the rate of mana regen per second from mp5.
