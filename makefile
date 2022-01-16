@@ -2,6 +2,7 @@
 rwildcard=$(foreach d,$(wildcard $(1:=/*)),$(call rwildcard,$d,$2) $(filter $(subst *,%,$2),$d))
 
 OUT_DIR=dist/tbc
+GOROOT:=$(shell go env GOROOT)
 
 # Make everything. Keep this first so it's the default rule.
 $(OUT_DIR): balance_druid elemental_shaman enhancement_shaman mage shadow_priest warrior raid
@@ -16,8 +17,11 @@ warrior: $(OUT_DIR)/warrior/index.js $(OUT_DIR)/warrior/index.css $(OUT_DIR)/war
 
 raid: $(OUT_DIR)/raid/index.js $(OUT_DIR)/raid/index.css $(OUT_DIR)/raid/index.html
 
-ui_shared: $(OUT_DIR)/lib.wasm $(OUT_DIR)/sim_worker.js $(OUT_DIR)/net_worker.js detailed_results
+ui_shared: $(OUT_DIR)/lib.wasm $(OUT_DIR)/sim_worker.js $(OUT_DIR)/net_worker.js detailed_results $(OUT_DIR)/index.md
 detailed_results: $(OUT_DIR)/detailed_results/index.js $(OUT_DIR)/detailed_results/index.css $(OUT_DIR)/detailed_results/index.html
+
+$(OUT_DIR)/index.md:
+	cp ui/index.md $(OUT_DIR)
 
 clean:
 	rm -f ui/core/proto/*.ts
@@ -85,7 +89,8 @@ $(OUT_DIR)/lib.wasm: sim/wasm/* sim/core/proto/api.pb.go $(filter-out sim/core/i
 
 # Generic sim_worker that uses the generic lib.wasm
 $(OUT_DIR)/sim_worker.js: ui/worker/sim_worker.js
-	cp ui/worker/sim_worker.js $(OUT_DIR)
+	cat $(GOROOT)/misc/wasm/wasm_exec.js > $(OUT_DIR)/sim_worker.js
+	cat ui/worker/sim_worker.js >> $(OUT_DIR)/sim_worker.js
 
 $(OUT_DIR)/net_worker.js: ui/worker/net_worker.js
 	cp ui/worker/net_worker.js $(OUT_DIR)
@@ -103,11 +108,12 @@ binary_dist: $(OUT_DIR)
 	mkdir -p binary_dist
 	cp -r $(OUT_DIR) binary_dist/
 	rm binary_dist/tbc/lib.wasm
+	rm -rf binary_dist/tbc/assets/item_data
 
 # Builds the web server with the compiled client.
-wowsimtbc: sim/web/main.go  binary_dist binary_dist/dist.go devserver
+wowsimtbc: sim/web/main.go  binary_dist devserver
 
-devserver:
+devserver: binary_dist/dist.go
 	@echo "Starting server compile now..."
 	@if go build -o wowsimtbc ./sim/web/main.go; then \
 		echo "\033[1;32mBuild Completed Succeessfully\033[0m"; \

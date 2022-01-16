@@ -42,7 +42,7 @@ func (priest *Priest) newVampiricTouchTemplate(sim *core.Simulation) core.Simple
 		SpellCast: core.SpellCast{
 			Cast: baseCast,
 		},
-		SpellHitEffect: effect,
+		Effect: effect,
 	})
 }
 
@@ -53,7 +53,7 @@ func (priest *Priest) NewVampiricTouch(sim *core.Simulation, target *core.Target
 	priest.vtCastTemplate.Apply(mf)
 
 	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	mf.Target = target
+	mf.Effect.Target = target
 	mf.Init(sim)
 
 	return mf

@@ -42,7 +42,7 @@ func (druid *Druid) newInsectSwarmTemplate(sim *core.Simulation) core.SimpleSpel
 		SpellCast: core.SpellCast{
 			Cast: baseCast,
 		},
-		SpellHitEffect: effect,
+		Effect: effect,
 	})
 }
 
@@ -54,12 +54,12 @@ func (druid *Druid) NewInsectSwarm(sim *core.Simulation, target *core.Target) *c
 	druid.insectSwarmCastTemplate.Apply(sf)
 
 	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	sf.Target = target
+	sf.Effect.Target = target
 	sf.Init(sim)
 
 	return sf
 }
 
 func (druid *Druid) ShouldCastInsectSwarm(sim *core.Simulation, target *core.Target, rotation proto.BalanceDruid_Rotation) bool {
-	return rotation.InsectSwarm && !druid.InsectSwarmSpell.DotInput.IsTicking(sim)
+	return rotation.InsectSwarm && !druid.InsectSwarmSpell.Effect.DotInput.IsTicking(sim)
 }

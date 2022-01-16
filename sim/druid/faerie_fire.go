@@ -15,7 +15,7 @@ func (druid *Druid) newFaerieFireTemplate(sim *core.Simulation) core.SimpleSpell
 				ManaCost:     145,
 			},
 		},
-		SpellHitEffect: core.SpellHitEffect{
+		Effect: core.SpellHitEffect{
 			SpellEffect: core.SpellEffect{
 				OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 					// core.FaerieFireAura applies the -armor buff and removes it on expire.
@@ -33,7 +33,7 @@ func (druid *Druid) NewFaerieFire(sim *core.Simulation, target *core.Target) *co
 	druid.faerieFireCastTemplate.Apply(ff)
 
 	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	ff.Target = target
+	ff.Effect.Target = target
 	ff.Init(sim)
 
 	return ff

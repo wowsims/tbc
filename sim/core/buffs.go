@@ -1,6 +1,7 @@
 package core
 
 import (
+	"math"
 	"time"
 
 	"github.com/wowsims/tbc/sim/core/proto"
@@ -29,6 +30,21 @@ func applyBuffEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs proto.P
 	character.AddStats(stats.Stats{
 		stats.SpellCrit: GetTristateValueFloat(partyBuffs.MoonkinAura, 5*SpellCritRatingPerCritChance, 5*SpellCritRatingPerCritChance+20),
 	})
+	character.AddStats(stats.Stats{
+		stats.MeleeCrit: GetTristateValueFloat(partyBuffs.LeaderOfThePack, 5*MeleeCritRatingPerCritChance, 5*MeleeCritRatingPerCritChance+20),
+	})
+
+	if partyBuffs.TrueshotAura {
+		character.AddStats(stats.Stats{
+			stats.AttackPower: 125,
+		})
+	}
+
+	if partyBuffs.FerociousInspiration > 0 {
+		character.AddPermanentAura(func(sim *Simulation) Aura {
+			return FerociousInspirationAura(partyBuffs.FerociousInspiration)
+		})
+	}
 
 	if partyBuffs.DraeneiRacialMelee {
 		character.AddStats(stats.Stats{
@@ -54,14 +70,12 @@ func applyBuffEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs proto.P
 		})
 	}
 
-	// shadow priest buff bot just statically applies mp5
 	if individualBuffs.ShadowPriestDps > 0 {
 		character.AddStats(stats.Stats{
 			stats.MP5: float64(individualBuffs.ShadowPriestDps) * 0.25,
 		})
 	}
 
-	// TODO: Double-check these numbers
 	character.AddStats(stats.Stats{
 		stats.MP5: GetTristateValueFloat(individualBuffs.BlessingOfWisdom, 42.0, 50.0),
 	})
@@ -90,6 +104,12 @@ func applyBuffEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs proto.P
 		}
 	}
 
+	if partyBuffs.SanctityAura == proto.TristateEffect_TristateEffectImproved {
+		character.AddPermanentAura(func(sim *Simulation) Aura {
+			return ImprovedSanctityAura()
+		})
+	}
+
 	character.AddStats(stats.Stats{
 		stats.AttackPower: GetTristateValueFloat(partyBuffs.BattleShout, 306, 382.5),
 	})
@@ -106,12 +126,24 @@ func applyBuffEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs proto.P
 	character.AddStats(stats.Stats{
 		stats.Agility: GetTristateValueFloat(partyBuffs.GraceOfAirTotem, 77.0, 88.55),
 	})
-	character.AddStats(stats.Stats{
-		stats.Strength: GetTristateValueFloat(partyBuffs.StrengthOfEarthTotem, 86.0, 98.9),
-	})
+	switch partyBuffs.StrengthOfEarthTotem {
+	case proto.StrengthOfEarthType_Basic:
+		character.AddStat(stats.Strength, 86)
+	case proto.StrengthOfEarthType_CycloneBonus:
+		character.AddStat(stats.Strength, 98)
+	case proto.StrengthOfEarthType_EnhancingTotems:
+		character.AddStat(stats.Strength, 98.9)
+	case proto.StrengthOfEarthType_EnhancingAndCyclone:
+		character.AddStat(stats.Strength, 110.9)
+	}
 	character.AddStats(stats.Stats{
 		stats.MP5: GetTristateValueFloat(partyBuffs.ManaSpringTotem, 50, 62.5),
 	})
+	if partyBuffs.WindfuryTotemRank > 0 && IsEligibleForWindfuryTotem(character) {
+		character.AddPermanentAura(func(sim *Simulation) Aura {
+			return WindfuryTotemAura(character, partyBuffs.WindfuryTotemRank, partyBuffs.WindfuryTotemIwt)
+		})
+	}
 
 	registerBloodlustCD(agent, partyBuffs.Bloodlust)
 	registerPowerInfusionCD(agent, individualBuffs.PowerInfusions)
@@ -137,6 +169,114 @@ func applyBuffEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs proto.P
 	}
 	if partyBuffs.ChainOfTheTwilightOwl {
 		character.AddStats(stats.Stats{stats.SpellCrit: 2 * SpellCritRatingPerCritChance})
+	}
+}
+
+var FerociousInspirationAuraID = NewAuraID()
+
+func FerociousInspirationAura(numBMHunters int32) Aura {
+	multiplier := math.Pow(1.03, float64(numBMHunters))
+	return Aura{
+		ID:       FerociousInspirationAuraID,
+		ActionID: ActionID{SpellID: 31870},
+		OnBeforeMeleeHit: func(sim *Simulation, ability *ActiveMeleeAbility, hitEffect *AbilityHitEffect) {
+			hitEffect.DamageMultiplier *= multiplier
+		},
+		OnBeforeSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect) {
+			spellEffect.DamageMultiplier *= multiplier
+		},
+		OnBeforePeriodicDamage: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect, tickDamage *float64) {
+			*tickDamage *= multiplier
+		},
+	}
+}
+
+var ImprovedSanctityAuraID = NewAuraID()
+
+func ImprovedSanctityAura() Aura {
+	return Aura{
+		ID:       ImprovedSanctityAuraID,
+		ActionID: ActionID{SpellID: 31870},
+		OnBeforeMeleeHit: func(sim *Simulation, ability *ActiveMeleeAbility, hitEffect *AbilityHitEffect) {
+			hitEffect.DamageMultiplier *= 1.02
+		},
+		OnBeforeSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect) {
+			spellEffect.DamageMultiplier *= 1.02
+		},
+		OnBeforePeriodicDamage: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect, tickDamage *float64) {
+			*tickDamage *= 1.02
+		},
+	}
+}
+
+var WindfuryTotemAuraID = NewAuraID()
+
+var WindfurySpellRanks = []int32{
+	8512,
+	10613,
+	10614,
+	25585,
+	25587,
+}
+
+var windfuryAPBonuses = []float64{
+	122,
+	229,
+	315,
+	375,
+	445,
+}
+
+func IsEligibleForWindfuryTotem(character *Character) bool {
+	// TODO: Also check that no weapon imbue is applied.
+	return character.AutoAttacks.IsEnabled() && !character.HasMHWeaponImbue
+}
+
+func WindfuryTotemAura(character *Character, rank int32, iwtTalentPoints int32) Aura {
+	spellID := WindfurySpellRanks[rank-1]
+	actionID := ActionID{SpellID: spellID}
+	apBonus := windfuryAPBonuses[rank-1]
+	apBonus *= 1 + 0.15*float64(iwtTalentPoints)
+
+	wftempl := ActiveMeleeAbility{
+		MeleeAbility: MeleeAbility{
+			ActionID:       actionID,
+			CritMultiplier: 2.0,
+			Character:      character,
+		},
+		Effect: AbilityHitEffect{
+			AbilityEffect: AbilityEffect{
+				DamageMultiplier:       1.0,
+				StaticDamageMultiplier: 1.0,
+				BonusAttackPower:       apBonus,
+			},
+			WeaponInput: WeaponDamageInput{
+				IsOH:             false,
+				DamageMultiplier: 1.0,
+			},
+		},
+	}
+
+	wfTemplate := NewMeleeAbilityTemplate(wftempl)
+	wfAtk := ActiveMeleeAbility{}
+
+	const procChance = 0.2
+
+	return Aura{
+		ID:       WindfuryTotemAuraID,
+		ActionID: actionID,
+		OnMeleeAttack: func(sim *Simulation, ability *ActiveMeleeAbility, hitEffect *AbilityHitEffect) {
+			if !hitEffect.Landed() || !hitEffect.IsWeaponHit() || !hitEffect.IsMH() {
+				return
+			}
+			if sim.RandomFloat("Windfury Totem") > procChance {
+				return
+			}
+
+			wfTemplate.Apply(&wfAtk)
+			wfAtk.Effect.Target = hitEffect.Target
+			wfAtk.Attack(sim)
+		},
 	}
 }
 

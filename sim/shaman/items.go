@@ -11,12 +11,18 @@ import (
 func init() {
 	core.AddItemEffect(19344, ApplyNaturalAlignmentCrystal)
 	core.AddItemEffect(30663, ApplyFathomBroochOfTheTidewalker)
+	core.AddItemEffect(32491, ApplyAshtongueTalismanOfVision)
 	core.AddItemEffect(33506, ApplySkycallTotem)
+	core.AddItemEffect(33507, ApplyStonebreakersTotem)
 
 	core.AddItemSet(ItemSetTidefury)
 	core.AddItemSet(ItemSetCycloneRegalia)
 	core.AddItemSet(ItemSetCataclysmRegalia)
 	core.AddItemSet(ItemSetSkyshatterRegalia)
+
+	core.AddItemSet(ItemSetCycloneHarness)
+	core.AddItemSet(ItemSetCataclysmHarness)
+	core.AddItemSet(ItemSetSkyshatterHarness)
 
 	// Even though these item effects are handled elsewhere, add them so they are
 	// detected for automatic testing.
@@ -189,6 +195,31 @@ func ApplyFathomBroochOfTheTidewalker(agent core.Agent) {
 	})
 }
 
+var AshtongueTalismanOfVisionAuraID = core.NewAuraID()
+var AshtongueTalismanOfVisionProcAuraID = core.NewAuraID()
+
+func ApplyAshtongueTalismanOfVision(agent core.Agent) {
+	character := agent.GetCharacter()
+	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
+		const apBonus = 275
+		const dur = time.Second * 10
+		const procChance = 0.5
+
+		return core.Aura{
+			ID: AshtongueTalismanOfVisionAuraID,
+			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
+				if !ability.ActionID.SameAction(StormstrikeActionID) {
+					return
+				}
+				if sim.RandomFloat("Ashtongue Talisman of Vision") > procChance {
+					return
+				}
+				character.AddAuraWithTemporaryStats(sim, AshtongueTalismanOfVisionProcAuraID, core.ActionID{ItemID: 32491}, stats.AttackPower, apBonus, dur)
+			},
+		}
+	})
+}
+
 var SkycallTotemAuraID = core.NewAuraID()
 var EnergizedAuraID = core.NewAuraID()
 
@@ -209,4 +240,80 @@ func ApplySkycallTotem(agent core.Agent) {
 			},
 		}
 	})
+}
+
+var StonebreakersTotemAuraID = core.NewAuraID()
+var ElementalStrengthAuraID = core.NewAuraID()
+
+func ApplyStonebreakersTotem(agent core.Agent) {
+	character := agent.GetCharacter()
+	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
+		const apBonus = 110
+		const dur = time.Second * 10
+		const procChance = 0.5
+
+		return core.Aura{
+			ID:      StonebreakersTotemAuraID,
+			Expires: core.NeverExpires,
+			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
+				if !cast.IsSpellAction(SpellIDEarthShock) && !cast.IsSpellAction(SpellIDFlameShock) && !cast.IsSpellAction(SpellIDFrostShock) {
+					return
+				}
+
+				if sim.RandomFloat("Stonebreakers Totem") > procChance {
+					return
+				}
+
+				cast.Character.AddAuraWithTemporaryStats(sim, ElementalStrengthAuraID, core.ActionID{ItemID: 33507}, stats.AttackPower, apBonus, dur)
+			},
+		}
+	})
+}
+
+// Cyclone Harness
+// (2) Set : Your Strength of Earth Totem ability grants an additional 12 strength.
+// (4) Set : Your Stormstrike ability does an additional 30 damage per weapon.
+
+var ItemSetCycloneHarness = core.ItemSet{
+	Name:  "Cyclone Harness",
+	Items: map[int32]struct{}{29038: {}, 29039: {}, 29040: {}, 29043: {}, 29042: {}},
+	Bonuses: map[int32]core.ApplyEffect{
+		2: func(agent core.Agent) {
+			// shaman.go
+		},
+		4: func(agent core.Agent) {
+			// stormstrike.go
+		},
+	},
+}
+
+// Cataclysm Harness
+// (2) Set : Your melee attacks have a chance to reduce the cast time of your next Lesser Healing Wave by 1.5 sec. (Proc chance: 2%)
+// (4) Set : You gain 5% additional haste from your Flurry ability.
+
+var ItemSetCataclysmHarness = core.ItemSet{
+	Name:  "Cataclysm Harness",
+	Items: map[int32]struct{}{30185: {}, 30189: {}, 30190: {}, 30192: {}, 30194: {}},
+	Bonuses: map[int32]core.ApplyEffect{
+		4: func(agent core.Agent) {
+			// shaman.go
+		},
+	},
+}
+
+// Skyshatter Harness
+// 2 pieces: Your Earth Shock, Flame Shock, and Frost Shock abilities cost 10% less mana.
+// 4 pieces: Whenever you use Stormstrike, you gain 70 attack power for 12 sec.
+
+var ItemSetSkyshatterHarness = core.ItemSet{
+	Name:  "Skyshatter Harness",
+	Items: map[int32]struct{}{31018: {}, 31011: {}, 31015: {}, 31021: {}, 31024: {}, 34567: {}, 34439: {}, 34545: {}},
+	Bonuses: map[int32]core.ApplyEffect{
+		2: func(agent core.Agent) {
+			// implemented in shocks.go
+		},
+		4: func(agent core.Agent) {
+			// implemented in stormstrike.go
+		},
+	},
 }

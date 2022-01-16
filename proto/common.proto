@@ -75,16 +75,6 @@ enum Stat {
     StatArmor = 27;
 }
 
-// Does not correspond to anything in-game; just our own label to help filter
-// items in the UI.
-enum ItemCategory {
-	ItemCategoryUnknown = 0;
-	ItemCategoryCaster = 1;
-	ItemCategoryMelee = 2;
-	ItemCategoryHybrid = 3;
-	ItemCategoryHealer = 4;
-}
-
 enum ItemType {
     ItemTypeUnknown = 0;
     ItemTypeHead = 1;
@@ -224,7 +214,12 @@ message RaidBuffs {
 // Buffs that affect a single party.
 message PartyBuffs {
     int32 bloodlust = 1;
+		int32 ferocious_inspiration = 22; // Number of BM hunters in party.
+
     TristateEffect moonkin_aura = 2;
+    TristateEffect leader_of_the_pack = 19;
+    TristateEffect sanctity_aura = 20;
+    bool trueshot_aura = 21;
     bool draenei_racial_melee = 3;
     bool draenei_racial_caster = 4;
 
@@ -245,9 +240,20 @@ message PartyBuffs {
     int32 totem_of_wrath = 13;
     TristateEffect wrath_of_air_totem = 14;
     TristateEffect grace_of_air_totem = 15;
-    TristateEffect strength_of_earth_totem = 16;
+    StrengthOfEarthType strength_of_earth_totem = 16;
+
+		int32 windfury_totem_rank = 23; // 0 if none, otherwise rank of the ability (1-5).
+		int32 windfury_totem_iwt = 24;
 
     TristateEffect battle_shout = 18;
+}
+
+enum StrengthOfEarthType {
+    None = 0;
+    Basic = 1;
+    CycloneBonus = 2;
+    EnhancingTotems = 3;
+    EnhancingAndCyclone = 4;
 }
 
 // Buffs are only used by individual sims, never the raid sim.
@@ -318,6 +324,9 @@ message Debuffs {
     TristateEffect faerie_fire = 10; // Faerie Fire: -610 armor / imp 3% hit
     bool sunder_armor = 11; // Number of stacks of sunder armor: -520 armor per stack, 5 max
     bool curse_of_recklessness = 12; // -800 armor
+
+		double expose_weakness_uptime = 13;
+		double expose_weakness_hunter_agility = 14;
 }
 
 enum MobType {
@@ -369,7 +378,6 @@ message Item {
 
     string name = 2;
 
-    repeated ItemCategory categories = 14;
 		// Classes that are allowed to use the item. Empty indicates no special class restrictions.
 		repeated Class class_allowlist = 15;
 
@@ -382,6 +390,11 @@ message Item {
     repeated double stats = 8;
     repeated GemColor gem_sockets = 9;
     repeated double socketBonus = 10;
+
+		// Weapon stats, needed for computing proper EP for melee weapons
+		double weapon_damage_min = 17;
+		double weapon_damage_max = 18;
+		double weapon_speed = 19;
 
     int32 phase = 11;
     ItemQuality quality = 12;
@@ -435,6 +448,8 @@ enum OtherAction {
 	OtherActionNone = 0;
 	OtherActionWait = 1;
 	OtherActionManaRegen = 2;
+	OtherActionAttack = 3; // A white hit, can be main hand or off hand.
+	OtherActionShoot = 4; // Default shoot action using a wand/bow/gun.
 }
 
 message ActionID {

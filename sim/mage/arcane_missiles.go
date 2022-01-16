@@ -26,7 +26,7 @@ func (mage *Mage) newArcaneMissilesTemplate(sim *core.Simulation) core.SimpleSpe
 				},
 			},
 		},
-		SpellHitEffect: core.SpellHitEffect{
+		Effect: core.SpellHitEffect{
 			SpellEffect: core.SpellEffect{
 				DamageMultiplier:       1,
 				StaticDamageMultiplier: mage.spellDamageMultiplier,
@@ -46,12 +46,12 @@ func (mage *Mage) newArcaneMissilesTemplate(sim *core.Simulation) core.SimpleSpe
 		IsChannel: true,
 	}
 
-	spell.SpellHitEffect.SpellEffect.BonusSpellHitRating += float64(mage.Talents.ArcaneFocus) * 2 * core.SpellHitRatingPerHitChance
+	spell.Effect.BonusSpellHitRating += float64(mage.Talents.ArcaneFocus) * 2 * core.SpellHitRatingPerHitChance
 	spell.ManaCost += spell.BaseManaCost * float64(mage.Talents.EmpoweredArcaneMissiles) * 0.02
-	spell.SpellHitEffect.DotInput.TickSpellCoefficient += 0.15 * float64(mage.Talents.EmpoweredArcaneMissiles)
+	spell.Effect.DotInput.TickSpellCoefficient += 0.15 * float64(mage.Talents.EmpoweredArcaneMissiles)
 
 	if ItemSetTempestRegalia.CharacterHasSetBonus(&mage.Character, 4) {
-		spell.SpellHitEffect.SpellEffect.StaticDamageMultiplier *= 1.05
+		spell.Effect.StaticDamageMultiplier *= 1.05
 	}
 
 	return core.NewSimpleSpellTemplate(spell)
@@ -63,7 +63,7 @@ func (mage *Mage) NewArcaneMissiles(sim *core.Simulation, target *core.Target) *
 	mage.arcaneMissilesCastTemplate.Apply(arcaneMissiles)
 
 	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	arcaneMissiles.Target = target
+	arcaneMissiles.Effect.Target = target
 	arcaneMissiles.Init(sim)
 
 	return arcaneMissiles

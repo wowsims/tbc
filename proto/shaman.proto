@@ -82,6 +82,9 @@ message ShamanTotems {
 		// If set, will twist windfury with whichever air totem is selected.
 		bool twist_windfury = 5; 
 
+		// Rank of Windfury Totem to cast, if using Windfury Totem.
+		int32 windfury_totem_rank = 11;
+
 		// If set, will twist fire nova with whichever fire totem is selected.
 		bool twist_fire_nova = 6;
 
@@ -100,6 +103,14 @@ message ShamanTotems {
 		// If set, any time a 2-minute totem is about to expire, will recall and
 		// replace all totems.
 		bool recall_totems = 10;
+}
+
+enum ShamanWeaponImbue {
+	ImbueNone = 0;
+	ImbueFlametongue = 1;
+	ImbueFrostbrand = 2;
+	ImbueRockbiter = 3;
+	ImbueWindfury = 4;
 }
 
 message ElementalShaman {
@@ -136,18 +147,25 @@ message ElementalShaman {
 
 message EnhancementShaman {
   message Rotation {
-    enum RotationType {
-        Unknown = 0;
-        Basic = 1;
-    }
+		ShamanTotems totems = 1;
 
-    RotationType type = 1;
-		ShamanTotems totems = 2;
+    enum PrimaryShock {
+        None = 0;
+        Earth = 1;
+        Frost = 2;
+    }
+    PrimaryShock primary_shock = 2;
+
+		bool weave_flame_shock = 3;
   }
 
   message Options {
-      bool water_shield = 1;
-      bool bloodlust = 2;
+		bool water_shield = 1;
+		bool bloodlust = 2;
+		bool delay_offhand_swings = 5;
+
+		ShamanWeaponImbue main_hand_imbue = 3;
+		ShamanWeaponImbue off_hand_imbue = 4;
   }
 
   Rotation rotation = 1;

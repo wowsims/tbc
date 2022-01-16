@@ -57,10 +57,17 @@ func applyDebuffEffects(target *Target, debuffs proto.Debuffs) {
 	}
 
 	if debuffs.ExposeArmor != proto.TristateEffect_TristateEffectMissing {
-		target.armor -= 2050 // 5 points: 2050 armor / imp 5 points: 3075 armor
+		points := 0
 		if debuffs.ExposeArmor == proto.TristateEffect_TristateEffectImproved {
-			target.armor -= 1025
+			points = 2
 		}
+		target.AddPermanentAura(func(sim *Simulation) Aura {
+			return ExposeArmorAura(0, target, points)
+		})
+	} else if debuffs.SunderArmor {
+		target.AddPermanentAura(func(sim *Simulation) Aura {
+			return SunderArmorAura(0, target, 5)
+		})
 	}
 
 	if debuffs.FaerieFire != proto.TristateEffect_TristateEffectMissing {
@@ -69,12 +76,17 @@ func applyDebuffEffects(target *Target, debuffs proto.Debuffs) {
 		})
 	}
 
-	if debuffs.SunderArmor {
-		target.armor -= 5 * 520.0 // assume 5 stacks
+	if debuffs.CurseOfRecklessness {
+		target.AddPermanentAura(func(sim *Simulation) Aura {
+			return CurseOfRecklessnessAura(0, target)
+		})
 	}
 
-	if debuffs.CurseOfRecklessness {
-		target.armor -= 800
+	if debuffs.ExposeWeaknessUptime > 0 && debuffs.ExposeWeaknessHunterAgility > 0 {
+		multiplier := MinFloat(1.0, debuffs.ExposeWeaknessUptime)
+		target.AddPermanentAura(func(sim *Simulation) Aura {
+			return ExposeWeaknessAura(debuffs.ExposeWeaknessHunterAgility, multiplier)
+		})
 	}
 }
 
@@ -139,7 +151,7 @@ func JudgementOfWisdomAura() Aura {
 				character.AddMana(sim, mana, actionID, false)
 			}
 		},
-		OnMeleeAttack: func(sim *Simulation, target *Target, result MeleeHitType, ability *ActiveMeleeAbility, isOH bool) {
+		OnMeleeAttack: func(sim *Simulation, ability *ActiveMeleeAbility, hitEffect *AbilityHitEffect) {
 			// if ability.ActionID =
 			character := ability.Character
 			// Only apply to agents that have mana.
@@ -158,7 +170,9 @@ func ImprovedSealOfTheCrusaderAura() Aura {
 		ActionID: ActionID{SpellID: 20337},
 		OnBeforeSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect) {
 			spellEffect.BonusSpellCritRating += 3 * SpellCritRatingPerCritChance
-			// FUTURE: melee crit bonus, research actual value
+		},
+		OnBeforeMeleeHit: func(sim *Simulation, ability *ActiveMeleeAbility, hitEffect *AbilityHitEffect) {
+			hitEffect.BonusCritRating += 3 * MeleeCritRatingPerCritChance
 		},
 	}
 }
@@ -220,8 +234,8 @@ func BloodFrenzyAura() Aura {
 	return Aura{
 		ID:       BloodFrenzyDebuffID,
 		ActionID: ActionID{SpellID: 29859},
-		OnBeforeMelee: func(sim *Simulation, ability *ActiveMeleeAbility, isOH bool) {
-			ability.DamageMultiplier *= 1.04
+		OnBeforeMeleeHit: func(sim *Simulation, ability *ActiveMeleeAbility, hitEffect *AbilityHitEffect) {
+			hitEffect.DamageMultiplier *= 1.04
 		},
 	}
 }
@@ -281,8 +295,8 @@ func FaerieFireAura(currentTime time.Duration, target *Target, improved bool) Au
 		},
 	}
 	if improved {
-		aura.OnBeforeMelee = func(sim *Simulation, ability *ActiveMeleeAbility, isOH bool) {
-			ability.BonusHitRating += hitBonus
+		aura.OnBeforeMeleeHit = func(sim *Simulation, ability *ActiveMeleeAbility, hitEffect *AbilityHitEffect) {
+			hitEffect.BonusHitRating += hitBonus
 		}
 	}
 
@@ -290,4 +304,71 @@ func FaerieFireAura(currentTime time.Duration, target *Target, improved bool) Au
 }
 
 var SunderArmorDebuffID = NewDebuffID()
+
+func SunderArmorAura(currentTime time.Duration, target *Target, stacks int) Aura {
+	armorReduction := 520.0 * float64(stacks)
+	target.AddArmor(-armorReduction)
+
+	aura := Aura{
+		ID:       SunderArmorDebuffID,
+		ActionID: ActionID{SpellID: 25225},
+		Expires:  currentTime + time.Second*30,
+		OnExpire: func(sim *Simulation) {
+			target.AddArmor(armorReduction)
+		},
+	}
+
+	return aura
+}
+
+var ExposeArmorDebuffID = NewDebuffID()
+
+func ExposeArmorAura(currentTime time.Duration, target *Target, talentPoints int) Aura {
+	// TODO: Make this override sunder, not add
+	armorReduction := 2050.0 * (1.0 + 0.25*float64(talentPoints))
+	target.AddArmor(-armorReduction)
+
+	aura := Aura{
+		ID:       ExposeArmorDebuffID,
+		ActionID: ActionID{SpellID: 26866},
+		Expires:  currentTime + time.Second*30,
+		OnExpire: func(sim *Simulation) {
+			target.AddArmor(armorReduction)
+		},
+	}
+
+	return aura
+}
+
 var CurseOfRecklessnessDebuffID = NewDebuffID()
+
+func CurseOfRecklessnessAura(currentTime time.Duration, target *Target) Aura {
+	armorReduction := 800.0
+	target.AddArmor(-armorReduction)
+
+	aura := Aura{
+		ID:       CurseOfRecklessnessDebuffID,
+		ActionID: ActionID{SpellID: 27226},
+		Expires:  currentTime + time.Minute*2,
+		OnExpire: func(sim *Simulation) {
+			target.AddArmor(armorReduction)
+		},
+	}
+
+	return aura
+}
+
+var ExposeWeaknessDebuffID = NewDebuffID()
+
+// Multiplier is for accomodating uptime %. For a real hunter, always pass 1.0
+func ExposeWeaknessAura(hunterAgility float64, multiplier float64) Aura {
+	apBonus := hunterAgility * 0.25 * multiplier
+
+	return Aura{
+		ID:       ExposeWeaknessDebuffID,
+		ActionID: ActionID{SpellID: 34503},
+		OnBeforeMeleeHit: func(sim *Simulation, ability *ActiveMeleeAbility, hitEffect *AbilityHitEffect) {
+			hitEffect.BonusAttackPower += apBonus
+		},
+	}
+}

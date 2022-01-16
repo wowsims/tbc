@@ -28,7 +28,7 @@ func (mage *Mage) newFireballTemplate(sim *core.Simulation) core.SimpleSpellTemp
 				},
 			},
 		},
-		SpellHitEffect: core.SpellHitEffect{
+		Effect: core.SpellHitEffect{
 			SpellEffect: core.SpellEffect{
 				DamageMultiplier:       1,
 				StaticDamageMultiplier: mage.spellDamageMultiplier,
@@ -47,14 +47,14 @@ func (mage *Mage) newFireballTemplate(sim *core.Simulation) core.SimpleSpellTemp
 
 	spell.CastTime -= time.Millisecond * 100 * time.Duration(mage.Talents.ImprovedFireball)
 	spell.ManaCost -= spell.BaseManaCost * float64(mage.Talents.Pyromaniac) * 0.01
-	spell.SpellHitEffect.SpellEffect.BonusSpellHitRating += float64(mage.Talents.ElementalPrecision) * 1 * core.SpellHitRatingPerHitChance
-	spell.SpellHitEffect.SpellEffect.BonusSpellCritRating += float64(mage.Talents.CriticalMass) * 2 * core.SpellCritRatingPerCritChance
-	spell.SpellHitEffect.SpellEffect.BonusSpellCritRating += float64(mage.Talents.Pyromaniac) * 1 * core.SpellCritRatingPerCritChance
-	spell.SpellHitEffect.SpellEffect.StaticDamageMultiplier *= 1 + 0.02*float64(mage.Talents.FirePower)
-	spell.SpellHitEffect.DirectInput.SpellCoefficient += 0.03 * float64(mage.Talents.EmpoweredFireball)
+	spell.Effect.BonusSpellHitRating += float64(mage.Talents.ElementalPrecision) * 1 * core.SpellHitRatingPerHitChance
+	spell.Effect.BonusSpellCritRating += float64(mage.Talents.CriticalMass) * 2 * core.SpellCritRatingPerCritChance
+	spell.Effect.BonusSpellCritRating += float64(mage.Talents.Pyromaniac) * 1 * core.SpellCritRatingPerCritChance
+	spell.Effect.StaticDamageMultiplier *= 1 + 0.02*float64(mage.Talents.FirePower)
+	spell.Effect.DirectInput.SpellCoefficient += 0.03 * float64(mage.Talents.EmpoweredFireball)
 
 	if ItemSetTempestRegalia.CharacterHasSetBonus(&mage.Character, 4) {
-		spell.SpellHitEffect.SpellEffect.StaticDamageMultiplier *= 1.05
+		spell.Effect.StaticDamageMultiplier *= 1.05
 	}
 
 	return core.NewSimpleSpellTemplate(spell)
@@ -76,7 +76,7 @@ func (mage *Mage) newFireballDotTemplate(sim *core.Simulation) core.SimpleSpellT
 				IgnoreManaCost:  true,
 			},
 		},
-		SpellHitEffect: core.SpellHitEffect{
+		Effect: core.SpellHitEffect{
 			SpellEffect: core.SpellEffect{
 				DamageMultiplier:       1,
 				StaticDamageMultiplier: mage.spellDamageMultiplier,
@@ -92,10 +92,10 @@ func (mage *Mage) newFireballDotTemplate(sim *core.Simulation) core.SimpleSpellT
 		},
 	}
 
-	spell.SpellHitEffect.SpellEffect.StaticDamageMultiplier *= 1 + 0.02*float64(mage.Talents.FirePower)
+	spell.Effect.StaticDamageMultiplier *= 1 + 0.02*float64(mage.Talents.FirePower)
 
 	if ItemSetTempestRegalia.CharacterHasSetBonus(&mage.Character, 4) {
-		spell.SpellHitEffect.SpellEffect.StaticDamageMultiplier *= 1.05
+		spell.Effect.StaticDamageMultiplier *= 1.05
 	}
 
 	return core.NewSimpleSpellTemplate(spell)
@@ -109,7 +109,7 @@ func (mage *Mage) newFireballDot(sim *core.Simulation, target *core.Target) *cor
 	mage.fireballDotCastTemplate.Apply(fireballDot)
 
 	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	fireballDot.Target = target
+	fireballDot.Effect.Target = target
 	fireballDot.Init(sim)
 
 	return fireballDot
@@ -121,7 +121,7 @@ func (mage *Mage) NewFireball(sim *core.Simulation, target *core.Target) *core.S
 	mage.fireballCastTemplate.Apply(fireball)
 
 	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	fireball.Target = target
+	fireball.Effect.Target = target
 	fireball.Init(sim)
 
 	return fireball

@@ -15,8 +15,10 @@ import { EquipmentSpec } from '/tbc/core/proto/common.js';
 import { Gear } from '/tbc/core/proto_utils/gear.js';
 import { GearPicker } from '/tbc/core/components/gear_picker.js';
 import { IconPicker, IconPickerConfig } from '/tbc/core/components/icon_picker.js';
+import { IconEnumPicker, IconEnumPickerConfig } from '/tbc/core/components/icon_enum_picker.js';
 import { IndividualBuffs } from '/tbc/core/proto/common.js';
 import { IndividualSimSettings } from '/tbc/core/proto/ui.js';
+import { Input } from '/tbc/core/components/input.js';
 import { LogRunner } from '/tbc/core/components/log_runner.js';
 import { NumberPicker, NumberPickerConfig } from '/tbc/core/components/number_picker.js';
 import { Party } from './party.js';
@@ -64,22 +66,27 @@ const SAVED_ROTATION_STORAGE_KEY = '__savedRotation__';
 const SAVED_SETTINGS_STORAGE_KEY = '__savedSettings__';
 const SAVED_TALENTS_STORAGE_KEY = '__savedTalents__';
 
-export interface IndividualSimIconPickerConfig<ModObject, ValueType> extends IconPickerConfig<ModObject, ValueType> {
+export type IndividualSimIconPickerConfig<ModObject, ValueType> = (IconPickerConfig<ModObject, ValueType> | IconEnumPickerConfig<ModObject, ValueType>) & {
   // If set, all effects with matching tags will be deactivated when this
   // effect is enabled.
   exclusivityTags?: Array<ExclusivityTag>;
 };
 
-class IndividualSimIconPicker<ModObject, ValueType> extends IconPicker<ModObject, ValueType> {
+class IndividualSimIconPicker<ModObject, ValueType> {
   constructor(parent: HTMLElement, modObj: ModObject, input: IndividualSimIconPickerConfig<ModObject, ValueType>, simUI: IndividualSimUI<any>) {
-		super(parent, modObj, input);
+		let picker: Input<ModObject, ValueType> | null = null;
+		if ('states' in input) {
+			picker = new IconPicker<ModObject, ValueType>(parent, modObj, input);
+		} else {
+			picker = new IconEnumPicker<ModObject, ValueType>(parent, modObj, input);
+		}
 
     if (input.exclusivityTags) {
       simUI.registerExclusiveEffect({
         tags: input.exclusivityTags,
-        changedEvent: this.changeEmitter,
-        isActive: () => Boolean(this.getInputValue()),
-        deactivate: (eventID: EventID) => this.setValue(eventID, (typeof this.getInputValue() == 'number') ? 0 as unknown as ValueType : false as unknown as ValueType),
+        changedEvent: picker!.changeEmitter,
+        isActive: () => Boolean(picker!.getInputValue()),
+        deactivate: (eventID: EventID) => picker!.setValue(eventID, (typeof picker!.getInputValue() == 'number') ? 0 as unknown as ValueType : false as unknown as ValueType),
       });
     }
 	}
@@ -101,6 +108,11 @@ export interface InputSection {
 		type: 'enum',
 		getModObject: (simUI: IndividualSimUI<any>) => any,
 		config: EnumPickerConfig<any>,
+	} |
+	{
+		type: 'iconEnum',
+		getModObject: (simUI: IndividualSimUI<any>) => any,
+		config: IconEnumPickerConfig<any, any>,
 	}>,
 }
 
@@ -471,7 +483,7 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 
     const settingsTab = this.rootElem.getElementsByClassName('settings-inputs')[0] as HTMLElement;
 
-		const configureIconSection = (sectionElem: HTMLElement, iconPickers: Array<IconPicker<any, any>>, tooltip?: string) => {
+		const configureIconSection = (sectionElem: HTMLElement, iconPickers: Array<any>, tooltip?: string) => {
 			if (tooltip) {
 				tippy(sectionElem, {
 					'content': tooltip,
@@ -526,6 +538,8 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
           const picker = new BooleanPicker(sectionElem, inputConfig.getModObject(this), inputConfig.config);
         } else if (inputConfig.type == 'enum') {
           const picker = new EnumPicker(sectionElem, inputConfig.getModObject(this), inputConfig.config);
+        } else if (inputConfig.type == 'iconEnum') {
+          const picker = new IconEnumPicker(sectionElem, inputConfig.getModObject(this), inputConfig.config);
         }
       });
 		};
@@ -656,6 +670,10 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 		this.sim.waitForInit().then(() => {
 			savedEncounterManager.loadUserData();
 			savedSettingsManager.loadUserData();
+		});
+
+		Array.from(this.rootElem.getElementsByClassName('settings-section-container')).forEach((container, i) => {
+			(container as HTMLElement).style.zIndex = String(1000 - i);
 		});
 	}
 

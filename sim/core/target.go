@@ -64,7 +64,7 @@ type Target struct {
 	// 2nd target has index 1, etc.
 	Index int32
 
-	armor                float64 // base armor
+	initialArmor         float64 // base armor
 	currentArmor         float64 // current armor, can be mutated by spells
 	armorDamageReduction float64 // cached armor damage reduction
 
@@ -81,19 +81,22 @@ type Target struct {
 
 	// For logging.
 	Name string
+
+	// Cached value to handle sunder/expose overriding each other.
+	sunderOrExposeArmorReduction float64
 }
 
 func NewTarget(options proto.Target, targetIndex int32) *Target {
 	target := &Target{
-		Index:       targetIndex,
-		armor:       float64(options.Armor),
-		MobType:     options.MobType,
-		auraTracker: newAuraTracker(true),
-		Name:        "Target " + strconv.Itoa(int(targetIndex)+1),
-		Level:       73,
+		Index:        targetIndex,
+		currentArmor: float64(options.Armor),
+		MobType:      options.MobType,
+		auraTracker:  newAuraTracker(true),
+		Name:         "Target " + strconv.Itoa(int(targetIndex)+1),
+		Level:        73,
 	}
-	if target.armor == 0 {
-		target.armor = 7700
+	if target.currentArmor == 0 {
+		target.currentArmor = 7700
 	}
 	target.calculateReduction()
 
@@ -118,13 +121,14 @@ func (target *Target) finalize() {
 	}
 	target.finalized = true
 
+	target.initialArmor = target.currentArmor
 	target.auraTracker.finalize()
 }
 
 func (target *Target) Reset(sim *Simulation) {
+	target.currentArmor = target.initialArmor
 	target.auraTracker.reset(sim)
 	// Reset after removing any auras above
-	target.currentArmor = target.armor
 	target.calculateReduction()
 }
 
@@ -152,6 +156,8 @@ func (target *Target) AddArmor(value float64) {
 }
 
 // ArmorDamageReduction currently assumes a level 70 attacker
-func (target *Target) ArmorDamageReduction() float64 {
-	return target.armorDamageReduction
+func (target *Target) ArmorDamageReduction(armorPen float64) float64 {
+	// TODO: Cache this somehow so we dont have to recalculate every time.
+	effectiveArmor := MaxFloat(0, target.currentArmor-armorPen)
+	return effectiveArmor / (effectiveArmor + 10557.5)
 }

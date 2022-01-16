@@ -1,6 +1,6 @@
 import { Encounter as EncounterProto } from '/tbc/core/proto/common.js';
 import { Raid as RaidProto } from '/tbc/core/proto/api.js';
-import { RaidSimRequest, RaidSimResult } from '/tbc/core/proto/api.js';
+import { RaidSimRequest, RaidSimResult, ProgressMetrics } from '/tbc/core/proto/api.js';
 import { SimResult } from '/tbc/core/proto_utils/sim_result.js';
 import { SimUI } from '/tbc/core/sim_ui.js';
 import { EventID, TypedEvent } from '/tbc/core/typed_event.js';
@@ -8,7 +8,9 @@ import { EventID, TypedEvent } from '/tbc/core/typed_event.js';
 declare var tippy: any;
 
 export function addRaidSimAction(simUI: SimUI): RaidSimResultsManager {
-	simUI.addAction('DPS', 'dps-action', async () => simUI.runSim());
+	simUI.addAction('DPS', 'dps-action', async () => simUI.runSim((progress: ProgressMetrics) =>{
+		resultsManager.setSimProgress(progress);
+	}));
 
 	const resultsManager = new RaidSimResultsManager(simUI);
 	simUI.sim.simResultEmitter.on((eventID, simResult) => {
@@ -44,6 +46,19 @@ export class RaidSimResultsManager {
     ].forEach(emitter => emitter.on(eventID => this.changeEmitter.emit(eventID)));
   }
 
+  setSimProgress(progress: ProgressMetrics) {
+	this.simUI.setResultsContent(`
+  <div class="results-sim">
+			<div class="results-sim-dps">
+				<span class="results-sim-dps-avg">${progress.dps.toFixed(2)}</span>
+			</div>
+			<div class="">
+				${progress.completedIterations} / ${progress.totalIterations}<br>iterations complete
+			</div>
+  </div>
+`);
+  }
+
   setSimResult(eventID: EventID, simResult: SimResult) {
 		this.currentData = {
 			simResult: simResult,
@@ -61,7 +76,7 @@ export class RaidSimResultsManager {
 					<span class="results-sim-dps-stdev">${dpsMetrics.stdev.toFixed(2)}</span>
 				</div>
 				<div class="results-sim-reference">
-					<span class="results-sim-set-reference fa fa-bookmark"></span>
+					<span class="results-sim-set-reference fa fa-map-pin"></span>
 					<div class="results-sim-reference-bar">
 						<span class="results-sim-reference-diff"></span>
 						<span class="results-sim-reference-text"> vs. reference</span>

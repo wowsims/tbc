@@ -158,7 +158,7 @@ export class Sim {
 		});
   }
 
-  async runRaidSim(eventID: EventID): Promise<SimResult> {
+  async runRaidSim(eventID: EventID, onProgress: Function): Promise<SimResult> {
 		if (this.raid.isEmpty()) {
 			throw new Error('Raid is empty! Try adding some players first.');
 		} else if (this.encounter.getNumTargets() < 1) {
@@ -168,7 +168,8 @@ export class Sim {
 		await this.waitForInit();
 
 		const request = this.makeRaidSimRequest(false);
-		const result = await this.workerPool.raidSim(request);
+		
+		var result = await this.workerPool.raidSimAsync(request, onProgress);
 
 		const simResult = await SimResult.makeNew(request, result);
 		this.simResultEmitter.emit(eventID, simResult);
@@ -185,7 +186,7 @@ export class Sim {
 		await this.waitForInit();
 
 		const request = this.makeRaidSimRequest(true);
-		const result = await this.workerPool.raidSim(request);
+		const result = await this.workerPool.raidSimAsync(request, () => {});
 
 		const simResult = await SimResult.makeNew(request, result);
 		this.simResultEmitter.emit(eventID, simResult);
@@ -194,6 +195,11 @@ export class Sim {
 
 	// This should be invoked internally whenever stats might have changed.
 	private async updateCharacterStats(eventID: EventID) {
+		if (eventID == 0) {
+			// Skip the first event ID because it interferes with the loaded stats.
+			return;
+		}
+
 		await this.waitForInit();
 
 		// Capture the current players so we avoid issues if something changes while
@@ -212,7 +218,7 @@ export class Sim {
 		});
 	}
 
-  async statWeights(player: Player<any>, epStats: Array<Stat>, epReferenceStat: Stat): Promise<StatWeightsResult> {
+  async statWeights(player: Player<any>, epStats: Array<Stat>, epReferenceStat: Stat, onProgress: Function): Promise<StatWeightsResult> {
 		if (this.raid.isEmpty()) {
 			throw new Error('Raid is empty! Try adding some players first.');
 		} else if (this.encounter.getNumTargets() < 1) {
@@ -238,8 +244,8 @@ export class Sim {
 				statsToWeigh: epStats,
 				epReferenceStat: epReferenceStat,
 			});
-
-			return await this.workerPool.statWeights(request);
+			var result = await this.workerPool.statWeightsAsync(request, onProgress);
+			return result;
 		}
 	}
 
@@ -259,16 +265,16 @@ export class Sim {
 		return enchants;
 	}
 
-  getGems(socketColor: GemColor | undefined): Array<Gem> {
-    let gems = Object.values(this.gems);
+	getGems(socketColor: GemColor | undefined): Array<Gem> {
+		let gems = Object.values(this.gems);
 		if (socketColor) {
 			gems = gems.filter(gem => gemEligibleForSocket(gem, socketColor));
 		}
 		return gems;
-  }
+	}
 
 	getMatchingGems(socketColor: GemColor): Array<Gem> {
-    return Object.values(this.gems).filter(gem => gemMatchesSocket(gem, socketColor));
+    	return Object.values(this.gems).filter(gem => gemMatchesSocket(gem, socketColor));
 	}
   
   getPhase(): number {

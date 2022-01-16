@@ -203,8 +203,6 @@ func (mage *Mage) registerArcanePowerCD() {
 		},
 		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
 			return func(sim *core.Simulation, character *core.Character) {
-				character.Metrics.AddInstantCast(actionID)
-
 				character.AddAura(sim, core.Aura{
 					ID:       ArcanePowerAuraID,
 					ActionID: actionID,
@@ -219,7 +217,8 @@ func (mage *Mage) registerArcanePowerCD() {
 						*tickDamage *= 1.3
 					},
 				})
-				mage.SetCD(ArcanePowerCooldownID, sim.CurrentTime+time.Minute*3)
+				character.Metrics.AddInstantCast(actionID)
+				character.SetCD(ArcanePowerCooldownID, sim.CurrentTime+time.Minute*3)
 			}
 		},
 	})

@@ -1,7 +1,16 @@
 import { BooleanPicker } from '/tbc/core/components/boolean_picker.js';
-import { IconEnumPicker } from '/tbc/core/components/icon_enum_picker.js';
+import { EnumPicker } from '/tbc/core/components/enum_picker.js';
+import { IconEnumPicker, IconEnumPickerConfig } from '/tbc/core/components/icon_enum_picker.js';
 import { IconPickerConfig } from '/tbc/core/components/icon_picker.js';
-import { AirTotem, EarthTotem, FireTotem, WaterTotem, EnhancementShaman_Rotation_RotationType as RotationType, ShamanTotems } from '/tbc/core/proto/shaman.js';
+import {
+	AirTotem,
+	EarthTotem,
+	FireTotem,
+	WaterTotem,
+	EnhancementShaman_Rotation_PrimaryShock as PrimaryShock,
+	ShamanTotems,
+	ShamanWeaponImbue,
+} from '/tbc/core/proto/shaman.js';
 import { EnhancementShaman_Options as ShamanOptions } from '/tbc/core/proto/shaman.js';
 import { Spec } from '/tbc/core/proto/common.js';
 import { ActionId } from '/tbc/core/proto_utils/action_id.js';
@@ -18,30 +27,100 @@ export const IconBloodlust = makeBooleanShamanBuffInput(ActionId.fromSpellId(282
 // export const IconManaSpringTotem = makeBoolShamanTotem(ActionId.fromSpellId(25570), 'manaSpringTotem');
 // export const IconTotemOfWrath = makeBoolShamanTotem(ActionId.fromSpellId(30706), 'totemOfWrath');
 export const IconWaterShield = makeBooleanShamanBuffInput(ActionId.fromSpellId(33736), 'waterShield');
+export const MainHandImbue = makeShamanWeaponImbueInput(false);
+export const OffHandImbue = makeShamanWeaponImbueInput(true);
 // export const IconWrathOfAirTotem = makeBoolShamanTotem(ActionId.fromSpellId(3738), 'wrathOfAirTotem');
+
+function makeShamanWeaponImbueInput(isOffHand: boolean): IconEnumPickerConfig<Player<Spec.SpecEnhancementShaman>, ShamanWeaponImbue> {
+	return {
+		extraCssClasses: [
+			'shaman-weapon-imbue-picker',
+		],
+		numColumns: 1,
+		values: [
+			{ color: 'grey', value: ShamanWeaponImbue.ImbueNone },
+			{ actionId: ActionId.fromSpellId(25505), value: ShamanWeaponImbue.ImbueWindfury },
+			{ actionId: ActionId.fromSpellId(25489), value: ShamanWeaponImbue.ImbueFlametongue },
+			{ actionId: ActionId.fromSpellId(25500), value: ShamanWeaponImbue.ImbueFrostbrand },
+			{ actionId: ActionId.fromSpellId(25485), value: ShamanWeaponImbue.ImbueRockbiter },
+		],
+		equals: (a: ShamanWeaponImbue, b: ShamanWeaponImbue) => a == b,
+		zeroValue: ShamanWeaponImbue.ImbueNone,
+		changedEvent: (player: Player<Spec.SpecEnhancementShaman>) => player.specOptionsChangeEmitter,
+		getValue: (player: Player<Spec.SpecEnhancementShaman>) => (!isOffHand ? player.getSpecOptions().mainHandImbue : player.getSpecOptions().offHandImbue) || ShamanWeaponImbue.ImbueNone,
+		setValue: (eventID: EventID, player: Player<Spec.SpecEnhancementShaman>, newValue: number) => {
+			const newOptions = player.getSpecOptions();
+			if (!isOffHand) {
+				newOptions.mainHandImbue = newValue;
+			} else {
+				newOptions.offHandImbue = newValue;
+			}
+			player.setSpecOptions(eventID, newOptions);
+		},
+	};
+}
+
+export const DelayOffhandSwings = {
+	type: 'boolean' as const,
+	getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
+	config: {
+		extraCssClasses: [
+			'delay-offhand-swings-picker',
+		],
+		label: 'Delay Offhand Swings',
+		labelTooltip: 'Uses the startattack macro to delay OH swings, so they always follow within 0.5s of a MH swing.',
+		changedEvent: (player: Player<Spec.SpecEnhancementShaman>) => player.specOptionsChangeEmitter,
+		getValue: (player: Player<Spec.SpecEnhancementShaman>) => player.getSpecOptions().delayOffhandSwings,
+		setValue: (eventID: EventID, player: Player<Spec.SpecEnhancementShaman>, newValue: boolean) => {
+			const newOptions = player.getSpecOptions();
+			newOptions.delayOffhandSwings = newValue;
+			player.setSpecOptions(eventID, newOptions);
+		},
+	},
+};
 
 export const EnhancementShamanRotationConfig = {
 	inputs: [
 		{
-			type: 'enum' as const, cssClass: 'rotation-enum-picker',
+			type: 'enum' as const, cssClass: 'primary-shock-picker',
 			getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
 			config: {
-				label: 'Type',
+				label: 'Primary Shock',
 				values: [
 					{
-						name: 'Basic', value: RotationType.Basic,
-						tooltip: 'does basic stuff',
+						name: 'None', value: PrimaryShock.None,
+					},
+					{
+						name: 'Earth Shock', value: PrimaryShock.Earth,
+					},
+					{
+						name: 'Frost Shock', value: PrimaryShock.Frost,
 					},
 				],
 				changedEvent: (player: Player<Spec.SpecEnhancementShaman>) => player.rotationChangeEmitter,
-				getValue: (player: Player<Spec.SpecEnhancementShaman>) => player.getRotation().type,
+				getValue: (player: Player<Spec.SpecEnhancementShaman>) => player.getRotation().primaryShock,
 				setValue: (eventID: EventID, player: Player<Spec.SpecEnhancementShaman>, newValue: number) => {
 					const newRotation = player.getRotation();
-					newRotation.type = newValue;
+					newRotation.primaryShock = newValue;
 					player.setRotation(eventID, newRotation);
 				},
 			},
-		}
+		},
+		{
+			type: 'boolean' as const, cssClass: 'weave-flame-shock-picker',
+			getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
+			config: {
+				label: 'Weave Flame Shock',
+				labelTooltip: 'Use Flame Shock whenever the target does not already have the DoT.',
+				changedEvent: (player: Player<Spec.SpecEnhancementShaman>) => player.rotationChangeEmitter,
+				getValue: (player: Player<Spec.SpecEnhancementShaman>) => player.getRotation().weaveFlameShock,
+				setValue: (eventID: EventID, player: Player<Spec.SpecEnhancementShaman>, newValue: boolean) => {
+					const newRotation = player.getRotation();
+					newRotation.weaveFlameShock = newValue;
+					player.setRotation(eventID, newRotation);
+				},
+			},
+		},
 	],
 };
 
@@ -49,20 +128,17 @@ function makeBooleanShamanBuffInput(id: ActionId, optionsFieldName: keyof Shaman
 	return {
 	  id: id,
 	  states: 2,
-		  changedEvent: (player: Player<Spec.SpecEnhancementShaman>) => player.specOptionsChangeEmitter,
-		  getValue: (player: Player<Spec.SpecEnhancementShaman>) => player.getSpecOptions()[optionsFieldName] as boolean,
-		  setValue: (eventID: EventID, player: Player<Spec.SpecEnhancementShaman>, newValue: boolean) => {
-			  const newOptions = player.getSpecOptions();
-		(newOptions[optionsFieldName] as boolean) = newValue;
-			  player.setSpecOptions(eventID, newOptions);
-		  },
-	}
+		changedEvent: (player: Player<Spec.SpecEnhancementShaman>) => player.specOptionsChangeEmitter,
+		getValue: (player: Player<Spec.SpecEnhancementShaman>) => player.getSpecOptions()[optionsFieldName] as boolean,
+		setValue: (eventID: EventID, player: Player<Spec.SpecEnhancementShaman>, newValue: boolean) => {
+			const newOptions = player.getSpecOptions();
+	(newOptions[optionsFieldName] as boolean) = newValue;
+			player.setSpecOptions(eventID, newOptions);
+		},
+	};
 }
 
 export function TotemsSection(simUI: IndividualSimUI<Spec.SpecEnhancementShaman>, parentElem: HTMLElement): string {
-	const customSectionsContainer = parentElem.closest('.custom-sections-container') as HTMLElement;
-	customSectionsContainer.style.zIndex = '1000';
-
 	parentElem.innerHTML = `
 		<div class="totem-dropdowns-container"></div>
 		<div class="totem-inputs-container"></div>
@@ -181,6 +257,31 @@ export function TotemsSection(simUI: IndividualSimUI<Spec.SpecEnhancementShaman>
 		},
 	});
 
+	const windfuryRankPicker = new EnumPicker(totemInputsContainer, simUI.player, {
+		extraCssClasses: [
+			'windfury-rank-picker',
+		],
+		values: [
+			{ name: 'No WF', value: 0 },
+			{ name: '1', value: 1 },
+			{ name: '2', value: 2 },
+			{ name: '3', value: 3 },
+			{ name: '4', value: 4 },
+			{ name: '5', value: 5 },
+		],
+		label: 'WF Totem Rank',
+		labelTooltip: 'Rank of Windfury Totem to use, if using Windfury Totem.',
+		changedEvent: (player: Player<Spec.SpecEnhancementShaman>) => player.rotationChangeEmitter,
+		getValue: (player: Player<Spec.SpecEnhancementShaman>) => player.getRotation().totems?.windfuryTotemRank || 0,
+		setValue: (eventID: EventID, player: Player<Spec.SpecEnhancementShaman>, newValue: number) => {
+			const newRotation = player.getRotation();
+			if (!newRotation.totems)
+				newRotation.totems = ShamanTotems.create();
+			newRotation.totems!.windfuryTotemRank = newValue;
+			player.setRotation(eventID, newRotation);
+		},
+	});
+
 	const twistFireNovaPicker = new BooleanPicker(totemInputsContainer, simUI.player, {
 		extraCssClasses: [
 			'twist-fire-nova-picker',
@@ -200,22 +301,3 @@ export function TotemsSection(simUI: IndividualSimUI<Spec.SpecEnhancementShaman>
 
 	return 'Totems';
 }
-
-// function makeBoolShamanTotem(id: ActionId, optionsFieldName: keyof totems?): IconPickerConfig<Player<any>, boolean> {
-//   return {
-//     id: id,
-//     states: 2,
-// 		changedEvent: (player: Player<Spec.SpecEnhancementShaman>) => player.specOptionsChangeEmitter,
-// 		getValue: (player: Player<Spec.SpecEnhancementShaman>) => {
-// 			const totems = player.getSpecOptions().totems as ShamanTotems;
-// 			return totems[optionsFieldName] as boolean;
-// 		},
-// 		setValue: (player: Player<Spec.SpecEnhancementShaman>, newValue: boolean) => {
-// 			const newOptions = player.getSpecOptions();
-// 			const totems = newOptions.totems as ShamanTotems;
-//       		(totems[optionsFieldName] as boolean) = newValue;
-// 			newOptions.totems = totems;
-// 			player.setSpecOptions(newOptions);
-// 		},
-//   }
-// }

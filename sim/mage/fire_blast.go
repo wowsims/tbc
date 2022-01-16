@@ -28,7 +28,7 @@ func (mage *Mage) newFireBlastTemplate(sim *core.Simulation) core.SimpleSpellTem
 				},
 			},
 		},
-		SpellHitEffect: core.SpellHitEffect{
+		Effect: core.SpellHitEffect{
 			SpellEffect: core.SpellEffect{
 				DamageMultiplier:       1,
 				StaticDamageMultiplier: mage.spellDamageMultiplier,
@@ -43,10 +43,10 @@ func (mage *Mage) newFireBlastTemplate(sim *core.Simulation) core.SimpleSpellTem
 
 	spell.CastTime -= time.Millisecond * 500 * time.Duration(mage.Talents.ImprovedFireBlast)
 	spell.ManaCost -= spell.BaseManaCost * float64(mage.Talents.Pyromaniac) * 0.01
-	spell.SpellHitEffect.SpellEffect.BonusSpellHitRating += float64(mage.Talents.ElementalPrecision) * 1 * core.SpellHitRatingPerHitChance
-	spell.SpellHitEffect.SpellEffect.BonusSpellCritRating += float64(mage.Talents.CriticalMass) * 2 * core.SpellCritRatingPerCritChance
-	spell.SpellHitEffect.SpellEffect.BonusSpellCritRating += float64(mage.Talents.Pyromaniac) * 1 * core.SpellCritRatingPerCritChance
-	spell.SpellHitEffect.SpellEffect.StaticDamageMultiplier *= 1 + 0.02*float64(mage.Talents.FirePower)
+	spell.Effect.BonusSpellHitRating += float64(mage.Talents.ElementalPrecision) * 1 * core.SpellHitRatingPerHitChance
+	spell.Effect.BonusSpellCritRating += float64(mage.Talents.CriticalMass) * 2 * core.SpellCritRatingPerCritChance
+	spell.Effect.BonusSpellCritRating += float64(mage.Talents.Pyromaniac) * 1 * core.SpellCritRatingPerCritChance
+	spell.Effect.StaticDamageMultiplier *= 1 + 0.02*float64(mage.Talents.FirePower)
 
 	return core.NewSimpleSpellTemplate(spell)
 }
@@ -57,7 +57,7 @@ func (mage *Mage) NewFireBlast(sim *core.Simulation, target *core.Target) *core.
 	mage.fireBlastCastTemplate.Apply(fireBlast)
 
 	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	fireBlast.Target = target
+	fireBlast.Effect.Target = target
 	fireBlast.Init(sim)
 
 	return fireBlast

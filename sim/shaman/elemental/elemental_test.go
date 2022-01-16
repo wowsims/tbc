@@ -36,7 +36,7 @@ func TestP1FullCharacterStats(t *testing.T) {
 		stats.Spirit:    182.5,
 
 		stats.SpellPower:       1109,
-		stats.HealingPower:     705,
+		stats.HealingPower:     791,
 		stats.ArcaneSpellPower: 80,
 		stats.HolySpellPower:   80,
 		stats.NatureSpellPower: 123,
@@ -86,10 +86,10 @@ func TestCalcStatWeight(t *testing.T) {
 	}
 
 	core.StatWeightsTest("p1Full", t, swr, stats.Stats{
-		stats.Intellect:  0.188,
+		stats.Intellect:  0.190,
 		stats.SpellPower: 0.701,
-		stats.SpellHit:   0.070,
-		stats.SpellCrit:  0.565,
+		stats.SpellHit:   1.445,
+		stats.SpellCrit:  0.581,
 	})
 }
 
@@ -143,9 +143,6 @@ func TestAllItemEffects(t *testing.T) {
 		SimOptions: core.DefaultSimTestOptions,
 
 		ItemFilter: core.ItemFilter{
-			Categories: []proto.ItemCategory{
-				proto.ItemCategory_ItemCategoryCaster,
-			},
 			ArmorTypes: []proto.ArmorType{
 				proto.ArmorType_ArmorTypeUnknown,
 				proto.ArmorType_ArmorTypeCloth,

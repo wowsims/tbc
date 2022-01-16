@@ -21,7 +21,7 @@ import { PlayerStats } from '/tbc/core/proto/api.js';
 import { Player as PlayerProto } from '/tbc/core/proto/api.js';
 import { StatWeightsResult } from '/tbc/core/proto/api.js';
 
-import { EquippedItem } from '/tbc/core/proto_utils/equipped_item.js';
+import { EquippedItem, computeItemEP } from '/tbc/core/proto_utils/equipped_item.js';
 import { Gear } from '/tbc/core/proto_utils/gear.js';
 import {
 	gemEligibleForSocket,
@@ -75,6 +75,10 @@ export class Player<SpecType extends Spec> {
   private talentsString: string = '';
   private specOptions: SpecOptions<SpecType>;
   private cooldowns: Cooldowns = Cooldowns.create();
+
+  private itemEPCache: Map<number, number> = new Map<number, number>();
+  private gemEPCache: Map<number, number> = new Map<number, number>();
+  private enchantEPCache: Map<number, number> = new Map<number, number>();
 
   readonly specTypeFunctions: SpecTypeFunctions<SpecType>;
 
@@ -194,9 +198,9 @@ export class Player<SpecType extends Spec> {
 	}
 
 	// Returns all gems that this player can wear of the given color.
-  getGems(socketColor: GemColor | undefined): Array<Gem> {
+	getGems(socketColor: GemColor | undefined): Array<Gem> {
 		return this.sim.getGems(socketColor);
-  }
+	}
 
 	getEpWeights(): Stats {
 		return this.epWeights;
@@ -204,10 +208,14 @@ export class Player<SpecType extends Spec> {
 
 	setEpWeights(newEpWeights: Stats) {
 		this.epWeights = newEpWeights;
+
+		this.gemEPCache = new Map();
+		this.itemEPCache = new Map();
+		this.enchantEPCache = new Map();
 	}
 
-  async computeStatWeights(epStats: Array<Stat>, epReferenceStat: Stat): Promise<StatWeightsResult> {
-		const result = await this.sim.statWeights(this, epStats, epReferenceStat);
+  async computeStatWeights(epStats: Array<Stat>, epReferenceStat: Stat, onProgress: Function): Promise<StatWeightsResult> {
+		const result = await this.sim.statWeights(this, epStats, epReferenceStat, onProgress);
 		this.epWeights = new Stats(result.epValues);
 		return result;
 	}
@@ -421,22 +429,56 @@ export class Player<SpecType extends Spec> {
     this.specOptionsChangeEmitter.emit(eventID);
   }
 
+  	computeStatsEP(stats: number[] | undefined): number {
+		if (stats == undefined) {
+			return 0;
+		}
+		return new Stats(stats).computeEP(this.epWeights);
+	}
+
 	computeGemEP(gem: Gem): number {
+		if (this.gemEPCache.has(gem.id)) {
+			return this.gemEPCache.get(gem.id)!;
+		}
+
 		const epFromStats = new Stats(gem.stats).computeEP(this.epWeights);
 		const epFromEffect = getMetaGemEffectEP(this.spec, gem, new Stats(this.currentStats.finalStats));
-		return epFromStats + epFromEffect;
+		let bonusEP = 0;
+		// unique items are slightly worse than non-unique because you can have only one.
+		if (gem.unique) {
+			bonusEP -= 0.01;
+		}
+
+		let ep = epFromStats + epFromEffect + bonusEP;
+		this.gemEPCache.set(gem.id, ep);
+		return ep;
 	}
 
 	computeEnchantEP(enchant: Enchant): number {
-		return new Stats(enchant.stats).computeEP(this.epWeights);
+		if (this.enchantEPCache.has(enchant.id)) {
+			return this.enchantEPCache.get(enchant.id)!;
+		}
+
+		let ep = new Stats(enchant.stats).computeEP(this.epWeights);
+		this.enchantEPCache.set(enchant.id, ep);
+		return ep
 	}
 
 	computeItemEP(item: Item): number {
 		if (item == null)
 			return 0;
 
-		let ep = new Stats(item.stats).computeEP(this.epWeights);
+		if (this.itemEPCache.has(item.id)) {
+			return this.itemEPCache.get(item.id)!;
+		}
 
+		let ep = computeItemEP(item, this.epWeights);
+		
+		// unique items are slightly worse than non-unique because you can have only one.
+		if (item.unique) {
+			ep -= 0.01;
+		}
+		
 		const slot = getEligibleItemSlots(item)[0];
 		const enchants = this.sim.getEnchants(slot);
 		if (enchants.length > 0) {
@@ -464,6 +506,7 @@ export class Player<SpecType extends Spec> {
 
 		ep += Math.max(bestGemEPMatchingSockets, bestGemEPNotMatchingSockets);
 
+		this.itemEPCache.set(item.id, ep);
 		return ep;
 	}
 

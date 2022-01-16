@@ -7,8 +7,11 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
+var HumanWeaponSpecializationAuraID = NewAuraID()
+
 var OrcBloodFuryAuraID = NewAuraID()
 var OrcBloodFuryCooldownID = NewCooldownID()
+var OrcWeaponSpecializationAuraID = NewAuraID()
 
 var TrollBeastSlayingAuraID = NewAuraID()
 
@@ -39,8 +42,39 @@ func applyRaceEffects(agent Agent) {
 			Modifier: func(spirit float64, _ float64) float64 {
 				return spirit * 1.1
 			},
-			// TODO: +5 expertise for swords and maces
 		})
+
+		const expertiseBonus = 5 * ExpertisePerQuarterPercentReduction
+		mhMatches := false
+		ohMatches := false
+		if weapon := character.Equip[proto.ItemSlot_ItemSlotMainHand]; weapon.ID != 0 {
+			if weapon.WeaponType == proto.WeaponType_WeaponTypeSword || weapon.WeaponType == proto.WeaponType_WeaponTypeMace {
+				mhMatches = true
+			}
+		}
+		if weapon := character.Equip[proto.ItemSlot_ItemSlotOffHand]; weapon.ID != 0 {
+			if weapon.WeaponType == proto.WeaponType_WeaponTypeSword || weapon.WeaponType == proto.WeaponType_WeaponTypeMace {
+				ohMatches = true
+			}
+		}
+
+		if mhMatches || ohMatches {
+			character.AddPermanentAura(func(sim *Simulation) Aura {
+				return Aura{
+					ID: HumanWeaponSpecializationAuraID,
+					OnBeforeMeleeHit: func(sim *Simulation, ability *ActiveMeleeAbility, hitEffect *AbilityHitEffect) {
+						if hitEffect.IsMH() {
+							if !mhMatches {
+								return
+							}
+						} else if !ohMatches {
+							return
+						}
+						hitEffect.BonusExpertiseRating += expertiseBonus
+					},
+				}
+			})
+		}
 	case proto.Race_RaceNightElf:
 	case proto.Race_RaceOrc:
 		// TODO: Pet melee damage +5%
@@ -70,6 +104,37 @@ func applyRaceEffects(agent Agent) {
 			},
 		})
 
+		const expertiseBonus = 5 * ExpertisePerQuarterPercentReduction
+		mhMatches := false
+		ohMatches := false
+		if weapon := character.Equip[proto.ItemSlot_ItemSlotMainHand]; weapon.ID != 0 {
+			if weapon.WeaponType == proto.WeaponType_WeaponTypeAxe {
+				mhMatches = true
+			}
+		}
+		if weapon := character.Equip[proto.ItemSlot_ItemSlotOffHand]; weapon.ID != 0 {
+			if weapon.WeaponType == proto.WeaponType_WeaponTypeAxe {
+				ohMatches = true
+			}
+		}
+
+		if mhMatches || ohMatches {
+			character.AddPermanentAura(func(sim *Simulation) Aura {
+				return Aura{
+					ID: OrcWeaponSpecializationAuraID,
+					OnBeforeMeleeHit: func(sim *Simulation, ability *ActiveMeleeAbility, hitEffect *AbilityHitEffect) {
+						if hitEffect.IsMH() {
+							if !mhMatches {
+								return
+							}
+						} else if !ohMatches {
+							return
+						}
+						hitEffect.BonusExpertiseRating += expertiseBonus
+					},
+				}
+			})
+		}
 	case proto.Race_RaceTauren:
 		// TODO: Health +5%
 	case proto.Race_RaceTroll10, proto.Race_RaceTroll30:
@@ -79,6 +144,9 @@ func applyRaceEffects(agent Agent) {
 		character.AddPermanentAura(func(sim *Simulation) Aura {
 			return Aura{
 				ID: TrollBeastSlayingAuraID,
+				OnBeforeMeleeHit: func(sim *Simulation, ability *ActiveMeleeAbility, hitEffect *AbilityHitEffect) {
+					hitEffect.DamageMultiplier *= 1.05
+				},
 				OnBeforeSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect) {
 					if spellEffect.Target.MobType == proto.MobType_MobTypeBeast {
 						spellEffect.DamageMultiplier *= 1.05

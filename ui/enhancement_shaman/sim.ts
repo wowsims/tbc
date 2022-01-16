@@ -70,17 +70,20 @@ export class EnhancementShamanSimUI extends IndividualSimUI<Spec.SpecEnhancement
 
 			defaults: {
 				// Default equipped gear.
-				gear: Presets.P2_BIS.gear,
+				gear: Presets.P1_PRESET.gear,
 				// Default EP weights for sorting gear in the gear picker.
 				epWeights: Stats.fromMap({
-					[Stat.StatIntellect]: 1.02,
-					[Stat.StatAgility]: 2.23,
-					[Stat.StatStrength]: 2.04,
-					[Stat.StatSpellPower]: 0.45,
+					[Stat.StatIntellect]: 0.078,
+					[Stat.StatAgility]: 1.317,
+					[Stat.StatStrength]: 2.2,
+					[Stat.StatSpellPower]: 0.433,
+					[Stat.StatNatureSpellPower]: 0.216,
 					[Stat.StatAttackPower]: 1.0,
-					[Stat.StatMeleeHit]: 1.0,
-					[Stat.StatMeleeCrit]: 2.86,
-					[Stat.StatMeleeHaste]: 0.62,
+					[Stat.StatMeleeHit]: 1.665,
+					[Stat.StatMeleeCrit]: 1.357,
+					[Stat.StatMeleeHaste]: 1.944,
+					[Stat.StatArmorPenetration]: 0.283,
+					[Stat.StatExpertise]: 2.871,
 				}),
 				// Default consumes settings.
 				consumes: Presets.DefaultConsumes,
@@ -115,6 +118,8 @@ export class EnhancementShamanSimUI extends IndividualSimUI<Spec.SpecEnhancement
 			// IconInputs to include in the 'Self Buffs' section on the settings tab.
 			selfBuffInputs: [
 				ShamanInputs.IconWaterShield,
+				ShamanInputs.MainHandImbue,
+				ShamanInputs.OffHandImbue,
 				ShamanInputs.IconBloodlust,
 				IconInputs.DrumsOfBattleConsume,
 				IconInputs.DrumsOfRestorationConsume,
@@ -129,6 +134,11 @@ export class EnhancementShamanSimUI extends IndividualSimUI<Spec.SpecEnhancement
 				IconInputs.Bloodlust,
 				IconInputs.ManaSpringTotem,
 				IconInputs.BattleShout,
+				IconInputs.DraeneiRacialMelee,
+				IconInputs.LeaderOfThePack,
+				IconInputs.FerociousInspiration,
+				IconInputs.TrueshotAura,
+				IconInputs.SanctityAura,
 			],
 			playerBuffInputs: [
 				IconInputs.BlessingOfKings,
@@ -137,21 +147,24 @@ export class EnhancementShamanSimUI extends IndividualSimUI<Spec.SpecEnhancement
 			],
 			// IconInputs to include in the 'Debuffs' section on the settings tab.
 			debuffInputs: [
+				IconInputs.BloodFrenzy,
 				IconInputs.ImprovedSealOfTheCrusader,
 				IconInputs.JudgementOfWisdom,
 				IconInputs.FaerieFire,
 				IconInputs.SunderArmor,
 				IconInputs.ExposeArmor,
 				IconInputs.CurseOfRecklessness,
+				IconInputs.CurseOfElements,
 				IconInputs.Misery,
 				IconInputs.ImprovedScorch,
-				IconInputs.CurseOfElements,
+				IconInputs.WintersChill,
 			],
 			// IconInputs to include in the 'Consumes' section on the settings tab.
 			consumeInputs: [
 				IconInputs.DefaultHastePotion,
 				IconInputs.DefaultDarkRune,
 				IconInputs.FlaskOfRelentlessAssault,
+				IconInputs.ElixirOfDemonslaying,
 				IconInputs.ElixirOfMajorAgility,
 				IconInputs.RoastedClefthoof,
 				IconInputs.ScrollOfAgilityV,
@@ -162,8 +175,11 @@ export class EnhancementShamanSimUI extends IndividualSimUI<Spec.SpecEnhancement
 			// Inputs to include in the 'Other' section on the settings tab.
 			otherInputs: {
 				inputs: [
+					ShamanInputs.DelayOffhandSwings,
 					OtherInputs.StartingPotion,
 					OtherInputs.NumStartingPotions,
+					OtherInputs.ExposeWeaknessUptime,
+					OtherInputs.ExposeWeaknessHunterAgility,
 				],
 			},
 			customSections: [
@@ -171,7 +187,7 @@ export class EnhancementShamanSimUI extends IndividualSimUI<Spec.SpecEnhancement
 			],
 			encounterPicker: {
 				// Whether to include 'Target Armor' in the 'Encounter' section of the settings tab.
-				showTargetArmor: false,
+				showTargetArmor: true,
 				// Whether to include 'Execute Duration (%)' in the 'Encounter' section of the settings tab.
 				showExecuteProportion: false,
 				// Whether to include 'Num Targets' in the 'Encounter' section of the settings tab.
@@ -186,10 +202,13 @@ export class EnhancementShamanSimUI extends IndividualSimUI<Spec.SpecEnhancement
 				// Preset talents that the user can quickly select.
 				talents: [
 					Presets.StandardTalents,
+					Presets.RestoSubspecTalents,
 				],
 				// Preset gear configurations that the user can quickly select.
 				gear: [
-					Presets.P2_BIS,
+					Presets.P1_PRESET,
+					Presets.P2_PRESET,
+					Presets.P3_PRESET,
 				],
 			},
 		});

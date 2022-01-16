@@ -27,7 +27,10 @@ func RegisterEnhancementShaman() {
 func NewEnhancementShaman(character core.Character, options proto.Player) *EnhancementShaman {
 	enhOptions := options.GetEnhancementShaman()
 
-	selfBuffs := shaman.SelfBuffs{}
+	selfBuffs := shaman.SelfBuffs{
+		Bloodlust:   enhOptions.Options.Bloodlust,
+		WaterShield: enhOptions.Options.WaterShield,
+	}
 
 	if enhOptions.Rotation.Totems != nil {
 		selfBuffs.ManaSpring = enhOptions.Rotation.Totems.Water == proto.WaterTotem_ManaSpringTotem
@@ -37,7 +40,20 @@ func NewEnhancementShaman(character core.Character, options proto.Player) *Enhan
 		selfBuffs.FireTotem = enhOptions.Rotation.Totems.Fire
 		selfBuffs.NextTotemDropType[shaman.FireTotem] = int32(enhOptions.Rotation.Totems.Fire)
 
+		if enhOptions.Rotation.Totems.Air == proto.AirTotem_WindfuryTotem {
+			// No need to twist windfury if its already the default totem.
+			enhOptions.Rotation.Totems.TwistWindfury = false
+		}
+		if enhOptions.Rotation.Totems.WindfuryTotemRank == 0 {
+			// If rank is 0, disable windfury options.
+			enhOptions.Rotation.Totems.TwistWindfury = false
+			if enhOptions.Rotation.Totems.Air == proto.AirTotem_WindfuryTotem {
+				enhOptions.Rotation.Totems.Air = proto.AirTotem_NoAirTotem
+			}
+		}
+
 		selfBuffs.TwistWindfury = enhOptions.Rotation.Totems.TwistWindfury
+		selfBuffs.WindfuryTotemRank = enhOptions.Rotation.Totems.WindfuryTotemRank
 		if selfBuffs.TwistWindfury {
 			selfBuffs.NextTotemDropType[shaman.AirTotem] = int32(proto.AirTotem_WindfuryTotem)
 			selfBuffs.NextTotemDrops[shaman.AirTotem] = 0 // drop windfury immediately
@@ -49,22 +65,38 @@ func NewEnhancementShaman(character core.Character, options proto.Player) *Enhan
 		}
 	}
 	enh := &EnhancementShaman{
-		Shaman: shaman.NewShaman(character, *enhOptions.Talents, selfBuffs),
+		Shaman:   shaman.NewShaman(character, *enhOptions.Talents, selfBuffs),
+		Rotation: *enhOptions.Rotation,
 	}
 	// Enable Auto Attacks for this spec
-	enh.EnableAutoAttacks()
-
-	// TODO: de-sync dual weapons swing timers?
+	enh.EnableAutoAttacks(enhOptions.Options.DelayOffhandSwings)
 
 	// Modify auto attacks multiplier from weapon mastery.
-	enh.AutoAttacks.DamageMultiplier *= 1 + 0.02*float64(enhOptions.Talents.WeaponMastery)
-	shaman.ApplyWindfuryImbue(enh.Shaman, true, true)
+	enh.AutoAttacks.Effect.DamageMultiplier *= 1 + 0.02*float64(enhOptions.Talents.WeaponMastery)
+	enh.ApplyWindfuryImbue(
+		enhOptions.Options.MainHandImbue == proto.ShamanWeaponImbue_ImbueWindfury,
+		enhOptions.Options.OffHandImbue == proto.ShamanWeaponImbue_ImbueWindfury)
+	enh.ApplyFlametongueImbue(
+		enhOptions.Options.MainHandImbue == proto.ShamanWeaponImbue_ImbueFlametongue,
+		enhOptions.Options.OffHandImbue == proto.ShamanWeaponImbue_ImbueFlametongue)
+	enh.ApplyFrostbrandImbue(
+		enhOptions.Options.MainHandImbue == proto.ShamanWeaponImbue_ImbueFrostbrand,
+		enhOptions.Options.OffHandImbue == proto.ShamanWeaponImbue_ImbueFrostbrand)
+	enh.ApplyRockbiterImbue(
+		enhOptions.Options.MainHandImbue == proto.ShamanWeaponImbue_ImbueRockbiter,
+		enhOptions.Options.OffHandImbue == proto.ShamanWeaponImbue_ImbueRockbiter)
+
+	if enhOptions.Options.MainHandImbue != proto.ShamanWeaponImbue_ImbueNone {
+		enh.HasMHWeaponImbue = true
+	}
 
 	return enh
 }
 
 type EnhancementShaman struct {
 	*shaman.Shaman
+
+	Rotation proto.EnhancementShaman_Rotation
 }
 
 func (enh *EnhancementShaman) GetShaman() *shaman.Shaman {
@@ -79,39 +111,43 @@ func (enh *EnhancementShaman) Act(sim *core.Simulation) time.Duration {
 	// Redrop totems when needed.
 	dropTime := enh.TryDropTotems(sim)
 	if dropTime > 0 {
-		return enh.AutoAttacks.TimeUntil(sim, nil, nil, dropTime)
+		return core.MinDuration(dropTime, enh.AutoAttacks.NextAttackAt())
 	}
+
+	target := sim.GetPrimaryTarget()
 
 	success := true
 	cost := 0.0
-	const manaReserve = 1000 // if mana goes under 1000 we will need more soon. Pop shamanistic rage.
-	if enh.CurrentMana() < manaReserve && enh.TryActivateShamanisticRage(sim) {
-		// Just wait for GCD
-		return enh.AutoAttacks.TimeUntil(sim, nil, nil, 0)
-	} else if enh.GetRemainingCD(shaman.StormstrikeCD, sim.CurrentTime) == 0 {
-		ss := enh.NewStormstrike(sim, sim.GetPrimaryTarget())
+	if !enh.IsOnCD(shaman.StormstrikeCD, sim.CurrentTime) {
+		ss := enh.NewStormstrike(sim, target)
 		cost = ss.Cost.Value
 		if success = ss.Attack(sim); success {
-			return enh.AutoAttacks.TimeUntil(sim, nil, ss, 0)
+			return enh.AutoAttacks.NextEventAt(sim)
 		}
-	} else if enh.GetRemainingCD(shaman.ShockCooldownID, sim.CurrentTime) == 0 {
-		shock := enh.NewEarthShock(sim, sim.GetPrimaryTarget())
-		cost = shock.ManaCost
-		if success = shock.Cast(sim); success {
-			return enh.AutoAttacks.TimeUntil(sim, shock, nil, 0)
+	} else if !enh.IsOnCD(shaman.ShockCooldownID, sim.CurrentTime) {
+		var shock *core.SimpleSpell
+		if enh.Rotation.WeaveFlameShock && !enh.FlameShockSpell.IsInUse() {
+			shock = enh.NewFlameShock(sim, target)
+		} else if enh.Rotation.PrimaryShock == proto.EnhancementShaman_Rotation_Earth {
+			shock = enh.NewEarthShock(sim, target)
+		} else if enh.Rotation.PrimaryShock == proto.EnhancementShaman_Rotation_Frost {
+			shock = enh.NewFrostShock(sim, target)
+		}
+
+		if shock != nil {
+			cost = shock.ManaCost
+			if success = shock.Cast(sim); success {
+				return enh.AutoAttacks.NextEventAt(sim)
+			}
 		}
 	}
 	if !success {
 		regenTime := enh.TimeUntilManaRegen(cost)
-		enh.Character.Metrics.MarkOOM(sim, &enh.Character, regenTime)
-		return sim.CurrentTime + regenTime
+		nextActionAt := core.MinDuration(sim.CurrentTime+regenTime, enh.AutoAttacks.NextAttackAt())
+		enh.Character.Metrics.MarkOOM(sim, &enh.Character, nextActionAt-sim.CurrentTime)
+		return nextActionAt
 	}
 
-	// Do nothing, just swing axes until next CD available
-	nextCD := enh.GetRemainingCD(shaman.StormstrikeCD, sim.CurrentTime)
-	shockCD := enh.GetRemainingCD(shaman.ShockCooldownID, sim.CurrentTime)
-	if shockCD < nextCD {
-		nextCD = shockCD
-	}
-	return enh.AutoAttacks.TimeUntil(sim, nil, nil, sim.CurrentTime+nextCD)
+	// We didn't try to cast anything. Just wait for next auto.
+	return enh.AutoAttacks.NextAttackAt()
 }

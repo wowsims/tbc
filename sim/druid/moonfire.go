@@ -49,12 +49,12 @@ func (druid *Druid) newMoonfireTemplate(sim *core.Simulation) core.SimpleSpellTe
 	}
 
 	// Moonfire only talents
-	effect.SpellEffect.StaticDamageMultiplier *= 1 + 0.05*float64(druid.Talents.ImprovedMoonfire)
-	effect.SpellEffect.BonusSpellCritRating += float64(druid.Talents.ImprovedMoonfire) * 5 * core.SpellCritRatingPerCritChance
+	effect.StaticDamageMultiplier *= 1 + 0.05*float64(druid.Talents.ImprovedMoonfire)
+	effect.BonusSpellCritRating += float64(druid.Talents.ImprovedMoonfire) * 5 * core.SpellCritRatingPerCritChance
 
 	// TODO: Shared talents
 	baseCast.ManaCost -= baseCast.BaseManaCost * float64(druid.Talents.Moonglow) * 0.03
-	effect.SpellEffect.StaticDamageMultiplier *= 1 + 0.02*float64(druid.Talents.Moonfury)
+	effect.StaticDamageMultiplier *= 1 + 0.02*float64(druid.Talents.Moonfury)
 
 	// Convert to percent, multiply by percent increase, convert back to multiplier by adding 1
 	baseCast.CritMultiplier = (baseCast.CritMultiplier-1)*(1+float64(druid.Talents.Vengeance)*0.2) + 1
@@ -66,7 +66,7 @@ func (druid *Druid) newMoonfireTemplate(sim *core.Simulation) core.SimpleSpellTe
 		SpellCast: core.SpellCast{
 			Cast: baseCast,
 		},
-		SpellHitEffect: effect,
+		Effect: effect,
 	})
 }
 
@@ -78,12 +78,12 @@ func (druid *Druid) NewMoonfire(sim *core.Simulation, target *core.Target) *core
 	druid.moonfireCastTemplate.Apply(sf)
 
 	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	sf.Target = target
+	sf.Effect.Target = target
 	sf.Init(sim)
 
 	return sf
 }
 
 func (druid *Druid) ShouldCastMoonfire(sim *core.Simulation, target *core.Target, rotation proto.BalanceDruid_Rotation) bool {
-	return rotation.Moonfire && !druid.MoonfireSpell.DotInput.IsTicking(sim)
+	return rotation.Moonfire && !druid.MoonfireSpell.Effect.DotInput.IsTicking(sim)
 }

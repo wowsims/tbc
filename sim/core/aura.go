@@ -79,6 +79,7 @@ type Aura struct {
 	onPeriodicDamageIndex       int32 // Position of this aura's index in the sim.onPeriodicDamageIDs array.
 	OnMeleeAttackIndex          int32 // Position of this aura's index in the sim.OnMeleeAttack array.
 	OnBeforeMeleeIndex          int32 // Position of this aura's index in the sim.OnBeforeMelee array.
+	OnBeforeMeleeHitIndex       int32 // Position of this aura's index in the sim.OnBeforeMeleeHit array.
 
 	// The number of stacks, or charges, of this aura. If this aura doesn't care
 	// about charges, is just 0.
@@ -114,6 +115,9 @@ type Aura struct {
 
 	// Invoked before melee of any kind (swing or ability)
 	OnBeforeMelee OnBeforeMelee
+
+	// Invoked before melee hit of any kind (swing or ability)
+	OnBeforeMeleeHit OnBeforeMeleeHit
 }
 
 // This needs to be a function that returns an Aura rather than an Aura, so captured
@@ -155,6 +159,7 @@ type auraTracker struct {
 	onPeriodicDamageIDs       []AuraID
 	onMeleeAttackIDs          []AuraID
 	onBeforeMeleeIDs          []AuraID
+	onBeforeMeleeHitIDs       []AuraID
 
 	auraIDsToRemove []AuraID
 
@@ -179,6 +184,7 @@ func newAuraTracker(useDebuffIDs bool) auraTracker {
 		onPeriodicDamageIDs:       make([]AuraID, 0, 16),
 		onMeleeAttackIDs:          make([]AuraID, 0, 16),
 		onBeforeMeleeIDs:          make([]AuraID, 0, 16),
+		onBeforeMeleeHitIDs:       make([]AuraID, 0, 16),
 		auras:                     make([]Aura, numAura),
 		cooldowns:                 make([]time.Duration, numCooldownIDs),
 		useDebuffIDs:              useDebuffIDs,
@@ -221,6 +227,7 @@ func (at *auraTracker) reset(sim *Simulation) {
 	at.onPeriodicDamageIDs = at.onPeriodicDamageIDs[:0]
 	at.onMeleeAttackIDs = at.onMeleeAttackIDs[:0]
 	at.onBeforeMeleeIDs = at.onBeforeMeleeIDs[:0]
+	at.onBeforeMeleeHitIDs = at.onBeforeMeleeHitIDs[:0]
 
 	at.auraIDsToRemove = []AuraID{}
 
@@ -286,6 +293,7 @@ func (at *auraTracker) ReplaceAura(sim *Simulation, newAura Aura) {
 		newAura.onPeriodicDamageIndex = old.onPeriodicDamageIndex
 		newAura.OnMeleeAttackIndex = old.OnMeleeAttackIndex
 		newAura.OnBeforeMeleeIndex = old.OnBeforeMeleeIndex
+		newAura.OnBeforeMeleeHitIndex = old.OnBeforeMeleeHitIndex
 		newAura.startTime = old.startTime
 
 		at.auras[newAura.ID] = newAura
@@ -351,6 +359,11 @@ func (at *auraTracker) AddAura(sim *Simulation, newAura Aura) {
 	if newAura.OnBeforeMelee != nil {
 		at.auras[newAura.ID].OnBeforeMeleeIndex = int32(len(at.onBeforeMeleeIDs))
 		at.onBeforeMeleeIDs = append(at.onBeforeMeleeIDs, newAura.ID)
+	}
+
+	if newAura.OnBeforeMeleeHit != nil {
+		at.auras[newAura.ID].OnBeforeMeleeHitIndex = int32(len(at.onBeforeMeleeHitIDs))
+		at.onBeforeMeleeHitIDs = append(at.onBeforeMeleeHitIDs, newAura.ID)
 	}
 
 	if sim.Log != nil && !newAura.ActionID.IsEmptyAction() {
@@ -446,6 +459,13 @@ func (at *auraTracker) RemoveAura(sim *Simulation, id AuraID) {
 		at.onBeforeMeleeIDs = removeBySwappingToBack(at.onBeforeMeleeIDs, removeOnBeforeMelee)
 		if removeOnBeforeMelee < int32(len(at.onBeforeMeleeIDs)) {
 			at.auras[at.onBeforeMeleeIDs[removeOnBeforeMelee]].OnBeforeMeleeIndex = removeOnBeforeMelee
+		}
+	}
+	if at.auras[id].OnBeforeMeleeHit != nil {
+		removeOnBeforeMeleeHit := at.auras[id].OnBeforeMeleeHitIndex
+		at.onBeforeMeleeHitIDs = removeBySwappingToBack(at.onBeforeMeleeHitIDs, removeOnBeforeMeleeHit)
+		if removeOnBeforeMeleeHit < int32(len(at.onBeforeMeleeHitIDs)) {
+			at.auras[at.onBeforeMeleeHitIDs[removeOnBeforeMeleeHit]].OnBeforeMeleeHitIndex = removeOnBeforeMeleeHit
 		}
 	}
 
@@ -556,15 +576,21 @@ func (at *auraTracker) OnPeriodicDamage(sim *Simulation, spellCast *SpellCast, s
 	}
 }
 
-func (at *auraTracker) OnMeleeAttack(sim *Simulation, target *Target, result MeleeHitType, ability *ActiveMeleeAbility, isOH bool) {
+func (at *auraTracker) OnMeleeAttack(sim *Simulation, ability *ActiveMeleeAbility, hitEffect *AbilityHitEffect) {
 	for _, id := range at.onMeleeAttackIDs {
-		at.auras[id].OnMeleeAttack(sim, target, result, ability, isOH)
+		at.auras[id].OnMeleeAttack(sim, ability, hitEffect)
 	}
 }
 
-func (at *auraTracker) OnBeforeMelee(sim *Simulation, ability *ActiveMeleeAbility, isOH bool) {
+func (at *auraTracker) OnBeforeMelee(sim *Simulation, ability *ActiveMeleeAbility) {
 	for _, id := range at.onBeforeMeleeIDs {
-		at.auras[id].OnBeforeMelee(sim, ability, isOH)
+		at.auras[id].OnBeforeMelee(sim, ability)
+	}
+}
+
+func (at *auraTracker) OnBeforeMeleeHit(sim *Simulation, ability *ActiveMeleeAbility, hitEffect *AbilityHitEffect) {
+	for _, id := range at.onBeforeMeleeHitIDs {
+		at.auras[id].OnBeforeMeleeHit(sim, ability, hitEffect)
 	}
 }
 

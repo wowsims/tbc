@@ -10,11 +10,13 @@ import (
 
 // Totem Item IDs
 const (
+	StormfuryTotem           = 31031
 	TotemOfAncestralGuidance = 32330
+	TotemOfImpact            = 27947
 	TotemOfStorms            = 23199
 	TotemOfThePulsingEarth   = 29389
 	TotemOfTheVoid           = 28248
-	TotemOfImpact            = 27947
+	TotemOfRage              = 22395
 )
 
 const (

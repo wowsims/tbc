@@ -34,6 +34,15 @@ export class ActionId {
 					name = (tag/1000).toFixed(3) + 's ' + baseName;
 				}
 				break;
+			case OtherAction.OtherActionAttack:
+				name = 'Attack';
+				iconUrl = 'https://wow.zamimg.com/images/wow/icons/large/inv_sword_04.jpg';
+				if (tag == 1) {
+					name += ' (Main Hand)';
+				} else if (tag == 2) {
+					name += ' (Off Hand)';
+				}
+				break;
 		}
 		this.baseName = baseName;
 		this.name = name;
@@ -135,12 +144,23 @@ export class ActionId {
 					}
 				}
 				break;
+			case 'Darkmoon Card: Crusade':
+				if (this.tag == 1) {
+					name += ' (Melee)';
+				} else if (this.tag == 2) {
+					name += ' (Spell)';
+				}
+				break;
+			case 'Lightning Speed':
+			case 'Windfury Weapon':
+				if (this.tag == 1) {
+					name += ' (Main Hand)';
+				} else if (this.tag == 2) {
+					name += ' (Off Hand)';
+				}
+				break;
 			default:
-				if (this.tag == 10) {
-					name += ' (Auto)';
-				} else if (this.tag == 11) {
-					name += ' (Offhand Auto)';
-				} else if (this.tag) {
+				if (this.tag) {
 					name += ' (??)';
 				}
 				break;

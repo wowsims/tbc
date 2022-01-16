@@ -125,6 +125,12 @@ export class SpellMetrics extends ResultComponent {
 		const spellMetrics = resultData.result.getSpellMetrics(resultData.filter);
 		const spellGroups = ActionMetrics.groupById(spellMetrics);
 
+		if (spellMetrics.length == 0) {
+			this.rootElem.classList.add('empty');
+		} else {
+			this.rootElem.classList.remove('empty');
+		}
+
 		spellGroups.forEach(spellGroup => {
 			if (spellGroup.length == 1) {
 				addRow(spellGroup[0], false);

@@ -84,24 +84,36 @@ type CharacterIterationMetrics struct {
 
 type ActionMetrics struct {
 	ActionID ActionID
+	IsMelee  bool // True if melee action, false if spell action.
 
 	Casts  int32
 	Hits   int32
 	Crits  int32
 	Misses int32
 
+	// These will be 0 for spell actions.
+	Dodges  int32
+	Parries int32
+	Blocks  int32
+	Glances int32
+
 	Damage float64
 }
 
 func (actionMetrics *ActionMetrics) ToProto() *proto.ActionMetrics {
 	return &proto.ActionMetrics{
-		Id: actionMetrics.ActionID.ToProto(),
+		Id:      actionMetrics.ActionID.ToProto(),
+		IsMelee: actionMetrics.IsMelee,
 
-		Casts:  actionMetrics.Casts,
-		Hits:   actionMetrics.Hits,
-		Crits:  actionMetrics.Crits,
-		Misses: actionMetrics.Misses,
-		Damage: actionMetrics.Damage,
+		Casts:   actionMetrics.Casts,
+		Hits:    actionMetrics.Hits,
+		Crits:   actionMetrics.Crits,
+		Misses:  actionMetrics.Misses,
+		Dodges:  actionMetrics.Dodges,
+		Parries: actionMetrics.Parries,
+		Blocks:  actionMetrics.Blocks,
+		Glances: actionMetrics.Glances,
+		Damage:  actionMetrics.Damage,
 	}
 }
 
@@ -155,32 +167,6 @@ func (characterMetrics *CharacterMetrics) AddSpellCast(spellCast *SpellCast) {
 }
 
 // Adds the results of a melee action to the aggregated metrics.
-func (characterMetrics *CharacterMetrics) AddAutoAttack(itemID int32, result MeleeHitType, dmg float64, isOH bool) {
-	var tag int32 = 10
-	if isOH {
-		tag = 11
-	}
-	actionID := ActionID{ItemID: itemID, Tag: tag}
-	actionKey := NewActionKey(actionID)
-	actionMetrics, ok := characterMetrics.actions[actionKey]
-	if !ok {
-		actionMetrics.ActionID = actionID
-	}
-	actionMetrics.Casts++
-	if result == MeleeHitTypeMiss || result == MeleeHitTypeParry || result == MeleeHitTypeDodge {
-		actionMetrics.Misses++
-	} else {
-		actionMetrics.Hits++
-		if result == MeleeHitTypeCrit {
-			actionMetrics.Crits++
-		}
-	}
-	actionMetrics.Damage += dmg
-	characterMetrics.TotalDamage += dmg
-	characterMetrics.actions[actionKey] = actionMetrics
-}
-
-// Adds the results of a melee action to the aggregated metrics.
 func (characterMetrics *CharacterMetrics) AddMeleeAbility(ability *ActiveMeleeAbility) {
 	actionID := ability.ActionID
 	actionKey := NewActionKey(actionID)
@@ -188,12 +174,17 @@ func (characterMetrics *CharacterMetrics) AddMeleeAbility(ability *ActiveMeleeAb
 
 	if !ok {
 		actionMetrics.ActionID = actionID
+		actionMetrics.IsMelee = true
 	}
 
 	actionMetrics.Casts++
 	actionMetrics.Hits += ability.Hits
 	actionMetrics.Misses += ability.Misses
 	actionMetrics.Crits += ability.Crits
+	actionMetrics.Dodges += ability.Dodges
+	actionMetrics.Parries += ability.Parries
+	actionMetrics.Blocks += ability.Blocks
+	actionMetrics.Glances += ability.Glances
 	actionMetrics.Damage += ability.TotalDamage
 	characterMetrics.TotalDamage += ability.TotalDamage
 

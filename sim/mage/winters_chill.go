@@ -21,14 +21,14 @@ func (mage *Mage) newWintersChillTemplate(sim *core.Simulation) core.SimpleSpell
 				IgnoreManaCost:  true,
 			},
 		},
-		SpellHitEffect: core.SpellHitEffect{
+		Effect: core.SpellHitEffect{
 			SpellEffect: core.SpellEffect{},
 		},
 	}
 
-	spell.SpellHitEffect.SpellEffect.BonusSpellHitRating += float64(mage.Talents.ElementalPrecision) * 1 * core.SpellHitRatingPerHitChance
+	spell.Effect.BonusSpellHitRating += float64(mage.Talents.ElementalPrecision) * 1 * core.SpellHitRatingPerHitChance
 
-	spell.SpellHitEffect.OnSpellHit = func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+	spell.Effect.OnSpellHit = func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 		// Don't overwrite the permanent version.
 		if spellEffect.Target.RemainingAuraDuration(sim, core.WintersChillDebuffID) == core.NeverExpires {
 			return
@@ -47,7 +47,7 @@ func (mage *Mage) procWintersChill(sim *core.Simulation, target *core.Target) {
 	mage.wintersChillCastTemplate.Apply(wintersChill)
 
 	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	wintersChill.Target = target
+	wintersChill.Effect.Target = target
 	wintersChill.Init(sim)
 	wintersChill.Cast(sim)
 }

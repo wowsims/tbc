@@ -4,14 +4,16 @@ import (
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
+	"github.com/wowsims/tbc/sim/core/items"
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 var StormstrikeCD = core.NewCooldownID()
 var StormstrikeDebuffID = core.NewDebuffID()
 var StormstrikeActionID = core.ActionID{SpellID: 17364, CooldownID: StormstrikeCD}
+var SkyshatterAPBonusAuraID = core.NewAuraID()
 
-func (shaman *Shaman) newStormstrikeTemplate(sim *core.Simulation) core.MeleeAbilittyTemplate {
+func (shaman *Shaman) newStormstrikeTemplate(sim *core.Simulation) core.MeleeAbilityTemplate {
 
 	ssDebuffAura := core.Aura{
 		ID:       StormstrikeDebuffID,
@@ -32,46 +34,77 @@ func (shaman *Shaman) newStormstrikeTemplate(sim *core.Simulation) core.MeleeAbi
 		}
 	}
 
+	hasSkyshatter4p := ItemSetSkyshatterHarness.CharacterHasSetBonus(&shaman.Character, 4)
+	const skyshatterDur = time.Second * 12
 	ss := core.ActiveMeleeAbility{
 		MeleeAbility: core.MeleeAbility{
 			// ID for the action.
 			ActionID: StormstrikeActionID,
-			Name:     "Stormstrike",
 			Cooldown: time.Second * 10,
 			Cost: core.ResourceCost{
 				Type:  stats.Mana,
 				Value: 237,
 			},
-			CritMultiplier:  2.0,
-			ResetSwingTimer: true,
-			Character:       &shaman.Character,
+			CritMultiplier: 2.0,
+			Character:      &shaman.Character,
 		},
-		WeaponDamageInput: core.WeaponDamageInput{
-			MainHand: 1.0,
-			Offhand:  1.0,
+		Effects: []core.AbilityHitEffect{
+			core.AbilityHitEffect{
+				AbilityEffect: core.AbilityEffect{
+					DamageMultiplier:       1.0,
+					StaticDamageMultiplier: 1.0,
+				},
+				WeaponInput: core.WeaponDamageInput{
+					IsOH:             false,
+					DamageMultiplier: 1.0,
+				},
+			},
+			core.AbilityHitEffect{
+				AbilityEffect: core.AbilityEffect{
+					DamageMultiplier:       1.0,
+					StaticDamageMultiplier: 1.0,
+					ReuseMainHitRoll:       true,
+				},
+				WeaponInput: core.WeaponDamageInput{
+					IsOH:             true,
+					DamageMultiplier: 1.0,
+				},
+			},
 		},
-		AbilityEffect: core.AbilityEffect{
-			DamageMultiplier:       1.0,
-			StaticDamageMultiplier: 1.0,
-			IgnoreDualWieldPenalty: true,
-		},
-		OnMeleeAttack: func(sim *core.Simulation, target *core.Target, result core.MeleeHitType, ability *core.ActiveMeleeAbility, isOH bool) {
+		OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
+			if !hitEffect.Landed() {
+				return
+			}
+
 			ssDebuffAura.Stacks = 2
-			target.ReplaceAura(sim, ssDebuffAura)
+			hitEffect.Target.ReplaceAura(sim, ssDebuffAura)
+			if hasSkyshatter4p {
+				shaman.Character.AddAuraWithTemporaryStats(sim, SkyshatterAPBonusAuraID, core.ActionID{SpellID: 38432}, stats.SpellPower, 70, skyshatterDur)
+			}
 		},
 	}
 
-	// Add weapon % bonus to stormstrike weapons
-	ss.MainHand *= 1 + 0.02*float64(shaman.Talents.WeaponMastery)
-	ss.Offhand *= 1 + 0.02*float64(shaman.Talents.WeaponMastery)
+	if shaman.Equip[items.ItemSlotRanged].ID == StormfuryTotem {
+		ss.MeleeAbility.Cost.Value -= 22
+	}
 
-	return core.NewMeleeAbilittyTemplate(ss)
+	if ItemSetCycloneHarness.CharacterHasSetBonus(&shaman.Character, 4) {
+		ss.Effects[0].WeaponInput.FlatDamageBonus += 30
+		ss.Effects[1].WeaponInput.FlatDamageBonus += 30
+	}
+
+	// Add weapon % bonus to stormstrike weapons
+	ss.Effects[0].WeaponInput.DamageMultiplier *= 1 + 0.02*float64(shaman.Talents.WeaponMastery)
+	ss.Effects[1].WeaponInput.DamageMultiplier *= 1 + 0.02*float64(shaman.Talents.WeaponMastery)
+
+	return core.NewMeleeAbilityTemplate(ss)
 }
 
 func (shaman *Shaman) NewStormstrike(sim *core.Simulation, target *core.Target) *core.ActiveMeleeAbility {
 	ss := &shaman.stormstrikeSpell
 	shaman.stormstrikeTemplate.Apply(ss)
 	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	ss.Target = target
+	ss.Effects[0].Target = target
+	ss.Effects[1].Target = target
 	return ss
 }

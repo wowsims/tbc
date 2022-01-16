@@ -25,7 +25,7 @@ func (mage *Mage) newFrostboltTemplate(sim *core.Simulation) core.SimpleSpellTem
 				Binary: true,
 			},
 		},
-		SpellHitEffect: core.SpellHitEffect{
+		Effect: core.SpellHitEffect{
 			SpellEffect: core.SpellEffect{
 				DamageMultiplier:       1,
 				StaticDamageMultiplier: mage.spellDamageMultiplier,
@@ -40,14 +40,14 @@ func (mage *Mage) newFrostboltTemplate(sim *core.Simulation) core.SimpleSpellTem
 
 	spell.CastTime -= time.Millisecond * 100 * time.Duration(mage.Talents.ImprovedFrostbolt)
 	spell.ManaCost -= spell.BaseManaCost * float64(mage.Talents.FrostChanneling) * 0.05
-	spell.SpellHitEffect.SpellEffect.BonusSpellHitRating += float64(mage.Talents.ElementalPrecision) * 1 * core.SpellHitRatingPerHitChance
-	spell.SpellHitEffect.SpellEffect.BonusSpellCritRating += float64(mage.Talents.EmpoweredFrostbolt) * 1 * core.SpellCritRatingPerCritChance
-	spell.SpellHitEffect.SpellEffect.StaticDamageMultiplier *= 1 + 0.02*float64(mage.Talents.PiercingIce)
-	spell.SpellHitEffect.SpellEffect.StaticDamageMultiplier *= 1 + 0.01*float64(mage.Talents.ArcticWinds)
-	spell.SpellHitEffect.DirectInput.SpellCoefficient += 0.02 * float64(mage.Talents.EmpoweredFrostbolt)
+	spell.Effect.BonusSpellHitRating += float64(mage.Talents.ElementalPrecision) * 1 * core.SpellHitRatingPerHitChance
+	spell.Effect.BonusSpellCritRating += float64(mage.Talents.EmpoweredFrostbolt) * 1 * core.SpellCritRatingPerCritChance
+	spell.Effect.StaticDamageMultiplier *= 1 + 0.02*float64(mage.Talents.PiercingIce)
+	spell.Effect.StaticDamageMultiplier *= 1 + 0.01*float64(mage.Talents.ArcticWinds)
+	spell.Effect.DirectInput.SpellCoefficient += 0.02 * float64(mage.Talents.EmpoweredFrostbolt)
 
 	if ItemSetTempestRegalia.CharacterHasSetBonus(&mage.Character, 4) {
-		spell.SpellHitEffect.SpellEffect.StaticDamageMultiplier *= 1.05
+		spell.Effect.StaticDamageMultiplier *= 1.05
 	}
 
 	return core.NewSimpleSpellTemplate(spell)
@@ -59,7 +59,7 @@ func (mage *Mage) NewFrostbolt(sim *core.Simulation, target *core.Target) *core.
 	mage.frostboltCastTemplate.Apply(frostbolt)
 
 	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	frostbolt.Target = target
+	frostbolt.Effect.Target = target
 	frostbolt.Init(sim)
 
 	return frostbolt
