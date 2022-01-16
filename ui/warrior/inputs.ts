@@ -97,6 +97,7 @@ export const WarriorRotationConfig = {
 					'rotation-type-enum-picker',
 				],
 				label: 'Primary Instant',
+				labeTtooltip:'Main instant ability that will be prioritized above everything else while it is off CD.',
 				values: [
 					{
 						name: 'Bloodthirst', value: PrimaryInstant.Bloodthirst,
