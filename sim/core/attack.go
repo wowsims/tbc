@@ -270,9 +270,6 @@ func (effect *AbilityEffect) String() string {
 func (ahe *AbilityHitEffect) calculateDamage(sim *Simulation, ability *ActiveMeleeAbility) {
 	character := ability.Character
 
-	attackPower := character.stats[stats.AttackPower] + ahe.BonusAttackPower
-	bonusWeaponDamage := ahe.BonusWeaponDamage
-
 	if ahe.AbilityEffect.ReuseMainHitRoll {
 		ahe.HitType = ability.Effects[0].HitType
 	} else {
@@ -283,6 +280,9 @@ func (ahe *AbilityHitEffect) calculateDamage(sim *Simulation, ability *ActiveMel
 		ahe.Damage = 0
 		return
 	}
+
+	attackPower := character.stats[stats.AttackPower] + ahe.BonusAttackPower
+	bonusWeaponDamage := ahe.BonusWeaponDamage
 
 	dmg := 0.0
 	if ahe.WeaponInput.DamageMultiplier != 0 {
@@ -295,7 +295,12 @@ func (ahe *AbilityHitEffect) calculateDamage(sim *Simulation, ability *ActiveMel
 		dmg += ahe.WeaponInput.FlatDamageBonus
 	}
 
-	// TODO: Add damage from DirectDamageInput
+	// Add damage from DirectInput
+	if ahe.DirectInput.MinBaseDamage != 0 {
+		dmg += ahe.DirectInput.MinBaseDamage + (ahe.DirectInput.MaxBaseDamage-ahe.DirectInput.MinBaseDamage)*sim.RandomFloat("Melee Direct Input")
+	}
+	dmg += attackPower * ahe.DirectInput.SpellCoefficient
+	dmg += ahe.DirectInput.FlatDamageBonus
 
 	// If this is a yellow attack, need a 2nd roll to decide crit. Otherwise just use existing hit result.
 	if !ahe.AbilityEffect.IsWhiteHit {

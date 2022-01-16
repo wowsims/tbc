@@ -16,15 +16,20 @@ func init() {
 	core.AddItemEffect(28437, ApplyDrakefistHammer)
 	core.AddItemEffect(28438, ApplyDragonmaw)
 	core.AddItemEffect(28439, ApplyDragonstrike)
+	core.AddItemEffect(28573, ApplyDespair)
+	core.AddItemEffect(28767, ApplyTheDecapitator)
 	core.AddItemEffect(28774, ApplyGlaiveOfThePit)
 	core.AddItemEffect(29348, ApplyTheBladefist)
 	core.AddItemEffect(29996, ApplyRodOfTheSunKing)
 	core.AddItemEffect(30090, ApplyWorldBreaker)
+	core.AddItemEffect(30311, ApplyWarpSlicer)
 	core.AddItemEffect(30316, ApplyDevastation)
 	core.AddItemEffect(31318, ApplySingingCrystalAxe)
 	core.AddItemEffect(31331, ApplyTheNightBlade)
-	// decapitator
-	// despair
+
+	// TODO:
+	// blinkstrike
+	// syphon of the nathrezim
 }
 
 var KhoriumChampionAuraID = core.NewAuraID()
@@ -209,6 +214,111 @@ func ApplyDragonstrike(agent core.Agent) {
 	})
 }
 
+var DespairAuraID = core.NewAuraID()
+
+func ApplyDespair(agent core.Agent) {
+	character := agent.GetCharacter()
+	actionID := core.ActionID{SpellID: 34580}
+
+	templ := core.ActiveMeleeAbility{
+		MeleeAbility: core.MeleeAbility{
+			ActionID:        actionID,
+			CritMultiplier:  2.0,
+			Character:       character,
+			IgnoreCooldowns: true,
+			IgnoreCost:      true,
+		},
+		Effect: core.AbilityHitEffect{
+			AbilityEffect: core.AbilityEffect{
+				DamageMultiplier:       1.0,
+				StaticDamageMultiplier: 1.0,
+			},
+			DirectInput: core.DirectDamageInput{
+				FlatDamageBonus: 600,
+			},
+		},
+	}
+
+	abilityTemplate := core.NewMeleeAbilityTemplate(templ)
+	cast := core.ActiveMeleeAbility{}
+
+	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
+		const procChance = 0.5 * 3.5 / 60.0
+
+		return core.Aura{
+			ID: DespairAuraID,
+			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
+				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() {
+					return
+				}
+				if sim.RandomFloat("Despair") > procChance {
+					return
+				}
+
+				abilityTemplate.Apply(&cast)
+				cast.Effect.Target = sim.GetPrimaryTarget()
+				cast.Attack(sim)
+			},
+		}
+	})
+}
+
+var TheDecapitatorCooldownID = core.NewCooldownID()
+
+func ApplyTheDecapitator(agent core.Agent) {
+	character := agent.GetCharacter()
+	actionID := core.ActionID{SpellID: 37208}
+
+	templ := core.ActiveMeleeAbility{
+		MeleeAbility: core.MeleeAbility{
+			ActionID:        actionID,
+			CritMultiplier:  2.0,
+			Character:       character,
+			IgnoreCooldowns: true,
+			IgnoreCost:      true,
+		},
+		Effect: core.AbilityHitEffect{
+			AbilityEffect: core.AbilityEffect{
+				DamageMultiplier:       1.0,
+				StaticDamageMultiplier: 1.0,
+			},
+			DirectInput: core.DirectDamageInput{
+				MinBaseDamage: 513,
+				MaxBaseDamage: 567,
+			},
+		},
+	}
+
+	abilityTemplate := core.NewMeleeAbilityTemplate(templ)
+	ability := core.ActiveMeleeAbility{}
+
+	character.AddMajorCooldown(core.MajorCooldown{
+		ActionID:         actionID,
+		CooldownID:       TheDecapitatorCooldownID,
+		Cooldown:         time.Minute * 3,
+		SharedCooldownID: core.OffensiveTrinketSharedCooldownID,
+		SharedCooldown:   time.Second * 10,
+		Priority:         core.CooldownPriorityLow, // Use low prio so other actives get used first.
+		Type:             core.CooldownTypeDPS,
+		CanActivate: func(sim *core.Simulation, character *core.Character) bool {
+			return true
+		},
+		ShouldActivate: func(sim *core.Simulation, character *core.Character) bool {
+			return true
+		},
+		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
+			return func(sim *core.Simulation, character *core.Character) {
+				abilityTemplate.Apply(&ability)
+				ability.Effect.Target = sim.GetPrimaryTarget()
+				ability.Attack(sim)
+
+				character.SetCD(TheDecapitatorCooldownID, sim.CurrentTime+time.Minute*3)
+				character.SetCD(core.OffensiveTrinketSharedCooldownID, sim.CurrentTime+time.Second*10)
+			}
+		},
+	})
+}
+
 var GlaiveOfThePitAuraID = core.NewAuraID()
 var GlaiveOfThePitProcAuraID = core.NewAuraID()
 
@@ -339,6 +449,41 @@ func ApplyWorldBreaker(agent core.Agent) {
 				}
 
 				character.AddAuraWithTemporaryStats(sim, WorldBreakerProcAuraID, core.ActionID{ItemID: 30090}, stats.MeleeCrit, critBonus, dur)
+			},
+		}
+	})
+}
+
+var WarpSlicerAuraID = core.NewAuraID()
+var WarpSlicerProcAuraID = core.NewAuraID()
+
+func ApplyWarpSlicer(agent core.Agent) {
+	character := agent.GetCharacter()
+	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
+		const bonus = 1.2
+		const inverseBonus = 1 / 1.2
+		const dur = time.Second * 30
+		const procChance = 0.5
+
+		return core.Aura{
+			ID: WarpSlicerAuraID,
+			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
+				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() {
+					return
+				}
+				if sim.RandomFloat("WarpSlicer") > procChance {
+					return
+				}
+
+				character.MultiplyMeleeSpeed(sim, bonus)
+				character.AddAura(sim, core.Aura{
+					ID:       WarpSlicerProcAuraID,
+					ActionID: core.ActionID{ItemID: 30311},
+					Expires:  sim.CurrentTime + dur,
+					OnExpire: func(sim *core.Simulation) {
+						character.MultiplyMeleeSpeed(sim, inverseBonus)
+					},
+				})
 			},
 		}
 	})
