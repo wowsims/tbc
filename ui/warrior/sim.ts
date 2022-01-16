@@ -113,19 +113,15 @@ export class WarriorSimUI extends IndividualSimUI<Spec.SpecWarrior> {
 			],
 			// IconInputs to include in the 'Other Buffs' section on the settings tab.
 			raidBuffInputs: [
-				IconInputs.DivineSpirit,
 				IconInputs.GiftOfTheWild,
 			],
 			partyBuffInputs: [
-				//Replace with Feral aura
-				IconInputs.MoonkinAura,
+				IconInputs.LeaderOfThePack,
 				IconInputs.DrumsOfBattleBuff,
 				IconInputs.Bloodlust,
-				// Replace with windfury totem
-				IconInputs.WrathOfAirTotem,
-				// Replace with strength of earth totem
-				IconInputs.ManaTideTotem,
-				// Add Unleashed Rage
+				// IconInputs.WindfuryTotem,
+				// IconInputs.StrengthOfEarthTotem,
+				// IconInputs.UnleashedRage,
 				IconInputs.DraeneiRacialMelee,
 				IconInputs.BraidedEterniumChain
 			],
@@ -135,23 +131,22 @@ export class WarriorSimUI extends IndividualSimUI<Spec.SpecWarrior> {
 			],
 			// IconInputs to include in the 'Debuffs' section on the settings tab.
 			debuffInputs: [
-				// Add Improved hunters mark and bloodfrenzy
+				// IconInputs.ImprovedHuntersMark,
+				IconInputs.BloodFrenzy,
 				IconInputs.ImprovedSealOfTheCrusader,
 				IconInputs.CurseOfRecklessness,
 			],
 			// IconInputs to include in the 'Consumes' section on the settings tab.
 			consumeInputs: [
 				IconInputs.DefaultHastePotion,
-				// Replace with Mighty Rage potion
-				IconInputs.DefaultDestructionPotion,
+				// IconInputs.DefaultMightyRagePotion,
 				IconInputs.ElixirOfMajorAgility,
-				// Replace with Elixir of the Mongoose
-				IconInputs.ElixirOfMajorFrostPower,
-				IconInputs.BrilliantWizardOil,
-				IconInputs.SuperiorWizardOil,
-				IconInputs.BlackenedBasilisk,
-				IconInputs.SkullfishSoup,
-				IconInputs.KreegsStoutBeatdown,
+				// IconInputs.ElixirOfTheMongoose,
+				IconInputs.ElixirOfDemonslaying,
+				// IconInputs.AdamantiteStone,
+				// IconInputs.ElementalStone,
+				IconInputs.RoastedClefthoof,
+				// IconInputs.SpicyHotTalbuk,
 			],
 			// Inputs to include in the 'Rotation' section on the settings tab.
 			rotationInputs: WarriorInputs.WarriorRotationConfig,
