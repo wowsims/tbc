@@ -2,6 +2,7 @@ import { Consumes } from '/tbc/core/proto/common.js';
 import { EquipmentSpec } from '/tbc/core/proto/common.js';
 import { ItemSpec } from '/tbc/core/proto/common.js';
 import { Potions } from '/tbc/core/proto/common.js';
+import { Spec } from '/tbc/core/proto/common.js';
 import { Faction } from '/tbc/core/proto_utils/utils.js';
 import { Player } from '/tbc/core/player.js';
 
@@ -108,6 +109,7 @@ export const DefaultGeneralRotation = WarriorRotation.create({
 export const P1_FURY_PRESET = {
 	name: 'P1 Fury Preset',
 	tooltip: Tooltips.BASIC_BIS_DISCLAIMER,
+	enableWhen: (player: Player<Spec.SpecWarrior>) => player.getRotation().type == RotationType.Fury,
 	gear: EquipmentSpec.create({
 		items: [
 			ItemSpec.create({
@@ -215,6 +217,7 @@ export const P1_FURY_PRESET = {
 export const P1_ARMSSLAM_PRESET = {
 	name: 'P1 Arms Slam Preset',
 	tooltip: Tooltips.BASIC_BIS_DISCLAIMER,
+	enableWhen: (player: Player<Spec.SpecWarrior>) => player.getRotation().type == RotationType.ArmsSlam,
 	gear: EquipmentSpec.create({
 		items: [
 			ItemSpec.create({
@@ -318,6 +321,7 @@ export const P1_ARMSSLAM_PRESET = {
 export const P1_ARMSDW_PRESET = {
 	name: 'P1 Arms DW Preset',
 	tooltip: Tooltips.BASIC_BIS_DISCLAIMER,
+	enableWhen: (player: Player<Spec.SpecWarrior>) => player.getRotation().type == RotationType.ArmsDW,
 	gear: EquipmentSpec.create({
 		items: [
 			ItemSpec.create({
