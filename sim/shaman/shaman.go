@@ -14,6 +14,7 @@ func NewShaman(character core.Character, talents proto.ShamanTalents, selfBuffs 
 		Talents:   talents,
 		SelfBuffs: selfBuffs,
 	}
+	shaman.EnableManaBar()
 
 	// Add Shaman stat dependencies
 	shaman.AddStatDependency(stats.StatDependency{
