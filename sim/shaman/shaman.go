@@ -250,11 +250,11 @@ func (shaman *Shaman) Reset(sim *core.Simulation) {
 				shaman.SelfBuffs.NextTotemDropType[i] = int32(shaman.SelfBuffs.EarthTotem)
 			}
 		case FireTotem:
-			if shaman.SelfBuffs.FireTotem != proto.FireTotem_NoFireTotem {
-				shaman.SelfBuffs.NextTotemDropType[i] = int32(shaman.SelfBuffs.FireTotem)
-				if shaman.SelfBuffs.TwistFireNova {
-					shaman.SelfBuffs.NextTotemDropType[FireTotem] = int32(proto.FireTotem_FireNovaTotem) // start by dropping nova, then alternating.
-				}
+			shaman.SelfBuffs.NextTotemDropType[i] = int32(shaman.SelfBuffs.FireTotem)
+			if shaman.SelfBuffs.TwistFireNova {
+				shaman.SelfBuffs.NextTotemDropType[FireTotem] = int32(proto.FireTotem_FireNovaTotem) // start by dropping nova, then alternating.
+			}
+			if shaman.SelfBuffs.NextTotemDropType[i] != int32(proto.FireTotem_NoFireTotem) {
 				shaman.SelfBuffs.NextTotemDrops[i] = time.Second * 120 // 2 min until drop totems
 				if shaman.SelfBuffs.FireTotem != proto.FireTotem_TotemOfWrath {
 					shaman.SelfBuffs.NextTotemDrops[i] = 0 // attack totems we drop immediately

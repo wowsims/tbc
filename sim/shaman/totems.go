@@ -106,7 +106,8 @@ func (shaman *Shaman) tryTwistFireNova(sim *core.Simulation) {
 		return
 	}
 
-	if shaman.SelfBuffs.NextTotemDropType[FireTotem] != int32(proto.FireTotem_FireNovaTotem) {
+	if shaman.SelfBuffs.NextTotemDropType[FireTotem] != int32(proto.FireTotem_FireNovaTotem) ||
+		shaman.SelfBuffs.FireTotem == proto.FireTotem_NoFireTotem {
 		shaman.SelfBuffs.NextTotemDropType[FireTotem] = int32(proto.FireTotem_FireNovaTotem)
 		shaman.SelfBuffs.NextTotemDrops[FireTotem] = sim.CurrentTime + shaman.GetRemainingCD(CooldownIDNovaTotem, sim.CurrentTime)
 	} else {
