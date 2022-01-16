@@ -156,7 +156,7 @@ export const P1_FURY_PRESET = {
 				],
 			}),
 			ItemSpec.create({
-				id: 21847, // Gauntlets of Martial Perfection
+				id: 28824, // Gauntlets of Martial Perfection
 				enchant: Enchants.GLOVES_STRENGTH,
 				gems: [
 					// Gems.JAGGED_TALASITE,
@@ -264,7 +264,7 @@ export const P1_ARMSSLAM_PRESET = {
 				],
 			}),
 			ItemSpec.create({
-				id: 21847, // Gauntlets of Martial Perfection
+				id: 28824, // Gauntlets of Martial Perfection
 				enchant: Enchants.GLOVES_STRENGTH,
 				gems: [
 					// Gems.JAGGED_TALASITE,
@@ -368,7 +368,7 @@ export const P1_ARMSDW_PRESET = {
 				],
 			}),
 			ItemSpec.create({
-				id: 21847, // Gauntlets of Martial Perfection
+				id: 28824, // Gauntlets of Martial Perfection
 				enchant: Enchants.GLOVES_STRENGTH,
 				gems: [
 					// Gems.JAGGED_TALASITE,
