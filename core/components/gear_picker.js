@@ -146,7 +146,7 @@ class SelectorModal extends Component {
                 name: item.name,
                 quality: item.quality,
                 phase: item.phase,
-                baseEP: this.player.computeStatsEP(item.stats),
+                baseEP: this.player.computeItemEP(item),
                 ignoreEPFilter: false,
                 onEquip: (eventID, item) => {
                     const equippedItem = this.player.getEquippedItem(slot);
@@ -373,7 +373,7 @@ class SelectorModal extends Component {
             validItemElems = validItemElems.filter(elem => Number(elem.dataset.phase) <= phase);
             // If not a trinket slot, filter out items without EP values.
             if ((slot != ItemSlot.ItemSlotTrinket1 && slot != ItemSlot.ItemSlotTrinket2 && slot != ItemSlot.ItemSlotRanged)) {
-                validItemElems = validItemElems.filter(elem => (Number(elem.dataset.baseEP) > 1 || elem.dataset.ignoreEPFilter == "true"));
+                validItemElems = validItemElems.filter(elem => (Number(elem.dataset.baseEP) > 1 || elem.dataset.ignoreEPFilter == 'true'));
             }
             const currentEquippedItem = this.player.getEquippedItem(slot);
             if (label == 'Enchants' && currentEquippedItem) {
