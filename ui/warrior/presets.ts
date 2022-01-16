@@ -111,98 +111,102 @@ export const P1_FURY_PRESET = {
 	gear: EquipmentSpec.create({
 		items: [
 			ItemSpec.create({
-				id: 29076, // Collar of the Aldor
-				enchant: Enchants.GLYPH_OF_POWER,
+				id: 29021, // Warbringer Battle Helm
+				enchant: Enchants.GLYPH_OF_FEROCITY,
 				gems: [
-					Gems.CHAOTIC_SKYFIRE_DIAMOND,
-					Gems.GLOWING_NIGHTSEYE,
+					Gems.RELENTLESS_EARTHSTORM_DIAMOND,
+					// Gems.SMOOTH_DAWWNSTONE,
 				],
 			}),
 			ItemSpec.create({
-				id: 28134, // Brooch of Heightened Potential
+				id: 29381, // Choker of Vile Intent
 			}),
 			ItemSpec.create({
-				id: 29079, // Pauldrons of the Aldor
-				enchant: Enchants.GREATER_INSCRIPTION_OF_DISCIPLINE,
+				id: 29023, // Warbringer Shoulderplates
+				enchant: Enchants.GREATER_INSCRIPTION_OF_VENGEANCE,
 				gems: [
-					Gems.VEILED_NOBLE_TOPAZ,
-					Gems.RUNED_LIVING_RUBY,
+					// Gems.SMOOTH_DAWNSTONE,
+					// Gems.JAGGED_TALASITE,
 				],
 			}),
 			ItemSpec.create({
-				id: 28766, // Ruby Drape of the Mysticant
-				enchant: Enchants.SUBTLETY,
+				id: 24259, // Vengeance Wrap
+				enchant: Enchants.CLOAK_GREATER_AGILITY,
+				gems: [
+					Gems.INSCRIBED_NOBLE_TOPAZ
+				],
 			}),
 			ItemSpec.create({
-				id: 21848, // Spellfire Robe
+				id: 29019, // Warbringer Breastplate
 				enchant: Enchants.CHEST_EXCEPTIONAL_STATS,
 				gems: [
-					Gems.VEILED_NOBLE_TOPAZ,
-					Gems.VEILED_NOBLE_TOPAZ,
+					// Gems.SMOOTH_DAWNSTONE,
+					// Gems.SMOOTH_DAWNSTONE,
+					// Gems.SMOOTH_DAWNSTONE,
 				],
 			}),
 			ItemSpec.create({
-				id: 28411, // General's Silk Cuffs
-				enchant: Enchants.WRIST_SPELLPOWER,
+				id: 28795, // Bladespire Warbands
+				enchant: Enchants.WRIST_BRAWN,
 				gems: [
-					Gems.VEILED_NOBLE_TOPAZ,
+					// Gems.JAGGED_TALASITE,
+					Gems.INSCRIBED_NOBLE_TOPAZ,
 				],
 			}),
 			ItemSpec.create({
-				id: 21847, // Spellfire Gloves
-				enchant: Enchants.GLOVES_SPELLPOWER,
+				id: 21847, // Gauntlets of Martial Perfection
+				enchant: Enchants.GLOVES_STRENGTH,
 				gems: [
-					Gems.VEILED_NOBLE_TOPAZ,
-					Gems.GLOWING_NIGHTSEYE,
+					// Gems.JAGGED_TALASITE,
+					// Gems.SMOOTH_DAWNSTONE,
 				],
 			}),
 			ItemSpec.create({
-				id: 21846, // Spellfire Belt
+				id: 28779, // Girdle of the Endless Pit
 				gems: [
-					Gems.VEILED_NOBLE_TOPAZ,
-					Gems.VEILED_NOBLE_TOPAZ,
+					Gems.INSCRIBED_NOBLE_TOPAZ,
+					// Gems.JAGGED_TALASITE,
 				],
 			}),
 			ItemSpec.create({
-				id: 24262, // Spellstrike Pants
-				enchant: Enchants.RUNIC_SPELLTHREAD,
+				id: 28741, // Skulker's Greaves
+				enchant: Enchants.NETHERCOBRA_LEG_ARMOR,
 				gems: [
-					Gems.VEILED_NOBLE_TOPAZ,
-					Gems.VEILED_NOBLE_TOPAZ,
-					Gems.VEILED_NOBLE_TOPAZ,
+					// Gems.SMOOTH_DAWNSTONE,
+					// Gems.SMOOTH_DAWNSTONE,
+					// Gems.SMOOTH_DAWNSTONE,
 				],
 			}),
 			ItemSpec.create({
-				id: 28517, // Boots of Foretelling
-				enchant: Enchants.BOARS_SPEED,
+				id: 28608, // Ironstriders of Urgency
+				enchant: Enchants.FEET_CATS_SWIFTNESS,
 				gems: [
-					Gems.VEILED_NOBLE_TOPAZ,
-					Gems.VEILED_NOBLE_TOPAZ,
+					Gems.INSCRIBED_NOBLE_TOPAZ,
+					// Gems.SMOOTH_DAWNSTONE,
 				],
 			}),
 			ItemSpec.create({
-				id: 28793, // Band of Crimson Fury
-				enchant: Enchants.RING_SPELLPOWER,
+				id: 28757, // Ring of a Thousand Marks
 			}),
 			ItemSpec.create({
-				id: 29172, // Ashyen's Gift
-				enchant: Enchants.RING_SPELLPOWER,
+				id: 30834, // Shapeshifter's Signet
 			}),
 			ItemSpec.create({
-				id: 29370, // Icon of the Silver Crescent
+				id: 29383, // Bloodlust Brooch
 			}),
 			ItemSpec.create({
-				id: 27683, // Quagmirran's Eye
+				id: 28830, // Dragonspine Trophy
 			}),
 			ItemSpec.create({
-				id: 28802, // Bloodmaw Magus Blade
-				enchant: Enchants.SUNFIRE,
+				id: 28438, // Dragonmaw
+				enchant: Enchants.MONGOOSE,
 			}),
 			ItemSpec.create({
-				id: 29270, // Flametongue Seal
+				id: 28729, // Spiteblade
+				enchant: Enchants.MONGOOSE,
 			}),
 			ItemSpec.create({
-				id: 28673, // Tirisfal Wand of Ascendancy
+				id: 30279, // Mama's Insurance
 			}),
 		],
 	}),
@@ -214,98 +218,98 @@ export const P1_ARMSSLAM_PRESET = {
 	gear: EquipmentSpec.create({
 		items: [
 			ItemSpec.create({
-				id: 29076, // Collar of the Aldor
-				enchant: Enchants.GLYPH_OF_POWER,
+				id: 29021, // Warbringer Battle Helm
+				enchant: Enchants.GLYPH_OF_FEROCITY,
 				gems: [
-					Gems.CHAOTIC_SKYFIRE_DIAMOND,
-					Gems.GLOWING_NIGHTSEYE,
+					Gems.RELENTLESS_EARTHSTORM_DIAMOND,
+					// Gems.SMOOTH_DAWWNSTONE,
 				],
 			}),
 			ItemSpec.create({
-				id: 28134, // Brooch of Heightened Potential
+				id: 29349, // Adamantine Chain of the Unbroken
 			}),
 			ItemSpec.create({
-				id: 29079, // Pauldrons of the Aldor
-				enchant: Enchants.GREATER_INSCRIPTION_OF_DISCIPLINE,
+				id: 29023, // Warbringer Shoulderplates
+				enchant: Enchants.GREATER_INSCRIPTION_OF_VENGEANCE,
 				gems: [
-					Gems.VEILED_NOBLE_TOPAZ,
-					Gems.RUNED_LIVING_RUBY,
+					// Gems.SMOOTH_DAWNSTONE,
+					// Gems.JAGGED_TALASITE,
 				],
 			}),
 			ItemSpec.create({
-				id: 28766, // Ruby Drape of the Mysticant
-				enchant: Enchants.SUBTLETY,
+				id: 24259, // Vengeance Wrap
+				enchant: Enchants.CLOAK_GREATER_AGILITY,
+				gems: [
+					Gems.INSCRIBED_NOBLE_TOPAZ
+				],
 			}),
 			ItemSpec.create({
-				id: 21848, // Spellfire Robe
+				id: 29019, // Warbringer Breastplate
 				enchant: Enchants.CHEST_EXCEPTIONAL_STATS,
 				gems: [
-					Gems.VEILED_NOBLE_TOPAZ,
-					Gems.VEILED_NOBLE_TOPAZ,
+					// Gems.SMOOTH_DAWNSTONE,
+					// Gems.SMOOTH_DAWNSTONE,
+					// Gems.SMOOTH_DAWNSTONE,
 				],
 			}),
 			ItemSpec.create({
-				id: 28411, // General's Silk Cuffs
-				enchant: Enchants.WRIST_SPELLPOWER,
+				id: 28795, // Bladespire Warbands
+				enchant: Enchants.WRIST_BRAWN,
 				gems: [
-					Gems.VEILED_NOBLE_TOPAZ,
+					// Gems.JAGGED_TALASITE,
+					Gems.INSCRIBED_NOBLE_TOPAZ,
 				],
 			}),
 			ItemSpec.create({
-				id: 21847, // Spellfire Gloves
-				enchant: Enchants.GLOVES_SPELLPOWER,
+				id: 21847, // Gauntlets of Martial Perfection
+				enchant: Enchants.GLOVES_STRENGTH,
 				gems: [
-					Gems.VEILED_NOBLE_TOPAZ,
-					Gems.GLOWING_NIGHTSEYE,
+					// Gems.JAGGED_TALASITE,
+					// Gems.SMOOTH_DAWNSTONE,
 				],
 			}),
 			ItemSpec.create({
-				id: 21846, // Spellfire Belt
+				id: 28779, // Girdle of the Endless Pit
 				gems: [
-					Gems.VEILED_NOBLE_TOPAZ,
-					Gems.VEILED_NOBLE_TOPAZ,
+					Gems.INSCRIBED_NOBLE_TOPAZ,
+					// Gems.JAGGED_TALASITE,
 				],
 			}),
 			ItemSpec.create({
-				id: 24262, // Spellstrike Pants
-				enchant: Enchants.RUNIC_SPELLTHREAD,
+				id: 28741, // Skulker's Greaves
+				enchant: Enchants.NETHERCOBRA_LEG_ARMOR,
 				gems: [
-					Gems.VEILED_NOBLE_TOPAZ,
-					Gems.VEILED_NOBLE_TOPAZ,
-					Gems.VEILED_NOBLE_TOPAZ,
+					// Gems.SMOOTH_DAWNSTONE,
+					// Gems.SMOOTH_DAWNSTONE,
+					// Gems.SMOOTH_DAWNSTONE,
 				],
 			}),
 			ItemSpec.create({
-				id: 28517, // Boots of Foretelling
-				enchant: Enchants.BOARS_SPEED,
+				id: 28608, // Ironstriders of Urgency
+				enchant: Enchants.FEET_CATS_SWIFTNESS,
 				gems: [
-					Gems.VEILED_NOBLE_TOPAZ,
-					Gems.VEILED_NOBLE_TOPAZ,
+					Gems.INSCRIBED_NOBLE_TOPAZ,
+					// Gems.SMOOTH_DAWNSTONE,
 				],
 			}),
 			ItemSpec.create({
-				id: 28793, // Band of Crimson Fury
-				enchant: Enchants.RING_SPELLPOWER,
+				id: 28757, // Ring of a Thousand Marks
 			}),
 			ItemSpec.create({
-				id: 29172, // Ashyen's Gift
-				enchant: Enchants.RING_SPELLPOWER,
+				id: 28730, // Mithril Band of the Unscarred
 			}),
 			ItemSpec.create({
-				id: 29370, // Icon of the Silver Crescent
+				id: 29383, // Bloodlust Brooch
 			}),
 			ItemSpec.create({
-				id: 27683, // Quagmirran's Eye
+				id: 28830, // Dragonspine Trophy
 			}),
 			ItemSpec.create({
-				id: 28802, // Bloodmaw Magus Blade
-				enchant: Enchants.SUNFIRE,
+				id: 28429, // Lionheart Champion
+				enchant: Enchants.MONGOOSE,
 			}),
 			ItemSpec.create({
-				id: 29270, // Flametongue Seal
-			}),
-			ItemSpec.create({
-				id: 28673, // Tirisfal Wand of Ascendancy
+				id: 30279, // Mama's Insurance
 			}),
 		],
 	}),
@@ -317,98 +321,102 @@ export const P1_ARMSDW_PRESET = {
 	gear: EquipmentSpec.create({
 		items: [
 			ItemSpec.create({
-				id: 29076, // Collar of the Aldor
-				enchant: Enchants.GLYPH_OF_POWER,
+				id: 29021, // Warbringer Battle Helm
+				enchant: Enchants.GLYPH_OF_FEROCITY,
 				gems: [
-					Gems.CHAOTIC_SKYFIRE_DIAMOND,
-					Gems.GLOWING_NIGHTSEYE,
+					Gems.RELENTLESS_EARTHSTORM_DIAMOND,
+					// Gems.SMOOTH_DAWWNSTONE,
 				],
 			}),
 			ItemSpec.create({
-				id: 28134, // Brooch of Heightened Potential
+				id: 29349, // Adamantine Chain of the Unbroken
 			}),
 			ItemSpec.create({
-				id: 29079, // Pauldrons of the Aldor
-				enchant: Enchants.GREATER_INSCRIPTION_OF_DISCIPLINE,
+				id: 29023, // Warbringer Shoulderplates
+				enchant: Enchants.GREATER_INSCRIPTION_OF_VENGEANCE,
 				gems: [
-					Gems.VEILED_NOBLE_TOPAZ,
-					Gems.RUNED_LIVING_RUBY,
+					// Gems.SMOOTH_DAWNSTONE,
+					// Gems.JAGGED_TALASITE,
 				],
 			}),
 			ItemSpec.create({
-				id: 28766, // Ruby Drape of the Mysticant
-				enchant: Enchants.SUBTLETY,
+				id: 24259, // Vengeance Wrap
+				enchant: Enchants.CLOAK_GREATER_AGILITY,
+				gems: [
+					Gems.INSCRIBED_NOBLE_TOPAZ
+				],
 			}),
 			ItemSpec.create({
-				id: 21848, // Spellfire Robe
+				id: 29019, // Warbringer Breastplate
 				enchant: Enchants.CHEST_EXCEPTIONAL_STATS,
 				gems: [
-					Gems.VEILED_NOBLE_TOPAZ,
-					Gems.VEILED_NOBLE_TOPAZ,
+					// Gems.SMOOTH_DAWNSTONE,
+					// Gems.SMOOTH_DAWNSTONE,
+					// Gems.SMOOTH_DAWNSTONE,
 				],
 			}),
 			ItemSpec.create({
-				id: 28411, // General's Silk Cuffs
-				enchant: Enchants.WRIST_SPELLPOWER,
+				id: 28795, // Bladespire Warbands
+				enchant: Enchants.WRIST_BRAWN,
 				gems: [
-					Gems.VEILED_NOBLE_TOPAZ,
+					// Gems.JAGGED_TALASITE,
+					Gems.INSCRIBED_NOBLE_TOPAZ,
 				],
 			}),
 			ItemSpec.create({
-				id: 21847, // Spellfire Gloves
-				enchant: Enchants.GLOVES_SPELLPOWER,
+				id: 21847, // Gauntlets of Martial Perfection
+				enchant: Enchants.GLOVES_STRENGTH,
 				gems: [
-					Gems.VEILED_NOBLE_TOPAZ,
-					Gems.GLOWING_NIGHTSEYE,
+					// Gems.JAGGED_TALASITE,
+					// Gems.SMOOTH_DAWNSTONE,
 				],
 			}),
 			ItemSpec.create({
-				id: 21846, // Spellfire Belt
+				id: 28779, // Girdle of the Endless Pit
 				gems: [
-					Gems.VEILED_NOBLE_TOPAZ,
-					Gems.VEILED_NOBLE_TOPAZ,
+					Gems.INSCRIBED_NOBLE_TOPAZ,
+					// Gems.JAGGED_TALASITE,
 				],
 			}),
 			ItemSpec.create({
-				id: 24262, // Spellstrike Pants
-				enchant: Enchants.RUNIC_SPELLTHREAD,
+				id: 28741, // Skulker's Greaves
+				enchant: Enchants.NETHERCOBRA_LEG_ARMOR,
 				gems: [
-					Gems.VEILED_NOBLE_TOPAZ,
-					Gems.VEILED_NOBLE_TOPAZ,
-					Gems.VEILED_NOBLE_TOPAZ,
+					// Gems.SMOOTH_DAWNSTONE,
+					// Gems.SMOOTH_DAWNSTONE,
+					// Gems.SMOOTH_DAWNSTONE,
 				],
 			}),
 			ItemSpec.create({
-				id: 28517, // Boots of Foretelling
-				enchant: Enchants.BOARS_SPEED,
+				id: 28608, // Ironstriders of Urgency
+				enchant: Enchants.FEET_CATS_SWIFTNESS,
 				gems: [
-					Gems.VEILED_NOBLE_TOPAZ,
-					Gems.VEILED_NOBLE_TOPAZ,
+					Gems.INSCRIBED_NOBLE_TOPAZ,
+					// Gems.SMOOTH_DAWNSTONE,
 				],
 			}),
 			ItemSpec.create({
-				id: 28793, // Band of Crimson Fury
-				enchant: Enchants.RING_SPELLPOWER,
+				id: 28757, // Ring of a Thousand Marks
 			}),
 			ItemSpec.create({
-				id: 29172, // Ashyen's Gift
-				enchant: Enchants.RING_SPELLPOWER,
+				id: 28730, // Mithril Band of the Unscarred
 			}),
 			ItemSpec.create({
-				id: 29370, // Icon of the Silver Crescent
+				id: 29383, // Bloodlust Brooch
 			}),
 			ItemSpec.create({
-				id: 27683, // Quagmirran's Eye
+				id: 28830, // Dragonspine Trophy
 			}),
 			ItemSpec.create({
-				id: 28802, // Bloodmaw Magus Blade
-				enchant: Enchants.SUNFIRE,
+				id: 28729, // Spiteblade
+				enchant: Enchants.MONGOOSE,
 			}),
 			ItemSpec.create({
-				id: 29270, // Flametongue Seal
+				id: 28295, // Gladiator's Slicer
+				enchant: Enchants.MONGOOSE,
 			}),
 			ItemSpec.create({
-				id: 28673, // Tirisfal Wand of Ascendancy
+				id: 30279, // Mama's Insurance
 			}),
 		],
 	}),
