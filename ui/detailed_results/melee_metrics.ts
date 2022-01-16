@@ -60,13 +60,13 @@ export class MeleeMetrics extends ResultComponent {
 
 		// Hits
 		tippy(headerElems[4], {
-			'content': 'Hits',
+			'content': 'Hits + Crits + Glances + Blocks',
 			'allowHTML': true,
 		});
 
 		// Avg Hit
 		tippy(headerElems[5], {
-			'content': 'Damage / Hits',
+			'content': 'Damage / (Hits + Crits + Glances + Blocks)',
 			'allowHTML': true,
 		});
 
@@ -129,7 +129,7 @@ export class MeleeMetrics extends ResultComponent {
 			addCell(meleeMetric.dps.toFixed(1)); // DPS
 			addCell(meleeMetric.casts.toFixed(1)); // Casts
 			addCell(meleeMetric.avgCast.toFixed(1)); // Avg Cast
-			addCell(meleeMetric.hits.toFixed(1)); // Hits
+			addCell(meleeMetric.landedHits.toFixed(1)); // Hits
 			addCell(meleeMetric.avgHit.toFixed(1)); // Avg Hit
 			addCell(meleeMetric.critPercent.toFixed(2) + ' %'); // Crit %
 			addCell(meleeMetric.missPercent.toFixed(2) + ' %'); // Miss %

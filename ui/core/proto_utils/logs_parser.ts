@@ -244,7 +244,7 @@ export class DamageDealtLog extends SimLog {
 		const match = params.raw.match(/] (.*?) ((Miss)|(Hit)|(Crit)|(Glance)|(Dodge)|(Parry)|(Block)|(ticked))( for (\d+\.\d+) damage( \((\d+)% Resist\))?)?/);
 		if (match) {
 			return ActionId.fromLogString(match[1]).fill(params.source?.index).then(cause => {
-				if (match[2] == 'Miss') {
+				if (match[2] == 'Miss' || match[2] == 'Dodge' || match[2] == 'Parry') {
 					return new DamageDealtLog(params, 0, true, false, false, false, false, false, false, false, false, false, cause);
 				}
 
@@ -309,6 +309,9 @@ export class DpsLog extends SimLog {
 			}
 
 			const dps = curDamageTotal / DpsLog.DPS_WINDOW;
+			if (isNaN(dps)) {
+				console.warn('NaN dps!');
+			}
 
 			return new DpsLog({
 				raw: '',

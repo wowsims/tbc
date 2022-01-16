@@ -267,7 +267,7 @@ var TheDecapitatorCooldownID = core.NewCooldownID()
 
 func ApplyTheDecapitator(agent core.Agent) {
 	character := agent.GetCharacter()
-	actionID := core.ActionID{SpellID: 37208}
+	actionID := core.ActionID{ItemID: 28767}
 
 	templ := core.ActiveMeleeAbility{
 		MeleeAbility: core.MeleeAbility{
