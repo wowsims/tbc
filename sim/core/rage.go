@@ -74,5 +74,9 @@ func (rb *rageBar) SpendRage(sim *Simulation, amount float64, actionID ActionID)
 }
 
 func (rb *rageBar) reset(sim *Simulation) {
+	if rb.character == nil {
+		return
+	}
+
 	rb.currentRage = rb.startingRage
 }

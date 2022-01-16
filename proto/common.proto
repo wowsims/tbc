@@ -448,6 +448,7 @@ enum OtherAction {
 	OtherActionNone = 0;
 	OtherActionWait = 1;
 	OtherActionManaRegen = 2;
+	OtherActionEnergyRegen = 5;
 	OtherActionAttack = 3; // A white hit, can be main hand or off hand.
 	OtherActionShoot = 4; // Default shoot action using a wand/bow/gun.
 }

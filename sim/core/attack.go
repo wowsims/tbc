@@ -371,10 +371,10 @@ func (ability *ActiveMeleeAbility) Attack(sim *Simulation) bool {
 			}
 			ability.Character.SpendRage(sim, ability.MeleeAbility.Cost.Value, ability.MeleeAbility.ActionID)
 		} else {
-			if ability.Character.stats[ability.MeleeAbility.Cost.Type] < ability.MeleeAbility.Cost.Value {
+			if ability.Character.CurrentEnergy() < ability.MeleeAbility.Cost.Value {
 				return false
 			}
-			ability.Character.AddStat(ability.MeleeAbility.Cost.Type, -ability.MeleeAbility.Cost.Value)
+			ability.Character.SpendEnergy(sim, ability.MeleeAbility.Cost.Value, ability.MeleeAbility.ActionID)
 		}
 	}
 
