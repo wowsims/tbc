@@ -1,4 +1,4 @@
-import { RaidBuffs } from '/tbc/core/proto/common.js';
+import { RaidBuffs, StrengthOfEarthType } from '/tbc/core/proto/common.js';
 import { PartyBuffs } from '/tbc/core/proto/common.js';
 import { IndividualBuffs } from '/tbc/core/proto/common.js';
 import { Class } from '/tbc/core/proto/common.js';
@@ -90,9 +90,8 @@ export class WarriorSimUI extends IndividualSimUI<Spec.SpecWarrior> {
 				partyBuffs: PartyBuffs.create({
 					drums: Drums.DrumsOfBattle,
 					bloodlust: 1,
-					strengthOfEarthTotem: TristateEffect.TristateEffectImproved,
-					//Replace with windfury
-					wrathOfAirTotem: TristateEffect.TristateEffectRegular,
+					strengthOfEarthTotem: StrengthOfEarthType.EnhancingAndCyclone,
+					windfuryTotemRank: 5,
 				}),
 				individualBuffs: IndividualBuffs.create({
 					blessingOfKings: true,
@@ -108,6 +107,7 @@ export class WarriorSimUI extends IndividualSimUI<Spec.SpecWarrior> {
 
 			// IconInputs to include in the 'Self Buffs' section on the settings tab.
 			selfBuffInputs: [
+				// TODO: Move reck to cooldown tabs
 				WarriorInputs.Recklessness ,
 				IconInputs.DrumsOfBattleConsume,
 			],
