@@ -91,6 +91,11 @@ func (shaman *Shaman) tryTwistWindfury(sim *core.Simulation) {
 		return
 	}
 
+	if shaman.Metrics.WentOOM && shaman.CurrentManaPercent() < 0.2 {
+		shaman.SelfBuffs.NextTotemDropType[AirTotem] = int32(shaman.SelfBuffs.AirTotem)
+		return
+	}
+
 	// Swap to WF if we didn't just cast it, otherwise drop the other air totem immediately.
 	if shaman.SelfBuffs.NextTotemDropType[AirTotem] != int32(proto.AirTotem_WindfuryTotem) {
 		shaman.SelfBuffs.NextTotemDropType[AirTotem] = int32(proto.AirTotem_WindfuryTotem)
@@ -103,6 +108,11 @@ func (shaman *Shaman) tryTwistWindfury(sim *core.Simulation) {
 
 func (shaman *Shaman) tryTwistFireNova(sim *core.Simulation) {
 	if !shaman.SelfBuffs.TwistFireNova {
+		return
+	}
+
+	if shaman.Metrics.WentOOM && shaman.CurrentManaPercent() < 0.2 {
+		shaman.SelfBuffs.NextTotemDropType[FireTotem] = int32(shaman.SelfBuffs.FireTotem)
 		return
 	}
 
@@ -175,10 +185,11 @@ func (shaman *Shaman) NewTremorTotem(sim *core.Simulation) *core.SimpleCast {
 
 // TryDropTotems will check to see if totems need to be re-cast.
 //  If they do time.Duration will be returned will be >0.
-func (shaman *Shaman) TryDropTotems(sim *core.Simulation) time.Duration {
+//  Also returns whether the cast was a success. TODO: Figure out a cleaner way to do this.
+func (shaman *Shaman) TryDropTotems(sim *core.Simulation) (time.Duration, bool) {
 	gcd := shaman.GetRemainingCD(core.GCDCooldownID, sim.CurrentTime)
 	if gcd > 0 {
-		return sim.CurrentTime + gcd // can't drop totems in GCD
+		return sim.CurrentTime + gcd, false // can't drop totems in GCD
 	}
 
 	var cast *core.SimpleCast
@@ -241,13 +252,12 @@ func (shaman *Shaman) TryDropTotems(sim *core.Simulation) time.Duration {
 	}
 
 	if !anyCast {
-		return 0
+		return 0, false
 	}
 
 	if !success {
 		regenTime := shaman.TimeUntilManaRegen(cost)
-		shaman.Character.Metrics.MarkOOM(sim, &shaman.Character, regenTime)
-		return sim.CurrentTime + regenTime
+		return sim.CurrentTime + regenTime, false
 	}
-	return sim.CurrentTime + shaman.GetRemainingCD(core.GCDCooldownID, sim.CurrentTime)
+	return sim.CurrentTime + shaman.GetRemainingCD(core.GCDCooldownID, sim.CurrentTime), true
 }

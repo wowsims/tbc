@@ -319,9 +319,9 @@ func (ahe *AbilityHitEffect) calculateDamage(sim *Simulation, ability *ActiveMel
 
 	// Apply armor reduction.
 	dmg *= 1 - ahe.Target.ArmorDamageReduction(character.stats[stats.ArmorPenetration]+ahe.BonusArmorPenetration)
-	if sim.Log != nil {
-		character.Log(sim, "Target armor: %0.2f\n", ahe.Target.currentArmor)
-	}
+	//if sim.Log != nil {
+	//	character.Log(sim, "Target armor: %0.2f\n", ahe.Target.currentArmor)
+	//}
 
 	// Apply all other effect multipliers.
 	dmg *= ahe.DamageMultiplier * ahe.StaticDamageMultiplier
