@@ -10,10 +10,11 @@ import { IndividualSimUI } from '/tbc/core/individual_sim_ui.js';
 import { Target } from '/tbc/core/target.js';
 
 import { Warrior, Warrior_Rotation as WarriorRotation, WarriorTalents as WarriorTalents, Warrior_Options as WarriorOptions } from '/tbc/core/proto/warrior.js';
-import { Warrior_Rotation_Type as RotationType, Warrior_Rotation_ArmsSlamRotation as ArmsSlamRotation, Warrior_Rotation_ArmsDWRotation as ArmsDWRotation, Warrior_Rotation_FuryRotation as FuryRotation, Warrior_Rotation_GeneralRotation as GeneralRotation } from '/tbc/core/proto/warrior.js';
+import { Warrior_Rotation_Type as RotationType, Warrior_Rotation_ArmsSlamRotation as ArmsSlamRotation, Warrior_Rotation_ArmsDWRotation as ArmsDWRotation, Warrior_Rotation_FuryRotation as FuryRotation } from '/tbc/core/proto/warrior.js';
 import { Warrior_Rotation_FuryRotation_PrimaryInstant as PrimaryInstant } from '/tbc/core/proto/warrior.js';
 
 import * as Presets from './presets.js';
+import { SimUI } from '../core/sim_ui.js';
 
 // Configuration for spec-specific UI elements on the settings tab.
 // These don't need to be in a separate file but it keeps things cleaner.
@@ -97,7 +98,7 @@ export const WarriorRotationConfig = {
 					'rotation-type-enum-picker',
 				],
 				label: 'Primary Instant',
-				labeTtooltip:'Main instant ability that will be prioritized above everything else while it is off CD.',
+				labelTooltip:'Main instant ability that will be prioritized above everything else while it is off CD.',
 				values: [
 					{
 						name: 'Bloodthirst', value: PrimaryInstant.Bloodthirst,
@@ -124,16 +125,16 @@ export const WarriorRotationConfig = {
 			cssClass: 'bt-exec-picker-fury',
 			getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
 			config: {
-				label: 'BT on Execute Phase',
-				labelTooltip: 'Use Bloodthirst on Execute Phase.',
+				label: 'BT during Execute Phase',
+				labelTooltip: 'Use Bloodthirst during Execute Phase.',
 				changedEvent: (player: Player<Spec.SpecWarrior>) => player.rotationChangeEmitter,
-				getValue: (player: Player<Spec.SpecWarrior>) => player.getRotation().fury?.useBtExec || false,
+				getValue: (player: Player<Spec.SpecWarrior>) => player.getRotation().fury?.useBtDuringExecute || false,
 				setValue: (eventID: EventID, player: Player<Spec.SpecWarrior>, newValue: boolean) => {
 					const newRotation = player.getRotation();
 					if (!newRotation.fury) {
 						newRotation.fury = FuryRotation.clone(Presets.DefaultFuryRotation.fury!);
 					}
-					newRotation.fury.useBtExec = newValue;
+					newRotation.fury.useBtDuringExecute = newValue;
 					player.setRotation(eventID, newRotation);
 				},
 				showWhen: (player: Player<Spec.SpecWarrior>) => player.getRotation().type == RotationType.Fury,
@@ -148,13 +149,13 @@ export const WarriorRotationConfig = {
 				label: 'Rampage refresh timing (seconds)',
 				labelTooltip: 'Refresh rampage when it has certain duration left on it.',
 				changedEvent: (player: Player<Spec.SpecWarrior>) => player.rotationChangeEmitter,
-				getValue: (player: Player<Spec.SpecWarrior>) => player.getRotation().fury?.rampageCdTresh || 0,
+				getValue: (player: Player<Spec.SpecWarrior>) => player.getRotation().fury?.rampageCdThreshold || 0,
 				setValue: (eventID: EventID, player: Player<Spec.SpecWarrior>, newValue: number) => {
 					const newRotation = player.getRotation();
 					if (!newRotation.fury) {
 						newRotation.fury = FuryRotation.clone(Presets.DefaultFuryRotation.fury!);
 					}
-					newRotation.fury.rampageCdTresh = newValue;
+					newRotation.fury.rampageCdThreshold = newValue;
 					player.setRotation(eventID, newRotation);
 				},
 				showWhen: (player: Player<Spec.SpecWarrior>) => player.getRotation().type == RotationType.Fury,
@@ -168,16 +169,16 @@ export const WarriorRotationConfig = {
 			cssClass: 'ms-exec-picker-arms-slam',
 			getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
 			config: {
-				label: 'MS on Execute Phase',
-				labelTooltip: 'Use Mortal Strike on Execute Phase.',
+				label: 'MS during Execute Phase',
+				labelTooltip: 'Use Mortal Strike during Execute Phase.',
 				changedEvent: (player: Player<Spec.SpecWarrior>) => player.rotationChangeEmitter,
-				getValue: (player: Player<Spec.SpecWarrior>) => player.getRotation().armsSlam?.useMsExec || false,
+				getValue: (player: Player<Spec.SpecWarrior>) => player.getRotation().armsSlam?.useMsDuringExecute || false,
 				setValue: (eventID: EventID, player: Player<Spec.SpecWarrior>, newValue: boolean) => {
 					const newRotation = player.getRotation();
 					if (!newRotation.armsSlam) {
 						newRotation.armsSlam = ArmsSlamRotation.clone(Presets.DefaultArmsSlamRotation.armsSlam!);
 					}
-					newRotation.armsSlam.useMsExec = newValue;
+					newRotation.armsSlam.useMsDuringExecute = newValue;
 					player.setRotation(eventID, newRotation);
 				},
 				showWhen: (player: Player<Spec.SpecWarrior>) => player.getRotation().type == RotationType.ArmsSlam,
@@ -189,16 +190,16 @@ export const WarriorRotationConfig = {
 			cssClass: 'slam-exec-picker-arms-slam',
 			getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
 			config: {
-				label: 'Slam on Execute Phase',
-				labelTooltip: 'Use Slam on Execute Phase.',
+				label: 'Slam during Execute Phase',
+				labelTooltip: 'Use Slam during Execute Phase.',
 				changedEvent: (player: Player<Spec.SpecWarrior>) => player.rotationChangeEmitter,
-				getValue: (player: Player<Spec.SpecWarrior>) => player.getRotation().armsSlam?.useSlamExec || false,
+				getValue: (player: Player<Spec.SpecWarrior>) => player.getRotation().armsSlam?.useSlamDuringExecute || false,
 				setValue: (eventID: EventID, player: Player<Spec.SpecWarrior>, newValue: boolean) => {
 					const newRotation = player.getRotation();
 					if (!newRotation.armsSlam) {
 						newRotation.armsSlam = ArmsSlamRotation.clone(Presets.DefaultArmsSlamRotation.armsSlam!);
 					}
-					newRotation.armsSlam.useSlamExec = newValue;
+					newRotation.armsSlam.useSlamDuringExecute = newValue;
 					player.setRotation(eventID, newRotation);
 				},
 				showWhen: (player: Player<Spec.SpecWarrior>) => player.getRotation().type == RotationType.ArmsSlam,
@@ -234,16 +235,16 @@ export const WarriorRotationConfig = {
 			cssClass: 'ms-exec-picker-arms-dw',
 			getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
 			config: {
-				label: 'MS on Execute Phase',
-				labelTooltip: 'Use Mortal Strike on Execute Phase.',
+				label: 'MS during Execute Phase',
+				labelTooltip: 'Use Mortal Strike during Execute Phase.',
 				changedEvent: (player: Player<Spec.SpecWarrior>) => player.rotationChangeEmitter,
-				getValue: (player: Player<Spec.SpecWarrior>) => player.getRotation().armsDw?.useMsExec || false,
+				getValue: (player: Player<Spec.SpecWarrior>) => player.getRotation().armsDw?.useMsDuringExecute || false,
 				setValue: (eventID: EventID, player: Player<Spec.SpecWarrior>, newValue: boolean) => {
 					const newRotation = player.getRotation();
 					if (!newRotation.armsDw) {
 						newRotation.armsDw = ArmsDWRotation.clone(Presets.DefaultArmsDWRotation.armsDw!);
 					}
-					newRotation.armsDw.useMsExec = newValue;
+					newRotation.armsDw.useMsDuringExecute = newValue;
 					player.setRotation(eventID, newRotation);
 				},
 				showWhen: (player: Player<Spec.SpecWarrior>) => player.getRotation().type == RotationType.ArmsDW,
@@ -258,16 +259,13 @@ export const WarriorRotationConfig = {
 		cssClass: 'ww-exec-picker',
 		getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
 		config: {
-			label: 'WW on Execute Phase',
-			labelTooltip: 'Use Whirlwind on Execute Phase.',
+			label: 'WW during Execute Phase',
+			labelTooltip: 'Use Whirlwind during Execute Phase.',
 			changedEvent: (player: Player<Spec.SpecWarrior>) => player.rotationChangeEmitter,
-			getValue: (player: Player<Spec.SpecWarrior>) => player.getRotation().general?.useWwExec || false,
+			getValue: (player: Player<Spec.SpecWarrior>) => player.getRotation().useWwDuringExecute || true,
 			setValue: (eventID: EventID, player: Player<Spec.SpecWarrior>, newValue: boolean) => {
 				const newRotation = player.getRotation();
-				if (!newRotation.general) {
-					newRotation.general = GeneralRotation.clone(Presets.DefaultGeneralRotation.general!);
-				}
-				newRotation.general.useWwExec = newValue;
+				newRotation.useWwDuringExecute = newValue;
 				player.setRotation(eventID, newRotation);
 			},
 		},
@@ -277,16 +275,13 @@ export const WarriorRotationConfig = {
 		cssClass: 'hs-exec-picker',
 		getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
 		config: {
-			label: 'HS on Execute Phase',
-			labelTooltip: 'Use Heroic Strike on Execute Phase.',
+			label: 'HS during Execute Phase',
+			labelTooltip: 'Use Heroic Strike during Execute Phase.',
 			changedEvent: (player: Player<Spec.SpecWarrior>) => player.rotationChangeEmitter,
-			getValue: (player: Player<Spec.SpecWarrior>) => player.getRotation().general?.useHsExec || false,
+			getValue: (player: Player<Spec.SpecWarrior>) => player.getRotation().useHsDuringExecute || true,
 			setValue: (eventID: EventID, player: Player<Spec.SpecWarrior>, newValue: boolean) => {
 				const newRotation = player.getRotation();
-				if (!newRotation.general) {
-					newRotation.general = GeneralRotation.clone(Presets.DefaultGeneralRotation.general!);
-				}
-				newRotation.general.useHsExec = newValue;
+				newRotation.useHsDuringExecute = newValue;
 				player.setRotation(eventID, newRotation);
 			},
 		},
@@ -299,13 +294,10 @@ export const WarriorRotationConfig = {
 			label: 'HS rage threshold',
 			labelTooltip: 'Queue HS when rage is above:',
 			changedEvent: (player: Player<Spec.SpecWarrior>) => player.rotationChangeEmitter,
-			getValue: (player: Player<Spec.SpecWarrior>) => player.getRotation().general?.hsRageThresh || 60,
+			getValue: (player: Player<Spec.SpecWarrior>) => player.getRotation().hsRageThreshold || 70,
 			setValue: (eventID: EventID, player: Player<Spec.SpecWarrior>, newValue: number) => {
 				const newRotation = player.getRotation();
-				if (!newRotation.general) {
-					newRotation.general = GeneralRotation.clone(Presets.DefaultGeneralRotation.general!);
-				}
-				newRotation.general.hsRageThresh = newValue;
+				newRotation.hsRageThreshold = newValue;
 				player.setRotation(eventID, newRotation);
 			},
 		},
@@ -318,13 +310,10 @@ export const WarriorRotationConfig = {
 			label: 'Use Overpower',
 			labelTooltip: 'Use Overpower when it is possible.',
 			changedEvent: (player: Player<Spec.SpecWarrior>) => player.rotationChangeEmitter,
-			getValue: (player: Player<Spec.SpecWarrior>) => player.getRotation().general?.useOverpower || false,
+			getValue: (player: Player<Spec.SpecWarrior>) => player.getRotation().useOverpower || false,
 			setValue: (eventID: EventID, player: Player<Spec.SpecWarrior>, newValue: boolean) => {
 				const newRotation = player.getRotation();
-				if (!newRotation.general) {
-					newRotation.general = GeneralRotation.clone(Presets.DefaultGeneralRotation.general!);
-				}
-				newRotation.general.useOverpower = newValue;
+				newRotation.useOverpower = newValue;
 				player.setRotation(eventID, newRotation);
 			},
 		},
@@ -337,16 +326,13 @@ export const WarriorRotationConfig = {
 			label: 'Overpower rage threshold',
 			labelTooltip: 'Use Overpower when rage is below a point.',
 			changedEvent: (player: Player<Spec.SpecWarrior>) => player.rotationChangeEmitter,
-			getValue: (player: Player<Spec.SpecWarrior>) => player.getRotation().general?.overpowerRageThresh || 0,
+			getValue: (player: Player<Spec.SpecWarrior>) => player.getRotation().overpowerRageThreshold || 25,
 			setValue: (eventID: EventID, player: Player<Spec.SpecWarrior>, newValue: number) => {
 				const newRotation = player.getRotation();
-				if (!newRotation.general) {
-					newRotation.general = GeneralRotation.clone(Presets.DefaultGeneralRotation.general!);
-				}
-				newRotation.general.overpowerRageThresh = newValue;
+				newRotation.overpowerRageThreshold = newValue;
 				player.setRotation(eventID, newRotation);
 			},
-			showWhen: (player: Player<Spec.SpecWarrior>) => player.getRotation().general?.useOverpower == true,
+			showWhen: (player: Player<Spec.SpecWarrior>) => player.getRotation().useOverpower == true,
 		},
 	},
 	{
@@ -357,13 +343,10 @@ export const WarriorRotationConfig = {
 			label: 'Use Hamstring',
 			labelTooltip: 'Use Hamstring on free global.',
 			changedEvent: (player: Player<Spec.SpecWarrior>) => player.rotationChangeEmitter,
-			getValue: (player: Player<Spec.SpecWarrior>) => player.getRotation().general?.useHamstring || false,
+			getValue: (player: Player<Spec.SpecWarrior>) => player.getRotation().useHamstring || false,
 			setValue: (eventID: EventID, player: Player<Spec.SpecWarrior>, newValue: boolean) => {
 				const newRotation = player.getRotation();
-				if (!newRotation.general) {
-					newRotation.general = GeneralRotation.clone(Presets.DefaultGeneralRotation.general!);
-				}
-				newRotation.general.useHamstring = newValue;
+				newRotation.useHamstring = newValue;
 				player.setRotation(eventID, newRotation);
 			},
 		},
@@ -376,16 +359,13 @@ export const WarriorRotationConfig = {
 			label: 'Hamstring rage threshold',
 			labelTooltip: 'Use Hamstring when rage is above a ',
 			changedEvent: (player: Player<Spec.SpecWarrior>) => player.rotationChangeEmitter,
-			getValue: (player: Player<Spec.SpecWarrior>) => player.getRotation().general?.hamstringRageThresh || 0,
+			getValue: (player: Player<Spec.SpecWarrior>) => player.getRotation().hamstringRageThreshold || 70,
 			setValue: (eventID: EventID, player: Player<Spec.SpecWarrior>, newValue: number) => {
 				const newRotation = player.getRotation();
-				if (!newRotation.general) {
-					newRotation.general = GeneralRotation.clone(Presets.DefaultGeneralRotation.general!);
-				}
-				newRotation.general.hamstringRageThresh = newValue;
+				newRotation.hamstringRageThreshold = newValue;
 				player.setRotation(eventID, newRotation);
 			},
-			showWhen: (player: Player<Spec.SpecWarrior>) => player.getRotation().general?.useHamstring == true,
+			showWhen: (player: Player<Spec.SpecWarrior>) => player.getRotation().useHamstring == true,
 		},
 	},
 	],

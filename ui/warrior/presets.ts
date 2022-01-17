@@ -7,7 +7,7 @@ import { Faction } from '/tbc/core/proto_utils/utils.js';
 import { Player } from '/tbc/core/player.js';
 
 import { Warrior, Warrior_Rotation as WarriorRotation, WarriorTalents as WarriorTalents, Warrior_Options as WarriorOptions } from '/tbc/core/proto/warrior.js';
-import { Warrior_Rotation_Type as RotationType, Warrior_Rotation_ArmsSlamRotation as ArmsSlamRotation, Warrior_Rotation_ArmsDWRotation as ArmsDWRotation, Warrior_Rotation_FuryRotation as FuryRotation, Warrior_Rotation_GeneralRotation as GeneralRotation } from '/tbc/core/proto/warrior.js';
+import { Warrior_Rotation_Type as RotationType, Warrior_Rotation_ArmsSlamRotation as ArmsSlamRotation, Warrior_Rotation_ArmsDWRotation as ArmsDWRotation, Warrior_Rotation_FuryRotation as FuryRotation } from '/tbc/core/proto/warrior.js';
 import { Warrior_Rotation_FuryRotation_PrimaryInstant as PrimaryInstant } from '/tbc/core/proto/warrior.js';
 
 import * as Enchants from '/tbc/core/constants/enchants.js';
@@ -37,8 +37,8 @@ export const DefaultFuryRotation = WarriorRotation.create({
 	type: RotationType.Fury,
 	fury: FuryRotation.create({
 		primaryInstant: PrimaryInstant.Whirlwind,
-		useBtExec: true,
-		rampageCdTresh: 5,
+		useBtDuringExecute: true,
+		rampageCdThreshold: 5,
 	}),
 });
 
@@ -57,9 +57,9 @@ export const DefaultFuryConsumes = Consumes.create({
 export const DefaultArmsSlamRotation = WarriorRotation.create({
 	type: RotationType.ArmsSlam,
 	armsSlam: ArmsSlamRotation.create({
-		useSlamExec: true,
+		useSlamDuringExecute: true,
 		slamLatency: 150,
-		useMsExec: true,
+		useMsDuringExecute: true,
 	}),
 });
 
@@ -78,7 +78,7 @@ export const DefaultArmsSlamConsumes = Consumes.create({
 export const DefaultArmsDWRotation = WarriorRotation.create({
 	type: RotationType.ArmsSlam,
 	armsDw: ArmsDWRotation.create({
-		useMsExec: false,
+		useMsDuringExecute: false,
 	}),
 });
 
@@ -92,18 +92,6 @@ export const DefaultArmsDWConsumes = Consumes.create({
 	defaultPotion: Potions.HastePotion,
 	flaskOfRelentlessAssault: true,
 	roastedClefthoof: true,
-});
-
-export const DefaultGeneralRotation = WarriorRotation.create({
-	type: RotationType.General,
-	general: GeneralRotation.create({
-		useWwExec: true,
-		useHsExec: true,
-		useOverpower: false,
-		overpowerRageThresh: 25,
-		useHamstring: false,
-		hamstringRageThresh: 70,
-	}),
 });
 
 export const P1_FURY_PRESET = {
