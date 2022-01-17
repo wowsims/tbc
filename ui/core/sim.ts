@@ -199,6 +199,7 @@ export class Sim {
 			// Skip the first event ID because it interferes with the loaded stats.
 			return;
 		}
+		eventID = TypedEvent.nextEventID();
 
 		await this.waitForInit();
 

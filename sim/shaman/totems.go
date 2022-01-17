@@ -33,7 +33,6 @@ func (shaman *Shaman) newWrathOfAirTotemTemplate(sim *core.Simulation) core.Simp
 	return cast
 }
 
-// Totems that shaman will cast.
 func (shaman *Shaman) NewWrathOfAirTotem(sim *core.Simulation) *core.SimpleCast {
 	shaman.totemSpell = shaman.wrathOfAirTotemTemplate
 	shaman.totemSpell.Init(sim)
@@ -51,6 +50,22 @@ func (shaman *Shaman) newGraceOfAirTotemTemplate(sim *core.Simulation) core.Simp
 
 func (shaman *Shaman) NewGraceOfAirTotem(sim *core.Simulation) *core.SimpleCast {
 	shaman.totemSpell = shaman.graceOfAirTotemTemplate
+	shaman.totemSpell.Init(sim)
+	return &shaman.totemSpell
+}
+
+func (shaman *Shaman) newTranquilAirTotemTemplate(sim *core.Simulation) core.SimpleCast {
+	baseManaCost := shaman.BaseMana() * 0.06
+	cast := shaman.newTotemCastTemplate(sim, baseManaCost, 25908)
+	cast.OnCastComplete = func(sim *core.Simulation, cast *core.Cast) {
+		shaman.NextTotemDrops[AirTotem] = sim.CurrentTime + time.Second*120
+		shaman.tryTwistWindfury(sim)
+	}
+	return cast
+}
+
+func (shaman *Shaman) NewTranquilAirTotem(sim *core.Simulation) *core.SimpleCast {
+	shaman.totemSpell = shaman.tranquilAirTotemTemplate
 	shaman.totemSpell.Init(sim)
 	return &shaman.totemSpell
 }
@@ -210,6 +225,8 @@ func (shaman *Shaman) TryDropTotems(sim *core.Simulation) (time.Duration, bool) 
 					cast = shaman.NewWindfuryTotem(sim)
 				case proto.AirTotem_GraceOfAirTotem:
 					cast = shaman.NewGraceOfAirTotem(sim)
+				case proto.AirTotem_TranquilAirTotem:
+					cast = shaman.NewTranquilAirTotem(sim)
 				}
 
 			case EarthTotem:

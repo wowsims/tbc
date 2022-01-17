@@ -27,6 +27,9 @@ func NewShaman(character core.Character, talents proto.ShamanTalents, totems pro
 	if totems.Fire == proto.FireTotem_TotemOfWrath && !talents.TotemOfWrath {
 		totems.Fire = proto.FireTotem_NoFireTotem
 	}
+	if totems.Air != proto.AirTotem_WrathOfAirTotem && selfBuffs.SnapshotT42Pc {
+		selfBuffs.SnapshotT42Pc = false
+	}
 
 	shaman := &Shaman{
 		Character: character,
@@ -73,8 +76,9 @@ func NewShaman(character core.Character, talents proto.ShamanTalents, totems pro
 
 // Which buffs this shaman is using.
 type SelfBuffs struct {
-	Bloodlust   bool
-	WaterShield bool
+	Bloodlust     bool
+	WaterShield   bool
+	SnapshotT42Pc bool
 }
 
 // Indexes into NextTotemDrops for self buffs
@@ -131,6 +135,7 @@ type Shaman struct {
 	tremorTotemTemplate          core.SimpleCast
 	graceOfAirTotemTemplate      core.SimpleCast
 	wrathOfAirTotemTemplate      core.SimpleCast
+	tranquilAirTotemTemplate     core.SimpleCast
 	windfuryTotemTemplate        core.SimpleCast
 	totemOfWrathTemplate         core.SimpleCast
 	manaSpringTotemTemplate      core.SimpleCast
@@ -176,6 +181,8 @@ func (shaman *Shaman) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {
 		woaValue := proto.TristateEffect_TristateEffectRegular
 		if ItemSetCycloneRegalia.CharacterHasSetBonus(shaman.GetCharacter(), 2) {
 			woaValue = proto.TristateEffect_TristateEffectImproved
+		} else if shaman.SelfBuffs.SnapshotT42Pc {
+			partyBuffs.SnapshotImprovedWrathOfAirTotem = true
 		}
 		partyBuffs.WrathOfAirTotem = core.MaxTristate(partyBuffs.WrathOfAirTotem, woaValue)
 	case proto.AirTotem_GraceOfAirTotem:
@@ -233,6 +240,7 @@ func (shaman *Shaman) Init(sim *core.Simulation) {
 	shaman.strengthOfEarthTotemTemplate = shaman.newStrengthOfEarthTotemTemplate(sim)
 	shaman.tremorTotemTemplate = shaman.newTremorTotemTemplate(sim)
 	shaman.wrathOfAirTotemTemplate = shaman.newWrathOfAirTotemTemplate(sim)
+	shaman.tranquilAirTotemTemplate = shaman.newTranquilAirTotemTemplate(sim)
 	shaman.graceOfAirTotemTemplate = shaman.newGraceOfAirTotemTemplate(sim)
 	shaman.windfuryTotemTemplate = shaman.newWindfuryTotemTemplate(sim, shaman.Totems.WindfuryTotemRank)
 	shaman.manaSpringTotemTemplate = shaman.newManaSpringTotemTemplate(sim)

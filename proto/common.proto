@@ -239,6 +239,7 @@ message PartyBuffs {
     int32 mana_tide_totems = 17;
     int32 totem_of_wrath = 13;
     TristateEffect wrath_of_air_totem = 14;
+		bool snapshot_improved_wrath_of_air_totem = 25;
     TristateEffect grace_of_air_totem = 15;
     StrengthOfEarthType strength_of_earth_totem = 16;
 

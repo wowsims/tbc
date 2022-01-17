@@ -141,6 +141,10 @@ message ElementalShaman {
 				bool totem_of_wrath = 4;
 				bool wrath_of_air_totem = 5;
         // int32 WaterShieldPPM
+
+				// Indicates the shaman will be dropping an improved wrath of air totem before
+				// the fight by snapshotting the T4 2pc bonus.
+				bool snapshot_t4_2pc = 6;
     }
 
     Rotation rotation = 1;

@@ -20,6 +20,7 @@ import { Stat } from '/tbc/core/proto/common.js';
 import { PlayerStats } from '/tbc/core/proto/api.js';
 import { Player as PlayerProto } from '/tbc/core/proto/api.js';
 import { StatWeightsResult } from '/tbc/core/proto/api.js';
+import { ShamanTotems, EarthTotem, AirTotem, FireTotem, WaterTotem } from '/tbc/core/proto/shaman.js';
 
 import { EquippedItem, computeItemEP } from '/tbc/core/proto_utils/equipped_item.js';
 import { Gear } from '/tbc/core/proto_utils/gear.js';
@@ -549,6 +550,26 @@ export class Player<SpecType extends Spec> {
 				proto.consumes.defaultConjured = Conjured.ConjuredDarkRune;
 			}
 
+			let rotation = this.specTypeFunctions.rotationFromPlayer(proto);
+			// TODO: Remove this on 2/17/2022 (1 month).
+			if (this.spec == Spec.SpecElementalShaman) {
+				const eleRotation = rotation as SpecRotation<Spec.SpecElementalShaman>;
+				const options = this.specTypeFunctions.optionsFromPlayer(proto) as SpecOptions<Spec.SpecElementalShaman>;
+				if (!eleRotation.totems) {
+					eleRotation.totems = ShamanTotems.create();
+				}
+				if (options.manaSpringTotem) {
+					eleRotation.totems!.water = WaterTotem.ManaSpringTotem;
+				}
+				if (options.totemOfWrath) {
+					eleRotation.totems!.fire = FireTotem.TotemOfWrath;
+				}
+				if (options.wrathOfAirTotem) {
+					eleRotation.totems!.air = AirTotem.WrathOfAirTotem;
+				}
+				rotation = eleRotation as SpecRotation<SpecType>;
+			}
+
 			this.setName(eventID, proto.name);
 			this.setRace(eventID, proto.race);
 			this.setGear(eventID, proto.equipment ? this.sim.lookupEquipmentSpec(proto.equipment) : new Gear({}));
@@ -557,7 +578,7 @@ export class Player<SpecType extends Spec> {
 			this.setBuffs(eventID, proto.buffs || IndividualBuffs.create());
 			this.setCooldowns(eventID, proto.cooldowns || Cooldowns.create());
 			this.setTalentsString(eventID, proto.talentsString);
-			this.setRotation(eventID, this.specTypeFunctions.rotationFromPlayer(proto));
+			this.setRotation(eventID, rotation);
 			this.setTalents(eventID, this.specTypeFunctions.talentsFromPlayer(proto));
 			this.setSpecOptions(eventID, this.specTypeFunctions.optionsFromPlayer(proto));
 		});

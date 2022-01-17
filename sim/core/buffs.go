@@ -123,6 +123,9 @@ func applyBuffEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs proto.P
 	character.AddStats(stats.Stats{
 		stats.SpellPower: GetTristateValueFloat(partyBuffs.WrathOfAirTotem, 101.0, 121.0),
 	})
+	if partyBuffs.WrathOfAirTotem == proto.TristateEffect_TristateEffectRegular && partyBuffs.SnapshotImprovedWrathOfAirTotem {
+		character.AddPermanentAura(SnapshotImprovedWrathOfAirTotemAura(character))
+	}
 	character.AddStats(stats.Stats{
 		stats.Agility: GetTristateValueFloat(partyBuffs.GraceOfAirTotem, 77.0, 88.55),
 	})
@@ -169,6 +172,14 @@ func applyBuffEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs proto.P
 	}
 	if partyBuffs.ChainOfTheTwilightOwl {
 		character.AddStats(stats.Stats{stats.SpellCrit: 2 * SpellCritRatingPerCritChance})
+	}
+}
+
+var SnapshotImprovedWrathOfAirTotemAuraID = NewAuraID()
+
+func SnapshotImprovedWrathOfAirTotemAura(character *Character) AuraFactory {
+	return func(sim *Simulation) Aura {
+		return character.NewAuraWithTemporaryStats(sim, SnapshotImprovedWrathOfAirTotemAuraID, ActionID{SpellID: 37212}, stats.SpellPower, 20, time.Second*110)
 	}
 }
 

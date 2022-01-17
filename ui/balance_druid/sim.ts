@@ -177,6 +177,7 @@ export class BalanceDruidSimUI extends IndividualSimUI<Spec.SpecBalanceDruid> {
 					OtherInputs.ShadowPriestDPS,
 					OtherInputs.StartingPotion,
 					OtherInputs.NumStartingPotions,
+					OtherInputs.SnapshotImprovedWrathOfAirTotem,
 				],
 			},
 			encounterPicker: {
