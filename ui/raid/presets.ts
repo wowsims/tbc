@@ -21,18 +21,21 @@ import { Player } from '/tbc/core/player.js';
 import { BuffBot } from './buff_bot.js';
 
 import * as BalanceDruidPresets from '/tbc/balance_druid/presets.js';
+import * as MagePresets from '/tbc/mage/presets.js';
 import * as ElementalShamanPresets from '/tbc/elemental_shaman/presets.js';
 import * as ShadowPriestPresets from '/tbc/shadow_priest/presets.js';
 
 import { BalanceDruidSimUI } from '/tbc/balance_druid/sim.js';
 import { EnhancementShamanSimUI } from '/tbc/enhancement_shaman/sim.js';
 import { ElementalShamanSimUI } from '/tbc/elemental_shaman/sim.js';
+import { MageSimUI } from '/tbc/mage/sim.js';
 import { ShadowPriestSimUI } from '/tbc/shadow_priest/sim.js';
 
 export const specSimFactories: Partial<Record<Spec, (parentElem: HTMLElement, player: Player<any>) => IndividualSimUI<any>>> = {
 	[Spec.SpecBalanceDruid]: (parentElem: HTMLElement, player: Player<any>) => new BalanceDruidSimUI(parentElem, player),
 	[Spec.SpecElementalShaman]: (parentElem: HTMLElement, player: Player<any>) => new ElementalShamanSimUI(parentElem, player),
 	[Spec.SpecEnhancementShaman]: (parentElem: HTMLElement, player: Player<any>) => new EnhancementShamanSimUI(parentElem, player),
+	[Spec.SpecMage]: (parentElem: HTMLElement, player: Player<any>) => new MageSimUI(parentElem, player),
 	[Spec.SpecShadowPriest]: (parentElem: HTMLElement, player: Player<any>) => new ShadowPriestSimUI(parentElem, player),
 };
 
@@ -56,6 +59,11 @@ export interface PresetSpecSettings<SpecType extends Spec> {
 export interface BuffBotSettings {
 	// The value of this field must never change, to preserve local storage data.
 	buffBotId: string,
+
+	// Set this to true to remove a buff bot option after launching a real sim.
+	// This will allow users with saved settings to properly load the buffbot but
+	// also remove the buffbot as an option from the UI.
+	deprecated?: boolean,
 
 	spec: Spec,
 	name: string,
@@ -95,6 +103,90 @@ export const playerPresets: Array<PresetSpecSettings<any>> = [
 		},
 		tooltip: specNames[Spec.SpecBalanceDruid],
 		iconUrl: specIconsLarge[Spec.SpecBalanceDruid],
+	},
+	{
+		spec: Spec.SpecMage,
+		rotation: MagePresets.DefaultArcaneRotation,
+		talents: MagePresets.ArcaneTalents.data,
+		specOptions: MagePresets.DefaultArcaneOptions,
+		consumes: MagePresets.DefaultArcaneConsumes,
+		defaultName: 'Arcane Mage',
+		defaultFactionRaces: {
+			[Faction.Unknown]: Race.RaceUnknown,
+			[Faction.Alliance]: Race.RaceGnome,
+			[Faction.Horde]: Race.RaceTroll10,
+		},
+		defaultGear: {
+			[Faction.Unknown]: {},
+			[Faction.Alliance]: {
+				1: MagePresets.P1_ARCANE_PRESET.gear,
+				2: MagePresets.P2_ARCANE_PRESET.gear,
+				3: MagePresets.P3_ARCANE_PRESET.gear,
+			},
+			[Faction.Horde]: {
+				1: MagePresets.P1_ARCANE_PRESET.gear,
+				2: MagePresets.P2_ARCANE_PRESET.gear,
+				3: MagePresets.P3_ARCANE_PRESET.gear,
+			},
+		},
+		tooltip: 'Arcane Mage',
+		iconUrl: talentTreeIcons[Class.ClassMage][0],
+	},
+	{
+		spec: Spec.SpecMage,
+		rotation: MagePresets.DefaultFireRotation,
+		talents: MagePresets.FireTalents.data,
+		specOptions: MagePresets.DefaultFireOptions,
+		consumes: MagePresets.DefaultFireConsumes,
+		defaultName: 'Fire Mage',
+		defaultFactionRaces: {
+			[Faction.Unknown]: Race.RaceUnknown,
+			[Faction.Alliance]: Race.RaceGnome,
+			[Faction.Horde]: Race.RaceTroll10,
+		},
+		defaultGear: {
+			[Faction.Unknown]: {},
+			[Faction.Alliance]: {
+				1: MagePresets.P1_FIRE_PRESET.gear,
+				2: MagePresets.P2_FIRE_PRESET.gear,
+				3: MagePresets.P3_FIRE_PRESET.gear,
+			},
+			[Faction.Horde]: {
+				1: MagePresets.P1_FIRE_PRESET.gear,
+				2: MagePresets.P2_FIRE_PRESET.gear,
+				3: MagePresets.P3_FIRE_PRESET.gear,
+			},
+		},
+		tooltip: 'Fire Mage',
+		iconUrl: talentTreeIcons[Class.ClassMage][1],
+	},
+	{
+		spec: Spec.SpecMage,
+		rotation: MagePresets.DefaultFrostRotation,
+		talents: MagePresets.FrostTalents.data,
+		specOptions: MagePresets.DefaultFrostOptions,
+		consumes: MagePresets.DefaultFrostConsumes,
+		defaultName: 'Frost Mage',
+		defaultFactionRaces: {
+			[Faction.Unknown]: Race.RaceUnknown,
+			[Faction.Alliance]: Race.RaceGnome,
+			[Faction.Horde]: Race.RaceTroll10,
+		},
+		defaultGear: {
+			[Faction.Unknown]: {},
+			[Faction.Alliance]: {
+				1: MagePresets.P1_FROST_PRESET.gear,
+				2: MagePresets.P2_FROST_PRESET.gear,
+				3: MagePresets.P3_FROST_PRESET.gear,
+			},
+			[Faction.Horde]: {
+				1: MagePresets.P1_FROST_PRESET.gear,
+				2: MagePresets.P2_FROST_PRESET.gear,
+				3: MagePresets.P3_FROST_PRESET.gear,
+			},
+		},
+		tooltip: 'Frost Mage',
+		iconUrl: talentTreeIcons[Class.ClassMage][2],
 	},
 	{
 		spec: Spec.SpecElementalShaman,
@@ -183,6 +275,7 @@ export const buffBotPresets: Array<BuffBotSettings> = [
 	{
 		// The value of this field must never change, to preserve local storage data.
 		buffBotId: 'Mage',
+		deprecated: true,
 		spec: Spec.SpecMage,
 		name: 'Mage',
 		tooltip: 'Mage: Adds Arcane Brilliance.',

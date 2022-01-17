@@ -12,6 +12,7 @@
     { "path": "../balance_druid" },
     { "path": "../elemental_shaman" },
     { "path": "../enhancement_shaman" },
+    { "path": "../mage" },
     { "path": "../shadow_priest" },
   ],
 }

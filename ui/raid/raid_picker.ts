@@ -686,7 +686,9 @@ class NewPlayerPicker extends Component {
 				return;
 			}
 
-			const matchingBuffBots = buffBotPresets.filter(buffBot => specToClass[buffBot.spec] == wowClass);
+			const matchingBuffBots = buffBotPresets
+					.filter(buffBot => specToClass[buffBot.spec] == wowClass)
+					.filter(buffBot => !buffBot.deprecated);
 			if (matchingBuffBots.length == 0) {
 				return;
 			}
