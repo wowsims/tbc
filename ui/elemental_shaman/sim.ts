@@ -130,9 +130,6 @@ export class ElementalShamanSimUI extends IndividualSimUI<Spec.SpecElementalSham
 			selfBuffInputs: [
 				ShamanInputs.IconWaterShield,
 				ShamanInputs.IconBloodlust,
-				ShamanInputs.IconWrathOfAirTotem,
-				ShamanInputs.IconTotemOfWrath,
-				ShamanInputs.IconManaSpringTotem,
 				IconInputs.DrumsOfBattleConsume,
 				IconInputs.DrumsOfRestorationConsume,
 			],

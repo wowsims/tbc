@@ -124,7 +124,10 @@ func applyBuffEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs proto.P
 		stats.SpellPower: GetTristateValueFloat(partyBuffs.WrathOfAirTotem, 101.0, 121.0),
 	})
 	if partyBuffs.WrathOfAirTotem == proto.TristateEffect_TristateEffectRegular && partyBuffs.SnapshotImprovedWrathOfAirTotem {
-		character.AddPermanentAura(SnapshotImprovedWrathOfAirTotemAura(character))
+		character.AddPermanentAuraWithOptions(PermanentAura{
+			AuraFactory:       SnapshotImprovedWrathOfAirTotemAura(character),
+			RespectExpiration: true,
+		})
 	}
 	character.AddStats(stats.Stats{
 		stats.Agility: GetTristateValueFloat(partyBuffs.GraceOfAirTotem, 77.0, 88.55),
