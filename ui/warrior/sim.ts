@@ -122,6 +122,7 @@ export class WarriorSimUI extends IndividualSimUI<Spec.SpecWarrior> {
 				// IconInputs.WindfuryTotem,
 				// IconInputs.StrengthOfEarthTotem,
 				// IconInputs.UnleashedRage,
+				IconInputs.FerociousInspiration,
 				IconInputs.DraeneiRacialMelee,
 				IconInputs.BraidedEterniumChain
 			],
