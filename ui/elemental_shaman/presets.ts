@@ -21,7 +21,7 @@ import * as Tooltips from '/tbc/core/constants/tooltips.js';
 // https://tbc.wowhead.com/talent-calc and copy the numbers in the url.
 export const StandardTalents = {
 	name: 'Standard',
-	data: '55030105100213351051--05105301005',
+	data: '55003105100213351051--05105301005',
 };
 
 export const DefaultRotation = ElementalShamanRotation.create({
