@@ -35,7 +35,7 @@ import { SavedSettings } from '/tbc/core/proto/ui.js';
 import { SavedTalents } from '/tbc/core/proto/ui.js';
 import { Sim } from './sim.js';
 import { SimOptions } from '/tbc/core/proto/api.js';
-import { SimUI } from './sim_ui.js';
+import { SimUI, SimWarning } from './sim_ui.js';
 import { Spec } from '/tbc/core/proto/common.js';
 import { getMetaGemConditionDescription } from '/tbc/core/proto_utils/gems.js';
 import { SpecOptions } from '/tbc/core/proto_utils/utils.js';
@@ -121,6 +121,7 @@ export interface IndividualSimUIConfig<SpecType extends Spec> {
 	cssClass: string,
 
 	knownIssues?: Array<string>;
+	warnings?: Array<(simUI: IndividualSimUI<SpecType>) => SimWarning>,
 
   epStats: Array<Stat>;
   epReferenceStat: Stat;
@@ -223,6 +224,7 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 				return `Meta gem disabled (${metaGem.name}): ${getMetaGemConditionDescription(metaGem)}`;
 			},
 		});
+		(config.warnings || []).forEach(warning => this.addWarning(warning(this)));
 
     this.exclusivityMap = {
       'Battle Elixir': [],

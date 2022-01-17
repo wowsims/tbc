@@ -26,29 +26,37 @@ var StandardTalents = &proto.ShamanTalents{
 var eleShamOptionsNoBuffs = &proto.ElementalShaman_Options{
 	WaterShield: true,
 }
+
+var NoTotems = &proto.ShamanTotems{}
+var BasicTotems = &proto.ShamanTotems{
+	Earth: proto.EarthTotem_TremorTotem,
+	Air:   proto.AirTotem_WrathOfAirTotem,
+	Water: proto.WaterTotem_ManaSpringTotem,
+	Fire:  proto.FireTotem_TotemOfWrath,
+}
+
 var PlayerOptionsCLOnClearcastNoBuffs = &proto.Player_ElementalShaman{
 	ElementalShaman: &proto.ElementalShaman{
 		Talents: StandardTalents,
 		Options: eleShamOptionsNoBuffs,
 		Rotation: &proto.ElementalShaman_Rotation{
-			Type: proto.ElementalShaman_Rotation_CLOnClearcast,
+			Totems: NoTotems,
+			Type:   proto.ElementalShaman_Rotation_CLOnClearcast,
 		},
 	},
 }
 
 var eleShamOptions = &proto.ElementalShaman_Options{
-	WaterShield:     true,
-	Bloodlust:       true,
-	ManaSpringTotem: true,
-	TotemOfWrath:    true,
-	WrathOfAirTotem: true,
+	WaterShield: true,
+	Bloodlust:   true,
 }
 var PlayerOptionsAdaptive = &proto.Player_ElementalShaman{
 	ElementalShaman: &proto.ElementalShaman{
 		Talents: StandardTalents,
 		Options: eleShamOptions,
 		Rotation: &proto.ElementalShaman_Rotation{
-			Type: proto.ElementalShaman_Rotation_Adaptive,
+			Totems: BasicTotems,
+			Type:   proto.ElementalShaman_Rotation_Adaptive,
 		},
 	},
 }
@@ -58,7 +66,8 @@ var PlayerOptionsLBOnly = &proto.Player_ElementalShaman{
 		Talents: StandardTalents,
 		Options: eleShamOptions,
 		Rotation: &proto.ElementalShaman_Rotation{
-			Type: proto.ElementalShaman_Rotation_LBOnly,
+			Totems: BasicTotems,
+			Type:   proto.ElementalShaman_Rotation_LBOnly,
 		},
 	},
 }
@@ -68,6 +77,7 @@ var PlayerOptionsFixed3LBCL = &proto.Player_ElementalShaman{
 		Talents: StandardTalents,
 		Options: eleShamOptions,
 		Rotation: &proto.ElementalShaman_Rotation{
+			Totems:   BasicTotems,
 			Type:     proto.ElementalShaman_Rotation_FixedLBCL,
 			LbsPerCl: 3,
 		},
@@ -79,7 +89,8 @@ var PlayerOptionsCLOnClearcast = &proto.Player_ElementalShaman{
 		Talents: StandardTalents,
 		Options: eleShamOptions,
 		Rotation: &proto.ElementalShaman_Rotation{
-			Type: proto.ElementalShaman_Rotation_CLOnClearcast,
+			Totems: BasicTotems,
+			Type:   proto.ElementalShaman_Rotation_CLOnClearcast,
 		},
 	},
 }

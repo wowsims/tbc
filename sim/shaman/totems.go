@@ -27,13 +27,12 @@ func (shaman *Shaman) newTotemCastTemplate(sim *core.Simulation, baseManaCost fl
 func (shaman *Shaman) newWrathOfAirTotemTemplate(sim *core.Simulation) core.SimpleCast {
 	cast := shaman.newTotemCastTemplate(sim, 320.0, 3738)
 	cast.OnCastComplete = func(sim *core.Simulation, cast *core.Cast) {
-		shaman.SelfBuffs.NextTotemDrops[AirTotem] = sim.CurrentTime + time.Second*120
+		shaman.NextTotemDrops[AirTotem] = sim.CurrentTime + time.Second*120
 		shaman.tryTwistWindfury(sim)
 	}
 	return cast
 }
 
-// Totems that shaman will cast.
 func (shaman *Shaman) NewWrathOfAirTotem(sim *core.Simulation) *core.SimpleCast {
 	shaman.totemSpell = shaman.wrathOfAirTotemTemplate
 	shaman.totemSpell.Init(sim)
@@ -43,7 +42,7 @@ func (shaman *Shaman) NewWrathOfAirTotem(sim *core.Simulation) *core.SimpleCast 
 func (shaman *Shaman) newGraceOfAirTotemTemplate(sim *core.Simulation) core.SimpleCast {
 	cast := shaman.newTotemCastTemplate(sim, 310.0, 25359)
 	cast.OnCastComplete = func(sim *core.Simulation, cast *core.Cast) {
-		shaman.SelfBuffs.NextTotemDrops[AirTotem] = sim.CurrentTime + time.Second*120
+		shaman.NextTotemDrops[AirTotem] = sim.CurrentTime + time.Second*120
 		shaman.tryTwistWindfury(sim)
 	}
 	return cast
@@ -51,6 +50,22 @@ func (shaman *Shaman) newGraceOfAirTotemTemplate(sim *core.Simulation) core.Simp
 
 func (shaman *Shaman) NewGraceOfAirTotem(sim *core.Simulation) *core.SimpleCast {
 	shaman.totemSpell = shaman.graceOfAirTotemTemplate
+	shaman.totemSpell.Init(sim)
+	return &shaman.totemSpell
+}
+
+func (shaman *Shaman) newTranquilAirTotemTemplate(sim *core.Simulation) core.SimpleCast {
+	baseManaCost := shaman.BaseMana() * 0.06
+	cast := shaman.newTotemCastTemplate(sim, baseManaCost, 25908)
+	cast.OnCastComplete = func(sim *core.Simulation, cast *core.Cast) {
+		shaman.NextTotemDrops[AirTotem] = sim.CurrentTime + time.Second*120
+		shaman.tryTwistWindfury(sim)
+	}
+	return cast
+}
+
+func (shaman *Shaman) NewTranquilAirTotem(sim *core.Simulation) *core.SimpleCast {
+	shaman.totemSpell = shaman.tranquilAirTotemTemplate
 	shaman.totemSpell.Init(sim)
 	return &shaman.totemSpell
 }
@@ -74,7 +89,7 @@ func (shaman *Shaman) newWindfuryTotemTemplate(sim *core.Simulation, rank int32)
 	spellID := core.WindfurySpellRanks[rank-1]
 	cast := shaman.newTotemCastTemplate(sim, baseManaCost, spellID)
 	cast.OnCastComplete = func(sim *core.Simulation, cast *core.Cast) {
-		shaman.SelfBuffs.NextTotemDrops[AirTotem] = sim.CurrentTime + time.Second*120
+		shaman.NextTotemDrops[AirTotem] = sim.CurrentTime + time.Second*120
 		shaman.tryTwistWindfury(sim)
 	}
 	return cast
@@ -87,48 +102,48 @@ func (shaman *Shaman) NewWindfuryTotem(sim *core.Simulation) *core.SimpleCast {
 }
 
 func (shaman *Shaman) tryTwistWindfury(sim *core.Simulation) {
-	if !shaman.SelfBuffs.TwistWindfury {
+	if !shaman.Totems.TwistWindfury {
 		return
 	}
 
 	if shaman.Metrics.WentOOM && shaman.CurrentManaPercent() < 0.2 {
-		shaman.SelfBuffs.NextTotemDropType[AirTotem] = int32(shaman.SelfBuffs.AirTotem)
+		shaman.NextTotemDropType[AirTotem] = int32(shaman.Totems.Air)
 		return
 	}
 
 	// Swap to WF if we didn't just cast it, otherwise drop the other air totem immediately.
-	if shaman.SelfBuffs.NextTotemDropType[AirTotem] != int32(proto.AirTotem_WindfuryTotem) {
-		shaman.SelfBuffs.NextTotemDropType[AirTotem] = int32(proto.AirTotem_WindfuryTotem)
-		shaman.SelfBuffs.NextTotemDrops[AirTotem] = sim.CurrentTime + time.Second*10 // 10s until you need to drop WF
+	if shaman.NextTotemDropType[AirTotem] != int32(proto.AirTotem_WindfuryTotem) {
+		shaman.NextTotemDropType[AirTotem] = int32(proto.AirTotem_WindfuryTotem)
+		shaman.NextTotemDrops[AirTotem] = sim.CurrentTime + time.Second*10 // 10s until you need to drop WF
 	} else {
-		shaman.SelfBuffs.NextTotemDropType[AirTotem] = int32(shaman.SelfBuffs.AirTotem)
-		shaman.SelfBuffs.NextTotemDrops[AirTotem] = sim.CurrentTime + time.Second // drop immediately
+		shaman.NextTotemDropType[AirTotem] = int32(shaman.Totems.Air)
+		shaman.NextTotemDrops[AirTotem] = sim.CurrentTime + time.Second // drop immediately
 	}
 }
 
 func (shaman *Shaman) tryTwistFireNova(sim *core.Simulation) {
-	if !shaman.SelfBuffs.TwistFireNova {
+	if !shaman.Totems.TwistFireNova {
 		return
 	}
 
 	if shaman.Metrics.WentOOM && shaman.CurrentManaPercent() < 0.2 {
-		shaman.SelfBuffs.NextTotemDropType[FireTotem] = int32(shaman.SelfBuffs.FireTotem)
+		shaman.NextTotemDropType[FireTotem] = int32(shaman.Totems.Fire)
 		return
 	}
 
-	if shaman.SelfBuffs.NextTotemDropType[FireTotem] != int32(proto.FireTotem_FireNovaTotem) ||
-		shaman.SelfBuffs.FireTotem == proto.FireTotem_NoFireTotem {
-		shaman.SelfBuffs.NextTotemDropType[FireTotem] = int32(proto.FireTotem_FireNovaTotem)
-		shaman.SelfBuffs.NextTotemDrops[FireTotem] = sim.CurrentTime + shaman.GetRemainingCD(CooldownIDNovaTotem, sim.CurrentTime)
+	if shaman.NextTotemDropType[FireTotem] != int32(proto.FireTotem_FireNovaTotem) ||
+		shaman.Totems.Fire == proto.FireTotem_NoFireTotem {
+		shaman.NextTotemDropType[FireTotem] = int32(proto.FireTotem_FireNovaTotem)
+		shaman.NextTotemDrops[FireTotem] = sim.CurrentTime + shaman.GetRemainingCD(CooldownIDNovaTotem, sim.CurrentTime)
 	} else {
-		shaman.SelfBuffs.NextTotemDropType[FireTotem] = int32(shaman.SelfBuffs.FireTotem)
+		shaman.NextTotemDropType[FireTotem] = int32(shaman.Totems.Fire)
 	}
 }
 
 func (shaman *Shaman) newManaSpringTotemTemplate(sim *core.Simulation) core.SimpleCast {
 	cast := shaman.newTotemCastTemplate(sim, 120, 25570)
 	cast.OnCastComplete = func(sim *core.Simulation, cast *core.Cast) {
-		shaman.SelfBuffs.NextTotemDrops[WaterTotem] = sim.CurrentTime + time.Second*120
+		shaman.NextTotemDrops[WaterTotem] = sim.CurrentTime + time.Second*120
 	}
 	return cast
 }
@@ -143,7 +158,7 @@ func (shaman *Shaman) newTotemOfWrathTemplate(sim *core.Simulation) core.SimpleC
 	baseManaCost := shaman.BaseMana() * 0.05
 	cast := shaman.newTotemCastTemplate(sim, baseManaCost, 30706)
 	cast.OnCastComplete = func(sim *core.Simulation, cast *core.Cast) {
-		shaman.SelfBuffs.NextTotemDrops[FireTotem] = sim.CurrentTime + time.Second*120
+		shaman.NextTotemDrops[FireTotem] = sim.CurrentTime + time.Second*120
 		shaman.tryTwistFireNova(sim)
 	}
 	return cast
@@ -158,7 +173,7 @@ func (shaman *Shaman) NewTotemOfWrath(sim *core.Simulation) *core.SimpleCast {
 func (shaman *Shaman) newStrengthOfEarthTotemTemplate(sim *core.Simulation) core.SimpleCast {
 	cast := shaman.newTotemCastTemplate(sim, 125, 8161)
 	cast.OnCastComplete = func(sim *core.Simulation, cast *core.Cast) {
-		shaman.SelfBuffs.NextTotemDrops[EarthTotem] = sim.CurrentTime + time.Second*120
+		shaman.NextTotemDrops[EarthTotem] = sim.CurrentTime + time.Second*120
 	}
 	return cast
 }
@@ -172,7 +187,7 @@ func (shaman *Shaman) NewStrengthOfEarthTotem(sim *core.Simulation) *core.Simple
 func (shaman *Shaman) newTremorTotemTemplate(sim *core.Simulation) core.SimpleCast {
 	cast := shaman.newTotemCastTemplate(sim, 60, 8143)
 	cast.OnCastComplete = func(sim *core.Simulation, cast *core.Cast) {
-		shaman.SelfBuffs.NextTotemDrops[EarthTotem] = sim.CurrentTime + time.Second*120
+		shaman.NextTotemDrops[EarthTotem] = sim.CurrentTime + time.Second*120
 	}
 	return cast
 }
@@ -195,11 +210,11 @@ func (shaman *Shaman) TryDropTotems(sim *core.Simulation) (time.Duration, bool) 
 	var cast *core.SimpleCast
 	var attackCast *core.SimpleSpell // if using fire totems this will be an attack cast.
 
-	for totemTypeIdx, totemExpiration := range shaman.SelfBuffs.NextTotemDrops {
+	for totemTypeIdx, totemExpiration := range shaman.NextTotemDrops {
 		if cast != nil || attackCast != nil {
 			break
 		}
-		nextDrop := shaman.SelfBuffs.NextTotemDropType[totemTypeIdx]
+		nextDrop := shaman.NextTotemDropType[totemTypeIdx]
 		if sim.CurrentTime > totemExpiration {
 			switch totemTypeIdx {
 			case AirTotem:
@@ -210,6 +225,8 @@ func (shaman *Shaman) TryDropTotems(sim *core.Simulation) (time.Duration, bool) 
 					cast = shaman.NewWindfuryTotem(sim)
 				case proto.AirTotem_GraceOfAirTotem:
 					cast = shaman.NewGraceOfAirTotem(sim)
+				case proto.AirTotem_TranquilAirTotem:
+					cast = shaman.NewTranquilAirTotem(sim)
 				}
 
 			case EarthTotem:

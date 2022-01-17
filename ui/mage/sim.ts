@@ -186,6 +186,7 @@ export class MageSimUI extends IndividualSimUI<Spec.SpecMage> {
 					OtherInputs.ShadowPriestDPS,
 					OtherInputs.StartingPotion,
 					OtherInputs.NumStartingPotions,
+					OtherInputs.SnapshotImprovedWrathOfAirTotem,
 				],
 			},
 			encounterPicker: {

@@ -1,3 +1,5 @@
+@import "../core/components/totem_inputs";
+
 // Set color variables which control the site theme.
 .enhancement-shaman-sim-ui {
 	--theme-color-primary: #228db0;
@@ -18,17 +20,6 @@
 }
 .enhancement-shaman-sim-ui .debuffs-section {
   grid-template-columns: repeat(4, 1fr);
-}
-
-.totem-dropdowns-container {
-	display: flex;
-	justify-content: space-around;
-}
-
-.totem-inputs-container > div {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
 }
 
 // Enhancement has a lot of EP stats, so make the text smaller so it fits vertically.

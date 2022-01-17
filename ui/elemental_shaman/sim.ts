@@ -16,6 +16,8 @@ import { Player } from '/tbc/core/player.js';
 import { Stats } from '/tbc/core/proto_utils/stats.js';
 import { Sim } from '/tbc/core/sim.js';
 import { IndividualSimUI } from '/tbc/core/individual_sim_ui.js';
+import { EventID, TypedEvent } from '/tbc/core/typed_event.js';
+import { TotemsSection } from '/tbc/core/components/totem_inputs.js';
 
 import { ElementalShaman, ElementalShaman_Rotation as ElementalShamanRotation, ElementalShaman_Options as ElementalShamanOptions } from '/tbc/core/proto/shaman.js';
 
@@ -33,6 +35,21 @@ export class ElementalShamanSimUI extends IndividualSimUI<Spec.SpecElementalSham
 			cssClass: 'elemental-shaman-sim-ui',
 			// List any known bugs / issues here and they'll be shown on the site.
 			knownIssues: [
+			],
+			warnings: [
+				// Warning to use all 4 totems if T6 2pc bonus is active.
+				(simUI: IndividualSimUI<Spec.SpecElementalShaman>) => {
+					return {
+						updateOn: TypedEvent.onAny([simUI.player.rotationChangeEmitter, simUI.player.currentStatsEmitter]),
+						shouldDisplay: () => {
+							const hasT62P = simUI.player.getCurrentStats().sets.includes('Skyshatter Regalia (2pc)');
+							const totems = simUI.player.getRotation().totems!;
+							const hasAll4Totems = totems.earth && totems.air && totems.fire && totems.water;
+							return hasT62P && !hasAll4Totems;
+						},
+						getContent: () => 'T6 2pc bonus is equipped, but inactive because not all 4 totem types are being used.',
+					};
+				},
 			],
 
 			// All stats for which EP should be calculated.
@@ -172,11 +189,15 @@ export class ElementalShamanSimUI extends IndividualSimUI<Spec.SpecElementalSham
 			// Inputs to include in the 'Other' section on the settings tab.
 			otherInputs: {
 				inputs: [
+					ShamanInputs.SnapshotT42Pc,
 					OtherInputs.ShadowPriestDPS,
 					OtherInputs.StartingPotion,
 					OtherInputs.NumStartingPotions,
 				],
 			},
+			customSections: [
+				TotemsSection,
+			],
 			encounterPicker: {
 				// Whether to include 'Target Armor' in the 'Encounter' section of the settings tab.
 				showTargetArmor: false,

@@ -32,44 +32,12 @@ func NewEnhancementShaman(character core.Character, options proto.Player) *Enhan
 		WaterShield: enhOptions.Options.WaterShield,
 	}
 
+	totems := proto.ShamanTotems{}
 	if enhOptions.Rotation.Totems != nil {
-		selfBuffs.ManaSpring = enhOptions.Rotation.Totems.Water == proto.WaterTotem_ManaSpringTotem
-		selfBuffs.EarthTotem = enhOptions.Rotation.Totems.Earth
-		selfBuffs.AirTotem = enhOptions.Rotation.Totems.Air
-		selfBuffs.NextTotemDropType[shaman.AirTotem] = int32(enhOptions.Rotation.Totems.Air)
-		selfBuffs.FireTotem = enhOptions.Rotation.Totems.Fire
-		selfBuffs.NextTotemDropType[shaman.FireTotem] = int32(enhOptions.Rotation.Totems.Fire)
-
-		if enhOptions.Rotation.Totems.WindfuryTotemRank == 0 {
-			// If rank is 0, disable windfury options.
-			enhOptions.Rotation.Totems.TwistWindfury = false
-			if enhOptions.Rotation.Totems.Air == proto.AirTotem_WindfuryTotem {
-				enhOptions.Rotation.Totems.Air = proto.AirTotem_NoAirTotem
-			}
-		}
-		if enhOptions.Rotation.Totems.Air == proto.AirTotem_WindfuryTotem {
-			// No need to twist windfury if its already the default totem.
-			enhOptions.Rotation.Totems.TwistWindfury = false
-		} else if enhOptions.Rotation.Totems.Air == proto.AirTotem_NoAirTotem && enhOptions.Rotation.Totems.TwistWindfury {
-			// If twisting windfury without a default air totem, make windfury the default instead.
-			enhOptions.Rotation.Totems.Air = proto.AirTotem_WindfuryTotem
-			enhOptions.Rotation.Totems.TwistWindfury = false
-		}
-
-		selfBuffs.TwistWindfury = enhOptions.Rotation.Totems.TwistWindfury
-		selfBuffs.WindfuryTotemRank = enhOptions.Rotation.Totems.WindfuryTotemRank
-		if selfBuffs.TwistWindfury {
-			selfBuffs.NextTotemDropType[shaman.AirTotem] = int32(proto.AirTotem_WindfuryTotem)
-			selfBuffs.NextTotemDrops[shaman.AirTotem] = 0 // drop windfury immediately
-		}
-
-		selfBuffs.TwistFireNova = enhOptions.Rotation.Totems.TwistFireNova
-		if selfBuffs.TwistFireNova {
-			selfBuffs.NextTotemDropType[shaman.FireTotem] = int32(proto.FireTotem_FireNovaTotem) // start by dropping nova, then alternating.
-		}
+		totems = *enhOptions.Rotation.Totems
 	}
 	enh := &EnhancementShaman{
-		Shaman:   shaman.NewShaman(character, *enhOptions.Talents, selfBuffs),
+		Shaman:   shaman.NewShaman(character, *enhOptions.Talents, totems, selfBuffs),
 		Rotation: *enhOptions.Rotation,
 	}
 	// Enable Auto Attacks for this spec

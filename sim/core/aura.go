@@ -120,9 +120,18 @@ type Aura struct {
 	OnBeforeMeleeHit OnBeforeMeleeHit
 }
 
-// This needs to be a function that returns an Aura rather than an Aura, so captured
-// local variables can be reset on Sim reset.
-type PermanentAura func(*Simulation) Aura
+type AuraFactory func(*Simulation) Aura
+
+// Wraps aura creation and calls it on every sim reset.
+type PermanentAura struct {
+	AuraFactory AuraFactory
+
+	// By default, permanent auras have their expiration overwritten to never expire.
+	// This option disables that behavior, creating an aura which is applies at the
+	// beginning of every iteration but expires after a period of time. This is
+	// used for some snapshotting effects like Warrior battle shout.
+	RespectExpiration bool
+}
 
 // auraTracker is a centralized implementation of CD and Aura tracking.
 //  This is currently used by Player and Raid (for global debuffs)
@@ -194,12 +203,17 @@ func newAuraTracker(useDebuffIDs bool) auraTracker {
 
 // Registers a permanent aura to this Character which will be re-applied on
 // every Sim reset.
-func (at *auraTracker) AddPermanentAura(permAura PermanentAura) {
+func (at *auraTracker) AddPermanentAuraWithOptions(permAura PermanentAura) {
 	if at.finalized {
 		panic("Permanent auras may not be added once finalized!")
 	}
 
 	at.permanentAuras = append(at.permanentAuras, permAura)
+}
+func (at *auraTracker) AddPermanentAura(factory AuraFactory) {
+	at.AddPermanentAuraWithOptions(PermanentAura{
+		AuraFactory: factory,
+	})
 }
 
 func (at *auraTracker) finalize() {
@@ -237,8 +251,10 @@ func (at *auraTracker) reset(sim *Simulation) {
 	}
 
 	for _, permAura := range at.permanentAuras {
-		aura := permAura(sim)
-		aura.Expires = NeverExpires
+		aura := permAura.AuraFactory(sim)
+		if !permAura.RespectExpiration {
+			aura.Expires = NeverExpires
+		}
 		at.AddAura(sim, aura)
 	}
 }
@@ -630,6 +646,9 @@ func NewICD() InternalCD {
 
 // Helper for the common case of adding an Aura that gives a temporary stat boost.
 func (character *Character) AddAuraWithTemporaryStats(sim *Simulation, auraID AuraID, actionID ActionID, stat stats.Stat, amount float64, duration time.Duration) {
+	character.AddAura(sim, character.NewAuraWithTemporaryStats(sim, auraID, actionID, stat, amount, duration))
+}
+func (character *Character) NewAuraWithTemporaryStats(sim *Simulation, auraID AuraID, actionID ActionID, stat stats.Stat, amount float64, duration time.Duration) Aura {
 	if sim.Log != nil {
 		character.Log(sim, "Gained %0.02f %s from %s.", amount, stat.StatName(), actionID)
 	}
@@ -639,7 +658,7 @@ func (character *Character) AddAuraWithTemporaryStats(sim *Simulation, auraID Au
 		character.AddStat(stat, amount)
 	}
 
-	character.AddAura(sim, Aura{
+	return Aura{
 		ID:       auraID,
 		ActionID: actionID,
 		Expires:  sim.CurrentTime + duration,
@@ -653,5 +672,5 @@ func (character *Character) AddAuraWithTemporaryStats(sim *Simulation, auraID Au
 				character.AddStat(stat, -amount)
 			}
 		},
-	})
+	}
 }
