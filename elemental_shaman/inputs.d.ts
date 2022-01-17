@@ -9,6 +9,19 @@ export declare const IconManaSpringTotem: IconPickerConfig<Player<any>, boolean>
 export declare const IconTotemOfWrath: IconPickerConfig<Player<any>, boolean>;
 export declare const IconWaterShield: IconPickerConfig<Player<any>, boolean>;
 export declare const IconWrathOfAirTotem: IconPickerConfig<Player<any>, boolean>;
+export declare const SnapshotT42Pc: {
+    type: "boolean";
+    getModObject: (simUI: IndividualSimUI<any>) => Player<any>;
+    config: {
+        extraCssClasses: string[];
+        label: string;
+        labelTooltip: string;
+        changedEvent: (player: Player<Spec.SpecElementalShaman>) => TypedEvent<void>;
+        getValue: (player: Player<Spec.SpecElementalShaman>) => boolean;
+        setValue: (eventID: EventID, player: Player<Spec.SpecElementalShaman>, newValue: boolean) => void;
+        enableWhen: (player: Player<Spec.SpecElementalShaman>) => boolean;
+    };
+};
 export declare const ElementalShamanRotationConfig: {
     inputs: ({
         type: "enum";

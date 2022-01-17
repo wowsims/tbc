@@ -3,8 +3,10 @@ import { Conjured } from '/tbc/core/proto/common.js';
 import { Consumes } from '/tbc/core/proto/common.js';
 import { EquipmentSpec } from '/tbc/core/proto/common.js';
 import { IndividualBuffs } from '/tbc/core/proto/common.js';
+import { Spec } from '/tbc/core/proto/common.js';
 import { PlayerStats } from '/tbc/core/proto/api.js';
 import { Player as PlayerProto } from '/tbc/core/proto/api.js';
+import { ShamanTotems, AirTotem, FireTotem, WaterTotem } from '/tbc/core/proto/shaman.js';
 import { computeItemEP } from '/tbc/core/proto_utils/equipped_item.js';
 import { Gear } from '/tbc/core/proto_utils/gear.js';
 import { gemMatchesSocket, } from '/tbc/core/proto_utils/gems.js';
@@ -405,6 +407,25 @@ export class Player {
             if (proto.consumes && proto.consumes.darkRune) {
                 proto.consumes.defaultConjured = Conjured.ConjuredDarkRune;
             }
+            let rotation = this.specTypeFunctions.rotationFromPlayer(proto);
+            // TODO: Remove this on 2/17/2022 (1 month).
+            if (this.spec == Spec.SpecElementalShaman) {
+                const eleRotation = rotation;
+                const options = this.specTypeFunctions.optionsFromPlayer(proto);
+                if (!eleRotation.totems) {
+                    eleRotation.totems = ShamanTotems.create();
+                }
+                if (options.manaSpringTotem) {
+                    eleRotation.totems.water = WaterTotem.ManaSpringTotem;
+                }
+                if (options.totemOfWrath) {
+                    eleRotation.totems.fire = FireTotem.TotemOfWrath;
+                }
+                if (options.wrathOfAirTotem) {
+                    eleRotation.totems.air = AirTotem.WrathOfAirTotem;
+                }
+                rotation = eleRotation;
+            }
             this.setName(eventID, proto.name);
             this.setRace(eventID, proto.race);
             this.setGear(eventID, proto.equipment ? this.sim.lookupEquipmentSpec(proto.equipment) : new Gear({}));
@@ -413,7 +434,7 @@ export class Player {
             this.setBuffs(eventID, proto.buffs || IndividualBuffs.create());
             this.setCooldowns(eventID, proto.cooldowns || Cooldowns.create());
             this.setTalentsString(eventID, proto.talentsString);
-            this.setRotation(eventID, this.specTypeFunctions.rotationFromPlayer(proto));
+            this.setRotation(eventID, rotation);
             this.setTalents(eventID, this.specTypeFunctions.talentsFromPlayer(proto));
             this.setSpecOptions(eventID, this.specTypeFunctions.optionsFromPlayer(proto));
         });

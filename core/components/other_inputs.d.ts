@@ -1,5 +1,6 @@
 import { EnumPicker } from '/tbc/core/components/enum_picker.js';
 import { Potions } from '/tbc/core/proto/common.js';
+import { Party } from '/tbc/core/party.js';
 import { Player } from '/tbc/core/player.js';
 import { Sim } from '/tbc/core/sim.js';
 import { Target } from '/tbc/core/target.js';
@@ -79,5 +80,18 @@ export declare const ExposeWeaknessHunterAgility: {
         changedEvent: (target: Target) => TypedEvent<void>;
         getValue: (target: Target) => number;
         setValue: (eventID: EventID, target: Target, newValue: number) => void;
+    };
+};
+export declare const SnapshotImprovedWrathOfAirTotem: {
+    type: "boolean";
+    getModObject: (simUI: IndividualSimUI<any>) => Party;
+    config: {
+        extraCssClasses: string[];
+        label: string;
+        labelTooltip: string;
+        changedEvent: (party: Party) => TypedEvent<void>;
+        getValue: (party: Party) => boolean;
+        setValue: (eventID: EventID, party: Party, newValue: boolean) => void;
+        enableWhen: (party: Party) => boolean;
     };
 };

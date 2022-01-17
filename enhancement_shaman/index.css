@@ -2171,6 +2171,17 @@ input, select {
   display: inline-block;
 }
 
+.totem-dropdowns-container {
+  display: flex;
+  justify-content: space-around;
+}
+
+.totem-inputs-container > div {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
 .enhancement-shaman-sim-ui {
   --theme-color-primary: #228db0;
   --theme-color-background: #181d2d;
@@ -2192,17 +2203,6 @@ input, select {
 
 .enhancement-shaman-sim-ui .debuffs-section {
   grid-template-columns: repeat(4, 1fr);
-}
-
-.totem-dropdowns-container {
-  display: flex;
-  justify-content: space-around;
-}
-
-.totem-inputs-container > div {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
 }
 
 .enhancement-shaman-sim-ui .character-stats-table-row {

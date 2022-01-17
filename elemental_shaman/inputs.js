@@ -1,4 +1,5 @@
 import { ElementalShaman_Rotation_RotationType as RotationType } from '/tbc/core/proto/shaman.js';
+import { AirTotem } from '/tbc/core/proto/shaman.js';
 import { ActionId } from '/tbc/core/proto_utils/action_id.js';
 // Configuration for spec-specific UI elements on the settings tab.
 // These don't need to be in a separate file but it keeps things cleaner.
@@ -7,6 +8,25 @@ export const IconManaSpringTotem = makeBooleanShamanBuffInput(ActionId.fromSpell
 export const IconTotemOfWrath = makeBooleanShamanBuffInput(ActionId.fromSpellId(30706), 'totemOfWrath');
 export const IconWaterShield = makeBooleanShamanBuffInput(ActionId.fromSpellId(33736), 'waterShield');
 export const IconWrathOfAirTotem = makeBooleanShamanBuffInput(ActionId.fromSpellId(3738), 'wrathOfAirTotem');
+export const SnapshotT42Pc = {
+    type: 'boolean',
+    getModObject: (simUI) => simUI.player,
+    config: {
+        extraCssClasses: [
+            'snapshot-t4-2pc-picker',
+        ],
+        label: 'Snapshot T4 2pc',
+        labelTooltip: 'Snapshots the improved wrath of air totem bonus from T4 2pc (+20 spell power) for the first 1:50s of the fight. Only works if the selected air totem is Wrath of Air Totem.',
+        changedEvent: (player) => player.changeEmitter,
+        getValue: (player) => player.getSpecOptions().snapshotT42Pc,
+        setValue: (eventID, player, newValue) => {
+            const newOptions = player.getSpecOptions();
+            newOptions.snapshotT42Pc = newValue;
+            player.setSpecOptions(eventID, newOptions);
+        },
+        enableWhen: (player) => player.getRotation().totems?.air == AirTotem.WrathOfAirTotem,
+    },
+};
 export const ElementalShamanRotationConfig = {
     inputs: [
         {

@@ -112,6 +112,10 @@ export interface PartyBuffs {
      */
     wrathOfAirTotem: TristateEffect;
     /**
+     * @generated from protobuf field: bool snapshot_improved_wrath_of_air_totem = 25;
+     */
+    snapshotImprovedWrathOfAirTotem: boolean;
+    /**
      * @generated from protobuf field: proto.TristateEffect grace_of_air_totem = 15;
      */
     graceOfAirTotem: TristateEffect;

@@ -6,6 +6,8 @@ import { Stat } from '/tbc/core/proto/common.js';
 import { TristateEffect } from '/tbc/core/proto/common.js';
 import { Stats } from '/tbc/core/proto_utils/stats.js';
 import { IndividualSimUI } from '/tbc/core/individual_sim_ui.js';
+import { TypedEvent } from '/tbc/core/typed_event.js';
+import { TotemsSection } from '/tbc/core/components/totem_inputs.js';
 import * as IconInputs from '/tbc/core/components/icon_inputs.js';
 import * as OtherInputs from '/tbc/core/components/other_inputs.js';
 import * as Mechanics from '/tbc/core/constants/mechanics.js';
@@ -17,6 +19,21 @@ export class ElementalShamanSimUI extends IndividualSimUI {
             cssClass: 'elemental-shaman-sim-ui',
             // List any known bugs / issues here and they'll be shown on the site.
             knownIssues: [],
+            warnings: [
+                // Warning to use all 4 totems if T6 2pc bonus is active.
+                (simUI) => {
+                    return {
+                        updateOn: TypedEvent.onAny([simUI.player.rotationChangeEmitter, simUI.player.currentStatsEmitter]),
+                        shouldDisplay: () => {
+                            const hasT62P = simUI.player.getCurrentStats().sets.includes('Skyshatter Regalia (2pc)');
+                            const totems = simUI.player.getRotation().totems;
+                            const hasAll4Totems = totems.earth && totems.air && totems.fire && totems.water;
+                            return hasT62P && !hasAll4Totems;
+                        },
+                        getContent: () => 'T6 2pc bonus is equipped, but inactive because not all 4 totem types are being used.',
+                    };
+                },
+            ],
             // All stats for which EP should be calculated.
             epStats: [
                 Stat.StatIntellect,
@@ -147,11 +164,15 @@ export class ElementalShamanSimUI extends IndividualSimUI {
             // Inputs to include in the 'Other' section on the settings tab.
             otherInputs: {
                 inputs: [
+                    ShamanInputs.SnapshotT42Pc,
                     OtherInputs.ShadowPriestDPS,
                     OtherInputs.StartingPotion,
                     OtherInputs.NumStartingPotions,
                 ],
             },
+            customSections: [
+                TotemsSection,
+            ],
             encounterPicker: {
                 // Whether to include 'Target Armor' in the 'Encounter' section of the settings tab.
                 showTargetArmor: false,

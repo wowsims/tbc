@@ -123,6 +123,7 @@ export class Sim {
             // Skip the first event ID because it interferes with the loaded stats.
             return;
         }
+        eventID = TypedEvent.nextEventID();
         await this.waitForInit();
         // Capture the current players so we avoid issues if something changes while
         // request is in-flight.

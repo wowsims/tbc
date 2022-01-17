@@ -244,6 +244,10 @@ export interface ElementalShaman {
  */
 export interface ElementalShaman_Rotation {
     /**
+     * @generated from protobuf field: proto.ShamanTotems totems = 3;
+     */
+    totems?: ShamanTotems;
+    /**
      * @generated from protobuf field: proto.ElementalShaman.Rotation.RotationType type = 1;
      */
     type: ElementalShaman_Rotation_RotationType;
@@ -296,6 +300,8 @@ export interface ElementalShaman_Options {
      */
     bloodlust: boolean;
     /**
+     * Deprecate these totem options after 1 month (2/17/2022).
+     *
      * @generated from protobuf field: bool mana_spring_totem = 3;
      */
     manaSpringTotem: boolean;
@@ -307,6 +313,13 @@ export interface ElementalShaman_Options {
      * @generated from protobuf field: bool wrath_of_air_totem = 5;
      */
     wrathOfAirTotem: boolean;
+    /**
+     * Indicates the shaman will be dropping an improved wrath of air totem before
+     * the fight by snapshotting the T4 2pc bonus.
+     *
+     * @generated from protobuf field: bool snapshot_t4_2pc = 6 [json_name = "snapshotT42pc"];
+     */
+    snapshotT42Pc: boolean;
 }
 /**
  * @generated from protobuf message proto.EnhancementShaman

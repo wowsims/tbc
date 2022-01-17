@@ -85,6 +85,7 @@ export class IndividualSimUI extends SimUI {
                 return `Meta gem disabled (${metaGem.name}): ${getMetaGemConditionDescription(metaGem)}`;
             },
         });
+        (config.warnings || []).forEach(warning => this.addWarning(warning(this)));
         this.exclusivityMap = {
             'Battle Elixir': [],
             'Drums': [],

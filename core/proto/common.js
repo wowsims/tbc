@@ -908,6 +908,7 @@ class PartyBuffs$Type extends MessageType {
             { no: 17, name: "mana_tide_totems", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 13, name: "totem_of_wrath", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 14, name: "wrath_of_air_totem", kind: "enum", T: () => ["proto.TristateEffect", TristateEffect] },
+            { no: 25, name: "snapshot_improved_wrath_of_air_totem", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 15, name: "grace_of_air_totem", kind: "enum", T: () => ["proto.TristateEffect", TristateEffect] },
             { no: 16, name: "strength_of_earth_totem", kind: "enum", T: () => ["proto.StrengthOfEarthType", StrengthOfEarthType] },
             { no: 23, name: "windfury_totem_rank", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
@@ -916,7 +917,7 @@ class PartyBuffs$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { bloodlust: 0, ferociousInspiration: 0, moonkinAura: 0, leaderOfThePack: 0, sanctityAura: 0, trueshotAura: false, draeneiRacialMelee: false, draeneiRacialCaster: false, drums: 0, atieshMage: 0, atieshWarlock: 0, braidedEterniumChain: false, eyeOfTheNight: false, chainOfTheTwilightOwl: false, jadePendantOfBlasting: false, manaSpringTotem: 0, manaTideTotems: 0, totemOfWrath: 0, wrathOfAirTotem: 0, graceOfAirTotem: 0, strengthOfEarthTotem: 0, windfuryTotemRank: 0, windfuryTotemIwt: 0, battleShout: 0 };
+        const message = { bloodlust: 0, ferociousInspiration: 0, moonkinAura: 0, leaderOfThePack: 0, sanctityAura: 0, trueshotAura: false, draeneiRacialMelee: false, draeneiRacialCaster: false, drums: 0, atieshMage: 0, atieshWarlock: 0, braidedEterniumChain: false, eyeOfTheNight: false, chainOfTheTwilightOwl: false, jadePendantOfBlasting: false, manaSpringTotem: 0, manaTideTotems: 0, totemOfWrath: 0, wrathOfAirTotem: 0, snapshotImprovedWrathOfAirTotem: false, graceOfAirTotem: 0, strengthOfEarthTotem: 0, windfuryTotemRank: 0, windfuryTotemIwt: 0, battleShout: 0 };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -983,6 +984,9 @@ class PartyBuffs$Type extends MessageType {
                     break;
                 case /* proto.TristateEffect wrath_of_air_totem */ 14:
                     message.wrathOfAirTotem = reader.int32();
+                    break;
+                case /* bool snapshot_improved_wrath_of_air_totem */ 25:
+                    message.snapshotImprovedWrathOfAirTotem = reader.bool();
                     break;
                 case /* proto.TristateEffect grace_of_air_totem */ 15:
                     message.graceOfAirTotem = reader.int32();
@@ -1068,6 +1072,9 @@ class PartyBuffs$Type extends MessageType {
         /* proto.TristateEffect wrath_of_air_totem = 14; */
         if (message.wrathOfAirTotem !== 0)
             writer.tag(14, WireType.Varint).int32(message.wrathOfAirTotem);
+        /* bool snapshot_improved_wrath_of_air_totem = 25; */
+        if (message.snapshotImprovedWrathOfAirTotem !== false)
+            writer.tag(25, WireType.Varint).bool(message.snapshotImprovedWrathOfAirTotem);
         /* proto.TristateEffect grace_of_air_totem = 15; */
         if (message.graceOfAirTotem !== 0)
             writer.tag(15, WireType.Varint).int32(message.graceOfAirTotem);

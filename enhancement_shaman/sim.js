@@ -6,6 +6,7 @@ import { Stat } from '/tbc/core/proto/common.js';
 import { TristateEffect } from '/tbc/core/proto/common.js';
 import { Stats } from '/tbc/core/proto_utils/stats.js';
 import { IndividualSimUI } from '/tbc/core/individual_sim_ui.js';
+import { TotemsSection } from '/tbc/core/components/totem_inputs.js';
 import * as IconInputs from '/tbc/core/components/icon_inputs.js';
 import * as OtherInputs from '/tbc/core/components/other_inputs.js';
 import * as ShamanInputs from './inputs.js';
@@ -161,7 +162,7 @@ export class EnhancementShamanSimUI extends IndividualSimUI {
                 ],
             },
             customSections: [
-                ShamanInputs.TotemsSection,
+                TotemsSection,
             ],
             encounterPicker: {
                 // Whether to include 'Target Armor' in the 'Encounter' section of the settings tab.

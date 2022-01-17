@@ -628,6 +628,7 @@ export const ElementalShaman = new ElementalShaman$Type();
 class ElementalShaman_Rotation$Type extends MessageType {
     constructor() {
         super("proto.ElementalShaman.Rotation", [
+            { no: 3, name: "totems", kind: "message", T: () => ShamanTotems },
             { no: 1, name: "type", kind: "enum", T: () => ["proto.ElementalShaman.Rotation.RotationType", ElementalShaman_Rotation_RotationType] },
             { no: 2, name: "lbs_per_cl", kind: "scalar", T: 5 /*ScalarType.INT32*/ }
         ]);
@@ -644,6 +645,9 @@ class ElementalShaman_Rotation$Type extends MessageType {
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
+                case /* proto.ShamanTotems totems */ 3:
+                    message.totems = ShamanTotems.internalBinaryRead(reader, reader.uint32(), options, message.totems);
+                    break;
                 case /* proto.ElementalShaman.Rotation.RotationType type */ 1:
                     message.type = reader.int32();
                     break;
@@ -662,6 +666,9 @@ class ElementalShaman_Rotation$Type extends MessageType {
         return message;
     }
     internalBinaryWrite(message, writer, options) {
+        /* proto.ShamanTotems totems = 3; */
+        if (message.totems)
+            ShamanTotems.internalBinaryWrite(message.totems, writer.tag(3, WireType.LengthDelimited).fork(), options).join();
         /* proto.ElementalShaman.Rotation.RotationType type = 1; */
         if (message.type !== 0)
             writer.tag(1, WireType.Varint).int32(message.type);
@@ -686,11 +693,12 @@ class ElementalShaman_Options$Type extends MessageType {
             { no: 2, name: "bloodlust", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 3, name: "mana_spring_totem", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 4, name: "totem_of_wrath", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
-            { no: 5, name: "wrath_of_air_totem", kind: "scalar", T: 8 /*ScalarType.BOOL*/ }
+            { no: 5, name: "wrath_of_air_totem", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 6, name: "snapshot_t4_2pc", kind: "scalar", jsonName: "snapshotT42pc", T: 8 /*ScalarType.BOOL*/ }
         ]);
     }
     create(value) {
-        const message = { waterShield: false, bloodlust: false, manaSpringTotem: false, totemOfWrath: false, wrathOfAirTotem: false };
+        const message = { waterShield: false, bloodlust: false, manaSpringTotem: false, totemOfWrath: false, wrathOfAirTotem: false, snapshotT42Pc: false };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -715,6 +723,9 @@ class ElementalShaman_Options$Type extends MessageType {
                     break;
                 case /* bool wrath_of_air_totem */ 5:
                     message.wrathOfAirTotem = reader.bool();
+                    break;
+                case /* bool snapshot_t4_2pc = 6 [json_name = "snapshotT42pc"];*/ 6:
+                    message.snapshotT42Pc = reader.bool();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -743,6 +754,9 @@ class ElementalShaman_Options$Type extends MessageType {
         /* bool wrath_of_air_totem = 5; */
         if (message.wrathOfAirTotem !== false)
             writer.tag(5, WireType.Varint).bool(message.wrathOfAirTotem);
+        /* bool snapshot_t4_2pc = 6 [json_name = "snapshotT42pc"]; */
+        if (message.snapshotT42Pc !== false)
+            writer.tag(6, WireType.Varint).bool(message.snapshotT42Pc);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

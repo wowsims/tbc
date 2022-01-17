@@ -1,5 +1,6 @@
 import { EnumPicker } from '/tbc/core/components/enum_picker.js';
 import { Potions } from '/tbc/core/proto/common.js';
+import { TristateEffect } from '/tbc/core/proto/common.js';
 export function makePhaseSelector(parent, sim) {
     return new EnumPicker(parent, sim, {
         extraCssClasses: [
@@ -134,5 +135,25 @@ export const ExposeWeaknessHunterAgility = {
             newDebuffs.exposeWeaknessHunterAgility = newValue;
             target.setDebuffs(eventID, newDebuffs);
         },
+    },
+};
+export const SnapshotImprovedWrathOfAirTotem = {
+    type: 'boolean',
+    getModObject: (simUI) => simUI.player.getParty(),
+    config: {
+        extraCssClasses: [
+            'snapshot-improved-wrath-of-air-totem-picker',
+            'within-raid-sim-hide',
+        ],
+        label: 'Snapshot Imp Wrath of Air',
+        labelTooltip: 'An elemental shaman in your party is snapshotting their improved wrath of air totem bonus from T4 2pc (+20 spell power) for the first 1:50s of the fight.',
+        changedEvent: (party) => party.buffsChangeEmitter,
+        getValue: (party) => party.getBuffs().snapshotImprovedWrathOfAirTotem,
+        setValue: (eventID, party, newValue) => {
+            const buffs = party.getBuffs();
+            buffs.snapshotImprovedWrathOfAirTotem = newValue;
+            party.setBuffs(eventID, buffs);
+        },
+        enableWhen: (party) => party.getBuffs().wrathOfAirTotem == TristateEffect.TristateEffectRegular,
     },
 };

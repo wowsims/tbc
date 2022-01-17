@@ -156,6 +156,7 @@ export class ShadowPriestSimUI extends IndividualSimUI {
                     OtherInputs.ShadowPriestDPS,
                     OtherInputs.StartingPotion,
                     OtherInputs.NumStartingPotions,
+                    OtherInputs.SnapshotImprovedWrathOfAirTotem,
                 ],
             },
             encounterPicker: {

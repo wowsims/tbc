@@ -17,7 +17,7 @@ import { Race } from '/tbc/core/proto/common.js';
 import { Raid } from './raid.js';
 import { RaidBuffs } from '/tbc/core/proto/common.js';
 import { SavedDataConfig } from '/tbc/core/components/saved_data_manager.js';
-import { SimUI } from './sim_ui.js';
+import { SimUI, SimWarning } from './sim_ui.js';
 import { Spec } from '/tbc/core/proto/common.js';
 import { SpecOptions } from '/tbc/core/proto_utils/utils.js';
 import { SpecRotation } from '/tbc/core/proto_utils/utils.js';
@@ -51,6 +51,7 @@ export interface InputSection {
 export interface IndividualSimUIConfig<SpecType extends Spec> {
     cssClass: string;
     knownIssues?: Array<string>;
+    warnings?: Array<(simUI: IndividualSimUI<SpecType>) => SimWarning>;
     epStats: Array<Stat>;
     epReferenceStat: Stat;
     displayStats: Array<Stat>;
