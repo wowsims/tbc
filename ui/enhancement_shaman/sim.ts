@@ -16,6 +16,7 @@ import { Player } from '/tbc/core/player.js';
 import { Stats } from '/tbc/core/proto_utils/stats.js';
 import { Sim } from '/tbc/core/sim.js';
 import { IndividualSimUI } from '/tbc/core/individual_sim_ui.js';
+import { TotemsSection } from '/tbc/core/components/totem_inputs.js';
 
 import { EnhancementShaman, EnhancementShaman_Rotation as EnhancementShamanRotation, EnhancementShaman_Options as EnhancementShamanOptions } from '/tbc/core/proto/shaman.js';
 
@@ -139,6 +140,7 @@ export class EnhancementShamanSimUI extends IndividualSimUI<Spec.SpecEnhancement
 				IconInputs.FerociousInspiration,
 				IconInputs.TrueshotAura,
 				IconInputs.SanctityAura,
+				IconInputs.BraidedEterniumChain,
 			],
 			playerBuffInputs: [
 				IconInputs.BlessingOfKings,
@@ -163,10 +165,14 @@ export class EnhancementShamanSimUI extends IndividualSimUI<Spec.SpecEnhancement
 			consumeInputs: [
 				IconInputs.DefaultHastePotion,
 				IconInputs.DefaultDarkRune,
+				IconInputs.DefaultFlameCap,
 				IconInputs.FlaskOfRelentlessAssault,
 				IconInputs.ElixirOfDemonslaying,
+				IconInputs.ElixirOfMajorStrength,
 				IconInputs.ElixirOfMajorAgility,
+				IconInputs.ElixirOfTheMongoose,
 				IconInputs.RoastedClefthoof,
+				IconInputs.SpicyHotTalbuk,
 				IconInputs.ScrollOfAgilityV,
 				IconInputs.ScrollOfStrengthV,
 			],
@@ -183,7 +189,7 @@ export class EnhancementShamanSimUI extends IndividualSimUI<Spec.SpecEnhancement
 				],
 			},
 			customSections: [
-				ShamanInputs.TotemsSection,
+				TotemsSection,
 			],
 			encounterPicker: {
 				// Whether to include 'Target Armor' in the 'Encounter' section of the settings tab.

@@ -14,21 +14,19 @@ func init() {
 }
 
 func TestP1FullCharacterStats(t *testing.T) {
-	isr := core.NewIndividualSimRequest(core.IndividualSimInputs{
-		Player: &proto.Player{
+	raid := core.SinglePlayerRaidProto(
+		&proto.Player{
 			Race:      proto.Race_RaceTroll10,
 			Class:     proto.Class_ClassShaman,
 			Equipment: P1Gear,
 			Consumes:  FullConsumes,
 			Spec:      PlayerOptionsAdaptive,
+			Buffs:     FullIndividualBuffs,
 		},
+		FullPartyBuffs,
+		FullRaidBuffs)
 
-		RaidBuffs:       FullRaidBuffs,
-		PartyBuffs:      FullPartyBuffs,
-		IndividualBuffs: FullIndividualBuffs,
-	})
-
-	core.CharacterStatsTest("p1Full", t, isr, stats.Stats{
+	core.CharacterStatsTest("p1Full", t, raid, stats.Stats{
 		stats.Strength:  140.7,
 		stats.Agility:   100.0,
 		stats.Stamina:   522.4,
@@ -86,10 +84,10 @@ func TestCalcStatWeight(t *testing.T) {
 	}
 
 	core.StatWeightsTest("p1Full", t, swr, stats.Stats{
-		stats.Intellect:  0.190,
-		stats.SpellPower: 0.701,
-		stats.SpellHit:   1.445,
-		stats.SpellCrit:  0.581,
+		stats.Intellect:  0.185,
+		stats.SpellPower: 0.696,
+		stats.SpellHit:   1.502,
+		stats.SpellCrit:  0.573,
 	})
 }
 
@@ -183,21 +181,26 @@ func TestAverageDPS(t *testing.T) {
 }
 
 func BenchmarkSimulate(b *testing.B) {
-	isr := core.NewIndividualSimRequest(core.IndividualSimInputs{
-		Player: &proto.Player{
-			Race:      proto.Race_RaceOrc,
-			Class:     proto.Class_ClassShaman,
-			Equipment: P1Gear,
-			Consumes:  FullConsumes,
-			Spec:      PlayerOptionsAdaptive,
+	rsr := &proto.RaidSimRequest{
+		Raid: core.SinglePlayerRaidProto(
+			&proto.Player{
+				Race:      proto.Race_RaceOrc,
+				Class:     proto.Class_ClassShaman,
+				Equipment: P1Gear,
+				Consumes:  FullConsumes,
+				Spec:      PlayerOptionsAdaptive,
+				Buffs:     FullIndividualBuffs,
+			},
+			FullPartyBuffs,
+			FullRaidBuffs),
+		Encounter: &proto.Encounter{
+			Duration: 300,
+			Targets: []*proto.Target{
+				FullDebuffTarget,
+			},
 		},
+		SimOptions: core.AverageDefaultSimTestOptions,
+	}
 
-		RaidBuffs:       FullRaidBuffs,
-		PartyBuffs:      FullPartyBuffs,
-		IndividualBuffs: FullIndividualBuffs,
-
-		Target: FullDebuffTarget,
-	})
-
-	core.IndividualBenchmark(b, isr)
+	core.RaidBenchmark(b, rsr)
 }

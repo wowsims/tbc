@@ -33,8 +33,14 @@ func (shaman *Shaman) newSearingTotemTemplate(sim *core.Simulation) core.SimpleS
 				IgnoreHitCheck:         true,
 			},
 			DotInput: core.DotDamageInput{
-				NumberOfTicks:        30,
-				TickLength:           time.Second * 2,
+				// These are the real tick values, but searing totem doesn't start its next
+				// cast until the previous missile hits the target. We don't have an option
+				// for target distance yet so just pretend the tick rate is lower.
+				//NumberOfTicks:        30,
+				//TickLength:           time.Second * 2,
+				NumberOfTicks: 20,
+				TickLength:    time.Second * 3,
+
 				TickBaseDamage:       58,
 				TickSpellCoefficient: 0.167,
 				TicksCanMissAndCrit:  true,
@@ -44,6 +50,11 @@ func (shaman *Shaman) newSearingTotemTemplate(sim *core.Simulation) core.SimpleS
 	spell.Effect.DamageMultiplier *= 1 + float64(shaman.Talents.CallOfFlame)*0.05
 	spell.ManaCost -= spell.BaseManaCost * float64(shaman.Talents.TotemicFocus) * 0.05
 	spell.ManaCost -= spell.BaseManaCost * float64(shaman.Talents.MentalQuickness) * 0.02
+
+	spell.OnCastComplete = func(sim *core.Simulation, cast *core.Cast) {
+		shaman.NextTotemDrops[FireTotem] = sim.CurrentTime + time.Second*60
+		shaman.tryTwistFireNova(sim)
+	}
 
 	return core.NewSimpleSpellTemplate(spell)
 }
@@ -98,6 +109,11 @@ func (shaman *Shaman) newMagmaTotemTemplate(sim *core.Simulation) core.SimpleSpe
 		},
 	}
 	baseEffect.StaticDamageMultiplier *= 1 + float64(shaman.Talents.CallOfFlame)*0.05
+
+	spell.OnCastComplete = func(sim *core.Simulation, cast *core.Cast) {
+		shaman.NextTotemDrops[FireTotem] = sim.CurrentTime + time.Second*20
+		shaman.tryTwistFireNova(sim)
+	}
 
 	numHits := sim.GetNumTargets()
 	effects := make([]core.SpellHitEffect, 0, numHits)
@@ -168,6 +184,12 @@ func (shaman *Shaman) newNovaTotemTemplate(sim *core.Simulation) core.SimpleSpel
 	baseEffect.StaticDamageMultiplier *= 1 + float64(shaman.Talents.CallOfFlame)*0.05
 	baseEffect.DotInput.TickLength -= time.Duration(shaman.Talents.ImprovedFireTotems) * time.Second
 
+	tickLength := baseEffect.DotInput.TickLength
+	spell.OnCastComplete = func(sim *core.Simulation, cast *core.Cast) {
+		shaman.NextTotemDrops[FireTotem] = sim.CurrentTime + tickLength
+		shaman.tryTwistFireNova(sim)
+	}
+
 	numHits := sim.GetNumTargets()
 	effects := make([]core.SpellHitEffect, 0, numHits)
 	for i := int32(0); i < numHits; i++ {
@@ -179,6 +201,11 @@ func (shaman *Shaman) newNovaTotemTemplate(sim *core.Simulation) core.SimpleSpel
 }
 
 func (shaman *Shaman) NewNovaTotem(sim *core.Simulation) *core.SimpleSpell {
+	// If we drop nova while another totem is running, cancel it.
+	if shaman.FireTotemSpell.IsInUse() {
+		shaman.FireTotemSpell.Cancel(sim)
+	}
+
 	// Initialize cast from precomputed template.
 	novaTotem := &shaman.FireTotemSpell
 	shaman.novaTotemTemplate.Apply(novaTotem)

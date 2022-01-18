@@ -123,6 +123,12 @@ func applyBuffEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs proto.P
 	character.AddStats(stats.Stats{
 		stats.SpellPower: GetTristateValueFloat(partyBuffs.WrathOfAirTotem, 101.0, 121.0),
 	})
+	if partyBuffs.WrathOfAirTotem == proto.TristateEffect_TristateEffectRegular && partyBuffs.SnapshotImprovedWrathOfAirTotem {
+		character.AddPermanentAuraWithOptions(PermanentAura{
+			AuraFactory:       SnapshotImprovedWrathOfAirTotemAura(character),
+			RespectExpiration: true,
+		})
+	}
 	character.AddStats(stats.Stats{
 		stats.Agility: GetTristateValueFloat(partyBuffs.GraceOfAirTotem, 77.0, 88.55),
 	})
@@ -142,6 +148,17 @@ func applyBuffEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs proto.P
 	if partyBuffs.WindfuryTotemRank > 0 && IsEligibleForWindfuryTotem(character) {
 		character.AddPermanentAura(func(sim *Simulation) Aura {
 			return WindfuryTotemAura(character, partyBuffs.WindfuryTotemRank, partyBuffs.WindfuryTotemIwt)
+		})
+	}
+
+	if individualBuffs.UnleashedRage {
+		// TODO: This implementation won't give the bonus to temporary effects, like trinket actives.
+		character.AddStatDependency(stats.StatDependency{
+			SourceStat:   stats.AttackPower,
+			ModifiedStat: stats.AttackPower,
+			Modifier: func(ap float64, _ float64) float64 {
+				return ap * 1.1
+			},
 		})
 	}
 
@@ -169,6 +186,14 @@ func applyBuffEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs proto.P
 	}
 	if partyBuffs.ChainOfTheTwilightOwl {
 		character.AddStats(stats.Stats{stats.SpellCrit: 2 * SpellCritRatingPerCritChance})
+	}
+}
+
+var SnapshotImprovedWrathOfAirTotemAuraID = NewAuraID()
+
+func SnapshotImprovedWrathOfAirTotemAura(character *Character) AuraFactory {
+	return func(sim *Simulation) Aura {
+		return character.NewAuraWithTemporaryStats(sim, SnapshotImprovedWrathOfAirTotemAuraID, ActionID{SpellID: 37212}, stats.SpellPower, 20, time.Second*110)
 	}
 }
 

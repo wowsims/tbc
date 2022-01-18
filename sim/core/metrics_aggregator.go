@@ -199,6 +199,9 @@ func (characterMetrics *CharacterMetrics) AddFinalPetMetrics(petMetrics *Charact
 }
 
 func (characterMetrics *CharacterMetrics) MarkOOM(sim *Simulation, character *Character, dur time.Duration) {
+	//if sim.Log != nil {
+	//	character.Log(sim, "Adding OOM time: %s", dur)
+	//}
 	characterMetrics.CharacterIterationMetrics.OOMTime += dur
 	characterMetrics.CharacterIterationMetrics.WentOOM = true
 }

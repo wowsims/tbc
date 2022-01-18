@@ -270,9 +270,6 @@ func (effect *AbilityEffect) String() string {
 func (ahe *AbilityHitEffect) calculateDamage(sim *Simulation, ability *ActiveMeleeAbility) {
 	character := ability.Character
 
-	attackPower := character.stats[stats.AttackPower] + ahe.BonusAttackPower
-	bonusWeaponDamage := ahe.BonusWeaponDamage
-
 	if ahe.AbilityEffect.ReuseMainHitRoll {
 		ahe.HitType = ability.Effects[0].HitType
 	} else {
@@ -283,6 +280,9 @@ func (ahe *AbilityHitEffect) calculateDamage(sim *Simulation, ability *ActiveMel
 		ahe.Damage = 0
 		return
 	}
+
+	attackPower := character.stats[stats.AttackPower] + ahe.BonusAttackPower
+	bonusWeaponDamage := ahe.BonusWeaponDamage
 
 	dmg := 0.0
 	if ahe.WeaponInput.DamageMultiplier != 0 {
@@ -295,7 +295,12 @@ func (ahe *AbilityHitEffect) calculateDamage(sim *Simulation, ability *ActiveMel
 		dmg += ahe.WeaponInput.FlatDamageBonus
 	}
 
-	// TODO: Add damage from DirectDamageInput
+	// Add damage from DirectInput
+	if ahe.DirectInput.MinBaseDamage != 0 {
+		dmg += ahe.DirectInput.MinBaseDamage + (ahe.DirectInput.MaxBaseDamage-ahe.DirectInput.MinBaseDamage)*sim.RandomFloat("Melee Direct Input")
+	}
+	dmg += attackPower * ahe.DirectInput.SpellCoefficient
+	dmg += ahe.DirectInput.FlatDamageBonus
 
 	// If this is a yellow attack, need a 2nd roll to decide crit. Otherwise just use existing hit result.
 	if !ahe.AbilityEffect.IsWhiteHit {
@@ -319,9 +324,9 @@ func (ahe *AbilityHitEffect) calculateDamage(sim *Simulation, ability *ActiveMel
 
 	// Apply armor reduction.
 	dmg *= 1 - ahe.Target.ArmorDamageReduction(character.stats[stats.ArmorPenetration]+ahe.BonusArmorPenetration)
-	if sim.Log != nil {
-		character.Log(sim, "Target armor: %0.2f\n", ahe.Target.currentArmor)
-	}
+	//if sim.Log != nil {
+	//	character.Log(sim, "Target armor: %0.2f\n", ahe.Target.currentArmor)
+	//}
 
 	// Apply all other effect multipliers.
 	dmg *= ahe.DamageMultiplier * ahe.StaticDamageMultiplier
@@ -360,13 +365,21 @@ func (ability *ActiveMeleeAbility) Attack(sim *Simulation) bool {
 		log.Fatalf("Ability used while on GCD\n-------\nAbility %s: %#v\n", ability.ActionID, ability)
 	}
 	if ability.MeleeAbility.Cost.Type != 0 {
-		if ability.Character.stats[ability.MeleeAbility.Cost.Type] < ability.MeleeAbility.Cost.Value {
-			return false
-		}
 		if ability.MeleeAbility.Cost.Type == stats.Mana {
+			if ability.Character.CurrentMana() < ability.MeleeAbility.Cost.Value {
+				return false
+			}
 			ability.Character.SpendMana(sim, ability.MeleeAbility.Cost.Value, ability.MeleeAbility.ActionID)
+		} else if ability.MeleeAbility.Cost.Type == stats.Rage {
+			if ability.Character.CurrentRage() < ability.MeleeAbility.Cost.Value {
+				return false
+			}
+			ability.Character.SpendRage(sim, ability.MeleeAbility.Cost.Value, ability.MeleeAbility.ActionID)
 		} else {
-			ability.Character.AddStat(ability.MeleeAbility.Cost.Type, -ability.MeleeAbility.Cost.Value)
+			if ability.Character.CurrentEnergy() < ability.MeleeAbility.Cost.Value {
+				return false
+			}
+			ability.Character.SpendEnergy(sim, ability.MeleeAbility.Cost.Value, ability.MeleeAbility.ActionID)
 		}
 	}
 

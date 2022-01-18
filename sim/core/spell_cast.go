@@ -182,13 +182,13 @@ func (hitEffect *SpellHitEffect) calculateDirectDamage(sim *Simulation, spellCas
 
 	damage *= hitEffect.SpellEffect.DamageMultiplier * hitEffect.SpellEffect.StaticDamageMultiplier
 
+	if !spellCast.Binary {
+		damage, _ = calculateResists(sim, damage, &hitEffect.SpellEffect)
+	}
+
 	if hitEffect.SpellEffect.critCheck(sim, spellCast) {
 		hitEffect.SpellEffect.Crit = true
 		damage *= spellCast.CritMultiplier
-	}
-
-	if !spellCast.Binary {
-		damage, _ = calculateResists(sim, damage, &hitEffect.SpellEffect)
 	}
 
 	hitEffect.SpellEffect.Damage = damage
@@ -223,13 +223,13 @@ func (hitEffect *SpellHitEffect) onDotTick(sim *Simulation, spellCast *SpellCast
 	resistMultiplier := 1.0
 
 	if hit {
+		if !spellCast.Binary {
+			damage, resistMultiplier = calculateResists(sim, damage, &hitEffect.SpellEffect)
+		}
+
 		if hitEffect.DotInput.TicksCanMissAndCrit && hitEffect.critCheck(sim, spellCast) {
 			crit = true
 			damage *= spellCast.CritMultiplier
-		}
-
-		if !spellCast.Binary {
-			damage, resistMultiplier = calculateResists(sim, damage, &hitEffect.SpellEffect)
 		}
 	} else {
 		damage = 0

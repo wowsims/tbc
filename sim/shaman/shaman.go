@@ -8,12 +8,36 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-func NewShaman(character core.Character, talents proto.ShamanTalents, selfBuffs SelfBuffs) *Shaman {
+func NewShaman(character core.Character, talents proto.ShamanTalents, totems proto.ShamanTotems, selfBuffs SelfBuffs) *Shaman {
+	if totems.WindfuryTotemRank == 0 {
+		// If rank is 0, disable windfury options.
+		totems.TwistWindfury = false
+		if totems.Air == proto.AirTotem_WindfuryTotem {
+			totems.Air = proto.AirTotem_NoAirTotem
+		}
+	}
+	if totems.Air == proto.AirTotem_WindfuryTotem {
+		// No need to twist windfury if its already the default totem.
+		totems.TwistWindfury = false
+	} else if totems.Air == proto.AirTotem_NoAirTotem && totems.TwistWindfury {
+		// If twisting windfury without a default air totem, make windfury the default instead.
+		totems.Air = proto.AirTotem_WindfuryTotem
+		totems.TwistWindfury = false
+	}
+	if totems.Fire == proto.FireTotem_TotemOfWrath && !talents.TotemOfWrath {
+		totems.Fire = proto.FireTotem_NoFireTotem
+	}
+	if totems.Air != proto.AirTotem_WrathOfAirTotem && selfBuffs.SnapshotT42Pc {
+		selfBuffs.SnapshotT42Pc = false
+	}
+
 	shaman := &Shaman{
 		Character: character,
 		Talents:   talents,
+		Totems:    totems,
 		SelfBuffs: selfBuffs,
 	}
+	shaman.EnableManaBar()
 
 	// Add Shaman stat dependencies
 	shaman.AddStatDependency(stats.StatDependency{
@@ -52,24 +76,9 @@ func NewShaman(character core.Character, talents proto.ShamanTalents, selfBuffs 
 
 // Which buffs this shaman is using.
 type SelfBuffs struct {
-	Bloodlust   bool
-	WaterShield bool
-
-	ManaSpring    bool
-	EarthTotem    proto.EarthTotem
-	AirTotem      proto.AirTotem
-	TwistWindfury bool // if true will cast WF every 10s and then GoA
-
-	WindfuryTotemRank int32
-
-	FireTotem proto.FireTotem
-	// If true Fire Nova will be dropped on CD.
-	// After it will recast whatever other fire totem is available
-	TwistFireNova bool
-
-	// Mutated state on each run.
-	NextTotemDrops    [4]time.Duration // track when to drop totems
-	NextTotemDropType [4]int32         // track what totem to drop next to support twisting
+	Bloodlust     bool
+	WaterShield   bool
+	SnapshotT42Pc bool
 }
 
 // Indexes into NextTotemDrops for self buffs
@@ -86,6 +95,13 @@ type Shaman struct {
 
 	Talents   proto.ShamanTalents
 	SelfBuffs SelfBuffs
+
+	Totems proto.ShamanTotems
+
+	// The type of totem which should be dropped next and time to drop it, for
+	// each totem type (earth, air, fire, water).
+	NextTotemDropType [4]int32
+	NextTotemDrops    [4]time.Duration
 
 	ElementalFocusStacks byte
 
@@ -115,14 +131,20 @@ type Shaman struct {
 	FlameShockSpell    core.SimpleSpell
 	flameShockTemplate core.SimpleSpellTemplate
 
-	// Fire Totems
-	FireTotemSpell core.SimpleSpell
+	strengthOfEarthTotemTemplate core.SimpleCast
+	tremorTotemTemplate          core.SimpleCast
+	graceOfAirTotemTemplate      core.SimpleCast
+	wrathOfAirTotemTemplate      core.SimpleCast
+	tranquilAirTotemTemplate     core.SimpleCast
+	windfuryTotemTemplate        core.SimpleCast
+	totemOfWrathTemplate         core.SimpleCast
+	manaSpringTotemTemplate      core.SimpleCast
+	totemSpell                   core.SimpleCast
 
 	searingTotemTemplate core.SimpleSpellTemplate
 	magmaTotemTemplate   core.SimpleSpellTemplate
 	novaTotemTemplate    core.SimpleSpellTemplate
-
-	unleashedRages []core.Aura
+	FireTotemSpell       core.SimpleSpell
 }
 
 // Implemented by each Shaman spec.
@@ -140,22 +162,25 @@ func (shaman *Shaman) GetCharacter() *core.Character {
 func (shaman *Shaman) AddRaidBuffs(raidBuffs *proto.RaidBuffs) {
 }
 func (shaman *Shaman) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {
-	if shaman.Talents.TotemOfWrath && shaman.SelfBuffs.FireTotem == proto.FireTotem_TotemOfWrath {
+	if shaman.Totems.Fire == proto.FireTotem_TotemOfWrath {
 		partyBuffs.TotemOfWrath += 1
 	}
 
-	if shaman.SelfBuffs.ManaSpring {
+	switch shaman.Totems.Water {
+	case proto.WaterTotem_ManaSpringTotem:
 		partyBuffs.ManaSpringTotem = core.MaxTristate(partyBuffs.ManaSpringTotem, proto.TristateEffect_TristateEffectRegular)
 		if shaman.Talents.RestorativeTotems == 5 {
 			partyBuffs.ManaSpringTotem = proto.TristateEffect_TristateEffectImproved
 		}
 	}
 
-	switch shaman.SelfBuffs.AirTotem {
+	switch shaman.Totems.Air {
 	case proto.AirTotem_WrathOfAirTotem:
 		woaValue := proto.TristateEffect_TristateEffectRegular
 		if ItemSetCycloneRegalia.CharacterHasSetBonus(shaman.GetCharacter(), 2) {
 			woaValue = proto.TristateEffect_TristateEffectImproved
+		} else if shaman.SelfBuffs.SnapshotT42Pc {
+			partyBuffs.SnapshotImprovedWrathOfAirTotem = true
 		}
 		partyBuffs.WrathOfAirTotem = core.MaxTristate(partyBuffs.WrathOfAirTotem, woaValue)
 	case proto.AirTotem_GraceOfAirTotem:
@@ -165,15 +190,16 @@ func (shaman *Shaman) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {
 		}
 		partyBuffs.GraceOfAirTotem = core.MaxTristate(partyBuffs.GraceOfAirTotem, value)
 	case proto.AirTotem_WindfuryTotem:
-		if shaman.SelfBuffs.WindfuryTotemRank > partyBuffs.WindfuryTotemRank {
-			partyBuffs.WindfuryTotemRank = shaman.SelfBuffs.WindfuryTotemRank
+		if shaman.Totems.WindfuryTotemRank > partyBuffs.WindfuryTotemRank {
+			partyBuffs.WindfuryTotemRank = shaman.Totems.WindfuryTotemRank
 			partyBuffs.WindfuryTotemIwt = shaman.Talents.ImprovedWeaponTotems
-		} else if shaman.SelfBuffs.WindfuryTotemRank == partyBuffs.WindfuryTotemRank {
+		} else if shaman.Totems.WindfuryTotemRank == partyBuffs.WindfuryTotemRank {
 			partyBuffs.WindfuryTotemIwt = core.MaxInt32(partyBuffs.WindfuryTotemIwt, shaman.Talents.ImprovedWeaponTotems)
 		}
 	}
 
-	if shaman.SelfBuffs.EarthTotem == proto.EarthTotem_StrengthOfEarthTotem {
+	switch shaman.Totems.Earth {
+	case proto.EarthTotem_StrengthOfEarthTotem:
 		value := proto.StrengthOfEarthType_Basic
 		if shaman.Talents.EnhancingTotems == 2 {
 			value = proto.StrengthOfEarthType_EnhancingTotems
@@ -209,6 +235,15 @@ func (shaman *Shaman) Init(sim *core.Simulation) {
 	shaman.flameShockTemplate = shaman.newFlameShockTemplate(sim)
 	shaman.frostShockTemplate = shaman.newFrostShockTemplate(sim)
 
+	shaman.strengthOfEarthTotemTemplate = shaman.newStrengthOfEarthTotemTemplate(sim)
+	shaman.tremorTotemTemplate = shaman.newTremorTotemTemplate(sim)
+	shaman.wrathOfAirTotemTemplate = shaman.newWrathOfAirTotemTemplate(sim)
+	shaman.tranquilAirTotemTemplate = shaman.newTranquilAirTotemTemplate(sim)
+	shaman.graceOfAirTotemTemplate = shaman.newGraceOfAirTotemTemplate(sim)
+	shaman.windfuryTotemTemplate = shaman.newWindfuryTotemTemplate(sim, shaman.Totems.WindfuryTotemRank)
+	shaman.manaSpringTotemTemplate = shaman.newManaSpringTotemTemplate(sim)
+	shaman.totemOfWrathTemplate = shaman.newTotemOfWrathTemplate(sim)
+
 	shaman.searingTotemTemplate = shaman.newSearingTotemTemplate(sim)
 	shaman.magmaTotemTemplate = shaman.newMagmaTotemTemplate(sim)
 	shaman.novaTotemTemplate = shaman.newNovaTotemTemplate(sim)
@@ -216,43 +251,41 @@ func (shaman *Shaman) Init(sim *core.Simulation) {
 
 func (shaman *Shaman) Reset(sim *core.Simulation) {
 	// Check to see if we are casting a totem to set its expire time.
-	for i := range shaman.SelfBuffs.NextTotemDrops {
-		shaman.SelfBuffs.NextTotemDrops[i] = core.NeverExpires
+	for i := range shaman.NextTotemDrops {
+		shaman.NextTotemDrops[i] = core.NeverExpires
 		switch i {
 		case AirTotem:
-			if shaman.SelfBuffs.AirTotem != proto.AirTotem_NoAirTotem {
-				shaman.SelfBuffs.NextTotemDrops[i] = time.Second * 120 // 2 min until drop totems
-				shaman.SelfBuffs.NextTotemDropType[i] = int32(shaman.SelfBuffs.AirTotem)
+			if shaman.Totems.Air != proto.AirTotem_NoAirTotem {
+				shaman.NextTotemDrops[i] = time.Second * 120 // 2 min until drop totems
+				shaman.NextTotemDropType[i] = int32(shaman.Totems.Air)
 			}
-			if shaman.SelfBuffs.TwistWindfury {
-				shaman.SelfBuffs.NextTotemDropType[i] = int32(proto.AirTotem_WindfuryTotem)
-				shaman.SelfBuffs.NextTotemDrops[i] = time.Second * 10 // gotta recast windfury after 10s
+			if shaman.Totems.TwistWindfury {
+				shaman.NextTotemDropType[i] = int32(proto.AirTotem_WindfuryTotem)
+				shaman.NextTotemDrops[i] = time.Second * 10 // gotta recast windfury after 10s
 			}
 		case EarthTotem:
-			if shaman.SelfBuffs.EarthTotem != proto.EarthTotem_NoEarthTotem {
-				shaman.SelfBuffs.NextTotemDrops[i] = time.Second * 120 // 2 min until drop totems
-				shaman.SelfBuffs.NextTotemDropType[i] = int32(shaman.SelfBuffs.EarthTotem)
+			if shaman.Totems.Earth != proto.EarthTotem_NoEarthTotem {
+				shaman.NextTotemDrops[i] = time.Second * 120 // 2 min until drop totems
+				shaman.NextTotemDropType[i] = int32(shaman.Totems.Earth)
 			}
 		case FireTotem:
-			if shaman.SelfBuffs.FireTotem != proto.FireTotem_NoFireTotem {
-				shaman.SelfBuffs.NextTotemDropType[i] = int32(shaman.SelfBuffs.FireTotem)
-				if shaman.SelfBuffs.TwistFireNova {
-					shaman.SelfBuffs.NextTotemDropType[FireTotem] = int32(proto.FireTotem_FireNovaTotem) // start by dropping nova, then alternating.
-				}
-				shaman.SelfBuffs.NextTotemDrops[i] = time.Second * 120 // 2 min until drop totems
-				if shaman.SelfBuffs.FireTotem != proto.FireTotem_TotemOfWrath {
-					shaman.SelfBuffs.NextTotemDrops[i] = 0 // attack totems we drop immediately
+			shaman.NextTotemDropType[i] = int32(shaman.Totems.Fire)
+			if shaman.Totems.TwistFireNova {
+				shaman.NextTotemDropType[FireTotem] = int32(proto.FireTotem_FireNovaTotem) // start by dropping nova, then alternating.
+			}
+			if shaman.NextTotemDropType[i] != int32(proto.FireTotem_NoFireTotem) {
+				shaman.NextTotemDrops[i] = time.Second * 120 // 2 min until drop totems
+				if shaman.Totems.Fire != proto.FireTotem_TotemOfWrath {
+					shaman.NextTotemDrops[i] = 0 // attack totems we drop immediately
 				}
 			}
 		case WaterTotem:
-			if shaman.SelfBuffs.ManaSpring {
-				shaman.SelfBuffs.NextTotemDrops[i] = time.Second * 120 // 2 min until drop totems
+			if shaman.Totems.Water == proto.WaterTotem_ManaSpringTotem {
+				shaman.NextTotemDrops[i] = time.Second * 120 // 2 min until drop totems
 			}
 		}
 	}
 
-	// Reset stacks and unleashed rage auras
-	shaman.unleashedRages = shaman.unleashedRages[0:]
 	shaman.ElementalFocusStacks = 0
 }
 

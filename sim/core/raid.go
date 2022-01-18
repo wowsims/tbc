@@ -13,6 +13,8 @@ type Party struct {
 	Players []Agent
 	Pets    []PetAgent // Cached list of all the pets in the party.
 
+	PlayersAndPets []Agent // Cached list of players + pets, concatenated.
+
 	dpsMetrics DpsMetrics
 }
 
@@ -165,6 +167,13 @@ func (raid *Raid) finalize(raidConfig proto.Raid) {
 			for _, petAgent := range player.GetCharacter().Pets {
 				party.Pets = append(party.Pets, petAgent)
 			}
+		}
+		party.PlayersAndPets = make([]Agent, len(party.Players)+len(party.Pets))
+		for i, player := range party.Players {
+			party.PlayersAndPets[i] = player
+		}
+		for i, pet := range party.Pets {
+			party.PlayersAndPets[len(party.Players)+i] = pet
 		}
 	}
 

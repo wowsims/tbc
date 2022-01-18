@@ -111,52 +111,9 @@ func MakeAverageDefaultEncounterCombos(debuffs *proto.Debuffs) []EncounterCombo 
 	}
 }
 
-type IndividualSimInputs struct {
-	Player          *proto.Player
-	RaidBuffs       *proto.RaidBuffs
-	PartyBuffs      *proto.PartyBuffs
-	IndividualBuffs *proto.IndividualBuffs
-	SimOptions      *proto.SimOptions
-
-	Duration int
-
-	// Convenience field if only 1 target is desired
-	Target  *proto.Target
-	Targets []*proto.Target
-}
-
-func NewIndividualSimRequest(inputs IndividualSimInputs) *proto.IndividualSimRequest {
-	isr := &proto.IndividualSimRequest{
-		Player:     inputs.Player,
-		RaidBuffs:  inputs.RaidBuffs,
-		PartyBuffs: inputs.PartyBuffs,
-
-		Encounter:  &proto.Encounter{},
-		SimOptions: inputs.SimOptions,
-	}
-
-	isr.Player.Buffs = inputs.IndividualBuffs
-
-	isr.Encounter.Duration = float64(inputs.Duration)
-	if inputs.Target != nil {
-		isr.Encounter.Targets = []*proto.Target{inputs.Target}
-	} else {
-		isr.Encounter.Targets = inputs.Targets
-	}
-
-	if isr.SimOptions == nil {
-		isr.SimOptions = &proto.SimOptions{}
-	}
-	isr.SimOptions.Iterations = 1
-	isr.SimOptions.IsTest = true
-	isr.SimOptions.Debug = false
-
-	return isr
-}
-
-func CharacterStatsTest(label string, t *testing.T, isr *proto.IndividualSimRequest, expectedStats stats.Stats) {
+func CharacterStatsTest(label string, t *testing.T, raid *proto.Raid, expectedStats stats.Stats) {
 	csr := &proto.ComputeStatsRequest{
-		Raid: SinglePlayerRaidProto(isr.Player, isr.PartyBuffs, isr.RaidBuffs),
+		Raid: raid,
 	}
 
 	result := ComputeStats(csr)
@@ -184,22 +141,6 @@ func StatWeightsTest(label string, t *testing.T, _swr *proto.StatWeightsRequest,
 	}
 }
 
-// Performs a basic end-to-end test of the simulator.
-//   This is where we can add more sophisticated checks if we would like.
-//   Any changes to the damage output of an item set
-func IndividualSimTest(label string, t *testing.T, isr *proto.IndividualSimRequest, expectedDps float64) {
-	result := RunIndividualSim(isr)
-
-	tolerance := 0.5
-	if result.PlayerMetrics.Dps.Avg < expectedDps-tolerance || result.PlayerMetrics.Dps.Avg > expectedDps+tolerance {
-		// Automatically print output if we had debugging enabled.
-		if isr.SimOptions.Debug {
-			log.Printf("LOGS:\n%s\n", result.Logs)
-		}
-		t.Fatalf("%s failed: expected %0f dps from sim but was %0f", label, expectedDps, result.PlayerMetrics.Dps.Avg)
-	}
-}
-
 func RaidSimTest(label string, t *testing.T, rsr *proto.RaidSimRequest, expectedDps float64) {
 	result := RunRaidSim(rsr)
 
@@ -213,60 +154,14 @@ func RaidSimTest(label string, t *testing.T, rsr *proto.RaidSimRequest, expected
 	}
 }
 
-func IndividualSimAverageTest(label string, t *testing.T, isr *proto.IndividualSimRequest, expectedDps float64) {
-	isr.Encounter.Duration = LongDuration
-	isr.SimOptions.Iterations = 10000
-	// isr.SimOptions.Debug = true
-
-	result := RunIndividualSim(isr)
-
-	if isr.SimOptions.Debug {
-		log.Printf("LOGS:\n%s\n", result.Logs)
-	}
-
-	tolerance := 0.5
-	if result.PlayerMetrics.Dps.Avg < expectedDps-tolerance || result.PlayerMetrics.Dps.Avg > expectedDps+tolerance {
-		t.Fatalf("%s failed: expected %0f dps from sim but was %0f", label, expectedDps, result.PlayerMetrics.Dps.Avg)
-	}
-}
-
-type AllEncountersTestOptions struct {
-	Label string
-	T     *testing.T
-
-	Inputs IndividualSimInputs
-
-	ExpectedDpsShort float64
-	ExpectedDpsLong  float64
-}
-
-func IndividualSimAllEncountersTest(testOpts AllEncountersTestOptions) {
-	isr := NewIndividualSimRequest(testOpts.Inputs)
-	// isr.SimOptions.Debug = true
-
-	isr.Encounter.Duration = ShortDuration
-	IndividualSimTest(
-		testOpts.Label+"-short",
-		testOpts.T,
-		isr,
-		testOpts.ExpectedDpsShort)
-
-	isr.Encounter.Duration = LongDuration
-	IndividualSimTest(
-		testOpts.Label+"-long",
-		testOpts.T,
-		isr,
-		testOpts.ExpectedDpsLong)
-}
-
-func IndividualBenchmark(b *testing.B, isr *proto.IndividualSimRequest) {
-	isr.Encounter.Duration = LongDuration
-	isr.SimOptions.Iterations = 1000
+func RaidBenchmark(b *testing.B, rsr *proto.RaidSimRequest) {
+	rsr.Encounter.Duration = LongDuration
+	rsr.SimOptions.Iterations = 1000
 
 	// Set to false because IsTest adds a lot of computation.
-	isr.SimOptions.IsTest = false
+	rsr.SimOptions.IsTest = false
 
 	for i := 0; i < b.N; i++ {
-		RunIndividualSim(isr)
+		RunRaidSim(rsr)
 	}
 }

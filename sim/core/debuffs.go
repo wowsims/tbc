@@ -146,16 +146,13 @@ func JudgementOfWisdomAura() Aura {
 			}
 
 			character := spellCast.Character
-			// Only apply to agents that have mana.
-			if character.MaxMana() > 0 {
+			if character.HasManaBar() {
 				character.AddMana(sim, mana, actionID, false)
 			}
 		},
 		OnMeleeAttack: func(sim *Simulation, ability *ActiveMeleeAbility, hitEffect *AbilityHitEffect) {
-			// if ability.ActionID =
 			character := ability.Character
-			// Only apply to agents that have mana.
-			if character.MaxMana() > 0 {
+			if character.HasManaBar() {
 				character.AddMana(sim, mana, actionID, false)
 			}
 		},

@@ -21,7 +21,6 @@ func main() {
 
 	js.Global().Set("computeStats", js.FuncOf(computeStats))
 	js.Global().Set("gearList", js.FuncOf(gearList))
-	js.Global().Set("individualSim", js.FuncOf(individualSim))
 	js.Global().Set("raidSim", js.FuncOf(raidSim))
 	js.Global().Set("raidSimAsync", js.FuncOf(raidSimAsync))
 	js.Global().Set("statWeights", js.FuncOf(statWeights))
@@ -57,26 +56,6 @@ func gearList(this js.Value, args []js.Value) interface{} {
 		return nil
 	}
 	result := core.GetGearList(glr)
-
-	outbytes, err := googleProto.Marshal(result)
-	if err != nil {
-		log.Printf("[ERROR] Failed to marshal result: %s", err.Error())
-		return nil
-	}
-
-	outArray := js.Global().Get("Uint8Array").New(len(outbytes))
-	js.CopyBytesToJS(outArray, outbytes)
-
-	return outArray
-}
-
-func individualSim(this js.Value, args []js.Value) interface{} {
-	isr := &proto.IndividualSimRequest{}
-	if err := googleProto.Unmarshal(getArgsBinary(args[0]), isr); err != nil {
-		log.Printf("Failed to parse request: %s", err)
-		return nil
-	}
-	result := core.RunIndividualSim(isr)
 
 	outbytes, err := googleProto.Marshal(result)
 	if err != nil {

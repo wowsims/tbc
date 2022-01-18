@@ -29,18 +29,14 @@ func NewElementalShaman(character core.Character, options proto.Player) *Element
 	eleShamOptions := options.GetElementalShaman()
 
 	selfBuffs := shaman.SelfBuffs{
-		Bloodlust:   eleShamOptions.Options.Bloodlust,
-		ManaSpring:  eleShamOptions.Options.ManaSpringTotem,
-		WaterShield: eleShamOptions.Options.WaterShield,
+		Bloodlust:     eleShamOptions.Options.Bloodlust,
+		WaterShield:   eleShamOptions.Options.WaterShield,
+		SnapshotT42Pc: eleShamOptions.Options.SnapshotT4_2Pc,
 	}
-	if eleShamOptions.Options.TotemOfWrath {
-		selfBuffs.FireTotem = proto.FireTotem_TotemOfWrath
-	}
-	if eleShamOptions.Options.WrathOfAirTotem {
-		selfBuffs.AirTotem = proto.AirTotem_WrathOfAirTotem
-	}
-	if shaman.ItemSetSkyshatterRegalia.CharacterHasSetBonus(&character, 2) {
-		selfBuffs.EarthTotem = proto.EarthTotem_TremorTotem
+
+	totems := proto.ShamanTotems{}
+	if eleShamOptions.Rotation.Totems != nil {
+		totems = *eleShamOptions.Rotation.Totems
 	}
 
 	var rotation Rotation
@@ -59,7 +55,7 @@ func NewElementalShaman(character core.Character, options proto.Player) *Element
 	}
 
 	return &ElementalShaman{
-		Shaman:   shaman.NewShaman(character, *eleShamOptions.Talents, selfBuffs),
+		Shaman:   shaman.NewShaman(character, *eleShamOptions.Talents, totems, selfBuffs),
 		rotation: rotation,
 	}
 }
@@ -84,8 +80,11 @@ func (eleShaman *ElementalShaman) Reset(sim *core.Simulation) {
 }
 
 func (eleShaman *ElementalShaman) Act(sim *core.Simulation) time.Duration {
-	dropTime := eleShaman.TryDropTotems(sim)
+	dropTime, dropSuccess := eleShaman.TryDropTotems(sim)
 	if dropTime > 0 {
+		if !dropSuccess {
+			eleShaman.Metrics.MarkOOM(sim, &eleShaman.Character, dropTime-sim.CurrentTime)
+		}
 		return dropTime
 	}
 	newAction := eleShaman.rotation.ChooseAction(eleShaman, sim)

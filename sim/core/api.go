@@ -72,23 +72,6 @@ func StatWeightsAsync(request *proto.StatWeightsRequest, progress chan *proto.Pr
 }
 
 /**
- * Runs multiple iterations of the sim with just 1 player.
- */
-func RunIndividualSim(request *proto.IndividualSimRequest) *proto.IndividualSimResult {
-	raidResult := RunRaidSim(&proto.RaidSimRequest{
-		Raid:       SinglePlayerRaidProto(request.Player, request.PartyBuffs, request.RaidBuffs),
-		Encounter:  request.Encounter,
-		SimOptions: request.SimOptions,
-	})
-
-	return &proto.IndividualSimResult{
-		PlayerMetrics:    raidResult.RaidMetrics.Parties[0].Players[0],
-		EncounterMetrics: raidResult.EncounterMetrics,
-		Logs:             raidResult.Logs,
-	}
-}
-
-/**
  * Runs multiple iterations of the sim with a full raid.
  */
 func RunRaidSim(request *proto.RaidSimRequest) *proto.RaidSimResult {

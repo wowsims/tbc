@@ -32,40 +32,12 @@ func NewEnhancementShaman(character core.Character, options proto.Player) *Enhan
 		WaterShield: enhOptions.Options.WaterShield,
 	}
 
+	totems := proto.ShamanTotems{}
 	if enhOptions.Rotation.Totems != nil {
-		selfBuffs.ManaSpring = enhOptions.Rotation.Totems.Water == proto.WaterTotem_ManaSpringTotem
-		selfBuffs.EarthTotem = enhOptions.Rotation.Totems.Earth
-		selfBuffs.AirTotem = enhOptions.Rotation.Totems.Air
-		selfBuffs.NextTotemDropType[shaman.AirTotem] = int32(enhOptions.Rotation.Totems.Air)
-		selfBuffs.FireTotem = enhOptions.Rotation.Totems.Fire
-		selfBuffs.NextTotemDropType[shaman.FireTotem] = int32(enhOptions.Rotation.Totems.Fire)
-
-		if enhOptions.Rotation.Totems.Air == proto.AirTotem_WindfuryTotem {
-			// No need to twist windfury if its already the default totem.
-			enhOptions.Rotation.Totems.TwistWindfury = false
-		}
-		if enhOptions.Rotation.Totems.WindfuryTotemRank == 0 {
-			// If rank is 0, disable windfury options.
-			enhOptions.Rotation.Totems.TwistWindfury = false
-			if enhOptions.Rotation.Totems.Air == proto.AirTotem_WindfuryTotem {
-				enhOptions.Rotation.Totems.Air = proto.AirTotem_NoAirTotem
-			}
-		}
-
-		selfBuffs.TwistWindfury = enhOptions.Rotation.Totems.TwistWindfury
-		selfBuffs.WindfuryTotemRank = enhOptions.Rotation.Totems.WindfuryTotemRank
-		if selfBuffs.TwistWindfury {
-			selfBuffs.NextTotemDropType[shaman.AirTotem] = int32(proto.AirTotem_WindfuryTotem)
-			selfBuffs.NextTotemDrops[shaman.AirTotem] = 0 // drop windfury immediately
-		}
-
-		selfBuffs.TwistFireNova = enhOptions.Rotation.Totems.TwistFireNova
-		if selfBuffs.TwistFireNova {
-			selfBuffs.NextTotemDropType[shaman.FireTotem] = int32(proto.FireTotem_FireNovaTotem) // start by dropping nova, then alternating.
-		}
+		totems = *enhOptions.Rotation.Totems
 	}
 	enh := &EnhancementShaman{
-		Shaman:   shaman.NewShaman(character, *enhOptions.Talents, selfBuffs),
+		Shaman:   shaman.NewShaman(character, *enhOptions.Talents, totems, selfBuffs),
 		Rotation: *enhOptions.Rotation,
 	}
 	// Enable Auto Attacks for this spec
@@ -109,9 +81,13 @@ func (enh *EnhancementShaman) Reset(sim *core.Simulation) {
 
 func (enh *EnhancementShaman) Act(sim *core.Simulation) time.Duration {
 	// Redrop totems when needed.
-	dropTime := enh.TryDropTotems(sim)
+	dropTime, dropSuccess := enh.TryDropTotems(sim)
 	if dropTime > 0 {
-		return core.MinDuration(dropTime, enh.AutoAttacks.NextAttackAt())
+		nextEventTime := core.MinDuration(dropTime, enh.AutoAttacks.NextAttackAt())
+		if !dropSuccess {
+			enh.Metrics.MarkOOM(sim, &enh.Character, nextEventTime-sim.CurrentTime)
+		}
+		return nextEventTime
 	}
 
 	target := sim.GetPrimaryTarget()
@@ -144,7 +120,7 @@ func (enh *EnhancementShaman) Act(sim *core.Simulation) time.Duration {
 	if !success {
 		regenTime := enh.TimeUntilManaRegen(cost)
 		nextActionAt := core.MinDuration(sim.CurrentTime+regenTime, enh.AutoAttacks.NextAttackAt())
-		enh.Character.Metrics.MarkOOM(sim, &enh.Character, nextActionAt-sim.CurrentTime)
+		enh.Metrics.MarkOOM(sim, &enh.Character, nextActionAt-sim.CurrentTime)
 		return nextActionAt
 	}
 

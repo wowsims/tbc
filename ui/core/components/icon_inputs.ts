@@ -7,6 +7,7 @@ import { Consumes } from '/tbc/core/proto/common.js';
 import { Debuffs } from '/tbc/core/proto/common.js';
 import { Drums } from '/tbc/core/proto/common.js';
 import { Potions } from '/tbc/core/proto/common.js';
+import { TristateEffect } from '/tbc/core/proto/common.js';
 import { IndividualSimIconPickerConfig } from '/tbc/core/individual_sim_ui.js';
 import { Party } from '/tbc/core/party.js';
 import { Player } from '/tbc/core/player.js';
@@ -55,6 +56,7 @@ export const BlessingOfWisdom = makeTristateIndividualBuffInput(ActionId.fromSpe
 export const BlessingOfMight = makeTristateIndividualBuffInput(ActionId.fromSpellId(27140), ActionId.fromSpellId(20048), 'blessingOfMight');
 export const Innervate = makeMultistateIndividualBuffInput(ActionId.fromSpellId(29166), 11, 'innervates');
 export const PowerInfusion = makeMultistateIndividualBuffInput(ActionId.fromSpellId(10060), 11, 'powerInfusions');
+export const UnleashedRage = makeBooleanIndividualBuffInput(ActionId.fromSpellId(30811), 'unleashedRage');
 
 // Debuffs
 export const BloodFrenzy = makeBooleanDebuffInput(ActionId.fromSpellId(29859), 'bloodFrenzy');
@@ -80,6 +82,8 @@ export const ElixirOfMajorFrostPower = makeBooleanConsumeInput(ActionId.fromItem
 export const ElixirOfMajorMageblood = makeBooleanConsumeInput(ActionId.fromItemId(22840), 'elixirOfMajorMageblood', ['Guardian Elixir']);
 export const ElixirOfMajorShadowPower = makeBooleanConsumeInput(ActionId.fromItemId(22835), 'elixirOfMajorShadowPower', ['Battle Elixir']);
 export const ElixirOfMajorAgility = makeBooleanConsumeInput(ActionId.fromItemId(22831), 'elixirOfMajorAgility', ['Battle Elixir']);
+export const ElixirOfMajorStrength = makeBooleanConsumeInput(ActionId.fromItemId(22824), 'elixirOfMajorStrength', ['Battle Elixir']);
+export const ElixirOfTheMongoose = makeBooleanConsumeInput(ActionId.fromItemId(13452), 'elixirOfTheMongoose', ['Battle Elixir']);
 export const FlaskOfBlindingLight = makeBooleanConsumeInput(ActionId.fromItemId(22861), 'flaskOfBlindingLight', ['Battle Elixir', 'Guardian Elixir']);
 export const FlaskOfMightyRestoration = makeBooleanConsumeInput(ActionId.fromItemId(22853), 'flaskOfMightyRestoration', ['Battle Elixir', 'Guardian Elixir']);
 export const FlaskOfPureDeath = makeBooleanConsumeInput(ActionId.fromItemId(22866), 'flaskOfPureDeath', ['Battle Elixir', 'Guardian Elixir']);
@@ -92,9 +96,11 @@ export const RoastedClefthoof = makeBooleanConsumeInput(ActionId.fromItemId(2765
 export const ScrollOfStrengthV = makeBooleanConsumeInput(ActionId.fromItemId(27503), 'scrollOfStrengthV');
 export const ScrollOfAgilityV = makeBooleanConsumeInput(ActionId.fromItemId(27498), 'scrollOfAgilityV');
 export const ScrollOfSpiritV = makeBooleanConsumeInput(ActionId.fromItemId(27501), 'scrollOfSpiritV', ['Spirit']);
+export const SpicyHotTalbuk = makeBooleanConsumeInput(ActionId.fromItemId(33872), 'spicyHotTalbuk', ['Food']);
 
 export const DefaultDestructionPotion = makeEnumValueConsumeInput(ActionId.fromItemId(22839), 'defaultPotion', Potions.DestructionPotion, ['Potion']);
 export const DefaultHastePotion = makeEnumValueConsumeInput(ActionId.fromItemId(22838), 'defaultPotion', Potions.HastePotion, ['Potion']);
+export const DefaultMightyRagePotion = makeEnumValueConsumeInput(ActionId.fromItemId(13442), 'defaultPotion', Potions.MightyRagePotion, ['Potion']);
 export const DefaultSuperManaPotion = makeEnumValueConsumeInput(ActionId.fromItemId(22832), 'defaultPotion', Potions.SuperManaPotion, ['Potion']);
 
 export const DefaultDarkRune = makeEnumValueConsumeInput(ActionId.fromItemId(12662), 'defaultConjured', Conjured.ConjuredDarkRune, ['Conjured']);
@@ -310,3 +316,68 @@ function makeEnumValueConsumeInput(id: ActionId, consumesFieldName: keyof Consum
     },
   }
 }
+
+//////////////////////////////////////////////////////////////////////
+// Custom buffs that don't fit into any of the helper functions above.
+//////////////////////////////////////////////////////////////////////
+
+export const GraceOfAirTotem = {
+	id: ActionId.fromSpellId(25359),
+	states: 2,
+	changedEvent: (party: Party) => party.buffsChangeEmitter,
+	getValue: (party: Party) => party.getBuffs().graceOfAirTotem != TristateEffect.TristateEffectMissing,
+	setValue: (eventID: EventID, party: Party, newValue: boolean) => {
+		const newBuffs = party.getBuffs();
+		newBuffs.graceOfAirTotem = newValue
+				? TristateEffect.TristateEffectImproved
+				: TristateEffect.TristateEffectMissing;
+		party.setBuffs(eventID, newBuffs);
+	},
+};
+
+export const StrengthOfEarthTotem = {
+	id: ActionId.fromSpellId(25528),
+	states: 3,
+	improvedId: ActionId.fromSpellId(37223),
+	changedEvent: (party: Party) => party.buffsChangeEmitter,
+	getValue: (party: Party) => party.getBuffs().strengthOfEarthTotem > 0 ? party.getBuffs().strengthOfEarthTotem - 2 : 0,
+	setValue: (eventID: EventID, party: Party, newValue: number) => {
+		const newBuffs = party.getBuffs();
+		newBuffs.strengthOfEarthTotem = newValue > 0 ? newValue + 2 : 0;
+		party.setBuffs(eventID, newBuffs);
+	},
+};
+
+export const WindfuryTotem = {
+	id: ActionId.fromSpellId(25587),
+	states: 3,
+	improvedId: ActionId.fromSpellId(29193),
+	changedEvent: (party: Party) => party.buffsChangeEmitter,
+	getValue: (party: Party) => {
+		const buffs = party.getBuffs();
+		if (buffs.windfuryTotemRank > 0) {
+			if (buffs.windfuryTotemIwt > 0) {
+				return 2;
+			} else {
+				return 1;
+			}
+		} else {
+			return 0;
+		}
+	},
+	setValue: (eventID: EventID, party: Party, newValue: number) => {
+		const newBuffs = party.getBuffs();
+		if (newValue == 0) {
+			newBuffs.windfuryTotemRank = 0;
+			newBuffs.windfuryTotemIwt = 0;
+		} else {
+			newBuffs.windfuryTotemRank = 5;
+			if (newValue == 2) {
+				newBuffs.windfuryTotemIwt = 2;
+			} else {
+				newBuffs.windfuryTotemIwt = 0;
+			}
+		}
+		party.setBuffs(eventID, newBuffs);
+	},
+};

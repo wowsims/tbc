@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
+	"github.com/wowsims/tbc/sim/core/proto"
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
@@ -113,9 +114,22 @@ var ItemSetSkyshatterRegalia = core.ItemSet{
 	Items: map[int32]struct{}{34437: {}, 31017: {}, 34542: {}, 31008: {}, 31014: {}, 31020: {}, 31023: {}, 34566: {}},
 	Bonuses: map[int32]core.ApplyEffect{
 		2: func(agent core.Agent) {
-			agent.GetCharacter().AddStat(stats.MP5, 15)
-			agent.GetCharacter().AddStat(stats.SpellCrit, 35)
-			agent.GetCharacter().AddStat(stats.SpellPower, 45)
+			shamanAgent, ok := agent.(ShamanAgent)
+			if !ok {
+				log.Fatalf("Non-shaman attempted to activate shaman t6 2p bonus.")
+			}
+			shaman := shamanAgent.GetShaman()
+
+			if shaman.Totems.Air == proto.AirTotem_NoAirTotem ||
+				shaman.Totems.Water == proto.WaterTotem_NoWaterTotem ||
+				shaman.Totems.Earth == proto.EarthTotem_NoEarthTotem ||
+				shaman.Totems.Fire == proto.FireTotem_NoFireTotem {
+				return
+			}
+
+			shaman.AddStat(stats.MP5, 15)
+			shaman.AddStat(stats.SpellCrit, 35)
+			shaman.AddStat(stats.SpellPower, 45)
 		},
 		4: func(agent core.Agent) {
 			// Increases damage done by Lightning Bolt by 5%.

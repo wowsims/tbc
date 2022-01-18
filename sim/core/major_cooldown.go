@@ -9,6 +9,7 @@ import (
 )
 
 const (
+	CooldownPriorityLow       = -1.0
 	CooldownPriorityDefault   = 0.0
 	CooldownPriorityDrums     = 2.0
 	CooldownPriorityBloodlust = 1.0

@@ -297,9 +297,6 @@ var handlers = map[string]apiHandler{
 	"/raidSim": {msg: func() googleProto.Message { return &proto.RaidSimRequest{} }, handle: func(msg googleProto.Message) googleProto.Message {
 		return core.RunRaidSim(msg.(*proto.RaidSimRequest))
 	}},
-	"/individualSim": {msg: func() googleProto.Message { return &proto.IndividualSimRequest{} }, handle: func(msg googleProto.Message) googleProto.Message {
-		return core.RunIndividualSim(msg.(*proto.IndividualSimRequest))
-	}},
 	"/statWeights": {msg: func() googleProto.Message { return &proto.StatWeightsRequest{} }, handle: func(msg googleProto.Message) googleProto.Message {
 		return core.StatWeights(msg.(*proto.StatWeightsRequest))
 	}},
