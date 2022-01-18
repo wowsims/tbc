@@ -4,6 +4,7 @@ import { Spec } from '/tbc/core/proto/common.js';
 // This list controls which links are shown in the top-left dropdown menu.
 export const launchedSpecs = [
     Spec.SpecBalanceDruid,
+    Spec.SpecMage,
     Spec.SpecElementalShaman,
     Spec.SpecShadowPriest,
 ];

@@ -417,50 +417,6 @@ export interface RaidSimResult {
     logs: string;
 }
 /**
- * RPC IndividualSim
- *
- * @generated from protobuf message proto.IndividualSimRequest
- */
-export interface IndividualSimRequest {
-    /**
-     * @generated from protobuf field: proto.Player player = 1;
-     */
-    player?: Player;
-    /**
-     * @generated from protobuf field: proto.RaidBuffs raid_buffs = 2;
-     */
-    raidBuffs?: RaidBuffs;
-    /**
-     * @generated from protobuf field: proto.PartyBuffs party_buffs = 3;
-     */
-    partyBuffs?: PartyBuffs;
-    /**
-     * @generated from protobuf field: proto.Encounter encounter = 5;
-     */
-    encounter?: Encounter;
-    /**
-     * @generated from protobuf field: proto.SimOptions sim_options = 6;
-     */
-    simOptions?: SimOptions;
-}
-/**
- * @generated from protobuf message proto.IndividualSimResult
- */
-export interface IndividualSimResult {
-    /**
-     * @generated from protobuf field: proto.PlayerMetrics player_metrics = 1;
-     */
-    playerMetrics?: PlayerMetrics;
-    /**
-     * @generated from protobuf field: proto.EncounterMetrics encounter_metrics = 2;
-     */
-    encounterMetrics?: EncounterMetrics;
-    /**
-     * @generated from protobuf field: string logs = 3;
-     */
-    logs: string;
-}
-/**
  * RPC GearList
  *
  * @generated from protobuf message proto.GearListRequest
@@ -792,26 +748,6 @@ declare class RaidSimResult$Type extends MessageType<RaidSimResult> {
  * @generated MessageType for protobuf message proto.RaidSimResult
  */
 export declare const RaidSimResult: RaidSimResult$Type;
-declare class IndividualSimRequest$Type extends MessageType<IndividualSimRequest> {
-    constructor();
-    create(value?: PartialMessage<IndividualSimRequest>): IndividualSimRequest;
-    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: IndividualSimRequest): IndividualSimRequest;
-    internalBinaryWrite(message: IndividualSimRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
-}
-/**
- * @generated MessageType for protobuf message proto.IndividualSimRequest
- */
-export declare const IndividualSimRequest: IndividualSimRequest$Type;
-declare class IndividualSimResult$Type extends MessageType<IndividualSimResult> {
-    constructor();
-    create(value?: PartialMessage<IndividualSimResult>): IndividualSimResult;
-    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: IndividualSimResult): IndividualSimResult;
-    internalBinaryWrite(message: IndividualSimResult, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
-}
-/**
- * @generated MessageType for protobuf message proto.IndividualSimResult
- */
-export declare const IndividualSimResult: IndividualSimResult$Type;
 declare class GearListRequest$Type extends MessageType<GearListRequest> {
     constructor();
     create(value?: PartialMessage<GearListRequest>): GearListRequest;

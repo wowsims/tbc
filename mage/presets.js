@@ -1,3 +1,4 @@
+import { Conjured } from '/tbc/core/proto/common.js';
 import { Consumes } from '/tbc/core/proto/common.js';
 import { EquipmentSpec } from '/tbc/core/proto/common.js';
 import { ItemSpec } from '/tbc/core/proto/common.js';
@@ -40,19 +41,29 @@ export const DefaultFireRotation = MageRotation.create({
 });
 export const DefaultFireOptions = MageOptions.create({
     armor: ArmorType.MageArmor,
-    useManaEmeralds: true,
 });
 export const DefaultFireConsumes = Consumes.create({
     defaultPotion: Potions.SuperManaPotion,
     flaskOfPureDeath: true,
     brilliantWizardOil: true,
     blackenedBasilisk: true,
+    defaultConjured: Conjured.ConjuredFlameCap,
 });
 export const DefaultFrostRotation = MageRotation.create({
     type: RotationType.Frost,
     frost: FrostRotation.create({
         waterElementalDisobeyChance: 0.1,
     }),
+});
+export const DefaultFrostOptions = MageOptions.create({
+    armor: ArmorType.MageArmor,
+    useManaEmeralds: true,
+});
+export const DefaultFrostConsumes = Consumes.create({
+    defaultPotion: Potions.SuperManaPotion,
+    flaskOfPureDeath: true,
+    brilliantWizardOil: true,
+    blackenedBasilisk: true,
 });
 export const DefaultArcaneRotation = MageRotation.create({
     type: RotationType.Arcane,
