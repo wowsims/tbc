@@ -40,6 +40,13 @@ export const DefaultFuryRotation = WarriorRotation.create({
 		useBtDuringExecute: true,
 		rampageCdThreshold: 5,
 	}),
+	useWwDuringExecute: true,
+	useHsDuringExecute: true,
+	hsRageThreshold: 60,
+	useOverpower: false,
+	overpowerRageThreshold: 25,
+	useHamstring: false,
+	hamstringRageThreshold: 70
 });
 
 export const DefaultFuryOptions = WarriorOptions.create({
@@ -61,6 +68,13 @@ export const DefaultArmsSlamRotation = WarriorRotation.create({
 		slamLatency: 150,
 		useMsDuringExecute: true,
 	}),
+	useWwDuringExecute: true,
+	useHsDuringExecute: true,
+	hsRageThreshold: 60,
+	useOverpower: false,
+	overpowerRageThreshold: 25,
+	useHamstring: false,
+	hamstringRageThreshold: 70
 });
 
 export const DefaultArmsSlamOptions = WarriorOptions.create({
@@ -80,6 +94,13 @@ export const DefaultArmsDWRotation = WarriorRotation.create({
 	armsDw: ArmsDWRotation.create({
 		useMsDuringExecute: false,
 	}),
+	useWwDuringExecute: true,
+	useHsDuringExecute: true,
+	hsRageThreshold: 60,
+	useOverpower: false,
+	overpowerRageThreshold: 25,
+	useHamstring: false,
+	hamstringRageThreshold: 70
 });
 
 export const DefaultArmsDWOptions = WarriorOptions.create({

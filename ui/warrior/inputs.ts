@@ -262,7 +262,7 @@ export const WarriorRotationConfig = {
 			label: 'WW during Execute Phase',
 			labelTooltip: 'Use Whirlwind during Execute Phase.',
 			changedEvent: (player: Player<Spec.SpecWarrior>) => player.rotationChangeEmitter,
-			getValue: (player: Player<Spec.SpecWarrior>) => player.getRotation().useWwDuringExecute || true,
+			getValue: (player: Player<Spec.SpecWarrior>) => player.getRotation().useWwDuringExecute,
 			setValue: (eventID: EventID, player: Player<Spec.SpecWarrior>, newValue: boolean) => {
 				const newRotation = player.getRotation();
 				newRotation.useWwDuringExecute = newValue;
@@ -278,7 +278,7 @@ export const WarriorRotationConfig = {
 			label: 'HS during Execute Phase',
 			labelTooltip: 'Use Heroic Strike during Execute Phase.',
 			changedEvent: (player: Player<Spec.SpecWarrior>) => player.rotationChangeEmitter,
-			getValue: (player: Player<Spec.SpecWarrior>) => player.getRotation().useHsDuringExecute || true,
+			getValue: (player: Player<Spec.SpecWarrior>) => player.getRotation().useHsDuringExecute,
 			setValue: (eventID: EventID, player: Player<Spec.SpecWarrior>, newValue: boolean) => {
 				const newRotation = player.getRotation();
 				newRotation.useHsDuringExecute = newValue;
@@ -294,7 +294,7 @@ export const WarriorRotationConfig = {
 			label: 'HS rage threshold',
 			labelTooltip: 'Queue HS when rage is above:',
 			changedEvent: (player: Player<Spec.SpecWarrior>) => player.rotationChangeEmitter,
-			getValue: (player: Player<Spec.SpecWarrior>) => player.getRotation().hsRageThreshold || 70,
+			getValue: (player: Player<Spec.SpecWarrior>) => player.getRotation().hsRageThreshold,
 			setValue: (eventID: EventID, player: Player<Spec.SpecWarrior>, newValue: number) => {
 				const newRotation = player.getRotation();
 				newRotation.hsRageThreshold = newValue;
@@ -310,7 +310,7 @@ export const WarriorRotationConfig = {
 			label: 'Use Overpower',
 			labelTooltip: 'Use Overpower when it is possible.',
 			changedEvent: (player: Player<Spec.SpecWarrior>) => player.rotationChangeEmitter,
-			getValue: (player: Player<Spec.SpecWarrior>) => player.getRotation().useOverpower || false,
+			getValue: (player: Player<Spec.SpecWarrior>) => player.getRotation().useOverpower,
 			setValue: (eventID: EventID, player: Player<Spec.SpecWarrior>, newValue: boolean) => {
 				const newRotation = player.getRotation();
 				newRotation.useOverpower = newValue;
@@ -326,13 +326,13 @@ export const WarriorRotationConfig = {
 			label: 'Overpower rage threshold',
 			labelTooltip: 'Use Overpower when rage is below a point.',
 			changedEvent: (player: Player<Spec.SpecWarrior>) => player.rotationChangeEmitter,
-			getValue: (player: Player<Spec.SpecWarrior>) => player.getRotation().overpowerRageThreshold || 25,
+			getValue: (player: Player<Spec.SpecWarrior>) => player.getRotation().overpowerRageThreshold,
 			setValue: (eventID: EventID, player: Player<Spec.SpecWarrior>, newValue: number) => {
 				const newRotation = player.getRotation();
 				newRotation.overpowerRageThreshold = newValue;
 				player.setRotation(eventID, newRotation);
 			},
-			showWhen: (player: Player<Spec.SpecWarrior>) => player.getRotation().useOverpower == true,
+			showWhen: (player: Player<Spec.SpecWarrior>) => player.getRotation().useOverpower,
 		},
 	},
 	{
@@ -343,7 +343,7 @@ export const WarriorRotationConfig = {
 			label: 'Use Hamstring',
 			labelTooltip: 'Use Hamstring on free global.',
 			changedEvent: (player: Player<Spec.SpecWarrior>) => player.rotationChangeEmitter,
-			getValue: (player: Player<Spec.SpecWarrior>) => player.getRotation().useHamstring || false,
+			getValue: (player: Player<Spec.SpecWarrior>) => player.getRotation().useHamstring,
 			setValue: (eventID: EventID, player: Player<Spec.SpecWarrior>, newValue: boolean) => {
 				const newRotation = player.getRotation();
 				newRotation.useHamstring = newValue;
@@ -359,13 +359,13 @@ export const WarriorRotationConfig = {
 			label: 'Hamstring rage threshold',
 			labelTooltip: 'Use Hamstring when rage is above a ',
 			changedEvent: (player: Player<Spec.SpecWarrior>) => player.rotationChangeEmitter,
-			getValue: (player: Player<Spec.SpecWarrior>) => player.getRotation().hamstringRageThreshold || 70,
+			getValue: (player: Player<Spec.SpecWarrior>) => player.getRotation().hamstringRageThreshold,
 			setValue: (eventID: EventID, player: Player<Spec.SpecWarrior>, newValue: number) => {
 				const newRotation = player.getRotation();
 				newRotation.hamstringRageThreshold = newValue;
 				player.setRotation(eventID, newRotation);
 			},
-			showWhen: (player: Player<Spec.SpecWarrior>) => player.getRotation().useHamstring == true,
+			showWhen: (player: Player<Spec.SpecWarrior>) => player.getRotation().useHamstring,
 		},
 	},
 	],
