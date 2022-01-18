@@ -192,7 +192,8 @@ enum Potions {
 	UnknownPotion = 0;
 	DestructionPotion = 1;
 	SuperManaPotion = 2;
-    HastePotion = 3;
+	HastePotion = 3;
+	MightyRagePotion = 4;
 }
 
 enum Conjured {
@@ -266,6 +267,8 @@ message IndividualBuffs {
 
     int32 shadow_priest_dps = 4;
 
+    bool unleashed_rage = 7;
+
     // How many of each of these buffs the player will be receiving.
     int32 innervates = 5;
     int32 power_infusions = 6;
@@ -285,7 +288,9 @@ message Consumes {
     bool elixir_of_draenic_wisdom = 9;
     bool elixir_of_major_mageblood = 10;
     bool elixir_of_major_agility = 22;
+    bool elixir_of_major_strength = 31;
     bool elixir_of_demonslaying = 23;
+    bool elixir_of_the_mongoose = 30;
 
     bool brilliant_wizard_oil = 11; 
     bool superior_wizard_oil = 12; 
@@ -293,6 +298,7 @@ message Consumes {
     bool blackened_basilisk = 13;
     bool skullfish_soup = 14;
     bool roasted_clefthoof = 24;
+    bool spicy_hot_talbuk = 29;
 
     bool kreegsStoutBeatdown = 20;
 
@@ -307,7 +313,7 @@ message Consumes {
     bool dark_rune = 18; // Deprecated, use default_conjured instead.
     Conjured default_conjured = 27;
 
-	Drums drums = 19;
+		Drums drums = 19;
 }
 
 message Debuffs {

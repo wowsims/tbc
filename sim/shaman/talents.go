@@ -201,8 +201,8 @@ func (shaman *Shaman) registerNaturesSwiftnessCD() {
 	})
 }
 
-var UnleasedRageTalentAuraID = core.NewAuraID()
-var UnleasedRageProcAuraID = core.NewAuraID()
+var UnleashedRageTalentAuraID = core.NewAuraID()
+var UnleashedRageProcAuraID = core.NewAuraID()
 
 func (shaman *Shaman) applyUnleashedRage() {
 	if shaman.Talents.UnleashedRage == 0 {
@@ -210,42 +210,25 @@ func (shaman *Shaman) applyUnleashedRage() {
 	}
 	level := shaman.Talents.UnleashedRage
 
-	if len(shaman.unleashedRages) == 0 {
-		shaman.unleashedRages = make([]core.Aura, 5) //pre-fill up to 5 auras
-		for i := range shaman.unleashedRages {
-			shaman.unleashedRages[i] = core.Aura{
-				ID: UnleasedRageProcAuraID,
-			}
-		}
-	}
 	shaman.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		dur := time.Second * 10
-		bonus := 0.02 * float64(level)
+		bonusCoeff := 0.02 * float64(level)
+
+		currentAPBonuses := make([]float64, len(shaman.Party.PlayersAndPets))
+
 		return core.Aura{
-			ID: UnleasedRageTalentAuraID,
+			ID: UnleashedRageTalentAuraID,
 			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
 				if hitEffect.HitType != core.MeleeHitTypeCrit || !hitEffect.IsWeaponHit() {
 					return
 				}
-				for i, player := range shaman.GetCharacter().Party.Players {
-					char := player.GetCharacter()
-
-					// Set new expire time.
-					shaman.unleashedRages[i].Expires = sim.CurrentTime + dur
-
-					if char.HasAura(UnleasedRageProcAuraID) {
-						// Renew existing
-						char.ReplaceAura(sim, shaman.unleashedRages[i])
-						continue
-					}
-
-					// Update aura with new OnExpire
-					ap := char.GetStat(stats.AttackPower) * bonus
-					char.AddStat(stats.AttackPower, ap)
-					shaman.unleashedRages[i].OnExpire = func(sim *core.Simulation) {
-						char.AddStat(stats.AttackPower, -ap)
-					}
-					char.AddAura(sim, shaman.unleashedRages[i])
+				for i, playerOrPet := range shaman.Party.PlayersAndPets {
+					char := playerOrPet.GetCharacter()
+					prevBonus := currentAPBonuses[i]
+					newBonus := (char.GetStat(stats.AttackPower) - prevBonus) * bonusCoeff
+					aura := char.NewAuraWithTemporaryStats(sim, UnleashedRageProcAuraID, core.ActionID{SpellID: 30811}, stats.AttackPower, newBonus, dur)
+					char.AddAura(sim, aura)
+					currentAPBonuses[i] = newBonus
 				}
 			},
 		}

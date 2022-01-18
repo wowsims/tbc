@@ -140,6 +140,7 @@ export class EnhancementShamanSimUI extends IndividualSimUI<Spec.SpecEnhancement
 				IconInputs.FerociousInspiration,
 				IconInputs.TrueshotAura,
 				IconInputs.SanctityAura,
+				IconInputs.BraidedEterniumChain,
 			],
 			playerBuffInputs: [
 				IconInputs.BlessingOfKings,
@@ -164,10 +165,14 @@ export class EnhancementShamanSimUI extends IndividualSimUI<Spec.SpecEnhancement
 			consumeInputs: [
 				IconInputs.DefaultHastePotion,
 				IconInputs.DefaultDarkRune,
+				IconInputs.DefaultFlameCap,
 				IconInputs.FlaskOfRelentlessAssault,
 				IconInputs.ElixirOfDemonslaying,
+				IconInputs.ElixirOfMajorStrength,
 				IconInputs.ElixirOfMajorAgility,
+				IconInputs.ElixirOfTheMongoose,
 				IconInputs.RoastedClefthoof,
+				IconInputs.SpicyHotTalbuk,
 				IconInputs.ScrollOfAgilityV,
 				IconInputs.ScrollOfStrengthV,
 			],

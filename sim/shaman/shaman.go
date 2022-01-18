@@ -145,8 +145,6 @@ type Shaman struct {
 	magmaTotemTemplate   core.SimpleSpellTemplate
 	novaTotemTemplate    core.SimpleSpellTemplate
 	FireTotemSpell       core.SimpleSpell
-
-	unleashedRages []core.Aura
 }
 
 // Implemented by each Shaman spec.
@@ -288,8 +286,6 @@ func (shaman *Shaman) Reset(sim *core.Simulation) {
 		}
 	}
 
-	// Reset stacks and unleashed rage auras
-	shaman.unleashedRages = shaman.unleashedRages[0:]
 	shaman.ElementalFocusStacks = 0
 }
 
