@@ -57,12 +57,61 @@ message WarriorTalents {
 
 message Warrior {
     message Rotation {
+		enum Type {
+			ArmsSlam = 0;
+			ArmsDW = 1;
+			Fury = 2;
+		}
+
+		Type type = 1;
+
+		message ArmsSlamRotation {
+			bool use_slam_during_execute = 1;
+			double slam_latency = 2;
+			bool use_ms_during_execute = 3;
+		}
+		ArmsSlamRotation arms_slam = 2;
+
+		message ArmsDWRotation {
+			bool use_ms_during_execute = 1;
+		}
+		ArmsDWRotation  arms_dw = 3;
+
+		message FuryRotation {
+			enum PrimaryInstant {
+				Bloodthirst = 0;
+				Whirlwind = 1;
+			}
+			PrimaryInstant primary_instant = 1;
+
+			bool use_bt_during_execute = 2;
+			double rampage_cd_threshold = 10; // only when using rampage
+		}
+		FuryRotation fury = 4;
+
+		bool use_ww_during_execute = 5;
+
+		bool use_hs_during_execute = 6;
+
+		double hs_rage_threshold = 7;
+
+		bool use_overpower = 8;
+
+		double overpower_rage_threshold = 9;
+
+		bool use_hamstring = 10;
+
+		double hamstring_rage_threshold = 11;
     }
     Rotation rotation = 1;
 
     WarriorTalents talents = 2;
     
     message Options {
+		double starting_rage = 1;
+		bool precast_t2 = 2;
+		bool precast_sapphire = 3; // Disabled if sapphire is equipped
+		bool recklessness = 4;
     }
     Options options = 3;
 }
