@@ -680,6 +680,10 @@ export var Potions;
      * @generated from protobuf enum value: HastePotion = 3;
      */
     Potions[Potions["HastePotion"] = 3] = "HastePotion";
+    /**
+     * @generated from protobuf enum value: MightyRagePotion = 4;
+     */
+    Potions[Potions["MightyRagePotion"] = 4] = "MightyRagePotion";
 })(Potions || (Potions = {}));
 /**
  * @generated from protobuf enum proto.Conjured
@@ -1108,12 +1112,13 @@ class IndividualBuffs$Type extends MessageType {
             { no: 2, name: "blessing_of_wisdom", kind: "enum", T: () => ["proto.TristateEffect", TristateEffect] },
             { no: 3, name: "blessing_of_might", kind: "enum", T: () => ["proto.TristateEffect", TristateEffect] },
             { no: 4, name: "shadow_priest_dps", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 7, name: "unleashed_rage", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 5, name: "innervates", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 6, name: "power_infusions", kind: "scalar", T: 5 /*ScalarType.INT32*/ }
         ]);
     }
     create(value) {
-        const message = { blessingOfKings: false, blessingOfWisdom: 0, blessingOfMight: 0, shadowPriestDps: 0, innervates: 0, powerInfusions: 0 };
+        const message = { blessingOfKings: false, blessingOfWisdom: 0, blessingOfMight: 0, shadowPriestDps: 0, unleashedRage: false, innervates: 0, powerInfusions: 0 };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -1135,6 +1140,9 @@ class IndividualBuffs$Type extends MessageType {
                     break;
                 case /* int32 shadow_priest_dps */ 4:
                     message.shadowPriestDps = reader.int32();
+                    break;
+                case /* bool unleashed_rage */ 7:
+                    message.unleashedRage = reader.bool();
                     break;
                 case /* int32 innervates */ 5:
                     message.innervates = reader.int32();
@@ -1166,6 +1174,9 @@ class IndividualBuffs$Type extends MessageType {
         /* int32 shadow_priest_dps = 4; */
         if (message.shadowPriestDps !== 0)
             writer.tag(4, WireType.Varint).int32(message.shadowPriestDps);
+        /* bool unleashed_rage = 7; */
+        if (message.unleashedRage !== false)
+            writer.tag(7, WireType.Varint).bool(message.unleashedRage);
         /* int32 innervates = 5; */
         if (message.innervates !== 0)
             writer.tag(5, WireType.Varint).int32(message.innervates);
@@ -1198,12 +1209,15 @@ class Consumes$Type extends MessageType {
             { no: 9, name: "elixir_of_draenic_wisdom", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 10, name: "elixir_of_major_mageblood", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 22, name: "elixir_of_major_agility", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 31, name: "elixir_of_major_strength", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 23, name: "elixir_of_demonslaying", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 30, name: "elixir_of_the_mongoose", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 11, name: "brilliant_wizard_oil", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 12, name: "superior_wizard_oil", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 13, name: "blackened_basilisk", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 14, name: "skullfish_soup", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 24, name: "roasted_clefthoof", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 29, name: "spicy_hot_talbuk", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 20, name: "kreegsStoutBeatdown", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 25, name: "scroll_of_strength_v", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 26, name: "scroll_of_agility_v", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
@@ -1217,7 +1231,7 @@ class Consumes$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { flaskOfBlindingLight: false, flaskOfMightyRestoration: false, flaskOfPureDeath: false, flaskOfSupremePower: false, flaskOfRelentlessAssault: false, adeptsElixir: false, elixirOfMajorFirePower: false, elixirOfMajorFrostPower: false, elixirOfMajorShadowPower: false, elixirOfDraenicWisdom: false, elixirOfMajorMageblood: false, elixirOfMajorAgility: false, elixirOfDemonslaying: false, brilliantWizardOil: false, superiorWizardOil: false, blackenedBasilisk: false, skullfishSoup: false, roastedClefthoof: false, kreegsStoutBeatdown: false, scrollOfStrengthV: false, scrollOfAgilityV: false, scrollOfSpiritV: false, defaultPotion: 0, startingPotion: 0, numStartingPotions: 0, darkRune: false, defaultConjured: 0, drums: 0 };
+        const message = { flaskOfBlindingLight: false, flaskOfMightyRestoration: false, flaskOfPureDeath: false, flaskOfSupremePower: false, flaskOfRelentlessAssault: false, adeptsElixir: false, elixirOfMajorFirePower: false, elixirOfMajorFrostPower: false, elixirOfMajorShadowPower: false, elixirOfDraenicWisdom: false, elixirOfMajorMageblood: false, elixirOfMajorAgility: false, elixirOfMajorStrength: false, elixirOfDemonslaying: false, elixirOfTheMongoose: false, brilliantWizardOil: false, superiorWizardOil: false, blackenedBasilisk: false, skullfishSoup: false, roastedClefthoof: false, spicyHotTalbuk: false, kreegsStoutBeatdown: false, scrollOfStrengthV: false, scrollOfAgilityV: false, scrollOfSpiritV: false, defaultPotion: 0, startingPotion: 0, numStartingPotions: 0, darkRune: false, defaultConjured: 0, drums: 0 };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -1264,8 +1278,14 @@ class Consumes$Type extends MessageType {
                 case /* bool elixir_of_major_agility */ 22:
                     message.elixirOfMajorAgility = reader.bool();
                     break;
+                case /* bool elixir_of_major_strength */ 31:
+                    message.elixirOfMajorStrength = reader.bool();
+                    break;
                 case /* bool elixir_of_demonslaying */ 23:
                     message.elixirOfDemonslaying = reader.bool();
+                    break;
+                case /* bool elixir_of_the_mongoose */ 30:
+                    message.elixirOfTheMongoose = reader.bool();
                     break;
                 case /* bool brilliant_wizard_oil */ 11:
                     message.brilliantWizardOil = reader.bool();
@@ -1281,6 +1301,9 @@ class Consumes$Type extends MessageType {
                     break;
                 case /* bool roasted_clefthoof */ 24:
                     message.roastedClefthoof = reader.bool();
+                    break;
+                case /* bool spicy_hot_talbuk */ 29:
+                    message.spicyHotTalbuk = reader.bool();
                     break;
                 case /* bool kreegsStoutBeatdown */ 20:
                     message.kreegsStoutBeatdown = reader.bool();
@@ -1360,9 +1383,15 @@ class Consumes$Type extends MessageType {
         /* bool elixir_of_major_agility = 22; */
         if (message.elixirOfMajorAgility !== false)
             writer.tag(22, WireType.Varint).bool(message.elixirOfMajorAgility);
+        /* bool elixir_of_major_strength = 31; */
+        if (message.elixirOfMajorStrength !== false)
+            writer.tag(31, WireType.Varint).bool(message.elixirOfMajorStrength);
         /* bool elixir_of_demonslaying = 23; */
         if (message.elixirOfDemonslaying !== false)
             writer.tag(23, WireType.Varint).bool(message.elixirOfDemonslaying);
+        /* bool elixir_of_the_mongoose = 30; */
+        if (message.elixirOfTheMongoose !== false)
+            writer.tag(30, WireType.Varint).bool(message.elixirOfTheMongoose);
         /* bool brilliant_wizard_oil = 11; */
         if (message.brilliantWizardOil !== false)
             writer.tag(11, WireType.Varint).bool(message.brilliantWizardOil);
@@ -1378,6 +1407,9 @@ class Consumes$Type extends MessageType {
         /* bool roasted_clefthoof = 24; */
         if (message.roastedClefthoof !== false)
             writer.tag(24, WireType.Varint).bool(message.roastedClefthoof);
+        /* bool spicy_hot_talbuk = 29; */
+        if (message.spicyHotTalbuk !== false)
+            writer.tag(29, WireType.Varint).bool(message.spicyHotTalbuk);
         /* bool kreegsStoutBeatdown = 20; */
         if (message.kreegsStoutBeatdown !== false)
             writer.tag(20, WireType.Varint).bool(message.kreegsStoutBeatdown);

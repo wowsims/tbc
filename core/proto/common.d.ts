@@ -160,6 +160,10 @@ export interface IndividualBuffs {
      */
     shadowPriestDps: number;
     /**
+     * @generated from protobuf field: bool unleashed_rage = 7;
+     */
+    unleashedRage: boolean;
+    /**
      * How many of each of these buffs the player will be receiving.
      *
      * @generated from protobuf field: int32 innervates = 5;
@@ -223,9 +227,17 @@ export interface Consumes {
      */
     elixirOfMajorAgility: boolean;
     /**
+     * @generated from protobuf field: bool elixir_of_major_strength = 31;
+     */
+    elixirOfMajorStrength: boolean;
+    /**
      * @generated from protobuf field: bool elixir_of_demonslaying = 23;
      */
     elixirOfDemonslaying: boolean;
+    /**
+     * @generated from protobuf field: bool elixir_of_the_mongoose = 30;
+     */
+    elixirOfTheMongoose: boolean;
     /**
      * @generated from protobuf field: bool brilliant_wizard_oil = 11;
      */
@@ -246,6 +258,10 @@ export interface Consumes {
      * @generated from protobuf field: bool roasted_clefthoof = 24;
      */
     roastedClefthoof: boolean;
+    /**
+     * @generated from protobuf field: bool spicy_hot_talbuk = 29;
+     */
+    spicyHotTalbuk: boolean;
     /**
      * @generated from protobuf field: bool kreegsStoutBeatdown = 20;
      */
@@ -1313,7 +1329,11 @@ export declare enum Potions {
     /**
      * @generated from protobuf enum value: HastePotion = 3;
      */
-    HastePotion = 3
+    HastePotion = 3,
+    /**
+     * @generated from protobuf enum value: MightyRagePotion = 4;
+     */
+    MightyRagePotion = 4
 }
 /**
  * @generated from protobuf enum proto.Conjured
