@@ -3,6 +3,38 @@ import { UnknownFieldHandler } from '/tbc/protobuf-ts/index.js';
 import { reflectionMergePartial } from '/tbc/protobuf-ts/index.js';
 import { MESSAGE_TYPE } from '/tbc/protobuf-ts/index.js';
 import { MessageType } from '/tbc/protobuf-ts/index.js';
+/**
+ * @generated from protobuf enum proto.Warrior.Rotation.FuryRotation.PrimaryInstant
+ */
+export var Warrior_Rotation_FuryRotation_PrimaryInstant;
+(function (Warrior_Rotation_FuryRotation_PrimaryInstant) {
+    /**
+     * @generated from protobuf enum value: Bloodthirst = 0;
+     */
+    Warrior_Rotation_FuryRotation_PrimaryInstant[Warrior_Rotation_FuryRotation_PrimaryInstant["Bloodthirst"] = 0] = "Bloodthirst";
+    /**
+     * @generated from protobuf enum value: Whirlwind = 1;
+     */
+    Warrior_Rotation_FuryRotation_PrimaryInstant[Warrior_Rotation_FuryRotation_PrimaryInstant["Whirlwind"] = 1] = "Whirlwind";
+})(Warrior_Rotation_FuryRotation_PrimaryInstant || (Warrior_Rotation_FuryRotation_PrimaryInstant = {}));
+/**
+ * @generated from protobuf enum proto.Warrior.Rotation.Type
+ */
+export var Warrior_Rotation_Type;
+(function (Warrior_Rotation_Type) {
+    /**
+     * @generated from protobuf enum value: ArmsSlam = 0;
+     */
+    Warrior_Rotation_Type[Warrior_Rotation_Type["ArmsSlam"] = 0] = "ArmsSlam";
+    /**
+     * @generated from protobuf enum value: ArmsDW = 1;
+     */
+    Warrior_Rotation_Type[Warrior_Rotation_Type["ArmsDW"] = 1] = "ArmsDW";
+    /**
+     * @generated from protobuf enum value: Fury = 2;
+     */
+    Warrior_Rotation_Type[Warrior_Rotation_Type["Fury"] = 2] = "Fury";
+})(Warrior_Rotation_Type || (Warrior_Rotation_Type = {}));
 // @generated message type with reflection information, may provide speed optimized methods
 class WarriorTalents$Type extends MessageType {
     constructor() {
@@ -415,19 +447,110 @@ export const Warrior = new Warrior$Type();
 // @generated message type with reflection information, may provide speed optimized methods
 class Warrior_Rotation$Type extends MessageType {
     constructor() {
-        super("proto.Warrior.Rotation", []);
+        super("proto.Warrior.Rotation", [
+            { no: 1, name: "type", kind: "enum", T: () => ["proto.Warrior.Rotation.Type", Warrior_Rotation_Type] },
+            { no: 2, name: "arms_slam", kind: "message", T: () => Warrior_Rotation_ArmsSlamRotation },
+            { no: 3, name: "arms_dw", kind: "message", T: () => Warrior_Rotation_ArmsDWRotation },
+            { no: 4, name: "fury", kind: "message", T: () => Warrior_Rotation_FuryRotation },
+            { no: 5, name: "use_ww_during_execute", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 6, name: "use_hs_during_execute", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 7, name: "hs_rage_threshold", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
+            { no: 8, name: "use_overpower", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 9, name: "overpower_rage_threshold", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
+            { no: 10, name: "use_hamstring", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 11, name: "hamstring_rage_threshold", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ }
+        ]);
     }
     create(value) {
-        const message = {};
+        const message = { type: 0, useWwDuringExecute: false, useHsDuringExecute: false, hsRageThreshold: 0, useOverpower: false, overpowerRageThreshold: 0, useHamstring: false, hamstringRageThreshold: 0 };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
         return message;
     }
     internalBinaryRead(reader, length, options, target) {
-        return target ?? this.create();
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* proto.Warrior.Rotation.Type type */ 1:
+                    message.type = reader.int32();
+                    break;
+                case /* proto.Warrior.Rotation.ArmsSlamRotation arms_slam */ 2:
+                    message.armsSlam = Warrior_Rotation_ArmsSlamRotation.internalBinaryRead(reader, reader.uint32(), options, message.armsSlam);
+                    break;
+                case /* proto.Warrior.Rotation.ArmsDWRotation arms_dw */ 3:
+                    message.armsDw = Warrior_Rotation_ArmsDWRotation.internalBinaryRead(reader, reader.uint32(), options, message.armsDw);
+                    break;
+                case /* proto.Warrior.Rotation.FuryRotation fury */ 4:
+                    message.fury = Warrior_Rotation_FuryRotation.internalBinaryRead(reader, reader.uint32(), options, message.fury);
+                    break;
+                case /* bool use_ww_during_execute */ 5:
+                    message.useWwDuringExecute = reader.bool();
+                    break;
+                case /* bool use_hs_during_execute */ 6:
+                    message.useHsDuringExecute = reader.bool();
+                    break;
+                case /* double hs_rage_threshold */ 7:
+                    message.hsRageThreshold = reader.double();
+                    break;
+                case /* bool use_overpower */ 8:
+                    message.useOverpower = reader.bool();
+                    break;
+                case /* double overpower_rage_threshold */ 9:
+                    message.overpowerRageThreshold = reader.double();
+                    break;
+                case /* bool use_hamstring */ 10:
+                    message.useHamstring = reader.bool();
+                    break;
+                case /* double hamstring_rage_threshold */ 11:
+                    message.hamstringRageThreshold = reader.double();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
     }
     internalBinaryWrite(message, writer, options) {
+        /* proto.Warrior.Rotation.Type type = 1; */
+        if (message.type !== 0)
+            writer.tag(1, WireType.Varint).int32(message.type);
+        /* proto.Warrior.Rotation.ArmsSlamRotation arms_slam = 2; */
+        if (message.armsSlam)
+            Warrior_Rotation_ArmsSlamRotation.internalBinaryWrite(message.armsSlam, writer.tag(2, WireType.LengthDelimited).fork(), options).join();
+        /* proto.Warrior.Rotation.ArmsDWRotation arms_dw = 3; */
+        if (message.armsDw)
+            Warrior_Rotation_ArmsDWRotation.internalBinaryWrite(message.armsDw, writer.tag(3, WireType.LengthDelimited).fork(), options).join();
+        /* proto.Warrior.Rotation.FuryRotation fury = 4; */
+        if (message.fury)
+            Warrior_Rotation_FuryRotation.internalBinaryWrite(message.fury, writer.tag(4, WireType.LengthDelimited).fork(), options).join();
+        /* bool use_ww_during_execute = 5; */
+        if (message.useWwDuringExecute !== false)
+            writer.tag(5, WireType.Varint).bool(message.useWwDuringExecute);
+        /* bool use_hs_during_execute = 6; */
+        if (message.useHsDuringExecute !== false)
+            writer.tag(6, WireType.Varint).bool(message.useHsDuringExecute);
+        /* double hs_rage_threshold = 7; */
+        if (message.hsRageThreshold !== 0)
+            writer.tag(7, WireType.Bit64).double(message.hsRageThreshold);
+        /* bool use_overpower = 8; */
+        if (message.useOverpower !== false)
+            writer.tag(8, WireType.Varint).bool(message.useOverpower);
+        /* double overpower_rage_threshold = 9; */
+        if (message.overpowerRageThreshold !== 0)
+            writer.tag(9, WireType.Bit64).double(message.overpowerRageThreshold);
+        /* bool use_hamstring = 10; */
+        if (message.useHamstring !== false)
+            writer.tag(10, WireType.Varint).bool(message.useHamstring);
+        /* double hamstring_rage_threshold = 11; */
+        if (message.hamstringRageThreshold !== 0)
+            writer.tag(11, WireType.Bit64).double(message.hamstringRageThreshold);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -439,21 +562,232 @@ class Warrior_Rotation$Type extends MessageType {
  */
 export const Warrior_Rotation = new Warrior_Rotation$Type();
 // @generated message type with reflection information, may provide speed optimized methods
-class Warrior_Options$Type extends MessageType {
+class Warrior_Rotation_ArmsSlamRotation$Type extends MessageType {
     constructor() {
-        super("proto.Warrior.Options", []);
+        super("proto.Warrior.Rotation.ArmsSlamRotation", [
+            { no: 1, name: "use_slam_during_execute", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 2, name: "slam_latency", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
+            { no: 3, name: "use_ms_during_execute", kind: "scalar", T: 8 /*ScalarType.BOOL*/ }
+        ]);
     }
     create(value) {
-        const message = {};
+        const message = { useSlamDuringExecute: false, slamLatency: 0, useMsDuringExecute: false };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
         return message;
     }
     internalBinaryRead(reader, length, options, target) {
-        return target ?? this.create();
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* bool use_slam_during_execute */ 1:
+                    message.useSlamDuringExecute = reader.bool();
+                    break;
+                case /* double slam_latency */ 2:
+                    message.slamLatency = reader.double();
+                    break;
+                case /* bool use_ms_during_execute */ 3:
+                    message.useMsDuringExecute = reader.bool();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
     }
     internalBinaryWrite(message, writer, options) {
+        /* bool use_slam_during_execute = 1; */
+        if (message.useSlamDuringExecute !== false)
+            writer.tag(1, WireType.Varint).bool(message.useSlamDuringExecute);
+        /* double slam_latency = 2; */
+        if (message.slamLatency !== 0)
+            writer.tag(2, WireType.Bit64).double(message.slamLatency);
+        /* bool use_ms_during_execute = 3; */
+        if (message.useMsDuringExecute !== false)
+            writer.tag(3, WireType.Varint).bool(message.useMsDuringExecute);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message proto.Warrior.Rotation.ArmsSlamRotation
+ */
+export const Warrior_Rotation_ArmsSlamRotation = new Warrior_Rotation_ArmsSlamRotation$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class Warrior_Rotation_ArmsDWRotation$Type extends MessageType {
+    constructor() {
+        super("proto.Warrior.Rotation.ArmsDWRotation", [
+            { no: 1, name: "use_ms_during_execute", kind: "scalar", T: 8 /*ScalarType.BOOL*/ }
+        ]);
+    }
+    create(value) {
+        const message = { useMsDuringExecute: false };
+        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader, length, options, target) {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* bool use_ms_during_execute */ 1:
+                    message.useMsDuringExecute = reader.bool();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message, writer, options) {
+        /* bool use_ms_during_execute = 1; */
+        if (message.useMsDuringExecute !== false)
+            writer.tag(1, WireType.Varint).bool(message.useMsDuringExecute);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message proto.Warrior.Rotation.ArmsDWRotation
+ */
+export const Warrior_Rotation_ArmsDWRotation = new Warrior_Rotation_ArmsDWRotation$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class Warrior_Rotation_FuryRotation$Type extends MessageType {
+    constructor() {
+        super("proto.Warrior.Rotation.FuryRotation", [
+            { no: 1, name: "primary_instant", kind: "enum", T: () => ["proto.Warrior.Rotation.FuryRotation.PrimaryInstant", Warrior_Rotation_FuryRotation_PrimaryInstant] },
+            { no: 2, name: "use_bt_during_execute", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 10, name: "rampage_cd_threshold", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ }
+        ]);
+    }
+    create(value) {
+        const message = { primaryInstant: 0, useBtDuringExecute: false, rampageCdThreshold: 0 };
+        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader, length, options, target) {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* proto.Warrior.Rotation.FuryRotation.PrimaryInstant primary_instant */ 1:
+                    message.primaryInstant = reader.int32();
+                    break;
+                case /* bool use_bt_during_execute */ 2:
+                    message.useBtDuringExecute = reader.bool();
+                    break;
+                case /* double rampage_cd_threshold */ 10:
+                    message.rampageCdThreshold = reader.double();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message, writer, options) {
+        /* proto.Warrior.Rotation.FuryRotation.PrimaryInstant primary_instant = 1; */
+        if (message.primaryInstant !== 0)
+            writer.tag(1, WireType.Varint).int32(message.primaryInstant);
+        /* bool use_bt_during_execute = 2; */
+        if (message.useBtDuringExecute !== false)
+            writer.tag(2, WireType.Varint).bool(message.useBtDuringExecute);
+        /* double rampage_cd_threshold = 10; */
+        if (message.rampageCdThreshold !== 0)
+            writer.tag(10, WireType.Bit64).double(message.rampageCdThreshold);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message proto.Warrior.Rotation.FuryRotation
+ */
+export const Warrior_Rotation_FuryRotation = new Warrior_Rotation_FuryRotation$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class Warrior_Options$Type extends MessageType {
+    constructor() {
+        super("proto.Warrior.Options", [
+            { no: 1, name: "starting_rage", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
+            { no: 2, name: "precast_t2", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 3, name: "precast_sapphire", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 4, name: "recklessness", kind: "scalar", T: 8 /*ScalarType.BOOL*/ }
+        ]);
+    }
+    create(value) {
+        const message = { startingRage: 0, precastT2: false, precastSapphire: false, recklessness: false };
+        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader, length, options, target) {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* double starting_rage */ 1:
+                    message.startingRage = reader.double();
+                    break;
+                case /* bool precast_t2 */ 2:
+                    message.precastT2 = reader.bool();
+                    break;
+                case /* bool precast_sapphire */ 3:
+                    message.precastSapphire = reader.bool();
+                    break;
+                case /* bool recklessness */ 4:
+                    message.recklessness = reader.bool();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message, writer, options) {
+        /* double starting_rage = 1; */
+        if (message.startingRage !== 0)
+            writer.tag(1, WireType.Bit64).double(message.startingRage);
+        /* bool precast_t2 = 2; */
+        if (message.precastT2 !== false)
+            writer.tag(2, WireType.Varint).bool(message.precastT2);
+        /* bool precast_sapphire = 3; */
+        if (message.precastSapphire !== false)
+            writer.tag(3, WireType.Varint).bool(message.precastSapphire);
+        /* bool recklessness = 4; */
+        if (message.recklessness !== false)
+            writer.tag(4, WireType.Varint).bool(message.recklessness);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
