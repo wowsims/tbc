@@ -14,21 +14,19 @@ func init() {
 }
 
 func TestP1FullCharacterStats(t *testing.T) {
-	isr := core.NewIndividualSimRequest(core.IndividualSimInputs{
-		Player: &proto.Player{
+	raid := core.SinglePlayerRaidProto(
+		&proto.Player{
 			Race:      proto.Race_RaceTroll10,
 			Class:     proto.Class_ClassShaman,
 			Equipment: Phase2Gear,
 			Consumes:  FullConsumes,
 			Spec:      PlayerOptionsBasic,
+			Buffs:     FullIndividualBuffs,
 		},
+		FullPartyBuffs,
+		FullRaidBuffs)
 
-		RaidBuffs:       FullRaidBuffs,
-		PartyBuffs:      FullPartyBuffs,
-		IndividualBuffs: FullIndividualBuffs,
-	})
-
-	core.CharacterStatsTest("p2Full", t, isr, stats.Stats{
+	core.CharacterStatsTest("p2Full", t, raid, stats.Stats{
 		stats.Strength:  519.0,
 		stats.Agility:   512.0,
 		stats.Stamina:   595.0,

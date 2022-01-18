@@ -118,6 +118,9 @@ type SimpleSpell struct {
 
 	IsChannel bool
 
+	// Maximum amount of pre-crit damage this spell is allowed to do.
+	AOECap float64
+
 	// The action currently used for the dot effects of this spell, or nil if not ticking.
 	currentDotAction *PendingAction
 }
@@ -198,6 +201,8 @@ func (spell *SimpleSpell) Cast(sim *Simulation) bool {
 				} else {
 					hitEffect.applyResultsToCast(&spell.SpellCast)
 				}
+			} else {
+				hitEffect.applyResultsToCast(&spell.SpellCast)
 			}
 
 			hitEffect.afterCalculations(sim, &spell.SpellCast)
@@ -223,6 +228,8 @@ func (spell *SimpleSpell) Cast(sim *Simulation) bool {
 					} else {
 						hitEffect.applyResultsToCast(&spell.SpellCast)
 					}
+				} else {
+					hitEffect.applyResultsToCast(&spell.SpellCast)
 				}
 
 				hitEffect.afterCalculations(sim, &spell.SpellCast)
@@ -272,6 +279,12 @@ func (spell *SimpleSpell) Cast(sim *Simulation) bool {
 			spell.objectInUse = false
 		}
 	})
+}
+
+func (spell *SimpleSpell) applyAOECap() {
+	if spell.AOECap == 0 {
+		return
+	}
 }
 
 func (spell *SimpleSpell) Cancel(sim *Simulation) {

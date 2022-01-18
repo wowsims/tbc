@@ -165,24 +165,6 @@ message RaidSimResult {
 		string logs = 3;
 }
 
-// RPC IndividualSim
-message IndividualSimRequest {
-    Player player = 1;
-
-    RaidBuffs raid_buffs = 2;
-    PartyBuffs party_buffs = 3;
-
-    Encounter encounter = 5;
-		SimOptions sim_options = 6;
-}
-
-message IndividualSimResult {
-		PlayerMetrics player_metrics = 1;
-		EncounterMetrics encounter_metrics = 2;
-
-    string logs = 3;
-}
-
 // RPC GearList
 message GearListRequest {
 }
