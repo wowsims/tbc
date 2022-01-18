@@ -63,6 +63,13 @@ func consumesStats(c proto.Consumes, raidBuffs proto.RaidBuffs) stats.Stats {
 		s[stats.Agility] += 35
 		s[stats.MeleeCrit] += 20
 	}
+	if c.ElixirOfMajorStrength {
+		s[stats.Strength] += 35
+	}
+	if c.ElixirOfTheMongoose {
+		s[stats.Agility] += 25
+		s[stats.MeleeCrit] += 28
+	}
 
 	if c.FlaskOfSupremePower {
 		s[stats.SpellPower] += 70
@@ -99,6 +106,11 @@ func consumesStats(c proto.Consumes, raidBuffs proto.RaidBuffs) stats.Stats {
 	}
 	if c.RoastedClefthoof {
 		s[stats.Strength] += 20
+		s[stats.Spirit] += 20
+	}
+	if c.SpicyHotTalbuk {
+		s[stats.MeleeHit] += 20
+		s[stats.Spirit] += 20
 	}
 	if c.ScrollOfAgilityV {
 		s[stats.Agility] += 20
@@ -494,6 +506,34 @@ func makePotionActivation(potionType proto.Potions, character *Character) (Major
 				character.SetCD(PotionCooldownID, time.Minute*2+sim.CurrentTime)
 				character.Metrics.AddInstantCast(actionID)
 			}
+	} else if potionType == proto.Potions_MightyRagePotion {
+		actionID := ActionID{ItemID: 13442}
+		return MajorCooldown{
+				ActionID: actionID,
+				Type:     CooldownTypeDPS,
+				CanActivate: func(sim *Simulation, character *Character) bool {
+					return true
+				},
+				ShouldActivate: func(sim *Simulation, character *Character) bool {
+					if character.Class == proto.Class_ClassWarrior {
+						return character.CurrentRage() < 25
+					}
+					return true
+				},
+			},
+			func(sim *Simulation, character *Character) {
+				const strBonus = 20.0
+				const dur = time.Second * 15
+
+				character.AddAuraWithTemporaryStats(sim, PotionAuraID, actionID, stats.Strength, strBonus, dur)
+				if character.Class == proto.Class_ClassWarrior {
+					bonusRage := 45.0 + (75.0-45.0)*sim.RandomFloat("Mighty Rage Potion")
+					character.AddRage(sim, bonusRage, actionID)
+				}
+
+				character.SetCD(PotionCooldownID, time.Minute*2+sim.CurrentTime)
+				character.Metrics.AddInstantCast(actionID)
+			}
 	} else {
 		return MajorCooldown{}, nil
 	}
@@ -579,6 +619,32 @@ func makeConjuredActivation(conjuredType proto.Conjured, character *Character) (
 			}
 	} else if conjuredType == proto.Conjured_ConjuredFlameCap {
 		actionID := ActionID{ItemID: 22788}
+
+		castTemplate := NewSimpleSpellTemplate(SimpleSpell{
+			SpellCast: SpellCast{
+				Cast: Cast{
+					ActionID:        actionID,
+					Character:       character,
+					IgnoreCooldowns: true,
+					IgnoreManaCost:  true,
+					IsPhantom:       true,
+					SpellSchool:     stats.FireSpellPower,
+					CritMultiplier:  1.5,
+				},
+			},
+			Effect: SpellHitEffect{
+				SpellEffect: SpellEffect{
+					DamageMultiplier:       1,
+					StaticDamageMultiplier: 1,
+				},
+				DirectInput: DirectDamageInput{
+					MinBaseDamage: 40,
+					MaxBaseDamage: 40,
+				},
+			},
+		})
+		spellObj := SimpleSpell{}
+
 		return MajorCooldown{
 				ActionID: actionID,
 				Cooldown: time.Minute * 3,
@@ -593,9 +659,24 @@ func makeConjuredActivation(conjuredType proto.Conjured, character *Character) (
 			func(sim *Simulation, character *Character) {
 				const fireBonus = 80
 				const dur = time.Minute * 1
+				const procChance = 0.185
 
-				character.AddAuraWithTemporaryStats(sim, ConjuredAuraID, actionID, stats.FireSpellPower, fireBonus, dur)
-				// TODO: Add separate aura for damage proc on melee/ranged swings
+				aura := character.NewAuraWithTemporaryStats(sim, ConjuredAuraID, actionID, stats.FireSpellPower, fireBonus, dur)
+				aura.OnMeleeAttack = func(sim *Simulation, ability *ActiveMeleeAbility, hitEffect *AbilityHitEffect) {
+					if !hitEffect.Landed() || !hitEffect.IsWeaponHit() {
+						return
+					}
+					if sim.RandomFloat("Flame Cap Melee") > procChance {
+						return
+					}
+
+					castAction := &spellObj
+					castTemplate.Apply(castAction)
+					castAction.Effect.Target = hitEffect.Target
+					castAction.Init(sim)
+					castAction.Cast(sim)
+				}
+				character.AddAura(sim, aura)
 
 				character.SetCD(ConjuredCooldownID, time.Minute*3+sim.CurrentTime)
 				character.Metrics.AddInstantCast(actionID)

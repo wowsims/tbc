@@ -151,6 +151,17 @@ func applyBuffEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs proto.P
 		})
 	}
 
+	if individualBuffs.UnleashedRage {
+		// TODO: This implementation won't give the bonus to temporary effects, like trinket actives.
+		character.AddStatDependency(stats.StatDependency{
+			SourceStat:   stats.AttackPower,
+			ModifiedStat: stats.AttackPower,
+			Modifier: func(ap float64, _ float64) float64 {
+				return ap * 1.1
+			},
+		})
+	}
+
 	registerBloodlustCD(agent, partyBuffs.Bloodlust)
 	registerPowerInfusionCD(agent, individualBuffs.PowerInfusions)
 	registerManaTideTotemCD(agent, partyBuffs.ManaTideTotems)
