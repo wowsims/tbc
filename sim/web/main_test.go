@@ -9,6 +9,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/proto"
 	googleProto "google.golang.org/protobuf/proto"
 )
@@ -78,14 +79,17 @@ func init() {
 // TestIndividualSim is just a smoke test to make sure the http server works as expected.
 //   Don't modify this test unless the proto defintions change and this no longer compiles.
 func TestIndividualSim(t *testing.T) {
-	req := &proto.IndividualSimRequest{
-		Player: &proto.Player{
-			Race:      proto.Race_RaceTroll10,
-			Class:     proto.Class_ClassShaman,
-			Equipment: p1Equip,
-			Consumes:  basicConsumes,
-			Spec:      basicSpec,
-		},
+	req := &proto.RaidSimRequest{
+		Raid: core.SinglePlayerRaidProto(
+			&proto.Player{
+				Race:      proto.Race_RaceTroll10,
+				Class:     proto.Class_ClassShaman,
+				Equipment: p1Equip,
+				Consumes:  basicConsumes,
+				Spec:      basicSpec,
+			},
+			&proto.PartyBuffs{},
+			&proto.RaidBuffs{}),
 		Encounter: &proto.Encounter{
 			Duration: 120,
 			Targets: []*proto.Target{
@@ -104,7 +108,7 @@ func TestIndividualSim(t *testing.T) {
 		t.Fatalf("Failed to encode request: %s", err.Error())
 	}
 
-	r, err := http.Post("http://localhost:3333/individualSim", "application/x-protobuf", bytes.NewReader(msgBytes))
+	r, err := http.Post("http://localhost:3333/raidSim", "application/x-protobuf", bytes.NewReader(msgBytes))
 	if err != nil {
 		t.Fatalf("Failed to POST request: %s", err.Error())
 	}
@@ -115,11 +119,11 @@ func TestIndividualSim(t *testing.T) {
 		return
 	}
 
-	isr := &proto.IndividualSimResult{}
-	if err := googleProto.Unmarshal(body, isr); err != nil {
+	rsr := &proto.RaidSimResult{}
+	if err := googleProto.Unmarshal(body, rsr); err != nil {
 		t.Fatalf("Failed to parse request: %s", err.Error())
 		return
 	}
 
-	log.Printf("RESULT: %#v", isr)
+	log.Printf("RESULT: %#v", rsr)
 }

@@ -163,7 +163,7 @@ export const playerPresets: Array<PresetSpecSettings<any>> = [
 	{
 		spec: Spec.SpecMage,
 		rotation: MagePresets.DefaultFrostRotation,
-		talents: MagePresets.FrostTalents.data,
+		talents: MagePresets.DeepFrostTalents.data,
 		specOptions: MagePresets.DefaultFrostOptions,
 		consumes: MagePresets.DefaultFrostConsumes,
 		defaultName: 'Frost Mage',
