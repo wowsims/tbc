@@ -17,6 +17,7 @@ import { Item } from '/tbc/core/proto/common.js';
 import { Race } from '/tbc/core/proto/common.js';
 import { Spec } from '/tbc/core/proto/common.js';
 import { Stat } from '/tbc/core/proto/common.js';
+import { WeaponImbue } from '/tbc/core/proto/common.js';
 import { PlayerStats } from '/tbc/core/proto/api.js';
 import { Player as PlayerProto } from '/tbc/core/proto/api.js';
 import { StatWeightsResult } from '/tbc/core/proto/api.js';
@@ -548,6 +549,14 @@ export class Player<SpecType extends Spec> {
 			// TODO: Remove this on 1/31/2022 (1 month).
 			if (proto.consumes && proto.consumes.darkRune) {
 				proto.consumes.defaultConjured = Conjured.ConjuredDarkRune;
+			}
+
+			// TODO: Remove this on 2/18/2022 (1 month).
+			if (proto.consumes && proto.consumes.brilliantWizardOil) {
+				proto.consumes.mainHandImbue = WeaponImbue.WeaponImbueBrilliantWizardOil;
+			}
+			if (proto.consumes && proto.consumes.superiorWizardOil) {
+				proto.consumes.mainHandImbue = WeaponImbue.WeaponImbueSuperiorWizardOil;
 			}
 
 			let rotation = this.specTypeFunctions.rotationFromPlayer(proto);

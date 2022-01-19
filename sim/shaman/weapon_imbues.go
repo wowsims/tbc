@@ -234,38 +234,15 @@ func (shaman *Shaman) ApplyFrostbrandImbue(mh bool, oh bool) {
 	})
 }
 
-var RBImbueAuraID = core.NewAuraID()
-
 func (shaman *Shaman) ApplyRockbiterImbue(mh bool, oh bool) {
-	if !mh && !oh {
-		return
+	if weapon := shaman.Equip[proto.ItemSlot_ItemSlotMainHand]; mh && weapon.ID != 0 {
+		bonus := 62.0 * weapon.SwingSpeed
+		shaman.AutoAttacks.MH.BaseDamageMin += bonus
+		shaman.AutoAttacks.MH.BaseDamageMax += bonus
 	}
-
-	mhBonus := 0.0
-	ohBonus := 0.0
-	if weapon := shaman.Equip[proto.ItemSlot_ItemSlotMainHand]; weapon.ID != 0 {
-		mhBonus = 62.0 * weapon.SwingSpeed
+	if weapon := shaman.Equip[proto.ItemSlot_ItemSlotOffHand]; oh && weapon.ID != 0 {
+		bonus := 62.0 * weapon.SwingSpeed
+		shaman.AutoAttacks.MH.BaseDamageMin += bonus
+		shaman.AutoAttacks.MH.BaseDamageMax += bonus
 	}
-	if weapon := shaman.Equip[proto.ItemSlot_ItemSlotOffHand]; weapon.ID != 0 {
-		ohBonus = 62.0 * weapon.SwingSpeed
-	}
-
-	shaman.AddPermanentAura(func(sim *core.Simulation) core.Aura {
-		return core.Aura{
-			ID: RBImbueAuraID,
-			OnBeforeMeleeHit: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
-				if !hitEffect.IsWeaponHit() {
-					return
-				}
-
-				if hitEffect.IsMH() {
-					if mh {
-						hitEffect.BonusWeaponDamage += mhBonus
-					}
-				} else if oh {
-					hitEffect.BonusWeaponDamage += ohBonus
-				}
-			},
-		}
-	})
 }

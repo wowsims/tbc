@@ -205,6 +205,14 @@ enum Conjured {
 	// because there is always a max of 3 per encounter.
 }
 
+enum WeaponImbue {
+	WeaponImbueUnknown = 0;
+	WeaponImbueAdamantiteSharpeningStone = 1;
+	WeaponImbueElementalSharpeningStone = 2;
+	WeaponImbueBrilliantWizardOil = 3;
+	WeaponImbueSuperiorWizardOil = 4;
+}
+
 // Buffs that affect the entire raid.
 message RaidBuffs {
     bool arcane_brilliance = 1;
@@ -292,8 +300,13 @@ message Consumes {
     bool elixir_of_demonslaying = 23;
     bool elixir_of_the_mongoose = 30;
 
+		// Deprecated, use main_hand_imbue instead.
+		// Remove on 2/18/2022 (1 month).
     bool brilliant_wizard_oil = 11; 
     bool superior_wizard_oil = 12; 
+
+		WeaponImbue main_hand_imbue = 32;
+		WeaponImbue off_hand_imbue = 33;
 
     bool blackened_basilisk = 13;
     bool skullfish_soup = 14;

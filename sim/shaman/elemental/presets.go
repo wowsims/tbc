@@ -110,10 +110,10 @@ var FullIndividualBuffs = &proto.IndividualBuffs{
 
 var FullConsumes = &proto.Consumes{
 	FlaskOfBlindingLight: true,
-	BrilliantWizardOil:   true,
 	BlackenedBasilisk:    true,
 	DefaultPotion:        proto.Potions_SuperManaPotion,
 	StartingPotion:       proto.Potions_DestructionPotion,
+	MainHandImbue:        proto.WeaponImbue_WeaponImbueBrilliantWizardOil,
 	NumStartingPotions:   1,
 	DefaultConjured:      proto.Conjured_ConjuredDarkRune,
 	Drums:                proto.Drums_DrumsOfBattle,

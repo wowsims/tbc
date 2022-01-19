@@ -10,7 +10,17 @@ import (
 
 func init() {
 	// Keep these in order by item ID.
+	core.AddItemEffect(16250, ApplyWeaponSuperiorStriking)
+	core.AddItemEffect(22535, ApplyRingStriking)
 	core.AddItemEffect(22559, ApplyMongooseEffect)
+}
+
+func ApplyWeaponSuperiorStriking(agent core.Agent) {
+	agent.GetCharacter().PseudoStats.BonusWeaponDamage += 5
+}
+
+func ApplyRingStriking(agent core.Agent) {
+	agent.GetCharacter().PseudoStats.BonusWeaponDamage += 2
 }
 
 var MongooseAuraID = core.NewAuraID()

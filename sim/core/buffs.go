@@ -253,8 +253,9 @@ var windfuryAPBonuses = []float64{
 }
 
 func IsEligibleForWindfuryTotem(character *Character) bool {
-	// TODO: Also check that no weapon imbue is applied.
-	return character.AutoAttacks.IsEnabled() && !character.HasMHWeaponImbue
+	return character.AutoAttacks.IsEnabled() &&
+		!character.HasMHWeaponImbue &&
+		character.consumes.MainHandImbue == proto.WeaponImbue_WeaponImbueUnknown
 }
 
 func WindfuryTotemAura(character *Character, rank int32, iwtTalentPoints int32) Aura {

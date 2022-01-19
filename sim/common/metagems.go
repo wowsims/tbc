@@ -10,6 +10,7 @@ import (
 func init() {
 	// Keep these in order by item ID.
 	core.AddItemEffect(25893, ApplyMysticalSkyfireDiamond)
+	core.AddItemEffect(25899, ApplyBrutalEarthstormDiamond)
 	core.AddItemEffect(25901, ApplyInsightfulEarthstormDiamond)
 	core.AddItemEffect(34220, ApplyChaoticSkyfireDiamond)
 	core.AddItemEffect(35503, ApplyEmberSkyfireDiamond)
@@ -18,6 +19,10 @@ func init() {
 
 var MysticalSkyfireDiamondAuraID = core.NewAuraID()
 var MysticFocusAuraID = core.NewAuraID()
+
+func ApplyBrutalEarthstormDiamond(agent core.Agent) {
+	agent.GetCharacter().PseudoStats.BonusWeaponDamage += 3
+}
 
 func ApplyMysticalSkyfireDiamond(agent core.Agent) {
 	character := agent.GetCharacter()

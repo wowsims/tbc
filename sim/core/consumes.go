@@ -12,7 +12,7 @@ func applyConsumeEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs prot
 	character := agent.GetCharacter()
 	consumes := character.consumes
 
-	character.AddStats(consumesStats(consumes, raidBuffs))
+	character.AddStats(consumesStats(character, consumes, raidBuffs))
 
 	if consumes.ElixirOfDemonslaying {
 		character.AddPermanentAura(func(sim *Simulation) Aura {
@@ -25,18 +25,13 @@ func applyConsumeEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs prot
 	registerConjuredCD(agent, consumes)
 }
 
-func consumesStats(c proto.Consumes, raidBuffs proto.RaidBuffs) stats.Stats {
+func consumesStats(character *Character, c proto.Consumes, raidBuffs proto.RaidBuffs) stats.Stats {
 	s := stats.Stats{}
 
-	if c.BrilliantWizardOil {
-		s[stats.SpellCrit] += 14
-		s[stats.SpellPower] += 36
-		s[stats.HealingPower] += 36
+	if !character.HasMHWeaponImbue {
+		addImbueStats(character, c.MainHandImbue)
 	}
-	if c.SuperiorWizardOil {
-		s[stats.SpellPower] += 42
-		s[stats.HealingPower] += 42
-	}
+	addImbueStats(character, c.OffHandImbue)
 
 	if c.ElixirOfMajorMageblood {
 		s[stats.MP5] += 16.0
@@ -125,6 +120,31 @@ func consumesStats(c proto.Consumes, raidBuffs proto.RaidBuffs) stats.Stats {
 	}
 
 	return s
+}
+
+func addImbueStats(character *Character, imbue proto.WeaponImbue) {
+	if imbue == proto.WeaponImbue_WeaponImbueAdamantiteSharpeningStone {
+	} else if imbue == proto.WeaponImbue_WeaponImbueAdamantiteSharpeningStone {
+		character.AddStats(stats.Stats{
+			stats.MeleeCrit: 14,
+		})
+		character.PseudoStats.BonusWeaponDamage += 12
+	} else if imbue == proto.WeaponImbue_WeaponImbueElementalSharpeningStone {
+		character.AddStats(stats.Stats{
+			stats.MeleeCrit: 28,
+		})
+	} else if imbue == proto.WeaponImbue_WeaponImbueBrilliantWizardOil {
+		character.AddStats(stats.Stats{
+			stats.SpellCrit:    14,
+			stats.SpellPower:   36,
+			stats.HealingPower: 36,
+		})
+	} else if imbue == proto.WeaponImbue_WeaponImbueSuperiorWizardOil {
+		character.AddStats(stats.Stats{
+			stats.SpellPower:   42,
+			stats.HealingPower: 42,
+		})
+	}
 }
 
 var ElixirOfDemonslayingAuraID = NewAuraID()
