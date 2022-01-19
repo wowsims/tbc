@@ -90,7 +90,6 @@ type AbilityEffect struct {
 	Target *Target
 
 	// Bonus stats to be added to the attack.
-	BonusWeaponDamage     float64
 	BonusHitRating        float64
 	BonusAttackPower      float64
 	BonusCritRating       float64
@@ -127,8 +126,8 @@ type Weapon struct {
 	SwingDuration time.Duration // Duration between 2 swings.
 }
 
-func (weapon Weapon) calculateSwingDamage(sim *Simulation, bonusWeaponDamage float64, attackPower float64) float64 {
-	dmg := weapon.BaseDamageMin + bonusWeaponDamage + (weapon.BaseDamageMax-weapon.BaseDamageMin)*sim.RandomFloat("melee")
+func (weapon Weapon) calculateSwingDamage(sim *Simulation, attackPower float64) float64 {
+	dmg := weapon.BaseDamageMin + (weapon.BaseDamageMax-weapon.BaseDamageMin)*sim.RandomFloat("melee")
 	dmg += (weapon.SwingSpeed * attackPower) / MeleeAttackRatingPerDamage
 	return dmg
 }
@@ -282,14 +281,15 @@ func (ahe *AbilityHitEffect) calculateDamage(sim *Simulation, ability *ActiveMel
 	}
 
 	attackPower := character.stats[stats.AttackPower] + ahe.BonusAttackPower
-	bonusWeaponDamage := ahe.BonusWeaponDamage
+	bonusWeaponDamage := character.PseudoStats.BonusWeaponDamage
 
 	dmg := 0.0
 	if ahe.WeaponInput.DamageMultiplier != 0 {
+		// Bonus weapon damage applies after OH penalty: https://www.youtube.com/watch?v=bwCIU87hqTs
 		if !ahe.WeaponInput.IsOH {
-			dmg += character.AutoAttacks.mh.calculateSwingDamage(sim, bonusWeaponDamage, attackPower)
+			dmg += character.AutoAttacks.MH.calculateSwingDamage(sim, attackPower) + bonusWeaponDamage
 		} else {
-			dmg += character.AutoAttacks.oh.calculateSwingDamage(sim, bonusWeaponDamage, attackPower) * 0.5
+			dmg += character.AutoAttacks.OH.calculateSwingDamage(sim, attackPower)*0.5 + bonusWeaponDamage
 		}
 		dmg *= ahe.WeaponInput.DamageMultiplier
 		dmg += ahe.WeaponInput.FlatDamageBonus
@@ -443,8 +443,8 @@ func (ahe *AbilityHitEffect) performAttack(sim *Simulation, ability *ActiveMelee
 type AutoAttacks struct {
 	// initialized
 	character *Character
-	mh        Weapon
-	oh        Weapon
+	MH        Weapon
+	OH        Weapon
 
 	IsDualWielding bool
 
@@ -490,7 +490,7 @@ func NewAutoAttacks(c *Character, delayOHSwings bool) AutoAttacks {
 	}
 
 	if weapon := c.Equip[proto.ItemSlot_ItemSlotMainHand]; weapon.ID != 0 {
-		aa.mh = Weapon{
+		aa.MH = Weapon{
 			BaseDamageMin: weapon.WeaponDamageMin,
 			BaseDamageMax: weapon.WeaponDamageMax,
 			SwingSpeed:    weapon.SwingSpeed,
@@ -498,20 +498,20 @@ func NewAutoAttacks(c *Character, delayOHSwings bool) AutoAttacks {
 		}
 	}
 	if weapon := c.Equip[proto.ItemSlot_ItemSlotOffHand]; weapon.ID != 0 {
-		aa.oh = Weapon{
+		aa.OH = Weapon{
 			BaseDamageMin: weapon.WeaponDamageMin,
 			BaseDamageMax: weapon.WeaponDamageMax,
 			SwingSpeed:    weapon.SwingSpeed,
 			SwingDuration: time.Duration(weapon.SwingSpeed * float64(time.Second)),
 		}
 	}
-	aa.IsDualWielding = aa.mh.SwingSpeed != 0 && aa.oh.SwingSpeed != 0
+	aa.IsDualWielding = aa.MH.SwingSpeed != 0 && aa.OH.SwingSpeed != 0
 
 	return aa
 }
 
 func (aa *AutoAttacks) IsEnabled() bool {
-	return aa.mh.SwingSpeed != 0
+	return aa.MH.SwingSpeed != 0
 }
 
 func (aa *AutoAttacks) reset(sim *Simulation) {
@@ -538,11 +538,11 @@ func (aa *AutoAttacks) reset(sim *Simulation) {
 }
 
 func (aa *AutoAttacks) MainhandSwingSpeed() time.Duration {
-	return time.Duration(float64(aa.mh.SwingDuration) / aa.character.SwingSpeed())
+	return time.Duration(float64(aa.MH.SwingDuration) / aa.character.SwingSpeed())
 }
 
 func (aa *AutoAttacks) OffhandSwingSpeed() time.Duration {
-	return time.Duration(float64(aa.oh.SwingDuration) / aa.character.SwingSpeed())
+	return time.Duration(float64(aa.OH.SwingDuration) / aa.character.SwingSpeed())
 }
 
 // Swing will check any swing timers if they are up, and if so, swing!
@@ -580,7 +580,7 @@ func (aa *AutoAttacks) Swing(sim *Simulation, target *Target) {
 }
 
 func (aa *AutoAttacks) ModifySwingTime(sim *Simulation, amount float64) {
-	if aa.mh.SwingSpeed == 0 {
+	if aa.MH.SwingSpeed == 0 {
 		return
 	}
 	mhSwingTime := aa.MainhandSwingAt - sim.CurrentTime
@@ -588,7 +588,7 @@ func (aa *AutoAttacks) ModifySwingTime(sim *Simulation, amount float64) {
 		aa.MainhandSwingAt = sim.CurrentTime + time.Duration(float64(mhSwingTime)/amount)
 	}
 
-	if aa.oh.SwingSpeed == 0 {
+	if aa.OH.SwingSpeed == 0 {
 		return
 	}
 	ohSwingTime := aa.OffhandSwingAt - sim.CurrentTime
@@ -603,7 +603,7 @@ func (aa *AutoAttacks) ModifySwingTime(sim *Simulation, amount float64) {
 // Returns the time at which the next attack will occur.
 func (aa *AutoAttacks) NextAttackAt() time.Duration {
 	nextAttack := aa.MainhandSwingAt
-	if aa.oh.SwingSpeed != 0 {
+	if aa.OH.SwingSpeed != 0 {
 		nextAttack = MinDuration(nextAttack, aa.OffhandSwingAt)
 	}
 	return nextAttack
@@ -651,7 +651,7 @@ func (ppmm *PPMManager) ProcOH(sim *Simulation, label string) bool {
 
 // PPMToChance converts a character proc-per-minute into mh/oh proc chances
 func (aa *AutoAttacks) NewPPMManager(ppm float64) PPMManager {
-	if aa.mh.SwingSpeed == 0 {
+	if aa.MH.SwingSpeed == 0 {
 		// Means this character didn't enable autoattacks.
 		return PPMManager{
 			mhProcChance: 0,
@@ -660,8 +660,8 @@ func (aa *AutoAttacks) NewPPMManager(ppm float64) PPMManager {
 	}
 
 	return PPMManager{
-		mhProcChance: (aa.mh.SwingSpeed * ppm) / 60.0,
-		ohProcChance: (aa.oh.SwingSpeed * ppm) / 60.0,
+		mhProcChance: (aa.MH.SwingSpeed * ppm) / 60.0,
+		ohProcChance: (aa.OH.SwingSpeed * ppm) / 60.0,
 	}
 }
 

@@ -37,11 +37,11 @@ var FullIndividualBuffs = &proto.IndividualBuffs{
 
 var FullConsumes = &proto.Consumes{
 	FlaskOfPureDeath:   true,
-	BrilliantWizardOil: true,
 	BlackenedBasilisk:  true,
 	DefaultPotion:      proto.Potions_SuperManaPotion,
 	NumStartingPotions: 1,
 	DefaultConjured:    proto.Conjured_ConjuredDarkRune,
+	MainHandImbue:      proto.WeaponImbue_WeaponImbueBrilliantWizardOil,
 }
 
 var FullDebuffs = &proto.Debuffs{

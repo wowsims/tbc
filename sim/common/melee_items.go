@@ -10,6 +10,7 @@ import (
 func init() {
 	// Proc effects. Keep these in order by item ID.
 	core.AddItemEffect(23541, ApplyKhoriumChampion)
+	core.AddItemEffect(24114, ApplyBraidedEterniumChain)
 	core.AddItemEffect(27901, ApplyBlackoutTruncheon)
 	core.AddItemEffect(28429, ApplyLionheartChampion)
 	core.AddItemEffect(28430, ApplyLionheartExecutioner)
@@ -56,6 +57,10 @@ func ApplyKhoriumChampion(agent core.Agent) {
 			},
 		}
 	})
+}
+
+func ApplyBraidedEterniumChain(agent core.Agent) {
+	agent.GetCharacter().PseudoStats.BonusWeaponDamage += 5
 }
 
 var BlackoutTruncheonAuraID = core.NewAuraID()

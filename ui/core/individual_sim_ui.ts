@@ -235,7 +235,8 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
       'Potion': [],
       'Conjured': [],
       'Spirit': [],
-      'Weapon Imbue': [],
+      'MH Weapon Imbue': [],
+      'OH Weapon Imbue': [],
     };
 
 		if (!this.isWithinRaidSim) {
@@ -838,7 +839,8 @@ export type ExclusivityTag =
     | 'Potion'
     | 'Conjured'
     | 'Spirit'
-    | 'Weapon Imbue';
+    | 'MH Weapon Imbue'
+    | 'OH Weapon Imbue';
 
 export interface ExclusiveEffect {
   tags: Array<ExclusivityTag>;

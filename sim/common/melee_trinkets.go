@@ -120,20 +120,7 @@ func init() {
 		},
 	))
 
-	// TODO: Make sure +7 weapon damage is accounted for.
-	var CrystalforgedTrinketCooldownID = core.NewCooldownID()
-	core.AddItemEffect(32654, core.MakeTemporaryStatsOnUseCDRegistration(
-		core.OffensiveTrinketActiveAuraID,
-		stats.AttackPower,
-		216,
-		time.Second*10,
-		core.MajorCooldown{
-			ActionID:         core.ActionID{ItemID: 32654},
-			CooldownID:       CrystalforgedTrinketCooldownID,
-			Cooldown:         time.Minute * 1,
-			SharedCooldownID: core.OffensiveTrinketSharedCooldownID,
-		},
-	))
+	core.AddItemEffect(32654, ApplyCrystalforgedTrinket)
 
 	var BadgeOfTenacityCooldownID = core.NewCooldownID()
 	core.AddItemEffect(32658, core.MakeTemporaryStatsOnUseCDRegistration(
@@ -190,6 +177,25 @@ func init() {
 			SharedCooldownID: core.OffensiveTrinketSharedCooldownID,
 		},
 	))
+}
+
+var CrystalforgedTrinketCooldownID = core.NewCooldownID()
+
+func ApplyCrystalforgedTrinket(agent core.Agent) {
+	agent.GetCharacter().PseudoStats.BonusWeaponDamage += 7
+	core.RegisterTemporaryStatsOnUseCD(
+		agent,
+		core.OffensiveTrinketActiveAuraID,
+		stats.AttackPower,
+		216,
+		time.Second*10,
+		core.MajorCooldown{
+			ActionID:         core.ActionID{ItemID: 32654},
+			CooldownID:       CrystalforgedTrinketCooldownID,
+			Cooldown:         time.Minute * 1,
+			SharedCooldownID: core.OffensiveTrinketSharedCooldownID,
+		},
+	)
 }
 
 var BadgeOfTheSwarmguardAuraID = core.NewAuraID()

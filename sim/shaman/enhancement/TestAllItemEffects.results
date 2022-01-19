@@ -55,7 +55,7 @@ dps_results: {
 dps_results: {
  key: "TestAllItemEffects-BrutalEarthstormDiamond"
  value: {
-  dps: 1603.3677725096707
+  dps: 1608.4316015447207
  }
 }
 dps_results: {
@@ -85,7 +85,7 @@ dps_results: {
 dps_results: {
  key: "TestAllItemEffects-CrystalforgedTrinket-32654"
  value: {
-  dps: 1609.6672613797557
+  dps: 1621.8809107188881
  }
 }
 dps_results: {
