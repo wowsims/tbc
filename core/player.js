@@ -4,6 +4,7 @@ import { Consumes } from '/tbc/core/proto/common.js';
 import { EquipmentSpec } from '/tbc/core/proto/common.js';
 import { IndividualBuffs } from '/tbc/core/proto/common.js';
 import { Spec } from '/tbc/core/proto/common.js';
+import { WeaponImbue } from '/tbc/core/proto/common.js';
 import { PlayerStats } from '/tbc/core/proto/api.js';
 import { Player as PlayerProto } from '/tbc/core/proto/api.js';
 import { ShamanTotems, AirTotem, FireTotem, WaterTotem } from '/tbc/core/proto/shaman.js';
@@ -406,6 +407,13 @@ export class Player {
             // TODO: Remove this on 1/31/2022 (1 month).
             if (proto.consumes && proto.consumes.darkRune) {
                 proto.consumes.defaultConjured = Conjured.ConjuredDarkRune;
+            }
+            // TODO: Remove this on 2/18/2022 (1 month).
+            if (proto.consumes && proto.consumes.brilliantWizardOil) {
+                proto.consumes.mainHandImbue = WeaponImbue.WeaponImbueBrilliantWizardOil;
+            }
+            if (proto.consumes && proto.consumes.superiorWizardOil) {
+                proto.consumes.mainHandImbue = WeaponImbue.WeaponImbueSuperiorWizardOil;
             }
             let rotation = this.specTypeFunctions.rotationFromPlayer(proto);
             // TODO: Remove this on 2/17/2022 (1 month).

@@ -704,6 +704,32 @@ export var Conjured;
     Conjured[Conjured["ConjuredFlameCap"] = 2] = "ConjuredFlameCap";
 })(Conjured || (Conjured = {}));
 /**
+ * @generated from protobuf enum proto.WeaponImbue
+ */
+export var WeaponImbue;
+(function (WeaponImbue) {
+    /**
+     * @generated from protobuf enum value: WeaponImbueUnknown = 0;
+     */
+    WeaponImbue[WeaponImbue["WeaponImbueUnknown"] = 0] = "WeaponImbueUnknown";
+    /**
+     * @generated from protobuf enum value: WeaponImbueAdamantiteSharpeningStone = 1;
+     */
+    WeaponImbue[WeaponImbue["WeaponImbueAdamantiteSharpeningStone"] = 1] = "WeaponImbueAdamantiteSharpeningStone";
+    /**
+     * @generated from protobuf enum value: WeaponImbueElementalSharpeningStone = 2;
+     */
+    WeaponImbue[WeaponImbue["WeaponImbueElementalSharpeningStone"] = 2] = "WeaponImbueElementalSharpeningStone";
+    /**
+     * @generated from protobuf enum value: WeaponImbueBrilliantWizardOil = 3;
+     */
+    WeaponImbue[WeaponImbue["WeaponImbueBrilliantWizardOil"] = 3] = "WeaponImbueBrilliantWizardOil";
+    /**
+     * @generated from protobuf enum value: WeaponImbueSuperiorWizardOil = 4;
+     */
+    WeaponImbue[WeaponImbue["WeaponImbueSuperiorWizardOil"] = 4] = "WeaponImbueSuperiorWizardOil";
+})(WeaponImbue || (WeaponImbue = {}));
+/**
  * @generated from protobuf enum proto.StrengthOfEarthType
  */
 export var StrengthOfEarthType;
@@ -1214,6 +1240,8 @@ class Consumes$Type extends MessageType {
             { no: 30, name: "elixir_of_the_mongoose", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 11, name: "brilliant_wizard_oil", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 12, name: "superior_wizard_oil", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 32, name: "main_hand_imbue", kind: "enum", T: () => ["proto.WeaponImbue", WeaponImbue] },
+            { no: 33, name: "off_hand_imbue", kind: "enum", T: () => ["proto.WeaponImbue", WeaponImbue] },
             { no: 13, name: "blackened_basilisk", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 14, name: "skullfish_soup", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 24, name: "roasted_clefthoof", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
@@ -1231,7 +1259,7 @@ class Consumes$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { flaskOfBlindingLight: false, flaskOfMightyRestoration: false, flaskOfPureDeath: false, flaskOfSupremePower: false, flaskOfRelentlessAssault: false, adeptsElixir: false, elixirOfMajorFirePower: false, elixirOfMajorFrostPower: false, elixirOfMajorShadowPower: false, elixirOfDraenicWisdom: false, elixirOfMajorMageblood: false, elixirOfMajorAgility: false, elixirOfMajorStrength: false, elixirOfDemonslaying: false, elixirOfTheMongoose: false, brilliantWizardOil: false, superiorWizardOil: false, blackenedBasilisk: false, skullfishSoup: false, roastedClefthoof: false, spicyHotTalbuk: false, kreegsStoutBeatdown: false, scrollOfStrengthV: false, scrollOfAgilityV: false, scrollOfSpiritV: false, defaultPotion: 0, startingPotion: 0, numStartingPotions: 0, darkRune: false, defaultConjured: 0, drums: 0 };
+        const message = { flaskOfBlindingLight: false, flaskOfMightyRestoration: false, flaskOfPureDeath: false, flaskOfSupremePower: false, flaskOfRelentlessAssault: false, adeptsElixir: false, elixirOfMajorFirePower: false, elixirOfMajorFrostPower: false, elixirOfMajorShadowPower: false, elixirOfDraenicWisdom: false, elixirOfMajorMageblood: false, elixirOfMajorAgility: false, elixirOfMajorStrength: false, elixirOfDemonslaying: false, elixirOfTheMongoose: false, brilliantWizardOil: false, superiorWizardOil: false, mainHandImbue: 0, offHandImbue: 0, blackenedBasilisk: false, skullfishSoup: false, roastedClefthoof: false, spicyHotTalbuk: false, kreegsStoutBeatdown: false, scrollOfStrengthV: false, scrollOfAgilityV: false, scrollOfSpiritV: false, defaultPotion: 0, startingPotion: 0, numStartingPotions: 0, darkRune: false, defaultConjured: 0, drums: 0 };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -1292,6 +1320,12 @@ class Consumes$Type extends MessageType {
                     break;
                 case /* bool superior_wizard_oil */ 12:
                     message.superiorWizardOil = reader.bool();
+                    break;
+                case /* proto.WeaponImbue main_hand_imbue */ 32:
+                    message.mainHandImbue = reader.int32();
+                    break;
+                case /* proto.WeaponImbue off_hand_imbue */ 33:
+                    message.offHandImbue = reader.int32();
                     break;
                 case /* bool blackened_basilisk */ 13:
                     message.blackenedBasilisk = reader.bool();
@@ -1398,6 +1432,12 @@ class Consumes$Type extends MessageType {
         /* bool superior_wizard_oil = 12; */
         if (message.superiorWizardOil !== false)
             writer.tag(12, WireType.Varint).bool(message.superiorWizardOil);
+        /* proto.WeaponImbue main_hand_imbue = 32; */
+        if (message.mainHandImbue !== 0)
+            writer.tag(32, WireType.Varint).int32(message.mainHandImbue);
+        /* proto.WeaponImbue off_hand_imbue = 33; */
+        if (message.offHandImbue !== 0)
+            writer.tag(33, WireType.Varint).int32(message.offHandImbue);
         /* bool blackened_basilisk = 13; */
         if (message.blackenedBasilisk !== false)
             writer.tag(13, WireType.Varint).bool(message.blackenedBasilisk);

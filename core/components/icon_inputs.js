@@ -3,6 +3,7 @@ import { Conjured } from '/tbc/core/proto/common.js';
 import { Drums } from '/tbc/core/proto/common.js';
 import { Potions } from '/tbc/core/proto/common.js';
 import { TristateEffect } from '/tbc/core/proto/common.js';
+import { WeaponImbue } from '/tbc/core/proto/common.js';
 import { TypedEvent } from '/tbc/core/typed_event.js';
 // Keep each section in alphabetical order.
 // Raid Buffs
@@ -53,7 +54,6 @@ export const WintersChill = makeBooleanDebuffInput(ActionId.fromSpellId(28595), 
 // Consumes
 export const AdeptsElixir = makeBooleanConsumeInput(ActionId.fromItemId(28103), 'adeptsElixir', ['Battle Elixir']);
 export const BlackenedBasilisk = makeBooleanConsumeInput(ActionId.fromItemId(27657), 'blackenedBasilisk', ['Food']);
-export const BrilliantWizardOil = makeBooleanConsumeInput(ActionId.fromItemId(20749), 'brilliantWizardOil', ['Weapon Imbue']);
 export const ElixirOfDemonslaying = makeBooleanConsumeInput(ActionId.fromItemId(9224), 'elixirOfDemonslaying', ['Battle Elixir']);
 export const ElixirOfDraenicWisdom = makeBooleanConsumeInput(ActionId.fromItemId(32067), 'elixirOfDraenicWisdom', ['Guardian Elixir']);
 export const ElixirOfMajorFirePower = makeBooleanConsumeInput(ActionId.fromItemId(22833), 'elixirOfMajorFirePower', ['Battle Elixir']);
@@ -69,9 +69,14 @@ export const FlaskOfPureDeath = makeBooleanConsumeInput(ActionId.fromItemId(2286
 export const FlaskOfSupremePower = makeBooleanConsumeInput(ActionId.fromItemId(13512), 'flaskOfSupremePower', ['Battle Elixir', 'Guardian Elixir']);
 export const FlaskOfRelentlessAssault = makeBooleanConsumeInput(ActionId.fromItemId(22854), 'flaskOfRelentlessAssault', ['Battle Elixir', 'Guardian Elixir']);
 export const KreegsStoutBeatdown = makeBooleanConsumeInput(ActionId.fromItemId(18284), 'kreegsStoutBeatdown', ['Alchohol']);
-export const SkullfishSoup = makeBooleanConsumeInput(ActionId.fromItemId(33825), 'skullfishSoup', ['Food']);
-export const SuperiorWizardOil = makeBooleanConsumeInput(ActionId.fromItemId(22522), 'superiorWizardOil', ['Weapon Imbue']);
+export const MainHandAdamantiteSharpeningStone = makeEnumValueConsumeInput(ActionId.fromItemId(23529), 'mainHandImbue', WeaponImbue.WeaponImbueAdamantiteSharpeningStone, ['MH Weapon Imbue']);
+export const MainHandElementalSharpeningStone = makeEnumValueConsumeInput(ActionId.fromItemId(18262), 'mainHandImbue', WeaponImbue.WeaponImbueElementalSharpeningStone, ['MH Weapon Imbue']);
+export const MainHandBrilliantWizardOil = makeEnumValueConsumeInput(ActionId.fromItemId(20749), 'mainHandImbue', WeaponImbue.WeaponImbueBrilliantWizardOil, ['MH Weapon Imbue']);
+export const MainHandSuperiorWizardOil = makeEnumValueConsumeInput(ActionId.fromItemId(22522), 'mainHandImbue', WeaponImbue.WeaponImbueSuperiorWizardOil, ['MH Weapon Imbue']);
+export const OffHandAdamantiteSharpeningStone = makeEnumValueConsumeInput(ActionId.fromItemId(23529), 'offHandImbue', WeaponImbue.WeaponImbueAdamantiteSharpeningStone, ['OH Weapon Imbue']);
+export const OffHandElementalSharpeningStone = makeEnumValueConsumeInput(ActionId.fromItemId(18262), 'offHandImbue', WeaponImbue.WeaponImbueElementalSharpeningStone, ['OH Weapon Imbue']);
 export const RoastedClefthoof = makeBooleanConsumeInput(ActionId.fromItemId(27658), 'roastedClefthoof', ['Food']);
+export const SkullfishSoup = makeBooleanConsumeInput(ActionId.fromItemId(33825), 'skullfishSoup', ['Food']);
 export const ScrollOfStrengthV = makeBooleanConsumeInput(ActionId.fromItemId(27503), 'scrollOfStrengthV');
 export const ScrollOfAgilityV = makeBooleanConsumeInput(ActionId.fromItemId(27498), 'scrollOfAgilityV');
 export const ScrollOfSpiritV = makeBooleanConsumeInput(ActionId.fromItemId(27501), 'scrollOfSpiritV', ['Spirit']);

@@ -48,7 +48,6 @@ export declare const SunderArmor: IndividualSimIconPickerConfig<Target, boolean>
 export declare const WintersChill: IndividualSimIconPickerConfig<Target, boolean>;
 export declare const AdeptsElixir: IndividualSimIconPickerConfig<Player<any>, boolean>;
 export declare const BlackenedBasilisk: IndividualSimIconPickerConfig<Player<any>, boolean>;
-export declare const BrilliantWizardOil: IndividualSimIconPickerConfig<Player<any>, boolean>;
 export declare const ElixirOfDemonslaying: IndividualSimIconPickerConfig<Player<any>, boolean>;
 export declare const ElixirOfDraenicWisdom: IndividualSimIconPickerConfig<Player<any>, boolean>;
 export declare const ElixirOfMajorFirePower: IndividualSimIconPickerConfig<Player<any>, boolean>;
@@ -64,9 +63,14 @@ export declare const FlaskOfPureDeath: IndividualSimIconPickerConfig<Player<any>
 export declare const FlaskOfSupremePower: IndividualSimIconPickerConfig<Player<any>, boolean>;
 export declare const FlaskOfRelentlessAssault: IndividualSimIconPickerConfig<Player<any>, boolean>;
 export declare const KreegsStoutBeatdown: IndividualSimIconPickerConfig<Player<any>, boolean>;
-export declare const SkullfishSoup: IndividualSimIconPickerConfig<Player<any>, boolean>;
-export declare const SuperiorWizardOil: IndividualSimIconPickerConfig<Player<any>, boolean>;
+export declare const MainHandAdamantiteSharpeningStone: IndividualSimIconPickerConfig<Player<any>, boolean>;
+export declare const MainHandElementalSharpeningStone: IndividualSimIconPickerConfig<Player<any>, boolean>;
+export declare const MainHandBrilliantWizardOil: IndividualSimIconPickerConfig<Player<any>, boolean>;
+export declare const MainHandSuperiorWizardOil: IndividualSimIconPickerConfig<Player<any>, boolean>;
+export declare const OffHandAdamantiteSharpeningStone: IndividualSimIconPickerConfig<Player<any>, boolean>;
+export declare const OffHandElementalSharpeningStone: IndividualSimIconPickerConfig<Player<any>, boolean>;
 export declare const RoastedClefthoof: IndividualSimIconPickerConfig<Player<any>, boolean>;
+export declare const SkullfishSoup: IndividualSimIconPickerConfig<Player<any>, boolean>;
 export declare const ScrollOfStrengthV: IndividualSimIconPickerConfig<Player<any>, boolean>;
 export declare const ScrollOfAgilityV: IndividualSimIconPickerConfig<Player<any>, boolean>;
 export declare const ScrollOfSpiritV: IndividualSimIconPickerConfig<Player<any>, boolean>;

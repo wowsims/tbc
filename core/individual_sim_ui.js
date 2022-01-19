@@ -95,7 +95,8 @@ export class IndividualSimUI extends SimUI {
             'Potion': [],
             'Conjured': [],
             'Spirit': [],
-            'Weapon Imbue': [],
+            'MH Weapon Imbue': [],
+            'OH Weapon Imbue': [],
         };
         if (!this.isWithinRaidSim) {
             // This needs to go before all the UI components so that gear loading is the

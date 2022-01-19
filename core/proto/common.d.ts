@@ -239,6 +239,9 @@ export interface Consumes {
      */
     elixirOfTheMongoose: boolean;
     /**
+     * Deprecated, use main_hand_imbue instead.
+     * Remove on 2/18/2022 (1 month).
+     *
      * @generated from protobuf field: bool brilliant_wizard_oil = 11;
      */
     brilliantWizardOil: boolean;
@@ -246,6 +249,14 @@ export interface Consumes {
      * @generated from protobuf field: bool superior_wizard_oil = 12;
      */
     superiorWizardOil: boolean;
+    /**
+     * @generated from protobuf field: proto.WeaponImbue main_hand_imbue = 32;
+     */
+    mainHandImbue: WeaponImbue;
+    /**
+     * @generated from protobuf field: proto.WeaponImbue off_hand_imbue = 33;
+     */
+    offHandImbue: WeaponImbue;
     /**
      * @generated from protobuf field: bool blackened_basilisk = 13;
      */
@@ -1351,6 +1362,31 @@ export declare enum Conjured {
      * @generated from protobuf enum value: ConjuredFlameCap = 2;
      */
     ConjuredFlameCap = 2
+}
+/**
+ * @generated from protobuf enum proto.WeaponImbue
+ */
+export declare enum WeaponImbue {
+    /**
+     * @generated from protobuf enum value: WeaponImbueUnknown = 0;
+     */
+    WeaponImbueUnknown = 0,
+    /**
+     * @generated from protobuf enum value: WeaponImbueAdamantiteSharpeningStone = 1;
+     */
+    WeaponImbueAdamantiteSharpeningStone = 1,
+    /**
+     * @generated from protobuf enum value: WeaponImbueElementalSharpeningStone = 2;
+     */
+    WeaponImbueElementalSharpeningStone = 2,
+    /**
+     * @generated from protobuf enum value: WeaponImbueBrilliantWizardOil = 3;
+     */
+    WeaponImbueBrilliantWizardOil = 3,
+    /**
+     * @generated from protobuf enum value: WeaponImbueSuperiorWizardOil = 4;
+     */
+    WeaponImbueSuperiorWizardOil = 4
 }
 /**
  * @generated from protobuf enum proto.StrengthOfEarthType
