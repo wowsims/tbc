@@ -40,7 +40,7 @@ host: $(OUT_DIR)
 	# directory just like github pages.
 	npx http-server $(OUT_DIR)/..
 
-ui/core/proto/proto.ts: proto/*.proto node_modules
+ui/core/proto/api.ts: proto/*.proto node_modules
 	mkdir -p $(OUT_DIR)/protobuf-ts
 	cp -r node_modules/@protobuf-ts/runtime/build/es2015/* $(OUT_DIR)/protobuf-ts
 	sed -i -E "s/from '(.*)';/from '\1\.js';/g" $(OUT_DIR)/protobuf-ts/*
@@ -52,7 +52,7 @@ ui/core/proto/proto.ts: proto/*.proto node_modules
 node_modules: package-lock.json
 	npm install
 
-$(OUT_DIR)/core/tsconfig.tsbuildinfo: $(call rwildcard,ui/core,*.ts) ui/core/proto/proto.ts
+$(OUT_DIR)/core/tsconfig.tsbuildinfo: $(call rwildcard,ui/core,*.ts) ui/core/proto/api.ts
 	npx tsc -p ui/core
 	sed -i 's/@protobuf-ts\/runtime/\/tbc\/protobuf-ts\/index/g' $(OUT_DIR)/core/proto/*.js
 	sed -i -E "s/from \"(.*?)(\.js)?\";/from '\1\.js';/g" $(OUT_DIR)/core/proto/*.js
