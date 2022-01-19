@@ -63,7 +63,8 @@ export const FEET_VITALITY = 35298;
 enchantDescriptions.set(FEET_VITALITY, '+4 Mana Per 5 Sec.');
 export const FEET_CATS_SWIFTNESS = 28279;
 enchantDescriptions.set(FEET_CATS_SWIFTNESS, 'Minor Speed and +6 Agility');
-
+export const DEXTERITY = 27951;
+enchantDescriptions.set(DEXTERITY, '+12 Agility');
 
 // Weapon
 export const WEAPON_MAJOR_INTELLECT = 22551;
