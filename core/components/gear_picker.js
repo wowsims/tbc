@@ -2,7 +2,6 @@ import { EquippedItem } from '/tbc/core/proto_utils/equipped_item.js';
 import { getEmptyGemSocketIconUrl, gemMatchesSocket } from '/tbc/core/proto_utils/gems.js';
 import { setGemSocketCssClass } from '/tbc/core/proto_utils/gems.js';
 import { enchantAppliesToItem } from '/tbc/core/proto_utils/utils.js';
-import { GemColor } from '/tbc/core/proto/common.js';
 import { Item } from '/tbc/core/proto/common.js';
 import { ItemSlot } from '/tbc/core/proto/common.js';
 import { enchantDescriptions } from '/tbc/core/constants/enchants.js';
@@ -209,7 +208,7 @@ class SelectorModal extends Component {
                     quality: gem.quality,
                     phase: gem.phase,
                     baseEP: this.player.computeStatsEP(gem.stats),
-                    ignoreEPFilter: socketColor == GemColor.GemColorMeta,
+                    ignoreEPFilter: true,
                     onEquip: (eventID, gem) => {
                         const equippedItem = this.player.getEquippedItem(slot);
                         if (equippedItem)
@@ -373,7 +372,7 @@ class SelectorModal extends Component {
             validItemElems = validItemElems.filter(elem => Number(elem.dataset.phase) <= phase);
             // If not a trinket slot, filter out items without EP values.
             if ((slot != ItemSlot.ItemSlotTrinket1 && slot != ItemSlot.ItemSlotTrinket2 && slot != ItemSlot.ItemSlotRanged)) {
-                validItemElems = validItemElems.filter(elem => (Number(elem.dataset.baseEP) > 1 || elem.dataset.ignoreEPFilter == 'true'));
+                validItemElems = validItemElems.filter(elem => (Number(elem.dataset.baseEP) > 0 || elem.dataset.ignoreEPFilter == 'true'));
             }
             const currentEquippedItem = this.player.getEquippedItem(slot);
             if (label == 'Enchants' && currentEquippedItem) {
