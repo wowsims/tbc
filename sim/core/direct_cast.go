@@ -174,7 +174,8 @@ func (spell *SimpleSpell) Cast(sim *Simulation) bool {
 						NextActionAt: sim.CurrentTime + hitEffect.DotInput.TickLength,
 					}
 					pa.OnAction = func(sim *Simulation) {
-						hitEffect.onDotTick(sim, &spell.SpellCast)
+						hitEffect.calculateDotDamage(sim, &spell.SpellCast)
+						hitEffect.afterDotTick(sim, &spell.SpellCast)
 
 						if hitEffect.DotInput.tickIndex < hitEffect.DotInput.NumberOfTicks {
 							// Refresh action.
@@ -198,13 +199,10 @@ func (spell *SimpleSpell) Cast(sim *Simulation) bool {
 
 					spell.currentDotAction = pa
 					sim.AddPendingAction(pa)
-				} else {
-					hitEffect.applyResultsToCast(&spell.SpellCast)
 				}
-			} else {
-				hitEffect.applyResultsToCast(&spell.SpellCast)
 			}
 
+			hitEffect.applyResultsToCast(&spell.SpellCast)
 			hitEffect.afterCalculations(sim, &spell.SpellCast)
 		} else {
 			// Use a separate loop for the beforeCalculations() calls so that they all
@@ -225,13 +223,17 @@ func (spell *SimpleSpell) Cast(sim *Simulation) bool {
 
 					if hitEffect.DotInput.NumberOfTicks != 0 {
 						hitEffect.takeDotSnapshot(sim, &spell.SpellCast)
-					} else {
-						hitEffect.applyResultsToCast(&spell.SpellCast)
 					}
-				} else {
-					hitEffect.applyResultsToCast(&spell.SpellCast)
 				}
+			}
 
+			spell.applyAOECap()
+
+			// Use a separate loop for the afterCalculations() calls so all effect damage
+			// is fully calculated before invoking proc callbacks.
+			for effectIdx := range spell.Effects {
+				hitEffect := &spell.Effects[effectIdx]
+				hitEffect.applyResultsToCast(&spell.SpellCast)
 				hitEffect.afterCalculations(sim, &spell.SpellCast)
 			}
 
@@ -243,7 +245,13 @@ func (spell *SimpleSpell) Cast(sim *Simulation) bool {
 				}
 				pa.OnAction = func(sim *Simulation) {
 					for i := range spell.Effects {
-						spell.Effects[i].onDotTick(sim, &spell.SpellCast)
+						spell.Effects[i].calculateDotDamage(sim, &spell.SpellCast)
+					}
+
+					spell.applyAOECap()
+
+					for i := range spell.Effects {
+						spell.Effects[i].afterDotTick(sim, &spell.SpellCast)
 					}
 
 					// This assumes that all the dots have the same # of ticks and tick length.
@@ -284,6 +292,34 @@ func (spell *SimpleSpell) Cast(sim *Simulation) bool {
 func (spell *SimpleSpell) applyAOECap() {
 	if spell.AOECap == 0 {
 		return
+	}
+
+	// Increased damage from crits doesn't count towards the cap, so need to
+	// tally pre-crit damage.
+	precritTotal := 0.0
+	numHits := 0
+	for i, _ := range spell.Effects {
+		effect := &spell.Effects[i]
+		if effect.Crit {
+			precritTotal += effect.Damage / spell.CritMultiplier
+			numHits++
+		} else if effect.Hit {
+			precritTotal += effect.Damage
+			numHits++
+		}
+	}
+
+	if precritTotal <= spell.AOECap {
+		return
+	}
+
+	damageOverCap := precritTotal / spell.AOECap
+	reductionPerHit := damageOverCap / float64(numHits)
+	for i, _ := range spell.Effects {
+		effect := &spell.Effects[i]
+		if effect.Hit {
+			effect.Damage -= reductionPerHit
+		}
 	}
 }
 

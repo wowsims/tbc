@@ -90,6 +90,7 @@ func (shaman *Shaman) newMagmaTotemTemplate(sim *core.Simulation) core.SimpleSpe
 				GCDCooldown: time.Second,
 			},
 		},
+		AOECap: 1600,
 	}
 	spell.ManaCost -= spell.BaseManaCost * float64(shaman.Talents.TotemicFocus) * 0.05
 	spell.ManaCost -= spell.BaseManaCost * float64(shaman.Talents.MentalQuickness) * 0.02
@@ -163,6 +164,7 @@ func (shaman *Shaman) newNovaTotemTemplate(sim *core.Simulation) core.SimpleSpel
 				GCDCooldown: time.Second,
 			},
 		},
+		AOECap: 10000,
 	}
 	spell.ManaCost -= spell.BaseManaCost * float64(shaman.Talents.TotemicFocus) * 0.05
 	spell.ManaCost -= spell.BaseManaCost * float64(shaman.Talents.MentalQuickness) * 0.02
