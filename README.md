@@ -136,6 +136,7 @@ When everything is ready for release, modify `ui/core/launched_sims.ts` to inclu
 # Add your spec to the raid sim
 Don't touch the raid sim until the individual sim is ready for launch; anything in the raid sim is publicly accessible. To add your new spec to the raid sim, do the following:
  - Add a reference to the individual sim in `ui/raid/tsconfig.json`. DO NOT FORGET THIS STEP or Typescipt will silently do very bad things.
+ - Import the individual sim's css file from `ui/raid/index.scss`.
  - Update `ui/raid/presets.ts` to include a constructor factory in the `specSimFactories` variable and add configurations for new Players in the `playerPresets` variable.
 
 # Deployment
