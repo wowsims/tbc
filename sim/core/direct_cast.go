@@ -145,9 +145,9 @@ func (spell *SimpleSpell) Init(sim *Simulation) {
 func (spell *SimpleSpell) GetDuration() time.Duration {
 	if spell.IsChannel {
 		if len(spell.Effects) == 0 {
-			return spell.Effect.DotInput.FullDuration()
+			return spell.CastTime + spell.Effect.DotInput.FullDuration()
 		} else {
-			return spell.Effects[0].DotInput.FullDuration()
+			return spell.CastTime + spell.Effects[0].DotInput.FullDuration()
 		}
 	} else {
 		return spell.CastTime

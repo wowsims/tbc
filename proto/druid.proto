@@ -66,6 +66,7 @@ message BalanceDruid {
     bool faerie_fire = 2;
     bool insect_swarm = 3;
     bool moonfire = 4;
+		bool hurricane = 5;
   }
   Rotation rotation = 1;
   DruidTalents talents = 2;

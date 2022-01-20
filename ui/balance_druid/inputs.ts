@@ -126,12 +126,30 @@ export const BalanceDruidRotationConfig = {
       getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
       config: {
 				extraCssClasses: [
+					'hurricane-picker',
+				],
+        label: 'Use Hurricane',
+        labelTooltip: 'Casts Hurricane on cooldown.',
+        changedEvent: (player: Player<Spec.SpecBalanceDruid>) => player.specOptionsChangeEmitter,
+        getValue: (player: Player<Spec.SpecBalanceDruid>) => player.getRotation().hurricane,
+        setValue: (eventID: EventID, player: Player<Spec.SpecBalanceDruid>, newValue: boolean) => {
+          const newRotation = player.getRotation();                
+          newRotation.hurricane = newValue;
+          player.setRotation(eventID, newRotation);
+        },
+      },
+    },
+    {
+      type: 'boolean' as const,
+      getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
+      config: {
+				extraCssClasses: [
 					'battle-res-picker',
 				],
         label: 'Use Battle Res',
         labelTooltip: 'Cast Battle Res on an ally sometime during the encounter.',
         changedEvent: (player: Player<Spec.SpecBalanceDruid>) => player.specOptionsChangeEmitter,
-        getValue: (player: Player<Spec.SpecBalanceDruid>) =>player.getSpecOptions().battleRes,
+        getValue: (player: Player<Spec.SpecBalanceDruid>) => player.getSpecOptions().battleRes,
         setValue: (eventID: EventID, player: Player<Spec.SpecBalanceDruid>, newValue: boolean) => {
           const newOptions = player.getSpecOptions();                
           newOptions.battleRes = newValue;

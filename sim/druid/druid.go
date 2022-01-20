@@ -32,6 +32,9 @@ type Druid struct {
 
 	FaerieFireSpell        core.SimpleSpell
 	faerieFireCastTemplate core.SimpleSpellTemplate
+
+	HurricaneSpell        core.SimpleSpell
+	hurricaneCastTemplate core.SimpleSpellTemplate
 }
 
 type SelfBuffs struct {
@@ -72,6 +75,7 @@ func (druid *Druid) Init(sim *core.Simulation) {
 	druid.wrathCastTemplate = druid.newWrathTemplate(sim)
 	druid.insectSwarmCastTemplate = druid.newInsectSwarmTemplate(sim)
 	druid.faerieFireCastTemplate = druid.newFaerieFireTemplate(sim)
+	druid.hurricaneCastTemplate = druid.newHurricaneTemplate(sim)
 }
 
 func (druid *Druid) Reset(sim *core.Simulation) {

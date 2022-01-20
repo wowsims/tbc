@@ -151,6 +151,8 @@ func (moonkin *BalanceDruid) actRotation(sim *core.Simulation, rotation proto.Ba
 
 	if moonkin.ShouldCastFaerieFire(sim, target, rotation) {
 		spell = moonkin.NewFaerieFire(sim, target)
+	} else if moonkin.ShouldCastHurricane(sim, rotation) {
+		spell = moonkin.NewHurricane(sim)
 	} else if moonkin.ShouldCastInsectSwarm(sim, target, rotation) {
 		spell = moonkin.NewInsectSwarm(sim, target)
 	} else if moonkin.ShouldCastMoonfire(sim, target, rotation) {
@@ -177,7 +179,7 @@ func (moonkin *BalanceDruid) actRotation(sim *core.Simulation, rotation proto.Ba
 
 	return sim.CurrentTime + core.MaxDuration(
 		moonkin.GetRemainingCD(core.GCDCooldownID, sim.CurrentTime),
-		spell.CastTime)
+		spell.GetDuration())
 }
 
 // Returns the order of DPS rotations to try, from highest to lowest dps. The
