@@ -28,6 +28,7 @@ export class CooldownsPicker extends Component {
 		TypedEvent.onAny([this.player.currentStatsEmitter]).on(eventID => {
 			this.update();
 		});
+		this.update();
 	}
 
 	private update() {

@@ -15,6 +15,7 @@ func init() {
 	core.AddItemEffect(34220, ApplyChaoticSkyfireDiamond)
 	core.AddItemEffect(35503, ApplyEmberSkyfireDiamond)
 	core.AddItemEffect(32409, ApplyRelentlessEarthstormDiamond)
+	core.AddItemEffect(32410, ApplyThunderingSkyfireDiamond)
 }
 
 var MysticalSkyfireDiamondAuraID = core.NewAuraID()
@@ -106,6 +107,38 @@ func ApplyRelentlessEarthstormDiamond(agent core.Agent) {
 				// For a spell with a multiplier of 2 (i.e. 100% increased critical damage) this will be 2.
 				improvedCritRatio := (ability.CritMultiplier - 1) / 0.5
 				ability.CritMultiplier += 0.045 * improvedCritRatio
+			},
+		}
+	})
+}
+
+var ThunderingSkyfireDiamondAuraID = core.NewAuraID()
+var SkyfireSwiftnessAuraID = core.NewAuraID()
+
+func ApplyThunderingSkyfireDiamond(agent core.Agent) {
+	character := agent.GetCharacter()
+	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
+		const hasteBonus = 240.0
+		const dur = time.Second * 6
+		const icdDur = time.Second * 40
+		icd := core.NewICD()
+
+		ppmm := character.AutoAttacks.NewPPMManager(1.5)
+
+		return core.Aura{
+			ID: ThunderingSkyfireDiamondAuraID,
+			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
+				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() {
+					return
+				}
+				if icd.IsOnCD(sim) {
+					return
+				}
+				if !ppmm.Proc(sim, hitEffect.IsMH(), "Thundering Skyfire Diamond") {
+					return
+				}
+				icd = core.InternalCD(sim.CurrentTime + icdDur)
+				character.AddAuraWithTemporaryStats(sim, SkyfireSwiftnessAuraID, core.ActionID{ItemID: 32410}, stats.MeleeHaste, hasteBonus, dur)
 			},
 		}
 	})
