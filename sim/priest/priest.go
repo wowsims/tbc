@@ -86,9 +86,14 @@ func (priest *Priest) Advance(sim *core.Simulation, elapsedTime time.Duration) {
 }
 
 func New(char core.Character, selfBuffs SelfBuffs, talents proto.PriestTalents) *Priest {
-	char.EnableManaBar()
+	priest := &Priest{
+		Character: char,
+		SelfBuffs: selfBuffs,
+		Talents:   talents,
+	}
+	priest.EnableManaBar()
 
-	char.AddStatDependency(stats.StatDependency{
+	priest.AddStatDependency(stats.StatDependency{
 		SourceStat:   stats.Intellect,
 		ModifiedStat: stats.SpellCrit,
 		Modifier: func(intellect float64, spellCrit float64) float64 {
@@ -96,52 +101,10 @@ func New(char core.Character, selfBuffs SelfBuffs, talents proto.PriestTalents) 
 		},
 	})
 
-	char.AddStatDependency(stats.StatDependency{
-		SourceStat:   stats.Strength,
-		ModifiedStat: stats.AttackPower,
-		Modifier: func(strength float64, attackPower float64) float64 {
-			return attackPower + strength*2
-		},
-	})
-
-	if talents.Meditation > 0 {
-		char.PseudoStats.SpiritRegenRateCasting = float64(talents.Meditation) * 0.1
-	}
-
-	priest := &Priest{
-		Character: char,
-		SelfBuffs: selfBuffs,
-		Talents:   talents,
-	}
-
 	priest.registerShadowfiendCD()
+	priest.applyTalents()
 
 	return priest
-}
-
-var InnerFocusAuraID = core.NewAuraID()
-var InnerFocusCooldownID = core.NewCooldownID()
-
-func ApplyInnerFocus(sim *core.Simulation, priest *Priest) bool {
-	actionID := core.ActionID{SpellID: 14751}
-	priest.Metrics.AddInstantCast(actionID)
-	priest.Character.AddAura(sim, core.Aura{
-		ID:       InnerFocusAuraID,
-		ActionID: actionID,
-		Expires:  core.NeverExpires,
-		OnCast: func(sim *core.Simulation, cast *core.Cast) {
-			cast.ManaCost = 0
-		},
-		OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-			spellEffect.BonusSpellCritRating += 25 * core.SpellCritRatingPerCritChance
-		},
-		OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
-			// Remove the buff and put skill on CD
-			priest.SetCD(InnerFocusCooldownID, sim.CurrentTime+time.Minute*3)
-			priest.RemoveAura(sim, InnerFocusAuraID)
-		},
-	})
-	return true
 }
 
 func init() {
