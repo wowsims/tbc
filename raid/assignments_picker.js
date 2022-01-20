@@ -26,7 +26,8 @@ class AssignedBuffPicker extends Component {
         this.rootElem.appendChild(this.playersContainer);
         this.update();
         this.raidSimUI.changeEmitter.on(eventID => {
-            this.recoverRaidTargets();
+            // Disabled because this is bugged.
+            //this.recoverRaidTargets();
             this.update();
         });
     }

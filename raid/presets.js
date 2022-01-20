@@ -31,7 +31,7 @@ export const playerPresets = [
         talents: BalanceDruidPresets.StandardTalents.data,
         specOptions: BalanceDruidPresets.DefaultOptions,
         consumes: BalanceDruidPresets.DefaultConsumes,
-        defaultName: specNames[Spec.SpecBalanceDruid],
+        defaultName: 'Balance Druid',
         defaultFactionRaces: {
             [Faction.Unknown]: Race.RaceUnknown,
             [Faction.Alliance]: Race.RaceNightElf,
@@ -143,7 +143,7 @@ export const playerPresets = [
         talents: ElementalShamanPresets.StandardTalents.data,
         specOptions: ElementalShamanPresets.DefaultOptions,
         consumes: ElementalShamanPresets.DefaultConsumes,
-        defaultName: specNames[Spec.SpecElementalShaman],
+        defaultName: 'Ele Shaman',
         defaultFactionRaces: {
             [Faction.Unknown]: Race.RaceUnknown,
             [Faction.Alliance]: Race.RaceDraenei,
@@ -171,7 +171,7 @@ export const playerPresets = [
         talents: ShadowPriestPresets.StandardTalents.data,
         specOptions: ShadowPriestPresets.DefaultOptions,
         consumes: ShadowPriestPresets.DefaultConsumes,
-        defaultName: specNames[Spec.SpecShadowPriest],
+        defaultName: 'Shadow Priest',
         defaultFactionRaces: {
             [Faction.Unknown]: Race.RaceUnknown,
             [Faction.Alliance]: Race.RaceDwarf,
@@ -343,7 +343,7 @@ export const buffBotPresets = [
         // The value of this field must never change, to preserve local storage data.
         buffBotId: 'Malediction Warlock',
         spec: Spec.SpecWarlock,
-        name: 'Malediction Warlock',
+        name: 'Aff Warlock',
         tooltip: 'Afflication Warlock: Adds Curse of Elements (improved). Also adds +20% uptime to ISB.',
         iconUrl: 'https://wow.zamimg.com/images/wow/icons/large/spell_shadow_curseofachimonde.jpg',
         modifyRaidProto: (buffBot, raidProto, partyProto) => {

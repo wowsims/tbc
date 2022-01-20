@@ -90,8 +90,11 @@ class PlayerFilter extends Input {
         return option;
     }
     makeOptionElem(data) {
+        const optionContainer = document.createElement('div');
+        optionContainer.classList.add('dropdown-option-container');
         const option = document.createElement('div');
         option.classList.add('dropdown-option', 'player-filter-option');
+        optionContainer.appendChild(option);
         if (data.color) {
             option.style.backgroundColor = data.color;
         }
@@ -107,7 +110,7 @@ class PlayerFilter extends Input {
             label.classList.add('player-filter-label');
             option.appendChild(label);
         }
-        return option;
+        return optionContainer;
     }
     getInputElem() {
         return this.buttonElem;

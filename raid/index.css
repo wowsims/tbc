@@ -2219,6 +2219,30 @@ input, select {
   display: inline-block;
 }
 
+.mage-sim-ui {
+  --theme-color-primary: #10abb5;
+  --theme-color-background: #101a20;
+  --theme-color-background-raw: 16, 26, 32;
+  --theme-background-image: url("/tbc/assets/mage_background.jpg");
+  --main-text-color: White;
+}
+
+.mage-sim-ui .self-buffs-section {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.mage-sim-ui .consumes-section {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.mage-sim-ui .buffs-section {
+  grid-template-columns: repeat(5, 1fr);
+}
+
+.mage-sim-ui .debuffs-section {
+  grid-template-columns: repeat(3, 1fr);
+}
+
 .totem-dropdowns-container {
   display: flex;
   justify-content: space-around;
@@ -2324,8 +2348,9 @@ input, select {
 }
 
 .blessings-table-header-cell img {
-  height: 40px;
+  height: 50px;
   border: 1px solid white;
+  margin: 1px;
 }
 
 .blessings-table-label-cell {
@@ -2359,6 +2384,8 @@ input, select {
 .parties-container {
   display: flex;
   flex-wrap: wrap;
+  max-height: 100%;
+  overflow-y: auto;
 }
 
 .party-picker-root {
@@ -2374,6 +2401,7 @@ input, select {
 }
 
 .player-picker-root {
+  display: flex;
   height: 30px;
   width: 370px;
   border-width: 1px;
@@ -2390,7 +2418,7 @@ input, select {
 }
 
 .player-picker-root.dragto:not(.dragfrom) {
-  box-shadow: 0 0 5px var(--sidebar-highlight-color), 0 0 5px var(--sidebar-highlight-color), 0 0 5px var(--sidebar-highlight-color), 0 0 5px var(--sidebar-highlight-color);
+  box-shadow: 0 0 5px red, 0 0 5px red, 0 0 5px red, 0 0 5px red;
 }
 
 .player-label {
@@ -2398,6 +2426,7 @@ input, select {
   display: inline-flex;
   align-items: center;
   cursor: pointer;
+  overflow: hidden;
 }
 
 .player-icon {
@@ -2411,7 +2440,11 @@ input, select {
 
 .player-name {
   margin: 2px;
-  text-shadow: 0 0 3px var(--main-secondary-color), 0 0 3px var(--main-secondary-color), 0 0 3px var(--main-secondary-color);
+  text-shadow: 0 0 3px black, 0 0 3px black, 0 0 3px black;
+}
+
+.player-spacer {
+  flex-grow: 1;
 }
 
 .player-options {
@@ -2419,17 +2452,16 @@ input, select {
   vertical-align: top;
   display: inline-flex;
   align-items: center;
-  float: right;
 }
 
 .player-options span {
   margin: 4px;
   cursor: pointer;
-  text-shadow: 0 0 3px var(--main-secondary-color), 0 0 3px var(--main-secondary-color), 0 0 3px var(--main-secondary-color);
+  text-shadow: 0 0 3px black, 0 0 3px black, 0 0 3px black;
 }
 
 .player-options span:hover {
-  text-shadow: 0 0 3px var(--sidebar-highlight-color), 0 0 3px var(--sidebar-highlight-color), 0 0 3px var(--sidebar-highlight-color);
+  text-shadow: 0 0 3px red, 0 0 3px red, 0 0 3px red;
 }
 
 .player-edit {
@@ -2449,9 +2481,8 @@ input, select {
   vertical-align: top;
   display: inline-flex;
   align-items: center;
-  float: right;
   font-size: 16px;
-  text-shadow: 0 0 3px var(--main-secondary-color), 0 0 3px var(--main-secondary-color), 0 0 3px var(--main-secondary-color);
+  text-shadow: 0 0 3px black, 0 0 3px black, 0 0 3px black;
 }
 
 .player-results[draggable=true] {
@@ -2572,12 +2603,11 @@ input, select {
 }
 
 .raid-sim-ui {
-  --main-bg-color: Black;
+  --theme-color-primary: #a80b00;
+  --theme-color-background: #000000;
+  --theme-color-background-raw: 0, 0, 0;
   --main-text-color: White;
-  --main-secondary-color: Black;
   --sidebar-bg-color: #222;
-  --sidebar-text-color: White;
-  --sidebar-highlight-color: Red;
 }
 
 /*# sourceMappingURL=index.css.map */
