@@ -254,14 +254,16 @@ export class PlayerPicker extends Component {
 				<img class="player-icon"></img>
 				<span class="player-name" contenteditable></span>
 			</div>
-			<div class="player-results">
-				<span class="player-results-dps"></span>
-				<span class="player-results-reference-delta"></span>
+			<div class="player-spacer">
 			</div>
 			<div class="player-options">
 				<span class="player-edit fa fa-edit"></span>
 				<span class="player-copy fa fa-copy" draggable="true"></span>
 				<span class="player-delete fa fa-times"></span>
+			</div>
+			<div class="player-results">
+				<span class="player-results-dps"></span>
+				<span class="player-results-reference-delta"></span>
 			</div>
 		`;
 
@@ -278,7 +280,7 @@ export class PlayerPicker extends Component {
 			}
 		});
 
-		const maxLength = 25;
+		const maxLength = 15;
 		this.nameElem.addEventListener('keydown', event => {
 			// 9 is tab, 13 is enter
 			if (event.keyCode == 9 || event.keyCode == 13) {
