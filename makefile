@@ -57,6 +57,10 @@ $(OUT_DIR)/core/tsconfig.tsbuildinfo: $(call rwildcard,ui/core,*.ts) ui/core/pro
 	sed -i 's/@protobuf-ts\/runtime/\/tbc\/protobuf-ts\/index/g' $(OUT_DIR)/core/proto/*.js
 	sed -i -E "s/from \"(.*?)(\.js)?\";/from '\1\.js';/g" $(OUT_DIR)/core/proto/*.js
 
+# Generic rule for hosting any class directory
+host_%: %
+	npx http-server $(OUT_DIR)/..
+
 # Generic rule for building index.js for any class directory
 $(OUT_DIR)/%/index.js: ui/%/index.ts ui/%/*.ts $(OUT_DIR)/core/tsconfig.tsbuildinfo
 	npx tsc -p $(<D) 
