@@ -209,6 +209,10 @@ export interface BalanceDruid_Rotation {
      * @generated from protobuf field: bool moonfire = 4;
      */
     moonfire: boolean;
+    /**
+     * @generated from protobuf field: bool hurricane = 5;
+     */
+    hurricane: boolean;
 }
 /**
  * @generated from protobuf enum proto.BalanceDruid.Rotation.PrimarySpell

@@ -411,11 +411,12 @@ class BalanceDruid_Rotation$Type extends MessageType {
             { no: 1, name: "primary_spell", kind: "enum", T: () => ["proto.BalanceDruid.Rotation.PrimarySpell", BalanceDruid_Rotation_PrimarySpell] },
             { no: 2, name: "faerie_fire", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 3, name: "insect_swarm", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
-            { no: 4, name: "moonfire", kind: "scalar", T: 8 /*ScalarType.BOOL*/ }
+            { no: 4, name: "moonfire", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 5, name: "hurricane", kind: "scalar", T: 8 /*ScalarType.BOOL*/ }
         ]);
     }
     create(value) {
-        const message = { primarySpell: 0, faerieFire: false, insectSwarm: false, moonfire: false };
+        const message = { primarySpell: 0, faerieFire: false, insectSwarm: false, moonfire: false, hurricane: false };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -437,6 +438,9 @@ class BalanceDruid_Rotation$Type extends MessageType {
                     break;
                 case /* bool moonfire */ 4:
                     message.moonfire = reader.bool();
+                    break;
+                case /* bool hurricane */ 5:
+                    message.hurricane = reader.bool();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -462,6 +466,9 @@ class BalanceDruid_Rotation$Type extends MessageType {
         /* bool moonfire = 4; */
         if (message.moonfire !== false)
             writer.tag(4, WireType.Varint).bool(message.moonfire);
+        /* bool hurricane = 5; */
+        if (message.hurricane !== false)
+            writer.tag(5, WireType.Varint).bool(message.hurricane);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

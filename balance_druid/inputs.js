@@ -116,6 +116,24 @@ export const BalanceDruidRotationConfig = {
             getModObject: (simUI) => simUI.player,
             config: {
                 extraCssClasses: [
+                    'hurricane-picker',
+                ],
+                label: 'Use Hurricane',
+                labelTooltip: 'Casts Hurricane on cooldown.',
+                changedEvent: (player) => player.specOptionsChangeEmitter,
+                getValue: (player) => player.getRotation().hurricane,
+                setValue: (eventID, player, newValue) => {
+                    const newRotation = player.getRotation();
+                    newRotation.hurricane = newValue;
+                    player.setRotation(eventID, newRotation);
+                },
+            },
+        },
+        {
+            type: 'boolean',
+            getModObject: (simUI) => simUI.player,
+            config: {
+                extraCssClasses: [
                     'battle-res-picker',
                 ],
                 label: 'Use Battle Res',
