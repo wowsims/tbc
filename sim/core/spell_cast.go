@@ -78,11 +78,20 @@ type SpellEffect struct {
 	PartialResist_3_4 bool // 3/4 of the spell was resisted
 
 	Damage float64 // Damage done by this cast.
+
+	// Certain damage multiplier, such as target debuffs and crit multipliers, do
+	// not count towards the AOE cap. Store them here to they can be subtracted
+	// later when calculating AOE cap.
+	BeyondAOECapMultiplier float64
 }
 
 func (spellEffect *SpellEffect) beforeCalculations(sim *Simulation, spellCast *SpellCast) {
+	spellEffect.BeyondAOECapMultiplier = 1
 	spellCast.Character.OnBeforeSpellHit(sim, spellCast, spellEffect)
+
+	multiplierBeforeTargetEffects := spellEffect.DamageMultiplier
 	spellEffect.Target.OnBeforeSpellHit(sim, spellCast, spellEffect)
+	spellEffect.BeyondAOECapMultiplier *= spellEffect.DamageMultiplier / multiplierBeforeTargetEffects
 
 	spellEffect.Hit = spellEffect.IgnoreHitCheck || spellEffect.hitCheck(sim, spellCast)
 }
@@ -187,6 +196,7 @@ func (hitEffect *SpellHitEffect) calculateDirectDamage(sim *Simulation, spellCas
 	if hitEffect.SpellEffect.critCheck(sim, spellCast) {
 		hitEffect.SpellEffect.Crit = true
 		damage *= spellCast.CritMultiplier
+		hitEffect.SpellEffect.BeyondAOECapMultiplier *= spellCast.CritMultiplier
 	}
 
 	hitEffect.SpellEffect.Damage = damage
@@ -200,6 +210,7 @@ func (hitEffect *SpellHitEffect) takeDotSnapshot(sim *Simulation, spellCast *Spe
 	hitEffect.DotInput.startTime = sim.CurrentTime
 	hitEffect.DotInput.finalTickTime = sim.CurrentTime + time.Duration(hitEffect.DotInput.NumberOfTicks)*hitEffect.DotInput.TickLength
 	hitEffect.DotInput.damagePerTick = (hitEffect.DotInput.TickBaseDamage + totalSpellPower*hitEffect.DotInput.TickSpellCoefficient) * hitEffect.StaticDamageMultiplier
+	hitEffect.SpellEffect.BeyondAOECapMultiplier = 1
 }
 
 func (hitEffect *SpellHitEffect) calculateDotDamage(sim *Simulation, spellCast *SpellCast) {
@@ -207,7 +218,11 @@ func (hitEffect *SpellHitEffect) calculateDotDamage(sim *Simulation, spellCast *
 	damage := hitEffect.DotInput.damagePerTick
 
 	spellCast.Character.OnBeforePeriodicDamage(sim, spellCast, &hitEffect.SpellEffect, &damage)
+
+	damageBeforeTargetEffects := damage
 	hitEffect.Target.OnBeforePeriodicDamage(sim, spellCast, &hitEffect.SpellEffect, &damage)
+	hitEffect.SpellEffect.BeyondAOECapMultiplier *= damage / damageBeforeTargetEffects
+
 	if hitEffect.DotInput.OnBeforePeriodicDamage != nil {
 		hitEffect.DotInput.OnBeforePeriodicDamage(sim, spellCast, &hitEffect.SpellEffect, &damage)
 	}
@@ -229,6 +244,7 @@ func (hitEffect *SpellHitEffect) calculateDotDamage(sim *Simulation, spellCast *
 		if hitEffect.DotInput.TicksCanMissAndCrit && hitEffect.critCheck(sim, spellCast) {
 			hitEffect.Crit = true
 			damage *= spellCast.CritMultiplier
+			hitEffect.SpellEffect.BeyondAOECapMultiplier *= spellCast.CritMultiplier
 		}
 	} else {
 		damage = 0

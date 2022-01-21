@@ -296,29 +296,22 @@ func (spell *SimpleSpell) applyAOECap() {
 
 	// Increased damage from crits doesn't count towards the cap, so need to
 	// tally pre-crit damage.
-	precritTotal := 0.0
-	numHits := 0
+	totalTowardsCap := 0.0
 	for i, _ := range spell.Effects {
 		effect := &spell.Effects[i]
-		if effect.Crit {
-			precritTotal += effect.Damage / spell.CritMultiplier
-			numHits++
-		} else if effect.Hit {
-			precritTotal += effect.Damage
-			numHits++
-		}
+		totalTowardsCap += effect.Damage / effect.BeyondAOECapMultiplier
 	}
 
-	if precritTotal <= spell.AOECap {
+	if totalTowardsCap <= spell.AOECap {
 		return
 	}
 
-	damageOverCap := precritTotal / spell.AOECap
-	reductionPerHit := damageOverCap / float64(numHits)
+	maxDamagePerHit := spell.AOECap / float64(len(spell.Effects))
 	for i, _ := range spell.Effects {
 		effect := &spell.Effects[i]
-		if effect.Hit {
-			effect.Damage -= reductionPerHit
+		damageTowardsCap := effect.Damage / effect.BeyondAOECapMultiplier
+		if damageTowardsCap > maxDamagePerHit {
+			effect.Damage -= damageTowardsCap - maxDamagePerHit
 		}
 	}
 }

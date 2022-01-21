@@ -53,6 +53,7 @@ func (druid *Druid) newHurricaneTemplate(sim *core.Simulation) core.SimpleSpellT
 	effects := make([]core.SpellHitEffect, 0, numHits)
 	for i := int32(0); i < numHits; i++ {
 		effects = append(effects, baseEffect)
+		effects[i].Target = sim.GetTarget(i)
 	}
 	spell.Effects = effects
 
@@ -65,10 +66,6 @@ func (druid *Druid) NewHurricane(sim *core.Simulation) *core.SimpleSpell {
 	druid.hurricaneCastTemplate.Apply(hurricane)
 
 	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	numHits := sim.GetNumTargets()
-	for i := int32(0); i < numHits; i++ {
-		hurricane.Effects[i].Target = sim.GetTarget(i)
-	}
 	hurricane.Init(sim)
 
 	return hurricane

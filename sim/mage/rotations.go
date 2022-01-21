@@ -40,6 +40,10 @@ func (mage *Mage) Act(sim *core.Simulation) time.Duration {
 }
 
 func (mage *Mage) doArcaneRotation(sim *core.Simulation) *core.SimpleSpell {
+	if mage.UseAoeRotation {
+		return mage.doAoeRotation(sim)
+	}
+
 	// Only arcane rotation cares about mana tracking so update it here.
 	// Don't need to update tracker because we only use certain functions.
 	//mage.manaTracker.Update(sim, mage.GetCharacter())
@@ -154,6 +158,10 @@ func (mage *Mage) doFireRotation(sim *core.Simulation) *core.SimpleSpell {
 		return mage.NewScorch(sim, target)
 	}
 
+	if mage.UseAoeRotation {
+		return mage.doAoeRotation(sim)
+	}
+
 	if mage.FireRotation.WeaveFireBlast && !mage.IsOnCD(FireBlastCooldownID, sim.CurrentTime) {
 		return mage.NewFireBlast(sim, target)
 	}
@@ -166,7 +174,21 @@ func (mage *Mage) doFireRotation(sim *core.Simulation) *core.SimpleSpell {
 }
 
 func (mage *Mage) doFrostRotation(sim *core.Simulation) *core.SimpleSpell {
+	if mage.UseAoeRotation {
+		return mage.doAoeRotation(sim)
+	}
+
 	target := sim.GetPrimaryTarget()
 	spell := mage.NewFrostbolt(sim, target)
 	return spell
+}
+
+func (mage *Mage) doAoeRotation(sim *core.Simulation) *core.SimpleSpell {
+	if mage.AoeRotation.Rotation == proto.Mage_Rotation_AoeRotation_ArcaneExplosion {
+		return mage.NewArcaneExplosion(sim)
+	} else if mage.AoeRotation.Rotation == proto.Mage_Rotation_AoeRotation_Flamestrike {
+		return mage.NewFlamestrike(sim)
+	} else {
+		return mage.NewBlizzard(sim)
+	}
 }
