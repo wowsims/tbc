@@ -120,6 +120,7 @@ func (shaman *Shaman) newMagmaTotemTemplate(sim *core.Simulation) core.SimpleSpe
 	effects := make([]core.SpellHitEffect, 0, numHits)
 	for i := int32(0); i < numHits; i++ {
 		effects = append(effects, baseEffect)
+		effects[i].Target = sim.GetTarget(i)
 	}
 	spell.Effects = effects
 
@@ -132,10 +133,6 @@ func (shaman *Shaman) NewMagmaTotem(sim *core.Simulation) *core.SimpleSpell {
 	shaman.magmaTotemTemplate.Apply(magmaTotem)
 
 	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	numHits := sim.GetNumTargets()
-	for i := int32(0); i < numHits; i++ {
-		magmaTotem.Effects[i].Target = sim.GetTarget(i)
-	}
 	magmaTotem.Init(sim)
 
 	return magmaTotem
@@ -164,7 +161,7 @@ func (shaman *Shaman) newNovaTotemTemplate(sim *core.Simulation) core.SimpleSpel
 				GCDCooldown: time.Second,
 			},
 		},
-		AOECap: 10000,
+		AOECap: 9975,
 	}
 	spell.ManaCost -= spell.BaseManaCost * float64(shaman.Talents.TotemicFocus) * 0.05
 	spell.ManaCost -= spell.BaseManaCost * float64(shaman.Talents.MentalQuickness) * 0.02
@@ -196,6 +193,7 @@ func (shaman *Shaman) newNovaTotemTemplate(sim *core.Simulation) core.SimpleSpel
 	effects := make([]core.SpellHitEffect, 0, numHits)
 	for i := int32(0); i < numHits; i++ {
 		effects = append(effects, baseEffect)
+		effects[i].Target = sim.GetTarget(i)
 	}
 	spell.Effects = effects
 
@@ -213,10 +211,6 @@ func (shaman *Shaman) NewNovaTotem(sim *core.Simulation) *core.SimpleSpell {
 	shaman.novaTotemTemplate.Apply(novaTotem)
 
 	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	numHits := sim.GetNumTargets()
-	for i := int32(0); i < numHits; i++ {
-		novaTotem.Effects[i].Target = sim.GetTarget(i)
-	}
 	novaTotem.Init(sim)
 
 	return novaTotem

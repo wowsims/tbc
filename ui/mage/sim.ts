@@ -195,7 +195,7 @@ export class MageSimUI extends IndividualSimUI<Spec.SpecMage> {
 				// Whether to include 'Execute Duration (%)' in the 'Encounter' section of the settings tab.
 				showExecuteProportion: true,
 				// Whether to include 'Num Targets' in the 'Encounter' section of the settings tab.
-				showNumTargets: false,
+				showNumTargets: true,
 			},
 
 			// If true, the talents on the talents tab will not be individually modifiable by the user.

@@ -10,8 +10,9 @@ import { IndividualSimUI } from '/tbc/core/individual_sim_ui.js';
 import { Target } from '/tbc/core/target.js';
 
 import { Mage, Mage_Rotation as MageRotation, MageTalents as MageTalents, Mage_Options as MageOptions } from '/tbc/core/proto/mage.js';
-import { Mage_Rotation_Type as RotationType, Mage_Rotation_ArcaneRotation as ArcaneRotation, Mage_Rotation_FireRotation as FireRotation, Mage_Rotation_FrostRotation as FrostRotation } from '/tbc/core/proto/mage.js';
+import { Mage_Rotation_Type as RotationType, Mage_Rotation_ArcaneRotation as ArcaneRotation, Mage_Rotation_FireRotation as FireRotation, Mage_Rotation_FrostRotation as FrostRotation, Mage_Rotation_AoeRotation as AoeRotation } from '/tbc/core/proto/mage.js';
 import { Mage_Rotation_FireRotation_PrimarySpell as PrimaryFireSpell } from '/tbc/core/proto/mage.js';
+import { Mage_Rotation_AoeRotation_Rotation as AoeRotationSpells } from '/tbc/core/proto/mage.js';
 import { Mage_Rotation_ArcaneRotation_Filler as ArcaneFiller } from '/tbc/core/proto/mage.js';
 import { Mage_Options_ArmorType as ArmorType } from '/tbc/core/proto/mage.js';
 
@@ -125,6 +126,58 @@ export const MageRotationConfig = {
 			},
 		},
 		// ********************************************************
+		//                        AOE INPUTS
+		// ********************************************************
+		{
+			type: 'boolean' as const,
+			cssClass: 'multi-target-rotation-picker',
+			getModObject: (simUI: IndividualSimUI<any>) => simUI,
+			config: {
+				label: 'AOE Rotation',
+				labelTooltip: 'Use multi-target spells.',
+				changedEvent: (simUI: IndividualSimUI<Spec.SpecMage>) => simUI.player.rotationChangeEmitter,
+				getValue: (simUI: IndividualSimUI<Spec.SpecMage>) => simUI.player.getRotation().multiTargetRotation,
+				setValue: (eventID: EventID, simUI: IndividualSimUI<Spec.SpecMage>, newValue: boolean) => {
+					const newRotation = simUI.player.getRotation();
+					newRotation.multiTargetRotation = newValue;
+					simUI.player.setRotation(eventID, newRotation);
+					simUI.recomputeSettingsLayout();
+				},
+			},
+		},
+		{
+			type: 'enum' as const,
+			getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
+			config: {
+				extraCssClasses: [
+					'aoe-rotation-picker',
+				],
+				label: 'Primary Spell',
+				values: [
+					{
+						name: 'Arcane Explosion', value: AoeRotationSpells.ArcaneExplosion,
+					},
+					{
+						name: 'Flamestrike', value: AoeRotationSpells.Flamestrike,
+					},
+					{
+						name: 'Blizzard', value: AoeRotationSpells.Blizzard,
+					},
+				],
+				changedEvent: (player: Player<Spec.SpecMage>) => player.rotationChangeEmitter,
+				getValue: (player: Player<Spec.SpecMage>) => player.getRotation().aoe?.rotation || 0,
+				setValue: (eventID: EventID, player: Player<Spec.SpecMage>, newValue: number) => {
+					const newRotation = player.getRotation();
+					if (!newRotation.aoe) {
+						newRotation.aoe = AoeRotation.create();
+					}
+					newRotation.aoe.rotation = newValue;
+					player.setRotation(eventID, newRotation);
+				},
+				showWhen: (player: Player<Spec.SpecMage>) => player.getRotation().multiTargetRotation,
+			},
+		},
+		// ********************************************************
 		//                       FIRE INPUTS
 		// ********************************************************
 		{
@@ -153,7 +206,7 @@ export const MageRotationConfig = {
 					newRotation.fire.primarySpell = newValue;
 					player.setRotation(eventID, newRotation);
 				},
-				showWhen: (player: Player<Spec.SpecMage>) => player.getRotation().type == RotationType.Fire,
+				showWhen: (player: Player<Spec.SpecMage>) => player.getRotation().type == RotationType.Fire && !player.getRotation().multiTargetRotation,
 			},
 		},
 		{
@@ -193,7 +246,7 @@ export const MageRotationConfig = {
 					newRotation.fire.weaveFireBlast = newValue;
 					player.setRotation(eventID, newRotation);
 				},
-				showWhen: (player: Player<Spec.SpecMage>) => player.getRotation().type == RotationType.Fire,
+				showWhen: (player: Player<Spec.SpecMage>) => player.getRotation().type == RotationType.Fire && !player.getRotation().multiTargetRotation,
 			},
 		},
 		// ********************************************************
@@ -265,7 +318,7 @@ export const MageRotationConfig = {
 					newRotation.arcane.filler = newValue;
 					player.setRotation(eventID, newRotation);
 				},
-				showWhen: (player: Player<Spec.SpecMage>) => player.getRotation().type == RotationType.Arcane,
+				showWhen: (player: Player<Spec.SpecMage>) => player.getRotation().type == RotationType.Arcane && !player.getRotation().multiTargetRotation,
 			},
 		},
 		{
@@ -285,7 +338,7 @@ export const MageRotationConfig = {
 					newRotation.arcane.arcaneBlastsBetweenFillers = newValue;
 					player.setRotation(eventID, newRotation);
 				},
-				showWhen: (player: Player<Spec.SpecMage>) => player.getRotation().type == RotationType.Arcane,
+				showWhen: (player: Player<Spec.SpecMage>) => player.getRotation().type == RotationType.Arcane && !player.getRotation().multiTargetRotation,
 			},
 		},
 		{
@@ -305,7 +358,7 @@ export const MageRotationConfig = {
 					newRotation.arcane.startRegenRotationPercent = newValue / 100;
 					player.setRotation(eventID, newRotation);
 				},
-				showWhen: (player: Player<Spec.SpecMage>) => player.getRotation().type == RotationType.Arcane,
+				showWhen: (player: Player<Spec.SpecMage>) => player.getRotation().type == RotationType.Arcane && !player.getRotation().multiTargetRotation,
 			},
 		},
 		{
@@ -325,7 +378,7 @@ export const MageRotationConfig = {
 					newRotation.arcane.stopRegenRotationPercent = newValue / 100;
 					player.setRotation(eventID, newRotation);
 				},
-				showWhen: (player: Player<Spec.SpecMage>) => player.getRotation().type == RotationType.Arcane,
+				showWhen: (player: Player<Spec.SpecMage>) => player.getRotation().type == RotationType.Arcane && !player.getRotation().multiTargetRotation,
 			},
 		},
 		{
@@ -345,7 +398,7 @@ export const MageRotationConfig = {
 					newRotation.arcane.disableDpsCooldownsDuringRegen = newValue;
 					player.setRotation(eventID, newRotation);
 				},
-				showWhen: (player: Player<Spec.SpecMage>) => player.getRotation().type == RotationType.Arcane,
+				showWhen: (player: Player<Spec.SpecMage>) => player.getRotation().type == RotationType.Arcane && !player.getRotation().multiTargetRotation,
 			},
 		},
 	],

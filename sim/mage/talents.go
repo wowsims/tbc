@@ -67,6 +67,10 @@ func (mage *Mage) applyArcaneConcentration() {
 		procChance := 0.02 * float64(mage.Talents.ArcaneConcentration)
 		bonusCrit := float64(mage.Talents.ArcanePotency) * 10 * core.SpellCritRatingPerCritChance
 
+		// Used to make sure we don't try to roll twice for the same cast on aoe spells.
+		var curCastIdx int = 0
+		var lastCheckedCastIdx int = 0
+
 		ccAura := core.Aura{
 			ID:       ClearcastingAuraID,
 			ActionID: core.ActionID{SpellID: 12536},
@@ -82,6 +86,8 @@ func (mage *Mage) applyArcaneConcentration() {
 		return core.Aura{
 			ID: ArcaneConcentrationAuraID,
 			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
+				curCastIdx++
+
 				// Arcane missle initial hit can proc clearcasting.
 				if !cast.IsSpellAction(SpellIDArcaneMissiles) {
 					return
@@ -101,7 +107,12 @@ func (mage *Mage) applyArcaneConcentration() {
 					return
 				}
 
-				// TODO: This should only get 1 roll for each aoe cast.
+				if curCastIdx == lastCheckedCastIdx {
+					// Means we already rolled for this cast.
+					return
+				}
+				lastCheckedCastIdx = curCastIdx
+
 				if sim.RandomFloat("Arcane Concentration") > procChance {
 					return
 				}
