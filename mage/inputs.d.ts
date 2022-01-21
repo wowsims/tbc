@@ -6,6 +6,7 @@ import { EventID, TypedEvent } from '/tbc/core/typed_event.js';
 import { IndividualSimUI } from '/tbc/core/individual_sim_ui.js';
 import { Mage_Rotation_Type as RotationType } from '/tbc/core/proto/mage.js';
 import { Mage_Rotation_FireRotation_PrimarySpell as PrimaryFireSpell } from '/tbc/core/proto/mage.js';
+import { Mage_Rotation_AoeRotation_Rotation as AoeRotationSpells } from '/tbc/core/proto/mage.js';
 import { Mage_Rotation_ArcaneRotation_Filler as ArcaneFiller } from '/tbc/core/proto/mage.js';
 export declare const ManaEmerald: IconPickerConfig<Player<any>, boolean>;
 export declare const MageArmor: {
@@ -52,6 +53,39 @@ export declare const MageRotationConfig: {
             getValue: (simUI: IndividualSimUI<Spec.SpecMage>) => RotationType;
             setValue: (eventID: EventID, simUI: IndividualSimUI<Spec.SpecMage>, newValue: number) => void;
             showWhen?: undefined;
+            enableWhen?: undefined;
+        };
+        cssClass?: undefined;
+    } | {
+        type: "boolean";
+        cssClass: string;
+        getModObject: (simUI: IndividualSimUI<any>) => IndividualSimUI<any>;
+        config: {
+            label: string;
+            labelTooltip: string;
+            changedEvent: (simUI: IndividualSimUI<Spec.SpecMage>) => TypedEvent<void>;
+            getValue: (simUI: IndividualSimUI<Spec.SpecMage>) => boolean;
+            setValue: (eventID: EventID, simUI: IndividualSimUI<Spec.SpecMage>, newValue: boolean) => void;
+            extraCssClasses?: undefined;
+            values?: undefined;
+            showWhen?: undefined;
+            enableWhen?: undefined;
+        };
+    } | {
+        type: "enum";
+        getModObject: (simUI: IndividualSimUI<any>) => Player<any>;
+        config: {
+            extraCssClasses: string[];
+            label: string;
+            values: {
+                name: string;
+                value: AoeRotationSpells;
+            }[];
+            changedEvent: (player: Player<Spec.SpecMage>) => TypedEvent<void>;
+            getValue: (player: Player<Spec.SpecMage>) => AoeRotationSpells.Flamestrike | AoeRotationSpells.Blizzard | 0;
+            setValue: (eventID: EventID, player: Player<Spec.SpecMage>, newValue: number) => void;
+            showWhen: (player: Player<Spec.SpecMage>) => boolean;
+            labelTooltip?: undefined;
             enableWhen?: undefined;
         };
         cssClass?: undefined;

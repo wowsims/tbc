@@ -236,6 +236,14 @@ export interface Mage_Rotation {
      * @generated from protobuf field: proto.Mage.Rotation.FrostRotation frost = 4;
      */
     frost?: Mage_Rotation_FrostRotation;
+    /**
+     * @generated from protobuf field: proto.Mage.Rotation.AoeRotation aoe = 5;
+     */
+    aoe?: Mage_Rotation_AoeRotation;
+    /**
+     * @generated from protobuf field: bool multi_target_rotation = 6;
+     */
+    multiTargetRotation: boolean;
 }
 /**
  * @generated from protobuf message proto.Mage.Rotation.ArcaneRotation
@@ -345,6 +353,32 @@ export interface Mage_Rotation_FrostRotation {
      * @generated from protobuf field: double water_elemental_disobey_chance = 3;
      */
     waterElementalDisobeyChance: number;
+}
+/**
+ * @generated from protobuf message proto.Mage.Rotation.AoeRotation
+ */
+export interface Mage_Rotation_AoeRotation {
+    /**
+     * @generated from protobuf field: proto.Mage.Rotation.AoeRotation.Rotation rotation = 1;
+     */
+    rotation: Mage_Rotation_AoeRotation_Rotation;
+}
+/**
+ * @generated from protobuf enum proto.Mage.Rotation.AoeRotation.Rotation
+ */
+export declare enum Mage_Rotation_AoeRotation_Rotation {
+    /**
+     * @generated from protobuf enum value: ArcaneExplosion = 0;
+     */
+    ArcaneExplosion = 0,
+    /**
+     * @generated from protobuf enum value: Flamestrike = 1;
+     */
+    Flamestrike = 1,
+    /**
+     * @generated from protobuf enum value: Blizzard = 2;
+     */
+    Blizzard = 2
 }
 /**
  * Just used for controlling which options are displayed in the UI. Is not
@@ -462,6 +496,16 @@ declare class Mage_Rotation_FrostRotation$Type extends MessageType<Mage_Rotation
  * @generated MessageType for protobuf message proto.Mage.Rotation.FrostRotation
  */
 export declare const Mage_Rotation_FrostRotation: Mage_Rotation_FrostRotation$Type;
+declare class Mage_Rotation_AoeRotation$Type extends MessageType<Mage_Rotation_AoeRotation> {
+    constructor();
+    create(value?: PartialMessage<Mage_Rotation_AoeRotation>): Mage_Rotation_AoeRotation;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: Mage_Rotation_AoeRotation): Mage_Rotation_AoeRotation;
+    internalBinaryWrite(message: Mage_Rotation_AoeRotation, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message proto.Mage.Rotation.AoeRotation
+ */
+export declare const Mage_Rotation_AoeRotation: Mage_Rotation_AoeRotation$Type;
 declare class Mage_Options$Type extends MessageType<Mage_Options> {
     constructor();
     create(value?: PartialMessage<Mage_Options>): Mage_Options;

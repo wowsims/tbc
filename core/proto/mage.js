@@ -52,6 +52,24 @@ export var Mage_Rotation_FireRotation_PrimarySpell;
     Mage_Rotation_FireRotation_PrimarySpell[Mage_Rotation_FireRotation_PrimarySpell["Scorch"] = 1] = "Scorch";
 })(Mage_Rotation_FireRotation_PrimarySpell || (Mage_Rotation_FireRotation_PrimarySpell = {}));
 /**
+ * @generated from protobuf enum proto.Mage.Rotation.AoeRotation.Rotation
+ */
+export var Mage_Rotation_AoeRotation_Rotation;
+(function (Mage_Rotation_AoeRotation_Rotation) {
+    /**
+     * @generated from protobuf enum value: ArcaneExplosion = 0;
+     */
+    Mage_Rotation_AoeRotation_Rotation[Mage_Rotation_AoeRotation_Rotation["ArcaneExplosion"] = 0] = "ArcaneExplosion";
+    /**
+     * @generated from protobuf enum value: Flamestrike = 1;
+     */
+    Mage_Rotation_AoeRotation_Rotation[Mage_Rotation_AoeRotation_Rotation["Flamestrike"] = 1] = "Flamestrike";
+    /**
+     * @generated from protobuf enum value: Blizzard = 2;
+     */
+    Mage_Rotation_AoeRotation_Rotation[Mage_Rotation_AoeRotation_Rotation["Blizzard"] = 2] = "Blizzard";
+})(Mage_Rotation_AoeRotation_Rotation || (Mage_Rotation_AoeRotation_Rotation = {}));
+/**
  * Just used for controlling which options are displayed in the UI. Is not
  * used by the sim.
  *
@@ -520,11 +538,13 @@ class Mage_Rotation$Type extends MessageType {
             { no: 1, name: "type", kind: "enum", T: () => ["proto.Mage.Rotation.Type", Mage_Rotation_Type] },
             { no: 2, name: "arcane", kind: "message", T: () => Mage_Rotation_ArcaneRotation },
             { no: 3, name: "fire", kind: "message", T: () => Mage_Rotation_FireRotation },
-            { no: 4, name: "frost", kind: "message", T: () => Mage_Rotation_FrostRotation }
+            { no: 4, name: "frost", kind: "message", T: () => Mage_Rotation_FrostRotation },
+            { no: 5, name: "aoe", kind: "message", T: () => Mage_Rotation_AoeRotation },
+            { no: 6, name: "multi_target_rotation", kind: "scalar", T: 8 /*ScalarType.BOOL*/ }
         ]);
     }
     create(value) {
-        const message = { type: 0 };
+        const message = { type: 0, multiTargetRotation: false };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -546,6 +566,12 @@ class Mage_Rotation$Type extends MessageType {
                     break;
                 case /* proto.Mage.Rotation.FrostRotation frost */ 4:
                     message.frost = Mage_Rotation_FrostRotation.internalBinaryRead(reader, reader.uint32(), options, message.frost);
+                    break;
+                case /* proto.Mage.Rotation.AoeRotation aoe */ 5:
+                    message.aoe = Mage_Rotation_AoeRotation.internalBinaryRead(reader, reader.uint32(), options, message.aoe);
+                    break;
+                case /* bool multi_target_rotation */ 6:
+                    message.multiTargetRotation = reader.bool();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -571,6 +597,12 @@ class Mage_Rotation$Type extends MessageType {
         /* proto.Mage.Rotation.FrostRotation frost = 4; */
         if (message.frost)
             Mage_Rotation_FrostRotation.internalBinaryWrite(message.frost, writer.tag(4, WireType.LengthDelimited).fork(), options).join();
+        /* proto.Mage.Rotation.AoeRotation aoe = 5; */
+        if (message.aoe)
+            Mage_Rotation_AoeRotation.internalBinaryWrite(message.aoe, writer.tag(5, WireType.LengthDelimited).fork(), options).join();
+        /* bool multi_target_rotation = 6; */
+        if (message.multiTargetRotation !== false)
+            writer.tag(6, WireType.Varint).bool(message.multiTargetRotation);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -764,6 +796,53 @@ class Mage_Rotation_FrostRotation$Type extends MessageType {
  * @generated MessageType for protobuf message proto.Mage.Rotation.FrostRotation
  */
 export const Mage_Rotation_FrostRotation = new Mage_Rotation_FrostRotation$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class Mage_Rotation_AoeRotation$Type extends MessageType {
+    constructor() {
+        super("proto.Mage.Rotation.AoeRotation", [
+            { no: 1, name: "rotation", kind: "enum", T: () => ["proto.Mage.Rotation.AoeRotation.Rotation", Mage_Rotation_AoeRotation_Rotation] }
+        ]);
+    }
+    create(value) {
+        const message = { rotation: 0 };
+        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader, length, options, target) {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* proto.Mage.Rotation.AoeRotation.Rotation rotation */ 1:
+                    message.rotation = reader.int32();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message, writer, options) {
+        /* proto.Mage.Rotation.AoeRotation.Rotation rotation = 1; */
+        if (message.rotation !== 0)
+            writer.tag(1, WireType.Varint).int32(message.rotation);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message proto.Mage.Rotation.AoeRotation
+ */
+export const Mage_Rotation_AoeRotation = new Mage_Rotation_AoeRotation$Type();
 // @generated message type with reflection information, may provide speed optimized methods
 class Mage_Options$Type extends MessageType {
     constructor() {
