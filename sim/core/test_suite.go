@@ -7,11 +7,15 @@ import (
 	"testing"
 
 	"github.com/wowsims/tbc/sim/core/proto"
+	"github.com/wowsims/tbc/sim/core/stats"
 	"google.golang.org/protobuf/encoding/prototext"
 )
 
 type IndividualTestSuite struct {
 	Name string
+
+	// Names of all the tests, in the order they are tested.
+	testNames []string
 
 	testResults proto.TestSuiteResult
 }
@@ -23,8 +27,33 @@ func NewIndividualTestSuite(suiteName string) *IndividualTestSuite {
 	}
 }
 
+func (testSuite *IndividualTestSuite) TestCharacterStats(testName string, csr *proto.ComputeStatsRequest) {
+	fullTestName := testSuite.Name + "-" + testName
+	testSuite.testNames = append(testSuite.testNames, fullTestName)
+
+	result := ComputeStats(csr)
+	finalStats := stats.FromFloatArray(result.RaidStats.Parties[0].Players[0].FinalStats)
+
+	testSuite.testResults.CharacterStatsResults[fullTestName] = &proto.CharacterStatsTestResult{
+		FinalStats: finalStats[:],
+	}
+}
+
+func (testSuite *IndividualTestSuite) TestStatWeights(testName string, swr *proto.StatWeightsRequest) {
+	fullTestName := testSuite.Name + "-" + testName
+	testSuite.testNames = append(testSuite.testNames, fullTestName)
+
+	result := StatWeights(swr)
+	weights := stats.FromFloatArray(result.Weights)
+
+	testSuite.testResults.StatWeightsResults[fullTestName] = &proto.StatWeightsTestResult{
+		Weights: weights[:],
+	}
+}
+
 func (testSuite *IndividualTestSuite) TestDPS(testName string, rsr *proto.RaidSimRequest) {
 	fullTestName := testSuite.Name + "-" + testName
+	testSuite.testNames = append(testSuite.testNames, fullTestName)
 
 	result := RunRaidSim(rsr)
 	dps := result.RaidMetrics.Dps.Avg
@@ -44,19 +73,56 @@ const tolerance = 0.00001
 func (testSuite *IndividualTestSuite) evaluateResults(t *testing.T) {
 	expectedResults := testSuite.readExpectedResults()
 
-	for testName, expectedDpsResult := range expectedResults.DpsResults {
-		if actualDpsResult, ok := testSuite.testResults.DpsResults[testName]; ok {
-			if actualDpsResult.Dps < expectedDpsResult.Dps-tolerance || actualDpsResult.Dps > expectedDpsResult.Dps+tolerance {
-				t.Errorf("%s failed: expected %0.03f but was %0.03f!.", testName, expectedDpsResult.Dps, actualDpsResult.Dps)
+	// Display results in order of testNames, to keep the same order as the tests.
+	for _, testName := range testSuite.testNames {
+		if actualCharacterStats, ok := testSuite.testResults.CharacterStatsResults[testName]; ok {
+			actualStats := stats.FromFloatArray(actualCharacterStats.FinalStats)
+			if expectedCharacterStats, ok := expectedResults.CharacterStatsResults[testName]; ok {
+				expectedStats := stats.FromFloatArray(expectedCharacterStats.FinalStats)
+				if !actualStats.EqualsWithTolerance(expectedStats, tolerance) {
+					t.Errorf("%s failed: expected %v but was %v", testName, expectedStats, actualStats)
+				}
+			} else {
+				t.Errorf("Unexpected test %s with stats: %v", testName, actualStats)
 			}
-		} else {
-			t.Errorf("%s missing (expected %0.03f DPS)!", testName, expectedDpsResult.Dps)
+		} else if actualStatWeights, ok := testSuite.testResults.StatWeightsResults[testName]; ok {
+			actualWeights := stats.FromFloatArray(actualStatWeights.Weights)
+			if expectedStatWeights, ok := expectedResults.StatWeightsResults[testName]; ok {
+				expectedWeights := stats.FromFloatArray(expectedStatWeights.Weights)
+				if !actualWeights.EqualsWithTolerance(expectedWeights, tolerance) {
+					t.Errorf("%s failed: expected %v but was %v", testName, expectedWeights, actualWeights)
+				}
+			} else {
+				t.Errorf("Unexpected test %s with stat weights: %v", testName, actualWeights)
+			}
+		} else if actualDpsResult, ok := testSuite.testResults.DpsResults[testName]; ok {
+			if expectedDpsResult, ok := expectedResults.DpsResults[testName]; ok {
+				if actualDpsResult.Dps < expectedDpsResult.Dps-tolerance || actualDpsResult.Dps > expectedDpsResult.Dps+tolerance {
+					t.Errorf("%s failed: expected %0.03f but was %0.03f!.", testName, expectedDpsResult.Dps, actualDpsResult.Dps)
+				}
+			} else {
+				t.Errorf("Unexpected test %s with %0.03f DPS!", testName, actualDpsResult.Dps)
+			}
 		}
 	}
 
-	for testName, actualDpsResult := range testSuite.testResults.DpsResults {
-		if _, ok := expectedResults.DpsResults[testName]; !ok {
-			t.Errorf("Unexpected test %s with %0.03f DPS!", testName, actualDpsResult.Dps)
+	for testName, expectedCharacterStats := range expectedResults.CharacterStatsResults {
+		expectedStats := stats.FromFloatArray(expectedCharacterStats.FinalStats)
+		if _, ok := testSuite.testResults.CharacterStatsResults[testName]; !ok {
+			t.Errorf("%s missing (expected stats %v)!", testName, expectedStats)
+		}
+	}
+
+	for testName, expectedStatWeights := range expectedResults.StatWeightsResults {
+		expectedWeights := stats.FromFloatArray(expectedStatWeights.Weights)
+		if _, ok := testSuite.testResults.StatWeightsResults[testName]; !ok {
+			t.Errorf("%s missing (expected weights %v)!", testName, expectedWeights)
+		}
+	}
+
+	for testName, expectedDpsResult := range expectedResults.DpsResults {
+		if _, ok := testSuite.testResults.DpsResults[testName]; !ok {
+			t.Errorf("%s missing (expected %0.03f DPS)!", testName, expectedDpsResult.Dps)
 		}
 	}
 }
@@ -93,7 +159,9 @@ func (testSuite *IndividualTestSuite) readExpectedResults() proto.TestSuiteResul
 
 func newTestSuiteResult() proto.TestSuiteResult {
 	return proto.TestSuiteResult{
-		DpsResults: make(map[string]*proto.DpsTestResult),
+		CharacterStatsResults: make(map[string]*proto.CharacterStatsTestResult),
+		StatWeightsResults:    make(map[string]*proto.StatWeightsTestResult),
+		DpsResults:            make(map[string]*proto.DpsTestResult),
 	}
 }
 
@@ -102,7 +170,7 @@ type TestGenerator interface {
 	NumTests() int
 
 	// The name and API request for the test with the given index.
-	GetTest(testIdx int) (string, *proto.RaidSimRequest)
+	GetTest(testIdx int) (string, *proto.ComputeStatsRequest, *proto.StatWeightsRequest, *proto.RaidSimRequest)
 }
 
 func RunTestSuite(t *testing.T, suiteName string, generator TestGenerator) {
@@ -110,8 +178,16 @@ func RunTestSuite(t *testing.T, suiteName string, generator TestGenerator) {
 
 	numTests := generator.NumTests()
 	for i := 0; i < numTests; i++ {
-		testName, rsr := generator.GetTest(i)
-		testSuite.TestDPS(testName, rsr)
+		testName, csr, swr, rsr := generator.GetTest(i)
+		if csr != nil {
+			testSuite.TestCharacterStats(testName, csr)
+		} else if swr != nil {
+			testSuite.TestStatWeights(testName, swr)
+		} else if rsr != nil {
+			testSuite.TestDPS(testName, rsr)
+		} else {
+			panic("No test request provided")
+		}
 	}
 
 	testSuite.Done(t)

@@ -45,6 +45,13 @@ func NewEnhancementShaman(character core.Character, options proto.Player) *Enhan
 
 	// Modify auto attacks multiplier from weapon mastery.
 	enh.AutoAttacks.Effect.DamageMultiplier *= 1 + 0.02*float64(enhOptions.Talents.WeaponMastery)
+
+	if !enh.HasMHWeapon() {
+		enhOptions.Options.MainHandImbue = proto.ShamanWeaponImbue_ImbueNone
+	}
+	if !enh.HasOHWeapon() {
+		enhOptions.Options.OffHandImbue = proto.ShamanWeaponImbue_ImbueNone
+	}
 	enh.ApplyWindfuryImbue(
 		enhOptions.Options.MainHandImbue == proto.ShamanWeaponImbue_ImbueWindfury,
 		enhOptions.Options.OffHandImbue == proto.ShamanWeaponImbue_ImbueWindfury)

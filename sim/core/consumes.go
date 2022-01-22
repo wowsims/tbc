@@ -28,10 +28,12 @@ func applyConsumeEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs prot
 func consumesStats(character *Character, c proto.Consumes, raidBuffs proto.RaidBuffs) stats.Stats {
 	s := stats.Stats{}
 
-	if !character.HasMHWeaponImbue {
+	if character.HasMHWeapon() && !character.HasMHWeaponImbue {
 		addImbueStats(character, c.MainHandImbue)
 	}
-	addImbueStats(character, c.OffHandImbue)
+	if character.HasOHWeapon() {
+		addImbueStats(character, c.OffHandImbue)
+	}
 
 	if c.ElixirOfMajorMageblood {
 		s[stats.MP5] += 16.0
@@ -124,7 +126,6 @@ func consumesStats(character *Character, c proto.Consumes, raidBuffs proto.RaidB
 
 func addImbueStats(character *Character, imbue proto.WeaponImbue) {
 	if imbue == proto.WeaponImbue_WeaponImbueAdamantiteSharpeningStone {
-	} else if imbue == proto.WeaponImbue_WeaponImbueAdamantiteSharpeningStone {
 		character.AddStats(stats.Stats{
 			stats.MeleeCrit: 14,
 		})

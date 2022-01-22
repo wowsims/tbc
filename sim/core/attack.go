@@ -489,7 +489,7 @@ func NewAutoAttacks(c *Character, delayOHSwings bool) AutoAttacks {
 		},
 	}
 
-	if weapon := c.Equip[proto.ItemSlot_ItemSlotMainHand]; weapon.ID != 0 {
+	if weapon := c.GetMHWeapon(); weapon != nil {
 		aa.MH = Weapon{
 			BaseDamageMin: weapon.WeaponDamageMin,
 			BaseDamageMax: weapon.WeaponDamageMax,
@@ -497,7 +497,7 @@ func NewAutoAttacks(c *Character, delayOHSwings bool) AutoAttacks {
 			SwingDuration: time.Duration(weapon.SwingSpeed * float64(time.Second)),
 		}
 	}
-	if weapon := c.Equip[proto.ItemSlot_ItemSlotOffHand]; weapon.ID != 0 {
+	if weapon := c.GetOHWeapon(); weapon != nil {
 		aa.OH = Weapon{
 			BaseDamageMin: weapon.WeaponDamageMin,
 			BaseDamageMax: weapon.WeaponDamageMax,

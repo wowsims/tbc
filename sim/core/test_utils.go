@@ -14,6 +14,11 @@ var DefaultSimTestOptions = &proto.SimOptions{
 	IsTest:     true,
 	Debug:      false,
 }
+var StatWeightsDefaultSimTestOptions = &proto.SimOptions{
+	Iterations: 1000,
+	IsTest:     true,
+	Debug:      false,
+}
 var AverageDefaultSimTestOptions = &proto.SimOptions{
 	Iterations: 10000,
 	IsTest:     true,
