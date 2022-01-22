@@ -52,6 +52,9 @@ type MajorCooldown struct {
 	// Duration of secondary cooldown.
 	SharedCooldown time.Duration
 
+	// Whether this MCD requires the GCD.
+	UsesGCD bool
+
 	// How long before this cooldown takes effect after activation.
 	// Not used yet, but will eventually be important for planning cooldown
 	// schedules.
@@ -113,6 +116,10 @@ func (mcd *MajorCooldown) IsEnabled() bool {
 // Returns whether the MCD was activated.
 func (mcd *MajorCooldown) tryActivate(sim *Simulation, character *Character) bool {
 	if mcd.disabled {
+		return false
+	}
+
+	if mcd.UsesGCD && character.IsOnCD(GCDCooldownID, sim.CurrentTime) {
 		return false
 	}
 
@@ -289,6 +296,12 @@ func (mcdm *majorCooldownManager) TryUseCooldowns(sim *Simulation) {
 		mcd := mcdm.majorCooldowns[curIdx]
 		if mcd.tryActivate(sim, mcdm.character) {
 			anyCooldownsUsed = true
+
+			if mcd.UsesGCD {
+				// If we used a MCD that uses the GCD (like drums), hold off on using
+				// any remaining MCDs so they aren't wasted.
+				break
+			}
 		}
 	}
 

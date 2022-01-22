@@ -229,20 +229,35 @@ func registerDrumsCD(agent Agent, partyBuffs proto.PartyBuffs, consumes proto.Co
 	}
 
 	if drumsSelfCast {
-		// When a real player is using drums, their cast applies to the whole party.
+		mcd.UsesGCD = true
 		mcd.ActivationFactory = func(sim *Simulation) CooldownActivation {
+			character := agent.GetCharacter()
+			drumsTemplate := SimpleCast{
+				Cast: Cast{
+					ActionID:       actionID,
+					Character:      character,
+					IgnoreManaCost: true,
+					CastTime:       time.Second * 1,
+					OnCastComplete: func(sim *Simulation, cast *Cast) {
+						// When a real player is using drums, their cast applies to the whole party.
+						for _, agent := range character.Party.Players {
+							applyDrums(sim, agent.GetCharacter())
+						}
+						for _, petAgent := range character.Party.Pets {
+							pet := petAgent.GetPet()
+							if pet.IsEnabled() {
+								applyDrums(sim, &pet.Character)
+							}
+						}
+						character.UpdateMajorCooldowns()
+					},
+				},
+			}
+
 			return func(sim *Simulation, character *Character) {
-				for _, agent := range character.Party.Players {
-					applyDrums(sim, agent.GetCharacter())
-				}
-				for _, petAgent := range character.Party.Pets {
-					pet := petAgent.GetPet()
-					if pet.IsEnabled() {
-						applyDrums(sim, &pet.Character)
-					}
-				}
-				// TODO: Do a cast time
-				character.Metrics.AddInstantCast(actionID)
+				cast := drumsTemplate
+				cast.Init(sim)
+				cast.StartCast(sim)
 			}
 		}
 	} else {

@@ -191,4 +191,8 @@ func RunTestSuite(t *testing.T, suiteName string, generator TestGenerator) {
 	}
 
 	testSuite.Done(t)
+
+	if t.Failed() {
+		t.Log("One or more tests failed! If the changes are intentional, update the expected results with 'make update-tests'. Otherwise go fix your bugs!")
+	}
 }
