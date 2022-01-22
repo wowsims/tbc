@@ -160,6 +160,8 @@ func (cast *Cast) startCasting(sim *Simulation, onCastComplete OnCastComplete) b
 	if cast.CastTime == 0 {
 		cast.internalOnComplete(sim, onCastComplete)
 	} else {
+		// TODO: Not using a pending action here causes some very subtle bugs, like
+		// Drums aura not being applied until the 1.5s GCD has elapsed.
 		cast.Character.Hardcast.Expires = sim.CurrentTime + cast.CastTime
 		cast.Character.Hardcast.Cast = cast
 		cast.Character.Hardcast.OnComplete = onCastComplete
