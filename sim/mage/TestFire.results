@@ -560,6 +560,12 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestFire-SelfDrums-DPS"
+ value: {
+  dps: 1809.9556078817025
+ }
+}
+dps_results: {
  key: "TestFire-Settings-Troll10-P1Fire-FireRotation-FullBuffs-LongMultiTarget"
  value: {
   dps: 1847.5696956605864

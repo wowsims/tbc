@@ -31,7 +31,7 @@ func (shaman *Shaman) registerBloodlustCD() {
 		},
 	}
 
-	// TODO: Does mental quickness reduce cost?
+	bloodlustTemplate.ManaCost -= bloodlustTemplate.BaseManaCost * float64(shaman.Talents.MentalQuickness) * 0.02
 	manaCost := bloodlustTemplate.ManaCost
 
 	shaman.AddMajorCooldown(core.MajorCooldown{

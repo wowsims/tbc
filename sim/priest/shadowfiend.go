@@ -23,12 +23,9 @@ func (priest *Priest) registerShadowfiendCD() {
 		ActionID:   ShadowfiendActionID,
 		CooldownID: ShadowfiendCD,
 		Cooldown:   time.Minute * 5,
+		UsesGCD:    true,
 		Type:       core.CooldownTypeMana,
 		CanActivate: func(sim *core.Simulation, character *core.Character) bool {
-			if character.IsOnCD(core.GCDCooldownID, sim.CurrentTime) {
-				return false
-			}
-
 			if character.CurrentMana() < 575 {
 				return false
 			}
