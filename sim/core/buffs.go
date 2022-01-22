@@ -254,6 +254,7 @@ var windfuryAPBonuses = []float64{
 
 func IsEligibleForWindfuryTotem(character *Character) bool {
 	return character.AutoAttacks.IsEnabled() &&
+		character.HasMHWeapon() &&
 		!character.HasMHWeaponImbue &&
 		character.consumes.MainHandImbue == proto.WeaponImbue_WeaponImbueUnknown
 }

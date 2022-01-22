@@ -3,11 +3,25 @@ package proto;
 
 option go_package = "./proto";
 
+message CharacterStatsTestResult {
+	repeated double final_stats = 1;
+}
+
+message StatWeightsTestResult {
+	repeated double weights = 1;
+}
+
 message DpsTestResult {
-	double dps = 2;
+	double dps = 1;
 }
 
 message TestSuiteResult {
+	// Maps test names to their results.
+	map<string, CharacterStatsTestResult> character_stats_results = 2;
+
+	// Maps test names to their results.
+	map<string, StatWeightsTestResult> stat_weights_results = 3;
+
 	// Maps test names to their results.
 	map<string, DpsTestResult> dps_results = 1;
 }

@@ -392,6 +392,33 @@ func (character *Character) HasMetaGemEquipped(gemID int32) bool {
 	return false
 }
 
+// Returns the MH weapon if one is equipped, and null otherwise.
+func (character *Character) GetMHWeapon() *items.Item {
+	weapon := &character.Equip[proto.ItemSlot_ItemSlotMainHand]
+	if weapon.ID == 0 {
+		return nil
+	} else {
+		return weapon
+	}
+}
+func (character *Character) HasMHWeapon() bool {
+	return character.GetMHWeapon() != nil
+}
+
+// Returns the OH weapon if one is equipped, and null otherwise. Note that
+// shields / Held-in-off-hand items are NOT counted as weapons in this function.
+func (character *Character) GetOHWeapon() *items.Item {
+	weapon := &character.Equip[proto.ItemSlot_ItemSlotOffHand]
+	if weapon.ID == 0 || weapon.WeaponType == proto.WeaponType_WeaponTypeShield || weapon.WeaponType == proto.WeaponType_WeaponTypeOffHand {
+		return nil
+	} else {
+		return weapon
+	}
+}
+func (character *Character) HasOHWeapon() bool {
+	return character.GetOHWeapon() != nil
+}
+
 func (character *Character) doneIteration(simDuration time.Duration) {
 	// Need to do pets first so we can add their results to the owners.
 	if len(character.Pets) > 0 {

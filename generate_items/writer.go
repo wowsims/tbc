@@ -131,7 +131,6 @@ var Items = []Item{
 }
 
 func gemToGoString(gemDeclaration GemDeclaration, gemResponse WowheadItemResponse) string {
-	//{ID: 30588, Name: "Potent Fire Opal", Quality: proto.ItemQuality_ItemQualityEpic, Phase: 1, Color: proto.GemColor_GemColorOrange, Stats: stats.Stats{stats.SpellPower: 6, stats.SpellCrit: 4}, Unique: true},
 	gemStr := "{"
 
 	gemStr += fmt.Sprintf("Name:\"%s\", ", gemResponse.Name)

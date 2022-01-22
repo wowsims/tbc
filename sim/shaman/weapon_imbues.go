@@ -130,12 +130,12 @@ func (shaman *Shaman) ApplyFlametongueImbue(mh bool, oh bool) {
 	mhTmpl := ftTmpl
 	ohTmpl := ftTmpl
 
-	if weapon := shaman.Equip[proto.ItemSlot_ItemSlotMainHand]; weapon.ID != 0 {
+	if weapon := shaman.GetMHWeapon(); weapon != nil {
 		baseDamage := weapon.SwingSpeed * 35.0
 		mhTmpl.Effect.DirectInput.MinBaseDamage = baseDamage
 		mhTmpl.Effect.DirectInput.MaxBaseDamage = baseDamage
 	}
-	if weapon := shaman.Equip[proto.ItemSlot_ItemSlotOffHand]; weapon.ID != 0 {
+	if weapon := shaman.GetOHWeapon(); weapon != nil {
 		baseDamage := weapon.SwingSpeed * 35.0
 		ohTmpl.Effect.DirectInput.MinBaseDamage = baseDamage
 		ohTmpl.Effect.DirectInput.MaxBaseDamage = baseDamage
@@ -235,12 +235,12 @@ func (shaman *Shaman) ApplyFrostbrandImbue(mh bool, oh bool) {
 }
 
 func (shaman *Shaman) ApplyRockbiterImbue(mh bool, oh bool) {
-	if weapon := shaman.Equip[proto.ItemSlot_ItemSlotMainHand]; mh && weapon.ID != 0 {
+	if weapon := shaman.GetMHWeapon(); mh && weapon != nil {
 		bonus := 62.0 * weapon.SwingSpeed
 		shaman.AutoAttacks.MH.BaseDamageMin += bonus
 		shaman.AutoAttacks.MH.BaseDamageMax += bonus
 	}
-	if weapon := shaman.Equip[proto.ItemSlot_ItemSlotOffHand]; oh && weapon.ID != 0 {
+	if weapon := shaman.GetOHWeapon(); oh && weapon != nil {
 		bonus := 62.0 * weapon.SwingSpeed
 		shaman.AutoAttacks.MH.BaseDamageMin += bonus
 		shaman.AutoAttacks.MH.BaseDamageMax += bonus

@@ -127,7 +127,7 @@ dps_results: {
 dps_results: {
  key: "TestAllItemEffects-Despair-28573"
  value: {
-  dps: 1261.5536263466388
+  dps: 1283.64548282552
  }
 }
 dps_results: {
@@ -139,7 +139,7 @@ dps_results: {
 dps_results: {
  key: "TestAllItemEffects-Devastation-30316"
  value: {
-  dps: 1671.8594162428524
+  dps: 1641.6485471634535
  }
 }
 dps_results: {
@@ -235,7 +235,7 @@ dps_results: {
 dps_results: {
  key: "TestAllItemEffects-GlaiveofthePit-28774"
  value: {
-  dps: 1351.8718628835788
+  dps: 1319.6323539435568
  }
 }
 dps_results: {
@@ -277,7 +277,7 @@ dps_results: {
 dps_results: {
  key: "TestAllItemEffects-KhoriumChampion-23541"
  value: {
-  dps: 1299.7845964300986
+  dps: 1278.449053735879
  }
 }
 dps_results: {
@@ -289,13 +289,13 @@ dps_results: {
 dps_results: {
  key: "TestAllItemEffects-LionheartChampion-28429"
  value: {
-  dps: 1326.4726516608898
+  dps: 1328.076541318068
  }
 }
 dps_results: {
  key: "TestAllItemEffects-LionheartExecutioner-28430"
  value: {
-  dps: 1352.24780313273
+  dps: 1330.0022416528432
  }
 }
 dps_results: {
@@ -415,7 +415,7 @@ dps_results: {
 dps_results: {
  key: "TestAllItemEffects-SingingCrystalAxe-31318"
  value: {
-  dps: 1337.6811551417334
+  dps: 1357.5030815736845
  }
 }
 dps_results: {
@@ -589,7 +589,7 @@ dps_results: {
 dps_results: {
  key: "TestAllItemEffects-WorldBreaker-30090"
  value: {
-  dps: 1359.2515140236308
+  dps: 1354.4480020480878
  }
 }
 dps_results: {
