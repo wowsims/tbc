@@ -29,6 +29,7 @@ var FullRaidBuffs = &proto.RaidBuffs{
 }
 var FullPartyBuffs = &proto.PartyBuffs{
 	MoonkinAura: proto.TristateEffect_TristateEffectRegular,
+	Drums:       proto.Drums_DrumsOfBattle,
 }
 var FullIndividualBuffs = &proto.IndividualBuffs{
 	BlessingOfKings:  true,
@@ -44,7 +45,6 @@ var FullConsumes = &proto.Consumes{
 	MainHandImbue:        proto.WeaponImbue_WeaponImbueBrilliantWizardOil,
 	NumStartingPotions:   1,
 	DefaultConjured:      proto.Conjured_ConjuredDarkRune,
-	Drums:                proto.Drums_DrumsOfBattle,
 }
 
 var FullDebuffs = &proto.Debuffs{

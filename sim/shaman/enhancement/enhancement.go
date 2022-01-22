@@ -87,6 +87,11 @@ func (enh *EnhancementShaman) Reset(sim *core.Simulation) {
 }
 
 func (enh *EnhancementShaman) Act(sim *core.Simulation) time.Duration {
+	// If a major cooldown uses the GCD, it might already be on CD when Act() is called.
+	if enh.IsOnCD(core.GCDCooldownID, sim.CurrentTime) {
+		return enh.AutoAttacks.NextEventAt(sim)
+	}
+
 	// Redrop totems when needed.
 	dropTime, dropSuccess := enh.TryDropTotems(sim)
 	if dropTime > 0 {

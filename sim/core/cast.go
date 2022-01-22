@@ -148,6 +148,14 @@ func (cast *Cast) startCasting(sim *Simulation, onCastComplete OnCastComplete) b
 			cast.ActionID, cast.Character.CurrentMana(), cast.ManaCost, cast.CastTime)
 	}
 
+	// This needs to come before the internalOnComplete() call so that changes to
+	// casting speed caused by the cast don't affect the GCD CD.
+	if !cast.IgnoreCooldowns {
+		// Prevent any actions on the GCD until the cast AND the GCD are done.
+		gcdCD := MaxDuration(cast.CalculatedGCD(cast.Character), cast.CastTime)
+		cast.Character.SetCD(GCDCooldownID, sim.CurrentTime+gcdCD)
+	}
+
 	// For instant-cast spells we can skip creating an aura.
 	if cast.CastTime == 0 {
 		cast.internalOnComplete(sim, onCastComplete)
@@ -161,12 +169,6 @@ func (cast *Cast) startCasting(sim *Simulation, onCastComplete OnCastComplete) b
 			cast.Character.AutoAttacks.MainhandSwingAt = MaxDuration(cast.Character.AutoAttacks.MainhandSwingAt, cast.Character.Hardcast.Expires)
 			cast.Character.AutoAttacks.OffhandSwingAt = MaxDuration(cast.Character.AutoAttacks.OffhandSwingAt, cast.Character.Hardcast.Expires)
 		}
-	}
-
-	if !cast.IgnoreCooldowns {
-		// Prevent any actions on the GCD until the cast AND the GCD are done.
-		gcdCD := MaxDuration(cast.CalculatedGCD(cast.Character), cast.CastTime)
-		cast.Character.SetCD(GCDCooldownID, sim.CurrentTime+gcdCD)
 	}
 
 	return true

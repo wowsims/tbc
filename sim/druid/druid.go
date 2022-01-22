@@ -108,8 +108,8 @@ func (druid *Druid) applyNaturesGrace(spellCast *core.SpellCast) {
 	}
 }
 
-func New(char core.Character, selfBuffs SelfBuffs, talents proto.DruidTalents) Druid {
-	druid := Druid{
+func New(char core.Character, selfBuffs SelfBuffs, talents proto.DruidTalents) *Druid {
+	druid := &Druid{
 		Character:   char,
 		SelfBuffs:   selfBuffs,
 		Talents:     talents,

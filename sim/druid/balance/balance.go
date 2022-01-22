@@ -46,7 +46,7 @@ func NewBalanceDruid(character core.Character, options proto.Player) *BalanceDru
 }
 
 type BalanceDruid struct {
-	druid.Druid
+	*druid.Druid
 
 	primaryRotation proto.BalanceDruid_Rotation
 	useBattleRes    bool
@@ -61,7 +61,7 @@ type BalanceDruid struct {
 
 // GetDruid is to implement druid.Agent (supports nordrassil set bonus)
 func (moonkin *BalanceDruid) GetDruid() *druid.Druid {
-	return &moonkin.Druid
+	return moonkin.Druid
 }
 
 func (moonkin *BalanceDruid) GetPresimOptions() *core.PresimOptions {

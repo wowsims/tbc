@@ -2,6 +2,7 @@ package core
 
 import (
 	"errors"
+	"fmt"
 	"os"
 	"strings"
 	"testing"
@@ -175,10 +176,18 @@ type TestGenerator interface {
 
 func RunTestSuite(t *testing.T, suiteName string, generator TestGenerator) {
 	testSuite := NewIndividualTestSuite(suiteName)
+	var currentTestName string
+
+	defer func() {
+		if p := recover(); p != nil {
+			panic(fmt.Sprintf("Panic during test %s: %v", currentTestName, p))
+		}
+	}()
 
 	numTests := generator.NumTests()
 	for i := 0; i < numTests; i++ {
 		testName, csr, swr, rsr := generator.GetTest(i)
+		currentTestName = testName
 		if csr != nil {
 			testSuite.TestCharacterStats(testName, csr)
 		} else if swr != nil {
@@ -191,4 +200,8 @@ func RunTestSuite(t *testing.T, suiteName string, generator TestGenerator) {
 	}
 
 	testSuite.Done(t)
+
+	if t.Failed() {
+		t.Log("One or more tests failed! If the changes are intentional, update the expected results with 'make update-tests'. Otherwise go fix your bugs!")
+	}
 }

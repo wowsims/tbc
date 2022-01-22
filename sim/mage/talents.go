@@ -141,12 +141,9 @@ func (mage *Mage) registerPresenceOfMindCD() {
 		ActionID:   actionID,
 		CooldownID: PresenceOfMindCooldownID,
 		Cooldown:   cooldown,
+		UsesGCD:    true,
 		Type:       core.CooldownTypeDPS,
 		CanActivate: func(sim *core.Simulation, character *core.Character) bool {
-			if character.IsOnCD(core.GCDCooldownID, sim.CurrentTime) {
-				return false
-			}
-
 			manaCostCoeff := 1.0
 			if character.HasAura(ArcanePowerAuraID) {
 				manaCostCoeff = 1.3

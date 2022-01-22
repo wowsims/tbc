@@ -536,6 +536,9 @@ func (at *auraTracker) GetRemainingCD(id CooldownID, currentTime time.Duration) 
 }
 
 func (at *auraTracker) SetCD(id CooldownID, newCD time.Duration) {
+	if id == 0 {
+		panic("Trying to set CD with ID 0!")
+	}
 	at.cooldowns[id] = newCD
 }
 

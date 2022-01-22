@@ -80,6 +80,11 @@ func (eleShaman *ElementalShaman) Reset(sim *core.Simulation) {
 }
 
 func (eleShaman *ElementalShaman) Act(sim *core.Simulation) time.Duration {
+	// If a major cooldown uses the GCD, it might already be on CD when Act() is called.
+	if eleShaman.IsOnCD(core.GCDCooldownID, sim.CurrentTime) {
+		return sim.CurrentTime + eleShaman.GetRemainingCD(core.GCDCooldownID, sim.CurrentTime)
+	}
+
 	dropTime, dropSuccess := eleShaman.TryDropTotems(sim)
 	if dropTime > 0 {
 		if !dropSuccess {

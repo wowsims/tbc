@@ -18,12 +18,13 @@ func (mage *Mage) registerSummonWaterElementalCD() {
 	}
 
 	manaCost := 0.0
-	actionID := core.ActionID{SpellID: 31687}
+	actionID := core.ActionID{SpellID: 31687, CooldownID: SummonWaterElementalCooldownID}
 
 	mage.AddMajorCooldown(core.MajorCooldown{
 		ActionID:   actionID,
 		CooldownID: SummonWaterElementalCooldownID,
 		Cooldown:   time.Minute * 3,
+		UsesGCD:    true,
 		Priority:   core.CooldownPriorityDrums + 1, // Always prefer to cast before drums or lust so the ele gets their benefits.
 		Type:       core.CooldownTypeDPS,
 		CanActivate: func(sim *core.Simulation, character *core.Character) bool {
@@ -39,17 +40,26 @@ func (mage *Mage) registerSummonWaterElementalCD() {
 			return true
 		},
 		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
+			baseManaCost := mage.BaseMana() * 0.16
+			castTemplate := core.SimpleCast{
+				Cast: core.Cast{
+					ActionID:     actionID,
+					Character:    mage.GetCharacter(),
+					BaseManaCost: baseManaCost,
+					ManaCost:     baseManaCost,
+					Cooldown:     time.Minute * 3,
+					OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
+						mage.waterElemental.EnableWithTimeout(sim, mage.waterElemental, time.Second*45)
+					},
+				},
+			}
+			castTemplate.ManaCost -= castTemplate.BaseManaCost * float64(mage.Talents.FrostChanneling) * 0.05
+			manaCost = castTemplate.ManaCost
+
 			return func(sim *core.Simulation, character *core.Character) {
-				manaCost = mage.BaseMana() * 0.16
-				manaCost -= manaCost * float64(mage.Talents.FrostChanneling) * 0.05
-				duration := time.Duration(float64(time.Millisecond*1500) / character.CastSpeed())
-
-				mage.waterElemental.EnableWithTimeout(sim, mage.waterElemental, time.Second*45)
-
-				character.SpendMana(sim, manaCost, actionID)
-				character.Metrics.AddInstantCast(actionID)
-				character.SetCD(SummonWaterElementalCooldownID, sim.CurrentTime+time.Minute*3)
-				character.SetCD(core.GCDCooldownID, sim.CurrentTime+duration)
+				cast := castTemplate
+				cast.Init(sim)
+				cast.StartCast(sim)
 			}
 		},
 	})
