@@ -1,6 +1,0 @@
-dps_results: {
- key: "TestAverageDPS-Troll10-P1Arcane-Arcane-FullBuffs-LongSingleTarget"
- value: {
-  dps: 1344.6756839314683
- }
-}
