@@ -31,6 +31,7 @@ func (priest *Priest) newMindflayTemplate(sim *core.Simulation) core.SimpleSpell
 		SpellEffect: core.SpellEffect{
 			DamageMultiplier:       1,
 			StaticDamageMultiplier: 1,
+			ThreatMultiplier:       1,
 		},
 		DotInput: core.DotDamageInput{
 			NumberOfTicks:        3,

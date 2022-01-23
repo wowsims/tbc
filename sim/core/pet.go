@@ -46,13 +46,9 @@ type Pet struct {
 func NewPet(name string, owner *Character, baseStats stats.Stats, statInheritanceCoeffs stats.Stats, enabledOnStart bool) Pet {
 	pet := Pet{
 		Character: Character{
-			Name:  name,
-			Label: fmt.Sprintf("%s - %s", owner.Label, name),
-			PseudoStats: stats.PseudoStats{
-				AttackSpeedMultiplier: 1,
-				CastSpeedMultiplier:   1,
-				SpiritRegenMultiplier: 1,
-			},
+			Name:        name,
+			Label:       fmt.Sprintf("%s - %s", owner.Label, name),
+			PseudoStats: stats.NewPseudoStats(),
 			Party:       owner.Party,
 			PartyIndex:  owner.PartyIndex,
 			RaidIndex:   owner.RaidIndex,

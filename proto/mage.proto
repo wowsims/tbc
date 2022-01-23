@@ -27,6 +27,7 @@ message MageTalents {
 	int32 incineration = 18;
 	int32 improved_flamestrike = 19;
 	bool pyroblast = 20;
+	int32 burning_soul = 47;
 	int32 improved_scorch = 21;
 	int32 master_of_elements = 22;
 	int32 playing_with_fire = 23;

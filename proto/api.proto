@@ -118,6 +118,7 @@ message DistributionMetrics {
 // All the results for a single Player.
 message PlayerMetrics {
 		DistributionMetrics dps = 1;
+		DistributionMetrics threat = 8;
 
     // average seconds spent oom per iteration
     double seconds_oom_avg = 3; 

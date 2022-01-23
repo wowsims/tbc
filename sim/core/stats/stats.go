@@ -339,4 +339,15 @@ type PseudoStats struct {
 	SpiritRegenMultiplier float64 // Multiplier on spirit portion of mana regen.
 
 	BonusWeaponDamage float64 // Comes from '+X Weapon Damage' effects.
+
+	ThreatMultiplier float64 // Modulates the threat generated. Affected by things like salv.
+}
+
+func NewPseudoStats() PseudoStats {
+	return PseudoStats{
+		AttackSpeedMultiplier: 1,
+		CastSpeedMultiplier:   1,
+		SpiritRegenMultiplier: 1,
+		ThreatMultiplier:      1,
+	}
 }

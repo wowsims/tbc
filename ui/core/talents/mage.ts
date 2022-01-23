@@ -310,7 +310,7 @@ export class MageTalentsPicker extends TalentsPicker<Spec.SpecMage> {
             maxPoints: 1,
           },
           {
-            //fieldName: 'burningSoul',
+            fieldName: 'burningSoul',
             location: {
               rowIdx: 2,
               colIdx: 3,

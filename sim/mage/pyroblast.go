@@ -32,6 +32,7 @@ func (mage *Mage) newPyroblastTemplate(sim *core.Simulation) core.SimpleSpellTem
 			SpellEffect: core.SpellEffect{
 				DamageMultiplier:       1,
 				StaticDamageMultiplier: mage.spellDamageMultiplier,
+				ThreatMultiplier:       1 - 0.05*float64(mage.Talents.BurningSoul),
 				OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 					pyroblastDot := mage.newPyroblastDot(sim, spellEffect.Target)
 					pyroblastDot.Cast(sim)

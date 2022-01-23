@@ -29,6 +29,7 @@ func (mage *Mage) newFrostboltTemplate(sim *core.Simulation) core.SimpleSpellTem
 			SpellEffect: core.SpellEffect{
 				DamageMultiplier:       1,
 				StaticDamageMultiplier: mage.spellDamageMultiplier,
+				ThreatMultiplier:       1 - (0.1/3)*float64(mage.Talents.FrostChanneling),
 			},
 			DirectInput: core.DirectDamageInput{
 				MinBaseDamage:    600,

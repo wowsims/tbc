@@ -28,6 +28,7 @@ func (mage *Mage) newScorchTemplate(sim *core.Simulation) core.SimpleSpellTempla
 			SpellEffect: core.SpellEffect{
 				DamageMultiplier:       1,
 				StaticDamageMultiplier: mage.spellDamageMultiplier,
+				ThreatMultiplier:       1 - 0.05*float64(mage.Talents.BurningSoul),
 			},
 			DirectInput: core.DirectDamageInput{
 				MinBaseDamage:    305,

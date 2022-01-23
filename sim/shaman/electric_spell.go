@@ -80,6 +80,7 @@ func (shaman *Shaman) newElectricSpellEffect(minBaseDamage float64, maxBaseDamag
 		SpellEffect: core.SpellEffect{
 			DamageMultiplier:       1,
 			StaticDamageMultiplier: 1,
+			ThreatMultiplier:       1,
 		},
 		DirectInput: core.DirectDamageInput{
 			MinBaseDamage:    minBaseDamage,
@@ -91,8 +92,10 @@ func (shaman *Shaman) newElectricSpellEffect(minBaseDamage float64, maxBaseDamag
 	effect.SpellEffect.DamageMultiplier *= 1 + 0.01*float64(shaman.Talents.Concussion)
 	if isLightningOverload {
 		effect.SpellEffect.DamageMultiplier *= 0.5
+		effect.SpellEffect.ThreatMultiplier = 0
 	}
 
+	effect.ThreatMultiplier *= 1 - (0.1/3)*float64(shaman.Talents.ElementalPrecision)
 	effect.SpellEffect.BonusSpellHitRating += float64(shaman.Talents.ElementalPrecision) * 2 * core.SpellHitRatingPerHitChance
 	effect.SpellEffect.BonusSpellCritRating += float64(shaman.Talents.TidalMastery) * 1 * core.SpellCritRatingPerCritChance
 	effect.SpellEffect.BonusSpellCritRating += float64(shaman.Talents.CallOfThunder) * 1 * core.SpellCritRatingPerCritChance

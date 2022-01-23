@@ -29,6 +29,7 @@ func (mage *Mage) newIgniteTemplate(sim *core.Simulation) core.SimpleSpellTempla
 			SpellEffect: core.SpellEffect{
 				DamageMultiplier:       1,
 				StaticDamageMultiplier: 1,
+				ThreatMultiplier:       1 - 0.05*float64(mage.Talents.BurningSoul),
 				IgnoreHitCheck:         true,
 			},
 			DotInput: core.DotDamageInput{

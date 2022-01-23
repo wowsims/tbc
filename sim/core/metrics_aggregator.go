@@ -62,7 +62,9 @@ func NewDistributionMetrics() DistributionMetrics {
 }
 
 type CharacterMetrics struct {
-	dps DistributionMetrics
+	dps    DistributionMetrics
+	threat DistributionMetrics
+
 	CharacterIterationMetrics
 
 	// Aggregate values. These are updated after each iteration.
@@ -120,6 +122,7 @@ func (actionMetrics *ActionMetrics) ToProto() *proto.ActionMetrics {
 func NewCharacterMetrics() CharacterMetrics {
 	return CharacterMetrics{
 		dps:     NewDistributionMetrics(),
+		threat:  NewDistributionMetrics(),
 		actions: make(map[ActionKey]ActionMetrics),
 	}
 }
@@ -162,6 +165,7 @@ func (characterMetrics *CharacterMetrics) AddSpellCast(spellCast *SpellCast) {
 	actionMetrics.Crits += spellCast.Crits
 	actionMetrics.Damage += spellCast.TotalDamage
 	characterMetrics.dps.Total += spellCast.TotalDamage
+	characterMetrics.threat.Total += spellCast.TotalThreat
 
 	characterMetrics.actions[actionKey] = actionMetrics
 }
@@ -187,6 +191,7 @@ func (characterMetrics *CharacterMetrics) AddMeleeAbility(ability *ActiveMeleeAb
 	actionMetrics.Glances += ability.Glances
 	actionMetrics.Damage += ability.TotalDamage
 	characterMetrics.dps.Total += ability.TotalDamage
+	characterMetrics.threat.Total += ability.TotalThreat
 
 	characterMetrics.actions[actionKey] = actionMetrics
 }
@@ -208,18 +213,21 @@ func (characterMetrics *CharacterMetrics) MarkOOM(sim *Simulation, character *Ch
 
 func (characterMetrics *CharacterMetrics) reset() {
 	characterMetrics.dps.reset()
+	characterMetrics.threat.reset()
 	characterMetrics.CharacterIterationMetrics = CharacterIterationMetrics{}
 }
 
 // This should be called when a Sim iteration is complete.
 func (characterMetrics *CharacterMetrics) doneIteration(encounterDurationSeconds float64) {
 	characterMetrics.dps.doneIteration(encounterDurationSeconds)
+	characterMetrics.threat.doneIteration(encounterDurationSeconds)
 	characterMetrics.oomTimeSum += float64(characterMetrics.OOMTime.Seconds())
 }
 
 func (characterMetrics *CharacterMetrics) ToProto(numIterations int32) *proto.PlayerMetrics {
 	protoMetrics := &proto.PlayerMetrics{
 		Dps:           characterMetrics.dps.ToProto(numIterations),
+		Threat:        characterMetrics.threat.ToProto(numIterations),
 		SecondsOomAvg: characterMetrics.oomTimeSum / float64(numIterations),
 	}
 

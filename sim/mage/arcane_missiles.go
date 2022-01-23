@@ -30,6 +30,7 @@ func (mage *Mage) newArcaneMissilesTemplate(sim *core.Simulation) core.SimpleSpe
 			SpellEffect: core.SpellEffect{
 				DamageMultiplier:       1,
 				StaticDamageMultiplier: mage.spellDamageMultiplier,
+				ThreatMultiplier:       1 - 0.2*float64(mage.Talents.ArcaneSubtlety),
 				IgnoreHitCheck:         true,
 			},
 			DotInput: core.DotDamageInput{

@@ -38,6 +38,10 @@ func (druid *Druid) applyTalents() {
 		druid.PseudoStats.SpiritRegenRateCasting = float64(druid.Talents.Intensity) * 0.1
 	}
 
+	if druid.Talents.Subtlety > 0 {
+		druid.PseudoStats.ThreatMultiplier *= 1 - 0.04*float64(druid.Talents.Subtlety)
+	}
+
 	if druid.Talents.HeartOfTheWild > 0 {
 		bonus := 0.04 * float64(druid.Talents.HeartOfTheWild)
 		druid.AddStatDependency(stats.StatDependency{

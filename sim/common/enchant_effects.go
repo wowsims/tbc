@@ -13,6 +13,8 @@ func init() {
 	core.AddItemEffect(16250, ApplyWeaponSuperiorStriking)
 	core.AddItemEffect(22535, ApplyRingStriking)
 	core.AddItemEffect(22559, ApplyMongooseEffect)
+	core.AddItemEffect(33150, ApplyBackSubtlety)
+	core.AddItemEffect(33153, ApplyGlovesThreat)
 }
 
 func ApplyWeaponSuperiorStriking(agent core.Agent) {
@@ -89,4 +91,13 @@ func ApplyMongooseEffect(agent core.Agent) {
 			},
 		}
 	})
+}
+
+func ApplyBackSubtlety(agent core.Agent) {
+	character := agent.GetCharacter()
+	character.PseudoStats.ThreatMultiplier *= 0.98
+}
+func ApplyGlovesThreat(agent core.Agent) {
+	character := agent.GetCharacter()
+	character.PseudoStats.ThreatMultiplier *= 1.02
 }

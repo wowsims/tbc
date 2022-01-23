@@ -85,6 +85,7 @@ func ApplyTimbals(agent core.Agent) {
 			SpellEffect: core.SpellEffect{
 				DamageMultiplier:       1,
 				StaticDamageMultiplier: 1,
+				ThreatMultiplier:       1,
 			},
 			DirectInput: core.DirectDamageInput{
 				MinBaseDamage: 285,

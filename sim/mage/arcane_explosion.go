@@ -28,6 +28,7 @@ func (mage *Mage) newArcaneExplosionTemplate(sim *core.Simulation) core.SimpleSp
 		SpellEffect: core.SpellEffect{
 			DamageMultiplier:       1,
 			StaticDamageMultiplier: mage.spellDamageMultiplier,
+			ThreatMultiplier:       1 - 0.2*float64(mage.Talents.ArcaneSubtlety),
 		},
 		DirectInput: core.DirectDamageInput{
 			MinBaseDamage:    249,

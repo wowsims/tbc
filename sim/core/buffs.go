@@ -104,6 +104,10 @@ func applyBuffEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs proto.P
 		}
 	}
 
+	if individualBuffs.BlessingOfSalvation {
+		character.PseudoStats.ThreatMultiplier *= 0.7
+	}
+
 	if partyBuffs.SanctityAura == proto.TristateEffect_TristateEffectImproved {
 		character.AddPermanentAura(func(sim *Simulation) Aura {
 			return ImprovedSanctityAura()
@@ -149,6 +153,9 @@ func applyBuffEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs proto.P
 		character.AddPermanentAura(func(sim *Simulation) Aura {
 			return WindfuryTotemAura(character, partyBuffs.WindfuryTotemRank, partyBuffs.WindfuryTotemIwt)
 		})
+	}
+	if partyBuffs.TranquilAirTotem {
+		character.PseudoStats.ThreatMultiplier *= 0.8
 	}
 
 	if individualBuffs.UnleashedRage {
