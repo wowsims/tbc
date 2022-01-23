@@ -89,9 +89,10 @@ func MakeDefaultEncounterCombos(debuffs *proto.Debuffs) []EncounterCombo {
 	}
 }
 
-func MakeSingleTargetFullDebuffEncounter(debuffs *proto.Debuffs) *proto.Encounter {
+func MakeSingleTargetFullDebuffEncounter(debuffs *proto.Debuffs, variation float64) *proto.Encounter {
 	return &proto.Encounter{
 		Duration:          LongDuration,
+		DurationVariation: variation,
 		ExecuteProportion: 0.2,
 		Targets: []*proto.Target{
 			&proto.Target{
@@ -100,18 +101,6 @@ func MakeSingleTargetFullDebuffEncounter(debuffs *proto.Debuffs) *proto.Encounte
 				MobType: proto.MobType_MobTypeDemon,
 				Debuffs: debuffs,
 			},
-		},
-	}
-}
-
-// Returns default encounter combos, for testing average DPS.
-// When doing average DPS tests we use a lot more iterations, so to save time
-// we test fewer encounters.
-func MakeAverageDefaultEncounterCombos(debuffs *proto.Debuffs) []EncounterCombo {
-	return []EncounterCombo{
-		EncounterCombo{
-			Label:     "LongSingleTarget",
-			Encounter: MakeSingleTargetFullDebuffEncounter(debuffs),
 		},
 	}
 }

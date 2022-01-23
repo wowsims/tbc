@@ -478,7 +478,7 @@ func FullCharacterTestSuiteGenerator(config CharacterSuiteConfig) TestGenerator 
 					Player:     defaultPlayer,
 					RaidBuffs:  config.RaidBuffs,
 					PartyBuffs: config.PartyBuffs,
-					Encounter:  MakeSingleTargetFullDebuffEncounter(config.Debuffs),
+					Encounter:  MakeSingleTargetFullDebuffEncounter(config.Debuffs, 0),
 					SimOptions: DefaultSimTestOptions,
 					ItemFilter: config.ItemFilter,
 				},
@@ -495,7 +495,7 @@ func FullCharacterTestSuiteGenerator(config CharacterSuiteConfig) TestGenerator 
 					Player:     defaultPlayer,
 					RaidBuffs:  config.RaidBuffs,
 					PartyBuffs: config.PartyBuffs,
-					Encounter:  MakeSingleTargetFullDebuffEncounter(config.Debuffs),
+					Encounter:  MakeSingleTargetFullDebuffEncounter(config.Debuffs, 0),
 					SimOptions: StatWeightsDefaultSimTestOptions,
 
 					StatsToWeigh:    config.StatsToWeigh,
@@ -515,7 +515,7 @@ func FullCharacterTestSuiteGenerator(config CharacterSuiteConfig) TestGenerator 
 				Name: "DPS",
 				Request: &proto.RaidSimRequest{
 					Raid:       newRaid,
-					Encounter:  MakeSingleTargetFullDebuffEncounter(config.Debuffs),
+					Encounter:  MakeSingleTargetFullDebuffEncounter(config.Debuffs, 0),
 					SimOptions: DefaultSimTestOptions,
 				},
 			},
@@ -530,7 +530,7 @@ func FullCharacterTestSuiteGenerator(config CharacterSuiteConfig) TestGenerator 
 			Name: "Default",
 			Request: &proto.RaidSimRequest{
 				Raid:       defaultRaid,
-				Encounter:  MakeSingleTargetFullDebuffEncounter(config.Debuffs),
+				Encounter:  MakeSingleTargetFullDebuffEncounter(config.Debuffs, 5),
 				SimOptions: AverageDefaultSimTestOptions,
 			},
 		},

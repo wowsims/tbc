@@ -21,9 +21,6 @@ func NewEncounter(options proto.Encounter) Encounter {
 		executePhaseBegins: DurationFromSeconds(options.Duration * (1 - options.ExecuteProportion)),
 		Targets:            []*Target{},
 	}
-	if options.DurationVariation == 0 {
-		encounter.DurationVariation = 5 * time.Second
-	}
 
 	for targetIndex, targetOptions := range options.Targets {
 		target := NewTarget(*targetOptions, int32(targetIndex))
