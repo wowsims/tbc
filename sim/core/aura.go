@@ -531,6 +531,10 @@ func (at *auraTracker) IsOnCD(id CooldownID, currentTime time.Duration) bool {
 	return at.cooldowns[id] > currentTime
 }
 
+func (at *auraTracker) CDReadyAt(id CooldownID) time.Duration {
+	return at.cooldowns[id]
+}
+
 func (at *auraTracker) GetRemainingCD(id CooldownID, currentTime time.Duration) time.Duration {
 	return MaxDuration(0, at.cooldowns[id]-currentTime)
 }

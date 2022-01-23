@@ -136,6 +136,10 @@ func (enh *EnhancementShaman) Act(sim *core.Simulation) time.Duration {
 		return nextActionAt
 	}
 
-	// We didn't try to cast anything. Just wait for next auto.
-	return enh.AutoAttacks.NextAttackAt()
+	// We didn't try to cast anything. Just wait for next auto or CD.
+	nextEventAt := core.MinDuration(enh.AutoAttacks.NextAttackAt(), enh.CDReadyAt(shaman.StormstrikeCD))
+	if enh.Rotation.PrimaryShock != proto.EnhancementShaman_Rotation_None {
+		nextEventAt = core.MinDuration(nextEventAt, enh.CDReadyAt(shaman.ShockCooldownID))
+	}
+	return nextEventAt
 }
