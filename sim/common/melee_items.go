@@ -664,6 +664,7 @@ func ApplySyphonOfTheNathrezim(agent core.Agent) {
 					castAction := &spellObj
 					castTemplate.Apply(castAction)
 					castAction.Effect.Target = hitEffect.Target
+					castAction.ActionID.Tag = tag
 					castAction.Init(sim)
 					castAction.Cast(sim)
 				},
