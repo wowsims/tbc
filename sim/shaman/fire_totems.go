@@ -38,8 +38,8 @@ func (shaman *Shaman) newSearingTotemTemplate(sim *core.Simulation) core.SimpleS
 				// for target distance yet so just pretend the tick rate is lower.
 				//NumberOfTicks:        30,
 				//TickLength:           time.Second * 2,
-				NumberOfTicks: 20,
-				TickLength:    time.Second * 3,
+				NumberOfTicks: 24,
+				TickLength:    time.Second * 60 / 24,
 
 				TickBaseDamage:       58,
 				TickSpellCoefficient: 0.167,

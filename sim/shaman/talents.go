@@ -69,6 +69,7 @@ func (shaman *Shaman) applyTalents() {
 	shaman.applyElementalDevastation()
 	shaman.applyFlurry()
 	shaman.applyShamanisticFocus()
+	shaman.applyWeaponMastery()
 	shaman.applyUnleashedRage()
 	shaman.registerElementalMasteryCD()
 	shaman.registerNaturesSwiftnessCD()
@@ -198,6 +199,28 @@ func (shaman *Shaman) registerNaturesSwiftnessCD() {
 				})
 			}
 		},
+	})
+}
+
+var WeaponMasteryAuraID = core.NewAuraID()
+
+func (shaman *Shaman) applyWeaponMastery() {
+	if shaman.Talents.WeaponMastery == 0 {
+		return
+	}
+
+	multiplier := 1 + 0.02*float64(shaman.Talents.WeaponMastery)
+
+	shaman.AddPermanentAura(func(sim *core.Simulation) core.Aura {
+		return core.Aura{
+			ID: WeaponMasteryAuraID,
+			OnBeforeMeleeHit: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
+				if !hitEffect.IsWeaponHit() {
+					return
+				}
+				hitEffect.DamageMultiplier *= multiplier
+			},
+		}
 	})
 }
 
