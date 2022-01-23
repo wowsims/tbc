@@ -409,9 +409,13 @@ export class CastBeganLog extends SimLog {
         return `${this.toStringPrefix()} Casting ${this.castId.name} (Cast time = ${this.castTime.toFixed(2)}s, Mana cost = ${this.manaCost.toFixed(1)}).`;
     }
     static parse(params) {
-        const match = params.raw.match(/Casting (.*) \(Current Mana = (\d+\.?\d*), Mana Cost = (\d+\.?\d*), Cast Time = (\d+\.?\d*)s\)/);
+        const match = params.raw.match(/Casting (.*) \(Current Mana = (\d+\.?\d*), Mana Cost = (\d+\.?\d*), Cast Time = (\d+\.?\d*)(m?s)\)/);
         if (match) {
-            return ActionId.fromLogString(match[1]).fill(params.source?.index).then(castId => new CastBeganLog(params, castId, parseFloat(match[2]), parseFloat(match[3]), parseFloat(match[4])));
+            let castTime = parseFloat(match[4]);
+            if (match[5] == 'ms') {
+                castTime /= 1000;
+            }
+            return ActionId.fromLogString(match[1]).fill(params.source?.index).then(castId => new CastBeganLog(params, castId, parseFloat(match[2]), parseFloat(match[3]), castTime));
         }
         else {
             return null;

@@ -124,6 +124,10 @@ export interface PartyBuffs {
      */
     strengthOfEarthTotem: StrengthOfEarthType;
     /**
+     * @generated from protobuf field: bool tranquil_air_totem = 26;
+     */
+    tranquilAirTotem: boolean;
+    /**
      * @generated from protobuf field: int32 windfury_totem_rank = 23;
      */
     windfuryTotemRank: number;
@@ -147,6 +151,10 @@ export interface IndividualBuffs {
      * @generated from protobuf field: bool blessing_of_kings = 1;
      */
     blessingOfKings: boolean;
+    /**
+     * @generated from protobuf field: bool blessing_of_salvation = 8;
+     */
+    blessingOfSalvation: boolean;
     /**
      * @generated from protobuf field: proto.TristateEffect blessing_of_wisdom = 2;
      */

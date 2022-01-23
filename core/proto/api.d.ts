@@ -279,9 +279,9 @@ export interface AuraMetrics {
     uptimeSecondsStdev: number;
 }
 /**
- * @generated from protobuf message proto.DpsMetrics
+ * @generated from protobuf message proto.DistributionMetrics
  */
-export interface DpsMetrics {
+export interface DistributionMetrics {
     /**
      * @generated from protobuf field: double avg = 1;
      */
@@ -308,9 +308,13 @@ export interface DpsMetrics {
  */
 export interface PlayerMetrics {
     /**
-     * @generated from protobuf field: proto.DpsMetrics dps = 1;
+     * @generated from protobuf field: proto.DistributionMetrics dps = 1;
      */
-    dps?: DpsMetrics;
+    dps?: DistributionMetrics;
+    /**
+     * @generated from protobuf field: proto.DistributionMetrics threat = 8;
+     */
+    threat?: DistributionMetrics;
     /**
      * average seconds spent oom per iteration
      *
@@ -337,9 +341,9 @@ export interface PlayerMetrics {
  */
 export interface PartyMetrics {
     /**
-     * @generated from protobuf field: proto.DpsMetrics dps = 1;
+     * @generated from protobuf field: proto.DistributionMetrics dps = 1;
      */
-    dps?: DpsMetrics;
+    dps?: DistributionMetrics;
     /**
      * @generated from protobuf field: repeated proto.PlayerMetrics players = 2;
      */
@@ -352,9 +356,9 @@ export interface PartyMetrics {
  */
 export interface RaidMetrics {
     /**
-     * @generated from protobuf field: proto.DpsMetrics dps = 1;
+     * @generated from protobuf field: proto.DistributionMetrics dps = 1;
      */
-    dps?: DpsMetrics;
+    dps?: DistributionMetrics;
     /**
      * @generated from protobuf field: repeated proto.PartyMetrics parties = 2;
      */
@@ -667,17 +671,17 @@ declare class AuraMetrics$Type extends MessageType<AuraMetrics> {
  * @generated MessageType for protobuf message proto.AuraMetrics
  */
 export declare const AuraMetrics: AuraMetrics$Type;
-declare class DpsMetrics$Type extends MessageType<DpsMetrics> {
+declare class DistributionMetrics$Type extends MessageType<DistributionMetrics> {
     constructor();
-    create(value?: PartialMessage<DpsMetrics>): DpsMetrics;
-    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: DpsMetrics): DpsMetrics;
+    create(value?: PartialMessage<DistributionMetrics>): DistributionMetrics;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: DistributionMetrics): DistributionMetrics;
     private binaryReadMap4;
-    internalBinaryWrite(message: DpsMetrics, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+    internalBinaryWrite(message: DistributionMetrics, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
- * @generated MessageType for protobuf message proto.DpsMetrics
+ * @generated MessageType for protobuf message proto.DistributionMetrics
  */
-export declare const DpsMetrics: DpsMetrics$Type;
+export declare const DistributionMetrics: DistributionMetrics$Type;
 declare class PlayerMetrics$Type extends MessageType<PlayerMetrics> {
     constructor();
     create(value?: PartialMessage<PlayerMetrics>): PlayerMetrics;

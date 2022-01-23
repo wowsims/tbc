@@ -69,6 +69,7 @@ class DruidTalents$Type extends MessageType {
             { no: 33, name: "naturalist", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 34, name: "natural_shapeshifter", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 35, name: "intensity", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 40, name: "subtlety", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 36, name: "omen_of_clarity", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 37, name: "natures_swiftness", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 38, name: "living_spirit", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
@@ -76,7 +77,7 @@ class DruidTalents$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { starlightWrath: 0, focusedStarlight: 0, improvedMoonfire: 0, brambles: 0, insectSwarm: false, vengeance: 0, lunarGuidance: 0, naturesGrace: false, moonglow: 0, moonfury: 0, balanceOfPower: 0, dreamstate: 0, moonkinForm: false, improvedFaerieFire: 0, wrathOfCenarius: 0, forceOfNature: false, ferocity: 0, feralAggresion: 0, sharpenedClaws: 0, shreddingAttacks: 0, predatoryStrikes: 0, primalFury: 0, savageFury: 0, faerieFire: false, heartOfTheWild: 0, survivalOfTheFittest: 0, leaderOfThePack: false, improvedLeaderOfThePack: 0, predatoryInstincts: 0, mangle: false, improvedMarkOfTheWild: 0, furor: 0, naturalist: 0, naturalShapeshifter: 0, intensity: 0, omenOfClarity: false, naturesSwiftness: false, livingSpirit: 0, naturalPerfection: 0 };
+        const message = { starlightWrath: 0, focusedStarlight: 0, improvedMoonfire: 0, brambles: 0, insectSwarm: false, vengeance: 0, lunarGuidance: 0, naturesGrace: false, moonglow: 0, moonfury: 0, balanceOfPower: 0, dreamstate: 0, moonkinForm: false, improvedFaerieFire: 0, wrathOfCenarius: 0, forceOfNature: false, ferocity: 0, feralAggresion: 0, sharpenedClaws: 0, shreddingAttacks: 0, predatoryStrikes: 0, primalFury: 0, savageFury: 0, faerieFire: false, heartOfTheWild: 0, survivalOfTheFittest: 0, leaderOfThePack: false, improvedLeaderOfThePack: 0, predatoryInstincts: 0, mangle: false, improvedMarkOfTheWild: 0, furor: 0, naturalist: 0, naturalShapeshifter: 0, intensity: 0, subtlety: 0, omenOfClarity: false, naturesSwiftness: false, livingSpirit: 0, naturalPerfection: 0 };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -191,6 +192,9 @@ class DruidTalents$Type extends MessageType {
                     break;
                 case /* int32 intensity */ 35:
                     message.intensity = reader.int32();
+                    break;
+                case /* int32 subtlety */ 40:
+                    message.subtlety = reader.int32();
                     break;
                 case /* bool omen_of_clarity */ 36:
                     message.omenOfClarity = reader.bool();
@@ -321,6 +325,9 @@ class DruidTalents$Type extends MessageType {
         /* int32 intensity = 35; */
         if (message.intensity !== 0)
             writer.tag(35, WireType.Varint).int32(message.intensity);
+        /* int32 subtlety = 40; */
+        if (message.subtlety !== 0)
+            writer.tag(40, WireType.Varint).int32(message.subtlety);
         /* bool omen_of_clarity = 36; */
         if (message.omenOfClarity !== false)
             writer.tag(36, WireType.Varint).bool(message.omenOfClarity);

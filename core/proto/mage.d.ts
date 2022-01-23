@@ -93,6 +93,10 @@ export interface MageTalents {
      */
     pyroblast: boolean;
     /**
+     * @generated from protobuf field: int32 burning_soul = 47;
+     */
+    burningSoul: number;
+    /**
      * @generated from protobuf field: int32 improved_scorch = 21;
      */
     improvedScorch: number;

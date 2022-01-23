@@ -113,6 +113,7 @@ export class ActionId {
                     name += ' (3 Tick)';
                 }
                 break;
+            case 'Chain Lightning':
             case 'Lightning Bolt':
                 if (this.tag)
                     name += ' (LO)';
@@ -140,6 +141,7 @@ export class ActionId {
                 }
                 break;
             case 'Lightning Speed':
+            case 'Siphon Essence':
             case 'Windfury Weapon':
                 if (this.tag == 1) {
                     name += ' (Main Hand)';

@@ -156,6 +156,10 @@ export interface DruidTalents {
      */
     intensity: number;
     /**
+     * @generated from protobuf field: int32 subtlety = 40;
+     */
+    subtlety: number;
+    /**
      * @generated from protobuf field: bool omen_of_clarity = 36;
      */
     omenOfClarity: boolean;

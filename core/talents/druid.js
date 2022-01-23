@@ -476,7 +476,7 @@ export class DruidTalentsPicker extends TalentsPicker {
                         maxPoints: 3,
                     },
                     {
-                        //fieldName: 'subtelty',
+                        fieldName: 'subtlety',
                         location: {
                             rowIdx: 2,
                             colIdx: 1,

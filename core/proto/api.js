@@ -600,9 +600,9 @@ class AuraMetrics$Type extends MessageType {
  */
 export const AuraMetrics = new AuraMetrics$Type();
 // @generated message type with reflection information, may provide speed optimized methods
-class DpsMetrics$Type extends MessageType {
+class DistributionMetrics$Type extends MessageType {
     constructor() {
-        super("proto.DpsMetrics", [
+        super("proto.DistributionMetrics", [
             { no: 1, name: "avg", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
             { no: 2, name: "stdev", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
             { no: 3, name: "max", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
@@ -655,7 +655,7 @@ class DpsMetrics$Type extends MessageType {
                 case 2:
                     val = reader.int32();
                     break;
-                default: throw new globalThis.Error("unknown map entry field for field proto.DpsMetrics.hist");
+                default: throw new globalThis.Error("unknown map entry field for field proto.DistributionMetrics.hist");
             }
         }
         map[key ?? 0] = val ?? 0;
@@ -680,14 +680,15 @@ class DpsMetrics$Type extends MessageType {
     }
 }
 /**
- * @generated MessageType for protobuf message proto.DpsMetrics
+ * @generated MessageType for protobuf message proto.DistributionMetrics
  */
-export const DpsMetrics = new DpsMetrics$Type();
+export const DistributionMetrics = new DistributionMetrics$Type();
 // @generated message type with reflection information, may provide speed optimized methods
 class PlayerMetrics$Type extends MessageType {
     constructor() {
         super("proto.PlayerMetrics", [
-            { no: 1, name: "dps", kind: "message", T: () => DpsMetrics },
+            { no: 1, name: "dps", kind: "message", T: () => DistributionMetrics },
+            { no: 8, name: "threat", kind: "message", T: () => DistributionMetrics },
             { no: 3, name: "seconds_oom_avg", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
             { no: 5, name: "actions", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => ActionMetrics },
             { no: 6, name: "auras", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => AuraMetrics },
@@ -706,8 +707,11 @@ class PlayerMetrics$Type extends MessageType {
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
-                case /* proto.DpsMetrics dps */ 1:
-                    message.dps = DpsMetrics.internalBinaryRead(reader, reader.uint32(), options, message.dps);
+                case /* proto.DistributionMetrics dps */ 1:
+                    message.dps = DistributionMetrics.internalBinaryRead(reader, reader.uint32(), options, message.dps);
+                    break;
+                case /* proto.DistributionMetrics threat */ 8:
+                    message.threat = DistributionMetrics.internalBinaryRead(reader, reader.uint32(), options, message.threat);
                     break;
                 case /* double seconds_oom_avg */ 3:
                     message.secondsOomAvg = reader.double();
@@ -733,9 +737,12 @@ class PlayerMetrics$Type extends MessageType {
         return message;
     }
     internalBinaryWrite(message, writer, options) {
-        /* proto.DpsMetrics dps = 1; */
+        /* proto.DistributionMetrics dps = 1; */
         if (message.dps)
-            DpsMetrics.internalBinaryWrite(message.dps, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+            DistributionMetrics.internalBinaryWrite(message.dps, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+        /* proto.DistributionMetrics threat = 8; */
+        if (message.threat)
+            DistributionMetrics.internalBinaryWrite(message.threat, writer.tag(8, WireType.LengthDelimited).fork(), options).join();
         /* double seconds_oom_avg = 3; */
         if (message.secondsOomAvg !== 0)
             writer.tag(3, WireType.Bit64).double(message.secondsOomAvg);
@@ -762,7 +769,7 @@ export const PlayerMetrics = new PlayerMetrics$Type();
 class PartyMetrics$Type extends MessageType {
     constructor() {
         super("proto.PartyMetrics", [
-            { no: 1, name: "dps", kind: "message", T: () => DpsMetrics },
+            { no: 1, name: "dps", kind: "message", T: () => DistributionMetrics },
             { no: 2, name: "players", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => PlayerMetrics }
         ]);
     }
@@ -778,8 +785,8 @@ class PartyMetrics$Type extends MessageType {
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
-                case /* proto.DpsMetrics dps */ 1:
-                    message.dps = DpsMetrics.internalBinaryRead(reader, reader.uint32(), options, message.dps);
+                case /* proto.DistributionMetrics dps */ 1:
+                    message.dps = DistributionMetrics.internalBinaryRead(reader, reader.uint32(), options, message.dps);
                     break;
                 case /* repeated proto.PlayerMetrics players */ 2:
                     message.players.push(PlayerMetrics.internalBinaryRead(reader, reader.uint32(), options));
@@ -796,9 +803,9 @@ class PartyMetrics$Type extends MessageType {
         return message;
     }
     internalBinaryWrite(message, writer, options) {
-        /* proto.DpsMetrics dps = 1; */
+        /* proto.DistributionMetrics dps = 1; */
         if (message.dps)
-            DpsMetrics.internalBinaryWrite(message.dps, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+            DistributionMetrics.internalBinaryWrite(message.dps, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
         /* repeated proto.PlayerMetrics players = 2; */
         for (let i = 0; i < message.players.length; i++)
             PlayerMetrics.internalBinaryWrite(message.players[i], writer.tag(2, WireType.LengthDelimited).fork(), options).join();
@@ -816,7 +823,7 @@ export const PartyMetrics = new PartyMetrics$Type();
 class RaidMetrics$Type extends MessageType {
     constructor() {
         super("proto.RaidMetrics", [
-            { no: 1, name: "dps", kind: "message", T: () => DpsMetrics },
+            { no: 1, name: "dps", kind: "message", T: () => DistributionMetrics },
             { no: 2, name: "parties", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => PartyMetrics }
         ]);
     }
@@ -832,8 +839,8 @@ class RaidMetrics$Type extends MessageType {
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
-                case /* proto.DpsMetrics dps */ 1:
-                    message.dps = DpsMetrics.internalBinaryRead(reader, reader.uint32(), options, message.dps);
+                case /* proto.DistributionMetrics dps */ 1:
+                    message.dps = DistributionMetrics.internalBinaryRead(reader, reader.uint32(), options, message.dps);
                     break;
                 case /* repeated proto.PartyMetrics parties */ 2:
                     message.parties.push(PartyMetrics.internalBinaryRead(reader, reader.uint32(), options));
@@ -850,9 +857,9 @@ class RaidMetrics$Type extends MessageType {
         return message;
     }
     internalBinaryWrite(message, writer, options) {
-        /* proto.DpsMetrics dps = 1; */
+        /* proto.DistributionMetrics dps = 1; */
         if (message.dps)
-            DpsMetrics.internalBinaryWrite(message.dps, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+            DistributionMetrics.internalBinaryWrite(message.dps, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
         /* repeated proto.PartyMetrics parties = 2; */
         for (let i = 0; i < message.parties.length; i++)
             PartyMetrics.internalBinaryWrite(message.parties[i], writer.tag(2, WireType.LengthDelimited).fork(), options).join();

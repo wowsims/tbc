@@ -1,6 +1,6 @@
 import { ActionMetrics as ActionMetricsProto } from '/tbc/core/proto/api.js';
 import { AuraMetrics as AuraMetricsProto } from '/tbc/core/proto/api.js';
-import { DpsMetrics as DpsMetricsProto } from '/tbc/core/proto/api.js';
+import { DistributionMetrics as DistributionMetricsProto } from '/tbc/core/proto/api.js';
 import { RaidSimRequest, RaidSimResult } from '/tbc/core/proto/api.js';
 import { Class } from '/tbc/core/proto/common.js';
 import { ActionId } from '/tbc/core/proto_utils/action_id.js';
@@ -51,7 +51,7 @@ export class SimResult {
     }
     getDamageMetrics(filter) {
         if (filter.player || filter.player === 0) {
-            return this.getPlayerWithRaidIndex(filter.player)?.dps || DpsMetricsProto.create();
+            return this.getPlayerWithRaidIndex(filter.player)?.dps || DistributionMetricsProto.create();
         }
         return this.raidMetrics.dps;
     }

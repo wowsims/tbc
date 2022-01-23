@@ -1,6 +1,6 @@
 import { ActionMetrics as ActionMetricsProto } from '/tbc/core/proto/api.js';
 import { AuraMetrics as AuraMetricsProto } from '/tbc/core/proto/api.js';
-import { DpsMetrics as DpsMetricsProto } from '/tbc/core/proto/api.js';
+import { DistributionMetrics as DistributionMetricsProto } from '/tbc/core/proto/api.js';
 import { Encounter as EncounterProto } from '/tbc/core/proto/common.js';
 import { EncounterMetrics as EncounterMetricsProto } from '/tbc/core/proto/api.js';
 import { Party as PartyProto } from '/tbc/core/proto/api.js';
@@ -31,7 +31,7 @@ export declare class SimResult {
     getPlayerWithRaidIndex(raidIndex: number): PlayerMetrics | null;
     getTargets(filter?: SimResultFilter): Array<TargetMetrics>;
     getTargetWithIndex(index: number): TargetMetrics | null;
-    getDamageMetrics(filter: SimResultFilter): DpsMetricsProto;
+    getDamageMetrics(filter: SimResultFilter): DistributionMetricsProto;
     getActionMetrics(filter: SimResultFilter): Array<ActionMetrics>;
     getSpellMetrics(filter: SimResultFilter): Array<ActionMetrics>;
     getMeleeMetrics(filter: SimResultFilter): Array<ActionMetrics>;
@@ -44,7 +44,7 @@ export declare class SimResult {
 export declare class RaidMetrics {
     private readonly raid;
     private readonly metrics;
-    readonly dps: DpsMetricsProto;
+    readonly dps: DistributionMetricsProto;
     readonly parties: Array<PartyMetrics>;
     private constructor();
     static makeNew(iterations: number, duration: number, raid: RaidProto, metrics: RaidMetricsProto, logs: Array<SimLog>): Promise<RaidMetrics>;
@@ -53,7 +53,7 @@ export declare class PartyMetrics {
     private readonly party;
     private readonly metrics;
     readonly partyIndex: number;
-    readonly dps: DpsMetricsProto;
+    readonly dps: DistributionMetricsProto;
     readonly players: Array<PlayerMetrics>;
     private constructor();
     static makeNew(iterations: number, duration: number, party: PartyProto, metrics: PartyMetricsProto, partyIndex: number, logs: Array<SimLog>): Promise<PartyMetrics>;
@@ -67,7 +67,7 @@ export declare class PlayerMetrics {
     readonly isPet: boolean;
     readonly iconUrl: string;
     readonly classColor: string;
-    readonly dps: DpsMetricsProto;
+    readonly dps: DistributionMetricsProto;
     readonly actions: Array<ActionMetrics>;
     readonly auras: Array<AuraMetrics>;
     readonly pets: Array<PlayerMetrics>;

@@ -26,7 +26,7 @@ export class PriestTalentsPicker extends TalentsPicker {
                         maxPoints: 5,
                     },
                     {
-                        //fieldName: 'silentResolve',
+                        fieldName: 'silentResolve',
                         location: {
                             rowIdx: 1,
                             colIdx: 0,
@@ -445,7 +445,7 @@ export class PriestTalentsPicker extends TalentsPicker {
                         maxPoints: 5,
                     },
                     {
-                        //fieldName: 'shadowAffinity',
+                        fieldName: 'shadowAffinity',
                         location: {
                             rowIdx: 1,
                             colIdx: 0,

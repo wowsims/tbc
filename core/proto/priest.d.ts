@@ -15,6 +15,10 @@ export interface PriestTalents {
      */
     wandSpecialization: number;
     /**
+     * @generated from protobuf field: int32 silent_resolve = 31;
+     */
+    silentResolve: number;
+    /**
      * @generated from protobuf field: bool inner_focus = 2;
      */
     innerFocus: boolean;
@@ -83,6 +87,10 @@ export interface PriestTalents {
     /**
      * Shadow
      *
+     * @generated from protobuf field: int32 shadow_affinity = 32;
+     */
+    shadowAffinity: number;
+    /**
      * @generated from protobuf field: int32 improved_shadow_word_pain = 18;
      */
     improvedShadowWordPain: number;

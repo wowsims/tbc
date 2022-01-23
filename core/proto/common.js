@@ -941,13 +941,14 @@ class PartyBuffs$Type extends MessageType {
             { no: 25, name: "snapshot_improved_wrath_of_air_totem", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 15, name: "grace_of_air_totem", kind: "enum", T: () => ["proto.TristateEffect", TristateEffect] },
             { no: 16, name: "strength_of_earth_totem", kind: "enum", T: () => ["proto.StrengthOfEarthType", StrengthOfEarthType] },
+            { no: 26, name: "tranquil_air_totem", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 23, name: "windfury_totem_rank", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 24, name: "windfury_totem_iwt", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 18, name: "battle_shout", kind: "enum", T: () => ["proto.TristateEffect", TristateEffect] }
         ]);
     }
     create(value) {
-        const message = { bloodlust: 0, ferociousInspiration: 0, moonkinAura: 0, leaderOfThePack: 0, sanctityAura: 0, trueshotAura: false, draeneiRacialMelee: false, draeneiRacialCaster: false, drums: 0, atieshMage: 0, atieshWarlock: 0, braidedEterniumChain: false, eyeOfTheNight: false, chainOfTheTwilightOwl: false, jadePendantOfBlasting: false, manaSpringTotem: 0, manaTideTotems: 0, totemOfWrath: 0, wrathOfAirTotem: 0, snapshotImprovedWrathOfAirTotem: false, graceOfAirTotem: 0, strengthOfEarthTotem: 0, windfuryTotemRank: 0, windfuryTotemIwt: 0, battleShout: 0 };
+        const message = { bloodlust: 0, ferociousInspiration: 0, moonkinAura: 0, leaderOfThePack: 0, sanctityAura: 0, trueshotAura: false, draeneiRacialMelee: false, draeneiRacialCaster: false, drums: 0, atieshMage: 0, atieshWarlock: 0, braidedEterniumChain: false, eyeOfTheNight: false, chainOfTheTwilightOwl: false, jadePendantOfBlasting: false, manaSpringTotem: 0, manaTideTotems: 0, totemOfWrath: 0, wrathOfAirTotem: 0, snapshotImprovedWrathOfAirTotem: false, graceOfAirTotem: 0, strengthOfEarthTotem: 0, tranquilAirTotem: false, windfuryTotemRank: 0, windfuryTotemIwt: 0, battleShout: 0 };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -1023,6 +1024,9 @@ class PartyBuffs$Type extends MessageType {
                     break;
                 case /* proto.StrengthOfEarthType strength_of_earth_totem */ 16:
                     message.strengthOfEarthTotem = reader.int32();
+                    break;
+                case /* bool tranquil_air_totem */ 26:
+                    message.tranquilAirTotem = reader.bool();
                     break;
                 case /* int32 windfury_totem_rank */ 23:
                     message.windfuryTotemRank = reader.int32();
@@ -1111,6 +1115,9 @@ class PartyBuffs$Type extends MessageType {
         /* proto.StrengthOfEarthType strength_of_earth_totem = 16; */
         if (message.strengthOfEarthTotem !== 0)
             writer.tag(16, WireType.Varint).int32(message.strengthOfEarthTotem);
+        /* bool tranquil_air_totem = 26; */
+        if (message.tranquilAirTotem !== false)
+            writer.tag(26, WireType.Varint).bool(message.tranquilAirTotem);
         /* int32 windfury_totem_rank = 23; */
         if (message.windfuryTotemRank !== 0)
             writer.tag(23, WireType.Varint).int32(message.windfuryTotemRank);
@@ -1135,6 +1142,7 @@ class IndividualBuffs$Type extends MessageType {
     constructor() {
         super("proto.IndividualBuffs", [
             { no: 1, name: "blessing_of_kings", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 8, name: "blessing_of_salvation", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 2, name: "blessing_of_wisdom", kind: "enum", T: () => ["proto.TristateEffect", TristateEffect] },
             { no: 3, name: "blessing_of_might", kind: "enum", T: () => ["proto.TristateEffect", TristateEffect] },
             { no: 4, name: "shadow_priest_dps", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
@@ -1144,7 +1152,7 @@ class IndividualBuffs$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { blessingOfKings: false, blessingOfWisdom: 0, blessingOfMight: 0, shadowPriestDps: 0, unleashedRage: false, innervates: 0, powerInfusions: 0 };
+        const message = { blessingOfKings: false, blessingOfSalvation: false, blessingOfWisdom: 0, blessingOfMight: 0, shadowPriestDps: 0, unleashedRage: false, innervates: 0, powerInfusions: 0 };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -1157,6 +1165,9 @@ class IndividualBuffs$Type extends MessageType {
             switch (fieldNo) {
                 case /* bool blessing_of_kings */ 1:
                     message.blessingOfKings = reader.bool();
+                    break;
+                case /* bool blessing_of_salvation */ 8:
+                    message.blessingOfSalvation = reader.bool();
                     break;
                 case /* proto.TristateEffect blessing_of_wisdom */ 2:
                     message.blessingOfWisdom = reader.int32();
@@ -1191,6 +1202,9 @@ class IndividualBuffs$Type extends MessageType {
         /* bool blessing_of_kings = 1; */
         if (message.blessingOfKings !== false)
             writer.tag(1, WireType.Varint).bool(message.blessingOfKings);
+        /* bool blessing_of_salvation = 8; */
+        if (message.blessingOfSalvation !== false)
+            writer.tag(8, WireType.Varint).bool(message.blessingOfSalvation);
         /* proto.TristateEffect blessing_of_wisdom = 2; */
         if (message.blessingOfWisdom !== 0)
             writer.tag(2, WireType.Varint).int32(message.blessingOfWisdom);
