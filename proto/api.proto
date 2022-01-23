@@ -108,7 +108,7 @@ message AuraMetrics {
 		double uptime_seconds_stdev = 3;
 }
 
-message DpsMetrics {
+message DistributionMetrics {
     double avg   = 1;
     double stdev = 2;
     double max   = 3;
@@ -117,7 +117,7 @@ message DpsMetrics {
 
 // All the results for a single Player.
 message PlayerMetrics {
-		DpsMetrics dps = 1;
+		DistributionMetrics dps = 1;
 
     // average seconds spent oom per iteration
     double seconds_oom_avg = 3; 
@@ -130,14 +130,14 @@ message PlayerMetrics {
 
 // Results for a whole raid.
 message PartyMetrics {
-		DpsMetrics dps = 1;
+		DistributionMetrics dps = 1;
 
 		repeated PlayerMetrics players = 2;
 }
 
 // Results for a whole raid.
 message RaidMetrics {
-		DpsMetrics dps = 1;
+		DistributionMetrics dps = 1;
 
 		repeated PartyMetrics parties = 2;
 }
