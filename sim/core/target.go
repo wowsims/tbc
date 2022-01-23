@@ -9,6 +9,7 @@ import (
 
 type Encounter struct {
 	Duration           time.Duration
+	DurationVariation  time.Duration
 	executePhaseBegins time.Duration
 	Targets            []*Target
 }
@@ -16,8 +17,12 @@ type Encounter struct {
 func NewEncounter(options proto.Encounter) Encounter {
 	encounter := Encounter{
 		Duration:           DurationFromSeconds(options.Duration),
+		DurationVariation:  DurationFromSeconds(options.DurationVariation),
 		executePhaseBegins: DurationFromSeconds(options.Duration * (1 - options.ExecuteProportion)),
 		Targets:            []*Target{},
+	}
+	if options.DurationVariation == 0 {
+		encounter.DurationVariation = 5 * time.Second
 	}
 
 	for targetIndex, targetOptions := range options.Targets {
