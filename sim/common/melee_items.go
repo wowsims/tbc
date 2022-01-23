@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
+	"github.com/wowsims/tbc/sim/core/proto"
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
@@ -27,10 +28,10 @@ func init() {
 	core.AddItemEffect(30316, ApplyDevastation)
 	core.AddItemEffect(31318, ApplySingingCrystalAxe)
 	core.AddItemEffect(31331, ApplyTheNightBlade)
+	core.AddItemEffect(32262, ApplySyphonOfTheNathrezim)
 
 	// TODO:
 	// blinkstrike
-	// syphon of the nathrezim
 }
 
 var KhoriumChampionAuraID = core.NewAuraID()
@@ -589,6 +590,98 @@ func ApplyTheNightBlade(agent core.Agent) {
 						hitEffect.BonusArmorPenetration += newBonus
 					},
 				})
+			},
+		}
+	})
+}
+
+var SyphonOfTheNathrezimAuraID = core.NewAuraID()
+
+var SiphonEssenceMHAuraID = core.NewAuraID()
+var SiphonEssenceOHAuraID = core.NewAuraID()
+
+func ApplySyphonOfTheNathrezim(agent core.Agent) {
+	character := agent.GetCharacter()
+	ppmm := character.AutoAttacks.NewPPMManager(1.0)
+	mh := character.Equip[proto.ItemSlot_ItemSlotMainHand].ID == 32262
+	oh := character.Equip[proto.ItemSlot_ItemSlotOffHand].ID == 32262
+	if !mh && !oh {
+		return
+	}
+	if !mh {
+		ppmm.SetProcChance(false, 0)
+	}
+	if !oh {
+		ppmm.SetProcChance(true, 0)
+	}
+
+	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
+		castTemplate := core.NewSimpleSpellTemplate(core.SimpleSpell{
+			SpellCast: core.SpellCast{
+				Cast: core.Cast{
+					ActionID:        core.ActionID{SpellID: 40291},
+					Character:       character,
+					IgnoreCooldowns: true,
+					IgnoreManaCost:  true,
+					IsPhantom:       true,
+					SpellSchool:     stats.ShadowSpellPower,
+					CritMultiplier:  1.5,
+				},
+			},
+			Effect: core.SpellHitEffect{
+				SpellEffect: core.SpellEffect{
+					DamageMultiplier:       1,
+					StaticDamageMultiplier: 1,
+					ThreatMultiplier:       1,
+				},
+				DirectInput: core.DirectDamageInput{
+					MinBaseDamage: 20,
+					MaxBaseDamage: 20,
+				},
+			},
+		})
+		spellObj := core.SimpleSpell{}
+
+		applySiphonEssence := func(sim *core.Simulation, character *core.Character, isMH bool) {
+			var tag int32
+			var auraID core.AuraID
+			if isMH {
+				tag = 1
+				auraID = SiphonEssenceMHAuraID
+			} else {
+				tag = 2
+				auraID = SiphonEssenceOHAuraID
+			}
+			character.AddAura(sim, core.Aura{
+				ID:       auraID,
+				ActionID: core.ActionID{SpellID: 40291, Tag: tag},
+				Expires:  sim.CurrentTime + (time.Second * 6),
+				OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
+					if !hitEffect.Landed() || !hitEffect.IsWeaponHit() {
+						return
+					}
+
+					castAction := &spellObj
+					castTemplate.Apply(castAction)
+					castAction.Effect.Target = hitEffect.Target
+					castAction.ActionID.Tag = tag
+					castAction.Init(sim)
+					castAction.Cast(sim)
+				},
+			})
+		}
+
+		return core.Aura{
+			ID: SyphonOfTheNathrezimAuraID,
+			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
+				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() {
+					return
+				}
+
+				isMH := hitEffect.IsMH()
+				if ppmm.Proc(sim, isMH, "Syphon Of The Nathrezim") {
+					applySiphonEssence(sim, character, isMH)
+				}
 			},
 		}
 	})
