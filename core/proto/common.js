@@ -1715,12 +1715,13 @@ class Encounter$Type extends MessageType {
     constructor() {
         super("proto.Encounter", [
             { no: 1, name: "duration", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
+            { no: 4, name: "duration_variation", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
             { no: 3, name: "execute_proportion", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
             { no: 2, name: "targets", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => Target }
         ]);
     }
     create(value) {
-        const message = { duration: 0, executeProportion: 0, targets: [] };
+        const message = { duration: 0, durationVariation: 0, executeProportion: 0, targets: [] };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -1733,6 +1734,9 @@ class Encounter$Type extends MessageType {
             switch (fieldNo) {
                 case /* double duration */ 1:
                     message.duration = reader.double();
+                    break;
+                case /* double duration_variation */ 4:
+                    message.durationVariation = reader.double();
                     break;
                 case /* double execute_proportion */ 3:
                     message.executeProportion = reader.double();
@@ -1755,6 +1759,9 @@ class Encounter$Type extends MessageType {
         /* double duration = 1; */
         if (message.duration !== 0)
             writer.tag(1, WireType.Bit64).double(message.duration);
+        /* double duration_variation = 4; */
+        if (message.durationVariation !== 0)
+            writer.tag(4, WireType.Bit64).double(message.durationVariation);
         /* double execute_proportion = 3; */
         if (message.executeProportion !== 0)
             writer.tag(3, WireType.Bit64).double(message.executeProportion);

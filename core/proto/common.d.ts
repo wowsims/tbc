@@ -413,6 +413,12 @@ export interface Encounter {
      */
     duration: number;
     /**
+     * Variation in the duration
+     *
+     * @generated from protobuf field: double duration_variation = 4;
+     */
+    durationVariation: number;
+    /**
      * The ratio of the encounter duration, between 0 and 1, for which the targets
      * will be in execute range for the purposes of Warrior Execute, Mage Molten
      * Fury, etc.
