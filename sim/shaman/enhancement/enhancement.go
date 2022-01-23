@@ -43,9 +43,6 @@ func NewEnhancementShaman(character core.Character, options proto.Player) *Enhan
 	// Enable Auto Attacks for this spec
 	enh.EnableAutoAttacks(enhOptions.Options.DelayOffhandSwings)
 
-	// Modify auto attacks multiplier from weapon mastery.
-	enh.AutoAttacks.Effect.DamageMultiplier *= 1 + 0.02*float64(enhOptions.Talents.WeaponMastery)
-
 	if !enh.HasMHWeapon() {
 		enhOptions.Options.MainHandImbue = proto.ShamanWeaponImbue_ImbueNone
 	}

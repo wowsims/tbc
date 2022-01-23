@@ -37,20 +37,26 @@ func (shaman *Shaman) ApplyWindfuryImbue(mh bool, oh bool) {
 			Character:       &shaman.Character,
 			IgnoreCooldowns: true,
 		},
-		Effect: core.AbilityHitEffect{
-			AbilityEffect: core.AbilityEffect{
-				DamageMultiplier:       1.0,
-				StaticDamageMultiplier: 1.0,
-				ThreatMultiplier:       1.0,
-				BonusAttackPower:       apBonus,
-			},
-			WeaponInput: core.WeaponDamageInput{
-				DamageMultiplier: 1.0,
-			},
+	}
+
+	baseEffect := core.AbilityHitEffect{
+		AbilityEffect: core.AbilityEffect{
+			DamageMultiplier:       1.0,
+			StaticDamageMultiplier: 1.0,
+			ThreatMultiplier:       1.0,
+			BonusAttackPower:       apBonus,
+		},
+		WeaponInput: core.WeaponDamageInput{
+			DamageMultiplier: 1.0,
 		},
 	}
 	if shaman.Talents.ElementalWeapons > 0 {
-		wftempl.Effect.WeaponInput.DamageMultiplier *= 1 + math.Round(float64(shaman.Talents.ElementalWeapons)*13.33)/100
+		baseEffect.WeaponInput.DamageMultiplier *= 1 + math.Round(float64(shaman.Talents.ElementalWeapons)*13.33)/100
+	}
+
+	wftempl.Effects = []core.AbilityHitEffect{
+		baseEffect,
+		baseEffect,
 	}
 
 	wfTemplate := core.NewMeleeAbilityTemplate(wftempl)
@@ -78,20 +84,25 @@ func (shaman *Shaman) ApplyWindfuryImbue(mh bool, oh bool) {
 					return
 				}
 				icd = core.InternalCD(sim.CurrentTime + icdDur)
-				for i := 0; i < 2; i++ {
-					wfTemplate.Apply(&wfAtk)
 
-					// Set so only the proc'd hand attacks
-					wfAtk.Effect.WeaponInput.IsOH = !isMHHit
-					if isMHHit {
-						wfAtk.ActionID.Tag = 1
-					} else {
-						wfAtk.ActionID.Tag = 2
-					}
-
-					wfAtk.Effect.Target = hitEffect.Target
-					wfAtk.Attack(sim)
+				wfTemplate.Apply(&wfAtk)
+				// Set so only the proc'd hand attacks
+				if isMHHit {
+					wfAtk.ActionID.Tag = 1
+				} else {
+					wfAtk.ActionID.Tag = 2
 				}
+				for i := 0; i < 2; i++ {
+					wfAtk.Effects[i].WeaponInput.IsOH = !isMHHit
+					wfAtk.Effects[i].Target = hitEffect.Target
+
+					if !isMHHit {
+						// For whatever reason, OH penalty does not apply to the bonus AP from WF OH
+						// hits. Implement this by doubling the AP bonus we provide.
+						wfAtk.Effects[i].BonusAttackPower += apBonus
+					}
+				}
+				wfAtk.Attack(sim)
 			},
 		}
 	})
