@@ -14,10 +14,12 @@ import (
 type InitialAura func(*Simulation) Aura
 
 type Simulation struct {
-	Raid      *Raid
-	encounter Encounter
-	Options   proto.SimOptions
-	Duration  time.Duration
+	Raid              *Raid
+	encounter         Encounter
+	Options           proto.SimOptions
+	BaseDuration      time.Duration // base duration
+	DurationVariation time.Duration // variation per duration
+	Duration          time.Duration // Duration of current iteration
 
 	rand *rand.Rand
 
@@ -61,11 +63,12 @@ func newSim(rsr proto.RaidSimRequest) *Simulation {
 	}
 
 	return &Simulation{
-		Raid:      raid,
-		encounter: encounter,
-		Options:   simOptions,
-		Duration:  encounter.Duration,
-		Log:       nil,
+		Raid:              raid,
+		encounter:         encounter,
+		Options:           simOptions,
+		BaseDuration:      encounter.Duration,
+		DurationVariation: encounter.DurationVariation,
+		Log:               nil,
 
 		rand: rand.New(rand.NewSource(rseed)),
 
@@ -105,7 +108,9 @@ func (sim *Simulation) reset() {
 		sim.Log("SIM RESET")
 		sim.Log("----------------------")
 	}
+	variation := sim.DurationVariation * 2
 
+	sim.Duration = sim.BaseDuration + time.Duration((sim.RandomFloat("sim duration") * float64(variation))) - sim.DurationVariation
 	sim.CurrentTime = 0.0
 	sim.pendingActions = make([]*PendingAction, 0, 64)
 
