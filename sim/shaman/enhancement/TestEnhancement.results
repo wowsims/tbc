@@ -518,6 +518,12 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestEnhancement-AllItems-SyphonoftheNathrezim-32262"
+ value: {
+  dps: 1731.2978227575354
+ }
+}
+dps_results: {
  key: "TestEnhancement-AllItems-TenaciousEarthstormDiamond"
  value: {
   dps: 1693.2373496039709

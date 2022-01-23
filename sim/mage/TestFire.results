@@ -452,6 +452,12 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestFire-AllItems-SyphonoftheNathrezim-32262"
+ value: {
+  dps: 1847.5696956605864
+ }
+}
+dps_results: {
  key: "TestFire-AllItems-TempestRegalia"
  value: {
   dps: 2005.096021051673
