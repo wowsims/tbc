@@ -145,7 +145,7 @@ func (cast *Cast) startCasting(sim *Simulation, onCastComplete OnCastComplete) b
 
 	if sim.Log != nil {
 		cast.Character.Log(sim, "Casting %s (Current Mana = %0.03f, Mana Cost = %0.03f, Cast Time = %s)",
-			cast.ActionID, cast.Character.CurrentMana(), cast.ManaCost, cast.CastTime)
+			cast.ActionID, cast.Character.CurrentMana(), MaxFloat(0, cast.ManaCost), cast.CastTime)
 	}
 
 	// This needs to come before the internalOnComplete() call so that changes to

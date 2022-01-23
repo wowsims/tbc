@@ -251,6 +251,7 @@ message PartyBuffs {
 		bool snapshot_improved_wrath_of_air_totem = 25;
     TristateEffect grace_of_air_totem = 15;
     StrengthOfEarthType strength_of_earth_totem = 16;
+		bool tranquil_air_totem = 26;
 
 		int32 windfury_totem_rank = 23; // 0 if none, otherwise rank of the ability (1-5).
 		int32 windfury_totem_iwt = 24;
@@ -270,6 +271,7 @@ enum StrengthOfEarthType {
 // These are usually individuals of actions taken by other Characters.
 message IndividualBuffs {
     bool blessing_of_kings = 1;
+    bool blessing_of_salvation = 8;
     TristateEffect blessing_of_wisdom = 2;
     TristateEffect blessing_of_might = 3;
 

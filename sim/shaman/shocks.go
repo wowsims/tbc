@@ -37,10 +37,12 @@ func (shaman *Shaman) newShockTemplateSpell(sim *core.Simulation, spellID int32,
 			SpellEffect: core.SpellEffect{
 				DamageMultiplier:       1,
 				StaticDamageMultiplier: 1,
+				ThreatMultiplier:       1,
 			},
 		},
 	}
 
+	spell.Effect.ThreatMultiplier *= 1 - (0.1/3)*float64(shaman.Talents.ElementalPrecision)
 	spell.ManaCost -= spell.BaseManaCost * float64(shaman.Talents.Convection) * 0.02
 	spell.ManaCost -= spell.BaseManaCost * float64(shaman.Talents.MentalQuickness) * 0.02
 	spell.Cooldown -= time.Millisecond * 200 * time.Duration(shaman.Talents.Reverberation)
@@ -153,6 +155,7 @@ func (shaman *Shaman) newFrostShockTemplate(sim *core.Simulation) core.SimpleSpe
 		MaxBaseDamage:    683,
 		SpellCoefficient: 0.386,
 	}
+	spell.Effect.ThreatMultiplier *= 2
 
 	return core.NewSimpleSpellTemplate(spell)
 }

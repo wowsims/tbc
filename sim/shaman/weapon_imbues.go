@@ -41,6 +41,7 @@ func (shaman *Shaman) ApplyWindfuryImbue(mh bool, oh bool) {
 			AbilityEffect: core.AbilityEffect{
 				DamageMultiplier:       1.0,
 				StaticDamageMultiplier: 1.0,
+				ThreatMultiplier:       1.0,
 				BonusAttackPower:       apBonus,
 			},
 			WeaponInput: core.WeaponDamageInput{
@@ -119,6 +120,7 @@ func (shaman *Shaman) ApplyFlametongueImbue(mh bool, oh bool) {
 			SpellEffect: core.SpellEffect{
 				DamageMultiplier:       1,
 				StaticDamageMultiplier: 1,
+				ThreatMultiplier:       1,
 			},
 			DirectInput: core.DirectDamageInput{
 				SpellCoefficient: 0.1,
@@ -194,6 +196,7 @@ func (shaman *Shaman) ApplyFrostbrandImbue(mh bool, oh bool) {
 			SpellEffect: core.SpellEffect{
 				DamageMultiplier:       1,
 				StaticDamageMultiplier: 1,
+				ThreatMultiplier:       1,
 			},
 			DirectInput: core.DirectDamageInput{
 				MinBaseDamage:    246,

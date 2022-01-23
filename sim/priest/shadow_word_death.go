@@ -30,6 +30,7 @@ func (priest *Priest) newShadowWordDeathTemplate(sim *core.Simulation) core.Simp
 		SpellEffect: core.SpellEffect{
 			DamageMultiplier:       1,
 			StaticDamageMultiplier: 1,
+			ThreatMultiplier:       1,
 		},
 		DirectInput: core.DirectDamageInput{
 			MinBaseDamage:    572,

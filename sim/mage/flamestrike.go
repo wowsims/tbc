@@ -39,6 +39,7 @@ func (mage *Mage) newFlamestrikeTemplate(sim *core.Simulation) core.SimpleSpellT
 		SpellEffect: core.SpellEffect{
 			DamageMultiplier:       1,
 			StaticDamageMultiplier: mage.spellDamageMultiplier,
+			ThreatMultiplier:       1 - 0.05*float64(mage.Talents.BurningSoul),
 		},
 		DirectInput: core.DirectDamageInput{
 			MinBaseDamage:    480,

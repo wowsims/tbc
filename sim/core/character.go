@@ -104,11 +104,9 @@ func NewCharacter(party *Party, partyIndex int, player proto.Player) Character {
 		Race:  player.Race,
 		Class: player.Class,
 		Equip: items.ProtoToEquipment(*player.Equipment),
-		PseudoStats: stats.PseudoStats{
-			AttackSpeedMultiplier: 1,
-			CastSpeedMultiplier:   1,
-			SpiritRegenMultiplier: 1,
-		},
+
+		PseudoStats: stats.NewPseudoStats(),
+
 		Party:      party,
 		PartyIndex: partyIndex,
 		RaidIndex:  party.Index*5 + partyIndex,

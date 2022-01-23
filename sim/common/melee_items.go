@@ -228,15 +228,16 @@ func ApplyDespair(agent core.Agent) {
 	templ := core.ActiveMeleeAbility{
 		MeleeAbility: core.MeleeAbility{
 			ActionID:        actionID,
-			CritMultiplier:  2.0,
+			CritMultiplier:  2,
 			Character:       character,
 			IgnoreCooldowns: true,
 			IgnoreCost:      true,
 		},
 		Effect: core.AbilityHitEffect{
 			AbilityEffect: core.AbilityEffect{
-				DamageMultiplier:       1.0,
-				StaticDamageMultiplier: 1.0,
+				DamageMultiplier:       1,
+				StaticDamageMultiplier: 1,
+				ThreatMultiplier:       1,
 			},
 			DirectInput: core.DirectDamageInput{
 				FlatDamageBonus: 600,
@@ -277,15 +278,16 @@ func ApplyTheDecapitator(agent core.Agent) {
 	templ := core.ActiveMeleeAbility{
 		MeleeAbility: core.MeleeAbility{
 			ActionID:        actionID,
-			CritMultiplier:  2.0,
+			CritMultiplier:  2,
 			Character:       character,
 			IgnoreCooldowns: true,
 			IgnoreCost:      true,
 		},
 		Effect: core.AbilityHitEffect{
 			AbilityEffect: core.AbilityEffect{
-				DamageMultiplier:       1.0,
-				StaticDamageMultiplier: 1.0,
+				DamageMultiplier:       1,
+				StaticDamageMultiplier: 1,
+				ThreatMultiplier:       1,
 			},
 			DirectInput: core.DirectDamageInput{
 				MinBaseDamage: 513,
@@ -350,6 +352,7 @@ func ApplyGlaiveOfThePit(agent core.Agent) {
 				SpellEffect: core.SpellEffect{
 					DamageMultiplier:       1,
 					StaticDamageMultiplier: 1,
+					ThreatMultiplier:       1,
 				},
 				DirectInput: core.DirectDamageInput{
 					MinBaseDamage: 285,

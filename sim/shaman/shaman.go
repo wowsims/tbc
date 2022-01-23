@@ -196,6 +196,8 @@ func (shaman *Shaman) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {
 		} else if shaman.Totems.WindfuryTotemRank == partyBuffs.WindfuryTotemRank {
 			partyBuffs.WindfuryTotemIwt = core.MaxInt32(partyBuffs.WindfuryTotemIwt, shaman.Talents.ImprovedWeaponTotems)
 		}
+	case proto.AirTotem_TranquilAirTotem:
+		partyBuffs.TranquilAirTotem = true
 	}
 
 	switch shaman.Totems.Earth {

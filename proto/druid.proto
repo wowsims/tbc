@@ -46,6 +46,7 @@ message DruidTalents {
     int32 naturalist = 33;
     int32 natural_shapeshifter = 34;
     int32 intensity = 35;
+    int32 subtlety = 40;
     bool omen_of_clarity = 36;
     bool natures_swiftness = 37;
     int32 living_spirit = 38;

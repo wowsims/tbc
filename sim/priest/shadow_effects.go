@@ -6,6 +6,7 @@ import (
 )
 
 func (priest *Priest) applyTalentsToShadowSpell(cast *core.Cast, effect *core.SpellHitEffect) {
+	effect.ThreatMultiplier *= 1 - 0.08*float64(priest.Talents.ShadowAffinity)
 	if cast.ActionID.SpellID == SpellIDShadowWordDeath || cast.ActionID.SpellID == SpellIDMindBlast {
 		effect.BonusSpellCritRating += float64(priest.Talents.ShadowPower) * 3 * core.SpellCritRatingPerCritChance
 	}

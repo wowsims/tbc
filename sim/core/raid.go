@@ -15,13 +15,13 @@ type Party struct {
 
 	PlayersAndPets []Agent // Cached list of players + pets, concatenated.
 
-	dpsMetrics DpsMetrics
+	dpsMetrics DistributionMetrics
 }
 
 func NewParty(index int, partyConfig proto.Party) *Party {
 	party := &Party{
 		Index:      index,
-		dpsMetrics: NewDpsMetrics(),
+		dpsMetrics: NewDistributionMetrics(),
 	}
 
 	for playerIndex, playerConfig := range partyConfig.Players {
@@ -78,7 +78,7 @@ func (party *Party) reset(sim *Simulation) {
 func (party *Party) doneIteration(simDuration time.Duration) {
 	for _, agent := range party.Players {
 		agent.GetCharacter().doneIteration(simDuration)
-		party.dpsMetrics.TotalDamage += agent.GetCharacter().Metrics.TotalDamage
+		party.dpsMetrics.Total += agent.GetCharacter().Metrics.dps.Total
 	}
 
 	party.dpsMetrics.doneIteration(simDuration.Seconds())
@@ -126,13 +126,13 @@ func (party *Party) GetStats() *proto.PartyStats {
 type Raid struct {
 	Parties []*Party
 
-	dpsMetrics DpsMetrics
+	dpsMetrics DistributionMetrics
 }
 
 // Makes a new raid.
 func NewRaid(raidConfig proto.Raid) *Raid {
 	raid := &Raid{
-		dpsMetrics: NewDpsMetrics(),
+		dpsMetrics: NewDistributionMetrics(),
 	}
 
 	for partyIndex, partyConfig := range raidConfig.Parties {
@@ -257,7 +257,7 @@ func (raid *Raid) reset(sim *Simulation) {
 func (raid *Raid) doneIteration(simDuration time.Duration) {
 	for _, party := range raid.Parties {
 		party.doneIteration(simDuration)
-		raid.dpsMetrics.TotalDamage += party.dpsMetrics.TotalDamage
+		raid.dpsMetrics.Total += party.dpsMetrics.Total
 	}
 
 	raid.dpsMetrics.doneIteration(simDuration.Seconds())
