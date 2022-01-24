@@ -43,6 +43,7 @@ func (mage *Mage) newBlizzardTemplate(sim *core.Simulation) core.SimpleSpellTemp
 	}
 
 	spell.ManaCost -= spell.BaseManaCost * float64(mage.Talents.FrostChanneling) * 0.05
+	spell.ManaCost *= 1 - float64(mage.Talents.ElementalPrecision)*0.01
 	baseEffect.BonusSpellHitRating += float64(mage.Talents.ElementalPrecision) * 1 * core.SpellHitRatingPerHitChance
 	baseEffect.StaticDamageMultiplier *= 1 + 0.02*float64(mage.Talents.PiercingIce)
 	baseEffect.StaticDamageMultiplier *= 1 + 0.01*float64(mage.Talents.ArcticWinds)
