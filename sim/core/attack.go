@@ -403,7 +403,7 @@ func (ability *ActiveMeleeAbility) Attack(sim *Simulation) bool {
 
 	if !ability.IgnoreCooldowns {
 		gcdCD := MaxDuration(ability.CalculatedGCD(ability.Character), ability.CastTime)
-		ability.Character.SetCD(GCDCooldownID, sim.CurrentTime+gcdCD)
+		ability.Character.SetGCDTimer(sim, sim.CurrentTime+gcdCD)
 
 		if ability.ActionID.CooldownID != 0 {
 			ability.Character.SetCD(ability.ActionID.CooldownID, sim.CurrentTime+ability.Cooldown)
@@ -640,8 +640,10 @@ func (aa *AutoAttacks) ModifySwingTime(sim *Simulation, amount float64) {
 		}
 	}
 
-	aa.autoSwingAction.Cancel(sim)
-	aa.resetAutoSwingAction(sim)
+	if aa.autoSwingAction != nil {
+		aa.autoSwingAction.Cancel(sim)
+		aa.resetAutoSwingAction(sim)
+	}
 }
 
 // Returns the time at which the next attack will occur.

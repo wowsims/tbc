@@ -105,6 +105,8 @@ type Shaman struct {
 
 	ElementalFocusStacks byte
 
+	WaitingForMana float64
+
 	// "object pool" for shaman spells that are currently being cast.
 	lightningBoltSpell   core.SimpleSpell
 	lightningBoltSpellLO core.SimpleSpell

@@ -27,10 +27,13 @@ type Agent interface {
 	// and once after the final iteration.
 	Reset(sim *Simulation)
 
+	// Called whenever the GCD becomes ready for this Agent.
 	OnGCDReady(sim *Simulation)
 
+	// Called after each mana tick, if this Agent uses mana.
 	OnManaTick(sim *Simulation)
 
+	// Called after each auto attack performed by this Agent.
 	OnAutoAttack(sim *Simulation)
 }
 

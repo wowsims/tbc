@@ -168,6 +168,7 @@ func (cast *Cast) startCasting(sim *Simulation, onCastComplete OnCastComplete) b
 
 		if cast.Character.AutoAttacks.IsEnabled() {
 			// Delay autoattacks until the cast is complete.
+			// TODO: reset aa PA.
 			cast.Character.AutoAttacks.MainhandSwingAt = MaxDuration(cast.Character.AutoAttacks.MainhandSwingAt, cast.Character.Hardcast.Expires)
 			cast.Character.AutoAttacks.OffhandSwingAt = MaxDuration(cast.Character.AutoAttacks.OffhandSwingAt, cast.Character.Hardcast.Expires)
 		}

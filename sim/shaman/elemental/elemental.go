@@ -64,8 +64,6 @@ type ElementalShaman struct {
 	*shaman.Shaman
 
 	rotation Rotation
-
-	waitingForMana float64
 }
 
 func (eleShaman *ElementalShaman) GetShaman() *shaman.Shaman {
@@ -79,7 +77,7 @@ func (eleShaman *ElementalShaman) GetPresimOptions() *core.PresimOptions {
 func (eleShaman *ElementalShaman) Reset(sim *core.Simulation) {
 	eleShaman.Shaman.Reset(sim)
 	eleShaman.rotation.Reset(eleShaman, sim)
-	eleShaman.waitingForMana = 0
+	eleShaman.WaitingForMana = 0
 }
 
 func (eleShaman *ElementalShaman) OnGCDReady(sim *core.Simulation) {
@@ -87,10 +85,10 @@ func (eleShaman *ElementalShaman) OnGCDReady(sim *core.Simulation) {
 }
 
 func (eleShaman *ElementalShaman) OnManaTick(sim *core.Simulation) {
-	if eleShaman.waitingForMana == 0 || eleShaman.CurrentMana() < eleShaman.waitingForMana {
+	if eleShaman.WaitingForMana == 0 || eleShaman.CurrentMana() < eleShaman.WaitingForMana {
 		return
 	}
-	eleShaman.waitingForMana = 0
+	eleShaman.WaitingForMana = 0
 	eleShaman.tryUseGCD(sim)
 }
 
@@ -108,7 +106,7 @@ func (eleShaman *ElementalShaman) tryUseGCD(sim *core.Simulation) {
 	} else {
 		// Only way for a shaman spell to fail is due to mana cost.
 		// Wait until we have enough mana to cast.
-		eleShaman.waitingForMana = newAction.GetManaCost()
+		eleShaman.WaitingForMana = newAction.GetManaCost()
 
 		//regenTime := eleShaman.TimeUntilManaRegen(newAction.GetManaCost())
 		//newAction = common.NewWaitAction(sim, eleShaman.GetCharacter(), regenTime, common.WaitReasonOOM)
