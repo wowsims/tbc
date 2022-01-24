@@ -83,7 +83,8 @@ var FullIndividualBuffs = &proto.IndividualBuffs{
 }
 
 var FullConsumes = &proto.Consumes{
-	Drums: proto.Drums_DrumsOfBattle,
+	Drums:         proto.Drums_DrumsOfBattle,
+	BattleChicken: true,
 }
 
 var NoDebuffTarget = &proto.Target{

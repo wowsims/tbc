@@ -224,6 +224,7 @@ message RaidBuffs {
 message PartyBuffs {
     int32 bloodlust = 1;
 		int32 ferocious_inspiration = 22; // Number of BM hunters in party.
+    int32 battle_chickens = 27;
 
     TristateEffect moonkin_aura = 2;
     TristateEffect leader_of_the_pack = 19;
@@ -257,6 +258,9 @@ message PartyBuffs {
 		int32 windfury_totem_iwt = 24;
 
     TristateEffect battle_shout = 18;
+		bool bs_solarian_sapphire = 28;
+		bool snapshot_bs_solarian_sapphire = 29;
+		bool snapshot_bs_t2 = 30;
 }
 
 enum StrengthOfEarthType {
@@ -329,6 +333,7 @@ message Consumes {
     Conjured default_conjured = 27;
 
 		Drums drums = 19;
+		bool battle_chicken = 34;
 }
 
 message Debuffs {
