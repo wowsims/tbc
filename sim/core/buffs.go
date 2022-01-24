@@ -622,6 +622,7 @@ func registerInnervateCD(agent Agent, numInnervates int32) {
 func AddInnervateAura(sim *Simulation, character *Character, expectedBonusManaReduction float64, actionTag int32) {
 	character.PseudoStats.ForceFullSpiritRegen = true
 	character.PseudoStats.SpiritRegenMultiplier *= 5.0
+	character.UpdateManaRegenRates()
 
 	lastUpdateTime := sim.CurrentTime
 	bonusManaSubtracted := 0.0
@@ -643,6 +644,7 @@ func AddInnervateAura(sim *Simulation, character *Character, expectedBonusManaRe
 		OnExpire: func(sim *Simulation) {
 			character.PseudoStats.ForceFullSpiritRegen = false
 			character.PseudoStats.SpiritRegenMultiplier /= 5.0
+			character.UpdateManaRegenRates()
 
 			remainder := expectedBonusManaReduction - bonusManaSubtracted
 			character.ExpectedBonusMana -= remainder

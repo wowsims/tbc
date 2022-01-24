@@ -40,9 +40,6 @@ type Character struct {
 	// effects from items / abilities.
 	initialStats stats.Stats
 
-	// Base mana regen rate while casting, without any temporary effects.
-	initialManaRegenPerSecondWhileCasting float64
-
 	// Cast speed without any temporary effects.
 	initialCastSpeed float64
 
@@ -103,6 +100,10 @@ type Character struct {
 	// Fields related to waiting for certain events to happen.
 	waitingForMana float64
 	waitStartTime  time.Duration
+
+	// Cached mana return values per tick.
+	manaTickWhileCasting    float64
+	manaTickWhileNotCasting float64
 }
 
 func NewCharacter(party *Party, partyIndex int, player proto.Player) Character {
@@ -213,6 +214,10 @@ func (character *Character) AddStat(stat stats.Stat, amount float64) {
 	}
 
 	character.stats[stat] += amount
+
+	if stat == stats.MP5 || stat == stats.Intellect || stat == stats.Spirit {
+		character.UpdateManaRegenRates()
+	}
 
 	if len(character.Pets) > 0 {
 		for _, petAgent := range character.Pets {
@@ -337,8 +342,6 @@ func (character *Character) Finalize() {
 	// All stats added up to this point are part of the 'initial' stats.
 	character.initialStats = character.stats
 	character.initialPseudoStats = character.PseudoStats
-
-	character.initialManaRegenPerSecondWhileCasting = character.ManaRegenPerSecondWhileCasting()
 	character.initialCastSpeed = character.CastSpeed()
 
 	character.auraTracker.finalize()
@@ -353,6 +356,7 @@ func (character *Character) reset(sim *Simulation, agent Agent) {
 	character.stats = character.initialStats
 	character.PseudoStats = character.initialPseudoStats
 	character.ExpectedBonusMana = 0
+	character.UpdateManaRegenRates()
 
 	character.energyBar.reset(sim)
 	character.rageBar.reset(sim)
