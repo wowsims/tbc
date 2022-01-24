@@ -227,7 +227,7 @@ func (at *auraTracker) reset(sim *Simulation) {
 	if at.useDebuffIDs {
 		at.auras = make([]Aura, numDebuffIDs)
 	} else {
-		at.auras = make([]Aura, numAuraIDs)
+		copy(at.auras, sim.emptyAuras)
 	}
 
 	at.cooldowns = make([]time.Duration, numCooldownIDs)
