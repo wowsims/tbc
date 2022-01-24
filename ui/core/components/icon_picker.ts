@@ -17,8 +17,11 @@ export interface IconPickerConfig<ModObject, ValueType> extends InputConfig<ModO
   // for a bi-state icon (on or off). 0 indicates an unlimited number of states.
   states: number;
 
-  // Only used if states == 3.
+  // Only used if states >= 3.
   improvedId?: ActionId;
+
+  // Only used if states >= 4.
+  improvedId2?: ActionId;
 };
 
 // Icon-based UI for picking buffs / consumes / etc
@@ -28,6 +31,7 @@ export class IconPicker<ModObject, ValueType> extends Input<ModObject, ValueType
 
   private readonly rootAnchor: HTMLAnchorElement;
   private readonly improvedAnchor: HTMLAnchorElement;
+  private readonly improvedAnchor2: HTMLAnchorElement;
   private readonly counterElem: HTMLElement;
 
 	private currentValue: number;
@@ -40,26 +44,37 @@ export class IconPicker<ModObject, ValueType> extends Input<ModObject, ValueType
 
     this.rootAnchor = this.rootElem as HTMLAnchorElement;
     this.rootAnchor.target = '_blank';
-    this.rootAnchor.dataset.states = String(this.config.states);
+		
+		const useImprovedIcons = Boolean(this.config.improvedId);
+		if (useImprovedIcons) {
+			this.rootAnchor.classList.add('use-improved-icons');
+		}
+		if (this.config.improvedId2) {
+			this.rootAnchor.classList.add('use-improved-icons2');
+		}
+		if (!useImprovedIcons && this.config.states > 2) {
+			this.rootAnchor.classList.add('use-counter');
+		}
 
     this.rootAnchor.innerHTML = `
     <div class="icon-input-level-container">
-      <a class="icon-input-improved"></a>
+      <a class="icon-input-improved icon-input-improved1"></a>
+      <a class="icon-input-improved icon-input-improved2"></a>
       <span class="icon-input-counter"></span>
     </div>
     `;
 
-    this.improvedAnchor = this.rootAnchor.getElementsByClassName('icon-input-improved')[0] as HTMLAnchorElement;
+    this.improvedAnchor = this.rootAnchor.getElementsByClassName('icon-input-improved1')[0] as HTMLAnchorElement;
+    this.improvedAnchor2 = this.rootAnchor.getElementsByClassName('icon-input-improved2')[0] as HTMLAnchorElement;
     this.counterElem = this.rootAnchor.getElementsByClassName('icon-input-counter')[0] as HTMLElement;
 
 		this.config.id.fillAndSet(this.rootAnchor, true, true);
 
-    if (this.config.states == 3) {
-      if (this.config.improvedId) {
-				this.config.improvedId.fillAndSet(this.improvedAnchor, true, true);
-      } else {
-        throw new Error('IconInput missing improved icon id');
-      }
+    if (this.config.states >= 3 && this.config.improvedId) {
+			this.config.improvedId.fillAndSet(this.improvedAnchor, true, true);
+    }
+    if (this.config.states >= 4 && this.config.improvedId2) {
+			this.config.improvedId2.fillAndSet(this.improvedAnchor2, true, true);
     }
 
 		this.init();
@@ -110,15 +125,22 @@ export class IconPicker<ModObject, ValueType> extends Input<ModObject, ValueType
       this.counterElem.classList.remove('active');
     }
 
-    if (this.config.states == 3) {
+    if (this.config.states >= 3 && this.config.improvedId) {
       if (this.currentValue > 1) {
         this.improvedAnchor.classList.add('active');
       } else {
         this.improvedAnchor.classList.remove('active');
       }
     }
+    if (this.config.states >= 4 && this.config.improvedId2) {
+      if (this.currentValue > 2) {
+        this.improvedAnchor2.classList.add('active');
+      } else {
+        this.improvedAnchor2.classList.remove('active');
+      }
+    }
 
-    if (this.config.states > 3 || this.config.states == 0) {
+    if (!this.config.improvedId && (this.config.states > 3 || this.config.states == 0)) {
       this.counterElem.textContent = String(this.currentValue);
     }
   }

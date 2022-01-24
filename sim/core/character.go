@@ -289,6 +289,9 @@ func (character *Character) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {
 	if character.consumes.Drums > 0 {
 		partyBuffs.Drums = character.consumes.Drums
 	}
+	if character.consumes.BattleChicken {
+		partyBuffs.BattleChickens++
+	}
 
 	if character.Equip[items.ItemSlotMainHand].ID == ItemIDAtieshMage {
 		partyBuffs.AtieshMage += 1

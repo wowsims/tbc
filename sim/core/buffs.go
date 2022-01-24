@@ -114,9 +114,26 @@ func applyBuffEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs proto.P
 		})
 	}
 
-	character.AddStats(stats.Stats{
-		stats.AttackPower: GetTristateValueFloat(partyBuffs.BattleShout, 306, 382.5),
-	})
+	if partyBuffs.BattleShout != proto.TristateEffect_TristateEffectMissing {
+		character.AddStats(stats.Stats{
+			stats.AttackPower: GetTristateValueFloat(partyBuffs.BattleShout, 306, 382.5),
+		})
+		if partyBuffs.BsSolarianSapphire {
+			partyBuffs.SnapshotBsSolarianSapphire = false
+			character.AddStats(stats.Stats{
+				stats.AttackPower: 70,
+			})
+		}
+
+		snapshotSapphire := partyBuffs.SnapshotBsSolarianSapphire
+		snapshotT2 := partyBuffs.SnapshotBsT2
+		if snapshotSapphire || snapshotT2 {
+			character.AddPermanentAuraWithOptions(PermanentAura{
+				AuraFactory:       SnapshotBattleShoutAura(character, snapshotSapphire, snapshotT2),
+				RespectExpiration: true,
+			})
+		}
+	}
 
 	if partyBuffs.TotemOfWrath > 0 {
 		character.AddStats(stats.Stats{
@@ -194,6 +211,12 @@ func applyBuffEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs proto.P
 	if partyBuffs.ChainOfTheTwilightOwl {
 		character.AddStats(stats.Stats{stats.SpellCrit: 2 * SpellCritRatingPerCritChance})
 	}
+	if partyBuffs.BattleChickens > 0 {
+		character.AddPermanentAuraWithOptions(PermanentAura{
+			AuraFactory:       BattleChickenAura(character, partyBuffs.BattleChickens),
+			RespectExpiration: true,
+		})
+	}
 }
 
 var SnapshotImprovedWrathOfAirTotemAuraID = NewAuraID()
@@ -201,6 +224,41 @@ var SnapshotImprovedWrathOfAirTotemAuraID = NewAuraID()
 func SnapshotImprovedWrathOfAirTotemAura(character *Character) AuraFactory {
 	return func(sim *Simulation) Aura {
 		return character.NewAuraWithTemporaryStats(sim, SnapshotImprovedWrathOfAirTotemAuraID, ActionID{SpellID: 37212}, stats.SpellPower, 20, time.Second*110)
+	}
+}
+
+var SnapshotBattleShoutAuraID = NewAuraID()
+
+func SnapshotBattleShoutAura(character *Character, snapshotSapphire bool, snapshotT2 bool) AuraFactory {
+	bonus := 0.0
+	if snapshotSapphire {
+		bonus += 70
+	}
+	if snapshotT2 {
+		bonus += 30
+	}
+
+	return func(sim *Simulation) Aura {
+		return character.NewAuraWithTemporaryStats(sim, SnapshotBattleShoutAuraID, ActionID{ItemID: 30446}, stats.AttackPower, bonus, time.Second*110)
+	}
+}
+
+var BattleChickenAuraID = NewAuraID()
+
+func BattleChickenAura(character *Character, numChickens int32) AuraFactory {
+	bonus := math.Pow(1.05, float64(numChickens))
+	inverseBonus := 1 / bonus
+
+	return func(sim *Simulation) Aura {
+		character.MultiplyMeleeSpeed(sim, bonus)
+
+		return Aura{
+			ID:      BattleChickenAuraID,
+			Expires: sim.CurrentTime + time.Minute*4,
+			OnExpire: func(sim *Simulation) {
+				character.MultiplyMeleeSpeed(sim, inverseBonus)
+			},
+		}
 	}
 }
 

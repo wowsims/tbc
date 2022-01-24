@@ -124,6 +124,7 @@ export class EnhancementShamanSimUI extends IndividualSimUI<Spec.SpecEnhancement
 				ShamanInputs.IconBloodlust,
 				IconInputs.DrumsOfBattleConsume,
 				IconInputs.DrumsOfRestorationConsume,
+				IconInputs.BattleChicken,
 			],
 			// IconInputs to include in the 'Other Buffs' section on the settings tab.
 			raidBuffInputs: [
@@ -141,6 +142,7 @@ export class EnhancementShamanSimUI extends IndividualSimUI<Spec.SpecEnhancement
 				IconInputs.TrueshotAura,
 				IconInputs.SanctityAura,
 				IconInputs.BraidedEterniumChain,
+				IconInputs.BattleChickens,
 			],
 			playerBuffInputs: [
 				IconInputs.BlessingOfKings,
@@ -186,6 +188,8 @@ export class EnhancementShamanSimUI extends IndividualSimUI<Spec.SpecEnhancement
 					OtherInputs.NumStartingPotions,
 					OtherInputs.ExposeWeaknessUptime,
 					OtherInputs.ExposeWeaknessHunterAgility,
+					OtherInputs.SnapshotBsSolarianSapphire,
+					OtherInputs.SnapshotBsT2,
 				],
 			},
 			customSections: [
