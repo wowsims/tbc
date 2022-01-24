@@ -38,6 +38,10 @@ export interface PartyBuffs {
      */
     ferociousInspiration: number;
     /**
+     * @generated from protobuf field: int32 battle_chickens = 27;
+     */
+    battleChickens: number;
+    /**
      * @generated from protobuf field: proto.TristateEffect moonkin_aura = 2;
      */
     moonkinAura: TristateEffect;
@@ -139,6 +143,18 @@ export interface PartyBuffs {
      * @generated from protobuf field: proto.TristateEffect battle_shout = 18;
      */
     battleShout: TristateEffect;
+    /**
+     * @generated from protobuf field: bool bs_solarian_sapphire = 28;
+     */
+    bsSolarianSapphire: boolean;
+    /**
+     * @generated from protobuf field: bool snapshot_bs_solarian_sapphire = 29;
+     */
+    snapshotBsSolarianSapphire: boolean;
+    /**
+     * @generated from protobuf field: bool snapshot_bs_t2 = 30;
+     */
+    snapshotBsT2: boolean;
 }
 /**
  * Buffs are only used by individual sims, never the raid sim.
@@ -321,6 +337,10 @@ export interface Consumes {
      * @generated from protobuf field: proto.Drums drums = 19;
      */
     drums: Drums;
+    /**
+     * @generated from protobuf field: bool battle_chicken = 34;
+     */
+    battleChicken: boolean;
 }
 /**
  * @generated from protobuf message proto.Debuffs

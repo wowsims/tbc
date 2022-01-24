@@ -13,6 +13,7 @@ export const GiftOfTheWild = makeTristateRaidBuffInput(ActionId.fromSpellId(2699
 // Party Buffs
 export const AtieshMage = makeMultistatePartyBuffInput(ActionId.fromSpellId(28142), 5, 'atieshMage');
 export const AtieshWarlock = makeMultistatePartyBuffInput(ActionId.fromSpellId(28143), 5, 'atieshWarlock');
+export const BattleChickens = makeMultistatePartyBuffInput(ActionId.fromItemId(10725), 5, 'battleChickens');
 export const Bloodlust = makeMultistatePartyBuffInput(ActionId.fromSpellId(2825), 11, 'bloodlust');
 export const BraidedEterniumChain = makeBooleanPartyBuffInput(ActionId.fromSpellId(31025), 'braidedEterniumChain');
 export const ChainOfTheTwilightOwl = makeBooleanPartyBuffInput(ActionId.fromSpellId(31035), 'chainOfTheTwilightOwl');
@@ -29,7 +30,6 @@ export const SanctityAura = makeTristatePartyBuffInput(ActionId.fromSpellId(2021
 export const TotemOfWrath = makeMultistatePartyBuffInput(ActionId.fromSpellId(30706), 5, 'totemOfWrath');
 export const TrueshotAura = makeBooleanPartyBuffInput(ActionId.fromSpellId(27066), 'trueshotAura');
 export const WrathOfAirTotem = makeTristatePartyBuffInput(ActionId.fromSpellId(3738), ActionId.fromSpellId(37212), 'wrathOfAirTotem');
-export const BattleShout = makeTristatePartyBuffInput(ActionId.fromSpellId(2048), ActionId.fromSpellId(12861), 'battleShout');
 export const DrumsOfBattleBuff = makeEnumValuePartyBuffInput(ActionId.fromSpellId(35476), 'drums', Drums.DrumsOfBattle, ['Drums']);
 export const DrumsOfRestorationBuff = makeEnumValuePartyBuffInput(ActionId.fromSpellId(35478), 'drums', Drums.DrumsOfRestoration, ['Drums']);
 // Individual Buffs
@@ -53,6 +53,7 @@ export const SunderArmor = makeBooleanDebuffInput(ActionId.fromSpellId(25225), '
 export const WintersChill = makeBooleanDebuffInput(ActionId.fromSpellId(28595), 'wintersChill');
 // Consumes
 export const AdeptsElixir = makeBooleanConsumeInput(ActionId.fromItemId(28103), 'adeptsElixir', ['Battle Elixir']);
+export const BattleChicken = makeBooleanConsumeInput(ActionId.fromItemId(10725), 'battleChicken');
 export const BlackenedBasilisk = makeBooleanConsumeInput(ActionId.fromItemId(27657), 'blackenedBasilisk', ['Food']);
 export const ElixirOfDemonslaying = makeBooleanConsumeInput(ActionId.fromItemId(9224), 'elixirOfDemonslaying', ['Battle Elixir']);
 export const ElixirOfDraenicWisdom = makeBooleanConsumeInput(ActionId.fromItemId(32067), 'elixirOfDraenicWisdom', ['Guardian Elixir']);
@@ -320,16 +321,14 @@ export const WindfuryTotem = {
     changedEvent: (party) => party.buffsChangeEmitter,
     getValue: (party) => {
         const buffs = party.getBuffs();
-        if (buffs.windfuryTotemRank > 0) {
-            if (buffs.windfuryTotemIwt > 0) {
-                return 2;
-            }
-            else {
-                return 1;
-            }
+        if (buffs.windfuryTotemRank == 0) {
+            return 0;
+        }
+        if (buffs.windfuryTotemIwt > 0) {
+            return 2;
         }
         else {
-            return 0;
+            return 1;
         }
     },
     setValue: (eventID, party, newValue) => {
@@ -347,6 +346,28 @@ export const WindfuryTotem = {
                 newBuffs.windfuryTotemIwt = 0;
             }
         }
+        party.setBuffs(eventID, newBuffs);
+    },
+};
+export const BattleShout = {
+    id: ActionId.fromSpellId(2048),
+    states: 4,
+    improvedId: ActionId.fromSpellId(12861),
+    improvedId2: ActionId.fromItemId(30446),
+    changedEvent: (party) => party.buffsChangeEmitter,
+    getValue: (party) => {
+        const buffs = party.getBuffs();
+        if (buffs.battleShout == TristateEffect.TristateEffectImproved) {
+            return buffs.battleShout + Number(buffs.bsSolarianSapphire);
+        }
+        else {
+            return buffs.battleShout;
+        }
+    },
+    setValue: (eventID, party, newValue) => {
+        const newBuffs = party.getBuffs();
+        newBuffs.battleShout = Math.min(2, newValue);
+        newBuffs.bsSolarianSapphire = newValue == 3;
         party.setBuffs(eventID, newBuffs);
     },
 };

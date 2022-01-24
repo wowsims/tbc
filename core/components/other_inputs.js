@@ -157,3 +157,43 @@ export const SnapshotImprovedWrathOfAirTotem = {
         enableWhen: (party) => party.getBuffs().wrathOfAirTotem == TristateEffect.TristateEffectRegular,
     },
 };
+export const SnapshotBsSolarianSapphire = {
+    type: 'boolean',
+    getModObject: (simUI) => simUI.player.getParty(),
+    config: {
+        extraCssClasses: [
+            'snapshot-bs-solarian-sapphire-picker',
+            'within-raid-sim-hide',
+        ],
+        label: 'Snapshot BS Solarian\'s Sapphire',
+        labelTooltip: 'A Warrior in your party is snapshotting their Battle Shout before combat, using the bonus from Solarian\'s Sapphire (+70 attack power) for the first 1:50s of the fight.',
+        changedEvent: (party) => party.buffsChangeEmitter,
+        getValue: (party) => party.getBuffs().snapshotBsSolarianSapphire,
+        setValue: (eventID, party, newValue) => {
+            const buffs = party.getBuffs();
+            buffs.snapshotBsSolarianSapphire = newValue;
+            party.setBuffs(eventID, buffs);
+        },
+        enableWhen: (party) => party.getBuffs().battleShout > 0 && !party.getBuffs().bsSolarianSapphire,
+    },
+};
+export const SnapshotBsT2 = {
+    type: 'boolean',
+    getModObject: (simUI) => simUI.player.getParty(),
+    config: {
+        extraCssClasses: [
+            'snapshot-bs-t2-picker',
+            'within-raid-sim-hide',
+        ],
+        label: 'Snapshot BS T2',
+        labelTooltip: 'A Warrior in your party is snapshotting their Battle Shout before combat, using the bonus from T2 3pc (+30 attack power) for the first 1:50s of the fight.',
+        changedEvent: (party) => party.buffsChangeEmitter,
+        getValue: (party) => party.getBuffs().snapshotBsT2,
+        setValue: (eventID, party, newValue) => {
+            const buffs = party.getBuffs();
+            buffs.snapshotBsT2 = newValue;
+            party.setBuffs(eventID, buffs);
+        },
+        enableWhen: (party) => party.getBuffs().battleShout > 0,
+    },
+};

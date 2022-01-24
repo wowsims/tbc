@@ -921,6 +921,7 @@ class PartyBuffs$Type extends MessageType {
         super("proto.PartyBuffs", [
             { no: 1, name: "bloodlust", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 22, name: "ferocious_inspiration", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 27, name: "battle_chickens", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 2, name: "moonkin_aura", kind: "enum", T: () => ["proto.TristateEffect", TristateEffect] },
             { no: 19, name: "leader_of_the_pack", kind: "enum", T: () => ["proto.TristateEffect", TristateEffect] },
             { no: 20, name: "sanctity_aura", kind: "enum", T: () => ["proto.TristateEffect", TristateEffect] },
@@ -944,11 +945,14 @@ class PartyBuffs$Type extends MessageType {
             { no: 26, name: "tranquil_air_totem", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 23, name: "windfury_totem_rank", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 24, name: "windfury_totem_iwt", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
-            { no: 18, name: "battle_shout", kind: "enum", T: () => ["proto.TristateEffect", TristateEffect] }
+            { no: 18, name: "battle_shout", kind: "enum", T: () => ["proto.TristateEffect", TristateEffect] },
+            { no: 28, name: "bs_solarian_sapphire", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 29, name: "snapshot_bs_solarian_sapphire", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 30, name: "snapshot_bs_t2", kind: "scalar", T: 8 /*ScalarType.BOOL*/ }
         ]);
     }
     create(value) {
-        const message = { bloodlust: 0, ferociousInspiration: 0, moonkinAura: 0, leaderOfThePack: 0, sanctityAura: 0, trueshotAura: false, draeneiRacialMelee: false, draeneiRacialCaster: false, drums: 0, atieshMage: 0, atieshWarlock: 0, braidedEterniumChain: false, eyeOfTheNight: false, chainOfTheTwilightOwl: false, jadePendantOfBlasting: false, manaSpringTotem: 0, manaTideTotems: 0, totemOfWrath: 0, wrathOfAirTotem: 0, snapshotImprovedWrathOfAirTotem: false, graceOfAirTotem: 0, strengthOfEarthTotem: 0, tranquilAirTotem: false, windfuryTotemRank: 0, windfuryTotemIwt: 0, battleShout: 0 };
+        const message = { bloodlust: 0, ferociousInspiration: 0, battleChickens: 0, moonkinAura: 0, leaderOfThePack: 0, sanctityAura: 0, trueshotAura: false, draeneiRacialMelee: false, draeneiRacialCaster: false, drums: 0, atieshMage: 0, atieshWarlock: 0, braidedEterniumChain: false, eyeOfTheNight: false, chainOfTheTwilightOwl: false, jadePendantOfBlasting: false, manaSpringTotem: 0, manaTideTotems: 0, totemOfWrath: 0, wrathOfAirTotem: 0, snapshotImprovedWrathOfAirTotem: false, graceOfAirTotem: 0, strengthOfEarthTotem: 0, tranquilAirTotem: false, windfuryTotemRank: 0, windfuryTotemIwt: 0, battleShout: 0, bsSolarianSapphire: false, snapshotBsSolarianSapphire: false, snapshotBsT2: false };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -964,6 +968,9 @@ class PartyBuffs$Type extends MessageType {
                     break;
                 case /* int32 ferocious_inspiration */ 22:
                     message.ferociousInspiration = reader.int32();
+                    break;
+                case /* int32 battle_chickens */ 27:
+                    message.battleChickens = reader.int32();
                     break;
                 case /* proto.TristateEffect moonkin_aura */ 2:
                     message.moonkinAura = reader.int32();
@@ -1037,6 +1044,15 @@ class PartyBuffs$Type extends MessageType {
                 case /* proto.TristateEffect battle_shout */ 18:
                     message.battleShout = reader.int32();
                     break;
+                case /* bool bs_solarian_sapphire */ 28:
+                    message.bsSolarianSapphire = reader.bool();
+                    break;
+                case /* bool snapshot_bs_solarian_sapphire */ 29:
+                    message.snapshotBsSolarianSapphire = reader.bool();
+                    break;
+                case /* bool snapshot_bs_t2 */ 30:
+                    message.snapshotBsT2 = reader.bool();
+                    break;
                 default:
                     let u = options.readUnknownField;
                     if (u === "throw")
@@ -1055,6 +1071,9 @@ class PartyBuffs$Type extends MessageType {
         /* int32 ferocious_inspiration = 22; */
         if (message.ferociousInspiration !== 0)
             writer.tag(22, WireType.Varint).int32(message.ferociousInspiration);
+        /* int32 battle_chickens = 27; */
+        if (message.battleChickens !== 0)
+            writer.tag(27, WireType.Varint).int32(message.battleChickens);
         /* proto.TristateEffect moonkin_aura = 2; */
         if (message.moonkinAura !== 0)
             writer.tag(2, WireType.Varint).int32(message.moonkinAura);
@@ -1127,6 +1146,15 @@ class PartyBuffs$Type extends MessageType {
         /* proto.TristateEffect battle_shout = 18; */
         if (message.battleShout !== 0)
             writer.tag(18, WireType.Varint).int32(message.battleShout);
+        /* bool bs_solarian_sapphire = 28; */
+        if (message.bsSolarianSapphire !== false)
+            writer.tag(28, WireType.Varint).bool(message.bsSolarianSapphire);
+        /* bool snapshot_bs_solarian_sapphire = 29; */
+        if (message.snapshotBsSolarianSapphire !== false)
+            writer.tag(29, WireType.Varint).bool(message.snapshotBsSolarianSapphire);
+        /* bool snapshot_bs_t2 = 30; */
+        if (message.snapshotBsT2 !== false)
+            writer.tag(30, WireType.Varint).bool(message.snapshotBsT2);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -1269,11 +1297,12 @@ class Consumes$Type extends MessageType {
             { no: 17, name: "num_starting_potions", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 18, name: "dark_rune", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 27, name: "default_conjured", kind: "enum", T: () => ["proto.Conjured", Conjured] },
-            { no: 19, name: "drums", kind: "enum", T: () => ["proto.Drums", Drums] }
+            { no: 19, name: "drums", kind: "enum", T: () => ["proto.Drums", Drums] },
+            { no: 34, name: "battle_chicken", kind: "scalar", T: 8 /*ScalarType.BOOL*/ }
         ]);
     }
     create(value) {
-        const message = { flaskOfBlindingLight: false, flaskOfMightyRestoration: false, flaskOfPureDeath: false, flaskOfSupremePower: false, flaskOfRelentlessAssault: false, adeptsElixir: false, elixirOfMajorFirePower: false, elixirOfMajorFrostPower: false, elixirOfMajorShadowPower: false, elixirOfDraenicWisdom: false, elixirOfMajorMageblood: false, elixirOfMajorAgility: false, elixirOfMajorStrength: false, elixirOfDemonslaying: false, elixirOfTheMongoose: false, brilliantWizardOil: false, superiorWizardOil: false, mainHandImbue: 0, offHandImbue: 0, blackenedBasilisk: false, skullfishSoup: false, roastedClefthoof: false, spicyHotTalbuk: false, kreegsStoutBeatdown: false, scrollOfStrengthV: false, scrollOfAgilityV: false, scrollOfSpiritV: false, defaultPotion: 0, startingPotion: 0, numStartingPotions: 0, darkRune: false, defaultConjured: 0, drums: 0 };
+        const message = { flaskOfBlindingLight: false, flaskOfMightyRestoration: false, flaskOfPureDeath: false, flaskOfSupremePower: false, flaskOfRelentlessAssault: false, adeptsElixir: false, elixirOfMajorFirePower: false, elixirOfMajorFrostPower: false, elixirOfMajorShadowPower: false, elixirOfDraenicWisdom: false, elixirOfMajorMageblood: false, elixirOfMajorAgility: false, elixirOfMajorStrength: false, elixirOfDemonslaying: false, elixirOfTheMongoose: false, brilliantWizardOil: false, superiorWizardOil: false, mainHandImbue: 0, offHandImbue: 0, blackenedBasilisk: false, skullfishSoup: false, roastedClefthoof: false, spicyHotTalbuk: false, kreegsStoutBeatdown: false, scrollOfStrengthV: false, scrollOfAgilityV: false, scrollOfSpiritV: false, defaultPotion: 0, startingPotion: 0, numStartingPotions: 0, darkRune: false, defaultConjured: 0, drums: 0, battleChicken: false };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -1382,6 +1411,9 @@ class Consumes$Type extends MessageType {
                     break;
                 case /* proto.Drums drums */ 19:
                     message.drums = reader.int32();
+                    break;
+                case /* bool battle_chicken */ 34:
+                    message.battleChicken = reader.bool();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -1494,6 +1526,9 @@ class Consumes$Type extends MessageType {
         /* proto.Drums drums = 19; */
         if (message.drums !== 0)
             writer.tag(19, WireType.Varint).int32(message.drums);
+        /* bool battle_chicken = 34; */
+        if (message.battleChicken !== false)
+            writer.tag(34, WireType.Varint).bool(message.battleChicken);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

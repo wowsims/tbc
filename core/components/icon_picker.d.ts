@@ -4,11 +4,13 @@ export interface IconPickerConfig<ModObject, ValueType> extends InputConfig<ModO
     id: ActionId;
     states: number;
     improvedId?: ActionId;
+    improvedId2?: ActionId;
 }
 export declare class IconPicker<ModObject, ValueType> extends Input<ModObject, ValueType> {
     private readonly config;
     private readonly rootAnchor;
     private readonly improvedAnchor;
+    private readonly improvedAnchor2;
     private readonly counterElem;
     private currentValue;
     constructor(parent: HTMLElement, modObj: ModObject, config: IconPickerConfig<ModObject, ValueType>);
