@@ -87,8 +87,8 @@ func (pet *Pet) Finalize() {
 	pet.Character.Finalize()
 }
 
-func (pet *Pet) reset(sim *Simulation) {
-	pet.Character.reset(sim)
+func (pet *Pet) reset(sim *Simulation, agent Agent) {
+	pet.Character.reset(sim, agent)
 	pet.pendingAction = nil
 	pet.enabled = false
 }
@@ -109,8 +109,9 @@ func (pet *Pet) Enable(sim *Simulation, petAgent PetAgent) {
 		return
 	}
 
-	pet.pendingAction = sim.newDefaultAgentAction(petAgent)
-	sim.AddPendingAction(pet.pendingAction)
+	//pet.pendingAction = sim.newDefaultAgentAction(petAgent)
+	pet.SetGCDTimer(sim, sim.CurrentTime)
+	//sim.AddPendingAction(pet.pendingAction)
 
 	pet.enabled = true
 

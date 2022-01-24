@@ -96,6 +96,9 @@ type Character struct {
 	// a MH imbue.
 	// TODO: Figure out a cleaner way to do this.
 	HasMHWeaponImbue bool
+
+	// The PendingAction tracking this character's GCD.
+	gcdAction *PendingAction
 }
 
 func NewCharacter(party *Party, partyIndex int, player proto.Player) Character {
@@ -342,7 +345,7 @@ func (character *Character) Finalize() {
 	}
 }
 
-func (character *Character) reset(sim *Simulation) {
+func (character *Character) reset(sim *Simulation, agent Agent) {
 	character.stats = character.initialStats
 	character.PseudoStats = character.initialPseudoStats
 	character.ExpectedBonusMana = 0
@@ -356,9 +359,26 @@ func (character *Character) reset(sim *Simulation) {
 	character.Metrics.reset()
 
 	for _, petAgent := range character.Pets {
-		petAgent.GetPet().reset(sim)
+		petAgent.GetPet().reset(sim, petAgent)
 		petAgent.Reset(sim)
 	}
+
+	character.gcdAction = &PendingAction{
+		Name: "Agent GCD",
+		OnAction: func(sim *Simulation) {
+			character := agent.GetCharacter()
+			character.TryUseCooldowns(sim)
+			if !character.IsOnCD(GCDCooldownID, sim.CurrentTime) {
+				agent.OnGCDReady(sim)
+			}
+		},
+	}
+}
+
+func (character *Character) SetGCDTimer(sim *Simulation, gcdReadyAt time.Duration) {
+	character.SetCD(GCDCooldownID, gcdReadyAt)
+	character.gcdAction.NextActionAt = gcdReadyAt
+	sim.AddPendingAction(character.gcdAction)
 }
 
 // Advance moves time forward counting down auras, CDs, mana regen, etc
@@ -374,7 +394,6 @@ func (character *Character) advance(sim *Simulation, elapsedTime time.Duration) 
 	if len(character.Pets) > 0 {
 		for _, petAgent := range character.Pets {
 			petAgent.GetPet().advance(sim, elapsedTime)
-			petAgent.Advance(sim, elapsedTime)
 		}
 	}
 }
@@ -463,8 +482,8 @@ func (character *Character) GetMetricsProto(numIterations int32) *proto.PlayerMe
 	return metrics
 }
 
-func (character *Character) EnableAutoAttacks(delayOHSwings bool) {
-	character.AutoAttacks = NewAutoAttacks(character, delayOHSwings)
+func (character *Character) EnableAutoAttacks(agent Agent, delayOHSwings bool) {
+	character.AutoAttacks = NewAutoAttacks(agent, delayOHSwings)
 }
 
 type BaseStatsKey struct {

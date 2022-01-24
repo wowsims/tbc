@@ -450,6 +450,7 @@ func (ahe *AbilityHitEffect) performAttack(sim *Simulation, ability *ActiveMelee
 
 type AutoAttacks struct {
 	// initialized
+	agent     Agent
 	character *Character
 	MH        Weapon
 	OH        Weapon
@@ -470,10 +471,16 @@ type AutoAttacks struct {
 
 	// The time at which the last MH swing occurred.
 	previousMHSwingAt time.Duration
+
+	// PendingAction which handles auto attacks.
+	autoSwingAction *PendingAction
 }
 
-func NewAutoAttacks(c *Character, delayOHSwings bool) AutoAttacks {
+func NewAutoAttacks(agent Agent, delayOHSwings bool) AutoAttacks {
+	c := agent.GetCharacter()
+
 	aa := AutoAttacks{
+		agent:         agent,
 		character:     c,
 		DelayOHSwings: delayOHSwings,
 		ActiveMeleeAbility: ActiveMeleeAbility{
@@ -523,6 +530,9 @@ func (aa *AutoAttacks) IsEnabled() bool {
 	return aa.MH.SwingSpeed != 0
 }
 
+// Empty handler so Agents don't have to provide one if they have no logic to add.
+func (character *Character) OnAutoAttack(sim *Simulation) {}
+
 func (aa *AutoAttacks) reset(sim *Simulation) {
 	if !aa.IsEnabled() {
 		return
@@ -544,6 +554,28 @@ func (aa *AutoAttacks) reset(sim *Simulation) {
 	} else {
 		aa.OffhandSwingAt = delay
 	}
+
+	aa.resetAutoSwingAction(sim)
+}
+
+func (aa *AutoAttacks) resetAutoSwingAction(sim *Simulation) {
+	pa := &PendingAction{
+		Name:         "AutoAttacks",
+		Priority:     -1, // Give lower priority so that auto attacks always happen before player actions.
+		NextActionAt: 0,  // First auto is always at 0
+	}
+	pa.OnAction = func(sim *Simulation) {
+		aa.Swing(sim, sim.GetPrimaryTarget())
+		aa.agent.OnAutoAttack(sim)
+
+		// Cancelled means we made a new one because of a swing speed change.
+		if !pa.cancelled {
+			pa.NextActionAt = aa.NextAttackAt()
+			sim.AddPendingAction(pa)
+		}
+	}
+	aa.autoSwingAction = pa
+	sim.AddPendingAction(pa)
 }
 
 func (aa *AutoAttacks) MainhandSwingSpeed() time.Duration {
@@ -589,24 +621,27 @@ func (aa *AutoAttacks) Swing(sim *Simulation, target *Target) {
 }
 
 func (aa *AutoAttacks) ModifySwingTime(sim *Simulation, amount float64) {
-	if aa.MH.SwingSpeed == 0 {
+	if !aa.IsEnabled() {
 		return
 	}
+
 	mhSwingTime := aa.MainhandSwingAt - sim.CurrentTime
 	if mhSwingTime > 0 {
 		aa.MainhandSwingAt = sim.CurrentTime + time.Duration(float64(mhSwingTime)/amount)
 	}
 
-	if aa.OH.SwingSpeed == 0 {
-		return
-	}
-	ohSwingTime := aa.OffhandSwingAt - sim.CurrentTime
-	if ohSwingTime > 0 {
-		newTime := time.Duration(float64(ohSwingTime) / amount)
-		if newTime > 0 {
-			aa.OffhandSwingAt = sim.CurrentTime + newTime
+	if aa.OH.SwingSpeed != 0 {
+		ohSwingTime := aa.OffhandSwingAt - sim.CurrentTime
+		if ohSwingTime > 0 {
+			newTime := time.Duration(float64(ohSwingTime) / amount)
+			if newTime > 0 {
+				aa.OffhandSwingAt = sim.CurrentTime + newTime
+			}
 		}
 	}
+
+	aa.autoSwingAction.Cancel(sim)
+	aa.resetAutoSwingAction(sim)
 }
 
 // Returns the time at which the next attack will occur.

@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"reflect"
 	"strings"
-	"time"
 
 	"github.com/wowsims/tbc/sim/core/proto"
 )
@@ -28,15 +27,11 @@ type Agent interface {
 	// and once after the final iteration.
 	Reset(sim *Simulation)
 
-	// Allows the Agent to take whatever actions it wants to. This is called by
-	// the main event loop. The return value determines when the main event loop
-	// will call this again; it will call Act() at the time specified by the return
-	// value.
-	Act(sim *Simulation) time.Duration
+	OnGCDReady(sim *Simulation)
 
-	// Called after sim.CurrentTime is changed. Use this function to calculate
-	// mana/energy regen, cooldown changes, etc.
-	Advance(sim *Simulation, elapsedTime time.Duration)
+	OnManaTick(sim *Simulation)
+
+	OnAutoAttack(sim *Simulation)
 }
 
 type ActionID struct {

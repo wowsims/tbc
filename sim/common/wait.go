@@ -69,6 +69,7 @@ func (action WaitAction) Cast(sim *core.Simulation) bool {
 			action.character.Log(sim, "Waiting for %s because its more dps.", action.GetDuration())
 		}
 	}
+	action.character.SetGCDTimer(sim, sim.CurrentTime+action.GetDuration())
 
 	return true
 }

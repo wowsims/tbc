@@ -153,7 +153,7 @@ func (cast *Cast) startCasting(sim *Simulation, onCastComplete OnCastComplete) b
 	if !cast.IgnoreCooldowns {
 		// Prevent any actions on the GCD until the cast AND the GCD are done.
 		gcdCD := MaxDuration(cast.CalculatedGCD(cast.Character), cast.CastTime)
-		cast.Character.SetCD(GCDCooldownID, sim.CurrentTime+gcdCD)
+		cast.Character.SetGCDTimer(sim, sim.CurrentTime+gcdCD)
 	}
 
 	// For instant-cast spells we can skip creating an aura.

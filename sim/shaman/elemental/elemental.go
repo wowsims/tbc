@@ -64,6 +64,8 @@ type ElementalShaman struct {
 	*shaman.Shaman
 
 	rotation Rotation
+
+	waitingForMana float64
 }
 
 func (eleShaman *ElementalShaman) GetShaman() *shaman.Shaman {
@@ -77,37 +79,41 @@ func (eleShaman *ElementalShaman) GetPresimOptions() *core.PresimOptions {
 func (eleShaman *ElementalShaman) Reset(sim *core.Simulation) {
 	eleShaman.Shaman.Reset(sim)
 	eleShaman.rotation.Reset(eleShaman, sim)
+	eleShaman.waitingForMana = 0
 }
 
-func (eleShaman *ElementalShaman) Act(sim *core.Simulation) time.Duration {
-	// If a major cooldown uses the GCD, it might already be on CD when Act() is called.
-	if eleShaman.IsOnCD(core.GCDCooldownID, sim.CurrentTime) {
-		return sim.CurrentTime + eleShaman.GetRemainingCD(core.GCDCooldownID, sim.CurrentTime)
+func (eleShaman *ElementalShaman) OnGCDReady(sim *core.Simulation) {
+	eleShaman.tryUseGCD(sim)
+}
+
+func (eleShaman *ElementalShaman) OnManaTick(sim *core.Simulation) {
+	if eleShaman.waitingForMana == 0 || eleShaman.CurrentMana() < eleShaman.waitingForMana {
+		return
+	}
+	eleShaman.waitingForMana = 0
+	eleShaman.tryUseGCD(sim)
+}
+
+func (eleShaman *ElementalShaman) tryUseGCD(sim *core.Simulation) {
+	dropSuccess := eleShaman.TryDropTotems(sim)
+	if dropSuccess {
+		//eleShaman.Metrics.MarkOOM(sim, &eleShaman.Character, dropTime-sim.CurrentTime)
+		return
 	}
 
-	dropTime, dropSuccess := eleShaman.TryDropTotems(sim)
-	if dropTime > 0 {
-		if !dropSuccess {
-			eleShaman.Metrics.MarkOOM(sim, &eleShaman.Character, dropTime-sim.CurrentTime)
-		}
-		return dropTime
-	}
 	newAction := eleShaman.rotation.ChooseAction(eleShaman, sim)
-
 	actionSuccessful := newAction.Cast(sim)
 	if actionSuccessful {
 		eleShaman.rotation.OnActionAccepted(eleShaman, sim, newAction)
-		return sim.CurrentTime + core.MaxDuration(
-			eleShaman.GetRemainingCD(core.GCDCooldownID, sim.CurrentTime),
-			newAction.GetDuration())
 	} else {
 		// Only way for a shaman spell to fail is due to mana cost.
 		// Wait until we have enough mana to cast.
-		regenTime := eleShaman.TimeUntilManaRegen(newAction.GetManaCost())
-		newAction = common.NewWaitAction(sim, eleShaman.GetCharacter(), regenTime, common.WaitReasonOOM)
-		newAction.Cast(sim)
-		eleShaman.rotation.OnActionAccepted(eleShaman, sim, newAction)
-		return sim.CurrentTime + newAction.GetDuration()
+		eleShaman.waitingForMana = newAction.GetManaCost()
+
+		//regenTime := eleShaman.TimeUntilManaRegen(newAction.GetManaCost())
+		//newAction = common.NewWaitAction(sim, eleShaman.GetCharacter(), regenTime, common.WaitReasonOOM)
+		//newAction.Cast(sim)
+		//eleShaman.rotation.OnActionAccepted(eleShaman, sim, newAction)
 	}
 }
 
