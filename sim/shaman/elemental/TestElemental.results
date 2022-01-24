@@ -37,19 +37,19 @@ stat_weights_results: {
   weights: 0
   weights: 0
   weights: 0
-  weights: 0.17733281207370966
+  weights: 0.17749843632789408
   weights: 0
-  weights: 0.6798809786554034
-  weights: 0
-  weights: 0
+  weights: 0.679881241417902
   weights: 0
   weights: 0
   weights: 0
   weights: 0
   weights: 0
   weights: 0
-  weights: 1.4943069049322275
-  weights: 0.5683003467710637
+  weights: 0
+  weights: 0
+  weights: 1.5130126545547227
+  weights: 0.5683476903825453
   weights: 0
   weights: 0
   weights: 0
@@ -679,7 +679,7 @@ dps_results: {
 dps_results: {
  key: "TestElemental-Average-Default"
  value: {
-  dps: 1535.6457828531459
+  dps: 1535.4611585738335
  }
 }
 dps_results: {
@@ -697,7 +697,7 @@ dps_results: {
 dps_results: {
  key: "TestElemental-Settings-Orc-P1-Adaptive-FullBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 1430.7258682948814
+  dps: 1441.7073422759186
  }
 }
 dps_results: {
@@ -709,19 +709,19 @@ dps_results: {
 dps_results: {
  key: "TestElemental-Settings-Orc-P1-Adaptive-NoBuffs-LongMultiTarget"
  value: {
-  dps: 1113.4066413905275
+  dps: 1247.4345015599818
  }
 }
 dps_results: {
  key: "TestElemental-Settings-Orc-P1-Adaptive-NoBuffs-LongSingleTargetFullDebuffs"
  value: {
-  dps: 1103.930203065885
+  dps: 742.0278255370904
  }
 }
 dps_results: {
  key: "TestElemental-Settings-Orc-P1-Adaptive-NoBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 763.7883717795004
+  dps: 591.642996257215
  }
 }
 dps_results: {
@@ -757,19 +757,19 @@ dps_results: {
 dps_results: {
  key: "TestElemental-Settings-Orc-P1-CLOnClearcast-NoBuffs-LongMultiTarget"
  value: {
-  dps: 1256.4901064825453
+  dps: 1246.2017507996086
  }
 }
 dps_results: {
  key: "TestElemental-Settings-Orc-P1-CLOnClearcast-NoBuffs-LongSingleTargetFullDebuffs"
  value: {
-  dps: 812.1913860514579
+  dps: 767.7410314001429
  }
 }
 dps_results: {
  key: "TestElemental-Settings-Orc-P1-CLOnClearcast-NoBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 664.1538169118335
+  dps: 604.2337478563466
  }
 }
 dps_results: {
@@ -805,19 +805,19 @@ dps_results: {
 dps_results: {
  key: "TestElemental-Settings-Orc-P1-CLOnClearcastNoBuffs-NoBuffs-LongMultiTarget"
  value: {
-  dps: 1013.3119211516847
+  dps: 996.3478829641261
  }
 }
 dps_results: {
  key: "TestElemental-Settings-Orc-P1-CLOnClearcastNoBuffs-NoBuffs-LongSingleTargetFullDebuffs"
  value: {
-  dps: 704.5271329063105
+  dps: 662.4619737555505
  }
 }
 dps_results: {
  key: "TestElemental-Settings-Orc-P1-CLOnClearcastNoBuffs-NoBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 554.4447151561459
+  dps: 506.38555193294695
  }
 }
 dps_results: {
@@ -841,7 +841,7 @@ dps_results: {
 dps_results: {
  key: "TestElemental-Settings-Orc-P1-Fixed3LBCL-FullBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 1421.736584420214
+  dps: 1416.345328280385
  }
 }
 dps_results: {
@@ -853,19 +853,19 @@ dps_results: {
 dps_results: {
  key: "TestElemental-Settings-Orc-P1-Fixed3LBCL-NoBuffs-LongMultiTarget"
  value: {
-  dps: 1170.3798966478842
+  dps: 1081.9074513412259
  }
 }
 dps_results: {
  key: "TestElemental-Settings-Orc-P1-Fixed3LBCL-NoBuffs-LongSingleTargetFullDebuffs"
  value: {
-  dps: 738.2948947120356
+  dps: 732.0771345363091
  }
 }
 dps_results: {
  key: "TestElemental-Settings-Orc-P1-Fixed3LBCL-NoBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 587.3995807319724
+  dps: 565.568485233171
  }
 }
 dps_results: {
@@ -901,19 +901,19 @@ dps_results: {
 dps_results: {
  key: "TestElemental-Settings-Orc-P1-LBOnly-NoBuffs-LongMultiTarget"
  value: {
-  dps: 1072.2110253234985
+  dps: 1057.127895138429
  }
 }
 dps_results: {
  key: "TestElemental-Settings-Orc-P1-LBOnly-NoBuffs-LongSingleTargetFullDebuffs"
  value: {
-  dps: 1072.2110253234985
+  dps: 1057.127895138429
  }
 }
 dps_results: {
  key: "TestElemental-Settings-Orc-P1-LBOnly-NoBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 762.2795324974301
+  dps: 746.1498680905513
  }
 }
 dps_results: {
@@ -925,7 +925,7 @@ dps_results: {
 dps_results: {
  key: "TestElemental-Settings-Troll10-P1-Adaptive-FullBuffs-LongMultiTarget"
  value: {
-  dps: 2012.4270992840857
+  dps: 2013.1360517109613
  }
 }
 dps_results: {
@@ -949,19 +949,19 @@ dps_results: {
 dps_results: {
  key: "TestElemental-Settings-Troll10-P1-Adaptive-NoBuffs-LongMultiTarget"
  value: {
-  dps: 1090.3349838143636
+  dps: 1198.2339948272756
  }
 }
 dps_results: {
  key: "TestElemental-Settings-Troll10-P1-Adaptive-NoBuffs-LongSingleTargetFullDebuffs"
  value: {
-  dps: 1082.47367726378
+  dps: 761.0968720010931
  }
 }
 dps_results: {
  key: "TestElemental-Settings-Troll10-P1-Adaptive-NoBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 787.397333189042
+  dps: 618.1573859153682
  }
 }
 dps_results: {
@@ -997,19 +997,19 @@ dps_results: {
 dps_results: {
  key: "TestElemental-Settings-Troll10-P1-CLOnClearcast-NoBuffs-LongMultiTarget"
  value: {
-  dps: 1193.0340414533675
+  dps: 1198.2339948272756
  }
 }
 dps_results: {
  key: "TestElemental-Settings-Troll10-P1-CLOnClearcast-NoBuffs-LongSingleTargetFullDebuffs"
  value: {
-  dps: 802.7691454729301
+  dps: 769.6956112521282
  }
 }
 dps_results: {
  key: "TestElemental-Settings-Troll10-P1-CLOnClearcast-NoBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 688.1362814215033
+  dps: 626.4491102295425
  }
 }
 dps_results: {
@@ -1033,7 +1033,7 @@ dps_results: {
 dps_results: {
  key: "TestElemental-Settings-Troll10-P1-CLOnClearcastNoBuffs-FullBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 1343.4011330251478
+  dps: 1347.2772872249132
  }
 }
 dps_results: {
@@ -1045,19 +1045,19 @@ dps_results: {
 dps_results: {
  key: "TestElemental-Settings-Troll10-P1-CLOnClearcastNoBuffs-NoBuffs-LongMultiTarget"
  value: {
-  dps: 1015.6786200084947
+  dps: 962.227278269571
  }
 }
 dps_results: {
  key: "TestElemental-Settings-Troll10-P1-CLOnClearcastNoBuffs-NoBuffs-LongSingleTargetFullDebuffs"
  value: {
-  dps: 690.6413550300789
+  dps: 665.290254923686
  }
 }
 dps_results: {
  key: "TestElemental-Settings-Troll10-P1-CLOnClearcastNoBuffs-NoBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 544.7140727047012
+  dps: 516.525711895702
  }
 }
 dps_results: {
@@ -1081,7 +1081,7 @@ dps_results: {
 dps_results: {
  key: "TestElemental-Settings-Troll10-P1-Fixed3LBCL-FullBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 1477.4161797709723
+  dps: 1474.4035128220278
  }
 }
 dps_results: {
@@ -1093,19 +1093,19 @@ dps_results: {
 dps_results: {
  key: "TestElemental-Settings-Troll10-P1-Fixed3LBCL-NoBuffs-LongMultiTarget"
  value: {
-  dps: 1046.9346568567337
+  dps: 1029.5707214312288
  }
 }
 dps_results: {
  key: "TestElemental-Settings-Troll10-P1-Fixed3LBCL-NoBuffs-LongSingleTargetFullDebuffs"
  value: {
-  dps: 714.9474650455458
+  dps: 716.5388743297193
  }
 }
 dps_results: {
  key: "TestElemental-Settings-Troll10-P1-Fixed3LBCL-NoBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 631.1087756751231
+  dps: 592.0422458840599
  }
 }
 dps_results: {
@@ -1141,19 +1141,19 @@ dps_results: {
 dps_results: {
  key: "TestElemental-Settings-Troll10-P1-LBOnly-NoBuffs-LongMultiTarget"
  value: {
-  dps: 1025.7301957250597
+  dps: 1018.6039273879856
  }
 }
 dps_results: {
  key: "TestElemental-Settings-Troll10-P1-LBOnly-NoBuffs-LongSingleTargetFullDebuffs"
  value: {
-  dps: 1025.7301957250597
+  dps: 1018.6039273879856
  }
 }
 dps_results: {
  key: "TestElemental-Settings-Troll10-P1-LBOnly-NoBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 788.5317738332204
+  dps: 765.7438016878698
  }
 }
 dps_results: {
