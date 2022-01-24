@@ -245,7 +245,7 @@ export const P3_PRESET = {
                 enchant: Enchants.GLYPH_OF_FEROCITY,
                 gems: [
                     Gems.RELENTLESS_EARTHSTORM_DIAMOND,
-                    Gems.BOLD_LIVING_RUBY,
+                    Gems.BOLD_CRIMSON_SPINEL,
                 ],
             }),
             ItemSpec.create({
@@ -263,9 +263,9 @@ export const P3_PRESET = {
                 id: 30905,
                 enchant: Enchants.CHEST_EXCEPTIONAL_STATS,
                 gems: [
-                    Gems.SOVEREIGN_NIGHTSEYE,
-                    Gems.BOLD_LIVING_RUBY,
-                    Gems.INSCRIBED_NOBLE_TOPAZ,
+                    Gems.SOVEREIGN_SHADOWSONG_AMETHYST,
+                    Gems.BOLD_CRIMSON_SPINEL,
+                    Gems.INSCRIBED_PYRESTONE,
                 ],
             }),
             ItemSpec.create({
@@ -279,17 +279,17 @@ export const P3_PRESET = {
             ItemSpec.create({
                 id: 30106,
                 gems: [
-                    Gems.BOLD_LIVING_RUBY,
-                    Gems.BOLD_LIVING_RUBY,
+                    Gems.BOLD_CRIMSON_SPINEL,
+                    Gems.BOLD_CRIMSON_SPINEL,
                 ],
             }),
             ItemSpec.create({
                 id: 30900,
                 enchant: Enchants.NETHERCOBRA_LEG_ARMOR,
                 gems: [
-                    Gems.BOLD_LIVING_RUBY,
-                    Gems.INSCRIBED_NOBLE_TOPAZ,
-                    Gems.SOVEREIGN_NIGHTSEYE,
+                    Gems.BOLD_CRIMSON_SPINEL,
+                    Gems.INSCRIBED_PYRESTONE,
+                    Gems.SOVEREIGN_SHADOWSONG_AMETHYST,
                 ],
             }),
             ItemSpec.create({
@@ -309,11 +309,11 @@ export const P3_PRESET = {
                 id: 29383, // Bloodlust Brooch
             }),
             ItemSpec.create({
-                id: 32236,
+                id: 32262,
                 enchant: Enchants.MONGOOSE,
             }),
             ItemSpec.create({
-                id: 29924,
+                id: 32262,
                 enchant: Enchants.MONGOOSE,
             }),
             ItemSpec.create({

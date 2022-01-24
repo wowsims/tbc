@@ -2,6 +2,8 @@ import { EquippedItem } from '/tbc/core/proto_utils/equipped_item.js';
 import { getEmptyGemSocketIconUrl, gemMatchesSocket } from '/tbc/core/proto_utils/gems.js';
 import { setGemSocketCssClass } from '/tbc/core/proto_utils/gems.js';
 import { enchantAppliesToItem } from '/tbc/core/proto_utils/utils.js';
+import { GemColor } from '/tbc/core/proto/common.js';
+import { HandType } from '/tbc/core/proto/common.js';
 import { Item } from '/tbc/core/proto/common.js';
 import { ItemSlot } from '/tbc/core/proto/common.js';
 import { enchantDescriptions } from '/tbc/core/constants/enchants.js';
@@ -12,6 +14,9 @@ import { TypedEvent } from '/tbc/core/typed_event.js';
 import { Component } from './component.js';
 import { CloseButton } from './close_button.js';
 import { makePhaseSelector } from './other_inputs.js';
+import { makeShow1hWeaponsSelector } from './other_inputs.js';
+import { makeShow2hWeaponsSelector } from './other_inputs.js';
+import { makeShowMatchingGemsSelector } from './other_inputs.js';
 export class GearPicker extends Component {
     constructor(parent, player) {
         super(parent, 'gear-picker-root');
@@ -157,7 +162,7 @@ class SelectorModal extends Component {
                     }
                 },
             };
-        }, eventID => {
+        }, GemColor.GemColorUnknown, eventID => {
             this.player.equipItem(eventID, slot, null);
         });
         this.addTab('Enchants', slot, equippedItem, eligibleEnchants, enchant => this.player.computeEnchantEP(enchant), equippedItem => equippedItem?.enchant, enchant => {
@@ -175,7 +180,7 @@ class SelectorModal extends Component {
                         this.player.equipItem(eventID, slot, equippedItem.withEnchant(enchant));
                 },
             };
-        }, eventID => {
+        }, GemColor.GemColorUnknown, eventID => {
             const equippedItem = this.player.getEquippedItem(slot);
             if (equippedItem)
                 this.player.equipItem(eventID, slot, equippedItem.withEnchant(null));
@@ -215,7 +220,7 @@ class SelectorModal extends Component {
                             this.player.equipItem(eventID, slot, equippedItem.withGem(gem, socketIdx));
                     },
                 };
-            }, eventID => {
+            }, socketColor, eventID => {
                 const equippedItem = this.player.getEquippedItem(slot);
                 if (equippedItem)
                     this.player.equipItem(eventID, slot, equippedItem.withGem(null, socketIdx));
@@ -246,7 +251,7 @@ class SelectorModal extends Component {
      * T is expected to be Item, Enchant, or Gem. Tab menus for all 3 looks extremely
      * similar so this function uses extra functions to do it generically.
      */
-    addTab(label, slot, equippedItem, items, computeEP, equippedToItemFn, getItemData, onRemove, setTabContent) {
+    addTab(label, slot, equippedItem, items, computeEP, equippedToItemFn, getItemData, socketColor, onRemove, setTabContent) {
         if (items.length == 0) {
             return;
         }
@@ -276,10 +281,23 @@ class SelectorModal extends Component {
       <button class="selector-modal-remove-button">Remove</button>
       <input class="selector-modal-search" type="text" placeholder="Search...">
       <div class="selector-modal-filter-bar-filler"></div>
+      <div class="sim-input selector-modal-boolean-option selector-modal-show-1h-weapons"></div>
+      <div class="sim-input selector-modal-boolean-option selector-modal-show-2h-weapons"></div>
+      <div class="sim-input selector-modal-boolean-option selector-modal-show-matching-gems"></div>
       <div class="selector-modal-phase-selector"></div>
     </div>
     <ul class="selector-modal-list"></ul>
     `;
+        const show1hWeaponsSelector = makeShow1hWeaponsSelector(tabContent.getElementsByClassName('selector-modal-show-1h-weapons')[0], this.player.sim);
+        const show2hWeaponsSelector = makeShow2hWeaponsSelector(tabContent.getElementsByClassName('selector-modal-show-2h-weapons')[0], this.player.sim);
+        if (label != 'Items' || slot != ItemSlot.ItemSlotMainHand) {
+            tabContent.getElementsByClassName('selector-modal-show-1h-weapons')[0].style.display = 'none';
+            tabContent.getElementsByClassName('selector-modal-show-2h-weapons')[0].style.display = 'none';
+        }
+        const showMatchingGemsSelector = makeShowMatchingGemsSelector(tabContent.getElementsByClassName('selector-modal-show-matching-gems')[0], this.player.sim);
+        if (!label.startsWith('Gem')) {
+            tabContent.getElementsByClassName('selector-modal-show-matching-gems')[0].style.display = 'none';
+        }
         const phaseSelector = makePhaseSelector(tabContent.getElementsByClassName('selector-modal-phase-selector')[0], this.player.sim);
         if (label == 'Items') {
             tabElem.classList.add('active', 'in');
@@ -366,10 +384,33 @@ class SelectorModal extends Component {
         this.player.gearChangeEmitter.on(updateSelected);
         const applyFilters = () => {
             let validItemElems = listItemElems;
-            const searchQuery = searchInput.value.toLowerCase();
-            validItemElems = validItemElems.filter(elem => elem.dataset.name.toLowerCase().includes(searchQuery));
+            if (label == 'Items' && slot == ItemSlot.ItemSlotMainHand) {
+                if (!this.player.sim.getShow1hWeapons()) {
+                    validItemElems = validItemElems.filter(elem => {
+                        const listItemId = parseInt(elem.dataset.id);
+                        const listItem = items.find(item => getItemData(item).id == listItemId);
+                        return listItem.handType == HandType.HandTypeTwoHand;
+                    });
+                }
+                if (!this.player.sim.getShow2hWeapons()) {
+                    validItemElems = validItemElems.filter(elem => {
+                        const listItemId = parseInt(elem.dataset.id);
+                        const listItem = items.find(item => getItemData(item).id == listItemId);
+                        return listItem.handType != HandType.HandTypeTwoHand;
+                    });
+                }
+            }
             const phase = this.player.sim.getPhase();
             validItemElems = validItemElems.filter(elem => Number(elem.dataset.phase) <= phase);
+            const searchQuery = searchInput.value.toLowerCase();
+            validItemElems = validItemElems.filter(elem => elem.dataset.name.toLowerCase().includes(searchQuery));
+            if (label.startsWith('Gem') && this.player.sim.getShowMatchingGems()) {
+                validItemElems = validItemElems.filter(elem => {
+                    const listItemId = parseInt(elem.dataset.id);
+                    const listItem = items.find(item => getItemData(item).id == listItemId);
+                    return gemMatchesSocket(listItem, socketColor);
+                });
+            }
             // If not a trinket slot, filter out items without EP values.
             if ((slot != ItemSlot.ItemSlotTrinket1 && slot != ItemSlot.ItemSlotTrinket2 && slot != ItemSlot.ItemSlotRanged)) {
                 validItemElems = validItemElems.filter(elem => (Number(elem.dataset.baseEP) > 0 || elem.dataset.ignoreEPFilter == 'true'));
@@ -404,6 +445,13 @@ class SelectorModal extends Component {
         tabContent.dataset.phase = String(this.player.sim.getPhase());
         this.player.sim.phaseChangeEmitter.on(() => {
             tabContent.dataset.phase = String(this.player.sim.getPhase());
+            applyFilters();
+        });
+        TypedEvent.onAny([
+            this.player.sim.show1hWeaponsChangeEmitter,
+            this.player.sim.show2hWeaponsChangeEmitter,
+            this.player.sim.showMatchingGemsChangeEmitter,
+        ]).on(() => {
             applyFilters();
         });
         this.player.gearChangeEmitter.on(() => {

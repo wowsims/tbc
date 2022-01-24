@@ -30,6 +30,9 @@ export declare class Sim {
     private readonly workerPool;
     private iterations;
     private phase;
+    private show1hWeapons;
+    private show2hWeapons;
+    private showMatchingGems;
     readonly raid: Raid;
     readonly encounter: Encounter;
     private items;
@@ -37,6 +40,9 @@ export declare class Sim {
     private gems;
     readonly iterationsChangeEmitter: TypedEvent<void>;
     readonly phaseChangeEmitter: TypedEvent<void>;
+    readonly show1hWeaponsChangeEmitter: TypedEvent<void>;
+    readonly show2hWeaponsChangeEmitter: TypedEvent<void>;
+    readonly showMatchingGemsChangeEmitter: TypedEvent<void>;
     readonly changeEmitter: TypedEvent<void>;
     readonly simResultEmitter: TypedEvent<SimResult>;
     private readonly _initPromise;
@@ -59,6 +65,12 @@ export declare class Sim {
     getMatchingGems(socketColor: GemColor): Array<Gem>;
     getPhase(): number;
     setPhase(eventID: EventID, newPhase: number): void;
+    getShow1hWeapons(): boolean;
+    setShow1hWeapons(eventID: EventID, newShow1hWeapons: boolean): void;
+    getShow2hWeapons(): boolean;
+    setShow2hWeapons(eventID: EventID, newShow2hWeapons: boolean): void;
+    getShowMatchingGems(): boolean;
+    setShowMatchingGems(eventID: EventID, newShowMatchingGems: boolean): void;
     getIterations(): number;
     setIterations(eventID: EventID, newIterations: number): void;
     lookupItemSpec(itemSpec: ItemSpec): EquippedItem | null;

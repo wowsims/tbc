@@ -1,3 +1,4 @@
+import { BooleanPicker } from '/tbc/core/components/boolean_picker.js';
 import { EnumPicker } from '/tbc/core/components/enum_picker.js';
 import { Potions } from '/tbc/core/proto/common.js';
 import { Party } from '/tbc/core/party.js';
@@ -6,6 +7,9 @@ import { Sim } from '/tbc/core/sim.js';
 import { Target } from '/tbc/core/target.js';
 import { IndividualSimUI } from '/tbc/core/individual_sim_ui.js';
 import { EventID, TypedEvent } from '/tbc/core/typed_event.js';
+export declare function makeShow1hWeaponsSelector(parent: HTMLElement, sim: Sim): BooleanPicker<Sim>;
+export declare function makeShow2hWeaponsSelector(parent: HTMLElement, sim: Sim): BooleanPicker<Sim>;
+export declare function makeShowMatchingGemsSelector(parent: HTMLElement, sim: Sim): BooleanPicker<Sim>;
 export declare function makePhaseSelector(parent: HTMLElement, sim: Sim): EnumPicker<Sim>;
 export declare const StartingPotion: {
     type: "enum";

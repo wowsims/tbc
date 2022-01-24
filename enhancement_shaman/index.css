@@ -469,6 +469,23 @@
   flex-grow: 1;
 }
 
+.selector-modal-boolean-option {
+  margin: 5px;
+}
+
+.selector-modal-boolean-option .input-label-div {
+  margin: 0;
+}
+
+.selector-modal-boolean-option .input-label {
+  font-weight: bold;
+  margin: 0;
+}
+
+.selector-modal-boolean-option .boolean-picker-input {
+  width: 10px;
+}
+
 .selector-modal-phase-selector {
   font-size: 18px;
   font-weight: 700;
@@ -1582,6 +1599,13 @@ input, select {
   padding: 3px;
 }
 
+.sim-input {
+  color: var(--main-text-color);
+  background-color: #1e2633;
+  border: 1px solid #373e58;
+  padding: 3px;
+}
+
 .sim-root {
   height: 100%;
   display: flex;
@@ -2193,7 +2217,7 @@ input, select {
 }
 
 .enhancement-shaman-sim-ui .self-buffs-section {
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
 }
 
 .enhancement-shaman-sim-ui .consumes-section {
@@ -2209,15 +2233,15 @@ input, select {
 }
 
 .enhancement-shaman-sim-ui .character-stats-table-row {
-  font-size: 14px;
+  font-size: 11px;
 }
 
 .enhancement-shaman-sim-ui .results-ep-table tr td:nth-child(1) {
-  font-size: 12px;
+  font-size: 11px;
 }
 
 .enhancement-shaman-sim-ui .results-ep-table tr td:nth-child(2), .results-ep-table tr td:nth-child(4) {
-  font-size: 12px;
+  font-size: 11px;
 }
 
 .enhancement-shaman-sim-ui .results-ep-table tr td:nth-child(2):after {

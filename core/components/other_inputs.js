@@ -1,6 +1,46 @@
+import { BooleanPicker } from '/tbc/core/components/boolean_picker.js';
 import { EnumPicker } from '/tbc/core/components/enum_picker.js';
 import { Potions } from '/tbc/core/proto/common.js';
 import { TristateEffect } from '/tbc/core/proto/common.js';
+export function makeShow1hWeaponsSelector(parent, sim) {
+    return new BooleanPicker(parent, sim, {
+        extraCssClasses: [
+            'show-1h-weapons-selector',
+        ],
+        label: '1H',
+        changedEvent: (sim) => sim.show1hWeaponsChangeEmitter,
+        getValue: (sim) => sim.getShow1hWeapons(),
+        setValue: (eventID, sim, newValue) => {
+            sim.setShow1hWeapons(eventID, newValue);
+        },
+    });
+}
+export function makeShow2hWeaponsSelector(parent, sim) {
+    return new BooleanPicker(parent, sim, {
+        extraCssClasses: [
+            'show-2h-weapons-selector',
+        ],
+        label: '2H',
+        changedEvent: (sim) => sim.show2hWeaponsChangeEmitter,
+        getValue: (sim) => sim.getShow2hWeapons(),
+        setValue: (eventID, sim, newValue) => {
+            sim.setShow2hWeapons(eventID, newValue);
+        },
+    });
+}
+export function makeShowMatchingGemsSelector(parent, sim) {
+    return new BooleanPicker(parent, sim, {
+        extraCssClasses: [
+            'show-matching-gems-selector',
+        ],
+        label: 'Match Socket',
+        changedEvent: (sim) => sim.showMatchingGemsChangeEmitter,
+        getValue: (sim) => sim.getShowMatchingGems(),
+        setValue: (eventID, sim, newValue) => {
+            sim.setShowMatchingGems(eventID, newValue);
+        },
+    });
+}
 export function makePhaseSelector(parent, sim) {
     return new EnumPicker(parent, sim, {
         extraCssClasses: [

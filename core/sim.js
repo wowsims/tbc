@@ -21,12 +21,18 @@ export class Sim {
     constructor() {
         this.iterations = 3000;
         this.phase = OtherConstants.CURRENT_PHASE;
+        this.show1hWeapons = true;
+        this.show2hWeapons = true;
+        this.showMatchingGems = true;
         // Database
         this.items = {};
         this.enchants = {};
         this.gems = {};
         this.iterationsChangeEmitter = new TypedEvent();
         this.phaseChangeEmitter = new TypedEvent();
+        this.show1hWeaponsChangeEmitter = new TypedEvent();
+        this.show2hWeaponsChangeEmitter = new TypedEvent();
+        this.showMatchingGemsChangeEmitter = new TypedEvent();
         // Fires when a raid sim API call completes.
         this.simResultEmitter = new TypedEvent();
         // These callbacks are needed so we can apply BuffBot modifications automatically before sending requests.
@@ -43,6 +49,9 @@ export class Sim {
         this.changeEmitter = TypedEvent.onAny([
             this.iterationsChangeEmitter,
             this.phaseChangeEmitter,
+            this.show1hWeaponsChangeEmitter,
+            this.show2hWeaponsChangeEmitter,
+            this.showMatchingGemsChangeEmitter,
             this.raid.changeEmitter,
             this.encounter.changeEmitter,
         ]);
@@ -196,6 +205,33 @@ export class Sim {
         if (newPhase != this.phase) {
             this.phase = newPhase;
             this.phaseChangeEmitter.emit(eventID);
+        }
+    }
+    getShow1hWeapons() {
+        return this.show1hWeapons;
+    }
+    setShow1hWeapons(eventID, newShow1hWeapons) {
+        if (newShow1hWeapons != this.show1hWeapons) {
+            this.show1hWeapons = newShow1hWeapons;
+            this.show1hWeaponsChangeEmitter.emit(eventID);
+        }
+    }
+    getShow2hWeapons() {
+        return this.show2hWeapons;
+    }
+    setShow2hWeapons(eventID, newShow2hWeapons) {
+        if (newShow2hWeapons != this.show2hWeapons) {
+            this.show2hWeapons = newShow2hWeapons;
+            this.show2hWeaponsChangeEmitter.emit(eventID);
+        }
+    }
+    getShowMatchingGems() {
+        return this.showMatchingGems;
+    }
+    setShowMatchingGems(eventID, newShowMatchingGems) {
+        if (newShowMatchingGems != this.showMatchingGems) {
+            this.showMatchingGems = newShowMatchingGems;
+            this.showMatchingGemsChangeEmitter.emit(eventID);
         }
     }
     getIterations() {
