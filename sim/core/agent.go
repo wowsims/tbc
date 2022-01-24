@@ -1,8 +1,8 @@
 package core
 
 import (
-	"fmt"
 	"reflect"
+	"strconv"
 	"strings"
 	"time"
 
@@ -79,15 +79,18 @@ func (actionID ActionID) String() string {
 	sb.WriteString("{")
 
 	if actionID.SpellID != 0 {
-		fmt.Fprintf(&sb, "SpellID: %d", actionID.SpellID)
+		sb.WriteString("SpellID: ")
+		sb.WriteString(strconv.Itoa(int(actionID.SpellID)))
 	} else if actionID.ItemID != 0 {
-		fmt.Fprintf(&sb, "ItemID: %d", actionID.ItemID)
+		sb.WriteString("ItemID: ")
+		sb.WriteString(strconv.Itoa(int(actionID.ItemID)))
 	} else if actionID.OtherID != 0 {
-		fmt.Fprintf(&sb, "OtherID: %d", actionID.OtherID)
+		sb.WriteString("OtherID: ")
+		sb.WriteString(strconv.Itoa(int(actionID.OtherID)))
 	}
-
 	if actionID.Tag != 0 {
-		fmt.Fprintf(&sb, ", Tag: %d", actionID.Tag)
+		sb.WriteString("Tag: ")
+		sb.WriteString(strconv.Itoa(int(actionID.Tag)))
 	}
 	sb.WriteString("}")
 

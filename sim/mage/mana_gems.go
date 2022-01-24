@@ -25,6 +25,17 @@ func (mage *Mage) registerManaGemsCD() {
 		maxManaEmeraldGain *= manaMultiplier
 		minManaRubyGain *= manaMultiplier
 		maxManaRubyGain *= manaMultiplier
+
+		mage.serpentCoilAura = core.Aura{
+			ID:       SerpentCoilBraidAuraID,
+			ActionID: core.ActionID{ItemID: SerpentCoilBraidID},
+			OnExpire: func(sim *core.Simulation) {
+				if sim.Log != nil {
+					mage.Log(sim, "Lost 225 SpellPower from fading Serpent-Coil Braid.")
+				}
+				mage.AddStat(stats.SpellPower, -225)
+			},
+		}
 	}
 	manaEmeraldGainRange := maxManaEmeraldGain - minManaEmeraldGain
 	manaRubyGainRange := maxManaRubyGain - minManaRubyGain
@@ -88,5 +99,8 @@ func (mage *Mage) registerManaGemsCD() {
 var SerpentCoilBraidAuraID = core.NewAuraID()
 
 func (mage *Mage) activateSerpentCoilBraid(sim *core.Simulation) {
-	mage.AddAuraWithTemporaryStats(sim, SerpentCoilBraidAuraID, core.ActionID{ItemID: SerpentCoilBraidID}, stats.SpellPower, 225, time.Second*15)
+	const dur = time.Second * 15
+	mage.AddStat(stats.SpellPower, 225)
+	mage.serpentCoilAura.Expires = sim.CurrentTime + dur
+	mage.AddAura(sim, mage.serpentCoilAura)
 }

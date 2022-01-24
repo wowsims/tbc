@@ -12,6 +12,19 @@ const ArcaneBlastBaseManaCost = 195.0
 const ArcaneBlastBaseCastTime = time.Millisecond * 2500
 
 func (mage *Mage) newArcaneBlastTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
+	abAura := core.Aura{
+		ID:       ArcaneBlastAuraID,
+		ActionID: core.ActionID{SpellID: 36032},
+		Expires:  sim.CurrentTime + time.Second*8,
+		Stacks:   0,
+		OnExpire: func(sim *core.Simulation) {
+			// Reset the mana cost on expiration.
+			if mage.arcaneBlastSpell.IsInUse() {
+				mage.arcaneBlastSpell.ManaCost = core.MaxFloat(0, mage.arcaneBlastSpell.ManaCost-3.0*ArcaneBlastBaseManaCost*0.75)
+				mage.arcaneBlastSpell.ActionID.Tag = 1
+			}
+		},
+	}
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
@@ -25,8 +38,8 @@ func (mage *Mage) newArcaneBlastTemplate(sim *core.Simulation) core.SimpleSpellT
 					SpellID: SpellIDArcaneBlast,
 				},
 				OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
-					newNumStacks := core.MinInt32(3, mage.NumStacks(ArcaneBlastAuraID)+1)
-					cast.Character.ReplaceAura(sim, mage.ArcaneBlastAura(sim, newNumStacks))
+					abAura.Stacks = core.MinInt32(3, mage.NumStacks(ArcaneBlastAuraID)+1)
+					cast.Character.ReplaceAura(sim, abAura)
 				},
 			},
 		},
@@ -47,7 +60,7 @@ func (mage *Mage) newArcaneBlastTemplate(sim *core.Simulation) core.SimpleSpellT
 	spell.Effect.BonusSpellHitRating += float64(mage.Talents.ArcaneFocus) * 2 * core.SpellHitRatingPerHitChance
 	spell.Effect.BonusSpellCritRating += float64(mage.Talents.ArcaneImpact) * 2 * core.SpellCritRatingPerCritChance
 
-	if ItemSetTirisfalRegalia.CharacterHasSetBonus(&mage.Character, 2) {
+	if mage.hasTristfal {
 		spell.Effect.StaticDamageMultiplier *= 1.2
 		spell.ManaCost += 0.2 * ArcaneBlastBaseManaCost
 	}
@@ -109,7 +122,7 @@ func (mage *Mage) canBlast(sim *core.Simulation, curArcaneBlast *core.SimpleSpel
 	inverseCastSpeed := 1 / mage.CastSpeed()
 
 	extraManaCost := 0.0
-	if ItemSetTirisfalRegalia.CharacterHasSetBonus(&mage.Character, 2) {
+	if mage.hasTristfal {
 		extraManaCost = 39
 	}
 

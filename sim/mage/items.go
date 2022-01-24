@@ -62,12 +62,22 @@ var ItemSetTirisfalRegalia = core.ItemSet{
 		4: func(agent core.Agent) {
 			// Your spell critical strikes grant you up to 70 spell damage for 6 sec.
 			character := agent.GetCharacter()
+			aura := core.Aura{
+				ID:       Tirisfal4PcProcAuraID,
+				ActionID: core.ActionID{SpellID: 37443},
+				OnExpire: func(sim *core.Simulation) {
+					character.AddStat(stats.SpellPower, -225)
+				},
+			}
 			character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 				return core.Aura{
 					ID: Tirisfal4PcAuraID,
 					OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 						if spellEffect.Crit {
-							character.AddAuraWithTemporaryStats(sim, Tirisfal4PcProcAuraID, core.ActionID{SpellID: 37443}, stats.SpellPower, 70, time.Second*6)
+							const dur = time.Second * 6
+							character.AddStat(stats.SpellPower, 70)
+							aura.Expires = sim.CurrentTime + dur
+							character.AddAura(sim, aura)
 						}
 					},
 				}
