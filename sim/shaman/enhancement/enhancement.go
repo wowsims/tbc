@@ -97,10 +97,6 @@ func (enh *EnhancementShaman) OnManaTick(sim *core.Simulation) {
 }
 
 func (enh *EnhancementShaman) tryUseGCD(sim *core.Simulation) {
-	if sim.Log != nil {
-		enh.Log(sim, "TryuseGCD at %0.02f", sim.CurrentTime.Seconds())
-	}
-
 	// Redrop totems when needed.
 	dropSuccess := enh.TryDropTotems(sim)
 	if dropSuccess {

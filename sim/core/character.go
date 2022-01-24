@@ -366,15 +366,9 @@ func (character *Character) reset(sim *Simulation, agent Agent) {
 	character.gcdAction = &PendingAction{
 		Name: "Agent GCD",
 		OnAction: func(sim *Simulation) {
-			if sim.Log != nil {
-				character.Log(sim, "GCD Action")
-			}
 			character := agent.GetCharacter()
 			character.TryUseCooldowns(sim)
 			if !character.IsOnCD(GCDCooldownID, sim.CurrentTime) {
-				if sim.Log != nil {
-					character.Log(sim, "GCD Action Ready")
-				}
 				agent.OnGCDReady(sim)
 			}
 		},
@@ -382,9 +376,6 @@ func (character *Character) reset(sim *Simulation, agent Agent) {
 }
 
 func (character *Character) SetGCDTimer(sim *Simulation, gcdReadyAt time.Duration) {
-	if sim.Log != nil {
-		character.Log(sim, "Setting GCD timer to %0.02f", gcdReadyAt.Seconds())
-	}
 	character.SetCD(GCDCooldownID, gcdReadyAt)
 	character.gcdAction.NextActionAt = gcdReadyAt
 	sim.AddPendingAction(character.gcdAction)
