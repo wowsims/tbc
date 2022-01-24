@@ -27,8 +27,25 @@ func (mage *Mage) Act(sim *core.Simulation) time.Duration {
 
 	if !actionSuccessful {
 		regenTime := mage.TimeUntilManaRegen(spell.GetManaCost())
-		// Waiting too long can give us enough mana to pick less mana-effecient spells.
-		waitTime := core.MinDuration(regenTime, time.Second*1)
+
+		if mage.numCastsDone != 0 {
+			mage.tryingToDropStacks = false
+		}
+
+		var waitTime time.Duration
+		numStacks := mage.NumStacks(ArcaneBlastAuraID)
+
+		if numStacks >= 1 && sim.GetRemainingDuration() > time.Second*5 {
+			// Wait for AB stacks to drop.
+			waitTime = mage.RemainingAuraDuration(sim, ArcaneBlastAuraID) + time.Millisecond*100
+			if sim.Log != nil {
+				mage.Log(sim, "Waiting for AB stacks to drop: %0.02f", waitTime.Seconds())
+			}
+		} else {
+			// Waiting too long can give us enough mana to pick less mana-efficient spells.
+			waitTime = core.MinDuration(regenTime, time.Second*1)
+		}
+
 		waitAction := common.NewWaitAction(sim, mage.GetCharacter(), waitTime, common.WaitReasonOOM)
 		waitAction.Cast(sim)
 		return sim.CurrentTime + waitAction.GetDuration()
@@ -143,7 +160,7 @@ func (mage *Mage) doArcaneRotation(sim *core.Simulation) *core.SimpleSpell {
 		}
 	} else {
 		mage.numCastsDone++
-		if mage.numCastsDone >= mage.ArcaneRotation.ArcaneBlastsBetweenFillers {
+		if (mage.Metrics.WentOOM && currentManaPercent < 0.2 && mage.numCastsDone >= 2) || mage.numCastsDone >= mage.ArcaneRotation.ArcaneBlastsBetweenFillers {
 			mage.tryingToDropStacks = true
 			mage.numCastsDone = 0
 		}

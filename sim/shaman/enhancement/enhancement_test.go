@@ -37,3 +37,28 @@ func TestEnhancement(t *testing.T) {
 		},
 	}))
 }
+
+func BenchmarkSimulate(b *testing.B) {
+	rsr := &proto.RaidSimRequest{
+		Raid: core.SinglePlayerRaidProto(
+			&proto.Player{
+				Race:      proto.Race_RaceOrc,
+				Class:     proto.Class_ClassShaman,
+				Equipment: Phase2Gear,
+				Consumes:  FullConsumes,
+				Spec:      PlayerOptionsBasic,
+				Buffs:     FullIndividualBuffs,
+			},
+			FullPartyBuffs,
+			FullRaidBuffs),
+		Encounter: &proto.Encounter{
+			Duration: 300,
+			Targets: []*proto.Target{
+				FullDebuffTarget,
+			},
+		},
+		SimOptions: core.AverageDefaultSimTestOptions,
+	}
+
+	core.RaidBenchmark(b, rsr)
+}

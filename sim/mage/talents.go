@@ -175,8 +175,10 @@ func (mage *Mage) registerPresenceOfMindCD() {
 					spell = mage.NewPyroblast(sim, target)
 				} else if mage.RotationType == proto.Mage_Rotation_Fire {
 					spell = mage.NewFireball(sim, target)
-				} else {
+				} else if mage.RotationType == proto.Mage_Rotation_Frost {
 					spell = mage.NewFrostbolt(sim, target)
+				} else {
+					spell, _ = mage.NewArcaneBlast(sim, target)
 				}
 				spell.CastTime = 0
 

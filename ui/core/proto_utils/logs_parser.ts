@@ -448,7 +448,7 @@ export class ManaChangedLog extends SimLog {
 
 	toString(): string {
 		const signedDiff = (this.manaAfter - this.manaBefore) * (this.isSpend ? -1 : 1);
-		return `${this.toStringPrefix()} ${this.isSpend ? 'Spent' : 'Gained'} ${signedDiff.toFixed(1)} mana from ${this.cause.name}.`;
+		return `${this.toStringPrefix()} ${this.isSpend ? 'Spent' : 'Gained'} ${signedDiff.toFixed(1)} mana from ${this.cause.name}. (${this.manaBefore.toFixed(1)} --> ${this.manaAfter.toFixed(1)})`;
 	}
 
 	resultString(): string {

@@ -54,6 +54,7 @@ func (mage *Mage) registerSummonWaterElementalCD() {
 				},
 			}
 			castTemplate.ManaCost -= castTemplate.BaseManaCost * float64(mage.Talents.FrostChanneling) * 0.05
+			castTemplate.ManaCost *= 1 - float64(mage.Talents.ElementalPrecision)*0.01
 			manaCost = castTemplate.ManaCost
 
 			return func(sim *core.Simulation, character *core.Character) {
