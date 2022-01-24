@@ -99,6 +99,10 @@ type Character struct {
 
 	// The PendingAction tracking this character's GCD.
 	gcdAction *PendingAction
+
+	// Fields related to waiting for certain events to happen.
+	waitingForMana float64
+	waitStartTime  time.Duration
 }
 
 func NewCharacter(party *Party, partyIndex int, player proto.Player) Character {
@@ -363,22 +367,7 @@ func (character *Character) reset(sim *Simulation, agent Agent) {
 		petAgent.Reset(sim)
 	}
 
-	character.gcdAction = &PendingAction{
-		Name: "Agent GCD",
-		OnAction: func(sim *Simulation) {
-			character := agent.GetCharacter()
-			character.TryUseCooldowns(sim)
-			if !character.IsOnCD(GCDCooldownID, sim.CurrentTime) {
-				agent.OnGCDReady(sim)
-			}
-		},
-	}
-}
-
-func (character *Character) SetGCDTimer(sim *Simulation, gcdReadyAt time.Duration) {
-	character.SetCD(GCDCooldownID, gcdReadyAt)
-	character.gcdAction.NextActionAt = gcdReadyAt
-	sim.AddPendingAction(character.gcdAction)
+	character.gcdAction = character.newGCDAction(sim, agent)
 }
 
 // Advance moves time forward counting down auras, CDs, mana regen, etc
@@ -453,6 +442,7 @@ func (character *Character) doneIteration(simDuration time.Duration) {
 		character.Hardcast.Cast.Cancel()
 		character.Hardcast = Hardcast{}
 	}
+	character.doneIterationGCD(simDuration)
 	character.Metrics.doneIteration(simDuration.Seconds())
 	character.auraTracker.doneIteration(simDuration)
 }

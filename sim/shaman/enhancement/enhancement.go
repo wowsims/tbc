@@ -1,7 +1,6 @@
 package enhancement
 
 import (
-	"github.com/wowsims/tbc/sim/common"
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/proto"
 	"github.com/wowsims/tbc/sim/shaman"
@@ -87,21 +86,15 @@ func (enh *EnhancementShaman) OnGCDReady(sim *core.Simulation) {
 }
 
 func (enh *EnhancementShaman) OnManaTick(sim *core.Simulation) {
-	if enh.WaitingForMana == 0 || enh.CurrentMana() < enh.WaitingForMana {
-		return
-	}
-	enh.WaitingForMana = 0
-	if !enh.IsOnCD(core.GCDCooldownID, sim.CurrentTime) {
+	if enh.FinishedWaitingForManaAndGCDReady(sim) {
 		enh.tryUseGCD(sim)
 	}
 }
 
 func (enh *EnhancementShaman) tryUseGCD(sim *core.Simulation) {
 	// Redrop totems when needed.
-	dropSuccess := enh.TryDropTotems(sim)
-	if dropSuccess {
+	if enh.TryDropTotems(sim) {
 		return
-		//enh.Metrics.MarkOOM(sim, &enh.Character, nextEventTime-sim.CurrentTime)
 	}
 
 	target := sim.GetPrimaryTarget()
@@ -109,7 +102,7 @@ func (enh *EnhancementShaman) tryUseGCD(sim *core.Simulation) {
 	if !enh.IsOnCD(shaman.StormstrikeCD, sim.CurrentTime) {
 		ss := enh.NewStormstrike(sim, target)
 		if success := ss.Attack(sim); !success {
-			enh.WaitingForMana = ss.Cost.Value
+			enh.WaitForMana(sim, ss.Cost.Value)
 		}
 		return
 	} else if !enh.IsOnCD(shaman.ShockCooldownID, sim.CurrentTime) {
@@ -124,23 +117,16 @@ func (enh *EnhancementShaman) tryUseGCD(sim *core.Simulation) {
 
 		if shock != nil {
 			if success := shock.Cast(sim); !success {
-				enh.WaitingForMana = shock.ManaCost
+				enh.WaitForMana(sim, shock.ManaCost)
 			}
 			return
 		}
 	}
-
-	//if !success {
-	//	nextActionAt := core.MinDuration(sim.CurrentTime+regenTime, enh.AutoAttacks.NextAttackAt())
-	//	enh.Metrics.MarkOOM(sim, &enh.Character, nextActionAt-sim.CurrentTime)
-	//	return nextActionAt
-	//}
 
 	// We didn't try to cast anything. Just wait for next auto or CD.
 	nextEventAt := enh.CDReadyAt(shaman.StormstrikeCD)
 	if enh.Rotation.PrimaryShock != proto.EnhancementShaman_Rotation_None {
 		nextEventAt = core.MinDuration(nextEventAt, enh.CDReadyAt(shaman.ShockCooldownID))
 	}
-	wait := common.NewWaitAction(sim, enh.GetCharacter(), nextEventAt-sim.CurrentTime, common.WaitReasonRotation)
-	wait.Cast(sim)
+	enh.WaitUntil(sim, nextEventAt)
 }

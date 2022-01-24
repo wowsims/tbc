@@ -251,9 +251,15 @@ func (shaman *Shaman) TryDropTotems(sim *core.Simulation) bool {
 	}
 
 	if cast != nil {
-		return cast.StartCast(sim)
+		if success := cast.StartCast(sim); !success {
+			shaman.WaitForMana(sim, cast.ManaCost)
+		}
+		return true
 	} else if attackCast != nil {
-		return attackCast.Cast(sim)
+		if success := attackCast.Cast(sim); !success {
+			shaman.WaitForMana(sim, attackCast.ManaCost)
+		}
+		return true
 	}
 	return false
 }

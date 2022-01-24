@@ -77,7 +77,6 @@ func (eleShaman *ElementalShaman) GetPresimOptions() *core.PresimOptions {
 func (eleShaman *ElementalShaman) Reset(sim *core.Simulation) {
 	eleShaman.Shaman.Reset(sim)
 	eleShaman.rotation.Reset(eleShaman, sim)
-	eleShaman.WaitingForMana = 0
 }
 
 func (eleShaman *ElementalShaman) OnGCDReady(sim *core.Simulation) {
@@ -85,17 +84,13 @@ func (eleShaman *ElementalShaman) OnGCDReady(sim *core.Simulation) {
 }
 
 func (eleShaman *ElementalShaman) OnManaTick(sim *core.Simulation) {
-	if eleShaman.WaitingForMana == 0 || eleShaman.CurrentMana() < eleShaman.WaitingForMana {
-		return
+	if eleShaman.FinishedWaitingForManaAndGCDReady(sim) {
+		eleShaman.tryUseGCD(sim)
 	}
-	eleShaman.WaitingForMana = 0
-	eleShaman.tryUseGCD(sim)
 }
 
 func (eleShaman *ElementalShaman) tryUseGCD(sim *core.Simulation) {
-	dropSuccess := eleShaman.TryDropTotems(sim)
-	if dropSuccess {
-		//eleShaman.Metrics.MarkOOM(sim, &eleShaman.Character, dropTime-sim.CurrentTime)
+	if eleShaman.TryDropTotems(sim) {
 		return
 	}
 
@@ -106,12 +101,7 @@ func (eleShaman *ElementalShaman) tryUseGCD(sim *core.Simulation) {
 	} else {
 		// Only way for a shaman spell to fail is due to mana cost.
 		// Wait until we have enough mana to cast.
-		eleShaman.WaitingForMana = newAction.GetManaCost()
-
-		//regenTime := eleShaman.TimeUntilManaRegen(newAction.GetManaCost())
-		//newAction = common.NewWaitAction(sim, eleShaman.GetCharacter(), regenTime, common.WaitReasonOOM)
-		//newAction.Cast(sim)
-		//eleShaman.rotation.OnActionAccepted(eleShaman, sim, newAction)
+		eleShaman.WaitForMana(sim, newAction.GetManaCost())
 	}
 }
 
