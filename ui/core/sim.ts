@@ -63,6 +63,9 @@ export class Sim {
 
 	private iterations: number = 3000;
   private phase: number = OtherConstants.CURRENT_PHASE;
+  private show1hWeapons: boolean = true;
+  private show2hWeapons: boolean = true;
+  private showMatchingGems: boolean = true;
 
   readonly raid: Raid;
   readonly encounter: Encounter;
@@ -74,6 +77,9 @@ export class Sim {
 
   readonly iterationsChangeEmitter = new TypedEvent<void>();
   readonly phaseChangeEmitter = new TypedEvent<void>();
+  readonly show1hWeaponsChangeEmitter = new TypedEvent<void>();
+  readonly show2hWeaponsChangeEmitter = new TypedEvent<void>();
+  readonly showMatchingGemsChangeEmitter = new TypedEvent<void>();
 
   // Emits when any of the above emitters emit.
   readonly changeEmitter: TypedEvent<void>;
@@ -103,6 +109,9 @@ export class Sim {
 		this.changeEmitter = TypedEvent.onAny([
       this.iterationsChangeEmitter,
       this.phaseChangeEmitter,
+      this.show1hWeaponsChangeEmitter,
+      this.show2hWeaponsChangeEmitter,
+      this.showMatchingGemsChangeEmitter,
 			this.raid.changeEmitter,
 			this.encounter.changeEmitter,
 		]);
@@ -285,6 +294,36 @@ export class Sim {
     if (newPhase != this.phase) {
       this.phase = newPhase;
       this.phaseChangeEmitter.emit(eventID);
+    }
+  }
+  
+  getShow1hWeapons(): boolean {
+    return this.show1hWeapons;
+  }
+  setShow1hWeapons(eventID: EventID, newShow1hWeapons: boolean) {
+    if (newShow1hWeapons != this.show1hWeapons) {
+      this.show1hWeapons = newShow1hWeapons;
+      this.show1hWeaponsChangeEmitter.emit(eventID);
+    }
+  }
+  
+  getShow2hWeapons(): boolean {
+    return this.show2hWeapons;
+  }
+  setShow2hWeapons(eventID: EventID, newShow2hWeapons: boolean) {
+    if (newShow2hWeapons != this.show2hWeapons) {
+      this.show2hWeapons = newShow2hWeapons;
+      this.show2hWeaponsChangeEmitter.emit(eventID);
+    }
+  }
+  
+  getShowMatchingGems(): boolean {
+    return this.showMatchingGems;
+  }
+  setShowMatchingGems(eventID: EventID, newShowMatchingGems: boolean) {
+    if (newShowMatchingGems != this.showMatchingGems) {
+      this.showMatchingGems = newShowMatchingGems;
+      this.showMatchingGemsChangeEmitter.emit(eventID);
     }
   }
   
