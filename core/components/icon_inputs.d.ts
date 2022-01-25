@@ -36,6 +36,7 @@ export declare const Innervate: IndividualSimIconPickerConfig<Player<any>, numbe
 export declare const PowerInfusion: IndividualSimIconPickerConfig<Player<any>, number>;
 export declare const UnleashedRage: IndividualSimIconPickerConfig<Player<any>, boolean>;
 export declare const BloodFrenzy: IndividualSimIconPickerConfig<Target, boolean>;
+export declare const HuntersMark: IndividualSimIconPickerConfig<Target, number>;
 export declare const ImprovedScorch: IndividualSimIconPickerConfig<Target, boolean>;
 export declare const ImprovedSealOfTheCrusader: IndividualSimIconPickerConfig<Target, boolean>;
 export declare const JudgementOfWisdom: IndividualSimIconPickerConfig<Target, boolean>;

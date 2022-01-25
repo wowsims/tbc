@@ -132,6 +132,7 @@ export class EnhancementShamanSimUI extends IndividualSimUI {
                 IconInputs.BloodFrenzy,
                 IconInputs.ImprovedSealOfTheCrusader,
                 IconInputs.JudgementOfWisdom,
+                IconInputs.HuntersMark,
                 IconInputs.FaerieFire,
                 IconInputs.SunderArmor,
                 IconInputs.ExposeArmor,
