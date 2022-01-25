@@ -32,7 +32,7 @@ func (character *Character) MaxMana() float64 {
 	return character.GetInitialStat(stats.Mana)
 }
 func (character *Character) CurrentMana() float64 {
-	return character.GetStat(stats.Mana)
+	return character.stats[stats.Mana]
 }
 func (character *Character) CurrentManaPercent() float64 {
 	return character.CurrentMana() / character.MaxMana()
@@ -109,11 +109,18 @@ func (character *Character) ManaRegenPerSecondWhileNotCasting() float64 {
 	return regenRate
 }
 
+var blankActionID = ActionID{}
+
 // Regenerates mana based on MP5 stat, spirit regen allowed while casting and the elapsed time.
 func (character *Character) RegenManaCasting(sim *Simulation, elapsedTime time.Duration) {
 	elapsedSeconds := elapsedTime.Seconds()
 	manaRegen := character.ManaRegenPerSecondWhileCasting() * elapsedSeconds
-	character.AddMana(sim, manaRegen, ActionID{OtherID: proto.OtherAction_OtherActionManaRegen, Tag: int32(elapsedSeconds * 1000)}, false)
+	if sim.Log != nil {
+		character.AddMana(sim, manaRegen, ActionID{OtherID: proto.OtherAction_OtherActionManaRegen, Tag: int32(elapsedSeconds * 1000)}, false)
+	} else {
+		character.AddMana(sim, manaRegen, blankActionID, false)
+	}
+
 }
 
 // Regenerates mana using mp5 and spirit. Will calculate time since last cast and then enable spirit regen if needed.
@@ -133,7 +140,12 @@ func (character *Character) RegenMana(sim *Simulation, elapsedTime time.Duration
 	} else {
 		regen = character.ManaRegenPerSecondWhileCasting() * elapsedSeconds
 	}
-	character.AddMana(sim, regen, ActionID{OtherID: proto.OtherAction_OtherActionManaRegen, Tag: int32(elapsedSeconds * 1000)}, false)
+	if sim.Log != nil {
+		character.AddMana(sim, regen, ActionID{OtherID: proto.OtherAction_OtherActionManaRegen, Tag: int32(elapsedSeconds * 1000)}, false)
+	} else {
+		character.AddMana(sim, regen, blankActionID, false)
+	}
+
 }
 
 // Returns the amount of time this Character would need to wait in order to reach

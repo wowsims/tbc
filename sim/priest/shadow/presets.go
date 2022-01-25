@@ -6,18 +6,21 @@ import (
 )
 
 var StandardTalents = &proto.PriestTalents{
+	InnerFocus:             true,
+	Meditation:             3,
+	ShadowAffinity:         3,
 	ImprovedShadowWordPain: 2,
-	ImprovedMindBlast:      5,
 	ShadowFocus:            5,
+	ImprovedMindBlast:      5,
 	MindFlay:               true,
 	ShadowWeaving:          5,
 	VampiricEmbrace:        true,
 	FocusedMind:            3,
 	Darkness:               5,
 	Shadowform:             true,
+	ShadowPower:            4,
 	Misery:                 5,
 	VampiricTouch:          true,
-	InnerFocus:             true,
 }
 
 var FullRaidBuffs = &proto.RaidBuffs{

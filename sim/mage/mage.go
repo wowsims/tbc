@@ -47,6 +47,8 @@ type Mage struct {
 
 	waterElemental *WaterElemental
 
+	hasTristfal bool
+
 	// Cached values for a few mechanics.
 	spellDamageMultiplier float64
 
@@ -201,6 +203,7 @@ func NewMage(character core.Character, options proto.Player) *Mage {
 	mage.registerManaGemsCD()
 	mage.applyTalents()
 
+	mage.hasTristfal = ItemSetTirisfalRegalia.CharacterHasSetBonus(&mage.Character, 2)
 	return mage
 }
 
