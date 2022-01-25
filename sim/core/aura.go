@@ -651,6 +651,38 @@ func NewICD() InternalCD {
 	return InternalCD(0)
 }
 
+// NewTempStatAuraApplier creates an application function for applying temp stats. This is higher performance because it creates a cached Aura object in its closure.
+//  You can replace most calls of 'AddAuraWithTemporaryStats' whenever a perf issue is discovered.
+func (character *Character) NewTempStatAuraApplier(sim *Simulation, auraID AuraID, actionID ActionID, stat stats.Stat, amount float64, duration time.Duration) func(sim *Simulation) {
+	aura := Aura{
+		ID:       auraID,
+		ActionID: actionID,
+		OnExpire: func(sim *Simulation) {
+			if sim.Log != nil {
+				character.Log(sim, "Lost %0.02f %s from fading %s.", amount, stat.StatName(), actionID)
+			}
+			if stat == stats.MeleeHaste {
+				character.AddMeleeHaste(sim, -amount)
+			} else {
+				character.AddStat(stat, -amount)
+			}
+		},
+	}
+
+	return func(sim *Simulation) {
+		if sim.Log != nil {
+			character.Log(sim, "Gained %0.02f %s from %s.", amount, stat.StatName(), actionID)
+		}
+		if stat == stats.MeleeHaste {
+			character.AddMeleeHaste(sim, amount)
+		} else {
+			character.AddStat(stat, amount)
+		}
+		aura.Expires = sim.CurrentTime + duration
+		character.AddAura(sim, aura)
+	}
+}
+
 // Helper for the common case of adding an Aura that gives a temporary stat boost.
 func (character *Character) AddAuraWithTemporaryStats(sim *Simulation, auraID AuraID, actionID ActionID, stat stats.Stat, amount float64, duration time.Duration) {
 	character.AddAura(sim, character.NewAuraWithTemporaryStats(sim, auraID, actionID, stat, amount, duration))

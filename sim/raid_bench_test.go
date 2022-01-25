@@ -142,38 +142,6 @@ var castersWithElemental = &proto.Party{
 				BlessingOfWisdom: proto.TristateEffect_TristateEffectImproved,
 			},
 		},
-		{
-			Name:      "Arcane Mage 2",
-			Race:      proto.Race_RaceTroll10,
-			Class:     proto.Class_ClassMage,
-			Equipment: ArcaneEquipment,
-			Spec: &proto.Player_Mage{
-				Mage: &proto.Mage{
-					Talents: mage.ArcaneTalents,
-					Options: &proto.Mage_Options{
-						Armor:           proto.Mage_Options_MageArmor,
-						UseManaEmeralds: true,
-					},
-					Rotation: &proto.Mage_Rotation{
-						Arcane: &proto.Mage_Rotation_ArcaneRotation{
-							ArcaneBlastsBetweenFillers: 3,
-							StartRegenRotationPercent:  0.2,
-							StopRegenRotationPercent:   0.5,
-						},
-					},
-				},
-			},
-			Consumes: &proto.Consumes{
-				FlaskOfBlindingLight: true,
-				MainHandImbue:        proto.WeaponImbue_WeaponImbueBrilliantWizardOil,
-				BlackenedBasilisk:    true,
-				DefaultPotion:        proto.Potions_SuperManaPotion,
-			},
-			Buffs: &proto.IndividualBuffs{
-				BlessingOfKings:  true,
-				BlessingOfWisdom: proto.TristateEffect_TristateEffectImproved,
-			},
-		},
 	},
 	Buffs: &proto.PartyBuffs{},
 }
@@ -241,70 +209,6 @@ var castersWithResto = &proto.Party{
 		},
 		{
 			Name:      "Arcane Mage 3",
-			Race:      proto.Race_RaceTroll10,
-			Class:     proto.Class_ClassMage,
-			Equipment: ArcaneEquipment,
-			Spec: &proto.Player_Mage{
-				Mage: &proto.Mage{
-					Talents: mage.ArcaneTalents,
-					Options: &proto.Mage_Options{
-						Armor:           proto.Mage_Options_MageArmor,
-						UseManaEmeralds: true,
-					},
-					Rotation: &proto.Mage_Rotation{
-						Arcane: &proto.Mage_Rotation_ArcaneRotation{
-							ArcaneBlastsBetweenFillers: 3,
-							StartRegenRotationPercent:  0.2,
-							StopRegenRotationPercent:   0.5,
-						},
-					},
-				},
-			},
-			Consumes: &proto.Consumes{
-				FlaskOfBlindingLight: true,
-				MainHandImbue:        proto.WeaponImbue_WeaponImbueBrilliantWizardOil,
-				BlackenedBasilisk:    true,
-				DefaultPotion:        proto.Potions_SuperManaPotion,
-			},
-			Buffs: &proto.IndividualBuffs{
-				BlessingOfKings:  true,
-				BlessingOfWisdom: proto.TristateEffect_TristateEffectImproved,
-			},
-		},
-		{
-			Name:      "Arcane Mage 4",
-			Race:      proto.Race_RaceTroll10,
-			Class:     proto.Class_ClassMage,
-			Equipment: ArcaneEquipment,
-			Spec: &proto.Player_Mage{
-				Mage: &proto.Mage{
-					Talents: mage.ArcaneTalents,
-					Options: &proto.Mage_Options{
-						Armor:           proto.Mage_Options_MageArmor,
-						UseManaEmeralds: true,
-					},
-					Rotation: &proto.Mage_Rotation{
-						Arcane: &proto.Mage_Rotation_ArcaneRotation{
-							ArcaneBlastsBetweenFillers: 3,
-							StartRegenRotationPercent:  0.2,
-							StopRegenRotationPercent:   0.5,
-						},
-					},
-				},
-			},
-			Consumes: &proto.Consumes{
-				FlaskOfBlindingLight: true,
-				MainHandImbue:        proto.WeaponImbue_WeaponImbueBrilliantWizardOil,
-				BlackenedBasilisk:    true,
-				DefaultPotion:        proto.Potions_SuperManaPotion,
-			},
-			Buffs: &proto.IndividualBuffs{
-				BlessingOfKings:  true,
-				BlessingOfWisdom: proto.TristateEffect_TristateEffectImproved,
-			},
-		},
-		{
-			Name:      "Arcane Mage 5",
 			Race:      proto.Race_RaceTroll10,
 			Class:     proto.Class_ClassMage,
 			Equipment: ArcaneEquipment,

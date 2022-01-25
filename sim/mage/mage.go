@@ -49,7 +49,6 @@ type Mage struct {
 
 	hasTristfal bool
 
-	serpentCoilAura core.Aura
 	// Cached values for a few mechanics.
 	spellDamageMultiplier float64
 

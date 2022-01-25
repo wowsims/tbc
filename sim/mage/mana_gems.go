@@ -26,17 +26,17 @@ func (mage *Mage) registerManaGemsCD() {
 		minManaRubyGain *= manaMultiplier
 		maxManaRubyGain *= manaMultiplier
 
-		scbActionID := core.ActionID{ItemID: SerpentCoilBraidID}
-		mage.serpentCoilAura = core.Aura{
-			ID:       SerpentCoilBraidAuraID,
-			ActionID: scbActionID,
-			OnExpire: func(sim *core.Simulation) {
-				if sim.Log != nil {
-					mage.Log(sim, "Lost 225 SpellPower from fading "+scbActionID.String())
-				}
-				mage.AddStat(stats.SpellPower, -225)
-			},
-		}
+		// scbActionID := core.ActionID{ItemID: SerpentCoilBraidID}
+		// mage.serpentCoilAura = core.Aura{
+		// 	ID:       SerpentCoilBraidAuraID,
+		// 	ActionID: scbActionID,
+		// 	OnExpire: func(sim *core.Simulation) {
+		// 		if sim.Log != nil {
+		// 			mage.Log(sim, "Lost 225 SpellPower from fading "+scbActionID.String())
+		// 		}
+		// 		mage.AddStat(stats.SpellPower, -225)
+		// 	},
+		// }
 	}
 	manaEmeraldGainRange := maxManaEmeraldGain - minManaEmeraldGain
 	manaRubyGainRange := maxManaRubyGain - minManaRubyGain
@@ -67,6 +67,8 @@ func (mage *Mage) registerManaGemsCD() {
 			return true
 		},
 		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
+			serpentCoilAuraApplier := mage.NewTempStatAuraApplier(sim, SerpentCoilBraidAuraID, core.ActionID{ItemID: SerpentCoilBraidID}, stats.SpellPower, 225, time.Second*15)
+
 			return func(sim *core.Simulation, character *core.Character) {
 				if mage.remainingManaGems == 1 {
 					// Mana Ruby: Restores 1073 to 1127 mana. (2 Min Cooldown)
@@ -83,7 +85,7 @@ func (mage *Mage) registerManaGemsCD() {
 				}
 
 				if serpentCoilBraid {
-					mage.activateSerpentCoilBraid(sim)
+					serpentCoilAuraApplier(sim)
 				}
 
 				mage.remainingManaGems--
@@ -98,10 +100,3 @@ func (mage *Mage) registerManaGemsCD() {
 }
 
 var SerpentCoilBraidAuraID = core.NewAuraID()
-
-func (mage *Mage) activateSerpentCoilBraid(sim *core.Simulation) {
-	const dur = time.Second * 15
-	mage.AddStat(stats.SpellPower, 225)
-	mage.serpentCoilAura.Expires = sim.CurrentTime + dur
-	mage.AddAura(sim, mage.serpentCoilAura)
-}
