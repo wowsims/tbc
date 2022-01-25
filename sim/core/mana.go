@@ -32,7 +32,7 @@ func (character *Character) MaxMana() float64 {
 	return character.GetInitialStat(stats.Mana)
 }
 func (character *Character) CurrentMana() float64 {
-	return character.GetStat(stats.Mana)
+	return character.stats[stats.Mana]
 }
 func (character *Character) CurrentManaPercent() float64 {
 	return character.CurrentMana() / character.MaxMana()
@@ -43,7 +43,7 @@ func (character *Character) AddMana(sim *Simulation, amount float64, actionID Ac
 		panic("Trying to add negative mana!")
 	}
 
-	oldMana := character.stats[stats.Mana]
+	oldMana := character.CurrentMana()
 	newMana := MinFloat(oldMana+amount, character.MaxMana())
 
 	if sim.Log != nil {
