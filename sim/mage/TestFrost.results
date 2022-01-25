@@ -110,6 +110,12 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestFrost-AllItems-CloakofDarkness-33122"
+ value: {
+  dps: 1603.339660396594
+ }
+}
+dps_results: {
  key: "TestFrost-AllItems-CoreofAr'kelos-29776"
  value: {
   dps: 1567.7700551674504

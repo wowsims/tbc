@@ -723,6 +723,7 @@ export const specToEligibleRaces: Record<Spec, Array<Race>> = {
 // Specs that can dual wield. This could be based on class, except that
 // Enhancement Shaman learn dual wield from a talent.
 const dualWieldSpecs: Array<Spec> = [
+	Spec.SpecEnhancementShaman,
 	Spec.SpecHunter,
 	Spec.SpecRogue,
 	Spec.SpecWarrior,
@@ -1022,7 +1023,6 @@ export function getMetaGemEffectEP(spec: Spec, gem: Gem, playerStats: Stats) {
 // Returns true if this item may be equipped in at least 1 slot for the given Spec.
 export function canEquipItem(item: Item, spec: Spec): boolean {
 	const playerClass = specToClass[spec];
-
 	if (item.classAllowlist.length > 0 && !item.classAllowlist.includes(playerClass)) {
 		return false;
 	}

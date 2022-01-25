@@ -357,6 +357,11 @@ func (ahe *AbilityHitEffect) IsOH() bool {
 	return ahe.WeaponInput.IsOH
 }
 
+// Returns whether this hit effect matches the hand in which a weapon is equipped.
+func (ahe *AbilityHitEffect) IsEquippedHand(mh bool, oh bool) bool {
+	return (ahe.IsMH() && mh) || (ahe.IsOH() && oh)
+}
+
 func (ability *ActiveMeleeAbility) CalculatedGCD(char *Character) time.Duration {
 	baseGCD := GCDDefault
 	if ability.GCDCooldown != 0 {

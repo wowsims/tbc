@@ -420,6 +420,19 @@ func (character *Character) HasOHWeapon() bool {
 	return character.GetOHWeapon() != nil
 }
 
+// Returns the hands that the item is equipped in, as (MH, OH).
+func (character *Character) GetWeaponHands(itemID int32) (bool, bool) {
+	mh := false
+	oh := false
+	if weapon := character.GetMHWeapon(); weapon != nil && weapon.ID == itemID {
+		mh = true
+	}
+	if weapon := character.GetOHWeapon(); weapon != nil && weapon.ID == itemID {
+		oh = true
+	}
+	return mh, oh
+}
+
 func (character *Character) doneIteration(simDuration time.Duration) {
 	// Need to do pets first so we can add their results to the owners.
 	if len(character.Pets) > 0 {

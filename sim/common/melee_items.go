@@ -4,7 +4,6 @@ import (
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
-	"github.com/wowsims/tbc/sim/core/proto"
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
@@ -29,6 +28,7 @@ func init() {
 	core.AddItemEffect(31318, ApplySingingCrystalAxe)
 	core.AddItemEffect(31331, ApplyTheNightBlade)
 	core.AddItemEffect(32262, ApplySyphonOfTheNathrezim)
+	core.AddItemEffect(33122, ApplyCloakOfDarkness)
 
 	// TODO:
 	// blinkstrike
@@ -69,6 +69,8 @@ var BlackoutTruncheonProcAuraID = core.NewAuraID()
 
 func ApplyBlackoutTruncheon(agent core.Agent) {
 	character := agent.GetCharacter()
+	mh, oh := character.GetWeaponHands(27901)
+
 	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		const hasteBonus = 132.0
 		const dur = time.Second * 10
@@ -77,7 +79,7 @@ func ApplyBlackoutTruncheon(agent core.Agent) {
 		return core.Aura{
 			ID: BlackoutTruncheonAuraID,
 			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
-				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() {
+				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() || !hitEffect.IsEquippedHand(mh, oh) {
 					return
 				}
 				if sim.RandomFloat("BlackoutTruncheon") > procChance {
@@ -147,6 +149,7 @@ var DrakefistHammerProcAuraID = core.NewAuraID()
 
 func ApplyDrakefistHammer(agent core.Agent) {
 	character := agent.GetCharacter()
+	mh, oh := character.GetWeaponHands(28437)
 	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		const hasteBonus = 212.0
 		const dur = time.Second * 10
@@ -155,7 +158,7 @@ func ApplyDrakefistHammer(agent core.Agent) {
 		return core.Aura{
 			ID: DrakefistHammerAuraID,
 			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
-				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() {
+				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() || !hitEffect.IsEquippedHand(mh, oh) {
 					return
 				}
 				if sim.RandomFloat("DrakefistHammer") > procChance {
@@ -173,6 +176,7 @@ var DragonmawProcAuraID = core.NewAuraID()
 
 func ApplyDragonmaw(agent core.Agent) {
 	character := agent.GetCharacter()
+	mh, oh := character.GetWeaponHands(28438)
 	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		const hasteBonus = 212.0
 		const dur = time.Second * 10
@@ -181,7 +185,7 @@ func ApplyDragonmaw(agent core.Agent) {
 		return core.Aura{
 			ID: DragonmawAuraID,
 			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
-				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() {
+				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() || !hitEffect.IsEquippedHand(mh, oh) {
 					return
 				}
 				if sim.RandomFloat("Dragonmaw") > procChance {
@@ -199,6 +203,7 @@ var DragonstrikeProcAuraID = core.NewAuraID()
 
 func ApplyDragonstrike(agent core.Agent) {
 	character := agent.GetCharacter()
+	mh, oh := character.GetWeaponHands(28439)
 	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		const hasteBonus = 212.0
 		const dur = time.Second * 10
@@ -207,7 +212,7 @@ func ApplyDragonstrike(agent core.Agent) {
 		return core.Aura{
 			ID: DragonstrikeAuraID,
 			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
-				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() {
+				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() || !hitEffect.IsEquippedHand(mh, oh) {
 					return
 				}
 				if sim.RandomFloat("Dragonstrike") > procChance {
@@ -395,7 +400,7 @@ func ApplyTheBladefist(agent core.Agent) {
 		return core.Aura{
 			ID: TheBladefistAuraID,
 			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
-				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() {
+				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() || !hitEffect.IsMH() {
 					return
 				}
 				if sim.RandomFloat("The Bladefist") > procChance {
@@ -412,13 +417,14 @@ var RodOfTheSunKingAuraID = core.NewAuraID()
 
 func ApplyRodOfTheSunKing(agent core.Agent) {
 	character := agent.GetCharacter()
+	mh, oh := character.GetWeaponHands(29996)
 	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		const procChance = 2.7 / 60.0
 
 		return core.Aura{
 			ID: RodOfTheSunKingAuraID,
 			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
-				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() {
+				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() || !hitEffect.IsEquippedHand(mh, oh) {
 					return
 				}
 				if sim.RandomFloat("Rod of the Sun King") > procChance {
@@ -468,6 +474,7 @@ var WarpSlicerProcAuraID = core.NewAuraID()
 
 func ApplyWarpSlicer(agent core.Agent) {
 	character := agent.GetCharacter()
+	mh, oh := character.GetWeaponHands(30311)
 	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		const bonus = 1.2
 		const inverseBonus = 1 / 1.2
@@ -477,7 +484,7 @@ func ApplyWarpSlicer(agent core.Agent) {
 		return core.Aura{
 			ID: WarpSlicerAuraID,
 			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
-				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() {
+				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() || !hitEffect.IsEquippedHand(mh, oh) {
 					return
 				}
 				if sim.RandomFloat("WarpSlicer") > procChance {
@@ -564,6 +571,7 @@ var TheNightBladeProcAuraID = core.NewAuraID()
 
 func ApplyTheNightBlade(agent core.Agent) {
 	character := agent.GetCharacter()
+	mh, oh := character.GetWeaponHands(31331)
 	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		const arPenBonus = 435.0
 		const dur = time.Second * 10
@@ -572,7 +580,7 @@ func ApplyTheNightBlade(agent core.Agent) {
 		return core.Aura{
 			ID: TheNightBladeAuraID,
 			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
-				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() {
+				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() || !hitEffect.IsEquippedHand(mh, oh) {
 					return
 				}
 				if sim.RandomFloat("The Night Blade") > procChance {
@@ -603,11 +611,7 @@ var SiphonEssenceOHAuraID = core.NewAuraID()
 func ApplySyphonOfTheNathrezim(agent core.Agent) {
 	character := agent.GetCharacter()
 	ppmm := character.AutoAttacks.NewPPMManager(1.0)
-	mh := character.Equip[proto.ItemSlot_ItemSlotMainHand].ID == 32262
-	oh := character.Equip[proto.ItemSlot_ItemSlotOffHand].ID == 32262
-	if !mh && !oh {
-		return
-	}
+	mh, oh := character.GetWeaponHands(32262)
 	if !mh {
 		ppmm.SetProcChance(false, 0)
 	}
@@ -682,6 +686,21 @@ func ApplySyphonOfTheNathrezim(agent core.Agent) {
 				if ppmm.Proc(sim, isMH, "Syphon Of The Nathrezim") {
 					applySiphonEssence(sim, character, isMH)
 				}
+			},
+		}
+	})
+}
+
+var CloakOfDarknessAuraID = core.NewAuraID()
+
+func ApplyCloakOfDarkness(agent core.Agent) {
+	character := agent.GetCharacter()
+	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
+		return core.Aura{
+			ID: CloakOfDarknessAuraID,
+			OnBeforeMeleeHit: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
+				// TODO: Melee crit only
+				hitEffect.BonusCritRating += 24
 			},
 		}
 	})
