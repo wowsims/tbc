@@ -305,16 +305,16 @@ func (shaman *Shaman) applyFlurry() {
 		return
 	}
 
+	bonus := 1.05 + 0.05*float64(shaman.Talents.Flurry)
+	if ItemSetCataclysmHarness.CharacterHasSetBonus(&shaman.Character, 4) {
+		bonus += 0.05
+	}
+	inverseBonus := 1 / bonus
+
 	shaman.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		flurryStacks := 0
 		icdDur := time.Millisecond * 500
 		var icd core.InternalCD
-
-		bonus := 1.05 + 0.05*float64(shaman.Talents.Flurry)
-		if ItemSetCataclysmRegalia.CharacterHasSetBonus(&shaman.Character, 4) {
-			bonus += 1.05
-		}
-		inverseBonus := 1 / 1.3
 
 		return core.Aura{
 			ID: FlurryTalentAuraID,
