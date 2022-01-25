@@ -109,6 +109,10 @@ func consumesStats(character *Character, c proto.Consumes, raidBuffs proto.RaidB
 		s[stats.MeleeHit] += 20
 		s[stats.Spirit] += 20
 	}
+	if c.SpicyHotTalbuk {
+		s[stats.Agility] += 20
+		s[stats.Spirit] += 20
+	}
 	if c.ScrollOfAgilityV {
 		s[stats.Agility] += 20
 	}
