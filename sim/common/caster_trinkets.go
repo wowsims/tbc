@@ -188,6 +188,7 @@ func ApplyQuagmirransEye(agent core.Agent) {
 		const dur = time.Second * 45
 		icd := core.NewICD()
 
+		applyStatAura := character.NewTempStatAuraApplier(sim, FungalFrenzyAuraID, core.ActionID{ItemID: 27683}, stats.SpellHaste, hasteBonus, time.Second*6)
 		return core.Aura{
 			ID: QuagmirransEyeAuraID,
 			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
@@ -195,7 +196,7 @@ func ApplyQuagmirransEye(agent core.Agent) {
 					return
 				}
 				icd = core.InternalCD(sim.CurrentTime + dur)
-				character.AddAuraWithTemporaryStats(sim, FungalFrenzyAuraID, core.ActionID{ItemID: 27683}, stats.SpellHaste, hasteBonus, time.Second*6)
+				applyStatAura(sim)
 			},
 		}
 	})

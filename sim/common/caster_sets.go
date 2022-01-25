@@ -32,13 +32,14 @@ var ItemSetManaEtched = core.ItemSet{
 				const spellBonus = 110.0
 				const duration = time.Second * 15
 
+				applyStatAura := character.NewTempStatAuraApplier(sim, ManaEtchedInsightAuraID, core.ActionID{SpellID: 37619}, stats.SpellPower, spellBonus, duration)
 				return core.Aura{
 					ID: ManaEtchedAuraID,
 					OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
 						if sim.RandomFloat("Mana-Etched Insight") > 0.02 {
 							return
 						}
-						character.AddAuraWithTemporaryStats(sim, ManaEtchedInsightAuraID, core.ActionID{SpellID: 37619}, stats.SpellPower, spellBonus, duration)
+						applyStatAura(sim)
 					},
 				}
 			})

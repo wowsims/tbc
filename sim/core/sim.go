@@ -35,6 +35,8 @@ type Simulation struct {
 
 	Log  func(string, ...interface{})
 	logs []string
+
+	emptyAuras []Aura
 }
 
 func RunSim(rsr proto.RaidSimRequest, progress chan *proto.ProgressMetrics) *proto.RaidSimResult {
@@ -74,6 +76,8 @@ func newSim(rsr proto.RaidSimRequest) *Simulation {
 
 		isTest:    simOptions.IsTest,
 		testRands: make(map[uint32]*rand.Rand),
+
+		emptyAuras: make([]Aura, numAuraIDs),
 	}
 }
 

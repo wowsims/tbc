@@ -35,7 +35,7 @@ func (character *Character) MaxMana() float64 {
 	return character.GetInitialStat(stats.Mana)
 }
 func (character *Character) CurrentMana() float64 {
-	return character.GetStat(stats.Mana)
+	return character.stats[stats.Mana]
 }
 func (character *Character) CurrentManaPercent() float64 {
 	return character.CurrentMana() / character.MaxMana()

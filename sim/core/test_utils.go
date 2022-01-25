@@ -150,7 +150,7 @@ func RaidSimTest(label string, t *testing.T, rsr *proto.RaidSimRequest, expected
 
 func RaidBenchmark(b *testing.B, rsr *proto.RaidSimRequest) {
 	rsr.Encounter.Duration = LongDuration
-	rsr.SimOptions.Iterations = 1000
+	rsr.SimOptions.Iterations = 1
 
 	// Set to false because IsTest adds a lot of computation.
 	rsr.SimOptions.IsTest = false

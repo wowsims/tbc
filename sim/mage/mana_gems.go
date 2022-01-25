@@ -36,10 +36,7 @@ func (mage *Mage) registerManaGemsCD() {
 		Priority:   core.CooldownPriorityDefault,
 		Type:       core.CooldownTypeMana,
 		CanActivate: func(sim *core.Simulation, character *core.Character) bool {
-			if mage.remainingManaGems == 0 {
-				return false
-			}
-			return true
+			return mage.remainingManaGems != 0
 		},
 		ShouldActivate: func(sim *core.Simulation, character *core.Character) bool {
 			// Only pop if we have less than the max mana provided by the gem minus 1mp5 tick.
@@ -55,6 +52,8 @@ func (mage *Mage) registerManaGemsCD() {
 			return true
 		},
 		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
+			serpentCoilAuraApplier := mage.NewTempStatAuraApplier(sim, SerpentCoilBraidAuraID, core.ActionID{ItemID: SerpentCoilBraidID}, stats.SpellPower, 225, time.Second*15)
+
 			return func(sim *core.Simulation, character *core.Character) {
 				if mage.remainingManaGems == 1 {
 					// Mana Ruby: Restores 1073 to 1127 mana. (2 Min Cooldown)
@@ -71,7 +70,7 @@ func (mage *Mage) registerManaGemsCD() {
 				}
 
 				if serpentCoilBraid {
-					mage.activateSerpentCoilBraid(sim)
+					serpentCoilAuraApplier(sim)
 				}
 
 				mage.remainingManaGems--
@@ -86,7 +85,3 @@ func (mage *Mage) registerManaGemsCD() {
 }
 
 var SerpentCoilBraidAuraID = core.NewAuraID()
-
-func (mage *Mage) activateSerpentCoilBraid(sim *core.Simulation) {
-	mage.AddAuraWithTemporaryStats(sim, SerpentCoilBraidAuraID, core.ActionID{ItemID: SerpentCoilBraidID}, stats.SpellPower, 225, time.Second*15)
-}
