@@ -353,6 +353,7 @@ message Debuffs {
     bool sunder_armor = 11; // Number of stacks of sunder armor: -520 armor per stack, 5 max
     bool curse_of_recklessness = 12; // -800 armor
 
+		TristateEffect hunters_mark = 15;
 		double expose_weakness_uptime = 13;
 		double expose_weakness_hunter_agility = 14;
 }

@@ -88,6 +88,14 @@ func applyDebuffEffects(target *Target, debuffs proto.Debuffs) {
 			return ExposeWeaknessAura(debuffs.ExposeWeaknessHunterAgility, multiplier)
 		})
 	}
+
+	if debuffs.HuntersMark != proto.TristateEffect_TristateEffectMissing {
+		if debuffs.HuntersMark == proto.TristateEffect_TristateEffectImproved {
+			target.AddPermanentAura(func(sim *Simulation) Aura {
+				return HuntersMarkAura(5)
+			})
+		}
+	}
 }
 
 var MiseryDebuffID = NewDebuffID()
@@ -366,6 +374,21 @@ func ExposeWeaknessAura(hunterAgility float64, multiplier float64) Aura {
 		ActionID: ActionID{SpellID: 34503},
 		OnBeforeMeleeHit: func(sim *Simulation, ability *ActiveMeleeAbility, hitEffect *AbilityHitEffect) {
 			hitEffect.BonusAttackPower += apBonus
+		},
+	}
+}
+
+var HuntersMarkDebuffID = NewDebuffID()
+
+func HuntersMarkAura(points int32) Aura {
+	rangedBonus := 440.0
+	meleeBonus := rangedBonus * 0.2 * float64(points)
+
+	return Aura{
+		ID:       HuntersMarkDebuffID,
+		ActionID: ActionID{SpellID: 14325},
+		OnBeforeMeleeHit: func(sim *Simulation, ability *ActiveMeleeAbility, hitEffect *AbilityHitEffect) {
+			hitEffect.BonusAttackPower += meleeBonus
 		},
 	}
 }
