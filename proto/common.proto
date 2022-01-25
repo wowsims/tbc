@@ -318,6 +318,7 @@ message Consumes {
     bool skullfish_soup = 14;
     bool roasted_clefthoof = 24;
     bool spicy_hot_talbuk = 29;
+    bool grilled_mudfish = 35;
 
     bool kreegsStoutBeatdown = 20;
 
