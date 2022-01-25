@@ -551,6 +551,7 @@ export const specToEligibleRaces = {
 // Specs that can dual wield. This could be based on class, except that
 // Enhancement Shaman learn dual wield from a talent.
 const dualWieldSpecs = [
+    Spec.SpecEnhancementShaman,
     Spec.SpecHunter,
     Spec.SpecRogue,
     Spec.SpecWarrior,
