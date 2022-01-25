@@ -281,4 +281,6 @@ var allowList = map[int]bool{
 	33143: true, // Stone of Blades
 	33144: true, // Facet of Eternity
 	31139: true, // Fist of Reckoning
+	19808: true, // Rockhide Strongfish
+	6360:  true, // Steelscale Crushfish
 }
