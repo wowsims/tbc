@@ -280,4 +280,5 @@ var allowList = map[int]bool{
 	33140: true, // Blood of Amber
 	33143: true, // Stone of Blades
 	33144: true, // Facet of Eternity
+	31139: true, // Fist of Reckoning
 }
