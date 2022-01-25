@@ -66,7 +66,7 @@ var ItemSetTirisfalRegalia = core.ItemSet{
 				ID:       Tirisfal4PcProcAuraID,
 				ActionID: core.ActionID{SpellID: 37443},
 				OnExpire: func(sim *core.Simulation) {
-					character.AddStat(stats.SpellPower, -225)
+					character.AddStat(stats.SpellPower, -70)
 				},
 			}
 			character.AddPermanentAura(func(sim *core.Simulation) core.Aura {

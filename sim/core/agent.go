@@ -89,7 +89,7 @@ func (actionID ActionID) String() string {
 		sb.WriteString(strconv.Itoa(int(actionID.OtherID)))
 	}
 	if actionID.Tag != 0 {
-		sb.WriteString("Tag: ")
+		sb.WriteString(", Tag: ")
 		sb.WriteString(strconv.Itoa(int(actionID.Tag)))
 	}
 	sb.WriteString("}")

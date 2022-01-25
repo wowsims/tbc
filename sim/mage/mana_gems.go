@@ -26,12 +26,13 @@ func (mage *Mage) registerManaGemsCD() {
 		minManaRubyGain *= manaMultiplier
 		maxManaRubyGain *= manaMultiplier
 
+		scbActionID := core.ActionID{ItemID: SerpentCoilBraidID}
 		mage.serpentCoilAura = core.Aura{
 			ID:       SerpentCoilBraidAuraID,
-			ActionID: core.ActionID{ItemID: SerpentCoilBraidID},
+			ActionID: scbActionID,
 			OnExpire: func(sim *core.Simulation) {
 				if sim.Log != nil {
-					mage.Log(sim, "Lost 225 SpellPower from fading Serpent-Coil Braid.")
+					mage.Log(sim, "Lost 225 SpellPower from fading "+scbActionID.String())
 				}
 				mage.AddStat(stats.SpellPower, -225)
 			},
