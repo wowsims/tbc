@@ -194,6 +194,7 @@ enum Potions {
 	SuperManaPotion = 2;
 	HastePotion = 3;
 	MightyRagePotion = 4;
+    InsaneStrengthPotion = 5;
 }
 
 enum Conjured {
@@ -291,19 +292,25 @@ message Consumes {
     bool elixir_of_major_strength = 31;
     bool elixir_of_demonslaying = 23;
     bool elixir_of_the_mongoose = 30;
+    bool fel_strength_elixir = 32;
 
     bool brilliant_wizard_oil = 11; 
     bool superior_wizard_oil = 12; 
+    bool adamantite_sharpening_stone = 33;
+    bool elemental_sharpening_stone = 34;
 
     bool blackened_basilisk = 13;
     bool skullfish_soup = 14;
     bool roasted_clefthoof = 24;
     bool spicy_hot_talbuk = 29;
+    bool grilled_mudfish = 35;
 
     bool kreegsStoutBeatdown = 20;
 
     bool scroll_of_strength_v = 25; // 20 str
+    bool scroll_of_strength_iv = 36; // 17 str
     bool scroll_of_agility_v = 26; // 20 agi
+    bool scroll_of_agility_iv = 37; // 17 agi
     bool scroll_of_spirit_v = 28; // 30 spirit
 
     Potions default_potion = 15;

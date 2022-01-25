@@ -89,17 +89,24 @@ export const FlaskOfMightyRestoration = makeBooleanConsumeInput(ActionId.fromIte
 export const FlaskOfPureDeath = makeBooleanConsumeInput(ActionId.fromItemId(22866), 'flaskOfPureDeath', ['Battle Elixir', 'Guardian Elixir']);
 export const FlaskOfSupremePower = makeBooleanConsumeInput(ActionId.fromItemId(13512), 'flaskOfSupremePower', ['Battle Elixir', 'Guardian Elixir']);
 export const FlaskOfRelentlessAssault = makeBooleanConsumeInput(ActionId.fromItemId(22854), 'flaskOfRelentlessAssault', ['Battle Elixir', 'Guardian Elixir']);
+export const FelStrengthElixir = makeBooleanConsumeInput(ActionId.fromItemId(31679), 'felStrengthElixir', ['Battle Elixir']);
 export const KreegsStoutBeatdown = makeBooleanConsumeInput(ActionId.fromItemId(18284), 'kreegsStoutBeatdown', ['Alchohol']);
 export const SkullfishSoup = makeBooleanConsumeInput(ActionId.fromItemId(33825), 'skullfishSoup', ['Food']);
 export const SuperiorWizardOil = makeBooleanConsumeInput(ActionId.fromItemId(22522), 'superiorWizardOil', ['Weapon Imbue']);
+export const AdamantiteSharpeningStone = makeBooleanConsumeInput(ActionId.fromItemId(23529), 'adamantiteSharpeningStone', ['Weapon Imbue']);
+export const ElementalSharpeningStone = makeBooleanConsumeInput(ActionId.fromItemId(18262), 'elementalSharpeningStone', ['Weapon Imbue']);
 export const RoastedClefthoof = makeBooleanConsumeInput(ActionId.fromItemId(27658), 'roastedClefthoof', ['Food']);
+export const GrilledMudfish = makeBooleanConsumeInput(ActionId.fromItemId(27664), 'grilledMudfish', ['Food']);
 export const ScrollOfStrengthV = makeBooleanConsumeInput(ActionId.fromItemId(27503), 'scrollOfStrengthV');
+export const ScrollOfStrengthIV = makeBooleanConsumeInput(ActionId.fromItemId(10310), 'scrollOfStrengthIv');
 export const ScrollOfAgilityV = makeBooleanConsumeInput(ActionId.fromItemId(27498), 'scrollOfAgilityV');
+export const ScrollOfAgilityIV = makeBooleanConsumeInput(ActionId.fromItemId(10309), 'scrollOfAgilityIv');
 export const ScrollOfSpiritV = makeBooleanConsumeInput(ActionId.fromItemId(27501), 'scrollOfSpiritV', ['Spirit']);
 export const SpicyHotTalbuk = makeBooleanConsumeInput(ActionId.fromItemId(33872), 'spicyHotTalbuk', ['Food']);
 
 export const DefaultDestructionPotion = makeEnumValueConsumeInput(ActionId.fromItemId(22839), 'defaultPotion', Potions.DestructionPotion, ['Potion']);
 export const DefaultHastePotion = makeEnumValueConsumeInput(ActionId.fromItemId(22838), 'defaultPotion', Potions.HastePotion, ['Potion']);
+export const DefaultInsaneStrengthPotion = makeEnumValueConsumeInput(ActionId.fromItemId(22828), 'defaultPotion', Potions.InsaneStrengthPotion, ['Potion']);
 export const DefaultMightyRagePotion = makeEnumValueConsumeInput(ActionId.fromItemId(13442), 'defaultPotion', Potions.MightyRagePotion, ['Potion']);
 export const DefaultSuperManaPotion = makeEnumValueConsumeInput(ActionId.fromItemId(22832), 'defaultPotion', Potions.SuperManaPotion, ['Potion']);
 
