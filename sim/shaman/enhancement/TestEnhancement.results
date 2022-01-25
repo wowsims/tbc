@@ -110,6 +110,12 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestEnhancement-AllItems-CloakofDarkness-33122"
+ value: {
+  dps: 1880.974638175221
+ }
+}
+dps_results: {
  key: "TestEnhancement-AllItems-CoreofAr'kelos-29776"
  value: {
   dps: 1878.0710624293254
@@ -178,19 +184,19 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-AllItems-Dragonmaw-28438"
  value: {
-  dps: 1923.9889842398902
+  dps: 1835.4673574302321
  }
 }
 dps_results: {
  key: "TestEnhancement-AllItems-Dragonstrike-28439"
  value: {
-  dps: 1886.4280281635704
+  dps: 1835.1158699312232
  }
 }
 dps_results: {
  key: "TestEnhancement-AllItems-DrakefistHammer-28437"
  value: {
-  dps: 1884.1746290137503
+  dps: 1825.02643687736
  }
 }
 dps_results: {
@@ -532,7 +538,7 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-AllItems-TheBladefist-29348"
  value: {
-  dps: 1753.8616713370122
+  dps: 1739.391623457377
  }
 }
 dps_results: {

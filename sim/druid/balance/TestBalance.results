@@ -104,6 +104,12 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestBalance-AllItems-CloakofDarkness-33122"
+ value: {
+  dps: 1260.9350059629485
+ }
+}
+dps_results: {
  key: "TestBalance-AllItems-CoreofAr'kelos-29776"
  value: {
   dps: 1252.416906741917
