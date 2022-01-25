@@ -118,7 +118,7 @@ func (shaman *Shaman) ApplyFlametongueImbue(mh bool, oh bool) {
 	ftTmpl := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				ActionID:        core.ActionID{ItemID: 25489},
+				ActionID:        core.ActionID{SpellID: 25489},
 				Character:       &shaman.Character,
 				IgnoreCooldowns: true,
 				IgnoreManaCost:  true,
@@ -194,7 +194,7 @@ func (shaman *Shaman) ApplyFrostbrandImbue(mh bool, oh bool) {
 	fbTmpl := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				ActionID:        core.ActionID{ItemID: 25500},
+				ActionID:        core.ActionID{SpellID: 25500},
 				Character:       &shaman.Character,
 				IgnoreCooldowns: true,
 				IgnoreManaCost:  true,
