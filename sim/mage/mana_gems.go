@@ -36,10 +36,7 @@ func (mage *Mage) registerManaGemsCD() {
 		Priority:   core.CooldownPriorityDefault,
 		Type:       core.CooldownTypeMana,
 		CanActivate: func(sim *core.Simulation, character *core.Character) bool {
-			if mage.remainingManaGems == 0 {
-				return false
-			}
-			return true
+			return mage.remainingManaGems != 0
 		},
 		ShouldActivate: func(sim *core.Simulation, character *core.Character) bool {
 			// Only pop if we have less than the max mana provided by the gem minus 1mp5 tick.
