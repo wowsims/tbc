@@ -593,7 +593,7 @@ func (aa *AutoAttacks) ModifySwingTime(sim *Simulation, amount float64) {
 		return
 	}
 	mhSwingTime := aa.MainhandSwingAt - sim.CurrentTime
-	if mhSwingTime > 0 {
+	if mhSwingTime > 1 { // If its 1 we end up rounding down to 0 and causing a panic.
 		aa.MainhandSwingAt = sim.CurrentTime + time.Duration(float64(mhSwingTime)/amount)
 	}
 
@@ -601,7 +601,7 @@ func (aa *AutoAttacks) ModifySwingTime(sim *Simulation, amount float64) {
 		return
 	}
 	ohSwingTime := aa.OffhandSwingAt - sim.CurrentTime
-	if ohSwingTime > 0 {
+	if ohSwingTime > 1 {
 		newTime := time.Duration(float64(ohSwingTime) / amount)
 		if newTime > 0 {
 			aa.OffhandSwingAt = sim.CurrentTime + newTime
@@ -620,6 +620,9 @@ func (aa *AutoAttacks) NextAttackAt() time.Duration {
 
 // Returns the time at which the next event will occur, considering both autos and the gcd.
 func (aa *AutoAttacks) NextEventAt(sim *Simulation) time.Duration {
+	if aa.NextAttackAt() == sim.CurrentTime {
+		panic(fmt.Sprintf("Returned 0 from next attack at %s, mh: %s, oh: %s", sim.CurrentTime, aa.MainhandSwingAt, aa.OffhandSwingAt))
+	}
 	return MinDuration(
 		sim.CurrentTime+aa.Character.GetRemainingCD(GCDCooldownID, sim.CurrentTime),
 		aa.NextAttackAt())
