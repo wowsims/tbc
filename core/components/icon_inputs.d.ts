@@ -63,6 +63,7 @@ export declare const FlaskOfMightyRestoration: IndividualSimIconPickerConfig<Pla
 export declare const FlaskOfPureDeath: IndividualSimIconPickerConfig<Player<any>, boolean>;
 export declare const FlaskOfSupremePower: IndividualSimIconPickerConfig<Player<any>, boolean>;
 export declare const FlaskOfRelentlessAssault: IndividualSimIconPickerConfig<Player<any>, boolean>;
+export declare const GrilledMudfish: IndividualSimIconPickerConfig<Player<any>, boolean>;
 export declare const KreegsStoutBeatdown: IndividualSimIconPickerConfig<Player<any>, boolean>;
 export declare const MainHandAdamantiteSharpeningStone: IndividualSimIconPickerConfig<Player<any>, boolean>;
 export declare const MainHandElementalSharpeningStone: IndividualSimIconPickerConfig<Player<any>, boolean>;

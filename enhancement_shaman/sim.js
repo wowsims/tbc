@@ -144,6 +144,7 @@ export class EnhancementShamanSimUI extends IndividualSimUI {
             // IconInputs to include in the 'Consumes' section on the settings tab.
             consumeInputs: [
                 IconInputs.DefaultHastePotion,
+                IconInputs.DefaultSuperManaPotion,
                 IconInputs.DefaultDarkRune,
                 IconInputs.DefaultFlameCap,
                 IconInputs.FlaskOfRelentlessAssault,
@@ -151,7 +152,10 @@ export class EnhancementShamanSimUI extends IndividualSimUI {
                 IconInputs.ElixirOfMajorStrength,
                 IconInputs.ElixirOfMajorAgility,
                 IconInputs.ElixirOfTheMongoose,
+                IconInputs.ElixirOfDraenicWisdom,
+                IconInputs.ElixirOfMajorMageblood,
                 IconInputs.RoastedClefthoof,
+                IconInputs.GrilledMudfish,
                 IconInputs.SpicyHotTalbuk,
                 IconInputs.ScrollOfAgilityV,
                 IconInputs.ScrollOfStrengthV,

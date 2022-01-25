@@ -1288,6 +1288,7 @@ class Consumes$Type extends MessageType {
             { no: 14, name: "skullfish_soup", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 24, name: "roasted_clefthoof", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 29, name: "spicy_hot_talbuk", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 35, name: "grilled_mudfish", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 20, name: "kreegsStoutBeatdown", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 25, name: "scroll_of_strength_v", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 26, name: "scroll_of_agility_v", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
@@ -1302,7 +1303,7 @@ class Consumes$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { flaskOfBlindingLight: false, flaskOfMightyRestoration: false, flaskOfPureDeath: false, flaskOfSupremePower: false, flaskOfRelentlessAssault: false, adeptsElixir: false, elixirOfMajorFirePower: false, elixirOfMajorFrostPower: false, elixirOfMajorShadowPower: false, elixirOfDraenicWisdom: false, elixirOfMajorMageblood: false, elixirOfMajorAgility: false, elixirOfMajorStrength: false, elixirOfDemonslaying: false, elixirOfTheMongoose: false, brilliantWizardOil: false, superiorWizardOil: false, mainHandImbue: 0, offHandImbue: 0, blackenedBasilisk: false, skullfishSoup: false, roastedClefthoof: false, spicyHotTalbuk: false, kreegsStoutBeatdown: false, scrollOfStrengthV: false, scrollOfAgilityV: false, scrollOfSpiritV: false, defaultPotion: 0, startingPotion: 0, numStartingPotions: 0, darkRune: false, defaultConjured: 0, drums: 0, battleChicken: false };
+        const message = { flaskOfBlindingLight: false, flaskOfMightyRestoration: false, flaskOfPureDeath: false, flaskOfSupremePower: false, flaskOfRelentlessAssault: false, adeptsElixir: false, elixirOfMajorFirePower: false, elixirOfMajorFrostPower: false, elixirOfMajorShadowPower: false, elixirOfDraenicWisdom: false, elixirOfMajorMageblood: false, elixirOfMajorAgility: false, elixirOfMajorStrength: false, elixirOfDemonslaying: false, elixirOfTheMongoose: false, brilliantWizardOil: false, superiorWizardOil: false, mainHandImbue: 0, offHandImbue: 0, blackenedBasilisk: false, skullfishSoup: false, roastedClefthoof: false, spicyHotTalbuk: false, grilledMudfish: false, kreegsStoutBeatdown: false, scrollOfStrengthV: false, scrollOfAgilityV: false, scrollOfSpiritV: false, defaultPotion: 0, startingPotion: 0, numStartingPotions: 0, darkRune: false, defaultConjured: 0, drums: 0, battleChicken: false };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -1381,6 +1382,9 @@ class Consumes$Type extends MessageType {
                     break;
                 case /* bool spicy_hot_talbuk */ 29:
                     message.spicyHotTalbuk = reader.bool();
+                    break;
+                case /* bool grilled_mudfish */ 35:
+                    message.grilledMudfish = reader.bool();
                     break;
                 case /* bool kreegsStoutBeatdown */ 20:
                     message.kreegsStoutBeatdown = reader.bool();
@@ -1496,6 +1500,9 @@ class Consumes$Type extends MessageType {
         /* bool spicy_hot_talbuk = 29; */
         if (message.spicyHotTalbuk !== false)
             writer.tag(29, WireType.Varint).bool(message.spicyHotTalbuk);
+        /* bool grilled_mudfish = 35; */
+        if (message.grilledMudfish !== false)
+            writer.tag(35, WireType.Varint).bool(message.grilledMudfish);
         /* bool kreegsStoutBeatdown = 20; */
         if (message.kreegsStoutBeatdown !== false)
             writer.tag(20, WireType.Varint).bool(message.kreegsStoutBeatdown);

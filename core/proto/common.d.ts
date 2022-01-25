@@ -298,6 +298,10 @@ export interface Consumes {
      */
     spicyHotTalbuk: boolean;
     /**
+     * @generated from protobuf field: bool grilled_mudfish = 35;
+     */
+    grilledMudfish: boolean;
+    /**
      * @generated from protobuf field: bool kreegsStoutBeatdown = 20;
      */
     kreegsStoutBeatdown: boolean;
