@@ -603,7 +603,7 @@ class SelectorModal extends Component {
 				.filter(tab => tab.dataset.label.includes(labelSubstring));
 
     const contentElems = tabElems
-        .map(tabElem => document.getElementById(tabElem.href.substring(1)))
+        .map(tabElem => document.getElementById(tabElem.getAttribute('href').substring(1)))
         .filter(tabElem => Boolean(tabElem));
 
     tabElems.forEach(elem => elem.parentElement.remove());
