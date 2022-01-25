@@ -5,6 +5,10 @@ import (
 
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/proto"
+	"github.com/wowsims/tbc/sim/druid/balance"
+	"github.com/wowsims/tbc/sim/mage"
+	"github.com/wowsims/tbc/sim/priest/shadow"
+	"github.com/wowsims/tbc/sim/shaman/elemental"
 )
 
 // 1 moonkin, 1 ele shaman, 1 spriest, 2x arcane
@@ -17,7 +21,7 @@ var castersWithElemental = &proto.Party{
 			Equipment: MoonkinEquipment,
 			Spec: &proto.Player_BalanceDruid{
 				BalanceDruid: &proto.BalanceDruid{
-					Talents: MoonkinTalents,
+					Talents: balance.StandardTalents,
 					Rotation: &proto.BalanceDruid_Rotation{
 						PrimarySpell: proto.BalanceDruid_Rotation_Adaptive,
 						FaerieFire:   true,
@@ -47,7 +51,7 @@ var castersWithElemental = &proto.Party{
 			Equipment: ShadowEquipment,
 			Spec: &proto.Player_ShadowPriest{
 				ShadowPriest: &proto.ShadowPriest{
-					Talents: ShadowPriestTalents,
+					Talents: shadow.StandardTalents,
 					Rotation: &proto.ShadowPriest_Rotation{
 						RotationType: proto.ShadowPriest_Rotation_Ideal,
 						UseDevPlague: true,
@@ -75,7 +79,7 @@ var castersWithElemental = &proto.Party{
 			Equipment: ElementalEquipment,
 			Spec: &proto.Player_ElementalShaman{
 				ElementalShaman: &proto.ElementalShaman{
-					Talents: ElementalTalents,
+					Talents: elemental.StandardTalents,
 					Rotation: &proto.ElementalShaman_Rotation{
 						Totems: &proto.ShamanTotems{
 							Earth: proto.EarthTotem_TremorTotem,
@@ -113,7 +117,7 @@ var castersWithElemental = &proto.Party{
 			Equipment: ArcaneEquipment,
 			Spec: &proto.Player_Mage{
 				Mage: &proto.Mage{
-					Talents: ArcaneTalents,
+					Talents: mage.ArcaneTalents,
 					Options: &proto.Mage_Options{
 						Armor:           proto.Mage_Options_MageArmor,
 						UseManaEmeralds: true,
@@ -145,7 +149,7 @@ var castersWithElemental = &proto.Party{
 			Equipment: ArcaneEquipment,
 			Spec: &proto.Player_Mage{
 				Mage: &proto.Mage{
-					Talents: ArcaneTalents,
+					Talents: mage.ArcaneTalents,
 					Options: &proto.Mage_Options{
 						Armor:           proto.Mage_Options_MageArmor,
 						UseManaEmeralds: true,
@@ -184,7 +188,7 @@ var castersWithResto = &proto.Party{
 			Equipment: MoonkinEquipment,
 			Spec: &proto.Player_BalanceDruid{
 				BalanceDruid: &proto.BalanceDruid{
-					Talents: MoonkinTalents,
+					Talents: balance.StandardTalents,
 					Rotation: &proto.BalanceDruid_Rotation{
 						PrimarySpell: proto.BalanceDruid_Rotation_Adaptive,
 						FaerieFire:   true,
@@ -214,7 +218,7 @@ var castersWithResto = &proto.Party{
 			Equipment: ShadowEquipment,
 			Spec: &proto.Player_ShadowPriest{
 				ShadowPriest: &proto.ShadowPriest{
-					Talents: ShadowPriestTalents,
+					Talents: shadow.StandardTalents,
 					Rotation: &proto.ShadowPriest_Rotation{
 						RotationType: proto.ShadowPriest_Rotation_Ideal,
 						UseDevPlague: true,
@@ -242,7 +246,7 @@ var castersWithResto = &proto.Party{
 			Equipment: ArcaneEquipment,
 			Spec: &proto.Player_Mage{
 				Mage: &proto.Mage{
-					Talents: ArcaneTalents,
+					Talents: mage.ArcaneTalents,
 					Options: &proto.Mage_Options{
 						Armor:           proto.Mage_Options_MageArmor,
 						UseManaEmeralds: true,
@@ -274,7 +278,7 @@ var castersWithResto = &proto.Party{
 			Equipment: ArcaneEquipment,
 			Spec: &proto.Player_Mage{
 				Mage: &proto.Mage{
-					Talents: ArcaneTalents,
+					Talents: mage.ArcaneTalents,
 					Options: &proto.Mage_Options{
 						Armor:           proto.Mage_Options_MageArmor,
 						UseManaEmeralds: true,
@@ -306,7 +310,7 @@ var castersWithResto = &proto.Party{
 			Equipment: ArcaneEquipment,
 			Spec: &proto.Player_Mage{
 				Mage: &proto.Mage{
-					Talents: ArcaneTalents,
+					Talents: mage.ArcaneTalents,
 					Options: &proto.Mage_Options{
 						Armor:           proto.Mage_Options_MageArmor,
 						UseManaEmeralds: true,
@@ -374,86 +378,7 @@ func BenchmarkSimulate(b *testing.B) {
 	core.RaidBenchmark(b, rsr)
 }
 
-var ArcaneTalents = &proto.MageTalents{
-	ArcaneFocus:         5,
-	ArcaneConcentration: 5,
-	ArcaneImpact:        3,
-	ArcaneMeditation:    3,
-	PresenceOfMind:      true,
-	ArcaneMind:          5,
-	ArcaneInstability:   3,
-	ArcanePotency:       3,
-	ArcanePower:         true,
-	SpellPower:          2,
-	MindMastery:         5,
-
-	ImprovedFrostbolt:  5,
-	ElementalPrecision: 3,
-	IceShards:          5,
-	IcyVeins:           true,
-	PiercingIce:        5,
-	FrostChanneling:    3,
-	ColdSnap:           true,
-}
-
-var ElementalTalents = &proto.ShamanTalents{
-	Convection:         5,
-	Concussion:         5,
-	ElementalFocus:     true,
-	CallOfThunder:      5,
-	ElementalFury:      true,
-	UnrelentingStorm:   3,
-	ElementalPrecision: 3,
-	LightningMastery:   5,
-	ElementalMastery:   true,
-	LightningOverload:  5,
-	TotemOfWrath:       true,
-
-	TotemicFocus:    5,
-	NaturesGuidance: 3,
-	TidalMastery:    5,
-}
-
-var MoonkinTalents = &proto.DruidTalents{
-	StarlightWrath:        5,
-	FocusedStarlight:      2,
-	ImprovedMoonfire:      2,
-	Brambles:              3,
-	InsectSwarm:           true,
-	Vengeance:             5,
-	LunarGuidance:         3,
-	NaturesGrace:          true,
-	Moonglow:              3,
-	Moonfury:              5,
-	BalanceOfPower:        2,
-	Dreamstate:            3,
-	MoonkinForm:           true,
-	ImprovedFaerieFire:    3,
-	WrathOfCenarius:       5,
-	ForceOfNature:         true,
-	ImprovedMarkOfTheWild: 5,
-	Furor:                 2,
-	NaturalShapeshifter:   3,
-	Intensity:             3,
-}
-
-var ShadowPriestTalents = &proto.PriestTalents{
-	InnerFocus:             true,
-	Meditation:             3,
-	ShadowAffinity:         3,
-	ImprovedShadowWordPain: 2,
-	ShadowFocus:            5,
-	ImprovedMindBlast:      5,
-	MindFlay:               true,
-	ShadowWeaving:          5,
-	VampiricEmbrace:        true,
-	FocusedMind:            3,
-	Darkness:               5,
-	Shadowform:             true,
-	ShadowPower:            4,
-	Misery:                 5,
-	VampiricTouch:          true,
-}
+// P3 gear for each class
 
 // Shadow Priest Equipment
 var ShadowEquipment = &proto.EquipmentSpec{
@@ -539,7 +464,6 @@ var ShadowEquipment = &proto.EquipmentSpec{
 			Id:      32374,
 			Enchant: 22561,
 		},
-		{},
 		{
 			Id: 29982,
 		},
@@ -723,7 +647,6 @@ var MoonkinEquipment = &proto.EquipmentSpec{
 			Id:      32374,
 			Enchant: 22560,
 		},
-		{},
 		{
 			Id: 32387,
 		},
@@ -741,7 +664,6 @@ var ElementalEquipment = &proto.EquipmentSpec{
 				32215,
 			},
 		},
-
 		{
 			Id: 30015,
 		},
@@ -815,7 +737,6 @@ var ElementalEquipment = &proto.EquipmentSpec{
 			Id:      32374,
 			Enchant: 22555,
 		},
-		{},
 		{
 			Id: 32330,
 		},
