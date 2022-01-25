@@ -25,6 +25,14 @@ export class EncounterPicker extends Component {
 				encounter.setDuration(eventID, newValue);
       },
     });
+    new NumberPicker(this.rootElem, modEncounter, {
+      label: 'Duration +/-',
+      changedEvent: (encounter: Encounter) => encounter.durationChangeEmitter,
+      getValue: (encounter: Encounter) => encounter.getDurationVariation(),
+      setValue: (eventID: EventID, encounter: Encounter, newValue: number) => {
+				encounter.setDurationVariation(eventID, newValue);
+      },
+    });
 
     if (config.showTargetArmor) {
       new NumberPicker(this.rootElem, modEncounter.primaryTarget, {
