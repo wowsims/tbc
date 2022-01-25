@@ -3,7 +3,6 @@ package shadow
 import (
 	"time"
 
-	"github.com/wowsims/tbc/sim/common"
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/proto"
 	"github.com/wowsims/tbc/sim/core/stats"
@@ -75,12 +74,17 @@ const (
 	swpidx
 )
 
-func (spriest *ShadowPriest) Act(sim *core.Simulation) time.Duration {
-	// If a major cooldown uses the GCD, it might already be on CD when Act() is called.
-	if spriest.IsOnCD(core.GCDCooldownID, sim.CurrentTime) {
-		return sim.CurrentTime + spriest.GetRemainingCD(core.GCDCooldownID, sim.CurrentTime)
-	}
+func (spriest *ShadowPriest) OnGCDReady(sim *core.Simulation) {
+	spriest.tryUseGCD(sim)
+}
 
+func (spriest *ShadowPriest) OnManaTick(sim *core.Simulation) {
+	if spriest.FinishedWaitingForManaAndGCDReady(sim) {
+		spriest.tryUseGCD(sim)
+	}
+}
+
+func (spriest *ShadowPriest) tryUseGCD(sim *core.Simulation) {
 	if spriest.rotation.PrecastVt && sim.CurrentTime == 0 {
 		spell := spriest.NewVampiricTouch(sim, sim.GetPrimaryTarget())
 		spell.CastTime = 0
@@ -157,7 +161,8 @@ func (spriest *ShadowPriest) Act(sim *core.Simulation) time.Duration {
 
 			if spell.Effect.DotInput.NumberOfTicks == 0 {
 				spell.Cancel(sim)
-				return sim.CurrentTime + core.MaxDuration(spriest.GetRemainingCD(core.GCDCooldownID, sim.CurrentTime), wait)
+				spriest.WaitUntil(sim, sim.CurrentTime+core.MaxDuration(spriest.GetRemainingCD(core.GCDCooldownID, sim.CurrentTime), wait))
+				return
 			}
 
 			// if our channel is longer than GCD it will have human latency to end it beause you can't queue the next spell.
@@ -165,8 +170,7 @@ func (spriest *ShadowPriest) Act(sim *core.Simulation) time.Duration {
 				base := spriest.rotation.Latency * 0.66
 				variation := base + sim.RandomFloat("spriest latency")*base // should vary from 0.66 - 1.33 of given latency
 				variation = core.MaxFloat(variation, 10)                    // no player can go under XXXms response time
-
-				wait += time.Duration(variation) * time.Millisecond
+				spell.AfterCastDelay += time.Duration(variation) * time.Millisecond
 			}
 		}
 	} else {
@@ -178,24 +182,13 @@ func (spriest *ShadowPriest) Act(sim *core.Simulation) time.Duration {
 		wait1 = core.MinDuration(mbcd, swdcd)
 		wait2 = core.MinDuration(vtidx, swpidx)
 		wait = core.MinDuration(wait1, wait2)
+		spriest.WaitUntil(sim, sim.CurrentTime+wait)
+		return
 	}
 
-	actionSuccessful := spell.Cast(sim)
-
-	// fmt.Printf("\tCasting: %s, %0.2f\n", spell.Name, spell.CastTime.Seconds())
-	if !actionSuccessful {
-		regenTime := spriest.TimeUntilManaRegen(spell.GetManaCost())
-		waitAction := common.NewWaitAction(sim, spriest.GetCharacter(), regenTime, common.WaitReasonOOM)
-		waitAction.Cast(sim)
-		return sim.CurrentTime + waitAction.GetDuration()
+	if success := spell.Cast(sim); !success {
+		spriest.WaitForMana(sim, spell.GetManaCost())
 	}
-	if wait != 0 {
-		return sim.CurrentTime + core.MaxDuration(spriest.GetRemainingCD(core.GCDCooldownID, sim.CurrentTime), wait)
-	}
-
-	return sim.CurrentTime + core.MaxDuration(
-		spriest.GetRemainingCD(core.GCDCooldownID, sim.CurrentTime),
-		spell.CastTime)
 }
 
 func (spriest *ShadowPriest) BasicMindflayRotation(sim *core.Simulation, spell *core.SimpleSpell, allCDs []time.Duration, gcd time.Duration) time.Duration {

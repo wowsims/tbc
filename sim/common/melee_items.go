@@ -414,6 +414,7 @@ func ApplyRodOfTheSunKing(agent core.Agent) {
 	character := agent.GetCharacter()
 	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		const procChance = 2.7 / 60.0
+		actionID := core.ActionID{ItemID: 29996}
 
 		return core.Aura{
 			ID: RodOfTheSunKingAuraID,
@@ -421,11 +422,18 @@ func ApplyRodOfTheSunKing(agent core.Agent) {
 				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() {
 					return
 				}
-				if sim.RandomFloat("Rod of the Sun King") > procChance {
-					return
-				}
 
-				// TODO: Add 5 rage or 10 energy.
+				if ability.Character.HasRageBar() {
+					if sim.RandomFloat("Rod of the Sun King") > procChance {
+						return
+					}
+					ability.Character.AddRage(sim, 5, actionID)
+				} else if ability.Character.HasEnergyBar() {
+					if sim.RandomFloat("Rod of the Sun King") > procChance {
+						return
+					}
+					ability.Character.AddEnergy(sim, 10, actionID)
+				}
 			},
 		}
 	})

@@ -128,6 +128,10 @@ type SimpleSpell struct {
 // Init will call any 'OnCast' effects associated with the caster and then apply spell haste to the cast.
 //  Init will panic if the spell or the GCD is still on CD.
 func (spell *SimpleSpell) Init(sim *Simulation) {
+	if spell.IsChannel {
+		spell.AfterCastDelay += spell.GetChannelDuration()
+	}
+
 	spell.SpellCast.init(sim)
 	if len(spell.Effects) == 0 {
 		if spell.Effect.DotInput.NumberOfTicks > 0 {
@@ -142,13 +146,17 @@ func (spell *SimpleSpell) Init(sim *Simulation) {
 	}
 }
 
+func (spell *SimpleSpell) GetChannelDuration() time.Duration {
+	if len(spell.Effects) == 0 {
+		return spell.Effect.DotInput.FullDuration()
+	} else {
+		return spell.Effects[0].DotInput.FullDuration()
+	}
+}
+
 func (spell *SimpleSpell) GetDuration() time.Duration {
 	if spell.IsChannel {
-		if len(spell.Effects) == 0 {
-			return spell.CastTime + spell.Effect.DotInput.FullDuration()
-		} else {
-			return spell.CastTime + spell.Effects[0].DotInput.FullDuration()
-		}
+		return spell.CastTime + spell.GetChannelDuration()
 	} else {
 		return spell.CastTime
 	}
