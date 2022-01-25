@@ -6,5 +6,6 @@ export const launchedSpecs = [
     Spec.SpecBalanceDruid,
     Spec.SpecMage,
     Spec.SpecElementalShaman,
+    Spec.SpecEnhancementShaman,
     Spec.SpecShadowPriest,
 ];
