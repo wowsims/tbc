@@ -4,6 +4,14 @@ import (
 	"time"
 )
 
+const (
+	ActionPriorityLow   = -1
+	ActionPriorityGCD   = 0
+	ActionPriorityAuto  = 1 // Higher than GCD so autos always happen before GCD actions.
+	ActionPriorityDOT   = 2 // Higher than others so dots always happen before actions.
+	ActionPriorityRegen = 3 // Higher than others so regen ticks always happen before other actions.
+)
+
 type PendingAction struct {
 	Name         string
 	Priority     int

@@ -201,7 +201,6 @@ func applyRaceEffects(agent Agent) {
 					})
 					character.SpendMana(sim, manaCost, actionID)
 					character.Metrics.AddInstantCast(actionID)
-					character.AddAuraUptime(TrollBerserkingAuraID, actionID, MinDuration(dur, sim.Duration-sim.CurrentTime))
 				}
 			},
 		})

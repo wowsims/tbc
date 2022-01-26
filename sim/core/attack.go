@@ -357,6 +357,11 @@ func (ahe *AbilityHitEffect) IsOH() bool {
 	return ahe.WeaponInput.IsOH
 }
 
+// Returns whether this hit effect matches the hand in which a weapon is equipped.
+func (ahe *AbilityHitEffect) IsEquippedHand(mh bool, oh bool) bool {
+	return (ahe.IsMH() && mh) || (ahe.IsOH() && oh)
+}
+
 func (ability *ActiveMeleeAbility) CalculatedGCD(char *Character) time.Duration {
 	baseGCD := GCDDefault
 	if ability.GCDCooldown != 0 {
@@ -560,9 +565,8 @@ func (aa *AutoAttacks) reset(sim *Simulation) {
 
 func (aa *AutoAttacks) resetAutoSwingAction(sim *Simulation) {
 	pa := &PendingAction{
-		Name:         "AutoAttacks",
-		Priority:     -1, // Give lower priority so that auto attacks always happen before player actions.
-		NextActionAt: 0,  // First auto is always at 0
+		Priority:     ActionPriorityAuto,
+		NextActionAt: 0, // First auto is always at 0
 	}
 	pa.OnAction = func(sim *Simulation) {
 		aa.Swing(sim, sim.GetPrimaryTarget())

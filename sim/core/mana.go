@@ -183,7 +183,7 @@ func (sim *Simulation) initManaTickAction() {
 	interval := time.Second * 2
 	pa := &PendingAction{
 		Name:     "Mana Tick",
-		Priority: -2, // Give lower priority so that mana ticks always happen before player actions.
+		Priority: ActionPriorityRegen,
 
 		NextActionAt: interval,
 	}

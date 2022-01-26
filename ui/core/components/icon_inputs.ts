@@ -61,6 +61,7 @@ export const UnleashedRage = makeBooleanIndividualBuffInput(ActionId.fromSpellId
 
 // Debuffs
 export const BloodFrenzy = makeBooleanDebuffInput(ActionId.fromSpellId(29859), 'bloodFrenzy');
+export const HuntersMark = makeTristateDebuffInput(ActionId.fromSpellId(14325), ActionId.fromSpellId(19425), 'huntersMark');
 export const ImprovedScorch = makeBooleanDebuffInput(ActionId.fromSpellId(12873), 'improvedScorch');
 export const ImprovedSealOfTheCrusader = makeBooleanDebuffInput(ActionId.fromSpellId(20337), 'improvedSealOfTheCrusader');
 export const JudgementOfWisdom = makeBooleanDebuffInput(ActionId.fromSpellId(27164), 'judgementOfWisdom');
@@ -90,6 +91,7 @@ export const FlaskOfMightyRestoration = makeBooleanConsumeInput(ActionId.fromIte
 export const FlaskOfPureDeath = makeBooleanConsumeInput(ActionId.fromItemId(22866), 'flaskOfPureDeath', ['Battle Elixir', 'Guardian Elixir']);
 export const FlaskOfSupremePower = makeBooleanConsumeInput(ActionId.fromItemId(13512), 'flaskOfSupremePower', ['Battle Elixir', 'Guardian Elixir']);
 export const FlaskOfRelentlessAssault = makeBooleanConsumeInput(ActionId.fromItemId(22854), 'flaskOfRelentlessAssault', ['Battle Elixir', 'Guardian Elixir']);
+export const GrilledMudfish = makeBooleanConsumeInput(ActionId.fromItemId(27664), 'grilledMudfish', ['Food']);
 export const KreegsStoutBeatdown = makeBooleanConsumeInput(ActionId.fromItemId(18284), 'kreegsStoutBeatdown', ['Alchohol']);
 export const MainHandAdamantiteSharpeningStone = makeEnumValueConsumeInput(ActionId.fromItemId(23529), 'mainHandImbue', WeaponImbue.WeaponImbueAdamantiteSharpeningStone, ['MH Weapon Imbue']);
 export const MainHandElementalSharpeningStone = makeEnumValueConsumeInput(ActionId.fromItemId(18262), 'mainHandImbue', WeaponImbue.WeaponImbueElementalSharpeningStone, ['MH Weapon Imbue']);

@@ -171,7 +171,7 @@ func (shaman *Shaman) NewTotemOfWrath(sim *core.Simulation) *core.SimpleCast {
 }
 
 func (shaman *Shaman) newStrengthOfEarthTotemTemplate(sim *core.Simulation) core.SimpleCast {
-	cast := shaman.newTotemCastTemplate(sim, 125, 8161)
+	cast := shaman.newTotemCastTemplate(sim, 300, 25528)
 	cast.OnCastComplete = func(sim *core.Simulation, cast *core.Cast) {
 		shaman.NextTotemDrops[EarthTotem] = sim.CurrentTime + time.Second*120
 	}

@@ -109,6 +109,10 @@ func consumesStats(character *Character, c proto.Consumes, raidBuffs proto.RaidB
 		s[stats.MeleeHit] += 20
 		s[stats.Spirit] += 20
 	}
+	if c.SpicyHotTalbuk {
+		s[stats.Agility] += 20
+		s[stats.Spirit] += 20
+	}
 	if c.ScrollOfAgilityV {
 		s[stats.Agility] += 20
 	}
@@ -249,6 +253,8 @@ func registerDrumsCD(agent Agent, partyBuffs proto.PartyBuffs, consumes proto.Co
 								applyDrums(sim, &pet.Character)
 							}
 						}
+
+						// All MCDs that use the GCD and have a non-zero cast time must call this.
 						character.UpdateMajorCooldowns()
 					},
 				},

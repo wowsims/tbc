@@ -1,6 +1,7 @@
 package shadow
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
@@ -98,7 +99,10 @@ func (spriest *ShadowPriest) tryUseGCD(sim *core.Simulation) {
 	if spriest.VTSpellCasting.Effect.DotInput.IsTicking(sim) {
 		if spriest.VTSpell.Effect.DotInput.TimeRemaining(sim) > 0 {
 			// If we still have VT ticking that isn't allowed... crash immediately so we can fix the logic.
-			panic("never should have two copies ticking")
+			panic(fmt.Sprintf("Two VT copies ticking at: %s, time remaining: %s, %s",
+				sim.CurrentTime,
+				spriest.VTSpellCasting.Effect.DotInput.TimeRemaining(sim),
+				spriest.VTSpell.Effect.DotInput.TimeRemaining(sim)))
 		}
 		oldVT := spriest.VTSpell
 		spriest.VTSpell = spriest.VTSpellCasting

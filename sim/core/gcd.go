@@ -6,7 +6,7 @@ import (
 
 func (character *Character) newGCDAction(sim *Simulation, agent Agent) *PendingAction {
 	return &PendingAction{
-		Name: "Agent GCD",
+		Priority: ActionPriorityGCD,
 		OnAction: func(sim *Simulation) {
 			character := agent.GetCharacter()
 			character.TryUseCooldowns(sim)
@@ -21,6 +21,12 @@ func (character *Character) SetGCDTimer(sim *Simulation, gcdReadyAt time.Duratio
 	character.SetCD(GCDCooldownID, gcdReadyAt)
 	character.gcdAction.NextActionAt = gcdReadyAt
 	sim.AddPendingAction(character.gcdAction)
+}
+
+// Call this to stop the GCD loop for a character.
+// This is mostly used for pets that get summoned / expire.
+func (character *Character) CancelGCDTimer(sim *Simulation) {
+	character.gcdAction.Cancel(sim)
 }
 
 func (character *Character) IsWaiting() bool {

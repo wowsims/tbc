@@ -9,6 +9,7 @@ export class Encounter {
 	private readonly sim: Sim;
 
   private duration: number = 300;
+  private durationVariation: number = 0;
   private numTargets: number = 1;
   private executeProportion: number = 0.2;
 	readonly primaryTarget: Target;
@@ -30,6 +31,17 @@ export class Encounter {
       this.executeProportionChangeEmitter,
       this.primaryTarget.changeEmitter,
     ].forEach(emitter => emitter.on(eventID => this.changeEmitter.emit(eventID)));
+  }
+
+  getDurationVariation(): number {
+	  return this.durationVariation;
+  }
+  setDurationVariation(eventID: EventID, newDuration: number) {
+    if (newDuration == this.durationVariation)
+			return;
+
+	this.durationVariation = newDuration;
+	this.durationChangeEmitter.emit(eventID);
   }
   
   getDuration(): number {
@@ -74,6 +86,7 @@ export class Encounter {
 
 		return EncounterProto.create({
 			duration: this.duration,
+			durationVariation: this.durationVariation,
 			executeProportion: this.executeProportion,
 			targets: targetProtos,
 		});
@@ -82,6 +95,7 @@ export class Encounter {
 	fromProto(eventID: EventID, proto: EncounterProto) {
 		TypedEvent.freezeAllAndDo(() => {
 			this.setDuration(eventID, proto.duration);
+			this.setDurationVariation(eventID, proto.durationVariation);
 			this.setExecuteProportion(eventID, proto.executeProportion);
 			this.setNumTargets(eventID, proto.targets.length);
 
@@ -95,6 +109,7 @@ export class Encounter {
   toJson(): Object {
     return {
 			'duration': this.getDuration(),
+			'durationVariation': this.getDurationVariation(),
 			'executeProportion': this.getExecuteProportion(),
 			'numTargets': this.getNumTargets(),
 			'primaryTarget': this.primaryTarget.toJson(),
@@ -107,6 +122,11 @@ export class Encounter {
 			const parsedDuration = parseInt(obj['duration']);
 			if (!isNaN(parsedDuration) && parsedDuration != 0) {
 				this.setDuration(eventID, parsedDuration);
+			}
+
+			const parsedDurationVariation = parseInt(obj['durationVariation']);
+			if (!isNaN(parsedDurationVariation) && parsedDurationVariation != 0) {
+				this.setDurationVariation(eventID, parsedDurationVariation);
 			}
 
 			const parsedExecuteProportion = parseInt(obj['executeProportion']);

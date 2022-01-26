@@ -47,11 +47,14 @@ var Gems = []Gem{
 		if gemData.Declaration.Filter {
 			continue
 		}
-		if gemData.Response.Quality < int(proto.ItemQuality_ItemQualityUncommon) {
-			continue
-		}
-		if gemData.Response.GetPhase() == 0 {
-			continue
+		allow := allowList[gemData.Declaration.ID]
+		if !allow {
+			if gemData.Response.Quality < int(proto.ItemQuality_ItemQualityUncommon) {
+				continue
+			}
+			if gemData.Response.GetPhase() == 0 {
+				continue
+			}
 		}
 		file.WriteString(fmt.Sprintf("\t%s,\n", gemToGoString(gemData.Declaration, gemData.Response)))
 	}
@@ -273,4 +276,11 @@ var allowList = map[int]bool{
 	20966: true, // Jade Pendant of Blasting
 	22395: true, // Totem of Rage
 	27947: true, // Totem of Impact
+	33135: true, // Falling Star
+	33140: true, // Blood of Amber
+	33143: true, // Stone of Blades
+	33144: true, // Facet of Eternity
+	31139: true, // Fist of Reckoning
+	19808: true, // Rockhide Strongfish
+	6360:  true, // Steelscale Crushfish
 }
