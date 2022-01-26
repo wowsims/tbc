@@ -42,6 +42,7 @@ export declare class Player<SpecType extends Spec> {
     private enchantEPCache;
     readonly specTypeFunctions: SpecTypeFunctions<SpecType>;
     private epWeights;
+    private epWeightsForCalc;
     private currentStats;
     readonly nameChangeEmitter: TypedEvent<void>;
     readonly buffsChangeEmitter: TypedEvent<void>;
@@ -101,7 +102,7 @@ export declare class Player<SpecType extends Spec> {
     getTalentTreeIcon(): string;
     getSpecOptions(): SpecOptions<SpecType>;
     setSpecOptions(eventID: EventID, newSpecOptions: SpecOptions<SpecType>): void;
-    computeStatsEP(stats: number[] | undefined): number;
+    computeStatsEP(stats?: Stats): number;
     computeGemEP(gem: Gem): number;
     computeEnchantEP(enchant: Enchant): number;
     computeItemEP(item: Item): number;

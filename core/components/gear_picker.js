@@ -1,6 +1,7 @@
 import { EquippedItem } from '/tbc/core/proto_utils/equipped_item.js';
 import { getEmptyGemSocketIconUrl, gemMatchesSocket } from '/tbc/core/proto_utils/gems.js';
 import { setGemSocketCssClass } from '/tbc/core/proto_utils/gems.js';
+import { Stats } from '/tbc/core/proto_utils/stats.js';
 import { enchantAppliesToItem } from '/tbc/core/proto_utils/utils.js';
 import { GemColor } from '/tbc/core/proto/common.js';
 import { HandType } from '/tbc/core/proto/common.js';
@@ -172,7 +173,7 @@ class SelectorModal extends Component {
                 name: enchant.name,
                 quality: enchant.quality,
                 phase: 1,
-                baseEP: this.player.computeStatsEP(enchant.stats),
+                baseEP: this.player.computeStatsEP(new Stats(enchant.stats)),
                 ignoreEPFilter: true,
                 onEquip: (eventID, enchant) => {
                     const equippedItem = this.player.getEquippedItem(slot);
@@ -197,7 +198,7 @@ class SelectorModal extends Component {
         if (equippedItem == undefined) {
             return;
         }
-        const socketBonusEP = this.player.computeStatsEP(equippedItem.item.socketBonus) / equippedItem.item.gemSockets.length;
+        const socketBonusEP = this.player.computeStatsEP(new Stats(equippedItem.item.socketBonus)) / equippedItem.item.gemSockets.length;
         equippedItem.item.gemSockets.forEach((socketColor, socketIdx) => {
             this.addTab('Gem ' + (socketIdx + 1), slot, equippedItem, this.player.getGems(socketColor), gem => {
                 let gemEP = this.player.computeGemEP(gem);
@@ -212,7 +213,7 @@ class SelectorModal extends Component {
                     name: gem.name,
                     quality: gem.quality,
                     phase: gem.phase,
-                    baseEP: this.player.computeStatsEP(gem.stats),
+                    baseEP: this.player.computeStatsEP(new Stats(gem.stats)),
                     ignoreEPFilter: true,
                     onEquip: (eventID, gem) => {
                         const equippedItem = this.player.getEquippedItem(slot);
