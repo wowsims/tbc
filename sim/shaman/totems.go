@@ -198,9 +198,20 @@ func (shaman *Shaman) NewTremorTotem(sim *core.Simulation) *core.SimpleCast {
 	return &shaman.totemSpell
 }
 
+func (shaman *Shaman) NextTotemAt(sim *core.Simulation) time.Duration {
+	nextTotemAt := core.MinDuration(
+		shaman.NextTotemDrops[0],
+		core.MinDuration(
+			shaman.NextTotemDrops[1],
+			core.MinDuration(
+				shaman.NextTotemDrops[2],
+				shaman.NextTotemDrops[3])))
+
+	return nextTotemAt
+}
+
 // TryDropTotems will check to see if totems need to be re-cast.
-//  If they do time.Duration will be returned will be >0.
-//  Also returns whether the cast was a success. TODO: Figure out a cleaner way to do this.
+//  Returns whether we tried to cast a totem, regardless of whether it succeeded.
 func (shaman *Shaman) TryDropTotems(sim *core.Simulation) bool {
 	var cast *core.SimpleCast
 	var attackCast *core.SimpleSpell // if using fire totems this will be an attack cast.
@@ -210,7 +221,7 @@ func (shaman *Shaman) TryDropTotems(sim *core.Simulation) bool {
 			break
 		}
 		nextDrop := shaman.NextTotemDropType[totemTypeIdx]
-		if sim.CurrentTime > totemExpiration {
+		if sim.CurrentTime >= totemExpiration {
 			switch totemTypeIdx {
 			case AirTotem:
 				switch proto.AirTotem(nextDrop) {

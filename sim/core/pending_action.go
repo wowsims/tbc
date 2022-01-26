@@ -5,11 +5,19 @@ import (
 )
 
 const (
-	ActionPriorityLow   = -1
-	ActionPriorityGCD   = 0
-	ActionPriorityAuto  = 1 // Higher than GCD so autos always happen before GCD actions.
-	ActionPriorityDOT   = 2 // Higher than others so dots always happen before actions.
-	ActionPriorityRegen = 3 // Higher than others so regen ticks always happen before other actions.
+	ActionPriorityLow = -1
+	ActionPriorityGCD = 0
+
+	// Higher than GCD because regen can cause GCD actions (if we were waiting
+	// for mana).
+	ActionPriorityRegen = 1
+
+	// Autos can cause regen (JoW, rage, energy procs, etc) so they should be
+	// higher prio so that we never go backwards in the priority order.
+	ActionPriorityAuto = 2
+
+	// DOTs need to be higher than anything else so that dots can properly expire before we take other actions.
+	ActionPriorityDOT = 3
 )
 
 type PendingAction struct {
