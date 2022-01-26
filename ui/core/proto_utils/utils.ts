@@ -992,6 +992,39 @@ const classToEligibleWeaponTypes: Record<Class, Array<EligibleWeaponType>> = {
 	],
 };
 
+export const specEPTransforms: Record<Spec, (epWeights: Stats) => Stats> = {
+  [Spec.SpecBalanceDruid]: (epWeights: Stats) => {
+		return epWeights.withStat(Stat.StatSpellHit, 0);
+	},
+  [Spec.SpecElementalShaman]: (epWeights: Stats) => {
+		return epWeights.withStat(Stat.StatSpellHit, 0);
+	},
+  [Spec.SpecEnhancementShaman]: (epWeights: Stats) => {
+		return epWeights;
+	},
+  [Spec.SpecHunter]: (epWeights: Stats) => {
+		return epWeights.withStat(Stat.StatMeleeHit, 0);
+	},
+  [Spec.SpecMage]: (epWeights: Stats) => {
+		return epWeights.withStat(Stat.StatSpellHit, 0);
+	},
+  [Spec.SpecRogue]: (epWeights: Stats) => {
+		return epWeights;
+	},
+  [Spec.SpecRetributionPaladin]: (epWeights: Stats) => {
+		return epWeights.withStat(Stat.StatMeleeHit, 0);
+	},
+  [Spec.SpecShadowPriest]: (epWeights: Stats) => {
+		return epWeights.withStat(Stat.StatSpellHit, 0);
+	},
+  [Spec.SpecWarlock]: (epWeights: Stats) => {
+		return epWeights.withStat(Stat.StatSpellHit, 0);
+	},
+  [Spec.SpecWarrior]: (epWeights: Stats) => {
+		return epWeights;
+	},
+};
+
 // Custom functions for determining the EP value of meta gem effects.
 // Default meta effect EP value is 0, so just handle the ones relevant to your spec.
 const metaGemEffectEPs: Partial<Record<Spec, (gem: Gem, playerStats: Stats) => number>> = {
