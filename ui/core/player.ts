@@ -44,6 +44,7 @@ import {
 	getTalentTreeIcon,
 	getMetaGemEffectEP,
 	raceToFaction,
+	specEPTransforms,
 	specToClass,
 	specToEligibleRaces,
 	specTypeFunctions,
@@ -85,6 +86,7 @@ export class Player<SpecType extends Spec> {
   readonly specTypeFunctions: SpecTypeFunctions<SpecType>;
 
 	private epWeights: Stats = new Stats();
+	private epWeightsForCalc: Stats = new Stats();
 	private currentStats: PlayerStats = PlayerStats.create();
 
   readonly nameChangeEmitter = new TypedEvent<void>('PlayerName');
@@ -210,6 +212,7 @@ export class Player<SpecType extends Spec> {
 
 	setEpWeights(newEpWeights: Stats) {
 		this.epWeights = newEpWeights;
+		this.epWeightsForCalc = specEPTransforms[this.spec](this.epWeights);
 
 		this.gemEPCache = new Map();
 		this.itemEPCache = new Map();
@@ -218,7 +221,7 @@ export class Player<SpecType extends Spec> {
 
   async computeStatWeights(epStats: Array<Stat>, epReferenceStat: Stat, onProgress: Function): Promise<StatWeightsResult> {
 		const result = await this.sim.statWeights(this, epStats, epReferenceStat, onProgress);
-		this.epWeights = new Stats(result.epValues);
+		this.setEpWeights(new Stats(result.epValues));
 		return result;
 	}
 
@@ -431,11 +434,11 @@ export class Player<SpecType extends Spec> {
     this.specOptionsChangeEmitter.emit(eventID);
   }
 
-  	computeStatsEP(stats: number[] | undefined): number {
+	computeStatsEP(stats?: Stats): number {
 		if (stats == undefined) {
 			return 0;
 		}
-		return new Stats(stats).computeEP(this.epWeights);
+		return stats.computeEP(this.epWeightsForCalc);
 	}
 
 	computeGemEP(gem: Gem): number {
@@ -443,7 +446,7 @@ export class Player<SpecType extends Spec> {
 			return this.gemEPCache.get(gem.id)!;
 		}
 
-		const epFromStats = new Stats(gem.stats).computeEP(this.epWeights);
+		const epFromStats = this.computeStatsEP(new Stats(gem.stats));
 		const epFromEffect = getMetaGemEffectEP(this.spec, gem, new Stats(this.currentStats.finalStats));
 		let bonusEP = 0;
 		// unique items are slightly worse than non-unique because you can have only one.
@@ -461,7 +464,7 @@ export class Player<SpecType extends Spec> {
 			return this.enchantEPCache.get(enchant.id)!;
 		}
 
-		let ep = new Stats(enchant.stats).computeEP(this.epWeights);
+		let ep = this.computeStatsEP(new Stats(enchant.stats));
 		this.enchantEPCache.set(enchant.id, ep);
 		return ep
 	}
@@ -474,7 +477,7 @@ export class Player<SpecType extends Spec> {
 			return this.itemEPCache.get(item.id)!;
 		}
 
-		let ep = computeItemEP(item, this.epWeights);
+		let ep = computeItemEP(item, this.epWeightsForCalc);
 		
 		// unique items are slightly worse than non-unique because you can have only one.
 		if (item.unique) {
@@ -504,7 +507,7 @@ export class Player<SpecType extends Spec> {
 			} else {
 				return 0;
 			}
-		})) + new Stats(item.socketBonus).computeEP(this.epWeights);
+		})) + this.computeStatsEP(new Stats(item.socketBonus));
 
 		ep += Math.max(bestGemEPMatchingSockets, bestGemEPNotMatchingSockets);
 
