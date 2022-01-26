@@ -66,7 +66,7 @@ var Enchants = []Enchant{
 	{ID: 22560, EffectID: 2671, Name: "Sunfire", Quality: proto.ItemQuality_ItemQualityRare, Bonus: stats.Stats{stats.ArcaneSpellPower: 50, stats.FireSpellPower: 50}, ItemType: proto.ItemType_ItemTypeWeapon},
 	{ID: 22561, EffectID: 2672, Name: "Soulfrost", Quality: proto.ItemQuality_ItemQualityRare, Bonus: stats.Stats{stats.FrostSpellPower: 50, stats.ShadowSpellPower: 50}, ItemType: proto.ItemType_ItemTypeWeapon},
 	{ID: 22559, EffectID: 2673, Name: "Weapon - Mongoose", Quality: proto.ItemQuality_ItemQualityRare, Bonus: stats.Stats{}, ItemType: proto.ItemType_ItemTypeWeapon},
-	{ID: 42620, EffectID: 3222, Name: "Weapon - Greater Agility", Quality: proto.ItemQuality_ItemQualityCommon, Bonus: stats.Stats{stats.Agility: 20}, ItemType: proto.ItemType_ItemTypeWeapon},
+	{ID: 33165, EffectID: 3222, Name: "Weapon - Greater Agility", Quality: proto.ItemQuality_ItemQualityCommon, Bonus: stats.Stats{stats.Agility: 20}, ItemType: proto.ItemType_ItemTypeWeapon},
 	// TODO: Crusader, spellsurge, executioner
 
 	// Shield
