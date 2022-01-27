@@ -114,6 +114,13 @@ class ItemPicker extends Component {
 				event.preventDefault();
         const selectorModal = new SelectorModal(this.rootElem.closest('.individual-sim-ui')!, this.player, this.slot, this._equippedItem, this._items, this._enchants);
       });
+      this.iconElem.addEventListener('touchstart', event => {
+				event.preventDefault();
+        const selectorModal = new SelectorModal(this.rootElem.closest('.individual-sim-ui')!, this.player, this.slot, this._equippedItem, this._items, this._enchants);
+      });
+      this.iconElem.addEventListener('touchend', event => {
+				event.preventDefault();
+      });
     });
     player.gearChangeEmitter.on(() => {
       this.item = player.getEquippedItem(slot);

@@ -2,11 +2,14 @@
 
 .gear-picker-root {
   display: flex;
-  margin: 15px;
+  flex-wrap: wrap;
+  min-width: 400px;
 }
 
 .gear-picker-left, .gear-picker-right {
   width: 50%;
+  flex: 1;
+  min-width: 400px;
 }
 
 .item-picker-root {
@@ -20,6 +23,12 @@
 .gear-picker-right .item-picker-root {
   flex-direction: row-reverse;
   text-align: right;
+}
+@media only screen and (max-width: calc(1100px + 1vw)) {
+  .gear-picker-right .item-picker-root {
+    text-align: left;
+    flex-direction: row;
+  }
 }
 
 .item-picker-icon {
@@ -67,6 +76,7 @@
 	padding: 8px;
 	background-color: #666;
 	border-radius: 6px;
+  max-width: 100%;
 }
 
 .selector-modal-tab-content-header {
