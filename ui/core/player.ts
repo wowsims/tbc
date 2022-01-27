@@ -551,14 +551,17 @@ export class Player<SpecType extends Spec> {
 		TypedEvent.freezeAllAndDo(() => {
 			// TODO: Remove this on 1/31/2022 (1 month).
 			if (proto.consumes && proto.consumes.darkRune) {
+				proto.consumes.darkRune = false
 				proto.consumes.defaultConjured = Conjured.ConjuredDarkRune;
 			}
 
 			// TODO: Remove this on 2/18/2022 (1 month).
 			if (proto.consumes && proto.consumes.brilliantWizardOil) {
+				proto.consumes.brilliantWizardOil = false;
 				proto.consumes.mainHandImbue = WeaponImbue.WeaponImbueBrilliantWizardOil;
 			}
 			if (proto.consumes && proto.consumes.superiorWizardOil) {
+				proto.consumes.superiorWizardOil = false;
 				proto.consumes.mainHandImbue = WeaponImbue.WeaponImbueSuperiorWizardOil;
 			}
 

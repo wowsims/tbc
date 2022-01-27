@@ -1,9 +1,9 @@
 package shadow
 
 import (
+	"fmt"
 	"time"
 
-	"github.com/wowsims/tbc/sim/common"
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/proto"
 	"github.com/wowsims/tbc/sim/core/stats"
@@ -75,12 +75,17 @@ const (
 	swpidx
 )
 
-func (spriest *ShadowPriest) Act(sim *core.Simulation) time.Duration {
-	// If a major cooldown uses the GCD, it might already be on CD when Act() is called.
-	if spriest.IsOnCD(core.GCDCooldownID, sim.CurrentTime) {
-		return sim.CurrentTime + spriest.GetRemainingCD(core.GCDCooldownID, sim.CurrentTime)
-	}
+func (spriest *ShadowPriest) OnGCDReady(sim *core.Simulation) {
+	spriest.tryUseGCD(sim)
+}
 
+func (spriest *ShadowPriest) OnManaTick(sim *core.Simulation) {
+	if spriest.FinishedWaitingForManaAndGCDReady(sim) {
+		spriest.tryUseGCD(sim)
+	}
+}
+
+func (spriest *ShadowPriest) tryUseGCD(sim *core.Simulation) {
 	if spriest.rotation.PrecastVt && sim.CurrentTime == 0 {
 		spell := spriest.NewVampiricTouch(sim, sim.GetPrimaryTarget())
 		spell.CastTime = 0
@@ -94,7 +99,10 @@ func (spriest *ShadowPriest) Act(sim *core.Simulation) time.Duration {
 	if spriest.VTSpellCasting.Effect.DotInput.IsTicking(sim) {
 		if spriest.VTSpell.Effect.DotInput.TimeRemaining(sim) > 0 {
 			// If we still have VT ticking that isn't allowed... crash immediately so we can fix the logic.
-			panic("never should have two copies ticking")
+			panic(fmt.Sprintf("Two VT copies ticking at: %s, time remaining: %s, %s",
+				sim.CurrentTime,
+				spriest.VTSpellCasting.Effect.DotInput.TimeRemaining(sim),
+				spriest.VTSpell.Effect.DotInput.TimeRemaining(sim)))
 		}
 		oldVT := spriest.VTSpell
 		spriest.VTSpell = spriest.VTSpellCasting
@@ -109,7 +117,8 @@ func (spriest *ShadowPriest) Act(sim *core.Simulation) time.Duration {
 	var wait time.Duration
 
 	// calculate how much time a VT cast would take so we can possibly start casting right before the dot is up.
-	vtCastTime := time.Duration(float64(time.Millisecond*1500) / spriest.CastSpeed())
+	castSpeed := spriest.CastSpeed()
+	vtCastTime := time.Duration(float64(time.Millisecond*1500) / castSpeed)
 
 	// timeForDots := sim.Duration-sim.CurrentTime > time.Second*12
 	// TODO: stop casting dots near the end?
@@ -139,34 +148,39 @@ func (spriest *ShadowPriest) Act(sim *core.Simulation) time.Duration {
 		} else if allCDs[swdidx] == 0 {
 			spell = spriest.NewShadowWordDeath(sim, target)
 		} else {
-			spell = spriest.NewMindFlay(sim, target)
-			gcd := spell.CalculatedGCD(&spriest.Character)
+			gcd := core.MinDuration(core.GCDMin, time.Duration(float64(core.GCDDefault)/castSpeed))
+			tickLength := time.Duration(float64(time.Second) / castSpeed)
 
+			var numTicks int
 			switch spriest.rotation.RotationType {
 			case proto.ShadowPriest_Rotation_Basic:
-				wait = spriest.BasicMindflayRotation(sim, spell, allCDs, gcd)
+				numTicks = spriest.BasicMindflayRotation(sim, allCDs, gcd, tickLength)
 			case proto.ShadowPriest_Rotation_Clipping:
-				wait = spriest.ClippingMindflayRotation(sim, spell, allCDs, gcd)
+				numTicks = spriest.ClippingMindflayRotation(sim, allCDs, gcd, tickLength)
 			case proto.ShadowPriest_Rotation_Ideal:
-				wait = spriest.IdealMindflayRotation(sim, spell, allCDs, gcd)
+				numTicks = spriest.IdealMindflayRotation(sim, allCDs, gcd, tickLength)
 			}
 
-			if sim.Log != nil {
-				spriest.Log(sim, "<spriest> Selected %d mindflay ticks.", spell.Effect.DotInput.NumberOfTicks)
+			if numTicks == 0 {
+				// Means we'd rather wait for next CD (swp, vt, etc) than start a MF cast.
+				nextCD := core.NeverExpires
+				for _, v := range allCDs {
+					if v < nextCD {
+						nextCD = v
+					}
+				}
+				spriest.WaitUntil(sim, sim.CurrentTime+nextCD)
+				return
 			}
 
-			if spell.Effect.DotInput.NumberOfTicks == 0 {
-				spell.Cancel(sim)
-				return sim.CurrentTime + core.MaxDuration(spriest.GetRemainingCD(core.GCDCooldownID, sim.CurrentTime), wait)
-			}
+			spell = spriest.NewMindFlay(sim, target, numTicks)
 
 			// if our channel is longer than GCD it will have human latency to end it beause you can't queue the next spell.
 			if wait > gcd && spriest.rotation.Latency > 0 {
 				base := spriest.rotation.Latency * 0.66
 				variation := base + sim.RandomFloat("spriest latency")*base // should vary from 0.66 - 1.33 of given latency
 				variation = core.MaxFloat(variation, 10)                    // no player can go under XXXms response time
-
-				wait += time.Duration(variation) * time.Millisecond
+				spell.AfterCastDelay += time.Duration(variation) * time.Millisecond
 			}
 		}
 	} else {
@@ -178,27 +192,17 @@ func (spriest *ShadowPriest) Act(sim *core.Simulation) time.Duration {
 		wait1 = core.MinDuration(mbcd, swdcd)
 		wait2 = core.MinDuration(vtidx, swpidx)
 		wait = core.MinDuration(wait1, wait2)
+		spriest.WaitUntil(sim, sim.CurrentTime+wait)
+		return
 	}
 
-	actionSuccessful := spell.Cast(sim)
-
-	// fmt.Printf("\tCasting: %s, %0.2f\n", spell.Name, spell.CastTime.Seconds())
-	if !actionSuccessful {
-		regenTime := spriest.TimeUntilManaRegen(spell.GetManaCost())
-		waitAction := common.NewWaitAction(sim, spriest.GetCharacter(), regenTime, common.WaitReasonOOM)
-		waitAction.Cast(sim)
-		return sim.CurrentTime + waitAction.GetDuration()
+	if success := spell.Cast(sim); !success {
+		spriest.WaitForMana(sim, spell.GetManaCost())
 	}
-	if wait != 0 {
-		return sim.CurrentTime + core.MaxDuration(spriest.GetRemainingCD(core.GCDCooldownID, sim.CurrentTime), wait)
-	}
-
-	return sim.CurrentTime + core.MaxDuration(
-		spriest.GetRemainingCD(core.GCDCooldownID, sim.CurrentTime),
-		spell.CastTime)
 }
 
-func (spriest *ShadowPriest) BasicMindflayRotation(sim *core.Simulation, spell *core.SimpleSpell, allCDs []time.Duration, gcd time.Duration) time.Duration {
+// Returns the number of MF ticks to use, or 0 to wait for next CD.
+func (spriest *ShadowPriest) BasicMindflayRotation(sim *core.Simulation, allCDs []time.Duration, gcd time.Duration, tickLength time.Duration) int {
 	// just do MF3, never clipping
 	nextCD := core.NeverExpires
 	for _, v := range allCDs {
@@ -208,16 +212,14 @@ func (spriest *ShadowPriest) BasicMindflayRotation(sim *core.Simulation, spell *
 	}
 	// But don't start a MF if we can't get a single tick off.
 	if nextCD < gcd {
-		spell.Effect.DotInput.NumberOfTicks = 0
-		return nextCD
+		return 0
 	} else {
-		return spell.Effect.DotInput.FullDuration()
+		return 3
 	}
 }
 
-// IdealMindflayRotation will calculate how many ticks should be cast and mutate the cast.
-//  It will calculate the DPS difference between MF and other pending CDs and select clipping based on that.
-func (spriest *ShadowPriest) IdealMindflayRotation(sim *core.Simulation, spell *core.SimpleSpell, allCDs []time.Duration, gcd time.Duration) time.Duration {
+// Returns the number of MF ticks to use, or 0 to wait for next CD.
+func (spriest *ShadowPriest) IdealMindflayRotation(sim *core.Simulation, allCDs []time.Duration, gcd time.Duration, tickLength time.Duration) int {
 	nextCD := core.NeverExpires
 	nextIdx := -1
 	for i, v := range allCDs {
@@ -231,7 +233,7 @@ func (spriest *ShadowPriest) IdealMindflayRotation(sim *core.Simulation, spell *
 	if nextCD < gcd {
 		numTicks = 0
 	} else {
-		numTicks = int(nextCD / spell.Effect.DotInput.TickLength)
+		numTicks = int(nextCD / tickLength)
 	}
 
 	critChance := (spriest.GetStat(stats.SpellCrit) / (core.SpellCritRatingPerCritChance * 100)) + (float64(spriest.Talents.ShadowPower) * 0.03)
@@ -252,10 +254,10 @@ func (spriest *ShadowPriest) IdealMindflayRotation(sim *core.Simulation, spell *
 		}
 
 		dpsPossibleshort := []float64{
-			(Major_dmg * float64(nextCD+gcd)) / float64(gcd+nextCD),                                                // dps with no tick and just wait
-			(Major_dmg*(nextCD+gcd).Seconds() + mfDamage) / (gcd + gcd).Seconds(),                                  // new damage for 1 extra tick
-			(Major_dmg*(nextCD+gcd).Seconds() + 2*mfDamage) / (2*spell.Effect.DotInput.TickLength + gcd).Seconds(), // new damage for 2 extra tick
-			(Major_dmg*(nextCD+gcd).Seconds() + 3*mfDamage) / (3*spell.Effect.DotInput.TickLength + gcd).Seconds(), // new damage for 3 extra tick
+			(Major_dmg * float64(nextCD+gcd)) / float64(gcd+nextCD),                          // dps with no tick and just wait
+			(Major_dmg*(nextCD+gcd).Seconds() + mfDamage) / (gcd + gcd).Seconds(),            // new damage for 1 extra tick
+			(Major_dmg*(nextCD+gcd).Seconds() + 2*mfDamage) / (2*tickLength + gcd).Seconds(), // new damage for 2 extra tick
+			(Major_dmg*(nextCD+gcd).Seconds() + 3*mfDamage) / (3*tickLength + gcd).Seconds(), // new damage for 3 extra tick
 		}
 
 		// Find the highest possible dps and its index
@@ -270,27 +272,23 @@ func (spriest *ShadowPriest) IdealMindflayRotation(sim *core.Simulation, spell *
 			}
 		}
 		if highestPossibleIdx == 0 {
-			spell.Effect.DotInput.NumberOfTicks = 0
-			return nextCD
+			return 0
 		}
 		numTicks = highestPossibleIdx
 
 		// Now that the number of optimal ticks has been determined to optimize dps
 		// Now optimize mf2s and mf3s
 		if numTicks == 1 {
-			spell.Effect.DotInput.NumberOfTicks = 1
+			return 1
 		} else if numTicks == 2 || numTicks == 4 {
-			spell.Effect.DotInput.NumberOfTicks = 2
+			return 2
 		} else {
-			spell.Effect.DotInput.NumberOfTicks = 3
+			return 3
 		}
-		spell.ActionID.Tag = int32(spell.Effect.DotInput.NumberOfTicks)
-
-		return spell.Effect.DotInput.FullDuration()
 	}
 
 	// TODO: Should spriest latency be added to the second option here?
-	mfTime := core.MaxDuration(gcd, time.Duration(numTicks)*spell.Effect.DotInput.TickLength)
+	mfTime := core.MaxDuration(gcd, time.Duration(numTicks)*tickLength)
 
 	// Amount of gap time after casting mind flay, but before each CD is available.
 	cdDiffs := []time.Duration{
@@ -321,7 +319,7 @@ func (spriest *ShadowPriest) IdealMindflayRotation(sim *core.Simulation, spell *
 	}
 
 	if nextIdx != bestIdx && cdDiffs[bestIdx] < time.Millisecond*1490 {
-		numTicks = int(allCDs[bestIdx] / spell.Effect.DotInput.TickLength)
+		numTicks = int(allCDs[bestIdx] / tickLength)
 	}
 
 	chosenWait := cdDiffs[bestIdx]
@@ -343,7 +341,7 @@ func (spriest *ShadowPriest) IdealMindflayRotation(sim *core.Simulation, spell *
 	highestPossibleIdx := 0
 	// TODO: Modified this slightly to expand time window, but it still doesn't change dps for any tests.
 	// Probably can remove this entirely (and then also the if highestPossibleIdx == 0 right after)
-	if (finalMFStart == 2) && (chosenWait <= spell.Effect.DotInput.TickLength && chosenWait > (spell.Effect.DotInput.TickLength-time.Millisecond*15)) {
+	if (finalMFStart == 2) && (chosenWait <= tickLength && chosenWait > (tickLength-time.Millisecond*15)) {
 		highestPossibleIdx = 1 // if the wait time is equal to an extra mf tick, and there are already 2 ticks, then just add 1
 	}
 
@@ -351,11 +349,11 @@ func (spriest *ShadowPriest) IdealMindflayRotation(sim *core.Simulation, spell *
 		switch finalMFStart {
 		case 0:
 			// this means that the extra ticks will be relative to starting a new mf cast entirely
-			dpsPossible[1] = (bestDmg*dpsDuration + mfDamage) / float64(gcd+gcd)                                  // new damage for 1 extra tick
-			dpsPossible[2] = (bestDmg*dpsDuration + 2*mfDamage) / float64(2*spell.Effect.DotInput.TickLength+gcd) // new damage for 2 extra tick
-			dpsPossible[3] = (bestDmg*dpsDuration + 3*mfDamage) / float64(3*spell.Effect.DotInput.TickLength+gcd) // new damage for 3 extra tick
+			dpsPossible[1] = (bestDmg*dpsDuration + mfDamage) / float64(gcd+gcd)            // new damage for 1 extra tick
+			dpsPossible[2] = (bestDmg*dpsDuration + 2*mfDamage) / float64(2*tickLength+gcd) // new damage for 2 extra tick
+			dpsPossible[3] = (bestDmg*dpsDuration + 3*mfDamage) / float64(3*tickLength+gcd) // new damage for 3 extra tick
 		case 1:
-			total_check_time := 2 * spell.Effect.DotInput.TickLength
+			total_check_time := 2 * tickLength
 
 			if total_check_time < gcd {
 				newDuration := float64((gcd + gcd).Seconds())
@@ -365,7 +363,7 @@ func (spriest *ShadowPriest) IdealMindflayRotation(sim *core.Simulation, spell *
 				dpsPossible[1] = (bestDmg*dpsDuration + (mfDamage * float64(finalMFStart+1))) / newDuration
 			}
 			// % check add 2
-			total_check_time2 := 2 * spell.Effect.DotInput.TickLength
+			total_check_time2 := 2 * tickLength
 			if total_check_time2 < gcd {
 				dpsPossible[2] = (bestDmg*dpsDuration + (mfDamage * float64(finalMFStart+2))) / float64(gcd+gcd)
 			} else {
@@ -373,18 +371,18 @@ func (spriest *ShadowPriest) IdealMindflayRotation(sim *core.Simulation, spell *
 			}
 		case 2:
 			// % check add 1
-			total_check_time := spell.Effect.DotInput.TickLength
+			total_check_time := tickLength
 			newDuration := float64((total_check_time + gcd).Seconds())
 			dpsPossible[1] = (bestDmg*dpsDuration + mfDamage) / newDuration
 
 		default:
 			dpsPossible[1] = (bestDmg*dpsDuration + mfDamage) / float64(gcd+gcd)
-			if spell.Effect.DotInput.TickLength*2 > gcd {
-				dpsPossible[2] = (bestDmg*dpsDuration + 2*mfDamage) / float64(2*spell.Effect.DotInput.TickLength+gcd)
+			if tickLength*2 > gcd {
+				dpsPossible[2] = (bestDmg*dpsDuration + 2*mfDamage) / float64(2*tickLength+gcd)
 			} else {
 				dpsPossible[2] = (bestDmg*dpsDuration + 2*mfDamage) / float64(gcd+gcd)
 			}
-			dpsPossible[3] = (bestDmg*dpsDuration + 3*mfDamage) / float64(3*spell.Effect.DotInput.TickLength+gcd)
+			dpsPossible[3] = (bestDmg*dpsDuration + 3*mfDamage) / float64(3*tickLength+gcd)
 		}
 	}
 
@@ -408,24 +406,21 @@ func (spriest *ShadowPriest) IdealMindflayRotation(sim *core.Simulation, spell *
 	//  Now that the number of optimal ticks has been determined to optimize dps
 	//  Now optimize mf2s and mf3s
 	if numTicks == 1 {
-		spell.Effect.DotInput.NumberOfTicks = 1
+		return 1
 	} else if numTicks == 2 || numTicks == 4 {
-		spell.Effect.DotInput.NumberOfTicks = 2
+		return 2
 	} else {
-		spell.Effect.DotInput.NumberOfTicks = 3
+		return 3
 	}
-	spell.ActionID.Tag = int32(spell.Effect.DotInput.NumberOfTicks)
 
 	//  ONE BIG CAVEAT THAT STILL NEEDS WORK.. THIS NEEDS TO BE UPDATED TO INCLUDE HASTE PROCS THAT CAN OCCUR/DROP OFF MID MF SEQUENCE
-
-	return spell.Effect.DotInput.FullDuration()
 }
 
 // ClippingMindflayRotation is to be a 'sweaty but not perfect' rotation.
-//  it will prioritize casting MB / SWD by clipping.
-//  If there is 4s until the next CD it will use a 2xMF2 instead of 3+1
-//  This will mutate the input cast to the correct number of ticks.
-func (spriest *ShadowPriest) ClippingMindflayRotation(sim *core.Simulation, spell *core.SimpleSpell, allCDs []time.Duration, gcd time.Duration) time.Duration {
+//  It will prioritize casting MB / SWD by clipping.
+//  If there is 4s until the next CD it will use a 2xMF2 instead of 3+1.
+//  Returns the number of MF ticks to use, or 0 to wait for next CD.
+func (spriest *ShadowPriest) ClippingMindflayRotation(sim *core.Simulation, allCDs []time.Duration, gcd time.Duration, tickLength time.Duration) int {
 	nextCD := core.NeverExpires
 	for _, v := range allCDs[:2] {
 		if v < nextCD {
@@ -438,21 +433,17 @@ func (spriest *ShadowPriest) ClippingMindflayRotation(sim *core.Simulation, spel
 	}
 	// This means a CD is coming up before we could cast a single MF
 	if nextCD < gcd {
-		spell.Effect.DotInput.NumberOfTicks = 0
-		return nextCD
+		return 0
 	}
 
 	// How many ticks we have time for.
-	numTicks := int((nextCD - time.Duration(spriest.rotation.Latency)) / spell.Effect.DotInput.TickLength)
+	numTicks := int((nextCD - time.Duration(spriest.rotation.Latency)) / tickLength)
 
 	if numTicks == 1 {
-		spell.Effect.DotInput.NumberOfTicks = 1
+		return 1
 	} else if numTicks == 2 || numTicks == 4 {
-		spell.Effect.DotInput.NumberOfTicks = 2
+		return 2
 	} else {
-		spell.Effect.DotInput.NumberOfTicks = 3
+		return 3
 	}
-
-	spell.ActionID.Tag = int32(spell.Effect.DotInput.NumberOfTicks)
-	return spell.Effect.DotInput.FullDuration()
 }

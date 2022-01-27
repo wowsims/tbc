@@ -203,10 +203,7 @@ func (characterMetrics *CharacterMetrics) AddFinalPetMetrics(petMetrics *Charact
 	characterMetrics.dps.Total += petMetrics.dps.Total
 }
 
-func (characterMetrics *CharacterMetrics) MarkOOM(sim *Simulation, character *Character, dur time.Duration) {
-	//if sim.Log != nil {
-	//	character.Log(sim, "Adding OOM time: %s", dur)
-	//}
+func (characterMetrics *CharacterMetrics) MarkOOM(character *Character, dur time.Duration) {
 	characterMetrics.CharacterIterationMetrics.OOMTime += dur
 	characterMetrics.CharacterIterationMetrics.WentOOM = true
 }

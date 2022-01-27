@@ -42,6 +42,9 @@ func (priest *Priest) registerShadowfiendCD() {
 		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
 			return func(sim *core.Simulation, character *core.Character) {
 				priest.NewShadowfiend(sim, sim.GetPrimaryTarget()).Cast(sim)
+
+				// All MCDs that use the GCD and have a non-zero cast time must call this.
+				priest.UpdateMajorCooldowns()
 			}
 		},
 	})

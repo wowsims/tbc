@@ -76,7 +76,7 @@ func (eb *energyBar) reset(sim *Simulation) {
 
 	pa := &PendingAction{
 		Name:         "Energy Tick",
-		Priority:     -1, // Give lower priority so that energy ticks always happen before player actions.
+		Priority:     ActionPriorityRegen,
 		NextActionAt: tickDuration,
 	}
 	pa.OnAction = func(sim *Simulation) {

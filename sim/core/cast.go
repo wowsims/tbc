@@ -56,6 +56,10 @@ type Cast struct {
 
 	CastTime time.Duration
 
+	// Adds additional delay to the GCD after the cast is completed. This is usually
+	// used for adding latency following the cast.
+	AfterCastDelay time.Duration
+
 	// E.g. for nature spells, set to stats.NatureSpellPower.
 	SpellSchool stats.Stat
 
@@ -152,8 +156,8 @@ func (cast *Cast) startCasting(sim *Simulation, onCastComplete OnCastComplete) b
 	// casting speed caused by the cast don't affect the GCD CD.
 	if !cast.IgnoreCooldowns {
 		// Prevent any actions on the GCD until the cast AND the GCD are done.
-		gcdCD := MaxDuration(cast.CalculatedGCD(cast.Character), cast.CastTime)
-		cast.Character.SetCD(GCDCooldownID, sim.CurrentTime+gcdCD)
+		gcdCD := MaxDuration(cast.CalculatedGCD(cast.Character), cast.CastTime+cast.AfterCastDelay)
+		cast.Character.SetGCDTimer(sim, sim.CurrentTime+gcdCD)
 	}
 
 	// For instant-cast spells we can skip creating an aura.
@@ -168,6 +172,7 @@ func (cast *Cast) startCasting(sim *Simulation, onCastComplete OnCastComplete) b
 
 		if cast.Character.AutoAttacks.IsEnabled() {
 			// Delay autoattacks until the cast is complete.
+			// TODO: reset aa PA.
 			cast.Character.AutoAttacks.MainhandSwingAt = MaxDuration(cast.Character.AutoAttacks.MainhandSwingAt, cast.Character.Hardcast.Expires)
 			cast.Character.AutoAttacks.OffhandSwingAt = MaxDuration(cast.Character.AutoAttacks.OffhandSwingAt, cast.Character.Hardcast.Expires)
 		}
