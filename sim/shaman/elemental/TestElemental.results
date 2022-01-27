@@ -239,6 +239,12 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestElemental-AllItems-DragonstrikeP5--23"
+ value: {
+  dps: 1529.742411572946
+ }
+}
+dps_results: {
  key: "TestElemental-AllItems-DrakefistHammer-28437"
  value: {
   dps: 1380.5910935841957
