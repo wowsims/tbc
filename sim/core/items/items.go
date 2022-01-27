@@ -139,6 +139,7 @@ type Enchant struct {
 	Bonus       stats.Stats
 	ItemType    proto.ItemType    // Which slot the enchant goes on.
 	EnchantType proto.EnchantType // Additional category when ItemType isn't enough.
+	Phase       int32
 }
 
 func (enchant Enchant) ToProto() *proto.Enchant {
@@ -151,6 +152,7 @@ func (enchant Enchant) ToProto() *proto.Enchant {
 		EnchantType: enchant.EnchantType,
 		Stats:       enchant.Bonus[:],
 		Quality:     enchant.Quality,
+		Phase:       enchant.Phase,
 	}
 }
 
