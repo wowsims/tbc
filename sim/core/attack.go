@@ -362,8 +362,17 @@ func (ahe *AbilityHitEffect) IsEquippedHand(mh bool, oh bool) bool {
 	return (ahe.IsMH() && mh) || (ahe.IsOH() && oh)
 }
 
+// It appears that TBC does not do hasted GCD for abilities.
+//  Leaving this option here in case we want it in the future.
+const EnableAbilityHaste = false
+
 func (ability *ActiveMeleeAbility) CalculatedGCD(char *Character) time.Duration {
 	baseGCD := GCDDefault
+	if !EnableAbilityHaste {
+		// TODO: Other classes have different GCD defaults for abilites.
+		//  Probably want to just have all abilities specify the GCD explicitly?
+		return baseGCD
+	}
 	if ability.GCDCooldown != 0 {
 		baseGCD = ability.GCDCooldown
 	}
