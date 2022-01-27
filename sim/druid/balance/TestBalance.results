@@ -176,6 +176,12 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestBalance-AllItems-DragonstrikeP5--23"
+ value: {
+  dps: 1261.9987390752015
+ }
+}
+dps_results: {
  key: "TestBalance-AllItems-DrakefistHammer-28437"
  value: {
   dps: 1106.5481641841166
@@ -568,7 +574,7 @@ dps_results: {
 dps_results: {
  key: "TestBalance-AllItems-WindhawkArmor"
  value: {
-  dps: 1220.55976719658
+  dps: 1213.8980090337807
  }
 }
 dps_results: {

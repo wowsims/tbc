@@ -188,6 +188,12 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestShadow-AllItems-DragonstrikeP5--23"
+ value: {
+  dps: 1481.5024143539747
+ }
+}
+dps_results: {
  key: "TestShadow-AllItems-DrakefistHammer-28437"
  value: {
   dps: 1342.5328332960858
