@@ -609,6 +609,10 @@ export interface Enchant {
      * @generated from protobuf field: proto.ItemQuality quality = 8;
      */
     quality: ItemQuality;
+    /**
+     * @generated from protobuf field: int32 phase = 11;
+     */
+    phase: number;
 }
 /**
  * @generated from protobuf message proto.Gem
