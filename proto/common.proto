@@ -456,6 +456,7 @@ message Enchant {
     repeated double stats = 7;
 
     ItemQuality quality = 8;
+		int32 phase = 11;
 }
 
 message Gem {

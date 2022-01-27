@@ -141,8 +141,8 @@ input, select {
 }
 
 .nav-tabs {
-  padding-left: 40px;
-  padding-top: 15px;
+	padding-left: 40px;
+	padding-top: 15px;
 	border-bottom-color: var(--theme-color-primary);
 	color: var(--main-text-color);
 }
@@ -158,12 +158,12 @@ input, select {
 }
 
 .sim-main > .tab-content {
-  flex-grow: 1;
+	flex-grow: 1;
 	height: 80%;
 }
 .sim-main > .tab-content > .tab-pane {
 	height: 100%;
-  padding: 25px;
+	padding: 25px;
 }
 
 .sim-toolbar {
