@@ -92,10 +92,6 @@ func (enh *EnhancementShaman) OnManaTick(sim *core.Simulation) {
 }
 
 func (enh *EnhancementShaman) tryUseGCD(sim *core.Simulation) {
-	// Redrop totems when needed.
-	if enh.TryDropTotems(sim) {
-		return
-	}
 
 	target := sim.GetPrimaryTarget()
 
@@ -123,8 +119,12 @@ func (enh *EnhancementShaman) tryUseGCD(sim *core.Simulation) {
 		}
 	}
 
+	// Redrop totems when needed.
+	if enh.TryDropTotems(sim) {
+		return
+	}
+
 	// We didn't try to cast anything. Just wait for next auto or CD.
-	//nextEventAt := enh.CDReadyAt(shaman.StormstrikeCD)
 	nextEventAt := core.MinDuration(enh.NextTotemAt(sim), enh.CDReadyAt(shaman.StormstrikeCD))
 	if enh.Rotation.PrimaryShock != proto.EnhancementShaman_Rotation_None {
 		nextEventAt = core.MinDuration(nextEventAt, enh.CDReadyAt(shaman.ShockCooldownID))
