@@ -70,6 +70,10 @@ enchantDescriptions.set(FEET_CATS_SWIFTNESS, 'Minor Speed and +6 Agility');
 
 
 // Weapon
+export const CRUSADER = 16252;
+enchantDescriptions.set(CRUSADER, 'Crusader');
+export const EXECUTIONER = 33307;
+enchantDescriptions.set(EXECUTIONER, 'Executioner');
 export const WEAPON_MAJOR_AGILITY = 22556;
 enchantDescriptions.set(WEAPON_MAJOR_AGILITY, '+35 Agility');
 export const WEAPON_MAJOR_INTELLECT = 22551;
@@ -92,5 +96,5 @@ export const RING_SPELLPOWER = 22536;
 enchantDescriptions.set(RING_SPELLPOWER, '+12 Spell Damage');
 
 // Ranged
-export const STABLIIZED_ETERNIUM_SCOPE = 23766;
+export const STABILIZED_ETERNIUM_SCOPE = 23766;
 enchantDescriptions.set(STABILIZED_ETERNIUM_SCOPE, '+28 Crit Rating');

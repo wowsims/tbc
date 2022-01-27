@@ -2,7 +2,6 @@ import { BooleanPicker } from '/tbc/core/components/boolean_picker.js';
 import { EnumPicker } from '/tbc/core/components/enum_picker.js';
 import { IconEnumPicker, IconEnumPickerConfig } from '/tbc/core/components/icon_enum_picker.js';
 import { IconPickerConfig } from '/tbc/core/components/icon_picker.js';
-import { Hunter_Options as HunterOptions } from '/tbc/core/proto/shaman.js';
 import { Spec } from '/tbc/core/proto/common.js';
 import { ActionId } from '/tbc/core/proto_utils/action_id.js';
 import { Player } from '/tbc/core/player.js';
@@ -17,15 +16,10 @@ import {
 	Hunter_Options as HunterOptions,
 	Hunter_Options_Ammo as Ammo,
 	Hunter_Options_QuiverBonus as QuiverBonus,
-} from '/tbc/core/proto/shaman.js';
+} from '/tbc/core/proto/hunter.js';
 
 // Configuration for spec-specific UI elements on the settings tab.
 // These don't need to be in a separate file but it keeps things cleaner.
-
-export const IconBloodlust = makeBooleanHunterBuffInput(ActionId.fromSpellId(2825), 'bloodlust');
-export const IconWaterShield = makeBooleanHunterBuffInput(ActionId.fromSpellId(33736), 'waterShield');
-export const MainHandImbue = makeHunterWeaponImbueInput(false);
-export const OffHandImbue = makeHunterWeaponImbueInput(true);
 
 export const Quiver = {
 	extraCssClasses: [
@@ -42,7 +36,7 @@ export const Quiver = {
 		{ actionId: ActionId.fromItemId(3573), value: QuiverBonus.Speed10 },
 	],
 	equals: (a: QuiverBonus, b: QuiverBonus) => a == b,
-	zeroValue: QuiverBonus.ImbueNone,
+	zeroValue: QuiverBonus.QuiverNone,
 	changedEvent: (player: Player<Spec.SpecHunter>) => player.specOptionsChangeEmitter,
 	getValue: (player: Player<Spec.SpecHunter>) => player.getSpecOptions().quiverBonus,
 	setValue: (eventID: EventID, player: Player<Spec.SpecHunter>, newValue: number) => {
@@ -52,20 +46,45 @@ export const Quiver = {
 	},
 };
 
-export const DelayOffhandSwings = {
-	type: 'boolean' as const,
+export const WeaponAmmo = {
+	extraCssClasses: [
+		'ammo-picker',
+	],
+	numColumns: 1,
+	values: [
+		{ color: 'grey', value: Ammo.AmmoNone },
+		{ actionId: ActionId.fromItemId(31737), value: Ammo.TimelessArrow },
+		{ actionId: ActionId.fromItemId(34581), value: Ammo.MysteriousArrow },
+		{ actionId: ActionId.fromItemId(33803), value: Ammo.AdamantineStinger },
+		{ actionId: ActionId.fromItemId(31949), value: Ammo.WardensArrow },
+		{ actionId: ActionId.fromItemId(30611), value: Ammo.HalaaniRazorshaft },
+		{ actionId: ActionId.fromItemId(28056), value: Ammo.BlackflightArrow },
+	],
+	equals: (a: Ammo, b: Ammo) => a == b,
+	zeroValue: Ammo.AmmoNone,
+	changedEvent: (player: Player<Spec.SpecHunter>) => player.specOptionsChangeEmitter,
+	getValue: (player: Player<Spec.SpecHunter>) => player.getSpecOptions().ammo,
+	setValue: (eventID: EventID, player: Player<Spec.SpecHunter>, newValue: number) => {
+		const newOptions = player.getSpecOptions();
+		newOptions.ammo = newValue;
+		player.setSpecOptions(eventID, newOptions);
+	},
+};
+
+export const LatencyMs = {
+	type: 'number' as const,
 	getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
 	config: {
 		extraCssClasses: [
-			'delay-offhand-swings-picker',
+			'latency-ms-picker',
 		],
-		label: 'Delay Offhand Swings',
-		labelTooltip: 'Uses the startattack macro to delay OH swings, so they always follow within 0.5s of a MH swing.',
+		label: 'Latency',
+		labelTooltip: 'Player latency, used for TODO',
 		changedEvent: (player: Player<Spec.SpecHunter>) => player.specOptionsChangeEmitter,
-		getValue: (player: Player<Spec.SpecHunter>) => player.getSpecOptions().delayOffhandSwings,
-		setValue: (eventID: EventID, player: Player<Spec.SpecHunter>, newValue: boolean) => {
+		getValue: (player: Player<Spec.SpecHunter>) => player.getSpecOptions().latencyMs,
+		setValue: (eventID: EventID, player: Player<Spec.SpecHunter>, newValue: number) => {
 			const newOptions = player.getSpecOptions();
-			newOptions.delayOffhandSwings = newValue;
+			newOptions.latencyMs = newValue;
 			player.setSpecOptions(eventID, newOptions);
 		},
 	},
@@ -74,58 +93,64 @@ export const DelayOffhandSwings = {
 export const HunterRotationConfig = {
 	inputs: [
 		{
-			type: 'enum' as const, cssClass: 'primary-shock-picker',
+			type: 'boolean' as const, cssClass: 'adaptive-picker',
 			getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
 			config: {
-				label: 'Primary Shock',
-				values: [
-					{
-						name: 'None', value: PrimaryShock.None,
-					},
-					{
-						name: 'Earth Shock', value: PrimaryShock.Earth,
-					},
-					{
-						name: 'Frost Shock', value: PrimaryShock.Frost,
-					},
-				],
+				label: 'Adaptive',
+				labelTooltip: 'Adapts rotation based on attack speed / mana.',
 				changedEvent: (player: Player<Spec.SpecHunter>) => player.rotationChangeEmitter,
-				getValue: (player: Player<Spec.SpecHunter>) => player.getRotation().primaryShock,
-				setValue: (eventID: EventID, player: Player<Spec.SpecHunter>, newValue: number) => {
+				getValue: (player: Player<Spec.SpecHunter>) => player.getRotation().adaptive,
+				setValue: (eventID: EventID, player: Player<Spec.SpecHunter>, newValue: boolean) => {
 					const newRotation = player.getRotation();
-					newRotation.primaryShock = newValue;
+					newRotation.adaptive = newValue;
 					player.setRotation(eventID, newRotation);
 				},
 			},
 		},
 		{
-			type: 'boolean' as const, cssClass: 'weave-flame-shock-picker',
+			type: 'boolean' as const, cssClass: 'use-multi-shot-picker',
 			getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
 			config: {
-				label: 'Weave Flame Shock',
-				labelTooltip: 'Use Flame Shock whenever the target does not already have the DoT.',
+				label: 'Use Multi Shot',
+				labelTooltip: 'Includes Multi Shot in the rotation.',
 				changedEvent: (player: Player<Spec.SpecHunter>) => player.rotationChangeEmitter,
-				getValue: (player: Player<Spec.SpecHunter>) => player.getRotation().weaveFlameShock,
+				getValue: (player: Player<Spec.SpecHunter>) => player.getRotation().useMultiShot,
 				setValue: (eventID: EventID, player: Player<Spec.SpecHunter>, newValue: boolean) => {
 					const newRotation = player.getRotation();
-					newRotation.weaveFlameShock = newValue;
+					newRotation.useMultiShot = newValue;
+					player.setRotation(eventID, newRotation);
+				},
+			},
+		},
+		{
+			type: 'boolean' as const, cssClass: 'use-arcane-shot-picker',
+			getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
+			config: {
+				label: 'Use Arcane Shot',
+				labelTooltip: 'Includes Arcane Shot in the rotation.',
+				changedEvent: (player: Player<Spec.SpecHunter>) => player.rotationChangeEmitter,
+				getValue: (player: Player<Spec.SpecHunter>) => player.getRotation().useArcaneShot,
+				setValue: (eventID: EventID, player: Player<Spec.SpecHunter>, newValue: boolean) => {
+					const newRotation = player.getRotation();
+					newRotation.useArcaneShot = newValue;
+					player.setRotation(eventID, newRotation);
+				},
+			},
+		},
+		{
+			type: 'boolean' as const, cssClass: 'melee-weave-picker',
+			getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
+			config: {
+				label: 'Melee Weave',
+				labelTooltip: 'Uses melee weaving in the rotation.',
+				changedEvent: (player: Player<Spec.SpecHunter>) => player.rotationChangeEmitter,
+				getValue: (player: Player<Spec.SpecHunter>) => player.getRotation().meleeWeave,
+				setValue: (eventID: EventID, player: Player<Spec.SpecHunter>, newValue: boolean) => {
+					const newRotation = player.getRotation();
+					newRotation.meleeWeave = newValue;
 					player.setRotation(eventID, newRotation);
 				},
 			},
 		},
 	],
 };
-
-function makeBooleanHunterBuffInput(id: ActionId, optionsFieldName: keyof HunterOptions): IconPickerConfig<Player<any>, boolean> {
-	return {
-	  id: id,
-	  states: 2,
-		changedEvent: (player: Player<Spec.SpecHunter>) => player.specOptionsChangeEmitter,
-		getValue: (player: Player<Spec.SpecHunter>) => player.getSpecOptions()[optionsFieldName] as boolean,
-		setValue: (eventID: EventID, player: Player<Spec.SpecHunter>, newValue: boolean) => {
-			const newOptions = player.getSpecOptions();
-	(newOptions[optionsFieldName] as boolean) = newValue;
-			player.setSpecOptions(eventID, newOptions);
-		},
-	};
-}

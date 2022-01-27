@@ -221,8 +221,8 @@ func ApplyAshtongueTalismanOfVision(agent core.Agent) {
 
 		return core.Aura{
 			ID: AshtongueTalismanOfVisionAuraID,
-			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
-				if !ability.ActionID.SameAction(StormstrikeActionID) {
+			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
+				if !cast.SameAction(StormstrikeActionID) {
 					return
 				}
 				if sim.RandomFloat("Ashtongue Talisman of Vision") > procChance {

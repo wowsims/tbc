@@ -80,8 +80,8 @@ message Hunter {
 
 			enum Ammo {
 					AmmoNone = 0;
-					MysteriousArrow = 1;
-					TimelessArrow = 2;
+					TimelessArrow = 1;
+					MysteriousArrow = 2;
 					AdamantineStinger = 3;
 					WardensArrow = 4;
 					HalaaniRazorshaft = 5;

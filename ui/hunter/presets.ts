@@ -12,7 +12,7 @@ import {
 	Hunter_Options as HunterOptions,
 	Hunter_Options_Ammo as Ammo,
 	Hunter_Options_QuiverBonus as QuiverBonus,
-} from '/tbc/core/proto/shaman.js';
+} from '/tbc/core/proto/hunter.js';
 
 import * as Enchants from '/tbc/core/constants/enchants.js';
 import * as Gems from '/tbc/core/proto_utils/gems.js';
@@ -37,8 +37,8 @@ export const DefaultRotation = HunterRotation.create({
 
 export const DefaultOptions = HunterOptions.create({
 	quiverBonus: QuiverBonus.Speed15,
-	ammo: Ammo.AdamantiteSinger,
-	latency_ms: 30,
+	ammo: Ammo.AdamantineStinger,
+	latencyMs: 30,
 });
 
 export const DefaultConsumes = Consumes.create({
@@ -100,6 +100,10 @@ export const P1_BM_PRESET = {
 			}),
 			ItemSpec.create({
 				id: 28828, // Gronn-Stitched Girdle
+				gems: [
+					Gems.SHIFTING_NIGHTSEYE,
+					Gems.WICKED_NOBLE_TOPAZ,
+				],
 			}),
 			ItemSpec.create({
 				id: 30739, // Scaled Greaves of the Marksman

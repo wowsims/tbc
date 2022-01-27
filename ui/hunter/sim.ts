@@ -62,7 +62,7 @@ export class HunterSimUI extends IndividualSimUI<Spec.SpecHunter> {
 
 			defaults: {
 				// Default equipped gear.
-				gear: Presets.P1_PRESET.gear,
+				gear: Presets.P1_BM_PRESET.gear,
 				// Default EP weights for sorting gear in the gear picker.
 				epWeights: Stats.fromMap({
 					[Stat.StatIntellect]: 0.078,
@@ -79,7 +79,7 @@ export class HunterSimUI extends IndividualSimUI<Spec.SpecHunter> {
 				// Default rotation settings.
 				rotation: Presets.DefaultRotation,
 				// Default talents.
-				talents: Presets.StandardTalents.data,
+				talents: Presets.BeastMasteryTalents.data,
 				// Default spec-specific settings.
 				specOptions: Presets.DefaultOptions,
 				// Default raid/party buffs settings.
@@ -107,10 +107,8 @@ export class HunterSimUI extends IndividualSimUI<Spec.SpecHunter> {
 
 			// IconInputs to include in the 'Self Buffs' section on the settings tab.
 			selfBuffInputs: [
-				HunterInputs.IconWaterShield,
-				HunterInputs.MainHandImbue,
-				HunterInputs.OffHandImbue,
-				HunterInputs.IconBloodlust,
+				HunterInputs.Quiver,
+				HunterInputs.WeaponAmmo,
 				IconInputs.DrumsOfBattleConsume,
 				IconInputs.DrumsOfRestorationConsume,
 				IconInputs.BattleChicken,
@@ -173,6 +171,7 @@ export class HunterSimUI extends IndividualSimUI<Spec.SpecHunter> {
 			// Inputs to include in the 'Other' section on the settings tab.
 			otherInputs: {
 				inputs: [
+					HunterInputs.LatencyMs,
 					OtherInputs.StartingPotion,
 					OtherInputs.NumStartingPotions,
 					OtherInputs.ExposeWeaknessUptime,
@@ -201,7 +200,7 @@ export class HunterSimUI extends IndividualSimUI<Spec.SpecHunter> {
 				],
 				// Preset gear configurations that the user can quickly select.
 				gear: [
-					Presets.P1_PRESET,
+					Presets.P1_BM_PRESET,
 				],
 			},
 		});

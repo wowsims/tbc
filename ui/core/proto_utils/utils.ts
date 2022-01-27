@@ -1163,7 +1163,7 @@ export function enchantAppliesToItem(enchant: Enchant, item: Item): boolean {
   if (sharedSlots.length == 0)
     return false;
 
-	if (enchant.enchantType == EnchantType.EnchantTypeTwoHanded && item.handType != HandType.HandTypeTwoHand)
+	if (enchant.enchantType == EnchantType.EnchantTypeTwoHand && item.handType != HandType.HandTypeTwoHand)
 		return false;
 
 	if ((enchant.enchantType == EnchantType.EnchantTypeShield) != (item.weaponType == WeaponType.WeaponTypeShield))

@@ -32,19 +32,16 @@ input, select {
 .sim-root {
   height: 100%;
   display: flex;
-  flex-wrap: wrap;
-  overflow-y: auto;
 }
 
 .sim-sidebar {
   height: 100%;
   width: 20%;
-  min-width: 300px;
+  min-width: 200px;
   display: flex;
   flex-direction: column;
   align-items: stretch;
   background: #111218;
-  flex: 1;
 }
 
 .sim-sidebar>div {
@@ -141,9 +138,6 @@ input, select {
 	background-size: cover;
 	background-position: center center;
   color: var(--main-text-color);
-  overflow-y: auto;
-  flex: 4;
-  min-width: 325px;
 }
 
 .nav-tabs {
@@ -151,13 +145,12 @@ input, select {
 	padding-top: 15px;
 	border-bottom-color: var(--theme-color-primary);
 	color: var(--main-text-color);
-	font-size: clamp(10px, 1.5vw, 15px);
 }
 .nav-tabs>li>a {
 	color: var(--main-text-color) !important;
 	border: none !important;
 	border-radius: 0 !important;
-	margin: 0.1vh 0.1vw 0.1vh 0.1vw;
+	margin-bottom: 1px;
 	font-weight: bold;
 }
 .nav-tabs>li>a:hover, .nav-tabs>li.active>a {
@@ -170,6 +163,7 @@ input, select {
 }
 .sim-main > .tab-content > .tab-pane {
 	height: 100%;
+	padding: 25px;
 }
 
 .sim-toolbar {
@@ -191,9 +185,9 @@ input, select {
 }
 
 .sim-top-bar-item {
+	margin: 10px;
+	font-size: 20px;
 	cursor: pointer;
-	font-size: clamp(12px, 2vw, 20px);
-	margin-right: 12px;
 }
 
 .warnings {
