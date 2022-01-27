@@ -57,7 +57,7 @@ body.new-tab {
 	color: var(--main-text-color) !important;
 	border: none !important;
 	border-radius: 0 !important;
-	margin: 0.1vh 0.1vw 0.1vh 0.1vw;
+	margin-bottom: 1px;
 	font-weight: bold;
 }
 .nav-tabs>li>a:hover, .nav-tabs>li.active>a {
