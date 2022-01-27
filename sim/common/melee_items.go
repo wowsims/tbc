@@ -17,6 +17,7 @@ func init() {
 	core.AddItemEffect(28437, ApplyDrakefistHammer)
 	core.AddItemEffect(28438, ApplyDragonmaw)
 	core.AddItemEffect(28439, ApplyDragonstrike)
+	core.AddItemEffect(-23, ApplyDragonstrike)
 	core.AddItemEffect(28573, ApplyDespair)
 	core.AddItemEffect(28767, ApplyTheDecapitator)
 	core.AddItemEffect(28774, ApplyGlaiveOfThePit)
@@ -203,7 +204,8 @@ var DragonstrikeProcAuraID = core.NewAuraID()
 
 func ApplyDragonstrike(agent core.Agent) {
 	character := agent.GetCharacter()
-	mh, oh := character.GetWeaponHands(28439)
+	mh, _ := character.GetWeaponHands(28439)
+	_, oh := character.GetWeaponHands(-23)
 	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		const hasteBonus = 212.0
 		const dur = time.Second * 10

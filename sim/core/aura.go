@@ -131,6 +131,10 @@ type PermanentAura struct {
 	// beginning of every iteration but expires after a period of time. This is
 	// used for some snapshotting effects like Warrior battle shout.
 	RespectExpiration bool
+
+	// Multiplies uptime for the aura metrics of this aura. This is for buffs coded
+	// as permanent but which are actually averaged versions of the real buff.
+	UptimeMultiplier float64
 }
 
 // auraTracker is a centralized implementation of CD and Aura tracking.
@@ -256,6 +260,9 @@ func (at *auraTracker) reset(sim *Simulation) {
 			aura.Expires = NeverExpires
 		}
 		at.AddAura(sim, aura)
+		if permAura.UptimeMultiplier != 0 && !aura.ActionID.IsEmptyAction() {
+			at.AddAuraUptime(aura.ID, aura.ActionID, time.Duration(-1*float64(sim.Duration)*(1.0-permAura.UptimeMultiplier)))
+		}
 	}
 }
 
