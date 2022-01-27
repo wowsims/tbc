@@ -253,6 +253,8 @@ func registerDrumsCD(agent Agent, partyBuffs proto.PartyBuffs, consumes proto.Co
 								applyDrums(sim, &pet.Character)
 							}
 						}
+
+						// All MCDs that use the GCD and have a non-zero cast time must call this.
 						character.UpdateMajorCooldowns()
 					},
 				},

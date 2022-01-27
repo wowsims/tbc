@@ -3,7 +3,6 @@ package mage
 import (
 	"time"
 
-	"github.com/wowsims/tbc/sim/common"
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/stats"
 )
@@ -50,6 +49,9 @@ func (mage *Mage) registerSummonWaterElementalCD() {
 					Cooldown:     time.Minute * 3,
 					OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
 						mage.waterElemental.EnableWithTimeout(sim, mage.waterElemental, time.Second*45)
+
+						// All MCDs that use the GCD and have a non-zero cast time must call this.
+						mage.UpdateMajorCooldowns()
 					},
 				},
 			}
@@ -106,31 +108,26 @@ func (we *WaterElemental) Init(sim *core.Simulation) {
 func (we *WaterElemental) Reset(newsim *core.Simulation) {
 }
 
-func (we *WaterElemental) Advance(sim *core.Simulation, elapsedTime time.Duration) {
-	// Water ele probably has mana regen?
-}
+func (we *WaterElemental) OnGCDReady(sim *core.Simulation) {
+	// There's some edge case where this causes a panic, haven't figured it out yet.
+	if we.waterboltSpell.IsInUse() {
+		we.waterboltSpell.Cancel(sim)
+	}
 
-func (we *WaterElemental) Act(sim *core.Simulation) time.Duration {
 	spell := we.NewWaterbolt(sim, sim.GetPrimaryTarget())
 
 	if sim.RandomFloat("Water Elemental Disobey") < we.disobeyChance {
 		// Water ele has decided not to cooperate, so just wait for the cast time
 		// instead of casting.
-		spell.Cancel(sim)
-		waitAction := common.NewWaitAction(sim, we.GetCharacter(), spell.GetDuration(), common.WaitReasonNone)
-		waitAction.Cast(sim)
-		return sim.CurrentTime + waitAction.GetDuration()
+		we.WaitUntil(sim, sim.CurrentTime+spell.GetDuration())
+		return
 	}
 
-	actionSuccessful := spell.Cast(sim)
-
-	if !actionSuccessful {
+	if success := spell.Cast(sim); !success {
 		// If water ele has gone OOM then there won't be enough time left for meaningful
 		// regen to occur before the ele expires. So just murder itself.
 		we.Disable(sim)
 	}
-
-	return sim.CurrentTime + spell.GetDuration()
 }
 
 // These numbers are just rough guesses based on looking at some logs.

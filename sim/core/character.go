@@ -40,9 +40,6 @@ type Character struct {
 	// effects from items / abilities.
 	initialStats stats.Stats
 
-	// Base mana regen rate while casting, without any temporary effects.
-	initialManaRegenPerSecondWhileCasting float64
-
 	// Cast speed without any temporary effects.
 	initialCastSpeed float64
 
@@ -96,6 +93,17 @@ type Character struct {
 	// a MH imbue.
 	// TODO: Figure out a cleaner way to do this.
 	HasMHWeaponImbue bool
+
+	// The PendingAction tracking this character's GCD.
+	gcdAction *PendingAction
+
+	// Fields related to waiting for certain events to happen.
+	waitingForMana float64
+	waitStartTime  time.Duration
+
+	// Cached mana return values per tick.
+	manaTickWhileCasting    float64
+	manaTickWhileNotCasting float64
 }
 
 func NewCharacter(party *Party, partyIndex int, player proto.Player) Character {
@@ -206,6 +214,10 @@ func (character *Character) AddStat(stat stats.Stat, amount float64) {
 	}
 
 	character.stats[stat] += amount
+
+	if stat == stats.MP5 || stat == stats.Intellect || stat == stats.Spirit {
+		character.UpdateManaRegenRates()
+	}
 
 	if len(character.Pets) > 0 {
 		for _, petAgent := range character.Pets {
@@ -330,8 +342,6 @@ func (character *Character) Finalize() {
 	// All stats added up to this point are part of the 'initial' stats.
 	character.initialStats = character.stats
 	character.initialPseudoStats = character.PseudoStats
-
-	character.initialManaRegenPerSecondWhileCasting = character.ManaRegenPerSecondWhileCasting()
 	character.initialCastSpeed = character.CastSpeed()
 
 	character.auraTracker.finalize()
@@ -342,10 +352,11 @@ func (character *Character) Finalize() {
 	}
 }
 
-func (character *Character) reset(sim *Simulation) {
+func (character *Character) reset(sim *Simulation, agent Agent) {
 	character.stats = character.initialStats
 	character.PseudoStats = character.initialPseudoStats
 	character.ExpectedBonusMana = 0
+	character.UpdateManaRegenRates()
 
 	character.energyBar.reset(sim)
 	character.rageBar.reset(sim)
@@ -356,9 +367,11 @@ func (character *Character) reset(sim *Simulation) {
 	character.Metrics.reset()
 
 	for _, petAgent := range character.Pets {
-		petAgent.GetPet().reset(sim)
+		petAgent.GetPet().reset(sim, petAgent)
 		petAgent.Reset(sim)
 	}
+
+	character.gcdAction = character.newGCDAction(sim, agent)
 }
 
 // Advance moves time forward counting down auras, CDs, mana regen, etc
@@ -374,7 +387,6 @@ func (character *Character) advance(sim *Simulation, elapsedTime time.Duration) 
 	if len(character.Pets) > 0 {
 		for _, petAgent := range character.Pets {
 			petAgent.GetPet().advance(sim, elapsedTime)
-			petAgent.Advance(sim, elapsedTime)
 		}
 	}
 }
@@ -447,6 +459,7 @@ func (character *Character) doneIteration(simDuration time.Duration) {
 		character.Hardcast.Cast.Cancel()
 		character.Hardcast = Hardcast{}
 	}
+	character.doneIterationGCD(simDuration)
 	character.Metrics.doneIteration(simDuration.Seconds())
 	character.auraTracker.doneIteration(simDuration)
 }
@@ -476,8 +489,8 @@ func (character *Character) GetMetricsProto(numIterations int32) *proto.PlayerMe
 	return metrics
 }
 
-func (character *Character) EnableAutoAttacks(delayOHSwings bool) {
-	character.AutoAttacks = NewAutoAttacks(character, delayOHSwings)
+func (character *Character) EnableAutoAttacks(agent Agent, delayOHSwings bool) {
+	character.AutoAttacks = NewAutoAttacks(agent, delayOHSwings)
 }
 
 type BaseStatsKey struct {

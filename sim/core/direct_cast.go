@@ -129,6 +129,7 @@ type SimpleSpell struct {
 //  Init will panic if the spell or the GCD is still on CD.
 func (spell *SimpleSpell) Init(sim *Simulation) {
 	spell.SpellCast.init(sim)
+
 	if len(spell.Effects) == 0 {
 		if spell.Effect.DotInput.NumberOfTicks > 0 {
 			spell.Effect.DotInput.init(&spell.SpellCast)
@@ -140,15 +141,23 @@ func (spell *SimpleSpell) Init(sim *Simulation) {
 			}
 		}
 	}
+
+	if spell.IsChannel {
+		spell.AfterCastDelay += spell.GetChannelDuration()
+	}
+}
+
+func (spell *SimpleSpell) GetChannelDuration() time.Duration {
+	if len(spell.Effects) == 0 {
+		return spell.Effect.DotInput.FullDuration()
+	} else {
+		return spell.Effects[0].DotInput.FullDuration()
+	}
 }
 
 func (spell *SimpleSpell) GetDuration() time.Duration {
 	if spell.IsChannel {
-		if len(spell.Effects) == 0 {
-			return spell.CastTime + spell.Effect.DotInput.FullDuration()
-		} else {
-			return spell.CastTime + spell.Effects[0].DotInput.FullDuration()
-		}
+		return spell.CastTime + spell.GetChannelDuration()
 	} else {
 		return spell.CastTime
 	}
@@ -170,7 +179,7 @@ func (spell *SimpleSpell) Cast(sim *Simulation) bool {
 					hitEffect.takeDotSnapshot(sim, &spell.SpellCast)
 
 					pa := &PendingAction{
-						// Name:         spell.SpellCast.ActionID.String(),
+						Priority:     ActionPriorityDOT,
 						NextActionAt: sim.CurrentTime + hitEffect.DotInput.TickLength,
 					}
 					pa.OnAction = func(sim *Simulation) {
@@ -240,7 +249,7 @@ func (spell *SimpleSpell) Cast(sim *Simulation) bool {
 			// This assumes that the effects either all have dots, or none of them do.
 			if spell.Effects[0].DotInput.NumberOfTicks != 0 {
 				pa := &PendingAction{
-					// Name:         spell.SpellCast.ActionID.String(), // TODO: This is a debugging name only. Might not be worth to use?
+					Priority:     ActionPriorityDOT,
 					NextActionAt: sim.CurrentTime + spell.Effects[0].DotInput.TickLength,
 				}
 				pa.OnAction = func(sim *Simulation) {
