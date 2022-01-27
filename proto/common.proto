@@ -437,7 +437,7 @@ message Item {
 // ItemType alone is not enough.
 enum EnchantType {
     EnchantTypeNormal = 0;
-    EnchantTypeTwoHanded = 1;
+    EnchantTypeTwoHand = 1;
     EnchantTypeShield = 2;
 }
 
