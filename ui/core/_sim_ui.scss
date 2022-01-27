@@ -39,7 +39,7 @@ input, select {
 .sim-sidebar {
   height: 100%;
   width: 20%;
-  min-width: 300px;
+  min-width: 250px;
   display: flex;
   flex-direction: column;
   align-items: stretch;
@@ -143,7 +143,7 @@ input, select {
   color: var(--main-text-color);
   overflow-y: auto;
   flex: 4;
-  min-width: 325px;
+  min-width: 250px;
 }
 
 .nav-tabs {

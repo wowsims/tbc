@@ -46,15 +46,15 @@
 }
 
 .left-gear-panel {
-  min-width: calc(800px + 2vw);
+  min-width: calc(500px + 2vw);
   flex: 3;
   padding-left: 1vw;
   padding-right: 1vw;
   padding-top: 1vh;
 }
-@media only screen and (max-width: calc(1100px + 1vw)) {
+@media only screen and (max-width: calc(750px + 1vw)) {
   .left-gear-panel {
-    min-width: calc(400px + 1vw);
+    min-width: calc(250px + 1vw);
   }
 }
 
@@ -63,20 +63,20 @@
   border-left: 3px solid var(--main-text-color);
   position: relative;
   flex: 1.25;
-  min-width: 300px;
+  min-width: 250px;
   min-height: 450px;
   height: calc(90% - 60px);
   margin-top: 10px;
   margin-bottom: 10px;
 }
-@media only screen and (max-width: calc(1400px + 2vw)) {
+@media only screen and (max-width: calc(1000px + 2vw)) {
   .right-gear-panel {
     border-left: none;
   }
 }
-@media only screen and (max-width: calc(1100px + 1vw)) {
+@media only screen and (max-width: calc(750px + 1vw)) {
   .right-gear-panel {
-    min-width: 400px;
+    min-width: 250px;
     border-left: none;
   }
 }
