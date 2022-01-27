@@ -810,9 +810,9 @@ export var EnchantType;
      */
     EnchantType[EnchantType["EnchantTypeNormal"] = 0] = "EnchantTypeNormal";
     /**
-     * @generated from protobuf enum value: EnchantTypeTwoHanded = 1;
+     * @generated from protobuf enum value: EnchantTypeTwoHand = 1;
      */
-    EnchantType[EnchantType["EnchantTypeTwoHanded"] = 1] = "EnchantTypeTwoHanded";
+    EnchantType[EnchantType["EnchantTypeTwoHand"] = 1] = "EnchantTypeTwoHand";
     /**
      * @generated from protobuf enum value: EnchantTypeShield = 2;
      */

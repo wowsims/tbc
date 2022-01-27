@@ -212,11 +212,146 @@ export interface Hunter {
  * @generated from protobuf message proto.Hunter.Rotation
  */
 export interface Hunter_Rotation {
+    /**
+     * @generated from protobuf field: bool adaptive = 1;
+     */
+    adaptive: boolean;
+    /**
+     * @generated from protobuf field: bool use_multi_shot = 2;
+     */
+    useMultiShot: boolean;
+    /**
+     * @generated from protobuf field: bool use_arcane_shot = 3;
+     */
+    useArcaneShot: boolean;
+    /**
+     * @generated from protobuf field: bool melee_weave = 4;
+     */
+    meleeWeave: boolean;
 }
 /**
  * @generated from protobuf message proto.Hunter.Options
  */
 export interface Hunter_Options {
+    /**
+     * @generated from protobuf field: proto.Hunter.Options.QuiverBonus quiver_bonus = 1;
+     */
+    quiverBonus: Hunter_Options_QuiverBonus;
+    /**
+     * @generated from protobuf field: proto.Hunter.Options.Ammo ammo = 2;
+     */
+    ammo: Hunter_Options_Ammo;
+    /**
+     * @generated from protobuf field: proto.Hunter.Options.PetType pet_type = 3;
+     */
+    petType: Hunter_Options_PetType;
+    /**
+     * @generated from protobuf field: double pet_uptime = 4;
+     */
+    petUptime: number;
+    /**
+     * @generated from protobuf field: double latency_ms = 5;
+     */
+    latencyMs: number;
+}
+/**
+ * @generated from protobuf enum proto.Hunter.Options.QuiverBonus
+ */
+export declare enum Hunter_Options_QuiverBonus {
+    /**
+     * @generated from protobuf enum value: QuiverNone = 0;
+     */
+    QuiverNone = 0,
+    /**
+     * @generated from protobuf enum value: Speed10 = 1;
+     */
+    Speed10 = 1,
+    /**
+     * @generated from protobuf enum value: Speed11 = 2;
+     */
+    Speed11 = 2,
+    /**
+     * @generated from protobuf enum value: Speed12 = 3;
+     */
+    Speed12 = 3,
+    /**
+     * @generated from protobuf enum value: Speed13 = 4;
+     */
+    Speed13 = 4,
+    /**
+     * @generated from protobuf enum value: Speed14 = 5;
+     */
+    Speed14 = 5,
+    /**
+     * @generated from protobuf enum value: Speed15 = 6;
+     */
+    Speed15 = 6
+}
+/**
+ * @generated from protobuf enum proto.Hunter.Options.Ammo
+ */
+export declare enum Hunter_Options_Ammo {
+    /**
+     * @generated from protobuf enum value: AmmoNone = 0;
+     */
+    AmmoNone = 0,
+    /**
+     * @generated from protobuf enum value: TimelessArrow = 1;
+     */
+    TimelessArrow = 1,
+    /**
+     * @generated from protobuf enum value: MysteriousArrow = 2;
+     */
+    MysteriousArrow = 2,
+    /**
+     * @generated from protobuf enum value: AdamantineStinger = 3;
+     */
+    AdamantineStinger = 3,
+    /**
+     * @generated from protobuf enum value: WardensArrow = 4;
+     */
+    WardensArrow = 4,
+    /**
+     * @generated from protobuf enum value: HalaaniRazorshaft = 5;
+     */
+    HalaaniRazorshaft = 5,
+    /**
+     * @generated from protobuf enum value: BlackflightArrow = 6;
+     */
+    BlackflightArrow = 6
+}
+/**
+ * @generated from protobuf enum proto.Hunter.Options.PetType
+ */
+export declare enum Hunter_Options_PetType {
+    /**
+     * @generated from protobuf enum value: PetNone = 0;
+     */
+    PetNone = 0,
+    /**
+     * @generated from protobuf enum value: Ravager = 1;
+     */
+    Ravager = 1,
+    /**
+     * @generated from protobuf enum value: Cat = 2;
+     */
+    Cat = 2,
+    /**
+     * @generated from protobuf enum value: Raptor = 3;
+     */
+    Raptor = 3,
+    /**
+     * @generated from protobuf enum value: Owl = 4;
+     */
+    Owl = 4,
+    /**
+     * @generated from protobuf enum value: Bat = 5;
+     */
+    Bat = 5,
+    /**
+     * @generated from protobuf enum value: WindSerpent = 6;
+     */
+    WindSerpent = 6
 }
 declare class HunterTalents$Type extends MessageType<HunterTalents> {
     constructor();

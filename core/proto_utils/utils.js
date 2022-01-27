@@ -952,7 +952,7 @@ export function enchantAppliesToItem(enchant, item) {
     const sharedSlots = intersection(getEligibleEnchantSlots(enchant), getEligibleItemSlots(item));
     if (sharedSlots.length == 0)
         return false;
-    if (enchant.enchantType == EnchantType.EnchantTypeTwoHanded && item.handType != HandType.HandTypeTwoHand)
+    if (enchant.enchantType == EnchantType.EnchantTypeTwoHand && item.handType != HandType.HandTypeTwoHand)
         return false;
     if ((enchant.enchantType == EnchantType.EnchantTypeShield) != (item.weaponType == WeaponType.WeaponTypeShield))
         return false;

@@ -1512,9 +1512,9 @@ export declare enum EnchantType {
      */
     EnchantTypeNormal = 0,
     /**
-     * @generated from protobuf enum value: EnchantTypeTwoHanded = 1;
+     * @generated from protobuf enum value: EnchantTypeTwoHand = 1;
      */
-    EnchantTypeTwoHanded = 1,
+    EnchantTypeTwoHand = 1,
     /**
      * @generated from protobuf enum value: EnchantTypeShield = 2;
      */

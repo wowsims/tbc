@@ -3,6 +3,108 @@ import { UnknownFieldHandler } from '/tbc/protobuf-ts/index.js';
 import { reflectionMergePartial } from '/tbc/protobuf-ts/index.js';
 import { MESSAGE_TYPE } from '/tbc/protobuf-ts/index.js';
 import { MessageType } from '/tbc/protobuf-ts/index.js';
+/**
+ * @generated from protobuf enum proto.Hunter.Options.QuiverBonus
+ */
+export var Hunter_Options_QuiverBonus;
+(function (Hunter_Options_QuiverBonus) {
+    /**
+     * @generated from protobuf enum value: QuiverNone = 0;
+     */
+    Hunter_Options_QuiverBonus[Hunter_Options_QuiverBonus["QuiverNone"] = 0] = "QuiverNone";
+    /**
+     * @generated from protobuf enum value: Speed10 = 1;
+     */
+    Hunter_Options_QuiverBonus[Hunter_Options_QuiverBonus["Speed10"] = 1] = "Speed10";
+    /**
+     * @generated from protobuf enum value: Speed11 = 2;
+     */
+    Hunter_Options_QuiverBonus[Hunter_Options_QuiverBonus["Speed11"] = 2] = "Speed11";
+    /**
+     * @generated from protobuf enum value: Speed12 = 3;
+     */
+    Hunter_Options_QuiverBonus[Hunter_Options_QuiverBonus["Speed12"] = 3] = "Speed12";
+    /**
+     * @generated from protobuf enum value: Speed13 = 4;
+     */
+    Hunter_Options_QuiverBonus[Hunter_Options_QuiverBonus["Speed13"] = 4] = "Speed13";
+    /**
+     * @generated from protobuf enum value: Speed14 = 5;
+     */
+    Hunter_Options_QuiverBonus[Hunter_Options_QuiverBonus["Speed14"] = 5] = "Speed14";
+    /**
+     * @generated from protobuf enum value: Speed15 = 6;
+     */
+    Hunter_Options_QuiverBonus[Hunter_Options_QuiverBonus["Speed15"] = 6] = "Speed15";
+})(Hunter_Options_QuiverBonus || (Hunter_Options_QuiverBonus = {}));
+/**
+ * @generated from protobuf enum proto.Hunter.Options.Ammo
+ */
+export var Hunter_Options_Ammo;
+(function (Hunter_Options_Ammo) {
+    /**
+     * @generated from protobuf enum value: AmmoNone = 0;
+     */
+    Hunter_Options_Ammo[Hunter_Options_Ammo["AmmoNone"] = 0] = "AmmoNone";
+    /**
+     * @generated from protobuf enum value: TimelessArrow = 1;
+     */
+    Hunter_Options_Ammo[Hunter_Options_Ammo["TimelessArrow"] = 1] = "TimelessArrow";
+    /**
+     * @generated from protobuf enum value: MysteriousArrow = 2;
+     */
+    Hunter_Options_Ammo[Hunter_Options_Ammo["MysteriousArrow"] = 2] = "MysteriousArrow";
+    /**
+     * @generated from protobuf enum value: AdamantineStinger = 3;
+     */
+    Hunter_Options_Ammo[Hunter_Options_Ammo["AdamantineStinger"] = 3] = "AdamantineStinger";
+    /**
+     * @generated from protobuf enum value: WardensArrow = 4;
+     */
+    Hunter_Options_Ammo[Hunter_Options_Ammo["WardensArrow"] = 4] = "WardensArrow";
+    /**
+     * @generated from protobuf enum value: HalaaniRazorshaft = 5;
+     */
+    Hunter_Options_Ammo[Hunter_Options_Ammo["HalaaniRazorshaft"] = 5] = "HalaaniRazorshaft";
+    /**
+     * @generated from protobuf enum value: BlackflightArrow = 6;
+     */
+    Hunter_Options_Ammo[Hunter_Options_Ammo["BlackflightArrow"] = 6] = "BlackflightArrow";
+})(Hunter_Options_Ammo || (Hunter_Options_Ammo = {}));
+/**
+ * @generated from protobuf enum proto.Hunter.Options.PetType
+ */
+export var Hunter_Options_PetType;
+(function (Hunter_Options_PetType) {
+    /**
+     * @generated from protobuf enum value: PetNone = 0;
+     */
+    Hunter_Options_PetType[Hunter_Options_PetType["PetNone"] = 0] = "PetNone";
+    /**
+     * @generated from protobuf enum value: Ravager = 1;
+     */
+    Hunter_Options_PetType[Hunter_Options_PetType["Ravager"] = 1] = "Ravager";
+    /**
+     * @generated from protobuf enum value: Cat = 2;
+     */
+    Hunter_Options_PetType[Hunter_Options_PetType["Cat"] = 2] = "Cat";
+    /**
+     * @generated from protobuf enum value: Raptor = 3;
+     */
+    Hunter_Options_PetType[Hunter_Options_PetType["Raptor"] = 3] = "Raptor";
+    /**
+     * @generated from protobuf enum value: Owl = 4;
+     */
+    Hunter_Options_PetType[Hunter_Options_PetType["Owl"] = 4] = "Owl";
+    /**
+     * @generated from protobuf enum value: Bat = 5;
+     */
+    Hunter_Options_PetType[Hunter_Options_PetType["Bat"] = 5] = "Bat";
+    /**
+     * @generated from protobuf enum value: WindSerpent = 6;
+     */
+    Hunter_Options_PetType[Hunter_Options_PetType["WindSerpent"] = 6] = "WindSerpent";
+})(Hunter_Options_PetType || (Hunter_Options_PetType = {}));
 // @generated message type with reflection information, may provide speed optimized methods
 class HunterTalents$Type extends MessageType {
     constructor() {
@@ -415,19 +517,61 @@ export const Hunter = new Hunter$Type();
 // @generated message type with reflection information, may provide speed optimized methods
 class Hunter_Rotation$Type extends MessageType {
     constructor() {
-        super("proto.Hunter.Rotation", []);
+        super("proto.Hunter.Rotation", [
+            { no: 1, name: "adaptive", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 2, name: "use_multi_shot", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 3, name: "use_arcane_shot", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 4, name: "melee_weave", kind: "scalar", T: 8 /*ScalarType.BOOL*/ }
+        ]);
     }
     create(value) {
-        const message = {};
+        const message = { adaptive: false, useMultiShot: false, useArcaneShot: false, meleeWeave: false };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
         return message;
     }
     internalBinaryRead(reader, length, options, target) {
-        return target ?? this.create();
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* bool adaptive */ 1:
+                    message.adaptive = reader.bool();
+                    break;
+                case /* bool use_multi_shot */ 2:
+                    message.useMultiShot = reader.bool();
+                    break;
+                case /* bool use_arcane_shot */ 3:
+                    message.useArcaneShot = reader.bool();
+                    break;
+                case /* bool melee_weave */ 4:
+                    message.meleeWeave = reader.bool();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
     }
     internalBinaryWrite(message, writer, options) {
+        /* bool adaptive = 1; */
+        if (message.adaptive !== false)
+            writer.tag(1, WireType.Varint).bool(message.adaptive);
+        /* bool use_multi_shot = 2; */
+        if (message.useMultiShot !== false)
+            writer.tag(2, WireType.Varint).bool(message.useMultiShot);
+        /* bool use_arcane_shot = 3; */
+        if (message.useArcaneShot !== false)
+            writer.tag(3, WireType.Varint).bool(message.useArcaneShot);
+        /* bool melee_weave = 4; */
+        if (message.meleeWeave !== false)
+            writer.tag(4, WireType.Varint).bool(message.meleeWeave);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -441,19 +585,68 @@ export const Hunter_Rotation = new Hunter_Rotation$Type();
 // @generated message type with reflection information, may provide speed optimized methods
 class Hunter_Options$Type extends MessageType {
     constructor() {
-        super("proto.Hunter.Options", []);
+        super("proto.Hunter.Options", [
+            { no: 1, name: "quiver_bonus", kind: "enum", T: () => ["proto.Hunter.Options.QuiverBonus", Hunter_Options_QuiverBonus] },
+            { no: 2, name: "ammo", kind: "enum", T: () => ["proto.Hunter.Options.Ammo", Hunter_Options_Ammo] },
+            { no: 3, name: "pet_type", kind: "enum", T: () => ["proto.Hunter.Options.PetType", Hunter_Options_PetType] },
+            { no: 4, name: "pet_uptime", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
+            { no: 5, name: "latency_ms", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ }
+        ]);
     }
     create(value) {
-        const message = {};
+        const message = { quiverBonus: 0, ammo: 0, petType: 0, petUptime: 0, latencyMs: 0 };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
         return message;
     }
     internalBinaryRead(reader, length, options, target) {
-        return target ?? this.create();
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* proto.Hunter.Options.QuiverBonus quiver_bonus */ 1:
+                    message.quiverBonus = reader.int32();
+                    break;
+                case /* proto.Hunter.Options.Ammo ammo */ 2:
+                    message.ammo = reader.int32();
+                    break;
+                case /* proto.Hunter.Options.PetType pet_type */ 3:
+                    message.petType = reader.int32();
+                    break;
+                case /* double pet_uptime */ 4:
+                    message.petUptime = reader.double();
+                    break;
+                case /* double latency_ms */ 5:
+                    message.latencyMs = reader.double();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
     }
     internalBinaryWrite(message, writer, options) {
+        /* proto.Hunter.Options.QuiverBonus quiver_bonus = 1; */
+        if (message.quiverBonus !== 0)
+            writer.tag(1, WireType.Varint).int32(message.quiverBonus);
+        /* proto.Hunter.Options.Ammo ammo = 2; */
+        if (message.ammo !== 0)
+            writer.tag(2, WireType.Varint).int32(message.ammo);
+        /* proto.Hunter.Options.PetType pet_type = 3; */
+        if (message.petType !== 0)
+            writer.tag(3, WireType.Varint).int32(message.petType);
+        /* double pet_uptime = 4; */
+        if (message.petUptime !== 0)
+            writer.tag(4, WireType.Bit64).double(message.petUptime);
+        /* double latency_ms = 5; */
+        if (message.latencyMs !== 0)
+            writer.tag(5, WireType.Bit64).double(message.latencyMs);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
