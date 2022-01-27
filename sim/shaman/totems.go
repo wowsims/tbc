@@ -198,15 +198,21 @@ func (shaman *Shaman) NewTremorTotem(sim *core.Simulation) *core.SimpleCast {
 	return &shaman.totemSpell
 }
 
-// TryDropTotems will check to see if totems need to be re-cast.
-//  If they do time.Duration will be returned will be >0.
-//  Also returns whether the cast was a success. TODO: Figure out a cleaner way to do this.
-func (shaman *Shaman) TryDropTotems(sim *core.Simulation) (time.Duration, bool) {
-	gcd := shaman.GetRemainingCD(core.GCDCooldownID, sim.CurrentTime)
-	if gcd > 0 {
-		return sim.CurrentTime + gcd, false // can't drop totems in GCD
-	}
+func (shaman *Shaman) NextTotemAt(sim *core.Simulation) time.Duration {
+	nextTotemAt := core.MinDuration(
+		shaman.NextTotemDrops[0],
+		core.MinDuration(
+			shaman.NextTotemDrops[1],
+			core.MinDuration(
+				shaman.NextTotemDrops[2],
+				shaman.NextTotemDrops[3])))
 
+	return nextTotemAt
+}
+
+// TryDropTotems will check to see if totems need to be re-cast.
+//  Returns whether we tried to cast a totem, regardless of whether it succeeded.
+func (shaman *Shaman) TryDropTotems(sim *core.Simulation) bool {
 	var cast *core.SimpleCast
 	var attackCast *core.SimpleSpell // if using fire totems this will be an attack cast.
 
@@ -215,7 +221,7 @@ func (shaman *Shaman) TryDropTotems(sim *core.Simulation) (time.Duration, bool) 
 			break
 		}
 		nextDrop := shaman.NextTotemDropType[totemTypeIdx]
-		if sim.CurrentTime > totemExpiration {
+		if sim.CurrentTime >= totemExpiration {
 			switch totemTypeIdx {
 			case AirTotem:
 				switch proto.AirTotem(nextDrop) {
@@ -255,26 +261,16 @@ func (shaman *Shaman) TryDropTotems(sim *core.Simulation) (time.Duration, bool) 
 		}
 	}
 
-	success := false
-	cost := 0.0
-	anyCast := false
 	if cast != nil {
-		anyCast = true
-		success = cast.StartCast(sim)
-		cost = cast.GetManaCost()
+		if success := cast.StartCast(sim); !success {
+			shaman.WaitForMana(sim, cast.ManaCost)
+		}
+		return true
 	} else if attackCast != nil {
-		anyCast = true
-		success = attackCast.Cast(sim)
-		cost = attackCast.GetManaCost()
+		if success := attackCast.Cast(sim); !success {
+			shaman.WaitForMana(sim, attackCast.ManaCost)
+		}
+		return true
 	}
-
-	if !anyCast {
-		return 0, false
-	}
-
-	if !success {
-		regenTime := shaman.TimeUntilManaRegen(cost)
-		return sim.CurrentTime + regenTime, false
-	}
-	return sim.CurrentTime + shaman.GetRemainingCD(core.GCDCooldownID, sim.CurrentTime), true
+	return false
 }

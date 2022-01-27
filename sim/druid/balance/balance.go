@@ -113,36 +113,38 @@ func (moonkin *BalanceDruid) Reset(sim *core.Simulation) {
 	moonkin.Druid.Reset(sim)
 }
 
-func (moonkin *BalanceDruid) Act(sim *core.Simulation) time.Duration {
-	// If a major cooldown uses the GCD, it might already be on CD when Act() is called.
-	if moonkin.IsOnCD(core.GCDCooldownID, sim.CurrentTime) {
-		return sim.CurrentTime + moonkin.GetRemainingCD(core.GCDCooldownID, sim.CurrentTime)
-	}
+func (moonkin *BalanceDruid) OnGCDReady(sim *core.Simulation) {
+	moonkin.tryUseGCD(sim)
+}
 
+func (moonkin *BalanceDruid) OnManaTick(sim *core.Simulation) {
+	if moonkin.FinishedWaitingForManaAndGCDReady(sim) {
+		moonkin.tryUseGCD(sim)
+	}
+}
+
+func (moonkin *BalanceDruid) tryUseGCD(sim *core.Simulation) {
 	if moonkin.useSurplusRotation {
 		moonkin.manaTracker.Update(sim, moonkin.GetCharacter())
 
 		// If we have enough mana to burn, use the surplus rotation.
 		if moonkin.manaTracker.ProjectedManaSurplus(sim, moonkin.GetCharacter()) {
-			return moonkin.actRotation(sim, moonkin.surplusRotation)
+			moonkin.actRotation(sim, moonkin.surplusRotation)
 		} else {
-			return moonkin.actRotation(sim, moonkin.primaryRotation)
+			moonkin.actRotation(sim, moonkin.primaryRotation)
 		}
 	} else {
-		return moonkin.actRotation(sim, moonkin.primaryRotation)
+		moonkin.actRotation(sim, moonkin.primaryRotation)
 	}
 }
 
-func (moonkin *BalanceDruid) actRotation(sim *core.Simulation, rotation proto.BalanceDruid_Rotation) time.Duration {
+func (moonkin *BalanceDruid) actRotation(sim *core.Simulation, rotation proto.BalanceDruid_Rotation) {
 	// Activate shared druid behaviors
 	// Use Rebirth at the beginning of the fight if flagged in rotation settings
 	// Potentially allow options for "Time of cast" in future or default cast like 1 min into fight
 	// Currently just casts at the beginning of encounter (with all CDs popped)
-	if moonkin.useBattleRes {
-		rebirthTime := moonkin.TryRebirth(sim)
-		if rebirthTime > 0 {
-			return rebirthTime
-		}
+	if moonkin.useBattleRes && moonkin.TryRebirth(sim) {
+		return
 	}
 
 	target := sim.GetPrimaryTarget()
@@ -168,18 +170,9 @@ func (moonkin *BalanceDruid) actRotation(sim *core.Simulation, rotation proto.Ba
 		}
 	}
 
-	actionSuccessful := spell.Cast(sim)
-
-	if !actionSuccessful {
-		regenTime := moonkin.TimeUntilManaRegen(spell.GetManaCost())
-		waitAction := common.NewWaitAction(sim, moonkin.GetCharacter(), regenTime, common.WaitReasonOOM)
-		waitAction.Cast(sim)
-		return sim.CurrentTime + waitAction.GetDuration()
+	if success := spell.Cast(sim); !success {
+		moonkin.WaitForMana(sim, spell.GetManaCost())
 	}
-
-	return sim.CurrentTime + core.MaxDuration(
-		moonkin.GetRemainingCD(core.GCDCooldownID, sim.CurrentTime),
-		spell.GetDuration())
 }
 
 // Returns the order of DPS rotations to try, from highest to lowest dps. The

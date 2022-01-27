@@ -291,11 +291,6 @@ func (shaman *Shaman) Reset(sim *core.Simulation) {
 	shaman.ElementalFocusStacks = 0
 }
 
-func (shaman *Shaman) Advance(sim *core.Simulation, elapsedTime time.Duration) {
-	// Enh shaman could have a 5s window without casting, use longer regen function
-	shaman.Character.RegenMana(sim, elapsedTime)
-}
-
 func init() {
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceDraenei, Class: proto.Class_ClassShaman}] = stats.Stats{
 		stats.Strength:    103,

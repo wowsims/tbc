@@ -6,23 +6,48 @@ import (
 	"github.com/wowsims/tbc/sim/core"
 )
 
-var EvocationAuraID = core.NewAuraID()
 var EvocationCooldownID = core.NewCooldownID()
 
 func (mage *Mage) registerEvocationCD() {
 	cooldown := time.Minute * 8
 	manaThreshold := 0.0
-	actionID := core.ActionID{SpellID: 12051}
+	actionID := core.ActionID{SpellID: 12051, CooldownID: EvocationCooldownID}
+
+	maxTicks := int32(4)
+	if ItemSetTempestRegalia.CharacterHasSetBonus(&mage.Character, 2) {
+		maxTicks++
+	}
+
+	numTicks := core.MaxInt32(0, core.MinInt32(maxTicks, mage.Options.EvocationTicks))
+	if numTicks == 0 {
+		numTicks = maxTicks
+	}
+
+	castTime := time.Duration(numTicks) * time.Second * 2
+	manaGain := 0.0
+
+	template := core.SimpleCast{
+		Cast: core.Cast{
+			ActionID:  actionID,
+			Character: mage.GetCharacter(),
+			Cooldown:  time.Minute * 8,
+			CastTime:  castTime,
+			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
+				mage.AddMana(sim, manaGain, actionID, true)
+
+				// All MCDs that use the GCD and have a non-zero cast time must call this.
+				mage.UpdateMajorCooldowns()
+			},
+		},
+	}
 
 	mage.AddMajorCooldown(core.MajorCooldown{
 		ActionID:   actionID,
 		CooldownID: EvocationCooldownID,
 		Cooldown:   cooldown,
+		UsesGCD:    true,
 		Type:       core.CooldownTypeMana,
 		CanActivate: func(sim *core.Simulation, character *core.Character) bool {
-			if character.IsOnCD(core.GCDCooldownID, sim.CurrentTime) {
-				return false
-			}
 			return true
 		},
 		ShouldActivate: func(sim *core.Simulation, character *core.Character) bool {
@@ -46,32 +71,13 @@ func (mage *Mage) registerEvocationCD() {
 			return true
 		},
 		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
-			maxTicks := int32(4)
-			if ItemSetTempestRegalia.CharacterHasSetBonus(&mage.Character, 2) {
-				maxTicks++
-			}
-
-			numTicks := core.MaxInt32(0, core.MinInt32(maxTicks, mage.Options.EvocationTicks))
-			if numTicks == 0 {
-				numTicks = maxTicks
-			}
-
-			baseDuration := time.Duration(numTicks) * time.Second * 2
-			totalAmount := float64(numTicks) * mage.MaxMana() * 0.15
+			manaGain = float64(numTicks) * mage.MaxMana() * 0.15
 			manaThreshold = mage.MaxMana() * 0.2
 
 			return func(sim *core.Simulation, character *core.Character) {
-				duration := time.Duration(float64(baseDuration) / character.CastSpeed())
-
-				character.AddMana(sim, totalAmount, actionID, true)
-				character.AddAura(sim, core.Aura{
-					ID:       EvocationAuraID,
-					ActionID: actionID,
-					Expires:  sim.CurrentTime + duration,
-				})
-				character.Metrics.AddInstantCast(actionID)
-				character.SetCD(EvocationCooldownID, sim.CurrentTime+cooldown)
-				character.SetCD(core.GCDCooldownID, sim.CurrentTime+duration)
+				cast := template
+				cast.Init(sim)
+				cast.StartCast(sim)
 			}
 		},
 	})

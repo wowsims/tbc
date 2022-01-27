@@ -362,8 +362,17 @@ func (ahe *AbilityHitEffect) IsEquippedHand(mh bool, oh bool) bool {
 	return (ahe.IsMH() && mh) || (ahe.IsOH() && oh)
 }
 
+// It appears that TBC does not do hasted GCD for abilities.
+//  Leaving this option here in case we want it in the future.
+const EnableAbilityHaste = false
+
 func (ability *ActiveMeleeAbility) CalculatedGCD(char *Character) time.Duration {
 	baseGCD := GCDDefault
+	if !EnableAbilityHaste {
+		// TODO: Other classes have different GCD defaults for abilites.
+		//  Probably want to just have all abilities specify the GCD explicitly?
+		return baseGCD
+	}
 	if ability.GCDCooldown != 0 {
 		baseGCD = ability.GCDCooldown
 	}
@@ -408,7 +417,7 @@ func (ability *ActiveMeleeAbility) Attack(sim *Simulation) bool {
 
 	if !ability.IgnoreCooldowns {
 		gcdCD := MaxDuration(ability.CalculatedGCD(ability.Character), ability.CastTime)
-		ability.Character.SetCD(GCDCooldownID, sim.CurrentTime+gcdCD)
+		ability.Character.SetGCDTimer(sim, sim.CurrentTime+gcdCD)
 
 		if ability.ActionID.CooldownID != 0 {
 			ability.Character.SetCD(ability.ActionID.CooldownID, sim.CurrentTime+ability.Cooldown)
@@ -455,6 +464,7 @@ func (ahe *AbilityHitEffect) performAttack(sim *Simulation, ability *ActiveMelee
 
 type AutoAttacks struct {
 	// initialized
+	agent     Agent
 	character *Character
 	MH        Weapon
 	OH        Weapon
@@ -475,10 +485,16 @@ type AutoAttacks struct {
 
 	// The time at which the last MH swing occurred.
 	previousMHSwingAt time.Duration
+
+	// PendingAction which handles auto attacks.
+	autoSwingAction *PendingAction
 }
 
-func NewAutoAttacks(c *Character, delayOHSwings bool) AutoAttacks {
+func NewAutoAttacks(agent Agent, delayOHSwings bool) AutoAttacks {
+	c := agent.GetCharacter()
+
 	aa := AutoAttacks{
+		agent:         agent,
 		character:     c,
 		DelayOHSwings: delayOHSwings,
 		ActiveMeleeAbility: ActiveMeleeAbility{
@@ -528,6 +544,9 @@ func (aa *AutoAttacks) IsEnabled() bool {
 	return aa.MH.SwingSpeed != 0
 }
 
+// Empty handler so Agents don't have to provide one if they have no logic to add.
+func (character *Character) OnAutoAttack(sim *Simulation) {}
+
 func (aa *AutoAttacks) reset(sim *Simulation) {
 	if !aa.IsEnabled() {
 		return
@@ -549,6 +568,27 @@ func (aa *AutoAttacks) reset(sim *Simulation) {
 	} else {
 		aa.OffhandSwingAt = delay
 	}
+
+	aa.resetAutoSwingAction(sim)
+}
+
+func (aa *AutoAttacks) resetAutoSwingAction(sim *Simulation) {
+	pa := &PendingAction{
+		Priority:     ActionPriorityAuto,
+		NextActionAt: 0, // First auto is always at 0
+	}
+	pa.OnAction = func(sim *Simulation) {
+		aa.Swing(sim, sim.GetPrimaryTarget())
+		aa.agent.OnAutoAttack(sim)
+
+		// Cancelled means we made a new one because of a swing speed change.
+		if !pa.cancelled {
+			pa.NextActionAt = aa.NextAttackAt()
+			sim.AddPendingAction(pa)
+		}
+	}
+	aa.autoSwingAction = pa
+	sim.AddPendingAction(pa)
 }
 
 func (aa *AutoAttacks) MainhandSwingSpeed() time.Duration {
@@ -594,23 +634,28 @@ func (aa *AutoAttacks) Swing(sim *Simulation, target *Target) {
 }
 
 func (aa *AutoAttacks) ModifySwingTime(sim *Simulation, amount float64) {
-	if aa.MH.SwingSpeed == 0 {
+	if !aa.IsEnabled() {
 		return
 	}
+
 	mhSwingTime := aa.MainhandSwingAt - sim.CurrentTime
 	if mhSwingTime > 1 { // If its 1 we end up rounding down to 0 and causing a panic.
 		aa.MainhandSwingAt = sim.CurrentTime + time.Duration(float64(mhSwingTime)/amount)
 	}
 
-	if aa.OH.SwingSpeed == 0 {
-		return
-	}
-	ohSwingTime := aa.OffhandSwingAt - sim.CurrentTime
-	if ohSwingTime > 1 {
-		newTime := time.Duration(float64(ohSwingTime) / amount)
-		if newTime > 0 {
-			aa.OffhandSwingAt = sim.CurrentTime + newTime
+	if aa.OH.SwingSpeed != 0 {
+		ohSwingTime := aa.OffhandSwingAt - sim.CurrentTime
+		if ohSwingTime > 1 {
+			newTime := time.Duration(float64(ohSwingTime) / amount)
+			if newTime > 0 {
+				aa.OffhandSwingAt = sim.CurrentTime + newTime
+			}
 		}
+	}
+
+	if aa.autoSwingAction != nil {
+		aa.autoSwingAction.Cancel(sim)
+		aa.resetAutoSwingAction(sim)
 	}
 }
 

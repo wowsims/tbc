@@ -28,23 +28,14 @@ func (druid *Druid) NewRebirth(sim *core.Simulation) *core.SimpleCast {
 	return rb
 }
 
-func (druid *Druid) TryRebirth(sim *core.Simulation) time.Duration {
-
+func (druid *Druid) TryRebirth(sim *core.Simulation) bool {
 	if druid.RebirthUsed {
-		return 0
+		return false
 	}
 
-	var cast *core.SimpleCast
-
-	if !druid.RebirthUsed {
-		cast = druid.NewRebirth(sim)
+	cast := druid.NewRebirth(sim)
+	if success := cast.StartCast(sim); !success {
+		druid.WaitForMana(sim, cast.GetManaCost())
 	}
-
-	success := cast.StartCast(sim)
-	if !success {
-		regenTime := druid.TimeUntilManaRegen(cast.GetManaCost())
-		druid.Character.Metrics.MarkOOM(sim, &druid.Character, regenTime)
-		return sim.CurrentTime + regenTime
-	}
-	return sim.CurrentTime + druid.GetRemainingCD(core.GCDCooldownID, sim.CurrentTime)
+	return true
 }

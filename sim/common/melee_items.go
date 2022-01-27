@@ -17,6 +17,7 @@ func init() {
 	core.AddItemEffect(28437, ApplyDrakefistHammer)
 	core.AddItemEffect(28438, ApplyDragonmaw)
 	core.AddItemEffect(28439, ApplyDragonstrike)
+	core.AddItemEffect(-23, ApplyDragonstrike)
 	core.AddItemEffect(28573, ApplyDespair)
 	core.AddItemEffect(28767, ApplyTheDecapitator)
 	core.AddItemEffect(28774, ApplyGlaiveOfThePit)
@@ -203,7 +204,8 @@ var DragonstrikeProcAuraID = core.NewAuraID()
 
 func ApplyDragonstrike(agent core.Agent) {
 	character := agent.GetCharacter()
-	mh, oh := character.GetWeaponHands(28439)
+	mh, _ := character.GetWeaponHands(28439)
+	_, oh := character.GetWeaponHands(-23)
 	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		const hasteBonus = 212.0
 		const dur = time.Second * 10
@@ -420,6 +422,7 @@ func ApplyRodOfTheSunKing(agent core.Agent) {
 	mh, oh := character.GetWeaponHands(29996)
 	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		const procChance = 2.7 / 60.0
+		actionID := core.ActionID{ItemID: 29996}
 
 		return core.Aura{
 			ID: RodOfTheSunKingAuraID,
@@ -427,11 +430,18 @@ func ApplyRodOfTheSunKing(agent core.Agent) {
 				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() || !hitEffect.IsEquippedHand(mh, oh) {
 					return
 				}
-				if sim.RandomFloat("Rod of the Sun King") > procChance {
-					return
-				}
 
-				// TODO: Add 5 rage or 10 energy.
+				if ability.Character.HasRageBar() {
+					if sim.RandomFloat("Rod of the Sun King") > procChance {
+						return
+					}
+					ability.Character.AddRage(sim, 5, actionID)
+				} else if ability.Character.HasEnergyBar() {
+					if sim.RandomFloat("Rod of the Sun King") > procChance {
+						return
+					}
+					ability.Character.AddEnergy(sim, 10, actionID)
+				}
 			},
 		}
 	})

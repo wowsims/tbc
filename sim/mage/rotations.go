@@ -3,17 +3,21 @@ package mage
 import (
 	"time"
 
-	"github.com/wowsims/tbc/sim/common"
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/proto"
 )
 
-func (mage *Mage) Act(sim *core.Simulation) time.Duration {
-	// If a major cooldown uses the GCD, it might already be on CD when Act() is called.
-	if mage.IsOnCD(core.GCDCooldownID, sim.CurrentTime) {
-		return sim.CurrentTime + mage.GetRemainingCD(core.GCDCooldownID, sim.CurrentTime)
-	}
+func (mage *Mage) OnGCDReady(sim *core.Simulation) {
+	mage.tryUseGCD(sim)
+}
 
+func (mage *Mage) OnManaTick(sim *core.Simulation) {
+	if mage.FinishedWaitingForManaAndGCDReady(sim) {
+		mage.tryUseGCD(sim)
+	}
+}
+
+func (mage *Mage) tryUseGCD(sim *core.Simulation) {
 	var spell *core.SimpleSpell
 	if mage.RotationType == proto.Mage_Rotation_Arcane {
 		spell = mage.doArcaneRotation(sim)
@@ -23,37 +27,26 @@ func (mage *Mage) Act(sim *core.Simulation) time.Duration {
 		spell = mage.doFrostRotation(sim)
 	}
 
-	actionSuccessful := spell.Cast(sim)
-
-	if !actionSuccessful {
-		regenTime := mage.TimeUntilManaRegen(spell.GetManaCost())
-
-		if mage.numCastsDone != 0 {
-			mage.tryingToDropStacks = false
-		}
-
-		var waitTime time.Duration
-		numStacks := mage.NumStacks(ArcaneBlastAuraID)
-
-		if numStacks >= 1 && sim.GetRemainingDuration() > time.Second*5 {
-			// Wait for AB stacks to drop.
-			waitTime = mage.RemainingAuraDuration(sim, ArcaneBlastAuraID) + time.Millisecond*100
-			if sim.Log != nil {
-				mage.Log(sim, "Waiting for AB stacks to drop: %0.02f", waitTime.Seconds())
-			}
-		} else {
-			// Waiting too long can give us enough mana to pick less mana-efficient spells.
-			waitTime = core.MinDuration(regenTime, time.Second*1)
-		}
-
-		waitAction := common.NewWaitAction(sim, mage.GetCharacter(), waitTime, common.WaitReasonOOM)
-		waitAction.Cast(sim)
-		return sim.CurrentTime + waitAction.GetDuration()
+	if success := spell.Cast(sim); success {
+		return
 	}
 
-	return sim.CurrentTime + core.MaxDuration(
-		mage.GetRemainingCD(core.GCDCooldownID, sim.CurrentTime),
-		spell.GetDuration())
+	if mage.numCastsDone != 0 {
+		mage.tryingToDropStacks = false
+	}
+
+	numStacks := mage.NumStacks(ArcaneBlastAuraID)
+	if numStacks > 0 && sim.GetRemainingDuration() > time.Second*5 {
+		// Wait for AB stacks to drop.
+		waitTime := mage.RemainingAuraDuration(sim, ArcaneBlastAuraID) + time.Millisecond*100
+		if sim.Log != nil {
+			mage.Log(sim, "Waiting for AB stacks to drop: %0.02f", waitTime.Seconds())
+		}
+		mage.Metrics.MarkOOM(&mage.Character, waitTime)
+		mage.WaitUntil(sim, sim.CurrentTime+waitTime)
+	} else {
+		mage.WaitForMana(sim, spell.GetManaCost())
+	}
 }
 
 func (mage *Mage) doArcaneRotation(sim *core.Simulation) *core.SimpleSpell {

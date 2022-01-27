@@ -56,7 +56,7 @@ func (action WaitAction) Cast(sim *core.Simulation) bool {
 			action.character.Log(sim, "Idling for %s seconds, for no particular reason.", action.GetDuration())
 		}
 	case WaitReasonOOM:
-		action.character.Metrics.MarkOOM(sim, action.character, action.GetDuration())
+		action.character.Metrics.MarkOOM(action.character, action.GetDuration())
 		if sim.Log != nil {
 			action.character.Log(sim, "Not enough mana to cast, regenerating for %s.", action.GetDuration())
 		}
@@ -69,6 +69,7 @@ func (action WaitAction) Cast(sim *core.Simulation) bool {
 			action.character.Log(sim, "Waiting for %s because its more dps.", action.GetDuration())
 		}
 	}
+	action.character.SetGCDTimer(sim, sim.CurrentTime+action.GetDuration())
 
 	return true
 }

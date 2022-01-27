@@ -81,7 +81,7 @@ func (shaman *Shaman) newStormstrikeTemplate(sim *core.Simulation) core.MeleeAbi
 			ssDebuffAura.Stacks = 2
 			hitEffect.Target.ReplaceAura(sim, ssDebuffAura)
 			if hasSkyshatter4p {
-				shaman.Character.AddAuraWithTemporaryStats(sim, SkyshatterAPBonusAuraID, core.ActionID{SpellID: 38432}, stats.SpellPower, 70, skyshatterDur)
+				shaman.Character.AddAuraWithTemporaryStats(sim, SkyshatterAPBonusAuraID, core.ActionID{SpellID: 38432}, stats.AttackPower, 70, skyshatterDur)
 			}
 		},
 	}
@@ -94,10 +94,6 @@ func (shaman *Shaman) newStormstrikeTemplate(sim *core.Simulation) core.MeleeAbi
 		ss.Effects[0].WeaponInput.FlatDamageBonus += 30
 		ss.Effects[1].WeaponInput.FlatDamageBonus += 30
 	}
-
-	// Add weapon % bonus to stormstrike weapons
-	ss.Effects[0].WeaponInput.DamageMultiplier *= 1 + 0.02*float64(shaman.Talents.WeaponMastery)
-	ss.Effects[1].WeaponInput.DamageMultiplier *= 1 + 0.02*float64(shaman.Talents.WeaponMastery)
 
 	return core.NewMeleeAbilityTemplate(ss)
 }

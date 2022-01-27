@@ -1,8 +1,6 @@
 package priest
 
 import (
-	"time"
-
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/proto"
 	"github.com/wowsims/tbc/sim/core/stats"
@@ -78,11 +76,6 @@ func (priest *Priest) Reset(newsim *core.Simulation) {
 	// These spells still need special cleanup because they're wierd.
 	priest.VTSpell = &core.SimpleSpell{}
 	priest.VTSpellCasting = &core.SimpleSpell{}
-}
-
-func (priest *Priest) Advance(sim *core.Simulation, elapsedTime time.Duration) {
-	// spriest should never be outside the 5s window, use combat regen.
-	priest.Character.RegenManaCasting(sim, elapsedTime)
 }
 
 func New(char core.Character, selfBuffs SelfBuffs, talents proto.PriestTalents) *Priest {

@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"regexp"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/wowsims/tbc/sim/core/proto"
@@ -47,8 +48,17 @@ func GetBestRegexIntValue(srcStr string, patterns []*regexp.Regexp, matchIdx int
 	return best
 }
 
+func (item WowheadItemResponse) TooltipWithoutSet() string {
+	setIdx := strings.Index(item.Tooltip, "Set : ")
+	if setIdx == -1 {
+		return item.Tooltip
+	} else {
+		return item.Tooltip[:setIdx]
+	}
+}
+
 func (item WowheadItemResponse) GetTooltipRegexValue(pattern *regexp.Regexp, matchIdx int) int {
-	return GetRegexIntValue(item.Tooltip, pattern, matchIdx)
+	return GetRegexIntValue(item.TooltipWithoutSet(), pattern, matchIdx)
 }
 
 func (item WowheadItemResponse) GetIntValue(pattern *regexp.Regexp) int {

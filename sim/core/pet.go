@@ -34,10 +34,6 @@ type Pet struct {
 	// such as Mage Water Elemental, begin as disabled and are enabled when summoned.
 	enabled bool
 
-	// The PendingAction corresponding to this Pet, or nil if this Pet is currently
-	// disabled.
-	pendingAction *PendingAction
-
 	// Some pets expire after a certain duration. This is the pending action that disables
 	// the pet on expiration.
 	timeoutAction *PendingAction
@@ -87,9 +83,8 @@ func (pet *Pet) Finalize() {
 	pet.Character.Finalize()
 }
 
-func (pet *Pet) reset(sim *Simulation) {
-	pet.Character.reset(sim)
-	pet.pendingAction = nil
+func (pet *Pet) reset(sim *Simulation, agent Agent) {
+	pet.Character.reset(sim, agent)
 	pet.enabled = false
 }
 func (pet *Pet) advance(sim *Simulation, elapsedTime time.Duration) {
@@ -109,8 +104,7 @@ func (pet *Pet) Enable(sim *Simulation, petAgent PetAgent) {
 		return
 	}
 
-	pet.pendingAction = sim.newDefaultAgentAction(petAgent)
-	sim.AddPendingAction(pet.pendingAction)
+	pet.SetGCDTimer(sim, sim.CurrentTime)
 
 	pet.enabled = true
 
@@ -123,13 +117,11 @@ func (pet *Pet) Disable(sim *Simulation) {
 		return
 	}
 
-	pet.pendingAction.Cancel(sim)
-	pet.pendingAction = nil
+	pet.CancelGCDTimer(sim)
 	pet.enabled = false
 
 	// If a pet is immediately re-summoned it might try to use GCD, so we need to
 	// clear it.
-	pet.SetCD(GCDCooldownID, 0)
 	if pet.Hardcast.Cast != nil {
 		pet.Hardcast.Cast.Cancel()
 		pet.Hardcast = Hardcast{}
@@ -153,7 +145,6 @@ func (pet *Pet) EnableWithTimeout(sim *Simulation, petAgent PetAgent, petDuratio
 	pet.Enable(sim, petAgent)
 
 	pet.timeoutAction = &PendingAction{
-		Name:         "Pet Timeout",
 		NextActionAt: sim.CurrentTime + petDuration,
 		OnAction: func(sim *Simulation) {
 			pet.Disable(sim)

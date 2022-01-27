@@ -27,6 +27,9 @@ func (shaman *Shaman) registerBloodlustCD() {
 				for _, partyMember := range shaman.Party.Players {
 					core.AddBloodlustAura(sim, partyMember.GetCharacter(), actionID.Tag)
 				}
+
+				// All MCDs that use the GCD and have a non-zero cast time must call this.
+				shaman.UpdateMajorCooldowns()
 			},
 		},
 	}

@@ -1,8 +1,6 @@
 package mage
 
 import (
-	"time"
-
 	"github.com/wowsims/tbc/sim/common"
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/proto"
@@ -140,10 +138,6 @@ func (mage *Mage) Reset(newsim *core.Simulation) {
 	mage.numCastsDone = 0
 	mage.isBlastSpamming = false
 	mage.manaTracker.Reset()
-}
-
-func (mage *Mage) Advance(sim *core.Simulation, elapsedTime time.Duration) {
-	mage.Character.RegenMana(sim, elapsedTime)
 }
 
 func NewMage(character core.Character, options proto.Player) *Mage {

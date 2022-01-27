@@ -33,8 +33,12 @@ func applyDebuffEffects(target *Target, debuffs proto.Debuffs) {
 	}
 
 	if debuffs.IsbUptime > 0.0 {
-		target.AddPermanentAura(func(sim *Simulation) Aura {
-			return ImprovedShadowBoltAura(debuffs.IsbUptime)
+		uptime := MinFloat(1.0, debuffs.IsbUptime)
+		target.AddPermanentAuraWithOptions(PermanentAura{
+			AuraFactory: func(sim *Simulation) Aura {
+				return ImprovedShadowBoltAura(uptime)
+			},
+			UptimeMultiplier: uptime,
 		})
 	}
 
@@ -84,8 +88,11 @@ func applyDebuffEffects(target *Target, debuffs proto.Debuffs) {
 
 	if debuffs.ExposeWeaknessUptime > 0 && debuffs.ExposeWeaknessHunterAgility > 0 {
 		multiplier := MinFloat(1.0, debuffs.ExposeWeaknessUptime)
-		target.AddPermanentAura(func(sim *Simulation) Aura {
-			return ExposeWeaknessAura(debuffs.ExposeWeaknessHunterAgility, multiplier)
+		target.AddPermanentAuraWithOptions(PermanentAura{
+			AuraFactory: func(sim *Simulation) Aura {
+				return ExposeWeaknessAura(debuffs.ExposeWeaknessHunterAgility, multiplier)
+			},
+			UptimeMultiplier: multiplier,
 		})
 	}
 
