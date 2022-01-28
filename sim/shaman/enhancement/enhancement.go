@@ -130,7 +130,10 @@ func (enh *EnhancementShaman) tryUseGCD(sim *core.Simulation) {
 	}
 
 	// We didn't try to cast anything. Just wait for next auto or CD.
-	nextEventAt := core.MinDuration(enh.NextTotemAt(sim), enh.CDReadyAt(shaman.StormstrikeCD))
+	nextEventAt := enh.NextTotemAt(sim)
+	if enh.Talents.Stormstrike {
+		nextEventAt = core.MinDuration(nextEventAt, enh.CDReadyAt(shaman.StormstrikeCD))
+	}
 	if enh.Rotation.PrimaryShock != proto.EnhancementShaman_Rotation_None {
 		nextEventAt = core.MinDuration(nextEventAt, enh.CDReadyAt(shaman.ShockCooldownID))
 	}
