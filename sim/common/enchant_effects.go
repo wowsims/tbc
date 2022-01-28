@@ -81,7 +81,7 @@ func ApplyCrusader(agent core.Agent) {
 				}
 
 				isMH := hitEffect.IsMH()
-				if ppmm.Proc(sim, isMH, "Crusader") {
+				if ppmm.Proc(sim, isMH, false, "Crusader") {
 					applyCrusaderStrength(sim, character, isMH)
 				}
 			},
@@ -154,7 +154,7 @@ func ApplyMongoose(agent core.Agent) {
 				}
 
 				isMH := hitEffect.IsMH()
-				if ppmm.Proc(sim, isMH, "mongoose") {
+				if ppmm.Proc(sim, isMH, false, "mongoose") {
 					applyLightningSpeed(sim, character, isMH)
 				}
 			},
@@ -199,7 +199,7 @@ func ApplyExecutioner(agent core.Agent) {
 					return
 				}
 
-				if ppmm.Proc(sim, hitEffect.IsMH(), "Executioner") {
+				if ppmm.Proc(sim, hitEffect.IsMH(), false, "Executioner") {
 					character.AddAuraWithTemporaryStats(sim, ExecutionerProcAuraID, core.ActionID{SpellID: 42976}, stats.ArmorPenetration, arPenBonus, dur)
 				}
 			},

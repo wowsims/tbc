@@ -412,7 +412,7 @@ func ApplyBandOfTheEternalChampion(agent core.Agent) {
 				if icd.IsOnCD(sim) {
 					return
 				}
-				if !ppmm.Proc(sim, hitEffect.IsMH(), "Band of the Eternal Champion") {
+				if !ppmm.Proc(sim, hitEffect.IsMH(), hitEffect.IsRanged(), "Band of the Eternal Champion") {
 					return
 				}
 
@@ -727,7 +727,7 @@ func ApplySyphonOfTheNathrezim(agent core.Agent) {
 				}
 
 				isMH := hitEffect.IsMH()
-				if ppmm.Proc(sim, isMH, "Syphon Of The Nathrezim") {
+				if ppmm.Proc(sim, isMH, false, "Syphon Of The Nathrezim") {
 					applySiphonEssence(sim, character, isMH)
 				}
 			},

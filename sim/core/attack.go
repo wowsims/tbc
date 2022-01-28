@@ -409,6 +409,10 @@ func (ahe *AbilityHitEffect) IsOH() bool {
 	return ahe.WeaponInput.IsOH
 }
 
+func (ahe *AbilityHitEffect) IsRanged() bool {
+	return ahe.WeaponInput.IsRanged
+}
+
 // Returns whether this hit effect matches the hand in which a weapon is equipped.
 func (ahe *AbilityHitEffect) IsEquippedHand(mh bool, oh bool) bool {
 	return (ahe.IsMH() && mh) || (ahe.IsOH() && oh)
@@ -798,8 +802,7 @@ func (aa *AutoAttacks) ModifySwingTime(sim *Simulation, amount float64) {
 		}
 	}
 
-	aa.resetMeleeAutoSwing(sim)
-	aa.resetRangedAutoSwing(sim)
+	aa.resetAutoSwing(sim)
 }
 
 // Returns the time at which the next attack will occur.
