@@ -13,16 +13,19 @@ var DefaultSimTestOptions = &proto.SimOptions{
 	Iterations: 1,
 	IsTest:     true,
 	Debug:      false,
+	RandomSeed: 101,
 }
 var StatWeightsDefaultSimTestOptions = &proto.SimOptions{
 	Iterations: 1000,
 	IsTest:     true,
 	Debug:      false,
+	RandomSeed: 101,
 }
 var AverageDefaultSimTestOptions = &proto.SimOptions{
 	Iterations: 10000,
 	IsTest:     true,
 	Debug:      false,
+	RandomSeed: 101,
 }
 
 const ShortDuration = 60

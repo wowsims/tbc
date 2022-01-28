@@ -169,7 +169,7 @@ func ApplyNaturalAlignmentCrystal(agent core.Agent) {
 					ActionID: actionID,
 					Expires:  sim.CurrentTime + dur,
 					OnCast: func(sim *core.Simulation, cast *core.Cast) {
-						cast.ManaCost *= 1.2
+						cast.ManaCost += cast.BaseManaCost * 0.2
 					},
 					OnExpire: func(sim *core.Simulation) {
 						character.AddStat(stats.SpellPower, -sp)
