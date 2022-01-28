@@ -235,7 +235,7 @@ func (shaman *Shaman) ApplyFrostbrandImbue(mh bool, oh bool) {
 					return // cant proc if not enchanted
 				}
 
-				if !ppmm.Proc(sim, isMHHit, "Frostbrand Weapon") {
+				if !ppmm.Proc(sim, isMHHit, false, "Frostbrand Weapon") {
 					return
 				}
 
