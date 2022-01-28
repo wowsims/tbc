@@ -660,6 +660,7 @@ func (aa *AutoAttacks) reset(sim *Simulation) {
 		aa.OffhandSwingAt = delay
 	}
 
+	aa.autoSwingAction = nil
 	aa.resetAutoSwing(sim)
 }
 
