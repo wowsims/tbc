@@ -489,10 +489,6 @@ func (character *Character) GetMetricsProto(numIterations int32) *proto.PlayerMe
 	return metrics
 }
 
-func (character *Character) EnableAutoAttacks(agent Agent, delayOHSwings bool) {
-	character.AutoAttacks = NewAutoAttacks(agent, delayOHSwings)
-}
-
 type BaseStatsKey struct {
 	Race  proto.Race
 	Class proto.Class

@@ -39,7 +39,12 @@ func NewEnhancementShaman(character core.Character, options proto.Player) *Enhan
 		Rotation: *enhOptions.Rotation,
 	}
 	// Enable Auto Attacks for this spec
-	enh.EnableAutoAttacks(enh, enhOptions.Options.DelayOffhandSwings)
+	enh.EnableAutoAttacks(enh, core.AutoAttackOptions{
+		MainHand:       enh.WeaponFromMainHand(),
+		OffHand:        enh.WeaponFromOffHand(),
+		AutoSwingMelee: true,
+		DelayOHSwings:  enhOptions.Options.DelayOffhandSwings,
+	})
 
 	if !enh.HasMHWeapon() {
 		enhOptions.Options.MainHandImbue = proto.ShamanWeaponImbue_ImbueNone
