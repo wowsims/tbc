@@ -100,7 +100,7 @@ func (enh *EnhancementShaman) tryUseGCD(sim *core.Simulation) {
 
 	target := sim.GetPrimaryTarget()
 
-	if !enh.IsOnCD(shaman.StormstrikeCD, sim.CurrentTime) {
+	if enh.Talents.Stormstrike && !enh.IsOnCD(shaman.StormstrikeCD, sim.CurrentTime) {
 		ss := enh.NewStormstrike(sim, target)
 		if success := ss.Attack(sim); !success {
 			enh.WaitForMana(sim, ss.Cost.Value)
