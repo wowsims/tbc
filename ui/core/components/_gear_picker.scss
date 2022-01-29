@@ -2,11 +2,14 @@
 
 .gear-picker-root {
   display: flex;
-	margin: 15px;
+  flex-wrap: wrap;
+  min-width: 250px;
 }
 
 .gear-picker-left, .gear-picker-right {
   width: 50%;
+  flex: 1;
+  min-width: 250px;
 }
 
 .item-picker-root {
@@ -20,6 +23,12 @@
 .gear-picker-right .item-picker-root {
   flex-direction: row-reverse;
   text-align: right;
+}
+@media only screen and (max-width: calc(750px + 1vw)) {
+  .gear-picker-right .item-picker-root {
+    text-align: left;
+    flex-direction: row;
+  }
 }
 
 .item-picker-icon {
@@ -45,17 +54,18 @@
 .item-picker-labels-container {
   padding: 3px;
 	text-shadow: 2px 2px 3px black;
+  flex: 1;
 }
 
 .item-picker-name {
   display: block;
-  font-size: 18px;
+  font-size: clamp(16px, 17px, 18px);
 	letter-spacing: normal;
 }
 
 .item-picker-enchant {
   display: block;
-  font-size: 14px;
+  font-size: clamp(12px, 13px, 14px);;
   color: lawngreen;
 	letter-spacing: normal;
 }
@@ -67,6 +77,7 @@
 	padding: 8px;
 	background-color: #666;
 	border-radius: 6px;
+  max-width: 100%;
 }
 
 .selector-modal-tab-content-header {
