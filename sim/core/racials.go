@@ -145,7 +145,9 @@ func applyRaceEffects(agent Agent) {
 			return Aura{
 				ID: TrollBeastSlayingAuraID,
 				OnBeforeMeleeHit: func(sim *Simulation, ability *ActiveMeleeAbility, hitEffect *AbilityHitEffect) {
-					hitEffect.DamageMultiplier *= 1.05
+					if hitEffect.Target.MobType == proto.MobType_MobTypeBeast {
+						hitEffect.DamageMultiplier *= 1.05
+					}
 				},
 				OnBeforeSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect) {
 					if spellEffect.Target.MobType == proto.MobType_MobTypeBeast {
@@ -153,7 +155,9 @@ func applyRaceEffects(agent Agent) {
 					}
 				},
 				OnBeforePeriodicDamage: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect, tickDamage *float64) {
-					*tickDamage *= 1.05
+					if spellEffect.Target.MobType == proto.MobType_MobTypeBeast {
+						*tickDamage *= 1.05
+					}
 				},
 			}
 		})
