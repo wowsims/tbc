@@ -485,7 +485,7 @@ export class ActionMetrics {
 	}
 
 	get critPercent() {
-		return (this.data.crits / this.landedHitsRaw) * 100;
+		return (this.data.crits / this.hitAttempts) * 100;
 	}
 
 	get misses() {
