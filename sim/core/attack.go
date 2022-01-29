@@ -289,9 +289,10 @@ func (effect *AbilityEffect) WhiteHitTableResult(sim *Simulation, ability *Activ
 	if roll < chance {
 		return MeleeHitTypeGlance
 	}
-	// Crit Check
-	chance += ((character.stats[stats.MeleeCrit] + effect.BonusCritRating) / (MeleeCritRatingPerCritChance * 100)) - skillDifference*0.002 - 0.018
 
+	// Crit Check
+	critChance := ((character.stats[stats.MeleeCrit] + effect.BonusCritRating) / (MeleeCritRatingPerCritChance * 100)) - skillDifference*0.002 - 0.018
+	chance += critChance
 	if roll < chance {
 		return MeleeHitTypeCrit
 	}
@@ -656,8 +657,8 @@ func (aa *AutoAttacks) reset(sim *Simulation) {
 	// properly at the start.
 	aa.previousMHSwingAt = time.Second * -1
 
-	// Apply random delay of 0 - 0.5s, to one of the weapons.
-	delay := time.Duration(sim.RandomFloat("SwingResetDelay") * float64(time.Millisecond*500))
+	// Apply random delay of 0 - 50% swing time, to one of the weapons.
+	delay := time.Duration(sim.RandomFloat("SwingResetDelay") * float64(aa.MH.SwingDuration/2))
 	isMHDelay := sim.RandomFloat("SwingResetWeapon") < 0.5
 
 	if isMHDelay {
@@ -754,7 +755,10 @@ func (aa *AutoAttacks) TrySwingOH(sim *Simulation, target *Target) {
 
 	if aa.DelayOHSwings && (sim.CurrentTime-aa.previousMHSwingAt) > time.Millisecond*500 {
 		// Delay the OH swing for later, so it follows the MH swing.
-		aa.OffhandSwingAt = aa.MainhandSwingAt + time.Millisecond*250
+		aa.OffhandSwingAt = aa.MainhandSwingAt + time.Millisecond*100
+		if sim.Log != nil {
+			aa.character.Log(sim, "Delaying OH swing by %s", aa.OffhandSwingAt-sim.CurrentTime)
+		}
 		return
 	}
 
