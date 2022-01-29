@@ -29,104 +29,43 @@ func NewIndividualTestSuite(suiteName string) *IndividualTestSuite {
 }
 
 func (testSuite *IndividualTestSuite) TestCharacterStats(testName string, csr *proto.ComputeStatsRequest) {
-	fullTestName := testSuite.Name + "-" + testName
-	testSuite.testNames = append(testSuite.testNames, fullTestName)
+	testSuite.testNames = append(testSuite.testNames, testName)
 
 	result := ComputeStats(csr)
 	finalStats := stats.FromFloatArray(result.RaidStats.Parties[0].Players[0].FinalStats)
 
-	testSuite.testResults.CharacterStatsResults[fullTestName] = &proto.CharacterStatsTestResult{
+	testSuite.testResults.CharacterStatsResults[testName] = &proto.CharacterStatsTestResult{
 		FinalStats: finalStats[:],
 	}
 }
 
 func (testSuite *IndividualTestSuite) TestStatWeights(testName string, swr *proto.StatWeightsRequest) {
-	fullTestName := testSuite.Name + "-" + testName
-	testSuite.testNames = append(testSuite.testNames, fullTestName)
+	testSuite.testNames = append(testSuite.testNames, testName)
 
 	result := StatWeights(swr)
 	weights := stats.FromFloatArray(result.Weights)
 
-	testSuite.testResults.StatWeightsResults[fullTestName] = &proto.StatWeightsTestResult{
+	testSuite.testResults.StatWeightsResults[testName] = &proto.StatWeightsTestResult{
 		Weights: weights[:],
 	}
 }
 
 func (testSuite *IndividualTestSuite) TestDPS(testName string, rsr *proto.RaidSimRequest) {
-	fullTestName := testSuite.Name + "-" + testName
-	testSuite.testNames = append(testSuite.testNames, fullTestName)
+	testSuite.testNames = append(testSuite.testNames, testName)
 
 	result := RunRaidSim(rsr)
 	dps := result.RaidMetrics.Dps.Avg
 
-	testSuite.testResults.DpsResults[fullTestName] = &proto.DpsTestResult{
+	testSuite.testResults.DpsResults[testName] = &proto.DpsTestResult{
 		Dps: dps,
 	}
 }
 
 func (testSuite *IndividualTestSuite) Done(t *testing.T) {
 	testSuite.writeToFile()
-	testSuite.evaluateResults(t)
 }
 
 const tolerance = 0.00001
-
-func (testSuite *IndividualTestSuite) evaluateResults(t *testing.T) {
-	expectedResults := testSuite.readExpectedResults()
-
-	// Display results in order of testNames, to keep the same order as the tests.
-	for _, testName := range testSuite.testNames {
-		if actualCharacterStats, ok := testSuite.testResults.CharacterStatsResults[testName]; ok {
-			actualStats := stats.FromFloatArray(actualCharacterStats.FinalStats)
-			if expectedCharacterStats, ok := expectedResults.CharacterStatsResults[testName]; ok {
-				expectedStats := stats.FromFloatArray(expectedCharacterStats.FinalStats)
-				if !actualStats.EqualsWithTolerance(expectedStats, tolerance) {
-					t.Errorf("%s failed: expected %v but was %v", testName, expectedStats, actualStats)
-				}
-			} else {
-				t.Errorf("Unexpected test %s with stats: %v", testName, actualStats)
-			}
-		} else if actualStatWeights, ok := testSuite.testResults.StatWeightsResults[testName]; ok {
-			actualWeights := stats.FromFloatArray(actualStatWeights.Weights)
-			if expectedStatWeights, ok := expectedResults.StatWeightsResults[testName]; ok {
-				expectedWeights := stats.FromFloatArray(expectedStatWeights.Weights)
-				if !actualWeights.EqualsWithTolerance(expectedWeights, tolerance) {
-					t.Errorf("%s failed: expected %v but was %v", testName, expectedWeights, actualWeights)
-				}
-			} else {
-				t.Errorf("Unexpected test %s with stat weights: %v", testName, actualWeights)
-			}
-		} else if actualDpsResult, ok := testSuite.testResults.DpsResults[testName]; ok {
-			if expectedDpsResult, ok := expectedResults.DpsResults[testName]; ok {
-				if actualDpsResult.Dps < expectedDpsResult.Dps-tolerance || actualDpsResult.Dps > expectedDpsResult.Dps+tolerance {
-					t.Errorf("%s failed: expected %0.03f but was %0.03f!.", testName, expectedDpsResult.Dps, actualDpsResult.Dps)
-				}
-			} else {
-				t.Errorf("Unexpected test %s with %0.03f DPS!", testName, actualDpsResult.Dps)
-			}
-		}
-	}
-
-	for testName, expectedCharacterStats := range expectedResults.CharacterStatsResults {
-		expectedStats := stats.FromFloatArray(expectedCharacterStats.FinalStats)
-		if _, ok := testSuite.testResults.CharacterStatsResults[testName]; !ok {
-			t.Errorf("%s missing (expected stats %v)!", testName, expectedStats)
-		}
-	}
-
-	for testName, expectedStatWeights := range expectedResults.StatWeightsResults {
-		expectedWeights := stats.FromFloatArray(expectedStatWeights.Weights)
-		if _, ok := testSuite.testResults.StatWeightsResults[testName]; !ok {
-			t.Errorf("%s missing (expected weights %v)!", testName, expectedWeights)
-		}
-	}
-
-	for testName, expectedDpsResult := range expectedResults.DpsResults {
-		if _, ok := testSuite.testResults.DpsResults[testName]; !ok {
-			t.Errorf("%s missing (expected %0.03f DPS)!", testName, expectedDpsResult.Dps)
-		}
-	}
-}
 
 func (testSuite *IndividualTestSuite) writeToFile() {
 	str := prototext.Format(&testSuite.testResults)
@@ -184,24 +123,79 @@ func RunTestSuite(t *testing.T, suiteName string, generator TestGenerator) {
 		}
 	}()
 
+	expectedResults := testSuite.readExpectedResults()
+
 	numTests := generator.NumTests()
 	for i := 0; i < numTests; i++ {
 		testName, csr, swr, rsr := generator.GetTest(i)
-		currentTestName = testName
-		if csr != nil {
-			testSuite.TestCharacterStats(testName, csr)
-		} else if swr != nil {
-			testSuite.TestStatWeights(testName, swr)
-		} else if rsr != nil {
-			testSuite.TestDPS(testName, rsr)
-		} else {
-			panic("No test request provided")
+		if strings.Contains(testName, "Average") && testing.Short() {
+			continue
 		}
+		currentTestName = testName
+
+		t.Run(currentTestName, func(t *testing.T) {
+			fullTestName := suiteName + "-" + testName
+			if csr != nil {
+				testSuite.TestCharacterStats(fullTestName, csr)
+				if actualCharacterStats, ok := testSuite.testResults.CharacterStatsResults[fullTestName]; ok {
+					actualStats := stats.FromFloatArray(actualCharacterStats.FinalStats)
+					if expectedCharacterStats, ok := expectedResults.CharacterStatsResults[fullTestName]; ok {
+						expectedStats := stats.FromFloatArray(expectedCharacterStats.FinalStats)
+						if !actualStats.EqualsWithTolerance(expectedStats, tolerance) {
+							t.Logf("Stats expected %v but was %v", expectedStats, actualStats)
+							t.Fail()
+						}
+					} else {
+						t.Logf("Unexpected test %s with stats: %v", fullTestName, actualStats)
+						t.Fail()
+					}
+				} else if !ok {
+					t.Logf("Missing Result for test %s", fullTestName)
+					t.Fail()
+				}
+			} else if swr != nil {
+				testSuite.TestStatWeights(fullTestName, swr)
+				if actualStatWeights, ok := testSuite.testResults.StatWeightsResults[fullTestName]; ok {
+					actualWeights := stats.FromFloatArray(actualStatWeights.Weights)
+					if expectedStatWeights, ok := expectedResults.StatWeightsResults[fullTestName]; ok {
+						expectedWeights := stats.FromFloatArray(expectedStatWeights.Weights)
+						if !actualWeights.EqualsWithTolerance(expectedWeights, tolerance) {
+							t.Logf("Weights expected %v but was %v", expectedWeights, actualWeights)
+							t.Fail()
+						}
+					} else {
+						t.Logf("Unexpected test %s with stat weights: %v", fullTestName, actualWeights)
+						t.Fail()
+					}
+				} else if !ok {
+					t.Logf("Missing Result for test %s", fullTestName)
+					t.Fail()
+				}
+			} else if rsr != nil {
+				testSuite.TestDPS(fullTestName, rsr)
+				if actualDpsResult, ok := testSuite.testResults.DpsResults[fullTestName]; ok {
+					if expectedDpsResult, ok := expectedResults.DpsResults[fullTestName]; ok {
+						if actualDpsResult.Dps < expectedDpsResult.Dps-tolerance || actualDpsResult.Dps > expectedDpsResult.Dps+tolerance {
+							t.Logf("DPS expected %0.03f but was %0.03f!.", expectedDpsResult.Dps, actualDpsResult.Dps)
+							t.Fail()
+						}
+					} else {
+						t.Logf("Unexpected test %s with %0.03f DPS!", fullTestName, actualDpsResult.Dps)
+						t.Fail()
+					}
+				} else if !ok {
+					t.Logf("Missing Result for test %s", fullTestName)
+					t.Fail()
+				}
+			} else {
+				panic("No test request provided")
+			}
+		})
 	}
 
 	testSuite.Done(t)
 
 	if t.Failed() {
-		t.Log("One or more tests failed! If the changes are intentional, update the expected results with 'make update-tests'. Otherwise go fix your bugs!")
+		t.Log("One or more tests failed! If the changes are intentional, update the expected results with 'make test && make update-tests'. Otherwise go fix your bugs!")
 	}
 }

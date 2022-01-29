@@ -289,9 +289,10 @@ func (effect *AbilityEffect) WhiteHitTableResult(sim *Simulation, ability *Activ
 	if roll < chance {
 		return MeleeHitTypeGlance
 	}
-	// Crit Check
-	chance += ((character.stats[stats.MeleeCrit] + effect.BonusCritRating) / (MeleeCritRatingPerCritChance * 100)) - skillDifference*0.002 - 0.018
 
+	// Crit Check
+	critChance := ((character.stats[stats.MeleeCrit] + effect.BonusCritRating) / (MeleeCritRatingPerCritChance * 100)) - skillDifference*0.002 - 0.018
+	chance += critChance
 	if roll < chance {
 		return MeleeHitTypeCrit
 	}

@@ -302,28 +302,31 @@ func (at *auraTracker) doneIteration(simDuration time.Duration) {
 // ReplaceAura is like AddAura but an existing aura will not be removed/readded.
 // This means that 'OnExpire' will not fire off on the old aura.
 func (at *auraTracker) ReplaceAura(sim *Simulation, newAura Aura) {
-	if at.HasAura(newAura.ID) {
-		old := at.auras[newAura.ID]
-
-		// private cached state has to be copied over
-		newAura.activeIndex = old.activeIndex
-		newAura.onCastIndex = old.onCastIndex
-		newAura.onCastCompleteIndex = old.onCastCompleteIndex
-		newAura.onBeforeSpellHitIndex = old.onBeforeSpellHitIndex
-		newAura.onSpellHitIndex = old.onSpellHitIndex
-		newAura.onSpellMissIndex = old.onSpellMissIndex
-		newAura.onBeforePeriodicDamageIndex = old.onBeforePeriodicDamageIndex
-		newAura.onPeriodicDamageIndex = old.onPeriodicDamageIndex
-		newAura.OnMeleeAttackIndex = old.OnMeleeAttackIndex
-		newAura.OnBeforeMeleeIndex = old.OnBeforeMeleeIndex
-		newAura.OnBeforeMeleeHitIndex = old.OnBeforeMeleeHitIndex
-		newAura.startTime = old.startTime
-
-		at.auras[newAura.ID] = newAura
+	if !at.HasAura(newAura.ID) {
+		at.AddAura(sim, newAura)
 		return
 	}
 
-	at.AddAura(sim, newAura)
+	old := at.auras[newAura.ID]
+
+	if old.ActionID != newAura.ActionID {
+		panic("bad")
+	}
+	// private cached state has to be copied over
+	newAura.activeIndex = old.activeIndex
+	newAura.onCastIndex = old.onCastIndex
+	newAura.onCastCompleteIndex = old.onCastCompleteIndex
+	newAura.onBeforeSpellHitIndex = old.onBeforeSpellHitIndex
+	newAura.onSpellHitIndex = old.onSpellHitIndex
+	newAura.onSpellMissIndex = old.onSpellMissIndex
+	newAura.onBeforePeriodicDamageIndex = old.onBeforePeriodicDamageIndex
+	newAura.onPeriodicDamageIndex = old.onPeriodicDamageIndex
+	newAura.OnMeleeAttackIndex = old.OnMeleeAttackIndex
+	newAura.OnBeforeMeleeIndex = old.OnBeforeMeleeIndex
+	newAura.OnBeforeMeleeHitIndex = old.OnBeforeMeleeHitIndex
+	newAura.startTime = old.startTime
+
+	at.auras[newAura.ID] = newAura
 }
 
 // Adds a new aura to the simulation. If an aura with the same ID already
