@@ -21,6 +21,7 @@ func init() {
 	core.AddItemEffect(28573, ApplyDespair)
 	core.AddItemEffect(28767, ApplyTheDecapitator)
 	core.AddItemEffect(28774, ApplyGlaiveOfThePit)
+	core.AddItemEffect(29301, ApplyBandOfTheEternalChampion)
 	core.AddItemEffect(29348, ApplyTheBladefist)
 	core.AddItemEffect(29996, ApplyRodOfTheSunKing)
 	core.AddItemEffect(30090, ApplyWorldBreaker)
@@ -389,6 +390,39 @@ func ApplyGlaiveOfThePit(agent core.Agent) {
 	})
 }
 
+var BandOfTheEternalChampionAuraID = core.NewAuraID()
+var BandOfTheEternalChampionProcAuraID = core.NewAuraID()
+
+func ApplyBandOfTheEternalChampion(agent core.Agent) {
+	character := agent.GetCharacter()
+	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
+		const apBonus = 160
+		const dur = time.Second * 10
+		ppmm := character.AutoAttacks.NewPPMManager(1.0)
+
+		icd := core.NewICD()
+		const icdDur = time.Second * 60
+
+		return core.Aura{
+			ID: BandOfTheEternalChampionAuraID,
+			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
+				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() {
+					return
+				}
+				if icd.IsOnCD(sim) {
+					return
+				}
+				if !ppmm.Proc(sim, hitEffect.IsMH(), hitEffect.IsRanged(), "Band of the Eternal Champion") {
+					return
+				}
+
+				icd = core.InternalCD(sim.CurrentTime + icdDur)
+				character.AddAuraWithTemporaryStats(sim, BandOfTheEternalChampionProcAuraID, core.ActionID{ItemID: 29301}, stats.AttackPower, apBonus, dur)
+			},
+		}
+	})
+}
+
 var TheBladefistAuraID = core.NewAuraID()
 var TheBladefistProcAuraID = core.NewAuraID()
 
@@ -693,7 +727,7 @@ func ApplySyphonOfTheNathrezim(agent core.Agent) {
 				}
 
 				isMH := hitEffect.IsMH()
-				if ppmm.Proc(sim, isMH, "Syphon Of The Nathrezim") {
+				if ppmm.Proc(sim, isMH, false, "Syphon Of The Nathrezim") {
 					applySiphonEssence(sim, character, isMH)
 				}
 			},

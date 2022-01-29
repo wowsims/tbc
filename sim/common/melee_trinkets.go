@@ -335,7 +335,7 @@ func ApplyRomulosPoisonVial(agent core.Agent) {
 				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() {
 					return
 				}
-				if !ppmm.Proc(sim, hitEffect.IsMH(), "RomulosPoisonVial") {
+				if !ppmm.Proc(sim, hitEffect.IsMH(), hitEffect.IsRanged(), "RomulosPoisonVial") {
 					return
 				}
 
@@ -370,7 +370,7 @@ func ApplyDragonspineTrophy(agent core.Agent) {
 				if icd.IsOnCD(sim) {
 					return
 				}
-				if !ppmm.Proc(sim, hitEffect.IsMH(), "dragonspine") {
+				if !ppmm.Proc(sim, hitEffect.IsMH(), hitEffect.IsRanged(), "dragonspine") {
 					return
 				}
 				icd = core.InternalCD(sim.CurrentTime + icdDur)
@@ -460,7 +460,7 @@ func ApplyMadnessOfTheBetrayer(agent core.Agent) {
 				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() {
 					return
 				}
-				if !ppmm.Proc(sim, hitEffect.IsMH(), "Madness of the Betrayer") {
+				if !ppmm.Proc(sim, hitEffect.IsMH(), hitEffect.IsRanged(), "Madness of the Betrayer") {
 					return
 				}
 

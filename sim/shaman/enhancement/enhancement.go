@@ -39,7 +39,12 @@ func NewEnhancementShaman(character core.Character, options proto.Player) *Enhan
 		Rotation: *enhOptions.Rotation,
 	}
 	// Enable Auto Attacks for this spec
-	enh.EnableAutoAttacks(enh, enhOptions.Options.DelayOffhandSwings)
+	enh.EnableAutoAttacks(enh, core.AutoAttackOptions{
+		MainHand:       enh.WeaponFromMainHand(),
+		OffHand:        enh.WeaponFromOffHand(),
+		AutoSwingMelee: true,
+		DelayOHSwings:  enhOptions.Options.DelayOffhandSwings,
+	})
 
 	if !enh.HasMHWeapon() {
 		enhOptions.Options.MainHandImbue = proto.ShamanWeaponImbue_ImbueNone
@@ -95,7 +100,7 @@ func (enh *EnhancementShaman) tryUseGCD(sim *core.Simulation) {
 
 	target := sim.GetPrimaryTarget()
 
-	if !enh.IsOnCD(shaman.StormstrikeCD, sim.CurrentTime) {
+	if enh.Talents.Stormstrike && !enh.IsOnCD(shaman.StormstrikeCD, sim.CurrentTime) {
 		ss := enh.NewStormstrike(sim, target)
 		if success := ss.Attack(sim); !success {
 			enh.WaitForMana(sim, ss.Cost.Value)
@@ -125,7 +130,10 @@ func (enh *EnhancementShaman) tryUseGCD(sim *core.Simulation) {
 	}
 
 	// We didn't try to cast anything. Just wait for next auto or CD.
-	nextEventAt := core.MinDuration(enh.NextTotemAt(sim), enh.CDReadyAt(shaman.StormstrikeCD))
+	nextEventAt := enh.NextTotemAt(sim)
+	if enh.Talents.Stormstrike {
+		nextEventAt = core.MinDuration(nextEventAt, enh.CDReadyAt(shaman.StormstrikeCD))
+	}
 	if enh.Rotation.PrimaryShock != proto.EnhancementShaman_Rotation_None {
 		nextEventAt = core.MinDuration(nextEventAt, enh.CDReadyAt(shaman.ShockCooldownID))
 	}

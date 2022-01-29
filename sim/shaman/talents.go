@@ -238,7 +238,6 @@ func (shaman *Shaman) applyUnleashedRage() {
 		bonusCoeff := 0.02 * float64(level)
 
 		currentAPBonuses := make([]float64, len(shaman.Party.PlayersAndPets))
-
 		return core.Aura{
 			ID: UnleashedRageTalentAuraID,
 			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
@@ -291,7 +290,7 @@ func (shaman *Shaman) applyShamanisticFocus() {
 				if hitEffect.HitType != core.MeleeHitTypeCrit {
 					return
 				}
-				shaman.AddAura(sim, focusedAura)
+				ability.Character.ReplaceAura(sim, focusedAura)
 			},
 		}
 	})

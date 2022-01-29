@@ -56,6 +56,12 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestBalance-AllItems-BandoftheEternalChampion-29301"
+ value: {
+  dps: 1245.4162750192036
+ }
+}
+dps_results: {
  key: "TestBalance-AllItems-BandoftheEternalSage-29305"
  value: {
   dps: 1301.206711942977

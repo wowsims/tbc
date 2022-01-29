@@ -422,7 +422,9 @@ func (character *Character) HasMHWeapon() bool {
 // shields / Held-in-off-hand items are NOT counted as weapons in this function.
 func (character *Character) GetOHWeapon() *items.Item {
 	weapon := &character.Equip[proto.ItemSlot_ItemSlotOffHand]
-	if weapon.ID == 0 || weapon.WeaponType == proto.WeaponType_WeaponTypeShield || weapon.WeaponType == proto.WeaponType_WeaponTypeOffHand {
+	if weapon.ID == 0 ||
+		weapon.WeaponType == proto.WeaponType_WeaponTypeShield ||
+		weapon.WeaponType == proto.WeaponType_WeaponTypeOffHand {
 		return nil
 	} else {
 		return weapon
@@ -430,6 +432,22 @@ func (character *Character) GetOHWeapon() *items.Item {
 }
 func (character *Character) HasOHWeapon() bool {
 	return character.GetOHWeapon() != nil
+}
+
+// Returns the ranged weapon if one is equipped, and null otherwise.
+func (character *Character) GetRangedWeapon() *items.Item {
+	weapon := &character.Equip[proto.ItemSlot_ItemSlotRanged]
+	if weapon.ID == 0 ||
+		weapon.RangedWeaponType == proto.RangedWeaponType_RangedWeaponTypeIdol ||
+		weapon.RangedWeaponType == proto.RangedWeaponType_RangedWeaponTypeLibram ||
+		weapon.RangedWeaponType == proto.RangedWeaponType_RangedWeaponTypeTotem {
+		return nil
+	} else {
+		return weapon
+	}
+}
+func (character *Character) HasRangedWeapon() bool {
+	return character.GetRangedWeapon() != nil
 }
 
 // Returns the hands that the item is equipped in, as (MH, OH).
@@ -487,10 +505,6 @@ func (character *Character) GetMetricsProto(numIterations int32) *proto.PlayerMe
 	}
 
 	return metrics
-}
-
-func (character *Character) EnableAutoAttacks(agent Agent, delayOHSwings bool) {
-	character.AutoAttacks = NewAutoAttacks(agent, delayOHSwings)
 }
 
 type BaseStatsKey struct {
