@@ -545,7 +545,8 @@ type AutoAttacks struct {
 	OffhandSwingAt  time.Duration
 	RangedSwingAt   time.Duration
 
-	ActiveMeleeAbility // Parameters for auto attacks.
+	ActiveMeleeAbility                    // Parameters for auto attacks.
+	cachedMelee        ActiveMeleeAbility // reuse to save memory allocations
 
 	RangedAuto ActiveMeleeAbility // Parameters for ranged auto attacks.
 
@@ -730,11 +731,11 @@ func (aa *AutoAttacks) TrySwingMH(sim *Simulation, target *Target) {
 		}
 	}
 
-	ama := aa.ActiveMeleeAbility
-	ama.ActionID.Tag = 1
-	ama.Effect.Target = target
-	ama.Effect.WeaponInput.IsOH = false
-	ama.Attack(sim)
+	aa.cachedMelee = aa.ActiveMeleeAbility
+	aa.cachedMelee.ActionID.Tag = 1
+	aa.cachedMelee.Effect.Target = target
+	aa.cachedMelee.Effect.WeaponInput.IsOH = false
+	aa.cachedMelee.Attack(sim)
 	aa.MainhandSwingAt = sim.CurrentTime + aa.MainhandSwingSpeed()
 	aa.previousMHSwingAt = sim.CurrentTime
 	aa.agent.OnAutoAttack(sim)
@@ -752,11 +753,11 @@ func (aa *AutoAttacks) TrySwingOH(sim *Simulation, target *Target) {
 		return
 	}
 
-	ama := aa.ActiveMeleeAbility
-	ama.ActionID.Tag = 2
-	ama.Effect.Target = target
-	ama.Effect.WeaponInput.IsOH = true
-	ama.Attack(sim)
+	aa.cachedMelee = aa.ActiveMeleeAbility
+	aa.cachedMelee.ActionID.Tag = 2
+	aa.cachedMelee.Effect.Target = target
+	aa.cachedMelee.Effect.WeaponInput.IsOH = true
+	aa.cachedMelee.Attack(sim)
 	aa.OffhandSwingAt = sim.CurrentTime + aa.OffhandSwingSpeed()
 	aa.agent.OnAutoAttack(sim)
 }
