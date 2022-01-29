@@ -29,6 +29,7 @@ character_stats_results: {
   final_stats: 0
   final_stats: 0
   final_stats: 5451.99
+  final_stats: 1213
  }
 }
 dps_results: {
@@ -52,7 +53,7 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-AllItems-BadgeoftheSwarmguard-21670"
  value: {
-  dps: 1887.2846028857869
+  dps: 1877.032850382479
  }
 }
 dps_results: {
@@ -622,7 +623,7 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-AllItems-TsunamiTalisman-30627"
  value: {
-  dps: 1884.7795277616929
+  dps: 1885.3523137113946
  }
 }
 dps_results: {

@@ -45,6 +45,7 @@ const (
 	Energy
 	Rage
 	Armor
+	RangedAttackPower
 
 	Len
 )
@@ -115,6 +116,8 @@ func (s Stat) StatName() string {
 		return "Rage"
 	case Armor:
 		return "Armor"
+	case RangedAttackPower:
+		return "RangedAttackPower"
 	}
 
 	return "none"

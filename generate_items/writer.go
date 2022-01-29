@@ -146,7 +146,7 @@ func gemToGoString(gemDeclaration GemDeclaration, gemResponse WowheadItemRespons
 	gemStr += fmt.Sprintf("Phase:%d, ", phase)
 	gemStr += fmt.Sprintf("Quality:proto.ItemQuality_%s, ", proto.ItemQuality(gemResponse.Quality).String())
 	gemStr += fmt.Sprintf("Color:proto.GemColor_%s, ", proto.GemColor(gemResponse.GetSocketColor()).String())
-	gemStr += fmt.Sprintf("Stats: %s, ", statsToGoString(gemResponse.GetGemStats()))
+	gemStr += fmt.Sprintf("Stats: %s, ", statsToGoString(gemResponse.GetGemStats(), gemDeclaration.Stats))
 
 	if gemResponse.GetUnique() {
 		gemStr += fmt.Sprintf("Unique:true, ")
@@ -218,7 +218,7 @@ func itemToGoString(itemDeclaration ItemDeclaration, itemResponse WowheadItemRes
 		itemStr += fmt.Sprintf("Unique:true, ")
 	}
 
-	itemStr += fmt.Sprintf("Stats: %s, ", statsToGoString(itemResponse.GetStats()))
+	itemStr += fmt.Sprintf("Stats: %s, ", statsToGoString(itemResponse.GetStats(), itemDeclaration.Stats))
 
 	gemSockets := itemResponse.GetGemSockets()
 	if len(gemSockets) > 0 {
@@ -229,18 +229,22 @@ func itemToGoString(itemDeclaration ItemDeclaration, itemResponse WowheadItemRes
 		itemStr += "}, "
 	}
 
-	itemStr += fmt.Sprintf("SocketBonus: %s", statsToGoString(itemResponse.GetSocketBonus()))
+	itemStr += fmt.Sprintf("SocketBonus: %s", statsToGoString(itemResponse.GetSocketBonus(), Stats{}))
 
 	itemStr += "}"
 	return itemStr
 }
 
-func statsToGoString(statlist Stats) string {
+func statsToGoString(statlist Stats, overrides Stats) string {
 	statsStr := "stats.Stats{"
 
 	for stat, value := range statlist {
+		val := value
+		if overrides[stat] > 0 {
+			val = overrides[stat]
+		}
 		if value > 0 {
-			statsStr += fmt.Sprintf("stats.%s:%.0f,", stats.Stat(stat).StatName(), value)
+			statsStr += fmt.Sprintf("stats.%s:%.0f,", stats.Stat(stat).StatName(), val)
 		}
 	}
 

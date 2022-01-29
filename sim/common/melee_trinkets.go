@@ -221,6 +221,7 @@ func ApplyBadgeOfTheSwarmguard(agent core.Agent) {
 			return func(sim *core.Simulation, character *core.Character) {
 				const arPenBonus = 200.0
 				const dur = time.Second * 30
+				ppmm := character.AutoAttacks.NewPPMManager(10.0)
 				stacks := 0
 
 				character.AddAura(sim, core.Aura{
@@ -229,6 +230,10 @@ func ApplyBadgeOfTheSwarmguard(agent core.Agent) {
 					Expires:  sim.CurrentTime + dur,
 					OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
 						if !hitEffect.Landed() {
+							return
+						}
+
+						if !ppmm.Proc(sim, hitEffect.IsMH(), hitEffect.IsRanged(), "Badge of the Swarmguard") {
 							return
 						}
 
@@ -403,7 +408,7 @@ func ApplyTsunamiTalisman(agent core.Agent) {
 				if icd.IsOnCD(sim) {
 					return
 				}
-				if sim.RandomFloat("Madness of the Betrayer") > procChance {
+				if sim.RandomFloat("Tsunami Talisman") > procChance {
 					return
 				}
 

@@ -86,6 +86,7 @@ func consumesStats(character *Character, c proto.Consumes, raidBuffs proto.RaidB
 	}
 	if c.FlaskOfRelentlessAssault {
 		s[stats.AttackPower] += 120
+		s[stats.RangedAttackPower] += 120
 	}
 
 	if c.BlackenedBasilisk {
