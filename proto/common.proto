@@ -73,6 +73,7 @@ enum Stat {
     StatEnergy = 25;
     StatRage = 26;
     StatArmor = 27;
+    StatRangedAttackPower = 28;
 }
 
 enum ItemType {

@@ -36,7 +36,8 @@ func applyBuffEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs proto.P
 
 	if partyBuffs.TrueshotAura {
 		character.AddStats(stats.Stats{
-			stats.AttackPower: 125,
+			stats.AttackPower:       125,
+			stats.RangedAttackPower: 125,
 		})
 	}
 
@@ -81,7 +82,8 @@ func applyBuffEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs proto.P
 	})
 
 	character.AddStats(stats.Stats{
-		stats.AttackPower: GetTristateValueFloat(individualBuffs.BlessingOfMight, 220, 264),
+		stats.AttackPower:       GetTristateValueFloat(individualBuffs.BlessingOfMight, 220, 264),
+		stats.RangedAttackPower: GetTristateValueFloat(individualBuffs.BlessingOfMight, 220, 264),
 	})
 
 	if individualBuffs.BlessingOfKings {
@@ -223,23 +225,40 @@ var SnapshotImprovedWrathOfAirTotemAuraID = NewAuraID()
 
 func SnapshotImprovedWrathOfAirTotemAura(character *Character) AuraFactory {
 	return func(sim *Simulation) Aura {
-		return character.NewAuraWithTemporaryStats(sim, SnapshotImprovedWrathOfAirTotemAuraID, ActionID{SpellID: 37212}, stats.SpellPower, 20, time.Second*110)
+		return character.NewAuraWithTemporaryStats(sim, SnapshotImprovedWrathOfAirTotemAuraID, ActionID{SpellID: 37212, Tag: 1}, stats.SpellPower, 20, time.Second*110)
 	}
 }
 
 var SnapshotBattleShoutAuraID = NewAuraID()
 
 func SnapshotBattleShoutAura(character *Character, snapshotSapphire bool, snapshotT2 bool) AuraFactory {
-	bonus := 0.0
+	amount := 0.0
 	if snapshotSapphire {
-		bonus += 70
+		amount += 70
 	}
 	if snapshotT2 {
-		bonus += 30
+		amount += 30
 	}
 
+	// Do this manually instead of calling NewAuraWithTemporary stats so that it
+	// only affects melee AP.
 	return func(sim *Simulation) Aura {
-		return character.NewAuraWithTemporaryStats(sim, SnapshotBattleShoutAuraID, ActionID{ItemID: 30446}, stats.AttackPower, bonus, time.Second*110)
+		if sim.Log != nil {
+			character.Log(sim, "Gained %0.02f %s from BS Snapshot.", amount, stats.AttackPower.StatName())
+		}
+		character.AddStat(stats.AttackPower, amount)
+
+		return Aura{
+			ID:       SnapshotBattleShoutAuraID,
+			ActionID: ActionID{ItemID: 30446, Tag: 1},
+			Expires:  sim.CurrentTime + time.Second*110,
+			OnExpire: func(sim *Simulation) {
+				if sim.Log != nil {
+					character.Log(sim, "Lost %0.02f %s from fading BS Snapshot.", amount, stats.AttackPower.StatName())
+				}
+				character.AddStat(stats.AttackPower, -amount)
+			},
+		}
 	}
 }
 

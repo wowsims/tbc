@@ -401,7 +401,7 @@ func (ahe *AbilityHitEffect) IsWeaponHit() bool {
 
 // Returns whether this hit effect is associated with the main-hand weapon.
 func (ahe *AbilityHitEffect) IsMH() bool {
-	return !ahe.WeaponInput.IsOH
+	return !ahe.WeaponInput.IsOH && !ahe.WeaponInput.IsRanged
 }
 
 // Returns whether this hit effect is associated with the off-hand weapon.
@@ -409,6 +409,12 @@ func (ahe *AbilityHitEffect) IsOH() bool {
 	return ahe.WeaponInput.IsOH
 }
 
+// Returns whether this hit effect is associated with either melee weapon.
+func (ahe *AbilityHitEffect) IsMelee() bool {
+	return !ahe.WeaponInput.IsRanged
+}
+
+// Returns whether this hit effect is associated with the ranged weapon.
 func (ahe *AbilityHitEffect) IsRanged() bool {
 	return ahe.WeaponInput.IsRanged
 }

@@ -702,6 +702,9 @@ func (character *Character) NewAuraWithTemporaryStats(sim *Simulation, auraID Au
 		character.AddMeleeHaste(sim, amount)
 	} else {
 		character.AddStat(stat, amount)
+		if stat == stats.AttackPower {
+			character.AddStat(stats.RangedAttackPower, amount)
+		}
 	}
 
 	return Aura{
@@ -716,6 +719,9 @@ func (character *Character) NewAuraWithTemporaryStats(sim *Simulation, auraID Au
 				character.AddMeleeHaste(sim, -amount)
 			} else {
 				character.AddStat(stat, -amount)
+				if stat == stats.AttackPower {
+					character.AddStat(stats.RangedAttackPower, -amount)
+				}
 			}
 		},
 	}
