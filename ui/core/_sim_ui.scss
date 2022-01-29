@@ -38,13 +38,13 @@ input, select {
 
 .sim-sidebar {
   height: 100%;
-  width: 20%;
   min-width: 250px;
   display: flex;
   flex-direction: column;
   align-items: stretch;
   background: #111218;
   flex: 1;
+  overflow-y: auto;
 }
 
 .sim-sidebar>div {
