@@ -44,6 +44,7 @@ export const statNames = {
     [Stat.StatEnergy]: 'Energy',
     [Stat.StatRage]: 'Rage',
     [Stat.StatArmor]: 'Armor',
+    [Stat.StatRangedAttackPower]: 'Ranged AP',
 };
 export const slotNames = {
     [ItemSlot.ItemSlotHead]: 'Head',

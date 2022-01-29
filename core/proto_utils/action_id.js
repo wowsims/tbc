@@ -150,6 +150,12 @@ export class ActionId {
                     name += ' (Off Hand)';
                 }
                 break;
+            case 'Wrath Of Air Totem':
+            case 'Battle Shout':
+                if (this.tag == 1) {
+                    name += ' (Snapshot)';
+                }
+                break;
             default:
                 if (this.tag) {
                     name += ' (??)';

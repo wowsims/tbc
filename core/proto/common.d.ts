@@ -983,7 +983,11 @@ export declare enum Stat {
     /**
      * @generated from protobuf enum value: StatArmor = 27;
      */
-    StatArmor = 27
+    StatArmor = 27,
+    /**
+     * @generated from protobuf enum value: StatRangedAttackPower = 28;
+     */
+    StatRangedAttackPower = 28
 }
 /**
  * @generated from protobuf enum proto.ItemType
