@@ -401,11 +401,14 @@
 
 .gear-picker-root {
   display: flex;
-  margin: 15px;
+  flex-wrap: wrap;
+  min-width: 250px;
 }
 
 .gear-picker-left, .gear-picker-right {
   width: 50%;
+  flex: 1;
+  min-width: 250px;
 }
 
 .item-picker-root {
@@ -423,6 +426,12 @@
   text-align: right;
 }
 
+@media only screen and (max-width: calc(750px + 1vw)) {
+  .gear-picker-right .item-picker-root {
+    text-align: left;
+    flex-direction: row;
+  }
+}
 .item-picker-icon {
   background-repeat: no-repeat;
   background-size: cover;
@@ -458,17 +467,18 @@
 .item-picker-labels-container {
   padding: 3px;
   text-shadow: 2px 2px 3px black;
+  flex: 1;
 }
 
 .item-picker-name {
   display: block;
-  font-size: 18px;
+  font-size: clamp(16px, 17px, 18px);
   letter-spacing: normal;
 }
 
 .item-picker-enchant {
   display: block;
-  font-size: 14px;
+  font-size: clamp(12px, 13px, 14px);
   color: lawngreen;
   letter-spacing: normal;
 }
@@ -484,6 +494,7 @@
   padding: 8px;
   background-color: #666;
   border-radius: 6px;
+  max-width: 100%;
 }
 
 .selector-modal-tab-content-header {
@@ -1657,16 +1668,19 @@ input, select {
 .sim-root {
   height: 100%;
   display: flex;
+  flex-wrap: wrap;
+  overflow-y: auto;
 }
 
 .sim-sidebar {
   height: 100%;
-  width: 20%;
-  min-width: 200px;
+  min-width: 250px;
   display: flex;
   flex-direction: column;
   align-items: stretch;
   background: #111218;
+  flex: 1;
+  overflow-y: auto;
 }
 
 .sim-sidebar > div {
@@ -1764,6 +1778,9 @@ input, select {
   background-size: cover;
   background-position: center center;
   color: var(--main-text-color);
+  overflow-y: auto;
+  flex: 4;
+  min-width: 250px;
 }
 
 .nav-tabs {
@@ -1771,13 +1788,14 @@ input, select {
   padding-top: 15px;
   border-bottom-color: var(--theme-color-primary);
   color: var(--main-text-color);
+  font-size: clamp(10px, 1.5vw, 15px);
 }
 
 .nav-tabs > li > a {
   color: var(--main-text-color) !important;
   border: none !important;
   border-radius: 0 !important;
-  margin-bottom: 1px;
+  margin: 0.1vh 0.1vw 0.1vh 0.1vw;
   font-weight: bold;
 }
 
@@ -1792,7 +1810,6 @@ input, select {
 
 .sim-main > .tab-content > .tab-pane {
   height: 100%;
-  padding: 25px;
 }
 
 .sim-toolbar {
@@ -1814,9 +1831,9 @@ input, select {
 }
 
 .sim-top-bar-item {
-  margin: 10px;
-  font-size: 20px;
   cursor: pointer;
+  font-size: clamp(12px, 2vw, 20px);
+  margin-right: 12px;
 }
 
 .warnings {
@@ -2097,23 +2114,52 @@ input, select {
 
 .gear-tab-columns {
   display: flex;
+  flex-wrap: wrap;
+  overflow-y: auto;
+  height: 100%;
 }
 
 .left-gear-panel {
-  width: 70%;
+  min-width: calc(500px + 2vw);
+  flex: 3;
+  padding-left: 1vw;
+  padding-right: 1vw;
+  padding-top: 1vh;
 }
 
+@media only screen and (max-width: calc(750px + 1vw)) {
+  .left-gear-panel {
+    min-width: calc(250px + 1vw);
+  }
+}
 .right-gear-panel {
-  width: 30%;
   text-align: center;
   border-left: 3px solid var(--main-text-color);
   position: relative;
+  flex: 1.25;
+  min-width: 250px;
+  min-height: 450px;
+  height: calc(90% - 60px);
+  margin-top: 10px;
+  margin-bottom: 10px;
 }
 
+@media only screen and (max-width: calc(1000px + 2vw)) {
+  .right-gear-panel {
+    border-left: none;
+  }
+}
+@media only screen and (max-width: calc(750px + 1vw)) {
+  .right-gear-panel {
+    min-width: 250px;
+    border-left: none;
+  }
+}
 .bonus-stats-root {
   justify-content: end;
   text-align: right;
   color: var(--main-text-color);
+  margin-bottom: 20px;
 }
 
 .bonus-stats-root .number-picker-root {
@@ -2121,8 +2167,6 @@ input, select {
 }
 
 .saved-gear-manager {
-  position: absolute;
-  bottom: 0;
   position: absolute;
   right: 0;
   text-align: right;

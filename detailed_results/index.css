@@ -890,7 +890,7 @@ body.new-tab {
   color: var(--main-text-color) !important;
   border: none !important;
   border-radius: 0 !important;
-  margin-bottom: 1px;
+  margin: 0.1vh 0.1vw 0.1vh 0.1vw;
   font-weight: bold;
 }
 

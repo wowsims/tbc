@@ -61,6 +61,20 @@ export class IconPicker extends Input {
                 }
             }
         });
+        this.rootAnchor.addEventListener('touchstart', event => {
+            if (this.config.states == 0 || (this.currentValue + 1) < this.config.states) {
+                this.currentValue++;
+                this.inputChanged(TypedEvent.nextEventID());
+            }
+            else if (this.currentValue > 0) { // roll over
+                this.currentValue = 0;
+                this.inputChanged(TypedEvent.nextEventID());
+            }
+            event.preventDefault();
+        });
+        this.rootAnchor.addEventListener('touchend', event => {
+            event.preventDefault();
+        });
     }
     getInputElem() {
         return this.rootAnchor;

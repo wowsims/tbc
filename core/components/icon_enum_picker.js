@@ -17,6 +17,18 @@ export class IconEnumPicker extends Input {
         this.buttonElem.addEventListener('click', event => {
             event.preventDefault();
         });
+        this.buttonElem.addEventListener('touchstart', event => {
+            if (dropdownElem.style.display == "block") {
+                dropdownElem.style.display = "none";
+            }
+            else {
+                dropdownElem.style.display = "block";
+            }
+            event.preventDefault();
+        });
+        this.buttonElem.addEventListener('touchend', event => {
+            event.preventDefault();
+        });
         let columns = [];
         for (let i = 0; i < this.config.numColumns; i++) {
             const column = document.createElement('div');
@@ -44,6 +56,15 @@ export class IconEnumPicker extends Input {
                 // being moused over, and the tooltip doesn't disappear. Patch this by
                 // dispatching our own mouseout event.
                 option.dispatchEvent(new Event('mouseout'));
+            });
+            option.addEventListener('touchstart', event => {
+                event.preventDefault();
+            });
+            option.addEventListener('touchend', event => {
+                event.preventDefault();
+                this.currentValue = valueConfig.value;
+                this.inputChanged(TypedEvent.nextEventID());
+                dropdownElem.style.display = "none";
             });
         });
         this.init();
