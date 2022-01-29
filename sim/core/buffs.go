@@ -225,7 +225,7 @@ var SnapshotImprovedWrathOfAirTotemAuraID = NewAuraID()
 
 func SnapshotImprovedWrathOfAirTotemAura(character *Character) AuraFactory {
 	return func(sim *Simulation) Aura {
-		return character.NewAuraWithTemporaryStats(sim, SnapshotImprovedWrathOfAirTotemAuraID, ActionID{SpellID: 37212, Tag: 1}, stats.SpellPower, 20, time.Second*110)
+		return character.NewAuraWithTemporaryStats(sim, SnapshotImprovedWrathOfAirTotemAuraID, ActionID{SpellID: 37212}, stats.SpellPower, 20, time.Second*110)
 	}
 }
 
@@ -240,21 +240,22 @@ func SnapshotBattleShoutAura(character *Character, snapshotSapphire bool, snapsh
 		amount += 30
 	}
 
-	// Do this manually instead of calling NewAuraWithTemporary stats so that it
+	// Do this manually instead of calling NewAuraWithTemporaryStats so that it
 	// only affects melee AP.
 	return func(sim *Simulation) Aura {
+		actionID := ActionID{SpellID: 2048, Tag: 1}
 		if sim.Log != nil {
-			character.Log(sim, "Gained %0.02f %s from BS Snapshot.", amount, stats.AttackPower.StatName())
+			character.Log(sim, "Gained %0.02f %s from %s.", amount, stats.AttackPower.StatName(), actionID)
 		}
 		character.AddStat(stats.AttackPower, amount)
 
 		return Aura{
 			ID:       SnapshotBattleShoutAuraID,
-			ActionID: ActionID{ItemID: 30446, Tag: 1},
+			ActionID: actionID,
 			Expires:  sim.CurrentTime + time.Second*110,
 			OnExpire: func(sim *Simulation) {
 				if sim.Log != nil {
-					character.Log(sim, "Lost %0.02f %s from fading BS Snapshot.", amount, stats.AttackPower.StatName())
+					character.Log(sim, "Lost %0.02f %s from fading %s.", amount, stats.AttackPower.StatName(), actionID)
 				}
 				character.AddStat(stats.AttackPower, -amount)
 			},

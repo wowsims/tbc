@@ -319,33 +319,32 @@ func (shaman *Shaman) applyFlurry() {
 		return core.Aura{
 			ID: FlurryTalentAuraID,
 			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
-				if hitEffect.HitType != core.MeleeHitTypeCrit {
-					if ability == nil {
-						// Remove a stack from auto attacks
-						if flurryStacks > 0 && !icd.IsOnCD(sim) {
-							icd = core.InternalCD(sim.CurrentTime + icdDur)
-							flurryStacks--
-							// Remove aura will reset attack speed
-							if flurryStacks == 0 {
-								shaman.RemoveAura(sim, FlurryProcAuraID)
-							}
-						}
+				if hitEffect.HitType == core.MeleeHitTypeCrit {
+					if flurryStacks == 0 {
+						shaman.MultiplyMeleeSpeed(sim, bonus)
+						shaman.AddAura(sim, core.Aura{
+							ID:       FlurryProcAuraID,
+							ActionID: core.ActionID{SpellID: 16280},
+							Expires:  core.NeverExpires,
+							OnExpire: func(sim *core.Simulation) {
+								shaman.MultiplyMeleeSpeed(sim, inverseBonus)
+							},
+						})
 					}
+					icd = 0
+					flurryStacks = 3
 					return
 				}
-				if flurryStacks == 0 {
-					shaman.MultiplyMeleeSpeed(sim, bonus)
-					shaman.AddAura(sim, core.Aura{
-						ID:       FlurryProcAuraID,
-						ActionID: core.ActionID{SpellID: 16280},
-						Expires:  core.NeverExpires,
-						OnExpire: func(sim *core.Simulation) {
-							shaman.MultiplyMeleeSpeed(sim, inverseBonus)
-						},
-					})
+
+				// Remove a stack.
+				if flurryStacks > 0 && !icd.IsOnCD(sim) {
+					icd = core.InternalCD(sim.CurrentTime + icdDur)
+					flurryStacks--
+					if flurryStacks == 0 {
+						// RemoveAura will reset attack speed via OnExpire
+						shaman.RemoveAura(sim, FlurryProcAuraID)
+					}
 				}
-				icd = 0
-				flurryStacks = 3
 			},
 		}
 	})
