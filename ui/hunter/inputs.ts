@@ -55,7 +55,7 @@ export const WeaponAmmo = {
 		{ color: 'grey', value: Ammo.AmmoNone },
 		{ actionId: ActionId.fromItemId(31737), value: Ammo.TimelessArrow },
 		{ actionId: ActionId.fromItemId(34581), value: Ammo.MysteriousArrow },
-		{ actionId: ActionId.fromItemId(33803), value: Ammo.AdamantineStinger },
+		{ actionId: ActionId.fromItemId(33803), value: Ammo.AdamantiteStinger },
 		{ actionId: ActionId.fromItemId(31949), value: Ammo.WardensArrow },
 		{ actionId: ActionId.fromItemId(30611), value: Ammo.HalaaniRazorshaft },
 		{ actionId: ActionId.fromItemId(28056), value: Ammo.BlackflightArrow },
@@ -138,6 +138,36 @@ export const HunterRotationConfig = {
 			},
 		},
 		{
+			type: 'boolean' as const, cssClass: 'maintain-scorpid-sting-picker',
+			getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
+			config: {
+				label: 'Maintain Scorpid Sting',
+				labelTooltip: 'Casts scorpid sting when the primary target does not have the debuff.',
+				changedEvent: (player: Player<Spec.SpecHunter>) => player.rotationChangeEmitter,
+				getValue: (player: Player<Spec.SpecHunter>) => player.getRotation().maintainScorpidSting,
+				setValue: (eventID: EventID, player: Player<Spec.SpecHunter>, newValue: boolean) => {
+					const newRotation = player.getRotation();
+					newRotation.maintainScorpidSting = newValue;
+					player.setRotation(eventID, newRotation);
+				},
+			},
+		},
+		{
+			type: 'boolean' as const, cssClass: 'precast-aimed-shot-picker',
+			getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
+			config: {
+				label: 'Precast Aimed Shot',
+				labelTooltip: 'Starts the encounter with an instant Aimed Shot.',
+				changedEvent: (player: Player<Spec.SpecHunter>) => player.rotationChangeEmitter,
+				getValue: (player: Player<Spec.SpecHunter>) => player.getRotation().precastAimedShot,
+				setValue: (eventID: EventID, player: Player<Spec.SpecHunter>, newValue: boolean) => {
+					const newRotation = player.getRotation();
+					newRotation.precastAimedShot = newValue;
+					player.setRotation(eventID, newRotation);
+				},
+			},
+		},
+		{
 			type: 'boolean' as const, cssClass: 'melee-weave-picker',
 			getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
 			config: {
@@ -148,6 +178,36 @@ export const HunterRotationConfig = {
 				setValue: (eventID: EventID, player: Player<Spec.SpecHunter>, newValue: boolean) => {
 					const newRotation = player.getRotation();
 					newRotation.meleeWeave = newValue;
+					player.setRotation(eventID, newRotation);
+				},
+			},
+		},
+		{
+			type: 'number' as const, cssClass: 'viper-start-picker',
+			getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
+			config: {
+				label: 'Viper Start Mana %',
+				labelTooltip: 'Switch to Aspect of the Viper when mana goes below this amount.',
+				changedEvent: (player: Player<Spec.SpecHunter>) => player.rotationChangeEmitter,
+				getValue: (player: Player<Spec.SpecHunter>) => player.getRotation().viperStartManaPercent * 100,
+				setValue: (eventID: EventID, player: Player<Spec.SpecHunter>, newValue: number) => {
+					const newRotation = player.getRotation();
+					newRotation.viperStartManaPercent = newValue / 100;
+					player.setRotation(eventID, newRotation);
+				},
+			},
+		},
+		{
+			type: 'number' as const, cssClass: 'viper-stop-picker',
+			getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
+			config: {
+				label: 'Viper Stop Mana %',
+				labelTooltip: 'Switch back to Aspect of the Hawk when mana goes above this amount.',
+				changedEvent: (player: Player<Spec.SpecHunter>) => player.rotationChangeEmitter,
+				getValue: (player: Player<Spec.SpecHunter>) => player.getRotation().viperStopManaPercent * 100,
+				setValue: (eventID: EventID, player: Player<Spec.SpecHunter>, newValue: number) => {
+					const newRotation = player.getRotation();
+					newRotation.viperStopManaPercent = newValue / 100;
 					player.setRotation(eventID, newRotation);
 				},
 			},

@@ -118,6 +118,9 @@ type AbilityEffect struct {
 	// Adds a fixed amount of threat to this spell, before multipliers.
 	FlatThreatBonus float64
 
+	// Ignores reduction from target armor.
+	IgnoreArmor bool
+
 	// The type of hit this was, i.e. miss/dodge/block/crit/hit.
 	HitType MeleeHitType
 
@@ -180,10 +183,12 @@ func (character *Character) WeaponFromRanged() Weapon {
 	}
 }
 
+func (weapon Weapon) BaseDamage(sim *Simulation) float64 {
+	return weapon.BaseDamageMin + (weapon.BaseDamageMax-weapon.BaseDamageMin)*sim.RandomFloat("melee")
+}
+
 func (weapon Weapon) calculateSwingDamage(sim *Simulation, attackPower float64) float64 {
-	dmg := weapon.BaseDamageMin + (weapon.BaseDamageMax-weapon.BaseDamageMin)*sim.RandomFloat("melee")
-	dmg += (weapon.SwingSpeed * attackPower) / MeleeAttackRatingPerDamage
-	return dmg
+	return weapon.BaseDamage(sim) + (weapon.SwingSpeed*attackPower)/MeleeAttackRatingPerDamage
 }
 
 // If MainHand or Offhand is non-zero the associated ability will create a weapon swing.
@@ -199,6 +204,9 @@ type WeaponDamageInput struct {
 
 	DamageMultiplier float64 // Damage multiplier on weapon damage.
 	FlatDamageBonus  float64 // Flat bonus added to swing.
+
+	// If set, skips the normal calc for weapon damage and uses this function instead.
+	CalculateDamage func(attackPower float64, bonusWeaponDamage float64) float64
 }
 
 type AbilityHitEffect struct {
@@ -355,17 +363,21 @@ func (ahe *AbilityHitEffect) calculateDamage(sim *Simulation, ability *ActiveMel
 	}
 
 	dmg := 0.0
-	if ahe.WeaponInput.DamageMultiplier != 0 {
-		// Bonus weapon damage applies after OH penalty: https://www.youtube.com/watch?v=bwCIU87hqTs
-		if ahe.IsRanged() {
-			dmg += character.AutoAttacks.Ranged.calculateSwingDamage(sim, attackPower) + bonusWeaponDamage
-		} else if ahe.IsMH() {
-			dmg += character.AutoAttacks.MH.calculateSwingDamage(sim, attackPower) + bonusWeaponDamage
+	if ahe.IsWeaponHit() {
+		if ahe.WeaponInput.CalculateDamage != nil {
+			dmg += ahe.WeaponInput.CalculateDamage(attackPower, bonusWeaponDamage)
 		} else {
-			dmg += character.AutoAttacks.OH.calculateSwingDamage(sim, attackPower)*0.5 + bonusWeaponDamage
+			// Bonus weapon damage applies after OH penalty: https://www.youtube.com/watch?v=bwCIU87hqTs
+			if ahe.IsRanged() {
+				dmg += character.AutoAttacks.Ranged.calculateSwingDamage(sim, attackPower) + bonusWeaponDamage
+			} else if ahe.IsMH() {
+				dmg += character.AutoAttacks.MH.calculateSwingDamage(sim, attackPower) + bonusWeaponDamage
+			} else {
+				dmg += character.AutoAttacks.OH.calculateSwingDamage(sim, attackPower)*0.5 + bonusWeaponDamage
+			}
+			dmg *= ahe.WeaponInput.DamageMultiplier
+			dmg += ahe.WeaponInput.FlatDamageBonus
 		}
-		dmg *= ahe.WeaponInput.DamageMultiplier
-		dmg += ahe.WeaponInput.FlatDamageBonus
 	}
 
 	// Add damage from DirectInput
@@ -396,10 +408,12 @@ func (ahe *AbilityHitEffect) calculateDamage(sim *Simulation, ability *ActiveMel
 	}
 
 	// Apply armor reduction.
-	dmg *= 1 - ahe.Target.ArmorDamageReduction(character.stats[stats.ArmorPenetration]+ahe.BonusArmorPenetration)
-	//if sim.Log != nil {
-	//	character.Log(sim, "Target armor: %0.2f\n", ahe.Target.currentArmor)
-	//}
+	if !ahe.IgnoreArmor {
+		dmg *= 1 - ahe.Target.ArmorDamageReduction(character.stats[stats.ArmorPenetration]+ahe.BonusArmorPenetration)
+		//if sim.Log != nil {
+		//	character.Log(sim, "Target armor: %0.2f\n", ahe.Target.currentArmor)
+		//}
+	}
 
 	// Apply all other effect multipliers.
 	dmg *= ahe.DamageMultiplier * ahe.StaticDamageMultiplier
@@ -410,7 +424,7 @@ func (ahe *AbilityHitEffect) calculateDamage(sim *Simulation, ability *ActiveMel
 // Returns whether this hit effect is associated with one of the character's
 // weapons. This check is necessary to decide whether certains effects are eligible.
 func (ahe *AbilityHitEffect) IsWeaponHit() bool {
-	return ahe.WeaponInput.DamageMultiplier > 0
+	return ahe.WeaponInput.DamageMultiplier != 0 || ahe.WeaponInput.CalculateDamage != nil
 }
 
 // Returns whether this hit effect is associated with the main-hand weapon.
@@ -601,8 +615,9 @@ func (character *Character) EnableAutoAttacks(agent Agent, options AutoAttackOpt
 		ActiveMeleeAbility: ActiveMeleeAbility{
 			MeleeAbility: MeleeAbility{
 				ActionID:        ActionID{OtherID: proto.OtherAction_OtherActionAttack},
-				CritMultiplier:  2,
 				Character:       character,
+				SpellSchool:     stats.AttackPower,
+				CritMultiplier:  2,
 				IgnoreCooldowns: true,
 				IgnoreCost:      true,
 			},
@@ -621,8 +636,9 @@ func (character *Character) EnableAutoAttacks(agent Agent, options AutoAttackOpt
 		RangedAuto: ActiveMeleeAbility{
 			MeleeAbility: MeleeAbility{
 				ActionID:        ActionID{OtherID: proto.OtherAction_OtherActionShoot},
-				CritMultiplier:  2,
 				Character:       character,
+				SpellSchool:     stats.AttackPower,
+				CritMultiplier:  2,
 				IgnoreCooldowns: true,
 				IgnoreCost:      true,
 			},

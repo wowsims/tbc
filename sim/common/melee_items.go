@@ -238,8 +238,9 @@ func ApplyDespair(agent core.Agent) {
 	templ := core.ActiveMeleeAbility{
 		MeleeAbility: core.MeleeAbility{
 			ActionID:        actionID,
-			CritMultiplier:  2,
 			Character:       character,
+			SpellSchool:     stats.AttackPower,
+			CritMultiplier:  2,
 			IgnoreCooldowns: true,
 			IgnoreCost:      true,
 		},
@@ -288,8 +289,9 @@ func ApplyTheDecapitator(agent core.Agent) {
 	templ := core.ActiveMeleeAbility{
 		MeleeAbility: core.MeleeAbility{
 			ActionID:        actionID,
-			CritMultiplier:  2,
 			Character:       character,
+			SpellSchool:     stats.AttackPower,
+			CritMultiplier:  2,
 			IgnoreCooldowns: true,
 			IgnoreCost:      true,
 		},

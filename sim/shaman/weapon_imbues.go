@@ -30,11 +30,10 @@ func (shaman *Shaman) ApplyWindfuryImbue(mh bool, oh bool) {
 
 	wftempl := core.ActiveMeleeAbility{
 		MeleeAbility: core.MeleeAbility{
-			ActionID: core.ActionID{
-				SpellID: 25505,
-			},
-			CritMultiplier:  2.0,
+			ActionID:        core.ActionID{SpellID: 25505},
 			Character:       &shaman.Character,
+			SpellSchool:     stats.AttackPower,
+			CritMultiplier:  2.0,
 			IgnoreCooldowns: true,
 		},
 	}

@@ -353,8 +353,9 @@ func WindfuryTotemAura(character *Character, rank int32, iwtTalentPoints int32) 
 	wftempl := ActiveMeleeAbility{
 		MeleeAbility: MeleeAbility{
 			ActionID:       actionID,
-			CritMultiplier: 2.0,
 			Character:      character,
+			SpellSchool:    stats.AttackPower,
+			CritMultiplier: 2.0,
 		},
 		Effect: AbilityHitEffect{
 			AbilityEffect: AbilityEffect{
