@@ -2,6 +2,7 @@ package sim
 
 import (
 	_ "github.com/wowsims/tbc/sim/common"
+	"github.com/wowsims/tbc/sim/core/warrior"
 	"github.com/wowsims/tbc/sim/druid/balance"
 	"github.com/wowsims/tbc/sim/hunter"
 	"github.com/wowsims/tbc/sim/mage"
@@ -24,4 +25,5 @@ func RegisterAll() {
 	hunter.RegisterHunter()
 	mage.RegisterMage()
 	shadow.RegisterShadowPriest()
+	warrior.RegisterWarrior()
 }

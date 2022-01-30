@@ -1,8 +1,8 @@
 package core
 
-import ()
-
 const MaxRage = 100.0
+
+const RageFactor = 3.75 / 274.7
 
 var RageBarAuraID = NewAuraID()
 
@@ -22,10 +22,22 @@ func (character *Character) EnableRageBar(startingRage float64) {
 					return
 				}
 
-				damage := hitEffect.Damage
+				var HitFactor float64
+				var BaseSwingSpeed float64
 
-				// TODO: Put the actual equation here.
-				generatedRage := damage
+				if hitEffect.IsMH() {
+					HitFactor = 3.5 / 2
+					BaseSwingSpeed = character.AutoAttacks.MH.SwingSpeed
+				} else {
+					HitFactor = 1.75 / 2
+					BaseSwingSpeed = character.AutoAttacks.OH.SwingSpeed
+				}
+
+				if hitEffect.HitType == MeleeHitTypeCrit {
+					HitFactor *= 2
+				}
+
+				generatedRage := hitEffect.Damage*RageFactor + HitFactor*BaseSwingSpeed
 
 				character.AddRage(sim, generatedRage, ability.ActionID)
 			},
