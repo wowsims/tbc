@@ -46,12 +46,8 @@ type MeleeAbility struct {
 	// Note that the GCD CD will be activated even if this is not set.
 	Cooldown time.Duration
 
-	// If set, this will be used as the GCD instead of the default value (1.5s).
-	GCDCooldown time.Duration
-
-	// If set, CD for this action and GCD CD will be ignored, and this action
-	// will not set new values for those CDs either.
-	IgnoreCooldowns bool
+	// The amount of GCD time incurred by this cast. This is almost always 0, 1s, or 1.5s.
+	GCD time.Duration
 
 	// If set, this spell will have its resource cost ignored.
 	IgnoreCost bool
@@ -457,22 +453,16 @@ func (ahe *AbilityHitEffect) IsEquippedHand(mh bool, oh bool) bool {
 const EnableAbilityHaste = false
 
 func (ability *ActiveMeleeAbility) CalculatedGCD(char *Character) time.Duration {
-	baseGCD := GCDDefault
 	if !EnableAbilityHaste {
-		// TODO: Other classes have different GCD defaults for abilites.
-		//  Probably want to just have all abilities specify the GCD explicitly?
-		return baseGCD
+		return ability.GCD
 	}
-	if ability.GCDCooldown != 0 {
-		baseGCD = ability.GCDCooldown
-	}
-	return MaxDuration(GCDMin, time.Duration(float64(baseGCD)/char.SwingSpeed()))
+	return MaxDuration(GCDMin, time.Duration(float64(ability.GCD)/char.SwingSpeed()))
 }
 
 // Attack will perform the attack
 //  Returns false if unable to attack (due to resource lacking)
 func (ability *ActiveMeleeAbility) Attack(sim *Simulation) bool {
-	if !ability.IgnoreCooldowns && ability.Character.GetRemainingCD(GCDCooldownID, sim.CurrentTime) > 0 {
+	if ability.GCD != 0 && ability.Character.GetRemainingCD(GCDCooldownID, sim.CurrentTime) > 0 {
 		log.Fatalf("Ability used while on GCD\n-------\nAbility %s: %#v\n", ability.ActionID, ability)
 	}
 	if ability.MeleeAbility.Cost.Type != 0 {
@@ -505,13 +495,13 @@ func (ability *ActiveMeleeAbility) Attack(sim *Simulation) bool {
 		}
 	}
 
-	if !ability.IgnoreCooldowns {
+	if ability.GCD != 0 {
 		gcdCD := MaxDuration(ability.CalculatedGCD(ability.Character), ability.CastTime)
 		ability.Character.SetGCDTimer(sim, sim.CurrentTime+gcdCD)
+	}
 
-		if ability.ActionID.CooldownID != 0 {
-			ability.Character.SetCD(ability.ActionID.CooldownID, sim.CurrentTime+ability.Cooldown)
-		}
+	if ability.Cooldown != 0 {
+		ability.Character.SetCD(ability.ActionID.CooldownID, sim.CurrentTime+ability.Cooldown)
 	}
 	ability.Character.Metrics.AddMeleeAbility(ability)
 	return true
@@ -614,12 +604,11 @@ func (character *Character) EnableAutoAttacks(agent Agent, options AutoAttackOpt
 		DelayOHSwings:   options.DelayOHSwings,
 		ActiveMeleeAbility: ActiveMeleeAbility{
 			MeleeAbility: MeleeAbility{
-				ActionID:        ActionID{OtherID: proto.OtherAction_OtherActionAttack},
-				Character:       character,
-				SpellSchool:     stats.AttackPower,
-				CritMultiplier:  2,
-				IgnoreCooldowns: true,
-				IgnoreCost:      true,
+				ActionID:       ActionID{OtherID: proto.OtherAction_OtherActionAttack},
+				Character:      character,
+				SpellSchool:    stats.AttackPower,
+				CritMultiplier: 2,
+				IgnoreCost:     true,
 			},
 			Effect: AbilityHitEffect{
 				AbilityEffect: AbilityEffect{
@@ -635,12 +624,11 @@ func (character *Character) EnableAutoAttacks(agent Agent, options AutoAttackOpt
 		},
 		RangedAuto: ActiveMeleeAbility{
 			MeleeAbility: MeleeAbility{
-				ActionID:        ActionID{OtherID: proto.OtherAction_OtherActionShoot},
-				Character:       character,
-				SpellSchool:     stats.AttackPower,
-				CritMultiplier:  2,
-				IgnoreCooldowns: true,
-				IgnoreCost:      true,
+				ActionID:       ActionID{OtherID: proto.OtherAction_OtherActionShoot},
+				Character:      character,
+				SpellSchool:    stats.AttackPower,
+				CritMultiplier: 2,
+				IgnoreCost:     true,
 			},
 			Effect: AbilityHitEffect{
 				AbilityEffect: AbilityEffect{

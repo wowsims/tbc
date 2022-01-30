@@ -93,13 +93,12 @@ var ItemSetFistsOfFury = core.ItemSet{
 				castTemplate := core.NewSimpleSpellTemplate(core.SimpleSpell{
 					SpellCast: core.SpellCast{
 						Cast: core.Cast{
-							ActionID:        core.ActionID{SpellID: 41989},
-							Character:       character,
-							IgnoreCooldowns: true,
-							IgnoreManaCost:  true,
-							IsPhantom:       true,
-							SpellSchool:     stats.FireSpellPower,
-							CritMultiplier:  1.5,
+							ActionID:       core.ActionID{SpellID: 41989},
+							Character:      character,
+							IgnoreManaCost: true,
+							IsPhantom:      true,
+							SpellSchool:    stats.FireSpellPower,
+							CritMultiplier: 1.5,
 						},
 					},
 					Effect: core.SpellHitEffect{

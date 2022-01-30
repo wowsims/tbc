@@ -46,6 +46,7 @@ func (mage *Mage) registerSummonWaterElementalCD() {
 					Character:    mage.GetCharacter(),
 					BaseManaCost: baseManaCost,
 					ManaCost:     baseManaCost,
+					GCD:          core.GCDDefault,
 					Cooldown:     time.Minute * 3,
 					OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
 						mage.waterElemental.EnableWithTimeout(sim, mage.waterElemental, time.Second*45)
@@ -164,6 +165,7 @@ func (we *WaterElemental) newWaterboltTemplate(sim *core.Simulation) core.Simple
 				BaseManaCost:   baseManaCost,
 				ManaCost:       baseManaCost,
 				CastTime:       time.Millisecond * 3000,
+				GCD:            core.GCDDefault,
 				ActionID: core.ActionID{
 					SpellID: SpellIDWaterbolt,
 				},

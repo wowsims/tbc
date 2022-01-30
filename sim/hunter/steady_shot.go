@@ -16,6 +16,7 @@ func (hunter *Hunter) newSteadyShotCastTemplate(sim *core.Simulation) core.Simpl
 			BaseManaCost: 110,
 			ManaCost:     110,
 			CastTime:     time.Second * 1,
+			GCD:          core.GCDDefault,
 		},
 		DisableMetrics: true,
 	}
@@ -26,12 +27,11 @@ func (hunter *Hunter) newSteadyShotCastTemplate(sim *core.Simulation) core.Simpl
 func (hunter *Hunter) newSteadyShotAbilityTemplate(sim *core.Simulation) core.MeleeAbilityTemplate {
 	ama := core.ActiveMeleeAbility{
 		MeleeAbility: core.MeleeAbility{
-			ActionID:        core.ActionID{SpellID: 34120},
-			Character:       &hunter.Character,
-			SpellSchool:     stats.AttackPower,
-			CritMultiplier:  2.0,
-			IgnoreCooldowns: true,
-			IgnoreCost:      true,
+			ActionID:       core.ActionID{SpellID: 34120},
+			Character:      &hunter.Character,
+			SpellSchool:    stats.AttackPower,
+			CritMultiplier: 2.0,
+			IgnoreCost:     true,
 		},
 		Effect: core.AbilityHitEffect{
 			AbilityEffect: core.AbilityEffect{

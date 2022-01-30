@@ -23,6 +23,7 @@ func (druid *Druid) newHurricaneTemplate(sim *core.Simulation) core.SimpleSpellT
 				BaseManaCost:   1905,
 				ManaCost:       1905,
 				CastTime:       0,
+				GCD:            core.GCDDefault,
 				Cooldown:       time.Second * 60,
 				ActionID: core.ActionID{
 					SpellID:    SpellIDHurricane,

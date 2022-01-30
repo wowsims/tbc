@@ -21,6 +21,7 @@ func (mage *Mage) newArcaneMissilesTemplate(sim *core.Simulation) core.SimpleSpe
 				Character:      &mage.Character,
 				BaseManaCost:   740,
 				ManaCost:       740,
+				GCD:            core.GCDDefault,
 				ActionID: core.ActionID{
 					SpellID: SpellIDArcaneMissiles,
 				},

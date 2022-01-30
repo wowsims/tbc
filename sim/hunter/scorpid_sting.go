@@ -18,6 +18,7 @@ func (hunter *Hunter) newScorpidStingTemplate(sim *core.Simulation) core.MeleeAb
 			ActionID:    actionID,
 			Character:   &hunter.Character,
 			SpellSchool: stats.NatureSpellPower,
+			GCD:         core.GCDDefault,
 			Cost: core.ResourceCost{
 				Type:  stats.Mana,
 				Value: manaCost,

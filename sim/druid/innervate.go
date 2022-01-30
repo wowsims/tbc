@@ -79,6 +79,7 @@ func (druid *Druid) registerInnervateCD() {
 					Character:    druid.GetCharacter(),
 					BaseManaCost: baseManaCost,
 					ManaCost:     baseManaCost,
+					GCD:          core.GCDDefault,
 					Cooldown:     innervateCD,
 					OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
 						// Update expected bonus mana

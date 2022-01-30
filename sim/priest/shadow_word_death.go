@@ -19,6 +19,7 @@ func (priest *Priest) newShadowWordDeathTemplate(sim *core.Simulation) core.Simp
 		BaseManaCost:   309,
 		ManaCost:       309,
 		CastTime:       0,
+		GCD:            core.GCDDefault,
 		Cooldown:       time.Second * 12,
 		ActionID: core.ActionID{
 			SpellID:    SpellIDShadowWordDeath,

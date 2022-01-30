@@ -16,6 +16,7 @@ func (mage *Mage) newArcaneExplosionTemplate(sim *core.Simulation) core.SimpleSp
 				Character:      &mage.Character,
 				BaseManaCost:   390,
 				ManaCost:       390,
+				GCD:            core.GCDDefault,
 				ActionID: core.ActionID{
 					SpellID: SpellIDArcaneExplosion,
 				},

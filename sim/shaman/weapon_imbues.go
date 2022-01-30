@@ -30,11 +30,10 @@ func (shaman *Shaman) ApplyWindfuryImbue(mh bool, oh bool) {
 
 	wftempl := core.ActiveMeleeAbility{
 		MeleeAbility: core.MeleeAbility{
-			ActionID:        core.ActionID{SpellID: 25505},
-			Character:       &shaman.Character,
-			SpellSchool:     stats.AttackPower,
-			CritMultiplier:  2.0,
-			IgnoreCooldowns: true,
+			ActionID:       core.ActionID{SpellID: 25505},
+			Character:      &shaman.Character,
+			SpellSchool:    stats.AttackPower,
+			CritMultiplier: 2.0,
 		},
 	}
 
@@ -117,13 +116,12 @@ func (shaman *Shaman) ApplyFlametongueImbue(mh bool, oh bool) {
 	ftTmpl := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				ActionID:        core.ActionID{SpellID: 25489},
-				Character:       &shaman.Character,
-				IgnoreCooldowns: true,
-				IgnoreManaCost:  true,
-				IsPhantom:       true,
-				SpellSchool:     stats.FireSpellPower,
-				CritMultiplier:  1.5,
+				ActionID:       core.ActionID{SpellID: 25489},
+				Character:      &shaman.Character,
+				SpellSchool:    stats.FireSpellPower,
+				IgnoreManaCost: true,
+				IsPhantom:      true,
+				CritMultiplier: 1.5,
 			},
 		},
 		Effect: core.SpellHitEffect{
@@ -193,13 +191,12 @@ func (shaman *Shaman) ApplyFrostbrandImbue(mh bool, oh bool) {
 	fbTmpl := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				ActionID:        core.ActionID{SpellID: 25500},
-				Character:       &shaman.Character,
-				IgnoreCooldowns: true,
-				IgnoreManaCost:  true,
-				IsPhantom:       true,
-				SpellSchool:     stats.FrostSpellPower,
-				CritMultiplier:  1.5,
+				ActionID:       core.ActionID{SpellID: 25500},
+				Character:      &shaman.Character,
+				SpellSchool:    stats.FrostSpellPower,
+				IgnoreManaCost: true,
+				IsPhantom:      true,
+				CritMultiplier: 1.5,
 			},
 		},
 		Effect: core.SpellHitEffect{

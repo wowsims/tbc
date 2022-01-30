@@ -59,11 +59,10 @@ func newLightningCapacitorCastTemplate(sim *core.Simulation, character *core.Cha
 				ActionID: core.ActionID{
 					ItemID: core.ItemIDTheLightningCapacitor,
 				},
-				Character:       character,
-				IgnoreCooldowns: true,
-				IgnoreManaCost:  true,
-				SpellSchool:     stats.NatureSpellPower,
-				CritMultiplier:  1.5,
+				Character:      character,
+				IgnoreManaCost: true,
+				SpellSchool:    stats.NatureSpellPower,
+				CritMultiplier: 1.5,
 			},
 		},
 		Effect: core.SpellHitEffect{

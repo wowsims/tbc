@@ -17,7 +17,7 @@ func (shaman *Shaman) newTotemCastTemplate(sim *core.Simulation, baseManaCost fl
 			Character:    shaman.GetCharacter(),
 			BaseManaCost: baseManaCost,
 			ManaCost:     manaCost,
-			GCDCooldown:  time.Second * 1,
+			GCD:          time.Second,
 		},
 	}
 

@@ -23,6 +23,7 @@ func (mage *Mage) newFireballTemplate(sim *core.Simulation) core.SimpleSpellTemp
 				BaseManaCost:   425,
 				ManaCost:       425,
 				CastTime:       time.Millisecond * 3500,
+				GCD:            core.GCDDefault,
 				ActionID: core.ActionID{
 					SpellID: SpellIDFireball,
 				},
@@ -74,8 +75,7 @@ func (mage *Mage) newFireballDotTemplate(sim *core.Simulation) core.SimpleSpellT
 					SpellID: SpellIDFireball,
 					Tag:     CastTagFireballDot,
 				},
-				IgnoreCooldowns: true,
-				IgnoreManaCost:  true,
+				IgnoreManaCost: true,
 			},
 		},
 		Effect: core.SpellHitEffect{

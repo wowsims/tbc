@@ -20,6 +20,7 @@ func (druid *Druid) newMoonfireTemplate(sim *core.Simulation) core.SimpleSpellTe
 		BaseManaCost:   495,
 		ManaCost:       495,
 		CastTime:       0,
+		GCD:            core.GCDDefault,
 		ActionID: core.ActionID{
 			SpellID: SpellIDMoonfire,
 		},

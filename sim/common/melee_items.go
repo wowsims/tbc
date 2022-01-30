@@ -237,12 +237,11 @@ func ApplyDespair(agent core.Agent) {
 
 	templ := core.ActiveMeleeAbility{
 		MeleeAbility: core.MeleeAbility{
-			ActionID:        actionID,
-			Character:       character,
-			SpellSchool:     stats.AttackPower,
-			CritMultiplier:  2,
-			IgnoreCooldowns: true,
-			IgnoreCost:      true,
+			ActionID:       actionID,
+			Character:      character,
+			SpellSchool:    stats.AttackPower,
+			CritMultiplier: 2,
+			IgnoreCost:     true,
 		},
 		Effect: core.AbilityHitEffect{
 			AbilityEffect: core.AbilityEffect{
@@ -288,12 +287,11 @@ func ApplyTheDecapitator(agent core.Agent) {
 
 	templ := core.ActiveMeleeAbility{
 		MeleeAbility: core.MeleeAbility{
-			ActionID:        actionID,
-			Character:       character,
-			SpellSchool:     stats.AttackPower,
-			CritMultiplier:  2,
-			IgnoreCooldowns: true,
-			IgnoreCost:      true,
+			ActionID:       actionID,
+			Character:      character,
+			SpellSchool:    stats.AttackPower,
+			CritMultiplier: 2,
+			IgnoreCost:     true,
 		},
 		Effect: core.AbilityHitEffect{
 			AbilityEffect: core.AbilityEffect{
@@ -351,13 +349,12 @@ func ApplyGlaiveOfThePit(agent core.Agent) {
 		castTemplate := core.NewSimpleSpellTemplate(core.SimpleSpell{
 			SpellCast: core.SpellCast{
 				Cast: core.Cast{
-					ActionID:        core.ActionID{SpellID: 34696},
-					Character:       character,
-					IgnoreCooldowns: true,
-					IgnoreManaCost:  true,
-					IsPhantom:       true,
-					SpellSchool:     stats.ShadowSpellPower,
-					CritMultiplier:  1.5,
+					ActionID:       core.ActionID{SpellID: 34696},
+					Character:      character,
+					IgnoreManaCost: true,
+					IsPhantom:      true,
+					SpellSchool:    stats.ShadowSpellPower,
+					CritMultiplier: 1.5,
 				},
 			},
 			Effect: core.SpellHitEffect{
@@ -670,13 +667,12 @@ func ApplySyphonOfTheNathrezim(agent core.Agent) {
 		castTemplate := core.NewSimpleSpellTemplate(core.SimpleSpell{
 			SpellCast: core.SpellCast{
 				Cast: core.Cast{
-					ActionID:        core.ActionID{SpellID: 40291},
-					Character:       character,
-					IgnoreCooldowns: true,
-					IgnoreManaCost:  true,
-					IsPhantom:       true,
-					SpellSchool:     stats.ShadowSpellPower,
-					CritMultiplier:  1.5,
+					ActionID:       core.ActionID{SpellID: 40291},
+					Character:      character,
+					IgnoreManaCost: true,
+					IsPhantom:      true,
+					SpellSchool:    stats.ShadowSpellPower,
+					CritMultiplier: 1.5,
 				},
 			},
 			Effect: core.SpellHitEffect{

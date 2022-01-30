@@ -15,15 +15,14 @@ const IdolAvenger int32 = 31025
 
 func (druid *Druid) newWrathTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
 	baseCast := core.Cast{
-		CritMultiplier: 1.5,
-		SpellSchool:    stats.NatureSpellPower,
+		ActionID:       core.ActionID{SpellID: SpellIDWrath},
 		Character:      &druid.Character,
+		SpellSchool:    stats.NatureSpellPower,
 		BaseManaCost:   255,
 		ManaCost:       255,
 		CastTime:       time.Millisecond * 2000,
-		ActionID: core.ActionID{
-			SpellID: SpellIDWrath,
-		},
+		GCD:            core.GCDDefault,
+		CritMultiplier: 1.5,
 	}
 
 	effect := core.SpellHitEffect{

@@ -17,6 +17,7 @@ func (hunter *Hunter) newMultiShotTemplate(sim *core.Simulation) core.MeleeAbili
 			Character:      &hunter.Character,
 			SpellSchool:    stats.AttackPower,
 			CritMultiplier: 2.0,
+			GCD:            core.GCDDefault,
 			Cooldown:       time.Second * 10,
 			Cost: core.ResourceCost{
 				Type:  stats.Mana,

@@ -32,6 +32,7 @@ func (mage *Mage) registerEvocationCD() {
 			Character: mage.GetCharacter(),
 			Cooldown:  time.Minute * 8,
 			CastTime:  castTime,
+			GCD:       core.GCDDefault,
 			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
 				mage.AddMana(sim, manaGain, actionID, true)
 
