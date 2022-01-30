@@ -96,6 +96,7 @@ type AbilityEffect struct {
 	BonusCritRating       float64
 	BonusExpertiseRating  float64
 	BonusArmorPenetration float64
+	BonusWeaponDamage     float64
 
 	IsWhiteHit bool
 
@@ -233,73 +234,6 @@ func (effect *AbilityEffect) Landed() bool {
 	return effect.HitType != MeleeHitTypeMiss && effect.HitType != MeleeHitTypeDodge && effect.HitType != MeleeHitTypeParry
 }
 
-// Computes an attack result using the white-hit table formula (single roll).
-func (effect *AbilityEffect) WhiteHitTableResult(sim *Simulation, ability *ActiveMeleeAbility) MeleeHitType {
-	// 1. Single roll -> Miss				Dodge	Parry	Glance	Block	Crit / Hit
-	// 3 				8.0%(9.0% hit cap)	6.5%	14.0%	24% 	5%		-4.8%
-
-	// TODO: many calculations in here can be cached. For now its just written out fully.
-	//  Once everything is working we can start caching values.
-	character := ability.Character
-
-	roll := sim.RandomFloat("auto attack")
-	level := float64(effect.Target.Level)
-	skill := 350.0 // assume max skill level for now.
-
-	// Difference between attacker's waepon skill and target's defense skill.
-	skillDifference := (level * 5) - skill
-
-	// First check miss
-	missChance := 0.05 + skillDifference*0.002
-	if effect.IsWhiteHit && character.AutoAttacks.IsDualWielding {
-		missChance += 0.19
-	}
-	hitSuppression := (skillDifference - 10) * 0.002
-	hitBonus := ((character.stats[stats.MeleeHit] + effect.BonusHitRating) / (MeleeHitRatingPerHitChance * 100)) - hitSuppression
-	if hitBonus > 0 {
-		missChance = math.Max(0, missChance-hitBonus)
-	}
-
-	chance := missChance
-	if roll < chance {
-		return MeleeHitTypeMiss
-	}
-
-	// Next Dodge
-	dodge := 0.05 + skillDifference*0.001
-	expertisePercentage := math.Min(math.Floor((character.stats[stats.Expertise]+effect.BonusExpertiseRating)/(ExpertisePerQuarterPercentReduction))/400, dodge)
-	chance += dodge - expertisePercentage
-	if roll < chance {
-		return MeleeHitTypeDodge
-	}
-
-	// Parry (if in front)
-	// If the target is a mob and defense minus weapon skill is 11 or more:
-	// ParryChance = 5% + (TargetLevel*5 - AttackerSkill) * 0.6%
-
-	// If the target is a mob and defense minus weapon skill is 10 or less:
-	// ParryChance = 5% + (TargetLevel*5 - AttackerSkill) * 0.1%
-
-	// Block (if in front)
-	// If the target is a mob:
-	// BlockChance = MIN(5%, 5% + (TargetLevel*5 - AttackerSkill) * 0.1%)
-
-	// Glancing Check
-	chance += math.Max(0.06+skillDifference*0.012, 0)
-	if roll < chance {
-		return MeleeHitTypeGlance
-	}
-
-	// Crit Check
-	critChance := ((character.stats[stats.MeleeCrit] + effect.BonusCritRating) / (MeleeCritRatingPerCritChance * 100)) - skillDifference*0.002 - 0.018
-	chance += critChance
-	if roll < chance {
-		return MeleeHitTypeCrit
-	}
-
-	return MeleeHitTypeHit
-}
-
 func (effect *AbilityEffect) String() string {
 	if effect.HitType == MeleeHitTypeMiss {
 		return "Miss"
@@ -326,13 +260,83 @@ func (effect *AbilityEffect) String() string {
 	return sb.String()
 }
 
+// Computes an attack result using the white-hit table formula (single roll).
+func (ahe *AbilityHitEffect) WhiteHitTableResult(sim *Simulation, ability *ActiveMeleeAbility) MeleeHitType {
+	// 1. Single roll -> Miss				Dodge	Parry	Glance	Block	Crit / Hit
+	// 3 				8.0%(9.0% hit cap)	6.5%	14.0%	24% 	5%		-4.8%
+
+	// TODO: many calculations in here can be cached. For now its just written out fully.
+	//  Once everything is working we can start caching values.
+	character := ability.Character
+
+	roll := sim.RandomFloat("auto attack")
+	level := float64(ahe.Target.Level)
+	skill := 350.0 // assume max skill level for now.
+
+	// Difference between attacker's waepon skill and target's defense skill.
+	skillDifference := (level * 5) - skill
+
+	// Miss
+	missChance := 0.05 + skillDifference*0.002
+	if ahe.IsWhiteHit && character.AutoAttacks.IsDualWielding {
+		missChance += 0.19
+	}
+	hitSuppression := (skillDifference - 10) * 0.002
+	hitBonus := ((character.stats[stats.MeleeHit] + ahe.BonusHitRating) / (MeleeHitRatingPerHitChance * 100)) - hitSuppression
+	if hitBonus > 0 {
+		missChance = math.Max(0, missChance-hitBonus)
+	}
+
+	chance := missChance
+	if roll < chance {
+		return MeleeHitTypeMiss
+	}
+
+	if !ahe.IsRanged() { // Ranged hits can't be dodged/glance, and are always 2-roll
+		// Dodge
+		dodge := 0.05 + skillDifference*0.001
+		expertisePercentage := math.Min(math.Floor((character.stats[stats.Expertise]+ahe.BonusExpertiseRating)/(ExpertisePerQuarterPercentReduction))/400, dodge)
+		chance += dodge - expertisePercentage
+		if roll < chance {
+			return MeleeHitTypeDodge
+		}
+
+		// Parry (if in front)
+		// If the target is a mob and defense minus weapon skill is 11 or more:
+		// ParryChance = 5% + (TargetLevel*5 - AttackerSkill) * 0.6%
+
+		// If the target is a mob and defense minus weapon skill is 10 or less:
+		// ParryChance = 5% + (TargetLevel*5 - AttackerSkill) * 0.1%
+
+		// Block (if in front)
+		// If the target is a mob:
+		// BlockChance = MIN(5%, 5% + (TargetLevel*5 - AttackerSkill) * 0.1%)
+		// If we actually implement blocks, ranged hits can be blocked.
+
+		// Glance
+		chance += math.Max(0.06+skillDifference*0.012, 0)
+		if roll < chance {
+			return MeleeHitTypeGlance
+		}
+
+		// Crit
+		critChance := ((character.stats[stats.MeleeCrit] + ahe.BonusCritRating) / (MeleeCritRatingPerCritChance * 100)) - skillDifference*0.002 - 0.018
+		chance += critChance
+		if roll < chance {
+			return MeleeHitTypeCrit
+		}
+	}
+
+	return MeleeHitTypeHit
+}
+
 func (ahe *AbilityHitEffect) calculateDamage(sim *Simulation, ability *ActiveMeleeAbility) {
 	character := ability.Character
 
 	if ahe.AbilityEffect.ReuseMainHitRoll {
 		ahe.HitType = ability.Effects[0].HitType
 	} else {
-		ahe.HitType = ahe.AbilityEffect.WhiteHitTableResult(sim, ability)
+		ahe.HitType = ahe.WhiteHitTableResult(sim, ability)
 	}
 
 	if !ahe.Landed() {
@@ -340,13 +344,22 @@ func (ahe *AbilityHitEffect) calculateDamage(sim *Simulation, ability *ActiveMel
 		return
 	}
 
-	attackPower := character.stats[stats.AttackPower] + ahe.BonusAttackPower
-	bonusWeaponDamage := character.PseudoStats.BonusWeaponDamage
+	var attackPower float64
+	var bonusWeaponDamage float64
+	if ahe.IsRanged() {
+		attackPower = character.stats[stats.RangedAttackPower] + ahe.BonusAttackPower
+		bonusWeaponDamage = character.PseudoStats.BonusRangedDamage + ahe.BonusWeaponDamage
+	} else {
+		attackPower = character.stats[stats.AttackPower] + ahe.BonusAttackPower
+		bonusWeaponDamage = character.PseudoStats.BonusMeleeDamage + ahe.BonusWeaponDamage
+	}
 
 	dmg := 0.0
 	if ahe.WeaponInput.DamageMultiplier != 0 {
 		// Bonus weapon damage applies after OH penalty: https://www.youtube.com/watch?v=bwCIU87hqTs
-		if !ahe.WeaponInput.IsOH {
+		if ahe.IsRanged() {
+			dmg += character.AutoAttacks.Ranged.calculateSwingDamage(sim, attackPower) + bonusWeaponDamage
+		} else if ahe.IsMH() {
 			dmg += character.AutoAttacks.MH.calculateSwingDamage(sim, attackPower) + bonusWeaponDamage
 		} else {
 			dmg += character.AutoAttacks.OH.calculateSwingDamage(sim, attackPower)*0.5 + bonusWeaponDamage
@@ -363,7 +376,7 @@ func (ahe *AbilityHitEffect) calculateDamage(sim *Simulation, ability *ActiveMel
 	dmg += ahe.DirectInput.FlatDamageBonus
 
 	// If this is a yellow attack, need a 2nd roll to decide crit. Otherwise just use existing hit result.
-	if !ahe.AbilityEffect.IsWhiteHit {
+	if !ahe.AbilityEffect.IsWhiteHit || ahe.IsRanged() {
 		skill := 350.0
 		level := float64(ahe.Target.Level)
 		critChance := ((character.stats[stats.MeleeCrit] + ahe.BonusCritRating) / (MeleeCritRatingPerCritChance * 100)) + ((skill - (level * 5)) * 0.002) - 0.018
@@ -710,7 +723,7 @@ func (aa *AutoAttacks) OffhandSwingSpeed() time.Duration {
 }
 
 func (aa *AutoAttacks) RangedSwingSpeed() time.Duration {
-	return time.Duration(float64(aa.Ranged.SwingDuration) / aa.character.SwingSpeed())
+	return time.Duration(float64(aa.Ranged.SwingDuration) / aa.character.RangedSwingSpeed())
 }
 
 // SwingMelee will check any swing timers if they are up, and if so, swing!
@@ -780,7 +793,7 @@ func (aa *AutoAttacks) TrySwingRanged(sim *Simulation, target *Target) {
 	ama := aa.RangedAuto
 	ama.Effect.Target = target
 	ama.Attack(sim)
-	aa.OffhandSwingAt = sim.CurrentTime + aa.OffhandSwingSpeed()
+	aa.RangedSwingAt = sim.CurrentTime + aa.RangedSwingSpeed()
 }
 
 func (aa *AutoAttacks) ModifySwingTime(sim *Simulation, amount float64) {

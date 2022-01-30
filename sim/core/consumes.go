@@ -134,7 +134,8 @@ func addImbueStats(character *Character, imbue proto.WeaponImbue) {
 		character.AddStats(stats.Stats{
 			stats.MeleeCrit: 14,
 		})
-		character.PseudoStats.BonusWeaponDamage += 12
+		character.PseudoStats.BonusMeleeDamage += 12
+		character.PseudoStats.BonusRangedDamage += 12
 	} else if imbue == proto.WeaponImbue_WeaponImbueElementalSharpeningStone {
 		character.AddStats(stats.Stats{
 			stats.MeleeCrit: 28,
