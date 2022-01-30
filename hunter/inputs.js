@@ -35,7 +35,7 @@ export const WeaponAmmo = {
         { color: 'grey', value: Ammo.AmmoNone },
         { actionId: ActionId.fromItemId(31737), value: Ammo.TimelessArrow },
         { actionId: ActionId.fromItemId(34581), value: Ammo.MysteriousArrow },
-        { actionId: ActionId.fromItemId(33803), value: Ammo.AdamantineStinger },
+        { actionId: ActionId.fromItemId(33803), value: Ammo.AdamantiteStinger },
         { actionId: ActionId.fromItemId(31949), value: Ammo.WardensArrow },
         { actionId: ActionId.fromItemId(30611), value: Ammo.HalaaniRazorshaft },
         { actionId: ActionId.fromItemId(28056), value: Ammo.BlackflightArrow },
@@ -116,6 +116,36 @@ export const HunterRotationConfig = {
             },
         },
         {
+            type: 'boolean', cssClass: 'maintain-scorpid-sting-picker',
+            getModObject: (simUI) => simUI.player,
+            config: {
+                label: 'Maintain Scorpid Sting',
+                labelTooltip: 'Casts scorpid sting when the primary target does not have the debuff.',
+                changedEvent: (player) => player.rotationChangeEmitter,
+                getValue: (player) => player.getRotation().maintainScorpidSting,
+                setValue: (eventID, player, newValue) => {
+                    const newRotation = player.getRotation();
+                    newRotation.maintainScorpidSting = newValue;
+                    player.setRotation(eventID, newRotation);
+                },
+            },
+        },
+        {
+            type: 'boolean', cssClass: 'precast-aimed-shot-picker',
+            getModObject: (simUI) => simUI.player,
+            config: {
+                label: 'Precast Aimed Shot',
+                labelTooltip: 'Starts the encounter with an instant Aimed Shot.',
+                changedEvent: (player) => player.rotationChangeEmitter,
+                getValue: (player) => player.getRotation().precastAimedShot,
+                setValue: (eventID, player, newValue) => {
+                    const newRotation = player.getRotation();
+                    newRotation.precastAimedShot = newValue;
+                    player.setRotation(eventID, newRotation);
+                },
+            },
+        },
+        {
             type: 'boolean', cssClass: 'melee-weave-picker',
             getModObject: (simUI) => simUI.player,
             config: {
@@ -126,6 +156,36 @@ export const HunterRotationConfig = {
                 setValue: (eventID, player, newValue) => {
                     const newRotation = player.getRotation();
                     newRotation.meleeWeave = newValue;
+                    player.setRotation(eventID, newRotation);
+                },
+            },
+        },
+        {
+            type: 'number', cssClass: 'viper-start-picker',
+            getModObject: (simUI) => simUI.player,
+            config: {
+                label: 'Viper Start Mana %',
+                labelTooltip: 'Switch to Aspect of the Viper when mana goes below this amount.',
+                changedEvent: (player) => player.rotationChangeEmitter,
+                getValue: (player) => player.getRotation().viperStartManaPercent * 100,
+                setValue: (eventID, player, newValue) => {
+                    const newRotation = player.getRotation();
+                    newRotation.viperStartManaPercent = newValue / 100;
+                    player.setRotation(eventID, newRotation);
+                },
+            },
+        },
+        {
+            type: 'number', cssClass: 'viper-stop-picker',
+            getModObject: (simUI) => simUI.player,
+            config: {
+                label: 'Viper Stop Mana %',
+                labelTooltip: 'Switch back to Aspect of the Hawk when mana goes above this amount.',
+                changedEvent: (player) => player.rotationChangeEmitter,
+                getValue: (player) => player.getRotation().viperStopManaPercent * 100,
+                setValue: (eventID, player, newValue) => {
+                    const newRotation = player.getRotation();
+                    newRotation.viperStopManaPercent = newValue / 100;
                     player.setRotation(eventID, newRotation);
                 },
             },

@@ -229,9 +229,29 @@ export interface Hunter_Rotation {
      */
     useArcaneShot: boolean;
     /**
-     * @generated from protobuf field: bool melee_weave = 4;
+     * @generated from protobuf field: bool maintain_scorpid_sting = 4;
+     */
+    maintainScorpidSting: boolean;
+    /**
+     * @generated from protobuf field: bool precast_aimed_shot = 5;
+     */
+    precastAimedShot: boolean;
+    /**
+     * @generated from protobuf field: bool melee_weave = 6;
      */
     meleeWeave: boolean;
+    /**
+     * Switch to Aspect of the Viper when mana goes below this percent.
+     *
+     * @generated from protobuf field: double viper_start_mana_percent = 7;
+     */
+    viperStartManaPercent: number;
+    /**
+     * Switch back to Aspect of the Hawk when mana goes above this percent.
+     *
+     * @generated from protobuf field: double viper_stop_mana_percent = 8;
+     */
+    viperStopManaPercent: number;
 }
 /**
  * @generated from protobuf message proto.Hunter.Options
@@ -308,9 +328,9 @@ export declare enum Hunter_Options_Ammo {
      */
     MysteriousArrow = 2,
     /**
-     * @generated from protobuf enum value: AdamantineStinger = 3;
+     * @generated from protobuf enum value: AdamantiteStinger = 3;
      */
-    AdamantineStinger = 3,
+    AdamantiteStinger = 3,
     /**
      * @generated from protobuf enum value: WardensArrow = 4;
      */

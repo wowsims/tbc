@@ -55,9 +55,9 @@ export var Hunter_Options_Ammo;
      */
     Hunter_Options_Ammo[Hunter_Options_Ammo["MysteriousArrow"] = 2] = "MysteriousArrow";
     /**
-     * @generated from protobuf enum value: AdamantineStinger = 3;
+     * @generated from protobuf enum value: AdamantiteStinger = 3;
      */
-    Hunter_Options_Ammo[Hunter_Options_Ammo["AdamantineStinger"] = 3] = "AdamantineStinger";
+    Hunter_Options_Ammo[Hunter_Options_Ammo["AdamantiteStinger"] = 3] = "AdamantiteStinger";
     /**
      * @generated from protobuf enum value: WardensArrow = 4;
      */
@@ -528,11 +528,15 @@ class Hunter_Rotation$Type extends MessageType {
             { no: 1, name: "adaptive", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 2, name: "use_multi_shot", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 3, name: "use_arcane_shot", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
-            { no: 4, name: "melee_weave", kind: "scalar", T: 8 /*ScalarType.BOOL*/ }
+            { no: 4, name: "maintain_scorpid_sting", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 5, name: "precast_aimed_shot", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 6, name: "melee_weave", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 7, name: "viper_start_mana_percent", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
+            { no: 8, name: "viper_stop_mana_percent", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ }
         ]);
     }
     create(value) {
-        const message = { adaptive: false, useMultiShot: false, useArcaneShot: false, meleeWeave: false };
+        const message = { adaptive: false, useMultiShot: false, useArcaneShot: false, maintainScorpidSting: false, precastAimedShot: false, meleeWeave: false, viperStartManaPercent: 0, viperStopManaPercent: 0 };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -552,8 +556,20 @@ class Hunter_Rotation$Type extends MessageType {
                 case /* bool use_arcane_shot */ 3:
                     message.useArcaneShot = reader.bool();
                     break;
-                case /* bool melee_weave */ 4:
+                case /* bool maintain_scorpid_sting */ 4:
+                    message.maintainScorpidSting = reader.bool();
+                    break;
+                case /* bool precast_aimed_shot */ 5:
+                    message.precastAimedShot = reader.bool();
+                    break;
+                case /* bool melee_weave */ 6:
                     message.meleeWeave = reader.bool();
+                    break;
+                case /* double viper_start_mana_percent */ 7:
+                    message.viperStartManaPercent = reader.double();
+                    break;
+                case /* double viper_stop_mana_percent */ 8:
+                    message.viperStopManaPercent = reader.double();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -576,9 +592,21 @@ class Hunter_Rotation$Type extends MessageType {
         /* bool use_arcane_shot = 3; */
         if (message.useArcaneShot !== false)
             writer.tag(3, WireType.Varint).bool(message.useArcaneShot);
-        /* bool melee_weave = 4; */
+        /* bool maintain_scorpid_sting = 4; */
+        if (message.maintainScorpidSting !== false)
+            writer.tag(4, WireType.Varint).bool(message.maintainScorpidSting);
+        /* bool precast_aimed_shot = 5; */
+        if (message.precastAimedShot !== false)
+            writer.tag(5, WireType.Varint).bool(message.precastAimedShot);
+        /* bool melee_weave = 6; */
         if (message.meleeWeave !== false)
-            writer.tag(4, WireType.Varint).bool(message.meleeWeave);
+            writer.tag(6, WireType.Varint).bool(message.meleeWeave);
+        /* double viper_start_mana_percent = 7; */
+        if (message.viperStartManaPercent !== 0)
+            writer.tag(7, WireType.Bit64).double(message.viperStartManaPercent);
+        /* double viper_stop_mana_percent = 8; */
+        if (message.viperStopManaPercent !== 0)
+            writer.tag(8, WireType.Bit64).double(message.viperStopManaPercent);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

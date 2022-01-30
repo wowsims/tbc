@@ -53,7 +53,7 @@ export declare const LatencyMs: {
     };
 };
 export declare const HunterRotationConfig: {
-    inputs: {
+    inputs: ({
         type: "boolean";
         cssClass: string;
         getModObject: (simUI: IndividualSimUI<any>) => Player<any>;
@@ -64,5 +64,16 @@ export declare const HunterRotationConfig: {
             getValue: (player: Player<Spec.SpecHunter>) => boolean;
             setValue: (eventID: EventID, player: Player<Spec.SpecHunter>, newValue: boolean) => void;
         };
-    }[];
+    } | {
+        type: "number";
+        cssClass: string;
+        getModObject: (simUI: IndividualSimUI<any>) => Player<any>;
+        config: {
+            label: string;
+            labelTooltip: string;
+            changedEvent: (player: Player<Spec.SpecHunter>) => TypedEvent<void>;
+            getValue: (player: Player<Spec.SpecHunter>) => number;
+            setValue: (eventID: EventID, player: Player<Spec.SpecHunter>, newValue: number) => void;
+        };
+    })[];
 };
