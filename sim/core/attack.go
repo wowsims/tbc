@@ -700,13 +700,14 @@ func (aa *AutoAttacks) resetAutoSwing(sim *Simulation) {
 	pa.OnAction = func(sim *Simulation) {
 		if aa.AutoSwingMelee {
 			aa.SwingMelee(sim, sim.GetPrimaryTarget())
+			pa.NextActionAt = aa.NextAttackAt()
 		} else {
 			aa.SwingRanged(sim, sim.GetPrimaryTarget())
+			pa.NextActionAt = aa.RangedSwingAt
 		}
 
 		// Cancelled means we made a new one because of a swing speed change.
 		if !pa.cancelled {
-			pa.NextActionAt = aa.NextAttackAt()
 			sim.AddPendingAction(pa)
 		}
 	}

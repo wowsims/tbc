@@ -1,0 +1,189 @@
+package hunter
+
+import (
+	"github.com/wowsims/tbc/sim/core"
+	"github.com/wowsims/tbc/sim/core/proto"
+	"github.com/wowsims/tbc/sim/core/stats"
+)
+
+func RegisterHunter() {
+	core.RegisterAgentFactory(
+		proto.Player_Hunter{},
+		func(character core.Character, options proto.Player) core.Agent {
+			return NewHunter(character, options)
+		},
+		func(player *proto.Player, spec interface{}) {
+			playerSpec, ok := spec.(*proto.Player_Hunter)
+			if !ok {
+				panic("Invalid spec value for Hunter!")
+			}
+			player.Spec = playerSpec
+		},
+	)
+}
+
+type Hunter struct {
+	core.Character
+
+	Talents  proto.HunterTalents
+	Options  proto.Hunter_Options
+	Rotation proto.Hunter_Rotation
+}
+
+func (hunter *Hunter) GetCharacter() *core.Character {
+	return &hunter.Character
+}
+
+func (hunter *Hunter) AddRaidBuffs(raidBuffs *proto.RaidBuffs) {
+}
+func (hunter *Hunter) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {
+}
+
+func (hunter *Hunter) Init(sim *core.Simulation) {
+}
+
+func (hunter *Hunter) Reset(newsim *core.Simulation) {
+}
+
+func NewHunter(character core.Character, options proto.Player) *Hunter {
+	hunterOptions := options.GetHunter()
+
+	hunter := &Hunter{
+		Character: character,
+		Talents:   *hunterOptions.Talents,
+		Options:   *hunterOptions.Options,
+		Rotation:  *hunterOptions.Rotation,
+	}
+
+	hunter.PseudoStats.RangedSpeedMultiplier = 1
+	hunter.EnableManaBar()
+	hunter.EnableAutoAttacks(hunter, core.AutoAttackOptions{
+		MainHand:        hunter.WeaponFromMainHand(),
+		OffHand:         hunter.WeaponFromOffHand(),
+		Ranged:          hunter.WeaponFromRanged(),
+		AutoSwingRanged: true,
+	})
+
+	hunter.Character.AddStatDependency(stats.StatDependency{
+		SourceStat:   stats.Intellect,
+		ModifiedStat: stats.SpellCrit,
+		Modifier: func(intellect float64, spellCrit float64) float64 {
+			return spellCrit + (intellect/55)*core.SpellCritRatingPerCritChance
+		},
+	})
+
+	hunter.Character.AddStatDependency(stats.StatDependency{
+		SourceStat:   stats.Strength,
+		ModifiedStat: stats.AttackPower,
+		Modifier: func(strength float64, attackPower float64) float64 {
+			return attackPower + strength*1
+		},
+	})
+
+	hunter.Character.AddStatDependency(stats.StatDependency{
+		SourceStat:   stats.Agility,
+		ModifiedStat: stats.RangedAttackPower,
+		Modifier: func(agility float64, rap float64) float64 {
+			return rap + agility*1
+		},
+	})
+
+	hunter.Character.AddStatDependency(stats.StatDependency{
+		SourceStat:   stats.Agility,
+		ModifiedStat: stats.MeleeCrit,
+		Modifier: func(agility float64, meleeCrit float64) float64 {
+			return meleeCrit + (agility/40)*core.MeleeCritRatingPerCritChance
+		},
+	})
+
+	//hunter.applyTalents()
+
+	return hunter
+}
+
+func init() {
+	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceBloodElf, Class: proto.Class_ClassHunter}] = stats.Stats{
+		stats.Strength:  61,
+		stats.Agility:   153,
+		stats.Stamina:   106,
+		stats.Intellect: 81,
+		stats.Spirit:    82,
+		stats.Mana:      3383,
+
+		stats.AttackPower:       120,
+		stats.RangedAttackPower: 130,
+	}
+	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceDraenei, Class: proto.Class_ClassHunter}] = stats.Stats{
+		stats.Strength:  65,
+		stats.Agility:   148,
+		stats.Stamina:   107,
+		stats.Intellect: 78,
+		stats.Spirit:    85,
+		stats.Mana:      3383,
+
+		stats.AttackPower:       120,
+		stats.RangedAttackPower: 130,
+	}
+	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceDwarf, Class: proto.Class_ClassHunter}] = stats.Stats{
+		stats.Strength:  66,
+		stats.Agility:   147,
+		stats.Stamina:   111,
+		stats.Intellect: 76,
+		stats.Spirit:    82,
+		stats.Mana:      3383,
+
+		stats.AttackPower:       120,
+		stats.RangedAttackPower: 130,
+	}
+	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceNightElf, Class: proto.Class_ClassHunter}] = stats.Stats{
+		stats.Strength:  61,
+		stats.Agility:   156,
+		stats.Stamina:   107,
+		stats.Intellect: 77,
+		stats.Spirit:    83,
+		stats.Mana:      3383,
+
+		stats.AttackPower:       120,
+		stats.RangedAttackPower: 130,
+	}
+	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceOrc, Class: proto.Class_ClassHunter}] = stats.Stats{
+		stats.Strength:  67,
+		stats.Agility:   148,
+		stats.Stamina:   110,
+		stats.Intellect: 74,
+		stats.Spirit:    86,
+		stats.Mana:      3383,
+
+		stats.AttackPower:       120,
+		stats.RangedAttackPower: 130,
+	}
+	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceTauren, Class: proto.Class_ClassHunter}] = stats.Stats{
+		stats.Strength:  69,
+		stats.Agility:   146,
+		stats.Stamina:   110,
+		stats.Intellect: 72,
+		stats.Spirit:    85,
+		stats.Mana:      3383,
+
+		stats.AttackPower:       120,
+		stats.RangedAttackPower: 130,
+	}
+	trollStats := stats.Stats{
+		stats.Strength:  65,
+		stats.Agility:   153,
+		stats.Stamina:   109,
+		stats.Intellect: 73,
+		stats.Spirit:    84,
+		stats.Mana:      3383,
+
+		stats.AttackPower:       120,
+		stats.RangedAttackPower: 130,
+	}
+	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceTroll10, Class: proto.Class_ClassHunter}] = trollStats
+	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceTroll30, Class: proto.Class_ClassHunter}] = trollStats
+}
+
+// Agent is a generic way to access underlying hunter on any of the agents.
+type Agent interface {
+	GetHunter() *Hunter
+}
