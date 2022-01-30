@@ -32,6 +32,10 @@ export class ActionId {
                     name += ' (Off Hand)';
                 }
                 break;
+            case OtherAction.OtherActionShoot:
+                name = 'Shoot';
+                iconUrl = 'https://wow.zamimg.com/images/wow/icons/large/ability_marksmanship.jpg';
+                break;
         }
         this.baseName = baseName;
         this.name = name;

@@ -528,6 +528,7 @@ export class IndividualSimUI extends SimUI {
                 config.isPreset = true;
                 savedTalentsManager.addSavedData({
                     name: config.name,
+                    isPreset: true,
                     data: SavedTalents.create({
                         talentsString: config.data,
                     }),

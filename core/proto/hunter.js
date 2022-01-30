@@ -115,6 +115,7 @@ class HunterTalents$Type extends MessageType {
             { no: 4, name: "unleashed_fury", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 5, name: "ferocity", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 6, name: "bestial_discipline", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 45, name: "animal_handler", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 7, name: "frenzy", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 8, name: "ferocious_inspiration", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 9, name: "bestial_wrath", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
@@ -156,7 +157,7 @@ class HunterTalents$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { improvedAspectOfTheHawk: 0, enduranceTraining: 0, focusedFire: 0, unleashedFury: 0, ferocity: 0, bestialDiscipline: 0, frenzy: 0, ferociousInspiration: 0, bestialWrath: false, serpentsSwiftness: 0, theBeastWithin: false, lethalShots: 0, improvedHuntersMark: 0, efficiency: 0, goForTheThroat: 0, improvedArcaneShot: 0, aimedShot: false, rapidKilling: 0, improvedStings: 0, mortalShots: 0, scatterShot: false, barrage: 0, combatExperience: 0, rangedWeaponSpecialization: 0, carefulAim: 0, trueshotAura: false, improvedBarrage: 0, masterMarksman: 0, silencingShot: false, monsterSlaying: 0, humanoidSlaying: 0, savageStrikes: 0, cleverTraps: 0, survivalist: 0, trapMastery: 0, surefooted: 0, survivalInstincts: 0, killerInstinct: 0, resourcefulness: 0, lightningReflexes: 0, thrillOfTheHunt: 0, exposeWeakness: 0, masterTactician: 0, readiness: false };
+        const message = { improvedAspectOfTheHawk: 0, enduranceTraining: 0, focusedFire: 0, unleashedFury: 0, ferocity: 0, bestialDiscipline: 0, animalHandler: 0, frenzy: 0, ferociousInspiration: 0, bestialWrath: false, serpentsSwiftness: 0, theBeastWithin: false, lethalShots: 0, improvedHuntersMark: 0, efficiency: 0, goForTheThroat: 0, improvedArcaneShot: 0, aimedShot: false, rapidKilling: 0, improvedStings: 0, mortalShots: 0, scatterShot: false, barrage: 0, combatExperience: 0, rangedWeaponSpecialization: 0, carefulAim: 0, trueshotAura: false, improvedBarrage: 0, masterMarksman: 0, silencingShot: false, monsterSlaying: 0, humanoidSlaying: 0, savageStrikes: 0, cleverTraps: 0, survivalist: 0, trapMastery: 0, surefooted: 0, survivalInstincts: 0, killerInstinct: 0, resourcefulness: 0, lightningReflexes: 0, thrillOfTheHunt: 0, exposeWeakness: 0, masterTactician: 0, readiness: false };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -184,6 +185,9 @@ class HunterTalents$Type extends MessageType {
                     break;
                 case /* int32 bestial_discipline */ 6:
                     message.bestialDiscipline = reader.int32();
+                    break;
+                case /* int32 animal_handler */ 45:
+                    message.animalHandler = reader.int32();
                     break;
                 case /* int32 frenzy */ 7:
                     message.frenzy = reader.int32();
@@ -329,6 +333,9 @@ class HunterTalents$Type extends MessageType {
         /* int32 bestial_discipline = 6; */
         if (message.bestialDiscipline !== 0)
             writer.tag(6, WireType.Varint).int32(message.bestialDiscipline);
+        /* int32 animal_handler = 45; */
+        if (message.animalHandler !== 0)
+            writer.tag(45, WireType.Varint).int32(message.animalHandler);
         /* int32 frenzy = 7; */
         if (message.frenzy !== 0)
             writer.tag(7, WireType.Varint).int32(message.frenzy);

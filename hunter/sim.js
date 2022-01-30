@@ -89,8 +89,6 @@ export class HunterSimUI extends IndividualSimUI {
                 HunterInputs.Quiver,
                 HunterInputs.WeaponAmmo,
                 IconInputs.DrumsOfBattleConsume,
-                IconInputs.DrumsOfRestorationConsume,
-                IconInputs.BattleChicken,
             ],
             // IconInputs to include in the 'Other Buffs' section on the settings tab.
             raidBuffInputs: [
@@ -107,7 +105,6 @@ export class HunterSimUI extends IndividualSimUI {
                 IconInputs.FerociousInspiration,
                 IconInputs.TrueshotAura,
                 IconInputs.SanctityAura,
-                IconInputs.BattleChickens,
                 IconInputs.BraidedEterniumChain,
             ],
             playerBuffInputs: [

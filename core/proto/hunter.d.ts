@@ -35,6 +35,10 @@ export interface HunterTalents {
      */
     bestialDiscipline: number;
     /**
+     * @generated from protobuf field: int32 animal_handler = 45;
+     */
+    animalHandler: number;
+    /**
      * @generated from protobuf field: int32 frenzy = 7;
      */
     frenzy: number;

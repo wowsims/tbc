@@ -129,11 +129,11 @@ export class HunterTalentsPicker extends TalentsPicker {
                             rowIdx: 4,
                             colIdx: 3,
                         },
-                        spellIds: [19590],
+                        spellIds: [19590, 19592],
                         maxPoints: 2,
                     },
                     {
-                        //fieldName: 'animalHandler',
+                        fieldName: 'animalHandler',
                         location: {
                             rowIdx: 5,
                             colIdx: 0,
