@@ -453,6 +453,9 @@ func (ahe *AbilityHitEffect) IsEquippedHand(mh bool, oh bool) bool {
 const EnableAbilityHaste = false
 
 func (ability *ActiveMeleeAbility) CalculatedGCD(char *Character) time.Duration {
+	if !EnableAbilityHaste {
+		return ability.GCD
+	}
 	return MaxDuration(GCDMin, time.Duration(float64(ability.GCD)/char.SwingSpeed()))
 }
 
