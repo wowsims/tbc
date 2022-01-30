@@ -59,12 +59,9 @@ func NewWarrior(character core.Character, options proto.Player) *Warrior {
 	warrior.PseudoStats.MeleeSpeedMultiplier = 1
 	warrior.EnableRageBar(warriorOptions.Options.StartingRage)
 	warrior.EnableAutoAttacks(warrior, core.AutoAttackOptions{
-		MainHand:        warrior.WeaponFromMainHand(),
-		OffHand:         warrior.WeaponFromOffHand(),
-		Ranged:          warrior.WeaponFromRanged(),
-		AutoSwingMelee:  true,
-		AutoSwingRanged: false,
-		DelayOHSwings:   false,
+		MainHand:       warrior.WeaponFromMainHand(),
+		OffHand:        warrior.WeaponFromOffHand(),
+		AutoSwingMelee: true,
 	})
 
 	if warrior.RotationType == proto.Warrior_Rotation_ArmsSlam && warriorOptions.Rotation.ArmsSlam != nil {

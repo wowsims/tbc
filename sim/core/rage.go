@@ -6,10 +6,6 @@ const RageFactor = 3.75 / 274.7
 
 var RageBarAuraID = NewAuraID()
 
-var HitFactor float64 = 0
-
-var BaseSwingSpeed float64 = 0
-
 type rageBar struct {
 	character *Character
 
@@ -26,7 +22,8 @@ func (character *Character) EnableRageBar(startingRage float64) {
 					return
 				}
 
-				damage := hitEffect.Damage
+				var HitFactor float64
+				var BaseSwingSpeed float64
 
 				if hitEffect.IsMH() {
 					HitFactor = 3.5 / 2
@@ -40,7 +37,7 @@ func (character *Character) EnableRageBar(startingRage float64) {
 					HitFactor *= 2
 				}
 
-				generatedRage := damage*RageFactor + HitFactor*BaseSwingSpeed
+				generatedRage := hitEffect.Damage*RageFactor + HitFactor*BaseSwingSpeed
 
 				character.AddRage(sim, generatedRage, ability.ActionID)
 			},
