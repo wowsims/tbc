@@ -35,15 +35,20 @@ var PlayerOptionsBasic = &proto.Player_Hunter{
 }
 
 var hunterRotation = &proto.Hunter_Rotation{
-	Adaptive:      true,
-	UseMultiShot:  true,
-	UseArcaneShot: true,
-	MeleeWeave:    true,
+	Adaptive:             true,
+	UseMultiShot:         true,
+	UseArcaneShot:        true,
+	MaintainScorpidSting: true,
+	PrecastAimedShot:     true,
+	MeleeWeave:           true,
+
+	ViperStartManaPercent: 0.2,
+	ViperStopManaPercent:  0.3,
 }
 
 var hunterOptions = &proto.Hunter_Options{
 	QuiverBonus: proto.Hunter_Options_Speed15,
-	Ammo:        proto.Hunter_Options_AdamantineStinger,
+	Ammo:        proto.Hunter_Options_AdamantiteStinger,
 	PetType:     proto.Hunter_Options_Ravager,
 	PetUptime:   0.9,
 	LatencyMs:   15,

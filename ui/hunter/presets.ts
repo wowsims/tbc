@@ -33,11 +33,13 @@ export const DefaultRotation = HunterRotation.create({
 	adaptive: true,
 	useMultiShot: true,
 	meleeWeave: false,
+	viperStartManaPercent: 0.2,
+	viperStopManaPercent: 0.4,
 });
 
 export const DefaultOptions = HunterOptions.create({
 	quiverBonus: QuiverBonus.Speed15,
-	ammo: Ammo.AdamantineStinger,
+	ammo: Ammo.AdamantiteStinger,
 	latencyMs: 30,
 });
 

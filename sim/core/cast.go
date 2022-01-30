@@ -37,6 +37,10 @@ type Cast struct {
 	// will not set new values for those CDs either.
 	IgnoreCooldowns bool
 
+	// If set, GCD CD for this action will be ignored, and this action
+	// will not set new values for the GCD either.
+	IgnoreGCD bool
+
 	// If set, this spell will have its mana cost ignored.
 	IgnoreManaCost bool
 
@@ -122,7 +126,7 @@ func (cast *Cast) init(sim *Simulation) {
 
 	// By panicking if spell is on CD, we force each sim to properly check for their own CDs.
 	if !cast.IgnoreCooldowns {
-		if cast.Character.IsOnCD(GCDCooldownID, sim.CurrentTime) {
+		if !cast.IgnoreGCD && cast.Character.IsOnCD(GCDCooldownID, sim.CurrentTime) {
 			panic(fmt.Sprintf("Trying to cast %s but GCD on cooldown for %s", cast.ActionID, cast.Character.GetRemainingCD(GCDCooldownID, sim.CurrentTime)))
 		}
 
@@ -154,7 +158,7 @@ func (cast *Cast) startCasting(sim *Simulation, onCastComplete OnCastComplete) b
 
 	// This needs to come before the internalOnComplete() call so that changes to
 	// casting speed caused by the cast don't affect the GCD CD.
-	if !cast.IgnoreCooldowns {
+	if !cast.IgnoreCooldowns && !cast.IgnoreGCD {
 		// Prevent any actions on the GCD until the cast AND the GCD are done.
 		gcdCD := MaxDuration(cast.CalculatedGCD(cast.Character), cast.CastTime+cast.AfterCastDelay)
 		cast.Character.SetGCDTimer(sim, sim.CurrentTime+gcdCD)
@@ -175,6 +179,7 @@ func (cast *Cast) startCasting(sim *Simulation, onCastComplete OnCastComplete) b
 			// TODO: reset aa PA.
 			cast.Character.AutoAttacks.MainhandSwingAt = MaxDuration(cast.Character.AutoAttacks.MainhandSwingAt, cast.Character.Hardcast.Expires)
 			cast.Character.AutoAttacks.OffhandSwingAt = MaxDuration(cast.Character.AutoAttacks.OffhandSwingAt, cast.Character.Hardcast.Expires)
+			cast.Character.AutoAttacks.RangedSwingAt = MaxDuration(cast.Character.AutoAttacks.RangedSwingAt, cast.Character.Hardcast.Expires)
 		}
 	}
 
@@ -213,6 +218,9 @@ type SimpleCast struct {
 	Cast
 
 	OnCastComplete OnCastComplete
+
+	// Turns off metrics recording for this cast.
+	DisableMetrics bool
 }
 
 func (simpleCast *SimpleCast) Init(sim *Simulation) {
@@ -222,7 +230,9 @@ func (simpleCast *SimpleCast) Init(sim *Simulation) {
 // TODO: Need to rename this. Cant call it Cast() because of conflict with field of the same name.
 func (simpleCast *SimpleCast) StartCast(sim *Simulation) bool {
 	return simpleCast.Cast.startCasting(sim, func(sim *Simulation, cast *Cast) {
-		cast.Character.Metrics.AddCast(cast)
+		if !simpleCast.DisableMetrics {
+			cast.Character.Metrics.AddCast(cast)
+		}
 		if simpleCast.OnCastComplete != nil {
 			simpleCast.OnCastComplete(sim, cast)
 		}
