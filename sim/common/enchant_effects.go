@@ -20,7 +20,8 @@ func init() {
 }
 
 func ApplyWeaponSuperiorStriking(agent core.Agent) {
-	agent.GetCharacter().PseudoStats.BonusWeaponDamage += 5
+	agent.GetCharacter().PseudoStats.BonusMeleeDamage += 5
+	// Melee only, no ranged bonus.
 }
 
 var CrusaderAuraID = core.NewAuraID()
@@ -90,7 +91,8 @@ func ApplyCrusader(agent core.Agent) {
 }
 
 func ApplyRingStriking(agent core.Agent) {
-	agent.GetCharacter().PseudoStats.BonusWeaponDamage += 2
+	agent.GetCharacter().PseudoStats.BonusMeleeDamage += 2
+	agent.GetCharacter().PseudoStats.BonusRangedDamage += 2
 }
 
 var MongooseAuraID = core.NewAuraID()

@@ -507,7 +507,7 @@ func AddBloodlustAura(sim *Simulation, character *Character, actionTag int32) {
 		character.PseudoStats.CastSpeedMultiplier /= 1.2
 	}
 	character.PseudoStats.CastSpeedMultiplier *= bonus
-	character.MultiplyMeleeSpeed(sim, bonus)
+	character.MultiplyAttackSpeed(sim, bonus)
 
 	character.AddAura(sim, Aura{
 		ID:       BloodlustAuraID,
@@ -518,7 +518,7 @@ func AddBloodlustAura(sim *Simulation, character *Character, actionTag int32) {
 			if character.HasAura(PowerInfusionAuraID) {
 				character.PseudoStats.CastSpeedMultiplier *= 1.2
 			}
-			character.MultiplyMeleeSpeed(sim, inverseBonus)
+			character.MultiplyAttackSpeed(sim, inverseBonus)
 		},
 	})
 

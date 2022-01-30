@@ -332,7 +332,8 @@ func (sdm *StatDependencyManager) ApplyStatDependencies(stats Stats) Stats {
 
 type PseudoStats struct {
 	CastSpeedMultiplier   float64
-	AttackSpeedMultiplier float64
+	MeleeSpeedMultiplier  float64
+	RangedSpeedMultiplier float64
 
 	FiveSecondRuleRefreshTime time.Duration // last time a spell was cast
 	SpiritRegenRateCasting    float64       // percentage of spirit regen allowed during casting
@@ -341,15 +342,17 @@ type PseudoStats struct {
 	ForceFullSpiritRegen  bool    // If set, automatically uses full spirit regen regardless of FSR refresh time.
 	SpiritRegenMultiplier float64 // Multiplier on spirit portion of mana regen.
 
-	BonusWeaponDamage float64 // Comes from '+X Weapon Damage' effects.
+	BonusMeleeDamage  float64 // Comes from '+X Weapon Damage' effects, affects melee hits only.
+	BonusRangedDamage float64 // Comes from '+X Weapon Damage' effects, affects ranged hits only.
 
 	ThreatMultiplier float64 // Modulates the threat generated. Affected by things like salv.
 }
 
 func NewPseudoStats() PseudoStats {
 	return PseudoStats{
-		AttackSpeedMultiplier: 1,
-		CastSpeedMultiplier:   1,
+		CastSpeedMultiplier:  1,
+		MeleeSpeedMultiplier: 1,
+		//RangedSpeedMultiplier: 1, // Leave at 0 so we can use this to ignore ranged stuff for non-hunters.
 		SpiritRegenMultiplier: 1,
 		ThreatMultiplier:      1,
 	}

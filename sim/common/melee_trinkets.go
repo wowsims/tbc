@@ -182,7 +182,8 @@ func init() {
 var CrystalforgedTrinketCooldownID = core.NewCooldownID()
 
 func ApplyCrystalforgedTrinket(agent core.Agent) {
-	agent.GetCharacter().PseudoStats.BonusWeaponDamage += 7
+	agent.GetCharacter().PseudoStats.BonusMeleeDamage += 7
+	agent.GetCharacter().PseudoStats.BonusRangedDamage += 7
 	core.RegisterTemporaryStatsOnUseCD(
 		agent,
 		core.OffensiveTrinketActiveAuraID,

@@ -7,12 +7,15 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
+var DwarfGunSpecializationAuraID = NewAuraID()
 var HumanWeaponSpecializationAuraID = NewAuraID()
 
 var OrcBloodFuryAuraID = NewAuraID()
 var OrcBloodFuryCooldownID = NewCooldownID()
+var OrcCommandAuraID = NewAuraID()
 var OrcWeaponSpecializationAuraID = NewAuraID()
 
+var TrollBowSpecializationAuraID = NewAuraID()
 var TrollBeastSlayingAuraID = NewAuraID()
 
 var TrollBerserkingAuraID = NewAuraID()
@@ -26,7 +29,26 @@ func applyRaceEffects(agent Agent) {
 		// TODO: Add major cooldown: arcane torrent
 	case proto.Race_RaceDraenei:
 	case proto.Race_RaceDwarf:
-		// TODO: If gun equipped, +1% ranged crit
+		// Gun specialization (+1% ranged crit when using a gun).
+		matches := false
+		if weapon := character.Equip[proto.ItemSlot_ItemSlotRanged]; weapon.ID != 0 {
+			if weapon.RangedWeaponType == proto.RangedWeaponType_RangedWeaponTypeGun {
+				matches = true
+			}
+		}
+
+		if matches && character.Class == proto.Class_ClassHunter {
+			character.AddPermanentAura(func(sim *Simulation) Aura {
+				return Aura{
+					ID: DwarfGunSpecializationAuraID,
+					OnBeforeMeleeHit: func(sim *Simulation, ability *ActiveMeleeAbility, hitEffect *AbilityHitEffect) {
+						if hitEffect.IsRanged() {
+							hitEffect.BonusCritRating += 1 * MeleeCritRatingPerCritChance
+						}
+					},
+				}
+			})
+		}
 	case proto.Race_RaceGnome:
 		character.AddStatDependency(stats.StatDependency{
 			SourceStat:   stats.Intellect,
@@ -77,8 +99,29 @@ func applyRaceEffects(agent Agent) {
 		}
 	case proto.Race_RaceNightElf:
 	case proto.Race_RaceOrc:
-		// TODO: Pet melee damage +5%
-		// TODO: +5 expertise with axes
+		// Command (Pet damage +5%)
+		if len(character.Pets) > 0 {
+			const multiplier = 1.05
+			for _, petAgent := range character.Pets {
+				pet := petAgent.GetPet()
+				pet.AddPermanentAura(func(sim *Simulation) Aura {
+					return Aura{
+						ID: OrcCommandAuraID,
+						OnBeforeMeleeHit: func(sim *Simulation, ability *ActiveMeleeAbility, hitEffect *AbilityHitEffect) {
+							hitEffect.DamageMultiplier *= multiplier
+						},
+						OnBeforeSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect) {
+							spellEffect.DamageMultiplier *= multiplier
+						},
+						OnBeforePeriodicDamage: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect, tickDamage *float64) {
+							*tickDamage *= multiplier
+						},
+					}
+				})
+			}
+		}
+
+		// Blood Fury
 		const cd = time.Minute * 2
 		const dur = time.Second * 15
 		const apBonus = 282 // level * 4 + 2
@@ -118,6 +161,7 @@ func applyRaceEffects(agent Agent) {
 			},
 		})
 
+		// Axe specialization
 		const expertiseBonus = 5 * ExpertisePerQuarterPercentReduction
 		mhMatches := false
 		ohMatches := false
@@ -152,7 +196,26 @@ func applyRaceEffects(agent Agent) {
 	case proto.Race_RaceTauren:
 		// TODO: Health +5%
 	case proto.Race_RaceTroll10, proto.Race_RaceTroll30:
-		// TODO: +1% ranged crit when using a bow
+		// Bow specialization (+1% ranged crit when using a bow).
+		matches := false
+		if weapon := character.Equip[proto.ItemSlot_ItemSlotRanged]; weapon.ID != 0 {
+			if weapon.RangedWeaponType == proto.RangedWeaponType_RangedWeaponTypeBow {
+				matches = true
+			}
+		}
+
+		if matches && character.Class == proto.Class_ClassHunter {
+			character.AddPermanentAura(func(sim *Simulation) Aura {
+				return Aura{
+					ID: TrollBowSpecializationAuraID,
+					OnBeforeMeleeHit: func(sim *Simulation, ability *ActiveMeleeAbility, hitEffect *AbilityHitEffect) {
+						if hitEffect.IsRanged() {
+							hitEffect.BonusCritRating += 1 * MeleeCritRatingPerCritChance
+						}
+					},
+				}
+			})
+		}
 
 		// Beast Slaying (+5% damage to beasts)
 		character.AddPermanentAura(func(sim *Simulation) Aura {
@@ -206,14 +269,14 @@ func applyRaceEffects(agent Agent) {
 				return func(sim *Simulation, character *Character) {
 					// Increase cast speed multiplier
 					character.PseudoStats.CastSpeedMultiplier *= hasteBonus
-					character.MultiplyMeleeSpeed(sim, hasteBonus)
+					character.MultiplyAttackSpeed(sim, hasteBonus)
 					character.AddAura(sim, Aura{
 						ID:       TrollBerserkingAuraID,
 						ActionID: actionID,
 						Expires:  sim.CurrentTime + dur,
 						OnExpire: func(sim *Simulation) {
 							character.PseudoStats.CastSpeedMultiplier /= hasteBonus
-							character.MultiplyMeleeSpeed(sim, inverseBonus)
+							character.MultiplyAttackSpeed(sim, inverseBonus)
 						},
 					})
 					character.SpendMana(sim, manaCost, actionID)
