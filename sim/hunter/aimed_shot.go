@@ -1,8 +1,6 @@
 package hunter
 
 import (
-	"time"
-
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/stats"
 )
@@ -17,9 +15,10 @@ func (hunter *Hunter) newAimedShotTemplate(sim *core.Simulation) core.MeleeAbili
 			Character:      &hunter.Character,
 			SpellSchool:    stats.AttackPower,
 			CritMultiplier: 2.0,
-			Cooldown:       time.Second * 6,
 			// Actual aimed shot has a 2.5s cast time, but we only use it as an instant precast.
-			IgnoreCooldowns: true,
+			//CastTime:       time.Millisecond * 2500,
+			//Cooldown:       time.Second * 6,
+			//GCD:            core.GCDDefault,
 			Cost: core.ResourceCost{
 				Type:  stats.Mana,
 				Value: 370,

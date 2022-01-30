@@ -17,6 +17,7 @@ func (hunter *Hunter) newArcaneShotTemplate(sim *core.Simulation) core.MeleeAbil
 			Character:      &hunter.Character,
 			SpellSchool:    stats.ArcaneSpellPower,
 			CritMultiplier: 2.0,
+			GCD:            core.GCDDefault,
 			Cooldown:       time.Second * 6,
 			Cost: core.ResourceCost{
 				Type:  stats.Mana,

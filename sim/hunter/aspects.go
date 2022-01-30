@@ -50,6 +50,7 @@ func (hunter *Hunter) newAspectOfTheHawkTemplate(sim *core.Simulation) core.Simp
 			Character:    hunter.GetCharacter(),
 			BaseManaCost: 140,
 			ManaCost:     140,
+			GCD:          core.GCDDefault,
 			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
 				hunter.RemoveAura(sim, AspectOfTheViperAuraID)
 				hunter.AddAura(sim, aura)
@@ -78,6 +79,7 @@ func (hunter *Hunter) newAspectOfTheViperTemplate(sim *core.Simulation) core.Sim
 			Character:    hunter.GetCharacter(),
 			BaseManaCost: 40,
 			ManaCost:     40,
+			GCD:          core.GCDDefault,
 			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
 				hunter.RemoveAura(sim, AspectOfTheHawkAuraID)
 				hunter.AddAura(sim, aura)

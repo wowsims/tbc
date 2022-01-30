@@ -13,6 +13,7 @@ func (druid *Druid) newFaerieFireTemplate(sim *core.Simulation) core.SimpleSpell
 				Character:    druid.GetCharacter(),
 				BaseManaCost: 145,
 				ManaCost:     145,
+				GCD:          core.GCDDefault,
 			},
 		},
 		Effect: core.SpellHitEffect{

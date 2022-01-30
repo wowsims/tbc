@@ -18,7 +18,6 @@ func (hunter *Hunter) registerRapidFireCD() {
 			ActionID:     actionID,
 			Character:    hunter.GetCharacter(),
 			Cooldown:     cooldown,
-			IgnoreGCD:    true,
 			BaseManaCost: 100,
 			ManaCost:     100,
 			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {

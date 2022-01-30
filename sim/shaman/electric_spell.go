@@ -37,10 +37,11 @@ func (shaman *Shaman) newElectricSpellCast(actionID core.ActionID, baseManaCost 
 		Cast: core.Cast{
 			ActionID:       actionID,
 			Character:      shaman.GetCharacter(),
+			SpellSchool:    stats.NatureSpellPower,
 			BaseManaCost:   baseManaCost,
 			ManaCost:       baseManaCost,
 			CastTime:       baseCastTime,
-			SpellSchool:    stats.NatureSpellPower,
+			GCD:            core.GCDDefault,
 			CritMultiplier: 1.5,
 		},
 	}
@@ -53,7 +54,7 @@ func (shaman *Shaman) newElectricSpellCast(actionID core.ActionID, baseManaCost 
 		spellCast.ActionID.Tag = CastTagLightningOverload
 		spellCast.CastTime = 0
 		spellCast.ManaCost = 0
-		spellCast.IgnoreCooldowns = true
+		spellCast.GCD = 0
 		spellCast.IgnoreManaCost = true
 	} else if shaman.Talents.LightningMastery > 0 {
 		// Convection applies against the base cost of the spell.

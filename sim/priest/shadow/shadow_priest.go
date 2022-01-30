@@ -89,7 +89,7 @@ func (spriest *ShadowPriest) tryUseGCD(sim *core.Simulation) {
 	if spriest.rotation.PrecastVt && sim.CurrentTime == 0 {
 		spell := spriest.NewVampiricTouch(sim, sim.GetPrimaryTarget())
 		spell.CastTime = 0
-		spell.IgnoreCooldowns = true
+		spell.GCD = 0
 		spell.Cast(sim)
 	}
 

@@ -20,6 +20,7 @@ func (priest *Priest) newMindflayTemplate(sim *core.Simulation) core.SimpleSpell
 		BaseManaCost:   230,
 		ManaCost:       230,
 		CastTime:       0,
+		GCD:            core.GCDDefault,
 		Binary:         true,
 		ActionID: core.ActionID{
 			SpellID: SpellIDMindFlay,

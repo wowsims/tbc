@@ -22,6 +22,7 @@ func (shaman *Shaman) registerBloodlustCD() {
 			Character:    shaman.GetCharacter(),
 			BaseManaCost: 750,
 			ManaCost:     750,
+			GCD:          core.GCDDefault,
 			Cooldown:     core.BloodlustCD,
 			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
 				for _, partyMember := range shaman.Party.Players {

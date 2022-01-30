@@ -15,15 +15,13 @@ func (shaman *Shaman) newSearingTotemTemplate(sim *core.Simulation) core.SimpleS
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				CritMultiplier: 1.5,
-				SpellSchool:    stats.FireSpellPower,
+				ActionID:       core.ActionID{SpellID: SpellIDSearingTotem},
 				Character:      &shaman.Character,
+				SpellSchool:    stats.FireSpellPower,
 				BaseManaCost:   205,
 				ManaCost:       205,
-				ActionID: core.ActionID{
-					SpellID: SpellIDSearingTotem,
-				},
-				GCDCooldown: time.Second,
+				GCD:            time.Second,
+				CritMultiplier: 1.5,
 			},
 		},
 		Effect: core.SpellHitEffect{
@@ -79,15 +77,13 @@ func (shaman *Shaman) newMagmaTotemTemplate(sim *core.Simulation) core.SimpleSpe
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				CritMultiplier: 1.5,
-				SpellSchool:    stats.FireSpellPower,
+				ActionID:       core.ActionID{SpellID: SpellIDMagmaTotem},
 				Character:      &shaman.Character,
+				SpellSchool:    stats.FireSpellPower,
 				BaseManaCost:   800,
 				ManaCost:       800,
-				ActionID: core.ActionID{
-					SpellID: SpellIDMagmaTotem,
-				},
-				GCDCooldown: time.Second,
+				GCD:            time.Second,
+				CritMultiplier: 1.5,
 			},
 		},
 		AOECap: 1600,
@@ -148,17 +144,17 @@ func (shaman *Shaman) newNovaTotemTemplate(sim *core.Simulation) core.SimpleSpel
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				CritMultiplier: 1.5,
-				SpellSchool:    stats.FireSpellPower,
-				Character:      &shaman.Character,
-				BaseManaCost:   800,
-				ManaCost:       800,
 				ActionID: core.ActionID{
 					SpellID:    SpellIDNovaTotem,
 					CooldownID: CooldownIDNovaTotem,
 				},
-				Cooldown:    time.Second * 15,
-				GCDCooldown: time.Second,
+				Character:      &shaman.Character,
+				SpellSchool:    stats.FireSpellPower,
+				BaseManaCost:   800,
+				ManaCost:       800,
+				GCD:            time.Second,
+				Cooldown:       time.Second * 15,
+				CritMultiplier: 1.5,
 			},
 		},
 		AOECap: 9975,

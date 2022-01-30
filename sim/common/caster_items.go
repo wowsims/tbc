@@ -74,12 +74,9 @@ func ApplyTimbals(agent core.Agent) {
 	timbalsTemplate := core.NewSimpleSpellTemplate(core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				CritMultiplier:  1.5,
-				SpellSchool:     stats.ShadowSpellPower,
-				IgnoreCooldowns: true,
-				ActionID: core.ActionID{
-					SpellID: 45055,
-				},
+				ActionID:       core.ActionID{SpellID: 45055},
+				CritMultiplier: 1.5,
+				SpellSchool:    stats.ShadowSpellPower,
 			},
 		},
 		Effect: core.SpellHitEffect{

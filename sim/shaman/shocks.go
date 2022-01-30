@@ -20,17 +20,18 @@ func (shaman *Shaman) newShockTemplateSpell(sim *core.Simulation, spellID int32,
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				CritMultiplier: 1.5,
-				SpellSchool:    spellSchool,
-				Character:      &shaman.Character,
-				BaseManaCost:   baseManaCost,
-				ManaCost:       baseManaCost,
-				Cooldown:       time.Second * 6,
 				ActionID: core.ActionID{
 					SpellID:    spellID,
 					CooldownID: ShockCooldownID,
 				},
-				Binary: true,
+				Character:      &shaman.Character,
+				SpellSchool:    spellSchool,
+				BaseManaCost:   baseManaCost,
+				ManaCost:       baseManaCost,
+				GCD:            core.GCDDefault,
+				Cooldown:       time.Second * 6,
+				Binary:         true,
+				CritMultiplier: 1.5,
 			},
 		},
 		Effect: core.SpellHitEffect{

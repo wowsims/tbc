@@ -23,6 +23,7 @@ func (mage *Mage) newFlamestrikeTemplate(sim *core.Simulation) core.SimpleSpellT
 				BaseManaCost:   1175,
 				ManaCost:       1175,
 				CastTime:       time.Second * 3,
+				GCD:            core.GCDDefault,
 				ActionID: core.ActionID{
 					SpellID: SpellIDFlamestrike,
 				},
@@ -78,8 +79,7 @@ func (mage *Mage) newFlamestrikeDotTemplate(sim *core.Simulation) core.SimpleSpe
 					SpellID: SpellIDFlamestrike,
 					Tag:     CastTagFlamestrikeDot,
 				},
-				IgnoreCooldowns: true,
-				IgnoreManaCost:  true,
+				IgnoreManaCost: true,
 			},
 		},
 	}

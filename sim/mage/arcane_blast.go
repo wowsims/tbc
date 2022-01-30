@@ -34,6 +34,7 @@ func (mage *Mage) newArcaneBlastTemplate(sim *core.Simulation) core.SimpleSpellT
 				BaseManaCost:   ArcaneBlastBaseManaCost,
 				ManaCost:       ArcaneBlastBaseManaCost,
 				CastTime:       ArcaneBlastBaseCastTime,
+				GCD:            core.GCDDefault,
 				ActionID: core.ActionID{
 					SpellID: SpellIDArcaneBlast,
 				},

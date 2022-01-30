@@ -41,6 +41,7 @@ func (shaman *Shaman) newStormstrikeTemplate(sim *core.Simulation) core.MeleeAbi
 			ActionID:    StormstrikeActionID,
 			Character:   &shaman.Character,
 			SpellSchool: stats.AttackPower,
+			GCD:         core.GCDDefault,
 			Cooldown:    time.Second * 10,
 			Cost: core.ResourceCost{
 				Type:  stats.Mana,

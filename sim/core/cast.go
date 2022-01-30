@@ -30,16 +30,8 @@ type Cast struct {
 	// Note that the GCD CD will be activated even if this is not set.
 	Cooldown time.Duration
 
-	// If set, this will be used as the GCD instead of the default value (1.5s).
-	GCDCooldown time.Duration
-
-	// If set, CD for this action and GCD CD will be ignored, and this action
-	// will not set new values for those CDs either.
-	IgnoreCooldowns bool
-
-	// If set, GCD CD for this action will be ignored, and this action
-	// will not set new values for the GCD either.
-	IgnoreGCD bool
+	// The amount of GCD time incurred by this cast. This is almost always 0, 1s, or 1.5s.
+	GCD time.Duration
 
 	// If set, this spell will have its mana cost ignored.
 	IgnoreManaCost bool
@@ -125,11 +117,11 @@ func (cast *Cast) init(sim *Simulation) {
 	cast.Character.OnCast(sim, cast)
 
 	// By panicking if spell is on CD, we force each sim to properly check for their own CDs.
-	if !cast.IgnoreCooldowns {
-		if !cast.IgnoreGCD && cast.Character.IsOnCD(GCDCooldownID, sim.CurrentTime) {
-			panic(fmt.Sprintf("Trying to cast %s but GCD on cooldown for %s", cast.ActionID, cast.Character.GetRemainingCD(GCDCooldownID, sim.CurrentTime)))
-		}
+	if cast.GCD != 0 && cast.Character.IsOnCD(GCDCooldownID, sim.CurrentTime) {
+		panic(fmt.Sprintf("Trying to cast %s but GCD on cooldown for %s", cast.ActionID, cast.Character.GetRemainingCD(GCDCooldownID, sim.CurrentTime)))
+	}
 
+	if cast.Cooldown != 0 {
 		cooldownID := cast.ActionID.CooldownID
 		if cast.Character.IsOnCD(cooldownID, sim.CurrentTime) {
 			panic(fmt.Sprintf("Trying to cast %s but is still on cooldown for %s", cast.ActionID, cast.Character.GetRemainingCD(cooldownID, sim.CurrentTime)))
@@ -158,7 +150,7 @@ func (cast *Cast) startCasting(sim *Simulation, onCastComplete OnCastComplete) b
 
 	// This needs to come before the internalOnComplete() call so that changes to
 	// casting speed caused by the cast don't affect the GCD CD.
-	if !cast.IgnoreCooldowns && !cast.IgnoreGCD {
+	if cast.GCD != 0 {
 		// Prevent any actions on the GCD until the cast AND the GCD are done.
 		gcdCD := MaxDuration(cast.CalculatedGCD(cast.Character), cast.CastTime+cast.AfterCastDelay)
 		cast.Character.SetGCDTimer(sim, sim.CurrentTime+gcdCD)
@@ -187,11 +179,7 @@ func (cast *Cast) startCasting(sim *Simulation, onCastComplete OnCastComplete) b
 }
 
 func (cast *Cast) CalculatedGCD(char *Character) time.Duration {
-	baseGCD := GCDDefault
-	if cast.GCDCooldown != 0 {
-		baseGCD = cast.GCDCooldown
-	}
-	return MaxDuration(GCDMin, time.Duration(float64(baseGCD)/char.CastSpeed()))
+	return MaxDuration(GCDMin, time.Duration(float64(cast.GCD)/char.CastSpeed()))
 }
 
 // Cast has finished, activate the effects of the cast.
@@ -201,7 +189,7 @@ func (cast *Cast) internalOnComplete(sim *Simulation, onCastComplete OnCastCompl
 		cast.Character.PseudoStats.FiveSecondRuleRefreshTime = sim.CurrentTime + time.Second*5
 	}
 
-	if !cast.IgnoreCooldowns && cast.Cooldown > 0 {
+	if cast.Cooldown > 0 {
 		cast.Character.SetCD(cast.ActionID.CooldownID, sim.CurrentTime+cast.Cooldown)
 	}
 

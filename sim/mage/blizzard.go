@@ -17,6 +17,7 @@ func (mage *Mage) newBlizzardTemplate(sim *core.Simulation) core.SimpleSpellTemp
 				Character:    &mage.Character,
 				BaseManaCost: 1645,
 				ManaCost:     1645,
+				GCD:          core.GCDDefault,
 				ActionID: core.ActionID{
 					SpellID: SpellIDBlizzard,
 				},

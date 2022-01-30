@@ -22,7 +22,9 @@ func (shaman *Shaman) newChainLightningTemplate(sim *core.Simulation, isLightnin
 			time.Millisecond*2000,
 			isLightningOverload),
 	}
-	spellTemplate.Cooldown = time.Second * 6
+	if !isLightningOverload {
+		spellTemplate.Cooldown = time.Second * 6
+	}
 
 	effect := shaman.newElectricSpellEffect(734, 838, 0.651, isLightningOverload)
 
