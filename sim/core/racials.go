@@ -81,7 +81,8 @@ func applyRaceEffects(agent Agent) {
 		// TODO: +5 expertise with axes
 		const cd = time.Minute * 2
 		const dur = time.Second * 15
-		const spBonus = 143
+		const apBonus = 282 // level * 4 + 2
+		const spBonus = 143 // level * 2 + 3
 		actionID := ActionID{SpellID: 33697}
 
 		character.AddMajorCooldown(MajorCooldown{
@@ -97,8 +98,21 @@ func applyRaceEffects(agent Agent) {
 			},
 			ActivationFactory: func(sim *Simulation) CooldownActivation {
 				return func(sim *Simulation, character *Character) {
-					character.SetCD(OrcBloodFuryCooldownID, cd+sim.CurrentTime)
-					character.AddAuraWithTemporaryStats(sim, OrcBloodFuryAuraID, actionID, stats.SpellPower, spBonus, dur)
+					character.AddStat(stats.AttackPower, apBonus)
+					character.AddStat(stats.RangedAttackPower, apBonus)
+					character.AddStat(stats.SpellPower, spBonus)
+
+					character.AddAura(sim, Aura{
+						ID:       OrcBloodFuryAuraID,
+						ActionID: actionID,
+						Expires:  sim.CurrentTime + dur,
+						OnExpire: func(sim *Simulation) {
+							character.AddStat(stats.AttackPower, -apBonus)
+							character.AddStat(stats.RangedAttackPower, -apBonus)
+							character.AddStat(stats.SpellPower, -spBonus)
+						},
+					})
+					character.SetCD(OrcBloodFuryCooldownID, sim.CurrentTime+cd)
 					character.Metrics.AddInstantCast(actionID)
 				}
 			},
@@ -190,7 +204,6 @@ func applyRaceEffects(agent Agent) {
 			ActivationFactory: func(sim *Simulation) CooldownActivation {
 				manaCost = character.BaseMana() * 0.06
 				return func(sim *Simulation, character *Character) {
-					character.SetCD(TrollBerserkingCooldownID, cd+sim.CurrentTime)
 					// Increase cast speed multiplier
 					character.PseudoStats.CastSpeedMultiplier *= hasteBonus
 					character.MultiplyMeleeSpeed(sim, hasteBonus)
@@ -204,6 +217,7 @@ func applyRaceEffects(agent Agent) {
 						},
 					})
 					character.SpendMana(sim, manaCost, actionID)
+					character.SetCD(TrollBerserkingCooldownID, sim.CurrentTime+cd)
 					character.Metrics.AddInstantCast(actionID)
 				}
 			},
