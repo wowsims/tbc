@@ -38,15 +38,16 @@ func (shaman *Shaman) newStormstrikeTemplate(sim *core.Simulation) core.MeleeAbi
 	const skyshatterDur = time.Second * 12
 	ss := core.ActiveMeleeAbility{
 		MeleeAbility: core.MeleeAbility{
-			// ID for the action.
-			ActionID: StormstrikeActionID,
-			Cooldown: time.Second * 10,
+			ActionID:    StormstrikeActionID,
+			Character:   &shaman.Character,
+			SpellSchool: stats.AttackPower,
+			GCD:         core.GCDDefault,
+			Cooldown:    time.Second * 10,
 			Cost: core.ResourceCost{
 				Type:  stats.Mana,
 				Value: 237,
 			},
 			CritMultiplier: 2.0,
-			Character:      &shaman.Character,
 		},
 		Effects: []core.AbilityHitEffect{
 			core.AbilityHitEffect{

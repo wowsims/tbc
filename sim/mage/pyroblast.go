@@ -23,6 +23,7 @@ func (mage *Mage) newPyroblastTemplate(sim *core.Simulation) core.SimpleSpellTem
 				BaseManaCost:   500,
 				ManaCost:       500,
 				CastTime:       time.Millisecond * 6000,
+				GCD:            core.GCDDefault,
 				ActionID: core.ActionID{
 					SpellID: SpellIDPyroblast,
 				},
@@ -68,8 +69,7 @@ func (mage *Mage) newPyroblastDotTemplate(sim *core.Simulation) core.SimpleSpell
 					SpellID: SpellIDPyroblast,
 					Tag:     CastTagPyroblastDot,
 				},
-				IgnoreCooldowns: true,
-				IgnoreManaCost:  true,
+				IgnoreManaCost: true,
 			},
 		},
 		Effect: core.SpellHitEffect{

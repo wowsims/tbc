@@ -86,6 +86,7 @@ func consumesStats(character *Character, c proto.Consumes, raidBuffs proto.RaidB
 	}
 	if c.FlaskOfRelentlessAssault {
 		s[stats.AttackPower] += 120
+		s[stats.RangedAttackPower] += 120
 	}
 
 	if c.BlackenedBasilisk {
@@ -133,7 +134,8 @@ func addImbueStats(character *Character, imbue proto.WeaponImbue) {
 		character.AddStats(stats.Stats{
 			stats.MeleeCrit: 14,
 		})
-		character.PseudoStats.BonusWeaponDamage += 12
+		character.PseudoStats.BonusMeleeDamage += 12
+		character.PseudoStats.BonusRangedDamage += 12
 	} else if imbue == proto.WeaponImbue_WeaponImbueElementalSharpeningStone {
 		character.AddStats(stats.Stats{
 			stats.MeleeCrit: 28,
@@ -242,6 +244,7 @@ func registerDrumsCD(agent Agent, partyBuffs proto.PartyBuffs, consumes proto.Co
 					Character:      character,
 					IgnoreManaCost: true,
 					CastTime:       time.Second * 1,
+					GCD:            GCDDefault,
 					OnCastComplete: func(sim *Simulation, cast *Cast) {
 						// When a real player is using drums, their cast applies to the whole party.
 						for _, agent := range character.Party.Players {
@@ -665,13 +668,12 @@ func makeConjuredActivation(conjuredType proto.Conjured, character *Character) (
 		castTemplate := NewSimpleSpellTemplate(SimpleSpell{
 			SpellCast: SpellCast{
 				Cast: Cast{
-					ActionID:        actionID,
-					Character:       character,
-					IgnoreCooldowns: true,
-					IgnoreManaCost:  true,
-					IsPhantom:       true,
-					SpellSchool:     stats.FireSpellPower,
-					CritMultiplier:  1.5,
+					ActionID:       actionID,
+					Character:      character,
+					IgnoreManaCost: true,
+					IsPhantom:      true,
+					SpellSchool:    stats.FireSpellPower,
+					CritMultiplier: 1.5,
 				},
 			},
 			Effect: SpellHitEffect{

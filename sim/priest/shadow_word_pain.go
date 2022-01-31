@@ -21,6 +21,7 @@ func (priest *Priest) newShadowWordPainTemplate(sim *core.Simulation) core.Simpl
 		BaseManaCost:   575,
 		ManaCost:       575,
 		CastTime:       0,
+		GCD:            core.GCDDefault,
 		ActionID:       ShadowWordPainActionID,
 	}
 

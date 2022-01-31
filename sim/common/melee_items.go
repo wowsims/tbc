@@ -49,7 +49,7 @@ func ApplyKhoriumChampion(agent core.Agent) {
 		return core.Aura{
 			ID: KhoriumChampionAuraID,
 			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
-				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() {
+				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() || !hitEffect.IsMelee() {
 					return
 				}
 				if sim.RandomFloat("KhoriumChampion") > procChance {
@@ -63,7 +63,8 @@ func ApplyKhoriumChampion(agent core.Agent) {
 }
 
 func ApplyBraidedEterniumChain(agent core.Agent) {
-	agent.GetCharacter().PseudoStats.BonusWeaponDamage += 5
+	agent.GetCharacter().PseudoStats.BonusMeleeDamage += 5
+	agent.GetCharacter().PseudoStats.BonusRangedDamage += 5
 }
 
 var BlackoutTruncheonAuraID = core.NewAuraID()
@@ -107,7 +108,7 @@ func ApplyLionheartChampion(agent core.Agent) {
 		return core.Aura{
 			ID: LionheartChampionAuraID,
 			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
-				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() {
+				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() || !hitEffect.IsMelee() {
 					return
 				}
 				if sim.RandomFloat("LionheartChampion") > procChance {
@@ -133,7 +134,7 @@ func ApplyLionheartExecutioner(agent core.Agent) {
 		return core.Aura{
 			ID: LionheartExecutionerAuraID,
 			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
-				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() {
+				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() || !hitEffect.IsMelee() {
 					return
 				}
 				if sim.RandomFloat("LionheartExecutioner") > procChance {
@@ -236,11 +237,11 @@ func ApplyDespair(agent core.Agent) {
 
 	templ := core.ActiveMeleeAbility{
 		MeleeAbility: core.MeleeAbility{
-			ActionID:        actionID,
-			CritMultiplier:  2,
-			Character:       character,
-			IgnoreCooldowns: true,
-			IgnoreCost:      true,
+			ActionID:       actionID,
+			Character:      character,
+			SpellSchool:    stats.AttackPower,
+			CritMultiplier: 2,
+			IgnoreCost:     true,
 		},
 		Effect: core.AbilityHitEffect{
 			AbilityEffect: core.AbilityEffect{
@@ -263,7 +264,7 @@ func ApplyDespair(agent core.Agent) {
 		return core.Aura{
 			ID: DespairAuraID,
 			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
-				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() {
+				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() || !hitEffect.IsMelee() {
 					return
 				}
 				if sim.RandomFloat("Despair") > procChance {
@@ -286,11 +287,11 @@ func ApplyTheDecapitator(agent core.Agent) {
 
 	templ := core.ActiveMeleeAbility{
 		MeleeAbility: core.MeleeAbility{
-			ActionID:        actionID,
-			CritMultiplier:  2,
-			Character:       character,
-			IgnoreCooldowns: true,
-			IgnoreCost:      true,
+			ActionID:       actionID,
+			Character:      character,
+			SpellSchool:    stats.AttackPower,
+			CritMultiplier: 2,
+			IgnoreCost:     true,
 		},
 		Effect: core.AbilityHitEffect{
 			AbilityEffect: core.AbilityEffect{
@@ -348,13 +349,12 @@ func ApplyGlaiveOfThePit(agent core.Agent) {
 		castTemplate := core.NewSimpleSpellTemplate(core.SimpleSpell{
 			SpellCast: core.SpellCast{
 				Cast: core.Cast{
-					ActionID:        core.ActionID{SpellID: 34696},
-					Character:       character,
-					IgnoreCooldowns: true,
-					IgnoreManaCost:  true,
-					IsPhantom:       true,
-					SpellSchool:     stats.ShadowSpellPower,
-					CritMultiplier:  1.5,
+					ActionID:       core.ActionID{SpellID: 34696},
+					Character:      character,
+					IgnoreManaCost: true,
+					IsPhantom:      true,
+					SpellSchool:    stats.ShadowSpellPower,
+					CritMultiplier: 1.5,
 				},
 			},
 			Effect: core.SpellHitEffect{
@@ -373,7 +373,7 @@ func ApplyGlaiveOfThePit(agent core.Agent) {
 		return core.Aura{
 			ID: GlaiveOfThePitAuraID,
 			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
-				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() {
+				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() || !hitEffect.IsMelee() {
 					return
 				}
 				if sim.RandomFloat("GlaiveOfThePit") > procChance {
@@ -494,7 +494,7 @@ func ApplyWorldBreaker(agent core.Agent) {
 		return core.Aura{
 			ID: WorldBreakerAuraID,
 			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
-				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() {
+				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() || !hitEffect.IsMelee() {
 					if character.HasAura(WorldBreakerProcAuraID) {
 						character.RemoveAura(sim, WorldBreakerProcAuraID)
 					}
@@ -563,7 +563,7 @@ func ApplyDevastation(agent core.Agent) {
 		return core.Aura{
 			ID: DevastationAuraID,
 			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
-				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() {
+				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() || !hitEffect.IsMelee() {
 					return
 				}
 				if sim.RandomFloat("Devastation") > procChance {
@@ -597,7 +597,7 @@ func ApplySingingCrystalAxe(agent core.Agent) {
 		return core.Aura{
 			ID: SingingCrystalAxeAuraID,
 			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
-				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() {
+				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() || !hitEffect.IsMelee() {
 					return
 				}
 				if sim.RandomFloat("SingingCrystalAxe") > procChance {
@@ -667,13 +667,12 @@ func ApplySyphonOfTheNathrezim(agent core.Agent) {
 		castTemplate := core.NewSimpleSpellTemplate(core.SimpleSpell{
 			SpellCast: core.SpellCast{
 				Cast: core.Cast{
-					ActionID:        core.ActionID{SpellID: 40291},
-					Character:       character,
-					IgnoreCooldowns: true,
-					IgnoreManaCost:  true,
-					IsPhantom:       true,
-					SpellSchool:     stats.ShadowSpellPower,
-					CritMultiplier:  1.5,
+					ActionID:       core.ActionID{SpellID: 40291},
+					Character:      character,
+					IgnoreManaCost: true,
+					IsPhantom:      true,
+					SpellSchool:    stats.ShadowSpellPower,
+					CritMultiplier: 1.5,
 				},
 			},
 			Effect: core.SpellHitEffect{
@@ -705,7 +704,7 @@ func ApplySyphonOfTheNathrezim(agent core.Agent) {
 				ActionID: core.ActionID{SpellID: 40291, Tag: tag},
 				Expires:  sim.CurrentTime + (time.Second * 6),
 				OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
-					if !hitEffect.Landed() || !hitEffect.IsWeaponHit() {
+					if !hitEffect.Landed() || !hitEffect.IsWeaponHit() || !hitEffect.IsMelee() {
 						return
 					}
 
@@ -722,7 +721,7 @@ func ApplySyphonOfTheNathrezim(agent core.Agent) {
 		return core.Aura{
 			ID: SyphonOfTheNathrezimAuraID,
 			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
-				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() {
+				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() || !hitEffect.IsMelee() {
 					return
 				}
 
@@ -743,8 +742,9 @@ func ApplyCloakOfDarkness(agent core.Agent) {
 		return core.Aura{
 			ID: CloakOfDarknessAuraID,
 			OnBeforeMeleeHit: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
-				// TODO: Melee crit only
-				hitEffect.BonusCritRating += 24
+				if !hitEffect.IsRanged() {
+					hitEffect.BonusCritRating += 24
+				}
 			},
 		}
 	})

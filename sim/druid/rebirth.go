@@ -19,6 +19,7 @@ func (druid *Druid) NewRebirth(sim *core.Simulation) *core.SimpleCast {
 			BaseManaCost: manaCost,
 			ManaCost:     manaCost,
 			CastTime:     time.Second*3 + time.Millisecond*500,
+			GCD:          core.GCDDefault,
 		},
 		OnCastComplete: func(sim *core.Simulation, cast *core.Cast) { druid.RebirthUsed = true },
 	}

@@ -19,6 +19,7 @@ func (priest *Priest) newStarshardsTemplate(sim *core.Simulation) core.SimpleSpe
 		BaseManaCost:   0,
 		ManaCost:       0,
 		CastTime:       0,
+		GCD:            core.GCDDefault,
 		Cooldown:       time.Second * 30,
 		ActionID: core.ActionID{
 			SpellID:    SpellIDStarshards,

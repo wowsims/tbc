@@ -242,7 +242,24 @@ func (character *Character) AddMeleeHaste(sim *Simulation, amount float64) {
 
 // MultiplyMeleeSpeed will alter the attack speed multiplier and change swing speed of all autoattack swings in progress.
 func (character *Character) MultiplyMeleeSpeed(sim *Simulation, amount float64) {
-	character.PseudoStats.AttackSpeedMultiplier *= amount
+	character.PseudoStats.MeleeSpeedMultiplier *= amount
+	character.AutoAttacks.ModifySwingTime(sim, amount)
+}
+
+func (character *Character) MultiplyRangedSpeed(sim *Simulation, amount float64) {
+	if character.PseudoStats.RangedSpeedMultiplier == 0 {
+		// Short-circuit all the logic for non-hunters.
+		return
+	}
+
+	character.PseudoStats.RangedSpeedMultiplier *= amount
+	character.AutoAttacks.ModifySwingTime(sim, amount)
+}
+
+// Helper for when both MultiplyMeleeSpeed and MultiplyRangedSpeed are needed.
+func (character *Character) MultiplyAttackSpeed(sim *Simulation, amount float64) {
+	character.PseudoStats.MeleeSpeedMultiplier *= amount
+	character.PseudoStats.RangedSpeedMultiplier *= amount
 	character.AutoAttacks.ModifySwingTime(sim, amount)
 }
 
@@ -279,7 +296,11 @@ func (character *Character) CastSpeed() float64 {
 }
 
 func (character *Character) SwingSpeed() float64 {
-	return character.PseudoStats.AttackSpeedMultiplier * (1 + (character.stats[stats.MeleeHaste] / (HasteRatingPerHastePercent * 100)))
+	return character.PseudoStats.MeleeSpeedMultiplier * (1 + (character.stats[stats.MeleeHaste] / (HasteRatingPerHastePercent * 100)))
+}
+
+func (character *Character) RangedSwingSpeed() float64 {
+	return character.PseudoStats.RangedSpeedMultiplier * (1 + (character.stats[stats.MeleeHaste] / (HasteRatingPerHastePercent * 100)))
 }
 
 func (character *Character) AddRaidBuffs(raidBuffs *proto.RaidBuffs) {

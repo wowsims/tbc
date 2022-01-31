@@ -19,6 +19,7 @@ func (mage *Mage) newFrostboltTemplate(sim *core.Simulation) core.SimpleSpellTem
 				BaseManaCost:   330,
 				ManaCost:       330,
 				CastTime:       time.Millisecond * 3000,
+				GCD:            core.GCDDefault,
 				ActionID: core.ActionID{
 					SpellID: SpellIDFrostbolt,
 				},

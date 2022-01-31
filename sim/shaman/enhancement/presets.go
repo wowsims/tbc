@@ -62,7 +62,7 @@ var enhShamOptions = &proto.EnhancementShaman_Options{
 	Bloodlust:          true,
 	DelayOffhandSwings: true,
 	MainHandImbue:      proto.ShamanWeaponImbue_ImbueWindfury,
-	OffHandImbue:       proto.ShamanWeaponImbue_ImbueFlametongue,
+	OffHandImbue:       proto.ShamanWeaponImbue_ImbueWindfury,
 }
 
 var FullRaidBuffs = &proto.RaidBuffs{

@@ -8,17 +8,17 @@ import (
 var Enchants = []Enchant{
 	// Head
 	{ID: 29191, EffectID: 3002, Name: "Glyph of Power", Quality: proto.ItemQuality_ItemQualityUncommon, Bonus: stats.Stats{stats.SpellPower: 22, stats.SpellHit: 14}, ItemType: proto.ItemType_ItemTypeHead},
-	{ID: 29192, EffectID: 3003, Name: "Glyph of Ferocity", Quality: proto.ItemQuality_ItemQualityUncommon, Bonus: stats.Stats{stats.AttackPower: 34, stats.MeleeHit: 16}, ItemType: proto.ItemType_ItemTypeHead},
+	{ID: 29192, EffectID: 3003, Name: "Glyph of Ferocity", Quality: proto.ItemQuality_ItemQualityUncommon, Bonus: stats.Stats{stats.AttackPower: 34, stats.RangedAttackPower: 34, stats.MeleeHit: 16}, ItemType: proto.ItemType_ItemTypeHead},
 	{ID: 30846, EffectID: 3096, Name: "Glyph of the Outcast", Quality: proto.ItemQuality_ItemQualityUncommon, Bonus: stats.Stats{stats.Strength: 17, stats.Intellect: 16}, ItemType: proto.ItemType_ItemTypeHead},
 
 	// Shoulder
 	{ID: 28886, EffectID: 2982, Name: "Greater Inscription of Discipline", Quality: proto.ItemQuality_ItemQualityRare, Bonus: stats.Stats{stats.SpellPower: 18, stats.SpellCrit: 10}, ItemType: proto.ItemType_ItemTypeShoulder},
-	{ID: 28888, EffectID: 2986, Name: "Greater Inscription of Vengeance", Quality: proto.ItemQuality_ItemQualityRare, Bonus: stats.Stats{stats.AttackPower: 30, stats.MeleeCrit: 10}, ItemType: proto.ItemType_ItemTypeShoulder},
+	{ID: 28888, EffectID: 2986, Name: "Greater Inscription of Vengeance", Quality: proto.ItemQuality_ItemQualityRare, Bonus: stats.Stats{stats.AttackPower: 30, stats.RangedAttackPower: 30, stats.MeleeCrit: 10}, ItemType: proto.ItemType_ItemTypeShoulder},
 	{ID: 28909, EffectID: 2995, Name: "Greater Inscription of the Orb", Quality: proto.ItemQuality_ItemQualityRare, Bonus: stats.Stats{stats.SpellPower: 12, stats.SpellCrit: 15}, ItemType: proto.ItemType_ItemTypeShoulder},
-	{ID: 28910, EffectID: 2997, Name: "Greater Inscription of the Blade", Quality: proto.ItemQuality_ItemQualityRare, Bonus: stats.Stats{stats.AttackPower: 20, stats.MeleeCrit: 15}, ItemType: proto.ItemType_ItemTypeShoulder},
+	{ID: 28910, EffectID: 2997, Name: "Greater Inscription of the Blade", Quality: proto.ItemQuality_ItemQualityRare, Bonus: stats.Stats{stats.AttackPower: 20, stats.RangedAttackPower: 20, stats.MeleeCrit: 15}, ItemType: proto.ItemType_ItemTypeShoulder},
 	{ID: 20076, EffectID: 2605, Name: "Zandalar Signet of Mojo", Quality: proto.ItemQuality_ItemQualityRare, Bonus: stats.Stats{stats.SpellPower: 18}, ItemType: proto.ItemType_ItemTypeShoulder},
 	{ID: 23545, EffectID: 2721, Name: "Power of the Scourge", Quality: proto.ItemQuality_ItemQualityEpic, Bonus: stats.Stats{stats.SpellPower: 15, stats.SpellCrit: 14}, ItemType: proto.ItemType_ItemTypeShoulder},
-	{ID: 23548, EffectID: 2717, Name: "Might of the Scourge", Quality: proto.ItemQuality_ItemQualityEpic, Bonus: stats.Stats{stats.AttackPower: 26, stats.MeleeCrit: 14}, ItemType: proto.ItemType_ItemTypeShoulder},
+	{ID: 23548, EffectID: 2717, Name: "Might of the Scourge", Quality: proto.ItemQuality_ItemQualityEpic, Bonus: stats.Stats{stats.AttackPower: 26, stats.RangedAttackPower: 26, stats.MeleeCrit: 14}, ItemType: proto.ItemType_ItemTypeShoulder},
 
 	// Back
 	{ID: 33150, EffectID: 2621, Name: "Enchant Cloak - Subtlety", Quality: proto.ItemQuality_ItemQualityRare, Bonus: stats.Stats{}, ItemType: proto.ItemType_ItemTypeBack},
@@ -35,7 +35,7 @@ var Enchants = []Enchant{
 	{ID: 22534, EffectID: 2650, Name: "Bracer - Spellpower", Quality: proto.ItemQuality_ItemQualityUncommon, Bonus: stats.Stats{stats.SpellPower: 15}, ItemType: proto.ItemType_ItemTypeWrist},
 	{ID: 34001, EffectID: 369, Name: "Bracer - Major Intellect", IsSpellID: true, Quality: proto.ItemQuality_ItemQualityUncommon, Bonus: stats.Stats{stats.Intellect: 12}, ItemType: proto.ItemType_ItemTypeWrist},
 	{ID: 27899, EffectID: 2647, Name: "Bracer - Brawn", IsSpellID: true, Quality: proto.ItemQuality_ItemQualityUncommon, Bonus: stats.Stats{stats.Strength: 12}, ItemType: proto.ItemType_ItemTypeWrist},
-	{ID: 34002, EffectID: 1593, Name: "Bracer - Assault", IsSpellID: true, Quality: proto.ItemQuality_ItemQualityUncommon, Bonus: stats.Stats{stats.AttackPower: 24}, ItemType: proto.ItemType_ItemTypeWrist},
+	{ID: 34002, EffectID: 1593, Name: "Bracer - Assault", IsSpellID: true, Quality: proto.ItemQuality_ItemQualityUncommon, Bonus: stats.Stats{stats.AttackPower: 24, stats.RangedAttackPower: 24}, ItemType: proto.ItemType_ItemTypeWrist},
 	{ID: 27905, EffectID: 1891, Name: "Bracer - Stats", IsSpellID: true, Quality: proto.ItemQuality_ItemQualityUncommon, Bonus: stats.Stats{stats.Stamina: 4, stats.Intellect: 4, stats.Spirit: 4, stats.Strength: 4, stats.Agility: 4}, ItemType: proto.ItemType_ItemTypeWrist},
 
 	// Hands
@@ -48,8 +48,8 @@ var Enchants = []Enchant{
 	// Legs
 	{ID: 24274, EffectID: 2748, Name: "Runic Spellthread", Quality: proto.ItemQuality_ItemQualityEpic, Bonus: stats.Stats{stats.SpellPower: 35, stats.Stamina: 20}, ItemType: proto.ItemType_ItemTypeLegs},
 	{ID: 24273, EffectID: 2747, Name: "Mystic Spellthread", Quality: proto.ItemQuality_ItemQualityRare, Bonus: stats.Stats{stats.SpellPower: 25, stats.Stamina: 15}, ItemType: proto.ItemType_ItemTypeLegs},
-	{ID: 29533, EffectID: 3010, Name: "Cobrahide Leg Armor", Quality: proto.ItemQuality_ItemQualityRare, Bonus: stats.Stats{stats.AttackPower: 40, stats.MeleeCrit: 10}, ItemType: proto.ItemType_ItemTypeLegs},
-	{ID: 29535, EffectID: 3012, Name: "Nethercobra Leg Armor", Quality: proto.ItemQuality_ItemQualityEpic, Bonus: stats.Stats{stats.AttackPower: 50, stats.MeleeCrit: 12}, ItemType: proto.ItemType_ItemTypeLegs},
+	{ID: 29533, EffectID: 3010, Name: "Cobrahide Leg Armor", Quality: proto.ItemQuality_ItemQualityRare, Bonus: stats.Stats{stats.AttackPower: 40, stats.RangedAttackPower: 40, stats.MeleeCrit: 10}, ItemType: proto.ItemType_ItemTypeLegs},
+	{ID: 29535, EffectID: 3012, Name: "Nethercobra Leg Armor", Quality: proto.ItemQuality_ItemQualityEpic, Bonus: stats.Stats{stats.AttackPower: 50, stats.RangedAttackPower: 50, stats.MeleeCrit: 12}, ItemType: proto.ItemType_ItemTypeLegs},
 
 	// Feet
 	{ID: 16220, EffectID: 851, Name: "Enchant Boots - Spirit", Quality: proto.ItemQuality_ItemQualityUncommon, Bonus: stats.Stats{stats.Spirit: 5}, ItemType: proto.ItemType_ItemTypeFeet},

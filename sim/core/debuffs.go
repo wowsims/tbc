@@ -101,6 +101,10 @@ func applyDebuffEffects(target *Target, debuffs proto.Debuffs) {
 			target.AddPermanentAura(func(sim *Simulation) Aura {
 				return HuntersMarkAura(5)
 			})
+		} else {
+			target.AddPermanentAura(func(sim *Simulation) Aura {
+				return HuntersMarkAura(0)
+			})
 		}
 	}
 }
@@ -193,12 +197,15 @@ var CurseOfElementsDebuffID = NewDebuffID()
 
 func CurseOfElementsAura(coe proto.TristateEffect) Aura {
 	mult := 1.1
+	level := int32(0)
 	if coe == proto.TristateEffect_TristateEffectImproved {
 		mult = 1.13
+		level = 3
 	}
 	return Aura{
 		ID:       CurseOfElementsDebuffID,
 		ActionID: ActionID{SpellID: 27228},
+		Stacks:   level, // Use stacks to store talent level for detection by other code.
 		OnBeforeSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect) {
 			if spellCast.SpellSchool == stats.NatureSpellPower ||
 				spellCast.SpellSchool == stats.HolySpellPower ||
@@ -247,6 +254,9 @@ func BloodFrenzyAura() Aura {
 		ID:       BloodFrenzyDebuffID,
 		ActionID: ActionID{SpellID: 29859},
 		OnBeforeMeleeHit: func(sim *Simulation, ability *ActiveMeleeAbility, hitEffect *AbilityHitEffect) {
+			if ability.SpellSchool != stats.AttackPower {
+				return
+			}
 			hitEffect.DamageMultiplier *= 1.04
 		},
 	}
@@ -395,7 +405,11 @@ func HuntersMarkAura(points int32) Aura {
 		ID:       HuntersMarkDebuffID,
 		ActionID: ActionID{SpellID: 14325},
 		OnBeforeMeleeHit: func(sim *Simulation, ability *ActiveMeleeAbility, hitEffect *AbilityHitEffect) {
-			hitEffect.BonusAttackPower += meleeBonus
+			if hitEffect.IsMelee() {
+				hitEffect.BonusAttackPower += meleeBonus
+			} else {
+				hitEffect.BonusAttackPower += rangedBonus
+			}
 		},
 	}
 }

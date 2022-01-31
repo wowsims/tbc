@@ -19,6 +19,7 @@ func (priest *Priest) newVampiricTouchTemplate(sim *core.Simulation) core.Simple
 		BaseManaCost:   425,
 		ManaCost:       425,
 		CastTime:       time.Millisecond * 1500,
+		GCD:            core.GCDDefault,
 		ActionID:       VampiricTouchActionID,
 	}
 

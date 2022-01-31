@@ -21,6 +21,7 @@ func (mage *Mage) newFireBlastTemplate(sim *core.Simulation) core.SimpleSpellTem
 				BaseManaCost:   465,
 				ManaCost:       465,
 				CastTime:       0,
+				GCD:            core.GCDDefault,
 				Cooldown:       time.Second * 8,
 				ActionID: core.ActionID{
 					SpellID:    SpellIDFireBlast,

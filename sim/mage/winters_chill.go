@@ -17,8 +17,7 @@ func (mage *Mage) newWintersChillTemplate(sim *core.Simulation) core.SimpleSpell
 				ActionID: core.ActionID{
 					SpellID: SpellIDWintersChill,
 				},
-				IgnoreCooldowns: true,
-				IgnoreManaCost:  true,
+				IgnoreManaCost: true,
 			},
 		},
 		Effect: core.SpellHitEffect{

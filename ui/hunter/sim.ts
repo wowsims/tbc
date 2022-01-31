@@ -39,21 +39,21 @@ export class HunterSimUI extends IndividualSimUI<Spec.SpecHunter> {
 				Stat.StatIntellect,
 				Stat.StatAgility,
 				Stat.StatStrength,
-				Stat.StatAttackPower,
+				Stat.StatRangedAttackPower,
 				Stat.StatMeleeHit,
 				Stat.StatMeleeCrit,
 				Stat.StatMeleeHaste,
 				Stat.StatArmorPenetration,
 			],
-			// Reference stat against which to calculate EP. I think all classes use either spell power or attack power.
-			epReferenceStat: Stat.StatAttackPower,
+			// Reference stat against which to calculate EP.
+			epReferenceStat: Stat.StatRangedAttackPower,
 			// Which stats to display in the Character Stats section, at the bottom of the left-hand sidebar.
 			displayStats: [
 				Stat.StatStamina,
 				Stat.StatStrength,
 				Stat.StatAgility,
 				Stat.StatIntellect,
-				Stat.StatAttackPower,
+				Stat.StatRangedAttackPower,
 				Stat.StatMeleeHit,
 				Stat.StatMeleeCrit,
 				Stat.StatMeleeHaste,
@@ -68,7 +68,7 @@ export class HunterSimUI extends IndividualSimUI<Spec.SpecHunter> {
 					[Stat.StatIntellect]: 0.078,
 					[Stat.StatAgility]: 1.317,
 					[Stat.StatStrength]: 2.2,
-					[Stat.StatAttackPower]: 1.0,
+					[Stat.StatRangedAttackPower]: 1.0,
 					[Stat.StatMeleeHit]: 1.665,
 					[Stat.StatMeleeCrit]: 1.357,
 					[Stat.StatMeleeHaste]: 1.944,
@@ -110,8 +110,6 @@ export class HunterSimUI extends IndividualSimUI<Spec.SpecHunter> {
 				HunterInputs.Quiver,
 				HunterInputs.WeaponAmmo,
 				IconInputs.DrumsOfBattleConsume,
-				IconInputs.DrumsOfRestorationConsume,
-				IconInputs.BattleChicken,
 			],
 			// IconInputs to include in the 'Other Buffs' section on the settings tab.
 			raidBuffInputs: [
@@ -128,7 +126,6 @@ export class HunterSimUI extends IndividualSimUI<Spec.SpecHunter> {
 				IconInputs.FerociousInspiration,
 				IconInputs.TrueshotAura,
 				IconInputs.SanctityAura,
-				IconInputs.BattleChickens,
 				IconInputs.BraidedEterniumChain,
 			],
 			playerBuffInputs: [
@@ -171,6 +168,7 @@ export class HunterSimUI extends IndividualSimUI<Spec.SpecHunter> {
 			// Inputs to include in the 'Other' section on the settings tab.
 			otherInputs: {
 				inputs: [
+					HunterInputs.PetTypeInput,
 					HunterInputs.LatencyMs,
 					OtherInputs.StartingPotion,
 					OtherInputs.NumStartingPotions,

@@ -20,9 +20,8 @@ func (mage *Mage) newIgniteTemplate(sim *core.Simulation) core.SimpleSpellTempla
 				ActionID: core.ActionID{
 					SpellID: SpellIDIgnite,
 				},
-				IgnoreCooldowns: true,
-				IgnoreManaCost:  true,
-				Binary:          true,
+				IgnoreManaCost: true,
+				Binary:         true,
 			},
 		},
 		Effect: core.SpellHitEffect{

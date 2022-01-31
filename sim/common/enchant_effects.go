@@ -20,7 +20,8 @@ func init() {
 }
 
 func ApplyWeaponSuperiorStriking(agent core.Agent) {
-	agent.GetCharacter().PseudoStats.BonusWeaponDamage += 5
+	agent.GetCharacter().PseudoStats.BonusMeleeDamage += 5
+	// Melee only, no ranged bonus.
 }
 
 var CrusaderAuraID = core.NewAuraID()
@@ -76,7 +77,7 @@ func ApplyCrusader(agent core.Agent) {
 		return core.Aura{
 			ID: CrusaderAuraID,
 			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
-				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() {
+				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() || !hitEffect.IsMelee() {
 					return
 				}
 
@@ -90,7 +91,8 @@ func ApplyCrusader(agent core.Agent) {
 }
 
 func ApplyRingStriking(agent core.Agent) {
-	agent.GetCharacter().PseudoStats.BonusWeaponDamage += 2
+	agent.GetCharacter().PseudoStats.BonusMeleeDamage += 2
+	agent.GetCharacter().PseudoStats.BonusRangedDamage += 2
 }
 
 var MongooseAuraID = core.NewAuraID()
@@ -149,7 +151,7 @@ func ApplyMongoose(agent core.Agent) {
 		return core.Aura{
 			ID: MongooseAuraID,
 			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
-				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() {
+				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() || !hitEffect.IsMelee() {
 					return
 				}
 
@@ -195,7 +197,7 @@ func ApplyExecutioner(agent core.Agent) {
 		return core.Aura{
 			ID: ExecutionerAuraID,
 			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
-				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() {
+				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() || !hitEffect.IsMelee() {
 					return
 				}
 

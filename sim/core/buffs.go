@@ -36,7 +36,8 @@ func applyBuffEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs proto.P
 
 	if partyBuffs.TrueshotAura {
 		character.AddStats(stats.Stats{
-			stats.AttackPower: 125,
+			stats.AttackPower:       125,
+			stats.RangedAttackPower: 125,
 		})
 	}
 
@@ -81,7 +82,8 @@ func applyBuffEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs proto.P
 	})
 
 	character.AddStats(stats.Stats{
-		stats.AttackPower: GetTristateValueFloat(individualBuffs.BlessingOfMight, 220, 264),
+		stats.AttackPower:       GetTristateValueFloat(individualBuffs.BlessingOfMight, 220, 264),
+		stats.RangedAttackPower: GetTristateValueFloat(individualBuffs.BlessingOfMight, 220, 264),
 	})
 
 	if individualBuffs.BlessingOfKings {
@@ -230,16 +232,34 @@ func SnapshotImprovedWrathOfAirTotemAura(character *Character) AuraFactory {
 var SnapshotBattleShoutAuraID = NewAuraID()
 
 func SnapshotBattleShoutAura(character *Character, snapshotSapphire bool, snapshotT2 bool) AuraFactory {
-	bonus := 0.0
+	amount := 0.0
 	if snapshotSapphire {
-		bonus += 70
+		amount += 70
 	}
 	if snapshotT2 {
-		bonus += 30
+		amount += 30
 	}
 
+	// Do this manually instead of calling NewAuraWithTemporaryStats so that it
+	// only affects melee AP.
 	return func(sim *Simulation) Aura {
-		return character.NewAuraWithTemporaryStats(sim, SnapshotBattleShoutAuraID, ActionID{ItemID: 30446}, stats.AttackPower, bonus, time.Second*110)
+		actionID := ActionID{SpellID: 2048, Tag: 1}
+		if sim.Log != nil {
+			character.Log(sim, "Gained %0.02f %s from %s.", amount, stats.AttackPower.StatName(), actionID)
+		}
+		character.AddStat(stats.AttackPower, amount)
+
+		return Aura{
+			ID:       SnapshotBattleShoutAuraID,
+			ActionID: actionID,
+			Expires:  sim.CurrentTime + time.Second*110,
+			OnExpire: func(sim *Simulation) {
+				if sim.Log != nil {
+					character.Log(sim, "Lost %0.02f %s from fading %s.", amount, stats.AttackPower.StatName(), actionID)
+				}
+				character.AddStat(stats.AttackPower, -amount)
+			},
+		}
 	}
 }
 
@@ -333,8 +353,9 @@ func WindfuryTotemAura(character *Character, rank int32, iwtTalentPoints int32) 
 	wftempl := ActiveMeleeAbility{
 		MeleeAbility: MeleeAbility{
 			ActionID:       actionID,
-			CritMultiplier: 2.0,
 			Character:      character,
+			SpellSchool:    stats.AttackPower,
+			CritMultiplier: 2.0,
 		},
 		Effect: AbilityHitEffect{
 			AbilityEffect: AbilityEffect{
@@ -487,7 +508,7 @@ func AddBloodlustAura(sim *Simulation, character *Character, actionTag int32) {
 		character.PseudoStats.CastSpeedMultiplier /= 1.2
 	}
 	character.PseudoStats.CastSpeedMultiplier *= bonus
-	character.MultiplyMeleeSpeed(sim, bonus)
+	character.MultiplyAttackSpeed(sim, bonus)
 
 	character.AddAura(sim, Aura{
 		ID:       BloodlustAuraID,
@@ -498,7 +519,7 @@ func AddBloodlustAura(sim *Simulation, character *Character, actionTag int32) {
 			if character.HasAura(PowerInfusionAuraID) {
 				character.PseudoStats.CastSpeedMultiplier *= 1.2
 			}
-			character.MultiplyMeleeSpeed(sim, inverseBonus)
+			character.MultiplyAttackSpeed(sim, inverseBonus)
 		},
 	})
 

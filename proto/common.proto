@@ -73,6 +73,7 @@ enum Stat {
     StatEnergy = 25;
     StatRage = 26;
     StatArmor = 27;
+    StatRangedAttackPower = 28;
 }
 
 enum ItemType {
@@ -482,6 +483,7 @@ enum OtherAction {
 	OtherActionWait = 1;
 	OtherActionManaRegen = 2;
 	OtherActionEnergyRegen = 5;
+	OtherActionFocusRegen = 6;
 	OtherActionAttack = 3; // A white hit, can be main hand or off hand.
 	OtherActionShoot = 4; // Default shoot action using a wand/bow/gun.
 }

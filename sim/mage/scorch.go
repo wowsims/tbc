@@ -19,6 +19,7 @@ func (mage *Mage) newScorchTemplate(sim *core.Simulation) core.SimpleSpellTempla
 				BaseManaCost:   180,
 				ManaCost:       180,
 				CastTime:       time.Millisecond * 1500,
+				GCD:            core.GCDDefault,
 				ActionID: core.ActionID{
 					SpellID: SpellIDScorch,
 				},

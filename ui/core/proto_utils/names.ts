@@ -46,6 +46,7 @@ export const statNames: Record<Stat, string> = {
   [Stat.StatEnergy]: 'Energy',
   [Stat.StatRage]: 'Rage',
   [Stat.StatArmor]: 'Armor',
+  [Stat.StatRangedAttackPower]: 'Ranged AP',
 };
 
 export const slotNames: Record<ItemSlot, string> = {

@@ -20,6 +20,7 @@ func (druid *Druid) newInsectSwarmTemplate(sim *core.Simulation) core.SimpleSpel
 		BaseManaCost:   175,
 		ManaCost:       175,
 		CastTime:       0,
+		GCD:            core.GCDDefault,
 		ActionID: core.ActionID{
 			SpellID: SpellIDInsectSwarm,
 		},

@@ -291,6 +291,7 @@ func ApplyDarkmoonCardCrusade(agent core.Agent) {
 				if meleeStacks < 20 {
 					meleeStacks++
 					character.AddStat(stats.AttackPower, meleeBonus)
+					character.AddStat(stats.RangedAttackPower, meleeBonus)
 				}
 
 				// Removal aura will refresh with new total spellpower based on stacks.
@@ -301,6 +302,7 @@ func ApplyDarkmoonCardCrusade(agent core.Agent) {
 					Expires:  sim.CurrentTime + time.Second*10,
 					OnExpire: func(sim *core.Simulation) {
 						character.AddStat(stats.AttackPower, -meleeBonus*float64(meleeStacks))
+						character.AddStat(stats.RangedAttackPower, -meleeBonus*float64(meleeStacks))
 						meleeStacks = 0
 					},
 				})
