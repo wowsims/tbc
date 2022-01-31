@@ -16,6 +16,7 @@ import {
 	Hunter_Options as HunterOptions,
 	Hunter_Options_Ammo as Ammo,
 	Hunter_Options_QuiverBonus as QuiverBonus,
+	Hunter_Options_PetType as PetType,
 } from '/tbc/core/proto/hunter.js';
 
 // Configuration for spec-specific UI elements on the settings tab.
@@ -85,6 +86,33 @@ export const LatencyMs = {
 		setValue: (eventID: EventID, player: Player<Spec.SpecHunter>, newValue: number) => {
 			const newOptions = player.getSpecOptions();
 			newOptions.latencyMs = newValue;
+			player.setSpecOptions(eventID, newOptions);
+		},
+	},
+};
+
+export const PetTypeInput = {
+	type: 'enum' as const,
+	getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
+	config: {
+		extraCssClasses: [
+			'pet-type-picker',
+		],
+		label: 'Pet',
+		values: [
+			{ name: 'None', value: PetType.PetNone },
+			{ name: 'Ravager', value: PetType.Ravager },
+			{ name: 'Wind Serpent', value: PetType.WindSerpent },
+			{ name: 'Bat', value: PetType.Bat },
+			{ name: 'Cat', value: PetType.Cat },
+			{ name: 'Owl', value: PetType.Owl },
+			{ name: 'Raptor', value: PetType.Raptor },
+		],
+		changedEvent: (player: Player<Spec.SpecHunter>) => player.specOptionsChangeEmitter,
+		getValue: (player: Player<Spec.SpecHunter>) => player.getSpecOptions().petType,
+		setValue: (eventID: EventID, player: Player<Spec.SpecHunter>, newValue: number) => {
+			const newOptions = player.getSpecOptions();
+			newOptions.petType = newValue;
 			player.setSpecOptions(eventID, newOptions);
 		},
 	},
