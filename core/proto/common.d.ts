@@ -1547,6 +1547,10 @@ export declare enum OtherAction {
      */
     OtherActionEnergyRegen = 5,
     /**
+     * @generated from protobuf enum value: OtherActionFocusRegen = 6;
+     */
+    OtherActionFocusRegen = 6,
+    /**
      * A white hit, can be main hand or off hand.
      *
      * @generated from protobuf enum value: OtherActionAttack = 3;

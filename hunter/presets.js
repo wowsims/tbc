@@ -2,7 +2,7 @@ import { Consumes } from '/tbc/core/proto/common.js';
 import { EquipmentSpec } from '/tbc/core/proto/common.js';
 import { ItemSpec } from '/tbc/core/proto/common.js';
 import { Potions } from '/tbc/core/proto/common.js';
-import { Hunter_Rotation as HunterRotation, Hunter_Options as HunterOptions, Hunter_Options_Ammo as Ammo, Hunter_Options_QuiverBonus as QuiverBonus, } from '/tbc/core/proto/hunter.js';
+import { Hunter_Rotation as HunterRotation, Hunter_Options as HunterOptions, Hunter_Options_Ammo as Ammo, Hunter_Options_QuiverBonus as QuiverBonus, Hunter_Options_PetType as PetType, } from '/tbc/core/proto/hunter.js';
 import * as Enchants from '/tbc/core/constants/enchants.js';
 import * as Gems from '/tbc/core/proto_utils/gems.js';
 import * as Tooltips from '/tbc/core/constants/tooltips.js';
@@ -25,6 +25,7 @@ export const DefaultRotation = HunterRotation.create({
 export const DefaultOptions = HunterOptions.create({
     quiverBonus: QuiverBonus.Speed15,
     ammo: Ammo.AdamantiteStinger,
+    petType: PetType.Ravager,
     latencyMs: 30,
 });
 export const DefaultConsumes = Consumes.create({

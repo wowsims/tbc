@@ -3,7 +3,7 @@ import { ActionId } from '/tbc/core/proto_utils/action_id.js';
 import { Player } from '/tbc/core/player.js';
 import { IndividualSimUI } from '/tbc/core/individual_sim_ui.js';
 import { EventID, TypedEvent } from '/tbc/core/typed_event.js';
-import { Hunter_Options_Ammo as Ammo, Hunter_Options_QuiverBonus as QuiverBonus } from '/tbc/core/proto/hunter.js';
+import { Hunter_Options_Ammo as Ammo, Hunter_Options_QuiverBonus as QuiverBonus, Hunter_Options_PetType as PetType } from '/tbc/core/proto/hunter.js';
 export declare const Quiver: {
     extraCssClasses: string[];
     numColumns: number;
@@ -49,6 +49,21 @@ export declare const LatencyMs: {
         labelTooltip: string;
         changedEvent: (player: Player<Spec.SpecHunter>) => TypedEvent<void>;
         getValue: (player: Player<Spec.SpecHunter>) => number;
+        setValue: (eventID: EventID, player: Player<Spec.SpecHunter>, newValue: number) => void;
+    };
+};
+export declare const PetTypeInput: {
+    type: "enum";
+    getModObject: (simUI: IndividualSimUI<any>) => Player<any>;
+    config: {
+        extraCssClasses: string[];
+        label: string;
+        values: {
+            name: string;
+            value: PetType;
+        }[];
+        changedEvent: (player: Player<Spec.SpecHunter>) => TypedEvent<void>;
+        getValue: (player: Player<Spec.SpecHunter>) => PetType;
         setValue: (eventID: EventID, player: Player<Spec.SpecHunter>, newValue: number) => void;
     };
 };

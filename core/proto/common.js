@@ -846,6 +846,10 @@ export var OtherAction;
      */
     OtherAction[OtherAction["OtherActionEnergyRegen"] = 5] = "OtherActionEnergyRegen";
     /**
+     * @generated from protobuf enum value: OtherActionFocusRegen = 6;
+     */
+    OtherAction[OtherAction["OtherActionFocusRegen"] = 6] = "OtherActionFocusRegen";
+    /**
      * A white hit, can be main hand or off hand.
      *
      * @generated from protobuf enum value: OtherActionAttack = 3;
