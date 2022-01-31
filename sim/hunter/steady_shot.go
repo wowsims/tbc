@@ -21,6 +21,8 @@ func (hunter *Hunter) newSteadyShotCastTemplate(sim *core.Simulation) core.Simpl
 		DisableMetrics: true,
 	}
 
+	template.ManaCost *= 1 - 0.02*float64(hunter.Talents.Efficiency)
+
 	return template
 }
 

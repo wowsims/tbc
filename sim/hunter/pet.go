@@ -41,7 +41,7 @@ func (hunter *Hunter) NewHunterPet() *HunterPet {
 	hp.PseudoStats.MeleeSpeedMultiplier *= 1.3
 	hp.damageMultiplier *= 0.85
 
-	hp.EnableFocusBar(1.0, func(sim *core.Simulation) {
+	hp.EnableFocusBar(1.0+0.5*float64(hunter.Talents.BestialDiscipline), func(sim *core.Simulation) {
 		if !hp.IsOnCD(core.GCDCooldownID, sim.CurrentTime) {
 			hp.OnGCDReady(sim)
 		}

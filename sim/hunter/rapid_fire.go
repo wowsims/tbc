@@ -34,6 +34,8 @@ func (hunter *Hunter) registerRapidFireCD() {
 		},
 	}
 
+	template.Cooldown -= time.Minute * time.Duration(hunter.Talents.RapidKilling)
+
 	hunter.AddMajorCooldown(core.MajorCooldown{
 		ActionID:   actionID,
 		CooldownID: RapidFireCooldownID,

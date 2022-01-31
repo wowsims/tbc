@@ -67,6 +67,12 @@ func (hunter *Hunter) GetCharacter() *core.Character {
 func (hunter *Hunter) AddRaidBuffs(raidBuffs *proto.RaidBuffs) {
 }
 func (hunter *Hunter) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {
+	if hunter.Talents.FerociousInspiration == 3 {
+		partyBuffs.FerociousInspiration++
+	}
+	if hunter.Talents.TrueshotAura {
+		partyBuffs.TrueshotAura = true
+	}
 }
 
 func (hunter *Hunter) Init(sim *core.Simulation) {
@@ -171,7 +177,7 @@ func NewHunter(character core.Character, options proto.Player) *Hunter {
 		hunter.PseudoStats.RangedSpeedMultiplier *= 1.15
 	}
 
-	//hunter.applyTalents()
+	hunter.applyTalents()
 	hunter.registerRapidFireCD()
 	hunter.applyAspectOfTheHawk()
 	hunter.applyRotationAura()
