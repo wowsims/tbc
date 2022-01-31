@@ -168,6 +168,7 @@ export class HunterSimUI extends IndividualSimUI<Spec.SpecHunter> {
 			// Inputs to include in the 'Other' section on the settings tab.
 			otherInputs: {
 				inputs: [
+					HunterInputs.PetTypeInput,
 					HunterInputs.LatencyMs,
 					OtherInputs.StartingPotion,
 					OtherInputs.NumStartingPotions,

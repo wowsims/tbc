@@ -86,7 +86,7 @@ func (mage *Mage) NewWaterElemental(disobeyChance float64) *WaterElemental {
 			"Water Elemental",
 			&mage.Character,
 			waterElementalBaseStats,
-			waterElementalInheritanceCoeffs,
+			waterElementalStatInheritance,
 			false,
 		),
 		disobeyChance: disobeyChance,
@@ -140,16 +140,18 @@ var waterElementalBaseStats = stats.Stats{
 	stats.SpellCrit:  8 * core.SpellCritRatingPerCritChance,
 }
 
-// These numbers are just rough guesses based on looking at some logs.
-var waterElementalInheritanceCoeffs = stats.Stats{
-	// Computed based on my lvl 65 mage, need to ask someone with a 70 to check these
-	stats.Stamina:   0.2238,
-	stats.Intellect: 0.01,
+var waterElementalStatInheritance = func(ownerStats stats.Stats) stats.Stats {
+	// These numbers are just rough guesses based on looking at some logs.
+	return ownerStats.DotProduct(stats.Stats{
+		// Computed based on my lvl 65 mage, need to ask someone with a 70 to check these
+		stats.Stamina:   0.2238,
+		stats.Intellect: 0.01,
 
-	stats.SpellPower:      0.333,
-	stats.FrostSpellPower: 0.333,
-	stats.SpellHit:        0.01,
-	stats.SpellCrit:       0.01,
+		stats.SpellPower:      0.333,
+		stats.FrostSpellPower: 0.333,
+		stats.SpellHit:        0.01,
+		stats.SpellCrit:       0.01,
+	})
 }
 
 const SpellIDWaterbolt int32 = 31707

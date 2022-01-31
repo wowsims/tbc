@@ -16,6 +16,8 @@ type PetAgent interface {
 	GetPet() *Pet
 }
 
+type PetStatInheritance func(ownerStats stats.Stats) stats.Stats
+
 // Pet is an extension of Character, for any entity created by a player that can
 // take actions on its own.
 type Pet struct {
@@ -23,9 +25,8 @@ type Pet struct {
 
 	Owner *Character
 
-	// Coefficients for each stat that correspond to the proportion
-	// of that stat inherited from the owner.
-	statInheritanceCoeffs stats.Stats
+	// Calculates inherited stats based on owner stats or stat changes.
+	statInheritance PetStatInheritance
 
 	initialEnabled bool
 
@@ -39,7 +40,7 @@ type Pet struct {
 	timeoutAction *PendingAction
 }
 
-func NewPet(name string, owner *Character, baseStats stats.Stats, statInheritanceCoeffs stats.Stats, enabledOnStart bool) Pet {
+func NewPet(name string, owner *Character, baseStats stats.Stats, statInheritance PetStatInheritance, enabledOnStart bool) Pet {
 	pet := Pet{
 		Character: Character{
 			Name:        name,
@@ -52,9 +53,9 @@ func NewPet(name string, owner *Character, baseStats stats.Stats, statInheritanc
 			baseStats:   baseStats,
 			Metrics:     NewCharacterMetrics(),
 		},
-		Owner:                 owner,
-		statInheritanceCoeffs: statInheritanceCoeffs,
-		initialEnabled:        enabledOnStart,
+		Owner:           owner,
+		statInheritance: statInheritance,
+		initialEnabled:  enabledOnStart,
 	}
 
 	pet.AddStats(baseStats)
@@ -67,18 +68,19 @@ func NewPet(name string, owner *Character, baseStats stats.Stats, statInheritanc
 // addedStats is the amount of stats added to the owner (will be negative if the
 // owner lost stats).
 func (pet *Pet) addOwnerStats(addedStats stats.Stats) {
-	inheritedChange := addedStats.DotProduct(pet.statInheritanceCoeffs)
+	inheritedChange := pet.statInheritance(addedStats)
 	pet.AddStats(inheritedChange)
 }
 func (pet *Pet) addOwnerStat(stat stats.Stat, addedAmount float64) {
-	inheritedChange := addedAmount * pet.statInheritanceCoeffs[stat]
-	pet.AddStat(stat, inheritedChange)
+	s := stats.Stats{}
+	s[stat] = addedAmount
+	pet.addOwnerStats(s)
 }
 
 // This needs to be called after owner stats are finalized so we can inherit the
 // final values.
 func (pet *Pet) Finalize() {
-	inheritedStats := pet.Owner.GetStats().DotProduct(pet.statInheritanceCoeffs)
+	inheritedStats := pet.statInheritance(pet.Owner.GetStats())
 	pet.AddStats(inheritedStats)
 	pet.Character.Finalize()
 }

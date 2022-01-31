@@ -36,6 +36,8 @@ type Hunter struct {
 
 	aspectOfTheViper bool // False indicates aspect of the hawk.
 
+	pet *HunterPet
+
 	aimedShotTemplate core.MeleeAbilityTemplate
 	aimedShot         core.ActiveMeleeAbility
 
@@ -101,6 +103,8 @@ func NewHunter(character core.Character, options proto.Player) *Hunter {
 		Ranged:          hunter.WeaponFromRanged(),
 		AutoSwingRanged: true,
 	})
+
+	hunter.pet = hunter.NewHunterPet()
 
 	hunter.Character.AddStatDependency(stats.StatDependency{
 		SourceStat:   stats.Intellect,
