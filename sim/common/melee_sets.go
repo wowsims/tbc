@@ -98,7 +98,7 @@ var ItemSetFistsOfFury = core.ItemSet{
 							IgnoreManaCost: true,
 							IsPhantom:      true,
 							SpellSchool:    stats.FireSpellPower,
-							CritMultiplier: 1.5,
+							CritMultiplier: character.DefaultSpellCritMultiplier(),
 						},
 					},
 					Effect: core.SpellHitEffect{

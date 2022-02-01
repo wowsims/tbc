@@ -21,7 +21,7 @@ func (shaman *Shaman) newSearingTotemTemplate(sim *core.Simulation) core.SimpleS
 				BaseManaCost:   205,
 				ManaCost:       205,
 				GCD:            time.Second,
-				CritMultiplier: 1.5,
+				CritMultiplier: shaman.DefaultSpellCritMultiplier(),
 			},
 		},
 		Effect: core.SpellHitEffect{
@@ -49,7 +49,7 @@ func (shaman *Shaman) newSearingTotemTemplate(sim *core.Simulation) core.SimpleS
 	spell.ManaCost -= spell.BaseManaCost * float64(shaman.Talents.TotemicFocus) * 0.05
 	spell.ManaCost -= spell.BaseManaCost * float64(shaman.Talents.MentalQuickness) * 0.02
 	if shaman.Talents.ElementalFury {
-		spell.CritMultiplier = 2
+		spell.CritMultiplier = shaman.SpellCritMultiplier(1, 1)
 	}
 	spell.Effect.SpellEffect.BonusSpellHitRating += float64(shaman.Talents.ElementalPrecision) * 2 * core.SpellHitRatingPerHitChance
 
@@ -87,7 +87,7 @@ func (shaman *Shaman) newMagmaTotemTemplate(sim *core.Simulation) core.SimpleSpe
 				BaseManaCost:   800,
 				ManaCost:       800,
 				GCD:            time.Second,
-				CritMultiplier: 1.5,
+				CritMultiplier: shaman.DefaultSpellCritMultiplier(),
 			},
 		},
 		AOECap: 1600,
@@ -95,7 +95,7 @@ func (shaman *Shaman) newMagmaTotemTemplate(sim *core.Simulation) core.SimpleSpe
 	spell.ManaCost -= spell.BaseManaCost * float64(shaman.Talents.TotemicFocus) * 0.05
 	spell.ManaCost -= spell.BaseManaCost * float64(shaman.Talents.MentalQuickness) * 0.02
 	if shaman.Talents.ElementalFury {
-		spell.CritMultiplier = 2
+		spell.CritMultiplier = shaman.SpellCritMultiplier(1, 1)
 	}
 
 	baseEffect := core.SpellHitEffect{
@@ -162,7 +162,7 @@ func (shaman *Shaman) newNovaTotemTemplate(sim *core.Simulation) core.SimpleSpel
 				ManaCost:       800,
 				GCD:            time.Second,
 				Cooldown:       time.Second * 15,
-				CritMultiplier: 1.5,
+				CritMultiplier: shaman.DefaultSpellCritMultiplier(),
 			},
 		},
 		AOECap: 9975,
@@ -170,7 +170,7 @@ func (shaman *Shaman) newNovaTotemTemplate(sim *core.Simulation) core.SimpleSpel
 	spell.ManaCost -= spell.BaseManaCost * float64(shaman.Talents.TotemicFocus) * 0.05
 	spell.ManaCost -= spell.BaseManaCost * float64(shaman.Talents.MentalQuickness) * 0.02
 	if shaman.Talents.ElementalFury {
-		spell.CritMultiplier = 2
+		spell.CritMultiplier = shaman.SpellCritMultiplier(1, 1)
 	}
 
 	baseEffect := core.SpellHitEffect{

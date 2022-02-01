@@ -42,12 +42,12 @@ func (shaman *Shaman) newElectricSpellCast(actionID core.ActionID, baseManaCost 
 			ManaCost:       baseManaCost,
 			CastTime:       baseCastTime,
 			GCD:            core.GCDDefault,
-			CritMultiplier: 1.5,
+			CritMultiplier: shaman.DefaultSpellCritMultiplier(),
 		},
 	}
 
 	if shaman.Talents.ElementalFury {
-		spellCast.CritMultiplier = 2
+		spellCast.CritMultiplier = shaman.SpellCritMultiplier(1, 1)
 	}
 
 	if isLightningOverload {
