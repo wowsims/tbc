@@ -405,6 +405,7 @@ func HuntersMarkAura(points int32) Aura {
 	return Aura{
 		ID:       HuntersMarkDebuffID,
 		ActionID: ActionID{SpellID: 14325},
+		Stacks:   points,
 		OnBeforeMeleeHit: func(sim *Simulation, ability *ActiveMeleeAbility, hitEffect *AbilityHitEffect) {
 			if hitEffect.IsMelee() {
 				hitEffect.BonusAttackPower += meleeBonus

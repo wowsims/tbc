@@ -87,8 +87,14 @@ func (hunter *Hunter) Init(sim *core.Simulation) {
 	hunter.steadyShotAbilityTemplate = hunter.newSteadyShotAbilityTemplate(sim)
 }
 
-func (hunter *Hunter) Reset(newsim *core.Simulation) {
+func (hunter *Hunter) Reset(sim *core.Simulation) {
 	hunter.aspectOfTheViper = false
+
+	target := sim.GetPrimaryTarget()
+	impHuntersMark := hunter.Talents.ImprovedHuntersMark
+	if !target.HasAura(core.HuntersMarkDebuffID) || target.NumStacks(core.HuntersMarkDebuffID) < impHuntersMark {
+		target.AddAura(sim, core.HuntersMarkAura(impHuntersMark))
+	}
 }
 
 func NewHunter(character core.Character, options proto.Player) *Hunter {

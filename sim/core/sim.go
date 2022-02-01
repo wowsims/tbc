@@ -118,11 +118,13 @@ func (sim *Simulation) reset() {
 	sim.CurrentTime = 0.0
 	sim.pendingActions = make([]*PendingAction, 0, 64)
 
-	sim.Raid.reset(sim)
-
+	// Targets need to be reset before the raid, so that players can check for
+	// then presence of permanent target auras in their Reset handlers.
 	for _, target := range sim.encounter.Targets {
 		target.Reset(sim)
 	}
+
+	sim.Raid.reset(sim)
 
 	sim.initManaTickAction()
 }
