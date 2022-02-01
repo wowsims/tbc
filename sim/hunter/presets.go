@@ -59,8 +59,13 @@ var FullRaidBuffs = &proto.RaidBuffs{
 	GiftOfTheWild:    proto.TristateEffect_TristateEffectImproved,
 }
 var FullPartyBuffs = &proto.PartyBuffs{
+	Bloodlust: 1,
+	Drums:     proto.Drums_DrumsOfBattle,
+
 	BattleShout:     proto.TristateEffect_TristateEffectImproved,
 	LeaderOfThePack: proto.TristateEffect_TristateEffectImproved,
+	ManaSpringTotem: proto.TristateEffect_TristateEffectRegular,
+	GraceOfAirTotem: proto.TristateEffect_TristateEffectRegular,
 }
 var FullIndividualBuffs = &proto.IndividualBuffs{
 	BlessingOfKings:  true,
@@ -69,7 +74,8 @@ var FullIndividualBuffs = &proto.IndividualBuffs{
 }
 
 var FullConsumes = &proto.Consumes{
-	Drums: proto.Drums_DrumsOfBattle,
+	FlaskOfRelentlessAssault: true,
+	DefaultPotion:            proto.Potions_HastePotion,
 }
 
 var FullDebuffs = &proto.Debuffs{

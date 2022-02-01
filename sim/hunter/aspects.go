@@ -53,8 +53,6 @@ func (hunter *Hunter) applyAspectOfTheHawk() {
 }
 
 func (hunter *Hunter) newAspectOfTheHawkTemplate(sim *core.Simulation) core.SimpleCast {
-	aura := hunter.aspectOfTheHawkAura()
-
 	template := core.SimpleCast{
 		Cast: core.Cast{
 			ActionID:     AspectOfTheHawkActionID,
@@ -63,9 +61,8 @@ func (hunter *Hunter) newAspectOfTheHawkTemplate(sim *core.Simulation) core.Simp
 			ManaCost:     140,
 			GCD:          core.GCDDefault,
 			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
-				hunter.RemoveAura(sim, AspectOfTheViperAuraID)
-				hunter.AddAura(sim, aura)
 				hunter.aspectOfTheViper = false
+				hunter.changingAspects = true
 			},
 		},
 	}
@@ -77,13 +74,17 @@ func (hunter *Hunter) NewAspectOfTheHawk(sim *core.Simulation) core.SimpleCast {
 	return hunter.aspectOfTheHawkTemplate
 }
 
-func (hunter *Hunter) newAspectOfTheViperTemplate(sim *core.Simulation) core.SimpleCast {
-	aura := core.Aura{
+func (hunter *Hunter) aspectOfTheViperAura() core.Aura {
+	return core.Aura{
 		ID:       AspectOfTheViperAuraID,
 		ActionID: AspectOfTheViperActionID,
 		Expires:  core.NeverExpires,
+		// Mana gain from viper is handled in rotation.go
 	}
 
+}
+
+func (hunter *Hunter) newAspectOfTheViperTemplate(sim *core.Simulation) core.SimpleCast {
 	template := core.SimpleCast{
 		Cast: core.Cast{
 			ActionID:     core.ActionID{SpellID: 34074},
@@ -92,14 +93,11 @@ func (hunter *Hunter) newAspectOfTheViperTemplate(sim *core.Simulation) core.Sim
 			ManaCost:     40,
 			GCD:          core.GCDDefault,
 			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
-				hunter.RemoveAura(sim, AspectOfTheHawkAuraID)
-				hunter.AddAura(sim, aura)
 				hunter.aspectOfTheViper = true
+				hunter.changingAspects = true
 			},
 		},
 	}
-
-	// Mana gain from viper is handled in rotation.go
 
 	return template
 }

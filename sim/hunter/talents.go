@@ -121,10 +121,26 @@ func (hunter *Hunter) critMultiplier(isRanged bool, target *core.Target) float64
 var FocusedFireAuraID = core.NewAuraID()
 
 func (hunter *Hunter) applyFocusedFire() {
-	if hunter.Talents.FocusedFire == 0 {
+	if hunter.Talents.FocusedFire == 0 || hunter.pet == nil {
 		return
 	}
 
+	multiplier := 1.0 + 0.01*float64(hunter.Talents.FocusedFire)
+
+	hunter.AddPermanentAura(func(sim *core.Simulation) core.Aura {
+		return core.Aura{
+			ID: FocusedFireAuraID,
+			OnBeforeMeleeHit: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
+				hitEffect.DamageMultiplier *= multiplier
+			},
+			OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+				spellEffect.DamageMultiplier *= multiplier
+			},
+			OnBeforePeriodicDamage: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect, tickDamage *float64) {
+				*tickDamage *= multiplier
+			},
+		}
+	})
 }
 
 var FrenzyAuraID = core.NewAuraID()
@@ -315,7 +331,7 @@ func (hunter *Hunter) applySlaying() {
 
 	hunter.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		return core.Aura{
-			ID: FocusedFireAuraID,
+			ID: SlayingAuraID,
 			OnBeforeMeleeHit: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
 				if hitEffect.Target.MobType == proto.MobType_MobTypeBeast || hitEffect.Target.MobType == proto.MobType_MobTypeGiant || hitEffect.Target.MobType == proto.MobType_MobTypeDragonkin {
 					hitEffect.DamageMultiplier *= monsterMultiplier
