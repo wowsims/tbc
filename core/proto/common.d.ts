@@ -569,6 +569,10 @@ export interface Item {
      * @generated from protobuf field: bool unique = 13;
      */
     unique: boolean;
+    /**
+     * @generated from protobuf field: int32 ilvl = 20;
+     */
+    ilvl: number;
 }
 /**
  * @generated from protobuf message proto.Enchant

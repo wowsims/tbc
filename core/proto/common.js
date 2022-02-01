@@ -1972,11 +1972,12 @@ class Item$Type extends MessageType {
             { no: 19, name: "weapon_speed", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
             { no: 11, name: "phase", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 12, name: "quality", kind: "enum", T: () => ["proto.ItemQuality", ItemQuality] },
-            { no: 13, name: "unique", kind: "scalar", T: 8 /*ScalarType.BOOL*/ }
+            { no: 13, name: "unique", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 20, name: "ilvl", kind: "scalar", T: 5 /*ScalarType.INT32*/ }
         ]);
     }
     create(value) {
-        const message = { id: 0, wowheadId: 0, name: "", classAllowlist: [], type: 0, armorType: 0, weaponType: 0, handType: 0, rangedWeaponType: 0, stats: [], gemSockets: [], socketBonus: [], weaponDamageMin: 0, weaponDamageMax: 0, weaponSpeed: 0, phase: 0, quality: 0, unique: false };
+        const message = { id: 0, wowheadId: 0, name: "", classAllowlist: [], type: 0, armorType: 0, weaponType: 0, handType: 0, rangedWeaponType: 0, stats: [], gemSockets: [], socketBonus: [], weaponDamageMin: 0, weaponDamageMax: 0, weaponSpeed: 0, phase: 0, quality: 0, unique: false, ilvl: 0 };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -2056,6 +2057,9 @@ class Item$Type extends MessageType {
                     break;
                 case /* bool unique */ 13:
                     message.unique = reader.bool();
+                    break;
+                case /* int32 ilvl */ 20:
+                    message.ilvl = reader.int32();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -2139,6 +2143,9 @@ class Item$Type extends MessageType {
         /* bool unique = 13; */
         if (message.unique !== false)
             writer.tag(13, WireType.Varint).bool(message.unique);
+        /* int32 ilvl = 20; */
+        if (message.ilvl !== 0)
+            writer.tag(20, WireType.Varint).int32(message.ilvl);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
