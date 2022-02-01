@@ -332,6 +332,10 @@ func (at *auraTracker) ReplaceAura(sim *Simulation, newAura Aura) {
 // Adds a new aura to the simulation. If an aura with the same ID already
 // exists it will be replaced with the new one.
 func (at *auraTracker) AddAura(sim *Simulation, newAura Aura) {
+	if newAura.ID == 0 {
+		panic("Empty aura ID")
+	}
+
 	if at.HasAura(newAura.ID) {
 		at.RemoveAura(sim, newAura.ID)
 	}

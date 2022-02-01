@@ -26,6 +26,8 @@ func (hunter *Hunter) newMultiShotTemplate(sim *core.Simulation) core.MeleeAbili
 		},
 	}
 
+	ama.Cost.Value *= 1 - 0.02*float64(hunter.Talents.Efficiency)
+
 	baseEffect := core.AbilityHitEffect{
 		AbilityEffect: core.AbilityEffect{
 			DamageMultiplier:       1,
@@ -43,6 +45,9 @@ func (hunter *Hunter) newMultiShotTemplate(sim *core.Simulation) core.MeleeAbili
 			},
 		},
 	}
+
+	baseEffect.DamageMultiplier *= 1 + 0.04*float64(hunter.Talents.Barrage)
+	baseEffect.BonusCritRating += float64(hunter.Talents.ImprovedBarrage) * 4 * core.MeleeCritRatingPerCritChance
 
 	numHits := core.MinInt32(3, sim.GetNumTargets())
 	effects := make([]core.AbilityHitEffect, 0, numHits)

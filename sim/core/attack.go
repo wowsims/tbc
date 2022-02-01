@@ -18,7 +18,7 @@ import (
 type OnBeforeMHSwing func(sim *Simulation) bool
 
 // OnBeforeMelee is invoked once for each ability, even if there are multiple hits.
-//  This should be used for any effects that adjust the stats / multipliers of the attack.
+//  This should be used for any effects that adjust the cost / stats / multipliers of the attack.
 type OnBeforeMelee func(sim *Simulation, ability *ActiveMeleeAbility)
 
 // OnBeforeMelee is invoked before the hit/dmg rolls are made.
@@ -465,6 +465,9 @@ func (ability *ActiveMeleeAbility) Attack(sim *Simulation) bool {
 	if ability.GCD != 0 && ability.Character.GetRemainingCD(GCDCooldownID, sim.CurrentTime) > 0 {
 		log.Fatalf("Ability used while on GCD\n-------\nAbility %s: %#v\n", ability.ActionID, ability)
 	}
+
+	ability.Character.OnBeforeMelee(sim, ability)
+
 	if ability.MeleeAbility.Cost.Type != 0 {
 		if ability.MeleeAbility.Cost.Type == stats.Mana {
 			if ability.Character.CurrentMana() < ability.MeleeAbility.Cost.Value {
@@ -483,8 +486,6 @@ func (ability *ActiveMeleeAbility) Attack(sim *Simulation) bool {
 			ability.Character.SpendEnergy(sim, ability.MeleeAbility.Cost.Value, ability.MeleeAbility.ActionID)
 		}
 	}
-
-	ability.Character.OnBeforeMelee(sim, ability)
 
 	if len(ability.Effects) == 0 {
 		ability.Effect.performAttack(sim, ability)

@@ -43,6 +43,8 @@ func (hunter *Hunter) newAimedShotTemplate(sim *core.Simulation) core.MeleeAbili
 		},
 	}
 
+	ama.Cost.Value *= 1 - 0.02*float64(hunter.Talents.Efficiency)
+
 	return core.NewMeleeAbilityTemplate(ama)
 }
 

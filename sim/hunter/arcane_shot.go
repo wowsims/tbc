@@ -40,6 +40,9 @@ func (hunter *Hunter) newArcaneShotTemplate(sim *core.Simulation) core.MeleeAbil
 		},
 	}
 
+	ama.Cost.Value *= 1 - 0.02*float64(hunter.Talents.Efficiency)
+	ama.Cooldown -= time.Millisecond * 200 * time.Duration(hunter.Talents.ImprovedArcaneShot)
+
 	return core.NewMeleeAbilityTemplate(ama)
 }
 
