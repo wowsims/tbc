@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"math/rand"
 	"runtime"
-	"sort"
 	"strings"
 	"time"
 
@@ -28,7 +27,7 @@ type Simulation struct {
 	testRands map[uint32]*rand.Rand
 
 	// Current Simulation State
-	pendingActions ActionsQueue
+	pendingActions []*PendingAction
 	CurrentTime    time.Duration // duration that has elapsed in the sim since starting
 
 	ProgressReport func(*proto.ProgressMetrics)
@@ -236,17 +235,13 @@ func (sim *Simulation) runOnce() {
 func (sim *Simulation) AddPendingAction(pa *PendingAction) {
 	oldlen := len(sim.pendingActions)
 
-	index := sort.Search(oldlen, func(i int) bool {
-		v := sim.pendingActions[i]
-		return v.NextActionAt < pa.NextActionAt || (v.NextActionAt == pa.NextActionAt && v.Priority > pa.Priority)
-	})
-	// var index = 0
-	// for _, v := range sim.pendingActions {
-	// 	if v.NextActionAt < pa.NextActionAt || (v.NextActionAt == pa.NextActionAt && v.Priority > pa.Priority) {
-	// 		break
-	// 	}
-	// 	index++
-	// }
+	var index = 0
+	for _, v := range sim.pendingActions {
+		if v.NextActionAt < pa.NextActionAt || (v.NextActionAt == pa.NextActionAt && v.Priority > pa.Priority) {
+			break
+		}
+		index++
+	}
 
 	sim.pendingActions = append(sim.pendingActions, pa)
 	if index == oldlen {
