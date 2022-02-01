@@ -1,10 +1,10 @@
 package core
 
 import (
-	"container/heap"
 	"fmt"
 	"math/rand"
 	"runtime"
+	"sort"
 	"strings"
 	"time"
 
@@ -205,7 +205,8 @@ func (sim *Simulation) runOnce() {
 	sim.reset()
 
 	for true {
-		pa := heap.Pop(&sim.pendingActions).(*PendingAction)
+		pa := sim.pendingActions[len(sim.pendingActions)-1]
+		sim.pendingActions = sim.pendingActions[:len(sim.pendingActions)-1]
 		if pa.NextActionAt > sim.Duration {
 			if pa.CleanUp != nil {
 				pa.CleanUp(sim)
@@ -233,7 +234,27 @@ func (sim *Simulation) runOnce() {
 }
 
 func (sim *Simulation) AddPendingAction(pa *PendingAction) {
-	heap.Push(&sim.pendingActions, pa)
+	oldlen := len(sim.pendingActions)
+
+	index := sort.Search(oldlen, func(i int) bool {
+		v := sim.pendingActions[i]
+		return v.NextActionAt < pa.NextActionAt || (v.NextActionAt == pa.NextActionAt && v.Priority > pa.Priority)
+	})
+	// var index = 0
+	// for _, v := range sim.pendingActions {
+	// 	if v.NextActionAt < pa.NextActionAt || (v.NextActionAt == pa.NextActionAt && v.Priority > pa.Priority) {
+	// 		break
+	// 	}
+	// 	index++
+	// }
+
+	sim.pendingActions = append(sim.pendingActions, pa)
+	if index == oldlen {
+		return
+	}
+
+	copy(sim.pendingActions[index+1:], sim.pendingActions[index:])
+	sim.pendingActions[index] = pa
 }
 
 // Advance moves time forward counting down auras, CDs, mana regen, etc
