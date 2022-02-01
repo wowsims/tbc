@@ -119,7 +119,7 @@ func (sim *Simulation) reset() {
 	sim.pendingActions = make([]*PendingAction, 0, 64)
 
 	// Targets need to be reset before the raid, so that players can check for
-	// then presence of permanent target auras in their Reset handlers.
+	// the presence of permanent target auras in their Reset handlers.
 	for _, target := range sim.encounter.Targets {
 		target.Reset(sim)
 	}
