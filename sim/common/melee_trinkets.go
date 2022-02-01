@@ -248,6 +248,7 @@ func ApplyBadgeOfTheSwarmguard(agent core.Agent) {
 						stacks = 0
 					},
 				})
+				character.SetCD(BadgeOfTheSwarmguardCooldownID, sim.CurrentTime+time.Minute*3)
 			}
 		},
 	})
