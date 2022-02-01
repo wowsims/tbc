@@ -165,6 +165,9 @@ func (shaman *Shaman) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {
 	if shaman.Totems.Fire == proto.FireTotem_TotemOfWrath {
 		partyBuffs.TotemOfWrath += 1
 	}
+	if shaman.Talents.ManaTideTotem {
+		partyBuffs.ManaTideTotems++
+	}
 
 	switch shaman.Totems.Water {
 	case proto.WaterTotem_ManaSpringTotem:

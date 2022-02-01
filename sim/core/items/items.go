@@ -86,6 +86,7 @@ type Item struct {
 	Phase      byte
 	Quality    proto.ItemQuality
 	Unique     bool
+	Ilvl       int32
 
 	GemSockets  []proto.GemColor
 	SocketBonus stats.Stats
@@ -113,6 +114,7 @@ func (item Item) ToProto() *proto.Item {
 		Phase:            int32(item.Phase),
 		Quality:          item.Quality,
 		Unique:           item.Unique,
+		Ilvl:             item.Ilvl,
 		GemSockets:       item.GemSockets,
 		SocketBonus:      item.SocketBonus[:],
 	}

@@ -18,12 +18,13 @@ import { Race } from '/tbc/core/proto/common.js';
 import { Spec } from '/tbc/core/proto/common.js';
 import { Stat } from '/tbc/core/proto/common.js';
 import { WeaponImbue } from '/tbc/core/proto/common.js';
+import { WeaponType } from '/tbc/core/proto/common.js';
 import { PlayerStats } from '/tbc/core/proto/api.js';
 import { Player as PlayerProto } from '/tbc/core/proto/api.js';
 import { StatWeightsResult } from '/tbc/core/proto/api.js';
 import { ShamanTotems, EarthTotem, AirTotem, FireTotem, WaterTotem } from '/tbc/core/proto/shaman.js';
 
-import { EquippedItem, computeItemEP } from '/tbc/core/proto_utils/equipped_item.js';
+import { EquippedItem, getWeaponDPS } from '/tbc/core/proto_utils/equipped_item.js';
 import { Gear } from '/tbc/core/proto_utils/gear.js';
 import {
 	gemEligibleForSocket,
@@ -477,7 +478,20 @@ export class Player<SpecType extends Spec> {
 			return this.itemEPCache.get(item.id)!;
 		}
 
-		let ep = computeItemEP(item, this.epWeightsForCalc);
+		let itemStats = new Stats(item.stats);
+		if (item.weaponType != WeaponType.WeaponTypeUnknown) {
+			// Add weapon dps as attack power, so the EP is appropriate.
+			const weaponDps = getWeaponDPS(item);
+			const effectiveAttackPower = itemStats.getStat(Stat.StatAttackPower) + weaponDps * 14;
+			itemStats = itemStats.withStat(Stat.StatAttackPower, effectiveAttackPower);
+		}
+		if (item.id == 33122) {
+			// Cloak of Darkness is super weird, just hardcode it.
+			if (this.spec != Spec.SpecHunter) {
+				itemStats = itemStats.withStat(Stat.StatMeleeCrit, itemStats.getStat(Stat.StatMeleeCrit) + 24);
+			}
+		}
+		let ep = itemStats.computeEP(this.epWeightsForCalc);
 		
 		// unique items are slightly worse than non-unique because you can have only one.
 		if (item.unique) {
