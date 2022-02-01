@@ -2,11 +2,14 @@
 	display: flex;
 	flex-direction: row;
 	justify-content: space-between;
+	max-height: 95%;
 }
 
 .parties-container {
 	display: flex;
 	flex-wrap: wrap;
+	max-height: 100%;
+	overflow-y: auto;
 }
 
 .party-picker-root {
@@ -22,6 +25,7 @@
 }
 
 .player-picker-root {
+	display: flex;
 	height: 30px;
 	width: 370px;
 	border-width: 1px;
@@ -43,10 +47,10 @@
 
 .player-picker-root.dragto:not(.dragfrom) {
 	box-shadow:
-		0 0 5px var(--sidebar-highlight-color),
-		0 0 5px var(--sidebar-highlight-color),
-		0 0 5px var(--sidebar-highlight-color),
-		0 0 5px var(--sidebar-highlight-color);
+		0 0 5px red,
+		0 0 5px red,
+		0 0 5px red,
+		0 0 5px red;
 }
 
 .player-label {
@@ -54,6 +58,7 @@
 	display: inline-flex;
 	align-items: center;
 	cursor: pointer;
+	overflow: hidden;
 }
 
 .player-icon {
@@ -68,9 +73,13 @@
 .player-name {
 	margin: 2px;
 	text-shadow:
-		0 0 3px var(--main-secondary-color),
-		0 0 3px var(--main-secondary-color),
-		0 0 3px var(--main-secondary-color);
+		0 0 3px black,
+		0 0 3px black,
+		0 0 3px black;
+}
+
+.player-spacer {
+	flex-grow: 1;
 }
 
 .player-options {
@@ -78,23 +87,22 @@
 	vertical-align: top;
 	display: inline-flex;
 	align-items: center;
-	float: right;
 }
 
 .player-options span {
 	margin: 4px;
 	cursor: pointer;
 	text-shadow:
-		0 0 3px var(--main-secondary-color),
-		0 0 3px var(--main-secondary-color),
-		0 0 3px var(--main-secondary-color);
+		0 0 3px black,
+		0 0 3px black,
+		0 0 3px black;
 }
 
 .player-options span:hover {
 	text-shadow:
-		0 0 3px var(--sidebar-highlight-color),
-		0 0 3px var(--sidebar-highlight-color),
-		0 0 3px var(--sidebar-highlight-color);
+		0 0 3px red,
+		0 0 3px red,
+		0 0 3px red;
 }
 
 .player-edit {
@@ -114,13 +122,12 @@
 	vertical-align: top;
 	display: inline-flex;
 	align-items: center;
-	float: right;
 
 	font-size: 16px;
 	text-shadow:
-		0 0 3px var(--main-secondary-color),
-		0 0 3px var(--main-secondary-color),
-		0 0 3px var(--main-secondary-color);
+		0 0 3px black,
+		0 0 3px black,
+		0 0 3px black;
 }
 
 .player-results[draggable="true"] {

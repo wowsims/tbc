@@ -188,6 +188,7 @@ func ApplyQuagmirransEye(agent core.Agent) {
 		const dur = time.Second * 45
 		icd := core.NewICD()
 
+		applyStatAura := character.NewTempStatAuraApplier(sim, FungalFrenzyAuraID, core.ActionID{ItemID: 27683}, stats.SpellHaste, hasteBonus, time.Second*6)
 		return core.Aura{
 			ID: QuagmirransEyeAuraID,
 			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
@@ -195,7 +196,7 @@ func ApplyQuagmirransEye(agent core.Agent) {
 					return
 				}
 				icd = core.InternalCD(sim.CurrentTime + dur)
-				character.AddAuraWithTemporaryStats(sim, FungalFrenzyAuraID, core.ActionID{ItemID: 27683}, stats.SpellHaste, hasteBonus, time.Second*6)
+				applyStatAura(sim)
 			},
 		}
 	})
@@ -290,6 +291,7 @@ func ApplyDarkmoonCardCrusade(agent core.Agent) {
 				if meleeStacks < 20 {
 					meleeStacks++
 					character.AddStat(stats.AttackPower, meleeBonus)
+					character.AddStat(stats.RangedAttackPower, meleeBonus)
 				}
 
 				// Removal aura will refresh with new total spellpower based on stacks.
@@ -300,6 +302,7 @@ func ApplyDarkmoonCardCrusade(agent core.Agent) {
 					Expires:  sim.CurrentTime + time.Second*10,
 					OnExpire: func(sim *core.Simulation) {
 						character.AddStat(stats.AttackPower, -meleeBonus*float64(meleeStacks))
+						character.AddStat(stats.RangedAttackPower, -meleeBonus*float64(meleeStacks))
 						meleeStacks = 0
 					},
 				})

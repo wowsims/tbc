@@ -131,6 +131,10 @@ type PermanentAura struct {
 	// beginning of every iteration but expires after a period of time. This is
 	// used for some snapshotting effects like Warrior battle shout.
 	RespectExpiration bool
+
+	// Multiplies uptime for the aura metrics of this aura. This is for buffs coded
+	// as permanent but which are actually averaged versions of the real buff.
+	UptimeMultiplier float64
 }
 
 // auraTracker is a centralized implementation of CD and Aura tracking.
@@ -227,7 +231,7 @@ func (at *auraTracker) reset(sim *Simulation) {
 	if at.useDebuffIDs {
 		at.auras = make([]Aura, numDebuffIDs)
 	} else {
-		at.auras = make([]Aura, numAuraIDs)
+		copy(at.auras, sim.emptyAuras)
 	}
 
 	at.cooldowns = make([]time.Duration, numCooldownIDs)
@@ -256,6 +260,9 @@ func (at *auraTracker) reset(sim *Simulation) {
 			aura.Expires = NeverExpires
 		}
 		at.AddAura(sim, aura)
+		if permAura.UptimeMultiplier != 0 && !aura.ActionID.IsEmptyAction() {
+			at.AddAuraUptime(aura.ID, aura.ActionID, time.Duration(-1*float64(sim.Duration)*(1.0-permAura.UptimeMultiplier)))
+		}
 	}
 }
 
@@ -295,28 +302,31 @@ func (at *auraTracker) doneIteration(simDuration time.Duration) {
 // ReplaceAura is like AddAura but an existing aura will not be removed/readded.
 // This means that 'OnExpire' will not fire off on the old aura.
 func (at *auraTracker) ReplaceAura(sim *Simulation, newAura Aura) {
-	if at.HasAura(newAura.ID) {
-		old := at.auras[newAura.ID]
-
-		// private cached state has to be copied over
-		newAura.activeIndex = old.activeIndex
-		newAura.onCastIndex = old.onCastIndex
-		newAura.onCastCompleteIndex = old.onCastCompleteIndex
-		newAura.onBeforeSpellHitIndex = old.onBeforeSpellHitIndex
-		newAura.onSpellHitIndex = old.onSpellHitIndex
-		newAura.onSpellMissIndex = old.onSpellMissIndex
-		newAura.onBeforePeriodicDamageIndex = old.onBeforePeriodicDamageIndex
-		newAura.onPeriodicDamageIndex = old.onPeriodicDamageIndex
-		newAura.OnMeleeAttackIndex = old.OnMeleeAttackIndex
-		newAura.OnBeforeMeleeIndex = old.OnBeforeMeleeIndex
-		newAura.OnBeforeMeleeHitIndex = old.OnBeforeMeleeHitIndex
-		newAura.startTime = old.startTime
-
-		at.auras[newAura.ID] = newAura
+	if !at.HasAura(newAura.ID) {
+		at.AddAura(sim, newAura)
 		return
 	}
 
-	at.AddAura(sim, newAura)
+	old := at.auras[newAura.ID]
+
+	if old.ActionID != newAura.ActionID {
+		panic("bad")
+	}
+	// private cached state has to be copied over
+	newAura.activeIndex = old.activeIndex
+	newAura.onCastIndex = old.onCastIndex
+	newAura.onCastCompleteIndex = old.onCastCompleteIndex
+	newAura.onBeforeSpellHitIndex = old.onBeforeSpellHitIndex
+	newAura.onSpellHitIndex = old.onSpellHitIndex
+	newAura.onSpellMissIndex = old.onSpellMissIndex
+	newAura.onBeforePeriodicDamageIndex = old.onBeforePeriodicDamageIndex
+	newAura.onPeriodicDamageIndex = old.onPeriodicDamageIndex
+	newAura.OnMeleeAttackIndex = old.OnMeleeAttackIndex
+	newAura.OnBeforeMeleeIndex = old.OnBeforeMeleeIndex
+	newAura.OnBeforeMeleeHitIndex = old.OnBeforeMeleeHitIndex
+	newAura.startTime = old.startTime
+
+	at.auras[newAura.ID] = newAura
 }
 
 // Adds a new aura to the simulation. If an aura with the same ID already
@@ -531,11 +541,18 @@ func (at *auraTracker) IsOnCD(id CooldownID, currentTime time.Duration) bool {
 	return at.cooldowns[id] > currentTime
 }
 
+func (at *auraTracker) CDReadyAt(id CooldownID) time.Duration {
+	return at.cooldowns[id]
+}
+
 func (at *auraTracker) GetRemainingCD(id CooldownID, currentTime time.Duration) time.Duration {
 	return MaxDuration(0, at.cooldowns[id]-currentTime)
 }
 
 func (at *auraTracker) SetCD(id CooldownID, newCD time.Duration) {
+	if id == 0 {
+		panic("Trying to set CD with ID 0!")
+	}
 	at.cooldowns[id] = newCD
 }
 
@@ -644,6 +661,38 @@ func NewICD() InternalCD {
 	return InternalCD(0)
 }
 
+// NewTempStatAuraApplier creates an application function for applying temp stats. This is higher performance because it creates a cached Aura object in its closure.
+//  You can replace most calls of 'AddAuraWithTemporaryStats' whenever a perf issue is discovered.
+func (character *Character) NewTempStatAuraApplier(sim *Simulation, auraID AuraID, actionID ActionID, stat stats.Stat, amount float64, duration time.Duration) func(sim *Simulation) {
+	aura := Aura{
+		ID:       auraID,
+		ActionID: actionID,
+		OnExpire: func(sim *Simulation) {
+			if sim.Log != nil {
+				character.Log(sim, "Lost %0.02f %s from fading %s.", amount, stat.StatName(), actionID)
+			}
+			if stat == stats.MeleeHaste {
+				character.AddMeleeHaste(sim, -amount)
+			} else {
+				character.AddStat(stat, -amount)
+			}
+		},
+	}
+
+	return func(sim *Simulation) {
+		if sim.Log != nil {
+			character.Log(sim, "Gained %0.02f %s from %s.", amount, stat.StatName(), actionID)
+		}
+		if stat == stats.MeleeHaste {
+			character.AddMeleeHaste(sim, amount)
+		} else {
+			character.AddStat(stat, amount)
+		}
+		aura.Expires = sim.CurrentTime + duration
+		character.AddAura(sim, aura)
+	}
+}
+
 // Helper for the common case of adding an Aura that gives a temporary stat boost.
 func (character *Character) AddAuraWithTemporaryStats(sim *Simulation, auraID AuraID, actionID ActionID, stat stats.Stat, amount float64, duration time.Duration) {
 	character.AddAura(sim, character.NewAuraWithTemporaryStats(sim, auraID, actionID, stat, amount, duration))
@@ -656,6 +705,9 @@ func (character *Character) NewAuraWithTemporaryStats(sim *Simulation, auraID Au
 		character.AddMeleeHaste(sim, amount)
 	} else {
 		character.AddStat(stat, amount)
+		if stat == stats.AttackPower {
+			character.AddStat(stats.RangedAttackPower, amount)
+		}
 	}
 
 	return Aura{
@@ -670,6 +722,9 @@ func (character *Character) NewAuraWithTemporaryStats(sim *Simulation, auraID Au
 				character.AddMeleeHaste(sim, -amount)
 			} else {
 				character.AddStat(stat, -amount)
+				if stat == stats.AttackPower {
+					character.AddStat(stats.RangedAttackPower, -amount)
+				}
 			}
 		},
 	}

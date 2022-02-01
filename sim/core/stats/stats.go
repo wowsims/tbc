@@ -45,6 +45,7 @@ const (
 	Energy
 	Rage
 	Armor
+	RangedAttackPower
 
 	Len
 )
@@ -115,6 +116,8 @@ func (s Stat) StatName() string {
 		return "Rage"
 	case Armor:
 		return "Armor"
+	case RangedAttackPower:
+		return "RangedAttackPower"
 	}
 
 	return "none"
@@ -329,7 +332,8 @@ func (sdm *StatDependencyManager) ApplyStatDependencies(stats Stats) Stats {
 
 type PseudoStats struct {
 	CastSpeedMultiplier   float64
-	AttackSpeedMultiplier float64
+	MeleeSpeedMultiplier  float64
+	RangedSpeedMultiplier float64
 
 	FiveSecondRuleRefreshTime time.Duration // last time a spell was cast
 	SpiritRegenRateCasting    float64       // percentage of spirit regen allowed during casting
@@ -337,33 +341,19 @@ type PseudoStats struct {
 	// Both of these are currently only used for innervate.
 	ForceFullSpiritRegen  bool    // If set, automatically uses full spirit regen regardless of FSR refresh time.
 	SpiritRegenMultiplier float64 // Multiplier on spirit portion of mana regen.
+
+	BonusMeleeDamage  float64 // Comes from '+X Weapon Damage' effects, affects melee hits only.
+	BonusRangedDamage float64 // Comes from '+X Weapon Damage' effects, affects ranged hits only.
+
+	ThreatMultiplier float64 // Modulates the threat generated. Affected by things like salv.
 }
 
-// TODO: more stat calculations
-
-// INT
-
-// Warlocks receive 1% Spell Critical Strike chance for every 81.9 points of intellect.
-// Druids receive 1% Spell Critical Strike chance for every 79.4 points of intellect.
-// Shamans receive 1% Spell Critical Strike chance for every 78.1 points of intellect.
-// Mages receive 1% Spell Critical Strike chance for every 81 points of intellect.
-// Priests receive 1% Spell Critical Strike chance for every 80 points of intellect.
-// Paladins receive 1% Spell Critical Strike chance for every 79.4 points of intellect.
-
-// AGI
-
-// Rogues, Hunters, and Warriors gain 1 ranged Attack Power per point of Agility.
-// Druids in Cat Form, Hunters and Rogues gain 1 melee Attack Power per point of Agility.
-// You gain 2 Armor for every point of Agility.
-
-// You gain Critical Strike Chance at varying rates, depending on your class:
-// 	Paladins, Druids, and Shamans receive 1% Critical Strike Chance for every 25 points of Agility.
-// 	Rogues and Hunters receive 1% Critical Strike Chance for every 40 points of Agility.
-// 	Warriors receive 1% Critical Strike Chance for every 33 points of Agility.
-
-// STR
-
-// Feral Druids receive 2 melee Attack Power per point of Strength.
-// Protection and Retribution Paladins receive 1 melee Attack Power per point of Strength.
-// Rogues receive 1 melee Attack Power per point of Strength.
-// Enhancement Shaman receive 2 melee Attack Power per point of Strength.
+func NewPseudoStats() PseudoStats {
+	return PseudoStats{
+		CastSpeedMultiplier:  1,
+		MeleeSpeedMultiplier: 1,
+		//RangedSpeedMultiplier: 1, // Leave at 0 so we can use this to ignore ranged stuff for non-hunters.
+		SpiritRegenMultiplier: 1,
+		ThreatMultiplier:      1,
+	}
+}

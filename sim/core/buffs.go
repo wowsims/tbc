@@ -36,7 +36,8 @@ func applyBuffEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs proto.P
 
 	if partyBuffs.TrueshotAura {
 		character.AddStats(stats.Stats{
-			stats.AttackPower: 125,
+			stats.AttackPower:       125,
+			stats.RangedAttackPower: 125,
 		})
 	}
 
@@ -81,7 +82,8 @@ func applyBuffEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs proto.P
 	})
 
 	character.AddStats(stats.Stats{
-		stats.AttackPower: GetTristateValueFloat(individualBuffs.BlessingOfMight, 220, 264),
+		stats.AttackPower:       GetTristateValueFloat(individualBuffs.BlessingOfMight, 220, 264),
+		stats.RangedAttackPower: GetTristateValueFloat(individualBuffs.BlessingOfMight, 220, 264),
 	})
 
 	if individualBuffs.BlessingOfKings {
@@ -104,15 +106,36 @@ func applyBuffEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs proto.P
 		}
 	}
 
+	if individualBuffs.BlessingOfSalvation {
+		character.PseudoStats.ThreatMultiplier *= 0.7
+	}
+
 	if partyBuffs.SanctityAura == proto.TristateEffect_TristateEffectImproved {
 		character.AddPermanentAura(func(sim *Simulation) Aura {
 			return ImprovedSanctityAura()
 		})
 	}
 
-	character.AddStats(stats.Stats{
-		stats.AttackPower: GetTristateValueFloat(partyBuffs.BattleShout, 306, 382.5),
-	})
+	if partyBuffs.BattleShout != proto.TristateEffect_TristateEffectMissing {
+		character.AddStats(stats.Stats{
+			stats.AttackPower: GetTristateValueFloat(partyBuffs.BattleShout, 306, 382.5),
+		})
+		if partyBuffs.BsSolarianSapphire {
+			partyBuffs.SnapshotBsSolarianSapphire = false
+			character.AddStats(stats.Stats{
+				stats.AttackPower: 70,
+			})
+		}
+
+		snapshotSapphire := partyBuffs.SnapshotBsSolarianSapphire
+		snapshotT2 := partyBuffs.SnapshotBsT2
+		if snapshotSapphire || snapshotT2 {
+			character.AddPermanentAuraWithOptions(PermanentAura{
+				AuraFactory:       SnapshotBattleShoutAura(character, snapshotSapphire, snapshotT2),
+				RespectExpiration: true,
+			})
+		}
+	}
 
 	if partyBuffs.TotemOfWrath > 0 {
 		character.AddStats(stats.Stats{
@@ -149,6 +172,9 @@ func applyBuffEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs proto.P
 		character.AddPermanentAura(func(sim *Simulation) Aura {
 			return WindfuryTotemAura(character, partyBuffs.WindfuryTotemRank, partyBuffs.WindfuryTotemIwt)
 		})
+	}
+	if partyBuffs.TranquilAirTotem {
+		character.PseudoStats.ThreatMultiplier *= 0.8
 	}
 
 	if individualBuffs.UnleashedRage {
@@ -187,6 +213,12 @@ func applyBuffEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs proto.P
 	if partyBuffs.ChainOfTheTwilightOwl {
 		character.AddStats(stats.Stats{stats.SpellCrit: 2 * SpellCritRatingPerCritChance})
 	}
+	if partyBuffs.BattleChickens > 0 {
+		character.AddPermanentAuraWithOptions(PermanentAura{
+			AuraFactory:       BattleChickenAura(character, partyBuffs.BattleChickens),
+			RespectExpiration: true,
+		})
+	}
 }
 
 var SnapshotImprovedWrathOfAirTotemAuraID = NewAuraID()
@@ -197,13 +229,66 @@ func SnapshotImprovedWrathOfAirTotemAura(character *Character) AuraFactory {
 	}
 }
 
+var SnapshotBattleShoutAuraID = NewAuraID()
+
+func SnapshotBattleShoutAura(character *Character, snapshotSapphire bool, snapshotT2 bool) AuraFactory {
+	amount := 0.0
+	if snapshotSapphire {
+		amount += 70
+	}
+	if snapshotT2 {
+		amount += 30
+	}
+
+	// Do this manually instead of calling NewAuraWithTemporaryStats so that it
+	// only affects melee AP.
+	return func(sim *Simulation) Aura {
+		actionID := ActionID{SpellID: 2048, Tag: 1}
+		if sim.Log != nil {
+			character.Log(sim, "Gained %0.02f %s from %s.", amount, stats.AttackPower.StatName(), actionID)
+		}
+		character.AddStat(stats.AttackPower, amount)
+
+		return Aura{
+			ID:       SnapshotBattleShoutAuraID,
+			ActionID: actionID,
+			Expires:  sim.CurrentTime + time.Second*110,
+			OnExpire: func(sim *Simulation) {
+				if sim.Log != nil {
+					character.Log(sim, "Lost %0.02f %s from fading %s.", amount, stats.AttackPower.StatName(), actionID)
+				}
+				character.AddStat(stats.AttackPower, -amount)
+			},
+		}
+	}
+}
+
+var BattleChickenAuraID = NewAuraID()
+
+func BattleChickenAura(character *Character, numChickens int32) AuraFactory {
+	bonus := math.Pow(1.05, float64(numChickens))
+	inverseBonus := 1 / bonus
+
+	return func(sim *Simulation) Aura {
+		character.MultiplyMeleeSpeed(sim, bonus)
+
+		return Aura{
+			ID:      BattleChickenAuraID,
+			Expires: sim.CurrentTime + time.Minute*4,
+			OnExpire: func(sim *Simulation) {
+				character.MultiplyMeleeSpeed(sim, inverseBonus)
+			},
+		}
+	}
+}
+
 var FerociousInspirationAuraID = NewAuraID()
 
 func FerociousInspirationAura(numBMHunters int32) Aura {
 	multiplier := math.Pow(1.03, float64(numBMHunters))
 	return Aura{
 		ID:       FerociousInspirationAuraID,
-		ActionID: ActionID{SpellID: 31870},
+		ActionID: ActionID{SpellID: 34460},
 		OnBeforeMeleeHit: func(sim *Simulation, ability *ActiveMeleeAbility, hitEffect *AbilityHitEffect) {
 			hitEffect.DamageMultiplier *= multiplier
 		},
@@ -253,8 +338,10 @@ var windfuryAPBonuses = []float64{
 }
 
 func IsEligibleForWindfuryTotem(character *Character) bool {
-	// TODO: Also check that no weapon imbue is applied.
-	return character.AutoAttacks.IsEnabled() && !character.HasMHWeaponImbue
+	return character.AutoAttacks.IsEnabled() &&
+		character.HasMHWeapon() &&
+		!character.HasMHWeaponImbue &&
+		character.consumes.MainHandImbue == proto.WeaponImbue_WeaponImbueUnknown
 }
 
 func WindfuryTotemAura(character *Character, rank int32, iwtTalentPoints int32) Aura {
@@ -266,8 +353,9 @@ func WindfuryTotemAura(character *Character, rank int32, iwtTalentPoints int32) 
 	wftempl := ActiveMeleeAbility{
 		MeleeAbility: MeleeAbility{
 			ActionID:       actionID,
-			CritMultiplier: 2.0,
 			Character:      character,
+			SpellSchool:    stats.AttackPower,
+			CritMultiplier: 2.0,
 		},
 		Effect: AbilityHitEffect{
 			AbilityEffect: AbilityEffect{
@@ -420,7 +508,7 @@ func AddBloodlustAura(sim *Simulation, character *Character, actionTag int32) {
 		character.PseudoStats.CastSpeedMultiplier /= 1.2
 	}
 	character.PseudoStats.CastSpeedMultiplier *= bonus
-	character.MultiplyMeleeSpeed(sim, bonus)
+	character.MultiplyAttackSpeed(sim, bonus)
 
 	character.AddAura(sim, Aura{
 		ID:       BloodlustAuraID,
@@ -431,7 +519,7 @@ func AddBloodlustAura(sim *Simulation, character *Character, actionTag int32) {
 			if character.HasAura(PowerInfusionAuraID) {
 				character.PseudoStats.CastSpeedMultiplier *= 1.2
 			}
-			character.MultiplyMeleeSpeed(sim, inverseBonus)
+			character.MultiplyAttackSpeed(sim, inverseBonus)
 		},
 	})
 
@@ -506,8 +594,8 @@ const InnervateCD = time.Minute * 6
 
 func InnervateManaThreshold(character *Character) float64 {
 	if character.Class == proto.Class_ClassMage {
-		// Mages burn mana really fast so they probably need a higher threshold.
-		return 2000
+		// Mages burn mana really fast so they need a higher threshold.
+		return character.MaxMana() * 0.7
 	} else {
 		return 1000
 	}
@@ -555,6 +643,7 @@ func registerInnervateCD(agent Agent, numInnervates int32) {
 func AddInnervateAura(sim *Simulation, character *Character, expectedBonusManaReduction float64, actionTag int32) {
 	character.PseudoStats.ForceFullSpiritRegen = true
 	character.PseudoStats.SpiritRegenMultiplier *= 5.0
+	character.UpdateManaRegenRates()
 
 	lastUpdateTime := sim.CurrentTime
 	bonusManaSubtracted := 0.0
@@ -576,6 +665,7 @@ func AddInnervateAura(sim *Simulation, character *Character, expectedBonusManaRe
 		OnExpire: func(sim *Simulation) {
 			character.PseudoStats.ForceFullSpiritRegen = false
 			character.PseudoStats.SpiritRegenMultiplier /= 5.0
+			character.UpdateManaRegenRates()
 
 			remainder := expectedBonusManaReduction - bonusManaSubtracted
 			character.ExpectedBonusMana -= remainder

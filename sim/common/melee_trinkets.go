@@ -120,20 +120,7 @@ func init() {
 		},
 	))
 
-	// TODO: Make sure +7 weapon damage is accounted for.
-	var CrystalforgedTrinketCooldownID = core.NewCooldownID()
-	core.AddItemEffect(32654, core.MakeTemporaryStatsOnUseCDRegistration(
-		core.OffensiveTrinketActiveAuraID,
-		stats.AttackPower,
-		216,
-		time.Second*10,
-		core.MajorCooldown{
-			ActionID:         core.ActionID{ItemID: 32654},
-			CooldownID:       CrystalforgedTrinketCooldownID,
-			Cooldown:         time.Minute * 1,
-			SharedCooldownID: core.OffensiveTrinketSharedCooldownID,
-		},
-	))
+	core.AddItemEffect(32654, ApplyCrystalforgedTrinket)
 
 	var BadgeOfTenacityCooldownID = core.NewCooldownID()
 	core.AddItemEffect(32658, core.MakeTemporaryStatsOnUseCDRegistration(
@@ -192,6 +179,26 @@ func init() {
 	))
 }
 
+var CrystalforgedTrinketCooldownID = core.NewCooldownID()
+
+func ApplyCrystalforgedTrinket(agent core.Agent) {
+	agent.GetCharacter().PseudoStats.BonusMeleeDamage += 7
+	agent.GetCharacter().PseudoStats.BonusRangedDamage += 7
+	core.RegisterTemporaryStatsOnUseCD(
+		agent,
+		core.OffensiveTrinketActiveAuraID,
+		stats.AttackPower,
+		216,
+		time.Second*10,
+		core.MajorCooldown{
+			ActionID:         core.ActionID{ItemID: 32654},
+			CooldownID:       CrystalforgedTrinketCooldownID,
+			Cooldown:         time.Minute * 1,
+			SharedCooldownID: core.OffensiveTrinketSharedCooldownID,
+		},
+	)
+}
+
 var BadgeOfTheSwarmguardAuraID = core.NewAuraID()
 var BadgeOfTheSwarmguardProcAuraID = core.NewAuraID()
 var BadgeOfTheSwarmguardCooldownID = core.NewCooldownID()
@@ -215,6 +222,7 @@ func ApplyBadgeOfTheSwarmguard(agent core.Agent) {
 			return func(sim *core.Simulation, character *core.Character) {
 				const arPenBonus = 200.0
 				const dur = time.Second * 30
+				ppmm := character.AutoAttacks.NewPPMManager(10.0)
 				stacks := 0
 
 				character.AddAura(sim, core.Aura{
@@ -223,6 +231,10 @@ func ApplyBadgeOfTheSwarmguard(agent core.Agent) {
 					Expires:  sim.CurrentTime + dur,
 					OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
 						if !hitEffect.Landed() {
+							return
+						}
+
+						if !ppmm.Proc(sim, hitEffect.IsMH(), hitEffect.IsRanged(), "Badge of the Swarmguard") {
 							return
 						}
 
@@ -301,19 +313,19 @@ func ApplyRomulosPoisonVial(agent core.Agent) {
 		castTemplate := core.NewSimpleSpellTemplate(core.SimpleSpell{
 			SpellCast: core.SpellCast{
 				Cast: core.Cast{
-					ActionID:        core.ActionID{ItemID: 28579},
-					Character:       character,
-					IgnoreCooldowns: true,
-					IgnoreManaCost:  true,
-					IsPhantom:       true,
-					SpellSchool:     stats.NatureSpellPower,
-					CritMultiplier:  1.5,
+					ActionID:       core.ActionID{ItemID: 28579},
+					Character:      character,
+					IgnoreManaCost: true,
+					IsPhantom:      true,
+					SpellSchool:    stats.NatureSpellPower,
+					CritMultiplier: 1.5,
 				},
 			},
 			Effect: core.SpellHitEffect{
 				SpellEffect: core.SpellEffect{
 					DamageMultiplier:       1,
 					StaticDamageMultiplier: 1,
+					ThreatMultiplier:       1,
 				},
 				DirectInput: core.DirectDamageInput{
 					MinBaseDamage: 222,
@@ -328,7 +340,7 @@ func ApplyRomulosPoisonVial(agent core.Agent) {
 				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() {
 					return
 				}
-				if !ppmm.Proc(sim, hitEffect.IsMH(), "RomulosPoisonVial") {
+				if !ppmm.Proc(sim, hitEffect.IsMH(), hitEffect.IsRanged(), "RomulosPoisonVial") {
 					return
 				}
 
@@ -363,7 +375,7 @@ func ApplyDragonspineTrophy(agent core.Agent) {
 				if icd.IsOnCD(sim) {
 					return
 				}
-				if !ppmm.Proc(sim, hitEffect.IsMH(), "dragonspine") {
+				if !ppmm.Proc(sim, hitEffect.IsMH(), hitEffect.IsRanged(), "dragonspine") {
 					return
 				}
 				icd = core.InternalCD(sim.CurrentTime + icdDur)
@@ -396,7 +408,7 @@ func ApplyTsunamiTalisman(agent core.Agent) {
 				if icd.IsOnCD(sim) {
 					return
 				}
-				if sim.RandomFloat("Madness of the Betrayer") > procChance {
+				if sim.RandomFloat("Tsunami Talisman") > procChance {
 					return
 				}
 
@@ -453,7 +465,7 @@ func ApplyMadnessOfTheBetrayer(agent core.Agent) {
 				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() {
 					return
 				}
-				if !ppmm.Proc(sim, hitEffect.IsMH(), "Madness of the Betrayer") {
+				if !ppmm.Proc(sim, hitEffect.IsMH(), hitEffect.IsRanged(), "Madness of the Betrayer") {
 					return
 				}
 

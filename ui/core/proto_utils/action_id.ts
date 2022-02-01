@@ -43,6 +43,10 @@ export class ActionId {
 					name += ' (Off Hand)';
 				}
 				break;
+			case OtherAction.OtherActionShoot:
+				name = 'Shoot';
+				iconUrl = 'https://wow.zamimg.com/images/wow/icons/large/ability_marksmanship.jpg';
+				break;
 		}
 		this.baseName = baseName;
 		this.name = name;
@@ -116,6 +120,7 @@ export class ActionId {
 				}
 				break;
 			case 'Fireball':
+			case 'Flamestrike':
 			case 'Pyroblast':
 				if (this.tag) name += ' (DoT)';
 				break;
@@ -128,6 +133,7 @@ export class ActionId {
 					name += ' (3 Tick)';
 				}
 				break;
+			case 'Chain Lightning':
 			case 'Lightning Bolt':
 				if (this.tag) name += ' (LO)';
 				break;
@@ -152,11 +158,17 @@ export class ActionId {
 				}
 				break;
 			case 'Lightning Speed':
+			case 'Siphon Essence':
 			case 'Windfury Weapon':
 				if (this.tag == 1) {
 					name += ' (Main Hand)';
 				} else if (this.tag == 2) {
 					name += ' (Off Hand)';
+				}
+				break;
+			case 'Battle Shout':
+				if (this.tag == 1) {
+					name += ' (Snapshot)';
 				}
 				break;
 			default:

@@ -44,7 +44,7 @@ export class ElementalShamanSimUI extends IndividualSimUI<Spec.SpecElementalSham
 						shouldDisplay: () => {
 							const hasT62P = simUI.player.getCurrentStats().sets.includes('Skyshatter Regalia (2pc)');
 							const totems = simUI.player.getRotation().totems!;
-							const hasAll4Totems = totems.earth && totems.air && totems.fire && totems.water;
+							const hasAll4Totems = totems && totems.earth && totems.air && totems.fire && totems.water;
 							return hasT62P && !hasAll4Totems;
 						},
 						getContent: () => 'T6 2pc bonus is equipped, but inactive because not all 4 totem types are being used.',
@@ -176,8 +176,8 @@ export class ElementalShamanSimUI extends IndividualSimUI<Spec.SpecElementalSham
 				IconInputs.AdeptsElixir,
 				IconInputs.ElixirOfMajorMageblood,
 				IconInputs.ElixirOfDraenicWisdom,
-				IconInputs.BrilliantWizardOil,
-				IconInputs.SuperiorWizardOil,
+				IconInputs.MainHandBrilliantWizardOil,
+				IconInputs.MainHandSuperiorWizardOil,
 				IconInputs.BlackenedBasilisk,
 				IconInputs.SkullfishSoup,
 			],

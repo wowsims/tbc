@@ -6,21 +6,26 @@ import (
 )
 
 var StandardTalents = &proto.DruidTalents{
-	StarlightWrath:   5,
-	FocusedStarlight: 2,
-	ImprovedMoonfire: 2,
-	InsectSwarm:      true,
-	Vengeance:        5,
-	LunarGuidance:    3,
-	NaturesGrace:     true,
-	Moonglow:         3,
-	Moonfury:         5,
-	BalanceOfPower:   2,
-	Dreamstate:       3,
-	MoonkinForm:      true,
-	WrathOfCenarius:  5,
-	ForceOfNature:    true,
-	Intensity:        3,
+	StarlightWrath:        5,
+	FocusedStarlight:      2,
+	ImprovedMoonfire:      2,
+	Brambles:              3,
+	InsectSwarm:           true,
+	Vengeance:             5,
+	LunarGuidance:         3,
+	NaturesGrace:          true,
+	Moonglow:              3,
+	Moonfury:              5,
+	BalanceOfPower:        2,
+	Dreamstate:            3,
+	MoonkinForm:           true,
+	ImprovedFaerieFire:    3,
+	WrathOfCenarius:       5,
+	ForceOfNature:         true,
+	ImprovedMarkOfTheWild: 5,
+	Furor:                 2,
+	NaturalShapeshifter:   3,
+	Intensity:             3,
 }
 
 var FullRaidBuffs = &proto.RaidBuffs{
@@ -29,6 +34,7 @@ var FullRaidBuffs = &proto.RaidBuffs{
 }
 var FullPartyBuffs = &proto.PartyBuffs{
 	MoonkinAura: proto.TristateEffect_TristateEffectRegular,
+	Drums:       proto.Drums_DrumsOfBattle,
 }
 var FullIndividualBuffs = &proto.IndividualBuffs{
 	BlessingOfKings:  true,
@@ -38,13 +44,12 @@ var FullIndividualBuffs = &proto.IndividualBuffs{
 
 var FullConsumes = &proto.Consumes{
 	FlaskOfBlindingLight: true,
-	BrilliantWizardOil:   true,
 	BlackenedBasilisk:    true,
 	DefaultPotion:        proto.Potions_SuperManaPotion,
 	StartingPotion:       proto.Potions_DestructionPotion,
+	MainHandImbue:        proto.WeaponImbue_WeaponImbueBrilliantWizardOil,
 	NumStartingPotions:   1,
 	DefaultConjured:      proto.Conjured_ConjuredDarkRune,
-	Drums:                proto.Drums_DrumsOfBattle,
 }
 
 var FullDebuffs = &proto.Debuffs{

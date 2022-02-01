@@ -448,7 +448,7 @@ export class ManaChangedLog extends SimLog {
 
 	toString(): string {
 		const signedDiff = (this.manaAfter - this.manaBefore) * (this.isSpend ? -1 : 1);
-		return `${this.toStringPrefix()} ${this.isSpend ? 'Spent' : 'Gained'} ${signedDiff.toFixed(1)} mana from ${this.cause.name}.`;
+		return `${this.toStringPrefix()} ${this.isSpend ? 'Spent' : 'Gained'} ${signedDiff.toFixed(1)} mana from ${this.cause.name}. (${this.manaBefore.toFixed(1)} --> ${this.manaAfter.toFixed(1)})`;
 	}
 
 	resultString(): string {
@@ -545,9 +545,13 @@ export class CastBeganLog extends SimLog {
 	}
 
 	static parse(params: SimLogParams): Promise<CastBeganLog> | null {
-		const match = params.raw.match(/Casting (.*) \(Current Mana = (\d+\.?\d*), Mana Cost = (\d+\.?\d*), Cast Time = (\d+\.?\d*)s\)/);
+		const match = params.raw.match(/Casting (.*) \(Current Mana = (\d+\.?\d*), Mana Cost = (\d+\.?\d*), Cast Time = (\d+\.?\d*)(m?s)\)/);
 		if (match) {
-			return ActionId.fromLogString(match[1]).fill(params.source?.index).then(castId => new CastBeganLog(params, castId, parseFloat(match[2]), parseFloat(match[3]), parseFloat(match[4])));
+			let castTime = parseFloat(match[4]);
+			if (match[5] == 'ms') {
+				castTime /= 1000;
+			}
+			return ActionId.fromLogString(match[1]).fill(params.source?.index).then(castId => new CastBeganLog(params, castId, parseFloat(match[2]), parseFloat(match[3]), castTime));
 		} else {
 			return null;
 		}

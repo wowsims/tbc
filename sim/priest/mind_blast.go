@@ -19,6 +19,7 @@ func (priest *Priest) newMindBlastTemplate(sim *core.Simulation) core.SimpleSpel
 		BaseManaCost:   450,
 		ManaCost:       450,
 		CastTime:       time.Millisecond * 1500,
+		GCD:            core.GCDDefault,
 		Cooldown:       time.Second * 8,
 		ActionID: core.ActionID{
 			SpellID:    SpellIDMindBlast,
@@ -30,6 +31,7 @@ func (priest *Priest) newMindBlastTemplate(sim *core.Simulation) core.SimpleSpel
 		SpellEffect: core.SpellEffect{
 			DamageMultiplier:       1,
 			StaticDamageMultiplier: 1,
+			ThreatMultiplier:       1,
 		},
 		DirectInput: core.DirectDamageInput{
 			MinBaseDamage:    711,

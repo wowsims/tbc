@@ -11,6 +11,7 @@ message HunterTalents {
 	int32 unleashed_fury = 4;
 	int32 ferocity = 5;
 	int32 bestial_discipline = 6;
+	int32 animal_handler = 45;
 	int32 frenzy = 7;
 	int32 ferocious_inspiration = 8;
 	bool bestial_wrath = 9;
@@ -57,12 +58,59 @@ message HunterTalents {
 
 message Hunter {
     message Rotation {
+			bool adaptive = 1;
+			bool use_multi_shot = 2;
+			bool use_arcane_shot = 3;
+			bool maintain_scorpid_sting = 4;
+			bool precast_aimed_shot = 5;
+			bool melee_weave = 6;
+
+			// Switch to Aspect of the Viper when mana goes below this percent.
+			double viper_start_mana_percent = 7;
+			// Switch back to Aspect of the Hawk when mana goes above this percent.
+			double viper_stop_mana_percent = 8;
     }
     Rotation rotation = 1;
 
     HunterTalents talents = 2;
     
     message Options {
+			enum QuiverBonus {
+					QuiverNone = 0;
+					Speed10 = 1;
+					Speed11 = 2;
+					Speed12 = 3;
+					Speed13 = 4;
+					Speed14 = 5;
+					Speed15 = 6;
+			}
+			QuiverBonus quiver_bonus = 1;
+
+			enum Ammo {
+					AmmoNone = 0;
+					TimelessArrow = 1;
+					MysteriousArrow = 2;
+					AdamantiteStinger = 3;
+					WardensArrow = 4;
+					HalaaniRazorshaft = 5;
+					BlackflightArrow = 6;
+			}
+			Ammo ammo = 2;
+
+			enum PetType {
+					PetNone = 0;
+					Ravager = 1;
+					Cat = 2;
+					Raptor = 3;
+					Owl = 4;
+					Bat = 5;
+					WindSerpent = 6;
+			}
+			PetType pet_type = 3;
+
+			double pet_uptime = 4;
+
+			double latency_ms = 5;
     }
     Options options = 3;
 }

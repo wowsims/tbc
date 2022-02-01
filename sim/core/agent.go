@@ -1,10 +1,9 @@
 package core
 
 import (
-	"fmt"
 	"reflect"
+	"strconv"
 	"strings"
-	"time"
 
 	"github.com/wowsims/tbc/sim/core/proto"
 )
@@ -28,15 +27,14 @@ type Agent interface {
 	// and once after the final iteration.
 	Reset(sim *Simulation)
 
-	// Allows the Agent to take whatever actions it wants to. This is called by
-	// the main event loop. The return value determines when the main event loop
-	// will call this again; it will call Act() at the time specified by the return
-	// value.
-	Act(sim *Simulation) time.Duration
+	// Called whenever the GCD becomes ready for this Agent.
+	OnGCDReady(sim *Simulation)
 
-	// Called after sim.CurrentTime is changed. Use this function to calculate
-	// mana/energy regen, cooldown changes, etc.
-	Advance(sim *Simulation, elapsedTime time.Duration)
+	// Called after each mana tick, if this Agent uses mana.
+	OnManaTick(sim *Simulation)
+
+	// Called after each auto attack performed by this Agent.
+	OnAutoAttack(sim *Simulation)
 }
 
 type ActionID struct {
@@ -79,15 +77,18 @@ func (actionID ActionID) String() string {
 	sb.WriteString("{")
 
 	if actionID.SpellID != 0 {
-		fmt.Fprintf(&sb, "SpellID: %d", actionID.SpellID)
+		sb.WriteString("SpellID: ")
+		sb.WriteString(strconv.Itoa(int(actionID.SpellID)))
 	} else if actionID.ItemID != 0 {
-		fmt.Fprintf(&sb, "ItemID: %d", actionID.ItemID)
+		sb.WriteString("ItemID: ")
+		sb.WriteString(strconv.Itoa(int(actionID.ItemID)))
 	} else if actionID.OtherID != 0 {
-		fmt.Fprintf(&sb, "OtherID: %d", actionID.OtherID)
+		sb.WriteString("OtherID: ")
+		sb.WriteString(strconv.Itoa(int(actionID.OtherID)))
 	}
-
 	if actionID.Tag != 0 {
-		fmt.Fprintf(&sb, ", Tag: %d", actionID.Tag)
+		sb.WriteString(", Tag: ")
+		sb.WriteString(strconv.Itoa(int(actionID.Tag)))
 	}
 	sb.WriteString("}")
 

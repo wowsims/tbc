@@ -93,19 +93,19 @@ var ItemSetFistsOfFury = core.ItemSet{
 				castTemplate := core.NewSimpleSpellTemplate(core.SimpleSpell{
 					SpellCast: core.SpellCast{
 						Cast: core.Cast{
-							ActionID:        core.ActionID{SpellID: 41989},
-							Character:       character,
-							IgnoreCooldowns: true,
-							IgnoreManaCost:  true,
-							IsPhantom:       true,
-							SpellSchool:     stats.FireSpellPower,
-							CritMultiplier:  1.5,
+							ActionID:       core.ActionID{SpellID: 41989},
+							Character:      character,
+							IgnoreManaCost: true,
+							IsPhantom:      true,
+							SpellSchool:    stats.FireSpellPower,
+							CritMultiplier: 1.5,
 						},
 					},
 					Effect: core.SpellHitEffect{
 						SpellEffect: core.SpellEffect{
 							DamageMultiplier:       1,
 							StaticDamageMultiplier: 1,
+							ThreatMultiplier:       1,
 						},
 						DirectInput: core.DirectDamageInput{
 							MinBaseDamage: 100,
@@ -117,10 +117,10 @@ var ItemSetFistsOfFury = core.ItemSet{
 				return core.Aura{
 					ID: FistsOfFuryAuraID,
 					OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
-						if !hitEffect.Landed() || !hitEffect.IsWeaponHit() {
+						if !hitEffect.Landed() || !hitEffect.IsWeaponHit() || !hitEffect.IsMelee() {
 							return
 						}
-						if !ppmm.Proc(sim, hitEffect.IsMH(), "Fists of Fury") {
+						if !ppmm.Proc(sim, hitEffect.IsMH(), false, "Fists of Fury") {
 							return
 						}
 
@@ -142,6 +142,7 @@ var ItemSetPrimalstrike = core.ItemSet{
 	Bonuses: map[int32]core.ApplyEffect{
 		3: func(agent core.Agent) {
 			agent.GetCharacter().AddStat(stats.AttackPower, 40)
+			agent.GetCharacter().AddStat(stats.RangedAttackPower, 40)
 		},
 	},
 }

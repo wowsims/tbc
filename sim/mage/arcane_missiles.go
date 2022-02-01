@@ -21,6 +21,7 @@ func (mage *Mage) newArcaneMissilesTemplate(sim *core.Simulation) core.SimpleSpe
 				Character:      &mage.Character,
 				BaseManaCost:   740,
 				ManaCost:       740,
+				GCD:            core.GCDDefault,
 				ActionID: core.ActionID{
 					SpellID: SpellIDArcaneMissiles,
 				},
@@ -30,6 +31,7 @@ func (mage *Mage) newArcaneMissilesTemplate(sim *core.Simulation) core.SimpleSpe
 			SpellEffect: core.SpellEffect{
 				DamageMultiplier:       1,
 				StaticDamageMultiplier: mage.spellDamageMultiplier,
+				ThreatMultiplier:       1 - 0.2*float64(mage.Talents.ArcaneSubtlety),
 				IgnoreHitCheck:         true,
 			},
 			DotInput: core.DotDamageInput{

@@ -28,6 +28,7 @@ func ApplyRobeOfTheElderScribes(agent core.Agent) {
 		const icdDur = time.Second * 50
 		const proc = 0.2
 
+		applyStatAura := character.NewTempStatAuraApplier(sim, PowerOfArcanagosAuraID, core.ActionID{ItemID: 28602}, stats.SpellPower, spellBonus, dur)
 		return core.Aura{
 			ID: RobeOfTheElderScribeAuraID,
 			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
@@ -35,7 +36,7 @@ func ApplyRobeOfTheElderScribes(agent core.Agent) {
 					return
 				}
 				icd = core.InternalCD(sim.CurrentTime + icdDur)
-				character.AddAuraWithTemporaryStats(sim, PowerOfArcanagosAuraID, core.ActionID{ItemID: 28602}, stats.SpellPower, spellBonus, dur)
+				applyStatAura(sim)
 			},
 		}
 	})
@@ -73,18 +74,16 @@ func ApplyTimbals(agent core.Agent) {
 	timbalsTemplate := core.NewSimpleSpellTemplate(core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				CritMultiplier:  1.5,
-				SpellSchool:     stats.ShadowSpellPower,
-				IgnoreCooldowns: true,
-				ActionID: core.ActionID{
-					SpellID: 45055,
-				},
+				ActionID:       core.ActionID{SpellID: 45055},
+				CritMultiplier: 1.5,
+				SpellSchool:    stats.ShadowSpellPower,
 			},
 		},
 		Effect: core.SpellHitEffect{
 			SpellEffect: core.SpellEffect{
 				DamageMultiplier:       1,
 				StaticDamageMultiplier: 1,
+				ThreatMultiplier:       1,
 			},
 			DirectInput: core.DirectDamageInput{
 				MinBaseDamage: 285,

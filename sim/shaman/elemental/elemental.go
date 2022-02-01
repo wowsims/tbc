@@ -79,30 +79,29 @@ func (eleShaman *ElementalShaman) Reset(sim *core.Simulation) {
 	eleShaman.rotation.Reset(eleShaman, sim)
 }
 
-func (eleShaman *ElementalShaman) Act(sim *core.Simulation) time.Duration {
-	dropTime, dropSuccess := eleShaman.TryDropTotems(sim)
-	if dropTime > 0 {
-		if !dropSuccess {
-			eleShaman.Metrics.MarkOOM(sim, &eleShaman.Character, dropTime-sim.CurrentTime)
-		}
-		return dropTime
-	}
-	newAction := eleShaman.rotation.ChooseAction(eleShaman, sim)
+func (eleShaman *ElementalShaman) OnGCDReady(sim *core.Simulation) {
+	eleShaman.tryUseGCD(sim)
+}
 
+func (eleShaman *ElementalShaman) OnManaTick(sim *core.Simulation) {
+	if eleShaman.FinishedWaitingForManaAndGCDReady(sim) {
+		eleShaman.tryUseGCD(sim)
+	}
+}
+
+func (eleShaman *ElementalShaman) tryUseGCD(sim *core.Simulation) {
+	if eleShaman.TryDropTotems(sim) {
+		return
+	}
+
+	newAction := eleShaman.rotation.ChooseAction(eleShaman, sim)
 	actionSuccessful := newAction.Cast(sim)
 	if actionSuccessful {
 		eleShaman.rotation.OnActionAccepted(eleShaman, sim, newAction)
-		return sim.CurrentTime + core.MaxDuration(
-			eleShaman.GetRemainingCD(core.GCDCooldownID, sim.CurrentTime),
-			newAction.GetDuration())
 	} else {
 		// Only way for a shaman spell to fail is due to mana cost.
 		// Wait until we have enough mana to cast.
-		regenTime := eleShaman.TimeUntilManaRegen(newAction.GetManaCost())
-		newAction = common.NewWaitAction(sim, eleShaman.GetCharacter(), regenTime, common.WaitReasonOOM)
-		newAction.Cast(sim)
-		eleShaman.rotation.OnActionAccepted(eleShaman, sim, newAction)
-		return sim.CurrentTime + newAction.GetDuration()
+		eleShaman.WaitForMana(sim, newAction.GetManaCost())
 	}
 }
 

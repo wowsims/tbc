@@ -196,6 +196,8 @@ func (shaman *Shaman) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {
 		} else if shaman.Totems.WindfuryTotemRank == partyBuffs.WindfuryTotemRank {
 			partyBuffs.WindfuryTotemIwt = core.MaxInt32(partyBuffs.WindfuryTotemIwt, shaman.Talents.ImprovedWeaponTotems)
 		}
+	case proto.AirTotem_TranquilAirTotem:
+		partyBuffs.TranquilAirTotem = true
 	}
 
 	switch shaman.Totems.Earth {
@@ -256,7 +258,7 @@ func (shaman *Shaman) Reset(sim *core.Simulation) {
 		switch i {
 		case AirTotem:
 			if shaman.Totems.Air != proto.AirTotem_NoAirTotem {
-				shaman.NextTotemDrops[i] = time.Second * 120 // 2 min until drop totems
+				shaman.NextTotemDrops[i] = time.Second * 115 // 1:55 until refresh
 				shaman.NextTotemDropType[i] = int32(shaman.Totems.Air)
 			}
 			if shaman.Totems.TwistWindfury {
@@ -265,7 +267,7 @@ func (shaman *Shaman) Reset(sim *core.Simulation) {
 			}
 		case EarthTotem:
 			if shaman.Totems.Earth != proto.EarthTotem_NoEarthTotem {
-				shaman.NextTotemDrops[i] = time.Second * 120 // 2 min until drop totems
+				shaman.NextTotemDrops[i] = time.Second * 115 // 1:55 until refresh
 				shaman.NextTotemDropType[i] = int32(shaman.Totems.Earth)
 			}
 		case FireTotem:
@@ -274,24 +276,19 @@ func (shaman *Shaman) Reset(sim *core.Simulation) {
 				shaman.NextTotemDropType[FireTotem] = int32(proto.FireTotem_FireNovaTotem) // start by dropping nova, then alternating.
 			}
 			if shaman.NextTotemDropType[i] != int32(proto.FireTotem_NoFireTotem) {
-				shaman.NextTotemDrops[i] = time.Second * 120 // 2 min until drop totems
+				shaman.NextTotemDrops[i] = time.Second * 115 // 1:55 until refresh
 				if shaman.Totems.Fire != proto.FireTotem_TotemOfWrath {
 					shaman.NextTotemDrops[i] = 0 // attack totems we drop immediately
 				}
 			}
 		case WaterTotem:
 			if shaman.Totems.Water == proto.WaterTotem_ManaSpringTotem {
-				shaman.NextTotemDrops[i] = time.Second * 120 // 2 min until drop totems
+				shaman.NextTotemDrops[i] = time.Second * 115 // 1:55 until refresh
 			}
 		}
 	}
 
 	shaman.ElementalFocusStacks = 0
-}
-
-func (shaman *Shaman) Advance(sim *core.Simulation, elapsedTime time.Duration) {
-	// Enh shaman could have a 5s window without casting, use longer regen function
-	shaman.Character.RegenMana(sim, elapsedTime)
 }
 
 func init() {

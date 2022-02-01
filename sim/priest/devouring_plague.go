@@ -19,6 +19,7 @@ func (priest *Priest) newDevouringPlagueTemplate(sim *core.Simulation) core.Simp
 		BaseManaCost:   1145,
 		ManaCost:       1145,
 		CastTime:       0,
+		GCD:            core.GCDDefault,
 		Cooldown:       time.Minute * 3,
 		ActionID: core.ActionID{
 			SpellID:    SpellIDDevouringPlague,
@@ -30,6 +31,7 @@ func (priest *Priest) newDevouringPlagueTemplate(sim *core.Simulation) core.Simp
 		SpellEffect: core.SpellEffect{
 			DamageMultiplier:       1,
 			StaticDamageMultiplier: 1,
+			ThreatMultiplier:       1,
 		},
 		DotInput: core.DotDamageInput{
 			NumberOfTicks:        8,

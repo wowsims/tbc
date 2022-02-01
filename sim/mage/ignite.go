@@ -20,15 +20,15 @@ func (mage *Mage) newIgniteTemplate(sim *core.Simulation) core.SimpleSpellTempla
 				ActionID: core.ActionID{
 					SpellID: SpellIDIgnite,
 				},
-				IgnoreCooldowns: true,
-				IgnoreManaCost:  true,
-				Binary:          true,
+				IgnoreManaCost: true,
+				Binary:         true,
 			},
 		},
 		Effect: core.SpellHitEffect{
 			SpellEffect: core.SpellEffect{
 				DamageMultiplier:       1,
 				StaticDamageMultiplier: 1,
+				ThreatMultiplier:       1 - 0.05*float64(mage.Talents.BurningSoul),
 				IgnoreHitCheck:         true,
 			},
 			DotInput: core.DotDamageInput{
@@ -47,14 +47,15 @@ func (mage *Mage) newIgniteTemplate(sim *core.Simulation) core.SimpleSpellTempla
 
 func (mage *Mage) procIgnite(sim *core.Simulation, target *core.Target, damageFromProccingSpell float64) {
 	newIgniteDamage := damageFromProccingSpell * float64(mage.Talents.Ignite) * 0.08
-	if mage.igniteSpell.Effect.DotInput.IsTicking(sim) {
-		newIgniteDamage += mage.igniteSpell.Effect.DotInput.RemainingDamage()
+	ignite := &mage.igniteSpells[target.Index]
+
+	if ignite.Effect.DotInput.IsTicking(sim) {
+		newIgniteDamage += ignite.Effect.DotInput.RemainingDamage()
 	}
 
 	// Cancel the current ignite dot.
-	mage.igniteSpell.Cancel(sim)
+	ignite.Cancel(sim)
 
-	ignite := &mage.igniteSpell
 	mage.igniteCastTemplate.Apply(ignite)
 
 	// Set dynamic fields, i.e. the stuff we couldn't precompute.

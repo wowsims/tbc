@@ -723,6 +723,7 @@ export const specToEligibleRaces: Record<Spec, Array<Race>> = {
 // Specs that can dual wield. This could be based on class, except that
 // Enhancement Shaman learn dual wield from a talent.
 const dualWieldSpecs: Array<Spec> = [
+	Spec.SpecEnhancementShaman,
 	Spec.SpecHunter,
 	Spec.SpecRogue,
 	Spec.SpecWarrior,
@@ -991,6 +992,39 @@ const classToEligibleWeaponTypes: Record<Class, Array<EligibleWeaponType>> = {
 	],
 };
 
+export const specEPTransforms: Record<Spec, (epWeights: Stats) => Stats> = {
+  [Spec.SpecBalanceDruid]: (epWeights: Stats) => {
+		return epWeights.withStat(Stat.StatSpellHit, 0);
+	},
+  [Spec.SpecElementalShaman]: (epWeights: Stats) => {
+		return epWeights.withStat(Stat.StatSpellHit, 0);
+	},
+  [Spec.SpecEnhancementShaman]: (epWeights: Stats) => {
+		return epWeights;
+	},
+  [Spec.SpecHunter]: (epWeights: Stats) => {
+		return epWeights.withStat(Stat.StatMeleeHit, 0);
+	},
+  [Spec.SpecMage]: (epWeights: Stats) => {
+		return epWeights.withStat(Stat.StatSpellHit, 0);
+	},
+  [Spec.SpecRogue]: (epWeights: Stats) => {
+		return epWeights;
+	},
+  [Spec.SpecRetributionPaladin]: (epWeights: Stats) => {
+		return epWeights.withStat(Stat.StatMeleeHit, 0);
+	},
+  [Spec.SpecShadowPriest]: (epWeights: Stats) => {
+		return epWeights.withStat(Stat.StatSpellHit, 0);
+	},
+  [Spec.SpecWarlock]: (epWeights: Stats) => {
+		return epWeights.withStat(Stat.StatSpellHit, 0);
+	},
+  [Spec.SpecWarrior]: (epWeights: Stats) => {
+		return epWeights;
+	},
+};
+
 // Custom functions for determining the EP value of meta gem effects.
 // Default meta effect EP value is 0, so just handle the ones relevant to your spec.
 const metaGemEffectEPs: Partial<Record<Spec, (gem: Gem, playerStats: Stats) => number>> = {
@@ -1022,7 +1056,6 @@ export function getMetaGemEffectEP(spec: Spec, gem: Gem, playerStats: Stats) {
 // Returns true if this item may be equipped in at least 1 slot for the given Spec.
 export function canEquipItem(item: Item, spec: Spec): boolean {
 	const playerClass = specToClass[spec];
-
 	if (item.classAllowlist.length > 0 && !item.classAllowlist.includes(playerClass)) {
 		return false;
 	}
@@ -1130,7 +1163,7 @@ export function enchantAppliesToItem(enchant: Enchant, item: Item): boolean {
   if (sharedSlots.length == 0)
     return false;
 
-	if (enchant.enchantType == EnchantType.EnchantTypeTwoHanded && item.handType != HandType.HandTypeTwoHand)
+	if (enchant.enchantType == EnchantType.EnchantTypeTwoHand && item.handType != HandType.HandTypeTwoHand)
 		return false;
 
 	if ((enchant.enchantType == EnchantType.EnchantTypeShield) != (item.weaponType == WeaponType.WeaponTypeShield))

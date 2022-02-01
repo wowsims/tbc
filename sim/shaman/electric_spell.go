@@ -37,10 +37,11 @@ func (shaman *Shaman) newElectricSpellCast(actionID core.ActionID, baseManaCost 
 		Cast: core.Cast{
 			ActionID:       actionID,
 			Character:      shaman.GetCharacter(),
+			SpellSchool:    stats.NatureSpellPower,
 			BaseManaCost:   baseManaCost,
 			ManaCost:       baseManaCost,
 			CastTime:       baseCastTime,
-			SpellSchool:    stats.NatureSpellPower,
+			GCD:            core.GCDDefault,
 			CritMultiplier: 1.5,
 		},
 	}
@@ -53,7 +54,7 @@ func (shaman *Shaman) newElectricSpellCast(actionID core.ActionID, baseManaCost 
 		spellCast.ActionID.Tag = CastTagLightningOverload
 		spellCast.CastTime = 0
 		spellCast.ManaCost = 0
-		spellCast.IgnoreCooldowns = true
+		spellCast.GCD = 0
 		spellCast.IgnoreManaCost = true
 	} else if shaman.Talents.LightningMastery > 0 {
 		// Convection applies against the base cost of the spell.
@@ -80,6 +81,7 @@ func (shaman *Shaman) newElectricSpellEffect(minBaseDamage float64, maxBaseDamag
 		SpellEffect: core.SpellEffect{
 			DamageMultiplier:       1,
 			StaticDamageMultiplier: 1,
+			ThreatMultiplier:       1,
 		},
 		DirectInput: core.DirectDamageInput{
 			MinBaseDamage:    minBaseDamage,
@@ -91,8 +93,10 @@ func (shaman *Shaman) newElectricSpellEffect(minBaseDamage float64, maxBaseDamag
 	effect.SpellEffect.DamageMultiplier *= 1 + 0.01*float64(shaman.Talents.Concussion)
 	if isLightningOverload {
 		effect.SpellEffect.DamageMultiplier *= 0.5
+		effect.SpellEffect.ThreatMultiplier = 0
 	}
 
+	effect.ThreatMultiplier *= 1 - (0.1/3)*float64(shaman.Talents.ElementalPrecision)
 	effect.SpellEffect.BonusSpellHitRating += float64(shaman.Talents.ElementalPrecision) * 2 * core.SpellHitRatingPerHitChance
 	effect.SpellEffect.BonusSpellCritRating += float64(shaman.Talents.TidalMastery) * 1 * core.SpellCritRatingPerCritChance
 	effect.SpellEffect.BonusSpellCritRating += float64(shaman.Talents.CallOfThunder) * 1 * core.SpellCritRatingPerCritChance

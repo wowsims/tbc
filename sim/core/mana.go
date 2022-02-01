@@ -25,6 +25,9 @@ func (character *Character) HasManaBar() bool {
 	return character.MaxMana() > 0
 }
 
+// Empty handler so Agents don't have to provide one if they have no logic to add.
+func (character *Character) OnManaTick(sim *Simulation) {}
+
 func (character *Character) BaseMana() float64 {
 	return character.GetBaseStats()[stats.Mana]
 }
@@ -32,7 +35,7 @@ func (character *Character) MaxMana() float64 {
 	return character.GetInitialStat(stats.Mana)
 }
 func (character *Character) CurrentMana() float64 {
-	return character.GetStat(stats.Mana)
+	return character.stats[stats.Mana]
 }
 func (character *Character) CurrentManaPercent() float64 {
 	return character.CurrentMana() / character.MaxMana()
@@ -109,31 +112,20 @@ func (character *Character) ManaRegenPerSecondWhileNotCasting() float64 {
 	return regenRate
 }
 
-// Regenerates mana based on MP5 stat, spirit regen allowed while casting and the elapsed time.
-func (character *Character) RegenManaCasting(sim *Simulation, elapsedTime time.Duration) {
-	elapsedSeconds := elapsedTime.Seconds()
-	manaRegen := character.ManaRegenPerSecondWhileCasting() * elapsedSeconds
-	character.AddMana(sim, manaRegen, ActionID{OtherID: proto.OtherAction_OtherActionManaRegen, Tag: int32(elapsedSeconds * 1000)}, false)
+func (character *Character) UpdateManaRegenRates() {
+	character.manaTickWhileCasting = character.ManaRegenPerSecondWhileCasting() * 2
+	character.manaTickWhileNotCasting = character.ManaRegenPerSecondWhileNotCasting() * 2
 }
 
-// Regenerates mana using mp5 and spirit. Will calculate time since last cast and then enable spirit regen if needed.
-func (character *Character) RegenMana(sim *Simulation, elapsedTime time.Duration) {
-	elapsedSeconds := elapsedTime.Seconds()
+// Applies 1 'tick' of mana regen, which worth 2s of regeneration based on mp5/int/spirit/etc.
+func (character *Character) ManaTick(sim *Simulation) {
 	var regen float64
-	if sim.CurrentTime-elapsedTime > character.PseudoStats.FiveSecondRuleRefreshTime {
-		// Five second rule activated before the advance window started, so use full
-		// spirit regen for the full duration.
-		regen = character.ManaRegenPerSecondWhileNotCasting() * elapsedSeconds
-	} else if sim.CurrentTime > character.PseudoStats.FiveSecondRuleRefreshTime {
-		// Five second rule activated sometime in the middle of the advance window,
-		// so regen is a combination of casting and not-casting regen.
-		notCastingRegenTime := sim.CurrentTime - character.PseudoStats.FiveSecondRuleRefreshTime // how many seconds of full spirit regen
-		castingRegenTime := elapsedTime - notCastingRegenTime
-		regen = (character.ManaRegenPerSecondWhileNotCasting() * notCastingRegenTime.Seconds()) + (character.ManaRegenPerSecondWhileCasting() * castingRegenTime.Seconds())
+	if sim.CurrentTime < character.PseudoStats.FiveSecondRuleRefreshTime {
+		regen = character.manaTickWhileCasting
 	} else {
-		regen = character.ManaRegenPerSecondWhileCasting() * elapsedSeconds
+		regen = character.manaTickWhileNotCasting
 	}
-	character.AddMana(sim, regen, ActionID{OtherID: proto.OtherAction_OtherActionManaRegen, Tag: int32(elapsedSeconds * 1000)}, false)
+	character.AddMana(sim, regen, ActionID{OtherID: proto.OtherAction_OtherActionManaRegen, Tag: 2000}, false)
 }
 
 // Returns the amount of time this Character would need to wait in order to reach
@@ -162,4 +154,54 @@ func (character *Character) TimeUntilManaRegen(desiredMana float64) time.Duratio
 	}
 
 	return regenTime
+}
+
+func (sim *Simulation) initManaTickAction() {
+	var playersWithManaBars []Agent
+	var petsWithManaBars []PetAgent
+
+	for _, party := range sim.Raid.Parties {
+		for _, player := range party.Players {
+			character := player.GetCharacter()
+			if character.HasManaBar() {
+				playersWithManaBars = append(playersWithManaBars, player)
+			}
+
+			for _, petAgent := range character.Pets {
+				pet := petAgent.GetPet()
+				if pet.HasManaBar() {
+					petsWithManaBars = append(petsWithManaBars, petAgent)
+				}
+			}
+		}
+	}
+
+	if len(playersWithManaBars) == 0 && len(petsWithManaBars) == 0 {
+		return
+	}
+
+	interval := time.Second * 2
+	pa := &PendingAction{
+		Name:     "Mana Tick",
+		Priority: ActionPriorityRegen,
+
+		NextActionAt: interval,
+	}
+	pa.OnAction = func(sim *Simulation) {
+		for _, player := range playersWithManaBars {
+			player.GetCharacter().ManaTick(sim)
+			player.OnManaTick(sim)
+		}
+		for _, petAgent := range petsWithManaBars {
+			pet := petAgent.GetPet()
+			if pet.IsEnabled() {
+				pet.ManaTick(sim)
+				petAgent.OnManaTick(sim)
+			}
+		}
+
+		pa.NextActionAt = sim.CurrentTime + interval
+		sim.AddPendingAction(pa)
+	}
+	sim.AddPendingAction(pa)
 }

@@ -1,8 +1,6 @@
 package enhancement
 
 import (
-	"time"
-
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/proto"
 	"github.com/wowsims/tbc/sim/shaman"
@@ -41,10 +39,19 @@ func NewEnhancementShaman(character core.Character, options proto.Player) *Enhan
 		Rotation: *enhOptions.Rotation,
 	}
 	// Enable Auto Attacks for this spec
-	enh.EnableAutoAttacks(enhOptions.Options.DelayOffhandSwings)
+	enh.EnableAutoAttacks(enh, core.AutoAttackOptions{
+		MainHand:       enh.WeaponFromMainHand(),
+		OffHand:        enh.WeaponFromOffHand(),
+		AutoSwingMelee: true,
+		DelayOHSwings:  enhOptions.Options.DelayOffhandSwings,
+	})
 
-	// Modify auto attacks multiplier from weapon mastery.
-	enh.AutoAttacks.Effect.DamageMultiplier *= 1 + 0.02*float64(enhOptions.Talents.WeaponMastery)
+	if !enh.HasMHWeapon() {
+		enhOptions.Options.MainHandImbue = proto.ShamanWeaponImbue_ImbueNone
+	}
+	if !enh.HasOHWeapon() {
+		enhOptions.Options.OffHandImbue = proto.ShamanWeaponImbue_ImbueNone
+	}
 	enh.ApplyWindfuryImbue(
 		enhOptions.Options.MainHandImbue == proto.ShamanWeaponImbue_ImbueWindfury,
 		enhOptions.Options.OffHandImbue == proto.ShamanWeaponImbue_ImbueWindfury)
@@ -79,27 +86,26 @@ func (enh *EnhancementShaman) Reset(sim *core.Simulation) {
 	enh.Shaman.Reset(sim)
 }
 
-func (enh *EnhancementShaman) Act(sim *core.Simulation) time.Duration {
-	// Redrop totems when needed.
-	dropTime, dropSuccess := enh.TryDropTotems(sim)
-	if dropTime > 0 {
-		nextEventTime := core.MinDuration(dropTime, enh.AutoAttacks.NextAttackAt())
-		if !dropSuccess {
-			enh.Metrics.MarkOOM(sim, &enh.Character, nextEventTime-sim.CurrentTime)
-		}
-		return nextEventTime
+func (enh *EnhancementShaman) OnGCDReady(sim *core.Simulation) {
+	enh.tryUseGCD(sim)
+}
+
+func (enh *EnhancementShaman) OnManaTick(sim *core.Simulation) {
+	if enh.FinishedWaitingForManaAndGCDReady(sim) {
+		enh.tryUseGCD(sim)
 	}
+}
+
+func (enh *EnhancementShaman) tryUseGCD(sim *core.Simulation) {
 
 	target := sim.GetPrimaryTarget()
 
-	success := true
-	cost := 0.0
-	if !enh.IsOnCD(shaman.StormstrikeCD, sim.CurrentTime) {
+	if enh.Talents.Stormstrike && !enh.IsOnCD(shaman.StormstrikeCD, sim.CurrentTime) {
 		ss := enh.NewStormstrike(sim, target)
-		cost = ss.Cost.Value
-		if success = ss.Attack(sim); success {
-			return enh.AutoAttacks.NextEventAt(sim)
+		if success := ss.Attack(sim); !success {
+			enh.WaitForMana(sim, ss.Cost.Value)
 		}
+		return
 	} else if !enh.IsOnCD(shaman.ShockCooldownID, sim.CurrentTime) {
 		var shock *core.SimpleSpell
 		if enh.Rotation.WeaveFlameShock && !enh.FlameShockSpell.IsInUse() {
@@ -111,19 +117,25 @@ func (enh *EnhancementShaman) Act(sim *core.Simulation) time.Duration {
 		}
 
 		if shock != nil {
-			cost = shock.ManaCost
-			if success = shock.Cast(sim); success {
-				return enh.AutoAttacks.NextEventAt(sim)
+			if success := shock.Cast(sim); !success {
+				enh.WaitForMana(sim, shock.ManaCost)
 			}
+			return
 		}
 	}
-	if !success {
-		regenTime := enh.TimeUntilManaRegen(cost)
-		nextActionAt := core.MinDuration(sim.CurrentTime+regenTime, enh.AutoAttacks.NextAttackAt())
-		enh.Metrics.MarkOOM(sim, &enh.Character, nextActionAt-sim.CurrentTime)
-		return nextActionAt
+
+	// Redrop totems when needed.
+	if enh.TryDropTotems(sim) {
+		return
 	}
 
-	// We didn't try to cast anything. Just wait for next auto.
-	return enh.AutoAttacks.NextAttackAt()
+	// We didn't try to cast anything. Just wait for next auto or CD.
+	nextEventAt := enh.NextTotemAt(sim)
+	if enh.Talents.Stormstrike {
+		nextEventAt = core.MinDuration(nextEventAt, enh.CDReadyAt(shaman.StormstrikeCD))
+	}
+	if enh.Rotation.PrimaryShock != proto.EnhancementShaman_Rotation_None {
+		nextEventAt = core.MinDuration(nextEventAt, enh.CDReadyAt(shaman.ShockCooldownID))
+	}
+	enh.WaitUntil(sim, nextEventAt)
 }

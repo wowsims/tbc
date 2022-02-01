@@ -15,15 +15,13 @@ func (shaman *Shaman) newSearingTotemTemplate(sim *core.Simulation) core.SimpleS
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				CritMultiplier: 1.5,
-				SpellSchool:    stats.FireSpellPower,
+				ActionID:       core.ActionID{SpellID: SpellIDSearingTotem},
 				Character:      &shaman.Character,
+				SpellSchool:    stats.FireSpellPower,
 				BaseManaCost:   205,
 				ManaCost:       205,
-				ActionID: core.ActionID{
-					SpellID: SpellIDSearingTotem,
-				},
-				GCDCooldown: time.Second,
+				GCD:            time.Second,
+				CritMultiplier: 1.5,
 			},
 		},
 		Effect: core.SpellHitEffect{
@@ -38,8 +36,8 @@ func (shaman *Shaman) newSearingTotemTemplate(sim *core.Simulation) core.SimpleS
 				// for target distance yet so just pretend the tick rate is lower.
 				//NumberOfTicks:        30,
 				//TickLength:           time.Second * 2,
-				NumberOfTicks: 20,
-				TickLength:    time.Second * 3,
+				NumberOfTicks: 24,
+				TickLength:    time.Second * 60 / 24,
 
 				TickBaseDamage:       58,
 				TickSpellCoefficient: 0.167,
@@ -79,17 +77,16 @@ func (shaman *Shaman) newMagmaTotemTemplate(sim *core.Simulation) core.SimpleSpe
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				CritMultiplier: 1.5,
-				SpellSchool:    stats.FireSpellPower,
+				ActionID:       core.ActionID{SpellID: SpellIDMagmaTotem},
 				Character:      &shaman.Character,
+				SpellSchool:    stats.FireSpellPower,
 				BaseManaCost:   800,
 				ManaCost:       800,
-				ActionID: core.ActionID{
-					SpellID: SpellIDMagmaTotem,
-				},
-				GCDCooldown: time.Second,
+				GCD:            time.Second,
+				CritMultiplier: 1.5,
 			},
 		},
+		AOECap: 1600,
 	}
 	spell.ManaCost -= spell.BaseManaCost * float64(shaman.Talents.TotemicFocus) * 0.05
 	spell.ManaCost -= spell.BaseManaCost * float64(shaman.Talents.MentalQuickness) * 0.02
@@ -119,6 +116,7 @@ func (shaman *Shaman) newMagmaTotemTemplate(sim *core.Simulation) core.SimpleSpe
 	effects := make([]core.SpellHitEffect, 0, numHits)
 	for i := int32(0); i < numHits; i++ {
 		effects = append(effects, baseEffect)
+		effects[i].Target = sim.GetTarget(i)
 	}
 	spell.Effects = effects
 
@@ -131,10 +129,6 @@ func (shaman *Shaman) NewMagmaTotem(sim *core.Simulation) *core.SimpleSpell {
 	shaman.magmaTotemTemplate.Apply(magmaTotem)
 
 	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	numHits := sim.GetNumTargets()
-	for i := int32(0); i < numHits; i++ {
-		magmaTotem.Effects[i].Target = sim.GetTarget(i)
-	}
 	magmaTotem.Init(sim)
 
 	return magmaTotem
@@ -150,19 +144,20 @@ func (shaman *Shaman) newNovaTotemTemplate(sim *core.Simulation) core.SimpleSpel
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				CritMultiplier: 1.5,
-				SpellSchool:    stats.FireSpellPower,
-				Character:      &shaman.Character,
-				BaseManaCost:   800,
-				ManaCost:       800,
 				ActionID: core.ActionID{
 					SpellID:    SpellIDNovaTotem,
 					CooldownID: CooldownIDNovaTotem,
 				},
-				Cooldown:    time.Second * 15,
-				GCDCooldown: time.Second,
+				Character:      &shaman.Character,
+				SpellSchool:    stats.FireSpellPower,
+				BaseManaCost:   800,
+				ManaCost:       800,
+				GCD:            time.Second,
+				Cooldown:       time.Second * 15,
+				CritMultiplier: 1.5,
 			},
 		},
+		AOECap: 9975,
 	}
 	spell.ManaCost -= spell.BaseManaCost * float64(shaman.Talents.TotemicFocus) * 0.05
 	spell.ManaCost -= spell.BaseManaCost * float64(shaman.Talents.MentalQuickness) * 0.02
@@ -194,6 +189,7 @@ func (shaman *Shaman) newNovaTotemTemplate(sim *core.Simulation) core.SimpleSpel
 	effects := make([]core.SpellHitEffect, 0, numHits)
 	for i := int32(0); i < numHits; i++ {
 		effects = append(effects, baseEffect)
+		effects[i].Target = sim.GetTarget(i)
 	}
 	spell.Effects = effects
 
@@ -211,10 +207,6 @@ func (shaman *Shaman) NewNovaTotem(sim *core.Simulation) *core.SimpleSpell {
 	shaman.novaTotemTemplate.Apply(novaTotem)
 
 	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	numHits := sim.GetNumTargets()
-	for i := int32(0); i < numHits; i++ {
-		novaTotem.Effects[i].Target = sim.GetTarget(i)
-	}
 	novaTotem.Init(sim)
 
 	return novaTotem

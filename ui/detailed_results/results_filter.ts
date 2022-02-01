@@ -136,8 +136,12 @@ class PlayerFilter extends Input<FilterData, number> {
 	}
 
 	private makeOptionElem(data: PlayerFilterOption): HTMLElement {
+		const optionContainer = document.createElement('div');
+		optionContainer.classList.add('dropdown-option-container');
+
 		const option = document.createElement('div');
 		option.classList.add('dropdown-option', 'player-filter-option');
+		optionContainer.appendChild(option);
 
 		if (data.color) {
 			option.style.backgroundColor = data.color;
@@ -157,7 +161,7 @@ class PlayerFilter extends Input<FilterData, number> {
 			option.appendChild(label);
 		}
 
-		return option;
+		return optionContainer;
 	}
 
 	getInputElem(): HTMLElement {

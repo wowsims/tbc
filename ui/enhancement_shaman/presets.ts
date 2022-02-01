@@ -266,7 +266,7 @@ export const P3_PRESET = {
 				enchant: Enchants.GLYPH_OF_FEROCITY,
 				gems: [
 					Gems.RELENTLESS_EARTHSTORM_DIAMOND,
-					Gems.BOLD_LIVING_RUBY,
+					Gems.BOLD_CRIMSON_SPINEL,
 				],
 			}),
 			ItemSpec.create({
@@ -284,9 +284,9 @@ export const P3_PRESET = {
 				id: 30905, // Midnight Chestguard
 				enchant: Enchants.CHEST_EXCEPTIONAL_STATS,
 				gems: [
-					Gems.SOVEREIGN_NIGHTSEYE,
-					Gems.BOLD_LIVING_RUBY,
-					Gems.INSCRIBED_NOBLE_TOPAZ,
+					Gems.SOVEREIGN_SHADOWSONG_AMETHYST,
+					Gems.BOLD_CRIMSON_SPINEL,
+					Gems.INSCRIBED_PYRESTONE,
 				],
 			}),
 			ItemSpec.create({
@@ -300,17 +300,17 @@ export const P3_PRESET = {
 			ItemSpec.create({
 				id: 30106, // Belt of One-Hundred Deaths
 				gems: [
-					Gems.BOLD_LIVING_RUBY,
-					Gems.BOLD_LIVING_RUBY,
+					Gems.BOLD_CRIMSON_SPINEL,
+					Gems.BOLD_CRIMSON_SPINEL,
 				],
 			}),
 			ItemSpec.create({
 				id: 30900, // Bow-Stitched Leggings
 				enchant: Enchants.NETHERCOBRA_LEG_ARMOR,
 				gems: [
-					Gems.BOLD_LIVING_RUBY,
-					Gems.INSCRIBED_NOBLE_TOPAZ,
-					Gems.SOVEREIGN_NIGHTSEYE,
+					Gems.BOLD_CRIMSON_SPINEL,
+					Gems.INSCRIBED_PYRESTONE,
+					Gems.SOVEREIGN_SHADOWSONG_AMETHYST,
 				],
 			}),
 			ItemSpec.create({
@@ -330,11 +330,11 @@ export const P3_PRESET = {
 				id: 29383, // Bloodlust Brooch
 			}),
 			ItemSpec.create({
-				id: 32236, // Rising Tide
+				id: 32262, // Syphon of the Nathrezim
 				enchant: Enchants.MONGOOSE,
 			}),
 			ItemSpec.create({
-				id: 29924, // Netherbane
+				id: 32262, // Syphon of the Nathrezim
 				enchant: Enchants.MONGOOSE,
 			}),
 			ItemSpec.create({

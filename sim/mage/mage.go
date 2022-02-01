@@ -1,8 +1,6 @@
 package mage
 
 import (
-	"time"
-
 	"github.com/wowsims/tbc/sim/common"
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/proto"
@@ -34,6 +32,8 @@ type Mage struct {
 	ArcaneRotation proto.Mage_Rotation_ArcaneRotation
 	FireRotation   proto.Mage_Rotation_FireRotation
 	FrostRotation  proto.Mage_Rotation_FrostRotation
+	AoeRotation    proto.Mage_Rotation_AoeRotation
+	UseAoeRotation bool
 
 	remainingManaGems int
 
@@ -45,6 +45,8 @@ type Mage struct {
 
 	waterElemental *WaterElemental
 
+	hasTristfal bool
+
 	// Cached values for a few mechanics.
 	spellDamageMultiplier float64
 
@@ -52,10 +54,16 @@ type Mage struct {
 	arcaneBlastSpell        core.SimpleSpell
 	arcaneBlastCastTemplate core.SimpleSpellTemplate
 
+	arcaneExplosionSpell        core.SimpleSpell
+	arcaneExplosionCastTemplate core.SimpleSpellTemplate
+
 	arcaneMissilesSpell        core.SimpleSpell
 	arcaneMissilesCastTemplate core.SimpleSpellTemplate
 
-	igniteSpell        core.SimpleSpell
+	blizzardSpell        core.SimpleSpell
+	blizzardCastTemplate core.SimpleSpellTemplate
+
+	igniteSpells       []core.SimpleSpell
 	igniteCastTemplate core.SimpleSpellTemplate
 
 	fireballSpell        core.SimpleSpell
@@ -66,6 +74,12 @@ type Mage struct {
 
 	fireBlastSpell        core.SimpleSpell
 	fireBlastCastTemplate core.SimpleSpellTemplate
+
+	flamestrikeSpell        core.SimpleSpell
+	flamestrikeCastTemplate core.SimpleSpellTemplate
+
+	flamestrikeDotSpell        core.SimpleSpell
+	flamestrikeDotCastTemplate core.SimpleSpellTemplate
 
 	frostboltSpell        core.SimpleSpell
 	frostboltCastTemplate core.SimpleSpellTemplate
@@ -97,16 +111,22 @@ func (mage *Mage) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {
 
 func (mage *Mage) Init(sim *core.Simulation) {
 	mage.arcaneBlastCastTemplate = mage.newArcaneBlastTemplate(sim)
+	mage.arcaneExplosionCastTemplate = mage.newArcaneExplosionTemplate(sim)
 	mage.arcaneMissilesCastTemplate = mage.newArcaneMissilesTemplate(sim)
+	mage.blizzardCastTemplate = mage.newBlizzardTemplate(sim)
 	mage.igniteCastTemplate = mage.newIgniteTemplate(sim)
 	mage.fireballCastTemplate = mage.newFireballTemplate(sim)
 	mage.fireballDotCastTemplate = mage.newFireballDotTemplate(sim)
 	mage.fireBlastCastTemplate = mage.newFireBlastTemplate(sim)
+	mage.flamestrikeCastTemplate = mage.newFlamestrikeTemplate(sim)
+	mage.flamestrikeDotCastTemplate = mage.newFlamestrikeDotTemplate(sim)
 	mage.frostboltCastTemplate = mage.newFrostboltTemplate(sim)
 	mage.pyroblastCastTemplate = mage.newPyroblastTemplate(sim)
 	mage.pyroblastDotCastTemplate = mage.newPyroblastDotTemplate(sim)
 	mage.scorchCastTemplate = mage.newScorchTemplate(sim)
 	mage.wintersChillCastTemplate = mage.newWintersChillTemplate(sim)
+
+	mage.igniteSpells = make([]core.SimpleSpell, sim.GetNumTargets())
 }
 
 func (mage *Mage) Reset(newsim *core.Simulation) {
@@ -120,10 +140,6 @@ func (mage *Mage) Reset(newsim *core.Simulation) {
 	mage.manaTracker.Reset()
 }
 
-func (mage *Mage) Advance(sim *core.Simulation, elapsedTime time.Duration) {
-	mage.Character.RegenMana(sim, elapsedTime)
-}
-
 func NewMage(character core.Character, options proto.Player) *Mage {
 	mageOptions := options.GetMage()
 
@@ -132,6 +148,8 @@ func NewMage(character core.Character, options proto.Player) *Mage {
 		Talents:      *mageOptions.Talents,
 		Options:      *mageOptions.Options,
 		RotationType: mageOptions.Rotation.Type,
+
+		UseAoeRotation: mageOptions.Rotation.MultiTargetRotation,
 
 		spellDamageMultiplier: 1.0,
 		manaTracker:           common.NewManaSpendingRateTracker(),
@@ -144,6 +162,9 @@ func NewMage(character core.Character, options proto.Player) *Mage {
 		mage.FireRotation = *mageOptions.Rotation.Fire
 	} else if mage.RotationType == proto.Mage_Rotation_Frost && mageOptions.Rotation.Frost != nil {
 		mage.FrostRotation = *mageOptions.Rotation.Frost
+	}
+	if mageOptions.Rotation.Aoe != nil {
+		mage.AoeRotation = *mageOptions.Rotation.Aoe
 	}
 
 	mage.Character.AddStatDependency(stats.StatDependency{
@@ -176,6 +197,7 @@ func NewMage(character core.Character, options proto.Player) *Mage {
 	mage.registerManaGemsCD()
 	mage.applyTalents()
 
+	mage.hasTristfal = ItemSetTirisfalRegalia.CharacterHasSetBonus(&mage.Character, 2)
 	return mage
 }
 

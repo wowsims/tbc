@@ -23,6 +23,7 @@ import { BuffBot } from './buff_bot.js';
 import * as BalanceDruidPresets from '/tbc/balance_druid/presets.js';
 import * as MagePresets from '/tbc/mage/presets.js';
 import * as ElementalShamanPresets from '/tbc/elemental_shaman/presets.js';
+import * as EnhancementShamanPresets from '/tbc/enhancement_shaman/presets.js';
 import * as ShadowPriestPresets from '/tbc/shadow_priest/presets.js';
 
 import { BalanceDruidSimUI } from '/tbc/balance_druid/sim.js';
@@ -82,7 +83,7 @@ export const playerPresets: Array<PresetSpecSettings<any>> = [
 		talents: BalanceDruidPresets.StandardTalents.data,
 		specOptions: BalanceDruidPresets.DefaultOptions,
 		consumes: BalanceDruidPresets.DefaultConsumes,
-		defaultName: specNames[Spec.SpecBalanceDruid],
+		defaultName: 'Balance Druid',
 		defaultFactionRaces: {
 			[Faction.Unknown]: Race.RaceUnknown,
 			[Faction.Alliance]: Race.RaceNightElf,
@@ -194,7 +195,7 @@ export const playerPresets: Array<PresetSpecSettings<any>> = [
 		talents: ElementalShamanPresets.StandardTalents.data,
 		specOptions: ElementalShamanPresets.DefaultOptions,
 		consumes: ElementalShamanPresets.DefaultConsumes,
-		defaultName: specNames[Spec.SpecElementalShaman],
+		defaultName: 'Ele Shaman',
 		defaultFactionRaces: {
 			[Faction.Unknown]: Race.RaceUnknown,
 			[Faction.Alliance]: Race.RaceDraenei,
@@ -217,12 +218,40 @@ export const playerPresets: Array<PresetSpecSettings<any>> = [
 		iconUrl: specIconsLarge[Spec.SpecElementalShaman],
 	},
 	{
+		spec: Spec.SpecEnhancementShaman,
+		rotation: EnhancementShamanPresets.DefaultRotation,
+		talents: EnhancementShamanPresets.StandardTalents.data,
+		specOptions: EnhancementShamanPresets.DefaultOptions,
+		consumes: EnhancementShamanPresets.DefaultConsumes,
+		defaultName: 'Enh Shaman',
+		defaultFactionRaces: {
+			[Faction.Unknown]: Race.RaceUnknown,
+			[Faction.Alliance]: Race.RaceDraenei,
+			[Faction.Horde]: Race.RaceOrc,
+		},
+		defaultGear: {
+			[Faction.Unknown]: {},
+			[Faction.Alliance]: {
+				1: EnhancementShamanPresets.P1_PRESET.gear,
+				2: EnhancementShamanPresets.P2_PRESET.gear,
+				3: EnhancementShamanPresets.P3_PRESET.gear,
+			},
+			[Faction.Horde]: {
+				1: EnhancementShamanPresets.P1_PRESET.gear,
+				2: EnhancementShamanPresets.P2_PRESET.gear,
+				3: EnhancementShamanPresets.P3_PRESET.gear,
+			},
+		},
+		tooltip: specNames[Spec.SpecEnhancementShaman],
+		iconUrl: specIconsLarge[Spec.SpecEnhancementShaman],
+	},
+	{
 		spec: Spec.SpecShadowPriest,
 		rotation: ShadowPriestPresets.DefaultRotation,
 		talents: ShadowPriestPresets.StandardTalents.data,
 		specOptions: ShadowPriestPresets.DefaultOptions,
 		consumes: ShadowPriestPresets.DefaultConsumes,
-		defaultName: specNames[Spec.SpecShadowPriest],
+		defaultName: 'Shadow Priest',
 		defaultFactionRaces: {
 			[Faction.Unknown]: Race.RaceUnknown,
 			[Faction.Alliance]: Race.RaceDwarf,
@@ -398,7 +427,7 @@ export const buffBotPresets: Array<BuffBotSettings> = [
 		// The value of this field must never change, to preserve local storage data.
 		buffBotId: 'Malediction Warlock',
 		spec: Spec.SpecWarlock,
-		name: 'Malediction Warlock',
+		name: 'Aff Warlock',
 		tooltip: 'Afflication Warlock: Adds Curse of Elements (improved). Also adds +20% uptime to ISB.',
 		iconUrl: 'https://wow.zamimg.com/images/wow/icons/large/spell_shadow_curseofachimonde.jpg',
 		modifyRaidProto: (buffBot: BuffBot, raidProto: RaidProto, partyProto: PartyProto) => {

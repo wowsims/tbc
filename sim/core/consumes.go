@@ -12,7 +12,7 @@ func applyConsumeEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs prot
 	character := agent.GetCharacter()
 	consumes := character.consumes
 
-	character.AddStats(consumesStats(consumes, raidBuffs))
+	character.AddStats(consumesStats(character, consumes, raidBuffs))
 
 	if consumes.ElixirOfDemonslaying {
 		character.AddPermanentAura(func(sim *Simulation) Aura {
@@ -25,17 +25,14 @@ func applyConsumeEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs prot
 	registerConjuredCD(agent, consumes)
 }
 
-func consumesStats(c proto.Consumes, raidBuffs proto.RaidBuffs) stats.Stats {
+func consumesStats(character *Character, c proto.Consumes, raidBuffs proto.RaidBuffs) stats.Stats {
 	s := stats.Stats{}
 
-	if c.BrilliantWizardOil {
-		s[stats.SpellCrit] += 14
-		s[stats.SpellPower] += 36
-		s[stats.HealingPower] += 36
+	if character.HasMHWeapon() && !character.HasMHWeaponImbue {
+		addImbueStats(character, c.MainHandImbue)
 	}
-	if c.SuperiorWizardOil {
-		s[stats.SpellPower] += 42
-		s[stats.HealingPower] += 42
+	if character.HasOHWeapon() {
+		addImbueStats(character, c.OffHandImbue)
 	}
 
 	if c.ElixirOfMajorMageblood {
@@ -89,6 +86,7 @@ func consumesStats(c proto.Consumes, raidBuffs proto.RaidBuffs) stats.Stats {
 	}
 	if c.FlaskOfRelentlessAssault {
 		s[stats.AttackPower] += 120
+		s[stats.RangedAttackPower] += 120
 	}
 
 	if c.BlackenedBasilisk {
@@ -112,6 +110,10 @@ func consumesStats(c proto.Consumes, raidBuffs proto.RaidBuffs) stats.Stats {
 		s[stats.MeleeHit] += 20
 		s[stats.Spirit] += 20
 	}
+	if c.SpicyHotTalbuk {
+		s[stats.Agility] += 20
+		s[stats.Spirit] += 20
+	}
 	if c.ScrollOfAgilityV {
 		s[stats.Agility] += 20
 	}
@@ -125,6 +127,31 @@ func consumesStats(c proto.Consumes, raidBuffs proto.RaidBuffs) stats.Stats {
 	}
 
 	return s
+}
+
+func addImbueStats(character *Character, imbue proto.WeaponImbue) {
+	if imbue == proto.WeaponImbue_WeaponImbueAdamantiteSharpeningStone {
+		character.AddStats(stats.Stats{
+			stats.MeleeCrit: 14,
+		})
+		character.PseudoStats.BonusMeleeDamage += 12
+		character.PseudoStats.BonusRangedDamage += 12
+	} else if imbue == proto.WeaponImbue_WeaponImbueElementalSharpeningStone {
+		character.AddStats(stats.Stats{
+			stats.MeleeCrit: 28,
+		})
+	} else if imbue == proto.WeaponImbue_WeaponImbueBrilliantWizardOil {
+		character.AddStats(stats.Stats{
+			stats.SpellCrit:    14,
+			stats.SpellPower:   36,
+			stats.HealingPower: 36,
+		})
+	} else if imbue == proto.WeaponImbue_WeaponImbueSuperiorWizardOil {
+		character.AddStats(stats.Stats{
+			stats.SpellPower:   42,
+			stats.HealingPower: 42,
+		})
+	}
 }
 
 var ElixirOfDemonslayingAuraID = NewAuraID()
@@ -208,20 +235,38 @@ func registerDrumsCD(agent Agent, partyBuffs proto.PartyBuffs, consumes proto.Co
 	}
 
 	if drumsSelfCast {
-		// When a real player is using drums, their cast applies to the whole party.
+		mcd.UsesGCD = true
 		mcd.ActivationFactory = func(sim *Simulation) CooldownActivation {
+			character := agent.GetCharacter()
+			drumsTemplate := SimpleCast{
+				Cast: Cast{
+					ActionID:       actionID,
+					Character:      character,
+					IgnoreManaCost: true,
+					CastTime:       time.Second * 1,
+					GCD:            GCDDefault,
+					OnCastComplete: func(sim *Simulation, cast *Cast) {
+						// When a real player is using drums, their cast applies to the whole party.
+						for _, agent := range character.Party.Players {
+							applyDrums(sim, agent.GetCharacter())
+						}
+						for _, petAgent := range character.Party.Pets {
+							pet := petAgent.GetPet()
+							if pet.IsEnabled() {
+								applyDrums(sim, &pet.Character)
+							}
+						}
+
+						// All MCDs that use the GCD and have a non-zero cast time must call this.
+						character.UpdateMajorCooldowns()
+					},
+				},
+			}
+
 			return func(sim *Simulation, character *Character) {
-				for _, agent := range character.Party.Players {
-					applyDrums(sim, agent.GetCharacter())
-				}
-				for _, petAgent := range character.Party.Pets {
-					pet := petAgent.GetPet()
-					if pet.IsEnabled() {
-						applyDrums(sim, &pet.Character)
-					}
-				}
-				// TODO: Do a cast time
-				character.Metrics.AddInstantCast(actionID)
+				cast := drumsTemplate
+				cast.Init(sim)
+				cast.StartCast(sim)
 			}
 		}
 	} else {
@@ -623,13 +668,12 @@ func makeConjuredActivation(conjuredType proto.Conjured, character *Character) (
 		castTemplate := NewSimpleSpellTemplate(SimpleSpell{
 			SpellCast: SpellCast{
 				Cast: Cast{
-					ActionID:        actionID,
-					Character:       character,
-					IgnoreCooldowns: true,
-					IgnoreManaCost:  true,
-					IsPhantom:       true,
-					SpellSchool:     stats.FireSpellPower,
-					CritMultiplier:  1.5,
+					ActionID:       actionID,
+					Character:      character,
+					IgnoreManaCost: true,
+					IsPhantom:      true,
+					SpellSchool:    stats.FireSpellPower,
+					CritMultiplier: 1.5,
 				},
 			},
 			Effect: SpellHitEffect{

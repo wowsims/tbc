@@ -20,6 +20,7 @@ func (druid *Druid) newInsectSwarmTemplate(sim *core.Simulation) core.SimpleSpel
 		BaseManaCost:   175,
 		ManaCost:       175,
 		CastTime:       0,
+		GCD:            core.GCDDefault,
 		ActionID: core.ActionID{
 			SpellID: SpellIDInsectSwarm,
 		},
@@ -29,6 +30,7 @@ func (druid *Druid) newInsectSwarmTemplate(sim *core.Simulation) core.SimpleSpel
 		SpellEffect: core.SpellEffect{
 			DamageMultiplier:       1,
 			StaticDamageMultiplier: 1,
+			ThreatMultiplier:       1,
 		},
 		DotInput: core.DotDamageInput{
 			NumberOfTicks:        6,
@@ -46,8 +48,6 @@ func (druid *Druid) newInsectSwarmTemplate(sim *core.Simulation) core.SimpleSpel
 	})
 }
 
-// TODO: This might behave weird if we have a moonfire still ticking when we cast one.
-//   We could do a check and if the spell is still ticking allocate a new SingleHitSpell?
 func (druid *Druid) NewInsectSwarm(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
 	// Initialize cast from precomputed template.
 	sf := &druid.InsectSwarmSpell

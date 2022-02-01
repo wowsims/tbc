@@ -23,6 +23,7 @@ $icon-active-border-color: lawngreen;
   @include vertical-bottom;
   @include horizontal-right;
   margin: 3px;
+	display: flex;
 }
 
 .icon-input-level-container * {
@@ -35,7 +36,10 @@ $icon-active-border-color: lawngreen;
   transition: .2s ease-in;
   border: 1px solid $icon-active-border-color;
 }
-.icon-input:not([data-states="3"]) .icon-input-improved {
+.icon-input:not(.use-improved-icons) .icon-input-improved {
+  display: none;
+}
+.icon-input:not(.use-improved-icons2) .icon-input-improved2 {
   display: none;
 }
 
@@ -45,8 +49,6 @@ $icon-active-border-color: lawngreen;
   color: $icon-active-border-color;
   border: none;
 }
-.icon-input[data-states="1"] .icon-input-counter,
-.icon-input[data-states="2"] .icon-input-counter,
-.icon-input[data-states="3"] .icon-input-counter {
+.icon-input:not(.use-counter) .icon-input-counter {
   display: none;
 }

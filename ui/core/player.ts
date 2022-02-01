@@ -17,6 +17,7 @@ import { Item } from '/tbc/core/proto/common.js';
 import { Race } from '/tbc/core/proto/common.js';
 import { Spec } from '/tbc/core/proto/common.js';
 import { Stat } from '/tbc/core/proto/common.js';
+import { WeaponImbue } from '/tbc/core/proto/common.js';
 import { PlayerStats } from '/tbc/core/proto/api.js';
 import { Player as PlayerProto } from '/tbc/core/proto/api.js';
 import { StatWeightsResult } from '/tbc/core/proto/api.js';
@@ -43,6 +44,7 @@ import {
 	getTalentTreeIcon,
 	getMetaGemEffectEP,
 	raceToFaction,
+	specEPTransforms,
 	specToClass,
 	specToEligibleRaces,
 	specTypeFunctions,
@@ -84,6 +86,7 @@ export class Player<SpecType extends Spec> {
   readonly specTypeFunctions: SpecTypeFunctions<SpecType>;
 
 	private epWeights: Stats = new Stats();
+	private epWeightsForCalc: Stats = new Stats();
 	private currentStats: PlayerStats = PlayerStats.create();
 
   readonly nameChangeEmitter = new TypedEvent<void>('PlayerName');
@@ -209,6 +212,7 @@ export class Player<SpecType extends Spec> {
 
 	setEpWeights(newEpWeights: Stats) {
 		this.epWeights = newEpWeights;
+		this.epWeightsForCalc = specEPTransforms[this.spec](this.epWeights);
 
 		this.gemEPCache = new Map();
 		this.itemEPCache = new Map();
@@ -217,7 +221,7 @@ export class Player<SpecType extends Spec> {
 
   async computeStatWeights(epStats: Array<Stat>, epReferenceStat: Stat, onProgress: Function): Promise<StatWeightsResult> {
 		const result = await this.sim.statWeights(this, epStats, epReferenceStat, onProgress);
-		this.epWeights = new Stats(result.epValues);
+		this.setEpWeights(new Stats(result.epValues));
 		return result;
 	}
 
@@ -430,11 +434,11 @@ export class Player<SpecType extends Spec> {
     this.specOptionsChangeEmitter.emit(eventID);
   }
 
-  	computeStatsEP(stats: number[] | undefined): number {
+	computeStatsEP(stats?: Stats): number {
 		if (stats == undefined) {
 			return 0;
 		}
-		return new Stats(stats).computeEP(this.epWeights);
+		return stats.computeEP(this.epWeightsForCalc);
 	}
 
 	computeGemEP(gem: Gem): number {
@@ -442,7 +446,7 @@ export class Player<SpecType extends Spec> {
 			return this.gemEPCache.get(gem.id)!;
 		}
 
-		const epFromStats = new Stats(gem.stats).computeEP(this.epWeights);
+		const epFromStats = this.computeStatsEP(new Stats(gem.stats));
 		const epFromEffect = getMetaGemEffectEP(this.spec, gem, new Stats(this.currentStats.finalStats));
 		let bonusEP = 0;
 		// unique items are slightly worse than non-unique because you can have only one.
@@ -460,7 +464,7 @@ export class Player<SpecType extends Spec> {
 			return this.enchantEPCache.get(enchant.id)!;
 		}
 
-		let ep = new Stats(enchant.stats).computeEP(this.epWeights);
+		let ep = this.computeStatsEP(new Stats(enchant.stats));
 		this.enchantEPCache.set(enchant.id, ep);
 		return ep
 	}
@@ -473,7 +477,7 @@ export class Player<SpecType extends Spec> {
 			return this.itemEPCache.get(item.id)!;
 		}
 
-		let ep = computeItemEP(item, this.epWeights);
+		let ep = computeItemEP(item, this.epWeightsForCalc);
 		
 		// unique items are slightly worse than non-unique because you can have only one.
 		if (item.unique) {
@@ -503,7 +507,7 @@ export class Player<SpecType extends Spec> {
 			} else {
 				return 0;
 			}
-		})) + new Stats(item.socketBonus).computeEP(this.epWeights);
+		})) + this.computeStatsEP(new Stats(item.socketBonus));
 
 		ep += Math.max(bestGemEPMatchingSockets, bestGemEPNotMatchingSockets);
 
@@ -547,7 +551,18 @@ export class Player<SpecType extends Spec> {
 		TypedEvent.freezeAllAndDo(() => {
 			// TODO: Remove this on 1/31/2022 (1 month).
 			if (proto.consumes && proto.consumes.darkRune) {
+				proto.consumes.darkRune = false
 				proto.consumes.defaultConjured = Conjured.ConjuredDarkRune;
+			}
+
+			// TODO: Remove this on 2/18/2022 (1 month).
+			if (proto.consumes && proto.consumes.brilliantWizardOil) {
+				proto.consumes.brilliantWizardOil = false;
+				proto.consumes.mainHandImbue = WeaponImbue.WeaponImbueBrilliantWizardOil;
+			}
+			if (proto.consumes && proto.consumes.superiorWizardOil) {
+				proto.consumes.superiorWizardOil = false;
+				proto.consumes.mainHandImbue = WeaponImbue.WeaponImbueSuperiorWizardOil;
 			}
 
 			let rotation = this.specTypeFunctions.rotationFromPlayer(proto);

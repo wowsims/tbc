@@ -17,8 +17,7 @@ func (shaman *Shaman) applyTalents() {
 		shaman.AddStat(stats.MeleeCrit, core.MeleeCritRatingPerCritChance*1*float64(shaman.Talents.ThunderingStrikes))
 	}
 
-	if shaman.Talents.DualWieldSpecialization > 0 {
-		// TODO: Check that player is actually dual wielding
+	if shaman.Talents.DualWieldSpecialization > 0 && shaman.HasOHWeapon() {
 		shaman.AddStat(stats.MeleeHit, core.MeleeHitRatingPerHitChance*2*float64(shaman.Talents.DualWieldSpecialization))
 	}
 
@@ -69,6 +68,7 @@ func (shaman *Shaman) applyTalents() {
 	shaman.applyElementalDevastation()
 	shaman.applyFlurry()
 	shaman.applyShamanisticFocus()
+	shaman.applyWeaponMastery()
 	shaman.applyUnleashedRage()
 	shaman.registerElementalMasteryCD()
 	shaman.registerNaturesSwiftnessCD()
@@ -201,6 +201,28 @@ func (shaman *Shaman) registerNaturesSwiftnessCD() {
 	})
 }
 
+var WeaponMasteryAuraID = core.NewAuraID()
+
+func (shaman *Shaman) applyWeaponMastery() {
+	if shaman.Talents.WeaponMastery == 0 {
+		return
+	}
+
+	multiplier := 1 + 0.02*float64(shaman.Talents.WeaponMastery)
+
+	shaman.AddPermanentAura(func(sim *core.Simulation) core.Aura {
+		return core.Aura{
+			ID: WeaponMasteryAuraID,
+			OnBeforeMeleeHit: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
+				if !hitEffect.IsWeaponHit() {
+					return
+				}
+				hitEffect.DamageMultiplier *= multiplier
+			},
+		}
+	})
+}
+
 var UnleashedRageTalentAuraID = core.NewAuraID()
 var UnleashedRageProcAuraID = core.NewAuraID()
 
@@ -215,7 +237,6 @@ func (shaman *Shaman) applyUnleashedRage() {
 		bonusCoeff := 0.02 * float64(level)
 
 		currentAPBonuses := make([]float64, len(shaman.Party.PlayersAndPets))
-
 		return core.Aura{
 			ID: UnleashedRageTalentAuraID,
 			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
@@ -268,7 +289,7 @@ func (shaman *Shaman) applyShamanisticFocus() {
 				if hitEffect.HitType != core.MeleeHitTypeCrit {
 					return
 				}
-				shaman.AddAura(sim, focusedAura)
+				ability.Character.ReplaceAura(sim, focusedAura)
 			},
 		}
 	})
@@ -282,47 +303,46 @@ func (shaman *Shaman) applyFlurry() {
 		return
 	}
 
+	bonus := 1.05 + 0.05*float64(shaman.Talents.Flurry)
+	if ItemSetCataclysmHarness.CharacterHasSetBonus(&shaman.Character, 4) {
+		bonus += 0.05
+	}
+	inverseBonus := 1 / bonus
+
 	shaman.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		flurryStacks := 0
 		icdDur := time.Millisecond * 500
 		var icd core.InternalCD
 
-		bonus := 1.05 + 0.05*float64(shaman.Talents.Flurry)
-		if ItemSetCataclysmRegalia.CharacterHasSetBonus(&shaman.Character, 4) {
-			bonus += 1.05
-		}
-		inverseBonus := 1 / 1.3
-
 		return core.Aura{
 			ID: FlurryTalentAuraID,
 			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
-				if hitEffect.HitType != core.MeleeHitTypeCrit {
-					if ability == nil {
-						// Remove a stack from auto attacks
-						if flurryStacks > 0 && !icd.IsOnCD(sim) {
-							icd = core.InternalCD(sim.CurrentTime + icdDur)
-							flurryStacks--
-							// Remove aura will reset attack speed
-							if flurryStacks == 0 {
-								shaman.RemoveAura(sim, FlurryProcAuraID)
-							}
-						}
+				if hitEffect.HitType == core.MeleeHitTypeCrit {
+					if flurryStacks == 0 {
+						shaman.MultiplyMeleeSpeed(sim, bonus)
+						shaman.AddAura(sim, core.Aura{
+							ID:       FlurryProcAuraID,
+							ActionID: core.ActionID{SpellID: 16280},
+							Expires:  core.NeverExpires,
+							OnExpire: func(sim *core.Simulation) {
+								shaman.MultiplyMeleeSpeed(sim, inverseBonus)
+							},
+						})
 					}
+					icd = 0
+					flurryStacks = 3
 					return
 				}
-				if flurryStacks == 0 {
-					shaman.MultiplyMeleeSpeed(sim, bonus)
-					shaman.AddAura(sim, core.Aura{
-						ID:       FlurryProcAuraID,
-						ActionID: core.ActionID{SpellID: 16280},
-						Expires:  core.NeverExpires,
-						OnExpire: func(sim *core.Simulation) {
-							shaman.MultiplyMeleeSpeed(sim, inverseBonus)
-						},
-					})
+
+				// Remove a stack.
+				if flurryStacks > 0 && !ability.SameAction(StormstrikeActionID) && !icd.IsOnCD(sim) {
+					icd = core.InternalCD(sim.CurrentTime + icdDur)
+					flurryStacks--
+					if flurryStacks == 0 {
+						// RemoveAura will reset attack speed via OnExpire
+						shaman.RemoveAura(sim, FlurryProcAuraID)
+					}
 				}
-				icd = 0
-				flurryStacks = 3
 			},
 		}
 	})

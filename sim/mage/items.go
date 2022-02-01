@@ -63,11 +63,12 @@ var ItemSetTirisfalRegalia = core.ItemSet{
 			// Your spell critical strikes grant you up to 70 spell damage for 6 sec.
 			character := agent.GetCharacter()
 			character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
+				statApplier := character.NewTempStatAuraApplier(sim, Tirisfal4PcProcAuraID, core.ActionID{SpellID: 37443}, stats.SpellPower, 70, time.Second*6)
 				return core.Aura{
 					ID: Tirisfal4PcAuraID,
 					OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 						if spellEffect.Crit {
-							character.AddAuraWithTemporaryStats(sim, Tirisfal4PcProcAuraID, core.ActionID{SpellID: 37443}, stats.SpellPower, 70, time.Second*6)
+							statApplier(sim)
 						}
 					},
 				}
@@ -103,6 +104,8 @@ func ApplyAshtongueTalismanOfInsight(agent core.Agent) {
 
 	char := agent.GetCharacter()
 	char.AddPermanentAura(func(sim *core.Simulation) core.Aura {
+		statApplier := char.NewTempStatAuraApplier(sim, AshtongueTalismanOfInsightProcAuraID, core.ActionID{ItemID: 32488}, stats.SpellHaste, hasteBonus, dur)
+
 		return core.Aura{
 			ID: AshtongueTalismanOfInsightAuraID,
 			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
@@ -114,7 +117,7 @@ func ApplyAshtongueTalismanOfInsight(agent core.Agent) {
 					return
 				}
 
-				char.AddAuraWithTemporaryStats(sim, AshtongueTalismanOfInsightProcAuraID, core.ActionID{ItemID: 32488}, stats.SpellHaste, hasteBonus, dur)
+				statApplier(sim)
 			},
 		}
 	})

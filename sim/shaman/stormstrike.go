@@ -38,36 +38,39 @@ func (shaman *Shaman) newStormstrikeTemplate(sim *core.Simulation) core.MeleeAbi
 	const skyshatterDur = time.Second * 12
 	ss := core.ActiveMeleeAbility{
 		MeleeAbility: core.MeleeAbility{
-			// ID for the action.
-			ActionID: StormstrikeActionID,
-			Cooldown: time.Second * 10,
+			ActionID:    StormstrikeActionID,
+			Character:   &shaman.Character,
+			SpellSchool: stats.AttackPower,
+			GCD:         core.GCDDefault,
+			Cooldown:    time.Second * 10,
 			Cost: core.ResourceCost{
 				Type:  stats.Mana,
 				Value: 237,
 			},
 			CritMultiplier: 2.0,
-			Character:      &shaman.Character,
 		},
 		Effects: []core.AbilityHitEffect{
 			core.AbilityHitEffect{
 				AbilityEffect: core.AbilityEffect{
-					DamageMultiplier:       1.0,
-					StaticDamageMultiplier: 1.0,
+					DamageMultiplier:       1,
+					StaticDamageMultiplier: 1,
+					ThreatMultiplier:       1,
 				},
 				WeaponInput: core.WeaponDamageInput{
 					IsOH:             false,
-					DamageMultiplier: 1.0,
+					DamageMultiplier: 1,
 				},
 			},
 			core.AbilityHitEffect{
 				AbilityEffect: core.AbilityEffect{
-					DamageMultiplier:       1.0,
-					StaticDamageMultiplier: 1.0,
+					DamageMultiplier:       1,
+					StaticDamageMultiplier: 1,
+					ThreatMultiplier:       1,
 					ReuseMainHitRoll:       true,
 				},
 				WeaponInput: core.WeaponDamageInput{
 					IsOH:             true,
-					DamageMultiplier: 1.0,
+					DamageMultiplier: 1,
 				},
 			},
 		},
@@ -79,7 +82,7 @@ func (shaman *Shaman) newStormstrikeTemplate(sim *core.Simulation) core.MeleeAbi
 			ssDebuffAura.Stacks = 2
 			hitEffect.Target.ReplaceAura(sim, ssDebuffAura)
 			if hasSkyshatter4p {
-				shaman.Character.AddAuraWithTemporaryStats(sim, SkyshatterAPBonusAuraID, core.ActionID{SpellID: 38432}, stats.SpellPower, 70, skyshatterDur)
+				shaman.Character.AddAuraWithTemporaryStats(sim, SkyshatterAPBonusAuraID, core.ActionID{SpellID: 38432}, stats.AttackPower, 70, skyshatterDur)
 			}
 		},
 	}
@@ -92,10 +95,6 @@ func (shaman *Shaman) newStormstrikeTemplate(sim *core.Simulation) core.MeleeAbi
 		ss.Effects[0].WeaponInput.FlatDamageBonus += 30
 		ss.Effects[1].WeaponInput.FlatDamageBonus += 30
 	}
-
-	// Add weapon % bonus to stormstrike weapons
-	ss.Effects[0].WeaponInput.DamageMultiplier *= 1 + 0.02*float64(shaman.Talents.WeaponMastery)
-	ss.Effects[1].WeaponInput.DamageMultiplier *= 1 + 0.02*float64(shaman.Talents.WeaponMastery)
 
 	return core.NewMeleeAbilityTemplate(ss)
 }

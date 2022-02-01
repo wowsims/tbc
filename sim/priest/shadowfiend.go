@@ -23,12 +23,9 @@ func (priest *Priest) registerShadowfiendCD() {
 		ActionID:   ShadowfiendActionID,
 		CooldownID: ShadowfiendCD,
 		Cooldown:   time.Minute * 5,
+		UsesGCD:    true,
 		Type:       core.CooldownTypeMana,
 		CanActivate: func(sim *core.Simulation, character *core.Character) bool {
-			if character.IsOnCD(core.GCDCooldownID, sim.CurrentTime) {
-				return false
-			}
-
 			if character.CurrentMana() < 575 {
 				return false
 			}
@@ -45,6 +42,9 @@ func (priest *Priest) registerShadowfiendCD() {
 		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
 			return func(sim *core.Simulation, character *core.Character) {
 				priest.NewShadowfiend(sim, sim.GetPrimaryTarget()).Cast(sim)
+
+				// All MCDs that use the GCD and have a non-zero cast time must call this.
+				priest.UpdateMajorCooldowns()
 			}
 		},
 	})
@@ -58,6 +58,7 @@ func (priest *Priest) newShadowfiendTemplate(sim *core.Simulation) core.SimpleSp
 		BaseManaCost:   575,
 		ManaCost:       575,
 		CastTime:       0,
+		GCD:            core.GCDDefault,
 		Cooldown:       time.Minute * 5,
 		ActionID:       ShadowfiendActionID,
 	}

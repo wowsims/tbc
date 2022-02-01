@@ -8,6 +8,7 @@ type ItemDeclaration struct {
 	ID int
 
 	// Override fields, in case wowhead is wrong.
+	Stats          Stats // Only non-zero values will override
 	ClassAllowlist []proto.Class
 	Phase          int
 	Filter         bool // If true, this item will be omitted from the sim.
@@ -21,6 +22,7 @@ type GemDeclaration struct {
 	ID int
 
 	// Override fields, in case wowhead is wrong.
+	Stats Stats // Only non-zero values will override
 	Phase int
 
 	Filter bool // If true, this item will be omitted from the sim.
@@ -32,6 +34,8 @@ type GemData struct {
 
 // Allows manual overriding for Gem fields in case WowHead is wrong.
 var GemDeclarationOverrides = []GemDeclaration{
+	{ID: 33131, Stats: Stats{proto.Stat_StatAttackPower: 32, proto.Stat_StatRangedAttackPower: 32}},
+
 	// pvp non-unique gems not in game currently.
 	{ID: 35489, Filter: true},
 	{ID: 38545, Filter: true},
@@ -64,6 +68,8 @@ var ItemDeclarationOverrides = []ItemDeclaration{
 	{ /** Idol of the Unseen Moon */ ID: 33510, Phase: 4},
 	{ /** Magnified Moon Specs */ ID: 32480, ClassAllowlist: []proto.Class{proto.Class_ClassDruid}},
 	{ /** Skycall Totem */ ID: 33506, Phase: 4},
+	{ /** Vindicator's Band of Triumph */ ID: 33919, Phase: 3},
+	{ /** Twinblade of the Pheonix */ ID: 29993, Stats: Stats{proto.Stat_StatRangedAttackPower: 108}},
 
 	{ID: 17782, Filter: true}, // talisman of the binding shard
 	{ID: 17783, Filter: true}, // talisman of the binding fragment

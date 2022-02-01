@@ -13,11 +13,19 @@ var DefaultSimTestOptions = &proto.SimOptions{
 	Iterations: 1,
 	IsTest:     true,
 	Debug:      false,
+	RandomSeed: 101,
+}
+var StatWeightsDefaultSimTestOptions = &proto.SimOptions{
+	Iterations: 1000,
+	IsTest:     true,
+	Debug:      false,
+	RandomSeed: 101,
 }
 var AverageDefaultSimTestOptions = &proto.SimOptions{
 	Iterations: 10000,
 	IsTest:     true,
 	Debug:      false,
+	RandomSeed: 101,
 }
 
 const ShortDuration = 60
@@ -84,9 +92,10 @@ func MakeDefaultEncounterCombos(debuffs *proto.Debuffs) []EncounterCombo {
 	}
 }
 
-func MakeSingleTargetFullDebuffEncounter(debuffs *proto.Debuffs) *proto.Encounter {
+func MakeSingleTargetFullDebuffEncounter(debuffs *proto.Debuffs, variation float64) *proto.Encounter {
 	return &proto.Encounter{
 		Duration:          LongDuration,
+		DurationVariation: variation,
 		ExecuteProportion: 0.2,
 		Targets: []*proto.Target{
 			&proto.Target{
@@ -95,18 +104,6 @@ func MakeSingleTargetFullDebuffEncounter(debuffs *proto.Debuffs) *proto.Encounte
 				MobType: proto.MobType_MobTypeDemon,
 				Debuffs: debuffs,
 			},
-		},
-	}
-}
-
-// Returns default encounter combos, for testing average DPS.
-// When doing average DPS tests we use a lot more iterations, so to save time
-// we test fewer encounters.
-func MakeAverageDefaultEncounterCombos(debuffs *proto.Debuffs) []EncounterCombo {
-	return []EncounterCombo{
-		EncounterCombo{
-			Label:     "LongSingleTarget",
-			Encounter: MakeSingleTargetFullDebuffEncounter(debuffs),
 		},
 	}
 }
@@ -156,7 +153,7 @@ func RaidSimTest(label string, t *testing.T, rsr *proto.RaidSimRequest, expected
 
 func RaidBenchmark(b *testing.B, rsr *proto.RaidSimRequest) {
 	rsr.Encounter.Duration = LongDuration
-	rsr.SimOptions.Iterations = 1000
+	rsr.SimOptions.Iterations = 1
 
 	// Set to false because IsTest adds a lot of computation.
 	rsr.SimOptions.IsTest = false

@@ -2,8 +2,10 @@ import { getWowheadItemId } from '/tbc/core/proto_utils/equipped_item.js';
 import { EquippedItem } from '/tbc/core/proto_utils/equipped_item.js';
 import { getEmptyGemSocketIconUrl, gemMatchesSocket } from '/tbc/core/proto_utils/gems.js';
 import { setGemSocketCssClass } from '/tbc/core/proto_utils/gems.js';
+import { Stats } from '/tbc/core/proto_utils/stats.js';
 import { enchantAppliesToItem } from '/tbc/core/proto_utils/utils.js';
-import { Enchant, GemColor } from '/tbc/core/proto/common.js';
+import { Enchant, Gem, GemColor } from '/tbc/core/proto/common.js';
+import { HandType } from '/tbc/core/proto/common.js';
 import { Item } from '/tbc/core/proto/common.js';
 import { ItemQuality } from '/tbc/core/proto/common.js';
 import { ItemSlot } from '/tbc/core/proto/common.js';
@@ -18,6 +20,9 @@ import { getEnumValues } from '/tbc/core/utils.js';
 import { Component } from './component.js';
 import { CloseButton } from './close_button.js';
 import { makePhaseSelector } from './other_inputs.js';
+import { makeShow1hWeaponsSelector } from './other_inputs.js';
+import { makeShow2hWeaponsSelector } from './other_inputs.js';
+import { makeShowMatchingGemsSelector } from './other_inputs.js';
 
 declare var $: any;
 
@@ -108,6 +113,13 @@ class ItemPicker extends Component {
       this.iconElem.addEventListener('click', event => {
 				event.preventDefault();
         const selectorModal = new SelectorModal(this.rootElem.closest('.individual-sim-ui')!, this.player, this.slot, this._equippedItem, this._items, this._enchants);
+      });
+      this.iconElem.addEventListener('touchstart', event => {
+				event.preventDefault();
+        const selectorModal = new SelectorModal(this.rootElem.closest('.individual-sim-ui')!, this.player, this.slot, this._equippedItem, this._items, this._enchants);
+      });
+      this.iconElem.addEventListener('touchend', event => {
+				event.preventDefault();
       });
     });
     player.gearChangeEmitter.on(() => {
@@ -214,6 +226,7 @@ class SelectorModal extends Component {
             },
           };
         },
+				GemColor.GemColorUnknown,
         eventID => {
           this.player.equipItem(eventID, slot, null);
         });
@@ -231,8 +244,8 @@ class SelectorModal extends Component {
 						actionId: enchant.isSpellId ? ActionId.fromSpellId(enchant.id) : ActionId.fromItemId(enchant.id),
             name: enchant.name,
             quality: enchant.quality,
-						phase: 1,
-            baseEP: this.player.computeStatsEP(enchant.stats),
+						phase: enchant.phase || 1,
+            baseEP: this.player.computeStatsEP(new Stats(enchant.stats)),
             ignoreEPFilter: true,
             onEquip: (eventID, enchant) => {
               const equippedItem = this.player.getEquippedItem(slot);
@@ -241,6 +254,7 @@ class SelectorModal extends Component {
             },
           };
         },
+				GemColor.GemColorUnknown,
         eventID => {
           const equippedItem = this.player.getEquippedItem(slot);
           if (equippedItem)
@@ -262,7 +276,7 @@ class SelectorModal extends Component {
       return;
     }
 
-    const socketBonusEP = this.player.computeStatsEP(equippedItem.item.socketBonus) / equippedItem.item.gemSockets.length;
+    const socketBonusEP = this.player.computeStatsEP(new Stats(equippedItem.item.socketBonus)) / equippedItem.item.gemSockets.length;
     equippedItem.item.gemSockets.forEach((socketColor, socketIdx) => {
       this.addTab(
           'Gem ' + (socketIdx + 1),
@@ -284,8 +298,8 @@ class SelectorModal extends Component {
               name: gem.name,
               quality: gem.quality,
 							phase: gem.phase,
-              baseEP: this.player.computeStatsEP(gem.stats),
-              ignoreEPFilter: socketColor == GemColor.GemColorMeta,
+              baseEP: this.player.computeStatsEP(new Stats(gem.stats)),
+              ignoreEPFilter: true,
               onEquip: (eventID, gem) => {
                 const equippedItem = this.player.getEquippedItem(slot);
                 if (equippedItem)
@@ -293,6 +307,7 @@ class SelectorModal extends Component {
               },
             };
           },
+					socketColor,
           eventID => {
             const equippedItem = this.player.getEquippedItem(slot);
             if (equippedItem)
@@ -345,6 +360,7 @@ class SelectorModal extends Component {
           ignoreEPFilter: boolean,
           onEquip: (eventID: EventID, item: T) => void,
         },
+				socketColor: GemColor,
         onRemove: (eventID: EventID) => void,
 				setTabContent?: (tabElem: HTMLAnchorElement) => void) {
     if (items.length == 0) {
@@ -380,10 +396,26 @@ class SelectorModal extends Component {
       <button class="selector-modal-remove-button">Remove</button>
       <input class="selector-modal-search" type="text" placeholder="Search...">
       <div class="selector-modal-filter-bar-filler"></div>
+      <div class="sim-input selector-modal-boolean-option selector-modal-show-1h-weapons"></div>
+      <div class="sim-input selector-modal-boolean-option selector-modal-show-2h-weapons"></div>
+      <div class="sim-input selector-modal-boolean-option selector-modal-show-matching-gems"></div>
       <div class="selector-modal-phase-selector"></div>
     </div>
     <ul class="selector-modal-list"></ul>
     `;
+
+		const show1hWeaponsSelector = makeShow1hWeaponsSelector(tabContent.getElementsByClassName('selector-modal-show-1h-weapons')[0] as HTMLElement, this.player.sim);
+		const show2hWeaponsSelector = makeShow2hWeaponsSelector(tabContent.getElementsByClassName('selector-modal-show-2h-weapons')[0] as HTMLElement, this.player.sim);
+		if (label != 'Items' || slot != ItemSlot.ItemSlotMainHand) {
+			(tabContent.getElementsByClassName('selector-modal-show-1h-weapons')[0] as HTMLElement).style.display = 'none';
+			(tabContent.getElementsByClassName('selector-modal-show-2h-weapons')[0] as HTMLElement).style.display = 'none';
+		}
+
+		const showMatchingGemsSelector = makeShowMatchingGemsSelector(tabContent.getElementsByClassName('selector-modal-show-matching-gems')[0] as HTMLElement, this.player.sim);
+		if (!label.startsWith('Gem')) {
+			(tabContent.getElementsByClassName('selector-modal-show-matching-gems')[0] as HTMLElement).style.display = 'none';
+		}
+
 		const phaseSelector = makePhaseSelector(tabContent.getElementsByClassName('selector-modal-phase-selector')[0] as HTMLElement, this.player.sim);
 
     if (label == 'Items') {
@@ -490,15 +522,40 @@ class SelectorModal extends Component {
 		const applyFilters = () => {
 			let validItemElems = listItemElems;
 
-			const searchQuery = searchInput.value.toLowerCase();
-			validItemElems = validItemElems.filter(elem => elem.dataset.name!.toLowerCase().includes(searchQuery))
+			if (label == 'Items' && slot == ItemSlot.ItemSlotMainHand) {
+				if (!this.player.sim.getShow1hWeapons()) {
+					validItemElems = validItemElems.filter(elem => {
+						const listItemId = parseInt(elem.dataset.id!);
+						const listItem = items.find(item => getItemData(item).id == listItemId) as unknown as Item;
+						return listItem.handType == HandType.HandTypeTwoHand;
+					});
+				}
+				if (!this.player.sim.getShow2hWeapons()) {
+					validItemElems = validItemElems.filter(elem => {
+						const listItemId = parseInt(elem.dataset.id!);
+						const listItem = items.find(item => getItemData(item).id == listItemId) as unknown as Item;
+						return listItem.handType != HandType.HandTypeTwoHand;
+					});
+				}
+			}
 
 			const phase = this.player.sim.getPhase();
 			validItemElems = validItemElems.filter(elem => Number(elem.dataset.phase!) <= phase)
 
+			const searchQuery = searchInput.value.toLowerCase();
+			validItemElems = validItemElems.filter(elem => elem.dataset.name!.toLowerCase().includes(searchQuery))
+
+			if (label.startsWith('Gem') && this.player.sim.getShowMatchingGems()) {
+				validItemElems = validItemElems.filter(elem => {
+					const listItemId = parseInt(elem.dataset.id!);
+					const listItem = items.find(item => getItemData(item).id == listItemId) as unknown as Gem;
+					return gemMatchesSocket(listItem, socketColor);
+				});
+			}
+
       // If not a trinket slot, filter out items without EP values.
       if ((slot != ItemSlot.ItemSlotTrinket1 && slot != ItemSlot.ItemSlotTrinket2 && slot != ItemSlot.ItemSlotRanged)) {
-        validItemElems = validItemElems.filter(elem => (Number(elem.dataset.baseEP) > 1 || elem.dataset.ignoreEPFilter=='true'));
+        validItemElems = validItemElems.filter(elem => (Number(elem.dataset.baseEP) > 0 || elem.dataset.ignoreEPFilter=='true'));
       }
 
       const currentEquippedItem = this.player.getEquippedItem(slot);
@@ -534,6 +591,13 @@ class SelectorModal extends Component {
 			tabContent.dataset.phase = String(this.player.sim.getPhase());
 			applyFilters();
 		});
+		TypedEvent.onAny([
+			this.player.sim.show1hWeaponsChangeEmitter,
+			this.player.sim.show2hWeaponsChangeEmitter,
+			this.player.sim.showMatchingGemsChangeEmitter,
+		]).on(() => {
+			applyFilters();
+		});
 		this.player.gearChangeEmitter.on(() => {
 			applyFilters();
 			updateSelected();
@@ -547,7 +611,7 @@ class SelectorModal extends Component {
 				.filter(tab => tab.dataset.label.includes(labelSubstring));
 
     const contentElems = tabElems
-        .map(tabElem => document.getElementById(tabElem.href.substring(1)))
+        .map(tabElem => document.getElementById(tabElem.getAttribute('href').substring(1)))
         .filter(tabElem => Boolean(tabElem));
 
     tabElems.forEach(elem => elem.parentElement.remove());

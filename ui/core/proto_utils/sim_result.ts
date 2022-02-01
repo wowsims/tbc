@@ -1,6 +1,6 @@
 import { ActionMetrics as ActionMetricsProto } from '/tbc/core/proto/api.js';
 import { AuraMetrics as AuraMetricsProto } from '/tbc/core/proto/api.js';
-import { DpsMetrics as DpsMetricsProto } from '/tbc/core/proto/api.js';
+import { DistributionMetrics as DistributionMetricsProto } from '/tbc/core/proto/api.js';
 import { Encounter as EncounterProto } from '/tbc/core/proto/common.js';
 import { EncounterMetrics as EncounterMetricsProto } from '/tbc/core/proto/api.js';
 import { Party as PartyProto } from '/tbc/core/proto/api.js';
@@ -89,9 +89,9 @@ export class SimResult {
 		return this.getTargets().find(target => target.index == index) || null;
 	}
 
-	getDamageMetrics(filter: SimResultFilter): DpsMetricsProto {
+	getDamageMetrics(filter: SimResultFilter): DistributionMetricsProto {
 		if (filter.player || filter.player === 0) {
-			return this.getPlayerWithRaidIndex(filter.player)?.dps || DpsMetricsProto.create();
+			return this.getPlayerWithRaidIndex(filter.player)?.dps || DistributionMetricsProto.create();
 		}
 
 		return this.raidMetrics.dps;
@@ -149,7 +149,7 @@ export class RaidMetrics {
 	private readonly raid: RaidProto;
 	private readonly metrics: RaidMetricsProto;
 
-	readonly dps: DpsMetricsProto;
+	readonly dps: DistributionMetricsProto;
 	readonly parties: Array<PartyMetrics>;
 
 	private constructor(raid: RaidProto, metrics: RaidMetricsProto, parties: Array<PartyMetrics>) {
@@ -181,7 +181,7 @@ export class PartyMetrics {
 	private readonly metrics: PartyMetricsProto;
 
 	readonly partyIndex: number;
-	readonly dps: DpsMetricsProto;
+	readonly dps: DistributionMetricsProto;
 	readonly players: Array<PlayerMetrics>;
 
 	private constructor(party: PartyProto, metrics: PartyMetricsProto, partyIndex: number, players: Array<PlayerMetrics>) {
@@ -221,7 +221,7 @@ export class PlayerMetrics {
 	readonly isPet: boolean;
 	readonly iconUrl: string;
 	readonly classColor: string;
-	readonly dps: DpsMetricsProto;
+	readonly dps: DistributionMetricsProto;
 	readonly actions: Array<ActionMetrics>;
 	readonly auras: Array<AuraMetrics>;
 	readonly pets: Array<PlayerMetrics>;
@@ -485,7 +485,7 @@ export class ActionMetrics {
 	}
 
 	get critPercent() {
-		return (this.data.crits / this.landedHitsRaw) * 100;
+		return (this.data.crits / this.hitAttempts) * 100;
 	}
 
 	get misses() {

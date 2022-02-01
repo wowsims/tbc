@@ -148,7 +148,7 @@ class SimWorker {
     await this.onReady;
 
     const taskPromise = new Promise<Uint8Array>((resolve, reject) => {
-      if (id == null) {
+      if (!id) {
         id = this.makeTaskId();
       }
       this.taskIdsToPromiseFuncs[id] = [resolve, reject];

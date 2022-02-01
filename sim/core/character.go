@@ -40,9 +40,6 @@ type Character struct {
 	// effects from items / abilities.
 	initialStats stats.Stats
 
-	// Base mana regen rate while casting, without any temporary effects.
-	initialManaRegenPerSecondWhileCasting float64
-
 	// Cast speed without any temporary effects.
 	initialCastSpeed float64
 
@@ -96,6 +93,17 @@ type Character struct {
 	// a MH imbue.
 	// TODO: Figure out a cleaner way to do this.
 	HasMHWeaponImbue bool
+
+	// The PendingAction tracking this character's GCD.
+	gcdAction *PendingAction
+
+	// Fields related to waiting for certain events to happen.
+	waitingForMana float64
+	waitStartTime  time.Duration
+
+	// Cached mana return values per tick.
+	manaTickWhileCasting    float64
+	manaTickWhileNotCasting float64
 }
 
 func NewCharacter(party *Party, partyIndex int, player proto.Player) Character {
@@ -104,11 +112,9 @@ func NewCharacter(party *Party, partyIndex int, player proto.Player) Character {
 		Race:  player.Race,
 		Class: player.Class,
 		Equip: items.ProtoToEquipment(*player.Equipment),
-		PseudoStats: stats.PseudoStats{
-			AttackSpeedMultiplier: 1,
-			CastSpeedMultiplier:   1,
-			SpiritRegenMultiplier: 1,
-		},
+
+		PseudoStats: stats.NewPseudoStats(),
+
 		Party:      party,
 		PartyIndex: partyIndex,
 		RaidIndex:  party.Index*5 + partyIndex,
@@ -209,6 +215,10 @@ func (character *Character) AddStat(stat stats.Stat, amount float64) {
 
 	character.stats[stat] += amount
 
+	if stat == stats.MP5 || stat == stats.Intellect || stat == stats.Spirit {
+		character.UpdateManaRegenRates()
+	}
+
 	if len(character.Pets) > 0 {
 		for _, petAgent := range character.Pets {
 			petAgent.GetPet().addOwnerStat(stat, amount)
@@ -232,7 +242,24 @@ func (character *Character) AddMeleeHaste(sim *Simulation, amount float64) {
 
 // MultiplyMeleeSpeed will alter the attack speed multiplier and change swing speed of all autoattack swings in progress.
 func (character *Character) MultiplyMeleeSpeed(sim *Simulation, amount float64) {
-	character.PseudoStats.AttackSpeedMultiplier *= amount
+	character.PseudoStats.MeleeSpeedMultiplier *= amount
+	character.AutoAttacks.ModifySwingTime(sim, amount)
+}
+
+func (character *Character) MultiplyRangedSpeed(sim *Simulation, amount float64) {
+	if character.PseudoStats.RangedSpeedMultiplier == 0 {
+		// Short-circuit all the logic for non-hunters.
+		return
+	}
+
+	character.PseudoStats.RangedSpeedMultiplier *= amount
+	character.AutoAttacks.ModifySwingTime(sim, amount)
+}
+
+// Helper for when both MultiplyMeleeSpeed and MultiplyRangedSpeed are needed.
+func (character *Character) MultiplyAttackSpeed(sim *Simulation, amount float64) {
+	character.PseudoStats.MeleeSpeedMultiplier *= amount
+	character.PseudoStats.RangedSpeedMultiplier *= amount
 	character.AutoAttacks.ModifySwingTime(sim, amount)
 }
 
@@ -269,7 +296,11 @@ func (character *Character) CastSpeed() float64 {
 }
 
 func (character *Character) SwingSpeed() float64 {
-	return character.PseudoStats.AttackSpeedMultiplier * (1 + (character.stats[stats.MeleeHaste] / (HasteRatingPerHastePercent * 100)))
+	return character.PseudoStats.MeleeSpeedMultiplier * (1 + (character.stats[stats.MeleeHaste] / (HasteRatingPerHastePercent * 100)))
+}
+
+func (character *Character) RangedSwingSpeed() float64 {
+	return character.PseudoStats.RangedSpeedMultiplier * (1 + (character.stats[stats.MeleeHaste] / (HasteRatingPerHastePercent * 100)))
 }
 
 func (character *Character) AddRaidBuffs(raidBuffs *proto.RaidBuffs) {
@@ -290,6 +321,9 @@ func (character *Character) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {
 
 	if character.consumes.Drums > 0 {
 		partyBuffs.Drums = character.consumes.Drums
+	}
+	if character.consumes.BattleChicken {
+		partyBuffs.BattleChickens++
 	}
 
 	if character.Equip[items.ItemSlotMainHand].ID == ItemIDAtieshMage {
@@ -329,8 +363,6 @@ func (character *Character) Finalize() {
 	// All stats added up to this point are part of the 'initial' stats.
 	character.initialStats = character.stats
 	character.initialPseudoStats = character.PseudoStats
-
-	character.initialManaRegenPerSecondWhileCasting = character.ManaRegenPerSecondWhileCasting()
 	character.initialCastSpeed = character.CastSpeed()
 
 	character.auraTracker.finalize()
@@ -341,10 +373,11 @@ func (character *Character) Finalize() {
 	}
 }
 
-func (character *Character) reset(sim *Simulation) {
+func (character *Character) reset(sim *Simulation, agent Agent) {
 	character.stats = character.initialStats
 	character.PseudoStats = character.initialPseudoStats
 	character.ExpectedBonusMana = 0
+	character.UpdateManaRegenRates()
 
 	character.energyBar.reset(sim)
 	character.rageBar.reset(sim)
@@ -355,9 +388,11 @@ func (character *Character) reset(sim *Simulation) {
 	character.Metrics.reset()
 
 	for _, petAgent := range character.Pets {
-		petAgent.GetPet().reset(sim)
+		petAgent.GetPet().reset(sim, petAgent)
 		petAgent.Reset(sim)
 	}
+
+	character.gcdAction = character.newGCDAction(sim, agent)
 }
 
 // Advance moves time forward counting down auras, CDs, mana regen, etc
@@ -373,7 +408,6 @@ func (character *Character) advance(sim *Simulation, elapsedTime time.Duration) 
 	if len(character.Pets) > 0 {
 		for _, petAgent := range character.Pets {
 			petAgent.GetPet().advance(sim, elapsedTime)
-			petAgent.Advance(sim, elapsedTime)
 		}
 	}
 }
@@ -392,6 +426,64 @@ func (character *Character) HasMetaGemEquipped(gemID int32) bool {
 	return false
 }
 
+// Returns the MH weapon if one is equipped, and null otherwise.
+func (character *Character) GetMHWeapon() *items.Item {
+	weapon := &character.Equip[proto.ItemSlot_ItemSlotMainHand]
+	if weapon.ID == 0 {
+		return nil
+	} else {
+		return weapon
+	}
+}
+func (character *Character) HasMHWeapon() bool {
+	return character.GetMHWeapon() != nil
+}
+
+// Returns the OH weapon if one is equipped, and null otherwise. Note that
+// shields / Held-in-off-hand items are NOT counted as weapons in this function.
+func (character *Character) GetOHWeapon() *items.Item {
+	weapon := &character.Equip[proto.ItemSlot_ItemSlotOffHand]
+	if weapon.ID == 0 ||
+		weapon.WeaponType == proto.WeaponType_WeaponTypeShield ||
+		weapon.WeaponType == proto.WeaponType_WeaponTypeOffHand {
+		return nil
+	} else {
+		return weapon
+	}
+}
+func (character *Character) HasOHWeapon() bool {
+	return character.GetOHWeapon() != nil
+}
+
+// Returns the ranged weapon if one is equipped, and null otherwise.
+func (character *Character) GetRangedWeapon() *items.Item {
+	weapon := &character.Equip[proto.ItemSlot_ItemSlotRanged]
+	if weapon.ID == 0 ||
+		weapon.RangedWeaponType == proto.RangedWeaponType_RangedWeaponTypeIdol ||
+		weapon.RangedWeaponType == proto.RangedWeaponType_RangedWeaponTypeLibram ||
+		weapon.RangedWeaponType == proto.RangedWeaponType_RangedWeaponTypeTotem {
+		return nil
+	} else {
+		return weapon
+	}
+}
+func (character *Character) HasRangedWeapon() bool {
+	return character.GetRangedWeapon() != nil
+}
+
+// Returns the hands that the item is equipped in, as (MH, OH).
+func (character *Character) GetWeaponHands(itemID int32) (bool, bool) {
+	mh := false
+	oh := false
+	if weapon := character.GetMHWeapon(); weapon != nil && weapon.ID == itemID {
+		mh = true
+	}
+	if weapon := character.GetOHWeapon(); weapon != nil && weapon.ID == itemID {
+		oh = true
+	}
+	return mh, oh
+}
+
 func (character *Character) doneIteration(simDuration time.Duration) {
 	// Need to do pets first so we can add their results to the owners.
 	if len(character.Pets) > 0 {
@@ -406,6 +498,7 @@ func (character *Character) doneIteration(simDuration time.Duration) {
 		character.Hardcast.Cast.Cancel()
 		character.Hardcast = Hardcast{}
 	}
+	character.doneIterationGCD(simDuration)
 	character.Metrics.doneIteration(simDuration.Seconds())
 	character.auraTracker.doneIteration(simDuration)
 }
@@ -433,10 +526,6 @@ func (character *Character) GetMetricsProto(numIterations int32) *proto.PlayerMe
 	}
 
 	return metrics
-}
-
-func (character *Character) EnableAutoAttacks(delayOHSwings bool) {
-	character.AutoAttacks = NewAutoAttacks(character, delayOHSwings)
 }
 
 type BaseStatsKey struct {

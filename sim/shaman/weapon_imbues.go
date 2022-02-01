@@ -30,26 +30,31 @@ func (shaman *Shaman) ApplyWindfuryImbue(mh bool, oh bool) {
 
 	wftempl := core.ActiveMeleeAbility{
 		MeleeAbility: core.MeleeAbility{
-			ActionID: core.ActionID{
-				SpellID: 25505,
-			},
-			CritMultiplier:  2.0,
-			Character:       &shaman.Character,
-			IgnoreCooldowns: true,
+			ActionID:       core.ActionID{SpellID: 25505},
+			Character:      &shaman.Character,
+			SpellSchool:    stats.AttackPower,
+			CritMultiplier: 2.0,
 		},
-		Effect: core.AbilityHitEffect{
-			AbilityEffect: core.AbilityEffect{
-				DamageMultiplier:       1.0,
-				StaticDamageMultiplier: 1.0,
-				BonusAttackPower:       apBonus,
-			},
-			WeaponInput: core.WeaponDamageInput{
-				DamageMultiplier: 1.0,
-			},
+	}
+
+	baseEffect := core.AbilityHitEffect{
+		AbilityEffect: core.AbilityEffect{
+			DamageMultiplier:       1.0,
+			StaticDamageMultiplier: 1.0,
+			ThreatMultiplier:       1.0,
+			BonusAttackPower:       apBonus,
+		},
+		WeaponInput: core.WeaponDamageInput{
+			DamageMultiplier: 1.0,
 		},
 	}
 	if shaman.Talents.ElementalWeapons > 0 {
-		wftempl.Effect.WeaponInput.DamageMultiplier *= 1 + math.Round(float64(shaman.Talents.ElementalWeapons)*13.33)/100
+		baseEffect.WeaponInput.DamageMultiplier *= 1 + math.Round(float64(shaman.Talents.ElementalWeapons)*13.33)/100
+	}
+
+	wftempl.Effects = []core.AbilityHitEffect{
+		baseEffect,
+		baseEffect,
 	}
 
 	wfTemplate := core.NewMeleeAbilityTemplate(wftempl)
@@ -77,20 +82,25 @@ func (shaman *Shaman) ApplyWindfuryImbue(mh bool, oh bool) {
 					return
 				}
 				icd = core.InternalCD(sim.CurrentTime + icdDur)
-				for i := 0; i < 2; i++ {
-					wfTemplate.Apply(&wfAtk)
 
-					// Set so only the proc'd hand attacks
-					wfAtk.Effect.WeaponInput.IsOH = !isMHHit
-					if isMHHit {
-						wfAtk.ActionID.Tag = 1
-					} else {
-						wfAtk.ActionID.Tag = 2
-					}
-
-					wfAtk.Effect.Target = hitEffect.Target
-					wfAtk.Attack(sim)
+				wfTemplate.Apply(&wfAtk)
+				// Set so only the proc'd hand attacks
+				if isMHHit {
+					wfAtk.ActionID.Tag = 1
+				} else {
+					wfAtk.ActionID.Tag = 2
 				}
+				for i := 0; i < 2; i++ {
+					wfAtk.Effects[i].WeaponInput.IsOH = !isMHHit
+					wfAtk.Effects[i].Target = hitEffect.Target
+
+					if !isMHHit {
+						// For whatever reason, OH penalty does not apply to the bonus AP from WF OH
+						// hits. Implement this by doubling the AP bonus we provide.
+						wfAtk.Effects[i].BonusAttackPower += apBonus
+					}
+				}
+				wfAtk.Attack(sim)
 			},
 		}
 	})
@@ -106,19 +116,19 @@ func (shaman *Shaman) ApplyFlametongueImbue(mh bool, oh bool) {
 	ftTmpl := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				ActionID:        core.ActionID{ItemID: 25489},
-				Character:       &shaman.Character,
-				IgnoreCooldowns: true,
-				IgnoreManaCost:  true,
-				IsPhantom:       true,
-				SpellSchool:     stats.FireSpellPower,
-				CritMultiplier:  1.5,
+				ActionID:       core.ActionID{SpellID: 25489},
+				Character:      &shaman.Character,
+				SpellSchool:    stats.FireSpellPower,
+				IgnoreManaCost: true,
+				IsPhantom:      true,
+				CritMultiplier: 1.5,
 			},
 		},
 		Effect: core.SpellHitEffect{
 			SpellEffect: core.SpellEffect{
 				DamageMultiplier:       1,
 				StaticDamageMultiplier: 1,
+				ThreatMultiplier:       1,
 			},
 			DirectInput: core.DirectDamageInput{
 				SpellCoefficient: 0.1,
@@ -130,12 +140,12 @@ func (shaman *Shaman) ApplyFlametongueImbue(mh bool, oh bool) {
 	mhTmpl := ftTmpl
 	ohTmpl := ftTmpl
 
-	if weapon := shaman.Equip[proto.ItemSlot_ItemSlotMainHand]; weapon.ID != 0 {
+	if weapon := shaman.GetMHWeapon(); weapon != nil {
 		baseDamage := weapon.SwingSpeed * 35.0
 		mhTmpl.Effect.DirectInput.MinBaseDamage = baseDamage
 		mhTmpl.Effect.DirectInput.MaxBaseDamage = baseDamage
 	}
-	if weapon := shaman.Equip[proto.ItemSlot_ItemSlotOffHand]; weapon.ID != 0 {
+	if weapon := shaman.GetOHWeapon(); weapon != nil {
 		baseDamage := weapon.SwingSpeed * 35.0
 		ohTmpl.Effect.DirectInput.MinBaseDamage = baseDamage
 		ohTmpl.Effect.DirectInput.MaxBaseDamage = baseDamage
@@ -181,19 +191,19 @@ func (shaman *Shaman) ApplyFrostbrandImbue(mh bool, oh bool) {
 	fbTmpl := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				ActionID:        core.ActionID{ItemID: 25500},
-				Character:       &shaman.Character,
-				IgnoreCooldowns: true,
-				IgnoreManaCost:  true,
-				IsPhantom:       true,
-				SpellSchool:     stats.FrostSpellPower,
-				CritMultiplier:  1.5,
+				ActionID:       core.ActionID{SpellID: 25500},
+				Character:      &shaman.Character,
+				SpellSchool:    stats.FrostSpellPower,
+				IgnoreManaCost: true,
+				IsPhantom:      true,
+				CritMultiplier: 1.5,
 			},
 		},
 		Effect: core.SpellHitEffect{
 			SpellEffect: core.SpellEffect{
 				DamageMultiplier:       1,
 				StaticDamageMultiplier: 1,
+				ThreatMultiplier:       1,
 			},
 			DirectInput: core.DirectDamageInput{
 				MinBaseDamage:    246,
@@ -221,7 +231,7 @@ func (shaman *Shaman) ApplyFrostbrandImbue(mh bool, oh bool) {
 					return // cant proc if not enchanted
 				}
 
-				if !ppmm.Proc(sim, isMHHit, "Frostbrand Weapon") {
+				if !ppmm.Proc(sim, isMHHit, false, "Frostbrand Weapon") {
 					return
 				}
 
@@ -234,38 +244,15 @@ func (shaman *Shaman) ApplyFrostbrandImbue(mh bool, oh bool) {
 	})
 }
 
-var RBImbueAuraID = core.NewAuraID()
-
 func (shaman *Shaman) ApplyRockbiterImbue(mh bool, oh bool) {
-	if !mh && !oh {
-		return
+	if weapon := shaman.GetMHWeapon(); mh && weapon != nil {
+		bonus := 62.0 * weapon.SwingSpeed
+		shaman.AutoAttacks.MH.BaseDamageMin += bonus
+		shaman.AutoAttacks.MH.BaseDamageMax += bonus
 	}
-
-	mhBonus := 0.0
-	ohBonus := 0.0
-	if weapon := shaman.Equip[proto.ItemSlot_ItemSlotMainHand]; weapon.ID != 0 {
-		mhBonus = 62.0 * weapon.SwingSpeed
+	if weapon := shaman.GetOHWeapon(); oh && weapon != nil {
+		bonus := 62.0 * weapon.SwingSpeed
+		shaman.AutoAttacks.MH.BaseDamageMin += bonus
+		shaman.AutoAttacks.MH.BaseDamageMax += bonus
 	}
-	if weapon := shaman.Equip[proto.ItemSlot_ItemSlotOffHand]; weapon.ID != 0 {
-		ohBonus = 62.0 * weapon.SwingSpeed
-	}
-
-	shaman.AddPermanentAura(func(sim *core.Simulation) core.Aura {
-		return core.Aura{
-			ID: RBImbueAuraID,
-			OnBeforeMeleeHit: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
-				if !hitEffect.IsWeaponHit() {
-					return
-				}
-
-				if hitEffect.IsMH() {
-					if mh {
-						hitEffect.BonusWeaponDamage += mhBonus
-					}
-				} else if oh {
-					hitEffect.BonusWeaponDamage += ohBonus
-				}
-			},
-		}
-	})
 }

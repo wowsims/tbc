@@ -1,3 +1,4 @@
+import { BooleanPicker } from '/tbc/core/components/boolean_picker.js';
 import { EnumPicker, EnumPickerConfig } from '/tbc/core/components/enum_picker.js';
 import { Potions } from '/tbc/core/proto/common.js';
 import { TristateEffect } from '/tbc/core/proto/common.js';
@@ -8,6 +9,48 @@ import { Target } from '/tbc/core/target.js';
 import { SimUI } from '/tbc/core/sim_ui.js';
 import { IndividualSimUI } from '/tbc/core/individual_sim_ui.js';
 import { EventID, TypedEvent } from '/tbc/core/typed_event.js';
+
+export function makeShow1hWeaponsSelector(parent: HTMLElement, sim: Sim): BooleanPicker<Sim> {
+	return new BooleanPicker<Sim>(parent, sim, {
+		extraCssClasses: [
+			'show-1h-weapons-selector',
+		],
+		label: '1H',
+		changedEvent: (sim: Sim) => sim.show1hWeaponsChangeEmitter,
+		getValue: (sim: Sim) => sim.getShow1hWeapons(),
+		setValue: (eventID: EventID, sim: Sim, newValue: boolean) => {
+			sim.setShow1hWeapons(eventID, newValue);
+		},
+	});
+}
+
+export function makeShow2hWeaponsSelector(parent: HTMLElement, sim: Sim): BooleanPicker<Sim> {
+	return new BooleanPicker<Sim>(parent, sim, {
+		extraCssClasses: [
+			'show-2h-weapons-selector',
+		],
+		label: '2H',
+		changedEvent: (sim: Sim) => sim.show2hWeaponsChangeEmitter,
+		getValue: (sim: Sim) => sim.getShow2hWeapons(),
+		setValue: (eventID: EventID, sim: Sim, newValue: boolean) => {
+			sim.setShow2hWeapons(eventID, newValue);
+		},
+	});
+}
+
+export function makeShowMatchingGemsSelector(parent: HTMLElement, sim: Sim): BooleanPicker<Sim> {
+	return new BooleanPicker<Sim>(parent, sim, {
+		extraCssClasses: [
+			'show-matching-gems-selector',
+		],
+		label: 'Match Socket',
+		changedEvent: (sim: Sim) => sim.showMatchingGemsChangeEmitter,
+		getValue: (sim: Sim) => sim.getShowMatchingGems(),
+		setValue: (eventID: EventID, sim: Sim, newValue: boolean) => {
+			sim.setShowMatchingGems(eventID, newValue);
+		},
+	});
+}
 
 export function makePhaseSelector(parent: HTMLElement, sim: Sim): EnumPicker<Sim> {
 	return new EnumPicker<Sim>(parent, sim, {
@@ -170,5 +213,47 @@ export const SnapshotImprovedWrathOfAirTotem = {
 			party.setBuffs(eventID, buffs);
 		},
 		enableWhen: (party: Party) => party.getBuffs().wrathOfAirTotem == TristateEffect.TristateEffectRegular,
+	},
+};
+
+export const SnapshotBsSolarianSapphire = {
+	type: 'boolean' as const,
+	getModObject: (simUI: IndividualSimUI<any>) => simUI.player.getParty()!,
+	config: {
+		extraCssClasses: [
+			'snapshot-bs-solarian-sapphire-picker',
+			'within-raid-sim-hide',
+		],
+		label: 'Snapshot BS Solarian\'s Sapphire',
+		labelTooltip: 'A Warrior in your party is snapshotting their Battle Shout before combat, using the bonus from Solarian\'s Sapphire (+70 attack power) for the first 1:50s of the fight.',
+		changedEvent: (party: Party) => party.buffsChangeEmitter,
+		getValue: (party: Party) => party.getBuffs().snapshotBsSolarianSapphire,
+		setValue: (eventID: EventID, party: Party, newValue: boolean) => {
+			const buffs = party.getBuffs();
+			buffs.snapshotBsSolarianSapphire = newValue;
+			party.setBuffs(eventID, buffs);
+		},
+		enableWhen: (party: Party) => party.getBuffs().battleShout > 0 && !party.getBuffs().bsSolarianSapphire,
+	},
+};
+
+export const SnapshotBsT2 = {
+	type: 'boolean' as const,
+	getModObject: (simUI: IndividualSimUI<any>) => simUI.player.getParty()!,
+	config: {
+		extraCssClasses: [
+			'snapshot-bs-t2-picker',
+			'within-raid-sim-hide',
+		],
+		label: 'Snapshot BS T2',
+		labelTooltip: 'A Warrior in your party is snapshotting their Battle Shout before combat, using the bonus from T2 3pc (+30 attack power) for the first 1:50s of the fight.',
+		changedEvent: (party: Party) => party.buffsChangeEmitter,
+		getValue: (party: Party) => party.getBuffs().snapshotBsT2,
+		setValue: (eventID: EventID, party: Party, newValue: boolean) => {
+			const buffs = party.getBuffs();
+			buffs.snapshotBsT2 = newValue;
+			party.setBuffs(eventID, buffs);
+		},
+		enableWhen: (party: Party) => party.getBuffs().battleShout > 0,
 	},
 };

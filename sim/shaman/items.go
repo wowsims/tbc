@@ -169,7 +169,7 @@ func ApplyNaturalAlignmentCrystal(agent core.Agent) {
 					ActionID: actionID,
 					Expires:  sim.CurrentTime + dur,
 					OnCast: func(sim *core.Simulation, cast *core.Cast) {
-						cast.ManaCost *= 1.2
+						cast.ManaCost += cast.BaseManaCost * 0.2
 					},
 					OnExpire: func(sim *core.Simulation) {
 						character.AddStat(stats.SpellPower, -sp)
@@ -221,8 +221,8 @@ func ApplyAshtongueTalismanOfVision(agent core.Agent) {
 
 		return core.Aura{
 			ID: AshtongueTalismanOfVisionAuraID,
-			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
-				if !ability.ActionID.SameAction(StormstrikeActionID) {
+			OnBeforeMelee: func(sim *core.Simulation, ability *core.ActiveMeleeAbility) {
+				if !ability.SameAction(StormstrikeActionID) {
 					return
 				}
 				if sim.RandomFloat("Ashtongue Talisman of Vision") > procChance {

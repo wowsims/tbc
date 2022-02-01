@@ -9,12 +9,13 @@ import (
 	"net/http"
 	"regexp"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/wowsims/tbc/sim/core/proto"
 )
 
-type Stats [28]float64
+type Stats [29]float64
 
 type WowheadItemResponse struct {
 	Name    string `json:"name"`
@@ -47,8 +48,17 @@ func GetBestRegexIntValue(srcStr string, patterns []*regexp.Regexp, matchIdx int
 	return best
 }
 
+func (item WowheadItemResponse) TooltipWithoutSet() string {
+	setIdx := strings.Index(item.Tooltip, "Set : ")
+	if setIdx == -1 {
+		return item.Tooltip
+	} else {
+		return item.Tooltip[:setIdx]
+	}
+}
+
 func (item WowheadItemResponse) GetTooltipRegexValue(pattern *regexp.Regexp, matchIdx int) int {
-	return GetRegexIntValue(item.Tooltip, pattern, matchIdx)
+	return GetRegexIntValue(item.TooltipWithoutSet(), pattern, matchIdx)
 }
 
 func (item WowheadItemResponse) GetIntValue(pattern *regexp.Regexp) int {
@@ -97,31 +107,32 @@ func (item WowheadItemResponse) GetStats() Stats {
 	healingPower := spellPower + healingPowerFromHealing
 
 	return Stats{
-		proto.Stat_StatArmor:            float64(item.GetIntValue(armorRegex)),
-		proto.Stat_StatStrength:         float64(item.GetIntValue(strengthRegex)),
-		proto.Stat_StatAgility:          float64(item.GetIntValue(agilityRegex)),
-		proto.Stat_StatStamina:          float64(item.GetIntValue(staminaRegex)),
-		proto.Stat_StatIntellect:        float64(item.GetIntValue(intellectRegex)),
-		proto.Stat_StatSpirit:           float64(item.GetIntValue(spiritRegex)),
-		proto.Stat_StatSpellPower:       float64(spellPower),
-		proto.Stat_StatHealingPower:     float64(healingPower),
-		proto.Stat_StatArcaneSpellPower: float64(item.GetIntValue(arcaneSpellPowerRegex)),
-		proto.Stat_StatFireSpellPower:   float64(item.GetIntValue(fireSpellPowerRegex)),
-		proto.Stat_StatFrostSpellPower:  float64(item.GetIntValue(frostSpellPowerRegex)),
-		proto.Stat_StatHolySpellPower:   float64(item.GetIntValue(holySpellPowerRegex)),
-		proto.Stat_StatNatureSpellPower: float64(item.GetIntValue(natureSpellPowerRegex)),
-		proto.Stat_StatShadowSpellPower: float64(item.GetIntValue(shadowSpellPowerRegex)),
-		proto.Stat_StatSpellHit:         float64(item.GetIntValue(spellHitRegex) + item.GetIntValue(spellHitRegex2)),
-		proto.Stat_StatSpellCrit:        float64(item.GetIntValue(spellCritRegex) + item.GetIntValue(spellCritRegex2)),
-		proto.Stat_StatSpellHaste:       float64(item.GetIntValue(spellHasteRegex)),
-		proto.Stat_StatSpellPenetration: float64(item.GetIntValue(spellPenetrationRegex)),
-		proto.Stat_StatMP5:              float64(item.GetIntValue(mp5Regex)),
-		proto.Stat_StatAttackPower:      float64(item.GetIntValue(attackPowerRegex)),
-		proto.Stat_StatMeleeHit:         float64(item.GetIntValue(meleeHitRegex) + item.GetIntValue(meleeHitRegex2)),
-		proto.Stat_StatMeleeCrit:        float64(item.GetIntValue(meleeCritRegex) + item.GetIntValue(meleeCritRegex2)),
-		proto.Stat_StatMeleeHaste:       float64(item.GetIntValue(meleeHasteRegex)),
-		proto.Stat_StatArmorPenetration: float64(item.GetIntValue(armorPenetrationRegex)),
-		proto.Stat_StatExpertise:        float64(item.GetIntValue(expertiseRegex)),
+		proto.Stat_StatArmor:             float64(item.GetIntValue(armorRegex)),
+		proto.Stat_StatStrength:          float64(item.GetIntValue(strengthRegex)),
+		proto.Stat_StatAgility:           float64(item.GetIntValue(agilityRegex)),
+		proto.Stat_StatStamina:           float64(item.GetIntValue(staminaRegex)),
+		proto.Stat_StatIntellect:         float64(item.GetIntValue(intellectRegex)),
+		proto.Stat_StatSpirit:            float64(item.GetIntValue(spiritRegex)),
+		proto.Stat_StatSpellPower:        float64(spellPower),
+		proto.Stat_StatHealingPower:      float64(healingPower),
+		proto.Stat_StatArcaneSpellPower:  float64(item.GetIntValue(arcaneSpellPowerRegex)),
+		proto.Stat_StatFireSpellPower:    float64(item.GetIntValue(fireSpellPowerRegex)),
+		proto.Stat_StatFrostSpellPower:   float64(item.GetIntValue(frostSpellPowerRegex)),
+		proto.Stat_StatHolySpellPower:    float64(item.GetIntValue(holySpellPowerRegex)),
+		proto.Stat_StatNatureSpellPower:  float64(item.GetIntValue(natureSpellPowerRegex)),
+		proto.Stat_StatShadowSpellPower:  float64(item.GetIntValue(shadowSpellPowerRegex)),
+		proto.Stat_StatSpellHit:          float64(item.GetIntValue(spellHitRegex) + item.GetIntValue(spellHitRegex2)),
+		proto.Stat_StatSpellCrit:         float64(item.GetIntValue(spellCritRegex) + item.GetIntValue(spellCritRegex2)),
+		proto.Stat_StatSpellHaste:        float64(item.GetIntValue(spellHasteRegex)),
+		proto.Stat_StatSpellPenetration:  float64(item.GetIntValue(spellPenetrationRegex)),
+		proto.Stat_StatMP5:               float64(item.GetIntValue(mp5Regex)),
+		proto.Stat_StatAttackPower:       float64(item.GetIntValue(attackPowerRegex)),
+		proto.Stat_StatRangedAttackPower: float64(item.GetIntValue(attackPowerRegex)),
+		proto.Stat_StatMeleeHit:          float64(item.GetIntValue(meleeHitRegex) + item.GetIntValue(meleeHitRegex2)),
+		proto.Stat_StatMeleeCrit:         float64(item.GetIntValue(meleeCritRegex) + item.GetIntValue(meleeCritRegex2)),
+		proto.Stat_StatMeleeHaste:        float64(item.GetIntValue(meleeHasteRegex)),
+		proto.Stat_StatArmorPenetration:  float64(item.GetIntValue(armorPenetrationRegex)),
+		proto.Stat_StatExpertise:         float64(item.GetIntValue(expertiseRegex)),
 	}
 }
 
@@ -404,17 +415,18 @@ func (item WowheadItemResponse) GetSocketBonus() Stats {
 	//fmt.Printf("\n%s\n", bonusStr)
 
 	stats := Stats{
-		proto.Stat_StatStrength:    float64(GetBestRegexIntValue(bonusStr, strengthSocketBonusRegexes, 1)),
-		proto.Stat_StatAgility:     float64(GetBestRegexIntValue(bonusStr, agilitySocketBonusRegexes, 1)),
-		proto.Stat_StatStamina:     float64(GetBestRegexIntValue(bonusStr, staminaSocketBonusRegexes, 1)),
-		proto.Stat_StatIntellect:   float64(GetBestRegexIntValue(bonusStr, intellectSocketBonusRegexes, 1)),
-		proto.Stat_StatSpirit:      float64(GetBestRegexIntValue(bonusStr, spiritSocketBonusRegexes, 1)),
-		proto.Stat_StatSpellHit:    float64(GetBestRegexIntValue(bonusStr, spellHitSocketBonusRegexes, 1)),
-		proto.Stat_StatSpellCrit:   float64(GetBestRegexIntValue(bonusStr, spellCritSocketBonusRegexes, 1)),
-		proto.Stat_StatMP5:         float64(GetBestRegexIntValue(bonusStr, mp5SocketBonusRegexes, 1)),
-		proto.Stat_StatAttackPower: float64(GetBestRegexIntValue(bonusStr, attackPowerSocketBonusRegexes, 1)),
-		proto.Stat_StatMeleeHit:    float64(GetBestRegexIntValue(bonusStr, meleeHitSocketBonusRegexes, 1)),
-		proto.Stat_StatMeleeCrit:   float64(GetBestRegexIntValue(bonusStr, meleeCritSocketBonusRegexes, 1)),
+		proto.Stat_StatStrength:          float64(GetBestRegexIntValue(bonusStr, strengthSocketBonusRegexes, 1)),
+		proto.Stat_StatAgility:           float64(GetBestRegexIntValue(bonusStr, agilitySocketBonusRegexes, 1)),
+		proto.Stat_StatStamina:           float64(GetBestRegexIntValue(bonusStr, staminaSocketBonusRegexes, 1)),
+		proto.Stat_StatIntellect:         float64(GetBestRegexIntValue(bonusStr, intellectSocketBonusRegexes, 1)),
+		proto.Stat_StatSpirit:            float64(GetBestRegexIntValue(bonusStr, spiritSocketBonusRegexes, 1)),
+		proto.Stat_StatSpellHit:          float64(GetBestRegexIntValue(bonusStr, spellHitSocketBonusRegexes, 1)),
+		proto.Stat_StatSpellCrit:         float64(GetBestRegexIntValue(bonusStr, spellCritSocketBonusRegexes, 1)),
+		proto.Stat_StatMP5:               float64(GetBestRegexIntValue(bonusStr, mp5SocketBonusRegexes, 1)),
+		proto.Stat_StatAttackPower:       float64(GetBestRegexIntValue(bonusStr, attackPowerSocketBonusRegexes, 1)),
+		proto.Stat_StatRangedAttackPower: float64(GetBestRegexIntValue(bonusStr, attackPowerSocketBonusRegexes, 1)),
+		proto.Stat_StatMeleeHit:          float64(GetBestRegexIntValue(bonusStr, meleeHitSocketBonusRegexes, 1)),
+		proto.Stat_StatMeleeCrit:         float64(GetBestRegexIntValue(bonusStr, meleeCritSocketBonusRegexes, 1)),
 	}
 
 	spellPower := GetBestRegexIntValue(bonusStr, spellPowerSocketBonusRegexes, 1)
@@ -484,18 +496,19 @@ var meleeCritGemStatRegexes = []*regexp.Regexp{
 
 func (item WowheadItemResponse) GetGemStats() Stats {
 	stats := Stats{
-		proto.Stat_StatStrength:    float64(GetBestRegexIntValue(item.Tooltip, strengthGemStatRegexes, 1)),
-		proto.Stat_StatAgility:     float64(GetBestRegexIntValue(item.Tooltip, agilityGemStatRegexes, 1)),
-		proto.Stat_StatStamina:     float64(GetBestRegexIntValue(item.Tooltip, staminaGemStatRegexes, 1)),
-		proto.Stat_StatIntellect:   float64(GetBestRegexIntValue(item.Tooltip, intellectGemStatRegexes, 1)),
-		proto.Stat_StatSpirit:      float64(GetBestRegexIntValue(item.Tooltip, spiritGemStatRegexes, 1)),
-		proto.Stat_StatSpellHit:    float64(GetBestRegexIntValue(item.Tooltip, spellHitGemStatRegexes, 1)),
-		proto.Stat_StatSpellCrit:   float64(GetBestRegexIntValue(item.Tooltip, spellCritGemStatRegexes, 1)),
-		proto.Stat_StatSpellHaste:  float64(GetBestRegexIntValue(item.Tooltip, spellHasteGemStatRegexes, 1)),
-		proto.Stat_StatMP5:         float64(GetBestRegexIntValue(item.Tooltip, mp5GemStatRegexes, 1)),
-		proto.Stat_StatAttackPower: float64(GetBestRegexIntValue(item.Tooltip, attackPowerGemStatRegexes, 1)),
-		proto.Stat_StatMeleeHit:    float64(GetBestRegexIntValue(item.Tooltip, meleeHitGemStatRegexes, 1)),
-		proto.Stat_StatMeleeCrit:   float64(GetBestRegexIntValue(item.Tooltip, meleeCritGemStatRegexes, 1)),
+		proto.Stat_StatStrength:          float64(GetBestRegexIntValue(item.Tooltip, strengthGemStatRegexes, 1)),
+		proto.Stat_StatAgility:           float64(GetBestRegexIntValue(item.Tooltip, agilityGemStatRegexes, 1)),
+		proto.Stat_StatStamina:           float64(GetBestRegexIntValue(item.Tooltip, staminaGemStatRegexes, 1)),
+		proto.Stat_StatIntellect:         float64(GetBestRegexIntValue(item.Tooltip, intellectGemStatRegexes, 1)),
+		proto.Stat_StatSpirit:            float64(GetBestRegexIntValue(item.Tooltip, spiritGemStatRegexes, 1)),
+		proto.Stat_StatSpellHit:          float64(GetBestRegexIntValue(item.Tooltip, spellHitGemStatRegexes, 1)),
+		proto.Stat_StatSpellCrit:         float64(GetBestRegexIntValue(item.Tooltip, spellCritGemStatRegexes, 1)),
+		proto.Stat_StatSpellHaste:        float64(GetBestRegexIntValue(item.Tooltip, spellHasteGemStatRegexes, 1)),
+		proto.Stat_StatMP5:               float64(GetBestRegexIntValue(item.Tooltip, mp5GemStatRegexes, 1)),
+		proto.Stat_StatAttackPower:       float64(GetBestRegexIntValue(item.Tooltip, attackPowerGemStatRegexes, 1)),
+		proto.Stat_StatRangedAttackPower: float64(GetBestRegexIntValue(item.Tooltip, attackPowerGemStatRegexes, 1)),
+		proto.Stat_StatMeleeHit:          float64(GetBestRegexIntValue(item.Tooltip, meleeHitGemStatRegexes, 1)),
+		proto.Stat_StatMeleeCrit:         float64(GetBestRegexIntValue(item.Tooltip, meleeCritGemStatRegexes, 1)),
 	}
 
 	spellPower := GetBestRegexIntValue(item.Tooltip, spellPowerGemStatRegexes, 1)

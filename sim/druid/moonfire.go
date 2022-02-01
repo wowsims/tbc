@@ -20,6 +20,7 @@ func (druid *Druid) newMoonfireTemplate(sim *core.Simulation) core.SimpleSpellTe
 		BaseManaCost:   495,
 		ManaCost:       495,
 		CastTime:       0,
+		GCD:            core.GCDDefault,
 		ActionID: core.ActionID{
 			SpellID: SpellIDMoonfire,
 		},
@@ -29,6 +30,7 @@ func (druid *Druid) newMoonfireTemplate(sim *core.Simulation) core.SimpleSpellTe
 		SpellEffect: core.SpellEffect{
 			DamageMultiplier:       1,
 			StaticDamageMultiplier: 1,
+			ThreatMultiplier:       1,
 		},
 		DirectInput: core.DirectDamageInput{
 			MinBaseDamage:    305,

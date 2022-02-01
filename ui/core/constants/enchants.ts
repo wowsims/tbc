@@ -35,12 +35,16 @@ export const CHEST_RESTORE_MANA_PRIME = 33991;
 enchantDescriptions.set(CHEST_RESTORE_MANA_PRIME, '+6 Mana Per 5 Sec.');
 
 // Wrist
+export const WRIST_ASSAULT = 34002;
+enchantDescriptions.set(WRIST_ASSAULT, '+24 Attack Power');
 export const WRIST_SPELLPOWER = 22534;
 enchantDescriptions.set(WRIST_SPELLPOWER, '+15 Spell Damage');
 export const WRIST_BRAWN = 27899;
 enchantDescriptions.set(WRIST_BRAWN, '+12 Strength');
 
 // Gloves
+export const GLOVES_MAJOR_AGILITY = 33152;
+enchantDescriptions.set(GLOVES_MAJOR_AGILITY, '+15 Agility');
 export const GLOVES_SPELLPOWER = 28272;
 enchantDescriptions.set(GLOVES_SPELLPOWER, '+20 Spell Damage');
 export const GLOVES_SPELLSTRIKE = 28271;
@@ -67,13 +71,22 @@ export const DEXTERITY = 27951;
 enchantDescriptions.set(DEXTERITY, '+12 Agility');
 
 // Weapon
+export const CRUSADER = 16252;
+enchantDescriptions.set(CRUSADER, 'Crusader');
+export const EXECUTIONER = 33307;
+enchantDescriptions.set(EXECUTIONER, 'Executioner');
+export const WEAPON_MAJOR_AGILITY = 22556;
+enchantDescriptions.set(WEAPON_MAJOR_AGILITY, '+35 Agility');
 export const WEAPON_MAJOR_INTELLECT = 22551;
 enchantDescriptions.set(WEAPON_MAJOR_INTELLECT, '+30 Intellect');
 export const WEAPON_SPELLPOWER = 22555;
 enchantDescriptions.set(WEAPON_SPELLPOWER, '+40 Spell Damage');
 export const SUNFIRE = 22560;
+enchantDescriptions.set(SUNFIRE, 'Sunfire');
 export const SOULFROST = 22561;
+enchantDescriptions.set(SOULFROST, 'Soulfrost');
 export const MONGOOSE = 22559;
+enchantDescriptions.set(MONGOOSE, 'Mongoose');
 
 // Shield
 export const SHIELD_INTELLECT = 22539;
@@ -82,3 +95,7 @@ enchantDescriptions.set(SHIELD_INTELLECT, '+12 Intellect');
 // Ring
 export const RING_SPELLPOWER = 22536;
 enchantDescriptions.set(RING_SPELLPOWER, '+12 Spell Damage');
+
+// Ranged
+export const STABILIZED_ETERNIUM_SCOPE = 23766;
+enchantDescriptions.set(STABILIZED_ETERNIUM_SCOPE, '+28 Crit Rating');

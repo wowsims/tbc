@@ -23,6 +23,7 @@ func (mage *Mage) newPyroblastTemplate(sim *core.Simulation) core.SimpleSpellTem
 				BaseManaCost:   500,
 				ManaCost:       500,
 				CastTime:       time.Millisecond * 6000,
+				GCD:            core.GCDDefault,
 				ActionID: core.ActionID{
 					SpellID: SpellIDPyroblast,
 				},
@@ -32,6 +33,7 @@ func (mage *Mage) newPyroblastTemplate(sim *core.Simulation) core.SimpleSpellTem
 			SpellEffect: core.SpellEffect{
 				DamageMultiplier:       1,
 				StaticDamageMultiplier: mage.spellDamageMultiplier,
+				ThreatMultiplier:       1 - 0.05*float64(mage.Talents.BurningSoul),
 				OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 					pyroblastDot := mage.newPyroblastDot(sim, spellEffect.Target)
 					pyroblastDot.Cast(sim)
@@ -46,6 +48,7 @@ func (mage *Mage) newPyroblastTemplate(sim *core.Simulation) core.SimpleSpellTem
 	}
 
 	spell.ManaCost -= spell.BaseManaCost * float64(mage.Talents.Pyromaniac) * 0.01
+	spell.ManaCost *= 1 - float64(mage.Talents.ElementalPrecision)*0.01
 	spell.Effect.BonusSpellHitRating += float64(mage.Talents.ElementalPrecision) * 1 * core.SpellHitRatingPerHitChance
 	spell.Effect.BonusSpellCritRating += float64(mage.Talents.CriticalMass) * 2 * core.SpellCritRatingPerCritChance
 	spell.Effect.BonusSpellCritRating += float64(mage.Talents.Pyromaniac) * 1 * core.SpellCritRatingPerCritChance
@@ -66,8 +69,7 @@ func (mage *Mage) newPyroblastDotTemplate(sim *core.Simulation) core.SimpleSpell
 					SpellID: SpellIDPyroblast,
 					Tag:     CastTagPyroblastDot,
 				},
-				IgnoreCooldowns: true,
-				IgnoreManaCost:  true,
+				IgnoreManaCost: true,
 			},
 		},
 		Effect: core.SpellHitEffect{

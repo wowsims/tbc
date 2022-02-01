@@ -235,7 +235,8 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
       'Potion': [],
       'Conjured': [],
       'Spirit': [],
-      'Weapon Imbue': [],
+      'MH Weapon Imbue': [],
+      'OH Weapon Imbue': [],
     };
 
 		if (!this.isWithinRaidSim) {
@@ -714,6 +715,7 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 				config.isPreset = true;
 				savedTalentsManager.addSavedData({
 					name: config.name,
+					isPreset: true,
 					data: SavedTalents.create({
 						talentsString: config.data,
 					}),
@@ -838,7 +840,8 @@ export type ExclusivityTag =
     | 'Potion'
     | 'Conjured'
     | 'Spirit'
-    | 'Weapon Imbue';
+    | 'MH Weapon Imbue'
+    | 'OH Weapon Imbue';
 
 export interface ExclusiveEffect {
   tags: Array<ExclusivityTag>;
