@@ -5,6 +5,14 @@ export declare const BeastMasteryTalents: {
     name: string;
     data: string;
 };
+export declare const MarksmanTalents: {
+    name: string;
+    data: string;
+};
+export declare const SurvivalTalents: {
+    name: string;
+    data: string;
+};
 export declare const DefaultRotation: HunterRotation;
 export declare const DefaultOptions: HunterOptions;
 export declare const DefaultConsumes: Consumes;

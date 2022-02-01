@@ -15,6 +15,14 @@ export const BeastMasteryTalents = {
     name: 'BM',
     data: '502030015150121531051-0505201205',
 };
+export const MarksmanTalents = {
+    name: 'Marksman',
+    data: '51200200502-0551201205013253135',
+};
+export const SurvivalTalents = {
+    name: 'Survival',
+    data: '502-0550201205-333200022003223005103',
+};
 export const DefaultRotation = HunterRotation.create({
     adaptive: true,
     useMultiShot: true,
