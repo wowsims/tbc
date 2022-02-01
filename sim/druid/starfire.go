@@ -24,7 +24,7 @@ func (druid *Druid) newStarfireTemplate(sim *core.Simulation, rank int) core.Sim
 		ManaCost:       370,
 		CastTime:       time.Millisecond * 3500,
 		GCD:            core.GCDDefault,
-		CritMultiplier: 1.5,
+		CritMultiplier: druid.SpellCritMultiplier(1, 0.2*float64(druid.Talents.Vengeance)),
 	}
 
 	effect := core.SpellHitEffect{
@@ -51,21 +51,17 @@ func (druid *Druid) newStarfireTemplate(sim *core.Simulation, rank int) core.Sim
 		effect.DirectInput.SpellCoefficient = 0.99
 	}
 
+	baseCast.ManaCost -= baseCast.BaseManaCost * 0.03 * float64(druid.Talents.Moonglow)
+	baseCast.CastTime -= time.Millisecond * 100 * time.Duration(druid.Talents.StarlightWrath)
+
+	effect.StaticDamageMultiplier *= 1 + 0.02*float64(druid.Talents.Moonfury)
+	effect.BonusSpellCritRating += float64(druid.Talents.FocusedStarlight) * 2 * core.SpellCritRatingPerCritChance // 2% crit per point
+	effect.DirectInput.SpellCoefficient += 0.04 * float64(druid.Talents.WrathOfCenarius)
+
 	if druid.Equip[items.ItemSlotRanged].ID == IvoryMoongoddess {
 		// This seems to be unaffected by wrath of cenarius so it needs to come first.
 		effect.DirectInput.FlatDamageBonus += 55 * effect.DirectInput.SpellCoefficient
 	}
-
-	effect.DirectInput.SpellCoefficient += 0.04 * float64(druid.Talents.WrathOfCenarius)
-
-	baseCast.CastTime -= time.Millisecond * 100 * time.Duration(druid.Talents.StarlightWrath)
-	effect.BonusSpellCritRating += float64(druid.Talents.FocusedStarlight) * 2 * core.SpellCritRatingPerCritChance // 2% crit per point
-
-	// Convert to percent, multiply by percent increase, convert back to multiplier by adding 1
-	baseCast.CritMultiplier = (baseCast.CritMultiplier-1)*(1+float64(druid.Talents.Vengeance)*0.2) + 1
-	baseCast.ManaCost -= baseCast.BaseManaCost * float64(druid.Talents.Moonglow) * 0.03
-	effect.StaticDamageMultiplier *= 1 + 0.02*float64(druid.Talents.Moonfury)
-
 	if ItemSetThunderheart.CharacterHasSetBonus(&druid.Character, 4) { // Thunderheart 4p adds 5% crit to starfire
 		effect.BonusSpellCritRating += 5 * core.SpellCritRatingPerCritChance
 	}

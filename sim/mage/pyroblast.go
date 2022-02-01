@@ -17,16 +17,14 @@ func (mage *Mage) newPyroblastTemplate(sim *core.Simulation) core.SimpleSpellTem
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				CritMultiplier: 1.5 + 0.125*float64(mage.Talents.SpellPower),
-				SpellSchool:    stats.FireSpellPower,
+				ActionID:       core.ActionID{SpellID: SpellIDPyroblast},
 				Character:      &mage.Character,
+				SpellSchool:    stats.FireSpellPower,
 				BaseManaCost:   500,
 				ManaCost:       500,
 				CastTime:       time.Millisecond * 6000,
 				GCD:            core.GCDDefault,
-				ActionID: core.ActionID{
-					SpellID: SpellIDPyroblast,
-				},
+				CritMultiplier: mage.SpellCritMultiplier(1, 0.25*float64(mage.Talents.SpellPower)),
 			},
 		},
 		Effect: core.SpellHitEffect{
@@ -63,12 +61,12 @@ func (mage *Mage) newPyroblastDotTemplate(sim *core.Simulation) core.SimpleSpell
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				SpellSchool: stats.FireSpellPower,
-				Character:   &mage.Character,
 				ActionID: core.ActionID{
 					SpellID: SpellIDPyroblast,
 					Tag:     CastTagPyroblastDot,
 				},
+				Character:      &mage.Character,
+				SpellSchool:    stats.FireSpellPower,
 				IgnoreManaCost: true,
 			},
 		},

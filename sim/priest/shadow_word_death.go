@@ -13,18 +13,18 @@ var SWDCooldownID = core.NewCooldownID()
 
 func (priest *Priest) newShadowWordDeathTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
 	baseCast := core.Cast{
-		CritMultiplier: 1.5,
-		SpellSchool:    stats.ShadowSpellPower,
+		ActionID: core.ActionID{
+			SpellID:    SpellIDShadowWordDeath,
+			CooldownID: SWDCooldownID,
+		},
 		Character:      &priest.Character,
+		SpellSchool:    stats.ShadowSpellPower,
 		BaseManaCost:   309,
 		ManaCost:       309,
 		CastTime:       0,
 		GCD:            core.GCDDefault,
 		Cooldown:       time.Second * 12,
-		ActionID: core.ActionID{
-			SpellID:    SpellIDShadowWordDeath,
-			CooldownID: SWDCooldownID,
-		},
+		CritMultiplier: priest.DefaultSpellCritMultiplier(),
 	}
 
 	effect := core.SpellHitEffect{

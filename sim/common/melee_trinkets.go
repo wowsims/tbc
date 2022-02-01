@@ -248,6 +248,7 @@ func ApplyBadgeOfTheSwarmguard(agent core.Agent) {
 						stacks = 0
 					},
 				})
+				character.SetCD(BadgeOfTheSwarmguardCooldownID, sim.CurrentTime+time.Minute*3)
 			}
 		},
 	})
@@ -318,7 +319,7 @@ func ApplyRomulosPoisonVial(agent core.Agent) {
 					IgnoreManaCost: true,
 					IsPhantom:      true,
 					SpellSchool:    stats.NatureSpellPower,
-					CritMultiplier: 1.5,
+					CritMultiplier: character.DefaultSpellCritMultiplier(),
 				},
 			},
 			Effect: core.SpellHitEffect{

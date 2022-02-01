@@ -432,6 +432,7 @@ message Item {
     int32 phase = 11;
     ItemQuality quality = 12;
 		bool unique = 13;
+		int32 ilvl = 20;
 }
 
 // Extra enum for describing which items are eligible for an enchant, when

@@ -17,16 +17,14 @@ func (mage *Mage) newFlamestrikeTemplate(sim *core.Simulation) core.SimpleSpellT
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				CritMultiplier: 1.5 + 0.125*float64(mage.Talents.SpellPower),
-				SpellSchool:    stats.FireSpellPower,
+				ActionID:       core.ActionID{SpellID: SpellIDFlamestrike},
 				Character:      &mage.Character,
+				SpellSchool:    stats.FireSpellPower,
 				BaseManaCost:   1175,
 				ManaCost:       1175,
 				CastTime:       time.Second * 3,
 				GCD:            core.GCDDefault,
-				ActionID: core.ActionID{
-					SpellID: SpellIDFlamestrike,
-				},
+				CritMultiplier: mage.SpellCritMultiplier(1, 0.25*float64(mage.Talents.SpellPower)),
 				OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
 					flamestrikeDot := mage.newFlamestrikeDot(sim)
 					flamestrikeDot.Cast(sim)
@@ -72,13 +70,12 @@ func (mage *Mage) newFlamestrikeDotTemplate(sim *core.Simulation) core.SimpleSpe
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				CritMultiplier: 1.5 + 0.125*float64(mage.Talents.SpellPower),
-				SpellSchool:    stats.FireSpellPower,
-				Character:      &mage.Character,
 				ActionID: core.ActionID{
 					SpellID: SpellIDFlamestrike,
 					Tag:     CastTagFlamestrikeDot,
 				},
+				Character:      &mage.Character,
+				SpellSchool:    stats.FireSpellPower,
 				IgnoreManaCost: true,
 			},
 		},

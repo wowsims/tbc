@@ -1,6 +1,8 @@
 package hunter
 
 import (
+	"time"
+
 	"github.com/wowsims/tbc/sim/core"
 )
 
@@ -13,7 +15,7 @@ var AspectOfTheViperAuraID = core.NewAuraID()
 
 func (hunter *Hunter) aspectOfTheHawkAura() core.Aura {
 	const improvedHawkProcChance = 0.1
-	improvedHawkBonus := 0.03 * float64(hunter.Talents.ImprovedAspectOfTheHawk)
+	improvedHawkBonus := 1 + 0.03*float64(hunter.Talents.ImprovedAspectOfTheHawk)
 
 	aura := core.Aura{
 		ID:       AspectOfTheHawkAuraID,
@@ -23,10 +25,19 @@ func (hunter *Hunter) aspectOfTheHawkAura() core.Aura {
 			hitEffect.BonusAttackPower += 155
 		},
 		OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
+			if !hitEffect.IsWhiteHit {
+				return
+			}
+
 			if improvedHawkBonus > 0 && sim.RandomFloat("Imp Aspect of the Hawk") < improvedHawkProcChance {
+				hunter.PseudoStats.RangedSpeedMultiplier *= improvedHawkBonus
 				hunter.AddAura(sim, core.Aura{
 					ID:       ImprovedAspectOfTheHawkAuraID,
-					ActionID: AspectOfTheHawkActionID,
+					ActionID: core.ActionID{SpellID: 19556},
+					Expires:  sim.CurrentTime + time.Second*12,
+					OnExpire: func(sim *core.Simulation) {
+						hunter.PseudoStats.RangedSpeedMultiplier /= improvedHawkBonus
+					},
 				})
 			}
 		},

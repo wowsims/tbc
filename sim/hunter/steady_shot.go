@@ -21,6 +21,8 @@ func (hunter *Hunter) newSteadyShotCastTemplate(sim *core.Simulation) core.Simpl
 		DisableMetrics: true,
 	}
 
+	template.ManaCost *= 1 - 0.02*float64(hunter.Talents.Efficiency)
+
 	return template
 }
 
@@ -30,8 +32,8 @@ func (hunter *Hunter) newSteadyShotAbilityTemplate(sim *core.Simulation) core.Me
 			ActionID:       core.ActionID{SpellID: 34120},
 			Character:      &hunter.Character,
 			SpellSchool:    stats.AttackPower,
-			CritMultiplier: 2.0,
 			IgnoreCost:     true,
+			CritMultiplier: hunter.critMultiplier(true, sim.GetPrimaryTarget()),
 		},
 		Effect: core.AbilityHitEffect{
 			AbilityEffect: core.AbilityEffect{

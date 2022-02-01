@@ -218,6 +218,8 @@ func itemToGoString(itemDeclaration ItemDeclaration, itemResponse WowheadItemRes
 		itemStr += fmt.Sprintf("Unique:true, ")
 	}
 
+	itemStr += fmt.Sprintf("Ilvl:%d, ", itemResponse.GetItemLevel())
+
 	itemStr += fmt.Sprintf("Stats: %s, ", statsToGoString(itemResponse.GetStats(), itemDeclaration.Stats))
 
 	gemSockets := itemResponse.GetGemSockets()

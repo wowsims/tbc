@@ -22,7 +22,7 @@ func (druid *Druid) newWrathTemplate(sim *core.Simulation) core.SimpleSpellTempl
 		ManaCost:       255,
 		CastTime:       time.Millisecond * 2000,
 		GCD:            core.GCDDefault,
-		CritMultiplier: 1.5,
+		CritMultiplier: druid.SpellCritMultiplier(1, 0.2*float64(druid.Talents.Vengeance)),
 	}
 
 	effect := core.SpellHitEffect{
@@ -38,18 +38,15 @@ func (druid *Druid) newWrathTemplate(sim *core.Simulation) core.SimpleSpellTempl
 		},
 	}
 
+	baseCast.CastTime -= time.Millisecond * 100 * time.Duration(druid.Talents.StarlightWrath)
+	baseCast.ManaCost -= baseCast.BaseManaCost * 0.03 * float64(druid.Talents.Moonglow)
+
+	effect.BonusSpellCritRating += float64(druid.Talents.FocusedStarlight) * 2 * core.SpellCritRatingPerCritChance // 2% crit per point
+	effect.StaticDamageMultiplier *= 1 + 0.02*float64(druid.Talents.Moonfury)
 	if druid.Equip[items.ItemSlotRanged].ID == IdolAvenger {
 		// This seems to be unaffected by wrath of cenarius so it needs to come first.
 		effect.DirectInput.FlatDamageBonus += 25 * effect.DirectInput.SpellCoefficient
 	}
-
-	baseCast.CastTime -= time.Millisecond * 100 * time.Duration(druid.Talents.StarlightWrath)
-	effect.BonusSpellCritRating += float64(druid.Talents.FocusedStarlight) * 2 * core.SpellCritRatingPerCritChance // 2% crit per point
-
-	// Convert to percent, multiply by percent increase, convert back to multiplier by adding 1
-	baseCast.CritMultiplier = (baseCast.CritMultiplier-1)*(1+float64(druid.Talents.Vengeance)*0.2) + 1
-	baseCast.ManaCost -= baseCast.BaseManaCost * float64(druid.Talents.Moonglow) * 0.03
-	effect.StaticDamageMultiplier *= 1 + 0.02*float64(druid.Talents.Moonfury)
 
 	effect.OnSpellHit = druid.applyOnHitTalents
 	spCast := &core.SpellCast{

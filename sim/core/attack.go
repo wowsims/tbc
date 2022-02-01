@@ -18,7 +18,7 @@ import (
 type OnBeforeMHSwing func(sim *Simulation) bool
 
 // OnBeforeMelee is invoked once for each ability, even if there are multiple hits.
-//  This should be used for any effects that adjust the stats / multipliers of the attack.
+//  This should be used for any effects that adjust the cost / stats / multipliers of the attack.
 type OnBeforeMelee func(sim *Simulation, ability *ActiveMeleeAbility)
 
 // OnBeforeMelee is invoked before the hit/dmg rolls are made.
@@ -127,53 +127,56 @@ type AbilityEffect struct {
 // Represents a generic weapon. Pets / unarmed / various other cases dont use
 // actual weapon items so this is an abstraction of a Weapon.
 type Weapon struct {
-	BaseDamageMin float64
-	BaseDamageMax float64
-	SwingSpeed    float64
-	SwingDuration time.Duration // Duration between 2 swings.
+	BaseDamageMin  float64
+	BaseDamageMax  float64
+	SwingSpeed     float64
+	SwingDuration  time.Duration // Duration between 2 swings.
+	CritMultiplier float64
 }
 
-func newWeaponFromUnarmed() Weapon {
+func newWeaponFromUnarmed(critMultiplier float64) Weapon {
 	// These numbers are probably wrong but nobody cares.
 	return Weapon{
-		BaseDamageMin: 0,
-		BaseDamageMax: 0,
-		SwingSpeed:    1,
-		SwingDuration: time.Second,
+		BaseDamageMin:  0,
+		BaseDamageMax:  0,
+		SwingSpeed:     1,
+		SwingDuration:  time.Second,
+		CritMultiplier: critMultiplier,
 	}
 }
 
-func newWeaponFromItem(item items.Item) Weapon {
+func newWeaponFromItem(item items.Item, critMultiplier float64) Weapon {
 	return Weapon{
-		BaseDamageMin: item.WeaponDamageMin,
-		BaseDamageMax: item.WeaponDamageMax,
-		SwingSpeed:    item.SwingSpeed,
-		SwingDuration: time.Duration(item.SwingSpeed * float64(time.Second)),
+		BaseDamageMin:  item.WeaponDamageMin,
+		BaseDamageMax:  item.WeaponDamageMax,
+		SwingSpeed:     item.SwingSpeed,
+		SwingDuration:  time.Duration(item.SwingSpeed * float64(time.Second)),
+		CritMultiplier: critMultiplier,
 	}
 }
 
 // Returns weapon stats using the main hand equipped weapon.
-func (character *Character) WeaponFromMainHand() Weapon {
+func (character *Character) WeaponFromMainHand(critMultiplier float64) Weapon {
 	if weapon := character.GetMHWeapon(); weapon != nil {
-		return newWeaponFromItem(*weapon)
+		return newWeaponFromItem(*weapon, critMultiplier)
 	} else {
-		return newWeaponFromUnarmed()
+		return newWeaponFromUnarmed(critMultiplier)
 	}
 }
 
 // Returns weapon stats using the off hand equipped weapon.
-func (character *Character) WeaponFromOffHand() Weapon {
+func (character *Character) WeaponFromOffHand(critMultiplier float64) Weapon {
 	if weapon := character.GetOHWeapon(); weapon != nil {
-		return newWeaponFromItem(*weapon)
+		return newWeaponFromItem(*weapon, critMultiplier)
 	} else {
 		return Weapon{}
 	}
 }
 
 // Returns weapon stats using the off hand equipped weapon.
-func (character *Character) WeaponFromRanged() Weapon {
+func (character *Character) WeaponFromRanged(critMultiplier float64) Weapon {
 	if weapon := character.GetRangedWeapon(); weapon != nil {
-		return newWeaponFromItem(*weapon)
+		return newWeaponFromItem(*weapon, critMultiplier)
 	} else {
 		return Weapon{}
 	}
@@ -465,6 +468,9 @@ func (ability *ActiveMeleeAbility) Attack(sim *Simulation) bool {
 	if ability.GCD != 0 && ability.Character.GetRemainingCD(GCDCooldownID, sim.CurrentTime) > 0 {
 		log.Fatalf("Ability used while on GCD\n-------\nAbility %s: %#v\n", ability.ActionID, ability)
 	}
+
+	ability.Character.OnBeforeMelee(sim, ability)
+
 	if ability.MeleeAbility.Cost.Type != 0 {
 		if ability.MeleeAbility.Cost.Type == stats.Mana {
 			if ability.Character.CurrentMana() < ability.MeleeAbility.Cost.Value {
@@ -483,8 +489,6 @@ func (ability *ActiveMeleeAbility) Attack(sim *Simulation) bool {
 			ability.Character.SpendEnergy(sim, ability.MeleeAbility.Cost.Value, ability.MeleeAbility.ActionID)
 		}
 	}
-
-	ability.Character.OnBeforeMelee(sim, ability)
 
 	if len(ability.Effects) == 0 {
 		ability.Effect.performAttack(sim, ability)
@@ -605,11 +609,10 @@ func (character *Character) EnableAutoAttacks(agent Agent, options AutoAttackOpt
 		DelayOHSwings:   options.DelayOHSwings,
 		ActiveMeleeAbility: ActiveMeleeAbility{
 			MeleeAbility: MeleeAbility{
-				ActionID:       ActionID{OtherID: proto.OtherAction_OtherActionAttack},
-				Character:      character,
-				SpellSchool:    stats.AttackPower,
-				CritMultiplier: 2,
-				IgnoreCost:     true,
+				ActionID:    ActionID{OtherID: proto.OtherAction_OtherActionAttack},
+				Character:   character,
+				SpellSchool: stats.AttackPower,
+				IgnoreCost:  true,
 			},
 			Effect: AbilityHitEffect{
 				AbilityEffect: AbilityEffect{
@@ -625,11 +628,10 @@ func (character *Character) EnableAutoAttacks(agent Agent, options AutoAttackOpt
 		},
 		RangedAuto: ActiveMeleeAbility{
 			MeleeAbility: MeleeAbility{
-				ActionID:       ActionID{OtherID: proto.OtherAction_OtherActionShoot},
-				Character:      character,
-				SpellSchool:    stats.AttackPower,
-				CritMultiplier: 2,
-				IgnoreCost:     true,
+				ActionID:    ActionID{OtherID: proto.OtherAction_OtherActionShoot},
+				Character:   character,
+				SpellSchool: stats.AttackPower,
+				IgnoreCost:  true,
 			},
 			Effect: AbilityHitEffect{
 				AbilityEffect: AbilityEffect{
@@ -687,6 +689,9 @@ func (aa *AutoAttacks) reset(sim *Simulation) {
 
 	aa.autoSwingAction = nil
 	aa.resetAutoSwing(sim)
+
+	// Can precompute this.
+	aa.RangedAuto.CritMultiplier = aa.Ranged.CritMultiplier
 }
 
 func (aa *AutoAttacks) resetAutoSwing(sim *Simulation) {
@@ -758,6 +763,7 @@ func (aa *AutoAttacks) TrySwingMH(sim *Simulation, target *Target) {
 
 	aa.cachedMelee = aa.ActiveMeleeAbility
 	aa.cachedMelee.ActionID.Tag = 1
+	aa.cachedMelee.CritMultiplier = aa.MH.CritMultiplier
 	aa.cachedMelee.Effect.Target = target
 	aa.cachedMelee.Effect.WeaponInput.IsOH = false
 	aa.cachedMelee.Attack(sim)
@@ -783,6 +789,7 @@ func (aa *AutoAttacks) TrySwingOH(sim *Simulation, target *Target) {
 
 	aa.cachedMelee = aa.ActiveMeleeAbility
 	aa.cachedMelee.ActionID.Tag = 2
+	aa.cachedMelee.CritMultiplier = aa.OH.CritMultiplier
 	aa.cachedMelee.Effect.Target = target
 	aa.cachedMelee.Effect.WeaponInput.IsOH = true
 	aa.cachedMelee.Attack(sim)

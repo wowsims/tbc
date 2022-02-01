@@ -355,7 +355,7 @@ func WindfuryTotemAura(character *Character, rank int32, iwtTalentPoints int32) 
 			ActionID:       actionID,
 			Character:      character,
 			SpellSchool:    stats.AttackPower,
-			CritMultiplier: 2.0,
+			CritMultiplier: character.DefaultMeleeCritMultiplier(),
 		},
 		Effect: AbilityHitEffect{
 			AbilityEffect: AbilityEffect{

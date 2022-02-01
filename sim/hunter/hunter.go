@@ -67,9 +67,20 @@ func (hunter *Hunter) GetCharacter() *core.Character {
 func (hunter *Hunter) AddRaidBuffs(raidBuffs *proto.RaidBuffs) {
 }
 func (hunter *Hunter) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {
+	if hunter.Talents.FerociousInspiration == 3 {
+		partyBuffs.FerociousInspiration++
+	}
+	if hunter.Talents.TrueshotAura {
+		partyBuffs.TrueshotAura = true
+	}
 }
 
 func (hunter *Hunter) Init(sim *core.Simulation) {
+	// Update auto crit multipliers now that we have the targets.
+	hunter.AutoAttacks.MH.CritMultiplier = hunter.critMultiplier(false, sim.GetPrimaryTarget())
+	hunter.AutoAttacks.OH.CritMultiplier = hunter.critMultiplier(false, sim.GetPrimaryTarget())
+	hunter.AutoAttacks.Ranged.CritMultiplier = hunter.critMultiplier(true, sim.GetPrimaryTarget())
+
 	// Precompute all the spell templates.
 	hunter.aimedShotTemplate = hunter.newAimedShotTemplate(sim)
 	hunter.arcaneShotTemplate = hunter.newArcaneShotTemplate(sim)
@@ -81,8 +92,14 @@ func (hunter *Hunter) Init(sim *core.Simulation) {
 	hunter.steadyShotAbilityTemplate = hunter.newSteadyShotAbilityTemplate(sim)
 }
 
-func (hunter *Hunter) Reset(newsim *core.Simulation) {
+func (hunter *Hunter) Reset(sim *core.Simulation) {
 	hunter.aspectOfTheViper = false
+
+	target := sim.GetPrimaryTarget()
+	impHuntersMark := hunter.Talents.ImprovedHuntersMark
+	if !target.HasAura(core.HuntersMarkDebuffID) || target.NumStacks(core.HuntersMarkDebuffID) < impHuntersMark {
+		target.AddAura(sim, core.HuntersMarkAura(impHuntersMark))
+	}
 }
 
 func NewHunter(character core.Character, options proto.Player) *Hunter {
@@ -98,9 +115,11 @@ func NewHunter(character core.Character, options proto.Player) *Hunter {
 	hunter.PseudoStats.RangedSpeedMultiplier = 1
 	hunter.EnableManaBar()
 	hunter.EnableAutoAttacks(hunter, core.AutoAttackOptions{
-		MainHand:        hunter.WeaponFromMainHand(),
-		OffHand:         hunter.WeaponFromOffHand(),
-		Ranged:          hunter.WeaponFromRanged(),
+		// We don't know crit multiplier until later when we see the target so just
+		// use 0 for now.
+		MainHand:        hunter.WeaponFromMainHand(0),
+		OffHand:         hunter.WeaponFromOffHand(0),
+		Ranged:          hunter.WeaponFromRanged(0),
 		AutoSwingRanged: true,
 	})
 
@@ -171,7 +190,7 @@ func NewHunter(character core.Character, options proto.Player) *Hunter {
 		hunter.PseudoStats.RangedSpeedMultiplier *= 1.15
 	}
 
-	//hunter.applyTalents()
+	hunter.applyTalents()
 	hunter.registerRapidFireCD()
 	hunter.applyAspectOfTheHawk()
 	hunter.applyRotationAura()

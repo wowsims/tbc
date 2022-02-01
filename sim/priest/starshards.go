@@ -13,18 +13,17 @@ var SSCooldownID = core.NewCooldownID()
 
 func (priest *Priest) newStarshardsTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
 	baseCast := core.Cast{
-		CritMultiplier: 1.5,
-		SpellSchool:    stats.ArcaneSpellPower,
-		Character:      &priest.Character,
-		BaseManaCost:   0,
-		ManaCost:       0,
-		CastTime:       0,
-		GCD:            core.GCDDefault,
-		Cooldown:       time.Second * 30,
 		ActionID: core.ActionID{
 			SpellID:    SpellIDStarshards,
 			CooldownID: SSCooldownID,
 		},
+		Character:    &priest.Character,
+		SpellSchool:  stats.ArcaneSpellPower,
+		BaseManaCost: 0,
+		ManaCost:     0,
+		CastTime:     0,
+		GCD:          core.GCDDefault,
+		Cooldown:     time.Second * 30,
 	}
 
 	effect := core.SpellHitEffect{

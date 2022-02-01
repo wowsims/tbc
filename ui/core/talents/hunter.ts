@@ -341,19 +341,6 @@ export class HunterTalentsPicker extends TalentsPicker<Spec.SpecHunter> {
             maxPoints: 3,
           },
           {
-            fieldName: 'trueshotAura',
-            location: {
-              rowIdx: 6,
-              colIdx: 1,
-            },
-            prereqLocation: {
-              rowIdx: 4,
-              colIdx: 1,
-            },
-            spellIds: [19506],
-            maxPoints: 1,
-          },
-          {
             fieldName: 'combatExperience',
             location: {
               rowIdx: 5,
@@ -379,6 +366,19 @@ export class HunterTalentsPicker extends TalentsPicker<Spec.SpecHunter> {
             },
             spellIds: [34482],
             maxPoints: 3,
+          },
+          {
+            fieldName: 'trueshotAura',
+            location: {
+              rowIdx: 6,
+              colIdx: 1,
+            },
+            prereqLocation: {
+              rowIdx: 4,
+              colIdx: 1,
+            },
+            spellIds: [19506],
+            maxPoints: 1,
           },
           {
             fieldName: 'improvedBarrage',

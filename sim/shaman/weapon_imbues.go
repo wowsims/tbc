@@ -33,7 +33,7 @@ func (shaman *Shaman) ApplyWindfuryImbue(mh bool, oh bool) {
 			ActionID:       core.ActionID{SpellID: 25505},
 			Character:      &shaman.Character,
 			SpellSchool:    stats.AttackPower,
-			CritMultiplier: 2.0,
+			CritMultiplier: shaman.DefaultMeleeCritMultiplier(),
 		},
 	}
 
@@ -121,7 +121,7 @@ func (shaman *Shaman) ApplyFlametongueImbue(mh bool, oh bool) {
 				SpellSchool:    stats.FireSpellPower,
 				IgnoreManaCost: true,
 				IsPhantom:      true,
-				CritMultiplier: 1.5,
+				CritMultiplier: shaman.DefaultSpellCritMultiplier(),
 			},
 		},
 		Effect: core.SpellHitEffect{
@@ -196,7 +196,7 @@ func (shaman *Shaman) ApplyFrostbrandImbue(mh bool, oh bool) {
 				SpellSchool:    stats.FrostSpellPower,
 				IgnoreManaCost: true,
 				IsPhantom:      true,
-				CritMultiplier: 1.5,
+				CritMultiplier: shaman.DefaultSpellCritMultiplier(),
 			},
 		},
 		Effect: core.SpellHitEffect{

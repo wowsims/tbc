@@ -22,7 +22,7 @@ func (hunter *Hunter) applyRotationAura() {
 }
 
 func (hunter *Hunter) tryUseGCD(sim *core.Simulation) {
-	if sim.CurrentTime == 0 && hunter.Rotation.PrecastAimedShot {
+	if sim.CurrentTime == 0 && hunter.Rotation.PrecastAimedShot && hunter.Talents.AimedShot {
 		hunter.NewAimedShot(sim, sim.GetPrimaryTarget()).Attack(sim)
 		return
 	}

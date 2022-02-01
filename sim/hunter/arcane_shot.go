@@ -13,16 +13,16 @@ var ArcaneShotActionID = core.ActionID{SpellID: 27019, CooldownID: ArcaneShotCoo
 func (hunter *Hunter) newArcaneShotTemplate(sim *core.Simulation) core.MeleeAbilityTemplate {
 	ama := core.ActiveMeleeAbility{
 		MeleeAbility: core.MeleeAbility{
-			ActionID:       ArcaneShotActionID,
-			Character:      &hunter.Character,
-			SpellSchool:    stats.ArcaneSpellPower,
-			CritMultiplier: 2.0,
-			GCD:            core.GCDDefault,
-			Cooldown:       time.Second * 6,
+			ActionID:    ArcaneShotActionID,
+			Character:   &hunter.Character,
+			SpellSchool: stats.ArcaneSpellPower,
+			GCD:         core.GCDDefault,
+			Cooldown:    time.Second * 6,
 			Cost: core.ResourceCost{
 				Type:  stats.Mana,
 				Value: 230,
 			},
+			CritMultiplier: hunter.critMultiplier(true, sim.GetPrimaryTarget()),
 		},
 		Effect: core.AbilityHitEffect{
 			AbilityEffect: core.AbilityEffect{
@@ -39,6 +39,9 @@ func (hunter *Hunter) newArcaneShotTemplate(sim *core.Simulation) core.MeleeAbil
 			},
 		},
 	}
+
+	ama.Cost.Value *= 1 - 0.02*float64(hunter.Talents.Efficiency)
+	ama.Cooldown -= time.Millisecond * 200 * time.Duration(hunter.Talents.ImprovedArcaneShot)
 
 	return core.NewMeleeAbilityTemplate(ama)
 }
