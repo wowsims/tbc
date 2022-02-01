@@ -10,11 +10,15 @@ import (
 
 type HunterPet struct {
 	core.Pet
-
 	focusBar
+
+	hunterOwner *Hunter
 
 	// Combines a few static effects.
 	damageMultiplier float64
+
+	killCommandTemplate core.MeleeAbilityTemplate
+	killCommand         core.ActiveMeleeAbility
 }
 
 func (hunter *Hunter) NewHunterPet() *HunterPet {
@@ -31,6 +35,7 @@ func (hunter *Hunter) NewHunterPet() *HunterPet {
 			hunterPetStatInheritance,
 			true,
 		),
+		hunterOwner:      hunter,
 		damageMultiplier: petConfig.DamageMultiplier,
 	}
 
@@ -57,6 +62,8 @@ func (hunter *Hunter) NewHunterPet() *HunterPet {
 		AutoSwingMelee: true,
 	})
 
+	hp.applyPetEffects()
+
 	hunter.AddPet(hp)
 
 	return hp
@@ -67,6 +74,7 @@ func (hp *HunterPet) GetPet() *core.Pet {
 }
 
 func (hp *HunterPet) Init(sim *core.Simulation) {
+	hp.killCommandTemplate = hp.newKillCommandTemplate(sim)
 }
 
 func (hp *HunterPet) Reset(newsim *core.Simulation) {
@@ -89,6 +97,25 @@ var hunterPetStatInheritance = func(ownerStats stats.Stats) stats.Stats {
 		stats.AttackPower: ownerStats[stats.RangedAttackPower] * 0.22,
 		stats.SpellPower:  ownerStats[stats.RangedAttackPower] * 0.125,
 	}
+}
+
+var PetEffectsAuraID = core.NewAuraID()
+
+func (hp *HunterPet) applyPetEffects() {
+	hp.AddPermanentAura(func(sim *core.Simulation) core.Aura {
+		return core.Aura{
+			ID: PetEffectsAuraID,
+			OnBeforeMeleeHit: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
+				hitEffect.DamageMultiplier *= hp.damageMultiplier
+			},
+			OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+				spellEffect.DamageMultiplier *= hp.damageMultiplier
+			},
+			OnBeforePeriodicDamage: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect, tickDamage *float64) {
+				*tickDamage *= hp.damageMultiplier
+			},
+		}
+	})
 }
 
 type PetConfig struct {

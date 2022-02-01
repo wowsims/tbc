@@ -78,7 +78,6 @@ func (fb *focusBar) reset(sim *core.Simulation) {
 	fb.currentFocus = MaxFocus
 
 	pa := &core.PendingAction{
-		Name:         "Focus Tick",
 		Priority:     core.ActionPriorityRegen,
 		NextActionAt: tickDuration,
 	}
