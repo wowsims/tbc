@@ -32,8 +32,8 @@ func (hunter *Hunter) newSteadyShotAbilityTemplate(sim *core.Simulation) core.Me
 			ActionID:       core.ActionID{SpellID: 34120},
 			Character:      &hunter.Character,
 			SpellSchool:    stats.AttackPower,
-			CritMultiplier: 2.0,
 			IgnoreCost:     true,
+			CritMultiplier: hunter.critMultiplier(true, sim.GetPrimaryTarget()),
 		},
 		Effect: core.AbilityHitEffect{
 			AbilityEffect: core.AbilityEffect{

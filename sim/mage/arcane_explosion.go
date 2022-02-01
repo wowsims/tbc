@@ -11,15 +11,13 @@ func (mage *Mage) newArcaneExplosionTemplate(sim *core.Simulation) core.SimpleSp
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				CritMultiplier: 1.5 + 0.125*float64(mage.Talents.SpellPower),
-				SpellSchool:    stats.ArcaneSpellPower,
+				ActionID:       core.ActionID{SpellID: SpellIDArcaneExplosion},
 				Character:      &mage.Character,
+				SpellSchool:    stats.ArcaneSpellPower,
 				BaseManaCost:   390,
 				ManaCost:       390,
 				GCD:            core.GCDDefault,
-				ActionID: core.ActionID{
-					SpellID: SpellIDArcaneExplosion,
-				},
+				CritMultiplier: mage.SpellCritMultiplier(1, 0.25*float64(mage.Talents.SpellPower)),
 			},
 		},
 		AOECap: 10180,

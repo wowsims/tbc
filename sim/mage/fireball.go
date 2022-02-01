@@ -17,16 +17,14 @@ func (mage *Mage) newFireballTemplate(sim *core.Simulation) core.SimpleSpellTemp
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				CritMultiplier: 1.5 + 0.125*float64(mage.Talents.SpellPower),
-				SpellSchool:    stats.FireSpellPower,
+				ActionID:       core.ActionID{SpellID: SpellIDFireball},
 				Character:      &mage.Character,
+				SpellSchool:    stats.FireSpellPower,
 				BaseManaCost:   425,
 				ManaCost:       425,
 				CastTime:       time.Millisecond * 3500,
 				GCD:            core.GCDDefault,
-				ActionID: core.ActionID{
-					SpellID: SpellIDFireball,
-				},
+				CritMultiplier: mage.SpellCritMultiplier(1, 0.25*float64(mage.Talents.SpellPower)),
 			},
 		},
 		Effect: core.SpellHitEffect{
@@ -69,12 +67,12 @@ func (mage *Mage) newFireballDotTemplate(sim *core.Simulation) core.SimpleSpellT
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				SpellSchool: stats.FireSpellPower,
-				Character:   &mage.Character,
 				ActionID: core.ActionID{
 					SpellID: SpellIDFireball,
 					Tag:     CastTagFireballDot,
 				},
+				Character:      &mage.Character,
+				SpellSchool:    stats.FireSpellPower,
 				IgnoreManaCost: true,
 			},
 		},

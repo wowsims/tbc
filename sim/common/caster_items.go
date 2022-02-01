@@ -75,8 +75,8 @@ func ApplyTimbals(agent core.Agent) {
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
 				ActionID:       core.ActionID{SpellID: 45055},
-				CritMultiplier: 1.5,
 				SpellSchool:    stats.ShadowSpellPower,
+				CritMultiplier: agent.GetCharacter().DefaultSpellCritMultiplier(),
 			},
 		},
 		Effect: core.SpellHitEffect{

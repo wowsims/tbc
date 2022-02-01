@@ -17,18 +17,16 @@ func (druid *Druid) newHurricaneTemplate(sim *core.Simulation) core.SimpleSpellT
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				CritMultiplier: 1.5,
-				SpellSchool:    stats.NatureSpellPower,
-				Character:      &druid.Character,
-				BaseManaCost:   1905,
-				ManaCost:       1905,
-				CastTime:       0,
-				GCD:            core.GCDDefault,
-				Cooldown:       time.Second * 60,
 				ActionID: core.ActionID{
 					SpellID:    SpellIDHurricane,
 					CooldownID: HurricaneCooldownID,
 				},
+				Character:    &druid.Character,
+				SpellSchool:  stats.NatureSpellPower,
+				BaseManaCost: 1905,
+				ManaCost:     1905,
+				GCD:          core.GCDDefault,
+				Cooldown:     time.Second * 60,
 			},
 		},
 		IsChannel: true,

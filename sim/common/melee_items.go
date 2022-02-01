@@ -240,7 +240,7 @@ func ApplyDespair(agent core.Agent) {
 			ActionID:       actionID,
 			Character:      character,
 			SpellSchool:    stats.AttackPower,
-			CritMultiplier: 2,
+			CritMultiplier: character.DefaultMeleeCritMultiplier(),
 			IgnoreCost:     true,
 		},
 		Effect: core.AbilityHitEffect{
@@ -290,7 +290,7 @@ func ApplyTheDecapitator(agent core.Agent) {
 			ActionID:       actionID,
 			Character:      character,
 			SpellSchool:    stats.AttackPower,
-			CritMultiplier: 2,
+			CritMultiplier: character.DefaultMeleeCritMultiplier(),
 			IgnoreCost:     true,
 		},
 		Effect: core.AbilityHitEffect{
@@ -354,7 +354,7 @@ func ApplyGlaiveOfThePit(agent core.Agent) {
 					IgnoreManaCost: true,
 					IsPhantom:      true,
 					SpellSchool:    stats.ShadowSpellPower,
-					CritMultiplier: 1.5,
+					CritMultiplier: character.DefaultSpellCritMultiplier(),
 				},
 			},
 			Effect: core.SpellHitEffect{
@@ -672,7 +672,7 @@ func ApplySyphonOfTheNathrezim(agent core.Agent) {
 					IgnoreManaCost: true,
 					IsPhantom:      true,
 					SpellSchool:    stats.ShadowSpellPower,
-					CritMultiplier: 1.5,
+					CritMultiplier: character.DefaultSpellCritMultiplier(),
 				},
 			},
 			Effect: core.SpellHitEffect{

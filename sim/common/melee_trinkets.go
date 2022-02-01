@@ -318,7 +318,7 @@ func ApplyRomulosPoisonVial(agent core.Agent) {
 					IgnoreManaCost: true,
 					IsPhantom:      true,
 					SpellSchool:    stats.NatureSpellPower,
-					CritMultiplier: 1.5,
+					CritMultiplier: character.DefaultSpellCritMultiplier(),
 				},
 			},
 			Effect: core.SpellHitEffect{

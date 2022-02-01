@@ -161,16 +161,14 @@ func (we *WaterElemental) newWaterboltTemplate(sim *core.Simulation) core.Simple
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				CritMultiplier: 1.5,
-				SpellSchool:    stats.FrostSpellPower,
+				ActionID:       core.ActionID{SpellID: SpellIDWaterbolt},
 				Character:      &we.Character,
+				SpellSchool:    stats.FrostSpellPower,
 				BaseManaCost:   baseManaCost,
 				ManaCost:       baseManaCost,
 				CastTime:       time.Millisecond * 3000,
 				GCD:            core.GCDDefault,
-				ActionID: core.ActionID{
-					SpellID: SpellIDWaterbolt,
-				},
+				CritMultiplier: we.DefaultSpellCritMultiplier(),
 			},
 		},
 		Effect: core.SpellHitEffect{

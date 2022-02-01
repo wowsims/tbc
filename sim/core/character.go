@@ -303,6 +303,28 @@ func (character *Character) RangedSwingSpeed() float64 {
 	return character.PseudoStats.RangedSpeedMultiplier * (1 + (character.stats[stats.MeleeHaste] / (HasteRatingPerHastePercent * 100)))
 }
 
+// Returns the crit multiplier for a spell.
+// https://web.archive.org/web/20081014064638/http://elitistjerks.com/f31/t12595-relentless_earthstorm_diamond_-_melee_only/p4/
+// https://github.com/TheGroxEmpire/TBC_DPS_Warrior_Sim/issues/30
+func (character *Character) calculateCritMultiplier(normalCritDamage float64, primaryModifiers float64, secondaryModifiers float64) float64 {
+	if character.HasMetaGemEquipped(34220) || character.HasMetaGemEquipped(32409) { // CSD and RED
+		primaryModifiers *= 1.03
+	}
+	return 1.0 + (normalCritDamage*primaryModifiers-1.0)*(1.0+secondaryModifiers)
+}
+func (character *Character) SpellCritMultiplier(primaryModifiers float64, secondaryModifiers float64) float64 {
+	return character.calculateCritMultiplier(1.5, primaryModifiers, secondaryModifiers)
+}
+func (character *Character) MeleeCritMultiplier(primaryModifiers float64, secondaryModifiers float64) float64 {
+	return character.calculateCritMultiplier(2.0, primaryModifiers, secondaryModifiers)
+}
+func (character *Character) DefaultSpellCritMultiplier() float64 {
+	return character.SpellCritMultiplier(1, 0)
+}
+func (character *Character) DefaultMeleeCritMultiplier() float64 {
+	return character.MeleeCritMultiplier(1, 0)
+}
+
 func (character *Character) AddRaidBuffs(raidBuffs *proto.RaidBuffs) {
 }
 func (character *Character) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {

@@ -47,7 +47,7 @@ func (shaman *Shaman) newStormstrikeTemplate(sim *core.Simulation) core.MeleeAbi
 				Type:  stats.Mana,
 				Value: 237,
 			},
-			CritMultiplier: 2.0,
+			CritMultiplier: shaman.DefaultMeleeCritMultiplier(),
 		},
 		Effects: []core.AbilityHitEffect{
 			core.AbilityHitEffect{
