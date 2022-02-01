@@ -120,7 +120,7 @@ var ItemSetFistsOfFury = core.ItemSet{
 						if !hitEffect.Landed() || !hitEffect.IsWeaponHit() || !hitEffect.IsMelee() {
 							return
 						}
-						if !ppmm.Proc(sim, hitEffect.IsMH(), false, "Fists of Fury") {
+						if !ppmm.Proc(sim, hitEffect.IsMH(), false, "The Fists of Fury") {
 							return
 						}
 
