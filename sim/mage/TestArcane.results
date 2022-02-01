@@ -365,7 +365,7 @@ dps_results: {
 dps_results: {
  key: "TestArcane-AllItems-RelentlessEarthstormDiamond"
  value: {
-  dps: 1344.6009153069365
+  dps: 1374.1173438619935
  }
 }
 dps_results: {
@@ -545,7 +545,7 @@ dps_results: {
 dps_results: {
  key: "TestArcane-AllItems-Timbal'sFocusingCrystal-34470"
  value: {
-  dps: 1385.9444083625856
+  dps: 1386.1677669790038
  }
 }
 dps_results: {

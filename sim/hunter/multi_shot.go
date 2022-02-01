@@ -13,16 +13,18 @@ var MultiShotActionID = core.ActionID{SpellID: 27021, CooldownID: MultiShotCoold
 func (hunter *Hunter) newMultiShotTemplate(sim *core.Simulation) core.MeleeAbilityTemplate {
 	ama := core.ActiveMeleeAbility{
 		MeleeAbility: core.MeleeAbility{
-			ActionID:       MultiShotActionID,
-			Character:      &hunter.Character,
-			SpellSchool:    stats.AttackPower,
-			CritMultiplier: 2.0,
-			GCD:            core.GCDDefault,
-			Cooldown:       time.Second * 10,
+			ActionID:    MultiShotActionID,
+			Character:   &hunter.Character,
+			SpellSchool: stats.AttackPower,
+			GCD:         core.GCDDefault,
+			Cooldown:    time.Second * 10,
 			Cost: core.ResourceCost{
 				Type:  stats.Mana,
 				Value: 275,
 			},
+			// TODO: If we ever allow multiple targets to have their own type, need to
+			// update this.
+			CritMultiplier: hunter.critMultiplier(true, sim.GetPrimaryTarget()),
 		},
 	}
 

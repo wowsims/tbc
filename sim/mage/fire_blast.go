@@ -15,18 +15,18 @@ func (mage *Mage) newFireBlastTemplate(sim *core.Simulation) core.SimpleSpellTem
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				CritMultiplier: 1.5 + 0.125*float64(mage.Talents.SpellPower),
-				SpellSchool:    stats.FireSpellPower,
+				ActionID: core.ActionID{
+					SpellID:    SpellIDFireBlast,
+					CooldownID: FireBlastCooldownID,
+				},
 				Character:      &mage.Character,
+				SpellSchool:    stats.FireSpellPower,
 				BaseManaCost:   465,
 				ManaCost:       465,
 				CastTime:       0,
 				GCD:            core.GCDDefault,
 				Cooldown:       time.Second * 8,
-				ActionID: core.ActionID{
-					SpellID:    SpellIDFireBlast,
-					CooldownID: FireBlastCooldownID,
-				},
+				CritMultiplier: mage.SpellCritMultiplier(1, 0.25*float64(mage.Talents.SpellPower)),
 			},
 		},
 		Effect: core.SpellHitEffect{

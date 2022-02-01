@@ -52,15 +52,15 @@ func (priest *Priest) registerShadowfiendCD() {
 
 func (priest *Priest) newShadowfiendTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
 	baseCast := core.Cast{
-		CritMultiplier: 1.5,
-		SpellSchool:    stats.ShadowSpellPower,
+		ActionID:       ShadowfiendActionID,
 		Character:      &priest.Character,
+		SpellSchool:    stats.ShadowSpellPower,
 		BaseManaCost:   575,
 		ManaCost:       575,
 		CastTime:       0,
 		GCD:            core.GCDDefault,
 		Cooldown:       time.Minute * 5,
-		ActionID:       ShadowfiendActionID,
+		CritMultiplier: priest.DefaultSpellCritMultiplier(),
 	}
 
 	// Dmg over 15 sec = shadow_dmg*.6 + 1191

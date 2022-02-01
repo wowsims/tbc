@@ -13,18 +13,17 @@ var DevouringPlagueCooldownID = core.NewCooldownID()
 
 func (priest *Priest) newDevouringPlagueTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
 	baseCast := core.Cast{
-		CritMultiplier: 1.5,
-		SpellSchool:    stats.ShadowSpellPower,
-		Character:      &priest.Character,
-		BaseManaCost:   1145,
-		ManaCost:       1145,
-		CastTime:       0,
-		GCD:            core.GCDDefault,
-		Cooldown:       time.Minute * 3,
 		ActionID: core.ActionID{
 			SpellID:    SpellIDDevouringPlague,
 			CooldownID: DevouringPlagueCooldownID,
 		},
+		Character:    &priest.Character,
+		SpellSchool:  stats.ShadowSpellPower,
+		BaseManaCost: 1145,
+		ManaCost:     1145,
+		CastTime:     0,
+		GCD:          core.GCDDefault,
+		Cooldown:     time.Minute * 3,
 	}
 
 	effect := core.SpellHitEffect{

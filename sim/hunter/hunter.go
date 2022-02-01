@@ -76,6 +76,11 @@ func (hunter *Hunter) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {
 }
 
 func (hunter *Hunter) Init(sim *core.Simulation) {
+	// Update auto crit multipliers now that we have the targets.
+	hunter.AutoAttacks.MH.CritMultiplier = hunter.critMultiplier(false, sim.GetPrimaryTarget())
+	hunter.AutoAttacks.OH.CritMultiplier = hunter.critMultiplier(false, sim.GetPrimaryTarget())
+	hunter.AutoAttacks.Ranged.CritMultiplier = hunter.critMultiplier(true, sim.GetPrimaryTarget())
+
 	// Precompute all the spell templates.
 	hunter.aimedShotTemplate = hunter.newAimedShotTemplate(sim)
 	hunter.arcaneShotTemplate = hunter.newArcaneShotTemplate(sim)
@@ -110,9 +115,11 @@ func NewHunter(character core.Character, options proto.Player) *Hunter {
 	hunter.PseudoStats.RangedSpeedMultiplier = 1
 	hunter.EnableManaBar()
 	hunter.EnableAutoAttacks(hunter, core.AutoAttackOptions{
-		MainHand:        hunter.WeaponFromMainHand(),
-		OffHand:         hunter.WeaponFromOffHand(),
-		Ranged:          hunter.WeaponFromRanged(),
+		// We don't know crit multiplier until later when we see the target so just
+		// use 0 for now.
+		MainHand:        hunter.WeaponFromMainHand(0),
+		OffHand:         hunter.WeaponFromOffHand(0),
+		Ranged:          hunter.WeaponFromRanged(0),
 		AutoSwingRanged: true,
 	})
 

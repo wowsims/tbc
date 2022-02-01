@@ -11,10 +11,9 @@ var AimedShotActionID = core.ActionID{SpellID: 27065, CooldownID: AimedShotCoold
 func (hunter *Hunter) newAimedShotTemplate(sim *core.Simulation) core.MeleeAbilityTemplate {
 	ama := core.ActiveMeleeAbility{
 		MeleeAbility: core.MeleeAbility{
-			ActionID:       AimedShotActionID,
-			Character:      &hunter.Character,
-			SpellSchool:    stats.AttackPower,
-			CritMultiplier: 2.0,
+			ActionID:    AimedShotActionID,
+			Character:   &hunter.Character,
+			SpellSchool: stats.AttackPower,
 			// Actual aimed shot has a 2.5s cast time, but we only use it as an instant precast.
 			//CastTime:       time.Millisecond * 2500,
 			//Cooldown:       time.Second * 6,
@@ -23,6 +22,7 @@ func (hunter *Hunter) newAimedShotTemplate(sim *core.Simulation) core.MeleeAbili
 				Type:  stats.Mana,
 				Value: 370,
 			},
+			CritMultiplier: hunter.critMultiplier(true, sim.GetPrimaryTarget()),
 		},
 		Effect: core.AbilityHitEffect{
 			AbilityEffect: core.AbilityEffect{

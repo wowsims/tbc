@@ -14,18 +14,17 @@ const TagMF3 = 3
 
 func (priest *Priest) newMindflayTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
 	baseCast := core.Cast{
-		CritMultiplier: 1.5,
-		SpellSchool:    stats.ShadowSpellPower,
-		Character:      &priest.Character,
-		BaseManaCost:   230,
-		ManaCost:       230,
-		CastTime:       0,
-		GCD:            core.GCDDefault,
-		Binary:         true,
 		ActionID: core.ActionID{
 			SpellID: SpellIDMindFlay,
 			Tag:     3, // default to 3 tick mf
 		},
+		Character:    &priest.Character,
+		SpellSchool:  stats.ShadowSpellPower,
+		BaseManaCost: 230,
+		ManaCost:     230,
+		CastTime:     0,
+		GCD:          core.GCDDefault,
+		Binary:       true,
 	}
 
 	effect := core.SpellHitEffect{

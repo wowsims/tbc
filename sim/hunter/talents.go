@@ -99,6 +99,25 @@ func (hunter *Hunter) applyTalents() {
 	}
 }
 
+func (hunter *Hunter) critMultiplier(isRanged bool, target *core.Target) float64 {
+	primaryModifier := 1.0
+	secondaryModifier := 0.0
+
+	monsterMultiplier := 1.0 + 0.01*float64(hunter.Talents.MonsterSlaying)
+	humanoidMultiplier := 1.0 + 0.01*float64(hunter.Talents.HumanoidSlaying)
+	if target.MobType == proto.MobType_MobTypeBeast || target.MobType == proto.MobType_MobTypeGiant || target.MobType == proto.MobType_MobTypeDragonkin {
+		primaryModifier *= monsterMultiplier
+	} else if target.MobType == proto.MobType_MobTypeHumanoid {
+		primaryModifier *= humanoidMultiplier
+	}
+
+	if isRanged {
+		secondaryModifier += 0.06 * float64(hunter.Talents.MortalShots)
+	}
+
+	return hunter.MeleeCritMultiplier(primaryModifier, secondaryModifier)
+}
+
 var FocusedFireAuraID = core.NewAuraID()
 
 func (hunter *Hunter) applyFocusedFire() {
@@ -244,7 +263,6 @@ var RangedEffectsAuraID = core.NewAuraID()
 
 func (hunter *Hunter) applyRangedEffects() {
 	critBonus := 1 * float64(hunter.Talents.LethalShots) * core.MeleeCritRatingPerCritChance
-	critDamageBonus := 0.06 * float64(hunter.Talents.MortalShots)
 	damageBonus := 1 + 0.01*float64(hunter.Talents.RangedWeaponSpecialization)
 
 	hunter.AddPermanentAura(func(sim *core.Simulation) core.Aura {
@@ -253,7 +271,6 @@ func (hunter *Hunter) applyRangedEffects() {
 			OnBeforeMeleeHit: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
 				if hitEffect.IsRanged() {
 					hitEffect.BonusCritRating += critBonus
-					ability.CritMultiplier = (ability.CritMultiplier-1)*critDamageBonus + 1
 					hitEffect.DamageMultiplier *= damageBonus
 				}
 			},
@@ -302,19 +319,15 @@ func (hunter *Hunter) applySlaying() {
 			OnBeforeMeleeHit: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
 				if hitEffect.Target.MobType == proto.MobType_MobTypeBeast || hitEffect.Target.MobType == proto.MobType_MobTypeGiant || hitEffect.Target.MobType == proto.MobType_MobTypeDragonkin {
 					hitEffect.DamageMultiplier *= monsterMultiplier
-					ability.CritMultiplier = (ability.CritMultiplier-1)*monsterMultiplier + 1
 				} else if hitEffect.Target.MobType == proto.MobType_MobTypeHumanoid {
 					hitEffect.DamageMultiplier *= humanoidMultiplier
-					ability.CritMultiplier = (ability.CritMultiplier-1)*monsterMultiplier + 1
 				}
 			},
 			OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 				if spellEffect.Target.MobType == proto.MobType_MobTypeBeast || spellEffect.Target.MobType == proto.MobType_MobTypeGiant || spellEffect.Target.MobType == proto.MobType_MobTypeDragonkin {
 					spellEffect.DamageMultiplier *= monsterMultiplier
-					spellCast.CritMultiplier = (spellCast.CritMultiplier-1)*monsterMultiplier + 1
 				} else if spellEffect.Target.MobType == proto.MobType_MobTypeHumanoid {
 					spellEffect.DamageMultiplier *= humanoidMultiplier
-					spellCast.CritMultiplier = (spellCast.CritMultiplier-1)*monsterMultiplier + 1
 				}
 			},
 			OnBeforePeriodicDamage: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect, tickDamage *float64) {

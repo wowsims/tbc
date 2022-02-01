@@ -13,18 +13,18 @@ var MBCooldownID = core.NewCooldownID()
 
 func (priest *Priest) newMindBlastTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
 	baseCast := core.Cast{
-		CritMultiplier: 1.5,
-		SpellSchool:    stats.ShadowSpellPower,
+		ActionID: core.ActionID{
+			SpellID:    SpellIDMindBlast,
+			CooldownID: MBCooldownID,
+		},
 		Character:      &priest.Character,
+		SpellSchool:    stats.ShadowSpellPower,
 		BaseManaCost:   450,
 		ManaCost:       450,
 		CastTime:       time.Millisecond * 1500,
 		GCD:            core.GCDDefault,
 		Cooldown:       time.Second * 8,
-		ActionID: core.ActionID{
-			SpellID:    SpellIDMindBlast,
-			CooldownID: MBCooldownID,
-		},
+		CritMultiplier: priest.DefaultSpellCritMultiplier(),
 	}
 
 	effect := core.SpellHitEffect{
