@@ -47,6 +47,10 @@ func (shaman *Shaman) newShockTemplateSpell(sim *core.Simulation, spellID int32,
 	spell.ManaCost -= spell.BaseManaCost * float64(shaman.Talents.Convection) * 0.02
 	spell.ManaCost -= spell.BaseManaCost * float64(shaman.Talents.MentalQuickness) * 0.02
 	spell.Cooldown -= time.Millisecond * 200 * time.Duration(shaman.Talents.Reverberation)
+	if shaman.Talents.ElementalFury {
+		spell.CritMultiplier = 2
+	}
+	spell.Effect.SpellEffect.BonusSpellHitRating += float64(shaman.Talents.ElementalPrecision) * 2 * core.SpellHitRatingPerHitChance
 
 	// TODO: confirm this is how it reduces mana cost.
 	if ItemSetSkyshatterHarness.CharacterHasSetBonus(&shaman.Character, 2) {
