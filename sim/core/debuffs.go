@@ -90,7 +90,7 @@ func applyDebuffEffects(target *Target, debuffs proto.Debuffs) {
 		multiplier := MinFloat(1.0, debuffs.ExposeWeaknessUptime)
 		target.AddPermanentAuraWithOptions(PermanentAura{
 			AuraFactory: func(sim *Simulation) Aura {
-				return ExposeWeaknessAura(debuffs.ExposeWeaknessHunterAgility, multiplier)
+				return ExposeWeaknessAura(0, debuffs.ExposeWeaknessHunterAgility, multiplier)
 			},
 			UptimeMultiplier: multiplier,
 		})
@@ -383,12 +383,13 @@ func CurseOfRecklessnessAura(currentTime time.Duration, target *Target) Aura {
 var ExposeWeaknessDebuffID = NewDebuffID()
 
 // Multiplier is for accomodating uptime %. For a real hunter, always pass 1.0
-func ExposeWeaknessAura(hunterAgility float64, multiplier float64) Aura {
+func ExposeWeaknessAura(currentTime time.Duration, hunterAgility float64, multiplier float64) Aura {
 	apBonus := hunterAgility * 0.25 * multiplier
 
 	return Aura{
 		ID:       ExposeWeaknessDebuffID,
 		ActionID: ActionID{SpellID: 34503},
+		Expires:  currentTime + time.Second*7,
 		OnBeforeMeleeHit: func(sim *Simulation, ability *ActiveMeleeAbility, hitEffect *AbilityHitEffect) {
 			hitEffect.BonusAttackPower += apBonus
 		},

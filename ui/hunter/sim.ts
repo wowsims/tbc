@@ -195,6 +195,8 @@ export class HunterSimUI extends IndividualSimUI<Spec.SpecHunter> {
 				// Preset talents that the user can quickly select.
 				talents: [
 					Presets.BeastMasteryTalents,
+					Presets.MarksmanTalents,
+					Presets.SurvivalTalents,
 				],
 				// Preset gear configurations that the user can quickly select.
 				gear: [

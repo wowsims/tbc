@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
+	"github.com/wowsims/tbc/sim/core/proto"
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
@@ -21,8 +22,15 @@ func (hunter *Hunter) applyTalents() {
 
 	hunter.applyRangedEffects()
 	hunter.applyGoForTheThroat()
+	hunter.applySlaying()
+	hunter.applyThrillOfTheHunt()
+	hunter.applyExposeWeakness()
+	hunter.applyMasterTactician()
+	hunter.registerReadinessCD()
 
 	hunter.PseudoStats.RangedSpeedMultiplier *= 1 + 0.04*float64(hunter.Talents.SerpentsSwiftness)
+	hunter.AddStat(stats.MeleeHit, core.MeleeHitRatingPerHitChance*1*float64(hunter.Talents.Surefooted))
+	hunter.AddStat(stats.MeleeCrit, core.MeleeCritRatingPerCritChance*1*float64(hunter.Talents.KillerInstinct))
 
 	if hunter.Talents.CombatExperience > 0 {
 		agiBonus := 1 + 0.01*float64(hunter.Talents.CombatExperience)
@@ -62,6 +70,33 @@ func (hunter *Hunter) applyTalents() {
 			},
 		})
 	}
+	if hunter.Talents.SurvivalInstincts > 0 {
+		apBonus := 1 + 0.02*float64(hunter.Talents.SurvivalInstincts)
+		hunter.Character.AddStatDependency(stats.StatDependency{
+			SourceStat:   stats.AttackPower,
+			ModifiedStat: stats.AttackPower,
+			Modifier: func(ap float64, _ float64) float64 {
+				return ap * apBonus
+			},
+		})
+		hunter.Character.AddStatDependency(stats.StatDependency{
+			SourceStat:   stats.RangedAttackPower,
+			ModifiedStat: stats.RangedAttackPower,
+			Modifier: func(rap float64, _ float64) float64 {
+				return rap * apBonus
+			},
+		})
+	}
+	if hunter.Talents.LightningReflexes > 0 {
+		agiBonus := 1 + 0.03*float64(hunter.Talents.LightningReflexes)
+		hunter.Character.AddStatDependency(stats.StatDependency{
+			SourceStat:   stats.Agility,
+			ModifiedStat: stats.Agility,
+			Modifier: func(agility float64, _ float64) float64 {
+				return agility * agiBonus
+			},
+		})
+	}
 }
 
 var FocusedFireAuraID = core.NewAuraID()
@@ -71,22 +106,6 @@ func (hunter *Hunter) applyFocusedFire() {
 		return
 	}
 
-	multiplier := 1.0 + 0.01*float64(hunter.Talents.FocusedFire)
-
-	hunter.AddPermanentAura(func(sim *core.Simulation) core.Aura {
-		return core.Aura{
-			ID: FocusedFireAuraID,
-			OnBeforeMeleeHit: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
-				hitEffect.DamageMultiplier *= multiplier
-			},
-			OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-				spellEffect.DamageMultiplier *= multiplier
-			},
-			OnBeforePeriodicDamage: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect, tickDamage *float64) {
-				*tickDamage *= multiplier
-			},
-		}
-	})
 }
 
 var FrenzyAuraID = core.NewAuraID()
@@ -248,6 +267,9 @@ func (hunter *Hunter) applyGoForTheThroat() {
 	if hunter.Talents.GoForTheThroat == 0 {
 		return
 	}
+	if hunter.pet == nil {
+		return
+	}
 
 	amount := 25.0 * float64(hunter.Talents.GoForTheThroat)
 
@@ -258,11 +280,204 @@ func (hunter *Hunter) applyGoForTheThroat() {
 				if !hitEffect.IsRanged() || hitEffect.HitType != core.MeleeHitTypeCrit {
 					return
 				}
-				if hunter.pet == nil {
-					return
-				}
 				hunter.pet.AddFocus(sim, amount, core.ActionID{SpellID: 34954})
 			},
 		}
+	})
+}
+
+var SlayingAuraID = core.NewAuraID()
+
+func (hunter *Hunter) applySlaying() {
+	if hunter.Talents.MonsterSlaying == 0 && hunter.Talents.HumanoidSlaying == 0 {
+		return
+	}
+
+	monsterMultiplier := 1.0 + 0.01*float64(hunter.Talents.MonsterSlaying)
+	humanoidMultiplier := 1.0 + 0.01*float64(hunter.Talents.HumanoidSlaying)
+
+	hunter.AddPermanentAura(func(sim *core.Simulation) core.Aura {
+		return core.Aura{
+			ID: FocusedFireAuraID,
+			OnBeforeMeleeHit: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
+				if hitEffect.Target.MobType == proto.MobType_MobTypeBeast || hitEffect.Target.MobType == proto.MobType_MobTypeGiant || hitEffect.Target.MobType == proto.MobType_MobTypeDragonkin {
+					hitEffect.DamageMultiplier *= monsterMultiplier
+					ability.CritMultiplier = (ability.CritMultiplier-1)*monsterMultiplier + 1
+				} else if hitEffect.Target.MobType == proto.MobType_MobTypeHumanoid {
+					hitEffect.DamageMultiplier *= humanoidMultiplier
+					ability.CritMultiplier = (ability.CritMultiplier-1)*monsterMultiplier + 1
+				}
+			},
+			OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+				if spellEffect.Target.MobType == proto.MobType_MobTypeBeast || spellEffect.Target.MobType == proto.MobType_MobTypeGiant || spellEffect.Target.MobType == proto.MobType_MobTypeDragonkin {
+					spellEffect.DamageMultiplier *= monsterMultiplier
+					spellCast.CritMultiplier = (spellCast.CritMultiplier-1)*monsterMultiplier + 1
+				} else if spellEffect.Target.MobType == proto.MobType_MobTypeHumanoid {
+					spellEffect.DamageMultiplier *= humanoidMultiplier
+					spellCast.CritMultiplier = (spellCast.CritMultiplier-1)*monsterMultiplier + 1
+				}
+			},
+			OnBeforePeriodicDamage: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect, tickDamage *float64) {
+				if spellEffect.Target.MobType == proto.MobType_MobTypeBeast || spellEffect.Target.MobType == proto.MobType_MobTypeGiant || spellEffect.Target.MobType == proto.MobType_MobTypeDragonkin {
+					*tickDamage *= monsterMultiplier
+				} else if spellEffect.Target.MobType == proto.MobType_MobTypeHumanoid {
+					*tickDamage *= humanoidMultiplier
+				}
+			},
+		}
+	})
+}
+
+var ThrillOfTheHuntAuraID = core.NewAuraID()
+
+func (hunter *Hunter) applyThrillOfTheHunt() {
+	if hunter.Talents.ThrillOfTheHunt == 0 {
+		return
+	}
+
+	procChance := float64(hunter.Talents.ThrillOfTheHunt) / 3
+	actionID := core.ActionID{SpellID: 34499}
+
+	hunter.AddPermanentAura(func(sim *core.Simulation) core.Aura {
+		return core.Aura{
+			ID: ThrillOfTheHuntAuraID,
+			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
+				if hitEffect.IsWhiteHit || !hitEffect.IsRanged() {
+					return
+				}
+
+				if hitEffect.HitType != core.MeleeHitTypeCrit {
+					return
+				}
+
+				if procChance == 1 || sim.RandomFloat("ThrillOfTheHunt") < procChance {
+					hunter.AddMana(sim, ability.Cost.Value*0.4, actionID, false)
+				}
+			},
+		}
+	})
+}
+
+var ExposeWeaknessAuraID = core.NewAuraID()
+
+func (hunter *Hunter) applyExposeWeakness() {
+	if hunter.Talents.ExposeWeakness == 0 {
+		return
+	}
+
+	procChance := float64(hunter.Talents.ExposeWeakness) / 3
+
+	hunter.AddPermanentAura(func(sim *core.Simulation) core.Aura {
+		return core.Aura{
+			ID: ExposeWeaknessAuraID,
+			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
+				if !hitEffect.IsRanged() {
+					return
+				}
+
+				if hitEffect.HitType != core.MeleeHitTypeCrit {
+					return
+				}
+
+				if hitEffect.Target.RemainingAuraDuration(sim, core.ExposeWeaknessDebuffID) == core.NeverExpires {
+					// Don't overwrite permanent version
+					return
+				}
+
+				if procChance == 1 || sim.RandomFloat("ExposeWeakness") < procChance {
+					hitEffect.Target.AddAura(sim, core.ExposeWeaknessAura(sim.CurrentTime, hunter.GetStat(stats.Agility), 1.0))
+				}
+			},
+		}
+	})
+}
+
+var MasterTacticianAuraID = core.NewAuraID()
+var MasterTacticianProcAuraID = core.NewAuraID()
+
+func (hunter *Hunter) applyMasterTactician() {
+	if hunter.Talents.MasterTactician == 0 {
+		return
+	}
+
+	procChance := 0.06
+	critBonus := 2 * core.MeleeCritRatingPerCritChance * float64(hunter.Talents.MasterTactician)
+
+	hunter.AddPermanentAura(func(sim *core.Simulation) core.Aura {
+		procAura := core.Aura{
+			ID:       MasterTacticianProcAuraID,
+			ActionID: core.ActionID{SpellID: 34839},
+			Expires:  sim.CurrentTime + time.Second*8,
+			OnBeforeMeleeHit: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
+				hitEffect.BonusCritRating += critBonus
+			},
+		}
+
+		return core.Aura{
+			ID: MasterTacticianAuraID,
+			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
+				if !hitEffect.IsRanged() || !hitEffect.Landed() {
+					return
+				}
+
+				if sim.RandomFloat("Master Tactician") > procChance {
+					return
+				}
+
+				hunter.AddAura(sim, procAura)
+			},
+		}
+	})
+}
+
+var ReadinessCooldownID = core.NewCooldownID()
+
+func (hunter *Hunter) registerReadinessCD() {
+	if !hunter.Talents.Readiness {
+		return
+	}
+
+	actionID := core.ActionID{SpellID: 23989, CooldownID: ReadinessCooldownID}
+	cooldown := time.Minute * 5
+
+	template := core.SimpleCast{
+		Cast: core.Cast{
+			ActionID:  actionID,
+			Character: hunter.GetCharacter(),
+			Cooldown:  cooldown,
+			GCD:       time.Second * 1,
+			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
+				hunter.SetCD(RapidFireCooldownID, 0)
+				hunter.SetCD(MultiShotCooldownID, 0)
+				hunter.SetCD(ArcaneShotCooldownID, 0)
+				hunter.SetCD(AimedShotCooldownID, 0)
+				// TODO: Kill command?
+			},
+		},
+	}
+
+	hunter.AddMajorCooldown(core.MajorCooldown{
+		ActionID:   actionID,
+		CooldownID: ReadinessCooldownID,
+		Cooldown:   cooldown,
+		UsesGCD:    true,
+		Type:       core.CooldownTypeDPS,
+		CanActivate: func(sim *core.Simulation, character *core.Character) bool {
+			// Don't use if there are no cooldowns to reset.
+			if !character.IsOnCD(RapidFireCooldownID, sim.CurrentTime) {
+				return false
+			}
+			return true
+		},
+		ShouldActivate: func(sim *core.Simulation, character *core.Character) bool {
+			return true
+		},
+		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
+			return func(sim *core.Simulation, character *core.Character) {
+				cast := template
+				cast.Init(sim)
+				cast.StartCast(sim)
+			}
+		},
 	})
 }

@@ -42,6 +42,10 @@ func (hunter *Hunter) registerRapidFireCD() {
 		Cooldown:   cooldown,
 		Type:       core.CooldownTypeDPS,
 		CanActivate: func(sim *core.Simulation, character *core.Character) bool {
+			// Make sure we don't reuse after a Readiness cast.
+			if character.HasAura(RapidFireAuraID) {
+				return false
+			}
 			return true
 		},
 		ShouldActivate: func(sim *core.Simulation, character *core.Character) bool {
