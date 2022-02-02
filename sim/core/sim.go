@@ -118,6 +118,10 @@ func (sim *Simulation) reset() {
 
 	sim.Duration = sim.BaseDuration + time.Duration((sim.RandomFloat("sim duration") * float64(variation))) - sim.DurationVariation
 	sim.CurrentTime = 0.0
+
+	for _, pa := range sim.pendingActions {
+		sim.pendingActionPool.Put(pa)
+	}
 	sim.pendingActions = make([]*PendingAction, 0, 64)
 
 	// Targets need to be reset before the raid, so that players can check for
@@ -238,6 +242,8 @@ func (sim *Simulation) runOnce() {
 func (sim *Simulation) AddPendingAction(pa *PendingAction) {
 	oldlen := len(sim.pendingActions)
 
+	// The logic to calculate the index to insert at can be replaced with sort.Search() which uses a binary search.
+	//   However I haven't found any cases yet in our simulator that it is faster.
 	var index = 0
 	for _, v := range sim.pendingActions {
 		if v.NextActionAt < pa.NextActionAt || (v.NextActionAt == pa.NextActionAt && v.Priority > pa.Priority) {
@@ -247,7 +253,7 @@ func (sim *Simulation) AddPendingAction(pa *PendingAction) {
 	}
 
 	sim.pendingActions = append(sim.pendingActions, pa)
-	if index == oldlen {
+	if index == oldlen { // if the insert was at the end, just return now.
 		return
 	}
 
