@@ -133,7 +133,6 @@ func RunTestSuite(t *testing.T, suiteName string, generator TestGenerator) {
 		}
 		currentTestName = testName
 
-		// log.Printf("TestName: %s", currentTestName)
 		t.Run(currentTestName, func(t *testing.T) {
 			fullTestName := suiteName + "-" + testName
 			if csr != nil {
