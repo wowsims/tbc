@@ -1,6 +1,8 @@
 package hunter
 
 import (
+	"time"
+
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/stats"
 )
@@ -52,6 +54,9 @@ func (hunter *Hunter) newKillCommandTemplate(sim *core.Simulation) core.SimpleCa
 }
 
 func (hp *HunterPet) newKillCommandTemplate(sim *core.Simulation) core.MeleeAbilityTemplate {
+	hasBeastLord4Pc := ItemSetBeastLord.CharacterHasSetBonus(&hp.hunterOwner.Character, 4)
+	beastLordApplier := hp.hunterOwner.NewTempStatAuraApplier(sim, BeastLord4PcAuraID, core.ActionID{SpellID: 37483}, stats.ArmorPenetration, 600, time.Second*15)
+
 	ama := core.ActiveMeleeAbility{
 		MeleeAbility: core.MeleeAbility{
 			ActionID:       core.ActionID{SpellID: 34027},
@@ -69,6 +74,11 @@ func (hp *HunterPet) newKillCommandTemplate(sim *core.Simulation) core.MeleeAbil
 				DamageMultiplier: 1,
 				FlatDamageBonus:  127,
 			},
+		},
+		OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
+			if hasBeastLord4Pc {
+				beastLordApplier(sim)
+			}
 		},
 	}
 

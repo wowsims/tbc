@@ -83,6 +83,10 @@ func (hunter *Hunter) OnManaTick(sim *core.Simulation) {
 		// https://wowpedia.fandom.com/wiki/Aspect_of_the_Viper?oldid=1458832
 		percentMana := core.MaxFloat(0.2, core.MinFloat(0.9, hunter.CurrentManaPercent()))
 		scaling := 22.0/35.0*(0.9-percentMana) + 0.11
+		if hunter.hasGronnstalker2Pc {
+			scaling += 0.05
+		}
+
 		bonusPer5Seconds := hunter.GetStat(stats.Intellect)*scaling + 0.35*70
 		manaGain := bonusPer5Seconds * 2 / 5
 		hunter.AddMana(sim, manaGain, AspectOfTheViperActionID, false)

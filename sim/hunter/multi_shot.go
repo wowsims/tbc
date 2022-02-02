@@ -29,6 +29,9 @@ func (hunter *Hunter) newMultiShotTemplate(sim *core.Simulation) core.MeleeAbili
 	}
 
 	ama.Cost.Value *= 1 - 0.02*float64(hunter.Talents.Efficiency)
+	if ItemSetDemonStalker.CharacterHasSetBonus(&hunter.Character, 4) {
+		ama.Cost.Value -= 275.0 * 0.1
+	}
 
 	baseEffect := core.AbilityHitEffect{
 		AbilityEffect: core.AbilityEffect{

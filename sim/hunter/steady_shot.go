@@ -52,6 +52,13 @@ func (hunter *Hunter) newSteadyShotAbilityTemplate(sim *core.Simulation) core.Me
 		},
 	}
 
+	if ItemSetRiftStalker.CharacterHasSetBonus(&hunter.Character, 4) {
+		ama.Effect.BonusCritRating += 5 * core.MeleeCritRatingPerCritChance
+	}
+	if ItemSetGronnstalker.CharacterHasSetBonus(&hunter.Character, 4) {
+		ama.Effect.DamageMultiplier *= 1.1
+	}
+
 	return core.NewMeleeAbilityTemplate(ama)
 }
 
