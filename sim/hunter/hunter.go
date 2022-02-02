@@ -133,7 +133,7 @@ func NewHunter(character core.Character, options proto.Player) *Hunter {
 
 	hunter.pet = hunter.NewHunterPet()
 
-	hunter.Character.AddStatDependency(stats.StatDependency{
+	hunter.AddStatDependency(stats.StatDependency{
 		SourceStat:   stats.Intellect,
 		ModifiedStat: stats.SpellCrit,
 		Modifier: func(intellect float64, spellCrit float64) float64 {
@@ -141,7 +141,7 @@ func NewHunter(character core.Character, options proto.Player) *Hunter {
 		},
 	})
 
-	hunter.Character.AddStatDependency(stats.StatDependency{
+	hunter.AddStatDependency(stats.StatDependency{
 		SourceStat:   stats.Strength,
 		ModifiedStat: stats.AttackPower,
 		Modifier: func(strength float64, attackPower float64) float64 {
@@ -149,7 +149,7 @@ func NewHunter(character core.Character, options proto.Player) *Hunter {
 		},
 	})
 
-	hunter.Character.AddStatDependency(stats.StatDependency{
+	hunter.AddStatDependency(stats.StatDependency{
 		SourceStat:   stats.Agility,
 		ModifiedStat: stats.RangedAttackPower,
 		Modifier: func(agility float64, rap float64) float64 {
@@ -157,7 +157,7 @@ func NewHunter(character core.Character, options proto.Player) *Hunter {
 		},
 	})
 
-	hunter.Character.AddStatDependency(stats.StatDependency{
+	hunter.AddStatDependency(stats.StatDependency{
 		SourceStat:   stats.Agility,
 		ModifiedStat: stats.MeleeCrit,
 		Modifier: func(agility float64, meleeCrit float64) float64 {

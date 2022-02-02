@@ -22,6 +22,9 @@ func TestHunter(t *testing.T) {
 		GearSet: core.GearSetCombo{Label: "P1", GearSet: P1Gear},
 
 		SpecOptions: core.SpecOptionsCombo{Label: "Basic", SpecOptions: PlayerOptionsBasic},
+		OtherSpecOptions: []core.SpecOptionsCombo{
+			core.SpecOptionsCombo{Label: "WindSerpent", SpecOptions: PlayerOptionsWindSerpent},
+		},
 
 		RaidBuffs:   FullRaidBuffs,
 		PartyBuffs:  FullPartyBuffs,
