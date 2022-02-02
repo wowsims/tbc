@@ -245,7 +245,7 @@ func (sim *Simulation) AddPendingAction(pa *PendingAction) {
 	//   However I haven't found any cases yet in our simulator that it is faster.
 	var index = 0
 	for _, v := range sim.pendingActions {
-		if v.NextActionAt < pa.NextActionAt || (v.NextActionAt == pa.NextActionAt && v.Priority > pa.Priority) {
+		if v.NextActionAt < pa.NextActionAt || (v.NextActionAt == pa.NextActionAt && v.Priority >= pa.Priority) {
 			break
 		}
 		index++
