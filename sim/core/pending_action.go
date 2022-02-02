@@ -42,3 +42,48 @@ func (pa *PendingAction) Cancel(sim *Simulation) {
 
 	pa.cancelled = true
 }
+
+type paPool struct {
+	objs []*PendingAction
+}
+
+func newPAPool() *paPool {
+	objs := make([]*PendingAction, 64)
+	for i := range objs {
+		objs[i] = &PendingAction{}
+	}
+	return &paPool{
+		objs: objs,
+	}
+}
+
+func (pap *paPool) Get() *PendingAction {
+	if len(pap.objs) == 0 {
+		// Allocate more
+		newObjs := make([]*PendingAction, 128)
+		copy(newObjs, pap.objs)
+		pap.objs = newObjs
+		for i := range pap.objs {
+			if pap.objs[i] == nil {
+				pap.objs[i] = &PendingAction{}
+			}
+		}
+		// panic("for now dont do this")
+	}
+
+	pa := pap.objs[len(pap.objs)-1]
+	pap.objs = pap.objs[:len(pap.objs)-1]
+
+	return pa
+}
+
+func (pap *paPool) Put(pa *PendingAction) {
+	pa.cancelled = false
+	pa.CleanUp = nil
+	pa.Name = ""
+	pa.NextActionAt = 0
+	pa.OnAction = nil
+	pa.Priority = 0
+
+	pap.objs = append(pap.objs, pa)
+}

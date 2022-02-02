@@ -27,8 +27,9 @@ type Simulation struct {
 	testRands map[uint32]*rand.Rand
 
 	// Current Simulation State
-	pendingActions []*PendingAction
-	CurrentTime    time.Duration // duration that has elapsed in the sim since starting
+	pendingActions    []*PendingAction
+	pendingActionPool *paPool
+	CurrentTime       time.Duration // duration that has elapsed in the sim since starting
 
 	ProgressReport func(*proto.ProgressMetrics)
 
@@ -77,6 +78,8 @@ func newSim(rsr proto.RaidSimRequest) *Simulation {
 		testRands: make(map[uint32]*rand.Rand),
 
 		emptyAuras: make([]Aura, numAuraIDs),
+
+		pendingActionPool: newPAPool(),
 	}
 }
 

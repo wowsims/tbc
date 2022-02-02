@@ -178,10 +178,9 @@ func (spell *SimpleSpell) Cast(sim *Simulation) bool {
 				if hitEffect.DotInput.NumberOfTicks != 0 {
 					hitEffect.takeDotSnapshot(sim, &spell.SpellCast)
 
-					pa := &PendingAction{
-						Priority:     ActionPriorityDOT,
-						NextActionAt: sim.CurrentTime + hitEffect.DotInput.TickLength,
-					}
+					pa := sim.pendingActionPool.Get()
+					pa.Priority = ActionPriorityDOT
+					pa.NextActionAt = sim.CurrentTime + hitEffect.DotInput.TickLength
 					pa.OnAction = func(sim *Simulation) {
 						hitEffect.calculateDotDamage(sim, &spell.SpellCast)
 						hitEffect.afterDotTick(sim, &spell.SpellCast)
@@ -192,6 +191,7 @@ func (spell *SimpleSpell) Cast(sim *Simulation) bool {
 							sim.AddPendingAction(pa)
 						} else {
 							pa.CleanUp(sim)
+							sim.pendingActionPool.Put(pa)
 						}
 					}
 					pa.CleanUp = func(sim *Simulation) {
@@ -248,10 +248,11 @@ func (spell *SimpleSpell) Cast(sim *Simulation) bool {
 
 			// This assumes that the effects either all have dots, or none of them do.
 			if spell.Effects[0].DotInput.NumberOfTicks != 0 {
-				pa := &PendingAction{
-					Priority:     ActionPriorityDOT,
-					NextActionAt: sim.CurrentTime + spell.Effects[0].DotInput.TickLength,
-				}
+				pa := sim.pendingActionPool.Get()
+
+				pa.Priority = ActionPriorityDOT
+				pa.NextActionAt = sim.CurrentTime + spell.Effects[0].DotInput.TickLength
+
 				pa.OnAction = func(sim *Simulation) {
 					for i := range spell.Effects {
 						spell.Effects[i].calculateDotDamage(sim, &spell.SpellCast)
@@ -270,6 +271,7 @@ func (spell *SimpleSpell) Cast(sim *Simulation) bool {
 						sim.AddPendingAction(pa)
 					} else {
 						pa.CleanUp(sim)
+						sim.pendingActionPool.Put(pa)
 					}
 				}
 				pa.CleanUp = func(sim *Simulation) {

@@ -5,16 +5,16 @@ import (
 )
 
 func (character *Character) newGCDAction(sim *Simulation, agent Agent) *PendingAction {
-	return &PendingAction{
-		Priority: ActionPriorityGCD,
-		OnAction: func(sim *Simulation) {
-			character := agent.GetCharacter()
-			character.TryUseCooldowns(sim)
-			if !character.IsOnCD(GCDCooldownID, sim.CurrentTime) {
-				agent.OnGCDReady(sim)
-			}
-		},
+	pa := sim.pendingActionPool.Get()
+	pa.Priority = ActionPriorityGCD
+	pa.OnAction = func(sim *Simulation) {
+		character := agent.GetCharacter()
+		character.TryUseCooldowns(sim)
+		if !character.IsOnCD(GCDCooldownID, sim.CurrentTime) {
+			agent.OnGCDReady(sim)
+		}
 	}
+	return pa
 }
 
 func (character *Character) SetGCDTimer(sim *Simulation, gcdReadyAt time.Duration) {

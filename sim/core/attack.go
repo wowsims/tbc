@@ -284,14 +284,13 @@ func (ahe *AbilityHitEffect) WhiteHitTableResult(sim *Simulation, ability *Activ
 	skillDifference := (level * 5) - skill
 
 	// Miss
-	missChance := 0.05 + skillDifference*0.002
+	missChance := ahe.Target.MissChance
 	if ahe.IsWhiteHit && character.AutoAttacks.IsDualWielding {
 		missChance += 0.19
 	}
-	hitSuppression := (skillDifference - 10) * 0.002
-	hitBonus := ((character.stats[stats.MeleeHit] + ahe.BonusHitRating) / (MeleeHitRatingPerHitChance * 100)) - hitSuppression
+	hitBonus := ((character.stats[stats.MeleeHit] + ahe.BonusHitRating) / (MeleeHitRatingPerHitChance * 100)) - ahe.Target.HitSuppression
 	if hitBonus > 0 {
-		missChance = math.Max(0, missChance-hitBonus)
+		missChance = MaxFloat(0, missChance-hitBonus)
 	}
 
 	chance := missChance
@@ -301,8 +300,8 @@ func (ahe *AbilityHitEffect) WhiteHitTableResult(sim *Simulation, ability *Activ
 
 	if !ahe.IsRanged() { // Ranged hits can't be dodged/glance, and are always 2-roll
 		// Dodge
-		dodge := 0.05 + skillDifference*0.001
-		expertisePercentage := math.Min(math.Floor((character.stats[stats.Expertise]+ahe.BonusExpertiseRating)/(ExpertisePerQuarterPercentReduction))/400, dodge)
+		dodge := ahe.Target.Dodge
+		expertisePercentage := MinFloat(math.Floor((character.stats[stats.Expertise]+ahe.BonusExpertiseRating)/(ExpertisePerQuarterPercentReduction))/400, dodge)
 		chance += dodge - expertisePercentage
 		if roll < chance {
 			return MeleeHitTypeDodge
@@ -321,7 +320,7 @@ func (ahe *AbilityHitEffect) WhiteHitTableResult(sim *Simulation, ability *Activ
 		// If we actually implement blocks, ranged hits can be blocked.
 
 		// Glance
-		chance += math.Max(0.06+skillDifference*0.012, 0)
+		chance += ahe.Target.Glance
 		if roll < chance {
 			return MeleeHitTypeGlance
 		}
@@ -703,10 +702,10 @@ func (aa *AutoAttacks) resetAutoSwing(sim *Simulation) {
 		aa.autoSwingAction.Cancel(sim)
 	}
 
-	pa := &PendingAction{
-		Priority:     ActionPriorityAuto,
-		NextActionAt: 0, // First auto is always at 0
-	}
+	pa := sim.pendingActionPool.Get()
+	pa.Priority = ActionPriorityAuto
+	pa.NextActionAt = 0 // First auto is always at 0
+
 	pa.OnAction = func(sim *Simulation) {
 		if aa.AutoSwingMelee {
 			aa.SwingMelee(sim, sim.GetPrimaryTarget())
@@ -719,6 +718,8 @@ func (aa *AutoAttacks) resetAutoSwing(sim *Simulation) {
 		// Cancelled means we made a new one because of a swing speed change.
 		if !pa.cancelled {
 			sim.AddPendingAction(pa)
+		} else {
+			sim.pendingActionPool.Put(pa)
 		}
 	}
 	aa.autoSwingAction = pa
