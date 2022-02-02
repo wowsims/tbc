@@ -119,9 +119,6 @@ func (sim *Simulation) reset() {
 	sim.Duration = sim.BaseDuration + time.Duration((sim.RandomFloat("sim duration") * float64(variation))) - sim.DurationVariation
 	sim.CurrentTime = 0.0
 
-	for _, pa := range sim.pendingActions {
-		sim.pendingActionPool.Put(pa)
-	}
 	sim.pendingActions = make([]*PendingAction, 0, 64)
 
 	// Targets need to be reset before the raid, so that players can check for
