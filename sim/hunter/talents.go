@@ -34,7 +34,7 @@ func (hunter *Hunter) applyTalents() {
 
 	if hunter.Talents.CombatExperience > 0 {
 		agiBonus := 1 + 0.01*float64(hunter.Talents.CombatExperience)
-		hunter.Character.AddStatDependency(stats.StatDependency{
+		hunter.AddStatDependency(stats.StatDependency{
 			SourceStat:   stats.Agility,
 			ModifiedStat: stats.Agility,
 			Modifier: func(agility float64, _ float64) float64 {
@@ -42,7 +42,7 @@ func (hunter *Hunter) applyTalents() {
 			},
 		})
 		intBonus := 1 + 0.03*float64(hunter.Talents.CombatExperience)
-		hunter.Character.AddStatDependency(stats.StatDependency{
+		hunter.AddStatDependency(stats.StatDependency{
 			SourceStat:   stats.Intellect,
 			ModifiedStat: stats.Intellect,
 			Modifier: func(intellect float64, _ float64) float64 {
@@ -52,7 +52,7 @@ func (hunter *Hunter) applyTalents() {
 	}
 	if hunter.Talents.CarefulAim > 0 {
 		bonus := 0.15 * float64(hunter.Talents.CarefulAim)
-		hunter.Character.AddStatDependency(stats.StatDependency{
+		hunter.AddStatDependency(stats.StatDependency{
 			SourceStat:   stats.Intellect,
 			ModifiedStat: stats.RangedAttackPower,
 			Modifier: func(intellect float64, rap float64) float64 {
@@ -62,7 +62,7 @@ func (hunter *Hunter) applyTalents() {
 	}
 	if hunter.Talents.MasterMarksman > 0 {
 		bonus := 1 + 0.02*float64(hunter.Talents.MasterMarksman)
-		hunter.Character.AddStatDependency(stats.StatDependency{
+		hunter.AddStatDependency(stats.StatDependency{
 			SourceStat:   stats.RangedAttackPower,
 			ModifiedStat: stats.RangedAttackPower,
 			Modifier: func(rap float64, _ float64) float64 {
@@ -72,14 +72,14 @@ func (hunter *Hunter) applyTalents() {
 	}
 	if hunter.Talents.SurvivalInstincts > 0 {
 		apBonus := 1 + 0.02*float64(hunter.Talents.SurvivalInstincts)
-		hunter.Character.AddStatDependency(stats.StatDependency{
+		hunter.AddStatDependency(stats.StatDependency{
 			SourceStat:   stats.AttackPower,
 			ModifiedStat: stats.AttackPower,
 			Modifier: func(ap float64, _ float64) float64 {
 				return ap * apBonus
 			},
 		})
-		hunter.Character.AddStatDependency(stats.StatDependency{
+		hunter.AddStatDependency(stats.StatDependency{
 			SourceStat:   stats.RangedAttackPower,
 			ModifiedStat: stats.RangedAttackPower,
 			Modifier: func(rap float64, _ float64) float64 {
@@ -89,7 +89,7 @@ func (hunter *Hunter) applyTalents() {
 	}
 	if hunter.Talents.LightningReflexes > 0 {
 		agiBonus := 1 + 0.03*float64(hunter.Talents.LightningReflexes)
-		hunter.Character.AddStatDependency(stats.StatDependency{
+		hunter.AddStatDependency(stats.StatDependency{
 			SourceStat:   stats.Agility,
 			ModifiedStat: stats.Agility,
 			Modifier: func(agility float64, _ float64) float64 {
@@ -121,10 +121,26 @@ func (hunter *Hunter) critMultiplier(isRanged bool, target *core.Target) float64
 var FocusedFireAuraID = core.NewAuraID()
 
 func (hunter *Hunter) applyFocusedFire() {
-	if hunter.Talents.FocusedFire == 0 {
+	if hunter.Talents.FocusedFire == 0 || hunter.pet == nil {
 		return
 	}
 
+	multiplier := 1.0 + 0.01*float64(hunter.Talents.FocusedFire)
+
+	hunter.AddPermanentAura(func(sim *core.Simulation) core.Aura {
+		return core.Aura{
+			ID: FocusedFireAuraID,
+			OnBeforeMeleeHit: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
+				hitEffect.DamageMultiplier *= multiplier
+			},
+			OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+				spellEffect.DamageMultiplier *= multiplier
+			},
+			OnBeforePeriodicDamage: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect, tickDamage *float64) {
+				*tickDamage *= multiplier
+			},
+		}
+	})
 }
 
 var FrenzyAuraID = core.NewAuraID()
@@ -315,7 +331,7 @@ func (hunter *Hunter) applySlaying() {
 
 	hunter.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		return core.Aura{
-			ID: FocusedFireAuraID,
+			ID: SlayingAuraID,
 			OnBeforeMeleeHit: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
 				if hitEffect.Target.MobType == proto.MobType_MobTypeBeast || hitEffect.Target.MobType == proto.MobType_MobTypeGiant || hitEffect.Target.MobType == proto.MobType_MobTypeDragonkin {
 					hitEffect.DamageMultiplier *= monsterMultiplier

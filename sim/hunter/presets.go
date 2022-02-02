@@ -34,6 +34,14 @@ var PlayerOptionsBasic = &proto.Player_Hunter{
 	},
 }
 
+var PlayerOptionsWindSerpent = &proto.Player_Hunter{
+	Hunter: &proto.Hunter{
+		Talents:  BMTalents,
+		Options:  hunterOptions,
+		Rotation: hunterRotation,
+	},
+}
+
 var hunterRotation = &proto.Hunter_Rotation{
 	Adaptive:             true,
 	UseMultiShot:         true,
@@ -54,13 +62,26 @@ var hunterOptions = &proto.Hunter_Options{
 	LatencyMs:   15,
 }
 
+var windSerpentOptions = &proto.Hunter_Options{
+	QuiverBonus: proto.Hunter_Options_Speed15,
+	Ammo:        proto.Hunter_Options_AdamantiteStinger,
+	PetType:     proto.Hunter_Options_WindSerpent,
+	PetUptime:   0.9,
+	LatencyMs:   15,
+}
+
 var FullRaidBuffs = &proto.RaidBuffs{
 	ArcaneBrilliance: true,
 	GiftOfTheWild:    proto.TristateEffect_TristateEffectImproved,
 }
 var FullPartyBuffs = &proto.PartyBuffs{
+	Bloodlust: 1,
+	Drums:     proto.Drums_DrumsOfBattle,
+
 	BattleShout:     proto.TristateEffect_TristateEffectImproved,
 	LeaderOfThePack: proto.TristateEffect_TristateEffectImproved,
+	ManaSpringTotem: proto.TristateEffect_TristateEffectRegular,
+	GraceOfAirTotem: proto.TristateEffect_TristateEffectRegular,
 }
 var FullIndividualBuffs = &proto.IndividualBuffs{
 	BlessingOfKings:  true,
@@ -69,7 +90,8 @@ var FullIndividualBuffs = &proto.IndividualBuffs{
 }
 
 var FullConsumes = &proto.Consumes{
-	Drums: proto.Drums_DrumsOfBattle,
+	FlaskOfRelentlessAssault: true,
+	DefaultPotion:            proto.Potions_HastePotion,
 }
 
 var FullDebuffs = &proto.Debuffs{

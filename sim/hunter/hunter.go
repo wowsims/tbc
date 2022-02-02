@@ -35,6 +35,10 @@ type Hunter struct {
 	AmmoDamageBonus float64
 
 	aspectOfTheViper bool // False indicates aspect of the hawk.
+	changingAspects  bool // True when trying to change aspects.
+
+	killCommandEnabled bool                // True after landing a crit.
+	killCommandAction  *core.PendingAction // Action to use KC when its comes off CD.
 
 	pet *HunterPet
 
@@ -46,6 +50,8 @@ type Hunter struct {
 
 	aspectOfTheHawkTemplate  core.SimpleCast
 	aspectOfTheViperTemplate core.SimpleCast
+
+	killCommandTemplate core.SimpleCast
 
 	multiShotTemplate core.MeleeAbilityTemplate
 	multiShot         core.ActiveMeleeAbility
@@ -86,6 +92,7 @@ func (hunter *Hunter) Init(sim *core.Simulation) {
 	hunter.arcaneShotTemplate = hunter.newArcaneShotTemplate(sim)
 	hunter.aspectOfTheHawkTemplate = hunter.newAspectOfTheHawkTemplate(sim)
 	hunter.aspectOfTheViperTemplate = hunter.newAspectOfTheViperTemplate(sim)
+	hunter.killCommandTemplate = hunter.newKillCommandTemplate(sim)
 	hunter.multiShotTemplate = hunter.newMultiShotTemplate(sim)
 	hunter.scorpidStingTemplate = hunter.newScorpidStingTemplate(sim)
 	hunter.steadyShotCastTemplate = hunter.newSteadyShotCastTemplate(sim)
@@ -94,6 +101,7 @@ func (hunter *Hunter) Init(sim *core.Simulation) {
 
 func (hunter *Hunter) Reset(sim *core.Simulation) {
 	hunter.aspectOfTheViper = false
+	hunter.killCommandAction.NextActionAt = 0
 
 	target := sim.GetPrimaryTarget()
 	impHuntersMark := hunter.Talents.ImprovedHuntersMark
@@ -125,7 +133,7 @@ func NewHunter(character core.Character, options proto.Player) *Hunter {
 
 	hunter.pet = hunter.NewHunterPet()
 
-	hunter.Character.AddStatDependency(stats.StatDependency{
+	hunter.AddStatDependency(stats.StatDependency{
 		SourceStat:   stats.Intellect,
 		ModifiedStat: stats.SpellCrit,
 		Modifier: func(intellect float64, spellCrit float64) float64 {
@@ -133,7 +141,7 @@ func NewHunter(character core.Character, options proto.Player) *Hunter {
 		},
 	})
 
-	hunter.Character.AddStatDependency(stats.StatDependency{
+	hunter.AddStatDependency(stats.StatDependency{
 		SourceStat:   stats.Strength,
 		ModifiedStat: stats.AttackPower,
 		Modifier: func(strength float64, attackPower float64) float64 {
@@ -141,7 +149,7 @@ func NewHunter(character core.Character, options proto.Player) *Hunter {
 		},
 	})
 
-	hunter.Character.AddStatDependency(stats.StatDependency{
+	hunter.AddStatDependency(stats.StatDependency{
 		SourceStat:   stats.Agility,
 		ModifiedStat: stats.RangedAttackPower,
 		Modifier: func(agility float64, rap float64) float64 {
@@ -149,7 +157,7 @@ func NewHunter(character core.Character, options proto.Player) *Hunter {
 		},
 	})
 
-	hunter.Character.AddStatDependency(stats.StatDependency{
+	hunter.AddStatDependency(stats.StatDependency{
 		SourceStat:   stats.Agility,
 		ModifiedStat: stats.MeleeCrit,
 		Modifier: func(agility float64, meleeCrit float64) float64 {
@@ -193,6 +201,7 @@ func NewHunter(character core.Character, options proto.Player) *Hunter {
 	hunter.applyTalents()
 	hunter.registerRapidFireCD()
 	hunter.applyAspectOfTheHawk()
+	hunter.applyKillCommand()
 	hunter.applyRotationAura()
 
 	return hunter
