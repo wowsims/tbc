@@ -208,8 +208,10 @@ func (sim *Simulation) runOnce() {
 	sim.reset()
 
 	for true {
-		pa := sim.pendingActions[len(sim.pendingActions)-1]
-		sim.pendingActions = sim.pendingActions[:len(sim.pendingActions)-1]
+		last := len(sim.pendingActions) - 1
+		pa := sim.pendingActions[last]
+		sim.pendingActions[last] = nil
+		sim.pendingActions = sim.pendingActions[:last]
 		if pa.NextActionAt > sim.Duration {
 			if pa.CleanUp != nil {
 				pa.CleanUp(sim)
@@ -251,6 +253,9 @@ func (sim *Simulation) AddPendingAction(pa *PendingAction) {
 
 	sim.pendingActions = append(sim.pendingActions, pa)
 	if index == oldlen { // if the insert was at the end, just return now.
+		return
+	} else if oldlen == 1 { // simple case we can just swap the two
+		sim.pendingActions[0], sim.pendingActions[1] = sim.pendingActions[1], sim.pendingActions[0]
 		return
 	}
 

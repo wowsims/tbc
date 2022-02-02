@@ -28,6 +28,7 @@ type PendingAction struct {
 	NextActionAt time.Duration
 
 	cancelled bool
+	id        int
 }
 
 func (pa *PendingAction) Cancel(sim *Simulation) {
@@ -44,16 +45,20 @@ func (pa *PendingAction) Cancel(sim *Simulation) {
 }
 
 type paPool struct {
-	objs []*PendingAction
+	objs  []*PendingAction
+	maxid int
 }
 
 func newPAPool() *paPool {
 	objs := make([]*PendingAction, 64)
 	for i := range objs {
-		objs[i] = &PendingAction{}
+		objs[i] = &PendingAction{
+			id: i + 1,
+		}
 	}
 	return &paPool{
-		objs: objs,
+		objs:  objs,
+		maxid: len(objs) + 1,
 	}
 }
 
@@ -65,7 +70,10 @@ func (pap *paPool) Get() *PendingAction {
 		pap.objs = newObjs
 		for i := range pap.objs {
 			if pap.objs[i] == nil {
-				pap.objs[i] = &PendingAction{}
+				pap.objs[i] = &PendingAction{
+					id: pap.maxid,
+				}
+				pap.maxid++
 			}
 		}
 		// panic("for now dont do this")

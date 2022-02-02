@@ -191,7 +191,6 @@ func (spell *SimpleSpell) Cast(sim *Simulation) bool {
 							sim.AddPendingAction(pa)
 						} else {
 							pa.CleanUp(sim)
-							sim.pendingActionPool.Put(pa)
 						}
 					}
 					pa.CleanUp = func(sim *Simulation) {
@@ -204,6 +203,7 @@ func (spell *SimpleSpell) Cast(sim *Simulation) bool {
 
 						spell.Character.Metrics.AddSpellCast(&spell.SpellCast)
 						spell.objectInUse = false
+						// sim.pendingActionPool.Put(pa)
 					}
 
 					spell.currentDotAction = pa
@@ -271,7 +271,6 @@ func (spell *SimpleSpell) Cast(sim *Simulation) bool {
 						sim.AddPendingAction(pa)
 					} else {
 						pa.CleanUp(sim)
-						sim.pendingActionPool.Put(pa)
 					}
 				}
 				pa.CleanUp = func(sim *Simulation) {
@@ -286,6 +285,9 @@ func (spell *SimpleSpell) Cast(sim *Simulation) bool {
 
 					spell.Character.Metrics.AddSpellCast(&spell.SpellCast)
 					spell.objectInUse = false
+					pa.CleanUp = nil
+					pa.OnAction = nil
+					// sim.pendingActionPool.Put(pa)
 				}
 
 				spell.currentDotAction = pa
