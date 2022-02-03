@@ -214,9 +214,51 @@ enum WeaponImbue {
 	WeaponImbueSuperiorWizardOil = 4;
 }
 
+enum Flask {
+	FlaskUnknown = 0;
+	FlaskOfBlindingLight = 1;
+	FlaskOfMightyRestoration = 2;
+	FlaskOfPureDeath = 3;
+	FlaskOfRelentlessAssault = 4;
+	FlaskOfSupremePower = 5;
+}
+
+enum BattleElixir {
+	BattleElixirUnknown = 0;
+	AdeptsElixir = 1;
+	ElixirOfDemonslaying = 2;
+	ElixirOfMajorAgility = 3;
+	ElixirOfMajorFirePower = 4;
+	ElixirOfMajorFrostPower = 5;
+	ElixirOfMajorShadowPower = 6;
+	ElixirOfMajorStrength = 7;
+	ElixirOfTheMongoose = 8;
+}
+
+enum GuardianElixir {
+	GuardianElixirUnknown = 0;
+	ElixirOfDraenicWisdom = 1;
+	ElixirOfMajorMageblood = 2;
+}
+
+enum Food {
+	FoodUnknown = 0;
+	FoodBlackenedBasilisk = 1;
+	FoodGrilledMudfish = 2;
+	FoodRavagerDog = 3;
+	FoodRoastedClefthoof = 4;
+	FoodSkullfishSoup = 5;
+	FoodSpicyHotTalbuk = 6;
+}
+
 enum PetFood {
-	PetFoodNone = 0;
+	PetFoodUnknown = 0;
 	PetFoodKiblersBits = 1;
+}
+
+enum Alchohol {
+	AlchoholUnknown = 0;
+	AlchoholKreegsStoutBeatdown = 1;
 }
 
 // Buffs that affect the entire raid.
@@ -295,22 +337,32 @@ message IndividualBuffs {
 }
 
 message Consumes {
+		// Deprecated in favor of flask.
+		// Remove on 3/4/2022 (1 month).
     bool flask_of_blinding_light = 1;
     bool flask_of_mighty_restoration = 2;
     bool flask_of_pure_death = 3;
     bool flask_of_supreme_power = 4;
     bool flask_of_relentless_assault = 21;
+		Flask flask = 38;
 
+		// Deprecated in favor of battle_elixir.
+		// Remove on 3/4/2022 (1 month).
     bool adepts_elixir = 5;
     bool elixir_of_major_fire_power = 6;
     bool elixir_of_major_frost_power = 7;
     bool elixir_of_major_shadow_power = 8;
-    bool elixir_of_draenic_wisdom = 9;
-    bool elixir_of_major_mageblood = 10;
     bool elixir_of_major_agility = 22;
     bool elixir_of_major_strength = 31;
     bool elixir_of_demonslaying = 23;
     bool elixir_of_the_mongoose = 30;
+		BattleElixir battle_elixir = 39;
+
+		// Deprecated in favor of guardian_elixir.
+		// Remove on 3/4/2022 (1 month).
+    bool elixir_of_draenic_wisdom = 9;
+    bool elixir_of_major_mageblood = 10;
+		GuardianElixir guardian_elixir = 40;
 
 		// Deprecated, use main_hand_imbue instead.
 		// Remove on 2/18/2022 (1 month).
@@ -320,16 +372,22 @@ message Consumes {
 		WeaponImbue main_hand_imbue = 32;
 		WeaponImbue off_hand_imbue = 33;
 
+		// Deprecated in favor of food.
+		// Remove on 3/4/2022 (1 month).
     bool blackened_basilisk = 13;
     bool skullfish_soup = 14;
     bool roasted_clefthoof = 24;
     bool spicy_hot_talbuk = 29;
     bool grilled_mudfish = 35;
 		bool ravager_dog = 36;
+		Food food = 41;
 
 		PetFood pet_food = 37;
 
+		// Deprecated in favor of alchohol.
+		// Remove on 3/4/2022 (1 month).
     bool kreegsStoutBeatdown = 20;
+		Alchohol alchohol = 42;
 
     bool scroll_of_strength_v = 25; // 20 str
     bool scroll_of_agility_v = 26; // 20 agi
