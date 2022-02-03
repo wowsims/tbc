@@ -129,10 +129,205 @@ export const P1_BM_PRESET = {
             }),
             ItemSpec.create({
                 id: 28435,
-                enchant: Enchants.WEAPON_MAJOR_AGILITY,
+                enchant: Enchants.WEAPON_2H_MAJOR_AGILITY,
             }),
             ItemSpec.create({
                 id: 28772,
+                enchant: Enchants.STABILIZED_ETERNIUM_SCOPE,
+            }),
+        ],
+    }),
+};
+export const P2_BM_PRESET = {
+    name: 'P2 BM Preset',
+    tooltip: Tooltips.BASIC_BIS_DISCLAIMER,
+    gear: EquipmentSpec.create({
+        items: [
+            ItemSpec.create({
+                id: 30141,
+                enchant: Enchants.GLYPH_OF_FEROCITY,
+                gems: [
+                    Gems.DELICATE_LIVING_RUBY,
+                    Gems.RELENTLESS_EARTHSTORM_DIAMOND,
+                ],
+            }),
+            ItemSpec.create({
+                id: 30017, // Telonicus's Pendant of Mayhem
+            }),
+            ItemSpec.create({
+                id: 30143,
+                enchant: Enchants.GREATER_INSCRIPTION_OF_VENGEANCE,
+                gems: [
+                    Gems.DELICATE_LIVING_RUBY,
+                    Gems.DELICATE_LIVING_RUBY,
+                ],
+            }),
+            ItemSpec.create({
+                id: 29994,
+                enchant: Enchants.CLOAK_GREATER_AGILITY,
+            }),
+            ItemSpec.create({
+                id: 30139,
+                enchant: Enchants.CHEST_EXCEPTIONAL_STATS,
+                gems: [
+                    Gems.SHIFTING_NIGHTSEYE,
+                    Gems.WICKED_NOBLE_TOPAZ,
+                    Gems.WICKED_NOBLE_TOPAZ,
+                ],
+            }),
+            ItemSpec.create({
+                id: 29966,
+                enchant: Enchants.WRIST_ASSAULT,
+                gems: [
+                    Gems.DELICATE_LIVING_RUBY,
+                ],
+            }),
+            ItemSpec.create({
+                id: 30140,
+                enchant: Enchants.GLOVES_MAJOR_AGILITY,
+            }),
+            ItemSpec.create({
+                id: 30040,
+                gems: [
+                    Gems.DELICATE_LIVING_RUBY,
+                    Gems.DELICATE_LIVING_RUBY,
+                ],
+            }),
+            ItemSpec.create({
+                id: 29995,
+                enchant: Enchants.NETHERCOBRA_LEG_ARMOR,
+            }),
+            ItemSpec.create({
+                id: 30104,
+                gems: [
+                    Gems.SHIFTING_NIGHTSEYE,
+                    Gems.DELICATE_LIVING_RUBY,
+                ],
+                enchant: Enchants.FEET_CATS_SWIFTNESS,
+            }),
+            ItemSpec.create({
+                id: 29997, // Band of the Ranger-General
+            }),
+            ItemSpec.create({
+                id: 28791, // Ring of the Recalcitrant
+            }),
+            ItemSpec.create({
+                id: 28830, // Dragonspine Trophy
+            }),
+            ItemSpec.create({
+                id: 29383, // Bloodlust Brooch
+            }),
+            ItemSpec.create({
+                id: 29993,
+                gems: [
+                    Gems.DELICATE_LIVING_RUBY,
+                    Gems.DELICATE_LIVING_RUBY,
+                    Gems.DELICATE_LIVING_RUBY,
+                ],
+                enchant: Enchants.WEAPON_2H_MAJOR_AGILITY,
+            }),
+            ItemSpec.create({
+                id: 30105,
+                enchant: Enchants.STABILIZED_ETERNIUM_SCOPE,
+            }),
+        ],
+    }),
+};
+export const P3_BM_PRESET = {
+    name: 'P3 BM Preset',
+    tooltip: Tooltips.BASIC_BIS_DISCLAIMER,
+    gear: EquipmentSpec.create({
+        items: [
+            ItemSpec.create({
+                id: 32235,
+                enchant: Enchants.GLYPH_OF_FEROCITY,
+                gems: [
+                    Gems.RELENTLESS_EARTHSTORM_DIAMOND,
+                    Gems.DELICATE_CRIMSON_SPINEL,
+                ],
+            }),
+            ItemSpec.create({
+                id: 32591, // Choker of Serrated Blades
+            }),
+            ItemSpec.create({
+                id: 31006,
+                enchant: Enchants.GREATER_INSCRIPTION_OF_VENGEANCE,
+                gems: [
+                    Gems.DELICATE_CRIMSON_SPINEL,
+                    Gems.DELICATE_CRIMSON_SPINEL,
+                ],
+            }),
+            ItemSpec.create({
+                id: 32323,
+                enchant: Enchants.CLOAK_GREATER_AGILITY,
+            }),
+            ItemSpec.create({
+                id: 31004,
+                enchant: Enchants.CHEST_EXCEPTIONAL_STATS,
+                gems: [
+                    Gems.DELICATE_CRIMSON_SPINEL,
+                    Gems.JAGGED_SEASPRAY_EMERALD,
+                    Gems.JAGGED_SEASPRAY_EMERALD,
+                ],
+            }),
+            ItemSpec.create({
+                id: 32324,
+                enchant: Enchants.WRIST_ASSAULT,
+                gems: [
+                    Gems.WICKED_PYRESTONE,
+                ],
+            }),
+            ItemSpec.create({
+                id: 31001,
+                enchant: Enchants.GLOVES_MAJOR_AGILITY,
+                gems: [
+                    Gems.DELICATE_CRIMSON_SPINEL,
+                ],
+            }),
+            ItemSpec.create({
+                id: 30879,
+                gems: [
+                    Gems.DELICATE_CRIMSON_SPINEL,
+                    Gems.DELICATE_CRIMSON_SPINEL,
+                ],
+            }),
+            ItemSpec.create({
+                id: 31005,
+                enchant: Enchants.NETHERCOBRA_LEG_ARMOR,
+                gems: [
+                    Gems.DELICATE_CRIMSON_SPINEL,
+                ],
+            }),
+            ItemSpec.create({
+                id: 32366,
+                gems: [
+                    Gems.DELICATE_CRIMSON_SPINEL,
+                    Gems.WICKED_PYRESTONE,
+                ],
+                enchant: Enchants.FEET_CATS_SWIFTNESS,
+            }),
+            ItemSpec.create({
+                id: 29997, // Band of the Ranger-General
+            }),
+            ItemSpec.create({
+                id: 29301, // Band of the Eternal Champion
+            }),
+            ItemSpec.create({
+                id: 28830, // Dragonspine Trophy
+            }),
+            ItemSpec.create({
+                id: 32505, // Madness of the Betrayer
+            }),
+            ItemSpec.create({
+                id: 30901,
+                enchant: Enchants.WEAPON_GREATER_AGILITY,
+            }),
+            ItemSpec.create({
+                id: 30881,
+                enchant: Enchants.WEAPON_GREATER_AGILITY,
+            }),
+            ItemSpec.create({
+                id: 30906,
                 enchant: Enchants.STABILIZED_ETERNIUM_SCOPE,
             }),
         ],
