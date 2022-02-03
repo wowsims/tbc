@@ -67,22 +67,14 @@ func (hunter *Hunter) OnGCDReady(sim *core.Simulation) {
 }
 
 func (hunter *Hunter) OnManaTick(sim *core.Simulation) {
-	// Can't add/remove auras within OnMeleeAttack so have to switch aspects here instead.
-	if hunter.changingAspects {
-		if hunter.aspectOfTheViper {
-			hunter.RemoveAura(sim, AspectOfTheHawkAuraID)
-			hunter.AddAura(sim, hunter.aspectOfTheViperAura())
-		} else {
-			hunter.RemoveAura(sim, AspectOfTheViperAuraID)
-			hunter.AddAura(sim, hunter.aspectOfTheHawkAura())
-		}
-		hunter.changingAspects = false
-	}
-
 	if hunter.aspectOfTheViper {
 		// https://wowpedia.fandom.com/wiki/Aspect_of_the_Viper?oldid=1458832
 		percentMana := core.MaxFloat(0.2, core.MinFloat(0.9, hunter.CurrentManaPercent()))
 		scaling := 22.0/35.0*(0.9-percentMana) + 0.11
+		if hunter.hasGronnstalker2Pc {
+			scaling += 0.05
+		}
+
 		bonusPer5Seconds := hunter.GetStat(stats.Intellect)*scaling + 0.35*70
 		manaGain := bonusPer5Seconds * 2 / 5
 		hunter.AddMana(sim, manaGain, AspectOfTheViperActionID, false)

@@ -35,7 +35,8 @@ type Hunter struct {
 	AmmoDamageBonus float64
 
 	aspectOfTheViper bool // False indicates aspect of the hawk.
-	changingAspects  bool // True when trying to change aspects.
+
+	hasGronnstalker2Pc bool
 
 	killCommandEnabled bool                // True after landing a crit.
 	killCommandAction  *core.PendingAction // Action to use KC when its comes off CD.
@@ -68,6 +69,10 @@ type Hunter struct {
 
 func (hunter *Hunter) GetCharacter() *core.Character {
 	return &hunter.Character
+}
+
+func (hunter *Hunter) GetHunter() *Hunter {
+	return hunter
 }
 
 func (hunter *Hunter) AddRaidBuffs(raidBuffs *proto.RaidBuffs) {
@@ -119,6 +124,7 @@ func NewHunter(character core.Character, options proto.Player) *Hunter {
 		Options:   *hunterOptions.Options,
 		Rotation:  *hunterOptions.Rotation,
 	}
+	hunter.hasGronnstalker2Pc = ItemSetGronnstalker.CharacterHasSetBonus(&hunter.Character, 2)
 
 	hunter.PseudoStats.RangedSpeedMultiplier = 1
 	hunter.EnableManaBar()
