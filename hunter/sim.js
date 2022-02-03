@@ -89,6 +89,7 @@ export class HunterSimUI extends IndividualSimUI {
                 HunterInputs.Quiver,
                 HunterInputs.WeaponAmmo,
                 IconInputs.DrumsOfBattleConsume,
+                IconInputs.BattleChicken,
             ],
             // IconInputs to include in the 'Other Buffs' section on the settings tab.
             raidBuffInputs: [
@@ -98,6 +99,9 @@ export class HunterSimUI extends IndividualSimUI {
             partyBuffInputs: [
                 IconInputs.DrumsOfBattleBuff,
                 IconInputs.Bloodlust,
+                IconInputs.GraceOfAirTotem,
+                IconInputs.WindfuryTotem,
+                IconInputs.StrengthOfEarthTotem,
                 IconInputs.ManaSpringTotem,
                 IconInputs.BattleShout,
                 IconInputs.DraeneiRacialMelee,
@@ -106,11 +110,13 @@ export class HunterSimUI extends IndividualSimUI {
                 IconInputs.TrueshotAura,
                 IconInputs.SanctityAura,
                 IconInputs.BraidedEterniumChain,
+                IconInputs.BattleChickens,
             ],
             playerBuffInputs: [
                 IconInputs.BlessingOfKings,
                 IconInputs.BlessingOfWisdom,
                 IconInputs.BlessingOfMight,
+                IconInputs.UnleashedRage,
             ],
             // IconInputs to include in the 'Debuffs' section on the settings tab.
             debuffInputs: [
@@ -126,21 +132,23 @@ export class HunterSimUI extends IndividualSimUI {
             ],
             // IconInputs to include in the 'Consumes' section on the settings tab.
             consumeInputs: [
+                IconInputs.MainHandAdamantiteSharpeningStone,
+                IconInputs.OffHandAdamantiteSharpeningStone,
                 IconInputs.DefaultHastePotion,
                 IconInputs.DefaultSuperManaPotion,
                 IconInputs.DefaultDarkRune,
                 IconInputs.FlaskOfRelentlessAssault,
                 IconInputs.ElixirOfDemonslaying,
-                IconInputs.ElixirOfMajorStrength,
                 IconInputs.ElixirOfMajorAgility,
                 IconInputs.ElixirOfTheMongoose,
                 IconInputs.ElixirOfDraenicWisdom,
                 IconInputs.ElixirOfMajorMageblood,
-                IconInputs.RoastedClefthoof,
+                IconInputs.RavagerDog,
                 IconInputs.GrilledMudfish,
                 IconInputs.SpicyHotTalbuk,
                 IconInputs.ScrollOfAgilityV,
                 IconInputs.ScrollOfStrengthV,
+                IconInputs.KiblersBits,
             ],
             // Inputs to include in the 'Rotation' section on the settings tab.
             rotationInputs: HunterInputs.HunterRotationConfig,
@@ -148,7 +156,7 @@ export class HunterSimUI extends IndividualSimUI {
             otherInputs: {
                 inputs: [
                     HunterInputs.PetTypeInput,
-                    HunterInputs.LatencyMs,
+                    //HunterInputs.LatencyMs,
                     OtherInputs.StartingPotion,
                     OtherInputs.NumStartingPotions,
                     OtherInputs.ExposeWeaknessUptime,

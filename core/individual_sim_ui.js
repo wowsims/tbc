@@ -90,6 +90,7 @@ export class IndividualSimUI extends SimUI {
             'Battle Elixir': [],
             'Drums': [],
             'Food': [],
+            'Pet Food': [],
             'Alchohol': [],
             'Guardian Elixir': [],
             'Potion': [],

@@ -302,6 +302,14 @@ export interface Consumes {
      */
     grilledMudfish: boolean;
     /**
+     * @generated from protobuf field: bool ravager_dog = 36;
+     */
+    ravagerDog: boolean;
+    /**
+     * @generated from protobuf field: proto.PetFood pet_food = 37;
+     */
+    petFood: PetFood;
+    /**
      * @generated from protobuf field: bool kreegsStoutBeatdown = 20;
      */
     kreegsStoutBeatdown: boolean;
@@ -1441,6 +1449,19 @@ export declare enum WeaponImbue {
      * @generated from protobuf enum value: WeaponImbueSuperiorWizardOil = 4;
      */
     WeaponImbueSuperiorWizardOil = 4
+}
+/**
+ * @generated from protobuf enum proto.PetFood
+ */
+export declare enum PetFood {
+    /**
+     * @generated from protobuf enum value: PetFoodNone = 0;
+     */
+    PetFoodNone = 0,
+    /**
+     * @generated from protobuf enum value: PetFoodKiblersBits = 1;
+     */
+    PetFoodKiblersBits = 1
 }
 /**
  * @generated from protobuf enum proto.StrengthOfEarthType

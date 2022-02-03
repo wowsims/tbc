@@ -72,6 +72,7 @@ export declare const MainHandBrilliantWizardOil: IndividualSimIconPickerConfig<P
 export declare const MainHandSuperiorWizardOil: IndividualSimIconPickerConfig<Player<any>, boolean>;
 export declare const OffHandAdamantiteSharpeningStone: IndividualSimIconPickerConfig<Player<any>, boolean>;
 export declare const OffHandElementalSharpeningStone: IndividualSimIconPickerConfig<Player<any>, boolean>;
+export declare const RavagerDog: IndividualSimIconPickerConfig<Player<any>, boolean>;
 export declare const RoastedClefthoof: IndividualSimIconPickerConfig<Player<any>, boolean>;
 export declare const SkullfishSoup: IndividualSimIconPickerConfig<Player<any>, boolean>;
 export declare const ScrollOfStrengthV: IndividualSimIconPickerConfig<Player<any>, boolean>;
@@ -84,6 +85,7 @@ export declare const DefaultMightyRagePotion: IndividualSimIconPickerConfig<Play
 export declare const DefaultSuperManaPotion: IndividualSimIconPickerConfig<Player<any>, boolean>;
 export declare const DefaultDarkRune: IndividualSimIconPickerConfig<Player<any>, boolean>;
 export declare const DefaultFlameCap: IndividualSimIconPickerConfig<Player<any>, boolean>;
+export declare const KiblersBits: IndividualSimIconPickerConfig<Player<any>, boolean>;
 export declare const DrumsOfBattleConsume: IndividualSimIconPickerConfig<Player<any>, boolean>;
 export declare const DrumsOfRestorationConsume: IndividualSimIconPickerConfig<Player<any>, boolean>;
 export declare const GraceOfAirTotem: {

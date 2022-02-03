@@ -69,6 +69,7 @@ export declare const ExposeWeaknessUptime: {
     config: {
         extraCssClasses: string[];
         label: string;
+        labelTooltip: string;
         changedEvent: (target: Target) => TypedEvent<void>;
         getValue: (target: Target) => number;
         setValue: (eventID: EventID, target: Target, newValue: number) => void;
