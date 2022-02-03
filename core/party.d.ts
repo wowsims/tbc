@@ -26,6 +26,4 @@ export declare class Party {
     setBuffs(eventID: EventID, newBuffs: PartyBuffs): void;
     toProto(): PartyProto;
     fromProto(eventID: EventID, proto: PartyProto): void;
-    toJson(): Object;
-    fromJson(eventID: EventID, obj: any): void;
 }

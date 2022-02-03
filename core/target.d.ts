@@ -21,6 +21,4 @@ export declare class Target {
     setDebuffs(eventID: EventID, newDebuffs: Debuffs): void;
     toProto(): TargetProto;
     fromProto(eventID: EventID, proto: TargetProto): void;
-    toJson(): Object;
-    fromJson(eventID: EventID, obj: any): void;
 }

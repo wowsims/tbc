@@ -1320,14 +1320,13 @@ class Consumes$Type extends MessageType {
             { no: 15, name: "default_potion", kind: "enum", T: () => ["proto.Potions", Potions] },
             { no: 16, name: "starting_potion", kind: "enum", T: () => ["proto.Potions", Potions] },
             { no: 17, name: "num_starting_potions", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
-            { no: 18, name: "dark_rune", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 27, name: "default_conjured", kind: "enum", T: () => ["proto.Conjured", Conjured] },
             { no: 19, name: "drums", kind: "enum", T: () => ["proto.Drums", Drums] },
             { no: 34, name: "battle_chicken", kind: "scalar", T: 8 /*ScalarType.BOOL*/ }
         ]);
     }
     create(value) {
-        const message = { flaskOfBlindingLight: false, flaskOfMightyRestoration: false, flaskOfPureDeath: false, flaskOfSupremePower: false, flaskOfRelentlessAssault: false, adeptsElixir: false, elixirOfMajorFirePower: false, elixirOfMajorFrostPower: false, elixirOfMajorShadowPower: false, elixirOfDraenicWisdom: false, elixirOfMajorMageblood: false, elixirOfMajorAgility: false, elixirOfMajorStrength: false, elixirOfDemonslaying: false, elixirOfTheMongoose: false, brilliantWizardOil: false, superiorWizardOil: false, mainHandImbue: 0, offHandImbue: 0, blackenedBasilisk: false, skullfishSoup: false, roastedClefthoof: false, spicyHotTalbuk: false, grilledMudfish: false, ravagerDog: false, petFood: 0, kreegsStoutBeatdown: false, scrollOfStrengthV: false, scrollOfAgilityV: false, scrollOfSpiritV: false, defaultPotion: 0, startingPotion: 0, numStartingPotions: 0, darkRune: false, defaultConjured: 0, drums: 0, battleChicken: false };
+        const message = { flaskOfBlindingLight: false, flaskOfMightyRestoration: false, flaskOfPureDeath: false, flaskOfSupremePower: false, flaskOfRelentlessAssault: false, adeptsElixir: false, elixirOfMajorFirePower: false, elixirOfMajorFrostPower: false, elixirOfMajorShadowPower: false, elixirOfDraenicWisdom: false, elixirOfMajorMageblood: false, elixirOfMajorAgility: false, elixirOfMajorStrength: false, elixirOfDemonslaying: false, elixirOfTheMongoose: false, brilliantWizardOil: false, superiorWizardOil: false, mainHandImbue: 0, offHandImbue: 0, blackenedBasilisk: false, skullfishSoup: false, roastedClefthoof: false, spicyHotTalbuk: false, grilledMudfish: false, ravagerDog: false, petFood: 0, kreegsStoutBeatdown: false, scrollOfStrengthV: false, scrollOfAgilityV: false, scrollOfSpiritV: false, defaultPotion: 0, startingPotion: 0, numStartingPotions: 0, defaultConjured: 0, drums: 0, battleChicken: false };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -1436,9 +1435,6 @@ class Consumes$Type extends MessageType {
                     break;
                 case /* int32 num_starting_potions */ 17:
                     message.numStartingPotions = reader.int32();
-                    break;
-                case /* bool dark_rune */ 18:
-                    message.darkRune = reader.bool();
                     break;
                 case /* proto.Conjured default_conjured */ 27:
                     message.defaultConjured = reader.int32();
@@ -1560,9 +1556,6 @@ class Consumes$Type extends MessageType {
         /* int32 num_starting_potions = 17; */
         if (message.numStartingPotions !== 0)
             writer.tag(17, WireType.Varint).int32(message.numStartingPotions);
-        /* bool dark_rune = 18; */
-        if (message.darkRune !== false)
-            writer.tag(18, WireType.Varint).bool(message.darkRune);
         /* proto.Conjured default_conjured = 27; */
         if (message.defaultConjured !== 0)
             writer.tag(27, WireType.Varint).int32(message.defaultConjured);

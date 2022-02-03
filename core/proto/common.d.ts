@@ -338,10 +338,6 @@ export interface Consumes {
      */
     numStartingPotions: number;
     /**
-     * @generated from protobuf field: bool dark_rune = 18;
-     */
-    darkRune: boolean;
-    /**
      * @generated from protobuf field: proto.Conjured default_conjured = 27;
      */
     defaultConjured: Conjured;

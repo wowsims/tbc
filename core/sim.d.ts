@@ -6,7 +6,6 @@ import { GemColor } from '/tbc/core/proto/common.js';
 import { ItemSlot } from '/tbc/core/proto/common.js';
 import { ItemSpec } from '/tbc/core/proto/common.js';
 import { Item } from '/tbc/core/proto/common.js';
-import { Spec } from '/tbc/core/proto/common.js';
 import { Stat } from '/tbc/core/proto/common.js';
 import { Raid as RaidProto } from '/tbc/core/proto/api.js';
 import { RaidSimRequest, RaidSimResult } from '/tbc/core/proto/api.js';
@@ -76,5 +75,4 @@ export declare class Sim {
     lookupItemSpec(itemSpec: ItemSpec): EquippedItem | null;
     lookupEquipmentSpec(equipSpec: EquipmentSpec): Gear;
     toJson(): Object;
-    fromJson(eventID: EventID, obj: any, spec?: Spec): void;
 }

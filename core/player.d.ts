@@ -110,7 +110,5 @@ export declare class Player<SpecType extends Spec> {
     setWowheadData(equippedItem: EquippedItem, elem: HTMLElement): void;
     toProto(): PlayerProto;
     fromProto(eventID: EventID, proto: PlayerProto): void;
-    toJson(): Object;
-    fromJson(eventID: EventID, obj: any): void;
     clone(eventID: EventID): Player<SpecType>;
 }

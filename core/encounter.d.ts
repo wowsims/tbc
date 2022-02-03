@@ -24,6 +24,4 @@ export declare class Encounter {
     setNumTargets(eventID: EventID, newNumTargets: number): void;
     toProto(): EncounterProto;
     fromProto(eventID: EventID, proto: EncounterProto): void;
-    toJson(): Object;
-    fromJson(eventID: EventID, obj: any): void;
 }

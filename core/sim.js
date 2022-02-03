@@ -1,4 +1,6 @@
+import { Encounter as EncounterProto } from '/tbc/core/proto/common.js';
 import { Item } from '/tbc/core/proto/common.js';
+import { Raid as RaidProto } from '/tbc/core/proto/api.js';
 import { ComputeStatsRequest } from '/tbc/core/proto/api.js';
 import { GearListRequest } from '/tbc/core/proto/api.js';
 import { RaidSimRequest } from '/tbc/core/proto/api.js';
@@ -270,39 +272,8 @@ export class Sim {
     // Returns JSON representing all the current values.
     toJson() {
         return {
-            'raid': this.raid.toJson(),
-            'encounter': this.encounter.toJson(),
+            'raid': RaidProto.toJson(this.raid.toProto()),
+            'encounter': EncounterProto.toJson(this.encounter.toProto()),
         };
-    }
-    // Set all the current values, assumes obj is the same type returned by toJson().
-    fromJson(eventID, obj, spec) {
-        TypedEvent.freezeAllAndDo(() => {
-            // For legacy format. Do not remove this until 2022/01/05 (1 month).
-            if (obj['sim']) {
-                if (!obj['raid']) {
-                    obj['raid'] = {
-                        'parties': [
-                            {
-                                'players': [
-                                    {
-                                        'spec': spec,
-                                        'player': obj['player'],
-                                    },
-                                ],
-                                'buffs': obj['sim']['partyBuffs'],
-                            },
-                        ],
-                        'buffs': obj['sim']['raidBuffs'],
-                    };
-                    obj['raid']['parties'][0]['players'][0]['player']['buffs'] = obj['sim']['individualBuffs'];
-                }
-            }
-            if (obj['raid']) {
-                this.raid.fromJson(eventID, obj['raid']);
-            }
-            if (obj['encounter']) {
-                this.encounter.fromJson(eventID, obj['encounter']);
-            }
-        });
     }
 }

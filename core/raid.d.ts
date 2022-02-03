@@ -28,6 +28,4 @@ export declare class Raid {
     setBuffs(eventID: EventID, newBuffs: RaidBuffs): void;
     toProto(): RaidProto;
     fromProto(eventID: EventID, proto: RaidProto): void;
-    toJson(): Object;
-    fromJson(eventID: EventID, obj: any): void;
 }

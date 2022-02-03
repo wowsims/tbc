@@ -82,41 +82,4 @@ export class Encounter {
             }
         });
     }
-    // Returns JSON representing all the current values.
-    toJson() {
-        return {
-            'duration': this.getDuration(),
-            'durationVariation': this.getDurationVariation(),
-            'executeProportion': this.getExecuteProportion(),
-            'numTargets': this.getNumTargets(),
-            'primaryTarget': this.primaryTarget.toJson(),
-        };
-    }
-    // Set all the current values, assumes obj is the same type returned by toJson().
-    fromJson(eventID, obj) {
-        TypedEvent.freezeAllAndDo(() => {
-            const parsedDuration = parseInt(obj['duration']);
-            if (!isNaN(parsedDuration) && parsedDuration != 0) {
-                this.setDuration(eventID, parsedDuration);
-            }
-            const parsedDurationVariation = parseInt(obj['durationVariation']);
-            if (!isNaN(parsedDurationVariation) && parsedDurationVariation != 0) {
-                this.setDurationVariation(eventID, parsedDurationVariation);
-            }
-            const parsedExecuteProportion = parseInt(obj['executeProportion']);
-            if (!isNaN(parsedExecuteProportion) && parsedExecuteProportion != 0) {
-                this.setExecuteProportion(eventID, parsedExecuteProportion);
-            }
-            const parsedNumTargets = parseInt(obj['numTargets']);
-            if (!isNaN(parsedNumTargets) && parsedNumTargets != 0) {
-                this.setNumTargets(eventID, parsedNumTargets);
-            }
-            try {
-                this.primaryTarget.fromJson(eventID, obj['primaryTarget']);
-            }
-            catch (e) {
-                console.warn('Failed to parse debuffs: ' + e);
-            }
-        });
-    }
 }
