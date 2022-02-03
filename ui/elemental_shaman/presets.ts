@@ -1,8 +1,11 @@
 import { Consumes } from '/tbc/core/proto/common.js';
 import { Drums } from '/tbc/core/proto/common.js';
 import { EquipmentSpec } from '/tbc/core/proto/common.js';
+import { Flask } from '/tbc/core/proto/common.js';
+import { Food } from '/tbc/core/proto/common.js';
 import { ItemSpec } from '/tbc/core/proto/common.js';
 import { Potions } from '/tbc/core/proto/common.js';
+import { WeaponImbue } from '/tbc/core/proto/common.js';
 import { Faction } from '/tbc/core/proto_utils/utils.js';
 import { Player } from '/tbc/core/player.js';
 
@@ -39,9 +42,9 @@ export const DefaultOptions = ElementalShamanOptions.create({
 export const DefaultConsumes = Consumes.create({
 	drums: Drums.DrumsOfBattle,
 	defaultPotion: Potions.SuperManaPotion,
-	flaskOfBlindingLight: true,
-	brilliantWizardOil: true,
-	blackenedBasilisk: true,
+	flask: Flask.FlaskOfBlindingLight,
+	food: Food.FoodBlackenedBasilisk,
+	mainHandImbue: WeaponImbue.WeaponImbueBrilliantWizardOil,
 });
 
 export const P1_PRESET = {

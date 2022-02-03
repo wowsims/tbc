@@ -14,7 +14,7 @@ func applyConsumeEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs prot
 
 	character.AddStats(consumesStats(character, consumes, raidBuffs))
 
-	if consumes.ElixirOfDemonslaying {
+	if consumes.BattleElixir == proto.BattleElixir_ElixirOfDemonslaying {
 		character.AddPermanentAura(func(sim *Simulation) Aura {
 			return ElixirOfDemonslayingAura()
 		})
@@ -28,6 +28,84 @@ func applyConsumeEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs prot
 func consumesStats(character *Character, c proto.Consumes, raidBuffs proto.RaidBuffs) stats.Stats {
 	s := stats.Stats{}
 
+	if c.Flask != proto.Flask_FlaskUnknown {
+		switch c.Flask {
+		case proto.Flask_FlaskOfBlindingLight:
+			s[stats.NatureSpellPower] += 80
+			s[stats.ArcaneSpellPower] += 80
+			s[stats.HolySpellPower] += 80
+		case proto.Flask_FlaskOfMightyRestoration:
+			s[stats.MP5] += 25
+		case proto.Flask_FlaskOfPureDeath:
+			s[stats.FireSpellPower] += 80
+			s[stats.FrostSpellPower] += 80
+			s[stats.ShadowSpellPower] += 80
+		case proto.Flask_FlaskOfRelentlessAssault:
+			s[stats.AttackPower] += 120
+			s[stats.RangedAttackPower] += 120
+		case proto.Flask_FlaskOfSupremePower:
+			s[stats.SpellPower] += 70
+		}
+	} else {
+		switch c.BattleElixir {
+		case proto.BattleElixir_AdeptsElixir:
+			s[stats.SpellCrit] += 24
+			s[stats.SpellPower] += 24
+			s[stats.HealingPower] += 24
+		case proto.BattleElixir_ElixirOfMajorAgility:
+			s[stats.Agility] += 35
+			s[stats.MeleeCrit] += 20
+		case proto.BattleElixir_ElixirOfMajorFirePower:
+			s[stats.FireSpellPower] += 55
+		case proto.BattleElixir_ElixirOfMajorFrostPower:
+			s[stats.FrostSpellPower] += 55
+		case proto.BattleElixir_ElixirOfMajorShadowPower:
+			s[stats.ShadowSpellPower] += 55
+		case proto.BattleElixir_ElixirOfMajorStrength:
+			s[stats.Strength] += 35
+		case proto.BattleElixir_ElixirOfTheMongoose:
+			s[stats.Agility] += 25
+			s[stats.MeleeCrit] += 28
+		}
+
+		switch c.GuardianElixir {
+		case proto.GuardianElixir_ElixirOfDraenicWisdom:
+			s[stats.Intellect] += 30
+			s[stats.Spirit] += 30
+		case proto.GuardianElixir_ElixirOfMajorMageblood:
+			s[stats.MP5] += 16.0
+		}
+	}
+
+	switch c.Food {
+	case proto.Food_FoodBlackenedBasilisk:
+		s[stats.SpellPower] += 23
+		s[stats.HealingPower] += 23
+		s[stats.Spirit] += 20
+	case proto.Food_FoodGrilledMudfish:
+		s[stats.Agility] += 20
+		s[stats.Spirit] += 20
+	case proto.Food_FoodRavagerDog:
+		s[stats.AttackPower] += 40
+		s[stats.RangedAttackPower] += 40
+		s[stats.Spirit] += 20
+	case proto.Food_FoodRoastedClefthoof:
+		s[stats.Strength] += 20
+		s[stats.Spirit] += 20
+	case proto.Food_FoodSkullfishSoup:
+		s[stats.SpellCrit] += 20
+		s[stats.Spirit] += 20
+	case proto.Food_FoodSpicyHotTalbuk:
+		s[stats.MeleeHit] += 20
+		s[stats.Spirit] += 20
+	}
+
+	switch c.Alchohol {
+	case proto.Alchohol_AlchoholKreegsStoutBeatdown:
+		s[stats.Intellect] -= 5
+		s[stats.Spirit] += 25
+	}
+
 	if character.HasMHWeapon() && !character.HasMHWeaponImbue {
 		addImbueStats(character, c.MainHandImbue)
 	}
@@ -35,90 +113,6 @@ func consumesStats(character *Character, c proto.Consumes, raidBuffs proto.RaidB
 		addImbueStats(character, c.OffHandImbue)
 	}
 
-	if c.ElixirOfMajorMageblood {
-		s[stats.MP5] += 16.0
-	}
-	if c.AdeptsElixir {
-		s[stats.SpellCrit] += 24
-		s[stats.SpellPower] += 24
-		s[stats.HealingPower] += 24
-	}
-	if c.ElixirOfMajorFirePower {
-		s[stats.FireSpellPower] += 55
-	}
-	if c.ElixirOfMajorFrostPower {
-		s[stats.FrostSpellPower] += 55
-	}
-	if c.ElixirOfMajorShadowPower {
-		s[stats.ShadowSpellPower] += 55
-	}
-	if c.ElixirOfDraenicWisdom {
-		s[stats.Intellect] += 30
-		s[stats.Spirit] += 30
-	}
-	if c.ElixirOfMajorAgility {
-		s[stats.Agility] += 35
-		s[stats.MeleeCrit] += 20
-	}
-	if c.ElixirOfMajorStrength {
-		s[stats.Strength] += 35
-	}
-	if c.ElixirOfTheMongoose {
-		s[stats.Agility] += 25
-		s[stats.MeleeCrit] += 28
-	}
-
-	if c.FlaskOfSupremePower {
-		s[stats.SpellPower] += 70
-	}
-	if c.FlaskOfBlindingLight {
-		s[stats.NatureSpellPower] += 80
-		s[stats.ArcaneSpellPower] += 80
-		s[stats.HolySpellPower] += 80
-	}
-	if c.FlaskOfPureDeath {
-		s[stats.FireSpellPower] += 80
-		s[stats.FrostSpellPower] += 80
-		s[stats.ShadowSpellPower] += 80
-	}
-	if c.FlaskOfMightyRestoration {
-		s[stats.MP5] += 25
-	}
-	if c.FlaskOfRelentlessAssault {
-		s[stats.AttackPower] += 120
-		s[stats.RangedAttackPower] += 120
-	}
-
-	if c.BlackenedBasilisk {
-		s[stats.SpellPower] += 23
-		s[stats.HealingPower] += 23
-		s[stats.Spirit] += 20
-	}
-	if c.SkullfishSoup {
-		s[stats.SpellCrit] += 20
-		s[stats.Spirit] += 20
-	}
-	if c.KreegsStoutBeatdown {
-		s[stats.Intellect] -= 5
-		s[stats.Spirit] += 25
-	}
-	if c.RoastedClefthoof {
-		s[stats.Strength] += 20
-		s[stats.Spirit] += 20
-	}
-	if c.SpicyHotTalbuk {
-		s[stats.MeleeHit] += 20
-		s[stats.Spirit] += 20
-	}
-	if c.SpicyHotTalbuk {
-		s[stats.Agility] += 20
-		s[stats.Spirit] += 20
-	}
-	if c.RavagerDog {
-		s[stats.AttackPower] += 40
-		s[stats.RangedAttackPower] += 40
-		s[stats.Spirit] += 20
-	}
 	if c.ScrollOfAgilityV {
 		s[stats.Agility] += 20
 	}

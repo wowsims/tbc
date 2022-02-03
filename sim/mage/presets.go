@@ -158,26 +158,27 @@ var FullArcaneIndividualBuffs = &proto.IndividualBuffs{
 }
 
 var FullFireConsumes = &proto.Consumes{
-	FlaskOfPureDeath:  true,
-	BlackenedBasilisk: true,
-	DefaultPotion:     proto.Potions_SuperManaPotion,
-	DefaultConjured:   proto.Conjured_ConjuredFlameCap,
-	MainHandImbue:     proto.WeaponImbue_WeaponImbueBrilliantWizardOil,
+	Flask:            proto.Flask_FlaskOfPureDeath,
+	Food:             proto.Food_FoodBlackenedBasilisk,
+	FlaskOfPureDeath: true,
+	DefaultPotion:    proto.Potions_SuperManaPotion,
+	DefaultConjured:  proto.Conjured_ConjuredFlameCap,
+	MainHandImbue:    proto.WeaponImbue_WeaponImbueBrilliantWizardOil,
 }
 var FullFrostConsumes = &proto.Consumes{
-	FlaskOfPureDeath:  true,
-	BlackenedBasilisk: true,
-	DefaultPotion:     proto.Potions_SuperManaPotion,
-	DefaultConjured:   proto.Conjured_ConjuredDarkRune,
-	MainHandImbue:     proto.WeaponImbue_WeaponImbueBrilliantWizardOil,
+	Flask:           proto.Flask_FlaskOfPureDeath,
+	Food:            proto.Food_FoodBlackenedBasilisk,
+	DefaultPotion:   proto.Potions_SuperManaPotion,
+	DefaultConjured: proto.Conjured_ConjuredDarkRune,
+	MainHandImbue:   proto.WeaponImbue_WeaponImbueBrilliantWizardOil,
 }
 
 var FullArcaneConsumes = &proto.Consumes{
-	FlaskOfBlindingLight: true,
-	BlackenedBasilisk:    true,
-	DefaultPotion:        proto.Potions_SuperManaPotion,
-	DefaultConjured:      proto.Conjured_ConjuredDarkRune,
-	MainHandImbue:        proto.WeaponImbue_WeaponImbueBrilliantWizardOil,
+	Flask:           proto.Flask_FlaskOfBlindingLight,
+	Food:            proto.Food_FoodBlackenedBasilisk,
+	DefaultPotion:   proto.Potions_SuperManaPotion,
+	DefaultConjured: proto.Conjured_ConjuredDarkRune,
+	MainHandImbue:   proto.WeaponImbue_WeaponImbueBrilliantWizardOil,
 }
 
 var FullDebuffs = &proto.Debuffs{

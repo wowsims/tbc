@@ -39,8 +39,8 @@ var FullIndividualBuffs = &proto.IndividualBuffs{
 }
 
 var FullConsumes = &proto.Consumes{
-	FlaskOfPureDeath:   true,
-	BlackenedBasilisk:  true,
+	Flask:              proto.Flask_FlaskOfPureDeath,
+	Food:               proto.Food_FoodBlackenedBasilisk,
 	DefaultPotion:      proto.Potions_SuperManaPotion,
 	NumStartingPotions: 1,
 	DefaultConjured:    proto.Conjured_ConjuredDarkRune,
