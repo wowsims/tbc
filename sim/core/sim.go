@@ -210,7 +210,6 @@ func (sim *Simulation) runOnce() {
 	for true {
 		last := len(sim.pendingActions) - 1
 		pa := sim.pendingActions[last]
-		sim.pendingActions[last] = nil
 		sim.pendingActions = sim.pendingActions[:last]
 		if pa.NextActionAt > sim.Duration {
 			if pa.CleanUp != nil {
