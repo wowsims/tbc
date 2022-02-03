@@ -14,7 +14,7 @@ import { getWeaponDPS } from '/tbc/core/proto_utils/equipped_item.js';
 import { Gear } from '/tbc/core/proto_utils/gear.js';
 import { gemMatchesSocket, } from '/tbc/core/proto_utils/gems.js';
 import { Stats } from '/tbc/core/proto_utils/stats.js';
-import { canEquipItem, classColors, getEligibleItemSlots, getTalentTreeIcon, getMetaGemEffectEP, raceToFaction, specEPTransforms, specToClass, specToEligibleRaces, specTypeFunctions, withSpecProto, } from '/tbc/core/proto_utils/utils.js';
+import { canEquipItem, classColors, getEligibleItemSlots, getTalentTree, getTalentTreeIcon, getMetaGemEffectEP, raceToFaction, specEPTransforms, specToClass, specToEligibleRaces, specTypeFunctions, withSpecProto, } from '/tbc/core/proto_utils/utils.js';
 import { TypedEvent } from './typed_event.js';
 import { MAX_PARTY_SIZE } from './party.js';
 import { sum } from './utils.js';
@@ -301,6 +301,9 @@ export class Player {
             return;
         this.talentsString = newTalentsString;
         this.talentsStringChangeEmitter.emit(eventID);
+    }
+    getTalentTree() {
+        return getTalentTree(this.getTalentsString());
     }
     getTalentTreeIcon() {
         return getTalentTreeIcon(this.spec, this.getTalentsString());

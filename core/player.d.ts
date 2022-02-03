@@ -99,6 +99,7 @@ export declare class Player<SpecType extends Spec> {
     setTalents(eventID: EventID, newTalents: SpecTalents<SpecType>): void;
     getTalentsString(): string;
     setTalentsString(eventID: EventID, newTalentsString: string): void;
+    getTalentTree(): number;
     getTalentTreeIcon(): string;
     getSpecOptions(): SpecOptions<SpecType>;
     setSpecOptions(eventID: EventID, newSpecOptions: SpecOptions<SpecType>): void;

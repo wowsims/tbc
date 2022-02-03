@@ -22,6 +22,7 @@ export declare const RUNIC_SPELLTHREAD = 24274;
 export declare const MYSTIC_SPELLTHREAD = 24273;
 export declare const NETHERCOBRA_LEG_ARMOR = 29535;
 export declare const BOARS_SPEED = 35297;
+export declare const FEET_DEXTERITY = 22544;
 export declare const FEET_VITALITY = 35298;
 export declare const FEET_CATS_SWIFTNESS = 28279;
 export declare const CRUSADER = 16252;

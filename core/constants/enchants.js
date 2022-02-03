@@ -54,6 +54,8 @@ enchantDescriptions.set(NETHERCOBRA_LEG_ARMOR, '+50 Attack Power and +12 Crit Ra
 // Feet
 export const BOARS_SPEED = 35297;
 enchantDescriptions.set(BOARS_SPEED, 'Minor Speed and +9 Stamina');
+export const FEET_DEXTERITY = 22544;
+enchantDescriptions.set(FEET_DEXTERITY, '+12 Agility');
 export const FEET_VITALITY = 35298;
 enchantDescriptions.set(FEET_VITALITY, '+4 Mana Per 5 Sec.');
 export const FEET_CATS_SWIFTNESS = 28279;

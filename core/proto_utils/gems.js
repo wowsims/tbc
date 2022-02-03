@@ -108,6 +108,7 @@ export const BRILLIANT_DAWNSTONE = 24047;
 export const BRILLIANT_LIONSEYE = 32204;
 // Green
 export const JAGGED_SEASPRAY_EMERALD = 32226;
+export const JAGGED_TALASITE = 24067;
 const gemSocketCssClasses = {
     [GemColor.GemColorBlue]: 'socket-color-blue',
     [GemColor.GemColorMeta]: 'socket-color-meta',

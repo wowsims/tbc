@@ -45,5 +45,6 @@ export declare const RUNED_ORNATE_RUBY = 28118;
 export declare const BRILLIANT_DAWNSTONE = 24047;
 export declare const BRILLIANT_LIONSEYE = 32204;
 export declare const JAGGED_SEASPRAY_EMERALD = 32226;
+export declare const JAGGED_TALASITE = 24067;
 export declare function setGemSocketCssClass(elem: HTMLElement, color: GemColor): void;
 export declare function getEmptyGemSocketIconUrl(color: GemColor): string;
