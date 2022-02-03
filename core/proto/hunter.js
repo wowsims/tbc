@@ -4,6 +4,24 @@ import { reflectionMergePartial } from '/tbc/protobuf-ts/index.js';
 import { MESSAGE_TYPE } from '/tbc/protobuf-ts/index.js';
 import { MessageType } from '/tbc/protobuf-ts/index.js';
 /**
+ * @generated from protobuf enum proto.Hunter.Rotation.StingType
+ */
+export var Hunter_Rotation_StingType;
+(function (Hunter_Rotation_StingType) {
+    /**
+     * @generated from protobuf enum value: NoSting = 0;
+     */
+    Hunter_Rotation_StingType[Hunter_Rotation_StingType["NoSting"] = 0] = "NoSting";
+    /**
+     * @generated from protobuf enum value: ScorpidSting = 1;
+     */
+    Hunter_Rotation_StingType[Hunter_Rotation_StingType["ScorpidSting"] = 1] = "ScorpidSting";
+    /**
+     * @generated from protobuf enum value: SerpentSting = 2;
+     */
+    Hunter_Rotation_StingType[Hunter_Rotation_StingType["SerpentSting"] = 2] = "SerpentSting";
+})(Hunter_Rotation_StingType || (Hunter_Rotation_StingType = {}));
+/**
  * @generated from protobuf enum proto.Hunter.Options.QuiverBonus
  */
 export var Hunter_Options_QuiverBonus;
@@ -525,18 +543,17 @@ export const Hunter = new Hunter$Type();
 class Hunter_Rotation$Type extends MessageType {
     constructor() {
         super("proto.Hunter.Rotation", [
-            { no: 1, name: "adaptive", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
-            { no: 2, name: "use_multi_shot", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
-            { no: 3, name: "use_arcane_shot", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
-            { no: 4, name: "maintain_scorpid_sting", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
-            { no: 5, name: "precast_aimed_shot", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
-            { no: 6, name: "melee_weave", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
-            { no: 7, name: "viper_start_mana_percent", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
-            { no: 8, name: "viper_stop_mana_percent", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ }
+            { no: 1, name: "use_multi_shot", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 2, name: "use_arcane_shot", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 3, name: "precast_aimed_shot", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 4, name: "melee_weave", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 5, name: "sting", kind: "enum", T: () => ["proto.Hunter.Rotation.StingType", Hunter_Rotation_StingType] },
+            { no: 6, name: "viper_start_mana_percent", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
+            { no: 7, name: "viper_stop_mana_percent", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ }
         ]);
     }
     create(value) {
-        const message = { adaptive: false, useMultiShot: false, useArcaneShot: false, maintainScorpidSting: false, precastAimedShot: false, meleeWeave: false, viperStartManaPercent: 0, viperStopManaPercent: 0 };
+        const message = { useMultiShot: false, useArcaneShot: false, precastAimedShot: false, meleeWeave: false, sting: 0, viperStartManaPercent: 0, viperStopManaPercent: 0 };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -547,28 +564,25 @@ class Hunter_Rotation$Type extends MessageType {
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
-                case /* bool adaptive */ 1:
-                    message.adaptive = reader.bool();
-                    break;
-                case /* bool use_multi_shot */ 2:
+                case /* bool use_multi_shot */ 1:
                     message.useMultiShot = reader.bool();
                     break;
-                case /* bool use_arcane_shot */ 3:
+                case /* bool use_arcane_shot */ 2:
                     message.useArcaneShot = reader.bool();
                     break;
-                case /* bool maintain_scorpid_sting */ 4:
-                    message.maintainScorpidSting = reader.bool();
-                    break;
-                case /* bool precast_aimed_shot */ 5:
+                case /* bool precast_aimed_shot */ 3:
                     message.precastAimedShot = reader.bool();
                     break;
-                case /* bool melee_weave */ 6:
+                case /* bool melee_weave */ 4:
                     message.meleeWeave = reader.bool();
                     break;
-                case /* double viper_start_mana_percent */ 7:
+                case /* proto.Hunter.Rotation.StingType sting */ 5:
+                    message.sting = reader.int32();
+                    break;
+                case /* double viper_start_mana_percent */ 6:
                     message.viperStartManaPercent = reader.double();
                     break;
-                case /* double viper_stop_mana_percent */ 8:
+                case /* double viper_stop_mana_percent */ 7:
                     message.viperStopManaPercent = reader.double();
                     break;
                 default:
@@ -583,30 +597,27 @@ class Hunter_Rotation$Type extends MessageType {
         return message;
     }
     internalBinaryWrite(message, writer, options) {
-        /* bool adaptive = 1; */
-        if (message.adaptive !== false)
-            writer.tag(1, WireType.Varint).bool(message.adaptive);
-        /* bool use_multi_shot = 2; */
+        /* bool use_multi_shot = 1; */
         if (message.useMultiShot !== false)
-            writer.tag(2, WireType.Varint).bool(message.useMultiShot);
-        /* bool use_arcane_shot = 3; */
+            writer.tag(1, WireType.Varint).bool(message.useMultiShot);
+        /* bool use_arcane_shot = 2; */
         if (message.useArcaneShot !== false)
-            writer.tag(3, WireType.Varint).bool(message.useArcaneShot);
-        /* bool maintain_scorpid_sting = 4; */
-        if (message.maintainScorpidSting !== false)
-            writer.tag(4, WireType.Varint).bool(message.maintainScorpidSting);
-        /* bool precast_aimed_shot = 5; */
+            writer.tag(2, WireType.Varint).bool(message.useArcaneShot);
+        /* bool precast_aimed_shot = 3; */
         if (message.precastAimedShot !== false)
-            writer.tag(5, WireType.Varint).bool(message.precastAimedShot);
-        /* bool melee_weave = 6; */
+            writer.tag(3, WireType.Varint).bool(message.precastAimedShot);
+        /* bool melee_weave = 4; */
         if (message.meleeWeave !== false)
-            writer.tag(6, WireType.Varint).bool(message.meleeWeave);
-        /* double viper_start_mana_percent = 7; */
+            writer.tag(4, WireType.Varint).bool(message.meleeWeave);
+        /* proto.Hunter.Rotation.StingType sting = 5; */
+        if (message.sting !== 0)
+            writer.tag(5, WireType.Varint).int32(message.sting);
+        /* double viper_start_mana_percent = 6; */
         if (message.viperStartManaPercent !== 0)
-            writer.tag(7, WireType.Bit64).double(message.viperStartManaPercent);
-        /* double viper_stop_mana_percent = 8; */
+            writer.tag(6, WireType.Bit64).double(message.viperStartManaPercent);
+        /* double viper_stop_mana_percent = 7; */
         if (message.viperStopManaPercent !== 0)
-            writer.tag(8, WireType.Bit64).double(message.viperStopManaPercent);
+            writer.tag(7, WireType.Bit64).double(message.viperStopManaPercent);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

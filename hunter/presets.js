@@ -24,7 +24,6 @@ export const SurvivalTalents = {
     data: '502-0550201205-333200022003223005103',
 };
 export const DefaultRotation = HunterRotation.create({
-    adaptive: true,
     useMultiShot: true,
     meleeWeave: false,
     viperStartManaPercent: 0.2,

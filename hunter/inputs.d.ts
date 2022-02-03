@@ -3,7 +3,7 @@ import { ActionId } from '/tbc/core/proto_utils/action_id.js';
 import { Player } from '/tbc/core/player.js';
 import { IndividualSimUI } from '/tbc/core/individual_sim_ui.js';
 import { EventID, TypedEvent } from '/tbc/core/typed_event.js';
-import { Hunter_Options_Ammo as Ammo, Hunter_Options_QuiverBonus as QuiverBonus, Hunter_Options_PetType as PetType } from '/tbc/core/proto/hunter.js';
+import { Hunter_Rotation_StingType as StingType, Hunter_Options_Ammo as Ammo, Hunter_Options_QuiverBonus as QuiverBonus, Hunter_Options_PetType as PetType } from '/tbc/core/proto/hunter.js';
 export declare const Quiver: {
     extraCssClasses: string[];
     numColumns: number;
@@ -78,6 +78,22 @@ export declare const HunterRotationConfig: {
             changedEvent: (player: Player<Spec.SpecHunter>) => TypedEvent<void>;
             getValue: (player: Player<Spec.SpecHunter>) => boolean;
             setValue: (eventID: EventID, player: Player<Spec.SpecHunter>, newValue: boolean) => void;
+            values?: undefined;
+        };
+    } | {
+        type: "enum";
+        cssClass: string;
+        getModObject: (simUI: IndividualSimUI<any>) => Player<any>;
+        config: {
+            label: string;
+            labelTooltip: string;
+            values: {
+                name: string;
+                value: StingType;
+            }[];
+            changedEvent: (player: Player<Spec.SpecHunter>) => TypedEvent<void>;
+            getValue: (player: Player<Spec.SpecHunter>) => StingType;
+            setValue: (eventID: EventID, player: Player<Spec.SpecHunter>, newValue: number) => void;
         };
     } | {
         type: "number";
@@ -89,6 +105,7 @@ export declare const HunterRotationConfig: {
             changedEvent: (player: Player<Spec.SpecHunter>) => TypedEvent<void>;
             getValue: (player: Player<Spec.SpecHunter>) => number;
             setValue: (eventID: EventID, player: Player<Spec.SpecHunter>, newValue: number) => void;
+            values?: undefined;
         };
     })[];
 };

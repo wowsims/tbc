@@ -217,41 +217,54 @@ export interface Hunter {
  */
 export interface Hunter_Rotation {
     /**
-     * @generated from protobuf field: bool adaptive = 1;
-     */
-    adaptive: boolean;
-    /**
-     * @generated from protobuf field: bool use_multi_shot = 2;
+     * @generated from protobuf field: bool use_multi_shot = 1;
      */
     useMultiShot: boolean;
     /**
-     * @generated from protobuf field: bool use_arcane_shot = 3;
+     * @generated from protobuf field: bool use_arcane_shot = 2;
      */
     useArcaneShot: boolean;
     /**
-     * @generated from protobuf field: bool maintain_scorpid_sting = 4;
-     */
-    maintainScorpidSting: boolean;
-    /**
-     * @generated from protobuf field: bool precast_aimed_shot = 5;
+     * @generated from protobuf field: bool precast_aimed_shot = 3;
      */
     precastAimedShot: boolean;
     /**
-     * @generated from protobuf field: bool melee_weave = 6;
+     * @generated from protobuf field: bool melee_weave = 4;
      */
     meleeWeave: boolean;
     /**
+     * @generated from protobuf field: proto.Hunter.Rotation.StingType sting = 5;
+     */
+    sting: Hunter_Rotation_StingType;
+    /**
      * Switch to Aspect of the Viper when mana goes below this percent.
      *
-     * @generated from protobuf field: double viper_start_mana_percent = 7;
+     * @generated from protobuf field: double viper_start_mana_percent = 6;
      */
     viperStartManaPercent: number;
     /**
      * Switch back to Aspect of the Hawk when mana goes above this percent.
      *
-     * @generated from protobuf field: double viper_stop_mana_percent = 8;
+     * @generated from protobuf field: double viper_stop_mana_percent = 7;
      */
     viperStopManaPercent: number;
+}
+/**
+ * @generated from protobuf enum proto.Hunter.Rotation.StingType
+ */
+export declare enum Hunter_Rotation_StingType {
+    /**
+     * @generated from protobuf enum value: NoSting = 0;
+     */
+    NoSting = 0,
+    /**
+     * @generated from protobuf enum value: ScorpidSting = 1;
+     */
+    ScorpidSting = 1,
+    /**
+     * @generated from protobuf enum value: SerpentSting = 2;
+     */
+    SerpentSting = 2
 }
 /**
  * @generated from protobuf message proto.Hunter.Options

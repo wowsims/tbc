@@ -1,5 +1,5 @@
 import { ActionId } from '/tbc/core/proto_utils/action_id.js';
-import { Hunter_Options_Ammo as Ammo, Hunter_Options_QuiverBonus as QuiverBonus, Hunter_Options_PetType as PetType, } from '/tbc/core/proto/hunter.js';
+import { Hunter_Rotation_StingType as StingType, Hunter_Options_Ammo as Ammo, Hunter_Options_QuiverBonus as QuiverBonus, Hunter_Options_PetType as PetType, } from '/tbc/core/proto/hunter.js';
 // Configuration for spec-specific UI elements on the settings tab.
 // These don't need to be in a separate file but it keeps things cleaner.
 export const Quiver = {
@@ -97,21 +97,6 @@ export const PetTypeInput = {
 export const HunterRotationConfig = {
     inputs: [
         {
-            type: 'boolean', cssClass: 'adaptive-picker',
-            getModObject: (simUI) => simUI.player,
-            config: {
-                label: 'Adaptive',
-                labelTooltip: 'Adapts rotation based on attack speed / mana.',
-                changedEvent: (player) => player.rotationChangeEmitter,
-                getValue: (player) => player.getRotation().adaptive,
-                setValue: (eventID, player, newValue) => {
-                    const newRotation = player.getRotation();
-                    newRotation.adaptive = newValue;
-                    player.setRotation(eventID, newRotation);
-                },
-            },
-        },
-        {
             type: 'boolean', cssClass: 'use-multi-shot-picker',
             getModObject: (simUI) => simUI.player,
             config: {
@@ -142,16 +127,21 @@ export const HunterRotationConfig = {
             },
         },
         {
-            type: 'boolean', cssClass: 'maintain-scorpid-sting-picker',
+            type: 'enum', cssClass: 'sting-picker',
             getModObject: (simUI) => simUI.player,
             config: {
-                label: 'Maintain Scorpid Sting',
-                labelTooltip: 'Casts scorpid sting when the primary target does not have the debuff.',
+                label: 'Sting',
+                labelTooltip: 'Maintains the selected Sting on the primary target.',
+                values: [
+                    { name: 'None', value: StingType.NoSting },
+                    { name: 'Scorpid Sting', value: StingType.ScorpidSting },
+                    { name: 'Serpent Sting', value: StingType.SerpentSting },
+                ],
                 changedEvent: (player) => player.rotationChangeEmitter,
-                getValue: (player) => player.getRotation().maintainScorpidSting,
+                getValue: (player) => player.getRotation().sting,
                 setValue: (eventID, player, newValue) => {
                     const newRotation = player.getRotation();
-                    newRotation.maintainScorpidSting = newValue;
+                    newRotation.sting = newValue;
                     player.setRotation(eventID, newRotation);
                 },
             },
