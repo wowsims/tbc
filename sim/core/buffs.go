@@ -221,6 +221,22 @@ func applyBuffEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs proto.P
 	}
 }
 
+// Applies buffs to pets.
+func applyPetBuffEffects(petAgent PetAgent, raidBuffs proto.RaidBuffs, partyBuffs proto.PartyBuffs, individualBuffs proto.IndividualBuffs) {
+	// Summoned pets, like Mage Water Elemental, aren't around to receive raid buffs.
+	if !petAgent.GetPet().initialEnabled {
+		return
+	}
+
+	// We need to modify the buffs a bit because some things are applied to pets by
+	// the owner during combat (Bloodlust) or don't make sense for a pet.
+	partyBuffs.Bloodlust = 0
+	individualBuffs.Innervates = 0
+	individualBuffs.PowerInfusions = 0
+
+	applyBuffEffects(petAgent, raidBuffs, partyBuffs, individualBuffs)
+}
+
 var SnapshotImprovedWrathOfAirTotemAuraID = NewAuraID()
 
 func SnapshotImprovedWrathOfAirTotemAura(character *Character) AuraFactory {
@@ -341,7 +357,7 @@ func IsEligibleForWindfuryTotem(character *Character) bool {
 	return character.AutoAttacks.IsEnabled() &&
 		character.HasMHWeapon() &&
 		!character.HasMHWeaponImbue &&
-		character.consumes.MainHandImbue == proto.WeaponImbue_WeaponImbueUnknown
+		character.Consumes.MainHandImbue == proto.WeaponImbue_WeaponImbueUnknown
 }
 
 func WindfuryTotemAura(character *Character, rank int32, iwtTalentPoints int32) Aura {

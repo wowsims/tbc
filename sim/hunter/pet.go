@@ -88,6 +88,7 @@ func (hunter *Hunter) NewHunterPet() *HunterPet {
 		},
 	})
 
+	core.ApplyPetConsumeEffects(&hp.Character, hunter.Consumes.PetFood)
 	hp.applyPetEffects()
 
 	hunter.AddPet(hp)

@@ -92,6 +92,7 @@ var FullIndividualBuffs = &proto.IndividualBuffs{
 var FullConsumes = &proto.Consumes{
 	FlaskOfRelentlessAssault: true,
 	DefaultPotion:            proto.Potions_HastePotion,
+	PetFood:                  proto.PetFood_PetFoodKiblersBits,
 }
 
 var FullDebuffs = &proto.Debuffs{
