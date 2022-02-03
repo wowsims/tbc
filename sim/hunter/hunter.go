@@ -60,6 +60,12 @@ type Hunter struct {
 	scorpidStingTemplate core.MeleeAbilityTemplate
 	scorpidSting         core.ActiveMeleeAbility
 
+	serpentStingTemplate core.MeleeAbilityTemplate
+	serpentSting         core.ActiveMeleeAbility
+
+	serpentStingDotTemplate core.SimpleSpellTemplate
+	serpentStingDot         core.SimpleSpell
+
 	steadyShotCastTemplate core.SimpleCast
 	steadyShotCast         core.SimpleCast
 
@@ -100,6 +106,8 @@ func (hunter *Hunter) Init(sim *core.Simulation) {
 	hunter.killCommandTemplate = hunter.newKillCommandTemplate(sim)
 	hunter.multiShotTemplate = hunter.newMultiShotTemplate(sim)
 	hunter.scorpidStingTemplate = hunter.newScorpidStingTemplate(sim)
+	hunter.serpentStingTemplate = hunter.newSerpentStingTemplate(sim)
+	hunter.serpentStingDotTemplate = hunter.newSerpentStingDotTemplate(sim)
 	hunter.steadyShotCastTemplate = hunter.newSteadyShotCastTemplate(sim)
 	hunter.steadyShotAbilityTemplate = hunter.newSteadyShotAbilityTemplate(sim)
 }

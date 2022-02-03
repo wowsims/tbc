@@ -43,12 +43,11 @@ var PlayerOptionsWindSerpent = &proto.Player_Hunter{
 }
 
 var hunterRotation = &proto.Hunter_Rotation{
-	Adaptive:             true,
-	UseMultiShot:         true,
-	UseArcaneShot:        true,
-	MaintainScorpidSting: true,
-	PrecastAimedShot:     true,
-	MeleeWeave:           true,
+	UseMultiShot:     true,
+	UseArcaneShot:    true,
+	Sting:            proto.Hunter_Rotation_SerpentSting,
+	PrecastAimedShot: true,
+	MeleeWeave:       true,
 
 	ViperStartManaPercent: 0.2,
 	ViperStopManaPercent:  0.3,

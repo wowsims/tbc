@@ -41,7 +41,6 @@ export const SurvivalTalents = {
 };
 
 export const DefaultRotation = HunterRotation.create({
-	adaptive: true,
 	useMultiShot: true,
 	meleeWeave: false,
 	viperStartManaPercent: 0.2,

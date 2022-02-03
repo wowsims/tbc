@@ -13,6 +13,7 @@ import { EventID, TypedEvent } from '/tbc/core/typed_event.js';
 import {
 	Hunter,
 	Hunter_Rotation as HunterRotation,
+	Hunter_Rotation_StingType as StingType,
 	Hunter_Options as HunterOptions,
 	Hunter_Options_Ammo as Ammo,
 	Hunter_Options_QuiverBonus as QuiverBonus,
@@ -121,21 +122,6 @@ export const PetTypeInput = {
 export const HunterRotationConfig = {
 	inputs: [
 		{
-			type: 'boolean' as const, cssClass: 'adaptive-picker',
-			getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
-			config: {
-				label: 'Adaptive',
-				labelTooltip: 'Adapts rotation based on attack speed / mana.',
-				changedEvent: (player: Player<Spec.SpecHunter>) => player.rotationChangeEmitter,
-				getValue: (player: Player<Spec.SpecHunter>) => player.getRotation().adaptive,
-				setValue: (eventID: EventID, player: Player<Spec.SpecHunter>, newValue: boolean) => {
-					const newRotation = player.getRotation();
-					newRotation.adaptive = newValue;
-					player.setRotation(eventID, newRotation);
-				},
-			},
-		},
-		{
 			type: 'boolean' as const, cssClass: 'use-multi-shot-picker',
 			getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
 			config: {
@@ -166,16 +152,21 @@ export const HunterRotationConfig = {
 			},
 		},
 		{
-			type: 'boolean' as const, cssClass: 'maintain-scorpid-sting-picker',
+			type: 'enum' as const, cssClass: 'sting-picker',
 			getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
 			config: {
-				label: 'Maintain Scorpid Sting',
-				labelTooltip: 'Casts scorpid sting when the primary target does not have the debuff.',
+				label: 'Sting',
+				labelTooltip: 'Maintains the selected Sting on the primary target.',
+				values: [
+					{ name: 'None', value: StingType.NoSting },
+					{ name: 'Scorpid Sting', value: StingType.ScorpidSting },
+					{ name: 'Serpent Sting', value: StingType.SerpentSting },
+				],
 				changedEvent: (player: Player<Spec.SpecHunter>) => player.rotationChangeEmitter,
-				getValue: (player: Player<Spec.SpecHunter>) => player.getRotation().maintainScorpidSting,
-				setValue: (eventID: EventID, player: Player<Spec.SpecHunter>, newValue: boolean) => {
+				getValue: (player: Player<Spec.SpecHunter>) => player.getRotation().sting,
+				setValue: (eventID: EventID, player: Player<Spec.SpecHunter>, newValue: number) => {
 					const newRotation = player.getRotation();
-					newRotation.maintainScorpidSting = newValue;
+					newRotation.sting = newValue;
 					player.setRotation(eventID, newRotation);
 				},
 			},
