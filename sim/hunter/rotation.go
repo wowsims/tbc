@@ -67,18 +67,6 @@ func (hunter *Hunter) OnGCDReady(sim *core.Simulation) {
 }
 
 func (hunter *Hunter) OnManaTick(sim *core.Simulation) {
-	// Can't add/remove auras within OnMeleeAttack so have to switch aspects here instead.
-	if hunter.changingAspects {
-		if hunter.aspectOfTheViper {
-			hunter.RemoveAura(sim, AspectOfTheHawkAuraID)
-			hunter.AddAura(sim, hunter.aspectOfTheViperAura())
-		} else {
-			hunter.RemoveAura(sim, AspectOfTheViperAuraID)
-			hunter.AddAura(sim, hunter.aspectOfTheHawkAura())
-		}
-		hunter.changingAspects = false
-	}
-
 	if hunter.aspectOfTheViper {
 		// https://wowpedia.fandom.com/wiki/Aspect_of_the_Viper?oldid=1458832
 		percentMana := core.MaxFloat(0.2, core.MinFloat(0.9, hunter.CurrentManaPercent()))

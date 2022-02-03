@@ -35,7 +35,6 @@ type Hunter struct {
 	AmmoDamageBonus float64
 
 	aspectOfTheViper bool // False indicates aspect of the hawk.
-	changingAspects  bool // True when trying to change aspects.
 
 	hasGronnstalker2Pc bool
 
@@ -70,6 +69,10 @@ type Hunter struct {
 
 func (hunter *Hunter) GetCharacter() *core.Character {
 	return &hunter.Character
+}
+
+func (hunter *Hunter) GetHunter() *Hunter {
+	return hunter
 }
 
 func (hunter *Hunter) AddRaidBuffs(raidBuffs *proto.RaidBuffs) {

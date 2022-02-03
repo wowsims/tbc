@@ -1,11 +1,17 @@
 package hunter
 
 import (
+	"log"
+	"time"
+
 	"github.com/wowsims/tbc/sim/core"
+	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 func init() {
-	//core.AddItemEffect(19344, ApplyNaturalAlignmentCrystal)
+	core.AddItemEffect(30448, ApplyTalonOfAlar)
+	core.AddItemEffect(30892, ApplyBeasttamersShoulders)
+	core.AddItemEffect(32487, ApplyAshtongueTalismanOfSwiftness)
 
 	core.AddItemSet(ItemSetBeastLord)
 	core.AddItemSet(ItemSetDemonStalker)
@@ -61,4 +67,76 @@ var ItemSetGronnstalker = core.ItemSet{
 			// Handled in steady_shot.go
 		},
 	},
+}
+
+var TalonOfAlarAuraID = core.NewAuraID()
+var TalonOfAlarProcAuraID = core.NewAuraID()
+
+func ApplyTalonOfAlar(agent core.Agent) {
+	character := agent.GetCharacter()
+	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
+		procAura := core.Aura{
+			ID:       TalonOfAlarAuraID,
+			ActionID: core.ActionID{ItemID: 30448},
+			OnBeforeMeleeHit: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
+				if !ability.SameAction(SteadyShotActionID) &&
+					!ability.SameAction(MultiShotActionID) &&
+					!ability.SameAction(ArcaneShotActionID) &&
+					!ability.SameAction(AimedShotActionID) {
+					return
+				}
+				hitEffect.DirectInput.FlatDamageBonus += 40
+			},
+		}
+
+		return core.Aura{
+			ID: TalonOfAlarAuraID,
+			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
+				if !ability.SameAction(ArcaneShotActionID) {
+					return
+				}
+
+				aura := procAura
+				// Add 1 in case we use arcane shot exactly off CD.
+				aura.Expires = sim.CurrentTime + time.Second*6 + 1
+
+				character.AddAuraOnNextAdvance(sim, aura)
+			},
+		}
+	})
+}
+
+func ApplyBeasttamersShoulders(agent core.Agent) {
+	hunterAgent, ok := agent.(Agent)
+	if !ok {
+		log.Fatalf("Non-hunter attempted to activate hunter item effect.")
+	}
+	hunter := hunterAgent.GetHunter()
+
+	hunter.pet.damageMultiplier *= 1.03
+	hunter.pet.AddStat(stats.MeleeCrit, core.MeleeCritRatingPerCritChance*2)
+}
+
+var AshtongueTalismanOfSwiftnessAuraID = core.NewAuraID()
+var AshtongueTalismanOfSwiftnessProcAuraID = core.NewAuraID()
+
+func ApplyAshtongueTalismanOfSwiftness(agent core.Agent) {
+	character := agent.GetCharacter()
+	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
+		statApplier := character.NewTempStatAuraApplier(sim, AshtongueTalismanOfSwiftnessProcAuraID, core.ActionID{ItemID: 32487}, stats.AttackPower, 275, time.Second*8)
+		const procChance = 0.15
+
+		return core.Aura{
+			ID: AshtongueTalismanOfSwiftnessAuraID,
+			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
+				if !ability.SameAction(SteadyShotActionID) {
+					return
+				}
+				if sim.RandomFloat("Ashtongue Talisman of Swiftness") > procChance {
+					return
+				}
+				statApplier(sim)
+			},
+		}
+	})
 }

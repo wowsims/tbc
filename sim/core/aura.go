@@ -174,6 +174,7 @@ type auraTracker struct {
 	onBeforeMeleeIDs          []AuraID
 	onBeforeMeleeHitIDs       []AuraID
 
+	aurasToAdd      []Aura
 	auraIDsToRemove []AuraID
 
 	// Metrics for each aura.
@@ -247,6 +248,7 @@ func (at *auraTracker) reset(sim *Simulation) {
 	at.onBeforeMeleeIDs = at.onBeforeMeleeIDs[:0]
 	at.onBeforeMeleeHitIDs = at.onBeforeMeleeHitIDs[:0]
 
+	at.aurasToAdd = []Aura{}
 	at.auraIDsToRemove = []AuraID{}
 
 	for i, _ := range at.metrics {
@@ -275,6 +277,17 @@ func (at *auraTracker) advance(sim *Simulation) {
 
 		for _, id := range toRemove {
 			at.RemoveAura(sim, id)
+		}
+	}
+
+	if len(at.aurasToAdd) > 0 {
+		// Copy to temp array so there are no issues if AddAuraOnNextAdvance()
+		// is called within the loop.
+		toAdd := at.aurasToAdd
+		at.aurasToAdd = []Aura{}
+
+		for _, aura := range toAdd {
+			at.AddAura(sim, aura)
 		}
 	}
 
@@ -500,6 +513,13 @@ func (at *auraTracker) RemoveAura(sim *Simulation, id AuraID) {
 	}
 
 	at.auras[id] = Aura{}
+}
+
+// Registers an ID to be added on the next advance() call. This is used instead
+// of AddAura() when calling from inside a callback like OnSpellHit() to avoid
+// modifying auraTracker arrays while they are being looped over.
+func (at *auraTracker) AddAuraOnNextAdvance(sim *Simulation, aura Aura) {
+	at.aurasToAdd = append(at.aurasToAdd, aura)
 }
 
 // Registers an ID to be removed on the next advance() call. This is used instead
