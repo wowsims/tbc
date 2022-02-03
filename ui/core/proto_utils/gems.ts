@@ -125,6 +125,7 @@ export const BRILLIANT_LIONSEYE = 32204;
 
 // Green
 export const JAGGED_SEASPRAY_EMERALD = 32226;
+export const JAGGED_TALASITE = 24067;
 
 const gemSocketCssClasses: Partial<Record<GemColor, string>> = {
   [GemColor.GemColorBlue]: 'socket-color-blue',

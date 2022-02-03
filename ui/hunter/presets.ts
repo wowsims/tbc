@@ -62,6 +62,7 @@ export const DefaultConsumes = Consumes.create({
 export const P1_BM_PRESET = {
 	name: 'P1 BM Preset',
 	tooltip: Tooltips.BASIC_BIS_DISCLAIMER,
+	enableWhen: (player: Player<any>) => player.getTalentTree() != 2,
 	gear: EquipmentSpec.create({
 		items: [
 			ItemSpec.create({
@@ -162,6 +163,7 @@ export const P1_BM_PRESET = {
 export const P2_BM_PRESET = {
 	name: 'P2 BM Preset',
 	tooltip: Tooltips.BASIC_BIS_DISCLAIMER,
+	enableWhen: (player: Player<any>) => player.getTalentTree() != 2,
 	gear: EquipmentSpec.create({
 		items: [
 			ItemSpec.create({
@@ -258,6 +260,7 @@ export const P2_BM_PRESET = {
 export const P3_BM_PRESET = {
 	name: 'P3 BM Preset',
 	tooltip: Tooltips.BASIC_BIS_DISCLAIMER,
+	enableWhen: (player: Player<any>) => player.getTalentTree() != 2,
 	gear: EquipmentSpec.create({
 		items: [
 			ItemSpec.create({
@@ -350,6 +353,329 @@ export const P3_BM_PRESET = {
 			}),
 			ItemSpec.create({
 				id: 30906, // Bristleblitz Striker
+				enchant: Enchants.STABILIZED_ETERNIUM_SCOPE,
+			}),
+		],
+	}),
+};
+
+export const P1_SV_PRESET = {
+	name: 'P1 SV Preset',
+	tooltip: Tooltips.BASIC_BIS_DISCLAIMER,
+	enableWhen: (player: Player<any>) => player.getTalentTree() == 2,
+	gear: EquipmentSpec.create({
+		items: [
+			ItemSpec.create({
+				id: 28275, // Beast Lord Helm
+				enchant: Enchants.GLYPH_OF_FEROCITY,
+				gems: [
+					Gems.GLINTING_NOBLE_TOPAZ,
+					Gems.RELENTLESS_EARTHSTORM_DIAMOND,
+				],
+			}),
+			ItemSpec.create({
+				id: 28343, // Jagged Bark Pendant
+			}),
+			ItemSpec.create({
+				id: 27801, // Beast Lord Mantle
+				enchant: Enchants.GREATER_INSCRIPTION_OF_VENGEANCE,
+				gems: [
+					Gems.DELICATE_LIVING_RUBY,
+					Gems.DELICATE_LIVING_RUBY,
+				],
+			}),
+			ItemSpec.create({
+				id: 29382, // Blood Knight War Cloak
+				enchant: Enchants.CLOAK_GREATER_AGILITY,
+			}),
+			ItemSpec.create({
+				id: 28228, // Beast Lord Cuirass
+				enchant: Enchants.CHEST_EXCEPTIONAL_STATS,
+				gems: [
+					Gems.DELICATE_LIVING_RUBY,
+					Gems.DELICATE_LIVING_RUBY,
+					Gems.SHIFTING_NIGHTSEYE,
+				],
+			}),
+			ItemSpec.create({
+				id: 25697, // Felstalker Bracers
+				enchant: Enchants.WRIST_ASSAULT,
+				gems: [
+					Gems.DELICATE_LIVING_RUBY,
+				],
+			}),
+			ItemSpec.create({
+				id: 27474, // Beast Lord Handguards
+				enchant: Enchants.GLOVES_MAJOR_AGILITY,
+				gems: [
+					Gems.DELICATE_LIVING_RUBY,
+					Gems.DELICATE_LIVING_RUBY,
+				],
+			}),
+			ItemSpec.create({
+				id: 28750, // Girdle of Treachery
+				gems: [
+					Gems.DELICATE_LIVING_RUBY,
+					Gems.DELICATE_LIVING_RUBY,
+				],
+			}),
+			ItemSpec.create({
+				id: 28741, // Skulker's Greaves
+				enchant: Enchants.NETHERCOBRA_LEG_ARMOR,
+				gems: [
+					Gems.DELICATE_LIVING_RUBY,
+					Gems.DELICATE_LIVING_RUBY,
+					Gems.DELICATE_LIVING_RUBY,
+				],
+			}),
+			ItemSpec.create({
+				id: 28545, // Edgewalker Longboots
+				enchant: Enchants.FEET_DEXTERITY,
+				gems: [
+					Gems.DELICATE_LIVING_RUBY,
+					Gems.DELICATE_LIVING_RUBY,
+				],
+			}),
+			ItemSpec.create({
+				id: 31277, // Pathfinder's Band
+			}),
+			ItemSpec.create({
+				id: 28791, // Ring of the Recalcitrant
+			}),
+			ItemSpec.create({
+				id: 28830, // Dragonspine Trophy
+			}),
+			ItemSpec.create({
+				id: 29383, // Bloodlust Brooch
+			}),
+			ItemSpec.create({
+				id: 27846, // Claw of the Watcher
+				enchant: Enchants.WEAPON_GREATER_AGILITY,
+				gems: [
+					Gems.DELICATE_LIVING_RUBY,
+					Gems.DELICATE_LIVING_RUBY,
+				],
+			}),
+			ItemSpec.create({
+				id: 28572, // Blade of the Unrequited
+				enchant: Enchants.WEAPON_GREATER_AGILITY,
+				gems: [
+					Gems.DELICATE_LIVING_RUBY,
+					Gems.GLINTING_NOBLE_TOPAZ,
+					Gems.SHIFTING_NIGHTSEYE,
+				],
+			}),
+			ItemSpec.create({
+				id: 28772, // Sunfury Bow of the Pheonix
+				enchant: Enchants.STABILIZED_ETERNIUM_SCOPE,
+			}),
+		],
+	}),
+};
+
+export const P2_SV_PRESET = {
+	name: 'P2 SV Preset',
+	tooltip: Tooltips.BASIC_BIS_DISCLAIMER,
+	enableWhen: (player: Player<any>) => player.getTalentTree() == 2,
+	gear: EquipmentSpec.create({
+		items: [
+			ItemSpec.create({
+				id: 30141, // Rift Stalker Helm
+				enchant: Enchants.GLYPH_OF_FEROCITY,
+				gems: [
+					Gems.DELICATE_LIVING_RUBY,
+					Gems.RELENTLESS_EARTHSTORM_DIAMOND,
+				],
+			}),
+			ItemSpec.create({
+				id: 30017, // Telonicus's Pendant of Mayhem
+			}),
+			ItemSpec.create({
+				id: 30143, // Rift Stalker Mantle
+				enchant: Enchants.GREATER_INSCRIPTION_OF_VENGEANCE,
+				gems: [
+					Gems.DELICATE_LIVING_RUBY,
+					Gems.DELICATE_LIVING_RUBY,
+				],
+			}),
+			ItemSpec.create({
+				id: 29994, // Thalassian Wildercloak
+				enchant: Enchants.CLOAK_GREATER_AGILITY,
+			}),
+			ItemSpec.create({
+				id: 30054, // Ranger-General's Chestguard
+				enchant: Enchants.CHEST_EXCEPTIONAL_STATS,
+				gems: [
+					Gems.DELICATE_LIVING_RUBY,
+					Gems.DELICATE_LIVING_RUBY,
+					Gems.DELICATE_LIVING_RUBY,
+				],
+			}),
+			ItemSpec.create({
+				id: 29966, // Vambraces of Ending
+				enchant: Enchants.WRIST_ASSAULT,
+				gems: [
+					Gems.DELICATE_LIVING_RUBY,
+				],
+			}),
+			ItemSpec.create({
+				id: 28506, // Gloves of Dexterous Manipulation
+				enchant: Enchants.GLOVES_MAJOR_AGILITY,
+				gems: [
+					Gems.DELICATE_LIVING_RUBY,
+					Gems.DELICATE_LIVING_RUBY,
+				],
+			}),
+			ItemSpec.create({
+				id: 30040, // Belt of Deep Shadow
+				gems: [
+					Gems.DELICATE_LIVING_RUBY,
+					Gems.DELICATE_LIVING_RUBY,
+				],
+			}),
+			ItemSpec.create({
+				id: 29985, // Void Reaver Greaves
+				enchant: Enchants.NETHERCOBRA_LEG_ARMOR,
+				gems: [
+					Gems.DELICATE_LIVING_RUBY,
+					Gems.GLINTING_NOBLE_TOPAZ,
+					Gems.SHIFTING_NIGHTSEYE,
+				],
+			}),
+			ItemSpec.create({
+				id: 30104, // Cobra-Lash Boots
+				enchant: Enchants.FEET_DEXTERITY,
+				gems: [
+					Gems.JAGGED_TALASITE,
+					Gems.DELICATE_LIVING_RUBY,
+				],
+			}),
+			ItemSpec.create({
+				id: 29298, // Band of Eternity
+			}),
+			ItemSpec.create({
+				id: 28791, // Ring of the Recalcitrant
+			}),
+			ItemSpec.create({
+				id: 28830, // Dragonspine Trophy
+			}),
+			ItemSpec.create({
+				id: 29383, // Bloodlust Brooch
+			}),
+			ItemSpec.create({
+				id: 29924, // Netherbane
+				enchant: Enchants.WEAPON_GREATER_AGILITY,
+			}),
+			ItemSpec.create({
+				id: 29948, // Claw of the Phoenix
+				enchant: Enchants.WEAPON_GREATER_AGILITY,
+			}),
+			ItemSpec.create({
+				id: 30105, // Serpent Spine Longbow
+				enchant: Enchants.STABILIZED_ETERNIUM_SCOPE,
+			}),
+		],
+	}),
+};
+
+export const P3_SV_PRESET = {
+	name: 'P3 SV Preset',
+	tooltip: Tooltips.BASIC_BIS_DISCLAIMER,
+	enableWhen: (player: Player<any>) => player.getTalentTree() == 2,
+	gear: EquipmentSpec.create({
+		items: [
+			ItemSpec.create({
+				id: 31003, // Gonnstalker's Helmt
+				enchant: Enchants.GLYPH_OF_FEROCITY,
+				gems: [
+					Gems.DELICATE_CRIMSON_SPINEL,
+					Gems.RELENTLESS_EARTHSTORM_DIAMOND,
+				],
+			}),
+			ItemSpec.create({
+				id: 30017, // Telonicus's Pendant of Mayhem
+			}),
+			ItemSpec.create({
+				id: 31006, // Gronnstalker's Spaulders
+				enchant: Enchants.GREATER_INSCRIPTION_OF_VENGEANCE,
+				gems: [
+					Gems.DELICATE_CRIMSON_SPINEL,
+					Gems.DELICATE_CRIMSON_SPINEL,
+				],
+			}),
+			ItemSpec.create({
+				id: 29994, // Thalassian Wildercloak
+				enchant: Enchants.CLOAK_GREATER_AGILITY,
+			}),
+			ItemSpec.create({
+				id: 31004, // Gronnstalker's Chestguard
+				enchant: Enchants.CHEST_EXCEPTIONAL_STATS,
+				gems: [
+					Gems.DELICATE_CRIMSON_SPINEL,
+					Gems.JAGGED_SEASPRAY_EMERALD,
+					Gems.JAGGED_SEASPRAY_EMERALD,
+				],
+			}),
+			ItemSpec.create({
+				id: 32324, // Insidious Bands
+				enchant: Enchants.WRIST_ASSAULT,
+				gems: [
+					Gems.DELICATE_CRIMSON_SPINEL,
+				],
+			}),
+			ItemSpec.create({
+				id: 31001, // Gronnstalker's Gloves
+				enchant: Enchants.GLOVES_MAJOR_AGILITY,
+				gems: [
+					Gems.DELICATE_CRIMSON_SPINEL,
+				],
+			}),
+			ItemSpec.create({
+				id: 30879, // Don Alejandro's Money Belt
+				gems: [
+					Gems.DELICATE_CRIMSON_SPINEL,
+					Gems.DELICATE_CRIMSON_SPINEL,
+				],
+			}),
+			ItemSpec.create({
+				id: 30900, // Bow-Stitched Leggings
+				enchant: Enchants.NETHERCOBRA_LEG_ARMOR,
+				gems: [
+					Gems.DELICATE_CRIMSON_SPINEL,
+					Gems.DELICATE_CRIMSON_SPINEL,
+					Gems.DELICATE_CRIMSON_SPINEL,
+				],
+			}),
+			ItemSpec.create({
+				id: 32366, // Shadowmaster's Boots
+				gems: [
+					Gems.DELICATE_CRIMSON_SPINEL,
+					Gems.DELICATE_CRIMSON_SPINEL,
+				],
+				enchant: Enchants.FEET_DEXTERITY,
+			}),
+			ItemSpec.create({
+				id: 28791, // Ring of the Recalcitrant
+			}),
+			ItemSpec.create({
+				id: 29301, // Band of the Eternal Champion
+			}),
+			ItemSpec.create({
+				id: 28830, // Dragonspine Trophy
+			}),
+			ItemSpec.create({
+				id: 32505, // Madness of the Betrayer
+			}),
+			ItemSpec.create({
+				id: 30881, // Blade of Infamy
+				enchant: Enchants.WEAPON_GREATER_AGILITY,
+			}),
+			ItemSpec.create({
+				id: 30881, // Blade of Infamy
+				enchant: Enchants.WEAPON_GREATER_AGILITY,
+			}),
+			ItemSpec.create({
+				id: 32336, // Black Bow of the Betrayer
 				enchant: Enchants.STABILIZED_ETERNIUM_SCOPE,
 			}),
 		],

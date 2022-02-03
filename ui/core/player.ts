@@ -42,6 +42,7 @@ import {
 	classColors,
 	getEligibleEnchantSlots,
 	getEligibleItemSlots,
+	getTalentTree,
 	getTalentTreeIcon,
 	getMetaGemEffectEP,
 	raceToFaction,
@@ -418,6 +419,10 @@ export class Player<SpecType extends Spec> {
     this.talentsString = newTalentsString;
     this.talentsStringChangeEmitter.emit(eventID);
   }
+
+	getTalentTree(): number {
+		return getTalentTree(this.getTalentsString());
+	}
 
 	getTalentTreeIcon(): string {
 		return getTalentTreeIcon(this.spec, this.getTalentsString());
