@@ -10,7 +10,7 @@ import (
 // Registers all consume-related effects to the Agent.
 func applyConsumeEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs proto.PartyBuffs) {
 	character := agent.GetCharacter()
-	consumes := character.consumes
+	consumes := character.Consumes
 
 	character.AddStats(consumesStats(character, consumes, raidBuffs))
 
@@ -114,6 +114,11 @@ func consumesStats(character *Character, c proto.Consumes, raidBuffs proto.RaidB
 		s[stats.Agility] += 20
 		s[stats.Spirit] += 20
 	}
+	if c.RavagerDog {
+		s[stats.AttackPower] += 40
+		s[stats.RangedAttackPower] += 40
+		s[stats.Spirit] += 20
+	}
 	if c.ScrollOfAgilityV {
 		s[stats.Agility] += 20
 	}
@@ -127,6 +132,16 @@ func consumesStats(character *Character, c proto.Consumes, raidBuffs proto.RaidB
 	}
 
 	return s
+}
+
+func ApplyPetConsumeEffects(pet *Character, petFood proto.PetFood) {
+	switch petFood {
+	case proto.PetFood_PetFoodKiblersBits:
+		pet.AddStats(stats.Stats{
+			stats.Strength: 20,
+			stats.Spirit:   20,
+		})
+	}
 }
 
 func addImbueStats(character *Character, imbue proto.WeaponImbue) {
@@ -190,7 +205,7 @@ func registerDrumsCD(agent Agent, partyBuffs proto.PartyBuffs, consumes proto.Co
 		// Disable self-drums on other party members, so there is only 1 drummer.
 		for _, partyMember := range agent.GetCharacter().Party.Players {
 			if partyMember != agent {
-				partyMember.GetCharacter().consumes.Drums = proto.Drums_DrumsUnknown
+				partyMember.GetCharacter().Consumes.Drums = proto.Drums_DrumsUnknown
 			}
 		}
 	} else if partyBuffs.Drums != proto.Drums_DrumsUnknown {
@@ -200,7 +215,7 @@ func registerDrumsCD(agent Agent, partyBuffs proto.PartyBuffs, consumes proto.Co
 	// If we aren't casting drums, and there is another real party member doing so, then we're done.
 	if !drumsSelfCast {
 		for _, partyMember := range agent.GetCharacter().Party.Players {
-			if partyMember != agent && partyMember.GetCharacter().consumes.Drums != proto.Drums_DrumsUnknown {
+			if partyMember != agent && partyMember.GetCharacter().Consumes.Drums != proto.Drums_DrumsUnknown {
 				return
 			}
 		}

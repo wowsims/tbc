@@ -64,6 +64,7 @@ func (hunter *Hunter) tryUseGCD(sim *core.Simulation) {
 }
 
 func (hunter *Hunter) OnGCDReady(sim *core.Simulation) {
+	// Hunters do everything between auto shots, so GCD usage is handled as an aura (see above).
 }
 
 func (hunter *Hunter) OnManaTick(sim *core.Simulation) {

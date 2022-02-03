@@ -214,6 +214,11 @@ enum WeaponImbue {
 	WeaponImbueSuperiorWizardOil = 4;
 }
 
+enum PetFood {
+	PetFoodNone = 0;
+	PetFoodKiblersBits = 1;
+}
+
 // Buffs that affect the entire raid.
 message RaidBuffs {
     bool arcane_brilliance = 1;
@@ -320,6 +325,9 @@ message Consumes {
     bool roasted_clefthoof = 24;
     bool spicy_hot_talbuk = 29;
     bool grilled_mudfish = 35;
+		bool ravager_dog = 36;
+
+		PetFood pet_food = 37;
 
     bool kreegsStoutBeatdown = 20;
 

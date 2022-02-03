@@ -30,7 +30,7 @@ type Character struct {
 	energyBar
 
 	// Consumables this Character will be using.
-	consumes proto.Consumes
+	Consumes proto.Consumes
 
 	// Base stats for this Character.
 	baseStats stats.Stats
@@ -128,7 +128,7 @@ func NewCharacter(party *Party, partyIndex int, player proto.Player) Character {
 	character.Label = fmt.Sprintf("%s (#%d)", character.Name, character.RaidIndex+1)
 
 	if player.Consumes != nil {
-		character.consumes = *player.Consumes
+		character.Consumes = *player.Consumes
 	}
 
 	character.baseStats = BaseStats[BaseStatsKey{Race: character.Race, Class: character.Class}]
@@ -341,10 +341,10 @@ func (character *Character) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {
 		}
 	}
 
-	if character.consumes.Drums > 0 {
-		partyBuffs.Drums = character.consumes.Drums
+	if character.Consumes.Drums > 0 {
+		partyBuffs.Drums = character.Consumes.Drums
 	}
-	if character.consumes.BattleChicken {
+	if character.Consumes.BattleChicken {
 		partyBuffs.BattleChickens++
 	}
 
