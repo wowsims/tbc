@@ -269,36 +269,16 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 				// Remove leading '#'
 				hash = hash.substring(1);
 				try {
-					let jsonData;
-					if (new URLSearchParams(window.location.search).has('uncompressed')) {
-						const jsonStr = atob(hash);
-						const jsonData = JSON.parse(jsonStr);
-						this.sim.fromJson(initEventID, jsonData, this.player.spec);
-						loadedSettings = true;
-					} else {
-						const binary = atob(hash);
-						const bytes = new Uint8Array(binary.length);
-						for (let i = 0; i < bytes.length; i++) {
-								bytes[i] = binary.charCodeAt(i);
-						}
-						const jsonStr = pako.inflate(bytes, { to: 'string' });  
-						try {
-							jsonData = JSON.parse(jsonStr);
-						} catch (e) {
-							// Json parse failure just means we're using the new proto format so its ok.
-						}
-
-						if (jsonData) {
-							this.sim.fromJson(initEventID, jsonData, this.player.spec);
-							loadedSettings = true;
-						} else {
-							// TODO: Deprecate the json pathways and make this the default on January 25th, 2022 (1 month).
-							const settingsBytes = pako.inflate(bytes);  
-							const settings = IndividualSimSettings.fromBinary(settingsBytes);
-							this.fromProto(initEventID, settings);
-							loadedSettings = true;
-						}
+					const binary = atob(hash);
+					const bytes = new Uint8Array(binary.length);
+					for (let i = 0; i < bytes.length; i++) {
+							bytes[i] = binary.charCodeAt(i);
 					}
+
+					const settingsBytes = pako.inflate(bytes);  
+					const settings = IndividualSimSettings.fromBinary(settingsBytes);
+					this.fromProto(initEventID, settings);
+					loadedSettings = true;
 				} catch (e) {
 					console.warn('Failed to parse settings from window hash: ' + e);
 				}
@@ -308,13 +288,8 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 			const savedSettings = window.localStorage.getItem(this.getSettingsStorageKey());
 			if (!loadedSettings && savedSettings != null) {
 				try {
-					const jsonData = JSON.parse(savedSettings);
-					if (jsonData?.raid) {
-						this.sim.fromJson(initEventID, jsonData, this.player.spec);
-					} else {
-						const settings = IndividualSimSettings.fromJsonString(savedSettings);
-						this.fromProto(initEventID, settings);
-					}
+					const settings = IndividualSimSettings.fromJsonString(savedSettings);
+					this.fromProto(initEventID, settings);
 					loadedSettings = true;
 				} catch (e) {
 					console.warn('Failed to parse saved settings: ' + e);

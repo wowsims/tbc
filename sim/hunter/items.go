@@ -11,6 +11,7 @@ import (
 func init() {
 	core.AddItemEffect(30448, ApplyTalonOfAlar)
 	core.AddItemEffect(30892, ApplyBeasttamersShoulders)
+	core.AddItemEffect(32336, ApplyBlackBowOfTheBetrayer)
 	core.AddItemEffect(32487, ApplyAshtongueTalismanOfSwiftness)
 
 	core.AddItemSet(ItemSetBeastLord)
@@ -115,6 +116,24 @@ func ApplyBeasttamersShoulders(agent core.Agent) {
 
 	hunter.pet.damageMultiplier *= 1.03
 	hunter.pet.AddStat(stats.MeleeCrit, core.MeleeCritRatingPerCritChance*2)
+}
+
+var BlackBowOfTheBetrayerAuraID = core.NewAuraID()
+
+func ApplyBlackBowOfTheBetrayer(agent core.Agent) {
+	character := agent.GetCharacter()
+	const manaGain = 8.0
+	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
+		return core.Aura{
+			ID: BlackBowOfTheBetrayerAuraID,
+			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
+				if !hitEffect.Landed() || !hitEffect.IsRanged() {
+					return
+				}
+				character.AddMana(sim, manaGain, core.ActionID{SpellID: 46939}, false)
+			},
+		}
+	})
 }
 
 var AshtongueTalismanOfSwiftnessAuraID = core.NewAuraID()
