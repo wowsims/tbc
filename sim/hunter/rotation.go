@@ -2,6 +2,7 @@ package hunter
 
 import (
 	"github.com/wowsims/tbc/sim/core"
+	"github.com/wowsims/tbc/sim/core/proto"
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
@@ -40,8 +41,13 @@ func (hunter *Hunter) tryUseGCD(sim *core.Simulation) {
 	} else if !hunter.aspectOfTheViper && currentMana < hunter.Rotation.ViperStartManaPercent {
 		aspect := hunter.NewAspectOfTheViper(sim)
 		aspect.StartCast(sim)
-	} else if hunter.Rotation.MaintainScorpidSting && !target.HasAura(ScorpidStingDebuffID) {
+	} else if hunter.Rotation.Sting == proto.Hunter_Rotation_ScorpidSting && !target.HasAura(ScorpidStingDebuffID) {
 		ss := hunter.NewScorpidSting(sim, target)
+		if success := ss.Attack(sim); !success {
+			hunter.WaitForMana(sim, ss.Cost.Value)
+		}
+	} else if hunter.Rotation.Sting == proto.Hunter_Rotation_SerpentSting && !hunter.serpentStingDot.IsInUse() {
+		ss := hunter.NewSerpentSting(sim, target)
 		if success := ss.Attack(sim); !success {
 			hunter.WaitForMana(sim, ss.Cost.Value)
 		}
