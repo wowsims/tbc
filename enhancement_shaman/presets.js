@@ -43,9 +43,7 @@ export const DefaultOptions = EnhancementShamanOptions.create({
 export const DefaultConsumes = Consumes.create({
     drums: Drums.DrumsOfBattle,
     defaultPotion: Potions.SuperManaPotion,
-    flaskOfBlindingLight: true,
-    brilliantWizardOil: true,
-    blackenedBasilisk: true,
+    flaskOfRelentlessAssault: true,
 });
 export const P1_PRESET = {
     name: 'P1 Preset',
