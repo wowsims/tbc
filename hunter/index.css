@@ -1726,7 +1726,7 @@ input, select {
   width: 80%;
   display: flex;
   flex-direction: column;
-  background-image: linear-gradient(rgba(var(--theme-color-background-raw), 0.95), rgba(var(--theme-color-background-raw), 0.95)), var(--theme-background-image);
+  background-image: linear-gradient(rgba(var(--theme-color-background-raw), 0.9), rgba(var(--theme-color-background-raw), 0.9)), var(--theme-background-image);
   background-size: cover;
   background-position: center center;
   color: var(--main-text-color);
@@ -2254,10 +2254,10 @@ input, select {
 }
 
 .hunter-sim-ui {
-  --theme-color-primary: #3beb6a;
-  --theme-color-background: #124f22;
-  --theme-color-background-raw: 18, 79, 34;
-  --theme-background-image: url("/tbc/assets/enhancement_shaman_background.jpg");
+  --theme-color-primary: #2ead50;
+  --theme-color-background: #0c190f;
+  --theme-color-background-raw: 12, 25, 15;
+  --theme-background-image: url("/tbc/assets/hunter_background.jpg");
 }
 
 .hunter-sim-ui .self-buffs-section {

@@ -135,7 +135,7 @@ export const titleIcons = {
     [Spec.SpecBalanceDruid]: '/tbc/assets/balance_druid_icon.png',
     [Spec.SpecElementalShaman]: '/tbc/assets/elemental_shaman_icon.png',
     [Spec.SpecEnhancementShaman]: '/tbc/assets/enhancement_shaman_icon.png',
-    [Spec.SpecHunter]: 'https://wow.zamimg.com/images/wow/icons/large/ability_marksmanship.jpg',
+    [Spec.SpecHunter]: '/tbc/assets/hunter_icon.png',
     [Spec.SpecMage]: '/tbc/assets/mage_icon.png',
     [Spec.SpecRogue]: 'https://wow.zamimg.com/images/wow/icons/large/ability_rogue_eviscerate.jpg',
     [Spec.SpecRetributionPaladin]: 'https://wow.zamimg.com/images/wow/icons/large/spell_holy_auraoflight.jpg',
