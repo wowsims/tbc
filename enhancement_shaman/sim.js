@@ -157,6 +157,7 @@ export class EnhancementShamanSimUI extends IndividualSimUI {
                 IconInputs.DefaultFlameCap,
                 IconInputs.FlaskOfRelentlessAssault,
                 IconInputs.FlaskOfSupremePower,
+                IconInputs.FlaskOfBlindingLight,
                 IconInputs.ElixirOfDemonslaying,
                 IconInputs.ElixirOfMajorStrength,
                 IconInputs.ElixirOfMajorAgility,
