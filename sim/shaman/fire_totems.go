@@ -132,6 +132,9 @@ func (shaman *Shaman) newMagmaTotemTemplate(sim *core.Simulation) core.SimpleSpe
 }
 
 func (shaman *Shaman) NewMagmaTotem(sim *core.Simulation) *core.SimpleSpell {
+	if shaman.FireTotemSpell.IsInUse() {
+		shaman.FireTotemSpell.Cancel(sim)
+	}
 	// Initialize cast from precomputed template.
 	magmaTotem := &shaman.FireTotemSpell
 	shaman.magmaTotemTemplate.Apply(magmaTotem)
