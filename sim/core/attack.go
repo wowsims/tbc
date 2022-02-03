@@ -277,11 +277,6 @@ func (ahe *AbilityHitEffect) WhiteHitTableResult(sim *Simulation, ability *Activ
 	character := ability.Character
 
 	roll := sim.RandomFloat("auto attack")
-	level := float64(ahe.Target.Level)
-	skill := 350.0 // assume max skill level for now.
-
-	// Difference between attacker's waepon skill and target's defense skill.
-	skillDifference := (level * 5) - skill
 
 	// Miss
 	missChance := ahe.Target.MissChance
@@ -326,7 +321,7 @@ func (ahe *AbilityHitEffect) WhiteHitTableResult(sim *Simulation, ability *Activ
 		}
 
 		// Crit
-		critChance := ((character.stats[stats.MeleeCrit] + ahe.BonusCritRating) / (MeleeCritRatingPerCritChance * 100)) - skillDifference*0.002 - 0.018
+		critChance := ((character.stats[stats.MeleeCrit] + ahe.BonusCritRating) / (MeleeCritRatingPerCritChance * 100)) - ahe.Target.CritSuppression
 		chance += critChance
 		if roll < chance {
 			return MeleeHitTypeCrit
