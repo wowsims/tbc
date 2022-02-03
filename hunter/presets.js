@@ -1,5 +1,7 @@
 import { Consumes } from '/tbc/core/proto/common.js';
 import { EquipmentSpec } from '/tbc/core/proto/common.js';
+import { Flask } from '/tbc/core/proto/common.js';
+import { Food } from '/tbc/core/proto/common.js';
 import { ItemSpec } from '/tbc/core/proto/common.js';
 import { Potions } from '/tbc/core/proto/common.js';
 import { Hunter_Rotation as HunterRotation, Hunter_Options as HunterOptions, Hunter_Options_Ammo as Ammo, Hunter_Options_QuiverBonus as QuiverBonus, Hunter_Options_PetType as PetType, } from '/tbc/core/proto/hunter.js';
@@ -37,7 +39,8 @@ export const DefaultOptions = HunterOptions.create({
 });
 export const DefaultConsumes = Consumes.create({
     defaultPotion: Potions.HastePotion,
-    flaskOfRelentlessAssault: true,
+    flask: Flask.FlaskOfRelentlessAssault,
+    food: Food.FoodGrilledMudfish,
 });
 export const P1_BM_PRESET = {
     name: 'P1 BM Preset',

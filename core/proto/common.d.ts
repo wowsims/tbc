@@ -203,6 +203,9 @@ export interface IndividualBuffs {
  */
 export interface Consumes {
     /**
+     * Deprecated in favor of flask.
+     * Remove on 3/4/2022 (1 month).
+     *
      * @generated from protobuf field: bool flask_of_blinding_light = 1;
      */
     flaskOfBlindingLight: boolean;
@@ -223,6 +226,13 @@ export interface Consumes {
      */
     flaskOfRelentlessAssault: boolean;
     /**
+     * @generated from protobuf field: proto.Flask flask = 38;
+     */
+    flask: Flask;
+    /**
+     * Deprecated in favor of battle_elixir.
+     * Remove on 3/4/2022 (1 month).
+     *
      * @generated from protobuf field: bool adepts_elixir = 5;
      */
     adeptsElixir: boolean;
@@ -239,14 +249,6 @@ export interface Consumes {
      */
     elixirOfMajorShadowPower: boolean;
     /**
-     * @generated from protobuf field: bool elixir_of_draenic_wisdom = 9;
-     */
-    elixirOfDraenicWisdom: boolean;
-    /**
-     * @generated from protobuf field: bool elixir_of_major_mageblood = 10;
-     */
-    elixirOfMajorMageblood: boolean;
-    /**
      * @generated from protobuf field: bool elixir_of_major_agility = 22;
      */
     elixirOfMajorAgility: boolean;
@@ -262,6 +264,25 @@ export interface Consumes {
      * @generated from protobuf field: bool elixir_of_the_mongoose = 30;
      */
     elixirOfTheMongoose: boolean;
+    /**
+     * @generated from protobuf field: proto.BattleElixir battle_elixir = 39;
+     */
+    battleElixir: BattleElixir;
+    /**
+     * Deprecated in favor of guardian_elixir.
+     * Remove on 3/4/2022 (1 month).
+     *
+     * @generated from protobuf field: bool elixir_of_draenic_wisdom = 9;
+     */
+    elixirOfDraenicWisdom: boolean;
+    /**
+     * @generated from protobuf field: bool elixir_of_major_mageblood = 10;
+     */
+    elixirOfMajorMageblood: boolean;
+    /**
+     * @generated from protobuf field: proto.GuardianElixir guardian_elixir = 40;
+     */
+    guardianElixir: GuardianElixir;
     /**
      * Deprecated, use main_hand_imbue instead.
      * Remove on 2/18/2022 (1 month).
@@ -282,6 +303,9 @@ export interface Consumes {
      */
     offHandImbue: WeaponImbue;
     /**
+     * Deprecated in favor of food.
+     * Remove on 3/4/2022 (1 month).
+     *
      * @generated from protobuf field: bool blackened_basilisk = 13;
      */
     blackenedBasilisk: boolean;
@@ -306,13 +330,24 @@ export interface Consumes {
      */
     ravagerDog: boolean;
     /**
+     * @generated from protobuf field: proto.Food food = 41;
+     */
+    food: Food;
+    /**
      * @generated from protobuf field: proto.PetFood pet_food = 37;
      */
     petFood: PetFood;
     /**
+     * Deprecated in favor of alchohol.
+     * Remove on 3/4/2022 (1 month).
+     *
      * @generated from protobuf field: bool kreegsStoutBeatdown = 20;
      */
     kreegsStoutBeatdown: boolean;
+    /**
+     * @generated from protobuf field: proto.Alchohol alchohol = 42;
+     */
+    alchohol: Alchohol;
     /**
      * @generated from protobuf field: bool scroll_of_strength_v = 25;
      */
@@ -1447,17 +1482,150 @@ export declare enum WeaponImbue {
     WeaponImbueSuperiorWizardOil = 4
 }
 /**
+ * @generated from protobuf enum proto.Flask
+ */
+export declare enum Flask {
+    /**
+     * @generated from protobuf enum value: FlaskUnknown = 0;
+     */
+    FlaskUnknown = 0,
+    /**
+     * @generated from protobuf enum value: FlaskOfBlindingLight = 1;
+     */
+    FlaskOfBlindingLight = 1,
+    /**
+     * @generated from protobuf enum value: FlaskOfMightyRestoration = 2;
+     */
+    FlaskOfMightyRestoration = 2,
+    /**
+     * @generated from protobuf enum value: FlaskOfPureDeath = 3;
+     */
+    FlaskOfPureDeath = 3,
+    /**
+     * @generated from protobuf enum value: FlaskOfRelentlessAssault = 4;
+     */
+    FlaskOfRelentlessAssault = 4,
+    /**
+     * @generated from protobuf enum value: FlaskOfSupremePower = 5;
+     */
+    FlaskOfSupremePower = 5
+}
+/**
+ * @generated from protobuf enum proto.BattleElixir
+ */
+export declare enum BattleElixir {
+    /**
+     * @generated from protobuf enum value: BattleElixirUnknown = 0;
+     */
+    BattleElixirUnknown = 0,
+    /**
+     * @generated from protobuf enum value: AdeptsElixir = 1;
+     */
+    AdeptsElixir = 1,
+    /**
+     * @generated from protobuf enum value: ElixirOfDemonslaying = 2;
+     */
+    ElixirOfDemonslaying = 2,
+    /**
+     * @generated from protobuf enum value: ElixirOfMajorAgility = 3;
+     */
+    ElixirOfMajorAgility = 3,
+    /**
+     * @generated from protobuf enum value: ElixirOfMajorFirePower = 4;
+     */
+    ElixirOfMajorFirePower = 4,
+    /**
+     * @generated from protobuf enum value: ElixirOfMajorFrostPower = 5;
+     */
+    ElixirOfMajorFrostPower = 5,
+    /**
+     * @generated from protobuf enum value: ElixirOfMajorShadowPower = 6;
+     */
+    ElixirOfMajorShadowPower = 6,
+    /**
+     * @generated from protobuf enum value: ElixirOfMajorStrength = 7;
+     */
+    ElixirOfMajorStrength = 7,
+    /**
+     * @generated from protobuf enum value: ElixirOfTheMongoose = 8;
+     */
+    ElixirOfTheMongoose = 8
+}
+/**
+ * @generated from protobuf enum proto.GuardianElixir
+ */
+export declare enum GuardianElixir {
+    /**
+     * @generated from protobuf enum value: GuardianElixirUnknown = 0;
+     */
+    GuardianElixirUnknown = 0,
+    /**
+     * @generated from protobuf enum value: ElixirOfDraenicWisdom = 1;
+     */
+    ElixirOfDraenicWisdom = 1,
+    /**
+     * @generated from protobuf enum value: ElixirOfMajorMageblood = 2;
+     */
+    ElixirOfMajorMageblood = 2
+}
+/**
+ * @generated from protobuf enum proto.Food
+ */
+export declare enum Food {
+    /**
+     * @generated from protobuf enum value: FoodUnknown = 0;
+     */
+    FoodUnknown = 0,
+    /**
+     * @generated from protobuf enum value: FoodBlackenedBasilisk = 1;
+     */
+    FoodBlackenedBasilisk = 1,
+    /**
+     * @generated from protobuf enum value: FoodGrilledMudfish = 2;
+     */
+    FoodGrilledMudfish = 2,
+    /**
+     * @generated from protobuf enum value: FoodRavagerDog = 3;
+     */
+    FoodRavagerDog = 3,
+    /**
+     * @generated from protobuf enum value: FoodRoastedClefthoof = 4;
+     */
+    FoodRoastedClefthoof = 4,
+    /**
+     * @generated from protobuf enum value: FoodSkullfishSoup = 5;
+     */
+    FoodSkullfishSoup = 5,
+    /**
+     * @generated from protobuf enum value: FoodSpicyHotTalbuk = 6;
+     */
+    FoodSpicyHotTalbuk = 6
+}
+/**
  * @generated from protobuf enum proto.PetFood
  */
 export declare enum PetFood {
     /**
-     * @generated from protobuf enum value: PetFoodNone = 0;
+     * @generated from protobuf enum value: PetFoodUnknown = 0;
      */
-    PetFoodNone = 0,
+    PetFoodUnknown = 0,
     /**
      * @generated from protobuf enum value: PetFoodKiblersBits = 1;
      */
     PetFoodKiblersBits = 1
+}
+/**
+ * @generated from protobuf enum proto.Alchohol
+ */
+export declare enum Alchohol {
+    /**
+     * @generated from protobuf enum value: AlchoholUnknown = 0;
+     */
+    AlchoholUnknown = 0,
+    /**
+     * @generated from protobuf enum value: AlchoholKreegsStoutBeatdown = 1;
+     */
+    AlchoholKreegsStoutBeatdown = 1
 }
 /**
  * @generated from protobuf enum proto.StrengthOfEarthType

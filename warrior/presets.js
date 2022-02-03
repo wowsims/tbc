@@ -1,5 +1,7 @@
 import { Consumes } from '/tbc/core/proto/common.js';
 import { EquipmentSpec } from '/tbc/core/proto/common.js';
+import { Flask } from '/tbc/core/proto/common.js';
+import { Food } from '/tbc/core/proto/common.js';
 import { ItemSpec } from '/tbc/core/proto/common.js';
 import { Potions } from '/tbc/core/proto/common.js';
 import { Warrior_Rotation as WarriorRotation, Warrior_Options as WarriorOptions } from '/tbc/core/proto/warrior.js';
@@ -46,9 +48,9 @@ export const DefaultFuryOptions = WarriorOptions.create({
     precastT2: false,
 });
 export const DefaultFuryConsumes = Consumes.create({
+    flask: Flask.FlaskOfRelentlessAssault,
+    food: Food.FoodRoastedClefthoof,
     defaultPotion: Potions.HastePotion,
-    flaskOfRelentlessAssault: true,
-    roastedClefthoof: true,
 });
 export const DefaultArmsSlamRotation = WarriorRotation.create({
     type: RotationType.ArmsSlam,

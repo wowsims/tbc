@@ -1,8 +1,11 @@
 import { Conjured } from '/tbc/core/proto/common.js';
 import { Consumes } from '/tbc/core/proto/common.js';
 import { EquipmentSpec } from '/tbc/core/proto/common.js';
+import { Flask } from '/tbc/core/proto/common.js';
+import { Food } from '/tbc/core/proto/common.js';
 import { ItemSpec } from '/tbc/core/proto/common.js';
 import { Potions } from '/tbc/core/proto/common.js';
+import { WeaponImbue } from '/tbc/core/proto/common.js';
 import { Mage_Rotation as MageRotation, Mage_Options as MageOptions } from '/tbc/core/proto/mage.js';
 import { Mage_Rotation_Type as RotationType, Mage_Rotation_ArcaneRotation as ArcaneRotation, Mage_Rotation_FireRotation as FireRotation, Mage_Rotation_FrostRotation as FrostRotation } from '/tbc/core/proto/mage.js';
 import { Mage_Rotation_FireRotation_PrimarySpell as PrimaryFireSpell } from '/tbc/core/proto/mage.js';
@@ -43,10 +46,10 @@ export const DefaultFireOptions = MageOptions.create({
     armor: ArmorType.MageArmor,
 });
 export const DefaultFireConsumes = Consumes.create({
+    flask: Flask.FlaskOfPureDeath,
+    food: Food.FoodBlackenedBasilisk,
+    mainHandImbue: WeaponImbue.WeaponImbueBrilliantWizardOil,
     defaultPotion: Potions.SuperManaPotion,
-    flaskOfPureDeath: true,
-    brilliantWizardOil: true,
-    blackenedBasilisk: true,
     defaultConjured: Conjured.ConjuredFlameCap,
 });
 export const DefaultFrostRotation = MageRotation.create({
@@ -61,9 +64,9 @@ export const DefaultFrostOptions = MageOptions.create({
 });
 export const DefaultFrostConsumes = Consumes.create({
     defaultPotion: Potions.SuperManaPotion,
-    flaskOfPureDeath: true,
-    brilliantWizardOil: true,
-    blackenedBasilisk: true,
+    flask: Flask.FlaskOfPureDeath,
+    food: Food.FoodBlackenedBasilisk,
+    mainHandImbue: WeaponImbue.WeaponImbueBrilliantWizardOil,
 });
 export const DefaultArcaneRotation = MageRotation.create({
     type: RotationType.Arcane,
@@ -80,9 +83,9 @@ export const DefaultArcaneOptions = MageOptions.create({
 });
 export const DefaultArcaneConsumes = Consumes.create({
     defaultPotion: Potions.SuperManaPotion,
-    flaskOfBlindingLight: true,
-    brilliantWizardOil: true,
-    blackenedBasilisk: true,
+    flask: Flask.FlaskOfBlindingLight,
+    food: Food.FoodBlackenedBasilisk,
+    mainHandImbue: WeaponImbue.WeaponImbueBrilliantWizardOil,
 });
 export const P1_ARCANE_PRESET = {
     name: 'P1 Arcane Preset',

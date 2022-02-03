@@ -1,5 +1,10 @@
+import { Alchohol } from '/tbc/core/proto/common.js';
+import { BattleElixir } from '/tbc/core/proto/common.js';
 import { Cooldowns } from '/tbc/core/proto/common.js';
 import { Consumes } from '/tbc/core/proto/common.js';
+import { Flask } from '/tbc/core/proto/common.js';
+import { Food } from '/tbc/core/proto/common.js';
+import { GuardianElixir } from '/tbc/core/proto/common.js';
 import { IndividualBuffs } from '/tbc/core/proto/common.js';
 import { Spec } from '/tbc/core/proto/common.js';
 import { Stat } from '/tbc/core/proto/common.js';
@@ -430,6 +435,95 @@ export class Player {
             if (proto.consumes && proto.consumes.superiorWizardOil) {
                 proto.consumes.superiorWizardOil = false;
                 proto.consumes.mainHandImbue = WeaponImbue.WeaponImbueSuperiorWizardOil;
+            }
+            // TODO: Remove this on 3/4/2022 (1 month).
+            if (proto.consumes && proto.consumes.flaskOfBlindingLight) {
+                proto.consumes.flaskOfBlindingLight = false;
+                proto.consumes.flask = Flask.FlaskOfBlindingLight;
+            }
+            if (proto.consumes && proto.consumes.flaskOfMightyRestoration) {
+                proto.consumes.flaskOfMightyRestoration = false;
+                proto.consumes.flask = Flask.FlaskOfMightyRestoration;
+            }
+            if (proto.consumes && proto.consumes.flaskOfPureDeath) {
+                proto.consumes.flaskOfPureDeath = false;
+                proto.consumes.flask = Flask.FlaskOfPureDeath;
+            }
+            if (proto.consumes && proto.consumes.flaskOfRelentlessAssault) {
+                proto.consumes.flaskOfRelentlessAssault = false;
+                proto.consumes.flask = Flask.FlaskOfRelentlessAssault;
+            }
+            if (proto.consumes && proto.consumes.flaskOfSupremePower) {
+                proto.consumes.flaskOfSupremePower = false;
+                proto.consumes.flask = Flask.FlaskOfSupremePower;
+            }
+            if (proto.consumes && proto.consumes.adeptsElixir) {
+                proto.consumes.adeptsElixir = false;
+                proto.consumes.battleElixir = BattleElixir.AdeptsElixir;
+            }
+            if (proto.consumes && proto.consumes.elixirOfDemonslaying) {
+                proto.consumes.elixirOfDemonslaying = false;
+                proto.consumes.battleElixir = BattleElixir.ElixirOfDemonslaying;
+            }
+            if (proto.consumes && proto.consumes.elixirOfMajorAgility) {
+                proto.consumes.elixirOfMajorAgility = false;
+                proto.consumes.battleElixir = BattleElixir.ElixirOfMajorAgility;
+            }
+            if (proto.consumes && proto.consumes.elixirOfMajorFirePower) {
+                proto.consumes.elixirOfMajorFirePower = false;
+                proto.consumes.battleElixir = BattleElixir.ElixirOfMajorFirePower;
+            }
+            if (proto.consumes && proto.consumes.elixirOfMajorFrostPower) {
+                proto.consumes.elixirOfMajorFrostPower = false;
+                proto.consumes.battleElixir = BattleElixir.ElixirOfMajorFrostPower;
+            }
+            if (proto.consumes && proto.consumes.elixirOfMajorShadowPower) {
+                proto.consumes.elixirOfMajorShadowPower = false;
+                proto.consumes.battleElixir = BattleElixir.ElixirOfMajorShadowPower;
+            }
+            if (proto.consumes && proto.consumes.elixirOfMajorStrength) {
+                proto.consumes.elixirOfMajorStrength = false;
+                proto.consumes.battleElixir = BattleElixir.ElixirOfMajorStrength;
+            }
+            if (proto.consumes && proto.consumes.elixirOfTheMongoose) {
+                proto.consumes.elixirOfTheMongoose = false;
+                proto.consumes.battleElixir = BattleElixir.ElixirOfTheMongoose;
+            }
+            if (proto.consumes && proto.consumes.elixirOfDraenicWisdom) {
+                proto.consumes.elixirOfDraenicWisdom = false;
+                proto.consumes.guardianElixir = GuardianElixir.ElixirOfDraenicWisdom;
+            }
+            if (proto.consumes && proto.consumes.elixirOfMajorMageblood) {
+                proto.consumes.elixirOfMajorMageblood = false;
+                proto.consumes.guardianElixir = GuardianElixir.ElixirOfMajorMageblood;
+            }
+            if (proto.consumes && proto.consumes.blackenedBasilisk) {
+                proto.consumes.blackenedBasilisk = false;
+                proto.consumes.food = Food.FoodBlackenedBasilisk;
+            }
+            if (proto.consumes && proto.consumes.grilledMudfish) {
+                proto.consumes.grilledMudfish = false;
+                proto.consumes.food = Food.FoodGrilledMudfish;
+            }
+            if (proto.consumes && proto.consumes.ravagerDog) {
+                proto.consumes.ravagerDog = false;
+                proto.consumes.food = Food.FoodRavagerDog;
+            }
+            if (proto.consumes && proto.consumes.roastedClefthoof) {
+                proto.consumes.roastedClefthoof = false;
+                proto.consumes.food = Food.FoodRoastedClefthoof;
+            }
+            if (proto.consumes && proto.consumes.skullfishSoup) {
+                proto.consumes.skullfishSoup = false;
+                proto.consumes.food = Food.FoodSkullfishSoup;
+            }
+            if (proto.consumes && proto.consumes.spicyHotTalbuk) {
+                proto.consumes.spicyHotTalbuk = false;
+                proto.consumes.food = Food.FoodSpicyHotTalbuk;
+            }
+            if (proto.consumes && proto.consumes.kreegsStoutBeatdown) {
+                proto.consumes.kreegsStoutBeatdown = false;
+                proto.consumes.alchohol = Alchohol.AlchoholKreegsStoutBeatdown;
             }
             let rotation = this.specTypeFunctions.rotationFromPlayer(proto);
             // TODO: Remove this on 2/17/2022 (1 month).

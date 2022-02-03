@@ -734,19 +734,157 @@ export var WeaponImbue;
     WeaponImbue[WeaponImbue["WeaponImbueSuperiorWizardOil"] = 4] = "WeaponImbueSuperiorWizardOil";
 })(WeaponImbue || (WeaponImbue = {}));
 /**
+ * @generated from protobuf enum proto.Flask
+ */
+export var Flask;
+(function (Flask) {
+    /**
+     * @generated from protobuf enum value: FlaskUnknown = 0;
+     */
+    Flask[Flask["FlaskUnknown"] = 0] = "FlaskUnknown";
+    /**
+     * @generated from protobuf enum value: FlaskOfBlindingLight = 1;
+     */
+    Flask[Flask["FlaskOfBlindingLight"] = 1] = "FlaskOfBlindingLight";
+    /**
+     * @generated from protobuf enum value: FlaskOfMightyRestoration = 2;
+     */
+    Flask[Flask["FlaskOfMightyRestoration"] = 2] = "FlaskOfMightyRestoration";
+    /**
+     * @generated from protobuf enum value: FlaskOfPureDeath = 3;
+     */
+    Flask[Flask["FlaskOfPureDeath"] = 3] = "FlaskOfPureDeath";
+    /**
+     * @generated from protobuf enum value: FlaskOfRelentlessAssault = 4;
+     */
+    Flask[Flask["FlaskOfRelentlessAssault"] = 4] = "FlaskOfRelentlessAssault";
+    /**
+     * @generated from protobuf enum value: FlaskOfSupremePower = 5;
+     */
+    Flask[Flask["FlaskOfSupremePower"] = 5] = "FlaskOfSupremePower";
+})(Flask || (Flask = {}));
+/**
+ * @generated from protobuf enum proto.BattleElixir
+ */
+export var BattleElixir;
+(function (BattleElixir) {
+    /**
+     * @generated from protobuf enum value: BattleElixirUnknown = 0;
+     */
+    BattleElixir[BattleElixir["BattleElixirUnknown"] = 0] = "BattleElixirUnknown";
+    /**
+     * @generated from protobuf enum value: AdeptsElixir = 1;
+     */
+    BattleElixir[BattleElixir["AdeptsElixir"] = 1] = "AdeptsElixir";
+    /**
+     * @generated from protobuf enum value: ElixirOfDemonslaying = 2;
+     */
+    BattleElixir[BattleElixir["ElixirOfDemonslaying"] = 2] = "ElixirOfDemonslaying";
+    /**
+     * @generated from protobuf enum value: ElixirOfMajorAgility = 3;
+     */
+    BattleElixir[BattleElixir["ElixirOfMajorAgility"] = 3] = "ElixirOfMajorAgility";
+    /**
+     * @generated from protobuf enum value: ElixirOfMajorFirePower = 4;
+     */
+    BattleElixir[BattleElixir["ElixirOfMajorFirePower"] = 4] = "ElixirOfMajorFirePower";
+    /**
+     * @generated from protobuf enum value: ElixirOfMajorFrostPower = 5;
+     */
+    BattleElixir[BattleElixir["ElixirOfMajorFrostPower"] = 5] = "ElixirOfMajorFrostPower";
+    /**
+     * @generated from protobuf enum value: ElixirOfMajorShadowPower = 6;
+     */
+    BattleElixir[BattleElixir["ElixirOfMajorShadowPower"] = 6] = "ElixirOfMajorShadowPower";
+    /**
+     * @generated from protobuf enum value: ElixirOfMajorStrength = 7;
+     */
+    BattleElixir[BattleElixir["ElixirOfMajorStrength"] = 7] = "ElixirOfMajorStrength";
+    /**
+     * @generated from protobuf enum value: ElixirOfTheMongoose = 8;
+     */
+    BattleElixir[BattleElixir["ElixirOfTheMongoose"] = 8] = "ElixirOfTheMongoose";
+})(BattleElixir || (BattleElixir = {}));
+/**
+ * @generated from protobuf enum proto.GuardianElixir
+ */
+export var GuardianElixir;
+(function (GuardianElixir) {
+    /**
+     * @generated from protobuf enum value: GuardianElixirUnknown = 0;
+     */
+    GuardianElixir[GuardianElixir["GuardianElixirUnknown"] = 0] = "GuardianElixirUnknown";
+    /**
+     * @generated from protobuf enum value: ElixirOfDraenicWisdom = 1;
+     */
+    GuardianElixir[GuardianElixir["ElixirOfDraenicWisdom"] = 1] = "ElixirOfDraenicWisdom";
+    /**
+     * @generated from protobuf enum value: ElixirOfMajorMageblood = 2;
+     */
+    GuardianElixir[GuardianElixir["ElixirOfMajorMageblood"] = 2] = "ElixirOfMajorMageblood";
+})(GuardianElixir || (GuardianElixir = {}));
+/**
+ * @generated from protobuf enum proto.Food
+ */
+export var Food;
+(function (Food) {
+    /**
+     * @generated from protobuf enum value: FoodUnknown = 0;
+     */
+    Food[Food["FoodUnknown"] = 0] = "FoodUnknown";
+    /**
+     * @generated from protobuf enum value: FoodBlackenedBasilisk = 1;
+     */
+    Food[Food["FoodBlackenedBasilisk"] = 1] = "FoodBlackenedBasilisk";
+    /**
+     * @generated from protobuf enum value: FoodGrilledMudfish = 2;
+     */
+    Food[Food["FoodGrilledMudfish"] = 2] = "FoodGrilledMudfish";
+    /**
+     * @generated from protobuf enum value: FoodRavagerDog = 3;
+     */
+    Food[Food["FoodRavagerDog"] = 3] = "FoodRavagerDog";
+    /**
+     * @generated from protobuf enum value: FoodRoastedClefthoof = 4;
+     */
+    Food[Food["FoodRoastedClefthoof"] = 4] = "FoodRoastedClefthoof";
+    /**
+     * @generated from protobuf enum value: FoodSkullfishSoup = 5;
+     */
+    Food[Food["FoodSkullfishSoup"] = 5] = "FoodSkullfishSoup";
+    /**
+     * @generated from protobuf enum value: FoodSpicyHotTalbuk = 6;
+     */
+    Food[Food["FoodSpicyHotTalbuk"] = 6] = "FoodSpicyHotTalbuk";
+})(Food || (Food = {}));
+/**
  * @generated from protobuf enum proto.PetFood
  */
 export var PetFood;
 (function (PetFood) {
     /**
-     * @generated from protobuf enum value: PetFoodNone = 0;
+     * @generated from protobuf enum value: PetFoodUnknown = 0;
      */
-    PetFood[PetFood["PetFoodNone"] = 0] = "PetFoodNone";
+    PetFood[PetFood["PetFoodUnknown"] = 0] = "PetFoodUnknown";
     /**
      * @generated from protobuf enum value: PetFoodKiblersBits = 1;
      */
     PetFood[PetFood["PetFoodKiblersBits"] = 1] = "PetFoodKiblersBits";
 })(PetFood || (PetFood = {}));
+/**
+ * @generated from protobuf enum proto.Alchohol
+ */
+export var Alchohol;
+(function (Alchohol) {
+    /**
+     * @generated from protobuf enum value: AlchoholUnknown = 0;
+     */
+    Alchohol[Alchohol["AlchoholUnknown"] = 0] = "AlchoholUnknown";
+    /**
+     * @generated from protobuf enum value: AlchoholKreegsStoutBeatdown = 1;
+     */
+    Alchohol[Alchohol["AlchoholKreegsStoutBeatdown"] = 1] = "AlchoholKreegsStoutBeatdown";
+})(Alchohol || (Alchohol = {}));
 /**
  * @generated from protobuf enum proto.StrengthOfEarthType
  */
@@ -1292,16 +1430,19 @@ class Consumes$Type extends MessageType {
             { no: 3, name: "flask_of_pure_death", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 4, name: "flask_of_supreme_power", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 21, name: "flask_of_relentless_assault", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 38, name: "flask", kind: "enum", T: () => ["proto.Flask", Flask] },
             { no: 5, name: "adepts_elixir", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 6, name: "elixir_of_major_fire_power", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 7, name: "elixir_of_major_frost_power", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 8, name: "elixir_of_major_shadow_power", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
-            { no: 9, name: "elixir_of_draenic_wisdom", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
-            { no: 10, name: "elixir_of_major_mageblood", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 22, name: "elixir_of_major_agility", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 31, name: "elixir_of_major_strength", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 23, name: "elixir_of_demonslaying", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 30, name: "elixir_of_the_mongoose", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 39, name: "battle_elixir", kind: "enum", T: () => ["proto.BattleElixir", BattleElixir] },
+            { no: 9, name: "elixir_of_draenic_wisdom", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 10, name: "elixir_of_major_mageblood", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 40, name: "guardian_elixir", kind: "enum", T: () => ["proto.GuardianElixir", GuardianElixir] },
             { no: 11, name: "brilliant_wizard_oil", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 12, name: "superior_wizard_oil", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 32, name: "main_hand_imbue", kind: "enum", T: () => ["proto.WeaponImbue", WeaponImbue] },
@@ -1312,8 +1453,10 @@ class Consumes$Type extends MessageType {
             { no: 29, name: "spicy_hot_talbuk", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 35, name: "grilled_mudfish", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 36, name: "ravager_dog", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 41, name: "food", kind: "enum", T: () => ["proto.Food", Food] },
             { no: 37, name: "pet_food", kind: "enum", T: () => ["proto.PetFood", PetFood] },
             { no: 20, name: "kreegsStoutBeatdown", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 42, name: "alchohol", kind: "enum", T: () => ["proto.Alchohol", Alchohol] },
             { no: 25, name: "scroll_of_strength_v", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 26, name: "scroll_of_agility_v", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 28, name: "scroll_of_spirit_v", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
@@ -1326,7 +1469,7 @@ class Consumes$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { flaskOfBlindingLight: false, flaskOfMightyRestoration: false, flaskOfPureDeath: false, flaskOfSupremePower: false, flaskOfRelentlessAssault: false, adeptsElixir: false, elixirOfMajorFirePower: false, elixirOfMajorFrostPower: false, elixirOfMajorShadowPower: false, elixirOfDraenicWisdom: false, elixirOfMajorMageblood: false, elixirOfMajorAgility: false, elixirOfMajorStrength: false, elixirOfDemonslaying: false, elixirOfTheMongoose: false, brilliantWizardOil: false, superiorWizardOil: false, mainHandImbue: 0, offHandImbue: 0, blackenedBasilisk: false, skullfishSoup: false, roastedClefthoof: false, spicyHotTalbuk: false, grilledMudfish: false, ravagerDog: false, petFood: 0, kreegsStoutBeatdown: false, scrollOfStrengthV: false, scrollOfAgilityV: false, scrollOfSpiritV: false, defaultPotion: 0, startingPotion: 0, numStartingPotions: 0, defaultConjured: 0, drums: 0, battleChicken: false };
+        const message = { flaskOfBlindingLight: false, flaskOfMightyRestoration: false, flaskOfPureDeath: false, flaskOfSupremePower: false, flaskOfRelentlessAssault: false, flask: 0, adeptsElixir: false, elixirOfMajorFirePower: false, elixirOfMajorFrostPower: false, elixirOfMajorShadowPower: false, elixirOfMajorAgility: false, elixirOfMajorStrength: false, elixirOfDemonslaying: false, elixirOfTheMongoose: false, battleElixir: 0, elixirOfDraenicWisdom: false, elixirOfMajorMageblood: false, guardianElixir: 0, brilliantWizardOil: false, superiorWizardOil: false, mainHandImbue: 0, offHandImbue: 0, blackenedBasilisk: false, skullfishSoup: false, roastedClefthoof: false, spicyHotTalbuk: false, grilledMudfish: false, ravagerDog: false, food: 0, petFood: 0, kreegsStoutBeatdown: false, alchohol: 0, scrollOfStrengthV: false, scrollOfAgilityV: false, scrollOfSpiritV: false, defaultPotion: 0, startingPotion: 0, numStartingPotions: 0, defaultConjured: 0, drums: 0, battleChicken: false };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -1352,6 +1495,9 @@ class Consumes$Type extends MessageType {
                 case /* bool flask_of_relentless_assault */ 21:
                     message.flaskOfRelentlessAssault = reader.bool();
                     break;
+                case /* proto.Flask flask */ 38:
+                    message.flask = reader.int32();
+                    break;
                 case /* bool adepts_elixir */ 5:
                     message.adeptsElixir = reader.bool();
                     break;
@@ -1364,12 +1510,6 @@ class Consumes$Type extends MessageType {
                 case /* bool elixir_of_major_shadow_power */ 8:
                     message.elixirOfMajorShadowPower = reader.bool();
                     break;
-                case /* bool elixir_of_draenic_wisdom */ 9:
-                    message.elixirOfDraenicWisdom = reader.bool();
-                    break;
-                case /* bool elixir_of_major_mageblood */ 10:
-                    message.elixirOfMajorMageblood = reader.bool();
-                    break;
                 case /* bool elixir_of_major_agility */ 22:
                     message.elixirOfMajorAgility = reader.bool();
                     break;
@@ -1381,6 +1521,18 @@ class Consumes$Type extends MessageType {
                     break;
                 case /* bool elixir_of_the_mongoose */ 30:
                     message.elixirOfTheMongoose = reader.bool();
+                    break;
+                case /* proto.BattleElixir battle_elixir */ 39:
+                    message.battleElixir = reader.int32();
+                    break;
+                case /* bool elixir_of_draenic_wisdom */ 9:
+                    message.elixirOfDraenicWisdom = reader.bool();
+                    break;
+                case /* bool elixir_of_major_mageblood */ 10:
+                    message.elixirOfMajorMageblood = reader.bool();
+                    break;
+                case /* proto.GuardianElixir guardian_elixir */ 40:
+                    message.guardianElixir = reader.int32();
                     break;
                 case /* bool brilliant_wizard_oil */ 11:
                     message.brilliantWizardOil = reader.bool();
@@ -1412,11 +1564,17 @@ class Consumes$Type extends MessageType {
                 case /* bool ravager_dog */ 36:
                     message.ravagerDog = reader.bool();
                     break;
+                case /* proto.Food food */ 41:
+                    message.food = reader.int32();
+                    break;
                 case /* proto.PetFood pet_food */ 37:
                     message.petFood = reader.int32();
                     break;
                 case /* bool kreegsStoutBeatdown */ 20:
                     message.kreegsStoutBeatdown = reader.bool();
+                    break;
+                case /* proto.Alchohol alchohol */ 42:
+                    message.alchohol = reader.int32();
                     break;
                 case /* bool scroll_of_strength_v */ 25:
                     message.scrollOfStrengthV = reader.bool();
@@ -1472,6 +1630,9 @@ class Consumes$Type extends MessageType {
         /* bool flask_of_relentless_assault = 21; */
         if (message.flaskOfRelentlessAssault !== false)
             writer.tag(21, WireType.Varint).bool(message.flaskOfRelentlessAssault);
+        /* proto.Flask flask = 38; */
+        if (message.flask !== 0)
+            writer.tag(38, WireType.Varint).int32(message.flask);
         /* bool adepts_elixir = 5; */
         if (message.adeptsElixir !== false)
             writer.tag(5, WireType.Varint).bool(message.adeptsElixir);
@@ -1484,12 +1645,6 @@ class Consumes$Type extends MessageType {
         /* bool elixir_of_major_shadow_power = 8; */
         if (message.elixirOfMajorShadowPower !== false)
             writer.tag(8, WireType.Varint).bool(message.elixirOfMajorShadowPower);
-        /* bool elixir_of_draenic_wisdom = 9; */
-        if (message.elixirOfDraenicWisdom !== false)
-            writer.tag(9, WireType.Varint).bool(message.elixirOfDraenicWisdom);
-        /* bool elixir_of_major_mageblood = 10; */
-        if (message.elixirOfMajorMageblood !== false)
-            writer.tag(10, WireType.Varint).bool(message.elixirOfMajorMageblood);
         /* bool elixir_of_major_agility = 22; */
         if (message.elixirOfMajorAgility !== false)
             writer.tag(22, WireType.Varint).bool(message.elixirOfMajorAgility);
@@ -1502,6 +1657,18 @@ class Consumes$Type extends MessageType {
         /* bool elixir_of_the_mongoose = 30; */
         if (message.elixirOfTheMongoose !== false)
             writer.tag(30, WireType.Varint).bool(message.elixirOfTheMongoose);
+        /* proto.BattleElixir battle_elixir = 39; */
+        if (message.battleElixir !== 0)
+            writer.tag(39, WireType.Varint).int32(message.battleElixir);
+        /* bool elixir_of_draenic_wisdom = 9; */
+        if (message.elixirOfDraenicWisdom !== false)
+            writer.tag(9, WireType.Varint).bool(message.elixirOfDraenicWisdom);
+        /* bool elixir_of_major_mageblood = 10; */
+        if (message.elixirOfMajorMageblood !== false)
+            writer.tag(10, WireType.Varint).bool(message.elixirOfMajorMageblood);
+        /* proto.GuardianElixir guardian_elixir = 40; */
+        if (message.guardianElixir !== 0)
+            writer.tag(40, WireType.Varint).int32(message.guardianElixir);
         /* bool brilliant_wizard_oil = 11; */
         if (message.brilliantWizardOil !== false)
             writer.tag(11, WireType.Varint).bool(message.brilliantWizardOil);
@@ -1532,12 +1699,18 @@ class Consumes$Type extends MessageType {
         /* bool ravager_dog = 36; */
         if (message.ravagerDog !== false)
             writer.tag(36, WireType.Varint).bool(message.ravagerDog);
+        /* proto.Food food = 41; */
+        if (message.food !== 0)
+            writer.tag(41, WireType.Varint).int32(message.food);
         /* proto.PetFood pet_food = 37; */
         if (message.petFood !== 0)
             writer.tag(37, WireType.Varint).int32(message.petFood);
         /* bool kreegsStoutBeatdown = 20; */
         if (message.kreegsStoutBeatdown !== false)
             writer.tag(20, WireType.Varint).bool(message.kreegsStoutBeatdown);
+        /* proto.Alchohol alchohol = 42; */
+        if (message.alchohol !== 0)
+            writer.tag(42, WireType.Varint).int32(message.alchohol);
         /* bool scroll_of_strength_v = 25; */
         if (message.scrollOfStrengthV !== false)
             writer.tag(25, WireType.Varint).bool(message.scrollOfStrengthV);
