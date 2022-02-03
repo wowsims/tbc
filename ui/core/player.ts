@@ -568,12 +568,6 @@ export class Player<SpecType extends Spec> {
 
 	fromProto(eventID: EventID, proto: PlayerProto) {
 		TypedEvent.freezeAllAndDo(() => {
-			// TODO: Remove this on 1/31/2022 (1 month).
-			if (proto.consumes && proto.consumes.darkRune) {
-				proto.consumes.darkRune = false
-				proto.consumes.defaultConjured = Conjured.ConjuredDarkRune;
-			}
-
 			// TODO: Remove this on 2/18/2022 (1 month).
 			if (proto.consumes && proto.consumes.brilliantWizardOil) {
 				proto.consumes.brilliantWizardOil = false;
@@ -617,93 +611,6 @@ export class Player<SpecType extends Spec> {
 			this.setSpecOptions(eventID, this.specTypeFunctions.optionsFromPlayer(proto));
 		});
 	}
-
-	// TODO: Remove to/from json functions and use proto versions instead. This will require
-	// some way to store all talents in the proto.
-  // Returns JSON representing all the current values.
-  toJson(): Object {
-    return {
-      'name': this.name,
-      'buffs': IndividualBuffs.toJson(this.buffs),
-      'consumes': Consumes.toJson(this.consumes),
-      'bonusStats': this.bonusStats.toJson(),
-      'gear': EquipmentSpec.toJson(this.gear.asSpec()),
-      'race': this.race,
-      'rotation': this.specTypeFunctions.rotationToJson(this.rotation),
-      'talents': this.talentsString,
-      'specOptions': this.specTypeFunctions.optionsToJson(this.specOptions),
-    };
-  }
-
-  // Set all the current values, assumes obj is the same type returned by toJson().
-  fromJson(eventID: EventID, obj: any) {
-		TypedEvent.freezeAllAndDo(() => {
-			try {
-				if (obj['name']) {
-					this.setName(eventID, obj['name']);
-				}
-			} catch (e) {
-				console.warn('Failed to parse name: ' + e);
-			}
-
-			try {
-				this.setBuffs(eventID, IndividualBuffs.fromJson(obj['buffs']));
-			} catch (e) {
-				console.warn('Failed to parse player buffs: ' + e);
-			}
-
-			try {
-				const consumes = Consumes.fromJson(obj['consumes']);
-				if (consumes.darkRune) {
-					consumes.defaultConjured = Conjured.ConjuredDarkRune;
-				}
-				this.setConsumes(eventID, consumes);
-			} catch (e) {
-				console.warn('Failed to parse consumes: ' + e);
-			}
-
-			// For legacy format. Do not remove this until 2022/01/02 (1 month).
-			if (obj['customStats']) {
-				obj['bonusStats'] = obj['customStats'];
-			}
-
-			try {
-				this.setBonusStats(eventID, Stats.fromJson(obj['bonusStats']));
-			} catch (e) {
-				console.warn('Failed to parse bonus stats: ' + e);
-			}
-
-			try {
-				this.setGear(eventID, this.sim.lookupEquipmentSpec(EquipmentSpec.fromJson(obj['gear'])));
-			} catch (e) {
-				console.warn('Failed to parse gear: ' + e);
-			}
-
-			try {
-				this.setRace(eventID, obj['race']);
-			} catch (e) {
-				console.warn('Failed to parse race: ' + e);
-			}
-
-			try {
-				this.setRotation(eventID, this.specTypeFunctions.rotationFromJson(obj['rotation']));
-			} catch (e) {
-				console.warn('Failed to parse rotation: ' + e);
-			}
-
-			try {
-				this.setTalentsString(eventID, obj['talents']);
-			} catch (e) {
-				console.warn('Failed to parse talents: ' + e);
-			}
-
-			try {
-				this.setSpecOptions(eventID, this.specTypeFunctions.optionsFromJson(obj['specOptions']));
-			} catch (e) {
-				console.warn('Failed to parse spec options: ' + e);
-			}
-		});
-  }
 
 	clone(eventID: EventID): Player<SpecType> {
 		const newPlayer = new Player<SpecType>(this.spec, this.sim);

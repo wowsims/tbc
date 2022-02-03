@@ -339,7 +339,6 @@ message Consumes {
     Potions starting_potion = 16;
     int32 num_starting_potions = 17;
 
-    bool dark_rune = 18; // Deprecated, use default_conjured instead.
     Conjured default_conjured = 27;
 
 		Drums drums = 19;
