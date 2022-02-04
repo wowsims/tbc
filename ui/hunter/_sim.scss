@@ -21,6 +21,9 @@
 .hunter-sim-ui .debuffs-section {
   grid-template-columns: repeat(4, 1fr);
 }
+.hunter-sim-ui .PetBuffs-section {
+  grid-template-columns: repeat(3, 1fr);
+}
 
 // Enhancement has a lot of EP stats, so make the text smaller so it fits vertically.
 .hunter-sim-ui .character-stats-table-row {

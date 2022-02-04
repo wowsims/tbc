@@ -209,6 +209,7 @@ enum Conjured {
 enum WeaponImbue {
 	WeaponImbueUnknown = 0;
 	WeaponImbueAdamantiteSharpeningStone = 1;
+	WeaponImbueAdamantiteWeightstone = 5;
 	WeaponImbueElementalSharpeningStone = 2;
 	WeaponImbueBrilliantWizardOil = 3;
 	WeaponImbueSuperiorWizardOil = 4;
@@ -397,9 +398,12 @@ message Consumes {
 
 		// 0 means no scroll, otherwise value is the scroll level.
 		// E.g. 5 indicates Scroll of Agility V.
-    int32 scroll_of_strength = 43;
     int32 scroll_of_agility = 44;
+    int32 scroll_of_strength = 43;
     int32 scroll_of_spirit = 45;
+
+    int32 pet_scroll_of_agility = 46;
+    int32 pet_scroll_of_strength = 47;
 
     Potions default_potion = 15;
     Potions starting_potion = 16;

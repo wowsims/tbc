@@ -155,6 +155,7 @@ export interface IndividualSimUIConfig<SpecType extends Spec> {
 
 	// Extra UI sections with the same input config as other sections.
   additionalSections?: Record<string, InputSection>;
+  additionalIconSections?: Record<string, Array<IndividualSimIconPickerConfig<Player<any>, any>>>;
 
 	// For when extra sections are needed, with even more flexibility than additionalSections.
 	// Return value is the label for the section.
@@ -639,6 +640,16 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
       sectionElem.innerHTML = `<legend>${sectionName}</legend>`;
       customSectionsContainer.appendChild(sectionElem);
       configureInputSection(sectionElem, sectionConfig);
+			anyCustomSections = true;
+    };
+
+		for (const [sectionName, sectionConfig] of Object.entries(this.individualConfig.additionalIconSections || {})) {
+			const sectionCssPrefix = sectionName.replace(/\s+/g, '');
+      const sectionElem = document.createElement('fieldset');
+      sectionElem.classList.add('settings-section', sectionCssPrefix + '-section');
+      sectionElem.innerHTML = `<legend>${sectionName}</legend>`;
+      customSectionsContainer.appendChild(sectionElem);
+			configureIconSection(sectionElem, sectionConfig.map(iconInput => new IndividualSimIconPicker(sectionElem, this.player, iconInput, this)));
 			anyCustomSections = true;
     };
 
