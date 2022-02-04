@@ -1,6 +1,8 @@
 import { Consumes } from '/tbc/core/proto/common.js';
 import { Drums } from '/tbc/core/proto/common.js';
 import { EquipmentSpec } from '/tbc/core/proto/common.js';
+import { Flask } from '/tbc/core/proto/common.js';
+import { Food } from '/tbc/core/proto/common.js';
 import { ItemSpec } from '/tbc/core/proto/common.js';
 import { Potions } from '/tbc/core/proto/common.js';
 import { EnhancementShaman_Rotation as EnhancementShamanRotation, EnhancementShaman_Options as EnhancementShamanOptions } from '/tbc/core/proto/shaman.js';
@@ -43,7 +45,8 @@ export const DefaultOptions = EnhancementShamanOptions.create({
 export const DefaultConsumes = Consumes.create({
     drums: Drums.DrumsOfBattle,
     defaultPotion: Potions.SuperManaPotion,
-    flaskOfRelentlessAssault: true,
+    flask: Flask.FlaskOfRelentlessAssault,
+    food: Food.FoodRoastedClefthoof,
 });
 export const P1_PRESET = {
     name: 'P1 Preset',

@@ -349,6 +349,9 @@ export interface Consumes {
      */
     alchohol: Alchohol;
     /**
+     * Deprecated in favor of int32 versions below.
+     * Remove on 3/4/2022 (1 month).
+     *
      * @generated from protobuf field: bool scroll_of_strength_v = 25;
      */
     scrollOfStrengthV: boolean;
@@ -360,6 +363,21 @@ export interface Consumes {
      * @generated from protobuf field: bool scroll_of_spirit_v = 28;
      */
     scrollOfSpiritV: boolean;
+    /**
+     * 0 means no scroll, otherwise value is the scroll level.
+     * E.g. 5 indicates Scroll of Agility V.
+     *
+     * @generated from protobuf field: int32 scroll_of_strength = 43;
+     */
+    scrollOfStrength: number;
+    /**
+     * @generated from protobuf field: int32 scroll_of_agility = 44;
+     */
+    scrollOfAgility: number;
+    /**
+     * @generated from protobuf field: int32 scroll_of_spirit = 45;
+     */
+    scrollOfSpirit: number;
     /**
      * @generated from protobuf field: proto.Potions default_potion = 15;
      */
