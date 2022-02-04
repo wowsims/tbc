@@ -992,6 +992,23 @@ const classToEligibleWeaponTypes: Record<Class, Array<EligibleWeaponType>> = {
 	],
 };
 
+export function isSharpWeaponType(weaponType: WeaponType): boolean {
+	return [
+		WeaponType.WeaponTypeAxe,
+		WeaponType.WeaponTypeDagger,
+		WeaponType.WeaponTypePolearm,
+		WeaponType.WeaponTypeSword,
+	].includes(weaponType);
+}
+
+export function isBluntWeaponType(weaponType: WeaponType): boolean {
+	return [
+		WeaponType.WeaponTypeFist,
+		WeaponType.WeaponTypeMace,
+		WeaponType.WeaponTypeStaff,
+	].includes(weaponType);
+}
+
 export const specEPTransforms: Record<Spec, (epWeights: Stats) => Stats> = {
   [Spec.SpecBalanceDruid]: (epWeights: Stats) => {
 		return epWeights.withStat(Stat.StatSpellHit, 0);

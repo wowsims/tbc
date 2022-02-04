@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
+	"github.com/wowsims/tbc/sim/core/proto"
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
@@ -738,6 +739,14 @@ var CloakOfDarknessAuraID = core.NewAuraID()
 
 func ApplyCloakOfDarkness(agent core.Agent) {
 	character := agent.GetCharacter()
+
+	// The melee distinction only matters for hunters, so for others we can skip
+	// having a separate aura.
+	if character.Class != proto.Class_ClassHunter {
+		character.AddStat(stats.MeleeCrit, 24)
+		return
+	}
+
 	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		return core.Aura{
 			ID: CloakOfDarknessAuraID,
