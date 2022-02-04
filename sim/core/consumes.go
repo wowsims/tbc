@@ -113,16 +113,12 @@ func consumesStats(character *Character, c proto.Consumes, raidBuffs proto.RaidB
 		addImbueStats(character, c.OffHandImbue)
 	}
 
-	if c.ScrollOfAgilityV {
-		s[stats.Agility] += 20
-	}
-	if c.ScrollOfStrengthV {
-		s[stats.Strength] += 20
-	}
+	s[stats.Agility] += []float64{0, 5, 9, 13, 17, 20}[c.ScrollOfAgility]
+	s[stats.Strength] += []float64{0, 5, 9, 13, 17, 20}[c.ScrollOfStrength]
 
 	// Doesn't stack with DS
-	if c.ScrollOfSpiritV && raidBuffs.DivineSpirit == proto.TristateEffect_TristateEffectMissing {
-		s[stats.Spirit] += 30
+	if raidBuffs.DivineSpirit == proto.TristateEffect_TristateEffectMissing {
+		s[stats.Spirit] += []float64{0, 3, 7, 11, 15, 30}[c.ScrollOfSpirit]
 	}
 
 	return s

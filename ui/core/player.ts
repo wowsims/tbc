@@ -672,6 +672,18 @@ export class Player<SpecType extends Spec> {
 				proto.consumes.kreegsStoutBeatdown = false;
 				proto.consumes.alchohol = Alchohol.AlchoholKreegsStoutBeatdown;
 			}
+			if (proto.consumes && proto.consumes.scrollOfAgilityV) {
+				proto.consumes.scrollOfAgilityV = false;
+				proto.consumes.scrollOfAgility = 5;
+			}
+			if (proto.consumes && proto.consumes.scrollOfStrengthV) {
+				proto.consumes.scrollOfStrengthV = false;
+				proto.consumes.scrollOfStrength = 5;
+			}
+			if (proto.consumes && proto.consumes.scrollOfSpiritV) {
+				proto.consumes.scrollOfSpiritV = false;
+				proto.consumes.scrollOfSpirit = 5;
+			}
 
 			let rotation = this.specTypeFunctions.rotationFromPlayer(proto);
 			// TODO: Remove this on 2/17/2022 (1 month).
