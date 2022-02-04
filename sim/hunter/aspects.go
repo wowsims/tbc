@@ -31,7 +31,7 @@ func (hunter *Hunter) aspectOfTheHawkAura() core.Aura {
 
 			if improvedHawkBonus > 0 && sim.RandomFloat("Imp Aspect of the Hawk") < improvedHawkProcChance {
 				hunter.PseudoStats.RangedSpeedMultiplier *= improvedHawkBonus
-				hunter.AddAura(sim, core.Aura{
+				hunter.AddAuraOnNextAdvance(sim, core.Aura{
 					ID:       ImprovedAspectOfTheHawkAuraID,
 					ActionID: core.ActionID{SpellID: 19556},
 					Expires:  sim.CurrentTime + time.Second*12,
@@ -64,7 +64,7 @@ func (hunter *Hunter) newAspectOfTheHawkTemplate(sim *core.Simulation) core.Simp
 			GCD:          core.GCDDefault,
 			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
 				hunter.aspectOfTheViper = false
-				hunter.RemoveAura(sim, AspectOfTheHawkAuraID)
+				hunter.RemoveAuraOnNextAdvance(sim, AspectOfTheHawkAuraID)
 				hunter.AddAuraOnNextAdvance(sim, aura)
 			},
 		},
@@ -94,7 +94,7 @@ func (hunter *Hunter) newAspectOfTheViperTemplate(sim *core.Simulation) core.Sim
 			GCD:          core.GCDDefault,
 			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
 				hunter.aspectOfTheViper = true
-				hunter.RemoveAura(sim, AspectOfTheHawkAuraID)
+				hunter.RemoveAuraOnNextAdvance(sim, AspectOfTheHawkAuraID)
 				hunter.AddAuraOnNextAdvance(sim, aura)
 			},
 		},
