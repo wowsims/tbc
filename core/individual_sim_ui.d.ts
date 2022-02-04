@@ -77,6 +77,7 @@ export interface IndividualSimUIConfig<SpecType extends Spec> {
     rotationInputs: InputSection;
     otherInputs?: InputSection;
     additionalSections?: Record<string, InputSection>;
+    additionalIconSections?: Record<string, Array<IndividualSimIconPickerConfig<Player<any>, any>>>;
     customSections?: Array<(simUI: IndividualSimUI<SpecType>, parentElem: HTMLElement) => string>;
     encounterPicker: EncounterPickerConfig;
     freezeTalents?: boolean;

@@ -133,7 +133,9 @@ export class HunterSimUI extends IndividualSimUI {
             // IconInputs to include in the 'Consumes' section on the settings tab.
             consumeInputs: [
                 IconInputs.MainHandAdamantiteSharpeningStone,
+                IconInputs.MainHandAdamantiteWeightstone,
                 IconInputs.OffHandAdamantiteSharpeningStone,
+                IconInputs.OffHandAdamantiteWeightstone,
                 IconInputs.DefaultHastePotion,
                 IconInputs.DefaultSuperManaPotion,
                 IconInputs.DefaultDarkRune,
@@ -148,7 +150,6 @@ export class HunterSimUI extends IndividualSimUI {
                 IconInputs.SpicyHotTalbuk,
                 IconInputs.ScrollOfAgilityV,
                 IconInputs.ScrollOfStrengthV,
-                IconInputs.KiblersBits,
             ],
             // Inputs to include in the 'Rotation' section on the settings tab.
             rotationInputs: HunterInputs.HunterRotationConfig,
@@ -163,6 +164,13 @@ export class HunterSimUI extends IndividualSimUI {
                     OtherInputs.ExposeWeaknessHunterAgility,
                     OtherInputs.SnapshotBsSolarianSapphire,
                     OtherInputs.SnapshotBsT2,
+                ],
+            },
+            additionalIconSections: {
+                'Pet Buffs': [
+                    IconInputs.KiblersBits,
+                    IconInputs.PetScrollOfAgilityV,
+                    IconInputs.PetScrollOfStrengthV,
                 ],
             },
             encounterPicker: {

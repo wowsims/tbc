@@ -800,6 +800,21 @@ const classToEligibleWeaponTypes = {
         { weaponType: WeaponType.WeaponTypeSword, canUseTwoHand: true },
     ],
 };
+export function isSharpWeaponType(weaponType) {
+    return [
+        WeaponType.WeaponTypeAxe,
+        WeaponType.WeaponTypeDagger,
+        WeaponType.WeaponTypePolearm,
+        WeaponType.WeaponTypeSword,
+    ].includes(weaponType);
+}
+export function isBluntWeaponType(weaponType) {
+    return [
+        WeaponType.WeaponTypeFist,
+        WeaponType.WeaponTypeMace,
+        WeaponType.WeaponTypeStaff,
+    ].includes(weaponType);
+}
 export const specEPTransforms = {
     [Spec.SpecBalanceDruid]: (epWeights) => {
         return epWeights.withStat(Stat.StatSpellHit, 0);

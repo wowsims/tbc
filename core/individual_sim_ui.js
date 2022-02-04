@@ -457,6 +457,16 @@ export class IndividualSimUI extends SimUI {
             anyCustomSections = true;
         }
         ;
+        for (const [sectionName, sectionConfig] of Object.entries(this.individualConfig.additionalIconSections || {})) {
+            const sectionCssPrefix = sectionName.replace(/\s+/g, '');
+            const sectionElem = document.createElement('fieldset');
+            sectionElem.classList.add('settings-section', sectionCssPrefix + '-section');
+            sectionElem.innerHTML = `<legend>${sectionName}</legend>`;
+            customSectionsContainer.appendChild(sectionElem);
+            configureIconSection(sectionElem, sectionConfig.map(iconInput => new IndividualSimIconPicker(sectionElem, this.player, iconInput, this)));
+            anyCustomSections = true;
+        }
+        ;
         (this.individualConfig.customSections || []).forEach(customSection => {
             const sectionElem = document.createElement('fieldset');
             customSectionsContainer.appendChild(sectionElem);

@@ -721,6 +721,10 @@ export var WeaponImbue;
      */
     WeaponImbue[WeaponImbue["WeaponImbueAdamantiteSharpeningStone"] = 1] = "WeaponImbueAdamantiteSharpeningStone";
     /**
+     * @generated from protobuf enum value: WeaponImbueAdamantiteWeightstone = 5;
+     */
+    WeaponImbue[WeaponImbue["WeaponImbueAdamantiteWeightstone"] = 5] = "WeaponImbueAdamantiteWeightstone";
+    /**
      * @generated from protobuf enum value: WeaponImbueElementalSharpeningStone = 2;
      */
     WeaponImbue[WeaponImbue["WeaponImbueElementalSharpeningStone"] = 2] = "WeaponImbueElementalSharpeningStone";
@@ -1460,9 +1464,11 @@ class Consumes$Type extends MessageType {
             { no: 25, name: "scroll_of_strength_v", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 26, name: "scroll_of_agility_v", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 28, name: "scroll_of_spirit_v", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
-            { no: 43, name: "scroll_of_strength", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 44, name: "scroll_of_agility", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 43, name: "scroll_of_strength", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 45, name: "scroll_of_spirit", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 46, name: "pet_scroll_of_agility", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 47, name: "pet_scroll_of_strength", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 15, name: "default_potion", kind: "enum", T: () => ["proto.Potions", Potions] },
             { no: 16, name: "starting_potion", kind: "enum", T: () => ["proto.Potions", Potions] },
             { no: 17, name: "num_starting_potions", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
@@ -1472,7 +1478,7 @@ class Consumes$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { flaskOfBlindingLight: false, flaskOfMightyRestoration: false, flaskOfPureDeath: false, flaskOfSupremePower: false, flaskOfRelentlessAssault: false, flask: 0, adeptsElixir: false, elixirOfMajorFirePower: false, elixirOfMajorFrostPower: false, elixirOfMajorShadowPower: false, elixirOfMajorAgility: false, elixirOfMajorStrength: false, elixirOfDemonslaying: false, elixirOfTheMongoose: false, battleElixir: 0, elixirOfDraenicWisdom: false, elixirOfMajorMageblood: false, guardianElixir: 0, brilliantWizardOil: false, superiorWizardOil: false, mainHandImbue: 0, offHandImbue: 0, blackenedBasilisk: false, skullfishSoup: false, roastedClefthoof: false, spicyHotTalbuk: false, grilledMudfish: false, ravagerDog: false, food: 0, petFood: 0, kreegsStoutBeatdown: false, alchohol: 0, scrollOfStrengthV: false, scrollOfAgilityV: false, scrollOfSpiritV: false, scrollOfStrength: 0, scrollOfAgility: 0, scrollOfSpirit: 0, defaultPotion: 0, startingPotion: 0, numStartingPotions: 0, defaultConjured: 0, drums: 0, battleChicken: false };
+        const message = { flaskOfBlindingLight: false, flaskOfMightyRestoration: false, flaskOfPureDeath: false, flaskOfSupremePower: false, flaskOfRelentlessAssault: false, flask: 0, adeptsElixir: false, elixirOfMajorFirePower: false, elixirOfMajorFrostPower: false, elixirOfMajorShadowPower: false, elixirOfMajorAgility: false, elixirOfMajorStrength: false, elixirOfDemonslaying: false, elixirOfTheMongoose: false, battleElixir: 0, elixirOfDraenicWisdom: false, elixirOfMajorMageblood: false, guardianElixir: 0, brilliantWizardOil: false, superiorWizardOil: false, mainHandImbue: 0, offHandImbue: 0, blackenedBasilisk: false, skullfishSoup: false, roastedClefthoof: false, spicyHotTalbuk: false, grilledMudfish: false, ravagerDog: false, food: 0, petFood: 0, kreegsStoutBeatdown: false, alchohol: 0, scrollOfStrengthV: false, scrollOfAgilityV: false, scrollOfSpiritV: false, scrollOfAgility: 0, scrollOfStrength: 0, scrollOfSpirit: 0, petScrollOfAgility: 0, petScrollOfStrength: 0, defaultPotion: 0, startingPotion: 0, numStartingPotions: 0, defaultConjured: 0, drums: 0, battleChicken: false };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -1588,14 +1594,20 @@ class Consumes$Type extends MessageType {
                 case /* bool scroll_of_spirit_v */ 28:
                     message.scrollOfSpiritV = reader.bool();
                     break;
-                case /* int32 scroll_of_strength */ 43:
-                    message.scrollOfStrength = reader.int32();
-                    break;
                 case /* int32 scroll_of_agility */ 44:
                     message.scrollOfAgility = reader.int32();
                     break;
+                case /* int32 scroll_of_strength */ 43:
+                    message.scrollOfStrength = reader.int32();
+                    break;
                 case /* int32 scroll_of_spirit */ 45:
                     message.scrollOfSpirit = reader.int32();
+                    break;
+                case /* int32 pet_scroll_of_agility */ 46:
+                    message.petScrollOfAgility = reader.int32();
+                    break;
+                case /* int32 pet_scroll_of_strength */ 47:
+                    message.petScrollOfStrength = reader.int32();
                     break;
                 case /* proto.Potions default_potion */ 15:
                     message.defaultPotion = reader.int32();
@@ -1732,15 +1744,21 @@ class Consumes$Type extends MessageType {
         /* bool scroll_of_spirit_v = 28; */
         if (message.scrollOfSpiritV !== false)
             writer.tag(28, WireType.Varint).bool(message.scrollOfSpiritV);
-        /* int32 scroll_of_strength = 43; */
-        if (message.scrollOfStrength !== 0)
-            writer.tag(43, WireType.Varint).int32(message.scrollOfStrength);
         /* int32 scroll_of_agility = 44; */
         if (message.scrollOfAgility !== 0)
             writer.tag(44, WireType.Varint).int32(message.scrollOfAgility);
+        /* int32 scroll_of_strength = 43; */
+        if (message.scrollOfStrength !== 0)
+            writer.tag(43, WireType.Varint).int32(message.scrollOfStrength);
         /* int32 scroll_of_spirit = 45; */
         if (message.scrollOfSpirit !== 0)
             writer.tag(45, WireType.Varint).int32(message.scrollOfSpirit);
+        /* int32 pet_scroll_of_agility = 46; */
+        if (message.petScrollOfAgility !== 0)
+            writer.tag(46, WireType.Varint).int32(message.petScrollOfAgility);
+        /* int32 pet_scroll_of_strength = 47; */
+        if (message.petScrollOfStrength !== 0)
+            writer.tag(47, WireType.Varint).int32(message.petScrollOfStrength);
         /* proto.Potions default_potion = 15; */
         if (message.defaultPotion !== 0)
             writer.tag(15, WireType.Varint).int32(message.defaultPotion);

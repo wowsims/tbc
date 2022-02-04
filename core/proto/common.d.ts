@@ -367,17 +367,25 @@ export interface Consumes {
      * 0 means no scroll, otherwise value is the scroll level.
      * E.g. 5 indicates Scroll of Agility V.
      *
-     * @generated from protobuf field: int32 scroll_of_strength = 43;
-     */
-    scrollOfStrength: number;
-    /**
      * @generated from protobuf field: int32 scroll_of_agility = 44;
      */
     scrollOfAgility: number;
     /**
+     * @generated from protobuf field: int32 scroll_of_strength = 43;
+     */
+    scrollOfStrength: number;
+    /**
      * @generated from protobuf field: int32 scroll_of_spirit = 45;
      */
     scrollOfSpirit: number;
+    /**
+     * @generated from protobuf field: int32 pet_scroll_of_agility = 46;
+     */
+    petScrollOfAgility: number;
+    /**
+     * @generated from protobuf field: int32 pet_scroll_of_strength = 47;
+     */
+    petScrollOfStrength: number;
     /**
      * @generated from protobuf field: proto.Potions default_potion = 15;
      */
@@ -1486,6 +1494,10 @@ export declare enum WeaponImbue {
      * @generated from protobuf enum value: WeaponImbueAdamantiteSharpeningStone = 1;
      */
     WeaponImbueAdamantiteSharpeningStone = 1,
+    /**
+     * @generated from protobuf enum value: WeaponImbueAdamantiteWeightstone = 5;
+     */
+    WeaponImbueAdamantiteWeightstone = 5,
     /**
      * @generated from protobuf enum value: WeaponImbueElementalSharpeningStone = 2;
      */

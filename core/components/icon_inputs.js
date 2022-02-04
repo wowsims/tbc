@@ -75,12 +75,14 @@ export const ElixirOfMajorStrength = makeEnumValueConsumeInput(ActionId.fromItem
 export const ElixirOfTheMongoose = makeEnumValueConsumeInput(ActionId.fromItemId(13452), 'battleElixir', BattleElixir.ElixirOfTheMongoose, ['Battle Elixir']);
 export const ElixirOfDraenicWisdom = makeEnumValueConsumeInput(ActionId.fromItemId(32067), 'guardianElixir', GuardianElixir.ElixirOfDraenicWisdom, ['Guardian Elixir']);
 export const ElixirOfMajorMageblood = makeEnumValueConsumeInput(ActionId.fromItemId(22840), 'guardianElixir', GuardianElixir.ElixirOfMajorMageblood, ['Guardian Elixir']);
-export const MainHandAdamantiteSharpeningStone = makeEnumValueConsumeInput(ActionId.fromItemId(23529), 'mainHandImbue', WeaponImbue.WeaponImbueAdamantiteSharpeningStone, ['MH Weapon Imbue']);
 export const MainHandElementalSharpeningStone = makeEnumValueConsumeInput(ActionId.fromItemId(18262), 'mainHandImbue', WeaponImbue.WeaponImbueElementalSharpeningStone, ['MH Weapon Imbue']);
 export const MainHandBrilliantWizardOil = makeEnumValueConsumeInput(ActionId.fromItemId(20749), 'mainHandImbue', WeaponImbue.WeaponImbueBrilliantWizardOil, ['MH Weapon Imbue']);
 export const MainHandSuperiorWizardOil = makeEnumValueConsumeInput(ActionId.fromItemId(22522), 'mainHandImbue', WeaponImbue.WeaponImbueSuperiorWizardOil, ['MH Weapon Imbue']);
-export const OffHandAdamantiteSharpeningStone = makeEnumValueConsumeInput(ActionId.fromItemId(23529), 'offHandImbue', WeaponImbue.WeaponImbueAdamantiteSharpeningStone, ['OH Weapon Imbue']);
 export const OffHandElementalSharpeningStone = makeEnumValueConsumeInput(ActionId.fromItemId(18262), 'offHandImbue', WeaponImbue.WeaponImbueElementalSharpeningStone, ['OH Weapon Imbue']);
+export const MainHandAdamantiteSharpeningStone = makeAdamantiteStoneInput(ActionId.fromItemId(23529), true, true, WeaponImbue.WeaponImbueAdamantiteSharpeningStone);
+export const MainHandAdamantiteWeightstone = makeAdamantiteStoneInput(ActionId.fromItemId(28421), false, true, WeaponImbue.WeaponImbueAdamantiteWeightstone);
+export const OffHandAdamantiteSharpeningStone = makeAdamantiteStoneInput(ActionId.fromItemId(23529), true, false, WeaponImbue.WeaponImbueAdamantiteSharpeningStone);
+export const OffHandAdamantiteWeightstone = makeAdamantiteStoneInput(ActionId.fromItemId(28421), false, false, WeaponImbue.WeaponImbueAdamantiteWeightstone);
 export const BlackenedBasilisk = makeEnumValueConsumeInput(ActionId.fromItemId(27657), 'food', Food.FoodBlackenedBasilisk, ['Food']);
 export const GrilledMudfish = makeEnumValueConsumeInput(ActionId.fromItemId(27664), 'food', Food.FoodGrilledMudfish, ['Food']);
 export const RavagerDog = makeEnumValueConsumeInput(ActionId.fromItemId(27655), 'food', Food.FoodRavagerDog, ['Food']);
@@ -98,6 +100,8 @@ export const DefaultFlameCap = makeEnumValueConsumeInput(ActionId.fromItemId(227
 export const ScrollOfAgilityV = makeEnumValueConsumeInput(ActionId.fromItemId(27498), 'scrollOfAgility', 5);
 export const ScrollOfSpiritV = makeEnumValueConsumeInput(ActionId.fromItemId(27501), 'scrollOfSpirit', 5, ['Spirit']);
 export const ScrollOfStrengthV = makeEnumValueConsumeInput(ActionId.fromItemId(27503), 'scrollOfStrength', 5);
+export const PetScrollOfAgilityV = makeEnumValueConsumeInput(ActionId.fromItemId(27498), 'petScrollOfAgility', 5);
+export const PetScrollOfStrengthV = makeEnumValueConsumeInput(ActionId.fromItemId(27503), 'petScrollOfStrength', 5);
 function removeOtherPartyMembersDrums(eventID, player, newValue) {
     if (newValue) {
         player.getOtherPartyMembers().forEach(otherPlayer => {
@@ -277,7 +281,7 @@ function makeBooleanConsumeInput(id, consumesFieldName, exclusivityTags) {
         },
     };
 }
-function makeEnumValueConsumeInput(id, consumesFieldName, enumValue, exclusivityTags, onSet) {
+function makeEnumValueConsumeInput(id, consumesFieldName, enumValue, exclusivityTags, onSet, showWhen) {
     return {
         id: id,
         states: 2,
@@ -294,6 +298,7 @@ function makeEnumValueConsumeInput(id, consumesFieldName, enumValue, exclusivity
                 }
             });
         },
+        showWhen: showWhen,
     };
 }
 //////////////////////////////////////////////////////////////////////
@@ -381,3 +386,20 @@ export const BattleShout = {
         party.setBuffs(eventID, newBuffs);
     },
 };
+function makeAdamantiteStoneInput(id, isSharp, isMH, enumValue) {
+    const exclusivityTags = isMH ? ['MH Weapon Imbue'] : ['OH Weapon Imbue'];
+    const consumesFieldName = isMH ? 'mainHandImbue' : 'offHandImbue';
+    return {
+        id: id,
+        states: 2,
+        exclusivityTags: exclusivityTags,
+        changedEvent: (player) => TypedEvent.onAny([player.consumesChangeEmitter, player.gearChangeEmitter]),
+        getValue: (player) => player.getConsumes()[consumesFieldName] == enumValue,
+        setValue: (eventID, player, newValue) => {
+            const newConsumes = player.getConsumes();
+            newConsumes[consumesFieldName] = newValue ? enumValue : 0;
+            player.setConsumes(eventID, newConsumes);
+        },
+        showWhen: (player) => (isMH ? player.getGear().hasBluntMHWeapon() : player.getGear().hasBluntOHWeapon()) != isSharp,
+    };
+}

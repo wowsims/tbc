@@ -63,12 +63,14 @@ export declare const ElixirOfMajorStrength: IndividualSimIconPickerConfig<Player
 export declare const ElixirOfTheMongoose: IndividualSimIconPickerConfig<Player<any>, boolean>;
 export declare const ElixirOfDraenicWisdom: IndividualSimIconPickerConfig<Player<any>, boolean>;
 export declare const ElixirOfMajorMageblood: IndividualSimIconPickerConfig<Player<any>, boolean>;
-export declare const MainHandAdamantiteSharpeningStone: IndividualSimIconPickerConfig<Player<any>, boolean>;
 export declare const MainHandElementalSharpeningStone: IndividualSimIconPickerConfig<Player<any>, boolean>;
 export declare const MainHandBrilliantWizardOil: IndividualSimIconPickerConfig<Player<any>, boolean>;
 export declare const MainHandSuperiorWizardOil: IndividualSimIconPickerConfig<Player<any>, boolean>;
-export declare const OffHandAdamantiteSharpeningStone: IndividualSimIconPickerConfig<Player<any>, boolean>;
 export declare const OffHandElementalSharpeningStone: IndividualSimIconPickerConfig<Player<any>, boolean>;
+export declare const MainHandAdamantiteSharpeningStone: IndividualSimIconPickerConfig<Player<any>, boolean>;
+export declare const MainHandAdamantiteWeightstone: IndividualSimIconPickerConfig<Player<any>, boolean>;
+export declare const OffHandAdamantiteSharpeningStone: IndividualSimIconPickerConfig<Player<any>, boolean>;
+export declare const OffHandAdamantiteWeightstone: IndividualSimIconPickerConfig<Player<any>, boolean>;
 export declare const BlackenedBasilisk: IndividualSimIconPickerConfig<Player<any>, boolean>;
 export declare const GrilledMudfish: IndividualSimIconPickerConfig<Player<any>, boolean>;
 export declare const RavagerDog: IndividualSimIconPickerConfig<Player<any>, boolean>;
@@ -86,6 +88,8 @@ export declare const DefaultFlameCap: IndividualSimIconPickerConfig<Player<any>,
 export declare const ScrollOfAgilityV: IndividualSimIconPickerConfig<Player<any>, boolean>;
 export declare const ScrollOfSpiritV: IndividualSimIconPickerConfig<Player<any>, boolean>;
 export declare const ScrollOfStrengthV: IndividualSimIconPickerConfig<Player<any>, boolean>;
+export declare const PetScrollOfAgilityV: IndividualSimIconPickerConfig<Player<any>, boolean>;
+export declare const PetScrollOfStrengthV: IndividualSimIconPickerConfig<Player<any>, boolean>;
 export declare const DrumsOfBattleConsume: IndividualSimIconPickerConfig<Player<any>, boolean>;
 export declare const DrumsOfRestorationConsume: IndividualSimIconPickerConfig<Player<any>, boolean>;
 export declare const GraceOfAirTotem: {

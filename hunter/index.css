@@ -2276,6 +2276,10 @@ input, select {
   grid-template-columns: repeat(4, 1fr);
 }
 
+.hunter-sim-ui .PetBuffs-section {
+  grid-template-columns: repeat(3, 1fr);
+}
+
 .hunter-sim-ui .character-stats-table-row {
   font-size: 11px;
 }
