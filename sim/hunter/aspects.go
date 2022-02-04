@@ -64,8 +64,8 @@ func (hunter *Hunter) newAspectOfTheHawkTemplate(sim *core.Simulation) core.Simp
 			GCD:          core.GCDDefault,
 			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
 				hunter.aspectOfTheViper = false
-				hunter.RemoveAura(sim, AspectOfTheHawkAuraID)
-				hunter.AddAuraOnNextAdvance(sim, aura)
+				hunter.RemoveAuraOnNextAdvance(sim, AspectOfTheHawkAuraID)
+				hunter.AddAura(sim, aura)
 			},
 		},
 	}
@@ -94,8 +94,8 @@ func (hunter *Hunter) newAspectOfTheViperTemplate(sim *core.Simulation) core.Sim
 			GCD:          core.GCDDefault,
 			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
 				hunter.aspectOfTheViper = true
-				hunter.RemoveAura(sim, AspectOfTheHawkAuraID)
-				hunter.AddAuraOnNextAdvance(sim, aura)
+				hunter.RemoveAuraOnNextAdvance(sim, AspectOfTheHawkAuraID)
+				hunter.AddAura(sim, aura)
 			},
 		},
 	}

@@ -285,7 +285,7 @@ func (ahe *AbilityHitEffect) WhiteHitTableResult(sim *Simulation, ability *Activ
 
 	// Miss
 	missChance := 0.05 + skillDifference*0.002
-	if ahe.IsWhiteHit && character.AutoAttacks.IsDualWielding {
+	if ahe.IsWhiteHit && !ahe.IsRanged() && character.AutoAttacks.IsDualWielding {
 		missChance += 0.19
 	}
 	hitSuppression := (skillDifference - 10) * 0.002

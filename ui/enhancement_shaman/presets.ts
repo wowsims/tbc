@@ -63,7 +63,8 @@ export const DefaultOptions = EnhancementShamanOptions.create({
 export const DefaultConsumes = Consumes.create({
 	drums: Drums.DrumsOfBattle,
 	defaultPotion: Potions.SuperManaPotion,
-	flaskOfRelentlessAssault: true,
+	flask: Flask.FlaskOfRelentlessAssault,
+	food: Food.FoodRoastedClefthoof,
 });
 
 export const P1_PRESET = {

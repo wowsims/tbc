@@ -389,9 +389,17 @@ message Consumes {
     bool kreegsStoutBeatdown = 20;
 		Alchohol alchohol = 42;
 
+		// Deprecated in favor of int32 versions below.
+		// Remove on 3/4/2022 (1 month).
     bool scroll_of_strength_v = 25; // 20 str
     bool scroll_of_agility_v = 26; // 20 agi
     bool scroll_of_spirit_v = 28; // 30 spirit
+
+		// 0 means no scroll, otherwise value is the scroll level.
+		// E.g. 5 indicates Scroll of Agility V.
+    int32 scroll_of_strength = 43;
+    int32 scroll_of_agility = 44;
+    int32 scroll_of_spirit = 45;
 
     Potions default_potion = 15;
     Potions starting_potion = 16;

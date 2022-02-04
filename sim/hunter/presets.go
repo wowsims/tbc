@@ -89,9 +89,10 @@ var FullIndividualBuffs = &proto.IndividualBuffs{
 }
 
 var FullConsumes = &proto.Consumes{
-	Flask:         proto.Flask_FlaskOfRelentlessAssault,
-	DefaultPotion: proto.Potions_HastePotion,
-	PetFood:       proto.PetFood_PetFoodKiblersBits,
+	Flask:           proto.Flask_FlaskOfRelentlessAssault,
+	DefaultPotion:   proto.Potions_HastePotion,
+	DefaultConjured: proto.Conjured_ConjuredDarkRune,
+	PetFood:         proto.PetFood_PetFoodKiblersBits,
 }
 
 var FullDebuffs = &proto.Debuffs{

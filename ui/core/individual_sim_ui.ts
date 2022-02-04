@@ -12,6 +12,7 @@ import { Encounter } from './encounter.js';
 import { EncounterPicker, EncounterPickerConfig } from '/tbc/core/components/encounter_picker.js';
 import { EnumPicker, EnumPickerConfig } from '/tbc/core/components/enum_picker.js';
 import { EquipmentSpec } from '/tbc/core/proto/common.js';
+import { Flask } from '/tbc/core/proto/common.js';
 import { Gear } from '/tbc/core/proto_utils/gear.js';
 import { GearPicker } from '/tbc/core/components/gear_picker.js';
 import { IconPicker, IconPickerConfig } from '/tbc/core/components/icon_picker.js';
@@ -299,6 +300,17 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 			if (!loadedSettings) {
 				this.applyDefaults(initEventID);
 			}
+
+			// Fix some bad defaults we used to have to enhance.
+			if (this.player.spec == Spec.SpecEnhancementShaman) {
+				const consumes = this.player.getConsumes();
+				if (consumes.flask == Flask.FlaskOfBlindingLight) {
+					consumes.flask = Flask.FlaskUnknown;
+				}
+				consumes.mainHandImbue = 0;
+				this.player.setConsumes(initEventID, consumes);
+			}
+
 			this.player.setName(initEventID, 'Player');
 
 			// This needs to go last so it doesn't re-store things as they are initialized.

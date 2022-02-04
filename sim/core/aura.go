@@ -699,6 +699,9 @@ func (character *Character) NewTempStatAuraApplier(sim *Simulation, auraID AuraI
 				character.AddMeleeHaste(sim, -amount)
 			} else {
 				character.AddStat(stat, -amount)
+				if stat == stats.AttackPower {
+					character.AddStat(stats.RangedAttackPower, -amount)
+				}
 			}
 		},
 	}
@@ -711,6 +714,9 @@ func (character *Character) NewTempStatAuraApplier(sim *Simulation, auraID AuraI
 			character.AddMeleeHaste(sim, amount)
 		} else {
 			character.AddStat(stat, amount)
+			if stat == stats.AttackPower {
+				character.AddStat(stats.RangedAttackPower, amount)
+			}
 		}
 		aura.Expires = sim.CurrentTime + duration
 		character.AddAura(sim, aura)
