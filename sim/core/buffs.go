@@ -395,7 +395,7 @@ func WindfuryTotemAura(character *Character, rank int32, iwtTalentPoints int32) 
 		ID:       WindfuryTotemAuraID,
 		ActionID: actionID,
 		OnMeleeAttack: func(sim *Simulation, ability *ActiveMeleeAbility, hitEffect *AbilityHitEffect) {
-			if !hitEffect.Landed() || !hitEffect.IsWeaponHit() || !hitEffect.IsMH() {
+			if !hitEffect.Landed() || !hitEffect.IsWeaponHit() || !hitEffect.IsMH() || ability.IsPhantom {
 				return
 			}
 			if sim.RandomFloat("Windfury Totem") > procChance {

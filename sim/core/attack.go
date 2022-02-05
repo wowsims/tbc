@@ -62,8 +62,9 @@ type MeleeAbility struct {
 	// How much to multiply damage by, if this cast crits.
 	CritMultiplier float64
 
-	// If true, will force the cast to crit (if it doesnt miss).
-	GuaranteedCrit bool
+	// Whether this is a phantom attack. Phantom attacks are usually triggered by some effect,
+	// like Windfury. Many on-hit effects do not proc from phantom attacks, only regular attacks.
+	IsPhantom bool
 
 	// Internal field only, used to prevent pool objects from being used by
 	// multiple attacks simultaneously.
