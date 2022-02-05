@@ -81,6 +81,12 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestWarrior-AllItems-BlazefuryMedallion-17111"
+ value: {
+  dps: 249.73385368092377
+ }
+}
+dps_results: {
  key: "TestWarrior-AllItems-BracingEarthstormDiamond"
  value: {
   dps: 254.4528071955675
@@ -444,6 +450,12 @@ dps_results: {
  key: "TestWarrior-AllItems-SpellstrikeInfusion"
  value: {
   dps: 203.2730731861985
+ }
+}
+dps_results: {
+ key: "TestWarrior-AllItems-StormGauntlets-12632"
+ value: {
+  dps: 247.59371296368045
  }
 }
 dps_results: {

@@ -87,6 +87,12 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestBalance-AllItems-BlazefuryMedallion-17111"
+ value: {
+  dps: 1244.0134221286507
+ }
+}
+dps_results: {
  key: "TestBalance-AllItems-BloodlustBrooch-29383"
  value: {
   dps: 1257.609108853167

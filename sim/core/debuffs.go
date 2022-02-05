@@ -160,8 +160,8 @@ func JudgementOfWisdomAura() Aura {
 		ID:       JudgementOfWisdomDebuffID,
 		ActionID: actionID,
 		OnSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect) {
-			if spellCast.ActionID.ItemID == ItemIDTheLightningCapacitor {
-				return // TLC cant proc JoW
+			if spellCast.IsPhantom {
+				return // Phantom spells (Romulo's, Lightning Capacitor, etc) don't proc JoW.
 			}
 
 			character := spellCast.Character

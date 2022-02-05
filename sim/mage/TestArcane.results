@@ -93,6 +93,12 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestArcane-AllItems-BlazefuryMedallion-17111"
+ value: {
+  dps: 1337.67390295851
+ }
+}
+dps_results: {
  key: "TestArcane-AllItems-BloodlustBrooch-29383"
  value: {
   dps: 1325.0198484394093
