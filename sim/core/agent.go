@@ -34,7 +34,7 @@ type Agent interface {
 	OnManaTick(sim *Simulation)
 
 	// Called after each auto attack performed by this Agent.
-	OnAutoAttack(sim *Simulation)
+	OnAutoAttack(sim *Simulation, ability *ActiveMeleeAbility)
 }
 
 type ActionID struct {

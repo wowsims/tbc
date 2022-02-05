@@ -45,6 +45,8 @@ type Hunter struct {
 
 	timeToWeave time.Duration
 
+	raptorStrikeCost float64 // Cached mana cost of raptor strike.
+
 	pet *HunterPet
 
 	aimedShotTemplate core.MeleeAbilityTemplate
@@ -162,7 +164,7 @@ func NewHunter(character core.Character, options proto.Player) *Hunter {
 		OffHand:         hunter.WeaponFromOffHand(0),
 		Ranged:          hunter.WeaponFromRanged(0),
 		AutoSwingRanged: true,
-		OnBeforeMHSwing: func(sim *core.Simulation) bool {
+		ReplaceMHSwing: func(sim *core.Simulation) *core.ActiveMeleeAbility {
 			return hunter.TryRaptorStrike(sim)
 		},
 	})

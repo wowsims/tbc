@@ -39,6 +39,8 @@ func (hunter *Hunter) newRaptorStrikeTemplate(sim *core.Simulation) core.MeleeAb
 	ama.Cost.Value -= 120 * 0.2 * float64(hunter.Talents.Resourcefulness)
 	ama.Effect.BonusCritRating += float64(hunter.Talents.SavageStrikes) * 10 * core.MeleeCritRatingPerCritChance
 
+	hunter.raptorStrikeCost = ama.Cost.Value
+
 	return core.NewMeleeAbilityTemplate(ama)
 }
 
@@ -53,10 +55,10 @@ func (hunter *Hunter) NewRaptorStrike(sim *core.Simulation, target *core.Target)
 }
 
 // Returns true if the regular melee swing should be used, false otherwise.
-func (hunter *Hunter) TryRaptorStrike(sim *core.Simulation) bool {
-	if !hunter.Rotation.UseRaptorStrike || hunter.IsOnCD(RaptorStrikeCooldownID, sim.CurrentTime) {
-		return true
+func (hunter *Hunter) TryRaptorStrike(sim *core.Simulation) *core.ActiveMeleeAbility {
+	if !hunter.Rotation.UseRaptorStrike || hunter.IsOnCD(RaptorStrikeCooldownID, sim.CurrentTime) || hunter.CurrentMana() < hunter.raptorStrikeCost {
+		return nil
 	}
 
-	return !hunter.NewRaptorStrike(sim, sim.GetPrimaryTarget()).Attack(sim)
+	return hunter.NewRaptorStrike(sim, sim.GetPrimaryTarget())
 }
