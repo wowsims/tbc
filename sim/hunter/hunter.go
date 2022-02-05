@@ -131,7 +131,7 @@ func (hunter *Hunter) Reset(sim *core.Simulation) {
 	target := sim.GetPrimaryTarget()
 	impHuntersMark := hunter.Talents.ImprovedHuntersMark
 	if !target.HasAura(core.HuntersMarkDebuffID) || target.NumStacks(core.HuntersMarkDebuffID) < impHuntersMark {
-		target.AddAura(sim, core.HuntersMarkAura(impHuntersMark))
+		target.AddAura(sim, core.HuntersMarkAura(impHuntersMark, false))
 	}
 }
 
