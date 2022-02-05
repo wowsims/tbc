@@ -546,14 +546,18 @@ class Hunter_Rotation$Type extends MessageType {
             { no: 1, name: "use_multi_shot", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 2, name: "use_arcane_shot", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 3, name: "precast_aimed_shot", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
-            { no: 4, name: "melee_weave", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 11, name: "use_french_rotation", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 5, name: "sting", kind: "enum", T: () => ["proto.Hunter.Rotation.StingType", Hunter_Rotation_StingType] },
             { no: 6, name: "viper_start_mana_percent", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
-            { no: 7, name: "viper_stop_mana_percent", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ }
+            { no: 7, name: "viper_stop_mana_percent", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
+            { no: 4, name: "melee_weave", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 8, name: "use_raptor_strike", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 9, name: "time_to_weave_ms", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 10, name: "percent_weaved", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ }
         ]);
     }
     create(value) {
-        const message = { useMultiShot: false, useArcaneShot: false, precastAimedShot: false, meleeWeave: false, sting: 0, viperStartManaPercent: 0, viperStopManaPercent: 0 };
+        const message = { useMultiShot: false, useArcaneShot: false, precastAimedShot: false, useFrenchRotation: false, sting: 0, viperStartManaPercent: 0, viperStopManaPercent: 0, meleeWeave: false, useRaptorStrike: false, timeToWeaveMs: 0, percentWeaved: 0 };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -573,8 +577,8 @@ class Hunter_Rotation$Type extends MessageType {
                 case /* bool precast_aimed_shot */ 3:
                     message.precastAimedShot = reader.bool();
                     break;
-                case /* bool melee_weave */ 4:
-                    message.meleeWeave = reader.bool();
+                case /* bool use_french_rotation */ 11:
+                    message.useFrenchRotation = reader.bool();
                     break;
                 case /* proto.Hunter.Rotation.StingType sting */ 5:
                     message.sting = reader.int32();
@@ -584,6 +588,18 @@ class Hunter_Rotation$Type extends MessageType {
                     break;
                 case /* double viper_stop_mana_percent */ 7:
                     message.viperStopManaPercent = reader.double();
+                    break;
+                case /* bool melee_weave */ 4:
+                    message.meleeWeave = reader.bool();
+                    break;
+                case /* bool use_raptor_strike */ 8:
+                    message.useRaptorStrike = reader.bool();
+                    break;
+                case /* int32 time_to_weave_ms */ 9:
+                    message.timeToWeaveMs = reader.int32();
+                    break;
+                case /* double percent_weaved */ 10:
+                    message.percentWeaved = reader.double();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -606,9 +622,9 @@ class Hunter_Rotation$Type extends MessageType {
         /* bool precast_aimed_shot = 3; */
         if (message.precastAimedShot !== false)
             writer.tag(3, WireType.Varint).bool(message.precastAimedShot);
-        /* bool melee_weave = 4; */
-        if (message.meleeWeave !== false)
-            writer.tag(4, WireType.Varint).bool(message.meleeWeave);
+        /* bool use_french_rotation = 11; */
+        if (message.useFrenchRotation !== false)
+            writer.tag(11, WireType.Varint).bool(message.useFrenchRotation);
         /* proto.Hunter.Rotation.StingType sting = 5; */
         if (message.sting !== 0)
             writer.tag(5, WireType.Varint).int32(message.sting);
@@ -618,6 +634,18 @@ class Hunter_Rotation$Type extends MessageType {
         /* double viper_stop_mana_percent = 7; */
         if (message.viperStopManaPercent !== 0)
             writer.tag(7, WireType.Bit64).double(message.viperStopManaPercent);
+        /* bool melee_weave = 4; */
+        if (message.meleeWeave !== false)
+            writer.tag(4, WireType.Varint).bool(message.meleeWeave);
+        /* bool use_raptor_strike = 8; */
+        if (message.useRaptorStrike !== false)
+            writer.tag(8, WireType.Varint).bool(message.useRaptorStrike);
+        /* int32 time_to_weave_ms = 9; */
+        if (message.timeToWeaveMs !== 0)
+            writer.tag(9, WireType.Varint).int32(message.timeToWeaveMs);
+        /* double percent_weaved = 10; */
+        if (message.percentWeaved !== 0)
+            writer.tag(10, WireType.Bit64).double(message.percentWeaved);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

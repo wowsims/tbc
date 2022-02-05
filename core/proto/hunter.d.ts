@@ -229,9 +229,9 @@ export interface Hunter_Rotation {
      */
     precastAimedShot: boolean;
     /**
-     * @generated from protobuf field: bool melee_weave = 4;
+     * @generated from protobuf field: bool use_french_rotation = 11;
      */
-    meleeWeave: boolean;
+    useFrenchRotation: boolean;
     /**
      * @generated from protobuf field: proto.Hunter.Rotation.StingType sting = 5;
      */
@@ -248,6 +248,26 @@ export interface Hunter_Rotation {
      * @generated from protobuf field: double viper_stop_mana_percent = 7;
      */
     viperStopManaPercent: number;
+    /**
+     * @generated from protobuf field: bool melee_weave = 4;
+     */
+    meleeWeave: boolean;
+    /**
+     * @generated from protobuf field: bool use_raptor_strike = 8;
+     */
+    useRaptorStrike: boolean;
+    /**
+     * Time in milliseconds from when the hunter starts moving to when they reengage their ranged autos.
+     *
+     * @generated from protobuf field: int32 time_to_weave_ms = 9;
+     */
+    timeToWeaveMs: number;
+    /**
+     * Percent of fight (0-1) to use melee weaving.
+     *
+     * @generated from protobuf field: double percent_weaved = 10;
+     */
+    percentWeaved: number;
 }
 /**
  * @generated from protobuf enum proto.Hunter.Rotation.StingType

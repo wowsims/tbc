@@ -162,16 +162,16 @@ export const HunterRotationConfig = {
             },
         },
         {
-            type: 'boolean', cssClass: 'melee-weave-picker',
+            type: 'boolean', cssClass: 'use-french-rotation-picker',
             getModObject: (simUI) => simUI.player,
             config: {
-                label: 'Melee Weave',
-                labelTooltip: 'Uses melee weaving in the rotation.',
+                label: 'Use French Rotation',
+                labelTooltip: 'Allows the use of French Rotation (SS+MS or SS+AS between two ranged autos) when no temporary haste effects are active.',
                 changedEvent: (player) => player.rotationChangeEmitter,
-                getValue: (player) => player.getRotation().meleeWeave,
+                getValue: (player) => player.getRotation().useFrenchRotation,
                 setValue: (eventID, player, newValue) => {
                     const newRotation = player.getRotation();
-                    newRotation.meleeWeave = newValue;
+                    newRotation.useFrenchRotation = newValue;
                     player.setRotation(eventID, newRotation);
                 },
             },
@@ -204,6 +204,70 @@ export const HunterRotationConfig = {
                     newRotation.viperStopManaPercent = newValue / 100;
                     player.setRotation(eventID, newRotation);
                 },
+            },
+        },
+        {
+            type: 'boolean', cssClass: 'melee-weave-picker',
+            getModObject: (simUI) => simUI,
+            config: {
+                label: 'Melee Weave',
+                labelTooltip: 'Uses melee weaving in the rotation.',
+                changedEvent: (simUI) => simUI.player.rotationChangeEmitter,
+                getValue: (simUI) => simUI.player.getRotation().meleeWeave,
+                setValue: (eventID, simUI, newValue) => {
+                    const newRotation = simUI.player.getRotation();
+                    newRotation.meleeWeave = newValue;
+                    simUI.player.setRotation(eventID, newRotation);
+                    simUI.recomputeSettingsLayout();
+                },
+            },
+        },
+        {
+            type: 'boolean', cssClass: 'use-raptor-strike-picker',
+            getModObject: (simUI) => simUI.player,
+            config: {
+                label: 'Use Raptor Strike',
+                labelTooltip: 'Uses Raptor Strike instead of regular melee hits while weaving.',
+                changedEvent: (player) => player.rotationChangeEmitter,
+                getValue: (player) => player.getRotation().useRaptorStrike,
+                setValue: (eventID, player, newValue) => {
+                    const newRotation = player.getRotation();
+                    newRotation.useRaptorStrike = newValue;
+                    player.setRotation(eventID, newRotation);
+                },
+                showWhen: (player) => player.getRotation().meleeWeave,
+            },
+        },
+        {
+            type: 'number', cssClass: 'time-to-weave-picker',
+            getModObject: (simUI) => simUI.player,
+            config: {
+                label: 'Time To Weave (ms)',
+                labelTooltip: 'Amount of time, in milliseconds, between when you start moving towards the boss and when you re-engage your ranged autos.',
+                changedEvent: (player) => player.rotationChangeEmitter,
+                getValue: (player) => player.getRotation().timeToWeaveMs,
+                setValue: (eventID, player, newValue) => {
+                    const newRotation = player.getRotation();
+                    newRotation.timeToWeaveMs = newValue;
+                    player.setRotation(eventID, newRotation);
+                },
+                showWhen: (player) => player.getRotation().meleeWeave,
+            },
+        },
+        {
+            type: 'number', cssClass: 'percent-weaved-picker',
+            getModObject: (simUI) => simUI.player,
+            config: {
+                label: 'Time Weaved (%)',
+                labelTooltip: 'Percentage of fight to use melee weaving.',
+                changedEvent: (player) => player.rotationChangeEmitter,
+                getValue: (player) => player.getRotation().percentWeaved * 100,
+                setValue: (eventID, player, newValue) => {
+                    const newRotation = player.getRotation();
+                    newRotation.percentWeaved = newValue / 100;
+                    player.setRotation(eventID, newRotation);
+                },
+                showWhen: (player) => player.getRotation().meleeWeave,
             },
         },
     ],

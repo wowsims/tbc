@@ -79,6 +79,7 @@ export declare const HunterRotationConfig: {
             getValue: (player: Player<Spec.SpecHunter>) => boolean;
             setValue: (eventID: EventID, player: Player<Spec.SpecHunter>, newValue: boolean) => void;
             values?: undefined;
+            showWhen?: undefined;
         };
     } | {
         type: "enum";
@@ -94,6 +95,7 @@ export declare const HunterRotationConfig: {
             changedEvent: (player: Player<Spec.SpecHunter>) => TypedEvent<void>;
             getValue: (player: Player<Spec.SpecHunter>) => StingType;
             setValue: (eventID: EventID, player: Player<Spec.SpecHunter>, newValue: number) => void;
+            showWhen?: undefined;
         };
     } | {
         type: "number";
@@ -105,6 +107,46 @@ export declare const HunterRotationConfig: {
             changedEvent: (player: Player<Spec.SpecHunter>) => TypedEvent<void>;
             getValue: (player: Player<Spec.SpecHunter>) => number;
             setValue: (eventID: EventID, player: Player<Spec.SpecHunter>, newValue: number) => void;
+            values?: undefined;
+            showWhen?: undefined;
+        };
+    } | {
+        type: "boolean";
+        cssClass: string;
+        getModObject: (simUI: IndividualSimUI<any>) => IndividualSimUI<any>;
+        config: {
+            label: string;
+            labelTooltip: string;
+            changedEvent: (simUI: IndividualSimUI<Spec.SpecHunter>) => TypedEvent<void>;
+            getValue: (simUI: IndividualSimUI<Spec.SpecHunter>) => boolean;
+            setValue: (eventID: EventID, simUI: IndividualSimUI<Spec.SpecHunter>, newValue: boolean) => void;
+            values?: undefined;
+            showWhen?: undefined;
+        };
+    } | {
+        type: "boolean";
+        cssClass: string;
+        getModObject: (simUI: IndividualSimUI<any>) => Player<any>;
+        config: {
+            label: string;
+            labelTooltip: string;
+            changedEvent: (player: Player<Spec.SpecHunter>) => TypedEvent<void>;
+            getValue: (player: Player<Spec.SpecHunter>) => boolean;
+            setValue: (eventID: EventID, player: Player<Spec.SpecHunter>, newValue: boolean) => void;
+            showWhen: (player: Player<Spec.SpecHunter>) => boolean;
+            values?: undefined;
+        };
+    } | {
+        type: "number";
+        cssClass: string;
+        getModObject: (simUI: IndividualSimUI<any>) => Player<any>;
+        config: {
+            label: string;
+            labelTooltip: string;
+            changedEvent: (player: Player<Spec.SpecHunter>) => TypedEvent<void>;
+            getValue: (player: Player<Spec.SpecHunter>) => number;
+            setValue: (eventID: EventID, player: Player<Spec.SpecHunter>, newValue: number) => void;
+            showWhen: (player: Player<Spec.SpecHunter>) => boolean;
             values?: undefined;
         };
     })[];
