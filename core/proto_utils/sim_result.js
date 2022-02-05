@@ -127,7 +127,7 @@ export class PlayerMetrics {
         this.player = player;
         this.metrics = metrics;
         this.raidIndex = raidIndex;
-        this.name = player.name;
+        this.name = metrics.name;
         this.spec = playerToSpec(player);
         this.isPet = isPet;
         this.iconUrl = getTalentTreeIcon(this.spec, player.talentsString);
@@ -159,6 +159,12 @@ export class PlayerMetrics {
     }
     getPlayerAndPetActions() {
         return this.actions.concat(this.pets.map(pet => pet.getPlayerAndPetActions()).flat());
+    }
+    getMeleeActions() {
+        return this.actions.filter(e => e.hitAttempts != 0 && e.isMeleeAction);
+    }
+    getSpellActions() {
+        return this.actions.filter(e => e.hitAttempts != 0 && !e.isMeleeAction);
     }
     static async makeNew(iterations, duration, player, metrics, raidIndex, isPet, logs) {
         const playerLogs = logs.filter(log => log.source && (!log.source.isTarget && (isPet == log.source.isPet) && log.source.index == raidIndex));

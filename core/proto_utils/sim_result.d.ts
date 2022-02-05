@@ -85,6 +85,8 @@ export declare class PlayerMetrics {
     get secondsOomAvg(): number;
     get totalDamage(): number;
     getPlayerAndPetActions(): Array<ActionMetrics>;
+    getMeleeActions(): Array<ActionMetrics>;
+    getSpellActions(): Array<ActionMetrics>;
     static makeNew(iterations: number, duration: number, player: PlayerProto, metrics: PlayerMetricsProto, raidIndex: number, isPet: boolean, logs: Array<SimLog>): Promise<PlayerMetrics>;
 }
 export declare class EncounterMetrics {

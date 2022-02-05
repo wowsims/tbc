@@ -687,6 +687,7 @@ export const DistributionMetrics = new DistributionMetrics$Type();
 class PlayerMetrics$Type extends MessageType {
     constructor() {
         super("proto.PlayerMetrics", [
+            { no: 9, name: "name", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
             { no: 1, name: "dps", kind: "message", T: () => DistributionMetrics },
             { no: 8, name: "threat", kind: "message", T: () => DistributionMetrics },
             { no: 3, name: "seconds_oom_avg", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
@@ -696,7 +697,7 @@ class PlayerMetrics$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { secondsOomAvg: 0, actions: [], auras: [], pets: [] };
+        const message = { name: "", secondsOomAvg: 0, actions: [], auras: [], pets: [] };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -707,6 +708,9 @@ class PlayerMetrics$Type extends MessageType {
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
+                case /* string name */ 9:
+                    message.name = reader.string();
+                    break;
                 case /* proto.DistributionMetrics dps */ 1:
                     message.dps = DistributionMetrics.internalBinaryRead(reader, reader.uint32(), options, message.dps);
                     break;
@@ -737,6 +741,9 @@ class PlayerMetrics$Type extends MessageType {
         return message;
     }
     internalBinaryWrite(message, writer, options) {
+        /* string name = 9; */
+        if (message.name !== "")
+            writer.tag(9, WireType.LengthDelimited).string(message.name);
         /* proto.DistributionMetrics dps = 1; */
         if (message.dps)
             DistributionMetrics.internalBinaryWrite(message.dps, writer.tag(1, WireType.LengthDelimited).fork(), options).join();

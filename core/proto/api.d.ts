@@ -308,6 +308,10 @@ export interface DistributionMetrics {
  */
 export interface PlayerMetrics {
     /**
+     * @generated from protobuf field: string name = 9;
+     */
+    name: string;
+    /**
      * @generated from protobuf field: proto.DistributionMetrics dps = 1;
      */
     dps?: DistributionMetrics;
