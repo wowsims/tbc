@@ -93,6 +93,12 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestFire-AllItems-BlazefuryMedallion-17111"
+ value: {
+  dps: 1793.9053636231079
+ }
+}
+dps_results: {
  key: "TestFire-AllItems-BloodlustBrooch-29383"
  value: {
   dps: 1827.5999395387776

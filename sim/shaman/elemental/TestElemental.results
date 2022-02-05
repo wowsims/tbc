@@ -121,6 +121,12 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestElemental-AllItems-BlazefuryMedallion-17111"
+ value: {
+  dps: 1526.352608891383
+ }
+}
+dps_results: {
  key: "TestElemental-AllItems-BloodlustBrooch-29383"
  value: {
   dps: 1496.6488109754657
@@ -562,6 +568,12 @@ dps_results: {
  key: "TestElemental-AllItems-Stonebreaker'sTotem-33507"
  value: {
   dps: 1515.6552113749033
+ }
+}
+dps_results: {
+ key: "TestElemental-AllItems-StormGauntlets-12632"
+ value: {
+  dps: 1512.1154376288198
  }
 }
 dps_results: {

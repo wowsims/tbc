@@ -105,6 +105,12 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestHunter-AllItems-BlazefuryMedallion-17111"
+ value: {
+  dps: 1436.2884045528651
+ }
+}
+dps_results: {
  key: "TestHunter-AllItems-BracingEarthstormDiamond"
  value: {
   dps: 1535.9322181461418
@@ -437,7 +443,7 @@ dps_results: {
 dps_results: {
  key: "TestHunter-AllItems-Romulo'sPoisonVial-28579"
  value: {
-  dps: 1439.611693184825
+  dps: 1446.3281360478322
  }
 }
 dps_results: {
@@ -498,6 +504,12 @@ dps_results: {
  key: "TestHunter-AllItems-SpellstrikeInfusion"
  value: {
   dps: 1314.202937383417
+ }
+}
+dps_results: {
+ key: "TestHunter-AllItems-StormGauntlets-12632"
+ value: {
+  dps: 1425.1165969392268
  }
 }
 dps_results: {

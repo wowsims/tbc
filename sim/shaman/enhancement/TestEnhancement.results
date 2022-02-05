@@ -87,6 +87,12 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestEnhancement-AllItems-BlazefuryMedallion-17111"
+ value: {
+  dps: 1854.4053387672411
+ }
+}
+dps_results: {
  key: "TestEnhancement-AllItems-BracingEarthstormDiamond"
  value: {
   dps: 1855.8144914437253
@@ -287,7 +293,7 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-AllItems-GlaiveofthePit-28774"
  value: {
-  dps: 1307.7567678592757
+  dps: 1353.9855182090923
  }
 }
 dps_results: {
@@ -431,7 +437,7 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-AllItems-Romulo'sPoisonVial-28579"
  value: {
-  dps: 1887.7904414412617
+  dps: 1897.1172056220087
  }
 }
 dps_results: {
@@ -519,6 +525,12 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestEnhancement-AllItems-StormGauntlets-12632"
+ value: {
+  dps: 1756.0751362359958
+ }
+}
+dps_results: {
  key: "TestEnhancement-AllItems-SwiftSkyfireDiamond"
  value: {
   dps: 1871.0017012763346
@@ -563,7 +575,7 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-AllItems-TheFistsofFury"
  value: {
-  dps: 1589.9938253055939
+  dps: 1574.140183826053
  }
 }
 dps_results: {

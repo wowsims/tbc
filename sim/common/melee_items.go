@@ -10,6 +10,8 @@ import (
 
 func init() {
 	// Proc effects. Keep these in order by item ID.
+	core.AddItemEffect(12632, ApplyStormGauntlets)
+	core.AddItemEffect(17111, ApplyBlazefuryMedallion)
 	core.AddItemEffect(23541, ApplyKhoriumChampion)
 	core.AddItemEffect(24114, ApplyBraidedEterniumChain)
 	core.AddItemEffect(27901, ApplyBlackoutTruncheon)
@@ -35,6 +37,102 @@ func init() {
 
 	// TODO:
 	// blinkstrike
+}
+
+var StormGauntletsAuraID = core.NewAuraID()
+
+func ApplyStormGauntlets(agent core.Agent) {
+	character := agent.GetCharacter()
+	spellObj := core.SimpleSpell{}
+
+	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
+		castTemplate := core.NewSimpleSpellTemplate(core.SimpleSpell{
+			SpellCast: core.SpellCast{
+				Cast: core.Cast{
+					ActionID:       core.ActionID{ItemID: 12632},
+					Character:      character,
+					IgnoreManaCost: true,
+					IsPhantom:      true,
+					SpellSchool:    stats.NatureSpellPower,
+					CritMultiplier: character.DefaultSpellCritMultiplier(),
+				},
+			},
+			Effect: core.SpellHitEffect{
+				SpellEffect: core.SpellEffect{
+					DamageMultiplier:       1,
+					StaticDamageMultiplier: 1,
+					ThreatMultiplier:       1,
+				},
+				DirectInput: core.DirectDamageInput{
+					MinBaseDamage: 3,
+					MaxBaseDamage: 3,
+				},
+			},
+		})
+
+		return core.Aura{
+			ID: StormGauntletsAuraID,
+			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
+				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() || !hitEffect.IsMelee() {
+					return
+				}
+
+				castAction := &spellObj
+				castTemplate.Apply(castAction)
+				castAction.Effect.Target = hitEffect.Target
+				castAction.Init(sim)
+				castAction.Cast(sim)
+			},
+		}
+	})
+}
+
+var BlazefuryMedallionAuraID = core.NewAuraID()
+
+func ApplyBlazefuryMedallion(agent core.Agent) {
+	character := agent.GetCharacter()
+	spellObj := core.SimpleSpell{}
+
+	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
+		castTemplate := core.NewSimpleSpellTemplate(core.SimpleSpell{
+			SpellCast: core.SpellCast{
+				Cast: core.Cast{
+					ActionID:       core.ActionID{ItemID: 17111},
+					Character:      character,
+					IgnoreManaCost: true,
+					IsPhantom:      true,
+					SpellSchool:    stats.FireSpellPower,
+					CritMultiplier: character.DefaultSpellCritMultiplier(),
+				},
+			},
+			Effect: core.SpellHitEffect{
+				SpellEffect: core.SpellEffect{
+					DamageMultiplier:       1,
+					StaticDamageMultiplier: 1,
+					ThreatMultiplier:       1,
+				},
+				DirectInput: core.DirectDamageInput{
+					MinBaseDamage: 2,
+					MaxBaseDamage: 2,
+				},
+			},
+		})
+
+		return core.Aura{
+			ID: BlazefuryMedallionAuraID,
+			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
+				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() || !hitEffect.IsMelee() {
+					return
+				}
+
+				castAction := &spellObj
+				castTemplate.Apply(castAction)
+				castAction.Effect.Target = hitEffect.Target
+				castAction.Init(sim)
+				castAction.Cast(sim)
+			},
+		}
+	})
 }
 
 var KhoriumChampionAuraID = core.NewAuraID()
