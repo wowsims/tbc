@@ -581,7 +581,7 @@ dps_results: {
 dps_results: {
  key: "TestShadow-SelfDrums-DPS"
  value: {
-  dps: 1492.4752374336288
+  dps: 1492.8751334943327
  }
 }
 dps_results: {

@@ -77,7 +77,7 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-AllItems-BlackenedNaaruSliver-34427"
  value: {
-  dps: 1931.9652911723297
+  dps: 1939.8642318028308
  }
 }
 dps_results: {
@@ -107,7 +107,7 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-AllItems-CataclysmHarness"
  value: {
-  dps: 1734.7369433659587
+  dps: 1719.9203061680996
  }
 }
 dps_results: {
@@ -203,13 +203,13 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-AllItems-Dragonstrike-28439"
  value: {
-  dps: 1873.2985321667188
+  dps: 1879.9926445795313
  }
 }
 dps_results: {
  key: "TestEnhancement-AllItems-DragonstrikeP5--23"
  value: {
-  dps: 1872.5556649789567
+  dps: 1882.722316695944
  }
 }
 dps_results: {
@@ -293,7 +293,7 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-AllItems-GlaiveofthePit-28774"
  value: {
-  dps: 1353.9855182090923
+  dps: 1330.352219482508
  }
 }
 dps_results: {
@@ -311,7 +311,7 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-AllItems-IconofUnyieldingCourage-28121"
  value: {
-  dps: 1896.9397017516937
+  dps: 1896.9809419852345
  }
 }
 dps_results: {
@@ -347,7 +347,7 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-AllItems-LionheartChampion-28429"
  value: {
-  dps: 1310.5601116298187
+  dps: 1314.8687302295182
  }
 }
 dps_results: {
@@ -449,31 +449,31 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-AllItems-SextantofUnstableCurrents-30626"
  value: {
-  dps: 1846.3056432255537
+  dps: 1846.3544692348125
  }
 }
 dps_results: {
  key: "TestEnhancement-AllItems-ShardofContempt-34472"
  value: {
-  dps: 1935.1670300415235
+  dps: 1937.0667553938176
  }
 }
 dps_results: {
  key: "TestEnhancement-AllItems-Shiffar'sNexus-Horn-28418"
  value: {
-  dps: 1851.3479923346674
+  dps: 1851.3968183439263
  }
 }
 dps_results: {
  key: "TestEnhancement-AllItems-ShiftingNaaruSliver-34429"
  value: {
-  dps: 1875.0889393537457
+  dps: 1881.3642208087251
  }
 }
 dps_results: {
  key: "TestEnhancement-AllItems-SingingCrystalAxe-31318"
  value: {
-  dps: 1320.7385527097247
+  dps: 1324.3822580350864
  }
 }
 dps_results: {
@@ -569,7 +569,7 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-AllItems-TheDecapitator-28767"
  value: {
-  dps: 1781.614849318193
+  dps: 1782.4770841807865
  }
 }
 dps_results: {
@@ -659,19 +659,19 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-AllItems-WorldBreaker-30090"
  value: {
-  dps: 1378.443358782135
+  dps: 1422.6921007911924
  }
 }
 dps_results: {
  key: "TestEnhancement-AllItems-Xi'ri'sGift-29179"
  value: {
-  dps: 1849.5927016148926
+  dps: 1849.6415276241516
  }
 }
 dps_results: {
  key: "TestEnhancement-Average-Default"
  value: {
-  dps: 1982.7457121487573
+  dps: 1983.431727957515
  }
 }
 dps_results: {
@@ -725,7 +725,7 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-Settings-Troll10-P2-Basic-FullBuffs-LongMultiTarget"
  value: {
-  dps: 2080.291574908858
+  dps: 2080.2901317441556
  }
 }
 dps_results: {
@@ -737,7 +737,7 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-Settings-Troll10-P2-Basic-FullBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 1358.309138788551
+  dps: 1369.491121563628
  }
 }
 dps_results: {
