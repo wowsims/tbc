@@ -285,7 +285,7 @@ func ApplyHourglassUnraveller(agent core.Agent) {
 		return core.Aura{
 			ID: HourglassUnravellerAuraID,
 			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
-				if hitEffect.HitType != core.MeleeHitTypeCrit {
+				if hitEffect.HitType != core.MeleeHitTypeCrit || ability.IsPhantom {
 					return
 				}
 				if icd.IsOnCD(sim) {
@@ -403,7 +403,7 @@ func ApplyTsunamiTalisman(agent core.Agent) {
 		return core.Aura{
 			ID: TsunamiTalismanAuraID,
 			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
-				if hitEffect.HitType != core.MeleeHitTypeCrit {
+				if hitEffect.HitType != core.MeleeHitTypeCrit || ability.IsPhantom {
 					return
 				}
 				if icd.IsOnCD(sim) {
@@ -431,7 +431,7 @@ func ApplyDarkmoonCardWrath(agent core.Agent) {
 		return core.Aura{
 			ID: DarkmoonCardWrathAuraID,
 			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
-				if !hitEffect.IsWeaponHit() {
+				if !hitEffect.IsWeaponHit() || ability.IsPhantom {
 					return
 				}
 
