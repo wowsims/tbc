@@ -784,7 +784,7 @@ func makeConjuredActivation(conjuredType proto.Conjured, character *Character) (
 
 				aura := character.NewAuraWithTemporaryStats(sim, ConjuredAuraID, actionID, stats.FireSpellPower, fireBonus, dur)
 				aura.OnMeleeAttack = func(sim *Simulation, ability *ActiveMeleeAbility, hitEffect *AbilityHitEffect) {
-					if !hitEffect.Landed() || !hitEffect.IsWeaponHit() {
+					if !hitEffect.Landed() || !hitEffect.IsWeaponHit() || ability.IsPhantom {
 						return
 					}
 					if sim.RandomFloat("Flame Cap Melee") > procChance {

@@ -73,7 +73,7 @@ func ApplyStormGauntlets(agent core.Agent) {
 		return core.Aura{
 			ID: StormGauntletsAuraID,
 			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
-				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() || !hitEffect.IsMelee() {
+				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() || !hitEffect.IsMelee() || ability.IsPhantom {
 					return
 				}
 
@@ -121,7 +121,7 @@ func ApplyBlazefuryMedallion(agent core.Agent) {
 		return core.Aura{
 			ID: BlazefuryMedallionAuraID,
 			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
-				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() || !hitEffect.IsMelee() {
+				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() || !hitEffect.IsMelee() || ability.IsPhantom {
 					return
 				}
 
@@ -148,7 +148,7 @@ func ApplyKhoriumChampion(agent core.Agent) {
 		return core.Aura{
 			ID: KhoriumChampionAuraID,
 			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
-				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() || !hitEffect.IsMelee() {
+				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() || !hitEffect.IsMelee() || ability.IsPhantom {
 					return
 				}
 				if sim.RandomFloat("KhoriumChampion") > procChance {
@@ -181,7 +181,7 @@ func ApplyBlackoutTruncheon(agent core.Agent) {
 		return core.Aura{
 			ID: BlackoutTruncheonAuraID,
 			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
-				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() || !hitEffect.IsEquippedHand(mh, oh) {
+				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() || !hitEffect.IsEquippedHand(mh, oh) || ability.IsPhantom {
 					return
 				}
 				if sim.RandomFloat("BlackoutTruncheon") > procChance {
@@ -207,7 +207,7 @@ func ApplyLionheartChampion(agent core.Agent) {
 		return core.Aura{
 			ID: LionheartChampionAuraID,
 			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
-				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() || !hitEffect.IsMelee() {
+				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() || !hitEffect.IsMelee() || ability.IsPhantom {
 					return
 				}
 				if sim.RandomFloat("LionheartChampion") > procChance {
@@ -233,7 +233,7 @@ func ApplyLionheartExecutioner(agent core.Agent) {
 		return core.Aura{
 			ID: LionheartExecutionerAuraID,
 			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
-				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() || !hitEffect.IsMelee() {
+				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() || !hitEffect.IsMelee() || ability.IsPhantom {
 					return
 				}
 				if sim.RandomFloat("LionheartExecutioner") > procChance {
@@ -260,7 +260,7 @@ func ApplyDrakefistHammer(agent core.Agent) {
 		return core.Aura{
 			ID: DrakefistHammerAuraID,
 			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
-				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() || !hitEffect.IsEquippedHand(mh, oh) {
+				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() || !hitEffect.IsEquippedHand(mh, oh) || ability.IsPhantom {
 					return
 				}
 				if sim.RandomFloat("DrakefistHammer") > procChance {
@@ -287,7 +287,7 @@ func ApplyDragonmaw(agent core.Agent) {
 		return core.Aura{
 			ID: DragonmawAuraID,
 			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
-				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() || !hitEffect.IsEquippedHand(mh, oh) {
+				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() || !hitEffect.IsEquippedHand(mh, oh) || ability.IsPhantom {
 					return
 				}
 				if sim.RandomFloat("Dragonmaw") > procChance {
@@ -315,7 +315,7 @@ func ApplyDragonstrike(agent core.Agent) {
 		return core.Aura{
 			ID: DragonstrikeAuraID,
 			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
-				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() || !hitEffect.IsEquippedHand(mh, oh) {
+				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() || !hitEffect.IsEquippedHand(mh, oh) || ability.IsPhantom {
 					return
 				}
 				if sim.RandomFloat("Dragonstrike") > procChance {
@@ -341,6 +341,7 @@ func ApplyDespair(agent core.Agent) {
 			SpellSchool:    stats.AttackPower,
 			CritMultiplier: character.DefaultMeleeCritMultiplier(),
 			IgnoreCost:     true,
+			IsPhantom:      true,
 		},
 		Effect: core.AbilityHitEffect{
 			AbilityEffect: core.AbilityEffect{
@@ -363,7 +364,7 @@ func ApplyDespair(agent core.Agent) {
 		return core.Aura{
 			ID: DespairAuraID,
 			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
-				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() || !hitEffect.IsMelee() {
+				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() || !hitEffect.IsMelee() || ability.IsPhantom {
 					return
 				}
 				if sim.RandomFloat("Despair") > procChance {
@@ -391,6 +392,7 @@ func ApplyTheDecapitator(agent core.Agent) {
 			SpellSchool:    stats.AttackPower,
 			CritMultiplier: character.DefaultMeleeCritMultiplier(),
 			IgnoreCost:     true,
+			IsPhantom:      true,
 		},
 		Effect: core.AbilityHitEffect{
 			AbilityEffect: core.AbilityEffect{
@@ -472,7 +474,7 @@ func ApplyGlaiveOfThePit(agent core.Agent) {
 		return core.Aura{
 			ID: GlaiveOfThePitAuraID,
 			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
-				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() || !hitEffect.IsMelee() {
+				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() || !hitEffect.IsMelee() || ability.IsPhantom {
 					return
 				}
 				if sim.RandomFloat("GlaiveOfThePit") > procChance {
@@ -505,7 +507,7 @@ func ApplyBandOfTheEternalChampion(agent core.Agent) {
 		return core.Aura{
 			ID: BandOfTheEternalChampionAuraID,
 			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
-				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() {
+				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() || ability.IsPhantom {
 					return
 				}
 				if icd.IsOnCD(sim) {
@@ -535,7 +537,7 @@ func ApplyTheBladefist(agent core.Agent) {
 		return core.Aura{
 			ID: TheBladefistAuraID,
 			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
-				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() || !hitEffect.IsMH() {
+				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() || !hitEffect.IsMH() || ability.IsPhantom {
 					return
 				}
 				if sim.RandomFloat("The Bladefist") > procChance {
@@ -560,7 +562,7 @@ func ApplyRodOfTheSunKing(agent core.Agent) {
 		return core.Aura{
 			ID: RodOfTheSunKingAuraID,
 			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
-				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() || !hitEffect.IsEquippedHand(mh, oh) {
+				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() || !hitEffect.IsEquippedHand(mh, oh) || ability.IsPhantom {
 					return
 				}
 
@@ -627,7 +629,7 @@ func ApplyWarpSlicer(agent core.Agent) {
 		return core.Aura{
 			ID: WarpSlicerAuraID,
 			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
-				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() || !hitEffect.IsEquippedHand(mh, oh) {
+				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() || !hitEffect.IsEquippedHand(mh, oh) || ability.IsPhantom {
 					return
 				}
 				if sim.RandomFloat("WarpSlicer") > procChance {
@@ -662,7 +664,7 @@ func ApplyDevastation(agent core.Agent) {
 		return core.Aura{
 			ID: DevastationAuraID,
 			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
-				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() || !hitEffect.IsMelee() {
+				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() || !hitEffect.IsMelee() || ability.IsPhantom {
 					return
 				}
 				if sim.RandomFloat("Devastation") > procChance {
@@ -696,7 +698,7 @@ func ApplySingingCrystalAxe(agent core.Agent) {
 		return core.Aura{
 			ID: SingingCrystalAxeAuraID,
 			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
-				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() || !hitEffect.IsMelee() {
+				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() || !hitEffect.IsMelee() || ability.IsPhantom {
 					return
 				}
 				if sim.RandomFloat("SingingCrystalAxe") > procChance {
@@ -723,7 +725,7 @@ func ApplyTheNightBlade(agent core.Agent) {
 		return core.Aura{
 			ID: TheNightBladeAuraID,
 			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
-				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() || !hitEffect.IsEquippedHand(mh, oh) {
+				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() || !hitEffect.IsEquippedHand(mh, oh) || ability.IsPhantom {
 					return
 				}
 				if sim.RandomFloat("The Night Blade") > procChance {
@@ -748,8 +750,7 @@ func ApplyTheNightBlade(agent core.Agent) {
 
 var SyphonOfTheNathrezimAuraID = core.NewAuraID()
 
-var SiphonEssenceMHAuraID = core.NewAuraID()
-var SiphonEssenceOHAuraID = core.NewAuraID()
+var SiphonEssenceAuraID = core.NewAuraID()
 
 func ApplySyphonOfTheNathrezim(agent core.Agent) {
 	character := agent.GetCharacter()
@@ -788,45 +789,33 @@ func ApplySyphonOfTheNathrezim(agent core.Agent) {
 		})
 		spellObj := core.SimpleSpell{}
 
-		applySiphonEssence := func(sim *core.Simulation, character *core.Character, isMH bool) {
-			var tag int32
-			var auraID core.AuraID
-			if isMH {
-				tag = 1
-				auraID = SiphonEssenceMHAuraID
-			} else {
-				tag = 2
-				auraID = SiphonEssenceOHAuraID
-			}
-			character.AddAura(sim, core.Aura{
-				ID:       auraID,
-				ActionID: core.ActionID{SpellID: 40291, Tag: tag},
-				Expires:  sim.CurrentTime + (time.Second * 6),
-				OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
-					if !hitEffect.Landed() || !hitEffect.IsWeaponHit() || !hitEffect.IsMelee() {
-						return
-					}
+		procAura := core.Aura{
+			ID:       SiphonEssenceAuraID,
+			ActionID: core.ActionID{SpellID: 40291},
+			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
+				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() || !hitEffect.IsMelee() || ability.IsPhantom {
+					return
+				}
 
-					castAction := &spellObj
-					castTemplate.Apply(castAction)
-					castAction.Effect.Target = hitEffect.Target
-					castAction.ActionID.Tag = tag
-					castAction.Init(sim)
-					castAction.Cast(sim)
-				},
-			})
+				castAction := &spellObj
+				castTemplate.Apply(castAction)
+				castAction.Effect.Target = hitEffect.Target
+				castAction.Init(sim)
+				castAction.Cast(sim)
+			},
 		}
 
 		return core.Aura{
 			ID: SyphonOfTheNathrezimAuraID,
 			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
-				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() || !hitEffect.IsMelee() {
+				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() || !hitEffect.IsMelee() || ability.IsPhantom {
 					return
 				}
 
-				isMH := hitEffect.IsMH()
-				if ppmm.Proc(sim, isMH, false, "Syphon Of The Nathrezim") {
-					applySiphonEssence(sim, character, isMH)
+				if ppmm.Proc(sim, hitEffect.IsMH(), false, "Syphon Of The Nathrezim") {
+					aura := procAura
+					aura.Expires = sim.CurrentTime + time.Second*6
+					character.AddAura(sim, aura)
 				}
 			},
 		}

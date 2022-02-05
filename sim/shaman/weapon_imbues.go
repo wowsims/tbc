@@ -34,6 +34,7 @@ func (shaman *Shaman) ApplyWindfuryImbue(mh bool, oh bool) {
 			Character:      &shaman.Character,
 			SpellSchool:    stats.AttackPower,
 			CritMultiplier: shaman.DefaultMeleeCritMultiplier(),
+			IsPhantom:      true,
 		},
 	}
 
@@ -67,7 +68,7 @@ func (shaman *Shaman) ApplyWindfuryImbue(mh bool, oh bool) {
 		return core.Aura{
 			ID: WFImbueAuraID,
 			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
-				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() {
+				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() || ability.IsPhantom {
 					return
 				}
 
@@ -159,7 +160,7 @@ func (shaman *Shaman) ApplyFlametongueImbue(mh bool, oh bool) {
 		return core.Aura{
 			ID: FTImbueAuraID,
 			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
-				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() {
+				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() || ability.IsPhantom {
 					return
 				}
 
@@ -222,7 +223,7 @@ func (shaman *Shaman) ApplyFrostbrandImbue(mh bool, oh bool) {
 		return core.Aura{
 			ID: FBImbueAuraID,
 			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
-				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() {
+				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() || ability.IsPhantom {
 					return
 				}
 

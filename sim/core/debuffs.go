@@ -170,6 +170,10 @@ func JudgementOfWisdomAura() Aura {
 			}
 		},
 		OnMeleeAttack: func(sim *Simulation, ability *ActiveMeleeAbility, hitEffect *AbilityHitEffect) {
+			if ability.IsPhantom {
+				return
+			}
+
 			character := ability.Character
 			if character.HasManaBar() {
 				character.AddMana(sim, mana, actionID, false)
