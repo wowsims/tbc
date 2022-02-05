@@ -1,8 +1,6 @@
 package hunter
 
 import (
-	"time"
-
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/proto"
 	"github.com/wowsims/tbc/sim/core/stats"
@@ -82,8 +80,8 @@ func (hunter *Hunter) tryUseSpecialGCD(sim *core.Simulation) bool {
 		return true
 	} else if hunter.Rotation.UseMultiShot && !hunter.IsOnCD(MultiShotCooldownID, sim.CurrentTime) {
 		ms := hunter.NewMultiShot(sim)
-		if success := ms.Attack(sim); !success {
-			hunter.WaitForMana(sim, ms.Cost.Value)
+		if success := ms.StartCast(sim); !success {
+			hunter.WaitForMana(sim, ms.GetManaCost())
 		}
 		return true
 	} else if hunter.Rotation.UseArcaneShot && !hunter.IsOnCD(ArcaneShotCooldownID, sim.CurrentTime) {
@@ -103,9 +101,8 @@ func (hunter *Hunter) OnGCDReady(sim *core.Simulation) {
 		sim.Log("hunter GCD")
 	}
 
-	if sim.CurrentTime < time.Second*3 {
-		// Don't do anything fancy for the first few seconds because this function is
-		// invoked weirdly. A real hunter would need time to get into position anyway.
+	if sim.CurrentTime == 0 {
+		// Dont do anything fancy on the first GCD.
 		return
 	}
 

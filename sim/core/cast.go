@@ -70,6 +70,9 @@ type Cast struct {
 
 	Binary bool // if spell is binary it ignores partial resists
 
+	// Ignores haste when calculating the GCD and cast time for this cast.
+	IgnoreHaste bool
+
 	// Internal field only, used to prevent cast pool objects from being used by
 	// multiple casts simultaneously.
 	objectInUse bool
@@ -111,7 +114,10 @@ func (cast *Cast) init(sim *Simulation) {
 		panic("Cast object already in use")
 	}
 	cast.objectInUse = true
-	cast.CastTime = time.Duration(float64(cast.CastTime) / cast.Character.CastSpeed())
+
+	if !cast.IgnoreHaste {
+		cast.CastTime = time.Duration(float64(cast.CastTime) / cast.Character.CastSpeed())
+	}
 
 	// Apply on-cast effects.
 	cast.Character.OnCast(sim, cast)
@@ -176,7 +182,11 @@ func (cast *Cast) startCasting(sim *Simulation, onCastComplete OnCastComplete) b
 }
 
 func (cast *Cast) CalculatedGCD(char *Character) time.Duration {
-	return MaxDuration(GCDMin, time.Duration(float64(cast.GCD)/char.CastSpeed()))
+	if cast.IgnoreHaste {
+		return cast.GCD
+	} else {
+		return MaxDuration(GCDMin, time.Duration(float64(cast.GCD)/char.CastSpeed()))
+	}
 }
 
 // Cast has finished, activate the effects of the cast.

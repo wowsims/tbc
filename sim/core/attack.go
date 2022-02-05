@@ -672,7 +672,7 @@ func (aa *AutoAttacks) reset(sim *Simulation) {
 
 	aa.MainhandSwingAt = 0
 	aa.OffhandSwingAt = 0
-	aa.RangedSwingAt = 0
+	aa.RangedSwingAt = aa.RangedSwingWindup()
 
 	// Set a fake value for previousMHSwing so that offhand swing delay works
 	// properly at the start.
@@ -738,6 +738,12 @@ func (aa *AutoAttacks) RangedSwingSpeed() time.Duration {
 	return time.Duration(float64(aa.Ranged.SwingDuration) / aa.character.RangedSwingSpeed())
 }
 
+// Ranged swings have a 0.5s 'windup' time before they can fire, affected by haste.
+// This function computes the amount of windup time based on the current haste.
+func (aa *AutoAttacks) RangedSwingWindup() time.Duration {
+	return time.Duration(float64(time.Millisecond*500) / aa.character.RangedSwingSpeed())
+}
+
 // SwingMelee will check any swing timers if they are up, and if so, swing!
 func (aa *AutoAttacks) SwingMelee(sim *Simulation, target *Target) {
 	aa.TrySwingMH(sim, target)
@@ -754,20 +760,16 @@ func (aa *AutoAttacks) TrySwingMH(sim *Simulation, target *Target) {
 		return
 	}
 
-	if aa.OnBeforeMHSwing != nil {
-		// Allow MH swing to be overridden for abilities like Heroic Strike.
-		doSwing := aa.OnBeforeMHSwing(sim)
-		if !doSwing {
-			return
-		}
+	// Allow MH swing to be overridden for abilities like Heroic Strike.
+	if aa.OnBeforeMHSwing == nil || aa.OnBeforeMHSwing(sim) {
+		ama := aa.ActiveMeleeAbility
+		ama.ActionID.Tag = 1
+		ama.CritMultiplier = aa.MH.CritMultiplier
+		ama.Effect.Target = target
+		ama.Effect.WeaponInput.IsOH = false
+		ama.Attack(sim)
 	}
 
-	ama := aa.ActiveMeleeAbility
-	ama.ActionID.Tag = 1
-	ama.CritMultiplier = aa.MH.CritMultiplier
-	ama.Effect.Target = target
-	ama.Effect.WeaponInput.IsOH = false
-	ama.Attack(sim)
 	aa.MainhandSwingAt = sim.CurrentTime + aa.MainhandSwingSpeed()
 	aa.previousMHSwingAt = sim.CurrentTime
 	aa.agent.OnAutoAttack(sim)
@@ -847,12 +849,12 @@ func (aa *AutoAttacks) ModifySwingTime(sim *Simulation, amount float64) {
 func (aa *AutoAttacks) DelayAllUntil(sim *Simulation, readyAt time.Duration) {
 	aa.MainhandSwingAt = MaxDuration(aa.MainhandSwingAt, readyAt)
 	aa.OffhandSwingAt = MaxDuration(aa.OffhandSwingAt, readyAt)
-	aa.RangedSwingAt = MaxDuration(aa.RangedSwingAt, readyAt)
+	aa.RangedSwingAt = MaxDuration(aa.RangedSwingAt, readyAt+aa.RangedSwingWindup())
 	aa.resetAutoSwing(sim)
 }
 
 func (aa *AutoAttacks) DelayRangedUntil(sim *Simulation, readyAt time.Duration) {
-	aa.RangedSwingAt = MaxDuration(aa.RangedSwingAt, readyAt)
+	aa.RangedSwingAt = MaxDuration(aa.RangedSwingAt, readyAt+aa.RangedSwingWindup())
 	aa.resetAutoSwing(sim)
 }
 

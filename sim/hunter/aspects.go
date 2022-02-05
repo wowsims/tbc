@@ -62,6 +62,7 @@ func (hunter *Hunter) newAspectOfTheHawkTemplate(sim *core.Simulation) core.Simp
 			BaseManaCost: 140,
 			ManaCost:     140,
 			GCD:          core.GCDDefault,
+			IgnoreHaste:  true, // Hunter GCD is locked at 1.5s
 			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
 				hunter.aspectOfTheViper = false
 				hunter.RemoveAuraOnNextAdvance(sim, AspectOfTheHawkAuraID)
@@ -92,6 +93,7 @@ func (hunter *Hunter) newAspectOfTheViperTemplate(sim *core.Simulation) core.Sim
 			BaseManaCost: 40,
 			ManaCost:     40,
 			GCD:          core.GCDDefault,
+			IgnoreHaste:  true, // Hunter GCD is locked at 1.5s
 			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
 				hunter.aspectOfTheViper = true
 				hunter.RemoveAuraOnNextAdvance(sim, AspectOfTheHawkAuraID)

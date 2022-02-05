@@ -58,8 +58,11 @@ type Hunter struct {
 
 	killCommandTemplate core.SimpleCast
 
-	multiShotTemplate core.MeleeAbilityTemplate
-	multiShot         core.ActiveMeleeAbility
+	multiShotCastTemplate core.SimpleCast
+	multiShotCast         core.SimpleCast
+
+	multiShotAbilityTemplate core.MeleeAbilityTemplate
+	multiShotAbility         core.ActiveMeleeAbility
 
 	raptorStrikeTemplate core.MeleeAbilityTemplate
 	raptorStrike         core.ActiveMeleeAbility
@@ -111,7 +114,8 @@ func (hunter *Hunter) Init(sim *core.Simulation) {
 	hunter.aspectOfTheHawkTemplate = hunter.newAspectOfTheHawkTemplate(sim)
 	hunter.aspectOfTheViperTemplate = hunter.newAspectOfTheViperTemplate(sim)
 	hunter.killCommandTemplate = hunter.newKillCommandTemplate(sim)
-	hunter.multiShotTemplate = hunter.newMultiShotTemplate(sim)
+	hunter.multiShotCastTemplate = hunter.newMultiShotCastTemplate(sim)
+	hunter.multiShotAbilityTemplate = hunter.newMultiShotAbilityTemplate(sim)
 	hunter.raptorStrikeTemplate = hunter.newRaptorStrikeTemplate(sim)
 	hunter.scorpidStingTemplate = hunter.newScorpidStingTemplate(sim)
 	hunter.serpentStingTemplate = hunter.newSerpentStingTemplate(sim)
