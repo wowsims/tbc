@@ -713,19 +713,19 @@ dps_results: {
 dps_results: {
  key: "TestBalance-Settings-Tauren-P1-Wrath-FullBuffs-LongMultiTarget"
  value: {
-  dps: 1057.3357164247464
+  dps: 1052.6535918993077
  }
 }
 dps_results: {
  key: "TestBalance-Settings-Tauren-P1-Wrath-FullBuffs-LongSingleTargetFullDebuffs"
  value: {
-  dps: 1057.3357164247464
+  dps: 1052.6535918993077
  }
 }
 dps_results: {
  key: "TestBalance-Settings-Tauren-P1-Wrath-FullBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 836.0877874028316
+  dps: 832.5963619039456
  }
 }
 dps_results: {
@@ -737,19 +737,19 @@ dps_results: {
 dps_results: {
  key: "TestBalance-Settings-Tauren-P1-Wrath-NoBuffs-LongMultiTarget"
  value: {
-  dps: 428.33258078235053
+  dps: 431.2543795754945
  }
 }
 dps_results: {
  key: "TestBalance-Settings-Tauren-P1-Wrath-NoBuffs-LongSingleTargetFullDebuffs"
  value: {
-  dps: 428.33258078235053
+  dps: 431.2543795754945
  }
 }
 dps_results: {
  key: "TestBalance-Settings-Tauren-P1-Wrath-NoBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 358.71543559376323
+  dps: 355.4799205318596
  }
 }
 dps_results: {
@@ -869,7 +869,7 @@ dps_results: {
 dps_results: {
  key: "TestBalance-Settings-Tauren-P2-Wrath-FullBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 1077.9274076880047
+  dps: 1078.7340089394218
  }
 }
 dps_results: {
@@ -881,19 +881,19 @@ dps_results: {
 dps_results: {
  key: "TestBalance-Settings-Tauren-P2-Wrath-NoBuffs-LongMultiTarget"
  value: {
-  dps: 590.3721272101827
+  dps: 585.7612175201592
  }
 }
 dps_results: {
  key: "TestBalance-Settings-Tauren-P2-Wrath-NoBuffs-LongSingleTargetFullDebuffs"
  value: {
-  dps: 590.3721272101827
+  dps: 585.7612175201592
  }
 }
 dps_results: {
  key: "TestBalance-Settings-Tauren-P2-Wrath-NoBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 478.5117556399626
+  dps: 484.1478800776118
  }
 }
 dps_results: {
