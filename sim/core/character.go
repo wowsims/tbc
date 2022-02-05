@@ -100,8 +100,9 @@ type Character struct {
 	// TODO: Figure out a cleaner way to do this.
 	HasMHWeaponImbue bool
 
-	// The PendingAction tracking this character's GCD.
-	gcdAction *PendingAction
+	// GCD-related PendingActions for this character.
+	gcdAction      *PendingAction
+	hardcastAction *PendingAction
 
 	// Fields related to waiting for certain events to happen.
 	waitingForMana float64
@@ -433,6 +434,7 @@ func (character *Character) reset(sim *Simulation, agent Agent) {
 	}
 
 	character.gcdAction = character.newGCDAction(sim, agent)
+	character.hardcastAction = character.newHardcastAction(sim)
 }
 
 // Advance moves time forward counting down auras, CDs, mana regen, etc

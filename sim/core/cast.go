@@ -166,11 +166,15 @@ func (cast *Cast) startCasting(sim *Simulation, onCastComplete OnCastComplete) b
 	if cast.CastTime == 0 {
 		cast.internalOnComplete(sim, onCastComplete)
 	} else {
-		// TODO: Not using a pending action here causes some very subtle bugs, like
-		// Drums aura not being applied until the 1.5s GCD has elapsed.
 		cast.Character.Hardcast.Expires = sim.CurrentTime + cast.CastTime
 		cast.Character.Hardcast.Cast = cast
 		cast.Character.Hardcast.OnComplete = onCastComplete
+
+		// If hardcast and GCD happen at the same time then we don't need a separate action.
+		if cast.Character.Hardcast.Expires != cast.Character.NextGCDAt() {
+			cast.Character.hardcastAction.NextActionAt = cast.Character.Hardcast.Expires
+			sim.AddPendingAction(cast.Character.hardcastAction)
+		}
 
 		if cast.Character.AutoAttacks.IsEnabled() {
 			// Delay autoattacks until the cast is complete.

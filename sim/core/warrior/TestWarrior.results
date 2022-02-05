@@ -587,7 +587,7 @@ dps_results: {
 dps_results: {
  key: "TestWarrior-Average-Default"
  value: {
-  dps: 252.01895572871453
+  dps: 251.9773862566659
  }
 }
 dps_results: {
