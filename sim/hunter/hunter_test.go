@@ -23,7 +23,8 @@ func TestHunter(t *testing.T) {
 
 		SpecOptions: core.SpecOptionsCombo{Label: "Basic", SpecOptions: PlayerOptionsBasic},
 		OtherSpecOptions: []core.SpecOptionsCombo{
-			core.SpecOptionsCombo{Label: "WindSerpent", SpecOptions: PlayerOptionsWindSerpent},
+			core.SpecOptionsCombo{Label: "French", SpecOptions: PlayerOptionsFrench},
+			core.SpecOptionsCombo{Label: "MeleeWeave", SpecOptions: PlayerOptionsMeleeWeave},
 		},
 
 		RaidBuffs:   FullRaidBuffs,

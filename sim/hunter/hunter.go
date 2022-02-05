@@ -1,6 +1,8 @@
 package hunter
 
 import (
+	"time"
+
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/proto"
 	"github.com/wowsims/tbc/sim/core/stats"
@@ -41,6 +43,8 @@ type Hunter struct {
 	killCommandEnabled bool                // True after landing a crit.
 	killCommandAction  *core.PendingAction // Action to use KC when its comes off CD.
 
+	timeToWeave time.Duration
+
 	pet *HunterPet
 
 	aimedShotTemplate core.MeleeAbilityTemplate
@@ -56,6 +60,9 @@ type Hunter struct {
 
 	multiShotTemplate core.MeleeAbilityTemplate
 	multiShot         core.ActiveMeleeAbility
+
+	raptorStrikeTemplate core.MeleeAbilityTemplate
+	raptorStrike         core.ActiveMeleeAbility
 
 	scorpidStingTemplate core.MeleeAbilityTemplate
 	scorpidSting         core.ActiveMeleeAbility
@@ -105,6 +112,7 @@ func (hunter *Hunter) Init(sim *core.Simulation) {
 	hunter.aspectOfTheViperTemplate = hunter.newAspectOfTheViperTemplate(sim)
 	hunter.killCommandTemplate = hunter.newKillCommandTemplate(sim)
 	hunter.multiShotTemplate = hunter.newMultiShotTemplate(sim)
+	hunter.raptorStrikeTemplate = hunter.newRaptorStrikeTemplate(sim)
 	hunter.scorpidStingTemplate = hunter.newScorpidStingTemplate(sim)
 	hunter.serpentStingTemplate = hunter.newSerpentStingTemplate(sim)
 	hunter.serpentStingDotTemplate = hunter.newSerpentStingDotTemplate(sim)
@@ -131,8 +139,15 @@ func NewHunter(character core.Character, options proto.Player) *Hunter {
 		Talents:   *hunterOptions.Talents,
 		Options:   *hunterOptions.Options,
 		Rotation:  *hunterOptions.Rotation,
+
+		timeToWeave: time.Millisecond * time.Duration(hunterOptions.Rotation.TimeToWeaveMs),
 	}
 	hunter.hasGronnstalker2Pc = ItemSetGronnstalker.CharacterHasSetBonus(&hunter.Character, 2)
+
+	if !hunter.Rotation.UseMultiShot && !hunter.Rotation.UseArcaneShot {
+		// Disable french rotation if we don't have any spells to use it with.
+		hunter.Rotation.UseFrenchRotation = false
+	}
 
 	hunter.PseudoStats.RangedSpeedMultiplier = 1
 	hunter.EnableManaBar()
@@ -143,6 +158,9 @@ func NewHunter(character core.Character, options proto.Player) *Hunter {
 		OffHand:         hunter.WeaponFromOffHand(0),
 		Ranged:          hunter.WeaponFromRanged(0),
 		AutoSwingRanged: true,
+		OnBeforeMHSwing: func(sim *core.Simulation) bool {
+			return hunter.TryRaptorStrike(sim)
+		},
 	})
 
 	hunter.pet = hunter.NewHunterPet()

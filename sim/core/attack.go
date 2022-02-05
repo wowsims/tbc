@@ -594,6 +594,7 @@ type AutoAttackOptions struct {
 	AutoSwingMelee  bool // If true, core engine will handle calling SwingMelee() for you.
 	AutoSwingRanged bool // If true, core engine will handle calling SwingRanged() for you.
 	DelayOHSwings   bool
+	OnBeforeMHSwing OnBeforeMHSwing
 }
 
 func (character *Character) EnableAutoAttacks(agent Agent, options AutoAttackOptions) {
@@ -606,6 +607,7 @@ func (character *Character) EnableAutoAttacks(agent Agent, options AutoAttackOpt
 		AutoSwingMelee:  options.AutoSwingMelee,
 		AutoSwingRanged: options.AutoSwingRanged,
 		DelayOHSwings:   options.DelayOHSwings,
+		OnBeforeMHSwing: options.OnBeforeMHSwing,
 		ActiveMeleeAbility: ActiveMeleeAbility{
 			MeleeAbility: MeleeAbility{
 				ActionID:    ActionID{OtherID: proto.OtherAction_OtherActionAttack},
@@ -841,6 +843,19 @@ func (aa *AutoAttacks) ModifySwingTime(sim *Simulation, amount float64) {
 	aa.resetAutoSwing(sim)
 }
 
+// Delays all swing timers until the specified time.
+func (aa *AutoAttacks) DelayAllUntil(sim *Simulation, readyAt time.Duration) {
+	aa.MainhandSwingAt = MaxDuration(aa.MainhandSwingAt, readyAt)
+	aa.OffhandSwingAt = MaxDuration(aa.OffhandSwingAt, readyAt)
+	aa.RangedSwingAt = MaxDuration(aa.RangedSwingAt, readyAt)
+	aa.resetAutoSwing(sim)
+}
+
+func (aa *AutoAttacks) DelayRangedUntil(sim *Simulation, readyAt time.Duration) {
+	aa.RangedSwingAt = MaxDuration(aa.RangedSwingAt, readyAt)
+	aa.resetAutoSwing(sim)
+}
+
 // Returns the time at which the next attack will occur.
 func (aa *AutoAttacks) NextAttackAt() time.Duration {
 	nextAttack := aa.MainhandSwingAt
@@ -848,6 +863,12 @@ func (aa *AutoAttacks) NextAttackAt() time.Duration {
 		nextAttack = MinDuration(nextAttack, aa.OffhandSwingAt)
 	}
 	return nextAttack
+}
+
+// Returns true if all melee weapons are ready for a swing.
+func (aa *AutoAttacks) MeleeSwingsReady(sim *Simulation) bool {
+	return aa.MainhandSwingAt <= sim.CurrentTime &&
+		(aa.OH.SwingSpeed == 0 || aa.OffhandSwingAt <= sim.CurrentTime)
 }
 
 // Returns the time at which the next event will occur, considering both autos and the gcd.

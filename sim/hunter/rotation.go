@@ -1,6 +1,8 @@
 package hunter
 
 import (
+	"time"
+
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/proto"
 	"github.com/wowsims/tbc/sim/core/stats"
@@ -33,44 +35,91 @@ func (hunter *Hunter) tryUseGCD(sim *core.Simulation) {
 	}
 
 	target := sim.GetPrimaryTarget()
+	hasted := hunter.HasTemporaryRangedSwingSpeedIncrease()
+
+	if hunter.Rotation.UseFrenchRotation && !hasted {
+		// French rotation, i.e. special GCDs are used after a steady shot.
+		cast := hunter.NewSteadyShot(sim, target)
+		if success := cast.StartCast(sim); !success {
+			hunter.WaitForMana(sim, cast.GetManaCost())
+		}
+	} else {
+		// Regular rotation, i.e. special GCDs take the place of steady shot.
+		if !hunter.tryUseSpecialGCD(sim) {
+			cast := hunter.NewSteadyShot(sim, target)
+			if success := cast.StartCast(sim); !success {
+				hunter.WaitForMana(sim, cast.GetManaCost())
+			}
+		}
+	}
+}
+
+// Decides whether to use a GCD spell other than Steady Shot.
+// Returns true if any of these spells was selected.
+func (hunter *Hunter) tryUseSpecialGCD(sim *core.Simulation) bool {
+	target := sim.GetPrimaryTarget()
 	currentMana := hunter.CurrentManaPercent()
 
 	if hunter.aspectOfTheViper && currentMana > hunter.Rotation.ViperStopManaPercent {
 		aspect := hunter.NewAspectOfTheHawk(sim)
 		aspect.StartCast(sim)
+		return true
 	} else if !hunter.aspectOfTheViper && currentMana < hunter.Rotation.ViperStartManaPercent {
 		aspect := hunter.NewAspectOfTheViper(sim)
 		aspect.StartCast(sim)
+		return true
 	} else if hunter.Rotation.Sting == proto.Hunter_Rotation_ScorpidSting && !target.HasAura(ScorpidStingDebuffID) {
 		ss := hunter.NewScorpidSting(sim, target)
 		if success := ss.Attack(sim); !success {
 			hunter.WaitForMana(sim, ss.Cost.Value)
 		}
+		return true
 	} else if hunter.Rotation.Sting == proto.Hunter_Rotation_SerpentSting && !hunter.serpentStingDot.IsInUse() {
 		ss := hunter.NewSerpentSting(sim, target)
 		if success := ss.Attack(sim); !success {
 			hunter.WaitForMana(sim, ss.Cost.Value)
 		}
+		return true
 	} else if hunter.Rotation.UseMultiShot && !hunter.IsOnCD(MultiShotCooldownID, sim.CurrentTime) {
 		ms := hunter.NewMultiShot(sim)
 		if success := ms.Attack(sim); !success {
 			hunter.WaitForMana(sim, ms.Cost.Value)
 		}
+		return true
 	} else if hunter.Rotation.UseArcaneShot && !hunter.IsOnCD(ArcaneShotCooldownID, sim.CurrentTime) {
 		as := hunter.NewArcaneShot(sim, target)
 		if success := as.Attack(sim); !success {
 			hunter.WaitForMana(sim, as.Cost.Value)
 		}
-	} else {
-		cast := hunter.NewSteadyShot(sim, target)
-		if success := cast.StartCast(sim); !success {
-			hunter.WaitForMana(sim, cast.GetManaCost())
-		}
+		return true
 	}
+	return false
 }
 
 func (hunter *Hunter) OnGCDReady(sim *core.Simulation) {
-	// Hunters do everything between auto shots, so GCD usage is handled as an aura (see above).
+	// Hunters do most things between auto shots, so GCD usage is handled as an aura (see above).
+	// Only use this for follow-up actions after an auto+GCD, i.e. melee weave or French rotation.
+	if sim.Log != nil {
+		sim.Log("hunter GCD")
+	}
+
+	if sim.CurrentTime < time.Second*3 {
+		// Don't do anything fancy for the first few seconds because this function is
+		// invoked weirdly. A real hunter would need time to get into position anyway.
+		return
+	}
+
+	hasted := hunter.HasTemporaryRangedSwingSpeedIncrease()
+	if hunter.Rotation.UseFrenchRotation && !hasted {
+		// 2nd GCD cast in the French rotation.
+		hunter.tryUseSpecialGCD(sim)
+	} else if hunter.Rotation.MeleeWeave && sim.GetRemainingDurationPercent() < hunter.Rotation.PercentWeaved && hunter.AutoAttacks.MeleeSwingsReady(sim) {
+		// Melee weave.
+		hunter.AutoAttacks.SwingMelee(sim, sim.GetPrimaryTarget())
+
+		// Delay ranged autos until the weaving is done.
+		hunter.AutoAttacks.DelayRangedUntil(sim, sim.CurrentTime+hunter.timeToWeave)
+	}
 }
 
 func (hunter *Hunter) OnManaTick(sim *core.Simulation) {

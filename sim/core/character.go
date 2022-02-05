@@ -43,6 +43,12 @@ type Character struct {
 	// Cast speed without any temporary effects.
 	initialCastSpeed float64
 
+	// Melee swing speed without any temporary effects.
+	initialMeleeSwingSpeed float64
+
+	// Ranged swing speed without any temporary effects.
+	initialRangedSwingSpeed float64
+
 	// Provides stat dependency management behavior.
 	stats.StatDependencyManager
 
@@ -278,13 +284,23 @@ func (character *Character) GetStat(stat stats.Stat) float64 {
 
 // Returns whether the indicates stat is currently modified by a temporary bonus.
 func (character *Character) HasTemporaryBonusForStat(stat stats.Stat) bool {
-	return character.GetInitialStat(stat) != character.GetStat(stat)
+	return character.initialStats[stat] != character.stats[stat]
 }
 
 // Returns if spell casting has any temporary increases active.
 func (character *Character) HasTemporarySpellCastSpeedIncrease() bool {
 	return character.HasTemporaryBonusForStat(stats.SpellHaste) ||
 		character.PseudoStats.CastSpeedMultiplier != 1
+}
+
+// Returns if melee swings have any temporary increases active.
+func (character *Character) HasTemporaryMeleeSwingSpeedIncrease() bool {
+	return character.SwingSpeed() != character.initialMeleeSwingSpeed
+}
+
+// Returns if ranged swings have any temporary increases active.
+func (character *Character) HasTemporaryRangedSwingSpeedIncrease() bool {
+	return character.RangedSwingSpeed() != character.initialRangedSwingSpeed
 }
 
 func (character *Character) InitialCastSpeed() float64 {
@@ -386,6 +402,8 @@ func (character *Character) Finalize() {
 	character.initialStats = character.stats
 	character.initialPseudoStats = character.PseudoStats
 	character.initialCastSpeed = character.CastSpeed()
+	character.initialMeleeSwingSpeed = character.SwingSpeed()
+	character.initialRangedSwingSpeed = character.RangedSwingSpeed()
 
 	character.auraTracker.finalize()
 	character.majorCooldownManager.finalize(character)

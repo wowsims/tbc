@@ -259,6 +259,11 @@ func (sim *Simulation) GetRemainingDuration() time.Duration {
 	return sim.Duration - sim.CurrentTime
 }
 
+// Returns the percentage of time remaining in the current iteration, as a value from 0-1.
+func (sim *Simulation) GetRemainingDurationPercent() float64 {
+	return float64(sim.Duration-sim.CurrentTime) / float64(sim.Duration)
+}
+
 func (sim *Simulation) GetNumTargets() int32 {
 	return int32(len(sim.encounter.Targets))
 }
