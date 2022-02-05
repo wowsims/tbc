@@ -17,8 +17,10 @@ func (hunter *Hunter) newSteadyShotCastTemplate(sim *core.Simulation) core.Simpl
 			Character:    hunter.GetCharacter(),
 			BaseManaCost: 110,
 			ManaCost:     110,
-			CastTime:     time.Second * 1,
-			GCD:          core.GCDDefault,
+			// Cast time is affected by ranged attack speed so set it later.
+			//CastTime:     time.Second * 1,
+			GCD:         core.GCDDefault,
+			IgnoreHaste: true, // Hunter GCD is locked at 1.5s
 		},
 		DisableMetrics: true,
 	}
@@ -74,6 +76,7 @@ func (hunter *Hunter) NewSteadyShot(sim *core.Simulation, target *core.Target) c
 		ss.Effect.Target = target
 		ss.Attack(sim)
 	}
+	hunter.steadyShotCast.CastTime = time.Duration(float64(time.Second*1) / hunter.RangedSwingSpeed())
 
 	hunter.steadyShotCast.Init(sim)
 	return hunter.steadyShotCast

@@ -471,10 +471,11 @@ func (hunter *Hunter) registerReadinessCD() {
 
 	template := core.SimpleCast{
 		Cast: core.Cast{
-			ActionID:  actionID,
-			Character: hunter.GetCharacter(),
-			Cooldown:  cooldown,
-			GCD:       time.Second * 1,
+			ActionID:    actionID,
+			Character:   hunter.GetCharacter(),
+			Cooldown:    cooldown,
+			GCD:         time.Second * 1,
+			IgnoreHaste: true, // Hunter GCD is locked
 			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
 				hunter.SetCD(RapidFireCooldownID, 0)
 				hunter.SetCD(MultiShotCooldownID, 0)
