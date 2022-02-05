@@ -254,7 +254,7 @@ export class PlayerMetrics {
 		this.metrics = metrics;
 
 		this.raidIndex = raidIndex;
-		this.name = player.name;
+		this.name = metrics.name;
 		this.spec = playerToSpec(player);
 		this.isPet = isPet;
 		this.iconUrl = getTalentTreeIcon(this.spec, player.talentsString);
@@ -294,6 +294,14 @@ export class PlayerMetrics {
 
 	getPlayerAndPetActions(): Array<ActionMetrics> {
 		return this.actions.concat(this.pets.map(pet => pet.getPlayerAndPetActions()).flat());
+	}
+
+	getMeleeActions(): Array<ActionMetrics> {
+		return this.actions.filter(e => e.hitAttempts != 0 && e.isMeleeAction);
+	}
+
+	getSpellActions(): Array<ActionMetrics> {
+		return this.actions.filter(e => e.hitAttempts != 0 && !e.isMeleeAction)
 	}
 
 	static async makeNew(iterations: number, duration: number, player: PlayerProto, metrics: PlayerMetricsProto, raidIndex: number, isPet: boolean, logs: Array<SimLog>): Promise<PlayerMetrics> {

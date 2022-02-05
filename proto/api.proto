@@ -117,6 +117,8 @@ message DistributionMetrics {
 
 // All the results for a single Player.
 message PlayerMetrics {
+		string name = 9;
+
 		DistributionMetrics dps = 1;
 		DistributionMetrics threat = 8;
 
