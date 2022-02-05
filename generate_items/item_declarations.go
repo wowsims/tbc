@@ -69,6 +69,8 @@ var ItemDeclarationOverrides = []ItemDeclaration{
 	{ /** Magnified Moon Specs */ ID: 32480, ClassAllowlist: []proto.Class{proto.Class_ClassDruid}},
 	{ /** Skycall Totem */ ID: 33506, Phase: 4},
 	{ /** Vindicator's Band of Triumph */ ID: 33919, Phase: 3},
+	{ /** Vindicator's Pendant of Reprieve */ ID: 35317, Phase: 4},
+	{ /** Vindicator's Pendant of Subjugation */ ID: 35319, Phase: 4},
 	{ /** Twinblade of the Pheonix */ ID: 29993, Stats: Stats{proto.Stat_StatRangedAttackPower: 108}},
 
 	{ID: 17782, Filter: true}, // talisman of the binding shard
