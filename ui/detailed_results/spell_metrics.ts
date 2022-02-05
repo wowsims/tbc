@@ -127,6 +127,7 @@ export class SpellMetrics extends ResultComponent {
 
 		if (spellMetrics.length == 0) {
 			this.rootElem.classList.add('empty');
+			return;
 		} else {
 			this.rootElem.classList.remove('empty');
 		}

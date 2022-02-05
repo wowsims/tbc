@@ -558,6 +558,7 @@ func (character *Character) GetStatsProto() *proto.PlayerStats {
 
 func (character *Character) GetMetricsProto(numIterations int32) *proto.PlayerMetrics {
 	metrics := character.Metrics.ToProto(numIterations)
+	metrics.Name = character.Name
 	metrics.Auras = character.auraTracker.GetMetricsProto(numIterations)
 
 	metrics.Pets = []*proto.PlayerMetrics{}

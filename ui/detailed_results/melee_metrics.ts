@@ -100,7 +100,15 @@ export class MeleeMetrics extends ResultComponent {
 	onSimResult(resultData: SimResultData) {
 		this.bodyElem.textContent = '';
 
-		const addRow = (meleeMetric: ActionMetrics, isChildMetric: boolean): HTMLElement => {
+		const players = resultData.result.getPlayers(resultData.filter);
+		if (players.length != 1) {
+			return;
+		}
+		const player = players[0];
+
+		const addRow = (meleeMetric: ActionMetrics, isChildMetric: boolean, rowNamePrefix: string, rowName: string): HTMLElement => {
+			const fullName = rowNamePrefix ? rowNamePrefix + ' - ' + rowName : rowName;
+
 			const rowElem = document.createElement('tr');
 			if (isChildMetric) {
 				rowElem.classList.add('child-metric');
@@ -111,7 +119,7 @@ export class MeleeMetrics extends ResultComponent {
 			rowElem.appendChild(nameCellElem);
 			nameCellElem.innerHTML = `
 			<a class="metrics-action-icon"></a>
-			<span class="metrics-action-name">${meleeMetric.name}</span>
+			<span class="metrics-action-name">${fullName}</span>
 			<span class="expand-toggle fa fa-caret-down"></span>
 			<span class="expand-toggle fa fa-caret-right"></span>
 			`;
@@ -137,25 +145,15 @@ export class MeleeMetrics extends ResultComponent {
 			addCell(meleeMetric.glancePercent.toFixed(2) + ' %'); // Glance %
 			return rowElem;
 		};
-
-		const meleeMetrics = resultData.result.getMeleeMetrics(resultData.filter);
-		const meleeGroups = ActionMetrics.groupById(meleeMetrics);
-
-		if (meleeMetrics.length == 0) {
-			this.rootElem.classList.add('empty');
-		} else {
-			this.rootElem.classList.remove('empty');
-		}
-
-		meleeGroups.forEach(meleeGroup => {
+		const addGroup = (meleeGroup: Array<ActionMetrics>, namePrefix: string) => {
 			if (meleeGroup.length == 1) {
-				addRow(meleeGroup[0], false);
+				addRow(meleeGroup[0], false, namePrefix, meleeGroup[0].name);
 				return;
 			}
 
 			const mergedMetrics = ActionMetrics.merge(meleeGroup, true);
-			const parentRow = addRow(mergedMetrics, false);
-			const childRows = meleeGroup.map(meleeMetric => addRow(meleeMetric, true));
+			const parentRow = addRow(mergedMetrics, false, '', namePrefix || mergedMetrics.name);
+			const childRows = meleeGroup.map(meleeMetric => addRow(meleeMetric, true, namePrefix, meleeMetric.name));
 			const defaultDisplay = childRows[0].style.display;
 
 			let expand = true;
@@ -170,7 +168,20 @@ export class MeleeMetrics extends ResultComponent {
 					parentRow.classList.remove('expand');
 				}
 			});
-		});
+		};
+
+		const meleeMetrics = player.getMeleeActions();
+		const meleeGroups = ActionMetrics.groupById(meleeMetrics);
+
+		if (meleeMetrics.length == 0) {
+			this.rootElem.classList.add('empty');
+			return
+		} else {
+			this.rootElem.classList.remove('empty');
+		}
+
+		meleeGroups.forEach(meleeGroup => addGroup(meleeGroup, ''));
+		player.pets.forEach(pet => addGroup(pet.getMeleeActions(), pet.name));
 
 		$(this.tableElem).trigger('update');
 	}
