@@ -480,7 +480,8 @@ func (hunter *Hunter) registerReadinessCD() {
 				hunter.SetCD(MultiShotCooldownID, 0)
 				hunter.SetCD(ArcaneShotCooldownID, 0)
 				hunter.SetCD(AimedShotCooldownID, 0)
-				// TODO: Kill command?
+				hunter.SetCD(KillCommandCooldownID, 0)
+				hunter.SetCD(RaptorStrikeCooldownID, 0)
 			},
 		},
 	}
