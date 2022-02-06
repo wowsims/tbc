@@ -92,7 +92,7 @@ export class Timeline extends ResultComponent {
         if (manaLogs.length == 0) {
             return;
         }
-        const maxMana = manaLogs[0].manaBefore;
+        const maxMana = manaLogs[0].valueBefore;
         const maxDps = dpsLogs[maxIndex(dpsLogs.map(l => l.dps))].dps;
         const dpsAxisMax = (Math.floor(maxDps / 100) + 1) * 100;
         // Figure out how much to vertically offset cooldown icons, for cooldowns
@@ -121,7 +121,7 @@ export class Timeline extends ResultComponent {
                     data: manaLogs.map(log => {
                         return {
                             x: this.toDatetime(log.timestamp),
-                            y: log.manaAfter,
+                            y: log.valueAfter,
                         };
                     }),
                 },
@@ -282,7 +282,7 @@ export class Timeline extends ResultComponent {
 							</div>
 							<div class="timeline-tooltip-body">
 								<div class="timeline-tooltip-body-row">
-									<span class="series-color">Before: ${log.manaBefore.toFixed(1)} (${(log.manaBefore / maxMana * 100).toFixed(0)}%)</span>
+									<span class="series-color">Before: ${log.valueBefore.toFixed(1)} (${(log.valueBefore / maxMana * 100).toFixed(0)}%)</span>
 								</div>
 								<ul class="timeline-mana-events">
 									${log.logs.map(manaChangedLog => {
@@ -299,7 +299,7 @@ export class Timeline extends ResultComponent {
                         }).join('')}
 								</ul>
 								<div class="timeline-tooltip-body-row">
-									<span class="series-color">After: ${log.manaAfter.toFixed(1)} (${(log.manaAfter / maxMana * 100).toFixed(0)}%)</span>
+									<span class="series-color">After: ${log.valueAfter.toFixed(1)} (${(log.valueAfter / maxMana * 100).toFixed(0)}%)</span>
 								</div>
 							</div>
 							${log.activeAuras.length == 0 ? '' : `

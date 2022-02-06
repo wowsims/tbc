@@ -85,7 +85,7 @@ export class SimLog {
             params.target = entities[1] || null;
             // Order from most to least common to reduce number of checks.
             return DamageDealtLog.parse(params)
-                || ManaChangedLog.parse(params)
+                || ResourceChangedLog.parse(params)
                 || AuraGainedLog.parse(params)
                 || AuraFadedLog.parse(params)
                 || MajorCooldownUsedLog.parse(params)
@@ -97,8 +97,8 @@ export class SimLog {
     isDamageDealt() {
         return this instanceof DamageDealtLog;
     }
-    isManaChanged() {
-        return this instanceof ManaChangedLog;
+    isResourceChanged() {
+        return this instanceof ResourceChangedLog;
     }
     isAuraGained() {
         return this instanceof AuraGainedLog;
@@ -325,20 +325,21 @@ export class AuraUptimeLog extends SimLog {
         });
     }
 }
-export class ManaChangedLog extends SimLog {
-    constructor(params, manaBefore, manaAfter, isSpend, cause) {
+export class ResourceChangedLog extends SimLog {
+    constructor(params, resource, valueBefore, valueAfter, isSpend, cause) {
         super(params);
-        this.manaBefore = manaBefore;
-        this.manaAfter = manaAfter;
+        this.resource = resource;
+        this.valueBefore = valueBefore;
+        this.valueAfter = valueAfter;
         this.isSpend = isSpend;
         this.cause = cause;
     }
     toString() {
-        const signedDiff = (this.manaAfter - this.manaBefore) * (this.isSpend ? -1 : 1);
-        return `${this.toStringPrefix()} ${this.isSpend ? 'Spent' : 'Gained'} ${signedDiff.toFixed(1)} mana from ${this.cause.name}. (${this.manaBefore.toFixed(1)} --> ${this.manaAfter.toFixed(1)})`;
+        const signedDiff = (this.valueAfter - this.valueBefore) * (this.isSpend ? -1 : 1);
+        return `${this.toStringPrefix()} ${this.isSpend ? 'Spent' : 'Gained'} ${signedDiff.toFixed(1)} ${this.resource} from ${this.cause.name}. (${this.valueBefore.toFixed(1)} --> ${this.valueAfter.toFixed(1)})`;
     }
     resultString() {
-        const delta = this.manaAfter - this.manaBefore;
+        const delta = this.valueAfter - this.valueBefore;
         if (delta < 0) {
             return delta.toFixed(1);
         }
@@ -347,10 +348,10 @@ export class ManaChangedLog extends SimLog {
         }
     }
     static parse(params) {
-        const match = params.raw.match(/((Gained)|(Spent)) \d+\.?\d* mana from (.*) \((\d+\.?\d*) --> (\d+\.?\d*)\)/);
+        const match = params.raw.match(/((Gained)|(Spent)) \d+\.?\d* ((mana)|(energy)|(focus)|(rage)) from (.*) \((\d+\.?\d*) --> (\d+\.?\d*)\)/);
         if (match) {
-            return ActionId.fromLogString(match[4]).fill(params.source?.index).then(cause => {
-                return new ManaChangedLog(params, parseFloat(match[5]), parseFloat(match[6]), match[1] == 'Spent', cause);
+            return ActionId.fromLogString(match[9]).fill(params.source?.index).then(cause => {
+                return new ResourceChangedLog(params, match[4], parseFloat(match[10]), parseFloat(match[11]), match[1] == 'Spent', cause);
             });
         }
         else {
@@ -358,25 +359,29 @@ export class ManaChangedLog extends SimLog {
         }
     }
 }
-export class ManaChangedLogGroup extends SimLog {
-    constructor(params, manaBefore, manaAfter, logs) {
+export class ResourceChangedLogGroup extends SimLog {
+    constructor(params, resource, valueBefore, valueAfter, logs) {
         super(params);
-        this.manaBefore = manaBefore;
-        this.manaAfter = manaAfter;
+        this.resource = resource;
+        this.valueBefore = valueBefore;
+        this.valueAfter = valueAfter;
         this.logs = logs;
     }
     toString() {
-        return `${this.toStringPrefix()} Mana: ${this.manaBefore.toFixed(1)} --> ${this.manaAfter.toFixed(1)}`;
+        const capitalizedResource = this.resource.charAt(0).toUpperCase() + this.resource.slice(1);
+        return `${this.toStringPrefix()} ${capitalizedResource}: ${this.valueBefore.toFixed(1)} --> ${this.valueAfter.toFixed(1)}`;
     }
-    static fromLogs(logs) {
-        const manaChangedLogs = logs.filter((log) => log.isManaChanged());
-        const groupedLogs = SimLog.groupDuplicateTimestamps(manaChangedLogs);
-        return groupedLogs.map(logGroup => new ManaChangedLogGroup({
+    static fromLogs(logs, resource) {
+        const resourceChangedLogs = logs
+            .filter((log) => log.isResourceChanged())
+            .filter(log => log.resource == resource);
+        const groupedLogs = SimLog.groupDuplicateTimestamps(resourceChangedLogs);
+        return groupedLogs.map(logGroup => new ResourceChangedLogGroup({
             raw: '',
             timestamp: logGroup[0].timestamp,
             source: logGroup[0].source,
             target: logGroup[0].target,
-        }, logGroup[0].manaBefore, logGroup[logGroup.length - 1].manaAfter, logGroup));
+        }, resource, logGroup[0].valueBefore, logGroup[logGroup.length - 1].valueAfter, logGroup));
     }
 }
 export class MajorCooldownUsedLog extends SimLog {

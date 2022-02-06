@@ -81,9 +81,9 @@ export const PetTypeInput = {
             { name: 'Ravager', value: PetType.Ravager },
             { name: 'Wind Serpent', value: PetType.WindSerpent },
             //{ name: 'Bat', value: PetType.Bat },
-            //{ name: 'Cat', value: PetType.Cat },
+            { name: 'Cat', value: PetType.Cat },
             //{ name: 'Owl', value: PetType.Owl },
-            //{ name: 'Raptor', value: PetType.Raptor },
+            { name: 'Raptor', value: PetType.Raptor },
         ],
         changedEvent: (player) => player.specOptionsChangeEmitter,
         getValue: (player) => player.getSpecOptions().petType,
@@ -147,21 +147,6 @@ export const HunterRotationConfig = {
             },
         },
         {
-            type: 'boolean', cssClass: 'precast-aimed-shot-picker',
-            getModObject: (simUI) => simUI.player,
-            config: {
-                label: 'Precast Aimed Shot',
-                labelTooltip: 'Starts the encounter with an instant Aimed Shot.',
-                changedEvent: (player) => player.rotationChangeEmitter,
-                getValue: (player) => player.getRotation().precastAimedShot,
-                setValue: (eventID, player, newValue) => {
-                    const newRotation = player.getRotation();
-                    newRotation.precastAimedShot = newValue;
-                    player.setRotation(eventID, newRotation);
-                },
-            },
-        },
-        {
             type: 'boolean', cssClass: 'use-french-rotation-picker',
             getModObject: (simUI) => simUI.player,
             config: {
@@ -202,6 +187,21 @@ export const HunterRotationConfig = {
                 setValue: (eventID, player, newValue) => {
                     const newRotation = player.getRotation();
                     newRotation.viperStopManaPercent = newValue / 100;
+                    player.setRotation(eventID, newRotation);
+                },
+            },
+        },
+        {
+            type: 'boolean', cssClass: 'precast-aimed-shot-picker',
+            getModObject: (simUI) => simUI.player,
+            config: {
+                label: 'Precast Aimed Shot',
+                labelTooltip: 'Starts the encounter with an instant Aimed Shot.',
+                changedEvent: (player) => player.rotationChangeEmitter,
+                getValue: (player) => player.getRotation().precastAimedShot,
+                setValue: (eventID, player, newValue) => {
+                    const newRotation = player.getRotation();
+                    newRotation.precastAimedShot = newValue;
                     player.setRotation(eventID, newRotation);
                 },
             },

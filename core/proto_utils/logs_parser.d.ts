@@ -29,7 +29,7 @@ export declare class SimLog {
     toStringPrefix(): string;
     static parseAll(result: RaidSimResult): Promise<Array<SimLog>>;
     isDamageDealt(): this is DamageDealtLog;
-    isManaChanged(): this is ManaChangedLog;
+    isResourceChanged(): this is ResourceChangedLog;
     isAuraGained(): this is AuraGainedLog;
     isAuraFaded(): this is AuraFadedLog;
     isMajorCooldownUsed(): this is MajorCooldownUsedLog;
@@ -83,23 +83,26 @@ export declare class AuraUptimeLog extends SimLog {
     static fromLogs(logs: Array<SimLog>, entity: Entity): Array<AuraUptimeLog>;
     static populateActiveAuras(logs: Array<SimLog>, auraLogs: Array<AuraUptimeLog>): void;
 }
-export declare class ManaChangedLog extends SimLog {
-    readonly manaBefore: number;
-    readonly manaAfter: number;
+export declare type Resource = 'mana' | 'energy' | 'focus' | 'rage';
+export declare class ResourceChangedLog extends SimLog {
+    readonly resource: Resource;
+    readonly valueBefore: number;
+    readonly valueAfter: number;
     readonly isSpend: boolean;
     readonly cause: ActionId;
-    constructor(params: SimLogParams, manaBefore: number, manaAfter: number, isSpend: boolean, cause: ActionId);
+    constructor(params: SimLogParams, resource: Resource, valueBefore: number, valueAfter: number, isSpend: boolean, cause: ActionId);
     toString(): string;
     resultString(): string;
-    static parse(params: SimLogParams): Promise<ManaChangedLog> | null;
+    static parse(params: SimLogParams): Promise<ResourceChangedLog> | null;
 }
-export declare class ManaChangedLogGroup extends SimLog {
-    readonly manaBefore: number;
-    readonly manaAfter: number;
-    readonly logs: Array<ManaChangedLog>;
-    constructor(params: SimLogParams, manaBefore: number, manaAfter: number, logs: Array<ManaChangedLog>);
+export declare class ResourceChangedLogGroup extends SimLog {
+    readonly resource: Resource;
+    readonly valueBefore: number;
+    readonly valueAfter: number;
+    readonly logs: Array<ResourceChangedLog>;
+    constructor(params: SimLogParams, resource: Resource, valueBefore: number, valueAfter: number, logs: Array<ResourceChangedLog>);
     toString(): string;
-    static fromLogs(logs: Array<SimLog>): Array<ManaChangedLogGroup>;
+    static fromLogs(logs: Array<SimLog>, resource: Resource): Array<ResourceChangedLogGroup>;
 }
 export declare class MajorCooldownUsedLog extends SimLog {
     readonly cooldownId: ActionId;
