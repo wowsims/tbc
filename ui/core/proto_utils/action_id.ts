@@ -49,6 +49,8 @@ export class ActionId {
 				name = 'Shoot';
 				iconUrl = 'https://wow.zamimg.com/images/wow/icons/large/ability_marksmanship.jpg';
 				break;
+			case OtherAction.OtherActionPet:
+				break;
 		}
 		this.baseName = baseName;
 		this.name = name || baseName;
@@ -256,6 +258,10 @@ export class ActionId {
 		return new ActionId(0, 0, otherId, tag || 0, '', '', '');
 	}
 
+	static fromPetName(petName: string): ActionId {
+		return new ActionId(0, 0, OtherAction.OtherActionPet, 0, petName, petName, petNameToIcon[petName] || '');
+	}
+
 	static fromItem(item: Item): ActionId {
 		return ActionId.fromItemId(getWowheadItemId(item));
 	}
@@ -317,3 +323,10 @@ idOverrides[ActionId.fromSpellId(37212).toProtoString()] = ActionId.fromItemId(2
 idOverrides[ActionId.fromSpellId(37223).toProtoString()] = ActionId.fromItemId(29040); // Improved Strength of Earth Totem
 idOverrides[ActionId.fromSpellId(37447).toProtoString()] = ActionId.fromItemId(30720); // Serpent-Coil Braid
 idOverrides[ActionId.fromSpellId(37443).toProtoString()] = ActionId.fromItemId(30196); // Robes of Tirisfal (4pc bonus)
+
+// https://tbc.wowhead.com/hunter-pets
+const petNameToIcon: Record<string, string> = {
+	'Ravager': 'https://wow.zamimg.com/images/wow/icons/large/ability_hunter_pet_ravager.jpg',
+	'Water Elemental': 'https://wow.zamimg.com/images/wow/icons/large/spell_frost_summonwaterelemental_2.jpg',
+	'Wind Serpent': 'https://wow.zamimg.com/images/wow/icons/large/ability_hunter_pet_windserpent.jpg',
+};

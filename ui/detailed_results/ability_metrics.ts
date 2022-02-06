@@ -1,4 +1,5 @@
 import { ActionMetrics, PlayerMetrics, SimResult, SimResultFilter } from '/tbc/core/proto_utils/sim_result.js';
+import { ActionId } from '/tbc/core/proto_utils/action_id.js';
 import { sum } from '/tbc/core/utils.js';
 
 import { ResultComponent, ResultComponentConfig, SimResultData } from './result_component.js';
@@ -62,7 +63,7 @@ export abstract class AbilityMetrics extends ResultComponent {
 				return;
 			}
 
-			const mergedMetrics = ActionMetrics.merge(actionGroup, true);
+			const mergedMetrics = ActionMetrics.merge(actionGroup, true, namePrefix ? ActionId.fromPetName(namePrefix) : undefined);
 			const parentRow = addRow(mergedMetrics, false, '', namePrefix || mergedMetrics.name);
 			const childRows = actionGroup.map(meleeMetric => addRow(meleeMetric, true, namePrefix, meleeMetric.name));
 			const defaultDisplay = childRows[0].style.display;
