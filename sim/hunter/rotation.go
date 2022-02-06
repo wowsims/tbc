@@ -87,11 +87,8 @@ func (hunter *Hunter) tryUseSpecialGCD(sim *core.Simulation) bool {
 }
 
 func (hunter *Hunter) OnGCDReady(sim *core.Simulation) {
-	// Hunters do most things between auto shots, so GCD usage is handled as an aura (see above).
+	// Hunters do most things between auto shots, so GCD usage is handled within OnAutoAttack (see above).
 	// Only use this for follow-up actions after an auto+GCD, i.e. melee weave or French rotation.
-	if sim.Log != nil {
-		sim.Log("hunter GCD")
-	}
 
 	if sim.CurrentTime == 0 {
 		// Dont do anything fancy on the first GCD.

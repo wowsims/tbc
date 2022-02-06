@@ -29,7 +29,7 @@ func (hunter *Hunter) aspectOfTheHawkAura() core.Aura {
 				return
 			}
 
-			if improvedHawkBonus > 0 && sim.RandomFloat("Imp Aspect of the Hawk") < improvedHawkProcChance {
+			if improvedHawkBonus > 1 && sim.RandomFloat("Imp Aspect of the Hawk") < improvedHawkProcChance {
 				hunter.PseudoStats.RangedSpeedMultiplier *= improvedHawkBonus
 				hunter.AddAura(sim, core.Aura{
 					ID:       ImprovedAspectOfTheHawkAuraID,

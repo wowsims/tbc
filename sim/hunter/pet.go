@@ -106,7 +106,8 @@ func (hp *HunterPet) Init(sim *core.Simulation) {
 	hp.secondaryAbility = hp.NewPetAbility(sim, hp.config.SecondaryAbility, false)
 }
 
-func (hp *HunterPet) Reset(newsim *core.Simulation) {
+func (hp *HunterPet) Reset(sim *core.Simulation) {
+	hp.focusBar.reset(sim)
 }
 
 func (hp *HunterPet) OnGCDReady(sim *core.Simulation) {
