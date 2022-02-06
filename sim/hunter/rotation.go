@@ -35,7 +35,7 @@ func (hunter *Hunter) tryUseGCD(sim *core.Simulation) {
 		}
 	} else {
 		// Regular rotation, i.e. special GCDs take the place of steady shot.
-		if !hunter.tryUseSpecialGCD(sim) {
+		if !hunter.tryUseSpecialGCD(sim, hasted) {
 			cast := hunter.NewSteadyShot(sim, target)
 			if success := cast.StartCast(sim); !success {
 				hunter.WaitForMana(sim, cast.GetManaCost())
@@ -46,7 +46,7 @@ func (hunter *Hunter) tryUseGCD(sim *core.Simulation) {
 
 // Decides whether to use a GCD spell other than Steady Shot.
 // Returns true if any of these spells was selected.
-func (hunter *Hunter) tryUseSpecialGCD(sim *core.Simulation) bool {
+func (hunter *Hunter) tryUseSpecialGCD(sim *core.Simulation, hasted bool) bool {
 	target := sim.GetPrimaryTarget()
 	currentMana := hunter.CurrentManaPercent()
 
@@ -76,7 +76,7 @@ func (hunter *Hunter) tryUseSpecialGCD(sim *core.Simulation) bool {
 			hunter.WaitForMana(sim, ms.GetManaCost())
 		}
 		return true
-	} else if hunter.Rotation.UseArcaneShot && !hunter.IsOnCD(ArcaneShotCooldownID, sim.CurrentTime) {
+	} else if !hasted && hunter.Rotation.UseArcaneShot && !hunter.IsOnCD(ArcaneShotCooldownID, sim.CurrentTime) {
 		as := hunter.NewArcaneShot(sim, target)
 		if success := as.Attack(sim); !success {
 			hunter.WaitForMana(sim, as.Cost.Value)
@@ -98,7 +98,7 @@ func (hunter *Hunter) OnGCDReady(sim *core.Simulation) {
 	hasted := hunter.HasTemporaryRangedSwingSpeedIncrease()
 	if hunter.Rotation.UseFrenchRotation && !hasted {
 		// 2nd GCD cast in the French rotation.
-		hunter.tryUseSpecialGCD(sim)
+		hunter.tryUseSpecialGCD(sim, hasted)
 	} else if hunter.Rotation.MeleeWeave && sim.GetRemainingDurationPercent() < hunter.Rotation.PercentWeaved && hunter.AutoAttacks.MeleeSwingsReady(sim) {
 		// Melee weave.
 		hunter.AutoAttacks.SwingMelee(sim, sim.GetPrimaryTarget())

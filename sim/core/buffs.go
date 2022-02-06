@@ -305,7 +305,7 @@ func FerociousInspirationAura(numBMHunters int32) Aura {
 	multiplier := math.Pow(1.03, float64(numBMHunters))
 	return Aura{
 		ID:       FerociousInspirationAuraID,
-		ActionID: ActionID{SpellID: 34460},
+		ActionID: ActionID{SpellID: 34460, Tag: -1},
 		OnBeforeMeleeHit: func(sim *Simulation, ability *ActiveMeleeAbility, hitEffect *AbilityHitEffect) {
 			hitEffect.DamageMultiplier *= multiplier
 		},
