@@ -8,6 +8,7 @@ import (
 )
 
 var KillCommandCooldownID = core.NewCooldownID()
+var KillCommandActionID = core.ActionID{SpellID: 34026, CooldownID: KillCommandCooldownID}
 
 var KillCommandAuraID = core.NewAuraID()
 
@@ -33,10 +34,11 @@ func (hunter *Hunter) applyKillCommand() {
 func (hunter *Hunter) newKillCommandTemplate(sim *core.Simulation) core.SimpleCast {
 	template := core.SimpleCast{
 		Cast: core.Cast{
-			ActionID:     core.ActionID{SpellID: 34026, CooldownID: KillCommandCooldownID},
+			ActionID:     KillCommandActionID,
 			Character:    hunter.GetCharacter(),
 			BaseManaCost: 75,
 			ManaCost:     75,
+			Cooldown:     time.Second * 5,
 		},
 	}
 
