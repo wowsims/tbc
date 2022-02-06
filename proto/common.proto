@@ -564,6 +564,7 @@ enum OtherAction {
 	OtherActionFocusRegen = 6;
 	OtherActionAttack = 3; // A white hit, can be main hand or off hand.
 	OtherActionShoot = 4; // Default shoot action using a wand/bow/gun.
+	OtherActionPet = 7; // Represents a grouping of all pet actions. Only used by the UI.
 }
 
 message ActionID {
