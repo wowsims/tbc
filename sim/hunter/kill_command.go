@@ -105,7 +105,7 @@ func (hunter *Hunter) NewKillCommand(sim *core.Simulation, target *core.Target) 
 }
 
 func (hunter *Hunter) TryKillCommand(sim *core.Simulation, target *core.Target) {
-	if !hunter.killCommandEnabled {
+	if !hunter.killCommandEnabled || hunter.killCommandBlocked {
 		return
 	}
 
