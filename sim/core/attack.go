@@ -12,10 +12,11 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-// OnBeforeMHSwing is called right before an auto attack fires
-//  if false is returned the weapon swing is cancelled.
+// ReplaceMHSwing is called right before an auto attack fires
+//  If it returns nil, the attack takes place as normal. If it returns an ability,
+//  that ability is used in place of the attack.
 //  This allows for abilities that convert a white attack into yellow attack.
-type OnBeforeMHSwing func(sim *Simulation) bool
+type ReplaceMHSwing func(sim *Simulation) *ActiveMeleeAbility
 
 // OnBeforeMelee is invoked once for each ability, even if there are multiple hits.
 //  This should be used for any effects that adjust the cost / stats / multipliers of the attack.
@@ -578,7 +579,7 @@ type AutoAttacks struct {
 
 	RangedAuto ActiveMeleeAbility // Parameters for ranged auto attacks.
 
-	OnBeforeMHSwing OnBeforeMHSwing
+	ReplaceMHSwing ReplaceMHSwing
 
 	// The time at which the last MH swing occurred.
 	previousMHSwingAt time.Duration
@@ -595,7 +596,7 @@ type AutoAttackOptions struct {
 	AutoSwingMelee  bool // If true, core engine will handle calling SwingMelee() for you.
 	AutoSwingRanged bool // If true, core engine will handle calling SwingRanged() for you.
 	DelayOHSwings   bool
-	OnBeforeMHSwing OnBeforeMHSwing
+	ReplaceMHSwing  ReplaceMHSwing
 }
 
 func (character *Character) EnableAutoAttacks(agent Agent, options AutoAttackOptions) {
@@ -608,7 +609,7 @@ func (character *Character) EnableAutoAttacks(agent Agent, options AutoAttackOpt
 		AutoSwingMelee:  options.AutoSwingMelee,
 		AutoSwingRanged: options.AutoSwingRanged,
 		DelayOHSwings:   options.DelayOHSwings,
-		OnBeforeMHSwing: options.OnBeforeMHSwing,
+		ReplaceMHSwing:  options.ReplaceMHSwing,
 		ActiveMeleeAbility: ActiveMeleeAbility{
 			MeleeAbility: MeleeAbility{
 				ActionID:    ActionID{OtherID: proto.OtherAction_OtherActionAttack},
@@ -664,7 +665,7 @@ func (aa *AutoAttacks) IsEnabled() bool {
 }
 
 // Empty handler so Agents don't have to provide one if they have no logic to add.
-func (character *Character) OnAutoAttack(sim *Simulation) {}
+func (character *Character) OnAutoAttack(sim *Simulation, ability *ActiveMeleeAbility) {}
 
 func (aa *AutoAttacks) reset(sim *Simulation) {
 	if !aa.IsEnabled() {
@@ -761,19 +762,28 @@ func (aa *AutoAttacks) TrySwingMH(sim *Simulation, target *Target) {
 		return
 	}
 
+	var ama ActiveMeleeAbility
+
 	// Allow MH swing to be overridden for abilities like Heroic Strike.
-	if aa.OnBeforeMHSwing == nil || aa.OnBeforeMHSwing(sim) {
-		ama := aa.ActiveMeleeAbility
+	var replaceAMA *ActiveMeleeAbility
+	if aa.ReplaceMHSwing != nil {
+		replaceAMA = aa.ReplaceMHSwing(sim)
+	}
+
+	if replaceAMA == nil {
+		ama = aa.ActiveMeleeAbility
 		ama.ActionID.Tag = 1
 		ama.CritMultiplier = aa.MH.CritMultiplier
 		ama.Effect.Target = target
 		ama.Effect.WeaponInput.IsOH = false
-		ama.Attack(sim)
+	} else {
+		ama = *replaceAMA
 	}
 
+	ama.Attack(sim)
 	aa.MainhandSwingAt = sim.CurrentTime + aa.MainhandSwingSpeed()
 	aa.previousMHSwingAt = sim.CurrentTime
-	aa.agent.OnAutoAttack(sim)
+	aa.agent.OnAutoAttack(sim, &ama)
 }
 
 // Performs an autoattack using the main hand weapon, if the OH CD is ready.
@@ -798,7 +808,7 @@ func (aa *AutoAttacks) TrySwingOH(sim *Simulation, target *Target) {
 	ama.Effect.WeaponInput.IsOH = true
 	ama.Attack(sim)
 	aa.OffhandSwingAt = sim.CurrentTime + aa.OffhandSwingSpeed()
-	aa.agent.OnAutoAttack(sim)
+	aa.agent.OnAutoAttack(sim, &ama)
 }
 
 // Performs an autoattack using the ranged weapon, if the ranged CD is ready.
@@ -811,6 +821,7 @@ func (aa *AutoAttacks) TrySwingRanged(sim *Simulation, target *Target) {
 	ama.Effect.Target = target
 	ama.Attack(sim)
 	aa.RangedSwingAt = sim.CurrentTime + aa.RangedSwingSpeed()
+	aa.agent.OnAutoAttack(sim, &ama)
 }
 
 func (aa *AutoAttacks) ModifySwingTime(sim *Simulation, amount float64) {
