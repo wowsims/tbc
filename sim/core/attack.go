@@ -718,7 +718,7 @@ func (aa *AutoAttacks) resetAutoSwing(sim *Simulation) {
 		if !pa.cancelled {
 			sim.AddPendingAction(pa)
 		} else {
-			sim.pendingActionPool.Put(pa)
+			// sim.pendingActionPool.Put(pa)
 		}
 	}
 	if aa.AutoSwingMelee {
@@ -816,7 +816,7 @@ func (aa *AutoAttacks) TrySwingOH(sim *Simulation, target *Target) {
 	aa.cachedMelee.Effect.WeaponInput.IsOH = true
 	aa.cachedMelee.Attack(sim)
 	aa.OffhandSwingAt = sim.CurrentTime + aa.OffhandSwingSpeed()
-	aa.agent.OnAutoAttack(sim, &ama)
+	aa.agent.OnAutoAttack(sim, &aa.cachedMelee)
 }
 
 // Performs an autoattack using the ranged weapon, if the ranged CD is ready.
