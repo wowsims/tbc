@@ -28,11 +28,13 @@ export class ActionId {
 				baseName = 'Wait';
 				break;
 			case OtherAction.OtherActionManaRegen:
-				baseName = 'Regen';
-				// Tag is number of milliseconds worth of regen.
-				if (tag) {
-					name = (tag/1000).toFixed(3) + 's ' + baseName;
-				}
+				baseName = 'Mana Tick';
+				break;
+			case OtherAction.OtherActionEnergyRegen:
+				baseName = 'Energy Tick';
+				break;
+			case OtherAction.OtherActionFocusRegen:
+				baseName = 'Focus Tick';
 				break;
 			case OtherAction.OtherActionAttack:
 				name = 'Attack';
@@ -49,7 +51,7 @@ export class ActionId {
 				break;
 		}
 		this.baseName = baseName;
-		this.name = name;
+		this.name = name || baseName;
 		this.iconUrl = iconUrl;
 	}
 

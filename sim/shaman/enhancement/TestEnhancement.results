@@ -515,7 +515,7 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-AllItems-SpellstrikeInfusion"
  value: {
-  dps: 1604.9432403759347
+  dps: 1617.9480561395949
  }
 }
 dps_results: {
@@ -671,7 +671,7 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-Average-Default"
  value: {
-  dps: 1964.564788317987
+  dps: 1964.7778638790314
  }
 }
 dps_results: {
@@ -713,7 +713,7 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-Settings-Orc-P2-Basic-NoBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 812.5685108192425
+  dps: 784.5938584936475
  }
 }
 dps_results: {
@@ -749,7 +749,7 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-Settings-Troll10-P2-Basic-NoBuffs-LongMultiTarget"
  value: {
-  dps: 1402.520538616176
+  dps: 1402.5116179915951
  }
 }
 dps_results: {

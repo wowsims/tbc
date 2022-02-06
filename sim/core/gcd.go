@@ -32,7 +32,13 @@ func (character *Character) NextGCDAt() time.Duration {
 
 func (character *Character) SetGCDTimer(sim *Simulation, gcdReadyAt time.Duration) {
 	character.SetCD(GCDCooldownID, gcdReadyAt)
-	character.gcdAction.NextActionAt = gcdReadyAt
+
+	character.gcdAction.Cancel(sim)
+	character.gcdAction = &PendingAction{
+		Priority:     ActionPriorityGCD,
+		OnAction:     character.gcdAction.OnAction,
+		NextActionAt: gcdReadyAt,
+	}
 	sim.AddPendingAction(character.gcdAction)
 }
 

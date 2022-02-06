@@ -85,6 +85,9 @@ func (fb *focusBar) reset(sim *core.Simulation) {
 		fb.AddFocus(sim, fb.focusPerTick, core.ActionID{OtherID: proto.OtherAction_OtherActionFocusRegen})
 
 		pa.NextActionAt = sim.CurrentTime + tickDuration
+		if sim.Log != nil {
+			sim.Log("Next focus tick at %s", pa.NextActionAt)
+		}
 		sim.AddPendingAction(pa)
 	}
 	fb.tickAction = pa

@@ -206,20 +206,28 @@ func (sim *Simulation) runOnce() {
 
 	for true {
 		pa := heap.Pop(&sim.pendingActions).(*PendingAction)
+		if pa.cancelled {
+			continue
+		}
+
 		if pa.NextActionAt > sim.Duration {
 			if pa.CleanUp != nil {
 				pa.CleanUp(sim)
 			}
 			break
 		}
+		if sim.Log != nil {
+			sim.Log("Doing action scheduled for %s, at %s", pa.NextActionAt, sim.CurrentTime)
+		}
 
 		if pa.NextActionAt > sim.CurrentTime {
+			if sim.Log != nil {
+				sim.Log("Advancing %s", pa.NextActionAt-sim.CurrentTime)
+			}
 			sim.advance(pa.NextActionAt - sim.CurrentTime)
 		}
 
-		if !pa.cancelled {
-			pa.OnAction(sim)
-		}
+		pa.OnAction(sim)
 	}
 
 	for _, pa := range sim.pendingActions {
