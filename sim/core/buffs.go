@@ -356,6 +356,7 @@ var windfuryAPBonuses = []float64{
 
 func IsEligibleForWindfuryTotem(character *Character) bool {
 	return character.AutoAttacks.IsEnabled() &&
+		character.HasMHWeapon() &&
 		!character.HasMHWeaponImbue &&
 		character.Consumes.MainHandImbue == proto.WeaponImbue_WeaponImbueUnknown
 }
@@ -391,7 +392,7 @@ func WindfuryTotemAura(character *Character, rank int32, iwtTalentPoints int32) 
 	const procChance = 0.2
 
 	var icd InternalCD
-	const icdDur = time.Second * 3
+	const icdDur = time.Duration(1) // No ICD, but only once per frame.
 
 	return Aura{
 		ID:       WindfuryTotemAuraID,
