@@ -73,7 +73,7 @@ func ApplyStormGauntlets(agent core.Agent) {
 		return core.Aura{
 			ID: StormGauntletsAuraID,
 			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
-				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() || !hitEffect.IsMelee() {
+				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() || !hitEffect.IsMelee() || ability.IsPhantom {
 					return
 				}
 
@@ -121,7 +121,7 @@ func ApplyBlazefuryMedallion(agent core.Agent) {
 		return core.Aura{
 			ID: BlazefuryMedallionAuraID,
 			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
-				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() || !hitEffect.IsMelee() {
+				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() || !hitEffect.IsMelee() || ability.IsPhantom {
 					return
 				}
 
@@ -341,6 +341,7 @@ func ApplyDespair(agent core.Agent) {
 			SpellSchool:    stats.AttackPower,
 			CritMultiplier: character.DefaultMeleeCritMultiplier(),
 			IgnoreCost:     true,
+			IsPhantom:      true,
 		},
 		Effect: core.AbilityHitEffect{
 			AbilityEffect: core.AbilityEffect{
@@ -391,6 +392,7 @@ func ApplyTheDecapitator(agent core.Agent) {
 			SpellSchool:    stats.AttackPower,
 			CritMultiplier: character.DefaultMeleeCritMultiplier(),
 			IgnoreCost:     true,
+			IsPhantom:      true,
 		},
 		Effect: core.AbilityHitEffect{
 			AbilityEffect: core.AbilityEffect{
@@ -505,7 +507,7 @@ func ApplyBandOfTheEternalChampion(agent core.Agent) {
 		return core.Aura{
 			ID: BandOfTheEternalChampionAuraID,
 			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
-				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() {
+				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() || ability.IsPhantom {
 					return
 				}
 				if icd.IsOnCD(sim) {
@@ -748,8 +750,7 @@ func ApplyTheNightBlade(agent core.Agent) {
 
 var SyphonOfTheNathrezimAuraID = core.NewAuraID()
 
-var SiphonEssenceMHAuraID = core.NewAuraID()
-var SiphonEssenceOHAuraID = core.NewAuraID()
+var SiphonEssenceAuraID = core.NewAuraID()
 
 func ApplySyphonOfTheNathrezim(agent core.Agent) {
 	character := agent.GetCharacter()
@@ -788,33 +789,20 @@ func ApplySyphonOfTheNathrezim(agent core.Agent) {
 		})
 		spellObj := core.SimpleSpell{}
 
-		applySiphonEssence := func(sim *core.Simulation, character *core.Character, isMH bool) {
-			var tag int32
-			var auraID core.AuraID
-			if isMH {
-				tag = 1
-				auraID = SiphonEssenceMHAuraID
-			} else {
-				tag = 2
-				auraID = SiphonEssenceOHAuraID
-			}
-			character.AddAura(sim, core.Aura{
-				ID:       auraID,
-				ActionID: core.ActionID{SpellID: 40291, Tag: tag},
-				Expires:  sim.CurrentTime + (time.Second * 6),
-				OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
-					if !hitEffect.Landed() || !hitEffect.IsWeaponHit() || !hitEffect.IsMelee() {
-						return
-					}
+		procAura := core.Aura{
+			ID:       SiphonEssenceAuraID,
+			ActionID: core.ActionID{SpellID: 40291},
+			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
+				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() || !hitEffect.IsMelee() || ability.IsPhantom {
+					return
+				}
 
-					castAction := &spellObj
-					castTemplate.Apply(castAction)
-					castAction.Effect.Target = hitEffect.Target
-					castAction.ActionID.Tag = tag
-					castAction.Init(sim)
-					castAction.Cast(sim)
-				},
-			})
+				castAction := &spellObj
+				castTemplate.Apply(castAction)
+				castAction.Effect.Target = hitEffect.Target
+				castAction.Init(sim)
+				castAction.Cast(sim)
+			},
 		}
 
 		return core.Aura{
@@ -824,9 +812,10 @@ func ApplySyphonOfTheNathrezim(agent core.Agent) {
 					return
 				}
 
-				isMH := hitEffect.IsMH()
-				if ppmm.Proc(sim, isMH, false, "Syphon Of The Nathrezim") {
-					applySiphonEssence(sim, character, isMH)
+				if ppmm.Proc(sim, hitEffect.IsMH(), false, "Syphon Of The Nathrezim") {
+					aura := procAura
+					aura.Expires = sim.CurrentTime + time.Second*6
+					character.AddAura(sim, aura)
 				}
 			},
 		}

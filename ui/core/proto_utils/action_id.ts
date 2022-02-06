@@ -158,7 +158,6 @@ export class ActionId {
 				}
 				break;
 			case 'Lightning Speed':
-			case 'Siphon Essence':
 			case 'Windfury Weapon':
 				if (this.tag == 1) {
 					name += ' (Main Hand)';
