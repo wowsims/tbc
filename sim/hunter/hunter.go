@@ -240,7 +240,6 @@ func NewHunter(character core.Character, options proto.Player) *Hunter {
 	hunter.registerRapidFireCD()
 	hunter.applyAspectOfTheHawk()
 	hunter.applyKillCommand()
-	hunter.applyRotationAura()
 
 	return hunter
 }

@@ -6,20 +6,12 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-var RotationCheckAuraID = core.NewAuraID()
-
-func (hunter *Hunter) applyRotationAura() {
-	hunter.AddPermanentAura(func(sim *core.Simulation) core.Aura {
-		return core.Aura{
-			ID: RotationCheckAuraID,
-			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
-				if !hitEffect.IsRanged() || !hitEffect.IsWhiteHit || hunter.IsOnCD(core.GCDCooldownID, sim.CurrentTime) {
-					return
-				}
-				hunter.tryUseGCD(sim)
-			},
-		}
-	})
+func (hunter *Hunter) OnAutoAttack(sim *core.Simulation, ability *core.ActiveMeleeAbility) {
+	hitEffect := &ability.Effect
+	if !hitEffect.IsRanged() || hunter.IsOnCD(core.GCDCooldownID, sim.CurrentTime) {
+		return
+	}
+	hunter.tryUseGCD(sim)
 }
 
 func (hunter *Hunter) tryUseGCD(sim *core.Simulation) {

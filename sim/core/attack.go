@@ -765,7 +765,7 @@ func (aa *AutoAttacks) TrySwingMH(sim *Simulation, target *Target) {
 
 	// Allow MH swing to be overridden for abilities like Heroic Strike.
 	var replaceAMA *ActiveMeleeAbility
-	if aa.ReplaceMHSwing == nil {
+	if aa.ReplaceMHSwing != nil {
 		replaceAMA = aa.ReplaceMHSwing(sim)
 	}
 
@@ -820,6 +820,7 @@ func (aa *AutoAttacks) TrySwingRanged(sim *Simulation, target *Target) {
 	ama.Effect.Target = target
 	ama.Attack(sim)
 	aa.RangedSwingAt = sim.CurrentTime + aa.RangedSwingSpeed()
+	aa.agent.OnAutoAttack(sim, &ama)
 }
 
 func (aa *AutoAttacks) ModifySwingTime(sim *Simulation, amount float64) {
