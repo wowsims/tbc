@@ -192,21 +192,6 @@ export const HunterRotationConfig = {
             },
         },
         {
-            type: 'boolean', cssClass: 'precast-aimed-shot-picker',
-            getModObject: (simUI) => simUI.player,
-            config: {
-                label: 'Precast Aimed Shot',
-                labelTooltip: 'Starts the encounter with an instant Aimed Shot.',
-                changedEvent: (player) => player.rotationChangeEmitter,
-                getValue: (player) => player.getRotation().precastAimedShot,
-                setValue: (eventID, player, newValue) => {
-                    const newRotation = player.getRotation();
-                    newRotation.precastAimedShot = newValue;
-                    player.setRotation(eventID, newRotation);
-                },
-            },
-        },
-        {
             type: 'boolean', cssClass: 'melee-weave-picker',
             getModObject: (simUI) => simUI,
             config: {
@@ -268,6 +253,21 @@ export const HunterRotationConfig = {
                     player.setRotation(eventID, newRotation);
                 },
                 showWhen: (player) => player.getRotation().meleeWeave,
+            },
+        },
+        {
+            type: 'boolean', cssClass: 'precast-aimed-shot-picker',
+            getModObject: (simUI) => simUI.player,
+            config: {
+                label: 'Precast Aimed Shot',
+                labelTooltip: 'Starts the encounter with an instant Aimed Shot.',
+                changedEvent: (player) => player.rotationChangeEmitter,
+                getValue: (player) => player.getRotation().precastAimedShot,
+                setValue: (eventID, player, newValue) => {
+                    const newRotation = player.getRotation();
+                    newRotation.precastAimedShot = newValue;
+                    player.setRotation(eventID, newRotation);
+                },
             },
         },
     ],
