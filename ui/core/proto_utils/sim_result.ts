@@ -28,7 +28,7 @@ import {
 	DpsLog,
 	Entity,
 	MajorCooldownUsedLog,
-	ManaChangedLogGroup,
+	ResourceChangedLogGroup,
 	SimLog,
 } from './logs_parser.js';
 
@@ -230,7 +230,7 @@ export class PlayerMetrics {
 
 	readonly logs: Array<SimLog>;
 	readonly damageDealtLogs: Array<DamageDealtLog>;
-	readonly manaChangedLogs: Array<ManaChangedLogGroup>;
+	readonly manaChangedLogs: Array<ResourceChangedLogGroup>;
 	readonly dpsLogs: Array<DpsLog>;
 	readonly auraUptimeLogs: Array<AuraUptimeLog>;
 	readonly majorCooldownLogs: Array<MajorCooldownUsedLog>;
@@ -273,7 +273,7 @@ export class PlayerMetrics {
 		this.auraUptimeLogs = AuraUptimeLog.fromLogs(this.logs, new Entity(this.name, '', this.raidIndex, false, this.isPet));
 		this.majorCooldownLogs = this.logs.filter((log): log is MajorCooldownUsedLog => log.isMajorCooldownUsed());
 
-		this.manaChangedLogs = ManaChangedLogGroup.fromLogs(this.logs);
+		this.manaChangedLogs = ResourceChangedLogGroup.fromLogs(this.logs, 'mana');
 		AuraUptimeLog.populateActiveAuras(this.dpsLogs, this.auraUptimeLogs);
 		AuraUptimeLog.populateActiveAuras(this.manaChangedLogs, this.auraUptimeLogs);
 

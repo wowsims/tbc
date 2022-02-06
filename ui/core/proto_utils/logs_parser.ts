@@ -122,7 +122,7 @@ export class SimLog {
 
 			// Order from most to least common to reduce number of checks.
 			return DamageDealtLog.parse(params)
-					|| ManaChangedLog.parse(params)
+					|| ResourceChangedLog.parse(params)
 					|| AuraGainedLog.parse(params)
 					|| AuraFadedLog.parse(params)
 					|| MajorCooldownUsedLog.parse(params)
@@ -136,8 +136,8 @@ export class SimLog {
 		return this instanceof DamageDealtLog;
 	}
 
-	isManaChanged(): this is ManaChangedLog {
-		return this instanceof ManaChangedLog;
+	isResourceChanged(): this is ResourceChangedLog {
+		return this instanceof ResourceChangedLog;
 	}
 
 	isAuraGained(): this is AuraGainedLog {
@@ -432,27 +432,31 @@ export class AuraUptimeLog extends SimLog {
 	}
 }
 
-export class ManaChangedLog extends SimLog {
-	readonly manaBefore: number;
-	readonly manaAfter: number;
+export type Resource = 'mana' | 'energy' | 'focus' | 'rage';
+
+export class ResourceChangedLog extends SimLog {
+	readonly resource: Resource;
+	readonly valueBefore: number;
+	readonly valueAfter: number;
 	readonly isSpend: boolean;
 	readonly cause: ActionId;
 
-	constructor(params: SimLogParams, manaBefore: number, manaAfter: number, isSpend: boolean, cause: ActionId) {
+	constructor(params: SimLogParams, resource: Resource, valueBefore: number, valueAfter: number, isSpend: boolean, cause: ActionId) {
 		super(params);
-		this.manaBefore = manaBefore;
-		this.manaAfter = manaAfter;
+		this.resource = resource;
+		this.valueBefore = valueBefore;
+		this.valueAfter = valueAfter;
 		this.isSpend = isSpend;
 		this.cause = cause;
 	}
 
 	toString(): string {
-		const signedDiff = (this.manaAfter - this.manaBefore) * (this.isSpend ? -1 : 1);
-		return `${this.toStringPrefix()} ${this.isSpend ? 'Spent' : 'Gained'} ${signedDiff.toFixed(1)} mana from ${this.cause.name}. (${this.manaBefore.toFixed(1)} --> ${this.manaAfter.toFixed(1)})`;
+		const signedDiff = (this.valueAfter - this.valueBefore) * (this.isSpend ? -1 : 1);
+		return `${this.toStringPrefix()} ${this.isSpend ? 'Spent' : 'Gained'} ${signedDiff.toFixed(1)} ${this.resource} from ${this.cause.name}. (${this.valueBefore.toFixed(1)} --> ${this.valueAfter.toFixed(1)})`;
 	}
 
 	resultString(): string {
-		const delta = this.manaAfter - this.manaBefore;
+		const delta = this.valueAfter - this.valueBefore;
 		if (delta < 0) {
 			return delta.toFixed(1);
 		} else {
@@ -460,11 +464,11 @@ export class ManaChangedLog extends SimLog {
 		}
 	}
 
-	static parse(params: SimLogParams): Promise<ManaChangedLog> | null {
-		const match = params.raw.match(/((Gained)|(Spent)) \d+\.?\d* mana from (.*) \((\d+\.?\d*) --> (\d+\.?\d*)\)/);
+	static parse(params: SimLogParams): Promise<ResourceChangedLog> | null {
+		const match = params.raw.match(/((Gained)|(Spent)) \d+\.?\d* ((mana)|(energy)|(focus)|(rage)) from (.*) \((\d+\.?\d*) --> (\d+\.?\d*)\)/);
 		if (match) {
-			return ActionId.fromLogString(match[4]).fill(params.source?.index).then(cause => {
-				return new ManaChangedLog(params, parseFloat(match[5]), parseFloat(match[6]), match[1] == 'Spent', cause);
+			return ActionId.fromLogString(match[9]).fill(params.source?.index).then(cause => {
+				return new ResourceChangedLog(params, match[4] as Resource, parseFloat(match[10]), parseFloat(match[11]), match[1] == 'Spent', cause);
 			});
 		} else {
 			return null;
@@ -472,34 +476,41 @@ export class ManaChangedLog extends SimLog {
 	}
 }
 
-export class ManaChangedLogGroup extends SimLog {
-	readonly manaBefore: number;
-	readonly manaAfter: number;
-	readonly logs: Array<ManaChangedLog>;
+export class ResourceChangedLogGroup extends SimLog {
+	readonly resource: Resource;
+	readonly valueBefore: number;
+	readonly valueAfter: number;
+	readonly logs: Array<ResourceChangedLog>;
 
-	constructor(params: SimLogParams, manaBefore: number, manaAfter: number, logs: Array<ManaChangedLog>) {
+	constructor(params: SimLogParams, resource: Resource, valueBefore: number, valueAfter: number, logs: Array<ResourceChangedLog>) {
 		super(params);
-		this.manaBefore = manaBefore;
-		this.manaAfter = manaAfter;
+		this.resource = resource;
+		this.valueBefore = valueBefore;
+		this.valueAfter = valueAfter;
 		this.logs = logs;
 	}
 
 	toString(): string {
-		return `${this.toStringPrefix()} Mana: ${this.manaBefore.toFixed(1)} --> ${this.manaAfter.toFixed(1)}`;
+		const capitalizedResource = this.resource.charAt(0).toUpperCase() + this.resource.slice(1);
+		return `${this.toStringPrefix()} ${capitalizedResource}: ${this.valueBefore.toFixed(1)} --> ${this.valueAfter.toFixed(1)}`;
 	}
 
-	static fromLogs(logs: Array<SimLog>): Array<ManaChangedLogGroup> {
-		const manaChangedLogs = logs.filter((log): log is ManaChangedLog => log.isManaChanged());
-		const groupedLogs = SimLog.groupDuplicateTimestamps(manaChangedLogs);
-		return groupedLogs.map(logGroup => new ManaChangedLogGroup(
+	static fromLogs(logs: Array<SimLog>, resource: Resource): Array<ResourceChangedLogGroup> {
+		const resourceChangedLogs = logs
+				.filter((log): log is ResourceChangedLog => log.isResourceChanged())
+				.filter(log => log.resource == resource);
+
+		const groupedLogs = SimLog.groupDuplicateTimestamps(resourceChangedLogs);
+		return groupedLogs.map(logGroup => new ResourceChangedLogGroup(
 				{
 					raw: '',
 					timestamp: logGroup[0].timestamp,
 					source: logGroup[0].source,
 					target: logGroup[0].target,
 				},
-				logGroup[0].manaBefore,
-				logGroup[logGroup.length - 1].manaAfter,
+				resource,
+				logGroup[0].valueBefore,
+				logGroup[logGroup.length - 1].valueAfter,
 				logGroup));
 	}
 }
