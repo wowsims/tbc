@@ -254,13 +254,7 @@ func (character *Character) MultiplyMeleeSpeed(sim *Simulation, amount float64) 
 }
 
 func (character *Character) MultiplyRangedSpeed(sim *Simulation, amount float64) {
-	if character.PseudoStats.RangedSpeedMultiplier == 0 {
-		// Short-circuit all the logic for non-hunters.
-		return
-	}
-
 	character.PseudoStats.RangedSpeedMultiplier *= amount
-	character.AutoAttacks.ModifySwingTime(sim, amount)
 }
 
 // Helper for when both MultiplyMeleeSpeed and MultiplyRangedSpeed are needed.

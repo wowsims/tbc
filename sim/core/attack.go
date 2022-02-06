@@ -724,6 +724,12 @@ func (aa *AutoAttacks) resetAutoSwing(sim *Simulation) {
 			sim.AddPendingAction(pa)
 		}
 	}
+	if aa.AutoSwingMelee {
+		pa.NextActionAt = aa.NextAttackAt()
+	} else {
+		pa.NextActionAt = aa.RangedSwingAt
+	}
+
 	aa.autoSwingAction = pa
 	sim.AddPendingAction(pa)
 }
@@ -840,16 +846,6 @@ func (aa *AutoAttacks) ModifySwingTime(sim *Simulation, amount float64) {
 			newTime := time.Duration(float64(ohSwingTime) / amount)
 			if newTime > 0 {
 				aa.OffhandSwingAt = sim.CurrentTime + newTime
-			}
-		}
-	}
-
-	if aa.Ranged.SwingSpeed != 0 {
-		rangedSwingTime := aa.RangedSwingAt - sim.CurrentTime
-		if rangedSwingTime > 1 {
-			newTime := time.Duration(float64(rangedSwingTime) / amount)
-			if newTime > 0 {
-				aa.RangedSwingAt = sim.CurrentTime + newTime
 			}
 		}
 	}
