@@ -107,10 +107,11 @@ var FullPartyBuffs = &proto.PartyBuffs{
 	Bloodlust: 1,
 	Drums:     proto.Drums_DrumsOfBattle,
 
-	BattleShout:     proto.TristateEffect_TristateEffectImproved,
-	LeaderOfThePack: proto.TristateEffect_TristateEffectImproved,
-	ManaSpringTotem: proto.TristateEffect_TristateEffectRegular,
-	GraceOfAirTotem: proto.TristateEffect_TristateEffectRegular,
+	BattleShout:       proto.TristateEffect_TristateEffectImproved,
+	LeaderOfThePack:   proto.TristateEffect_TristateEffectImproved,
+	ManaSpringTotem:   proto.TristateEffect_TristateEffectRegular,
+	GraceOfAirTotem:   proto.TristateEffect_TristateEffectRegular,
+	WindfuryTotemRank: 5,
 }
 var FullIndividualBuffs = &proto.IndividualBuffs{
 	BlessingOfKings:  true,

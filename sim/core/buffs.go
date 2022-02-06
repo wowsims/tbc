@@ -356,7 +356,6 @@ var windfuryAPBonuses = []float64{
 
 func IsEligibleForWindfuryTotem(character *Character) bool {
 	return character.AutoAttacks.IsEnabled() &&
-		character.HasMHWeapon() &&
 		!character.HasMHWeaponImbue &&
 		character.Consumes.MainHandImbue == proto.WeaponImbue_WeaponImbueUnknown
 }
@@ -391,6 +390,9 @@ func WindfuryTotemAura(character *Character, rank int32, iwtTalentPoints int32) 
 
 	const procChance = 0.2
 
+	var icd InternalCD
+	const icdDur = time.Second * 3
+
 	return Aura{
 		ID:       WindfuryTotemAuraID,
 		ActionID: actionID,
@@ -398,9 +400,13 @@ func WindfuryTotemAura(character *Character, rank int32, iwtTalentPoints int32) 
 			if !hitEffect.Landed() || !hitEffect.IsWeaponHit() || !hitEffect.IsMH() || ability.IsPhantom {
 				return
 			}
+			if icd.IsOnCD(sim) {
+				return
+			}
 			if sim.RandomFloat("Windfury Totem") > procChance {
 				return
 			}
+			icd = InternalCD(sim.CurrentTime + icdDur)
 
 			wfTemplate.Apply(&wfAtk)
 			wfAtk.Effect.Target = hitEffect.Target
