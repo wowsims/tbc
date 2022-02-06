@@ -41,6 +41,7 @@ type Hunter struct {
 	hasGronnstalker2Pc bool
 
 	killCommandEnabled bool                // True after landing a crit.
+	killCommandBlocked bool                // True while Steady Shot is casting, to prevent KC.
 	killCommandAction  *core.PendingAction // Action to use KC when its comes off CD.
 
 	timeToWeave time.Duration
@@ -125,6 +126,8 @@ func (hunter *Hunter) Init(sim *core.Simulation) {
 
 func (hunter *Hunter) Reset(sim *core.Simulation) {
 	hunter.aspectOfTheViper = false
+	hunter.killCommandEnabled = false
+	hunter.killCommandBlocked = false
 	hunter.killCommandAction.NextActionAt = 0
 
 	target := sim.GetPrimaryTarget()

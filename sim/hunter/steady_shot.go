@@ -21,6 +21,10 @@ func (hunter *Hunter) newSteadyShotCastTemplate(sim *core.Simulation) core.Simpl
 			//CastTime:     time.Second * 1,
 			GCD:         core.GCDDefault,
 			IgnoreHaste: true, // Hunter GCD is locked at 1.5s
+			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
+				hunter.killCommandBlocked = false
+				hunter.TryKillCommand(sim, sim.GetPrimaryTarget())
+			},
 		},
 		DisableMetrics: true,
 	}

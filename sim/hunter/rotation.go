@@ -32,6 +32,9 @@ func (hunter *Hunter) tryUseGCD(sim *core.Simulation) {
 		cast := hunter.NewSteadyShot(sim, target)
 		if success := cast.StartCast(sim); !success {
 			hunter.WaitForMana(sim, cast.GetManaCost())
+		} else {
+			// Can't use kill command while casting steady shot.
+			hunter.killCommandBlocked = true
 		}
 	} else {
 		// Regular rotation, i.e. special GCDs take the place of steady shot.
@@ -39,6 +42,9 @@ func (hunter *Hunter) tryUseGCD(sim *core.Simulation) {
 			cast := hunter.NewSteadyShot(sim, target)
 			if success := cast.StartCast(sim); !success {
 				hunter.WaitForMana(sim, cast.GetManaCost())
+			} else {
+				// Can't use kill command while casting steady shot.
+				hunter.killCommandBlocked = true
 			}
 		}
 	}

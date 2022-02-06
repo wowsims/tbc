@@ -407,7 +407,7 @@ dps_results: {
 dps_results: {
  key: "TestHunter-AllItems-Primalstrike"
  value: {
-  dps: 1499.123068497964
+  dps: 1504.2925797963437
  }
 }
 dps_results: {
@@ -647,7 +647,7 @@ dps_results: {
 dps_results: {
  key: "TestHunter-Average-Default"
  value: {
-  dps: 1483.7481059599256
+  dps: 1483.8707226135882
  }
 }
 dps_results: {
@@ -683,13 +683,13 @@ dps_results: {
 dps_results: {
  key: "TestHunter-Settings-Dwarf-P1-Basic-NoBuffs-LongMultiTarget"
  value: {
-  dps: 1001.9576698307633
+  dps: 1000.0839833695546
  }
 }
 dps_results: {
  key: "TestHunter-Settings-Dwarf-P1-Basic-NoBuffs-LongSingleTargetFullDebuffs"
  value: {
-  dps: 838.6096341811462
+  dps: 834.9831407875694
  }
 }
 dps_results: {
@@ -767,7 +767,7 @@ dps_results: {
 dps_results: {
  key: "TestHunter-Settings-Dwarf-P1-MeleeWeave-FullBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 1191.7177244390748
+  dps: 1192.2098097422142
  }
 }
 dps_results: {
@@ -779,13 +779,13 @@ dps_results: {
 dps_results: {
  key: "TestHunter-Settings-Dwarf-P1-MeleeWeave-NoBuffs-LongMultiTarget"
  value: {
-  dps: 1057.7013836612894
+  dps: 1065.0196216803774
  }
 }
 dps_results: {
  key: "TestHunter-Settings-Dwarf-P1-MeleeWeave-NoBuffs-LongSingleTargetFullDebuffs"
  value: {
-  dps: 926.2862354324362
+  dps: 904.4529769135238
  }
 }
 dps_results: {
@@ -815,7 +815,7 @@ dps_results: {
 dps_results: {
  key: "TestHunter-Settings-Orc-P1-Basic-FullBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 1139.6804868909473
+  dps: 1139.2015427986883
  }
 }
 dps_results: {
@@ -827,13 +827,13 @@ dps_results: {
 dps_results: {
  key: "TestHunter-Settings-Orc-P1-Basic-NoBuffs-LongMultiTarget"
  value: {
-  dps: 1012.9819235869121
+  dps: 1002.3995447379646
  }
 }
 dps_results: {
  key: "TestHunter-Settings-Orc-P1-Basic-NoBuffs-LongSingleTargetFullDebuffs"
  value: {
-  dps: 871.1719878535775
+  dps: 855.1097228811086
  }
 }
 dps_results: {
@@ -863,7 +863,7 @@ dps_results: {
 dps_results: {
  key: "TestHunter-Settings-Orc-P1-French-FullBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 1117.0934118810858
+  dps: 1111.0919245030539
  }
 }
 dps_results: {
@@ -881,7 +881,7 @@ dps_results: {
 dps_results: {
  key: "TestHunter-Settings-Orc-P1-French-NoBuffs-LongSingleTargetFullDebuffs"
  value: {
-  dps: 841.6816964287372
+  dps: 839.827085317219
  }
 }
 dps_results: {
@@ -911,7 +911,7 @@ dps_results: {
 dps_results: {
  key: "TestHunter-Settings-Orc-P1-MeleeWeave-FullBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 1189.8441002386273
+  dps: 1208.1844083421313
  }
 }
 dps_results: {
@@ -923,13 +923,13 @@ dps_results: {
 dps_results: {
  key: "TestHunter-Settings-Orc-P1-MeleeWeave-NoBuffs-LongMultiTarget"
  value: {
-  dps: 1097.5063102168745
+  dps: 1094.8329598121438
  }
 }
 dps_results: {
  key: "TestHunter-Settings-Orc-P1-MeleeWeave-NoBuffs-LongSingleTargetFullDebuffs"
  value: {
-  dps: 917.5627029980748
+  dps: 943.3441869868734
  }
 }
 dps_results: {
