@@ -150,7 +150,7 @@ export declare class ActionMetrics {
     get glances(): number;
     get glancePercent(): number;
     static makeNew(iterations: number, duration: number, actionMetrics: ActionMetricsProto, playerIndex?: number): Promise<ActionMetrics>;
-    static merge(actions: Array<ActionMetrics>, removeTag?: boolean): ActionMetrics;
+    static merge(actions: Array<ActionMetrics>, removeTag?: boolean, actionIdOverride?: ActionId): ActionMetrics;
     static joinById(actions: Array<ActionMetrics>): Array<ActionMetrics>;
     static groupById(actions: Array<ActionMetrics>): Array<Array<ActionMetrics>>;
 }

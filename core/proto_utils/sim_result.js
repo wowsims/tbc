@@ -334,9 +334,9 @@ export class ActionMetrics {
         return new ActionMetrics(actionId, iterations, duration, actionMetrics);
     }
     // Merges an array of metrics into a single metric.
-    static merge(actions, removeTag) {
+    static merge(actions, removeTag, actionIdOverride) {
         const firstAction = actions[0];
-        let actionId = firstAction.actionId;
+        let actionId = actionIdOverride || firstAction.actionId;
         if (removeTag) {
             actionId = actionId.withoutTag();
         }

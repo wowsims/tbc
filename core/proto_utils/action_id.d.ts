@@ -26,6 +26,7 @@ export declare class ActionId {
     static fromItemId(itemId: number, tag?: number): ActionId;
     static fromSpellId(spellId: number, tag?: number): ActionId;
     static fromOtherId(otherId: OtherAction, tag?: number): ActionId;
+    static fromPetName(petName: string): ActionId;
     static fromItem(item: Item): ActionId;
     static fromProto(protoId: ActionIdProto): ActionId;
     static fromLogString(str: string): ActionId;

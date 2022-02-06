@@ -1017,6 +1017,12 @@ export var OtherAction;
      * @generated from protobuf enum value: OtherActionShoot = 4;
      */
     OtherAction[OtherAction["OtherActionShoot"] = 4] = "OtherActionShoot";
+    /**
+     * Represents a grouping of all pet actions. Only used by the UI.
+     *
+     * @generated from protobuf enum value: OtherActionPet = 7;
+     */
+    OtherAction[OtherAction["OtherActionPet"] = 7] = "OtherActionPet";
 })(OtherAction || (OtherAction = {}));
 // @generated message type with reflection information, may provide speed optimized methods
 class RaidBuffs$Type extends MessageType {

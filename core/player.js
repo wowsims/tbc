@@ -6,6 +6,7 @@ import { Flask } from '/tbc/core/proto/common.js';
 import { Food } from '/tbc/core/proto/common.js';
 import { GuardianElixir } from '/tbc/core/proto/common.js';
 import { IndividualBuffs } from '/tbc/core/proto/common.js';
+import { RangedWeaponType } from '/tbc/core/proto/common.js';
 import { Spec } from '/tbc/core/proto/common.js';
 import { Stat } from '/tbc/core/proto/common.js';
 import { WeaponImbue } from '/tbc/core/proto/common.js';
@@ -384,6 +385,11 @@ export class Player {
             const weaponDps = getWeaponDPS(item);
             const effectiveAttackPower = itemStats.getStat(Stat.StatAttackPower) + weaponDps * 14;
             itemStats = itemStats.withStat(Stat.StatAttackPower, effectiveAttackPower);
+        }
+        else if (![RangedWeaponType.RangedWeaponTypeUnknown, RangedWeaponType.RangedWeaponTypeThrown].includes(item.rangedWeaponType)) {
+            const weaponDps = getWeaponDPS(item);
+            const effectiveAttackPower = itemStats.getStat(Stat.StatRangedAttackPower) + weaponDps * 14;
+            itemStats = itemStats.withStat(Stat.StatRangedAttackPower, effectiveAttackPower);
         }
         if (item.id == 33122) {
             // Cloak of Darkness is super weird, just hardcode it.

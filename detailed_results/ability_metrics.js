@@ -1,4 +1,5 @@
 import { ActionMetrics } from '/tbc/core/proto_utils/sim_result.js';
+import { ActionId } from '/tbc/core/proto_utils/action_id.js';
 import { ResultComponent } from './result_component.js';
 export class AbilityMetrics extends ResultComponent {
     constructor(config) {
@@ -44,7 +45,7 @@ export class AbilityMetrics extends ResultComponent {
                 addRow(actionGroup[0], false, namePrefix, actionGroup[0].name);
                 return;
             }
-            const mergedMetrics = ActionMetrics.merge(actionGroup, true);
+            const mergedMetrics = ActionMetrics.merge(actionGroup, true, namePrefix ? ActionId.fromPetName(namePrefix) : undefined);
             const parentRow = addRow(mergedMetrics, false, '', namePrefix || mergedMetrics.name);
             const childRows = actionGroup.map(meleeMetric => addRow(meleeMetric, true, namePrefix, meleeMetric.name));
             const defaultDisplay = childRows[0].style.display;

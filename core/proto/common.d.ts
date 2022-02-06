@@ -1780,7 +1780,13 @@ export declare enum OtherAction {
      *
      * @generated from protobuf enum value: OtherActionShoot = 4;
      */
-    OtherActionShoot = 4
+    OtherActionShoot = 4,
+    /**
+     * Represents a grouping of all pet actions. Only used by the UI.
+     *
+     * @generated from protobuf enum value: OtherActionPet = 7;
+     */
+    OtherActionPet = 7
 }
 declare class RaidBuffs$Type extends MessageType<RaidBuffs> {
     constructor();
