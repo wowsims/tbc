@@ -9,19 +9,22 @@ import { specNames } from '/tbc/core/proto_utils/utils.js';
 import { talentTreeIcons } from '/tbc/core/proto_utils/utils.js';
 import { NO_TARGET } from '/tbc/core/proto_utils/utils.js';
 import * as BalanceDruidPresets from '/tbc/balance_druid/presets.js';
-import * as MagePresets from '/tbc/mage/presets.js';
 import * as ElementalShamanPresets from '/tbc/elemental_shaman/presets.js';
 import * as EnhancementShamanPresets from '/tbc/enhancement_shaman/presets.js';
+import * as HunterPresets from '/tbc/hunter/presets.js';
+import * as MagePresets from '/tbc/mage/presets.js';
 import * as ShadowPriestPresets from '/tbc/shadow_priest/presets.js';
 import { BalanceDruidSimUI } from '/tbc/balance_druid/sim.js';
 import { EnhancementShamanSimUI } from '/tbc/enhancement_shaman/sim.js';
 import { ElementalShamanSimUI } from '/tbc/elemental_shaman/sim.js';
+import { HunterSimUI } from '/tbc/hunter/sim.js';
 import { MageSimUI } from '/tbc/mage/sim.js';
 import { ShadowPriestSimUI } from '/tbc/shadow_priest/sim.js';
 export const specSimFactories = {
     [Spec.SpecBalanceDruid]: (parentElem, player) => new BalanceDruidSimUI(parentElem, player),
     [Spec.SpecElementalShaman]: (parentElem, player) => new ElementalShamanSimUI(parentElem, player),
     [Spec.SpecEnhancementShaman]: (parentElem, player) => new EnhancementShamanSimUI(parentElem, player),
+    [Spec.SpecHunter]: (parentElem, player) => new HunterSimUI(parentElem, player),
     [Spec.SpecMage]: (parentElem, player) => new MageSimUI(parentElem, player),
     [Spec.SpecShadowPriest]: (parentElem, player) => new ShadowPriestSimUI(parentElem, player),
 };
@@ -53,6 +56,62 @@ export const playerPresets = [
         },
         tooltip: specNames[Spec.SpecBalanceDruid],
         iconUrl: specIconsLarge[Spec.SpecBalanceDruid],
+    },
+    {
+        spec: Spec.SpecHunter,
+        rotation: HunterPresets.DefaultRotation,
+        talents: HunterPresets.BeastMasteryTalents.data,
+        specOptions: HunterPresets.DefaultOptions,
+        consumes: HunterPresets.DefaultConsumes,
+        defaultName: 'BM Hunter',
+        defaultFactionRaces: {
+            [Faction.Unknown]: Race.RaceUnknown,
+            [Faction.Alliance]: Race.RaceNightElf,
+            [Faction.Horde]: Race.RaceOrc,
+        },
+        defaultGear: {
+            [Faction.Unknown]: {},
+            [Faction.Alliance]: {
+                1: HunterPresets.P1_BM_PRESET.gear,
+                2: HunterPresets.P2_BM_PRESET.gear,
+                3: HunterPresets.P3_BM_PRESET.gear,
+            },
+            [Faction.Horde]: {
+                1: HunterPresets.P1_BM_PRESET.gear,
+                2: HunterPresets.P2_BM_PRESET.gear,
+                3: HunterPresets.P3_BM_PRESET.gear,
+            },
+        },
+        tooltip: 'BM Hunter',
+        iconUrl: talentTreeIcons[Class.ClassHunter][0],
+    },
+    {
+        spec: Spec.SpecHunter,
+        rotation: HunterPresets.DefaultRotation,
+        talents: HunterPresets.SurvivalTalents.data,
+        specOptions: HunterPresets.DefaultOptions,
+        consumes: HunterPresets.DefaultConsumes,
+        defaultName: 'SV Hunter',
+        defaultFactionRaces: {
+            [Faction.Unknown]: Race.RaceUnknown,
+            [Faction.Alliance]: Race.RaceNightElf,
+            [Faction.Horde]: Race.RaceOrc,
+        },
+        defaultGear: {
+            [Faction.Unknown]: {},
+            [Faction.Alliance]: {
+                1: HunterPresets.P1_SV_PRESET.gear,
+                2: HunterPresets.P2_SV_PRESET.gear,
+                3: HunterPresets.P3_SV_PRESET.gear,
+            },
+            [Faction.Horde]: {
+                1: HunterPresets.P1_SV_PRESET.gear,
+                2: HunterPresets.P2_SV_PRESET.gear,
+                3: HunterPresets.P3_SV_PRESET.gear,
+            },
+        },
+        tooltip: 'SV Hunter',
+        iconUrl: talentTreeIcons[Class.ClassHunter][2],
     },
     {
         spec: Spec.SpecMage,

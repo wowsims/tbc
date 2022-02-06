@@ -2290,6 +2290,68 @@ input, select {
   display: inline-block;
 }
 
+.totem-dropdowns-container {
+  display: flex;
+  justify-content: space-around;
+}
+
+.totem-inputs-container > div {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.hunter-sim-ui {
+  --theme-color-primary: #2ead50;
+  --theme-color-background: #0c190f;
+  --theme-color-background-raw: 12, 25, 15;
+  --theme-background-image: url("/tbc/assets/hunter_background.jpg");
+}
+
+.hunter-sim-ui .self-buffs-section {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.hunter-sim-ui .consumes-section {
+  grid-template-columns: repeat(6, 1fr);
+}
+
+.hunter-sim-ui .buffs-section {
+  grid-template-columns: repeat(7, 1fr);
+}
+
+.hunter-sim-ui .debuffs-section {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.hunter-sim-ui .PetBuffs-section {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.hunter-sim-ui .character-stats-table-row {
+  font-size: 11px;
+}
+
+.hunter-sim-ui .results-ep-table tr td:nth-child(1) {
+  font-size: 11px;
+}
+
+.hunter-sim-ui .results-ep-table tr td:nth-child(2), .results-ep-table tr td:nth-child(4) {
+  font-size: 11px;
+}
+
+.hunter-sim-ui .results-ep-table tr td:nth-child(2):after {
+  font-size: 11px;
+}
+
+.hunter-sim-ui .results-ep-table tr td:nth-child(4):after {
+  font-size: 11px;
+}
+
+.hunter-sim-ui .results-ep-table tr td:nth-child(3), .results-ep-table tr td:nth-child(5) {
+  font-size: 10px;
+}
+
 .mage-sim-ui {
   --theme-color-primary: #10abb5;
   --theme-color-background: #101a20;

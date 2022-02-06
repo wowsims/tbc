@@ -15,7 +15,9 @@ export class HunterSimUI extends IndividualSimUI {
         super(parentElem, player, {
             cssClass: 'hunter-sim-ui',
             // List any known bugs / issues here and they'll be shown on the site.
-            knownIssues: [],
+            knownIssues: [
+                'This sim is newly released and there are likely still bugs. Take the DPS values with a grain of salt and let us know if you spot any issues!',
+            ],
             // All stats for which EP should be calculated.
             epStats: [
                 Stat.StatIntellect,
