@@ -84,8 +84,9 @@ export abstract class AbilityMetrics extends ResultComponent {
 
 		const actions = this.getPlayerActions(player);
 		const actionGroups = ActionMetrics.groupById(actions);
+		const petGroups = player.pets.map(pet => this.getPlayerActions(pet));
 
-		if (actions.length == 0) {
+		if (actions.length == 0 && petGroups.every(group => group.length == 0)) {
 			this.rootElem.classList.add('empty');
 			return
 		} else {
@@ -93,7 +94,7 @@ export abstract class AbilityMetrics extends ResultComponent {
 		}
 
 		actionGroups.forEach(meleeGroup => addGroup(meleeGroup, ''));
-		player.pets.forEach(pet => addGroup(this.getPlayerActions(pet), pet.name));
+		player.pets.forEach((pet, i) => addGroup(petGroups[i], pet.name));
 
 		$(tableElem).trigger('update');
 	}
