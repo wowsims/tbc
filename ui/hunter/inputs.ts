@@ -105,9 +105,9 @@ export const PetTypeInput = {
 			{ name: 'Ravager', value: PetType.Ravager },
 			{ name: 'Wind Serpent', value: PetType.WindSerpent },
 			//{ name: 'Bat', value: PetType.Bat },
-			//{ name: 'Cat', value: PetType.Cat },
+			{ name: 'Cat', value: PetType.Cat },
 			//{ name: 'Owl', value: PetType.Owl },
-			//{ name: 'Raptor', value: PetType.Raptor },
+			{ name: 'Raptor', value: PetType.Raptor },
 		],
 		changedEvent: (player: Player<Spec.SpecHunter>) => player.specOptionsChangeEmitter,
 		getValue: (player: Player<Spec.SpecHunter>) => player.getSpecOptions().petType,
@@ -172,21 +172,6 @@ export const HunterRotationConfig = {
 			},
 		},
 		{
-			type: 'boolean' as const, cssClass: 'precast-aimed-shot-picker',
-			getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
-			config: {
-				label: 'Precast Aimed Shot',
-				labelTooltip: 'Starts the encounter with an instant Aimed Shot.',
-				changedEvent: (player: Player<Spec.SpecHunter>) => player.rotationChangeEmitter,
-				getValue: (player: Player<Spec.SpecHunter>) => player.getRotation().precastAimedShot,
-				setValue: (eventID: EventID, player: Player<Spec.SpecHunter>, newValue: boolean) => {
-					const newRotation = player.getRotation();
-					newRotation.precastAimedShot = newValue;
-					player.setRotation(eventID, newRotation);
-				},
-			},
-		},
-		{
 			type: 'boolean' as const, cssClass: 'use-french-rotation-picker',
 			getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
 			config: {
@@ -227,6 +212,21 @@ export const HunterRotationConfig = {
 				setValue: (eventID: EventID, player: Player<Spec.SpecHunter>, newValue: number) => {
 					const newRotation = player.getRotation();
 					newRotation.viperStopManaPercent = newValue / 100;
+					player.setRotation(eventID, newRotation);
+				},
+			},
+		},
+		{
+			type: 'boolean' as const, cssClass: 'precast-aimed-shot-picker',
+			getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
+			config: {
+				label: 'Precast Aimed Shot',
+				labelTooltip: 'Starts the encounter with an instant Aimed Shot.',
+				changedEvent: (player: Player<Spec.SpecHunter>) => player.rotationChangeEmitter,
+				getValue: (player: Player<Spec.SpecHunter>) => player.getRotation().precastAimedShot,
+				setValue: (eventID: EventID, player: Player<Spec.SpecHunter>, newValue: boolean) => {
+					const newRotation = player.getRotation();
+					newRotation.precastAimedShot = newValue;
 					player.setRotation(eventID, newRotation);
 				},
 			},

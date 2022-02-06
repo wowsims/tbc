@@ -15,11 +15,6 @@ func (hunter *Hunter) OnAutoAttack(sim *core.Simulation, ability *core.ActiveMel
 }
 
 func (hunter *Hunter) tryUseGCD(sim *core.Simulation) {
-	if sim.CurrentTime == 0 && hunter.Rotation.PrecastAimedShot && hunter.Talents.AimedShot {
-		hunter.NewAimedShot(sim, sim.GetPrimaryTarget()).Attack(sim)
-		return
-	}
-
 	if hunter.IsWaitingForMana() {
 		return
 	}
@@ -95,6 +90,10 @@ func (hunter *Hunter) tryUseSpecialGCD(sim *core.Simulation, hasted bool) bool {
 func (hunter *Hunter) OnGCDReady(sim *core.Simulation) {
 	// Hunters do most things between auto shots, so GCD usage is handled within OnAutoAttack (see above).
 	// Only use this for follow-up actions after an auto+GCD, i.e. melee weave or French rotation.
+	if sim.CurrentTime == 0 && hunter.Rotation.PrecastAimedShot && hunter.Talents.AimedShot {
+		hunter.NewAimedShot(sim, sim.GetPrimaryTarget()).Attack(sim)
+		return
+	}
 
 	if sim.CurrentTime == 0 {
 		// Dont do anything fancy on the first GCD.
