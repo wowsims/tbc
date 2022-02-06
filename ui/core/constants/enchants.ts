@@ -63,6 +63,8 @@ enchantDescriptions.set(NETHERCOBRA_LEG_ARMOR, '+50 Attack Power and +12 Crit Ra
 // Feet
 export const BOARS_SPEED = 35297;
 enchantDescriptions.set(BOARS_SPEED, 'Minor Speed and +9 Stamina');
+export const FEET_DEXTERITY = 22544;
+enchantDescriptions.set(FEET_DEXTERITY, '+12 Agility');
 export const FEET_VITALITY = 35298;
 enchantDescriptions.set(FEET_VITALITY, '+4 Mana Per 5 Sec.');
 export const FEET_CATS_SWIFTNESS = 28279;
@@ -74,8 +76,10 @@ export const CRUSADER = 16252;
 enchantDescriptions.set(CRUSADER, 'Crusader');
 export const EXECUTIONER = 33307;
 enchantDescriptions.set(EXECUTIONER, 'Executioner');
-export const WEAPON_MAJOR_AGILITY = 22556;
-enchantDescriptions.set(WEAPON_MAJOR_AGILITY, '+35 Agility');
+export const WEAPON_GREATER_AGILITY = 33165;
+enchantDescriptions.set(WEAPON_GREATER_AGILITY, '+20 Agility');
+export const WEAPON_2H_MAJOR_AGILITY = 22556;
+enchantDescriptions.set(WEAPON_2H_MAJOR_AGILITY, '+35 Agility');
 export const WEAPON_MAJOR_INTELLECT = 22551;
 enchantDescriptions.set(WEAPON_MAJOR_INTELLECT, '+30 Intellect');
 export const WEAPON_SPELLPOWER = 22555;

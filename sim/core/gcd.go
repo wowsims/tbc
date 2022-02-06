@@ -17,9 +17,28 @@ func (character *Character) newGCDAction(sim *Simulation, agent Agent) *PendingA
 	return pa
 }
 
+// Note that this is only used when the hardcast and GCD actions
+func (character *Character) newHardcastAction(sim *Simulation) *PendingAction {
+	return &PendingAction{
+		OnAction: func(sim *Simulation) {
+			// Don't need to do anything, the Advance() call will take care of the hardcast.
+		},
+	}
+}
+
+func (character *Character) NextGCDAt() time.Duration {
+	return character.gcdAction.NextActionAt
+}
+
 func (character *Character) SetGCDTimer(sim *Simulation, gcdReadyAt time.Duration) {
 	character.SetCD(GCDCooldownID, gcdReadyAt)
-	character.gcdAction.NextActionAt = gcdReadyAt
+
+	character.gcdAction.Cancel(sim)
+	character.gcdAction = &PendingAction{
+		Priority:     ActionPriorityGCD,
+		OnAction:     character.gcdAction.OnAction,
+		NextActionAt: gcdReadyAt,
+	}
 	sim.AddPendingAction(character.gcdAction)
 }
 

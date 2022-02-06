@@ -210,6 +210,10 @@ func (sim *Simulation) runOnce() {
 
 	for true {
 		pa := heap.Pop(&sim.pendingActions).(*PendingAction)
+		if pa.cancelled {
+			continue
+		}
+
 		if pa.NextActionAt > sim.Duration {
 			if pa.CleanUp != nil {
 				pa.CleanUp(sim)
@@ -221,9 +225,7 @@ func (sim *Simulation) runOnce() {
 			sim.advance(pa.NextActionAt - sim.CurrentTime)
 		}
 
-		if !pa.cancelled {
-			pa.OnAction(sim)
-		}
+		pa.OnAction(sim)
 	}
 
 	for _, pa := range sim.pendingActions {
@@ -261,6 +263,11 @@ func (sim *Simulation) IsExecutePhase() bool {
 
 func (sim *Simulation) GetRemainingDuration() time.Duration {
 	return sim.Duration - sim.CurrentTime
+}
+
+// Returns the percentage of time remaining in the current iteration, as a value from 0-1.
+func (sim *Simulation) GetRemainingDurationPercent() float64 {
+	return float64(sim.Duration-sim.CurrentTime) / float64(sim.Duration)
 }
 
 func (sim *Simulation) GetNumTargets() int32 {

@@ -12,6 +12,7 @@ func (hunter *Hunter) applyTalents() {
 	if hunter.pet != nil {
 		hunter.applyFocusedFire()
 		hunter.applyFrenzy()
+		hunter.applyFerociousInspiration()
 		hunter.registerBestialWrathCD()
 
 		hunter.pet.damageMultiplier *= 1 + 0.04*float64(hunter.Talents.UnleashedFury)
@@ -179,6 +180,64 @@ func (hunter *Hunter) applyFrenzy() {
 			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 				if spellEffect.Crit {
 					tryProcAura()
+				}
+			},
+		}
+	})
+}
+
+// One ID for each index in the party (0-4) so auras from multiple hunters
+// don't collide.
+var FerociousInspirationAuraIDs = []core.AuraID{
+	core.NewAuraID(),
+	core.NewAuraID(),
+	core.NewAuraID(),
+	core.NewAuraID(),
+	core.NewAuraID(),
+}
+var FerociousInspirationAuraID = core.NewAuraID()
+
+func (hunter *Hunter) applyFerociousInspiration() {
+	if hunter.pet == nil || hunter.Talents.FerociousInspiration == 0 {
+		return
+	}
+
+	multiplier := 1.0 + 0.01*float64(hunter.Talents.FerociousInspiration)
+
+	procAura := core.Aura{
+		ID:       FerociousInspirationAuraIDs[hunter.PartyIndex],
+		ActionID: core.ActionID{SpellID: 34460, Tag: int32(hunter.RaidIndex)},
+		OnBeforeMeleeHit: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
+			hitEffect.DamageMultiplier *= multiplier
+		},
+		OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+			spellEffect.DamageMultiplier *= multiplier
+		},
+		OnBeforePeriodicDamage: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect, tickDamage *float64) {
+			*tickDamage *= multiplier
+		},
+	}
+
+	hunter.pet.AddPermanentAura(func(sim *core.Simulation) core.Aura {
+		applyAura := func() {
+			for _, playerOrPet := range hunter.Party.PlayersAndPets {
+				char := playerOrPet.GetCharacter()
+				aura := procAura
+				aura.Expires = sim.CurrentTime + time.Second*10
+				char.AddAura(sim, aura)
+			}
+		}
+
+		return core.Aura{
+			ID: FerociousInspirationAuraID,
+			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
+				if hitEffect.HitType == core.MeleeHitTypeCrit {
+					applyAura()
+				}
+			},
+			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+				if spellEffect.Crit {
+					applyAura()
 				}
 			},
 		}
@@ -471,16 +530,18 @@ func (hunter *Hunter) registerReadinessCD() {
 
 	template := core.SimpleCast{
 		Cast: core.Cast{
-			ActionID:  actionID,
-			Character: hunter.GetCharacter(),
-			Cooldown:  cooldown,
-			GCD:       time.Second * 1,
+			ActionID:    actionID,
+			Character:   hunter.GetCharacter(),
+			Cooldown:    cooldown,
+			GCD:         time.Second * 1,
+			IgnoreHaste: true, // Hunter GCD is locked
 			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
 				hunter.SetCD(RapidFireCooldownID, 0)
 				hunter.SetCD(MultiShotCooldownID, 0)
 				hunter.SetCD(ArcaneShotCooldownID, 0)
 				hunter.SetCD(AimedShotCooldownID, 0)
-				// TODO: Kill command?
+				hunter.SetCD(KillCommandCooldownID, 0)
+				hunter.SetCD(RaptorStrikeCooldownID, 0)
 			},
 		},
 	}

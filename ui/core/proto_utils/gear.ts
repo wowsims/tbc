@@ -3,8 +3,10 @@ import { GemColor } from '/tbc/core/proto/common.js';
 import { ItemSlot } from '/tbc/core/proto/common.js';
 import { ItemSpec } from '/tbc/core/proto/common.js';
 import { EquipmentSpec } from '/tbc/core/proto/common.js';
+import { WeaponType } from '/tbc/core/proto/common.js';
 import { equalsOrBothNull } from '/tbc/core/utils.js';
 import { getEnumValues } from '/tbc/core/utils.js';
+import { isBluntWeaponType, isSharpWeaponType } from '/tbc/core/proto_utils/utils.js';
 
 import { isMetaGemActive } from './gems.js';
 import { gemMatchesSocket } from './gems.js';
@@ -142,5 +144,22 @@ export class Gear {
 		} else {
 			return this;
 		}
+	}
+
+	hasBluntMHWeapon(): boolean {
+		const weapon = this.getEquippedItem(ItemSlot.ItemSlotMainHand);
+		return weapon != null && isBluntWeaponType(weapon.item.weaponType);
+	}
+	hasSharpMHWeapon(): boolean {
+		const weapon = this.getEquippedItem(ItemSlot.ItemSlotMainHand);
+		return weapon != null && isSharpWeaponType(weapon.item.weaponType);
+	}
+	hasBluntOHWeapon(): boolean {
+		const weapon = this.getEquippedItem(ItemSlot.ItemSlotOffHand);
+		return weapon != null && isBluntWeaponType(weapon.item.weaponType);
+	}
+	hasSharpOHWeapon(): boolean {
+		const weapon = this.getEquippedItem(ItemSlot.ItemSlotOffHand);
+		return weapon != null && isSharpWeaponType(weapon.item.weaponType);
 	}
 }

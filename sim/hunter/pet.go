@@ -88,6 +88,7 @@ func (hunter *Hunter) NewHunterPet() *HunterPet {
 		},
 	})
 
+	core.ApplyPetConsumeEffects(&hp.Character, hunter.Consumes)
 	hp.applyPetEffects()
 
 	hunter.AddPet(hp)
@@ -105,7 +106,8 @@ func (hp *HunterPet) Init(sim *core.Simulation) {
 	hp.secondaryAbility = hp.NewPetAbility(sim, hp.config.SecondaryAbility, false)
 }
 
-func (hp *HunterPet) Reset(newsim *core.Simulation) {
+func (hp *HunterPet) Reset(sim *core.Simulation) {
+	hp.focusBar.reset(sim)
 }
 
 func (hp *HunterPet) OnGCDReady(sim *core.Simulation) {
@@ -167,8 +169,8 @@ var PetConfigs = map[proto.Hunter_Options_PetType]PetConfig{
 	proto.Hunter_Options_Bat: PetConfig{
 		Name:             "Bat",
 		DamageMultiplier: 1.07,
-		PrimaryAbility:   Screech,
-		SecondaryAbility: Bite,
+		PrimaryAbility:   Bite,
+		SecondaryAbility: Screech,
 	},
 	proto.Hunter_Options_Cat: PetConfig{
 		Name:             "Cat",
@@ -179,14 +181,14 @@ var PetConfigs = map[proto.Hunter_Options_PetType]PetConfig{
 	proto.Hunter_Options_Owl: PetConfig{
 		Name:             "Owl",
 		DamageMultiplier: 1.07,
-		PrimaryAbility:   Screech,
-		SecondaryAbility: Bite,
+		PrimaryAbility:   Claw,
+		SecondaryAbility: Screech,
 	},
 	proto.Hunter_Options_Raptor: PetConfig{
 		Name:             "Raptor",
 		DamageMultiplier: 1.1,
 		PrimaryAbility:   Bite,
-		SecondaryAbility: Gore,
+		SecondaryAbility: Claw,
 	},
 	proto.Hunter_Options_Ravager: PetConfig{
 		Name:             "Ravager",
@@ -197,8 +199,8 @@ var PetConfigs = map[proto.Hunter_Options_PetType]PetConfig{
 	proto.Hunter_Options_WindSerpent: PetConfig{
 		Name:             "Wind Serpent",
 		DamageMultiplier: 1.07,
-		PrimaryAbility:   LightningBreath,
-		SecondaryAbility: Unknown,
+		PrimaryAbility:   Bite,
+		SecondaryAbility: LightningBreath,
 		IsCaster:         true,
 	},
 }

@@ -29,32 +29,61 @@ var BMTalents = &proto.HunterTalents{
 var PlayerOptionsBasic = &proto.Player_Hunter{
 	Hunter: &proto.Hunter{
 		Talents:  BMTalents,
-		Options:  hunterOptions,
-		Rotation: hunterRotation,
+		Options:  basicOptions,
+		Rotation: basicRotation,
 	},
 }
 
-var PlayerOptionsWindSerpent = &proto.Player_Hunter{
+var PlayerOptionsFrench = &proto.Player_Hunter{
 	Hunter: &proto.Hunter{
 		Talents:  BMTalents,
-		Options:  hunterOptions,
-		Rotation: hunterRotation,
+		Options:  windSerpentOptions,
+		Rotation: frenchRotation,
 	},
 }
 
-var hunterRotation = &proto.Hunter_Rotation{
-	Adaptive:             true,
-	UseMultiShot:         true,
-	UseArcaneShot:        true,
-	MaintainScorpidSting: true,
-	PrecastAimedShot:     true,
-	MeleeWeave:           true,
+var PlayerOptionsMeleeWeave = &proto.Player_Hunter{
+	Hunter: &proto.Hunter{
+		Talents:  BMTalents,
+		Options:  windSerpentOptions,
+		Rotation: meleeWeaveRotation,
+	},
+}
+
+var basicRotation = &proto.Hunter_Rotation{
+	UseMultiShot:     true,
+	UseArcaneShot:    false,
+	Sting:            proto.Hunter_Rotation_SerpentSting,
+	PrecastAimedShot: true,
+	MeleeWeave:       false,
 
 	ViperStartManaPercent: 0.2,
 	ViperStopManaPercent:  0.3,
 }
+var frenchRotation = &proto.Hunter_Rotation{
+	UseMultiShot:      true,
+	UseArcaneShot:     true,
+	Sting:             proto.Hunter_Rotation_SerpentSting,
+	PrecastAimedShot:  false,
+	MeleeWeave:        false,
+	UseFrenchRotation: true,
 
-var hunterOptions = &proto.Hunter_Options{
+	ViperStartManaPercent: 0.3,
+	ViperStopManaPercent:  0.5,
+}
+var meleeWeaveRotation = &proto.Hunter_Rotation{
+	UseMultiShot:    true,
+	UseArcaneShot:   false,
+	MeleeWeave:      true,
+	UseRaptorStrike: true,
+	TimeToWeaveMs:   500,
+	PercentWeaved:   0.8,
+
+	ViperStartManaPercent: 0.3,
+	ViperStopManaPercent:  0.5,
+}
+
+var basicOptions = &proto.Hunter_Options{
 	QuiverBonus: proto.Hunter_Options_Speed15,
 	Ammo:        proto.Hunter_Options_AdamantiteStinger,
 	PetType:     proto.Hunter_Options_Ravager,
@@ -78,10 +107,11 @@ var FullPartyBuffs = &proto.PartyBuffs{
 	Bloodlust: 1,
 	Drums:     proto.Drums_DrumsOfBattle,
 
-	BattleShout:     proto.TristateEffect_TristateEffectImproved,
-	LeaderOfThePack: proto.TristateEffect_TristateEffectImproved,
-	ManaSpringTotem: proto.TristateEffect_TristateEffectRegular,
-	GraceOfAirTotem: proto.TristateEffect_TristateEffectRegular,
+	BattleShout:       proto.TristateEffect_TristateEffectImproved,
+	LeaderOfThePack:   proto.TristateEffect_TristateEffectImproved,
+	ManaSpringTotem:   proto.TristateEffect_TristateEffectRegular,
+	GraceOfAirTotem:   proto.TristateEffect_TristateEffectRegular,
+	WindfuryTotemRank: 5,
 }
 var FullIndividualBuffs = &proto.IndividualBuffs{
 	BlessingOfKings:  true,
@@ -90,8 +120,10 @@ var FullIndividualBuffs = &proto.IndividualBuffs{
 }
 
 var FullConsumes = &proto.Consumes{
-	FlaskOfRelentlessAssault: true,
-	DefaultPotion:            proto.Potions_HastePotion,
+	Flask:           proto.Flask_FlaskOfRelentlessAssault,
+	DefaultPotion:   proto.Potions_HastePotion,
+	DefaultConjured: proto.Conjured_ConjuredDarkRune,
+	PetFood:         proto.PetFood_PetFoodKiblersBits,
 }
 
 var FullDebuffs = &proto.Debuffs{

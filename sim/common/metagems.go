@@ -96,7 +96,7 @@ func ApplyThunderingSkyfireDiamond(agent core.Agent) {
 		return core.Aura{
 			ID: ThunderingSkyfireDiamondAuraID,
 			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
-				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() {
+				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() || ability.IsPhantom {
 					return
 				}
 				if icd.IsOnCD(sim) {

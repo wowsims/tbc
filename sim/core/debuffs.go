@@ -99,11 +99,11 @@ func applyDebuffEffects(target *Target, debuffs proto.Debuffs) {
 	if debuffs.HuntersMark != proto.TristateEffect_TristateEffectMissing {
 		if debuffs.HuntersMark == proto.TristateEffect_TristateEffectImproved {
 			target.AddPermanentAura(func(sim *Simulation) Aura {
-				return HuntersMarkAura(5)
+				return HuntersMarkAura(5, true)
 			})
 		} else {
 			target.AddPermanentAura(func(sim *Simulation) Aura {
-				return HuntersMarkAura(0)
+				return HuntersMarkAura(0, true)
 			})
 		}
 	}
@@ -160,8 +160,8 @@ func JudgementOfWisdomAura() Aura {
 		ID:       JudgementOfWisdomDebuffID,
 		ActionID: actionID,
 		OnSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect) {
-			if spellCast.ActionID.ItemID == ItemIDTheLightningCapacitor {
-				return // TLC cant proc JoW
+			if spellCast.IsPhantom {
+				return // Phantom spells (Romulo's, Lightning Capacitor, etc) don't proc JoW.
 			}
 
 			character := spellCast.Character
@@ -170,6 +170,10 @@ func JudgementOfWisdomAura() Aura {
 			}
 		},
 		OnMeleeAttack: func(sim *Simulation, ability *ActiveMeleeAbility, hitEffect *AbilityHitEffect) {
+			if ability.IsPhantom {
+				return
+			}
+
 			character := ability.Character
 			if character.HasManaBar() {
 				character.AddMana(sim, mana, actionID, false)
@@ -398,19 +402,37 @@ func ExposeWeaknessAura(currentTime time.Duration, hunterAgility float64, multip
 
 var HuntersMarkDebuffID = NewDebuffID()
 
-func HuntersMarkAura(points int32) Aura {
-	rangedBonus := 440.0
-	meleeBonus := rangedBonus * 0.2 * float64(points)
+func HuntersMarkAura(points int32, fullyStacked bool) Aura {
+	const baseRangedBonus = 110.0
+	const bonusPerStack = 11.0
+	const maxStacks = 30
+	meleeBonus := baseRangedBonus * 0.2 * float64(points)
+
+	stacks := 0
+	if fullyStacked {
+		stacks = maxStacks
+	}
+
+	rangedBonus := baseRangedBonus + bonusPerStack*float64(stacks)
 
 	return Aura{
 		ID:       HuntersMarkDebuffID,
 		ActionID: ActionID{SpellID: 14325},
-		Stacks:   points,
+		Stacks:   points, // Use this to check whether to override in hunter/hunter.go
 		OnBeforeMeleeHit: func(sim *Simulation, ability *ActiveMeleeAbility, hitEffect *AbilityHitEffect) {
 			if hitEffect.IsMelee() {
 				hitEffect.BonusAttackPower += meleeBonus
 			} else {
 				hitEffect.BonusAttackPower += rangedBonus
+			}
+		},
+		OnMeleeAttack: func(sim *Simulation, ability *ActiveMeleeAbility, hitEffect *AbilityHitEffect) {
+			if !hitEffect.IsRanged() || !hitEffect.Landed() {
+				return
+			}
+			if stacks < maxStacks {
+				stacks++
+				rangedBonus = baseRangedBonus + bonusPerStack*float64(stacks)
 			}
 		},
 	}

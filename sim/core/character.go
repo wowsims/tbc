@@ -30,7 +30,7 @@ type Character struct {
 	energyBar
 
 	// Consumables this Character will be using.
-	consumes proto.Consumes
+	Consumes proto.Consumes
 
 	// Base stats for this Character.
 	baseStats stats.Stats
@@ -42,6 +42,12 @@ type Character struct {
 
 	// Cast speed without any temporary effects.
 	initialCastSpeed float64
+
+	// Melee swing speed without any temporary effects.
+	initialMeleeSwingSpeed float64
+
+	// Ranged swing speed without any temporary effects.
+	initialRangedSwingSpeed float64
 
 	// Provides stat dependency management behavior.
 	stats.StatDependencyManager
@@ -94,8 +100,9 @@ type Character struct {
 	// TODO: Figure out a cleaner way to do this.
 	HasMHWeaponImbue bool
 
-	// The PendingAction tracking this character's GCD.
-	gcdAction *PendingAction
+	// GCD-related PendingActions for this character.
+	gcdAction      *PendingAction
+	hardcastAction *PendingAction
 
 	// Fields related to waiting for certain events to happen.
 	waitingForMana float64
@@ -128,7 +135,7 @@ func NewCharacter(party *Party, partyIndex int, player proto.Player) Character {
 	character.Label = fmt.Sprintf("%s (#%d)", character.Name, character.RaidIndex+1)
 
 	if player.Consumes != nil {
-		character.consumes = *player.Consumes
+		character.Consumes = *player.Consumes
 	}
 
 	character.baseStats = BaseStats[BaseStatsKey{Race: character.Race, Class: character.Class}]
@@ -247,13 +254,7 @@ func (character *Character) MultiplyMeleeSpeed(sim *Simulation, amount float64) 
 }
 
 func (character *Character) MultiplyRangedSpeed(sim *Simulation, amount float64) {
-	if character.PseudoStats.RangedSpeedMultiplier == 0 {
-		// Short-circuit all the logic for non-hunters.
-		return
-	}
-
 	character.PseudoStats.RangedSpeedMultiplier *= amount
-	character.AutoAttacks.ModifySwingTime(sim, amount)
 }
 
 // Helper for when both MultiplyMeleeSpeed and MultiplyRangedSpeed are needed.
@@ -278,13 +279,23 @@ func (character *Character) GetStat(stat stats.Stat) float64 {
 
 // Returns whether the indicates stat is currently modified by a temporary bonus.
 func (character *Character) HasTemporaryBonusForStat(stat stats.Stat) bool {
-	return character.GetInitialStat(stat) != character.GetStat(stat)
+	return character.initialStats[stat] != character.stats[stat]
 }
 
 // Returns if spell casting has any temporary increases active.
 func (character *Character) HasTemporarySpellCastSpeedIncrease() bool {
 	return character.HasTemporaryBonusForStat(stats.SpellHaste) ||
 		character.PseudoStats.CastSpeedMultiplier != 1
+}
+
+// Returns if melee swings have any temporary increases active.
+func (character *Character) HasTemporaryMeleeSwingSpeedIncrease() bool {
+	return character.SwingSpeed() != character.initialMeleeSwingSpeed
+}
+
+// Returns if ranged swings have any temporary increases active.
+func (character *Character) HasTemporaryRangedSwingSpeedIncrease() bool {
+	return character.RangedSwingSpeed() != character.initialRangedSwingSpeed
 }
 
 func (character *Character) InitialCastSpeed() float64 {
@@ -341,10 +352,10 @@ func (character *Character) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {
 		}
 	}
 
-	if character.consumes.Drums > 0 {
-		partyBuffs.Drums = character.consumes.Drums
+	if character.Consumes.Drums > 0 {
+		partyBuffs.Drums = character.Consumes.Drums
 	}
-	if character.consumes.BattleChicken {
+	if character.Consumes.BattleChicken {
 		partyBuffs.BattleChickens++
 	}
 
@@ -386,6 +397,8 @@ func (character *Character) Finalize() {
 	character.initialStats = character.stats
 	character.initialPseudoStats = character.PseudoStats
 	character.initialCastSpeed = character.CastSpeed()
+	character.initialMeleeSwingSpeed = character.SwingSpeed()
+	character.initialRangedSwingSpeed = character.RangedSwingSpeed()
 
 	character.auraTracker.finalize()
 	character.majorCooldownManager.finalize(character)
@@ -418,6 +431,7 @@ func (character *Character) reset(sim *Simulation, agent Agent) {
 		sim.pendingActionPool.Put(character.gcdAction)
 	}
 	character.gcdAction = character.newGCDAction(sim, agent)
+	character.hardcastAction = character.newHardcastAction(sim)
 }
 
 // Advance moves time forward counting down auras, CDs, mana regen, etc
@@ -543,6 +557,7 @@ func (character *Character) GetStatsProto() *proto.PlayerStats {
 
 func (character *Character) GetMetricsProto(numIterations int32) *proto.PlayerMetrics {
 	metrics := character.Metrics.ToProto(numIterations)
+	metrics.Name = character.Name
 	metrics.Auras = character.auraTracker.GetMetricsProto(numIterations)
 
 	metrics.Pets = []*proto.PlayerMetrics{}

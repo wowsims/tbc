@@ -39,6 +39,11 @@ func (shaman *Shaman) newShockTemplateSpell(sim *core.Simulation, spellID int32,
 				DamageMultiplier:       1,
 				StaticDamageMultiplier: 1,
 				ThreatMultiplier:       1,
+				OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+					if shaman.Talents.ElementalFocus && spellEffect.Crit {
+						shaman.ElementalFocusStacks = 2
+					}
+				},
 			},
 		},
 	}

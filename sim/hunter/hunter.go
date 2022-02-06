@@ -1,6 +1,8 @@
 package hunter
 
 import (
+	"time"
+
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/proto"
 	"github.com/wowsims/tbc/sim/core/stats"
@@ -35,10 +37,16 @@ type Hunter struct {
 	AmmoDamageBonus float64
 
 	aspectOfTheViper bool // False indicates aspect of the hawk.
-	changingAspects  bool // True when trying to change aspects.
+
+	hasGronnstalker2Pc bool
 
 	killCommandEnabled bool                // True after landing a crit.
+	killCommandBlocked bool                // True while Steady Shot is casting, to prevent KC.
 	killCommandAction  *core.PendingAction // Action to use KC when its comes off CD.
+
+	timeToWeave time.Duration
+
+	raptorStrikeCost float64 // Cached mana cost of raptor strike.
 
 	pet *HunterPet
 
@@ -53,11 +61,23 @@ type Hunter struct {
 
 	killCommandTemplate core.SimpleCast
 
-	multiShotTemplate core.MeleeAbilityTemplate
-	multiShot         core.ActiveMeleeAbility
+	multiShotCastTemplate core.SimpleCast
+	multiShotCast         core.SimpleCast
+
+	multiShotAbilityTemplate core.MeleeAbilityTemplate
+	multiShotAbility         core.ActiveMeleeAbility
+
+	raptorStrikeTemplate core.MeleeAbilityTemplate
+	raptorStrike         core.ActiveMeleeAbility
 
 	scorpidStingTemplate core.MeleeAbilityTemplate
 	scorpidSting         core.ActiveMeleeAbility
+
+	serpentStingTemplate core.MeleeAbilityTemplate
+	serpentSting         core.ActiveMeleeAbility
+
+	serpentStingDotTemplate core.SimpleSpellTemplate
+	serpentStingDot         core.SimpleSpell
 
 	steadyShotCastTemplate core.SimpleCast
 	steadyShotCast         core.SimpleCast
@@ -70,12 +90,13 @@ func (hunter *Hunter) GetCharacter() *core.Character {
 	return &hunter.Character
 }
 
+func (hunter *Hunter) GetHunter() *Hunter {
+	return hunter
+}
+
 func (hunter *Hunter) AddRaidBuffs(raidBuffs *proto.RaidBuffs) {
 }
 func (hunter *Hunter) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {
-	if hunter.Talents.FerociousInspiration == 3 {
-		partyBuffs.FerociousInspiration++
-	}
 	if hunter.Talents.TrueshotAura {
 		partyBuffs.TrueshotAura = true
 	}
@@ -93,20 +114,26 @@ func (hunter *Hunter) Init(sim *core.Simulation) {
 	hunter.aspectOfTheHawkTemplate = hunter.newAspectOfTheHawkTemplate(sim)
 	hunter.aspectOfTheViperTemplate = hunter.newAspectOfTheViperTemplate(sim)
 	hunter.killCommandTemplate = hunter.newKillCommandTemplate(sim)
-	hunter.multiShotTemplate = hunter.newMultiShotTemplate(sim)
+	hunter.multiShotCastTemplate = hunter.newMultiShotCastTemplate(sim)
+	hunter.multiShotAbilityTemplate = hunter.newMultiShotAbilityTemplate(sim)
+	hunter.raptorStrikeTemplate = hunter.newRaptorStrikeTemplate(sim)
 	hunter.scorpidStingTemplate = hunter.newScorpidStingTemplate(sim)
+	hunter.serpentStingTemplate = hunter.newSerpentStingTemplate(sim)
+	hunter.serpentStingDotTemplate = hunter.newSerpentStingDotTemplate(sim)
 	hunter.steadyShotCastTemplate = hunter.newSteadyShotCastTemplate(sim)
 	hunter.steadyShotAbilityTemplate = hunter.newSteadyShotAbilityTemplate(sim)
 }
 
 func (hunter *Hunter) Reset(sim *core.Simulation) {
 	hunter.aspectOfTheViper = false
+	hunter.killCommandEnabled = false
+	hunter.killCommandBlocked = false
 	hunter.killCommandAction.NextActionAt = 0
 
 	target := sim.GetPrimaryTarget()
 	impHuntersMark := hunter.Talents.ImprovedHuntersMark
 	if !target.HasAura(core.HuntersMarkDebuffID) || target.NumStacks(core.HuntersMarkDebuffID) < impHuntersMark {
-		target.AddAura(sim, core.HuntersMarkAura(impHuntersMark))
+		target.AddAura(sim, core.HuntersMarkAura(impHuntersMark, false))
 	}
 }
 
@@ -118,6 +145,14 @@ func NewHunter(character core.Character, options proto.Player) *Hunter {
 		Talents:   *hunterOptions.Talents,
 		Options:   *hunterOptions.Options,
 		Rotation:  *hunterOptions.Rotation,
+
+		timeToWeave: time.Millisecond * time.Duration(hunterOptions.Rotation.TimeToWeaveMs),
+	}
+	hunter.hasGronnstalker2Pc = ItemSetGronnstalker.CharacterHasSetBonus(&hunter.Character, 2)
+
+	if !hunter.Rotation.UseMultiShot && !hunter.Rotation.UseArcaneShot {
+		// Disable french rotation if we don't have any spells to use it with.
+		hunter.Rotation.UseFrenchRotation = false
 	}
 
 	hunter.PseudoStats.RangedSpeedMultiplier = 1
@@ -129,6 +164,9 @@ func NewHunter(character core.Character, options proto.Player) *Hunter {
 		OffHand:         hunter.WeaponFromOffHand(0),
 		Ranged:          hunter.WeaponFromRanged(0),
 		AutoSwingRanged: true,
+		ReplaceMHSwing: func(sim *core.Simulation) *core.ActiveMeleeAbility {
+			return hunter.TryRaptorStrike(sim)
+		},
 	})
 
 	hunter.pet = hunter.NewHunterPet()
@@ -202,7 +240,6 @@ func NewHunter(character core.Character, options proto.Player) *Hunter {
 	hunter.registerRapidFireCD()
 	hunter.applyAspectOfTheHawk()
 	hunter.applyKillCommand()
-	hunter.applyRotationAura()
 
 	return hunter
 }

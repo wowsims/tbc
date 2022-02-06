@@ -81,6 +81,12 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestWarrior-AllItems-BlazefuryMedallion-17111"
+ value: {
+  dps: 249.73385368092377
+ }
+}
+dps_results: {
  key: "TestWarrior-AllItems-BracingEarthstormDiamond"
  value: {
   dps: 254.4528071955675
@@ -447,6 +453,12 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestWarrior-AllItems-StormGauntlets-12632"
+ value: {
+  dps: 247.59371296368045
+ }
+}
+dps_results: {
  key: "TestWarrior-AllItems-SwiftSkyfireDiamond"
  value: {
   dps: 256.22866702192897
@@ -575,7 +587,7 @@ dps_results: {
 dps_results: {
  key: "TestWarrior-Average-Default"
  value: {
-  dps: 252.01895572871453
+  dps: 251.9773862566659
  }
 }
 dps_results: {

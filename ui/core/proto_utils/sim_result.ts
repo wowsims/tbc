@@ -28,7 +28,7 @@ import {
 	DpsLog,
 	Entity,
 	MajorCooldownUsedLog,
-	ManaChangedLogGroup,
+	ResourceChangedLogGroup,
 	SimLog,
 } from './logs_parser.js';
 
@@ -230,7 +230,7 @@ export class PlayerMetrics {
 
 	readonly logs: Array<SimLog>;
 	readonly damageDealtLogs: Array<DamageDealtLog>;
-	readonly manaChangedLogs: Array<ManaChangedLogGroup>;
+	readonly manaChangedLogs: Array<ResourceChangedLogGroup>;
 	readonly dpsLogs: Array<DpsLog>;
 	readonly auraUptimeLogs: Array<AuraUptimeLog>;
 	readonly majorCooldownLogs: Array<MajorCooldownUsedLog>;
@@ -254,7 +254,7 @@ export class PlayerMetrics {
 		this.metrics = metrics;
 
 		this.raidIndex = raidIndex;
-		this.name = player.name;
+		this.name = metrics.name;
 		this.spec = playerToSpec(player);
 		this.isPet = isPet;
 		this.iconUrl = getTalentTreeIcon(this.spec, player.talentsString);
@@ -273,7 +273,7 @@ export class PlayerMetrics {
 		this.auraUptimeLogs = AuraUptimeLog.fromLogs(this.logs, new Entity(this.name, '', this.raidIndex, false, this.isPet));
 		this.majorCooldownLogs = this.logs.filter((log): log is MajorCooldownUsedLog => log.isMajorCooldownUsed());
 
-		this.manaChangedLogs = ManaChangedLogGroup.fromLogs(this.logs);
+		this.manaChangedLogs = ResourceChangedLogGroup.fromLogs(this.logs, 'mana');
 		AuraUptimeLog.populateActiveAuras(this.dpsLogs, this.auraUptimeLogs);
 		AuraUptimeLog.populateActiveAuras(this.manaChangedLogs, this.auraUptimeLogs);
 
@@ -294,6 +294,14 @@ export class PlayerMetrics {
 
 	getPlayerAndPetActions(): Array<ActionMetrics> {
 		return this.actions.concat(this.pets.map(pet => pet.getPlayerAndPetActions()).flat());
+	}
+
+	getMeleeActions(): Array<ActionMetrics> {
+		return this.actions.filter(e => e.hitAttempts != 0 && e.isMeleeAction);
+	}
+
+	getSpellActions(): Array<ActionMetrics> {
+		return this.actions.filter(e => e.hitAttempts != 0 && !e.isMeleeAction)
 	}
 
 	static async makeNew(iterations: number, duration: number, player: PlayerProto, metrics: PlayerMetricsProto, raidIndex: number, isPet: boolean, logs: Array<SimLog>): Promise<PlayerMetrics> {
@@ -534,9 +542,9 @@ export class ActionMetrics {
 	}
 
 	// Merges an array of metrics into a single metric.
-	static merge(actions: Array<ActionMetrics>, removeTag?: boolean): ActionMetrics {
+	static merge(actions: Array<ActionMetrics>, removeTag?: boolean, actionIdOverride?: ActionId): ActionMetrics {
 		const firstAction = actions[0];
-		let actionId = firstAction.actionId;
+		let actionId = actionIdOverride || firstAction.actionId;
 		if (removeTag) {
 			actionId = actionId.withoutTag();
 		}

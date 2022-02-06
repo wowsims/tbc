@@ -1,13 +1,18 @@
 import { ActionID as ActionIdProto } from '/tbc/core/proto/common.js';
 import { Class } from '/tbc/core/proto/common.js';
+import { Alchohol } from '/tbc/core/proto/common.js';
+import { BattleElixir } from '/tbc/core/proto/common.js';
 import { Cooldowns } from '/tbc/core/proto/common.js';
 import { Conjured } from '/tbc/core/proto/common.js';
 import { Consumes } from '/tbc/core/proto/common.js';
 import { Enchant } from '/tbc/core/proto/common.js';
 import { Encounter } from '/tbc/core/proto/common.js';
 import { EquipmentSpec } from '/tbc/core/proto/common.js';
+import { Flask } from '/tbc/core/proto/common.js';
+import { Food } from '/tbc/core/proto/common.js';
 import { Gem } from '/tbc/core/proto/common.js';
 import { GemColor } from '/tbc/core/proto/common.js';
+import { GuardianElixir } from '/tbc/core/proto/common.js';
 import { IndividualBuffs } from '/tbc/core/proto/common.js';
 import { ItemQuality } from '/tbc/core/proto/common.js';
 import { ItemSlot } from '/tbc/core/proto/common.js';
@@ -15,6 +20,7 @@ import { ItemSpec } from '/tbc/core/proto/common.js';
 import { ItemType } from '/tbc/core/proto/common.js';
 import { Item } from '/tbc/core/proto/common.js';
 import { Race } from '/tbc/core/proto/common.js';
+import { RangedWeaponType } from '/tbc/core/proto/common.js';
 import { Spec } from '/tbc/core/proto/common.js';
 import { Stat } from '/tbc/core/proto/common.js';
 import { WeaponImbue } from '/tbc/core/proto/common.js';
@@ -42,6 +48,7 @@ import {
 	classColors,
 	getEligibleEnchantSlots,
 	getEligibleItemSlots,
+	getTalentTree,
 	getTalentTreeIcon,
 	getMetaGemEffectEP,
 	raceToFaction,
@@ -365,6 +372,28 @@ export class Player<SpecType extends Spec> {
 		//}
 
 		TypedEvent.freezeAllAndDo(() => {
+			// If we swapped between sharp/blunt weapon types, then also swap between
+			// sharpening/weightstones.
+			const consumes = this.getConsumes();
+			let consumesChanged = false;
+			if (consumes.mainHandImbue == WeaponImbue.WeaponImbueAdamantiteSharpeningStone && newGear.hasBluntMHWeapon()) {
+				consumes.mainHandImbue = WeaponImbue.WeaponImbueAdamantiteWeightstone;
+				consumesChanged = true;
+			} else if (consumes.mainHandImbue == WeaponImbue.WeaponImbueAdamantiteWeightstone && newGear.hasSharpMHWeapon()) {
+				consumes.mainHandImbue = WeaponImbue.WeaponImbueAdamantiteSharpeningStone;
+				consumesChanged = true;
+			}
+			if (consumes.offHandImbue == WeaponImbue.WeaponImbueAdamantiteSharpeningStone && newGear.hasBluntOHWeapon()) {
+				consumes.offHandImbue = WeaponImbue.WeaponImbueAdamantiteWeightstone;
+				consumesChanged = true;
+			} else if (consumes.offHandImbue == WeaponImbue.WeaponImbueAdamantiteWeightstone && newGear.hasSharpOHWeapon()) {
+				consumes.offHandImbue = WeaponImbue.WeaponImbueAdamantiteSharpeningStone;
+				consumesChanged = true;
+			}
+			if (consumesChanged) {
+				this.setConsumes(eventID, consumes);
+			}
+
 			this.gear = newGear;
 			this.gearChangeEmitter.emit(eventID);
 			//this.setCooldowns(eventID, newCooldowns);
@@ -418,6 +447,10 @@ export class Player<SpecType extends Spec> {
     this.talentsString = newTalentsString;
     this.talentsStringChangeEmitter.emit(eventID);
   }
+
+	getTalentTree(): number {
+		return getTalentTree(this.getTalentsString());
+	}
 
 	getTalentTreeIcon(): string {
 		return getTalentTreeIcon(this.spec, this.getTalentsString());
@@ -484,6 +517,10 @@ export class Player<SpecType extends Spec> {
 			const weaponDps = getWeaponDPS(item);
 			const effectiveAttackPower = itemStats.getStat(Stat.StatAttackPower) + weaponDps * 14;
 			itemStats = itemStats.withStat(Stat.StatAttackPower, effectiveAttackPower);
+		} else if (![RangedWeaponType.RangedWeaponTypeUnknown, RangedWeaponType.RangedWeaponTypeThrown].includes(item.rangedWeaponType)) {
+			const weaponDps = getWeaponDPS(item);
+			const effectiveAttackPower = itemStats.getStat(Stat.StatRangedAttackPower) + weaponDps * 14;
+			itemStats = itemStats.withStat(Stat.StatRangedAttackPower, effectiveAttackPower);
 		}
 		if (item.id == 33122) {
 			// Cloak of Darkness is super weird, just hardcode it.
@@ -563,12 +600,6 @@ export class Player<SpecType extends Spec> {
 
 	fromProto(eventID: EventID, proto: PlayerProto) {
 		TypedEvent.freezeAllAndDo(() => {
-			// TODO: Remove this on 1/31/2022 (1 month).
-			if (proto.consumes && proto.consumes.darkRune) {
-				proto.consumes.darkRune = false
-				proto.consumes.defaultConjured = Conjured.ConjuredDarkRune;
-			}
-
 			// TODO: Remove this on 2/18/2022 (1 month).
 			if (proto.consumes && proto.consumes.brilliantWizardOil) {
 				proto.consumes.brilliantWizardOil = false;
@@ -577,6 +608,108 @@ export class Player<SpecType extends Spec> {
 			if (proto.consumes && proto.consumes.superiorWizardOil) {
 				proto.consumes.superiorWizardOil = false;
 				proto.consumes.mainHandImbue = WeaponImbue.WeaponImbueSuperiorWizardOil;
+			}
+
+			// TODO: Remove this on 3/4/2022 (1 month).
+			if (proto.consumes && proto.consumes.flaskOfBlindingLight) {
+				proto.consumes.flaskOfBlindingLight = false;
+				proto.consumes.flask = Flask.FlaskOfBlindingLight;
+			}
+			if (proto.consumes && proto.consumes.flaskOfMightyRestoration) {
+				proto.consumes.flaskOfMightyRestoration = false;
+				proto.consumes.flask = Flask.FlaskOfMightyRestoration;
+			}
+			if (proto.consumes && proto.consumes.flaskOfPureDeath) {
+				proto.consumes.flaskOfPureDeath = false;
+				proto.consumes.flask = Flask.FlaskOfPureDeath;
+			}
+			if (proto.consumes && proto.consumes.flaskOfRelentlessAssault) {
+				proto.consumes.flaskOfRelentlessAssault = false;
+				proto.consumes.flask = Flask.FlaskOfRelentlessAssault;
+			}
+			if (proto.consumes && proto.consumes.flaskOfSupremePower) {
+				proto.consumes.flaskOfSupremePower = false;
+				proto.consumes.flask = Flask.FlaskOfSupremePower;
+			}
+			if (proto.consumes && proto.consumes.adeptsElixir) {
+				proto.consumes.adeptsElixir = false;
+				proto.consumes.battleElixir = BattleElixir.AdeptsElixir;
+			}
+			if (proto.consumes && proto.consumes.elixirOfDemonslaying) {
+				proto.consumes.elixirOfDemonslaying = false;
+				proto.consumes.battleElixir = BattleElixir.ElixirOfDemonslaying;
+			}
+			if (proto.consumes && proto.consumes.elixirOfMajorAgility) {
+				proto.consumes.elixirOfMajorAgility = false;
+				proto.consumes.battleElixir = BattleElixir.ElixirOfMajorAgility;
+			}
+			if (proto.consumes && proto.consumes.elixirOfMajorFirePower) {
+				proto.consumes.elixirOfMajorFirePower = false;
+				proto.consumes.battleElixir = BattleElixir.ElixirOfMajorFirePower;
+			}
+			if (proto.consumes && proto.consumes.elixirOfMajorFrostPower) {
+				proto.consumes.elixirOfMajorFrostPower = false;
+				proto.consumes.battleElixir = BattleElixir.ElixirOfMajorFrostPower;
+			}
+			if (proto.consumes && proto.consumes.elixirOfMajorShadowPower) {
+				proto.consumes.elixirOfMajorShadowPower = false;
+				proto.consumes.battleElixir = BattleElixir.ElixirOfMajorShadowPower;
+			}
+			if (proto.consumes && proto.consumes.elixirOfMajorStrength) {
+				proto.consumes.elixirOfMajorStrength = false;
+				proto.consumes.battleElixir = BattleElixir.ElixirOfMajorStrength;
+			}
+			if (proto.consumes && proto.consumes.elixirOfTheMongoose) {
+				proto.consumes.elixirOfTheMongoose = false;
+				proto.consumes.battleElixir = BattleElixir.ElixirOfTheMongoose;
+			}
+			if (proto.consumes && proto.consumes.elixirOfDraenicWisdom) {
+				proto.consumes.elixirOfDraenicWisdom = false;
+				proto.consumes.guardianElixir = GuardianElixir.ElixirOfDraenicWisdom;
+			}
+			if (proto.consumes && proto.consumes.elixirOfMajorMageblood) {
+				proto.consumes.elixirOfMajorMageblood = false;
+				proto.consumes.guardianElixir = GuardianElixir.ElixirOfMajorMageblood;
+			}
+			if (proto.consumes && proto.consumes.blackenedBasilisk) {
+				proto.consumes.blackenedBasilisk = false;
+				proto.consumes.food = Food.FoodBlackenedBasilisk;
+			}
+			if (proto.consumes && proto.consumes.grilledMudfish) {
+				proto.consumes.grilledMudfish = false;
+				proto.consumes.food = Food.FoodGrilledMudfish;
+			}
+			if (proto.consumes && proto.consumes.ravagerDog) {
+				proto.consumes.ravagerDog = false;
+				proto.consumes.food = Food.FoodRavagerDog;
+			}
+			if (proto.consumes && proto.consumes.roastedClefthoof) {
+				proto.consumes.roastedClefthoof = false;
+				proto.consumes.food = Food.FoodRoastedClefthoof;
+			}
+			if (proto.consumes && proto.consumes.skullfishSoup) {
+				proto.consumes.skullfishSoup = false;
+				proto.consumes.food = Food.FoodSkullfishSoup;
+			}
+			if (proto.consumes && proto.consumes.spicyHotTalbuk) {
+				proto.consumes.spicyHotTalbuk = false;
+				proto.consumes.food = Food.FoodSpicyHotTalbuk;
+			}
+			if (proto.consumes && proto.consumes.kreegsStoutBeatdown) {
+				proto.consumes.kreegsStoutBeatdown = false;
+				proto.consumes.alchohol = Alchohol.AlchoholKreegsStoutBeatdown;
+			}
+			if (proto.consumes && proto.consumes.scrollOfAgilityV) {
+				proto.consumes.scrollOfAgilityV = false;
+				proto.consumes.scrollOfAgility = 5;
+			}
+			if (proto.consumes && proto.consumes.scrollOfStrengthV) {
+				proto.consumes.scrollOfStrengthV = false;
+				proto.consumes.scrollOfStrength = 5;
+			}
+			if (proto.consumes && proto.consumes.scrollOfSpiritV) {
+				proto.consumes.scrollOfSpiritV = false;
+				proto.consumes.scrollOfSpirit = 5;
 			}
 
 			let rotation = this.specTypeFunctions.rotationFromPlayer(proto);
@@ -612,93 +745,6 @@ export class Player<SpecType extends Spec> {
 			this.setSpecOptions(eventID, this.specTypeFunctions.optionsFromPlayer(proto));
 		});
 	}
-
-	// TODO: Remove to/from json functions and use proto versions instead. This will require
-	// some way to store all talents in the proto.
-  // Returns JSON representing all the current values.
-  toJson(): Object {
-    return {
-      'name': this.name,
-      'buffs': IndividualBuffs.toJson(this.buffs),
-      'consumes': Consumes.toJson(this.consumes),
-      'bonusStats': this.bonusStats.toJson(),
-      'gear': EquipmentSpec.toJson(this.gear.asSpec()),
-      'race': this.race,
-      'rotation': this.specTypeFunctions.rotationToJson(this.rotation),
-      'talents': this.talentsString,
-      'specOptions': this.specTypeFunctions.optionsToJson(this.specOptions),
-    };
-  }
-
-  // Set all the current values, assumes obj is the same type returned by toJson().
-  fromJson(eventID: EventID, obj: any) {
-		TypedEvent.freezeAllAndDo(() => {
-			try {
-				if (obj['name']) {
-					this.setName(eventID, obj['name']);
-				}
-			} catch (e) {
-				console.warn('Failed to parse name: ' + e);
-			}
-
-			try {
-				this.setBuffs(eventID, IndividualBuffs.fromJson(obj['buffs']));
-			} catch (e) {
-				console.warn('Failed to parse player buffs: ' + e);
-			}
-
-			try {
-				const consumes = Consumes.fromJson(obj['consumes']);
-				if (consumes.darkRune) {
-					consumes.defaultConjured = Conjured.ConjuredDarkRune;
-				}
-				this.setConsumes(eventID, consumes);
-			} catch (e) {
-				console.warn('Failed to parse consumes: ' + e);
-			}
-
-			// For legacy format. Do not remove this until 2022/01/02 (1 month).
-			if (obj['customStats']) {
-				obj['bonusStats'] = obj['customStats'];
-			}
-
-			try {
-				this.setBonusStats(eventID, Stats.fromJson(obj['bonusStats']));
-			} catch (e) {
-				console.warn('Failed to parse bonus stats: ' + e);
-			}
-
-			try {
-				this.setGear(eventID, this.sim.lookupEquipmentSpec(EquipmentSpec.fromJson(obj['gear'])));
-			} catch (e) {
-				console.warn('Failed to parse gear: ' + e);
-			}
-
-			try {
-				this.setRace(eventID, obj['race']);
-			} catch (e) {
-				console.warn('Failed to parse race: ' + e);
-			}
-
-			try {
-				this.setRotation(eventID, this.specTypeFunctions.rotationFromJson(obj['rotation']));
-			} catch (e) {
-				console.warn('Failed to parse rotation: ' + e);
-			}
-
-			try {
-				this.setTalentsString(eventID, obj['talents']);
-			} catch (e) {
-				console.warn('Failed to parse talents: ' + e);
-			}
-
-			try {
-				this.setSpecOptions(eventID, this.specTypeFunctions.optionsFromJson(obj['specOptions']));
-			} catch (e) {
-				console.warn('Failed to parse spec options: ' + e);
-			}
-		});
-  }
 
 	clone(eventID: EventID): Player<SpecType> {
 		const newPlayer = new Player<SpecType>(this.spec, this.sim);

@@ -7,16 +7,24 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
+var SteadyShotActionID = core.ActionID{SpellID: 34120}
+
 // ActiveMeleeAbility doesn't support cast times, so we wrap it in a SimpleCast.
 func (hunter *Hunter) newSteadyShotCastTemplate(sim *core.Simulation) core.SimpleCast {
 	template := core.SimpleCast{
 		Cast: core.Cast{
-			ActionID:     core.ActionID{SpellID: 34120},
+			ActionID:     SteadyShotActionID,
 			Character:    hunter.GetCharacter(),
 			BaseManaCost: 110,
 			ManaCost:     110,
-			CastTime:     time.Second * 1,
-			GCD:          core.GCDDefault,
+			// Cast time is affected by ranged attack speed so set it later.
+			//CastTime:     time.Second * 1,
+			GCD:         core.GCDDefault,
+			IgnoreHaste: true, // Hunter GCD is locked at 1.5s
+			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
+				hunter.killCommandBlocked = false
+				hunter.TryKillCommand(sim, sim.GetPrimaryTarget())
+			},
 		},
 		DisableMetrics: true,
 	}
@@ -29,7 +37,7 @@ func (hunter *Hunter) newSteadyShotCastTemplate(sim *core.Simulation) core.Simpl
 func (hunter *Hunter) newSteadyShotAbilityTemplate(sim *core.Simulation) core.MeleeAbilityTemplate {
 	ama := core.ActiveMeleeAbility{
 		MeleeAbility: core.MeleeAbility{
-			ActionID:       core.ActionID{SpellID: 34120},
+			ActionID:       SteadyShotActionID,
 			Character:      &hunter.Character,
 			SpellSchool:    stats.AttackPower,
 			IgnoreCost:     true,
@@ -52,6 +60,13 @@ func (hunter *Hunter) newSteadyShotAbilityTemplate(sim *core.Simulation) core.Me
 		},
 	}
 
+	if ItemSetRiftStalker.CharacterHasSetBonus(&hunter.Character, 4) {
+		ama.Effect.BonusCritRating += 5 * core.MeleeCritRatingPerCritChance
+	}
+	if ItemSetGronnstalker.CharacterHasSetBonus(&hunter.Character, 4) {
+		ama.Effect.DamageMultiplier *= 1.1
+	}
+
 	return core.NewMeleeAbilityTemplate(ama)
 }
 
@@ -65,6 +80,7 @@ func (hunter *Hunter) NewSteadyShot(sim *core.Simulation, target *core.Target) c
 		ss.Effect.Target = target
 		ss.Attack(sim)
 	}
+	hunter.steadyShotCast.CastTime = time.Duration(float64(time.Second*1) / hunter.RangedSwingSpeed())
 
 	hunter.steadyShotCast.Init(sim)
 	return hunter.steadyShotCast

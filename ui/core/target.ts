@@ -86,12 +86,4 @@ export class Target {
 			this.setDebuffs(eventID, proto.debuffs || Debuffs.create());
 		});
 	}
-
-  toJson(): Object {
-		return TargetProto.toJson(this.toProto()) as Object;
-  }
-
-  fromJson(eventID: EventID, obj: any) {
-		this.fromProto(eventID, TargetProto.fromJson(obj));
-  }
 }
