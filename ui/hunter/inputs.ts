@@ -217,21 +217,6 @@ export const HunterRotationConfig = {
 			},
 		},
 		{
-			type: 'boolean' as const, cssClass: 'precast-aimed-shot-picker',
-			getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
-			config: {
-				label: 'Precast Aimed Shot',
-				labelTooltip: 'Starts the encounter with an instant Aimed Shot.',
-				changedEvent: (player: Player<Spec.SpecHunter>) => player.rotationChangeEmitter,
-				getValue: (player: Player<Spec.SpecHunter>) => player.getRotation().precastAimedShot,
-				setValue: (eventID: EventID, player: Player<Spec.SpecHunter>, newValue: boolean) => {
-					const newRotation = player.getRotation();
-					newRotation.precastAimedShot = newValue;
-					player.setRotation(eventID, newRotation);
-				},
-			},
-		},
-		{
 			type: 'boolean' as const, cssClass: 'melee-weave-picker',
 			getModObject: (simUI: IndividualSimUI<any>) => simUI,
 			config: {
@@ -293,6 +278,21 @@ export const HunterRotationConfig = {
 					player.setRotation(eventID, newRotation);
 				},
 				showWhen: (player: Player<Spec.SpecHunter>) => player.getRotation().meleeWeave,
+			},
+		},
+		{
+			type: 'boolean' as const, cssClass: 'precast-aimed-shot-picker',
+			getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
+			config: {
+				label: 'Precast Aimed Shot',
+				labelTooltip: 'Starts the encounter with an instant Aimed Shot.',
+				changedEvent: (player: Player<Spec.SpecHunter>) => player.rotationChangeEmitter,
+				getValue: (player: Player<Spec.SpecHunter>) => player.getRotation().precastAimedShot,
+				setValue: (eventID: EventID, player: Player<Spec.SpecHunter>, newValue: boolean) => {
+					const newRotation = player.getRotation();
+					newRotation.precastAimedShot = newValue;
+					player.setRotation(eventID, newRotation);
+				},
 			},
 		},
 	],

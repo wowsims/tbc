@@ -855,15 +855,39 @@ func (aa *AutoAttacks) ModifySwingTime(sim *Simulation, amount float64) {
 
 // Delays all swing timers until the specified time.
 func (aa *AutoAttacks) DelayAllUntil(sim *Simulation, readyAt time.Duration) {
-	aa.MainhandSwingAt = MaxDuration(aa.MainhandSwingAt, readyAt)
-	aa.OffhandSwingAt = MaxDuration(aa.OffhandSwingAt, readyAt)
-	aa.RangedSwingAt = MaxDuration(aa.RangedSwingAt, readyAt+aa.RangedSwingWindup())
-	aa.resetAutoSwing(sim)
+	autoChanged := false
+
+	if readyAt > aa.MainhandSwingAt {
+		aa.MainhandSwingAt = readyAt
+		if aa.AutoSwingMelee {
+			autoChanged = true
+		}
+	}
+	if readyAt > aa.OffhandSwingAt {
+		aa.OffhandSwingAt = readyAt
+		if aa.AutoSwingMelee {
+			autoChanged = true
+		}
+	}
+	newRangedSwingAt := readyAt + aa.RangedSwingWindup()
+	if newRangedSwingAt > aa.RangedSwingAt {
+		aa.RangedSwingAt = newRangedSwingAt
+		if aa.AutoSwingRanged {
+			autoChanged = true
+		}
+	}
+
+	if autoChanged {
+		aa.resetAutoSwing(sim)
+	}
 }
 
 func (aa *AutoAttacks) DelayRangedUntil(sim *Simulation, readyAt time.Duration) {
-	aa.RangedSwingAt = MaxDuration(aa.RangedSwingAt, readyAt+aa.RangedSwingWindup())
-	aa.resetAutoSwing(sim)
+	newRangedSwingAt := readyAt + aa.RangedSwingWindup()
+	if newRangedSwingAt > aa.RangedSwingAt {
+		aa.RangedSwingAt = newRangedSwingAt
+		aa.resetAutoSwing(sim)
+	}
 }
 
 // Returns the time at which the next attack will occur.

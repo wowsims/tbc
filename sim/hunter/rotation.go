@@ -61,13 +61,19 @@ func (hunter *Hunter) tryUseSpecialGCD(sim *core.Simulation, hasted bool) bool {
 		return true
 	} else if hunter.Rotation.Sting == proto.Hunter_Rotation_ScorpidSting && !target.HasAura(ScorpidStingDebuffID) {
 		ss := hunter.NewScorpidSting(sim, target)
-		if success := ss.Attack(sim); !success {
+		if success := ss.Attack(sim); success {
+			// Applies clipping if necessary.
+			hunter.AutoAttacks.DelayRangedUntil(sim, sim.CurrentTime)
+		} else {
 			hunter.WaitForMana(sim, ss.Cost.Value)
 		}
 		return true
 	} else if hunter.Rotation.Sting == proto.Hunter_Rotation_SerpentSting && !hunter.serpentStingDot.IsInUse() {
 		ss := hunter.NewSerpentSting(sim, target)
-		if success := ss.Attack(sim); !success {
+		if success := ss.Attack(sim); success {
+			// Applies clipping if necessary.
+			hunter.AutoAttacks.DelayRangedUntil(sim, sim.CurrentTime)
+		} else {
 			hunter.WaitForMana(sim, ss.Cost.Value)
 		}
 		return true
@@ -79,7 +85,10 @@ func (hunter *Hunter) tryUseSpecialGCD(sim *core.Simulation, hasted bool) bool {
 		return true
 	} else if !hasted && hunter.Rotation.UseArcaneShot && !hunter.IsOnCD(ArcaneShotCooldownID, sim.CurrentTime) {
 		as := hunter.NewArcaneShot(sim, target)
-		if success := as.Attack(sim); !success {
+		if success := as.Attack(sim); success {
+			// Applies clipping if necessary.
+			hunter.AutoAttacks.DelayRangedUntil(sim, sim.CurrentTime)
+		} else {
 			hunter.WaitForMana(sim, as.Cost.Value)
 		}
 		return true
