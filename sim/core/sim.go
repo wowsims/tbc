@@ -216,14 +216,8 @@ func (sim *Simulation) runOnce() {
 			}
 			break
 		}
-		if sim.Log != nil {
-			sim.Log("Doing action scheduled for %s, at %s", pa.NextActionAt, sim.CurrentTime)
-		}
 
 		if pa.NextActionAt > sim.CurrentTime {
-			if sim.Log != nil {
-				sim.Log("Advancing %s", pa.NextActionAt-sim.CurrentTime)
-			}
 			sim.advance(pa.NextActionAt - sim.CurrentTime)
 		}
 
