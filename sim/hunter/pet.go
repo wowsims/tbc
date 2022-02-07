@@ -48,10 +48,6 @@ func (hunter *Hunter) NewHunterPet() *HunterPet {
 	// Happiness
 	hp.damageMultiplier *= 1.25
 
-	// Cobra reflexes
-	hp.PseudoStats.MeleeSpeedMultiplier *= 1.3
-	hp.damageMultiplier *= 0.85
-
 	hp.EnableFocusBar(1.0+0.5*float64(hunter.Talents.BestialDiscipline), func(sim *core.Simulation) {
 		if !hp.IsOnCD(core.GCDCooldownID, sim.CurrentTime) {
 			hp.OnGCDReady(sim)
@@ -65,13 +61,18 @@ func (hunter *Hunter) NewHunterPet() *HunterPet {
 
 	hp.EnableAutoAttacks(hp, core.AutoAttackOptions{
 		MainHand: core.Weapon{
-			BaseDamageMin: 42 - casterPenalty,
-			BaseDamageMax: 68 - casterPenalty,
-			SwingSpeed:    2,
-			SwingDuration: time.Second * 2,
+			BaseDamageMin:  42 - casterPenalty,
+			BaseDamageMax:  68 - casterPenalty,
+			SwingSpeed:     2,
+			SwingDuration:  time.Second * 2,
+			CritMultiplier: 2,
 		},
 		AutoSwingMelee: true,
 	})
+
+	// Cobra reflexes
+	hp.PseudoStats.MeleeSpeedMultiplier *= 1.3
+	hp.AutoAttacks.ActiveMeleeAbility.Effect.DamageMultiplier *= 0.85
 
 	hp.AddStatDependency(stats.StatDependency{
 		SourceStat:   stats.Strength,
