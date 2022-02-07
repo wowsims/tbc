@@ -219,6 +219,7 @@ func NewHunter(character core.Character, options proto.Player) *Hunter {
 			hunter.AmmoDPS = 32
 		}
 		hunter.AmmoDamageBonus = hunter.AmmoDPS * hunter.AutoAttacks.Ranged.SwingSpeed
+		hunter.AutoAttacks.RangedAuto.Effect.WeaponInput.FlatDamageBonus += hunter.AmmoDamageBonus
 	}
 
 	switch hunter.Options.QuiverBonus {
@@ -255,6 +256,7 @@ func init() {
 
 		stats.AttackPower:       120,
 		stats.RangedAttackPower: 130,
+		stats.MeleeCrit:         -1.53 * core.MeleeCritRatingPerCritChance,
 	}
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceDraenei, Class: proto.Class_ClassHunter}] = stats.Stats{
 		stats.Strength:  65,
@@ -266,6 +268,7 @@ func init() {
 
 		stats.AttackPower:       120,
 		stats.RangedAttackPower: 130,
+		stats.MeleeCrit:         -1.53 * core.MeleeCritRatingPerCritChance,
 	}
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceDwarf, Class: proto.Class_ClassHunter}] = stats.Stats{
 		stats.Strength:  66,
@@ -277,6 +280,7 @@ func init() {
 
 		stats.AttackPower:       120,
 		stats.RangedAttackPower: 130,
+		stats.MeleeCrit:         -1.53 * core.MeleeCritRatingPerCritChance,
 	}
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceNightElf, Class: proto.Class_ClassHunter}] = stats.Stats{
 		stats.Strength:  61,
@@ -288,6 +292,7 @@ func init() {
 
 		stats.AttackPower:       120,
 		stats.RangedAttackPower: 130,
+		stats.MeleeCrit:         -1.53 * core.MeleeCritRatingPerCritChance,
 	}
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceOrc, Class: proto.Class_ClassHunter}] = stats.Stats{
 		stats.Strength:  67,
@@ -299,6 +304,7 @@ func init() {
 
 		stats.AttackPower:       120,
 		stats.RangedAttackPower: 130,
+		stats.MeleeCrit:         -1.53 * core.MeleeCritRatingPerCritChance,
 	}
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceTauren, Class: proto.Class_ClassHunter}] = stats.Stats{
 		stats.Strength:  69,
@@ -310,6 +316,7 @@ func init() {
 
 		stats.AttackPower:       120,
 		stats.RangedAttackPower: 130,
+		stats.MeleeCrit:         -1.53 * core.MeleeCritRatingPerCritChance,
 	}
 	trollStats := stats.Stats{
 		stats.Strength:  65,
@@ -321,6 +328,7 @@ func init() {
 
 		stats.AttackPower:       120,
 		stats.RangedAttackPower: 130,
+		stats.MeleeCrit:         -1.53 * core.MeleeCritRatingPerCritChance,
 	}
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceTroll10, Class: proto.Class_ClassHunter}] = trollStats
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceTroll30, Class: proto.Class_ClassHunter}] = trollStats
