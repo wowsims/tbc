@@ -15,7 +15,7 @@ import * as Tooltips from '/tbc/core/constants/tooltips.js';
 // https://tbc.wowhead.com/talent-calc and copy the numbers in the url.
 export const BeastMasteryTalents = {
     name: 'BM',
-    data: '502030015150121531051-0505201205',
+    data: '502030015150122431051-0505201205',
 };
 export const MarksmanTalents = {
     name: 'Marksman',
