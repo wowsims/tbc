@@ -108,6 +108,11 @@ func (hp *HunterPet) Init(sim *core.Simulation) {
 
 func (hp *HunterPet) Reset(sim *core.Simulation) {
 	hp.focusBar.reset(sim)
+	if sim.Log != nil {
+		hp.Log(sim, "Pet stats: %s", hp.GetStats())
+		inheritedStats := hunterPetStatInheritance(hp.hunterOwner.GetStats())
+		hp.Log(sim, "Inherited stats: %s", inheritedStats)
+	}
 }
 
 func (hp *HunterPet) OnGCDReady(sim *core.Simulation) {

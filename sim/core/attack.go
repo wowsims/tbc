@@ -381,6 +381,10 @@ func (ahe *AbilityHitEffect) calculateDamage(sim *Simulation, ability *ActiveMel
 		}
 	}
 
+	if sim.Log != nil {
+		character.Log(sim, "Melee dmg calcs: AP=%0.1f, bonusWepDmg:%0.1f, dmgMultiplier:%0.1f, staticMultiplier:%0.1f, result:%d, weaponDmgCalc: %0.1f, Target armor: %0.1f\n", attackPower, bonusWeaponDamage, ahe.DamageMultiplier, ahe.StaticDamageMultiplier, ahe.HitType, dmg, ahe.Target.currentArmor)
+	}
+
 	// Add damage from DirectInput
 	if ahe.DirectInput.MinBaseDamage != 0 {
 		dmg += ahe.DirectInput.MinBaseDamage + (ahe.DirectInput.MaxBaseDamage-ahe.DirectInput.MinBaseDamage)*sim.RandomFloat("Melee Direct Input")
@@ -411,9 +415,6 @@ func (ahe *AbilityHitEffect) calculateDamage(sim *Simulation, ability *ActiveMel
 	// Apply armor reduction.
 	if !ahe.IgnoreArmor {
 		dmg *= 1 - ahe.Target.ArmorDamageReduction(character.stats[stats.ArmorPenetration]+ahe.BonusArmorPenetration)
-		//if sim.Log != nil {
-		//	character.Log(sim, "Target armor: %0.2f\n", ahe.Target.currentArmor)
-		//}
 	}
 
 	// Apply all other effect multipliers.
