@@ -110,9 +110,9 @@ func (hp *HunterPet) Init(sim *core.Simulation) {
 func (hp *HunterPet) Reset(sim *core.Simulation) {
 	hp.focusBar.reset(sim)
 	if sim.Log != nil {
-		hp.Log(sim, "Pet stats: %s", hp.GetStats())
+		hp.Log(sim, "Total Pet stats: %s", hp.GetStats())
 		inheritedStats := hunterPetStatInheritance(hp.hunterOwner.GetStats())
-		hp.Log(sim, "Inherited stats: %s", inheritedStats)
+		hp.Log(sim, "Inherited Pet stats: %s", inheritedStats)
 	}
 }
 
