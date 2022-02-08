@@ -593,7 +593,7 @@ dps_results: {
 dps_results: {
  key: "TestFrost-SelfDrums-DPS"
  value: {
-  dps: 1620.1643817286956
+  dps: 1636.925533211637
  }
 }
 dps_results: {
