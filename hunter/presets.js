@@ -16,7 +16,7 @@ import * as Tooltips from '/tbc/core/constants/tooltips.js';
 // https://tbc.wowhead.com/talent-calc and copy the numbers in the url.
 export const BeastMasteryTalents = {
     name: 'BM',
-    data: '502030015150122431051-0505201205',
+    data: '512002015150122431051-0505201205',
 };
 export const MarksmanTalents = {
     name: 'Marksman',
@@ -29,8 +29,8 @@ export const SurvivalTalents = {
 export const DefaultRotation = HunterRotation.create({
     useMultiShot: true,
     useArcaneShot: true,
-    viperStartManaPercent: 0.2,
-    viperStopManaPercent: 0.4,
+    viperStartManaPercent: 0.1,
+    viperStopManaPercent: 0.3,
     meleeWeave: true,
     useRaptorStrike: true,
     timeToWeaveMs: 500,
@@ -659,7 +659,7 @@ export const P3_SV_PRESET = {
                 enchant: Enchants.WEAPON_GREATER_AGILITY,
             }),
             ItemSpec.create({
-                id: 32336,
+                id: 30906,
                 enchant: Enchants.STABILIZED_ETERNIUM_SCOPE,
             }),
         ],
