@@ -826,7 +826,7 @@ export const specEPTransforms = {
         return epWeights;
     },
     [Spec.SpecHunter]: (epWeights) => {
-        return epWeights.withStat(Stat.StatMeleeHit, 0);
+        return epWeights;
     },
     [Spec.SpecMage]: (epWeights) => {
         return epWeights.withStat(Stat.StatSpellHit, 0);
