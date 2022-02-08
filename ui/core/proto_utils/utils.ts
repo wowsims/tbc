@@ -1020,7 +1020,7 @@ export const specEPTransforms: Record<Spec, (epWeights: Stats) => Stats> = {
 		return epWeights;
 	},
   [Spec.SpecHunter]: (epWeights: Stats) => {
-		return epWeights.withStat(Stat.StatMeleeHit, 0);
+		return epWeights;
 	},
   [Spec.SpecMage]: (epWeights: Stats) => {
 		return epWeights.withStat(Stat.StatSpellHit, 0);
