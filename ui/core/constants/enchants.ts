@@ -76,6 +76,8 @@ export const CRUSADER = 16252;
 enchantDescriptions.set(CRUSADER, 'Crusader');
 export const EXECUTIONER = 33307;
 enchantDescriptions.set(EXECUTIONER, 'Executioner');
+export const WEAPON_AGILITY = 19445;
+enchantDescriptions.set(WEAPON_AGILITY, '+15 Agility');
 export const WEAPON_GREATER_AGILITY = 33165;
 enchantDescriptions.set(WEAPON_GREATER_AGILITY, '+20 Agility');
 export const WEAPON_2H_MAJOR_AGILITY = 22556;
