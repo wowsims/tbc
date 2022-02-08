@@ -436,7 +436,7 @@ export const P1_SV_PRESET = {
             }),
             ItemSpec.create({
                 id: 27846,
-                enchant: Enchants.WEAPON_GREATER_AGILITY,
+                enchant: Enchants.WEAPON_AGILITY,
                 gems: [
                     Gems.DELICATE_LIVING_RUBY,
                     Gems.DELICATE_LIVING_RUBY,
@@ -444,7 +444,7 @@ export const P1_SV_PRESET = {
             }),
             ItemSpec.create({
                 id: 28572,
-                enchant: Enchants.WEAPON_GREATER_AGILITY,
+                enchant: Enchants.WEAPON_AGILITY,
                 gems: [
                     Gems.DELICATE_LIVING_RUBY,
                     Gems.GLINTING_NOBLE_TOPAZ,
@@ -549,11 +549,11 @@ export const P2_SV_PRESET = {
             }),
             ItemSpec.create({
                 id: 29924,
-                enchant: Enchants.WEAPON_GREATER_AGILITY,
+                enchant: Enchants.WEAPON_AGILITY,
             }),
             ItemSpec.create({
                 id: 29948,
-                enchant: Enchants.WEAPON_GREATER_AGILITY,
+                enchant: Enchants.WEAPON_AGILITY,
             }),
             ItemSpec.create({
                 id: 30105,

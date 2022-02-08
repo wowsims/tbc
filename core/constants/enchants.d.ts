@@ -27,6 +27,7 @@ export declare const FEET_VITALITY = 35298;
 export declare const FEET_CATS_SWIFTNESS = 28279;
 export declare const CRUSADER = 16252;
 export declare const EXECUTIONER = 33307;
+export declare const WEAPON_AGILITY = 19445;
 export declare const WEAPON_GREATER_AGILITY = 33165;
 export declare const WEAPON_2H_MAJOR_AGILITY = 22556;
 export declare const WEAPON_MAJOR_INTELLECT = 22551;
