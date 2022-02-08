@@ -45,13 +45,14 @@ export const SurvivalTalents = {
 
 export const DefaultRotation = HunterRotation.create({
 	useMultiShot: true,
+	useArcaneShot: true,
 	viperStartManaPercent: 0.2,
 	viperStopManaPercent: 0.4,
 
-	meleeWeave: false,
+	meleeWeave: true,
 	useRaptorStrike: true,
 	timeToWeaveMs: 500,
-	percentWeaved: 1,
+	percentWeaved: 0.8,
 });
 
 export const DefaultOptions = HunterOptions.create({
@@ -64,6 +65,8 @@ export const DefaultConsumes = Consumes.create({
 	defaultPotion: Potions.HastePotion,
 	flask: Flask.FlaskOfRelentlessAssault,
 	food: Food.FoodGrilledMudfish,
+	mainHandImbue: WeaponImbue.WeaponImbueAdamantiteSharpeningStone,
+	offHandImbue: WeaponImbue.WeaponImbueAdamantiteSharpeningStone,
 });
 
 export const P1_BM_PRESET = {

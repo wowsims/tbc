@@ -753,6 +753,11 @@ func (aa *AutoAttacks) RangedSwingWindup() time.Duration {
 	return time.Duration(float64(time.Millisecond*500) / aa.character.RangedSwingSpeed())
 }
 
+// Returns the amount of time available before ranged auto will be clipped.
+func (aa *AutoAttacks) TimeBeforeClippingRanged(sim *Simulation) time.Duration {
+	return aa.RangedSwingAt - aa.RangedSwingWindup() - sim.CurrentTime
+}
+
 // SwingMelee will check any swing timers if they are up, and if so, swing!
 func (aa *AutoAttacks) SwingMelee(sim *Simulation, target *Target) {
 	aa.TrySwingMH(sim, target)

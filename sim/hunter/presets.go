@@ -56,17 +56,17 @@ var basicRotation = &proto.Hunter_Rotation{
 	Sting:            proto.Hunter_Rotation_SerpentSting,
 	PrecastAimedShot: true,
 	MeleeWeave:       false,
+	LazyRotation:     true,
 
 	ViperStartManaPercent: 0.2,
 	ViperStopManaPercent:  0.3,
 }
 var frenchRotation = &proto.Hunter_Rotation{
-	UseMultiShot:      true,
-	UseArcaneShot:     true,
-	Sting:             proto.Hunter_Rotation_SerpentSting,
-	PrecastAimedShot:  false,
-	MeleeWeave:        false,
-	UseFrenchRotation: true,
+	UseMultiShot:     true,
+	UseArcaneShot:    true,
+	Sting:            proto.Hunter_Rotation_SerpentSting,
+	PrecastAimedShot: false,
+	MeleeWeave:       false,
 
 	ViperStartManaPercent: 0.3,
 	ViperStopManaPercent:  0.5,

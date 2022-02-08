@@ -353,27 +353,27 @@ function makeEnumValueConsumeInput(id: ActionId, consumesFieldName: keyof Consum
 
 export const GraceOfAirTotem = {
 	id: ActionId.fromSpellId(25359),
-	states: 2,
+	states: 3,
+	improvedId: ActionId.fromSpellId(16295),
 	changedEvent: (party: Party) => party.buffsChangeEmitter,
-	getValue: (party: Party) => party.getBuffs().graceOfAirTotem != TristateEffect.TristateEffectMissing,
-	setValue: (eventID: EventID, party: Party, newValue: boolean) => {
+	getValue: (party: Party) => party.getBuffs().graceOfAirTotem,
+	setValue: (eventID: EventID, party: Party, newValue: number) => {
 		const newBuffs = party.getBuffs();
-		newBuffs.graceOfAirTotem = newValue
-				? TristateEffect.TristateEffectImproved
-				: TristateEffect.TristateEffectMissing;
+		newBuffs.graceOfAirTotem = newValue;
 		party.setBuffs(eventID, newBuffs);
 	},
 };
 
 export const StrengthOfEarthTotem = {
 	id: ActionId.fromSpellId(25528),
-	states: 3,
-	improvedId: ActionId.fromSpellId(37223),
+	states: 4,
+	improvedId: ActionId.fromSpellId(16295),
+	improvedId2: ActionId.fromSpellId(37223),
 	changedEvent: (party: Party) => party.buffsChangeEmitter,
-	getValue: (party: Party) => party.getBuffs().strengthOfEarthTotem > 0 ? party.getBuffs().strengthOfEarthTotem - 2 : 0,
+	getValue: (party: Party) => Math.min(3, party.getBuffs().strengthOfEarthTotem),
 	setValue: (eventID: EventID, party: Party, newValue: number) => {
 		const newBuffs = party.getBuffs();
-		newBuffs.strengthOfEarthTotem = newValue > 0 ? newValue + 2 : 0;
+		newBuffs.strengthOfEarthTotem = newValue == 3 ? 4 : newValue;
 		party.setBuffs(eventID, newBuffs);
 	},
 };
