@@ -21,7 +21,7 @@ func (shaman *Shaman) newSearingTotemTemplate(sim *core.Simulation) core.SimpleS
 				BaseManaCost:   205,
 				ManaCost:       205,
 				GCD:            time.Second,
-				CritMultiplier: 1.5,
+				CritMultiplier: shaman.DefaultSpellCritMultiplier(),
 			},
 		},
 		Effect: core.SpellHitEffect{
@@ -48,6 +48,10 @@ func (shaman *Shaman) newSearingTotemTemplate(sim *core.Simulation) core.SimpleS
 	spell.Effect.DamageMultiplier *= 1 + float64(shaman.Talents.CallOfFlame)*0.05
 	spell.ManaCost -= spell.BaseManaCost * float64(shaman.Talents.TotemicFocus) * 0.05
 	spell.ManaCost -= spell.BaseManaCost * float64(shaman.Talents.MentalQuickness) * 0.02
+	if shaman.Talents.ElementalFury {
+		spell.CritMultiplier = shaman.SpellCritMultiplier(1, 1)
+	}
+	spell.Effect.SpellEffect.BonusSpellHitRating += float64(shaman.Talents.ElementalPrecision) * 2 * core.SpellHitRatingPerHitChance
 
 	spell.OnCastComplete = func(sim *core.Simulation, cast *core.Cast) {
 		shaman.NextTotemDrops[FireTotem] = sim.CurrentTime + time.Second*60
@@ -83,13 +87,16 @@ func (shaman *Shaman) newMagmaTotemTemplate(sim *core.Simulation) core.SimpleSpe
 				BaseManaCost:   800,
 				ManaCost:       800,
 				GCD:            time.Second,
-				CritMultiplier: 1.5,
+				CritMultiplier: shaman.DefaultSpellCritMultiplier(),
 			},
 		},
 		AOECap: 1600,
 	}
 	spell.ManaCost -= spell.BaseManaCost * float64(shaman.Talents.TotemicFocus) * 0.05
 	spell.ManaCost -= spell.BaseManaCost * float64(shaman.Talents.MentalQuickness) * 0.02
+	if shaman.Talents.ElementalFury {
+		spell.CritMultiplier = shaman.SpellCritMultiplier(1, 1)
+	}
 
 	baseEffect := core.SpellHitEffect{
 		SpellEffect: core.SpellEffect{
@@ -106,6 +113,7 @@ func (shaman *Shaman) newMagmaTotemTemplate(sim *core.Simulation) core.SimpleSpe
 		},
 	}
 	baseEffect.StaticDamageMultiplier *= 1 + float64(shaman.Talents.CallOfFlame)*0.05
+	baseEffect.SpellEffect.BonusSpellHitRating += float64(shaman.Talents.ElementalPrecision) * 2 * core.SpellHitRatingPerHitChance
 
 	spell.OnCastComplete = func(sim *core.Simulation, cast *core.Cast) {
 		shaman.NextTotemDrops[FireTotem] = sim.CurrentTime + time.Second*20
@@ -154,13 +162,16 @@ func (shaman *Shaman) newNovaTotemTemplate(sim *core.Simulation) core.SimpleSpel
 				ManaCost:       800,
 				GCD:            time.Second,
 				Cooldown:       time.Second * 15,
-				CritMultiplier: 1.5,
+				CritMultiplier: shaman.DefaultSpellCritMultiplier(),
 			},
 		},
 		AOECap: 9975,
 	}
 	spell.ManaCost -= spell.BaseManaCost * float64(shaman.Talents.TotemicFocus) * 0.05
 	spell.ManaCost -= spell.BaseManaCost * float64(shaman.Talents.MentalQuickness) * 0.02
+	if shaman.Talents.ElementalFury {
+		spell.CritMultiplier = shaman.SpellCritMultiplier(1, 1)
+	}
 
 	baseEffect := core.SpellHitEffect{
 		SpellEffect: core.SpellEffect{
@@ -177,6 +188,7 @@ func (shaman *Shaman) newNovaTotemTemplate(sim *core.Simulation) core.SimpleSpel
 		},
 	}
 	baseEffect.StaticDamageMultiplier *= 1 + float64(shaman.Talents.CallOfFlame)*0.05
+	baseEffect.SpellEffect.BonusSpellHitRating += float64(shaman.Talents.ElementalPrecision) * 2 * core.SpellHitRatingPerHitChance
 	baseEffect.DotInput.TickLength -= time.Duration(shaman.Talents.ImprovedFireTotems) * time.Second
 
 	tickLength := baseEffect.DotInput.TickLength

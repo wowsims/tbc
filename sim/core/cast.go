@@ -70,6 +70,9 @@ type Cast struct {
 
 	Binary bool // if spell is binary it ignores partial resists
 
+	// Ignores haste when calculating the GCD and cast time for this cast.
+	IgnoreHaste bool
+
 	// Internal field only, used to prevent cast pool objects from being used by
 	// multiple casts simultaneously.
 	objectInUse bool
@@ -111,7 +114,10 @@ func (cast *Cast) init(sim *Simulation) {
 		panic("Cast object already in use")
 	}
 	cast.objectInUse = true
-	cast.CastTime = time.Duration(float64(cast.CastTime) / cast.Character.CastSpeed())
+
+	if !cast.IgnoreHaste {
+		cast.CastTime = time.Duration(float64(cast.CastTime) / cast.Character.CastSpeed())
+	}
 
 	// Apply on-cast effects.
 	cast.Character.OnCast(sim, cast)
@@ -160,18 +166,19 @@ func (cast *Cast) startCasting(sim *Simulation, onCastComplete OnCastComplete) b
 	if cast.CastTime == 0 {
 		cast.internalOnComplete(sim, onCastComplete)
 	} else {
-		// TODO: Not using a pending action here causes some very subtle bugs, like
-		// Drums aura not being applied until the 1.5s GCD has elapsed.
 		cast.Character.Hardcast.Expires = sim.CurrentTime + cast.CastTime
 		cast.Character.Hardcast.Cast = cast
 		cast.Character.Hardcast.OnComplete = onCastComplete
 
+		// If hardcast and GCD happen at the same time then we don't need a separate action.
+		if cast.Character.Hardcast.Expires != cast.Character.NextGCDAt() {
+			cast.Character.hardcastAction.NextActionAt = cast.Character.Hardcast.Expires
+			sim.AddPendingAction(cast.Character.hardcastAction)
+		}
+
 		if cast.Character.AutoAttacks.IsEnabled() {
 			// Delay autoattacks until the cast is complete.
-			// TODO: reset aa PA.
-			cast.Character.AutoAttacks.MainhandSwingAt = MaxDuration(cast.Character.AutoAttacks.MainhandSwingAt, cast.Character.Hardcast.Expires)
-			cast.Character.AutoAttacks.OffhandSwingAt = MaxDuration(cast.Character.AutoAttacks.OffhandSwingAt, cast.Character.Hardcast.Expires)
-			cast.Character.AutoAttacks.RangedSwingAt = MaxDuration(cast.Character.AutoAttacks.RangedSwingAt, cast.Character.Hardcast.Expires)
+			cast.Character.AutoAttacks.DelayAllUntil(sim, cast.Character.Hardcast.Expires)
 		}
 	}
 
@@ -179,7 +186,11 @@ func (cast *Cast) startCasting(sim *Simulation, onCastComplete OnCastComplete) b
 }
 
 func (cast *Cast) CalculatedGCD(char *Character) time.Duration {
-	return MaxDuration(GCDMin, time.Duration(float64(cast.GCD)/char.CastSpeed()))
+	if cast.IgnoreHaste {
+		return cast.GCD
+	} else {
+		return MaxDuration(GCDMin, time.Duration(float64(cast.GCD)/char.CastSpeed()))
+	}
 }
 
 // Cast has finished, activate the effects of the cast.

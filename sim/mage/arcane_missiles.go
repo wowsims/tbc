@@ -16,15 +16,13 @@ func (mage *Mage) newArcaneMissilesTemplate(sim *core.Simulation) core.SimpleSpe
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				CritMultiplier: 1.5 + 0.125*float64(mage.Talents.SpellPower),
-				SpellSchool:    stats.ArcaneSpellPower,
+				ActionID:       core.ActionID{SpellID: SpellIDArcaneMissiles},
 				Character:      &mage.Character,
+				SpellSchool:    stats.ArcaneSpellPower,
 				BaseManaCost:   740,
 				ManaCost:       740,
 				GCD:            core.GCDDefault,
-				ActionID: core.ActionID{
-					SpellID: SpellIDArcaneMissiles,
-				},
+				CritMultiplier: mage.SpellCritMultiplier(1, 0.25*float64(mage.Talents.SpellPower)),
 			},
 		},
 		Effect: core.SpellHitEffect{

@@ -61,8 +61,9 @@ func newLightningCapacitorCastTemplate(sim *core.Simulation, character *core.Cha
 				},
 				Character:      character,
 				IgnoreManaCost: true,
+				IsPhantom:      true,
 				SpellSchool:    stats.NatureSpellPower,
-				CritMultiplier: 1.5,
+				CritMultiplier: character.DefaultSpellCritMultiplier(),
 			},
 		},
 		Effect: core.SpellHitEffect{

@@ -99,7 +99,6 @@ export const P2_PRESET = {
 			}),
 			ItemSpec.create({
 				id: 33482, // Cobra-Lash Boots
-				enchant: Enchants.DEXTERITY,
 			}),
 			ItemSpec.create({
 				id: 30061, // Ring of a Thousand Marks

@@ -59,8 +59,8 @@ func NewWarrior(character core.Character, options proto.Player) *Warrior {
 	warrior.PseudoStats.MeleeSpeedMultiplier = 1
 	warrior.EnableRageBar(warriorOptions.Options.StartingRage)
 	warrior.EnableAutoAttacks(warrior, core.AutoAttackOptions{
-		MainHand:       warrior.WeaponFromMainHand(),
-		OffHand:        warrior.WeaponFromOffHand(),
+		MainHand:       warrior.WeaponFromMainHand(warrior.DefaultMeleeCritMultiplier()),
+		OffHand:        warrior.WeaponFromOffHand(warrior.DefaultMeleeCritMultiplier()),
 		AutoSwingMelee: true,
 	})
 

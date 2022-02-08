@@ -28,11 +28,13 @@ export class ActionId {
 				baseName = 'Wait';
 				break;
 			case OtherAction.OtherActionManaRegen:
-				baseName = 'Regen';
-				// Tag is number of milliseconds worth of regen.
-				if (tag) {
-					name = (tag/1000).toFixed(3) + 's ' + baseName;
-				}
+				baseName = 'Mana Tick';
+				break;
+			case OtherAction.OtherActionEnergyRegen:
+				baseName = 'Energy Tick';
+				break;
+			case OtherAction.OtherActionFocusRegen:
+				baseName = 'Focus Tick';
 				break;
 			case OtherAction.OtherActionAttack:
 				name = 'Attack';
@@ -47,9 +49,11 @@ export class ActionId {
 				name = 'Shoot';
 				iconUrl = 'https://wow.zamimg.com/images/wow/icons/large/ability_marksmanship.jpg';
 				break;
+			case OtherAction.OtherActionPet:
+				break;
 		}
 		this.baseName = baseName;
-		this.name = name;
+		this.name = name || baseName;
 		this.iconUrl = iconUrl;
 	}
 
@@ -139,6 +143,7 @@ export class ActionId {
 				break;
 			// For targetted buffs, tag is the source player's raid index or -1 if none.
 			case 'Bloodlust':
+			case 'Ferocious Inspiration':
 			case 'Innervate':
 			case 'Mana Tide Totem':
 			case 'Power Infusion':
@@ -158,7 +163,6 @@ export class ActionId {
 				}
 				break;
 			case 'Lightning Speed':
-			case 'Siphon Essence':
 			case 'Windfury Weapon':
 				if (this.tag == 1) {
 					name += ' (Main Hand)';
@@ -255,6 +259,10 @@ export class ActionId {
 		return new ActionId(0, 0, otherId, tag || 0, '', '', '');
 	}
 
+	static fromPetName(petName: string): ActionId {
+		return new ActionId(0, 0, OtherAction.OtherActionPet, 0, petName, petName, petNameToIcon[petName] || '');
+	}
+
 	static fromItem(item: Item): ActionId {
 		return ActionId.fromItemId(getWowheadItemId(item));
 	}
@@ -316,3 +324,31 @@ idOverrides[ActionId.fromSpellId(37212).toProtoString()] = ActionId.fromItemId(2
 idOverrides[ActionId.fromSpellId(37223).toProtoString()] = ActionId.fromItemId(29040); // Improved Strength of Earth Totem
 idOverrides[ActionId.fromSpellId(37447).toProtoString()] = ActionId.fromItemId(30720); // Serpent-Coil Braid
 idOverrides[ActionId.fromSpellId(37443).toProtoString()] = ActionId.fromItemId(30196); // Robes of Tirisfal (4pc bonus)
+
+// https://tbc.wowhead.com/hunter-pets
+const petNameToIcon: Record<string, string> = {
+	'Bat': 'https://wow.zamimg.com/images/wow/icons/medium/ability_hunter_pet_bat.jpg',
+	'Bear': 'https://wow.zamimg.com/images/wow/icons/medium/ability_hunter_pet_bear.jpg',
+	'Boar': 'https://wow.zamimg.com/images/wow/icons/medium/ability_hunter_pet_boar.jpg',
+	'Carrion Bird': 'https://wow.zamimg.com/images/wow/icons/medium/ability_hunter_pet_carrionbird.jpg',
+	'Cat': 'https://wow.zamimg.com/images/wow/icons/medium/ability_hunter_pet_cat.jpg',
+	'Crab': 'https://wow.zamimg.com/images/wow/icons/medium/ability_hunter_pet_crab.jpg',
+	'Crocolisk': 'https://wow.zamimg.com/images/wow/icons/medium/ability_hunter_pet_crocolisk.jpg',
+	'Dragonhawk': 'https://wow.zamimg.com/images/wow/icons/medium/ability_hunter_pet_dragonhawk.jpg',
+	'Gorilla': 'https://wow.zamimg.com/images/wow/icons/medium/ability_hunter_pet_gorilla.jpg',
+	'Hyena': 'https://wow.zamimg.com/images/wow/icons/medium/ability_hunter_pet_hyena.jpg',
+	'Nether Ray': 'https://wow.zamimg.com/images/wow/icons/medium/ability_hunter_pet_netherray.jpg',
+	'Owl': 'https://wow.zamimg.com/images/wow/icons/medium/ability_hunter_pet_owl.jpg',
+	'Raptor': 'https://wow.zamimg.com/images/wow/icons/medium/ability_hunter_pet_raptor.jpg',
+	'Ravager': 'https://wow.zamimg.com/images/wow/icons/medium/ability_hunter_pet_ravager.jpg',
+	'Scorpid': 'https://wow.zamimg.com/images/wow/icons/medium/ability_hunter_pet_scorpid.jpg',
+	'Serpent': 'https://wow.zamimg.com/images/wow/icons/medium/ability_hunter_pet_serpent.jpg',
+	'Spider': 'https://wow.zamimg.com/images/wow/icons/medium/ability_hunter_pet_spider.jpg',
+	'Sporebat': 'https://wow.zamimg.com/images/wow/icons/medium/ability_hunter_pet_sporebat.jpg',
+	'Tallstrider': 'https://wow.zamimg.com/images/wow/icons/medium/ability_hunter_pet_tallstrider.jpg',
+	'Turtle': 'https://wow.zamimg.com/images/wow/icons/medium/ability_hunter_pet_turtle.jpg',
+	'Water Elemental': 'https://wow.zamimg.com/images/wow/icons/medium/spell_frost_summonwaterelemental_2.jpg',
+	'Warp Stalker': 'https://wow.zamimg.com/images/wow/icons/medium/ability_hunter_pet_warpstalker.jpg',
+	'Wind Serpent': 'https://wow.zamimg.com/images/wow/icons/medium/ability_hunter_pet_windserpent.jpg',
+	'Wolf': 'https://wow.zamimg.com/images/wow/icons/medium/ability_hunter_pet_wolf.jpg',
+};

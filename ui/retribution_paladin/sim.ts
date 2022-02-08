@@ -139,7 +139,6 @@ export class RetributionPaladinSimUI extends IndividualSimUI<Spec.SpecRetributio
 			consumeInputs: [
 				IconInputs.DefaultHastePotion,
 				IconInputs.DefaultSuperManaPotion,
-				IconInputs.DefaultInsaneStrengthPotion,
 				IconInputs.DefaultDarkRune,
 				IconInputs.DefaultFlameCap,
 				IconInputs.FlaskOfRelentlessAssault,
@@ -149,7 +148,6 @@ export class RetributionPaladinSimUI extends IndividualSimUI<Spec.SpecRetributio
 				IconInputs.ElixirOfTheMongoose,
 				IconInputs.ElixirOfMajorMageblood,
 				IconInputs.ElixirOfDraenicWisdom,
-				IconInputs.FelStrengthElixir,
 				IconInputs.MainHandAdamantiteSharpeningStone,
 				IconInputs.MainHandElementalSharpeningStone,
 				IconInputs.MainHandSuperiorWizardOil,
@@ -158,10 +156,6 @@ export class RetributionPaladinSimUI extends IndividualSimUI<Spec.SpecRetributio
 				IconInputs.SpicyHotTalbuk,
 				IconInputs.GrilledMudfish,
 				IconInputs.BlackenedBasilisk,
-				IconInputs.ScrollOfAgilityV,
-				IconInputs.ScrollOfAgilityIV,
-				IconInputs.ScrollOfStrengthV,
-				IconInputs.ScrollOfStrengthIV,
 			],
 			// Inputs to include in the 'Rotation' section on the settings tab.
 			rotationInputs: RetributionPaladinInputs.RetributionPaladinRotationConfig,

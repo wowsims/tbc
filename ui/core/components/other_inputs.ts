@@ -165,6 +165,7 @@ export const ExposeWeaknessUptime = {
 			'within-raid-sim-hide',
 		],
 		label: 'Expose Weakness Uptime %',
+		labelTooltip: 'Uptime for the Expose Weakness debuff, applied by 1 or more Survival hunters in your raid.',
 		changedEvent: (target: Target) => target.debuffsChangeEmitter,
 		getValue: (target: Target) => Math.round(target.getDebuffs().exposeWeaknessUptime*100),
 		setValue: (eventID: EventID, target: Target, newValue: number) => {

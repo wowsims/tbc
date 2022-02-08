@@ -4,7 +4,6 @@ import { Item } from '/tbc/core/proto/common.js';
 import { ItemSlot } from '/tbc/core/proto/common.js';
 import { ItemSpec } from '/tbc/core/proto/common.js';
 import { Stat } from '/tbc/core/proto/common.js';
-import { WeaponType } from '/tbc/core/proto/common.js';
 
 import { ActionId } from './action_id.js';
 import { enchantAppliesToItem } from './utils.js';
@@ -18,17 +17,6 @@ export function getWowheadItemId(item: Item): number {
 
 export function getWeaponDPS(item: Item): number {
 	return ((item.weaponDamageMin + item.weaponDamageMax) / 2) / (item.weaponSpeed || 1);
-}
-
-export function computeItemEP(item: Item, epWeights: Stats): number {
-	let itemStats = new Stats(item.stats);
-	if (item.weaponType != WeaponType.WeaponTypeUnknown) {
-		// Add weapon dps as attack power, so the EP is appropriate.
-		const weaponDps = getWeaponDPS(item);
-		const effectiveAttackPower = itemStats.getStat(Stat.StatAttackPower) + weaponDps * 14;
-		itemStats = itemStats.withStat(Stat.StatAttackPower, effectiveAttackPower);
-	}
-	return itemStats.computeEP(epWeights);
 }
 
 /**

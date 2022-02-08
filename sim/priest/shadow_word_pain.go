@@ -15,14 +15,13 @@ var ShadowWordPainDebuffID = core.NewDebuffID()
 
 func (priest *Priest) newShadowWordPainTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
 	baseCast := core.Cast{
-		CritMultiplier: 1.5,
-		SpellSchool:    stats.ShadowSpellPower,
-		Character:      &priest.Character,
-		BaseManaCost:   575,
-		ManaCost:       575,
-		CastTime:       0,
-		GCD:            core.GCDDefault,
-		ActionID:       ShadowWordPainActionID,
+		ActionID:     ShadowWordPainActionID,
+		Character:    &priest.Character,
+		SpellSchool:  stats.ShadowSpellPower,
+		BaseManaCost: 575,
+		ManaCost:     575,
+		CastTime:     0,
+		GCD:          core.GCDDefault,
 	}
 
 	effect := core.SpellHitEffect{

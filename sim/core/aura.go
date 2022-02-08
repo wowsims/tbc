@@ -174,6 +174,7 @@ type auraTracker struct {
 	onBeforeMeleeIDs          []AuraID
 	onBeforeMeleeHitIDs       []AuraID
 
+	aurasToAdd      []Aura
 	auraIDsToRemove []AuraID
 
 	// Metrics for each aura.
@@ -247,6 +248,7 @@ func (at *auraTracker) reset(sim *Simulation) {
 	at.onBeforeMeleeIDs = at.onBeforeMeleeIDs[:0]
 	at.onBeforeMeleeHitIDs = at.onBeforeMeleeHitIDs[:0]
 
+	at.aurasToAdd = []Aura{}
 	at.auraIDsToRemove = []AuraID{}
 
 	for i, _ := range at.metrics {
@@ -275,6 +277,17 @@ func (at *auraTracker) advance(sim *Simulation) {
 
 		for _, id := range toRemove {
 			at.RemoveAura(sim, id)
+		}
+	}
+
+	if len(at.aurasToAdd) > 0 {
+		// Copy to temp array so there are no issues if AddAuraOnNextAdvance()
+		// is called within the loop.
+		toAdd := at.aurasToAdd
+		at.aurasToAdd = []Aura{}
+
+		for _, aura := range toAdd {
+			at.AddAura(sim, aura)
 		}
 	}
 
@@ -332,6 +345,10 @@ func (at *auraTracker) ReplaceAura(sim *Simulation, newAura Aura) {
 // Adds a new aura to the simulation. If an aura with the same ID already
 // exists it will be replaced with the new one.
 func (at *auraTracker) AddAura(sim *Simulation, newAura Aura) {
+	if newAura.ID == 0 {
+		panic("Empty aura ID")
+	}
+
 	if at.HasAura(newAura.ID) {
 		at.RemoveAura(sim, newAura.ID)
 	}
@@ -496,6 +513,13 @@ func (at *auraTracker) RemoveAura(sim *Simulation, id AuraID) {
 	}
 
 	at.auras[id] = Aura{}
+}
+
+// Registers an ID to be added on the next advance() call. This is used instead
+// of AddAura() when calling from inside a callback like OnSpellHit() to avoid
+// modifying auraTracker arrays while they are being looped over.
+func (at *auraTracker) AddAuraOnNextAdvance(sim *Simulation, aura Aura) {
+	at.aurasToAdd = append(at.aurasToAdd, aura)
 }
 
 // Registers an ID to be removed on the next advance() call. This is used instead
@@ -675,6 +699,9 @@ func (character *Character) NewTempStatAuraApplier(sim *Simulation, auraID AuraI
 				character.AddMeleeHaste(sim, -amount)
 			} else {
 				character.AddStat(stat, -amount)
+				if stat == stats.AttackPower {
+					character.AddStat(stats.RangedAttackPower, -amount)
+				}
 			}
 		},
 	}
@@ -687,6 +714,9 @@ func (character *Character) NewTempStatAuraApplier(sim *Simulation, auraID AuraI
 			character.AddMeleeHaste(sim, amount)
 		} else {
 			character.AddStat(stat, amount)
+			if stat == stats.AttackPower {
+				character.AddStat(stats.RangedAttackPower, amount)
+			}
 		}
 		aura.Expires = sim.CurrentTime + duration
 		character.AddAura(sim, aura)

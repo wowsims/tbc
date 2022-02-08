@@ -33,7 +33,8 @@ func (shaman *Shaman) ApplyWindfuryImbue(mh bool, oh bool) {
 			ActionID:       core.ActionID{SpellID: 25505},
 			Character:      &shaman.Character,
 			SpellSchool:    stats.AttackPower,
-			CritMultiplier: 2.0,
+			CritMultiplier: shaman.DefaultMeleeCritMultiplier(),
+			IsPhantom:      true,
 		},
 	}
 
@@ -67,7 +68,7 @@ func (shaman *Shaman) ApplyWindfuryImbue(mh bool, oh bool) {
 		return core.Aura{
 			ID: WFImbueAuraID,
 			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
-				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() {
+				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() || ability.IsPhantom {
 					return
 				}
 
@@ -121,7 +122,7 @@ func (shaman *Shaman) ApplyFlametongueImbue(mh bool, oh bool) {
 				SpellSchool:    stats.FireSpellPower,
 				IgnoreManaCost: true,
 				IsPhantom:      true,
-				CritMultiplier: 1.5,
+				CritMultiplier: shaman.DefaultSpellCritMultiplier(),
 			},
 		},
 		Effect: core.SpellHitEffect{
@@ -159,7 +160,7 @@ func (shaman *Shaman) ApplyFlametongueImbue(mh bool, oh bool) {
 		return core.Aura{
 			ID: FTImbueAuraID,
 			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
-				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() {
+				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() || ability.IsPhantom {
 					return
 				}
 
@@ -196,7 +197,7 @@ func (shaman *Shaman) ApplyFrostbrandImbue(mh bool, oh bool) {
 				SpellSchool:    stats.FrostSpellPower,
 				IgnoreManaCost: true,
 				IsPhantom:      true,
-				CritMultiplier: 1.5,
+				CritMultiplier: shaman.DefaultSpellCritMultiplier(),
 			},
 		},
 		Effect: core.SpellHitEffect{
@@ -222,7 +223,7 @@ func (shaman *Shaman) ApplyFrostbrandImbue(mh bool, oh bool) {
 		return core.Aura{
 			ID: FBImbueAuraID,
 			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
-				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() {
+				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() || ability.IsPhantom {
 					return
 				}
 

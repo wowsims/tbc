@@ -28,16 +28,14 @@ func (mage *Mage) newArcaneBlastTemplate(sim *core.Simulation) core.SimpleSpellT
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				CritMultiplier: 1.5 + 0.125*float64(mage.Talents.SpellPower),
-				SpellSchool:    stats.ArcaneSpellPower,
+				ActionID:       core.ActionID{SpellID: SpellIDArcaneBlast},
 				Character:      &mage.Character,
+				SpellSchool:    stats.ArcaneSpellPower,
 				BaseManaCost:   ArcaneBlastBaseManaCost,
 				ManaCost:       ArcaneBlastBaseManaCost,
 				CastTime:       ArcaneBlastBaseCastTime,
 				GCD:            core.GCDDefault,
-				ActionID: core.ActionID{
-					SpellID: SpellIDArcaneBlast,
-				},
+				CritMultiplier: mage.SpellCritMultiplier(1, 0.25*float64(mage.Talents.SpellPower)),
 				OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
 					abAura.Stacks = core.MinInt32(3, mage.NumStacks(ArcaneBlastAuraID)+1)
 					abAura.Expires = sim.CurrentTime + abAuraDuration

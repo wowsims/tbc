@@ -204,11 +204,9 @@ class SelectorModal extends Component {
         'Items',
         slot,
         equippedItem,
-        eligibleItems,
-				item => this.player.computeItemEP(item),
-        equippedItem => equippedItem?.item,
-        item => {
+        eligibleItems.map(item => {
           return {
+						item: item,
             id: item.id,
             actionId: ActionId.fromItem(item),
             name: item.name,
@@ -216,7 +214,7 @@ class SelectorModal extends Component {
 						phase: item.phase,
             baseEP: this.player.computeItemEP(item),
             ignoreEPFilter: false,
-            onEquip: (eventID, item) => {
+            onEquip: (eventID, item: Item) => {
               const equippedItem = this.player.getEquippedItem(slot);
               if (equippedItem) {
                 this.player.equipItem(eventID, slot, equippedItem.withItem(item));
@@ -225,7 +223,9 @@ class SelectorModal extends Component {
               }
             },
           };
-        },
+				}),
+				item => this.player.computeItemEP(item),
+        equippedItem => equippedItem?.item,
 				GemColor.GemColorUnknown,
         eventID => {
           this.player.equipItem(eventID, slot, null);
@@ -235,11 +235,9 @@ class SelectorModal extends Component {
         'Enchants',
         slot,
         equippedItem,
-        eligibleEnchants,
-				enchant => this.player.computeEnchantEP(enchant),
-        equippedItem => equippedItem?.enchant,
-        enchant => {
+        eligibleEnchants.map(enchant => {
           return {
+						item: enchant,
             id: enchant.id,
 						actionId: enchant.isSpellId ? ActionId.fromSpellId(enchant.id) : ActionId.fromItemId(enchant.id),
             name: enchant.name,
@@ -247,13 +245,15 @@ class SelectorModal extends Component {
 						phase: enchant.phase || 1,
             baseEP: this.player.computeStatsEP(new Stats(enchant.stats)),
             ignoreEPFilter: true,
-            onEquip: (eventID, enchant) => {
+            onEquip: (eventID, enchant: Enchant) => {
               const equippedItem = this.player.getEquippedItem(slot);
               if (equippedItem)
                 this.player.equipItem(eventID, slot, equippedItem.withEnchant(enchant));
             },
           };
-        },
+				}),
+				enchant => this.player.computeEnchantEP(enchant),
+        equippedItem => equippedItem?.enchant,
 				GemColor.GemColorUnknown,
         eventID => {
           const equippedItem = this.player.getEquippedItem(slot);
@@ -282,7 +282,23 @@ class SelectorModal extends Component {
           'Gem ' + (socketIdx + 1),
           slot,
           equippedItem,
-          this.player.getGems(socketColor),
+          this.player.getGems(socketColor).map((gem: Gem) => {
+            return {
+							item: gem,
+              id: gem.id,
+							actionId: ActionId.fromItemId(gem.id),
+              name: gem.name,
+              quality: gem.quality,
+							phase: gem.phase,
+              baseEP: this.player.computeStatsEP(new Stats(gem.stats)),
+              ignoreEPFilter: true,
+              onEquip: (eventID, gem: Gem) => {
+                const equippedItem = this.player.getEquippedItem(slot);
+                if (equippedItem)
+                  this.player.equipItem(eventID, slot, equippedItem.withGem(gem, socketIdx));
+              },
+            };
+					}),
 					gem => {
             let gemEP = this.player.computeGemEP(gem);
             if (gemMatchesSocket(gem, socketColor)) {
@@ -291,22 +307,6 @@ class SelectorModal extends Component {
             return gemEP;
           },
           equippedItem => equippedItem?.gems[socketIdx],
-          gem => {
-            return {
-              id: gem.id,
-							actionId: ActionId.fromItemId(gem.id),
-              name: gem.name,
-              quality: gem.quality,
-							phase: gem.phase,
-              baseEP: this.player.computeStatsEP(new Stats(gem.stats)),
-              ignoreEPFilter: true,
-              onEquip: (eventID, gem) => {
-                const equippedItem = this.player.getEquippedItem(slot);
-                if (equippedItem)
-                  this.player.equipItem(eventID, slot, equippedItem.withGem(gem, socketIdx));
-              },
-            };
-          },
 					socketColor,
           eventID => {
             const equippedItem = this.player.getEquippedItem(slot);
@@ -347,32 +347,22 @@ class SelectorModal extends Component {
         label: string,
         slot: ItemSlot,
         equippedItem: EquippedItem | null,
-        items: Array<T>,
+        itemData: Array<ItemData<T>>,
 				computeEP: (item: T) => number,
         equippedToItemFn: (equippedItem: EquippedItem | null) => (T | null | undefined),
-        getItemData: (item: T) => {
-          id: number,
-          actionId: ActionId,
-          name: string,
-          quality: ItemQuality,
-					phase: number,
-          baseEP: number,
-          ignoreEPFilter: boolean,
-          onEquip: (eventID: EventID, item: T) => void,
-        },
 				socketColor: GemColor,
         onRemove: (eventID: EventID) => void,
 				setTabContent?: (tabElem: HTMLAnchorElement) => void) {
-    if (items.length == 0) {
+    if (itemData.length == 0) {
       return;
     }
 
-		const equippedToIdFn = (equippedItem: EquippedItem | null) => {
-			const item = equippedToItemFn(equippedItem);
-			return item ? getItemData(item).id : 0;
-		};
-
-		items.sort((itemA, itemB) => computeEP(itemB) - computeEP(itemA));
+		if (slot == ItemSlot.ItemSlotTrinket1 || slot == ItemSlot.ItemSlotTrinket2) {
+			// Trinket EP is weird so just sort by ilvl instead.
+			itemData.sort((dataA, dataB) => (dataB.item as unknown as Item).ilvl - (dataA.item as unknown as Item).ilvl);
+		} else {
+			itemData.sort((dataA, dataB) => computeEP(dataB.item) - computeEP(dataA.item));
+		}
 
     const tabElem = document.createElement('li');
     this.tabsElem.appendChild(tabElem);
@@ -425,33 +415,32 @@ class SelectorModal extends Component {
 
     const listElem = tabContent.getElementsByClassName('selector-modal-list')[0] as HTMLElement;
 
-    const listItemElems = items.map(item => {
-      const itemData = getItemData(item);
+    const listItemElems = itemData.map((itemData, itemIdx) => {
+			const item = itemData.item;
 			const itemEP = computeEP(item);
 
       const listItemElem = document.createElement('li');
       listItemElem.classList.add('selector-modal-list-item');
       listElem.appendChild(listItemElem);
 
-      listItemElem.dataset.id = String(itemData.id);
-      listItemElem.dataset.name = itemData.name;
-      listItemElem.dataset.phase = String(Math.max(itemData.phase, 1));
-      listItemElem.dataset.baseEP = String(itemData.baseEP);
-      listItemElem.dataset.ignoreEPFilter = String(itemData.ignoreEPFilter);
+      listItemElem.dataset.idx = String(itemIdx);
 
       listItemElem.innerHTML = `
         <a class="selector-modal-list-item-icon"></a>
         <a class="selector-modal-list-item-name">${itemData.name}</a>
         <div class="selector-modal-list-item-padding"></div>
         <div class="selector-modal-list-item-ep">
-					<span class="selector-modal-list-item-ep-value">${Math.round(itemEP)}</span>
+					<span class="selector-modal-list-item-ep-value">${itemEP < 9.95 ? itemEP.toFixed(1) : Math.round(itemEP)}</span>
 					<span class="selector-modal-list-item-ep-delta"></span>
 				</div>
       `;
 
-      const iconElem = listItemElem.getElementsByClassName('selector-modal-list-item-icon')[0] as HTMLImageElement;
+			if (slot == ItemSlot.ItemSlotTrinket1 || slot == ItemSlot.ItemSlotTrinket2) {
+				const epElem = listItemElem.getElementsByClassName('selector-modal-list-item-ep')[0] as HTMLElement;
+				epElem.style.display = 'none';
+			}
 
-		
+      const iconElem = listItemElem.getElementsByClassName('selector-modal-list-item-icon')[0] as HTMLImageElement;
 			itemData.actionId.fill().then(filledId => {
 				filledId.setWowheadHref(listItemElem.children[0] as HTMLAnchorElement);
 				filledId.setWowheadHref(listItemElem.children[1] as HTMLAnchorElement);
@@ -487,15 +476,16 @@ class SelectorModal extends Component {
       const newEquippedItem = this.player.getEquippedItem(slot);
 			const newItem = equippedToItemFn(newEquippedItem);
 
-			const newItemId = equippedToIdFn(newEquippedItem) || 0;
+			const newItemId = (newItem as any)?.id || null;
 			const newEP = newItem ? computeEP(newItem) : 0;
 
       listItemElems.forEach(elem => {
-				const listItemId = parseInt(elem.dataset.id!);
-				const listItem = items.find(item => getItemData(item).id == listItemId);
+				const listItemIdx = parseInt(elem.dataset.idx!);
+				const listItemData = itemData[listItemIdx];
+				const listItem = listItemData.item;
 
         elem.classList.remove('active');
-        if (listItemId == newItemId) {
+        if (listItemData.id == newItemId) {
           elem.classList.add('active');
         }
 
@@ -521,51 +511,50 @@ class SelectorModal extends Component {
 
 		const applyFilters = () => {
 			let validItemElems = listItemElems;
+			const currentEquippedItem = this.player.getEquippedItem(slot);
 
-			if (label == 'Items' && slot == ItemSlot.ItemSlotMainHand) {
-				if (!this.player.sim.getShow1hWeapons()) {
-					validItemElems = validItemElems.filter(elem => {
-						const listItemId = parseInt(elem.dataset.id!);
-						const listItem = items.find(item => getItemData(item).id == listItemId) as unknown as Item;
-						return listItem.handType == HandType.HandTypeTwoHand;
-					});
+			validItemElems = validItemElems.filter(elem => {
+				const listItemIdx = parseInt(elem.dataset.idx!);
+				const listItemData = itemData[listItemIdx];
+
+				if (label == 'Items') {
+					const listItem = listItemData.item as unknown as Item;
+					if (!this.player.sim.getShow1hWeapons() && listItem.handType != HandType.HandTypeTwoHand) {
+						return false;
+					}
+					if (!this.player.sim.getShow2hWeapons() && listItem.handType == HandType.HandTypeTwoHand) {
+						return false;
+					}
+				} else if (label == 'Enchants') {
+					const listItem = listItemData.item as unknown as Enchant;
+					if (currentEquippedItem && !enchantAppliesToItem(listItem, currentEquippedItem.item)) {
+						return false;
+					}
+				} else if (label.startsWith('Gem')) {
+					const listItem = listItemData.item as unknown as Gem;
+					if (this.player.sim.getShowMatchingGems() && !gemMatchesSocket(listItem, socketColor)) {
+						return false;
+					}
 				}
-				if (!this.player.sim.getShow2hWeapons()) {
-					validItemElems = validItemElems.filter(elem => {
-						const listItemId = parseInt(elem.dataset.id!);
-						const listItem = items.find(item => getItemData(item).id == listItemId) as unknown as Item;
-						return listItem.handType != HandType.HandTypeTwoHand;
-					});
+
+				if (listItemData.phase > this.player.sim.getPhase()) {
+					return false;
 				}
-			}
 
-			const phase = this.player.sim.getPhase();
-			validItemElems = validItemElems.filter(elem => Number(elem.dataset.phase!) <= phase)
+				const searchQuery = searchInput.value.toLowerCase();
+				if (!listItemData.name.toLowerCase().includes(searchQuery)) {
+					return false;
+				}
 
-			const searchQuery = searchInput.value.toLowerCase();
-			validItemElems = validItemElems.filter(elem => elem.dataset.name!.toLowerCase().includes(searchQuery))
+				// If not a trinket slot, filter out items without EP values.
+				if ((slot != ItemSlot.ItemSlotTrinket1 && slot != ItemSlot.ItemSlotTrinket2 && slot != ItemSlot.ItemSlotRanged)) {
+					if (!listItemData.ignoreEPFilter && !listItemData.baseEP) {
+						return false;
+					}
+				}
 
-			if (label.startsWith('Gem') && this.player.sim.getShowMatchingGems()) {
-				validItemElems = validItemElems.filter(elem => {
-					const listItemId = parseInt(elem.dataset.id!);
-					const listItem = items.find(item => getItemData(item).id == listItemId) as unknown as Gem;
-					return gemMatchesSocket(listItem, socketColor);
-				});
-			}
-
-      // If not a trinket slot, filter out items without EP values.
-      if ((slot != ItemSlot.ItemSlotTrinket1 && slot != ItemSlot.ItemSlotTrinket2 && slot != ItemSlot.ItemSlotRanged)) {
-        validItemElems = validItemElems.filter(elem => (Number(elem.dataset.baseEP) > 0 || elem.dataset.ignoreEPFilter=='true'));
-      }
-
-      const currentEquippedItem = this.player.getEquippedItem(slot);
-			if (label == 'Enchants' && currentEquippedItem) {
-				validItemElems = validItemElems.filter(elem => {
-					const listItemId = parseInt(elem.dataset.id!);
-					const listItem = items.find(item => getItemData(item).id == listItemId) as unknown as Enchant;
-					return enchantAppliesToItem(listItem, currentEquippedItem.item);
-				});
-			}
+				return true;
+			});
 
 			let numShown = 0;
       listItemElems.forEach(elem => {
@@ -586,9 +575,7 @@ class SelectorModal extends Component {
     const searchInput = tabContent.getElementsByClassName('selector-modal-search')[0] as HTMLInputElement;
     searchInput.addEventListener('input', applyFilters);
 
-		tabContent.dataset.phase = String(this.player.sim.getPhase());
 		this.player.sim.phaseChangeEmitter.on(() => {
-			tabContent.dataset.phase = String(this.player.sim.getPhase());
 			applyFilters();
 		});
 		TypedEvent.onAny([
@@ -617,6 +604,18 @@ class SelectorModal extends Component {
     tabElems.forEach(elem => elem.parentElement.remove());
     contentElems.forEach(elem => elem!.remove());
   }
+}
+
+interface ItemData<T> {
+	item: T,
+	name: string,
+	id: number,
+	actionId: ActionId,
+	quality: ItemQuality,
+	phase: number,
+	baseEP: number,
+	ignoreEPFilter: boolean,
+	onEquip: (eventID: EventID, item: T) => void,
 }
 
 const emptySlotIcons: Record<ItemSlot, string> = {

@@ -4,11 +4,14 @@ import (
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
+	"github.com/wowsims/tbc/sim/core/proto"
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 func init() {
 	// Proc effects. Keep these in order by item ID.
+	core.AddItemEffect(12632, ApplyStormGauntlets)
+	core.AddItemEffect(17111, ApplyBlazefuryMedallion)
 	core.AddItemEffect(23541, ApplyKhoriumChampion)
 	core.AddItemEffect(24114, ApplyBraidedEterniumChain)
 	core.AddItemEffect(27901, ApplyBlackoutTruncheon)
@@ -34,6 +37,102 @@ func init() {
 
 	// TODO:
 	// blinkstrike
+}
+
+var StormGauntletsAuraID = core.NewAuraID()
+
+func ApplyStormGauntlets(agent core.Agent) {
+	character := agent.GetCharacter()
+	spellObj := core.SimpleSpell{}
+
+	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
+		castTemplate := core.NewSimpleSpellTemplate(core.SimpleSpell{
+			SpellCast: core.SpellCast{
+				Cast: core.Cast{
+					ActionID:       core.ActionID{ItemID: 12632},
+					Character:      character,
+					IgnoreManaCost: true,
+					IsPhantom:      true,
+					SpellSchool:    stats.NatureSpellPower,
+					CritMultiplier: character.DefaultSpellCritMultiplier(),
+				},
+			},
+			Effect: core.SpellHitEffect{
+				SpellEffect: core.SpellEffect{
+					DamageMultiplier:       1,
+					StaticDamageMultiplier: 1,
+					ThreatMultiplier:       1,
+				},
+				DirectInput: core.DirectDamageInput{
+					MinBaseDamage: 3,
+					MaxBaseDamage: 3,
+				},
+			},
+		})
+
+		return core.Aura{
+			ID: StormGauntletsAuraID,
+			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
+				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() || !hitEffect.IsMelee() || ability.IsPhantom {
+					return
+				}
+
+				castAction := &spellObj
+				castTemplate.Apply(castAction)
+				castAction.Effect.Target = hitEffect.Target
+				castAction.Init(sim)
+				castAction.Cast(sim)
+			},
+		}
+	})
+}
+
+var BlazefuryMedallionAuraID = core.NewAuraID()
+
+func ApplyBlazefuryMedallion(agent core.Agent) {
+	character := agent.GetCharacter()
+	spellObj := core.SimpleSpell{}
+
+	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
+		castTemplate := core.NewSimpleSpellTemplate(core.SimpleSpell{
+			SpellCast: core.SpellCast{
+				Cast: core.Cast{
+					ActionID:       core.ActionID{ItemID: 17111},
+					Character:      character,
+					IgnoreManaCost: true,
+					IsPhantom:      true,
+					SpellSchool:    stats.FireSpellPower,
+					CritMultiplier: character.DefaultSpellCritMultiplier(),
+				},
+			},
+			Effect: core.SpellHitEffect{
+				SpellEffect: core.SpellEffect{
+					DamageMultiplier:       1,
+					StaticDamageMultiplier: 1,
+					ThreatMultiplier:       1,
+				},
+				DirectInput: core.DirectDamageInput{
+					MinBaseDamage: 2,
+					MaxBaseDamage: 2,
+				},
+			},
+		})
+
+		return core.Aura{
+			ID: BlazefuryMedallionAuraID,
+			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
+				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() || !hitEffect.IsMelee() || ability.IsPhantom {
+					return
+				}
+
+				castAction := &spellObj
+				castTemplate.Apply(castAction)
+				castAction.Effect.Target = hitEffect.Target
+				castAction.Init(sim)
+				castAction.Cast(sim)
+			},
+		}
+	})
 }
 
 var KhoriumChampionAuraID = core.NewAuraID()
@@ -240,8 +339,9 @@ func ApplyDespair(agent core.Agent) {
 			ActionID:       actionID,
 			Character:      character,
 			SpellSchool:    stats.AttackPower,
-			CritMultiplier: 2,
+			CritMultiplier: character.DefaultMeleeCritMultiplier(),
 			IgnoreCost:     true,
+			IsPhantom:      true,
 		},
 		Effect: core.AbilityHitEffect{
 			AbilityEffect: core.AbilityEffect{
@@ -290,8 +390,9 @@ func ApplyTheDecapitator(agent core.Agent) {
 			ActionID:       actionID,
 			Character:      character,
 			SpellSchool:    stats.AttackPower,
-			CritMultiplier: 2,
+			CritMultiplier: character.DefaultMeleeCritMultiplier(),
 			IgnoreCost:     true,
+			IsPhantom:      true,
 		},
 		Effect: core.AbilityHitEffect{
 			AbilityEffect: core.AbilityEffect{
@@ -354,7 +455,7 @@ func ApplyGlaiveOfThePit(agent core.Agent) {
 					IgnoreManaCost: true,
 					IsPhantom:      true,
 					SpellSchool:    stats.ShadowSpellPower,
-					CritMultiplier: 1.5,
+					CritMultiplier: character.DefaultSpellCritMultiplier(),
 				},
 			},
 			Effect: core.SpellHitEffect{
@@ -406,7 +507,7 @@ func ApplyBandOfTheEternalChampion(agent core.Agent) {
 		return core.Aura{
 			ID: BandOfTheEternalChampionAuraID,
 			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
-				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() {
+				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() || ability.IsPhantom {
 					return
 				}
 				if icd.IsOnCD(sim) {
@@ -649,8 +750,7 @@ func ApplyTheNightBlade(agent core.Agent) {
 
 var SyphonOfTheNathrezimAuraID = core.NewAuraID()
 
-var SiphonEssenceMHAuraID = core.NewAuraID()
-var SiphonEssenceOHAuraID = core.NewAuraID()
+var SiphonEssenceAuraID = core.NewAuraID()
 
 func ApplySyphonOfTheNathrezim(agent core.Agent) {
 	character := agent.GetCharacter()
@@ -672,7 +772,7 @@ func ApplySyphonOfTheNathrezim(agent core.Agent) {
 					IgnoreManaCost: true,
 					IsPhantom:      true,
 					SpellSchool:    stats.ShadowSpellPower,
-					CritMultiplier: 1.5,
+					CritMultiplier: character.DefaultSpellCritMultiplier(),
 				},
 			},
 			Effect: core.SpellHitEffect{
@@ -689,33 +789,20 @@ func ApplySyphonOfTheNathrezim(agent core.Agent) {
 		})
 		spellObj := core.SimpleSpell{}
 
-		applySiphonEssence := func(sim *core.Simulation, character *core.Character, isMH bool) {
-			var tag int32
-			var auraID core.AuraID
-			if isMH {
-				tag = 1
-				auraID = SiphonEssenceMHAuraID
-			} else {
-				tag = 2
-				auraID = SiphonEssenceOHAuraID
-			}
-			character.AddAura(sim, core.Aura{
-				ID:       auraID,
-				ActionID: core.ActionID{SpellID: 40291, Tag: tag},
-				Expires:  sim.CurrentTime + (time.Second * 6),
-				OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
-					if !hitEffect.Landed() || !hitEffect.IsWeaponHit() || !hitEffect.IsMelee() {
-						return
-					}
+		procAura := core.Aura{
+			ID:       SiphonEssenceAuraID,
+			ActionID: core.ActionID{SpellID: 40291},
+			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
+				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() || !hitEffect.IsMelee() || ability.IsPhantom {
+					return
+				}
 
-					castAction := &spellObj
-					castTemplate.Apply(castAction)
-					castAction.Effect.Target = hitEffect.Target
-					castAction.ActionID.Tag = tag
-					castAction.Init(sim)
-					castAction.Cast(sim)
-				},
-			})
+				castAction := &spellObj
+				castTemplate.Apply(castAction)
+				castAction.Effect.Target = hitEffect.Target
+				castAction.Init(sim)
+				castAction.Cast(sim)
+			},
 		}
 
 		return core.Aura{
@@ -725,9 +812,10 @@ func ApplySyphonOfTheNathrezim(agent core.Agent) {
 					return
 				}
 
-				isMH := hitEffect.IsMH()
-				if ppmm.Proc(sim, isMH, false, "Syphon Of The Nathrezim") {
-					applySiphonEssence(sim, character, isMH)
+				if ppmm.Proc(sim, hitEffect.IsMH(), false, "Syphon Of The Nathrezim") {
+					aura := procAura
+					aura.Expires = sim.CurrentTime + time.Second*6
+					character.AddAura(sim, aura)
 				}
 			},
 		}
@@ -738,6 +826,14 @@ var CloakOfDarknessAuraID = core.NewAuraID()
 
 func ApplyCloakOfDarkness(agent core.Agent) {
 	character := agent.GetCharacter()
+
+	// The melee distinction only matters for hunters, so for others we can skip
+	// having a separate aura.
+	if character.Class != proto.Class_ClassHunter {
+		character.AddStat(stats.MeleeCrit, 24)
+		return
+	}
+
 	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		return core.Aura{
 			ID: CloakOfDarknessAuraID,

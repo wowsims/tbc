@@ -22,6 +22,10 @@ func TestHunter(t *testing.T) {
 		GearSet: core.GearSetCombo{Label: "P1", GearSet: P1Gear},
 
 		SpecOptions: core.SpecOptionsCombo{Label: "Basic", SpecOptions: PlayerOptionsBasic},
+		OtherSpecOptions: []core.SpecOptionsCombo{
+			core.SpecOptionsCombo{Label: "French", SpecOptions: PlayerOptionsFrench},
+			core.SpecOptionsCombo{Label: "MeleeWeave", SpecOptions: PlayerOptionsMeleeWeave},
+		},
 
 		RaidBuffs:   FullRaidBuffs,
 		PartyBuffs:  FullPartyBuffs,

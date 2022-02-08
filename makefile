@@ -17,6 +17,7 @@ shadow_priest: $(OUT_DIR)/shadow_priest/index.js $(OUT_DIR)/shadow_priest/index.
 warrior: $(OUT_DIR)/warrior/index.js $(OUT_DIR)/warrior/index.css $(OUT_DIR)/warrior/index.html
 retribution_paladin: $(OUT_DIR)/retribution_paladin/index.js $(OUT_DIR)/retribution_paladin/index.css $(OUT_DIR)/retribution_paladin/index.html
 
+
 raid: $(OUT_DIR)/raid/index.js $(OUT_DIR)/raid/index.css $(OUT_DIR)/raid/index.html
 
 ui_shared: $(OUT_DIR)/lib.wasm $(OUT_DIR)/sim_worker.js $(OUT_DIR)/net_worker.js detailed_results $(OUT_DIR)/index.md

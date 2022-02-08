@@ -1,6 +1,8 @@
 package hunter
 
 import (
+	"time"
+
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/proto"
 	"github.com/wowsims/tbc/sim/core/stats"
@@ -36,6 +38,16 @@ type Hunter struct {
 
 	aspectOfTheViper bool // False indicates aspect of the hawk.
 
+	hasGronnstalker2Pc bool
+
+	killCommandEnabled bool                // True after landing a crit.
+	killCommandBlocked bool                // True while Steady Shot is casting, to prevent KC.
+	killCommandAction  *core.PendingAction // Action to use KC when its comes off CD.
+
+	timeToWeave time.Duration
+
+	raptorStrikeCost float64 // Cached mana cost of raptor strike.
+
 	pet *HunterPet
 
 	aimedShotTemplate core.MeleeAbilityTemplate
@@ -47,11 +59,25 @@ type Hunter struct {
 	aspectOfTheHawkTemplate  core.SimpleCast
 	aspectOfTheViperTemplate core.SimpleCast
 
-	multiShotTemplate core.MeleeAbilityTemplate
-	multiShot         core.ActiveMeleeAbility
+	killCommandTemplate core.SimpleCast
+
+	multiShotCastTemplate core.SimpleCast
+	multiShotCast         core.SimpleCast
+
+	multiShotAbilityTemplate core.MeleeAbilityTemplate
+	multiShotAbility         core.ActiveMeleeAbility
+
+	raptorStrikeTemplate core.MeleeAbilityTemplate
+	raptorStrike         core.ActiveMeleeAbility
 
 	scorpidStingTemplate core.MeleeAbilityTemplate
 	scorpidSting         core.ActiveMeleeAbility
+
+	serpentStingTemplate core.MeleeAbilityTemplate
+	serpentSting         core.ActiveMeleeAbility
+
+	serpentStingDotTemplate core.SimpleSpellTemplate
+	serpentStingDot         core.SimpleSpell
 
 	steadyShotCastTemplate core.SimpleCast
 	steadyShotCast         core.SimpleCast
@@ -64,25 +90,51 @@ func (hunter *Hunter) GetCharacter() *core.Character {
 	return &hunter.Character
 }
 
+func (hunter *Hunter) GetHunter() *Hunter {
+	return hunter
+}
+
 func (hunter *Hunter) AddRaidBuffs(raidBuffs *proto.RaidBuffs) {
 }
 func (hunter *Hunter) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {
+	if hunter.Talents.TrueshotAura {
+		partyBuffs.TrueshotAura = true
+	}
 }
 
 func (hunter *Hunter) Init(sim *core.Simulation) {
+	// Update auto crit multipliers now that we have the targets.
+	hunter.AutoAttacks.MH.CritMultiplier = hunter.critMultiplier(false, sim.GetPrimaryTarget())
+	hunter.AutoAttacks.OH.CritMultiplier = hunter.critMultiplier(false, sim.GetPrimaryTarget())
+	hunter.AutoAttacks.Ranged.CritMultiplier = hunter.critMultiplier(true, sim.GetPrimaryTarget())
+
 	// Precompute all the spell templates.
 	hunter.aimedShotTemplate = hunter.newAimedShotTemplate(sim)
 	hunter.arcaneShotTemplate = hunter.newArcaneShotTemplate(sim)
 	hunter.aspectOfTheHawkTemplate = hunter.newAspectOfTheHawkTemplate(sim)
 	hunter.aspectOfTheViperTemplate = hunter.newAspectOfTheViperTemplate(sim)
-	hunter.multiShotTemplate = hunter.newMultiShotTemplate(sim)
+	hunter.killCommandTemplate = hunter.newKillCommandTemplate(sim)
+	hunter.multiShotCastTemplate = hunter.newMultiShotCastTemplate(sim)
+	hunter.multiShotAbilityTemplate = hunter.newMultiShotAbilityTemplate(sim)
+	hunter.raptorStrikeTemplate = hunter.newRaptorStrikeTemplate(sim)
 	hunter.scorpidStingTemplate = hunter.newScorpidStingTemplate(sim)
+	hunter.serpentStingTemplate = hunter.newSerpentStingTemplate(sim)
+	hunter.serpentStingDotTemplate = hunter.newSerpentStingDotTemplate(sim)
 	hunter.steadyShotCastTemplate = hunter.newSteadyShotCastTemplate(sim)
 	hunter.steadyShotAbilityTemplate = hunter.newSteadyShotAbilityTemplate(sim)
 }
 
-func (hunter *Hunter) Reset(newsim *core.Simulation) {
+func (hunter *Hunter) Reset(sim *core.Simulation) {
 	hunter.aspectOfTheViper = false
+	hunter.killCommandEnabled = false
+	hunter.killCommandBlocked = false
+	hunter.killCommandAction.NextActionAt = 0
+
+	target := sim.GetPrimaryTarget()
+	impHuntersMark := hunter.Talents.ImprovedHuntersMark
+	if !target.HasAura(core.HuntersMarkDebuffID) || target.NumStacks(core.HuntersMarkDebuffID) < impHuntersMark {
+		target.AddAura(sim, core.HuntersMarkAura(impHuntersMark, false))
+	}
 }
 
 func NewHunter(character core.Character, options proto.Player) *Hunter {
@@ -93,20 +145,33 @@ func NewHunter(character core.Character, options proto.Player) *Hunter {
 		Talents:   *hunterOptions.Talents,
 		Options:   *hunterOptions.Options,
 		Rotation:  *hunterOptions.Rotation,
+
+		timeToWeave: time.Millisecond * time.Duration(hunterOptions.Rotation.TimeToWeaveMs),
+	}
+	hunter.hasGronnstalker2Pc = ItemSetGronnstalker.CharacterHasSetBonus(&hunter.Character, 2)
+
+	if !hunter.Rotation.UseMultiShot && !hunter.Rotation.UseArcaneShot {
+		// Disable french rotation if we don't have any spells to use it with.
+		hunter.Rotation.UseFrenchRotation = false
 	}
 
 	hunter.PseudoStats.RangedSpeedMultiplier = 1
 	hunter.EnableManaBar()
 	hunter.EnableAutoAttacks(hunter, core.AutoAttackOptions{
-		MainHand:        hunter.WeaponFromMainHand(),
-		OffHand:         hunter.WeaponFromOffHand(),
-		Ranged:          hunter.WeaponFromRanged(),
+		// We don't know crit multiplier until later when we see the target so just
+		// use 0 for now.
+		MainHand:        hunter.WeaponFromMainHand(0),
+		OffHand:         hunter.WeaponFromOffHand(0),
+		Ranged:          hunter.WeaponFromRanged(0),
 		AutoSwingRanged: true,
+		ReplaceMHSwing: func(sim *core.Simulation) *core.ActiveMeleeAbility {
+			return hunter.TryRaptorStrike(sim)
+		},
 	})
 
 	hunter.pet = hunter.NewHunterPet()
 
-	hunter.Character.AddStatDependency(stats.StatDependency{
+	hunter.AddStatDependency(stats.StatDependency{
 		SourceStat:   stats.Intellect,
 		ModifiedStat: stats.SpellCrit,
 		Modifier: func(intellect float64, spellCrit float64) float64 {
@@ -114,7 +179,7 @@ func NewHunter(character core.Character, options proto.Player) *Hunter {
 		},
 	})
 
-	hunter.Character.AddStatDependency(stats.StatDependency{
+	hunter.AddStatDependency(stats.StatDependency{
 		SourceStat:   stats.Strength,
 		ModifiedStat: stats.AttackPower,
 		Modifier: func(strength float64, attackPower float64) float64 {
@@ -122,7 +187,7 @@ func NewHunter(character core.Character, options proto.Player) *Hunter {
 		},
 	})
 
-	hunter.Character.AddStatDependency(stats.StatDependency{
+	hunter.AddStatDependency(stats.StatDependency{
 		SourceStat:   stats.Agility,
 		ModifiedStat: stats.RangedAttackPower,
 		Modifier: func(agility float64, rap float64) float64 {
@@ -130,7 +195,7 @@ func NewHunter(character core.Character, options proto.Player) *Hunter {
 		},
 	})
 
-	hunter.Character.AddStatDependency(stats.StatDependency{
+	hunter.AddStatDependency(stats.StatDependency{
 		SourceStat:   stats.Agility,
 		ModifiedStat: stats.MeleeCrit,
 		Modifier: func(agility float64, meleeCrit float64) float64 {
@@ -154,6 +219,7 @@ func NewHunter(character core.Character, options proto.Player) *Hunter {
 			hunter.AmmoDPS = 32
 		}
 		hunter.AmmoDamageBonus = hunter.AmmoDPS * hunter.AutoAttacks.Ranged.SwingSpeed
+		hunter.AutoAttacks.RangedAuto.Effect.WeaponInput.FlatDamageBonus += hunter.AmmoDamageBonus
 	}
 
 	switch hunter.Options.QuiverBonus {
@@ -171,10 +237,10 @@ func NewHunter(character core.Character, options proto.Player) *Hunter {
 		hunter.PseudoStats.RangedSpeedMultiplier *= 1.15
 	}
 
-	//hunter.applyTalents()
+	hunter.applyTalents()
 	hunter.registerRapidFireCD()
 	hunter.applyAspectOfTheHawk()
-	hunter.applyRotationAura()
+	hunter.applyKillCommand()
 
 	return hunter
 }
@@ -190,6 +256,7 @@ func init() {
 
 		stats.AttackPower:       120,
 		stats.RangedAttackPower: 130,
+		stats.MeleeCrit:         -1.53 * core.MeleeCritRatingPerCritChance,
 	}
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceDraenei, Class: proto.Class_ClassHunter}] = stats.Stats{
 		stats.Strength:  65,
@@ -201,6 +268,7 @@ func init() {
 
 		stats.AttackPower:       120,
 		stats.RangedAttackPower: 130,
+		stats.MeleeCrit:         -1.53 * core.MeleeCritRatingPerCritChance,
 	}
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceDwarf, Class: proto.Class_ClassHunter}] = stats.Stats{
 		stats.Strength:  66,
@@ -212,6 +280,7 @@ func init() {
 
 		stats.AttackPower:       120,
 		stats.RangedAttackPower: 130,
+		stats.MeleeCrit:         -1.53 * core.MeleeCritRatingPerCritChance,
 	}
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceNightElf, Class: proto.Class_ClassHunter}] = stats.Stats{
 		stats.Strength:  61,
@@ -223,6 +292,7 @@ func init() {
 
 		stats.AttackPower:       120,
 		stats.RangedAttackPower: 130,
+		stats.MeleeCrit:         -1.53 * core.MeleeCritRatingPerCritChance,
 	}
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceOrc, Class: proto.Class_ClassHunter}] = stats.Stats{
 		stats.Strength:  67,
@@ -234,6 +304,7 @@ func init() {
 
 		stats.AttackPower:       120,
 		stats.RangedAttackPower: 130,
+		stats.MeleeCrit:         -1.53 * core.MeleeCritRatingPerCritChance,
 	}
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceTauren, Class: proto.Class_ClassHunter}] = stats.Stats{
 		stats.Strength:  69,
@@ -245,6 +316,7 @@ func init() {
 
 		stats.AttackPower:       120,
 		stats.RangedAttackPower: 130,
+		stats.MeleeCrit:         -1.53 * core.MeleeCritRatingPerCritChance,
 	}
 	trollStats := stats.Stats{
 		stats.Strength:  65,
@@ -256,6 +328,7 @@ func init() {
 
 		stats.AttackPower:       120,
 		stats.RangedAttackPower: 130,
+		stats.MeleeCrit:         -1.53 * core.MeleeCritRatingPerCritChance,
 	}
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceTroll10, Class: proto.Class_ClassHunter}] = trollStats
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceTroll30, Class: proto.Class_ClassHunter}] = trollStats

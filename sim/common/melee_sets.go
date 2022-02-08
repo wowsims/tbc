@@ -98,7 +98,7 @@ var ItemSetFistsOfFury = core.ItemSet{
 							IgnoreManaCost: true,
 							IsPhantom:      true,
 							SpellSchool:    stats.FireSpellPower,
-							CritMultiplier: 1.5,
+							CritMultiplier: character.DefaultSpellCritMultiplier(),
 						},
 					},
 					Effect: core.SpellHitEffect{
@@ -120,7 +120,7 @@ var ItemSetFistsOfFury = core.ItemSet{
 						if !hitEffect.Landed() || !hitEffect.IsWeaponHit() || !hitEffect.IsMelee() {
 							return
 						}
-						if !ppmm.Proc(sim, hitEffect.IsMH(), false, "Fists of Fury") {
+						if !ppmm.Proc(sim, hitEffect.IsMH(), false, "The Fists of Fury") {
 							return
 						}
 
