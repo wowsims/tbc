@@ -130,7 +130,9 @@ var hunterPetBaseStats = stats.Stats{
 	stats.Agility:     127,
 	stats.Strength:    162,
 	stats.AttackPower: -20, // Apparently pets and warriors have a AP penalty.
-	stats.MeleeCrit:   1.1515 * core.MeleeCritRatingPerCritChance,
+
+	// Add 1.8% because pets aren't affected by that component of crit suppression.
+	stats.MeleeCrit: (1.1515 + 1.8) * core.MeleeCritRatingPerCritChance,
 }
 
 var hunterPetStatInheritance = func(ownerStats stats.Stats) stats.Stats {
