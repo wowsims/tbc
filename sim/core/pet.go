@@ -28,6 +28,9 @@ type Pet struct {
 	// Calculates inherited stats based on owner stats or stat changes.
 	statInheritance PetStatInheritance
 
+	// No-op until finalized to prevent owner stats from affecting pet until we're ready.
+	currentStatInheritance PetStatInheritance
+
 	initialEnabled bool
 
 	// Whether this pet is currently active. Pets which are active throughout a whole
@@ -57,6 +60,9 @@ func NewPet(name string, owner *Character, baseStats stats.Stats, statInheritanc
 		statInheritance: statInheritance,
 		initialEnabled:  enabledOnStart,
 	}
+	pet.currentStatInheritance = func(ownerStats stats.Stats) stats.Stats {
+		return stats.Stats{}
+	}
 
 	pet.AddStats(baseStats)
 	pet.addUniversalStatDependencies()
@@ -68,7 +74,7 @@ func NewPet(name string, owner *Character, baseStats stats.Stats, statInheritanc
 // addedStats is the amount of stats added to the owner (will be negative if the
 // owner lost stats).
 func (pet *Pet) addOwnerStats(addedStats stats.Stats) {
-	inheritedChange := pet.statInheritance(addedStats)
+	inheritedChange := pet.currentStatInheritance(addedStats)
 	pet.AddStats(inheritedChange)
 }
 func (pet *Pet) addOwnerStat(stat stats.Stat, addedAmount float64) {
@@ -82,6 +88,7 @@ func (pet *Pet) addOwnerStat(stat stats.Stat, addedAmount float64) {
 func (pet *Pet) Finalize() {
 	inheritedStats := pet.statInheritance(pet.Owner.GetStats())
 	pet.AddStats(inheritedStats)
+	pet.currentStatInheritance = pet.statInheritance
 	pet.Character.Finalize()
 }
 
