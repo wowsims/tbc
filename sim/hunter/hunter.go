@@ -150,11 +150,6 @@ func NewHunter(character core.Character, options proto.Player) *Hunter {
 	}
 	hunter.hasGronnstalker2Pc = ItemSetGronnstalker.CharacterHasSetBonus(&hunter.Character, 2)
 
-	if !hunter.Rotation.UseMultiShot && !hunter.Rotation.UseArcaneShot {
-		// Disable french rotation if we don't have any spells to use it with.
-		hunter.Rotation.UseFrenchRotation = false
-	}
-
 	hunter.PseudoStats.RangedSpeedMultiplier = 1
 	hunter.EnableManaBar()
 	hunter.EnableAutoAttacks(hunter, core.AutoAttackOptions{
