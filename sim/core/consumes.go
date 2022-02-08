@@ -327,10 +327,14 @@ func registerDrumsCD(agent Agent, partyBuffs proto.PartyBuffs, consumes proto.Co
 						for _, agent := range character.Party.Players {
 							applyDrums(sim, agent.GetCharacter())
 						}
-						for _, petAgent := range character.Party.Pets {
-							pet := petAgent.GetPet()
-							if pet.IsEnabled() {
-								applyDrums(sim, &pet.Character)
+
+						// Drums of battle doesn't affect pets, ask Blizzard
+						if drumsType != proto.Drums_DrumsOfBattle {
+							for _, petAgent := range character.Party.Pets {
+								pet := petAgent.GetPet()
+								if pet.IsEnabled() {
+									applyDrums(sim, &pet.Character)
+								}
 							}
 						}
 
@@ -353,10 +357,14 @@ func registerDrumsCD(agent Agent, partyBuffs proto.PartyBuffs, consumes proto.Co
 			return applyDrums
 			return func(sim *Simulation, character *Character) {
 				applyDrums(sim, character)
-				for _, petAgent := range character.Pets {
-					pet := petAgent.GetPet()
-					if pet.IsEnabled() {
-						applyDrums(sim, &pet.Character)
+
+				// Drums of battle doesn't affect pets, ask Blizzard
+				if drumsType != proto.Drums_DrumsOfBattle {
+					for _, petAgent := range character.Pets {
+						pet := petAgent.GetPet()
+						if pet.IsEnabled() {
+							applyDrums(sim, &pet.Character)
+						}
 					}
 				}
 			}
