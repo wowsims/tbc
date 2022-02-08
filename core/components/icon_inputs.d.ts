@@ -1,4 +1,5 @@
 import { ActionId } from '/tbc/core/proto_utils/action_id.js';
+import { TristateEffect } from '/tbc/core/proto/common.js';
 import { IndividualSimIconPickerConfig } from '/tbc/core/individual_sim_ui.js';
 import { Party } from '/tbc/core/party.js';
 import { Player } from '/tbc/core/player.js';
@@ -95,14 +96,16 @@ export declare const DrumsOfRestorationConsume: IndividualSimIconPickerConfig<Pl
 export declare const GraceOfAirTotem: {
     id: ActionId;
     states: number;
+    improvedId: ActionId;
     changedEvent: (party: Party) => TypedEvent<void>;
-    getValue: (party: Party) => boolean;
-    setValue: (eventID: EventID, party: Party, newValue: boolean) => void;
+    getValue: (party: Party) => TristateEffect;
+    setValue: (eventID: EventID, party: Party, newValue: number) => void;
 };
 export declare const StrengthOfEarthTotem: {
     id: ActionId;
     states: number;
     improvedId: ActionId;
+    improvedId2: ActionId;
     changedEvent: (party: Party) => TypedEvent<void>;
     getValue: (party: Party) => number;
     setValue: (eventID: EventID, party: Party, newValue: number) => void;

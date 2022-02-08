@@ -546,7 +546,7 @@ class Hunter_Rotation$Type extends MessageType {
             { no: 1, name: "use_multi_shot", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 2, name: "use_arcane_shot", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 3, name: "precast_aimed_shot", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
-            { no: 11, name: "use_french_rotation", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 12, name: "lazy_rotation", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 5, name: "sting", kind: "enum", T: () => ["proto.Hunter.Rotation.StingType", Hunter_Rotation_StingType] },
             { no: 6, name: "viper_start_mana_percent", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
             { no: 7, name: "viper_stop_mana_percent", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
@@ -557,7 +557,7 @@ class Hunter_Rotation$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { useMultiShot: false, useArcaneShot: false, precastAimedShot: false, useFrenchRotation: false, sting: 0, viperStartManaPercent: 0, viperStopManaPercent: 0, meleeWeave: false, useRaptorStrike: false, timeToWeaveMs: 0, percentWeaved: 0 };
+        const message = { useMultiShot: false, useArcaneShot: false, precastAimedShot: false, lazyRotation: false, sting: 0, viperStartManaPercent: 0, viperStopManaPercent: 0, meleeWeave: false, useRaptorStrike: false, timeToWeaveMs: 0, percentWeaved: 0 };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -577,8 +577,8 @@ class Hunter_Rotation$Type extends MessageType {
                 case /* bool precast_aimed_shot */ 3:
                     message.precastAimedShot = reader.bool();
                     break;
-                case /* bool use_french_rotation */ 11:
-                    message.useFrenchRotation = reader.bool();
+                case /* bool lazy_rotation */ 12:
+                    message.lazyRotation = reader.bool();
                     break;
                 case /* proto.Hunter.Rotation.StingType sting */ 5:
                     message.sting = reader.int32();
@@ -622,9 +622,9 @@ class Hunter_Rotation$Type extends MessageType {
         /* bool precast_aimed_shot = 3; */
         if (message.precastAimedShot !== false)
             writer.tag(3, WireType.Varint).bool(message.precastAimedShot);
-        /* bool use_french_rotation = 11; */
-        if (message.useFrenchRotation !== false)
-            writer.tag(11, WireType.Varint).bool(message.useFrenchRotation);
+        /* bool lazy_rotation = 12; */
+        if (message.lazyRotation !== false)
+            writer.tag(12, WireType.Varint).bool(message.lazyRotation);
         /* proto.Hunter.Rotation.StingType sting = 5; */
         if (message.sting !== 0)
             writer.tag(5, WireType.Varint).int32(message.sting);

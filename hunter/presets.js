@@ -4,6 +4,7 @@ import { Flask } from '/tbc/core/proto/common.js';
 import { Food } from '/tbc/core/proto/common.js';
 import { ItemSpec } from '/tbc/core/proto/common.js';
 import { Potions } from '/tbc/core/proto/common.js';
+import { WeaponImbue } from '/tbc/core/proto/common.js';
 import { Hunter_Rotation as HunterRotation, Hunter_Options as HunterOptions, Hunter_Options_Ammo as Ammo, Hunter_Options_QuiverBonus as QuiverBonus, Hunter_Options_PetType as PetType, } from '/tbc/core/proto/hunter.js';
 import * as Enchants from '/tbc/core/constants/enchants.js';
 import * as Gems from '/tbc/core/proto_utils/gems.js';
@@ -27,12 +28,13 @@ export const SurvivalTalents = {
 };
 export const DefaultRotation = HunterRotation.create({
     useMultiShot: true,
+    useArcaneShot: true,
     viperStartManaPercent: 0.2,
     viperStopManaPercent: 0.4,
-    meleeWeave: false,
+    meleeWeave: true,
     useRaptorStrike: true,
     timeToWeaveMs: 500,
-    percentWeaved: 1,
+    percentWeaved: 0.8,
 });
 export const DefaultOptions = HunterOptions.create({
     quiverBonus: QuiverBonus.Speed15,
@@ -43,6 +45,8 @@ export const DefaultConsumes = Consumes.create({
     defaultPotion: Potions.HastePotion,
     flask: Flask.FlaskOfRelentlessAssault,
     food: Food.FoodGrilledMudfish,
+    mainHandImbue: WeaponImbue.WeaponImbueAdamantiteSharpeningStone,
+    offHandImbue: WeaponImbue.WeaponImbueAdamantiteSharpeningStone,
 });
 export const P1_BM_PRESET = {
     name: 'P1 BM Preset',

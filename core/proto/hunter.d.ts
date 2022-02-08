@@ -229,9 +229,9 @@ export interface Hunter_Rotation {
      */
     precastAimedShot: boolean;
     /**
-     * @generated from protobuf field: bool use_french_rotation = 11;
+     * @generated from protobuf field: bool lazy_rotation = 12;
      */
-    useFrenchRotation: boolean;
+    lazyRotation: boolean;
     /**
      * @generated from protobuf field: proto.Hunter.Rotation.StingType sting = 5;
      */
