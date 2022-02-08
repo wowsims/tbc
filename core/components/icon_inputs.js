@@ -322,10 +322,11 @@ export const StrengthOfEarthTotem = {
     improvedId: ActionId.fromSpellId(16295),
     improvedId2: ActionId.fromSpellId(37223),
     changedEvent: (party) => party.buffsChangeEmitter,
-    getValue: (party) => Math.min(3, party.getBuffs().strengthOfEarthTotem),
+    getValue: (party) => party.getBuffs().strengthOfEarthTotem > 2 ? party.getBuffs().strengthOfEarthTotem - 1 : party.getBuffs().strengthOfEarthTotem,
     setValue: (eventID, party, newValue) => {
         const newBuffs = party.getBuffs();
-        newBuffs.strengthOfEarthTotem = newValue == 3 ? 4 : newValue;
+        // Skip cyclone-only value.
+        newBuffs.strengthOfEarthTotem = newValue > 1 ? newValue + 1 : newValue;
         party.setBuffs(eventID, newBuffs);
     },
 };
