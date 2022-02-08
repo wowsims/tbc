@@ -140,7 +140,7 @@ func (hunter *Hunter) adaptiveRotation(sim *core.Simulation, followsAuto bool) {
 	}
 
 	canMulti := hunter.Rotation.UseMultiShot && !hunter.IsOnCD(MultiShotCooldownID, sim.CurrentTime)
-	steadyShotCastTime := time.Duration(float64(time.Second*1) / rangedSwingSpeed)
+	steadyShotCastTime := time.Duration(float64(time.Millisecond*1500) / rangedSwingSpeed)
 	if timeBeforeClip < steadyShotCastTime {
 		if canMulti {
 			ms := hunter.NewMultiShot(sim)
