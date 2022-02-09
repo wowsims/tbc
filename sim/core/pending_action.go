@@ -42,7 +42,6 @@ func (pa *PendingAction) Cancel(sim *Simulation) {
 	}
 
 	pa.cancelled = true
-	// sim.RemovePendingAction(pa)
 }
 
 type paPool struct {

@@ -141,6 +141,7 @@ func (pet *Pet) Disable(sim *Simulation) {
 
 	if pet.timeoutAction != nil {
 		pet.timeoutAction.Cancel(sim)
+		// sim.pendingActionPool.Put(pet.timeoutAction)
 		pet.timeoutAction = nil
 	}
 
@@ -153,11 +154,10 @@ func (pet *Pet) Disable(sim *Simulation) {
 func (pet *Pet) EnableWithTimeout(sim *Simulation, petAgent PetAgent, petDuration time.Duration) {
 	pet.Enable(sim, petAgent)
 
-	pet.timeoutAction = &PendingAction{
-		NextActionAt: sim.CurrentTime + petDuration,
-		OnAction: func(sim *Simulation) {
-			pet.Disable(sim)
-		},
+	pet.timeoutAction = sim.pendingActionPool.Get()
+	pet.timeoutAction.NextActionAt = sim.CurrentTime + petDuration
+	pet.timeoutAction.OnAction = func(sim *Simulation) {
+		pet.Disable(sim)
 	}
 	sim.AddPendingAction(pet.timeoutAction)
 }

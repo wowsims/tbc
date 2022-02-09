@@ -277,7 +277,7 @@ func (spell *SimpleSpell) Cast(sim *Simulation) bool {
 					if spell.currentDotAction == nil {
 						return
 					}
-					spell.currentDotAction.cancelled = true
+					// temp := spell.currentDotAction
 					spell.currentDotAction = nil
 
 					for i := range spell.Effects {
@@ -286,8 +286,9 @@ func (spell *SimpleSpell) Cast(sim *Simulation) bool {
 
 					spell.Character.Metrics.AddSpellCast(&spell.SpellCast)
 					spell.objectInUse = false
-					sim.RemovePendingAction(pa)
-					sim.pendingActionPool.Put(pa)
+
+					// sim.RemovePendingAction(temp)
+					// sim.pendingActionPool.Put(pa)
 				}
 
 				spell.currentDotAction = pa

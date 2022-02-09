@@ -35,8 +35,6 @@ func (character *Character) SetGCDTimer(sim *Simulation, gcdReadyAt time.Duratio
 
 	character.gcdAction.Cancel(sim)
 	oldAction := character.gcdAction.OnAction
-	sim.RemovePendingAction(character.gcdAction)
-	sim.pendingActionPool.Put(character.gcdAction)
 
 	character.gcdAction = sim.pendingActionPool.Get()
 	character.gcdAction.Priority = ActionPriorityGCD
