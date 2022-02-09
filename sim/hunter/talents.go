@@ -158,15 +158,17 @@ func (hunter *Hunter) applyFrenzy() {
 		procAura := core.Aura{
 			ID:       FrenzyProcAuraID,
 			ActionID: core.ActionID{SpellID: 19625},
-			Expires:  sim.CurrentTime + time.Second*8,
 			OnExpire: func(sim *core.Simulation) {
 				hunter.pet.PseudoStats.MeleeSpeedMultiplier /= 1.3
 			},
 		}
+
 		tryProcAura := func() {
 			if procChance == 1 || sim.RandomFloat("Frenzy") < procChance {
 				hunter.pet.PseudoStats.MeleeSpeedMultiplier *= 1.3
-				hunter.pet.AddAura(sim, procAura)
+				aura := procAura
+				aura.Expires = sim.CurrentTime + time.Second*8
+				hunter.pet.AddAura(sim, aura)
 			}
 		}
 

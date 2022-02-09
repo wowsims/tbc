@@ -375,6 +375,10 @@ func (ahe *AbilityHitEffect) calculateDamage(sim *Simulation, ability *ActiveMel
 		}
 	}
 
+	if sim.Log != nil {
+		character.Log(sim, "Melee dmg calcs: AP=%0.1f, bonusWepDmg:%0.1f, dmgMultiplier:%0.2f, staticMultiplier:%0.2f, result:%d, weaponDmgCalc: %0.1f, critMultiplier: %0.3f, Target armor: %0.1f\n", attackPower, bonusWeaponDamage, ahe.DamageMultiplier, ahe.StaticDamageMultiplier, ahe.HitType, dmg, ability.CritMultiplier, ahe.Target.currentArmor)
+	}
+
 	// Add damage from DirectInput
 	if ahe.DirectInput.MinBaseDamage != 0 {
 		dmg += ahe.DirectInput.MinBaseDamage + (ahe.DirectInput.MaxBaseDamage-ahe.DirectInput.MinBaseDamage)*sim.RandomFloat("Melee Direct Input")
@@ -405,9 +409,6 @@ func (ahe *AbilityHitEffect) calculateDamage(sim *Simulation, ability *ActiveMel
 	// Apply armor reduction.
 	if !ahe.IgnoreArmor {
 		dmg *= 1 - ahe.Target.ArmorDamageReduction(character.stats[stats.ArmorPenetration]+ahe.BonusArmorPenetration)
-		//if sim.Log != nil {
-		//	character.Log(sim, "Target armor: %0.2f\n", ahe.Target.currentArmor)
-		//}
 	}
 
 	// Apply all other effect multipliers.
@@ -747,6 +748,11 @@ func (aa *AutoAttacks) RangedSwingSpeed() time.Duration {
 // This function computes the amount of windup time based on the current haste.
 func (aa *AutoAttacks) RangedSwingWindup() time.Duration {
 	return time.Duration(float64(time.Millisecond*500) / aa.character.RangedSwingSpeed())
+}
+
+// Returns the amount of time available before ranged auto will be clipped.
+func (aa *AutoAttacks) TimeBeforeClippingRanged(sim *Simulation) time.Duration {
+	return aa.RangedSwingAt - aa.RangedSwingWindup() - sim.CurrentTime
 }
 
 // SwingMelee will check any swing timers if they are up, and if so, swing!

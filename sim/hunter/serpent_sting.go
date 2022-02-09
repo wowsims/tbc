@@ -69,6 +69,7 @@ func (hunter *Hunter) newSerpentStingTemplate(sim *core.Simulation) core.MeleeAb
 
 			// Set dynamic fields, i.e. the stuff we couldn't precompute.
 			dot.Effect.Target = hitEffect.Target
+			// TODO: This should probably include AP from mark of the champion / elixir of demonslaying / target debuffs
 			dot.Effect.DotInput.TickBaseDamage = 132 + hunter.GetStat(stats.RangedAttackPower)*0.02
 
 			dot.Init(sim)

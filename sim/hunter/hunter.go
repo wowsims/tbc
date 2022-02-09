@@ -40,9 +40,9 @@ type Hunter struct {
 
 	hasGronnstalker2Pc bool
 
-	killCommandEnabled bool                // True after landing a crit.
-	killCommandBlocked bool                // True while Steady Shot is casting, to prevent KC.
-	killCommandAction  *core.PendingAction // Action to use KC when its comes off CD.
+	killCommandEnabledUntil time.Duration       // Time that KC enablement expires.
+	killCommandBlocked      bool                // True while Steady Shot is casting, to prevent KC.
+	killCommandAction       *core.PendingAction // Action to use KC when its comes off CD.
 
 	timeToWeave time.Duration
 
@@ -126,7 +126,7 @@ func (hunter *Hunter) Init(sim *core.Simulation) {
 
 func (hunter *Hunter) Reset(sim *core.Simulation) {
 	hunter.aspectOfTheViper = false
-	hunter.killCommandEnabled = false
+	hunter.killCommandEnabledUntil = 0
 	hunter.killCommandBlocked = false
 	hunter.killCommandAction.NextActionAt = 0
 
@@ -149,11 +149,6 @@ func NewHunter(character core.Character, options proto.Player) *Hunter {
 		timeToWeave: time.Millisecond * time.Duration(hunterOptions.Rotation.TimeToWeaveMs),
 	}
 	hunter.hasGronnstalker2Pc = ItemSetGronnstalker.CharacterHasSetBonus(&hunter.Character, 2)
-
-	if !hunter.Rotation.UseMultiShot && !hunter.Rotation.UseArcaneShot {
-		// Disable french rotation if we don't have any spells to use it with.
-		hunter.Rotation.UseFrenchRotation = false
-	}
 
 	hunter.PseudoStats.RangedSpeedMultiplier = 1
 	hunter.EnableManaBar()
@@ -219,6 +214,7 @@ func NewHunter(character core.Character, options proto.Player) *Hunter {
 			hunter.AmmoDPS = 32
 		}
 		hunter.AmmoDamageBonus = hunter.AmmoDPS * hunter.AutoAttacks.Ranged.SwingSpeed
+		hunter.AutoAttacks.RangedAuto.Effect.WeaponInput.FlatDamageBonus += hunter.AmmoDamageBonus
 	}
 
 	switch hunter.Options.QuiverBonus {
@@ -255,6 +251,7 @@ func init() {
 
 		stats.AttackPower:       120,
 		stats.RangedAttackPower: 130,
+		stats.MeleeCrit:         -1.53 * core.MeleeCritRatingPerCritChance,
 	}
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceDraenei, Class: proto.Class_ClassHunter}] = stats.Stats{
 		stats.Strength:  65,
@@ -266,6 +263,7 @@ func init() {
 
 		stats.AttackPower:       120,
 		stats.RangedAttackPower: 130,
+		stats.MeleeCrit:         -1.53 * core.MeleeCritRatingPerCritChance,
 	}
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceDwarf, Class: proto.Class_ClassHunter}] = stats.Stats{
 		stats.Strength:  66,
@@ -277,6 +275,7 @@ func init() {
 
 		stats.AttackPower:       120,
 		stats.RangedAttackPower: 130,
+		stats.MeleeCrit:         -1.53 * core.MeleeCritRatingPerCritChance,
 	}
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceNightElf, Class: proto.Class_ClassHunter}] = stats.Stats{
 		stats.Strength:  61,
@@ -288,6 +287,7 @@ func init() {
 
 		stats.AttackPower:       120,
 		stats.RangedAttackPower: 130,
+		stats.MeleeCrit:         -1.53 * core.MeleeCritRatingPerCritChance,
 	}
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceOrc, Class: proto.Class_ClassHunter}] = stats.Stats{
 		stats.Strength:  67,
@@ -299,6 +299,7 @@ func init() {
 
 		stats.AttackPower:       120,
 		stats.RangedAttackPower: 130,
+		stats.MeleeCrit:         -1.53 * core.MeleeCritRatingPerCritChance,
 	}
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceTauren, Class: proto.Class_ClassHunter}] = stats.Stats{
 		stats.Strength:  69,
@@ -310,6 +311,7 @@ func init() {
 
 		stats.AttackPower:       120,
 		stats.RangedAttackPower: 130,
+		stats.MeleeCrit:         -1.53 * core.MeleeCritRatingPerCritChance,
 	}
 	trollStats := stats.Stats{
 		stats.Strength:  65,
@@ -321,6 +323,7 @@ func init() {
 
 		stats.AttackPower:       120,
 		stats.RangedAttackPower: 130,
+		stats.MeleeCrit:         -1.53 * core.MeleeCritRatingPerCritChance,
 	}
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceTroll10, Class: proto.Class_ClassHunter}] = trollStats
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceTroll30, Class: proto.Class_ClassHunter}] = trollStats

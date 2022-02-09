@@ -48,10 +48,6 @@ func (hunter *Hunter) NewHunterPet() *HunterPet {
 	// Happiness
 	hp.damageMultiplier *= 1.25
 
-	// Cobra reflexes
-	hp.PseudoStats.MeleeSpeedMultiplier *= 1.3
-	hp.damageMultiplier *= 0.85
-
 	hp.EnableFocusBar(1.0+0.5*float64(hunter.Talents.BestialDiscipline), func(sim *core.Simulation) {
 		if !hp.IsOnCD(core.GCDCooldownID, sim.CurrentTime) {
 			hp.OnGCDReady(sim)
@@ -65,13 +61,18 @@ func (hunter *Hunter) NewHunterPet() *HunterPet {
 
 	hp.EnableAutoAttacks(hp, core.AutoAttackOptions{
 		MainHand: core.Weapon{
-			BaseDamageMin: 42 - casterPenalty,
-			BaseDamageMax: 68 - casterPenalty,
-			SwingSpeed:    2,
-			SwingDuration: time.Second * 2,
+			BaseDamageMin:  42 - casterPenalty,
+			BaseDamageMax:  68 - casterPenalty,
+			SwingSpeed:     2,
+			SwingDuration:  time.Second * 2,
+			CritMultiplier: 2,
 		},
 		AutoSwingMelee: true,
 	})
+
+	// Cobra reflexes
+	hp.PseudoStats.MeleeSpeedMultiplier *= 1.3
+	hp.AutoAttacks.ActiveMeleeAbility.Effect.DamageMultiplier *= 0.85
 
 	hp.AddStatDependency(stats.StatDependency{
 		SourceStat:   stats.Strength,
@@ -108,6 +109,11 @@ func (hp *HunterPet) Init(sim *core.Simulation) {
 
 func (hp *HunterPet) Reset(sim *core.Simulation) {
 	hp.focusBar.reset(sim)
+	if sim.Log != nil {
+		hp.Log(sim, "Total Pet stats: %s", hp.GetStats())
+		inheritedStats := hunterPetStatInheritance(hp.hunterOwner.GetStats())
+		hp.Log(sim, "Inherited Pet stats: %s", inheritedStats)
+	}
 }
 
 func (hp *HunterPet) OnGCDReady(sim *core.Simulation) {
@@ -121,9 +127,12 @@ func (hp *HunterPet) OnGCDReady(sim *core.Simulation) {
 
 // These numbers are just rough guesses based on looking at some logs.
 var hunterPetBaseStats = stats.Stats{
-	stats.Agility:   127,
-	stats.Strength:  162,
-	stats.MeleeCrit: 1.1515 * core.MeleeCritRatingPerCritChance,
+	stats.Agility:     127,
+	stats.Strength:    162,
+	stats.AttackPower: -20, // Apparently pets and warriors have a AP penalty.
+
+	// Add 1.8% because pets aren't affected by that component of crit suppression.
+	stats.MeleeCrit: (1.1515 + 1.8) * core.MeleeCritRatingPerCritChance,
 }
 
 var hunterPetStatInheritance = func(ownerStats stats.Stats) stats.Stats {
