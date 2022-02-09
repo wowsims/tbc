@@ -1,11 +1,14 @@
 package hunter
 
 import (
+	"time"
+
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 var KillCommandCooldownID = core.NewCooldownID()
+var KillCommandActionID = core.ActionID{SpellID: 34026, CooldownID: KillCommandCooldownID}
 
 var KillCommandAuraID = core.NewAuraID()
 
@@ -19,7 +22,7 @@ func (hunter *Hunter) applyKillCommand() {
 			ID: KillCommandAuraID,
 			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
 				if hitEffect.HitType == core.MeleeHitTypeCrit {
-					hunter.killCommandEnabled = true
+					hunter.killCommandEnabledUntil = sim.CurrentTime + time.Second*5
 					hunter.TryKillCommand(sim, sim.GetPrimaryTarget())
 				}
 			},
@@ -31,10 +34,11 @@ func (hunter *Hunter) applyKillCommand() {
 func (hunter *Hunter) newKillCommandTemplate(sim *core.Simulation) core.SimpleCast {
 	template := core.SimpleCast{
 		Cast: core.Cast{
-			ActionID:     core.ActionID{SpellID: 34026, CooldownID: KillCommandCooldownID},
+			ActionID:     KillCommandActionID,
 			Character:    hunter.GetCharacter(),
 			BaseManaCost: 75,
 			ManaCost:     75,
+			Cooldown:     time.Second * 5,
 		},
 	}
 
@@ -52,6 +56,9 @@ func (hunter *Hunter) newKillCommandTemplate(sim *core.Simulation) core.SimpleCa
 }
 
 func (hp *HunterPet) newKillCommandTemplate(sim *core.Simulation) core.MeleeAbilityTemplate {
+	hasBeastLord4Pc := ItemSetBeastLord.CharacterHasSetBonus(&hp.hunterOwner.Character, 4)
+	beastLordApplier := hp.hunterOwner.NewTempStatAuraApplier(sim, BeastLord4PcAuraID, core.ActionID{SpellID: 37483}, stats.ArmorPenetration, 600, time.Second*15)
+
 	ama := core.ActiveMeleeAbility{
 		MeleeAbility: core.MeleeAbility{
 			ActionID:       core.ActionID{SpellID: 34027},
@@ -70,6 +77,11 @@ func (hp *HunterPet) newKillCommandTemplate(sim *core.Simulation) core.MeleeAbil
 				FlatDamageBonus:  127,
 			},
 		},
+		OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
+			if hasBeastLord4Pc {
+				beastLordApplier(sim)
+			}
+		},
 	}
 
 	ama.Effect.BonusCritRating += float64(hp.hunterOwner.Talents.FocusedFire) * 10 * core.MeleeCritRatingPerCritChance
@@ -82,7 +94,7 @@ func (hunter *Hunter) NewKillCommand(sim *core.Simulation, target *core.Target) 
 
 	// Set dynamic fields, i.e. the stuff we couldn't precompute.
 	killCommand.OnCastComplete = func(sim *core.Simulation, cast *core.Cast) {
-		hunter.killCommandEnabled = false
+		hunter.killCommandEnabledUntil = 0
 
 		kc := &hunter.pet.killCommand
 		hunter.pet.killCommandTemplate.Apply(kc)
@@ -95,7 +107,7 @@ func (hunter *Hunter) NewKillCommand(sim *core.Simulation, target *core.Target) 
 }
 
 func (hunter *Hunter) TryKillCommand(sim *core.Simulation, target *core.Target) {
-	if !hunter.killCommandEnabled {
+	if hunter.killCommandEnabledUntil < sim.CurrentTime || hunter.killCommandBlocked {
 		return
 	}
 

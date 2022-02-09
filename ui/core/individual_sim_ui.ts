@@ -12,6 +12,7 @@ import { Encounter } from './encounter.js';
 import { EncounterPicker, EncounterPickerConfig } from '/tbc/core/components/encounter_picker.js';
 import { EnumPicker, EnumPickerConfig } from '/tbc/core/components/enum_picker.js';
 import { EquipmentSpec } from '/tbc/core/proto/common.js';
+import { Flask } from '/tbc/core/proto/common.js';
 import { Gear } from '/tbc/core/proto_utils/gear.js';
 import { GearPicker } from '/tbc/core/components/gear_picker.js';
 import { IconPicker, IconPickerConfig } from '/tbc/core/components/icon_picker.js';
@@ -154,6 +155,7 @@ export interface IndividualSimUIConfig<SpecType extends Spec> {
 
 	// Extra UI sections with the same input config as other sections.
   additionalSections?: Record<string, InputSection>;
+  additionalIconSections?: Record<string, Array<IndividualSimIconPickerConfig<Player<any>, any>>>;
 
 	// For when extra sections are needed, with even more flexibility than additionalSections.
 	// Return value is the label for the section.
@@ -230,6 +232,7 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
       'Battle Elixir': [],
       'Drums': [],
       'Food': [],
+      'Pet Food': [],
       'Alchohol': [],
       'Guardian Elixir': [],
       'Potion': [],
@@ -268,36 +271,16 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 				// Remove leading '#'
 				hash = hash.substring(1);
 				try {
-					let jsonData;
-					if (new URLSearchParams(window.location.search).has('uncompressed')) {
-						const jsonStr = atob(hash);
-						const jsonData = JSON.parse(jsonStr);
-						this.sim.fromJson(initEventID, jsonData, this.player.spec);
-						loadedSettings = true;
-					} else {
-						const binary = atob(hash);
-						const bytes = new Uint8Array(binary.length);
-						for (let i = 0; i < bytes.length; i++) {
-								bytes[i] = binary.charCodeAt(i);
-						}
-						const jsonStr = pako.inflate(bytes, { to: 'string' });  
-						try {
-							jsonData = JSON.parse(jsonStr);
-						} catch (e) {
-							// Json parse failure just means we're using the new proto format so its ok.
-						}
-
-						if (jsonData) {
-							this.sim.fromJson(initEventID, jsonData, this.player.spec);
-							loadedSettings = true;
-						} else {
-							// TODO: Deprecate the json pathways and make this the default on January 25th, 2022 (1 month).
-							const settingsBytes = pako.inflate(bytes);  
-							const settings = IndividualSimSettings.fromBinary(settingsBytes);
-							this.fromProto(initEventID, settings);
-							loadedSettings = true;
-						}
+					const binary = atob(hash);
+					const bytes = new Uint8Array(binary.length);
+					for (let i = 0; i < bytes.length; i++) {
+							bytes[i] = binary.charCodeAt(i);
 					}
+
+					const settingsBytes = pako.inflate(bytes);  
+					const settings = IndividualSimSettings.fromBinary(settingsBytes);
+					this.fromProto(initEventID, settings);
+					loadedSettings = true;
 				} catch (e) {
 					console.warn('Failed to parse settings from window hash: ' + e);
 				}
@@ -307,13 +290,8 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 			const savedSettings = window.localStorage.getItem(this.getSettingsStorageKey());
 			if (!loadedSettings && savedSettings != null) {
 				try {
-					const jsonData = JSON.parse(savedSettings);
-					if (jsonData?.raid) {
-						this.sim.fromJson(initEventID, jsonData, this.player.spec);
-					} else {
-						const settings = IndividualSimSettings.fromJsonString(savedSettings);
-						this.fromProto(initEventID, settings);
-					}
+					const settings = IndividualSimSettings.fromJsonString(savedSettings);
+					this.fromProto(initEventID, settings);
 					loadedSettings = true;
 				} catch (e) {
 					console.warn('Failed to parse saved settings: ' + e);
@@ -323,6 +301,17 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 			if (!loadedSettings) {
 				this.applyDefaults(initEventID);
 			}
+
+			// Fix some bad defaults we used to have to enhance.
+			if (this.player.spec == Spec.SpecEnhancementShaman) {
+				const consumes = this.player.getConsumes();
+				if (consumes.flask == Flask.FlaskOfBlindingLight) {
+					consumes.flask = Flask.FlaskUnknown;
+				}
+				consumes.mainHandImbue = 0;
+				this.player.setConsumes(initEventID, consumes);
+			}
+
 			this.player.setName(initEventID, 'Player');
 
 			// This needs to go last so it doesn't re-store things as they are initialized.
@@ -654,6 +643,16 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 			anyCustomSections = true;
     };
 
+		for (const [sectionName, sectionConfig] of Object.entries(this.individualConfig.additionalIconSections || {})) {
+			const sectionCssPrefix = sectionName.replace(/\s+/g, '');
+      const sectionElem = document.createElement('fieldset');
+      sectionElem.classList.add('settings-section', sectionCssPrefix + '-section');
+      sectionElem.innerHTML = `<legend>${sectionName}</legend>`;
+      customSectionsContainer.appendChild(sectionElem);
+			configureIconSection(sectionElem, sectionConfig.map(iconInput => new IndividualSimIconPicker(sectionElem, this.player, iconInput, this)));
+			anyCustomSections = true;
+    };
+
 		(this.individualConfig.customSections || []).forEach(customSection => {
       const sectionElem = document.createElement('fieldset');
       customSectionsContainer.appendChild(sectionElem);
@@ -835,6 +834,7 @@ export type ExclusivityTag =
     'Battle Elixir'
     | 'Drums'
     | 'Food'
+    | 'Pet Food'
     | 'Alchohol'
     | 'Guardian Elixir'
     | 'Potion'

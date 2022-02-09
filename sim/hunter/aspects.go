@@ -29,7 +29,7 @@ func (hunter *Hunter) aspectOfTheHawkAura() core.Aura {
 				return
 			}
 
-			if improvedHawkBonus > 0 && sim.RandomFloat("Imp Aspect of the Hawk") < improvedHawkProcChance {
+			if improvedHawkBonus > 1 && sim.RandomFloat("Imp Aspect of the Hawk") < improvedHawkProcChance {
 				hunter.PseudoStats.RangedSpeedMultiplier *= improvedHawkBonus
 				hunter.AddAura(sim, core.Aura{
 					ID:       ImprovedAspectOfTheHawkAuraID,
@@ -53,6 +53,8 @@ func (hunter *Hunter) applyAspectOfTheHawk() {
 }
 
 func (hunter *Hunter) newAspectOfTheHawkTemplate(sim *core.Simulation) core.SimpleCast {
+	aura := hunter.aspectOfTheHawkAura()
+
 	template := core.SimpleCast{
 		Cast: core.Cast{
 			ActionID:     AspectOfTheHawkActionID,
@@ -60,9 +62,11 @@ func (hunter *Hunter) newAspectOfTheHawkTemplate(sim *core.Simulation) core.Simp
 			BaseManaCost: 140,
 			ManaCost:     140,
 			GCD:          core.GCDDefault,
+			IgnoreHaste:  true, // Hunter GCD is locked at 1.5s
 			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
 				hunter.aspectOfTheViper = false
-				hunter.changingAspects = true
+				hunter.RemoveAuraOnNextAdvance(sim, AspectOfTheHawkAuraID)
+				hunter.AddAura(sim, aura)
 			},
 		},
 	}
@@ -74,17 +78,14 @@ func (hunter *Hunter) NewAspectOfTheHawk(sim *core.Simulation) core.SimpleCast {
 	return hunter.aspectOfTheHawkTemplate
 }
 
-func (hunter *Hunter) aspectOfTheViperAura() core.Aura {
-	return core.Aura{
+func (hunter *Hunter) newAspectOfTheViperTemplate(sim *core.Simulation) core.SimpleCast {
+	aura := core.Aura{
 		ID:       AspectOfTheViperAuraID,
 		ActionID: AspectOfTheViperActionID,
 		Expires:  core.NeverExpires,
 		// Mana gain from viper is handled in rotation.go
 	}
 
-}
-
-func (hunter *Hunter) newAspectOfTheViperTemplate(sim *core.Simulation) core.SimpleCast {
 	template := core.SimpleCast{
 		Cast: core.Cast{
 			ActionID:     core.ActionID{SpellID: 34074},
@@ -92,9 +93,11 @@ func (hunter *Hunter) newAspectOfTheViperTemplate(sim *core.Simulation) core.Sim
 			BaseManaCost: 40,
 			ManaCost:     40,
 			GCD:          core.GCDDefault,
+			IgnoreHaste:  true, // Hunter GCD is locked at 1.5s
 			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
 				hunter.aspectOfTheViper = true
-				hunter.changingAspects = true
+				hunter.RemoveAuraOnNextAdvance(sim, AspectOfTheHawkAuraID)
+				hunter.AddAura(sim, aura)
 			},
 		},
 	}

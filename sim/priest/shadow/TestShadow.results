@@ -99,6 +99,12 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestShadow-AllItems-BlazefuryMedallion-17111"
+ value: {
+  dps: 1474.6290018708899
+ }
+}
+dps_results: {
  key: "TestShadow-AllItems-BloodlustBrooch-29383"
  value: {
   dps: 1446.8793857509806
@@ -575,7 +581,7 @@ dps_results: {
 dps_results: {
  key: "TestShadow-SelfDrums-DPS"
  value: {
-  dps: 1492.4752374336288
+  dps: 1492.8751334943327
  }
 }
 dps_results: {

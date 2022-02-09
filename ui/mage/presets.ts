@@ -1,9 +1,12 @@
 import { Conjured } from '/tbc/core/proto/common.js';
 import { Consumes } from '/tbc/core/proto/common.js';
 import { EquipmentSpec } from '/tbc/core/proto/common.js';
+import { Flask } from '/tbc/core/proto/common.js';
+import { Food } from '/tbc/core/proto/common.js';
 import { ItemSpec } from '/tbc/core/proto/common.js';
 import { Potions } from '/tbc/core/proto/common.js';
 import { Spec } from '/tbc/core/proto/common.js';
+import { WeaponImbue } from '/tbc/core/proto/common.js';
 import { Faction } from '/tbc/core/proto_utils/utils.js';
 import { Player } from '/tbc/core/player.js';
 
@@ -53,10 +56,10 @@ export const DefaultFireOptions = MageOptions.create({
 });
 
 export const DefaultFireConsumes = Consumes.create({
+	flask: Flask.FlaskOfPureDeath,
+	food: Food.FoodBlackenedBasilisk,
+	mainHandImbue: WeaponImbue.WeaponImbueBrilliantWizardOil,
 	defaultPotion: Potions.SuperManaPotion,
-	flaskOfPureDeath: true,
-	brilliantWizardOil: true,
-	blackenedBasilisk: true,
 	defaultConjured: Conjured.ConjuredFlameCap,
 });
 
@@ -74,9 +77,9 @@ export const DefaultFrostOptions = MageOptions.create({
 
 export const DefaultFrostConsumes = Consumes.create({
 	defaultPotion: Potions.SuperManaPotion,
-	flaskOfPureDeath: true,
-	brilliantWizardOil: true,
-	blackenedBasilisk: true,
+	flask: Flask.FlaskOfPureDeath,
+	food: Food.FoodBlackenedBasilisk,
+	mainHandImbue: WeaponImbue.WeaponImbueBrilliantWizardOil,
 });
 
 export const DefaultArcaneRotation = MageRotation.create({
@@ -96,9 +99,9 @@ export const DefaultArcaneOptions = MageOptions.create({
 
 export const DefaultArcaneConsumes = Consumes.create({
 	defaultPotion: Potions.SuperManaPotion,
-	flaskOfBlindingLight: true,
-	brilliantWizardOil: true,
-	blackenedBasilisk: true,
+	flask: Flask.FlaskOfBlindingLight,
+	food: Food.FoodBlackenedBasilisk,
+	mainHandImbue: WeaponImbue.WeaponImbueBrilliantWizardOil,
 });
 
 export const P1_ARCANE_PRESET = {

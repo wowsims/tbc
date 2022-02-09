@@ -58,17 +58,31 @@ message HunterTalents {
 
 message Hunter {
     message Rotation {
-			bool adaptive = 1;
-			bool use_multi_shot = 2;
-			bool use_arcane_shot = 3;
-			bool maintain_scorpid_sting = 4;
-			bool precast_aimed_shot = 5;
-			bool melee_weave = 6;
+			bool use_multi_shot = 1;
+			bool use_arcane_shot = 2;
+			bool precast_aimed_shot = 3;
+			bool lazy_rotation = 12; // Restricts to 1 action between each auto shot.
+
+			enum StingType {
+					NoSting = 0;
+					ScorpidSting = 1;
+					SerpentSting = 2;
+			}
+			StingType sting = 5;
 
 			// Switch to Aspect of the Viper when mana goes below this percent.
-			double viper_start_mana_percent = 7;
+			double viper_start_mana_percent = 6;
 			// Switch back to Aspect of the Hawk when mana goes above this percent.
-			double viper_stop_mana_percent = 8;
+			double viper_stop_mana_percent = 7;
+
+			bool melee_weave = 4;
+			bool use_raptor_strike = 8;
+
+			// Time in milliseconds from when the hunter starts moving to when they reengage their ranged autos.
+			int32 time_to_weave_ms = 9;
+
+			// Percent of fight (0-1) to use melee weaving.
+			double percent_weaved = 10;
     }
     Rotation rotation = 1;
 

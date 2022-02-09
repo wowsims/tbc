@@ -10,132 +10,178 @@ import (
 // Registers all consume-related effects to the Agent.
 func applyConsumeEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs proto.PartyBuffs) {
 	character := agent.GetCharacter()
-	consumes := character.consumes
+	consumes := character.Consumes
 
-	character.AddStats(consumesStats(character, consumes, raidBuffs))
+	if consumes.Flask != proto.Flask_FlaskUnknown {
+		switch consumes.Flask {
+		case proto.Flask_FlaskOfBlindingLight:
+			character.AddStats(stats.Stats{
+				stats.NatureSpellPower: 80,
+				stats.ArcaneSpellPower: 80,
+				stats.HolySpellPower:   80,
+			})
+		case proto.Flask_FlaskOfMightyRestoration:
+			character.AddStats(stats.Stats{
+				stats.MP5: 25,
+			})
+		case proto.Flask_FlaskOfPureDeath:
+			character.AddStats(stats.Stats{
+				stats.FireSpellPower:   80,
+				stats.FrostSpellPower:  80,
+				stats.ShadowSpellPower: 80,
+			})
+		case proto.Flask_FlaskOfRelentlessAssault:
+			character.AddStats(stats.Stats{
+				stats.AttackPower:       120,
+				stats.RangedAttackPower: 120,
+			})
+		case proto.Flask_FlaskOfSupremePower:
+			character.AddStats(stats.Stats{
+				stats.SpellPower: 70,
+			})
+		}
+	} else {
+		switch consumes.BattleElixir {
+		case proto.BattleElixir_AdeptsElixir:
+			character.AddStats(stats.Stats{
+				stats.SpellCrit:    24,
+				stats.SpellPower:   24,
+				stats.HealingPower: 24,
+			})
+		case proto.BattleElixir_ElixirOfDemonslaying:
+			character.AddPermanentAura(func(sim *Simulation) Aura {
+				return ElixirOfDemonslayingAura()
+			})
+		case proto.BattleElixir_ElixirOfMajorAgility:
+			character.AddStats(stats.Stats{
+				stats.Agility:   35,
+				stats.MeleeCrit: 20,
+			})
+		case proto.BattleElixir_ElixirOfMajorFirePower:
+			character.AddStats(stats.Stats{
+				stats.FireSpellPower: 55,
+			})
+		case proto.BattleElixir_ElixirOfMajorFrostPower:
+			character.AddStats(stats.Stats{
+				stats.FrostSpellPower: 55,
+			})
+		case proto.BattleElixir_ElixirOfMajorShadowPower:
+			character.AddStats(stats.Stats{
+				stats.ShadowSpellPower: 55,
+			})
+		case proto.BattleElixir_ElixirOfMajorStrength:
+			character.AddStats(stats.Stats{
+				stats.Strength: 35,
+			})
+		case proto.BattleElixir_ElixirOfTheMongoose:
+			character.AddStats(stats.Stats{
+				stats.Agility:   25,
+				stats.MeleeCrit: 28,
+			})
+		}
 
-	if consumes.ElixirOfDemonslaying {
-		character.AddPermanentAura(func(sim *Simulation) Aura {
-			return ElixirOfDemonslayingAura()
+		switch consumes.GuardianElixir {
+		case proto.GuardianElixir_ElixirOfDraenicWisdom:
+			character.AddStats(stats.Stats{
+				stats.Intellect: 30,
+				stats.Spirit:    30,
+			})
+		case proto.GuardianElixir_ElixirOfMajorMageblood:
+			character.AddStats(stats.Stats{
+				stats.MP5: 16.0,
+			})
+		}
+	}
+
+	switch consumes.Food {
+	case proto.Food_FoodBlackenedBasilisk:
+		character.AddStats(stats.Stats{
+			stats.SpellPower:   23,
+			stats.HealingPower: 23,
+			stats.Spirit:       20,
+		})
+	case proto.Food_FoodGrilledMudfish:
+		character.AddStats(stats.Stats{
+			stats.Agility: 20,
+			stats.Spirit:  20,
+		})
+	case proto.Food_FoodRavagerDog:
+		character.AddStats(stats.Stats{
+			stats.AttackPower:       40,
+			stats.RangedAttackPower: 40,
+			stats.Spirit:            20,
+		})
+	case proto.Food_FoodRoastedClefthoof:
+		character.AddStats(stats.Stats{
+			stats.Strength: 20,
+			stats.Spirit:   20,
+		})
+	case proto.Food_FoodSkullfishSoup:
+		character.AddStats(stats.Stats{
+			stats.SpellCrit: 20,
+			stats.Spirit:    20,
+		})
+	case proto.Food_FoodSpicyHotTalbuk:
+		character.AddStats(stats.Stats{
+			stats.MeleeHit: 20,
+			stats.Spirit:   20,
 		})
 	}
+
+	switch consumes.Alchohol {
+	case proto.Alchohol_AlchoholKreegsStoutBeatdown:
+		character.AddStats(stats.Stats{
+			stats.Intellect: -5,
+			stats.Spirit:    25,
+		})
+	}
+
+	// Scrolls
+	character.AddStat(stats.Agility, []float64{0, 5, 9, 13, 17, 20}[consumes.ScrollOfAgility])
+	character.AddStat(stats.Strength, []float64{0, 5, 9, 13, 17, 20}[consumes.ScrollOfStrength])
+	// Doesn't stack with DS
+	if raidBuffs.DivineSpirit == proto.TristateEffect_TristateEffectMissing {
+		character.AddStat(stats.Spirit, []float64{0, 3, 7, 11, 15, 30}[consumes.ScrollOfSpirit])
+	}
+
+	// Weapon Imbues
+	if character.HasMHWeapon() && !character.HasMHWeaponImbue {
+		addImbueStats(character, consumes.MainHandImbue)
+	}
+	if character.HasOHWeapon() {
+		addImbueStats(character, consumes.OffHandImbue)
+	}
+	applyAdamantiteSharpeningStoneAura(character, consumes)
 
 	registerDrumsCD(agent, partyBuffs, consumes)
 	registerPotionCD(agent, consumes)
 	registerConjuredCD(agent, consumes)
 }
 
-func consumesStats(character *Character, c proto.Consumes, raidBuffs proto.RaidBuffs) stats.Stats {
-	s := stats.Stats{}
-
-	if character.HasMHWeapon() && !character.HasMHWeaponImbue {
-		addImbueStats(character, c.MainHandImbue)
-	}
-	if character.HasOHWeapon() {
-		addImbueStats(character, c.OffHandImbue)
-	}
-
-	if c.ElixirOfMajorMageblood {
-		s[stats.MP5] += 16.0
-	}
-	if c.AdeptsElixir {
-		s[stats.SpellCrit] += 24
-		s[stats.SpellPower] += 24
-		s[stats.HealingPower] += 24
-	}
-	if c.ElixirOfMajorFirePower {
-		s[stats.FireSpellPower] += 55
-	}
-	if c.ElixirOfMajorFrostPower {
-		s[stats.FrostSpellPower] += 55
-	}
-	if c.ElixirOfMajorShadowPower {
-		s[stats.ShadowSpellPower] += 55
-	}
-	if c.ElixirOfDraenicWisdom {
-		s[stats.Intellect] += 30
-		s[stats.Spirit] += 30
-	}
-	if c.ElixirOfMajorAgility {
-		s[stats.Agility] += 35
-		s[stats.MeleeCrit] += 20
-	}
-	if c.ElixirOfMajorStrength {
-		s[stats.Strength] += 35
-	}
-	if c.ElixirOfTheMongoose {
-		s[stats.Agility] += 25
-		s[stats.MeleeCrit] += 28
+func ApplyPetConsumeEffects(pet *Character, ownerConsumes proto.Consumes) {
+	switch ownerConsumes.PetFood {
+	case proto.PetFood_PetFoodKiblersBits:
+		pet.AddStats(stats.Stats{
+			stats.Strength: 20,
+			stats.Spirit:   20,
+		})
 	}
 
-	if c.FlaskOfSupremePower {
-		s[stats.SpellPower] += 70
-	}
-	if c.FlaskOfBlindingLight {
-		s[stats.NatureSpellPower] += 80
-		s[stats.ArcaneSpellPower] += 80
-		s[stats.HolySpellPower] += 80
-	}
-	if c.FlaskOfPureDeath {
-		s[stats.FireSpellPower] += 80
-		s[stats.FrostSpellPower] += 80
-		s[stats.ShadowSpellPower] += 80
-	}
-	if c.FlaskOfMightyRestoration {
-		s[stats.MP5] += 25
-	}
-	if c.FlaskOfRelentlessAssault {
-		s[stats.AttackPower] += 120
-		s[stats.RangedAttackPower] += 120
-	}
-
-	if c.BlackenedBasilisk {
-		s[stats.SpellPower] += 23
-		s[stats.HealingPower] += 23
-		s[stats.Spirit] += 20
-	}
-	if c.SkullfishSoup {
-		s[stats.SpellCrit] += 20
-		s[stats.Spirit] += 20
-	}
-	if c.KreegsStoutBeatdown {
-		s[stats.Intellect] -= 5
-		s[stats.Spirit] += 25
-	}
-	if c.RoastedClefthoof {
-		s[stats.Strength] += 20
-		s[stats.Spirit] += 20
-	}
-	if c.SpicyHotTalbuk {
-		s[stats.MeleeHit] += 20
-		s[stats.Spirit] += 20
-	}
-	if c.SpicyHotTalbuk {
-		s[stats.Agility] += 20
-		s[stats.Spirit] += 20
-	}
-	if c.ScrollOfAgilityV {
-		s[stats.Agility] += 20
-	}
-	if c.ScrollOfStrengthV {
-		s[stats.Strength] += 20
-	}
-
-	// Doesn't stack with DS
-	if c.ScrollOfSpiritV && raidBuffs.DivineSpirit == proto.TristateEffect_TristateEffectMissing {
-		s[stats.Spirit] += 30
-	}
-
-	return s
+	pet.AddStat(stats.Agility, []float64{0, 5, 9, 13, 17, 20}[ownerConsumes.PetScrollOfAgility])
+	pet.AddStat(stats.Strength, []float64{0, 5, 9, 13, 17, 20}[ownerConsumes.PetScrollOfStrength])
 }
 
 func addImbueStats(character *Character, imbue proto.WeaponImbue) {
 	if imbue == proto.WeaponImbue_WeaponImbueAdamantiteSharpeningStone {
+		character.PseudoStats.BonusMeleeDamage += 12
+		character.PseudoStats.BonusRangedDamage += 12
+		// Melee crit component handled separately because its melee-only.
+	} else if imbue == proto.WeaponImbue_WeaponImbueAdamantiteWeightstone {
+		character.PseudoStats.BonusMeleeDamage += 12
+		character.PseudoStats.BonusRangedDamage += 12
 		character.AddStats(stats.Stats{
 			stats.MeleeCrit: 14,
 		})
-		character.PseudoStats.BonusMeleeDamage += 12
-		character.PseudoStats.BonusRangedDamage += 12
 	} else if imbue == proto.WeaponImbue_WeaponImbueElementalSharpeningStone {
 		character.AddStats(stats.Stats{
 			stats.MeleeCrit: 28,
@@ -152,6 +198,37 @@ func addImbueStats(character *Character, imbue proto.WeaponImbue) {
 			stats.HealingPower: 42,
 		})
 	}
+}
+
+var AdamantiteSharpeningStoneMeleeCritAuraID = NewAuraID()
+
+func applyAdamantiteSharpeningStoneAura(character *Character, consumes proto.Consumes) {
+	critBonus := 0.0
+	if consumes.MainHandImbue == proto.WeaponImbue_WeaponImbueAdamantiteSharpeningStone {
+		critBonus += 14
+	}
+	if consumes.OffHandImbue == proto.WeaponImbue_WeaponImbueAdamantiteSharpeningStone {
+		critBonus += 14
+	}
+
+	// Crit rating for sharpening stone applies to melee only.
+	if character.Class != proto.Class_ClassHunter {
+		character.AddStats(stats.Stats{
+			stats.MeleeCrit: critBonus,
+		})
+		return
+	}
+
+	character.AddPermanentAura(func(sim *Simulation) Aura {
+		return Aura{
+			ID: AdamantiteSharpeningStoneMeleeCritAuraID,
+			OnBeforeMeleeHit: func(sim *Simulation, ability *ActiveMeleeAbility, hitEffect *AbilityHitEffect) {
+				if !hitEffect.IsRanged() {
+					hitEffect.BonusCritRating += critBonus
+				}
+			},
+		}
+	})
 }
 
 var ElixirOfDemonslayingAuraID = NewAuraID()
@@ -190,7 +267,7 @@ func registerDrumsCD(agent Agent, partyBuffs proto.PartyBuffs, consumes proto.Co
 		// Disable self-drums on other party members, so there is only 1 drummer.
 		for _, partyMember := range agent.GetCharacter().Party.Players {
 			if partyMember != agent {
-				partyMember.GetCharacter().consumes.Drums = proto.Drums_DrumsUnknown
+				partyMember.GetCharacter().Consumes.Drums = proto.Drums_DrumsUnknown
 			}
 		}
 	} else if partyBuffs.Drums != proto.Drums_DrumsUnknown {
@@ -200,7 +277,7 @@ func registerDrumsCD(agent Agent, partyBuffs proto.PartyBuffs, consumes proto.Co
 	// If we aren't casting drums, and there is another real party member doing so, then we're done.
 	if !drumsSelfCast {
 		for _, partyMember := range agent.GetCharacter().Party.Players {
-			if partyMember != agent && partyMember.GetCharacter().consumes.Drums != proto.Drums_DrumsUnknown {
+			if partyMember != agent && partyMember.GetCharacter().Consumes.Drums != proto.Drums_DrumsUnknown {
 				return
 			}
 		}
@@ -250,10 +327,14 @@ func registerDrumsCD(agent Agent, partyBuffs proto.PartyBuffs, consumes proto.Co
 						for _, agent := range character.Party.Players {
 							applyDrums(sim, agent.GetCharacter())
 						}
-						for _, petAgent := range character.Party.Pets {
-							pet := petAgent.GetPet()
-							if pet.IsEnabled() {
-								applyDrums(sim, &pet.Character)
+
+						// Drums of battle doesn't affect pets, ask Blizzard
+						if drumsType != proto.Drums_DrumsOfBattle {
+							for _, petAgent := range character.Party.Pets {
+								pet := petAgent.GetPet()
+								if pet.IsEnabled() {
+									applyDrums(sim, &pet.Character)
+								}
 							}
 						}
 
@@ -276,10 +357,14 @@ func registerDrumsCD(agent Agent, partyBuffs proto.PartyBuffs, consumes proto.Co
 			return applyDrums
 			return func(sim *Simulation, character *Character) {
 				applyDrums(sim, character)
-				for _, petAgent := range character.Pets {
-					pet := petAgent.GetPet()
-					if pet.IsEnabled() {
-						applyDrums(sim, &pet.Character)
+
+				// Drums of battle doesn't affect pets, ask Blizzard
+				if drumsType != proto.Drums_DrumsOfBattle {
+					for _, petAgent := range character.Pets {
+						pet := petAgent.GetPet()
+						if pet.IsEnabled() {
+							applyDrums(sim, &pet.Character)
+						}
 					}
 				}
 			}
@@ -707,7 +792,7 @@ func makeConjuredActivation(conjuredType proto.Conjured, character *Character) (
 
 				aura := character.NewAuraWithTemporaryStats(sim, ConjuredAuraID, actionID, stats.FireSpellPower, fireBonus, dur)
 				aura.OnMeleeAttack = func(sim *Simulation, ability *ActiveMeleeAbility, hitEffect *AbilityHitEffect) {
-					if !hitEffect.Landed() || !hitEffect.IsWeaponHit() {
+					if !hitEffect.Landed() || !hitEffect.IsWeaponHit() || ability.IsPhantom {
 						return
 					}
 					if sim.RandomFloat("Flame Cap Melee") > procChance {

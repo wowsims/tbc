@@ -30,7 +30,6 @@ func init() {
 	core.AddItemEffect(TotemOfThePulsingEarth, func(core.Agent) {})
 }
 
-var Tidefury2PcAuraID = core.NewAuraID()
 var ItemSetTidefury = core.ItemSet{
 	Name:  "Tidefury Raiment",
 	Items: map[int32]struct{}{28231: {}, 27510: {}, 28349: {}, 27909: {}, 27802: {}},

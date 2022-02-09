@@ -43,7 +43,6 @@ var basicConsumes = &proto.Consumes{
 	BlackenedBasilisk:    true,
 	BrilliantWizardOil:   true,
 	DefaultPotion:        proto.Potions_SuperManaPotion,
-	DarkRune:             true,
 }
 
 var p1Equip = &proto.EquipmentSpec{

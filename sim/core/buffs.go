@@ -221,6 +221,27 @@ func applyBuffEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs proto.P
 	}
 }
 
+// Applies buffs to pets.
+func applyPetBuffEffects(petAgent PetAgent, raidBuffs proto.RaidBuffs, partyBuffs proto.PartyBuffs, individualBuffs proto.IndividualBuffs) {
+	// Summoned pets, like Mage Water Elemental, aren't around to receive raid buffs.
+	if !petAgent.GetPet().initialEnabled {
+		return
+	}
+
+	// We need to modify the buffs a bit because some things are applied to pets by
+	// the owner during combat (Bloodlust) or don't make sense for a pet.
+	partyBuffs.Bloodlust = 0
+	partyBuffs.Drums = proto.Drums_DrumsUnknown
+	individualBuffs.Innervates = 0
+	individualBuffs.PowerInfusions = 0
+
+	// For some reason pets don't benefit from buffs that are ratings, e.g. crit rating or haste rating.
+	partyBuffs.LeaderOfThePack = MinTristate(partyBuffs.LeaderOfThePack, proto.TristateEffect_TristateEffectRegular)
+	partyBuffs.BraidedEterniumChain = false
+
+	applyBuffEffects(petAgent, raidBuffs, partyBuffs, individualBuffs)
+}
+
 var SnapshotImprovedWrathOfAirTotemAuraID = NewAuraID()
 
 func SnapshotImprovedWrathOfAirTotemAura(character *Character) AuraFactory {
@@ -288,7 +309,7 @@ func FerociousInspirationAura(numBMHunters int32) Aura {
 	multiplier := math.Pow(1.03, float64(numBMHunters))
 	return Aura{
 		ID:       FerociousInspirationAuraID,
-		ActionID: ActionID{SpellID: 34460},
+		ActionID: ActionID{SpellID: 34460, Tag: -1},
 		OnBeforeMeleeHit: func(sim *Simulation, ability *ActiveMeleeAbility, hitEffect *AbilityHitEffect) {
 			hitEffect.DamageMultiplier *= multiplier
 		},
@@ -341,7 +362,7 @@ func IsEligibleForWindfuryTotem(character *Character) bool {
 	return character.AutoAttacks.IsEnabled() &&
 		character.HasMHWeapon() &&
 		!character.HasMHWeaponImbue &&
-		character.consumes.MainHandImbue == proto.WeaponImbue_WeaponImbueUnknown
+		character.Consumes.MainHandImbue == proto.WeaponImbue_WeaponImbueUnknown
 }
 
 func WindfuryTotemAura(character *Character, rank int32, iwtTalentPoints int32) Aura {
@@ -374,16 +395,23 @@ func WindfuryTotemAura(character *Character, rank int32, iwtTalentPoints int32) 
 
 	const procChance = 0.2
 
+	var icd InternalCD
+	const icdDur = time.Duration(1) // No ICD, but only once per frame.
+
 	return Aura{
 		ID:       WindfuryTotemAuraID,
 		ActionID: actionID,
 		OnMeleeAttack: func(sim *Simulation, ability *ActiveMeleeAbility, hitEffect *AbilityHitEffect) {
-			if !hitEffect.Landed() || !hitEffect.IsWeaponHit() || !hitEffect.IsMH() {
+			if !hitEffect.Landed() || !hitEffect.IsWeaponHit() || !hitEffect.IsMH() || ability.IsPhantom {
+				return
+			}
+			if icd.IsOnCD(sim) {
 				return
 			}
 			if sim.RandomFloat("Windfury Totem") > procChance {
 				return
 			}
+			icd = InternalCD(sim.CurrentTime + icdDur)
 
 			wfTemplate.Apply(&wfAtk)
 			wfAtk.Effect.Target = hitEffect.Target

@@ -12,10 +12,11 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-// OnBeforeMHSwing is called right before an auto attack fires
-//  if false is returned the weapon swing is cancelled.
+// ReplaceMHSwing is called right before an auto attack fires
+//  If it returns nil, the attack takes place as normal. If it returns an ability,
+//  that ability is used in place of the attack.
 //  This allows for abilities that convert a white attack into yellow attack.
-type OnBeforeMHSwing func(sim *Simulation) bool
+type ReplaceMHSwing func(sim *Simulation) *ActiveMeleeAbility
 
 // OnBeforeMelee is invoked once for each ability, even if there are multiple hits.
 //  This should be used for any effects that adjust the cost / stats / multipliers of the attack.
@@ -62,8 +63,9 @@ type MeleeAbility struct {
 	// How much to multiply damage by, if this cast crits.
 	CritMultiplier float64
 
-	// If true, will force the cast to crit (if it doesnt miss).
-	GuaranteedCrit bool
+	// Whether this is a phantom attack. Phantom attacks are usually triggered by some effect,
+	// like Windfury. Many on-hit effects do not proc from phantom attacks, only regular attacks.
+	IsPhantom bool
 
 	// Internal field only, used to prevent pool objects from being used by
 	// multiple attacks simultaneously.
@@ -277,15 +279,10 @@ func (ahe *AbilityHitEffect) WhiteHitTableResult(sim *Simulation, ability *Activ
 	character := ability.Character
 
 	roll := sim.RandomFloat("auto attack")
-	level := float64(ahe.Target.Level)
-	skill := 350.0 // assume max skill level for now.
-
-	// Difference between attacker's waepon skill and target's defense skill.
-	skillDifference := (level * 5) - skill
 
 	// Miss
 	missChance := ahe.Target.MissChance
-	if ahe.IsWhiteHit && character.AutoAttacks.IsDualWielding {
+	if ahe.IsWhiteHit && !ahe.IsRanged() && character.AutoAttacks.IsDualWielding {
 		missChance += 0.19
 	}
 	hitBonus := ((character.stats[stats.MeleeHit] + ahe.BonusHitRating) / (MeleeHitRatingPerHitChance * 100)) - ahe.Target.HitSuppression
@@ -326,7 +323,7 @@ func (ahe *AbilityHitEffect) WhiteHitTableResult(sim *Simulation, ability *Activ
 		}
 
 		// Crit
-		critChance := ((character.stats[stats.MeleeCrit] + ahe.BonusCritRating) / (MeleeCritRatingPerCritChance * 100)) - skillDifference*0.002 - 0.018
+		critChance := ((character.stats[stats.MeleeCrit] + ahe.BonusCritRating) / (MeleeCritRatingPerCritChance * 100)) - ahe.Target.CritSuppression
 		chance += critChance
 		if roll < chance {
 			return MeleeHitTypeCrit
@@ -378,6 +375,10 @@ func (ahe *AbilityHitEffect) calculateDamage(sim *Simulation, ability *ActiveMel
 		}
 	}
 
+	if sim.Log != nil {
+		character.Log(sim, "Melee dmg calcs: AP=%0.1f, bonusWepDmg:%0.1f, dmgMultiplier:%0.2f, staticMultiplier:%0.2f, result:%d, weaponDmgCalc: %0.1f, critMultiplier: %0.3f, Target armor: %0.1f\n", attackPower, bonusWeaponDamage, ahe.DamageMultiplier, ahe.StaticDamageMultiplier, ahe.HitType, dmg, ability.CritMultiplier, ahe.Target.currentArmor)
+	}
+
 	// Add damage from DirectInput
 	if ahe.DirectInput.MinBaseDamage != 0 {
 		dmg += ahe.DirectInput.MinBaseDamage + (ahe.DirectInput.MaxBaseDamage-ahe.DirectInput.MinBaseDamage)*sim.RandomFloat("Melee Direct Input")
@@ -408,9 +409,6 @@ func (ahe *AbilityHitEffect) calculateDamage(sim *Simulation, ability *ActiveMel
 	// Apply armor reduction.
 	if !ahe.IgnoreArmor {
 		dmg *= 1 - ahe.Target.ArmorDamageReduction(character.stats[stats.ArmorPenetration]+ahe.BonusArmorPenetration)
-		//if sim.Log != nil {
-		//	character.Log(sim, "Target armor: %0.2f\n", ahe.Target.currentArmor)
-		//}
 	}
 
 	// Apply all other effect multipliers.
@@ -577,7 +575,7 @@ type AutoAttacks struct {
 
 	RangedAuto ActiveMeleeAbility // Parameters for ranged auto attacks.
 
-	OnBeforeMHSwing OnBeforeMHSwing
+	ReplaceMHSwing ReplaceMHSwing
 
 	// The time at which the last MH swing occurred.
 	previousMHSwingAt time.Duration
@@ -594,6 +592,7 @@ type AutoAttackOptions struct {
 	AutoSwingMelee  bool // If true, core engine will handle calling SwingMelee() for you.
 	AutoSwingRanged bool // If true, core engine will handle calling SwingRanged() for you.
 	DelayOHSwings   bool
+	ReplaceMHSwing  ReplaceMHSwing
 }
 
 func (character *Character) EnableAutoAttacks(agent Agent, options AutoAttackOptions) {
@@ -606,6 +605,7 @@ func (character *Character) EnableAutoAttacks(agent Agent, options AutoAttackOpt
 		AutoSwingMelee:  options.AutoSwingMelee,
 		AutoSwingRanged: options.AutoSwingRanged,
 		DelayOHSwings:   options.DelayOHSwings,
+		ReplaceMHSwing:  options.ReplaceMHSwing,
 		ActiveMeleeAbility: ActiveMeleeAbility{
 			MeleeAbility: MeleeAbility{
 				ActionID:    ActionID{OtherID: proto.OtherAction_OtherActionAttack},
@@ -661,7 +661,7 @@ func (aa *AutoAttacks) IsEnabled() bool {
 }
 
 // Empty handler so Agents don't have to provide one if they have no logic to add.
-func (character *Character) OnAutoAttack(sim *Simulation) {}
+func (character *Character) OnAutoAttack(sim *Simulation, ability *ActiveMeleeAbility) {}
 
 func (aa *AutoAttacks) reset(sim *Simulation) {
 	if !aa.IsEnabled() {
@@ -670,7 +670,7 @@ func (aa *AutoAttacks) reset(sim *Simulation) {
 
 	aa.MainhandSwingAt = 0
 	aa.OffhandSwingAt = 0
-	aa.RangedSwingAt = 0
+	aa.RangedSwingAt = aa.RangedSwingWindup()
 
 	// Set a fake value for previousMHSwing so that offhand swing delay works
 	// properly at the start.
@@ -722,6 +722,12 @@ func (aa *AutoAttacks) resetAutoSwing(sim *Simulation) {
 			sim.pendingActionPool.Put(pa)
 		}
 	}
+	if aa.AutoSwingMelee {
+		pa.NextActionAt = aa.NextAttackAt()
+	} else {
+		pa.NextActionAt = aa.RangedSwingAt
+	}
+
 	aa.autoSwingAction = pa
 	sim.AddPendingAction(pa)
 }
@@ -736,6 +742,17 @@ func (aa *AutoAttacks) OffhandSwingSpeed() time.Duration {
 
 func (aa *AutoAttacks) RangedSwingSpeed() time.Duration {
 	return time.Duration(float64(aa.Ranged.SwingDuration) / aa.character.RangedSwingSpeed())
+}
+
+// Ranged swings have a 0.5s 'windup' time before they can fire, affected by haste.
+// This function computes the amount of windup time based on the current haste.
+func (aa *AutoAttacks) RangedSwingWindup() time.Duration {
+	return time.Duration(float64(time.Millisecond*500) / aa.character.RangedSwingSpeed())
+}
+
+// Returns the amount of time available before ranged auto will be clipped.
+func (aa *AutoAttacks) TimeBeforeClippingRanged(sim *Simulation) time.Duration {
+	return aa.RangedSwingAt - aa.RangedSwingWindup() - sim.CurrentTime
 }
 
 // SwingMelee will check any swing timers if they are up, and if so, swing!
@@ -754,23 +771,26 @@ func (aa *AutoAttacks) TrySwingMH(sim *Simulation, target *Target) {
 		return
 	}
 
-	if aa.OnBeforeMHSwing != nil {
-		// Allow MH swing to be overridden for abilities like Heroic Strike.
-		doSwing := aa.OnBeforeMHSwing(sim)
-		if !doSwing {
-			return
-		}
+	// Allow MH swing to be overridden for abilities like Heroic Strike.
+	var replaceAMA *ActiveMeleeAbility
+	if aa.ReplaceMHSwing != nil {
+		replaceAMA = aa.ReplaceMHSwing(sim)
 	}
 
-	aa.cachedMelee = aa.ActiveMeleeAbility
-	aa.cachedMelee.ActionID.Tag = 1
-	aa.cachedMelee.CritMultiplier = aa.MH.CritMultiplier
-	aa.cachedMelee.Effect.Target = target
-	aa.cachedMelee.Effect.WeaponInput.IsOH = false
+	if replaceAMA == nil {
+		aa.cachedMelee = aa.ActiveMeleeAbility
+		aa.cachedMelee.ActionID.Tag = 1
+		aa.cachedMelee.CritMultiplier = aa.MH.CritMultiplier
+		aa.cachedMelee.Effect.Target = target
+		aa.cachedMelee.Effect.WeaponInput.IsOH = false
+	} else {
+		aa.cachedMelee = *replaceAMA
+	}
+
 	aa.cachedMelee.Attack(sim)
 	aa.MainhandSwingAt = sim.CurrentTime + aa.MainhandSwingSpeed()
 	aa.previousMHSwingAt = sim.CurrentTime
-	aa.agent.OnAutoAttack(sim)
+	aa.agent.OnAutoAttack(sim, &aa.cachedMelee)
 }
 
 // Performs an autoattack using the main hand weapon, if the OH CD is ready.
@@ -795,7 +815,7 @@ func (aa *AutoAttacks) TrySwingOH(sim *Simulation, target *Target) {
 	aa.cachedMelee.Effect.WeaponInput.IsOH = true
 	aa.cachedMelee.Attack(sim)
 	aa.OffhandSwingAt = sim.CurrentTime + aa.OffhandSwingSpeed()
-	aa.agent.OnAutoAttack(sim)
+	aa.agent.OnAutoAttack(sim, &aa.cachedMelee)
 }
 
 // Performs an autoattack using the ranged weapon, if the ranged CD is ready.
@@ -808,6 +828,7 @@ func (aa *AutoAttacks) TrySwingRanged(sim *Simulation, target *Target) {
 	ama.Effect.Target = target
 	ama.Attack(sim)
 	aa.RangedSwingAt = sim.CurrentTime + aa.RangedSwingSpeed()
+	aa.agent.OnAutoAttack(sim, &ama)
 }
 
 func (aa *AutoAttacks) ModifySwingTime(sim *Simulation, amount float64) {
@@ -830,17 +851,44 @@ func (aa *AutoAttacks) ModifySwingTime(sim *Simulation, amount float64) {
 		}
 	}
 
-	if aa.Ranged.SwingSpeed != 0 {
-		rangedSwingTime := aa.RangedSwingAt - sim.CurrentTime
-		if rangedSwingTime > 1 {
-			newTime := time.Duration(float64(rangedSwingTime) / amount)
-			if newTime > 0 {
-				aa.RangedSwingAt = sim.CurrentTime + newTime
-			}
+	aa.resetAutoSwing(sim)
+}
+
+// Delays all swing timers until the specified time.
+func (aa *AutoAttacks) DelayAllUntil(sim *Simulation, readyAt time.Duration) {
+	autoChanged := false
+
+	if readyAt > aa.MainhandSwingAt {
+		aa.MainhandSwingAt = readyAt
+		if aa.AutoSwingMelee {
+			autoChanged = true
+		}
+	}
+	if readyAt > aa.OffhandSwingAt {
+		aa.OffhandSwingAt = readyAt
+		if aa.AutoSwingMelee {
+			autoChanged = true
+		}
+	}
+	newRangedSwingAt := readyAt + aa.RangedSwingWindup()
+	if newRangedSwingAt > aa.RangedSwingAt {
+		aa.RangedSwingAt = newRangedSwingAt
+		if aa.AutoSwingRanged {
+			autoChanged = true
 		}
 	}
 
-	aa.resetAutoSwing(sim)
+	if autoChanged {
+		aa.resetAutoSwing(sim)
+	}
+}
+
+func (aa *AutoAttacks) DelayRangedUntil(sim *Simulation, readyAt time.Duration) {
+	newRangedSwingAt := readyAt + aa.RangedSwingWindup()
+	if newRangedSwingAt > aa.RangedSwingAt {
+		aa.RangedSwingAt = newRangedSwingAt
+		aa.resetAutoSwing(sim)
+	}
 }
 
 // Returns the time at which the next attack will occur.
@@ -850,6 +898,12 @@ func (aa *AutoAttacks) NextAttackAt() time.Duration {
 		nextAttack = MinDuration(nextAttack, aa.OffhandSwingAt)
 	}
 	return nextAttack
+}
+
+// Returns true if all melee weapons are ready for a swing.
+func (aa *AutoAttacks) MeleeSwingsReady(sim *Simulation) bool {
+	return aa.MainhandSwingAt <= sim.CurrentTime &&
+		(aa.OH.SwingSpeed == 0 || aa.OffhandSwingAt <= sim.CurrentTime)
 }
 
 // Returns the time at which the next event will occur, considering both autos and the gcd.

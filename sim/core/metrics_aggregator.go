@@ -103,12 +103,21 @@ type ActionMetrics struct {
 }
 
 func (actionMetrics *ActionMetrics) ToProto() *proto.ActionMetrics {
+	// Hack because serpent sting is super weird
+	casts := actionMetrics.Casts
+	hits := actionMetrics.Hits
+	if actionMetrics.ActionID.SpellID == 27016 {
+		extras := hits / 2
+		hits -= extras
+		casts -= extras
+	}
+
 	return &proto.ActionMetrics{
 		Id:      actionMetrics.ActionID.ToProto(),
 		IsMelee: actionMetrics.IsMelee,
 
-		Casts:   actionMetrics.Casts,
-		Hits:    actionMetrics.Hits,
+		Casts:   casts,
+		Hits:    hits,
 		Crits:   actionMetrics.Crits,
 		Misses:  actionMetrics.Misses,
 		Dodges:  actionMetrics.Dodges,

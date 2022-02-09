@@ -71,10 +71,11 @@ type Target struct {
 	currentArmor         float64 // current armor, can be mutated by spells
 	armorDamageReduction float64 // cached armor damage reduction
 
-	MissChance     float64
-	HitSuppression float64
-	Dodge          float64
-	Glance         float64
+	MissChance      float64
+	HitSuppression  float64
+	CritSuppression float64
+	Dodge           float64
+	Glance          float64
 
 	Level int32 // level of target
 
@@ -112,6 +113,7 @@ func NewTarget(options proto.Target, targetIndex int32) *Target {
 
 	target.MissChance = 0.05 + skillDifference*0.002
 	target.HitSuppression = (skillDifference - 10) * 0.002
+	target.CritSuppression = (skillDifference * 0.002) + 0.018
 	target.Dodge = 0.05 + skillDifference*0.001
 	target.Glance = math.Max(0.06+skillDifference*0.012, 0)
 

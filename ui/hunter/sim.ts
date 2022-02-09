@@ -11,6 +11,7 @@ import { MobType } from '/tbc/core/proto/common.js';
 import { Potions } from '/tbc/core/proto/common.js';
 import { Spec } from '/tbc/core/proto/common.js';
 import { Stat } from '/tbc/core/proto/common.js';
+import { StrengthOfEarthType } from '/tbc/core/proto/common.js';
 import { TristateEffect } from '/tbc/core/proto/common.js'
 import { Player } from '/tbc/core/player.js';
 import { Stats } from '/tbc/core/proto_utils/stats.js';
@@ -32,6 +33,7 @@ export class HunterSimUI extends IndividualSimUI<Spec.SpecHunter> {
 			cssClass: 'hunter-sim-ui',
 			// List any known bugs / issues here and they'll be shown on the site.
 			knownIssues: [
+				'This sim is newly released and there are likely still bugs. Take the DPS values with a grain of salt and let us know if you spot any issues!',
 			],
 
 			// All stats for which EP should be calculated.
@@ -39,6 +41,7 @@ export class HunterSimUI extends IndividualSimUI<Spec.SpecHunter> {
 				Stat.StatIntellect,
 				Stat.StatAgility,
 				Stat.StatStrength,
+				Stat.StatAttackPower,
 				Stat.StatRangedAttackPower,
 				Stat.StatMeleeHit,
 				Stat.StatMeleeCrit,
@@ -50,9 +53,10 @@ export class HunterSimUI extends IndividualSimUI<Spec.SpecHunter> {
 			// Which stats to display in the Character Stats section, at the bottom of the left-hand sidebar.
 			displayStats: [
 				Stat.StatStamina,
-				Stat.StatStrength,
 				Stat.StatAgility,
+				Stat.StatStrength,
 				Stat.StatIntellect,
+				Stat.StatAttackPower,
 				Stat.StatRangedAttackPower,
 				Stat.StatMeleeHit,
 				Stat.StatMeleeCrit,
@@ -65,14 +69,15 @@ export class HunterSimUI extends IndividualSimUI<Spec.SpecHunter> {
 				gear: Presets.P1_BM_PRESET.gear,
 				// Default EP weights for sorting gear in the gear picker.
 				epWeights: Stats.fromMap({
-					[Stat.StatIntellect]: 0.078,
-					[Stat.StatAgility]: 1.317,
-					[Stat.StatStrength]: 2.2,
+					[Stat.StatIntellect]: 0.01,
+					[Stat.StatAgility]: 2.5,
+					[Stat.StatStrength]: 0.15,
+					[Stat.StatAttackPower]: 0.15,
 					[Stat.StatRangedAttackPower]: 1.0,
-					[Stat.StatMeleeHit]: 1.665,
-					[Stat.StatMeleeCrit]: 1.357,
-					[Stat.StatMeleeHaste]: 1.944,
-					[Stat.StatArmorPenetration]: 0.283,
+					[Stat.StatMeleeHit]: 0.3,
+					[Stat.StatMeleeCrit]: 2.3,
+					[Stat.StatMeleeHaste]: 1.97,
+					[Stat.StatArmorPenetration]: 0.4,
 				}),
 				// Default consumes settings.
 				consumes: Presets.DefaultConsumes,
@@ -85,10 +90,15 @@ export class HunterSimUI extends IndividualSimUI<Spec.SpecHunter> {
 				// Default raid/party buffs settings.
 				raidBuffs: RaidBuffs.create({
 					arcaneBrilliance: true,
-					divineSpirit: TristateEffect.TristateEffectImproved,
 					giftOfTheWild: TristateEffect.TristateEffectImproved,
 				}),
 				partyBuffs: PartyBuffs.create({
+					bloodlust: 1,
+					graceOfAirTotem: TristateEffect.TristateEffectImproved,
+					strengthOfEarthTotem: StrengthOfEarthType.EnhancingAndCyclone,
+					windfuryTotemRank: 5,
+					battleShout: TristateEffect.TristateEffectImproved,
+					leaderOfThePack: TristateEffect.TristateEffectImproved,
 				}),
 				individualBuffs: IndividualBuffs.create({
 					blessingOfKings: true,
@@ -96,11 +106,11 @@ export class HunterSimUI extends IndividualSimUI<Spec.SpecHunter> {
 					blessingOfMight: 2,
 				}),
 				debuffs: Debuffs.create({
-					faerieFire: TristateEffect.TristateEffectImproved,
-					judgementOfWisdom: true,
-					improvedSealOfTheCrusader: true,
 					sunderArmor: true,
 					curseOfRecklessness: true,
+					faerieFire: TristateEffect.TristateEffectImproved,
+					improvedSealOfTheCrusader: true,
+					judgementOfWisdom: true,
 					curseOfElements: TristateEffect.TristateEffectRegular,
 				}),
 			},
@@ -110,15 +120,20 @@ export class HunterSimUI extends IndividualSimUI<Spec.SpecHunter> {
 				HunterInputs.Quiver,
 				HunterInputs.WeaponAmmo,
 				IconInputs.DrumsOfBattleConsume,
+				IconInputs.BattleChicken,
 			],
 			// IconInputs to include in the 'Other Buffs' section on the settings tab.
 			raidBuffInputs: [
 				IconInputs.ArcaneBrilliance,
+				IconInputs.DivineSpirit,
 				IconInputs.GiftOfTheWild,
 			],
 			partyBuffInputs: [
 				IconInputs.DrumsOfBattleBuff,
 				IconInputs.Bloodlust,
+				IconInputs.GraceOfAirTotem,
+				IconInputs.WindfuryTotem,
+				IconInputs.StrengthOfEarthTotem,
 				IconInputs.ManaSpringTotem,
 				IconInputs.BattleShout,
 				IconInputs.DraeneiRacialMelee,
@@ -127,37 +142,42 @@ export class HunterSimUI extends IndividualSimUI<Spec.SpecHunter> {
 				IconInputs.TrueshotAura,
 				IconInputs.SanctityAura,
 				IconInputs.BraidedEterniumChain,
+				IconInputs.BattleChickens,
 			],
 			playerBuffInputs: [
 				IconInputs.BlessingOfKings,
 				IconInputs.BlessingOfWisdom,
 				IconInputs.BlessingOfMight,
+				IconInputs.UnleashedRage,
 			],
 			// IconInputs to include in the 'Debuffs' section on the settings tab.
 			debuffInputs: [
-				IconInputs.BloodFrenzy,
-				IconInputs.ImprovedSealOfTheCrusader,
-				IconInputs.JudgementOfWisdom,
-				IconInputs.HuntersMark,
-				IconInputs.FaerieFire,
 				IconInputs.SunderArmor,
 				IconInputs.ExposeArmor,
 				IconInputs.CurseOfRecklessness,
+				IconInputs.FaerieFire,
+				IconInputs.ImprovedSealOfTheCrusader,
+				IconInputs.JudgementOfWisdom,
+				IconInputs.HuntersMark,
+				IconInputs.BloodFrenzy,
 				IconInputs.CurseOfElements,
 			],
 			// IconInputs to include in the 'Consumes' section on the settings tab.
 			consumeInputs: [
+				IconInputs.MainHandAdamantiteSharpeningStone,
+				IconInputs.MainHandAdamantiteWeightstone,
+				IconInputs.OffHandAdamantiteSharpeningStone,
+				IconInputs.OffHandAdamantiteWeightstone,
 				IconInputs.DefaultHastePotion,
 				IconInputs.DefaultSuperManaPotion,
 				IconInputs.DefaultDarkRune,
 				IconInputs.FlaskOfRelentlessAssault,
 				IconInputs.ElixirOfDemonslaying,
-				IconInputs.ElixirOfMajorStrength,
 				IconInputs.ElixirOfMajorAgility,
 				IconInputs.ElixirOfTheMongoose,
 				IconInputs.ElixirOfDraenicWisdom,
 				IconInputs.ElixirOfMajorMageblood,
-				IconInputs.RoastedClefthoof,
+				IconInputs.RavagerDog,
 				IconInputs.GrilledMudfish,
 				IconInputs.SpicyHotTalbuk,
 				IconInputs.ScrollOfAgilityV,
@@ -169,13 +189,20 @@ export class HunterSimUI extends IndividualSimUI<Spec.SpecHunter> {
 			otherInputs: {
 				inputs: [
 					HunterInputs.PetTypeInput,
-					HunterInputs.LatencyMs,
+					//HunterInputs.LatencyMs,
 					OtherInputs.StartingPotion,
 					OtherInputs.NumStartingPotions,
 					OtherInputs.ExposeWeaknessUptime,
 					OtherInputs.ExposeWeaknessHunterAgility,
 					OtherInputs.SnapshotBsSolarianSapphire,
 					OtherInputs.SnapshotBsT2,
+				],
+			},
+			additionalIconSections: {
+				'Pet Buffs': [
+					IconInputs.KiblersBits,
+					IconInputs.PetScrollOfAgilityV,
+					IconInputs.PetScrollOfStrengthV,
 				],
 			},
 			encounterPicker: {
@@ -201,6 +228,11 @@ export class HunterSimUI extends IndividualSimUI<Spec.SpecHunter> {
 				// Preset gear configurations that the user can quickly select.
 				gear: [
 					Presets.P1_BM_PRESET,
+					Presets.P2_BM_PRESET,
+					Presets.P3_BM_PRESET,
+					Presets.P1_SV_PRESET,
+					Presets.P2_SV_PRESET,
+					Presets.P3_SV_PRESET,
 				],
 			},
 		});

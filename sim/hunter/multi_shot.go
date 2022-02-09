@@ -10,25 +10,43 @@ import (
 var MultiShotCooldownID = core.NewCooldownID()
 var MultiShotActionID = core.ActionID{SpellID: 27021, CooldownID: MultiShotCooldownID}
 
-func (hunter *Hunter) newMultiShotTemplate(sim *core.Simulation) core.MeleeAbilityTemplate {
+// ActiveMeleeAbility doesn't support cast times, so we wrap it in a SimpleCast.
+func (hunter *Hunter) newMultiShotCastTemplate(sim *core.Simulation) core.SimpleCast {
+	template := core.SimpleCast{
+		Cast: core.Cast{
+			ActionID:     MultiShotActionID,
+			Character:    hunter.GetCharacter(),
+			BaseManaCost: 275,
+			ManaCost:     275,
+			// Cast time is affected by ranged attack speed so set it later.
+			//CastTime:     time.Millisecond * 500,
+			GCD:         core.GCDDefault,
+			Cooldown:    time.Second * 10,
+			IgnoreHaste: true, // Hunter GCD is locked at 1.5s
+		},
+		DisableMetrics: true,
+	}
+
+	template.ManaCost *= 1 - 0.02*float64(hunter.Talents.Efficiency)
+	if ItemSetDemonStalker.CharacterHasSetBonus(&hunter.Character, 4) {
+		template.ManaCost -= 275.0 * 0.1
+	}
+
+	return template
+}
+
+func (hunter *Hunter) newMultiShotAbilityTemplate(sim *core.Simulation) core.MeleeAbilityTemplate {
 	ama := core.ActiveMeleeAbility{
 		MeleeAbility: core.MeleeAbility{
 			ActionID:    MultiShotActionID,
 			Character:   &hunter.Character,
 			SpellSchool: stats.AttackPower,
-			GCD:         core.GCDDefault,
-			Cooldown:    time.Second * 10,
-			Cost: core.ResourceCost{
-				Type:  stats.Mana,
-				Value: 275,
-			},
+			IgnoreCost:  true,
 			// TODO: If we ever allow multiple targets to have their own type, need to
 			// update this.
 			CritMultiplier: hunter.critMultiplier(true, sim.GetPrimaryTarget()),
 		},
 	}
-
-	ama.Cost.Value *= 1 - 0.02*float64(hunter.Talents.Efficiency)
 
 	baseEffect := core.AbilityHitEffect{
 		AbilityEffect: core.AbilityEffect{
@@ -62,12 +80,17 @@ func (hunter *Hunter) newMultiShotTemplate(sim *core.Simulation) core.MeleeAbili
 	return core.NewMeleeAbilityTemplate(ama)
 }
 
-func (hunter *Hunter) NewMultiShot(sim *core.Simulation) *core.ActiveMeleeAbility {
-	ms := &hunter.multiShot
-	hunter.multiShotTemplate.Apply(ms)
+func (hunter *Hunter) NewMultiShot(sim *core.Simulation) core.SimpleCast {
+	hunter.multiShotCast = hunter.multiShotCastTemplate
 
 	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	// Nothing
+	hunter.multiShotCast.OnCastComplete = func(sim *core.Simulation, cast *core.Cast) {
+		ms := &hunter.multiShotAbility
+		hunter.multiShotAbilityTemplate.Apply(ms)
+		ms.Attack(sim)
+	}
+	hunter.multiShotCast.CastTime = time.Duration(float64(time.Millisecond*500) / hunter.RangedSwingSpeed())
 
-	return ms
+	hunter.multiShotCast.Init(sim)
+	return hunter.multiShotCast
 }

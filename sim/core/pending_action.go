@@ -76,17 +76,16 @@ func (pap *paPool) Get() *PendingAction {
 				pap.maxid++
 			}
 		}
-		// panic("for now dont do this")
 	}
 
 	pa := pap.objs[len(pap.objs)-1]
 	pap.objs = pap.objs[:len(pap.objs)-1]
-
+	pa.cancelled = false
 	return pa
 }
 
 func (pap *paPool) Put(pa *PendingAction) {
-	pa.cancelled = false
+	pa.cancelled = true
 	pa.CleanUp = nil
 	pa.Name = ""
 	pa.NextActionAt = 0

@@ -159,7 +159,7 @@ export const titleIcons: Record<Spec, string> = {
   [Spec.SpecBalanceDruid]: '/tbc/assets/balance_druid_icon.png',
   [Spec.SpecElementalShaman]: '/tbc/assets/elemental_shaman_icon.png',
   [Spec.SpecEnhancementShaman]: '/tbc/assets/enhancement_shaman_icon.png',
-  [Spec.SpecHunter]: 'https://wow.zamimg.com/images/wow/icons/large/ability_marksmanship.jpg',
+  [Spec.SpecHunter]: '/tbc/assets/hunter_icon.png',
   [Spec.SpecMage]: '/tbc/assets/mage_icon.png',
   [Spec.SpecRogue]: 'https://wow.zamimg.com/images/wow/icons/large/ability_rogue_eviscerate.jpg',
   [Spec.SpecRetributionPaladin]: 'https://wow.zamimg.com/images/wow/icons/large/spell_holy_auraoflight.jpg',
@@ -992,6 +992,23 @@ const classToEligibleWeaponTypes: Record<Class, Array<EligibleWeaponType>> = {
 	],
 };
 
+export function isSharpWeaponType(weaponType: WeaponType): boolean {
+	return [
+		WeaponType.WeaponTypeAxe,
+		WeaponType.WeaponTypeDagger,
+		WeaponType.WeaponTypePolearm,
+		WeaponType.WeaponTypeSword,
+	].includes(weaponType);
+}
+
+export function isBluntWeaponType(weaponType: WeaponType): boolean {
+	return [
+		WeaponType.WeaponTypeFist,
+		WeaponType.WeaponTypeMace,
+		WeaponType.WeaponTypeStaff,
+	].includes(weaponType);
+}
+
 export const specEPTransforms: Record<Spec, (epWeights: Stats) => Stats> = {
   [Spec.SpecBalanceDruid]: (epWeights: Stats) => {
 		return epWeights.withStat(Stat.StatSpellHit, 0);
@@ -1003,7 +1020,7 @@ export const specEPTransforms: Record<Spec, (epWeights: Stats) => Stats> = {
 		return epWeights;
 	},
   [Spec.SpecHunter]: (epWeights: Stats) => {
-		return epWeights.withStat(Stat.StatMeleeHit, 0);
+		return epWeights;
 	},
   [Spec.SpecMage]: (epWeights: Stats) => {
 		return epWeights.withStat(Stat.StatSpellHit, 0);
