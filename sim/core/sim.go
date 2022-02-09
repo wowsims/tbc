@@ -251,11 +251,6 @@ func (sim *Simulation) RemovePendingAction(pa *PendingAction) {
 			return
 		}
 	}
-	// fmt.Printf("Tried to remove %d, current queue:\n", pa.id)
-	// for _, v := range sim.pendingActions {
-	// 	fmt.Printf("Action: %d\n", v.id)
-	// }
-	// panic("couldn't find action to remove")
 }
 
 func (sim *Simulation) AddPendingAction(pa *PendingAction) {
