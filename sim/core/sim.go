@@ -211,6 +211,7 @@ func (sim *Simulation) runOnce() {
 	for true {
 		pa := heap.Pop(&sim.pendingActions).(*PendingAction)
 		if pa.cancelled {
+			sim.pendingActionPool.Put(pa)
 			continue
 		}
 
@@ -239,18 +240,6 @@ func (sim *Simulation) runOnce() {
 
 	sim.Raid.doneIteration(sim.Duration)
 	sim.encounter.doneIteration(sim.Duration)
-}
-
-func (sim *Simulation) RemovePendingAction(pa *PendingAction) {
-	if pa.id == 0 {
-		panic("cant remove a pending action without an ID")
-	}
-	for i, v := range sim.pendingActions {
-		if v.id == pa.id {
-			heap.Remove(&sim.pendingActions, i)
-			return
-		}
-	}
 }
 
 func (sim *Simulation) AddPendingAction(pa *PendingAction) {

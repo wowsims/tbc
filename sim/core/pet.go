@@ -141,7 +141,6 @@ func (pet *Pet) Disable(sim *Simulation) {
 
 	if pet.timeoutAction != nil {
 		pet.timeoutAction.Cancel(sim)
-		// sim.pendingActionPool.Put(pet.timeoutAction)
 		pet.timeoutAction = nil
 	}
 
@@ -152,6 +151,7 @@ func (pet *Pet) Disable(sim *Simulation) {
 
 // Helper for enabling a pet that will expire after a certain duration.
 func (pet *Pet) EnableWithTimeout(sim *Simulation, petAgent PetAgent, petDuration time.Duration) {
+	pet.EnableGCDTimer(sim, petAgent)
 	pet.Enable(sim, petAgent)
 
 	pet.timeoutAction = sim.pendingActionPool.Get()

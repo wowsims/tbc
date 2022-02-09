@@ -719,7 +719,7 @@ func (aa *AutoAttacks) resetAutoSwing(sim *Simulation) {
 		if !pa.cancelled {
 			sim.AddPendingAction(pa)
 		} else {
-			// sim.pendingActionPool.Put(pa)
+			sim.pendingActionPool.Put(pa)
 		}
 	}
 	if aa.AutoSwingMelee {
@@ -771,8 +771,6 @@ func (aa *AutoAttacks) TrySwingMH(sim *Simulation, target *Target) {
 		return
 	}
 
-	var ama ActiveMeleeAbility
-
 	// Allow MH swing to be overridden for abilities like Heroic Strike.
 	var replaceAMA *ActiveMeleeAbility
 	if aa.ReplaceMHSwing != nil {
@@ -780,24 +778,19 @@ func (aa *AutoAttacks) TrySwingMH(sim *Simulation, target *Target) {
 	}
 
 	if replaceAMA == nil {
-		ama = aa.ActiveMeleeAbility
-		ama.ActionID.Tag = 1
-		ama.CritMultiplier = aa.MH.CritMultiplier
-		ama.Effect.Target = target
-		ama.Effect.WeaponInput.IsOH = false
+		aa.cachedMelee = aa.ActiveMeleeAbility
+		aa.cachedMelee.ActionID.Tag = 1
+		aa.cachedMelee.CritMultiplier = aa.MH.CritMultiplier
+		aa.cachedMelee.Effect.Target = target
+		aa.cachedMelee.Effect.WeaponInput.IsOH = false
 	} else {
-		ama = *replaceAMA
+		aa.cachedMelee = *replaceAMA
 	}
 
-	aa.cachedMelee = aa.ActiveMeleeAbility
-	aa.cachedMelee.ActionID.Tag = 1
-	aa.cachedMelee.CritMultiplier = aa.MH.CritMultiplier
-	aa.cachedMelee.Effect.Target = target
-	aa.cachedMelee.Effect.WeaponInput.IsOH = false
 	aa.cachedMelee.Attack(sim)
 	aa.MainhandSwingAt = sim.CurrentTime + aa.MainhandSwingSpeed()
 	aa.previousMHSwingAt = sim.CurrentTime
-	aa.agent.OnAutoAttack(sim, &ama)
+	aa.agent.OnAutoAttack(sim, &aa.cachedMelee)
 }
 
 // Performs an autoattack using the main hand weapon, if the OH CD is ready.
