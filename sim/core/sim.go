@@ -28,8 +28,9 @@ type Simulation struct {
 	testRands map[uint32]*rand.Rand
 
 	// Current Simulation State
-	pendingActions ActionsQueue
-	CurrentTime    time.Duration // duration that has elapsed in the sim since starting
+	pendingActions    ActionsQueue
+	pendingActionPool *paPool
+	CurrentTime       time.Duration // duration that has elapsed in the sim since starting
 
 	ProgressReport func(*proto.ProgressMetrics)
 
@@ -78,6 +79,8 @@ func newSim(rsr proto.RaidSimRequest) *Simulation {
 		testRands: make(map[uint32]*rand.Rand),
 
 		emptyAuras: make([]Aura, numAuraIDs),
+
+		pendingActionPool: newPAPool(),
 	}
 }
 
@@ -116,6 +119,7 @@ func (sim *Simulation) reset() {
 
 	sim.Duration = sim.BaseDuration + time.Duration((sim.RandomFloat("sim duration") * float64(variation))) - sim.DurationVariation
 	sim.CurrentTime = 0.0
+
 	sim.pendingActions = make([]*PendingAction, 0, 64)
 
 	// Targets need to be reset before the raid, so that players can check for
@@ -207,6 +211,7 @@ func (sim *Simulation) runOnce() {
 	for true {
 		pa := heap.Pop(&sim.pendingActions).(*PendingAction)
 		if pa.cancelled {
+			sim.pendingActionPool.Put(pa)
 			continue
 		}
 
@@ -225,6 +230,9 @@ func (sim *Simulation) runOnce() {
 	}
 
 	for _, pa := range sim.pendingActions {
+		if pa == nil {
+			continue
+		}
 		if pa.CleanUp != nil {
 			pa.CleanUp(sim)
 		}

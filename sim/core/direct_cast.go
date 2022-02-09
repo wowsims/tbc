@@ -178,10 +178,9 @@ func (spell *SimpleSpell) Cast(sim *Simulation) bool {
 				if hitEffect.DotInput.NumberOfTicks != 0 {
 					hitEffect.takeDotSnapshot(sim, &spell.SpellCast)
 
-					pa := &PendingAction{
-						Priority:     ActionPriorityDOT,
-						NextActionAt: sim.CurrentTime + hitEffect.DotInput.TickLength,
-					}
+					pa := sim.pendingActionPool.Get()
+					pa.Priority = ActionPriorityDOT
+					pa.NextActionAt = sim.CurrentTime + hitEffect.DotInput.TickLength
 					pa.OnAction = func(sim *Simulation) {
 						hitEffect.calculateDotDamage(sim, &spell.SpellCast)
 						hitEffect.afterDotTick(sim, &spell.SpellCast)
@@ -195,10 +194,14 @@ func (spell *SimpleSpell) Cast(sim *Simulation) bool {
 						}
 					}
 					pa.CleanUp = func(sim *Simulation) {
-						if spell.currentDotAction == nil {
+						if pa.cancelled {
 							return
 						}
-						spell.currentDotAction = nil
+						pa.cancelled = true
+						if spell.currentDotAction != nil {
+							spell.currentDotAction.cancelled = true
+							spell.currentDotAction = nil
+						}
 
 						hitEffect.onDotComplete(sim, &spell.SpellCast)
 
@@ -248,10 +251,11 @@ func (spell *SimpleSpell) Cast(sim *Simulation) bool {
 
 			// This assumes that the effects either all have dots, or none of them do.
 			if spell.Effects[0].DotInput.NumberOfTicks != 0 {
-				pa := &PendingAction{
-					Priority:     ActionPriorityDOT,
-					NextActionAt: sim.CurrentTime + spell.Effects[0].DotInput.TickLength,
-				}
+				pa := sim.pendingActionPool.Get()
+
+				pa.Priority = ActionPriorityDOT
+				pa.NextActionAt = sim.CurrentTime + spell.Effects[0].DotInput.TickLength
+
 				pa.OnAction = func(sim *Simulation) {
 					for i := range spell.Effects {
 						spell.Effects[i].calculateDotDamage(sim, &spell.SpellCast)
@@ -273,11 +277,14 @@ func (spell *SimpleSpell) Cast(sim *Simulation) bool {
 					}
 				}
 				pa.CleanUp = func(sim *Simulation) {
-					if spell.currentDotAction == nil {
+					if pa.cancelled {
 						return
 					}
-					spell.currentDotAction = nil
-
+					pa.cancelled = true
+					if spell.currentDotAction != nil {
+						spell.currentDotAction.cancelled = true
+						spell.currentDotAction = nil
+					}
 					for i := range spell.Effects {
 						spell.Effects[i].onDotComplete(sim, &spell.SpellCast)
 					}
@@ -329,6 +336,7 @@ func (spell *SimpleSpell) Cancel(sim *Simulation) {
 	spell.SpellCast.Cancel()
 	if spell.currentDotAction != nil {
 		spell.currentDotAction.Cancel(sim)
+		spell.currentDotAction = nil
 	}
 }
 
