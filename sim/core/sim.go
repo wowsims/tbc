@@ -229,6 +229,9 @@ func (sim *Simulation) runOnce() {
 	}
 
 	for _, pa := range sim.pendingActions {
+		if pa == nil {
+			continue
+		}
 		if pa.CleanUp != nil {
 			pa.CleanUp(sim)
 		}
@@ -238,7 +241,27 @@ func (sim *Simulation) runOnce() {
 	sim.encounter.doneIteration(sim.Duration)
 }
 
+func (sim *Simulation) RemovePendingAction(pa *PendingAction) {
+	if pa.id == 0 {
+		panic("cant remove a pending action without an ID")
+	}
+	for i, v := range sim.pendingActions {
+		if v.id == pa.id {
+			heap.Remove(&sim.pendingActions, i)
+			return
+		}
+	}
+	// fmt.Printf("Tried to remove %d, current queue:\n", pa.id)
+	// for _, v := range sim.pendingActions {
+	// 	fmt.Printf("Action: %d\n", v.id)
+	// }
+	// panic("couldn't find action to remove")
+}
+
 func (sim *Simulation) AddPendingAction(pa *PendingAction) {
+	if pa == nil || pa.OnAction == nil {
+		panic("cant add nil action")
+	}
 	heap.Push(&sim.pendingActions, pa)
 }
 

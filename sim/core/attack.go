@@ -718,7 +718,7 @@ func (aa *AutoAttacks) resetAutoSwing(sim *Simulation) {
 		if !pa.cancelled {
 			sim.AddPendingAction(pa)
 		} else {
-			// sim.pendingActionPool.Put(pa)
+			sim.pendingActionPool.Put(pa)
 		}
 	}
 	if aa.AutoSwingMelee {

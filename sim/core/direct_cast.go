@@ -286,7 +286,8 @@ func (spell *SimpleSpell) Cast(sim *Simulation) bool {
 
 					spell.Character.Metrics.AddSpellCast(&spell.SpellCast)
 					spell.objectInUse = false
-					// sim.pendingActionPool.Put(pa)
+					sim.RemovePendingAction(pa)
+					sim.pendingActionPool.Put(pa)
 				}
 
 				spell.currentDotAction = pa
