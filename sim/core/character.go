@@ -427,9 +427,9 @@ func (character *Character) reset(sim *Simulation, agent Agent) {
 		petAgent.Reset(sim)
 	}
 
-	// if character.gcdAction != nil {
-	// 	sim.pendingActionPool.Put(character.gcdAction)
-	// }
+	if character.gcdAction != nil {
+		sim.pendingActionPool.Put(character.gcdAction)
+	}
 	character.gcdAction = character.newGCDAction(sim, agent)
 	character.hardcastAction = character.newHardcastAction(sim)
 }

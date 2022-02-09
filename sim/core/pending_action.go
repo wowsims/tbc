@@ -85,9 +85,6 @@ func (pap *paPool) Get() *PendingAction {
 }
 
 func (pap *paPool) Put(pa *PendingAction) {
-	if pa.id == 0 {
-		panic("added pending action that was not ID'd")
-	}
 	pa.cancelled = true
 	pa.CleanUp = nil
 	pa.Name = ""

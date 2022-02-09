@@ -194,11 +194,14 @@ func (spell *SimpleSpell) Cast(sim *Simulation) bool {
 						}
 					}
 					pa.CleanUp = func(sim *Simulation) {
-						if spell.currentDotAction == nil {
+						if pa.cancelled {
 							return
 						}
-						spell.currentDotAction.cancelled = true
-						spell.currentDotAction = nil
+						pa.cancelled = true
+						if spell.currentDotAction != nil {
+							spell.currentDotAction.cancelled = true
+							spell.currentDotAction = nil
+						}
 
 						hitEffect.onDotComplete(sim, &spell.SpellCast)
 
@@ -274,13 +277,14 @@ func (spell *SimpleSpell) Cast(sim *Simulation) bool {
 					}
 				}
 				pa.CleanUp = func(sim *Simulation) {
-					if spell.currentDotAction == nil {
+					if pa.cancelled {
 						return
 					}
-					// In case this is called from
-					spell.currentDotAction.cancelled = true
-					spell.currentDotAction = nil
-
+					pa.cancelled = true
+					if spell.currentDotAction != nil {
+						spell.currentDotAction.cancelled = true
+						spell.currentDotAction = nil
+					}
 					for i := range spell.Effects {
 						spell.Effects[i].onDotComplete(sim, &spell.SpellCast)
 					}

@@ -243,9 +243,6 @@ func (sim *Simulation) runOnce() {
 }
 
 func (sim *Simulation) AddPendingAction(pa *PendingAction) {
-	if pa == nil || pa.OnAction == nil {
-		panic("cant add nil action")
-	}
 	heap.Push(&sim.pendingActions, pa)
 }
 
