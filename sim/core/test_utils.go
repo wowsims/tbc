@@ -12,7 +12,7 @@ import (
 var DefaultSimTestOptions = &proto.SimOptions{
 	Iterations: 1,
 	IsTest:     true,
-	Debug:      false,
+	Debug:      true,
 	RandomSeed: 101,
 }
 var StatWeightsDefaultSimTestOptions = &proto.SimOptions{
@@ -29,7 +29,7 @@ var AverageDefaultSimTestOptions = &proto.SimOptions{
 }
 
 const ShortDuration = 60
-const LongDuration = 300
+const LongDuration = 20
 
 func MakeDefaultEncounterCombos(debuffs *proto.Debuffs) []EncounterCombo {
 	var NoDebuffTarget = &proto.Target{

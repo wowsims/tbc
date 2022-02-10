@@ -302,6 +302,10 @@ func (character *Character) InitialCastSpeed() float64 {
 	return character.initialCastSpeed
 }
 
+func (character *Character) SpellGCD() time.Duration {
+	return MinDuration(GCDMin, time.Duration(float64(GCDDefault)/character.CastSpeed()))
+}
+
 func (character *Character) CastSpeed() float64 {
 	return character.PseudoStats.CastSpeedMultiplier * (1 + (character.stats[stats.SpellHaste] / (HasteRatingPerHastePercent * 100)))
 }

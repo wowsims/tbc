@@ -11,8 +11,12 @@ type Paladin struct {
 
 	Talents proto.PaladinTalents
 
+	currentSeal core.Aura
+
 	crusaderStrikeTemplate core.MeleeAbilityTemplate
 	crusaderStrikeSpell    core.ActiveMeleeAbility
+	sealOfBlood            core.SimpleCast
+	sealOfCommand          core.SimpleCast
 }
 
 // Implemented by each Paladin spec.
@@ -48,6 +52,9 @@ func NewPaladin(character core.Character, talents proto.PaladinTalents) *Paladin
 	}
 
 	paladin.EnableManaBar()
+
+	paladin.setupSealOfBlood()
+	paladin.setupSealOfCommand()
 
 	return paladin
 }

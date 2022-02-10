@@ -32,7 +32,6 @@ func NewRetributionPaladin(character core.Character, options proto.Player) *Retr
 
 	ret.EnableAutoAttacks(ret, core.AutoAttackOptions{
 		MainHand:       ret.WeaponFromMainHand(ret.DefaultMeleeCritMultiplier()),
-		OffHand:        ret.WeaponFromOffHand(ret.DefaultMeleeCritMultiplier()),
 		AutoSwingMelee: true,
 	})
 
@@ -65,14 +64,6 @@ func (ret *RetributionPaladin) OnManaTick(sim *core.Simulation) {
 
 func (ret *RetributionPaladin) tryUseGCD(sim *core.Simulation) {
 	target := sim.GetPrimaryTarget()
-
-	if !ret.HasAura(paladin.SealOfBloodAuraID) {
-		cast := ret.NewSealOfBlood(sim)
-		if success := cast.StartCast(sim); !success {
-			ret.WaitForMana(sim, cast.GetManaCost())
-		}
-		return
-	}
 	
 	// check if we can use crusader strike
 	if !ret.IsOnCD(paladin.CrusaderStrikeCD, sim.CurrentTime) {
@@ -82,6 +73,36 @@ func (ret *RetributionPaladin) tryUseGCD(sim *core.Simulation) {
 		}
 		return
 	}
+
+	tts := ret.AutoAttacks.MainhandSwingAt - sim.CurrentTime
+
+	if ret.HasAura(paladin.SealOfCommandAuraID) {
+		// maybe do a mana check first to make sure we don't twist when we don't have mana
+		if tts <= paladin.TwistWindow {
+			sob := ret.NewSealOfBlood(sim)
+
+			// this is probably not the behaviour we want for not being able to twist
+			if success := sob.StartCast(sim); !success {
+				ret.WaitForMana(sim, sob.GetManaCost())
+			}
+			return
+		} else {
+			ret.WaitUntil(sim, ret.AutoAttacks.MainhandSwingAt - paladin.TwistWindow)
+		}
+	} else if tts > ret.SpellGCD() {
+		soc := ret.NewSealOfCommand(sim)
+		if success := soc.StartCast(sim); !success {
+			ret.WaitForMana(sim, soc.GetManaCost())
+		}
+		return
+	} else if !ret.HasAura(paladin.SealOfBloodAuraID) {
+		sob := ret.NewSealOfBlood(sim)
+		if success := sob.StartCast(sim); !success {
+			ret.WaitForMana(sim, sob.GetManaCost())
+		}
+		return
+	}
+
 
 	// probably should check for the min of crusader strike CD or SoB expiration
 	nextEventAt := ret.CDReadyAt(paladin.CrusaderStrikeCD)

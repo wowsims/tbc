@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"math/rand"
 	"runtime"
-	"strings"
+	"os"
 	"time"
 
 	"github.com/wowsims/tbc/sim/core/proto"
@@ -132,10 +132,11 @@ func (sim *Simulation) reset() {
 // Run runs the simulation for the configured number of iterations, and
 // collects all the metrics together.
 func (sim *Simulation) run() *proto.RaidSimResult {
-	logsBuffer := &strings.Builder{}
+	// logsBuffer := &strings.Builder{}
 	if sim.Options.Debug || sim.Options.DebugFirstIteration {
 		sim.Log = func(message string, vals ...interface{}) {
-			logsBuffer.WriteString(fmt.Sprintf("[%0.05f] "+message+"\n", append([]interface{}{sim.CurrentTime.Seconds()}, vals...)...))
+			// logsBuffer.WriteString(fmt.Sprintf("[%0.05f] "+message+"\n", append([]interface{}{sim.CurrentTime.Seconds()}, vals...)...))
+			os.Stderr.WriteString(fmt.Sprintf("[%0.05f] "+message+"\n", append([]interface{}{sim.CurrentTime.Seconds()}, vals...)...))
 		}
 	}
 
@@ -189,7 +190,7 @@ func (sim *Simulation) run() *proto.RaidSimResult {
 		RaidMetrics:      sim.Raid.GetMetrics(sim.Options.Iterations),
 		EncounterMetrics: sim.encounter.GetMetricsProto(sim.Options.Iterations),
 
-		Logs: logsBuffer.String(),
+		// Logs: logsBuffer.String(),
 	}
 
 	// Final progress report

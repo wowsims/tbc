@@ -279,21 +279,15 @@ func (ahe *AbilityHitEffect) WhiteHitTableResult(sim *Simulation, ability *Activ
 	character := ability.Character
 
 	roll := sim.RandomFloat("auto attack")
-	level := float64(ahe.Target.Level)
-	skill := 350.0 // assume max skill level for now.
-
-	// Difference between attacker's waepon skill and target's defense skill.
-	skillDifference := (level * 5) - skill
 
 	// Miss
-	missChance := 0.05 + skillDifference*0.002
+	missChance := ahe.Target.MissChance
 	if ahe.IsWhiteHit && !ahe.IsRanged() && character.AutoAttacks.IsDualWielding {
 		missChance += 0.19
 	}
-	hitSuppression := (skillDifference - 10) * 0.002
-	hitBonus := ((character.stats[stats.MeleeHit] + ahe.BonusHitRating) / (MeleeHitRatingPerHitChance * 100)) - hitSuppression
+	hitBonus := ((character.stats[stats.MeleeHit] + ahe.BonusHitRating) / (MeleeHitRatingPerHitChance * 100)) - ahe.Target.HitSuppression
 	if hitBonus > 0 {
-		missChance = math.Max(0, missChance-hitBonus)
+		missChance = MaxFloat(0, missChance-hitBonus)
 	}
 
 	chance := missChance
@@ -303,8 +297,8 @@ func (ahe *AbilityHitEffect) WhiteHitTableResult(sim *Simulation, ability *Activ
 
 	if !ahe.IsRanged() { // Ranged hits can't be dodged/glance, and are always 2-roll
 		// Dodge
-		dodge := 0.05 + skillDifference*0.001
-		expertisePercentage := math.Min(math.Floor((character.stats[stats.Expertise]+ahe.BonusExpertiseRating)/(ExpertisePerQuarterPercentReduction))/400, dodge)
+		dodge := ahe.Target.Dodge
+		expertisePercentage := MinFloat(math.Floor((character.stats[stats.Expertise]+ahe.BonusExpertiseRating)/(ExpertisePerQuarterPercentReduction))/400, dodge)
 		chance += dodge - expertisePercentage
 		if roll < chance {
 			return MeleeHitTypeDodge
@@ -323,13 +317,13 @@ func (ahe *AbilityHitEffect) WhiteHitTableResult(sim *Simulation, ability *Activ
 		// If we actually implement blocks, ranged hits can be blocked.
 
 		// Glance
-		chance += math.Max(0.06+skillDifference*0.012, 0)
+		chance += ahe.Target.Glance
 		if roll < chance {
 			return MeleeHitTypeGlance
 		}
 
 		// Crit
-		critChance := ((character.stats[stats.MeleeCrit] + ahe.BonusCritRating) / (MeleeCritRatingPerCritChance * 100)) - skillDifference*0.002 - 0.018
+		critChance := ((character.stats[stats.MeleeCrit] + ahe.BonusCritRating) / (MeleeCritRatingPerCritChance * 100)) - ahe.Target.CritSuppression
 		chance += critChance
 		if roll < chance {
 			return MeleeHitTypeCrit
@@ -381,9 +375,9 @@ func (ahe *AbilityHitEffect) calculateDamage(sim *Simulation, ability *ActiveMel
 		}
 	}
 
-	//if sim.Log != nil {
-	//	character.Log(sim, "Melee dmg calcs: AP=%0.1f, bonusWepDmg:%0.1f, dmgMultiplier:%0.2f, staticMultiplier:%0.2f, result:%d, weaponDmgCalc: %0.1f, critMultiplier: %0.3f, Target armor: %0.1f\n", attackPower, bonusWeaponDamage, ahe.DamageMultiplier, ahe.StaticDamageMultiplier, ahe.HitType, dmg, ability.CritMultiplier, ahe.Target.currentArmor)
-	//}
+	if sim.Log != nil {
+		character.Log(sim, "Melee dmg calcs: AP=%0.1f, bonusWepDmg:%0.1f, dmgMultiplier:%0.2f, staticMultiplier:%0.2f, result:%d, weaponDmgCalc: %0.1f, critMultiplier: %0.3f, Target armor: %0.1f\n", attackPower, bonusWeaponDamage, ahe.DamageMultiplier, ahe.StaticDamageMultiplier, ahe.HitType, dmg, ability.CritMultiplier, ahe.Target.currentArmor)
+	}
 
 	// Add damage from DirectInput
 	if ahe.DirectInput.MinBaseDamage != 0 {
@@ -576,7 +570,8 @@ type AutoAttacks struct {
 	OffhandSwingAt  time.Duration
 	RangedSwingAt   time.Duration
 
-	ActiveMeleeAbility // Parameters for auto attacks.
+	ActiveMeleeAbility                    // Parameters for auto attacks.
+	cachedMelee        ActiveMeleeAbility // reuse to save memory allocations
 
 	RangedAuto ActiveMeleeAbility // Parameters for ranged auto attacks.
 
@@ -707,10 +702,10 @@ func (aa *AutoAttacks) resetAutoSwing(sim *Simulation) {
 		aa.autoSwingAction.Cancel(sim)
 	}
 
-	pa := &PendingAction{
-		Priority:     ActionPriorityAuto,
-		NextActionAt: 0, // First auto is always at 0
-	}
+	pa := sim.pendingActionPool.Get()
+	pa.Priority = ActionPriorityAuto
+	pa.NextActionAt = 0 // First auto is always at 0
+
 	pa.OnAction = func(sim *Simulation) {
 		if aa.AutoSwingMelee {
 			aa.SwingMelee(sim, sim.GetPrimaryTarget())
@@ -723,6 +718,8 @@ func (aa *AutoAttacks) resetAutoSwing(sim *Simulation) {
 		// Cancelled means we made a new one because of a swing speed change.
 		if !pa.cancelled {
 			sim.AddPendingAction(pa)
+		} else {
+			sim.pendingActionPool.Put(pa)
 		}
 	}
 	if aa.AutoSwingMelee {
@@ -753,6 +750,11 @@ func (aa *AutoAttacks) RangedSwingWindup() time.Duration {
 	return time.Duration(float64(time.Millisecond*500) / aa.character.RangedSwingSpeed())
 }
 
+// Returns the amount of time available before ranged auto will be clipped.
+func (aa *AutoAttacks) TimeBeforeClippingRanged(sim *Simulation) time.Duration {
+	return aa.RangedSwingAt - aa.RangedSwingWindup() - sim.CurrentTime
+}
+
 // SwingMelee will check any swing timers if they are up, and if so, swing!
 func (aa *AutoAttacks) SwingMelee(sim *Simulation, target *Target) {
 	aa.TrySwingMH(sim, target)
@@ -769,8 +771,6 @@ func (aa *AutoAttacks) TrySwingMH(sim *Simulation, target *Target) {
 		return
 	}
 
-	var ama ActiveMeleeAbility
-
 	// Allow MH swing to be overridden for abilities like Heroic Strike.
 	var replaceAMA *ActiveMeleeAbility
 	if aa.ReplaceMHSwing != nil {
@@ -778,19 +778,19 @@ func (aa *AutoAttacks) TrySwingMH(sim *Simulation, target *Target) {
 	}
 
 	if replaceAMA == nil {
-		ama = aa.ActiveMeleeAbility
-		ama.ActionID.Tag = 1
-		ama.CritMultiplier = aa.MH.CritMultiplier
-		ama.Effect.Target = target
-		ama.Effect.WeaponInput.IsOH = false
+		aa.cachedMelee = aa.ActiveMeleeAbility
+		aa.cachedMelee.ActionID.Tag = 1
+		aa.cachedMelee.CritMultiplier = aa.MH.CritMultiplier
+		aa.cachedMelee.Effect.Target = target
+		aa.cachedMelee.Effect.WeaponInput.IsOH = false
 	} else {
-		ama = *replaceAMA
+		aa.cachedMelee = *replaceAMA
 	}
 
-	ama.Attack(sim)
+	aa.cachedMelee.Attack(sim)
 	aa.MainhandSwingAt = sim.CurrentTime + aa.MainhandSwingSpeed()
 	aa.previousMHSwingAt = sim.CurrentTime
-	aa.agent.OnAutoAttack(sim, &ama)
+	aa.agent.OnAutoAttack(sim, &aa.cachedMelee)
 }
 
 // Performs an autoattack using the main hand weapon, if the OH CD is ready.
@@ -808,14 +808,14 @@ func (aa *AutoAttacks) TrySwingOH(sim *Simulation, target *Target) {
 		return
 	}
 
-	ama := aa.ActiveMeleeAbility
-	ama.ActionID.Tag = 2
-	ama.CritMultiplier = aa.OH.CritMultiplier
-	ama.Effect.Target = target
-	ama.Effect.WeaponInput.IsOH = true
-	ama.Attack(sim)
+	aa.cachedMelee = aa.ActiveMeleeAbility
+	aa.cachedMelee.ActionID.Tag = 2
+	aa.cachedMelee.CritMultiplier = aa.OH.CritMultiplier
+	aa.cachedMelee.Effect.Target = target
+	aa.cachedMelee.Effect.WeaponInput.IsOH = true
+	aa.cachedMelee.Attack(sim)
 	aa.OffhandSwingAt = sim.CurrentTime + aa.OffhandSwingSpeed()
-	aa.agent.OnAutoAttack(sim, &ama)
+	aa.agent.OnAutoAttack(sim, &aa.cachedMelee)
 }
 
 // Performs an autoattack using the ranged weapon, if the ranged CD is ready.
