@@ -1,7 +1,6 @@
 package core
 
 import (
-	"container/heap"
 	"fmt"
 	"math/rand"
 	"runtime"
@@ -28,7 +27,7 @@ type Simulation struct {
 	testRands map[uint32]*rand.Rand
 
 	// Current Simulation State
-	pendingActions    ActionsQueue
+	pendingActions    []*PendingAction
 	pendingActionPool *paPool
 	CurrentTime       time.Duration // duration that has elapsed in the sim since starting
 
@@ -209,7 +208,9 @@ func (sim *Simulation) runOnce() {
 	sim.reset()
 
 	for true {
-		pa := heap.Pop(&sim.pendingActions).(*PendingAction)
+		last := len(sim.pendingActions) - 1
+		pa := sim.pendingActions[last]
+		sim.pendingActions = sim.pendingActions[:last]
 		if pa.cancelled {
 			sim.pendingActionPool.Put(pa)
 			continue
@@ -243,7 +244,28 @@ func (sim *Simulation) runOnce() {
 }
 
 func (sim *Simulation) AddPendingAction(pa *PendingAction) {
-	heap.Push(&sim.pendingActions, pa)
+	oldlen := len(sim.pendingActions)
+
+	// The logic to calculate the index to insert at can be replaced with sort.Search() which uses a binary search.
+	//   However I haven't found any cases yet in our simulator that it is faster.
+	var index = 0
+	for _, v := range sim.pendingActions {
+		if v.NextActionAt < pa.NextActionAt || (v.NextActionAt == pa.NextActionAt && v.Priority >= pa.Priority) {
+			break
+		}
+		index++
+	}
+
+	sim.pendingActions = append(sim.pendingActions, pa)
+	if index == oldlen { // if the insert was at the end, just return now.
+		return
+	} else if oldlen == 1 { // simple case we can just swap the two
+		sim.pendingActions[0], sim.pendingActions[1] = sim.pendingActions[1], sim.pendingActions[0]
+		return
+	}
+
+	copy(sim.pendingActions[index+1:], sim.pendingActions[index:])
+	sim.pendingActions[index] = pa
 }
 
 // Advance moves time forward counting down auras, CDs, mana regen, etc
