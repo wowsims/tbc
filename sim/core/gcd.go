@@ -90,6 +90,19 @@ func (character *Character) WaitUntil(sim *Simulation, readyTime time.Duration) 
 	}
 }
 
+func (character *Character) HardcastWaitUntil(sim *Simulation, readyTime time.Duration, cast *Cast) {
+	if character.Hardcast.Expires > sim.CurrentTime {
+		panic("Hardcast already in use")
+	}
+
+	character.Hardcast.Expires = readyTime
+	character.Hardcast.Cast = cast
+	character.Hardcast.OnComplete = cast.OnCastComplete
+
+	character.hardcastAction.NextActionAt = character.Hardcast.Expires
+	sim.AddPendingAction(character.hardcastAction)
+}
+
 func (character *Character) WaitForMana(sim *Simulation, desiredMana float64) {
 	character.waitStartTime = sim.CurrentTime
 	character.waitingForMana = desiredMana

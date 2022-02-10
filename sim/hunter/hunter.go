@@ -94,6 +94,8 @@ type Hunter struct {
 
 	steadyShotAbilityTemplate core.MeleeAbilityTemplate
 	steadyShotAbility         core.ActiveMeleeAbility
+
+	fakeHardcast core.Cast
 }
 
 func (hunter *Hunter) GetCharacter() *core.Character {
@@ -132,6 +134,15 @@ func (hunter *Hunter) Init(sim *core.Simulation) {
 	hunter.serpentStingDotTemplate = hunter.newSerpentStingDotTemplate(sim)
 	hunter.steadyShotCastTemplate = hunter.newSteadyShotCastTemplate(sim)
 	hunter.steadyShotAbilityTemplate = hunter.newSteadyShotAbilityTemplate(sim)
+
+	hunter.fakeHardcast = core.Cast{
+		Character:   &hunter.Character,
+		IgnoreHaste: true,
+		CastTime:    hunter.timeToWeave,
+		OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
+			hunter.rotation(sim, false)
+		},
+	}
 }
 
 func (hunter *Hunter) Reset(sim *core.Simulation) {

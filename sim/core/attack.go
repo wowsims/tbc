@@ -707,9 +707,8 @@ func (aa *AutoAttacks) reset(sim *Simulation) {
 		ama := aa.RangedAuto
 		ama.Effect.Target = sim.GetPrimaryTarget()
 		ama.Attack(sim)
-		aa.RangedSwingAt = sim.CurrentTime + aa.RangedSwingGap()
-		aa.agent.OnAutoAttack(sim, &ama)
 		aa.RangedSwingInProgress = false
+		aa.agent.OnAutoAttack(sim, &ama)
 	}
 }
 
@@ -854,6 +853,7 @@ func (aa *AutoAttacks) TrySwingRanged(sim *Simulation, target *Target) {
 
 	aa.RangedCast.CastTime = aa.RangedSwingWindup()
 	aa.RangedCast.StartCast(sim)
+	aa.RangedSwingAt = sim.CurrentTime + aa.RangedSwingSpeed()
 	aa.RangedSwingInProgress = true
 
 	// It's important that we update the GCD timer AFTER starting the ranged auto.
