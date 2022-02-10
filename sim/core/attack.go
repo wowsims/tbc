@@ -381,9 +381,9 @@ func (ahe *AbilityHitEffect) calculateDamage(sim *Simulation, ability *ActiveMel
 		}
 	}
 
-	if sim.Log != nil {
-		character.Log(sim, "Melee dmg calcs: AP=%0.1f, bonusWepDmg:%0.1f, dmgMultiplier:%0.2f, staticMultiplier:%0.2f, result:%d, weaponDmgCalc: %0.1f, critMultiplier: %0.3f, Target armor: %0.1f\n", attackPower, bonusWeaponDamage, ahe.DamageMultiplier, ahe.StaticDamageMultiplier, ahe.HitType, dmg, ability.CritMultiplier, ahe.Target.currentArmor)
-	}
+	//if sim.Log != nil {
+	//	character.Log(sim, "Melee dmg calcs: AP=%0.1f, bonusWepDmg:%0.1f, dmgMultiplier:%0.2f, staticMultiplier:%0.2f, result:%d, weaponDmgCalc: %0.1f, critMultiplier: %0.3f, Target armor: %0.1f\n", attackPower, bonusWeaponDamage, ahe.DamageMultiplier, ahe.StaticDamageMultiplier, ahe.HitType, dmg, ability.CritMultiplier, ahe.Target.currentArmor)
+	//}
 
 	// Add damage from DirectInput
 	if ahe.DirectInput.MinBaseDamage != 0 {
@@ -578,7 +578,9 @@ type AutoAttacks struct {
 
 	ActiveMeleeAbility // Parameters for auto attacks.
 
-	RangedAuto ActiveMeleeAbility // Parameters for ranged auto attacks.
+	RangedAuto            ActiveMeleeAbility // Parameters for ranged auto attacks.
+	RangedCast            SimpleCast         // Used for the 0.5s cast time on ranged autos.
+	RangedSwingInProgress bool
 
 	ReplaceMHSwing ReplaceMHSwing
 
@@ -650,6 +652,14 @@ func (character *Character) EnableAutoAttacks(agent Agent, options AutoAttackOpt
 				},
 			},
 		},
+		RangedCast: SimpleCast{
+			Cast: Cast{
+				ActionID:    ActionID{OtherID: proto.OtherAction_OtherActionShoot},
+				Character:   character,
+				IgnoreHaste: true, // Affected by ranged haste, not spell haste.
+			},
+			DisableMetrics: true,
+		},
 	}
 
 	if options.AutoSwingMelee && options.AutoSwingRanged {
@@ -675,7 +685,6 @@ func (aa *AutoAttacks) reset(sim *Simulation) {
 
 	aa.MainhandSwingAt = 0
 	aa.OffhandSwingAt = 0
-	aa.RangedSwingAt = aa.RangedSwingWindup()
 
 	// Set a fake value for previousMHSwing so that offhand swing delay works
 	// properly at the start.
@@ -696,6 +705,17 @@ func (aa *AutoAttacks) reset(sim *Simulation) {
 
 	// Can precompute this.
 	aa.RangedAuto.CritMultiplier = aa.Ranged.CritMultiplier
+
+	aa.RangedSwingAt = 0
+	aa.RangedSwingInProgress = false
+	aa.RangedCast.OnCastComplete = func(sim *Simulation, cast *Cast) {
+		ama := aa.RangedAuto
+		ama.Effect.Target = sim.GetPrimaryTarget()
+		ama.Attack(sim)
+		aa.RangedSwingAt = sim.CurrentTime + aa.RangedSwingGap()
+		aa.agent.OnAutoAttack(sim, &ama)
+		aa.RangedSwingInProgress = false
+	}
 }
 
 func (aa *AutoAttacks) resetAutoSwing(sim *Simulation) {
@@ -735,14 +755,17 @@ func (aa *AutoAttacks) resetAutoSwing(sim *Simulation) {
 	sim.AddPendingAction(pa)
 }
 
+// The amount of time between two MH swings.
 func (aa *AutoAttacks) MainhandSwingSpeed() time.Duration {
 	return time.Duration(float64(aa.MH.SwingDuration) / aa.character.SwingSpeed())
 }
 
+// The amount of time between two OH swings.
 func (aa *AutoAttacks) OffhandSwingSpeed() time.Duration {
 	return time.Duration(float64(aa.OH.SwingDuration) / aa.character.SwingSpeed())
 }
 
+// The amount of time between two ranged swings.
 func (aa *AutoAttacks) RangedSwingSpeed() time.Duration {
 	return time.Duration(float64(aa.Ranged.SwingDuration) / aa.character.RangedSwingSpeed())
 }
@@ -751,6 +774,11 @@ func (aa *AutoAttacks) RangedSwingSpeed() time.Duration {
 // This function computes the amount of windup time based on the current haste.
 func (aa *AutoAttacks) RangedSwingWindup() time.Duration {
 	return time.Duration(float64(time.Millisecond*500) / aa.character.RangedSwingSpeed())
+}
+
+// Time between a ranged auto finishes casting and the next one becomes available.
+func (aa *AutoAttacks) RangedSwingGap() time.Duration {
+	return time.Duration(float64(aa.Ranged.SwingDuration-time.Millisecond*500) / aa.character.RangedSwingSpeed())
 }
 
 // Returns the amount of time available before ranged auto will be clipped.
@@ -829,11 +857,16 @@ func (aa *AutoAttacks) TrySwingRanged(sim *Simulation, target *Target) {
 		return
 	}
 
-	ama := aa.RangedAuto
-	ama.Effect.Target = target
-	ama.Attack(sim)
-	aa.RangedSwingAt = sim.CurrentTime + aa.RangedSwingSpeed()
-	aa.agent.OnAutoAttack(sim, &ama)
+	aa.RangedCast.CastTime = aa.RangedSwingWindup()
+	aa.RangedCast.StartCast(sim)
+	aa.RangedSwingInProgress = true
+
+	// It's important that we update the GCD timer AFTER starting the ranged auto.
+	// Otherwise the hardcast action won't be created separately.
+	nextGCD := sim.CurrentTime + aa.RangedCast.CastTime
+	if nextGCD > aa.Character.NextGCDAt() {
+		aa.Character.SetGCDTimer(sim, nextGCD)
+	}
 }
 
 func (aa *AutoAttacks) ModifySwingTime(sim *Simulation, amount float64) {
@@ -875,9 +908,11 @@ func (aa *AutoAttacks) DelayAllUntil(sim *Simulation, readyAt time.Duration) {
 			autoChanged = true
 		}
 	}
-	newRangedSwingAt := readyAt + aa.RangedSwingWindup()
-	if newRangedSwingAt > aa.RangedSwingAt {
-		aa.RangedSwingAt = newRangedSwingAt
+	if readyAt > aa.RangedSwingAt {
+		if aa.RangedSwingInProgress {
+			panic("Ranged swing already in progress!")
+		}
+		aa.RangedSwingAt = readyAt
 		if aa.AutoSwingRanged {
 			autoChanged = true
 		}
@@ -889,9 +924,11 @@ func (aa *AutoAttacks) DelayAllUntil(sim *Simulation, readyAt time.Duration) {
 }
 
 func (aa *AutoAttacks) DelayRangedUntil(sim *Simulation, readyAt time.Duration) {
-	newRangedSwingAt := readyAt + aa.RangedSwingWindup()
-	if newRangedSwingAt > aa.RangedSwingAt {
-		aa.RangedSwingAt = newRangedSwingAt
+	if aa.RangedSwingInProgress {
+		panic("Ranged swing already in progress!")
+	}
+	if readyAt > aa.RangedSwingAt {
+		aa.RangedSwingAt = readyAt
 		aa.resetAutoSwing(sim)
 	}
 }
@@ -903,6 +940,11 @@ func (aa *AutoAttacks) NextAttackAt() time.Duration {
 		nextAttack = MinDuration(nextAttack, aa.OffhandSwingAt)
 	}
 	return nextAttack
+}
+
+// Returns the time at which all melee swings will be ready.
+func (aa *AutoAttacks) MeleeSwingsReadyAt() time.Duration {
+	return MaxDuration(aa.MainhandSwingAt, aa.OffhandSwingAt)
 }
 
 // Returns true if all melee weapons are ready for a swing.

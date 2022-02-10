@@ -33,6 +33,8 @@ type Hunter struct {
 	Options  proto.Hunter_Options
 	Rotation proto.Hunter_Rotation
 
+	pet *HunterPet
+
 	AmmoDPS         float64
 	AmmoDamageBonus float64
 
@@ -48,7 +50,15 @@ type Hunter struct {
 
 	raptorStrikeCost float64 // Cached mana cost of raptor strike.
 
-	pet *HunterPet
+	nextAction   int
+	nextActionAt time.Duration
+
+	// Expected single-cast damage values calculated by the presim, used for adaptive logic.
+	avgShootDmg  float64
+	avgWeaveDmg  float64
+	avgSteadyDmg float64
+	avgMultiDmg  float64
+	avgArcaneDmg float64
 
 	aimedShotTemplate core.MeleeAbilityTemplate
 	aimedShot         core.ActiveMeleeAbility
@@ -129,6 +139,8 @@ func (hunter *Hunter) Reset(sim *core.Simulation) {
 	hunter.killCommandEnabledUntil = 0
 	hunter.killCommandBlocked = false
 	hunter.killCommandAction.NextActionAt = 0
+	hunter.nextAction = OptionNone
+	hunter.nextActionAt = 0
 
 	target := sim.GetPrimaryTarget()
 	impHuntersMark := hunter.Talents.ImprovedHuntersMark
@@ -155,10 +167,9 @@ func NewHunter(character core.Character, options proto.Player) *Hunter {
 	hunter.EnableAutoAttacks(hunter, core.AutoAttackOptions{
 		// We don't know crit multiplier until later when we see the target so just
 		// use 0 for now.
-		MainHand:        hunter.WeaponFromMainHand(0),
-		OffHand:         hunter.WeaponFromOffHand(0),
-		Ranged:          hunter.WeaponFromRanged(0),
-		AutoSwingRanged: true,
+		MainHand: hunter.WeaponFromMainHand(0),
+		OffHand:  hunter.WeaponFromOffHand(0),
+		Ranged:   hunter.WeaponFromRanged(0),
 		ReplaceMHSwing: func(sim *core.Simulation) *core.ActiveMeleeAbility {
 			return hunter.TryRaptorStrike(sim)
 		},
