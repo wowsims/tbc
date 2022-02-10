@@ -40,9 +40,9 @@ type Hunter struct {
 
 	hasGronnstalker2Pc bool
 
-	killCommandEnabled bool                // True after landing a crit.
-	killCommandBlocked bool                // True while Steady Shot is casting, to prevent KC.
-	killCommandAction  *core.PendingAction // Action to use KC when its comes off CD.
+	killCommandEnabledUntil time.Duration       // Time that KC enablement expires.
+	killCommandBlocked      bool                // True while Steady Shot is casting, to prevent KC.
+	killCommandAction       *core.PendingAction // Action to use KC when its comes off CD.
 
 	timeToWeave time.Duration
 
@@ -126,7 +126,7 @@ func (hunter *Hunter) Init(sim *core.Simulation) {
 
 func (hunter *Hunter) Reset(sim *core.Simulation) {
 	hunter.aspectOfTheViper = false
-	hunter.killCommandEnabled = false
+	hunter.killCommandEnabledUntil = 0
 	hunter.killCommandBlocked = false
 	hunter.killCommandAction.NextActionAt = 0
 
@@ -149,11 +149,6 @@ func NewHunter(character core.Character, options proto.Player) *Hunter {
 		timeToWeave: time.Millisecond * time.Duration(hunterOptions.Rotation.TimeToWeaveMs),
 	}
 	hunter.hasGronnstalker2Pc = ItemSetGronnstalker.CharacterHasSetBonus(&hunter.Character, 2)
-
-	if !hunter.Rotation.UseMultiShot && !hunter.Rotation.UseArcaneShot {
-		// Disable french rotation if we don't have any spells to use it with.
-		hunter.Rotation.UseFrenchRotation = false
-	}
 
 	hunter.PseudoStats.RangedSpeedMultiplier = 1
 	hunter.EnableManaBar()

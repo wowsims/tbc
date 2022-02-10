@@ -5,25 +5,25 @@ import (
 )
 
 func (character *Character) newGCDAction(sim *Simulation, agent Agent) *PendingAction {
-	return &PendingAction{
-		Priority: ActionPriorityGCD,
-		OnAction: func(sim *Simulation) {
-			character := agent.GetCharacter()
-			character.TryUseCooldowns(sim)
-			if !character.IsOnCD(GCDCooldownID, sim.CurrentTime) {
-				agent.OnGCDReady(sim)
-			}
-		},
+	pa := sim.pendingActionPool.Get()
+	pa.Priority = ActionPriorityGCD
+	pa.OnAction = func(sim *Simulation) {
+		character := agent.GetCharacter()
+		character.TryUseCooldowns(sim)
+		if !character.IsOnCD(GCDCooldownID, sim.CurrentTime) {
+			agent.OnGCDReady(sim)
+		}
 	}
+	return pa
 }
 
 // Note that this is only used when the hardcast and GCD actions
 func (character *Character) newHardcastAction(sim *Simulation) *PendingAction {
-	return &PendingAction{
-		OnAction: func(sim *Simulation) {
-			// Don't need to do anything, the Advance() call will take care of the hardcast.
-		},
+	pa := sim.pendingActionPool.Get()
+	pa.OnAction = func(sim *Simulation) {
+		// Don't need to do anything, the Advance() call will take care of the hardcast.
 	}
+	return pa
 }
 
 func (character *Character) NextGCDAt() time.Duration {
@@ -34,18 +34,24 @@ func (character *Character) SetGCDTimer(sim *Simulation, gcdReadyAt time.Duratio
 	character.SetCD(GCDCooldownID, gcdReadyAt)
 
 	character.gcdAction.Cancel(sim)
-	character.gcdAction = &PendingAction{
-		Priority:     ActionPriorityGCD,
-		OnAction:     character.gcdAction.OnAction,
-		NextActionAt: gcdReadyAt,
-	}
+	oldAction := character.gcdAction.OnAction
+
+	character.gcdAction = sim.pendingActionPool.Get()
+	character.gcdAction.Priority = ActionPriorityGCD
+	character.gcdAction.OnAction = oldAction
+	character.gcdAction.NextActionAt = gcdReadyAt
 	sim.AddPendingAction(character.gcdAction)
+}
+
+func (character *Character) EnableGCDTimer(sim *Simulation, agent Agent) {
+	character.gcdAction = character.newGCDAction(sim, agent)
 }
 
 // Call this to stop the GCD loop for a character.
 // This is mostly used for pets that get summoned / expire.
 func (character *Character) CancelGCDTimer(sim *Simulation) {
 	character.gcdAction.Cancel(sim)
+	character.gcdAction = nil
 }
 
 func (character *Character) IsWaiting() bool {

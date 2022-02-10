@@ -322,9 +322,6 @@ func (at *auraTracker) ReplaceAura(sim *Simulation, newAura Aura) {
 
 	old := at.auras[newAura.ID]
 
-	if old.ActionID != newAura.ActionID {
-		panic("bad")
-	}
 	// private cached state has to be copied over
 	newAura.activeIndex = old.activeIndex
 	newAura.onCastIndex = old.onCastIndex

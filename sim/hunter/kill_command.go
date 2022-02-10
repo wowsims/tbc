@@ -22,7 +22,7 @@ func (hunter *Hunter) applyKillCommand() {
 			ID: KillCommandAuraID,
 			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
 				if hitEffect.HitType == core.MeleeHitTypeCrit {
-					hunter.killCommandEnabled = true
+					hunter.killCommandEnabledUntil = sim.CurrentTime + time.Second*5
 					hunter.TryKillCommand(sim, sim.GetPrimaryTarget())
 				}
 			},
@@ -94,7 +94,7 @@ func (hunter *Hunter) NewKillCommand(sim *core.Simulation, target *core.Target) 
 
 	// Set dynamic fields, i.e. the stuff we couldn't precompute.
 	killCommand.OnCastComplete = func(sim *core.Simulation, cast *core.Cast) {
-		hunter.killCommandEnabled = false
+		hunter.killCommandEnabledUntil = 0
 
 		kc := &hunter.pet.killCommand
 		hunter.pet.killCommandTemplate.Apply(kc)
@@ -107,7 +107,7 @@ func (hunter *Hunter) NewKillCommand(sim *core.Simulation, target *core.Target) 
 }
 
 func (hunter *Hunter) TryKillCommand(sim *core.Simulation, target *core.Target) {
-	if !hunter.killCommandEnabled || hunter.killCommandBlocked {
+	if hunter.killCommandEnabledUntil < sim.CurrentTime || hunter.killCommandBlocked {
 		return
 	}
 

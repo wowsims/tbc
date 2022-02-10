@@ -9,6 +9,7 @@ import (
 	"github.com/wowsims/tbc/sim/mage"
 	"github.com/wowsims/tbc/sim/priest/shadow"
 	"github.com/wowsims/tbc/sim/shaman/elemental"
+	"github.com/wowsims/tbc/sim/shaman/enhancement"
 )
 
 // 1 moonkin, 1 ele shaman, 1 spriest, 2x arcane
@@ -255,6 +256,42 @@ func BenchmarkSimulate(b *testing.B) {
 			Parties: []*proto.Party{
 				castersWithElemental,
 				castersWithResto,
+				{
+					Players: []*proto.Player{
+						{
+							Name:      "Enhancement Shaman 1",
+							Race:      proto.Race_RaceTroll10,
+							Class:     proto.Class_ClassShaman,
+							Equipment: enhancement.Phase2Gear,
+							Spec: &proto.Player_EnhancementShaman{
+								EnhancementShaman: &proto.EnhancementShaman{
+									Talents: enhancement.StandardTalents,
+									Rotation: &proto.EnhancementShaman_Rotation{
+										Totems: &proto.ShamanTotems{
+											Earth: proto.EarthTotem_TremorTotem,
+											Air:   proto.AirTotem_WrathOfAirTotem,
+											Fire:  proto.FireTotem_TotemOfWrath,
+											Water: proto.WaterTotem_ManaSpringTotem,
+										},
+										PrimaryShock: proto.EnhancementShaman_Rotation_Frost,
+									},
+									Options: &proto.EnhancementShaman_Options{
+										MainHandImbue:      proto.ShamanWeaponImbue_ImbueWindfury,
+										OffHandImbue:       proto.ShamanWeaponImbue_ImbueWindfury,
+										WaterShield:        true,
+										Bloodlust:          true,
+										DelayOffhandSwings: true,
+									},
+								},
+							},
+							Consumes: &proto.Consumes{},
+							Buffs: &proto.IndividualBuffs{
+								BlessingOfKings:  true,
+								BlessingOfWisdom: proto.TristateEffect_TristateEffectImproved,
+							},
+						},
+					},
+				},
 			},
 			Buffs: &proto.RaidBuffs{
 				GiftOfTheWild: proto.TristateEffect_TristateEffectImproved,

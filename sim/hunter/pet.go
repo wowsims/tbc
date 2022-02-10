@@ -110,9 +110,9 @@ func (hp *HunterPet) Init(sim *core.Simulation) {
 func (hp *HunterPet) Reset(sim *core.Simulation) {
 	hp.focusBar.reset(sim)
 	if sim.Log != nil {
-		hp.Log(sim, "Pet stats: %s", hp.GetStats())
+		hp.Log(sim, "Total Pet stats: %s", hp.GetStats())
 		inheritedStats := hunterPetStatInheritance(hp.hunterOwner.GetStats())
-		hp.Log(sim, "Inherited stats: %s", inheritedStats)
+		hp.Log(sim, "Inherited Pet stats: %s", inheritedStats)
 	}
 }
 
@@ -130,7 +130,9 @@ var hunterPetBaseStats = stats.Stats{
 	stats.Agility:     127,
 	stats.Strength:    162,
 	stats.AttackPower: -20, // Apparently pets and warriors have a AP penalty.
-	stats.MeleeCrit:   1.1515 * core.MeleeCritRatingPerCritChance,
+
+	// Add 1.8% because pets aren't affected by that component of crit suppression.
+	stats.MeleeCrit: (1.1515 + 1.8) * core.MeleeCritRatingPerCritChance,
 }
 
 var hunterPetStatInheritance = func(ownerStats stats.Stats) stats.Stats {

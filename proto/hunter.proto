@@ -61,7 +61,7 @@ message Hunter {
 			bool use_multi_shot = 1;
 			bool use_arcane_shot = 2;
 			bool precast_aimed_shot = 3;
-			bool use_french_rotation = 11;
+			bool lazy_rotation = 12; // Restricts to 1 action between each auto shot.
 
 			enum StingType {
 					NoSting = 0;

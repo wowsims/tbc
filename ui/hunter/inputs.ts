@@ -172,16 +172,16 @@ export const HunterRotationConfig = {
 			},
 		},
 		{
-			type: 'boolean' as const, cssClass: 'use-french-rotation-picker',
+			type: 'boolean' as const, cssClass: 'lazy-rotation-picker',
 			getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
 			config: {
-				label: 'Use French Rotation',
-				labelTooltip: 'Allows the use of French Rotation (SS+MS or SS+AS between two ranged autos) when no temporary haste effects are active.',
+				label: 'Lazy Rotation',
+				labelTooltip: 'Allows no more than 1 shot cast between each auto.',
 				changedEvent: (player: Player<Spec.SpecHunter>) => player.rotationChangeEmitter,
-				getValue: (player: Player<Spec.SpecHunter>) => player.getRotation().useFrenchRotation,
+				getValue: (player: Player<Spec.SpecHunter>) => player.getRotation().lazyRotation,
 				setValue: (eventID: EventID, player: Player<Spec.SpecHunter>, newValue: boolean) => {
 					const newRotation = player.getRotation();
-					newRotation.useFrenchRotation = newValue;
+					newRotation.lazyRotation = newValue;
 					player.setRotation(eventID, newRotation);
 				},
 			},

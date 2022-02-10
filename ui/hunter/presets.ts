@@ -30,7 +30,7 @@ import * as Tooltips from '/tbc/core/constants/tooltips.js';
 // https://tbc.wowhead.com/talent-calc and copy the numbers in the url.
 export const BeastMasteryTalents = {
 	name: 'BM',
-	data: '502030015150122431051-0505201205',
+	data: '512002015150122431051-0505201205',
 };
 
 export const MarksmanTalents = {
@@ -45,13 +45,14 @@ export const SurvivalTalents = {
 
 export const DefaultRotation = HunterRotation.create({
 	useMultiShot: true,
-	viperStartManaPercent: 0.2,
-	viperStopManaPercent: 0.4,
+	useArcaneShot: true,
+	viperStartManaPercent: 0.1,
+	viperStopManaPercent: 0.3,
 
-	meleeWeave: false,
+	meleeWeave: true,
 	useRaptorStrike: true,
 	timeToWeaveMs: 500,
-	percentWeaved: 1,
+	percentWeaved: 0.8,
 });
 
 export const DefaultOptions = HunterOptions.create({
@@ -64,6 +65,8 @@ export const DefaultConsumes = Consumes.create({
 	defaultPotion: Potions.HastePotion,
 	flask: Flask.FlaskOfRelentlessAssault,
 	food: Food.FoodGrilledMudfish,
+	mainHandImbue: WeaponImbue.WeaponImbueAdamantiteSharpeningStone,
+	offHandImbue: WeaponImbue.WeaponImbueAdamantiteSharpeningStone,
 });
 
 export const P1_BM_PRESET = {
@@ -457,7 +460,7 @@ export const P1_SV_PRESET = {
 			}),
 			ItemSpec.create({
 				id: 27846, // Claw of the Watcher
-				enchant: Enchants.WEAPON_GREATER_AGILITY,
+				enchant: Enchants.WEAPON_AGILITY,
 				gems: [
 					Gems.DELICATE_LIVING_RUBY,
 					Gems.DELICATE_LIVING_RUBY,
@@ -465,7 +468,7 @@ export const P1_SV_PRESET = {
 			}),
 			ItemSpec.create({
 				id: 28572, // Blade of the Unrequited
-				enchant: Enchants.WEAPON_GREATER_AGILITY,
+				enchant: Enchants.WEAPON_AGILITY,
 				gems: [
 					Gems.DELICATE_LIVING_RUBY,
 					Gems.GLINTING_NOBLE_TOPAZ,
@@ -571,11 +574,11 @@ export const P2_SV_PRESET = {
 			}),
 			ItemSpec.create({
 				id: 29924, // Netherbane
-				enchant: Enchants.WEAPON_GREATER_AGILITY,
+				enchant: Enchants.WEAPON_AGILITY,
 			}),
 			ItemSpec.create({
 				id: 29948, // Claw of the Phoenix
-				enchant: Enchants.WEAPON_GREATER_AGILITY,
+				enchant: Enchants.WEAPON_AGILITY,
 			}),
 			ItemSpec.create({
 				id: 30105, // Serpent Spine Longbow
@@ -682,7 +685,7 @@ export const P3_SV_PRESET = {
 				enchant: Enchants.WEAPON_GREATER_AGILITY,
 			}),
 			ItemSpec.create({
-				id: 32336, // Black Bow of the Betrayer
+				id: 30906, // Bristleblitz Striker
 				enchant: Enchants.STABILIZED_ETERNIUM_SCOPE,
 			}),
 		],

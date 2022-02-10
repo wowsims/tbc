@@ -28,6 +28,7 @@ type PendingAction struct {
 	NextActionAt time.Duration
 
 	cancelled bool
+	id        int
 }
 
 func (pa *PendingAction) Cancel(sim *Simulation) {
@@ -43,26 +44,53 @@ func (pa *PendingAction) Cancel(sim *Simulation) {
 	pa.cancelled = true
 }
 
-type ActionsQueue []*PendingAction
+type paPool struct {
+	objs  []*PendingAction
+	maxid int
+}
 
-func (queue ActionsQueue) Len() int {
-	return len(queue)
+func newPAPool() *paPool {
+	objs := make([]*PendingAction, 64)
+	for i := range objs {
+		objs[i] = &PendingAction{
+			id: i + 1,
+		}
+	}
+	return &paPool{
+		objs:  objs,
+		maxid: len(objs) + 1,
+	}
 }
-func (queue ActionsQueue) Less(i, j int) bool {
-	return queue[i].NextActionAt < queue[j].NextActionAt ||
-		(queue[i].NextActionAt == queue[j].NextActionAt && queue[i].Priority > queue[j].Priority)
+
+func (pap *paPool) Get() *PendingAction {
+	if len(pap.objs) == 0 {
+		// Allocate more
+		newObjs := make([]*PendingAction, 128)
+		copy(newObjs, pap.objs)
+		pap.objs = newObjs
+		for i := range pap.objs {
+			if pap.objs[i] == nil {
+				pap.objs[i] = &PendingAction{
+					id: pap.maxid,
+				}
+				pap.maxid++
+			}
+		}
+	}
+
+	pa := pap.objs[len(pap.objs)-1]
+	pap.objs = pap.objs[:len(pap.objs)-1]
+	pa.cancelled = false
+	return pa
 }
-func (queue ActionsQueue) Swap(i, j int) {
-	queue[i], queue[j] = queue[j], queue[i]
-}
-func (queue *ActionsQueue) Push(newAction interface{}) {
-	*queue = append(*queue, newAction.(*PendingAction))
-}
-func (queue *ActionsQueue) Pop() interface{} {
-	old := *queue
-	n := len(old)
-	action := old[n-1]
-	old[n-1] = nil
-	*queue = old[0 : n-1]
-	return action
+
+func (pap *paPool) Put(pa *PendingAction) {
+	pa.cancelled = true
+	pa.CleanUp = nil
+	pa.Name = ""
+	pa.NextActionAt = 0
+	pa.OnAction = nil
+	pa.Priority = 0
+
+	pap.objs = append(pap.objs, pa)
 }
