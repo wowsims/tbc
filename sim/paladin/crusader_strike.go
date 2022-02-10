@@ -20,11 +20,12 @@ func (paladin *Paladin) newCrusaderStrikeTemplate(sim *core.Simulation) core.Mel
 			SpellSchool: stats.AttackPower,
 			GCD:         core.GCDDefault,
 			Cooldown:    time.Second * 6,
+			CritMultiplier: paladin.DefaultMeleeCritMultiplier(),
+			IsPhantom: true,
 			Cost: core.ResourceCost{
 				Type:  stats.Mana,
 				Value: 236,
 			},
-			CritMultiplier: paladin.DefaultMeleeCritMultiplier(),
 		},
 		Effects: []core.AbilityHitEffect{
 			core.AbilityHitEffect{
@@ -35,7 +36,7 @@ func (paladin *Paladin) newCrusaderStrikeTemplate(sim *core.Simulation) core.Mel
 				},
 				WeaponInput: core.WeaponDamageInput{
 					IsOH:             false,
-					DamageMultiplier: 1.1,  // maybe this isn't the one that should be set to 1.1
+					DamageMultiplier: 1.1, // maybe this isn't the one that should be set to 1.1
 				},
 			},
 		},

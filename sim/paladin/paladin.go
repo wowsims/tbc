@@ -9,7 +9,7 @@ import (
 type Paladin struct {
 	core.Character
 
-	Talents   proto.PaladinTalents
+	Talents proto.PaladinTalents
 
 	crusaderStrikeTemplate core.MeleeAbilityTemplate
 	crusaderStrikeSpell    core.ActiveMeleeAbility
@@ -61,6 +61,6 @@ func init() {
 		stats.Spirit:    88,
 		stats.Mana:      3978, // pretty sure I need to subtract mana from the int stat
 
-		stats.AttackPower:       120,
+		stats.AttackPower: 120,
 	}
 }

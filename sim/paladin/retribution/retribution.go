@@ -26,7 +26,7 @@ func NewRetributionPaladin(character core.Character, options proto.Player) *Retr
 	retOptions := options.GetRetributionPaladin()
 
 	ret := &RetributionPaladin{
-		Paladin:   paladin.NewPaladin(character, *retOptions.Talents),
+		Paladin:  paladin.NewPaladin(character, *retOptions.Talents),
 		Rotation: *retOptions.Rotation,
 	}
 
@@ -66,6 +66,15 @@ func (ret *RetributionPaladin) OnManaTick(sim *core.Simulation) {
 func (ret *RetributionPaladin) tryUseGCD(sim *core.Simulation) {
 	target := sim.GetPrimaryTarget()
 
+	if !ret.HasAura(paladin.SealOfBloodAuraID) {
+		cast := ret.NewSealOfBlood(sim)
+		if success := cast.StartCast(sim); !success {
+			ret.WaitForMana(sim, cast.GetManaCost())
+		}
+		return
+	}
+	
+	// check if we can use crusader strike
 	if !ret.IsOnCD(paladin.CrusaderStrikeCD, sim.CurrentTime) {
 		cs := ret.NewCrusaderStrike(sim, target)
 		if success := cs.Attack(sim); !success {
@@ -74,7 +83,7 @@ func (ret *RetributionPaladin) tryUseGCD(sim *core.Simulation) {
 		return
 	}
 
-	// We didn't try to cast anything. Just wait for next auto or CD.
+	// probably should check for the min of crusader strike CD or SoB expiration
 	nextEventAt := ret.CDReadyAt(paladin.CrusaderStrikeCD)
 	ret.WaitUntil(sim, nextEventAt)
 }
