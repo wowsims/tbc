@@ -60,6 +60,16 @@ type Hunter struct {
 	avgMultiDmg  float64
 	avgArcaneDmg float64
 
+	// Cached values for adaptive rotation calcs.
+	rangedSwingSpeed   float64
+	rangedWindup       float64
+	shootDPS           float64
+	weaveDPS           float64
+	steadyDPS          float64
+	steadyShotCastTime float64
+	multiShotCastTime  float64
+	useMultiForCatchup bool
+
 	aimedShotTemplate core.MeleeAbilityTemplate
 	aimedShot         core.ActiveMeleeAbility
 
@@ -152,6 +162,7 @@ func (hunter *Hunter) Reset(sim *core.Simulation) {
 	hunter.killCommandAction.NextActionAt = 0
 	hunter.nextAction = OptionNone
 	hunter.nextActionAt = 0
+	hunter.rangedSwingSpeed = 0
 
 	target := sim.GetPrimaryTarget()
 	impHuntersMark := hunter.Talents.ImprovedHuntersMark
