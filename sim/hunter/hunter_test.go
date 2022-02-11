@@ -52,7 +52,7 @@ func BenchmarkSimulate(b *testing.B) {
 				Class:     proto.Class_ClassHunter,
 				Equipment: P1Gear,
 				Consumes:  FullConsumes,
-				Spec:      PlayerOptionsBasic,
+				Spec:      PlayerOptionsMeleeWeave,
 				Buffs:     FullIndividualBuffs,
 			},
 			FullPartyBuffs,

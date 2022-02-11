@@ -136,10 +136,37 @@ func (hunter *Hunter) adaptiveRotation(sim *core.Simulation, followsRangedAuto b
 	weaveAt := weaveAtDuration.Seconds()
 	shootAt := shootAtDuration.Seconds()
 
-	// Use the inverse (1 / x) because multiplication is faster than division.
-	gcdRate := 1.0 / 1.5
-	weaveRate := 1.0 / core.MaxDuration(hunter.AutoAttacks.MainhandSwingSpeed(), hunter.AutoAttacks.OffhandSwingSpeed()).Seconds()
-	shootRate := 1.0 / hunter.AutoAttacks.RangedSwingSpeed().Seconds()
+	rangedSwingSpeed := hunter.RangedSwingSpeed()
+	if rangedSwingSpeed != hunter.rangedSwingSpeed {
+		// A lot of the calculations only need to be done when ranged speed changes.
+		hunter.rangedSwingSpeed = rangedSwingSpeed
+		rangedWindupDuration := hunter.AutoAttacks.RangedSwingWindup()
+		hunter.rangedWindup = rangedWindupDuration.Seconds()
+
+		// Use the inverse (1 / x) because multiplication is faster than division.
+		gcdRate := 1.0 / 1.5
+		weaveRate := 1.0 / core.MaxDuration(hunter.AutoAttacks.MainhandSwingSpeed(), hunter.AutoAttacks.OffhandSwingSpeed()).Seconds()
+		shootRate := 1.0 / hunter.AutoAttacks.RangedSwingSpeed().Seconds()
+
+		hunter.shootDPS = hunter.avgShootDmg * shootRate
+		hunter.weaveDPS = hunter.avgWeaveDmg * weaveRate
+		hunter.steadyDPS = hunter.avgSteadyDmg * gcdRate
+
+		hunter.steadyShotCastTime = 1.5 / rangedSwingSpeed
+		hunter.multiShotCastTime = 0.5 / rangedSwingSpeed
+
+		// https://diziet559.github.io/rotationtools/#rotation-details
+		// When off CD, multi always has higher DPS than SS. Sometimes we want to
+		// save it for later though, if we need to take advantage of its lower cast
+		// time.
+		rangedGapTime := hunter.AutoAttacks.RangedSwingSpeed() - rangedWindupDuration
+		autoCycleDuration := rangedGapTime
+		for autoCycleDuration < core.GCDDefault {
+			autoCycleDuration += rangedGapTime + rangedWindupDuration
+		}
+		leftoverGCDRatio := float64(autoCycleDuration-core.GCDDefault) / float64(rangedGapTime+rangedWindupDuration)
+		hunter.useMultiForCatchup = leftoverGCDRatio < 0.95
+	}
 
 	// For each ability option, we calculate the expected damage as the avg damage
 	// of that ability with damage lost from delaying other abilities subtracted.
@@ -152,72 +179,24 @@ func (hunter *Hunter) adaptiveRotation(sim *core.Simulation, followsRangedAuto b
 		-10000.0,
 	}
 
-	// Only allow weaving if autos and GCD will both be on CD.
-	canWeave := hunter.Rotation.MeleeWeave &&
-		sim.GetRemainingDurationPercent() < hunter.Rotation.PercentWeaved &&
-		weaveAt < shootAt &&
-		weaveAt < gcdAt
-
 	// DPS from choosing to auto next.
-	rangedWindup := hunter.AutoAttacks.RangedSwingWindup()
-	rangedWindupSeconds := rangedWindup.Seconds()
-	shootDoneAt := shootAt + rangedWindupSeconds
+	shootDoneAt := shootAt + hunter.rangedWindup
 	shootGCDDelay := core.MaxFloat(0, shootDoneAt-gcdAt)
-	dmgResults[OptionShoot] = hunter.avgShootDmg - (hunter.avgSteadyDmg * gcdRate * shootGCDDelay)
-	if canWeave {
-		shootWeaveDelay := core.MaxFloat(0, shootDoneAt-weaveAt)
-		dmgResults[OptionShoot] -= hunter.avgWeaveDmg * weaveRate * shootWeaveDelay
-	}
-
-	// Dmg from choosing to weave next.
-	if canWeave {
-		weaveCastTime := hunter.timeToWeave.Seconds()
-		weaveShootDelay := core.MaxFloat(0, (weaveAt+weaveCastTime)-shootAt)
-		weaveGCDDelay := core.MaxFloat(0, (weaveAt+weaveCastTime)-gcdAt)
-		dmgResults[OptionWeave] = hunter.avgWeaveDmg -
-			(hunter.avgSteadyDmg * gcdRate * weaveGCDDelay) -
-			(hunter.avgShootDmg * shootRate * weaveShootDelay)
-	}
+	dmgResults[OptionShoot] = hunter.avgShootDmg - (hunter.steadyDPS * shootGCDDelay)
 
 	// Dmg from choosing Steady Shot next.
-	rangedSwingSpeed := hunter.RangedSwingSpeed()
-	steadyShotCastTime := 1.5 / rangedSwingSpeed
-	steadyShootDelay := core.MaxFloat(0, (gcdAt+steadyShotCastTime)-shootAt)
-	dmgResults[OptionSteady] = hunter.avgSteadyDmg -
-		(hunter.avgShootDmg * shootRate * steadyShootDelay)
-	if canWeave {
-		steadyWeaveDelay := core.MaxFloat(0, (gcdAt+steadyShotCastTime)-weaveAt)
-		dmgResults[OptionSteady] -= hunter.avgWeaveDmg * weaveRate * steadyWeaveDelay
-	}
+	steadyShootDelay := core.MaxFloat(0, (gcdAt+hunter.steadyShotCastTime)-shootAt)
+	dmgResults[OptionSteady] = hunter.avgSteadyDmg - (hunter.shootDPS * steadyShootDelay)
 
 	// Dmg from choosing Multi Shot next.
 	canMulti := hunter.Rotation.UseMultiShot && hunter.CDReadyAt(MultiShotCooldownID) <= hunter.NextGCDAt()
 	if canMulti {
-		// https://diziet559.github.io/rotationtools/#rotation-details
-		// When off CD, multi always has higher DPS than SS. Sometimes we want to
-		// save it for later though, if we need to take advantage of its lower cast
-		// time.
-		rangedGapTime := hunter.AutoAttacks.RangedSwingSpeed() - rangedWindup
-
-		autoCycleDuration := rangedGapTime
-		for autoCycleDuration < core.GCDDefault {
-			autoCycleDuration += rangedGapTime + rangedWindup
-		}
-		leftoverGCDRatio := float64(autoCycleDuration-core.GCDDefault) / float64(rangedGapTime+rangedWindup)
-		useForCatchup := leftoverGCDRatio < 0.95
-
-		multiShotCastTime := 0.5 / rangedSwingSpeed
-		multiShootDelay := core.MaxFloat(0, (gcdAt+multiShotCastTime)-shootAt)
+		multiShootDelay := core.MaxFloat(0, (gcdAt+hunter.multiShotCastTime)-shootAt)
 
 		// If ranged swing speed lines up closely with GCD without any clipping, then
 		// its never worth saving MS to use for the lower cast time.
-		if !useForCatchup || multiShootDelay < steadyShootDelay {
-			dmgResults[OptionMulti] = hunter.avgMultiDmg -
-				(hunter.avgShootDmg * shootRate * multiShootDelay)
-			if canWeave {
-				multiWeaveDelay := core.MaxFloat(0, (gcdAt+multiShotCastTime)-weaveAt)
-				dmgResults[OptionMulti] -= hunter.avgWeaveDmg * weaveRate * multiWeaveDelay
-			}
+		if !hunter.useMultiForCatchup || multiShootDelay < steadyShootDelay {
+			dmgResults[OptionMulti] = hunter.avgMultiDmg - (hunter.shootDPS * multiShootDelay)
 		}
 	}
 
@@ -225,12 +204,35 @@ func (hunter *Hunter) adaptiveRotation(sim *core.Simulation, followsRangedAuto b
 	canArcane := hunter.Rotation.UseArcaneShot && hunter.CDReadyAt(ArcaneShotCooldownID) <= hunter.NextGCDAt()
 	if canArcane {
 		arcaneShootDelay := core.MaxFloat(0, gcdAt-shootAt)
-		dmgResults[OptionArcane] = hunter.avgArcaneDmg -
-			(hunter.avgShootDmg * shootRate * arcaneShootDelay)
-		if canWeave {
-			arcaneWeaveDelay := core.MaxFloat(0, gcdAt-weaveAt)
-			dmgResults[OptionArcane] = hunter.avgWeaveDmg * weaveRate * arcaneWeaveDelay
-		}
+		dmgResults[OptionArcane] = hunter.avgArcaneDmg - (hunter.shootDPS * arcaneShootDelay)
+	}
+
+	// Only allow weaving if autos and GCD will both be on CD. Otherwise it will
+	// get used even when it would cause delays to them.
+	canWeave := hunter.Rotation.MeleeWeave &&
+		sim.GetRemainingDurationPercent() < hunter.Rotation.PercentWeaved &&
+		weaveAt < shootAt &&
+		weaveAt < gcdAt
+	if canWeave {
+		// Dmg from choosing to weave next.
+		weaveCastTime := hunter.timeToWeave.Seconds()
+		weaveShootDelay := core.MaxFloat(0, (weaveAt+weaveCastTime)-shootAt)
+		weaveGCDDelay := core.MaxFloat(0, (weaveAt+weaveCastTime)-gcdAt)
+		dmgResults[OptionWeave] = hunter.avgWeaveDmg -
+			(hunter.steadyDPS * weaveGCDDelay) -
+			(hunter.shootDPS * weaveShootDelay)
+
+		shootWeaveDelay := core.MaxFloat(0, shootDoneAt-weaveAt)
+		dmgResults[OptionShoot] -= hunter.weaveDPS * shootWeaveDelay
+
+		steadyWeaveDelay := core.MaxFloat(0, (gcdAt+hunter.steadyShotCastTime)-weaveAt)
+		dmgResults[OptionSteady] -= hunter.weaveDPS * steadyWeaveDelay
+
+		multiWeaveDelay := core.MaxFloat(0, (gcdAt+hunter.multiShotCastTime)-weaveAt)
+		dmgResults[OptionMulti] -= hunter.weaveDPS * multiWeaveDelay
+
+		arcaneWeaveDelay := core.MaxFloat(0, gcdAt-weaveAt)
+		dmgResults[OptionArcane] -= hunter.weaveDPS * arcaneWeaveDelay
 	}
 
 	actionAtResults := []time.Duration{
