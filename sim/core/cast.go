@@ -162,6 +162,10 @@ func (cast *Cast) startCasting(sim *Simulation, onCastComplete OnCastComplete) b
 		cast.Character.SetGCDTimer(sim, sim.CurrentTime+gcdCD)
 	}
 
+	if cast.Cooldown > 0 {
+		cast.Character.SetCD(cast.ActionID.CooldownID, sim.CurrentTime+cast.CastTime+cast.Cooldown)
+	}
+
 	// For instant-cast spells we can skip creating an aura.
 	if cast.CastTime == 0 {
 		cast.internalOnComplete(sim, onCastComplete)
@@ -198,10 +202,6 @@ func (cast *Cast) internalOnComplete(sim *Simulation, onCastComplete OnCastCompl
 	if !cast.IgnoreManaCost && cast.ManaCost > 0 {
 		cast.Character.SpendMana(sim, cast.ManaCost, cast.ActionID)
 		cast.Character.PseudoStats.FiveSecondRuleRefreshTime = sim.CurrentTime + time.Second*5
-	}
-
-	if cast.Cooldown > 0 {
-		cast.Character.SetCD(cast.ActionID.CooldownID, sim.CurrentTime+cast.Cooldown)
 	}
 
 	cast.Character.OnCastComplete(sim, cast)

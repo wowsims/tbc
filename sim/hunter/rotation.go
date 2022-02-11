@@ -37,7 +37,10 @@ func (hunter *Hunter) OnManaTick(sim *core.Simulation) {
 }
 
 func (hunter *Hunter) OnAutoAttack(sim *core.Simulation, ability *core.ActiveMeleeAbility) {
-	hunter.rotation(sim, ability.Effect.IsRanged())
+	if !ability.Effect.IsRanged() {
+		return
+	}
+	hunter.rotation(sim, true)
 }
 
 func (hunter *Hunter) OnGCDReady(sim *core.Simulation) {
@@ -49,10 +52,6 @@ func (hunter *Hunter) OnGCDReady(sim *core.Simulation) {
 		return
 	}
 
-	if sim.Log != nil {
-		sim.Log("gcd1")
-	}
-
 	if hunter.AutoAttacks.RangedSwingInProgress {
 		return
 	}
@@ -61,10 +60,6 @@ func (hunter *Hunter) OnGCDReady(sim *core.Simulation) {
 	// TODO: Remove the return here
 	if hunter.tryUsePrioGCD(sim) {
 		return
-	}
-
-	if sim.Log != nil {
-		sim.Log("gcd2")
 	}
 
 	hunter.rotation(sim, false)
@@ -80,6 +75,9 @@ func (hunter *Hunter) rotation(sim *core.Simulation, followsRangedAuto bool) {
 	}
 
 	if hunter.nextActionAt <= sim.CurrentTime {
+		//if sim.Log != nil {
+		//	hunter.Log(sim, "Doing option: %d", hunter.nextAction)
+		//}
 		hunter.doOption(sim, hunter.nextAction)
 	} else if hunter.nextActionAt != hunter.NextGCDAt() {
 		if hunter.Hardcast.Expires <= sim.CurrentTime {
@@ -93,10 +91,6 @@ func (hunter *Hunter) lazyRotation(sim *core.Simulation, followsRangedAuto bool)
 	shootReady := shootAt <= sim.CurrentTime
 	gcdAt := hunter.NextGCDAt()
 	gcdReady := gcdAt <= sim.CurrentTime
-
-	if sim.Log != nil {
-		sim.Log("gcd ready: %b", gcdReady)
-	}
 
 	canWeave := hunter.Rotation.MeleeWeave &&
 		sim.GetRemainingDurationPercent() < hunter.Rotation.PercentWeaved &&
@@ -206,14 +200,14 @@ func (hunter *Hunter) adaptiveRotation(sim *core.Simulation, followsRangedAuto b
 			autoCycleDuration += rangedGapTime + rangedWindup
 		}
 		leftoverGCDRatio := float64(autoCycleDuration-core.GCDDefault) / float64(rangedGapTime+rangedWindup)
-		canUseFollowingAuto := leftoverGCDRatio < 0.95
-		msWouldFollowAuto := followsRangedAuto && gcdAtDuration <= sim.CurrentTime
+		useForCatchup := leftoverGCDRatio < 0.95
+
+		multiShotCastTime := 0.5 / rangedSwingSpeed
+		multiShootDelay := core.MaxFloat(0, (gcdAt+multiShotCastTime)-shootAt)
 
 		// If ranged swing speed lines up closely with GCD without any clipping, then
 		// its never worth saving MS to use for the lower cast time.
-		if canUseFollowingAuto || !msWouldFollowAuto {
-			multiShotCastTime := 0.5 / rangedSwingSpeed
-			multiShootDelay := core.MaxFloat(0, (gcdAt+multiShotCastTime)-shootAt)
+		if !useForCatchup || multiShootDelay < steadyShootDelay {
 			dmgResults[OptionMulti] = hunter.avgMultiDmg -
 				(hunter.avgShootDmg * shootRate * multiShootDelay)
 			if canWeave {
@@ -227,21 +221,8 @@ func (hunter *Hunter) adaptiveRotation(sim *core.Simulation, followsRangedAuto b
 	canArcane := hunter.Rotation.UseArcaneShot && hunter.CDReadyAt(ArcaneShotCooldownID) <= hunter.NextGCDAt()
 	if canArcane {
 		arcaneShootDelay := core.MaxFloat(0, gcdAt-shootAt)
-
-		// Since steady is higher damage than arcane we need to subtract that difference too.
-		// The only times we'll ever use arcane shot is if another auto will follow
-		// before the steady shot, so we don't subtract the full steady damage because
-		// its only being partially delayed.
-		oldSteadyTime := shootDoneAt
-		newSteadyTime := core.MaxFloat(gcdAt+1.5, shootDoneAt+arcaneShootDelay)
-		arcaneSteadyDelay := core.MaxFloat(0, newSteadyTime-oldSteadyTime)
-
-		// TODO: Add auto shoot dps compared to steady delay, and weaving?
-
-		// TODO: Wrong calc here
 		dmgResults[OptionArcane] = hunter.avgArcaneDmg -
-			(hunter.avgShootDmg * shootRate * arcaneShootDelay) -
-			(hunter.avgSteadyDmg * gcdRate * arcaneSteadyDelay)
+			(hunter.avgShootDmg * shootRate * arcaneShootDelay)
 		if canWeave {
 			arcaneWeaveDelay := core.MaxFloat(0, gcdAt-weaveAt)
 			dmgResults[OptionArcane] = hunter.avgWeaveDmg * weaveRate * arcaneWeaveDelay
@@ -267,9 +248,9 @@ func (hunter *Hunter) adaptiveRotation(sim *core.Simulation, followsRangedAuto b
 		}
 	}
 
-	if sim.Log != nil {
-		hunter.Log(sim, "Choosing option: %d, %s, shoot: %0.01f, weave: %0.01f, ss: %0.01f, ms: %0.01f, as: %0.01f", bestOption, bestOptionAt, dmgResults[0], dmgResults[1], dmgResults[2], dmgResults[3], dmgResults[4])
-	}
+	//if sim.Log != nil {
+	//	hunter.Log(sim, "Choosing option: %d, %s, shoot: %0.01f, weave: %0.01f, ss: %0.01f, ms: %0.01f, as: %0.01f", bestOption, bestOptionAt, dmgResults[0], dmgResults[1], dmgResults[2], dmgResults[3], dmgResults[4])
+	//}
 
 	hunter.nextAction = bestOption
 	hunter.nextActionAt = bestOptionAt

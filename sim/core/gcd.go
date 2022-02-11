@@ -92,7 +92,7 @@ func (character *Character) WaitUntil(sim *Simulation, readyTime time.Duration) 
 
 func (character *Character) HardcastWaitUntil(sim *Simulation, readyTime time.Duration, cast *Cast) {
 	if character.Hardcast.Expires > sim.CurrentTime {
-		panic("Hardcast already in use")
+		panic("Hardcast already in use, will finish at: " + character.Hardcast.Expires.String())
 	}
 
 	character.Hardcast.Expires = readyTime
