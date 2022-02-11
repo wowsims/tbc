@@ -10,13 +10,22 @@ type Paladin struct {
 	core.Character
 
 	Talents proto.PaladinTalents
-
+	
+	// maybe I should make this a pointer instead so I can nil check for no active seal
 	currentSeal core.Aura
+
+	sealOfBlood            core.SimpleCast
+	sealOfCommand          core.SimpleCast
+	sealOfTheCrusader      core.SimpleCast
 
 	crusaderStrikeTemplate core.MeleeAbilityTemplate
 	crusaderStrikeSpell    core.ActiveMeleeAbility
-	sealOfBlood            core.SimpleCast
-	sealOfCommand          core.SimpleCast
+
+	judgementOfBloodTemplate core.SimpleSpellTemplate
+	judgementOfBloodSpell    core.SimpleSpell
+
+	judgementOfTheCrusaderTemplate core.SimpleSpellTemplate
+	judgementOfTheCrusaderSpell    core.SimpleSpell
 }
 
 // Implemented by each Paladin spec.
@@ -39,9 +48,12 @@ func (paladin *Paladin) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {
 
 func (paladin *Paladin) Init(sim *core.Simulation) {
 	paladin.crusaderStrikeTemplate = paladin.newCrusaderStrikeTemplate(sim)
+	paladin.judgementOfBloodTemplate = paladin.newJudgementOfBloodTemplate(sim)
+	paladin.judgementOfTheCrusaderTemplate = paladin.newJudgementOfTheCrusaderTemplate(sim)
 }
 
 func (paladin *Paladin) Reset(sim *core.Simulation) {
+	paladin.currentSeal.Expires = sim.CurrentTime
 }
 
 // maybe need to add stat dependencies
@@ -53,8 +65,34 @@ func NewPaladin(character core.Character, talents proto.PaladinTalents) *Paladin
 
 	paladin.EnableManaBar()
 
+	// Add paladin stat dependencies
+	paladin.AddStatDependency(stats.StatDependency{
+		SourceStat:   stats.Intellect,
+		ModifiedStat: stats.SpellCrit,
+		Modifier: func(intellect float64, spellCrit float64) float64 {
+			return spellCrit + (intellect/80)*core.SpellCritRatingPerCritChance
+		},
+	})
+
+	paladin.AddStatDependency(stats.StatDependency{
+		SourceStat:   stats.Strength,
+		ModifiedStat: stats.AttackPower,
+		Modifier: func(strength float64, attackPower float64) float64 {
+			return attackPower + strength*2
+		},
+	})
+
+	paladin.AddStatDependency(stats.StatDependency{
+		SourceStat:   stats.Agility,
+		ModifiedStat: stats.MeleeCrit,
+		Modifier: func(agility float64, meleeCrit float64) float64 {
+			return meleeCrit + (agility/25)*core.MeleeCritRatingPerCritChance
+		},
+	})
+
 	paladin.setupSealOfBlood()
 	paladin.setupSealOfCommand()
+	paladin.setupSealOfTheCrusader()
 
 	return paladin
 }
@@ -66,8 +104,9 @@ func init() {
 		stats.Stamina:   118,
 		stats.Intellect: 87,
 		stats.Spirit:    88,
-		stats.Mana:      3978, // pretty sure I need to subtract mana from the int stat
-
-		stats.AttackPower: 120,
+		stats.Mana:      2953,
+		stats.SpellCrit:   139.76,
+		stats.AttackPower: 190,
+		stats.MeleeCrit:   77.06,
 	}
 }

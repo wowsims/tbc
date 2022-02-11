@@ -63,7 +63,68 @@ func (ret *RetributionPaladin) OnManaTick(sim *core.Simulation) {
 }
 
 func (ret *RetributionPaladin) tryUseGCD(sim *core.Simulation) {
+	ret._2007Rotation(sim)
+}
+
+func (ret *RetributionPaladin) _2007Rotation(sim *core.Simulation) {
 	target := sim.GetPrimaryTarget()
+
+	// judge blood whenever we can
+	if !ret.IsOnCD(paladin.JudgementCD, sim.CurrentTime) {
+		judge := ret.NewJudgement(sim, target)
+		if judge != nil {
+			if success := judge.Cast(sim); !success {
+				ret.WaitForMana(sim, judge.GetManaCost())
+			}
+		}
+	}
+
+	// roll seal of blood
+	if !ret.HasAura(paladin.SealOfBloodAuraID) {
+		sob := ret.NewSealOfBlood(sim)
+		if success := sob.StartCast(sim); !success {
+			ret.WaitForMana(sim, sob.GetManaCost())
+		}
+		return
+	}
+
+	// Crusader strike if we can
+	if !ret.IsOnCD(paladin.CrusaderStrikeCD, sim.CurrentTime) {
+		cs := ret.NewCrusaderStrike(sim, target)
+		if success := cs.Attack(sim); !success {
+			ret.WaitForMana(sim, cs.Cost.Value)
+		}
+		return
+	}
+
+	// Proceed until SoB expires or CrusaderStrike comes off GCD
+	crusaderStrikeCD := ret.CDReadyAt(paladin.CrusaderStrikeCD)
+	sobExpiration := sim.CurrentTime + ret.RemainingAuraDuration(sim, paladin.SealOfBloodAuraID)
+	nextEventAt := core.MinDuration(crusaderStrikeCD, sobExpiration)
+	ret.WaitUntil(sim, nextEventAt)
+}
+
+func (ret *RetributionPaladin) testingMechanics(sim *core.Simulation) {
+	target := sim.GetPrimaryTarget()
+
+	// If judgement is not on the target and seal of crusader not active
+	if !target.HasAura(core.ImprovedSealOfTheCrusaderDebuffID) && !ret.HasAura(paladin.SealOfTheCrusaderAuraID) {
+		sotc := ret.NewSealOfTheCrusader(sim)
+		if success := sotc.StartCast(sim); !success {
+			ret.WaitForMana(sim, sotc.GetManaCost())
+		}
+		return
+	}
+
+	// Judgement is not on the GCD so just cast it I guess
+	if !ret.IsOnCD(paladin.JudgementCD, sim.CurrentTime) {
+		judge := ret.NewJudgement(sim, target)
+		if judge != nil {
+			if success := judge.Cast(sim); !success {
+				ret.WaitForMana(sim, judge.GetManaCost())
+			}
+		}
+	}
 	
 	// check if we can use crusader strike
 	if !ret.IsOnCD(paladin.CrusaderStrikeCD, sim.CurrentTime) {
@@ -74,37 +135,44 @@ func (ret *RetributionPaladin) tryUseGCD(sim *core.Simulation) {
 		return
 	}
 
-	tts := ret.AutoAttacks.MainhandSwingAt - sim.CurrentTime
+	// if !ret.HasAura(paladin.SealOfBloodAuraID) {
+	// 	sob := ret.NewSealOfBlood(sim)
+	// 	if success := sob.StartCast(sim); !success {
+	// 		ret.WaitForMana(sim, sob.GetManaCost())
+	// 	}
+	// 	return
+	// }
 
-	if ret.HasAura(paladin.SealOfCommandAuraID) {
-		// maybe do a mana check first to make sure we don't twist when we don't have mana
-		if tts <= paladin.TwistWindow {
-			sob := ret.NewSealOfBlood(sim)
+	// tts := ret.AutoAttacks.MainhandSwingAt - sim.CurrentTime
 
-			// this is probably not the behaviour we want for not being able to twist
-			if success := sob.StartCast(sim); !success {
-				ret.WaitForMana(sim, sob.GetManaCost())
-			}
-			return
-		} else {
-			ret.WaitUntil(sim, ret.AutoAttacks.MainhandSwingAt - paladin.TwistWindow)
-		}
-	} else if tts > ret.SpellGCD() {
-		soc := ret.NewSealOfCommand(sim)
-		if success := soc.StartCast(sim); !success {
-			ret.WaitForMana(sim, soc.GetManaCost())
-		}
-		return
-	} else if !ret.HasAura(paladin.SealOfBloodAuraID) {
-		sob := ret.NewSealOfBlood(sim)
-		if success := sob.StartCast(sim); !success {
-			ret.WaitForMana(sim, sob.GetManaCost())
-		}
-		return
-	}
+	// if ret.HasAura(paladin.SealOfCommandAuraID) {
+	// 	// maybe do a mana check first to make sure we don't twist when we don't have mana
+	// 	if tts <= paladin.TwistWindow {
+	// 		sob := ret.NewSealOfBlood(sim)
 
+	// 		// this is probably not the behaviour we want for not being able to twist
+	// 		if success := sob.StartCast(sim); !success {
+	// 			ret.WaitForMana(sim, sob.GetManaCost())
+	// 		}
+	// 		return
+	// 	} else {
+	// 		ret.WaitUntil(sim, ret.AutoAttacks.MainhandSwingAt - paladin.TwistWindow)
+	// 	}
+	// } else if tts > ret.SpellGCD() {
+	// 	soc := ret.NewSealOfCommand(sim)
+	// 	if success := soc.StartCast(sim); !success {
+	// 		ret.WaitForMana(sim, soc.GetManaCost())
+	// 	}
+	// 	return
+	// } else if !ret.HasAura(paladin.SealOfBloodAuraID) {
+	// 	sob := ret.NewSealOfBlood(sim)
+	// 	if success := sob.StartCast(sim); !success {
+	// 		ret.WaitForMana(sim, sob.GetManaCost())
+	// 	}
+	// 	return
+	// }
 
-	// probably should check for the min of crusader strike CD or SoB expiration
+	// bad logic here
 	nextEventAt := ret.CDReadyAt(paladin.CrusaderStrikeCD)
 	ret.WaitUntil(sim, nextEventAt)
 }

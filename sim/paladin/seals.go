@@ -160,25 +160,62 @@ func (paladin *Paladin) NewSealOfCommand(sim *core.Simulation) *core.SimpleCast 
 	return soc
 }
 
+var SealOfTheCrusaderAuraID = core.NewAuraID()
+var SealOfTheCrusaderActionID = core.ActionID{SpellID: 27158}
+
+// Seal of the crusader has a bunch of effects that we realistically don't care about (bonus AP, faster swing speed)
+// For now, we'll just use it as a setup to casting Judgement of the Crusader
+func (paladin *Paladin) setupSealOfTheCrusader() {
+	sotcAura := core.Aura{
+		ID:       SealOfTheCrusaderAuraID,
+		ActionID: SealOfTheCrusaderActionID,
+	}
+
+	sotc := core.SimpleCast{
+		Cast: core.Cast{
+			ActionID:  SealOfTheCrusaderActionID,
+			Character: paladin.GetCharacter(),
+			ManaCost:  210,
+			GCD:       core.GCDDefault,
+		},
+		OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
+			sotcAura.Expires = sim.CurrentTime + time.Second * 30
+			paladin.UpdateSeal(sim, sotcAura)
+		},
+	}
+
+	paladin.sealOfTheCrusader = sotc
+}
+
+func (paladin *Paladin) NewSealOfTheCrusader(sim *core.Simulation) *core.SimpleCast {
+	sotc := &paladin.sealOfTheCrusader
+	sotc.Init(sim)
+	return sotc
+}
+
+
 func (paladin *Paladin) UpdateSeal(sim *core.Simulation, newSeal core.Aura) {
 	oldSeal := paladin.currentSeal
 
-	// For Seal of Command, reduce duration to 0.4 seconds
-	if oldSeal.ID == SealOfCommandAuraID {
-		// Technically the current expiration could be shorter than 0.4 seconds
-		// TO-DO: Lookup behavior when seal of command is twisted at shorter than 0.4 seconds duration
-		oldSeal.Expires = sim.CurrentTime + TwistWindow 
-		paladin.ReplaceAura(sim, oldSeal)
+	// Check if oldSeal has expired. If it already expired, we don't need to handle removal logic
+	if oldSeal.Expires > sim.CurrentTime {
+		// For Seal of Command, reduce duration to 0.4 seconds
+		if oldSeal.ID == SealOfCommandAuraID {
+			// Technically the current expiration could be shorter than 0.4 seconds
+			// TO-DO: Lookup behavior when seal of command is twisted at shorter than 0.4 seconds duration
+			oldSeal.Expires = sim.CurrentTime + TwistWindow 
+			paladin.ReplaceAura(sim, oldSeal)
 
-		// This is a hack to get the sim to process and log the SoC aura expiring at the right time
-		if (sim.Options.Iterations == 1) {
-			sim.AddPendingAction(&core.PendingAction{
-				NextActionAt:sim.CurrentTime + TwistWindow, 
-				OnAction: func(_ *core.Simulation) {},
-			})
+			// This is a hack to get the sim to process and log the SoC aura expiring at the right time
+			if (sim.Options.Iterations == 1) {
+				sim.AddPendingAction(&core.PendingAction{
+					NextActionAt:sim.CurrentTime + TwistWindow, 
+					OnAction: func(_ *core.Simulation) {},
+				})
+			}
+		} else {
+			paladin.RemoveAura(sim, oldSeal.ID)
 		}
-	} else {
-		paladin.RemoveAura(sim, oldSeal.ID)
 	}
 
 	paladin.currentSeal = newSeal

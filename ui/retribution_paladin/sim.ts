@@ -33,6 +33,7 @@ export class RetributionPaladinSimUI extends IndividualSimUI<Spec.SpecRetributio
 			cssClass: 'retribution-paladin-sim-ui',
 			// List any known bugs / issues here and they'll be shown on the site.
 			knownIssues: [
+				"Basically everything is WIP"
 			],
 
 			// All stats for which EP should be calculated.
@@ -53,12 +54,18 @@ export class RetributionPaladinSimUI extends IndividualSimUI<Spec.SpecRetributio
 				Stat.StatStamina,
 				Stat.StatStrength,
 				Stat.StatAgility,
+				Stat.StatIntellect,
 				Stat.StatAttackPower,
-				Stat.StatExpertise,
 				Stat.StatMeleeHit,
 				Stat.StatMeleeCrit,
 				Stat.StatMeleeHaste,
+				Stat.StatExpertise,
 				Stat.StatArmorPenetration,
+				Stat.StatSpellPower,
+				Stat.StatNatureSpellPower,
+				Stat.StatSpellHit,
+				Stat.StatSpellCrit,
+				Stat.StatSpellHaste,
 			],
 
 			defaults: {
@@ -85,23 +92,12 @@ export class RetributionPaladinSimUI extends IndividualSimUI<Spec.SpecRetributio
 				specOptions: Presets.DefaultOptions,
 				// Default raid/party buffs settings.
 				raidBuffs: RaidBuffs.create({
-					giftOfTheWild: TristateEffect.TristateEffectImproved,
 				}),
 				partyBuffs: PartyBuffs.create({
-					drums: Drums.DrumsOfBattle,
-					bloodlust: 1,
-					strengthOfEarthTotem: StrengthOfEarthType.EnhancingAndCyclone,
-					windfuryTotemRank: 5,
 				}),
 				individualBuffs: IndividualBuffs.create({
-					blessingOfKings: true,
-					blessingOfMight: TristateEffect.TristateEffectImproved,
-					innervates: 1,
 				}),
 				debuffs: Debuffs.create({
-					bloodFrenzy: true,
-					curseOfRecklessness: true,
-					exposeArmor: TristateEffect.TristateEffectRegular
 				}),
 			},
 
